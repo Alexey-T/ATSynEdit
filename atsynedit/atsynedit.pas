@@ -316,7 +316,8 @@ type
     FShowCurColumn: boolean;
     //
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem;
-      var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer);
+      var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
+  AColorBG: TColor);
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);
@@ -1265,7 +1266,9 @@ begin
       Delete(StrOut, 1, NOutputCharsSkipped);
       Delete(StrOut, cMaxCharsForOutput, MaxInt);
 
-      DoCalcLineHilite(WrapItem, Parts, NOutputCharsSkipped, Length(StrOut));
+      DoCalcLineHilite(WrapItem, Parts, NOutputCharsSkipped, Length(StrOut),
+        IfThen(BmColor<>clNone, BmColor, FColorTextBG));
+
       CanvasTextOut(C,
         CurrPoint.X - AScrollHorz.NPos*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
         CurrPoint.Y,

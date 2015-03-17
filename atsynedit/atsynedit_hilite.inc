@@ -1,7 +1,8 @@
 {$ifdef nnn}begin end;{$endif}
 
 procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
-  var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer);
+  var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
+  AColorBG: TColor);
 var
   nIndex, i: integer;
   bSel, bSelPrev, bAdd: boolean;
@@ -47,7 +48,7 @@ begin
         else
         begin
           Color:= FColorTextFont;//random($ffff);
-          ColorBG:= FColorTextBG;
+          ColorBG:= AColorBG;
         end;
       end;
     end;
