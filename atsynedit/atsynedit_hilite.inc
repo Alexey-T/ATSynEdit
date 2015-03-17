@@ -1,6 +1,7 @@
 {$ifdef nnn}begin end;{$endif}
 
-procedure TATSynEdit.DoCalcLineHilite(var AParts: TATLineParts; const AItem: TATSynWrapItem);
+procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
+  var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer);
 var
   nIndex, i: integer;
   bSel, bSelPrev, bAdd: boolean;
@@ -13,12 +14,12 @@ begin
 
   //we have string for this call not only part of Strings.Lines[i] but
   //with StringOfChar(' ', NIndent) added
-  for i:= 0 to AItem.NLength-1+AItem.NIndent do
+  for i:= 0 to Min(ACharsMax, AItem.NLength-1+AItem.NIndent-ACharsSkipped) do
   begin
-    if i<AItem.NIndent then
+    if i<AItem.NIndent-ACharsSkipped then
       bSel:= false
     else
-      bSel:= IsPosSelected(AItem.NCharIndex-1-AItem.NIndent+i, AItem.NLineIndex);
+      bSel:= IsPosSelected(AItem.NCharIndex-1-AItem.NIndent+i+ACharsSkipped, AItem.NLineIndex);
 
     if nIndex<0 then
       bAdd:= true
@@ -40,12 +41,12 @@ begin
         Len:= 1;
         if bSel then
         begin
-          Color:= clHighlightText;//random($ffff);//clHighlightText;
-          ColorBG:= clHighlight;
+          Color:= FColorTextSel;//random($ffff);
+          ColorBG:= FColorTextSelBG;
         end
         else
         begin
-          Color:= Font.Color;//random($ffff);//Font.Color;
+          Color:= FColorTextFont;//random($ffff);
           ColorBG:= FColorTextBG;
         end;
       end;

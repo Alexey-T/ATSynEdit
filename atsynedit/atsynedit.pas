@@ -264,6 +264,8 @@ type
     FGutterBandFold: integer;
     FColorTextFont: TColor;
     FColorTextBG: TColor;
+    FColorTextSel: TColor;
+    FColorTextSelBG: TColor;
     FColorCaret: TColor;
     FColorGutterFont: TColor;
     FColorGutterBG: TColor;
@@ -313,8 +315,8 @@ type
     FShowCurLine: boolean;
     FShowCurColumn: boolean;
     //
-    procedure DoCalcLineHilite(var AParts: TATLineParts; const AItem: TATSynWrapItem
-      );
+    procedure DoCalcLineHilite(const AItem: TATSynWrapItem;
+      var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer);
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);
@@ -1263,8 +1265,7 @@ begin
       Delete(StrOut, 1, NOutputCharsSkipped);
       Delete(StrOut, cMaxCharsForOutput, MaxInt);
 
-      DoCalcLineHilite(Parts, WrapItem);
-
+      DoCalcLineHilite(WrapItem, Parts, NOutputCharsSkipped, Length(StrOut));
       CanvasTextOut(C,
         CurrPoint.X - AScrollHorz.NPos*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
         CurrPoint.Y,
@@ -1615,6 +1616,8 @@ begin
 
   FColorTextBG:= cInitColorTextBG;
   FColorTextFont:= cInitColorTextFont;
+  FColorTextSel:= clHighlightText;
+  FColorTextSelBG:= clHighlight;
   FColorCaret:= cInitColorCaret;
   FColorGutterFont:= cInitColorGutterFont;
   FColorGutterBG:= cInitColorGutterBG;

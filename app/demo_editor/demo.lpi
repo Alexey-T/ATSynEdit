@@ -125,7 +125,6 @@
       <Unit20>
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Unit1"/>
       </Unit20>
     </Units>
   </ProjectOptions>
