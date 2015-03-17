@@ -11,7 +11,7 @@ type
   TATSynCaretItem = class
     PosX, PosY,
     CoordX, CoordY,
-    SelLen: integer;
+    EndX, EndY: integer;
   end;
 
 type
@@ -39,7 +39,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATSynCaretItem read GetItem; default;
-    procedure Add(APosX, APosY, ASelLen: integer);
+    procedure Add(APosX, APosY: integer);
     procedure Sort;
     procedure Assign(Obj: TATSynCarets);
     function IndexOfPosXY(APosX, APosY: integer): integer;
@@ -102,7 +102,7 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATSynCarets.Add(APosX, APosY, ASelLen: integer);
+procedure TATSynCarets.Add(APosX, APosY: integer);
 var
   Item: TATSynCaretItem;
 begin
@@ -111,7 +111,6 @@ begin
   Item.PosY:= APosY;
   Item.CoordX:= -1;
   Item.CoordY:= -1;
-  Item.SelLen:= ASelLen;
   FList.Add(Item);
 end;
 
@@ -153,7 +152,7 @@ var
 begin
   Clear;
   for i:= 0 to Obj.Count-1 do
-    Add(Obj[i].PosX, Obj[i].PosY, Obj[i].SelLen);
+    Add(Obj[i].PosX, Obj[i].PosY);
 end;
 
 function TATSynCarets.IndexOfPosXY(APosX, APosY: integer): integer;

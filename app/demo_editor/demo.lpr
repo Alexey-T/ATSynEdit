@@ -7,8 +7,9 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, formmain, ATSynEdit, ATStrings, ATStringProc, ATCanvasProc,
-  atsynedit_commands, ATSynCarets, ATKeyMapping, formkey;
+  Forms, formmain, formkey, atcanvasproc, atkeymapping, atstringproc,
+  atstringproc_wordjump, atstrings, atsyncarets, atsynedit, atsynedit_commands,
+  atsynedit_keymapping;
 
 {$R *.res}
 

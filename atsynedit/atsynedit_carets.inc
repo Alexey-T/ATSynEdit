@@ -11,7 +11,7 @@ begin
       Carets.Delete(N);
   end
   else
-    Carets.Add(Pnt.X, Pnt.Y, 0);
+    Carets.Add(Pnt.X, Pnt.Y);
 end;
 
 procedure TATSynEdit.DoCaretsColumnToPoint(const PntTo: TPoint);
@@ -36,18 +36,18 @@ begin
   Carets.Clear;
   P:= ClientPosToCaretPos(PM1);
   if P.Y>=0 then
-    Carets.Add(P.X, P.Y, 0);
+    Carets.Add(P.X, P.Y);
 
   repeat
     Inc(PM1.Y, FCharSize.Y);
     P:= ClientPosToCaretPos(PM1);
     if P.Y>=0 then
       if not Carets.IsLineListed(P.Y) then
-        Carets.Add(P.X, P.Y, 0);
+        Carets.Add(P.X, P.Y);
   until PM1.Y>=PM2.Y;
 
   if Carets.Count=0 then
-    Carets.Add(PntTo.X, PntTo.Y, 0);
+    Carets.Add(PntTo.X, PntTo.Y);
 end;
 
 procedure TATSynEdit.DoCaretsSort;

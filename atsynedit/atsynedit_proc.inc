@@ -15,3 +15,15 @@ begin
     (Info1.NPage=Info2.NPage);
 end;
 
+procedure _InitCarets(var C: TATSynCarets);
+var
+  i: integer;
+begin
+  for i:= 0 to C.Count-1 do
+    with C[i] do
+    begin
+      EndY:= PosY;
+      EndX:= PosX+4;
+    end;
+end;
+

@@ -45,81 +45,91 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
-        <Filename Value="..\..\comp\atsynedit\atsynedit.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="..\..\comp\atsynedit\atstrings.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="..\..\comp\atsynedit\atstringproc.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="..\..\comp\atsynedit\atcanvasproc.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_cmd_handler.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_cmd_keys.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_commands.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_carets.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="..\..\comp\atsynedit\atsyncarets.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit10>
-      <Unit11>
-        <Filename Value="..\..\comp\atsynedit\atkeymapping.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_proc.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit12>
-      <Unit13>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_keymapping.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit13>
-      <Unit14>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_cmd_clipboard.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit14>
-      <Unit15>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_cmd_editing.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit15>
-      <Unit16>
-        <Filename Value="..\..\comp\atsynedit\atstrings_editing.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit16>
-      <Unit17>
-        <Filename Value="..\..\comp\atsynedit\atstringproc_wordjump.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit17>
-      <Unit18>
         <Filename Value="formkey.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="fmKey"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="..\..\atsynedit\atstrings_editing.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\..\atsynedit\atsynedit_carets.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\..\atsynedit\atsynedit_cmd_clipboard.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\..\atsynedit\atsynedit_cmd_editing.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\..\atsynedit\atsynedit_cmd_handler.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\..\atsynedit\atsynedit_cmd_keys.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="..\..\atsynedit\atsynedit_cmd_misc.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\..\atsynedit\atsynedit_proc.inc"/>
+        <IsPartOfProject Value="True"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\atsynedit\atcanvasproc.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="atcanvasproc"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\..\atsynedit\atkeymapping.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="atkeymapping"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\..\atsynedit\atstringproc.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="atstringproc"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="atstringproc_wordjump"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="..\..\atsynedit\atstrings.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="atstrings"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="..\..\atsynedit\atsyncarets.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynCarets"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="..\..\atsynedit\atsynedit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit"/>
+      </Unit17>
+      <Unit18>
+        <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="atsynedit_commands"/>
       </Unit18>
       <Unit19>
-        <Filename Value="..\..\comp\atsynedit\atsynedit_cmd_misc.inc"/>
+        <Filename Value="..\..\atsynedit\atsynedit_keymapping.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="atsynedit_keymapping"/>
       </Unit19>
     </Units>
   </ProjectOptions>
@@ -130,7 +140,7 @@
       <Filename Value="demo"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir);..\..\comp\atsynedit"/>
+      <IncludeFiles Value="$(ProjOutDir);..\..\comp\atsynedit;..\..\atsynedit"/>
       <OtherUnitFiles Value="..\..\atsynedit"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>

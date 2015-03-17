@@ -12,6 +12,7 @@ type
   { TfmMain }
   TfmMain = class(TForm)
     bFont: TButton;
+    chkGutterStat: TCheckBox;
     chkCurCol: TCheckBox;
     chkCurLine: TCheckBox;
     chkGutterNum: TCheckBox;
@@ -87,6 +88,7 @@ type
     procedure chkGutterBmChange(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
     procedure chkGutterNumChange(Sender: TObject);
+    procedure chkGutterStatChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
@@ -288,6 +290,7 @@ begin
   chkGutter.Checked:= edit.OptGutterVisible;
   chkGutterBm.Checked:= edit.Gutter[edit.GutterBandBm].Visible;
   chkGutterNum.Checked:= edit.Gutter[edit.GutterBandNum].Visible;
+  chkGutterStat.Checked:= edit.Gutter[edit.GutterBandState].Visible;
   chkRuler.Checked:= edit.OptRulerVisible;
   chkMinimap.Checked:= edit.OptMinimapVisible;
   chkMicromap.Checked:= edit.OptMicromapVisible;
@@ -406,7 +409,7 @@ var
 begin
   for j:= 1 to 40 do
     for i:= 1 to 100 do
-      edit.Carets.Add(i, j, 0);
+      edit.Carets.Add(i, j);
   edit.Carets.Sort;
   edit.Update;
   UpdateStatus;
@@ -476,6 +479,14 @@ procedure TfmMain.chkGutterNumChange(Sender: TObject);
 begin
   if wait then Exit;
   edit.Gutter[edit.GutterBandNum].Visible:= chkGutterNum.Checked;
+  edit.Gutter.Update;
+  edit.Update;
+end;
+
+procedure TfmMain.chkGutterStatChange(Sender: TObject);
+begin
+  if wait then Exit;
+  edit.Gutter[edit.GutterBandState].Visible:= chkGutterStat.Checked;
   edit.Gutter.Update;
   edit.Update;
 end;

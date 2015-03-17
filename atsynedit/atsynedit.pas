@@ -1136,6 +1136,9 @@ begin
 
   UpdateWrapInfo;
 
+  //debug
+  _InitCarets(FCarets);
+
   if FRulerVisible then
     DoPaintRulerTo(C);
   DoPaintTextTo(C, FRectMain, FCharSize, FGutterVisible, FUnprintedVisible, FScrollHorz, FScrollVert);
@@ -1325,11 +1328,12 @@ begin
       end;
 
       //draw line state
-      case Strings.LinesState[WrapItem.NLineIndex] of
-        cLineStateChanged: DoPaintState(NCoordTop, FColorStateChanged);
-        cLineStateAdded: DoPaintState(NCoordTop, FColorStateAdded);
-        cLineStateSaved: DoPaintState(NCoordTop, FColorStateSaved);
-      end;
+      if FGutter[FGutterBandState].Visible then
+        case Strings.LinesState[WrapItem.NLineIndex] of
+          cLineStateChanged: DoPaintState(NCoordTop, FColorStateChanged);
+          cLineStateAdded: DoPaintState(NCoordTop, FColorStateAdded);
+          cLineStateSaved: DoPaintState(NCoordTop, FColorStateSaved);
+        end;
     end;
 
     //end of painting line
@@ -1592,7 +1596,7 @@ begin
   Font.Size:= 9;
 
   FCarets:= TATSynCarets.Create;
-  FCarets.Add(0, 0, 0);
+  FCarets.Add(0, 0);
   FCaretShown:= false;
   FCaretShape:= cInitCaretShape;
   FCaretShapeOvr:= cCaretShapeFull;
@@ -1737,7 +1741,7 @@ begin
   DoPaintModeStatic;
 
   FCarets.Clear;
-  FCarets.Add(0, 0, 0);
+  FCarets.Add(0, 0);
 
   Strings.Clear;
   FWrapInfo.Clear;
@@ -2024,7 +2028,7 @@ begin
     if Shift=[ssLeft] then
     begin
       FCarets.Clear;
-      FCarets.Add(Pnt.X, Pnt.Y, 0);
+      FCarets.Add(Pnt.X, Pnt.Y);
     end;
 
     if Shift=[ssLeft, ssCtrl] then
@@ -2042,7 +2046,7 @@ begin
       if FCaretMoveByRtClick then
       begin
         FCarets.Clear;
-        FCarets.Add(Pnt.X, Pnt.Y, 0);
+        FCarets.Add(Pnt.X, Pnt.Y);
       end;
     end;
   end;

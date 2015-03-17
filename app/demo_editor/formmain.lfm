@@ -55,7 +55,7 @@ object fmMain: TfmMain
       Width = 44
       Caption = 'ruler'
       OnChange = chkRulerChange
-      TabOrder = 4
+      TabOrder = 5
     end
     object chkMinimap: TCheckBox
       Left = 8
@@ -64,7 +64,7 @@ object fmMain: TfmMain
       Width = 68
       Caption = 'minimap'
       OnChange = chkMinimapChange
-      TabOrder = 5
+      TabOrder = 6
     end
     object edSpaceX: TSpinEdit
       Left = 8
@@ -74,7 +74,7 @@ object fmMain: TfmMain
       MaxValue = 10
       MinValue = -5
       OnChange = edSpaceXChange
-      TabOrder = 10
+      TabOrder = 11
     end
     object Label1: TLabel
       Left = 67
@@ -100,7 +100,7 @@ object fmMain: TfmMain
       MaxValue = 200
       MinValue = 20
       OnChange = edMarRtChange
-      TabOrder = 12
+      TabOrder = 13
       Value = 80
     end
     object gWrap: TGroupBox
@@ -111,7 +111,7 @@ object fmMain: TfmMain
       Caption = 'wrap'
       ClientHeight = 84
       ClientWidth = 124
-      TabOrder = 13
+      TabOrder = 14
       object chkWrapOff: TRadioButton
         Left = 8
         Height = 19
@@ -152,10 +152,10 @@ object fmMain: TfmMain
       end
     end
     object edNum: TComboBox
-      Left = 24
+      Left = 16
       Height = 23
       Top = 48
-      Width = 112
+      Width = 120
       ItemHeight = 15
       Items.Strings = (
         'all'
@@ -166,7 +166,7 @@ object fmMain: TfmMain
       )
       OnChange = edNumChange
       Style = csDropDownList
-      TabOrder = 3
+      TabOrder = 4
     end
     object edFontsize: TSpinEdit
       Left = 8
@@ -176,7 +176,7 @@ object fmMain: TfmMain
       MaxValue = 40
       MinValue = 6
       OnChange = edFontsizeChange
-      TabOrder = 8
+      TabOrder = 9
       Value = 12
     end
     object Label4: TLabel
@@ -195,7 +195,7 @@ object fmMain: TfmMain
       Caption = 'unprintable'
       ClientHeight = 108
       ClientWidth = 124
-      TabOrder = 14
+      TabOrder = 15
       object chkUnprintVis: TCheckBox
         Left = 8
         Height = 19
@@ -250,7 +250,7 @@ object fmMain: TfmMain
       MaxValue = 12
       MinValue = 1
       OnChange = edTabsizeChange
-      TabOrder = 9
+      TabOrder = 10
       Value = 8
     end
     object Label5: TLabel
@@ -268,7 +268,7 @@ object fmMain: TfmMain
       Width = 73
       Caption = 'font...'
       OnClick = bFontClick
-      TabOrder = 7
+      TabOrder = 8
     end
     object chkMicromap: TCheckBox
       Left = 8
@@ -277,7 +277,7 @@ object fmMain: TfmMain
       Width = 75
       Caption = 'micromap'
       OnChange = chkMicromapChange
-      TabOrder = 6
+      TabOrder = 7
     end
     object edSpaceY: TSpinEdit
       Left = 8
@@ -287,7 +287,7 @@ object fmMain: TfmMain
       MaxValue = 10
       MinValue = -5
       OnChange = edSpaceYChange
-      TabOrder = 11
+      TabOrder = 12
     end
     object Label6: TLabel
       Left = 67
@@ -305,7 +305,7 @@ object fmMain: TfmMain
       Caption = 'carets'
       ClientHeight = 80
       ClientWidth = 124
-      TabOrder = 15
+      TabOrder = 16
       object edCaretSh: TComboBox
         Left = 4
         Height = 23
@@ -369,7 +369,7 @@ object fmMain: TfmMain
       end
     end
     object chkGutterBm: TCheckBox
-      Left = 24
+      Left = 14
       Height = 19
       Top = 28
       Width = 38
@@ -378,7 +378,7 @@ object fmMain: TfmMain
       TabOrder = 1
     end
     object chkGutterNum: TCheckBox
-      Left = 72
+      Left = 56
       Height = 19
       Top = 28
       Width = 45
@@ -393,7 +393,7 @@ object fmMain: TfmMain
       Width = 59
       Caption = 'cur line'
       OnChange = chkCurLineChange
-      TabOrder = 16
+      TabOrder = 17
     end
     object chkCurCol: TCheckBox
       Left = 144
@@ -402,7 +402,16 @@ object fmMain: TfmMain
       Width = 56
       Caption = 'cur col'
       OnChange = chkCurColChange
-      TabOrder = 17
+      TabOrder = 18
+    end
+    object chkGutterStat: TCheckBox
+      Left = 104
+      Height = 19
+      Top = 28
+      Width = 39
+      Caption = 'stat'
+      OnChange = chkGutterStatChange
+      TabOrder = 3
     end
   end
   object OpenDialog1: TOpenDialog
