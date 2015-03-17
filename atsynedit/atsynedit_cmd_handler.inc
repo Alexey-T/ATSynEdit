@@ -81,10 +81,10 @@ begin
   DoCaretsSort;
   UpdateCaretsCoords;
 
-  if cResultCaretLeft in Res then DoMakeVisibleCaret(cEdgeLeft);
-  if cResultCaretRight in Res then DoMakeVisibleCaret(cEdgeRight);
-  if cResultCaretTop in Res then DoMakeVisibleCaret(cEdgeTop);
-  if cResultCaretBottom in Res then DoMakeVisibleCaret(cEdgeBottom);
+  if cResultCaretLeft in Res then DoShowCaret(cEdgeLeft);
+  if cResultCaretRight in Res then DoShowCaret(cEdgeRight);
+  if cResultCaretTop in Res then DoShowCaret(cEdgeTop);
+  if cResultCaretBottom in Res then DoShowCaret(cEdgeBottom);
 
   if Res*[cResultCaretAny,
     cResultCaretLeft, cResultCaretRight,

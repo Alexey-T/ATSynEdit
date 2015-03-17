@@ -462,19 +462,19 @@ type
     property GutterBandFold: integer read FGutterBandFold write FGutterBandFold;
     property KeyMapping: TATKeyMapping read FKeyMapping;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
+    property ModeOvr: boolean read FOvrMode write SetOvrMode;
+    property ModeOvrApplyForPaste: boolean read FOvrModeApplyForPaste write FOvrModeApplyForPaste;
+    property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     //files
     procedure LoadFromFile(const AFilename: string);
     procedure SaveToFile(const AFilename: string);
     //carets
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint): TPoint;
-    property ModeOvr: boolean read FOvrMode write SetOvrMode;
-    property ModeOvrApplyForPaste: boolean read FOvrModeApplyForPaste write FOvrModeApplyForPaste;
-    property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property Carets: TATSynCarets read FCarets;
     function IsLineWithCaret(ALine: integer): boolean;
-    procedure DoMakeVisiblePos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
-    procedure DoMakeVisibleCaret(AEdge: TATSynCaretEdge);
+    procedure DoShowPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
+    procedure DoShowCaret(AEdge: TATSynCaretEdge);
     procedure DoGotoPos(APnt: TPoint);
     //misc
     procedure DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
@@ -2127,6 +2127,10 @@ begin
     R.Top:= Item.CoordY;
     R.Right:= R.Left+FCharSize.X;
     R.Bottom:= R.Top+FCharSize.Y;
+
+    //caret not visible
+    if R.Left<0 then Continue;
+    if R.Top<0 then Continue;
 
     case Shape of
       cCaretShapeVert1px:       begin R.Right:= R.Left+1; end;

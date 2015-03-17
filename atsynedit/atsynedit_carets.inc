@@ -91,8 +91,8 @@ var
   i, NFromStart: integer;
   Str: atString;
 begin
-  Result.X:= ARect.Left;
-  Result.Y:= ARect.Top;
+  Result.X:= -1;
+  Result.Y:= -1;
 
   for i:= 0 to AWrapInfo.Count-1 do
   begin
@@ -220,7 +220,7 @@ begin
   DoPaintModeBlinking;
 end;
 
-procedure TATSynEdit.DoMakeVisiblePos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
+procedure TATSynEdit.DoShowPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
 var
   NIndex, NVisLines, NChars: integer;
 begin
@@ -258,9 +258,9 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoMakeVisibleCaret(AEdge: TATSynCaretEdge);
+procedure TATSynEdit.DoShowCaret(AEdge: TATSynCaretEdge);
 begin
-  DoMakeVisiblePos(Carets.CaretAtEdge(AEdge), cSizeScrollCaretHorz, cSizeScrollCaretVert);
+  DoShowPos(Carets.CaretAtEdge(AEdge), cSizeScrollCaretHorz, cSizeScrollCaretVert);
 end;
 
 procedure TATSynEdit.DoGotoPos(APnt: TPoint);
@@ -276,7 +276,7 @@ begin
     UpdateWrapInfo;
   end;
 
-  DoMakeVisiblePos(APnt, cSizeScrollGotoHorz, cSizeScrollGotoVert);
+  DoShowPos(APnt, cSizeScrollGotoHorz, cSizeScrollGotoVert);
   Update;
 end;
 

@@ -45,7 +45,6 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -89,32 +88,26 @@
       <Unit11>
         <Filename Value="..\..\atsynedit\atcanvasproc.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="atcanvasproc"/>
       </Unit11>
       <Unit12>
         <Filename Value="..\..\atsynedit\atkeymapping.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="atkeymapping"/>
       </Unit12>
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="atstringproc"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="atstringproc_wordjump"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="atstrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atsyncarets.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynCarets"/>
       </Unit16>
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
@@ -124,12 +117,10 @@
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="atsynedit_commands"/>
       </Unit18>
       <Unit19>
         <Filename Value="..\..\atsynedit\atsynedit_keymapping.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="atsynedit_keymapping"/>
       </Unit19>
     </Units>
   </ProjectOptions>
