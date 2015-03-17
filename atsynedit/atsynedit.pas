@@ -313,9 +313,8 @@ type
     FShowCurLine: boolean;
     FShowCurColumn: boolean;
     //
-    procedure DoCalcLineParts(const ALineNum: integer; var AParts: TATLineParts);
-    procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer;
-      const ARect: TRect);
+    procedure DoCalcLineHilite(var AParts: TATLineParts; const AItem: TATSynWrapItem
+      );
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);
@@ -355,6 +354,7 @@ type
     procedure DoEventState;
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     procedure DoEventCommand(ACommand: integer; out AHandled: boolean);
+    procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
     function GetCaretsTime: integer;
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
@@ -365,6 +365,7 @@ type
     function GetStrings: TATStrings;
     function IsKeyMappingMatchedItem(const Str: string;
       const Item: TATKeyMappingItem): boolean;
+    function IsPosSelected(AX, AY: integer): boolean;
     procedure SetCaretsTime(AValue: integer);
     procedure SetCaretShape(AValue: TATSynCaretShape);
     procedure SetCaretShapeOvr(AValue: TATSynCaretShape);
@@ -1262,7 +1263,8 @@ begin
       Delete(StrOut, 1, NOutputCharsSkipped);
       Delete(StrOut, cMaxCharsForOutput, MaxInt);
 
-      DoCalcLineParts(NLinesIndex, Parts);
+      DoCalcLineHilite(Parts, WrapItem);
+
       CanvasTextOut(C,
         CurrPoint.X - AScrollHorz.NPos*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
         CurrPoint.Y,
@@ -1273,7 +1275,7 @@ begin
         Trunc(NOutputSpacesSkipped), //todo:
           //needed number of chars of all chars counted as 1.0,
           //while NOutputSpacesSkipped is with cjk counted as 1.7
-        nil //@Parts
+        @Parts
         );
 
       //draw unprintable spaces/tabs
@@ -2239,42 +2241,24 @@ begin
     FOnDrawBookmarkIcon(Self, C, ALineNumber, ARect);
 end;
 
-procedure TATSynEdit.DoCalcLineParts(const ALineNum: integer;
-  var AParts: TATLineParts);
-const
-  cc=4;
+function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
 var
-  i, n: integer;
+  i: integer;
+  Item: TATSynCaretItem;
 begin
-  FillChar(AParts, SizeOf(AParts), 0);
-  n:= Length(Strings.Lines[ALineNum]);
-
-  for i:= 0 to n div cc -1 do
-    with AParts[i] do
-    begin
-      Offset:= i*cc;
-      Len:= cc;
-      Color:= random($ffff);
-      if i mod 4 = 0 then
-        ColorBG:= clnavy
-      else
-        ColorBG:= clcream;
-
-      if i mod 4 = 0 then
-        Styles:= [fsBold, fsItalic];
-    end;
-
-  if n mod cc>0 then
-  with AParts[n div cc] do
+  Result:= false;
+  for i:= 0 to Carets.Count-1 do
   begin
-    Offset:= n div cc * cc;
-    Len:= n mod cc;
-    Color:= clyellow;
-    ColorBg:= clgreen;
+    Item:= Carets[i];
+    if (AY>=Item.PosY) and (AY<=Item.EndY) and
+      (AX>=Item.PosX) and (AX<Item.EndX) then
+      begin Result:= true; Break end;
   end;
 end;
 
+
 {$I atsynedit_carets.inc}
+{$I atsynedit_hilite.inc}
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}
 {$I atsynedit_cmd_editing.inc}
