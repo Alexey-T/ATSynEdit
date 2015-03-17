@@ -53,7 +53,6 @@
       <Unit3>
         <Filename Value="..\..\comp\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStrings"/>
       </Unit3>
     </Units>
   </ProjectOptions>
@@ -65,7 +64,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\..\comp\atsynedit"/>
+      <OtherUnitFiles Value="..\..\atsynedit"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
