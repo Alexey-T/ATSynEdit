@@ -111,6 +111,8 @@ begin
   Item.PosY:= APosY;
   Item.CoordX:= -1;
   Item.CoordY:= -1;
+  Item.EndX:= -1;
+  Item.EndY:= -1;
   FList.Add(Item);
 end;
 

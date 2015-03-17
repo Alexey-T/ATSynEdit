@@ -23,7 +23,15 @@ begin
     with C[i] do
     begin
       EndY:= PosY;
-      EndX:= PosX+4;
+      EndX:= Max(0, PosX+4);
     end;
+end;
+
+function IsCaretPosSorted(X1, Y1, X2, Y2: integer): boolean;
+begin
+  if Y1<>Y2 then
+    Result:= Y1<Y2
+  else
+    Result:= X1<X2;
 end;
 
