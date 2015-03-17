@@ -1,0 +1,36 @@
+object fmKey: TfmKey
+  Left = 433
+  Height = 414
+  Top = 521
+  Width = 684
+  Caption = 'Keymap'
+  ClientHeight = 414
+  ClientWidth = 684
+  OnShow = FormShow
+  Position = poScreenCenter
+  LCLVersion = '1.5'
+  object List: TListView
+    Left = 0
+    Height = 414
+    Top = 0
+    Width = 684
+    Align = alClient
+    Columns = <    
+      item
+        Caption = 'name'
+        Width = 350
+      end    
+      item
+        Caption = 'key1'
+        Width = 150
+      end    
+      item
+        Caption = 'key2'
+        Width = 150
+      end>
+    ReadOnly = True
+    RowSelect = True
+    TabOrder = 0
+    ViewStyle = vsReport
+  end
+end
