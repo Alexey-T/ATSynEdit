@@ -1266,7 +1266,8 @@ begin
       Delete(StrOut, 1, NOutputCharsSkipped);
       Delete(StrOut, cMaxCharsForOutput, MaxInt);
 
-      DoCalcLineHilite(WrapItem, Parts, NOutputCharsSkipped, Length(StrOut),
+      DoCalcLineHilite(WrapItem, Parts,
+        NOutputCharsSkipped, cMaxCharsForOutput,
         IfThen(BmColor<>clNone, BmColor, FColorTextBG));
 
       CanvasTextOut(C,
@@ -2245,21 +2246,6 @@ procedure TATSynEdit.DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; c
 begin
   if Assigned(FOnDrawBookmarkIcon) then
     FOnDrawBookmarkIcon(Self, C, ALineNumber, ARect);
-end;
-
-function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
-var
-  i: integer;
-  Item: TATSynCaretItem;
-begin
-  Result:= false;
-  for i:= 0 to Carets.Count-1 do
-  begin
-    Item:= Carets[i];
-    if (AY>=Item.PosY) and (AY<=Item.EndY) and
-      (AX>=Item.PosX) and (AX<Item.EndX) then
-      begin Result:= true; Break end;
-  end;
 end;
 
 

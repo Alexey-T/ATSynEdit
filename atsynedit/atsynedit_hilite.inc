@@ -1,5 +1,29 @@
 {$ifdef nnn}begin end;{$endif}
 
+function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
+var
+  i: integer;
+  Item: TATSynCaretItem;
+  bEnded: boolean;
+begin
+  Result:= false;
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Item:= Carets[i];
+
+    if (Item.EndY>=0) then
+      bEnded:= Min(Item.PosY, Item.EndY)>AY
+    else
+      bEnded:= Item.PosY>AY;
+    if bEnded then Exit;
+
+    if (AY>=Item.PosY) and (AY<=Item.EndY) and
+      (AX>=Item.PosX) and (AX<Item.EndX) then
+      begin Result:= true; Break end;
+  end;
+end;
+
+
 procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor);
