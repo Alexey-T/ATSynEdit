@@ -226,8 +226,6 @@ type
     FStringsInt,
     FStringsExt: TATStrings;
     FTextOffset: TPoint;
-    FOvrMode: boolean;
-    FOvrModeApplyForPaste: boolean;
     FCarets: TATSynCarets;
     FCaretShape,
     FCaretShapeOvr: TATSynCaretShape;
@@ -235,6 +233,9 @@ type
     FCaretVirtualPos: boolean;
     FCaretSpecPos: boolean;
     FCaretMoveByRtClick: boolean;
+    FOvrMode: boolean;
+    FOvrModeApplyForPaste: boolean;
+    FMouseDownPnt: TPoint;
     FKeyNavigateInWrappedLines: boolean;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
@@ -2031,31 +2032,29 @@ end;
 
 
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  Pnt: TPoint;
 begin
   inherited;
   SetFocus;
   FCaretSpecPos:= false;
 
+  FMouseDownPnt:= ClientPosToCaretPos(Point(X, Y));
+
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
-    Pnt:= ClientPosToCaretPos(Point(X, Y));
-
     if Shift=[ssLeft] then
     begin
       FCarets.Clear;
-      FCarets.Add(Pnt.X, Pnt.Y);
+      FCarets.Add(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if Shift=[ssLeft, ssCtrl] then
     begin
-      DoCaretAddToPoint(Pnt);
+      DoCaretAddToPoint(FMouseDownPnt);
     end;
 
     if Shift=[ssLeft, ssCtrl, ssShift] then
     begin
-      DoCaretsColumnToPoint(Pnt);
+      DoCaretsColumnToPoint(FMouseDownPnt);
     end;
 
     if Shift=[ssRight] then
@@ -2063,15 +2062,14 @@ begin
       if FCaretMoveByRtClick then
       begin
         FCarets.Clear;
-        FCarets.Add(Pnt.X, Pnt.Y);
+        FCarets.Add(FMouseDownPnt.X, FMouseDownPnt.Y);
       end;
     end;
   end;
 
   if PtInRect(FRectGutter, Point(X, Y)) then
   begin
-    Pnt:= ClientPosToCaretPos(Point(X, Y));
-    DoEventClickGutter(FGutter.IndexAt(X), Pnt.Y);
+    DoEventClickGutter(FGutter.IndexAt(X), FMouseDownPnt.Y);
   end;
 
   DoCaretsSort;
@@ -2085,6 +2083,7 @@ var
   RectBm: TRect;
   CItem: TATSynCaretItem;
   Pnt: TPoint;
+  nIndex: integer;
 begin
   inherited;
 
@@ -2111,11 +2110,30 @@ begin
       Pnt:= ClientPosToCaretPos(Point(X, Y));
       if Pnt.Y>=0 then
       begin
-        CItem:= Carets[0];
-        if CItem.EndX<0 then CItem.EndX:= CItem.PosX;
-        if CItem.EndY<0 then CItem.EndY:= CItem.PosY;
-        CItem.PosX:= Pnt.X;
-        CItem.PosY:= Pnt.Y;
+        //drag w/out button pressed: single selection
+        if [ssCtrl, ssShift, ssAlt]*Shift=[] then
+        begin
+          CItem:= Carets[0];
+          if CItem.EndX<0 then CItem.EndX:= CItem.PosX;
+          if CItem.EndY<0 then CItem.EndY:= CItem.PosY;
+          CItem.PosX:= Pnt.X;
+          CItem.PosY:= Pnt.Y;
+        end;
+
+        //drag with Ctrl pressed: add selection
+        if [ssCtrl, ssShift, ssAlt]*Shift=[ssCtrl] then
+        begin
+          nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+          if nIndex>=0 then
+          begin
+            CItem:= Carets[nIndex];
+            if CItem.EndX<0 then CItem.EndX:= CItem.PosX;
+            if CItem.EndY<0 then CItem.EndY:= CItem.PosY;
+            CItem.PosX:= Pnt.X;
+            CItem.PosY:= Pnt.Y;
+          end;
+        end;
+
         Invalidate;
       end;
     end;

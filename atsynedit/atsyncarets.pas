@@ -42,7 +42,7 @@ type
     procedure Add(APosX, APosY: integer);
     procedure Sort;
     procedure Assign(Obj: TATSynCarets);
-    function IndexOfPosXY(APosX, APosY: integer): integer;
+    function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
@@ -157,10 +157,11 @@ begin
     Add(Obj[i].PosX, Obj[i].PosY);
 end;
 
-function TATSynCarets.IndexOfPosXY(APosX, APosY: integer): integer;
+function TATSynCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
 var
   iStart, i: integer;
   Item: TATSynCaretItem;
+  XUse, YUse: integer;
 begin
   Result:= -1;
   iStart:= IndexOfPosYAvg(APosY);
@@ -168,8 +169,16 @@ begin
   for i:= iStart to FList.Count-1 do
   begin
     Item:= TATSynCaretItem(FList[i]);
-    if (Item.PosY>APosY) then Break;
-    if (Item.PosX=APosX) and (Item.PosY=APosY) then
+
+    if Item.EndY<0 then
+      AUseEndXY:= false;
+    if AUseEndXY then
+      begin XUse:= Item.EndX; YUse:= Item.EndY; end
+    else
+      begin XUse:= Item.PosX; YUse:= Item.PosY; end;
+
+    if (YUse>APosY) then Break;
+    if (XUse=APosX) and (YUse=APosY) then
       begin Result:= i; Break end;
   end;
 end;
