@@ -318,6 +318,7 @@ type
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     procedure DoCaretSingle(AX, AY: integer);
+    function DoCommand_SelectAll: TATCommandResults;
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);
@@ -361,6 +362,7 @@ type
     function GetCaretsTime: integer;
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
+    function GetLastPos: TPoint;
     function GetMarginString: string;
     function GetReadOnly: boolean;
     function GetScrollTop: integer;
@@ -2253,6 +2255,7 @@ end;
 {$I atsynedit_hilite.inc}
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}
+
 {$I atsynedit_cmd_editing.inc}
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}

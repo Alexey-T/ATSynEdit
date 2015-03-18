@@ -35,6 +35,7 @@ const
 
   cCommand_ScrollLineUp = 250;
   cCommand_ScrollLineDown = 251;
+  cCommand_SelectAll = 252;
 
   cCommand_ToggleReadOnly = 260;
   cCommand_ToggleOvr = 261;

@@ -125,19 +125,23 @@ begin
   Result:= [cResultCaretTop];
 end;
 
-function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
-var
-  X, Y: integer;
+function TATSynEdit.GetLastPos: TPoint;
 begin
-  X:= 0;
-  Y:= 0;
+  Result.X:= 0;
+  Result.Y:= 0;
   if Strings.Count>0 then
   begin
-    Y:= Strings.Count-1;
-    X:= Length(Strings.Lines[Y]);
+    Result.Y:= Strings.Count-1;
+    Result.X:= Length(Strings.Lines[Result.Y]);
   end;
+end;
 
-  DoCaretSingle(X, Y);
+function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
+var
+  P: TPoint;
+begin
+  P:= GetLastPos;
+  DoCaretSingle(P.X, P.Y);
 
   Result:= [cResultCaretBottom];
 end;
@@ -216,5 +220,20 @@ begin
     Carets.Delete(Carets.Count-1);
 
   Result:= [cResultCaretTop];
+end;
+
+function TATSynEdit.DoCommand_SelectAll: TATCommandResults;
+var
+  P: TPoint;
+begin
+  P:= GetLastPos;
+  DoCaretSingle(P.X, P.Y);
+  with Carets[0] do
+  begin
+    EndX:= 0;
+    EndY:= 0;
+  end;
+
+  Result:= [cResultCaretBottom];
 end;
 
