@@ -117,8 +117,8 @@ end;
 
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;
 begin
-  FCarets.Clear;
-  FCarets.Add(0, 0);
+  DoCaretsLeaveOne(0, 0);
+
   FScrollHorz.NPos:= 0;
   FScrollVert.NPos:= 0;
 
@@ -137,8 +137,7 @@ begin
     X:= Length(Strings.Lines[Y]);
   end;
 
-  FCarets.Clear;
-  FCarets.Add(X, Y);
+  DoCaretsLeaveOne(X, Y);
 
   Result:= [cResultCaretBottom];
 end;

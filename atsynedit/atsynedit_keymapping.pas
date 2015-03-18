@@ -18,14 +18,14 @@ procedure DoInitDefaultKeymapping(var M: TATKeyMapping);
 begin
   M.Clear;
 
-  M.Add(cCommand_KeyLeft, 'caret char left', ['Left'], []);
-  M.Add(cCommand_KeyRight, 'caret char right', ['Right'], []);
-  M.Add(cCommand_KeyUp, 'caret line up', ['Up'], []);
-  M.Add(cCommand_KeyDown, 'caret line down', ['Down'], []);
-  M.Add(cCommand_KeyHome, 'caret to line start', ['Home'], []);
-  M.Add(cCommand_KeyEnd, 'caret to line end', ['End'], []);
-  M.Add(cCommand_KeyPageUp, 'caret page up', ['Prior'], []);
-  M.Add(cCommand_KeyPageDown, 'caret page down', ['Next'], []);
+  M.Add(cCommand_KeyLeft, 'caret char left',          ['Left'],  ['Shift+Left']);
+  M.Add(cCommand_KeyRight, 'caret char right',        ['Right'], ['Shift+Right']);
+  M.Add(cCommand_KeyUp, 'caret line up',              ['Up'],    ['Shift+Up']);
+  M.Add(cCommand_KeyDown, 'caret line down',          ['Down'],  ['Shift+Down']);
+  M.Add(cCommand_KeyHome, 'caret to line start',      ['Home'],  ['Shift+Home']);
+  M.Add(cCommand_KeyEnd, 'caret to line end',         ['End'],   ['Shift+End']);
+  M.Add(cCommand_KeyPageUp, 'caret page up',          ['Prior'], ['Shift+Prior']);
+  M.Add(cCommand_KeyPageDown, 'caret page down',      ['Next'],  ['Shift+Next']);
 
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Backspace'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Delete'], []);
@@ -36,10 +36,10 @@ begin
   M.Add(cCommand_TextDeleteCurLine, 'delete current line', ['Ctrl+Y'], []);
   M.Add(cCommand_TextDuplicateCurLine, 'duplicate current line', ['Ctrl+D'], []);
 
-  M.Add(cCommand_GotoTextBegin, 'goto text begin', ['Ctrl+Home'], []);
-  M.Add(cCommand_GotoTextEnd, 'goto text end', ['Ctrl+End'], []);
-  M.Add(cCommand_GotoWordNext, 'goto word next', ['Ctrl+Right'], []);
-  M.Add(cCommand_GotoWordPrev, 'goto word prev', ['Ctrl+Left'], []);
+  M.Add(cCommand_GotoTextBegin, 'goto text begin', ['Ctrl+Home'], ['Ctrl+Shift+Home']);
+  M.Add(cCommand_GotoTextEnd, 'goto text end', ['Ctrl+End'], ['Ctrl+Shift+End']);
+  M.Add(cCommand_GotoWordNext, 'goto word next', ['Ctrl+Right'], ['Ctrl+Shift+Right']);
+  M.Add(cCommand_GotoWordPrev, 'goto word prev', ['Ctrl+Left'], ['Ctrl+Shift+Left']);
 
   M.Add(cCommand_ToggleOvr, 'toggle insert/overwrite mode', ['Insert'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', ['Ctrl+R'], []);

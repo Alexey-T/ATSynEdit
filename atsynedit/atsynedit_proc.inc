@@ -22,16 +22,16 @@ begin
   for i:= 0 to C.Count-1 do
     with C[i] do
     begin
-      EndY:= PosY;
-      EndX:= Max(0, PosX+4);
+      //EndY:= PosY;
+      //EndX:= Max(0, PosX+4);
     end;
 end;
 
-function IsCaretPosSorted(X1, Y1, X2, Y2: integer): boolean;
+function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
 begin
   if Y1<>Y2 then
     Result:= Y1<Y2
   else
-    Result:= X1<X2;
+    Result:= (X1<X2) or (AllowEq and (X1=X2));
 end;
 

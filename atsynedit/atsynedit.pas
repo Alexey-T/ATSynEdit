@@ -315,9 +315,9 @@ type
     FShowCurLine: boolean;
     FShowCurColumn: boolean;
     //
-    procedure DoCalcLineHilite(const AItem: TATSynWrapItem;
-      var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
-  AColorBG: TColor);
+    procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
+      ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
+    procedure DoCaretsLeaveOne(AX, AY: integer);
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);

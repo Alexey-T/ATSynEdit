@@ -11,14 +11,15 @@ begin
   begin
     Item:= Carets[i];
     if (Item.EndX<0) or (Item.EndY<0) then Continue;
+    if (Item.PosX=Item.EndX) and (Item.PosY=Item.EndY) then Continue;
 
     bEnded:= Min(Item.PosY, Item.EndY)>AY;
     if bEnded then Exit;
 
-    if IsCaretPosSorted(Item.PosX, Item.PosY, Item.EndX, Item.EndY) then
-      bMatch:= (AY>=Item.PosY) and (AY<=Item.EndY) and (AX>=Item.PosX) and (AX<Item.EndX)
-    else
-      bMatch:= (AY>=Item.EndY) and (AY<=Item.PosY) and (AX>=Item.EndX) and (AX<Item.PosX);
+    bMatch:=
+      (IsPosSorted(Item.PosX, Item.PosY, AX, AY, true) and IsPosSorted(AX, AY, Item.EndX, Item.EndY, false)) or
+      (IsPosSorted(Item.EndX, Item.EndY, AX, AY, true) and IsPosSorted(AX, AY, Item.PosX, Item.PosY, false));
+
     if bMatch then
       begin Result:= true; Break end;
   end;

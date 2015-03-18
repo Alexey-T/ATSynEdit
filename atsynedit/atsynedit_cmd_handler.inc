@@ -104,10 +104,29 @@ end;
 procedure TATSynEdit.DoCommandExec(ACmd: integer; const AText: atString = '');
 var
   Res: TATCommandResults;
+  bSel: boolean;
+  Item: TATSynCaretItem;
+  i: integer;
 begin
   if ACmd<=0 then Exit;
   Res:= [];
   FCaretSpecPos:= false;
+
+  bSel:= ssShift in GetKeyShiftState;
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Item:= Carets[i];
+    if not bSel then
+    begin
+      Item.EndX:= -1;
+      Item.EndY:= -1;
+    end
+    else
+    begin
+      if Item.EndY<0 then Item.EndY:= Item.PosY;
+      if Item.EndX<0 then Item.EndX:= Item.PosX;
+    end;
+  end;
 
   case ACmd of
     //most used commands
