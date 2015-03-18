@@ -2081,7 +2081,6 @@ end;
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   RectBm: TRect;
-  CItem: TATSynCaretItem;
   Pnt: TPoint;
   nIndex: integer;
 begin
@@ -2112,26 +2111,14 @@ begin
       begin
         //drag w/out button pressed: single selection
         if [ssCtrl, ssShift, ssAlt]*Shift=[] then
-        begin
-          CItem:= Carets[0];
-          if CItem.EndX<0 then CItem.EndX:= CItem.PosX;
-          if CItem.EndY<0 then CItem.EndY:= CItem.PosY;
-          CItem.PosX:= Pnt.X;
-          CItem.PosY:= Pnt.Y;
-        end;
+          Carets.ExtendSelection(0, Pnt.X, Pnt.Y);
 
         //drag with Ctrl pressed: add selection
         if [ssCtrl, ssShift, ssAlt]*Shift=[ssCtrl] then
         begin
           nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
           if nIndex>=0 then
-          begin
-            CItem:= Carets[nIndex];
-            if CItem.EndX<0 then CItem.EndX:= CItem.PosX;
-            if CItem.EndY<0 then CItem.EndY:= CItem.PosY;
-            CItem.PosX:= Pnt.X;
-            CItem.PosY:= Pnt.Y;
-          end;
+            Carets.ExtendSelection(nIndex, Pnt.X, Pnt.Y);
         end;
 
         Invalidate;

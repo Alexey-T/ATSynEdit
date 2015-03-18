@@ -27,11 +27,4 @@ begin
     end;
 end;
 
-function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
-begin
-  if Y1<>Y2 then
-    Result:= Y1<Y2
-  else
-    Result:= (X1<X2) or (AllowEq and (X1=X2));
-end;
 

@@ -23,7 +23,6 @@ type
     );
 
 type
-
   { TATSynCarets }
 
   TATSynCarets = class
@@ -31,6 +30,8 @@ type
     FList: TList;
     function GetItem(N: integer): TATSynCaretItem;
     procedure DeleteDups;
+    function IsJoinNeeded(N1, N2: integer;
+      out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -47,10 +48,16 @@ type
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
     function CaretAtEdge(AEdge: TATSynCaretEdge): TPoint;
+    procedure ExtendSelection(NIndex: integer; AToPosX, AToPosY: integer);
   end;
+
+function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
 
 
 implementation
+
+uses
+  Math;
 
 { TATSynCarets }
 
@@ -137,13 +144,24 @@ procedure TATSynCarets.DeleteDups;
 var
   i: integer;
   Item1, Item2: TATSynCaretItem;
+  OutPosX, OutPosY, OutEndX, OutEndY: integer;
 begin
   for i:= Count-1 downto 1 do
   begin
     Item1:= GetItem(i);
     Item2:= GetItem(i-1);
+
     if (Item1.PosY=Item2.PosY) and (Item1.PosX=Item2.PosX) then
       Delete(i);
+
+    if IsJoinNeeded(i, i-1, OutPosX, OutPosY, OutEndX, OutEndY) then
+    begin
+      Delete(i);
+      Item2.PosX:= OutPosX;
+      Item2.PosY:= OutPosY;
+      Item2.EndX:= OutEndX;
+      Item2.EndY:= OutEndY;
+    end;
   end;
 end;
 
@@ -250,6 +268,96 @@ begin
   if IsIndexValid(N) then
     with Items[N] do
       Result:= Point(PosX, PosY);
+end;
+
+procedure TATSynCarets.ExtendSelection(NIndex: integer; AToPosX, AToPosY: integer);
+var
+  Item: TATSynCaretItem;
+begin
+  if not IsIndexValid(NIndex) then Exit;
+  Item:= Items[NIndex];
+
+  if Item.EndX<0 then Item.EndX:= Item.PosX;
+  if Item.EndY<0 then Item.EndY:= Item.PosY;
+  Item.PosX:= AToPosX;
+  Item.PosY:= AToPosY;
+end;
+
+function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
+begin
+  if Y1<>Y2 then
+    Result:= Y1<Y2
+  else
+    Result:= (X1<X2) or (AllowEq and (X1=X2));
+end;
+
+function TATSynCarets.IsJoinNeeded(N1, N2: integer;
+  out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
+var
+  Item1, Item2: TATSynCaretItem;
+  XMin1, XMin2, YMin1, YMin2, XMax1, XMax2, YMax1, YMax2: integer;
+  bSorted: boolean;
+begin
+  Result:= false;
+  if not IsIndexValid(N1) then Exit;
+  if not IsIndexValid(N2) then Exit;
+  Item1:= Items[N1];
+  Item2:= Items[N2];
+
+  if Item1.EndY<0 then Exit;
+  if Item2.EndY<0 then Exit;
+
+  bSorted:= IsPosSorted(Item1.PosX, Item1.PosY, Item1.EndX, Item1.EndY, true);
+  if bSorted then
+  begin
+    XMin1:= Item1.PosX;
+    YMin1:= Item1.PosY;
+    XMax1:= Item1.EndX;
+    YMax1:= Item1.EndY;
+  end
+  else
+  begin
+    XMin1:= Item1.EndX;
+    YMin1:= Item1.EndY;
+    XMax1:= Item1.PosX;
+    YMax1:= Item1.PosY;
+  end;
+
+  bSorted:= IsPosSorted(Item2.PosX, Item2.PosY, Item2.EndX, Item2.EndY, true);
+  if bSorted then
+  begin
+    XMin2:= Item2.PosX;
+    YMin2:= Item2.PosY;
+    XMax2:= Item2.EndX;
+    YMax2:= Item2.EndY;
+  end
+  else
+  begin
+    XMin2:= Item2.EndX;
+    YMin2:= Item2.EndY;
+    XMax2:= Item2.PosX;
+    YMax2:= Item2.PosY;
+  end;
+
+  if bSorted then
+  begin
+    OutPosX:= Min(XMin1, XMin2);
+    OutEndX:= Max(XMax1, XMax2);
+    OutPosY:= Min(YMin1, YMin2);
+    OutEndY:= Max(YMax1, YMax2);
+  end
+  else
+  begin
+    OutEndX:= Min(XMin1, XMin2);
+    OutPosX:= Max(XMax1, XMax2);
+    OutEndY:= Min(YMin1, YMin2);
+    OutPosY:= Max(YMax1, YMax2);
+  end;
+
+  if IsPosSorted(XMax1, YMax1, XMin2, YMin2, false) then Exit;
+  if IsPosSorted(XMax2, YMax2, XMin1, YMin1, false) then Exit;
+
+  Result:= true;
 end;
 
 
