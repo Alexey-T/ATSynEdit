@@ -30,7 +30,7 @@ procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor);
 var
-  nIndex, i: integer;
+  nIndex, nMaxOffset, i: integer;
   bSel, bSelPrev, bAdd: boolean;
 begin
   FillChar(AParts, SizeOf(AParts), 0);
@@ -41,7 +41,9 @@ begin
 
   //we have string for this call not only part of Strings.Lines[i] but
   //with StringOfChar(' ', NIndent) added
-  for i:= 0 to Min(ACharsMax, AItem.NLength-1+AItem.NIndent-ACharsSkipped) do
+  nMaxOffset:= Min(ACharsMax, AItem.NLength-1+AItem.NIndent-ACharsSkipped +2{space eol});
+
+  for i:= 0 to nMaxOffset-1 do
   begin
     if i<AItem.NIndent-ACharsSkipped then
       bSel:= false

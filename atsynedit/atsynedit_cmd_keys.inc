@@ -132,7 +132,7 @@ begin
   if Strings.Count>0 then
   begin
     Result.Y:= Strings.Count-1;
-    Result.X:= Length(Strings.Lines[Result.Y]);
+    Result.X:= Length(Strings.Lines[Result.Y]) + 1{to hilite eol};
   end;
 end;
 

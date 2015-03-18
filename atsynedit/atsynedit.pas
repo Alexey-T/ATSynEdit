@@ -1261,6 +1261,9 @@ begin
       end;
     end;
 
+    if WrapItem.NFinal=cWrapItemFinal then
+      StrOut:= StrOut+' '; //to hilite eol
+
     //draw line
     if StrOut<>'' then
     begin
