@@ -39,6 +39,7 @@ object fmMain: TfmMain
     ClientHeight = 478
     ClientWidth = 281
     TabOrder = 1
+    OnClick = PanelRtClick
     object chkGutter: TCheckBox
       Left = 8
       Height = 19
@@ -264,8 +265,8 @@ object fmMain: TfmMain
     object bFont: TButton
       Left = 8
       Height = 25
-      Top = 144
-      Width = 73
+      Top = 336
+      Width = 81
       Caption = 'font...'
       OnClick = bFontClick
       TabOrder = 8
@@ -386,24 +387,6 @@ object fmMain: TfmMain
       OnChange = chkGutterNumChange
       TabOrder = 2
     end
-    object chkCurLine: TCheckBox
-      Left = 144
-      Height = 19
-      Top = 340
-      Width = 59
-      Caption = 'cur line'
-      OnChange = chkCurLineChange
-      TabOrder = 17
-    end
-    object chkCurCol: TCheckBox
-      Left = 144
-      Height = 19
-      Top = 360
-      Width = 56
-      Caption = 'cur col'
-      OnChange = chkCurColChange
-      TabOrder = 18
-    end
     object chkGutterStat: TCheckBox
       Left = 104
       Height = 19
@@ -412,6 +395,15 @@ object fmMain: TfmMain
       Caption = 'stat'
       OnChange = chkGutterStatChange
       TabOrder = 3
+    end
+    object Button1: TButton
+      Left = 8
+      Height = 25
+      Top = 364
+      Width = 81
+      Caption = 'more...'
+      OnClick = Button1Click
+      TabOrder = 17
     end
   end
   object OpenDialog1: TOpenDialog
@@ -427,8 +419,8 @@ object fmMain: TfmMain
     top = 20
   end
   object PopupMenu1: TPopupMenu
-    left = 496
-    top = 84
+    left = 480
+    top = 88
     object mnuPst: TMenuItem
       Caption = 'Paste'
       OnClick = mnuPstClick

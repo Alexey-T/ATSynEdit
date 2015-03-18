@@ -6,15 +6,14 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, formkey;
+  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, formkey, formopt;
 
 type
   { TfmMain }
   TfmMain = class(TForm)
     bFont: TButton;
+    Button1: TButton;
     chkGutterStat: TCheckBox;
-    chkCurCol: TCheckBox;
-    chkCurLine: TCheckBox;
     chkGutterNum: TCheckBox;
     chkGutterBm: TCheckBox;
     chkUnprintRep: TCheckBox;
@@ -83,6 +82,7 @@ type
     procedure bAddCrtClick(Sender: TObject);
     procedure bSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
     procedure chkCaretVirtualChange(Sender: TObject);
     procedure chkCurColChange(Sender: TObject);
     procedure chkCurLineChange(Sender: TObject);
@@ -121,6 +121,7 @@ type
     procedure mnuTBmsClick(Sender: TObject);
     procedure mnuTFoldClick(Sender: TObject);
     procedure mnuTMarginClick(Sender: TObject);
+    procedure PanelRtClick(Sender: TObject);
   private
     { private declarations }
     ed: TATSynEdit;
@@ -264,6 +265,11 @@ begin
   ed.Update;
 end;
 
+procedure TfmMain.PanelRtClick(Sender: TObject);
+begin
+
+end;
+
 procedure TfmMain.EditCaretMoved(Sender: TObject);
 begin
   UpdateStatus;
@@ -302,8 +308,6 @@ begin
   chkRuler.Checked:= ed.OptRulerVisible;
   chkMinimap.Checked:= ed.OptMinimapVisible;
   chkMicromap.Checked:= ed.OptMicromapVisible;
-  chkCurLine.Checked:= ed.OptShowCurLine;
-  chkCurCol.Checked:= ed.OptShowCurColumn;
   edFontsize.Value:= ed.Font.Size;
   edTabsize.Value:= ed.OptTabSize;
   edSpaceX.Value:= ed.OptCharSpacingX;
@@ -448,6 +452,22 @@ begin
   end;
 end;
 
+procedure TfmMain.Button1Click(Sender: TObject);
+begin
+  with fmOpt do
+  begin
+    chkCurLine.Checked:= ed.OptShowCurLine;
+    chkCurCol.Checked:= ed.OptShowCurColumn;
+    if ShowModal=mrOk then
+    begin
+      ed.OptShowCurLine:= chkCurLine.Checked;
+      ed.OptShowCurColumn:= chkCurCol.Checked;
+
+      ed.Update;
+    end;
+  end;
+end;
+
 procedure TfmMain.chkCaretVirtualChange(Sender: TObject);
 begin
   if wait then Exit;
@@ -456,16 +476,10 @@ end;
 
 procedure TfmMain.chkCurColChange(Sender: TObject);
 begin
-  if wait then Exit;
-  ed.OptShowCurColumn:= chkCurCol.Checked;
-  ed.Update;
 end;
 
 procedure TfmMain.chkCurLineChange(Sender: TObject);
 begin
-  if wait then Exit;
-  ed.OptShowCurLine:= chkCurLine.Checked;
-  ed.Update;
 end;
 
 procedure TfmMain.chkGutterBmChange(Sender: TObject);
