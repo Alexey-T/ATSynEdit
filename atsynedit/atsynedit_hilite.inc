@@ -1,30 +1,5 @@
 {$ifdef nnn}begin end;{$endif}
 
-function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
-var
-  i: integer;
-  Item: TATSynCaretItem;
-  bEnded, bMatch: boolean;
-begin
-  Result:= false;
-  for i:= 0 to Carets.Count-1 do
-  begin
-    Item:= Carets[i];
-    if (Item.EndX<0) or (Item.EndY<0) then Continue;
-    if (Item.PosX=Item.EndX) and (Item.PosY=Item.EndY) then Continue;
-
-    bEnded:= Min(Item.PosY, Item.EndY)>AY;
-    if bEnded then Exit;
-
-    bMatch:=
-      (IsPosSorted(Item.PosX, Item.PosY, AX, AY, true) and IsPosSorted(AX, AY, Item.EndX, Item.EndY, false)) or
-      (IsPosSorted(Item.EndX, Item.EndY, AX, AY, true) and IsPosSorted(AX, AY, Item.PosX, Item.PosY, false));
-
-    if bMatch then
-      begin Result:= true; Break end;
-  end;
-end;
-
 
 procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;

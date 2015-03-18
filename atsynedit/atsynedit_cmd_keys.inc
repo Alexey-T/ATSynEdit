@@ -225,17 +225,8 @@ begin
 end;
 
 function TATSynEdit.DoCommand_SelectAll: TATCommandResults;
-var
-  P: TPoint;
 begin
-  P:= GetLastPos;
-  DoCaretSingle(P.X, P.Y);
-  with Carets[0] do
-  begin
-    EndX:= 0;
-    EndY:= 0;
-  end;
-
+  DoSelect_All(false);
   Result:= [cResultCaretBottom];
 end;
 

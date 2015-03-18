@@ -34,7 +34,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="21">
+    <Units Count="22">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -100,7 +100,6 @@
       <Unit14>
         <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc_WordJump"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
@@ -127,6 +126,11 @@
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit20>
+      <Unit21>
+        <Filename Value="..\..\atsynedit\atsynedit_sel.inc"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit1"/>
+      </Unit21>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

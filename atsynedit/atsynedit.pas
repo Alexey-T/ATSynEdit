@@ -360,8 +360,9 @@ type
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     procedure DoEventCommand(ACommand: integer; out AHandled: boolean);
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
-    procedure DoSelect_Line(P: TPoint);
-    procedure DoSelect_Word(P: TPoint);
+    procedure DoSelect_All(AUpdate: boolean);
+    procedure DoSelect_Line(P: TPoint; AUpdate: boolean);
+    procedure DoSelect_Word(P: TPoint; AUpdate: boolean);
     function GetCaretsTime: integer;
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
@@ -2135,7 +2136,7 @@ begin
 
   P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos));
   if P.Y<0 then Exit;
-  DoSelect_Word(P);
+  DoSelect_Word(P, true);
 end;
 
 procedure TATSynEdit.TripleClick;
@@ -2146,7 +2147,7 @@ begin
 
   P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos));
   if P.Y<0 then Exit;
-  DoSelect_Line(P);
+  DoSelect_Line(P, true);
 end;
 
 procedure TATSynEdit.Invalidate;
@@ -2305,9 +2306,10 @@ end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
+{$I atsynedit_sel.inc}
+
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}
-
 {$I atsynedit_cmd_editing.inc}
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
