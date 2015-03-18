@@ -1988,10 +1988,11 @@ begin
     if ssLeft in Shift then
     begin
       DoCaretSingleAsIs;
-      P:= ClientPosToCaretPos(P);
-      if P.Y>=0 then
+      P:= ClientPosToCaretPos(Point(FRectMain.Left, P.Y));
+      if (P.Y>=0) and (P.X>=0) then
       begin
         Carets.ExtendSelectionToPoint(0, P.X, P.Y);
+        DoEventCarets;
         Update;
       end;
     end;
@@ -2017,6 +2018,7 @@ begin
               Carets.ExtendSelectionToPoint(nIndex, P.X, P.Y);
           end;
 
+          DoEventCarets;
           Update;
         end;
       end;
