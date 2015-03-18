@@ -123,7 +123,7 @@ type
     procedure mnuTMarginClick(Sender: TObject);
   private
     { private declarations }
-    edit: TATSynEdit;
+    ed: TATSynEdit;
     wait: boolean;
     FDir: string;
     procedure EditCaretMoved(Sender: TObject);
@@ -161,25 +161,25 @@ begin
   FDir:= ExtractFileDir(Application.ExeName)+'\..\..\test_files';
   wait:= true;
 
-  edit:= TATSynEdit.Create(Self);
-  edit.Parent:= PanelMain;
-  edit.Align:= alClient;
+  ed:= TATSynEdit.Create(Self);
+  ed.Parent:= PanelMain;
+  ed.Align:= alClient;
   {$ifdef windows}
-  edit.Font.Name:= 'Consolas';
+  ed.Font.Name:= 'Consolas';
   {$else}
   edit.Font.Name:= 'DejaVu Sans Mono';
   {$endif}
-  edit.PopupMenu:= PopupMenu1;
+  ed.PopupMenu:= PopupMenu1;
 
-  edit.OnChanged:= EditCaretMoved;
-  edit.OnCaretMoved:= EditCaretMoved;
-  edit.OnScrolled:= EditCaretMoved;
-  edit.OnStateChanged:= EditCaretMoved;
-  edit.OnCommand:= EditCommand;
-  edit.OnClickGutter:= EditClickGutter;
-  edit.OnDrawBookmarkIcon:= EditDrawBm;
+  ed.OnChanged:= EditCaretMoved;
+  ed.OnCaretMoved:= EditCaretMoved;
+  ed.OnScrolled:= EditCaretMoved;
+  ed.OnStateChanged:= EditCaretMoved;
+  ed.OnCommand:= EditCommand;
+  ed.OnClickGutter:= EditClickGutter;
+  ed.OnDrawBookmarkIcon:= EditDrawBm;
 
-  edit.SetFocus;
+  ed.SetFocus;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -191,57 +191,54 @@ begin
   wait:= false;
   fn:= FDir+'\fn.txt';
   if FileExists(fn) then
-    edit.LoadFromFile(fn);
+    ed.LoadFromFile(fn);
 end;
 
 procedure TfmMain.mnuPstClick(Sender: TObject);
 begin
-  edit.DoCommandExec(cCommand_ClipboardPaste);
-  edit.Update;
+  ed.DoCommandExec(cCommand_ClipboardPaste);
+  ed.Update;
 end;
 
 procedure TfmMain.mnuEndMcClick(Sender: TObject);
 begin
-  edit.Strings.Endings:= cLineEndMac;
-  edit.Update;
-  UpdateStatus;
+  ed.Strings.Endings:= cLineEndMac;
+  ed.Update;
 end;
 
 procedure TfmMain.mnuEndUnClick(Sender: TObject);
 begin
-  edit.Strings.Endings:= cLineEndUnix;
-  edit.Update;
-  UpdateStatus;
+  ed.Strings.Endings:= cLineEndUnix;
+  ed.Update;
 end;
 
 procedure TfmMain.mnuEndWClick(Sender: TObject);
 begin
-  edit.Strings.Endings:= cLineEndWin;
-  edit.Update;
-  UpdateStatus;
+  ed.Strings.Endings:= cLineEndWin;
+  ed.Update;
 end;
 
 procedure TfmMain.mnuSelClick(Sender: TObject);
 begin
-  edit.DoCommandExec(cCommand_SelectAll);
-  edit.Update;
+  ed.DoCommandExec(cCommand_SelectAll);
+  ed.Update;
 end;
 
 procedure TfmMain.mnuTBmsClick(Sender: TObject);
 var
   i: integer;
 begin
-  for i:= 0 to edit.Strings.Count-1 do
+  for i:= 0 to ed.Strings.Count-1 do
   begin
-    if edit.Strings.LinesBm[i]=cbmNone then
+    if ed.Strings.LinesBm[i]=cbmNone then
     begin
-      edit.Strings.LinesBm[i]:= cBmUsual;
-      edit.Strings.LinesBmColor[i]:= cColorBmLine;
+      ed.Strings.LinesBm[i]:= cBmUsual;
+      ed.Strings.LinesBmColor[i]:= cColorBmLine;
     end
     else
-      edit.Strings.LinesBm[i]:= cBmNone;
+      ed.Strings.LinesBm[i]:= cBmNone;
   end;
-  edit.Update;
+  ed.Update;
 end;
 
 procedure TfmMain.mnuTFoldClick(Sender: TObject);
@@ -249,19 +246,19 @@ var
   i: integer;
 begin
   mnuTFold.Checked:= not mnuTFold.Checked;
-  for i:= 0 to (edit.Strings.Count-1) div 10 do
+  for i:= 0 to (ed.Strings.Count-1) div 10 do
     if Odd(i) then
-      edit.DoFoldLines(i*10, i*10+9, 4, mnuTFold.Checked);
-  edit.Update;
+      ed.DoFoldLines(i*10, i*10+9, 4, mnuTFold.Checked);
+  ed.Update;
 end;
 
 procedure TfmMain.mnuTMarginClick(Sender: TObject);
 var
   S: string;
 begin
-  S:= InputBox('Margins', 'space separated numz', edit.OptMarginString);
-  edit.OptMarginString:= S;
-  edit.Update;
+  S:= InputBox('Margins', 'space separated numz', ed.OptMarginString);
+  ed.OptMarginString:= S;
+  ed.Update;
 end;
 
 procedure TfmMain.EditCaretMoved(Sender: TObject);
@@ -279,51 +276,51 @@ var
   i: integer;
 begin
   sPos:= '';
-  for i:= 0 to Min(4, edit.Carets.Count-1) do
-    with edit.Carets[i] do
+  for i:= 0 to Min(4, ed.Carets.Count-1) do
+    with ed.Carets[i] do
       sPos:= sPos+Format(' %d:%d', [PosY+1, PosX+1]);
 
   Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s | %s', [
     sPos,
-    edit.Carets.Count,
-    edit.ScrollTop+1,
-    cEnd[edit.Strings.Endings],
-    cOvr[edit.ModeOvr],
-    cRo[edit.ModeReadOnly]
+    ed.Carets.Count,
+    ed.ScrollTop+1,
+    cEnd[ed.Strings.Endings],
+    cOvr[ed.ModeOvr],
+    cRo[ed.ModeReadOnly]
     ]);
 end;
 
 procedure TfmMain.UpdateChecks;
 begin
-  chkGutter.Checked:= edit.OptGutterVisible;
-  chkGutterBm.Checked:= edit.Gutter[edit.GutterBandBm].Visible;
-  chkGutterNum.Checked:= edit.Gutter[edit.GutterBandNum].Visible;
-  chkGutterStat.Checked:= edit.Gutter[edit.GutterBandState].Visible;
-  chkRuler.Checked:= edit.OptRulerVisible;
-  chkMinimap.Checked:= edit.OptMinimapVisible;
-  chkMicromap.Checked:= edit.OptMicromapVisible;
-  chkCurLine.Checked:= edit.OptShowCurLine;
-  chkCurCol.Checked:= edit.OptShowCurColumn;
-  edFontsize.Value:= edit.Font.Size;
-  edTabsize.Value:= edit.OptTabSize;
-  edSpaceX.Value:= edit.OptCharSpacingX;
-  edSpaceY.Value:= edit.OptCharSpacingY;
-  edMarRt.Value:= edit.OptMarginRight;
-  case edit.OptWrapMode of
+  chkGutter.Checked:= ed.OptGutterVisible;
+  chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
+  chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
+  chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
+  chkRuler.Checked:= ed.OptRulerVisible;
+  chkMinimap.Checked:= ed.OptMinimapVisible;
+  chkMicromap.Checked:= ed.OptMicromapVisible;
+  chkCurLine.Checked:= ed.OptShowCurLine;
+  chkCurCol.Checked:= ed.OptShowCurColumn;
+  edFontsize.Value:= ed.Font.Size;
+  edTabsize.Value:= ed.OptTabSize;
+  edSpaceX.Value:= ed.OptCharSpacingX;
+  edSpaceY.Value:= ed.OptCharSpacingY;
+  edMarRt.Value:= ed.OptMarginRight;
+  case ed.OptWrapMode of
     cWrapOff: chkWrapOff.Checked:= true;
     cWrapOn: chkWrapOn.Checked:= true;
     cWrapAtMargin: chkWrapMargin.Checked:= true;
   end;
-  chkWrapIndent.Checked:= edit.OptWrapWithIndent;
-  chkUnprintVis.Checked:= edit.OptUnprintedVisible;
-  chkUnprintSp.Checked:= edit.OptUnprintedSpaces;
-  chkUnprintEnd.Checked:= edit.OptUnprintedEnds;
-  chkUnprintEndDet.Checked:= edit.OptUnprintedEndsDetails;
-  chkUnprintRep.Checked:= edit.OptUnprintedReplaceSpec;
-  edNum.ItemIndex:= Ord(edit.OptNumbersStyle);
-  edCaretSh.ItemIndex:= Ord(edit.OptCaretShape);
-  chkCaretVirtual.Checked:= edit.OptCaretVirtualPos;
-  edCaretTime.Value:= edit.OptCaretsTime;
+  chkWrapIndent.Checked:= ed.OptWrapWithIndent;
+  chkUnprintVis.Checked:= ed.OptUnprintedVisible;
+  chkUnprintSp.Checked:= ed.OptUnprintedSpaces;
+  chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
+  chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
+  chkUnprintRep.Checked:= ed.OptUnprintedReplaceSpec;
+  edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
+  edCaretSh.ItemIndex:= Ord(ed.OptCaretShape);
+  chkCaretVirtual.Checked:= ed.OptCaretVirtualPos;
+  edCaretTime.Value:= ed.OptCaretsTime;
 end;
 
 procedure TfmMain.EditScroll(Sender: TObject);
@@ -343,14 +340,14 @@ begin
   //Showmessage(format('%d %d', [ABandIndex, ALineNumber]));
   if ABandIndex=0 then
   begin
-    if edit.Strings.LinesBm[ALineNumber]<>cBmNone then
-      edit.Strings.LinesBm[ALineNumber]:= cBmNone
+    if ed.Strings.LinesBm[ALineNumber]<>cBmNone then
+      ed.Strings.LinesBm[ALineNumber]:= cBmNone
     else
     begin
-      edit.Strings.LinesBm[ALineNumber]:= cBmUsual;
-      edit.Strings.LinesBmColor[ALineNumber]:= cColorBmLine;
+      ed.Strings.LinesBm[ALineNumber]:= cBmUsual;
+      ed.Strings.LinesBmColor[ALineNumber]:= cColorBmLine;
     end;
-    edit.Update;
+    ed.Update;
   end;
 end;
 
@@ -377,7 +374,7 @@ begin
   begin
     InitialDir:= FDir;
     if not Execute then Exit;
-    edit.LoadFromFile(FileName);
+    ed.LoadFromFile(FileName);
   end;
 end;
 
@@ -390,23 +387,23 @@ begin
   if s='' then Exit;
   n:= StrToIntDef(s, 0)-1;
   if n<0 then Exit;
-  if n>=edit.Strings.Count then
+  if n>=ed.Strings.Count then
   begin
     Showmessage('Too big index: '+s);
     Exit
   end;
-  edit.DoGotoPos(Point(0, n));
+  ed.DoGotoPos(Point(0, n));
 end;
 
 procedure TfmMain.bFontClick(Sender: TObject);
 begin
   with FontDialog1 do
   begin
-    Font:= edit.Font;
+    Font:= ed.Font;
     if Execute then
     begin
-      edit.Font.Assign(Font);
-      edit.Update;
+      ed.Font.Assign(Font);
+      ed.Update;
     end;
   end;
 end;
@@ -417,9 +414,9 @@ var
 begin
   for j:= 1 to 40 do
     for i:= 1 to 100 do
-      edit.Carets.Add(i, j);
-  edit.Carets.Sort;
-  edit.Update;
+      ed.Carets.Add(i, j);
+  ed.Carets.Sort;
+  ed.Update;
   UpdateStatus;
 end;
 
@@ -431,8 +428,8 @@ begin
     FileName:= '';
     if Execute then
     begin
-      edit.SaveToFile(FileName);
-      edit.Update;
+      ed.SaveToFile(FileName);
+      ed.Update;
     end;
   end;
 end;
@@ -441,7 +438,7 @@ procedure TfmMain.bKeymapClick(Sender: TObject);
 begin
   with TfmKey.Create(nil) do
   try
-    edit:= Self.edit;
+    edit:= Self.ed;
     ShowModal;
   finally
     Free
@@ -451,149 +448,149 @@ end;
 procedure TfmMain.chkCaretVirtualChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptCaretVirtualPos:= chkCaretVirtual.Checked;
+  ed.OptCaretVirtualPos:= chkCaretVirtual.Checked;
 end;
 
 procedure TfmMain.chkCurColChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptShowCurColumn:= chkCurCol.Checked;
-  edit.Update;
+  ed.OptShowCurColumn:= chkCurCol.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkCurLineChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptShowCurLine:= chkCurLine.Checked;
-  edit.Update;
+  ed.OptShowCurLine:= chkCurLine.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkGutterBmChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.Gutter[edit.GutterBandBm].Visible:= chkGutterBm.Checked;
-  edit.Gutter.Update;
-  edit.Update;
+  ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
+  ed.Gutter.Update;
+  ed.Update;
 end;
 
 procedure TfmMain.chkGutterChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptGutterVisible:= chkGutter.Checked;
-  edit.Update;
+  ed.OptGutterVisible:= chkGutter.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkGutterNumChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.Gutter[edit.GutterBandNum].Visible:= chkGutterNum.Checked;
-  edit.Gutter.Update;
-  edit.Update;
+  ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
+  ed.Gutter.Update;
+  ed.Update;
 end;
 
 procedure TfmMain.chkGutterStatChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.Gutter[edit.GutterBandState].Visible:= chkGutterStat.Checked;
-  edit.Gutter.Update;
-  edit.Update;
+  ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
+  ed.Gutter.Update;
+  ed.Update;
 end;
 
 procedure TfmMain.chkMicromapChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptMicromapVisible:= chkMicromap.Checked;
-  edit.Update;
+  ed.OptMicromapVisible:= chkMicromap.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkMinimapChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptMinimapVisible:= chkMinimap.Checked;
-  edit.Update;
+  ed.OptMinimapVisible:= chkMinimap.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkRulerChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptRulerVisible:= chkRuler.Checked;
-  edit.Update;
+  ed.OptRulerVisible:= chkRuler.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkUnprintVisChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptUnprintedVisible:= chkUnprintVis.Checked;
-  edit.Update;
+  ed.OptUnprintedVisible:= chkUnprintVis.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkUnprintEndChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptUnprintedEnds:= chkUnprintEnd.Checked;
-  edit.Update;
+  ed.OptUnprintedEnds:= chkUnprintEnd.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkUnprintEndDetChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptUnprintedEndsDetails:= chkUnprintEndDet.Checked;
-  edit.Update;
+  ed.OptUnprintedEndsDetails:= chkUnprintEndDet.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkUnprintRepChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptUnprintedReplaceSpec:= chkUnprintRep.Checked;
-  edit.Update;
+  ed.OptUnprintedReplaceSpec:= chkUnprintRep.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkUnprintSpChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptUnprintedSpaces:= chkUnprintSp.Checked;
-  edit.Update;
+  ed.OptUnprintedSpaces:= chkUnprintSp.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.chkWrapMarginChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptWrapMode:= cWrapAtMargin;
-  edit.update;
+  ed.OptWrapMode:= cWrapAtMargin;
+  ed.update;
 end;
 
 procedure TfmMain.chkWrapOffChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptWrapMode:= cWrapOff;
-  edit.update;
+  ed.OptWrapMode:= cWrapOff;
+  ed.update;
 end;
 
 procedure TfmMain.chkWrapOnChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptWrapMode:= cWrapOn;
-  edit.update;
+  ed.OptWrapMode:= cWrapOn;
+  ed.update;
 end;
 
 procedure TfmMain.chkWrapIndentChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptWrapWithIndent:= chkWrapIndent.Checked;
-  edit.Update;
+  ed.OptWrapWithIndent:= chkWrapIndent.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.edCaretTimeChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptCaretsTime:= edCaretTime.Value;
+  ed.OptCaretsTime:= edCaretTime.Value;
 end;
 
 procedure TfmMain.edCaretShChange(Sender: TObject);
 begin
   if wait then Exit;
   if edCaretSh.ItemIndex>=0 then
-    edit.OptCaretShape:= TATSynCaretShape(edCaretSh.ItemIndex);
+    ed.OptCaretShape:= TATSynCaretShape(edCaretSh.ItemIndex);
 end;
 
 procedure TfmMain.edEndsChange(Sender: TObject);
@@ -603,42 +600,42 @@ end;
 procedure TfmMain.edFontsizeChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.Font.Size:= edFontsize.Value;
-  edit.Update(true);
+  ed.Font.Size:= edFontsize.Value;
+  ed.Update(true);
 end;
 
 procedure TfmMain.edMarRtChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptMarginRight:= edMarRt.Value;
+  ed.OptMarginRight:= edMarRt.Value;
 end;
 
 procedure TfmMain.edNumChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
-  edit.Update;
+  ed.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
+  ed.Update;
 end;
 
 procedure TfmMain.edSpaceXChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptCharSpacingX:= edSpaceX.Value;
-  edit.Update;
+  ed.OptCharSpacingX:= edSpaceX.Value;
+  ed.Update;
 end;
 
 procedure TfmMain.edSpaceYChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptCharSpacingY:= edSpaceY.Value;
-  edit.Update;
+  ed.OptCharSpacingY:= edSpaceY.Value;
+  ed.Update;
 end;
 
 procedure TfmMain.edTabsizeChange(Sender: TObject);
 begin
   if wait then Exit;
-  edit.OptTabSize:= edTabsize.Value;
-  edit.Update;
+  ed.OptTabSize:= edTabsize.Value;
+  ed.Update;
 end;
 
 

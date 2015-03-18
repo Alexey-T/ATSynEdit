@@ -52,12 +52,22 @@ type
   end;
 
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
+procedure SwapInt(var n1, n2: integer);
 
 
 implementation
 
 uses
   Math;
+
+procedure SwapInt(var n1, n2: integer);
+var
+  n: integer;
+begin
+  n:= n1;
+  n1:= n2;
+  n2:= n;
+end;
 
 { TATSynCarets }
 
@@ -339,23 +349,19 @@ begin
     YMax2:= Item2.PosY;
   end;
 
-  if bSorted then
+  OutPosX:= IfThen(XMin1<XMin2, XMin1, XMin2);
+  OutPosY:= IfThen(XMin1<XMin2, YMin1, YMin2);
+  OutEndX:= IfThen(XMin1<XMin2, XMax2, XMax1);
+  OutEndY:= IfThen(XMin1<XMin2, YMax2, YMax1);
+
+  if not bSorted then
   begin
-    OutPosX:= Min(XMin1, XMin2);
-    OutEndX:= Max(XMax1, XMax2);
-    OutPosY:= Min(YMin1, YMin2);
-    OutEndY:= Max(YMax1, YMax2);
-  end
-  else
-  begin
-    OutEndX:= Min(XMin1, XMin2);
-    OutPosX:= Max(XMax1, XMax2);
-    OutEndY:= Min(YMin1, YMin2);
-    OutPosY:= Max(YMax1, YMax2);
+    SwapInt(OutPosX, OutEndX);
+    SwapInt(OutPosY, OutEndY);
   end;
 
-  if IsPosSorted(XMax1, YMax1, XMin2, YMin2, false) then Exit;
-  if IsPosSorted(XMax2, YMax2, XMin1, YMin1, false) then Exit;
+  if IsPosSorted(XMax1, YMax1, XMin2, YMin2, false) then Exit; //ranges not overlap [x1, y1]...[x2, y2]
+  if IsPosSorted(XMax2, YMax2, XMin1, YMin1, false) then Exit; //ranges not overlap [x2, y2]...[x1, y1]
 
   Result:= true;
 end;
