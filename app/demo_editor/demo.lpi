@@ -141,6 +141,7 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formopt"/>
       </Unit23>
     </Units>
   </ProjectOptions>

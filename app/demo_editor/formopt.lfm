@@ -93,4 +93,12 @@ object fmOpt: TfmOpt
     Caption = 'gutter-states'
     TabOrder = 7
   end
+  object chkGutterEmpty: TCheckBox
+    Left = 176
+    Height = 19
+    Top = 68
+    Width = 130
+    Caption = 'gutter-empty-indent'
+    TabOrder = 8
+  end
 end

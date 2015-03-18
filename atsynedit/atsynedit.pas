@@ -119,7 +119,6 @@ const
   cInitMicromapWidth = 30;
   cInitMinimapWidth = 160;
   cInitMinimapFontSize = 2;
-  cInitNumbersVisible = true;
   cInitNumbersFontSize = 8;
   cInitNumbersStyle = cNumbersAll;
   cInitBitmapWidth = 1000;
@@ -145,11 +144,12 @@ const
   cInitColorStateAdded = $20c020;
   cInitColorStateSaved = clNavy;
 
-  cGutterBands = 4;
+  cGutterBands = 5;
   cSizeGutterBandBm = 15;
   cSizeGutterBandNum = 10;
   cSizeGutterBandFold = 0;
   cSizeGutterBandState = 3;
+  cSizeGutterBandEmpty = 2;
   cUnprintedFontOffsetX = 3;
   cUnprintedFontOffsetY = 2;
   cUnprintedFontScale = 0.80;
@@ -163,10 +163,10 @@ const
   cSizeCollapseMarkIndent = 3;
   cSizeIncreaseHorzScroll = 1; //n chars allow handy clicking after eol
   cSizeBitmapStep = 100;
-  cOffsetTextLeft = 3;
+  cOffsetTextLeft = 0; //needs fixing bookmark bg paint if >0
   cOffsetTextTop = 1;
   cSizeGutterNumOffsetLeft = 5;
-  cSizeGutterNumOffsetRight = 3;
+  cSizeGutterNumOffsetRight = 4;
   cSizeRulerHeight = 19;
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 6;
@@ -237,7 +237,8 @@ type
     FGutterBandBm,
     FGutterBandNum,
     FGutterBandState,
-    FGutterBandFold: integer;
+    FGutterBandFold,
+    FGutterBandEmpty: integer;
     FColorTextFont: TColor;
     FColorTextBG: TColor;
     FColorTextSel: TColor;
@@ -270,7 +271,6 @@ type
     FRulerMarkSizeSmall: integer;
     FRulerMarkSizeBig: integer;
     FGutterVisible: boolean;
-    FNumbersVisible: boolean;
     FNumbersStyle: TATSynNumbersStyle;
     FNumbersFontSize: integer;
     FMinimapWidth: integer;
@@ -355,10 +355,6 @@ type
     procedure SetCaretShapeOvr(AValue: TATSynCaretShape);
     procedure SetCharSpacingX(AValue: integer);
     procedure SetCharSpacingY(AValue: integer);
-    procedure SetGutterBmSize(AValue: integer);
-    procedure SetGutterBmVisible(AValue: boolean);
-    procedure SetGutterNumSize(AValue: integer);
-    procedure SetGutterNumVisible(AValue: boolean);
     procedure SetMarginString(AValue: string);
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
@@ -450,6 +446,7 @@ type
     property GutterBandNum: integer read FGutterBandNum write FGutterBandNum;
     property GutterBandState: integer read FGutterBandState write FGutterBandState;
     property GutterBandFold: integer read FGutterBandFold write FGutterBandFold;
+    property GutterBandEmpty: integer read FGutterBandEmpty write FGutterBandEmpty;
     //files
     procedure LoadFromFile(const AFilename: string);
     procedure SaveToFile(const AFilename: string);
@@ -617,6 +614,8 @@ end;
 { TATSynEdit }
 
 procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
+const
+  ATabSize = 1; //tab not needed in ruler
 var
   NX, NSize, NPrevSize, NRulerStart, i: integer;
   ACharSize: TPoint;
@@ -649,7 +648,8 @@ begin
     if i mod 10 = 0 then
     begin
       Str:= IntToStr(i);
-      CanvasTextOut(C, NX - CanvasTextWidth(Str, FTabSize, ACharSize) div 2, 0, Str, FTabSize, ACharSize, false);
+      Dec(NX, CanvasTextWidth(Str, ATabSize, ACharSize) div 2);
+      CanvasTextOut(C, NX, 0, Str, ATabSize, ACharSize, false);
     end;
   end;
 
@@ -984,7 +984,7 @@ begin
   if FGutterVisible then
   begin
     Result.Left:= 0;
-    Result.Top:= 0;
+    Result.Top:= IfThen(FRulerVisible, FTextOffset.Y);
     Result.Right:= FGutter.Width;
     Result.Bottom:= ClientHeight;
   end
@@ -1055,6 +1055,7 @@ var
   NGutterBmX1, NGutterBmX2,
   NGutterNumsX1, NGutterNumsX2,
   NGutterFoldX1, NGutterFoldX2,
+  NGutterEmptyX1, NGutterEmptyX2,
   NGutterStateX1, NGutterStateX2,
   NCoordTop, NCoordLeftNums: integer;
   NWrapIndex, NLinesIndex: integer;
@@ -1065,7 +1066,7 @@ var
   BmColor: TColor;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint: TPoint;
-  LineCaret: boolean;
+  LineWithCaret: boolean;
   Parts: TATLineParts;
   //
   procedure DoPaintState(ATop: integer; AColor: TColor);
@@ -1084,9 +1085,16 @@ begin
     with FGutter[FGutterBandNum] do begin NGutterNumsX1:= Left; NGutterNumsX2:= Right; end;
     with FGutter[FGutterBandState] do begin NGutterStateX1:= Left; NGutterStateX2:= Right; end;
     with FGutter[FGutterBandFold] do begin NGutterFoldX1:= Left; NGutterFoldX2:= Right; end;
+    with FGutter[FGutterBandEmpty] do begin NGutterEmptyX1:= Left; NGutterEmptyX2:= Right; end;
 
     C.Brush.Color:= FColorGutterBG;
     C.FillRect(FRectGutter);
+
+    if FGutter[FGutterBandEmpty].Visible then
+    begin
+      C.Brush.Color:= FColorTextBG;
+      C.FillRect(NGutterEmptyX1, FRectGutter.Top, NGutterEmptyX2, FRectGutter.Bottom);
+    end;
   end;
 
   NCoordTop:= ARect.Top;
@@ -1111,7 +1119,7 @@ begin
     //prepare line
     Str:= Strings.Lines[NLinesIndex];
     Str:= Copy(Str, WrapItem.NCharIndex, WrapItem.NLength);
-    LineCaret:= IsLineWithCaret(NLinesIndex);
+    LineWithCaret:= IsLineWithCaret(NLinesIndex);
 
     StrOut:= StringOfChar(' ', WrapItem.NIndent) + Str;
     StrOutUncut:= StrOut;
@@ -1129,13 +1137,13 @@ begin
     BmKind:= Strings.LinesBm[NLinesIndex];
     if BmKind<>cBmNone then
       BmColor:= Strings.LinesBmColor[NLinesIndex];
-    if FShowCurLine and LineCaret then
+    if FShowCurLine and LineWithCaret then
       BmColor:= FColorCurLineBG;
 
     if BmColor<>clNone then
     begin
       C.Brush.Color:= BmColor;
-      C.FillRect(0{ARect.Left is correct}, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+      C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
     end;
 
     if WrapItem.NFinal=cWrapItemFinal then
@@ -1184,21 +1192,21 @@ begin
           CanvasTextWidth(StrOutUncut, FTabSize, ACharSize) - AScrollHorz.NPos*ACharSize.X);
 
     //draw gutter
-    if AWithGutter and FNumbersVisible then
+    if AWithGutter then
     begin
       C.Brush.Color:= FColorGutterBG;
-      C.FillRect(0, NCoordTop, FGutter.Width, NCoordTop+ACharSize.Y);
+      C.FillRect(FRectGutter.Left, NCoordTop, FRectGutter.Right, NCoordTop+ACharSize.Y);
 
-      if LineCaret then
+      //gutter band: number
+      if FGutter[FGutterBandNum].Visible then
       begin
-        C.Brush.Color:= FColorGutterCaretBG;
-        C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
-      end;
+        if LineWithCaret then
+        begin
+          C.Brush.Color:= FColorGutterCaretBG;
+          C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
+        end;
 
-      if FWrapInfo.IsItemInitial(NWrapIndex) then
-      begin
-        //draw number
-        if FGutter[FGutterBandNum].Visible then
+        if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
           C.Font.Color:= FColorGutterFont;
           C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
@@ -1207,22 +1215,32 @@ begin
           NCoordLeftNums:= NGutterNumsX2 - CanvasTextWidth(Str, FTabSize, ACharSize) - cSizeGutterNumOffsetRight;
           CanvasTextOut(C, NCoordLeftNums, NCoordTop, Str, FTabSize, ACharSize, false);
         end;
-
-        //draw bookmark icon
-        if FGutter[FGutterBandBm].Visible then
-        begin
-          if Strings.LinesBm[NLinesIndex]<>cBmNone then
-            DoEventDrawBookmarkIcon(C, NLinesIndex, Rect(NGutterBmX1, NCoordTop, NGutterBmX2, NCoordTop+ACharSize.Y));
-        end;
       end;
 
-      //draw line state
+      //gutter band: bookmark
+      if FGutter[FGutterBandBm].Visible then
+      begin
+        if Strings.LinesBm[NLinesIndex]<>cBmNone then
+          DoEventDrawBookmarkIcon(C, NLinesIndex, Rect(NGutterBmX1, NCoordTop, NGutterBmX2, NCoordTop+ACharSize.Y));
+      end;
+
+      //gutter band: state
       if FGutter[FGutterBandState].Visible then
+      begin
         case Strings.LinesState[WrapItem.NLineIndex] of
           cLineStateChanged: DoPaintState(NCoordTop, FColorStateChanged);
           cLineStateAdded: DoPaintState(NCoordTop, FColorStateAdded);
           cLineStateSaved: DoPaintState(NCoordTop, FColorStateSaved);
         end;
+      end;
+
+      //gutter band: empty indent
+      if FGutter[FGutterBandEmpty].Visible then
+      begin
+        C.Brush.Color:= FColorTextBG;
+        C.FillRect(NGutterEmptyX1, NCoordTop, NGutterEmptyX2, NCoordTop+ACharSize.Y);
+        C.Brush.Color:= FColorGutterBG;
+      end;
     end;
 
     //end of painting line
@@ -1560,12 +1578,14 @@ begin
   FGutterBandNum:= 1;
   FGutterBandFold:= 2;
   FGutterBandState:= 3;
+  FGutterBandEmpty:= 4;
 
   for i:= 1 to cGutterBands do FGutter.Add(10);
   FGutter[FGutterBandBm].Size:= cSizeGutterBandBm;
   FGutter[FGutterBandNum].Size:= cSizeGutterBandNum;
   FGutter[FGutterBandState].Size:= cSizeGutterBandState;
   FGutter[FGutterBandFold].Size:= cSizeGutterBandFold;
+  FGutter[FGutterBandEmpty].Size:= cSizeGutterBandEmpty;
   FGutter.Update;
 
   FRulerHeight:= cSizeRulerHeight;
@@ -1575,7 +1595,6 @@ begin
   FRulerVisible:= true;
 
   FNumbersFontSize:= cInitNumbersFontSize;
-  FNumbersVisible:= cInitNumbersVisible;
   FNumbersStyle:= cInitNumbersStyle;
 
   FMinimapWidth:= cInitMinimapWidth;
@@ -1703,30 +1722,6 @@ begin
   if FCharSpacingText.Y=AValue then Exit;
   FCharSpacingText.Y:= AValue;
   FWrapUpdateNeeded:= true;
-end;
-
-procedure TATSynEdit.SetGutterBmSize(AValue: integer);
-begin
-  FGutter[FGutterBandBm].Size:= AValue;
-  FGutter.Update;
-end;
-
-procedure TATSynEdit.SetGutterBmVisible(AValue: boolean);
-begin
-  FGutter[FGutterBandBm].Visible:= AValue;
-  FGutter.Update;
-end;
-
-procedure TATSynEdit.SetGutterNumSize(AValue: integer);
-begin
-  FGutter[FGutterBandNum].Size:= AValue;
-  FGutter.Update;
-end;
-
-procedure TATSynEdit.SetGutterNumVisible(AValue: boolean);
-begin
-  FGutter[FGutterBandNum].Visible:= AValue;
-  FGutter.Update;
 end;
 
 procedure TATSynEdit.SetMarginString(AValue: string);

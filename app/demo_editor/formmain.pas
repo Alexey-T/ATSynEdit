@@ -454,6 +454,7 @@ begin
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
     chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
+    chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
 
     if ShowModal=mrOk then
     begin
@@ -465,6 +466,7 @@ begin
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
       ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
+      ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
 
       ed.Gutter.Update;
       ed.Update;

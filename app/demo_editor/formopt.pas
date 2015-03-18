@@ -19,6 +19,7 @@ type
     chkGutterBm: TCheckBox;
     chkGutterNum: TCheckBox;
     chkGutterStat: TCheckBox;
+    chkGutterEmpty: TCheckBox;
     edCaretTime: TSpinEdit;
     Label8: TLabel;
   private
