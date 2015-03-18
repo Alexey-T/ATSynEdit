@@ -101,7 +101,7 @@ object fmMain: TfmMain
       MinValue = 20
       OnChange = edMarRtChange
       TabOrder = 13
-      Value = 80
+      Value = 20
     end
     object gWrap: TGroupBox
       Left = 144
@@ -177,7 +177,7 @@ object fmMain: TfmMain
       MinValue = 6
       OnChange = edFontsizeChange
       TabOrder = 9
-      Value = 12
+      Value = 10
     end
     object Label4: TLabel
       Left = 67
@@ -427,11 +427,15 @@ object fmMain: TfmMain
     top = 20
   end
   object PopupMenu1: TPopupMenu
-    left = 480
-    top = 72
-    object MenuItem1: TMenuItem
+    left = 496
+    top = 84
+    object mnuPst: TMenuItem
       Caption = 'Paste'
-      OnClick = MenuItem1Click
+      OnClick = mnuPstClick
+    end
+    object mnuSel: TMenuItem
+      Caption = 'Select all'
+      OnClick = mnuSelClick
     end
   end
   object SaveDialog1: TSaveDialog

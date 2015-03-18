@@ -50,7 +50,8 @@ type
     Label8: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
-    MenuItem1: TMenuItem;
+    mnuPst: TMenuItem;
+    mnuSel: TMenuItem;
     mnuTBms: TMenuItem;
     mnuTMargin: TMenuItem;
     mnuFile: TMenuItem;
@@ -112,10 +113,11 @@ type
     procedure edTabsizeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure MenuItem1Click(Sender: TObject);
+    procedure mnuPstClick(Sender: TObject);
     procedure mnuEndMcClick(Sender: TObject);
     procedure mnuEndUnClick(Sender: TObject);
     procedure mnuEndWClick(Sender: TObject);
+    procedure mnuSelClick(Sender: TObject);
     procedure mnuTBmsClick(Sender: TObject);
     procedure mnuTFoldClick(Sender: TObject);
     procedure mnuTMarginClick(Sender: TObject);
@@ -192,7 +194,7 @@ begin
     edit.LoadFromFile(fn);
 end;
 
-procedure TfmMain.MenuItem1Click(Sender: TObject);
+procedure TfmMain.mnuPstClick(Sender: TObject);
 begin
   edit.DoCommandExec(cCommand_ClipboardPaste);
   edit.Update;
@@ -217,6 +219,12 @@ begin
   edit.Strings.Endings:= cLineEndWin;
   edit.Update;
   UpdateStatus;
+end;
+
+procedure TfmMain.mnuSelClick(Sender: TObject);
+begin
+  edit.DoCommandExec(cCommand_SelectAll);
+  edit.Update;
 end;
 
 procedure TfmMain.mnuTBmsClick(Sender: TObject);
