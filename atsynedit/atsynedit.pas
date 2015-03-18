@@ -360,6 +360,8 @@ type
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     procedure DoEventCommand(ACommand: integer; out AHandled: boolean);
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
+    procedure DoSelect_Line(P: TPoint);
+    procedure DoSelect_Word(P: TPoint);
     function GetCaretsTime: integer;
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
@@ -494,6 +496,8 @@ type
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
+    procedure DblClick; override;
+    procedure TripleClick; override;
     //messages
     {$ifdef windows}
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
@@ -1143,9 +1147,6 @@ begin
 
   UpdateWrapInfo;
 
-  //debug
-  _InitCarets(FCarets);
-
   if FRulerVisible then
     DoPaintRulerTo(C);
   DoPaintTextTo(C, FRectMain, FCharSize, FGutterVisible, FUnprintedVisible, FScrollHorz, FScrollVert);
@@ -1602,7 +1603,7 @@ begin
   inherited;
 
   Caption:= '';
-  ControlStyle:= ControlStyle+[csOpaque];
+  ControlStyle:= ControlStyle+[csOpaque, csDoubleClicks, csTripleClicks];
   BorderStyle:= bsNone;
   TabStop:= true;
 
@@ -2124,6 +2125,28 @@ begin
         Invalidate;
       end;
     end;
+end;
+
+procedure TATSynEdit.DblClick;
+var
+  P: TPoint;
+begin
+  inherited;
+
+  P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos));
+  if P.Y<0 then Exit;
+  DoSelect_Word(P);
+end;
+
+procedure TATSynEdit.TripleClick;
+var
+  P: TPoint;
+begin
+  inherited;
+
+  P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos));
+  if P.Y<0 then Exit;
+  DoSelect_Line(P);
 end;
 
 procedure TATSynEdit.Invalidate;

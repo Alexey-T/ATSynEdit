@@ -9,6 +9,7 @@ uses
   ATStringProc;
 
 function SFindWordOffset(const S: atString; AOffset: integer; ANext, ABigJump: boolean): integer;
+procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer);
 
 implementation
 
@@ -77,6 +78,21 @@ begin
     end
   end;
   Result:= n;
+end;
+
+procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer);
+begin
+  if (AOffset>=0) and (AOffset<Length(S)) and
+    IsWordChar(S[AOffset+1]) then
+  begin
+    AOffset1:= SFindWordOffset(S, AOffset, false, false);
+    AOffset2:= SFindWordOffset(S, AOffset, true, false);
+  end
+  else
+  begin
+    AOffset1:= AOffset;
+    AOffset2:= AOffset;
+  end;
 end;
 
 end.
