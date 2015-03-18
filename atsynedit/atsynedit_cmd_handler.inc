@@ -137,11 +137,11 @@ begin
     cCommand_KeyHome:             Res:= DoCommand_KeyHome;
     cCommand_KeyEnd:              Res:= DoCommand_KeyEnd;
 
-    cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOvrMode);
+    cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);
     cCommand_KeyDelete:           Res:= DoCommand_TextDeleteRight(1);
     cCommand_KeyTab:              Res:= DoCommand_TextInsertTab;
-    cCommand_KeyTabChar:          Res:= DoCommand_TextInsertAtCarets(#9, false, FOvrMode);
+    cCommand_KeyTabChar:          Res:= DoCommand_TextInsertAtCarets(#9, false, FOver);
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
     cCommand_KeyPageUp:           Res:= DoCommand_KeyUpDown(false, GetVisibleLines-1);
     cCommand_KeyPageDown:         Res:= DoCommand_KeyUpDown(true, GetVisibleLines-1);
@@ -161,7 +161,7 @@ begin
     cCommand_GotoWordPrev:             Res:= DoCommand_GotoWord(false);
 
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
-    cCommand_ToggleOvr:                Res:= DoCommand_ToggleOvr;
+    cCommand_ToggleOvr:                Res:= DoCommand_ToggleOver;
     cCommand_ScrollLineUp:             Res:= DoCommand_ScrollLineUpDown(false);
     cCommand_ScrollLineDown:           Res:= DoCommand_ScrollLineUpDown(true);
 

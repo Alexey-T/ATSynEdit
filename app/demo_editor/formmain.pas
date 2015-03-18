@@ -288,7 +288,7 @@ begin
     ed.Carets.Count,
     ed.ScrollTop+1,
     cEnd[ed.Strings.Endings],
-    cOvr[ed.ModeOvr],
+    cOvr[ed.ModeOver],
     cRo[ed.ModeReadOnly]
     ]);
 end;

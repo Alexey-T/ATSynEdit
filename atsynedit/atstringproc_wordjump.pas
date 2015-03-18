@@ -82,16 +82,17 @@ end;
 
 procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer);
 begin
+  AOffset1:= AOffset;
+  AOffset2:= AOffset;
+
   if (AOffset>=0) and (AOffset<Length(S)) and
     IsWordChar(S[AOffset+1]) then
   begin
-    AOffset1:= SFindWordOffset(S, AOffset, false, false);
+    //jump left only if at middle of word
+    if (AOffset>0) and IsWordChar(S[AOffset]) then
+      AOffset1:= SFindWordOffset(S, AOffset, false, false);
+    //jump right always
     AOffset2:= SFindWordOffset(S, AOffset, true, false);
-  end
-  else
-  begin
-    AOffset1:= AOffset;
-    AOffset2:= AOffset;
   end;
 end;
 

@@ -41,7 +41,7 @@ begin
     Str:= StringOfChar(' ', FTabSize)
   else
     Str:= #9;
-  Result:= DoCommand_TextInsertAtCarets(Str, false, FOvrMode);
+  Result:= DoCommand_TextInsertAtCarets(Str, false, FOver);
 end;
 
 

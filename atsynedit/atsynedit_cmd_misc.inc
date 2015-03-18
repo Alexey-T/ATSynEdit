@@ -1,8 +1,8 @@
 {$ifdef nnn}begin end;{$endif}
 
-function TATSynEdit.DoCommand_ToggleOvr: TATCommandResults;
+function TATSynEdit.DoCommand_ToggleOver: TATCommandResults;
 begin
-  ModeOvr:= not ModeOvr;
+  ModeOver:= not ModeOver;
   Result:= [cResultState];
 end;
 

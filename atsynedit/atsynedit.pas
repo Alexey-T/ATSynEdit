@@ -208,8 +208,8 @@ type
     FCaretVirtualPos: boolean;
     FCaretSpecPos: boolean;
     FCaretMoveByRtClick: boolean;
-    FOvrMode: boolean;
-    FOvrModeApplyForPaste: boolean;
+    FOver: boolean;
+    FUseOverOnPaste: boolean;
     FMouseDownPnt: TPoint;
     FKeyNavigateInWrappedLines: boolean;
     FOnCaretMoved: TNotifyEvent;
@@ -362,7 +362,7 @@ type
     procedure SetMarginString(AValue: string);
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
-    procedure SetOvrMode(AValue: boolean);
+    procedure SetOver(AValue: boolean);
     procedure SetReadOnly(AValue: boolean);
     procedure SetScrollTop(AValue: integer);
     procedure SetStrings(Obj: TATStrings);
@@ -404,7 +404,7 @@ type
     function DoCommand_CaretsRemove: TATCommandResults;
     function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
-    function DoCommand_ToggleOvr: TATCommandResults;
+    function DoCommand_ToggleOver: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
     function DoCommand_ScrollLineUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret, AOvrMode: boolean): TATCommandResults;
@@ -440,16 +440,16 @@ type
       AUpdateCaretsCoords: boolean = true); reintroduce;
     //text
     property Strings: TATStrings read GetStrings write SetStrings;
+    property KeyMapping: TATKeyMapping read FKeyMapping;
+    property ScrollTop: integer read GetScrollTop write SetScrollTop;
+    property ModeOver: boolean read FOver write SetOver;
+    property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
+    //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
     property GutterBandNum: integer read FGutterBandNum write FGutterBandNum;
     property GutterBandState: integer read FGutterBandState write FGutterBandState;
     property GutterBandFold: integer read FGutterBandFold write FGutterBandFold;
-    property KeyMapping: TATKeyMapping read FKeyMapping;
-    property ScrollTop: integer read GetScrollTop write SetScrollTop;
-    property ModeOvr: boolean read FOvrMode write SetOvrMode;
-    property ModeOvrApplyForPaste: boolean read FOvrModeApplyForPaste write FOvrModeApplyForPaste;
-    property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     //files
     procedure LoadFromFile(const AFilename: string);
     procedure SaveToFile(const AFilename: string);
@@ -481,6 +481,7 @@ type
     procedure WMHScroll(var Msg: TLMHScroll); message LM_HSCROLL;
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
   published
+    //events
     property OnCaretMoved: TNotifyEvent read FOnCaretMoved write FOnCaretMoved;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnScrolled: TNotifyEvent read FOnScrolled write FOnScrolled;
@@ -489,6 +490,8 @@ type
     property OnClickGutter: TATSynEditClickGutter read FOnClickGutter write FOnClickGutter;
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkIcon read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
 
+    //options
+    property OptUseOverOnPaste: boolean read FUseOverOnPaste write FUseOverOnPaste;
     property OptShowCurLine: boolean read FShowCurLine write FShowCurLine;
     property OptShowCurColumn: boolean read FShowCurColumn write FShowCurColumn;
     property OptCaretVirtualPos: boolean read FCaretVirtualPos write FCaretVirtualPos;
@@ -1501,8 +1504,8 @@ begin
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
   FKeyNavigateInWrappedLines:= true;
-  FOvrMode:= false;
-  FOvrModeApplyForPaste:= false;
+  FOver:= false;
+  FUseOverOnPaste:= false;
 
   FColorTextBG:= cInitColorTextBG;
   FColorTextFont:= cInitColorTextFont;
@@ -1759,10 +1762,10 @@ begin
   FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.SetOvrMode(AValue: boolean);
+procedure TATSynEdit.SetOver(AValue: boolean);
 begin
-  if FOvrMode= AValue then Exit;
-  FOvrMode:= AValue;
+  if FOver= AValue then Exit;
+  FOver:= AValue;
 end;
 
 procedure TATSynEdit.SetReadOnly(AValue: boolean);
@@ -2054,7 +2057,7 @@ var
   Item: TATSynCaretItem;
   Shape: TATSynCaretShape;
 begin
-  if ModeOvr then
+  if ModeOver then
     Shape:= FCaretShapeOvr
   else
     Shape:= FCaretShape;
