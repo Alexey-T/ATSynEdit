@@ -9,7 +9,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, formmain, formkey, atcanvasproc, atkeymapping, atstringproc,
   atstringproc_wordjump, atstrings, atsyncarets, atsynedit, atsynedit_commands,
-  atsynedit_keymapping;
+  atsynedit_keymapping, ATGutter;
 
 {$R *.res}
 
