@@ -1120,26 +1120,22 @@ begin
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
-    BmColor:= clNone;
 
     C.Brush.Color:= FColorTextBG;
     C.Font.Color:= FColorTextFont;
 
     //draw bookmark bg
-    if AWithGutter then
+    BmColor:= clNone;
+    BmKind:= Strings.LinesBm[NLinesIndex];
+    if BmKind<>cBmNone then
+      BmColor:= Strings.LinesBmColor[NLinesIndex];
+    if FShowCurLine and LineCaret then
+      BmColor:= FColorCurLineBG;
+
+    if BmColor<>clNone then
     begin
-      BmKind:= Strings.LinesBm[NLinesIndex];
-      if BmKind<>cBmNone then
-        BmColor:= Strings.LinesBmColor[NLinesIndex];
-
-      if FShowCurLine and LineCaret then
-        BmColor:= FColorCurLineBG;
-
-      if BmColor<>clNone then
-      begin
-        C.Brush.Color:= BmColor;
-        C.FillRect(FGutter.Width{ARect.Left is correct}, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-      end;
+      C.Brush.Color:= BmColor;
+      C.FillRect(0{ARect.Left is correct}, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
     end;
 
     if WrapItem.NFinal=cWrapItemFinal then
