@@ -1219,10 +1219,11 @@ begin
 
       //gutter band: bookmark
       if FGutter[FGutterBandBm].Visible then
-      begin
-        if Strings.LinesBm[NLinesIndex]<>cBmNone then
-          DoEventDrawBookmarkIcon(C, NLinesIndex, Rect(NGutterBmX1, NCoordTop, NGutterBmX2, NCoordTop+ACharSize.Y));
-      end;
+        if FWrapInfo.IsItemInitial(NWrapIndex) then
+        begin
+          if Strings.LinesBm[NLinesIndex]<>cBmNone then
+            DoEventDrawBookmarkIcon(C, NLinesIndex, Rect(NGutterBmX1, NCoordTop, NGutterBmX2, NCoordTop+ACharSize.Y));
+        end;
 
       //gutter band: state
       if FGutter[FGutterBandState].Visible then
