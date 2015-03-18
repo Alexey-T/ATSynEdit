@@ -211,6 +211,7 @@ type
     FOver: boolean;
     FUseOverOnPaste: boolean;
     FMouseDownPnt: TPoint;
+    FMouseDownNumber: integer;
     FKeyNavigateInWrappedLines: boolean;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
@@ -374,7 +375,7 @@ type
     procedure SetTabSize(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapWithIndent(AValue: boolean);
-    procedure UpdateGutterAutosize(C: TCanvas);
+    procedure UpdateGutterAutosize;
     procedure UpdateMinimapAutosize(C: TCanvas);
     function DoFormatLineNumber(N: integer): atString;
     procedure UpdateWrapInfo;
@@ -460,6 +461,7 @@ type
     procedure DoSelect_All(AUpdate: boolean);
     procedure DoSelect_Line(P: TPoint; AUpdate: boolean);
     procedure DoSelect_Word(P: TPoint; AUpdate: boolean);
+    procedure DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint; AUpdate: boolean);
     procedure DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
 
@@ -657,7 +659,7 @@ begin
   C.Font.Size:= NPrevSize;
 end;
 
-procedure TATSynEdit.UpdateGutterAutosize(C: TCanvas);
+procedure TATSynEdit.UpdateGutterAutosize;
 begin
   FGutter[FGutterBandNum].Size:= GetGutterNumbersColumnWidth;
   FGutter.Update;
@@ -729,7 +731,7 @@ const
 var
   si: TScrollInfo;
 begin
-  FillChar(si, SizeOf(si), 0);
+  FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;
   GetScrollInfo(Handle, cKind[bVertical], si);
@@ -920,7 +922,7 @@ procedure TATSynEdit.UpdateScrollbarVert;
 var
   si: TScrollInfo;
 begin
-  FillChar(si, SizeOf(si), 0);
+  FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL;
   si.nMin:= FScrollVert.NMin;
@@ -934,7 +936,7 @@ procedure TATSynEdit.UpdateScrollbarHorz;
 var
   si: TScrollInfo;
 begin
-  FillChar(si, SizeOf(si), 0);
+  FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL;
   si.nMin:= FScrollHorz.NMin;
@@ -1015,7 +1017,7 @@ begin
   FCharSize:= GetCharSize(C, FCharSpacingText);
   FCharSizeMinimap:= Point(8, 8);
 
-  if FGutterVisible then UpdateGutterAutosize(C);
+  if FGutterVisible then UpdateGutterAutosize;
   if FMinimapVisible then UpdateMinimapAutosize(C);
 
   FTextOffset:= GetTextOffset; //after gutter autosize
@@ -1158,7 +1160,7 @@ begin
       Delete(StrOut, 1, NOutputCharsSkipped);
       Delete(StrOut, cMaxCharsForOutput, MaxInt);
 
-      DoCalcLineHilite(WrapItem, Parts,
+      DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
         IfThen(BmColor<>clNone, BmColor, FColorTextBG));
 
@@ -1906,17 +1908,18 @@ end;
 
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  Pnt: TPoint;
+  PCaret: TPoint;
 begin
   inherited;
   SetFocus;
   FCaretSpecPos:= false;
 
-  Pnt:= ClientPosToCaretPos(Point(X, Y));
+  PCaret:= ClientPosToCaretPos(Point(X, Y));
+  FMouseDownNumber:= -1;
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
-    FMouseDownPnt:= Pnt;
+    FMouseDownPnt:= PCaret;
 
     if Shift=[ssLeft] then
     begin
@@ -1946,13 +1949,21 @@ begin
 
   if PtInRect(FRectGutter, Point(X, Y)) then
   begin
-    DoEventClickGutter(FGutter.IndexAt(X), Pnt.Y);
+    //handle click on numbers here
+    if (X>=FGutter[FGutterBandNum].Left) and
+      (X<FGutter[FGutterBandNum].Right) then
+    begin
+      FMouseDownNumber:= PCaret.Y;
+      DoSelect_Line(PCaret, false);
+    end
+    else
+      //on other bands- event
+      DoEventClickGutter(FGutter.IndexAt(X), PCaret.Y);
   end;
 
   DoCaretsSort;
-  UpdateCaretsCoords;
   DoEventCarets;
-  Invalidate;
+  Update;
 end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
@@ -1987,14 +1998,14 @@ begin
   if PtInRect(RectNums, P) then
     if ssLeft in Shift then
     begin
-      DoCaretSingleAsIs;
-      P:= ClientPosToCaretPos(Point(FRectMain.Left, P.Y));
+      P:= ClientPosToCaretPos(P);
       if (P.Y>=0) and (P.X>=0) then
-      begin
-        Carets.ExtendSelectionToPoint(0, P.X, P.Y);
-        DoEventCarets;
-        Update;
-      end;
+        if FMouseDownNumber>=0 then
+        begin
+          DoSelect_Lines_ToPoint(FMouseDownNumber, P, false);
+          DoEventCarets;
+          Update;
+        end;
     end;
 
   //mouse dragged on text

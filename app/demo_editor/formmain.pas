@@ -344,10 +344,12 @@ begin
     ed.Update;
   end;
 
+  {//in control
   if ABand=ed.GutterBandNum then
   begin
     ed.DoSelect_Line(Point(0, ALine), true);
   end;
+  }
 end;
 
 procedure TfmMain.EditDrawBm(Sender: TObject; C: TCanvas; ALineNum: integer;

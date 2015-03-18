@@ -141,6 +141,7 @@ begin
   Result.Y:= -1;
   if (ACharSize.X<=0) or (ACharSize.Y<=0) then Exit;
 
+  P.X:= Max(P.X, ARect.Left);
   NIndex:= (P.Y-ARect.Top) div ACharSize.Y + AScrollVert.NPos;
 
   if NIndex<0 then

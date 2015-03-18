@@ -86,3 +86,30 @@ begin
   if AUpdate then Update;
 end;
 
+procedure TATSynEdit.DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint; AUpdate: boolean);
+var
+  CItem: TATSynCaretItem;
+begin
+  DoCaretSingle(P.X, P.Y);
+  CItem:= Carets[0];
+
+  if P.Y<ALineFrom then
+  begin
+    CItem.EndX:= 0;
+    CItem.EndY:= ALineFrom+1;
+  end
+  else
+  if P.Y>ALineFrom then
+  begin
+    CItem.EndX:= 0;
+    CItem.EndY:= ALineFrom;
+  end
+  else
+  if P.Y=ALineFrom then
+  begin
+    DoSelect_Line(P, false);
+  end;
+
+  if AUpdate then Update;
+end;
+
