@@ -159,7 +159,7 @@ const
   cUnprintedFontOffsetX = 3;
   cUnprintedFontOffsetY = 2;
   cUnprintedFontScale = 0.80;
-  cUnprintedDotMin = 2;
+  cUnprintedDotMinSize = 2;
   cUnprintedDotScale = 6; //divider of line height
   cUnprintedEndScale = 3; //divider of line height
   cSizeScrollCaretHorz = 10;
@@ -343,7 +343,7 @@ type
       ACharSize: TPoint;
       AOffsetX: integer);
     procedure DoPaintUnprintedEol(C: TCanvas;
-      const AWrapItem: TATSynWrapItem;
+      const AItem: TATSynWrapItem;
       ALineStart: TPoint;
       AOffsetX: integer);
     procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer);
@@ -1486,15 +1486,20 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintUnprintedEol(C: TCanvas;
-  const AWrapItem: TATSynWrapItem;
+  const AItem: TATSynWrapItem;
   ALineStart: TPoint;
   AOffsetX: integer);
 var
   NPosX, NPosY, NPrevSize: integer;
+  Eol: TATLineEnds;
   StrEol: atString;
   ACharSize: TPoint;
 begin
-  if AWrapItem.NFinal<>cWrapItemFinal then Exit;
+  if AItem.NFinal<>cWrapItemFinal then Exit;
+
+  Eol:= Strings.LinesEnds[AItem.NLineIndex];
+  StrEol:= cLineEndNiceNames[Eol];
+  if StrEol='' then Exit;
 
   NPosX:= ALineStart.X + AOffsetX;
   NPosY:= ALineStart.Y;
@@ -1508,10 +1513,8 @@ begin
     C.Font.Color:= FColorUnprintedFont;
     C.Brush.Color:= FColorUnprintedBG;
 
-    Inc(NPosY, cUnprintedFontOffsetY);
-
-    StrEol:= cLineEndNiceNames[Strings.LinesEnds[AWrapItem.NLineIndex]];
     Inc(NPosX, cUnprintedFontOffsetX);
+    Inc(NPosY, cUnprintedFontOffsetY);
     CanvasTextOut(C, NPosX, NPosY, StrEol, FTabSize, ACharSize, false);
 
     C.Font.Size:= NPrevSize;
@@ -1527,7 +1530,7 @@ var
   R: TRect;
   NSize: integer;
 begin
-  NSize:= Max(cUnprintedDotMin, (ARect.Bottom-ARect.Top) div AScale);
+  NSize:= Max(cUnprintedDotMinSize, (ARect.Bottom-ARect.Top) div AScale);
   R.Left:= (ARect.Left+ARect.Right) div 2 - NSize div 2;
   R.Top:= (ARect.Top+ARect.Bottom) div 2 - NSize div 2;
   R.Right:= R.Left + NSize;
@@ -2079,25 +2082,43 @@ end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
-  RClick: TRect;
+  RectBm: TRect;
+  CItem: TATSynCaretItem;
+  Pnt: TPoint;
 begin
   inherited;
 
   with FGutter[FGutterBandBm] do
   begin
-    RClick.Left:= Left;
-    RClick.Right:= Right;
-    RClick.Top:= FRectMain.Top;
-    RClick.Bottom:= FRectMain.Bottom;
+    RectBm.Left:= Left;
+    RectBm.Right:= Right;
+    RectBm.Top:= FRectMain.Top;
+    RectBm.Bottom:= FRectMain.Bottom;
   end;
 
   if PtInRect(FRectMain, Point(X, Y)) then
     Cursor:= crIBeam
   else
-  if PtInRect(RClick, Point(X, Y)) then
+  if PtInRect(RectBm, Point(X, Y)) then
     Cursor:= crHandPoint
   else
     Cursor:= crDefault;
+
+  //mouse dragged
+  if ssLeft in Shift then
+    if Carets.Count>0 then
+    begin
+      Pnt:= ClientPosToCaretPos(Point(X, Y));
+      if Pnt.Y>=0 then
+      begin
+        CItem:= Carets[0];
+        if CItem.EndX<0 then CItem.EndX:= CItem.PosX;
+        if CItem.EndY<0 then CItem.EndY:= CItem.PosY;
+        CItem.PosX:= Pnt.X;
+        CItem.PosY:= Pnt.Y;
+        Invalidate;
+      end;
+    end;
 end;
 
 procedure TATSynEdit.Invalidate;
