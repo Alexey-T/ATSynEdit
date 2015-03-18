@@ -165,7 +165,7 @@ const
   cSizeBitmapStep = 100;
   cOffsetTextLeft = 3;
   cOffsetTextTop = 1;
-  cSizeGutterNumOffsetLeft = 10;
+  cSizeGutterNumOffsetLeft = 5;
   cSizeGutterNumOffsetRight = 3;
   cSizeRulerHeight = 19;
   cSizeRulerMarkSmall = 3;

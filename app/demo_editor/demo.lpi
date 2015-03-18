@@ -45,6 +45,7 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -133,7 +134,6 @@
       <Unit22>
         <Filename Value="..\..\atsynedit\atgutter.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATGutter"/>
       </Unit22>
     </Units>
   </ProjectOptions>
