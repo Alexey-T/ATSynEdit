@@ -291,9 +291,11 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoCaretsLeaveOne(AX, AY: integer);
+procedure TATSynEdit.DoCaretSingle(AX, AY: integer);
 begin
-  if Carets.Count=0 then Exit;
+  if Carets.Count=0 then
+    Carets.Add(AX, AY);
+
   while Carets.Count>1 do
     Carets.Delete(Carets.Count-1);
 

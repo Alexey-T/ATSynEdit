@@ -121,7 +121,6 @@
       <Unit19>
         <Filename Value="..\..\atsynedit\atsynedit_keymapping.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Keymapping"/>
       </Unit19>
       <Unit20>
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
