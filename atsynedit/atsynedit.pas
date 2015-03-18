@@ -1120,6 +1120,7 @@ begin
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
+    BmColor:= clNone;
 
     C.Brush.Color:= FColorTextBG;
     C.Font.Color:= FColorTextFont;
@@ -1127,7 +1128,6 @@ begin
     //draw bookmark bg
     if AWithGutter then
     begin
-      BmColor:= clNone;
       BmKind:= Strings.LinesBm[NLinesIndex];
       if BmKind<>cBmNone then
         BmColor:= Strings.LinesBmColor[NLinesIndex];
