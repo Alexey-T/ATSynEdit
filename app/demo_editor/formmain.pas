@@ -13,11 +13,7 @@ type
   TfmMain = class(TForm)
     bFont: TButton;
     Button1: TButton;
-    chkGutterStat: TCheckBox;
-    chkGutterNum: TCheckBox;
-    chkGutterBm: TCheckBox;
     chkUnprintRep: TCheckBox;
-    chkCaretVirtual: TCheckBox;
     chkMicromap: TCheckBox;
     chkUnprintSp: TCheckBox;
     chkUnprintEnd: TCheckBox;
@@ -27,7 +23,6 @@ type
     chkGutter: TCheckBox;
     chkRuler: TCheckBox;
     chkMinimap: TCheckBox;
-    edCaretTime: TSpinEdit;
     edCaretSh: TComboBox;
     edFontsize: TSpinEdit;
     edMarRt: TSpinEdit;
@@ -46,7 +41,6 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
-    Label8: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
     mnuPst: TMenuItem;
@@ -83,13 +77,7 @@ type
     procedure bSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure chkCaretVirtualChange(Sender: TObject);
-    procedure chkCurColChange(Sender: TObject);
-    procedure chkCurLineChange(Sender: TObject);
-    procedure chkGutterBmChange(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
-    procedure chkGutterNumChange(Sender: TObject);
-    procedure chkGutterStatChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
@@ -113,6 +101,7 @@ type
     procedure edTabsizeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure gCaretClick(Sender: TObject);
     procedure mnuPstClick(Sender: TObject);
     procedure mnuEndMcClick(Sender: TObject);
     procedure mnuEndUnClick(Sender: TObject);
@@ -193,6 +182,11 @@ begin
   fn:= FDir+'\fn.txt';
   if FileExists(fn) then
     ed.LoadFromFile(fn);
+end;
+
+procedure TfmMain.gCaretClick(Sender: TObject);
+begin
+
 end;
 
 procedure TfmMain.mnuPstClick(Sender: TObject);
@@ -302,9 +296,6 @@ end;
 procedure TfmMain.UpdateChecks;
 begin
   chkGutter.Checked:= ed.OptGutterVisible;
-  chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
-  chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
-  chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
   chkRuler.Checked:= ed.OptRulerVisible;
   chkMinimap.Checked:= ed.OptMinimapVisible;
   chkMicromap.Checked:= ed.OptMicromapVisible;
@@ -326,8 +317,6 @@ begin
   chkUnprintRep.Checked:= ed.OptUnprintedReplaceSpec;
   edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
   edCaretSh.ItemIndex:= Ord(ed.OptCaretShape);
-  chkCaretVirtual.Checked:= ed.OptCaretVirtualPos;
-  edCaretTime.Value:= ed.OptCaretsTime;
 end;
 
 procedure TfmMain.EditScroll(Sender: TObject);
@@ -413,6 +402,7 @@ begin
       ed.Update;
     end;
   end;
+  ed.SetFocus;
 end;
 
 procedure TfmMain.bAddCrtClick(Sender: TObject);
@@ -458,58 +448,36 @@ begin
   begin
     chkCurLine.Checked:= ed.OptShowCurLine;
     chkCurCol.Checked:= ed.OptShowCurColumn;
+    chkCaretVirtual.Checked:= ed.OptCaretVirtualPos;
+    edCaretTime.Value:= ed.OptCaretsTime;
+
+    chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
+    chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
+    chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
+
     if ShowModal=mrOk then
     begin
       ed.OptShowCurLine:= chkCurLine.Checked;
       ed.OptShowCurColumn:= chkCurCol.Checked;
+      ed.OptCaretVirtualPos:= chkCaretVirtual.Checked;
+      ed.OptCaretsTime:= edCaretTime.Value;
 
+      ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
+      ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
+      ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
+
+      ed.Gutter.Update;
       ed.Update;
     end;
+
+    ed.SetFocus;
   end;
-end;
-
-procedure TfmMain.chkCaretVirtualChange(Sender: TObject);
-begin
-  if wait then Exit;
-  ed.OptCaretVirtualPos:= chkCaretVirtual.Checked;
-end;
-
-procedure TfmMain.chkCurColChange(Sender: TObject);
-begin
-end;
-
-procedure TfmMain.chkCurLineChange(Sender: TObject);
-begin
-end;
-
-procedure TfmMain.chkGutterBmChange(Sender: TObject);
-begin
-  if wait then Exit;
-  ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
-  ed.Gutter.Update;
-  ed.Update;
 end;
 
 procedure TfmMain.chkGutterChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptGutterVisible:= chkGutter.Checked;
-  ed.Update;
-end;
-
-procedure TfmMain.chkGutterNumChange(Sender: TObject);
-begin
-  if wait then Exit;
-  ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
-  ed.Gutter.Update;
-  ed.Update;
-end;
-
-procedure TfmMain.chkGutterStatChange(Sender: TObject);
-begin
-  if wait then Exit;
-  ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
-  ed.Gutter.Update;
   ed.Update;
 end;
 
@@ -599,8 +567,6 @@ end;
 
 procedure TfmMain.edCaretTimeChange(Sender: TObject);
 begin
-  if wait then Exit;
-  ed.OptCaretsTime:= edCaretTime.Value;
 end;
 
 procedure TfmMain.edCaretShChange(Sender: TObject);

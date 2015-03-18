@@ -6,16 +6,21 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ButtonPanel;
+  ButtonPanel, Spin;
 
 type
-
   { TfmOpt }
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkCaretVirtual: TCheckBox;
     chkCurCol: TCheckBox;
     chkCurLine: TCheckBox;
+    chkGutterBm: TCheckBox;
+    chkGutterNum: TCheckBox;
+    chkGutterStat: TCheckBox;
+    edCaretTime: TSpinEdit;
+    Label8: TLabel;
   private
     { private declarations }
   public
