@@ -294,6 +294,7 @@ type
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     procedure DoCaretSingle(AX, AY: integer);
+    procedure DoCaretSingleAsIs;
     function DoCommand_SelectAll: TATCommandResults;
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
@@ -1957,17 +1958,23 @@ end;
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   P: TPoint;
-  RectBm: TRect;
+  RectBm, RectNums: TRect;
   nIndex: integer;
 begin
   inherited;
+
+  P:= Point(X, Y);
 
   RectBm.Left:= FGutter[FGutterBandBm].Left;
   RectBm.Right:= FGutter[FGutterBandBm].Right;
   RectBm.Top:= FRectMain.Top;
   RectBm.Bottom:= FRectMain.Bottom;
 
-  P:= Point(X, Y);
+  RectNums.Left:= FGutter[FGutterBandNum].Left;
+  RectNums.Right:= FGutter[FGutterBandNum].Right;
+  RectNums.Top:= FRectMain.Top;
+  RectNums.Bottom:= FRectMain.Bottom;
+
   if PtInRect(FRectMain, P) then
     Cursor:= crIBeam
   else
@@ -1976,7 +1983,20 @@ begin
   else
     Cursor:= crDefault;
 
-  //mouse dragged
+  //mouse dragged on numbers
+  if PtInRect(RectNums, P) then
+    if ssLeft in Shift then
+    begin
+      DoCaretSingleAsIs;
+      P:= ClientPosToCaretPos(P);
+      if P.Y>=0 then
+      begin
+        Carets.ExtendSelectionToPoint(0, P.X, P.Y);
+        Update;
+      end;
+    end;
+
+  //mouse dragged on text
   if PtInRect(FRectMain, P) then
   begin
     if ssLeft in Shift then
@@ -1987,17 +2007,17 @@ begin
         begin
           //drag w/out button pressed: single selection
           if [ssCtrl, ssShift, ssAlt]*Shift=[] then
-            Carets.ExtendSelection(0, P.X, P.Y);
+            Carets.ExtendSelectionToPoint(0, P.X, P.Y);
 
           //drag with Ctrl pressed: add selection
           if [ssCtrl, ssShift, ssAlt]*Shift=[ssCtrl] then
           begin
             nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
             if nIndex>=0 then
-              Carets.ExtendSelection(nIndex, P.X, P.Y);
+              Carets.ExtendSelectionToPoint(nIndex, P.X, P.Y);
           end;
 
-          Invalidate;
+          Update;
         end;
       end;
   end;
