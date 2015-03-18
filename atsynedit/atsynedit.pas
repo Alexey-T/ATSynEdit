@@ -335,9 +335,6 @@ type
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     procedure DoEventCommand(ACommand: integer; out AHandled: boolean);
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
-    procedure DoSelect_All(AUpdate: boolean);
-    procedure DoSelect_Line(P: TPoint; AUpdate: boolean);
-    procedure DoSelect_Word(P: TPoint; AUpdate: boolean);
     function GetCaretsTime: integer;
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
@@ -459,6 +456,9 @@ type
     procedure DoShowCaret(AEdge: TATSynCaretEdge);
     procedure DoGotoPos(APnt: TPoint);
     //misc
+    procedure DoSelect_All(AUpdate: boolean);
+    procedure DoSelect_Line(P: TPoint; AUpdate: boolean);
+    procedure DoSelect_Word(P: TPoint; AUpdate: boolean);
     procedure DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
 
@@ -1094,6 +1094,7 @@ begin
     begin
       C.Brush.Color:= FColorTextBG;
       C.FillRect(NGutterEmptyX1, FRectGutter.Top, NGutterEmptyX2, FRectGutter.Bottom);
+      C.Brush.Color:= FColorGutterBG;
     end;
   end;
 
@@ -1240,7 +1241,6 @@ begin
       begin
         C.Brush.Color:= FColorTextBG;
         C.FillRect(NGutterEmptyX1, NCoordTop, NGutterEmptyX2, NCoordTop+ACharSize.Y);
-        C.Brush.Color:= FColorGutterBG;
       end;
     end;
 
@@ -1904,15 +1904,19 @@ end;
 
 
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  Pnt: TPoint;
 begin
   inherited;
   SetFocus;
   FCaretSpecPos:= false;
 
-  FMouseDownPnt:= ClientPosToCaretPos(Point(X, Y));
+  Pnt:= ClientPosToCaretPos(Point(X, Y));
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
+    FMouseDownPnt:= Pnt;
+
     if Shift=[ssLeft] then
     begin
       FCarets.Clear;
@@ -1941,7 +1945,7 @@ begin
 
   if PtInRect(FRectGutter, Point(X, Y)) then
   begin
-    DoEventClickGutter(FGutter.IndexAt(X), FMouseDownPnt.Y);
+    DoEventClickGutter(FGutter.IndexAt(X), Pnt.Y);
   end;
 
   DoCaretsSort;
@@ -1952,50 +1956,51 @@ end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
+  P: TPoint;
   RectBm: TRect;
-  Pnt: TPoint;
   nIndex: integer;
 begin
   inherited;
 
-  with FGutter[FGutterBandBm] do
-  begin
-    RectBm.Left:= Left;
-    RectBm.Right:= Right;
-    RectBm.Top:= FRectMain.Top;
-    RectBm.Bottom:= FRectMain.Bottom;
-  end;
+  RectBm.Left:= FGutter[FGutterBandBm].Left;
+  RectBm.Right:= FGutter[FGutterBandBm].Right;
+  RectBm.Top:= FRectMain.Top;
+  RectBm.Bottom:= FRectMain.Bottom;
 
-  if PtInRect(FRectMain, Point(X, Y)) then
+  P:= Point(X, Y);
+  if PtInRect(FRectMain, P) then
     Cursor:= crIBeam
   else
-  if PtInRect(RectBm, Point(X, Y)) then
+  if PtInRect(RectBm, P) then
     Cursor:= crHandPoint
   else
     Cursor:= crDefault;
 
   //mouse dragged
-  if ssLeft in Shift then
-    if Carets.Count>0 then
-    begin
-      Pnt:= ClientPosToCaretPos(Point(X, Y));
-      if Pnt.Y>=0 then
+  if PtInRect(FRectMain, P) then
+  begin
+    if ssLeft in Shift then
+      if Carets.Count>0 then
       begin
-        //drag w/out button pressed: single selection
-        if [ssCtrl, ssShift, ssAlt]*Shift=[] then
-          Carets.ExtendSelection(0, Pnt.X, Pnt.Y);
-
-        //drag with Ctrl pressed: add selection
-        if [ssCtrl, ssShift, ssAlt]*Shift=[ssCtrl] then
+        P:= ClientPosToCaretPos(P);
+        if P.Y>=0 then
         begin
-          nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-          if nIndex>=0 then
-            Carets.ExtendSelection(nIndex, Pnt.X, Pnt.Y);
-        end;
+          //drag w/out button pressed: single selection
+          if [ssCtrl, ssShift, ssAlt]*Shift=[] then
+            Carets.ExtendSelection(0, P.X, P.Y);
 
-        Invalidate;
+          //drag with Ctrl pressed: add selection
+          if [ssCtrl, ssShift, ssAlt]*Shift=[ssCtrl] then
+          begin
+            nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+            if nIndex>=0 then
+              Carets.ExtendSelection(nIndex, P.X, P.Y);
+          end;
+
+          Invalidate;
+        end;
       end;
-    end;
+  end;
 end;
 
 procedure TATSynEdit.DblClick;
@@ -2004,9 +2009,13 @@ var
 begin
   inherited;
 
-  P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos));
-  if P.Y<0 then Exit;
-  DoSelect_Word(P, true);
+  P:= ScreenToClient(Mouse.CursorPos);
+  if PtInRect(FRectMain, P) then
+  begin
+    P:= ClientPosToCaretPos(P);
+    if P.Y<0 then Exit;
+    DoSelect_Word(P, true);
+  end;
 end;
 
 procedure TATSynEdit.TripleClick;
@@ -2015,9 +2024,13 @@ var
 begin
   inherited;
 
-  P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos));
-  if P.Y<0 then Exit;
-  DoSelect_Line(P, true);
+  P:= ScreenToClient(Mouse.CursorPos);
+  if PtInRect(FRectMain, P) then
+  begin
+    P:= ClientPosToCaretPos(P);
+    if P.Y<0 then Exit;
+    DoSelect_Line(P, true);
+  end;
 end;
 
 procedure TATSynEdit.Invalidate;

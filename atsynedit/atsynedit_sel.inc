@@ -47,22 +47,29 @@ end;
 
 procedure TATSynEdit.DoSelect_Line(P: TPoint; AUpdate: boolean);
 var
-  N1, N2: integer;
+  PLast: TPoint;
 begin
   if not Strings.IsIndexValid(P.Y) then Exit;
-  N1:= 0;
-  N2:= Length(Strings.Lines[P.Y]);
-  if N1<>N2 then
+
+  DoCaretSingle(P.X, P.Y);
+  with Carets[0] do
   begin
-    DoCaretSingle(P.X, P.Y);
-    with Carets[0] do
+    if P.Y<Strings.Count-1 then
     begin
-      EndY:= P.Y;
-      EndX:= N1;
-      PosX:= N2;
+      PosX:= 0;
+      PosY:= P.Y+1;
+    end
+    else
+    begin
+      PLast:= GetLastPos;
+      PosX:= PLast.X;
+      PosY:= PLast.Y;
     end;
-    if AUpdate then Update;
+    EndX:= 0;
+    EndY:= P.Y;
   end;
+
+  if AUpdate then Update;
 end;
 
 procedure TATSynEdit.DoSelect_All(AUpdate: boolean);

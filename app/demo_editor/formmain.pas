@@ -119,7 +119,7 @@ type
     procedure EditCaretMoved(Sender: TObject);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
-    procedure EditClickGutter(Sender: TObject; ABandIndex, ALineNumber: integer);
+    procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum: integer;
       const ARect: TRect);
     procedure UpdateStatus;
@@ -330,20 +330,23 @@ begin
   AHandled:= false;
 end;
 
-procedure TfmMain.EditClickGutter(Sender: TObject; ABandIndex,
-  ALineNumber: integer);
+procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer);
 begin
-  //Showmessage(format('%d %d', [ABandIndex, ALineNumber]));
-  if ABandIndex=0 then
+  if ABand=ed.GutterBandBm then
   begin
-    if ed.Strings.LinesBm[ALineNumber]<>cBmNone then
-      ed.Strings.LinesBm[ALineNumber]:= cBmNone
+    if ed.Strings.LinesBm[ALine]<>cBmNone then
+      ed.Strings.LinesBm[ALine]:= cBmNone
     else
     begin
-      ed.Strings.LinesBm[ALineNumber]:= cBmUsual;
-      ed.Strings.LinesBmColor[ALineNumber]:= cColorBmLine;
+      ed.Strings.LinesBm[ALine]:= cBmUsual;
+      ed.Strings.LinesBmColor[ALine]:= cColorBmLine;
     end;
     ed.Update;
+  end;
+
+  if ABand=ed.GutterBandNum then
+  begin
+    ed.DoSelect_Line(Point(0, ALine), true);
   end;
 end;
 
