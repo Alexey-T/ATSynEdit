@@ -158,7 +158,7 @@ const
   cSizeGutterBandState = 3;
   cUnprintedFontOffsetX = 3;
   cUnprintedFontOffsetY = 2;
-  cUnprintedFontDecrease = 2;
+  cUnprintedFontScale = 0.80;
   cUnprintedDotMin = 2;
   cUnprintedDotScale = 6; //divider of line height
   cUnprintedEndScale = 3; //divider of line height
@@ -1502,7 +1502,7 @@ begin
   if FUnprintedEndsDetails then
   begin
     NPrevSize:= C.Font.Size;
-    C.Font.Size:= C.Font.Size-cUnprintedFontDecrease;
+    C.Font.Size:= Trunc(C.Font.Size*cUnprintedFontScale);
     ACharSize:= GetCharSize(C, Point(0, 0));
 
     C.Font.Color:= FColorUnprintedFont;
