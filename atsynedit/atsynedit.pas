@@ -111,7 +111,8 @@ const
   cInitCaretShape = cCaretShapeVert2px;
   cInitSpacingText = 1;
   cInitSpacingMinimap = -1;
-  cInitTimerInverval = 600;
+  cInitTimerBlink = 600;
+  cInitTimerScroll = 100;
   cInitMinimapVisible = false;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
@@ -191,7 +192,8 @@ type
 type
   TATSynEdit = class(TCustomControl)
   private
-    FTimerCaret: TTimer;
+    FTimerBlink: TTimer;
+    FTimerScroll: TTimer;
     FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
     FBitmap: TBitmap;
@@ -212,6 +214,7 @@ type
     FUseOverOnPaste: boolean;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
+    FMouseAutoScroll: TAnchorKind;
     FKeyNavigateInWrappedLines: boolean;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
@@ -386,7 +389,8 @@ type
     function GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
-    procedure TimerCaretTick(Sender: TObject);
+    procedure TimerBlinkTick(Sender: TObject);
+    procedure TimerScrollTick(Sender: TObject);
 
     //carets
     procedure DoCaretAddToPoint(Pnt: TPoint);
@@ -471,6 +475,7 @@ type
     procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
     procedure DblClick; override;
     procedure TripleClick; override;
@@ -1547,9 +1552,14 @@ begin
   FColorStateAdded:= cInitColorStateAdded;
   FColorStateSaved:= cInitColorStateSaved;
 
-  FTimerCaret:= TTimer.Create(Self);
-  FTimerCaret.Interval:= cInitTimerInverval;
-  FTimerCaret.OnTimer:= TimerCaretTick;
+  FTimerBlink:= TTimer.Create(Self);
+  FTimerBlink.Interval:= cInitTimerBlink;
+  FTimerBlink.OnTimer:= TimerBlinkTick;
+
+  FTimerScroll:= TTimer.Create(Self);
+  FTimerScroll.Interval:= cInitTimerScroll;
+  FTimerScroll.OnTimer:= TimerScrollTick;
+  FTimerScroll.Enabled:= false;
 
   FBitmap:= Graphics.TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
@@ -1625,7 +1635,8 @@ end;
 destructor TATSynEdit.Destroy;
 begin
   DoPaintModeStatic;
-  FreeAndNil(FTimerCaret);
+  FreeAndNil(FTimerScroll);
+  FreeAndNil(FTimerBlink);
   FreeAndNil(FKeyMapping);
   FreeAndNil(FCarets);
   FreeAndNil(FGutter);
@@ -1711,7 +1722,7 @@ procedure TATSynEdit.SetCaretsTime(AValue: integer);
 begin
   AValue:= Max(AValue, cMinCaretTime);
   AValue:= Min(AValue, cMaxCaretTime);
-  FTimerCaret.Interval:= AValue;
+  FTimerBlink.Interval:= AValue;
 end;
 
 procedure TATSynEdit.SetCharSpacingX(AValue: integer);
@@ -1966,6 +1977,16 @@ begin
   Update;
 end;
 
+procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited;
+
+  FMouseDownPnt:= Point(-1, -1);
+  FMouseDownNumber:= -1;
+
+  FTimerScroll.Enabled:= false;
+end;
+
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   P: TPoint;
@@ -1993,6 +2014,13 @@ begin
     Cursor:= crHandPoint
   else
     Cursor:= crDefault;
+
+  //mouse dragged out?
+  FTimerScroll.Enabled:= (ssLeft in Shift) and (not PtInRect(FRectMain, P));
+  if P.Y<FRectMain.Top then FMouseAutoScroll:= akTop else
+  if P.Y>FRectMain.Bottom then FMouseAutoScroll:= akBottom else
+  if P.X<FRectMain.Left then FMouseAutoScroll:= akLeft else
+  if P.X>FRectMain.Right then FMouseAutoScroll:= akRight;
 
   //mouse dragged on numbers
   if PtInRect(RectNums, P) then
@@ -2072,7 +2100,7 @@ begin
   inherited;
 end;
 
-procedure TATSynEdit.TimerCaretTick(Sender: TObject);
+procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
   if not Focused then
   begin
@@ -2086,6 +2114,25 @@ begin
 
   FCaretShown:= not FCaretShown;
   DoPaintCarets(FBitmap.Canvas, true);
+end;
+
+procedure TATSynEdit.TimerScrollTick(Sender: TObject);
+begin
+  case FMouseAutoScroll of
+    akTop:
+      begin
+        with FScrollVert do
+          if NPos>NMin then Dec(NPos);
+      end;
+    akBottom:
+      begin
+        with FScrollVert do
+          if NPos<NMax then Inc(NPos);
+      end;
+  end;
+
+  DoEventScroll;
+  Update;
 end;
 
 procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
@@ -2145,7 +2192,7 @@ end;
 procedure TATSynEdit.DoPaintModeStatic;
 begin
   FPaintStatic:= true;
-  FTimerCaret.Enabled:= false;
+  FTimerBlink.Enabled:= false;
   FCaretShown:= false;
   Invalidate;
 end;
@@ -2153,10 +2200,10 @@ end;
 procedure TATSynEdit.DoPaintModeBlinking;
 begin
   FPaintStatic:= false;
-  if Assigned(FTimerCaret) then
+  if Assigned(FTimerBlink) then
   begin
-    FTimerCaret.Enabled:= false;
-    FTimerCaret.Enabled:= true;
+    FTimerBlink.Enabled:= false;
+    FTimerBlink.Enabled:= true;
   end;
 end;
 
@@ -2169,7 +2216,7 @@ end;
 
 function TATSynEdit.GetCaretsTime: integer;
 begin
-  Result:= FTimerCaret.Interval;
+  Result:= FTimerBlink.Interval;
 end;
 
 function TATSynEdit.GetWrapInfoIndex(AMousePos: TPoint): integer;
