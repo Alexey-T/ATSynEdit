@@ -146,11 +146,11 @@ begin
     cCommand_KeyPageDown,
     cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetVisibleLines-1);
 
-    cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver);
+    cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver, false);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);
     cCommand_KeyDelete:           Res:= DoCommand_TextDelete;
     cCommand_KeyTab:              Res:= DoCommand_TextInsertTab;
-    cCommand_KeyTabChar:          Res:= DoCommand_TextInsertAtCarets(#9, false, FOver);
+    cCommand_KeyTabChar:          Res:= DoCommand_TextInsertAtCarets(#9, false, FOver, false);
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
     //end of most used
 
@@ -184,9 +184,11 @@ begin
     cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];
     cCommand_ScrollToCaretRight:       Res:= [cResultCaretRight];
 
-    cCommand_ClipboardPaste,
-    cCommand_ClipboardPaste_Sel:       Res:= DoCommand_ClipboardPaste(false);
-    cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true);
+    cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy;
+    cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut;
+    cCommand_ClipboardPaste:           Res:= DoCommand_ClipboardPaste(false, false);
+    cCommand_ClipboardPaste_Sel:       Res:= DoCommand_ClipboardPaste(false, true);
+    cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true, false);
 
     cCommand_CaretsRemove:             Res:= DoCommand_CaretsRemove;
   end;

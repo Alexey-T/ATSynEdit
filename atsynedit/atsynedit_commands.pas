@@ -80,8 +80,10 @@ const
   cCommand_ToggleOverwrite = 301;
 
   cCommand_ClipboardPaste = 1000;
-  cCommand_ClipboardPaste_Sel = cCommand_ClipboardPaste or cSelKeep;
-  cCommand_ClipboardPaste_KeepCaret = 1001;
+  cCommand_ClipboardPaste_Sel = 1001;
+  cCommand_ClipboardPaste_KeepCaret = 1002;
+  cCommand_ClipboardCopy = 1005;
+  cCommand_ClipboardCut = 1006;
 
   cCommand_CaretsRemove = 2001;
 

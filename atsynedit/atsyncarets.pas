@@ -8,10 +8,14 @@ uses
   Classes, SysUtils;
 
 type
+  { TATCaretItem }
+
   TATCaretItem = class
+  public
     PosX, PosY,
     CoordX, CoordY,
     EndX, EndY: integer;
+    procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
   end;
 
 type
@@ -387,6 +391,25 @@ begin
   Result:= true;
 end;
 
+
+procedure TATCaretItem.GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
+begin
+  AX1:= PosX;
+  AY1:= PosY;
+  AX2:= EndX;
+  AY2:= EndY;
+  ASel:= false;
+
+  if (AX2<0) or (AY2<0) then Exit;
+  if (AX1=AX2) and (AY1=AY2) then Exit;
+
+  ASel:= true;
+  if IsPosSorted(AX2, AY2, AX1, AY1, false) then
+  begin
+    SwapInt(AX1, AX2);
+    SwapInt(AY1, AY2);
+  end;
+end;
 
 end.
 

@@ -308,6 +308,7 @@ type
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     procedure DoCaretSingle(AX, AY: integer);
     procedure DoCaretSingleAsIs;
+    procedure DoCaretsResetSelections;
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);
@@ -417,7 +418,8 @@ type
     function DoCommand_ToggleOver: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
     function DoCommand_ScrollVert(ALines: integer): TATCommandResults;
-    function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret, AOvrMode: boolean): TATCommandResults;
+    function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
+      AOvrMode, ASelectThen: boolean): TATCommandResults;
     function DoCommand_TextInsertTab: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
     function DoCommand_KeyEnd: TATCommandResults;
@@ -437,7 +439,9 @@ type
     function DoCommand_TextDeleteToLineEnd: TATCommandResults;
     function DoCommand_GotoTextBegin: TATCommandResults;
     function DoCommand_GotoTextEnd: TATCommandResults;
-    function DoCommand_ClipboardPaste(AKeepCaret: boolean): TATCommandResults;
+    function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
+    function DoCommand_ClipboardCopy: TATCommandResults;
+    function DoCommand_ClipboardCut: TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
 

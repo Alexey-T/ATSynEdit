@@ -1,8 +1,66 @@
-function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
 var
   Str: atString;
 begin
   Str:= UTF8Decode(Clipboard.AsText);
-  Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOver and FUseOverOnPaste);
+  DoCommand_TextDeleteSelections;
+  Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOver and FUseOverOnPaste, ASelectThen);
+end;
+
+function TATSynEdit.DoCommand_ClipboardCut: TATCommandResults;
+begin
+  if not Carets.IsSelection then
+    Result:= []
+  else
+  begin
+    DoCommand_ClipboardCopy;
+    Result:= DoCommand_TextDeleteSelections;
+  end;
+end;
+
+function TATSynEdit.DoCommand_ClipboardCopy: TATCommandResults;
+var
+  List: TList;
+  ListStr: TStringList;
+  Item: TATCaretItem;
+  i, X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  List:= TList.Create;
+  ListStr:= TStringList.Create;
+
+  try
+    for i:= 0 to Carets.Count-1 do
+    begin
+      Item:= Carets[i];
+      if List.IndexOf(pointer(Item.PosY))<0 then
+        List.Add(pointer(Item.PosY));
+    end;
+
+    //no selections-- copy entire lines
+    if not Carets.IsSelection then
+    begin
+      for i:= 0 to List.Count-1 do
+        ListStr.Add(UTF8Encode( Strings.Lines[integer(List[i])] ));
+    end
+    else
+    //selection(s)-- copy selected ranges
+    begin
+      for i:= 0 to Carets.Count-1 do
+      begin
+        Item:= Carets[i];
+        Item.GetRange(X1, Y1, X2, Y2, bSel);
+        if not bSel then Continue;
+        ListStr.Add(UTF8Encode( Strings.TextSubstring(X1, Y1, X2, Y2) ));
+      end;
+    end;
+
+    Clipboard.AsText:= ListStr.Text;
+  finally
+    FreeAndNil(ListStr);
+    FreeAndNil(List);
+  end;
+
+  Result:= [];
 end;
 

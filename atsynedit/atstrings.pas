@@ -141,6 +141,7 @@ type
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteCurLine(AX, AY: integer; out AShift, APosAfter: TPoint);
     procedure TextDuplicateCurLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+    function TextSubstring(AX1, AY1, AX2, AY2: integer): atString;
     //
   end;
 
@@ -708,6 +709,46 @@ begin
   if FEndings=cEndNone then
     FEndings:= cEndWin;
 end;
+
+function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: integer): atString;
+var
+  L: TStringList;
+  i: integer;
+  Str: atString;
+begin
+  Result:= '';
+  if AY1<AY2 then Exit;
+
+  if AY1=AY2 then
+  begin
+    Result:= Copy(Lines[AY1], AX1+1, AX2-AX1);
+    Exit
+  end;
+
+  L:= TStringList.Create;
+  try
+    //first line
+    Str:= Copy(Lines[AY1], AX1+1, MaxInt);
+    L.Add(UTF8Encode(Str));
+
+    //middle
+    for i:= AY1+1 to AY2-1 do
+    begin
+      Str:= Lines[i];
+      L.Add(UTF8Encode(Str));
+    end;
+
+    //last line
+    Str:= Copy(Lines[AY2], 1, AX2);
+    L.Add(UTF8Encode(Str));
+
+    //all text
+    Result:= UTF8Decode(L.Text);
+  finally
+    FreeAndNil(L);
+  end;
+end;
+
 
 {$I atstrings_editing.inc}
 

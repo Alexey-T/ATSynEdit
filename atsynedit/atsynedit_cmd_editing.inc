@@ -6,12 +6,16 @@ var
   iStart, i: integer;
   Item: TATCaretItem;
 begin
+  if APosX<0 then Exit;
+  if APosY<0 then Exit;
+
   iStart:= FCarets.IndexOfPosYAvg(APosY);
   if iStart<0 then Exit;
 
   for i:= iStart to FCarets.Count-1 do
   begin
     Item:= FCarets[i];
+
     //carets below src, apply ShiftY/ShiftBelowX
     if Item.PosY>APosY then
     begin
@@ -24,10 +28,25 @@ begin
     end
     else
     //carets on same line as src, apply ShiftX
-    if Item.PosX>APosX then
     begin
-      Inc(Item.PosX, AShiftX);
+      if Item.PosX>APosX then
+        Inc(Item.PosX, AShiftX);
     end;
+
+    //same, but for EndX/EndY
+    if Item.EndY>APosY then
+    begin
+      if Item.EndY=APosY+1 then
+        Inc(Item.EndX, AShiftBelowX);
+
+      Inc(Item.EndY, AShiftY);
+    end
+    else
+    begin
+      if Item.EndX>APosX then
+        Inc(Item.EndX, AShiftX);
+    end;
+
     if Item.PosX<0 then Item.PosX:= 0;
     if Item.PosY<0 then Item.PosY:= 0;
   end;
@@ -41,12 +60,12 @@ begin
     Str:= StringOfChar(' ', FTabSize)
   else
     Str:= #9;
-  Result:= DoCommand_TextInsertAtCarets(Str, false, FOver);
+  Result:= DoCommand_TextInsertAtCarets(Str, false, FOver, false);
 end;
 
 
 function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
-  AKeepCaret, AOvrMode: boolean): TATCommandResults;
+  AKeepCaret, AOvrMode, ASelectThen: boolean): TATCommandResults;
 var
   i: integer;
   Item: TATCaretItem;
@@ -58,9 +77,25 @@ begin
   begin
     Item:= FCarets[i];
     Strings.TextInsert(Item.PosX, Item.PosY, AText, AOvrMode, Shift, PosAfter);
+
     if not AKeepCaret then
     begin
-      DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
+      if ASelectThen then
+      begin
+        Item.EndX:= Item.PosX;
+        Item.EndY:= Item.PosY;
+      end
+      else
+      begin
+        Item.EndX:= -1;
+        Item.EndY:= -1;
+      end;
+    end;
+
+    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
+
+    if not AKeepCaret then
+    begin
       Item.PosX:= PosAfter.X;
       Item.PosY:= PosAfter.Y;
     end;
@@ -103,25 +138,15 @@ var
   i: integer;
   Shift, PosAfter: TPoint;
   AX1, AY1, AX2, AY2: integer;
+  bSel: boolean;
 begin
   if ModeReadOnly then Exit;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
-    Item:= FCarets[i];
-
-    AX1:= Item.PosX;
-    AY1:= Item.PosY;
-    AX2:= Item.EndX;
-    AY2:= Item.EndY;
-    if (AX2<0) or (AY2<0) then Continue;
-    if (AX1=AX2) and (AY1=AY2) then Continue;
-
-    if IsPosSorted(AX2, AY2, AX1, AY1, false) then
-    begin
-      SwapInt(AX1, AX2);
-      SwapInt(AY1, AY2);
-    end;
+    Item:= Carets[i];
+    Item.GetRange(AX1, AY1, AX2, AY2, bSel);
+    if not bSel then Continue;
 
     Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
     DoCaretsShift(AX1, AY1, Shift.X, Shift.Y);
