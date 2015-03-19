@@ -200,12 +200,9 @@ begin
   begin
     Item:= FCarets[i];
     Str:= Strings.Lines[Item.PosY];
-    if Item.PosX<Length(Str) then
-    begin
-      Delete(Str, 1, Item.PosX);
-      Strings.Lines[Item.PosY]:= Str;
-      Item.PosX:= 0;
-    end;
+    Delete(Str, 1, Item.PosX);
+    Strings.Lines[Item.PosY]:= Str;
+    Item.PosX:= 0;
   end;
 
   Result:= [cResultText, cResultCaretLeft];
