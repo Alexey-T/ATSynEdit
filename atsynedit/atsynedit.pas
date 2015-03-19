@@ -2072,7 +2072,7 @@ begin
           if [ssCtrl, ssShift, ssAlt]*Shift=[] then
           begin
             DoCaretSingleAsIs;
-            Carets.SelectToPoint(0, P.X, P.Y);
+            Carets[0].SelectToPoint(P.X, P.Y);
           end;
 
           //drag with Ctrl pressed: add selection
@@ -2080,7 +2080,9 @@ begin
           begin
             nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
             if nIndex>=0 then
-              Carets.SelectToPoint(nIndex, P.X, P.Y);
+              Carets[nIndex].SelectToPoint(P.X, P.Y);
+            //else
+            //  ShowMessage(format('mouse %d:%d'#13'carets'#13+carets.DebugText, [FMouseDownPnt.Y, FMouseDownPnt.X]));
           end;
 
           DoCaretsSort;
@@ -2182,7 +2184,7 @@ begin
   begin
     nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
     if nIndex>=0 then
-      Carets.SelectToPoint(nIndex, PCaret.X, PCaret.Y);
+      Carets[nIndex].SelectToPoint(PCaret.X, PCaret.Y);
   end;
 
   DoCaretsSort;

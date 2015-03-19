@@ -11,10 +11,12 @@ type
   { TATCaretItem }
 
   TATCaretItem = class
+  private
   public
     PosX, PosY,
-    CoordX, CoordY,
     EndX, EndY: integer;
+    CoordX, CoordY: integer;
+    procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
   end;
 
@@ -47,13 +49,14 @@ type
     procedure Add(APosX, APosY: integer);
     procedure Sort;
     procedure Assign(Obj: TATCarets);
-    function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
+    function IndexOfPosXY(APosX, APosY: integer; const AUseEndXY: boolean= false
+      ): integer;
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
     function IsSelection: boolean;
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
-    procedure SelectToPoint(NIndex: integer; AX, AY: integer);
+    function DebugText: string;
   end;
 
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
@@ -72,6 +75,35 @@ begin
   n:= n1;
   n1:= n2;
   n2:= n;
+end;
+
+{ TATCaretItem }
+
+procedure TATCaretItem.GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
+begin
+  AX1:= PosX;
+  AY1:= PosY;
+  AX2:= EndX;
+  AY2:= EndY;
+  ASel:= false;
+
+  if (AX2<0) or (AY2<0) then Exit;
+  if (AX1=AX2) and (AY1=AY2) then Exit;
+
+  ASel:= true;
+  if IsPosSorted(AX2, AY2, AX1, AY1, false) then
+  begin
+    SwapInt(AX1, AX2);
+    SwapInt(AY1, AY2);
+  end;
+end;
+
+procedure TATCaretItem.SelectToPoint(AX, AY: integer);
+begin
+  if EndX<0 then EndX:= PosX;
+  if EndY<0 then EndY:= PosY;
+  PosX:= AX;
+  PosY:= AY;
 end;
 
 { TATCarets }
@@ -190,27 +222,29 @@ begin
     Add(Obj[i].PosX, Obj[i].PosY);
 end;
 
-function TATCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
+function TATCarets.IndexOfPosXY(APosX, APosY: integer; const AUseEndXY: boolean = false): integer;
 var
   iStart, i: integer;
   Item: TATCaretItem;
   XUse, YUse: integer;
+  bUse: boolean;
 begin
   Result:= -1;
 
   iStart:= 0;
-  {//don't work
+  {//todo
   iStart:= IndexOfPosYAvg(APosY);
   if iStart<0 then Exit;
   }
 
-  for i:= iStart to FList.Count-1 do
+  for i:= iStart to Count-1 do
   begin
-    Item:= TATCaretItem(FList[i]);
+    Item:= Items[i];
 
+    bUse:= AUseEndXY;
     if Item.EndY<0 then
-      AUseEndXY:= false;
-    if AUseEndXY then
+      bUse:= false;
+    if bUse then
       begin XUse:= Item.EndX; YUse:= Item.EndY; end
     else
       begin XUse:= Item.PosX; YUse:= Item.PosY; end;
@@ -305,19 +339,6 @@ begin
       Result:= Point(PosX, PosY);
 end;
 
-procedure TATCarets.SelectToPoint(NIndex: integer; AX, AY: integer);
-var
-  Item: TATCaretItem;
-begin
-  if not IsIndexValid(NIndex) then Exit;
-  Item:= Items[NIndex];
-
-  if Item.EndX<0 then Item.EndX:= Item.PosX;
-  if Item.EndY<0 then Item.EndY:= Item.PosY;
-  Item.PosX:= AX;
-  Item.PosY:= AY;
-end;
-
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
 begin
   if Y1<>Y2 then
@@ -391,24 +412,16 @@ begin
   Result:= true;
 end;
 
-
-procedure TATCaretItem.GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
+function TATCarets.DebugText: string;
+var
+  i: integer;
 begin
-  AX1:= PosX;
-  AY1:= PosY;
-  AX2:= EndX;
-  AY2:= EndY;
-  ASel:= false;
-
-  if (AX2<0) or (AY2<0) then Exit;
-  if (AX1=AX2) and (AY1=AY2) then Exit;
-
-  ASel:= true;
-  if IsPosSorted(AX2, AY2, AX1, AY1, false) then
-  begin
-    SwapInt(AX1, AX2);
-    SwapInt(AY1, AY2);
-  end;
+  Result:= '';
+  for i:= 0 to Count-1 do
+    with Items[i] do
+      Result:= Result+Format('caret[%d] pos %d:%d end %d:%d', [
+        i, posy, posx, endy, endx
+        ])+sLineBreak;
 end;
 
 end.
