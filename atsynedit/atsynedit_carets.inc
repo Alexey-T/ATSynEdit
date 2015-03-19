@@ -59,7 +59,7 @@ procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean = false);
 var
   P: TPoint;
   NStart, i: integer;
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
 begin
   if AOnlyLast then
     NStart:= Carets.Count-1

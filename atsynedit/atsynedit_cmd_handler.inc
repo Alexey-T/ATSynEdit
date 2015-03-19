@@ -105,7 +105,7 @@ procedure TATSynEdit.DoCommandExec(ACmd: integer; const AText: atString = '');
 var
   Res: TATCommandResults;
   bSel: boolean;
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i: integer;
 begin
   if ACmd<=0 then Exit;
@@ -155,6 +155,8 @@ begin
     cCommand_TextDeleteWordNext:       Res:= DoCommand_TextDeleteWord(true);
 
     cCommand_SelectAll:                Res:= DoCommand_SelectAll;
+    cCommand_SelectWords:              Res:= DoCommand_SelectWords;
+
     cCommand_GotoTextBegin:            Res:= DoCommand_GotoTextBegin;
     cCommand_GotoTextEnd:              Res:= DoCommand_GotoTextEnd;
     cCommand_GotoWordNext:             Res:= DoCommand_GotoWord(true);

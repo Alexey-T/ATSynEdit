@@ -4,7 +4,7 @@ procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
   AShiftY: integer; AShiftBelowX: integer);
 var
   iStart, i: integer;
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
 begin
   iStart:= FCarets.IndexOfPosYAvg(APosY);
   if iStart<0 then Exit;
@@ -49,7 +49,7 @@ function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
   AKeepCaret, AOvrMode: boolean): TATCommandResults;
 var
   i: integer;
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   Shift, PosAfter: TPoint;
 begin
   if ModeReadOnly then Exit;
@@ -71,7 +71,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteLeft(ALen: integer): TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i: integer;
   Shift, PosAfter: TPoint;
 begin
@@ -91,7 +91,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i, Len, ShiftBelowX: integer;
   Shift, PosAfter: TPoint;
 begin
@@ -118,7 +118,7 @@ end;
 
 function TATSynEdit.DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   Shift, PosAfter: TPoint;
   i: integer;
   Str: atString;
@@ -147,7 +147,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteCurLine: TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i: integer;
   Shift, PosAfter: TPoint;
 begin
@@ -168,7 +168,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDuplicateCurLine: TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i: integer;
   Shift, PosAfter: TPoint;
 begin
@@ -189,7 +189,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineBegin: TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   Str: atString;
   i: integer;
 begin
@@ -213,7 +213,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineEnd: TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   Str: atString;
   i: integer;
 begin
@@ -238,7 +238,7 @@ function TATSynEdit.DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
 //
 //todo- delete duplicate carets on same words before....
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   Str: atString;
   Shift, PosAfter: TPoint;
   i: integer;

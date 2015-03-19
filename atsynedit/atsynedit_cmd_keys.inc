@@ -12,7 +12,7 @@ end;
 
 function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i: integer;
 begin
   for i:= 0 to FCarets.Count-1 do
@@ -26,7 +26,7 @@ end;
 
 function TATSynEdit.DoCommand_KeyLeft: TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i: integer;
 begin
   for i:= 0 to FCarets.Count-1 do
@@ -47,7 +47,7 @@ end;
 
 function TATSynEdit.DoCommand_KeyRight: TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i: integer;
 begin
   for i:= 0 to FCarets.Count-1 do
@@ -77,7 +77,7 @@ end;
 
 function TATSynEdit.DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i: integer;
 begin
   for i:= 0 to FCarets.Count-1 do
@@ -94,7 +94,7 @@ end;
 
 function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   Pnt: TPoint;
   i: integer;
 begin
@@ -156,7 +156,7 @@ end;
 
 function TATSynEdit.DoCommand_GotoWord(ANext: boolean): TATCommandResults;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   Str: atString;
   i: integer;
 begin

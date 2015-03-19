@@ -3,7 +3,7 @@
 function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
 var
   i: integer;
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   bEnded, bMatch: boolean;
 begin
   Result:= false;
@@ -84,7 +84,7 @@ end;
 
 procedure TATSynEdit.DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint);
 var
-  CItem: TATSynCaretItem;
+  CItem: TATCaretItem;
 begin
   DoCaretSingle(P.X, P.Y);
   CItem:= Carets[0];

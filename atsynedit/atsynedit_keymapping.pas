@@ -36,6 +36,7 @@ begin
   M.Add(cCommand_TextDeleteCurLine, 'delete current line', ['Ctrl+Y'], []);
   M.Add(cCommand_TextDuplicateCurLine, 'duplicate current line', ['Ctrl+D'], []);
   M.Add(cCommand_SelectAll, 'select all', ['Ctrl+A'], []);
+  M.Add(cCommand_SelectWords, 'select words at carets', ['Ctrl+Shift+S'], []);
 
   M.Add(cCommand_GotoTextBegin, 'goto text begin', ['Ctrl+Home'], ['Ctrl+Shift+Home']);
   M.Add(cCommand_GotoTextEnd, 'goto text end', ['Ctrl+End'], ['Ctrl+Shift+End']);

@@ -213,7 +213,7 @@ type
     FStringsInt,
     FStringsExt: TATStrings;
     FTextOffset: TPoint;
-    FCarets: TATSynCarets;
+    FCarets: TATCarets;
     FCaretShape,
     FCaretShapeOvr: TATSynCaretShape;
     FCaretShown: boolean;
@@ -409,6 +409,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_SelectWords: TATCommandResults;
     function DoCommand_SelectAll: TATCommandResults;
     function DoCommand_CaretsRemove: TATCommandResults;
     function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
@@ -466,7 +467,7 @@ type
     //carets
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint): TPoint;
-    property Carets: TATSynCarets read FCarets;
+    property Carets: TATCarets read FCarets;
     function IsLineWithCaret(ALine: integer): boolean;
     procedure DoShowPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoShowCaret(AEdge: TATSynCaretEdge);
@@ -1527,7 +1528,7 @@ begin
   Font.Name:= 'Courier New';
   Font.Size:= 9;
 
-  FCarets:= TATSynCarets.Create;
+  FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
   FCaretShown:= false;
   FCaretShape:= cInitCaretShape;
@@ -2188,7 +2189,7 @@ procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
   R: TRect;
   i: integer;
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   Shape: TATSynCaretShape;
 begin
   if ModeOver then

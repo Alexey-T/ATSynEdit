@@ -8,7 +8,7 @@ uses
   Classes, SysUtils;
 
 type
-  TATSynCaretItem = class
+  TATCaretItem = class
     PosX, PosY,
     CoordX, CoordY,
     EndX, EndY: integer;
@@ -23,12 +23,12 @@ type
     );
 
 type
-  { TATSynCarets }
+  { TATCarets }
 
-  TATSynCarets = class
+  TATCarets = class
   private
     FList: TList;
-    function GetItem(N: integer): TATSynCaretItem;
+    function GetItem(N: integer): TATCaretItem;
     procedure DeleteDups;
     function IsJoinNeeded(N1, N2: integer;
       out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
@@ -39,10 +39,10 @@ type
     procedure Delete(N: integer);
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
-    property Items[N: integer]: TATSynCaretItem read GetItem; default;
+    property Items[N: integer]: TATCaretItem read GetItem; default;
     procedure Add(APosX, APosY: integer);
     procedure Sort;
-    procedure Assign(Obj: TATSynCarets);
+    procedure Assign(Obj: TATCarets);
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
@@ -69,30 +69,30 @@ begin
   n2:= n;
 end;
 
-{ TATSynCarets }
+{ TATCarets }
 
-function TATSynCarets.GetItem(N: integer): TATSynCaretItem;
+function TATCarets.GetItem(N: integer): TATCaretItem;
 begin
   if IsIndexValid(N) then
-    Result:= TATSynCaretItem(FList[N])
+    Result:= TATCaretItem(FList[N])
   else
     Result:= nil;
 end;
 
-constructor TATSynCarets.Create;
+constructor TATCarets.Create;
 begin
   inherited;
   FList:= TList.Create;
 end;
 
-destructor TATSynCarets.Destroy;
+destructor TATCarets.Destroy;
 begin
   Clear;
   FreeAndNil(FList);
   inherited;
 end;
 
-procedure TATSynCarets.Clear;
+procedure TATCarets.Clear;
 var
   i: integer;
 begin
@@ -100,7 +100,7 @@ begin
     Delete(i);
 end;
 
-procedure TATSynCarets.Delete(N: integer);
+procedure TATCarets.Delete(N: integer);
 begin
   if IsIndexValid(N) then
   begin
@@ -109,21 +109,21 @@ begin
   end;
 end;
 
-function TATSynCarets.Count: integer;
+function TATCarets.Count: integer;
 begin
   Result:= FList.Count;
 end;
 
-function TATSynCarets.IsIndexValid(N: integer): boolean;
+function TATCarets.IsIndexValid(N: integer): boolean;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATSynCarets.Add(APosX, APosY: integer);
+procedure TATCarets.Add(APosX, APosY: integer);
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
 begin
-  Item:= TATSynCaretItem.Create;
+  Item:= TATCaretItem.Create;
   Item.PosX:= APosX;
   Item.PosY:= APosY;
   Item.CoordX:= -1;
@@ -135,25 +135,25 @@ end;
 
 function _ListCaretsCompare(Item1, Item2: Pointer): Integer;
 var
-  Obj1, Obj2: TATSynCaretItem;
+  Obj1, Obj2: TATCaretItem;
 begin
-  Obj1:= TATSynCaretItem(Item1);
-  Obj2:= TATSynCaretItem(Item2);
+  Obj1:= TATCaretItem(Item1);
+  Obj2:= TATCaretItem(Item2);
   Result:= Obj1.PosY-Obj2.PosY;
   if Result=0 then
     Result:= Obj1.PosX-Obj2.PosX;
 end;
 
-procedure TATSynCarets.Sort;
+procedure TATCarets.Sort;
 begin
   FList.Sort(_ListCaretsCompare);
   DeleteDups;
 end;
 
-procedure TATSynCarets.DeleteDups;
+procedure TATCarets.DeleteDups;
 var
   i: integer;
-  Item1, Item2: TATSynCaretItem;
+  Item1, Item2: TATCaretItem;
   OutPosX, OutPosY, OutEndX, OutEndY: integer;
 begin
   for i:= Count-1 downto 1 do
@@ -176,7 +176,7 @@ begin
 end;
 
 
-procedure TATSynCarets.Assign(Obj: TATSynCarets);
+procedure TATCarets.Assign(Obj: TATCarets);
 var
   i: integer;
 begin
@@ -185,10 +185,10 @@ begin
     Add(Obj[i].PosX, Obj[i].PosY);
 end;
 
-function TATSynCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
+function TATCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
 var
   iStart, i: integer;
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   XUse, YUse: integer;
 begin
   Result:= -1;
@@ -201,7 +201,7 @@ begin
 
   for i:= iStart to FList.Count-1 do
   begin
-    Item:= TATSynCaretItem(FList[i]);
+    Item:= TATCaretItem(FList[i]);
 
     if Item.EndY<0 then
       AUseEndXY:= false;
@@ -217,19 +217,19 @@ begin
 end;
 
 //todo-- binary search
-function TATSynCarets.IndexOfPosYAvg(APosY: integer): integer;
+function TATCarets.IndexOfPosYAvg(APosY: integer): integer;
 var
   i: integer;
 begin
   Result:= -1;
   for i:= 0 to FList.Count-1 do
-    if TATSynCaretItem(FList[i]).PosY>=APosY then
+    if TATCaretItem(FList[i]).PosY>=APosY then
       begin Result:= i; Exit end;
 end;
 
-function TATSynCarets.IndexOfLeftRight(ALeft: boolean): integer;
+function TATCarets.IndexOfLeftRight(ALeft: boolean): integer;
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
   i, NPos: integer;
   Upd: boolean;
 begin
@@ -251,15 +251,15 @@ begin
   end;
 end;
 
-function TATSynCarets.IsLineListed(APosY: integer): boolean;
+function TATCarets.IsLineListed(APosY: integer): boolean;
 var
   i: integer;
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
 begin
   Result:= false;
   for i:= 0 to FList.Count-1 do
   begin
-    Item:= TATSynCaretItem(FList[i]);
+    Item:= TATCaretItem(FList[i]);
     if Item.PosY=APosY then
     begin
       Result:= true;
@@ -269,7 +269,7 @@ begin
 end;
 
 
-function TATSynCarets.CaretAtEdge(AEdge: TATSynCaretEdge): TPoint;
+function TATCarets.CaretAtEdge(AEdge: TATSynCaretEdge): TPoint;
 var
   N: integer;
 begin
@@ -285,9 +285,9 @@ begin
       Result:= Point(PosX, PosY);
 end;
 
-procedure TATSynCarets.SelectToPoint(NIndex: integer; AX, AY: integer);
+procedure TATCarets.SelectToPoint(NIndex: integer; AX, AY: integer);
 var
-  Item: TATSynCaretItem;
+  Item: TATCaretItem;
 begin
   if not IsIndexValid(NIndex) then Exit;
   Item:= Items[NIndex];
@@ -306,10 +306,10 @@ begin
     Result:= (X1<X2) or (AllowEq and (X1=X2));
 end;
 
-function TATSynCarets.IsJoinNeeded(N1, N2: integer;
+function TATCarets.IsJoinNeeded(N1, N2: integer;
   out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
 var
-  Item1, Item2: TATSynCaretItem;
+  Item1, Item2: TATCaretItem;
   XMin1, XMin2, YMin1, YMin2, XMax1, XMax2, YMax1, YMax2: integer;
   bSorted: boolean;
 begin
