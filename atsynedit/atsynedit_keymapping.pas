@@ -47,6 +47,7 @@ begin
   M.Add(cCommand_SelectAll, 'select all', ['Ctrl+A'], []);
   M.Add(cCommand_SelectWords, 'select words at carets', [], []);
   M.Add(cCommand_SelectLines, 'select lines at carets', [], []);
+  M.Add(cCommand_SelectNone, 'cancel selection', [], []);
 
   M.Add(cCommand_GotoTextBegin,      'goto text begin',          ['Ctrl+Home'], []);
   M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', ['Ctrl+Shift+Home'], []);

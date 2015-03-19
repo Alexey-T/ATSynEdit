@@ -49,7 +49,7 @@ type
     procedure Add(APosX, APosY: integer);
     procedure Sort;
     procedure Assign(Obj: TATCarets);
-    function IndexOfPosXY(APosX, APosY: integer; const AUseEndXY: boolean= false
+    function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false
       ): integer;
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
@@ -222,29 +222,24 @@ begin
     Add(Obj[i].PosX, Obj[i].PosY);
 end;
 
-function TATCarets.IndexOfPosXY(APosX, APosY: integer; const AUseEndXY: boolean = false): integer;
+function TATCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
 var
   iStart, i: integer;
   Item: TATCaretItem;
   XUse, YUse: integer;
-  bUse: boolean;
 begin
   Result:= -1;
 
-  iStart:= 0;
-  {//todo
+  //iStart:= 0;
+  //todo
   iStart:= IndexOfPosYAvg(APosY);
   if iStart<0 then Exit;
-  }
 
   for i:= iStart to Count-1 do
   begin
     Item:= Items[i];
 
-    bUse:= AUseEndXY;
-    if Item.EndY<0 then
-      bUse:= false;
-    if bUse then
+    if AUseEndXY and (Item.EndY>=0) then
       begin XUse:= Item.EndX; YUse:= Item.EndY; end
     else
       begin XUse:= Item.PosX; YUse:= Item.PosY; end;

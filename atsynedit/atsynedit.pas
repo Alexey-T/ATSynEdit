@@ -308,7 +308,7 @@ type
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     procedure DoCaretSingle(AX, AY: integer);
     procedure DoCaretSingleAsIs;
-    procedure DoCaretsResetSelections;
+    procedure DoSelect_None;
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);

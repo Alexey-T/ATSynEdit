@@ -313,16 +313,4 @@ begin
   Carets[0].PosY:= AY;
 end;
 
-procedure TATSynEdit.DoCaretsResetSelections;
-var
-  i: integer;
-begin
-  for i:= 0 to Carets.Count-1 do
-    with Carets[i] do
-    begin
-      EndX:= -1;
-      EndY:= -1;
-    end;
-end;
-
 

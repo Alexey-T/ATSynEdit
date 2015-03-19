@@ -120,12 +120,7 @@ begin
     end;
 
   if ACmd and cSelReset <> 0 then
-    for i:= 0 to Carets.Count-1 do
-    begin
-      Item:= Carets[i];
-      Item.EndX:= -1;
-      Item.EndY:= -1;
-    end;
+    DoSelect_None;
 
   case ACmd of
     //most used commands
@@ -164,6 +159,7 @@ begin
     cCommand_SelectAll:                Res:= DoCommand_SelectAll;
     cCommand_SelectWords:              Res:= DoCommand_SelectWords;
     cCommand_SelectLines:              Res:= DoCommand_SelectLines;
+    cCommand_SelectNone:               Res:= [cResultCaretAny];
 
     cCommand_GotoTextBegin,
     cCommand_GotoTextBegin_Sel:        Res:= DoCommand_GotoTextBegin;

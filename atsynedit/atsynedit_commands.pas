@@ -75,6 +75,7 @@ const
   cCommand_SelectAll = 260 or cSelReset;
   cCommand_SelectWords = 261 or cSelReset;
   cCommand_SelectLines = 262 or cSelReset;
+  cCommand_SelectNone = 263 or cSelReset;
 
   cCommand_ToggleReadOnly = 300;
   cCommand_ToggleOverwrite = 301;
