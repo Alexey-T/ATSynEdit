@@ -54,6 +54,8 @@ const
   cCommand_ScrollLineDown = 251;
   cCommand_ScrollToCaretTop = 252;
   cCommand_ScrollToCaretBottom = 253;
+  cCommand_ScrollToCaretLeft = 254;
+  cCommand_ScrollToCaretRight = 255;
 
   cCommand_SelectAll = 260;
   cCommand_SelectWords = 261;

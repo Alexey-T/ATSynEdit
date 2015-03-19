@@ -417,7 +417,6 @@ type
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOver: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
-    function DoCommand_ScrollToCaret(AEdge: TATCaretEdge): TATCommandResults;
     function DoCommand_ScrollVert(ALines: integer): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret, AOvrMode: boolean): TATCommandResults;
     function DoCommand_TextInsertTab: TATCommandResults;

@@ -180,8 +180,10 @@ begin
 
     cCommand_ScrollLineUp:             Res:= DoCommand_ScrollVert(-1);
     cCommand_ScrollLineDown:           Res:= DoCommand_ScrollVert(1);
-    cCommand_ScrollToCaretTop:         Res:= DoCommand_ScrollToCaret(cEdgeTop);
-    cCommand_ScrollToCaretBottom:      Res:= DoCommand_ScrollToCaret(cEdgeBottom);
+    cCommand_ScrollToCaretTop:         Res:= [cResultCaretTop];
+    cCommand_ScrollToCaretBottom:      Res:= [cResultCaretBottom];
+    cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];
+    cCommand_ScrollToCaretRight:       Res:= [cResultCaretRight];
 
     cCommand_ClipboardPaste:           Res:= DoCommand_ClipboardPaste(false);
     cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true);
