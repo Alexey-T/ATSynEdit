@@ -52,17 +52,17 @@ begin
   M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', ['Ctrl+Shift+Home'], []);
   M.Add(cCommand_GotoTextEnd,        'goto text end',            ['Ctrl+End'], []);
   M.Add(cCommand_GotoTextEnd_Sel,    'goto text end + select',   ['Ctrl+Shift+End'], []);
-  M.Add(cCommand_GotoWordPrev,       'goto word prev',           ['Ctrl+Left'], []);
-  M.Add(cCommand_GotoWordPrev_Sel,   'goto word prev + select',  ['Ctrl+Shift+Left'], []);
-  M.Add(cCommand_GotoWordNext,       'goto word next',           ['Ctrl+Right'], []);
-  M.Add(cCommand_GotoWordNext_Sel,   'goto word next + select',  ['Ctrl+Shift+Right'], []);
+  M.Add(cCommand_GotoWordPrev,       'goto word left',           ['Ctrl+Left'], []);
+  M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  ['Ctrl+Shift+Left'], []);
+  M.Add(cCommand_GotoWordNext,       'goto word right',          ['Ctrl+Right'], []);
+  M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', ['Ctrl+Shift+Right'], []);
 
   M.Add(cCommand_ToggleOvr, 'toggle insert/overwrite mode', ['Insert'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', ['Ctrl+R'], []);
 
-  M.Add(cCommand_TextDeleteWordNext, 'delete word next', ['Ctrl+Delete'], []);
-  M.Add(cCommand_TextDeleteWordPrev, 'delete word prev', ['Ctrl+Backspace'], []);
-  M.Add(cCommand_TextDeleteToLineBegin, 'delete to line start', ['Ctrl+B'], []);
+  M.Add(cCommand_TextDeleteWordPrev, 'delete word left', ['Ctrl+Backspace'], []);
+  M.Add(cCommand_TextDeleteWordNext, 'delete word right', ['Ctrl+Delete'], []);
+  M.Add(cCommand_TextDeleteToLineBegin, 'delete to line start', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', ['Ctrl+K'], []);
 
   M.Add(cCommand_ScrollLineUp, 'scroll line up', ['Ctrl+Up'], []);
