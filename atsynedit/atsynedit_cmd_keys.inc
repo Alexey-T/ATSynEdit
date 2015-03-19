@@ -35,7 +35,7 @@ begin
     if (Item.PosX>0) then
       Dec(Item.PosX)
     else
-    if (Item.PosY>0) and not FCaretVirtualPos then
+    if (Item.PosY>0) and not FCaretVirtual then
     begin
       Dec(Item.PosY);
       Item.PosX:= Length(Strings.Lines[Item.PosY]);
@@ -53,7 +53,7 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Item:= FCarets[i];
-    if (Item.PosX<Length(Strings.Lines[Item.PosY])) or FCaretVirtualPos then
+    if (Item.PosX<Length(Strings.Lines[Item.PosY])) or FCaretVirtual then
       Inc(Item.PosX)
     else
     if (Item.PosY<Strings.Count-1) then

@@ -52,20 +52,20 @@ object fmMain: TfmMain
     object chkRuler: TCheckBox
       Left = 8
       Height = 19
-      Top = 52
+      Top = 28
       Width = 44
       Caption = 'ruler'
       OnChange = chkRulerChange
-      TabOrder = 2
+      TabOrder = 1
     end
     object chkMinimap: TCheckBox
       Left = 8
       Height = 19
-      Top = 72
+      Top = 48
       Width = 68
       Caption = 'minimap'
       OnChange = chkMinimapChange
-      TabOrder = 3
+      TabOrder = 2
     end
     object edSpaceX: TSpinEdit
       Left = 8
@@ -153,9 +153,9 @@ object fmMain: TfmMain
       end
     end
     object edNum: TComboBox
-      Left = 24
+      Left = 152
       Height = 23
-      Top = 28
+      Top = 300
       Width = 112
       ItemHeight = 15
       Items.Strings = (
@@ -167,7 +167,7 @@ object fmMain: TfmMain
       )
       OnChange = edNumChange
       Style = csDropDownList
-      TabOrder = 1
+      TabOrder = 14
     end
     object edFontsize: TSpinEdit
       Left = 8
@@ -265,20 +265,20 @@ object fmMain: TfmMain
     object bFont: TButton
       Left = 8
       Height = 25
-      Top = 336
+      Top = 88
       Width = 81
       Caption = 'font...'
       OnClick = bFontClick
-      TabOrder = 5
+      TabOrder = 4
     end
     object chkMicromap: TCheckBox
       Left = 8
       Height = 19
-      Top = 92
+      Top = 68
       Width = 75
       Caption = 'micromap'
       OnChange = chkMicromapChange
-      TabOrder = 4
+      TabOrder = 3
     end
     object edSpaceY: TSpinEdit
       Left = 8
@@ -298,57 +298,62 @@ object fmMain: TfmMain
       Caption = 'spacing-y'
       ParentColor = False
     end
-    object gCaret: TGroupBox
-      Left = 144
-      Height = 52
-      Top = 236
-      Width = 128
-      Caption = 'carets'
-      ClientHeight = 32
-      ClientWidth = 124
-      TabOrder = 13
-      OnClick = gCaretClick
-      object edCaretSh: TComboBox
-        Left = 4
-        Height = 23
-        Top = 0
-        Width = 112
-        DropDownCount = 40
-        ItemHeight = 15
-        Items.Strings = (
-          'full'
-          'vert1px'
-          'vert2px'
-          'vert3px'
-          'vert4px'
-          'vert10percent'
-          'vert20percent'
-          'vert30percent'
-          'vert40percent'
-          'vert50percent'
-          'horz1px'
-          'horz2px'
-          'horz3px'
-          'horz4px'
-          'horz10percent'
-          'horz20percent'
-          'horz30percent'
-          'horz40percent'
-          'horz50percent'
-        )
-        OnChange = edCaretShChange
-        Style = csDropDownList
-        TabOrder = 0
-      end
-    end
-    object Button1: TButton
+    object bOpt: TButton
       Left = 8
       Height = 25
-      Top = 364
+      Top = 116
       Width = 81
       Caption = 'more...'
-      OnClick = Button1Click
-      TabOrder = 14
+      OnClick = bOptClick
+      TabOrder = 5
+    end
+    object Label3: TLabel
+      Left = 152
+      Height = 15
+      Top = 284
+      Width = 47
+      Caption = 'numbers'
+      ParentColor = False
+    end
+    object edCaretSh: TComboBox
+      Left = 152
+      Height = 23
+      Top = 260
+      Width = 112
+      DropDownCount = 40
+      ItemHeight = 15
+      Items.Strings = (
+        'full'
+        'vert1px'
+        'vert2px'
+        'vert3px'
+        'vert4px'
+        'vert10percent'
+        'vert20percent'
+        'vert30percent'
+        'vert40percent'
+        'vert50percent'
+        'horz1px'
+        'horz2px'
+        'horz3px'
+        'horz4px'
+        'horz10percent'
+        'horz20percent'
+        'horz30percent'
+        'horz40percent'
+        'horz50percent'
+      )
+      OnChange = edCaretShChange
+      Style = csDropDownList
+      TabOrder = 13
+    end
+    object Label7: TLabel
+      Left = 152
+      Height = 15
+      Top = 244
+      Width = 31
+      Caption = 'carets'
+      ParentColor = False
     end
   end
   object OpenDialog1: TOpenDialog

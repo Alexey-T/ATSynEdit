@@ -202,7 +202,7 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
-    FCaretVirtualPos);
+    FCaretVirtual);
 end;
 
 procedure TATSynEdit.SetCaretShape(AValue: TATSynCaretShape);

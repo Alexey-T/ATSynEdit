@@ -12,7 +12,7 @@ type
   { TfmMain }
   TfmMain = class(TForm)
     bFont: TButton;
-    Button1: TButton;
+    bOpt: TButton;
     chkUnprintRep: TCheckBox;
     chkMicromap: TCheckBox;
     chkUnprintSp: TCheckBox;
@@ -33,14 +33,15 @@ type
     FontDialog1: TFontDialog;
     gWrap: TGroupBox;
     gUnpri: TGroupBox;
-    gCaret: TGroupBox;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
+    Label7: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
     mnuPst: TMenuItem;
@@ -76,7 +77,7 @@ type
     procedure bAddCrtClick(Sender: TObject);
     procedure bSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure bOptClick(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
@@ -309,7 +310,7 @@ begin
     cWrapOn: chkWrapOn.Checked:= true;
     cWrapAtMargin: chkWrapMargin.Checked:= true;
   end;
-  chkWrapIndent.Checked:= ed.OptWrapWithIndent;
+  chkWrapIndent.Checked:= ed.OptWrapIndented;
   chkUnprintVis.Checked:= ed.OptUnprintedVisible;
   chkUnprintSp.Checked:= ed.OptUnprintedSpaces;
   chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
@@ -447,13 +448,13 @@ begin
   end;
 end;
 
-procedure TfmMain.Button1Click(Sender: TObject);
+procedure TfmMain.bOptClick(Sender: TObject);
 begin
   with fmOpt do
   begin
     chkCurLine.Checked:= ed.OptShowCurLine;
     chkCurCol.Checked:= ed.OptShowCurColumn;
-    chkCaretVirtual.Checked:= ed.OptCaretVirtualPos;
+    chkCaretVirtual.Checked:= ed.OptCaretVirtual;
     edCaretTime.Value:= ed.OptCaretsTime;
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
@@ -461,17 +462,23 @@ begin
     chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
     chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
 
+    chkAutoInd.Checked:= ed.OptAutoIndent;
+    chkTabSp.Checked:= ed.OptTabSpaces;
+
     if ShowModal=mrOk then
     begin
       ed.OptShowCurLine:= chkCurLine.Checked;
       ed.OptShowCurColumn:= chkCurCol.Checked;
-      ed.OptCaretVirtualPos:= chkCaretVirtual.Checked;
+      ed.OptCaretVirtual:= chkCaretVirtual.Checked;
       ed.OptCaretsTime:= edCaretTime.Value;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
       ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
       ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
+
+      ed.OptAutoIndent:= chkAutoInd.Checked;
+      ed.OptTabSpaces:= chkTabSp.Checked;
 
       ed.Gutter.Update;
       ed.Update;
@@ -568,7 +575,7 @@ end;
 procedure TfmMain.chkWrapIndentChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptWrapWithIndent:= chkWrapIndent.Checked;
+  ed.OptWrapIndented:= chkWrapIndent.Checked;
   ed.Update;
 end;
 

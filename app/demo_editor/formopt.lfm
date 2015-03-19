@@ -1,7 +1,7 @@
 object fmOpt: TfmOpt
-  Left = 399
+  Left = 474
   Height = 326
-  Top = 482
+  Top = 488
   Width = 646
   BorderStyle = bsDialog
   Caption = 'Opts'
@@ -51,7 +51,7 @@ object fmOpt: TfmOpt
     TabOrder = 3
   end
   object edCaretTime: TSpinEdit
-    Left = 7
+    Left = 8
     Height = 23
     Top = 72
     Width = 59
@@ -72,33 +72,57 @@ object fmOpt: TfmOpt
   object chkGutterBm: TCheckBox
     Left = 176
     Height = 19
-    Top = 8
-    Width = 75
-    Caption = 'gutter-bm'
+    Top = 28
+    Width = 38
+    Caption = 'bm'
     TabOrder = 5
   end
   object chkGutterNum: TCheckBox
     Left = 176
     Height = 19
-    Top = 28
-    Width = 82
-    Caption = 'gutter-num'
+    Top = 48
+    Width = 50
+    Caption = 'nums'
     TabOrder = 6
   end
   object chkGutterStat: TCheckBox
     Left = 176
     Height = 19
-    Top = 48
-    Width = 87
-    Caption = 'gutter-states'
+    Top = 68
+    Width = 50
+    Caption = 'states'
     TabOrder = 7
   end
   object chkGutterEmpty: TCheckBox
     Left = 176
     Height = 19
-    Top = 68
-    Width = 130
-    Caption = 'gutter-empty-indent'
+    Top = 88
+    Width = 54
+    Caption = 'indent'
     TabOrder = 8
+  end
+  object Label1: TLabel
+    Left = 175
+    Height = 15
+    Top = 7
+    Width = 59
+    Caption = 'gutter cols:'
+    ParentColor = False
+  end
+  object chkAutoInd: TCheckBox
+    Left = 8
+    Height = 19
+    Top = 100
+    Width = 83
+    Caption = 'auto-indent'
+    TabOrder = 9
+  end
+  object chkTabSp: TCheckBox
+    Left = 8
+    Height = 19
+    Top = 120
+    Width = 89
+    Caption = 'tab as spaces'
+    TabOrder = 10
   end
 end

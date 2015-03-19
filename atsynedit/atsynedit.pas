@@ -217,7 +217,7 @@ type
     FCaretShape,
     FCaretShapeOvr: TATSynCaretShape;
     FCaretShown: boolean;
-    FCaretVirtualPos: boolean;
+    FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretMoveByRtClick: boolean;
     FOver: boolean;
@@ -237,7 +237,7 @@ type
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
     FWrapUpdateNeeded: boolean;
-    FWrapWithIndent: boolean;
+    FWrapIndented: boolean;
     FUnprintedVisible,
     FUnprintedSpaces,
     FUnprintedEnds,
@@ -387,7 +387,7 @@ type
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
-    procedure SetWrapWithIndent(AValue: boolean);
+    procedure SetWrapIndented(AValue: boolean);
     procedure UpdateGutterAutosize;
     procedure UpdateMinimapAutosize(C: TCanvas);
     function DoFormatLineNumber(N: integer): atString;
@@ -506,10 +506,13 @@ type
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkIcon read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
 
     //options
+    property OptAutoIndent: boolean read FTextAutoIndent write FTextAutoIndent;
+    property OptTabSpaces: boolean read FTextTabSpaces write FTextTabSpaces;
+    property OptTabSize: integer read FTabSize write SetTabSize;
     property OptUseOverOnPaste: boolean read FUseOverOnPaste write FUseOverOnPaste;
     property OptShowCurLine: boolean read FShowCurLine write FShowCurLine;
     property OptShowCurColumn: boolean read FShowCurColumn write FShowCurColumn;
-    property OptCaretVirtualPos: boolean read FCaretVirtualPos write FCaretVirtualPos;
+    property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual;
     property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
     property OptCaretsTime: integer read GetCaretsTime write SetCaretsTime;
@@ -520,8 +523,7 @@ type
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode;
-    property OptWrapWithIndent: boolean read FWrapWithIndent write SetWrapWithIndent;
-    property OptTabSize: integer read FTabSize write SetTabSize;
+    property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented;
     property OptMarginRight: integer read FMarginRight write SetMarginRight;
     property OptMarginString: string read GetMarginString write SetMarginString;
     property OptNumbersStyle: TATSynNumbersStyle read FNumbersStyle write FNumbersStyle;
@@ -826,7 +828,7 @@ begin
         NFinal:= cWrapItemMiddle;
       FWrapInfo.Add(i, NOffset, NLen, NIndent, NFinal);
 
-      if FWrapWithIndent then
+      if FWrapIndented then
         if NOffset=1 then
           NIndent:= SGetIndentExpanded(Str, FTabSize);
 
@@ -878,10 +880,10 @@ begin
     FScrollHorz.NPos:= 0;
 end;
 
-procedure TATSynEdit.SetWrapWithIndent(AValue: boolean);
+procedure TATSynEdit.SetWrapIndented(AValue: boolean);
 begin
-  if FWrapWithIndent=AValue then Exit;
-  FWrapWithIndent:=AValue;
+  if FWrapIndented=AValue then Exit;
+  FWrapIndented:=AValue;
   if FWrapMode<>cWrapOff then
     FWrapUpdateNeeded:= true;
 end;
@@ -1529,7 +1531,7 @@ begin
   FCaretShown:= false;
   FCaretShape:= cInitCaretShape;
   FCaretShapeOvr:= cCaretShapeFull;
-  FCaretVirtualPos:= true;
+  FCaretVirtual:= true;
   FCaretSpecPos:= false;
   FCaretMoveByRtClick:= true;
 
@@ -1583,7 +1585,7 @@ begin
   FWrapUpdateNeeded:= true;
   FWrapMode:= cWrapOn;
   FWrapColumn:= cInitMarginRight;
-  FWrapWithIndent:= true;
+  FWrapIndented:= true;
 
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
