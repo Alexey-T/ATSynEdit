@@ -108,10 +108,12 @@
       <Unit16>
         <Filename Value="..\..\atsynedit\atsyncarets.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynCarets"/>
       </Unit16>
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>

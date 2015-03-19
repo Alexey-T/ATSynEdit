@@ -15,7 +15,7 @@ type
   end;
 
 type
-  TATSynCaretEdge = (
+  TATCaretEdge = (
     cEdgeTop,
     cEdgeBottom,
     cEdgeLeft,
@@ -47,7 +47,7 @@ type
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
-    function CaretAtEdge(AEdge: TATSynCaretEdge): TPoint;
+    function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     procedure SelectToPoint(NIndex: integer; AX, AY: integer);
   end;
 
@@ -269,7 +269,7 @@ begin
 end;
 
 
-function TATCarets.CaretAtEdge(AEdge: TATSynCaretEdge): TPoint;
+function TATCarets.CaretAtEdge(AEdge: TATCaretEdge): TPoint;
 var
   N: integer;
 begin

@@ -5,7 +5,7 @@ unit ATSynEdit_Commands;
 interface
 
 const
-  cCommandSel = $100000;
+  cCommandSel = $10000;
 
 const
   cCommand_KeyUp = 100;
@@ -52,12 +52,15 @@ const
 
   cCommand_ScrollLineUp = 250;
   cCommand_ScrollLineDown = 251;
-  cCommand_SelectAll = 252;
-  cCommand_SelectWords = 253;
-  cCommand_SelectLines = 254;
+  cCommand_ScrollToCaretTop = 252;
+  cCommand_ScrollToCaretBottom = 253;
 
-  cCommand_ToggleReadOnly = 260;
-  cCommand_ToggleOvr = 261;
+  cCommand_SelectAll = 260;
+  cCommand_SelectWords = 261;
+  cCommand_SelectLines = 262;
+
+  cCommand_ToggleReadOnly = 300;
+  cCommand_ToggleOvr = 301;
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_KeepCaret = 1001;

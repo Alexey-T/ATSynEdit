@@ -154,6 +154,18 @@ begin
   Result:= [cResultScroll];
 end;
 
+function TATSynEdit.DoCommand_ScrollToCaret(AEdge: TATCaretEdge): TATCommandResults;
+begin
+  case AEdge of
+    cEdgeLeft: Result:= [cResultCaretLeft];
+    cEdgeRight: Result:= [cResultCaretRight];
+    cEdgeTop: Result:= [cResultCaretTop];
+    cEdgeBottom: Result:= [cResultCaretBottom];
+    else Result:= [];
+  end;
+end;
+
+
 function TATSynEdit.DoCommand_GotoWord(ANext: boolean): TATCommandResults;
 var
   Item: TATCaretItem;

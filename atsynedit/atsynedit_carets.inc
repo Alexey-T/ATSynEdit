@@ -259,7 +259,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoShowCaret(AEdge: TATSynCaretEdge);
+procedure TATSynEdit.DoShowCaret(AEdge: TATCaretEdge);
 begin
   DoShowPos(Carets.CaretAtEdge(AEdge), cSizeScrollCaretHorz, cSizeScrollCaretVert);
 end;

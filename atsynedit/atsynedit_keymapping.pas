@@ -67,6 +67,8 @@ begin
 
   M.Add(cCommand_ScrollLineUp, 'scroll line up', ['Ctrl+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', ['Ctrl+Down'], []);
+  M.Add(cCommand_ScrollToCaretTop, 'scroll to caret, top', [], []);
+  M.Add(cCommand_ScrollToCaretBottom, 'scroll to caret, bottom', [], []);
 
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', ['Ctrl+V'], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
