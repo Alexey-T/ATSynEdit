@@ -36,4 +36,24 @@ begin
   Result:= [cResultCaretAny];
 end;
 
+function TATSynEdit.DoCommand_SelectLines: TATCommandResults;
+var
+  Item: TATCaretItem;
+  i: integer;
+  Str: atString;
+begin
+  for i:= FCarets.Count-1 downto 0 do
+  begin
+    Item:= FCarets[i];
+    if not Strings.IsIndexValid(Item.PosY) then Continue;
+
+    Str:= Strings.Lines[Item.PosY];
+    Item.EndY:= Item.PosY;
+    Item.EndX:= 0;
+    Item.PosX:= Length(Str);
+  end;
+
+  Result:= [cResultCaretAny];
+end;
+
 

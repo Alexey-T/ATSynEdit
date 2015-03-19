@@ -156,6 +156,7 @@ begin
 
     cCommand_SelectAll:                Res:= DoCommand_SelectAll;
     cCommand_SelectWords:              Res:= DoCommand_SelectWords;
+    cCommand_SelectLines:              Res:= DoCommand_SelectLines;
 
     cCommand_GotoTextBegin:            Res:= DoCommand_GotoTextBegin;
     cCommand_GotoTextEnd:              Res:= DoCommand_GotoTextEnd;

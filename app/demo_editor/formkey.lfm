@@ -1,19 +1,20 @@
-object fmKey: TfmKey
-  Left = 433
-  Height = 414
-  Top = 521
-  Width = 684
-  Caption = 'Keymap'
-  ClientHeight = 414
-  ClientWidth = 684
+object fmCmd: TfmCmd
+  Left = 424
+  Height = 627
+  Top = 308
+  Width = 693
+  ActiveControl = List
+  Caption = 'Commands'
+  ClientHeight = 627
+  ClientWidth = 693
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.5'
   object List: TListView
     Left = 0
-    Height = 414
+    Height = 582
     Top = 0
-    Width = 684
+    Width = 693
     Align = alClient
     Columns = <    
       item
@@ -32,5 +33,23 @@ object fmKey: TfmKey
     RowSelect = True
     TabOrder = 0
     ViewStyle = vsReport
+    OnDblClick = ListDblClick
+  end
+  object ButtonPanel1: TButtonPanel
+    Left = 6
+    Height = 33
+    Top = 588
+    Width = 681
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    TabOrder = 1
+    ShowButtons = [pbOK, pbCancel]
+    ShowGlyphs = []
   end
 end

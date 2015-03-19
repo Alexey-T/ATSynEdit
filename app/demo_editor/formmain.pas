@@ -438,13 +438,14 @@ begin
 end;
 
 procedure TfmMain.bKeymapClick(Sender: TObject);
+var
+  Cmd: integer;
 begin
-  with TfmKey.Create(nil) do
-  try
-    edit:= Self.ed;
-    ShowModal;
-  finally
-    Free
+  Cmd:= DoCommandDialog(ed);
+  if Cmd>0 then
+  begin
+    ed.DoCommandExec(Cmd);
+    ed.Update;
   end;
 end;
 

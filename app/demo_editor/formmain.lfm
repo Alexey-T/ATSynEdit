@@ -447,6 +447,7 @@ object fmMain: TfmMain
       Caption = 'Help'
       object mnuKey: TMenuItem
         Caption = 'Keymap..'
+        ShortCut = 32848
         OnClick = bKeymapClick
       end
     end

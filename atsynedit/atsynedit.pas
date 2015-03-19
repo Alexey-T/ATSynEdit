@@ -410,6 +410,7 @@ type
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
     function DoCommand_SelectWords: TATCommandResults;
+    function DoCommand_SelectLines: TATCommandResults;
     function DoCommand_SelectAll: TATCommandResults;
     function DoCommand_CaretsRemove: TATCommandResults;
     function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
