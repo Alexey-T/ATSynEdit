@@ -5,12 +5,26 @@ unit ATSynEdit_Commands;
 interface
 
 const
+  cCommandSel = $100000;
+
+const
   cCommand_KeyUp = 100;
   cCommand_KeyDown = 101;
   cCommand_KeyLeft = 102;
   cCommand_KeyRight = 103;
   cCommand_KeyHome = 104;
   cCommand_KeyEnd = 105;
+  cCommand_KeyPageUp = 106;
+  cCommand_KeyPageDown = 107;
+
+  cCommand_KeyUp_Sel = cCommand_KeyUp or cCommandSel;
+  cCommand_KeyDown_Sel = cCommand_KeyDown or cCommandSel;
+  cCommand_KeyLeft_Sel = cCommand_KeyLeft or cCommandSel;
+  cCommand_KeyRight_Sel = cCommand_KeyRight or cCommandSel;
+  cCommand_KeyHome_Sel = cCommand_KeyHome or cCommandSel;
+  cCommand_KeyEnd_Sel = cCommand_KeyEnd or cCommandSel;
+  cCommand_KeyPageUp_Sel = cCommand_KeyPageUp or cCommandSel;
+  cCommand_KeyPageDown_Sel = cCommand_KeyPageDown or cCommandSel;
 
   cCommand_TextInsert = 150;
   cCommand_KeyBackspace = 151;
@@ -18,8 +32,6 @@ const
   cCommand_KeyEnter = 153;
   cCommand_KeyTab = 154;
   cCommand_KeyTabChar = 155;
-  cCommand_KeyPageUp = 160;
-  cCommand_KeyPageDown = 161;
 
   cCommand_TextDeleteCurLine = 170;
   cCommand_TextDuplicateCurLine = 171;
@@ -32,6 +44,11 @@ const
   cCommand_GotoTextEnd = 201;
   cCommand_GotoWordNext = 202;
   cCommand_GotoWordPrev = 203;
+
+  cCommand_GotoTextBegin_Sel = cCommand_GotoTextBegin or cCommandSel;
+  cCommand_GotoTextEnd_Sel = cCommand_GotoTextEnd or cCommandSel;
+  cCommand_GotoWordNext_Sel = cCommand_GotoWordNext or cCommandSel;
+  cCommand_GotoWordPrev_Sel = cCommand_GotoWordPrev or cCommandSel;
 
   cCommand_ScrollLineUp = 250;
   cCommand_ScrollLineDown = 251;

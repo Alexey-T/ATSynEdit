@@ -112,7 +112,7 @@ begin
   Res:= [];
   FCaretSpecPos:= false;
 
-  bSel:= ssShift in GetKeyShiftState;
+  bSel:= ACmd and cCommandSel <> 0;
   for i:= 0 to Carets.Count-1 do
   begin
     Item:= Carets[i];
@@ -130,12 +130,22 @@ begin
 
   case ACmd of
     //most used commands
-    cCommand_KeyLeft:             Res:= DoCommand_KeyLeft;
-    cCommand_KeyRight:            Res:= DoCommand_KeyRight;
-    cCommand_KeyUp:               Res:= DoCommand_KeyUpDown(false, 1);
-    cCommand_KeyDown:             Res:= DoCommand_KeyUpDown(true, 1);
-    cCommand_KeyHome:             Res:= DoCommand_KeyHome;
-    cCommand_KeyEnd:              Res:= DoCommand_KeyEnd;
+    cCommand_KeyLeft,
+    cCommand_KeyLeft_Sel:      Res:= DoCommand_KeyLeft;
+    cCommand_KeyRight,
+    cCommand_KeyRight_Sel:     Res:= DoCommand_KeyRight;
+    cCommand_KeyUp,
+    cCommand_KeyUp_Sel:        Res:= DoCommand_KeyUpDown(false, 1);
+    cCommand_KeyDown,
+    cCommand_KeyDown_Sel:      Res:= DoCommand_KeyUpDown(true, 1);
+    cCommand_KeyHome,
+    cCommand_KeyHome_Sel:      Res:= DoCommand_KeyHome;
+    cCommand_KeyEnd,
+    cCommand_KeyEnd_Sel:       Res:= DoCommand_KeyEnd;
+    cCommand_KeyPageUp,
+    cCommand_KeyPageUp_Sel:    Res:= DoCommand_KeyUpDown(false, GetVisibleLines-1);
+    cCommand_KeyPageDown,
+    cCommand_KeyPageDown_Sel:  Res:= DoCommand_KeyUpDown(true, GetVisibleLines-1);
 
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);
@@ -143,8 +153,6 @@ begin
     cCommand_KeyTab:              Res:= DoCommand_TextInsertTab;
     cCommand_KeyTabChar:          Res:= DoCommand_TextInsertAtCarets(#9, false, FOver);
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
-    cCommand_KeyPageUp:           Res:= DoCommand_KeyUpDown(false, GetVisibleLines-1);
-    cCommand_KeyPageDown:         Res:= DoCommand_KeyUpDown(true, GetVisibleLines-1);
     //end of most used
 
     cCommand_TextDeleteCurLine:        Res:= DoCommand_TextDeleteCurLine;
@@ -158,10 +166,14 @@ begin
     cCommand_SelectWords:              Res:= DoCommand_SelectWords;
     cCommand_SelectLines:              Res:= DoCommand_SelectLines;
 
-    cCommand_GotoTextBegin:            Res:= DoCommand_GotoTextBegin;
-    cCommand_GotoTextEnd:              Res:= DoCommand_GotoTextEnd;
-    cCommand_GotoWordNext:             Res:= DoCommand_GotoWord(true);
-    cCommand_GotoWordPrev:             Res:= DoCommand_GotoWord(false);
+    cCommand_GotoTextBegin,
+    cCommand_GotoTextBegin_Sel:        Res:= DoCommand_GotoTextBegin;
+    cCommand_GotoTextEnd,
+    cCommand_GotoTextEnd_Sel:          Res:= DoCommand_GotoTextEnd;
+    cCommand_GotoWordNext,
+    cCommand_GotoWordNext_Sel:         Res:= DoCommand_GotoWord(true);
+    cCommand_GotoWordPrev,
+    cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(false);
 
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
     cCommand_ToggleOvr:                Res:= DoCommand_ToggleOver;
