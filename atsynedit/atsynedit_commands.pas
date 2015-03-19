@@ -5,8 +5,8 @@ unit ATSynEdit_Commands;
 interface
 
 const
-  cSelKeep   = $10000; //command must continue selection
-  cSelReset = $20000; //command must reset selection
+  cSelKeep = $10000; //cmd continues selection (new caret pos makes bigger selection)
+  cSelReset = $20000; //before command reset selection
 
 const
   _base_KeyUp = 100;
@@ -43,8 +43,8 @@ const
   cCommand_KeyTab = 154;
   cCommand_KeyTabChar = 155;
 
-  cCommand_TextDeleteCurLine = 170 or cSelReset;
-  cCommand_TextDuplicateCurLine = 171 or cSelReset;
+  cCommand_TextDeleteLine = 170 or cSelReset;
+  cCommand_TextDuplicateLine = 171 or cSelReset;
   cCommand_TextDeleteToLineBegin = 172 or cSelReset;
   cCommand_TextDeleteToLineEnd = 173 or cSelReset;
   cCommand_TextDeleteWordNext = 174 or cSelReset;
@@ -77,11 +77,11 @@ const
   cCommand_SelectLines = 262 or cSelReset;
 
   cCommand_ToggleReadOnly = 300;
-  cCommand_ToggleOvr = 301;
+  cCommand_ToggleOverwrite = 301;
 
   cCommand_ClipboardPaste = 1000;
-  cCommand_ClipboardPaste_KeepCaret = 1001;
   cCommand_ClipboardPaste_Sel = cCommand_ClipboardPaste or cSelKeep;
+  cCommand_ClipboardPaste_KeepCaret = 1001;
 
   cCommand_CaretsRemove = 2001;
 

@@ -124,7 +124,7 @@ begin
     end;
 
     Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
-    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
+    DoCaretsShift(AX1, AY1, Shift.X, Shift.Y);
     Item.PosX:= PosAfter.X;
     Item.PosY:= PosAfter.Y;
     Item.EndX:= -1;

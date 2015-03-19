@@ -154,8 +154,8 @@ begin
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
     //end of most used
 
-    cCommand_TextDeleteCurLine:        Res:= DoCommand_TextDeleteCurLine;
-    cCommand_TextDuplicateCurLine:     Res:= DoCommand_TextDuplicateCurLine;
+    cCommand_TextDeleteLine:        Res:= DoCommand_TextDeleteCurLine;
+    cCommand_TextDuplicateLine:     Res:= DoCommand_TextDuplicateCurLine;
     cCommand_TextDeleteToLineBegin:    Res:= DoCommand_TextDeleteToLineBegin;
     cCommand_TextDeleteToLineEnd:      Res:= DoCommand_TextDeleteToLineEnd;
     cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);
@@ -175,7 +175,7 @@ begin
     cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(false);
 
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
-    cCommand_ToggleOvr:                Res:= DoCommand_ToggleOver;
+    cCommand_ToggleOverwrite:                Res:= DoCommand_ToggleOver;
 
     cCommand_ScrollLineUp:             Res:= DoCommand_ScrollVert(-1);
     cCommand_ScrollLineDown:           Res:= DoCommand_ScrollVert(1);

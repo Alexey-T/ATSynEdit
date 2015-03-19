@@ -41,8 +41,8 @@ begin
   M.Add(cCommand_KeyTab, 'tabulation', [], []);
   M.Add(cCommand_KeyTabChar, 'tabulation: tab-char', ['Ctrl+I'], []);
 
-  M.Add(cCommand_TextDeleteCurLine, 'delete current line', ['Ctrl+Y'], []);
-  M.Add(cCommand_TextDuplicateCurLine, 'duplicate current line', ['Ctrl+D'], []);
+  M.Add(cCommand_TextDeleteLine, 'delete current line', ['Ctrl+Y'], []);
+  M.Add(cCommand_TextDuplicateLine, 'duplicate current line', ['Ctrl+D'], []);
 
   M.Add(cCommand_SelectAll, 'select all', ['Ctrl+A'], []);
   M.Add(cCommand_SelectWords, 'select words at carets', [], []);
@@ -57,7 +57,7 @@ begin
   M.Add(cCommand_GotoWordNext,       'goto word right',          ['Ctrl+Right'], []);
   M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', ['Ctrl+Shift+Right'], []);
 
-  M.Add(cCommand_ToggleOvr, 'toggle insert/overwrite mode', ['Insert'], []);
+  M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Insert'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', ['Ctrl+R'], []);
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word left', ['Ctrl+Backspace'], []);

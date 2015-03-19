@@ -196,7 +196,7 @@ begin
     for i:= AToY downto AFromY+1 do
       LineDelete(i);
 
-    AShift.Y:= Max(0, AToY-AFromY);
+    AShift.Y:= -(AToY-AFromY);
   end;
 end;
 
