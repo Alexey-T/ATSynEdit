@@ -28,6 +28,14 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
+  TATAutoScroll = (
+    cScrollNone,
+    cScrollUp,
+    cScrollDown,
+    cScrollLeft,
+    cScrollRight
+    );
+
   TATSynWrapMode = (
     cWrapOff,
     cWrapOn,
@@ -214,7 +222,7 @@ type
     FUseOverOnPaste: boolean;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
-    FMouseAutoScroll: TAnchorKind;
+    FMouseAutoScroll: TATAutoScroll;
     FKeyNavigateInWrappedLines: boolean;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
@@ -2007,6 +2015,7 @@ begin
   RectNums.Top:= FRectMain.Top;
   RectNums.Bottom:= FRectMain.Bottom;
 
+  //update cursor
   if PtInRect(FRectMain, P) then
     Cursor:= crIBeam
   else
@@ -2015,12 +2024,13 @@ begin
   else
     Cursor:= crDefault;
 
-  //mouse dragged out?
+  //start scroll timer
   FTimerScroll.Enabled:= (ssLeft in Shift) and (not PtInRect(FRectMain, P));
-  if P.Y<FRectMain.Top then FMouseAutoScroll:= akTop else
-  if P.Y>FRectMain.Bottom then FMouseAutoScroll:= akBottom else
-  if P.X<FRectMain.Left then FMouseAutoScroll:= akLeft else
-  if P.X>FRectMain.Right then FMouseAutoScroll:= akRight;
+  if P.Y<FRectMain.Top then FMouseAutoScroll:= cScrollUp else
+  if P.Y>=FRectMain.Bottom then FMouseAutoScroll:= cScrollDown else
+  if P.X<FRectMain.Left then FMouseAutoScroll:= cScrollLeft else
+  if P.X>=FRectMain.Right then FMouseAutoScroll:= cScrollRight else
+    FMouseAutoScroll:= cScrollNone;
 
   //mouse dragged on numbers
   if PtInRect(RectNums, P) then
@@ -2057,6 +2067,7 @@ begin
               Carets.ExtendSelectionToPoint(nIndex, P.X, P.Y);
           end;
 
+          DoCaretsSort;
           DoEventCarets;
           Update;
         end;
@@ -2117,20 +2128,39 @@ begin
 end;
 
 procedure TATSynEdit.TimerScrollTick(Sender: TObject);
+var
+  nIndex: integer;
+  PClient, PCaret: TPoint;
 begin
+  PClient:= ScreenToClient(Mouse.CursorPos);
+
   case FMouseAutoScroll of
-    akTop:
+    cScrollUp:
       begin
+        PClient.Y:= FRectMain.Top;
         with FScrollVert do
           if NPos>NMin then Dec(NPos);
       end;
-    akBottom:
+    cScrollDown:
       begin
+        PClient.Y:= FRectMain.Bottom;
         with FScrollVert do
           if NPos<NMax then Inc(NPos);
       end;
+    else
+      Exit;
   end;
 
+  PCaret:= ClientPosToCaretPos(PClient);
+  if (PCaret.X>=0) and (PCaret.Y>=0) then
+  begin
+    nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+    if nIndex>=0 then
+      Carets.ExtendSelectionToPoint(nIndex, PCaret.X, PCaret.Y);
+  end;
+
+  DoCaretsSort;
+  DoEventCarets;
   DoEventScroll;
   Update;
 end;
