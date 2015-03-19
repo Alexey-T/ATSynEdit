@@ -26,7 +26,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoSelect_Word(P: TPoint; AUpdate: boolean);
+procedure TATSynEdit.DoSelect_Word(P: TPoint);
 var
   N1, N2: integer;
 begin
@@ -41,11 +41,10 @@ begin
       EndX:= N1;
       PosX:= N2;
     end;
-    if AUpdate then Update;
   end;
 end;
 
-procedure TATSynEdit.DoSelect_Line(P: TPoint; AUpdate: boolean);
+procedure TATSynEdit.DoSelect_Line(P: TPoint);
 var
   PLast: TPoint;
 begin
@@ -68,11 +67,9 @@ begin
     EndX:= 0;
     EndY:= P.Y;
   end;
-
-  if AUpdate then Update;
 end;
 
-procedure TATSynEdit.DoSelect_All(AUpdate: boolean);
+procedure TATSynEdit.DoSelect_All;
 var
   P: TPoint;
 begin
@@ -83,10 +80,9 @@ begin
     EndX:= 0;
     EndY:= 0;
   end;
-  if AUpdate then Update;
 end;
 
-procedure TATSynEdit.DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint; AUpdate: boolean);
+procedure TATSynEdit.DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint);
 var
   CItem: TATSynCaretItem;
 begin
@@ -107,9 +103,7 @@ begin
   else
   if P.Y=ALineFrom then
   begin
-    DoSelect_Line(P, false);
+    DoSelect_Line(P);
   end;
-
-  if AUpdate then Update;
 end;
 

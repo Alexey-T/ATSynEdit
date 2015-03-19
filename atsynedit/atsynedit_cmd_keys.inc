@@ -150,7 +150,7 @@ end;
 
 function TATSynEdit.DoCommand_ScrollVert(ALines: integer): TATCommandResults;
 begin
-  DoScrollByDelta(0, ALines, false);
+  DoScrollByDelta(0, ALines);
   Result:= [cResultScroll];
 end;
 
@@ -215,7 +215,7 @@ end;
 
 function TATSynEdit.DoCommand_SelectAll: TATCommandResults;
 begin
-  DoSelect_All(false);
+  DoSelect_All;
   Result:= [cResultCaretBottom];
 end;
 

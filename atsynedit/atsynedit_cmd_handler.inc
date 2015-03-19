@@ -162,6 +162,7 @@ begin
 
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
     cCommand_ToggleOvr:                Res:= DoCommand_ToggleOver;
+
     cCommand_ScrollLineUp:             Res:= DoCommand_ScrollVert(-1);
     cCommand_ScrollLineDown:           Res:= DoCommand_ScrollVert(1);
 

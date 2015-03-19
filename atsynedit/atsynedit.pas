@@ -309,7 +309,6 @@ type
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     procedure DoCaretSingle(AX, AY: integer);
     procedure DoCaretSingleAsIs;
-    function DoCommand_SelectAll: TATCommandResults;
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);
@@ -410,6 +409,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_SelectAll: TATCommandResults;
     function DoCommand_CaretsRemove: TATCommandResults;
     function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
@@ -472,13 +472,13 @@ type
     procedure DoShowCaret(AEdge: TATSynCaretEdge);
     procedure DoGotoPos(APnt: TPoint);
     //misc
-    procedure DoSelect_All(AUpdate: boolean);
-    procedure DoSelect_Line(P: TPoint; AUpdate: boolean);
-    procedure DoSelect_Word(P: TPoint; AUpdate: boolean);
-    procedure DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint; AUpdate: boolean);
+    procedure DoSelect_All;
+    procedure DoSelect_Line(P: TPoint);
+    procedure DoSelect_Word(P: TPoint);
+    procedure DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint);
     procedure DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
-    procedure DoScrollByDelta(Dx, Dy: integer; AUpdate: boolean);
+    procedure DoScrollByDelta(Dx, Dy: integer);
 
   protected
     procedure Paint; override;
@@ -1978,7 +1978,7 @@ begin
       (X<FGutter[FGutterBandNum].Right) then
     begin
       FMouseDownNumber:= PCaret.Y;
-      DoSelect_Line(PCaret, false);
+      DoSelect_Line(PCaret);
     end
     else
       //on other bands- event
@@ -2045,7 +2045,7 @@ begin
       if (P.Y>=0) and (P.X>=0) then
         if FMouseDownNumber>=0 then
         begin
-          DoSelect_Lines_ToPoint(FMouseDownNumber, P, false);
+          DoSelect_Lines_ToPoint(FMouseDownNumber, P);
           DoCaretsSort;
           DoEventCarets;
           Update;
@@ -2095,7 +2095,8 @@ begin
   begin
     P:= ClientPosToCaretPos(P);
     if P.Y<0 then Exit;
-    DoSelect_Word(P, true);
+    DoSelect_Word(P);
+    Update;
   end;
 end;
 
@@ -2110,7 +2111,8 @@ begin
   begin
     P:= ClientPosToCaretPos(P);
     if P.Y<0 then Exit;
-    DoSelect_Line(P, true);
+    DoSelect_Line(P);
+    Update;
   end;
 end;
 
@@ -2147,22 +2149,22 @@ begin
     cScrollUp:
       begin
         PClient.Y:= FRectMain.Top;
-        DoScrollByDelta(0, -cSizeScrollVertAuto, false);
+        DoScrollByDelta(0, -cSizeScrollVertAuto);
       end;
     cScrollDown:
       begin
         PClient.Y:= FRectMain.Bottom;
-        DoScrollByDelta(0, cSizeScrollVertAuto, false);
+        DoScrollByDelta(0, cSizeScrollVertAuto);
       end;
     cScrollLeft:
       begin
         PClient.X:= FRectMain.Left;
-        DoScrollByDelta(-cSizeScrollHorzAuto, 0, false);
+        DoScrollByDelta(-cSizeScrollHorzAuto, 0);
       end;
     cScrollRight:
       begin
         PClient.X:= FRectMain.Right;
-        DoScrollByDelta(cSizeScrollHorzAuto, 0, false);
+        DoScrollByDelta(cSizeScrollHorzAuto, 0);
       end;
     else
       Exit;
@@ -2313,14 +2315,12 @@ begin
     FOnDrawBookmarkIcon(Self, C, ALineNumber, ARect);
 end;
 
-procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer; AUpdate: boolean);
+procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
   with FScrollHorz do
     NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
   with FScrollVert do
     NPos:= Max(0, Min(NMax-NPage, NPos+Dy));
-
-  if AUpdate then Update;
 end;
 
 
