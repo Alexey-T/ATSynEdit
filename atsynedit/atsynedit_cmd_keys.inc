@@ -148,20 +148,9 @@ begin
   Result:= [cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_ScrollLineUpDown(ADown: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ScrollVert(ALines: integer): TATCommandResults;
 begin
-  with FScrollVert do
-    if ADown then
-    begin
-      if NPos<NMax then
-        Inc(NPos);
-    end
-    else
-    begin
-      if NPos>NMin then
-        Dec(NPos);
-    end;
-
+  DoScrollByDelta(0, ALines, false);
   Result:= [cResultScroll];
 end;
 

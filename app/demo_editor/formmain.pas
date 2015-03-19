@@ -464,6 +464,7 @@ begin
 
     chkAutoInd.Checked:= ed.OptAutoIndent;
     chkTabSp.Checked:= ed.OptTabSpaces;
+    chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
 
     if ShowModal=mrOk then
     begin
@@ -479,6 +480,7 @@ begin
 
       ed.OptAutoIndent:= chkAutoInd.Checked;
       ed.OptTabSpaces:= chkTabSp.Checked;
+      ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
 
       ed.Gutter.Update;
       ed.Update;

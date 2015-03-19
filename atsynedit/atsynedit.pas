@@ -415,7 +415,7 @@ type
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOver: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
-    function DoCommand_ScrollLineUpDown(ADown: boolean): TATCommandResults;
+    function DoCommand_ScrollVert(ALines: integer): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret, AOvrMode: boolean): TATCommandResults;
     function DoCommand_TextInsertTab: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
@@ -478,6 +478,7 @@ type
     procedure DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint; AUpdate: boolean);
     procedure DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
+    procedure DoScrollByDelta(Dx, Dy: integer; AUpdate: boolean);
 
   protected
     procedure Paint; override;
@@ -2146,26 +2147,22 @@ begin
     cScrollUp:
       begin
         PClient.Y:= FRectMain.Top;
-        with FScrollVert do
-          NPos:= Max(0, NPos-cSizeScrollVertAuto);
+        DoScrollByDelta(0, -cSizeScrollVertAuto, false);
       end;
     cScrollDown:
       begin
         PClient.Y:= FRectMain.Bottom;
-        with FScrollVert do
-          NPos:= Max(0, Min(NMax-NPage, NPos+cSizeScrollVertAuto));
+        DoScrollByDelta(0, cSizeScrollVertAuto, false);
       end;
     cScrollLeft:
       begin
         PClient.X:= FRectMain.Left;
-        with FScrollHorz do
-          NPos:= Max(0, NPos-cSizeScrollHorzAuto);
+        DoScrollByDelta(-cSizeScrollHorzAuto, 0, false);
       end;
     cScrollRight:
       begin
         PClient.X:= FRectMain.Right;
-        with FScrollHorz do
-          NPos:= Max(0, Min(NMax-NPage, NPos+cSizeScrollHorzAuto));
+        DoScrollByDelta(cSizeScrollHorzAuto, 0, false);
       end;
     else
       Exit;
@@ -2315,6 +2312,17 @@ begin
   if Assigned(FOnDrawBookmarkIcon) then
     FOnDrawBookmarkIcon(Self, C, ALineNumber, ARect);
 end;
+
+procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer; AUpdate: boolean);
+begin
+  with FScrollHorz do
+    NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
+  with FScrollVert do
+    NPos:= Max(0, Min(NMax-NPage, NPos+Dy));
+
+  if AUpdate then Update;
+end;
+
 
 
 {$I atsynedit_carets.inc}
