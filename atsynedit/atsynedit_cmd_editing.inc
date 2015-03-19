@@ -70,35 +70,52 @@ var
   i: integer;
   Item: TATCaretItem;
   Shift, PosAfter: TPoint;
+  List: TStringList;
+  //
+  function TextItem(i: integer): atString;
+  begin
+    if (Carets.Count=List.Count) and (i>=0) and (i<List.Count) then
+      Result:= UTF8Decode(List[i])
+    else
+      Result:= AText;
+  end;
+  //
 begin
   if ModeReadOnly then Exit;
 
-  for i:= FCarets.Count-1 downto 0 do
-  begin
-    Item:= FCarets[i];
-    Strings.TextInsert(Item.PosX, Item.PosY, AText, AOvrMode, Shift, PosAfter);
+  List:= TStringList.Create;
+  try
+    List.Text:= UTF8Encode(AText);
 
-    if not AKeepCaret then
+    for i:= FCarets.Count-1 downto 0 do
     begin
-      if ASelectThen then
+      Item:= FCarets[i];
+      Strings.TextInsert(Item.PosX, Item.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
+
+      if not AKeepCaret then
       begin
-        Item.EndX:= Item.PosX;
-        Item.EndY:= Item.PosY;
-      end
-      else
+        if ASelectThen then
+        begin
+          Item.EndX:= Item.PosX;
+          Item.EndY:= Item.PosY;
+        end
+        else
+        begin
+          Item.EndX:= -1;
+          Item.EndY:= -1;
+        end;
+      end;
+
+      DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
+
+      if not AKeepCaret then
       begin
-        Item.EndX:= -1;
-        Item.EndY:= -1;
+        Item.PosX:= PosAfter.X;
+        Item.PosY:= PosAfter.Y;
       end;
     end;
-
-    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
-
-    if not AKeepCaret then
-    begin
-      Item.PosX:= PosAfter.X;
-      Item.PosY:= PosAfter.Y;
-    end;
+  finally
+    FreeAndNil(List);
   end;
 
   Result:= [cResultText, cResultCaretAny];

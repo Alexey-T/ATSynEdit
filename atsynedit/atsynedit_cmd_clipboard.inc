@@ -25,6 +25,7 @@ var
   Item: TATCaretItem;
   i, X1, Y1, X2, Y2: integer;
   bSel: boolean;
+  Str: atString;
 begin
   List:= TList.Create;
   ListStr:= TStringList.Create;
@@ -41,7 +42,11 @@ begin
     if not Carets.IsSelection then
     begin
       for i:= 0 to List.Count-1 do
-        ListStr.Add(UTF8Encode( Strings.Lines[integer(List[i])] ));
+      begin
+        Str:= Strings.Lines[integer(List[i])];
+        if Str<>'' then
+          ListStr.Add(UTF8Encode(Str));
+      end;
     end
     else
     //selection(s)-- copy selected ranges
@@ -51,7 +56,10 @@ begin
         Item:= Carets[i];
         Item.GetRange(X1, Y1, X2, Y2, bSel);
         if not bSel then Continue;
-        ListStr.Add(UTF8Encode( Strings.TextSubstring(X1, Y1, X2, Y2) ));
+
+        Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
+        if Str<>'' then
+          ListStr.Add(UTF8Encode(Str));
       end;
     end;
 

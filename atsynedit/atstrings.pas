@@ -717,7 +717,7 @@ var
   Str: atString;
 begin
   Result:= '';
-  if AY1<AY2 then Exit;
+  if AY1>AY2 then Exit;
 
   if AY1=AY2 then
   begin
