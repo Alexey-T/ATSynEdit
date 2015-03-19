@@ -48,7 +48,7 @@ type
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
     function CaretAtEdge(AEdge: TATSynCaretEdge): TPoint;
-    procedure ExtendSelectionToPoint(NIndex: integer; AX, AY: integer);
+    procedure SelectToPoint(NIndex: integer; AX, AY: integer);
   end;
 
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
@@ -285,7 +285,7 @@ begin
       Result:= Point(PosX, PosY);
 end;
 
-procedure TATSynCarets.ExtendSelectionToPoint(NIndex: integer; AX, AY: integer);
+procedure TATSynCarets.SelectToPoint(NIndex: integer; AX, AY: integer);
 var
   Item: TATSynCaretItem;
 begin

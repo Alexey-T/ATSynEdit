@@ -120,7 +120,7 @@ const
   cInitSpacingText = 1;
   cInitSpacingMinimap = -1;
   cInitTimerBlink = 600;
-  cInitTimerScroll = 100;
+  cInitTimerScroll = 80;
   cInitMinimapVisible = false;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
@@ -170,7 +170,9 @@ const
   cSizeScrollGotoHorz = 10;
   cSizeScrollGotoVert = 3;
   cSizeCollapseMarkIndent = 3;
-  cSizeIncreaseHorzScroll = 1; //n chars allow handy clicking after eol
+  cSizeScrollHorzAuto = 10; //chars to scroll by drag out of right/left
+  cSizeScrollVertAuto = 1;
+  cSizeScrollHorzKeep = 1; //n chars allow handy clicking after eol
   cSizeBitmapStep = 100;
   cOffsetTextLeft = 0; //needs fixing bookmark bg paint if >0
   cOffsetTextTop = 1;
@@ -786,7 +788,7 @@ begin
     cWrapOff:
       FWrapColumn:= 0;
     cWrapOn:
-      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-cSizeIncreaseHorzScroll);
+      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-cSizeScrollHorzKeep);
     cWrapAtMargin:
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
   end;
@@ -1141,7 +1143,7 @@ begin
     StrOut:= StringOfChar(' ', WrapItem.NIndent) + Str;
     StrOutUncut:= StrOut;
     AScrollHorz.NMax:= Max(AScrollHorz.NMax,
-      Round(CanvasTextSpaces(StrOutUncut, FTabSize)) + cSizeIncreaseHorzScroll);
+      Round(CanvasTextSpaces(StrOutUncut, FTabSize)) + cSizeScrollHorzKeep);
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
@@ -2026,11 +2028,11 @@ begin
 
   //start scroll timer
   FTimerScroll.Enabled:= (ssLeft in Shift) and (not PtInRect(FRectMain, P));
+  FMouseAutoScroll:= cScrollNone;
   if P.Y<FRectMain.Top then FMouseAutoScroll:= cScrollUp else
   if P.Y>=FRectMain.Bottom then FMouseAutoScroll:= cScrollDown else
   if P.X<FRectMain.Left then FMouseAutoScroll:= cScrollLeft else
-  if P.X>=FRectMain.Right then FMouseAutoScroll:= cScrollRight else
-    FMouseAutoScroll:= cScrollNone;
+  if P.X>=FRectMain.Right then FMouseAutoScroll:= cScrollRight;
 
   //mouse dragged on numbers
   if PtInRect(RectNums, P) then
@@ -2041,6 +2043,7 @@ begin
         if FMouseDownNumber>=0 then
         begin
           DoSelect_Lines_ToPoint(FMouseDownNumber, P, false);
+          DoCaretsSort;
           DoEventCarets;
           Update;
         end;
@@ -2057,14 +2060,17 @@ begin
         begin
           //drag w/out button pressed: single selection
           if [ssCtrl, ssShift, ssAlt]*Shift=[] then
-            Carets.ExtendSelectionToPoint(0, P.X, P.Y);
+          begin
+            DoCaretSingleAsIs;
+            Carets.SelectToPoint(0, P.X, P.Y);
+          end;
 
           //drag with Ctrl pressed: add selection
           if [ssCtrl, ssShift, ssAlt]*Shift=[ssCtrl] then
           begin
             nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
             if nIndex>=0 then
-              Carets.ExtendSelectionToPoint(nIndex, P.X, P.Y);
+              Carets.SelectToPoint(nIndex, P.X, P.Y);
           end;
 
           DoCaretsSort;
@@ -2139,13 +2145,25 @@ begin
       begin
         PClient.Y:= FRectMain.Top;
         with FScrollVert do
-          if NPos>NMin then Dec(NPos);
+          NPos:= Max(0, NPos-cSizeScrollVertAuto);
       end;
     cScrollDown:
       begin
         PClient.Y:= FRectMain.Bottom;
         with FScrollVert do
-          if NPos<NMax then Inc(NPos);
+          NPos:= Max(0, Min(NMax-NPage, NPos+cSizeScrollVertAuto));
+      end;
+    cScrollLeft:
+      begin
+        PClient.X:= FRectMain.Left;
+        with FScrollHorz do
+          NPos:= Max(0, NPos-cSizeScrollHorzAuto);
+      end;
+    cScrollRight:
+      begin
+        PClient.X:= FRectMain.Right;
+        with FScrollHorz do
+          NPos:= Max(0, Min(NMax-NPage, NPos+cSizeScrollHorzAuto));
       end;
     else
       Exit;
@@ -2156,7 +2174,7 @@ begin
   begin
     nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
     if nIndex>=0 then
-      Carets.ExtendSelectionToPoint(nIndex, PCaret.X, PCaret.Y);
+      Carets.SelectToPoint(nIndex, PCaret.X, PCaret.Y);
   end;
 
   DoCaretsSort;
