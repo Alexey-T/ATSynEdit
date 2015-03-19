@@ -73,6 +73,7 @@ begin
   M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
 
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', ['Ctrl+V'], []);
+  M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', [], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
 
   M.Add(cCommand_CaretsRemove, 'carets: remove multi-carets', ['Escape'], []);

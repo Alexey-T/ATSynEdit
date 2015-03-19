@@ -174,7 +174,6 @@ const
   cSizeScrollVertAuto = 1;
   cSizeScrollHorzKeep = 1; //n chars allow handy clicking after eol
   cSizeBitmapStep = 100;
-  cOffsetTextLeft = 0; //needs fixing bookmark bg paint if >0
   cOffsetTextTop = 1;
   cSizeGutterNumOffsetLeft = 5;
   cSizeGutterNumOffsetRight = 4;
@@ -379,7 +378,7 @@ type
     function GetRectGutter: TRect;
     function GetRectRuler: TRect;
     function GetTextOffset: TPoint;
-    function GetGutterNumbersColumnWidth: integer;
+    function GetGutterNumbersWidth: integer;
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
     function GetVisibleLinesMinimap: integer;
@@ -681,7 +680,7 @@ end;
 
 procedure TATSynEdit.UpdateGutterAutosize;
 begin
-  FGutter[FGutterBandNum].Size:= GetGutterNumbersColumnWidth;
+  FGutter[FGutterBandNum].Size:= GetGutterNumbersWidth;
   FGutter.Update;
 end;
 
@@ -1814,7 +1813,7 @@ end;
 
 function TATSynEdit.GetTextOffset: TPoint;
 begin
-  Result.X:= cOffsetTextLeft;
+  Result.X:= 0;
   if FGutterVisible then
     Inc(Result.X, FGutter.Width);
 
@@ -1823,7 +1822,7 @@ begin
     Inc(Result.Y, FRulerHeight);
 end;
 
-function TATSynEdit.GetGutterNumbersColumnWidth: integer;
+function TATSynEdit.GetGutterNumbersWidth: integer;
 var
   Str: atString;
 begin

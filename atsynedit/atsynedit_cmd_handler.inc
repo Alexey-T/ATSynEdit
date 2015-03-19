@@ -185,7 +185,8 @@ begin
     cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];
     cCommand_ScrollToCaretRight:       Res:= [cResultCaretRight];
 
-    cCommand_ClipboardPaste:           Res:= DoCommand_ClipboardPaste(false);
+    cCommand_ClipboardPaste,
+    cCommand_ClipboardPaste_Sel:       Res:= DoCommand_ClipboardPaste(false);
     cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true);
 
     cCommand_CaretsRemove:             Res:= DoCommand_CaretsRemove;

@@ -66,6 +66,7 @@ const
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_KeepCaret = 1001;
+  cCommand_ClipboardPaste_Sel = cCommand_ClipboardPaste or cCommandSel;
 
   cCommand_CaretsRemove = 2001;
 
