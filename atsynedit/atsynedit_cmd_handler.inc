@@ -149,7 +149,7 @@ begin
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
     //end of most used
 
-    cCommand_TextDeleteLine:        Res:= DoCommand_TextDeleteCurLine;
+    cCommand_TextDeleteLine:        Res:= DoCommand_TextDeleteLine;
     cCommand_TextDuplicateLine:     Res:= DoCommand_TextDuplicateCurLine;
     cCommand_TextDeleteToLineBegin:    Res:= DoCommand_TextDeleteToLineBegin;
     cCommand_TextDeleteToLineEnd:      Res:= DoCommand_TextDeleteToLineEnd;

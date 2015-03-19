@@ -2,8 +2,8 @@ function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): 
 var
   Str: atString;
 begin
-  if ModeReadOnly then
-    begin Result:= []; Exit end;
+  Result:= [];
+  if ModeReadOnly then Exit;
 
   Str:= UTF8Decode(Clipboard.AsText);
   DoCommand_TextDeleteSelections;
@@ -12,16 +12,12 @@ end;
 
 function TATSynEdit.DoCommand_ClipboardCut: TATCommandResults;
 begin
-  if ModeReadOnly then
-    begin Result:= []; Exit end;
+  Result:= [];
+  if ModeReadOnly then Exit;
+  if not Carets.IsSelection then Exit;
 
-  if not Carets.IsSelection then
-    Result:= []
-  else
-  begin
-    DoCommand_ClipboardCopy;
-    Result:= DoCommand_TextDeleteSelections;
-  end;
+  DoCommand_ClipboardCopy;
+  Result:= DoCommand_TextDeleteSelections;
 end;
 
 function TATSynEdit.DoCommand_ClipboardCopy: TATCommandResults;

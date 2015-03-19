@@ -81,7 +81,9 @@ var
   end;
   //
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
+  DoCommand_TextDeleteSelections;
 
   List:= nil;
   if Length(AText)>1 then
@@ -132,6 +134,7 @@ var
   i: integer;
   Shift, PosAfter: TPoint;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
 
   for i:= 0 to FCarets.Count-1 do
@@ -162,7 +165,9 @@ var
   AX1, AY1, AX2, AY2: integer;
   bSel: boolean;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
+  if not Carets.IsSelection then Exit;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
@@ -188,6 +193,7 @@ var
   i, Len, ShiftBelowX: integer;
   Shift, PosAfter: TPoint;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
 
   for i:= 0 to FCarets.Count-1 do
@@ -216,6 +222,7 @@ var
   i: integer;
   Str: atString;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
 
   for i:= FCarets.Count-1 downto 0 do
@@ -238,12 +245,13 @@ begin
   Result:= [cResultText, cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_TextDeleteCurLine: TATCommandResults;
+function TATSynEdit.DoCommand_TextDeleteLine: TATCommandResults;
 var
   Item: TATCaretItem;
   i: integer;
   Shift, PosAfter: TPoint;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
   DoCaretsDeleteOnSameLines;
 
@@ -265,6 +273,7 @@ var
   i: integer;
   Shift, PosAfter: TPoint;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
   DoCaretsDeleteOnSameLines;
 
@@ -286,6 +295,7 @@ var
   Str: atString;
   i: integer;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
   DoCaretsDeleteOnSameLines;
 
@@ -307,6 +317,7 @@ var
   Str: atString;
   i: integer;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
   DoCaretsDeleteOnSameLines;
 
@@ -333,6 +344,7 @@ var
   Shift, PosAfter: TPoint;
   i: integer;
 begin
+  Result:= [];
   if ModeReadOnly then Exit;
 
   for i:= FCarets.Count-1 downto 0 do

@@ -433,7 +433,7 @@ type
     function DoCommand_TextDeleteLeft(ALen: integer): TATCommandResults;
     function DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
     function DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
-    function DoCommand_TextDeleteCurLine: TATCommandResults;
+    function DoCommand_TextDeleteLine: TATCommandResults;
     function DoCommand_TextDuplicateCurLine: TATCommandResults;
     function DoCommand_TextDeleteToLineBegin: TATCommandResults;
     function DoCommand_TextDeleteToLineEnd: TATCommandResults;
