@@ -74,7 +74,7 @@ var
   //
   function TextItem(i: integer): atString;
   begin
-    if (Carets.Count=List.Count) and (i>=0) and (i<List.Count) then
+    if Assigned(List) and (Carets.Count=List.Count) and (i>=0) and (i<List.Count) then
       Result:= UTF8Decode(List[i])
     else
       Result:= AText;
@@ -83,10 +83,14 @@ var
 begin
   if ModeReadOnly then Exit;
 
-  List:= TStringList.Create;
-  try
+  List:= nil;
+  if Length(AText)>1 then
+  begin
+    List:= TStringList.Create;
     List.Text:= UTF8Encode(AText);
+  end;
 
+  try
     for i:= FCarets.Count-1 downto 0 do
     begin
       Item:= FCarets[i];
@@ -115,7 +119,8 @@ begin
       end;
     end;
   finally
-    FreeAndNil(List);
+    if Assigned(List) then
+      FreeAndNil(List);
   end;
 
   Result:= [cResultText, cResultCaretAny];
