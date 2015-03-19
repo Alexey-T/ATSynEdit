@@ -104,7 +104,6 @@ end;
 procedure TATSynEdit.DoCommandExec(ACmd: integer; const AText: atString = '');
 var
   Res: TATCommandResults;
-  bSel: boolean;
   Item: TATCaretItem;
   i: integer;
 begin
@@ -112,44 +111,44 @@ begin
   Res:= [];
   FCaretSpecPos:= false;
 
-  bSel:= ACmd and cCommandSel <> 0;
-  for i:= 0 to Carets.Count-1 do
-  begin
-    Item:= Carets[i];
-    if not bSel then
+  if ACmd and cSelKeep <> 0 then
+    for i:= 0 to Carets.Count-1 do
     begin
-      Item.EndX:= -1;
-      Item.EndY:= -1;
-    end
-    else
-    begin
+      Item:= Carets[i];
       if Item.EndY<0 then Item.EndY:= Item.PosY;
       if Item.EndX<0 then Item.EndX:= Item.PosX;
     end;
-  end;
+
+  if ACmd and cSelReset <> 0 then
+    for i:= 0 to Carets.Count-1 do
+    begin
+      Item:= Carets[i];
+      Item.EndX:= -1;
+      Item.EndY:= -1;
+    end;
 
   case ACmd of
     //most used commands
     cCommand_KeyLeft,
-    cCommand_KeyLeft_Sel:      Res:= DoCommand_KeyLeft;
+    cCommand_KeyLeft_Sel:         Res:= DoCommand_KeyLeft;
     cCommand_KeyRight,
-    cCommand_KeyRight_Sel:     Res:= DoCommand_KeyRight;
+    cCommand_KeyRight_Sel:        Res:= DoCommand_KeyRight;
     cCommand_KeyUp,
-    cCommand_KeyUp_Sel:        Res:= DoCommand_KeyUpDown(false, 1);
+    cCommand_KeyUp_Sel:           Res:= DoCommand_KeyUpDown(false, 1);
     cCommand_KeyDown,
-    cCommand_KeyDown_Sel:      Res:= DoCommand_KeyUpDown(true, 1);
+    cCommand_KeyDown_Sel:         Res:= DoCommand_KeyUpDown(true, 1);
     cCommand_KeyHome,
-    cCommand_KeyHome_Sel:      Res:= DoCommand_KeyHome;
+    cCommand_KeyHome_Sel:         Res:= DoCommand_KeyHome;
     cCommand_KeyEnd,
-    cCommand_KeyEnd_Sel:       Res:= DoCommand_KeyEnd;
+    cCommand_KeyEnd_Sel:          Res:= DoCommand_KeyEnd;
     cCommand_KeyPageUp,
-    cCommand_KeyPageUp_Sel:    Res:= DoCommand_KeyUpDown(false, GetVisibleLines-1);
+    cCommand_KeyPageUp_Sel:       Res:= DoCommand_KeyUpDown(false, GetVisibleLines-1);
     cCommand_KeyPageDown,
-    cCommand_KeyPageDown_Sel:  Res:= DoCommand_KeyUpDown(true, GetVisibleLines-1);
+    cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetVisibleLines-1);
 
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);
-    cCommand_KeyDelete:           Res:= DoCommand_TextDeleteRight(1);
+    cCommand_KeyDelete:           Res:= DoCommand_TextDelete;
     cCommand_KeyTab:              Res:= DoCommand_TextInsertTab;
     cCommand_KeyTabChar:          Res:= DoCommand_TextInsertAtCarets(#9, false, FOver);
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);

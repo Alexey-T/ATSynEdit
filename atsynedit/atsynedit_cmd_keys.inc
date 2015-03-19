@@ -133,7 +133,7 @@ begin
   begin
     Result.Y:= Strings.Count-1;
     Result.X:= Length(Strings.Lines[Result.Y]);
-    if Strings.LinesEnds[Result.Y]<>cLineEndNone then
+    if Strings.LinesEnds[Result.Y]<>cEndNone then
       Inc(Result.X);
   end;
 end;

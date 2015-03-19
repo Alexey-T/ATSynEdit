@@ -155,10 +155,49 @@ begin
         LineDelete(AY+1);
       end
       else
-        LinesEnds[AY]:= cLineEndNone;
+        LinesEnds[AY]:= cEndNone;
 
       AShift.Y:= -1;
     end;
+end;
+
+procedure TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
+  out AShift, APosAfter: TPoint);
+var
+  Str: atString;
+  i: integer;
+begin
+  AShift.X:= 0;
+  AShift.Y:= 0;
+  APosAfter.X:= AFromX;
+  APosAfter.Y:= AFromY;
+  if not IsIndexValid(AFromY) then Exit;
+  if not IsIndexValid(AToY) then Exit;
+  if (AFromX=AToX) and (AFromY=AToY) then Exit;
+  if (AFromY>AToY) then Exit;
+
+  if AFromY=AToY then
+  //delete range in one line
+  begin
+    Str:= Lines[AFromY];
+    Delete(Str, AFromX+1, AToX-AFromX);
+    Lines[AFromY]:= Str;
+
+    AShift.X:= -(AToX-AFromX);
+  end
+  else
+  //delete from 1st line, concat rest of last line, delete lines
+  begin
+    Str:= Lines[AFromY];
+    Delete(Str, AFromX+1, MaxInt);
+    Str:= Str+Copy(Lines[AToY], AToX+1, MaxInt);
+    Lines[AFromY]:= Str;
+
+    for i:= AToY downto AFromY+1 do
+      LineDelete(i);
+
+    AShift.Y:= Max(0, AToY-AFromY);
+  end;
 end;
 
 procedure TATStrings.TextInsertEol(AX, AY: integer; AKeepCaret: boolean; const AStrIndent: atString; out AShift, APosAfter: TPoint);

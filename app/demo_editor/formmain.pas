@@ -198,21 +198,21 @@ end;
 
 procedure TfmMain.mnuEndMcClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cLineEndMac;
+  ed.Strings.Endings:= cEndMac;
   ed.Update;
   UpdateStatus;
 end;
 
 procedure TfmMain.mnuEndUnClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cLineEndUnix;
+  ed.Strings.Endings:= cEndUnix;
   ed.Update;
   UpdateStatus;
 end;
 
 procedure TfmMain.mnuEndWClick(Sender: TObject);
 begin
-  ed.Strings.Endings:= cLineEndWin;
+  ed.Strings.Endings:= cEndWin;
   ed.Update;
   UpdateStatus;
 end;

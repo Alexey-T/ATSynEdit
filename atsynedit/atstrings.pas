@@ -9,10 +9,10 @@ uses
 
 type
   TATLineEnds = (
-    cLineEndNone,
-    cLineEndWin,
-    cLineEndUnix,
-    cLineEndMac
+    cEndNone,
+    cEndWin,
+    cEndUnix,
+    cEndMac
     );
 const
   cLineEndStrings: array[TATLineEnds] of atString = ('', #13#10, #10, #13);
@@ -136,6 +136,7 @@ type
       out AShift, APosAfter: TPoint);
     procedure TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
     procedure TextDeleteRight(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
+    procedure TextDeleteRange(AFromX, AFromY, AToX, AToY: integer; out AShift, APosAfter: TPoint);
     procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteCurLine(AX, AY: integer; out AShift, APosAfter: TPoint);
@@ -253,7 +254,7 @@ begin
   if IsIndexValid(N) then
     Result:= TATStringItem(FList[N]).ItemEnd
   else
-    Result:= cLineEndNone;
+    Result:= cEndNone;
 end;
 
 function TATStrings.GetLineHidden(N: integer): integer;
@@ -373,7 +374,7 @@ begin
 
   FEncoding:= cEncAnsi;
   FEncodingDetect:= true;
-  FEndings:= cLineEndWin;
+  FEndings:= cEndWin;
 
   FSaveUtf8Sign:= true;
   FSaveWideSign:= true;
@@ -450,7 +451,7 @@ begin
 
   if AForceEmpty then
     if FList.Count=0 then
-      LineAddEx('', cLineEndNone);
+      LineAddEx('', cEndNone);
 end;
 
 procedure TATStrings.Clear;
@@ -522,22 +523,22 @@ begin
       Len:= NEnd-NStart;
 
       //detect+skip Eol
-      LineEnd:= cLineEndNone;
+      LineEnd:= cEndNone;
       if (NEnd+CharSize<BufSize) and (_BufferCharCode(NEnd)=13) and (_BufferCharCode(NEnd+CharSize)=10) then
       begin
-        LineEnd:= cLineEndWin;
+        LineEnd:= cEndWin;
         Inc(NEnd, CharSize*2);
       end
       else
       if (NEnd<BufSize) and (_BufferCharCode(NEnd)=10) then
       begin
-        LineEnd:= cLineEndUnix;
+        LineEnd:= cEndUnix;
         Inc(NEnd, CharSize);
       end
       else
       if (NEnd<BufSize) and (_BufferCharCode(NEnd)=13) then
       begin
-        LineEnd:= cLineEndMac;
+        LineEnd:= cEndMac;
         Inc(NEnd, CharSize);
       end
       else
@@ -606,7 +607,7 @@ procedure TATStrings.DoFinalizeLoading;
 begin
   DoDetectEndings;
   if Count=0 then
-    LineAddEx('', cLineEndNone); //force empty line
+    LineAddEx('', cEndNone); //force empty line
   DoResetLineStates(false);
 end;
 
@@ -704,8 +705,8 @@ end;
 procedure TATStrings.DoDetectEndings;
 begin
   FEndings:= LinesEnds[0]; //no range-chk
-  if FEndings=cLineEndNone then
-    FEndings:= cLineEndWin;
+  if FEndings=cEndNone then
+    FEndings:= cEndWin;
 end;
 
 {$I atstrings_editing.inc}

@@ -47,6 +47,7 @@ type
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
+    function IsSelection: boolean;
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     procedure SelectToPoint(NIndex: integer; AX, AY: integer);
   end;
@@ -265,6 +266,21 @@ begin
       Result:= true;
       Exit
     end;
+  end;
+end;
+
+function TATCarets.IsSelection: boolean;
+var
+  Item: TATCaretItem;
+  i: integer;
+begin
+  Result:= false;
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    if (Item.EndX<0) or (Item.EndY<0) then Continue;
+    if (Item.PosX<>Item.EndX) or (Item.PosY<>Item.EndY) then
+      begin Result:= true; Exit end;
   end;
 end;
 

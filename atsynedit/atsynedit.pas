@@ -426,6 +426,8 @@ type
     function DoCommand_KeyUpDown(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
+    function DoCommand_TextDelete: TATCommandResults;
+    function DoCommand_TextDeleteSelections: TATCommandResults;
     function DoCommand_TextDeleteLeft(ALen: integer): TATCommandResults;
     function DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
     function DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;

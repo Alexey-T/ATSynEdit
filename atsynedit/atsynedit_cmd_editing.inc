@@ -89,6 +89,52 @@ begin
   Result:= [cResultText, cResultCaretAny];
 end;
 
+function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
+begin
+  if Carets.IsSelection then
+    Result:= DoCommand_TextDeleteSelections
+  else
+    Result:= DoCommand_TextDeleteRight(1);
+end;
+
+function TATSynEdit.DoCommand_TextDeleteSelections: TATCommandResults;
+var
+  Item: TATCaretItem;
+  i: integer;
+  Shift, PosAfter: TPoint;
+  AX1, AY1, AX2, AY2: integer;
+begin
+  if ModeReadOnly then Exit;
+
+  for i:= FCarets.Count-1 downto 0 do
+  begin
+    Item:= FCarets[i];
+
+    AX1:= Item.PosX;
+    AY1:= Item.PosY;
+    AX2:= Item.EndX;
+    AY2:= Item.EndY;
+    if (AX2<0) or (AY2<0) then Continue;
+    if (AX1=AX2) and (AY1=AY2) then Continue;
+
+    if IsPosSorted(AX2, AY2, AX1, AY1, false) then
+    begin
+      SwapInt(AX1, AX2);
+      SwapInt(AY1, AY2);
+    end;
+
+    Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
+    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
+    Item.PosX:= PosAfter.X;
+    Item.PosY:= PosAfter.Y;
+    Item.EndX:= -1;
+    Item.EndY:= -1;
+  end;
+
+  Result:= [cResultText, cResultCaretAny];
+end;
+
+
 function TATSynEdit.DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
 var
   Item: TATCaretItem;
