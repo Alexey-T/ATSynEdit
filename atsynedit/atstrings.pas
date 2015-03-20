@@ -89,6 +89,7 @@ type
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(N: integer): integer;
     function GetLineState(Index: integer): TATLineState;
+    procedure LineDeleteLastFake;
     procedure LineForceLast;
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
@@ -404,6 +405,12 @@ var
 begin
   Item:= TATStringItem(FList.Last);
   Result:= Assigned(Item) and (Item.ItemString='') and (Item.ItemEnd=cEndNone);
+end;
+
+procedure TATStrings.LineDeleteLastFake;
+begin
+  if IsLastLineFake then
+    LineDelete(Count-1, false{dont force});
 end;
 
 procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds);

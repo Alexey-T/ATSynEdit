@@ -17,7 +17,7 @@ begin
 
   Str:= Lines[AY];
 
-  if AX<Length(Str) then
+  if AX<=Length(Str) then
   begin
     StrLead:= Copy(Str, 1, AX);
     StrTail:= Copy(Str, AX+1, MaxInt);
@@ -49,22 +49,20 @@ begin
   List:= TATStrings.Create;
   try
     List.LoadFromString(StrLead+AText);
+    List.LineDeleteLastFake;
     if List.Count=0 then Exit;
-    with List do
-      if IsLastLineFake then
-        LineDelete(Count-1, false{dont force});
 
-    List.LineAdd(StrTail);
-    with List do
-      if IsLastLineFake then
-        LineDelete(Count-1, false{dont force});
+    if StrTail<>'' then
+      Lines[AY]:= StrTail
+    else
+    if Lines[AY]<>'' then
+      LineDelete(AY);
 
-    LineDelete(AY);
     for i:= List.Count-1 downto 0 do
       LineInsert(AY, List.Lines[i]);
 
     APosAfter.X:= 0;
-    APosAfter.Y:= AY+List.Count-1;
+    APosAfter.Y:= AY+List.Count;
     AShift.Y:= APosAfter.Y-AY;
   finally
     FreeAndNil(List);
