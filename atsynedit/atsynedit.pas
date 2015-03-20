@@ -357,6 +357,7 @@ type
     function GetMarginString: string;
     function GetReadOnly: boolean;
     function GetScrollTop: integer;
+    function GetTextForClipboard: AnsiString;
     function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
     function IsKeyMappingMatchedItem(const Str: string;

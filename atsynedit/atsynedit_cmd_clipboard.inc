@@ -21,6 +21,12 @@ begin
 end;
 
 function TATSynEdit.DoCommand_ClipboardCopy: TATCommandResults;
+begin
+  Clipboard.AsText:= GetTextForClipboard;
+  Result:= [];
+end;
+
+function TATSynEdit.GetTextForClipboard: AnsiString;
 var
   ListNum: TList;
   ListStr: TStringList;
@@ -29,7 +35,7 @@ var
   bSel: boolean;
   Str: atString;
 begin
-  Result:= [];
+  Result:= '';
   ListNum:= TList.Create;
   ListStr:= TStringList.Create;
 
@@ -45,12 +51,15 @@ begin
     if not Carets.IsSelection then
     begin
       if FTextCopyLinesIfNoSel then
+      begin
         for i:= 0 to ListNum.Count-1 do
         begin
           Str:= Strings.Lines[integer(ListNum[i])];
           if Str<>'' then
             ListStr.Add(UTF8Encode(Str));
         end;
+        Result:= ListStr.Text; //always use Text, need eol
+      end;
     end
     else
     //selections-- copy selected ranges
@@ -62,16 +71,15 @@ begin
         if not bSel then Continue;
 
         Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
-        ListStr.Add(UTF8Encode(Str));
+        if Str<>'' then
+          ListStr.Add(UTF8Encode(Str));
       end;
+
+      if ListStr.Count=1 then
+        Result:= ListStr[0] //don't use Text to skip eol
+      else
+        Result:= ListStr.Text;
     end;
-
-    TrimStringList(ListStr);
-    if ListStr.Count=1 then
-      Clipboard.AsText:= ListStr[0]
-    else
-      Clipboard.AsText:= ListStr.Text;
-
   finally
     FreeAndNil(ListStr);
     FreeAndNil(ListNum);
