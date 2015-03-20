@@ -526,6 +526,7 @@ type
     property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
     property OptCaretsTime: integer read GetCaretsTime write SetCaretsTime;
+    property OptCaretMoveByRtClick: boolean read FCaretMoveByRtClick write FCaretMoveByRtClick;
     property OptGutterVisible: boolean read FGutterVisible write FGutterVisible;
     property OptRulerVisible: boolean read FRulerVisible write FRulerVisible;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
@@ -1543,7 +1544,7 @@ begin
   FCaretShapeOvr:= cCaretShapeFull;
   FCaretVirtual:= true;
   FCaretSpecPos:= false;
-  FCaretMoveByRtClick:= true;
+  FCaretMoveByRtClick:= false;
 
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];

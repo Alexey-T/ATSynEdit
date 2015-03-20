@@ -125,7 +125,7 @@ begin
       FreeAndNil(List);
   end;
 
-  Result:= [cResultText, cResultCaretAny];
+  Result:= [cResultText, cResultCaretBottom];
 end;
 
 function TATSynEdit.DoCommand_TextDeleteLeft(ALen: integer): TATCommandResults;
