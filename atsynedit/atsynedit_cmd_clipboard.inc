@@ -44,12 +44,13 @@ begin
     //no selections-- copy entire lines
     if not Carets.IsSelection then
     begin
-      for i:= 0 to List.Count-1 do
-      begin
-        Str:= Strings.Lines[integer(List[i])];
-        if Str<>'' then
-          ListStr.Add(UTF8Encode(Str));
-      end;
+      if FTextCopyLinesIfNoSel then
+        for i:= 0 to List.Count-1 do
+        begin
+          Str:= Strings.Lines[integer(List[i])];
+          if Str<>'' then
+            ListStr.Add(UTF8Encode(Str));
+        end;
     end
     else
     //selection(s)-- copy selected ranges

@@ -301,6 +301,7 @@ type
     FPrevVert: TATSynScrollInfo;
     FTextAutoIndent: boolean;
     FTextTabSpaces: boolean;
+    FTextCopyLinesIfNoSel: boolean;
     FShowCurLine: boolean;
     FShowCurColumn: boolean;
     //
@@ -514,9 +515,10 @@ type
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkIcon read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
 
     //options
-    property OptAutoIndent: boolean read FTextAutoIndent write FTextAutoIndent;
     property OptTabSpaces: boolean read FTextTabSpaces write FTextTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
+    property OptAutoIndent: boolean read FTextAutoIndent write FTextAutoIndent;
+    property OptCopyLinesIfNoSel: boolean read FTextCopyLinesIfNoSel write FTextCopyLinesIfNoSel;
     property OptUseOverOnPaste: boolean read FUseOverOnPaste write FUseOverOnPaste;
     property OptShowCurLine: boolean read FShowCurLine write FShowCurLine;
     property OptShowCurColumn: boolean read FShowCurColumn write FShowCurColumn;
@@ -1642,6 +1644,7 @@ begin
 
   FTextAutoIndent:= true;
   FTextTabSpaces:= false;
+  FTextCopyLinesIfNoSel:= true;
   FShowCurLine:= false;
   FShowCurColumn:= false;
 
