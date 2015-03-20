@@ -776,7 +776,7 @@ begin
     Str:= Copy(Lines[AY2], 1, AX2);
     L.Add(UTF8Encode(Str));
 
-    SListTrim(L);
+    TrimStringList(L);
     Result:= UTF8Decode(L.Text);
   finally
     FreeAndNil(L);

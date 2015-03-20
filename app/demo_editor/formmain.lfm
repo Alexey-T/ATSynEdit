@@ -458,8 +458,8 @@ object fmMain: TfmMain
     object mnuHlp: TMenuItem
       Caption = 'Help'
       object mnuKey: TMenuItem
-        Caption = 'Keymap..'
-        ShortCut = 32848
+        Caption = 'Commands..'
+        ShortCut = 112
         OnClick = bKeymapClick
       end
     end

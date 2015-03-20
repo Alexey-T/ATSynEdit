@@ -27,7 +27,8 @@ function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 procedure SReplaceSpecChars(var S: atString);
-procedure SListTrim(L: TStringList);
+procedure TrimStringList(L: TStringList);
+function SWithBreaks(const S: atString): boolean;
 
 procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
   ATabSize: integer; ACharsSkipped: integer = 0);
@@ -381,10 +382,17 @@ begin
 end;
 
 
-procedure SListTrim(L: TStringList);
+procedure TrimStringList(L: TStringList);
 begin
   while (L.Count>0) and (L[L.Count-1]='') do
     L.Delete(L.Count-1);
+end;
+
+function SWithBreaks(const S: atString): boolean;
+begin
+  Result:=
+    (Pos(#13, S)>0) or
+    (Pos(#10, S)>0);
 end;
 
 end.

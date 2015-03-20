@@ -22,38 +22,38 @@ end;
 
 function TATSynEdit.DoCommand_ClipboardCopy: TATCommandResults;
 var
-  List: TList;
-  ListStr, ListItem: TStringList;
+  ListNum: TList;
+  ListStr: TStringList;
   Item: TATCaretItem;
   i, X1, Y1, X2, Y2: integer;
   bSel: boolean;
   Str: atString;
 begin
-  List:= TList.Create;
+  Result:= [];
+  ListNum:= TList.Create;
   ListStr:= TStringList.Create;
-  ListItem:= TStringList.Create;
 
   try
     for i:= 0 to Carets.Count-1 do
     begin
       Item:= Carets[i];
-      if List.IndexOf(pointer(Item.PosY))<0 then
-        List.Add(pointer(Item.PosY));
+      if ListNum.IndexOf(pointer(Item.PosY))<0 then
+        ListNum.Add(pointer(Item.PosY));
     end;
 
     //no selections-- copy entire lines
     if not Carets.IsSelection then
     begin
       if FTextCopyLinesIfNoSel then
-        for i:= 0 to List.Count-1 do
+        for i:= 0 to ListNum.Count-1 do
         begin
-          Str:= Strings.Lines[integer(List[i])];
+          Str:= Strings.Lines[integer(ListNum[i])];
           if Str<>'' then
             ListStr.Add(UTF8Encode(Str));
         end;
     end
     else
-    //selection(s)-- copy selected ranges
+    //selections-- copy selected ranges
     begin
       for i:= 0 to Carets.Count-1 do
       begin
@@ -62,20 +62,19 @@ begin
         if not bSel then Continue;
 
         Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
-        ListItem.Text:= UTF8Encode(Str);
-        ListStr.AddStrings(ListItem);
+        ListStr.Add(UTF8Encode(Str));
       end;
     end;
 
-    SListTrim(ListStr);
-    Clipboard.AsText:= ListStr.Text;
+    TrimStringList(ListStr);
+    if ListStr.Count=1 then
+      Clipboard.AsText:= ListStr[0]
+    else
+      Clipboard.AsText:= ListStr.Text;
 
   finally
-    FreeAndNil(ListItem);
     FreeAndNil(ListStr);
-    FreeAndNil(List);
+    FreeAndNil(ListNum);
   end;
-
-  Result:= [];
 end;
 

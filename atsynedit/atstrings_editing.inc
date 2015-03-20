@@ -34,8 +34,7 @@ begin
   //------------------
   //Insert single line
 
-  if (Pos(#13, AText)=0) and
-    (Pos(#10, AText)=0) then
+  if not SWithBreaks(AText) then
   begin
     Lines[AY]:= StrLead+AText+StrTail;
     if not AReplace then
