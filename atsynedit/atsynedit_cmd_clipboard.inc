@@ -23,7 +23,7 @@ end;
 function TATSynEdit.DoCommand_ClipboardCopy: TATCommandResults;
 var
   List: TList;
-  ListStr: TStringList;
+  ListStr, ListItem: TStringList;
   Item: TATCaretItem;
   i, X1, Y1, X2, Y2: integer;
   bSel: boolean;
@@ -31,6 +31,7 @@ var
 begin
   List:= TList.Create;
   ListStr:= TStringList.Create;
+  ListItem:= TStringList.Create;
 
   try
     for i:= 0 to Carets.Count-1 do
@@ -60,13 +61,16 @@ begin
         if not bSel then Continue;
 
         Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
-        if Str<>'' then
-          ListStr.Add(UTF8Encode(Str));
+        ListItem.Text:= UTF8Encode(Str);
+        ListStr.AddStrings(ListItem);
       end;
     end;
 
+    SListTrim(ListStr);
     Clipboard.AsText:= ListStr.Text;
+
   finally
+    FreeAndNil(ListItem);
     FreeAndNil(ListStr);
     FreeAndNil(List);
   end;

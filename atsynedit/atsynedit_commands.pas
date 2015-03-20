@@ -37,9 +37,9 @@ const
   cCommand_KeyPageDown_Sel = _base_KeyPageDown or cSelKeep;
 
   cCommand_TextInsert = 150;
-  cCommand_KeyBackspace = 151;
+  cCommand_KeyBackspace = 151 or cSelReset;
   cCommand_KeyDelete = 152;
-  cCommand_KeyEnter = 153;
+  cCommand_KeyEnter = 153 or cSelReset;
   cCommand_KeyTab = 154;
   cCommand_KeyTabChar = 155;
 

@@ -96,6 +96,7 @@
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
@@ -104,16 +105,15 @@
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atsyncarets.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynCarets"/>
       </Unit16>
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
