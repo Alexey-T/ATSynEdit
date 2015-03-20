@@ -77,8 +77,8 @@ type
     FEndings: TATLineEnds;
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
-    FSaveUtf8Sign: boolean;
-    FSaveWideSign: boolean;
+    FSaveSignUtf8: boolean;
+    FSaveSignWide: boolean;
     FReadOnly: boolean;
     procedure DoFinalizeSaving;
     function GetLine(N: integer): atString;
@@ -88,6 +88,7 @@ type
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(N: integer): integer;
     function GetLineState(Index: integer): TATLineState;
+    procedure LineForceLast;
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
     procedure SetLineBm(Index: integer; AValue: TATLineBookmark);
@@ -109,9 +110,10 @@ type
     procedure Clear;
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
+    function IsLastLineFake: boolean;
     procedure LineAdd(const AString: atString);
     procedure LineInsert(N: integer; const AString: atString);
-    procedure LineDelete(N: integer; AForceEmpty: boolean = true);
+    procedure LineDelete(N: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[Index: integer]: integer read GetLineHidden write SetLineHidden;
@@ -127,8 +129,8 @@ type
     procedure LoadFromFile(const Filename: string);
     procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);
-    property SaveUtf8Sign: boolean read FSaveUtf8Sign write FSaveUtf8Sign;
-    property SaveWideSign: boolean read FSaveWideSign write FSaveWideSign;
+    property SaveSignUtf8: boolean read FSaveSignUtf8 write FSaveSignUtf8;
+    property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
     property TextAll: atString read GetTextAll;
@@ -377,8 +379,8 @@ begin
   FEncodingDetect:= true;
   FEndings:= cEndWin;
 
-  FSaveUtf8Sign:= true;
-  FSaveWideSign:= true;
+  FSaveSignUtf8:= true;
+  FSaveSignWide:= true;
 end;
 
 destructor TATStrings.Destroy;
@@ -393,15 +395,40 @@ begin
   LineAddEx(AString, Endings);
 end;
 
+
+function TATStrings.IsLastLineFake: boolean;
+var
+  Item: TATStringItem;
+begin
+  Item:= TATStringItem(FList.Last);
+  Result:= Assigned(Item) and (Item.ItemString='') and (Item.ItemEnd=cEndNone);
+end;
+
 procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds);
 var
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
 
-  Item:= TATStringItem.Create(AString, AEnd);
-  Item.ItemState:= cLineStateAdded;
-  FList.Add(Item);
+  if IsLastLineFake then
+  begin
+    Item:= TATStringItem.Create(AString, AEnd);
+    Item.ItemState:= cLineStateAdded;
+    FList.Insert(Count-1, Item);
+  end
+  else
+  begin
+    Item:= TATStringItem.Create(AString, AEnd);
+    Item.ItemState:= cLineStateAdded;
+    FList.Add(Item);
+
+    if AEnd<>cEndNone then
+    begin
+      Item:= TATStringItem.Create('', cEndNone);
+      Item.ItemState:= cLineStateAdded;
+      FList.Add(Item);
+    end;
+  end;
 end;
 
 procedure TATStrings.LineInsert(N: integer; const AString: atString);
@@ -438,7 +465,13 @@ begin
   Result:= FList.Count;
 end;
 
-procedure TATStrings.LineDelete(N: integer; AForceEmpty: boolean = true);
+procedure TATStrings.LineForceLast;
+begin
+  if (Count=0) or (LinesEnds[Count-1]<>cEndNone) then
+    LineAddEx('', cEndNone);
+end;
+
+procedure TATStrings.LineDelete(N: integer; AForceLast: boolean = true);
 begin
   if FReadOnly then Exit;
 
@@ -450,9 +483,8 @@ begin
   else
     raise Exception.Create('Invalid Delete index: '+IntToStr(N));
 
-  if AForceEmpty then
-    if FList.Count=0 then
-      LineAddEx('', cEndNone);
+  if AForceLast then
+    LineForceLast;
 end;
 
 procedure TATStrings.Clear;
@@ -690,8 +722,8 @@ var
   WithSign: boolean;
 begin
   WithSign:=
-    ((FEncoding in [cEncUTF8]) and FSaveUtf8Sign) or
-    ((FEncoding in [cEncWideLE, cEncWideBE]) and FSaveWideSign);
+    ((FEncoding in [cEncUTF8]) and FSaveSignUtf8) or
+    ((FEncoding in [cEncWideLE, cEncWideBE]) and FSaveSignWide);
 
   fs:= TFileStreamUtf8.Create(AFilename, fmCreate or fmOpenWrite);
   try

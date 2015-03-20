@@ -58,7 +58,10 @@ begin
       List.Encoding:= cEncWideLE;
       List.EncodingDetect:= false;
       List.LoadFromStream(MS);
+
       if List.Count=0 then Exit;
+      if List.IsLastLineFake then
+        List.LineDelete(List.Count-1);
     finally
       FreeAndNil(MS);
     end;
@@ -67,7 +70,7 @@ begin
     for i:= List.Count-1 downto 1 do
       LineInsert(AY+1, List.Lines[i]);
 
-    APosAfter.X:= Length(List.Lines[List.Count-1])-Length(StrTail);
+    APosAfter.X:= Max(0, Length(List.Lines[List.Count-1])-Length(StrTail));
     APosAfter.Y:= AY+List.Count-1;
     AShift.Y:= List.Count-1;
   finally
@@ -186,7 +189,7 @@ begin
     AShift.X:= -(AToX-AFromX);
   end
   else
-  //delete from 1st line, concat rest of last line, delete lines
+  //delete from 1st line, concat rest of last line, delete oth lines
   begin
     Str:= Lines[AFromY];
     Delete(Str, AFromX+1, MaxInt);
@@ -198,9 +201,6 @@ begin
 
     AShift.Y:= -(AToY-AFromY);
   end;
-
-  if Count=0 then
-    LineAdd('');
 end;
 
 procedure TATStrings.TextInsertEol(AX, AY: integer; AKeepCaret: boolean; const AStrIndent: atString; out AShift, APosAfter: TPoint);

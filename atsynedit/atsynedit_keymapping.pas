@@ -74,9 +74,9 @@ begin
   M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
   M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
 
-  M.Add(cCommand_ClipboardCopy, 'clipboard: copy', ['Ctrl+C'], []);
-  M.Add(cCommand_ClipboardCut, 'clipboard: cut', ['Ctrl+X'], []);
-  M.Add(cCommand_ClipboardPaste, 'clipboard: paste', ['Ctrl+V'], []);
+  M.Add(cCommand_ClipboardCopy, 'clipboard: copy', ['Ctrl+C'], ['Ctrl+Insert']);
+  M.Add(cCommand_ClipboardCut, 'clipboard: cut', ['Ctrl+X'], ['Shift+Delete']);
+  M.Add(cCommand_ClipboardPaste, 'clipboard: paste', ['Ctrl+V'], ['Shift+Insert']);
   M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', ['Alt+V'], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
 

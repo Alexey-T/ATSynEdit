@@ -86,7 +86,7 @@ begin
   DoCommand_TextDeleteSelections;
 
   List:= nil;
-  if Length(AText)>1 then
+  if (Length(AText)>1) and (Carets.Count>1) then
   begin
     List:= TStringList.Create;
     List.Text:= UTF8Encode(AText);
