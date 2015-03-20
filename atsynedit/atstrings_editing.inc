@@ -3,7 +3,6 @@
 procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AReplace: boolean; out AShift, APosAfter: TPoint);
 var
   Str, StrLead, StrTail: atString;
-  MS: TMemoryStream;
   List: TATStrings;
   i: integer;
 begin
@@ -50,32 +49,24 @@ begin
 
   List:= TATStrings.Create;
   try
-    MS:= TMemoryStream.Create;
-    try
-      Str:= AText+StrTail;
-      MS.Write(Str[1], Length(Str)*SizeOf(atChar));
-      MS.Position:= 0;
-      List.Encoding:= cEncWideLE;
-      List.EncodingDetect:= false;
-      List.LoadFromStream(MS);
+    List.LoadFromString(StrLead+AText);
+    if List.Count=0 then Exit;
+    with List do
+      if IsLastLineFake then
+        LineDelete(Count-1, false{dont force});
 
-      if List.Count=0 then Exit;
-      if List.IsLastLineFake then
-        List.LineDelete(List.Count-1);
-    finally
-      FreeAndNil(MS);
-    end;
+    List.LineAdd(StrTail);
+    with List do
+      if IsLastLineFake then
+        LineDelete(Count-1, false{dont force});
 
-    //correct 1st line
-    Lines[AY]:= StrLead+List.Lines[0];
-    LinesEnds[AY]:= FEndings;
-    //add other lines
-    for i:= List.Count-1 downto 1 do
-      LineInsert(AY+1, List.Lines[i]);
+    LineDelete(AY);
+    for i:= List.Count-1 downto 0 do
+      LineInsert(AY, List.Lines[i]);
 
-    APosAfter.X:= Max(0, Length(List.Lines[List.Count-1])-Length(StrTail));
+    APosAfter.X:= 0;
     APosAfter.Y:= AY+List.Count-1;
-    AShift.Y:= List.Count-1;
+    AShift.Y:= APosAfter.Y-AY;
   finally
     FreeAndNil(List);
   end;
@@ -183,8 +174,8 @@ begin
   if (AFromY>AToY) then Exit;
 
   if AFromY=AToY then
-  //delete range in one line
   begin
+    //delete range in one line
     Str:= Lines[AFromY];
     Delete(Str, AFromX+1, AToX-AFromX);
     Lines[AFromY]:= Str;
@@ -192,15 +183,18 @@ begin
     AShift.X:= -(AToX-AFromX);
   end
   else
-  //delete from 1st line, concat rest of last line, delete oth lines
   begin
-    Str:= Lines[AFromY];
-    Delete(Str, AFromX+1, MaxInt);
-    Str:= Str+Copy(Lines[AToY], AToX+1, MaxInt);
+    //correct 1st line
+    Str:= Copy(Lines[AFromY], 1, AFromX)+Copy(Lines[AToY], AToX+1, MaxInt);
     Lines[AFromY]:= Str;
 
+    //del oth lines
     for i:= AToY downto AFromY+1 do
       LineDelete(i);
+
+    //del 1st line too?
+    if Str='' then
+      LineDelete(AFromY);
 
     AShift.Y:= -(AToY-AFromY);
   end;
@@ -226,9 +220,8 @@ begin
     Lines[AY]:= Str;
   end;
 
+  LinesEnds[AY]:= Endings; //force eol to cur line
   LineInsert(AY+1, AStrIndent+StrMove);
-  LinesEnds[AY]:= Endings; //force eol
-  LinesEnds[AY+1]:= Endings; //force eol
 
   if not AKeepCaret then
   begin
@@ -238,7 +231,7 @@ begin
   end;
 end;
 
-procedure TATStrings.TextDeleteCurLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+procedure TATStrings.TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -254,7 +247,7 @@ begin
   LineDelete(AY);
 end;
 
-procedure TATStrings.TextDuplicateCurLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+procedure TATStrings.TextDuplicateLine(AX, AY: integer; out AShift, APosAfter: TPoint);
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -267,8 +260,6 @@ begin
   if LinesEnds[AY]<>Endings then
     LinesEnds[AY]:= Endings;
   LinesEnds[AY+1]:= Endings;
-  //if AY+1=Count-1 then
-  //  LineAddEx('');
 
   AShift.Y:= 1;
 end;

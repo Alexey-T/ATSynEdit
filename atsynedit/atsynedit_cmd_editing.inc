@@ -97,7 +97,7 @@ begin
     begin
       Item:= FCarets[i];
       Strings.TextInsert(Item.PosX, Item.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
-
+      DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
       if not AKeepCaret then
       begin
         if ASelectThen then
@@ -110,12 +110,7 @@ begin
           Item.EndX:= -1;
           Item.EndY:= -1;
         end;
-      end;
 
-      DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
-
-      if not AKeepCaret then
-      begin
         Item.PosX:= PosAfter.X;
         Item.PosY:= PosAfter.Y;
       end;
@@ -258,7 +253,7 @@ begin
   for i:= FCarets.Count-1 downto 0 do
   begin
     Item:= FCarets[i];
-    Strings.TextDeleteCurLine(Item.PosX, Item.PosY, Shift, PosAfter);
+    Strings.TextDeleteLine(Item.PosX, Item.PosY, Shift, PosAfter);
     DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
     Item.PosX:= PosAfter.X;
     Item.PosY:= PosAfter.Y;
@@ -280,7 +275,7 @@ begin
   for i:= FCarets.Count-1 downto 0 do
   begin
     Item:= FCarets[i];
-    Strings.TextDuplicateCurLine(Item.PosX, Item.PosY, Shift, PosAfter);
+    Strings.TextDuplicateLine(Item.PosX, Item.PosY, Shift, PosAfter);
     DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
     Item.PosX:= PosAfter.X;
     Item.PosY:= PosAfter.Y;

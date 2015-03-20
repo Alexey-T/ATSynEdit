@@ -80,6 +80,7 @@ type
     FSaveSignUtf8: boolean;
     FSaveSignWide: boolean;
     FReadOnly: boolean;
+    function DebugText: atString;
     procedure DoFinalizeSaving;
     function GetLine(N: integer): atString;
     function GetLineBm(Index: integer): TATLineBookmark;
@@ -127,6 +128,7 @@ type
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const Filename: string);
+    procedure LoadFromString(const AText: atString);
     procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);
     property SaveSignUtf8: boolean read FSaveSignUtf8 write FSaveSignUtf8;
@@ -141,8 +143,8 @@ type
     procedure TextDeleteRange(AFromX, AFromY, AToX, AToY: integer; out AShift, APosAfter: TPoint);
     procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
-    procedure TextDeleteCurLine(AX, AY: integer; out AShift, APosAfter: TPoint);
-    procedure TextDuplicateCurLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+    procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+    procedure TextDuplicateLine(AX, AY: integer; out AShift, APosAfter: TPoint);
     function TextSubstring(AX1, AY1, AX2, AY2: integer): atString;
     //
   end;
@@ -467,7 +469,7 @@ end;
 
 procedure TATStrings.LineForceLast;
 begin
-  if (Count=0) or (LinesEnds[Count-1]<>cEndNone) then
+  if Count=0 then
     LineAddEx('', cEndNone);
 end;
 
@@ -781,6 +783,33 @@ begin
   end;
 end;
 
+function TATStrings.DebugText: atString;
+var
+  i: integer;
+begin
+  Result:= '';
+  for i:= 0 to Min(10, Count-1) do
+    Result:= Result+Format('[%d] "%s" <%s>', [i, Lines[i], cLineEndNiceNames[LinesEnds[i]] ])+#13;
+end;
+
+procedure TATStrings.LoadFromString(const AText: atString);
+var
+  MS: TMemoryStream;
+begin
+  Clear;
+  if AText='' then Exit;
+  MS:= TMemoryStream.Create;
+  try
+    MS.Write(AText[1], Length(AText)*SizeOf(atChar));
+    MS.Position:= 0;
+
+    Encoding:= cEncWideLE;
+    EncodingDetect:= false;
+    LoadFromStream(MS);
+  finally
+    FreeAndNil(MS);
+  end;
+end;
 
 {$I atstrings_editing.inc}
 
