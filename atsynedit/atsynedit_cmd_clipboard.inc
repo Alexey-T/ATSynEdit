@@ -20,9 +20,13 @@ begin
   Result:= DoCommand_TextDeleteSelections;
 end;
 
-function TATSynEdit.DoCommand_ClipboardCopy: TATCommandResults;
+function TATSynEdit.DoCommand_ClipboardCopy(DoAdd: boolean): TATCommandResults;
 begin
-  Clipboard.AsText:= GetTextForClipboard;
+  if DoAdd then
+    Clipboard.AsText:= Clipboard.AsText+GetTextForClipboard
+  else
+    Clipboard.AsText:= GetTextForClipboard;
+
   Result:= [];
 end;
 

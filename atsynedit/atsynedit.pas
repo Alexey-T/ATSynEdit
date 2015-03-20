@@ -165,15 +165,15 @@ const
   cUnprintedDotMinSize = 2;
   cUnprintedDotScale = 6; //divider of line height
   cUnprintedEndScale = 3; //divider of line height
-  cSizeScrollCaretHorz = 10;
-  cSizeScrollCaretVert = 1;
-  cSizeScrollGotoHorz = 10;
-  cSizeScrollGotoVert = 3;
-  cSizeCollapseMarkIndent = 3;
-  cSizeScrollHorzAuto = 10; //chars to scroll by drag out of right/left
-  cSizeScrollVertAuto = 1;
-  cSizeScrollHorzKeep = 1; //n chars allow handy clicking after eol
-  cSizeBitmapStep = 100;
+  cCollapseMarkIndent = 3;
+  cScrollKeepHorz = 1; //n chars allow handy clicking after eol
+  cScrollIndentCaretHorz = 10;
+  cScrollIndentCaretVert = 1;
+  cScrollIndentGotoHorz = 10;
+  cScrollIndentGotoVert = 3;
+  cScrollAutoHorz = 10;
+  cScrollAutoVert = 1;
+  cResizeBitmapStep = 100;
   cOffsetTextTop = 1;
   cSizeGutterNumOffsetLeft = 5;
   cSizeGutterNumOffsetRight = 4;
@@ -442,7 +442,7 @@ type
     function DoCommand_GotoTextBegin: TATCommandResults;
     function DoCommand_GotoTextEnd: TATCommandResults;
     function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
-    function DoCommand_ClipboardCopy: TATCommandResults;
+    function DoCommand_ClipboardCopy(DoAdd: boolean = false): TATCommandResults;
     function DoCommand_ClipboardCut: TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
@@ -802,7 +802,7 @@ begin
     cWrapOff:
       FWrapColumn:= 0;
     cWrapOn:
-      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-cSizeScrollHorzKeep);
+      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-cScrollKeepHorz);
     cWrapAtMargin:
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
   end;
@@ -1157,7 +1157,7 @@ begin
     StrOut:= StringOfChar(' ', WrapItem.NIndent) + Str;
     StrOutUncut:= StrOut;
     AScrollHorz.NMax:= Max(AScrollHorz.NMax,
-      Round(CanvasTextSpaces(StrOutUncut, FTabSize)) + cSizeScrollHorzKeep);
+      Round(CanvasTextSpaces(StrOutUncut, FTabSize)) + cScrollKeepHorz);
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
@@ -1357,7 +1357,7 @@ var
 begin
   Dec(ALineStart.X, FCharSize.X*AScrollPos);
   Inc(ALineStart.X, CanvasTextWidth(Str, FTabSize, FCharSize));
-  Inc(ALineStart.X, cSizeCollapseMarkIndent);
+  Inc(ALineStart.X, cCollapseMarkIndent);
 
   //paint text
   C.Font.Color:= FColorCollapsedText;
@@ -1365,8 +1365,8 @@ begin
 
   SMark:= '...';
   ACharSize:= GetCharSize(C, Point(0, 0));
-  CanvasTextOut(C, ALineStart.X+cSizeCollapseMarkIndent, ALineStart.Y, SMark, FTabSize, ACharSize, false);
-  NSize:= CanvasTextWidth(SMark, FTabSize, ACharSize) + 2*cSizeCollapseMarkIndent;
+  CanvasTextOut(C, ALineStart.X+cCollapseMarkIndent, ALineStart.Y, SMark, FTabSize, ACharSize, false);
+  NSize:= CanvasTextWidth(SMark, FTabSize, ACharSize) + 2*cCollapseMarkIndent;
 
   //paint frame
   C.Pen.Color:= FColorCollapsedText;
@@ -1884,8 +1884,8 @@ begin
 
   if Assigned(FBitmap) then
   begin
-    FBitmap.Width:= Max(FBitmap.Width, ((Width div cSizeBitmapStep)+1)*cSizeBitmapStep);
-    FBitmap.Height:= Max(FBitmap.Height, ((Height div cSizeBitmapStep)+1)*cSizeBitmapStep);
+    FBitmap.Width:= Max(FBitmap.Width, ((Width div cResizeBitmapStep)+1)*cResizeBitmapStep);
+    FBitmap.Height:= Max(FBitmap.Height, ((Height div cResizeBitmapStep)+1)*cResizeBitmapStep);
   end;
 
   Invalidate;
@@ -2158,30 +2158,17 @@ var
   PClient, PCaret: TPoint;
 begin
   PClient:= ScreenToClient(Mouse.CursorPos);
+  PClient.X:= Max(FRectMain.Left, PClient.X);
+  PClient.Y:= Max(FRectMain.Top, PClient.Y);
+  PClient.X:= Min(FRectMain.Right, PClient.X);
+  PClient.Y:= Min(FRectMain.Bottom, PClient.Y);
 
   case FMouseAutoScroll of
-    cScrollUp:
-      begin
-        PClient.Y:= FRectMain.Top;
-        DoScrollByDelta(0, -cSizeScrollVertAuto);
-      end;
-    cScrollDown:
-      begin
-        PClient.Y:= FRectMain.Bottom;
-        DoScrollByDelta(0, cSizeScrollVertAuto);
-      end;
-    cScrollLeft:
-      begin
-        PClient.X:= FRectMain.Left;
-        DoScrollByDelta(-cSizeScrollHorzAuto, 0);
-      end;
-    cScrollRight:
-      begin
-        PClient.X:= FRectMain.Right;
-        DoScrollByDelta(cSizeScrollHorzAuto, 0);
-      end;
-    else
-      Exit;
+    cScrollUp:    DoScrollByDelta(0, -cScrollAutoVert);
+    cScrollDown:  DoScrollByDelta(0, cScrollAutoVert);
+    cScrollLeft:  DoScrollByDelta(-cScrollAutoHorz, 0);
+    cScrollRight: DoScrollByDelta(cScrollAutoHorz, 0);
+    else Exit;
   end;
 
   PCaret:= ClientPosToCaretPos(PClient);
@@ -2336,7 +2323,6 @@ begin
   with FScrollVert do
     NPos:= Max(0, Min(NMax-NPage, NPos+Dy));
 end;
-
 
 
 {$I atsynedit_carets.inc}

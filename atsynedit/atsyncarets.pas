@@ -49,8 +49,7 @@ type
     procedure Add(APosX, APosY: integer);
     procedure Sort;
     procedure Assign(Obj: TATCarets);
-    function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false
-      ): integer;
+    function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
@@ -230,10 +229,10 @@ var
 begin
   Result:= -1;
 
-  //iStart:= 0;
-  //todo
-  iStart:= IndexOfPosYAvg(APosY);
-  if iStart<0 then Exit;
+  iStart:= 0;
+  //todo--fix for case called from TimerScrollTick, dont work for cScrollUp
+  //iStart:= IndexOfPosYAvg(APosY);
+  //if iStart<0 then Exit;
 
   for i:= iStart to Count-1 do
   begin

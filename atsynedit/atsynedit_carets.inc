@@ -261,7 +261,7 @@ end;
 
 procedure TATSynEdit.DoShowCaret(AEdge: TATCaretEdge);
 begin
-  DoShowPos(Carets.CaretAtEdge(AEdge), cSizeScrollCaretHorz, cSizeScrollCaretVert);
+  DoShowPos(Carets.CaretAtEdge(AEdge), cScrollIndentCaretHorz, cScrollIndentCaretVert);
 end;
 
 procedure TATSynEdit.DoGotoPos(APnt: TPoint);
@@ -277,7 +277,7 @@ begin
     UpdateWrapInfo;
   end;
 
-  DoShowPos(APnt, cSizeScrollGotoHorz, cSizeScrollGotoVert);
+  DoShowPos(APnt, cScrollIndentGotoHorz, cScrollIndentGotoVert);
   Update;
 end;
 
