@@ -66,7 +66,10 @@ begin
       FreeAndNil(MS);
     end;
 
+    //correct 1st line
     Lines[AY]:= StrLead+List.Lines[0];
+    LinesEnds[AY]:= FEndings;
+    //add other lines
     for i:= List.Count-1 downto 1 do
       LineInsert(AY+1, List.Lines[i]);
 
@@ -226,8 +229,6 @@ begin
   LineInsert(AY+1, AStrIndent+StrMove);
   LinesEnds[AY]:= Endings; //force eol
   LinesEnds[AY+1]:= Endings; //force eol
-  //if AY+1=Count-1 then
-  //  LineAddEx('');
 
   if not AKeepCaret then
   begin

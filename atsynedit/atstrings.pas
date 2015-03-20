@@ -412,7 +412,7 @@ begin
 
   if IsLastLineFake then
   begin
-    Item:= TATStringItem.Create(AString, AEnd);
+    Item:= TATStringItem.Create(AString, FEndings{not AEnd});
     Item.ItemState:= cLineStateAdded;
     FList.Insert(Count-1, Item);
   end

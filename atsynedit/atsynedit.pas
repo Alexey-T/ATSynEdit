@@ -166,7 +166,7 @@ const
   cUnprintedDotScale = 6; //divider of line height
   cUnprintedEndScale = 3; //divider of line height
   cSizeScrollCaretHorz = 10;
-  cSizeScrollCaretVert = 0;
+  cSizeScrollCaretVert = 1;
   cSizeScrollGotoHorz = 10;
   cSizeScrollGotoVert = 3;
   cSizeCollapseMarkIndent = 3;
