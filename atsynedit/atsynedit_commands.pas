@@ -49,6 +49,7 @@ const
   cCommand_TextDeleteToLineEnd = 173 or cSelReset;
   cCommand_TextDeleteWordNext = 174 or cSelReset;
   cCommand_TextDeleteWordPrev = 175 or cSelReset;
+  cCommand_TextDeleteSelection = 180;
 
   _base_GotoTextBegin = 200;
   _base_GotoTextEnd = 201;

@@ -65,6 +65,7 @@ begin
   M.Add(cCommand_TextDeleteWordNext, 'delete word right', ['Ctrl+Delete'], []);
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line start', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', ['Ctrl+K'], []);
+  M.Add(cCommand_TextDeleteSelection, 'delete selection', [], []);
 
   M.Add(cCommand_ScrollLineUp, 'scroll line up', ['Ctrl+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', ['Ctrl+Down'], []);

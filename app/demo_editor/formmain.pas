@@ -44,6 +44,9 @@ type
     Label7: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
+    mnuCopy: TMenuItem;
+    mnuCut: TMenuItem;
+    mnuDel: TMenuItem;
     mnuPst: TMenuItem;
     mnuSel: TMenuItem;
     mnuTBms: TMenuItem;
@@ -103,6 +106,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure gCaretClick(Sender: TObject);
+    procedure mnuCopyClick(Sender: TObject);
+    procedure mnuCutClick(Sender: TObject);
+    procedure mnuDelClick(Sender: TObject);
     procedure mnuPstClick(Sender: TObject);
     procedure mnuEndMcClick(Sender: TObject);
     procedure mnuEndUnClick(Sender: TObject);
@@ -188,6 +194,24 @@ end;
 procedure TfmMain.gCaretClick(Sender: TObject);
 begin
 
+end;
+
+procedure TfmMain.mnuCopyClick(Sender: TObject);
+begin
+  ed.DoCommandExec(cCommand_ClipboardCopy);
+  ed.Update;
+end;
+
+procedure TfmMain.mnuCutClick(Sender: TObject);
+begin
+  ed.DoCommandExec(cCommand_ClipboardCut);
+  ed.Update;
+end;
+
+procedure TfmMain.mnuDelClick(Sender: TObject);
+begin
+  ed.DoCommandExec(cCommand_TextDeleteSelection);
+  ed.Update;
 end;
 
 procedure TfmMain.mnuPstClick(Sender: TObject);

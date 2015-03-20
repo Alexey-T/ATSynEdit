@@ -371,9 +371,21 @@ object fmMain: TfmMain
   object PopupMenu1: TPopupMenu
     left = 480
     top = 88
+    object mnuCut: TMenuItem
+      Caption = 'Cut'
+      OnClick = mnuCutClick
+    end
+    object mnuCopy: TMenuItem
+      Caption = 'Copy'
+      OnClick = mnuCopyClick
+    end
     object mnuPst: TMenuItem
       Caption = 'Paste'
       OnClick = mnuPstClick
+    end
+    object mnuDel: TMenuItem
+      Caption = 'Delete'
+      OnClick = mnuDelClick
     end
     object mnuSel: TMenuItem
       Caption = 'Select all'

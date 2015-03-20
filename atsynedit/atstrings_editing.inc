@@ -198,6 +198,9 @@ begin
 
     AShift.Y:= -(AToY-AFromY);
   end;
+
+  if Count=0 then
+    LineAdd('');
 end;
 
 procedure TATStrings.TextInsertEol(AX, AY: integer; AKeepCaret: boolean; const AStrIndent: atString; out AShift, APosAfter: TPoint);

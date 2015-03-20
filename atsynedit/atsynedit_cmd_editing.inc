@@ -183,7 +183,7 @@ begin
     Item.EndY:= -1;
   end;
 
-  Result:= [cResultText, cResultCaretAny];
+  Result:= [cResultText, cResultCaretTop];
 end;
 
 

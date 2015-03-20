@@ -155,6 +155,7 @@ begin
     cCommand_TextDeleteToLineEnd:      Res:= DoCommand_TextDeleteToLineEnd;
     cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);
     cCommand_TextDeleteWordNext:       Res:= DoCommand_TextDeleteWord(true);
+    cCommand_TextDeleteSelection:      Res:= DoCommand_TextDeleteSelections;
 
     cCommand_SelectAll:                Res:= DoCommand_SelectAll;
     cCommand_SelectWords:              Res:= DoCommand_SelectWords;
