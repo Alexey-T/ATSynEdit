@@ -164,7 +164,7 @@ begin
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
   {$else}
-  edit.Font.Name:= 'DejaVu Sans Mono';
+  ed.Font.Name:= 'DejaVu Sans Mono';
   {$endif}
   ed.PopupMenu:= PopupMenu1;
 
@@ -665,4 +665,4 @@ begin
 end;
 
 
-end.
+end.
