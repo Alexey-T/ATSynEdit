@@ -45,6 +45,7 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -92,7 +93,6 @@
       <Unit12>
         <Filename Value="..\..\atsynedit\atkeymapping.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATKeyMapping"/>
       </Unit12>
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
@@ -141,6 +141,7 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formopt"/>
       </Unit23>
     </Units>
   </ProjectOptions>

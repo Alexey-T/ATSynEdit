@@ -141,4 +141,12 @@ object fmOpt: TfmOpt
     Caption = 'copy lines if no sel'
     TabOrder = 12
   end
+  object chkColorSel: TCheckBox
+    Left = 175
+    Height = 19
+    Top = 108
+    Width = 156
+    Caption = 'colorize selection till edge'
+    TabOrder = 13
+  end
 end

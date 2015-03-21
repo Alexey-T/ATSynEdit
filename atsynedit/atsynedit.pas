@@ -302,6 +302,7 @@ type
     FTextAutoIndent: boolean;
     FTextTabSpaces: boolean;
     FTextCopyLinesIfNoSel: boolean;
+    FTextHiliteSelectionFull: boolean;
     FShowCurLine: boolean;
     FShowCurColumn: boolean;
     //
@@ -522,6 +523,7 @@ type
     property OptTabSize: integer read FTabSize write SetTabSize;
     property OptAutoIndent: boolean read FTextAutoIndent write FTextAutoIndent;
     property OptCopyLinesIfNoSel: boolean read FTextCopyLinesIfNoSel write FTextCopyLinesIfNoSel;
+    property OptHiliteSelectionFull: boolean read FTextHiliteSelectionFull write FTextHiliteSelectionFull;
     property OptUseOverOnPaste: boolean read FUseOverOnPaste write FUseOverOnPaste;
     property OptShowCurLine: boolean read FShowCurLine write FShowCurLine;
     property OptShowCurColumn: boolean read FShowCurColumn write FShowCurColumn;
@@ -1099,7 +1101,7 @@ var
   BmKind: TATLineBookmark;
   BmColor: TColor;
   Str, StrOut, StrOutUncut: atString;
-  CurrPoint: TPoint;
+  CurrPoint, CurrPointText: TPoint;
   LineWithCaret: boolean;
   Parts: TATLineParts;
   //
@@ -1191,13 +1193,28 @@ begin
       Delete(StrOut, 1, NOutputCharsSkipped);
       Delete(StrOut, cMaxCharsForOutput, MaxInt);
 
+      CurrPointText:= Point(
+        CurrPoint.X - AScrollHorz.NPos*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
+        CurrPoint.Y);
+
+      if FTextHiliteSelectionFull then
+        if IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex) then
+        begin
+          C.Brush.Color:= FColorTextSelBG;
+          C.FillRect(
+            CurrPointText.X,
+            CurrPointText.Y,
+            ARect.Right,
+            CurrPointText.Y+ACharSize.Y);
+        end;
+
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
         IfThen(BmColor<>clNone, BmColor, FColorTextBG));
 
       CanvasTextOut(C,
-        CurrPoint.X - AScrollHorz.NPos*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
-        CurrPoint.Y,
+        CurrPointText.X,
+        CurrPointText.Y,
         StrOut,
         FTabSize,
         ACharSize,
@@ -1649,6 +1666,7 @@ begin
   FTextAutoIndent:= true;
   FTextTabSpaces:= false;
   FTextCopyLinesIfNoSel:= true;
+  FTextHiliteSelectionFull:= false;
   FShowCurLine:= false;
   FShowCurColumn:= false;
 

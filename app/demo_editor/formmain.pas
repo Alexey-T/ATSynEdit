@@ -443,6 +443,7 @@ begin
     chkTabSp.Checked:= ed.OptTabSpaces;
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
+    chkColorSel.Checked:= ed.OptHiliteSelectionFull;
 
     if ShowModal=mrOk then
     begin
@@ -460,6 +461,7 @@ begin
       ed.OptTabSpaces:= chkTabSp.Checked;
       ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
+      ed.OptHiliteSelectionFull:= chkColorSel.Checked;
 
       ed.Gutter.Update;
       ed.Update;
