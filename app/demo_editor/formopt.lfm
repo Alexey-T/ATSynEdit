@@ -219,4 +219,32 @@ object fmOpt: TfmOpt
       WordWrap = True
     end
   end
+  object edRulerH: TSpinEdit
+    Left = 496
+    Height = 23
+    Top = 156
+    Width = 50
+    MaxValue = 80
+    MinValue = 4
+    TabOrder = 15
+    Value = 4
+  end
+  object edRulerFont: TSpinEdit
+    Left = 552
+    Height = 23
+    Top = 156
+    Width = 50
+    MaxValue = 80
+    MinValue = 4
+    TabOrder = 16
+    Value = 4
+  end
+  object Label2: TLabel
+    Left = 608
+    Height = 15
+    Top = 160
+    Width = 51
+    Caption = 'ruler sizes'
+    ParentColor = False
+  end
 end

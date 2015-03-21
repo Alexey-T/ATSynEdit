@@ -128,8 +128,7 @@ implementation
 
 uses
   Math,
-  Types,
-  ATSynEdit_Commands;
+  Types;
 
 {$R *.lfm}
 
@@ -447,6 +446,8 @@ begin
     chkClick2.Checked:= ed.Opt2ClickSelectsLine;
     chkClick3.Checked:= ed.Opt3ClickSelectsLine;
     chkCaretMul.Checked:= ed.OptCaretManyAllowed;
+    edRulerH.Value:= ed.OptRulerHeight;
+    edRulerFont.Value:= ed.OptRulerFontSize;
 
     if ShowModal=mrOk then
     begin
@@ -471,6 +472,8 @@ begin
       ed.Opt2ClickSelectsLine:= chkClick2.Checked;
       ed.Opt3ClickSelectsLine:= chkClick3.Checked;
       ed.OptCaretManyAllowed:= chkCaretMul.Checked;
+      ed.OptRulerHeight:= edRulerH.Value;
+      ed.OptRulerFontSize:= edRulerFont.Value;
 
       ed.Gutter.Update;
       ed.Update;

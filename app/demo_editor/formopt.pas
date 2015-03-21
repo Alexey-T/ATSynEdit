@@ -35,7 +35,10 @@ type
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     Label1: TLabel;
+    Label2: TLabel;
     Label8: TLabel;
+    edRulerH: TSpinEdit;
+    edRulerFont: TSpinEdit;
   private
     { private declarations }
   public

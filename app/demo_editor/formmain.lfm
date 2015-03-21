@@ -301,7 +301,7 @@ object fmMain: TfmMain
     object Label3: TLabel
       Left = 152
       Height = 15
-      Top = 288
+      Top = 284
       Width = 47
       Caption = 'numbers'
       ParentColor = False

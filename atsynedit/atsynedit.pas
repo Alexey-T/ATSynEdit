@@ -544,6 +544,8 @@ type
     property OptCaretMoveByRtClick: boolean read FCaretMoveByRtClick write FCaretMoveByRtClick;
     property OptGutterVisible: boolean read FGutterVisible write FGutterVisible;
     property OptRulerVisible: boolean read FRulerVisible write FRulerVisible;
+    property OptRulerHeight: integer read FRulerHeight write FRulerHeight;
+    property OptRulerFontSize: integer read FRulerFontSize write FRulerFontSize;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX;
