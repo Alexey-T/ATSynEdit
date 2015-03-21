@@ -118,9 +118,9 @@ object fmOpt: TfmOpt
     TabOrder = 10
   end
   object GroupBox1: TGroupBox
-    Left = 352
+    Left = 384
     Height = 107
-    Top = 4
+    Top = 8
     Width = 95
     Caption = 'gutter cols'
     ClientHeight = 87
@@ -158,5 +158,21 @@ object fmOpt: TfmOpt
       Caption = 'indent'
       TabOrder = 3
     end
+  end
+  object chkNavWrap: TCheckBox
+    Left = 176
+    Height = 19
+    Top = 88
+    Width = 206
+    Caption = 'up/down navigate in wrapped lines'
+    TabOrder = 12
+  end
+  object chkLastOnTop: TCheckBox
+    Left = 8
+    Height = 19
+    Top = 140
+    Width = 136
+    Caption = 'last line shown on top'
+    TabOrder = 13
   end
 end

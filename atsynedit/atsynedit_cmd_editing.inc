@@ -56,7 +56,7 @@ function TATSynEdit.DoCommand_TextInsertTab: TATCommandResults;
 var
   Str: atString;
 begin
-  if FTextTabSpaces then
+  if FOptTabSpaces then
     Str:= StringOfChar(' ', FTabSize)
   else
     Str:= #9;
@@ -225,7 +225,7 @@ begin
     Item:= FCarets[i];
 
     Str:= '';
-    if FTextAutoIndent then
+    if FOptAutoIndent then
     begin
       Str:= Strings.Lines[Item.PosY];
       Str:= Copy(Str, 1, Min(Item.PosX, SGetIndentChars(Str)));

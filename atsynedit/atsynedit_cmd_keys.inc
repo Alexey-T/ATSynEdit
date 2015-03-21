@@ -69,7 +69,7 @@ end;
 function TATSynEdit.DoCommand_KeyUpDown(ADown: boolean; ALines: integer): TATCommandResults;
 begin
   FCaretSpecPos:= true;
-  if FKeyNavigateInWrappedLines then
+  if FOptNavInWrappedLines then
     Result:= DoCommand_KeyUpDown_Wrapped(ADown, ALines)
   else
     Result:= DoCommand_KeyUpDown_NextLine(ADown, ALines);

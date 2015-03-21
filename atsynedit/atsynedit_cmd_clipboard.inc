@@ -7,7 +7,7 @@ begin
 
   Str:= UTF8Decode(Clipboard.AsText);
   DoCommand_TextDeleteSelections;
-  Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOver and FUseOverOnPaste, ASelectThen);
+  Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOver and FOptUseOverOnPaste, ASelectThen);
 end;
 
 function TATSynEdit.DoCommand_ClipboardCut: TATCommandResults;
@@ -54,7 +54,7 @@ begin
     //no selections-- copy entire lines
     if not Carets.IsSelection then
     begin
-      if FTextCopyLinesIfNoSel then
+      if FOptCopyLinesIfNoSel then
       begin
         for i:= 0 to ListNum.Count-1 do
         begin

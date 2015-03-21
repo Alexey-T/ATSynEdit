@@ -220,11 +220,9 @@ type
     FCaretSpecPos: boolean;
     FCaretMoveByRtClick: boolean;
     FOver: boolean;
-    FUseOverOnPaste: boolean;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
     FMouseAutoScroll: TATAutoScroll;
-    FKeyNavigateInWrappedLines: boolean;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
@@ -245,6 +243,8 @@ type
     FPrevVisibleColumns: integer;
     FCharSize: TPoint;
     FCharSizeMinimap: TPoint;
+    FCharSpacingText,
+    FCharSpacingMinimap: TPoint;
     FTabSize: integer;
     FGutter: TATGutter;
     FGutterBandBm,
@@ -291,20 +291,21 @@ type
     FMinimapVisible: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
-    FCharSpacingText,
-    FCharSpacingMinimap: TPoint;
     FScrollVert,
     FScrollHorz: TATSynScrollInfo;
     FScrollVertMinimap,
     FScrollHorzMinimap: TATSynScrollInfo;
     FPrevHorz,
     FPrevVert: TATSynScrollInfo;
-    FTextAutoIndent: boolean;
-    FTextTabSpaces: boolean;
-    FTextCopyLinesIfNoSel: boolean;
-    FTextHiliteSelectionFull: boolean;
-    FShowCurLine: boolean;
-    FShowCurColumn: boolean;
+    FOptAutoIndent: boolean;
+    FOptTabSpaces: boolean;
+    FOptLastLineOnTop: boolean;
+    FOptUseOverOnPaste: boolean;
+    FOptNavInWrappedLines: boolean;
+    FOptCopyLinesIfNoSel: boolean;
+    FOptHiliteSelectionFull: boolean;
+    FOptShowCurLine: boolean;
+    FOptShowCurColumn: boolean;
     //
     procedure MenuClick(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
@@ -519,14 +520,16 @@ type
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkIcon read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
 
     //options
-    property OptTabSpaces: boolean read FTextTabSpaces write FTextTabSpaces;
+    property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
-    property OptAutoIndent: boolean read FTextAutoIndent write FTextAutoIndent;
-    property OptCopyLinesIfNoSel: boolean read FTextCopyLinesIfNoSel write FTextCopyLinesIfNoSel;
-    property OptHiliteSelectionFull: boolean read FTextHiliteSelectionFull write FTextHiliteSelectionFull;
-    property OptUseOverOnPaste: boolean read FUseOverOnPaste write FUseOverOnPaste;
-    property OptShowCurLine: boolean read FShowCurLine write FShowCurLine;
-    property OptShowCurColumn: boolean read FShowCurColumn write FShowCurColumn;
+    property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
+    property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel;
+    property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
+    property OptHiliteSelectionFull: boolean read FOptHiliteSelectionFull write FOptHiliteSelectionFull;
+    property OptUseOverOnPaste: boolean read FOptUseOverOnPaste write FOptUseOverOnPaste;
+    property OptNavigateInWrappedLines: boolean read FOptNavInWrappedLines write FOptNavInWrappedLines;
+    property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
+    property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual;
     property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
@@ -908,7 +911,10 @@ begin
   begin
     NPage:= Max(1, GetVisibleLines)-1;
     NMin:= 0;
-    NMax:= Max(1, FWrapInfo.Count-1);
+    if FOptLastLineOnTop then
+      NMax:= Max(1, FWrapInfo.Count+NPage-1)
+    else
+      NMax:= Max(1, FWrapInfo.Count-1);
   end;
 
   with FScrollHorz do
@@ -1169,7 +1175,7 @@ begin
     BmKind:= Strings.LinesBm[NLinesIndex];
     if BmKind<>cBmNone then
       BmColor:= Strings.LinesBmColor[NLinesIndex];
-    if FShowCurLine and LineWithCaret then
+    if FOptShowCurLine and LineWithCaret then
       BmColor:= FColorCurLineBG;
 
     if BmColor<>clNone then
@@ -1192,7 +1198,7 @@ begin
         CurrPoint.X - AScrollHorz.NPos*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
         CurrPoint.Y);
 
-      if FTextHiliteSelectionFull then
+      if FOptHiliteSelectionFull then
         if IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex) then
         begin
           C.Brush.Color:= FColorTextSelBG;
@@ -1561,9 +1567,9 @@ begin
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
-  FKeyNavigateInWrappedLines:= true;
+  FOptNavInWrappedLines:= true;
   FOver:= false;
-  FUseOverOnPaste:= false;
+  FOptUseOverOnPaste:= false;
 
   FColorTextBG:= cInitColorTextBG;
   FColorTextFont:= cInitColorTextFont;
@@ -1655,12 +1661,13 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
-  FTextAutoIndent:= true;
-  FTextTabSpaces:= false;
-  FTextCopyLinesIfNoSel:= true;
-  FTextHiliteSelectionFull:= false;
-  FShowCurLine:= false;
-  FShowCurColumn:= false;
+  FOptAutoIndent:= true;
+  FOptTabSpaces:= false;
+  FOptLastLineOnTop:= false;
+  FOptCopyLinesIfNoSel:= true;
+  FOptHiliteSelectionFull:= false;
+  FOptShowCurLine:= false;
+  FOptShowCurColumn:= false;
 
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
@@ -1870,7 +1877,7 @@ begin
     if cPaintUpdateCaretsCoords in AFlags then
     begin
       UpdateCaretsCoords;
-      if FShowCurColumn and (Carets.Count>0) then
+      if FOptShowCurColumn and (Carets.Count>0) then
         DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX);
     end;
 

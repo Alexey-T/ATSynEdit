@@ -175,7 +175,7 @@ object fmMain: TfmMain
       Top = 176
       Width = 52
       MaxValue = 40
-      MinValue = 6
+      MinValue = 4
       OnChange = edFontsizeChange
       TabOrder = 6
       Value = 10

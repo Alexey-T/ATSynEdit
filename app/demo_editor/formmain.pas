@@ -442,6 +442,8 @@ begin
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkColorSel.Checked:= ed.OptHiliteSelectionFull;
     chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
+    chkNavWrap.Checked:= ed.OptNavigateInWrappedLines;
+    chkLastOnTop.Checked:= ed.OptLastLineOnTop;
 
     if ShowModal=mrOk then
     begin
@@ -461,6 +463,8 @@ begin
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptHiliteSelectionFull:= chkColorSel.Checked;
       ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
+      ed.OptNavigateInWrappedLines:= chkNavWrap.Checked;
+      ed.OptLastLineOnTop:= chkLastOnTop.Checked;
 
       ed.Gutter.Update;
       ed.Update;
