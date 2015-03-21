@@ -31,9 +31,12 @@ type
     property Items[N: integer]: TATKeyMappingItem read GetItem; default;
     procedure Add(ACmd: integer; const AName: string; const AKeys1,
       AKeys2: array of string);
+    function GetShortcutFromCommand(Cmd: integer): TShortcut;
   end;
 
 implementation
+
+uses LCLProc;
 
 { TATKeyMapping }
 
@@ -98,6 +101,19 @@ begin
   for i:= 0 to High(AKeys1) do Item.Keys1[i]:= AKeys1[i];
   for i:= 0 to High(AKeys2) do Item.Keys2[i]:= AKeys2[i];
   FList.Add(Item);
+end;
+
+function TATKeyMapping.GetShortcutFromCommand(Cmd: integer): TShortcut;
+var
+  i: integer;
+begin
+  Result:= scNone;
+  for i:= 0 to Count-1 do
+    if Items[i].Cmd=Cmd then
+    begin
+      Result:= TextToShortCut(Items[i].Keys1[0]);
+      Exit
+    end;
 end;
 
 

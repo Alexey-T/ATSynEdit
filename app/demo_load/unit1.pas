@@ -22,7 +22,7 @@ type
     procedure FormShow(Sender: TObject);
   private
     { private declarations }
-    FEdit: TATSynEdit;
+    ed: TATSynEdit;
   public
     { public declarations }
   end;
@@ -38,10 +38,10 @@ implementation
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  FEdit:= TATSynEdit.Create(Self);
-  FEdit.Parent:= Panel1;
-  FEdit.Align:= alClient;
-  FEdit.Font.Name:= 'Consolas';
+  ed:= TATSynEdit.Create(Self);
+  ed.Parent:= Panel1;
+  ed.Align:= alClient;
+  ed.Font.Name:= 'Courier New';
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -54,14 +54,14 @@ var
   fn: string;
 begin
   fn:= ExtractFilePath(Application.Exename)+'..\..\test_files\'+edFN.Text;
-  FEdit.LoadFromFile(fn);
-  FEdit.SetFocus;
+  ed.LoadFromFile(fn);
+  ed.SetFocus;
 end;
 
 procedure TForm1.bGettextClick(Sender: TObject);
 begin
-  ShowMessage(UTF8Encode(FEdit.Strings.TextAll));
+  ShowMessage(UTF8Encode(ed.Strings.TextAll));
 end;
 
 
-end.
+end.

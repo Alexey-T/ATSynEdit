@@ -305,10 +305,12 @@ type
     FShowCurLine: boolean;
     FShowCurColumn: boolean;
     //
+    procedure MenuClick(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     procedure DoCaretSingle(AX, AY: integer);
     procedure DoCaretSingleAsIs;
+    procedure DoInitDefaultPopupMenu;
     procedure DoSelect_None;
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
@@ -1655,6 +1657,7 @@ begin
 
   FKeyMapping:= TATKeyMapping.Create;
   DoInitDefaultKeymapping(FKeyMapping);
+  DoInitDefaultPopupMenu;
 end;
 
 destructor TATSynEdit.Destroy;
@@ -2322,6 +2325,46 @@ begin
     NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
   with FScrollVert do
     NPos:= Max(0, Min(NMax-NPage, NPos+Dy));
+end;
+
+procedure TATSynEdit.MenuClick(Sender: TObject);
+var
+  Cmd: integer;
+begin
+  Cmd:= (Sender as TMenuItem).Tag;
+  if Cmd>0 then
+  begin
+    DoCommandExec(Cmd);
+    Update;
+  end;
+end;
+
+procedure TATSynEdit.DoInitDefaultPopupMenu;
+var
+  M: TPopupMenu;
+  //
+  procedure Add(const SName: string; Cmd: integer);
+  var
+    MI: TMenuItem;
+  begin
+    MI:= TMenuItem.Create(M);
+    MI.Caption:= SName;
+    MI.ShortCut:= FKeyMapping.GetShortcutFromCommand(Cmd);
+    MI.Tag:= Cmd;
+    MI.OnClick:= MenuClick;
+    M.Items.Add(MI);
+  end;
+  //
+begin
+  M:= TPopupMenu.Create(Self);
+  PopupMenu:= M;
+
+  Add('Cut', cCommand_ClipboardCut);
+  Add('Copy', cCommand_ClipboardCopy);
+  Add('Paste', cCommand_ClipboardPaste);
+  Add('Delete', cCommand_TextDeleteSelection);
+  Add('-', 0);
+  Add('Select all', cCommand_SelectAll);
 end;
 
 

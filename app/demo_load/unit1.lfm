@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 859
   OnCreate = FormCreate
   OnShow = FormShow
-  LCLVersion = '1.5'
+  LCLVersion = '1.2.6.0'
   object Panel1: TPanel
     Left = 0
     Height = 442
@@ -40,10 +40,10 @@ object Form1: TForm1
     end
     object edFN: TComboBox
       Left = 8
-      Height = 23
+      Height = 27
       Top = 40
       Width = 115
-      ItemHeight = 15
+      ItemHeight = 0
       ItemIndex = 0
       Items.Strings = (
         'fn.txt'
@@ -65,4 +65,4 @@ object Form1: TForm1
       TabOrder = 2
     end
   end
-end
+end

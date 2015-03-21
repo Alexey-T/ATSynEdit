@@ -15,3 +15,4 @@ begin
     (Info1.NPage=Info2.NPage);
 end;
 
+

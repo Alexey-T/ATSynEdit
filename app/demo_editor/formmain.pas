@@ -44,11 +44,6 @@ type
     Label7: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
-    mnuCopy: TMenuItem;
-    mnuCut: TMenuItem;
-    mnuDel: TMenuItem;
-    mnuPst: TMenuItem;
-    mnuSel: TMenuItem;
     mnuTBms: TMenuItem;
     mnuTMargin: TMenuItem;
     mnuFile: TMenuItem;
@@ -71,7 +66,6 @@ type
     chkWrapOff: TRadioButton;
     chkWrapOn: TRadioButton;
     chkWrapMargin: TRadioButton;
-    PopupMenu1: TPopupMenu;
     SaveDialog1: TSaveDialog;
     Status: TStatusBar;
     procedure bGotoClick(Sender: TObject);
@@ -105,15 +99,9 @@ type
     procedure edTabsizeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure gCaretClick(Sender: TObject);
-    procedure mnuCopyClick(Sender: TObject);
-    procedure mnuCutClick(Sender: TObject);
-    procedure mnuDelClick(Sender: TObject);
-    procedure mnuPstClick(Sender: TObject);
     procedure mnuEndMcClick(Sender: TObject);
     procedure mnuEndUnClick(Sender: TObject);
     procedure mnuEndWClick(Sender: TObject);
-    procedure mnuSelClick(Sender: TObject);
     procedure mnuTBmsClick(Sender: TObject);
     procedure mnuTFoldClick(Sender: TObject);
     procedure mnuTMarginClick(Sender: TObject);
@@ -166,7 +154,6 @@ begin
   {$else}
   ed.Font.Name:= 'DejaVu Sans Mono';
   {$endif}
-  ed.PopupMenu:= PopupMenu1;
 
   ed.OnChanged:= EditCaretMoved;
   ed.OnCaretMoved:= EditCaretMoved;
@@ -191,35 +178,6 @@ begin
     ed.LoadFromFile(fn);
 end;
 
-procedure TfmMain.gCaretClick(Sender: TObject);
-begin
-
-end;
-
-procedure TfmMain.mnuCopyClick(Sender: TObject);
-begin
-  ed.DoCommandExec(cCommand_ClipboardCopy);
-  ed.Update;
-end;
-
-procedure TfmMain.mnuCutClick(Sender: TObject);
-begin
-  ed.DoCommandExec(cCommand_ClipboardCut);
-  ed.Update;
-end;
-
-procedure TfmMain.mnuDelClick(Sender: TObject);
-begin
-  ed.DoCommandExec(cCommand_TextDeleteSelection);
-  ed.Update;
-end;
-
-procedure TfmMain.mnuPstClick(Sender: TObject);
-begin
-  ed.DoCommandExec(cCommand_ClipboardPaste);
-  ed.Update;
-end;
-
 procedure TfmMain.mnuEndMcClick(Sender: TObject);
 begin
   ed.Strings.Endings:= cEndMac;
@@ -239,12 +197,6 @@ begin
   ed.Strings.Endings:= cEndWin;
   ed.Update;
   UpdateStatus;
-end;
-
-procedure TfmMain.mnuSelClick(Sender: TObject);
-begin
-  ed.DoCommandExec(cCommand_SelectAll);
-  ed.Update;
 end;
 
 procedure TfmMain.mnuTBmsClick(Sender: TObject);
@@ -665,4 +617,4 @@ begin
 end;
 
 
-end.
+end.

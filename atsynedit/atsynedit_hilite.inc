@@ -1,6 +1,5 @@
 {$ifdef nnn}begin end;{$endif}
 
-
 procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor);

@@ -155,7 +155,7 @@ object fmMain: TfmMain
     object edNum: TComboBox
       Left = 152
       Height = 23
-      Top = 300
+      Top = 304
       Width = 112
       ItemHeight = 15
       Items.Strings = (
@@ -265,7 +265,7 @@ object fmMain: TfmMain
     object bFont: TButton
       Left = 8
       Height = 25
-      Top = 88
+      Top = 92
       Width = 81
       Caption = 'font...'
       OnClick = bFontClick
@@ -301,16 +301,16 @@ object fmMain: TfmMain
     object bOpt: TButton
       Left = 8
       Height = 25
-      Top = 116
+      Top = 120
       Width = 81
-      Caption = 'more...'
+      Caption = 'opt..'
       OnClick = bOptClick
       TabOrder = 5
     end
     object Label3: TLabel
       Left = 152
       Height = 15
-      Top = 284
+      Top = 288
       Width = 47
       Caption = 'numbers'
       ParentColor = False
@@ -367,30 +367,6 @@ object fmMain: TfmMain
     MaxFontSize = 0
     left = 536
     top = 20
-  end
-  object PopupMenu1: TPopupMenu
-    left = 480
-    top = 88
-    object mnuCut: TMenuItem
-      Caption = 'Cut'
-      OnClick = mnuCutClick
-    end
-    object mnuCopy: TMenuItem
-      Caption = 'Copy'
-      OnClick = mnuCopyClick
-    end
-    object mnuPst: TMenuItem
-      Caption = 'Paste'
-      OnClick = mnuPstClick
-    end
-    object mnuDel: TMenuItem
-      Caption = 'Delete'
-      OnClick = mnuDelClick
-    end
-    object mnuSel: TMenuItem
-      Caption = 'Select all'
-      OnClick = mnuSelClick
-    end
   end
   object SaveDialog1: TSaveDialog
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
