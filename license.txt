@@ -1,0 +1,2 @@
+This code is MPL 2.0 licensed.
+Copyright (C) Alexey Torgashin
