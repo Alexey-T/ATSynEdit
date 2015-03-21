@@ -13,7 +13,6 @@ type
   TfmMain = class(TForm)
     bFont: TButton;
     bOpt: TButton;
-    chkUnprintRep: TCheckBox;
     chkMicromap: TCheckBox;
     chkUnprintSp: TCheckBox;
     chkUnprintEnd: TCheckBox;
@@ -82,7 +81,6 @@ type
     procedure chkUnprintVisChange(Sender: TObject);
     procedure chkUnprintEndChange(Sender: TObject);
     procedure chkUnprintEndDetChange(Sender: TObject);
-    procedure chkUnprintRepChange(Sender: TObject);
     procedure chkUnprintSpChange(Sender: TObject);
     procedure chkWrapMarginChange(Sender: TObject);
     procedure chkWrapOffChange(Sender: TObject);
@@ -291,7 +289,6 @@ begin
   chkUnprintSp.Checked:= ed.OptUnprintedSpaces;
   chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
   chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
-  chkUnprintRep.Checked:= ed.OptUnprintedReplaceSpec;
   edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
   edCaretSh.ItemIndex:= Ord(ed.OptCaretShape);
 end;
@@ -444,6 +441,7 @@ begin
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkColorSel.Checked:= ed.OptHiliteSelectionFull;
+    chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
 
     if ShowModal=mrOk then
     begin
@@ -462,6 +460,7 @@ begin
       ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptHiliteSelectionFull:= chkColorSel.Checked;
+      ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
 
       ed.Gutter.Update;
       ed.Update;
@@ -517,13 +516,6 @@ procedure TfmMain.chkUnprintEndDetChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptUnprintedEndsDetails:= chkUnprintEndDet.Checked;
-  ed.Update;
-end;
-
-procedure TfmMain.chkUnprintRepChange(Sender: TObject);
-begin
-  if wait then Exit;
-  ed.OptUnprintedReplaceSpec:= chkUnprintRep.Checked;
   ed.Update;
 end;
 

@@ -190,11 +190,11 @@ object fmMain: TfmMain
     end
     object gUnpri: TGroupBox
       Left = 144
-      Height = 128
+      Height = 104
       Top = 108
       Width = 128
       Caption = 'unprintable'
-      ClientHeight = 108
+      ClientHeight = 84
       ClientWidth = 124
       TabOrder = 12
       object chkUnprintVis: TCheckBox
@@ -232,15 +232,6 @@ object fmMain: TfmMain
         Caption = 'end-details'
         OnChange = chkUnprintEndDetChange
         TabOrder = 3
-      end
-      object chkUnprintRep: TCheckBox
-        Left = 8
-        Height = 19
-        Top = 80
-        Width = 90
-        Caption = 'replace specs'
-        OnChange = chkUnprintRepChange
-        TabOrder = 4
       end
     end
     object edTabsize: TSpinEdit

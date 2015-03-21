@@ -69,53 +69,13 @@ object fmOpt: TfmOpt
     Caption = 'caret time'
     ParentColor = False
   end
-  object chkGutterBm: TCheckBox
-    Left = 192
-    Height = 19
-    Top = 24
-    Width = 38
-    Caption = 'bm'
-    TabOrder = 5
-  end
-  object chkGutterNum: TCheckBox
-    Left = 192
-    Height = 19
-    Top = 44
-    Width = 50
-    Caption = 'nums'
-    TabOrder = 6
-  end
-  object chkGutterStat: TCheckBox
-    Left = 256
-    Height = 19
-    Top = 24
-    Width = 50
-    Caption = 'states'
-    TabOrder = 7
-  end
-  object chkGutterEmpty: TCheckBox
-    Left = 256
-    Height = 19
-    Top = 44
-    Width = 54
-    Caption = 'indent'
-    TabOrder = 8
-  end
-  object Label1: TLabel
-    Left = 175
-    Height = 15
-    Top = 7
-    Width = 59
-    Caption = 'gutter cols:'
-    ParentColor = False
-  end
   object chkAutoInd: TCheckBox
     Left = 8
     Height = 19
     Top = 120
     Width = 83
     Caption = 'auto-indent'
-    TabOrder = 9
+    TabOrder = 5
   end
   object chkTabSp: TCheckBox
     Left = 8
@@ -123,30 +83,80 @@ object fmOpt: TfmOpt
     Top = 100
     Width = 89
     Caption = 'tab as spaces'
-    TabOrder = 10
+    TabOrder = 6
   end
   object chkOvrPaste: TCheckBox
-    Left = 175
+    Left = 176
     Height = 19
-    Top = 68
+    Top = 8
     Width = 153
     Caption = 'apply ovr-mode on paste'
-    TabOrder = 11
+    TabOrder = 7
   end
   object chkCopyNoSel: TCheckBox
-    Left = 175
+    Left = 176
     Height = 19
-    Top = 88
+    Top = 28
     Width = 117
     Caption = 'copy lines if no sel'
-    TabOrder = 12
+    TabOrder = 8
   end
   object chkColorSel: TCheckBox
-    Left = 175
+    Left = 176
     Height = 19
-    Top = 108
-    Width = 156
-    Caption = 'colorize selection till edge'
-    TabOrder = 13
+    Top = 48
+    Width = 123
+    Caption = 'colorize sel till edge'
+    TabOrder = 9
+  end
+  object chkRepSpec: TCheckBox
+    Left = 176
+    Height = 19
+    Top = 68
+    Width = 155
+    Caption = 'replace spec-ascii with "."'
+    TabOrder = 10
+  end
+  object GroupBox1: TGroupBox
+    Left = 352
+    Height = 107
+    Top = 4
+    Width = 95
+    Caption = 'gutter cols'
+    ClientHeight = 87
+    ClientWidth = 91
+    TabOrder = 11
+    object chkGutterBm: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 0
+      Width = 38
+      Caption = 'bm'
+      TabOrder = 0
+    end
+    object chkGutterNum: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 20
+      Width = 50
+      Caption = 'nums'
+      TabOrder = 1
+    end
+    object chkGutterStat: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 40
+      Width = 50
+      Caption = 'states'
+      TabOrder = 2
+    end
+    object chkGutterEmpty: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 60
+      Width = 54
+      Caption = 'indent'
+      TabOrder = 3
+    end
   end
 end
