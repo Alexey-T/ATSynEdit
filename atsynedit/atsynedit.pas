@@ -406,8 +406,8 @@ type
     procedure TimerScrollTick(Sender: TObject);
 
     //carets
-    procedure DoCaretAddToPoint(Pnt: TPoint);
-    procedure DoCaretsColumnToPoint(const PntTo: TPoint);
+    procedure DoCaretAddToPoint(AX, AY: integer);
+    procedure DoCaretsColumnToPoint(AX, AY: integer);
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer; AShiftBelowX: integer = 0);
     procedure DoCaretsDeleteOnSameLines;
 
@@ -1962,26 +1962,32 @@ begin
 
     if Shift=[ssLeft] then
     begin
-      FCarets.Clear;
-      FCarets.Add(FMouseDownPnt.X, FMouseDownPnt.Y);
+      DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+      DoSelect_None;
+    end;
+
+    if Shift=[ssLeft, ssShift] then
+    begin
+      DoCaretSingleAsIs;
+      Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if Shift=[ssLeft, ssCtrl] then
     begin
-      DoCaretAddToPoint(FMouseDownPnt);
+      DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if Shift=[ssLeft, ssCtrl, ssShift] then
     begin
-      DoCaretsColumnToPoint(FMouseDownPnt);
+      DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if Shift=[ssRight] then
     begin
       if FCaretMoveByRtClick then
       begin
-        FCarets.Clear;
-        FCarets.Add(FMouseDownPnt.X, FMouseDownPnt.Y);
+        DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+        DoSelect_None;
       end;
     end;
   end;

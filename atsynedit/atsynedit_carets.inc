@@ -1,37 +1,33 @@
 {$ifdef nnnn}begin end;{$endif}
 
-procedure TATSynEdit.DoCaretAddToPoint(Pnt: TPoint);
+procedure TATSynEdit.DoCaretAddToPoint(AX, AY: integer);
 var
   N: integer;
 begin
-  N:= Carets.IndexOfPosXY(Pnt.X, Pnt.Y);
+  N:= Carets.IndexOfPosXY(AX, AY);
   if Carets.IsIndexValid(N) then
   begin
     if Carets.Count>1 then
       Carets.Delete(N);
   end
   else
-    Carets.Add(Pnt.X, Pnt.Y);
+    Carets.Add(AX, AY);
 end;
 
-procedure TATSynEdit.DoCaretsColumnToPoint(const PntTo: TPoint);
+procedure TATSynEdit.DoCaretsColumnToPoint(AX, AY: integer);
 var
   P, PM1, PM2: TPoint;
 begin
-  if Carets.Count=0 then Exit;
+  DoCaretSingleAsIs;
   with Carets[0] do
-    P:= Point(PosX, PosY);
+    begin P.X:= PosX; P.Y:= PosY; end;
 
   PM1:= CaretPosToClientPos(P);
-  PM2:= CaretPosToClientPos(PntTo);
+  PM2:= CaretPosToClientPos(Point(AX, AY));
 
-  //clicked above caret
+  //clicked above caret?
   if PM2.Y<PM1.Y then
-  begin
-    P.Y:= PM1.Y;
-    PM1.Y:= PM2.Y;
-    PM2.Y:= P.Y;
-  end;
+    SwapInt(PM1.Y, PM2.Y);
 
   Carets.Clear;
   P:= ClientPosToCaretPos(PM1);
@@ -47,7 +43,7 @@ begin
   until PM1.Y>=PM2.Y;
 
   if Carets.Count=0 then
-    Carets.Add(PntTo.X, PntTo.Y);
+    Carets.Add(AX, AY);
 end;
 
 procedure TATSynEdit.DoCaretsSort;
