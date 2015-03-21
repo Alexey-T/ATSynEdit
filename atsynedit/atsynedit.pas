@@ -128,7 +128,6 @@ const
   cInitMicromapWidth = 30;
   cInitMinimapWidth = 160;
   cInitMinimapFontSize = 2;
-  cInitNumbersFontSize = 8;
   cInitNumbersStyle = cNumbersEach5th;
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
@@ -278,25 +277,24 @@ type
     FRectMicromap,
     FRectGutter,
     FRectRuler: TRect;
-    FRulerHeight: integer;
-    FRulerVisible: boolean;
-    FRulerFontSize: integer;
-    FRulerMarkSizeSmall: integer;
-    FRulerMarkSizeBig: integer;
-    FGutterVisible: boolean;
-    FNumbersStyle: TATSynNumbersStyle;
-    FNumbersFontSize: integer;
-    FMinimapWidth: integer;
-    FMinimapFontSize: integer;
-    FMinimapVisible: boolean;
-    FMicromapWidth: integer;
-    FMicromapVisible: boolean;
     FScrollVert,
     FScrollHorz: TATSynScrollInfo;
     FScrollVertMinimap,
     FScrollHorzMinimap: TATSynScrollInfo;
     FPrevHorz,
     FPrevVert: TATSynScrollInfo;
+    FMinimapWidth: integer;
+    FMinimapFontSize: integer;
+    FMinimapVisible: boolean;
+    FMicromapWidth: integer;
+    FMicromapVisible: boolean;
+    FOptRulerVisible: boolean;
+    FOptRulerHeight: integer;
+    FOptRulerFontSize: integer;
+    FOptRulerMarkSizeSmall: integer;
+    FOptRulerMarkSizeBig: integer;
+    FOptGutterVisible: boolean;
+    FOptNumbersStyle: TATSynNumbersStyle;
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
     FOptTabSpaces: boolean;
@@ -546,10 +544,10 @@ type
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
     property OptCaretTime: integer read GetCaretTime write SetCaretTime;
     property OptCaretMoveByRtClick: boolean read FCaretMoveByRtClick write FCaretMoveByRtClick;
-    property OptGutterVisible: boolean read FGutterVisible write FGutterVisible;
-    property OptRulerVisible: boolean read FRulerVisible write FRulerVisible;
-    property OptRulerHeight: integer read FRulerHeight write FRulerHeight;
-    property OptRulerFontSize: integer read FRulerFontSize write FRulerFontSize;
+    property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
+    property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
+    property OptRulerHeight: integer read FOptRulerHeight write FOptRulerHeight;
+    property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX;
@@ -558,7 +556,7 @@ type
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented;
     property OptMarginRight: integer read FMarginRight write SetMarginRight;
     property OptMarginString: string read GetMarginString write SetMarginString;
-    property OptNumbersStyle: TATSynNumbersStyle read FNumbersStyle write FNumbersStyle;
+    property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle;
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible;
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
@@ -675,7 +673,7 @@ begin
   NPrevSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
 
-  C.Font.Size:= FRulerFontSize;
+  C.Font.Size:= FOptRulerFontSize;
   C.Font.Color:= FColorRulerMark;
   C.Pen.Color:= FColorRulerMark;
   C.Brush.Color:= FColorRulerBG;
@@ -688,11 +686,11 @@ begin
   begin
     NX:= FTextOffset.X+(i-NRulerStart)*FCharSize.X;
     if i mod 5 = 0 then
-      NSize:= FRulerMarkSizeBig
+      NSize:= FOptRulerMarkSizeBig
     else
-      NSize:= FRulerMarkSizeSmall;
-    C.MoveTo(NX, FRulerHeight-1);
-    C.LineTo(NX, FRulerHeight-1-NSize);
+      NSize:= FOptRulerMarkSizeSmall;
+    C.MoveTo(NX, FOptRulerHeight-1);
+    C.LineTo(NX, FOptRulerHeight-1-NSize);
 
     if i mod 10 = 0 then
     begin
@@ -732,7 +730,7 @@ end;
 
 function TATSynEdit.DoFormatLineNumber(N: integer): atString;
 begin
-  case FNumbersStyle of
+  case FOptNumbersStyle of
     cNumbersAll:
       Result:= IntToStr(N);
     cNumbersNone:
@@ -1033,10 +1031,10 @@ end;
 
 function TATSynEdit.GetRectGutter: TRect;
 begin
-  if FGutterVisible then
+  if FOptGutterVisible then
   begin
     Result.Left:= 0;
-    Result.Top:= IfThen(FRulerVisible, FTextOffset.Y);
+    Result.Top:= IfThen(FOptRulerVisible, FTextOffset.Y);
     Result.Right:= FGutter.Width;
     Result.Bottom:= ClientHeight;
   end
@@ -1046,12 +1044,12 @@ end;
 
 function TATSynEdit.GetRectRuler: TRect;
 begin
-  if FRulerVisible then
+  if FOptRulerVisible then
   begin
     Result.Left:= 0;
     Result.Right:= FRectMain.Right;
     Result.Top:= 0;
-    Result.Bottom:= Result.Top+FRulerHeight;
+    Result.Bottom:= Result.Top+FOptRulerHeight;
   end
   else
     Result:= Rect(0, 0, 0, 0);
@@ -1066,7 +1064,7 @@ begin
   FCharSize:= GetCharSize(C, FCharSpacingText);
   FCharSizeMinimap:= Point(8, 8);
 
-  if FGutterVisible then UpdateGutterAutosize;
+  if FOptGutterVisible then UpdateGutterAutosize;
   if FMinimapVisible then UpdateMinimapAutosize(C);
 
   FTextOffset:= GetTextOffset; //after gutter autosize
@@ -1078,9 +1076,9 @@ begin
 
   UpdateWrapInfo;
 
-  if FRulerVisible then
+  if FOptRulerVisible then
     DoPaintRulerTo(C);
-  DoPaintTextTo(C, FRectMain, FCharSize, FGutterVisible, FUnprintedVisible, FScrollHorz, FScrollVert);
+  DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, FUnprintedVisible, FScrollHorz, FScrollVert);
   DoPaintMarginsTo(C);
 
   if FMinimapVisible then
@@ -1642,7 +1640,7 @@ begin
   FUnprintedReplaceSpec:= true;
 
   FGutter:= TATGutter.Create;
-  FGutterVisible:= true;
+  FOptGutterVisible:= true;
 
   FGutterBandBm:= 0;
   FGutterBandNum:= 1;
@@ -1658,15 +1656,13 @@ begin
   FGutter[FGutterBandEmpty].Size:= cSizeGutterBandEmpty;
   FGutter.Update;
 
-  FRulerHeight:= cSizeRulerHeight;
-  FRulerMarkSizeSmall:= cSizeRulerMarkSmall;
-  FRulerMarkSizeBig:= cSizeRulerMarkBig;
-  FRulerFontSize:= 8;
-  FRulerVisible:= true;
+  FOptRulerHeight:= cSizeRulerHeight;
+  FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
+  FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
+  FOptRulerFontSize:= 8;
+  FOptRulerVisible:= true;
 
-  FNumbersFontSize:= cInitNumbersFontSize;
-  FNumbersStyle:= cInitNumbersStyle;
-
+  FOptNumbersStyle:= cInitNumbersStyle;
   FMinimapWidth:= cInitMinimapWidth;
   FMinimapFontSize:= cInitMinimapFontSize;
   FMinimapVisible:= cInitMinimapVisible;
@@ -1867,12 +1863,12 @@ end;
 function TATSynEdit.GetTextOffset: TPoint;
 begin
   Result.X:= 0;
-  if FGutterVisible then
+  if FOptGutterVisible then
     Inc(Result.X, FGutter.Width);
 
   Result.Y:= cOffsetTextTop;
-  if FRulerVisible then
-    Inc(Result.Y, FRulerHeight);
+  if FOptRulerVisible then
+    Inc(Result.Y, FOptRulerHeight);
 end;
 
 function TATSynEdit.GetGutterNumbersWidth: integer;
