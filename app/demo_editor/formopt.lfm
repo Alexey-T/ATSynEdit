@@ -171,8 +171,24 @@ object fmOpt: TfmOpt
     Left = 8
     Height = 19
     Top = 140
-    Width = 136
-    Caption = 'last line shown on top'
+    Width = 98
+    Caption = 'last line on top'
     TabOrder = 13
+  end
+  object chkClick2: TCheckBox
+    Left = 177
+    Height = 19
+    Top = 108
+    Width = 124
+    Caption = 'dbl click selects line'
+    TabOrder = 14
+  end
+  object chkClick3: TCheckBox
+    Left = 176
+    Height = 19
+    Top = 128
+    Width = 134
+    Caption = 'triple click selects line'
+    TabOrder = 15
   end
 end

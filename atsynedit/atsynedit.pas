@@ -306,7 +306,11 @@ type
     FOptHiliteSelectionFull: boolean;
     FOptShowCurLine: boolean;
     FOptShowCurColumn: boolean;
+    FOpt2ClickSelectsLine: boolean;
+    FOpt3ClickSelectsLine: boolean;
     //
+    procedure DoSelect_Line_ByClick;
+    procedure DoSelect_Word_ByClick;
     procedure MenuClick(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
@@ -551,6 +555,8 @@ type
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
     property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
+    property Opt2ClickSelectsLine: boolean read FOpt2ClickSelectsLine write FOpt2ClickSelectsLine;
+    property Opt3ClickSelectsLine: boolean read FOpt3ClickSelectsLine write FOpt3ClickSelectsLine;
   end;
 
 implementation
@@ -1664,6 +1670,8 @@ begin
   FOptAutoIndent:= true;
   FOptTabSpaces:= false;
   FOptLastLineOnTop:= false;
+  FOpt2ClickSelectsLine:= false;
+  FOpt3ClickSelectsLine:= true;
   FOptCopyLinesIfNoSel:= true;
   FOptHiliteSelectionFull:= false;
   FOptShowCurLine:= false;
@@ -2125,11 +2133,28 @@ begin
 end;
 
 procedure TATSynEdit.DblClick;
-var
-  P: TPoint;
 begin
   inherited;
 
+  if FOpt2ClickSelectsLine then
+    DoSelect_Line_ByClick
+  else
+    DoSelect_Word_ByClick;
+end;
+
+procedure TATSynEdit.TripleClick;
+begin
+  inherited;
+
+  if FOpt3ClickSelectsLine then
+    DoSelect_Line_ByClick;
+end;
+
+
+procedure TATSynEdit.DoSelect_Word_ByClick;
+var
+  P: TPoint;
+begin
   P:= ScreenToClient(Mouse.CursorPos);
   if PtInRect(FRectMain, P) then
   begin
@@ -2140,12 +2165,10 @@ begin
   end;
 end;
 
-procedure TATSynEdit.TripleClick;
+procedure TATSynEdit.DoSelect_Line_ByClick;
 var
   P: TPoint;
 begin
-  inherited;
-
   P:= ScreenToClient(Mouse.CursorPos);
   if PtInRect(FRectMain, P) then
   begin
@@ -2155,6 +2178,7 @@ begin
     Update;
   end;
 end;
+
 
 procedure TATSynEdit.Invalidate;
 begin

@@ -444,6 +444,8 @@ begin
     chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
     chkNavWrap.Checked:= ed.OptNavigateInWrappedLines;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
+    chkClick2.Checked:= ed.Opt2ClickSelectsLine;
+    chkClick3.Checked:= ed.Opt3ClickSelectsLine;
 
     if ShowModal=mrOk then
     begin
@@ -465,6 +467,8 @@ begin
       ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
       ed.OptNavigateInWrappedLines:= chkNavWrap.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
+      ed.Opt2ClickSelectsLine:= chkClick2.Checked;
+      ed.Opt3ClickSelectsLine:= chkClick3.Checked;
 
       ed.Gutter.Update;
       ed.Update;
