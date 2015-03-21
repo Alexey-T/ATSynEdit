@@ -88,7 +88,7 @@ object fmOpt: TfmOpt
   object chkOvrPaste: TCheckBox
     Left = 176
     Height = 19
-    Top = 8
+    Top = 48
     Width = 153
     Caption = 'apply ovr-mode on paste'
     TabOrder = 7
@@ -96,7 +96,7 @@ object fmOpt: TfmOpt
   object chkCopyNoSel: TCheckBox
     Left = 176
     Height = 19
-    Top = 28
+    Top = 8
     Width = 117
     Caption = 'copy lines if no sel'
     TabOrder = 8
@@ -104,7 +104,7 @@ object fmOpt: TfmOpt
   object chkColorSel: TCheckBox
     Left = 176
     Height = 19
-    Top = 48
+    Top = 28
     Width = 123
     Caption = 'colorize sel till edge'
     TabOrder = 9

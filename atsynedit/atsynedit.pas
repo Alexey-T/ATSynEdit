@@ -2200,11 +2200,16 @@ begin
 
   PCaret:= ClientPosToCaretPos(PClient);
   if (PCaret.X>=0) and (PCaret.Y>=0) then
-  begin
-    nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-    if nIndex>=0 then
-      Carets[nIndex].SelectToPoint(PCaret.X, PCaret.Y);
-  end;
+    if FMouseDownNumber>=0 then
+    begin
+      DoSelect_Lines_ToPoint(FMouseDownNumber, PCaret);
+    end
+    else
+    begin
+      nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+      if nIndex>=0 then
+        Carets[nIndex].SelectToPoint(PCaret.X, PCaret.Y);
+    end;
 
   DoCaretsSort;
   DoEventCarets;
