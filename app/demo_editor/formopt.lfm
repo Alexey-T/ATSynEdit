@@ -247,4 +247,27 @@ object fmOpt: TfmOpt
     Caption = 'ruler sizes'
     ParentColor = False
   end
+  object chkOvrSel: TCheckBox
+    Left = 8
+    Height = 19
+    Top = 109
+    Width = 124
+    Caption = 'overwrite sel by text'
+    TabOrder = 17
+  end
+  object edChars: TEdit
+    Left = 496
+    Height = 23
+    Top = 187
+    Width = 106
+    TabOrder = 18
+  end
+  object LabChars: TLabel
+    Left = 609
+    Height = 15
+    Top = 191
+    Width = 60
+    Caption = 'word-chars'
+    ParentColor = False
+  end
 end

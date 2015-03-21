@@ -31,7 +31,7 @@ var
   N1, N2: integer;
 begin
   if not Strings.IsIndexValid(P.Y) then Exit;
-  SFindWordBounds(Strings.Lines[P.Y], P.X, N1, N2);
+  SFindWordBounds(Strings.Lines[P.Y], P.X, N1, N2, FOptWordChars);
   if N1<>N2 then
   begin
     DoCaretSingle(P.X, P.Y);

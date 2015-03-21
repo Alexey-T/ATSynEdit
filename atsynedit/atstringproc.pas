@@ -16,7 +16,7 @@ const
   cMaxTabPositionToExpand = 500; //no sense to expand too far tabs
   cCharScaleFullwidth = 1.7; //width of CJK chars
 
-function IsWordChar(ch: atChar): boolean;
+function IsWordChar(ch: atChar; const AWordChars: atString): boolean;
 function IsSpecialCodeChar(ch: atChar): boolean;
 function IsEolCode(N: Word): boolean;
 function IsAccentChar(ch: WideChar): boolean;
@@ -33,7 +33,8 @@ function SWithBreaks(const S: atString): boolean;
 procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
   ATabSize: integer; ACharsSkipped: integer = 0);
 function SExpandTabulations(const S: atString; ATabSize: integer): atString;
-function SFindWordWrapPosition(const S: atString; AColumns, ATabSize: integer): integer;
+function SFindWordWrapPosition(const S: atString; AColumns, ATabSize: integer;
+  const AWordChars: atString): integer;
 function SFindClickedPosition(const Str: atString;
   APixelsFromLeft, ACharSize, ATabSize: integer;
   AAllowVirtualPos: boolean): integer;
@@ -50,13 +51,18 @@ begin
   Result:= (N=10) or (N=13);
 end;
 
-function IsWordChar(ch: atChar): boolean;
+function IsWordChar(ch: atChar; const AWordChars: atString): boolean;
 begin
   Result:=
     ((ch>='0') and (ch<='9')) or
     ((ch>='a') and (ch<='z')) or
     ((ch>='A') and (ch<='Z')) or
     (ch='_');
+
+  if not Result then
+    if AWordChars<>'' then
+      if Pos(ch, AWordChars)>0 then
+        Result:= true;
 end;
 
 function IsSpaceChar(ch: atChar): boolean;
@@ -80,7 +86,8 @@ begin
   showmessage('Offsets'#13+s);
 end;
 
-function SFindWordWrapPosition(const S: atString; AColumns, ATabSize: integer): integer;
+function SFindWordWrapPosition(const S: atString; AColumns, ATabSize: integer;
+  const AWordChars: atString): integer;
 var
   N, NMin, NAvg: integer;
   List: array of real;
@@ -101,7 +108,7 @@ begin
   N:= Length(S)-1;
   while (N>NMin) and (List[N]>AColumns+1) do Dec(N);
   NAvg:= N;
-  while (N>NMin) and IsWordChar(S[N]) and IsWordChar(S[N+1]) do Dec(N);
+  while (N>NMin) and IsWordChar(S[N], AWordChars) and IsWordChar(S[N+1], AWordChars) do Dec(N);
 
   if N>NMin then
     Result:= N

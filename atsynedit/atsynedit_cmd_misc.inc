@@ -24,7 +24,7 @@ begin
     if not Strings.IsIndexValid(Item.PosY) then Continue;
 
     Str:= Strings.Lines[Item.PosY];
-    SFindWordBounds(Str, Item.PosX, NOffset1, NOffset2);
+    SFindWordBounds(Str, Item.PosX, NOffset1, NOffset2, FOptWordChars);
     if NOffset1<>NOffset2 then
     begin
       Item.EndY:= Item.PosY;

@@ -196,7 +196,7 @@ begin
     //jump inside line?
     if (Item.PosX<=Length(Str)) then
     begin
-      Item.PosX:= SFindWordOffset(Str, Item.PosX, ANext, true);
+      Item.PosX:= SFindWordOffset(Str, Item.PosX, ANext, true, FOptWordChars);
     end;
   end;
 

@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkOvrSel: TCheckBox;
     chkCaretMul: TCheckBox;
     chkCaretVirtual: TCheckBox;
     chkClick3: TCheckBox;
@@ -32,10 +33,12 @@ type
     chkCurCol: TCheckBox;
     chkCurLine: TCheckBox;
     edCaretTime: TSpinEdit;
+    edChars: TEdit;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     Label1: TLabel;
     Label2: TLabel;
+    LabChars: TLabel;
     Label8: TLabel;
     edRulerH: TSpinEdit;
     edRulerFont: TSpinEdit;

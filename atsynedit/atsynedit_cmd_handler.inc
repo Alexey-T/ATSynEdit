@@ -150,7 +150,7 @@ begin
     //end of most used
 
     cCommand_TextDeleteLine:        Res:= DoCommand_TextDeleteLine;
-    cCommand_TextDuplicateLine:     Res:= DoCommand_TextDuplicateCurLine;
+    cCommand_TextDuplicateLine:     Res:= DoCommand_TextDuplicateLine;
     cCommand_TextDeleteToLineBegin:    Res:= DoCommand_TextDeleteToLineBegin;
     cCommand_TextDeleteToLineEnd:      Res:= DoCommand_TextDeleteToLineEnd;
     cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);

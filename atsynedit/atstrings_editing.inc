@@ -238,10 +238,10 @@ begin
 
   AShift.Y:= -1;
   APosAfter.X:= 0;
-  if AY=Count-1 then
-    APosAfter.Y:= Max(0, AY-1);
 
   LineDelete(AY);
+  if AY>=Count then
+    LineAddEx('', cEndNone);
 end;
 
 procedure TATStrings.TextDuplicateLine(AX, AY: integer; out AShift, APosAfter: TPoint);

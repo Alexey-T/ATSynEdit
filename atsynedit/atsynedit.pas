@@ -297,9 +297,11 @@ type
     FScrollHorzMinimap: TATSynScrollInfo;
     FPrevHorz,
     FPrevVert: TATSynScrollInfo;
+    FOptWordChars: atString;
     FOptAutoIndent: boolean;
     FOptTabSpaces: boolean;
     FOptLastLineOnTop: boolean;
+    FOptOverwriteSel: boolean;
     FOptUseOverOnPaste: boolean;
     FOptNavInWrappedLines: boolean;
     FOptCopyLinesIfNoSel: boolean;
@@ -446,7 +448,7 @@ type
     function DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
     function DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
     function DoCommand_TextDeleteLine: TATCommandResults;
-    function DoCommand_TextDuplicateCurLine: TATCommandResults;
+    function DoCommand_TextDuplicateLine: TATCommandResults;
     function DoCommand_TextDeleteToLineBegin: TATCommandResults;
     function DoCommand_TextDeleteToLineEnd: TATCommandResults;
     function DoCommand_GotoTextBegin: TATCommandResults;
@@ -528,9 +530,11 @@ type
     //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
+    property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel;
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
+    property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptHiliteSelectionFull: boolean read FOptHiliteSelectionFull write FOptHiliteSelectionFull;
     property OptUseOverOnPaste: boolean read FOptUseOverOnPaste write FOptUseOverOnPaste;
     property OptNavigateInWrappedLines: boolean read FOptNavInWrappedLines write FOptNavInWrappedLines;
@@ -846,7 +850,7 @@ begin
     NIndent:= 0;
 
     repeat
-      NLen:= SFindWordWrapPosition(Str, FWrapColumn-NIndent, FTabSize);
+      NLen:= SFindWordWrapPosition(Str, FWrapColumn-NIndent, FTabSize, FOptWordChars);
       if NLen>=Length(Str) then
         NFinal:= cWrapItemFinal
       else
@@ -1672,9 +1676,11 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
+  FOptWordChars:= '';
   FOptAutoIndent:= true;
   FOptTabSpaces:= false;
   FOptLastLineOnTop:= false;
+  FOptOverwriteSel:= true;
   FOpt2ClickSelectsLine:= false;
   FOpt3ClickSelectsLine:= true;
   FOptCopyLinesIfNoSel:= true;

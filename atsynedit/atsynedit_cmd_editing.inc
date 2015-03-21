@@ -83,7 +83,11 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
-  DoCommand_TextDeleteSelections;
+
+  if FOptOverwriteSel then
+    DoCommand_TextDeleteSelections
+  else
+    DoSelect_None;
 
   List:= nil;
   if (Length(AText)>1) and (Carets.Count>1) then
@@ -262,7 +266,7 @@ begin
   Result:= [cResultText, cResultCaretTop];
 end;
 
-function TATSynEdit.DoCommand_TextDuplicateCurLine: TATCommandResults;
+function TATSynEdit.DoCommand_TextDuplicateLine: TATCommandResults;
 var
   Item: TATCaretItem;
   i: integer;
@@ -373,7 +377,7 @@ begin
     //delete inside line?
     if (Item.PosX<=Length(Str)) then
     begin
-      PosAfter.X:= SFindWordOffset(Str, Item.PosX, ANext, false);
+      PosAfter.X:= SFindWordOffset(Str, Item.PosX, ANext, false, FOptWordChars);
       if PosAfter.X<>Item.PosX then
       begin
         System.Delete(Str, Min(Item.PosX, PosAfter.X)+1, Abs(Item.PosX-PosAfter.X));

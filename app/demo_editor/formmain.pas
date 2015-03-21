@@ -435,8 +435,10 @@ begin
     chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
     chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
 
+    edChars.Text:= ed.OptWordChars;
     chkAutoInd.Checked:= ed.OptAutoIndent;
     chkTabSp.Checked:= ed.OptTabSpaces;
+    chkOvrSel.Checked:= ed.OptOverwriteSel;
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkColorSel.Checked:= ed.OptHiliteSelectionFull;
@@ -461,8 +463,10 @@ begin
       ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
       ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
 
+      ed.OptWordChars:= edChars.Text;
       ed.OptAutoIndent:= chkAutoInd.Checked;
       ed.OptTabSpaces:= chkTabSp.Checked;
+      ed.OptOverwriteSel:= chkOvrSel.Checked;
       ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptHiliteSelectionFull:= chkColorSel.Checked;
