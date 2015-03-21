@@ -650,19 +650,14 @@ end;
 { TATSynEdit }
 
 procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
-const
-  ATabSize = 1; //tab not needed in ruler
 var
   NX, NSize, NPrevSize, NRulerStart, i: integer;
-  ACharSize: TPoint;
   Str: string;
 begin
   NPrevSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
 
   C.Font.Size:= FRulerFontSize;
-  ACharSize:= GetCharSize(C, Point(0, 0));
-
   C.Font.Color:= FColorRulerMark;
   C.Pen.Color:= FColorRulerMark;
   C.Brush.Color:= FColorRulerBG;
@@ -684,8 +679,8 @@ begin
     if i mod 10 = 0 then
     begin
       Str:= IntToStr(i);
-      Dec(NX, CanvasTextWidth(Str, ATabSize, ACharSize) div 2);
-      CanvasTextOut(C, NX, 0, Str, ATabSize, ACharSize, false);
+      Dec(NX, C.TextWidth(Str) div 2);
+      C.TextOut(NX, 0, Str);
     end;
   end;
 
@@ -1264,8 +1259,8 @@ begin
           C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
 
           Str:= DoFormatLineNumber(NLinesIndex+1);
-          NCoordLeftNums:= NGutterNumsX2 - CanvasTextWidth(Str, FTabSize, ACharSize) - cSizeGutterNumOffsetRight;
-          CanvasTextOut(C, NCoordLeftNums, NCoordTop, Str, FTabSize, ACharSize, false);
+          NCoordLeftNums:= NGutterNumsX2 - C.TextWidth(Str) - cSizeGutterNumOffsetRight;
+          C.TextOut(NCoordLeftNums, NCoordTop, Str);
         end;
       end;
 
@@ -1440,7 +1435,6 @@ var
   NPosX, NPosY, NPrevSize: integer;
   Eol: TATLineEnds;
   StrEol: atString;
-  ACharSize: TPoint;
 begin
   if AItem.NFinal<>cWrapItemFinal then Exit;
 
@@ -1455,14 +1449,12 @@ begin
   begin
     NPrevSize:= C.Font.Size;
     C.Font.Size:= Trunc(C.Font.Size*cUnprintedFontScale);
-    ACharSize:= GetCharSize(C, Point(0, 0));
-
     C.Font.Color:= FColorUnprintedFont;
     C.Brush.Color:= FColorUnprintedBG;
 
     Inc(NPosX, cUnprintedFontOffsetX);
     Inc(NPosY, cUnprintedFontOffsetY);
-    CanvasTextOut(C, NPosX, NPosY, StrEol, FTabSize, ACharSize, false);
+    C.TextOut(NPosX, NPosY, StrEol); //faster to use this func
 
     C.Font.Size:= NPrevSize;
   end

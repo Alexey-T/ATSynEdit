@@ -21,17 +21,9 @@
 *.ppu
 *.bak
 
-synlite
-atgroups/demo
-
-DLLs/
 lib/
 backup/
-comp_ec/
-comp/atgroups
-comp/python
 *.lps
 *.copy
 project?
 demo
-/ATBinHex-Lazarus
