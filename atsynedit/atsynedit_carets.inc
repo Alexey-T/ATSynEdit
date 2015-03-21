@@ -11,7 +11,9 @@ begin
       Carets.Delete(N);
   end
   else
+  begin
     Carets.Add(AX, AY);
+  end;
 end;
 
 procedure TATSynEdit.DoCaretsColumnToPoint(AX, AY: integer);

@@ -2,11 +2,11 @@ object fmOpt: TfmOpt
   Left = 474
   Height = 326
   Top = 488
-  Width = 646
+  Width = 690
   BorderStyle = bsDialog
   Caption = 'Opts'
   ClientHeight = 326
-  ClientWidth = 646
+  ClientWidth = 690
   Position = poScreenCenter
   LCLVersion = '1.5'
   object chkCurLine: TCheckBox
@@ -29,7 +29,7 @@ object fmOpt: TfmOpt
     Left = 6
     Height = 33
     Top = 287
-    Width = 634
+    Width = 678
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
@@ -42,48 +42,21 @@ object fmOpt: TfmOpt
     ShowButtons = [pbOK, pbCancel]
     ShowGlyphs = []
   end
-  object chkCaretVirtual: TCheckBox
-    Left = 8
-    Height = 19
-    Top = 48
-    Width = 92
-    Caption = 'caret after eol'
-    TabOrder = 3
-  end
-  object edCaretTime: TSpinEdit
-    Left = 8
-    Height = 23
-    Top = 72
-    Width = 59
-    Increment = 100
-    MaxValue = 2000
-    MinValue = 300
-    TabOrder = 4
-    Value = 500
-  end
-  object Label8: TLabel
-    Left = 71
-    Height = 15
-    Top = 76
-    Width = 53
-    Caption = 'caret time'
-    ParentColor = False
-  end
   object chkAutoInd: TCheckBox
     Left = 8
     Height = 19
-    Top = 120
+    Top = 68
     Width = 83
     Caption = 'auto-indent'
-    TabOrder = 5
+    TabOrder = 3
   end
   object chkTabSp: TCheckBox
     Left = 8
     Height = 19
-    Top = 100
+    Top = 48
     Width = 89
     Caption = 'tab as spaces'
-    TabOrder = 6
+    TabOrder = 4
   end
   object chkOvrPaste: TCheckBox
     Left = 176
@@ -91,7 +64,7 @@ object fmOpt: TfmOpt
     Top = 48
     Width = 153
     Caption = 'apply ovr-mode on paste'
-    TabOrder = 7
+    TabOrder = 5
   end
   object chkCopyNoSel: TCheckBox
     Left = 176
@@ -99,7 +72,7 @@ object fmOpt: TfmOpt
     Top = 8
     Width = 117
     Caption = 'copy lines if no sel'
-    TabOrder = 8
+    TabOrder = 6
   end
   object chkColorSel: TCheckBox
     Left = 176
@@ -107,7 +80,7 @@ object fmOpt: TfmOpt
     Top = 28
     Width = 123
     Caption = 'colorize sel till edge'
-    TabOrder = 9
+    TabOrder = 7
   end
   object chkRepSpec: TCheckBox
     Left = 176
@@ -115,17 +88,17 @@ object fmOpt: TfmOpt
     Top = 68
     Width = 155
     Caption = 'replace spec-ascii with "."'
-    TabOrder = 10
+    TabOrder = 8
   end
   object GroupBox1: TGroupBox
     Left = 384
-    Height = 107
-    Top = 8
+    Height = 103
+    Top = 4
     Width = 95
     Caption = 'gutter cols'
-    ClientHeight = 87
+    ClientHeight = 83
     ClientWidth = 91
-    TabOrder = 11
+    TabOrder = 9
     object chkGutterBm: TCheckBox
       Left = 8
       Height = 19
@@ -165,23 +138,23 @@ object fmOpt: TfmOpt
     Top = 88
     Width = 206
     Caption = 'up/down navigate in wrapped lines'
-    TabOrder = 12
+    TabOrder = 10
   end
   object chkLastOnTop: TCheckBox
     Left = 8
     Height = 19
-    Top = 140
+    Top = 88
     Width = 98
     Caption = 'last line on top'
-    TabOrder = 13
+    TabOrder = 11
   end
   object chkClick2: TCheckBox
-    Left = 177
+    Left = 176
     Height = 19
     Top = 108
     Width = 124
     Caption = 'dbl click selects line'
-    TabOrder = 14
+    TabOrder = 12
   end
   object chkClick3: TCheckBox
     Left = 176
@@ -189,6 +162,61 @@ object fmOpt: TfmOpt
     Top = 128
     Width = 134
     Caption = 'triple click selects line'
-    TabOrder = 15
+    TabOrder = 13
+  end
+  object GroupBox2: TGroupBox
+    Left = 487
+    Height = 147
+    Top = 4
+    Width = 197
+    Caption = 'carets'
+    ClientHeight = 127
+    ClientWidth = 193
+    TabOrder = 14
+    object edCaretTime: TSpinEdit
+      Left = 8
+      Height = 23
+      Top = 0
+      Width = 59
+      Increment = 100
+      MaxValue = 2000
+      MinValue = 300
+      TabOrder = 0
+      Value = 500
+    end
+    object Label8: TLabel
+      Left = 71
+      Height = 15
+      Top = 4
+      Width = 53
+      Caption = 'caret time'
+      ParentColor = False
+    end
+    object chkCaretVirtual: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 28
+      Width = 92
+      Caption = 'caret after eol'
+      TabOrder = 1
+    end
+    object chkCaretMul: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 49
+      Width = 84
+      Caption = 'multi-carets'
+      TabOrder = 2
+    end
+    object Label1: TLabel
+      Left = 11
+      Height = 48
+      Top = 68
+      Width = 181
+      AutoSize = False
+      Caption = 'Ctrl+click to add/del; Ctrl+Shift+click to add column; Ctrl+drag to add with sel'
+      ParentColor = False
+      WordWrap = True
+    end
   end
 end

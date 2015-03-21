@@ -13,6 +13,8 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkCaretMul: TCheckBox;
+    chkCaretVirtual: TCheckBox;
     chkClick3: TCheckBox;
     chkClick2: TCheckBox;
     chkLastOnTop: TCheckBox;
@@ -27,11 +29,12 @@ type
     chkOvrPaste: TCheckBox;
     chkAutoInd: TCheckBox;
     chkTabSp: TCheckBox;
-    chkCaretVirtual: TCheckBox;
     chkCurCol: TCheckBox;
     chkCurLine: TCheckBox;
     edCaretTime: TSpinEdit;
     GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
+    Label1: TLabel;
     Label8: TLabel;
   private
     { private declarations }

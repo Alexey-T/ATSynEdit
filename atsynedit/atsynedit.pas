@@ -311,6 +311,7 @@ type
     //
     procedure DoSelect_Line_ByClick;
     procedure DoSelect_Word_ByClick;
+    function GetCaretManyAllowed: boolean;
     procedure MenuClick(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
@@ -358,7 +359,7 @@ type
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     procedure DoEventCommand(ACommand: integer; out AHandled: boolean);
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
-    function GetCaretsTime: integer;
+    function GetCaretTime: integer;
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
     function GetLastPos: TPoint;
@@ -371,7 +372,8 @@ type
     function IsKeyMappingMatchedItem(const Str: string;
       const Item: TATKeyMappingItem): boolean;
     function IsPosSelected(AX, AY: integer): boolean;
-    procedure SetCaretsTime(AValue: integer);
+    procedure SetCaretManyAllowed(AValue: boolean);
+    procedure SetCaretTime(AValue: integer);
     procedure SetCaretShape(AValue: TATSynCaretShape);
     procedure SetCaretShapeOvr(AValue: TATSynCaretShape);
     procedure SetCharSpacingX(AValue: integer);
@@ -534,10 +536,11 @@ type
     property OptNavigateInWrappedLines: boolean read FOptNavInWrappedLines write FOptNavInWrappedLines;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
+    property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual;
     property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
-    property OptCaretsTime: integer read GetCaretsTime write SetCaretsTime;
+    property OptCaretTime: integer read GetCaretTime write SetCaretTime;
     property OptCaretMoveByRtClick: boolean read FCaretMoveByRtClick write FCaretMoveByRtClick;
     property OptGutterVisible: boolean read FGutterVisible write FGutterVisible;
     property OptRulerVisible: boolean read FRulerVisible write FRulerVisible;
@@ -1771,7 +1774,7 @@ begin
     Result:= FStringsInt;
 end;
 
-procedure TATSynEdit.SetCaretsTime(AValue: integer);
+procedure TATSynEdit.SetCaretTime(AValue: integer);
 begin
   AValue:= Max(AValue, cMinCaretTime);
   AValue:= Min(AValue, cMaxCaretTime);
@@ -2165,6 +2168,19 @@ begin
   end;
 end;
 
+function TATSynEdit.GetCaretManyAllowed: boolean;
+begin
+  Result:= Carets.ManyAllowed;
+end;
+
+procedure TATSynEdit.SetCaretManyAllowed(AValue: boolean);
+begin
+  Carets.ManyAllowed:= AValue;
+  if not AValue then
+    DoCaretSingleAsIs;
+end;
+
+
 procedure TATSynEdit.DoSelect_Line_ByClick;
 var
   P: TPoint;
@@ -2319,7 +2335,7 @@ begin
     FOnCommand(Self, ACommand, AHandled);
 end;
 
-function TATSynEdit.GetCaretsTime: integer;
+function TATSynEdit.GetCaretTime: integer;
 begin
   Result:= FTimerBlink.Interval;
 end;

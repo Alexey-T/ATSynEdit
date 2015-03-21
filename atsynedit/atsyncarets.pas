@@ -34,6 +34,7 @@ type
   TATCarets = class
   private
     FList: TList;
+    FManyAllowed: boolean;
     function GetItem(N: integer): TATCaretItem;
     procedure DeleteDups;
     function IsJoinNeeded(N1, N2: integer;
@@ -56,6 +57,7 @@ type
     function IsSelection: boolean;
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
+    property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
   end;
 
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
@@ -119,6 +121,7 @@ constructor TATCarets.Create;
 begin
   inherited;
   FList:= TList.Create;
+  FManyAllowed:= true;
 end;
 
 destructor TATCarets.Destroy;
@@ -159,6 +162,8 @@ procedure TATCarets.Add(APosX, APosY: integer);
 var
   Item: TATCaretItem;
 begin
+  if (not FManyAllowed) and (Count>=1) then Exit;
+
   Item:= TATCaretItem.Create;
   Item.PosX:= APosX;
   Item.PosY:= APosY;

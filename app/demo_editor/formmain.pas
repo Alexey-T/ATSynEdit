@@ -429,7 +429,7 @@ begin
     chkCurLine.Checked:= ed.OptShowCurLine;
     chkCurCol.Checked:= ed.OptShowCurColumn;
     chkCaretVirtual.Checked:= ed.OptCaretVirtual;
-    edCaretTime.Value:= ed.OptCaretsTime;
+    edCaretTime.Value:= ed.OptCaretTime;
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
@@ -446,13 +446,14 @@ begin
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
     chkClick2.Checked:= ed.Opt2ClickSelectsLine;
     chkClick3.Checked:= ed.Opt3ClickSelectsLine;
+    chkCaretMul.Checked:= ed.OptCaretManyAllowed;
 
     if ShowModal=mrOk then
     begin
       ed.OptShowCurLine:= chkCurLine.Checked;
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptCaretVirtual:= chkCaretVirtual.Checked;
-      ed.OptCaretsTime:= edCaretTime.Value;
+      ed.OptCaretTime:= edCaretTime.Value;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
@@ -469,6 +470,7 @@ begin
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.Opt2ClickSelectsLine:= chkClick2.Checked;
       ed.Opt3ClickSelectsLine:= chkClick3.Checked;
+      ed.OptCaretManyAllowed:= chkCaretMul.Checked;
 
       ed.Gutter.Update;
       ed.Update;
