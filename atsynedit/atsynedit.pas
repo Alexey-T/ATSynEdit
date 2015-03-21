@@ -129,7 +129,7 @@ const
   cInitMinimapWidth = 160;
   cInitMinimapFontSize = 2;
   cInitNumbersFontSize = 8;
-  cInitNumbersStyle = cNumbersAll;
+  cInitNumbersStyle = cNumbersEach5th;
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
 
@@ -1679,6 +1679,9 @@ begin
   FOptHiliteSelectionFull:= false;
   FOptShowCurLine:= false;
   FOptShowCurColumn:= false;
+
+  FMouseDownPnt:= Point(-1, -1);
+  FMouseDownNumber:= -1;
 
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);

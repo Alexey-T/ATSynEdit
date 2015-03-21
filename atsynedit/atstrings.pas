@@ -384,6 +384,8 @@ begin
 
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
+
+  LineAddEx('', cEndNone);
 end;
 
 destructor TATStrings.Destroy;

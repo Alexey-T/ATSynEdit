@@ -150,7 +150,7 @@ begin
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
   {$else}
-  ed.Font.Name:= 'DejaVu Sans Mono';
+  ed.Font.Name:= 'Courier New';
   {$endif}
 
   ed.OnChanged:= EditCaretMoved;
