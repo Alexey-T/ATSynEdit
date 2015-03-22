@@ -2,10 +2,23 @@
 
 function TATSynEdit.DoCommand_KeyHome: TATCommandResults;
 var
-  i: integer;
+  i, NIndent: integer;
+  Item: TATCaretItem;
 begin
   for i:= 0 to FCarets.Count-1 do
-    FCarets[i].PosX:= 0;
+  begin
+    Item:= FCarets[i];
+    NIndent:= SGetIndentChars(Strings.Lines[Item.PosY]);
+    if FOptKeyHomeEndToNonSpace then
+    begin
+      if Item.PosX<>NIndent then
+        Item.PosX:= NIndent
+      else
+        Item.PosX:= 0;
+    end
+    else
+      Item.PosX:= 0;
+  end;
 
   Result:= [cResultCaretLeft];
 end;
@@ -13,12 +26,23 @@ end;
 function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
 var
   Item: TATCaretItem;
-  i: integer;
+  Str: atString;
+  i, NLen: integer;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Item:= FCarets[i];
-    Item.PosX:= Length(Strings.Lines[Item.PosY]);
+    Str:= Strings.Lines[Item.PosY];
+    if FOptKeyHomeEndToNonSpace then
+    begin
+      NLen:= SGetNonSpaceLength(Str);
+      if Item.PosX<>NLen then
+        Item.PosX:= NLen
+      else
+        Item.PosX:= Length(Str);
+    end
+    else
+      Item.PosX:= Length(Str);
   end;
 
   Result:= [cResultCaretRight];

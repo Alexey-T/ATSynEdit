@@ -25,6 +25,7 @@ function SGetItem(var S: string; const sep: Char = ','): string;
 function BoolToPlusMinusOne(b: boolean): integer;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SGetIndentChars(const S: atString): integer;
+function SGetNonSpaceLength(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 procedure SReplaceSpecChars(var S: atString);
 procedure TrimStringList(L: TStringList);
@@ -124,6 +125,14 @@ begin
   Result:= 0;
   while (Result<Length(S)) and IsSpaceChar(S[Result+1]) do
     Inc(Result);
+end;
+
+function SGetNonSpaceLength(const S: atString): integer;
+begin
+  Result:= Length(S);
+  while (Result>0) and IsSpaceChar(S[Result]) do Dec(Result);
+  if Result=0 then
+    Result:= Length(S);
 end;
 
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;

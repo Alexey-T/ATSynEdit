@@ -329,6 +329,7 @@ type
     FOptMouseRightClickMovesCaret: boolean;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
+    FOptKeyHomeEndToNonSpace: boolean;
     //
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoDropText;
@@ -598,6 +599,7 @@ type
     property OptKeyNavigateWrapped: boolean read FOptKeyNavigateWrapped write FOptKeyNavigateWrapped;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel;
+    property OptKeyHomeEndToNonSpace: boolean read FOptKeyHomeEndToNonSpace write FOptKeyHomeEndToNonSpace;
   end;
 
 implementation
@@ -1720,6 +1722,7 @@ begin
   FOptShowCurColumn:= false;
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
   FOptKeyLeftRightSwapSel:= true;
+  FOptKeyHomeEndToNonSpace:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;

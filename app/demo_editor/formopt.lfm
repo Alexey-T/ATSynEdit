@@ -222,6 +222,14 @@ object fmOpt: TfmOpt
         Caption = 'left/right swaps edges of sel'
         TabOrder = 16
       end
+      object chkHomeEnd: TCheckBox
+        Left = 160
+        Height = 19
+        Top = 128
+        Width = 170
+        Caption = 'home/end to nonspace char'
+        TabOrder = 17
+      end
     end
     object TabSheet2: TTabSheet
       Caption = 'gutter'

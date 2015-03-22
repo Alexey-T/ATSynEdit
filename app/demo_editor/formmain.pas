@@ -459,6 +459,7 @@ begin
     chkRtMove.Checked:= ed.OptMouseRightClickMovesCaret;
     edPage.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
     chkLeftRt.Checked:= ed.OptKeyLeftRightSwapSel;
+    chkHomeEnd.Checked:= ed.OptKeyHomeEndToNonSpace;
 
     if ShowModal=mrOk then
     begin
@@ -496,6 +497,7 @@ begin
       ed.OptMouseRightClickMovesCaret:= chkRtMove.Checked;
       ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);
       ed.OptKeyLeftRightSwapSel:= chkLeftRt.Checked;
+      ed.OptKeyHomeEndToNonSpace:= chkHomeEnd.Checked;
 
       ed.Gutter.Update;
       ed.Update;
