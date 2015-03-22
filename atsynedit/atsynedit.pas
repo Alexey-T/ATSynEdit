@@ -217,7 +217,6 @@ type
     FCaretShown: boolean;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
-    FCaretMoveByRtClick: boolean;
     FOver: boolean;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
@@ -312,6 +311,7 @@ type
     FOpt3ClickSelectsLine: boolean;
     FOpt2ClickDragSelectsWords: boolean;
     FOptDragDrop: boolean;
+    FOptRightClickMovesCaret: boolean;
     //
     procedure DoDropText;
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
@@ -551,7 +551,6 @@ type
     property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
     property OptCaretTime: integer read GetCaretTime write SetCaretTime;
-    property OptCaretMoveByRtClick: boolean read FCaretMoveByRtClick write FCaretMoveByRtClick;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerHeight: integer read FOptRulerHeight write FOptRulerHeight;
@@ -574,6 +573,7 @@ type
     property Opt3ClickSelectsLine: boolean read FOpt3ClickSelectsLine write FOpt3ClickSelectsLine;
     property Opt2ClickDragSelectsWords: boolean read FOpt2ClickDragSelectsWords write FOpt2ClickDragSelectsWords;
     property OptDragDrop: boolean read FOptDragDrop write FOptDragDrop;
+    property OptRightClickMovesCaret: boolean read FOptRightClickMovesCaret write FOptRightClickMovesCaret;
   end;
 
 implementation
@@ -1218,7 +1218,7 @@ begin
       Delete(StrOut, cMaxCharsForOutput, MaxInt);
 
       CurrPointText:= Point(
-        CurrPoint.X - AScrollHorz.NPos*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
+        CurrPoint.X - Int64(AScrollHorz.NPos)*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
         CurrPoint.Y);
 
       if FOptHiliteSelectionFull then
@@ -1585,7 +1585,6 @@ begin
   FCaretShapeOvr:= cCaretShapeFull;
   FCaretVirtual:= true;
   FCaretSpecPos:= false;
-  FCaretMoveByRtClick:= false;
 
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
@@ -1695,6 +1694,7 @@ begin
   FOptHiliteSelectionFull:= false;
   FOptShowCurLine:= false;
   FOptShowCurColumn:= false;
+  FOptRightClickMovesCaret:= false;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -2043,11 +2043,12 @@ begin
 
     if Shift=[ssRight] then
     begin
-      if FCaretMoveByRtClick then
-      begin
-        DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
-        DoSelect_None;
-      end;
+      if FOptRightClickMovesCaret then
+        if GetCaretSelectionIndex(FMouseDownPnt)<0 then
+        begin
+          DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+          DoSelect_None;
+        end;
     end;
   end;
 

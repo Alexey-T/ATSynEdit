@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkRtMove: TCheckBox;
     chkDnD: TCheckBox;
     chkAutoInd: TCheckBox;
     chkCaretMul: TCheckBox;

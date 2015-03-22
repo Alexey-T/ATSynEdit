@@ -455,6 +455,7 @@ begin
     edRulerH.Value:= ed.OptRulerHeight;
     edRulerFont.Value:= ed.OptRulerFontSize;
     chkDnD.Checked:= ed.OptDragDrop;
+    chkRtMove.Checked:= ed.OptRightClickMovesCaret;
 
     if ShowModal=mrOk then
     begin
@@ -488,6 +489,7 @@ begin
       ed.OptRulerHeight:= edRulerH.Value;
       ed.OptRulerFontSize:= edRulerFont.Value;
       ed.OptDragDrop:= chkDnD.Checked;
+      ed.OptRightClickMovesCaret:= chkRtMove.Checked;
 
       ed.Gutter.Update;
       ed.Update;

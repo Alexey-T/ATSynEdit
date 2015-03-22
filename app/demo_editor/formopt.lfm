@@ -270,6 +270,14 @@ object fmOpt: TfmOpt
         Caption = 'drag-drop of txt'
         TabOrder = 3
       end
+      object chkRtMove: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 88
+        Width = 139
+        Caption = 'right click moves caret'
+        TabOrder = 4
+      end
     end
     object TabSheet4: TTabSheet
       Caption = 'carets'
