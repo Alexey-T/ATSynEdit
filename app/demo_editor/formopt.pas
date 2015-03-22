@@ -15,6 +15,8 @@ type
     ButtonPanel1: TButtonPanel;
     chkHomeEnd: TCheckBox;
     chkLeftRt: TCheckBox;
+    chkNavWrap: TCheckBox;
+    chkOvrSel: TCheckBox;
     chkRtMove: TCheckBox;
     chkDnD: TCheckBox;
     chkAutoInd: TCheckBox;
@@ -32,15 +34,13 @@ type
     chkGutterNum: TCheckBox;
     chkGutterStat: TCheckBox;
     chkLastOnTop: TCheckBox;
-    chkNavWrap: TCheckBox;
     chkOvrPaste: TCheckBox;
-    chkOvrSel: TCheckBox;
     chkRepSpec: TCheckBox;
     chkTabSp: TCheckBox;
     edCaretTime: TSpinEdit;
     edChars: TEdit;
-    edPage: TComboBox;
     edAutoInd: TComboBox;
+    edPage: TComboBox;
     edRulerFont: TSpinEdit;
     edRulerH: TSpinEdit;
     LabChars: TLabel;
@@ -57,6 +57,7 @@ type
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
+    TabSheet5: TTabSheet;
   private
     { private declarations }
   public
