@@ -24,16 +24,17 @@ begin
   Result:= [cResultCaretRight];
 end;
 
-function TATSynEdit.DoCommand_KeyLeft(AAllowSwapEdge: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
 var
   Item: TATCaretItem;
   i: integer;
 begin
   Result:= [cResultCaretLeft];
 
-  if AAllowSwapEdge then
+  if not ASelCommand then
   begin
-    if DoCaretSwapEdge(true) then Exit;
+    if FOptKeyLeftRightSwapSel then
+      if DoCaretSwapEdge(true) then Exit;
     DoSelect_None;
   end;
 
@@ -51,16 +52,17 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCommand_KeyRight(AAllowSwapEdge: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_KeyRight(ASelCommand: boolean): TATCommandResults;
 var
   Item: TATCaretItem;
   i: integer;
 begin
   Result:= [cResultCaretRight];
 
-  if AAllowSwapEdge then
+  if not ASelCommand then
   begin
-    if DoCaretSwapEdge(false) then Exit;
+    if FOptKeyLeftRightSwapSel then
+      if DoCaretSwapEdge(false) then Exit;
     DoSelect_None;
   end;
 
@@ -81,7 +83,7 @@ end;
 function TATSynEdit.DoCommand_KeyUpDown(ADown: boolean; ALines: integer): TATCommandResults;
 begin
   FCaretSpecPos:= true;
-  if FOptNavInWrappedLines then
+  if FOptKeyNavigateWrapped then
     Result:= DoCommand_KeyUpDown_Wrapped(ADown, ALines)
   else
     Result:= DoCommand_KeyUpDown_NextLine(ADown, ALines);

@@ -214,6 +214,14 @@ object fmOpt: TfmOpt
         Caption = 'auto-indent kind'
         ParentColor = False
       end
+      object chkLeftRt: TCheckBox
+        Left = 160
+        Height = 19
+        Top = 108
+        Width = 167
+        Caption = 'left/right swaps edges of sel'
+        TabOrder = 16
+      end
     end
     object TabSheet2: TTabSheet
       Caption = 'gutter'

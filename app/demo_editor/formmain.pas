@@ -447,17 +447,18 @@ begin
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkColorSel.Checked:= ed.OptHiliteSelectionFull;
     chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
-    chkNavWrap.Checked:= ed.OptNavigateInWrappedLines;
+    chkNavWrap.Checked:= ed.OptKeyNavigateWrapped;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
-    chkClick2.Checked:= ed.Opt2ClickSelectsLine;
-    chkClick3.Checked:= ed.Opt3ClickSelectsLine;
-    chkClick2W.Checked:= ed.Opt2ClickDragSelectsWords;
+    chkClick2.Checked:= ed.OptMouse2ClickSelectsLine;
+    chkClick3.Checked:= ed.OptMouse3ClickSelectsLine;
+    chkClick2W.Checked:= ed.OptMouse2ClickDragSelectsWords;
     chkCaretMul.Checked:= ed.OptCaretManyAllowed;
     edRulerH.Value:= ed.OptRulerHeight;
     edRulerFont.Value:= ed.OptRulerFontSize;
-    chkDnD.Checked:= ed.OptDragDrop;
-    chkRtMove.Checked:= ed.OptRightClickMovesCaret;
-    edPage.ItemIndex:= Ord(ed.OptPageUpDownSize);
+    chkDnD.Checked:= ed.OptMouseDragDrop;
+    chkRtMove.Checked:= ed.OptMouseRightClickMovesCaret;
+    edPage.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
+    chkLeftRt.Checked:= ed.OptKeyLeftRightSwapSel;
 
     if ShowModal=mrOk then
     begin
@@ -483,17 +484,18 @@ begin
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptHiliteSelectionFull:= chkColorSel.Checked;
       ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
-      ed.OptNavigateInWrappedLines:= chkNavWrap.Checked;
+      ed.OptKeyNavigateWrapped:= chkNavWrap.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
-      ed.Opt2ClickSelectsLine:= chkClick2.Checked;
-      ed.Opt3ClickSelectsLine:= chkClick3.Checked;
-      ed.Opt2ClickDragSelectsWords:= chkClick2W.Checked;
+      ed.OptMouse2ClickSelectsLine:= chkClick2.Checked;
+      ed.OptMouse3ClickSelectsLine:= chkClick3.Checked;
+      ed.OptMouse2ClickDragSelectsWords:= chkClick2W.Checked;
       ed.OptCaretManyAllowed:= chkCaretMul.Checked;
       ed.OptRulerHeight:= edRulerH.Value;
       ed.OptRulerFontSize:= edRulerFont.Value;
-      ed.OptDragDrop:= chkDnD.Checked;
-      ed.OptRightClickMovesCaret:= chkRtMove.Checked;
-      ed.OptPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);
+      ed.OptMouseDragDrop:= chkDnD.Checked;
+      ed.OptMouseRightClickMovesCaret:= chkRtMove.Checked;
+      ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);
+      ed.OptKeyLeftRightSwapSel:= chkLeftRt.Checked;
 
       ed.Gutter.Update;
       ed.Update;

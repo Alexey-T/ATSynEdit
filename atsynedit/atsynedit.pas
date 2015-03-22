@@ -312,22 +312,23 @@ type
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
+    FOptAutoIndentKind: TATAutoIndentKind;
     FOptTabSpaces: boolean;
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptUseOverOnPaste: boolean;
-    FOptNavInWrappedLines: boolean;
+    FOptKeyNavigateWrapped: boolean;
     FOptCopyLinesIfNoSel: boolean;
     FOptHiliteSelectionFull: boolean;
     FOptShowCurLine: boolean;
     FOptShowCurColumn: boolean;
-    FOpt2ClickSelectsLine: boolean;
-    FOpt3ClickSelectsLine: boolean;
-    FOpt2ClickDragSelectsWords: boolean;
-    FOptDragDrop: boolean;
-    FOptRightClickMovesCaret: boolean;
-    FOptPageUpDownSize: TATPageUpDownSize;
-    FOptAutoIndentKind: TATAutoIndentKind;
+    FOptMouse2ClickSelectsLine: boolean;
+    FOptMouse3ClickSelectsLine: boolean;
+    FOptMouse2ClickDragSelectsWords: boolean;
+    FOptMouseDragDrop: boolean;
+    FOptMouseRightClickMovesCaret: boolean;
+    FOptKeyPageUpDownSize: TATPageUpDownSize;
+    FOptKeyLeftRightSwapSel: boolean;
     //
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoDropText;
@@ -463,8 +464,8 @@ type
     function DoCommand_TextInsertTab: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
     function DoCommand_KeyEnd: TATCommandResults;
-    function DoCommand_KeyLeft(AAllowSwapEdge: boolean): TATCommandResults;
-    function DoCommand_KeyRight(AAllowSwapEdge: boolean): TATCommandResults;
+    function DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
+    function DoCommand_KeyRight(ASelCommand: boolean): TATCommandResults;
     function DoCommand_KeyUpDown(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
@@ -564,7 +565,6 @@ type
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptHiliteSelectionFull: boolean read FOptHiliteSelectionFull write FOptHiliteSelectionFull;
     property OptUseOverOnPaste: boolean read FOptUseOverOnPaste write FOptUseOverOnPaste;
-    property OptNavigateInWrappedLines: boolean read FOptNavInWrappedLines write FOptNavInWrappedLines;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed;
@@ -590,12 +590,14 @@ type
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
     property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
-    property Opt2ClickSelectsLine: boolean read FOpt2ClickSelectsLine write FOpt2ClickSelectsLine;
-    property Opt3ClickSelectsLine: boolean read FOpt3ClickSelectsLine write FOpt3ClickSelectsLine;
-    property Opt2ClickDragSelectsWords: boolean read FOpt2ClickDragSelectsWords write FOpt2ClickDragSelectsWords;
-    property OptDragDrop: boolean read FOptDragDrop write FOptDragDrop;
-    property OptRightClickMovesCaret: boolean read FOptRightClickMovesCaret write FOptRightClickMovesCaret;
-    property OptPageUpDownSize: TATPageUpDownSize read FOptPageUpDownSize write FOptPageUpDownSize;
+    property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine;
+    property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine;
+    property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords;
+    property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop;
+    property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret;
+    property OptKeyNavigateWrapped: boolean read FOptKeyNavigateWrapped write FOptKeyNavigateWrapped;
+    property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
+    property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel;
   end;
 
 implementation
@@ -1699,24 +1701,25 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
-  FOptNavInWrappedLines:= true;
+  FOptKeyNavigateWrapped:= true;
   FOptUseOverOnPaste:= false;
   FOptWordChars:= '';
   FOptAutoIndent:= true;
+  FOptAutoIndentKind:= cIndentAsIs;
   FOptTabSpaces:= false;
   FOptLastLineOnTop:= false;
   FOptOverwriteSel:= true;
-  FOptDragDrop:= true;
-  FOpt2ClickSelectsLine:= false;
-  FOpt3ClickSelectsLine:= true;
-  FOpt2ClickDragSelectsWords:= true;
+  FOptMouseDragDrop:= true;
+  FOptMouse2ClickSelectsLine:= false;
+  FOptMouse3ClickSelectsLine:= true;
+  FOptMouse2ClickDragSelectsWords:= true;
+  FOptMouseRightClickMovesCaret:= false;
   FOptCopyLinesIfNoSel:= true;
   FOptHiliteSelectionFull:= false;
   FOptShowCurLine:= false;
   FOptShowCurColumn:= false;
-  FOptRightClickMovesCaret:= false;
-  FOptPageUpDownSize:= cPageSizeFullMinus1;
-  FOptAutoIndentKind:= cIndentAsIs;
+  FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
+  FOptKeyLeftRightSwapSel:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -1922,7 +1925,7 @@ end;
 
 function TATSynEdit.GetPageLines: integer;
 begin
-  case FOptPageUpDownSize of
+  case FOptKeyPageUpDownSize of
     cPageSizeFull: Result:= GetVisibleLines;
     cPageSizeFullMinus1: Result:= GetVisibleLines-1;
     cPageSizeHalf: Result:= GetVisibleLines div 2;
@@ -2048,7 +2051,7 @@ begin
     if Shift=[ssLeft] then
     begin
       DoCaretSingleAsIs;
-      if FOptDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
+      if FOptMouseDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
       begin
         FMouseDragging:= true;
         Cursor:= crDrag;
@@ -2078,7 +2081,7 @@ begin
 
     if Shift=[ssRight] then
     begin
-      if FOptRightClickMovesCaret then
+      if FOptMouseRightClickMovesCaret then
         if GetCaretSelectionIndex(FMouseDownPnt)<0 then
         begin
           DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
@@ -2195,7 +2198,7 @@ begin
           if [ssCtrl, ssShift, ssAlt]*Shift=[] then
           begin
             DoCaretSingleAsIs;
-            if FMouseDownDouble and FOpt2ClickDragSelectsWords then
+            if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
               DoSelect_WordRange(0, FMouseDownPnt, P)
             else
               DoSelect_CharRange(0, P);
@@ -2220,7 +2223,7 @@ procedure TATSynEdit.DblClick;
 begin
   inherited;
 
-  if FOpt2ClickSelectsLine then
+  if FOptMouse2ClickSelectsLine then
     DoSelect_Line_ByClick
   else
   begin
@@ -2233,7 +2236,7 @@ procedure TATSynEdit.TripleClick;
 begin
   inherited;
 
-  if FOpt3ClickSelectsLine then
+  if FOptMouse3ClickSelectsLine then
     DoSelect_Line_ByClick;
 end;
 

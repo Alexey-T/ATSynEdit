@@ -124,10 +124,10 @@ begin
 
   case ACmd of
     //most used commands
-    cCommand_KeyLeft:             Res:= DoCommand_KeyLeft(true);
-    cCommand_KeyLeft_Sel:         Res:= DoCommand_KeyLeft(false);
-    cCommand_KeyRight:            Res:= DoCommand_KeyRight(true);
-    cCommand_KeyRight_Sel:        Res:= DoCommand_KeyRight(false);
+    cCommand_KeyLeft:             Res:= DoCommand_KeyLeft(false);
+    cCommand_KeyLeft_Sel:         Res:= DoCommand_KeyLeft(true);
+    cCommand_KeyRight:            Res:= DoCommand_KeyRight(false);
+    cCommand_KeyRight_Sel:        Res:= DoCommand_KeyRight(true);
     cCommand_KeyUp,
     cCommand_KeyUp_Sel:           Res:= DoCommand_KeyUpDown(false, 1);
     cCommand_KeyDown,
