@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
-  Controls, ExtCtrls,
+  Controls, ExtCtrls, Menus,
   LMessages, LCLType,
   {$ifdef windows}
   Messages,
@@ -217,6 +217,7 @@ type
     FCaretShown: boolean;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
+    FMenu: TPopupMenu;
     FOver: boolean;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
@@ -321,6 +322,7 @@ type
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
     procedure MenuClick(Sender: TObject);
+    procedure MenuPopup(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     procedure DoCaretSingle(AX, AY: integer);
@@ -584,7 +586,6 @@ uses
   Forms,
   Dialogs,
   Types,
-  Menus,
   Math,
   Clipbrd,
   ATSynEdit_Commands,
@@ -1589,10 +1590,6 @@ begin
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
-  FOptNavInWrappedLines:= true;
-  FOver:= false;
-  FOptUseOverOnPaste:= false;
-
   FColorTextBG:= cInitColorTextBG;
   FColorTextFont:= cInitColorTextFont;
   FColorTextSel:= clHighlightText;
@@ -1638,6 +1635,7 @@ begin
   FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
 
+  FOver:= false;
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
   FMarginList:= TList.Create;
@@ -1665,13 +1663,13 @@ begin
   FGutter[FGutterBandEmpty].Size:= cSizeGutterBandEmpty;
   FGutter.Update;
 
+  FOptNumbersStyle:= cInitNumbersStyle;
   FOptRulerHeight:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
   FOptRulerFontSize:= 8;
   FOptRulerVisible:= true;
 
-  FOptNumbersStyle:= cInitNumbersStyle;
   FMinimapWidth:= cInitMinimapWidth;
   FMinimapFontSize:= cInitMinimapFontSize;
   FMinimapVisible:= cInitMinimapVisible;
@@ -1681,6 +1679,8 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
+  FOptNavInWrappedLines:= true;
+  FOptUseOverOnPaste:= false;
   FOptWordChars:= '';
   FOptAutoIndent:= true;
   FOptTabSpaces:= false;
@@ -1705,6 +1705,8 @@ begin
   DoClearScrollInfo(FScrollVert);
 
   FKeyMapping:= TATKeyMapping.Create;
+  FMenu:= nil;
+
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitDefaultPopupMenu;
 end;
@@ -2456,25 +2458,36 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoInitDefaultPopupMenu;
+procedure TATSynEdit.MenuPopup(Sender: TObject);
 var
-  M: TPopupMenu;
+  i: integer;
+begin
+  for i:= 0 to FMenu.Items.Count-1 do
+    with FMenu.Items[i] do
+      if (Tag=cCommand_ClipboardCut) or
+        (Tag=cCommand_ClipboardPaste) or
+        (Tag=cCommand_TextDeleteSelection) then
+        Enabled:= not ModeReadOnly;
+end;
+
+procedure TATSynEdit.DoInitDefaultPopupMenu;
   //
   procedure Add(const SName: string; Cmd: integer);
   var
     MI: TMenuItem;
   begin
-    MI:= TMenuItem.Create(M);
+    MI:= TMenuItem.Create(FMenu);
     MI.Caption:= SName;
     MI.ShortCut:= FKeyMapping.GetShortcutFromCommand(Cmd);
     MI.Tag:= Cmd;
     MI.OnClick:= MenuClick;
-    M.Items.Add(MI);
+    FMenu.Items.Add(MI);
   end;
   //
 begin
-  M:= TPopupMenu.Create(Self);
-  PopupMenu:= M;
+  FMenu:= TPopupMenu.Create(Self);
+  FMenu.OnPopup:= MenuPopup;
+  PopupMenu:= FMenu;
 
   Add('Cut', cCommand_ClipboardCut);
   Add('Copy', cCommand_ClipboardCopy);
@@ -2483,6 +2496,7 @@ begin
   Add('-', 0);
   Add('Select all', cCommand_SelectAll);
 end;
+
 
 //drop selection of 1st caret into mouse-pos
 procedure TATSynEdit.DoDropText;
