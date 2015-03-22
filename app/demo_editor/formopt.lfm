@@ -191,6 +191,29 @@ object fmOpt: TfmOpt
         Caption = 'page up/down size'
         ParentColor = False
       end
+      object edAutoInd: TComboBox
+        Left = 176
+        Height = 23
+        Top = 132
+        Width = 106
+        ItemHeight = 15
+        Items.Strings = (
+          'as is'
+          'spaces'
+          'tabs+spaces'
+          'tabs only'
+        )
+        Style = csDropDownList
+        TabOrder = 15
+      end
+      object Label4: TLabel
+        Left = 288
+        Height = 15
+        Top = 136
+        Width = 87
+        Caption = 'auto indent kind'
+        ParentColor = False
+      end
     end
     object TabSheet2: TTabSheet
       Caption = 'gutter'

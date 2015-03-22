@@ -440,6 +440,7 @@ begin
 
     edChars.Text:= ed.OptWordChars;
     chkAutoInd.Checked:= ed.OptAutoIndent;
+    edAutoInd.ItemIndex:= Ord(ed.OptAutoIndentKind);
     chkTabSp.Checked:= ed.OptTabSpaces;
     chkOvrSel.Checked:= ed.OptOverwriteSel;
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
@@ -475,6 +476,7 @@ begin
 
       ed.OptWordChars:= edChars.Text;
       ed.OptAutoIndent:= chkAutoInd.Checked;
+      ed.OptAutoIndentKind:= TATAutoIndentKind(edAutoInd.ItemIndex);
       ed.OptTabSpaces:= chkTabSp.Checked;
       ed.OptOverwriteSel:= chkOvrSel.Checked;
       ed.OptUseOverOnPaste:= chkOvrPaste.Checked;

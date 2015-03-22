@@ -38,12 +38,14 @@ type
     edCaretTime: TSpinEdit;
     edChars: TEdit;
     edPage: TComboBox;
+    edAutoInd: TComboBox;
     edRulerFont: TSpinEdit;
     edRulerH: TSpinEdit;
     LabChars: TLabel;
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
+    Label4: TLabel;
     Label8: TLabel;
     PageControl1: TPageControl;
     edSizeBm: TSpinEdit;

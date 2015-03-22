@@ -230,10 +230,7 @@ begin
 
     Str:= '';
     if FOptAutoIndent then
-    begin
-      Str:= Strings.Lines[Item.PosY];
-      Str:= Copy(Str, 1, Min(Item.PosX, SGetIndentChars(Str)));
-    end;
+      Str:= GetAutoIndentString(Item.PosX, Item.PosY);
 
     Strings.TextInsertEol(Item.PosX, Item.PosY, AKeepCaret, Str, Shift, PosAfter);
     DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);

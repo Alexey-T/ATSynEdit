@@ -28,6 +28,13 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
+  TATAutoIndentKind = (
+    cIndentAsIs,
+    cIndentSpaces,
+    cIndentTabsSpaces,
+    cIndentTabsOnly
+    );
+
   TATPageUpDownSize = (
     cPageSizeFull,
     cPageSizeFullMinus1,
@@ -320,12 +327,14 @@ type
     FOptDragDrop: boolean;
     FOptRightClickMovesCaret: boolean;
     FOptPageUpDownSize: TATPageUpDownSize;
+    FOptAutoIndentKind: TATAutoIndentKind;
     //
     procedure DoDropText;
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_Word_ByClick;
     procedure DoSelect_Line_ByClick;
+    function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
     procedure MenuClick(Sender: TObject);
@@ -548,6 +557,7 @@ type
     property OptTabSize: integer read FTabSize write SetTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
+    property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel;
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
@@ -1705,6 +1715,7 @@ begin
   FOptShowCurColumn:= false;
   FOptRightClickMovesCaret:= false;
   FOptPageUpDownSize:= cPageSizeFullMinus1;
+  FOptAutoIndentKind:= cIndentAsIs;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -2565,6 +2576,32 @@ begin
   end;
 
   Update(true);
+end;
+
+function TATSynEdit.GetAutoIndentString(APosX, APosY: integer): atString;
+var
+  Str: atString;
+  NChars, NSpaces: integer;
+begin
+  Str:= Strings.Lines[APosY];
+  NChars:= SGetIndentChars(Str); //count of chars in indent
+  NChars:= Min(APosX, NChars); //limit indent by x-pos
+
+  Str:= Copy(Str, 1, NChars);
+  NSpaces:= Length(SExpandTabulations(Str, FTabSize));
+
+  case FOptAutoIndentKind of
+    cIndentAsIs:
+      Result:= Str;
+    cIndentSpaces:
+      Result:= StringOfChar(' ', NSpaces);
+    cIndentTabsOnly:
+      Result:= StringOfChar(#9, NSpaces div FTabSize);
+    cIndentTabsSpaces:
+      Result:= StringOfChar(#9, NSpaces div FTabSize) + StringOfChar(' ', NSpaces mod FTabSize);
+    else
+      raise Exception.Create('unknown indent-kind');
+  end;
 end;
 
 {$I atsynedit_carets.inc}
