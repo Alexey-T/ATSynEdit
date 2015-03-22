@@ -418,12 +418,17 @@ end;
 procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds);
 var
   Item: TATStringItem;
+  AEndInside: TATLineEnds;
 begin
   if FReadOnly then Exit;
 
+  AEndInside:= AEnd;
+  if AEndInside=cEndNone then
+    AEndInside:= FEndings;
+
   if IsLastLineFake then
   begin
-    Item:= TATStringItem.Create(AString, FEndings{not AEnd});
+    Item:= TATStringItem.Create(AString, AEndInside);
     Item.ItemState:= cLineStateAdded;
     FList.Insert(Count-1, Item);
   end
