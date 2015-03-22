@@ -155,7 +155,7 @@ object fmMain: TfmMain
     object edNum: TComboBox
       Left = 152
       Height = 23
-      Top = 304
+      Top = 308
       Width = 112
       ItemHeight = 15
       Items.Strings = (
@@ -301,7 +301,7 @@ object fmMain: TfmMain
     object Label3: TLabel
       Left = 152
       Height = 15
-      Top = 284
+      Top = 292
       Width = 47
       Caption = 'numbers'
       ParentColor = False

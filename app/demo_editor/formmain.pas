@@ -434,6 +434,9 @@ begin
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
     chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
     chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
+    edSizeBm.Value:= ed.Gutter[ed.GutterBandBm].Size;
+    edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
+    edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
 
     edChars.Text:= ed.OptWordChars;
     chkAutoInd.Checked:= ed.OptAutoIndent;
@@ -463,6 +466,9 @@ begin
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
       ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
       ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
+      ed.Gutter[ed.GutterBandBm].Size:= edSizeBm.Value;
+      ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
+      ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
 
       ed.OptWordChars:= edChars.Text;
       ed.OptAutoIndent:= chkAutoInd.Checked;

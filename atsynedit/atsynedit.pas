@@ -153,7 +153,7 @@ const
   cInitColorStateSaved = clNavy;
 
   cGutterBands = 5;
-  cSizeGutterBandBm = 15;
+  cSizeGutterBandBm = 16;
   cSizeGutterBandNum = 10;
   cSizeGutterBandFold = 0;
   cSizeGutterBandState = 3;
