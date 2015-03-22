@@ -326,7 +326,7 @@ begin
     Item:= Carets[i];
     Item.GetRange(X1, Y1, X2, Y2, bSel);
     if not bSel then Continue;
-    if IsPosSorted(X1, Y1, P.X, P.Y, true) and IsPosSorted(P.X, P.Y, X2, Y2, false) then
+    if IsPosInRange(P.X, P.Y, X1, Y1, X2, Y2)=cRelateInside then
     begin
       Result:= i;
       Break

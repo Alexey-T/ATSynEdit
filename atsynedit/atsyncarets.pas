@@ -367,55 +367,25 @@ function TATCarets.IsJoinNeeded(N1, N2: integer;
 var
   Item1, Item2: TATCaretItem;
   XMin1, XMin2, YMin1, YMin2, XMax1, XMax2, YMax1, YMax2: integer;
-  bSorted: boolean;
+  bSel1, bSel2: boolean;
 begin
   Result:= false;
   if not IsIndexValid(N1) then Exit;
   if not IsIndexValid(N2) then Exit;
+
   Item1:= Items[N1];
   Item2:= Items[N2];
-
-  if Item1.EndY<0 then Exit;
-  if Item2.EndY<0 then Exit;
-
-  bSorted:= IsPosSorted(Item1.PosX, Item1.PosY, Item1.EndX, Item1.EndY, true);
-  if bSorted then
-  begin
-    XMin1:= Item1.PosX;
-    YMin1:= Item1.PosY;
-    XMax1:= Item1.EndX;
-    YMax1:= Item1.EndY;
-  end
-  else
-  begin
-    XMin1:= Item1.EndX;
-    YMin1:= Item1.EndY;
-    XMax1:= Item1.PosX;
-    YMax1:= Item1.PosY;
-  end;
-
-  bSorted:= IsPosSorted(Item2.PosX, Item2.PosY, Item2.EndX, Item2.EndY, true);
-  if bSorted then
-  begin
-    XMin2:= Item2.PosX;
-    YMin2:= Item2.PosY;
-    XMax2:= Item2.EndX;
-    YMax2:= Item2.EndY;
-  end
-  else
-  begin
-    XMin2:= Item2.EndX;
-    YMin2:= Item2.EndY;
-    XMax2:= Item2.PosX;
-    YMax2:= Item2.PosY;
-  end;
+  Item1.GetRange(XMin1, YMin1, XMax1, YMax1, bSel1);
+  Item2.GetRange(XMin2, YMin2, XMax2, YMax2, bSel2);
+  if not bSel1 then Exit;
+  if not bSel2 then Exit;
 
   OutPosX:= IfThen(XMin1<XMin2, XMin1, XMin2);
   OutPosY:= IfThen(XMin1<XMin2, YMin1, YMin2);
   OutEndX:= IfThen(XMin1<XMin2, XMax2, XMax1);
   OutEndY:= IfThen(XMin1<XMin2, YMax2, YMax1);
 
-  if not bSorted then
+  if not IsPosSorted(Item1.PosX, Item1.PosY, Item1.EndX, Item1.EndY, false) then
   begin
     SwapInt(OutPosX, OutEndX);
     SwapInt(OutPosY, OutEndY);
@@ -423,8 +393,7 @@ begin
 
   if IsPosSorted(XMax1, YMax1, XMin2, YMin2, false) then Exit; //ranges not overlap [x1, y1]...[x2, y2]
   if IsPosSorted(XMax2, YMax2, XMin1, YMin1, false) then Exit; //ranges not overlap [x2, y2]...[x1, y1]
-
-  Result:= true;
+  Result:= true; //ranges overlap
 end;
 
 function TATCarets.DebugText: string;

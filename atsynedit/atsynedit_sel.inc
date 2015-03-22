@@ -2,24 +2,21 @@
 
 function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
 var
-  i: integer;
   Item: TATCaretItem;
-  bEnded, bMatch: boolean;
+  i, X1, Y1, X2, Y2: integer;
+  bSel, bEnded, bMatch: boolean;
 begin
   Result:= false;
   for i:= 0 to Carets.Count-1 do
   begin
     Item:= Carets[i];
-    if (Item.EndX<0) or (Item.EndY<0) then Continue;
-    if (Item.PosX=Item.EndX) and (Item.PosY=Item.EndY) then Continue;
+    Item.GetRange(X1, Y1, X2, Y2, bSel);
+    if not bSel then Continue;
 
-    bEnded:= Min(Item.PosY, Item.EndY)>AY;
+    bEnded:= Y1>AY;
     if bEnded then Exit;
 
-    bMatch:=
-      (IsPosSorted(Item.PosX, Item.PosY, AX, AY, true) and IsPosSorted(AX, AY, Item.EndX, Item.EndY, false)) or
-      (IsPosSorted(Item.EndX, Item.EndY, AX, AY, true) and IsPosSorted(AX, AY, Item.PosX, Item.PosY, false));
-
+    bMatch:= IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside;
     if bMatch then
       begin Result:= true; Break end;
   end;
