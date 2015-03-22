@@ -454,6 +454,7 @@ begin
     chkCaretMul.Checked:= ed.OptCaretManyAllowed;
     edRulerH.Value:= ed.OptRulerHeight;
     edRulerFont.Value:= ed.OptRulerFontSize;
+    chkDnD.Checked:= ed.OptDragDrop;
 
     if ShowModal=mrOk then
     begin
@@ -486,6 +487,7 @@ begin
       ed.OptCaretManyAllowed:= chkCaretMul.Checked;
       ed.OptRulerHeight:= edRulerH.Value;
       ed.OptRulerFontSize:= edRulerFont.Value;
+      ed.OptDragDrop:= chkDnD.Checked;
 
       ed.Gutter.Update;
       ed.Update;

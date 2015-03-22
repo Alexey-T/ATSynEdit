@@ -222,6 +222,7 @@ type
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
     FMouseDownDouble: boolean;
+    FMouseDragging: boolean;
     FMouseAutoScroll: TATAutoScroll;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
@@ -310,12 +311,15 @@ type
     FOpt2ClickSelectsLine: boolean;
     FOpt3ClickSelectsLine: boolean;
     FOpt2ClickDragSelectsWords: boolean;
+    FOptDragDrop: boolean;
     //
+    procedure DoDropText;
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_Word_ByClick;
     procedure DoSelect_Line_ByClick;
     function GetCaretManyAllowed: boolean;
+    function GetCaretSelectionIndex(P: TPoint): integer;
     procedure MenuClick(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
@@ -569,6 +573,7 @@ type
     property Opt2ClickSelectsLine: boolean read FOpt2ClickSelectsLine write FOpt2ClickSelectsLine;
     property Opt3ClickSelectsLine: boolean read FOpt3ClickSelectsLine write FOpt3ClickSelectsLine;
     property Opt2ClickDragSelectsWords: boolean read FOpt2ClickDragSelectsWords write FOpt2ClickDragSelectsWords;
+    property OptDragDrop: boolean read FOptDragDrop write FOptDragDrop;
   end;
 
 implementation
@@ -1682,6 +1687,7 @@ begin
   FOptTabSpaces:= false;
   FOptLastLineOnTop:= false;
   FOptOverwriteSel:= true;
+  FOptDragDrop:= true;
   FOpt2ClickSelectsLine:= false;
   FOpt3ClickSelectsLine:= true;
   FOpt2ClickDragSelectsWords:= true;
@@ -1693,6 +1699,7 @@ begin
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
+  FMouseDragging:= false;
 
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
@@ -1993,10 +2000,11 @@ var
 begin
   inherited;
   SetFocus;
-  FCaretSpecPos:= false;
 
   PCaret:= ClientPosToCaretPos(Point(X, Y));
+  FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
+  FMouseDragging:= false;
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
@@ -2004,8 +2012,17 @@ begin
 
     if Shift=[ssLeft] then
     begin
-      DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
-      DoSelect_None;
+      DoCaretSingleAsIs;
+      if FOptDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) then
+      begin
+        FMouseDragging:= true;
+        Cursor:= crDrag;
+      end
+      else
+      begin
+        DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+        DoSelect_None;
+      end;
     end;
 
     if Shift=[ssLeft, ssShift] then
@@ -2057,9 +2074,16 @@ procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Int
 begin
   inherited;
 
+  if FMouseDragging then
+  begin
+    DoDropText;
+    Cursor:= crDefault;
+  end;
+
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
+  FMouseDragging:= false;
 
   FTimerScroll.Enabled:= false;
 end;
@@ -2086,7 +2110,12 @@ begin
 
   //update cursor
   if PtInRect(FRectMain, P) then
-    Cursor:= crIBeam
+  begin
+    if FMouseDragging then
+      Cursor:= crDrag
+    else
+      Cursor:= crIBeam;
+  end
   else
   if PtInRect(RectBm, P) then
     Cursor:= crHandPoint
@@ -2117,6 +2146,7 @@ begin
     end;
 
   //mouse dragged on text
+  if not FMouseDragging then
   if PtInRect(FRectMain, P) then
   begin
     if ssLeft in Shift then
@@ -2453,6 +2483,48 @@ begin
   Add('Select all', cCommand_SelectAll);
 end;
 
+//drop selection of 1st caret into mouse-pos
+procedure TATSynEdit.DoDropText;
+var
+  P, PosAfter, Shift: TPoint;
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+  Str: atString;
+begin
+  if Carets.Count<>1 then Exit; //allow only 1 caret
+  Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
+  if not bSel then Exit;
+
+  //calc insert-pos
+  P:= ScreenToClient(Mouse.CursorPos);
+  P:= ClientPosToCaretPos(P);
+  if P.Y<0 then
+    begin SysUtils.Beep; Exit end;
+
+  //can't drop into selection
+  if IsPosSorted(X1, Y1, P.X, P.Y, true) and IsPosSorted(P.X, P.Y, X2, Y2, false) then
+    begin SysUtils.Beep; Exit end;
+
+  Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
+  if Str='' then
+    begin SysUtils.Beep; Exit end;
+
+  //insert-pos before selection?
+  if IsPosSorted(P.X, P.Y, X1, Y1, true) then
+  begin
+    Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+    Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
+  end
+  else
+  begin
+    Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
+    Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+  end;
+
+  DoCaretSingle(P.X, P.Y);
+  DoSelect_None;
+  Update(true);
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

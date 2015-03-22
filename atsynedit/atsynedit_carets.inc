@@ -307,8 +307,30 @@ begin
   while Carets.Count>1 do
     Carets.Delete(Carets.Count-1);
 
-  Carets[0].PosX:= AX;
-  Carets[0].PosY:= AY;
+  with Carets[0] do
+  begin
+    PosX:= AX;
+    PosY:= AY;
+  end;
 end;
 
+function TATSynEdit.GetCaretSelectionIndex(P: TPoint): integer;
+var
+  Item: TATCaretItem;
+  X1, Y1, X2, Y2, i: integer;
+  bSel: boolean;
+begin
+  Result:= -1;
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Item:= Carets[i];
+    Item.GetRange(X1, Y1, X2, Y2, bSel);
+    if not bSel then Continue;
+    if IsPosSorted(X1, Y1, P.X, P.Y, true) and IsPosSorted(P.X, P.Y, X2, Y2, false) then
+    begin
+      Result:= i;
+      Break
+    end;
+  end;
+end;
 
