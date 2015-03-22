@@ -2511,20 +2511,23 @@ begin
   if Str='' then
     begin SysUtils.Beep; Exit end;
 
-  //insert-pos before selection?
+  DoSelect_None;
+
+  //insert before selection?
   if Relation=cRelateBefore then
   begin
     Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
     Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
+    DoCaretSingle(P.X, P.Y);
   end
   else
   begin
     Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
     Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+    DoCaretSingle(P.X, P.Y);
+    DoCaretsShift(X1, Y1, Shift.X, Shift.Y);
   end;
 
-  DoCaretSingle(P.X, P.Y);
-  DoSelect_None;
   Update(true);
 end;
 

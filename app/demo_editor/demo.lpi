@@ -108,7 +108,6 @@
       <Unit16>
         <Filename Value="..\..\atsynedit\atsyncarets.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynCarets"/>
       </Unit16>
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
