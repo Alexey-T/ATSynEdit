@@ -456,6 +456,7 @@ begin
     edRulerFont.Value:= ed.OptRulerFontSize;
     chkDnD.Checked:= ed.OptDragDrop;
     chkRtMove.Checked:= ed.OptRightClickMovesCaret;
+    edPage.ItemIndex:= Ord(ed.OptPageUpDownSize);
 
     if ShowModal=mrOk then
     begin
@@ -490,6 +491,7 @@ begin
       ed.OptRulerFontSize:= edRulerFont.Value;
       ed.OptDragDrop:= chkDnD.Checked;
       ed.OptRightClickMovesCaret:= chkRtMove.Checked;
+      ed.OptPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);
 
       ed.Gutter.Update;
       ed.Update;

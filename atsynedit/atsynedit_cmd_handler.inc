@@ -137,9 +137,9 @@ begin
     cCommand_KeyEnd,
     cCommand_KeyEnd_Sel:          Res:= DoCommand_KeyEnd;
     cCommand_KeyPageUp,
-    cCommand_KeyPageUp_Sel:       Res:= DoCommand_KeyUpDown(false, GetVisibleLines-1);
+    cCommand_KeyPageUp_Sel:       Res:= DoCommand_KeyUpDown(false, GetPageLines);
     cCommand_KeyPageDown,
-    cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetVisibleLines-1);
+    cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetPageLines);
 
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver, false);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);

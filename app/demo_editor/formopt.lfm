@@ -31,8 +31,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 592
-    ActivePage = TabSheet3
-    TabIndex = 2
+    ActivePage = TabSheet1
+    TabIndex = 0
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -168,6 +168,28 @@ object fmOpt: TfmOpt
         Top = 187
         Width = 106
         TabOrder = 13
+      end
+      object edPage: TComboBox
+        Left = 176
+        Height = 23
+        Top = 160
+        Width = 106
+        ItemHeight = 15
+        Items.Strings = (
+          'full height'
+          'full height -1'
+          'half height'
+        )
+        Style = csDropDownList
+        TabOrder = 14
+      end
+      object Label3: TLabel
+        Left = 288
+        Height = 15
+        Top = 164
+        Width = 100
+        Caption = 'page up/down size'
+        ParentColor = False
       end
     end
     object TabSheet2: TTabSheet

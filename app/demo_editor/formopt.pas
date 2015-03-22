@@ -37,11 +37,13 @@ type
     chkTabSp: TCheckBox;
     edCaretTime: TSpinEdit;
     edChars: TEdit;
+    edPage: TComboBox;
     edRulerFont: TSpinEdit;
     edRulerH: TSpinEdit;
     LabChars: TLabel;
     Label1: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
     Label8: TLabel;
     PageControl1: TPageControl;
     edSizeBm: TSpinEdit;

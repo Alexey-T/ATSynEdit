@@ -28,6 +28,12 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
+  TATPageUpDownSize = (
+    cPageSizeFull,
+    cPageSizeFullMinus1,
+    cPageSizeHalf
+    );
+
   TATAutoScroll = (
     cScrollNone,
     cScrollUp,
@@ -313,6 +319,7 @@ type
     FOpt2ClickDragSelectsWords: boolean;
     FOptDragDrop: boolean;
     FOptRightClickMovesCaret: boolean;
+    FOptPageUpDownSize: TATPageUpDownSize;
     //
     procedure DoDropText;
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
@@ -402,6 +409,7 @@ type
     function GetRectRuler: TRect;
     function GetTextOffset: TPoint;
     function GetGutterNumbersWidth: integer;
+    function GetPageLines: integer;
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
     function GetVisibleLinesMinimap: integer;
@@ -576,6 +584,7 @@ type
     property Opt2ClickDragSelectsWords: boolean read FOpt2ClickDragSelectsWords write FOpt2ClickDragSelectsWords;
     property OptDragDrop: boolean read FOptDragDrop write FOptDragDrop;
     property OptRightClickMovesCaret: boolean read FOptRightClickMovesCaret write FOptRightClickMovesCaret;
+    property OptPageUpDownSize: TATPageUpDownSize read FOptPageUpDownSize write FOptPageUpDownSize;
   end;
 
 implementation
@@ -1695,6 +1704,7 @@ begin
   FOptShowCurLine:= false;
   FOptShowCurColumn:= false;
   FOptRightClickMovesCaret:= false;
+  FOptPageUpDownSize:= cPageSizeFullMinus1;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -1898,6 +1908,17 @@ begin
     cSizeGutterNumOffsetRight;
 end;
 
+function TATSynEdit.GetPageLines: integer;
+begin
+  case FOptPageUpDownSize of
+    cPageSizeFull: Result:= GetVisibleLines;
+    cPageSizeFullMinus1: Result:= GetVisibleLines-1;
+    cPageSizeHalf: Result:= GetVisibleLines div 2;
+    else
+      raise Exception.Create('Unknown pagesize');
+  end;
+end;
+
 procedure TATSynEdit.DoPaint(AFlags: TATSynPaintFlags);
 var
   ARect: TRect;
@@ -2015,7 +2036,7 @@ begin
     if Shift=[ssLeft] then
     begin
       DoCaretSingleAsIs;
-      if FOptDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) then
+      if FOptDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
       begin
         FMouseDragging:= true;
         Cursor:= crDrag;
