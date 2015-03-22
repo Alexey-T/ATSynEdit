@@ -51,7 +51,7 @@ var
   procedure Home;
   var gr: TCharGr;
   begin
-    if not ((n>0) and (n<=Length(s))) then Exit;
+    if not ((n>0) and (n<Length(s))) then Exit;
     gr:= SCharGr(s[n+1], AWordChars);
     while (n>0) and (SCharGr(s[n], AWordChars)=gr) do
       Dec(n);

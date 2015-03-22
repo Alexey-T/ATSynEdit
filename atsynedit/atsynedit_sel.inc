@@ -44,6 +44,36 @@ begin
   end;
 end;
 
+procedure TATSynEdit.DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
+begin
+  if not Carets.IsIndexValid(ACaretIndex) then Exit;
+  Carets[ACaretIndex].SelectToPoint(Pnt.X, Pnt.Y);
+end;
+
+procedure TATSynEdit.DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
+begin
+  if not Carets.IsIndexValid(ACaretIndex) then Exit;
+  if not Strings.IsIndexValid(P1.Y) then Exit;
+  if not Strings.IsIndexValid(P2.Y) then Exit;
+
+  if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
+  begin
+    SwapInt(P1.X, P2.X);
+    SwapInt(P1.Y, P2.Y);
+  end;
+
+  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, false, false, FOptWordChars);
+  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, true, false, FOptWordChars);
+
+  with Carets[ACaretIndex] do
+  begin
+    PosX:= P2.X;
+    PosY:= P2.Y;
+    EndX:= P1.X;
+    EndY:= P1.Y;
+  end;
+end;
+
 procedure TATSynEdit.DoSelect_Line(P: TPoint);
 var
   PLast: TPoint;

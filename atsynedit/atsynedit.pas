@@ -221,6 +221,7 @@ type
     FOver: boolean;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
+    FMouseDownDouble: boolean;
     FMouseAutoScroll: TATAutoScroll;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
@@ -308,9 +309,12 @@ type
     FOptShowCurColumn: boolean;
     FOpt2ClickSelectsLine: boolean;
     FOpt3ClickSelectsLine: boolean;
+    FOpt2ClickDragSelectsWords: boolean;
     //
-    procedure DoSelect_Line_ByClick;
+    procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
+    procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_Word_ByClick;
+    procedure DoSelect_Line_ByClick;
     function GetCaretManyAllowed: boolean;
     procedure MenuClick(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
@@ -564,6 +568,7 @@ type
     property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
     property Opt2ClickSelectsLine: boolean read FOpt2ClickSelectsLine write FOpt2ClickSelectsLine;
     property Opt3ClickSelectsLine: boolean read FOpt3ClickSelectsLine write FOpt3ClickSelectsLine;
+    property Opt2ClickDragSelectsWords: boolean read FOpt2ClickDragSelectsWords write FOpt2ClickDragSelectsWords;
   end;
 
 implementation
@@ -1679,6 +1684,7 @@ begin
   FOptOverwriteSel:= true;
   FOpt2ClickSelectsLine:= false;
   FOpt3ClickSelectsLine:= true;
+  FOpt2ClickDragSelectsWords:= true;
   FOptCopyLinesIfNoSel:= true;
   FOptHiliteSelectionFull:= false;
   FOptShowCurLine:= false;
@@ -1686,6 +1692,7 @@ begin
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
+  FMouseDownDouble:= false;
 
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
@@ -2052,6 +2059,7 @@ begin
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
+  FMouseDownDouble:= false;
 
   FTimerScroll.Enabled:= false;
 end;
@@ -2121,17 +2129,17 @@ begin
           if [ssCtrl, ssShift, ssAlt]*Shift=[] then
           begin
             DoCaretSingleAsIs;
-            Carets[0].SelectToPoint(P.X, P.Y);
+            if FMouseDownDouble and FOpt2ClickDragSelectsWords then
+              DoSelect_WordRange(0, FMouseDownPnt, P)
+            else
+              DoSelect_CharRange(0, P);
           end;
 
           //drag with Ctrl pressed: add selection
           if [ssCtrl, ssShift, ssAlt]*Shift=[ssCtrl] then
           begin
             nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-            if nIndex>=0 then
-              Carets[nIndex].SelectToPoint(P.X, P.Y);
-            //else
-            //  ShowMessage(format('mouse %d:%d'#13'carets'#13+carets.DebugText, [FMouseDownPnt.Y, FMouseDownPnt.X]));
+            DoSelect_CharRange(nIndex, P);
           end;
 
           DoCaretsSort;
@@ -2149,7 +2157,10 @@ begin
   if FOpt2ClickSelectsLine then
     DoSelect_Line_ByClick
   else
+  begin
+    FMouseDownDouble:= true;
     DoSelect_Word_ByClick;
+  end;
 end;
 
 procedure TATSynEdit.TripleClick;

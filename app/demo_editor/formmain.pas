@@ -447,6 +447,7 @@ begin
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
     chkClick2.Checked:= ed.Opt2ClickSelectsLine;
     chkClick3.Checked:= ed.Opt3ClickSelectsLine;
+    chkClick2W.Checked:= ed.Opt2ClickDragSelectsWords;
     chkCaretMul.Checked:= ed.OptCaretManyAllowed;
     edRulerH.Value:= ed.OptRulerHeight;
     edRulerFont.Value:= ed.OptRulerFontSize;
@@ -475,6 +476,7 @@ begin
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.Opt2ClickSelectsLine:= chkClick2.Checked;
       ed.Opt3ClickSelectsLine:= chkClick3.Checked;
+      ed.Opt2ClickDragSelectsWords:= chkClick2W.Checked;
       ed.OptCaretManyAllowed:= chkCaretMul.Checked;
       ed.OptRulerHeight:= edRulerH.Value;
       ed.OptRulerFontSize:= edRulerFont.Value;

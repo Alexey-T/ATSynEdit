@@ -270,4 +270,12 @@ object fmOpt: TfmOpt
     Caption = 'word-chars'
     ParentColor = False
   end
+  object chkClick2W: TCheckBox
+    Left = 176
+    Height = 19
+    Top = 148
+    Width = 175
+    Caption = 'dbl click + drag selects words'
+    TabOrder = 19
+  end
 end
