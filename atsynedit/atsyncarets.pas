@@ -8,6 +8,14 @@ uses
   Classes, SysUtils;
 
 type
+  TATPosRelation = (cRelateBefore, cRelateInside, cRelateAfter);
+
+procedure SwapInt(var n1, n2: integer);
+function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
+function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer): TATPosRelation;
+
+
+type
   { TATCaretItem }
 
   TATCaretItem = class
@@ -60,14 +68,30 @@ type
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
   end;
 
-function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
-procedure SwapInt(var n1, n2: integer);
-
 
 implementation
 
 uses
   Math;
+
+function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
+begin
+  if Y1<>Y2 then
+    Result:= Y1<Y2
+  else
+    Result:= (X1<X2) or (AllowEq and (X1=X2));
+end;
+
+function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer): TATPosRelation;
+var
+  b1, b2: boolean;
+begin
+  b1:= IsPosSorted(X, Y, X1, Y1, false);
+  b2:= IsPosSorted(X, Y, X2, Y2, false);
+  if b1 then Result:= cRelateBefore else
+   if b2 then Result:= cRelateInside else
+    Result:= cRelateAfter;
+end;
 
 procedure SwapInt(var n1, n2: integer);
 var
@@ -336,14 +360,6 @@ begin
   if IsIndexValid(N) then
     with Items[N] do
       Result:= Point(PosX, PosY);
-end;
-
-function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
-begin
-  if Y1<>Y2 then
-    Result:= Y1<Y2
-  else
-    Result:= (X1<X2) or (AllowEq and (X1=X2));
 end;
 
 function TATCarets.IsJoinNeeded(N1, N2: integer;

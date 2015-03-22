@@ -47,8 +47,8 @@ begin
     for i:= 0 to Carets.Count-1 do
     begin
       Item:= Carets[i];
-      if ListNum.IndexOf(pointer(Item.PosY))<0 then
-        ListNum.Add(pointer(Item.PosY));
+      if ListNum.IndexOf(pointer{%H-}(Item.PosY))<0 then
+        ListNum.Add(pointer{%H-}(Item.PosY));
     end;
 
     //no selections-- copy entire lines
@@ -58,7 +58,7 @@ begin
       begin
         for i:= 0 to ListNum.Count-1 do
         begin
-          Str:= Strings.Lines[integer(ListNum[i])];
+          Str:= Strings.Lines[integer{%H-}(ListNum[i])];
           if Str<>'' then
             ListStr.Add(UTF8Encode(Str));
         end;

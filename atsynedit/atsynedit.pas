@@ -1387,7 +1387,7 @@ begin
   if FMarginRight>1 then
     DoPaintMarginLineTo(C, PosX(FMarginRight));
   for i:= 0 to FMarginList.Count-1 do
-    DoPaintMarginLineTo(C, PosX(integer(FMarginList[i])));
+    DoPaintMarginLineTo(C, PosX(integer{%H-}(FMarginList[i])));
 end;
 
 
@@ -1544,7 +1544,7 @@ var
 begin
   Result:= '';
   for i:= 0 to FMarginList.Count-1 do
-    Result:= Result+IntToStr(integer(FMarginList[i]))+' ';
+    Result:= Result+IntToStr(integer{%H-}(FMarginList[i]))+' ';
 end;
 
 function TATSynEdit.GetReadOnly: boolean;
@@ -1827,7 +1827,7 @@ begin
     if S='' then Break;
     N:= StrToIntDef(S, 0);
     if N<2 then Continue;
-    FMarginList.Add(Pointer(N));
+    FMarginList.Add(pointer{%H-}(N));
   until false;
 end;
 
@@ -2490,6 +2490,7 @@ var
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
   Str: atString;
+  Relation: TATPosRelation;
 begin
   if Carets.Count<>1 then Exit; //allow only 1 caret
   Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
@@ -2502,7 +2503,8 @@ begin
     begin SysUtils.Beep; Exit end;
 
   //can't drop into selection
-  if IsPosSorted(X1, Y1, P.X, P.Y, true) and IsPosSorted(P.X, P.Y, X2, Y2, false) then
+  Relation:= IsPosInRange(P.X, P.Y, X1, Y1, X2, Y2);
+  if Relation=cRelateInside then
     begin SysUtils.Beep; Exit end;
 
   Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
@@ -2510,7 +2512,7 @@ begin
     begin SysUtils.Beep; Exit end;
 
   //insert-pos before selection?
-  if IsPosSorted(P.X, P.Y, X1, Y1, true) then
+  if Relation=cRelateBefore then
   begin
     Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
     Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
