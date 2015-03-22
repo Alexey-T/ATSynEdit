@@ -24,11 +24,19 @@ begin
   Result:= [cResultCaretRight];
 end;
 
-function TATSynEdit.DoCommand_KeyLeft: TATCommandResults;
+function TATSynEdit.DoCommand_KeyLeft(AAllowSwapEdge: boolean): TATCommandResults;
 var
   Item: TATCaretItem;
   i: integer;
 begin
+  Result:= [cResultCaretLeft];
+
+  if AAllowSwapEdge then
+  begin
+    if DoCaretSwapEdge(true) then Exit;
+    DoSelect_None;
+  end;
+
   for i:= 0 to FCarets.Count-1 do
   begin
     Item:= FCarets[i];
@@ -41,15 +49,21 @@ begin
       Item.PosX:= Length(Strings.Lines[Item.PosY]);
     end;
   end;
-
-  Result:= [cResultCaretLeft];
 end;
 
-function TATSynEdit.DoCommand_KeyRight: TATCommandResults;
+function TATSynEdit.DoCommand_KeyRight(AAllowSwapEdge: boolean): TATCommandResults;
 var
   Item: TATCaretItem;
   i: integer;
 begin
+  Result:= [cResultCaretRight];
+
+  if AAllowSwapEdge then
+  begin
+    if DoCaretSwapEdge(false) then Exit;
+    DoSelect_None;
+  end;
+
   for i:= 0 to FCarets.Count-1 do
   begin
     Item:= FCarets[i];
@@ -62,8 +76,6 @@ begin
       Inc(Item.PosY);
     end;
   end;
-
-  Result:= [cResultCaretRight];
 end;
 
 function TATSynEdit.DoCommand_KeyUpDown(ADown: boolean; ALines: integer): TATCommandResults;

@@ -20,8 +20,8 @@ const
 
   cCommand_KeyUp           = _base_KeyUp or cSelReset;
   cCommand_KeyDown         = _base_KeyDown or cSelReset;
-  cCommand_KeyLeft         = _base_KeyLeft or cSelReset;
-  cCommand_KeyRight        = _base_KeyRight or cSelReset;
+  cCommand_KeyLeft         = _base_KeyLeft;
+  cCommand_KeyRight        = _base_KeyRight;
   cCommand_KeyHome         = _base_KeyHome or cSelReset;
   cCommand_KeyEnd          = _base_KeyEnd or cSelReset;
   cCommand_KeyPageUp       = _base_KeyPageUp or cSelReset;

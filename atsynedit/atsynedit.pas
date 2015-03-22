@@ -329,6 +329,7 @@ type
     FOptPageUpDownSize: TATPageUpDownSize;
     FOptAutoIndentKind: TATAutoIndentKind;
     //
+    function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoDropText;
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
@@ -462,8 +463,8 @@ type
     function DoCommand_TextInsertTab: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
     function DoCommand_KeyEnd: TATCommandResults;
-    function DoCommand_KeyLeft: TATCommandResults;
-    function DoCommand_KeyRight: TATCommandResults;
+    function DoCommand_KeyLeft(AAllowSwapEdge: boolean): TATCommandResults;
+    function DoCommand_KeyRight(AAllowSwapEdge: boolean): TATCommandResults;
     function DoCommand_KeyUpDown(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
