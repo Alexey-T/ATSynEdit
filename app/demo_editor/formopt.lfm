@@ -2,18 +2,18 @@ object fmOpt: TfmOpt
   Left = 474
   Height = 364
   Top = 199
-  Width = 605
+  Width = 640
   BorderStyle = bsDialog
   Caption = 'Opts'
   ClientHeight = 364
-  ClientWidth = 605
+  ClientWidth = 640
   Position = poScreenCenter
   LCLVersion = '1.5'
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 33
     Top = 325
-    Width = 593
+    Width = 628
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
@@ -30,14 +30,14 @@ object fmOpt: TfmOpt
     Left = 8
     Height = 311
     Top = 8
-    Width = 592
+    Width = 624
     ActivePage = TabSheet1
     TabIndex = 0
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'general'
       ClientHeight = 283
-      ClientWidth = 584
+      ClientWidth = 616
       object chkCurLine: TCheckBox
         Left = 8
         Height = 19
@@ -65,7 +65,7 @@ object fmOpt: TfmOpt
       object chkAutoInd: TCheckBox
         Left = 8
         Height = 19
-        Top = 68
+        Top = 108
         Width = 83
         Caption = 'auto-indent'
         TabOrder = 3
@@ -73,7 +73,7 @@ object fmOpt: TfmOpt
       object chkLastOnTop: TCheckBox
         Left = 8
         Height = 19
-        Top = 88
+        Top = 68
         Width = 98
         Caption = 'last line on top'
         TabOrder = 4
@@ -81,13 +81,13 @@ object fmOpt: TfmOpt
       object chkOvrSel: TCheckBox
         Left = 8
         Height = 19
-        Top = 109
+        Top = 88
         Width = 124
         Caption = 'overwrite sel by text'
         TabOrder = 5
       end
       object chkCopyNoSel: TCheckBox
-        Left = 176
+        Left = 160
         Height = 19
         Top = 8
         Width = 117
@@ -95,7 +95,7 @@ object fmOpt: TfmOpt
         TabOrder = 6
       end
       object chkColorSel: TCheckBox
-        Left = 176
+        Left = 160
         Height = 19
         Top = 28
         Width = 123
@@ -103,7 +103,7 @@ object fmOpt: TfmOpt
         TabOrder = 7
       end
       object chkOvrPaste: TCheckBox
-        Left = 176
+        Left = 160
         Height = 19
         Top = 48
         Width = 153
@@ -111,7 +111,7 @@ object fmOpt: TfmOpt
         TabOrder = 8
       end
       object chkRepSpec: TCheckBox
-        Left = 176
+        Left = 160
         Height = 19
         Top = 68
         Width = 155
@@ -119,7 +119,7 @@ object fmOpt: TfmOpt
         TabOrder = 9
       end
       object chkNavWrap: TCheckBox
-        Left = 176
+        Left = 160
         Height = 19
         Top = 88
         Width = 206
@@ -127,9 +127,9 @@ object fmOpt: TfmOpt
         TabOrder = 10
       end
       object edRulerH: TSpinEdit
-        Left = 176
+        Left = 384
         Height = 23
-        Top = 216
+        Top = 172
         Width = 50
         MaxValue = 80
         MinValue = 4
@@ -137,9 +137,9 @@ object fmOpt: TfmOpt
         Value = 4
       end
       object edRulerFont: TSpinEdit
-        Left = 232
+        Left = 440
         Height = 23
-        Top = 216
+        Top = 172
         Width = 50
         MaxValue = 80
         MinValue = 4
@@ -147,54 +147,54 @@ object fmOpt: TfmOpt
         Value = 4
       end
       object Label2: TLabel
-        Left = 288
+        Left = 496
         Height = 15
-        Top = 220
+        Top = 176
         Width = 51
         Caption = 'ruler sizes'
         ParentColor = False
       end
       object LabChars: TLabel
-        Left = 288
+        Left = 496
         Height = 15
-        Top = 191
+        Top = 147
         Width = 60
         Caption = 'word-chars'
         ParentColor = False
       end
       object edChars: TEdit
-        Left = 176
+        Left = 384
         Height = 23
-        Top = 187
+        Top = 143
         Width = 106
         TabOrder = 13
       end
       object edPage: TComboBox
-        Left = 176
+        Left = 384
         Height = 23
-        Top = 160
+        Top = 116
         Width = 106
         ItemHeight = 15
         Items.Strings = (
-          'full height'
-          'full height -1'
-          'half height'
+          'size'
+          'size-1'
+          'size/2'
         )
         Style = csDropDownList
         TabOrder = 14
       end
       object Label3: TLabel
-        Left = 288
+        Left = 496
         Height = 15
-        Top = 164
+        Top = 120
         Width = 100
         Caption = 'page up/down size'
         ParentColor = False
       end
       object edAutoInd: TComboBox
-        Left = 176
+        Left = 384
         Height = 23
-        Top = 132
+        Top = 88
         Width = 106
         ItemHeight = 15
         Items.Strings = (
@@ -207,11 +207,11 @@ object fmOpt: TfmOpt
         TabOrder = 15
       end
       object Label4: TLabel
-        Left = 288
+        Left = 496
         Height = 15
-        Top = 136
-        Width = 87
-        Caption = 'auto indent kind'
+        Top = 92
+        Width = 89
+        Caption = 'auto-indent kind'
         ParentColor = False
       end
     end

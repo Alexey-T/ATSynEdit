@@ -227,11 +227,7 @@ begin
   for i:= FCarets.Count-1 downto 0 do
   begin
     Item:= FCarets[i];
-
-    Str:= '';
-    if FOptAutoIndent then
-      Str:= GetAutoIndentString(Item.PosX, Item.PosY);
-
+    Str:= GetAutoIndentString(Item.PosX, Item.PosY);
     Strings.TextInsertEol(Item.PosX, Item.PosY, AKeepCaret, Str, Shift, PosAfter);
     DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
     Item.PosX:= PosAfter.X;

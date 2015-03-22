@@ -2583,6 +2583,9 @@ var
   Str: atString;
   NChars, NSpaces: integer;
 begin
+  if not FOptAutoIndent then
+    begin Result:= ''; Exit end;
+
   Str:= Strings.Lines[APosY];
   NChars:= SGetIndentChars(Str); //count of chars in indent
   NChars:= Min(APosX, NChars); //limit indent by x-pos
