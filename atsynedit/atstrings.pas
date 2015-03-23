@@ -90,7 +90,7 @@ type
     function GetLineHidden(N: integer): integer;
     function GetLineState(Index: integer): TATLineState;
     procedure LineDeleteLastFake;
-    procedure LineForceLast;
+    procedure LineAddLastFake;
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
     procedure SetLineBm(Index: integer; AValue: TATLineBookmark);
@@ -104,7 +104,8 @@ type
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure DoResetLineStates(ASaved: boolean);
-    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
+    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds;
+      AAddAsIs: boolean= false);
     procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
   public
     constructor Create; virtual;
@@ -385,7 +386,7 @@ begin
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
 
-  LineAddEx('', cEndNone);
+  LineAddLastFake;
 end;
 
 destructor TATStrings.Destroy;
@@ -415,12 +416,22 @@ begin
     LineDelete(Count-1, false{dont force});
 end;
 
-procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds);
+procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds; AAddAsIs: boolean = false);
 var
   Item: TATStringItem;
   AEndInside: TATLineEnds;
 begin
   if FReadOnly then Exit;
+
+  //set AddAsIs=On if loaded from file, it's faster and safe, not unneeded work
+  //of last fake-line
+  if AAddAsIs then
+  begin
+    Item:= TATStringItem.Create(AString, AEnd);
+    Item.ItemState:= cLineStateAdded;
+    FList.Add(Item);
+    Exit
+  end;
 
   AEndInside:= AEnd;
   if AEndInside=cEndNone then
@@ -481,10 +492,10 @@ begin
   Result:= FList.Count;
 end;
 
-procedure TATStrings.LineForceLast;
+procedure TATStrings.LineAddLastFake;
 begin
   if Count=0 then
-    LineAddEx('', cEndNone);
+    LineAddEx('', cEndNone, true);
 end;
 
 procedure TATStrings.LineDelete(N: integer; AForceLast: boolean = true);
@@ -500,7 +511,7 @@ begin
     raise Exception.Create('Invalid Delete index: '+IntToStr(N));
 
   if AForceLast then
-    LineForceLast;
+    LineAddLastFake;
 end;
 
 procedure TATStrings.Clear;
@@ -594,7 +605,7 @@ begin
         Inc(NEnd, CharSize);
 
       if Len=0 then
-        LineAddEx('', LineEnd)
+        LineAddEx('', LineEnd, true{!})
       else
       begin
         case FEncoding of
@@ -603,7 +614,7 @@ begin
               SA:= '';
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
-              LineAddEx(SA, LineEnd);
+              LineAddEx(SA, LineEnd, true{!});
             end;
 
           cEncUTF8:
@@ -612,7 +623,7 @@ begin
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
               SW:= UTF8Decode(SA);
-              LineAddEx(SW, LineEnd);
+              LineAddEx(SW, LineEnd, true{!});
             end;
 
           cEncWideLE,
@@ -623,7 +634,7 @@ begin
               Move(Buf[NStart], SW[1], Len);
               if FEncoding=cEncWideBE then
                 SW:= SSwapEndian(SW);
-              LineAddEx(SW, LineEnd);
+              LineAddEx(SW, LineEnd, true{!});
             end;
 
           else
@@ -655,8 +666,7 @@ end;
 procedure TATStrings.DoFinalizeLoading;
 begin
   DoDetectEndings;
-  if Count=0 then
-    LineAddEx('', cEndNone); //force empty line
+  LineAddLastFake;
   DoResetLineStates(false);
 end;
 
