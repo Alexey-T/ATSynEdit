@@ -9,38 +9,16 @@ uses
   Classes, SysUtils, Graphics, Types,
   ATStringProc;
 
-const
-  cUnprintedDotScale = 0.15;
-  cUnprintedEndScale = 0.30;
-  cUnprintedFontScale = 0.80;
-  cUnprintedFontOffsetX = 3;
-  cUnprintedFontOffsetY = 2;
-
-procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: real; AFontColor: TColor);
-procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor);
-procedure DoPaintUnprintedChars(C: TCanvas;
-  const AString: atString;
-  const AOffsets: array of integer;
-  APoint: TPoint;
-  ACharSize: TPoint;
-  AColorFont: TColor);
-procedure DoPaintUnprintedEol(C: TCanvas;
-  const AStrEol: atString;
-  APoint: TPoint;
-  ACharSize: TPoint;
-  AColorFont, AColorBG: TColor;
-  ADetails: boolean);
-
 type
   TATLinePart = record
     Offset, Len: integer;
     Color, ColorBG: TColor;
     Styles: TFontStyles;
   end;
+
 type
   TATLineParts = array[0..400] of TATLinePart;
   PATLineParts = ^TATLineParts;
-
 
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
@@ -53,6 +31,13 @@ procedure CanvasTextOut(C: TCanvas;
   out AStrWidth: integer;
   ACharsSkipped: integer = 0;
   AParts: PATLineParts = nil);
+
+procedure DoPaintUnprintedEol(C: TCanvas;
+  const AStrEol: atString;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont, AColorBG: TColor;
+  ADetails: boolean);
 
 function CanvasTextSpaces(const S: atString; ATabSize: integer): real;
 function CanvasTextWidth(const S: atString; ATabSize: integer; ACharSize: TPoint): integer;
@@ -71,6 +56,12 @@ uses
   LCLType,
   LCLIntf;
 
+const
+  cUnprintedDotScale = 0.15;
+  cUnprintedEndScale = 0.30;
+  cUnprintedFontScale = 0.80;
+  cUnprintedFontOffsetX = 3;
+  cUnprintedFontOffsetY = 2;
 
 procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: real; AFontColor: TColor);
 const
@@ -132,11 +123,6 @@ begin
 
       R.Top:= APoint.Y;
       R.Bottom:= R.Top+ACharSize.Y;
-
-      {
-      if R.Right<AVisibleRect.Left then Continue;
-      if R.Left>AVisibleRect.Right then Continue;
-      }
 
       if AString[i]=' ' then
         DoPaintUnprintedSpace(C, R, cUnprintedDotScale, AColorFont)
