@@ -110,38 +110,10 @@ object fmOpt: TfmOpt
         Caption = 'replace spec-ascii with "."'
         TabOrder = 8
       end
-      object edRulerH: TSpinEdit
-        Left = 384
-        Height = 23
-        Top = 172
-        Width = 50
-        MaxValue = 80
-        MinValue = 4
-        TabOrder = 9
-        Value = 4
-      end
-      object edRulerFont: TSpinEdit
-        Left = 440
-        Height = 23
-        Top = 172
-        Width = 50
-        MaxValue = 80
-        MinValue = 4
-        TabOrder = 10
-        Value = 4
-      end
-      object Label2: TLabel
-        Left = 496
-        Height = 15
-        Top = 176
-        Width = 51
-        Caption = 'ruler sizes'
-        ParentColor = False
-      end
       object LabChars: TLabel
         Left = 496
         Height = 15
-        Top = 147
+        Top = 195
         Width = 60
         Caption = 'word-chars'
         ParentColor = False
@@ -149,14 +121,14 @@ object fmOpt: TfmOpt
       object edChars: TEdit
         Left = 384
         Height = 23
-        Top = 143
+        Top = 191
         Width = 106
-        TabOrder = 11
+        TabOrder = 9
       end
       object edAutoInd: TComboBox
         Left = 384
         Height = 23
-        Top = 116
+        Top = 164
         Width = 106
         ItemHeight = 15
         Items.Strings = (
@@ -166,12 +138,12 @@ object fmOpt: TfmOpt
           'tabs only'
         )
         Style = csDropDownList
-        TabOrder = 12
+        TabOrder = 10
       end
       object Label4: TLabel
         Left = 496
         Height = 15
-        Top = 120
+        Top = 168
         Width = 89
         Caption = 'auto-indent kind'
         ParentColor = False
@@ -180,7 +152,7 @@ object fmOpt: TfmOpt
     object TabSheet2: TTabSheet
       Caption = 'gutter'
       ClientHeight = 283
-      ClientWidth = 584
+      ClientWidth = 616
       object chkGutterBm: TCheckBox
         Left = 8
         Height = 19
@@ -239,6 +211,34 @@ object fmOpt: TfmOpt
         MinValue = 1
         TabOrder = 6
         Value = 1
+      end
+      object edRulerH: TSpinEdit
+        Left = 24
+        Height = 23
+        Top = 92
+        Width = 50
+        MaxValue = 80
+        MinValue = 4
+        TabOrder = 7
+        Value = 4
+      end
+      object edRulerFont: TSpinEdit
+        Left = 24
+        Height = 23
+        Top = 120
+        Width = 50
+        MaxValue = 80
+        MinValue = 4
+        TabOrder = 8
+        Value = 4
+      end
+      object Label2: TLabel
+        Left = 8
+        Height = 15
+        Top = 72
+        Width = 51
+        Caption = 'ruler sizes'
+        ParentColor = False
       end
     end
     object TabSheet5: TTabSheet
