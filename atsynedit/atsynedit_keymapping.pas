@@ -41,13 +41,8 @@ begin
   M.Add(cCommand_KeyTab, 'tabulation', [], []);
   M.Add(cCommand_KeyTabChar, 'tabulation: tab-char', [], []);
 
-  M.Add(cCommand_TextDeleteLine, 'delete current line', ['Ctrl+Y'], []);
-  M.Add(cCommand_TextDuplicateLine, 'duplicate current line', ['Ctrl+D'], []);
-
-  M.Add(cCommand_SelectAll, 'select all', ['Ctrl+A'], []);
-  M.Add(cCommand_SelectWords, 'select words at carets', [], []);
-  M.Add(cCommand_SelectLines, 'select lines at carets', [], []);
-  M.Add(cCommand_SelectNone, 'cancel selection', [], []);
+  M.Add(cCommand_TextDeleteLine, 'delete line', ['Ctrl+Y'], []);
+  M.Add(cCommand_TextDuplicateLine, 'duplicate line', ['Ctrl+D'], []);
 
   M.Add(cCommand_GotoTextBegin,      'goto text begin',          ['Ctrl+Home'], []);
   M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', ['Ctrl+Shift+Home'], []);
@@ -57,6 +52,12 @@ begin
   M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  ['Ctrl+Shift+Left'], []);
   M.Add(cCommand_GotoWordNext,       'goto word right',          ['Ctrl+Right'], []);
   M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', ['Ctrl+Shift+Right'], []);
+
+  M.Add(cCommand_SelectAll, 'select all', ['Ctrl+A'], []);
+  M.Add(cCommand_SelectWords, 'select words at carets', [], []);
+  M.Add(cCommand_SelectLines, 'select lines at carets', [], []);
+  M.Add(cCommand_SelectNone, 'cancel selection', [], []);
+  M.Add(cCommand_Cancel, 'cancel carets, selection, drag-drop', ['Escape'], []);
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Insert'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', ['Ctrl+R'], []);
@@ -83,8 +84,6 @@ begin
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', ['Ctrl+V'], ['Shift+Insert']);
   M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', ['Alt+V'], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
-
-  M.Add(cCommand_Cancel, 'cancel selections/ carets/ drag-drop', ['Escape'], []);
 end;
 
 procedure DoCheckKeyMapping(const M: TATKeyMapping);

@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkAutoInd: TCheckBox;
     chkTabInd: TCheckBox;
     chkHomeEnd: TCheckBox;
     chkLeftRt: TCheckBox;
@@ -20,7 +21,6 @@ type
     chkOvrSel: TCheckBox;
     chkRtMove: TCheckBox;
     chkDnD: TCheckBox;
-    chkAutoInd: TCheckBox;
     chkCaretMul: TCheckBox;
     chkCaretVirtual: TCheckBox;
     chkClick2: TCheckBox;
@@ -38,9 +38,10 @@ type
     chkOvrPaste: TCheckBox;
     chkRepSpec: TCheckBox;
     chkTabSp: TCheckBox;
+    edAutoInd: TComboBox;
     edCaretTime: TSpinEdit;
     edChars: TEdit;
-    edAutoInd: TComboBox;
+    edIndent: TSpinEdit;
     edPage: TComboBox;
     edRulerFont: TSpinEdit;
     edRulerH: TSpinEdit;
@@ -55,7 +56,6 @@ type
     edSizeBm: TSpinEdit;
     edSizeState: TSpinEdit;
     edSizeEmpty: TSpinEdit;
-    edIndent: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
