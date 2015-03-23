@@ -9,7 +9,7 @@ begin
   begin
     Item:= FCarets[i];
     NIndent:= SGetIndentChars(Strings.Lines[Item.PosY]);
-    if FOptKeyHomeEndToNonSpace then
+    if FOptKeyHomeToNonSpace then
     begin
       if Item.PosX<>NIndent then
         Item.PosX:= NIndent
@@ -33,7 +33,7 @@ begin
   begin
     Item:= FCarets[i];
     Str:= Strings.Lines[Item.PosY];
-    if FOptKeyHomeEndToNonSpace then
+    if FOptKeyEndToNonSpace then
     begin
       NLen:= SGetNonSpaceLength(Str);
       if Item.PosX<>NLen then

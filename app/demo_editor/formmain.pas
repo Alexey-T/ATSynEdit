@@ -459,7 +459,8 @@ begin
     chkRtMove.Checked:= ed.OptMouseRightClickMovesCaret;
     edPage.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
     chkLeftRt.Checked:= ed.OptKeyLeftRightSwapSel;
-    chkHomeEnd.Checked:= ed.OptKeyHomeEndToNonSpace;
+    chkHome.Checked:= ed.OptKeyHomeToNonSpace;
+    chkEnd.Checked:= ed.OptKeyEndToNonSpace;
     chkTabInd.Checked:= ed.OptKeyTabIndents;
     edIndent.Value:= ed.OptIndentSize;
     chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
@@ -500,7 +501,8 @@ begin
       ed.OptMouseRightClickMovesCaret:= chkRtMove.Checked;
       ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);
       ed.OptKeyLeftRightSwapSel:= chkLeftRt.Checked;
-      ed.OptKeyHomeEndToNonSpace:= chkHomeEnd.Checked;
+      ed.OptKeyHomeToNonSpace:= chkHome.Checked;
+      ed.OptKeyEndToNonSpace:= chkEnd.Checked;
       ed.OptKeyTabIndents:= chkTabInd.Checked;
       ed.OptIndentSize:= edIndent.Value;
       ed.OptIndentKeepsAlign:= chkUninKeep.Checked;

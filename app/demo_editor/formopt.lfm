@@ -230,12 +230,12 @@ object fmOpt: TfmOpt
         Caption = 'left/right: swap edge of sel'
         TabOrder = 2
       end
-      object chkHomeEnd: TCheckBox
+      object chkHome: TCheckBox
         Left = 8
         Height = 19
         Top = 68
-        Width = 173
-        Caption = 'home/end: to nonspace char'
+        Width = 123
+        Caption = 'home: to text begin'
         TabOrder = 3
       end
       object edPage: TComboBox
@@ -250,7 +250,7 @@ object fmOpt: TfmOpt
           'size/2'
         )
         Style = csDropDownList
-        TabOrder = 8
+        TabOrder = 10
       end
       object Label3: TLabel
         Left = 120
@@ -271,10 +271,10 @@ object fmOpt: TfmOpt
       object chkTabInd: TCheckBox
         Left = 8
         Height = 19
-        Top = 108
+        Top = 128
         Width = 94
         Caption = 'tab: indent sel'
-        TabOrder = 5
+        TabOrder = 6
       end
       object Label5: TLabel
         Left = 64
@@ -287,10 +287,10 @@ object fmOpt: TfmOpt
       object chkAutoInd: TCheckBox
         Left = 8
         Height = 19
-        Top = 88
+        Top = 108
         Width = 116
         Caption = 'enter: auto-indent'
-        TabOrder = 4
+        TabOrder = 5
       end
       object edAutoInd: TComboBox
         Left = 8
@@ -305,7 +305,7 @@ object fmOpt: TfmOpt
           'tabs only'
         )
         Style = csDropDownList
-        TabOrder = 7
+        TabOrder = 9
       end
       object edIndent: TSpinEdit
         Left = 8
@@ -314,7 +314,7 @@ object fmOpt: TfmOpt
         Width = 50
         MaxValue = 30
         MinValue = -10
-        TabOrder = 6
+        TabOrder = 8
         Value = 1
       end
       object Label4: TLabel
@@ -328,10 +328,18 @@ object fmOpt: TfmOpt
       object chkUninKeep: TCheckBox
         Left = 8
         Height = 19
-        Top = 128
+        Top = 148
         Width = 130
         Caption = 'unindent keeps align'
-        TabOrder = 9
+        TabOrder = 7
+      end
+      object chkEnd: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 88
+        Width = 102
+        Caption = 'end: to text end'
+        TabOrder = 4
       end
     end
     object TabSheet3: TTabSheet

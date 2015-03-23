@@ -325,7 +325,8 @@ type
     FOptMouseRightClickMovesCaret: boolean;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
-    FOptKeyHomeEndToNonSpace: boolean;
+    FOptKeyHomeToNonSpace: boolean;
+    FOptKeyEndToNonSpace: boolean;
     FOptKeyTabIndents: boolean;
     //
     procedure DoDropText;
@@ -593,7 +594,8 @@ type
     property OptKeyNavigateWrapped: boolean read FOptKeyNavigateWrapped write FOptKeyNavigateWrapped;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel;
-    property OptKeyHomeEndToNonSpace: boolean read FOptKeyHomeEndToNonSpace write FOptKeyHomeEndToNonSpace;
+    property OptKeyHomeToNonSpace: boolean read FOptKeyHomeToNonSpace write FOptKeyHomeToNonSpace;
+    property OptKeyEndToNonSpace: boolean read FOptKeyEndToNonSpace write FOptKeyEndToNonSpace;
     property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents;
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize;
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
@@ -1642,7 +1644,8 @@ begin
   FOptShowCurColumn:= false;
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
   FOptKeyLeftRightSwapSel:= true;
-  FOptKeyHomeEndToNonSpace:= true;
+  FOptKeyHomeToNonSpace:= true;
+  FOptKeyEndToNonSpace:= true;
   FOptKeyTabIndents:= true;
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
