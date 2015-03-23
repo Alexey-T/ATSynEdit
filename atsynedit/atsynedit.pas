@@ -326,6 +326,7 @@ type
     FOptKeyHomeEndToNonSpace: boolean;
     //
     procedure DoDropText;
+    procedure DoMinimapClick(X, Y: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
@@ -416,6 +417,7 @@ type
     procedure SetTabSize(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
+    procedure UpdateCursor;
     procedure UpdateGutterAutosize;
     procedure UpdateMinimapAutosize(C: TCanvas);
     function DoFormatLineNumber(N: integer): atString;
@@ -441,7 +443,7 @@ type
     function DoCommand_SelectWords: TATCommandResults;
     function DoCommand_SelectLines: TATCommandResults;
     function DoCommand_SelectAll: TATCommandResults;
-    function DoCommand_CaretsRemove: TATCommandResults;
+    function DoCommand_Cancel: TATCommandResults;
     function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOver: TATCommandResults;
@@ -1670,6 +1672,7 @@ procedure TATSynEdit.Update(
   AUpdateWrapInfo: boolean = false;
   AUpdateCaretsCoords: boolean = true);
 begin
+  UpdateCursor;
   if AUpdateWrapInfo then
     FWrapUpdateNeeded:= true;
   Include(FPaintFlags, cPaintUpdateScrollbars);
@@ -1959,6 +1962,12 @@ begin
   FMouseDownNumber:= -1;
   FMouseDragging:= false;
 
+  if PtInRect(FRectMinimap, Point(X, Y)) then
+  begin
+    DoMinimapClick(X, Y);
+    Exit
+  end;
+
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
     FMouseDownPnt:= PCaret;
@@ -1969,7 +1978,7 @@ begin
       if FOptMouseDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
       begin
         FMouseDragging:= true;
-        Cursor:= crDrag;
+        UpdateCursor;
       end
       else
       begin
@@ -2030,7 +2039,6 @@ begin
 
   if FMouseDragging then
   begin
-    Cursor:= crDefault;
     DoDropText;
     Update;
   end;
@@ -2043,39 +2051,45 @@ begin
   FTimerScroll.Enabled:= false;
 end;
 
-procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
+procedure TATSynEdit.UpdateCursor;
 var
   P: TPoint;
-  RectBm, RectNums: TRect;
-  nIndex: integer;
+  RectBm: TRect;
 begin
-  inherited;
-
-  P:= Point(X, Y);
+  P:= ScreenToClient(Mouse.CursorPos);
 
   RectBm.Left:= FGutter[FGutterBandBm].Left;
   RectBm.Right:= FGutter[FGutterBandBm].Right;
   RectBm.Top:= FRectMain.Top;
   RectBm.Bottom:= FRectMain.Bottom;
 
-  RectNums.Left:= FGutter[FGutterBandNum].Left;
-  RectNums.Right:= FGutter[FGutterBandNum].Right;
-  RectNums.Top:= FRectMain.Top;
-  RectNums.Bottom:= FRectMain.Bottom;
-
-  //update cursor
+  if FMouseDragging then
+    Cursor:= crDrag
+  else
   if PtInRect(FRectMain, P) then
-  begin
-    if FMouseDragging then
-      Cursor:= crDrag
-    else
-      Cursor:= crIBeam;
-  end
+    Cursor:= crIBeam
   else
   if PtInRect(RectBm, P) then
     Cursor:= crHandPoint
   else
     Cursor:= crDefault;
+end;
+
+procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
+var
+  P: TPoint;
+  RectNums: TRect;
+  nIndex: integer;
+begin
+  inherited;
+
+  P:= Point(X, Y);
+  UpdateCursor;
+
+  RectNums.Left:= FGutter[FGutterBandNum].Left;
+  RectNums.Right:= FGutter[FGutterBandNum].Right;
+  RectNums.Top:= FRectMain.Top;
+  RectNums.Bottom:= FRectMain.Bottom;
 
   //start scroll timer
   FTimerScroll.Enabled:= (ssLeft in Shift) and (not PtInRect(FRectMain, P));
@@ -2525,6 +2539,16 @@ begin
     else
       raise Exception.Create('unknown indent-kind');
   end;
+end;
+
+procedure TATSynEdit.DoMinimapClick(X, Y: integer);
+var
+  N: integer;
+begin
+  N:= (Y-FRectMinimap.Top) div FCharSizeMinimap.Y;
+  if not FWrapInfo.IsIndexValid(N) then Exit;
+  N:= FWrapInfo.Items[N].NLineIndex;
+  DoGotoPos(Point(0, N));
 end;
 
 {$I atsynedit_carets.inc}

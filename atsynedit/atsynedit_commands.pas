@@ -88,7 +88,7 @@ const
   cCommand_ClipboardCopyAdd = 1005;
   cCommand_ClipboardCut = 1006;
 
-  cCommand_CaretsRemove = 2001;
+  cCommand_Cancel = 2001;
 
 implementation
 

@@ -81,7 +81,7 @@ begin
   M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', ['Alt+V'], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
 
-  M.Add(cCommand_CaretsRemove, 'carets: remove multi-carets', ['Escape'], []);
+  M.Add(cCommand_Cancel, 'cancel selections/ carets/ drag-drop', ['Escape'], []);
 end;
 
 procedure DoCheckKeyMapping(const M: TATKeyMapping);

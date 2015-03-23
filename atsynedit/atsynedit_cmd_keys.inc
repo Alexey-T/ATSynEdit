@@ -244,10 +244,13 @@ begin
     Result:= [cResultCaretTop];
 end;
 
-function TATSynEdit.DoCommand_CaretsRemove: TATCommandResults;
+function TATSynEdit.DoCommand_Cancel: TATCommandResults;
 begin
   DoCaretSingleAsIs;
   DoSelect_None;
+
+  FMouseDragging:= false;
+  UpdateCursor;
 
   Result:= [cResultCaretTop];
 end;

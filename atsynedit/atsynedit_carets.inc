@@ -264,9 +264,8 @@ end;
 
 procedure TATSynEdit.DoGotoPos(APnt: TPoint);
 begin
-  DoCommandExec(cCommand_CaretsRemove);
-  Carets[0].PosX:= APnt.X;
-  Carets[0].PosY:= APnt.Y;
+  DoCommandExec(cCommand_Cancel);
+  DoCaretSingle(APnt.X, APnt.Y);
 
   if Strings.LinesHidden[APnt.Y]<>0 then //collapsed
   begin

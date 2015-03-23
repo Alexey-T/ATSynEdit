@@ -188,7 +188,7 @@ begin
     cCommand_ClipboardPaste_Sel:       Res:= DoCommand_ClipboardPaste(false, true);
     cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true, false);
 
-    cCommand_CaretsRemove:             Res:= DoCommand_CaretsRemove;
+    cCommand_Cancel:                   Res:= DoCommand_Cancel;
   end;
 
   DoCommandResults(Res);
