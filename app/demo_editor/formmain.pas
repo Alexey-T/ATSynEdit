@@ -462,6 +462,7 @@ begin
     chkHomeEnd.Checked:= ed.OptKeyHomeEndToNonSpace;
     chkTabInd.Checked:= ed.OptKeyTabIndents;
     edIndent.Value:= ed.OptIndentSize;
+    chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
 
     if ShowModal=mrOk then
     begin
@@ -502,6 +503,7 @@ begin
       ed.OptKeyHomeEndToNonSpace:= chkHomeEnd.Checked;
       ed.OptKeyTabIndents:= chkTabInd.Checked;
       ed.OptIndentSize:= edIndent.Value;
+      ed.OptIndentKeepsAlign:= chkUninKeep.Checked;
 
       ed.Gutter.Update;
       ed.Update;

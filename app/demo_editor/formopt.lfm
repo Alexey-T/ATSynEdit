@@ -279,7 +279,7 @@ object fmOpt: TfmOpt
       object Label5: TLabel
         Left = 64
         Height = 15
-        Top = 136
+        Top = 200
         Width = 188
         Caption = 'indent/unindent size, if <0: use tabs'
         ParentColor = False
@@ -310,7 +310,7 @@ object fmOpt: TfmOpt
       object edIndent: TSpinEdit
         Left = 8
         Height = 23
-        Top = 132
+        Top = 196
         Width = 50
         MaxValue = 30
         MinValue = -10
@@ -324,6 +324,14 @@ object fmOpt: TfmOpt
         Width = 63
         Caption = 'auto-indent'
         ParentColor = False
+      end
+      object chkUninKeep: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 128
+        Width = 130
+        Caption = 'unindent keeps align'
+        TabOrder = 9
       end
     end
     object TabSheet3: TTabSheet

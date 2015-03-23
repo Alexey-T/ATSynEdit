@@ -416,8 +416,8 @@ end;
 function TATSynEdit.DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
 var
   Y1, Y2: integer;
+  NDecSpaces, NMinSpaces, i: integer;
   Str: atString;
-  i, MinIndent: integer;
 begin
   Result:= [];
   DoCaretSingleAsIs;
@@ -425,20 +425,22 @@ begin
   GetSelectedLines(0, Y1, Y2);
   if Y1<0 then Exit;
 
-  MinIndent:= MaxInt;
+  if FOptIndentSize>=0 then
+    NDecSpaces:= FOptIndentSize
+  else
+    NDecSpaces:= Abs(FOptIndentSize)*FTabSize;
+
+  NMinSpaces:= MaxInt;
   for i:= Y1 to Y2 do
   begin
     Str:= Strings.Lines[i];
     if Trim(Str)='' then Continue;
-    MinIndent:= Min(MinIndent, SGetIndentChars(Str));
+    NMinSpaces:= Min(NMinSpaces, SGetIndentExpanded(Str, FTabSize));
   end;
-  if MinIndent=MaxInt then Exit;
+  if NMinSpaces=MaxInt then Exit;
 
-  //this is raw estimate
-  {
   if FOptIndentKeepsAlign then
-    if (not ARight) and (MinIndent<Abs(FOptIndentSize)) then Exit;
-    }
+    if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
   for i:= Y1 to Y2 do
   begin
