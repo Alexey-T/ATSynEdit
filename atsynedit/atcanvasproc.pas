@@ -9,21 +9,49 @@ uses
   Classes, SysUtils, Graphics, Types,
   ATStringProc;
 
+
+procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer; AFontColor: TColor);
+procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor);
+procedure DoPaintUnprintedChars(C: TCanvas;
+  const AString: atString;
+  const AOffsets: array of integer;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont: TColor);
+procedure DoPaintUnprintedEol(C: TCanvas;
+  const AStrEol: atString;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont, AColorBG: TColor;
+  ADetails: boolean);
+
+const
+  cUnprintedDotScale = 6; //divider of line height
+  cUnprintedEndScale = 3; //divider of line height
+  cUnprintedFontOffsetX = 3;
+  cUnprintedFontOffsetY = 2;
+  cUnprintedFontScale = 0.80;
+
 type
   TATLinePart = record
     Offset, Len: integer;
     Color, ColorBG: TColor;
     Styles: TFontStyles;
   end;
-
+type
   TATLineParts = array[0..400] of TATLinePart;
   PATLineParts = ^TATLineParts;
 
 
-procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; S: UnicodeString;
+procedure CanvasTextOut(C: TCanvas;
+  PosX, PosY: integer;
+  Str: atString;
   ATabSize: integer;
   ACharSize: TPoint;
   AReplaceSpecs: boolean;
+  AShowUnprintable: boolean;
+  AColorUnprintable: TColor;
+  out AStrWidth: integer;
   ACharsSkipped: integer = 0;
   AParts: PATLineParts = nil);
 
@@ -41,11 +69,114 @@ uses
   {$ifdef win_fast}
   Windows,
   {$endif}
+  LCLType,
   LCLIntf;
 
+
+procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer; AFontColor: TColor);
 const
-  ETO_OPAQUE = 2;
-  ETO_CLIPPED = 4;
+  cMinDotSize = 2;
+var
+  R: TRect;
+  NSize: integer;
+begin
+  NSize:= Max(cMinDotSize, (ARect.Bottom-ARect.Top) div AScale);
+  R.Left:= (ARect.Left+ARect.Right) div 2 - NSize div 2;
+  R.Top:= (ARect.Top+ARect.Bottom) div 2 - NSize div 2;
+  R.Right:= R.Left + NSize;
+  R.Bottom:= R.Top + NSize;
+  C.Pen.Color:= AFontColor;
+  C.Brush.Color:= AFontColor;
+  C.FillRect(R);
+end;
+
+procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor);
+const
+  cIndent = 1; //offset left/rt
+  cScale = 4; //part 1/N of height
+var
+  X, X2, Y, Dx: integer;
+begin
+  X:= ARect.Right-cIndent;
+  X2:= ARect.Left+cIndent;
+  Y:= (ARect.Top+ARect.Bottom) div 2;
+  Dx:= (ARect.Bottom-ARect.Top) div cScale;
+  C.Pen.Color:= AColorFont;
+  C.MoveTo(X, Y);
+  C.LineTo(X2, Y);
+  C.MoveTo(X, Y);
+  C.LineTo(X-Dx, Y-Dx);
+  C.MoveTo(X, Y);
+  C.LineTo(X-Dx, Y+Dx);
+end;
+
+procedure DoPaintUnprintedChars(C: TCanvas;
+  const AString: atString;
+  const AOffsets: array of integer;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont: TColor);
+var
+  R: TRect;
+  i: integer;
+begin
+  if AString='' then Exit;
+
+  for i:= 1 to Length(AString) do
+    if (AString[i]=' ') or (AString[i]=#9) then
+    begin
+      R.Left:= APoint.X;
+      R.Right:= APoint.X;
+      if i>1 then
+        Inc(R.Left, AOffsets[i-2]);
+      Inc(R.Right, AOffsets[i-1]);
+
+      R.Top:= APoint.Y;
+      R.Bottom:= R.Top+ACharSize.Y;
+
+      {
+      if R.Right<AVisibleRect.Left then Continue;
+      if R.Left>AVisibleRect.Right then Continue;
+      }
+
+      if AString[i]=' ' then
+        DoPaintUnprintedSpace(C, R, cUnprintedDotScale, AColorFont)
+      else
+        DoPaintUnprintedTabulation(C, R, AColorFont);
+    end;
+end;
+
+procedure DoPaintUnprintedEol(C: TCanvas;
+  const AStrEol: atString;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont, AColorBG: TColor;
+  ADetails: boolean);
+var
+  NPrevSize: integer;
+begin
+  if AStrEol='' then Exit;
+
+  if ADetails then
+  begin
+    NPrevSize:= C.Font.Size;
+    C.Font.Size:= Trunc(C.Font.Size*cUnprintedFontScale);
+    C.Font.Color:= AColorFont;
+    C.Brush.Color:= AColorBG;
+    C.TextOut(
+      APoint.X+cUnprintedFontOffsetX,
+      APoint.Y+cUnprintedFontOffsetY,
+      AStrEol);
+    C.Font.Size:= NPrevSize;
+  end
+  else
+  begin
+    DoPaintUnprintedSpace(C,
+      Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+      cUnprintedEndScale,
+      AColorFont);
+  end;
+end;
 
 
 function CanvasFontSizes(C: TCanvas): TSize;
@@ -69,9 +200,17 @@ begin
   Result:= Trunc(CanvasTextSpaces(S, ATabSize)*ACharSize.X);
 end;
 
-procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; S: UnicodeString;
-  ATabSize: integer; ACharSize: TPoint; AReplaceSpecs: boolean;
-  ACharsSkipped: integer; AParts: PATLineParts);
+procedure CanvasTextOut(C: TCanvas;
+  PosX, PosY: integer;
+  Str: atString;
+  ATabSize: integer;
+  ACharSize: TPoint;
+  AReplaceSpecs: boolean;
+  AShowUnprintable: boolean;
+  AColorUnprintable: TColor;
+  out AStrWidth: integer;
+  ACharsSkipped: integer;
+  AParts: PATLineParts);
 var
   ListReal: array of real;
   ListInt: array of Longint;
@@ -85,15 +224,15 @@ var
   PartRect: TRect;
   Buf: AnsiString;
 begin
-  if S='' then Exit;
+  if Str='' then Exit;
   if AReplaceSpecs then
-    SReplaceSpecChars(S);
+    SReplaceSpecChars(Str);
 
-  SetLength(ListReal, Length(S));
-  SetLength(ListInt, Length(S));
-  SetLength(Dx, Length(S));
+  SetLength(ListReal, Length(Str));
+  SetLength(ListInt, Length(Str));
+  SetLength(Dx, Length(Str));
 
-  SCalcCharOffsets(S, ListReal, ATabSize, ACharsSkipped);
+  SCalcCharOffsets(Str, ListReal, ATabSize, ACharsSkipped);
 
   for i:= 0 to High(ListReal) do
     ListInt[i]:= Trunc(ListReal[i]*ACharSize.X);
@@ -106,7 +245,7 @@ begin
 
   if AParts=nil then
   begin
-    Buf:= UTF8Encode(S);
+    Buf:= UTF8Encode(Str);
     ExtTextOut(C.Handle, PosX, PosY, 0, nil, PChar(Buf), Length(Buf), @Dx[0]);
   end
   else
@@ -115,7 +254,7 @@ begin
       PartLen:= AParts^[j].Len;
       if PartLen=0 then Break;
       PartOffset:= AParts^[j].Offset;
-      PartStr:= Copy(S, PartOffset+1, PartLen);
+      PartStr:= Copy(Str, PartOffset+1, PartLen);
       if PartStr='' then Break;
       PartColor:= AParts^[j].Color;
       PartColorBG:= AParts^[j].ColorBG;
@@ -126,7 +265,7 @@ begin
       else
         PixOffset1:= 0;
 
-      i:= Min(PartOffset+PartLen, Length(S));
+      i:= Min(PartOffset+PartLen, Length(Str));
       if i>0 then
         PixOffset2:= ListInt[i-1]
       else
@@ -152,6 +291,11 @@ begin
         Length(Buf),
         @Dx[PartOffset]);
     end;
+
+  if AShowUnprintable then
+    DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable);
+
+  AStrWidth:= ListInt[High(ListInt)];
 end;
 
 var
@@ -183,6 +327,8 @@ begin
   C.AntialiasingMode:= AM;
   C.Rectangle(0, 0, 0, 0); //apply pen
 end;
+
+
 
 end.
 

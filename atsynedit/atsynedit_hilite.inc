@@ -13,16 +13,11 @@ begin
   bSelPrev:= false;
   nIndex:= -1;
 
-  //we have string for this call not only part of Strings.Lines[i] but
-  //with StringOfChar(' ', NIndent) added
-  nMaxOffset:= Min(ACharsMax, AItem.NLength-1+AItem.NIndent-ACharsSkipped +2{space eol});
+  nMaxOffset:= Min(ACharsMax, AItem.NLength-1-ACharsSkipped +2{space eol});
 
   for i:= 0 to nMaxOffset-1 do
   begin
-    if i<AItem.NIndent-ACharsSkipped then
-      bSel:= false
-    else
-      bSel:= IsPosSelected(AItem.NCharIndex-1-AItem.NIndent+i+ACharsSkipped, AItem.NLineIndex);
+    bSel:= IsPosSelected(AItem.NCharIndex-1+i+ACharsSkipped, AItem.NLineIndex);
 
     if nIndex<0 then
       bAdd:= true

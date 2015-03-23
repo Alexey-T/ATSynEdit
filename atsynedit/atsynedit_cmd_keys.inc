@@ -246,8 +246,8 @@ end;
 
 function TATSynEdit.DoCommand_CaretsRemove: TATCommandResults;
 begin
-  while Carets.Count>1 do
-    Carets.Delete(Carets.Count-1);
+  DoCaretSingleAsIs;
+  DoSelect_None;
 
   Result:= [cResultCaretTop];
 end;

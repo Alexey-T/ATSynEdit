@@ -171,12 +171,6 @@ const
   cSizeGutterBandFold = 0;
   cSizeGutterBandState = 3;
   cSizeGutterBandEmpty = 2;
-  cUnprintedFontOffsetX = 3;
-  cUnprintedFontOffsetY = 2;
-  cUnprintedFontScale = 0.80;
-  cUnprintedDotMinSize = 2;
-  cUnprintedDotScale = 6; //divider of line height
-  cUnprintedEndScale = 3; //divider of line height
   cCollapseMarkIndent = 3;
   cScrollKeepHorz = 1; //n chars allow handy clicking after eol
   cScrollIndentCaretHorz = 10;
@@ -331,23 +325,20 @@ type
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyHomeEndToNonSpace: boolean;
     //
-    function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoDropText;
-    procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
-    procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
-    procedure DoSelect_Word_ByClick;
-    procedure DoSelect_Line_ByClick;
     function GetAutoIndentString(APosX, APosY: integer): atString;
-    function GetCaretManyAllowed: boolean;
-    function GetCaretSelectionIndex(P: TPoint): integer;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
-    procedure DoCaretSingle(AX, AY: integer);
-    procedure DoCaretSingleAsIs;
     procedure DoInitDefaultPopupMenu;
+    //select
+    procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
+    procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
+    procedure DoSelect_Word_ByClick;
+    procedure DoSelect_Line_ByClick;
     procedure DoSelect_None;
+    //paint
     procedure DoPaint(AFlags: TATSynPaintFlags);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
     procedure DoPaintTo(C: TCanvas);
@@ -365,22 +356,18 @@ type
       const Str: atString;
       ALineStart: TPoint;
       AScrollPos: integer);
-    procedure DoPaintUnprintedChars(C: TCanvas;
-      const Str: atString;
-      ALineStart: TPoint;
-      const AVisibleRect: TRect;
-      ACharSize: TPoint;
-      AOffsetX: integer);
-    procedure DoPaintUnprintedEol(C: TCanvas;
-      const AItem: TATSynWrapItem;
-      ALineStart: TPoint;
-      AOffsetX: integer);
-    procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer);
-    procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
+    //carets
+    function GetCaretManyAllowed: boolean;
+    function GetCaretSelectionIndex(P: TPoint): integer;
+    function GetCaretTime: integer;
+    function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoCaretsSort;
+    procedure DoCaretSingle(AX, AY: integer);
+    procedure DoCaretSingleAsIs;
+    //events
     procedure DoEventCarets;
     procedure DoEventScroll;
     procedure DoEventChange;
@@ -388,7 +375,7 @@ type
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     procedure DoEventCommand(ACommand: integer; out AHandled: boolean);
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
-    function GetCaretTime: integer;
+    //
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
     function GetLastPos: TPoint;
@@ -1144,14 +1131,14 @@ var
   NGutterStateX1, NGutterStateX2,
   NCoordTop, NCoordLeftNums: integer;
   NWrapIndex, NLinesIndex: integer;
-  NOutputCharsSkipped: integer;
+  NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: real;
   WrapItem: TATSynWrapItem;
   BmKind: TATLineBookmark;
   BmColor: TColor;
-  Str, StrOut, StrOutUncut: atString;
+  Str, StrOut, StrOutUncut, StrEol: atString;
   CurrPoint, CurrPointText: TPoint;
-  LineWithCaret: boolean;
+  LineWithCaret, LineEolSelected: boolean;
   Parts: TATLineParts;
   //
   procedure DoPaintState(ATop: integer; AColor: TColor);
@@ -1207,7 +1194,7 @@ begin
     Str:= Copy(Str, WrapItem.NCharIndex, WrapItem.NLength);
     LineWithCaret:= IsLineWithCaret(NLinesIndex);
 
-    StrOut:= StringOfChar(' ', WrapItem.NIndent) + Str;
+    StrOut:= Str;
     StrOutUncut:= StrOut;
     AScrollHorz.NMax:= Max(AScrollHorz.NMax,
       Round(CanvasTextSpaces(StrOutUncut, FTabSize)) + cScrollKeepHorz);
@@ -1232,8 +1219,13 @@ begin
       C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
     end;
 
-    if WrapItem.NFinal=cWrapItemFinal then
-      StrOut:= StrOut+' '; //to hilite eol
+    CurrPointText:= Point(
+      CurrPoint.X
+        - Int64(AScrollHorz.NPos)*ACharSize.X
+        + WrapItem.NIndent*ACharSize.X,
+      CurrPoint.Y);
+    LineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
+    NOutputStrWidth:= 0;
 
     //draw line
     if StrOut<>'' then
@@ -1242,12 +1234,10 @@ begin
       Delete(StrOut, 1, NOutputCharsSkipped);
       Delete(StrOut, cMaxCharsForOutput, MaxInt);
 
-      CurrPointText:= Point(
-        CurrPoint.X - Int64(AScrollHorz.NPos)*ACharSize.X + Trunc(NOutputSpacesSkipped*ACharSize.X),
-        CurrPoint.Y);
+      Inc(CurrPointText.X, Trunc(NOutputSpacesSkipped*ACharSize.X));
 
       if FOptHiliteSelectionFull then
-        if IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex) then
+        if LineEolSelected then
         begin
           C.Brush.Color:= FColorTextSelBG;
           C.FillRect(
@@ -1268,29 +1258,60 @@ begin
         FTabSize,
         ACharSize,
         FUnprintedReplaceSpec,
+        AWithUnprintable and FUnprintedSpaces,
+        FColorUnprintedFont,
+        NOutputStrWidth,
         Trunc(NOutputSpacesSkipped), //todo:
           //needed number of chars of all chars counted as 1.0,
           //while NOutputSpacesSkipped is with cjk counted as 1.7
         @Parts
         );
+    end
+    else
+    begin
+      if FOptHiliteSelectionFull then
+        if LineEolSelected then
+        begin
+          C.Brush.Color:= FColorTextSelBG;
+          C.FillRect(
+            CurrPointText.X,
+            CurrPointText.Y,
+            ARect.Right,
+            CurrPointText.Y+ACharSize.Y);
+        end;
+    end;
 
-      //draw unprintable spaces/tabs
+    if WrapItem.NFinal=cWrapItemFinal then
+    begin
+      //for OptHiliteSelectionFull=false paint eol as selected space
+      if LineEolSelected then
+      begin
+        C.Brush.Color:= FColorTextSelBG;
+        C.FillRect(
+          CurrPointText.X+NOutputStrWidth,
+          CurrPointText.Y,
+          CurrPointText.X+NOutputStrWidth+ACharSize.X,
+          CurrPointText.Y+ACharSize.Y);
+      end;
+
+      //paint eol mark
       if AWithUnprintable then
-        if FUnprintedSpaces then
-          DoPaintUnprintedChars(C, Str, CurrPoint, ARect, ACharSize,
-            (WrapItem.NIndent - AScrollHorz.NPos)*ACharSize.X);
+        if FUnprintedEnds then
+          DoPaintUnprintedEol(C,
+            cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
+            Point(
+              CurrPointText.X+NOutputStrWidth,
+              CurrPointText.Y),
+            ACharSize,
+            FColorUnprintedFont,
+            FColorUnprintedBG,
+            FUnprintedEndsDetails);
     end;
 
     //draw collapsed-mark
-    if AWithUnprintable then
-      if WrapItem.NFinal=cWrapItemCollapsed then
+    if WrapItem.NFinal=cWrapItemCollapsed then
+      if AWithUnprintable then
         DoPaintCollapseMark(C, Str, CurrPoint, AScrollHorz.NPos);
-
-    //draw unprintable eol
-    if AWithUnprintable then
-      if FUnprintedEnds then
-        DoPaintUnprintedEol(C, WrapItem, CurrPoint,
-          CanvasTextWidth(StrOutUncut, FTabSize, ACharSize) - AScrollHorz.NPos*ACharSize.X);
 
     //draw gutter
     if AWithGutter then
@@ -1421,7 +1442,6 @@ procedure TATSynEdit.DoPaintCollapseMark(C: TCanvas; const Str: atString;
 var
   SMark: atString;
   NSize: integer;
-  ACharSize: TPoint;
 begin
   Dec(ALineStart.X, FCharSize.X*AScrollPos);
   Inc(ALineStart.X, CanvasTextWidth(Str, FTabSize, FCharSize));
@@ -1432,125 +1452,16 @@ begin
   C.Brush.Color:= FColorTextBG;
 
   SMark:= '...';
-  ACharSize:= GetCharSize(C, Point(0, 0));
-  CanvasTextOut(C, ALineStart.X+cCollapseMarkIndent, ALineStart.Y, SMark, FTabSize, ACharSize, false);
-  NSize:= CanvasTextWidth(SMark, FTabSize, ACharSize) + 2*cCollapseMarkIndent;
+  C.TextOut(
+    ALineStart.X+cCollapseMarkIndent,
+    ALineStart.Y,
+    SMark);
+  NSize:= C.TextWidth(SMark) + 2*cCollapseMarkIndent;
 
   //paint frame
   C.Pen.Color:= FColorCollapsedText;
   C.Brush.Style:= bsClear;
   C.Rectangle(ALineStart.X, ALineStart.Y, ALineStart.X+NSize, ALineStart.Y+FCharSize.Y);
-end;
-
-procedure TATSynEdit.DoPaintUnprintedChars(C: TCanvas;
-  const Str: atString;
-  ALineStart: TPoint;
-  const AVisibleRect: TRect;
-  ACharSize: TPoint;
-  AOffsetX: integer);
-var
-  List: array of real;
-  R: TRect;
-  i: integer;
-begin
-  if Str='' then Exit;
-  Inc(ALineStart.X, AOffsetX);
-
-  SetLength(List, Length(Str));
-  SCalcCharOffsets(Str, List, FTabSize);
-
-  for i:= 1 to Length(Str) do
-    if (Str[i]=' ') or (Str[i]=#9) then
-    begin
-      R.Left:= ALineStart.X;
-      R.Right:= ALineStart.X;
-      if i>1 then
-        Inc(R.Left, Round(ACharSize.X*List[i-2]));
-      Inc(R.Right, Round(ACharSize.X*List[i-1]));
-
-      R.Top:= ALineStart.Y;
-      R.Bottom:= R.Top+ACharSize.Y;
-
-      if R.Right<AVisibleRect.Left then Continue;
-      if R.Left>AVisibleRect.Right then Continue;
-
-      if Str[i]=' ' then
-        DoPaintUnprintedSpace(C, R, cUnprintedDotScale)
-      else
-        DoPaintUnprintedTabulation(C, R);
-    end;
-end;
-
-procedure TATSynEdit.DoPaintUnprintedEol(C: TCanvas;
-  const AItem: TATSynWrapItem;
-  ALineStart: TPoint;
-  AOffsetX: integer);
-var
-  NPosX, NPosY, NPrevSize: integer;
-  Eol: TATLineEnds;
-  StrEol: atString;
-begin
-  if AItem.NFinal<>cWrapItemFinal then Exit;
-
-  Eol:= Strings.LinesEnds[AItem.NLineIndex];
-  StrEol:= cLineEndNiceNames[Eol];
-  if StrEol='' then Exit;
-
-  NPosX:= ALineStart.X + AOffsetX;
-  NPosY:= ALineStart.Y;
-
-  if FUnprintedEndsDetails then
-  begin
-    NPrevSize:= C.Font.Size;
-    C.Font.Size:= Trunc(C.Font.Size*cUnprintedFontScale);
-    C.Font.Color:= FColorUnprintedFont;
-    C.Brush.Color:= FColorUnprintedBG;
-
-    Inc(NPosX, cUnprintedFontOffsetX);
-    Inc(NPosY, cUnprintedFontOffsetY);
-    C.TextOut(NPosX, NPosY, StrEol); //faster to use this func
-
-    C.Font.Size:= NPrevSize;
-  end
-  else
-  begin
-    DoPaintUnprintedSpace(C, Rect(NPosX, NPosY, NPosX+FCharSize.X, NPosY+FCharSize.Y), cUnprintedEndScale);
-  end;
-end;
-
-procedure TATSynEdit.DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer);
-var
-  R: TRect;
-  NSize: integer;
-begin
-  NSize:= Max(cUnprintedDotMinSize, (ARect.Bottom-ARect.Top) div AScale);
-  R.Left:= (ARect.Left+ARect.Right) div 2 - NSize div 2;
-  R.Top:= (ARect.Top+ARect.Bottom) div 2 - NSize div 2;
-  R.Right:= R.Left + NSize;
-  R.Bottom:= R.Top + NSize;
-  C.Pen.Color:= FColorUnprintedFont;
-  C.Brush.Color:= FColorUnprintedFont;
-  C.FillRect(R);
-end;
-
-procedure TATSynEdit.DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect);
-const
-  cInd = 1; //offset left/rt
-  cDiv = 4; //part 1/N of size-y
-var
-  X, X2, Y, Dx: integer;
-begin
-  X:= ARect.Right-cInd;
-  X2:= ARect.Left+cInd;
-  Y:= (ARect.Top+ARect.Bottom) div 2;
-  Dx:= (ARect.Bottom-ARect.Top) div cDiv;
-  C.Pen.Color:= FColorUnprintedFont;
-  C.MoveTo(X, Y);
-  C.LineTo(X2, Y);
-  C.MoveTo(X, Y);
-  C.LineTo(X-Dx, Y-Dx);
-  C.MoveTo(X, Y);
-  C.LineTo(X-Dx, Y+Dx);
 end;
 
 function TATSynEdit.GetCharSpacingX: integer;
