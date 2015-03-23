@@ -832,7 +832,7 @@ begin
   FWrapInfo.Clear;
 
   {$ifdef beep_wrapinfo}
-  SysUtils.Beep;
+  Beep;
   {$endif}
 
   case FWrapMode of
@@ -974,7 +974,7 @@ begin
     if (not bVert1 and bVert2) or
       (not bHorz1 and bHorz2) then
       begin
-        //SysUtils.Beep;
+        //Beep;
         UpdateScrollbars(false);
       end;
 
@@ -2030,8 +2030,9 @@ begin
 
   if FMouseDragging then
   begin
-    DoDropText;
     Cursor:= crDefault;
+    DoDropText;
+    Update;
   end;
 
   FMouseDownPnt:= Point(-1, -1);
@@ -2462,22 +2463,22 @@ begin
   Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then Exit;
 
+  DoSelect_None;
+
   //calc insert-pos
   P:= ScreenToClient(Mouse.CursorPos);
   P:= ClientPosToCaretPos(P);
   if P.Y<0 then
-    begin SysUtils.Beep; Exit end;
+    begin Beep; Exit end;
 
   //can't drop into selection
   Relation:= IsPosInRange(P.X, P.Y, X1, Y1, X2, Y2);
   if Relation=cRelateInside then
-    begin SysUtils.Beep; Exit end;
+    begin Beep; Exit end;
 
   Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
   if Str='' then
-    begin SysUtils.Beep; Exit end;
-
-  DoSelect_None;
+    begin Beep; Exit end;
 
   //insert before selection?
   if Relation=cRelateBefore then
