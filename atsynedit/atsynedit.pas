@@ -124,7 +124,7 @@ type
     function IsIndexValid(N: integer): boolean;
     function IsItemInitial(N: integer): boolean;
     function IsItemAfterCollapsed(N: integer): boolean;
-    property Items[N: integer]: TATSynWrapItem read GetItem;
+    property Items[N: integer]: TATSynWrapItem read GetItem; default;
     procedure Add(AIndex, AOffset, ALen, AIndent: integer; AFinal: TATSynWrapFinal);
   end;
 
@@ -2545,10 +2545,12 @@ procedure TATSynEdit.DoMinimapClick(X, Y: integer);
 var
   N: integer;
 begin
-  N:= (Y-FRectMinimap.Top) div FCharSizeMinimap.Y;
-  if not FWrapInfo.IsIndexValid(N) then Exit;
-  N:= FWrapInfo.Items[N].NLineIndex;
-  DoGotoPos(Point(0, N));
+  N:= (Y-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
+  if FWrapInfo.IsIndexValid(N) then
+  begin
+    N:= FWrapInfo[N].NLineIndex;
+    DoGotoPos(Point(0, N));
+  end;
 end;
 
 {$I atsynedit_carets.inc}
