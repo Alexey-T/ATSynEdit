@@ -1,6 +1,6 @@
 Mac10.8
 Laz1.2.6
 
-- minimap not painted with text(ignored too small font). Redo? don't textout, but paint dots?
-- caret not blinking, minimap selrect overlaps all. So CanvasInvertRect just overlaps all..
+- minimap not painted with text(ignored too small font). Redo map for mac?
+- a)caret not blinking, b)minimap selrect overlaps all. So CanvasInvertRect just overlaps all..
 
