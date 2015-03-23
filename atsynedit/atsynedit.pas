@@ -331,7 +331,7 @@ type
     FOptKeyTabIndents: boolean;
     //
     procedure DoDropText;
-    procedure DoMinimapClick(APosX, APosY: integer);
+    procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
     procedure MenuClick(Sender: TObject);
@@ -1979,7 +1979,7 @@ begin
 
   if PtInRect(FRectMinimap, Point(X, Y)) then
   begin
-    DoMinimapClick(X, Y);
+    DoMinimapClick(Y);
     Exit
   end;
 
@@ -2236,15 +2236,16 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  if (not Focused) and FCaretStopsUnfocused then
-  begin
-    if FCaretShown then
+  if FCaretStopsUnfocused then
+    if not Focused then
     begin
-      FCaretShown:= not FCaretShown;
-      DoPaintCarets(FBitmap.Canvas, true);
+      if FCaretShown then
+      begin
+        FCaretShown:= not FCaretShown;
+        DoPaintCarets(FBitmap.Canvas, true);
+      end;
+      Exit;
     end;
-    Exit;
-  end;
 
   FCaretShown:= not FCaretShown;
   DoPaintCarets(FBitmap.Canvas, true);
@@ -2556,7 +2557,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoMinimapClick(APosX, APosY: integer);
+procedure TATSynEdit.DoMinimapClick(APosY: integer);
 var
   N: integer;
 begin
