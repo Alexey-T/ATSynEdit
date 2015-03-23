@@ -1192,7 +1192,9 @@ begin
     //prepare line
     Str:= Strings.Lines[NLinesIndex];
     Str:= Copy(Str, WrapItem.NCharIndex, WrapItem.NLength);
+
     LineWithCaret:= IsLineWithCaret(NLinesIndex);
+    LineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
     StrOut:= Str;
     StrOutUncut:= StrOut;
@@ -1224,7 +1226,6 @@ begin
         - Int64(AScrollHorz.NPos)*ACharSize.X
         + WrapItem.NIndent*ACharSize.X,
       CurrPoint.Y);
-    LineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
     NOutputStrWidth:= 0;
 
     //draw line
@@ -1283,7 +1284,7 @@ begin
 
     if WrapItem.NFinal=cWrapItemFinal then
     begin
-      //for OptHiliteSelectionFull=false paint eol as selected space
+      //for OptHiliteSelectionFull=false paint eol bg
       if LineEolSelected then
       begin
         C.Brush.Color:= FColorTextSelBG;
