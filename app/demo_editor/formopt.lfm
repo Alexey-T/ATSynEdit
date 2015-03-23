@@ -31,8 +31,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet5
-    TabIndex = 2
+    ActivePage = TabSheet4
+    TabIndex = 4
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -390,8 +390,8 @@ object fmOpt: TfmOpt
     object TabSheet4: TTabSheet
       Caption = 'carets'
       ClientHeight = 283
-      ClientWidth = 584
-      object edCaretTime: TSpinEdit
+      ClientWidth = 616
+      object edCrTime: TSpinEdit
         Left = 8
         Height = 23
         Top = 8
@@ -410,7 +410,7 @@ object fmOpt: TfmOpt
         Caption = 'caret time'
         ParentColor = False
       end
-      object chkCaretVirtual: TCheckBox
+      object chkCrVirt: TCheckBox
         Left = 8
         Height = 19
         Top = 36
@@ -418,7 +418,7 @@ object fmOpt: TfmOpt
         Caption = 'caret after eol'
         TabOrder = 1
       end
-      object chkCaretMul: TCheckBox
+      object chkCrMul: TCheckBox
         Left = 8
         Height = 19
         Top = 57
@@ -434,6 +434,14 @@ object fmOpt: TfmOpt
         Caption = 'Ctrl+click to add/del; Ctrl+Shift+click to add column; Ctrl+drag to add with sel'
         ParentColor = False
         WordWrap = True
+      end
+      object chkCrUnfocus: TCheckBox
+        Left = 9
+        Height = 19
+        Top = 100
+        Width = 112
+        Caption = 'stop if unfocused'
+        TabOrder = 3
       end
     end
   end

@@ -427,8 +427,8 @@ begin
   begin
     chkCurLine.Checked:= ed.OptShowCurLine;
     chkCurCol.Checked:= ed.OptShowCurColumn;
-    chkCaretVirtual.Checked:= ed.OptCaretVirtual;
-    edCaretTime.Value:= ed.OptCaretTime;
+    chkCrVirt.Checked:= ed.OptCaretVirtual;
+    edCrTime.Value:= ed.OptCaretTime;
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
@@ -452,7 +452,8 @@ begin
     chkClick2.Checked:= ed.OptMouse2ClickSelectsLine;
     chkClick3.Checked:= ed.OptMouse3ClickSelectsLine;
     chkClick2W.Checked:= ed.OptMouse2ClickDragSelectsWords;
-    chkCaretMul.Checked:= ed.OptCaretManyAllowed;
+    chkCrMul.Checked:= ed.OptCaretManyAllowed;
+    chkCrUnfocus.Checked:= ed.OptCaretStopsUnfocused;
     edRulerH.Value:= ed.OptRulerHeight;
     edRulerFont.Value:= ed.OptRulerFontSize;
     chkDnD.Checked:= ed.OptMouseDragDrop;
@@ -469,8 +470,8 @@ begin
     begin
       ed.OptShowCurLine:= chkCurLine.Checked;
       ed.OptShowCurColumn:= chkCurCol.Checked;
-      ed.OptCaretVirtual:= chkCaretVirtual.Checked;
-      ed.OptCaretTime:= edCaretTime.Value;
+      ed.OptCaretVirtual:= chkCrVirt.Checked;
+      ed.OptCaretTime:= edCrTime.Value;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
@@ -494,7 +495,8 @@ begin
       ed.OptMouse2ClickSelectsLine:= chkClick2.Checked;
       ed.OptMouse3ClickSelectsLine:= chkClick3.Checked;
       ed.OptMouse2ClickDragSelectsWords:= chkClick2W.Checked;
-      ed.OptCaretManyAllowed:= chkCaretMul.Checked;
+      ed.OptCaretManyAllowed:= chkCrMul.Checked;
+      ed.OptCaretStopsUnfocused:= chkCrUnfocus.Checked;
       ed.OptRulerHeight:= edRulerH.Value;
       ed.OptRulerFontSize:= edRulerFont.Value;
       ed.OptMouseDragDrop:= chkDnD.Checked;

@@ -224,6 +224,7 @@ type
     FCaretShown: boolean;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
+    FCaretStopsUnfocused: boolean;
     FMenu: TPopupMenu;
     FOver: boolean;
     FMouseDownPnt: TPoint;
@@ -568,6 +569,7 @@ type
     property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
     property OptCaretTime: integer read GetCaretTime write SetCaretTime;
+    property OptCaretStopsUnfocused: boolean read FCaretStopsUnfocused write FCaretStopsUnfocused;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerHeight: integer read FOptRulerHeight write FOptRulerHeight;
@@ -1532,6 +1534,7 @@ begin
   FCaretShapeOvr:= cCaretShapeFull;
   FCaretVirtual:= true;
   FCaretSpecPos:= false;
+  FCaretStopsUnfocused:= true;
 
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
@@ -2233,7 +2236,7 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  if not Focused then
+  if (not Focused) and FCaretStopsUnfocused then
   begin
     if FCaretShown then
     begin
