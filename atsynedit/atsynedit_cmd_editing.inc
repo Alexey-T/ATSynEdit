@@ -52,10 +52,22 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCommand_TextInsertTab: TATCommandResults;
+function TATSynEdit.DoCommand_TextTabulation: TATCommandResults;
 var
   Str: atString;
+  N1, N2: integer;
 begin
+  if FOptKeyTabIndents then
+    if Carets.Count=1 then
+    begin
+      GetSelectedLines(0, N1, N2);
+      if N1>=0 then
+      begin
+        Result:= DoCommand_TextIndentUnindent(true);
+        Exit
+      end;
+    end;
+
   if FOptTabSpaces then
     Str:= StringOfChar(' ', FTabSize)
   else
@@ -401,4 +413,42 @@ begin
     Result:= [cResultText, cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
+var
+  Y1, Y2: integer;
+  Str: atString;
+  i, MinIndent: integer;
+begin
+  Result:= [];
+  DoCaretSingleAsIs;
+
+  GetSelectedLines(0, Y1, Y2);
+  if Y1<0 then Exit;
+
+  MinIndent:= MaxInt;
+  for i:= Y1 to Y2 do
+  begin
+    Str:= Strings.Lines[i];
+    if Trim(Str)='' then Continue;
+    MinIndent:= Min(MinIndent, SGetIndentChars(Str));
+  end;
+  if MinIndent=MaxInt then Exit;
+
+  //this is raw estimate
+  {
+  if FOptIndentKeepsAlign then
+    if (not ARight) and (MinIndent<Abs(FOptIndentSize)) then Exit;
+    }
+
+  for i:= Y1 to Y2 do
+  begin
+    Str:= Strings.Lines[i];
+    if Trim(Str)='' then Continue;
+    Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize);
+    if Strings.Lines[i]<>Str then
+      Strings.Lines[i]:= Str;
+  end;
+
+  Result:= [cResultText, cResultCaretTop];
+end;
 

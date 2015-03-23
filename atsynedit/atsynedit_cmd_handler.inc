@@ -144,7 +144,7 @@ begin
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver, false);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);
     cCommand_KeyDelete:           Res:= DoCommand_TextDelete;
-    cCommand_KeyTab:              Res:= DoCommand_TextInsertTab;
+    cCommand_KeyTab:              Res:= DoCommand_TextTabulation;
     cCommand_KeyTabChar:          Res:= DoCommand_TextInsertAtCarets(#9, false, FOver, false);
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
     //end of most used
@@ -172,7 +172,10 @@ begin
     cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(false);
 
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
-    cCommand_ToggleOverwrite:                Res:= DoCommand_ToggleOver;
+    cCommand_ToggleOverwrite:          Res:= DoCommand_ToggleOverwrite;
+
+    cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
+    cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);
 
     cCommand_ScrollLineUp:             Res:= DoCommand_ScrollVert(-1);
     cCommand_ScrollLineDown:           Res:= DoCommand_ScrollVert(1);

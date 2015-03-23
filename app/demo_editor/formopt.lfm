@@ -31,8 +31,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet1
-    TabIndex = 0
+    ActivePage = TabSheet5
+    TabIndex = 2
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -272,7 +272,7 @@ object fmOpt: TfmOpt
       object edPage: TComboBox
         Left = 8
         Height = 23
-        Top = 92
+        Top = 252
         Width = 106
         ItemHeight = 15
         Items.Strings = (
@@ -286,7 +286,7 @@ object fmOpt: TfmOpt
       object Label3: TLabel
         Left = 120
         Height = 15
-        Top = 96
+        Top = 256
         Width = 100
         Caption = 'page up/down size'
         ParentColor = False
@@ -298,6 +298,32 @@ object fmOpt: TfmOpt
         Width = 124
         Caption = 'overwrite sel by text'
         TabOrder = 4
+      end
+      object chkTabInd: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 88
+        Width = 94
+        Caption = 'tab: indent sel'
+        TabOrder = 5
+      end
+      object edIndent: TSpinEdit
+        Left = 8
+        Height = 23
+        Top = 112
+        Width = 50
+        MaxValue = 30
+        MinValue = -10
+        TabOrder = 6
+        Value = 1
+      end
+      object Label5: TLabel
+        Left = 66
+        Height = 15
+        Top = 116
+        Width = 207
+        Caption = 'indent size (ctrl-I, ctrl-U), if <0: use tabs'
+        ParentColor = False
       end
     end
     object TabSheet3: TTabSheet

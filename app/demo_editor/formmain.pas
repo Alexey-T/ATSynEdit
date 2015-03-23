@@ -460,6 +460,8 @@ begin
     edPage.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
     chkLeftRt.Checked:= ed.OptKeyLeftRightSwapSel;
     chkHomeEnd.Checked:= ed.OptKeyHomeEndToNonSpace;
+    chkTabInd.Checked:= ed.OptKeyTabIndents;
+    edIndent.Value:= ed.OptIndentSize;
 
     if ShowModal=mrOk then
     begin
@@ -498,6 +500,8 @@ begin
       ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);
       ed.OptKeyLeftRightSwapSel:= chkLeftRt.Checked;
       ed.OptKeyHomeEndToNonSpace:= chkHomeEnd.Checked;
+      ed.OptKeyTabIndents:= chkTabInd.Checked;
+      ed.OptIndentSize:= edIndent.Value;
 
       ed.Gutter.Update;
       ed.Update;

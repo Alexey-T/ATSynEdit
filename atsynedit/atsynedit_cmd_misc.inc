@@ -1,6 +1,6 @@
 {$ifdef nnn}begin end;{$endif}
 
-function TATSynEdit.DoCommand_ToggleOver: TATCommandResults;
+function TATSynEdit.DoCommand_ToggleOverwrite: TATCommandResults;
 begin
   ModeOver:= not ModeOver;
   Result:= [cResultState];

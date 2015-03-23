@@ -297,6 +297,8 @@ type
     FMinimapVisible: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptIndentSize: integer;
+    FOptIndentKeepsAlign: boolean;
     FOptRulerVisible: boolean;
     FOptRulerHeight: integer;
     FOptRulerFontSize: integer;
@@ -324,10 +326,12 @@ type
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyHomeEndToNonSpace: boolean;
+    FOptKeyTabIndents: boolean;
     //
     procedure DoDropText;
     procedure DoMinimapClick(APosX, APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
+    procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
@@ -440,18 +444,19 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
     function DoCommand_SelectWords: TATCommandResults;
     function DoCommand_SelectLines: TATCommandResults;
     function DoCommand_SelectAll: TATCommandResults;
     function DoCommand_Cancel: TATCommandResults;
     function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
-    function DoCommand_ToggleOver: TATCommandResults;
+    function DoCommand_ToggleOverwrite: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
     function DoCommand_ScrollVert(ALines: integer): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;
-    function DoCommand_TextInsertTab: TATCommandResults;
+    function DoCommand_TextTabulation: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
     function DoCommand_KeyEnd: TATCommandResults;
     function DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
@@ -589,6 +594,9 @@ type
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel;
     property OptKeyHomeEndToNonSpace: boolean read FOptKeyHomeEndToNonSpace write FOptKeyHomeEndToNonSpace;
+    property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents;
+    property OptIndentSize: integer read FOptIndentSize write FOptIndentSize;
+    property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
   end;
 
 implementation
@@ -1136,7 +1144,7 @@ var
   WrapItem: TATSynWrapItem;
   BmKind: TATLineBookmark;
   BmColor: TColor;
-  Str, StrOut, StrOutUncut, StrEol: atString;
+  Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText: TPoint;
   LineWithCaret, LineEolSelected: boolean;
   Parts: TATLineParts;
@@ -1635,6 +1643,9 @@ begin
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
   FOptKeyLeftRightSwapSel:= true;
   FOptKeyHomeEndToNonSpace:= true;
+  FOptKeyTabIndents:= true;
+  FOptIndentSize:= 2;
+  FOptIndentKeepsAlign:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;

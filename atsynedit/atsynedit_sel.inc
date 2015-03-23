@@ -146,4 +146,21 @@ begin
     end;
 end;
 
+procedure TATSynEdit.GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
+var
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  AFrom:= -1;
+  ATo:= -1;
+  if not Carets.IsIndexValid(ACaretIndex) then Exit;
+
+  Carets[ACaretIndex].GetRange(X1, Y1, X2, Y2, bSel);
+  if not bSel then Exit;
+
+  AFrom:= Y1;
+  ATo:= Y2;
+  //sel ended at line-start?
+  if (X2=0) and (Y2>0) then Dec(ATo);
+end;
 

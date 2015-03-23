@@ -39,7 +39,7 @@ begin
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Delete'], []);
   M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Return'], []);
   M.Add(cCommand_KeyTab, 'tabulation', [], []);
-  M.Add(cCommand_KeyTabChar, 'tabulation: tab-char', ['Ctrl+I'], []);
+  M.Add(cCommand_KeyTabChar, 'tabulation: tab-char', [], []);
 
   M.Add(cCommand_TextDeleteLine, 'delete current line', ['Ctrl+Y'], []);
   M.Add(cCommand_TextDuplicateLine, 'duplicate current line', ['Ctrl+D'], []);
@@ -66,6 +66,9 @@ begin
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line start', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', ['Ctrl+K'], []);
   M.Add(cCommand_TextDeleteSelection, 'delete selection', [], []);
+
+  M.Add(cCommand_TextIndent, 'indent selection', ['Ctrl+I'], []);
+  M.Add(cCommand_TextUnindent, 'unindent selection', ['Ctrl+U'], ['Shift+Tab']);
 
   M.Add(cCommand_ScrollLineUp, 'scroll line up', ['Ctrl+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', ['Ctrl+Down'], []);

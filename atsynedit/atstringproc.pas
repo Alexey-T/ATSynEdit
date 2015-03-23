@@ -21,6 +21,9 @@ function IsSpecialCodeChar(ch: atChar): boolean;
 function IsEolCode(N: Word): boolean;
 function IsAccentChar(ch: WideChar): boolean;
 
+function SIndentUnindent(const Str: atString; ARight: boolean;
+  AIndentSize, ATabSize: integer): atString;
+function SSpacesToTabs(const Str: atString; ATabSize: integer): atString;
 function SGetItem(var S: string; const sep: Char = ','): string;
 function BoolToPlusMinusOne(b: boolean): integer;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
@@ -45,7 +48,7 @@ procedure SFindOutputSkipPosition(const S: atString; ATabSize, AScrollPos: integ
 implementation
 
 uses
-  Dialogs, Math;
+  Dialogs;
 
 function IsEolCode(N: Word): boolean;
 begin
@@ -409,6 +412,51 @@ begin
   Result:=
     (Pos(#13, S)>0) or
     (Pos(#10, S)>0);
+end;
+
+function SSpacesToTabs(const Str: atString; ATabSize: integer): atString;
+begin
+  Result:= StringReplace(Str, StringOfChar(' ', ATabSize), #9, [rfReplaceAll]);
+end;
+
+function SIndentUnindent(const Str: atString; ARight: boolean;
+  AIndentSize, ATabSize: integer): atString;
+var
+  StrIndent, StrText: atString;
+  DecSpaces, N: integer;
+  DoTabs: boolean;
+begin
+  Result:= Str;
+
+  //indent<0== use tabs
+  if AIndentSize>=0 then
+  begin
+    StrIndent:= StringOfChar(' ', AIndentSize);
+    DecSpaces:= AIndentSize;
+  end
+  else
+  begin
+    StrIndent:= StringOfChar(#9, Abs(AIndentSize));
+    DecSpaces:= Abs(AIndentSize)*ATabSize;
+  end;
+
+  if ARight then
+    Result:= StrIndent+Str
+  else
+  begin
+    N:= SGetIndentChars(Str);
+    StrIndent:= Copy(Str, 1, N);
+    StrText:= Copy(Str, N+1, MaxInt);
+    DoTabs:= Pos(#9, StrIndent)>0;
+
+    StrIndent:= SExpandTabulations(StrIndent, ATabSize);
+    if Length(StrIndent)<DecSpaces then Exit;
+    Delete(StrIndent, 1, DecSpaces);
+
+    if DoTabs then
+      StrIndent:= SSpacesToTabs(StrIndent, ATabSize);
+    Result:= StrIndent+StrText;
+  end;
 end;
 
 end.

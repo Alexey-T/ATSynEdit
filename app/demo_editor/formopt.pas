@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkTabInd: TCheckBox;
     chkHomeEnd: TCheckBox;
     chkLeftRt: TCheckBox;
     chkNavWrap: TCheckBox;
@@ -48,11 +49,13 @@ type
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
+    Label5: TLabel;
     Label8: TLabel;
     PageControl1: TPageControl;
     edSizeBm: TSpinEdit;
     edSizeState: TSpinEdit;
     edSizeEmpty: TSpinEdit;
+    edIndent: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
