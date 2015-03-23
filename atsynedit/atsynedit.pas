@@ -326,7 +326,7 @@ type
     FOptKeyHomeEndToNonSpace: boolean;
     //
     procedure DoDropText;
-    procedure DoMinimapClick(X, Y: integer);
+    procedure DoMinimapClick(APosX, APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
@@ -885,8 +885,6 @@ begin
 
       Inc(NOffset, NLen);
       Delete(Str, 1, NLen);
-
-      if (str<>'') and (nlen<=0) then showmessage('aa');
     until Str='';
   end;
 end;
@@ -2537,15 +2535,15 @@ begin
     cIndentTabsSpaces:
       Result:= StringOfChar(#9, NSpaces div FTabSize) + StringOfChar(' ', NSpaces mod FTabSize);
     else
-      raise Exception.Create('unknown indent-kind');
+      raise Exception.Create('Unknown autoindent-kind');
   end;
 end;
 
-procedure TATSynEdit.DoMinimapClick(X, Y: integer);
+procedure TATSynEdit.DoMinimapClick(APosX, APosY: integer);
 var
   N: integer;
 begin
-  N:= (Y-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
+  N:= (APosY-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
   if FWrapInfo.IsIndexValid(N) then
   begin
     N:= FWrapInfo[N].NLineIndex;
