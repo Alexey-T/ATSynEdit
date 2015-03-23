@@ -9,8 +9,14 @@ uses
   Classes, SysUtils, Graphics, Types,
   ATStringProc;
 
+const
+  cUnprintedDotScale = 0.15;
+  cUnprintedEndScale = 0.30;
+  cUnprintedFontScale = 0.80;
+  cUnprintedFontOffsetX = 3;
+  cUnprintedFontOffsetY = 2;
 
-procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer; AFontColor: TColor);
+procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: real; AFontColor: TColor);
 procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor);
 procedure DoPaintUnprintedChars(C: TCanvas;
   const AString: atString;
@@ -24,13 +30,6 @@ procedure DoPaintUnprintedEol(C: TCanvas;
   ACharSize: TPoint;
   AColorFont, AColorBG: TColor;
   ADetails: boolean);
-
-const
-  cUnprintedDotScale = 6; //divider of line height
-  cUnprintedEndScale = 3; //divider of line height
-  cUnprintedFontOffsetX = 3;
-  cUnprintedFontOffsetY = 2;
-  cUnprintedFontScale = 0.80;
 
 type
   TATLinePart = record
@@ -73,14 +72,14 @@ uses
   LCLIntf;
 
 
-procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer; AFontColor: TColor);
+procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: real; AFontColor: TColor);
 const
   cMinDotSize = 2;
 var
   R: TRect;
   NSize: integer;
 begin
-  NSize:= Max(cMinDotSize, (ARect.Bottom-ARect.Top) div AScale);
+  NSize:= Max(cMinDotSize, Trunc((ARect.Bottom-ARect.Top)*AScale));
   R.Left:= (ARect.Left+ARect.Right) div 2 - NSize div 2;
   R.Top:= (ARect.Top+ARect.Bottom) div 2 - NSize div 2;
   R.Right:= R.Left + NSize;
