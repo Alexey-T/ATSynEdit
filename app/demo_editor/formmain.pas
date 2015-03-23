@@ -452,6 +452,7 @@ begin
     chkClick2.Checked:= ed.OptMouse2ClickSelectsLine;
     chkClick3.Checked:= ed.OptMouse3ClickSelectsLine;
     chkClick2W.Checked:= ed.OptMouse2ClickDragSelectsWords;
+    chkClickNm.Checked:= ed.OptMouseGutterClickSelectsLine;
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
     chkCrUnfocus.Checked:= ed.OptCaretStopsUnfocused;
     edRulerH.Value:= ed.OptRulerHeight;
@@ -495,6 +496,7 @@ begin
       ed.OptMouse2ClickSelectsLine:= chkClick2.Checked;
       ed.OptMouse3ClickSelectsLine:= chkClick3.Checked;
       ed.OptMouse2ClickDragSelectsWords:= chkClick2W.Checked;
+      ed.OptMouseGutterClickSelectsLine:= chkClickNm.Checked;
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
       ed.OptCaretStopsUnfocused:= chkCrUnfocus.Checked;
       ed.OptRulerHeight:= edRulerH.Value;

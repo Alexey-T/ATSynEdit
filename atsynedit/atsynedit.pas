@@ -324,6 +324,7 @@ type
     FOptMouse2ClickDragSelectsWords: boolean;
     FOptMouseDragDrop: boolean;
     FOptMouseRightClickMovesCaret: boolean;
+    FOptMouseGutterClickSelectsLine: boolean;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyHomeToNonSpace: boolean;
@@ -593,6 +594,7 @@ type
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret;
+    property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine;
     property OptKeyNavigateWrapped: boolean read FOptKeyNavigateWrapped write FOptKeyNavigateWrapped;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel;
@@ -1641,6 +1643,7 @@ begin
   FOptMouse3ClickSelectsLine:= true;
   FOptMouse2ClickDragSelectsWords:= true;
   FOptMouseRightClickMovesCaret:= false;
+  FOptMouseGutterClickSelectsLine:= true;
   FOptCopyLinesIfNoSel:= true;
   FOptHiliteSelectionFull:= false;
   FOptShowCurLine:= false;
@@ -2032,7 +2035,8 @@ begin
   if PtInRect(FRectGutter, Point(X, Y)) then
   begin
     //handle click on numbers here
-    if (X>=FGutter[FGutterBandNum].Left) and
+    if FOptMouseGutterClickSelectsLine and
+      (X>=FGutter[FGutterBandNum].Left) and
       (X<FGutter[FGutterBandNum].Right) then
     begin
       FMouseDownNumber:= PCaret.Y;

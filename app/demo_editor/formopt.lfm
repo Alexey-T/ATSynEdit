@@ -31,8 +31,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet4
-    TabIndex = 4
+    ActivePage = TabSheet3
+    TabIndex = 3
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -345,7 +345,7 @@ object fmOpt: TfmOpt
     object TabSheet3: TTabSheet
       Caption = 'mouse'
       ClientHeight = 283
-      ClientWidth = 584
+      ClientWidth = 616
       object chkClick2: TCheckBox
         Left = 8
         Height = 19
@@ -385,6 +385,14 @@ object fmOpt: TfmOpt
         Width = 139
         Caption = 'right click moves caret'
         TabOrder = 4
+      end
+      object chkClickNm: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 108
+        Width = 166
+        Caption = 'click on number selects line'
+        TabOrder = 5
       end
     end
     object TabSheet4: TTabSheet
