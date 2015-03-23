@@ -1,8 +1,8 @@
+project*.exe
 *.rar
 *.zip
 *.dbg
 *.ico
-*.exe
 *.dll
 *.bpl
 *.bpi
