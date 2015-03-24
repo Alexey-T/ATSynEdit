@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, formmain, formkey, atcanvasproc, atkeymapping, atstringproc,
-  atstringproc_wordjump, atstrings, atsyncarets, atsynedit, atsynedit_commands,
+  atstringproc_wordjump, atstrings, atcarets, atsynedit, atsynedit_commands,
   atsynedit_keymapping, ATGutter, formopt;
 
 {$R *.res}

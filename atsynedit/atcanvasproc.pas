@@ -44,6 +44,7 @@ function CanvasTextWidth(const S: atString; ATabSize: integer; ACharSize: TPoint
 
 function CanvasFontSizes(C: TCanvas): TSize;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
+procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
 
 
 implementation
@@ -314,6 +315,14 @@ begin
 end;
 
 
+procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
+var
+  j: integer;
+begin
+  for j:= Y1 to Y2 do
+    if Odd(j) then
+      C.Pixels[X, j]:= AColor;
+end;
 
 end.
 

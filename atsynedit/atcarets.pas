@@ -1,4 +1,4 @@
-unit ATSynCarets;
+unit ATCarets;
 
 {$mode delphi}
 

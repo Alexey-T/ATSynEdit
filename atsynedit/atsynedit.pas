@@ -13,7 +13,7 @@ uses
   Messages,
   {$endif}
   ATStringProc, ATStrings, ATCanvasProc, ATGutter,
-  ATSynCarets, ATKeyMapping;
+  ATCarets, ATKeyMapping;
 
 type
   TATCommandResult = (
@@ -1150,7 +1150,6 @@ var
   NCoordTop, NCoordLeftNums: integer;
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
-  NCoordGuide, i, j: integer;
   NOutputSpacesSkipped: real;
   WrapItem: TATSynWrapItem;
   BmKind: TATLineBookmark;
@@ -1159,6 +1158,7 @@ var
   CurrPoint, CurrPointText: TPoint;
   LineWithCaret, LineEolSelected: boolean;
   Parts: TATLineParts;
+  i: integer;
   //
   procedure DoPaintState(ATop: integer; AColor: TColor);
   begin
@@ -1245,12 +1245,7 @@ begin
       begin
         for i:= 0 to WrapItem.NIndent-1 do
           if i mod FTabSize = 0 then
-          begin
-            NCoordGuide:= ARect.Left + i*ACharSize.X;
-            for j:= NCoordTop to NCoordTop+ACharSize.Y do
-              if Odd(j) then
-                C.Pixels[NCoordGuide, j]:= FColorIndentLines;
-          end;
+            CanvasDottedVertLine(C, ARect.Left + i*ACharSize.X, NCoordTop, NCoordTop+ACharSize.Y, FColorIndentLines);
       end;
 
     CurrPointText:= Point(
