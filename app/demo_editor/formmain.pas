@@ -466,6 +466,7 @@ begin
     chkTabInd.Checked:= ed.OptKeyTabIndents;
     edIndent.Value:= ed.OptIndentSize;
     chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
+    chkDotLn.Checked:= ed.OptShowIndentLines;
 
     if ShowModal=mrOk then
     begin
@@ -482,6 +483,7 @@ begin
       ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
 
+      ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptWordChars:= edChars.Text;
       ed.OptAutoIndent:= chkAutoInd.Checked;
       ed.OptAutoIndentKind:= TATAutoIndentKind(edAutoInd.ItemIndex);

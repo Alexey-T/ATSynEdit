@@ -1240,17 +1240,18 @@ begin
       C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
     end;
 
-    if FOptShowIndentLines then
-    begin
-      for i:= 0 to WrapItem.NIndent-1 do
-        if i mod FTabSize = 0 then
-        begin
-          NCoordGuide:= ARect.Left + i*ACharSize.X;
-          for j:= NCoordTop to NCoordTop+ACharSize.Y do
-            if Odd(j) then
-              C.Pixels[NCoordGuide, j]:= FColorIndentLines;
-        end;
-    end;
+    if AWithUnprintable then
+      if FOptShowIndentLines then
+      begin
+        for i:= 0 to WrapItem.NIndent-1 do
+          if i mod FTabSize = 0 then
+          begin
+            NCoordGuide:= ARect.Left + i*ACharSize.X;
+            for j:= NCoordTop to NCoordTop+ACharSize.Y do
+              if Odd(j) then
+                C.Pixels[NCoordGuide, j]:= FColorIndentLines;
+          end;
+      end;
 
     CurrPointText:= Point(
       CurrPoint.X
