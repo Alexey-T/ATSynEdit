@@ -155,6 +155,7 @@ const
   cInitColorRulerMark = clGray;
   cInitColorCollapsedLine = clNavy;
   cInitColorCollapsedText = clBlue;
+  cInitColorIndentLines = clGray;
   cInitColorMargins = clLtGray;
   cInitColorUnprintedFont = $5050f0;
   cInitColorUnprintedBG = $e0e0e0;
@@ -271,6 +272,7 @@ type
     FColorGutterCaretBG: TColor;
     FColorCurLineBG: TColor;
     FColorMargins: TColor;
+    FColorIndentLines: TColor;
     FColorRulerMark: TColor;
     FColorRulerBG: TColor;
     FColorCollapsedLine: TColor;
@@ -330,6 +332,7 @@ type
     FOptKeyHomeToNonSpace: boolean;
     FOptKeyEndToNonSpace: boolean;
     FOptKeyTabIndents: boolean;
+    FOptShowIndentLines: boolean;
     //
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
@@ -603,6 +606,7 @@ type
     property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents;
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize;
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
+    property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
   end;
 
 implementation
@@ -1146,6 +1150,7 @@ var
   NCoordTop, NCoordLeftNums: integer;
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
+  NCoordGuide, i, j: integer;
   NOutputSpacesSkipped: real;
   WrapItem: TATSynWrapItem;
   BmKind: TATLineBookmark;
@@ -1233,6 +1238,18 @@ begin
     begin
       C.Brush.Color:= BmColor;
       C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+    end;
+
+    if FOptShowIndentLines then
+    begin
+      for i:= 0 to WrapItem.NIndent-1 do
+        if i mod FTabSize = 0 then
+        begin
+          NCoordGuide:= ARect.Left + i*ACharSize.X;
+          for j:= NCoordTop to NCoordTop+ACharSize.Y do
+            if Odd(j) then
+              C.Pixels[NCoordGuide, j]:= FColorIndentLines;
+        end;
     end;
 
     CurrPointText:= Point(
@@ -1555,6 +1572,7 @@ begin
   FColorCollapsedLine:= cInitColorCollapsedLine;
   FColorCollapsedText:= cInitColorCollapsedText;
   FColorMargins:= cInitColorMargins;
+  FColorIndentLines:= cInitColorIndentLines;
   FColorUnprintedFont:= cInitColorUnprintedFont;
   FColorUnprintedBG:= cInitColorUnprintedBG;
   FColorMinimapBorder:= cInitColorMinimapBorder;
@@ -1653,6 +1671,7 @@ begin
   FOptKeyHomeToNonSpace:= true;
   FOptKeyEndToNonSpace:= true;
   FOptKeyTabIndents:= true;
+  FOptShowIndentLines:= true;
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
 
