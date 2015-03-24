@@ -1,0 +1,7 @@
+
+Big todo..
+col block
+cache WrapInfo(big file editing)
+fold +-
+undo
+tokens adapter
