@@ -447,6 +447,7 @@ begin
     chkOvrSel.Checked:= ed.OptOverwriteSel;
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
+    chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
     chkColorSel.Checked:= ed.OptHiliteSelectionFull;
     chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
     chkNavWrap.Checked:= ed.OptKeyNavigateWrapped;
@@ -493,6 +494,7 @@ begin
       ed.OptOverwriteSel:= chkOvrSel.Checked;
       ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
+      ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
       ed.OptHiliteSelectionFull:= chkColorSel.Checked;
       ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
       ed.OptKeyNavigateWrapped:= chkNavWrap.Checked;

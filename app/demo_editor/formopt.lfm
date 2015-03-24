@@ -76,15 +76,15 @@ object fmOpt: TfmOpt
         Top = 8
         Width = 117
         Caption = 'copy lines if no sel'
-        TabOrder = 4
+        TabOrder = 5
       end
       object chkColorSel: TCheckBox
-        Left = 160
+        Left = 8
         Height = 19
-        Top = 28
+        Top = 88
         Width = 123
         Caption = 'colorize sel till edge'
-        TabOrder = 5
+        TabOrder = 4
       end
       object chkOvrPaste: TCheckBox
         Left = 160
@@ -92,7 +92,7 @@ object fmOpt: TfmOpt
         Top = 88
         Width = 153
         Caption = 'apply ovr-mode on paste'
-        TabOrder = 8
+        TabOrder = 9
       end
       object chkRepSpec: TCheckBox
         Left = 160
@@ -100,7 +100,7 @@ object fmOpt: TfmOpt
         Top = 108
         Width = 155
         Caption = 'replace spec-ascii with "."'
-        TabOrder = 9
+        TabOrder = 10
       end
       object LabChars: TLabel
         Left = 496
@@ -115,15 +115,15 @@ object fmOpt: TfmOpt
         Height = 23
         Top = 8
         Width = 106
-        TabOrder = 10
+        TabOrder = 11
       end
       object chkDotLn: TCheckBox
         Left = 160
         Height = 19
         Top = 48
-        Width = 143
-        Caption = 'show wrap-indent lines'
-        TabOrder = 6
+        Width = 166
+        Caption = 'show wrap-indent vert lines'
+        TabOrder = 7
       end
       object chkShowNumBg: TCheckBox
         Left = 160
@@ -131,7 +131,15 @@ object fmOpt: TfmOpt
         Top = 68
         Width = 189
         Caption = 'show caret-numbers colored bg'
-        TabOrder = 7
+        TabOrder = 8
+      end
+      object chkCutNoSel: TCheckBox
+        Left = 160
+        Height = 19
+        Top = 28
+        Width = 108
+        Caption = 'cut lines if no sel'
+        TabOrder = 6
       end
     end
     object TabSheet2: TTabSheet

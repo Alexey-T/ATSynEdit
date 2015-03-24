@@ -249,7 +249,7 @@ begin
   Result:= [cResultText, cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_TextDeleteLine: TATCommandResults;
+function TATSynEdit.DoCommand_TextDeleteLines: TATCommandResults;
 var
   Item: TATCaretItem;
   i: integer;

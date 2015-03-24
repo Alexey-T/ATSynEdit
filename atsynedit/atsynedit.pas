@@ -307,6 +307,7 @@ type
     FOptUseOverOnPaste: boolean;
     FOptKeyNavigateWrapped: boolean;
     FOptCopyLinesIfNoSel: boolean;
+    FOptCutLinesIfNoSel: boolean;
     FOptHiliteSelectionFull: boolean;
     FOptShowCurLine: boolean;
     FOptShowCurColumn: boolean;
@@ -466,7 +467,7 @@ type
     function DoCommand_TextDeleteLeft(ALen: integer): TATCommandResults;
     function DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
     function DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
-    function DoCommand_TextDeleteLine: TATCommandResults;
+    function DoCommand_TextDeleteLines: TATCommandResults;
     function DoCommand_TextDuplicateLine: TATCommandResults;
     function DoCommand_TextDeleteToLineBegin: TATCommandResults;
     function DoCommand_TextDeleteToLineEnd: TATCommandResults;
@@ -554,6 +555,7 @@ type
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel;
+    property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel;
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptHiliteSelectionFull: boolean read FOptHiliteSelectionFull write FOptHiliteSelectionFull;
@@ -1633,6 +1635,7 @@ begin
   FOptMouseRightClickMovesCaret:= false;
   FOptMouseGutterClickSelectsLine:= true;
   FOptCopyLinesIfNoSel:= true;
+  FOptCutLinesIfNoSel:= false;
   FOptHiliteSelectionFull:= false;
   FOptShowCurLine:= false;
   FOptShowCurColumn:= false;

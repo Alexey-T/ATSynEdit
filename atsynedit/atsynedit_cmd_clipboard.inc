@@ -14,10 +14,20 @@ function TATSynEdit.DoCommand_ClipboardCut: TATCommandResults;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
-  if not Carets.IsSelection then Exit;
 
-  DoCommand_ClipboardCopy;
-  Result:= DoCommand_TextDeleteSelections;
+  if Carets.IsSelection then
+  begin
+    DoCommand_ClipboardCopy;
+    Result:= DoCommand_TextDeleteSelections;
+  end
+  else
+  begin
+    if FOptCutLinesIfNoSel then
+    begin
+      DoCommand_ClipboardCopy;
+      Result:= DoCommand_TextDeleteLines;
+    end;
+  end;
 end;
 
 function TATSynEdit.DoCommand_ClipboardCopy(DoAdd: boolean): TATCommandResults;
