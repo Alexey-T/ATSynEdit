@@ -155,8 +155,10 @@ const
   cInitColorRulerMark = clGray;
   cInitColorCollapsedLine = clNavy;
   cInitColorCollapsedText = clBlue;
-  cInitColorIndentLines = clGray;
-  cInitColorMargins = clLtGray;
+  cInitColorIndentLines = clMedGray;
+  cInitColorMarginRight = clLtGray;
+  cInitColorMarginCaret = $60d080;
+  cInitColorMarginUser = clYellow;
   cInitColorUnprintedFont = $5050f0;
   cInitColorUnprintedBG = $e0e0e0;
   cInitColorMicromapBG = clCream;
@@ -271,7 +273,9 @@ type
     FColorGutterBG: TColor;
     FColorGutterCaretBG: TColor;
     FColorCurLineBG: TColor;
-    FColorMargins: TColor;
+    FColorMarginRight: TColor;
+    FColorMarginCaret: TColor;
+    FColorMarginUser: TColor;
     FColorIndentLines: TColor;
     FColorRulerMark: TColor;
     FColorRulerBG: TColor;
@@ -351,7 +355,7 @@ type
     procedure DoSelect_None;
     //paint
     procedure DoPaint(AFlags: TATSynPaintFlags);
-    procedure DoPaintMarginLineTo(C: TCanvas; AX: integer);
+    procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintRulerTo(C: TCanvas);
     procedure DoPaintTextTo(C: TCanvas;
@@ -1439,11 +1443,11 @@ begin
   C.FillRect(FRectMicromap);
 end;
 
-procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX: integer);
+procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
 begin
   if (AX>=FRectMain.Left) and (AX<FRectMain.Right) then
   begin
-    C.Pen.Color:= FColorMargins;
+    C.Pen.Color:= AColor;
     C.MoveTo(AX, FRectMain.Top);
     C.LineTo(AX, FRectMain.Bottom);
   end;
@@ -1459,9 +1463,9 @@ var
   i: integer;
 begin
   if FMarginRight>1 then
-    DoPaintMarginLineTo(C, PosX(FMarginRight));
+    DoPaintMarginLineTo(C, PosX(FMarginRight), FColorMarginRight);
   for i:= 0 to FMarginList.Count-1 do
-    DoPaintMarginLineTo(C, PosX(integer{%H-}(FMarginList[i])));
+    DoPaintMarginLineTo(C, PosX(integer{%H-}(FMarginList[i])), FColorMarginUser);
 end;
 
 
@@ -1567,7 +1571,9 @@ begin
   FColorRulerMark:= cInitColorRulerMark;
   FColorCollapsedLine:= cInitColorCollapsedLine;
   FColorCollapsedText:= cInitColorCollapsedText;
-  FColorMargins:= cInitColorMargins;
+  FColorMarginRight:= cInitColorMarginRight;
+  FColorMarginCaret:= cInitColorMarginCaret;
+  FColorMarginUser:= cInitColorMarginUser;
   FColorIndentLines:= cInitColorIndentLines;
   FColorUnprintedFont:= cInitColorUnprintedFont;
   FColorUnprintedBG:= cInitColorUnprintedBG;
@@ -1899,7 +1905,7 @@ begin
     begin
       UpdateCaretsCoords;
       if FOptShowCurColumn and (Carets.Count>0) then
-        DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX);
+        DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX, FColorMarginCaret);
     end;
 
     DoPaintCarets(FBitmap.Canvas, false);
