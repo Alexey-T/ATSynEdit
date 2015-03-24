@@ -160,7 +160,7 @@ begin
   ed.OnClickGutter:= EditClickGutter;
   ed.OnDrawBookmarkIcon:= EditDrawBm;
 
-  ed.Colors.UnprintedFont:= $2020e0;
+  //ed.Colors.UnprintedFont:= $2020e0;
 
   ed.SetFocus;
 end;

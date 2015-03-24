@@ -53,6 +53,7 @@ type
     UnprintedBG,
     MinimapBorder,
     MinimapSel,
+    MicromapBG,
     StateChanged,
     StateAdded,
     StateSaved: TColor;
@@ -174,29 +175,6 @@ const
   cInitNumbersStyle = cNumbersEach5th;
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
-
-  cInitColorCaret = clBlack;
-  cInitColorTextBG = clWhite;
-  cInitColorTextFont = clBlack;
-  cInitColorGutterFont = clGray;
-  cInitColorGutterBG = $e0e0e0;
-  cInitColorGutterCaretBG = $c8c8c8;
-  cInitColorCurLineBG = $e0f0f0;
-  cInitColorRulerMark = clGray;
-  cInitColorCollapsedLine = clNavy;
-  cInitColorCollapsedText = clBlue;
-  cInitColorIndentLines = clMedGray;
-  cInitColorMarginRight = clLtGray;
-  cInitColorMarginCaret = $60d080;
-  cInitColorMarginUser = clYellow;
-  cInitColorUnprintedFont = $5050f0;
-  cInitColorUnprintedBG = $e0e0e0;
-  cInitColorMicromapBG = clCream;
-  cInitColorMinimapBorder = clLtGray;
-  cInitColorMinimapSel = $eeeeee;
-  cInitColorStateChanged = $00f0f0;
-  cInitColorStateAdded = $20c020;
-  cInitColorStateSaved = clNavy;
 
   cGutterBands = 5;
   cSizeGutterBandBm = 16;
@@ -349,6 +327,7 @@ type
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
+    procedure InitColors;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
@@ -1447,7 +1426,7 @@ end;
 
 procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
 begin
-  C.Brush.Color:= cInitColorMicromapBG;
+  C.Brush.Color:= FColors.MicromapBG;
   C.FillRect(FRectMicromap);
 end;
 
@@ -1567,30 +1546,7 @@ begin
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
   FColors:= TATSynEditColors.Create;
-  FColors.TextBG:= cInitColorTextBG;
-  FColors.TextFont:= cInitColorTextFont;
-  FColors.TextSel:= clHighlightText;
-  FColors.TextSelBG:= clHighlight;
-  FColors.Caret:= cInitColorCaret;
-  FColors.GutterFont:= cInitColorGutterFont;
-  FColors.GutterBG:= cInitColorGutterBG;
-  FColors.GutterCaretBG:= cInitColorGutterCaretBG;
-  FColors.CurLineBG:= cInitColorCurLineBG;
-  FColors.RulerBG:= cInitColorGutterBG;
-  FColors.RulerMark:= cInitColorRulerMark;
-  FColors.CollapsedLine:= cInitColorCollapsedLine;
-  FColors.CollapsedText:= cInitColorCollapsedText;
-  FColors.MarginRight:= cInitColorMarginRight;
-  FColors.MarginCaret:= cInitColorMarginCaret;
-  FColors.MarginUser:= cInitColorMarginUser;
-  FColors.IndentLines:= cInitColorIndentLines;
-  FColors.UnprintedFont:= cInitColorUnprintedFont;
-  FColors.UnprintedBG:= cInitColorUnprintedBG;
-  FColors.MinimapBorder:= cInitColorMinimapBorder;
-  FColors.MinimapSel:= cInitColorMinimapSel;
-  FColors.StateChanged:= cInitColorStateChanged;
-  FColors.StateAdded:= cInitColorStateAdded;
-  FColors.StateSaved:= cInitColorStateSaved;
+  InitColors;
 
   FTimerBlink:= TTimer.Create(Self);
   FTimerBlink.Interval:= cInitTimerBlink;
@@ -2602,6 +2558,35 @@ begin
     N:= FWrapInfo[N].NLineIndex;
     DoGotoPos(Point(0, N));
   end;
+end;
+
+procedure TATSynEdit.InitColors;
+begin
+  FColors.TextBG:= clWhite;
+  FColors.TextFont:= clBlack;
+  FColors.TextSel:= clHighlightText;
+  FColors.TextSelBG:= clHighlight;
+  FColors.Caret:= clBlack;
+  FColors.GutterFont:= clGray;
+  FColors.GutterBG:= $e0e0e0;
+  FColors.GutterCaretBG:= $c8c8c8;
+  FColors.CurLineBG:= $e0f0f0;
+  FColors.RulerBG:= FColors.GutterBG;
+  FColors.RulerMark:= clGray;
+  FColors.CollapsedLine:= clNavy;
+  FColors.CollapsedText:= clBlue;
+  FColors.MarginRight:= clLtGray;
+  FColors.MarginCaret:= $60d080;
+  FColors.MarginUser:= clYellow;
+  FColors.IndentLines:= clMedGray;
+  FColors.UnprintedFont:= $5050f0;
+  FColors.UnprintedBG:= $e0e0e0;
+  FColors.MinimapBorder:= clLtGray;
+  FColors.MinimapSel:= $eeeeee;
+  FColors.MicromapBG:= clCream;
+  FColors.StateChanged:= $00f0f0;
+  FColors.StateAdded:= $20c020;
+  FColors.StateSaved:= clNavy;
 end;
 
 {$I atsynedit_carets.inc}
