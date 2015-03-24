@@ -89,18 +89,18 @@ object fmOpt: TfmOpt
       object chkOvrPaste: TCheckBox
         Left = 160
         Height = 19
-        Top = 48
+        Top = 88
         Width = 153
         Caption = 'apply ovr-mode on paste'
-        TabOrder = 6
+        TabOrder = 8
       end
       object chkRepSpec: TCheckBox
         Left = 160
         Height = 19
-        Top = 68
+        Top = 108
         Width = 155
         Caption = 'replace spec-ascii with "."'
-        TabOrder = 7
+        TabOrder = 9
       end
       object LabChars: TLabel
         Left = 496
@@ -115,15 +115,23 @@ object fmOpt: TfmOpt
         Height = 23
         Top = 8
         Width = 106
-        TabOrder = 8
+        TabOrder = 10
       end
       object chkDotLn: TCheckBox
         Left = 160
         Height = 19
-        Top = 88
+        Top = 48
         Width = 143
         Caption = 'show wrap-indent lines'
-        TabOrder = 9
+        TabOrder = 6
+      end
+      object chkShowNumBg: TCheckBox
+        Left = 160
+        Height = 19
+        Top = 68
+        Width = 189
+        Caption = 'show caret-numbers colored bg'
+        TabOrder = 7
       end
     end
     object TabSheet2: TTabSheet

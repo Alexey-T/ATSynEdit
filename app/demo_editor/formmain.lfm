@@ -294,7 +294,7 @@ object fmMain: TfmMain
       Height = 25
       Top = 120
       Width = 81
-      Caption = 'opt..'
+      Caption = 'opts...'
       OnClick = bOptClick
       TabOrder = 5
     end

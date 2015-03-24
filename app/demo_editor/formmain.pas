@@ -169,9 +169,9 @@ procedure TfmMain.FormShow(Sender: TObject);
 var
   fn: string;
 begin
-  if wait then
-    UpdateChecks;
+  if wait then UpdateChecks;
   wait:= false;
+
   fn:= FDir+'\fn.txt';
   if FileExists(fn) then
     ed.LoadFromFile(fn);
@@ -469,6 +469,7 @@ begin
     edIndent.Value:= ed.OptIndentSize;
     chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
     chkDotLn.Checked:= ed.OptShowIndentLines;
+    chkShowNumBg.Checked:= ed.OptShowCaretNumberBG;
 
     if ShowModal=mrOk then
     begin
@@ -485,7 +486,6 @@ begin
       ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
 
-      ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptWordChars:= edChars.Text;
       ed.OptAutoIndent:= chkAutoInd.Checked;
       ed.OptAutoIndentKind:= TATAutoIndentKind(edAutoInd.ItemIndex);
@@ -514,6 +514,8 @@ begin
       ed.OptKeyTabIndents:= chkTabInd.Checked;
       ed.OptIndentSize:= edIndent.Value;
       ed.OptIndentKeepsAlign:= chkUninKeep.Checked;
+      ed.OptShowIndentLines:= chkDotLn.Checked;
+      ed.OptShowCaretNumberBG:= chkShowNumBg.Checked;
 
       ed.Gutter.Update;
       ed.Update;

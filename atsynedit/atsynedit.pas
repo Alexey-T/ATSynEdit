@@ -322,6 +322,7 @@ type
     FOptKeyEndToNonSpace: boolean;
     FOptKeyTabIndents: boolean;
     FOptShowIndentLines: boolean;
+    FOptShowCaretNumberBG: boolean;
     //
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
@@ -598,6 +599,7 @@ type
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize;
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
+    property OptShowCaretNumberBG: boolean read FOptShowCaretNumberBG write FOptShowCaretNumberBG;
   end;
 
 implementation
@@ -1341,7 +1343,7 @@ begin
       //gutter band: number
       if FGutter[FGutterBandNum].Visible then
       begin
-        if LineWithCaret then
+        if LineWithCaret and FOptShowCaretNumberBG then
         begin
           C.Brush.Color:= FColors.GutterCaretBG;
           C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
@@ -1551,6 +1553,7 @@ begin
   FTimerBlink:= TTimer.Create(Self);
   FTimerBlink.Interval:= cInitTimerBlink;
   FTimerBlink.OnTimer:= TimerBlinkTick;
+  FTimerBlink.Enabled:= true;
 
   FTimerScroll:= TTimer.Create(Self);
   FTimerScroll.Interval:= cInitTimerScroll;
@@ -1639,6 +1642,7 @@ begin
   FOptKeyEndToNonSpace:= true;
   FOptKeyTabIndents:= true;
   FOptShowIndentLines:= true;
+  FOptShowCaretNumberBG:= true;
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
 
@@ -2576,7 +2580,7 @@ begin
   FColors.CollapsedLine:= clNavy;
   FColors.CollapsedText:= clBlue;
   FColors.MarginRight:= clLtGray;
-  FColors.MarginCaret:= $60d080;
+  FColors.MarginCaret:= clLime;
   FColors.MarginUser:= clYellow;
   FColors.IndentLines:= clMedGray;
   FColors.UnprintedFont:= $5050f0;
