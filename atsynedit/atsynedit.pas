@@ -28,6 +28,36 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
+
+type
+  TATSynEditColors = class
+  public
+    TextFont,
+    TextBG,
+    TextSel,
+    TextSelBG,
+    Caret,
+    GutterFont,
+    GutterBG,
+    GutterCaretBG,
+    CurLineBG,
+    MarginRight,
+    MarginCaret,
+    MarginUser,
+    IndentLines,
+    RulerMark,
+    RulerBG,
+    CollapsedLine,
+    CollapsedText,
+    UnprintedFont,
+    UnprintedBG,
+    MinimapBorder,
+    MinimapSel,
+    StateChanged,
+    StateAdded,
+    StateSaved: TColor;
+  end;
+
   TATAutoIndentKind = (
     cIndentAsIs,
     cIndentSpaces,
@@ -264,30 +294,7 @@ type
     FGutterBandState,
     FGutterBandFold,
     FGutterBandEmpty: integer;
-    FColorTextFont: TColor;
-    FColorTextBG: TColor;
-    FColorTextSel: TColor;
-    FColorTextSelBG: TColor;
-    FColorCaret: TColor;
-    FColorGutterFont: TColor;
-    FColorGutterBG: TColor;
-    FColorGutterCaretBG: TColor;
-    FColorCurLineBG: TColor;
-    FColorMarginRight: TColor;
-    FColorMarginCaret: TColor;
-    FColorMarginUser: TColor;
-    FColorIndentLines: TColor;
-    FColorRulerMark: TColor;
-    FColorRulerBG: TColor;
-    FColorCollapsedLine: TColor;
-    FColorCollapsedText: TColor;
-    FColorUnprintedFont: TColor;
-    FColorUnprintedBG: TColor;
-    FColorMinimapBorder: TColor;
-    FColorMinimapSel: TColor;
-    FColorStateChanged: TColor;
-    FColorStateAdded: TColor;
-    FColorStateSaved: TColor;
+    FColors: TATSynEditColors;
     FRectMain,
     FRectMinimap,
     FRectMicromap,
@@ -560,6 +567,7 @@ type
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkIcon read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
 
     //options
+    property Colors: TATSynEditColors read FColors;
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
@@ -720,9 +728,9 @@ begin
   NRulerStart:= FScrollHorz.NPos;
 
   C.Font.Size:= FOptRulerFontSize;
-  C.Font.Color:= FColorRulerMark;
-  C.Pen.Color:= FColorRulerMark;
-  C.Brush.Color:= FColorRulerBG;
+  C.Font.Color:= FColors.RulerMark;
+  C.Pen.Color:= FColors.RulerMark;
+  C.Brush.Color:= FColors.RulerBG;
 
   C.FillRect(FRectRuler);
   C.MoveTo(FRectRuler.Left, FRectRuler.Bottom);
@@ -1101,7 +1109,7 @@ end;
 
 procedure TATSynEdit.DoPaintTo(C: TCanvas);
 begin
-  C.Brush.Color:= FColorTextBG;
+  C.Brush.Color:= FColors.TextBG;
   C.FillRect(ClientRect);
 
   C.Font.Assign(Font);
@@ -1171,7 +1179,7 @@ var
   end;
   //
 begin
-  C.Brush.Color:= FColorTextBG;
+  C.Brush.Color:= FColors.TextBG;
   C.FillRect(ARect);
 
   if AWithGutter then
@@ -1182,14 +1190,14 @@ begin
     with FGutter[FGutterBandFold] do begin NGutterFoldX1:= Left; NGutterFoldX2:= Right; end;
     with FGutter[FGutterBandEmpty] do begin NGutterEmptyX1:= Left; NGutterEmptyX2:= Right; end;
 
-    C.Brush.Color:= FColorGutterBG;
+    C.Brush.Color:= FColors.GutterBG;
     C.FillRect(FRectGutter);
 
     if FGutter[FGutterBandEmpty].Visible then
     begin
-      C.Brush.Color:= FColorTextBG;
+      C.Brush.Color:= FColors.TextBG;
       C.FillRect(NGutterEmptyX1, FRectGutter.Top, NGutterEmptyX2, FRectGutter.Bottom);
-      C.Brush.Color:= FColorGutterBG;
+      C.Brush.Color:= FColors.GutterBG;
     end;
   end;
 
@@ -1207,7 +1215,7 @@ begin
 
     if FWrapInfo.IsItemAfterCollapsed(NWrapIndex) then
     begin
-      C.Pen.Color:= FColorCollapsedLine;
+      C.Pen.Color:= FColors.CollapsedLine;
       C.MoveTo(ARect.Left, NCoordTop-1);
       C.LineTo(ARect.Right, NCoordTop-1);
     end;
@@ -1227,8 +1235,8 @@ begin
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
 
-    C.Brush.Color:= FColorTextBG;
-    C.Font.Color:= FColorTextFont;
+    C.Brush.Color:= FColors.TextBG;
+    C.Font.Color:= FColors.TextFont;
 
     //draw bookmark bg
     BmColor:= clNone;
@@ -1236,7 +1244,7 @@ begin
     if BmKind<>cBmNone then
       BmColor:= Strings.LinesBmColor[NLinesIndex];
     if FOptShowCurLine and LineWithCaret then
-      BmColor:= FColorCurLineBG;
+      BmColor:= FColors.CurLineBG;
 
     if BmColor<>clNone then
     begin
@@ -1249,7 +1257,7 @@ begin
       begin
         for i:= 0 to WrapItem.NIndent-1 do
           if i mod FTabSize = 0 then
-            CanvasDottedVertLine(C, ARect.Left + i*ACharSize.X, NCoordTop, NCoordTop+ACharSize.Y, FColorIndentLines);
+            CanvasDottedVertLine(C, ARect.Left + i*ACharSize.X, NCoordTop, NCoordTop+ACharSize.Y, FColors.IndentLines);
       end;
 
     CurrPointText:= Point(
@@ -1271,7 +1279,7 @@ begin
       if FOptHiliteSelectionFull then
         if LineEolSelected then
         begin
-          C.Brush.Color:= FColorTextSelBG;
+          C.Brush.Color:= FColors.TextSelBG;
           C.FillRect(
             CurrPointText.X,
             CurrPointText.Y,
@@ -1281,7 +1289,7 @@ begin
 
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
-        IfThen(BmColor<>clNone, BmColor, FColorTextBG));
+        IfThen(BmColor<>clNone, BmColor, FColors.TextBG));
 
       CanvasTextOut(C,
         CurrPointText.X,
@@ -1291,7 +1299,7 @@ begin
         ACharSize,
         FUnprintedReplaceSpec,
         AWithUnprintable and FUnprintedSpaces,
-        FColorUnprintedFont,
+        FColors.UnprintedFont,
         NOutputStrWidth,
         Trunc(NOutputSpacesSkipped), //todo:
           //needed number of chars of all chars counted as 1.0,
@@ -1304,7 +1312,7 @@ begin
       if FOptHiliteSelectionFull then
         if LineEolSelected then
         begin
-          C.Brush.Color:= FColorTextSelBG;
+          C.Brush.Color:= FColors.TextSelBG;
           C.FillRect(
             CurrPointText.X,
             CurrPointText.Y,
@@ -1318,7 +1326,7 @@ begin
       //for OptHiliteSelectionFull=false paint eol bg
       if LineEolSelected then
       begin
-        C.Brush.Color:= FColorTextSelBG;
+        C.Brush.Color:= FColors.TextSelBG;
         C.FillRect(
           CurrPointText.X+NOutputStrWidth,
           CurrPointText.Y,
@@ -1335,8 +1343,8 @@ begin
               CurrPointText.X+NOutputStrWidth,
               CurrPointText.Y),
             ACharSize,
-            FColorUnprintedFont,
-            FColorUnprintedBG,
+            FColors.UnprintedFont,
+            FColors.UnprintedBG,
             FUnprintedEndsDetails);
     end;
 
@@ -1348,7 +1356,7 @@ begin
     //draw gutter
     if AWithGutter then
     begin
-      C.Brush.Color:= FColorGutterBG;
+      C.Brush.Color:= FColors.GutterBG;
       C.FillRect(FRectGutter.Left, NCoordTop, FRectGutter.Right, NCoordTop+ACharSize.Y);
 
       //gutter band: number
@@ -1356,13 +1364,13 @@ begin
       begin
         if LineWithCaret then
         begin
-          C.Brush.Color:= FColorGutterCaretBG;
+          C.Brush.Color:= FColors.GutterCaretBG;
           C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
         end;
 
         if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
-          C.Font.Color:= FColorGutterFont;
+          C.Font.Color:= FColors.GutterFont;
           C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
 
           Str:= DoFormatLineNumber(NLinesIndex+1);
@@ -1383,16 +1391,16 @@ begin
       if FGutter[FGutterBandState].Visible then
       begin
         case Strings.LinesState[WrapItem.NLineIndex] of
-          cLineStateChanged: DoPaintState(NCoordTop, FColorStateChanged);
-          cLineStateAdded: DoPaintState(NCoordTop, FColorStateAdded);
-          cLineStateSaved: DoPaintState(NCoordTop, FColorStateSaved);
+          cLineStateChanged: DoPaintState(NCoordTop, FColors.StateChanged);
+          cLineStateAdded: DoPaintState(NCoordTop, FColors.StateAdded);
+          cLineStateSaved: DoPaintState(NCoordTop, FColors.StateSaved);
         end;
       end;
 
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
       begin
-        C.Brush.Color:= FColorTextBG;
+        C.Brush.Color:= FColors.TextBG;
         C.FillRect(NGutterEmptyX1, NCoordTop, NGutterEmptyX2, NCoordTop+ACharSize.Y);
       end;
     end;
@@ -1413,7 +1421,7 @@ begin
   R.Bottom:= R.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y;
 
   if IntersectRect(R, R, FRectMinimap) then
-    CanvasInvertRect(C, R, FColorMinimapSel);
+    CanvasInvertRect(C, R, FColors.MinimapSel);
 end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
@@ -1429,9 +1437,9 @@ begin
 
   DoPaintMinimapSelTo(C);
 
-  if FColorMinimapBorder<>clNone then
+  if FColors.MinimapBorder<>clNone then
   begin
-    C.Pen.Color:= FColorMinimapBorder;
+    C.Pen.Color:= FColors.MinimapBorder;
     C.MoveTo(FRectMinimap.Left-1, FRectMinimap.Top);
     C.LineTo(FRectMinimap.Left-1, FRectMinimap.Bottom);
   end;
@@ -1463,9 +1471,9 @@ var
   i: integer;
 begin
   if FMarginRight>1 then
-    DoPaintMarginLineTo(C, PosX(FMarginRight), FColorMarginRight);
+    DoPaintMarginLineTo(C, PosX(FMarginRight), FColors.MarginRight);
   for i:= 0 to FMarginList.Count-1 do
-    DoPaintMarginLineTo(C, PosX(integer{%H-}(FMarginList[i])), FColorMarginUser);
+    DoPaintMarginLineTo(C, PosX(integer{%H-}(FMarginList[i])), FColors.MarginUser);
 end;
 
 
@@ -1480,8 +1488,8 @@ begin
   Inc(ALineStart.X, cCollapseMarkIndent);
 
   //paint text
-  C.Font.Color:= FColorCollapsedText;
-  C.Brush.Color:= FColorTextBG;
+  C.Font.Color:= FColors.CollapsedText;
+  C.Brush.Color:= FColors.TextBG;
 
   SMark:= '...';
   C.TextOut(
@@ -1491,7 +1499,7 @@ begin
   NSize:= C.TextWidth(SMark) + 2*cCollapseMarkIndent;
 
   //paint frame
-  C.Pen.Color:= FColorCollapsedText;
+  C.Pen.Color:= FColors.CollapsedText;
   C.Brush.Style:= bsClear;
   C.Rectangle(ALineStart.X, ALineStart.Y, ALineStart.X+NSize, ALineStart.Y+FCharSize.Y);
 end;
@@ -1558,30 +1566,31 @@ begin
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
-  FColorTextBG:= cInitColorTextBG;
-  FColorTextFont:= cInitColorTextFont;
-  FColorTextSel:= clHighlightText;
-  FColorTextSelBG:= clHighlight;
-  FColorCaret:= cInitColorCaret;
-  FColorGutterFont:= cInitColorGutterFont;
-  FColorGutterBG:= cInitColorGutterBG;
-  FColorGutterCaretBG:= cInitColorGutterCaretBG;
-  FColorCurLineBG:= cInitColorCurLineBG;
-  FColorRulerBG:= cInitColorGutterBG;
-  FColorRulerMark:= cInitColorRulerMark;
-  FColorCollapsedLine:= cInitColorCollapsedLine;
-  FColorCollapsedText:= cInitColorCollapsedText;
-  FColorMarginRight:= cInitColorMarginRight;
-  FColorMarginCaret:= cInitColorMarginCaret;
-  FColorMarginUser:= cInitColorMarginUser;
-  FColorIndentLines:= cInitColorIndentLines;
-  FColorUnprintedFont:= cInitColorUnprintedFont;
-  FColorUnprintedBG:= cInitColorUnprintedBG;
-  FColorMinimapBorder:= cInitColorMinimapBorder;
-  FColorMinimapSel:= cInitColorMinimapSel;
-  FColorStateChanged:= cInitColorStateChanged;
-  FColorStateAdded:= cInitColorStateAdded;
-  FColorStateSaved:= cInitColorStateSaved;
+  FColors:= TATSynEditColors.Create;
+  FColors.TextBG:= cInitColorTextBG;
+  FColors.TextFont:= cInitColorTextFont;
+  FColors.TextSel:= clHighlightText;
+  FColors.TextSelBG:= clHighlight;
+  FColors.Caret:= cInitColorCaret;
+  FColors.GutterFont:= cInitColorGutterFont;
+  FColors.GutterBG:= cInitColorGutterBG;
+  FColors.GutterCaretBG:= cInitColorGutterCaretBG;
+  FColors.CurLineBG:= cInitColorCurLineBG;
+  FColors.RulerBG:= cInitColorGutterBG;
+  FColors.RulerMark:= cInitColorRulerMark;
+  FColors.CollapsedLine:= cInitColorCollapsedLine;
+  FColors.CollapsedText:= cInitColorCollapsedText;
+  FColors.MarginRight:= cInitColorMarginRight;
+  FColors.MarginCaret:= cInitColorMarginCaret;
+  FColors.MarginUser:= cInitColorMarginUser;
+  FColors.IndentLines:= cInitColorIndentLines;
+  FColors.UnprintedFont:= cInitColorUnprintedFont;
+  FColors.UnprintedBG:= cInitColorUnprintedBG;
+  FColors.MinimapBorder:= cInitColorMinimapBorder;
+  FColors.MinimapSel:= cInitColorMinimapSel;
+  FColors.StateChanged:= cInitColorStateChanged;
+  FColors.StateAdded:= cInitColorStateAdded;
+  FColors.StateSaved:= cInitColorStateSaved;
 
   FTimerBlink:= TTimer.Create(Self);
   FTimerBlink.Interval:= cInitTimerBlink;
@@ -1704,6 +1713,7 @@ begin
   FreeAndNil(FWrapInfo);
   FreeAndNil(FStringsInt);
   FreeAndNil(FBitmap);
+  FreeAndNil(FColors);
   inherited;
 end;
 
@@ -1905,7 +1915,7 @@ begin
     begin
       UpdateCaretsCoords;
       if FOptShowCurColumn and (Carets.Count>0) then
-        DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX, FColorMarginCaret);
+        DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX, FColors.MarginCaret);
     end;
 
     DoPaintCarets(FBitmap.Canvas, false);
@@ -2361,7 +2371,7 @@ begin
 
     if IntersectRect(R, R, FRectMain) then
     begin
-      CanvasInvertRect(C, R, FColorCaret);
+      CanvasInvertRect(C, R, FColors.Caret);
       if AWithInvalidate then
         InvalidateRect(Handle, @R, false);
     end;
