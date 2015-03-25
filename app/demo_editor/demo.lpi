@@ -97,6 +97,7 @@
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
@@ -141,7 +142,6 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="formopt"/>
       </Unit23>
     </Units>
   </ProjectOptions>

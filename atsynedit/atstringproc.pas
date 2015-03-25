@@ -48,7 +48,7 @@ procedure SFindOutputSkipPosition(const S: atString; ATabSize, AScrollPos: integ
 implementation
 
 uses
-  Dialogs;
+  Dialogs, Math;
 
 function IsEolCode(N: Word): boolean;
 begin
@@ -98,6 +98,8 @@ var
 begin
   if S='' then
     begin Result:= 0; Exit end;
+  if AColumns<5 then
+    begin Result:= AColumns; Exit end;
 
   SetLength(List, Length(S));
   SCalcCharOffsets(S, List, ATabSize);
@@ -108,7 +110,7 @@ begin
     Exit
   end;
 
-  NMin:= SGetIndentChars(S)+1;
+  NMin:= Min(SGetIndentChars(S)+1, AColumns);
   N:= Length(S)-1;
   while (N>NMin) and (List[N]>AColumns+1) do Dec(N);
   NAvg:= N;
@@ -120,7 +122,7 @@ begin
   if NAvg>NMin then
     Result:= NAvg
   else
-    Result:= Length(S);
+    Result:= Min(AColumns, Length(S));
 end;
 
 function SGetIndentChars(const S: atString): integer;
@@ -428,7 +430,7 @@ var
 begin
   Result:= Str;
 
-  //indent<0== use tabs
+  //indent<0 - use tabs
   if AIndentSize>=0 then
   begin
     StrIndent:= StringOfChar(' ', AIndentSize);

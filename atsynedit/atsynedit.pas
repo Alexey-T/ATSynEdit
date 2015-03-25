@@ -202,6 +202,7 @@ const
   cMaxTabSize = 16;
   cMinMinimapWidth = 30;
   cMinWrapColumn = 20;
+  cMinWrapColumnAbs = 4;
   cMinMarginRt = 20;
   cMinCaretTime = 300;
   cMaxCaretTime = 2000;
@@ -875,7 +876,7 @@ begin
     end;
 
     //wrap not needed?
-    if (FWrapColumn<=1) then
+    if (FWrapColumn<cMinWrapColumnAbs) then
     begin
       FWrapInfo.Add(i, 1, NLen, 0, cWrapItemFinal);
       Continue
@@ -885,7 +886,7 @@ begin
     NIndent:= 0;
 
     repeat
-      NLen:= SFindWordWrapPosition(Str, FWrapColumn-NIndent, FTabSize, FOptWordChars);
+      NLen:= SFindWordWrapPosition(Str, Max(FWrapColumn-NIndent, cMinWrapColumnAbs), FTabSize, FOptWordChars);
       if NLen>=Length(Str) then
         NFinal:= cWrapItemFinal
       else
