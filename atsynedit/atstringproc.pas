@@ -42,7 +42,7 @@ function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
 function SFindClickedPosition(const Str: atString;
   APixelsFromLeft, ACharSize, ATabSize: integer;
   AAllowVirtualPos: boolean): integer;
-procedure SFindOutputSkipPosition(const S: atString; ATabSize, AScrollPos: integer;
+procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
   out ACharsSkipped: integer; out ASpacesSkipped: real);
 
 implementation
@@ -93,14 +93,14 @@ end;
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString): integer;
 const
-  cMinColumns = 4;
+  cMinColumns = 5;
 var
   N, NMin, NAvg: integer;
   List: array of real;
 begin
   if S='' then
     begin Result:= 0; Exit end;
-  if AColumns<=cMinColumns then
+  if AColumns<cMinColumns then
     begin Result:= AColumns; Exit end;
 
   SetLength(List, Length(S));
@@ -112,19 +112,19 @@ begin
     Exit
   end;
 
-  NMin:= Min(SGetIndentChars(S)+1, AColumns);
   N:= Length(S)-1;
-  while (N>NMin) and (List[N]>AColumns+1) do Dec(N);
+  while (N>0) and (List[N]>AColumns+1) do Dec(N);
   NAvg:= N;
+  if NAvg<cMinColumns then
+    begin Result:= cMinColumns; Exit end;
+
+  NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and IsWordChar(S[N], AWordChars) and IsWordChar(S[N+1], AWordChars) do Dec(N);
 
   if N>NMin then
     Result:= N
   else
-  if NAvg>NMin then
-    Result:= NAvg
-  else
-    Result:= Min(AColumns, Length(S));
+    Result:= NAvg;
 end;
 
 function SGetIndentChars(const S: atString): integer;
@@ -358,7 +358,7 @@ begin
     Result:= Length(Str)+1;
 end;
 
-procedure SFindOutputSkipPosition(const S: atString; ATabSize, AScrollPos: integer;
+procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
   out ACharsSkipped: integer; out ASpacesSkipped: real);
 var
   List: array of real;

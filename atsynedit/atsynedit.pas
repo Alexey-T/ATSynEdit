@@ -831,11 +831,14 @@ end;
 
 procedure TATSynEdit.UpdateWrapInfo;
 var
-  NNewVisibleColumns, NOffset, NLen, NIndent, NHiddenIndex, i: integer;
+  NNewVisibleColumns, NOffset, NLen, NIndent, NHiddenIndex, NIndentMaximal: integer;
   NFinal: TATSynWrapFinal;
   Str: atString;
+  i: integer;
 begin
   NNewVisibleColumns:= GetVisibleColumns;
+  NIndentMaximal:= Max(2, NNewVisibleColumns-20); //don't do too big NIndent
+
   if (not FWrapUpdateNeeded) and
     (FWrapMode=cWrapOn) and
     (FPrevVisibleColumns<>NNewVisibleColumns) then
@@ -895,7 +898,10 @@ begin
 
       if FWrapIndented then
         if NOffset=1 then
+        begin
           NIndent:= SGetIndentExpanded(Str, FTabSize);
+          NIndent:= Min(NIndent, NIndentMaximal);
+        end;
 
       Inc(NOffset, NLen);
       Delete(Str, 1, NLen);
@@ -1241,24 +1247,26 @@ begin
       begin
         for i:= 0 to WrapItem.NIndent-1 do
           if i mod FTabSize = 0 then
-            CanvasDottedVertLine(C, ARect.Left + i*ACharSize.X, NCoordTop, NCoordTop+ACharSize.Y, FColors.IndentLines);
+            CanvasDottedVertLine(C, ARect.Left + (i-AScrollHorz.NPos)*ACharSize.X, NCoordTop, NCoordTop+ACharSize.Y, FColors.IndentLines);
       end;
 
     CurrPointText:= Point(
-      CurrPoint.X
-        - Int64(AScrollHorz.NPos)*ACharSize.X
-        + WrapItem.NIndent*ACharSize.X,
+      CurrPoint.X + Int64(WrapItem.NIndent-AScrollHorz.NPos)*ACharSize.X,
       CurrPoint.Y);
     NOutputStrWidth:= 0;
 
     //draw line
     if StrOut<>'' then
     begin
-      SFindOutputSkipPosition(StrOut, FTabSize, AScrollHorz.NPos, NOutputCharsSkipped, NOutputSpacesSkipped);
-      Delete(StrOut, 1, NOutputCharsSkipped);
-      Delete(StrOut, cMaxCharsForOutput, MaxInt);
-
-      Inc(CurrPointText.X, Trunc(NOutputSpacesSkipped*ACharSize.X));
+      NOutputCharsSkipped:= 0;
+      NOutputSpacesSkipped:= 0;
+      if FWrapInfo.IsItemInitial(NWrapIndex) then
+      begin
+        SFindOutputSkipOffset(StrOut, FTabSize, AScrollHorz.NPos, NOutputCharsSkipped, NOutputSpacesSkipped);
+        Delete(StrOut, 1, NOutputCharsSkipped);
+        Delete(StrOut, cMaxCharsForOutput, MaxInt);
+        Inc(CurrPointText.X, Trunc(NOutputSpacesSkipped*ACharSize.X));
+      end;
 
       if FOptHiliteSelectionFull then
         if LineEolSelected then
