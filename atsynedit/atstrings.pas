@@ -26,22 +26,6 @@ type
     cLineStateSaved
     );
 
-type
-  TATLineBookmark = (
-    cBmNone,
-    cBmUsual,
-    cBmIndex1,
-    cBmIndex2,
-    cBmIndex3,
-    cBmIndex4,
-    cBmIndex5,
-    cBmIndex6,
-    cBmIndex7,
-    cBmIndex8,
-    cBmIndex9,
-    cBmIndex10
-    );
-
   TATFileEncoding = (
     cEncAnsi,
     cEncUTF8,
@@ -62,7 +46,7 @@ type
     ItemState: TATLineState;
     ItemHidden: integer; //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
     ItemCached: boolean; //for UpdateWrapInfo
-    ItemBm: TATLineBookmark;
+    ItemBm: integer;
     ItemBmColor: integer;
     //ItemBmHint: atString;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
@@ -83,7 +67,7 @@ type
     function DebugText: atString;
     procedure DoFinalizeSaving;
     function GetLine(N: integer): atString;
-    function GetLineBm(Index: integer): TATLineBookmark;
+    function GetLineBm(Index: integer): integer;
     function GetLineBmColor(Index: integer): integer;
     function GetLineCached(Index: integer): boolean;
     function GetLineEnd(N: integer): TATLineEnds;
@@ -96,7 +80,7 @@ type
       AEnd: TATLineEnds);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
-    procedure SetLineBm(Index: integer; AValue: TATLineBookmark);
+    procedure SetLineBm(Index: integer; AValue: integer);
     procedure SetLineBmColor(Index: integer; AValue: integer);
     procedure SetLineCached(Index: integer; AValue: boolean);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
@@ -124,7 +108,7 @@ type
     property LinesHidden[Index: integer]: integer read GetLineHidden write SetLineHidden;
     property LinesCached[Index: integer]: boolean read GetLineCached write SetLineCached;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
-    property LinesBm[Index: integer]: TATLineBookmark read GetLineBm write SetLineBm;
+    property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesBmColor[Index: integer]: integer read GetLineBmColor write SetLineBmColor;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
@@ -219,7 +203,7 @@ begin
   ItemState:= cLineStateNone;
   ItemHidden:= 0;
   ItemCached:= false;
-  ItemBm:= cBmNone;
+  ItemBm:= 0;
   ItemBmColor:= 0;
   //ItemBmHint:= '';
 end;
@@ -234,12 +218,12 @@ begin
     Result:= '';
 end;
 
-function TATStrings.GetLineBm(Index: integer): TATLineBookmark;
+function TATStrings.GetLineBm(Index: integer): integer;
 begin
   if IsIndexValid(Index) then
     Result:= TATStringItem(FList[Index]).ItemBm
   else
-    Result:= cBmNone;
+    Result:= 0;
 end;
 
 function TATStrings.GetLineBmColor(Index: integer): integer;
@@ -311,7 +295,7 @@ begin
   end;
 end;
 
-procedure TATStrings.SetLineBm(Index: integer; AValue: TATLineBookmark);
+procedure TATStrings.SetLineBm(Index: integer; AValue: integer);
 begin
   if IsIndexValid(Index) then
     TATStringItem(FList[Index]).ItemBm:= AValue;

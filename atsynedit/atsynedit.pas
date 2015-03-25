@@ -1154,7 +1154,7 @@ var
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: real;
   WrapItem: TATSynWrapItem;
-  BmKind: TATLineBookmark;
+  BmKind: integer;
   BmColor: TColor;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText: TPoint;
@@ -1231,7 +1231,7 @@ begin
     //draw bookmark bg
     BmColor:= clNone;
     BmKind:= Strings.LinesBm[NLinesIndex];
-    if BmKind<>cBmNone then
+    if BmKind<>0 then
       BmColor:= Strings.LinesBmColor[NLinesIndex];
     if FOptShowCurLine and LineWithCaret then
       BmColor:= FColors.CurLineBG;
@@ -1375,7 +1375,7 @@ begin
       if FGutter[FGutterBandBm].Visible then
         if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
-          if Strings.LinesBm[NLinesIndex]<>cBmNone then
+          if Strings.LinesBm[NLinesIndex]<>0 then
             DoEventDrawBookmarkIcon(C, NLinesIndex, Rect(NGutterBmX1, NCoordTop, NGutterBmX2, NCoordTop+ACharSize.Y));
         end;
 

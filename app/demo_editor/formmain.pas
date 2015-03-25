@@ -204,13 +204,13 @@ var
 begin
   for i:= 0 to ed.Strings.Count-1 do
   begin
-    if ed.Strings.LinesBm[i]=cbmNone then
+    if ed.Strings.LinesBm[i]=0 then
     begin
-      ed.Strings.LinesBm[i]:= cBmUsual;
+      ed.Strings.LinesBm[i]:= 1;
       ed.Strings.LinesBmColor[i]:= cColorBmLine;
     end
     else
-      ed.Strings.LinesBm[i]:= cBmNone;
+      ed.Strings.LinesBm[i]:= 0;
   end;
   ed.Update;
 end;
@@ -309,11 +309,11 @@ procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer);
 begin
   if ABand=ed.GutterBandBm then
   begin
-    if ed.Strings.LinesBm[ALine]<>cBmNone then
-      ed.Strings.LinesBm[ALine]:= cBmNone
+    if ed.Strings.LinesBm[ALine]<>0 then
+      ed.Strings.LinesBm[ALine]:= 0
     else
     begin
-      ed.Strings.LinesBm[ALine]:= cBmUsual;
+      ed.Strings.LinesBm[ALine]:= 1;
       ed.Strings.LinesBmColor[ALine]:= cColorBmLine;
     end;
     ed.Update;
