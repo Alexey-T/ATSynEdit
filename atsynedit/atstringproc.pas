@@ -15,28 +15,22 @@ type
 const
   cMaxTabPositionToExpand = 500; //no sense to expand too far tabs
   cCharScaleFullwidth = 1.7; //width of CJK chars
+  cMinWordWrapOffset = 3;
 
+function IsLineBreakCode(N: Word): boolean;
 function IsWordChar(ch: atChar; const AWordChars: atString): boolean;
-function IsSpecialCodeChar(ch: atChar): boolean;
-function IsEolCode(N: Word): boolean;
-function IsAccentChar(ch: WideChar): boolean;
+function IsSpaceChar(ch: atChar): boolean;
+function IsAsciiControlChar(ch: atChar): boolean;
+function IsAccentChar(ch: atChar): boolean;
 
-function SIndentUnindent(const Str: atString; ARight: boolean;
-  AIndentSize, ATabSize: integer): atString;
-function SSpacesToTabs(const Str: atString; ATabSize: integer): atString;
-function SGetItem(var S: string; const sep: Char = ','): string;
-function BoolToPlusMinusOne(b: boolean): integer;
-function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SGetIndentChars(const S: atString): integer;
-function SGetNonSpaceLength(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
-procedure SReplaceSpecChars(var S: atString);
-procedure TrimStringList(L: TStringList);
-function SWithBreaks(const S: atString): boolean;
+function SGetNonSpaceLength(const S: atString): integer;
+function STabsToSpaces(const S: atString; ATabSize: integer): atString;
+function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
 
 procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
   ATabSize: integer; ACharsSkipped: integer = 0);
-function SExpandTabulations(const S: atString; ATabSize: integer): atString;
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString): integer;
 function SFindClickedPosition(const Str: atString;
@@ -45,12 +39,23 @@ function SFindClickedPosition(const Str: atString;
 procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
   out ACharsSkipped: integer; out ASpacesSkipped: real);
 
+function SIndentUnindent(const Str: atString; ARight: boolean;
+  AIndentSize, ATabSize: integer): atString;
+function SGetItem(var S: string; const sep: Char = ','): string;
+function SSwapEndian(const S: UnicodeString): UnicodeString;
+function SWithBreaks(const S: atString): boolean;
+procedure SReplaceAsciiControlChars(var S: atString);
+
+function BoolToPlusMinusOne(b: boolean): integer;
+procedure TrimStringList(L: TStringList);
+
+
 implementation
 
 uses
-  Dialogs, Math;
+  Dialogs, Math{%H-};
 
-function IsEolCode(N: Word): boolean;
+function IsLineBreakCode(N: Word): boolean;
 begin
   Result:= (N=10) or (N=13);
 end;
@@ -74,7 +79,7 @@ begin
   Result:= (ch=' ') or (ch=#9);
 end;
 
-function IsSpecialCodeChar(ch: atChar): boolean;
+function IsAsciiControlChar(ch: atChar): boolean;
 begin
   Result:= (ch<>#9) and (AnsiChar(ch)<' ');
 end;
@@ -92,15 +97,13 @@ end;
 
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString): integer;
-const
-  cMinColumns = 5;
 var
   N, NMin, NAvg: integer;
   List: array of real;
 begin
   if S='' then
     begin Result:= 0; Exit end;
-  if AColumns<cMinColumns then
+  if AColumns<cMinWordWrapOffset then
     begin Result:= AColumns; Exit end;
 
   SetLength(List, Length(S));
@@ -115,8 +118,8 @@ begin
   N:= Length(S)-1;
   while (N>0) and (List[N]>AColumns+1) do Dec(N);
   NAvg:= N;
-  if NAvg<cMinColumns then
-    begin Result:= cMinColumns; Exit end;
+  if NAvg<cMinWordWrapOffset then
+    begin Result:= cMinWordWrapOffset; Exit end;
 
   NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and IsWordChar(S[N], AWordChars) and IsWordChar(S[N+1], AWordChars) do Dec(N);
@@ -147,7 +150,7 @@ var
   SIndent: atString;
 begin
   SIndent:= Copy(S, 1, SGetIndentChars(S));
-  SIndent:= SExpandTabulations(SIndent, ATabSize);
+  SIndent:= STabsToSpaces(SIndent, ATabSize);
   Result:= Length(SIndent);
 end;
 
@@ -168,7 +171,7 @@ begin
     Inc(Result);
 end;
 
-function SExpandTabulations(const S: atString; ATabSize: integer): atString;
+function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 var
   N, NSize: integer;
 begin
@@ -195,7 +198,7 @@ end;
   Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
   Combining Half Marks (FE20–FE2F), versions 1.0, updates in 5.2
 }
-function IsAccentChar(ch: WideChar): boolean;
+function IsAccentChar(ch: atChar): boolean;
 begin
   case Ord(ch) of
     $0300..$036F,
@@ -383,14 +386,14 @@ begin
   if b then Result:= 1 else Result:= -1;
 end;
 
-procedure SReplaceSpecChars(var S: atString);
+procedure SReplaceAsciiControlChars(var S: atString);
 const
   cSpecChar = '.';
 var
   i: integer;
 begin
   for i:= 1 to Length(S) do
-    if IsSpecialCodeChar(S[i]) then
+    if IsAsciiControlChar(S[i]) then
       S[i]:= cSpecChar;
 end;
 
@@ -418,9 +421,9 @@ begin
     (Pos(#10, S)>0);
 end;
 
-function SSpacesToTabs(const Str: atString; ATabSize: integer): atString;
+function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
 begin
-  Result:= StringReplace(Str, StringOfChar(' ', ATabSize), #9, [rfReplaceAll]);
+  Result:= StringReplace(S, StringOfChar(' ', ATabSize), #9, [rfReplaceAll]);
 end;
 
 function SIndentUnindent(const Str: atString; ARight: boolean;
@@ -453,7 +456,7 @@ begin
     StrText:= Copy(Str, N+1, MaxInt);
     DoTabs:= Pos(#9, StrIndent)>0;
 
-    StrIndent:= SExpandTabulations(StrIndent, ATabSize);
+    StrIndent:= STabsToSpaces(StrIndent, ATabSize);
     if Length(StrIndent)<DecSpaces then Exit;
     Delete(StrIndent, 1, DecSpaces);
 

@@ -2548,7 +2548,7 @@ begin
   NChars:= Min(APosX, NChars); //limit indent by x-pos
 
   Str:= Copy(Str, 1, NChars);
-  NSpaces:= Length(SExpandTabulations(Str, FTabSize));
+  NSpaces:= Length(STabsToSpaces(Str, FTabSize));
 
   case FOptAutoIndentKind of
     cIndentAsIs:

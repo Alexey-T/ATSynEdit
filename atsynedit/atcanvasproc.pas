@@ -212,7 +212,7 @@ var
 begin
   if Str='' then Exit;
   if AReplaceSpecs then
-    SReplaceSpecChars(Str);
+    SReplaceAsciiControlChars(Str);
 
   SetLength(ListReal, Length(Str));
   SetLength(ListInt, Length(Str));
