@@ -37,7 +37,7 @@ function SWithBreaks(const S: atString): boolean;
 procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
   ATabSize: integer; ACharsSkipped: integer = 0);
 function SExpandTabulations(const S: atString; ATabSize: integer): atString;
-function SFindWordWrapPosition(const S: atString; AColumns, ATabSize: integer;
+function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString): integer;
 function SFindClickedPosition(const Str: atString;
   APixelsFromLeft, ACharSize, ATabSize: integer;
@@ -90,15 +90,17 @@ begin
   showmessage('Offsets'#13+s);
 end;
 
-function SFindWordWrapPosition(const S: atString; AColumns, ATabSize: integer;
+function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString): integer;
+const
+  cMinColumns = 4;
 var
   N, NMin, NAvg: integer;
   List: array of real;
 begin
   if S='' then
     begin Result:= 0; Exit end;
-  if AColumns<5 then
+  if AColumns<=cMinColumns then
     begin Result:= AColumns; Exit end;
 
   SetLength(List, Length(S));

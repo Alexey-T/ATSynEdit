@@ -886,7 +886,7 @@ begin
     NIndent:= 0;
 
     repeat
-      NLen:= SFindWordWrapPosition(Str, Max(FWrapColumn-NIndent, cMinWrapColumnAbs), FTabSize, FOptWordChars);
+      NLen:= SFindWordWrapOffset(Str, Max(FWrapColumn-NIndent, cMinWrapColumnAbs), FTabSize, FOptWordChars);
       if NLen>=Length(Str) then
         NFinal:= cWrapItemFinal
       else
