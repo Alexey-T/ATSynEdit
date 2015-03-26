@@ -991,12 +991,11 @@ begin
 
   //recalculate scrollbars, if they shown just now
   if AllowRepeat then
-    if (not bVert1 and bVert2) or
-      (not bHorz1 and bHorz2) then
-      begin
-        //Beep;
-        UpdateScrollbars(false);
-      end;
+    if (bVert1<>bVert2) or (bHorz1<>bHorz2) then
+    begin
+      //Beep;
+      UpdateScrollbars(false);
+    end;
 
   if not IsEqualScrollInfo(FPrevHorz, FScrollHorz) or
     not IsEqualScrollInfo(FPrevVert, FScrollVert) then
@@ -1013,7 +1012,7 @@ var
 begin
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
-  si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL;
+  si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
   si.nMin:= FScrollVert.NMin;
   si.nMax:= FScrollVert.NMax;
   si.nPage:= FScrollVert.NPage;
