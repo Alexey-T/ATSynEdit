@@ -28,6 +28,7 @@ procedure CanvasTextOut(C: TCanvas;
   AReplaceSpecs: boolean;
   AShowUnprintable: boolean;
   AColorUnprintable: TColor;
+  AColorHex: TColor;
   out AStrWidth: integer;
   ACharsSkipped: integer = 0;
   AParts: PATLineParts = nil);
@@ -132,6 +133,47 @@ begin
     end;
 end;
 
+procedure DoPaintHexChars(C: TCanvas;
+  const AString: atString;
+  ADx: PIntegerArray;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont,
+  AColorBg: TColor);
+var
+  Buf: string;
+  R: TRect;
+  i, j: integer;
+begin
+  if AString='' then Exit;
+
+  for i:= 1 to Length(AString) do
+    if IsCharHex(AString[i]) then
+    begin
+      R.Left:= APoint.X;
+      R.Right:= APoint.X;
+
+      for j:= 0 to i-2 do
+        Inc(R.Left, ADx[j]);
+      R.Right:= R.Left+ADx[i-1];
+
+      R.Top:= APoint.Y;
+      R.Bottom:= R.Top+ACharSize.Y;
+
+      C.Font.Color:= AColorFont;
+      C.Brush.Color:= AColorBg;
+
+      Buf:= '<'+IntToHex(Ord(AString[i]), 4)+'>';
+      ExtTextOut(C.Handle,
+        R.Left, R.Top,
+        ETO_CLIPPED+ETO_OPAQUE,
+        @R,
+        PChar(Buf),
+        Length(Buf),
+        nil);
+    end;
+end;
+
 procedure DoPaintUnprintedEol(C: TCanvas;
   const AStrEol: atString;
   APoint: TPoint;
@@ -186,17 +228,10 @@ begin
   Result:= Trunc(CanvasTextSpaces(S, ATabSize)*ACharSize.X);
 end;
 
-procedure CanvasTextOut(C: TCanvas;
-  PosX, PosY: integer;
-  Str: atString;
-  ATabSize: integer;
-  ACharSize: TPoint;
-  AReplaceSpecs: boolean;
-  AShowUnprintable: boolean;
-  AColorUnprintable: TColor;
-  out AStrWidth: integer;
-  ACharsSkipped: integer;
-  AParts: PATLineParts);
+procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
+  ATabSize: integer; ACharSize: TPoint; AReplaceSpecs: boolean;
+  AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
+  AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts);
 var
   ListReal: array of real;
   ListInt: array of Longint;
@@ -211,6 +246,7 @@ var
   Buf: AnsiString;
 begin
   if Str='' then Exit;
+
   if AReplaceSpecs then
     SReplaceAsciiControlChars(Str);
 
@@ -233,6 +269,15 @@ begin
   begin
     Buf:= UTF8Encode(Str);
     ExtTextOut(C.Handle, PosX, PosY, 0, nil, PChar(Buf), Length(Buf), @Dx[0]);
+
+    DoPaintHexChars(C,
+      Str,
+      @Dx[0],
+      Point(PosX, PosY),
+      ACharSize,
+      AColorHex,
+      C.Brush.Color
+      );
   end
   else
   for j:= 0 to High(TATLineParts) do
@@ -276,6 +321,15 @@ begin
         PChar(Buf),
         Length(Buf),
         @Dx[PartOffset]);
+
+      DoPaintHexChars(C,
+        PartStr,
+        @Dx[PartOffset],
+        Point(PosX+PixOffset1, PosY),
+        ACharSize,
+        AColorHex,
+        PartColorBG
+        );
     end;
 
   if AShowUnprintable then

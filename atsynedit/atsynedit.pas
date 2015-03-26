@@ -51,6 +51,7 @@ type
     CollapsedText,
     UnprintedFont,
     UnprintedBG,
+    HexSpecialChars,
     MinimapBorder,
     MinimapSel,
     MicromapBG,
@@ -1291,6 +1292,7 @@ begin
         FUnprintedReplaceSpec,
         AWithUnprintable and FUnprintedSpaces,
         FColors.UnprintedFont,
+        FColors.HexSpecialChars,
         NOutputStrWidth,
         Trunc(NOutputSpacesSkipped), //todo:
           //needed number of chars of all chars counted as 1.0,
@@ -2596,6 +2598,7 @@ begin
   FColors.IndentLines:= clMedGray;
   FColors.UnprintedFont:= $5050f0;
   FColors.UnprintedBG:= $e0e0e0;
+  FColors.HexSpecialChars:= clMedGray;
   FColors.MinimapBorder:= clLtGray;
   FColors.MinimapSel:= $eeeeee;
   FColors.MicromapBG:= clCream;

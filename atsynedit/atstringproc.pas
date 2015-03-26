@@ -15,13 +15,19 @@ type
 const
   cMaxTabPositionToExpand = 500; //no sense to expand too far tabs
   cCharScaleFullwidth = 1.7; //width of CJK chars
+  cCharScaleHex = 6.0; //show as hex: "<NNNN>"
   cMinWordWrapOffset = 3;
+
+var
+  OptCharsHex: atString = ''; //show these chars as "<NNNN>"
+
 
 function IsLineBreakCode(N: Word): boolean;
 function IsWordChar(ch: atChar; const AWordChars: atString): boolean;
 function IsSpaceChar(ch: atChar): boolean;
 function IsAsciiControlChar(ch: atChar): boolean;
 function IsAccentChar(ch: atChar): boolean;
+function IsCharHex(ch: atChar): boolean;
 
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
@@ -83,6 +89,12 @@ function IsAsciiControlChar(ch: atChar): boolean;
 begin
   Result:= (ch<>#9) and (AnsiChar(ch)<' ');
 end;
+
+function IsCharHex(ch: atChar): boolean;
+begin
+  Result:= Pos(ch, OptCharsHex)>0;
+end;
+
 
 procedure DoDebugOffsets(const List: array of real);
 var
@@ -276,10 +288,12 @@ begin
     Inc(i);
     if i>Length(S) then Break;
 
-    if IsCharFullWidth(S[i]) then
-      Scale:= cCharScaleFullwidth
+    Scale:= 1.0;
+    if IsCharHex(S[i]) then
+      Scale:= cCharScaleHex
     else
-      Scale:= 1.0;
+    if IsCharFullWidth(S[i]) then
+      Scale:= cCharScaleFullwidth;
 
     {$ifdef test_wide_char}
     if IsSpaceChar(S[i]) then
@@ -397,6 +411,7 @@ begin
       S[i]:= cSpecChar;
 end;
 
+
 function SGetItem(var S: string; const sep: Char = ','): string;
 var
   i: integer;
@@ -465,6 +480,18 @@ begin
     Result:= StrIndent+StrText;
   end;
 end;
+
+procedure _InitCharsHex;
+var
+  i: integer;
+begin
+  for i:= 0 to 31 do
+    if (i<>13) and (i<>10) and (i<>9) then
+      OptCharsHex:= OptCharsHex+Chr(i);
+end;
+
+initialization
+  _InitCharsHex;
 
 end.
 
