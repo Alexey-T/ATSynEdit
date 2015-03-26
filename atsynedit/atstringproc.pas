@@ -19,14 +19,13 @@ const
   cMinWordWrapOffset = 3;
 
 var
-  OptCharsHex: atString = ''; //show these chars as "<NNNN>"
+  SOptionCharsHex: UnicodeString = ''; //show these chars as "<NNNN>"
 
-
-function IsLineBreakCode(N: Word): boolean;
-function IsWordChar(ch: atChar; const AWordChars: atString): boolean;
-function IsSpaceChar(ch: atChar): boolean;
-function IsAsciiControlChar(ch: atChar): boolean;
-function IsAccentChar(ch: atChar): boolean;
+function IsCodeEol(N: Word): boolean;
+function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
+function IsCharSpace(ch: atChar): boolean;
+function IsCharAsciiControl(ch: atChar): boolean;
+function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
 
 function SGetIndentChars(const S: atString): integer;
@@ -34,7 +33,9 @@ function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+
 function SRemoveHexChars(const S: atString): atString;
+function SRemoveAsciiControlChars(const S: atString): atString;
 
 procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
   ATabSize: integer; ACharsSkipped: integer = 0);
@@ -51,7 +52,6 @@ function SIndentUnindent(const Str: atString; ARight: boolean;
 function SGetItem(var S: string; const sep: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SWithBreaks(const S: atString): boolean;
-procedure SReplaceAsciiControlChars(var S: atString);
 
 function BoolToPlusMinusOne(b: boolean): integer;
 procedure TrimStringList(L: TStringList);
@@ -62,12 +62,12 @@ implementation
 uses
   Dialogs, Math{%H-};
 
-function IsLineBreakCode(N: Word): boolean;
+function IsCodeEol(N: Word): boolean;
 begin
   Result:= (N=10) or (N=13);
 end;
 
-function IsWordChar(ch: atChar; const AWordChars: atString): boolean;
+function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
 begin
   Result:=
     ((ch>='0') and (ch<='9')) or
@@ -81,19 +81,19 @@ begin
         Result:= true;
 end;
 
-function IsSpaceChar(ch: atChar): boolean;
+function IsCharSpace(ch: atChar): boolean;
 begin
   Result:= (ch=' ') or (ch=#9);
 end;
 
-function IsAsciiControlChar(ch: atChar): boolean;
+function IsCharAsciiControl(ch: atChar): boolean;
 begin
   Result:= (ch<>#9) and (AnsiChar(ch)<' ');
 end;
 
 function IsCharHex(ch: atChar): boolean;
 begin
-  Result:= Pos(ch, OptCharsHex)>0;
+  Result:= Pos(ch, SOptionCharsHex)>0;
 end;
 
 
@@ -135,7 +135,7 @@ begin
     begin Result:= cMinWordWrapOffset; Exit end;
 
   NMin:= SGetIndentChars(S)+1;
-  while (N>NMin) and IsWordChar(S[N], AWordChars) and IsWordChar(S[N+1], AWordChars) do Dec(N);
+  while (N>NMin) and IsCharWord(S[N], AWordChars) and IsCharWord(S[N+1], AWordChars) do Dec(N);
 
   if N>NMin then
     Result:= N
@@ -146,14 +146,14 @@ end;
 function SGetIndentChars(const S: atString): integer;
 begin
   Result:= 0;
-  while (Result<Length(S)) and IsSpaceChar(S[Result+1]) do
+  while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
     Inc(Result);
 end;
 
 function SGetNonSpaceLength(const S: atString): integer;
 begin
   Result:= Length(S);
-  while (Result>0) and IsSpaceChar(S[Result]) do Dec(Result);
+  while (Result>0) and IsCharSpace(S[Result]) do Dec(Result);
   if Result=0 then
     Result:= Length(S);
 end;
@@ -211,7 +211,7 @@ end;
   Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
   Combining Half Marks (FE20–FE2F), versions 1.0, updates in 5.2
 }
-function IsAccentChar(ch: atChar): boolean;
+function IsCharAccent(ch: atChar): boolean;
 begin
   case Ord(ch) of
     $0300..$036F,
@@ -315,7 +315,7 @@ begin
       Inc(i, NTabSize-1);
     end;
 
-    if (i<Length(S)) and IsAccentChar(S[i+1]) then
+    if (i<Length(S)) and IsCharAccent(S[i+1]) then
     begin
       NOffset:= 0;
     end;
@@ -401,18 +401,6 @@ begin
   if b then Result:= 1 else Result:= -1;
 end;
 
-procedure SReplaceAsciiControlChars(var S: atString);
-const
-  cSpecChar = '.';
-var
-  i: integer;
-begin
-  for i:= 1 to Length(S) do
-    if IsAsciiControlChar(S[i]) then
-      S[i]:= cSpecChar;
-end;
-
-
 function SGetItem(var S: string; const sep: Char = ','): string;
 var
   i: integer;
@@ -482,6 +470,16 @@ begin
   end;
 end;
 
+function SRemoveAsciiControlChars(const S: atString): atString;
+var
+  i: integer;
+begin
+  Result:= S;
+  for i:= 1 to Length(Result) do
+    if IsCharAsciiControl(Result[i]) then
+      Result[i]:= '.';
+end;
+
 function SRemoveHexChars(const S: atString): atString;
 var
   i: integer;
@@ -489,7 +487,7 @@ begin
   Result:= S;
   for i:= 1 to Length(Result) do
     if IsCharHex(Result[i]) then
-      Result[i]:= '_';
+      Result[i]:= '?';
 end;
 
 {
@@ -500,7 +498,7 @@ Explicit Directional Isolate Formatting Characters 	LRI, RLI, FSI, PDI
 }
 procedure _InitCharsHex;
 const
-  cDirCode: UnicodeString =
+  cDirCodes: UnicodeString =
     #$202A {LRE} + #$202B {RLE} + #$202D {LRO} + #$202E {RLO} + #$202C {PDF} +
     #$2066 {LRI} + #$2067 {RLI} + #$2068 {FSI} + #$2069 {PDI} +
     #$200E {LRM} + #$200F {RLM} + #$061C {ALM};
@@ -509,9 +507,9 @@ var
 begin
   for i:= 0 to 31 do
     if (i<>13) and (i<>10) and (i<>9) then
-      OptCharsHex:= OptCharsHex+Chr(i);
+      SOptionCharsHex:= SOptionCharsHex+Chr(i);
 
-  OptCharsHex:= OptCharsHex + cDirCode;
+  SOptionCharsHex:= SOptionCharsHex + cDirCodes;
 end;
 
 initialization

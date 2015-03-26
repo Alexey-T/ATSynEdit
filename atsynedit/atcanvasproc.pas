@@ -248,7 +248,7 @@ begin
   if Str='' then Exit;
 
   if AReplaceSpecs then
-    SReplaceAsciiControlChars(Str);
+    Str:= SRemoveAsciiControlChars(Str);
 
   SetLength(ListReal, Length(Str));
   SetLength(ListInt, Length(Str));

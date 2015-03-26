@@ -91,10 +91,10 @@ begin
   AOffset2:= AOffset;
 
   if (AOffset>=0) and (AOffset<Length(S)) and
-    IsWordChar(S[AOffset+1], AWordChars) then
+    IsCharWord(S[AOffset+1], AWordChars) then
   begin
     //jump left only if at middle of word
-    if (AOffset>0) and IsWordChar(S[AOffset], AWordChars) then
+    if (AOffset>0) and IsCharWord(S[AOffset], AWordChars) then
       AOffset1:= SFindWordOffset(S, AOffset, false, false, AWordChars);
     //jump right always
     AOffset2:= SFindWordOffset(S, AOffset, true, false, AWordChars);
