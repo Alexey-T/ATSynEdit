@@ -344,7 +344,7 @@ type
     procedure DoSelect_Line_ByClick;
     procedure DoSelect_None;
     //paint
-    procedure DoPaint(AFlags: TATSynPaintFlags);
+    function DoPaint(AFlags: TATSynPaintFlags): boolean;
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintRulerTo(C: TCanvas);
@@ -426,7 +426,7 @@ type
     procedure UpdateMinimapAutosize(C: TCanvas);
     function DoFormatLineNumber(N: integer): atString;
     procedure UpdateWrapInfo;
-    procedure UpdateScrollbars(AllowRepeat: boolean = true);
+    function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
     procedure UpdateCaretsCoords(AOnlyLast: boolean = false);
@@ -958,11 +958,13 @@ begin
     FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.UpdateScrollbars(AllowRepeat: boolean = true);
+function TATSynEdit.UpdateScrollbars: boolean;
 var
   bVert1, bVert2,
   bHorz1, bHorz2: boolean;
 begin
+  Result:= false;
+
   with FScrollVert do
   begin
     NPage:= Max(1, GetVisibleLines)-1;
@@ -989,14 +991,7 @@ begin
   UpdateScrollbarHorz;
   bVert2:= GetScrollbarVisible(true);
   bHorz2:= GetScrollbarVisible(false);
-
-  //recalculate scrollbars, if they shown just now
-  if AllowRepeat then
-    if (bVert1<>bVert2) or (bHorz1<>bHorz2) then
-    begin
-      //Beep;
-      UpdateScrollbars(false);
-    end;
+  Result:= (bVert1<>bVert2) or (bHorz1<>bHorz2);
 
   if not IsEqualScrollInfo(FPrevHorz, FScrollHorz) or
     not IsEqualScrollInfo(FPrevVert, FScrollVert) then
@@ -1874,10 +1869,11 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPaint(AFlags: TATSynPaintFlags);
+function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags): boolean;
 var
   ARect: TRect;
 begin
+  Result:= false;
   if not Assigned(FBitmap) then Exit;
 
   if cPaintUpdateBitmap in AFlags then
@@ -1898,13 +1894,16 @@ begin
   Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
 
   if cPaintUpdateScrollbars in AFlags then
-    UpdateScrollbars;
+    Result:= UpdateScrollbars;
 end;
 
 
 procedure TATSynEdit.Paint;
 begin
-  DoPaint(FPaintFlags);
+  //if scrollbars shown, paint again
+  if DoPaint(FPaintFlags) then
+    DoPaint(FPaintFlags);
+
   Exclude(FPaintFlags, cPaintUpdateBitmap);
 end;
 

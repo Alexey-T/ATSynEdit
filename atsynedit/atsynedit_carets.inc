@@ -232,13 +232,13 @@ begin
   if NIndex<FScrollVert.NPos then
   begin
     FScrollVert.NPos:= Max(0, NIndex-AIndentVert);
-    UpdateScrollbars(true);
+    UpdateScrollbars;
   end
   else
   if NIndex>FScrollVert.NPos+NVisLines-1 then
   begin
     FScrollVert.NPos:= Max(0, NIndex-NVisLines+1+AIndentVert);
-    UpdateScrollbars(true);
+    UpdateScrollbars;
   end;
 
   //for x
@@ -246,14 +246,14 @@ begin
   begin
     NChars:= (FRectMain.Left-APnt.X) div FCharSize.X + 1 + AIndentHorz;
     FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
-    UpdateScrollbars(true);
+    UpdateScrollbars;
   end
   else
   if APnt.X>FRectMain.Right-FCharSize.X then
   begin
     NChars:= (APnt.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
     Inc(FScrollHorz.NPos, NChars);
-    UpdateScrollbars(true);
+    UpdateScrollbars;
   end;
 end;
 

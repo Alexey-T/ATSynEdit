@@ -204,14 +204,14 @@ begin
 end;
 
 {
-  http://en.wikipedia.org/wiki/Combining_character
-  Combining Diacritical Marks (0300–036F), since version 1.0, with modifications in subsequent versions down to 4.1
-  Combining Diacritical Marks Extended (1AB0–1AFF), version 7.0
-  Combining Diacritical Marks Supplement (1DC0–1DFF), versions 4.1 to 5.2
-  Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
-  Combining Half Marks (FE20–FE2F), versions 1.0, updates in 5.2
+http://en.wikipedia.org/wiki/Combining_character
+Combining Diacritical Marks (0300–036F), since version 1.0, with modifications in subsequent versions down to 4.1
+Combining Diacritical Marks Extended (1AB0–1AFF), version 7.0
+Combining Diacritical Marks Supplement (1DC0–1DFF), versions 4.1 to 5.2
+Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
+Combining Half Marks (FE20–FE2F), versions 1.0, updates in 5.2
 }
-function IsCharAccent(ch: atChar): boolean;
+function IsCharAccent(ch: WideChar): boolean;
 begin
   case Ord(ch) of
     $0300..$036F,
@@ -225,24 +225,6 @@ begin
   end;
 end;
 
-{
-Ranges that are FullWidth char
- 1100  e1 84 80  ..  115F  e1 85 9f
- 2329  e2 8c a9  ..  232A  e2 8c aa
- 2E80  e2 ba 80  ..  303E  e3 80 be
- 3041  e3 81 81  ..  33FF  e3 8f bf
- 3400  e3 90 80  ..  4DB5  e4 b6 b5
- 4E00  e4 b8 80  ..  9FC3  e9 bf 83
- A000  ea 80 80  ..  A4C6  ea 93 86
- AC00  ea b0 80  ..  D7A3  ed 9e a3
- F900  ef a4 80  ..  FAD9  ef ab 99
- FE10  ef b8 90  ..  FE19  ef b8 99
- FE30  ef b8 b0  ..  FE6B  ef b9 ab
- FF01  ef bc 81  ..  FF60  ef bd a0
- FFE0  ef bf a0  ..  FFE6  ef bf a6
-20000  f0 a0 80 80  .. 2FFFD f0 af bf bd
-30000  f0 b0 80 80  .. 3FFFD f0 bf bf bd
-}
 function IsCharFullWidth(ch: WideChar): boolean;
 begin
   case Ord(ch) of
