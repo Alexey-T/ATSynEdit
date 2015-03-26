@@ -34,6 +34,7 @@ function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+function SRemoveHexChars(const S: atString): atString;
 
 procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
   ATabSize: integer; ACharsSkipped: integer = 0);
@@ -481,13 +482,36 @@ begin
   end;
 end;
 
+function SRemoveHexChars(const S: atString): atString;
+var
+  i: integer;
+begin
+  Result:= S;
+  for i:= 1 to Length(Result) do
+    if IsCharHex(Result[i]) then
+      Result[i]:= '_';
+end;
+
+{
+http://unicode.org/reports/tr9/#Directional_Formatting_Characters
+Implicit Directional Formatting Characters 	LRM, RLM, ALM
+Explicit Directional Embedding and Override Formatting Characters 	LRE, RLE, LRO, RLO, PDF
+Explicit Directional Isolate Formatting Characters 	LRI, RLI, FSI, PDI
+}
 procedure _InitCharsHex;
+const
+  cDirCode: UnicodeString =
+    #$202A {LRE} + #$202B {RLE} + #$202D {LRO} + #$202E {RLO} + #$202C {PDF} +
+    #$2066 {LRI} + #$2067 {RLI} + #$2068 {FSI} + #$2069 {PDI} +
+    #$200E {LRM} + #$200F {RLM} + #$061C {ALM};
 var
   i: integer;
 begin
   for i:= 0 to 31 do
     if (i<>13) and (i<>10) and (i<>9) then
       OptCharsHex:= OptCharsHex+Chr(i);
+
+  OptCharsHex:= OptCharsHex + cDirCode;
 end;
 
 initialization

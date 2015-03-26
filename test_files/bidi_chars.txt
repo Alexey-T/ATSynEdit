@@ -1,0 +1,2 @@
+﻿s = "spam‮" ,spam ,"‬spam"
+s[1]()

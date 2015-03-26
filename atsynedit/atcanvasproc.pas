@@ -267,7 +267,7 @@ begin
 
   if AParts=nil then
   begin
-    Buf:= UTF8Encode(Str);
+    Buf:= UTF8Encode(SRemoveHexChars(Str));
     ExtTextOut(C.Handle, PosX, PosY, 0, nil, PChar(Buf), Length(Buf), @Dx[0]);
 
     DoPaintHexChars(C,
@@ -312,7 +312,7 @@ begin
         PosX+PixOffset2,
         PosY+ACharSize.Y);
 
-      Buf:= UTF8Encode(PartStr);
+      Buf:= UTF8Encode(SRemoveHexChars(PartStr));
       ExtTextOut(C.Handle,
         PosX+PixOffset1,
         PosY,
