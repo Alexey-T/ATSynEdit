@@ -350,7 +350,7 @@ var
 begin
   for j:= R.Top to R.Bottom-1 do
     for i:= R.Left to R.Right-1 do
-      C.Pixels[i, j]:= C.Pixels[i, j] xor $FFFFFF;
+      C.Pixels[i, j]:= C.Pixels[i, j] xor (not AColor and $ffffff);
 end;
 {$else}
 var
