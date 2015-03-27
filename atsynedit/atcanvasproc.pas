@@ -2,6 +2,11 @@ unit ATCanvasProc;
 
 {$mode delphi}
 //{$define win_fast} //use Windows api
+//{$define invert_pixels} //slow invert-rect
+
+{$ifdef darwin}
+  {$define invert_pixels}
+{$endif}
 
 interface
 
@@ -338,6 +343,16 @@ begin
   AStrWidth:= ListInt[High(ListInt)];
 end;
 
+{$ifdef invert_pixels}
+procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  i, j: integer;
+begin
+  for j:= R.Top to R.Bottom-1 do
+    for i:= R.Left to R.Right-1 do
+      C.Pixels[i, j]:= C.Pixels[i, j] xor $FFFFFF;
+end;
+{$else}
 var
   _Pen: TPen = nil;
 
@@ -367,7 +382,7 @@ begin
   C.AntialiasingMode:= AM;
   C.Rectangle(0, 0, 0, 0); //apply pen
 end;
-
+{$endif}
 
 procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
 var
