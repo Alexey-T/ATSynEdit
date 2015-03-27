@@ -11,7 +11,7 @@ type
   TATKeyMappingItem = class
     Cmd: integer;
     Name: string;
-    Keys1, Keys2: array[0..0] of string;
+    Keys1, Keys2: array[0..0] of TShortcut;
   end;
 
 type
@@ -36,7 +36,9 @@ type
 
 implementation
 
-uses LCLProc;
+uses
+  LCLProc,
+  Dialogs;
 
 { TATKeyMapping }
 
@@ -87,19 +89,33 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATKeyMapping.Add(ACmd: integer; const AName: string;
-  const AKeys1, AKeys2: array of string);
+procedure TATKeyMapping.Add(ACmd: integer; const AName: string; const AKeys1,
+  AKeys2: array of string);
 var
   Item: TATKeyMappingItem;
+  Sh: TShortcut;
   i: integer;
 begin
   Item:= TATKeyMappingItem.Create;
   Item.Cmd:= ACmd;
   Item.Name:= AName;
-  for i:= 0 to High(Item.Keys1) do Item.Keys1[i]:= '';
-  for i:= 0 to High(Item.Keys2) do Item.Keys2[i]:= '';
-  for i:= 0 to High(AKeys1) do Item.Keys1[i]:= AKeys1[i];
-  for i:= 0 to High(AKeys2) do Item.Keys2[i]:= AKeys2[i];
+
+  for i:= 0 to High(Item.Keys1) do Item.Keys1[i]:= 0;
+  for i:= 0 to High(Item.Keys2) do Item.Keys2[i]:= 0;
+
+  for i:= 0 to High(AKeys1) do
+  begin
+    Sh:= TextToShortCut(AKeys1[i]);
+    if Sh=0 then Showmessage('Incorrect key: '+AKeys1[i]);
+    Item.Keys1[i]:= Sh;
+  end;
+
+  for i:= 0 to High(AKeys2) do
+  begin
+    Sh:= TextToShortCut(AKeys2[i]);
+    if Sh=0 then Showmessage('Incorrect key: '+AKeys2[i]);
+    Item.Keys2[i]:= Sh;
+  end;
   FList.Add(Item);
 end;
 
@@ -111,7 +127,7 @@ begin
   for i:= 0 to Count-1 do
     if Items[i].Cmd=Cmd then
     begin
-      Result:= TextToShortCut(Items[i].Keys1[0]);
+      Result:= Items[i].Keys1[0];
       Exit
     end;
 end;

@@ -33,7 +33,7 @@ end;
 
 function TATSynEdit.GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
 var
-  Str: string;
+  Shortcut: TShortcut;
   Item: TATKeyMappingItem;
   i: integer;
 begin
@@ -49,12 +49,12 @@ begin
   if IsEditableTextKey(Key) and ((Shift=[]) or (Shift=[ssShift])) then
     Exit;
 
-  Str:= KeyAndShiftStateToKeyString(Key, Shift);
+  Shortcut:= KeyToShortCut(Key, Shift);
 
   for i:= 0 to FKeyMapping.Count-1 do
   begin
     Item:= FKeyMapping[i];
-    if IsKeyMappingMatchedItem(Str, Item) then
+    if IsKeyMappingMatchedItem(Shortcut, Item) then
     begin
       Result:= Item.Cmd;
       Key:= 0;
@@ -63,11 +63,11 @@ begin
   end;
 end;
 
-function TATSynEdit.IsKeyMappingMatchedItem(const Str: string; const Item: TATKeyMappingItem): boolean;
+function TATSynEdit.IsKeyMappingMatchedItem(const AKey: TShortcut; const AItem: TATKeyMappingItem): boolean;
 begin
   Result:=
-    (Str=Item.Keys1[0]) or
-    (Str=Item.Keys2[0]);
+    (AKey=AItem.Keys1[0]) or
+    (AKey=AItem.Keys2[0]);
 end;
 
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);

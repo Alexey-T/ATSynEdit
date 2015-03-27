@@ -15,7 +15,7 @@ uses
   Dialogs;
 
 const
-  cXCtrl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
+  cXControl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
   cXCtrlShift = {$ifdef darwin} 'Shift+Meta' {$else} 'Ctrl+Shift' {$endif};
 
 
@@ -35,58 +35,58 @@ begin
   M.Add(cCommand_KeyHome_Sel,     'caret to line start + select',  ['Shift+Home'], []);
   M.Add(cCommand_KeyEnd,          'caret to line end',             ['End'], []);
   M.Add(cCommand_KeyEnd_Sel,      'caret to line end + select',    ['Shift+End'], []);
-  M.Add(cCommand_KeyPageUp,       'caret page up',                 ['Prior'], []);
-  M.Add(cCommand_KeyPageUp_Sel,   'caret page up + select',        ['Shift+Prior'], []);
-  M.Add(cCommand_KeyPageDown,     'caret page down',               ['Next'], []);
-  M.Add(cCommand_KeyPageDown_Sel, 'caret page down + select',      ['Shift+Next'], []);
+  M.Add(cCommand_KeyPageUp,       'caret page up',                 ['PgUp'], []);
+  M.Add(cCommand_KeyPageUp_Sel,   'caret page up + select',        ['Shift+PgUp'], []);
+  M.Add(cCommand_KeyPageDown,     'caret page down',               ['PgDn'], []);
+  M.Add(cCommand_KeyPageDown_Sel, 'caret page down + select',      ['Shift+PgDn'], []);
 
-  M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Backspace'], []);
-  M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Delete'], []);
-  M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Return'], []);
+  M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
+  M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
+  M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Enter'], []);
   M.Add(cCommand_KeyTab, 'tabulation', [], []);
   M.Add(cCommand_KeyTabChar, 'tabulation: tab-char', [], []);
 
-  M.Add(cCommand_TextDeleteLine, 'delete line', [cXCtrl+'+Y'], []);
-  M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXCtrl+'+D'], []);
+  M.Add(cCommand_TextDeleteLine, 'delete line', [cXControl+'+Y'], []);
+  M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXControl+'+D'], []);
 
-  M.Add(cCommand_GotoTextBegin,      'goto text begin',          [cXCtrl+'+Home'], []);
+  M.Add(cCommand_GotoTextBegin,      'goto text begin',          [cXControl+'+Home'], []);
   M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', [cXCtrlShift+'+Home'], []);
-  M.Add(cCommand_GotoTextEnd,        'goto text end',            [cXCtrl+'+End'], []);
+  M.Add(cCommand_GotoTextEnd,        'goto text end',            [cXControl+'+End'], []);
   M.Add(cCommand_GotoTextEnd_Sel,    'goto text end + select',   [cXCtrlShift+'+End'], []);
-  M.Add(cCommand_GotoWordPrev,       'goto word left',           [cXCtrl+'+Left'], []);
+  M.Add(cCommand_GotoWordPrev,       'goto word left',           [cXControl+'+Left'], []);
   M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  [cXCtrlShift+'+Left'], []);
-  M.Add(cCommand_GotoWordNext,       'goto word right',          [cXCtrl+'+Right'], []);
+  M.Add(cCommand_GotoWordNext,       'goto word right',          [cXControl+'+Right'], []);
   M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXCtrlShift+'+Right'], []);
 
-  M.Add(cCommand_SelectAll, 'select all', [cXCtrl+'+A'], []);
+  M.Add(cCommand_SelectAll, 'select all', [cXControl+'+A'], []);
   M.Add(cCommand_SelectWords, 'select words at carets', [], []);
   M.Add(cCommand_SelectLines, 'select lines at carets', [], []);
   M.Add(cCommand_SelectNone, 'cancel selection', [], []);
-  M.Add(cCommand_Cancel, 'cancel carets, selection, drag-drop', ['Escape'], []);
+  M.Add(cCommand_Cancel, 'cancel carets, selection, drag-drop', ['Esc'], []);
 
-  M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Insert'], []);
-  M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXCtrl+'+R'], []);
+  M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
+  M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXControl+'+R'], []);
 
-  M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXCtrl+'+Backspace'], []);
-  M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXCtrl+'+Delete'], []);
+  M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
+  M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line start', [], []);
-  M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXCtrl+'+K'], []);
+  M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXControl+'+K'], []);
   M.Add(cCommand_TextDeleteSelection, 'delete selection', [], []);
 
-  M.Add(cCommand_TextIndent, 'indent selection', [cXCtrl+'+I'], []);
-  M.Add(cCommand_TextUnindent, 'unindent selection', [cXCtrl+'+U'], ['Shift+Tab']);
+  M.Add(cCommand_TextIndent, 'indent selection', [cXControl+'+I'], []);
+  M.Add(cCommand_TextUnindent, 'unindent selection', [cXControl+'+U'], ['Shift+Tab']);
 
-  M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXCtrl+'+Up'], []);
-  M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXCtrl+'+Down'], []);
+  M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
+  M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
   M.Add(cCommand_ScrollToCaretTop, 'scroll to caret, top', [], []);
   M.Add(cCommand_ScrollToCaretBottom, 'scroll to caret, bottom', [], []);
   M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
   M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
 
-  M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXCtrl+'+C'], [cXCtrl+'+Insert']);
+  M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXControl+'+C'], [cXControl+'+Ins']);
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/add', [], []);
-  M.Add(cCommand_ClipboardCut, 'clipboard: cut', [cXCtrl+'+X'], ['Shift+Delete']);
-  M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXCtrl+'+V'], ['Shift+Insert']);
+  M.Add(cCommand_ClipboardCut, 'clipboard: cut', [cXControl+'+X'], ['Shift+Del']);
+  M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXControl+'+V'], ['Shift+Ins']);
   M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', ['Alt+V'], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
 end;

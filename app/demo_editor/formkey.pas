@@ -30,6 +30,9 @@ function DoCommandDialog(AEdit: TATSynEdit): integer;
 
 implementation
 
+uses
+  Menus, LCLProc;
+
 {$R *.lfm}
 
 function DoCommandDialog(AEdit: TATSynEdit): integer;
@@ -57,8 +60,8 @@ begin
       with List.Items.Add do
       begin
         Caption:= Name;
-        SubItems.Add(Keys1[0]);
-        SubItems.Add(Keys2[0]);
+        SubItems.Add(ShortCutToText(Keys1[0]));
+        SubItems.Add(ShortCutToText(Keys2[0]));
         SubItems.Add(Inttostr(Cmd));
       end;
 
