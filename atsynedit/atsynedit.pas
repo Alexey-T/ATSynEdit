@@ -1984,6 +1984,7 @@ begin
   FMouseDragging:= false;
 
   if PtInRect(FRectMinimap, Point(X, Y)) then
+  if Shift=[ssLeft] then
   begin
     DoMinimapClick(Y);
     Exit
@@ -2036,6 +2037,7 @@ begin
   end;
 
   if PtInRect(FRectGutter, Point(X, Y)) then
+  if Shift=[ssLeft] then
   begin
     //handle click on numbers here
     if FOptMouseGutterClickSelectsLine and
