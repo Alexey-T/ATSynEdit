@@ -2349,7 +2349,7 @@ begin
         {$ifndef darwin}
         FColors.Caret
         {$else}
-        //Mac: PenMode=pmNotXor ignored, caret painted as solid, needed hack
+        //Mac: PenMode=pmNotXor ignored, caret painted as solid
         IfThen(FCaretShown, FColors.Caret, FColors.TextBG)
         {$endif}
         );
