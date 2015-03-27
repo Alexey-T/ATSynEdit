@@ -1245,7 +1245,7 @@ begin
       end;
 
     CurrPointText:= Point(
-      CurrPoint.X + Int64(WrapItem.NIndent-AScrollHorz.NPos)*ACharSize.X,
+      Int64(CurrPoint.X) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
       CurrPoint.Y);
     NOutputStrWidth:= 0;
 

@@ -37,10 +37,49 @@ const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2);
 
 type
+  TATUndoAction = (
+    cUndoActionDeleteLine,
+    cUndoActionChangeLine,
+    cUndoActionInsertLine
+    );
+
+
+type
+  { TATUndoItem }
+
+  TATUndoItem = class
+    Action: TATUndoAction;
+    Text: atString;
+    Index: integer;
+    constructor Create(AAction: TATUndoAction; const AText: atString; AIndex: integer);
+  end;
+
+type
+  { TATUndoList }
+
+  TATUndoList = class
+  private
+    FList: TList;
+    FMaxCount: integer;
+    function GetItem(N: integer): TATUndoItem;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    function IsIndexValid(N: integer): boolean;
+    function Count: integer;
+    function Last: TATUndoItem;
+    property Items[N: integer]: TATUndoItem read GetItem; default;
+    property MaxCount: integer read FMaxCount write FMaxCount;
+    procedure Clear;
+    procedure Delete(N: integer);
+    procedure DeleteLast;
+    procedure Add(AAction: TATUndoAction; const AText: atString; AIndex: integer);
+  end;
+
+type
   { TATStringItem }
 
   TATStringItem = class
-  public
     ItemString: atString;
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
@@ -58,6 +97,7 @@ type
   TATStrings = class
   private
     FList: TList;
+    FUndoList: TATUndoList;
     FEndings: TATLineEnds;
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
@@ -74,10 +114,11 @@ type
     function GetLineHidden(N: integer): integer;
     function GetLineState(Index: integer): TATLineState;
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
-    procedure LineDeleteLastFake;
+    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddLastFake;
-    procedure LineInsertRaw(N: integer; const AString: atString;
-      AEnd: TATLineEnds);
+    procedure LineDeleteLastFake;
+    procedure LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
+    procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
     procedure SetLineBm(Index: integer; AValue: integer);
@@ -91,8 +132,6 @@ type
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure DoResetLineStates(ASaved: boolean);
-    procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
-    procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -194,6 +233,90 @@ begin
   end;
 end;
 
+{ TATUndoItem }
+
+constructor TATUndoItem.Create(AAction: TATUndoAction; const AText: atString;
+  AIndex: integer);
+begin
+  Action:= AAction;
+  Text:= AText;
+  Index:= AIndex;
+end;
+
+{ TATUndoList }
+
+function TATUndoList.GetItem(N: integer): TATUndoItem;
+begin
+  if IsIndexValid(N) then
+    Result:= TATUndoItem(FList[N])
+  else
+    Result:= nil;
+end;
+
+constructor TATUndoList.Create;
+begin
+  FList:= TList.Create;
+  FMaxCount:= 10000;
+end;
+
+destructor TATUndoList.Destroy;
+begin
+  Clear;
+  FreeAndNil(FList);
+  inherited;
+end;
+
+function TATUndoList.Count: integer;
+begin
+  Result:= FList.Count;
+end;
+
+function TATUndoList.IsIndexValid(N: integer): boolean;
+begin
+  Result:= (N>=0) and (N<Count);
+end;
+
+procedure TATUndoList.Delete(N: integer);
+begin
+  if IsIndexValid(N) then
+  begin
+    TObject(FList[N]).Free;
+    FList.Delete(N);
+  end;
+end;
+
+procedure TATUndoList.DeleteLast;
+begin
+  Delete(Count-1);
+end;
+
+procedure TATUndoList.Clear;
+var
+  i: integer;
+begin
+  for i:= Count-1 downto 0 do
+    Delete(i);
+end;
+
+procedure TATUndoList.Add(AAction: TATUndoAction; const AText: atString; AIndex: integer);
+var
+  Item: TATUndoItem;
+begin
+  Item:= TATUndoItem.Create(AAction, AText, AIndex);
+  FList.Add(Item);
+
+  while Count>MaxCount do
+    Delete(0);
+end;
+
+function TATUndoList.Last: TATUndoItem;
+begin
+  if Count>0 then
+    Result:= Items[Count-1]
+  else
+    Result:= nil;
+end;
+
 { TATStringItem }
 
 constructor TATStringItem.Create(const AString: atString; AEnd: TATLineEnds);
@@ -205,7 +328,6 @@ begin
   ItemCached:= false;
   ItemBm:= 0;
   ItemBmColor:= 0;
-  //ItemBmHint:= '';
 end;
 
 { TATStrings }
@@ -362,8 +484,8 @@ end;
 
 constructor TATStrings.Create;
 begin
-  inherited;
   FList:= TList.Create;
+  FUndoList:= TATUndoList.Create;
 
   FEncoding:= cEncAnsi;
   FEncodingDetect:= true;
@@ -378,6 +500,7 @@ end;
 destructor TATStrings.Destroy;
 begin
   Clear;
+  FreeAndNil(FUndoList);
   FreeAndNil(FList);
   inherited;
 end;
@@ -465,7 +588,7 @@ end;
 
 function TATStrings.IsIndexValid(N: integer): boolean;
 begin
-  Result:= (N>=0) and (N<FList.Count);
+  Result:= (N>=0) and (N<Count);
 end;
 
 function TATStrings.Count: integer;
@@ -499,7 +622,7 @@ procedure TATStrings.Clear;
 var
   i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
+  for i:= Count-1 downto 0 do
     LineDelete(i, false);
 end;
 
@@ -661,7 +784,7 @@ var
   Item: TATStringItem;
   i: integer;
 begin
-  for i:= 0 to FList.Count-1 do
+  for i:= 0 to Count-1 do
   begin
     Item:= TATStringItem(FList[i]);
     if ASaved then
@@ -694,7 +817,7 @@ begin
       Stream.WriteBuffer(Sign[1], Length(Sign));
   end;
 
-  for i:= 0 to FList.Count-1 do
+  for i:= 0 to Count-1 do
   begin
     Item:= TATStringItem(FList[i]);
     SW:= Item.ItemString + cLineEndStrings[Item.ItemEnd];
