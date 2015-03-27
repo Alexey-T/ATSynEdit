@@ -2345,7 +2345,14 @@ begin
 
     if IntersectRect(R, R, FRectMain) then
     begin
-      CanvasInvertRect(C, R, FColors.Caret);
+      CanvasInvertRect(C, R,
+        {$ifndef darwin}
+        FColors.Caret
+        {$else}
+        //Mac: PenMode=pmNotXor ignored, caret painted as solid, needed hack
+        IfThen(FCaretShown, FColors.Caret, FColors.TextBG)
+        {$endif}
+        );
       if AWithInvalidate then
         InvalidateRect(Handle, @R, false);
     end;
