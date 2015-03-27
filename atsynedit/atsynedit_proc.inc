@@ -1,3 +1,6 @@
+const
+  ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
+
 procedure DoClearScrollInfo(var Info: TATSynScrollInfo);
 begin
   Info.NPos:= 0;

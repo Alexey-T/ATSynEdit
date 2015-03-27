@@ -28,7 +28,6 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
-
 type
   TATSynEditColors = class
   public
@@ -2015,12 +2014,12 @@ begin
       Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if Shift=[ssLeft, {$ifndef darwin}ssCtrl{$else}ssMeta{$endif}] then
+    if Shift=[ssLeft, ssXControl] then
     begin
       DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if Shift=[ssLeft, {$ifndef darwin}ssCtrl{$else}ssMeta{$endif}, ssShift] then
+    if Shift=[ssLeft, ssXControl, ssShift] then
     begin
       DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
@@ -2149,7 +2148,7 @@ begin
         if P.Y>=0 then
         begin
           //drag w/out button pressed: single selection
-          if [ssCtrl, ssShift, ssAlt]*Shift=[] then
+          if [ssXControl, ssShift, ssAlt]*Shift=[] then
           begin
             DoCaretSingleAsIs;
             if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
@@ -2159,7 +2158,7 @@ begin
           end;
 
           //drag with Ctrl pressed: add selection
-          if [ssCtrl, ssShift, ssAlt]*Shift=[ssCtrl] then
+          if [ssXControl, ssShift, ssAlt]*Shift=[ssXControl] then
           begin
             nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
             DoSelect_CharRange(nIndex, P);
