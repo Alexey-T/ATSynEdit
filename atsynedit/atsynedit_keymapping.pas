@@ -11,11 +11,12 @@ procedure DoInitDefaultKeymapping(var M: TATKeyMapping);
 implementation
 
 uses
+  SysUtils,
   LCLProc,
   Dialogs;
 
 const
-  //instead of Ctrl use Command on Mac (Command+A, Command+C..)
+  //Mac: instead of Ctrl use Command-key
   cXControl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
 
 

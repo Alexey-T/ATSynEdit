@@ -1662,7 +1662,7 @@ begin
   DoClearScrollInfo(FScrollVert);
 
   FKeyMapping:= TATKeyMapping.Create;
-  FMenu:= nil;
+  FMenu:= TPopupMenu.Create(Self);
 
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitDefaultPopupMenu;
@@ -2475,7 +2475,6 @@ procedure TATSynEdit.DoInitDefaultPopupMenu;
   end;
   //
 begin
-  FMenu:= TPopupMenu.Create(Self);
   FMenu.OnPopup:= MenuPopup;
   PopupMenu:= FMenu;
 
