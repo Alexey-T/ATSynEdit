@@ -16,7 +16,6 @@ uses
 
 const
   cXControl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
-  cXCtrlShift = {$ifdef darwin} 'Shift+Meta' {$else} 'Ctrl+Shift' {$endif};
 
 
 procedure DoInitDefaultKeymapping(var M: TATKeyMapping);
@@ -43,20 +42,20 @@ begin
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
   M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Enter'], []);
+  M.Add(cCommand_KeyTabChar, 'insert tab char', [], []);
   M.Add(cCommand_KeyTab, 'tabulation', [], []);
-  M.Add(cCommand_KeyTabChar, 'tabulation: tab-char', [], []);
 
   M.Add(cCommand_TextDeleteLine, 'delete line', [cXControl+'+Y'], []);
   M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXControl+'+D'], []);
 
   M.Add(cCommand_GotoTextBegin,      'goto text begin',          [cXControl+'+Home'], []);
-  M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', [cXCtrlShift+'+Home'], []);
+  M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', [cXControl+'+Shift+Home'], []);
   M.Add(cCommand_GotoTextEnd,        'goto text end',            [cXControl+'+End'], []);
-  M.Add(cCommand_GotoTextEnd_Sel,    'goto text end + select',   [cXCtrlShift+'+End'], []);
+  M.Add(cCommand_GotoTextEnd_Sel,    'goto text end + select',   [cXControl+'+Shift+End'], []);
   M.Add(cCommand_GotoWordPrev,       'goto word left',           [cXControl+'+Left'], []);
-  M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  [cXCtrlShift+'+Left'], []);
+  M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  [cXControl+'+Shift+Left'], []);
   M.Add(cCommand_GotoWordNext,       'goto word right',          [cXControl+'+Right'], []);
-  M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXCtrlShift+'+Right'], []);
+  M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXControl+'+Shift+Right'], []);
 
   M.Add(cCommand_SelectAll, 'select all', [cXControl+'+A'], []);
   M.Add(cCommand_SelectWords, 'select words at carets', [], []);
