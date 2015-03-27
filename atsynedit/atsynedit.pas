@@ -1540,7 +1540,7 @@ begin
   Width:= 300;
   Height:= 200;
   Font.Name:= 'Courier New';
-  Font.Size:= 9;
+  Font.Size:= {$ifndef darwin} 9 {$else} 14 {$endif};
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
@@ -2015,12 +2015,12 @@ begin
       Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if Shift=[ssLeft, ssCtrl] then
+    if Shift=[ssLeft, {$ifndef darwin}ssCtrl{$else}ssMeta{$endif}] then
     begin
       DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if Shift=[ssLeft, ssCtrl, ssShift] then
+    if Shift=[ssLeft, {$ifndef darwin}ssCtrl{$else}ssMeta{$endif}, ssShift] then
     begin
       DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;

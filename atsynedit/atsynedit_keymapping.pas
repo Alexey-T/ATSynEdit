@@ -16,6 +16,8 @@ uses
 
 const
   cXCtrl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
+  cXCtrlShift = {$ifdef darwin} 'Shift+Meta' {$else} 'Ctrl+Shift' {$endif};
+
 
 procedure DoInitDefaultKeymapping(var M: TATKeyMapping);
 begin
@@ -48,13 +50,13 @@ begin
   M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXCtrl+'+D'], []);
 
   M.Add(cCommand_GotoTextBegin,      'goto text begin',          [cXCtrl+'+Home'], []);
-  M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', [cXCtrl+'+Shift+Home'], []);
+  M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', [cXCtrlShift+'+Home'], []);
   M.Add(cCommand_GotoTextEnd,        'goto text end',            [cXCtrl+'+End'], []);
-  M.Add(cCommand_GotoTextEnd_Sel,    'goto text end + select',   [cXCtrl+'+Shift+End'], []);
+  M.Add(cCommand_GotoTextEnd_Sel,    'goto text end + select',   [cXCtrlShift+'+End'], []);
   M.Add(cCommand_GotoWordPrev,       'goto word left',           [cXCtrl+'+Left'], []);
-  M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  [cXCtrl+'+Shift+Left'], []);
+  M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  [cXCtrlShift+'+Left'], []);
   M.Add(cCommand_GotoWordNext,       'goto word right',          [cXCtrl+'+Right'], []);
-  M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXCtrl+'+Shift+Right'], []);
+  M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXCtrlShift+'+Right'], []);
 
   M.Add(cCommand_SelectAll, 'select all', [cXCtrl+'+A'], []);
   M.Add(cCommand_SelectWords, 'select words at carets', [], []);
