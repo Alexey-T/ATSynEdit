@@ -67,21 +67,23 @@ begin
   Result:= (N=10) or (N=13);
 end;
 
-function IsCharWord(ch: WideChar; const AWordChars: atString): boolean;
+function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
 begin
   Result:= false;
 
   //check EN
-  if ((ch>='0') and (ch<='9')) or
-    ((ch>='a') and (ch<='z')) or
-    ((ch>='A') and (ch<='Z')) or
-    (ch='_') then
-    begin Result:= true; Exit end;
+  case Ord(ch) of
+    Ord('0')..Ord('9'),
+    Ord('a')..Ord('z'),
+    Ord('A')..Ord('Z'),
+    Ord('_'):
+      begin Result:= true; Exit end;
+  end;
 
   //check RU
   case Ord(ch) of
-    $0430..$044F, //lowercase
-    $0410..$042F, //uppercase
+    $0430..$044F, //a..z
+    $0410..$042F, //A..Z
     $0451, //yo
     $0401: //YO
       begin Result:= true; Exit end;
@@ -222,7 +224,7 @@ Combining Diacritical Marks Supplement (1DC0–1DFF), versions 4.1 to 5.2
 Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
 Combining Half Marks (FE20–FE2F), versions 1.0, updates in 5.2
 }
-function IsCharAccent(ch: WideChar): boolean;
+function IsCharAccent(ch: atChar): boolean;
 begin
   case Ord(ch) of
     $0300..$036F,
@@ -236,7 +238,7 @@ begin
   end;
 end;
 
-function IsCharFullWidth(ch: WideChar): boolean;
+function IsCharFullWidth(ch: atChar): boolean;
 begin
   case Ord(ch) of
     $1100..$115F,
