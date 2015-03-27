@@ -71,21 +71,18 @@ function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
 begin
   Result:= false;
 
-  //check EN
   case Ord(ch) of
+    //En
     Ord('0')..Ord('9'),
     Ord('a')..Ord('z'),
     Ord('A')..Ord('Z'),
-    Ord('_'):
-      begin Result:= true; Exit end;
-  end;
-
-  //check RU
-  case Ord(ch) of
+    Ord('_'),
+    //Ger
+    $E4, $C4, $E9, $F6, $D6, $FC, $DC, $DF,
+    //Rus
     $0430..$044F, //a..z
     $0410..$042F, //A..Z
-    $0451, //yo
-    $0401: //YO
+    $0451, $0401: //yo, Yo
       begin Result:= true; Exit end;
   end;
 
