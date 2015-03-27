@@ -67,18 +67,29 @@ begin
   Result:= (N=10) or (N=13);
 end;
 
-function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
+function IsCharWord(ch: WideChar; const AWordChars: atString): boolean;
 begin
-  Result:=
-    ((ch>='0') and (ch<='9')) or
+  Result:= false;
+
+  //check EN
+  if ((ch>='0') and (ch<='9')) or
     ((ch>='a') and (ch<='z')) or
     ((ch>='A') and (ch<='Z')) or
-    (ch='_');
+    (ch='_') then
+    begin Result:= true; Exit end;
 
-  if not Result then
-    if AWordChars<>'' then
-      if Pos(ch, AWordChars)>0 then
-        Result:= true;
+  //check RU
+  case Ord(ch) of
+    $0430..$044F, //lowercase
+    $0410..$042F, //uppercase
+    $0451, //yo
+    $0401: //YO
+      begin Result:= true; Exit end;
+  end;
+
+  if AWordChars<>'' then
+    if Pos(ch, AWordChars)>0 then
+      Result:= true;
 end;
 
 function IsCharSpace(ch: atChar): boolean;
