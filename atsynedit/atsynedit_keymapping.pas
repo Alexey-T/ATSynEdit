@@ -3,10 +3,10 @@ unit ATSynEdit_Keymapping;
 interface
 
 uses
-  ATKeyMapping, ATSynEdit_Commands;
+  ATKeyMapping,
+  ATSynEdit_Commands;
 
 procedure DoInitDefaultKeymapping(var M: TATKeyMapping);
-procedure DoCheckKeyMapping(const M: TATKeyMapping);
 
 implementation
 
@@ -15,6 +15,7 @@ uses
   Dialogs;
 
 const
+  //instead of Ctrl use Command on Mac (Command+A, Command+C..)
   cXControl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
 
 
@@ -86,21 +87,10 @@ begin
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/add', [], []);
   M.Add(cCommand_ClipboardCut, 'clipboard: cut', [cXControl+'+X'], ['Shift+Del']);
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXControl+'+V'], ['Shift+Ins']);
-  M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', ['Alt+V'], []);
+  M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', [], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
 end;
 
-procedure DoCheckKeyMapping(const M: TATKeyMapping);
-var
-  i: integer;
-begin
-  for i:= 0 to M.Count-1 do
-    with M[i] do
-    begin
-      //DoCheckText(Keys1[0]);
-      //DoCheckText(Keys2[0]);
-    end;
-end;
 
 end.
 

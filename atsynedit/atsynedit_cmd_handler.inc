@@ -56,7 +56,7 @@ begin
     Item:= FKeyMapping[i];
     if IsKeyMappingMatchedItem(Shortcut, Item) then
     begin
-      Result:= Item.Cmd;
+      Result:= Item.Command;
       Key:= 0;
       Break
     end;

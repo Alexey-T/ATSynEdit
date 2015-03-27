@@ -62,7 +62,7 @@ begin
         Caption:= Name;
         SubItems.Add(ShortCutToText(Keys1[0]));
         SubItems.Add(ShortCutToText(Keys2[0]));
-        SubItems.Add(Inttostr(Cmd));
+        SubItems.Add(Inttostr(Command));
       end;
 
   if List.Items.Count>0 then

@@ -9,7 +9,7 @@ uses
 
 type
   TATKeyMappingItem = class
-    Cmd: integer;
+    Command: integer;
     Name: string;
     Keys1, Keys2: array[0..0] of TShortcut;
   end;
@@ -29,9 +29,8 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATKeyMappingItem read GetItem; default;
-    procedure Add(ACmd: integer; const AName: string; const AKeys1,
-      AKeys2: array of string);
-    function GetShortcutFromCommand(Cmd: integer): TShortcut;
+    procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string);
+    function GetShortcutFromCommand(ACode: integer): TShortcut;
   end;
 
 implementation
@@ -89,6 +88,12 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
+function _TextToShortcut(const S: string): TShortcut;
+begin
+  Result:= TextToShortCut(S);
+  if Result=0 then Showmessage('Incorrect key: '+S);
+end;
+
 procedure TATKeyMapping.Add(ACmd: integer; const AName: string; const AKeys1,
   AKeys2: array of string);
 var
@@ -97,35 +102,25 @@ var
   i: integer;
 begin
   Item:= TATKeyMappingItem.Create;
-  Item.Cmd:= ACmd;
+  Item.Command:= ACmd;
   Item.Name:= AName;
 
   for i:= 0 to High(Item.Keys1) do Item.Keys1[i]:= 0;
   for i:= 0 to High(Item.Keys2) do Item.Keys2[i]:= 0;
 
-  for i:= 0 to High(AKeys1) do
-  begin
-    Sh:= TextToShortCut(AKeys1[i]);
-    if Sh=0 then Showmessage('Incorrect key: '+AKeys1[i]);
-    Item.Keys1[i]:= Sh;
-  end;
+  for i:= 0 to High(AKeys1) do Item.Keys1[i]:= _TextToShortcut(AKeys1[i]);
+  for i:= 0 to High(AKeys2) do Item.Keys2[i]:= _TextToShortcut(AKeys2[i]);
 
-  for i:= 0 to High(AKeys2) do
-  begin
-    Sh:= TextToShortCut(AKeys2[i]);
-    if Sh=0 then Showmessage('Incorrect key: '+AKeys2[i]);
-    Item.Keys2[i]:= Sh;
-  end;
   FList.Add(Item);
 end;
 
-function TATKeyMapping.GetShortcutFromCommand(Cmd: integer): TShortcut;
+function TATKeyMapping.GetShortcutFromCommand(ACode: integer): TShortcut;
 var
   i: integer;
 begin
   Result:= scNone;
   for i:= 0 to Count-1 do
-    if Items[i].Cmd=Cmd then
+    if Items[i].Command=ACode then
     begin
       Result:= Items[i].Keys1[0];
       Exit
