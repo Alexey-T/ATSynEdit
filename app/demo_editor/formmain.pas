@@ -104,7 +104,6 @@ type
     procedure mnuTBmsClick(Sender: TObject);
     procedure mnuTFoldClick(Sender: TObject);
     procedure mnuTMarginClick(Sender: TObject);
-    procedure PanelRtClick(Sender: TObject);
   private
     { private declarations }
     ed: TATSynEdit;
@@ -160,8 +159,6 @@ begin
   ed.OnCommand:= EditCommand;
   ed.OnClickGutter:= EditClickGutter;
   ed.OnDrawBookmarkIcon:= EditDrawBm;
-
-  //ed.Colors.UnprintedFont:= $2020e0;
 
   ed.SetFocus;
 end;
@@ -234,11 +231,6 @@ begin
   S:= InputBox('Margins', 'space separated numz', ed.OptMarginString);
   ed.OptMarginString:= S;
   ed.Update;
-end;
-
-procedure TfmMain.PanelRtClick(Sender: TObject);
-begin
-
 end;
 
 procedure TfmMain.EditCaretMoved(Sender: TObject);
@@ -459,8 +451,8 @@ begin
     chkClickNm.Checked:= ed.OptMouseGutterClickSelectsLine;
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
     chkCrUnfocus.Checked:= ed.OptCaretStopsUnfocused;
-    edRulerH.Value:= ed.OptRulerHeight;
-    edRulerFont.Value:= ed.OptRulerFontSize;
+    edRulerSize.Value:= ed.OptRulerSize;
+    edRulerFSize.Value:= ed.OptRulerFontSize;
     chkDnD.Checked:= ed.OptMouseDragDrop;
     chkRtMove.Checked:= ed.OptMouseRightClickMovesCaret;
     edPage.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
@@ -506,8 +498,8 @@ begin
       ed.OptMouseGutterClickSelectsLine:= chkClickNm.Checked;
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
       ed.OptCaretStopsUnfocused:= chkCrUnfocus.Checked;
-      ed.OptRulerHeight:= edRulerH.Value;
-      ed.OptRulerFontSize:= edRulerFont.Value;
+      ed.OptRulerSize:= edRulerSize.Value;
+      ed.OptRulerFontSize:= edRulerFSize.Value;
       ed.OptMouseDragDrop:= chkDnD.Checked;
       ed.OptMouseRightClickMovesCaret:= chkRtMove.Checked;
       ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);

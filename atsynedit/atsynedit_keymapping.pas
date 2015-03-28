@@ -77,13 +77,6 @@ begin
   M.Add(cCommand_TextIndent, 'indent selection', [cXControl+'+I'], []);
   M.Add(cCommand_TextUnindent, 'unindent selection', [cXControl+'+U'], ['Shift+Tab']);
 
-  M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
-  M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
-  M.Add(cCommand_ScrollToCaretTop, 'scroll to caret, top', [], []);
-  M.Add(cCommand_ScrollToCaretBottom, 'scroll to caret, bottom', [], []);
-  M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
-  M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
-
   M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
   M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Y'], []);
 
@@ -93,6 +86,16 @@ begin
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXControl+'+V'], ['Shift+Ins']);
   M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', [], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
+
+  M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
+  M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
+  M.Add(cCommand_ScrollToCaretTop, 'scroll to caret, top', [], []);
+  M.Add(cCommand_ScrollToCaretBottom, 'scroll to caret, bottom', [], []);
+  M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
+  M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
+
+  M.Add(cCommand_ScaleIncrease, 'scale increase', [], []);
+  M.Add(cCommand_ScaleDecrease, 'scale decrease', [], []);
 end;
 
 

@@ -198,6 +198,7 @@ const
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 6;
   cMaxCharsForOutput = 400;
+  cMinFontSize = 6;
   cMinTabSize = 1;
   cMaxTabSize = 16;
   cMinMinimapWidth = 30;
@@ -293,7 +294,7 @@ type
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
     FOptRulerVisible: boolean;
-    FOptRulerHeight: integer;
+    FOptRulerSize: integer;
     FOptRulerFontSize: integer;
     FOptRulerMarkSizeSmall: integer;
     FOptRulerMarkSizeBig: integer;
@@ -326,6 +327,7 @@ type
     FOptShowIndentLines: boolean;
     FOptShowCaretNumberBG: boolean;
     //
+    function DoCommand_Scale(AInc: boolean): TATCommandResults;
     function DoCommand_Undo: TATCommandResults;
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
@@ -524,6 +526,7 @@ type
     procedure DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
     procedure DoScrollByDelta(Dx, Dy: integer);
+    function DoMouseWheel(Shift: TShiftState; AUp: boolean): boolean;
 
   protected
     procedure Paint; override;
@@ -535,6 +538,8 @@ type
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
     procedure DblClick; override;
     procedure TripleClick; override;
+    function DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): boolean; override;
+    function DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean; override;
     //messages
     {$ifdef windows}
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
@@ -574,7 +579,7 @@ type
     property OptCaretStopsUnfocused: boolean read FCaretStopsUnfocused write FCaretStopsUnfocused;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
-    property OptRulerHeight: integer read FOptRulerHeight write FOptRulerHeight;
+    property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
@@ -730,8 +735,8 @@ begin
       NSize:= FOptRulerMarkSizeBig
     else
       NSize:= FOptRulerMarkSizeSmall;
-    C.MoveTo(NX, FOptRulerHeight-1);
-    C.LineTo(NX, FOptRulerHeight-1-NSize);
+    C.MoveTo(NX, FOptRulerSize-1);
+    C.LineTo(NX, FOptRulerSize-1-NSize);
 
     if i mod 10 = 0 then
     begin
@@ -1088,7 +1093,7 @@ begin
     Result.Left:= 0;
     Result.Right:= FRectMain.Right;
     Result.Top:= 0;
-    Result.Bottom:= Result.Top+FOptRulerHeight;
+    Result.Bottom:= Result.Top+FOptRulerSize;
   end
   else
     Result:= Rect(0, 0, 0, 0);
@@ -1614,7 +1619,7 @@ begin
   FGutter.Update;
 
   FOptNumbersStyle:= cInitNumbersStyle;
-  FOptRulerHeight:= cSizeRulerHeight;
+  FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
   FOptRulerFontSize:= 8;
@@ -1848,7 +1853,7 @@ begin
 
   Result.Y:= cOffsetTextTop;
   if FOptRulerVisible then
-    Inc(Result.Y, FOptRulerHeight);
+    Inc(Result.Y, FOptRulerSize);
 end;
 
 function TATSynEdit.GetGutterNumbersWidth: integer;
@@ -1956,15 +1961,20 @@ begin
 end;
 
 procedure TATSynEdit.WMVScroll(var Msg: TLMVScroll);
-{
-not needed so deled:
-if not UpdateScrollInfoFromMessage(Msg, FScrollVert) then
-  Exclude(FPaintFlags, cPaintUpdateScrollbars);
-}
 begin
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
   UpdateScrollInfoFromMessage(Msg, FScrollVert);
   Invalidate;
+end;
+
+function TATSynEdit.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): boolean;
+begin
+  Result:= DoMouseWheel(Shift, true);
+end;
+
+function TATSynEdit.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean;
+begin
+  Result:= DoMouseWheel(Shift, false);
 end;
 
 procedure TATSynEdit.WMHScroll(var Msg: TLMHScroll);
@@ -2439,6 +2449,20 @@ begin
     NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
   with FScrollVert do
     NPos:= Max(0, Min(NMax-NPage, NPos+Dy));
+end;
+
+function TATSynEdit.DoMouseWheel(Shift: TShiftState; AUp: boolean): boolean;
+begin
+  if Shift=[ssCtrl] then
+  begin
+    if AUp then
+      DoCommandExec(cCommand_ScaleIncrease)
+    else
+      DoCommandExec(cCommand_ScaleDecrease);
+    Result:= true;
+  end
+  else
+    Result:= false;
 end;
 
 procedure TATSynEdit.MenuClick(Sender: TObject);

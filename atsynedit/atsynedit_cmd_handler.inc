@@ -151,8 +151,8 @@ begin
 
     cCommand_Undo:                Res:= DoCommand_Undo;
 
-    cCommand_TextDeleteLine:        Res:= DoCommand_TextDeleteLines;
-    cCommand_TextDuplicateLine:     Res:= DoCommand_TextDuplicateLine;
+    cCommand_TextDeleteLine:           Res:= DoCommand_TextDeleteLines;
+    cCommand_TextDuplicateLine:        Res:= DoCommand_TextDuplicateLine;
     cCommand_TextDeleteToLineBegin:    Res:= DoCommand_TextDeleteToLineBegin;
     cCommand_TextDeleteToLineEnd:      Res:= DoCommand_TextDeleteToLineEnd;
     cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);
@@ -175,6 +175,8 @@ begin
 
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
     cCommand_ToggleOverwrite:          Res:= DoCommand_ToggleOverwrite;
+    cCommand_ScaleIncrease:            Res:= DoCommand_Scale(true);
+    cCommand_ScaleDecrease:            Res:= DoCommand_Scale(false);
 
     cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);

@@ -39,7 +39,6 @@ object fmMain: TfmMain
     ClientHeight = 478
     ClientWidth = 281
     TabOrder = 1
-    OnClick = PanelRtClick
     object chkGutter: TCheckBox
       Left = 8
       Height = 19

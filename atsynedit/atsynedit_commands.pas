@@ -86,6 +86,8 @@ const
 
   cCommand_ToggleReadOnly = 300;
   cCommand_ToggleOverwrite = 301;
+  cCommand_ScaleIncrease = 302;
+  cCommand_ScaleDecrease = 303;
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Sel = 1001;

@@ -50,8 +50,8 @@ type
     edChars: TEdit;
     edIndent: TSpinEdit;
     edPage: TComboBox;
-    edRulerFont: TSpinEdit;
-    edRulerH: TSpinEdit;
+    edRulerFSize: TSpinEdit;
+    edRulerSize: TSpinEdit;
     LabChars: TLabel;
     Label1: TLabel;
     Label2: TLabel;
