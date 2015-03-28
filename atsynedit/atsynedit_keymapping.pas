@@ -93,9 +93,6 @@ begin
   M.Add(cCommand_ScrollToCaretBottom, 'scroll to caret, bottom', [], []);
   M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
   M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
-
-  M.Add(cCommand_SizePlus, 'size +', [], []);
-  M.Add(cCommand_SizeMinus, 'size -', [], []);
 end;
 
 
