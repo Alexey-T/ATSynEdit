@@ -354,4 +354,14 @@ begin
   SwapInt(Item.PosY, Item.EndY);
 end;
 
+function TATSynEdit.GetCaretsArray: TPointArray;
+begin
+  Result:= Carets.SaveToArray;
+end;
+
+procedure TATSynEdit.SetCaretsArray(const L: TPointArray);
+begin
+  Carets.LoadFromArray(L);
+end;
+
 

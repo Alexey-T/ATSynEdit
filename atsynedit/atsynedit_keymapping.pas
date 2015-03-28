@@ -47,7 +47,7 @@ begin
   M.Add(cCommand_KeyTabChar, 'insert tab char', [], []);
   M.Add(cCommand_KeyTab, 'tabulation', [], []);
 
-  M.Add(cCommand_TextDeleteLine, 'delete line', [cXControl+'+Y'], []);
+  M.Add(cCommand_TextDeleteLine, 'delete line', ['Alt+Y'], []);
   M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXControl+'+D'], []);
 
   M.Add(cCommand_GotoTextBegin,      'goto text begin',          [cXControl+'+Home'], []);
@@ -64,9 +64,6 @@ begin
   M.Add(cCommand_SelectLines, 'select lines at carets', [], []);
   M.Add(cCommand_SelectNone, 'cancel selection', [], []);
   M.Add(cCommand_Cancel, 'cancel carets, selection, drag-drop', ['Esc'], []);
-
-  M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
-  M.Add(cCommand_Redo, 'perform redo', [], []);
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXControl+'+R'], []);
@@ -86,6 +83,9 @@ begin
   M.Add(cCommand_ScrollToCaretBottom, 'scroll to caret, bottom', [], []);
   M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
   M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
+
+  M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
+  M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Y'], []);
 
   M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXControl+'+C'], [cXControl+'+Ins']);
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/add', [], []);

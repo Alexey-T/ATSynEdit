@@ -42,6 +42,10 @@ type
   end;
 
 type
+  TATStringsGetCarets = function: TPointArray of object;
+  TATStringsSetCarets = procedure(const ACarets: TPointArray) of object;
+
+type
   { TATStrings }
 
   TATStrings = class
@@ -54,8 +58,11 @@ type
     FSaveSignUtf8: boolean;
     FSaveSignWide: boolean;
     FReadOnly: boolean;
+    FOnGetCaretsArray: TATStringsGetCarets;
+    FOnSetCaretsArray: TATStringsSetCarets;
     function DebugText: atString;
     procedure DoFinalizeSaving;
+    function GetCaretsArray: TPointArray;
     function GetLine(N: integer): atString;
     function GetLineBm(Index: integer): integer;
     function GetLineBmColor(Index: integer): integer;
@@ -69,6 +76,7 @@ type
     procedure LineDeleteLastFake;
     procedure LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
     procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
+    procedure SetCaretsArray(const L: TPointArray);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
     procedure SetLineBm(Index: integer; AValue: integer);
@@ -124,6 +132,8 @@ type
     procedure TextDuplicateLine(AX, AY: integer; out AShift, APosAfter: TPoint);
     function TextSubstring(AX1, AY1, AX2, AY2: integer): atString;
     //undo
+    property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
+    property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
     procedure Undo;
   end;
 
@@ -279,7 +289,9 @@ begin
     Item:= TATStringItem(FList[Index]);
 
     if Assigned(FUndoList) then
-      FUndoList.Add(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
+    begin
+      FUndoList.Add(cEditActionChange, Index, Item.ItemString, Item.ItemEnd, GetCaretsArray);
+    end;
 
     Item.ItemString:= AValue;
     Item.ItemHidden:= 0;
@@ -318,7 +330,9 @@ begin
     Item:= TATStringItem(FList[Index]);
 
     if Assigned(FUndoList) then
-      FUndoList.Add(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
+    begin
+      FUndoList.Add(cEditActionChange, Index, Item.ItemString, Item.ItemEnd, GetCaretsArray);
+    end;
 
     Item.ItemEnd:= AValue;
     if Item.ItemState<>cLineStateAdded then
@@ -404,7 +418,9 @@ begin
   if FReadOnly then Exit;
 
   if Assigned(FUndoList) then
-    FUndoList.Add(cEditActionInsert, Count, '', cEndNone);
+  begin
+    FUndoList.Add(cEditActionInsert, Count, '', cEndNone, GetCaretsArray);
+  end;
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -444,7 +460,9 @@ begin
   if FReadOnly then Exit;
 
   if Assigned(FUndoList) then
-    FUndoList.Add(cEditActionInsert, N, '', cEndNone);
+  begin
+    FUndoList.Add(cEditActionInsert, N, '', cEndNone, GetCaretsArray);
+  end;
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -497,7 +515,9 @@ begin
     Item:= TATStringItem(FList[N]);
 
     if Assigned(FUndoList) then
-      FUndoList.Add(cEditActionDelete, N, Item.ItemString, Item.ItemEnd);
+    begin
+      FUndoList.Add(cEditActionDelete, N, Item.ItemString, Item.ItemEnd, GetCaretsArray);
+    end;
 
     Item.Free;
     FList.Delete(N);
@@ -656,6 +676,7 @@ var
   AText: atString;
   AIndex: integer;
   AEnd: TATLineEnds;
+  ACarets: TPointArray;
 begin
   if FReadOnly then Exit;
   if not Assigned(FUndoList) then Exit;
@@ -666,6 +687,7 @@ begin
   AIndex:= Item.ItemIndex;
   AText:= Item.ItemText;
   AEnd:= Item.ItemEnd;
+  ACarets:= Item.ItemCarets;
 
   Item:= nil;
   FUndoList.DeleteLast;
@@ -693,8 +715,10 @@ begin
         end;
 
       else
-        raise Exception.Create('Unknown undo kind');
+        raise Exception.Create('Unknown undo action');
     end;
+
+    SetCaretsArray(ACarets);
   finally
     FUndoList.Locked:= false;
   end;
@@ -708,6 +732,19 @@ begin
   for i:= 0 to Min(10, Count-1) do
     Result:= Result+Format('[%d] "%s" <%s>', [i, Lines[i], cLineEndNiceNames[LinesEnds[i]] ])+#13;
 end;
+
+function TATStrings.GetCaretsArray: TPointArray;
+begin
+  if Assigned(FOnGetCaretsArray) then
+    Result:= FOnGetCaretsArray;
+end;
+
+procedure TATStrings.SetCaretsArray(const L: TPointArray);
+begin
+  if Assigned(FOnSetCaretsArray) then
+    FOnSetCaretsArray(L);
+end;
+
 
 {$I atstrings_editing.inc}
 {$I atstrings_load.inc}

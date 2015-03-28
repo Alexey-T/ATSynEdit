@@ -514,6 +514,8 @@ type
     procedure DoShowPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoShowCaret(AEdge: TATCaretEdge);
     procedure DoGotoPos(APnt: TPoint);
+    function GetCaretsArray: TPointArray;
+    procedure SetCaretsArray(const L: TPointArray);
     //misc
     procedure DoSelect_All;
     procedure DoSelect_Line(P: TPoint);
@@ -1572,8 +1574,10 @@ begin
   FBitmap.Width:= cInitBitmapWidth;
   FBitmap.Height:= cInitBitmapHeight;
 
-  FStringsInt:= TATStrings.Create;
   FStringsExt:= nil;
+  FStringsInt:= TATStrings.Create;
+  FStringsInt.OnGetCaretsArray:= GetCaretsArray;
+  FStringsInt.OnSetCaretsArray:= SetCaretsArray;
 
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapUpdateNeeded:= true;
@@ -2482,6 +2486,7 @@ begin
   PopupMenu:= FMenu;
 
   Add('Undo', cCommand_Undo);
+  Add('Redo', cCommand_Redo);
   Add('-', 0);
   Add('Cut', cCommand_ClipboardCut);
   Add('Copy', cCommand_ClipboardCopy);

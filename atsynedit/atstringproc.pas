@@ -11,15 +11,10 @@ uses
 type
   atString = UnicodeString;
   atChar = WideChar;
+  TPointArray = array of TPoint;
 
 type
-  TATLineEnds = (
-    cEndNone,
-    cEndWin,
-    cEndUnix,
-    cEndMac
-    );
-
+  TATLineEnds = (cEndNone, cEndWin, cEndUnix, cEndMac);
 const
   cLineEndStrings: array[TATLineEnds] of atString = ('', #13#10, #10, #13);
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'win', 'un', 'mac');

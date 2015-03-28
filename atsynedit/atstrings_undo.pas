@@ -23,8 +23,10 @@ type
     ItemIndex: integer;
     ItemText: atString;
     ItemEnd: TATLineEnds;
+    ItemCarets: array of TPoint;
     constructor Create(AAction: TATEditAction; AIndex: integer;
-      const AText: atString; AEnd: TATLineEnds); virtual;
+      const AText: atString; AEnd: TATLineEnds; const ACarets: TPointArray);
+  virtual;
   end;
 
 type
@@ -49,21 +51,32 @@ type
     procedure Delete(N: integer);
     procedure DeleteLast;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
-      AEnd: TATLineEnds);
+      AEnd: TATLineEnds; const ACarets: TPointArray);
   end;
 
 
 implementation
 
+uses
+  Dialogs;
+
 { TATUndoItem }
 
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
-  const AText: atString; AEnd: TATLineEnds);
+  const AText: atString; AEnd: TATLineEnds; const ACarets: TPointArray);
+var
+  i: integer;
 begin
   ItemAction:= AAction;
   ItemIndex:= AIndex;
   ItemText:= AText;
   ItemEnd:= AEnd;
+
+  SetLength(ItemCarets, Length(ACarets));
+  for i:= 0 to High(ACarets) do
+  begin
+    ItemCarets[i]:= ACarets[i];
+  end;
 end;
 
 { TATUndoList }
@@ -122,13 +135,14 @@ begin
     Delete(i);
 end;
 
-procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
+procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
+  const AText: atString; AEnd: TATLineEnds; const ACarets: TPointArray);
 var
   Item: TATUndoItem;
 begin
   if FLocked then Exit;
 
-  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd);
+  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ACarets);
   FList.Add(Item);
 
   while Count>MaxCount do

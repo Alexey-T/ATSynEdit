@@ -5,7 +5,8 @@ unit ATCarets;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils,
+  ATStringProc;
 
 type
   TATPosRelation = (cRelateBefore, cRelateInside, cRelateAfter);
@@ -66,6 +67,8 @@ type
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
+    function SaveToArray: TPointArray;
+    procedure LoadFromArray(const L: TPointArray);
   end;
 
 
@@ -406,6 +409,29 @@ begin
       Result:= Result+Format('caret[%d] pos %d:%d end %d:%d', [
         i, posy, posx, endy, endx
         ])+sLineBreak;
+end;
+
+function TATCarets.SaveToArray: TPointArray;
+var
+  Item: TATCaretItem;
+  i: integer;
+begin
+  SetLength(Result, Count);
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    Result[i].X:= Item.PosX;
+    Result[i].Y:= Item.PosY;
+  end;
+end;
+
+procedure TATCarets.LoadFromArray(const L: TPointArray);
+var
+  i: integer;
+begin
+  Clear;
+  for i:= 0 to Length(L)-1 do
+    Add(L[i].X, L[i].Y);
 end;
 
 end.
