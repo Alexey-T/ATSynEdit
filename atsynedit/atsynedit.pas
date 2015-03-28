@@ -327,8 +327,6 @@ type
     FOptShowIndentLines: boolean;
     FOptShowCaretNumberBG: boolean;
     //
-    function DoCommand_Scale(AInc: boolean): TATCommandResults;
-    function DoCommand_Undo: TATCommandResults;
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
@@ -446,6 +444,8 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_SizeChange(AInc: boolean): TATCommandResults;
+    function DoCommand_Undo: TATCommandResults;
     function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
     function DoCommand_SelectWords: TATCommandResults;
     function DoCommand_SelectLines: TATCommandResults;
@@ -526,7 +526,7 @@ type
     procedure DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
     procedure DoScrollByDelta(Dx, Dy: integer);
-    function DoMouseWheel(Shift: TShiftState; AUp: boolean): boolean;
+    function DoMouseWheelWork(Shift: TShiftState; AUp: boolean): boolean;
 
   protected
     procedure Paint; override;
@@ -536,10 +536,9 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
+    function DoMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos{%H-}: TPoint): boolean; override;
     procedure DblClick; override;
     procedure TripleClick; override;
-    function DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): boolean; override;
-    function DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean; override;
     //messages
     {$ifdef windows}
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
@@ -1967,16 +1966,6 @@ begin
   Invalidate;
 end;
 
-function TATSynEdit.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): boolean;
-begin
-  Result:= DoMouseWheel(Shift, true);
-end;
-
-function TATSynEdit.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean;
-begin
-  Result:= DoMouseWheel(Shift, false);
-end;
-
 procedure TATSynEdit.WMHScroll(var Msg: TLMHScroll);
 begin
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
@@ -2185,6 +2174,12 @@ begin
         end;
       end;
   end;
+end;
+
+function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: Integer;
+  MousePos: TPoint): Boolean;
+begin
+  Result:= DoMouseWheelWork(Shift, WheelDelta>0);
 end;
 
 procedure TATSynEdit.DblClick;
@@ -2451,14 +2446,14 @@ begin
     NPos:= Max(0, Min(NMax-NPage, NPos+Dy));
 end;
 
-function TATSynEdit.DoMouseWheel(Shift: TShiftState; AUp: boolean): boolean;
+function TATSynEdit.DoMouseWheelWork(Shift: TShiftState; AUp: boolean): boolean;
 begin
   if Shift=[ssCtrl] then
   begin
     if AUp then
-      DoCommandExec(cCommand_ScaleIncrease)
+      DoCommandExec(cCommand_SizePlus)
     else
-      DoCommandExec(cCommand_ScaleDecrease);
+      DoCommandExec(cCommand_SizeMinus);
     Result:= true;
   end
   else

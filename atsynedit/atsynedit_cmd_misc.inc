@@ -56,9 +56,9 @@ begin
   Result:= [cResultCaretAny];
 end;
 
-function TATSynEdit.DoCommand_Scale(AInc: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_SizeChange(AInc: boolean): TATCommandResults;
 begin
-  Result:= [cResultText, cResultState];
+  Result:= [cResultScroll, cResultState];
 
   if not AInc then
     if Font.Size<=cMinFontSize then Exit;

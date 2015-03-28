@@ -175,8 +175,8 @@ begin
 
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
     cCommand_ToggleOverwrite:          Res:= DoCommand_ToggleOverwrite;
-    cCommand_ScaleIncrease:            Res:= DoCommand_Scale(true);
-    cCommand_ScaleDecrease:            Res:= DoCommand_Scale(false);
+    cCommand_SizePlus:                 Res:= DoCommand_SizeChange(true);
+    cCommand_SizeMinus:                Res:= DoCommand_SizeChange(false);
 
     cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);
