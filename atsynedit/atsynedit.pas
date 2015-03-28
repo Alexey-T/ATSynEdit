@@ -2457,7 +2457,9 @@ begin
     with FMenu.Items[i] do
       if (Tag=cCommand_ClipboardCut) or
         (Tag=cCommand_ClipboardPaste) or
-        (Tag=cCommand_TextDeleteSelection) then
+        (Tag=cCommand_TextDeleteSelection) or
+        (Tag=cCommand_Undo) or
+        (Tag=cCommand_Redo) then
         Enabled:= not ModeReadOnly;
 end;
 

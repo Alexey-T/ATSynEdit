@@ -9,21 +9,21 @@ uses
   ATStringProc;
 
 type
-  TATUndoAction = (
-    cUndoActionDelete,
-    cUndoActionChange,
-    cUndoActionInsert
+  TATEditAction = (
+    cEditActionChange,
+    cEditActionInsert,
+    cEditActionDelete
     );
 
 type
   { TATUndoItem }
 
   TATUndoItem = class
-    ItemAction: TATUndoAction;
+    ItemAction: TATEditAction;
     ItemIndex: integer;
     ItemText: atString;
     ItemEnd: TATLineEnds;
-    constructor Create(AAction: TATUndoAction; AIndex: integer;
+    constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds); virtual;
   end;
 
@@ -48,7 +48,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteLast;
-    procedure Add(AAction: TATUndoAction; AIndex: integer; const AText: atString;
+    procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds);
   end;
 
@@ -57,7 +57,7 @@ implementation
 
 { TATUndoItem }
 
-constructor TATUndoItem.Create(AAction: TATUndoAction; AIndex: integer;
+constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds);
 begin
   ItemAction:= AAction;
@@ -122,7 +122,7 @@ begin
     Delete(i);
 end;
 
-procedure TATUndoList.Add(AAction: TATUndoAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
+procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
 var
   Item: TATUndoItem;
 begin

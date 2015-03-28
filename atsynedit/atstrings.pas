@@ -279,7 +279,7 @@ begin
     Item:= TATStringItem(FList[Index]);
 
     if Assigned(FUndoList) then
-      FUndoList.Add(cUndoActionChange, Index, Item.ItemString, Item.ItemEnd);
+      FUndoList.Add(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
 
     Item.ItemString:= AValue;
     Item.ItemHidden:= 0;
@@ -318,7 +318,7 @@ begin
     Item:= TATStringItem(FList[Index]);
 
     if Assigned(FUndoList) then
-      FUndoList.Add(cUndoActionChange, Index, Item.ItemString, Item.ItemEnd);
+      FUndoList.Add(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
 
     Item.ItemEnd:= AValue;
     if Item.ItemState<>cLineStateAdded then
@@ -404,7 +404,7 @@ begin
   if FReadOnly then Exit;
 
   if Assigned(FUndoList) then
-    FUndoList.Add(cUndoActionInsert, Count, '', cEndNone);
+    FUndoList.Add(cEditActionInsert, Count, '', cEndNone);
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -444,7 +444,7 @@ begin
   if FReadOnly then Exit;
 
   if Assigned(FUndoList) then
-    FUndoList.Add(cUndoActionInsert, N, '', cEndNone);
+    FUndoList.Add(cEditActionInsert, N, '', cEndNone);
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -497,7 +497,7 @@ begin
     Item:= TATStringItem(FList[N]);
 
     if Assigned(FUndoList) then
-      FUndoList.Add(cUndoActionDelete, N, Item.ItemString, Item.ItemEnd);
+      FUndoList.Add(cEditActionDelete, N, Item.ItemString, Item.ItemEnd);
 
     Item.Free;
     FList.Delete(N);
@@ -652,11 +652,12 @@ end;
 procedure TATStrings.Undo;
 var
   Item: TATUndoItem;
-  AAction: TATUndoAction;
+  AAction: TATEditAction;
   AText: atString;
   AIndex: integer;
   AEnd: TATLineEnds;
 begin
+  if FReadOnly then Exit;
   if not Assigned(FUndoList) then Exit;
 
   Item:= FUndoList.Last;
@@ -672,18 +673,18 @@ begin
 
   try
     case AAction of
-      cUndoActionChange:
+      cEditActionChange:
         begin
           Lines[AIndex]:= AText;
           LinesEnds[AIndex]:= AEnd;
         end;
 
-      cUndoActionInsert:
+      cEditActionInsert:
         begin
           LineDelete(AIndex);
         end;
 
-      cUndoActionDelete:
+      cEditActionDelete:
         begin
           if AIndex>=Count then
             LineAddRaw(AText, AEnd)
