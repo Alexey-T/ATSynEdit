@@ -659,6 +659,7 @@ var
   AText: atString;
   AIndex: integer;
   AEnd: TATLineEnds;
+  en: boolean;
 begin
   if not Assigned(FUndoList) then Exit;
 
@@ -669,21 +670,44 @@ begin
   AText:= Item.ItemText;
   AIndex:= Item.ItemIndex;
   if Item.ItemWithEnd then AEnd:= Endings else AEnd:= cEndNone;
-  Item:= nil;
+  if AText<>'' then AEnd:= Endings; //force eol for nonempty line
 
+  Item:= nil;
   FUndoList.DeleteLast;
   FUndoList.Locked:= true;
 
   try
     case AAction of
+      cUndoActionChange:
+        begin
+          Lines[AIndex]:= AText;
+          if (AIndex<Count-1) and IsLastLineFake then
+            LinesEnds[AIndex]:= Endings
+          else
+            LinesEnds[AIndex]:= AEnd;
+        end;
+
       cUndoActionInsert:
-        LineDelete(AIndex);
+        begin
+          en:= true;
+          //don't delete fake-line sometimes
+          if (AIndex=Count-1) then
+            if IsLastLineFake then
+              en:= false;
+          if en then
+            LineDelete(AIndex);
+        end;
+
       cUndoActionDelete:
         begin
-          LineInsertEx(AIndex, AText, AEnd);
+          en:= true;
+          //don't restore fake-line sometimes
+          if (AEnd=cEndNone) and (AText='') then
+            if (Count>0) and (LinesEnds[Count-1]=cEndNone) then
+              en:= false;
+          if en then
+            LineInsertEx(AIndex, AText, AEnd);
         end;
-      cUndoActionChange:
-        Lines[AIndex]:= AText;
       else
         raise Exception.Create('Unknown undo kind');
     end;
