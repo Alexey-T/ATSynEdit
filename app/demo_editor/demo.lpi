@@ -34,7 +34,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="25">
+    <Units Count="26">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -146,6 +146,11 @@
         <Filename Value="..\..\atsynedit\atstrings_load.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit24>
+      <Unit25>
+        <Filename Value="..\..\atsynedit\atstrings_undo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStrings_Undo"/>
+      </Unit25>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
