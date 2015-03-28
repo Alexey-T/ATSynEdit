@@ -38,20 +38,20 @@ const
 
 type
   TATUndoAction = (
-    cUndoActionDeleteLine,
-    cUndoActionChangeLine,
-    cUndoActionInsertLine
+    cUndoActionDelete,
+    cUndoActionChange,
+    cUndoActionInsert
     );
-
 
 type
   { TATUndoItem }
 
   TATUndoItem = class
-    Action: TATUndoAction;
-    Text: atString;
-    Index: integer;
-    constructor Create(AAction: TATUndoAction; const AText: atString; AIndex: integer);
+    ItemAction: TATUndoAction;
+    ItemIndex: integer;
+    ItemWithEnd: boolean;
+    ItemText: atString;
+    constructor Create(AAction: TATUndoAction; AIndex: integer; const AText: atString; AWithEnd: boolean); virtual;
   end;
 
 type
@@ -61,6 +61,7 @@ type
   private
     FList: TList;
     FMaxCount: integer;
+    FLocked: boolean;
     function GetItem(N: integer): TATUndoItem;
   public
     constructor Create; virtual;
@@ -70,10 +71,12 @@ type
     function Last: TATUndoItem;
     property Items[N: integer]: TATUndoItem read GetItem; default;
     property MaxCount: integer read FMaxCount write FMaxCount;
+    property Locked: boolean read FLocked write FLocked;
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteLast;
-    procedure Add(AAction: TATUndoAction; const AText: atString; AIndex: integer);
+    procedure Add(AAction: TATUndoAction; AIndex: integer; const AText: atString;
+      AWithEnd: boolean);
   end;
 
 type
@@ -87,7 +90,6 @@ type
     ItemCached: boolean; //for UpdateWrapInfo
     ItemBm: integer;
     ItemBmColor: integer;
-    //ItemBmHint: atString;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
   end;
 
@@ -173,7 +175,8 @@ type
     procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
     procedure TextDuplicateLine(AX, AY: integer; out AShift, APosAfter: TPoint);
     function TextSubstring(AX1, AY1, AX2, AY2: integer): atString;
-    //
+    //undo
+    procedure Undo;
   end;
 
 implementation
@@ -235,12 +238,13 @@ end;
 
 { TATUndoItem }
 
-constructor TATUndoItem.Create(AAction: TATUndoAction; const AText: atString;
-  AIndex: integer);
+constructor TATUndoItem.Create(AAction: TATUndoAction; AIndex: integer;
+  const AText: atString; AWithEnd: boolean);
 begin
-  Action:= AAction;
-  Text:= AText;
-  Index:= AIndex;
+  ItemAction:= AAction;
+  ItemIndex:= AIndex;
+  ItemText:= AText;
+  ItemWithEnd:= AWithEnd;
 end;
 
 { TATUndoList }
@@ -256,7 +260,8 @@ end;
 constructor TATUndoList.Create;
 begin
   FList:= TList.Create;
-  FMaxCount:= 10000;
+  FMaxCount:= 5000;
+  FLocked:= false;
 end;
 
 destructor TATUndoList.Destroy;
@@ -298,11 +303,13 @@ begin
     Delete(i);
 end;
 
-procedure TATUndoList.Add(AAction: TATUndoAction; const AText: atString; AIndex: integer);
+procedure TATUndoList.Add(AAction: TATUndoAction; AIndex: integer; const AText: atString; AWithEnd: boolean);
 var
   Item: TATUndoItem;
 begin
-  Item:= TATUndoItem.Create(AAction, AText, AIndex);
+  if FLocked then Exit;
+
+  Item:= TATUndoItem.Create(AAction, AIndex, AText, AWithEnd);
   FList.Add(Item);
 
   while Count>MaxCount do
@@ -311,10 +318,7 @@ end;
 
 function TATUndoList.Last: TATUndoItem;
 begin
-  if Count>0 then
-    Result:= Items[Count-1]
-  else
-    Result:= nil;
+  Result:= Items[Count-1];
 end;
 
 { TATStringItem }
@@ -409,6 +413,10 @@ begin
   if IsIndexValid(Index) then
   begin
     Item:= TATStringItem(FList[Index]);
+
+    if Assigned(FUndoList) then
+      FUndoList.Add(cUndoActionChange, Index, Item.ItemString, Item.ItemEnd<>cEndNone);
+
     Item.ItemString:= AValue;
     Item.ItemHidden:= 0;
     Item.ItemCached:= false;
@@ -499,9 +507,11 @@ end;
 
 destructor TATStrings.Destroy;
 begin
-  Clear;
   FreeAndNil(FUndoList);
+
+  Clear;
   FreeAndNil(FList);
+
   inherited;
 end;
 
@@ -524,6 +534,9 @@ var
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
+
+  if Assigned(FUndoList) then
+    FUndoList.Add(cUndoActionInsert, Count, '', true);
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -561,6 +574,9 @@ var
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
+
+  if Assigned(FUndoList) then
+    FUndoList.Add(cUndoActionInsert, N, '', true);
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -608,6 +624,9 @@ begin
 
   if IsIndexValid(N) then
   begin
+    if Assigned(FUndoList) then
+      FUndoList.Add(cUndoActionDelete, N, Lines[N], LinesEnds[N]<>cEndNone);
+
     TObject(FList[N]).Free;
     FList.Delete(N);
   end
@@ -624,159 +643,6 @@ var
 begin
   for i:= Count-1 downto 0 do
     LineDelete(i, false);
-end;
-
-procedure TATStrings.LoadFromStream(Stream: TStream);
-begin
-  DoLoadFromStream(Stream);
-  DoFinalizeLoading;
-end;
-
-procedure TATStrings.DoLoadFromStream(Stream: TStream);
-var
-  Buf: PAnsiChar;
-  BufSize: int64;
-  CharSize: integer;
-
-  function _BufferCharCode(NPos: integer): Word;
-  begin
-    case FEncoding of
-      cEncAnsi,
-      cEncUTF8:
-        Result:= PByte(Buf)[NPos];
-      cEncWideLE:
-        Result:= PByte(Buf)[NPos] + $100 * PByte(Buf)[NPos+1];
-      cEncWideBE:
-        Result:= PByte(Buf)[NPos+1] + $100 * PByte(Buf)[NPos];
-      else
-        DoEncError;
-    end;
-  end;
-
-  function _FindNextEol(NPos: integer): integer;
-  begin
-    Result:= NPos;
-    while (Result<BufSize) and not IsCodeEol(_BufferCharCode(Result)) do
-      Inc(Result, CharSize);
-  end;
-
-var
-  NStart, NEnd, Len: integer;
-  SA: AnsiString;
-  SW: UnicodeString;
-  LineEnd: TATLineEnds;
-begin
-  Clear;
-
-  Len:= 0;
-  if FEncodingDetect then
-    DoDetectStreamEncoding(Stream, FEncoding, Len);
-  CharSize:= cEncodingSize[FEncoding];
-
-  BufSize:= Stream.Size-Len;
-  if BufSize<=0 then Exit;
-
-  GetMem(Buf, BufSize);
-  try
-    Stream.Position:= Len;
-    Stream.ReadBuffer(Buf^, BufSize);
-
-    NStart:= 0;
-    repeat
-      NEnd:= _FindNextEol(NStart);
-      Len:= NEnd-NStart;
-
-      //detect+skip Eol
-      LineEnd:= cEndNone;
-      if (NEnd+CharSize<BufSize) and (_BufferCharCode(NEnd)=13) and (_BufferCharCode(NEnd+CharSize)=10) then
-      begin
-        LineEnd:= cEndWin;
-        Inc(NEnd, CharSize*2);
-      end
-      else
-      if (NEnd<BufSize) and (_BufferCharCode(NEnd)=10) then
-      begin
-        LineEnd:= cEndUnix;
-        Inc(NEnd, CharSize);
-      end
-      else
-      if (NEnd<BufSize) and (_BufferCharCode(NEnd)=13) then
-      begin
-        LineEnd:= cEndMac;
-        Inc(NEnd, CharSize);
-      end
-      else
-        Inc(NEnd, CharSize);
-
-      if Len=0 then
-        LineAddRaw('', LineEnd)
-      else
-      begin
-        case FEncoding of
-          cEncAnsi:
-            begin
-              SA:= '';
-              SetLength(SA, Len);
-              Move(Buf[NStart], SA[1], Len);
-              LineAddRaw(SA, LineEnd);
-            end;
-
-          cEncUTF8:
-            begin
-              SA:= '';
-              SetLength(SA, Len);
-              Move(Buf[NStart], SA[1], Len);
-              SW:= UTF8Decode(SA);
-              LineAddRaw(SW, LineEnd);
-            end;
-
-          cEncWideLE,
-          cEncWideBE:
-            begin
-              SW:= '';
-              SetLength(SW, Len div 2);
-              Move(Buf[NStart], SW[1], Len);
-              if FEncoding=cEncWideBE then
-                SW:= SSwapEndian(SW);
-              LineAddRaw(SW, LineEnd);
-            end;
-
-          else
-            DoEncError;
-        end;
-      end;
-
-      NStart:= NEnd;
-      if (NStart>=BufSize) then Break;
-    until false;
-
-  finally
-    FreeMem(Buf);
-  end;
-end;
-
-procedure TATStrings.LoadFromFile(const Filename: string);
-var
-  fs: TFileStreamUtf8;
-begin
-  fs:= TFileStreamUtf8.Create(Filename, fmOpenRead);
-  try
-    LoadFromStream(fs);
-  finally
-    FreeAndNil(fs);
-  end;
-end;
-
-procedure TATStrings.DoFinalizeLoading;
-begin
-  DoDetectEndings;
-  LineAddLastFake;
-  DoResetLineStates(false);
-end;
-
-procedure TATStrings.DoFinalizeSaving;
-begin
-  DoResetLineStates(true);
 end;
 
 procedure TATStrings.DoResetLineStates(ASaved: boolean);
@@ -911,6 +777,46 @@ begin
   end;
 end;
 
+procedure TATStrings.Undo;
+var
+  Item: TATUndoItem;
+  AAction: TATUndoAction;
+  AText: atString;
+  AIndex: integer;
+  AEnd: TATLineEnds;
+begin
+  if not Assigned(FUndoList) then Exit;
+
+  Item:= FUndoList.Last;
+  if Item=nil then Exit;
+
+  AAction:= Item.ItemAction;
+  AText:= Item.ItemText;
+  AIndex:= Item.ItemIndex;
+  if Item.ItemWithEnd then AEnd:= Endings else AEnd:= cEndNone;
+  Item:= nil;
+
+  FUndoList.DeleteLast;
+  FUndoList.Locked:= true;
+
+  try
+    case AAction of
+      cUndoActionInsert:
+        LineDelete(AIndex);
+      cUndoActionDelete:
+        begin
+          LineInsertEx(AIndex, AText, AEnd);
+        end;
+      cUndoActionChange:
+        Lines[AIndex]:= AText;
+      else
+        raise Exception.Create('Unknown undo kind');
+    end;
+  finally
+    FUndoList.Locked:= false;
+  end;
+end;
+
 function TATStrings.DebugText: atString;
 var
   i: integer;
@@ -920,26 +826,8 @@ begin
     Result:= Result+Format('[%d] "%s" <%s>', [i, Lines[i], cLineEndNiceNames[LinesEnds[i]] ])+#13;
 end;
 
-procedure TATStrings.LoadFromString(const AText: atString);
-var
-  MS: TMemoryStream;
-begin
-  Clear;
-  if AText='' then Exit;
-  MS:= TMemoryStream.Create;
-  try
-    MS.Write(AText[1], Length(AText)*SizeOf(atChar));
-    MS.Position:= 0;
-
-    Encoding:= cEncWideLE;
-    EncodingDetect:= false;
-    LoadFromStream(MS);
-  finally
-    FreeAndNil(MS);
-  end;
-end;
-
 {$I atstrings_editing.inc}
+{$I atstrings_load.inc}
 
 end.
 

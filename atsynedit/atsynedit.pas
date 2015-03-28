@@ -326,6 +326,7 @@ type
     FOptShowIndentLines: boolean;
     FOptShowCaretNumberBG: boolean;
     //
+    function DoCommand_Undo: TATCommandResults;
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
@@ -2478,6 +2479,8 @@ begin
   FMenu.OnPopup:= MenuPopup;
   PopupMenu:= FMenu;
 
+  Add('Undo', cCommand_Undo);
+  Add('-', 0);
   Add('Cut', cCommand_ClipboardCut);
   Add('Copy', cCommand_ClipboardCopy);
   Add('Paste', cCommand_ClipboardPaste);

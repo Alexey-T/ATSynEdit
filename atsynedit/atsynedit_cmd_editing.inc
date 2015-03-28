@@ -454,3 +454,12 @@ begin
   Result:= [cResultText, cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_Undo: TATCommandResults;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  Strings.Undo;
+  Result:= [cResultText, cResultCaretAny];
+end;
+

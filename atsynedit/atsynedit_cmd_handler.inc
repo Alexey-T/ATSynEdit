@@ -149,6 +149,8 @@ begin
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
     //end of most used
 
+    cCommand_Undo:                Res:= DoCommand_Undo;
+
     cCommand_TextDeleteLine:        Res:= DoCommand_TextDeleteLines;
     cCommand_TextDuplicateLine:     Res:= DoCommand_TextDuplicateLine;
     cCommand_TextDeleteToLineBegin:    Res:= DoCommand_TextDeleteToLineBegin;

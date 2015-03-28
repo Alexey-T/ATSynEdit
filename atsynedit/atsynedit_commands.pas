@@ -66,6 +66,9 @@ const
   cCommand_GotoWordNext_Sel = _base_GotoWordNext or cSelKeep;
   cCommand_GotoWordPrev_Sel = _base_GotoWordPrev or cSelKeep;
 
+  cCommand_Undo = 235 or cSelReset;
+  cCommand_Redo = 236;
+
   cCommand_TextIndent = 240;
   cCommand_TextUnindent = 241;
 

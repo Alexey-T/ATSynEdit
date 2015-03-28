@@ -65,6 +65,9 @@ begin
   M.Add(cCommand_SelectNone, 'cancel selection', [], []);
   M.Add(cCommand_Cancel, 'cancel carets, selection, drag-drop', ['Esc'], []);
 
+  M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
+  M.Add(cCommand_Redo, 'perform redo', [], []);
+
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXControl+'+R'], []);
 
