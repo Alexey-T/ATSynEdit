@@ -12,6 +12,18 @@ type
   atString = UnicodeString;
   atChar = WideChar;
 
+type
+  TATLineEnds = (
+    cEndNone,
+    cEndWin,
+    cEndUnix,
+    cEndMac
+    );
+
+const
+  cLineEndStrings: array[TATLineEnds] of atString = ('', #13#10, #10, #13);
+  cLineEndNiceNames: array[TATLineEnds] of string = ('', 'win', 'un', 'mac');
+
 const
   cMaxTabPositionToExpand = 500; //no sense to expand too far tabs
   cCharScaleFullwidth = 1.7; //width of CJK chars

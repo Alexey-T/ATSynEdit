@@ -10,17 +10,6 @@ uses
   ATStrings_Undo;
 
 type
-  TATLineEnds = (
-    cEndNone,
-    cEndWin,
-    cEndUnix,
-    cEndMac
-    );
-const
-  cLineEndStrings: array[TATLineEnds] of atString = ('', #13#10, #10, #13);
-  cLineEndNiceNames: array[TATLineEnds] of string = ('', 'win', 'un', 'mac');
-
-type
   TATLineState = (
     cLineStateNone,
     cLineStateChanged,
@@ -290,7 +279,7 @@ begin
     Item:= TATStringItem(FList[Index]);
 
     if Assigned(FUndoList) then
-      FUndoList.Add(cUndoActionChange, Index, Item.ItemString, Item.ItemEnd<>cEndNone);
+      FUndoList.Add(cUndoActionChange, Index, Item.ItemString, Item.ItemEnd);
 
     Item.ItemString:= AValue;
     Item.ItemHidden:= 0;
@@ -327,6 +316,10 @@ begin
   if IsIndexValid(Index) then
   begin
     Item:= TATStringItem(FList[Index]);
+
+    if Assigned(FUndoList) then
+      FUndoList.Add(cUndoActionChange, Index, Item.ItemString, Item.ItemEnd);
+
     Item.ItemEnd:= AValue;
     if Item.ItemState<>cLineStateAdded then
       Item.ItemState:= cLineStateChanged;
@@ -411,7 +404,7 @@ begin
   if FReadOnly then Exit;
 
   if Assigned(FUndoList) then
-    FUndoList.Add(cUndoActionInsert, Count, '', true);
+    FUndoList.Add(cUndoActionInsert, Count, '', cEndNone);
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -451,7 +444,7 @@ begin
   if FReadOnly then Exit;
 
   if Assigned(FUndoList) then
-    FUndoList.Add(cUndoActionInsert, N, '', true);
+    FUndoList.Add(cUndoActionInsert, N, '', cEndNone);
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -494,15 +487,19 @@ begin
 end;
 
 procedure TATStrings.LineDelete(N: integer; AForceLast: boolean = true);
+var
+  Item: TATStringItem;
 begin
   if FReadOnly then Exit;
 
   if IsIndexValid(N) then
   begin
-    if Assigned(FUndoList) then
-      FUndoList.Add(cUndoActionDelete, N, Lines[N], LinesEnds[N]<>cEndNone);
+    Item:= TATStringItem(FList[N]);
 
-    TObject(FList[N]).Free;
+    if Assigned(FUndoList) then
+      FUndoList.Add(cUndoActionDelete, N, Item.ItemString, Item.ItemEnd);
+
+    Item.Free;
     FList.Delete(N);
   end
   else
@@ -659,18 +656,15 @@ var
   AText: atString;
   AIndex: integer;
   AEnd: TATLineEnds;
-  en: boolean;
 begin
   if not Assigned(FUndoList) then Exit;
 
   Item:= FUndoList.Last;
   if Item=nil then Exit;
-
   AAction:= Item.ItemAction;
-  AText:= Item.ItemText;
   AIndex:= Item.ItemIndex;
-  if Item.ItemWithEnd then AEnd:= Endings else AEnd:= cEndNone;
-  if AText<>'' then AEnd:= Endings; //force eol for nonempty line
+  AText:= Item.ItemText;
+  AEnd:= Item.ItemEnd;
 
   Item:= nil;
   FUndoList.DeleteLast;
@@ -681,33 +675,22 @@ begin
       cUndoActionChange:
         begin
           Lines[AIndex]:= AText;
-          if (AIndex<Count-1) and IsLastLineFake then
-            LinesEnds[AIndex]:= Endings
-          else
-            LinesEnds[AIndex]:= AEnd;
+          LinesEnds[AIndex]:= AEnd;
         end;
 
       cUndoActionInsert:
         begin
-          en:= true;
-          //don't delete fake-line sometimes
-          if (AIndex=Count-1) then
-            if IsLastLineFake then
-              en:= false;
-          if en then
-            LineDelete(AIndex);
+          LineDelete(AIndex);
         end;
 
       cUndoActionDelete:
         begin
-          en:= true;
-          //don't restore fake-line sometimes
-          if (AEnd=cEndNone) and (AText='') then
-            if (Count>0) and (LinesEnds[Count-1]=cEndNone) then
-              en:= false;
-          if en then
-            LineInsertEx(AIndex, AText, AEnd);
+          if AIndex>=Count then
+            LineAddRaw(AText, AEnd)
+          else
+            LineInsertRaw(AIndex, AText, AEnd);
         end;
+
       else
         raise Exception.Create('Unknown undo kind');
     end;

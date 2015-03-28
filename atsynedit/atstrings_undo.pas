@@ -21,10 +21,10 @@ type
   TATUndoItem = class
     ItemAction: TATUndoAction;
     ItemIndex: integer;
-    ItemWithEnd: boolean;
     ItemText: atString;
+    ItemEnd: TATLineEnds;
     constructor Create(AAction: TATUndoAction; AIndex: integer;
-      const AText: atString; AWithEnd: boolean); virtual;
+      const AText: atString; AEnd: TATLineEnds); virtual;
   end;
 
 type
@@ -49,7 +49,7 @@ type
     procedure Delete(N: integer);
     procedure DeleteLast;
     procedure Add(AAction: TATUndoAction; AIndex: integer; const AText: atString;
-      AWithEnd: boolean);
+      AEnd: TATLineEnds);
   end;
 
 
@@ -58,12 +58,12 @@ implementation
 { TATUndoItem }
 
 constructor TATUndoItem.Create(AAction: TATUndoAction; AIndex: integer;
-  const AText: atString; AWithEnd: boolean);
+  const AText: atString; AEnd: TATLineEnds);
 begin
   ItemAction:= AAction;
   ItemIndex:= AIndex;
   ItemText:= AText;
-  ItemWithEnd:= AWithEnd;
+  ItemEnd:= AEnd;
 end;
 
 { TATUndoList }
@@ -122,13 +122,13 @@ begin
     Delete(i);
 end;
 
-procedure TATUndoList.Add(AAction: TATUndoAction; AIndex: integer; const AText: atString; AWithEnd: boolean);
+procedure TATUndoList.Add(AAction: TATUndoAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
 var
   Item: TATUndoItem;
 begin
   if FLocked then Exit;
 
-  Item:= TATUndoItem.Create(AAction, AIndex, AText, AWithEnd);
+  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd);
   FList.Add(Item);
 
   while Count>MaxCount do
