@@ -1,7 +1,9 @@
 
-Big todo..
+undo simple:done
+undo grouped
+redo simple
+redo grouped
+
 col block
 cache WrapInfo(big file editing)
-fold +-
-undo
-tokens adapter
+foldin +- sign
