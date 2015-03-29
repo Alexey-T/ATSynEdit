@@ -74,6 +74,7 @@ procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
 begin
   if cResultText in Res then
   begin
+    FCaretMoved:= false; //reset it after text-commands
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
   end;
@@ -111,7 +112,8 @@ begin
   Res:= [];
   FCaretSpecPos:= false;
 
-  if ACmd and cSelKeep <> 0 then
+  //---handle special command bits (cCmdNNNNN)
+  if ACmd and cCmdSelKeep <> 0 then
     for i:= 0 to Carets.Count-1 do
     begin
       Item:= Carets[i];
@@ -119,8 +121,15 @@ begin
       if Item.EndX<0 then Item.EndX:= Item.PosX;
     end;
 
-  if ACmd and cSelReset <> 0 then
+  if ACmd and cCmdSelReset <> 0 then
     DoSelect_None;
+
+  if ACmd and cCmdCaret <> 0 then
+    FCaretMoved:= true; //start undo-group
+
+  //debug
+  //if FCaretMoved then Beep;
+  //--------
 
   case ACmd of
     //most used commands

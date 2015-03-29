@@ -238,6 +238,7 @@ type
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopsUnfocused: boolean;
+    FCaretMoved: boolean;
     FMenu: TPopupMenu;
     FOver: boolean;
     FMouseDownPnt: TPoint;
@@ -1557,6 +1558,7 @@ begin
   FCaretVirtual:= true;
   FCaretSpecPos:= false;
   FCaretStopsUnfocused:= true;
+  FCaretMoved:= false;
 
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
@@ -2000,7 +2002,9 @@ begin
 
     if Shift=[ssLeft] then
     begin
+      FCaretMoved:= true; //start undo-group
       DoCaretSingleAsIs;
+
       if FOptMouseDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
       begin
         FMouseDragging:= true;
