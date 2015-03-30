@@ -332,6 +332,7 @@ type
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
+    function GetUndoLimit: integer;
     procedure InitColors;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
@@ -420,6 +421,7 @@ type
     function GetVisibleLinesMinimap: integer;
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
+    procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
     procedure UpdateCursor;
@@ -613,6 +615,7 @@ type
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
     property OptShowCaretNumberBG: boolean read FOptShowCaretNumberBG write FOptShowCaretNumberBG;
     property OptGroupedUndo: boolean read FOptGroupedUndo write FOptGroupedUndo;
+    property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
   end;
 
 implementation
@@ -2641,6 +2644,16 @@ begin
   FColors.StateChanged:= $00f0f0;
   FColors.StateAdded:= $20c020;
   FColors.StateSaved:= clNavy;
+end;
+
+function TATSynEdit.GetUndoLimit: integer;
+begin
+  Result:= Strings.UndoLimit;
+end;
+
+procedure TATSynEdit.SetUndoLimit(AValue: integer);
+begin
+  Strings.UndoLimit:= AValue;
 end;
 
 {$I atsynedit_carets.inc}

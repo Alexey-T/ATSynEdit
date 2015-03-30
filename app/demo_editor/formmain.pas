@@ -425,6 +425,9 @@ begin
     chkCrVirt.Checked:= ed.OptCaretVirtual;
     edCrTime.Value:= ed.OptCaretTime;
 
+    edUndo.Value:= ed.OptUndoLimit;
+    chkUndoGr.Checked:= ed.OptGroupedUndo;
+
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
     chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
@@ -471,6 +474,9 @@ begin
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptCaretVirtual:= chkCrVirt.Checked;
       ed.OptCaretTime:= edCrTime.Value;
+
+      ed.OptUndoLimit:= edUndo.Value;
+      ed.OptGroupedUndo:= chkUndoGr.Checked;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;

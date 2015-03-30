@@ -460,6 +460,6 @@ begin
   if ModeReadOnly then Exit;
 
   Strings.UndoGrouped(FOptGroupedUndo);
-  Result:= [cResultText, cResultCaretAny];
+  Result:= [cResultText, cResultCaretBottom];
 end;
 

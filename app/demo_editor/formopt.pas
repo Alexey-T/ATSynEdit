@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkUndoGr: TCheckBox;
     chkCutNoSel: TCheckBox;
     chkShowNumBg: TCheckBox;
     chkDotLn: TCheckBox;
@@ -58,16 +59,19 @@ type
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
+    Label6: TLabel;
     Label8: TLabel;
     PageControl1: TPageControl;
     edSizeBm: TSpinEdit;
     edSizeState: TSpinEdit;
     edSizeEmpty: TSpinEdit;
+    edUndo: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
+    TabSheet6: TTabSheet;
   private
     { private declarations }
   public

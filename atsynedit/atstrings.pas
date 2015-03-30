@@ -70,6 +70,7 @@ type
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(N: integer): integer;
     function GetLineState(Index: integer): TATLineState;
+    function GetUndoLimit: integer;
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddLastFake;
@@ -90,6 +91,7 @@ type
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure DoResetLineStates(ASaved: boolean);
+    procedure SetUndoLimit(AValue: integer);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -137,6 +139,7 @@ type
     procedure SetGroupMark;
     function UndoSingle: boolean;
     procedure UndoGrouped(AGrouped: boolean);
+    property UndoLimit: integer read GetUndoLimit write SetUndoLimit;
   end;
 
 implementation
@@ -266,6 +269,14 @@ begin
     Result:= TATStringItem(FList[Index]).ItemState
   else
     Result:= cLineStateNone;
+end;
+
+function TATStrings.GetUndoLimit: integer;
+begin
+  if Assigned(FUndoList) then
+    Result:= FUndoList.MaxCount
+  else
+    Result:= 5000;
 end;
 
 procedure TATStrings.SetEndings(AValue: TATLineEnds);
@@ -555,6 +566,12 @@ begin
     else
       Item.ItemState:= cLineStateNone;
   end;
+end;
+
+procedure TATStrings.SetUndoLimit(AValue: integer);
+begin
+  if Assigned(FUndoList) then
+    FUndoList.MaxCount:= AValue;
 end;
 
 procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
