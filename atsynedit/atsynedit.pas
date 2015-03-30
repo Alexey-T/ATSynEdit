@@ -332,6 +332,7 @@ type
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
+    function GetUndoAfterSave: boolean;
     function GetUndoLimit: integer;
     procedure InitColors;
     procedure MenuClick(Sender: TObject);
@@ -421,6 +422,7 @@ type
     function GetVisibleLinesMinimap: integer;
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
+    procedure SetUndoAfterSave(AValue: boolean);
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
@@ -614,8 +616,9 @@ type
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
     property OptShowCaretNumberBG: boolean read FOptShowCaretNumberBG write FOptShowCaretNumberBG;
-    property OptGroupedUndo: boolean read FOptGroupedUndo write FOptGroupedUndo;
+    property OptUndoGrouped: boolean read FOptGroupedUndo write FOptGroupedUndo;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
+    property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
   end;
 
 implementation
@@ -2655,6 +2658,17 @@ procedure TATSynEdit.SetUndoLimit(AValue: integer);
 begin
   Strings.UndoLimit:= AValue;
 end;
+
+function TATSynEdit.GetUndoAfterSave: boolean;
+begin
+  Result:= Strings.UndoAfterSave;
+end;
+
+procedure TATSynEdit.SetUndoAfterSave(AValue: boolean);
+begin
+  Strings.UndoAfterSave:= AValue;
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

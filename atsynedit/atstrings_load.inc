@@ -181,9 +181,4 @@ begin
   DoResetLineStates(false);
 end;
 
-procedure TATStrings.DoFinalizeSaving;
-begin
-  DoResetLineStates(true);
-end;
-
 

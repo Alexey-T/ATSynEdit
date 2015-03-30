@@ -1,9 +1,9 @@
 
-undo simple:done
-undo grouped
+undo simple--done
+undo grouped--done
 redo simple
 redo grouped
 
-col block
 cache WrapInfo(big file editing)
+col block
 foldin +- sign

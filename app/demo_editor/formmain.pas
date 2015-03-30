@@ -426,7 +426,8 @@ begin
     edCrTime.Value:= ed.OptCaretTime;
 
     edUndo.Value:= ed.OptUndoLimit;
-    chkUndoGr.Checked:= ed.OptGroupedUndo;
+    chkUndoGr.Checked:= ed.OptUndoGrouped;
+    chkUndoSv.Checked:= ed.OptUndoAfterSave;
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
@@ -476,7 +477,8 @@ begin
       ed.OptCaretTime:= edCrTime.Value;
 
       ed.OptUndoLimit:= edUndo.Value;
-      ed.OptGroupedUndo:= chkUndoGr.Checked;
+      ed.OptUndoGrouped:= chkUndoGr.Checked;
+      ed.OptUndoAfterSave:= chkUndoSv.Checked;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
