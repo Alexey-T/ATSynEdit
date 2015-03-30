@@ -139,7 +139,7 @@ type
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
     procedure SetGroupMark;
     function UndoSingle: boolean;
-    procedure UndoGrouped(AGrouped: boolean);
+    procedure Undo(AGrouped: boolean);
     property UndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
   end;
@@ -686,7 +686,7 @@ begin
   end;
 end;
 
-procedure TATStrings.UndoGrouped(AGrouped: boolean);
+procedure TATStrings.Undo(AGrouped: boolean);
 var
   bEnd: boolean;
 begin

@@ -111,10 +111,9 @@ type
     FDir: string;
     procedure EditCaretMoved(Sender: TObject);
     procedure EditScroll(Sender: TObject);
-    procedure EditCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
+    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
-    procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum: integer;
-      const ARect: TRect);
+    procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure UpdateStatus;
     procedure UpdateChecks;
   public
@@ -292,8 +291,7 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer;
-  var AHandled: boolean);
+procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
 begin
   AHandled:= false;
 end;
@@ -328,7 +326,6 @@ var
 begin
   r:= arect;
   if IsRectEmpty(r) then exit;
-  //InflateRect(r, -2, -2);
   c.brush.color:= cColorBmIco;
   c.pen.color:= cColorBmIco;
   inc(r.top, 1);
@@ -467,7 +464,7 @@ begin
     edIndent.Value:= ed.OptIndentSize;
     chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
     chkDotLn.Checked:= ed.OptShowIndentLines;
-    chkShowNumBg.Checked:= ed.OptShowCaretNumberBG;
+    chkShowNumBg.Checked:= ed.OptShowGutterNumberBG;
 
     if ShowModal=mrOk then
     begin
@@ -518,7 +515,7 @@ begin
       ed.OptIndentSize:= edIndent.Value;
       ed.OptIndentKeepsAlign:= chkUninKeep.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
-      ed.OptShowCaretNumberBG:= chkShowNumBg.Checked;
+      ed.OptShowGutterNumberBG:= chkShowNumBg.Checked;
 
       ed.Gutter.Update;
       ed.Update;

@@ -1,19 +1,20 @@
 object fmOpt: TfmOpt
   Left = 474
-  Height = 364
+  Height = 357
   Top = 199
   Width = 640
   BorderStyle = bsDialog
   Caption = 'Opts'
-  ClientHeight = 364
+  ClientHeight = 357
   ClientWidth = 640
   Position = poScreenCenter
   LCLVersion = '1.5'
   object ButtonPanel1: TButtonPanel
     Left = 6
-    Height = 33
-    Top = 325
+    Height = 25
+    Top = 326
     Width = 628
+    AutoSize = False
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
@@ -25,6 +26,7 @@ object fmOpt: TfmOpt
     TabOrder = 1
     ShowButtons = [pbOK, pbCancel]
     ShowGlyphs = []
+    ShowBevel = False
   end
   object PageControl1: TPageControl
     Left = 8

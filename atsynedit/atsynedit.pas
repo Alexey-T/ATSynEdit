@@ -291,7 +291,7 @@ type
     FMinimapVisible: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
-    FOptGroupedUndo: boolean;
+    FOptUndoGrouped: boolean;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
     FOptRulerVisible: boolean;
@@ -326,7 +326,7 @@ type
     FOptKeyEndToNonSpace: boolean;
     FOptKeyTabIndents: boolean;
     FOptShowIndentLines: boolean;
-    FOptShowCaretNumberBG: boolean;
+    FOptShowGutterNumberBG: boolean;
     //
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
@@ -615,9 +615,9 @@ type
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize;
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
-    property OptShowCaretNumberBG: boolean read FOptShowCaretNumberBG write FOptShowCaretNumberBG;
-    property OptUndoGrouped: boolean read FOptGroupedUndo write FOptGroupedUndo;
+    property OptShowGutterNumberBG: boolean read FOptShowGutterNumberBG write FOptShowGutterNumberBG;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
+    property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
   end;
 
@@ -1365,7 +1365,7 @@ begin
       //gutter band: number
       if FGutter[FGutterBandNum].Visible then
       begin
-        if LineWithCaret and FOptShowCaretNumberBG then
+        if LineWithCaret and FOptShowGutterNumberBG then
         begin
           C.Brush.Color:= FColors.GutterCaretBG;
           C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
@@ -1667,10 +1667,10 @@ begin
   FOptKeyEndToNonSpace:= true;
   FOptKeyTabIndents:= true;
   FOptShowIndentLines:= true;
-  FOptShowCaretNumberBG:= true;
+  FOptShowGutterNumberBG:= true;
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
-  FOptGroupedUndo:= true;
+  FOptUndoGrouped:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
