@@ -24,8 +24,10 @@ type
     ItemText: atString;
     ItemEnd: TATLineEnds;
     ItemCarets: array of TPoint;
+    GroupMark: boolean;
     constructor Create(AAction: TATEditAction; AIndex: integer;
-      const AText: atString; AEnd: TATLineEnds; const ACarets: TPointArray);
+      const AText: atString; AEnd: TATLineEnds; AGroupMark: boolean;
+      const ACarets: TPointArray);
   virtual;
   end;
 
@@ -37,6 +39,7 @@ type
     FList: TList;
     FMaxCount: integer;
     FLocked: boolean;
+    FGroupMark: boolean;
     function GetItem(N: integer): TATUndoItem;
   public
     constructor Create; virtual;
@@ -47,6 +50,7 @@ type
     property Items[N: integer]: TATUndoItem read GetItem; default;
     property MaxCount: integer read FMaxCount write FMaxCount;
     property Locked: boolean read FLocked write FLocked;
+    property GroupMark: boolean read FGroupMark write FGroupMark;
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteLast;
@@ -63,7 +67,8 @@ uses
 { TATUndoItem }
 
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
-  const AText: atString; AEnd: TATLineEnds; const ACarets: TPointArray);
+  const AText: atString; AEnd: TATLineEnds; AGroupMark: boolean;
+  const ACarets: TPointArray);
 var
   i: integer;
 begin
@@ -71,6 +76,7 @@ begin
   ItemIndex:= AIndex;
   ItemText:= AText;
   ItemEnd:= AEnd;
+  GroupMark:= AGroupMark;
 
   SetLength(ItemCarets, Length(ACarets));
   for i:= 0 to High(ACarets) do
@@ -94,6 +100,7 @@ begin
   FList:= TList.Create;
   FMaxCount:= 5000;
   FLocked:= false;
+  FGroupMark:= false;
 end;
 
 destructor TATUndoList.Destroy;
@@ -136,14 +143,16 @@ begin
 end;
 
 procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
-  const AText: atString; AEnd: TATLineEnds; const ACarets: TPointArray);
+  const AText: atString; AEnd: TATLineEnds;
+  const ACarets: TPointArray);
 var
   Item: TATUndoItem;
 begin
   if FLocked then Exit;
 
-  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ACarets);
+  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, FGroupMark, ACarets);
   FList.Add(Item);
+  FGroupMark:= false;
 
   while Count>MaxCount do
     Delete(0);

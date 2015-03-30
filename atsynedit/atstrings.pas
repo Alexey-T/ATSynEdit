@@ -134,6 +134,7 @@ type
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
+    procedure SetGroupMark;
     procedure Undo;
   end;
 
@@ -667,6 +668,12 @@ begin
   finally
     FreeAndNil(L);
   end;
+end;
+
+procedure TATStrings.SetGroupMark;
+begin
+  if Assigned(FUndoList) then
+    FUndoList.GroupMark:= true;
 end;
 
 procedure TATStrings.Undo;

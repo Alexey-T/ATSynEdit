@@ -74,7 +74,6 @@ procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
 begin
   if cResultText in Res then
   begin
-    FCaretMoved:= false; //reset it after text-commands
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
   end;
@@ -125,7 +124,7 @@ begin
     DoSelect_None;
 
   if ACmd and cCmdCaret <> 0 then
-    FCaretMoved:= true; //start undo-group
+    Strings.SetGroupMark;
 
   //debug
   //if FCaretMoved then Beep;

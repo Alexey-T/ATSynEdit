@@ -104,6 +104,7 @@
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atcarets.pas"/>
@@ -112,6 +113,7 @@
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
@@ -147,6 +149,7 @@
       <Unit25>
         <Filename Value="..\..\atsynedit\atstrings_undo.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStrings_Undo"/>
       </Unit25>
     </Units>
   </ProjectOptions>
