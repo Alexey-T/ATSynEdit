@@ -108,16 +108,21 @@ begin
   ed.Items.Add('/');
   ed.Items.Add('[');
   ed.Items.Add(']');
+
+  for i:= 0 to 9 do
+    ed.Items.Add('Num'+Inttostr(i));
   ed.Items.Add('NumPlus');
   ed.Items.Add('NumMinus');
   ed.Items.Add('NumMul');
   ed.Items.Add('NumDiv');
-  ed.Items.Add('Num5');
+  ed.Items.Add('NumDot');
+  ed.Items.Add('NumClear');
+
   ed.Items.Add('NumLock');
   ed.Items.Add('ScrollLock');
   ed.Items.Add('CapsLock');
   ed.Items.Add('Break');
-  ed.Items.Add('Menu');
+  ed.Items.Add('PopUp');
 end;
 
 end.

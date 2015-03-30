@@ -9,7 +9,7 @@ object fmKeyOpt: TfmKeyOpt
   ClientWidth = 291
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.4.0.2'
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 33
