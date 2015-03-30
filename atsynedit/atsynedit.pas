@@ -9,9 +9,6 @@ uses
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus,
   LMessages, LCLType,
-  {$ifdef windows}
-  Messages,
-  {$endif}
   ATStringProc, ATStrings, ATCanvasProc, ATGutter,
   ATCarets, ATKeyMapping;
 
@@ -237,7 +234,7 @@ type
     FCaretShown: boolean;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
-    FCaretStopsUnfocused: boolean;
+    FCaretStopUnfocused: boolean;
     FMenu: TPopupMenu;
     FOver: boolean;
     FMouseDownPnt: TPoint;
@@ -311,7 +308,7 @@ type
     FOptKeyNavigateWrapped: boolean;
     FOptCopyLinesIfNoSel: boolean;
     FOptCutLinesIfNoSel: boolean;
-    FOptHiliteSelectionFull: boolean;
+    FOptHiliteSelFull: boolean;
     FOptShowCurLine: boolean;
     FOptShowCurColumn: boolean;
     FOptMouse2ClickSelectsLine: boolean;
@@ -326,7 +323,7 @@ type
     FOptKeyEndToNonSpace: boolean;
     FOptKeyTabIndents: boolean;
     FOptShowIndentLines: boolean;
-    FOptShowGutterNumberBG: boolean;
+    FOptShowGutterCaretBG: boolean;
     //
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
@@ -546,9 +543,7 @@ type
     procedure DblClick; override;
     procedure TripleClick; override;
     //messages
-    {$ifdef windows}
-    procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
-    {$endif}
+    procedure WMEraseBkgnd(var Msg: TLMEraseBkgnd); message LM_ERASEBKGND;
     procedure WMHScroll(var Msg: TLMHScroll); message LM_HSCROLL;
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
   published
@@ -572,7 +567,7 @@ type
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel;
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
-    property OptHiliteSelectionFull: boolean read FOptHiliteSelectionFull write FOptHiliteSelectionFull;
+    property OptHiliteSelFull: boolean read FOptHiliteSelFull write FOptHiliteSelFull;
     property OptUseOverOnPaste: boolean read FOptUseOverOnPaste write FOptUseOverOnPaste;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
@@ -581,7 +576,7 @@ type
     property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
     property OptCaretTime: integer read GetCaretTime write SetCaretTime;
-    property OptCaretStopsUnfocused: boolean read FCaretStopsUnfocused write FCaretStopsUnfocused;
+    property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
@@ -615,7 +610,7 @@ type
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize;
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
-    property OptShowGutterNumberBG: boolean read FOptShowGutterNumberBG write FOptShowGutterNumberBG;
+    property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
@@ -1278,7 +1273,7 @@ begin
         Inc(CurrPointText.X, Trunc(NOutputSpacesSkipped*ACharSize.X));
       end;
 
-      if FOptHiliteSelectionFull then
+      if FOptHiliteSelFull then
         if LineEolSelected then
         begin
           C.Brush.Color:= FColors.TextSelBG;
@@ -1312,7 +1307,7 @@ begin
     end
     else
     begin
-      if FOptHiliteSelectionFull then
+      if FOptHiliteSelFull then
         if LineEolSelected then
         begin
           C.Brush.Color:= FColors.TextSelBG;
@@ -1326,7 +1321,7 @@ begin
 
     if WrapItem.NFinal=cWrapItemFinal then
     begin
-      //for OptHiliteSelectionFull=false paint eol bg
+      //for OptHiliteSelFull=false paint eol bg
       if LineEolSelected then
       begin
         C.Brush.Color:= FColors.TextSelBG;
@@ -1365,7 +1360,7 @@ begin
       //gutter band: number
       if FGutter[FGutterBandNum].Visible then
       begin
-        if LineWithCaret and FOptShowGutterNumberBG then
+        if LineWithCaret and FOptShowGutterCaretBG then
         begin
           C.Brush.Color:= FColors.GutterCaretBG;
           C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
@@ -1564,7 +1559,7 @@ begin
   FCaretShapeOvr:= cCaretShapeFull;
   FCaretVirtual:= true;
   FCaretSpecPos:= false;
-  FCaretStopsUnfocused:= true;
+  FCaretStopUnfocused:= true;
 
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
@@ -1658,7 +1653,7 @@ begin
   FOptMouseGutterClickSelectsLine:= true;
   FOptCopyLinesIfNoSel:= true;
   FOptCutLinesIfNoSel:= false;
-  FOptHiliteSelectionFull:= false;
+  FOptHiliteSelFull:= false;
   FOptShowCurLine:= false;
   FOptShowCurColumn:= false;
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
@@ -1667,7 +1662,7 @@ begin
   FOptKeyEndToNonSpace:= true;
   FOptKeyTabIndents:= true;
   FOptShowIndentLines:= true;
-  FOptShowGutterNumberBG:= true;
+  FOptShowGutterCaretBG:= true;
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
   FOptUndoGrouped:= true;
@@ -1938,13 +1933,11 @@ begin
   Invalidate;
 end;
 
-{$ifdef windows}
 //needed to remove flickering on resize and mouse-over
-procedure TATSynEdit.WMEraseBkgnd(var Message: TMessage);
+procedure TATSynEdit.WMEraseBkgnd(var Msg: TLMEraseBkgnd);
 begin
-  Message.Result:= 1;
+  Msg.Result:= 1;
 end;
-{$endif}
 
 function UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
 var
@@ -2282,7 +2275,7 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  if FCaretStopsUnfocused then
+  if FCaretStopUnfocused then
     if not Focused then
     begin
       if FCaretShown then

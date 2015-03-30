@@ -442,7 +442,7 @@ begin
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
-    chkColorSel.Checked:= ed.OptHiliteSelectionFull;
+    chkColorSel.Checked:= ed.OptHiliteSelFull;
     chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
     chkNavWrap.Checked:= ed.OptKeyNavigateWrapped;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
@@ -451,7 +451,7 @@ begin
     chkClick2W.Checked:= ed.OptMouse2ClickDragSelectsWords;
     chkClickNm.Checked:= ed.OptMouseGutterClickSelectsLine;
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
-    chkCrUnfocus.Checked:= ed.OptCaretStopsUnfocused;
+    chkCrUnfocus.Checked:= ed.OptCaretStopUnfocused;
     edRulerSize.Value:= ed.OptRulerSize;
     edRulerFSize.Value:= ed.OptRulerFontSize;
     chkDnD.Checked:= ed.OptMouseDragDrop;
@@ -464,7 +464,7 @@ begin
     edIndent.Value:= ed.OptIndentSize;
     chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
     chkDotLn.Checked:= ed.OptShowIndentLines;
-    chkShowNumBg.Checked:= ed.OptShowGutterNumberBG;
+    chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
 
     if ShowModal=mrOk then
     begin
@@ -493,7 +493,7 @@ begin
       ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
-      ed.OptHiliteSelectionFull:= chkColorSel.Checked;
+      ed.OptHiliteSelFull:= chkColorSel.Checked;
       ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
       ed.OptKeyNavigateWrapped:= chkNavWrap.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
@@ -502,7 +502,7 @@ begin
       ed.OptMouse2ClickDragSelectsWords:= chkClick2W.Checked;
       ed.OptMouseGutterClickSelectsLine:= chkClickNm.Checked;
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
-      ed.OptCaretStopsUnfocused:= chkCrUnfocus.Checked;
+      ed.OptCaretStopUnfocused:= chkCrUnfocus.Checked;
       ed.OptRulerSize:= edRulerSize.Value;
       ed.OptRulerFontSize:= edRulerFSize.Value;
       ed.OptMouseDragDrop:= chkDnD.Checked;
@@ -515,7 +515,7 @@ begin
       ed.OptIndentSize:= edIndent.Value;
       ed.OptIndentKeepsAlign:= chkUninKeep.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
-      ed.OptShowGutterNumberBG:= chkShowNumBg.Checked;
+      ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
 
       ed.Gutter.Update;
       ed.Update;

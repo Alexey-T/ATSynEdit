@@ -1,7 +1,7 @@
 object fmOpt: TfmOpt
-  Left = 474
+  Left = 424
   Height = 357
-  Top = 199
+  Top = 232
   Width = 640
   BorderStyle = bsDialog
   Caption = 'Opts'
@@ -486,7 +486,7 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 23
         Top = 12
-        Width = 66
+        Width = 72
         Increment = 1000
         MaxValue = 100000
         MinValue = 1000
@@ -494,7 +494,7 @@ object fmOpt: TfmOpt
         Value = 1000
       end
       object Label6: TLabel
-        Left = 80
+        Left = 88
         Height = 15
         Top = 16
         Width = 55

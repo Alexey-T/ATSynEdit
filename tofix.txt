@@ -1,0 +1,1 @@
+sel-all, paste(2 lns), undo.==> last line empty (no eol) added/ incorrect undo
