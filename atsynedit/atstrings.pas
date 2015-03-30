@@ -135,7 +135,8 @@ type
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
     procedure SetGroupMark;
-    procedure Undo;
+    function UndoSingle: boolean;
+    procedure UndoGrouped(AGrouped: boolean);
   end;
 
 implementation
@@ -676,7 +677,7 @@ begin
     FUndoList.GroupMark:= true;
 end;
 
-procedure TATStrings.Undo;
+function TATStrings.UndoSingle: boolean;
 var
   Item: TATUndoItem;
   AAction: TATEditAction;
@@ -685,6 +686,7 @@ var
   AEnd: TATLineEnds;
   ACarets: TPointArray;
 begin
+  Result:= true;
   if FReadOnly then Exit;
   if not Assigned(FUndoList) then Exit;
 
@@ -695,6 +697,7 @@ begin
   AText:= Item.ItemText;
   AEnd:= Item.ItemEnd;
   ACarets:= Item.ItemCarets;
+  Result:= Item.GroupMark;
 
   Item:= nil;
   FUndoList.DeleteLast;
@@ -729,6 +732,15 @@ begin
   finally
     FUndoList.Locked:= false;
   end;
+end;
+
+procedure TATStrings.UndoGrouped(AGrouped: boolean);
+var
+  bEnd: boolean;
+begin
+  repeat
+    bEnd:= UndoSingle;
+  until (not AGrouped) or bEnd;
 end;
 
 function TATStrings.DebugText: atString;

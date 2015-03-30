@@ -291,6 +291,7 @@ type
     FMinimapVisible: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptGroupedUndo: boolean;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
     FOptRulerVisible: boolean;
@@ -611,6 +612,7 @@ type
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
     property OptShowCaretNumberBG: boolean read FOptShowCaretNumberBG write FOptShowCaretNumberBG;
+    property OptGroupedUndo: boolean read FOptGroupedUndo write FOptGroupedUndo;
   end;
 
 implementation
@@ -1662,6 +1664,7 @@ begin
   FOptShowCaretNumberBG:= true;
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
+  FOptGroupedUndo:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;

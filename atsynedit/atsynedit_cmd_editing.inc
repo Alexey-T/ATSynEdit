@@ -459,7 +459,7 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  Strings.Undo;
+  Strings.UndoGrouped(FOptGroupedUndo);
   Result:= [cResultText, cResultCaretAny];
 end;
 

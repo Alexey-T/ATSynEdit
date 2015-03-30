@@ -149,7 +149,6 @@
       <Unit25>
         <Filename Value="..\..\atsynedit\atstrings_undo.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStrings_Undo"/>
       </Unit25>
     </Units>
   </ProjectOptions>
