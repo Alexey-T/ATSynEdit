@@ -13,10 +13,11 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkShowNumBg: TCheckBox;
+    chkTabSp: TCheckBox;
     chkUndoSv: TCheckBox;
     chkUndoGr: TCheckBox;
     chkCutNoSel: TCheckBox;
-    chkShowNumBg: TCheckBox;
     chkDotLn: TCheckBox;
     chkClickNm: TCheckBox;
     chkCrUnfocus: TCheckBox;
@@ -46,7 +47,6 @@ type
     chkLastOnTop: TCheckBox;
     chkOvrPaste: TCheckBox;
     chkRepSpec: TCheckBox;
-    chkTabSp: TCheckBox;
     edAutoInd: TComboBox;
     edCrShape: TComboBox;
     edCrShape2: TComboBox;
@@ -106,24 +106,24 @@ procedure TfmOpt.InitShape(ed: TCombobox);
 begin
   ed.Items.Clear;
   ed.Items.Add('full');
-  ed.Items.Add('vert1px');
-  ed.Items.Add('vert2px');
-  ed.Items.Add('vert3px');
-  ed.Items.Add('vert4px');
-  ed.Items.Add('vert10percent');
-  ed.Items.Add('vert20percent');
-  ed.Items.Add('vert30percent');
-  ed.Items.Add('vert40percent');
-  ed.Items.Add('vert50percent');
-  ed.Items.Add('horz1px');
-  ed.Items.Add('horz2px');
-  ed.Items.Add('horz3px');
-  ed.Items.Add('horz4px');
-  ed.Items.Add('horz10percent');
-  ed.Items.Add('horz20percent');
-  ed.Items.Add('horz30percent');
-  ed.Items.Add('horz40percent');
-  ed.Items.Add('horz50percent');
+  ed.Items.Add('vert 1px');
+  ed.Items.Add('vert 2px');
+  ed.Items.Add('vert 3px');
+  ed.Items.Add('vert 4px');
+  ed.Items.Add('vert 10%');
+  ed.Items.Add('vert 20%');
+  ed.Items.Add('vert 30%');
+  ed.Items.Add('vert 40%');
+  ed.Items.Add('vert 50%');
+  ed.Items.Add('horz 1px');
+  ed.Items.Add('horz 2px');
+  ed.Items.Add('horz 3px');
+  ed.Items.Add('horz 4px');
+  ed.Items.Add('horz 10%');
+  ed.Items.Add('horz 20%');
+  ed.Items.Add('horz 30%');
+  ed.Items.Add('horz 40%');
+  ed.Items.Add('horz 50%');
 end;
 
 end.
