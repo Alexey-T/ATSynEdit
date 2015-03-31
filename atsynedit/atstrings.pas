@@ -39,6 +39,7 @@ type
     ItemBm: integer;
     ItemBmColor: integer;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
+    function IsFake: boolean;
   end;
 
 type
@@ -78,6 +79,7 @@ type
     function GetRedoCount: integer;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
+    function IsLastFakeLineUnneeded: boolean;
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddLastFake;
@@ -101,6 +103,7 @@ type
     procedure SetUndoLimit(AValue: integer);
     function DoUndoSingle(AUndoList: TATUndoList): boolean;
     procedure DoClearUndo(ALocked: boolean = false);
+    procedure DoDeleteDupFakeLines;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -223,6 +226,11 @@ begin
   ItemCached:= false;
   ItemBm:= 0;
   ItemBmColor:= 0;
+end;
+
+function TATStringItem.IsFake: boolean;
+begin
+  Result:= (ItemString='') and (ItemEnd=cEndNone);
 end;
 
 { TATStrings }
@@ -441,11 +449,16 @@ begin
 end;
 
 function TATStrings.IsLastLineFake: boolean;
-var
-  Item: TATStringItem;
 begin
-  Item:= TATStringItem(FList.Last);
-  Result:= Assigned(Item) and (Item.ItemString='') and (Item.ItemEnd=cEndNone);
+  Result:= (Count>0) and
+    (TATStringItem(FList.Last).IsFake);
+end;
+
+function TATStrings.IsLastFakeLineUnneeded: boolean;
+begin
+  Result:= (Count>1) and
+    (TATStringItem(FList.Last).IsFake) and
+    (TATStringItem(FList[FList.Count-2]).ItemEnd=cEndNone);
 end;
 
 procedure TATStrings.LineDeleteLastFake;
@@ -555,9 +568,9 @@ begin
 
     Item.Free;
     FList.Delete(N);
-  end
-  else
-    raise Exception.Create('Invalid Delete index: '+IntToStr(N));
+  end;
+  //else
+  //  raise Exception.Create('Invalid Delete index: '+IntToStr(N));
 
   if AForceLast then
     LineAddLastFake;
@@ -678,7 +691,6 @@ begin
       cEditActionChange:
         begin
           Lines[AIndex]:= AText;
-          LinesEnds[AIndex]:= AEnd;
         end;
 
       cEditActionChangeEol:
@@ -688,7 +700,8 @@ begin
 
       cEditActionInsert:
         begin
-          LineDelete(AIndex);
+          if IsIndexValid(AIndex) then
+            LineDelete(AIndex);
         end;
 
       cEditActionDelete:
@@ -704,6 +717,7 @@ begin
     end;
 
     SetCaretsArray(ACarets);
+    DoDeleteDupFakeLines;
   finally
     AUndoList.Locked:= false;
   end;
@@ -787,6 +801,12 @@ begin
     FRedoList.Clear;
     FRedoList.Locked:= ALocked;
   end;
+end;
+
+procedure TATStrings.DoDeleteDupFakeLines;
+begin
+  while IsLastFakeLineUnneeded do
+    LineDelete(Count-1, false);
 end;
 
 

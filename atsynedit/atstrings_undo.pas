@@ -167,15 +167,27 @@ var
 begin
   if FLocked then Exit;
 
-  //not dup?
+  //not dup change?
   if (Count>0) and (AAction in [cEditActionChange, cEditActionChangeEol]) then
-    begin
-      Item:= Items[Count-1];
-      if (Item.ItemAction=AAction) and
-        (Item.ItemIndex=AIndex) and
-        (Item.ItemText=AText) then
-          Exit;
-    end;
+  begin
+    Item:= Items[Count-1];
+    if (Item.ItemAction=AAction) and
+      (Item.ItemIndex=AIndex) and
+      (Item.ItemText=AText) then
+        Exit;
+  end;
+
+  //not insert/delete same index?
+  if (Count>0) and (AAction=cEditActionDelete) then
+  begin
+    Item:= Items[Count-1];
+    if (Item.ItemAction=cEditActionInsert) and
+      (Item.ItemIndex=AIndex) then
+      begin
+        DeleteLast;
+        Exit
+      end;
+  end;
 
   Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, FGroupMark, ACarets);
   FList.Add(Item);
@@ -192,7 +204,7 @@ var
   Item: TATUndoItem;
 begin
   s:= '';
-  for i:= 0 to Min(20, Count)-1 do
+  for i:= 0 to Min(40, Count)-1 do
   begin
     Item:= Items[i];
     case Item.ItemAction of
@@ -201,15 +213,13 @@ begin
       cEditActionDelete: sa:= 'del';
       cEditActionInsert: sa:= 'ins';
     end;
-    if IsItemsEqual(i, i-1) then
-      s1:= 'same'
-    else
-      s1:= '';
-    s:= s+Format('action %s, text "%s", %s', [
-      sa, UTF8Encode(Item.ItemText), s1
+    if Item.ItemEnd=cEndNone then
+      s1:= '-' else s1:= '';
+    s:= s+Format('%s, text "%s", %s, index %d', [
+      sa, UTF8Encode(Item.ItemText), s1, Item.ItemIndex
       ])+#13;
   end;
-  ShowMessage(s);
+  ShowMessage('Undo list:'#13+s);
 end;
 
 function TATUndoList.Last: TATUndoItem;
