@@ -144,17 +144,7 @@ end;
 
 procedure TATStrings.LoadFromStream(Stream: TStream);
 begin
-  if Assigned(FUndoList) then
-  begin
-    FUndoList.Clear;
-    FUndoList.Locked:= true;
-  end;
-  if Assigned(FRedoList) then
-  begin
-    FRedoList.Clear;
-    FRedoList.Locked:= true;
-  end;
-
+  ClearUndoRedo(true);
   DoLoadFromStream(Stream);
   DoFinalizeLoading;
 end;
@@ -177,17 +167,7 @@ begin
   DoDetectEndings;
   LineAddLastFake;
   DoResetLineStates(false);
-
-  if Assigned(FUndoList) then
-  begin
-    FUndoList.Clear;
-    FUndoList.Locked:= false;
-  end;
-  if Assigned(FRedoList) then
-  begin
-    FRedoList.Clear;
-    FRedoList.Locked:= false;
-  end;
+  ClearUndoRedo;
 end;
 
 

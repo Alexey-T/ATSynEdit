@@ -1,7 +1,7 @@
 object fmOpt: TfmOpt
-  Left = 429
+  Left = 422
   Height = 357
-  Top = 122
+  Top = 225
   Width = 640
   BorderStyle = bsDialog
   Caption = 'Opts'

@@ -1685,6 +1685,9 @@ begin
 
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitDefaultPopupMenu;
+
+  //UpdateCaretsCoords;
+  //DoPaintModeBlinking;
 end;
 
 destructor TATSynEdit.Destroy;

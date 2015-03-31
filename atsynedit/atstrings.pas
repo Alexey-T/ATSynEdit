@@ -104,6 +104,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
+    procedure ClearUndoRedo(ALocked: boolean= false);
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
@@ -422,6 +423,7 @@ begin
   FUndoAfterSave:= true;
 
   LineAddLastFake;
+  ClearUndoRedo;
 end;
 
 destructor TATStrings.Destroy;
@@ -772,6 +774,21 @@ procedure TATStrings.Redo(AGrouped: boolean);
 begin
   DoUndoRedo(false, AGrouped);
 end;
+
+procedure TATStrings.ClearUndoRedo(ALocked: boolean = false);
+begin
+  if Assigned(FUndoList) then
+  begin
+    FUndoList.Clear;
+    FUndoList.Locked:= ALocked;
+  end;
+  if Assigned(FRedoList) then
+  begin
+    FRedoList.Clear;
+    FRedoList.Locked:= ALocked;
+  end;
+end;
+
 
 
 {$I atstrings_editing.inc}

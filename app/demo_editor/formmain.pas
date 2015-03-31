@@ -163,6 +163,7 @@ var
 begin
   if wait then UpdateChecks;
   wait:= false;
+  ActiveControl:= ed;
 
   fn:= FDir+'\fn.txt';
   if FileExists(fn) then
