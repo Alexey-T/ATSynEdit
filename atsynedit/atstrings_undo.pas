@@ -11,6 +11,7 @@ uses
 type
   TATEditAction = (
     cEditActionChange,
+    cEditActionChangeEol,
     cEditActionInsert,
     cEditActionDelete
     );
@@ -167,8 +168,7 @@ begin
   if FLocked then Exit;
 
   //not dup?
-  if (Count>0) and
-    (AAction=cEditActionChange) then
+  if (Count>0) and (AAction in [cEditActionChange, cEditActionChangeEol]) then
     begin
       Item:= Items[Count-1];
       if (Item.ItemAction=AAction) and
@@ -197,6 +197,7 @@ begin
     Item:= Items[i];
     case Item.ItemAction of
       cEditActionChange: sa:= 'ch';
+      cEditActionChangeEol: sa:= 'eol';
       cEditActionDelete: sa:= 'del';
       cEditActionInsert: sa:= 'ins';
     end;

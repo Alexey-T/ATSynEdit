@@ -73,8 +73,12 @@ begin
   DoResetLineStates(true);
 
   if not FUndoAfterSave then
+  begin
     if Assigned(FUndoList) then
       FUndoList.Clear;
+    if Assigned(FRedoList) then
+      FRedoList.Clear;
+  end;
 end;
 
 

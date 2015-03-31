@@ -133,7 +133,7 @@ uses
 
 const
   cColorBmLine = clMoneyGreen;
-  cColorBmIco = $909090;
+  cColorBmIco = clMedGray;
 
 { TfmMain }
 

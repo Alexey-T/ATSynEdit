@@ -367,7 +367,7 @@ begin
   begin
     Item:= TATStringItem(FList[Index]);
 
-    DoAddUndo(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
+    DoAddUndo(cEditActionChangeEol, Index, '', Item.ItemEnd);
 
     Item.ItemEnd:= AValue;
     if Item.ItemState<>cLineStateAdded then
@@ -426,11 +426,14 @@ end;
 
 destructor TATStrings.Destroy;
 begin
+  FUndoList.Locked:= true;
+  FRedoList.Locked:= true;
+
   Clear;
   FreeAndNil(FList);
 
-  FreeAndNil(FRedoList);
   FreeAndNil(FUndoList);
+  FreeAndNil(FRedoList);
 
   inherited;
 end;
@@ -673,6 +676,11 @@ begin
       cEditActionChange:
         begin
           Lines[AIndex]:= AText;
+          LinesEnds[AIndex]:= AEnd;
+        end;
+
+      cEditActionChangeEol:
+        begin
           LinesEnds[AIndex]:= AEnd;
         end;
 

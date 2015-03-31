@@ -1,8 +1,6 @@
 
-undo simple--done
 undo grouped--done
-redo simple
-redo grouped
+redo grouped--done
 
 cache WrapInfo(big file editing)
 col block

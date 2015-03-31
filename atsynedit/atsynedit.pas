@@ -2650,7 +2650,7 @@ begin
   FColors.MicromapBG:= clCream;
   FColors.StateChanged:= $00f0f0;
   FColors.StateAdded:= $20c020;
-  FColors.StateSaved:= clNavy;
+  FColors.StateSaved:= clMedGray;
 end;
 
 function TATSynEdit.GetUndoLimit: integer;
