@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ButtonPanel, Spin, ComCtrls;
+  ButtonPanel, Spin, ComCtrls, ATSynedit;
 
 type
   { TfmOpt }
@@ -90,9 +90,148 @@ type
 var
   fmOpt: TfmOpt;
 
+procedure DoConfigEditor(ed: TATSynEdit);
+
+
 implementation
 
 {$R *.lfm}
+
+procedure DoConfigEditor(ed: TATSynEdit);
+begin
+  with fmOpt do
+  begin
+    //general
+    chkCurLine.Checked:= ed.OptShowCurLine;
+    chkCurCol.Checked:= ed.OptShowCurColumn;
+    chkLastOnTop.Checked:= ed.OptLastLineOnTop;
+    chkColorSel.Checked:= ed.OptHiliteSelFull;
+    chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
+    chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
+    chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
+    chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
+    chkDotLn.Checked:= ed.OptShowIndentLines;
+    edChars.Text:= ed.OptWordChars;
+
+    //caret
+    chkCrVirt.Checked:= ed.OptCaretVirtual;
+    chkCrMul.Checked:= ed.OptCaretManyAllowed;
+    chkCrUnfocus.Checked:= ed.OptCaretStopUnfocused;
+    edCrTime.Value:= ed.OptCaretTime;
+    edCrShape.ItemIndex:= Ord(ed.OptCaretShape);
+    edCrShape2.ItemIndex:= Ord(ed.OptCaretShapeOvr);
+
+    //gutter
+    edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
+    edRulerSize.Value:= ed.OptRulerSize;
+    edRulerFSize.Value:= ed.OptRulerFontSize;
+    chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
+
+    chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
+    chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
+    chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
+    chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
+    edSizeBm.Value:= ed.Gutter[ed.GutterBandBm].Size;
+    edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
+    edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
+
+    //key
+    chkTabSp.Checked:= ed.OptTabSpaces;
+    chkOvrSel.Checked:= ed.OptOverwriteSel;
+    chkNavWrap.Checked:= ed.OptKeyNavigateWrapped;
+    chkLeftRt.Checked:= ed.OptKeyLeftRightSwapSel;
+    chkHome.Checked:= ed.OptKeyHomeToNonSpace;
+    chkEnd.Checked:= ed.OptKeyEndToNonSpace;
+    chkTabInd.Checked:= ed.OptKeyTabIndents;
+    chkAutoInd.Checked:= ed.OptAutoIndent;
+    edAutoInd.ItemIndex:= Ord(ed.OptAutoIndentKind);
+    edIndent.Value:= ed.OptIndentSize;
+    chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
+    edPage.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
+
+    //mouse
+    chkClick2.Checked:= ed.OptMouse2ClickSelectsLine;
+    chkClick3.Checked:= ed.OptMouse3ClickSelectsLine;
+    chkClick2W.Checked:= ed.OptMouse2ClickDragSelectsWords;
+    chkClickNm.Checked:= ed.OptMouseGutterClickSelectsLine;
+    chkDnD.Checked:= ed.OptMouseDragDrop;
+    chkRtMove.Checked:= ed.OptMouseRightClickMovesCaret;
+
+    //undo
+    edUndo.Value:= ed.OptUndoLimit;
+    chkUndoGr.Checked:= ed.OptUndoGrouped;
+    chkUndoSv.Checked:= ed.OptUndoAfterSave;
+
+    if ShowModal=mrOk then
+    begin
+      //general
+      ed.OptShowCurLine:= chkCurLine.Checked;
+      ed.OptShowCurColumn:= chkCurCol.Checked;
+      ed.OptWordChars:= edChars.Text;
+      ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
+      ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
+      ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
+      ed.OptHiliteSelFull:= chkColorSel.Checked;
+      ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
+      ed.OptLastLineOnTop:= chkLastOnTop.Checked;
+      ed.OptShowIndentLines:= chkDotLn.Checked;
+
+      //caret
+      ed.OptCaretVirtual:= chkCrVirt.Checked;
+      ed.OptCaretTime:= edCrTime.Value;
+      ed.OptCaretShape:= TATSynCaretShape(edCrShape.ItemIndex);
+      ed.OptCaretShapeOvr:= TATSynCaretShape(edCrShape2.ItemIndex);
+      ed.OptCaretManyAllowed:= chkCrMul.Checked;
+      ed.OptCaretStopUnfocused:= chkCrUnfocus.Checked;
+
+      //gutter
+      ed.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
+      ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
+      ed.OptRulerSize:= edRulerSize.Value;
+      ed.OptRulerFontSize:= edRulerFSize.Value;
+
+      ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
+      ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
+      ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
+      ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
+      ed.Gutter[ed.GutterBandBm].Size:= edSizeBm.Value;
+      ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
+      ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
+
+      //key
+      ed.OptTabSpaces:= chkTabSp.Checked;
+      ed.OptOverwriteSel:= chkOvrSel.Checked;
+      ed.OptKeyNavigateWrapped:= chkNavWrap.Checked;
+      ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);
+      ed.OptKeyLeftRightSwapSel:= chkLeftRt.Checked;
+      ed.OptKeyHomeToNonSpace:= chkHome.Checked;
+      ed.OptKeyEndToNonSpace:= chkEnd.Checked;
+      ed.OptKeyTabIndents:= chkTabInd.Checked;
+      ed.OptAutoIndent:= chkAutoInd.Checked;
+      ed.OptAutoIndentKind:= TATAutoIndentKind(edAutoInd.ItemIndex);
+      ed.OptIndentSize:= edIndent.Value;
+      ed.OptIndentKeepsAlign:= chkUninKeep.Checked;
+
+      //mouse
+      ed.OptMouse2ClickSelectsLine:= chkClick2.Checked;
+      ed.OptMouse3ClickSelectsLine:= chkClick3.Checked;
+      ed.OptMouse2ClickDragSelectsWords:= chkClick2W.Checked;
+      ed.OptMouseGutterClickSelectsLine:= chkClickNm.Checked;
+      ed.OptMouseDragDrop:= chkDnD.Checked;
+      ed.OptMouseRightClickMovesCaret:= chkRtMove.Checked;
+
+      //undo
+      ed.OptUndoLimit:= edUndo.Value;
+      ed.OptUndoGrouped:= chkUndoGr.Checked;
+      ed.OptUndoAfterSave:= chkUndoSv.Checked;
+
+      //apply
+      ed.Gutter.Update;
+      ed.Update;
+    end;
+  end;
+end;
+
 
 { TfmOpt }
 

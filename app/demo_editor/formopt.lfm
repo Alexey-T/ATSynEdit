@@ -1,7 +1,7 @@
 object fmOpt: TfmOpt
-  Left = 424
+  Left = 429
   Height = 357
-  Top = 232
+  Top = 122
   Width = 640
   BorderStyle = bsDialog
   Caption = 'Opts'
@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet1
-    TabIndex = 0
+    ActivePage = TabSheet6
+    TabIndex = 5
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
