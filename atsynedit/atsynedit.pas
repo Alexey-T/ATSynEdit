@@ -2,6 +2,7 @@ unit ATSynEdit;
 
 {$mode delphi}
 //{$define beep_wrapinfo}
+//{$define debug_findwrapindex}
 
 interface
 
@@ -154,6 +155,7 @@ type
     function IsItemAfterCollapsed(N: integer): boolean;
     property Items[N: integer]: TATSynWrapItem read GetItem; default;
     procedure Add(AIndex, AOffset, ALen, AIndent: integer; AFinal: TATSynWrapFinal);
+    procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
   end;
 
 const
@@ -325,6 +327,7 @@ type
     FOptShowIndentLines: boolean;
     FOptShowGutterCaretBG: boolean;
     //
+    procedure DebugFindWrapIndex;
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
@@ -716,6 +719,40 @@ begin
   FList.Add(Item);
 end;
 
+procedure TATSynWrapInfo.FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
+var
+  a, b, m, dif: integer;
+begin
+  AFrom:= -1;
+  ATo:= -1;
+
+  a:= 0;
+  b:= Count-1;
+  if b<0 then Exit;
+
+  repeat
+    dif:= Items[a].NLineIndex-ALineNum;
+    if dif=0 then begin m:= a; Break end;
+
+    m:= a+b;
+    if Odd(m) then
+      m:= m div 2 +1
+    else
+      m:= m div 2;
+
+    dif:= Items[m].NLineIndex-ALineNum;
+    if dif=0 then Break;
+
+    if dif>0 then b:= m else a:= m;
+    if a=b then Exit;
+  until false;
+
+  AFrom:= m;
+  ATo:= m;
+  while (AFrom>0) and (Items[AFrom-1].NLineIndex=ALineNum) do Dec(AFrom);
+  while (ATo<Count-1) and (Items[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
+end;
+
 
 { TATSynEdit }
 
@@ -923,6 +960,32 @@ begin
       Delete(Str, 1, NLen);
     until Str='';
   end;
+
+  {$ifdef debug_findwrapindex}
+  DebugFindWrapIndex;
+  {$endif}
+end;
+
+procedure TATSynEdit.DebugFindWrapIndex;
+var
+  i, j, n1, n2: integer;
+begin
+  for i:= 0 to Strings.Count-1 do
+  begin
+    FWrapInfo.FindIndexesOfLineNumber(i, n1, n2);
+    if n1<0 then
+    begin
+      Application.MainForm.caption:= format('fail findindex: %d', [i]);
+      Exit
+    end;
+    for j:= n1 to n2 do
+      if FWrapInfo.Items[j].NLineIndex<>i then
+      begin
+        Application.MainForm.caption:= format('fail findindex: %d', [i]);
+        Exit
+      end;
+  end;
+  Application.MainForm.caption:= 'ok findindex';
 end;
 
 function TATSynEdit.GetVisibleLines: integer;
