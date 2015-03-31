@@ -23,13 +23,11 @@ type
     chkGutter: TCheckBox;
     chkRuler: TCheckBox;
     chkMinimap: TCheckBox;
-    edCaretSh: TComboBox;
     edFontsize: TSpinEdit;
     edMarRt: TSpinEdit;
     edSpaceX: TSpinEdit;
     edSpaceY: TSpinEdit;
     edTabsize: TSpinEdit;
-    edNum: TComboBox;
     FontDialog1: TFontDialog;
     gWrap: TGroupBox;
     gUnpri: TGroupBox;
@@ -37,13 +35,12 @@ type
     Label10: TLabel;
     Label11: TLabel;
     Label2: TLabel;
-    Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
-    Label7: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
+    mnuOpt: TMenuItem;
     mnuTBms: TMenuItem;
     mnuTMargin: TMenuItem;
     mnuFile: TMenuItem;
@@ -88,11 +85,9 @@ type
     procedure chkWrapOnChange(Sender: TObject);
     procedure chkWrapIndentChange(Sender: TObject);
     procedure edCaretTimeChange(Sender: TObject);
-    procedure edCaretShChange(Sender: TObject);
     procedure edEndsChange(Sender: TObject);
     procedure edFontsizeChange(Sender: TObject);
     procedure edMarRtChange(Sender: TObject);
-    procedure edNumChange(Sender: TObject);
     procedure edSpaceXChange(Sender: TObject);
     procedure edSpaceYChange(Sender: TObject);
     procedure edTabsizeChange(Sender: TObject);
@@ -240,7 +235,7 @@ end;
 procedure TfmMain.UpdateStatus;
 const
   cEnd: array[TATLineEnds] of string = ('?', 'Win', 'Unix', 'Mac');
-  cOvr: array[boolean] of string = ('Ins', 'Ovr');
+  cOvr: array[boolean] of string = ('-', 'Ovr');
   cRo: array[boolean] of string = ('-', 'RO');
 var
   sPos: string;
@@ -284,8 +279,6 @@ begin
   chkUnprintSp.Checked:= ed.OptUnprintedSpaces;
   chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
   chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
-  edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
-  edCaretSh.ItemIndex:= Ord(ed.OptCaretShape);
 end;
 
 procedure TfmMain.EditScroll(Sender: TObject);
@@ -423,11 +416,14 @@ begin
     chkCurCol.Checked:= ed.OptShowCurColumn;
     chkCrVirt.Checked:= ed.OptCaretVirtual;
     edCrTime.Value:= ed.OptCaretTime;
+    edCrShape.ItemIndex:= Ord(ed.OptCaretShape);
+    edCrShape2.ItemIndex:= Ord(ed.OptCaretShapeOvr);
 
     edUndo.Value:= ed.OptUndoLimit;
     chkUndoGr.Checked:= ed.OptUndoGrouped;
     chkUndoSv.Checked:= ed.OptUndoAfterSave;
 
+    edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
     chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
@@ -474,6 +470,8 @@ begin
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptCaretVirtual:= chkCrVirt.Checked;
       ed.OptCaretTime:= edCrTime.Value;
+      ed.OptCaretShape:= TATSynCaretShape(edCrShape.ItemIndex);
+      ed.OptCaretShapeOvr:= TATSynCaretShape(edCrShape2.ItemIndex);
 
       ed.OptUndoLimit:= edUndo.Value;
       ed.OptUndoGrouped:= chkUndoGr.Checked;
@@ -487,6 +485,7 @@ begin
       ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
 
+      ed.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
       ed.OptWordChars:= edChars.Text;
       ed.OptAutoIndent:= chkAutoInd.Checked;
       ed.OptAutoIndentKind:= TATAutoIndentKind(edAutoInd.ItemIndex);
@@ -615,13 +614,6 @@ procedure TfmMain.edCaretTimeChange(Sender: TObject);
 begin
 end;
 
-procedure TfmMain.edCaretShChange(Sender: TObject);
-begin
-  if wait then Exit;
-  if edCaretSh.ItemIndex>=0 then
-    ed.OptCaretShape:= TATSynCaretShape(edCaretSh.ItemIndex);
-end;
-
 procedure TfmMain.edEndsChange(Sender: TObject);
 begin
 end;
@@ -637,13 +629,6 @@ procedure TfmMain.edMarRtChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptMarginRight:= edMarRt.Value;
-end;
-
-procedure TfmMain.edNumChange(Sender: TObject);
-begin
-  if wait then Exit;
-  ed.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
-  ed.Update;
 end;
 
 procedure TfmMain.edSpaceXChange(Sender: TObject);

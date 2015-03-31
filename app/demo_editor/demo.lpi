@@ -141,6 +141,7 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formopt"/>
       </Unit23>
       <Unit24>
         <Filename Value="..\..\atsynedit\atstrings_load.inc"/>
@@ -149,7 +150,6 @@
       <Unit25>
         <Filename Value="..\..\atsynedit\atstrings_undo.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStrings_Undo"/>
       </Unit25>
       <Unit26>
         <Filename Value="..\..\atsynedit\atstrings_save.inc"/>

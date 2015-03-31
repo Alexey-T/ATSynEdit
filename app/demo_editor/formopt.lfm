@@ -7,6 +7,7 @@ object fmOpt: TfmOpt
   Caption = 'Opts'
   ClientHeight = 357
   ClientWidth = 640
+  OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.5'
   object ButtonPanel1: TButtonPanel
@@ -234,6 +235,30 @@ object fmOpt: TfmOpt
         Width = 51
         Caption = 'ruler sizes'
         ParentColor = False
+      end
+      object Label10: TLabel
+        Left = 96
+        Height = 15
+        Top = 72
+        Width = 47
+        Caption = 'numbers'
+        ParentColor = False
+      end
+      object edNum: TComboBox
+        Left = 106
+        Height = 23
+        Top = 92
+        Width = 112
+        ItemHeight = 15
+        Items.Strings = (
+          'all'
+          'none'
+          'each 10th'
+          'each 5th'
+          'with carets'
+        )
+        Style = csDropDownList
+        TabOrder = 9
       end
     end
     object TabSheet5: TTabSheet
@@ -476,6 +501,42 @@ object fmOpt: TfmOpt
         Width = 112
         Caption = 'stop if unfocused'
         TabOrder = 3
+      end
+      object Label7: TLabel
+        Left = 128
+        Height = 15
+        Top = 232
+        Width = 31
+        Caption = 'shape'
+        ParentColor = False
+      end
+      object edCrShape: TComboBox
+        Left = 8
+        Height = 23
+        Top = 228
+        Width = 114
+        DropDownCount = 40
+        ItemHeight = 15
+        Style = csDropDownList
+        TabOrder = 4
+      end
+      object edCrShape2: TComboBox
+        Left = 8
+        Height = 23
+        Top = 256
+        Width = 113
+        DropDownCount = 40
+        ItemHeight = 15
+        Style = csDropDownList
+        TabOrder = 5
+      end
+      object Label9: TLabel
+        Left = 128
+        Height = 15
+        Top = 260
+        Width = 54
+        Caption = 'shape, ovr'
+        ParentColor = False
       end
     end
     object TabSheet6: TTabSheet

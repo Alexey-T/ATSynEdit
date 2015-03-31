@@ -151,23 +151,6 @@ object fmMain: TfmMain
         TabOrder = 3
       end
     end
-    object edNum: TComboBox
-      Left = 152
-      Height = 23
-      Top = 308
-      Width = 112
-      ItemHeight = 15
-      Items.Strings = (
-        'all'
-        'none'
-        'each 10th'
-        'each 5th'
-        'with carets'
-      )
-      OnChange = edNumChange
-      Style = csDropDownList
-      TabOrder = 14
-    end
     object edFontsize: TSpinEdit
       Left = 8
       Height = 23
@@ -297,54 +280,6 @@ object fmMain: TfmMain
       OnClick = bOptClick
       TabOrder = 5
     end
-    object Label3: TLabel
-      Left = 152
-      Height = 15
-      Top = 292
-      Width = 47
-      Caption = 'numbers'
-      ParentColor = False
-    end
-    object edCaretSh: TComboBox
-      Left = 152
-      Height = 23
-      Top = 260
-      Width = 112
-      DropDownCount = 40
-      ItemHeight = 15
-      Items.Strings = (
-        'full'
-        'vert1px'
-        'vert2px'
-        'vert3px'
-        'vert4px'
-        'vert10percent'
-        'vert20percent'
-        'vert30percent'
-        'vert40percent'
-        'vert50percent'
-        'horz1px'
-        'horz2px'
-        'horz3px'
-        'horz4px'
-        'horz10percent'
-        'horz20percent'
-        'horz30percent'
-        'horz40percent'
-        'horz50percent'
-      )
-      OnChange = edCaretShChange
-      Style = csDropDownList
-      TabOrder = 13
-    end
-    object Label7: TLabel
-      Left = 152
-      Height = 15
-      Top = 244
-      Width = 31
-      Caption = 'carets'
-      ParentColor = False
-    end
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]
@@ -423,6 +358,11 @@ object fmMain: TfmMain
     end
     object mnuHlp: TMenuItem
       Caption = 'Help'
+      object mnuOpt: TMenuItem
+        Caption = 'Opts..'
+        ShortCut = 120
+        OnClick = bOptClick
+      end
       object mnuKey: TMenuItem
         Caption = 'Commands..'
         ShortCut = 112
