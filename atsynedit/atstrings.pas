@@ -65,7 +65,7 @@ type
     FOnSetCaretsArray: TATStringsSetCarets;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
-    function DebugText: atString;
+    function DebugText: string;
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TPointArray;
@@ -723,13 +723,17 @@ begin
   end;
 end;
 
-function TATStrings.DebugText: atString;
+function TATStrings.DebugText: string;
 var
+  Item: TATStringItem;
   i: integer;
 begin
   Result:= '';
-  for i:= 0 to Min(10, Count-1) do
-    Result:= Result+Format('[%d] "%s" <%s>', [i, Lines[i], cLineEndNiceNames[LinesEnds[i]] ])+#13;
+  for i:= 0 to Min(20, Count-1) do
+  begin
+    Item:= TATStringItem(FList[i]);
+    Result:= Result+Format('[%d] "%s" <%s>', [i, UTF8Encode(Item.ItemString), cLineEndNiceNames[Item.ItemEnd] ])+#13;
+  end;
 end;
 
 function TATStrings.GetCaretsArray: TPointArray;
