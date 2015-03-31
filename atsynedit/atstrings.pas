@@ -35,7 +35,6 @@ type
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
     ItemHidden: integer; //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
-    ItemCached: boolean; //for UpdateWrapInfo
     ItemBm: integer;
     ItemBmColor: integer;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
@@ -52,6 +51,7 @@ type
   TATStrings = class
   private
     FList: TList;
+    FListUpdates: TList;
     FUndoList,
     FRedoList: TATUndoList;
     FEndings: TATLineEnds;
@@ -72,7 +72,6 @@ type
     function GetLine(N: integer): atString;
     function GetLineBm(Index: integer): integer;
     function GetLineBmColor(Index: integer): integer;
-    function GetLineCached(Index: integer): boolean;
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(N: integer): integer;
     function GetLineState(Index: integer): TATLineState;
@@ -91,7 +90,6 @@ type
     procedure SetLine(Index: integer; const AValue: atString);
     procedure SetLineBm(Index: integer; AValue: integer);
     procedure SetLineBmColor(Index: integer; AValue: integer);
-    procedure SetLineCached(Index: integer; AValue: boolean);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
     procedure SetLineHidden(Index: integer; AValue: integer);
     procedure SetLineState(Index: integer; AValue: TATLineState);
@@ -104,6 +102,7 @@ type
     function DoUndoSingle(AUndoList: TATUndoList): boolean;
     procedure DoClearUndo(ALocked: boolean = false);
     procedure DoDeleteDupFakeLines;
+    procedure DoAddUpdate(N: integer);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -117,13 +116,13 @@ type
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[Index: integer]: integer read GetLineHidden write SetLineHidden;
-    property LinesCached[Index: integer]: boolean read GetLineCached write SetLineCached;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesBmColor[Index: integer]: integer read GetLineBmColor write SetLineBmColor;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
     property Endings: TATLineEnds read FEndings write SetEndings;
+    property ListUpdates: TList read FListUpdates;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const Filename: string);
@@ -223,7 +222,6 @@ begin
   ItemEnd:= AEnd;
   ItemState:= cLineStateNone;
   ItemHidden:= 0;
-  ItemCached:= false;
   ItemBm:= 0;
   ItemBmColor:= 0;
 end;
@@ -257,14 +255,6 @@ begin
     Result:= TATStringItem(FList[Index]).ItemBmColor
   else
     Result:= 0;
-end;
-
-function TATStrings.GetLineCached(Index: integer): boolean;
-begin
-  if IsIndexValid(Index) then
-    Result:= TATStringItem(FList[Index]).ItemCached
-  else
-    Result:= false;
 end;
 
 function TATStrings.GetLineEnd(N: integer): TATLineEnds;
@@ -342,7 +332,6 @@ begin
 
     Item.ItemString:= AValue;
     Item.ItemHidden:= 0;
-    Item.ItemCached:= false;
     if Item.ItemState<>cLineStateAdded then
       Item.ItemState:= cLineStateChanged;
   end;
@@ -358,12 +347,6 @@ procedure TATStrings.SetLineBmColor(Index: integer; AValue: integer);
 begin
   if IsIndexValid(Index) then
     TATStringItem(FList[Index]).ItemBmColor:= AValue;
-end;
-
-procedure TATStrings.SetLineCached(Index: integer; AValue: boolean);
-begin
-  if IsIndexValid(Index) then
-    TATStringItem(FList[Index]).ItemCached:= AValue;
 end;
 
 procedure TATStrings.SetLineEnd(Index: integer; AValue: TATLineEnds);
@@ -419,6 +402,7 @@ end;
 constructor TATStrings.Create;
 begin
   FList:= TList.Create;
+  FListUpdates:= TList.Create;
   FUndoList:= TATUndoList.Create;
   FRedoList:= TATUndoList.Create;
 
@@ -440,6 +424,7 @@ begin
   FRedoList.Locked:= true;
 
   Clear;
+  FreeAndNil(FListUpdates);
   FreeAndNil(FList);
 
   FreeAndNil(FUndoList);
@@ -750,6 +735,7 @@ end;
 
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
 begin
+  DoAddUpdate(AIndex);
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 
@@ -813,6 +799,16 @@ begin
     LineDelete(Count-1, false);
 end;
 
+procedure TATStrings.DoAddUpdate(N: integer);
+var
+  Ptr: pointer;
+begin
+  Ptr:= pointer{%H-}(N);
+  if Assigned(FListUpdates) then
+    with FListUpdates do
+      if IndexOf(Ptr)<0 then
+        Add(Ptr);
+end;
 
 
 {$I atstrings_editing.inc}
