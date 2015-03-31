@@ -144,7 +144,7 @@ end;
 
 procedure TATStrings.LoadFromStream(Stream: TStream);
 begin
-  ClearUndoRedo(true);
+  DoClearUndo(true);
   DoLoadFromStream(Stream);
   DoFinalizeLoading;
 end;
@@ -166,8 +166,8 @@ procedure TATStrings.DoFinalizeLoading;
 begin
   DoDetectEndings;
   LineAddLastFake;
-  DoResetLineStates(false);
-  ClearUndoRedo;
+  DoClearLineStates(false);
+  DoClearUndo;
 end;
 
 

@@ -97,14 +97,14 @@ type
     procedure DoLoadFromStream(Stream: TStream);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
-    procedure DoResetLineStates(ASaved: boolean);
+    procedure DoClearLineStates(ASaved: boolean);
     procedure SetUndoLimit(AValue: integer);
     function DoUndoSingle(AUndoList: TATUndoList): boolean;
+    procedure DoClearUndo(ALocked: boolean = false);
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    procedure ClearUndoRedo(ALocked: boolean= false);
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
@@ -423,7 +423,7 @@ begin
   FUndoAfterSave:= true;
 
   LineAddLastFake;
-  ClearUndoRedo;
+  DoClearUndo;
 end;
 
 destructor TATStrings.Destroy;
@@ -571,7 +571,7 @@ begin
     LineDelete(i, false);
 end;
 
-procedure TATStrings.DoResetLineStates(ASaved: boolean);
+procedure TATStrings.DoClearLineStates(ASaved: boolean);
 var
   Item: TATStringItem;
   i: integer;
@@ -775,7 +775,7 @@ begin
   DoUndoRedo(false, AGrouped);
 end;
 
-procedure TATStrings.ClearUndoRedo(ALocked: boolean = false);
+procedure TATStrings.DoClearUndo(ALocked: boolean = false);
 begin
   if Assigned(FUndoList) then
   begin

@@ -70,10 +70,10 @@ end;
 
 procedure TATStrings.DoFinalizeSaving;
 begin
-  DoResetLineStates(true);
+  DoClearLineStates(true);
 
   if not FUndoAfterSave then
-    ClearUndoRedo;
+    DoClearUndo;
 end;
 
 

@@ -98,7 +98,6 @@ procedure TATKeyMapping.Add(ACmd: integer; const AName: string; const AKeys1,
   AKeys2: array of string);
 var
   Item: TATKeyMappingItem;
-  Sh: TShortcut;
   i: integer;
 begin
   Item:= TATKeyMappingItem.Create;
