@@ -725,12 +725,15 @@ begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 
+  if not FUndoList.Locked and not FRedoList.Locked then
+    FRedoList.Clear;
+
   if not FUndoList.Locked then
   begin
-    FRedoList.Clear;
     FUndoList.Add(AAction, AIndex, AText, AEnd, GetCaretsArray);
   end
   else
+  if not FRedoList.Locked then
   begin
     FRedoList.Add(AAction, AIndex, AText, AEnd, GetCaretsArray);
   end;
@@ -745,15 +748,11 @@ begin
   if not Assigned(FRedoList) then Exit;
 
   if AUndo then List:= FUndoList else List:= FRedoList;
-  FUndoList.Locked:= AUndo;
-  FRedoList.Locked:= not AUndo;
+  //List.DebugShow;
 
   repeat
     bEnd:= DoUndoSingle(List);
   until (not AGrouped) or bEnd;
-
-  FUndoList.Locked:= false;
-  FRedoList.Locked:= false;
 end;
 
 procedure TATStrings.Undo(AGrouped: boolean);

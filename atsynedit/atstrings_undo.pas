@@ -27,8 +27,7 @@ type
     GroupMark: boolean;
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; AGroupMark: boolean;
-      const ACarets: TPointArray);
-  virtual;
+      const ACarets: TPointArray); virtual;
   end;
 
 type
@@ -45,6 +44,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     function IsIndexValid(N: integer): boolean;
+    function IsItemsEqual(N1, N2: integer): boolean;
     function Count: integer;
     function Last: TATUndoItem;
     property Items[N: integer]: TATUndoItem read GetItem; default;
@@ -56,13 +56,14 @@ type
     procedure DeleteLast;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; const ACarets: TPointArray);
+    procedure DebugShow;
   end;
 
 
 implementation
 
 uses
-  Dialogs;
+  Math, Dialogs;
 
 { TATUndoItem }
 
@@ -120,6 +121,21 @@ begin
   Result:= (N>=0) and (N<Count);
 end;
 
+function TATUndoList.IsItemsEqual(N1, N2: integer): boolean;
+var
+  i1, i2: TATUndoItem;
+begin
+  Result:= false;
+  i1:= Items[N1];
+  i2:= Items[N2];
+  if not Assigned(i1) or not Assigned(i2) then Exit;
+  Result:=
+    (i1.ItemAction=cEditActionChange) and
+    (i1.ItemAction=i2.ItemAction) and
+    (i1.ItemIndex=i2.ItemIndex) and
+    (i1.ItemText=i2.ItemText);
+end;
+
 procedure TATUndoList.Delete(N: integer);
 begin
   if IsIndexValid(N) then
@@ -150,12 +166,49 @@ var
 begin
   if FLocked then Exit;
 
+  //not dup?
+  if (Count>0) and
+    (AAction=cEditActionChange) then
+    begin
+      Item:= Items[Count-1];
+      if (Item.ItemAction=AAction) and
+        (Item.ItemIndex=AIndex) and
+        (Item.ItemText=AText) then
+          Exit;
+    end;
+
   Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, FGroupMark, ACarets);
   FList.Add(Item);
   FGroupMark:= false;
 
   while Count>MaxCount do
     Delete(0);
+end;
+
+procedure TATUndoList.DebugShow;
+var
+  i: integer;
+  s, sa, s1: string;
+  Item: TATUndoItem;
+begin
+  s:= '';
+  for i:= 0 to Min(20, Count)-1 do
+  begin
+    Item:= Items[i];
+    case Item.ItemAction of
+      cEditActionChange: sa:= 'ch';
+      cEditActionDelete: sa:= 'del';
+      cEditActionInsert: sa:= 'ins';
+    end;
+    if IsItemsEqual(i, i-1) then
+      s1:= 'same'
+    else
+      s1:= '';
+    s:= s+Format('action %s, text "%s", %s', [
+      sa, UTF8Encode(Item.ItemText), s1
+      ])+#13;
+  end;
+  ShowMessage(s);
 end;
 
 function TATUndoList.Last: TATUndoItem;

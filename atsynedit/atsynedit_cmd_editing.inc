@@ -468,6 +468,7 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
+  Strings.SetGroupMark;
   Strings.Redo(FOptUndoGrouped);
   Result:= [cResultText, cResultCaretBottom];
 end;

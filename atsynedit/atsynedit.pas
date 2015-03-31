@@ -2490,12 +2490,13 @@ var
 begin
   for i:= 0 to FMenu.Items.Count-1 do
     with FMenu.Items[i] do
-      if (Tag=cCommand_ClipboardCut) or
-        (Tag=cCommand_ClipboardPaste) or
-        (Tag=cCommand_TextDeleteSelection) or
-        (Tag=cCommand_Undo) or
-        (Tag=cCommand_Redo) then
-        Enabled:= not ModeReadOnly;
+      case Tag of
+        cCommand_ClipboardCut: Enabled:= not ModeReadOnly;
+        cCommand_ClipboardPaste: Enabled:= not ModeReadOnly and Clipboard.HasFormat(CF_Text);
+        cCommand_TextDeleteSelection: Enabled:= not ModeReadOnly and Carets.IsSelection;
+        cCommand_Undo: Enabled:= not ModeReadOnly and (UndoCount>0);
+        cCommand_Redo: Enabled:= not ModeReadOnly and (RedoCount>0);
+      end;
 end;
 
 procedure TATSynEdit.DoInitDefaultPopupMenu;
