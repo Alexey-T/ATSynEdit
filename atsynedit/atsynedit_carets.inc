@@ -356,12 +356,14 @@ end;
 
 function TATSynEdit.GetCaretsArray: TPointArray;
 begin
-  Result:= Carets.SaveToArray;
+  if Assigned(FCarets) then
+    Result:= FCarets.SaveToArray;
 end;
 
 procedure TATSynEdit.SetCaretsArray(const L: TPointArray);
 begin
-  Carets.LoadFromArray(L);
+  if Assigned(FCarets) then
+    FCarets.LoadFromArray(L);
 end;
 
 

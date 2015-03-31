@@ -251,13 +251,15 @@ begin
     with ed.Carets[i] do
       sPos:= sPos+Format(' %d:%d', [PosY+1, PosX+1]);
 
-  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s | %s', [
+  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s | %s | Undo: %d, Redo: %d', [
     sPos,
     ed.Carets.Count,
     ed.ScrollTop+1,
     cEnd[ed.Strings.Endings],
     cOvr[ed.ModeOver],
-    cRo[ed.ModeReadOnly]
+    cRo[ed.ModeReadOnly],
+    ed.UndoCount,
+    ed.RedoCount
     ]);
 end;
 

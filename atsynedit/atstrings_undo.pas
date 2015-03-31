@@ -38,8 +38,8 @@ type
   private
     FList: TList;
     FMaxCount: integer;
-    FLocked: boolean;
     FGroupMark: boolean;
+    FLocked: boolean;
     function GetItem(N: integer): TATUndoItem;
   public
     constructor Create; virtual;
@@ -49,8 +49,8 @@ type
     function Last: TATUndoItem;
     property Items[N: integer]: TATUndoItem read GetItem; default;
     property MaxCount: integer read FMaxCount write FMaxCount;
-    property Locked: boolean read FLocked write FLocked;
     property GroupMark: boolean read FGroupMark write FGroupMark;
+    property Locked: boolean read FLocked write FLocked;
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteLast;
@@ -99,8 +99,8 @@ constructor TATUndoList.Create;
 begin
   FList:= TList.Create;
   FMaxCount:= 5000;
-  FLocked:= false;
   FGroupMark:= false;
+  FLocked:= false;
 end;
 
 destructor TATUndoList.Destroy;

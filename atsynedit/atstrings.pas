@@ -51,7 +51,8 @@ type
   TATStrings = class
   private
     FList: TList;
-    FUndoList: TATUndoList;
+    FUndoList,
+    FRedoList: TATUndoList;
     FEndings: TATLineEnds;
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
@@ -61,8 +62,11 @@ type
     FUndoAfterSave: boolean;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
+    procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
+      const AText: atString; AEnd: TATLineEnds);
     function DebugText: atString;
     procedure DoFinalizeSaving;
+    procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TPointArray;
     function GetLine(N: integer): atString;
     function GetLineBm(Index: integer): integer;
@@ -71,6 +75,8 @@ type
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(N: integer): integer;
     function GetLineState(Index: integer): TATLineState;
+    function GetRedoCount: integer;
+    function GetUndoCount: integer;
     function GetUndoLimit: integer;
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
@@ -93,6 +99,7 @@ type
     procedure DoFinalizeLoading;
     procedure DoResetLineStates(ASaved: boolean);
     procedure SetUndoLimit(AValue: integer);
+    function DoUndoSingle(AUndoList: TATUndoList): boolean;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -138,10 +145,12 @@ type
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
     procedure SetGroupMark;
-    function UndoSingle: boolean;
     procedure Undo(AGrouped: boolean);
+    procedure Redo(AGrouped: boolean);
     property UndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
+    property UndoCount: integer read GetUndoCount;
+    property RedoCount: integer read GetRedoCount;
   end;
 
 implementation
@@ -273,12 +282,29 @@ begin
     Result:= cLineStateNone;
 end;
 
+function TATStrings.GetUndoCount: integer;
+begin
+  if Assigned(FUndoList) then
+    Result:= FUndoList.Count
+  else
+    Result:= 0;
+end;
+
+function TATStrings.GetRedoCount: integer;
+begin
+  if Assigned(FRedoList) then
+    Result:= FRedoList.Count
+  else
+    Result:= 0;
+end;
+
+
 function TATStrings.GetUndoLimit: integer;
 begin
   if Assigned(FUndoList) then
     Result:= FUndoList.MaxCount
   else
-    Result:= 5000;
+    Result:= 2000;
 end;
 
 procedure TATStrings.SetEndings(AValue: TATLineEnds);
@@ -303,10 +329,7 @@ begin
   begin
     Item:= TATStringItem(FList[Index]);
 
-    if Assigned(FUndoList) then
-    begin
-      FUndoList.Add(cEditActionChange, Index, Item.ItemString, Item.ItemEnd, GetCaretsArray);
-    end;
+    DoAddUndo(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
 
     Item.ItemString:= AValue;
     Item.ItemHidden:= 0;
@@ -344,10 +367,7 @@ begin
   begin
     Item:= TATStringItem(FList[Index]);
 
-    if Assigned(FUndoList) then
-    begin
-      FUndoList.Add(cEditActionChange, Index, Item.ItemString, Item.ItemEnd, GetCaretsArray);
-    end;
+    DoAddUndo(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
 
     Item.ItemEnd:= AValue;
     if Item.ItemState<>cLineStateAdded then
@@ -391,6 +411,7 @@ constructor TATStrings.Create;
 begin
   FList:= TList.Create;
   FUndoList:= TATUndoList.Create;
+  FRedoList:= TATUndoList.Create;
 
   FEncoding:= cEncAnsi;
   FEncodingDetect:= true;
@@ -405,10 +426,11 @@ end;
 
 destructor TATStrings.Destroy;
 begin
-  FreeAndNil(FUndoList);
-
   Clear;
   FreeAndNil(FList);
+
+  FreeAndNil(FRedoList);
+  FreeAndNil(FUndoList);
 
   inherited;
 end;
@@ -433,10 +455,7 @@ var
 begin
   if FReadOnly then Exit;
 
-  if Assigned(FUndoList) then
-  begin
-    FUndoList.Add(cEditActionInsert, Count, '', cEndNone, GetCaretsArray);
-  end;
+  DoAddUndo(cEditActionInsert, Count, '', cEndNone);
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -475,10 +494,7 @@ var
 begin
   if FReadOnly then Exit;
 
-  if Assigned(FUndoList) then
-  begin
-    FUndoList.Add(cEditActionInsert, N, '', cEndNone, GetCaretsArray);
-  end;
+  DoAddUndo(cEditActionInsert, N, '', cEndNone);
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -530,10 +546,7 @@ begin
   begin
     Item:= TATStringItem(FList[N]);
 
-    if Assigned(FUndoList) then
-    begin
-      FUndoList.Add(cEditActionDelete, N, Item.ItemString, Item.ItemEnd, GetCaretsArray);
-    end;
+    DoAddUndo(cEditActionDelete, N, Item.ItemString, Item.ItemEnd);
 
     Item.Free;
     FList.Delete(N);
@@ -629,7 +642,7 @@ begin
     FUndoList.GroupMark:= true;
 end;
 
-function TATStrings.UndoSingle: boolean;
+function TATStrings.DoUndoSingle(AUndoList: TATUndoList): boolean;
 var
   Item: TATUndoItem;
   AAction: TATEditAction;
@@ -640,9 +653,9 @@ var
 begin
   Result:= true;
   if FReadOnly then Exit;
-  if not Assigned(FUndoList) then Exit;
+  if not Assigned(AUndoList) then Exit;
 
-  Item:= FUndoList.Last;
+  Item:= AUndoList.Last;
   if Item=nil then Exit;
   AAction:= Item.ItemAction;
   AIndex:= Item.ItemIndex;
@@ -652,8 +665,8 @@ begin
   Result:= Item.GroupMark;
 
   Item:= nil;
-  FUndoList.DeleteLast;
-  FUndoList.Locked:= true;
+  AUndoList.DeleteLast;
+  AUndoList.Locked:= true;
 
   try
     case AAction of
@@ -682,17 +695,8 @@ begin
 
     SetCaretsArray(ACarets);
   finally
-    FUndoList.Locked:= false;
+    AUndoList.Locked:= false;
   end;
-end;
-
-procedure TATStrings.Undo(AGrouped: boolean);
-var
-  bEnd: boolean;
-begin
-  repeat
-    bEnd:= UndoSingle;
-  until (not AGrouped) or bEnd;
 end;
 
 function TATStrings.DebugText: atString;
@@ -714,6 +718,52 @@ procedure TATStrings.SetCaretsArray(const L: TPointArray);
 begin
   if Assigned(FOnSetCaretsArray) then
     FOnSetCaretsArray(L);
+end;
+
+procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
+begin
+  if not Assigned(FUndoList) then Exit;
+  if not Assigned(FRedoList) then Exit;
+
+  if not FUndoList.Locked then
+  begin
+    FRedoList.Clear;
+    FUndoList.Add(AAction, AIndex, AText, AEnd, GetCaretsArray);
+  end
+  else
+  begin
+    FRedoList.Add(AAction, AIndex, AText, AEnd, GetCaretsArray);
+  end;
+end;
+
+procedure TATStrings.DoUndoRedo(AUndo: boolean; AGrouped: boolean);
+var
+  List: TATUndoList;
+  bEnd: boolean;
+begin
+  if not Assigned(FUndoList) then Exit;
+  if not Assigned(FRedoList) then Exit;
+
+  if AUndo then List:= FUndoList else List:= FRedoList;
+  FUndoList.Locked:= AUndo;
+  FRedoList.Locked:= not AUndo;
+
+  repeat
+    bEnd:= DoUndoSingle(List);
+  until (not AGrouped) or bEnd;
+
+  FUndoList.Locked:= false;
+  FRedoList.Locked:= false;
+end;
+
+procedure TATStrings.Undo(AGrouped: boolean);
+begin
+  DoUndoRedo(true, AGrouped);
+end;
+
+procedure TATStrings.Redo(AGrouped: boolean);
+begin
+  DoUndoRedo(false, AGrouped);
 end;
 
 

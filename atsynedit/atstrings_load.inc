@@ -149,15 +149,13 @@ begin
     FUndoList.Clear;
     FUndoList.Locked:= true;
   end;
-
-  DoLoadFromStream(Stream);
-
-  if Assigned(FUndoList) then
+  if Assigned(FRedoList) then
   begin
-    FUndoList.Clear;
-    FUndoList.Locked:= false;
+    FRedoList.Clear;
+    FRedoList.Locked:= true;
   end;
 
+  DoLoadFromStream(Stream);
   DoFinalizeLoading;
 end;
 
@@ -179,6 +177,17 @@ begin
   DoDetectEndings;
   LineAddLastFake;
   DoResetLineStates(false);
+
+  if Assigned(FUndoList) then
+  begin
+    FUndoList.Clear;
+    FUndoList.Locked:= false;
+  end;
+  if Assigned(FRedoList) then
+  begin
+    FRedoList.Clear;
+    FRedoList.Locked:= false;
+  end;
 end;
 
 

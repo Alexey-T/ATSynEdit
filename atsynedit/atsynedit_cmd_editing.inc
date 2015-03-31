@@ -463,3 +463,12 @@ begin
   Result:= [cResultText, cResultCaretBottom];
 end;
 
+function TATSynEdit.DoCommand_Redo: TATCommandResults;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  Strings.Redo(FOptUndoGrouped);
+  Result:= [cResultText, cResultCaretBottom];
+end;
+

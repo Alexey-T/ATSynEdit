@@ -328,8 +328,10 @@ type
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
+    function GetRedoCount: integer;
     procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
     function GetUndoAfterSave: boolean;
+    function GetUndoCount: integer;
     function GetUndoLimit: integer;
     procedure InitColors;
     procedure MenuClick(Sender: TObject);
@@ -447,6 +449,7 @@ type
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
     function DoCommand_Undo: TATCommandResults;
+    function DoCommand_Redo: TATCommandResults;
     function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
     function DoCommand_SelectWords: TATCommandResults;
     function DoCommand_SelectLines: TATCommandResults;
@@ -500,6 +503,8 @@ type
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
     property ModeOver: boolean read FOver write SetOver;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
+    property UndoCount: integer read GetUndoCount;
+    property RedoCount: integer read GetRedoCount;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -2600,6 +2605,11 @@ begin
   end;
 end;
 
+function TATSynEdit.GetRedoCount: integer;
+begin
+  Result:= Strings.RedoCount;
+end;
+
 procedure TATSynEdit.DoMinimapClick(APosY: integer);
 var
   N: integer;
@@ -2655,6 +2665,11 @@ end;
 function TATSynEdit.GetUndoAfterSave: boolean;
 begin
   Result:= Strings.UndoAfterSave;
+end;
+
+function TATSynEdit.GetUndoCount: integer;
+begin
+  Result:= Strings.UndoCount;
 end;
 
 procedure TATSynEdit.SetUndoAfterSave(AValue: boolean);
