@@ -41,6 +41,7 @@ type
     Label9: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
+    mnuTCaret1: TMenuItem;
     mnuUnlock: TMenuItem;
     mnuLock: TMenuItem;
     mnuOpt: TMenuItem;
@@ -52,7 +53,7 @@ type
     MenuItem5: TMenuItem;
     mnuTst: TMenuItem;
     mnuTFold: TMenuItem;
-    mnuTCarets: TMenuItem;
+    mnuTCaretK: TMenuItem;
     mnuEndW: TMenuItem;
     mnuEndUn: TMenuItem;
     mnuEndMc: TMenuItem;
@@ -101,6 +102,7 @@ type
     procedure mnuEndWClick(Sender: TObject);
     procedure mnuLockClick(Sender: TObject);
     procedure mnuTBmsClick(Sender: TObject);
+    procedure mnuTCaret1Click(Sender: TObject);
     procedure mnuTFoldClick(Sender: TObject);
     procedure mnuTMarginClick(Sender: TObject);
     procedure mnuUnlockClick(Sender: TObject);
@@ -216,6 +218,17 @@ begin
       ed.Strings.LinesBm[i]:= 0;
   end;
   ed.Update;
+end;
+
+procedure TfmMain.mnuTCaret1Click(Sender: TObject);
+var
+  i: integer;
+begin
+  for i:= 1 to 100 do
+    ed.Carets.Add(0, i);
+  ed.Carets.Sort;
+  ed.Update;
+  UpdateStatus;
 end;
 
 procedure TfmMain.mnuTFoldClick(Sender: TObject);
@@ -393,9 +406,9 @@ procedure TfmMain.bAddCrtClick(Sender: TObject);
 var
   i, j: integer;
 begin
-  for j:= 1 to 40 do
-    for i:= 1 to 100 do
-      ed.Carets.Add(i, j);
+  for j:= 1 to 100 do
+    for i:= 1 to 20 do
+      ed.Carets.Add(i*2, j);
   ed.Carets.Sort;
   ed.Update;
   UpdateStatus;

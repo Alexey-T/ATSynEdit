@@ -286,6 +286,7 @@ begin
     Result:= cLineStateNone;
 end;
 
+
 function TATStrings.GetUndoCount: integer;
 begin
   if Assigned(FUndoList) then
@@ -383,6 +384,7 @@ begin
   if IsIndexValid(Index) then
     TATStringItem(FList[Index]).ItemState:= AValue;
 end;
+
 
 function TATStrings.GetTextAll: atString;
 var

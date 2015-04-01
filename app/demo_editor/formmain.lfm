@@ -343,8 +343,12 @@ object fmMain: TfmMain
         Caption = 'fold'
         OnClick = mnuTFoldClick
       end
-      object mnuTCarets: TMenuItem
-        Caption = '1000 crts'
+      object mnuTCaret1: TMenuItem
+        Caption = '100 cr''s'
+        OnClick = mnuTCaret1Click
+      end
+      object mnuTCaretK: TMenuItem
+        Caption = '2000 cr''s'
         OnClick = bAddCrtClick
       end
       object mnuTMargin: TMenuItem

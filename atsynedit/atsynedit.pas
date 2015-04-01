@@ -304,6 +304,8 @@ type
     //
     procedure DebugFindWrapIndex;
     procedure DoDropText;
+    procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom,
+      ATo: integer);
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetRedoCount: integer;
@@ -311,7 +313,7 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
-    procedure GetWrapInfosForLine(ALine: integer; AIndentMaximal: integer;
+    procedure DoWrapInfosForLine(ALine: integer; AIndentMaximal: integer;
       AItems: TList);
     procedure InitColors;
     procedure MenuClick(Sender: TObject);
@@ -755,7 +757,7 @@ var
   Items: TList;
   ListNums: TList;
   i, j: integer;
-  NLine, NIndex1, NIndex2: integer;
+  NLine, NIndexFrom, NIndexTo: integer;
   UseUpdateList: boolean;
 begin
   NNewVisibleColumns:= GetVisibleColumns;
@@ -799,7 +801,7 @@ begin
       FWrapInfo.Clear;
       for i:= 0 to Strings.Count-1 do
       begin
-        GetWrapInfosForLine(i, NIndentMaximal, Items);
+        DoWrapInfosForLine(i, NIndentMaximal, Items);
         for j:= 0 to Items.Count-1 do
           FWrapInfo.Add(TATSynWrapItem(Items[j]));
       end;
@@ -814,16 +816,20 @@ begin
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= NativeInt{%H-}(ListNums[i]);
-        GetWrapInfosForLine(NLine, NIndentMaximal, Items);
+        DoWrapInfosForLine(NLine, NIndentMaximal, Items);
         if Items.Count=0 then Continue;
 
-        FWrapInfo.FindIndexesOfLineNumber(NLine, NIndex1, NIndex2);
-        if NIndex1<0 then begin Beep; Continue; end;////todo?
+        DoFindWrapIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
+        if NIndexFrom<0 then
+        begin
+          Showmessage('Cant find wrap-index for line '+Inttostr(NLine));
+          Continue;
+        end;
 
-        for j:= NIndex2 downto NIndex1 do
+        for j:= NIndexTo downto NIndexFrom do
           FWrapInfo.Delete(j);
         for j:= Items.Count-1 downto 0 do
-          FWrapInfo.Insert(NIndex1, Items[j]);
+          FWrapInfo.Insert(NIndexFrom, Items[j]);
       end;
     end;
   finally
@@ -840,7 +846,12 @@ begin
 end;
 
 
-procedure TATSynEdit.GetWrapInfosForLine(ALine: integer; AIndentMaximal: integer; AItems: TList);
+procedure TATSynEdit.DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
+begin
+  FWrapInfo.FindIndexesOfLineNumber(ALineNum, AFrom, ATo);
+end;
+
+procedure TATSynEdit.DoWrapInfosForLine(ALine: integer; AIndentMaximal: integer; AItems: TList);
 var
   NHiddenIndex, NOffset, NLen, NIndent: integer;
   NFinal: TATSynWrapFinal;
