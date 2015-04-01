@@ -43,7 +43,7 @@ object Form1: TForm1
       Height = 388
       Top = 8
       Width = 162
-      Color = clDefault
+      Color = clWhite
       HideSelection = False
       ReadOnly = True
       RowSelect = True

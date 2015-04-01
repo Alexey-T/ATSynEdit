@@ -55,7 +55,8 @@ type
     MicromapBG,
     StateChanged,
     StateAdded,
-    StateSaved: TColor;
+    StateSaved,
+    LockedBG: TColor;
   end;
 
   TATAutoIndentKind = (
@@ -196,6 +197,7 @@ type
     FTimerScroll: TTimer;
     FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
+    FPaintLocked: integer;
     FBitmap: TBitmap;
     FKeyMapping: TATKeyMapping;
     FMarginRight: integer;
@@ -504,6 +506,8 @@ type
     function GetCaretsArray: TPointArray;
     procedure SetCaretsArray(const L: TPointArray);
     //misc
+    procedure BeginUpdate;
+    procedure EndUpdate;
     procedure DoSelect_All;
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
@@ -1550,6 +1554,7 @@ begin
   FCaretSpecPos:= false;
   FCaretStopUnfocused:= true;
 
+  FPaintLocked:= 0;
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
@@ -1722,7 +1727,12 @@ begin
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
 
-  Strings.LoadFromFile(AFilename);
+  BeginUpdate;
+  try
+    Strings.LoadFromFile(AFilename);
+  finally
+    EndUpdate;
+  end;
 
   Update;
   DoPaintModeBlinking;
@@ -1905,6 +1915,15 @@ end;
 
 procedure TATSynEdit.Paint;
 begin
+  if FPaintLocked>0 then
+  begin
+    Canvas.Brush.Color:= FColors.LockedBG;
+    Canvas.FillRect(ClientRect);
+    Canvas.Font.Assign(Self.Font);
+    Canvas.TextOut(8, 4, '....');
+    Exit;
+  end;
+
   //if scrollbars shown, paint again
   if DoPaint(FPaintFlags) then
     DoPaint(FPaintFlags);
@@ -2638,6 +2657,7 @@ begin
   FColors.StateChanged:= $00f0f0;
   FColors.StateAdded:= $20c020;
   FColors.StateSaved:= clMedGray;
+  FColors.LockedBG:= $e0e0e0;
 end;
 
 function TATSynEdit.GetUndoLimit: integer;
@@ -2665,6 +2685,18 @@ begin
   Strings.UndoAfterSave:= AValue;
 end;
 
+procedure TATSynEdit.BeginUpdate;
+begin
+  Inc(FPaintLocked);
+  Invalidate;
+end;
+
+procedure TATSynEdit.EndUpdate;
+begin
+  Dec(FPaintLocked);
+  if FPaintLocked=0 then
+    Invalidate;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

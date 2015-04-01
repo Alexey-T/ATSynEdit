@@ -40,6 +40,9 @@ type
     Label6: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
+    MenuItem1: TMenuItem;
+    mnuUnlock: TMenuItem;
+    mnuLock: TMenuItem;
     mnuOpt: TMenuItem;
     mnuTBms: TMenuItem;
     mnuTMargin: TMenuItem;
@@ -96,9 +99,11 @@ type
     procedure mnuEndMcClick(Sender: TObject);
     procedure mnuEndUnClick(Sender: TObject);
     procedure mnuEndWClick(Sender: TObject);
+    procedure mnuLockClick(Sender: TObject);
     procedure mnuTBmsClick(Sender: TObject);
     procedure mnuTFoldClick(Sender: TObject);
     procedure mnuTMarginClick(Sender: TObject);
+    procedure mnuUnlockClick(Sender: TObject);
   private
     { private declarations }
     ed: TATSynEdit;
@@ -191,6 +196,11 @@ begin
   UpdateStatus;
 end;
 
+procedure TfmMain.mnuLockClick(Sender: TObject);
+begin
+  ed.BeginUpdate;
+end;
+
 procedure TfmMain.mnuTBmsClick(Sender: TObject);
 var
   i: integer;
@@ -226,6 +236,11 @@ begin
   S:= InputBox('Margins', 'space separated numz', ed.OptMarginString);
   ed.OptMarginString:= S;
   ed.Update;
+end;
+
+procedure TfmMain.mnuUnlockClick(Sender: TObject);
+begin
+  ed.EndUpdate;
 end;
 
 procedure TfmMain.EditCaretMoved(Sender: TObject);
@@ -336,7 +351,10 @@ begin
   begin
     InitialDir:= FDir;
     if not Execute then Exit;
+    ed.BeginUpdate;
+    Application.ProcessMessages;
     ed.LoadFromFile(FileName);
+    ed.EndUpdate;
   end;
 end;
 
