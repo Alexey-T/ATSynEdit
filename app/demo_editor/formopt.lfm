@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet6
-    TabIndex = 5
+    ActivePage = TabSheet4
+    TabIndex = 4
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -466,13 +466,13 @@ object fmOpt: TfmOpt
         Height = 15
         Top = 12
         Width = 53
-        Caption = 'caret time'
+        Caption = 'blink time'
         ParentColor = False
       end
       object chkCrVirt: TCheckBox
         Left = 8
         Height = 19
-        Top = 36
+        Top = 40
         Width = 92
         Caption = 'caret after eol'
         TabOrder = 1
@@ -480,38 +480,29 @@ object fmOpt: TfmOpt
       object chkCrMul: TCheckBox
         Left = 8
         Height = 19
-        Top = 57
+        Top = 60
         Width = 84
         Caption = 'multi-carets'
         TabOrder = 2
       end
-      object Label1: TLabel
-        Left = 24
-        Height = 15
-        Top = 80
-        Width = 416
-        Caption = 'Ctrl+click to add/del; Ctrl+Shift+click to add column; Ctrl+drag to add with sel'
-        ParentColor = False
-        WordWrap = True
-      end
       object chkCrUnfocus: TCheckBox
-        Left = 9
+        Left = 8
         Height = 19
-        Top = 100
+        Top = 80
         Width = 112
         Caption = 'stop if unfocused'
         TabOrder = 3
       end
       object Label7: TLabel
-        Left = 424
+        Left = 432
         Height = 15
         Top = 12
-        Width = 31
-        Caption = 'shape'
+        Width = 75
+        Caption = 'shape, normal'
         ParentColor = False
       end
       object edCrShape: TComboBox
-        Left = 304
+        Left = 312
         Height = 23
         Top = 8
         Width = 114
@@ -521,22 +512,37 @@ object fmOpt: TfmOpt
         TabOrder = 4
       end
       object edCrShape2: TComboBox
-        Left = 304
+        Left = 312
         Height = 23
         Top = 36
-        Width = 113
+        Width = 114
         DropDownCount = 40
         ItemHeight = 15
         Style = csDropDownList
         TabOrder = 5
       end
       object Label9: TLabel
-        Left = 424
+        Left = 432
         Height = 15
         Top = 40
         Width = 54
         Caption = 'shape, ovr'
         ParentColor = False
+      end
+      object Label11: TLabel
+        Cursor = crHelp
+        Left = 128
+        Height = 15
+        Hint = 'Ctrl+click to add/delete; Ctrl+Shift+click to add column; Ctrl+drag to add with selection'
+        Top = 60
+        Width = 23
+        Caption = 'Hint'
+        Font.Color = clBlue
+        Font.Style = [fsUnderline]
+        ParentColor = False
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
       end
     end
     object TabSheet6: TTabSheet
