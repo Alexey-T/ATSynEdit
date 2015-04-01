@@ -58,13 +58,13 @@ begin
   s:= List.GetPathFromItem(List.Selected);
   if not FileExists(s) then Exit;
 
-  Screen.Cursor:= crHourGlass;
+  ed.BeginUpdate;
+  Application.ProcessMessages;
   ed.LoadFromFile(s);
-  Screen.Cursor:= crDefault;
+  ed.EndUpdate;
 
   ed.SetFocus;
   Caption:= 'App - '+ExtractFileName(s);
-  Beep;
 end;
 
 procedure TForm1.bGettextClick(Sender: TObject);

@@ -8,6 +8,12 @@ begin
   Str:= UTF8Decode(Clipboard.AsText);
   DoCommand_TextDeleteSelections;
   Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOver and FOptUseOverOnPaste, ASelectThen);
+
+  //workaround: paste on last line, end
+  if Carets.Count>0 then
+    with Carets[0] do
+      if PosY>=Strings.Count then
+        Strings.LineAdd('');
 end;
 
 function TATSynEdit.DoCommand_ClipboardCut: TATCommandResults;

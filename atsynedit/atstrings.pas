@@ -529,10 +529,27 @@ end;
 
 procedure TATStrings.LineInsertStrings(N: integer; AList: TATStrings);
 var
+  Cnt, CntMove: integer;
+  Item: TATStringItem;
   i: integer;
 begin
-  for i:= AList.Count-1 downto 0 do
-    LineInsert(N, AList.Lines[i]);
+  Cnt:= AList.Count;
+  if Cnt=0 then Exit;
+  CntMove:= FList.Count-N;
+
+  //fast! insert many
+  FList.Count:= FList.Count+Cnt;
+  System.Move(FList.List^[N], FList.List^[N+Cnt], CntMove*SizeOf(Pointer));
+  FillChar(FList.List^[N], Cnt*SizeOf(Pointer), 0);
+
+  for i:= 0 to Cnt-1 do
+  begin
+    DoAddUndo(cEditActionInsert, N+i, '', cEndNone);
+
+    Item:= TATStringItem.Create(AList.Lines[i], Endings);
+    Item.ItemState:= cLineStateAdded;
+    FList[N+i]:= Item;
+  end;
 end;
 
 
