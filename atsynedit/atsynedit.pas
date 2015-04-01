@@ -11,7 +11,7 @@ uses
   Controls, ExtCtrls, Menus,
   LMessages, LCLType,
   ATStringProc, ATStrings, ATCanvasProc, ATGutter,
-  ATCarets, ATKeyMapping;
+  ATCarets, ATKeyMapping, ATSynEdit_WrapInfo;
 
 type
   TATCommandResult = (
@@ -127,36 +127,6 @@ type
     cCaretShapeHorz40percent,
     cCaretShapeHorz50percent
     );
-
-  { TATSynWrapItem }
-
-  TATSynWrapFinal = (cWrapItemFinal, cWrapItemCollapsed, cWrapItemMiddle);
-  TATSynWrapItem = class
-    NLineIndex,
-    NCharIndex,
-    NLength,
-    NIndent: integer;
-    NFinal: TATSynWrapFinal;
-  end;
-
-  { TATSynWrapInfo }
-
-  TATSynWrapInfo = class
-  private
-    FList: TList;
-    function GetItem(N: integer): TATSynWrapItem;
-  public
-    constructor Create; virtual;
-    destructor Destroy; override;
-    procedure Clear;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
-    function IsItemInitial(N: integer): boolean;
-    function IsItemAfterCollapsed(N: integer): boolean;
-    property Items[N: integer]: TATSynWrapItem read GetItem; default;
-    procedure Add(AIndex, AOffset, ALen, AIndent: integer; AFinal: TATSynWrapFinal);
-    procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
-  end;
 
 const
   cInitCaretShape = cCaretShapeVert2px;
@@ -336,6 +306,8 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
+    procedure GetWrapInfosForLine(ALine: integer; AIndentMaximal: integer;
+      AItems: TList);
     procedure InitColors;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
@@ -640,119 +612,6 @@ uses
 
 {$I atsynedit_proc.inc}
 
-{ TATSynWrapInfo }
-
-function TATSynWrapInfo.GetItem(N: integer): TATSynWrapItem;
-begin
-  if IsIndexValid(N) then
-    Result:= TATSynWrapItem(FList[N])
-  else
-    Result:= nil;
-end;
-
-constructor TATSynWrapInfo.Create;
-begin
-  FList:= TList.Create;
-end;
-
-destructor TATSynWrapInfo.Destroy;
-begin
-  Clear;
-  FreeAndNil(FList);
-  inherited;
-end;
-
-procedure TATSynWrapInfo.Clear;
-var
-  i: integer;
-begin
-  for i:= FList.Count-1 downto 0 do
-  begin
-    TObject(FList[i]).Free;
-    FList.Delete(i);
-  end;
-end;
-
-function TATSynWrapInfo.Count: integer;
-begin
-  Result:= FList.Count;
-end;
-
-function TATSynWrapInfo.IsIndexValid(N: integer): boolean;
-begin
-  Result:= (N>=0) and (N<FList.Count);
-end;
-
-function TATSynWrapInfo.IsItemInitial(N: integer): boolean;
-begin
-  if IsIndexValid(N) then
-  begin
-    if N=0 then
-      Result:= true
-    else
-      Result:= Items[N].NLineIndex<>Items[N-1].NLineIndex;
-  end
-  else
-    Result:= true;
-end;
-
-function TATSynWrapInfo.IsItemAfterCollapsed(N: integer): boolean;
-begin
-  if IsIndexValid(N) and (N>0) then
-  begin
-    Result:= Items[N].NLineIndex-Items[N-1].NLineIndex > 1;
-  end
-  else
-    Result:= false;
-end;
-
-procedure TATSynWrapInfo.Add(AIndex, AOffset, ALen, AIndent: integer; AFinal: TATSynWrapFinal);
-var
-  Item: TATSynWrapItem;
-begin
-  Item:= TATSynWrapItem.Create;
-  Item.NLineIndex:= AIndex;
-  Item.NCharIndex:= AOffset;
-  Item.NLength:= ALen;
-  Item.NIndent:= AIndent;
-  Item.NFinal:= AFinal;
-  FList.Add(Item);
-end;
-
-procedure TATSynWrapInfo.FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
-var
-  a, b, m, dif: integer;
-begin
-  AFrom:= -1;
-  ATo:= -1;
-
-  a:= 0;
-  b:= Count-1;
-  if b<0 then Exit;
-
-  repeat
-    dif:= Items[a].NLineIndex-ALineNum;
-    if dif=0 then begin m:= a; Break end;
-
-    m:= a+b;
-    if Odd(m) then
-      m:= m div 2 +1
-    else
-      m:= m div 2;
-
-    dif:= Items[m].NLineIndex-ALineNum;
-    if dif=0 then Break;
-
-    if dif>0 then b:= m else a:= m;
-    if a=b then Exit;
-  until false;
-
-  AFrom:= m;
-  ATo:= m;
-  while (AFrom>0) and (Items[AFrom-1].NLineIndex=ALineNum) do Dec(AFrom);
-  while (ATo<Count-1) and (Items[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
-end;
-
 
 { TATSynEdit }
 
@@ -884,10 +743,10 @@ end;
 
 procedure TATSynEdit.UpdateWrapInfo;
 var
-  NNewVisibleColumns, NOffset, NLen, NIndent, NHiddenIndex, NIndentMaximal: integer;
-  NFinal: TATSynWrapFinal;
-  Str: atString;
-  i: integer;
+  NNewVisibleColumns: integer;
+  NIndentMaximal: integer;
+  Items: TList;
+  i, j: integer;
 begin
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-20); //don't do too big NIndent
@@ -916,54 +775,73 @@ begin
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
   end;
 
-  for i:= 0 to Strings.Count-1 do
-  begin
-    NHiddenIndex:= Strings.LinesHidden[i];
-    if NHiddenIndex<0 then Continue;
-
-    Str:= Strings.Lines[i];
-    NLen:= Length(Str);
-
-    //line collapsed partially?
-    if NHiddenIndex>0 then
+  Items:= TList.Create;
+  try
+    for i:= 0 to Strings.Count-1 do
     begin
-      FWrapInfo.Add(i, 1, Min(NLen, NHiddenIndex-1), 0, cWrapItemCollapsed);
-      Continue;
+      GetWrapInfosForLine(i, NIndentMaximal, Items);
+      for j:= 0 to Items.Count-1 do
+        FWrapInfo.Add(TATSynWrapItem(Items[j]));
     end;
-
-    //wrap not needed?
-    if (FWrapColumn<cMinWrapColumnAbs) then
-    begin
-      FWrapInfo.Add(i, 1, NLen, 0, cWrapItemFinal);
-      Continue
-    end;
-
-    NOffset:= 1;
-    NIndent:= 0;
-
-    repeat
-      NLen:= SFindWordWrapOffset(Str, Max(FWrapColumn-NIndent, cMinWrapColumnAbs), FTabSize, FOptWordChars);
-      if NLen>=Length(Str) then
-        NFinal:= cWrapItemFinal
-      else
-        NFinal:= cWrapItemMiddle;
-      FWrapInfo.Add(i, NOffset, NLen, NIndent, NFinal);
-
-      if FWrapIndented then
-        if NOffset=1 then
-        begin
-          NIndent:= SGetIndentExpanded(Str, FTabSize);
-          NIndent:= Min(NIndent, NIndentMaximal);
-        end;
-
-      Inc(NOffset, NLen);
-      Delete(Str, 1, NLen);
-    until Str='';
+  finally
+    FreeAndNil(Items);
   end;
 
   {$ifdef debug_findwrapindex}
   DebugFindWrapIndex;
   {$endif}
+end;
+
+
+procedure TATSynEdit.GetWrapInfosForLine(ALine: integer; AIndentMaximal: integer; AItems: TList);
+var
+  NHiddenIndex, NOffset, NLen, NIndent: integer;
+  NFinal: TATSynWrapFinal;
+  Str: atString;
+begin
+  AItems.Clear;
+
+  NHiddenIndex:= Strings.LinesHidden[ALine];
+  if NHiddenIndex<0 then Exit;
+
+  Str:= Strings.Lines[ALine];
+  NLen:= Length(Str);
+
+  //line collapsed partially?
+  if NHiddenIndex>0 then
+  begin
+    AItems.Add(TATSynWrapItem.Create(ALine, 1, Min(NLen, NHiddenIndex-1), 0, cWrapItemCollapsed));
+    Exit;
+  end;
+
+  //wrap not needed?
+  if (FWrapColumn<cMinWrapColumnAbs) then
+  begin
+    AItems.Add(TATSynWrapItem.Create(ALine, 1, NLen, 0, cWrapItemFinal));
+    Exit;
+  end;
+
+  NOffset:= 1;
+  NIndent:= 0;
+
+  repeat
+    NLen:= SFindWordWrapOffset(Str, Max(FWrapColumn-NIndent, cMinWrapColumnAbs), FTabSize, FOptWordChars);
+    if NLen>=Length(Str) then
+      NFinal:= cWrapItemFinal
+    else
+      NFinal:= cWrapItemMiddle;
+    AItems.Add(TATSynWrapItem.Create(ALine, NOffset, NLen, NIndent, NFinal));
+
+    if FWrapIndented then
+      if NOffset=1 then
+      begin
+        NIndent:= SGetIndentExpanded(Str, FTabSize);
+        NIndent:= Min(NIndent, AIndentMaximal);
+      end;
+
+    Inc(NOffset, NLen);
+    Delete(Str, 1, NLen);
+  until Str='';
 end;
 
 procedure TATSynEdit.DebugFindWrapIndex;
