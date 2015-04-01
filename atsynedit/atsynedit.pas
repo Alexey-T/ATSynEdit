@@ -786,8 +786,8 @@ begin
   UseUpdateList:=
     (FWrapInfo.Count>0) and
     (Strings.Count>cMaxLinesForOldWrapUpdate) and
-    (Strings.ListUpdates.Count>0) and
-    (not Strings.ListUpdatesHard);
+    (not Strings.ListUpdatesHard) and
+    (Strings.ListUpdates.Count>0);
   //UseUpdateList:= false;////to disable
 
   Items:= TList.Create;
@@ -1920,7 +1920,7 @@ begin
     Canvas.Brush.Color:= FColors.LockedBG;
     Canvas.FillRect(ClientRect);
     Canvas.Font.Assign(Self.Font);
-    Canvas.TextOut(8, 4, '....');
+    Canvas.TextOut(4, 4, '...');
     Exit;
   end;
 

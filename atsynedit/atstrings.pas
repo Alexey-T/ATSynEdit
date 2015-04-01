@@ -27,6 +27,8 @@ type
 const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2);
 
+  cMaxUpdatesCountEasy = 200;
+
 type
   { TATStringItem }
 
@@ -819,14 +821,23 @@ procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
 var
   Ptr: pointer;
 begin
+  if not Assigned(FListUpdates) then Exit;
+
   if AAction in [cEditActionDelete, cEditActionInsert] then
+  begin
     FListUpdatesHard:= true;
+    Exit
+  end;
+
+  if FListUpdates.Count>cMaxUpdatesCountEasy then
+  begin
+    FListUpdatesHard:= true;
+    Exit
+  end;
 
   Ptr:= pointer{%H-}(N);
-  if Assigned(FListUpdates) then
-    with FListUpdates do
-      if IndexOf(Ptr)<0 then
-        Add(Ptr);
+  with FListUpdates do
+    if IndexOf(Ptr)<0 then Add(Ptr);
 end;
 
 
