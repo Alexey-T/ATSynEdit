@@ -8,61 +8,51 @@ object Form1: TForm1
   ClientWidth = 859
   OnCreate = FormCreate
   OnShow = FormShow
-  LCLVersion = '1.2.6.0'
+  LCLVersion = '1.5'
   object Panel1: TPanel
     Left = 0
     Height = 442
     Top = 0
-    Width = 734
+    Width = 694
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
   end
   object Panel2: TPanel
-    Left = 734
+    Left = 694
     Height = 442
     Top = 0
-    Width = 125
+    Width = 165
     Align = alRight
     BevelOuter = bvNone
     ClientHeight = 442
-    ClientWidth = 125
+    ClientWidth = 165
     TabOrder = 1
-    object bLoad: TButton
-      Left = 8
-      Height = 25
-      Top = 8
-      Width = 115
-      Caption = 'Load file'
-      OnClick = bLoadClick
-      TabOrder = 0
-    end
-    object edFN: TComboBox
-      Left = 8
-      Height = 27
-      Top = 40
-      Width = 115
-      ItemHeight = 0
-      ItemIndex = 0
-      Items.Strings = (
-        'fn.txt'
-        'fn_UTF8.txt'
-        'fn_WideLE.txt'
-        'fn_WideBE.txt'
-      )
-      Style = csDropDownList
-      TabOrder = 1
-      Text = 'fn.txt'
-    end
     object bGettext: TButton
-      Left = 8
+      Left = 0
       Height = 25
-      Top = 240
+      Top = 400
       Width = 80
       Caption = 'Get text'
       OnClick = bGettextClick
-      TabOrder = 2
+      TabOrder = 0
+    end
+    object List: TShellListView
+      Left = 0
+      Height = 388
+      Top = 8
+      Width = 162
+      Color = clDefault
+      HideSelection = False
+      ReadOnly = True
+      RowSelect = True
+      SortColumn = 0
+      SortType = stText
+      TabOrder = 1
+      ViewStyle = vsList
+      OnClick = ListClick
+      ObjectTypes = [otNonFolders]
     end
   end
-end
+end

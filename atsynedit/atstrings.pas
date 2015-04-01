@@ -103,7 +103,7 @@ type
     function DoUndoSingle(AUndoList: TATUndoList): boolean;
     procedure DoClearUndo(ALocked: boolean = false);
     procedure DoDeleteDupFakeLines;
-    procedure DoAddUpdate(N: integer);
+    procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -423,13 +423,12 @@ end;
 
 destructor TATStrings.Destroy;
 begin
-  FUndoList.Locked:= true;
-  FRedoList.Locked:= true;
+  DoClearUndo(true);
 
   Clear;
-  FreeAndNil(FListUpdates);
   FreeAndNil(FList);
 
+  FreeAndNil(FListUpdates);
   FreeAndNil(FUndoList);
   FreeAndNil(FRedoList);
 
@@ -567,9 +566,15 @@ end;
 procedure TATStrings.Clear;
 var
   i: integer;
+  Lock: boolean;
 begin
+  Lock:= FUndoList.Locked;
+  DoClearUndo(true);
+
   for i:= Count-1 downto 0 do
     LineDelete(i, false);
+
+  DoClearUndo(Lock);
 end;
 
 procedure TATStrings.DoClearLineStates(ASaved: boolean);
@@ -738,10 +743,6 @@ end;
 
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
 begin
-  DoAddUpdate(AIndex);
-  if AAction in [cEditActionDelete, cEditActionInsert] then
-    FListUpdatesHard:= true;
-
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 
@@ -750,11 +751,13 @@ begin
 
   if not FUndoList.Locked then
   begin
+    DoAddUpdate(AIndex, AAction);
     FUndoList.Add(AAction, AIndex, AText, AEnd, GetCaretsArray);
   end
   else
   if not FRedoList.Locked then
   begin
+    DoAddUpdate(AIndex, AAction);
     FRedoList.Add(AAction, AIndex, AText, AEnd, GetCaretsArray);
   end;
 end;
@@ -792,10 +795,17 @@ begin
     FUndoList.Clear;
     FUndoList.Locked:= ALocked;
   end;
+
   if Assigned(FRedoList) then
   begin
     FRedoList.Clear;
     FRedoList.Locked:= ALocked;
+  end;
+
+  if Assigned(FListUpdates) then
+  begin
+    FListUpdates.Clear;
+    FListUpdatesHard:= false;
   end;
 end;
 
@@ -805,10 +815,13 @@ begin
     LineDelete(Count-1, false);
 end;
 
-procedure TATStrings.DoAddUpdate(N: integer);
+procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
 var
   Ptr: pointer;
 begin
+  if AAction in [cEditActionDelete, cEditActionInsert] then
+    FListUpdatesHard:= true;
+
   Ptr:= pointer{%H-}(N);
   if Assigned(FListUpdates) then
     with FListUpdates do

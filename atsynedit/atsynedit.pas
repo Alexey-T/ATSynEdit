@@ -3,7 +3,7 @@ unit ATSynEdit;
 {$mode delphi}
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
-{$define beep_cached_update}
+//{$define beep_cached_update}
 
 interface
 

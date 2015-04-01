@@ -6,22 +6,22 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, atstrings, atsynedit, atstringproc;
+  ExtCtrls, ShellCtrls, atstrings, atsynedit, atstringproc, ComCtrls;
 
 type
   { TForm1 }
   TForm1 = class(TForm)
-    bLoad: TButton;
     bGettext: TButton;
-    edFN: TComboBox;
     Panel1: TPanel;
     Panel2: TPanel;
-    procedure bLoadClick(Sender: TObject);
+    List: TShellListView;
     procedure bGettextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure ListClick(Sender: TObject);
   private
     { private declarations }
+    fDir: string;
     ed: TATSynEdit;
   public
     { public declarations }
@@ -42,20 +42,29 @@ begin
   ed.Parent:= Panel1;
   ed.Align:= alClient;
   ed.Font.Name:= 'Courier New';
+
+  fDir:= ExtractFilePath(Application.Exename)+'..\..\test_files';
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  bLoad.Click;
+  List.Root:= fDir;
 end;
 
-procedure TForm1.bLoadClick(Sender: TObject);
+procedure TForm1.ListClick(Sender: TObject);
 var
-  fn: string;
+  s: string;
 begin
-  fn:= ExtractFilePath(Application.Exename)+'..\..\test_files\'+edFN.Text;
-  ed.LoadFromFile(fn);
+  s:= List.GetPathFromItem(List.Selected);
+  if not FileExists(s) then Exit;
+
+  Screen.Cursor:= crHourGlass;
+  ed.LoadFromFile(s);
+  Screen.Cursor:= crDefault;
+
   ed.SetFocus;
+  Caption:= 'App - '+ExtractFileName(s);
+  Beep;
 end;
 
 procedure TForm1.bGettextClick(Sender: TObject);
@@ -64,4 +73,4 @@ begin
 end;
 
 
-end.
+end.
