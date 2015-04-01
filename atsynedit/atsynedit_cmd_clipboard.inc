@@ -68,7 +68,7 @@ begin
       begin
         for i:= 0 to ListNum.Count-1 do
         begin
-          Str:= Strings.Lines[integer{%H-}(ListNum[i])];
+          Str:= Strings.Lines[NativeInt{%H-}(ListNum[i])];
           if Str<>'' then
             ListStr.Add(UTF8Encode(Str));
         end;

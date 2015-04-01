@@ -177,6 +177,8 @@ const
   cMinMarginRt = 20;
   cMinCaretTime = 300;
   cMaxCaretTime = 2000;
+  cMinCharsAfterAnyIndent = 20;
+  cMaxLinesForOldWrapUpdate = 100;
 
   { TATGutter }
 
@@ -753,7 +755,7 @@ var
   UseUpdateList: boolean;
 begin
   NNewVisibleColumns:= GetVisibleColumns;
-  NIndentMaximal:= Max(2, NNewVisibleColumns-20); //don't do too big NIndent
+  NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
 
   if (not FWrapUpdateNeeded) and
     (FWrapMode=cWrapOn) and
@@ -779,7 +781,7 @@ begin
 
   UseUpdateList:=
     (FWrapInfo.Count>0) and
-    (Strings.Count>100) and
+    (Strings.Count>cMaxLinesForOldWrapUpdate) and
     (Strings.ListUpdates.Count>0) and
     (not Strings.ListUpdatesHard);
   //UseUpdateList:= false;////to disable
@@ -807,7 +809,7 @@ begin
       ListNums.Assign(Strings.ListUpdates);
       for i:= 0 to ListNums.Count-1 do
       begin
-        NLine:= NativeInt(ListNums[i]);
+        NLine:= NativeInt{%H-}(ListNums[i]);
         GetWrapInfosForLine(NLine, NIndentMaximal, Items);
         if Items.Count=0 then Continue;
 
@@ -1138,7 +1140,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
 var
   NGutterBmX1, NGutterBmX2,
   NGutterNumsX1, NGutterNumsX2,
-  NGutterFoldX1, NGutterFoldX2,
+  //NGutterFoldX1, NGutterFoldX2,
   NGutterEmptyX1, NGutterEmptyX2,
   NGutterStateX1, NGutterStateX2,
   NCoordTop, NCoordLeftNums: integer;
@@ -1169,7 +1171,7 @@ begin
     with FGutter[FGutterBandBm] do begin NGutterBmX1:= Left; NGutterBmX2:= Right; end;
     with FGutter[FGutterBandNum] do begin NGutterNumsX1:= Left; NGutterNumsX2:= Right; end;
     with FGutter[FGutterBandState] do begin NGutterStateX1:= Left; NGutterStateX2:= Right; end;
-    with FGutter[FGutterBandFold] do begin NGutterFoldX1:= Left; NGutterFoldX2:= Right; end;
+    //with FGutter[FGutterBandFold] do begin NGutterFoldX1:= Left; NGutterFoldX2:= Right; end;
     with FGutter[FGutterBandEmpty] do begin NGutterEmptyX1:= Left; NGutterEmptyX2:= Right; end;
 
     C.Brush.Color:= FColors.GutterBG;
@@ -1458,7 +1460,7 @@ begin
   if FMarginRight>1 then
     DoPaintMarginLineTo(C, PosX(FMarginRight), FColors.MarginRight);
   for i:= 0 to FMarginList.Count-1 do
-    DoPaintMarginLineTo(C, PosX(integer{%H-}(FMarginList[i])), FColors.MarginUser);
+    DoPaintMarginLineTo(C, PosX(NativeInt{%H-}(FMarginList[i])), FColors.MarginUser);
 end;
 
 
@@ -1505,7 +1507,7 @@ var
 begin
   Result:= '';
   for i:= 0 to FMarginList.Count-1 do
-    Result:= Result+IntToStr(integer{%H-}(FMarginList[i]))+' ';
+    Result:= Result+IntToStr(NativeInt{%H-}(FMarginList[i]))+' ';
 end;
 
 function TATSynEdit.GetReadOnly: boolean;
