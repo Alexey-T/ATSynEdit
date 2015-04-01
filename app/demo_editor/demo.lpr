@@ -7,14 +7,25 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, formmain, formkey, atcanvasproc, atkeymapping, atstringproc,
-  atstringproc_wordjump, atstrings, atcarets, atsynedit, atsynedit_commands,
-  atsynedit_keymapping, ATGutter, formopt, atstrings_undo, ATSynEdit_WrapInfo;
+  Forms,
+  formmain, formkey, formopt,
+  atcanvasproc,
+  atkeymapping,
+  atstringproc,
+  atstringproc_wordjump,
+  atstrings,
+  atstrings_undo,
+  atcarets,
+  atgutter,
+  atsynedit,
+  atsynedit_commands,
+  atsynedit_keymapping,
+  atsynedit_wrapinfo;
 
 {$R *.res}
 
 begin
-  RequireDerivedFormResource:=True;
+  RequireDerivedFormResource:= True;
   Application.Initialize;
   Application.CreateForm(TfmMain, fmMain);
   Application.CreateForm(TfmOpt, fmOpt);
