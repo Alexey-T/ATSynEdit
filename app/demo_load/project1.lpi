@@ -44,15 +44,16 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Unit1"/>
       </Unit1>
       <Unit2>
-        <Filename Value="..\..\comp\atsynedit\atsynedit.pas"/>
+        <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit"/>
       </Unit2>
       <Unit3>
-        <Filename Value="..\..\comp\atsynedit\atstrings.pas"/>
+        <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStrings"/>
       </Unit3>
     </Units>
   </ProjectOptions>

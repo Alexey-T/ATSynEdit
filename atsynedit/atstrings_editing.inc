@@ -4,7 +4,6 @@ procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AReplace
 var
   Str, StrLead, StrTail: atString;
   List: TATStrings;
-  i: integer;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -58,8 +57,7 @@ begin
     if Lines[AY]<>'' then
       LineDelete(AY);
 
-    for i:= List.Count-1 downto 0 do
-      LineInsert(AY, List.Lines[i]);
+    LineInsertStrings(AY, List);
 
     APosAfter.X:= 0;
     APosAfter.Y:= AY+List.Count;

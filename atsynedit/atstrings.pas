@@ -115,6 +115,7 @@ type
     function IsLastLineFake: boolean;
     procedure LineAdd(const AString: atString);
     procedure LineInsert(N: integer; const AString: atString);
+    procedure LineInsertStrings(N: integer; AList: TATStrings);
     procedure LineDelete(N: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
@@ -524,6 +525,14 @@ end;
 procedure TATStrings.LineInsert(N: integer; const AString: atString);
 begin
   LineInsertEx(N, AString, FEndings);
+end;
+
+procedure TATStrings.LineInsertStrings(N: integer; AList: TATStrings);
+var
+  i: integer;
+begin
+  for i:= AList.Count-1 downto 0 do
+    LineInsert(N, AList.Lines[i]);
 end;
 
 
