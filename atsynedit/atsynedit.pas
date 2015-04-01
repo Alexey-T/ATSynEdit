@@ -746,7 +746,10 @@ var
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
   Items: TList;
+  ListUpdated: TList;
   i, j: integer;
+  NLine, NIndex1, NIndex2: integer;
+  bUseUpdateList: boolean;
 begin
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-20); //don't do too big NIndent
@@ -759,8 +762,6 @@ begin
   if not FWrapUpdateNeeded then Exit;
   FWrapUpdateNeeded:= false;
   FPrevVisibleColumns:= NNewVisibleColumns;
-
-  FWrapInfo.Clear;
 
   {$ifdef beep_wrapinfo}
   Beep;
@@ -775,17 +776,53 @@ begin
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
   end;
 
+  bUseUpdateList:=
+    (FWrapInfo.Count>0) and
+    (Strings.Count>100) and
+    (Strings.ListUpdates.Count>0);
+  bUseUpdateList:= false;/////////////todo
+
   Items:= TList.Create;
+  ListUpdated:= TList.Create;
+
   try
-    for i:= 0 to Strings.Count-1 do
+    if not bUseUpdateList then
     begin
-      GetWrapInfosForLine(i, NIndentMaximal, Items);
-      for j:= 0 to Items.Count-1 do
-        FWrapInfo.Add(TATSynWrapItem(Items[j]));
+      FWrapInfo.Clear;
+      for i:= 0 to Strings.Count-1 do
+      begin
+        GetWrapInfosForLine(i, NIndentMaximal, Items);
+        for j:= 0 to Items.Count-1 do
+          FWrapInfo.Add(TATSynWrapItem(Items[j]));
+      end;
+    end
+    else
+    begin
+      //////////////////todo
+      ///////////
+
+      ListUpdated.Assign(Strings.ListUpdates);
+      for i:= 0 to ListUpdated.Count-1 do
+      begin
+        NLine:= integer(ListUpdated[i]);
+        GetWrapInfosForLine(NLine, NIndentMaximal, Items);
+        if Items.Count=0 then Continue;
+
+        FWrapInfo.FindIndexesOfLineNumber(NLine, NIndex1, NIndex2);
+        if NIndex1<0 then begin Beep; Continue; end;//////////todo
+
+        for j:= NIndex2 downto NIndex1 do
+          FWrapInfo.Delete(j);
+        for j:= Items.Count-1 downto 0 do
+          FWrapInfo.Insert(NIndex1, Items[j]);
+      end;
     end;
   finally
+    FreeAndNil(ListUpdated);
     FreeAndNil(Items);
   end;
+
+  Strings.ListUpdates.Clear;
 
   {$ifdef debug_findwrapindex}
   DebugFindWrapIndex;

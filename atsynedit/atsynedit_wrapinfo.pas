@@ -40,6 +40,8 @@ type
     function IsItemAfterCollapsed(N: integer): boolean;
     property Items[N: integer]: TATSynWrapItem read GetItem; default;
     procedure Add(AItem: TATSynWrapItem);
+    procedure Delete(N: integer);
+    procedure Insert(N: integer; AItem: TATSynWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
   end;
 
@@ -127,6 +129,20 @@ end;
 procedure TATSynWrapInfo.Add(AItem: TATSynWrapItem);
 begin
   FList.Add(AItem);
+end;
+
+procedure TATSynWrapInfo.Delete(N: integer);
+begin
+  if IsIndexValid(N) then
+    FList.Delete(N);
+end;
+
+procedure TATSynWrapInfo.Insert(N: integer; AItem: TATSynWrapItem);
+begin
+  if N>=Count then
+    FList.Add(AItem)
+  else
+    FList.Insert(N, AItem);
 end;
 
 procedure TATSynWrapInfo.FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
