@@ -52,6 +52,7 @@ type
   private
     FList: TList;
     FListUpdates: TList;
+    FListUpdatesHard: boolean;
     FUndoList,
     FRedoList: TATUndoList;
     FEndings: TATLineEnds;
@@ -123,6 +124,7 @@ type
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
+    property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const Filename: string);
@@ -403,6 +405,7 @@ constructor TATStrings.Create;
 begin
   FList:= TList.Create;
   FListUpdates:= TList.Create;
+  FListUpdatesHard:= false;
   FUndoList:= TATUndoList.Create;
   FRedoList:= TATUndoList.Create;
 
@@ -736,6 +739,9 @@ end;
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
 begin
   DoAddUpdate(AIndex);
+  if AAction in [cEditActionDelete, cEditActionInsert] then
+    FListUpdatesHard:= true;
+
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 

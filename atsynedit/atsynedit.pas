@@ -3,6 +3,7 @@ unit ATSynEdit;
 {$mode delphi}
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
+{$define beep_cached_update}
 
 interface
 
@@ -746,10 +747,10 @@ var
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
   Items: TList;
-  ListUpdated: TList;
+  ListNums: TList;
   i, j: integer;
   NLine, NIndex1, NIndex2: integer;
-  bUseUpdateList: boolean;
+  UseUpdateList: boolean;
 begin
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-20); //don't do too big NIndent
@@ -776,17 +777,18 @@ begin
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
   end;
 
-  bUseUpdateList:=
+  UseUpdateList:=
     (FWrapInfo.Count>0) and
     (Strings.Count>100) and
-    (Strings.ListUpdates.Count>0);
-  bUseUpdateList:= false;/////////////todo
+    (Strings.ListUpdates.Count>0) and
+    (not Strings.ListUpdatesHard);
+  //UseUpdateList:= false;////to disable
 
   Items:= TList.Create;
-  ListUpdated:= TList.Create;
+  ListNums:= TList.Create;
 
   try
-    if not bUseUpdateList then
+    if not UseUpdateList then
     begin
       FWrapInfo.Clear;
       for i:= 0 to Strings.Count-1 do
@@ -798,18 +800,19 @@ begin
     end
     else
     begin
-      //////////////////todo
-      ///////////
+      {$ifdef beep_cached_update}
+      Beep;
+      {$endif}
 
-      ListUpdated.Assign(Strings.ListUpdates);
-      for i:= 0 to ListUpdated.Count-1 do
+      ListNums.Assign(Strings.ListUpdates);
+      for i:= 0 to ListNums.Count-1 do
       begin
-        NLine:= integer(ListUpdated[i]);
+        NLine:= NativeInt(ListNums[i]);
         GetWrapInfosForLine(NLine, NIndentMaximal, Items);
         if Items.Count=0 then Continue;
 
         FWrapInfo.FindIndexesOfLineNumber(NLine, NIndex1, NIndex2);
-        if NIndex1<0 then begin Beep; Continue; end;//////////todo
+        if NIndex1<0 then begin Beep; Continue; end;////todo?
 
         for j:= NIndex2 downto NIndex1 do
           FWrapInfo.Delete(j);
@@ -818,11 +821,12 @@ begin
       end;
     end;
   finally
-    FreeAndNil(ListUpdated);
+    FreeAndNil(ListNums);
     FreeAndNil(Items);
   end;
 
   Strings.ListUpdates.Clear;
+  Strings.ListUpdatesHard:= false;
 
   {$ifdef debug_findwrapindex}
   DebugFindWrapIndex;

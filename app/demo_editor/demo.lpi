@@ -104,6 +104,7 @@
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atcarets.pas"/>
@@ -156,7 +157,6 @@
       <Unit27>
         <Filename Value="..\..\atsynedit\atsynedit_wrapinfo.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_WrapInfo"/>
       </Unit27>
     </Units>
   </ProjectOptions>
