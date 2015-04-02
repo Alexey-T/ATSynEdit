@@ -205,6 +205,7 @@ type
     FStringsInt,
     FStringsExt: TATStrings;
     FTextOffset: TPoint;
+    FSelRect: TRect;
     FCarets: TATCarets;
     FCaretShape,
     FCaretShapeOvr: TATSynCaretShape;
@@ -1679,6 +1680,7 @@ begin
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDragging:= false;
+  FSelRect:= Rect(0, 0, 0, 0);
 
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
@@ -2013,6 +2015,7 @@ begin
   FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
   FMouseDragging:= false;
+  FSelRect:= Rect(0, 0, 0, 0);
 
   if PtInRect(FRectMinimap, Point(X, Y)) then
   if Shift=[ssLeft] then
@@ -2563,6 +2566,11 @@ begin
 
   if P1.Y>P2.Y then
     SwapInt(P1.Y, P2.Y);
+
+  FSelRect.Left:= P1.X;
+  FSelRect.Right:= P2.X;
+  FSelRect.Top:= P1.Y;
+  FSelRect.Bottom:= P2.Y;
 
   for i:= P1.Y to P2.Y do
   begin
