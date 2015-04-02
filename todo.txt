@@ -1,7 +1,4 @@
 
-undo grouped--done
-redo grouped--done
-
-cache WrapInfo(big file editing)
+cache wrapinfo(big file editing)--done?
 col block
 foldin +- sign
