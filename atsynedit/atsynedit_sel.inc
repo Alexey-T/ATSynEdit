@@ -215,7 +215,7 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
 var
   NLeft, NRight: integer;
 begin
-  if not IsRectEmpty(FSelRect) then
+  if not EqualRect(FSelRect, cRectEmpty) then
   begin
     if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
     begin

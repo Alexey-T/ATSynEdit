@@ -282,18 +282,18 @@ begin
   if EqualRect(ed.SelRect, Rect(0, 0, 0, 0)) then
     sSel:= '-'
   else
-    sSel:= 'column';
+    sSel:= 'ColSel';
 
-  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s | %s | Undo: %d, Redo: %d | %s', [
+  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s | Undo: %d, Redo: %d', [
     sPos,
     ed.Carets.Count,
     ed.ScrollTop+1,
     cEnd[ed.Strings.Endings],
     cOvr[ed.ModeOver],
     cRo[ed.ModeReadOnly],
+    sSel,
     ed.UndoCount,
-    ed.RedoCount,
-    sSel
+    ed.RedoCount
     ]);
 end;
 
