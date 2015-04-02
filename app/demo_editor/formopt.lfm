@@ -401,8 +401,8 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 19
         Top = 8
-        Width = 156
-        Caption = 'dbl click selects line/word'
+        Width = 185
+        Caption = 'dbl click selects line (else word)'
         TabOrder = 0
       end
       object chkClick3: TCheckBox
@@ -535,8 +535,8 @@ object fmOpt: TfmOpt
         Height = 15
         Hint = 'Ctrl+click to add/delete; Ctrl+Shift+click to add column; Ctrl+drag to add with selection'
         Top = 60
-        Width = 23
-        Caption = 'Hint'
+        Width = 21
+        Caption = 'hint'
         Font.Color = clBlue
         Font.Style = [fsUnderline]
         ParentColor = False

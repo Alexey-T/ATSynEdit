@@ -323,6 +323,7 @@ type
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     procedure DoInitDefaultPopupMenu;
     //select
+    procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_Word_ByClick;
@@ -2157,7 +2158,7 @@ begin
 
   //mouse dragged on numbers
   if PtInRect(RectNums, P) then
-    if ssLeft in Shift then
+    if Shift=[ssLeft] then
     begin
       P:= ClientPosToCaretPos(P);
       if (P.Y>=0) and (P.X>=0) then
@@ -2191,10 +2192,16 @@ begin
           end;
 
           //drag with Ctrl pressed: add selection
-          if [ssXControl, ssShift, ssAlt]*Shift=[ssXControl] then
+          if Shift=[ssXControl, ssLeft] then
           begin
             nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
             DoSelect_CharRange(nIndex, P);
+          end;
+
+          //drag with Alt pressed
+          if Shift=[ssAlt, ssLeft] then
+          begin
+            DoSelect_ColumnBlock(FMouseDownPnt, P);
           end;
 
           DoCaretsSort;
@@ -2545,6 +2552,30 @@ begin
   Add('Delete', cCommand_TextDeleteSelection);
   Add('-', 0);
   Add('Select all', cCommand_SelectAll);
+end;
+
+procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
+var
+  i: integer;
+begin
+  DoCaretSingle(P1.X, P1.Y);
+  DoSelect_None;
+
+  if P1.Y>P2.Y then
+    SwapInt(P1.Y, P2.Y);
+
+  for i:= P1.Y to P2.Y do
+  begin
+    if i=P1.Y then Carets.Clear;
+    Carets.Add(0, 0);
+    with Carets[Carets.Count-1] do
+    begin
+      PosX:= P2.X;
+      PosY:= i;
+      EndX:= P1.X;
+      EndY:= i;
+    end;
+  end;
 end;
 
 
