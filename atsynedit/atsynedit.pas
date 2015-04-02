@@ -491,6 +491,7 @@ type
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
+    property SelRect: TRect read FSelRect;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -517,7 +518,7 @@ type
     procedure DoSelect_All;
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
-    procedure DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint);
+    procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
     procedure DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
     procedure DoScrollByDelta(Dx, Dy: integer);
@@ -2167,7 +2168,7 @@ begin
       if (P.Y>=0) and (P.X>=0) then
         if FMouseDownNumber>=0 then
         begin
-          DoSelect_Lines_ToPoint(FMouseDownNumber, P);
+          DoSelect_LineRange(FMouseDownNumber, P);
           DoCaretsSort;
           DoEventCarets;
           Update;
@@ -2347,7 +2348,7 @@ begin
   if (PCaret.X>=0) and (PCaret.Y>=0) then
     if FMouseDownNumber>=0 then
     begin
-      DoSelect_Lines_ToPoint(FMouseDownNumber, PCaret);
+      DoSelect_LineRange(FMouseDownNumber, PCaret);
     end
     else
     begin
@@ -2567,8 +2568,8 @@ begin
   if P1.Y>P2.Y then
     SwapInt(P1.Y, P2.Y);
 
-  FSelRect.Left:= P1.X;
-  FSelRect.Right:= P2.X;
+  FSelRect.Left:= Min(P1.X, P2.X);
+  FSelRect.Right:= Max(P1.X, P2.X);
   FSelRect.Top:= P1.Y;
   FSelRect.Bottom:= P2.Y;
 

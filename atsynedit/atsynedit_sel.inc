@@ -109,7 +109,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoSelect_Lines_ToPoint(ALineFrom: integer; P: TPoint);
+procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; P: TPoint);
 var
   CItem: TATCaretItem;
 begin
