@@ -260,7 +260,7 @@ object fmOpt: TfmOpt
       object chkNavWrap: TCheckBox
         Left = 8
         Height = 19
-        Top = 28
+        Top = 8
         Width = 209
         Caption = 'up/down: navigate in wrapped lines'
         TabOrder = 1
@@ -268,7 +268,7 @@ object fmOpt: TfmOpt
       object chkLeftRt: TCheckBox
         Left = 8
         Height = 19
-        Top = 48
+        Top = 28
         Width = 160
         Caption = 'left/right: swap edge of sel'
         TabOrder = 2
@@ -276,9 +276,9 @@ object fmOpt: TfmOpt
       object chkHome: TCheckBox
         Left = 8
         Height = 19
-        Top = 68
-        Width = 123
-        Caption = 'home: to text begin'
+        Top = 48
+        Width = 142
+        Caption = 'home: to nonspace chr'
         TabOrder = 3
       end
       object edPage: TComboBox
@@ -304,7 +304,7 @@ object fmOpt: TfmOpt
         ParentColor = False
       end
       object chkOvrSel: TCheckBox
-        Left = 8
+        Left = 296
         Height = 19
         Top = 8
         Width = 124
@@ -314,9 +314,9 @@ object fmOpt: TfmOpt
       object chkTabInd: TCheckBox
         Left = 8
         Height = 19
-        Top = 128
-        Width = 94
-        Caption = 'tab: indent sel'
+        Top = 108
+        Width = 118
+        Caption = 'tab: also indent sel'
         TabOrder = 6
       end
       object Label5: TLabel
@@ -330,7 +330,7 @@ object fmOpt: TfmOpt
       object chkAutoInd: TCheckBox
         Left = 8
         Height = 19
-        Top = 108
+        Top = 88
         Width = 116
         Caption = 'enter: auto-indent'
         TabOrder = 5
@@ -371,7 +371,7 @@ object fmOpt: TfmOpt
       object chkUninKeep: TCheckBox
         Left = 296
         Height = 19
-        Top = 28
+        Top = 48
         Width = 130
         Caption = 'unindent keeps align'
         TabOrder = 7
@@ -379,15 +379,15 @@ object fmOpt: TfmOpt
       object chkEnd: TCheckBox
         Left = 8
         Height = 19
-        Top = 88
-        Width = 102
-        Caption = 'end: to text end'
+        Top = 68
+        Width = 131
+        Caption = 'end: to nonspace chr'
         TabOrder = 4
       end
       object chkTabSp: TCheckBox
         Left = 296
         Height = 19
-        Top = 8
+        Top = 28
         Width = 89
         Caption = 'tab as spaces'
         TabOrder = 11
@@ -401,8 +401,8 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 19
         Top = 8
-        Width = 124
-        Caption = 'dbl click selects line'
+        Width = 156
+        Caption = 'dbl click selects line/word'
         TabOrder = 0
       end
       object chkClick3: TCheckBox
