@@ -32,7 +32,7 @@ type
   public
     TextFont,
     TextBG,
-    TextSel,
+    TextSelFont,
     TextSelBG,
     Caret,
     GutterFont,
@@ -43,15 +43,15 @@ type
     MarginCaret,
     MarginUser,
     IndentLines,
-    RulerMark,
+    RulerFont,
     RulerBG,
-    CollapsedLine,
-    CollapsedText,
+    CollapseLine,
+    CollapseFont,
     UnprintedFont,
     UnprintedBG,
-    HexSpecialChars,
+    UnprintedHexFont,
     MinimapBorder,
-    MinimapSel,
+    MinimapSelBG,
     MicromapBG,
     StateChanged,
     StateAdded,
@@ -635,8 +635,8 @@ begin
   NRulerStart:= FScrollHorz.NPos;
 
   C.Font.Size:= FOptRulerFontSize;
-  C.Font.Color:= FColors.RulerMark;
-  C.Pen.Color:= FColors.RulerMark;
+  C.Font.Color:= FColors.RulerFont;
+  C.Pen.Color:= FColors.RulerFont;
   C.Brush.Color:= FColors.RulerBG;
 
   C.FillRect(FRectRuler);
@@ -1216,7 +1216,7 @@ begin
 
     if FWrapInfo.IsItemAfterCollapsed(NWrapIndex) then
     begin
-      C.Pen.Color:= FColors.CollapsedLine;
+      C.Pen.Color:= FColors.CollapseLine;
       C.MoveTo(ARect.Left, NCoordTop-1);
       C.LineTo(ARect.Right, NCoordTop-1);
     end;
@@ -1303,7 +1303,7 @@ begin
         FUnprintedReplaceSpec,
         AWithUnprintable and FUnprintedSpaces,
         FColors.UnprintedFont,
-        FColors.HexSpecialChars,
+        FColors.UnprintedHexFont,
         NOutputStrWidth,
         Trunc(NOutputSpacesSkipped), //todo:
           //needed number of chars of all chars counted as 1.0,
@@ -1425,7 +1425,7 @@ begin
   R.Bottom:= R.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y;
 
   if IntersectRect(R, R, FRectMinimap) then
-    CanvasInvertRect(C, R, FColors.MinimapSel);
+    CanvasInvertRect(C, R, FColors.MinimapSelBG);
 end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
@@ -1492,7 +1492,7 @@ begin
   Inc(ALineStart.X, cCollapseMarkIndent);
 
   //paint text
-  C.Font.Color:= FColors.CollapsedText;
+  C.Font.Color:= FColors.CollapseFont;
   C.Brush.Color:= FColors.TextBG;
 
   SMark:= '...';
@@ -1503,7 +1503,7 @@ begin
   NSize:= C.TextWidth(SMark) + 2*cCollapseMarkIndent;
 
   //paint frame
-  C.Pen.Color:= FColors.CollapsedText;
+  C.Pen.Color:= FColors.CollapseFont;
   C.Brush.Style:= bsClear;
   C.Rectangle(ALineStart.X, ALineStart.Y, ALineStart.X+NSize, ALineStart.Y+FCharSize.Y);
 end;
@@ -2646,7 +2646,7 @@ procedure TATSynEdit.InitColors;
 begin
   FColors.TextBG:= clWhite;
   FColors.TextFont:= clBlack;
-  FColors.TextSel:= clHighlightText;
+  FColors.TextSelFont:= clHighlightText;
   FColors.TextSelBG:= clHighlight;
   FColors.Caret:= clBlack;
   FColors.GutterFont:= clGray;
@@ -2654,18 +2654,18 @@ begin
   FColors.GutterCaretBG:= $c8c8c8;
   FColors.CurLineBG:= $e0f0f0;
   FColors.RulerBG:= FColors.GutterBG;
-  FColors.RulerMark:= clGray;
-  FColors.CollapsedLine:= clNavy;
-  FColors.CollapsedText:= clBlue;
+  FColors.RulerFont:= clGray;
+  FColors.CollapseLine:= clNavy;
+  FColors.CollapseFont:= clBlue;
   FColors.MarginRight:= clLtGray;
   FColors.MarginCaret:= clLime;
   FColors.MarginUser:= clYellow;
   FColors.IndentLines:= clMedGray;
   FColors.UnprintedFont:= $5050f0;
   FColors.UnprintedBG:= $e0e0e0;
-  FColors.HexSpecialChars:= clMedGray;
+  FColors.UnprintedHexFont:= clMedGray;
   FColors.MinimapBorder:= clLtGray;
-  FColors.MinimapSel:= $eeeeee;
+  FColors.MinimapSelBG:= $eeeeee;
   FColors.MicromapBG:= clCream;
   FColors.StateChanged:= $00f0f0;
   FColors.StateAdded:= $20c020;

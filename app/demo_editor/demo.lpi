@@ -104,7 +104,6 @@
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atcarets.pas"/>
@@ -118,12 +117,10 @@
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Commands"/>
       </Unit18>
       <Unit19>
         <Filename Value="..\..\atsynedit\atsynedit_keymapping.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Keymapping"/>
       </Unit19>
       <Unit20>
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
@@ -143,6 +140,7 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formopt"/>
       </Unit23>
       <Unit24>
         <Filename Value="..\..\atsynedit\atstrings_load.inc"/>

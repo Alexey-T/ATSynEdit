@@ -39,7 +39,7 @@ begin
         Len:= 1;
         if bSel then
         begin
-          Color:= FColors.TextSel;//random($ffff);
+          Color:= FColors.TextSelFont;//random($ffff);
           ColorBG:= FColors.TextSelBG;
         end
         else

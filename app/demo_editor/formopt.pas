@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ButtonPanel, Spin, ComCtrls, ATSynedit;
+  ButtonPanel, Spin, ComCtrls, ColorBox, ATSynedit;
 
 type
   { TfmOpt }
@@ -79,6 +79,8 @@ type
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
     TabSheet6: TTabSheet;
+    procedure ColorListBox1GetColors(Sender: TCustomColorListBox;
+      Items: TStrings);
     procedure FormCreate(Sender: TObject);
   private
     { private declarations }
@@ -239,6 +241,12 @@ procedure TfmOpt.FormCreate(Sender: TObject);
 begin
   InitShape(edCrShape);
   InitShape(edCrShape2);
+end;
+
+procedure TfmOpt.ColorListBox1GetColors(Sender: TCustomColorListBox;
+  Items: TStrings);
+begin
+  Items.AddObject('haha', TObject(pointer(clred)));
 end;
 
 procedure TfmOpt.InitShape(ed: TCombobox);
