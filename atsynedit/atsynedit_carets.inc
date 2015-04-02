@@ -366,4 +366,31 @@ begin
     FCarets.LoadFromArray(L);
 end;
 
+procedure TATSynEdit.DoCaretsExtend(ADown: boolean; ALines: integer);
+var
+  MoreCarets: TATCarets;
+  X, Y: integer;
+  i, j: integer;
+begin
+  MoreCarets:= TATCarets.Create;
+  try
+    for i:= 0 to Carets.Count-1 do
+      with Carets[i] do
+      begin
+        for j:= 1 to ALines do
+        begin
+          X:= PosX;
+          Y:= PosY+BoolToPlusMinusOne(ADown)*j;
+          if (Y<0) or (Y>=Strings.Count) then Break;
+          MoreCarets.Add(X, Y);
+        end;
+      end;
 
+    for i:= 0 to MoreCarets.Count-1 do
+      with MoreCarets[i] do
+        Carets.Add(PosX, PosY);
+    Carets.Sort;
+  finally
+    FreeAndNil(MoreCarets);
+  end;
+end;

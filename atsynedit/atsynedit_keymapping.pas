@@ -93,6 +93,13 @@ begin
   M.Add(cCommand_ScrollToCaretBottom, 'scroll to caret, bottom', [], []);
   M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
   M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
+
+  M.Add(cCommand_CaretsExtendUpLine, 'carets extend: up a line', ['Alt+Up'], []);
+  M.Add(cCommand_CaretsExtendUpPage, 'carets extend: up a page', [], []);
+  M.Add(cCommand_CaretsExtendUpToTop, 'carets extend: up to top', [], []);
+  M.Add(cCommand_CaretsExtendDownLine, 'carets extend: down a line', ['Alt+Down'], []);
+  M.Add(cCommand_CaretsExtendDownPage, 'carets extend: down a page', [], []);
+  M.Add(cCommand_CaretsExtendDownToEnd, 'carets extend: down to end', [], []);
 end;
 
 

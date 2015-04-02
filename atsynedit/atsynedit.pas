@@ -303,6 +303,7 @@ type
     FOptShowGutterCaretBG: boolean;
     //
     procedure DebugFindWrapIndex;
+    procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     procedure DoDropText;
     procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom,
       ATo: integer);
@@ -430,6 +431,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_Undo: TATCommandResults;
     function DoCommand_Redo: TATCommandResults;
     function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
@@ -2694,6 +2696,22 @@ end;
 procedure TATSynEdit.SetUndoAfterSave(AValue: boolean);
 begin
   Strings.UndoAfterSave:= AValue;
+end;
+
+procedure TATSynEdit.DoSizeChange(AInc: boolean);
+var
+  NTop: integer;
+begin
+  if not AInc then
+    if Font.Size<=cMinFontSize then Exit;
+
+  NTop:= ScrollTop;
+  Font.Size:= Font.Size+BoolToPlusMinusOne(AInc);
+  Update;
+  Application.ProcessMessages; //needed to apply Scrolltop
+
+  ScrollTop:= NTop;
+  Update;
 end;
 
 procedure TATSynEdit.BeginUpdate;

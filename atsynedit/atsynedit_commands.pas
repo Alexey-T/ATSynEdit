@@ -97,6 +97,13 @@ const
 
   cCommand_Cancel = 2001;
 
+  cCommand_CaretsExtendDownLine = 2010;
+  cCommand_CaretsExtendDownPage = 2011;
+  cCommand_CaretsExtendDownToEnd = 2012;
+  cCommand_CaretsExtendUpLine = 2013;
+  cCommand_CaretsExtendUpPage = 2014;
+  cCommand_CaretsExtendUpToTop = 2015;
+
 implementation
 
 end.

@@ -56,19 +56,10 @@ begin
   Result:= [cResultCaretAny];
 end;
 
-procedure TATSynEdit.DoSizeChange(AInc: boolean);
-var
-  NTop: integer;
+function TATSynEdit.DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
 begin
-  if not AInc then
-    if Font.Size<=cMinFontSize then Exit;
-
-  NTop:= ScrollTop;
-  Font.Size:= Font.Size+BoolToPlusMinusOne(AInc);
-  Update;
-  Application.ProcessMessages; //needed to apply Scrolltop
-
-  ScrollTop:= NTop;
-  Update;
+  DoCaretsExtend(ADown, ALines);
+  Result:= [cResultCaretAny];
 end;
+
 

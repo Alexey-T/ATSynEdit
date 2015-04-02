@@ -203,6 +203,13 @@ begin
     cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true, false);
 
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
+
+    cCommand_CaretsExtendUpLine:       Res:= DoCommand_CaretsExtend(false, 1);
+    cCommand_CaretsExtendUpPage:       Res:= DoCommand_CaretsExtend(false, GetPageLines);
+    cCommand_CaretsExtendUpToTop:      Res:= DoCommand_CaretsExtend(false, Strings.Count);
+    cCommand_CaretsExtendDownLine:     Res:= DoCommand_CaretsExtend(true, 1);
+    cCommand_CaretsExtendDownPage:     Res:= DoCommand_CaretsExtend(true, GetPageLines);
+    cCommand_CaretsExtendDownToEnd:    Res:= DoCommand_CaretsExtend(true, Strings.Count);
   end;
 
   DoCommandResults(Res);
