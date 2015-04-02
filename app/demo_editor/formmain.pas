@@ -14,7 +14,6 @@ type
   TfmMain = class(TForm)
     bFont: TButton;
     bOpt: TButton;
-    chkHilit: TCheckBox;
     chkMicromap: TCheckBox;
     chkUnprintSp: TCheckBox;
     chkUnprintEnd: TCheckBox;
@@ -44,6 +43,7 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     btnHlp: TMenuItem;
+    mnuHilit: TMenuItem;
     mnuTCaret1: TMenuItem;
     mnuUnlock: TMenuItem;
     mnuLock: TMenuItem;
@@ -81,7 +81,6 @@ type
     procedure bOptClick(Sender: TObject);
     procedure btnHlpClick(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
-    procedure chkHilitChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
@@ -105,6 +104,7 @@ type
     procedure mnuEndMcClick(Sender: TObject);
     procedure mnuEndUnClick(Sender: TObject);
     procedure mnuEndWClick(Sender: TObject);
+    procedure mnuHilitClick(Sender: TObject);
     procedure mnuLockClick(Sender: TObject);
     procedure mnuTBmsClick(Sender: TObject);
     procedure mnuTCaret1Click(Sender: TObject);
@@ -204,6 +204,12 @@ begin
   ed.Strings.Endings:= cEndWin;
   ed.Update;
   UpdateStatus;
+end;
+
+procedure TfmMain.mnuHilitClick(Sender: TObject);
+begin
+  with mnuHilit do Checked:= not Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.mnuLockClick(Sender: TObject);
@@ -481,11 +487,6 @@ begin
   ed.Update;
 end;
 
-procedure TfmMain.chkHilitChange(Sender: TObject);
-begin
-  ed.Update;
-end;
-
 procedure TfmMain.chkMicromapChange(Sender: TObject);
 begin
   if wait then Exit;
@@ -611,7 +612,7 @@ var
   X1, X2, Y, i: integer;
 begin
   if AStr='' then Exit;
-  if not chkHilit.Checked then Exit;
+  if not mnuHilit.Checked then Exit;
 
   C.Pen.Color:= clBlue;
   C.Pen.Width:= 2;
