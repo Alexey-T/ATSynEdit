@@ -459,11 +459,11 @@ end;
 procedure TfmMain.btnHlpClick(Sender: TObject);
 const
   txt =
-    'Ctrl+click - add/del'#13+
-    'Ctrl+drag - add with select'#13+
-    'Ctrl+Shift+click - add column'#13+
+    'Ctrl+click - add/del caret'#13+
+    'Ctrl+drag - add caret with select'#13+
+    'Ctrl+Shift+click - add caret column'#13+
     #13+
-    'Alt+drag - column-select (looks weird with wrap)'#13+
+    'Alt+drag - column-select (looks weird with wrap, ignores tab-width)'#13+
     'drag on line numbers - line-select'#13;
 begin
   Showmessage(txt);

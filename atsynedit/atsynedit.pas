@@ -2024,10 +2024,10 @@ begin
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
     FMouseDownPnt:= PCaret;
-    FSelRect:= cRectEmpty;
 
     if Shift=[ssLeft] then
     begin
+      FSelRect:= cRectEmpty;
       Strings.SetGroupMark;
       DoCaretSingleAsIs;
 
@@ -2045,17 +2045,20 @@ begin
 
     if Shift=[ssLeft, ssShift] then
     begin
+      FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
       Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if Shift=[ssLeft, ssXControl] then
     begin
+      FSelRect:= cRectEmpty;
       DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
     if Shift=[ssLeft, ssXControl, ssShift] then
     begin
+      FSelRect:= cRectEmpty;
       DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 

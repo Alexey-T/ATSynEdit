@@ -291,6 +291,8 @@ end;
 
 procedure TATSynEdit.DoCaretSingleAsIs;
 begin
+  FSelRect:= cRectEmpty;
+
   if Carets.Count=0 then
     Carets.Add(0, 0);
 
@@ -300,6 +302,8 @@ end;
 
 procedure TATSynEdit.DoCaretSingle(AX, AY: integer);
 begin
+  FSelRect:= cRectEmpty;
+
   if Carets.Count=0 then
     Carets.Add(AX, AY);
 
