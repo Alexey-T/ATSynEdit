@@ -89,10 +89,16 @@ begin
   if Res*[cResultCaretAny,
     cResultCaretLeft, cResultCaretRight,
     cResultCaretTop, cResultCaretBottom]<>[] then
+  begin
+    FSelRect:= Rect(0, 0, 0, 0);
     DoEventCarets;
+  end;
 
   if cResultText in Res then
+  begin
+    FSelRect:= Rect(0, 0, 0, 0);
     DoEventChange;
+  end;
 
   if cResultScroll in Res then
     DoEventScroll;

@@ -59,7 +59,6 @@ type
     edRulerSize: TSpinEdit;
     LabChars: TLabel;
     Label10: TLabel;
-    Label11: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -80,6 +79,7 @@ type
     TabSheet5: TTabSheet;
     TabSheet6: TTabSheet;
     procedure FormCreate(Sender: TObject);
+    procedure HelpButtonClick(Sender: TObject);
   private
     { private declarations }
   public
@@ -239,6 +239,21 @@ procedure TfmOpt.FormCreate(Sender: TObject);
 begin
   InitShape(edCrShape);
   InitShape(edCrShape2);
+end;
+
+procedure TfmOpt.HelpButtonClick(Sender: TObject);
+const
+  txt =
+    'carets:'#13+
+    'Ctrl+click - add/del'#13+
+    'Ctrl+drag - add with select'#13+
+    'Ctrl+Shift+click - add column'#13+
+    #13+
+    'mouse:'#13+
+    'Alt+drag - column-select (looks weird with wrap)'#13+
+    'drag on line numbers - line-select'#13;
+begin
+  Showmessage(txt);
 end;
 
 procedure TfmOpt.InitShape(ed: TCombobox);

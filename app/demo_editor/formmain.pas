@@ -268,6 +268,7 @@ const
   cRo: array[boolean] of string = ('-', 'RO');
 var
   sPos: string;
+  sSel: string;
   i: integer;
 begin
   sPos:= '';
@@ -275,7 +276,9 @@ begin
     with ed.Carets[i] do
       sPos:= sPos+Format(' %d:%d', [PosY+1, PosX+1]);
 
-  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s | %s | Undo: %d, Redo: %d |', [
+  if IsRectEmpty(ed.SelRect) then sSel:= '-' else sSel:= 'column';
+
+  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s | %s | Undo: %d, Redo: %d | %s', [
     sPos,
     ed.Carets.Count,
     ed.ScrollTop+1,
@@ -283,7 +286,8 @@ begin
     cOvr[ed.ModeOver],
     cRo[ed.ModeReadOnly],
     ed.UndoCount,
-    ed.RedoCount
+    ed.RedoCount,
+    sSel
     ]);
 end;
 

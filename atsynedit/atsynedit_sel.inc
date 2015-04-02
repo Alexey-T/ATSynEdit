@@ -198,20 +198,25 @@ end;
 procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   ACharSize: TPoint;
   const AVisRect: TRect;
-  AEolSelected: boolean;
-  APointText: TPoint;
   APointLeft: TPoint;
-  ALineIndex: integer);
+  APointText: TPoint;
+  ALineIndex: integer;
+  AEolSelected: boolean;
+  const AScrollHorz: TATSynScrollInfo);
+var
+  NLeft, NRight: integer;
 begin
   if not IsRectEmpty(FSelRect) then
   begin
     if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
     begin
+      NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
+      NRight:= NLeft+ACharSize.X*(FSelRect.Right-FSelRect.Left);
       C.Brush.Color:= FColors.TextSelBG;
       C.FillRect(
-        APointLeft.X+ACharSize.X*FSelRect.Left,
+        NLeft,
         APointLeft.Y,
-        APointLeft.X+ACharSize.X*FSelRect.Right,
+        NRight,
         APointLeft.Y+ACharSize.Y);
     end;
   end

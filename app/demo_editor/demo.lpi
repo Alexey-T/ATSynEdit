@@ -7,7 +7,7 @@
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
       <AutoCreateForms Value="False"/>
-      <Title Value="demo"/>
+      <Title Value="Demo"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
       <Icon Value="0"/>
@@ -140,6 +140,7 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formopt"/>
       </Unit23>
       <Unit24>
         <Filename Value="..\..\atsynedit\atstrings_load.inc"/>

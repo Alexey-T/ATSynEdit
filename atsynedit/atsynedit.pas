@@ -310,8 +310,9 @@ type
       ATo: integer);
     procedure DoMinimapClick(APosY: integer);
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
-      const AVisRect: TRect; AEolSelected: boolean; APointText: TPoint;
-  APointLeft: TPoint; ALineIndex: integer);
+      const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
+  ALineIndex: integer; AEolSelected: boolean;
+  const AScrollHorz: TATSynScrollInfo);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetRedoCount: integer;
     procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
@@ -1286,10 +1287,11 @@ begin
       end;
 
       DoPaintSelectedLineBG(C, ACharSize, ARect,
-        LineEolSelected,
-        CurrPointText,
         CurrPoint,
-        NLinesIndex);
+        CurrPointText,
+        NLinesIndex,
+        LineEolSelected,
+        AScrollHorz);
 
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
@@ -1315,10 +1317,11 @@ begin
     else
     begin
       DoPaintSelectedLineBG(C, ACharSize, ARect,
-        LineEolSelected,
-        CurrPointText,
         CurrPoint,
-        NLinesIndex);
+        CurrPointText,
+        NLinesIndex,
+        LineEolSelected,
+        AScrollHorz);
     end;
 
     if WrapItem.NFinal=cWrapItemFinal then
@@ -2009,7 +2012,6 @@ begin
   FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
   FMouseDragging:= false;
-  FSelRect:= Rect(0, 0, 0, 0);
 
   if PtInRect(FRectMinimap, Point(X, Y)) then
   if Shift=[ssLeft] then
@@ -2021,6 +2023,7 @@ begin
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
     FMouseDownPnt:= PCaret;
+    FSelRect:= Rect(0, 0, 0, 0);
 
     if Shift=[ssLeft] then
     begin
@@ -2074,6 +2077,7 @@ begin
       (X>=FGutter[FGutterBandNum].Left) and
       (X<FGutter[FGutterBandNum].Right) then
     begin
+      FSelRect:= Rect(0, 0, 0, 0);
       FMouseDownNumber:= PCaret.Y;
       DoSelect_Line(PCaret);
     end

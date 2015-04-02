@@ -20,12 +20,13 @@ object fmOpt: TfmOpt
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
     HelpButton.DefaultCaption = True
+    HelpButton.OnClick = HelpButtonClick
     CloseButton.Name = 'CloseButton'
     CloseButton.DefaultCaption = True
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
     TabOrder = 1
-    ShowButtons = [pbOK, pbCancel]
+    ShowButtons = [pbOK, pbCancel, pbHelp]
     ShowGlyphs = []
     ShowBevel = False
   end
@@ -528,21 +529,6 @@ object fmOpt: TfmOpt
         Width = 54
         Caption = 'shape, ovr'
         ParentColor = False
-      end
-      object Label11: TLabel
-        Cursor = crHelp
-        Left = 128
-        Height = 15
-        Hint = 'Ctrl+click to add/delete; Ctrl+Shift+click to add column; Ctrl+drag to add with selection'
-        Top = 60
-        Width = 21
-        Caption = 'hint'
-        Font.Color = clBlue
-        Font.Style = [fsUnderline]
-        ParentColor = False
-        ParentFont = False
-        ParentShowHint = False
-        ShowHint = True
       end
     end
     object TabSheet6: TTabSheet
