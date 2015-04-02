@@ -309,6 +309,9 @@ type
     procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom,
       ATo: integer);
     procedure DoMinimapClick(APosY: integer);
+    procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
+      const AVisRect: TRect; AEolSelected: boolean; APointText: TPoint;
+  APointLeft: TPoint; ALineIndex: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetRedoCount: integer;
     procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
@@ -1282,16 +1285,11 @@ begin
         Inc(CurrPointText.X, Trunc(NOutputSpacesSkipped*ACharSize.X));
       end;
 
-      if FOptHiliteSelFull then
-        if LineEolSelected then
-        begin
-          C.Brush.Color:= FColors.TextSelBG;
-          C.FillRect(
-            CurrPointText.X,
-            CurrPointText.Y,
-            ARect.Right,
-            CurrPointText.Y+ACharSize.Y);
-        end;
+      DoPaintSelectedLineBG(C, ACharSize, ARect,
+        LineEolSelected,
+        CurrPointText,
+        CurrPoint,
+        NLinesIndex);
 
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
@@ -1316,16 +1314,11 @@ begin
     end
     else
     begin
-      if FOptHiliteSelFull then
-        if LineEolSelected then
-        begin
-          C.Brush.Color:= FColors.TextSelBG;
-          C.FillRect(
-            CurrPointText.X,
-            CurrPointText.Y,
-            ARect.Right,
-            CurrPointText.Y+ACharSize.Y);
-        end;
+      DoPaintSelectedLineBG(C, ACharSize, ARect,
+        LineEolSelected,
+        CurrPointText,
+        CurrPoint,
+        NLinesIndex);
     end;
 
     if WrapItem.NFinal=cWrapItemFinal then
@@ -2556,35 +2549,6 @@ begin
   Add('Delete', cCommand_TextDeleteSelection);
   Add('-', 0);
   Add('Select all', cCommand_SelectAll);
-end;
-
-procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
-var
-  i: integer;
-begin
-  DoCaretSingle(P1.X, P1.Y);
-  DoSelect_None;
-
-  if P1.Y>P2.Y then
-    SwapInt(P1.Y, P2.Y);
-
-  FSelRect.Left:= Min(P1.X, P2.X);
-  FSelRect.Right:= Max(P1.X, P2.X);
-  FSelRect.Top:= P1.Y;
-  FSelRect.Bottom:= P2.Y;
-
-  for i:= P1.Y to P2.Y do
-  begin
-    if i=P1.Y then Carets.Clear;
-    Carets.Add(0, 0);
-    with Carets[Carets.Count-1] do
-    begin
-      PosX:= P2.X;
-      PosY:= i;
-      EndX:= P1.X;
-      EndY:= i;
-    end;
-  end;
 end;
 
 

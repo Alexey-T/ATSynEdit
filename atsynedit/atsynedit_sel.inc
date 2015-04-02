@@ -138,6 +138,8 @@ procedure TATSynEdit.DoSelect_None;
 var
   i: integer;
 begin
+  FSelRect:= Rect(0, 0, 0, 0);
+
   for i:= 0 to Carets.Count-1 do
     with Carets[i] do
     begin
@@ -164,4 +166,65 @@ begin
   if (X2=0) and (Y2>0) then Dec(ATo);
 end;
 
+procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
+var
+  i: integer;
+begin
+  DoCaretSingle(P1.X, P1.Y);
+  DoSelect_None;
+
+  if P1.Y>P2.Y then
+    SwapInt(P1.Y, P2.Y);
+
+  FSelRect.Left:= Min(P1.X, P2.X);
+  FSelRect.Right:= Max(P1.X, P2.X);
+  FSelRect.Top:= P1.Y;
+  FSelRect.Bottom:= P2.Y;
+
+  for i:= P1.Y to P2.Y do
+  begin
+    if i=P1.Y then Carets.Clear;
+    Carets.Add(0, 0);
+    with Carets[Carets.Count-1] do
+    begin
+      PosX:= P2.X;
+      PosY:= i;
+      EndX:= P1.X;
+      EndY:= i;
+    end;
+  end;
+end;
+
+procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
+  ACharSize: TPoint;
+  const AVisRect: TRect;
+  AEolSelected: boolean;
+  APointText: TPoint;
+  APointLeft: TPoint;
+  ALineIndex: integer);
+begin
+  if not IsRectEmpty(FSelRect) then
+  begin
+    if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
+    begin
+      C.Brush.Color:= FColors.TextSelBG;
+      C.FillRect(
+        APointLeft.X+ACharSize.X*FSelRect.Left,
+        APointLeft.Y,
+        APointLeft.X+ACharSize.X*FSelRect.Right,
+        APointLeft.Y+ACharSize.Y);
+    end;
+  end
+  else
+  if FOptHiliteSelFull then
+    if AEolSelected then
+    begin
+      C.Brush.Color:= FColors.TextSelBG;
+      C.FillRect(
+        APointText.X,
+        APointText.Y,
+        AVisRect.Right,
+        APointText.Y+ACharSize.Y);
+    end;
+end;
 
