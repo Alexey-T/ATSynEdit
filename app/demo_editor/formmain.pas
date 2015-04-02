@@ -41,6 +41,8 @@ type
     Label9: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    btnHlp: TMenuItem;
     mnuTCaret1: TMenuItem;
     mnuUnlock: TMenuItem;
     mnuLock: TMenuItem;
@@ -76,6 +78,7 @@ type
     procedure bSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
+    procedure btnHlpClick(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
@@ -448,6 +451,21 @@ procedure TfmMain.bOptClick(Sender: TObject);
 begin
   DoConfigEditor(ed);
   ed.SetFocus;
+end;
+
+procedure TfmMain.btnHlpClick(Sender: TObject);
+const
+  txt =
+    'carets:'#13+
+    'Ctrl+click - add/del'#13+
+    'Ctrl+drag - add with select'#13+
+    'Ctrl+Shift+click - add column'#13+
+    #13+
+    'mouse:'#13+
+    'Alt+drag - column-select (looks weird with wrap)'#13+
+    'drag on line numbers - line-select'#13;
+begin
+  Showmessage(txt);
 end;
 
 procedure TfmMain.chkGutterChange(Sender: TObject);

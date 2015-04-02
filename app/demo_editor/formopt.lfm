@@ -20,13 +20,12 @@ object fmOpt: TfmOpt
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
     HelpButton.DefaultCaption = True
-    HelpButton.OnClick = HelpButtonClick
     CloseButton.Name = 'CloseButton'
     CloseButton.DefaultCaption = True
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
     TabOrder = 1
-    ShowButtons = [pbOK, pbCancel, pbHelp]
+    ShowButtons = [pbOK, pbCancel]
     ShowGlyphs = []
     ShowBevel = False
   end

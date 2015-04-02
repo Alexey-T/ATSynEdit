@@ -383,6 +383,13 @@ object fmMain: TfmMain
         ShortCut = 112
         OnClick = bKeymapClick
       end
+      object MenuItem2: TMenuItem
+        Caption = '-'
+      end
+      object btnHlp: TMenuItem
+        Caption = 'help..'
+        OnClick = btnHlpClick
+      end
     end
   end
 end
