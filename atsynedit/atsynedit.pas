@@ -180,6 +180,7 @@ const
   cMaxCaretTime = 2000;
   cMinCharsAfterAnyIndent = 20;
   cMaxLinesForOldWrapUpdate = 100;
+  cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
 
   { TATGutter }
 
@@ -1073,7 +1074,7 @@ begin
     Result.Bottom:= ClientHeight;
   end
   else
-    Result:= Rect(0, 0, 0, 0);
+    Result:= cRectEmpty;
 end;
 
 function TATSynEdit.GetRectMicromap: TRect;
@@ -1086,7 +1087,7 @@ begin
     Result.Bottom:= ClientHeight;
   end
   else
-    Result:= Rect(0, 0, 0, 0);
+    Result:= cRectEmpty;
 end;
 
 function TATSynEdit.GetRectGutter: TRect;
@@ -1099,7 +1100,7 @@ begin
     Result.Bottom:= ClientHeight;
   end
   else
-    Result:= Rect(0, 0, 0, 0);
+    Result:= cRectEmpty;
 end;
 
 function TATSynEdit.GetRectRuler: TRect;
@@ -1112,7 +1113,7 @@ begin
     Result.Bottom:= Result.Top+FOptRulerSize;
   end
   else
-    Result:= Rect(0, 0, 0, 0);
+    Result:= cRectEmpty;
 end;
 
 procedure TATSynEdit.DoPaintTo(C: TCanvas);
@@ -1677,7 +1678,7 @@ begin
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDragging:= false;
-  FSelRect:= Rect(0, 0, 0, 0);
+  FSelRect:= cRectEmpty;
 
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
@@ -2023,7 +2024,7 @@ begin
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
     FMouseDownPnt:= PCaret;
-    FSelRect:= Rect(0, 0, 0, 0);
+    FSelRect:= cRectEmpty;
 
     if Shift=[ssLeft] then
     begin
@@ -2077,7 +2078,7 @@ begin
       (X>=FGutter[FGutterBandNum].Left) and
       (X<FGutter[FGutterBandNum].Right) then
     begin
-      FSelRect:= Rect(0, 0, 0, 0);
+      FSelRect:= cRectEmpty;
       FMouseDownNumber:= PCaret.Y;
       DoSelect_Line(PCaret);
     end
@@ -2744,6 +2745,7 @@ end;
 {$I atsynedit_cmd_editing.inc}
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
+
 
 end.
 

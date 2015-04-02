@@ -279,7 +279,10 @@ begin
     with ed.Carets[i] do
       sPos:= sPos+Format(' %d:%d', [PosY+1, PosX+1]);
 
-  if IsRectEmpty(ed.SelRect) then sSel:= '-' else sSel:= 'column';
+  if EqualRect(ed.SelRect, Rect(0, 0, 0, 0)) then
+    sSel:= '-'
+  else
+    sSel:= 'column';
 
   Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s | %s | Undo: %d, Redo: %d | %s', [
     sPos,
@@ -456,12 +459,10 @@ end;
 procedure TfmMain.btnHlpClick(Sender: TObject);
 const
   txt =
-    'carets:'#13+
     'Ctrl+click - add/del'#13+
     'Ctrl+drag - add with select'#13+
     'Ctrl+Shift+click - add column'#13+
     #13+
-    'mouse:'#13+
     'Alt+drag - column-select (looks weird with wrap)'#13+
     'drag on line numbers - line-select'#13;
 begin

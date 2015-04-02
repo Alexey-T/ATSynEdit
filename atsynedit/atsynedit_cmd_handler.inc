@@ -90,13 +90,13 @@ begin
     cResultCaretLeft, cResultCaretRight,
     cResultCaretTop, cResultCaretBottom]<>[] then
   begin
-    FSelRect:= Rect(0, 0, 0, 0);
+    FSelRect:= cRectEmpty;
     DoEventCarets;
   end;
 
   if cResultText in Res then
   begin
-    FSelRect:= Rect(0, 0, 0, 0);
+    FSelRect:= cRectEmpty;
     DoEventChange;
   end;
 

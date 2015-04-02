@@ -4,20 +4,30 @@ function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
 var
   Item: TATCaretItem;
   i, X1, Y1, X2, Y2: integer;
-  bSel, bEnded, bMatch: boolean;
+  bSel: boolean;
 begin
   Result:= false;
+
+  if not EqualRect(FSelRect, cRectEmpty) then
+  begin
+    //a) faster, b) works w/o mul-carets
+    Result:=
+      (AY>=FSelRect.Top) and
+      (AY<=FSelRect.Bottom) and
+      (AX>=FSelRect.Left) and
+      (AX<FSelRect.Right);
+  end
+  else
   for i:= 0 to Carets.Count-1 do
   begin
     Item:= Carets[i];
     Item.GetRange(X1, Y1, X2, Y2, bSel);
     if not bSel then Continue;
 
-    bEnded:= Y1>AY;
-    if bEnded then Exit;
+    //carets sorted: can stop
+    if Y1>AY then Exit;
 
-    bMatch:= IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside;
-    if bMatch then
+    if IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside then
       begin Result:= true; Break end;
   end;
 end;
@@ -138,8 +148,7 @@ procedure TATSynEdit.DoSelect_None;
 var
   i: integer;
 begin
-  FSelRect:= Rect(0, 0, 0, 0);
-
+  FSelRect:= cRectEmpty;
   for i:= 0 to Carets.Count-1 do
     with Carets[i] do
     begin
