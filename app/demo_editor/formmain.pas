@@ -14,6 +14,7 @@ type
   TfmMain = class(TForm)
     bFont: TButton;
     bOpt: TButton;
+    chkHilit: TCheckBox;
     chkMicromap: TCheckBox;
     chkUnprintSp: TCheckBox;
     chkUnprintEnd: TCheckBox;
@@ -80,6 +81,7 @@ type
     procedure bOptClick(Sender: TObject);
     procedure btnHlpClick(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
+    procedure chkHilitChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
@@ -115,6 +117,8 @@ type
     wait: boolean;
     FDir: string;
     procedure EditCaretMoved(Sender: TObject);
+    procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
+      const AStr: atString; ACharSize: TPoint; const AExtent: array of integer);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
@@ -163,6 +167,7 @@ begin
   ed.OnCommand:= EditCommand;
   ed.OnClickGutter:= EditClickGutter;
   ed.OnDrawBookmarkIcon:= EditDrawBm;
+  ed.OnDrawLine:= EditDrawLine;
 
   ed.SetFocus;
 end;
@@ -476,6 +481,11 @@ begin
   ed.Update;
 end;
 
+procedure TfmMain.chkHilitChange(Sender: TObject);
+begin
+  ed.Update;
+end;
+
 procedure TfmMain.chkMicromapChange(Sender: TObject);
 begin
   if wait then Exit;
@@ -595,5 +605,31 @@ begin
   ed.Update;
 end;
 
+procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas;
+  AX, AY: integer; const AStr: atString; ACharSize: TPoint; const AExtent: array of integer);
+var
+  X1, X2, Y, i: integer;
+begin
+  if AStr='' then Exit;
+  if not chkHilit.Checked then Exit;
+
+  C.Pen.Color:= clBlue;
+  C.Pen.Width:= 2;
+  C.Pen.EndCap:= pecSquare;
+
+  for i:= 1 to Length(AStr) do
+    if AStr[i]='w' then
+    begin
+      X1:= AX;
+      if i>1 then
+        Inc(X1, AExtent[i-2]);
+      X2:= AX+AExtent[i-1];
+      Y:= AY+ACharSize.Y-1;
+
+      C.Line(X1, Y, X2, Y);
+    end;
+
+  C.Pen.Width:= 1;
+end;
 
 end.

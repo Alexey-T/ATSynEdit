@@ -25,6 +25,11 @@ type
   TATLineParts = array[0..400] of TATLinePart;
   PATLineParts = ^TATLineParts;
 
+  TATSynEditDrawLineEvent = procedure(Sender: TObject; C: TCanvas;
+    AX, AY: integer; const AStr: atString; ACharSize: TPoint;
+    const AExtent: array of integer) of object;
+
+
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
   Str: atString;
@@ -35,8 +40,9 @@ procedure CanvasTextOut(C: TCanvas;
   AColorUnprintable: TColor;
   AColorHex: TColor;
   out AStrWidth: integer;
-  ACharsSkipped: integer = 0;
-  AParts: PATLineParts = nil);
+  ACharsSkipped: integer;
+  AParts: PATLineParts;
+  AEvent: TATSynEditDrawLineEvent);
 
 procedure DoPaintUnprintedEol(C: TCanvas;
   const AStrEol: atString;
@@ -236,7 +242,8 @@ end;
 procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   ATabSize: integer; ACharSize: TPoint; AReplaceSpecs: boolean;
   AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
-  AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts);
+  AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
+  AEvent: TATSynEditDrawLineEvent);
 var
   ListReal: array of real;
   ListInt: array of Longint;
@@ -341,7 +348,12 @@ begin
     DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable);
 
   AStrWidth:= ListInt[High(ListInt)];
+
+  if Str<>'' then
+    if Assigned(AEvent) then
+      AEvent(nil, C, PosX, PosY, Str, ACharSize, ListInt);
 end;
+
 
 {$ifdef invert_pixels}
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);

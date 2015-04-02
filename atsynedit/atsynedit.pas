@@ -182,16 +182,15 @@ const
   cMaxLinesForOldWrapUpdate = 100;
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
 
-  { TATGutter }
-
 type
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;
-  TATSynEditClickGutter = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
-  TATSynEditDrawBookmarkIcon = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
+  TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
+  TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
 
-  { TATSynEdit }
 
 type
+  { TATSynEdit }
+
   TATSynEdit = class(TCustomControl)
   private
     FTimerBlink: TTimer;
@@ -224,8 +223,9 @@ type
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
-    FOnClickGutter: TATSynEditClickGutter;
-    FOnDrawBookmarkIcon: TATSynEditDrawBookmarkIcon;
+    FOnClickGutter: TATSynEditClickGutterEvent;
+    FOnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent;
+    FOnDrawLine: TATSynEditDrawLineEvent;
     FOnStateChanged: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
     FWrapInfo: TATSynWrapInfo;
@@ -552,8 +552,9 @@ type
     property OnScrolled: TNotifyEvent read FOnScrolled write FOnScrolled;
     property OnStateChanged: TNotifyEvent read FOnStateChanged write FOnStateChanged;
     property OnCommand: TATSynEditCommandEvent read FOnCommand write FOnCommand;
-    property OnClickGutter: TATSynEditClickGutter read FOnClickGutter write FOnClickGutter;
-    property OnDrawBookmarkIcon: TATSynEditDrawBookmarkIcon read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
+    property OnClickGutter: TATSynEditClickGutterEvent read FOnClickGutter write FOnClickGutter;
+    property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
+    property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
 
     //options
     property Colors: TATSynEditColors read FColors;
@@ -1179,6 +1180,7 @@ var
   CurrPoint, CurrPointText: TPoint;
   LineWithCaret, LineEolSelected: boolean;
   Parts: TATLineParts;
+  Event: TATSynEditDrawLineEvent;
   i: integer;
   //
   procedure DoPaintState(ATop: integer; AColor: TColor);
@@ -1298,6 +1300,11 @@ begin
         NOutputCharsSkipped, cMaxCharsForOutput,
         IfThen(BmColor<>clNone, BmColor, FColors.TextBG));
 
+      if AWithGutter then
+        Event:= FOnDrawLine
+      else
+        Event:= nil;
+
       CanvasTextOut(C,
         CurrPointText.X,
         CurrPointText.Y,
@@ -1312,7 +1319,8 @@ begin
         Trunc(NOutputSpacesSkipped), //todo:
           //needed number of chars of all chars counted as 1.0,
           //while NOutputSpacesSkipped is with cjk counted as 1.7
-        @Parts
+        @Parts,
+        Event
         );
     end
     else

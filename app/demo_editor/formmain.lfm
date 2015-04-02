@@ -280,6 +280,15 @@ object fmMain: TfmMain
       OnClick = bOptClick
       TabOrder = 5
     end
+    object chkHilit: TCheckBox
+      Left = 8
+      Height = 19
+      Top = 336
+      Width = 64
+      Caption = 'hilite ''w'''
+      OnChange = chkHilitChange
+      TabOrder = 13
+    end
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]
