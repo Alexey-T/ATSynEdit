@@ -581,6 +581,8 @@ type
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
+    property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall;
+    property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX;
@@ -655,18 +657,14 @@ begin
   for i:= NRulerStart to NRulerStart+GetVisibleColumns+1 do
   begin
     NX:= FTextOffset.X+(i-NRulerStart)*FCharSize.X;
-    if i mod 5 = 0 then
-      NSize:= FOptRulerMarkSizeBig
-    else
-      NSize:= FOptRulerMarkSizeSmall;
-    C.Line(NX, FOptRulerSize-1,
-           NX, FOptRulerSize-1-NSize);
+    NSize:= IfThen(i mod 5 = 0, FOptRulerMarkSizeBig, FOptRulerMarkSizeSmall);
+    C.Line(NX, FRectRuler.Bottom-1,
+           NX, FRectRuler.Bottom-1-NSize);
 
     if i mod 10 = 0 then
     begin
       Str:= IntToStr(i);
-      Dec(NX, C.TextWidth(Str) div 2);
-      C.TextOut(NX, 0, Str);
+      C.TextOut(NX - C.TextWidth(Str) div 2, 0, Str);
     end;
   end;
 
