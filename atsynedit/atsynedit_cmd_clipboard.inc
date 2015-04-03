@@ -95,7 +95,7 @@ begin
       NLen:= FSelRect.Right-FSelRect.Left - Length(Str);
       if NLen>0 then
         Str:= Str+StringOfChar(' ', NLen);
-      Result:= Result+Str+sLineBreak;
+      Result:= Result+UTF8Encode(Str)+sLineBreak;
     end;
     Exit;
   end;
