@@ -180,11 +180,11 @@ const
   cMaxCaretTime = 2000;
   cMinCharsAfterAnyIndent = 20;
   cMaxLinesForOldWrapUpdate = 100;
-  cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
 
 var
-  cClipColumnSignature: integer = $1000;
-  cClipFormatId: integer = 0;
+  cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
+  cClipFormatId: integer = 0; //must be inited
+  cClipSignatureColumn: integer = $1000;
 
 type
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;

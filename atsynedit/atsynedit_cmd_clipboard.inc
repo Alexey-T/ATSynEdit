@@ -31,7 +31,6 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
-  DoSelect_None;
 
   Str:= UTF8Decode(Clipboard.AsText);
   Result:= DoCommand_TextInsertColumnBlockOnce(Str, AKeepCaret);
@@ -63,7 +62,7 @@ begin
   if not EqualRect(FSelRect, cRectEmpty) then
   begin
     Clipboard.AsText:= GetTextForClipboard;
-    Clipboard.AddFormat(cClipFormatId, cClipColumnSignature, SizeOf(cClipColumnSignature));
+    Clipboard.AddFormat(cClipFormatId, cClipSignatureColumn, SizeOf(cClipSignatureColumn));
   end
   else
   begin

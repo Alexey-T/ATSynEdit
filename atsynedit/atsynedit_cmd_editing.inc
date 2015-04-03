@@ -485,7 +485,9 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
+  //cannot handle carets/selections for colblock
   DoCaretSingleAsIs;
+  DoSelect_None;
   Item:= FCarets[0];
 
   List:= TATStrings.Create;
