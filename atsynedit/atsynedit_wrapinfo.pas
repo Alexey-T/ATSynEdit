@@ -1,7 +1,6 @@
 unit ATSynEdit_WrapInfo;
 
 {$mode objfpc}{$H+}
-//{$define debug_replaceitems}
 
 interface
 
@@ -199,18 +198,14 @@ begin
   FList.Capacity:= Max(1024, N);
 end;
 
-//optimized; don't del/ins but assign
+//optimized; don't just del/ins
 procedure TATSynWrapInfo.ReplaceItems(AFrom, ATo: integer; AItems: TList);
 var
-  i, Dif: integer;
+  Dif, i: integer;
 begin
   Dif:= AItems.Count - (ATo-AFrom+1);
 
-  {$ifdef debug_replaceitems}
-  if dif<>0 then application.MainForm.caption:= 'dif '+inttostr(dif)
-    else application.MainForm.caption:= '';
-  {$endif}
-
+  //adjust count of items
   if Dif<0 then
   begin
     for i:= 1 to Abs(Dif) do
@@ -219,10 +214,11 @@ begin
   else
   if Dif>0 then
   begin
-    for i:= 1 to Abs(Dif) do
+    for i:= 1 to Dif do
       Insert(AFrom, TATSynWrapItem.Create(0, 0, 0, 0, Low(TATSynWrapFinal)));
   end;
 
+  //overwrite N items
   for i:= 0 to AItems.Count-1 do
     TATSynWrapItem(FList[AFrom+i]).Assign(TATSynWrapItem(AItems[i]));
 end;

@@ -2761,7 +2761,7 @@ end;
 
 
 initialization
-  cClipFormatId:= RegisterClipboardFormat('ATSynEdit-Column-Block');
+  cClipFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
 
 end.
 
