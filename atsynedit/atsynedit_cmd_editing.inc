@@ -473,3 +473,41 @@ begin
   Result:= [cResultText, cResultCaretBottom];
 end;
 
+
+function TATSynEdit.DoCommand_TextInsertColumnBlockOnce(const AText: atString;
+  AKeepCaret: boolean): TATCommandResults;
+var
+  Item: TATCaretItem;
+  List: TATStrings;
+  Shift, PosAfter: TPoint;
+  i, PosY: integer;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  DoCaretSingleAsIs;
+  Item:= FCarets[0];
+
+  List:= TATStrings.Create;
+  try
+    List.LoadFromString(AText);
+    List.LineDeleteLastFake;
+    if List.Count=0 then Exit;
+
+    PosY:= Item.PosY;
+    for i:= 0 to List.Count-1 do
+    begin
+      Strings.TextInsert(Item.PosX, PosY, List.Lines[i], FOver, Shift, PosAfter);
+      if not AKeepCaret then
+        Item.PosY:= PosY;
+      Inc(PosY);
+      if not Strings.IsIndexValid(PosY) then Break;
+    end;
+
+  finally
+    FreeAndNil(List);
+  end;
+
+  Result:= [cResultText, cResultCaretBottom];
+end;
+

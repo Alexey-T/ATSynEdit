@@ -307,13 +307,12 @@ type
     procedure DebugFindWrapIndex;
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     procedure DoDropText;
-    procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom,
-      ATo: integer);
+    procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
     procedure DoMinimapClick(APosY: integer);
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
       const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
-  ALineIndex: integer; AEolSelected: boolean;
-  const AScrollHorz: TATSynScrollInfo);
+      ALineIndex: integer; AEolSelected: boolean;
+      const AScrollHorz: TATSynScrollInfo);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetRedoCount: integer;
     procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
@@ -438,6 +437,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_Undo: TATCommandResults;
     function DoCommand_Redo: TATCommandResults;
@@ -473,6 +473,7 @@ type
     function DoCommand_GotoTextBegin: TATCommandResults;
     function DoCommand_GotoTextEnd: TATCommandResults;
     function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
+    function DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean): TATCommandResults;
     function DoCommand_ClipboardCopy(DoAdd: boolean = false): TATCommandResults;
     function DoCommand_ClipboardCut: TATCommandResults;
     //

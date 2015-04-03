@@ -84,8 +84,10 @@ begin
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/add', [], []);
   M.Add(cCommand_ClipboardCut, 'clipboard: cut', [cXControl+'+X'], ['Shift+Del']);
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXControl+'+V'], ['Shift+Ins']);
-  M.Add(cCommand_ClipboardPaste_Sel, 'clipboard: paste + select', [], []);
+  M.Add(cCommand_ClipboardPaste_Select, 'clipboard: paste + select', [], []);
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
+  M.Add(cCommand_ClipboardPaste_Column, 'clipboard: paste, force column block', [], []);
+  M.Add(cCommand_ClipboardPaste_ColumnKeepCaret, 'clipboard: paste, force column block, keep caret', [], []);
 
   M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);

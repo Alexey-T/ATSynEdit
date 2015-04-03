@@ -16,6 +16,17 @@ begin
         Strings.LineAdd('');
 end;
 
+function TATSynEdit.DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean): TATCommandResults;
+var
+  Str: atString;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  Str:= UTF8Decode(Clipboard.AsText);
+  Result:= DoCommand_TextInsertColumnBlockOnce(Str, AKeepCaret);
+end;
+
 function TATSynEdit.DoCommand_ClipboardCut: TATCommandResults;
 begin
   Result:= [];

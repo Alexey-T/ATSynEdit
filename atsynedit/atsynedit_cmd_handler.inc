@@ -205,8 +205,10 @@ begin
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true);
     cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut;
     cCommand_ClipboardPaste:           Res:= DoCommand_ClipboardPaste(false, false);
-    cCommand_ClipboardPaste_Sel:       Res:= DoCommand_ClipboardPaste(false, true);
+    cCommand_ClipboardPaste_Select:    Res:= DoCommand_ClipboardPaste(false, true);
     cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true, false);
+    cCommand_ClipboardPaste_Column:          Res:= DoCommand_ClipboardPasteColumnBlock(false);
+    cCommand_ClipboardPaste_ColumnKeepCaret: Res:= DoCommand_ClipboardPasteColumnBlock(true);
 
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
 

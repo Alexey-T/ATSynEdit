@@ -85,7 +85,6 @@ type
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddLastFake;
-    procedure LineDeleteLastFake;
     procedure LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
     procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
     procedure SetCaretsArray(const L: TPointArray);
@@ -117,6 +116,7 @@ type
     procedure LineInsert(N: integer; const AString: atString);
     procedure LineInsertStrings(N: integer; AList: TATStrings);
     procedure LineDelete(N: integer; AForceLast: boolean = true);
+    procedure LineDeleteLastFake;
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[Index: integer]: integer read GetLineHidden write SetLineHidden;

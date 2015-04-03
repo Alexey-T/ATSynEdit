@@ -89,11 +89,13 @@ const
   cCommand_ToggleOverwrite = 301;
 
   cCommand_ClipboardPaste = 1000;
-  cCommand_ClipboardPaste_Sel = 1001;
+  cCommand_ClipboardPaste_Select = 1001;
   cCommand_ClipboardPaste_KeepCaret = 1002;
-  cCommand_ClipboardCopy = 1004;
-  cCommand_ClipboardCopyAdd = 1005;
-  cCommand_ClipboardCut = 1006;
+  cCommand_ClipboardPaste_Column = 1003 or cCmdSelReset;
+  cCommand_ClipboardPaste_ColumnKeepCaret = 1004 or cCmdSelReset;
+  cCommand_ClipboardCopy = 1006;
+  cCommand_ClipboardCopyAdd = 1007;
+  cCommand_ClipboardCut = 1008;
 
   cCommand_Cancel = 2001;
 
