@@ -649,8 +649,8 @@ begin
   C.Brush.Color:= FColors.RulerBG;
 
   C.FillRect(FRectRuler);
-  C.MoveTo(FRectRuler.Left, FRectRuler.Bottom);
-  C.LineTo(FRectRuler.Right, FRectRuler.Bottom);
+  C.Line(FRectRuler.Left, FRectRuler.Bottom,
+         FRectRuler.Right, FRectRuler.Bottom);
 
   for i:= NRulerStart to NRulerStart+GetVisibleColumns+1 do
   begin
@@ -659,8 +659,8 @@ begin
       NSize:= FOptRulerMarkSizeBig
     else
       NSize:= FOptRulerMarkSizeSmall;
-    C.MoveTo(NX, FOptRulerSize-1);
-    C.LineTo(NX, FOptRulerSize-1-NSize);
+    C.Line(NX, FOptRulerSize-1,
+           NX, FOptRulerSize-1-NSize);
 
     if i mod 10 = 0 then
     begin
@@ -1227,8 +1227,7 @@ begin
     if FWrapInfo.IsItemAfterCollapsed(NWrapIndex) then
     begin
       C.Pen.Color:= FColors.CollapseLine;
-      C.MoveTo(ARect.Left, NCoordTop-1);
-      C.LineTo(ARect.Right, NCoordTop-1);
+      C.Line(ARect.Left, NCoordTop-1, ARect.Right, NCoordTop-1);
     end;
 
     //prepare line
@@ -1452,8 +1451,8 @@ begin
   if FColors.MinimapBorder<>clNone then
   begin
     C.Pen.Color:= FColors.MinimapBorder;
-    C.MoveTo(FRectMinimap.Left-1, FRectMinimap.Top);
-    C.LineTo(FRectMinimap.Left-1, FRectMinimap.Bottom);
+    C.Line(FRectMinimap.Left-1, FRectMinimap.Top,
+           FRectMinimap.Left-1, FRectMinimap.Bottom);
   end;
 end;
 
@@ -1468,8 +1467,8 @@ begin
   if (AX>=FRectMain.Left) and (AX<FRectMain.Right) then
   begin
     C.Pen.Color:= AColor;
-    C.MoveTo(AX, FRectMain.Top);
-    C.LineTo(AX, FRectMain.Bottom);
+    C.Line(AX, FRectMain.Top,
+           AX, FRectMain.Bottom);
   end;
 end;
 
