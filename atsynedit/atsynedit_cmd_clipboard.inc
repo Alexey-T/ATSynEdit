@@ -5,6 +5,14 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
+  //column block
+  if Clipboard.HasFormat(cClipFormatId) then
+  begin
+    Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret);
+    Exit
+  end;
+
+  //usual text
   Str:= UTF8Decode(Clipboard.AsText);
   DoCommand_TextDeleteSelections;
   Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOver and FOptUseOverOnPaste, ASelectThen);
@@ -16,16 +24,19 @@ begin
         Strings.LineAdd('');
 end;
 
+
 function TATSynEdit.DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean): TATCommandResults;
 var
   Str: atString;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  DoSelect_None;
 
   Str:= UTF8Decode(Clipboard.AsText);
   Result:= DoCommand_TextInsertColumnBlockOnce(Str, AKeepCaret);
 end;
+
 
 function TATSynEdit.DoCommand_ClipboardCut: TATCommandResults;
 begin
@@ -47,26 +58,48 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCommand_ClipboardCopy(DoAdd: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean): TATCommandResults;
 begin
-  if DoAdd then
-    Clipboard.AsText:= Clipboard.AsText+GetTextForClipboard
-  else
+  if not EqualRect(FSelRect, cRectEmpty) then
+  begin
     Clipboard.AsText:= GetTextForClipboard;
+    Clipboard.AddFormat(cClipFormatId, cClipColumnSignature, SizeOf(cClipColumnSignature));
+  end
+  else
+  begin
+    if Append then
+      Clipboard.AsText:= Clipboard.AsText+GetTextForClipboard
+    else
+      Clipboard.AsText:= GetTextForClipboard;
+  end;
 
   Result:= [];
 end;
 
-function TATSynEdit.GetTextForClipboard: AnsiString;
+function TATSynEdit.GetTextForClipboard: string;
 var
   ListNum: TList;
   ListStr: TStringList;
   Item: TATCaretItem;
-  i, X1, Y1, X2, Y2: integer;
+  i, NLen, X1, Y1, X2, Y2: integer;
   bSel: boolean;
   Str: atString;
 begin
   Result:= '';
+
+  if not EqualRect(FSelRect, cRectEmpty) then
+  begin
+    for i:= FSelRect.Top to FSelRect.Bottom do
+    begin
+      Str:= Strings.TextSubstring(FSelRect.Left, i, FSelRect.Right, i);
+      NLen:= FSelRect.Right-FSelRect.Left - Length(Str);
+      if NLen>0 then
+        Str:= Str+StringOfChar(' ', NLen);
+      Result:= Result+Str+sLineBreak;
+    end;
+    Exit;
+  end;
+
   ListNum:= TList.Create;
   ListStr:= TStringList.Create;
 

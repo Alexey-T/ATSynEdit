@@ -182,6 +182,10 @@ const
   cMaxLinesForOldWrapUpdate = 100;
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
 
+var
+  cClipColumnSignature: integer = $1000;
+  cClipFormatId: integer = 0;
+
 type
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
@@ -378,7 +382,7 @@ type
     function GetMarginString: string;
     function GetReadOnly: boolean;
     function GetScrollTop: integer;
-    function GetTextForClipboard: AnsiString;
+    function GetTextForClipboard: string;
     function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
     function IsKeyMappingMatchedItem(const AKey: TShortcut;
@@ -474,7 +478,7 @@ type
     function DoCommand_GotoTextEnd: TATCommandResults;
     function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
     function DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean): TATCommandResults;
-    function DoCommand_ClipboardCopy(DoAdd: boolean = false): TATCommandResults;
+    function DoCommand_ClipboardCopy(Append: boolean = false): TATCommandResults;
     function DoCommand_ClipboardCut: TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
@@ -2755,6 +2759,9 @@ end;
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
 
+
+initialization
+  cClipFormatId:= RegisterClipboardFormat('ATSynEdit-Column-Block');
 
 end.
 
