@@ -156,10 +156,10 @@ const
   cCollapseMarkIndent = 3;
   cScrollKeepHorz = 1; //n chars allow handy clicking after eol
   cScrollIndentCaretHorz = 10;
-  cScrollIndentCaretVert = 1;
+  cScrollIndentCaretVert = 0; //mustbe 0, 1 gives jumps 2 lines on moving down
   cScrollIndentGotoHorz = 10;
   cScrollIndentGotoVert = 3;
-  cScrollAutoHorz = 10;
+  cScrollAutoHorz = 10; //scroll N chrs each timer tick
   cScrollAutoVert = 1;
   cResizeBitmapStep = 100;
   cOffsetTextTop = 1;
@@ -168,10 +168,10 @@ const
   cSizeRulerHeight = 19;
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 6;
-  cMaxCharsForOutput = 400;
   cMinFontSize = 6;
   cMinTabSize = 1;
   cMaxTabSize = 16;
+  cMaxCharsForOutput = 400;
   cMinMinimapWidth = 30;
   cMinWrapColumn = 20;
   cMinWrapColumnAbs = 4;
