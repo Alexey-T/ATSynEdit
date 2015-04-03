@@ -1,6 +1,7 @@
 unit ATSynEdit_WrapInfo;
 
 {$mode objfpc}{$H+}
+//{$define debug_replaceitems}
 
 interface
 
@@ -11,7 +12,6 @@ type
   { TATSynWrapItem }
 
   TATSynWrapFinal = (cWrapItemFinal, cWrapItemCollapsed, cWrapItemMiddle);
-
   TATSynWrapItem = class
   public
     NLineIndex,
@@ -52,7 +52,7 @@ type
 implementation
 
 uses
-  Math;
+  Math, Dialogs, Forms;
 
 { TATSynWrapItem }
 
@@ -199,22 +199,32 @@ begin
   FList.Capacity:= Max(1024, N);
 end;
 
+//optimized; don't del/ins but assign
 procedure TATSynWrapInfo.ReplaceItems(AFrom, ATo: integer; AItems: TList);
 var
-  i: integer;
+  i, Dif: integer;
 begin
-  //optimize; don't del/ins but assign
-  if AItems.Count=(ATo-AFrom+1) then
+  Dif:= AItems.Count - (ATo-AFrom+1);
+
+  {$ifdef debug_replaceitems}
+  if dif<>0 then application.MainForm.caption:= 'dif '+inttostr(dif)
+    else application.MainForm.caption:= '';
+  {$endif}
+
+  if Dif<0 then
   begin
-    for i:= 0 to AItems.Count-1 do
-      TATSynWrapItem(FList[AFrom+i]).Assign(TATSynWrapItem(AItems[i]));
-    Exit
+    for i:= 1 to Abs(Dif) do
+      Delete(AFrom);
+  end
+  else
+  if Dif>0 then
+  begin
+    for i:= 1 to Abs(Dif) do
+      Insert(AFrom, TATSynWrapItem.Create(0, 0, 0, 0, Low(TATSynWrapFinal)));
   end;
 
-  for i:= ATo downto AFrom do
-    Delete(i);
-  for i:= AItems.Count-1 downto 0 do
-    Insert(AFrom, TATSynWrapItem(AItems[i]));
+  for i:= 0 to AItems.Count-1 do
+    TATSynWrapItem(FList[AFrom+i]).Assign(TATSynWrapItem(AItems[i]));
 end;
 
 
