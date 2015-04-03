@@ -841,6 +841,8 @@ begin
           Continue;
         end;
 
+        //slow for 100carets, 1M lines, so made method in which
+        //we can optimize it (instead of del/ins do assign)
         FWrapInfo.ReplaceItems(NIndexFrom, NIndexTo, Items);
       end;
     end;

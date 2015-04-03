@@ -203,6 +203,14 @@ procedure TATSynWrapInfo.ReplaceItems(AFrom, ATo: integer; AItems: TList);
 var
   i: integer;
 begin
+  //optimize; don't del/ins but assign
+  if AItems.Count=(ATo-AFrom+1) then
+  begin
+    for i:= 0 to AItems.Count-1 do
+      TATSynWrapItem(FList[AFrom+i]).Assign(TATSynWrapItem(AItems[i]));
+    Exit
+  end;
+
   for i:= ATo downto AFrom do
     Delete(i);
   for i:= AItems.Count-1 downto 0 do
