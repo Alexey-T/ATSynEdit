@@ -166,8 +166,8 @@ const
   cSizeGutterNumOffsetLeft = 5;
   cSizeGutterNumOffsetRight = 4;
   cSizeRulerHeight = 19;
-  cSizeRulerMarkSmall = 3;
-  cSizeRulerMarkBig = 6;
+  cSizeRulerMarkSmall = 4;
+  cSizeRulerMarkBig = 7;
   cMinFontSize = 6;
   cMinTabSize = 1;
   cMaxTabSize = 16;
@@ -656,8 +656,8 @@ begin
   C.Brush.Color:= FColors.RulerBG;
 
   C.FillRect(FRectRuler);
-  C.Line(FRectRuler.Left, FRectRuler.Bottom,
-         FRectRuler.Right, FRectRuler.Bottom);
+  C.Line(FRectRuler.Left, FRectRuler.Bottom-1,
+         FRectRuler.Right, FRectRuler.Bottom-1);
 
   for i:= NRulerStart to NRulerStart+GetVisibleColumns+1 do
   begin
@@ -1099,7 +1099,7 @@ begin
   if FOptGutterVisible then
   begin
     Result.Left:= 0;
-    Result.Top:= IfThen(FOptRulerVisible, FTextOffset.Y);
+    Result.Top:= IfThen(FOptRulerVisible, FOptRulerSize);
     Result.Right:= FGutter.Width;
     Result.Bottom:= ClientHeight;
   end
