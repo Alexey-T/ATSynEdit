@@ -21,6 +21,7 @@ type
     NFinal: TATSynWrapFinal;
     constructor Create(ALineIndex, ACharIndex, ALength, AIndent: integer;
       AFinal: TATSynWrapFinal); virtual;
+    procedure Assign(Item: TATSynWrapItem);
   end;
 
 type
@@ -43,10 +44,15 @@ type
     procedure Delete(N: integer);
     procedure Insert(N: integer; AItem: TATSynWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
+    procedure SetCapacity(N: integer);
+    procedure ReplaceItems(AFrom, ATo: integer; AItems: TList);
   end;
 
 
 implementation
+
+uses
+  Math;
 
 { TATSynWrapItem }
 
@@ -58,6 +64,15 @@ begin
   NLength:= ALength;
   NIndent:= AIndent;
   NFinal:= AFinal;
+end;
+
+procedure TATSynWrapItem.Assign(Item: TATSynWrapItem);
+begin
+  NLineIndex:= Item.NLineIndex;
+  NCharIndex:= Item.NCharIndex;
+  NLength:= Item.NLength;
+  NIndent:= Item.NIndent;
+  NFinal:= Item.NFinal;
 end;
 
 { TATSynWrapInfo }
@@ -177,6 +192,21 @@ begin
   ATo:= m;
   while (AFrom>0) and (Items[AFrom-1].NLineIndex=ALineNum) do Dec(AFrom);
   while (ATo<Count-1) and (Items[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
+end;
+
+procedure TATSynWrapInfo.SetCapacity(N: integer);
+begin
+  FList.Capacity:= Max(1024, N);
+end;
+
+procedure TATSynWrapInfo.ReplaceItems(AFrom, ATo: integer; AItems: TList);
+var
+  i: integer;
+begin
+  for i:= ATo downto AFrom do
+    Delete(i);
+  for i:= AItems.Count-1 downto 0 do
+    Insert(AFrom, TATSynWrapItem(AItems[i]));
 end;
 
 

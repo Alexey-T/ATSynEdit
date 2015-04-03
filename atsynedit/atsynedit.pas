@@ -323,7 +323,7 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
-    procedure DoWrapInfosForLine(ALine: integer; AIndentMaximal: integer;
+    procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
       AItems: TList);
     procedure InitColors;
     procedure MenuClick(Sender: TObject);
@@ -772,7 +772,7 @@ var
   ListNums: TList;
   i, j: integer;
   NLine, NIndexFrom, NIndexTo: integer;
-  UseUpdateList: boolean;
+  UseCachedUpdate: boolean;
 begin
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
@@ -799,23 +799,24 @@ begin
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
   end;
 
-  UseUpdateList:=
+  UseCachedUpdate:=
     (FWrapInfo.Count>0) and
     (Strings.Count>cMaxLinesForOldWrapUpdate) and
     (not Strings.ListUpdatesHard) and
     (Strings.ListUpdates.Count>0);
-  //UseUpdateList:= false;////to disable
+  //UseCachedUpdate:= false;////to disable
 
   Items:= TList.Create;
   ListNums:= TList.Create;
 
   try
-    if not UseUpdateList then
+    if not UseCachedUpdate then
     begin
       FWrapInfo.Clear;
+      FWrapInfo.SetCapacity(Strings.Count);
       for i:= 0 to Strings.Count-1 do
       begin
-        DoWrapInfosForLine(i, NIndentMaximal, Items);
+        DoCalcWrapInfos(i, NIndentMaximal, Items);
         for j:= 0 to Items.Count-1 do
           FWrapInfo.Add(TATSynWrapItem(Items[j]));
       end;
@@ -830,7 +831,7 @@ begin
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= NativeInt{%H-}(ListNums[i]);
-        DoWrapInfosForLine(NLine, NIndentMaximal, Items);
+        DoCalcWrapInfos(NLine, NIndentMaximal, Items);
         if Items.Count=0 then Continue;
 
         DoFindWrapIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
@@ -840,10 +841,7 @@ begin
           Continue;
         end;
 
-        for j:= NIndexTo downto NIndexFrom do
-          FWrapInfo.Delete(j);
-        for j:= Items.Count-1 downto 0 do
-          FWrapInfo.Insert(NIndexFrom, Items[j]);
+        FWrapInfo.ReplaceItems(NIndexFrom, NIndexTo, Items);
       end;
     end;
   finally
@@ -865,7 +863,7 @@ begin
   FWrapInfo.FindIndexesOfLineNumber(ALineNum, AFrom, ATo);
 end;
 
-procedure TATSynEdit.DoWrapInfosForLine(ALine: integer; AIndentMaximal: integer; AItems: TList);
+procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
 var
   NHiddenIndex, NOffset, NLen, NIndent: integer;
   NFinal: TATSynWrapFinal;

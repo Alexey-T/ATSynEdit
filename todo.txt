@@ -1,6 +1,6 @@
 
-cache wrapinfo(big file editing)--done
+cache wrapinfo--done
 col-sel--done
-col-sel copy/pst
 
 foldin bar
+tokens hilite (styles/ adapt SynEdit)
