@@ -166,7 +166,7 @@ const
   cSizeGutterNumOffsetLeft = 5;
   cSizeGutterNumOffsetRight = 4;
   cSizeRulerHeight = 19;
-  cSizeRulerMarkSmall = 4;
+  cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 7;
   cMinFontSize = 6;
   cMinTabSize = 1;
@@ -1859,8 +1859,17 @@ end;
 
 procedure TATSynEdit.SetScrollTop(AValue: integer);
 var
-  i: integer;
+  NFrom, NTo, i: integer;
 begin
+  //find exact match
+  DoFindWrapIndexesOfLineNumber(AValue, NFrom, NTo);
+  if NFrom>=0 then
+  begin
+    FScrollVert.NPos:= NFrom;
+    Exit
+  end;
+
+  //find approx match
   for i:= 0 to FWrapInfo.Count-1 do
     with FWrapInfo.Items[i] do
       if NLineIndex>=AValue then

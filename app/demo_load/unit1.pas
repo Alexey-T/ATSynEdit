@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, ShellCtrls, atstrings, atsynedit, atstringproc, ComCtrls;
+  ExtCtrls, ShellCtrls, atstrings, atsynedit, atstringproc;
 
 type
   { TForm1 }

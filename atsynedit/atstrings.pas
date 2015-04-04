@@ -596,15 +596,12 @@ end;
 procedure TATStrings.Clear;
 var
   i: integer;
-  Lock: boolean;
 begin
-  Lock:= FUndoList.Locked;
-  DoClearUndo(true);
+  DoClearUndo(FUndoList.Locked);
 
   for i:= Count-1 downto 0 do
-    LineDelete(i, false);
-
-  DoClearUndo(Lock);
+    TObject(FList[i]).Free;
+  FList.Clear;
 end;
 
 procedure TATStrings.DoClearLineStates(ASaved: boolean);

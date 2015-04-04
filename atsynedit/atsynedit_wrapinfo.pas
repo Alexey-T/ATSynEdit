@@ -103,8 +103,8 @@ begin
   for i:= FList.Count-1 downto 0 do
   begin
     TObject(FList[i]).Free;
-    FList.Delete(i);
   end;
+  FList.Clear;
 end;
 
 function TATSynWrapInfo.Count: integer;
