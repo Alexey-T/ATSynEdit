@@ -16,6 +16,7 @@ uses
 
 type
   TATDirection = (
+    cDirNone,
     cDirLeft,
     cDirRight,
     cDirUp,
@@ -78,14 +79,6 @@ type
     cPageSizeFull,
     cPageSizeFullMinus1,
     cPageSizeHalf
-    );
-
-  TATAutoScroll = (
-    cScrollNone,
-    cScrollUp,
-    cScrollDown,
-    cScrollLeft,
-    cScrollRight
     );
 
   TATSynWrapMode = (
@@ -233,7 +226,7 @@ type
     FMouseDownNumber: integer;
     FMouseDownDouble: boolean;
     FMouseDragging: boolean;
-    FMouseAutoScroll: TATAutoScroll;
+    FMouseAutoScroll: TATDirection;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
@@ -2185,11 +2178,11 @@ begin
 
   //start scroll timer
   FTimerScroll.Enabled:= (ssLeft in Shift) and (not PtInRect(FRectMain, P));
-  FMouseAutoScroll:= cScrollNone;
-  if P.Y<FRectMain.Top then FMouseAutoScroll:= cScrollUp else
-  if P.Y>=FRectMain.Bottom then FMouseAutoScroll:= cScrollDown else
-  if P.X<FRectMain.Left then FMouseAutoScroll:= cScrollLeft else
-  if P.X>=FRectMain.Right then FMouseAutoScroll:= cScrollRight;
+  FMouseAutoScroll:= cDirNone;
+  if P.Y<FRectMain.Top then FMouseAutoScroll:= cDirUp else
+  if P.Y>=FRectMain.Bottom then FMouseAutoScroll:= cDirDown else
+  if P.X<FRectMain.Left then FMouseAutoScroll:= cDirLeft else
+  if P.X>=FRectMain.Right then FMouseAutoScroll:= cDirRight;
 
   //mouse dragged on numbers
   if PtInRect(RectNums, P) then
@@ -2370,10 +2363,10 @@ begin
   PClient.Y:= Min(FRectMain.Bottom, PClient.Y);
 
   case FMouseAutoScroll of
-    cScrollUp:    DoScrollByDelta(0, -cScrollAutoVert);
-    cScrollDown:  DoScrollByDelta(0, cScrollAutoVert);
-    cScrollLeft:  DoScrollByDelta(-cScrollAutoHorz, 0);
-    cScrollRight: DoScrollByDelta(cScrollAutoHorz, 0);
+    cDirUp:    DoScrollByDelta(0, -cScrollAutoVert);
+    cDirDown:  DoScrollByDelta(0, cScrollAutoVert);
+    cDirLeft:  DoScrollByDelta(-cScrollAutoHorz, 0);
+    cDirRight: DoScrollByDelta(cScrollAutoHorz, 0);
     else Exit;
   end;
 

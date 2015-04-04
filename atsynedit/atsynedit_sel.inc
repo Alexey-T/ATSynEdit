@@ -149,6 +149,7 @@ var
   i: integer;
 begin
   FSelRect:= cRectEmpty;
+  FSelRectBegin:= Point(-1, -1);
 
   for i:= 0 to Carets.Count-1 do
     with Carets[i] do
@@ -251,7 +252,7 @@ begin
   Result:= [];
   if Carets.Count=0 then Exit;
 
-  if IsSelRectEmpty then
+  if IsSelRectEmpty or (FSelRectBegin.X<0) then
   begin
     DoCaretSingleAsIs;
     DoSelect_None;

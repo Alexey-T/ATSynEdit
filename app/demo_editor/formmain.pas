@@ -290,10 +290,7 @@ begin
     with ed.Carets[i] do
       sPos:= sPos+Format(' %d:%d', [PosY+1, PosX+1]);
 
-  if EqualRect(ed.SelRect, Rect(0, 0, 0, 0)) then
-    sSel:= '-'
-  else
-    sSel:= 'ColSel';
+  if ed.IsSelRectEmpty then sSel:= '-' else sSel:= 'Column';
 
   Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s | Undo: %d, Redo: %d', [
     sPos,
