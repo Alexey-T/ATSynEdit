@@ -60,7 +60,7 @@ begin
   if FOptKeyTabIndents then
     if Carets.Count=1 then
     begin
-      GetSelectedLines(0, N1, N2);
+      Carets[0].GetSelLines(N1, N2);
       if N1>=0 then
       begin
         Result:= DoCommand_TextIndentUnindent(true);
@@ -422,7 +422,7 @@ begin
   Result:= [];
   DoCaretSingleAsIs;
 
-  GetSelectedLines(0, Y1, Y2);
+  Carets[0].GetSelLines(Y1, Y2);
   if Y1<0 then Exit;
 
   if FOptIndentSize>=0 then

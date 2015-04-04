@@ -27,6 +27,7 @@ type
     CoordX, CoordY: integer;
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
+    procedure GetSelLines(out AFrom, ATo: integer);
   end;
 
 type
@@ -124,6 +125,23 @@ begin
     SwapInt(AX1, AX2);
     SwapInt(AY1, AY2);
   end;
+end;
+
+procedure TATCaretItem.GetSelLines(out AFrom, ATo: integer);
+var
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  AFrom:= -1;
+  ATo:= -1;
+
+  GetRange(X1, Y1, X2, Y2, bSel);
+  if not bSel then Exit;
+
+  AFrom:= Y1;
+  ATo:= Y2;
+  //sel ended at line-start?
+  if (X2=0) and (Y2>0) then Dec(ATo);
 end;
 
 procedure TATCaretItem.SelectToPoint(AX, AY: integer);

@@ -324,7 +324,6 @@ type
       const AScrollHorz: TATSynScrollInfo);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetRedoCount: integer;
-    procedure GetSelectedLines(ACaretIndex: integer; out AFrom, ATo: integer);
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
