@@ -513,3 +513,32 @@ begin
   Result:= [cResultText, cResultCaretBottom];
 end;
 
+
+function TATSynEdit.DoCommand_TextDeleteToFileEnd: TATCommandResults;
+var
+  Item: TATCaretItem;
+  Str: atString;
+  i: integer;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  DoCaretSingleAsIs;
+
+  Item:= FCarets[0];
+  Str:= Strings.Lines[Item.PosY];
+  if Item.PosX<Length(Str) then
+  begin
+    Delete(Str, Item.PosX+1, MaxInt);
+    Strings.Lines[Item.PosY]:= Str;
+  end;
+
+  for i:= Strings.Count-1 downto Item.PosY+1 do
+    Strings.LineDelete(i);
+
+  if Item.PosY>=Strings.Count-1 then
+    Strings.LinesEnds[Item.PosY]:= cEndNone;
+
+  Result:= [cResultText, cResultCaretBottom];
+end;
+

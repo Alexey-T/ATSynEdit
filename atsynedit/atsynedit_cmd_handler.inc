@@ -173,6 +173,7 @@ begin
     cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);
     cCommand_TextDeleteWordNext:       Res:= DoCommand_TextDeleteWord(true);
     cCommand_TextDeleteSelection:      Res:= DoCommand_TextDeleteSelections;
+    cCommand_TextDeleteToFileEnd:      Res:= DoCommand_TextDeleteToFileEnd;
 
     cCommand_SelectAll:                Res:= DoCommand_SelectAll;
     cCommand_SelectWords:              Res:= DoCommand_SelectWords;

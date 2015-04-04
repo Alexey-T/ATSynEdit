@@ -1,18 +1,18 @@
 object fmCmd: TfmCmd
-  Left = 424
-  Height = 640
-  Top = 308
+  Left = 425
+  Height = 620
+  Top = 250
   Width = 679
   ActiveControl = List
   Caption = 'Commands'
-  ClientHeight = 640
+  ClientHeight = 620
   ClientWidth = 679
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.5'
   object List: TListView
     Left = 0
-    Height = 595
+    Height = 582
     Top = 0
     Width = 679
     Align = alClient
@@ -37,9 +37,10 @@ object fmCmd: TfmCmd
   end
   object ButtonPanel1: TButtonPanel
     Left = 6
-    Height = 33
-    Top = 601
+    Height = 26
+    Top = 588
     Width = 667
+    AutoSize = False
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
@@ -51,5 +52,6 @@ object fmCmd: TfmCmd
     TabOrder = 1
     ShowButtons = [pbOK, pbCancel]
     ShowGlyphs = []
+    ShowBevel = False
   end
 end

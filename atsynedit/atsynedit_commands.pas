@@ -50,6 +50,7 @@ const
   cCommand_TextDeleteToLineEnd = 173 or cCmdSelReset;
   cCommand_TextDeleteWordNext = 174 or cCmdSelReset;
   cCommand_TextDeleteWordPrev = 175 or cCmdSelReset;
+  cCommand_TextDeleteToFileEnd = 176 or cCmdSelReset;
   cCommand_TextDeleteSelection = 180;
 
   _base_GotoTextBegin = 200 or cCmdCaret;

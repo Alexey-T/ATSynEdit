@@ -73,6 +73,7 @@ begin
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line start', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXControl+'+K'], []);
   M.Add(cCommand_TextDeleteSelection, 'delete selection', [], []);
+  M.Add(cCommand_TextDeleteToFileEnd, 'delete to file end', [], []);
 
   M.Add(cCommand_TextIndent, 'indent selection', [cXControl+'+I'], []);
   M.Add(cCommand_TextUnindent, 'unindent selection', [cXControl+'+U'], ['Shift+Tab']);

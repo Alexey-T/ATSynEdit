@@ -323,8 +323,7 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
-    procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
-      AItems: TList);
+    procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
     procedure InitColors;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
@@ -450,7 +449,6 @@ type
     function DoCommand_SelectLines: TATCommandResults;
     function DoCommand_SelectAll: TATCommandResults;
     function DoCommand_Cancel: TATCommandResults;
-    function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
@@ -474,6 +472,8 @@ type
     function DoCommand_TextDuplicateLine: TATCommandResults;
     function DoCommand_TextDeleteToLineBegin: TATCommandResults;
     function DoCommand_TextDeleteToLineEnd: TATCommandResults;
+    function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
+    function DoCommand_TextDeleteToFileEnd: TATCommandResults;
     function DoCommand_GotoTextBegin: TATCommandResults;
     function DoCommand_GotoTextEnd: TATCommandResults;
     function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
@@ -828,6 +828,7 @@ begin
       {$endif}
 
       ListNums.Assign(Strings.ListUpdates);
+
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= NativeInt{%H-}(ListNums[i]);
