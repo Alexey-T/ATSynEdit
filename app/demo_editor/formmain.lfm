@@ -111,7 +111,7 @@ object fmMain: TfmMain
       Caption = 'wrap'
       ClientHeight = 84
       ClientWidth = 124
-      TabOrder = 11
+      TabOrder = 12
       object chkWrapOff: TRadioButton
         Left = 8
         Height = 19
@@ -178,7 +178,7 @@ object fmMain: TfmMain
       Caption = 'unprintable'
       ClientHeight = 84
       ClientWidth = 124
-      TabOrder = 12
+      TabOrder = 13
       object chkUnprintVis: TCheckBox
         Left = 8
         Height = 19
@@ -279,6 +279,25 @@ object fmMain: TfmMain
       Caption = 'opts...'
       OnClick = bOptClick
       TabOrder = 5
+    end
+    object edMapFont: TSpinEdit
+      Left = 8
+      Height = 23
+      Top = 336
+      Width = 52
+      MaxValue = 8
+      MinValue = 2
+      OnChange = edMapFontChange
+      TabOrder = 11
+      Value = 8
+    end
+    object Label7: TLabel
+      Left = 67
+      Height = 15
+      Top = 340
+      Width = 71
+      Caption = 'map font size'
+      ParentColor = False
     end
   end
   object OpenDialog1: TOpenDialog
