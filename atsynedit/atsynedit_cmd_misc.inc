@@ -2,7 +2,7 @@
 
 function TATSynEdit.DoCommand_ToggleOverwrite: TATCommandResults;
 begin
-  ModeOver:= not ModeOver;
+  ModeOverwrite:= not ModeOverwrite;
   Result:= [cResultState];
 end;
 

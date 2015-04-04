@@ -494,25 +494,26 @@ type
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
     function DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
+    function GetCaretsArray: TPointArray;
+    procedure SetCaretsArray(const L: TPointArray);
 
   public
-    //std
+    //override
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetFocus; override;
     procedure Invalidate; override;
-    procedure Update(
-      AUpdateWrapInfo: boolean = false;
-      AUpdateCaretsCoords: boolean = true); reintroduce;
-    //text
+    procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
+    //general
     property Strings: TATStrings read GetStrings write SetStrings;
     property KeyMapping: TATKeyMapping read FKeyMapping;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
-    property ModeOver: boolean read FOver write SetOver;
+    property ModeOverwrite: boolean read FOver write SetOver;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
     property SelRect: TRect read FSelRect;
+    function IsSelRectEmpty: boolean;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -531,8 +532,6 @@ type
     procedure DoShowPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoShowCaret(AEdge: TATCaretEdge);
     procedure DoGotoPos(APnt: TPoint);
-    function GetCaretsArray: TPointArray;
-    procedure SetCaretsArray(const L: TPointArray);
     //misc
     procedure BeginUpdate;
     procedure EndUpdate;
@@ -2404,7 +2403,7 @@ var
   Item: TATCaretItem;
   Shape: TATSynCaretShape;
 begin
-  if ModeOver then
+  if ModeOverwrite then
     Shape:= FCaretShapeOvr
   else
     Shape:= FCaretShape;

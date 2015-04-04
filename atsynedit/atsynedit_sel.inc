@@ -8,7 +8,7 @@ var
 begin
   Result:= false;
 
-  if not EqualRect(FSelRect, cRectEmpty) then
+  if not IsSelRectEmpty then
   begin
     //a) faster, b) works w/o mul-carets
     Result:=
@@ -149,8 +149,6 @@ var
   i: integer;
 begin
   FSelRect:= cRectEmpty;
-  FSelRectBegin:= Point(-1, -1);
-  FSelRectEnd:= Point(-1, -1);
 
   for i:= 0 to Carets.Count-1 do
     with Carets[i] do
@@ -215,7 +213,7 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
 var
   NLeft, NRight: integer;
 begin
-  if not EqualRect(FSelRect, cRectEmpty) then
+  if not IsSelRectEmpty then
   begin
     if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
     begin
@@ -243,12 +241,17 @@ begin
 end;
 
 
+function TATSynEdit.IsSelRectEmpty: boolean;
+begin
+  Result:= EqualRect(FSelRect, cRectEmpty);
+end;
+
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
 begin
-  Result:= [cResultKeepColumnSel];
-
+  Result:= [];
   if Carets.Count=0 then Exit;
-  if EqualRect(FSelRect, cRectEmpty) then
+
+  if IsSelRectEmpty then
   begin
     DoCaretSingleAsIs;
     DoSelect_None;
@@ -262,22 +265,22 @@ begin
     cDirLeft:
       begin
         if FSelRectEnd.X>0 then Dec(FSelRectEnd.X);
-        Include(Result, cResultCaretLeft);
+        Result:= [cResultKeepColumnSel, cResultCaretLeft];
       end;
     cDirRight:
       begin
         Inc(FSelRectEnd.X);
-        Include(Result, cResultCaretRight);
+        Result:= [cResultKeepColumnSel, cResultCaretRight];
       end;
     cDirUp:
       begin
         if FSelRectEnd.Y>0 then Dec(FSelRectEnd.Y);
-        Include(Result, cResultCaretTop);
+        Result:= [cResultKeepColumnSel, cResultCaretTop];
       end;
     cDirDown:
       begin
         if FSelRectEnd.Y<Strings.Count-1 then Inc(FSelRectEnd.Y);
-        Include(Result, cResultCaretBottom);
+        Result:= [cResultKeepColumnSel, cResultCaretBottom];
       end;
   end;
 

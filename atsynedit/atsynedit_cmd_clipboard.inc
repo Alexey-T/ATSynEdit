@@ -59,7 +59,7 @@ end;
 
 function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean): TATCommandResults;
 begin
-  if not EqualRect(FSelRect, cRectEmpty) then
+  if not IsSelRectEmpty then
   begin
     Clipboard.AsText:= GetTextForClipboard;
     Clipboard.AddFormat(cClipFormatId, cClipSignatureColumn, SizeOf(cClipSignatureColumn));
@@ -86,7 +86,7 @@ var
 begin
   Result:= '';
 
-  if not EqualRect(FSelRect, cRectEmpty) then
+  if not IsSelRectEmpty then
   begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin

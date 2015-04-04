@@ -300,7 +300,7 @@ begin
     ed.Carets.Count,
     ed.ScrollTop+1,
     cEnd[ed.Strings.Endings],
-    cOvr[ed.ModeOver],
+    cOvr[ed.ModeOverwrite],
     cRo[ed.ModeReadOnly],
     sSel,
     ed.UndoCount,
