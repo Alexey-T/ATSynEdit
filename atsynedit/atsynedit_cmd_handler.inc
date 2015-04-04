@@ -208,9 +208,6 @@ begin
     cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];
     cCommand_ScrollToCaretRight:       Res:= [cResultCaretRight];
 
-    cCommand_MoveSelectionUp:          Res:= DoCommand_MoveSelectionUpDown(false);
-    cCommand_MoveSelectiondown:        Res:= DoCommand_MoveSelectionUpDown(true);
-
     cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy;
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true);
     cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut;
@@ -219,6 +216,11 @@ begin
     cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true, false);
     cCommand_ClipboardPaste_Column:          Res:= DoCommand_ClipboardPasteColumnBlock(false);
     cCommand_ClipboardPaste_ColumnKeepCaret: Res:= DoCommand_ClipboardPasteColumnBlock(true);
+
+    cCommand_MoveSelectionUp:          Res:= DoCommand_MoveSelectionUpDown(false);
+    cCommand_MoveSelectiondown:        Res:= DoCommand_MoveSelectionUpDown(true);
+    cCommand_TextInsertEmptyAbove:     Res:= DoCommand_TextInsertEmptyAboveBelow(false);
+    cCommand_TextInsertEmptyBelow:     Res:= DoCommand_TextInsertEmptyAboveBelow(true);
 
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
 

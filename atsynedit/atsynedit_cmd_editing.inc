@@ -516,7 +516,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteToFileEnd: TATCommandResults;
 var
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   Str: atString;
   i: integer;
 begin
@@ -525,20 +525,43 @@ begin
 
   DoCaretSingleAsIs;
 
-  Item:= FCarets[0];
-  Str:= Strings.Lines[Item.PosY];
-  if Item.PosX<Length(Str) then
+  Caret:= FCarets[0];
+  Str:= Strings.Lines[Caret.PosY];
+  if Caret.PosX<Length(Str) then
   begin
-    Delete(Str, Item.PosX+1, MaxInt);
-    Strings.Lines[Item.PosY]:= Str;
+    Delete(Str, Caret.PosX+1, MaxInt);
+    Strings.Lines[Caret.PosY]:= Str;
   end;
 
-  for i:= Strings.Count-1 downto Item.PosY+1 do
+  for i:= Strings.Count-1 downto Caret.PosY+1 do
     Strings.LineDelete(i);
 
-  if Item.PosY>=Strings.Count-1 then
-    Strings.LinesEnds[Item.PosY]:= cEndNone;
+  if Caret.PosY>=Strings.Count-1 then
+    Strings.LinesEnds[Caret.PosY]:= cEndNone;
 
   Result:= [cResultText, cResultCaretBottom];
+end;
+
+
+function TATSynEdit.DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
+var
+  Caret: TATCaretItem;
+  i: integer;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  DoCaretsDeleteOnSameLines;
+
+  for i:= Carets.Count-1 downto 0 do
+  begin
+    Caret:= Carets[i];
+    Strings.LineInsert(Caret.PosY + IfThen(ADown, 1), '');
+    DoCaretsShift(0, Caret.PosY, 0, 1);
+    if ADown then
+      Inc(Caret.PosY);
+  end;
+
+  Result:= [cResultText, cResultCaretAny];
 end;
 

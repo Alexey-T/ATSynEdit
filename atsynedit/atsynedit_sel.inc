@@ -314,3 +314,4 @@ begin
   Result:= [cResultText, cResultCaretTop];
 end;
 
+

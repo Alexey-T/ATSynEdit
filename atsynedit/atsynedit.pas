@@ -315,7 +315,6 @@ type
     //
     procedure DebugFindWrapIndex;
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
-    function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     procedure DoDropText;
     procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
     procedure DoMinimapClick(APosY: integer);
@@ -445,6 +444,8 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
+    function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
     function DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;

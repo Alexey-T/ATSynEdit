@@ -102,8 +102,10 @@ begin
   M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
   M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
 
-  M.Add(cCommand_MoveSelectionUp, 'move selection up', ['Alt+Up'], []);
-  M.Add(cCommand_MoveSelectionDown, 'move selection down', ['Alt+Down'], []);
+  M.Add(cCommand_MoveSelectionUp, 'move selected lines up', ['Alt+Up'], []);
+  M.Add(cCommand_MoveSelectionDown, 'move selected lines down', ['Alt+Down'], []);
+  M.Add(cCommand_TextInsertEmptyAbove, 'insert empty line above', [], []);
+  M.Add(cCommand_TextInsertEmptyBelow, 'insert empty line below', [], []);
 
   M.Add(cCommand_CaretsExtendUpLine, 'carets extend: up a line', [], []);
   M.Add(cCommand_CaretsExtendUpPage, 'carets extend: up a page', [], []);

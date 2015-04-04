@@ -1,8 +1,5 @@
 
-move selectn up/dn
-ins empty up/down
 markr
-
 foldin bar
 tokens hilite (styles, adapt SynEdit)
 
