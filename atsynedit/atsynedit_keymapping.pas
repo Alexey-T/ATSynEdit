@@ -108,6 +108,8 @@ begin
   M.Add(cCommand_CaretsExtendDownLine, 'carets extend: down a line', ['Alt+Down'], []);
   M.Add(cCommand_CaretsExtendDownPage, 'carets extend: down a page', [], []);
   M.Add(cCommand_CaretsExtendDownToEnd, 'carets extend: down to end', [], []);
+
+  M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
 end;
 
 

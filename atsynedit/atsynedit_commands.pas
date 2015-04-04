@@ -104,6 +104,7 @@ const
   cCommand_ClipboardCut = 1008;
 
   cCommand_Cancel = 2001;
+  cCommand_RepeatTextCommand = 2002;
 
   cCommand_CaretsExtendDownLine = 2010;
   cCommand_CaretsExtendDownPage = 2011;

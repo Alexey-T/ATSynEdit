@@ -225,7 +225,16 @@ begin
     cCommand_CaretsExtendDownLine:     Res:= DoCommand_CaretsExtend(true, 1);
     cCommand_CaretsExtendDownPage:     Res:= DoCommand_CaretsExtend(true, GetPageLines);
     cCommand_CaretsExtendDownToEnd:    Res:= DoCommand_CaretsExtend(true, Strings.Count);
+
+    cCommand_RepeatTextCommand:        DoCommandExec(FLastTextCmd, FLastTextCmdText);
   end;
+
+  if cResultText in Res then
+    if ACmd<>cCommand_RepeatTextCommand then
+    begin
+      FLastTextCmd:= ACmd;
+      FLastTextCmdText:= AText;
+    end;
 
   DoCommandResults(Res);
 end;

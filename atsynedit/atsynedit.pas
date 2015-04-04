@@ -227,6 +227,8 @@ type
     FMouseDownDouble: boolean;
     FMouseDragging: boolean;
     FMouseAutoScroll: TATDirection;
+    FLastTextCmd: integer;
+    FLastTextCmdText: atString;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
@@ -1694,6 +1696,8 @@ begin
   FMouseDownDouble:= false;
   FMouseDragging:= false;
   FSelRect:= cRectEmpty;
+  FLastTextCmd:= 0;
+  FLastTextCmdText:= '';
 
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);

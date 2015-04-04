@@ -1,3 +1,10 @@
 
+move selectn up/dn
+ins empty up/down
+markr
+
 foldin bar
 tokens hilite (styles, adapt SynEdit)
+
+sort sel--plugin (N opts)
+case conv--plugin (N modes)
