@@ -90,7 +90,8 @@ begin
     cResultCaretLeft, cResultCaretRight,
     cResultCaretTop, cResultCaretBottom]<>[] then
   begin
-    FSelRect:= cRectEmpty;
+    if not (cResultKeepColumnSel in Res) then
+      FSelRect:= cRectEmpty;
     DoEventCarets;
   end;
 

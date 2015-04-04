@@ -245,6 +245,8 @@ end;
 
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
 begin
+  Result:= [cResultKeepColumnSel];
+
   if Carets.Count=0 then Exit;
   if EqualRect(FSelRect, cRectEmpty) then
   begin
@@ -260,23 +262,26 @@ begin
     cDirLeft:
       begin
         if FSelRectEnd.X>0 then Dec(FSelRectEnd.X);
+        Include(Result, cResultCaretLeft);
       end;
     cDirRight:
       begin
         Inc(FSelRectEnd.X);
+        Include(Result, cResultCaretRight);
       end;
     cDirUp:
       begin
         if FSelRectEnd.Y>0 then Dec(FSelRectEnd.Y);
+        Include(Result, cResultCaretTop);
       end;
     cDirDown:
       begin
         if FSelRectEnd.Y<Strings.Count-1 then Inc(FSelRectEnd.Y);
+        Include(Result, cResultCaretBottom);
       end;
   end;
 
   DoSelect_ColumnBlock(FSelRectBegin, FSelRectEnd);
-  Result:= [cResultState]; //dont do cResultCaretNN, this resets colblock
 end;
 
 

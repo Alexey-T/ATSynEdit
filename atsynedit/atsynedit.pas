@@ -29,6 +29,7 @@ type
     cResultCaretTop,
     cResultCaretRight,
     cResultCaretBottom,
+    cResultKeepColumnSel,
     cResultScroll,
     cResultState
     );
