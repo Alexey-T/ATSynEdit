@@ -1,6 +1,3 @@
 
-cache wrapinfo--done
-col-sel--done
-
 foldin bar
-tokens hilite (styles/ adapt SynEdit)
+tokens hilite (styles, adapt SynEdit)

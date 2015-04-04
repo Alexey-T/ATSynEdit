@@ -155,6 +155,11 @@ begin
     cCommand_KeyPageDown,
     cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetPageLines);
 
+    cCommand_ColSelectLeft:      Res:= DoCommand_SelectColumn(cDirLeft);
+    cCommand_ColSelectRight:     Res:= DoCommand_SelectColumn(cDirRight);
+    cCommand_ColSelectUp:        Res:= DoCommand_SelectColumn(cDirUp);
+    cCommand_ColSelectDown:      Res:= DoCommand_SelectColumn(cDirDown);
+
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver, false);
     cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOver, false);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);

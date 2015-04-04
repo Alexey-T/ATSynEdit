@@ -41,6 +41,11 @@ begin
   M.Add(cCommand_KeyPageDown,     'caret page down',               ['PgDn'], []);
   M.Add(cCommand_KeyPageDown_Sel, 'caret page down + select',      ['Shift+PgDn'], []);
 
+  M.Add(cCommand_ColSelectLeft,  'column select: left',  ['Shift+Alt+Left'], []);
+  M.Add(cCommand_ColSelectRight, 'column select: right', ['Shift+Alt+Right'], []);
+  M.Add(cCommand_ColSelectUp,    'column select: up',    ['Shift+Alt+Up'], []);
+  M.Add(cCommand_ColSelectDown,  'column select: down',  ['Shift+Alt+Down'], []);
+
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
   M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Enter'], []);

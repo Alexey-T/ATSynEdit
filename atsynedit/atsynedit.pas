@@ -15,6 +15,13 @@ uses
   ATCarets, ATKeyMapping, ATSynEdit_WrapInfo;
 
 type
+  TATDirection = (
+    cDirLeft,
+    cDirRight,
+    cDirUp,
+    cDirDown
+    );
+
   TATCommandResult = (
     cResultText,
     cResultCaretAny,
@@ -210,6 +217,8 @@ type
     FStringsExt: TATStrings;
     FTextOffset: TPoint;
     FSelRect: TRect;
+    FSelRectBegin,
+    FSelRectEnd: TPoint;
     FCarets: TATCarets;
     FCaretShape,
     FCaretShapeOvr: TATSynCaretShape;
@@ -440,6 +449,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_Undo: TATCommandResults;
@@ -2226,6 +2236,8 @@ begin
           //drag with Alt pressed
           if Shift=[ssAlt, ssLeft] then
           begin
+            DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+            DoSelect_None;
             DoSelect_ColumnBlock(FMouseDownPnt, P);
           end;
 

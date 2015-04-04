@@ -149,6 +149,9 @@ var
   i: integer;
 begin
   FSelRect:= cRectEmpty;
+  FSelRectBegin:= Point(-1, -1);
+  FSelRectEnd:= Point(-1, -1);
+
   for i:= 0 to Carets.Count-1 do
     with Carets[i] do
     begin
@@ -179,9 +182,6 @@ procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
 var
   i: integer;
 begin
-  DoCaretSingle(P1.X, P1.Y);
-  DoSelect_None;
-
   if P1.Y>P2.Y then
     SwapInt(P1.Y, P2.Y);
 
@@ -241,4 +241,42 @@ begin
         APointText.Y+ACharSize.Y);
     end;
 end;
+
+
+function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
+begin
+  if Carets.Count=0 then Exit;
+  if EqualRect(FSelRect, cRectEmpty) then
+  begin
+    DoCaretSingleAsIs;
+    DoSelect_None;
+    FSelRectBegin.X:= Carets[0].PosX;
+    FSelRectBegin.Y:= Carets[0].PosY;
+    FSelRectEnd.X:= FSelRectBegin.X;
+    FSelRectEnd.Y:= FSelRectBegin.Y;
+  end;
+
+  case ADir of
+    cDirLeft:
+      begin
+        if FSelRectEnd.X>0 then Dec(FSelRectEnd.X);
+      end;
+    cDirRight:
+      begin
+        Inc(FSelRectEnd.X);
+      end;
+    cDirUp:
+      begin
+        if FSelRectEnd.Y>0 then Dec(FSelRectEnd.Y);
+      end;
+    cDirDown:
+      begin
+        if FSelRectEnd.Y<Strings.Count-1 then Inc(FSelRectEnd.Y);
+      end;
+  end;
+
+  DoSelect_ColumnBlock(FSelRectBegin, FSelRectEnd);
+  Result:= [cResultState]; //dont do cResultCaretNN, this resets colblock
+end;
+
 

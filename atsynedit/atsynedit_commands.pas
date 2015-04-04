@@ -5,9 +5,9 @@ unit ATSynEdit_Commands;
 interface
 
 const
-  cCmdSelKeep  = $10000; //cmd continues selection (new caret pos makes bigger selection)
-  cCmdSelReset = $20000; //before command reset selection
-  cCmdCaret    = $40000; //command moves caret and makes new undo-group
+  cCmdSelKeep   = $10000; //cmd continues selection (new caret pos makes bigger selection)
+  cCmdSelReset  = $20000; //before command reset selection
+  cCmdCaret     = $80000; //cmd moves caret and makes new undo-group
 
 const
   _base_KeyUp       = 100 or cCmdCaret;
@@ -36,6 +36,11 @@ const
   cCommand_KeyEnd_Sel      = _base_KeyEnd or cCmdSelKeep;
   cCommand_KeyPageUp_Sel   = _base_KeyPageUp or cCmdSelKeep;
   cCommand_KeyPageDown_Sel = _base_KeyPageDown or cCmdSelKeep;
+
+  cCommand_ColSelectUp    = 110;
+  cCommand_ColSelectDown  = 111;
+  cCommand_ColSelectLeft  = 112;
+  cCommand_ColSelectRight = 113;
 
   cCommand_TextInsert = 150;
   cCommand_TextInsertTabChar = 151;
