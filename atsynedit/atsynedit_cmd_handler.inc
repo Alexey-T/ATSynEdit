@@ -208,6 +208,9 @@ begin
     cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];
     cCommand_ScrollToCaretRight:       Res:= [cResultCaretRight];
 
+    cCommand_MoveSelectionUp:          Res:= DoCommand_MoveSelectionUpDown(false);
+    cCommand_MoveSelectiondown:        Res:= DoCommand_MoveSelectionUpDown(true);
+
     cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy;
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true);
     cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut;

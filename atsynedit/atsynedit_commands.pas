@@ -91,6 +91,9 @@ const
   cCommand_SelectLines = 262 or cCmdSelReset or cCmdCaret;
   cCommand_SelectNone = 263 or cCmdSelReset or cCmdCaret;
 
+  cCommand_MoveSelectionUp = 268;
+  cCommand_MoveSelectionDown = 269;
+
   cCommand_ToggleReadOnly = 300;
   cCommand_ToggleOverwrite = 301;
 

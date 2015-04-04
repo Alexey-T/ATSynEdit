@@ -271,3 +271,46 @@ begin
 end;
 
 
+
+function TATSynEdit.DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
+var
+  NFrom, NTo: integer;
+  Str: atString;
+  Caret: TATCaretItem;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  DoCaretSingleAsIs;
+  Caret:= Carets[0];
+  Caret.GetSelLines(NFrom, NTo);
+  if NFrom<0 then
+  begin
+    NFrom:= Caret.PosY;
+    NTo:= NFrom;
+  end;
+
+  if ADown then
+  begin
+    if (NTo>=Strings.Count-1) then Exit;
+    Str:= Strings.Lines[NTo+1];
+    Strings.LineDelete(NTo+1);
+    Strings.LineInsert(NFrom, Str);
+    Inc(Caret.PosY);
+    if Caret.EndY>=0 then
+      Inc(Caret.EndY);
+  end
+  else
+  begin
+    if (NFrom<=0) then Exit;
+    Str:= Strings.Lines[NFrom-1];
+    Strings.LineDelete(NFrom-1);
+    Strings.LineInsert(NTo, Str);
+    Dec(Caret.PosY);
+    if Caret.EndY>=0 then
+      Dec(Caret.EndY);
+  end;
+
+  Result:= [cResultText, cResultCaretTop];
+end;
+

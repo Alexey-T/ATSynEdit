@@ -315,6 +315,7 @@ type
     //
     procedure DebugFindWrapIndex;
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
+    function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     procedure DoDropText;
     procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
     procedure DoMinimapClick(APosY: integer);
