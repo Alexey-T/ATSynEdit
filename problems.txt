@@ -1,5 +1,0 @@
-Mac10.8
-Laz1.2.6
-
-- minimap not painted with text(ignored too small font). Redo map for mac?
-

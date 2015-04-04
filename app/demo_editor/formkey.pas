@@ -71,7 +71,7 @@ end;
 
 procedure TfmCmd.ListDblClick(Sender: TObject);
 begin
-  ModalResult:= mrOk;
+  //ModalResult:= mrOk;
 end;
 
 end.

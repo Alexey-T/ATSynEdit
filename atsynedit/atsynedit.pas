@@ -143,7 +143,7 @@ const
   cInitTabSize = 10;
   cInitMicromapWidth = 30;
   cInitMinimapWidth = 160;
-  cInitMinimapFontSize = 2;
+  cInitMinimapFontSize = {$ifdef darwin} 4 {$else} 2 {$endif};
   cInitNumbersStyle = cNumbersEach5th;
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
@@ -592,6 +592,7 @@ type
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall;
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
+    property OptMinimapFontSize: integer read FMinimapFontSize write FMinimapFontSize;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY;
