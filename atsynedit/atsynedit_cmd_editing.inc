@@ -97,7 +97,7 @@ begin
   if ModeReadOnly then Exit;
 
   if FOptOverwriteSel then
-    DoCommand_TextDeleteSelections
+    DoCommand_TextDeleteSelection
   else
     DoSelect_None;
 
@@ -163,12 +163,12 @@ end;
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
 begin
   if Carets.IsSelection then
-    Result:= DoCommand_TextDeleteSelections
+    Result:= DoCommand_TextDeleteSelection
   else
     Result:= DoCommand_TextDeleteRight(1);
 end;
 
-function TATSynEdit.DoCommand_TextDeleteSelections: TATCommandResults;
+function TATSynEdit.DoCommand_TextDeleteSelection: TATCommandResults;
 var
   Item: TATCaretItem;
   i: integer;

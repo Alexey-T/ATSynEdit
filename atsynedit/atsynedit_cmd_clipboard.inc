@@ -14,7 +14,7 @@ begin
 
   //usual text
   Str:= UTF8Decode(Clipboard.AsText);
-  DoCommand_TextDeleteSelections;
+  DoCommand_TextDeleteSelection;
   Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOver and FOptUseOverOnPaste, ASelectThen);
 
   //workaround: paste on last line, end
@@ -45,7 +45,7 @@ begin
   if Carets.IsSelection then
   begin
     DoCommand_ClipboardCopy;
-    Result:= DoCommand_TextDeleteSelections;
+    Result:= DoCommand_TextDeleteSelection;
   end
   else
   begin

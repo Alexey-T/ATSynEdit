@@ -38,20 +38,20 @@ const
   cCommand_KeyPageDown_Sel = _base_KeyPageDown or cCmdSelKeep;
 
   cCommand_TextInsert = 150;
-  cCommand_KeyBackspace = 151 or cCmdSelReset;
-  cCommand_KeyDelete = 152;
-  cCommand_KeyEnter = 153 or cCmdSelReset;
-  cCommand_KeyTab = 154;
-  cCommand_KeyTabChar = 155;
+  cCommand_TextInsertTabChar = 151;
+  cCommand_KeyBackspace = 152 or cCmdSelReset;
+  cCommand_KeyDelete = 153;
+  cCommand_KeyEnter = 154 or cCmdSelReset;
+  cCommand_KeyTab = 155;
 
-  cCommand_TextDeleteLine = 170 or cCmdSelReset;
-  cCommand_TextDuplicateLine = 171 or cCmdSelReset;
-  cCommand_TextDeleteToLineBegin = 172 or cCmdSelReset;
-  cCommand_TextDeleteToLineEnd = 173 or cCmdSelReset;
-  cCommand_TextDeleteWordNext = 174 or cCmdSelReset;
-  cCommand_TextDeleteWordPrev = 175 or cCmdSelReset;
-  cCommand_TextDeleteToFileEnd = 176 or cCmdSelReset;
-  cCommand_TextDeleteSelection = 180;
+  cCommand_TextDeleteSelection = 170;
+  cCommand_TextDeleteLine = 171 or cCmdSelReset;
+  cCommand_TextDuplicateLine = 172 or cCmdSelReset;
+  cCommand_TextDeleteToLineBegin = 173 or cCmdSelReset;
+  cCommand_TextDeleteToLineEnd = 174 or cCmdSelReset;
+  cCommand_TextDeleteToTextEnd = 175 or cCmdSelReset;
+  cCommand_TextDeleteWordNext = 176 or cCmdSelReset;
+  cCommand_TextDeleteWordPrev = 177 or cCmdSelReset;
 
   _base_GotoTextBegin = 200 or cCmdCaret;
   _base_GotoTextEnd   = 201 or cCmdCaret;

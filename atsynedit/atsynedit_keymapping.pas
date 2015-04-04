@@ -44,8 +44,8 @@ begin
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
   M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Enter'], []);
-  M.Add(cCommand_KeyTabChar, 'insert tab char', [], []);
-  M.Add(cCommand_KeyTab, 'tabulation', [], []);
+  M.Add(cCommand_KeyTab, 'tabulation key', [], []);
+  M.Add(cCommand_TextInsertTabChar, 'insert tab char', [], []);
 
   M.Add(cCommand_TextDeleteLine, 'delete line', [cXControl+'+Y'], []);
   M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXControl+'+D'], []);
@@ -68,12 +68,12 @@ begin
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXControl+'+R'], []);
 
+  M.Add(cCommand_TextDeleteSelection, 'delete selection', [], []);
   M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line start', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXControl+'+K'], []);
-  M.Add(cCommand_TextDeleteSelection, 'delete selection', [], []);
-  M.Add(cCommand_TextDeleteToFileEnd, 'delete to file end', [], []);
+  M.Add(cCommand_TextDeleteToTextEnd, 'delete to text end', [], []);
 
   M.Add(cCommand_TextIndent, 'indent selection', [cXControl+'+I'], []);
   M.Add(cCommand_TextUnindent, 'unindent selection', [cXControl+'+U'], ['Shift+Tab']);

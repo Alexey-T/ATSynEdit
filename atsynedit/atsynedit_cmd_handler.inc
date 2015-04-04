@@ -156,24 +156,24 @@ begin
     cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetPageLines);
 
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver, false);
+    cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOver, false);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);
     cCommand_KeyDelete:           Res:= DoCommand_TextDelete;
     cCommand_KeyTab:              Res:= DoCommand_TextTabulation;
-    cCommand_KeyTabChar:          Res:= DoCommand_TextInsertAtCarets(#9, false, FOver, false);
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
-    //end of most used
 
     cCommand_Undo:                Res:= DoCommand_Undo;
     cCommand_Redo:                Res:= DoCommand_Redo;
+    //end of most used
 
+    cCommand_TextDeleteSelection:      Res:= DoCommand_TextDeleteSelection;
     cCommand_TextDeleteLine:           Res:= DoCommand_TextDeleteLines;
     cCommand_TextDuplicateLine:        Res:= DoCommand_TextDuplicateLine;
     cCommand_TextDeleteToLineBegin:    Res:= DoCommand_TextDeleteToLineBegin;
     cCommand_TextDeleteToLineEnd:      Res:= DoCommand_TextDeleteToLineEnd;
+    cCommand_TextDeleteToTextEnd:      Res:= DoCommand_TextDeleteToFileEnd;
     cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);
     cCommand_TextDeleteWordNext:       Res:= DoCommand_TextDeleteWord(true);
-    cCommand_TextDeleteSelection:      Res:= DoCommand_TextDeleteSelections;
-    cCommand_TextDeleteToFileEnd:      Res:= DoCommand_TextDeleteToFileEnd;
 
     cCommand_SelectAll:                Res:= DoCommand_SelectAll;
     cCommand_SelectWords:              Res:= DoCommand_SelectWords;
