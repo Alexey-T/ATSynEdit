@@ -558,6 +558,8 @@ begin
     Caret:= Carets[i];
     Strings.LineInsert(Caret.PosY + IfThen(ADown, 1), '');
     DoCaretsShift(0, Caret.PosY, 0, 1);
+
+    Caret.PosX:= 0;
     if ADown then
       Inc(Caret.PosY);
   end;

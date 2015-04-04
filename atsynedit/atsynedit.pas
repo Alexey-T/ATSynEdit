@@ -381,7 +381,7 @@ type
     //
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
-    function GetLastPos: TPoint;
+    function GetEndOfFilePos: TPoint;
     function GetMarginString: string;
     function GetReadOnly: boolean;
     function GetScrollTop: integer;

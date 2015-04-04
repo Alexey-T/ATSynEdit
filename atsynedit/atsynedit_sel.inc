@@ -97,7 +97,7 @@ begin
     end
     else
     begin
-      PLast:= GetLastPos;
+      PLast:= GetEndOfFilePos;
       PosX:= PLast.X;
       PosY:= PLast.Y;
     end;
@@ -110,7 +110,7 @@ procedure TATSynEdit.DoSelect_All;
 var
   P: TPoint;
 begin
-  P:= GetLastPos;
+  P:= GetEndOfFilePos;
   DoCaretSingle(P.X, P.Y);
   with Carets[0] do
   begin
@@ -275,8 +275,9 @@ end;
 function TATSynEdit.DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
 var
   NFrom, NTo: integer;
-  Str: atString;
   Caret: TATCaretItem;
+  Str: atString;
+  Pnt: TPoint;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -296,9 +297,18 @@ begin
     Str:= Strings.Lines[NTo+1];
     Strings.LineDelete(NTo+1);
     Strings.LineInsert(NFrom, Str);
+
     Inc(Caret.PosY);
     if Caret.EndY>=0 then
       Inc(Caret.EndY);
+
+    //correct caret if out of file
+    if Caret.PosY>=Strings.Count then
+    begin
+      Pnt:= GetEndOfFilePos;
+      Caret.PosX:= Pnt.X;
+      Caret.PosY:= Pnt.Y;
+    end;
   end
   else
   begin
@@ -306,6 +316,7 @@ begin
     Str:= Strings.Lines[NFrom-1];
     Strings.LineDelete(NFrom-1);
     Strings.LineInsert(NTo, Str);
+
     Dec(Caret.PosY);
     if Caret.EndY>=0 then
       Dec(Caret.EndY);

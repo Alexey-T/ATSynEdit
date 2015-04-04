@@ -163,7 +163,7 @@ begin
   Result:= [cResultCaretTop];
 end;
 
-function TATSynEdit.GetLastPos: TPoint;
+function TATSynEdit.GetEndOfFilePos: TPoint;
 begin
   Result.X:= 0;
   Result.Y:= 0;
@@ -180,7 +180,7 @@ function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
 var
   P: TPoint;
 begin
-  P:= GetLastPos;
+  P:= GetEndOfFilePos;
   DoCaretSingle(P.X, P.Y);
 
   Result:= [cResultCaretBottom];
