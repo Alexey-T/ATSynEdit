@@ -128,7 +128,8 @@ type
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteDupFakeLines;
     procedure ActionAddFakeLineIfNeeded;
-    procedure ActionEnsureFinalEol;
+    function ActionTrimTrailSpaces: boolean;
+    function ActionEnsureFinalEol: boolean;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const Filename: string);
@@ -878,13 +879,35 @@ begin
 end;
 
 
-procedure TATStrings.ActionEnsureFinalEol;
+function TATStrings.ActionEnsureFinalEol: boolean;
 begin
+  Result:= false;
   if IsLastLineFake then Exit;
   if Count>0 then
   begin
     if LinesEnds[Count-1]=cEndNone then
+    begin
       LinesEnds[Count-1]:= Endings;
+      Result:= true;
+    end;
+  end;
+end;
+
+function TATStrings.ActionTrimTrailSpaces: boolean;
+var
+  i: integer;
+  S1, S2: atString;
+begin
+  Result:= false;
+  for i:= 0 to Count-1 do
+  begin
+    S1:= Lines[i];
+    S2:= STrimRight(S1);
+    if S2<>S1 then
+    begin
+      Lines[i]:= S2;
+      Result:= true;
+    end;
   end;
 end;
 

@@ -328,7 +328,6 @@ type
       const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
       ALineIndex: integer; AEolSelected: boolean;
       const AScrollHorz: TATSynScrollInfo);
-    procedure DoTrimTrailingSpaces;
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetRedoCount: integer;
     function GetUndoAfterSave: boolean;
@@ -1802,13 +1801,18 @@ begin
 end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
+var
+  Change1, Change2: boolean;
 begin
-  if FOptSavingForceFinalEol or FOptSavingTrimSpaces then
-  begin
-    if FOptSavingForceFinalEol then Strings.ActionEnsureFinalEol;
-    if FOptSavingTrimSpaces then DoTrimTrailingSpaces;
+  Change1:= false;
+  Change2:= false;
+
+  if FOptSavingForceFinalEol then
+    Change1:= Strings.ActionEnsureFinalEol;
+  if FOptSavingTrimSpaces then
+    Change2:= Strings.ActionTrimTrailSpaces;
+  if Change1 or Change2 then
     Update(true);
-  end;
 
   Strings.SaveToFile(AFilename);
 end;
@@ -2822,20 +2826,6 @@ begin
   Dec(FPaintLocked);
   if FPaintLocked=0 then
     Invalidate;
-end;
-
-procedure TATSynEdit.DoTrimTrailingSpaces;
-var
-  i: integer;
-  S1, S2: atString;
-begin
-  for i:= 0 to Strings.Count-1 do
-  begin
-    S1:= Strings.Lines[i];
-    S2:= STrimRight(S1);
-    if S2<>S1 then
-      Strings.Lines[i]:= S2;
-  end;
 end;
 
 
