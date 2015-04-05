@@ -46,6 +46,7 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     btnHlp: TMenuItem;
+    mnuPane: TMenuItem;
     mnuHilit: TMenuItem;
     mnuTCaret1: TMenuItem;
     mnuOpt: TMenuItem;
@@ -81,6 +82,7 @@ type
     procedure chkGutterChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
+    procedure mnuPaneClick(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
     procedure chkUnprintVisChange(Sender: TObject);
     procedure chkUnprintEndChange(Sender: TObject);
@@ -500,6 +502,15 @@ begin
   if wait then Exit;
   ed.OptMinimapVisible:= chkMinimap.Checked;
   ed.Update;
+end;
+
+procedure TfmMain.mnuPaneClick(Sender: TObject);
+begin
+  with mnuPane do
+  begin
+    Checked:= not Checked;
+    PanelRt.Visible:= Checked;
+  end;
 end;
 
 procedure TfmMain.chkRulerChange(Sender: TObject);

@@ -2010,13 +2010,17 @@ begin
 end;
 
 procedure TATSynEdit.DoOnResize;
+var
+  SizeX, SizeY: integer;
 begin
   inherited;
 
   if Assigned(FBitmap) then
   begin
-    FBitmap.Width:= Max(FBitmap.Width, ((Width div cResizeBitmapStep)+1)*cResizeBitmapStep);
-    FBitmap.Height:= Max(FBitmap.Height, ((Height div cResizeBitmapStep)+1)*cResizeBitmapStep);
+    SizeX:= ((Width div cResizeBitmapStep)+1)*cResizeBitmapStep;
+    SizeY:= ((Height div cResizeBitmapStep)+1)*cResizeBitmapStep;
+    if (SizeX>FBitmap.Width) or (SizeY>FBitmap.Height) then
+      FBitmap.SetSize(SizeX, SizeY);
   end;
 
   Invalidate;

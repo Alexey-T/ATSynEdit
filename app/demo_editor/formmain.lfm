@@ -366,6 +366,11 @@ object fmMain: TfmMain
       object MenuItem1: TMenuItem
         Caption = '-'
       end
+      object mnuPane: TMenuItem
+        Caption = 'show pane'
+        Checked = True
+        OnClick = mnuPaneClick
+      end
     end
     object mnuHlp: TMenuItem
       Caption = 'Help'
