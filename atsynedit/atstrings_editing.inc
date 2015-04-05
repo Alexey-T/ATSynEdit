@@ -48,7 +48,7 @@ begin
   List:= TATStrings.Create;
   try
     List.LoadFromString(StrLead+AText);
-    List.LineDeleteLastFake;
+    List.ActionDeleteFakeLine;
     if List.Count=0 then Exit;
 
     if StrTail<>'' then

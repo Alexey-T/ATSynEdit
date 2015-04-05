@@ -165,7 +165,7 @@ end;
 procedure TATStrings.DoFinalizeLoading;
 begin
   DoDetectEndings;
-  LineAddLastFake;
+  ActionAddFakeLineIfNeeded;
   DoClearLineStates(false);
   DoClearUndo;
 end;

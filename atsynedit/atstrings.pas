@@ -84,7 +84,6 @@ type
     function IsLastFakeLineUnneeded: boolean;
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
-    procedure LineAddLastFake;
     procedure LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
     procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
     procedure SetCaretsArray(const L: TPointArray);
@@ -103,7 +102,6 @@ type
     procedure SetUndoLimit(AValue: integer);
     function DoUndoSingle(AUndoList: TATUndoList): boolean;
     procedure DoClearUndo(ALocked: boolean = false);
-    procedure DoDeleteDupFakeLines;
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   public
     constructor Create; virtual;
@@ -116,7 +114,6 @@ type
     procedure LineInsert(N: integer; const AString: atString);
     procedure LineInsertStrings(N: integer; AList: TATStrings);
     procedure LineDelete(N: integer; AForceLast: boolean = true);
-    procedure LineDeleteLastFake;
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[Index: integer]: integer read GetLineHidden write SetLineHidden;
@@ -128,6 +125,9 @@ type
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
+    procedure ActionDeleteFakeLine;
+    procedure ActionDeleteDupFakeLines;
+    procedure ActionAddFakeLineIfNeeded;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const Filename: string);
@@ -422,7 +422,7 @@ begin
   FSaveSignWide:= true;
   FUndoAfterSave:= true;
 
-  LineAddLastFake;
+  ActionAddFakeLineIfNeeded;
   DoClearUndo;
 end;
 
@@ -453,10 +453,27 @@ begin
     (TATStringItem(FList[FList.Count-2]).ItemEnd=cEndNone);
 end;
 
-procedure TATStrings.LineDeleteLastFake;
+procedure TATStrings.ActionDeleteFakeLine;
 begin
   if IsLastLineFake then
     LineDelete(Count-1, false{dont force});
+end;
+
+procedure TATStrings.ActionAddFakeLineIfNeeded;
+begin
+  if Count=0 then
+  begin
+    LineAddRaw('', cEndNone);
+    Exit
+  end;
+
+  if IsLastLineFake then Exit;
+
+  if LinesEnds[Count-1]<>cEndNone then
+  begin
+    LineAddRaw('', cEndNone);
+    Exit
+  end;
 end;
 
 procedure TATStrings.LineAddRaw(const AString: atString; AEnd: TATLineEnds);
@@ -565,12 +582,6 @@ begin
   Result:= FList.Count;
 end;
 
-procedure TATStrings.LineAddLastFake;
-begin
-  if Count=0 then
-    LineAddRaw('', cEndNone);
-end;
-
 procedure TATStrings.LineDelete(N: integer; AForceLast: boolean = true);
 var
   Item: TATStringItem;
@@ -590,7 +601,7 @@ begin
   //  raise Exception.Create('Invalid Delete index: '+IntToStr(N));
 
   if AForceLast then
-    LineAddLastFake;
+    ActionAddFakeLineIfNeeded;
 end;
 
 procedure TATStrings.Clear;
@@ -737,7 +748,7 @@ begin
     end;
 
     SetCaretsArray(ACarets);
-    DoDeleteDupFakeLines;
+    ActionDeleteDupFakeLines;
   finally
     AUndoList.Locked:= false;
   end;
@@ -836,7 +847,7 @@ begin
   end;
 end;
 
-procedure TATStrings.DoDeleteDupFakeLines;
+procedure TATStrings.ActionDeleteDupFakeLines;
 begin
   while IsLastFakeLineUnneeded do
     LineDelete(Count-1, false);

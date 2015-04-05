@@ -493,7 +493,7 @@ begin
   List:= TATStrings.Create;
   try
     List.LoadFromString(AText);
-    List.LineDeleteLastFake;
+    List.ActionDeleteFakeLine;
     if List.Count=0 then Exit;
 
     PosY:= Item.PosY;
