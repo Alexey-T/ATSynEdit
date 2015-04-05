@@ -80,17 +80,20 @@ begin
   Result:= false;
 
   case Ord(ch) of
-    //En
+    //Eng
     Ord('0')..Ord('9'),
     Ord('a')..Ord('z'),
     Ord('A')..Ord('Z'),
     Ord('_'),
-    //Ger
+    //German
     $E4, $C4, $E9, $F6, $D6, $FC, $DC, $DF,
     //Rus
     $0430..$044F, //a..z
     $0410..$042F, //A..Z
-    $0451, $0401: //yo, Yo
+    $0451, $0401, //yo, Yo
+    //Greek
+    $0391..$03A9,
+    $03B1..$03C9:
       begin Result:= true; Exit end;
   end;
 
