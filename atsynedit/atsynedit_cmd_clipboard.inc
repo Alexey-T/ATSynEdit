@@ -17,11 +17,10 @@ begin
   DoCommand_TextDeleteSelection;
   Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOver and FOptUseOverOnPaste, ASelectThen);
 
-  //workaround: paste on last line, end
+  //workaround: paste on last line end
   if Carets.Count>0 then
-    with Carets[0] do
-      if PosY>=Strings.Count then
-        Strings.LineAdd('');
+    if Carets[0].PosY>=Strings.Count then
+      Strings.ActionAddFakeLineIfNeeded;
 end;
 
 

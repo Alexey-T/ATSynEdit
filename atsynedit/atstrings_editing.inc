@@ -141,12 +141,14 @@ begin
       if AX>=Length(Str) then
         Str:= Str+StringOfChar(' ', AX-Length(Str));
 
+      //not last? del next line
       if AY+1<Count then
       begin
         Lines[AY]:= Str+Lines[AY+1];
-        LineDelete(AY+1);
+        LineDelete(AY+1, false{not force});
       end
       else
+        //last? del eol
         LinesEnds[AY]:= cEndNone;
 
       AShift.Y:= -1;
