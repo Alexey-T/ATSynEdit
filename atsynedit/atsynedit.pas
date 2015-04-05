@@ -323,7 +323,6 @@ type
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     procedure DoDropText;
     procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
-    procedure DoForceFinalEol;
     procedure DoMinimapClick(APosY: integer);
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
       const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
@@ -1806,7 +1805,7 @@ procedure TATSynEdit.SaveToFile(const AFilename: string);
 begin
   if FOptSavingForceFinalEol or FOptSavingTrimSpaces then
   begin
-    if FOptSavingForceFinalEol then DoForceFinalEol;
+    if FOptSavingForceFinalEol then Strings.ActionEnsureFinalEol;
     if FOptSavingTrimSpaces then DoTrimTrailingSpaces;
     Update(true);
   end;
@@ -2837,17 +2836,6 @@ begin
     if S2<>S1 then
       Strings.Lines[i]:= S2;
   end;
-end;
-
-procedure TATSynEdit.DoForceFinalEol;
-var
-  N: integer;
-begin
-  N:= Strings.Count;
-  if N=0 then Exit;
-  if Strings.IsLastLineFake then Exit;
-  if Strings.LinesEnds[N-1]=cEndNone then
-    Strings.LinesEnds[N-1]:= Strings.Endings;
 end;
 
 

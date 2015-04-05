@@ -128,6 +128,7 @@ type
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteDupFakeLines;
     procedure ActionAddFakeLineIfNeeded;
+    procedure ActionEnsureFinalEol;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const Filename: string);
@@ -876,6 +877,16 @@ begin
     if IndexOf(Ptr)<0 then Add(Ptr);
 end;
 
+
+procedure TATStrings.ActionEnsureFinalEol;
+begin
+  if IsLastLineFake then Exit;
+  if Count>0 then
+  begin
+    if LinesEnds[Count-1]=cEndNone then
+      LinesEnds[Count-1]:= Endings;
+  end;
+end;
 
 {$I atstrings_editing.inc}
 {$I atstrings_load.inc}
