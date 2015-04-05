@@ -76,6 +76,10 @@ const
   cUnprintedFontOffsetX = 3;
   cUnprintedFontOffsetY = 2;
 
+var
+  _Pen: TPen = nil;
+
+
 procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: real; AFontColor: TColor);
 const
   cMinDotSize = 2;
@@ -365,17 +369,11 @@ begin
       C.Pixels[i, j]:= C.Pixels[i, j] xor (not AColor and $ffffff);
 end;
 {$else}
-var
-  _Pen: TPen = nil;
-
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 var
   X: integer;
   AM: TAntialiasingMode;
 begin
-  if not Assigned(_Pen) then
-    _Pen:= TPen.Create;
-
   AM:= C.AntialiasingMode;
   _Pen.Assign(C.Pen);
 
@@ -404,6 +402,14 @@ begin
     if Odd(j) then
       C.Pixels[X, j]:= AColor;
 end;
+
+
+initialization
+  _Pen:= TPen.Create;
+
+finalization
+  if Assigned(_Pen) then
+    FreeAndNil(_Pen);
 
 end.
 

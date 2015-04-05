@@ -2020,7 +2020,10 @@ begin
     SizeX:= ((Width div cResizeBitmapStep)+1)*cResizeBitmapStep;
     SizeY:= ((Height div cResizeBitmapStep)+1)*cResizeBitmapStep;
     if (SizeX>FBitmap.Width) or (SizeY>FBitmap.Height) then
+    begin
       FBitmap.SetSize(SizeX, SizeY);
+      FBitmap.FreeImage; //recommended, else seen black bitmap on bigsize
+    end;
   end;
 
   Invalidate;
