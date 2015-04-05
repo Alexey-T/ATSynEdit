@@ -4,7 +4,7 @@ object fmOpt: TfmOpt
   Top = 225
   Width = 640
   BorderStyle = bsDialog
-  Caption = 'Opts'
+  Caption = 'Editor opts'
   ClientHeight = 357
   ClientWidth = 640
   OnCreate = FormCreate

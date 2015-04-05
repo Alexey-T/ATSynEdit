@@ -2166,7 +2166,6 @@ procedure TATSynEdit.UpdateCursor;
 var
   P: TPoint;
   RectBm: TRect;
-  bMap: boolean;
 begin
   P:= ScreenToClient(Mouse.CursorPos);
 

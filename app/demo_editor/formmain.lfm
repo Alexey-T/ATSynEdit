@@ -3,7 +3,7 @@ object fmMain: TfmMain
   Height = 498
   Top = 111
   Width = 953
-  Caption = 'Editor'
+  Caption = 'Demo'
   ClientHeight = 478
   ClientWidth = 953
   Menu = MainMenu1
@@ -365,14 +365,6 @@ object fmMain: TfmMain
       end
       object MenuItem1: TMenuItem
         Caption = '-'
-      end
-      object mnuLock: TMenuItem
-        Caption = 'lock'
-        OnClick = mnuLockClick
-      end
-      object mnuUnlock: TMenuItem
-        Caption = 'unlock'
-        OnClick = mnuUnlockClick
       end
     end
     object mnuHlp: TMenuItem

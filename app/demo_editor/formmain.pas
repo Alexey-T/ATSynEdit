@@ -48,8 +48,6 @@ type
     btnHlp: TMenuItem;
     mnuHilit: TMenuItem;
     mnuTCaret1: TMenuItem;
-    mnuUnlock: TMenuItem;
-    mnuLock: TMenuItem;
     mnuOpt: TMenuItem;
     mnuTBms: TMenuItem;
     mnuTMargin: TMenuItem;
@@ -114,6 +112,7 @@ type
     ed: TATSynEdit;
     wait: boolean;
     FDir: string;
+    procedure DoOpen(const fn: string);
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: array of integer);
@@ -146,7 +145,7 @@ const
 
 procedure TfmMain.FormCreate(Sender: TObject);
 begin
-  FDir:= ExtractFileDir(Application.ExeName)+'\..\..\test_files';
+  FDir:= ExtractFilePath(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'test_files';
   wait:= true;
 
   ed:= TATSynEdit.Create(Self);
@@ -180,7 +179,7 @@ begin
 
   fn:= FDir+'\fn.txt';
   if FileExists(fn) then
-    ed.LoadFromFile(fn);
+    DoOpen(fn);
 end;
 
 procedure TfmMain.mnuEndMcClick(Sender: TObject);
@@ -380,11 +379,18 @@ begin
   begin
     InitialDir:= FDir;
     if not Execute then Exit;
-    ed.BeginUpdate;
-    Application.ProcessMessages;
-    ed.LoadFromFile(FileName);
-    ed.EndUpdate;
+    DoOpen(FileName);
   end;
+end;
+
+procedure TfmMain.DoOpen(const fn: string);
+begin
+  ed.BeginUpdate;
+  Application.ProcessMessages;
+  ed.LoadFromFile(fn);
+  ed.EndUpdate;
+
+  Caption:= 'Demo - '+ExtractFileName(fn);
 end;
 
 procedure TfmMain.bGotoClick(Sender: TObject);
