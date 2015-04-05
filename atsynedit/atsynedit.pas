@@ -61,6 +61,7 @@ type
     UnprintedHexFont,
     MinimapBorder,
     MinimapSelBG,
+    MinimapSelBorder,
     MicromapBG,
     StateChanged,
     StateAdded,
@@ -229,6 +230,7 @@ type
     FMouseAutoScroll: TATDirection;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
+    FCursorOnMinimap: boolean;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
@@ -274,6 +276,8 @@ type
     FMinimapWidth: integer;
     FMinimapFontSize: integer;
     FMinimapVisible: boolean;
+    FMinimapShowSelBorder: boolean;
+    FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
     FOptUndoGrouped: boolean;
@@ -596,6 +600,8 @@ type
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
     property OptMinimapFontSize: integer read FMinimapFontSize write FMinimapFontSize;
+    property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder;
+    property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY;
@@ -1437,13 +1443,25 @@ procedure TATSynEdit.DoPaintMinimapSelTo(C: TCanvas);
 var
   R: TRect;
 begin
+  if not FMinimapShowSelAlways then
+    if not FCursorOnMinimap then Exit;
+
   R.Left:= FRectMinimap.Left;
   R.Right:= FRectMinimap.Right;
   R.Top:= FRectMinimap.Top + (FScrollVert.NPos-FScrollVertMinimap.NPos)*FCharSizeMinimap.Y;
   R.Bottom:= R.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y;
 
   if IntersectRect(R, R, FRectMinimap) then
+  begin
     CanvasInvertRect(C, R, FColors.MinimapSelBG);
+    if FMinimapShowSelBorder then
+    begin
+      C.Pen.Color:= FColors.MinimapSelBorder;
+      C.Brush.Style:= bsClear;
+      C.Rectangle(R);
+      C.Brush.Style:= bsSolid;
+    end;
+  end;
 end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
@@ -1656,6 +1674,8 @@ begin
   FMinimapWidth:= cInitMinimapWidth;
   FMinimapFontSize:= cInitMinimapFontSize;
   FMinimapVisible:= cInitMinimapVisible;
+  FMinimapShowSelBorder:= false;
+  FMinimapShowSelAlways:= true;
   FMicromapWidth:= cInitMicromapWidth;
   FMicromapVisible:= cInitMicromapVisible;
 
@@ -2146,6 +2166,7 @@ procedure TATSynEdit.UpdateCursor;
 var
   P: TPoint;
   RectBm: TRect;
+  bMap: boolean;
 begin
   P:= ScreenToClient(Mouse.CursorPos);
 
@@ -2171,12 +2192,24 @@ var
   P: TPoint;
   RectNums: TRect;
   nIndex: integer;
+  bMap: boolean;
 begin
   inherited;
 
   P:= Point(X, Y);
   UpdateCursor;
 
+  //minimap
+  if FMinimapVisible then
+  begin
+    bMap:= PtInRect(FRectMinimap, P);
+    if not FMinimapShowSelAlways then
+      if bMap<>FCursorOnMinimap then
+        Invalidate;
+    FCursorOnMinimap:= bMap;
+  end;
+
+  //numbers
   RectNums.Left:= FGutter[FGutterBandNum].Left;
   RectNums.Right:= FGutter[FGutterBandNum].Right;
   RectNums.Top:= FRectMain.Top;
@@ -2709,6 +2742,7 @@ begin
   FColors.UnprintedHexFont:= clMedGray;
   FColors.MinimapBorder:= clLtGray;
   FColors.MinimapSelBG:= $eeeeee;
+  FColors.MinimapSelBorder:= clMedGray;
   FColors.MicromapBG:= clCream;
   FColors.StateChanged:= $00f0f0;
   FColors.StateAdded:= $20c020;

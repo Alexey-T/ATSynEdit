@@ -14,24 +14,26 @@ type
   TfmMain = class(TForm)
     bFont: TButton;
     bOpt: TButton;
+    chkGutter: TCheckBox;
     chkMicromap: TCheckBox;
-    chkUnprintSp: TCheckBox;
+    chkMinimap: TCheckBox;
+    chkRuler: TCheckBox;
     chkUnprintEnd: TCheckBox;
     chkUnprintEndDet: TCheckBox;
+    chkUnprintSp: TCheckBox;
     chkUnprintVis: TCheckBox;
     chkWrapIndent: TCheckBox;
-    chkGutter: TCheckBox;
-    chkRuler: TCheckBox;
-    chkMinimap: TCheckBox;
+    chkWrapMargin: TRadioButton;
+    chkWrapOff: TRadioButton;
+    chkWrapOn: TRadioButton;
     edFontsize: TSpinEdit;
-    edMapFont: TSpinEdit;
     edMarRt: TSpinEdit;
     edSpaceX: TSpinEdit;
     edSpaceY: TSpinEdit;
     edTabsize: TSpinEdit;
     FontDialog1: TFontDialog;
-    gWrap: TGroupBox;
     gUnpri: TGroupBox;
+    gWrap: TGroupBox;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
@@ -39,7 +41,6 @@ type
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
-    Label7: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
@@ -69,9 +70,6 @@ type
     OpenDialog1: TOpenDialog;
     PanelMain: TPanel;
     PanelRt: TPanel;
-    chkWrapOff: TRadioButton;
-    chkWrapOn: TRadioButton;
-    chkWrapMargin: TRadioButton;
     SaveDialog1: TSaveDialog;
     Status: TStatusBar;
     procedure bGotoClick(Sender: TObject);
@@ -95,7 +93,6 @@ type
     procedure chkWrapOnChange(Sender: TObject);
     procedure chkWrapIndentChange(Sender: TObject);
     procedure edFontsizeChange(Sender: TObject);
-    procedure edMapFontChange(Sender: TObject);
     procedure edMarRtChange(Sender: TObject);
     procedure edSpaceXChange(Sender: TObject);
     procedure edSpaceYChange(Sender: TObject);
@@ -313,7 +310,6 @@ begin
   chkMinimap.Checked:= ed.OptMinimapVisible;
   chkMicromap.Checked:= ed.OptMicromapVisible;
   edFontsize.Value:= ed.Font.Size;
-  edMapFont.Value:= ed.OptMinimapFontSize;
   edTabsize.Value:= ed.OptTabSize;
   edSpaceX.Value:= ed.OptCharSpacingX;
   edSpaceY.Value:= ed.OptCharSpacingY;
@@ -568,13 +564,6 @@ begin
   if wait then Exit;
   ed.Font.Size:= edFontsize.Value;
   ed.Update(true);
-end;
-
-procedure TfmMain.edMapFontChange(Sender: TObject);
-begin
-  if wait then Exit;
-  ed.OptMinimapFontSize:= edMapFont.Value;
-  ed.Update;
 end;
 
 procedure TfmMain.edMarRtChange(Sender: TObject);

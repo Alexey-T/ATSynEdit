@@ -13,6 +13,8 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkMapBord: TCheckBox;
+    chkMapAlw: TCheckBox;
     chkShowNumBg: TCheckBox;
     chkTabSp: TCheckBox;
     chkUndoSv: TCheckBox;
@@ -53,12 +55,14 @@ type
     edCrTime: TSpinEdit;
     edChars: TEdit;
     edIndent: TSpinEdit;
+    edMapFont: TSpinEdit;
     edNum: TComboBox;
     edPage: TComboBox;
     edRulerFSize: TSpinEdit;
     edRulerSize: TSpinEdit;
     LabChars: TLabel;
     Label10: TLabel;
+    Label11: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -78,6 +82,7 @@ type
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
     TabSheet6: TTabSheet;
+    TabSheet7: TTabSheet;
     procedure FormCreate(Sender: TObject);
   private
     { private declarations }
@@ -133,6 +138,11 @@ begin
     edSizeBm.Value:= ed.Gutter[ed.GutterBandBm].Size;
     edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
+
+    //minimap
+    edMapFont.Value:= ed.OptMinimapFontSize;
+    chkMapBord.Checked:= ed.OptMinimapShowSelBorder;
+    chkMapAlw.Checked:= ed.OptMinimapShowSelAlways;
 
     //key
     chkTabSp.Checked:= ed.OptTabSpaces;
@@ -196,6 +206,11 @@ begin
       ed.Gutter[ed.GutterBandBm].Size:= edSizeBm.Value;
       ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
+
+      //minimap
+      ed.OptMinimapFontSize:= edMapFont.Value;
+      ed.OptMinimapShowSelBorder:= chkMapBord.Checked;
+      ed.OptMinimapShowSelAlways:= chkMapAlw.Checked;
 
       //key
       ed.OptTabSpaces:= chkTabSp.Checked;
