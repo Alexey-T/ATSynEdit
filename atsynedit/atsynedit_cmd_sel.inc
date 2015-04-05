@@ -49,7 +49,7 @@ end;
 
 function TATSynEdit.DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
 var
-  NFrom, NTo: integer;
+  NFrom, NTo, NLastLine: integer;
   Caret: TATCaretItem;
   Str: atString;
   Pnt: TPoint;
@@ -68,7 +68,11 @@ begin
 
   if ADown then
   begin
-    if (NTo>=Strings.Count-1) then Exit;
+    NLastLine:= Strings.Count-1;
+    if Strings.IsLastLineFake then
+      Dec(NLastLine);
+    if NTo>=NLastLine then Exit;
+
     Str:= Strings.Lines[NTo+1];
     Strings.LineDelete(NTo+1);
     Strings.LineInsert(NFrom, Str);
@@ -87,7 +91,7 @@ begin
   end
   else
   begin
-    if (NFrom<=0) then Exit;
+    if NFrom<=0 then Exit;
     Str:= Strings.Lines[NFrom-1];
     Strings.LineDelete(NFrom-1);
     Strings.LineInsert(NTo, Str);

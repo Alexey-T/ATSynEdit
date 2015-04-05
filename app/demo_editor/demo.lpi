@@ -96,7 +96,6 @@
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
@@ -114,7 +113,6 @@
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
@@ -142,7 +140,6 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="formopt"/>
       </Unit23>
       <Unit24>
         <Filename Value="..\..\atsynedit\atstrings_load.inc"/>
@@ -163,7 +160,6 @@
       <Unit28>
         <Filename Value="..\..\atsynedit\atsynedit_cmd_sel.inc"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Unit1"/>
       </Unit28>
     </Units>
   </ProjectOptions>

@@ -98,7 +98,7 @@ object fmOpt: TfmOpt
         TabOrder = 8
       end
       object LabChars: TLabel
-        Left = 496
+        Left = 504
         Height = 15
         Top = 12
         Width = 60
@@ -106,7 +106,7 @@ object fmOpt: TfmOpt
         ParentColor = False
       end
       object edChars: TEdit
-        Left = 384
+        Left = 392
         Height = 23
         Top = 8
         Width = 106
@@ -129,13 +129,13 @@ object fmOpt: TfmOpt
         TabOrder = 5
       end
       object GroupBox1: TGroupBox
-        Left = 384
-        Height = 113
+        Left = 392
+        Height = 72
         Top = 36
-        Width = 225
+        Width = 217
         Caption = 'on saving'
-        ClientHeight = 93
-        ClientWidth = 221
+        ClientHeight = 52
+        ClientWidth = 213
         TabOrder = 10
         object chkSaveTrim: TCheckBox
           Left = 7

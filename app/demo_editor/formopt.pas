@@ -119,8 +119,8 @@ begin
     chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
     chkDotLn.Checked:= ed.OptShowIndentLines;
     edChars.Text:= ed.OptWordChars;
-    chkSaveEol.Checked:= ed.OptOnSavingForceFinalEol;
-    chkSaveTrim.Checked:= ed.OptOnSavingTrimSpaces;
+    chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
+    chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
 
     //caret
     chkCrVirt.Checked:= ed.OptCaretVirtual;
@@ -189,8 +189,8 @@ begin
       ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
-      ed.OptOnSavingForceFinalEol:= chkSaveEol.Checked;
-      ed.OptOnSavingTrimSpaces:= chkSaveTrim.Checked;
+      ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
+      ed.OptSavingTrimSpaces:= chkSaveTrim.Checked;
 
       //caret
       ed.OptCaretVirtual:= chkCrVirt.Checked;

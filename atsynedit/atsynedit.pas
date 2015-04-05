@@ -638,8 +638,8 @@ type
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
-    property OptOnSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol;
-    property OptOnSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces;
+    property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol;
+    property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces;
   end;
 
 implementation
