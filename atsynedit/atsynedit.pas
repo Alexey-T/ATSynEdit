@@ -62,7 +62,6 @@ type
     MinimapBorder,
     MinimapSelBG,
     MinimapSelBorder,
-    MicromapBG,
     StateChanged,
     StateAdded,
     StateSaved,
@@ -192,6 +191,7 @@ type
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
+  TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
 
 
 type
@@ -237,6 +237,7 @@ type
     FOnClickGutter: TATSynEditClickGutterEvent;
     FOnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent;
     FOnDrawLine: TATSynEditDrawLineEvent;
+    FOnDrawMicromap: TATSynEditDrawRectEvent;
     FOnStateChanged: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
     FWrapInfo: TATSynWrapInfo;
@@ -572,6 +573,7 @@ type
     property OnClickGutter: TATSynEditClickGutterEvent read FOnClickGutter write FOnClickGutter;
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
+    property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
 
     //options
     property Colors: TATSynEditColors read FColors;
@@ -605,6 +607,7 @@ type
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder;
     property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
+    property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode;
@@ -1491,8 +1494,13 @@ end;
 
 procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
 begin
-  C.Brush.Color:= FColors.MicromapBG;
-  C.FillRect(FRectMicromap);
+  if Assigned(FOnDrawMicromap) then
+    FOnDrawMicromap(Self, C, FRectMicromap)
+  else
+  begin
+    C.Brush.Color:= clCream;
+    C.FillRect(FRectMicromap);
+  end;
 end;
 
 procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
@@ -2767,7 +2775,6 @@ begin
   FColors.MinimapBorder:= clLtGray;
   FColors.MinimapSelBG:= $eeeeee;
   FColors.MinimapSelBorder:= clMedGray;
-  FColors.MicromapBG:= clCream;
   FColors.StateChanged:= $00f0f0;
   FColors.StateAdded:= $20c020;
   FColors.StateSaved:= clMedGray;

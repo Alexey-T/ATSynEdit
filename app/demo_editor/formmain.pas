@@ -122,6 +122,7 @@ type
     procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
+    procedure EditDrawMicromap(Snd: TObject; C: TCanvas; const ARect: TRect);
     procedure UpdateStatus;
     procedure UpdateChecks;
   public
@@ -167,6 +168,7 @@ begin
   ed.OnClickGutter:= EditClickGutter;
   ed.OnDrawBookmarkIcon:= EditDrawBm;
   ed.OnDrawLine:= EditDrawLine;
+  ed.OnDrawMicromap:= EditDrawMicromap;
 
   ed.SetFocus;
 end;
@@ -373,6 +375,14 @@ begin
   inc(r.left, 4);
   dx:= (r.bottom-r.top) div 2-1;
   c.Polygon([Point(r.left, r.top), Point(r.left+dx, r.top+dx), Point(r.left, r.top+2*dx)]);
+end;
+
+procedure TfmMain.EditDrawMicromap(Snd: TObject; C: TCanvas; const ARect: TRect);
+begin
+  C.Pen.Color:= $c0c0c0;
+  C.Brush.Color:= $eeeeee;
+  C.Rectangle(ARect);
+  C.TextOut(ARect.Left+2, ARect.Top+2, 'tst');
 end;
 
 procedure TfmMain.bOpenClick(Sender: TObject);
