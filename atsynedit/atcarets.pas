@@ -434,22 +434,32 @@ var
   Item: TATCaretItem;
   i: integer;
 begin
-  SetLength(Result, Count);
+  SetLength(Result, Count*2);
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
-    Result[i].X:= Item.PosX;
-    Result[i].Y:= Item.PosY;
+    Result[i*2].X:= Item.PosX;
+    Result[i*2].Y:= Item.PosY;
+    Result[i*2+1].X:= Item.EndX;
+    Result[i*2+1].Y:= Item.EndY;
   end;
 end;
 
 procedure TATCarets.LoadFromArray(const L: TPointArray);
 var
   i: integer;
+  Item: TATCaretItem;
 begin
   Clear;
-  for i:= 0 to Length(L)-1 do
-    Add(L[i].X, L[i].Y);
+  for i:= 0 to Length(L) div 2 - 1 do
+  begin
+    Add(0, 0);
+    Item:= Items[Count-1];
+    Item.PosX:= L[i*2].X;
+    Item.PosY:= L[i*2].Y;
+    Item.EndX:= L[i*2+1].X;
+    Item.EndY:= L[i*2+1].Y;
+  end;
 end;
 
 end.
