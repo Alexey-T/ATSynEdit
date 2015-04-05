@@ -1,2 +1,2 @@
 
-paste, cr on last line not fake: added unneeded last empty ln("workaround..", LineAdd(''))
+1M-file. edit 10crs at top--Fast. edit 10cr at end--Slow!! FindIndexes bad?
