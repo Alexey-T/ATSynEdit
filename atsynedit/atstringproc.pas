@@ -35,6 +35,7 @@ function IsCharAsciiControl(ch: atChar): boolean;
 function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
 
+function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
@@ -509,6 +510,16 @@ begin
       SOptionCharsHex:= SOptionCharsHex+Chr(i);
 
   SOptionCharsHex:= SOptionCharsHex + cDirCodes;
+end;
+
+
+function STrimRight(const S: atString): atString;
+var
+  N: integer;
+begin
+  N:= Length(S);
+  while (N>0) and (S[N]=' ') do Dec(N);
+  Result:= Copy(S, 1, N);
 end;
 
 initialization

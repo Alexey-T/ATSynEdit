@@ -13,6 +13,8 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkSaveTrim: TCheckBox;
+    chkSaveEol: TCheckBox;
     chkMapBord: TCheckBox;
     chkMapAlw: TCheckBox;
     chkShowNumBg: TCheckBox;
@@ -60,6 +62,7 @@ type
     edPage: TComboBox;
     edRulerFSize: TSpinEdit;
     edRulerSize: TSpinEdit;
+    GroupBox1: TGroupBox;
     LabChars: TLabel;
     Label10: TLabel;
     Label11: TLabel;
@@ -116,6 +119,8 @@ begin
     chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
     chkDotLn.Checked:= ed.OptShowIndentLines;
     edChars.Text:= ed.OptWordChars;
+    chkSaveEol.Checked:= ed.OptOnSavingForceFinalEol;
+    chkSaveTrim.Checked:= ed.OptOnSavingTrimSpaces;
 
     //caret
     chkCrVirt.Checked:= ed.OptCaretVirtual;
@@ -184,6 +189,8 @@ begin
       ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
+      ed.OptOnSavingForceFinalEol:= chkSaveEol.Checked;
+      ed.OptOnSavingTrimSpaces:= chkSaveTrim.Checked;
 
       //caret
       ed.OptCaretVirtual:= chkCrVirt.Checked;

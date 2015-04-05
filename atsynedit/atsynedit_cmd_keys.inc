@@ -255,9 +255,4 @@ begin
   Result:= [cResultCaretTop];
 end;
 
-function TATSynEdit.DoCommand_SelectAll: TATCommandResults;
-begin
-  DoSelect_All;
-  Result:= [cResultCaretBottom];
-end;
 

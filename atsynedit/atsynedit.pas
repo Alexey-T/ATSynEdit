@@ -280,6 +280,8 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptSavingForceFinalEol: boolean;
+    FOptSavingTrimSpaces: boolean;
     FOptUndoGrouped: boolean;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
@@ -321,11 +323,13 @@ type
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     procedure DoDropText;
     procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
+    procedure DoForceFinalEol;
     procedure DoMinimapClick(APosY: integer);
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
       const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
       ALineIndex: integer; AEolSelected: boolean;
       const AScrollHorz: TATSynScrollInfo);
+    procedure DoTrimTrailingSpaces;
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetRedoCount: integer;
     function GetUndoAfterSave: boolean;
@@ -634,6 +638,8 @@ type
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
+    property OptOnSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol;
+    property OptOnSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces;
   end;
 
 implementation
@@ -1711,6 +1717,8 @@ begin
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
   FOptUndoGrouped:= true;
+  FOptSavingForceFinalEol:= false;
+  FOptSavingTrimSpaces:= false;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -1796,6 +1804,13 @@ end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
 begin
+  if FOptSavingForceFinalEol or FOptSavingTrimSpaces then
+  begin
+    if FOptSavingForceFinalEol then DoForceFinalEol;
+    if FOptSavingTrimSpaces then DoTrimTrailingSpaces;
+    Update(true);
+  end;
+
   Strings.SaveToFile(AFilename);
 end;
 
@@ -2803,12 +2818,39 @@ begin
     Invalidate;
 end;
 
+procedure TATSynEdit.DoTrimTrailingSpaces;
+var
+  i: integer;
+  S1, S2: atString;
+begin
+  for i:= 0 to Strings.Count-1 do
+  begin
+    S1:= Strings.Lines[i];
+    S2:= STrimRight(S1);
+    if S2<>S1 then
+      Strings.Lines[i]:= S2;
+  end;
+end;
+
+procedure TATSynEdit.DoForceFinalEol;
+var
+  N: integer;
+begin
+  N:= Strings.Count;
+  if N=0 then Exit;
+  if Strings.IsLastLineFake then Exit;
+  if Strings.LinesEnds[N-1]=cEndNone then
+    Strings.LinesEnds[N-1]:= Strings.Endings;
+end;
+
+
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
 {$I atsynedit_sel.inc}
 
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}
+{$I atsynedit_cmd_sel.inc}
 {$I atsynedit_cmd_editing.inc}
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}

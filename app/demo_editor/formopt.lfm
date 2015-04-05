@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet7
-    TabIndex = 6
+    ActivePage = TabSheet1
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -127,6 +127,32 @@ object fmOpt: TfmOpt
         Width = 108
         Caption = 'cut lines if no sel'
         TabOrder = 5
+      end
+      object GroupBox1: TGroupBox
+        Left = 384
+        Height = 113
+        Top = 36
+        Width = 225
+        Caption = 'on saving'
+        ClientHeight = 93
+        ClientWidth = 221
+        TabOrder = 10
+        object chkSaveTrim: TCheckBox
+          Left = 7
+          Height = 19
+          Top = 3
+          Width = 103
+          Caption = 'trim trail spaces'
+          TabOrder = 0
+        end
+        object chkSaveEol: TCheckBox
+          Left = 7
+          Height = 19
+          Top = 24
+          Width = 100
+          Caption = 'ensure final eol'
+          TabOrder = 1
+        end
       end
     end
     object TabSheet2: TTabSheet
