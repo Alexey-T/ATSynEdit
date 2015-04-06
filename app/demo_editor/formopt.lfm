@@ -250,8 +250,8 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 15
         Top = 4
-        Width = 47
-        Caption = 'numbers'
+        Width = 69
+        Caption = 'number style'
         ParentColor = False
       end
       object edNum: TComboBox
@@ -265,7 +265,6 @@ object fmOpt: TfmOpt
           'none'
           'each 10th'
           'each 5th'
-          'with carets'
         )
         Style = csDropDownList
         TabOrder = 0
@@ -274,16 +273,16 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 19
         Top = 96
-        Width = 189
-        Caption = 'show caret-numbers colored bg'
+        Width = 149
+        Caption = 'show bg-color for carets'
         TabOrder = 3
       end
       object chkShowNum1st: TCheckBox
         Left = 8
         Height = 19
         Top = 56
-        Width = 147
-        Caption = 'show number of 1st line'
+        Width = 151
+        Caption = 'show number for 1st line'
         TabOrder = 1
       end
       object chkShowNumCr: TCheckBox
