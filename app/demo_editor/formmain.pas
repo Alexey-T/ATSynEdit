@@ -119,10 +119,11 @@ type
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: array of integer);
     procedure EditScroll(Sender: TObject);
-    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; var AHandled: boolean);
-    procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
-    procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
+    procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
+    procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
+    procedure EditDrawBm(Snd: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Snd: TObject; C: TCanvas; const ARect: TRect);
+    procedure EditDrawEditor(Snd: TObject; C: TCanvas; const ARect: TRect);
     procedure UpdateStatus;
     procedure UpdateChecks;
   public
@@ -169,6 +170,7 @@ begin
   ed.OnDrawBookmarkIcon:= EditDrawBm;
   ed.OnDrawLine:= EditDrawLine;
   ed.OnDrawMicromap:= EditDrawMicromap;
+  //ed.OnDrawEditor:= EditDrawEditor;
 
   ed.SetFocus;
 end;
@@ -334,12 +336,12 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
+procedure TfmMain.EditCommand(Snd: TObject; ACmd: integer; var AHandled: boolean);
 begin
   AHandled:= false;
 end;
 
-procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer);
+procedure TfmMain.EditClickGutter(Snd: TObject; ABand, ALine: integer);
 begin
   if ABand=ed.GutterBandBm then
   begin
@@ -361,7 +363,7 @@ begin
   }
 end;
 
-procedure TfmMain.EditDrawBm(Sender: TObject; C: TCanvas; ALineNum: integer;
+procedure TfmMain.EditDrawBm(Snd: TObject; C: TCanvas; ALineNum: integer;
   const ARect: TRect);
 var
   r: trect;
@@ -383,6 +385,14 @@ begin
   C.Brush.Color:= $eeeeee;
   C.Rectangle(ARect);
   C.TextOut(ARect.Left+2, ARect.Top+2, 'tst');
+end;
+
+procedure TfmMain.EditDrawEditor(Snd: TObject; C: TCanvas; const ARect: TRect);
+begin
+  Exit;
+  C.Pen.Color:= clred;
+  C.Brush.Style:= bsClear;
+  C.Rectangle(ARect);
 end;
 
 procedure TfmMain.bOpenClick(Sender: TObject);

@@ -5,10 +5,10 @@
 Jp: ああえ, end
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 		wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
-	indent	1wwwwwwwwwwwww2	.	.	1wwwwwwwwwwwwwwwwwwwwwwwwwwww2  1wwwwwwwwwwwwwwww2   1wwwwwwwwwwwwwwwwwww2    1wwwwwwwwwwwwwwwwwwww2;
+	indent	1wwwwwwwwwwwww2	..	1wwwwwwwwwwwwwwwwwwwwwwwwwwww2  1wwwwwwwwwwwwwwww2   1wwwwwwwwwwwwwwwwwww2    1wwwwwwwwwwwwwwwwwwww2;
+		indent	.	  eeeeeeeeeeeeeeeeeeeeeeee eeeeeeeeeeeeeeeeeee eeeeeeeeeeeeeeeeeee+++eeeeeeeeeeeeeeeeeeeeeeeeeeee++++eeeeeeeeeeeeeeeeeeeeeeeeee+++ eeeeeeeeeeeeeeeeee+++;	
 		AwwwwwwwwwwwwwB AwwwwwwwwwwwwwwwwwwwwwwwwwwwwB AwwwwwwwwwwwwwwwwB AwwwwwwwwwwwwwwwwwwwB AwwwwwwwwwwwwwwwwwwwwB AwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwB AwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwB AwwwwwwwwwwwwwwwwwwwwwwwwwwwwB AwwwwwwwwwwwB;
 
-		indent	.	  eeeeeeeeeeeeeeeeeeeeeeee eeeeeeeeeeeeeeeeeee eeeeeeeeeeeeeeeeeee+++eeeeeeeeeeeeeeeeeeeeeeeeeeee++++eeeeeeeeeeeeeeeeeeeeeeeeee+++ eeeeeeeeeeeeeeeeee+++;	
 eeeeeeeeeeeeee
 
 eeeeeee

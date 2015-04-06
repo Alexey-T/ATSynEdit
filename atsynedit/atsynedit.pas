@@ -238,6 +238,7 @@ type
     FOnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent;
     FOnDrawLine: TATSynEditDrawLineEvent;
     FOnDrawMicromap: TATSynEditDrawRectEvent;
+    FOnDrawEditor: TATSynEditDrawRectEvent;
     FOnStateChanged: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
     FWrapInfo: TATSynWrapInfo;
@@ -574,6 +575,7 @@ type
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
+    property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
 
     //options
     property Colors: TATSynEditColors read FColors;
@@ -1166,6 +1168,9 @@ begin
     DoPaintRulerTo(C);
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, FUnprintedVisible, FScrollHorz, FScrollVert);
   DoPaintMarginsTo(C);
+
+  if Assigned(FOnDrawEditor) then
+    FOnDrawEditor(Self, C, FRectMain);
 
   if FMinimapVisible then
     DoPaintMinimapTo(C);
