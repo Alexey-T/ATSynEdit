@@ -1227,6 +1227,10 @@ var
   end;
   //
 begin
+  //wrap=off can cause incorrect scrollpos
+  with AScrollVert do
+    NPos:= Min(NPos, Max(0, FWrapInfo.Count-NPage));
+
   C.Brush.Color:= FColors.TextBG;
   C.FillRect(ARect);
 
