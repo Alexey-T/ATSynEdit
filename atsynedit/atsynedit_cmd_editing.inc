@@ -98,8 +98,9 @@ begin
 
   DoSelectionDeleteOrReset;
 
+  //list allows to insert each clip-line into one caret
   List:= nil;
-  if (Length(AText)>1) and (Carets.Count>1) then
+  if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
   begin
     List:= TStringList.Create;
     List.Text:= UTF8Encode(AText);

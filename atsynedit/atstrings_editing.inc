@@ -216,8 +216,8 @@ begin
 
   if (AX<Length(Str)) then
   begin
-    StrMove:= System.Copy(Str, AX+1, MaxInt);
-    System.Delete(Str, AX+1, MaxInt);
+    StrMove:= Copy(Str, AX+1, MaxInt);
+    Delete(Str, AX+1, MaxInt);
     Lines[AY]:= Str;
   end;
 
