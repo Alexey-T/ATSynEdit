@@ -91,8 +91,7 @@ type
     cNumbersAll,
     cNumbersNone,
     cNumbersEach10th,
-    cNumbersEach5th,
-    cNumbersForCarets
+    cNumbersEach5th
     );
 
   TATSynPaintFlag = (
@@ -295,6 +294,8 @@ type
     FOptRulerMarkSizeBig: integer;
     FOptGutterVisible: boolean;
     FOptNumbersStyle: TATSynNumbersStyle;
+    FOptNumbersShowFirst,
+    FOptNumbersShowCarets: boolean;
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
@@ -620,6 +621,8 @@ type
     property OptMarginRight: integer read FMarginRight write SetMarginRight;
     property OptMarginString: string read GetMarginString write SetMarginString;
     property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle;
+    property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst;
+    property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets;
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible;
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
@@ -728,6 +731,20 @@ end;
 
 function TATSynEdit.DoFormatLineNumber(N: integer): atString;
 begin
+  if FOptNumbersShowCarets then
+    if IsLineWithCaret(N-1) then
+    begin
+      Result:= IntToStr(N);
+      Exit
+    end;
+
+  if FOptNumbersShowFirst then
+    if N=1 then
+    begin
+      Result:= IntToStr(N);
+      Exit
+    end;
+
   case FOptNumbersStyle of
     cNumbersAll:
       Result:= IntToStr(N);
@@ -735,7 +752,7 @@ begin
       Result:= '.';
     cNumbersEach10th:
       begin
-        if (N=1) or (N mod 10 = 0) then
+        if (N mod 10 = 0) then
           Result:= IntToStr(N)
         else
         if (N mod 5) = 0 then
@@ -745,20 +762,13 @@ begin
       end;
     cNumbersEach5th:
       begin
-        if (N=1) or (N mod 5 = 0) then
-          Result:= IntToStr(N)
-        else
-          Result:= '.';
-      end;
-    cNumbersForCarets:
-      begin
-        if IsLineWithCaret(N-1) then
+        if (N mod 5 = 0) then
           Result:= IntToStr(N)
         else
           Result:= '.';
       end;
     else
-      raise Exception.Create('Unknown nums-style');
+      raise Exception.Create('Unknown num-style');
   end;
 end;
 
@@ -1694,6 +1704,8 @@ begin
   FGutter.Update;
 
   FOptNumbersStyle:= cInitNumbersStyle;
+  FOptNumbersShowFirst:= true;
+  FOptNumbersShowCarets:= false;
   FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;

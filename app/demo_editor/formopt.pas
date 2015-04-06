@@ -13,6 +13,8 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkShowNum1st: TCheckBox;
+    chkShowNumCr: TCheckBox;
     chkSaveTrim: TCheckBox;
     chkSaveEol: TCheckBox;
     chkMapBord: TCheckBox;
@@ -132,9 +134,11 @@ begin
 
     //gutter
     edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
+    chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
+    chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
+    chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
     edRulerSize.Value:= ed.OptRulerSize;
     edRulerFSize.Value:= ed.OptRulerFontSize;
-    chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
@@ -202,6 +206,8 @@ begin
 
       //gutter
       ed.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
+      ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
+      ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;
       ed.OptRulerFontSize:= edRulerFSize.Value;
