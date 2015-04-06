@@ -123,7 +123,7 @@ type
     procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
     procedure EditDrawBm(Snd: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Snd: TObject; C: TCanvas; const ARect: TRect);
-    procedure EditDrawEditor(Snd: TObject; C: TCanvas; const ARect: TRect);
+    procedure EditDrawTest(Snd: TObject; C: TCanvas; const ARect: TRect);
     procedure UpdateStatus;
     procedure UpdateChecks;
   public
@@ -170,7 +170,7 @@ begin
   ed.OnDrawBookmarkIcon:= EditDrawBm;
   ed.OnDrawLine:= EditDrawLine;
   ed.OnDrawMicromap:= EditDrawMicromap;
-  //ed.OnDrawEditor:= EditDrawEditor;
+  //ed.OnDrawRuler:= EditDrawTest;///////////
 
   ed.SetFocus;
 end;
@@ -387,9 +387,9 @@ begin
   C.TextOut(ARect.Left+2, ARect.Top+2, 'tst');
 end;
 
-procedure TfmMain.EditDrawEditor(Snd: TObject; C: TCanvas; const ARect: TRect);
+procedure TfmMain.EditDrawTest(Snd: TObject; C: TCanvas; const ARect: TRect);
 begin
-  Exit;
+  //Exit;
   C.Pen.Color:= clred;
   C.Brush.Style:= bsClear;
   C.Rectangle(ARect);

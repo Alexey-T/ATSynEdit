@@ -239,6 +239,7 @@ type
     FOnDrawLine: TATSynEditDrawLineEvent;
     FOnDrawMicromap: TATSynEditDrawRectEvent;
     FOnDrawEditor: TATSynEditDrawRectEvent;
+    FOnDrawRuler: TATSynEditDrawRectEvent;
     FOnStateChanged: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
     FWrapInfo: TATSynWrapInfo;
@@ -576,6 +577,7 @@ type
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
+    property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
 
     //options
     property Colors: TATSynEditColors read FColors;
@@ -1165,7 +1167,12 @@ begin
   UpdateWrapInfo;
 
   if FOptRulerVisible then
+  begin
     DoPaintRulerTo(C);
+    if Assigned(FOnDrawRuler) then
+      FOnDrawRuler(Self, C, FRectRuler);
+  end;
+
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, FUnprintedVisible, FScrollHorz, FScrollVert);
   DoPaintMarginsTo(C);
 
