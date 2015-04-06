@@ -4,7 +4,7 @@ procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
   AShiftY: integer; AShiftBelowX: integer);
 var
   iStart, i: integer;
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
 begin
   if APosX<0 then Exit;
   if APosY<0 then Exit;
@@ -14,41 +14,41 @@ begin
 
   for i:= iStart to FCarets.Count-1 do
   begin
-    Item:= FCarets[i];
+    Caret:= FCarets[i];
 
     //carets below src, apply ShiftY/ShiftBelowX
-    if Item.PosY>APosY then
+    if Caret.PosY>APosY then
     begin
       if AShiftY=0 then Exit;
 
-      if Item.PosY=APosY+1 then
-        Inc(Item.PosX, AShiftBelowX);
+      if Caret.PosY=APosY+1 then
+        Inc(Caret.PosX, AShiftBelowX);
 
-      Inc(Item.PosY, AShiftY);
+      Inc(Caret.PosY, AShiftY);
     end
     else
     //carets on same line as src, apply ShiftX
     begin
-      if Item.PosX>APosX then
-        Inc(Item.PosX, AShiftX);
+      if Caret.PosX>APosX then
+        Inc(Caret.PosX, AShiftX);
     end;
 
     //same, but for EndX/EndY
-    if Item.EndY>APosY then
+    if Caret.EndY>APosY then
     begin
-      if Item.EndY=APosY+1 then
-        Inc(Item.EndX, AShiftBelowX);
+      if Caret.EndY=APosY+1 then
+        Inc(Caret.EndX, AShiftBelowX);
 
-      Inc(Item.EndY, AShiftY);
+      Inc(Caret.EndY, AShiftY);
     end
     else
     begin
-      if Item.EndX>APosX then
-        Inc(Item.EndX, AShiftX);
+      if Caret.EndX>APosX then
+        Inc(Caret.EndX, AShiftX);
     end;
 
-    if Item.PosX<0 then Item.PosX:= 0;
-    if Item.PosY<0 then Item.PosY:= 0;
+    if Caret.PosX<0 then Caret.PosX:= 0;
+    if Caret.PosY<0 then Caret.PosY:= 0;
   end;
 end;
 
@@ -79,10 +79,10 @@ end;
 function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
   AKeepCaret, AOvrMode, ASelectThen: boolean): TATCommandResults;
 var
-  i: integer;
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   List: TStringList;
+  i: integer;
   //
   function TextItem(i: integer): atString;
   begin
@@ -108,24 +108,24 @@ begin
   try
     for i:= FCarets.Count-1 downto 0 do
     begin
-      Item:= FCarets[i];
-      Strings.TextInsert(Item.PosX, Item.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
-      DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
+      Caret:= FCarets[i];
+      Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
+      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
 
       if not AKeepCaret then
       begin
         if ASelectThen then
         begin
-          Item.EndX:= Item.PosX;
-          Item.EndY:= Item.PosY;
+          Caret.EndX:= Caret.PosX;
+          Caret.EndY:= Caret.PosY;
         end
         else
         begin
-          Item.EndX:= -1;
-          Item.EndY:= -1;
+          Caret.EndX:= -1;
+          Caret.EndY:= -1;
         end;
-        Item.PosX:= PosAfter.X;
-        Item.PosY:= PosAfter.Y;
+        Caret.PosX:= PosAfter.X;
+        Caret.PosY:= PosAfter.Y;
       end;
     end;
   finally
@@ -138,9 +138,9 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteLeft(ALen: integer): TATCommandResults;
 var
-  Item: TATCaretItem;
-  i: integer;
+  Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
+  i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -149,11 +149,11 @@ begin
 
   for i:= 0 to FCarets.Count-1 do
   begin
-    Item:= FCarets[i];
-    Strings.TextDeleteLeft(Item.PosX, Item.PosY, ALen, Shift, PosAfter);
-    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
-    Item.PosX:= PosAfter.X;
-    Item.PosY:= PosAfter.Y;
+    Caret:= FCarets[i];
+    Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, ALen, Shift, PosAfter);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+    Caret.PosX:= PosAfter.X;
+    Caret.PosY:= PosAfter.Y;
   end;
 
   Result:= [cResultText, cResultCaretAny];
@@ -169,9 +169,9 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteSelection: TATCommandResults;
 var
-  Item: TATCaretItem;
-  i: integer;
+  Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
+  i: integer;
   AX1, AY1, AX2, AY2: integer;
   bSel: boolean;
 begin
@@ -181,16 +181,16 @@ begin
 
   for i:= FCarets.Count-1 downto 0 do
   begin
-    Item:= Carets[i];
-    Item.GetRange(AX1, AY1, AX2, AY2, bSel);
+    Caret:= Carets[i];
+    Caret.GetRange(AX1, AY1, AX2, AY2, bSel);
     if not bSel then Continue;
 
     Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
     DoCaretsShift(AX1, AY1, Shift.X, Shift.Y);
-    Item.PosX:= PosAfter.X;
-    Item.PosY:= PosAfter.Y;
-    Item.EndX:= -1;
-    Item.EndY:= -1;
+    Caret.PosX:= PosAfter.X;
+    Caret.PosY:= PosAfter.Y;
+    Caret.EndX:= -1;
+    Caret.EndY:= -1;
   end;
 
   Result:= [cResultText, cResultCaretTop];
@@ -199,7 +199,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
 var
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   i, Len, ShiftBelowX: integer;
   Shift, PosAfter: TPoint;
 begin
@@ -210,18 +210,18 @@ begin
 
   for i:= 0 to FCarets.Count-1 do
   begin
-    Item:= FCarets[i];
+    Caret:= FCarets[i];
 
     //offsetX for carets in line[PosY+1]
     ShiftBelowX:= 0;
-    Len:= Length(Strings.Lines[Item.PosY]);
-    if Item.PosX=Len then
+    Len:= Length(Strings.Lines[Caret.PosY]);
+    if Caret.PosX=Len then
       ShiftBelowX:= Len;
 
-    Strings.TextDeleteRight(Item.PosX, Item.PosY, ALen, Shift, PosAfter);
-    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y, ShiftBelowX);
-    Item.PosX:= PosAfter.X;
-    Item.PosY:= PosAfter.Y;
+    Strings.TextDeleteRight(Caret.PosX, Caret.PosY, ALen, Shift, PosAfter);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, ShiftBelowX);
+    Caret.PosX:= PosAfter.X;
+    Caret.PosY:= PosAfter.Y;
   end;
 
   Result:= [cResultText, cResultCaretAny];
@@ -229,7 +229,7 @@ end;
 
 function TATSynEdit.DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
 var
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   i: integer;
   Str: atString;
@@ -241,12 +241,12 @@ begin
 
   for i:= FCarets.Count-1 downto 0 do
   begin
-    Item:= FCarets[i];
-    Str:= GetAutoIndentString(Item.PosX, Item.PosY);
-    Strings.TextInsertEol(Item.PosX, Item.PosY, AKeepCaret, Str, Shift, PosAfter);
-    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
-    Item.PosX:= PosAfter.X;
-    Item.PosY:= PosAfter.Y;
+    Caret:= FCarets[i];
+    Str:= GetAutoIndentString(Caret.PosX, Caret.PosY);
+    Strings.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+    Caret.PosX:= PosAfter.X;
+    Caret.PosY:= PosAfter.Y;
   end;
 
   Result:= [cResultText, cResultCaretBottom];
@@ -254,9 +254,9 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteLines: TATCommandResults;
 var
-  Item: TATCaretItem;
-  i: integer;
+  Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
+  i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -264,11 +264,11 @@ begin
 
   for i:= FCarets.Count-1 downto 0 do
   begin
-    Item:= FCarets[i];
-    Strings.TextDeleteLine(Item.PosX, Item.PosY, Shift, PosAfter);
-    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
-    Item.PosX:= PosAfter.X;
-    Item.PosY:= PosAfter.Y;
+    Caret:= FCarets[i];
+    Strings.TextDeleteLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+    Caret.PosX:= PosAfter.X;
+    Caret.PosY:= PosAfter.Y;
   end;
 
   Result:= [cResultText, cResultCaretTop];
@@ -276,9 +276,9 @@ end;
 
 function TATSynEdit.DoCommand_TextDuplicateLine: TATCommandResults;
 var
-  Item: TATCaretItem;
-  i: integer;
+  Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
+  i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -286,11 +286,11 @@ begin
 
   for i:= FCarets.Count-1 downto 0 do
   begin
-    Item:= FCarets[i];
-    Strings.TextDuplicateLine(Item.PosX, Item.PosY, Shift, PosAfter);
-    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
-    Item.PosX:= PosAfter.X;
-    Item.PosY:= PosAfter.Y;
+    Caret:= FCarets[i];
+    Strings.TextDuplicateLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+    Caret.PosX:= PosAfter.X;
+    Caret.PosY:= PosAfter.Y;
   end;
 
   Result:= [cResultText, cResultCaretAny];
@@ -298,7 +298,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineBegin: TATCommandResults;
 var
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   Str: atString;
   i: integer;
 begin
@@ -308,11 +308,11 @@ begin
 
   for i:= FCarets.Count-1 downto 0 do
   begin
-    Item:= FCarets[i];
-    Str:= Strings.Lines[Item.PosY];
-    Delete(Str, 1, Item.PosX);
-    Strings.Lines[Item.PosY]:= Str;
-    Item.PosX:= 0;
+    Caret:= FCarets[i];
+    Str:= Strings.Lines[Caret.PosY];
+    Delete(Str, 1, Caret.PosX);
+    Strings.Lines[Caret.PosY]:= Str;
+    Caret.PosX:= 0;
   end;
 
   Result:= [cResultText, cResultCaretLeft];
@@ -320,7 +320,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineEnd: TATCommandResults;
 var
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   Str: atString;
   i: integer;
 begin
@@ -330,12 +330,12 @@ begin
 
   for i:= FCarets.Count-1 downto 0 do
   begin
-    Item:= FCarets[i];
-    Str:= Strings.Lines[Item.PosY];
-    if Item.PosX<Length(Str) then
+    Caret:= FCarets[i];
+    Str:= Strings.Lines[Caret.PosY];
+    if Caret.PosX<Length(Str) then
     begin
-      Delete(Str, Item.PosX+1, MaxInt);
-      Strings.Lines[Item.PosY]:= Str;
+      Delete(Str, Caret.PosX+1, MaxInt);
+      Strings.Lines[Caret.PosY]:= Str;
     end;
   end;
 
@@ -343,10 +343,8 @@ begin
 end;
 
 function TATSynEdit.DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
-//
-//todo- delete duplicate carets on same words before....
 var
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   Str: atString;
   Shift, PosAfter: TPoint;
   i: integer;
@@ -356,48 +354,48 @@ begin
 
   for i:= FCarets.Count-1 downto 0 do
   begin
-    Item:= FCarets[i];
-    if not Strings.IsIndexValid(Item.PosY) then Continue;
-    Str:= Strings.Lines[Item.PosY];
+    Caret:= FCarets[i];
+    if not Strings.IsIndexValid(Caret.PosY) then Continue;
+    Str:= Strings.Lines[Caret.PosY];
     Shift.X:= 0;
     Shift.Y:= 0;
-    PosAfter.X:= Item.PosX;
-    PosAfter.Y:= Item.PosY;
+    PosAfter.X:= Caret.PosX;
+    PosAfter.Y:= Caret.PosY;
 
     //delete to prev line?
-    if (Item.PosX=0) and (not ANext) then
+    if (Caret.PosX=0) and (not ANext) then
     begin
-      Strings.TextDeleteLeft(Item.PosX, Item.PosY, 1, Shift, PosAfter);
+      Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter);
     end
     else
     //delete to next line?
-    if (Item.PosX>=Length(Str)) and ANext then
+    if (Caret.PosX>=Length(Str)) and ANext then
     begin
-      Strings.TextDeleteRight(Item.PosX, Item.PosY, 1, Shift, PosAfter);
+      Strings.TextDeleteRight(Caret.PosX, Caret.PosY, 1, Shift, PosAfter);
     end
     else
     //jump from beyond eol to eol?
-    if (Item.PosX>Length(Str)) and (not ANext) then
+    if (Caret.PosX>Length(Str)) and (not ANext) then
     begin
-      Item.PosX:= Length(Str);
+      Caret.PosX:= Length(Str);
     end
     else
     //delete inside line?
-    if (Item.PosX<=Length(Str)) then
+    if (Caret.PosX<=Length(Str)) then
     begin
-      PosAfter.X:= SFindWordOffset(Str, Item.PosX, ANext, false, FOptWordChars);
-      if PosAfter.X<>Item.PosX then
+      PosAfter.X:= SFindWordOffset(Str, Caret.PosX, ANext, false, FOptWordChars);
+      if PosAfter.X<>Caret.PosX then
       begin
-        System.Delete(Str, Min(Item.PosX, PosAfter.X)+1, Abs(Item.PosX-PosAfter.X));
-        Strings.Lines[Item.PosY]:= Str;
-        Shift.X:= -Abs(Item.PosX-PosAfter.X);
-        PosAfter.X:= Min(Item.PosX, PosAfter.X);
+        System.Delete(Str, Min(Caret.PosX, PosAfter.X)+1, Abs(Caret.PosX-PosAfter.X));
+        Strings.Lines[Caret.PosY]:= Str;
+        Shift.X:= -Abs(Caret.PosX-PosAfter.X);
+        PosAfter.X:= Min(Caret.PosX, PosAfter.X);
       end;
     end;
 
-    DoCaretsShift(Item.PosX, Item.PosY, Shift.X, Shift.Y);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
 
-    if ((Item.PosX<>PosAfter.X) or (Item.PosY<>PosAfter.Y)) and
+    if ((Caret.PosX<>PosAfter.X) or (Caret.PosY<>PosAfter.Y)) and
       (FCarets.IndexOfPosXY(PosAfter.X, PosAfter.Y)>=0) then
     begin
       if FCarets.Count>1 then
@@ -405,8 +403,8 @@ begin
     end
     else
     begin
-      Item.PosX:= PosAfter.X;
-      Item.PosY:= PosAfter.Y;
+      Caret.PosX:= PosAfter.X;
+      Caret.PosY:= PosAfter.Y;
     end;
   end;
 
