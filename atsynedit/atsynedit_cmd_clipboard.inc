@@ -1,3 +1,5 @@
+{$ifdef nn}begin end;{$endif}
+
 function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
 var
   Str: atString;
@@ -78,7 +80,7 @@ function TATSynEdit.GetTextForClipboard: string;
 var
   ListNum: TList;
   ListStr: TStringList;
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   i, NLen, X1, Y1, X2, Y2: integer;
   bSel: boolean;
   Str: atString;
@@ -104,9 +106,9 @@ begin
   try
     for i:= 0 to Carets.Count-1 do
     begin
-      Item:= Carets[i];
-      if ListNum.IndexOf(pointer{%H-}(Item.PosY))<0 then
-        ListNum.Add(pointer{%H-}(Item.PosY));
+      Caret:= Carets[i];
+      if ListNum.IndexOf(pointer{%H-}(Caret.PosY))<0 then
+        ListNum.Add(pointer{%H-}(Caret.PosY));
     end;
 
     //no selections-- copy entire lines
@@ -128,8 +130,8 @@ begin
     begin
       for i:= 0 to Carets.Count-1 do
       begin
-        Item:= Carets[i];
-        Item.GetRange(X1, Y1, X2, Y2, bSel);
+        Caret:= Carets[i];
+        Caret.GetRange(X1, Y1, X2, Y2, bSel);
         if not bSel then Continue;
 
         Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
