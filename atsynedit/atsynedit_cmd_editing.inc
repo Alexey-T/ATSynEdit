@@ -480,7 +480,7 @@ end;
 function TATSynEdit.DoCommand_TextInsertColumnBlockOnce(const AText: atString;
   AKeepCaret: boolean): TATCommandResults;
 var
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   List: TATStrings;
   Shift, PosAfter: TPoint;
   i, PosY: integer;
@@ -491,7 +491,7 @@ begin
   //cannot handle carets/selections for colblock
   DoCaretSingleAsIs;
   DoSelect_None;
-  Item:= FCarets[0];
+  Caret:= FCarets[0];
 
   List:= TATStrings.Create;
   try
@@ -499,14 +499,15 @@ begin
     List.ActionDeleteFakeLine;
     if List.Count=0 then Exit;
 
-    PosY:= Item.PosY;
+    PosY:= Caret.PosY;
     for i:= 0 to List.Count-1 do
     begin
-      Strings.TextInsert(Item.PosX, PosY, List.Lines[i], FOver, Shift, PosAfter);
+      Strings.TextInsert(Caret.PosX, PosY, List.Lines[i], FOver, Shift, PosAfter);
       if not AKeepCaret then
-        Item.PosY:= PosY;
+        Caret.PosY:= PosY;
       Inc(PosY);
-      if not Strings.IsIndexValid(PosY) then Break;
+      if not Strings.IsIndexValid(PosY) then
+        Strings.LineAdd('');
     end;
 
   finally
