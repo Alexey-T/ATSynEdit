@@ -203,6 +203,7 @@ end;
 procedure TATStrings.TextInsertEol(AX, AY: integer; AKeepCaret: boolean; const AStrIndent: atString; out AShift, APosAfter: TPoint);
 var
   Str, StrMove: atString;
+  NewEnd: TATLineEnds;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -220,8 +221,11 @@ begin
     Lines[AY]:= Str;
   end;
 
+  //handle situation when we at non-eol line, this must give
+  //inserted line also w/o eol
+  NewEnd:= LinesEnds[AY];
   LinesEnds[AY]:= Endings; //force eol to cur line
-  LineInsert(AY+1, AStrIndent+StrMove);
+  LineInsertRaw(AY+1, AStrIndent+StrMove, NewEnd);
 
   if not AKeepCaret then
   begin
