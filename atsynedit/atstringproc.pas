@@ -417,7 +417,8 @@ end;
 
 procedure TrimStringList(L: TStringList);
 begin
-  while (L.Count>0) and (L[L.Count-1]='') do
+  //dont do "while", we need correct last empty lines
+  if (L.Count>0) and (L[L.Count-1]='') then
     L.Delete(L.Count-1);
 end;
 
