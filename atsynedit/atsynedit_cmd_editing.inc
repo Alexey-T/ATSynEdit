@@ -503,6 +503,7 @@ begin
     for i:= 0 to List.Count-1 do
     begin
       Strings.TextInsert(Caret.PosX, PosY, List.Lines[i], FOver, Shift, PosAfter);
+      Strings.LinesEnds[PosY]:= Strings.Endings;
       if not AKeepCaret then
         Caret.PosY:= PosY;
       Inc(PosY);
