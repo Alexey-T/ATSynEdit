@@ -324,6 +324,7 @@ type
     //
     procedure DebugFindWrapIndex;
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
+    procedure DoSelectionDeleteOrReset;
     procedure DoDropText;
     procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
     procedure DoMinimapClick(APosY: integer);

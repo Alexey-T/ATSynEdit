@@ -44,9 +44,9 @@ const
 
   cCommand_TextInsert = 150;
   cCommand_TextInsertTabChar = 151;
-  cCommand_KeyBackspace = 152 or cCmdSelReset;
+  cCommand_KeyBackspace = 152;
   cCommand_KeyDelete = 153;
-  cCommand_KeyEnter = 154 or cCmdSelReset;
+  cCommand_KeyEnter = 154;
   cCommand_KeyTab = 155;
 
   cCommand_TextDeleteSelection = 170;

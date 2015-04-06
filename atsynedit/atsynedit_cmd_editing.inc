@@ -96,10 +96,7 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  if FOptOverwriteSel then
-    DoCommand_TextDeleteSelection
-  else
-    DoSelect_None;
+  DoSelectionDeleteOrReset;
 
   List:= nil;
   if (Length(AText)>1) and (Carets.Count>1) then
@@ -147,6 +144,8 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+
+  DoSelectionDeleteOrReset;
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -207,6 +206,8 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
+  DoSelectionDeleteOrReset;
+
   for i:= 0 to FCarets.Count-1 do
   begin
     Item:= FCarets[i];
@@ -235,6 +236,8 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+
+  DoSelectionDeleteOrReset;
 
   for i:= FCarets.Count-1 downto 0 do
   begin

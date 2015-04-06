@@ -228,4 +228,12 @@ begin
     end;
 end;
 
+procedure TATSynEdit.DoSelectionDeleteOrReset;
+begin
+  if FOptOverwriteSel then
+    DoCommand_TextDeleteSelection
+  else
+    DoSelect_None;
+end;
+
 
