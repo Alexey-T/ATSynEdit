@@ -82,7 +82,6 @@ type
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
-    procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
     procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
@@ -110,6 +109,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
+    procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(N: integer; const AString: atString);
     procedure LineInsertStrings(N: integer; AList: TATStrings);
