@@ -114,6 +114,8 @@ begin
   M.Add(cCommand_CaretsExtendDownPage, 'carets extend: down a page', [], []);
   M.Add(cCommand_CaretsExtendDownToEnd, 'carets extend: down to end', [], []);
 
+  M.Add(cCommand_ZoomIn, 'zoom in', [], []);
+  M.Add(cCommand_ZoomOut, 'zoom out', [], []);
   M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
 end;
 

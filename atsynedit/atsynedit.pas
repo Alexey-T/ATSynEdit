@@ -455,6 +455,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
     function DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;

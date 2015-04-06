@@ -18,4 +18,9 @@ begin
   Result:= [cResultCaretAny];
 end;
 
+function TATSynEdit.DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
+begin
+  DoSizeChange(AIncrease);
+  Result:= [cResultState];
+end;
 
