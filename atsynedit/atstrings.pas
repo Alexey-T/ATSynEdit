@@ -141,8 +141,10 @@ type
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
     property TextAll: atString read GetTextAll;
-    procedure TextInsert(AX, AY: integer; const AText: atString; AReplace: boolean;
+    procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
+    procedure TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings;
+      AOverwrite: boolean);
     procedure TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
     procedure TextDeleteRight(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
     procedure TextDeleteRange(AFromX, AFromY, AToX, AToY: integer; out AShift, APosAfter: TPoint);

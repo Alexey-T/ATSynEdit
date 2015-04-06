@@ -1,6 +1,6 @@
 {$ifdef none}begin end;{$endif}
 
-procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AReplace: boolean; out AShift, APosAfter: TPoint);
+procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean; out AShift, APosAfter: TPoint);
 var
   Str, StrLead, StrTail: atString;
   List: TATStrings;
@@ -27,7 +27,7 @@ begin
     StrTail:= '';
   end;
 
-  if AReplace then
+  if AOverwrite then
     Delete(StrTail, 1, Length(AText));
 
   //------------------
@@ -36,7 +36,7 @@ begin
   if not SWithBreaks(AText) then
   begin
     Lines[AY]:= StrLead+AText+StrTail;
-    if not AReplace then
+    if not AOverwrite then
       AShift.X:= Length(AText);
     APosAfter.X:= AX+Length(AText);
     Exit
@@ -197,6 +197,21 @@ begin
       LineDelete(AFromY);
 
     AShift.Y:= -(AToY-AFromY);
+  end;
+end;
+
+
+procedure TATStrings.TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings; AOverwrite: boolean);
+var
+  Shift, PosAfter: TPoint;
+  i: integer;
+begin
+  for i:= 0 to ABlock.Count-1 do
+  begin
+    TextInsert(AX, AY+i, ABlock.Lines[i], AOverwrite, Shift, PosAfter);
+    LinesEnds[AY+i]:= Endings; //force eol
+    if not IsIndexValid(AY+i+1) then
+      LineAddRaw('', cEndNone);
   end;
 end;
 
