@@ -399,8 +399,6 @@ type
     function GetTextForClipboard: string;
     function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
-    function IsKeyMappingMatchedItem(const AKey: TShortcut;
-      const AItem: TATKeyMappingItem): boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretTime(AValue: integer);

@@ -56,13 +56,6 @@ begin
   end;
 end;
 
-function TATSynEdit.IsKeyMappingMatchedItem(const AKey: TShortcut; const AItem: TATKeyMappingItem): boolean;
-begin
-  Result:=
-    (AKey=AItem.Keys1[0]) or
-    (AKey=AItem.Keys2[0]);
-end;
-
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
 begin
   if cResultText in Res then

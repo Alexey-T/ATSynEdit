@@ -1,35 +1,13 @@
 {$ifdef nnn}begin end;{$endif}
 
 function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
-var
-  Item: TATCaretItem;
-  i, X1, Y1, X2, Y2: integer;
-  bSel: boolean;
 begin
-  Result:= false;
-
   if not IsSelRectEmpty then
-  begin
     //a) faster, b) works w/o mul-carets
-    Result:=
-      (AY>=FSelRect.Top) and
-      (AY<=FSelRect.Bottom) and
-      (AX>=FSelRect.Left) and
-      (AX<FSelRect.Right);
-  end
+    Result:= (AY>=FSelRect.Top) and (AY<=FSelRect.Bottom) and
+             (AX>=FSelRect.Left) and (AX<FSelRect.Right)
   else
-  for i:= 0 to Carets.Count-1 do
-  begin
-    Item:= Carets[i];
-    Item.GetRange(X1, Y1, X2, Y2, bSel);
-    if not bSel then Continue;
-
-    //carets sorted: can stop
-    if Y1>AY then Exit;
-
-    if IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside then
-      begin Result:= true; Break end;
-  end;
+    Result:= Carets.IsPosSelected(AX, AY);
 end;
 
 function TATSynEdit.IsSelRectEmpty: boolean;
