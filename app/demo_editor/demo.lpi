@@ -45,6 +45,7 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -156,7 +157,6 @@
       <Unit27>
         <Filename Value="..\..\atsynedit\atsynedit_wrapinfo.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_WrapInfo"/>
       </Unit27>
       <Unit28>
         <Filename Value="..\..\atsynedit\atsynedit_cmd_sel.inc"/>

@@ -16,7 +16,7 @@ begin
 
   //usual text
   Str:= UTF8Decode(Clipboard.AsText);
-  if OptOneLine then
+  if ModeOneLine then
     Str:= SNewlinesToSpaces(Str);
 
   DoCommand_TextDeleteSelection;

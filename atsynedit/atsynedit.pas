@@ -342,6 +342,7 @@ type
     FOptShowIndentLines: boolean;
     FOptShowGutterCaretBG: boolean;
     FOptAllowScrollbars: boolean;
+    FOptAllowZooming: boolean;
     //
     procedure DebugFindWrapIndex;
     procedure DoDropText;
@@ -431,7 +432,6 @@ type
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
     procedure SetOneLine(AValue: boolean);
-    procedure SetOverwrite(AValue: boolean);
     procedure SetReadOnly(AValue: boolean);
     procedure SetScrollTop(AValue: integer);
     procedure SetStrings(Obj: TATStrings);
@@ -538,8 +538,9 @@ type
     property Strings: TATStrings read GetStrings write SetStrings;
     property KeyMapping: TATKeyMapping read FKeyMapping;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
-    property ModeOverwrite: boolean read FOverwrite write SetOverwrite;
+    property ModeOverwrite: boolean read FOverwrite write FOverwrite;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
+    property ModeOneLine: boolean read GetOneLine write SetOneLine;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
     property SelRect: TRect read FSelRect;
@@ -606,7 +607,6 @@ type
 
     //options
     property Colors: TATSynEditColors read FColors;
-    property OptOneLine: boolean read GetOneLine write SetOneLine;
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
@@ -670,6 +670,7 @@ type
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG;
     property OptAllowScrollbars: boolean read FOptAllowScrollbars write FOptAllowScrollbars;
+    property OptAllowZooming: boolean read FOptAllowZooming write FOptAllowZooming;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
@@ -1730,6 +1731,7 @@ begin
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
   FOptAllowScrollbars:= true;
+  FOptAllowZooming:= true;
   FOptKeyNavigateWrapped:= true;
   FOptUseOverOnPaste:= false;
   FOptWordChars:= '';
@@ -1957,17 +1959,12 @@ begin
     OptUnprintedVisible:= false;
     OptWrapMode:= cWrapOff;
     OptAllowScrollbars:= false;
-    OptMarginRight:= 1000;
+    OptAllowZooming:= false;
     OptMouseNiceScroll:= false;
     OptMouseDragDrop:= false;
-    OptUndoLimit:= 50;
+    OptMarginRight:= 1000;
+    OptUndoLimit:= 200;
   end;
-end;
-
-procedure TATSynEdit.SetOverwrite(AValue: boolean);
-begin
-  if FOverwrite= AValue then Exit;
-  FOverwrite:= AValue;
 end;
 
 procedure TATSynEdit.SetReadOnly(AValue: boolean);
@@ -2999,6 +2996,7 @@ procedure TATSynEdit.DoSizeChange(AInc: boolean);
 var
   NTop: integer;
 begin
+  if not FOptAllowZooming then Exit;
   if not AInc then
     if Font.Size<=cMinFontSize then Exit;
 

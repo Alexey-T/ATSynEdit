@@ -169,7 +169,7 @@ begin
   ed1.Align:= alClient;
   ed1.Font.Name:= ed.Font.Name;
   ed1.BorderStyle:= bsSingle;
-  ed1.OptOneLine:= true;
+  ed1.ModeOneLine:= true;
 
   ed.OnChanged:= EditCaretMoved;
   ed.OnCaretMoved:= EditCaretMoved;
