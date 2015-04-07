@@ -369,7 +369,6 @@ end;
 
 function TATCarets.IsPosSelected(AX, AY: integer): boolean;
 var
-  Caret: TATCaretItem;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
   i: integer;
@@ -377,8 +376,7 @@ begin
   Result:= false;
   for i:= 0 to Count-1 do
   begin
-    Caret:= Items[i];
-    Caret.GetRange(X1, Y1, X2, Y2, bSel);
+    Items[i].GetRange(X1, Y1, X2, Y2, bSel);
     if not bSel then Continue;
 
     //carets sorted: can stop
@@ -421,8 +419,23 @@ begin
   Item2:= Items[N2];
   Item1.GetRange(XMin1, YMin1, XMax1, YMax1, bSel1);
   Item2.GetRange(XMin2, YMin2, XMax2, YMax2, bSel2);
-  if not bSel1 then Exit;
-  if not bSel2 then Exit;
+
+  //caret1 w/out selection inside caret2 selection?
+  if not bSel1 and not bSel2 then Exit;
+  if not bSel1 then
+  begin
+    Result:= IsPosInRange(Item1.PosX, Item1.PosY, XMin2, YMin2, XMax2, YMax2)=cRelateInside;
+    if Result then
+      begin OutPosX:= Item2.PosX; OutPosY:= Item2.PosY; OutEndX:= Item2.EndX; OutEndY:= Item2.EndY; end;
+    Exit
+  end;
+  if not bSel2 then
+  begin
+    Result:= IsPosInRange(Item2.PosX, Item2.PosY, XMin1, YMin1, XMax1, YMax1)=cRelateInside;
+    if Result then
+      begin OutPosX:= Item1.PosX; OutPosY:= Item1.PosY; OutEndX:= Item1.EndX; OutEndY:= Item1.EndY; end;
+    Exit
+  end;
 
   OutPosX:= IfThen(XMin1<XMin2, XMin1, XMin2);
   OutPosY:= IfThen(XMin1<XMin2, YMin1, YMin2);
