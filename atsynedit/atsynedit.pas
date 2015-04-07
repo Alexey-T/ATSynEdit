@@ -137,6 +137,7 @@ const
   cInitSpacingMinimap = -1;
   cInitTimerBlink = 600;
   cInitTimerScroll = 80;
+  cInitTimerNiceScroll = 200;
   cInitMinimapVisible = false;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
@@ -181,11 +182,23 @@ const
   cMaxCaretTime = 2000;
   cMinCharsAfterAnyIndent = 20;
   cMaxLinesForOldWrapUpdate = 100;
+  cSpeedNiceScrollX = 4;
+  cSpeedNiceScrollY = 1;
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
   cClipFormatId: integer = 0; //must be inited
   cClipSignatureColumn: integer = $1000;
+
+var
+  cBitmapNiceScroll: TBitmap = nil; //must be inited
+const
+  cBitmapNiceScrollRadius = 16;
+  crNiceScrollNone  = TCursor(-30);
+  crNiceScrollUp    = TCursor(-31);
+  crNiceScrollDown  = TCursor(-32);
+  crNiceScrollLeft  = TCursor(-33);
+  crNiceScrollRight = TCursor(-34);
 
 type
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;
@@ -199,8 +212,12 @@ type
 
   TATSynEdit = class(TCustomControl)
   private
+    function GetMouseNiceScroll: boolean;
+    procedure SetMouseNiceScroll(AValue: boolean);
+  private
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
+    FTimerNiceScroll: TTimer;
     FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
     FPaintLocked: integer;
@@ -226,6 +243,7 @@ type
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
     FMouseDownDouble: boolean;
+    FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
     FMouseAutoScroll: TATDirection;
     FLastTextCmd: integer;
@@ -316,6 +334,7 @@ type
     FOptMouseDragDrop: boolean;
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseGutterClickSelectsLine: boolean;
+    FOptMouseNiceScroll: boolean;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyHomeToNonSpace: boolean;
@@ -327,6 +346,7 @@ type
     procedure DebugFindWrapIndex;
     procedure DebugTimeWrapIndex;
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
+    procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoSelectionDeleteOrReset;
     procedure DoDropText;
     procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
@@ -446,6 +466,7 @@ type
     procedure SetMarginRight(AValue: integer);
     procedure TimerBlinkTick(Sender: TObject);
     procedure TimerScrollTick(Sender: TObject);
+    procedure TimerNiceScrollTick(Sender: TObject);
 
     //carets
     procedure DoCaretAddToPoint(AX, AY: integer);
@@ -504,6 +525,7 @@ type
     function DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
     function GetCaretsArray: TPointArray;
     procedure SetCaretsArray(const L: TPointArray);
+    property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
 
   public
     //override
@@ -633,6 +655,7 @@ type
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop;
+    property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine;
     property OptKeyNavigateWrapped: boolean read FOptKeyNavigateWrapped write FOptKeyNavigateWrapped;
@@ -1168,6 +1191,7 @@ begin
 
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, FUnprintedVisible, FScrollHorz, FScrollVert);
   DoPaintMarginsTo(C);
+  DoPaintNiceScroll(C);
 
   if Assigned(FOnDrawEditor) then
     FOnDrawEditor(Self, C, FRectMain);
@@ -1641,6 +1665,11 @@ begin
   FTimerScroll.OnTimer:= TimerScrollTick;
   FTimerScroll.Enabled:= false;
 
+  FTimerNiceScroll:= TTimer.Create(Self);
+  FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
+  FTimerNiceScroll.OnTimer:= TimerNiceScrollTick;
+  FTimerNiceScroll.Enabled:= false;
+
   FBitmap:= Graphics.TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
   FBitmap.Width:= cInitBitmapWidth;
@@ -1714,6 +1743,7 @@ begin
   FOptLastLineOnTop:= false;
   FOptOverwriteSel:= true;
   FOptMouseDragDrop:= true;
+  FOptMouseNiceScroll:= true;
   FOptMouse2ClickSelectsLine:= false;
   FOptMouse3ClickSelectsLine:= true;
   FOptMouse2ClickDragSelectsWords:= true;
@@ -1741,6 +1771,8 @@ begin
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDragDropping:= false;
+  FMouseNiceScrollPos:= Point(0, 0);
+
   FSelRect:= cRectEmpty;
   FLastTextCmd:= 0;
   FLastTextCmdText:= '';
@@ -1761,6 +1793,7 @@ end;
 destructor TATSynEdit.Destroy;
 begin
   DoPaintModeStatic;
+  FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FKeyMapping);
@@ -2107,6 +2140,12 @@ begin
   FMouseDownNumber:= -1;
   FMouseDragDropping:= false;
 
+  if MouseNiceScroll then
+  begin
+    MouseNiceScroll:= false;
+    Exit
+  end;
+
   if PtInRect(FRectMinimap, Point(X, Y)) then
   if Shift=[ssLeft] then
   begin
@@ -2117,6 +2156,14 @@ begin
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
     FMouseDownPnt:= PCaret;
+
+    if Shift=[ssMiddle] then
+      if FOptMouseNiceScroll then
+      begin
+        FMouseNiceScrollPos:= Point(X, Y);
+        MouseNiceScroll:= true;
+        Exit
+      end;
 
     if Shift=[ssLeft] then
     begin
@@ -2211,6 +2258,7 @@ var
   P: TPoint;
   RectBm: TRect;
 begin
+  if MouseNiceScroll then Exit;
   P:= ScreenToClient(Mouse.CursorPos);
 
   RectBm.Left:= FGutter[FGutterBandBm].Left;
@@ -2485,6 +2533,45 @@ begin
   Update;
 end;
 
+procedure TATSynEdit.TimerNiceScrollTick(Sender: TObject);
+var
+  Pnt: TPoint;
+  Dx, Dy: integer;
+  Dir: TATDirection;
+begin
+  Pnt:= ScreenToClient(Mouse.CursorPos);
+  if not PtInRect(FRectMain, Pnt) then Exit;
+
+  Dx:= Pnt.X-FMouseNiceScrollPos.X;
+  Dy:= Pnt.Y-FMouseNiceScrollPos.Y;
+
+  if (Abs(Dx)<=cBitmapNiceScrollRadius) and
+    (Abs(Dy)<=cBitmapNiceScrollRadius) then
+    begin
+      Cursor:= crNiceScrollNone;
+      Exit;
+    end;
+
+  if (Dy<0) and (Abs(Dy)>Abs(Dx)) then Dir:= cDirUp else
+    if (Dy>0) and (Abs(Dy)>Abs(Dx)) then Dir:= cDirDown else
+      if Dx<0 then Dir:= cDirLeft else
+        Dir:= cDirRight;
+
+  case Dir of
+    cDirLeft:  Cursor:= crNiceScrollLeft;
+    cDirRight: Cursor:= crNiceScrollRight;
+    cDirUp:    Cursor:= crNiceScrollUp;
+    cDirDown:  Cursor:= crNiceScrollDown;
+  end;
+
+  if Dir in [cDirLeft, cDirRight] then
+    DoScrollByDelta((Dx div FCharSize.X)*cSpeedNiceScrollX, 0)
+  else
+    DoScrollByDelta(0, (Dy div FCharSize.Y)*cSpeedNiceScrollY);
+
+  Invalidate;
+end;
+
 procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
   R: TRect;
@@ -2556,6 +2643,54 @@ begin
     FTimerBlink.Enabled:= true;
   end;
 end;
+
+procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
+  ACharSize: TPoint;
+  const AVisRect: TRect;
+  APointLeft: TPoint;
+  APointText: TPoint;
+  ALineIndex: integer;
+  AEolSelected: boolean;
+  const AScrollHorz: TATSynScrollInfo);
+var
+  NLeft, NRight: integer;
+begin
+  if not IsSelRectEmpty then
+  begin
+    if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
+    begin
+      NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
+      NRight:= NLeft+ACharSize.X*(FSelRect.Right-FSelRect.Left);
+      C.Brush.Color:= FColors.TextSelBG;
+      C.FillRect(
+        NLeft,
+        APointLeft.Y,
+        NRight,
+        APointLeft.Y+ACharSize.Y);
+    end;
+  end
+  else
+  if FOptHiliteSelFull then
+    if AEolSelected then
+    begin
+      C.Brush.Color:= FColors.TextSelBG;
+      C.FillRect(
+        APointText.X,
+        APointText.Y,
+        AVisRect.Right,
+        APointText.Y+ACharSize.Y);
+    end;
+end;
+
+procedure TATSynEdit.DoPaintNiceScroll(C: TCanvas);
+begin
+  if MouseNiceScroll then
+    C.Draw(
+      FMouseNiceScrollPos.X - cBitmapNiceScrollRadius,
+      FMouseNiceScrollPos.Y - cBitmapNiceScrollRadius,
+      cBitmapNiceScroll);
+end;
+
 
 function TATSynEdit.DoEventCommand(ACommand: integer): boolean;
 begin
@@ -2861,6 +2996,19 @@ begin
     Invalidate;
 end;
 
+function TATSynEdit.GetMouseNiceScroll: boolean;
+begin
+  Result:= FTimerNiceScroll.Enabled;
+end;
+
+procedure TATSynEdit.SetMouseNiceScroll(AValue: boolean);
+begin
+  FTimerNiceScroll.Enabled:= AValue;
+  if not AValue then
+    UpdateCursor;
+  Invalidate;
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
@@ -2873,10 +3021,12 @@ end;
 {$I atsynedit_cmd_editing.inc}
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
+{$R res/nicescroll.res}
 
 
 initialization
-  cClipFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
+  InitClipboardFormat;
+  InitResources;
 
 end.
 

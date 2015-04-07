@@ -168,44 +168,6 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
-  ACharSize: TPoint;
-  const AVisRect: TRect;
-  APointLeft: TPoint;
-  APointText: TPoint;
-  ALineIndex: integer;
-  AEolSelected: boolean;
-  const AScrollHorz: TATSynScrollInfo);
-var
-  NLeft, NRight: integer;
-begin
-  if not IsSelRectEmpty then
-  begin
-    if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
-    begin
-      NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
-      NRight:= NLeft+ACharSize.X*(FSelRect.Right-FSelRect.Left);
-      C.Brush.Color:= FColors.TextSelBG;
-      C.FillRect(
-        NLeft,
-        APointLeft.Y,
-        NRight,
-        APointLeft.Y+ACharSize.Y);
-    end;
-  end
-  else
-  if FOptHiliteSelFull then
-    if AEolSelected then
-    begin
-      C.Brush.Color:= FColors.TextSelBG;
-      C.FillRect(
-        APointText.X,
-        APointText.Y,
-        AVisRect.Right,
-        APointText.Y+ACharSize.Y);
-    end;
-end;
-
 procedure TATSynEdit.DoSelectionDeleteOrReset;
 begin
   if FOptOverwriteSel then

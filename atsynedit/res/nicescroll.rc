@@ -1,0 +1,7 @@
+AB_MOVE   BITMAP mouse_scroll.bmp
+
+AB_MOVE   CURSOR mouse_scroll.cur
+AB_MOVE_U CURSOR mouse_scroll_up.cur
+AB_MOVE_D CURSOR mouse_scroll_down.cur
+AB_MOVE_L CURSOR mouse_scroll_left.cur
+AB_MOVE_R CURSOR mouse_scroll_right.cur

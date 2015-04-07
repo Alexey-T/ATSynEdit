@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkNice: TCheckBox;
     chkShowNum1st: TCheckBox;
     chkShowNumCr: TCheckBox;
     chkSaveTrim: TCheckBox;
@@ -174,6 +175,7 @@ begin
     chkClickNm.Checked:= ed.OptMouseGutterClickSelectsLine;
     chkDnD.Checked:= ed.OptMouseDragDrop;
     chkRtMove.Checked:= ed.OptMouseRightClickMovesCaret;
+    chkNice.Checked:= ed.OptMouseNiceScroll;
 
     //undo
     edUndo.Value:= ed.OptUndoLimit;
@@ -246,6 +248,7 @@ begin
       ed.OptMouseGutterClickSelectsLine:= chkClickNm.Checked;
       ed.OptMouseDragDrop:= chkDnD.Checked;
       ed.OptMouseRightClickMovesCaret:= chkRtMove.Checked;
+      ed.OptMouseNiceScroll:= chkNice.Checked;
 
       //undo
       ed.OptUndoLimit:= edUndo.Value;

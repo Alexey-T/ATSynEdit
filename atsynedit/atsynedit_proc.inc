@@ -25,3 +25,21 @@ begin
     (AKey=AItem.Keys2[0]);
 end;
 
+procedure InitClipboardFormat;
+begin
+  cClipFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
+end;
+
+procedure InitResources;
+begin
+  cBitmapNiceScroll:= TBitmap.Create;
+  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'AB_MOVE');
+  cBitmapNiceScroll.Transparent:= true;
+
+  Screen.Cursors[crNiceScrollNone]  := LoadCursor(HInstance, 'AB_MOVE');
+  Screen.Cursors[crNiceScrollUp]    := LoadCursor(HInstance, 'AB_MOVE_U');
+  Screen.Cursors[crNiceScrollDown]  := LoadCursor(HInstance, 'AB_MOVE_D');
+  Screen.Cursors[crNiceScrollLeft]  := LoadCursor(HInstance, 'AB_MOVE_L');
+  Screen.Cursors[crNiceScrollRight] := LoadCursor(HInstance, 'AB_MOVE_R');
+end;
+
