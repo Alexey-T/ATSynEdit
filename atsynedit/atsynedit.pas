@@ -3,7 +3,6 @@ unit ATSynEdit;
 {$mode delphi}
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
-//{$define debug_timefindwrapindex}
 //{$define beep_cached_update}
 
 interface
@@ -344,38 +343,32 @@ type
     FOptShowGutterCaretBG: boolean;
     //
     procedure DebugFindWrapIndex;
-    procedure DebugTimeWrapIndex;
-    procedure DoCaretsExtend(ADown: boolean; ALines: integer);
-    procedure DoPaintNiceScroll(C: TCanvas);
-    procedure DoSelectionDeleteOrReset;
     procedure DoDropText;
-    procedure DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
     procedure DoMinimapClick(APosY: integer);
-    procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
-      const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
-      ALineIndex: integer; AEolSelected: boolean;
-      const AScrollHorz: TATSynScrollInfo);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetRedoCount: integer;
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
-    procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
-    procedure InitColors;
+    procedure DoInitColors;
+    procedure DoInitPopupMenu;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
+    procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
-    procedure DoInitDefaultPopupMenu;
     //select
+    procedure DoSelectionDeleteOrReset;
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_Word_ByClick;
     procedure DoSelect_Line_ByClick;
     procedure DoSelect_None;
+    function IsPosSelected(AX, AY: integer): boolean;
     //paint
     function DoPaint(AFlags: TATSynPaintFlags): boolean;
+    procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintTo(C: TCanvas);
     procedure DoPaintRulerTo(C: TCanvas);
@@ -395,7 +388,12 @@ type
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
+    procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
+      const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
+      ALineIndex: integer; AEolSelected: boolean;
+      const AScrollHorz: TATSynScrollInfo);
     //carets
+    procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
     function GetCaretTime: integer;
@@ -421,7 +419,6 @@ type
     function GetTextForClipboard: string;
     function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
-    function IsPosSelected(AX, AY: integer): boolean;
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretTime(AValue: integer);
     procedure SetCaretShape(AValue: TATSynCaretShape);
@@ -894,7 +891,7 @@ begin
         DoCalcWrapInfos(NLine, NIndentMaximal, Items);
         if Items.Count=0 then Continue;
 
-        DoFindWrapIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
+        FWrapInfo.FindIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
         if NIndexFrom<0 then
         begin
           Showmessage('Cant find wrap-index for line '+Inttostr(NLine));
@@ -917,16 +914,8 @@ begin
   {$ifdef debug_findwrapindex}
   DebugFindWrapIndex;
   {$endif}
-  {$ifdef debug_timefindwrapindex}
-  DebugTimeWrapIndex;
-  {$endif}
 end;
 
-
-procedure TATSynEdit.DoFindWrapIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
-begin
-  FWrapInfo.FindIndexesOfLineNumber(ALineNum, AFrom, ATo);
-end;
 
 procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
 var
@@ -1653,7 +1642,7 @@ begin
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
   FColors:= TATSynEditColors.Create;
-  InitColors;
+  DoInitColors;
 
   FTimerBlink:= TTimer.Create(Self);
   FTimerBlink.Interval:= cInitTimerBlink;
@@ -1784,7 +1773,7 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   DoInitDefaultKeymapping(FKeyMapping);
-  DoInitDefaultPopupMenu;
+  DoInitPopupMenu;
 
   //UpdateCaretsCoords;
   //DoPaintModeBlinking;
@@ -1962,7 +1951,7 @@ var
   NFrom, NTo, i: integer;
 begin
   //find exact match
-  DoFindWrapIndexesOfLineNumber(AValue, NFrom, NTo);
+  FWrapInfo.FindIndexesOfLineNumber(AValue, NFrom, NTo);
   if NFrom>=0 then
   begin
     FScrollVert.NPos:= NFrom;
@@ -2791,7 +2780,7 @@ begin
       end;
 end;
 
-procedure TATSynEdit.DoInitDefaultPopupMenu;
+procedure TATSynEdit.DoInitPopupMenu;
   //
   procedure Add(const SName: string; Cmd: integer);
   var
@@ -2916,7 +2905,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.InitColors;
+procedure TATSynEdit.DoInitColors;
 begin
   FColors.TextBG:= clWhite;
   FColors.TextFont:= clBlack;
