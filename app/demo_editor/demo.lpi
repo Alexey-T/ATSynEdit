@@ -34,7 +34,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="29">
+    <Units Count="30">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -113,6 +113,7 @@
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
@@ -161,6 +162,11 @@
         <Filename Value="..\..\atsynedit\atsynedit_cmd_sel.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit28>
+      <Unit29>
+        <Filename Value="..\..\atsynedit\atsynedit_debug.inc"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit1"/>
+      </Unit29>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

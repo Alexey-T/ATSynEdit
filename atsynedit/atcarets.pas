@@ -409,7 +409,7 @@ function TATCarets.IsJoinNeeded(N1, N2: integer;
 var
   Item1, Item2: TATCaretItem;
   XMin1, XMin2, YMin1, YMin2, XMax1, XMax2, YMax1, YMax2: integer;
-  bSel1, bSel2: boolean;
+  Sel1, Sel2: boolean;
 begin
   Result:= false;
   if not IsIndexValid(N1) then Exit;
@@ -417,19 +417,19 @@ begin
 
   Item1:= Items[N1];
   Item2:= Items[N2];
-  Item1.GetRange(XMin1, YMin1, XMax1, YMax1, bSel1);
-  Item2.GetRange(XMin2, YMin2, XMax2, YMax2, bSel2);
+  Item1.GetRange(XMin1, YMin1, XMax1, YMax1, Sel1);
+  Item2.GetRange(XMin2, YMin2, XMax2, YMax2, Sel2);
 
   //caret1 w/out selection inside caret2 selection?
-  if not bSel1 and not bSel2 then Exit;
-  if not bSel1 then
+  if not Sel1 and not Sel2 then Exit;
+  if not Sel1 then
   begin
     Result:= IsPosInRange(Item1.PosX, Item1.PosY, XMin2, YMin2, XMax2, YMax2)=cRelateInside;
     if Result then
       begin OutPosX:= Item2.PosX; OutPosY:= Item2.PosY; OutEndX:= Item2.EndX; OutEndY:= Item2.EndY; end;
     Exit
   end;
-  if not bSel2 then
+  if not Sel2 then
   begin
     Result:= IsPosInRange(Item2.PosX, Item2.PosY, XMin1, YMin1, XMax1, YMax1)=cRelateInside;
     if Result then

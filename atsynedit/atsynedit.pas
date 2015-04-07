@@ -3,6 +3,7 @@ unit ATSynEdit;
 {$mode delphi}
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
+//{$define debug_timefindwrapindex}
 //{$define beep_cached_update}
 
 interface
@@ -324,6 +325,7 @@ type
     FOptShowGutterCaretBG: boolean;
     //
     procedure DebugFindWrapIndex;
+    procedure DebugTimeWrapIndex;
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     procedure DoSelectionDeleteOrReset;
     procedure DoDropText;
@@ -892,6 +894,9 @@ begin
   {$ifdef debug_findwrapindex}
   DebugFindWrapIndex;
   {$endif}
+  {$ifdef debug_timefindwrapindex}
+  DebugTimeWrapIndex;
+  {$endif}
 end;
 
 
@@ -949,28 +954,6 @@ begin
     Inc(NOffset, NLen);
     Delete(Str, 1, NLen);
   until Str='';
-end;
-
-procedure TATSynEdit.DebugFindWrapIndex;
-var
-  i, j, n1, n2: integer;
-begin
-  for i:= 0 to Strings.Count-1 do
-  begin
-    FWrapInfo.FindIndexesOfLineNumber(i, n1, n2);
-    if n1<0 then
-    begin
-      Application.MainForm.caption:= format('fail findindex: %d', [i]);
-      Exit
-    end;
-    for j:= n1 to n2 do
-      if FWrapInfo.Items[j].NLineIndex<>i then
-      begin
-        Application.MainForm.caption:= format('fail findindex: %d', [i]);
-        Exit
-      end;
-  end;
-  Application.MainForm.caption:= 'ok findindex';
 end;
 
 function TATSynEdit.GetVisibleLines: integer;
@@ -2882,6 +2865,7 @@ end;
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
 {$I atsynedit_sel.inc}
+{$I atsynedit_debug.inc}
 
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}
