@@ -1240,7 +1240,7 @@ var
 begin
   //wrap=off can cause incorrect scrollpos
   with AScrollVert do
-    NPos:= Min(NPos, Max(0, FWrapInfo.Count-NPage));
+    NPos:= Min(NPos, Max(0, FWrapInfo.Count-NPage-1));
 
   C.Brush.Color:= FColors.TextBG;
   C.FillRect(ARect);
@@ -2341,6 +2341,13 @@ begin
         end;
       end;
   end;
+
+  //mouse dragged on minimap
+  if PtInRect(FRectMinimap, P) then
+    if Shift=[ssLeft] then
+    begin
+      DoMinimapClick(Y);
+    end;
 end;
 
 function TATSynEdit.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean;
@@ -2770,13 +2777,14 @@ end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);
 var
-  N: integer;
+  NItem: integer;
 begin
-  N:= (APosY-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
-  if FWrapInfo.IsIndexValid(N) then
+  NItem:= (APosY-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
+  if FWrapInfo.IsIndexValid(NItem) then
   begin
-    N:= FWrapInfo[N].NLineIndex;
-    DoGotoPos(Point(0, N));
+    NItem:= Max(0, NItem - GetVisibleLines div 2);
+    FScrollVert.NPos:= Min(NItem, FScrollVert.NMax);
+    Update;
   end;
 end;
 

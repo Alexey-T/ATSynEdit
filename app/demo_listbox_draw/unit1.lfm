@@ -8,7 +8,7 @@ object Form1: TForm1
   ClientWidth = 320
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.2.6.0'
   object L: TListBox
     Left = 0
     Height = 240
@@ -20,7 +20,9 @@ object Form1: TForm1
     ExtendedSelect = False
     ItemHeight = 32
     OnDrawItem = LDrawItem
+    ScrollWidth = 320
     Style = lbOwnerDrawVariable
     TabOrder = 0
+    TopIndex = -1
   end
-end
+end

@@ -36,7 +36,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 var
   i: integer;
 begin
-  for i:= 1 to 40 do
+  for i:= 1 to 15 do
     L.Items.Add('Item '+inttostr(i));
 end;
 
@@ -59,4 +59,4 @@ begin
 end;
 
 end.
-
+
