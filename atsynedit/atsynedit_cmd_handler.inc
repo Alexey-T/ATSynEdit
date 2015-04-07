@@ -1,14 +1,10 @@
 {$ifdef none}begin end;{$endif}
 
 procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
-var
-  Cmd: integer;
-  Handled: boolean;
 begin
   DoPaintModeStatic;
   try
-    Cmd:= GetCommandFromKey(Key, Shift);
-    DoCommandExec(Cmd);
+    DoCommandExec(GetCommandFromKey(Key, Shift));
   finally
     DoPaintModeBlinking;
   end;

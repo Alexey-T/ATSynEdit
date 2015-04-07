@@ -249,7 +249,7 @@ begin
   DoCaretSingleAsIs;
   DoSelect_None;
 
-  FMouseDragging:= false;
+  FMouseDragDropping:= false;
   UpdateCursor;
 
   Result:= [cResultCaretTop];

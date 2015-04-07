@@ -225,7 +225,7 @@ type
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
     FMouseDownDouble: boolean;
-    FMouseDragging: boolean;
+    FMouseDragDropping: boolean;
     FMouseAutoScroll: TATDirection;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
@@ -1759,7 +1759,7 @@ begin
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
-  FMouseDragging:= false;
+  FMouseDragDropping:= false;
   FSelRect:= cRectEmpty;
   FLastTextCmd:= 0;
   FLastTextCmdText:= '';
@@ -2124,7 +2124,7 @@ begin
   PCaret:= ClientPosToCaretPos(Point(X, Y));
   FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
-  FMouseDragging:= false;
+  FMouseDragDropping:= false;
 
   if PtInRect(FRectMinimap, Point(X, Y)) then
   if Shift=[ssLeft] then
@@ -2145,7 +2145,7 @@ begin
 
       if FOptMouseDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
       begin
-        FMouseDragging:= true;
+        FMouseDragDropping:= true;
         UpdateCursor;
       end
       else
@@ -2211,7 +2211,7 @@ procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Int
 begin
   inherited;
 
-  if FMouseDragging then
+  if FMouseDragDropping then
   begin
     DoDropText;
     Update;
@@ -2220,7 +2220,7 @@ begin
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
-  FMouseDragging:= false;
+  FMouseDragDropping:= false;
 
   FTimerScroll.Enabled:= false;
 end;
@@ -2237,7 +2237,7 @@ begin
   RectBm.Top:= FRectMain.Top;
   RectBm.Bottom:= FRectMain.Bottom;
 
-  if FMouseDragging then
+  if FMouseDragDropping then
     Cursor:= crDrag
   else
   if PtInRect(FRectMain, P) then
@@ -2287,6 +2287,7 @@ begin
 
   //mouse dragged on numbers
   if PtInRect(RectNums, P) then
+  begin
     if Shift=[ssLeft] then
     begin
       P:= ClientPosToCaretPos(P);
@@ -2299,55 +2300,61 @@ begin
           Update;
         end;
     end;
+    Exit
+  end;
 
   //mouse dragged on text
-  if not FMouseDragging then
-  if PtInRect(FRectMain, P) then
-  begin
-    if ssLeft in Shift then
-      if Carets.Count>0 then
-      begin
-        P:= ClientPosToCaretPos(P);
-        if P.Y>=0 then
+  if (not FMouseDragDropping) and (FMouseDownPnt.X>=0) then
+    if PtInRect(FRectMain, P) then
+    begin
+      if ssLeft in Shift then
+        if Carets.Count>0 then
         begin
-          //drag w/out button pressed: single selection
-          if [ssXControl, ssShift, ssAlt]*Shift=[] then
+          P:= ClientPosToCaretPos(P);
+          if P.Y>=0 then
           begin
-            DoCaretSingleAsIs;
-            if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
-              DoSelect_WordRange(0, FMouseDownPnt, P)
-            else
-              DoSelect_CharRange(0, P);
-          end;
+            //drag w/out button pressed: single selection
+            if [ssXControl, ssShift, ssAlt]*Shift=[] then
+            begin
+              DoCaretSingleAsIs;
+              if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
+                DoSelect_WordRange(0, FMouseDownPnt, P)
+              else
+                DoSelect_CharRange(0, P);
+            end;
 
-          //drag with Ctrl pressed: add selection
-          if Shift=[ssXControl, ssLeft] then
-          begin
-            nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
-            DoSelect_CharRange(nIndex, P);
-          end;
+            //drag with Ctrl pressed: add selection
+            if Shift=[ssXControl, ssLeft] then
+            begin
+              nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+              DoSelect_CharRange(nIndex, P);
+            end;
 
-          //drag with Alt pressed
-          if Shift=[ssAlt, ssLeft] then
-          begin
-            DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
-            DoSelect_None;
-            DoSelect_ColumnBlock(FMouseDownPnt, P);
-          end;
+            //drag with Alt pressed
+            if Shift=[ssAlt, ssLeft] then
+            begin
+              DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+              DoSelect_None;
+              DoSelect_ColumnBlock(FMouseDownPnt, P);
+            end;
 
-          DoCaretsSort;
-          DoEventCarets;
-          Update;
+            DoCaretsSort;
+            DoEventCarets;
+            Update;
+          end;
         end;
-      end;
-  end;
+      Exit;
+    end;
 
   //mouse dragged on minimap
   if PtInRect(FRectMinimap, P) then
+  begin
     if Shift=[ssLeft] then
     begin
       DoMinimapClick(Y);
     end;
+    Exit
+  end;
 end;
 
 function TATSynEdit.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean;
