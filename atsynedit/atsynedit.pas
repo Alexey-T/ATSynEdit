@@ -341,11 +341,13 @@ type
     FOptKeyTabIndents: boolean;
     FOptShowIndentLines: boolean;
     FOptShowGutterCaretBG: boolean;
+    FOptAllowScrollbars: boolean;
     //
     procedure DebugFindWrapIndex;
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
+    function GetOneLine: boolean;
     function GetRedoCount: integer;
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
@@ -428,6 +430,7 @@ type
     procedure SetMarginString(AValue: string);
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
+    procedure SetOneLine(AValue: boolean);
     procedure SetOverwrite(AValue: boolean);
     procedure SetReadOnly(AValue: boolean);
     procedure SetScrollTop(AValue: integer);
@@ -603,6 +606,7 @@ type
 
     //options
     property Colors: TATSynEditColors read FColors;
+    property OptOneLine: boolean read GetOneLine write SetOneLine;
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
@@ -665,6 +669,7 @@ type
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG;
+    property OptAllowScrollbars: boolean read FOptAllowScrollbars write FOptAllowScrollbars;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
@@ -1022,6 +1027,7 @@ var
   bHorz1, bHorz2: boolean;
 begin
   Result:= false;
+  if not FOptAllowScrollbars then Exit;
 
   with FScrollVert do
   begin
@@ -1723,6 +1729,7 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
+  FOptAllowScrollbars:= true;
   FOptKeyNavigateWrapped:= true;
   FOptUseOverOnPaste:= false;
   FOptWordChars:= '';
@@ -1933,6 +1940,28 @@ begin
   if FMinimapVisible=AValue then Exit;
   FMinimapVisible:= AValue;
   FWrapUpdateNeeded:= true;
+end;
+
+procedure TATSynEdit.SetOneLine(AValue: boolean);
+begin
+  Strings.OneLine:= AValue;
+  Carets.OneLine:= AValue;
+  if AValue then
+  begin
+    OptGutterVisible:= false;
+    OptRulerVisible:= false;
+    OptMinimapVisible:= false;
+    OptMicromapVisible:= false;
+    OptCaretVirtual:= false;
+    OptCaretManyAllowed:= false;
+    OptUnprintedVisible:= false;
+    OptWrapMode:= cWrapOff;
+    OptAllowScrollbars:= false;
+    OptMarginRight:= 1000;
+    OptMouseNiceScroll:= false;
+    OptMouseDragDrop:= false;
+    OptUndoLimit:= 50;
+  end;
 end;
 
 procedure TATSynEdit.SetOverwrite(AValue: boolean);
@@ -2885,6 +2914,11 @@ begin
     else
       raise Exception.Create('Unknown autoindent-kind');
   end;
+end;
+
+function TATSynEdit.GetOneLine: boolean;
+begin
+  Result:= Strings.OneLine;
 end;
 
 function TATSynEdit.GetRedoCount: integer;

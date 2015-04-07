@@ -16,6 +16,9 @@ begin
 
   //usual text
   Str:= UTF8Decode(Clipboard.AsText);
+  if OptOneLine then
+    Str:= SNewlinesToSpaces(Str);
+
   DoCommand_TextDeleteSelection;
   Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOverwrite and FOptUseOverOnPaste, ASelectThen);
 

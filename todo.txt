@@ -1,7 +1,4 @@
 
-markr
-foldin bar
+fold-bar
 tokens hilite (styles, adapt SynEdit)
-
-sort sel--plugin (N opts)
-case conv--plugin (N modes)
+marks(drop/collect)

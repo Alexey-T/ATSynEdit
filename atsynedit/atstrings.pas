@@ -64,11 +64,13 @@ type
     FSaveSignWide: boolean;
     FReadOnly: boolean;
     FUndoAfterSave: boolean;
+    FOneLine: boolean;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
+    function DoCheckFilled: boolean;
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TPointArray;
@@ -125,6 +127,7 @@ type
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
+    property OneLine: boolean read FOneLine write FOneLine;
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteDupFakeLines;
     procedure ActionAddFakeLineIfNeeded;
@@ -425,6 +428,7 @@ begin
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
   FUndoAfterSave:= true;
+  FOneLine:= false;
 
   ActionAddFakeLineIfNeeded;
   DoClearUndo;
@@ -485,6 +489,7 @@ var
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
+  if DoCheckFilled then Exit;
 
   DoAddUndo(cEditActionInsert, Count, '', cEndNone);
 
@@ -519,11 +524,24 @@ begin
 end;
 
 
+function TATStrings.DoCheckFilled: boolean;
+begin
+  Result:= false;
+  if FOneLine then
+  begin
+    Result:= Count>0;
+    if Result then
+      while Count>1 do
+        LineDelete(Count-1);
+  end;
+end;
+
 procedure TATStrings.LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
 var
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
+  if DoCheckFilled then Exit;
 
   DoAddUndo(cEditActionInsert, N, '', cEndNone);
 

@@ -45,6 +45,7 @@ type
   private
     FList: TList;
     FManyAllowed: boolean;
+    FOneLine: boolean;
     function GetItem(N: integer): TATCaretItem;
     procedure DeleteDups;
     function IsJoinNeeded(N1, N2: integer;
@@ -69,6 +70,7 @@ type
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
+    property OneLine: boolean read FOneLine write FOneLine;
     function SaveToArray: TPointArray;
     procedure LoadFromArray(const L: TPointArray);
   end;
@@ -168,6 +170,7 @@ begin
   inherited;
   FList:= TList.Create;
   FManyAllowed:= true;
+  FOneLine:= false;
 end;
 
 destructor TATCarets.Destroy;
@@ -209,6 +212,8 @@ var
   Item: TATCaretItem;
 begin
   if (not FManyAllowed) and (Count>=1) then Exit;
+
+  if FOneLine then APosY:= 0;
 
   Item:= TATCaretItem.Create;
   Item.PosX:= APosX;

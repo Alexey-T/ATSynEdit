@@ -38,6 +38,7 @@ type
     Label10: TLabel;
     Label11: TLabel;
     Label2: TLabel;
+    Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
@@ -67,6 +68,7 @@ type
     mnuSav: TMenuItem;
     mnuGoto: TMenuItem;
     OpenDialog1: TOpenDialog;
+    PanelOne: TPanel;
     PanelMain: TPanel;
     PanelRt: TPanel;
     SaveDialog1: TSaveDialog;
@@ -111,7 +113,7 @@ type
     procedure mnuUnlockClick(Sender: TObject);
   private
     { private declarations }
-    ed: TATSynEdit;
+    ed, ed1: TATSynEdit;
     wait: boolean;
     FDir: string;
     procedure DoOpen(const fn: string);
@@ -161,6 +163,13 @@ begin
   {$else}
   ed.Font.Name:= 'Courier New';
   {$endif}
+
+  ed1:= TATSynEdit.Create(Self);
+  ed1.Parent:= PanelOne;
+  ed1.Align:= alClient;
+  ed1.Font.Name:= ed.Font.Name;
+  ed1.BorderStyle:= bsSingle;
+  ed1.OptOneLine:= true;
 
   ed.OnChanged:= EditCaretMoved;
   ed.OnCaretMoved:= EditCaretMoved;

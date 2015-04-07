@@ -237,6 +237,7 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  if OptOneLine then Exit;
 
   DoSelectionDeleteOrReset;
 

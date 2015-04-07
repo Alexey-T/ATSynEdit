@@ -280,6 +280,23 @@ object fmMain: TfmMain
       OnClick = bOptClick
       TabOrder = 5
     end
+    object Label3: TLabel
+      Left = 5
+      Height = 15
+      Top = 428
+      Width = 70
+      Caption = 'one-line edit:'
+      ParentColor = False
+    end
+    object PanelOne: TPanel
+      Left = 0
+      Height = 34
+      Top = 444
+      Width = 281
+      Align = alBottom
+      Caption = 'PanelOne'
+      TabOrder = 13
+    end
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]

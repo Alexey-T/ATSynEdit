@@ -41,6 +41,7 @@ function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+function SNewlinesToSpaces(const S: atString): atString;
 
 function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString): atString;
@@ -525,6 +526,14 @@ begin
   while (N>0) and (S[N]=' ') do Dec(N);
   Result:= Copy(S, 1, N);
 end;
+
+function SNewlinesToSpaces(const S: atString): atString;
+begin
+  Result:= S;
+  Result:= StringReplace(Result, #13, ' ', [rfReplaceAll]);
+  Result:= StringReplace(Result, #10, ' ', [rfReplaceAll]);
+end;
+
 
 initialization
   _InitCharsHex;
