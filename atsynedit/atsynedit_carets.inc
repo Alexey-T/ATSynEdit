@@ -86,17 +86,19 @@ function _DoCaretPosToClientPos(
   APreferLeftSide: boolean): TPoint;
 var
   Item: TATSynWrapItem;
-  i, NFromStart: integer;
+  NIndex1, NIndex2, i: integer;
+  NFromStart: integer;
   Str: atString;
 begin
   Result.X:= -1;
   Result.Y:= -1;
 
-  for i:= 0 to AWrapInfo.Count-1 do
+  AWrapInfo.FindIndexesOfLineNumber(P.Y, NIndex1, NIndex2);
+  if NIndex1<0 then Exit;
+
+  for i:= NIndex1 to NIndex2 do
   begin
     Item:= AWrapInfo.Items[i];
-    if Item.NLineIndex<P.Y then Continue;
-    if Item.NLineIndex>P.Y then Break;
 
     if (P.X<Item.NCharIndex-1) then Continue;
     if (Item.NFinal=cWrapItemMiddle) then

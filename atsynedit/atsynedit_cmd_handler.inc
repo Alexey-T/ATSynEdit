@@ -149,8 +149,8 @@ begin
     cCommand_ColSelectUp:        Res:= DoCommand_SelectColumn(cDirUp);
     cCommand_ColSelectDown:      Res:= DoCommand_SelectColumn(cDirDown);
 
-    cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOver, false);
-    cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOver, false);
+    cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
+    cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
     cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);
     cCommand_KeyDelete:           Res:= DoCommand_TextDelete;
     cCommand_KeyTab:              Res:= DoCommand_TextTabulation;

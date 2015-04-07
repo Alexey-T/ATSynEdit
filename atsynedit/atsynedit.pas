@@ -239,7 +239,7 @@ type
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
     FMenu: TPopupMenu;
-    FOver: boolean;
+    FOverwrite: boolean;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
     FMouseDownDouble: boolean;
@@ -431,7 +431,7 @@ type
     procedure SetMarginString(AValue: string);
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
-    procedure SetOver(AValue: boolean);
+    procedure SetOverwrite(AValue: boolean);
     procedure SetReadOnly(AValue: boolean);
     procedure SetScrollTop(AValue: integer);
     procedure SetStrings(Obj: TATStrings);
@@ -538,7 +538,7 @@ type
     property Strings: TATStrings read GetStrings write SetStrings;
     property KeyMapping: TATKeyMapping read FKeyMapping;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
-    property ModeOverwrite: boolean read FOver write SetOver;
+    property ModeOverwrite: boolean read FOverwrite write SetOverwrite;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
@@ -1686,7 +1686,7 @@ begin
   FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
 
-  FOver:= false;
+  FOverwrite:= false;
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
   FMarginList:= TList.Create;
@@ -1946,10 +1946,10 @@ begin
   FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.SetOver(AValue: boolean);
+procedure TATSynEdit.SetOverwrite(AValue: boolean);
 begin
-  if FOver= AValue then Exit;
-  FOver:= AValue;
+  if FOverwrite= AValue then Exit;
+  FOverwrite:= AValue;
 end;
 
 procedure TATSynEdit.SetReadOnly(AValue: boolean);

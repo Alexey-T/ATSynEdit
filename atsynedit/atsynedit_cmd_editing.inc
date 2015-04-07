@@ -72,7 +72,7 @@ begin
     Str:= StringOfChar(' ', FTabSize)
   else
     Str:= #9;
-  Result:= DoCommand_TextInsertAtCarets(Str, false, FOver, false);
+  Result:= DoCommand_TextInsertAtCarets(Str, false, FOverwrite, false);
 end;
 
 
@@ -496,7 +496,7 @@ begin
     Block.ActionDeleteFakeLine;
     if Block.Count=0 then Exit;
 
-    Strings.TextInsertColumnBlock(Caret.PosX, Caret.PosY, Block, FOver);
+    Strings.TextInsertColumnBlock(Caret.PosX, Caret.PosY, Block, FOverwrite);
     if not AKeepCaret then
       Inc(Caret.PosY, Block.Count-1);
   finally
