@@ -43,3 +43,8 @@ begin
   Screen.Cursors[crNiceScrollRight] := LoadCursor(HInstance, 'AB_MOVE_R');
 end;
 
+procedure FreeResources;
+begin
+  FreeAndNil(cBitmapNiceScroll);
+end;
+

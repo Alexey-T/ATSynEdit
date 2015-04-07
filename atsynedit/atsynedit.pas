@@ -2542,6 +2542,7 @@ begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
   if not PtInRect(FRectMain, Pnt) then Exit;
 
+  //delta in pixels
   Dx:= Pnt.X-FMouseNiceScrollPos.X;
   Dy:= Pnt.Y-FMouseNiceScrollPos.Y;
 
@@ -2564,10 +2565,14 @@ begin
     cDirDown:  Cursor:= crNiceScrollDown;
   end;
 
+  //delta in chars
+  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScrollRadius) div FCharSize.X + 1)*cSpeedNiceScrollX;
+  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScrollRadius) div FCharSize.Y + 1)*cSpeedNiceScrollY;
+
   if Dir in [cDirLeft, cDirRight] then
-    DoScrollByDelta((Dx div FCharSize.X)*cSpeedNiceScrollX, 0)
+    DoScrollByDelta(Dx, 0)
   else
-    DoScrollByDelta(0, (Dy div FCharSize.Y)*cSpeedNiceScrollY);
+    DoScrollByDelta(0, Dy);
 
   Invalidate;
 end;
@@ -3014,6 +3019,7 @@ end;
 {$I atsynedit_hilite.inc}
 {$I atsynedit_sel.inc}
 {$I atsynedit_debug.inc}
+{$R res/nicescroll.res}
 
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}
@@ -3021,12 +3027,14 @@ end;
 {$I atsynedit_cmd_editing.inc}
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
-{$R res/nicescroll.res}
 
 
 initialization
   InitClipboardFormat;
   InitResources;
+
+finalization
+  FreeResources;
 
 end.
 
