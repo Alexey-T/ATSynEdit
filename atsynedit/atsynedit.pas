@@ -387,7 +387,7 @@ type
     procedure DoEventChange;
     procedure DoEventState;
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
-    procedure DoEventCommand(ACommand: integer; out AHandled: boolean);
+    function DoEventCommand(ACommand: integer): boolean;
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
     //
     function GetCharSpacingX: integer;
@@ -2569,11 +2569,11 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoEventCommand(ACommand: integer; out AHandled: boolean);
+function TATSynEdit.DoEventCommand(ACommand: integer): boolean;
 begin
-  AHandled:= false;
+  Result:= false;
   if Assigned(FOnCommand) then
-    FOnCommand(Self, ACommand, AHandled);
+    FOnCommand(Self, ACommand, Result);
 end;
 
 function TATSynEdit.GetCaretTime: integer;

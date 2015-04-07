@@ -137,7 +137,8 @@ implementation
 
 uses
   Math,
-  Types;
+  Types,
+  atsynedit_commands;
 
 {$R *.lfm}
 
@@ -339,6 +340,14 @@ end;
 procedure TfmMain.EditCommand(Snd: TObject; ACmd: integer; var AHandled: boolean);
 begin
   AHandled:= false;
+
+  {
+  if ACmd=cCommand_KeyTab then
+  begin
+    AHandled:= true;
+    Beep;
+  end;
+  }
 end;
 
 procedure TfmMain.EditClickGutter(Snd: TObject; ABand, ALine: integer);

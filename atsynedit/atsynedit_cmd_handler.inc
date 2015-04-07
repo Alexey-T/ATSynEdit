@@ -8,10 +8,7 @@ begin
   DoPaintModeStatic;
   try
     Cmd:= GetCommandFromKey(Key, Shift);
-
-    DoEventCommand(Cmd, Handled);
-    if not Handled then
-      DoCommandExec(Cmd);
+    DoCommandExec(Cmd);
   finally
     DoPaintModeBlinking;
   end;
@@ -110,11 +107,13 @@ end;
 
 procedure TATSynEdit.DoCommandExec(ACmd: integer; const AText: atString = '');
 var
+  Caret: TATCaretItem;
   Res: TATCommandResults;
-  Item: TATCaretItem;
   i: integer;
 begin
   if ACmd<=0 then Exit;
+  if DoEventCommand(ACmd) then Exit;
+
   Res:= [];
   FCaretSpecPos:= false;
 
@@ -122,9 +121,9 @@ begin
   if ACmd and cCmdSelKeep <> 0 then
     for i:= 0 to Carets.Count-1 do
     begin
-      Item:= Carets[i];
-      if Item.EndY<0 then Item.EndY:= Item.PosY;
-      if Item.EndX<0 then Item.EndX:= Item.PosX;
+      Caret:= Carets[i];
+      if Caret.EndY<0 then Caret.EndY:= Caret.PosY;
+      if Caret.EndX<0 then Caret.EndX:= Caret.PosX;
     end;
 
   if ACmd and cCmdSelReset <> 0 then
