@@ -221,6 +221,10 @@ begin
   //overwrite N items
   for i:= 0 to AItems.Count-1 do
     TATSynWrapItem(FList[AFrom+i]).Assign(TATSynWrapItem(AItems[i]));
+
+  //must free list
+  for i:= 0 to AItems.Count-1 do
+    TObject(AItems[i]).Free;
 end;
 
 
