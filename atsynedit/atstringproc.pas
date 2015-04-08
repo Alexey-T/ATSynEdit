@@ -530,6 +530,7 @@ end;
 function SNewlinesToSpaces(const S: atString): atString;
 begin
   Result:= S;
+  Result:= StringReplace(Result, #13#10, ' ', [rfReplaceAll]);
   Result:= StringReplace(Result, #13, ' ', [rfReplaceAll]);
   Result:= StringReplace(Result, #10, ' ', [rfReplaceAll]);
 end;

@@ -10,6 +10,7 @@ begin
   //column block
   if Clipboard.HasFormat(cClipFormatId) then
   begin
+    if ModeOneLine then Exit;
     Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret);
     Exit
   end;
