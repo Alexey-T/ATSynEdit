@@ -61,7 +61,6 @@ type
     UnprintedHexFont,
     MinimapBorder,
     MinimapSelBG,
-    MinimapSelBorder,
     StateChanged,
     StateAdded,
     StateSaved,
@@ -163,7 +162,6 @@ const
   cScrollAutoHorz = 10; //scroll N chrs each timer tick
   cScrollAutoVert = 1;
   cResizeBitmapStep = 100;
-  cOffsetTextTop = 1;
   cSizeGutterNumOffsetLeft = 5;
   cSizeGutterNumOffsetRight = 4;
   cSizeRulerHeight = 19;
@@ -300,6 +298,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptOffsetTop: integer;
     FOptSavingForceFinalEol: boolean;
     FOptSavingTrimSpaces: boolean;
     FOptUndoGrouped: boolean;
@@ -609,6 +608,7 @@ type
     property Colors: TATSynEditColors read FColors;
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
+    property OptOffsetTop: integer read FOptOffsetTop write FOptOffsetTop;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind;
@@ -1495,7 +1495,7 @@ begin
     CanvasInvertRect(C, R, FColors.MinimapSelBG);
     if FMinimapShowSelBorder then
     begin
-      C.Pen.Color:= FColors.MinimapSelBorder;
+      C.Pen.Color:= FColors.MinimapBorder;
       C.Brush.Style:= bsClear;
       C.Rectangle(R);
       C.Brush.Style:= bsSolid;
@@ -1733,6 +1733,7 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
+  FOptOffsetTop:= 0;
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
   FOptKeyNavigateWrapped:= true;
@@ -2008,7 +2009,7 @@ begin
   if FOptGutterVisible then
     Inc(Result.X, FGutter.Width);
 
-  Result.Y:= cOffsetTextTop;
+  Result.Y:= FOptOffsetTop;
   if FOptRulerVisible then
     Inc(Result.Y, FOptRulerSize);
 end;
@@ -2963,7 +2964,6 @@ begin
   FColors.UnprintedHexFont:= clMedGray;
   FColors.MinimapBorder:= clLtGray;
   FColors.MinimapSelBG:= $eeeeee;
-  FColors.MinimapSelBorder:= clMedGray;
   FColors.StateChanged:= $00f0f0;
   FColors.StateAdded:= $20c020;
   FColors.StateSaved:= clMedGray;
