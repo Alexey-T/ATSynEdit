@@ -67,8 +67,10 @@ type
     edRulerSize: TSpinEdit;
     GroupBox1: TGroupBox;
     LabChars: TLabel;
+    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
+    Label12: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -82,6 +84,7 @@ type
     edSizeState: TSpinEdit;
     edSizeEmpty: TSpinEdit;
     edUndo: TSpinEdit;
+    edNumSize: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -135,6 +138,7 @@ begin
 
     //gutter
     edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
+    edNumSize.Value:= ed.OptNumbersFontSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
     chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
@@ -207,6 +211,7 @@ begin
       ed.OptCaretStopUnfocused:= chkCrUnfocus.Checked;
 
       //gutter
+      ed.OptNumbersFontSize:= edNumSize.Value;
       ed.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;

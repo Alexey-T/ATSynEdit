@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet3
-    TabIndex = 3
+    ActivePage = TabSheet2
+    TabIndex = 1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -160,7 +160,7 @@ object fmOpt: TfmOpt
       ClientHeight = 283
       ClientWidth = 616
       object chkGutterBm: TCheckBox
-        Left = 296
+        Left = 256
         Height = 19
         Top = 8
         Width = 64
@@ -168,7 +168,7 @@ object fmOpt: TfmOpt
         TabOrder = 4
       end
       object chkGutterNum: TCheckBox
-        Left = 296
+        Left = 256
         Height = 19
         Top = 32
         Width = 50
@@ -176,7 +176,7 @@ object fmOpt: TfmOpt
         TabOrder = 5
       end
       object chkGutterStat: TCheckBox
-        Left = 296
+        Left = 256
         Height = 19
         Top = 56
         Width = 50
@@ -184,7 +184,7 @@ object fmOpt: TfmOpt
         TabOrder = 6
       end
       object chkGutterEmpty: TCheckBox
-        Left = 296
+        Left = 256
         Height = 19
         Top = 80
         Width = 54
@@ -192,7 +192,7 @@ object fmOpt: TfmOpt
         TabOrder = 7
       end
       object edSizeBm: TSpinEdit
-        Left = 384
+        Left = 344
         Height = 23
         Top = 8
         Width = 50
@@ -201,7 +201,7 @@ object fmOpt: TfmOpt
         Value = 1
       end
       object edSizeState: TSpinEdit
-        Left = 384
+        Left = 344
         Height = 23
         Top = 52
         Width = 50
@@ -210,7 +210,7 @@ object fmOpt: TfmOpt
         Value = 1
       end
       object edSizeEmpty: TSpinEdit
-        Left = 384
+        Left = 344
         Height = 23
         Top = 80
         Width = 50
@@ -219,7 +219,7 @@ object fmOpt: TfmOpt
         Value = 1
       end
       object edRulerSize: TSpinEdit
-        Left = 552
+        Left = 560
         Height = 23
         Top = 8
         Width = 50
@@ -229,21 +229,20 @@ object fmOpt: TfmOpt
         Value = 4
       end
       object edRulerFSize: TSpinEdit
-        Left = 552
+        Left = 560
         Height = 23
-        Top = 36
+        Top = 40
         Width = 50
-        MaxValue = 80
-        MinValue = 4
+        MaxValue = 40
         TabOrder = 12
         Value = 4
       end
       object Label2: TLabel
-        Left = 472
+        Left = 408
         Height = 15
-        Top = 12
-        Width = 51
-        Caption = 'ruler sizes'
+        Top = 8
+        Width = 46
+        Caption = 'ruler size'
         ParentColor = False
       end
       object Label10: TLabel
@@ -292,6 +291,35 @@ object fmOpt: TfmOpt
         Width = 150
         Caption = 'show numbers for carets'
         TabOrder = 2
+      end
+      object edNumSize: TSpinEdit
+        Left = 560
+        Height = 23
+        Top = 72
+        Width = 50
+        MaxValue = 40
+        TabOrder = 13
+        Value = 5
+      end
+      object Label1: TLabel
+        Left = 408
+        Height = 34
+        Top = 72
+        Width = 144
+        AutoSize = False
+        Caption = 'numbers font size (if not 0)'
+        ParentColor = False
+        WordWrap = True
+      end
+      object Label12: TLabel
+        Left = 408
+        Height = 32
+        Top = 36
+        Width = 144
+        AutoSize = False
+        Caption = 'ruler font size (if not 0)'
+        ParentColor = False
+        WordWrap = True
       end
     end
     object TabSheet5: TTabSheet

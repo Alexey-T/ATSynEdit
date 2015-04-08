@@ -310,6 +310,7 @@ type
     FOptRulerMarkSizeSmall: integer;
     FOptRulerMarkSizeBig: integer;
     FOptGutterVisible: boolean;
+    FOptNumbersFontSize: integer;
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
     FOptNumbersShowCarets: boolean;
@@ -440,7 +441,7 @@ type
     function GetRectGutter: TRect;
     function GetRectRuler: TRect;
     function GetTextOffset: TPoint;
-    function GetGutterNumbersWidth: integer;
+    function GetGutterNumbersWidth(C: TCanvas): integer;
     function GetPageLines: integer;
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
@@ -452,7 +453,7 @@ type
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
     procedure UpdateCursor;
-    procedure UpdateGutterAutosize;
+    procedure UpdateGutterAutosize(C: TCanvas);
     procedure UpdateMinimapAutosize(C: TCanvas);
     function DoFormatLineNumber(N: integer): atString;
     procedure UpdateWrapInfo;
@@ -644,6 +645,7 @@ type
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented;
     property OptMarginRight: integer read FMarginRight write SetMarginRight;
     property OptMarginString: string read GetMarginString write SetMarginString;
+    property OptNumbersFontSize: integer read FOptNumbersFontSize write FOptNumbersFontSize;
     property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle;
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst;
     property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets;
@@ -714,7 +716,8 @@ begin
   NPrevSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
 
-  C.Font.Size:= FOptRulerFontSize;
+  if FOptRulerFontSize<>0 then
+    C.Font.Size:= FOptRulerFontSize;
   C.Font.Color:= FColors.RulerFont;
   C.Pen.Color:= FColors.RulerFont;
   C.Brush.Color:= FColors.RulerBG;
@@ -740,9 +743,9 @@ begin
   C.Font.Size:= NPrevSize;
 end;
 
-procedure TATSynEdit.UpdateGutterAutosize;
+procedure TATSynEdit.UpdateGutterAutosize(C: TCanvas);
 begin
-  FGutter[FGutterBandNum].Size:= GetGutterNumbersWidth;
+  FGutter[FGutterBandNum].Size:= GetGutterNumbersWidth(C);
   FGutter.Update;
 end;
 
@@ -1178,7 +1181,7 @@ begin
   FCharSize:= GetCharSize(C, FCharSpacingText);
   FCharSizeMinimap:= Point(8, 8);
 
-  if FOptGutterVisible then UpdateGutterAutosize;
+  if FOptGutterVisible then UpdateGutterAutosize(C);
   if FMinimapVisible then UpdateMinimapAutosize(C);
 
   FTextOffset:= GetTextOffset; //after gutter autosize
@@ -1449,9 +1452,12 @@ begin
           C.Font.Color:= FColors.GutterFont;
           C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
 
+          if FOptNumbersFontSize<>0 then
+            C.Font.Size:= FOptNumbersFontSize;
           Str:= DoFormatLineNumber(NLinesIndex+1);
           NCoordLeftNums:= NGutterNumsX2 - C.TextWidth(Str) - cSizeGutterNumOffsetRight;
           C.TextOut(NCoordLeftNums, NCoordTop, Str);
+          C.Font.Size:= Font.Size;
         end;
       end;
 
@@ -1722,6 +1728,7 @@ begin
   FGutter[FGutterBandEmpty].Size:= cSizeGutterBandEmpty;
   FGutter.Update;
 
+  FOptNumbersFontSize:= 0;
   FOptNumbersStyle:= cInitNumbersStyle;
   FOptNumbersShowFirst:= true;
   FOptNumbersShowCarets:= false;
@@ -2023,15 +2030,23 @@ begin
     Inc(Result.Y, FOptRulerSize);
 end;
 
-function TATSynEdit.GetGutterNumbersWidth: integer;
+function TATSynEdit.GetGutterNumbersWidth(C: TCanvas): integer;
 var
   Str: atString;
+  CharSize: integer;
 begin
+  if FOptNumbersFontSize<>0 then
+    C.Font.Size:= FOptNumbersFontSize;
+  CharSize:= C.TextWidth('0');
+
   Str:= IntToStr(Max(10, Strings.Count));
   Result:=
-    Length(Str)*FCharSize.X+
+    Length(Str)*CharSize+
     cSizeGutterNumOffsetLeft+
     cSizeGutterNumOffsetRight;
+
+  if FOptNumbersFontSize<>0 then
+    C.Font.Size:= Font.Size;
 end;
 
 function TATSynEdit.GetPageLines: integer;
