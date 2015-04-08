@@ -1028,7 +1028,6 @@ var
   bHorz1, bHorz2: boolean;
 begin
   Result:= false;
-  if not FOptAllowScrollbars then Exit;
 
   with FScrollVert do
   begin
@@ -1071,6 +1070,8 @@ procedure TATSynEdit.UpdateScrollbarVert;
 var
   si: TScrollInfo;
 begin
+  if not FOptAllowScrollbars then Exit;
+
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
@@ -1085,6 +1086,8 @@ procedure TATSynEdit.UpdateScrollbarHorz;
 var
   si: TScrollInfo;
 begin
+  if not FOptAllowScrollbars then Exit;
+
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL;

@@ -180,7 +180,7 @@ begin
   ed.OnDrawBookmarkIcon:= EditDrawBm;
   ed.OnDrawLine:= EditDrawLine;
   ed.OnDrawMicromap:= EditDrawMicromap;
-  //ed.OnDrawRuler:= EditDrawTest;///////////
+  //ed.OnDrawRuler:= EditDrawTest;//test
 
   ed.SetFocus;
 end;
@@ -349,7 +349,6 @@ end;
 procedure TfmMain.EditCommand(Snd: TObject; ACmd: integer; var AHandled: boolean);
 begin
   AHandled:= false;
-
   {
   if ACmd=cCommand_KeyTab then
   begin
