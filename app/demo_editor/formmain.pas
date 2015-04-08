@@ -68,7 +68,6 @@ type
     mnuSav: TMenuItem;
     mnuGoto: TMenuItem;
     OpenDialog1: TOpenDialog;
-    PanelOne: TPanel;
     PanelMain: TPanel;
     PanelRt: TPanel;
     SaveDialog1: TSaveDialog;
@@ -113,7 +112,8 @@ type
     procedure mnuUnlockClick(Sender: TObject);
   private
     { private declarations }
-    ed, ed1: TATSynEdit;
+    ed: TATSynEdit;
+    ed1: TATEdit;
     wait: boolean;
     FDir: string;
     procedure DoOpen(const fn: string);
@@ -164,14 +164,6 @@ begin
   ed.Font.Name:= 'Courier New';
   {$endif}
 
-  ed1:= TATSynEdit.Create(Self);
-  ed1.Parent:= PanelOne;
-  ed1.Align:= alClient;
-  ed1.Font.Name:= ed.Font.Name;
-  ed1.BorderStyle:= bsSingle;
-  ed1.OptOffsetTop:= 3;
-  ed1.ModeOneLine:= true;
-
   ed.OnChanged:= EditCaretMoved;
   ed.OnCaretMoved:= EditCaretMoved;
   ed.OnScrolled:= EditCaretMoved;
@@ -184,6 +176,11 @@ begin
   //ed.OnDrawRuler:= EditDrawTest;//test
 
   ed.SetFocus;
+
+  ed1:= TATEdit.Create(Self);
+  ed1.Parent:= PanelRt;
+  ed1.Align:= alBottom;
+  ed1.Font.Name:= ed.Font.Name;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);

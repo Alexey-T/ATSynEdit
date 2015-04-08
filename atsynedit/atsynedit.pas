@@ -678,6 +678,15 @@ type
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces;
   end;
 
+type
+
+  { TATEdit }
+
+  TATEdit = class(TATSynEdit)
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
 implementation
 
 uses
@@ -3052,6 +3061,19 @@ end;
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
 
+
+{ TATEdit }
+
+constructor TATEdit.Create(AOwner: TComponent);
+begin
+  inherited;
+
+  ModeOneLine:= true;
+  BorderStyle:= bsSingle;
+
+  OptOffsetTop:= 2;
+  Height:= 26;
+end;
 
 initialization
   InitClipboardFormat;

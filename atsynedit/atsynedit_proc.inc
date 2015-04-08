@@ -48,3 +48,4 @@ begin
   FreeAndNil(cBitmapNiceScroll);
 end;
 
+
