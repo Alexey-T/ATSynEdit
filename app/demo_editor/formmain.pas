@@ -47,6 +47,7 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     btnHlp: TMenuItem;
+    mnuOneLine: TMenuItem;
     mnuPane: TMenuItem;
     mnuHilit: TMenuItem;
     mnuTCaret1: TMenuItem;
@@ -83,6 +84,7 @@ type
     procedure chkGutterChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
+    procedure mnuOneLineClick(Sender: TObject);
     procedure mnuPaneClick(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
     procedure chkUnprintVisChange(Sender: TObject);
@@ -537,6 +539,15 @@ begin
   if wait then Exit;
   ed.OptMinimapVisible:= chkMinimap.Checked;
   ed.Update;
+end;
+
+procedure TfmMain.mnuOneLineClick(Sender: TObject);
+var
+  S: string;
+begin
+  S:= UTF8Encode(ed1.Text);
+  S:= InputBox('Test for edit', 'Text:', S);
+  ed1.Text:= UTF8Decode(S);
 end;
 
 procedure TfmMain.mnuPaneClick(Sender: TObject);

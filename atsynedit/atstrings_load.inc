@@ -5,7 +5,12 @@ var
   MS: TMemoryStream;
 begin
   Clear;
-  if AText='' then Exit;
+  if AText='' then
+  begin
+    ActionAddFakeLineIfNeeded;
+    Exit;
+  end;
+
   MS:= TMemoryStream.Create;
   try
     MS.Write(AText[1], Length(AText)*SizeOf(atChar));
@@ -14,6 +19,7 @@ begin
     Encoding:= cEncWideLE;
     EncodingDetect:= false;
     LoadFromStream(MS);
+    ActionAddFakeLineIfNeeded;
   finally
     FreeAndNil(MS);
   end;

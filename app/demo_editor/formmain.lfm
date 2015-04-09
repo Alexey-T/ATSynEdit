@@ -379,6 +379,10 @@ object fmMain: TfmMain
         Checked = True
         OnClick = mnuPaneClick
       end
+      object mnuOneLine: TMenuItem
+        Caption = 'set one-line txt'
+        OnClick = mnuOneLineClick
+      end
     end
     object mnuHlp: TMenuItem
       Caption = 'Help'

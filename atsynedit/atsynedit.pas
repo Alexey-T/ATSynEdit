@@ -350,6 +350,7 @@ type
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetOneLine: boolean;
     function GetRedoCount: integer;
+    function GetText: atString;
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
@@ -448,6 +449,7 @@ type
     function GetVisibleLinesMinimap: integer;
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
+    procedure SetText(AValue: atString);
     procedure SetUndoAfterSave(AValue: boolean);
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
@@ -545,6 +547,7 @@ type
     property RedoCount: integer read GetRedoCount;
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
+    property Text: atString read GetText write SetText;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -1014,6 +1017,12 @@ begin
   if FTabSize=AValue then Exit;
   FTabSize:= Min(cMaxTabSize, Max(cMinTabSize, AValue));
   FWrapUpdateNeeded:= true;
+end;
+
+procedure TATSynEdit.SetText(AValue: atString);
+begin
+  Strings.LoadFromString(AValue);
+  Update(true);
 end;
 
 procedure TATSynEdit.SetWrapMode(AValue: TATSynWrapMode);
@@ -2949,6 +2958,11 @@ end;
 function TATSynEdit.GetRedoCount: integer;
 begin
   Result:= Strings.RedoCount;
+end;
+
+function TATSynEdit.GetText: atString;
+begin
+  Result:= Strings.TextAll;
 end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);
