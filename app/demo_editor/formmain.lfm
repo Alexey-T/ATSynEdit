@@ -348,23 +348,27 @@ object fmMain: TfmMain
     object mnuTst: TMenuItem
       Caption = 'Test'
       object mnuTFold: TMenuItem
-        Caption = 'fold'
+        Caption = 'fold (11..20 etc)'
         OnClick = mnuTFoldClick
       end
       object mnuTCaret1: TMenuItem
-        Caption = '100 cr''s'
+        Caption = 'set 100 cr''s'
         OnClick = mnuTCaret1Click
       end
       object mnuTCaretK: TMenuItem
-        Caption = '2000 cr''s'
+        Caption = 'set 2000 cr''s'
         OnClick = bAddCrtClick
       end
       object mnuTMargin: TMenuItem
-        Caption = 'margins..'
+        Caption = 'set margins..'
         OnClick = mnuTMarginClick
       end
+      object mnuOneLine: TMenuItem
+        Caption = 'set one-line edit..'
+        OnClick = mnuOneLineClick
+      end
       object mnuTBms: TMenuItem
-        Caption = 'toggle bms'
+        Caption = 'toggle bookm'
         OnClick = mnuTBmsClick
       end
       object mnuHilit: TMenuItem
@@ -378,10 +382,6 @@ object fmMain: TfmMain
         Caption = 'show pane'
         Checked = True
         OnClick = mnuPaneClick
-      end
-      object mnuOneLine: TMenuItem
-        Caption = 'set one-line txt'
-        OnClick = mnuOneLineClick
       end
     end
     object mnuHlp: TMenuItem

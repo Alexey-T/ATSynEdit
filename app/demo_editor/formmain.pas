@@ -119,6 +119,7 @@ type
     wait: boolean;
     FDir: string;
     procedure DoOpen(const fn: string);
+    procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: array of integer);
@@ -166,7 +167,7 @@ begin
   ed.Font.Name:= 'Courier New';
   {$endif}
 
-  ed.OnChanged:= EditCaretMoved;
+  ed.OnChanged:= EditChanged;
   ed.OnCaretMoved:= EditCaretMoved;
   ed.OnScrolled:= EditCaretMoved;
   ed.OnStateChanged:= EditCaretMoved;
@@ -273,9 +274,12 @@ procedure TfmMain.mnuTMarginClick(Sender: TObject);
 var
   S: string;
 begin
-  S:= InputBox('Margins', 'space separated numz', ed.OptMarginString);
-  ed.OptMarginString:= S;
-  ed.Update;
+  S:= ed.OptMarginString;
+  if InputQuery('Margins', 'space separated ints', S) then
+  begin
+    ed.OptMarginString:= S;
+    ed.Update;
+  end;
 end;
 
 procedure TfmMain.mnuUnlockClick(Sender: TObject);
@@ -432,6 +436,11 @@ begin
   Caption:= 'Demo - '+ExtractFileName(fn);
 end;
 
+procedure TfmMain.EditChanged(Sender: TObject);
+begin
+  UpdateStatus;
+end;
+
 procedure TfmMain.bGotoClick(Sender: TObject);
 var
   s: string;
@@ -546,8 +555,10 @@ var
   S: string;
 begin
   S:= UTF8Encode(ed1.Text);
-  S:= InputBox('Test for edit', 'Text:', S);
-  ed1.Text:= UTF8Decode(S);
+  if InputQuery('Test for edit', 'Text:', S) then
+  begin
+    ed1.Text:= UTF8Decode(S);
+  end;
 end;
 
 procedure TfmMain.mnuPaneClick(Sender: TObject);
