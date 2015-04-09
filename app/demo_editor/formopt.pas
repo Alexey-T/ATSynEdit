@@ -18,10 +18,11 @@ type
     chkGutterNum: TCheckBox;
     chkGutterStat: TCheckBox;
     chkNice: TCheckBox;
+    chkRepSpec: TCheckBox;
+    chkSaveEol: TCheckBox;
+    chkSaveTrim: TCheckBox;
     chkShowNum1st: TCheckBox;
     chkShowNumCr: TCheckBox;
-    chkSaveTrim: TCheckBox;
-    chkSaveEol: TCheckBox;
     chkMapBord: TCheckBox;
     chkMapAlw: TCheckBox;
     chkShowNumBg: TCheckBox;
@@ -53,7 +54,6 @@ type
     chkCurLine: TCheckBox;
     chkLastOnTop: TCheckBox;
     chkOvrPaste: TCheckBox;
-    chkRepSpec: TCheckBox;
     edAutoInd: TComboBox;
     edCrShape: TComboBox;
     edCrShape2: TComboBox;
@@ -69,7 +69,7 @@ type
     edSizeBm: TSpinEdit;
     edSizeEmpty: TSpinEdit;
     edSizeState: TSpinEdit;
-    GroupBox1: TGroupBox;
+    edTabArrow: TSpinEdit;
     GroupBox2: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
@@ -77,7 +77,6 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
-    LabelArr: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -86,10 +85,10 @@ type
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
+    LabelArr: TLabel;
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
-    edTabArrow: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;

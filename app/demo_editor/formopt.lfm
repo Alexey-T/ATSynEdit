@@ -84,33 +84,25 @@ object fmOpt: TfmOpt
       object chkOvrPaste: TCheckBox
         Left = 296
         Height = 19
-        Top = 88
-        Width = 209
-        Caption = 'consider mode "overwrite" on paste'
+        Top = 68
+        Width = 201
+        Caption = 'consider overwrite-mode on paste'
         TabOrder = 7
       end
-      object chkRepSpec: TCheckBox
-        Left = 296
-        Height = 19
-        Top = 68
-        Width = 130
-        Caption = 'show ascii 0-31 as "."'
-        TabOrder = 8
-      end
       object LabChars: TLabel
-        Left = 120
+        Left = 408
         Height = 15
-        Top = 180
+        Top = 252
         Width = 60
         Caption = 'word-chars'
         ParentColor = False
       end
       object edChars: TEdit
-        Left = 8
+        Left = 296
         Height = 23
-        Top = 180
+        Top = 249
         Width = 106
-        TabOrder = 9
+        TabOrder = 8
       end
       object chkDotLn: TCheckBox
         Left = 296
@@ -128,47 +120,45 @@ object fmOpt: TfmOpt
         Caption = 'cut lines if no sel'
         TabOrder = 5
       end
-      object GroupBox1: TGroupBox
-        Left = 8
-        Height = 72
-        Top = 204
-        Width = 217
-        Caption = 'on saving'
-        ClientHeight = 52
-        ClientWidth = 213
+      object chkSaveTrim: TCheckBox
+        Left = 296
+        Height = 19
+        Top = 88
+        Width = 149
+        Caption = 'on save: trim trail spaces'
+        TabOrder = 9
+      end
+      object chkSaveEol: TCheckBox
+        Left = 296
+        Height = 19
+        Top = 108
+        Width = 146
+        Caption = 'on save: ensure final eol'
         TabOrder = 10
-        object chkSaveTrim: TCheckBox
-          Left = 7
-          Height = 19
-          Top = 3
-          Width = 103
-          Caption = 'trim trail spaces'
-          TabOrder = 0
-        end
-        object chkSaveEol: TCheckBox
-          Left = 7
-          Height = 19
-          Top = 24
-          Width = 100
-          Caption = 'ensure final eol'
-          TabOrder = 1
-        end
       end
       object edTabArrow: TSpinEdit
-        Left = 8
+        Left = 296
         Height = 23
-        Top = 148
-        Width = 42
+        Top = 216
+        Width = 50
         MaxValue = 16
         TabOrder = 11
       end
       object LabelArr: TLabel
-        Left = 56
+        Left = 352
         Height = 15
-        Top = 152
+        Top = 220
         Width = 114
         Caption = 'tab-arrow size (0: full)'
         ParentColor = False
+      end
+      object chkRepSpec: TCheckBox
+        Left = 296
+        Height = 19
+        Top = 128
+        Width = 130
+        Caption = 'show ascii 0-31 as "."'
+        TabOrder = 12
       end
     end
     object TabSheet2: TTabSheet

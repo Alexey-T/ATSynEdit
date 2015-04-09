@@ -55,7 +55,6 @@ type
     mnuTBms: TMenuItem;
     mnuTMargin: TMenuItem;
     mnuFile: TMenuItem;
-    mnuSr: TMenuItem;
     mnuHlp: TMenuItem;
     MenuItem5: TMenuItem;
     mnuTst: TMenuItem;
@@ -446,13 +445,13 @@ var
   s: string;
   n: integer;
 begin
-  s:= InputBox('Go to', 'Line:', '1');
+  s:= Inttostr(ed.ScrollTop+1);
+  if not InputQuery('Go to', 'Line:', s) then Exit;
   if s='' then Exit;
   n:= StrToIntDef(s, 0)-1;
-  if n<0 then Exit;
-  if n>=ed.Strings.Count then
+  if (n<0) or (n>=ed.Strings.Count) then
   begin
-    Showmessage('Too big index: '+s);
+    Showmessage('Incorr index: '+s);
     Exit
   end;
   ed.DoGotoPos(Point(0, n));

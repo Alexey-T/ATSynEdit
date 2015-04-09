@@ -337,16 +337,12 @@ object fmMain: TfmMain
         end
       end
     end
-    object mnuSr: TMenuItem
-      Caption = 'Search'
-      object mnuGoto: TMenuItem
-        Caption = 'Go to..'
-        ShortCut = 16455
-        OnClick = bGotoClick
-      end
-    end
     object mnuTst: TMenuItem
       Caption = 'Test'
+      object mnuGoto: TMenuItem
+        Caption = 'go to..'
+        OnClick = bGotoClick
+      end
       object mnuTFold: TMenuItem
         Caption = 'fold (11..20 etc)'
         OnClick = mnuTFoldClick
@@ -387,12 +383,12 @@ object fmMain: TfmMain
     object mnuHlp: TMenuItem
       Caption = 'Help'
       object mnuOpt: TMenuItem
-        Caption = 'Opts..'
+        Caption = 'options..'
         ShortCut = 120
         OnClick = bOptClick
       end
       object mnuKey: TMenuItem
-        Caption = 'Commands..'
+        Caption = 'commands..'
         ShortCut = 112
         OnClick = bKeymapClick
       end
@@ -400,7 +396,7 @@ object fmMain: TfmMain
         Caption = '-'
       end
       object btnHlp: TMenuItem
-        Caption = 'help..'
+        Caption = 'mouse help..'
         OnClick = btnHlpClick
       end
     end
