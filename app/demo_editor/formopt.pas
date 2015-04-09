@@ -77,6 +77,7 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
+    LabelArr: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -88,6 +89,7 @@ type
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
+    edTabArrow: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -130,6 +132,7 @@ begin
     edChars.Text:= ed.OptWordChars;
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
+    edTabArrow.Value:= ed.OptTabArrowSize;
 
     //caret
     chkCrVirt.Checked:= ed.OptCaretVirtual;
@@ -205,6 +208,7 @@ begin
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
       ed.OptSavingTrimSpaces:= chkSaveTrim.Checked;
+      ed.OptTabArrowSize:= edTabArrow.Value;
 
       //caret
       ed.OptCaretVirtual:= chkCrVirt.Checked;

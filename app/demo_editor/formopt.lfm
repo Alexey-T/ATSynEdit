@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet2
-    TabIndex = 1
+    ActivePage = TabSheet1
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -153,6 +153,22 @@ object fmOpt: TfmOpt
           Caption = 'ensure final eol'
           TabOrder = 1
         end
+      end
+      object edTabArrow: TSpinEdit
+        Left = 392
+        Height = 23
+        Top = 116
+        Width = 50
+        MaxValue = 16
+        TabOrder = 11
+      end
+      object LabelArr: TLabel
+        Left = 449
+        Height = 15
+        Top = 117
+        Width = 114
+        Caption = 'tab-arrow size (0: full)'
+        ParentColor = False
       end
     end
     object TabSheet2: TTabSheet
@@ -335,11 +351,11 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 23
         Top = 124
-        Width = 32
+        Width = 24
         TabOrder = 8
       end
       object Label13: TLabel
-        Left = 49
+        Left = 40
         Height = 15
         Top = 128
         Width = 105

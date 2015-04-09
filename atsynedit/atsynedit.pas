@@ -325,6 +325,7 @@ type
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
     FOptTabSpaces: boolean;
+    FOptTabArrowSize: integer;
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptUseOverOnPaste: boolean;
@@ -619,6 +620,7 @@ type
     property Colors: TATSynEditColors read FColors;
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
+    property OptTabArrowSize: integer read FOptTabArrowSize write FOptTabArrowSize;
     property OptOffsetTop: integer read FOptOffsetTop write FOptOffsetTop;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
@@ -1389,6 +1391,7 @@ begin
       else
         Event:= nil;
 
+      CanvasTabArrowSize:= FOptTabArrowSize;
       CanvasTextOut(C,
         CurrPointText.X,
         CurrPointText.Y,
@@ -1777,6 +1780,7 @@ begin
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsIs;
   FOptTabSpaces:= false;
+  FOptTabArrowSize:= 2;
   FOptLastLineOnTop:= false;
   FOptOverwriteSel:= true;
   FOptMouseDragDrop:= true;

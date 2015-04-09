@@ -29,6 +29,9 @@ type
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: array of integer) of object;
 
+var
+  CanvasTabArrowSize: integer = 0;
+
 
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
@@ -97,24 +100,38 @@ begin
   C.FillRect(R);
 end;
 
-procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor);
+procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor; ACharSizeX: integer);
 const
   cIndent = 1; //offset left/rt
   cScale = 4; //part 1/N of height
 var
-  X, X2, Y, Dx: integer;
+  XLeft, XRight, X1, X2, Y, Dx: integer;
 begin
-  X:= ARect.Right-cIndent;
-  X2:= ARect.Left+cIndent;
+  XLeft:= ARect.Left+cIndent;
+  XRight:= ARect.Right-cIndent;
+
+  if CanvasTabArrowSize=0 then
+  begin;
+    X1:= XLeft;
+    X2:= XRight;
+  end
+  else
+  begin
+    Dx:= (ARect.Left+ARect.Right) div 2;
+    X1:= Max(XLeft, Dx-CanvasTabArrowSize*ACharSizeX  div 2);
+    X2:= Min(XRight, Dx+CanvasTabArrowSize*ACharSizeX div 2);
+  end;
+
   Y:= (ARect.Top+ARect.Bottom) div 2;
   Dx:= (ARect.Bottom-ARect.Top) div cScale;
   C.Pen.Color:= AColorFont;
-  C.MoveTo(X, Y);
-  C.LineTo(X2, Y);
-  C.MoveTo(X, Y);
-  C.LineTo(X-Dx, Y-Dx);
-  C.MoveTo(X, Y);
-  C.LineTo(X-Dx, Y+Dx);
+
+  C.MoveTo(X2, Y);
+  C.LineTo(X1, Y);
+  C.MoveTo(X2, Y);
+  C.LineTo(X2-Dx, Y-Dx);
+  C.MoveTo(X2, Y);
+  C.LineTo(X2-Dx, Y+Dx);
 end;
 
 procedure DoPaintUnprintedChars(C: TCanvas;
@@ -144,7 +161,7 @@ begin
       if AString[i]=' ' then
         DoPaintUnprintedSpace(C, R, cUnprintedDotScale, AColorFont)
       else
-        DoPaintUnprintedTabulation(C, R, AColorFont);
+        DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X);
     end;
 end;
 
