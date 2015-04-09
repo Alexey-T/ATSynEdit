@@ -66,7 +66,7 @@ object fmOpt: TfmOpt
         TabOrder = 2
       end
       object chkCopyNoSel: TCheckBox
-        Left = 160
+        Left = 296
         Height = 19
         Top = 8
         Width = 117
@@ -77,51 +77,51 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 19
         Top = 68
-        Width = 123
-        Caption = 'colorize sel till edge'
+        Width = 108
+        Caption = 'hilite sel till edge'
         TabOrder = 3
       end
       object chkOvrPaste: TCheckBox
-        Left = 160
+        Left = 296
         Height = 19
         Top = 88
-        Width = 153
-        Caption = 'apply ovr-mode on paste'
+        Width = 209
+        Caption = 'consider mode "overwrite" on paste'
         TabOrder = 7
       end
       object chkRepSpec: TCheckBox
-        Left = 160
+        Left = 296
         Height = 19
         Top = 68
-        Width = 133
-        Caption = 'show spec-ascii as "."'
+        Width = 130
+        Caption = 'show ascii 0-31 as "."'
         TabOrder = 8
       end
       object LabChars: TLabel
-        Left = 504
+        Left = 120
         Height = 15
-        Top = 12
+        Top = 180
         Width = 60
         Caption = 'word-chars'
         ParentColor = False
       end
       object edChars: TEdit
-        Left = 392
+        Left = 8
         Height = 23
-        Top = 8
+        Top = 180
         Width = 106
         TabOrder = 9
       end
       object chkDotLn: TCheckBox
-        Left = 160
+        Left = 296
         Height = 19
         Top = 48
-        Width = 166
-        Caption = 'show wrap-indent vert lines'
+        Width = 186
+        Caption = 'show wrapped-indent vert lines'
         TabOrder = 6
       end
       object chkCutNoSel: TCheckBox
-        Left = 160
+        Left = 296
         Height = 19
         Top = 28
         Width = 108
@@ -129,9 +129,9 @@ object fmOpt: TfmOpt
         TabOrder = 5
       end
       object GroupBox1: TGroupBox
-        Left = 392
+        Left = 8
         Height = 72
-        Top = 36
+        Top = 204
         Width = 217
         Caption = 'on saving'
         ClientHeight = 52
@@ -155,17 +155,17 @@ object fmOpt: TfmOpt
         end
       end
       object edTabArrow: TSpinEdit
-        Left = 392
+        Left = 8
         Height = 23
-        Top = 116
-        Width = 50
+        Top = 148
+        Width = 42
         MaxValue = 16
         TabOrder = 11
       end
       object LabelArr: TLabel
-        Left = 449
+        Left = 56
         Height = 15
-        Top = 117
+        Top = 152
         Width = 114
         Caption = 'tab-arrow size (0: full)'
         ParentColor = False

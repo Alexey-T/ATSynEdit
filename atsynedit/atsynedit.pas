@@ -351,6 +351,7 @@ type
     FOptShowGutterCaretBG: boolean;
     FOptAllowScrollbars: boolean;
     FOptAllowZooming: boolean;
+    FOptAllowReadOnly: boolean;
     //
     procedure DebugFindWrapIndex;
     procedure DoDropText;
@@ -686,6 +687,7 @@ type
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG;
     property OptAllowScrollbars: boolean read FOptAllowScrollbars write FOptAllowScrollbars;
     property OptAllowZooming: boolean read FOptAllowZooming write FOptAllowZooming;
+    property OptAllowReadOnly: boolean read FOptAllowReadOnly write FOptAllowReadOnly;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
@@ -1774,6 +1776,7 @@ begin
   FOptOffsetTop:= 0;
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
+  FOptAllowReadOnly:= true;
   FOptKeyNavigateWrapped:= true;
   FOptUseOverOnPaste:= false;
   FOptWordChars:= '';
@@ -2003,6 +2006,7 @@ begin
     OptWrapMode:= cWrapOff;
     OptAllowScrollbars:= false;
     OptAllowZooming:= false;
+    OptAllowReadOnly:= false;
     OptMouseNiceScroll:= false;
     OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
@@ -2012,6 +2016,7 @@ end;
 
 procedure TATSynEdit.SetReadOnly(AValue: boolean);
 begin
+  if not FOptAllowReadOnly then Exit;
   Strings.ReadOnly:= AValue;
 end;
 
