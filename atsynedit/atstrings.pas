@@ -1,6 +1,11 @@
-unit ATStrings;
+{
+Copyright (C) Alexey Torgashin, uvviewsoft.com
+License: MPL 2.0
+}
 
 {$mode delphi}
+
+unit ATStrings;
 
 interface
 

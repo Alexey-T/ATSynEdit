@@ -1,9 +1,15 @@
-unit ATSynEdit;
+{
+Copyright (C) Alexey Torgashin, uvviewsoft.com
+License: MPL 2.0
+}
 
 {$mode delphi}
+
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
+
+unit ATSynEdit;
 
 interface
 
