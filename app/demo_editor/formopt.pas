@@ -13,6 +13,10 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkGutterBm: TCheckBox;
+    chkGutterEmpty: TCheckBox;
+    chkGutterNum: TCheckBox;
+    chkGutterStat: TCheckBox;
     chkNice: TCheckBox;
     chkShowNum1st: TCheckBox;
     chkShowNumCr: TCheckBox;
@@ -47,10 +51,6 @@ type
     chkCopyNoSel: TCheckBox;
     chkCurCol: TCheckBox;
     chkCurLine: TCheckBox;
-    chkGutterBm: TCheckBox;
-    chkGutterEmpty: TCheckBox;
-    chkGutterNum: TCheckBox;
-    chkGutterStat: TCheckBox;
     chkLastOnTop: TCheckBox;
     chkOvrPaste: TCheckBox;
     chkRepSpec: TCheckBox;
@@ -60,17 +60,23 @@ type
     edCrTime: TSpinEdit;
     edChars: TEdit;
     edIndent: TSpinEdit;
+    edNumSkip: TEdit;
     edMapFont: TSpinEdit;
     edNum: TComboBox;
     edPage: TComboBox;
     edRulerFSize: TSpinEdit;
     edRulerSize: TSpinEdit;
+    edSizeBm: TSpinEdit;
+    edSizeEmpty: TSpinEdit;
+    edSizeState: TSpinEdit;
     GroupBox1: TGroupBox;
+    GroupBox2: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
+    Label13: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -80,9 +86,6 @@ type
     Label8: TLabel;
     Label9: TLabel;
     PageControl1: TPageControl;
-    edSizeBm: TSpinEdit;
-    edSizeState: TSpinEdit;
-    edSizeEmpty: TSpinEdit;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
     TabSheet1: TTabSheet;
@@ -139,6 +142,7 @@ begin
     //gutter
     edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
     edNumSize.Value:= ed.OptNumbersFontSize;
+    edNumSkip.Text:= ed.OptNumbersSkippedChar;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
     chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
@@ -215,6 +219,7 @@ begin
       ed.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
+      ed.OptNumbersSkippedChar:= edNumSkip.Text;
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;
       ed.OptRulerFontSize:= edRulerFSize.Value;

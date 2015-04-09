@@ -314,6 +314,7 @@ type
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
     FOptNumbersShowCarets: boolean;
+    FOptNumbersSkippedChar: atString;
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
@@ -652,6 +653,7 @@ type
     property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle;
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst;
     property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets;
+    property OptNumbersSkippedChar: atString read FOptNumbersSkippedChar write FOptNumbersSkippedChar;
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible;
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
@@ -791,7 +793,7 @@ begin
     cNumbersAll:
       Result:= IntToStr(N);
     cNumbersNone:
-      Result:= '.';
+      Result:= FOptNumbersSkippedChar;
     cNumbersEach10th:
       begin
         if (N mod 10 = 0) then
@@ -800,14 +802,14 @@ begin
         if (N mod 5) = 0 then
           Result:= '-'
         else
-          Result:= '.';
+          Result:= FOptNumbersSkippedChar;
       end;
     cNumbersEach5th:
       begin
         if (N mod 5 = 0) then
           Result:= IntToStr(N)
         else
-          Result:= '.';
+          Result:= FOptNumbersSkippedChar;
       end;
     else
       raise Exception.Create('Unknown num-style');
@@ -1741,6 +1743,8 @@ begin
   FOptNumbersStyle:= cInitNumbersStyle;
   FOptNumbersShowFirst:= true;
   FOptNumbersShowCarets:= false;
+  FOptNumbersSkippedChar:= '.';
+
   FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
