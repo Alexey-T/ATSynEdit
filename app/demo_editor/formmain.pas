@@ -296,6 +296,7 @@ const
   cEnd: array[TATLineEnds] of string = ('?', 'Win', 'Unix', 'Mac');
   cOvr: array[boolean] of string = ('-', 'Ovr');
   cRo: array[boolean] of string = ('-', 'RO');
+  cMod: array[boolean] of string = ('-', 'Mod');
 var
   sPos: string;
   sSel: string;
@@ -308,7 +309,7 @@ begin
 
   if ed.IsSelRectEmpty then sSel:= '-' else sSel:= 'Column';
 
-  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s | Undo: %d, Redo: %d', [
+  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d', [
     sPos,
     ed.Carets.Count,
     ed.ScrollTop+1,
@@ -316,6 +317,7 @@ begin
     cOvr[ed.ModeOverwrite],
     cRo[ed.ModeReadOnly],
     sSel,
+    cMod[ed.Modified],
     ed.UndoCount,
     ed.RedoCount
     ]);

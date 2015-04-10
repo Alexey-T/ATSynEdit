@@ -65,6 +65,7 @@ type
     FEndings: TATLineEnds;
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
+    FModified: boolean;
     FSaveSignUtf8: boolean;
     FSaveSignWide: boolean;
     FReadOnly: boolean;
@@ -132,6 +133,7 @@ type
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
+    property Modified: boolean read FModified;
     property OneLine: boolean read FOneLine write FOneLine;
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteDupFakeLines;
@@ -430,6 +432,7 @@ begin
   FEncodingDetect:= true;
   FEndings:= cEndWin;
 
+  FModified:= false;
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
   FUndoAfterSave:= true;
@@ -808,6 +811,7 @@ end;
 
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
 begin
+  FModified:= true;
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 

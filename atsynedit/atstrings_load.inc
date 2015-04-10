@@ -174,6 +174,7 @@ begin
   ActionAddFakeLineIfNeeded;
   DoClearLineStates(false);
   DoClearUndo;
+  FModified:= false;
 end;
 
 

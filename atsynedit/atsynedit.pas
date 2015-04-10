@@ -360,6 +360,7 @@ type
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
+    function GetModified: boolean;
     function GetOneLine: boolean;
     function GetRedoCount: integer;
     function GetScrollTopRelative: integer;
@@ -552,6 +553,7 @@ type
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
+    property Modified: boolean read GetModified;
     property KeyMapping: TATKeyMapping read FKeyMapping;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
     property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
@@ -1923,6 +1925,7 @@ begin
     Update(true);
 
   Strings.SaveToFile(AFilename);
+  DoEventState;
 end;
 
 procedure TATSynEdit.DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
@@ -2981,6 +2984,11 @@ begin
     else
       raise Exception.Create('Unknown autoindent-kind');
   end;
+end;
+
+function TATSynEdit.GetModified: boolean;
+begin
+  Result:= Strings.Modified;
 end;
 
 function TATSynEdit.GetOneLine: boolean;

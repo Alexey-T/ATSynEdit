@@ -71,9 +71,8 @@ end;
 procedure TATStrings.DoFinalizeSaving;
 begin
   DoClearLineStates(true);
-
   if not FUndoAfterSave then
     DoClearUndo;
+  FModified:= false;
 end;
-
 
