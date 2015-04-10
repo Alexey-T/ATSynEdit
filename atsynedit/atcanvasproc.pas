@@ -115,9 +115,8 @@ begin
   end
   else
   begin
-    Dx:= (ARect.Left+ARect.Right) div 2;
-    X1:= Max(XLeft, Dx-AArrowSize*ACharSizeX  div 2);
-    X2:= Min(XRight, Dx+AArrowSize*ACharSizeX div 2);
+    X1:= XLeft;
+    X2:= Min(XRight, X1+AArrowSize*ACharSizeX);
   end;
 
   Y:= (ARect.Top+ARect.Bottom) div 2;
