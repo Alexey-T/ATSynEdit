@@ -283,8 +283,9 @@ object fmMain: TfmMain
     object Label3: TLabel
       Left = 5
       Height = 15
-      Top = 428
+      Top = 432
       Width = 70
+      Anchors = [akLeft, akBottom]
       Caption = 'one-line edit:'
       ParentColor = False
     end

@@ -297,17 +297,15 @@ const
   cOvr: array[boolean] of string = ('-', 'Ovr');
   cRo: array[boolean] of string = ('-', 'RO');
   cMod: array[boolean] of string = ('-', 'Mod');
+  cSel: array[boolean] of string = ('-', 'Column');
 var
   sPos: string;
-  sSel: string;
   i: integer;
 begin
   sPos:= '';
   for i:= 0 to Min(4, ed.Carets.Count-1) do
     with ed.Carets[i] do
       sPos:= sPos+Format(' %d:%d', [PosY+1, PosX+1]);
-
-  if ed.IsSelRectEmpty then sSel:= '-' else sSel:= 'Column';
 
   Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d', [
     sPos,
@@ -316,7 +314,7 @@ begin
     cEnd[ed.Strings.Endings],
     cOvr[ed.ModeOverwrite],
     cRo[ed.ModeReadOnly],
-    sSel,
+    cSel[not ed.IsSelRectEmpty],
     cMod[ed.Modified],
     ed.UndoCount,
     ed.RedoCount

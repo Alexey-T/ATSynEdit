@@ -1925,7 +1925,7 @@ begin
     Update(true);
 
   Strings.SaveToFile(AFilename);
-  DoEventState;
+  DoEventState; //modified
 end;
 
 procedure TATSynEdit.DoFoldLines(ALineFrom, ALineTo, ACharPosFrom: integer; AFold: boolean);
