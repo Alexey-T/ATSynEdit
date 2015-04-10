@@ -2,22 +2,34 @@
 
 function TATSynEdit.DoCommand_KeyHome: TATCommandResults;
 var
-  i, NIndent: integer;
-  Item: TATCaretItem;
+  i, NIndent, NWrapped: integer;
+  Caret: TATCaretItem;
+  Pnt: TPoint;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
-    Item:= FCarets[i];
-    NIndent:= SGetIndentChars(Strings.Lines[Item.PosY]);
-    if FOptKeyHomeToNonSpace then
+    Caret:= FCarets[i];
+    NWrapped:= 0;
+    NIndent:= 0;
+
+    if FOptKeyHomeEndNavigateWrapped then
     begin
-      if Item.PosX<>NIndent then
-        Item.PosX:= NIndent
-      else
-        Item.PosX:= 0;
-    end
+      Pnt.X:= 0;
+      Pnt.Y:= Caret.CoordY;
+      Pnt:= ClientPosToCaretPos(Pnt);
+      NWrapped:= Pnt.X;
+    end;
+
+    if FOptKeyHomeToNonSpace then
+      NIndent:= SGetIndentChars(Strings.Lines[Caret.PosY]);
+
+    if (NWrapped>0) and (Caret.PosX>NWrapped) then
+      Caret.PosX:= NWrapped
     else
-      Item.PosX:= 0;
+    if (NIndent>0) and (Caret.PosX>NIndent) then
+      Caret.PosX:= NIndent
+    else
+      Caret.PosX:= 0;
   end;
 
   Result:= [cResultCaretLeft];
@@ -25,24 +37,37 @@ end;
 
 function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
 var
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   Str: atString;
-  i, NLen: integer;
+  Pnt: TPoint;
+  i, NLen, NWrapped: integer;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
-    Item:= FCarets[i];
-    Str:= Strings.Lines[Item.PosY];
-    if FOptKeyEndToNonSpace then
+    Caret:= FCarets[i];
+    Str:= Strings.Lines[Caret.PosY];
+    NLen:= 0;
+    NWrapped:= 0;
+
+    if FOptKeyHomeEndNavigateWrapped then
     begin
+      Pnt.X:= ClientWidth;
+      Pnt.Y:= Caret.CoordY;
+      Pnt:= ClientPosToCaretPos(Pnt);
+      if Pnt.X<Length(Str) then
+        NWrapped:= Pnt.X;
+    end;
+
+    if FOptKeyEndToNonSpace then
       NLen:= SGetNonSpaceLength(Str);
-      if Item.PosX<>NLen then
-        Item.PosX:= NLen
-      else
-        Item.PosX:= Length(Str);
-    end
+
+    if (NWrapped<>0) and (Caret.PosX<NWrapped) then
+      Caret.PosX:= NWrapped
     else
-      Item.PosX:= Length(Str);
+    if (NLen<>0) and (Caret.PosX<NLen) then
+      Caret.PosX:= NLen
+    else
+      Caret.PosX:= Length(Str);
   end;
 
   Result:= [cResultCaretRight];
@@ -107,7 +132,7 @@ end;
 function TATSynEdit.DoCommand_KeyUpDown(ADown: boolean; ALines: integer): TATCommandResults;
 begin
   FCaretSpecPos:= true;
-  if FOptKeyNavigateWrapped then
+  if FOptKeyUpDownNavigateWrapped then
     Result:= DoCommand_KeyUpDown_Wrapped(ADown, ALines)
   else
     Result:= DoCommand_KeyUpDown_NextLine(ADown, ALines);

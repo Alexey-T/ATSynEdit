@@ -329,7 +329,8 @@ type
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptUseOverOnPaste: boolean;
-    FOptKeyNavigateWrapped: boolean;
+    FOptKeyUpDownNavigateWrapped: boolean;
+    FOptKeyHomeEndNavigateWrapped: boolean;
     FOptCopyLinesIfNoSel: boolean;
     FOptCutLinesIfNoSel: boolean;
     FOptHiliteSelFull: boolean;
@@ -675,7 +676,8 @@ type
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine;
-    property OptKeyNavigateWrapped: boolean read FOptKeyNavigateWrapped write FOptKeyNavigateWrapped;
+    property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped;
+    property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel;
     property OptKeyHomeToNonSpace: boolean read FOptKeyHomeToNonSpace write FOptKeyHomeToNonSpace;
@@ -1777,7 +1779,8 @@ begin
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;
-  FOptKeyNavigateWrapped:= true;
+  FOptKeyUpDownNavigateWrapped:= true;
+  FOptKeyHomeEndNavigateWrapped:= true;
   FOptUseOverOnPaste:= false;
   FOptWordChars:= '';
   FOptAutoIndent:= true;
