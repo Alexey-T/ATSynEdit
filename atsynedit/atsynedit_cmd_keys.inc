@@ -12,7 +12,7 @@ begin
     NWrapped:= 0;
     NIndent:= 0;
 
-    if FOptKeyHomeEndNavigateWrapped then
+    if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>cWrapOff) then
     begin
       Pnt.X:= 0;
       Pnt.Y:= Caret.CoordY;
@@ -49,7 +49,7 @@ begin
     NLen:= 0;
     NWrapped:= 0;
 
-    if FOptKeyHomeEndNavigateWrapped then
+    if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>cWrapOff) then
     begin
       Pnt.X:= ClientWidth;
       Pnt.Y:= Caret.CoordY;
@@ -61,10 +61,10 @@ begin
     if FOptKeyEndToNonSpace then
       NLen:= SGetNonSpaceLength(Str);
 
-    if (NWrapped<>0) and (Caret.PosX<NWrapped) then
+    if (NWrapped>0) and (Caret.PosX<NWrapped) then
       Caret.PosX:= NWrapped
     else
-    if (NLen<>0) and (Caret.PosX<NLen) then
+    if (NLen>0) and (Caret.PosX<NLen) then
       Caret.PosX:= NLen
     else
       Caret.PosX:= Length(Str);
