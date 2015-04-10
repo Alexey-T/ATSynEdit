@@ -110,7 +110,8 @@ type
     NMin,
     NMax,
     NPage,
-    NPos: integer;
+    NPos,
+    NPosLast: integer;
   end;
 
   TATSynCaretShape = (
@@ -229,7 +230,7 @@ type
     FMarginRight: integer;
     FMarginList: TList;
     FStringsInt,
-    FStringsExt: TATStrings;
+    FStringsExternal: TATStrings;
     FTextOffset: TPoint;
     FSelRect: TRect;
     FSelRectBegin,
@@ -329,6 +330,7 @@ type
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptUseOverOnPaste: boolean;
+    FOptKeyPageKeepsRelativePos: boolean;
     FOptKeyUpDownNavigateWrapped: boolean;
     FOptKeyHomeEndNavigateWrapped: boolean;
     FOptCopyLinesIfNoSel: boolean;
@@ -360,6 +362,7 @@ type
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetOneLine: boolean;
     function GetRedoCount: integer;
+    function GetScrollTopRelative: integer;
     function GetText: atString;
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
@@ -445,6 +448,7 @@ type
     procedure SetOneLine(AValue: boolean);
     procedure SetReadOnly(AValue: boolean);
     procedure SetScrollTop(AValue: integer);
+    procedure SetScrollTopRelative(AValue: integer);
     procedure SetStrings(Obj: TATStrings);
     function GetRectMain: TRect;
     function GetRectMinimap: TRect;
@@ -512,7 +516,7 @@ type
     function DoCommand_KeyEnd: TATCommandResults;
     function DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
     function DoCommand_KeyRight(ASelCommand: boolean): TATCommandResults;
-    function DoCommand_KeyUpDown(ADown: boolean; ALines: integer): TATCommandResults;
+    function DoCommand_KeyUpDown(ADown: boolean; ALines: integer; AKeepRelativePos: boolean): TATCommandResults;
     function DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_TextDelete: TATCommandResults;
@@ -550,6 +554,7 @@ type
     property Strings: TATStrings read GetStrings write SetStrings;
     property KeyMapping: TATKeyMapping read FKeyMapping;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
+    property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
     property ModeOverwrite: boolean read FOverwrite write FOverwrite;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property ModeOneLine: boolean read GetOneLine write SetOneLine;
@@ -676,6 +681,7 @@ type
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine;
+    property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped;
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
@@ -1072,6 +1078,7 @@ begin
       NMax:= Max(1, FWrapInfo.Count+NPage-1)
     else
       NMax:= Max(1, FWrapInfo.Count-1);
+    NPosLast:= Max(NMin, NMax-NPage);
   end;
 
   with FScrollHorz do
@@ -1082,6 +1089,7 @@ begin
     //hide horz bar for word-wrap:
     if FWrapMode=cWrapOn then
       NMax:= NPage;
+    NPosLast:= Max(NMin, NMax-NPage);
   end;
 
   bVert1:= GetScrollbarVisible(true);
@@ -1277,9 +1285,9 @@ var
   end;
   //
 begin
-  //wrap=off can cause incorrect scrollpos
+  //wrap turned off can cause bad scrollpos
   with AScrollVert do
-    NPos:= Min(NPos, Max(0, FWrapInfo.Count-NPage-1));
+    NPos:= Min(NPos, NPosLast);
 
   C.Brush.Color:= FColors.TextBG;
   C.FillRect(ARect);
@@ -1713,7 +1721,7 @@ begin
   FBitmap.Width:= cInitBitmapWidth;
   FBitmap.Height:= cInitBitmapHeight;
 
-  FStringsExt:= nil;
+  FStringsExternal:= nil;
   FStringsInt:= TATStrings.Create;
   FStringsInt.OnGetCaretsArray:= GetCaretsArray;
   FStringsInt.OnSetCaretsArray:= SetCaretsArray;
@@ -1779,6 +1787,7 @@ begin
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;
+  FOptKeyPageKeepsRelativePos:= true;
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptUseOverOnPaste:= false;
@@ -1937,8 +1946,8 @@ end;
 
 function TATSynEdit.GetStrings: TATStrings;
 begin
-  if Assigned(FStringsExt) then
-    Result:= FStringsExt
+  if Assigned(FStringsExternal) then
+    Result:= FStringsExternal
   else
     Result:= FStringsInt;
 end;
@@ -2045,9 +2054,15 @@ begin
       end;
 end;
 
+procedure TATSynEdit.SetScrollTopRelative(AValue: integer);
+begin
+  with FScrollVert do
+    NPos:= Max(0, NPos + (GetScrollTopRelative - AValue));
+end;
+
 procedure TATSynEdit.SetStrings(Obj: TATStrings);
 begin
-  FStringsExt:= Obj;
+  FStringsExternal:= Obj;
 end;
 
 function TATSynEdit.GetTextOffset: TPoint;
@@ -2165,20 +2180,16 @@ begin
 end;
 
 function UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
-var
-  AMax: integer;
 begin
-  AMax:= Max(0, Info.NMax-Info.NPage)+1;
-
   case Msg.ScrollCode of
     SB_TOP:        Info.NPos:= Info.NMin;
-    SB_BOTTOM:     Info.NPos:= AMax;
+    SB_BOTTOM:     Info.NPos:= Info.NPosLast;
 
     SB_LINEUP:     Info.NPos:= Max(Info.NPos-1, Info.NMin);
-    SB_LINEDOWN:   Info.NPos:= Min(Info.NPos+1, AMax);
+    SB_LINEDOWN:   Info.NPos:= Min(Info.NPos+1, Info.NPosLast);
 
     SB_PAGEUP:     Info.NPos:= Max(Info.NPos-Info.NPage, Info.NMin);
-    SB_PAGEDOWN:   Info.NPos:= Min(Info.NPos+Info.NPage, AMax);
+    SB_PAGEDOWN:   Info.NPos:= Min(Info.NPos+Info.NPage, Info.NPosLast);
 
     SB_THUMBPOSITION,
     SB_THUMBTRACK: Info.NPos:= Msg.Pos;
@@ -2833,9 +2844,9 @@ end;
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
   with FScrollHorz do
-    NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
+    NPos:= Max(0, Min(NPosLast, NPos+Dx));
   with FScrollVert do
-    NPos:= Max(0, Min(NMax-NPage, NPos+Dy));
+    NPos:= Max(0, Min(NPosLast, NPos+Dy));
 end;
 
 procedure TATSynEdit.MenuClick(Sender: TObject);
@@ -2980,6 +2991,18 @@ end;
 function TATSynEdit.GetRedoCount: integer;
 begin
   Result:= Strings.RedoCount;
+end;
+
+function TATSynEdit.GetScrollTopRelative: integer;
+var
+  P: TPoint;
+begin
+  if Carets.Count=0 then
+    begin Result:= 0; Exit end;
+  with Carets[0] do
+    P:= Point(PosX, PosY);
+  P:= CaretPosToClientPos(P);
+  Result:= (P.Y-FRectMain.Top) div FCharSize.Y;
 end;
 
 function TATSynEdit.GetText: atString;

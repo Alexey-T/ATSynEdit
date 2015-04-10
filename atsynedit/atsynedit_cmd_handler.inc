@@ -132,17 +132,17 @@ begin
     cCommand_KeyRight:            Res:= DoCommand_KeyRight(false);
     cCommand_KeyRight_Sel:        Res:= DoCommand_KeyRight(true);
     cCommand_KeyUp,
-    cCommand_KeyUp_Sel:           Res:= DoCommand_KeyUpDown(false, 1);
+    cCommand_KeyUp_Sel:           Res:= DoCommand_KeyUpDown(false, 1, false);
     cCommand_KeyDown,
-    cCommand_KeyDown_Sel:         Res:= DoCommand_KeyUpDown(true, 1);
+    cCommand_KeyDown_Sel:         Res:= DoCommand_KeyUpDown(true, 1, false);
     cCommand_KeyHome,
     cCommand_KeyHome_Sel:         Res:= DoCommand_KeyHome;
     cCommand_KeyEnd,
     cCommand_KeyEnd_Sel:          Res:= DoCommand_KeyEnd;
     cCommand_KeyPageUp,
-    cCommand_KeyPageUp_Sel:       Res:= DoCommand_KeyUpDown(false, GetPageLines);
+    cCommand_KeyPageUp_Sel:       Res:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
     cCommand_KeyPageDown,
-    cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetPageLines);
+    cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
 
     cCommand_ColSelectLeft:      Res:= DoCommand_SelectColumn(cDirLeft);
     cCommand_ColSelectRight:     Res:= DoCommand_SelectColumn(cDirRight);

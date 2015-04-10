@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet5
-    TabIndex = 2
+    ActivePage = TabSheet1
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -393,14 +393,14 @@ object fmOpt: TfmOpt
           'size/2'
         )
         Style = csDropDownList
-        TabOrder = 12
+        TabOrder = 13
       end
       object Label3: TLabel
         Left = 120
         Height = 15
         Top = 256
-        Width = 100
-        Caption = 'page up/down size'
+        Width = 102
+        Caption = 'page-up/down size'
         ParentColor = False
       end
       object chkOvrSel: TCheckBox
@@ -409,7 +409,7 @@ object fmOpt: TfmOpt
         Top = 8
         Width = 124
         Caption = 'overwrite sel by text'
-        TabOrder = 7
+        TabOrder = 8
       end
       object chkTabInd: TCheckBox
         Left = 8
@@ -448,7 +448,7 @@ object fmOpt: TfmOpt
           'tabs only'
         )
         Style = csDropDownList
-        TabOrder = 11
+        TabOrder = 12
       end
       object edIndent: TSpinEdit
         Left = 8
@@ -457,7 +457,7 @@ object fmOpt: TfmOpt
         Width = 50
         MaxValue = 30
         MinValue = -10
-        TabOrder = 10
+        TabOrder = 11
         Value = 1
       end
       object Label4: TLabel
@@ -474,7 +474,7 @@ object fmOpt: TfmOpt
         Top = 48
         Width = 130
         Caption = 'unindent keeps align'
-        TabOrder = 9
+        TabOrder = 10
       end
       object chkEnd: TCheckBox
         Left = 8
@@ -490,7 +490,7 @@ object fmOpt: TfmOpt
         Top = 28
         Width = 89
         Caption = 'tab as spaces'
-        TabOrder = 8
+        TabOrder = 9
       end
       object chkNavWrap2: TCheckBox
         Left = 8
@@ -499,6 +499,14 @@ object fmOpt: TfmOpt
         Width = 216
         Caption = 'home/end: navigate in wrapped lines'
         TabOrder = 1
+      end
+      object chkPageKeepRel: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 148
+        Width = 226
+        Caption = 'page-up/down: keep relative top offset'
+        TabOrder = 7
       end
     end
     object TabSheet3: TTabSheet

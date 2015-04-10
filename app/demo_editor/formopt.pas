@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkPageKeepRel: TCheckBox;
     chkNavWrap2: TCheckBox;
     chkGutterBm: TCheckBox;
     chkGutterEmpty: TCheckBox;
@@ -179,6 +180,7 @@ begin
     edIndent.Value:= ed.OptIndentSize;
     chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
     edPage.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
+    chkPageKeepRel.Checked:= ed.OptKeyPageKeepsRelativePos;
 
     //mouse
     chkClick2.Checked:= ed.OptMouse2ClickSelectsLine;
@@ -251,6 +253,7 @@ begin
       ed.OptKeyLeftRightSwapSel:= chkLeftRt.Checked;
       ed.OptKeyHomeToNonSpace:= chkHome.Checked;
       ed.OptKeyEndToNonSpace:= chkEnd.Checked;
+      ed.OptKeyPageKeepsRelativePos:= chkPageKeepRel.Checked;
       ed.OptKeyTabIndents:= chkTabInd.Checked;
       ed.OptAutoIndent:= chkAutoInd.Checked;
       ed.OptAutoIndentKind:= TATAutoIndentKind(edAutoInd.ItemIndex);
