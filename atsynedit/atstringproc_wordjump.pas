@@ -18,8 +18,8 @@ implementation
 const
   //no EOL here, we jump only inside line
   cCharsSp: atString = ' '#9;
-  //no chars '@' and '$', word-chars for email-text, php
-  cCharsSymb: atString = '!"#%&''()[]{}<>*+-/=,.:;?\^`|~‚„…‹›‘’“”–—¦«»­±';
+  //no chars '@' (email) and '$' (used in php)
+  cCharsSymb: atString = '!"#%&''()[]{}<>*+-/=,.:;?\^`|~‚„…‹›‘’“”–—¦«»­±';
 
 
 type

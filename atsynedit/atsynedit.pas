@@ -1793,7 +1793,7 @@ begin
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptUseOverOnPaste:= false;
-  FOptWordChars:= '';
+  FOptWordChars:= '@';
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsIs;
   FOptTabSpaces:= false;

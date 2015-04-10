@@ -97,10 +97,12 @@
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc_WordJump"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
