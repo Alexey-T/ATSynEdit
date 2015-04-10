@@ -29,9 +29,6 @@ type
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: array of integer) of object;
 
-var
-  CanvasTabArrowSize: integer = 0;
-
 
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
@@ -44,6 +41,7 @@ procedure CanvasTextOut(C: TCanvas;
   AColorHex: TColor;
   out AStrWidth: integer;
   ACharsSkipped: integer;
+  AArrowSize: integer;
   AParts: PATLineParts;
   AEvent: TATSynEditDrawLineEvent);
 
@@ -100,7 +98,7 @@ begin
   C.FillRect(R);
 end;
 
-procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor; ACharSizeX: integer);
+procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor; ACharSizeX, AArrowSize: integer);
 const
   cIndent = 1; //offset left/rt
   cScale = 4; //part 1/N of height
@@ -110,7 +108,7 @@ begin
   XLeft:= ARect.Left+cIndent;
   XRight:= ARect.Right-cIndent;
 
-  if CanvasTabArrowSize=0 then
+  if AArrowSize=0 then
   begin;
     X1:= XLeft;
     X2:= XRight;
@@ -118,8 +116,8 @@ begin
   else
   begin
     Dx:= (ARect.Left+ARect.Right) div 2;
-    X1:= Max(XLeft, Dx-CanvasTabArrowSize*ACharSizeX  div 2);
-    X2:= Min(XRight, Dx+CanvasTabArrowSize*ACharSizeX div 2);
+    X1:= Max(XLeft, Dx-AArrowSize*ACharSizeX  div 2);
+    X2:= Min(XRight, Dx+AArrowSize*ACharSizeX div 2);
   end;
 
   Y:= (ARect.Top+ARect.Bottom) div 2;
@@ -139,7 +137,8 @@ procedure DoPaintUnprintedChars(C: TCanvas;
   const AOffsets: array of integer;
   APoint: TPoint;
   ACharSize: TPoint;
-  AColorFont: TColor);
+  AColorFont: TColor;
+  AArrowSize: integer);
 var
   R: TRect;
   i: integer;
@@ -161,7 +160,7 @@ begin
       if AString[i]=' ' then
         DoPaintUnprintedSpace(C, R, cUnprintedDotScale, AColorFont)
       else
-        DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X);
+        DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X, AArrowSize);
     end;
 end;
 
@@ -263,8 +262,8 @@ end;
 procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   ATabSize: integer; ACharSize: TPoint; AReplaceSpecs: boolean;
   AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
-  AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
-  AEvent: TATSynEditDrawLineEvent);
+  AStrWidth: integer; ACharsSkipped: integer; AArrowSize: integer;
+  AParts: PATLineParts; AEvent: TATSynEditDrawLineEvent);
 var
   ListReal: array of real;
   ListInt: array of Longint;
@@ -366,7 +365,7 @@ begin
     end;
 
   if AShowUnprintable then
-    DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable);
+    DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable, AArrowSize);
 
   AStrWidth:= ListInt[High(ListInt)];
 
