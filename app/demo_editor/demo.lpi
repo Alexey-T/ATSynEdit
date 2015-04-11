@@ -45,7 +45,6 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -97,12 +96,10 @@
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc_WordJump"/>
       </Unit14>
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>

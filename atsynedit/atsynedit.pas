@@ -1560,6 +1560,7 @@ begin
   C.Font.Size:= FMinimapFontSize;
   FCharSizeMinimap:= GetCharSize(C, FCharSpacingMinimap);
   FScrollVertMinimap.NPos:= GetMinimapScrollPos;
+  FScrollVertMinimap.NPosLast:= MaxInt div 2;
   DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap);
   C.Font.Size:= Font.Size;
 
@@ -1793,7 +1794,7 @@ begin
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptUseOverOnPaste:= false;
-  FOptWordChars:= '@';
+  FOptWordChars:= '';
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsIs;
   FOptTabSpaces:= false;
