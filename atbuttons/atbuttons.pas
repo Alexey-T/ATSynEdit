@@ -18,6 +18,7 @@ type
     FCheckable: boolean;
     FCaption: string;
     FOnClick: TNotifyEvent;
+    procedure SetChecked(AValue: boolean);
   protected
     procedure Paint; override;
     procedure MouseEnter; override;
@@ -32,7 +33,7 @@ type
     ColorBorderOver: TColor;
     constructor Create(AOwner: TComponent); override;
     property Caption: string read FCaption write FCaption;
-    property Checked: boolean read FChecked;
+    property Checked: boolean read FChecked write SetChecked;
     property Checkable: boolean read FCheckable write FCheckable;
     property OnClick: TNotifyEvent read FOnClick write FOnClick;
   end;
@@ -42,6 +43,13 @@ implementation
 uses Math, Types;
 
 { TATSimpleButton }
+
+procedure TATSimpleButton.SetChecked(AValue: boolean);
+begin
+  if FChecked= AValue then Exit;
+  FChecked:= AValue;
+  Invalidate;
+end;
 
 procedure TATSimpleButton.Paint;
 var

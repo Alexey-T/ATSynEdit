@@ -34,7 +34,7 @@ begin
   b:= TATSimpleButton.create(self);
   b.parent:= self;
   b.SetBounds(50, 100, 180, 40);
-  b.Caption:= 'Test caption';
+  b.Caption:= 'Toggle chk';
   b.Font.Size:= 18;
   b.Font.Color:= clNavy;
   b.OnClick:= @FClick;
@@ -55,6 +55,8 @@ end;
 procedure TForm1.FClick(Snd: TObject);
 begin
   beep;
+  with b2 do Checked:= not Checked;
+  with b3 do Checked:= not Checked;
 end;
 
 end.
