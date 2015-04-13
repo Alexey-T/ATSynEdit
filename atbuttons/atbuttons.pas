@@ -47,7 +47,6 @@ procedure TATSimpleButton.Paint;
 var
   r: TRect;
   p: TPoint;
-  bPressed: boolean;
 begin
   inherited;
 
@@ -57,15 +56,14 @@ begin
       IfThen(FOver, ColorBgOver, ColorBgPassive));
   Canvas.FillRect(r);
 
-  bPressed:= FPressed or FChecked;
-  if bPressed then
+  if FPressed then
     InflateRect(r, -1, -1);
 
   Canvas.Pen.Color:= IfThen(FOver, ColorBorderOver, ColorBorderPassive);
   Canvas.Rectangle(r);
 
   p.x:= (ClientWidth - Canvas.TextWidth(FCaption)) div 2;
-  p.y:= (ClientHeight - Canvas.TextHeight('N')) div 2 + IfThen(bPressed, 1);
+  p.y:= (ClientHeight - Canvas.TextHeight('N')) div 2 + IfThen(FPressed, 1);
   Canvas.Font.Color:= ColorFont;
   Canvas.TextOut(p.x, p.y, FCaption);
 end;
@@ -112,6 +110,10 @@ end;
 constructor TATSimpleButton.Create(AOwner: TComponent);
 begin
   inherited;
+
+  ControlStyle:= ControlStyle
+    +[csOpaque, csNoFocus]
+    -[csDoubleClicks, csTripleClicks];
 
   FPressed:= false;
   FOver:= false;
