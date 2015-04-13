@@ -3,7 +3,8 @@ object Form1: TForm1
   Height = 299
   Top = 341
   Width = 515
-  Caption = 'Form1'
+  Caption = 'SimpleButton'
   OnCreate = FormCreate
+  Position = poScreenCenter
   LCLVersion = '1.5'
 end

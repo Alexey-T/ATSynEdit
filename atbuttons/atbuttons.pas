@@ -5,26 +5,26 @@ unit ATButtons;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Controls, Buttons;
+  Classes, SysUtils, Graphics, Controls;
 
 type
   { TATSimpleButton }
 
   TATSimpleButton = class(TCustomControl)
-  protected
+  private
     FPressed,
     FOver,
     FChecked,
     FCheckable: boolean;
     FCaption: string;
     FOnClick: TNotifyEvent;
+  protected
     procedure Paint; override;
     procedure MouseEnter; override;
     procedure MouseLeave; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   public
-    ColorFont,
     ColorBgPassive,
     ColorBgOver,
     ColorBgChecked,
@@ -58,13 +58,12 @@ begin
 
   if FPressed then
     InflateRect(r, -1, -1);
-
   Canvas.Pen.Color:= IfThen(FOver, ColorBorderOver, ColorBorderPassive);
   Canvas.Rectangle(r);
 
+  Canvas.Font.Assign(Self.Font);
   p.x:= (ClientWidth - Canvas.TextWidth(FCaption)) div 2;
   p.y:= (ClientHeight - Canvas.TextHeight('N')) div 2 + IfThen(FPressed, 1);
-  Canvas.Font.Color:= ColorFont;
   Canvas.TextOut(p.x, p.y, FCaption);
 end;
 
@@ -115,12 +114,13 @@ begin
     +[csOpaque, csNoFocus]
     -[csDoubleClicks, csTripleClicks];
 
+  FCaption:= 'Btn';
   FPressed:= false;
   FOver:= false;
   FChecked:= false;
   FCheckable:= false;
+  FOnClick:= nil;
 
-  ColorFont:= $404040;
   ColorBgPassive:= $e0e0e0;
   ColorBgOver:= $e0e0e0;
   ColorBgChecked:= $b0b0b0;

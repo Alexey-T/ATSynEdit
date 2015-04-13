@@ -17,7 +17,7 @@ type
   public
     { public declarations }
     b, b2, b3: TATSimpleButton;
-    procedure Cl(Snd: TObject);
+    procedure FClick(Snd: TObject);
   end;
 
 var
@@ -33,9 +33,11 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
   b:= TATSimpleButton.create(self);
   b.parent:= self;
-  b.SetBounds(50, 100, 150, 30);
+  b.SetBounds(50, 100, 180, 40);
   b.Caption:= 'Test caption';
-  b.OnClick:= @Cl;
+  b.Font.Size:= 18;
+  b.Font.Color:= clNavy;
+  b.OnClick:= @FClick;
 
   b2:= TATSimpleButton.create(self);
   b2.parent:= self;
@@ -50,7 +52,7 @@ begin
   b3.Checkable:= true;
 end;
 
-procedure TForm1.Cl(Snd: TObject);
+procedure TForm1.FClick(Snd: TObject);
 begin
   beep;
 end;
