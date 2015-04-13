@@ -23,6 +23,9 @@ type
     ColorBgChecked,
     ColorBorderPassive,
     ColorBorderOver: TColor;
+    MouseoverBorderWidth: integer;
+    PressedBorderWidth: integer;
+    PressedCaptionLower: integer;
   end;
 
 var
@@ -79,6 +82,7 @@ procedure TATSimpleButton.Paint;
 var
   r: TRect;
   p: TPoint;
+  i: integer;
 begin
   inherited;
 
@@ -88,15 +92,26 @@ begin
       IfThen(FOver, ATButtonTheme.ColorBgOver, ATButtonTheme.ColorBgPassive));
   Canvas.FillRect(r);
 
+  Canvas.Brush.Style:= bsClear;
   Canvas.Pen.Color:= IfThen(FOver, ATButtonTheme.ColorBorderOver, ATButtonTheme.ColorBorderPassive);
   Canvas.Rectangle(r);
 
-  //double border for pressed btn
+  //thick border for pressed btn
   if FPressed then
-  begin
-    InflateRect(r, -1, -1);
-    Canvas.Rectangle(r);
-  end;
+    for i:= 1 to ATButtonTheme.PressedBorderWidth-1 do
+    begin
+      InflateRect(r, -1, -1);
+      Canvas.Rectangle(r);
+    end
+  else
+  if FOver then
+    for i:= 1 to ATButtonTheme.MouseoverBorderWidth-1 do
+    begin
+      InflateRect(r, -1, -1);
+      Canvas.Rectangle(r);
+    end;
+
+  Canvas.Brush.Style:= bsSolid;
 
   Canvas.Font.Name:= ATButtonTheme.FontName;
   Canvas.Font.Color:= ATButtonTheme.ColorFont;
@@ -104,7 +119,8 @@ begin
   Canvas.Font.Style:= ATButtonTheme.FontStyles;
 
   p.x:= (ClientWidth - Canvas.TextWidth(FCaption)) div 2;
-  p.y:= (ClientHeight - Canvas.TextHeight('N')) div 2 + IfThen(FPressed, 1);
+  p.y:= (ClientHeight - Canvas.TextHeight(FCaption)) div 2 +
+    IfThen(FPressed, ATButtonTheme.PressedCaptionLower);
   Canvas.TextOut(p.x, p.y, FCaption);
 end;
 
@@ -176,6 +192,9 @@ initialization
     ColorBgChecked:= $b0b0b0;
     ColorBorderPassive:= clMedGray;
     ColorBorderOver:= $d0d0d0;
+    MouseoverBorderWidth:= 1;
+    PressedBorderWidth:= 3;
+    PressedCaptionLower:= 1;
   end;
 
 end.
