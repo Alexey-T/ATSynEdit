@@ -53,6 +53,7 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
   public
     constructor Create(AOwner: TComponent); override;
+  published
     property Caption: string read FCaption write SetCaption;
     property Checked: boolean read FChecked write SetChecked;
     property Checkable: boolean read FCheckable write FCheckable;
@@ -172,6 +173,9 @@ begin
   ControlStyle:= ControlStyle
     +[csOpaque, csNoFocus]
     -[csDoubleClicks, csTripleClicks];
+
+  Width:= 100;
+  Height:= 25;
 
   FCaption:= 'Btn';
   FPressed:= false;

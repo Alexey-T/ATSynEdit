@@ -11,6 +11,7 @@ type
   { TForm1 }
 
   TForm1 = class(TForm)
+    procedure ATSimpleButton1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     { private declarations }
@@ -48,6 +49,11 @@ begin
   b3.SetBounds(130, 150, 80, 30);
   b3.Caption:= 'Check2';
   b3.Checkable:= true;
+end;
+
+procedure TForm1.ATSimpleButton1Click(Sender: TObject);
+begin
+  beep;
 end;
 
 procedure TForm1.FClick(Snd: TObject);
