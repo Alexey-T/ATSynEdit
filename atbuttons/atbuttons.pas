@@ -1,3 +1,8 @@
+{
+Copyright (C) Alexey Torgashin, uvviewsoft.com
+License: MPL 2.0
+}
+
 unit ATButtons;
 
 {$mode objfpc}{$H+}
@@ -83,10 +88,15 @@ begin
       IfThen(FOver, ATButtonTheme.ColorBgOver, ATButtonTheme.ColorBgPassive));
   Canvas.FillRect(r);
 
-  if FPressed then
-    InflateRect(r, -1, -1);
   Canvas.Pen.Color:= IfThen(FOver, ATButtonTheme.ColorBorderOver, ATButtonTheme.ColorBorderPassive);
   Canvas.Rectangle(r);
+
+  //double border for pressed btn
+  if FPressed then
+  begin
+    InflateRect(r, -1, -1);
+    Canvas.Rectangle(r);
+  end;
 
   Canvas.Font.Name:= ATButtonTheme.FontName;
   Canvas.Font.Color:= ATButtonTheme.ColorFont;
