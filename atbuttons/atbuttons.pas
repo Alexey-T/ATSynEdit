@@ -26,6 +26,7 @@ type
     MouseoverBorderWidth: integer;
     PressedBorderWidth: integer;
     PressedCaptionLower: integer;
+    PressedCaptionRighter: integer;
   end;
 
 var
@@ -118,7 +119,8 @@ begin
   Canvas.Font.Size:= ATButtonTheme.FontSize;
   Canvas.Font.Style:= ATButtonTheme.FontStyles;
 
-  p.x:= (ClientWidth - Canvas.TextWidth(FCaption)) div 2;
+  p.x:= (ClientWidth - Canvas.TextWidth(FCaption)) div 2 +
+    IfThen(FPressed, ATButtonTheme.PressedCaptionRighter);
   p.y:= (ClientHeight - Canvas.TextHeight(FCaption)) div 2 +
     IfThen(FPressed, ATButtonTheme.PressedCaptionLower);
   Canvas.TextOut(p.x, p.y, FCaption);
@@ -193,8 +195,9 @@ initialization
     ColorBorderPassive:= clMedGray;
     ColorBorderOver:= $d0d0d0;
     MouseoverBorderWidth:= 1;
-    PressedBorderWidth:= 3;
+    PressedBorderWidth:= 2;
     PressedCaptionLower:= 1;
+    PressedCaptionRighter:= 0;
   end;
 
 end.
