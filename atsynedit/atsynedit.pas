@@ -207,6 +207,7 @@ const
 type
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
+  TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
 
@@ -216,6 +217,7 @@ type
 
   TATSynEdit = class(TCustomControl)
   private
+    procedure DoEventClickMicromap(AX, AY: integer);
     function GetMouseNiceScroll: boolean;
     procedure SetMouseNiceScroll(AValue: boolean);
   private
@@ -257,6 +259,7 @@ type
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
     FOnClickGutter: TATSynEditClickGutterEvent;
+    FOnClickMicromap: TATSynEditClickMicromapEvent;
     FOnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent;
     FOnDrawLine: TATSynEditDrawLineEvent;
     FOnDrawMicromap: TATSynEditDrawRectEvent;
@@ -619,6 +622,7 @@ type
     property OnStateChanged: TNotifyEvent read FOnStateChanged write FOnStateChanged;
     property OnCommand: TATSynEditCommandEvent read FOnCommand write FOnCommand;
     property OnClickGutter: TATSynEditClickGutterEvent read FOnClickGutter write FOnClickGutter;
+    property OnClickMicromap: TATSynEditClickMicromapEvent read FOnClickMicromap write FOnClickMicromap;
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
@@ -2235,12 +2239,12 @@ begin
     Exit
   end;
 
-  if PtInRect(FRectMinimap, Point(X, Y)) then
-  if Shift=[ssLeft] then
-  begin
-    DoMinimapClick(Y);
-    Exit
-  end;
+  if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
+    if Shift=[ssLeft] then
+    begin
+      DoMinimapClick(Y);
+      Exit
+    end;
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
@@ -2302,22 +2306,29 @@ begin
     end;
   end;
 
-  if PtInRect(FRectGutter, Point(X, Y)) then
-  if Shift=[ssLeft] then
-  begin
-    //handle click on numbers here
-    if FOptMouseGutterClickSelectsLine and
-      (X>=FGutter[FGutterBandNum].Left) and
-      (X<FGutter[FGutterBandNum].Right) then
+  if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
+    if Shift=[ssLeft] then
     begin
-      FSelRect:= cRectEmpty;
-      FMouseDownNumber:= PCaret.Y;
-      DoSelect_Line(PCaret);
-    end
-    else
-      //on other bands- event
-      DoEventClickGutter(FGutter.IndexAt(X), PCaret.Y);
-  end;
+      //handle click on numbers here
+      if FOptMouseGutterClickSelectsLine and
+        (X>=FGutter[FGutterBandNum].Left) and
+        (X<FGutter[FGutterBandNum].Right) then
+      begin
+        FSelRect:= cRectEmpty;
+        FMouseDownNumber:= PCaret.Y;
+        DoSelect_Line(PCaret);
+      end
+      else
+        //on other bands- event
+        DoEventClickGutter(FGutter.IndexAt(X), PCaret.Y);
+    end;
+
+  if FMicromapVisible and PtInRect(FRectMicromap, Point(X, Y)) then
+    if Shift=[ssLeft] then
+    begin
+      DoEventClickMicromap(X-FRectMicromap.Left, Y-FRectMicromap.Top);
+      Exit
+    end;
 
   DoCaretsSort;
   DoEventCarets;
@@ -2837,6 +2848,12 @@ procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer);
 begin
   if Assigned(FOnClickGutter) then
     FOnClickGutter(Self, ABandIndex, ALineNumber);
+end;
+
+procedure TATSynEdit.DoEventClickMicromap(AX, AY: integer);
+begin
+  if Assigned(FOnClickMicromap) then
+    FOnClickMicromap(Self, AX, AY);
 end;
 
 procedure TATSynEdit.DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);

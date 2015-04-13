@@ -125,6 +125,7 @@ type
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
+    procedure EditClickMicromap(Snd: TObject; AX, AY: integer);
     procedure EditDrawBm(Snd: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Snd: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawTest(Snd: TObject; C: TCanvas; const ARect: TRect);
@@ -172,6 +173,7 @@ begin
   ed.OnStateChanged:= EditCaretMoved;
   ed.OnCommand:= EditCommand;
   ed.OnClickGutter:= EditClickGutter;
+  ed.OnClickMicromap:= EditClickMicromap;
   ed.OnDrawBookmarkIcon:= EditDrawBm;
   ed.OnDrawLine:= EditDrawLine;
   ed.OnDrawMicromap:= EditDrawMicromap;
@@ -381,6 +383,11 @@ begin
     ed.DoSelect_Line(Point(0, ALine), true);
   end;
   }
+end;
+
+procedure TfmMain.EditClickMicromap(Snd: TObject; AX, AY: integer);
+begin
+  Showmessage(Format('Micromap click: %d:%d', [AX, AY]));
 end;
 
 procedure TfmMain.EditDrawBm(Snd: TObject; C: TCanvas; ALineNum: integer;
