@@ -16,7 +16,7 @@ type
     { private declarations }
   public
     { public declarations }
-    b: TATSimpleButton;
+    b, b2, b3: TATSimpleButton;
     procedure Cl(Snd: TObject);
   end;
 
@@ -36,6 +36,18 @@ begin
   b.SetBounds(50, 100, 150, 30);
   b.Caption:= 'Test caption';
   b.OnClick:= @Cl;
+
+  b2:= TATSimpleButton.create(self);
+  b2.parent:= self;
+  b2.SetBounds(50, 150, 80, 30);
+  b2.Caption:= 'Check1';
+  b2.Checkable:= true;
+
+  b3:= TATSimpleButton.create(self);
+  b3.parent:= self;
+  b3.SetBounds(130, 150, 80, 30);
+  b3.Caption:= 'Check2';
+  b3.Checkable:= true;
 end;
 
 procedure TForm1.Cl(Snd: TObject);
