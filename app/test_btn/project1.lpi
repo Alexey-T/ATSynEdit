@@ -47,11 +47,11 @@
         <ComponentName Value="Form1"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Unit1"/>
       </Unit1>
       <Unit2>
         <Filename Value="..\..\atbuttons\atbuttons.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATButtons"/>
       </Unit2>
     </Units>
   </ProjectOptions>

@@ -25,8 +25,8 @@ type
     ColorBorderOver: TColor;
     MouseoverBorderWidth: integer;
     PressedBorderWidth: integer;
-    PressedCaptionLower: integer;
-    PressedCaptionRighter: integer;
+    PressedCaptionShiftY: integer;
+    PressedCaptionShiftX: integer;
   end;
 
 var
@@ -84,46 +84,45 @@ procedure TATSimpleButton.Paint;
 var
   r: TRect;
   p: TPoint;
-  i: integer;
+  size, i: integer;
 begin
   inherited;
 
+  //----draw bg
   r:= ClientRect;
   Canvas.Brush.Color:=
     IfThen(FChecked, ATButtonTheme.ColorBgChecked,
       IfThen(FOver, ATButtonTheme.ColorBgOver, ATButtonTheme.ColorBgPassive));
   Canvas.FillRect(r);
 
+  //----draw border
   Canvas.Brush.Style:= bsClear;
+
   Canvas.Pen.Color:= IfThen(FOver, ATButtonTheme.ColorBorderOver, ATButtonTheme.ColorBorderPassive);
   Canvas.Rectangle(r);
 
-  //thick border for pressed btn
-  if FPressed then
-    for i:= 1 to ATButtonTheme.PressedBorderWidth-1 do
-    begin
-      InflateRect(r, -1, -1);
-      Canvas.Rectangle(r);
-    end
-  else
-  if FOver then
-    for i:= 1 to ATButtonTheme.MouseoverBorderWidth-1 do
-    begin
-      InflateRect(r, -1, -1);
-      Canvas.Rectangle(r);
-    end;
+  size:= 1;
+  if FPressed then size:= ATButtonTheme.PressedBorderWidth else
+  if FOver then size:= ATButtonTheme.MouseoverBorderWidth;
+
+  for i:= 1 to size-1 do
+  begin
+    InflateRect(r, -1, -1);
+    Canvas.Rectangle(r);
+  end;
 
   Canvas.Brush.Style:= bsSolid;
 
+  //----draw caption
   Canvas.Font.Name:= ATButtonTheme.FontName;
   Canvas.Font.Color:= ATButtonTheme.ColorFont;
   Canvas.Font.Size:= ATButtonTheme.FontSize;
   Canvas.Font.Style:= ATButtonTheme.FontStyles;
 
   p.x:= (ClientWidth - Canvas.TextWidth(FCaption)) div 2 +
-    IfThen(FPressed, ATButtonTheme.PressedCaptionRighter);
+    IfThen(FPressed, ATButtonTheme.PressedCaptionShiftX);
   p.y:= (ClientHeight - Canvas.TextHeight(FCaption)) div 2 +
-    IfThen(FPressed, ATButtonTheme.PressedCaptionLower);
+    IfThen(FPressed, ATButtonTheme.PressedCaptionShiftY);
   Canvas.TextOut(p.x, p.y, FCaption);
 end;
 
@@ -196,12 +195,12 @@ initialization
     ColorBgPassive:= $e0e0e0;
     ColorBgOver:= $e0e0e0;
     ColorBgChecked:= $b0b0b0;
-    ColorBorderPassive:= clMedGray;
+    ColorBorderPassive:= $a0a0a0;
     ColorBorderOver:= $d0d0d0;
     MouseoverBorderWidth:= 1;
     PressedBorderWidth:= 2;
-    PressedCaptionLower:= 1;
-    PressedCaptionRighter:= 0;
+    PressedCaptionShiftX:= 0;
+    PressedCaptionShiftY:= 1;
   end;
 
 end.
