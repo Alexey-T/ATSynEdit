@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, ATStringProc, formkey,
-  formopt;
+  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, ATStringProc, ATEdits,
+  formkey, formopt;
 
 type
   { TfmMain }
@@ -376,6 +376,11 @@ begin
     with ed1 do
     begin
       s:= UTF8Encode(Text);
+      ShowMessage('Enter: '+s);
+
+      Text:= '';
+      DoCaretSingle(0, 0);
+
       n:= Items.IndexOf(s);
       if n>=0 then Items.Delete(n);
       Items.Insert(0, s);

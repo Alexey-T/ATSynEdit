@@ -416,8 +416,6 @@ type
     function GetCaretTime: integer;
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoCaretsSort;
-    procedure DoCaretSingle(AX, AY: integer);
-    procedure DoCaretSingleAsIs;
     //events
     procedure DoEventCarets;
     procedure DoEventScroll;
@@ -578,6 +576,8 @@ type
     procedure LoadFromFile(const AFilename: string);
     procedure SaveToFile(const AFilename: string);
     //carets
+    procedure DoCaretSingle(AX, AY: integer);
+    procedure DoCaretSingleAsIs;
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint): TPoint;
     property Carets: TATCarets read FCarets;
@@ -707,32 +707,6 @@ type
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces;
   end;
-
-type
-  { TATEdit }
-
-  TATEdit = class(TATSynEdit)
-  public
-    constructor Create(AOwner: TComponent); override;
-  end;
-
-type
-  { TATComboEdit }
-
-  TATComboEdit = class(TATEdit)
-  private
-    FItems: TStringList;
-    FMenu: TPopupMenu;
-    procedure MicromapClick(Sender: TObject; AX, AY: integer);
-    procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
-    procedure DoMenu;
-    procedure MenuItemClick(Sender: TObject);
-  public
-    constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    property Items: TStringList read FItems;
-  end;
-
 
 implementation
 
@@ -3176,107 +3150,6 @@ end;
 {$I atsynedit_cmd_editing.inc}
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
-
-
-{ TATEdit }
-
-constructor TATEdit.Create(AOwner: TComponent);
-begin
-  inherited;
-
-  ModeOneLine:= true;
-  BorderStyle:= bsSingle;
-
-  OptOffsetTop:= 2;
-  Height:= 26;
-end;
-
-{ TATComboEdit }
-
-procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
-begin
-  DoMenu;
-end;
-
-procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
-  const ARect: TRect);
-const
-  dx = 4;
-var
-  color: TColor;
-  size, dy: integer;
-begin
-  color:= FColors.GutterFont;
-  size:= FMicromapWidth - 2*dx;
-  dy:= (ClientHeight-size div 2) div 2;
-
-  C.Brush.Color:= FColors.TextBG;
-  C.FillRect(ARect);
-
-  C.Brush.Color:= color;
-  C.Pen.Color:= color;
-  C.Polygon([
-    Point(ARect.Left+dx, ARect.Top+dy),
-    Point(ARect.Left+dx+size, ARect.Top+dy),
-    Point(ARect.Left+dx+size div 2, ARect.Top+dy+size div 2)
-    ]);
-end;
-
-procedure TATComboEdit.DoMenu;
-var
-  p: TPoint;
-  i: integer;
-  mi: TMenuItem;
-begin
-  p:= ClientToScreen(Point(Width-FMicromapWidth, Height));
-  with FMenu.Items do
-  begin
-    Clear;
-    for i:= 0 to FItems.Count-1 do
-    begin
-      mi:= TMenuItem.Create(Self);
-      mi.Caption:= FItems[i];
-      mi.Tag:= i;
-      mi.OnClick:= MenuItemClick;
-      Add(mi);
-    end;
-  end;
-  FMenu.PopUp(p.x, p.y);
-end;
-
-procedure TATComboEdit.MenuItemClick(Sender: TObject);
-var
-  n: integer;
-begin
-  n:= (Sender as TMenuItem).Tag;
-  if n>=0 then
-  begin
-    Text:= UTF8Decode(FItems[n]);
-    DoSelect_None;
-    DoCaretSingle(Length(Text), 0);
-    DoGotoCaret(cEdgeRight);
-  end;
-end;
-
-constructor TATComboEdit.Create(AOwner: TComponent);
-begin
-  inherited;
-
-  FItems:= TStringList.Create;
-  FMenu:= TPopupMenu.Create(Self);
-
-  FMicromapVisible:= true;
-  FMicromapWidth:= 16;
-  FOnClickMicromap:= MicromapClick;
-  FOnDrawMicromap:= MicromapDraw;
-end;
-
-destructor TATComboEdit.Destroy;
-begin
-  FreeAndNil(FMenu);
-  FreeAndNil(FItems);
-  inherited;
-end;
 
 
 initialization
