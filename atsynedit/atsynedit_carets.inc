@@ -221,7 +221,7 @@ begin
   DoPaintModeBlinking;
 end;
 
-procedure TATSynEdit.DoShowPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
+procedure TATSynEdit.DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
 var
   NIndex, NVisLines, NChars: integer;
 begin
@@ -259,12 +259,12 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoShowCaret(AEdge: TATCaretEdge);
+procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge);
 begin
-  DoShowPos(Carets.CaretAtEdge(AEdge), cScrollIndentCaretHorz, cScrollIndentCaretVert);
+  DoGotoPos(Carets.CaretAtEdge(AEdge), cScrollIndentCaretHorz, cScrollIndentCaretVert);
 end;
 
-procedure TATSynEdit.DoGotoPos(APnt: TPoint);
+procedure TATSynEdit.DoGotoPosEx(APnt: TPoint);
 begin
   DoCommandExec(cCommand_Cancel);
   DoCaretSingle(APnt.X, APnt.Y);
@@ -276,7 +276,7 @@ begin
     UpdateWrapInfo;
   end;
 
-  DoShowPos(APnt, cScrollIndentGotoHorz, cScrollIndentGotoVert);
+  DoGotoPos(APnt, cScrollIndentGotoHorz, cScrollIndentGotoVert);
   Update;
 end;
 

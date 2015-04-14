@@ -67,10 +67,10 @@ begin
   DoCaretsSort;
   UpdateCaretsCoords;
 
-  if cResultCaretLeft in Res then DoShowCaret(cEdgeLeft);
-  if cResultCaretRight in Res then DoShowCaret(cEdgeRight);
-  if cResultCaretTop in Res then DoShowCaret(cEdgeTop);
-  if cResultCaretBottom in Res then DoShowCaret(cEdgeBottom);
+  if cResultCaretLeft in Res then DoGotoCaret(cEdgeLeft);
+  if cResultCaretRight in Res then DoGotoCaret(cEdgeRight);
+  if cResultCaretTop in Res then DoGotoCaret(cEdgeTop);
+  if cResultCaretBottom in Res then DoGotoCaret(cEdgeBottom);
 
   if Res*[cResultCaretAny,
     cResultCaretLeft, cResultCaretRight,

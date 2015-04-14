@@ -482,7 +482,7 @@ begin
     Showmessage('Incorr index: '+s);
     Exit
   end;
-  ed.DoGotoPos(Point(0, n));
+  ed.DoGotoPosEx(Point(0, n));
 end;
 
 procedure TfmMain.bFontClick(Sender: TObject);

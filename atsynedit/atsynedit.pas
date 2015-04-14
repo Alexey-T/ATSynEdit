@@ -582,9 +582,9 @@ type
     function ClientPosToCaretPos(P: TPoint): TPoint;
     property Carets: TATCarets read FCarets;
     function IsLineWithCaret(ALine: integer): boolean;
-    procedure DoShowPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
-    procedure DoShowCaret(AEdge: TATCaretEdge);
-    procedure DoGotoPos(APnt: TPoint);
+    procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
+    procedure DoGotoCaret(AEdge: TATCaretEdge);
+    procedure DoGotoPosEx(APnt: TPoint);
     //misc
     procedure BeginUpdate;
     procedure EndUpdate;
@@ -726,7 +726,7 @@ type
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure DoMenu;
-    procedure MenuClick(Sender: TObject);
+    procedure MenuItemClick(Sender: TObject);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -3237,14 +3237,14 @@ begin
       mi:= TMenuItem.Create(Self);
       mi.Caption:= FItems[i];
       mi.Tag:= i;
-      mi.OnClick:= MenuClick;
+      mi.OnClick:= MenuItemClick;
       Add(mi);
     end;
   end;
   FMenu.PopUp(p.x, p.y);
 end;
 
-procedure TATComboEdit.MenuClick(Sender: TObject);
+procedure TATComboEdit.MenuItemClick(Sender: TObject);
 var
   n: integer;
 begin
@@ -3254,6 +3254,7 @@ begin
     Text:= UTF8Decode(FItems[n]);
     DoSelect_None;
     DoCaretSingle(Length(Text), 0);
+    DoGotoCaret(cEdgeRight);
   end;
 end;
 
