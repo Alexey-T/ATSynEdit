@@ -217,10 +217,6 @@ type
 
   TATSynEdit = class(TCustomControl)
   private
-    procedure DoEventClickMicromap(AX, AY: integer);
-    function GetMouseNiceScroll: boolean;
-    procedure SetMouseNiceScroll(AValue: boolean);
-  private
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
     FTimerNiceScroll: TTimer;
@@ -427,6 +423,7 @@ type
     procedure DoEventScroll;
     procedure DoEventChange;
     procedure DoEventState;
+    procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     function DoEventCommand(ACommand: integer): boolean;
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
@@ -440,6 +437,8 @@ type
     function GetTextForClipboard: string;
     function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
+    function GetMouseNiceScroll: boolean;
+    procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretTime(AValue: integer);
     procedure SetCaretShape(AValue: TATSynCaretShape);
@@ -710,13 +709,30 @@ type
   end;
 
 type
-
   { TATEdit }
 
   TATEdit = class(TATSynEdit)
   public
     constructor Create(AOwner: TComponent); override;
   end;
+
+type
+  { TATComboEdit }
+
+  TATComboEdit = class(TATEdit)
+  private
+    FItems: TStringList;
+    FMenu: TPopupMenu;
+    procedure MicromapClick(Sender: TObject; AX, AY: integer);
+    procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
+    procedure DoMenu;
+    procedure MenuClick(Sender: TObject);
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    property Items: TStringList read FItems;
+  end;
+
 
 implementation
 
@@ -3174,6 +3190,93 @@ begin
   OptOffsetTop:= 2;
   Height:= 26;
 end;
+
+{ TATComboEdit }
+
+procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
+begin
+  DoMenu;
+end;
+
+procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
+  const ARect: TRect);
+const
+  dx = 4;
+var
+  color: TColor;
+  size, dy: integer;
+begin
+  color:= FColors.GutterFont;
+  size:= FMicromapWidth - 2*dx;
+  dy:= (ClientHeight-size div 2) div 2;
+
+  C.Brush.Color:= FColors.TextBG;
+  C.FillRect(ARect);
+
+  C.Brush.Color:= color;
+  C.Pen.Color:= color;
+  C.Polygon([
+    Point(ARect.Left+dx, ARect.Top+dy),
+    Point(ARect.Left+dx+size, ARect.Top+dy),
+    Point(ARect.Left+dx+size div 2, ARect.Top+dy+size div 2)
+    ]);
+end;
+
+procedure TATComboEdit.DoMenu;
+var
+  p: TPoint;
+  i: integer;
+  mi: TMenuItem;
+begin
+  p:= ClientToScreen(Point(Width-FMicromapWidth, Height));
+  with FMenu.Items do
+  begin
+    Clear;
+    for i:= 0 to FItems.Count-1 do
+    begin
+      mi:= TMenuItem.Create(Self);
+      mi.Caption:= FItems[i];
+      mi.Tag:= i;
+      mi.OnClick:= MenuClick;
+      Add(mi);
+    end;
+  end;
+  FMenu.PopUp(p.x, p.y);
+end;
+
+procedure TATComboEdit.MenuClick(Sender: TObject);
+var
+  n: integer;
+begin
+  n:= (Sender as TMenuItem).Tag;
+  if n>=0 then
+  begin
+    Text:= UTF8Decode(FItems[n]);
+    DoSelect_None;
+    DoCaretSingle(Length(Text), 0);
+  end;
+end;
+
+constructor TATComboEdit.Create(AOwner: TComponent);
+begin
+  inherited;
+
+  FItems:= TStringList.Create;
+  FMenu:= TPopupMenu.Create(Self);
+
+  FMicromapVisible:= true;
+  FMicromapWidth:= 16;
+  FOnClickMicromap:= MicromapClick;
+  FOnDrawMicromap:= MicromapDraw;
+end;
+
+destructor TATComboEdit.Destroy;
+begin
+  FreeAndNil(FMenu);
+  FreeAndNil(FItems);
+  inherited;
+end;
+
 
 initialization
   InitClipboardFormat;

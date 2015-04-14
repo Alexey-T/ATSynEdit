@@ -114,7 +114,7 @@ type
   private
     { private declarations }
     ed: TATSynEdit;
-    ed1: TATEdit;
+    ed1: TATComboEdit;
     wait: boolean;
     FDir: string;
     procedure DoOpen(const fn: string);
@@ -124,6 +124,7 @@ type
       const AStr: atString; ACharSize: TPoint; const AExtent: array of integer);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
+    procedure ComboCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
     procedure EditClickMicromap(Snd: TObject; AX, AY: integer);
     procedure EditDrawBm(Snd: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
@@ -181,10 +182,11 @@ begin
 
   ed.SetFocus;
 
-  ed1:= TATEdit.Create(Self);
+  ed1:= TATComboEdit.Create(Self);
   ed1.Parent:= PanelRt;
   ed1.Align:= alBottom;
   ed1.Font.Name:= ed.Font.Name;
+  ed1.OnCommand:= ComboCommand;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -361,6 +363,25 @@ begin
     Beep;
   end;
   }
+end;
+
+procedure TfmMain.ComboCommand(Snd: TObject; ACmd: integer;
+  var AHandled: boolean);
+var
+  s: string;
+  n: integer;
+begin
+  if ACmd=cCommand_KeyEnter then
+  begin
+    with ed1 do
+    begin
+      s:= UTF8Encode(Text);
+      n:= Items.IndexOf(s);
+      if n>=0 then Items.Delete(n);
+      Items.Insert(0, s);
+    end;
+    AHandled:= true;
+  end;
 end;
 
 procedure TfmMain.EditClickGutter(Snd: TObject; ABand, ALine: integer);
