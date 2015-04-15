@@ -229,6 +229,8 @@ type
     FMarginList: TList;
     FStringsInt,
     FStringsExternal: TATStrings;
+    FCursorText,
+    FCursorBm: TCursor;
     FTextOffset: TPoint;
     FSelRect: TRect;
     FSelRectBegin,
@@ -628,8 +630,12 @@ type
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
 
-    //options
+    //misc
+    property CursorText: TCursor read FCursorText write FCursorText;
+    property CursorBm: TCursor read FCursorBm write FCursorBm;
     property Colors: TATSynEditColors read FColors;
+
+    //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
     property OptTabArrowSize: integer read FOptTabArrowSize write FOptTabArrowSize;
@@ -1698,6 +1704,9 @@ begin
   FColors:= TATSynEditColors.Create;
   DoInitColors;
 
+  FCursorText:= crIBeam;
+  FCursorBm:= crHandPoint;
+
   FTimerBlink:= TTimer.Create(Self);
   FTimerBlink.Interval:= cInitTimerBlink;
   FTimerBlink.OnTimer:= TimerBlinkTick;
@@ -2360,10 +2369,10 @@ begin
     Cursor:= crDrag
   else
   if PtInRect(FRectMain, P) then
-    Cursor:= crIBeam
+    Cursor:= FCursorText
   else
   if PtInRect(RectBm, P) then
-    Cursor:= crHandPoint
+    Cursor:= FCursorBm
   else
     Cursor:= crDefault;
 end;

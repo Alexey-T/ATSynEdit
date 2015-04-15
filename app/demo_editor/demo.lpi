@@ -169,7 +169,6 @@
       <Unit30>
         <Filename Value="..\..\atsynedit\atedits.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATEdits"/>
       </Unit30>
     </Units>
   </ProjectOptions>
