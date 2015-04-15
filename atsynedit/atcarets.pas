@@ -59,6 +59,7 @@ type
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATCaretItem read GetItem; default;
     procedure Add(APosX, APosY: integer);
+    procedure AddRange(XFrom, YFrom, XTo, YTo: integer);
     procedure Sort;
     procedure Assign(Obj: TATCarets);
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
@@ -274,7 +275,16 @@ var
 begin
   Clear;
   for i:= 0 to Obj.Count-1 do
-    Add(Obj[i].PosX, Obj[i].PosY);
+  begin
+    Add(0, 0);
+    with Items[Count-1] do
+    begin
+      PosX:= Obj[i].PosX;
+      PosY:= Obj[i].PosY;
+      EndX:= Obj[i].EndX;
+      EndY:= Obj[i].EndY;
+    end;
+  end;
 end;
 
 function TATCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
@@ -500,6 +510,19 @@ begin
     Item.PosY:= L[i*2].Y;
     Item.EndX:= L[i*2+1].X;
     Item.EndY:= L[i*2+1].Y;
+  end;
+end;
+
+procedure TATCarets.AddRange(XFrom, YFrom, XTo, YTo: integer);
+begin
+  if (XFrom=XTo) and (YFrom=YTo) then Exit;
+  Add(0, 0);
+  with Items[Count-1] do
+  begin
+    PosX:= XTo;
+    PosY:= YTo;
+    EndX:= XFrom;
+    EndY:= YFrom;
   end;
 end;
 

@@ -6,6 +6,12 @@ begin
   Result:= [cResultCaretBottom];
 end;
 
+function TATSynEdit.DoCommand_SelectInverted: TATCommandResults;
+begin
+  DoSelect_Inverted;
+  Result:= [cResultCaretBottom];
+end;
+
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
 begin
   Result:= [];

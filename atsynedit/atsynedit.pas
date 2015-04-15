@@ -507,6 +507,7 @@ type
     function DoCommand_SelectWords: TATCommandResults;
     function DoCommand_SelectLines: TATCommandResults;
     function DoCommand_SelectAll: TATCommandResults;
+    function DoCommand_SelectInverted: TATCommandResults;
     function DoCommand_Cancel: TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;
@@ -591,6 +592,7 @@ type
     procedure BeginUpdate;
     procedure EndUpdate;
     procedure DoSelect_All;
+    procedure DoSelect_Inverted;
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);

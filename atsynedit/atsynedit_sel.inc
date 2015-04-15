@@ -102,6 +102,46 @@ begin
   end;
 end;
 
+procedure TATSynEdit.DoSelect_Inverted;
+var
+  NewCarets: TATCarets;
+  X1, Y1, X2, Y2: integer;
+  XPrev, YPrev: integer;
+  i: integer;
+  Sel: boolean;
+  PosLast: TPoint;
+begin
+  XPrev:= 0;
+  YPrev:= 0;
+  NewCarets:= TATCarets.Create;
+  try
+    for i:= 0 to Carets.Count-1 do
+    begin
+      Carets[i].GetRange(X1, Y1, X2, Y2, Sel);
+      if not Sel then Continue;
+
+      //add range
+      NewCarets.AddRange(XPrev, YPrev, X1, Y1);
+      XPrev:= X2;
+      YPrev:= Y2;
+    end;
+
+    //add range after last caret
+    PosLast:= GetEndOfFilePos;
+    NewCarets.AddRange(XPrev, YPrev, PosLast.X, PosLast.Y);
+
+    //apply new carets
+    Carets.Clear;
+    if NewCarets.Count>0 then
+      Carets.Assign(NewCarets)
+    else
+      DoCaretSingle(0, 0);
+
+  finally
+    FreeAndNil(NewCarets);
+  end;
+end;
+
 procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; P: TPoint);
 var
   CItem: TATCaretItem;

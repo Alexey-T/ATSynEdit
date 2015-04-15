@@ -173,6 +173,7 @@ begin
     cCommand_SelectWords:              Res:= DoCommand_SelectWords;
     cCommand_SelectLines:              Res:= DoCommand_SelectLines;
     cCommand_SelectNone:               Res:= [cResultCaretAny];
+    cCommand_SelectInverted:           Res:= DoCommand_SelectInverted;
 
     cCommand_GotoTextBegin,
     cCommand_GotoTextBegin_Sel:        Res:= DoCommand_GotoTextBegin;
