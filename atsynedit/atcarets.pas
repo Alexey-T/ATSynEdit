@@ -452,11 +452,31 @@ begin
     Exit
   end;
 
-  OutPosX:= IfThen(XMin1<XMin2, XMin1, XMin2);
-  OutPosY:= IfThen(XMin1<XMin2, YMin1, YMin2);
-  OutEndX:= IfThen(XMin1<XMin2, XMax2, XMax1);
-  OutEndY:= IfThen(XMin1<XMin2, YMax2, YMax1);
+  //calc join-result, needed only for Result=true
+  //minimal point
+  if IsPosSorted(XMin1, YMin1, XMin2, YMin2, true) then
+  begin
+    OutPosX:= XMin1;
+    OutPosY:= YMin1;
+  end
+  else
+  begin
+    OutPosX:= XMin2;
+    OutPosY:= YMin2;
+  end;
+  //maximal point
+  if IsPosSorted(XMax1, YMax1, XMax2, YMax2, true) then
+  begin
+    OutEndX:= XMax2;
+    OutEndY:= YMax2;
+  end
+  else
+  begin
+    OutEndX:= XMax1;
+    OutEndY:= YMax1;
+  end;
 
+  //swap points?
   if not IsPosSorted(Item1.PosX, Item1.PosY, Item1.EndX, Item1.EndY, false) then
   begin
     SwapInt(OutPosX, OutEndX);
