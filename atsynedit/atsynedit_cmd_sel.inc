@@ -18,6 +18,12 @@ begin
   Result:= [cResultCaretBottom];
 end;
 
+function TATSynEdit.DoCommand_SelectExtendByLine: TATCommandResults;
+begin
+  DoSelect_ExtendSelectionByLine;
+  Result:= [cResultCaretBottom];
+end;
+
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
 begin
   Result:= [];

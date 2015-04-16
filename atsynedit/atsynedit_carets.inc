@@ -400,3 +400,14 @@ begin
     FreeAndNil(MoreCarets);
   end;
 end;
+
+procedure TATSynEdit.DoCaretsAssign(NewCarets: TATCarets);
+begin
+  Carets.Clear;
+  if NewCarets.Count>0 then
+    Carets.Assign(NewCarets)
+  else
+    DoCaretSingle(0, 0);
+end;
+
+

@@ -358,8 +358,10 @@ type
     FOptAllowReadOnly: boolean;
     //
     procedure DebugFindWrapIndex;
+    procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
     procedure DoMinimapClick(APosY: integer);
+    procedure DoSelect_ExtendSelectionByLine;
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetModified: boolean;
     function GetOneLine: boolean;
@@ -509,6 +511,7 @@ type
     function DoCommand_SelectAll: TATCommandResults;
     function DoCommand_SelectInverted: TATCommandResults;
     function DoCommand_SelectSplitToLines: TATCommandResults;
+    function DoCommand_SelectExtendByLine: TATCommandResults;
     function DoCommand_Cancel: TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;

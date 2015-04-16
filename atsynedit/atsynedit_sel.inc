@@ -15,7 +15,6 @@ begin
   Result:= EqualRect(FSelRect, cRectEmpty);
 end;
 
-
 procedure TATSynEdit.DoSelect_Word(P: TPoint);
 var
   N1, N2: integer;
@@ -130,13 +129,7 @@ begin
     PosLast:= GetEndOfFilePos;
     NewCarets.AddRange(XPrev, YPrev, PosLast.X, PosLast.Y);
 
-    //apply new carets
-    Carets.Clear;
-    if NewCarets.Count>0 then
-      Carets.Assign(NewCarets)
-    else
-      DoCaretSingle(0, 0);
-
+    DoCaretsAssign(NewCarets);
   finally
     FreeAndNil(NewCarets);
   end;
@@ -185,13 +178,44 @@ begin
       NewCarets.AddRange(0, Y2, X2, Y2);
     end;
 
-    //apply new carets
-    Carets.Clear;
-    if NewCarets.Count>0 then
-      Carets.Assign(NewCarets)
-    else
-      DoCaretSingle(0, 0);
+    DoCaretsAssign(NewCarets);
+  finally
+    FreeAndNil(NewCarets);
+  end;
+end;
 
+procedure TATSynEdit.DoSelect_ExtendSelectionByLine;
+var
+  NewCarets: TATCarets;
+  X1, Y1, X2, Y2: integer;
+  i: integer;
+  Sel: boolean;
+  PosLast: TPoint;
+begin
+  NewCarets:= TATCarets.Create;
+  try
+    for i:= 0 to Carets.Count-1 do
+    begin
+      Carets[i].GetRange(X1, Y1, X2, Y2, Sel);
+      if not Sel then
+        begin X2:= X1; Y2:= Y1; end;
+
+      if Y2<Strings.Count-1 then
+      begin
+        X2:= 0;
+        Y2:= Y2+1;
+      end
+      else
+      begin
+        PosLast:= GetEndOfFilePos;
+        X2:= PosLast.X;
+        Y2:= PosLast.Y;
+      end;
+
+      NewCarets.AddRange(X1, Y1, X2, Y2);
+    end;
+
+    DoCaretsAssign(NewCarets);
   finally
     FreeAndNil(NewCarets);
   end;
