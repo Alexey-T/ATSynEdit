@@ -142,6 +142,61 @@ begin
   end;
 end;
 
+procedure TATSynEdit.DoSelect_SplitSelectionToLines;
+var
+  NewCarets: TATCarets;
+  X1, Y1, X2, Y2: integer;
+  i, j: integer;
+  Sel: boolean;
+begin
+  NewCarets:= TATCarets.Create;
+  try
+    for i:= 0 to Carets.Count-1 do
+    begin
+      Carets[i].GetRange(X1, Y1, X2, Y2, Sel);
+      if not Sel then
+      begin
+        NewCarets.Add(X1, Y1);
+        Continue;
+      end;
+
+      if Y1=Y2 then
+      begin
+        NewCarets.AddRange(X1, Y1, X2, Y2);
+        Continue;
+      end;
+
+      //add first part
+      if X1<Length(Strings.Lines[Y1]) then
+        NewCarets.AddRange(X1, Y1, Length(Strings.Lines[Y1]), Y1)
+      else
+        NewCarets.Add(X1, Y1);
+
+      //add middle parts
+      for j:= Y1+1 to Y2-1 do
+      begin
+        if Strings.Lines[j]='' then
+          NewCarets.Add(0, j)
+        else
+          NewCarets.AddRange(0, j, Length(Strings.Lines[j]), j);
+      end;
+
+      //add last part
+      NewCarets.AddRange(0, Y2, X2, Y2);
+    end;
+
+    //apply new carets
+    Carets.Clear;
+    if NewCarets.Count>0 then
+      Carets.Assign(NewCarets)
+    else
+      DoCaretSingle(0, 0);
+
+  finally
+    FreeAndNil(NewCarets);
+  end;
+end;
+
 procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; P: TPoint);
 var
   CItem: TATCaretItem;

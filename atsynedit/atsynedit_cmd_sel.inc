@@ -12,6 +12,12 @@ begin
   Result:= [cResultCaretBottom];
 end;
 
+function TATSynEdit.DoCommand_SelectSplitToLines: TATCommandResults;
+begin
+  DoSelect_SplitSelectionToLines;
+  Result:= [cResultCaretBottom];
+end;
+
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
 begin
   Result:= [];

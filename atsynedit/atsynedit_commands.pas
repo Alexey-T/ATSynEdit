@@ -87,10 +87,11 @@ const
   cCommand_ScrollToCaretRight = 255;
 
   cCommand_SelectAll = 260 or cCmdSelReset or cCmdCaret;
-  cCommand_SelectWords = 261 or cCmdSelReset or cCmdCaret;
-  cCommand_SelectLines = 262 or cCmdSelReset or cCmdCaret;
-  cCommand_SelectNone = 263 or cCmdSelReset or cCmdCaret;
+  cCommand_SelectNone = 261 or cCmdSelReset or cCmdCaret;
+  cCommand_SelectWords = 262 or cCmdSelReset or cCmdCaret;
+  cCommand_SelectLines = 263 or cCmdSelReset or cCmdCaret;
   cCommand_SelectInverted = 264 or cCmdCaret;
+  cCommand_SelectSplitToLines = 265 or cCmdCaret;
 
   cCommand_MoveSelectionUp = 268 or cCmdCaret;
   cCommand_MoveSelectionDown = 269 or cCmdCaret;

@@ -170,10 +170,11 @@ begin
     cCommand_TextDeleteWordNext:       Res:= DoCommand_TextDeleteWord(true);
 
     cCommand_SelectAll:                Res:= DoCommand_SelectAll;
-    cCommand_SelectWords:              Res:= DoCommand_SelectWords;
-    cCommand_SelectLines:              Res:= DoCommand_SelectLines;
     cCommand_SelectNone:               Res:= [cResultCaretAny];
     cCommand_SelectInverted:           Res:= DoCommand_SelectInverted;
+    cCommand_SelectSplitToLines:       Res:= DoCommand_SelectSplitToLines;
+    cCommand_SelectWords:              Res:= DoCommand_SelectWords;
+    cCommand_SelectLines:              Res:= DoCommand_SelectLines;
 
     cCommand_GotoTextBegin,
     cCommand_GotoTextBegin_Sel:        Res:= DoCommand_GotoTextBegin;

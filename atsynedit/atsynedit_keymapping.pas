@@ -65,11 +65,12 @@ begin
   M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXControl+'+Shift+Right'], []);
 
   M.Add(cCommand_SelectAll, 'selection: select all', [cXControl+'+A'], []);
-  M.Add(cCommand_SelectNone, 'selection: select none', [], []);
   M.Add(cCommand_TextDeleteSelection, 'selection: delete selection', [], []);
   M.Add(cCommand_SelectInverted, 'selection: invert selection', [], []);
+  M.Add(cCommand_SelectSplitToLines, 'selection: split selection into lines', [], []);
   M.Add(cCommand_SelectWords, 'selection: select words at carets', [], []);
   M.Add(cCommand_SelectLines, 'selection: select lines at carets', [], []);
+  M.Add(cCommand_SelectNone, 'selection: cancel selection', [], []);
   M.Add(cCommand_Cancel, 'selection: cancel carets, selection, drag-drop', ['Esc'], []);
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
