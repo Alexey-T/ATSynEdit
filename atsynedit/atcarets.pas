@@ -90,6 +90,21 @@ begin
     Result:= (X1<X2) or (AllowEq and (X1=X2));
 end;
 
+procedure GetPositionMinOrMax(X1, Y1, X2, Y2: integer; AMaximal: boolean; out OutX, OutY: integer);
+begin
+  if IsPosSorted(X1, Y1, X2, Y2, true) xor AMaximal then
+  begin
+    OutX:= X1;
+    OutY:= Y1;
+  end
+  else
+  begin
+    OutX:= X2;
+    OutY:= Y2;
+  end;
+end;
+
+
 function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer): TATPosRelation;
 var
   b1, b2: boolean;
@@ -454,27 +469,9 @@ begin
 
   //calc join-result, needed only for Result=true
   //minimal point
-  if IsPosSorted(XMin1, YMin1, XMin2, YMin2, true) then
-  begin
-    OutPosX:= XMin1;
-    OutPosY:= YMin1;
-  end
-  else
-  begin
-    OutPosX:= XMin2;
-    OutPosY:= YMin2;
-  end;
+  GetPositionMinOrMax(XMin1, YMin1, XMin2, YMin2, false, OutPosX, OutPosY);
   //maximal point
-  if IsPosSorted(XMax1, YMax1, XMax2, YMax2, true) then
-  begin
-    OutEndX:= XMax2;
-    OutEndY:= YMax2;
-  end
-  else
-  begin
-    OutEndX:= XMax1;
-    OutEndY:= YMax1;
-  end;
+  GetPositionMinOrMax(XMax1, YMax1, XMax2, YMax2, true, OutEndX, OutEndY);
 
   //swap points?
   if not IsPosSorted(Item1.PosX, Item1.PosY, Item1.EndX, Item1.EndY, false) then
