@@ -12,7 +12,7 @@ object fmCmd: TfmCmd
   LCLVersion = '1.5'
   object List: TListView
     Left = 0
-    Height = 582
+    Height = 583
     Top = 0
     Width = 679
     Align = alClient
@@ -37,8 +37,8 @@ object fmCmd: TfmCmd
   end
   object ButtonPanel1: TButtonPanel
     Left = 6
-    Height = 26
-    Top = 588
+    Height = 25
+    Top = 589
     Width = 667
     AutoSize = False
     OKButton.Name = 'OKButton'
