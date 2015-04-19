@@ -15,7 +15,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
-  Controls, ExtCtrls, Menus,
+  Controls, ExtCtrls, Menus, Forms,
   LMessages, LCLType,
   ATStringProc, ATStrings, ATCanvasProc, ATGutter,
   ATCarets, ATKeyMapping, ATSynEdit_WrapInfo;
@@ -188,6 +188,7 @@ const
   cMaxLinesForOldWrapUpdate = 100;
   cSpeedNiceScrollX = 4;
   cSpeedNiceScrollY = 1;
+  cHintWindowWidth = 90;
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -244,6 +245,7 @@ type
     FCaretStopUnfocused: boolean;
     FMenu: TPopupMenu;
     FOverwrite: boolean;
+    FHintWnd: THintWindow;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
     FMouseDownDouble: boolean;
@@ -306,6 +308,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptShowScrollHint: boolean;
     FOptOffsetTop: integer;
     FOptSavingForceFinalEol: boolean;
     FOptSavingTrimSpaces: boolean;
@@ -360,6 +363,8 @@ type
     procedure DebugFindWrapIndex;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
+    procedure DoHintShow;
+    procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
     procedure DoSelect_ExtendSelectionByLine;
     function GetAutoIndentString(APosX, APosY: integer): atString;
@@ -477,6 +482,8 @@ type
     procedure UpdateGutterAutosize(C: TCanvas);
     procedure UpdateMinimapAutosize(C: TCanvas);
     function DoFormatLineNumber(N: integer): atString;
+    function UpdateScrollInfoFromMessage(const Msg: TLMScroll;
+      var Info: TATSynScrollInfo): boolean;
     procedure UpdateWrapInfo;
     function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
@@ -650,6 +657,7 @@ type
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind;
+    property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel;
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel;
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
@@ -726,7 +734,6 @@ implementation
 uses
   LCLIntf,
   LCLProc,
-  Forms,
   Dialogs,
   Types,
   Math,
@@ -1835,6 +1842,7 @@ begin
   FOptUndoGrouped:= true;
   FOptSavingForceFinalEol:= false;
   FOptSavingTrimSpaces:= false;
+  FOptShowScrollHint:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -1851,6 +1859,7 @@ begin
 
   FKeyMapping:= TATKeyMapping.Create;
   FMenu:= TPopupMenu.Create(Self);
+  FHintWnd:= nil;
 
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitPopupMenu;
@@ -1861,6 +1870,9 @@ end;
 
 destructor TATSynEdit.Destroy;
 begin
+  if Assigned(FHintWnd) then
+    FreeAndNil(FHintWnd);
+
   DoPaintModeStatic;
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
@@ -2193,7 +2205,32 @@ begin
   Msg.Result:= 1;
 end;
 
-function UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
+procedure TATSynEdit.DoHintShow;
+var
+  S: string;
+  P: TPoint;
+  R: TRect;
+begin
+  if not FOptShowScrollHint then Exit;
+  if not Assigned(FHintWnd) then
+    FHintWnd:= THintWindow.Create(nil);
+
+  S:= IntToStr(ScrollTop+1);
+  R:= FHintWnd.CalcHintRect(500, S, nil);
+  R.Right:= R.Left+cHintWindowWidth;
+  P:= ClientToScreen(Point(Width, 0));
+  OffsetRect(R, P.X, P.Y);
+
+  FHintWnd.ActivateHint(R, S);
+end;
+
+procedure TATSynEdit.DoHintHide;
+begin
+  if Assigned(FHintWnd) then
+    FHintWnd.Hide;
+end;
+
+function TATSynEdit.UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
 begin
   case Msg.ScrollCode of
     SB_TOP:        Info.NPos:= Info.NMin;
@@ -2205,8 +2242,14 @@ begin
     SB_PAGEUP:     Info.NPos:= Max(Info.NPos-Info.NPage, Info.NMin);
     SB_PAGEDOWN:   Info.NPos:= Min(Info.NPos+Info.NPage, Info.NPosLast);
 
-    SB_THUMBPOSITION,
-    SB_THUMBTRACK: Info.NPos:= Msg.Pos;
+    SB_THUMBPOSITION: Info.NPos:= Msg.Pos;
+    SB_THUMBTRACK:
+      begin
+        Info.NPos:= Msg.Pos;
+        if @Info=@FScrollVert then DoHintShow;
+      end;
+    SB_ENDSCROLL:
+      DoHintHide;
   end;
 
   Result:= Msg.ScrollCode<>SB_THUMBTRACK;
