@@ -188,7 +188,8 @@ const
   cMaxLinesForOldWrapUpdate = 100;
   cSpeedNiceScrollX = 4;
   cSpeedNiceScrollY = 1;
-  cHintWindowWidth = 90;
+  cHintStringLine = 'Line';
+  cHintDx = 5;
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -2215,11 +2216,12 @@ begin
   if not Assigned(FHintWnd) then
     FHintWnd:= THintWindow.Create(nil);
 
-  S:= IntToStr(ScrollTop+1);
+  S:= cHintStringLine+' '+IntToStr(ScrollTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
-  R.Right:= R.Left+cHintWindowWidth;
-  P:= ClientToScreen(Point(Width, 0));
+
+  P:= ClientToScreen(Point(ClientWidth-(R.Right-R.Left), 0));
   OffsetRect(R, P.X, P.Y);
+  OffsetRect(R, -cHintDx, cHintDx);
 
   FHintWnd.ActivateHint(R, S);
 end;
