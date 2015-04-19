@@ -342,6 +342,7 @@ type
     FOptCutLinesIfNoSel: boolean;
     FOptHiliteSelFull: boolean;
     FOptShowCurLine: boolean;
+    FOptShowCurLineMinimal: boolean;
     FOptShowCurColumn: boolean;
     FOptMouse2ClickSelectsLine: boolean;
     FOptMouse3ClickSelectsLine: boolean;
@@ -379,6 +380,7 @@ type
     function GetUndoLimit: integer;
     procedure DoInitColors;
     procedure DoInitPopupMenu;
+    function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
@@ -666,6 +668,7 @@ type
     property OptHiliteSelFull: boolean read FOptHiliteSelFull write FOptHiliteSelFull;
     property OptUseOverOnPaste: boolean read FOptUseOverOnPaste write FOptUseOverOnPaste;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
+    property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual;
@@ -849,11 +852,6 @@ begin
     else
       raise Exception.Create('Unknown num-style');
   end;
-end;
-
-function TATSynEdit.IsLineWithCaret(ALine: integer): boolean;
-begin
-  Result:= FCarets.IsLineListed(ALine);
 end;
 
 function TATSynEdit.GetScrollbarVisible(bVertical: boolean): boolean;
@@ -1369,8 +1367,20 @@ begin
     BmKind:= Strings.LinesBm[NLinesIndex];
     if BmKind<>0 then
       BmColor:= Strings.LinesBmColor[NLinesIndex];
-    if FOptShowCurLine and LineWithCaret then
-      BmColor:= FColors.CurLineBG;
+
+    if FOptShowCurLine then
+    begin
+      if FOptShowCurLineMinimal then
+      begin
+        if LineWithCaret and IsLinePartWithCaret(NLinesIndex, NCoordTop) then
+          BmColor:= FColors.CurLineBG;
+      end
+      else
+      begin
+        if LineWithCaret then
+          BmColor:= FColors.CurLineBG;
+      end;
+    end;
 
     if BmColor<>clNone then
     begin
@@ -1830,6 +1840,7 @@ begin
   FOptCutLinesIfNoSel:= false;
   FOptHiliteSelFull:= false;
   FOptShowCurLine:= false;
+  FOptShowCurLineMinimal:= true;
   FOptShowCurColumn:= false;
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
   FOptKeyLeftRightSwapSel:= true;

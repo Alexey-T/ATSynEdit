@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkCurLineMin: TCheckBox;
     chkHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
     chkNavWrap2: TCheckBox;
@@ -123,6 +124,7 @@ begin
   begin
     //general
     chkCurLine.Checked:= ed.OptShowCurLine;
+    chkCurLineMin.Checked:= ed.OptShowCurLineMinimal;
     chkCurCol.Checked:= ed.OptShowCurColumn;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
     chkColorSel.Checked:= ed.OptHiliteSelFull;
@@ -202,6 +204,7 @@ begin
     begin
       //general
       ed.OptShowCurLine:= chkCurLine.Checked;
+      ed.OptShowCurLineMinimal:= chkCurLineMin.Checked;
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptWordChars:= edChars.Text;
       ed.OptUseOverOnPaste:= chkOvrPaste.Checked;

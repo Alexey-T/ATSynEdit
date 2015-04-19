@@ -1,5 +1,35 @@
 {$ifdef nnnn}begin end;{$endif}
 
+function TATSynEdit.IsLineWithCaret(ALine: integer): boolean;
+begin
+  Result:= FCarets.IsLineListed(ALine);
+end;
+
+function TATSynEdit.IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
+var
+  i: integer;
+  Caret: TATCaretItem;
+  Coord: TPoint;
+begin
+  Result:= false;
+  //like Carets.IsLineListed with more code
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Caret:= Carets[i];
+    if Caret.PosY=ALine then
+    begin
+      Coord:= CaretPosToClientPos(Point(Caret.PosX, Caret.PosY));
+      if Coord.Y=ACoordY then
+      begin
+        Result:= true;
+        Exit
+      end;
+    end;
+  end;
+end;
+
+
+
 procedure TATSynEdit.DoCaretAddToPoint(AX, AY: integer);
 var
   N: integer;
