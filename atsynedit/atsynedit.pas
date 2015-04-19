@@ -1860,20 +1860,16 @@ begin
 
   FKeyMapping:= TATKeyMapping.Create;
   FMenu:= TPopupMenu.Create(Self);
-  FHintWnd:= nil;
+  FHintWnd:= THintWindow.Create(Self);
 
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitPopupMenu;
-
-  //UpdateCaretsCoords;
-  //DoPaintModeBlinking;
 end;
 
 destructor TATSynEdit.Destroy;
 begin
-  if Assigned(FHintWnd) then
-    FreeAndNil(FHintWnd);
-
+  FreeAndNil(FHintWnd);
+  FreeAndNil(FMenu);
   DoPaintModeStatic;
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
@@ -2213,8 +2209,6 @@ var
   R: TRect;
 begin
   if not FOptShowScrollHint then Exit;
-  if not Assigned(FHintWnd) then
-    FHintWnd:= THintWindow.Create(nil);
 
   S:= cHintStringLine+' '+IntToStr(ScrollTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
