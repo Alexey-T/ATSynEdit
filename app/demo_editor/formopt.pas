@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
     chkNavWrap2: TCheckBox;
     chkGutterBm: TCheckBox;
@@ -134,6 +135,7 @@ begin
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     edTabArrow.Value:= ed.OptTabArrowSize;
+    chkHint.Checked:= ed.OptShowScrollHint;
 
     //caret
     chkCrVirt.Checked:= ed.OptCaretVirtual;
@@ -212,6 +214,7 @@ begin
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
       ed.OptSavingTrimSpaces:= chkSaveTrim.Checked;
       ed.OptTabArrowSize:= edTabArrow.Value;
+      ed.OptShowScrollHint:= chkHint.Checked;
 
       //caret
       ed.OptCaretVirtual:= chkCrVirt.Checked;

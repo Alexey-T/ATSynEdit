@@ -1842,7 +1842,7 @@ begin
   FOptUndoGrouped:= true;
   FOptSavingForceFinalEol:= false;
   FOptSavingTrimSpaces:= false;
-  FOptShowScrollHint:= true;
+  FOptShowScrollHint:= false;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
