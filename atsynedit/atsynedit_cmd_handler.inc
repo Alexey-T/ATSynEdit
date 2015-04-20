@@ -119,7 +119,17 @@ begin
     DoSelect_None;
 
   if ACmd and cCmdCaret <> 0 then
+  begin
     Strings.SetGroupMark;
+
+    //save column for Up/Down movement
+    Carets.UpdateColumnCoord(
+      (ACmd=cCommand_KeyUp) or
+      (ACmd=cCommand_KeyDown) or
+      (ACmd=cCommand_KeyUp_Sel) or
+      (ACmd=cCommand_KeyDown_Sel)
+      );
+  end;
 
   //debug
   //if FCaretMoved then Beep;

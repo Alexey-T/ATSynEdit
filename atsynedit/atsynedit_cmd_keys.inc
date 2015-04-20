@@ -139,6 +139,7 @@ begin
   if AKeepRelativePos then
     NRelative:= ScrollTopRelative;
 
+  //don't check here FWrapMode<>cWrapOff
   if FOptKeyUpDownNavigateWrapped then
     Result:= DoCommand_KeyUpDown_Wrapped(ADown, ALines)
   else
@@ -174,7 +175,11 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
+
     Pnt.X:= Caret.CoordX;
+    if FOptKeyUpDownKeepColumn and (Caret.CoordColumn>0) then
+      Pnt.X:= Caret.CoordColumn;
+
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne(ADown);
     Pnt:= ClientPosToCaretPos(Pnt);
     if Pnt.Y<0 then Continue;

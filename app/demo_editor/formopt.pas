@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkKeepCol: TCheckBox;
     chkCurLineMin: TCheckBox;
     chkHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
@@ -175,6 +176,7 @@ begin
     chkOvrSel.Checked:= ed.OptOverwriteSel;
     chkNavWrap.Checked:= ed.OptKeyUpDownNavigateWrapped;
     chkNavWrap2.Checked:= ed.OptKeyHomeEndNavigateWrapped;
+    chkKeepCol.Checked:= ed.OptKeyUpDownKeepColumn;
     chkLeftRt.Checked:= ed.OptKeyLeftRightSwapSel;
     chkHome.Checked:= ed.OptKeyHomeToNonSpace;
     chkEnd.Checked:= ed.OptKeyEndToNonSpace;
@@ -253,6 +255,7 @@ begin
       //key
       ed.OptTabSpaces:= chkTabSp.Checked;
       ed.OptOverwriteSel:= chkOvrSel.Checked;
+      ed.OptKeyUpDownKeepColumn:= chkKeepCol.Checked;
       ed.OptKeyUpDownNavigateWrapped:= chkNavWrap.Checked;
       ed.OptKeyHomeEndNavigateWrapped:= chkNavWrap2.Checked;
       ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);

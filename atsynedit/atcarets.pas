@@ -20,11 +20,11 @@ type
   { TATCaretItem }
 
   TATCaretItem = class
-  private
   public
-    PosX, PosY,
-    EndX, EndY: integer;
-    CoordX, CoordY: integer;
+    PosX, PosY, //caret blinking pos
+    EndX, EndY: integer; //end of selection or -1
+    CoordX, CoordY: integer; //screen coords
+    CoordColumn: integer; //saved CoordX to use in keys Up/Down cmd
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer);
@@ -74,6 +74,7 @@ type
     property OneLine: boolean read FOneLine write FOneLine;
     function SaveToArray: TPointArray;
     procedure LoadFromArray(const L: TPointArray);
+    procedure UpdateColumnCoord(ASaveColumn: boolean);
   end;
 
 
@@ -540,6 +541,24 @@ begin
     PosY:= YTo;
     EndX:= XFrom;
     EndY:= YFrom;
+  end;
+end;
+
+procedure TATCarets.UpdateColumnCoord(ASaveColumn: boolean);
+var
+  i: integer;
+  Caret: TATCaretItem;
+begin
+  for i:= 0 to Count-1 do
+  begin
+    Caret:= Items[i];
+    if ASaveColumn then
+    begin
+      if Caret.CoordColumn=0 then
+        Caret.CoordColumn:= Caret.CoordX;
+    end
+    else
+      Caret.CoordColumn:= 0
   end;
 end;
 

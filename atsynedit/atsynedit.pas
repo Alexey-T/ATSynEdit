@@ -338,6 +338,7 @@ type
     FOptKeyPageKeepsRelativePos: boolean;
     FOptKeyUpDownNavigateWrapped: boolean;
     FOptKeyHomeEndNavigateWrapped: boolean;
+    FOptKeyUpDownKeepColumn: boolean;
     FOptCopyLinesIfNoSel: boolean;
     FOptCutLinesIfNoSel: boolean;
     FOptHiliteSelFull: boolean;
@@ -713,6 +714,7 @@ type
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped;
+    property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn;
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel;
@@ -1821,6 +1823,7 @@ begin
   FOptKeyPageKeepsRelativePos:= true;
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyHomeEndNavigateWrapped:= true;
+  FOptKeyUpDownKeepColumn:= true;
   FOptUseOverOnPaste:= false;
   FOptWordChars:= '';
   FOptAutoIndent:= true;
