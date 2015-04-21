@@ -1,5 +1,19 @@
 {$ifdef nnnn}begin end;{$endif}
 
+function TATSynEdit.IsPosCollapsed(AX, AY: integer): boolean;
+var
+  Flag: integer;
+begin
+  Result:= true;
+  if not Strings.IsIndexValid(AY) then Exit;
+
+  //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
+  Flag:= Strings.LinesHidden[AY];
+  if (Flag=-1) then Exit;
+  if (Flag>0) and (AX>=Flag) then Exit;
+  Result:= false;
+end;
+
 function TATSynEdit.IsLineWithCaret(ALine: integer): boolean;
 begin
   Result:= FCarets.IsLineListed(ALine);
@@ -27,7 +41,6 @@ begin
     end;
   end;
 end;
-
 
 
 procedure TATSynEdit.DoCaretAddToPoint(AX, AY: integer);
@@ -87,7 +100,7 @@ procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean = false);
 var
   P: TPoint;
   NStart, i: integer;
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
 begin
   if AOnlyLast then
     NStart:= Carets.Count-1
@@ -96,12 +109,20 @@ begin
 
   for i:= NStart to Carets.Count-1 do
   begin
-    Item:= Carets[i];
-    P.X:= Item.PosX;
-    P.Y:= Item.PosY;
-    P:= CaretPosToClientPos(P);
-    Item.CoordX:= P.X;
-    Item.CoordY:= P.Y;
+    Caret:= Carets[i];
+    P.X:= Caret.PosX;
+    P.Y:= Caret.PosY;
+    if IsPosCollapsed(P.X, P.Y) then
+    begin
+      Caret.CoordX:= -1;
+      Caret.CoordY:= -1;
+    end
+    else
+    begin
+      P:= CaretPosToClientPos(P);
+      Caret.CoordX:= P.X;
+      Caret.CoordY:= P.Y;
+    end;
   end;
 end;
 
