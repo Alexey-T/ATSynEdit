@@ -407,6 +407,9 @@ type
       const ACharSize: TPoint;
       AWithGutter, AWithUnprintable: boolean;
       var AScrollHorz, AScrollVert: TATSynScrollInfo);
+    procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
+      ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
+      AScrollPos: integer; AAllowIndentLines: boolean);
     procedure DoPaintMinimapSelTo(C: TCanvas);
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
@@ -1293,7 +1296,6 @@ var
   LineWithCaret, LineEolSelected: boolean;
   Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
-  i: integer;
   //
   procedure DoPaintState(ATop: integer; AColor: TColor);
   begin
@@ -1390,14 +1392,6 @@ begin
       C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
     end;
 
-    if AWithUnprintable then
-      if FOptShowIndentLines then
-      begin
-        for i:= 0 to WrapItem.NIndent-1 do
-          if i mod FTabSize = 0 then
-            CanvasDottedVertLine(C, ARect.Left + (i-AScrollHorz.NPos)*ACharSize.X, NCoordTop, NCoordTop+ACharSize.Y, FColors.IndentLines);
-      end;
-
     CurrPointText:= Point(
       Int64(CurrPoint.X) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
       CurrPoint.Y);
@@ -1422,6 +1416,10 @@ begin
         NLinesIndex,
         LineEolSelected,
         AScrollHorz);
+
+      DoPaintLineIndent(C, ARect, ACharSize, NCoordTop, WrapItem.NIndent,
+        IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
+        AScrollHorz.NPos, AWithUnprintable);
 
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
@@ -2806,6 +2804,36 @@ begin
     FTimerBlink.Enabled:= false;
     FTimerBlink.Enabled:= true;
   end;
+end;
+
+
+procedure TATSynEdit.DoPaintLineIndent(C: TCanvas;
+  const ARect: TRect;
+  ACharSize: TPoint;
+  ACoordY: integer;
+  AIndentSize: integer;
+  AColorBG: TColor;
+  AScrollPos: integer;
+  AAllowIndentLines: boolean);
+var
+  i: integer;
+  RBack: TRect;
+begin
+  if AIndentSize=0 then Exit;
+
+  RBack:= Rect(0, 0, AIndentSize*ACharSize.X, ACharSize.Y);
+  OffsetRect(RBack, ARect.Left-AScrollPos*ACharSize.X, ACoordY);
+
+  C.Brush.Color:= AColorBG;
+  C.FillRect(RBack);
+
+  if AAllowIndentLines then
+    if FOptShowIndentLines then
+    begin
+      for i:= 0 to AIndentSize-1 do
+        if i mod FTabSize = 0 then
+          CanvasDottedVertLine(C, ARect.Left + (i-AScrollPos)*ACharSize.X, ACoordY, ACoordY+ACharSize.Y, FColors.IndentLines);
+    end;
 end;
 
 procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
