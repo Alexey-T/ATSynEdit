@@ -21,10 +21,13 @@ type
     Styles: TFontStyles;
   end;
 
+const
+  cMaxLineParts = 1000;
 type
-  TATLineParts = array[0..400] of TATLinePart;
+  TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
 
+type
   TATSynEditDrawLineEvent = procedure(Sender: TObject; C: TCanvas;
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: array of integer) of object;

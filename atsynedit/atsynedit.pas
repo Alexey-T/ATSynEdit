@@ -180,8 +180,8 @@ const
   cMinFontSize = 6;
   cMinTabSize = 1;
   cMaxTabSize = 16;
-  cMaxCharsForOutput = 800; //don't paint more chars in line
   cMinMinimapWidth = 30;
+  cMaxCharsForOutput = 1000; //don't paint more chars in line
   cMinWrapColumn = 20; //too small width won't give smaller wrap-column
   cMinWrapColumnAbs = 4; //absolute min of wrap-column (leave n chars on line anyway)
   cMinMarginRt = 20;
