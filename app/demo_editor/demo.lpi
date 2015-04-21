@@ -34,7 +34,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="31">
+    <Units Count="32">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -45,6 +45,7 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -104,7 +105,6 @@
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atcarets.pas"/>
@@ -113,7 +113,6 @@
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
@@ -157,7 +156,6 @@
       <Unit27>
         <Filename Value="..\..\atsynedit\atsynedit_wrapinfo.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_WrapInfo"/>
       </Unit27>
       <Unit28>
         <Filename Value="..\..\atsynedit\atsynedit_cmd_sel.inc"/>
@@ -171,6 +169,13 @@
         <Filename Value="..\..\atsynedit\atedits.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit30>
+      <Unit31>
+        <Filename Value="formcombo.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="fmCombo"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formcombo"/>
+      </Unit31>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

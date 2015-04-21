@@ -1,0 +1,30 @@
+object fmCombo: TfmCombo
+  Left = 426
+  Height = 240
+  Top = 370
+  Width = 397
+  Caption = 'Edit test'
+  ClientHeight = 240
+  ClientWidth = 397
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '1.5'
+  object Panel1: TPanel
+    Left = 30
+    Height = 49
+    Top = 104
+    Width = 335
+    BevelOuter = bvNone
+    ClientHeight = 49
+    ClientWidth = 335
+    TabOrder = 0
+    object Label1: TLabel
+      Left = 5
+      Height = 15
+      Top = 4
+      Width = 78
+      Caption = 'ATComboEdit:'
+      ParentColor = False
+    end
+  end
+end

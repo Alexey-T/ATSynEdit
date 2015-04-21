@@ -280,15 +280,6 @@ object fmMain: TfmMain
       OnClick = bOptClick
       TabOrder = 5
     end
-    object Label3: TLabel
-      Left = 5
-      Height = 15
-      Top = 432
-      Width = 70
-      Anchors = [akLeft, akBottom]
-      Caption = 'one-line edit:'
-      ParentColor = False
-    end
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]
@@ -361,7 +352,7 @@ object fmMain: TfmMain
         OnClick = mnuTMarginClick
       end
       object mnuOneLine: TMenuItem
-        Caption = 'set one-line edit..'
+        Caption = 'combo..'
         OnClick = mnuOneLineClick
       end
       object mnuTBms: TMenuItem
