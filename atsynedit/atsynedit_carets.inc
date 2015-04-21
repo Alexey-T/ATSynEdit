@@ -239,7 +239,7 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
-    FCaretSpecPos
+    FCaretSpecPos or FOptCaretPreferLeftSide
     );
 end;
 

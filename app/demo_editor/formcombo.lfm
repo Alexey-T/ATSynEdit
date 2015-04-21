@@ -10,16 +10,16 @@ object fmCombo: TfmCombo
   Position = poScreenCenter
   LCLVersion = '1.5'
   object Panel1: TPanel
-    Left = 30
+    Left = 32
     Height = 49
-    Top = 104
+    Top = 124
     Width = 335
     BevelOuter = bvNone
     ClientHeight = 49
     ClientWidth = 335
     TabOrder = 0
     object Label1: TLabel
-      Left = 5
+      Left = 0
       Height = 15
       Top = 4
       Width = 78

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, ATStringProc, ATEdits,
+  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, ATStringProc,
   formkey, formopt, formcombo;
 
 type
@@ -141,7 +141,7 @@ implementation
 uses
   Math,
   Types,
-  atsynedit_commands;
+  atsynedit_commands{%H-};
 
 {$R *.lfm}
 

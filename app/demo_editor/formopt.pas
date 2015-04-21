@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkCrPreferLeft: TCheckBox;
     chkKeepCol: TCheckBox;
     chkCurLineMin: TCheckBox;
     chkHint: TCheckBox;
@@ -144,6 +145,7 @@ begin
     chkCrVirt.Checked:= ed.OptCaretVirtual;
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
     chkCrUnfocus.Checked:= ed.OptCaretStopUnfocused;
+    chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
     edCrTime.Value:= ed.OptCaretTime;
     edCrShape.ItemIndex:= Ord(ed.OptCaretShape);
     edCrShape2.ItemIndex:= Ord(ed.OptCaretShapeOvr);
@@ -228,6 +230,7 @@ begin
       ed.OptCaretShapeOvr:= TATSynCaretShape(edCrShape2.ItemIndex);
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
       ed.OptCaretStopUnfocused:= chkCrUnfocus.Checked;
+      ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
 
       //gutter
       ed.OptNumbersFontSize:= edNumSize.Value;

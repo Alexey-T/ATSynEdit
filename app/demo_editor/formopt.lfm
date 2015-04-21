@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet1
-    TabIndex = 0
+    ActivePage = TabSheet4
+    TabIndex = 4
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -676,6 +676,14 @@ object fmOpt: TfmOpt
         Width = 54
         Caption = 'shape, ovr'
         ParentColor = False
+      end
+      object chkCrPreferLeft: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 100
+        Width = 233
+        Caption = 'end of wrapped part: prefer next line pos'
+        TabOrder = 6
       end
     end
     object TabSheet6: TTabSheet

@@ -310,6 +310,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptCaretPreferLeftSide: boolean;
     FOptShowScrollHint: boolean;
     FOptOffsetTop: integer;
     FOptSavingForceFinalEol: boolean;
@@ -682,6 +683,7 @@ type
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
     property OptCaretTime: integer read GetCaretTime write SetCaretTime;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused;
+    property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
@@ -1859,6 +1861,7 @@ begin
   FOptSavingForceFinalEol:= false;
   FOptSavingTrimSpaces:= false;
   FOptShowScrollHint:= false;
+  FOptCaretPreferLeftSide:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
