@@ -160,36 +160,37 @@ const
   cSizeGutterBandFold = 0;
   cSizeGutterBandState = 3;
   cSizeGutterBandEmpty = 2;
-  cCollapseMarkIndent = 3;
+
+  cCollapseMarkIndent = 3; //collapse-mark [...] for line partly folded
   cScrollKeepHorz = 1; //n chars allow handy clicking after eol
-  cScrollIndentCaretHorz = 10;
-  cScrollIndentCaretVert = 0; //mustbe 0, 1 gives jumps 2 lines on moving down
-  cScrollIndentGotoHorz = 10;
+  cScrollIndentCaretHorz = 10; //offsets for caret-moving: if caret goes out of control
+  cScrollIndentCaretVert = 0; //must be 0, >0 gives jumps on move-down
+  cScrollIndentGotoHorz = 10; //offsets for "goto" command: if caret goes out of control
   cScrollIndentGotoVert = 3;
-  cScrollAutoHorz = 10; //scroll N chrs each timer tick
-  cScrollAutoVert = 1;
-  cResizeBitmapStep = 100;
-  cSizeGutterNumOffsetLeft = 5;
-  cSizeGutterNumOffsetRight = 4;
+  cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
+  cSpeedScrollAutoVert = 1; //... speed y
+  cSpeedScrollNiceHorz = 4; //browser-scroll (middle-click): speed x
+  cSpeedScrollNiceVert = 1; //... speed y
+  cResizeBitmapStep = 200; //resize bitmap by N pixels step
+  cSizeGutterNumOffsetLeft = 5; //offset lefter line-num, px
+  cSizeGutterNumOffsetRight = 4; //offset righter line-num
   cSizeRulerHeight = 19;
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 7;
   cMinFontSize = 6;
   cMinTabSize = 1;
   cMaxTabSize = 16;
-  cMaxCharsForOutput = 400;
+  cMaxCharsForOutput = 800; //don't paint more chars in line
   cMinMinimapWidth = 30;
-  cMinWrapColumn = 20;
-  cMinWrapColumnAbs = 4;
+  cMinWrapColumn = 20; //too small width won't give smaller wrap-column
+  cMinWrapColumnAbs = 4; //absolute min of wrap-column (leave n chars on line anyway)
   cMinMarginRt = 20;
   cMinCaretTime = 300;
   cMaxCaretTime = 2000;
-  cMinCharsAfterAnyIndent = 20;
-  cMaxLinesForOldWrapUpdate = 100;
-  cSpeedNiceScrollX = 4;
-  cSpeedNiceScrollY = 1;
-  cHintStringLine = 'Line';
-  cHintDx = 5;
+  cMinCharsAfterAnyIndent = 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
+  cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
+  cHintScrollPrefix = 'Line';
+  cHintScrollDx = 5;
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -1417,7 +1418,8 @@ begin
         LineEolSelected,
         AScrollHorz);
 
-      DoPaintLineIndent(C, ARect, ACharSize, NCoordTop, WrapItem.NIndent,
+      DoPaintLineIndent(C, ARect, ACharSize,
+        NCoordTop, WrapItem.NIndent,
         IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
         AScrollHorz.NPos, AWithUnprintable);
 
@@ -2222,12 +2224,12 @@ var
 begin
   if not FOptShowScrollHint then Exit;
 
-  S:= cHintStringLine+' '+IntToStr(ScrollTop+1);
+  S:= cHintScrollPrefix+' '+IntToStr(ScrollTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
   P:= ClientToScreen(Point(ClientWidth-(R.Right-R.Left), 0));
   OffsetRect(R, P.X, P.Y);
-  OffsetRect(R, -cHintDx, cHintDx);
+  OffsetRect(R, -cHintScrollDx, cHintScrollDx);
 
   FHintWnd.ActivateHint(R, S);
 end;
@@ -2664,10 +2666,10 @@ begin
   PClient.Y:= Min(FRectMain.Bottom, PClient.Y);
 
   case FMouseAutoScroll of
-    cDirUp:    DoScrollByDelta(0, -cScrollAutoVert);
-    cDirDown:  DoScrollByDelta(0, cScrollAutoVert);
-    cDirLeft:  DoScrollByDelta(-cScrollAutoHorz, 0);
-    cDirRight: DoScrollByDelta(cScrollAutoHorz, 0);
+    cDirUp:    DoScrollByDelta(0, -cSpeedScrollAutoVert);
+    cDirDown:  DoScrollByDelta(0, cSpeedScrollAutoVert);
+    cDirLeft:  DoScrollByDelta(-cSpeedScrollAutoHorz, 0);
+    cDirRight: DoScrollByDelta(cSpeedScrollAutoHorz, 0);
     else Exit;
   end;
 
@@ -2723,8 +2725,8 @@ begin
   end;
 
   //delta in chars
-  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScrollRadius) div FCharSize.X + 1)*cSpeedNiceScrollX;
-  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScrollRadius) div FCharSize.Y + 1)*cSpeedNiceScrollY;
+  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScrollRadius) div FCharSize.X + 1)*cSpeedScrollNiceHorz;
+  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScrollRadius) div FCharSize.Y + 1)*cSpeedScrollNiceVert;
 
   if Dir in [cDirLeft, cDirRight] then
     DoScrollByDelta(Dx, 0)
