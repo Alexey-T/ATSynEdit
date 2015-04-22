@@ -1,18 +1,5 @@
 {$ifdef nnnn}begin end;{$endif}
 
-function TATSynEdit.IsPosCollapsed(AX, AY: integer): boolean;
-var
-  Flag: integer;
-begin
-  Result:= true;
-  if not Strings.IsIndexValid(AY) then Exit;
-
-  //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
-  Flag:= Strings.LinesHidden[AY];
-  if (Flag=-1) then Exit;
-  if (Flag>0) and (AX>=Flag) then Exit;
-  Result:= false;
-end;
 
 function TATSynEdit.IsLineWithCaret(ALine: integer): boolean;
 begin
@@ -112,7 +99,7 @@ begin
     Caret:= Carets[i];
     P.X:= Caret.PosX;
     P.Y:= Caret.PosY;
-    if IsPosCollapsed(P.X, P.Y) then
+    if Strings.IsPosCollapsed(P.X, P.Y) then
     begin
       Caret.CoordX:= -1;
       Caret.CoordY:= -1;

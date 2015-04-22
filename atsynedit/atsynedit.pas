@@ -587,7 +587,6 @@ type
     property RedoCount: integer read GetRedoCount;
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
-    function IsPosCollapsed(AX, AY: integer): boolean;
     property Text: atString read GetText write SetText;
     //gutter
     property Gutter: TATGutter read FGutter;

@@ -117,6 +117,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
+    function IsPosCollapsed(AX, AY: integer): boolean;
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(N: integer; const AString: atString);
@@ -938,6 +939,20 @@ begin
       Result:= true;
     end;
   end;
+end;
+
+function TATStrings.IsPosCollapsed(AX, AY: integer): boolean;
+var
+  Flag: integer;
+begin
+  Result:= true;
+  if not IsIndexValid(AY) then Exit;
+
+  //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
+  Flag:= LinesHidden[AY];
+  if (Flag=-1) then Exit;
+  if (Flag>0) and (AX>=Flag) then Exit;
+  Result:= false;
 end;
 
 {$I atstrings_editing.inc}
