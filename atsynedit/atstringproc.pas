@@ -150,13 +150,14 @@ begin
     Exit
   end;
 
+  //NAvg is average wrap offset, we use it if no correct offset found
   N:= Length(S)-1;
   while (N>0) and (List[N]>AColumns+1) do Dec(N);
   NAvg:= N;
   if NAvg<cMinWordWrapOffset then
     begin Result:= cMinWordWrapOffset; Exit end;
 
-  //loop: not allowed at edge
+  //find correct offset: not allowed at edge
   //a) 2 wordchars,
   //b) space as 2nd char (not nice look for Python src)
   NMin:= SGetIndentChars(S)+1;
@@ -166,6 +167,7 @@ begin
      IsCharSpace(S[N+1]))
     do Dec(N);
 
+  //use correct of avg offset
   if N>NMin then
     Result:= N
   else
