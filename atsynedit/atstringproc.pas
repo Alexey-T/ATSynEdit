@@ -156,8 +156,15 @@ begin
   if NAvg<cMinWordWrapOffset then
     begin Result:= cMinWordWrapOffset; Exit end;
 
+  //loop: not allowed at edge
+  //a) 2 wordchars,
+  //b) space as 2nd char (not nice look for Python src)
   NMin:= SGetIndentChars(S)+1;
-  while (N>NMin) and IsCharWord(S[N], AWordChars) and IsCharWord(S[N+1], AWordChars) do Dec(N);
+  while (N>NMin) and
+    ((IsCharWord(S[N], AWordChars) and
+      IsCharWord(S[N+1], AWordChars)) or
+     IsCharSpace(S[N+1]))
+    do Dec(N);
 
   if N>NMin then
     Result:= N
