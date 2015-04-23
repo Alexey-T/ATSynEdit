@@ -55,7 +55,9 @@ begin
       Pnt.Y:= Caret.CoordY;
       Pnt:= ClientPosToCaretPos(Pnt);
       if Pnt.X<Length(Str) then
-        NWrapped:= Pnt.X;
+        NWrapped:= Pnt.X-1;
+        //-1 here: need to jump not to last chr but to last-1 chr
+        //(like Synwrite; to not blink caret at next part of wrapped line)
     end;
 
     if FOptKeyEndToNonSpace then
