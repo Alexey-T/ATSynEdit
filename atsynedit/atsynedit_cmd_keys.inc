@@ -5,6 +5,7 @@ var
   i, NIndent, NWrapped: integer;
   Caret: TATCaretItem;
   Pnt: TPoint;
+  EolPos: boolean;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -16,7 +17,7 @@ begin
     begin
       Pnt.X:= 0;
       Pnt.Y:= Caret.CoordY;
-      Pnt:= ClientPosToCaretPos(Pnt);
+      Pnt:= ClientPosToCaretPos(Pnt, EolPos);
       NWrapped:= Pnt.X;
     end;
 
@@ -41,6 +42,7 @@ var
   Str: atString;
   Pnt: TPoint;
   i, NLen, NWrapped: integer;
+  EolPos: boolean;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -53,7 +55,7 @@ begin
     begin
       Pnt.X:= ClientWidth;
       Pnt.Y:= Caret.CoordY;
-      Pnt:= ClientPosToCaretPos(Pnt);
+      Pnt:= ClientPosToCaretPos(Pnt, EolPos);
       if Pnt.X<Length(Str) then
         NWrapped:= Pnt.X-1;
         //-1 here: need to jump not to last chr but to last-1 chr
@@ -173,6 +175,7 @@ var
   Caret: TATCaretItem;
   Pnt: TPoint;
   i: integer;
+  EolPos: boolean;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -183,7 +186,7 @@ begin
       Pnt.X:= Caret.CoordColumn;
 
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne(ADown);
-    Pnt:= ClientPosToCaretPos(Pnt);
+    Pnt:= ClientPosToCaretPos(Pnt, EolPos);
     if Pnt.Y<0 then Continue;
     Caret.PosX:= Pnt.X;
     Caret.PosY:= Pnt.Y;

@@ -49,6 +49,7 @@ end;
 procedure TATSynEdit.DoCaretsColumnToPoint(AX, AY: integer);
 var
   P, PM1, PM2: TPoint;
+  EolPos: boolean;
 begin
   DoCaretSingleAsIs;
   with Carets[0] do
@@ -62,13 +63,13 @@ begin
     SwapInt(PM1.Y, PM2.Y);
 
   Carets.Clear;
-  P:= ClientPosToCaretPos(PM1);
+  P:= ClientPosToCaretPos(PM1, EolPos);
   if P.Y>=0 then
     Carets.Add(P.X, P.Y);
 
   repeat
     Inc(PM1.Y, FCharSize.Y);
-    P:= ClientPosToCaretPos(PM1);
+    P:= ClientPosToCaretPos(PM1, EolPos);
     if P.Y>=0 then
       if not Carets.IsLineListed(P.Y) then
         Carets.Add(P.X, P.Y);
@@ -168,13 +169,15 @@ function _DoClientPosToCaretPos(
   ATabSize: integer;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
-  ACaretVirtualPos: boolean): TPoint;
+  ACaretVirtualPos: boolean;
+  out AEndOfLinePos: boolean): TPoint;
 var
   NPixels, NIndex: integer;
   Item: TATSynWrapItem;
   Str: atString;
   AllowVirtual: boolean;
 begin
+  AEndOfLinePos:= false;
   Result.X:= 0;
   Result.Y:= -1;
   if (ACharSize.X<=0) or (ACharSize.Y<=0) then Exit;
@@ -211,7 +214,7 @@ begin
 
     AllowVirtual:= ACaretVirtualPos and (Item.NFinal=cWrapItemFinal);
     NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
-    NIndex:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize, AllowVirtual) + Item.NCharIndex - 2;
+    NIndex:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize, AllowVirtual, AEndOfLinePos) + Item.NCharIndex - 2;
     Result.X:= NIndex;
   end;
 end;
@@ -230,7 +233,7 @@ begin
     );
 end;
 
-function TATSynEdit.ClientPosToCaretPos(P: TPoint): TPoint;
+function TATSynEdit.ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;
 begin
   Result:= _DoClientPosToCaretPos(P,
     FWrapInfo,
@@ -240,7 +243,8 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
-    FCaretVirtual);
+    FCaretVirtual,
+    AEndOfLinePos);
 end;
 
 procedure TATSynEdit.SetCaretShape(AValue: TATSynCaretShape);

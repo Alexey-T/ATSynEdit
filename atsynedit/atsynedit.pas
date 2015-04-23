@@ -602,7 +602,7 @@ type
     procedure DoCaretSingle(AX, AY: integer);
     procedure DoCaretSingleAsIs;
     function CaretPosToClientPos(P: TPoint): TPoint;
-    function ClientPosToCaretPos(P: TPoint): TPoint;
+    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;
     property Carets: TATCarets read FCarets;
     function IsLineWithCaret(ALine: integer): boolean;
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
@@ -2286,11 +2286,12 @@ end;
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   PCaret: TPoint;
+  EolPos: boolean;
 begin
   inherited;
   SetFocus;
 
-  PCaret:= ClientPosToCaretPos(Point(X, Y));
+  PCaret:= ClientPosToCaretPos(Point(X, Y), EolPos);
   FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
   FMouseDragDropping:= false;
@@ -2445,7 +2446,7 @@ var
   P: TPoint;
   RectNums: TRect;
   nIndex: integer;
-  bMap: boolean;
+  bMap, bEolPos: boolean;
 begin
   inherited;
 
@@ -2481,7 +2482,7 @@ begin
   begin
     if Shift=[ssLeft] then
     begin
-      P:= ClientPosToCaretPos(P);
+      P:= ClientPosToCaretPos(P, bEolPos);
       if (P.Y>=0) and (P.X>=0) then
         if FMouseDownNumber>=0 then
         begin
@@ -2501,7 +2502,7 @@ begin
       if ssLeft in Shift then
         if Carets.Count>0 then
         begin
-          P:= ClientPosToCaretPos(P);
+          P:= ClientPosToCaretPos(P, bEolPos);
           if P.Y>=0 then
           begin
             //drag w/out button pressed: single selection
@@ -2595,11 +2596,12 @@ end;
 procedure TATSynEdit.DoSelect_Word_ByClick;
 var
   P: TPoint;
+  EolPos: boolean;
 begin
   P:= ScreenToClient(Mouse.CursorPos);
   if PtInRect(FRectMain, P) then
   begin
-    P:= ClientPosToCaretPos(P);
+    P:= ClientPosToCaretPos(P, EolPos);
     if P.Y<0 then Exit;
     DoSelect_Word(P);
     Update;
@@ -2622,11 +2624,12 @@ end;
 procedure TATSynEdit.DoSelect_Line_ByClick;
 var
   P: TPoint;
+  EolPos: boolean;
 begin
   P:= ScreenToClient(Mouse.CursorPos);
   if PtInRect(FRectMain, P) then
   begin
-    P:= ClientPosToCaretPos(P);
+    P:= ClientPosToCaretPos(P, EolPos);
     if P.Y<0 then Exit;
     DoSelect_Line(P);
     Update;
@@ -2661,6 +2664,7 @@ procedure TATSynEdit.TimerScrollTick(Sender: TObject);
 var
   nIndex: integer;
   PClient, PCaret: TPoint;
+  EolPos: boolean;
 begin
   PClient:= ScreenToClient(Mouse.CursorPos);
   PClient.X:= Max(FRectMain.Left, PClient.X);
@@ -2676,7 +2680,7 @@ begin
     else Exit;
   end;
 
-  PCaret:= ClientPosToCaretPos(PClient);
+  PCaret:= ClientPosToCaretPos(PClient, EolPos);
   if (PCaret.X>=0) and (PCaret.Y>=0) then
     if FMouseDownNumber>=0 then
     begin
@@ -3024,7 +3028,7 @@ procedure TATSynEdit.DoDropText;
 var
   P, PosAfter, Shift: TPoint;
   X1, Y1, X2, Y2: integer;
-  bSel: boolean;
+  bSel, bEolPos: boolean;
   Str: atString;
   Relation: TATPosRelation;
 begin
@@ -3036,7 +3040,7 @@ begin
 
   //calc insert-pos
   P:= ScreenToClient(Mouse.CursorPos);
-  P:= ClientPosToCaretPos(P);
+  P:= ClientPosToCaretPos(P, bEolPos);
   if P.Y<0 then
     begin Beep; Exit end;
 

@@ -52,7 +52,8 @@ function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
 function SFindClickedPosition(const Str: atString;
   APixelsFromLeft, ACharSize, ATabSize: integer;
-  AAllowVirtualPos: boolean): integer;
+  AAllowVirtualPos: boolean;
+  out AEndOfLinePos: boolean): integer;
 procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
   out ACharsSkipped: integer; out ASpacesSkipped: real);
 
@@ -345,12 +346,14 @@ end;
 
 function SFindClickedPosition(const Str: atString;
   APixelsFromLeft, ACharSize, ATabSize: integer;
-  AAllowVirtualPos: boolean): integer;
+  AAllowVirtualPos: boolean;
+  out AEndOfLinePos: boolean): integer;
 var
   ListReal: array of real;
   ListEnds, ListMid: array of integer;
   i: integer;
 begin
+  AEndOfLinePos:= false;
   if Str='' then
   begin
     if AAllowVirtualPos then
@@ -383,6 +386,7 @@ begin
       Exit
     end;
 
+  AEndOfLinePos:= true;
   if AAllowVirtualPos then
     Result:= Length(Str)+1 + (APixelsFromLeft - ListEnds[High(ListEnds)]) div ACharSize
   else
