@@ -188,6 +188,10 @@ begin
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne(ADown);
     Pnt:= ClientPosToCaretPos(Pnt, EolPos);
     if Pnt.Y<0 then Continue;
+
+    if EolPos and (Pnt.X>0) then
+      Dec(Pnt.X); //-1 so up/down won't jump to eol pos (caret may paint on next line)
+
     Caret.PosX:= Pnt.X;
     Caret.PosY:= Pnt.Y;
   end;
