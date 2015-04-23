@@ -49,7 +49,7 @@ function SRemoveAsciiControlChars(const S: atString): atString;
 procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
   ATabSize: integer; ACharsSkipped: integer = 0);
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
-  const AWordChars: atString): integer;
+  const AWordChars: atString; AWrapIndented: boolean): integer;
 function SFindClickedPosition(const Str: atString;
   APixelsFromLeft, ACharSize, ATabSize: integer;
   AAllowVirtualPos: boolean): integer;
@@ -131,7 +131,7 @@ begin
 end;
 
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
-  const AWordChars: atString): integer;
+  const AWordChars: atString; AWrapIndented: boolean): integer;
 var
   N, NMin, NAvg: integer;
   List: array of real;
@@ -164,7 +164,7 @@ begin
   while (N>NMin) and
     ((IsCharWord(S[N], AWordChars) and
       IsCharWord(S[N+1], AWordChars)) or
-     IsCharSpace(S[N+1]))
+     (AWrapIndented and IsCharSpace(S[N+1])))
     do Dec(N);
 
   //use correct of avg offset

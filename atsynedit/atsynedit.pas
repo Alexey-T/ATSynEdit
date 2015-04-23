@@ -1013,7 +1013,7 @@ begin
   NIndent:= 0;
 
   repeat
-    NLen:= SFindWordWrapOffset(Str, Max(FWrapColumn-NIndent, cMinWrapColumnAbs), FTabSize, FOptWordChars);
+    NLen:= SFindWordWrapOffset(Str, Max(FWrapColumn-NIndent, cMinWrapColumnAbs), FTabSize, FOptWordChars, FWrapIndented);
     if NLen>=Length(Str) then
       NFinal:= cWrapItemFinal
     else
