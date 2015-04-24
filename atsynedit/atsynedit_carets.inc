@@ -216,6 +216,9 @@ begin
     NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
     NIndex:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize, AllowVirtual, AEndOfLinePos) + Item.NCharIndex - 2;
     Result.X:= NIndex;
+
+    if Item.NFinal=cWrapItemFinal then //dont set EolPos for real eol
+      AEndOfLinePos:= false;
   end;
 end;
 
