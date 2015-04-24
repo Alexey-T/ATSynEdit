@@ -834,18 +834,24 @@ end;
 
 procedure TATStrings.DoUndoRedo(AUndo: boolean; AGrouped: boolean);
 var
-  List: TATUndoList;
+  List, ListOther: TATUndoList;
   bEnd: boolean;
 begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 
-  if AUndo then List:= FUndoList else List:= FRedoList;
-  //List.DebugShow;
+  if AUndo then
+    begin List:= FUndoList; ListOther:= FRedoList end
+  else
+    begin List:= FRedoList; ListOther:= FUndoList end;
 
   repeat
     bEnd:= DoUndoSingle(List);
   until (not AGrouped) or bEnd;
+
+  //if grouped: mark undone group in ListOther
+  if bEnd and AGrouped then
+    ListOther.GroupMark:= true;
 end;
 
 procedure TATStrings.Undo(AGrouped: boolean);
