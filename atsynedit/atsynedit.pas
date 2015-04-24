@@ -371,7 +371,6 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
-    procedure DoSelect_ExtendSelectionByLine;
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetModified: boolean;
     function GetOneLine: boolean;
@@ -391,6 +390,7 @@ type
       ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
     //select
     procedure DoSelectionDeleteOrReset;
+    procedure DoSelect_ExtendSelectionByLine;
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);

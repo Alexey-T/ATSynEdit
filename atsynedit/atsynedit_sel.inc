@@ -200,13 +200,16 @@ begin
       if not Sel then
         begin X2:= X1; Y2:= Y1; end;
 
+      X1:= 0; //select entire 1st line
       if Y2<Strings.Count-1 then
       begin
+        //select till start of next ln
         X2:= 0;
         Y2:= Y2+1;
       end
       else
       begin
+        //select till eof
         PosLast:= GetEndOfFilePos;
         X2:= PosLast.X;
         Y2:= PosLast.Y;
