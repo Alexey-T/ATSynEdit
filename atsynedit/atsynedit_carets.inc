@@ -169,15 +169,15 @@ function _DoClientPosToCaretPos(
   ATabSize: integer;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
-  ACaretVirtualPos: boolean;
-  out AEndOfLinePos: boolean): TPoint;
+  AVirtualPos: boolean;
+  out AWrappedEnd: boolean): TPoint;
 var
   NPixels, NIndex: integer;
   Item: TATSynWrapItem;
   Str: atString;
   AllowVirtual: boolean;
 begin
-  AEndOfLinePos:= false;
+  AWrappedEnd:= false;
   Result.X:= 0;
   Result.Y:= -1;
   if (ACharSize.X<=0) or (ACharSize.Y<=0) then Exit;
@@ -200,8 +200,7 @@ begin
     begin
       Item:= AWrapInfo.Items[NIndex];
       Result.Y:= Item.NLineIndex;
-      NIndex:= Item.NCharIndex+Item.NLength-1;
-      Result.X:= NIndex;
+      Result.X:= Item.NCharIndex+Item.NLength-1;
     end;
   end
   else
@@ -212,13 +211,12 @@ begin
 
     Str:= Copy(AStrings.Lines[Result.Y], Item.NCharIndex, Item.NLength);
 
-    AllowVirtual:= ACaretVirtualPos and (Item.NFinal=cWrapItemFinal);
+    AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
     NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
-    NIndex:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize, AllowVirtual, AEndOfLinePos) + Item.NCharIndex - 2;
-    Result.X:= NIndex;
+    Result.X:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize, AllowVirtual, AWrappedEnd) + Item.NCharIndex - 2;
 
-    if Item.NFinal=cWrapItemFinal then //dont set EolPos for real eol
-      AEndOfLinePos:= false;
+    if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol
+      AWrappedEnd:= false;
   end;
 end;
 
