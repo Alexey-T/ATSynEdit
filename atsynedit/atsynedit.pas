@@ -1477,17 +1477,16 @@ begin
       end;
 
       //paint eol mark
-      if AMainText and FUnprintedVisible then
-        if FUnprintedEnds then
-          DoPaintUnprintedEol(C,
-            cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
-            Point(
-              CurrPointText.X+NOutputStrWidth,
-              CurrPointText.Y),
-            ACharSize,
-            FColors.UnprintedFont,
-            FColors.UnprintedBG,
-            FUnprintedEndsDetails);
+      if AMainText and FUnprintedVisible and FUnprintedEnds then
+        DoPaintUnprintedEol(C,
+          cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
+          Point(
+            CurrPointText.X+NOutputStrWidth,
+            CurrPointText.Y),
+          ACharSize,
+          FColors.UnprintedFont,
+          FColors.UnprintedBG,
+          FUnprintedEndsDetails);
     end;
 
     //draw collapsed-mark
