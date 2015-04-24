@@ -407,11 +407,11 @@ type
     procedure DoPaintTextTo(C: TCanvas;
       const ARect: TRect;
       const ACharSize: TPoint;
-      AWithGutter, AWithUnprintable: boolean;
+      AWithGutter, AMainText: boolean;
       var AScrollHorz, AScrollVert: TATSynScrollInfo);
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
-      AScrollPos: integer; AAllowIndentLines: boolean);
+      AScrollPos: integer; AIndentLines: boolean);
     procedure DoPaintMinimapSelTo(C: TCanvas);
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
@@ -1254,7 +1254,7 @@ begin
       FOnDrawRuler(Self, C, FRectRuler);
   end;
 
-  DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, FUnprintedVisible, FScrollHorz, FScrollVert);
+  DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert);
   DoPaintMarginsTo(C);
   DoPaintNiceScroll(C);
 
@@ -1279,7 +1279,7 @@ end;
 procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   const ARect: TRect;
   const ACharSize: TPoint;
-  AWithGutter, AWithUnprintable: boolean;
+  AWithGutter, AMainText: boolean;
   var AScrollHorz, AScrollVert: TATSynScrollInfo);
 var
   NGutterBmX1, NGutterBmX2,
@@ -1423,7 +1423,7 @@ begin
       DoPaintLineIndent(C, ARect, ACharSize,
         NCoordTop, WrapItem.NIndent,
         IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
-        AScrollHorz.NPos, AWithUnprintable);
+        AScrollHorz.NPos, AMainText and FOptShowIndentLines);
 
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
@@ -1441,7 +1441,7 @@ begin
         FTabSize,
         ACharSize,
         FUnprintedReplaceSpec,
-        AWithUnprintable and FUnprintedSpaces,
+        AMainText and FUnprintedVisible and FUnprintedSpaces,
         FColors.UnprintedFont,
         FColors.UnprintedHexFont,
         NOutputStrWidth,
@@ -1477,7 +1477,7 @@ begin
       end;
 
       //paint eol mark
-      if AWithUnprintable then
+      if AMainText and FUnprintedVisible then
         if FUnprintedEnds then
           DoPaintUnprintedEol(C,
             cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
@@ -1492,7 +1492,7 @@ begin
 
     //draw collapsed-mark
     if WrapItem.NFinal=cWrapItemCollapsed then
-      if AWithUnprintable then
+      if AMainText then
         DoPaintCollapseMark(C, Str, CurrPoint, AScrollHorz.NPos);
 
     //draw gutter
@@ -2823,7 +2823,7 @@ procedure TATSynEdit.DoPaintLineIndent(C: TCanvas;
   AIndentSize: integer;
   AColorBG: TColor;
   AScrollPos: integer;
-  AAllowIndentLines: boolean);
+  AIndentLines: boolean);
 var
   i: integer;
   RBack: TRect;
@@ -2836,13 +2836,10 @@ begin
   C.Brush.Color:= AColorBG;
   C.FillRect(RBack);
 
-  if AAllowIndentLines then
-    if FOptShowIndentLines then
-    begin
-      for i:= 0 to AIndentSize-1 do
-        if i mod FTabSize = 0 then
-          CanvasDottedVertLine(C, ARect.Left + (i-AScrollPos)*ACharSize.X, ACoordY, ACoordY+ACharSize.Y, FColors.IndentLines);
-    end;
+  if AIndentLines then
+    for i:= 0 to AIndentSize-1 do
+      if i mod FTabSize = 0 then
+        CanvasDottedVertLine(C, ARect.Left + (i-AScrollPos)*ACharSize.X, ACoordY, ACoordY+ACharSize.Y, FColors.IndentLines);
 end;
 
 procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
