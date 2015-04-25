@@ -176,9 +176,9 @@
         <ResourceBaseClass Value="Form"/>
       </Unit31>
       <Unit32>
-        <Filename Value="..\..\atsynedit\atsynedit_lists.pas"/>
+        <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Lists"/>
+        <UnitName Value="ATSynEdit_Ranges"/>
       </Unit32>
     </Units>
   </ProjectOptions>

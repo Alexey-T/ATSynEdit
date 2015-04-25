@@ -1,4 +1,4 @@
-unit ATSynEdit_Lists;
+unit ATSynEdit_Ranges;
 
 {$mode objfpc}{$H+}
 
@@ -15,7 +15,7 @@ type
     X, Y, //start pos
     Y2: integer; //end line which is fully folded (can't partially fold)
     constructor Create(AX, AY, AY2: integer); virtual;
-    function IsOneLine: boolean;
+    function IsSimple: boolean;
   end;
 
 type
@@ -25,12 +25,12 @@ type
   private
     FList: TList;
     function GetCount: integer;
-    function IsIndexValid(N: integer): boolean;
     function GetItems(Index: integer): TATSynRange;
   public
     constructor Create; virtual;
     destructor Destroy; override;
     property Count: integer read GetCount;
+    function IsIndexValid(N: integer): boolean;
     procedure Clear;
     procedure Add(AX, AY, AY2: integer);
     procedure Insert(Index: integer; AX, AY, AY2: integer);
@@ -49,7 +49,7 @@ begin
   Y2:= AY2;
 end;
 
-function TATSynRange.IsOneLine: boolean;
+function TATSynRange.IsSimple: boolean;
 begin
   Result:= Y>=Y2;
 end;
