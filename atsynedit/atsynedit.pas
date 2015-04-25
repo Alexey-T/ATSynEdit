@@ -138,6 +138,7 @@ type
     );
 
 const
+  cShowLockedText: string = 'wait...';
   cInitCaretShape = cCaretShapeVert2px;
   cInitSpacingText = 1;
   cInitSpacingMinimap = -1;
@@ -2185,7 +2186,7 @@ begin
     Canvas.Brush.Color:= FColors.LockedBG;
     Canvas.FillRect(ClientRect);
     Canvas.Font.Assign(Self.Font);
-    Canvas.TextOut(4, 4, '...');
+    Canvas.TextOut(10, 5, cShowLockedText);
     Exit;
   end;
 
