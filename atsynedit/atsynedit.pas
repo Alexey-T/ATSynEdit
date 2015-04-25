@@ -138,12 +138,11 @@ type
     );
 
 const
-  cShowLockedText: string = 'wait...';
   cInitCaretShape = cCaretShapeVert2px;
   cInitSpacingText = 1;
   cInitSpacingMinimap = -1;
   cInitTimerBlink = 600;
-  cInitTimerScroll = 80;
+  cInitTimerAutoScroll = 80;
   cInitTimerNiceScroll = 200;
   cInitMinimapVisible = false;
   cInitMicromapVisible = false;
@@ -157,14 +156,15 @@ const
   cInitBitmapHeight = 800;
 
   cGutterBands = 5;
-  cSizeGutterBandBm = 16;
-  cSizeGutterBandNum = 10;
-  cSizeGutterBandFold = 0;
-  cSizeGutterBandState = 3;
-  cSizeGutterBandEmpty = 2;
+  cGutterSizeBm = 16;
+  cGutterSizeNum = 10;
+  cGutterSizeFold = 0;
+  cGutterSizeState = 3;
+  cGutterSizeEmpty = 2;
 
+  cShowLockedText: string = 'wait...';
   cCollapseMarkIndent = 3; //collapse-mark [...] for line partly folded
-  cScrollKeepHorz = 1; //n chars allow handy clicking after eol
+  cScrollKeepHorz = 1; //keep char, allow handy clicking after eol of longest line
   cScrollIndentCaretHorz = 10; //offsets for caret-moving: if caret goes out of control
   cScrollIndentCaretVert = 0; //must be 0, >0 gives jumps on move-down
   cScrollIndentGotoHorz = 10; //offsets for "goto" command: if caret goes out of control
@@ -1745,7 +1745,7 @@ begin
   FTimerBlink.Enabled:= true;
 
   FTimerScroll:= TTimer.Create(Self);
-  FTimerScroll.Interval:= cInitTimerScroll;
+  FTimerScroll.Interval:= cInitTimerAutoScroll;
   FTimerScroll.OnTimer:= @TimerScrollTick;
   FTimerScroll.Enabled:= false;
 
@@ -1792,11 +1792,11 @@ begin
   FGutterBandEmpty:= 4;
 
   for i:= 1 to cGutterBands do FGutter.Add(10);
-  FGutter[FGutterBandBm].Size:= cSizeGutterBandBm;
-  FGutter[FGutterBandNum].Size:= cSizeGutterBandNum;
-  FGutter[FGutterBandState].Size:= cSizeGutterBandState;
-  FGutter[FGutterBandFold].Size:= cSizeGutterBandFold;
-  FGutter[FGutterBandEmpty].Size:= cSizeGutterBandEmpty;
+  FGutter[FGutterBandBm].Size:= cGutterSizeBm;
+  FGutter[FGutterBandNum].Size:= cGutterSizeNum;
+  FGutter[FGutterBandState].Size:= cGutterSizeState;
+  FGutter[FGutterBandFold].Size:= cGutterSizeFold;
+  FGutter[FGutterBandEmpty].Size:= cGutterSizeEmpty;
   FGutter.Update;
 
   FOptNumbersFontSize:= 0;
