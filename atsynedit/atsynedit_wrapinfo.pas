@@ -191,8 +191,8 @@ begin
     dif:= Items[m].NLineIndex-ALineNum;
     if dif=0 then Break;
 
+    if Abs(a-b)<=1 then Exit;
     if dif>0 then b:= m else a:= m;
-    if a=b then Exit;
   until false;
 
   AFrom:= m;
