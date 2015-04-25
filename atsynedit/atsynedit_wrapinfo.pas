@@ -182,11 +182,8 @@ begin
     dif:= Items[a].NLineIndex-ALineNum;
     if dif=0 then begin m:= a; Break end;
 
-    m:= a+b;
-    if Odd(m) then
-      m:= m div 2 +1
-    else
-      m:= m div 2;
+    //middle, which is near b if not exact middle
+    m:= (a+b+1) div 2;
 
     dif:= Items[m].NLineIndex-ALineNum;
     if dif=0 then Break;
