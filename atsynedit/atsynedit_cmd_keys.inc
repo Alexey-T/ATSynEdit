@@ -165,9 +165,9 @@ begin
 
     repeat
       Y:= Y+ALines*BoolToPlusMinusOne(ADown);
-    until not Strings.IsIndexValid(Y) or not IsLineCollapsedFull(Y);
+    until not Strings.IsIndexValid(Y) or not IsLineCollapsed(Y);
 
-    if not IsLineCollapsedFull(Y) then
+    if not IsLineCollapsed(Y) then
     begin
       if Y<0 then Y:= GetFirstUncollapsedLineNumber;
       if Y>=Strings.Count then Y:= GetLastUncollapsedLineNumber;
@@ -192,7 +192,7 @@ begin
   begin
     Caret:= FCarets[i];
 
-    if Strings.IsPosCollapsed(Caret.PosX, Caret.PosY) then
+    if IsPosCollapsed(Caret.PosX, Caret.PosY) then
     begin
       Caret.PosX:= 0;
       Caret.PosY:= GetNextUncollapsedLineNumber(Caret.PosY, ADown);

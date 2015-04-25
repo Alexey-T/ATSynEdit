@@ -100,7 +100,7 @@ begin
     Caret:= Carets[i];
     P.X:= Caret.PosX;
     P.Y:= Caret.PosY;
-    if Strings.IsPosCollapsed(P.X, P.Y) then
+    if IsPosCollapsed(P.X, P.Y) then
     begin
       Caret.CoordX:= -1;
       Caret.CoordY:= -1;
@@ -268,7 +268,7 @@ procedure TATSynEdit.DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
 var
   NIndex, NVisLines, NChars: integer;
 begin
-  if Strings.IsPosCollapsed(APnt.X, APnt.Y) then Exit;
+  if IsPosCollapsed(APnt.X, APnt.Y) then Exit;
 
   NVisLines:= GetVisibleLines;
   APnt:= CaretPosToClientPos(APnt);
@@ -314,9 +314,9 @@ begin
   DoCommandExec(cCommand_Cancel);
   DoCaretSingle(APnt.X, APnt.Y);
 
-  if Strings.LinesHidden[APnt.Y]<>0 then //collapsed
+  if IsLineCollapsed(APnt.Y, true) then
   begin
-    Strings.LinesHidden[APnt.Y]:= 0; //uncollapse
+    DoUncollapseLine(APnt.Y);
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
   end;
