@@ -18,7 +18,7 @@ uses
   Controls, ExtCtrls, Menus, Forms,
   LMessages, LCLType,
   ATStringProc, ATStrings, ATCanvasProc, ATGutter,
-  ATCarets, ATKeyMapping, ATSynEdit_WrapInfo;
+  ATCarets, ATKeyMapping, ATSynEdit_WrapInfo, ATSynEdit_Ranges;
 
 type
   TATDirection = (
@@ -234,6 +234,7 @@ type
     FMarginList: TList;
     FStringsInt,
     FStringsExternal: TATStrings;
+    FFoldList: TATSynRanges;
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
@@ -388,6 +389,7 @@ type
     function GetUndoLimit: integer;
     procedure DoInitColors;
     procedure DoInitPopupMenu;
+    procedure DoDebugInitFoldList;
     function IsLineFolded(ALineNum: integer; ADetectPartiallyFolded: boolean = false): boolean;
     function IsLineFoldedFull(ALineNum: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
@@ -1766,6 +1768,8 @@ begin
   FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
 
+  FFoldList:= TATSynRanges.Create;
+
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
   FWrapUpdateNeeded:= true;
@@ -1887,6 +1891,7 @@ begin
 
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitPopupMenu;
+  DoDebugInitFoldList;
 end;
 
 destructor TATSynEdit.Destroy;
@@ -1894,6 +1899,7 @@ begin
   FreeAndNil(FHintWnd);
   FreeAndNil(FMenu);
   DoPaintModeStatic;
+  FreeAndNil(FFoldList);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);

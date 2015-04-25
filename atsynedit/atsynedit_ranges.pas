@@ -14,6 +14,7 @@ type
   public
     X, Y, //start pos
     Y2: integer; //end line which is fully folded (can't partially fold)
+    Folded: boolean;
     constructor Create(AX, AY, AY2: integer); virtual;
     function IsSimple: boolean;
   end;

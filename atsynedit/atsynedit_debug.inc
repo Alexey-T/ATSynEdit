@@ -22,4 +22,14 @@ begin
   Application.MainForm.caption:= 'ok findindex';
 end;
 
+procedure TATSynEdit.DoDebugInitFoldList;
+var
+  i: integer;
+begin
+  FFoldList.Clear;
+  for i:= 0 to (Strings.Count-1) div 10 do
+    if Odd(i) then
+      FFoldList.Add(4, i*10, i*10+9);
+end;
+
 
