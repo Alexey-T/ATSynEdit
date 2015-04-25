@@ -214,11 +214,12 @@ begin
 end;
 
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;
+var
+  Item: TATSynWrapItem;
 begin
-  DoCaretSingle(
-    0,
-    GetFirstUncollapsedLineNumber
-    );
+  Item:= FWrapInfo[0];
+  if Assigned(Item) then
+    DoCaretSingle(0, Item.NLineIndex);
 
   FScrollHorz.NPos:= 0;
   FScrollVert.NPos:= 0;
@@ -226,27 +227,13 @@ begin
   Result:= [cResultCaretTop];
 end;
 
-function TATSynEdit.GetEndOfFilePos: TPoint;
-begin
-  Result.X:= 0;
-  Result.Y:= 0;
-  if Strings.Count>0 then
-  begin
-    Result.Y:= Strings.Count-1;
-    Result.X:= Length(Strings.Lines[Result.Y]);
-    if Strings.LinesEnds[Result.Y]<>cEndNone then
-      Inc(Result.X);
-  end;
-end;
-
 function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
 var
-  P: TPoint;
+  Item: TATSynWrapItem;
 begin
-  DoCaretSingle(
-    GetEndOfFilePos.X,
-    GetLastUncollapsedLineNumber
-    );
+  Item:= FWrapInfo[FWrapInfo.Count-1];
+  if Assigned(Item) then
+    DoCaretSingle(Item.NLength, Item.NLineIndex);
 
   Result:= [cResultCaretBottom];
 end;

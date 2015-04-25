@@ -3243,6 +3243,18 @@ begin
   Invalidate;
 end;
 
+function TATSynEdit.GetEndOfFilePos: TPoint;
+begin
+  Result.X:= 0;
+  Result.Y:= 0;
+  if Strings.Count>0 then
+  begin
+    Result.Y:= Strings.Count-1;
+    Result.X:= Length(Strings.Lines[Result.Y]);
+    if Strings.LinesEnds[Result.Y]<>cEndNone then
+      Inc(Result.X);
+  end;
+end;
 
 function TATSynEdit.IsLineCollapsedFull(ALineNum: integer): boolean;
 begin
