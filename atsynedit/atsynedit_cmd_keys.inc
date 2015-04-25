@@ -192,6 +192,13 @@ begin
   begin
     Caret:= FCarets[i];
 
+    if Strings.IsPosCollapsed(Caret.PosX, Caret.PosY) then
+    begin
+      Caret.PosX:= 0;
+      Caret.PosY:= GetNextUncollapsedLineNumber(Caret.PosY, ADown);
+      Continue;
+    end;
+
     Pnt.X:= Caret.CoordX;
     if FOptKeyUpDownKeepColumn and (Caret.CoordColumn>0) then
       Pnt.X:= Caret.CoordColumn;

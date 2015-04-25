@@ -268,6 +268,8 @@ procedure TATSynEdit.DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
 var
   NIndex, NVisLines, NChars: integer;
 begin
+  if Strings.IsPosCollapsed(APnt.X, APnt.Y) then Exit;
+
   NVisLines:= GetVisibleLines;
   APnt:= CaretPosToClientPos(APnt);
   NIndex:= GetWrapInfoIndex(APnt);

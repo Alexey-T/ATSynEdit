@@ -377,6 +377,7 @@ type
     function GetFirstUncollapsedLineNumber: integer;
     function GetLastUncollapsedLineNumber: integer;
     function GetModified: boolean;
+    function GetNextUncollapsedLineNumber(ALine: integer; ADown: boolean): integer;
     function GetOneLine: boolean;
     function GetRedoCount: integer;
     function GetScrollTopRelative: integer;
@@ -3283,6 +3284,16 @@ begin
   if Strings.IsIndexValid(N) then Result:= N;
 end;
 
+function TATSynEdit.GetNextUncollapsedLineNumber(ALine: integer; ADown: boolean): integer;
+var
+  N: integer;
+begin
+  Result:= ALine;
+  N:= Result;
+  while IsLineCollapsedFull(N) and Strings.IsIndexValid(N) do
+    N:= N+BoolToPlusMinusOne(ADown);
+  if Strings.IsIndexValid(N) then Result:= N;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
