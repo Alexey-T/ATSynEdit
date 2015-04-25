@@ -1,4 +1,6 @@
 
+
+unfold range if goto into range (or Enter before range)
 fold-bar
 tokens hilite (styles, adapt SynEdit)
-marks(drop/collect)
+marker triangles(drop/collect/goto)
