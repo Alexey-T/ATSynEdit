@@ -1,6 +1,6 @@
 unit ATCanvasProc;
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 //{$define win_fast} //use Windows api
 //{$define invert_pixels} //slow invert-rect
 
@@ -187,8 +187,8 @@ begin
       R.Right:= APoint.X;
 
       for j:= 0 to i-2 do
-        Inc(R.Left, ADx[j]);
-      R.Right:= R.Left+ADx[i-1];
+        Inc(R.Left, ADx^[j]);
+      R.Right:= R.Left+ADx^[i-1];
 
       R.Top:= APoint.Y;
       R.Bottom:= R.Top+ACharSize.Y;

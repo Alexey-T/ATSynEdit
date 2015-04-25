@@ -1,6 +1,6 @@
 unit ATStringProc;
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 //{$define test_wide_char}
 
 interface

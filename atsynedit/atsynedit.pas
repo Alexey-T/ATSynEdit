@@ -3,7 +3,7 @@ Copyright (C) Alexey Torgashin, uvviewsoft.com
 License: MPL 2.0
 }
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
@@ -371,6 +371,7 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
+    function DoOnCheckLineCollapsed(ALineNum: integer): boolean;
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetModified: boolean;
     function GetOneLine: boolean;
@@ -1737,17 +1738,17 @@ begin
 
   FTimerBlink:= TTimer.Create(Self);
   FTimerBlink.Interval:= cInitTimerBlink;
-  FTimerBlink.OnTimer:= TimerBlinkTick;
+  FTimerBlink.OnTimer:= @TimerBlinkTick;
   FTimerBlink.Enabled:= true;
 
   FTimerScroll:= TTimer.Create(Self);
   FTimerScroll.Interval:= cInitTimerScroll;
-  FTimerScroll.OnTimer:= TimerScrollTick;
+  FTimerScroll.OnTimer:= @TimerScrollTick;
   FTimerScroll.Enabled:= false;
 
   FTimerNiceScroll:= TTimer.Create(Self);
   FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
-  FTimerNiceScroll.OnTimer:= TimerNiceScrollTick;
+  FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
   FTimerNiceScroll.Enabled:= false;
 
   FBitmap:= Graphics.TBitmap.Create;
@@ -1757,10 +1758,11 @@ begin
 
   FStringsExternal:= nil;
   FStringsInt:= TATStrings.Create;
-  FStringsInt.OnGetCaretsArray:= GetCaretsArray;
-  FStringsInt.OnSetCaretsArray:= SetCaretsArray;
+  FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
+  FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
 
   FWrapInfo:= TATSynWrapInfo.Create;
+  FWrapInfo.OnCheckLineCollapsed:= @DoOnCheckLineCollapsed;
   FWrapUpdateNeeded:= true;
   FWrapMode:= cWrapOn;
   FWrapColumn:= cInitMarginRight;
@@ -2999,12 +3001,12 @@ procedure TATSynEdit.DoInitPopupMenu;
     MI.Caption:= SName;
     MI.ShortCut:= FKeyMapping.GetShortcutFromCommand(Cmd);
     MI.Tag:= Cmd;
-    MI.OnClick:= MenuClick;
+    MI.OnClick:= @MenuClick;
     FMenu.Items.Add(MI);
   end;
   //
 begin
-  FMenu.OnPopup:= MenuPopup;
+  FMenu.OnPopup:= @MenuPopup;
   PopupMenu:= FMenu;
 
   Add('Undo', cCommand_Undo);
@@ -3239,6 +3241,11 @@ begin
   Invalidate;
 end;
 
+
+function TATSynEdit.DoOnCheckLineCollapsed(ALineNum: integer): boolean;
+begin
+  Result:= Strings.LinesHidden[ALineNum] = -1;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

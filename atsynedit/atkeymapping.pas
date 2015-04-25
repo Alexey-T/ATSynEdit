@@ -1,6 +1,6 @@
 unit ATKeyMapping;
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 
 interface
 

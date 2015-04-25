@@ -1,6 +1,6 @@
 unit formmain;
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 
 interface
 
@@ -165,16 +165,16 @@ begin
   ed.Font.Name:= 'Courier New';
   {$endif}
 
-  ed.OnChanged:= EditChanged;
-  ed.OnCaretMoved:= EditCaretMoved;
-  ed.OnScrolled:= EditCaretMoved;
-  ed.OnStateChanged:= EditCaretMoved;
-  ed.OnCommand:= EditCommand;
-  ed.OnClickGutter:= EditClickGutter;
-  ed.OnClickMicromap:= EditClickMicromap;
-  ed.OnDrawBookmarkIcon:= EditDrawBm;
-  ed.OnDrawLine:= EditDrawLine;
-  ed.OnDrawMicromap:= EditDrawMicromap;
+  ed.OnChanged:= @EditChanged;
+  ed.OnCaretMoved:= @EditCaretMoved;
+  ed.OnScrolled:= @EditCaretMoved;
+  ed.OnStateChanged:= @EditCaretMoved;
+  ed.OnCommand:= @EditCommand;
+  ed.OnClickGutter:= @EditClickGutter;
+  ed.OnClickMicromap:= @EditClickMicromap;
+  ed.OnDrawBookmarkIcon:= @EditDrawBm;
+  ed.OnDrawLine:= @EditDrawLine;
+  ed.OnDrawMicromap:= @EditDrawMicromap;
   //ed.OnDrawRuler:= EditDrawTest;//test
 
   ed.SetFocus;

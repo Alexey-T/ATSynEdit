@@ -1,6 +1,6 @@
 unit ATSynEdit_Commands;
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 
 interface
 

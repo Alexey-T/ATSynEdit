@@ -1,6 +1,6 @@
 unit ATCarets;
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 
 interface
 
@@ -255,7 +255,7 @@ end;
 
 procedure TATCarets.Sort;
 begin
-  FList.Sort(_ListCaretsCompare);
+  FList.Sort(@_ListCaretsCompare);
   DeleteDups;
 end;
 

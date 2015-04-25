@@ -3,7 +3,7 @@ Copyright (C) Alexey Torgashin, uvviewsoft.com
 License: MPL 2.0
 }
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 
 unit ATStrings;
 
@@ -801,7 +801,7 @@ end;
 function TATStrings.GetCaretsArray: TPointArray;
 begin
   if Assigned(FOnGetCaretsArray) then
-    Result:= FOnGetCaretsArray;
+    Result:= FOnGetCaretsArray();
 end;
 
 procedure TATStrings.SetCaretsArray(const L: TPointArray);

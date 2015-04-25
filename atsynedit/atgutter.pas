@@ -1,6 +1,6 @@
 unit ATGutter;
 
-{$mode delphi}
+{$mode objfpc}{$H+}
 
 interface
 

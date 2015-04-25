@@ -24,11 +24,15 @@ type
   end;
 
 type
+  TATCheckLineCollapsedEvent = function(ALineNum: integer): boolean of object;
+
+type
   { TATSynWrapInfo }
 
   TATSynWrapInfo = class
   private
     FList: TList;
+    FOnCheckCollapsed: TATCheckLineCollapsedEvent;
     function GetItem(N: integer): TATSynWrapItem;
   public
     constructor Create; virtual;
@@ -45,6 +49,7 @@ type
     procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
     procedure SetCapacity(N: integer);
     procedure ReplaceItems(AFrom, ATo: integer; AItems: TList);
+    property OnCheckLineCollapsed: TATCheckLineCollapsedEvent read FOnCheckCollapsed write FOnCheckCollapsed;
   end;
 
 
@@ -165,6 +170,9 @@ var
 begin
   AFrom:= -1;
   ATo:= -1;
+
+  if Assigned(FOnCheckCollapsed) then
+    if FOnCheckCollapsed(ALineNum) then Exit;
 
   a:= 0;
   b:= Count-1;
