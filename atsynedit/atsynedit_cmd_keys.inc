@@ -167,8 +167,12 @@ begin
       Y:= Y+ALines*BoolToPlusMinusOne(ADown);
     until not Strings.IsIndexValid(Y) or not IsLineCollapsedFull(Y);
 
-    if Strings.IsIndexValid(Y) then
+    if not IsLineCollapsedFull(Y) then
+    begin
+      if Y<0 then Y:= GetFirstUncollapsedLineNumber;
+      if Y>=Strings.Count then Y:= GetLastUncollapsedLineNumber;
       Caret.PosY:= Y;
+    end;
   end;
 
   if ADown then
@@ -211,7 +215,10 @@ end;
 
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;
 begin
-  DoCaretSingle(0, 0);
+  DoCaretSingle(
+    0,
+    GetFirstUncollapsedLineNumber
+    );
 
   FScrollHorz.NPos:= 0;
   FScrollVert.NPos:= 0;
@@ -236,8 +243,10 @@ function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
 var
   P: TPoint;
 begin
-  P:= GetEndOfFilePos;
-  DoCaretSingle(P.X, P.Y);
+  DoCaretSingle(
+    GetEndOfFilePos.X,
+    GetLastUncollapsedLineNumber
+    );
 
   Result:= [cResultCaretBottom];
 end;

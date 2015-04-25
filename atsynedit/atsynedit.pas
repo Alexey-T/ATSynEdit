@@ -372,6 +372,8 @@ type
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
+    function GetFirstUncollapsedLineNumber: integer;
+    function GetLastUncollapsedLineNumber: integer;
     function GetModified: boolean;
     function GetOneLine: boolean;
     function GetRedoCount: integer;
@@ -3246,6 +3248,27 @@ function TATSynEdit.IsLineCollapsedFull(ALineNum: integer): boolean;
 begin
   Result:= Strings.LinesHidden[ALineNum] = -1;
 end;
+
+function TATSynEdit.GetFirstUncollapsedLineNumber: integer;
+var
+  N: integer;
+begin
+  Result:= 0;
+  N:= Result;
+  while IsLineCollapsedFull(N) and Strings.IsIndexValid(N) do Inc(N);
+  if Strings.IsIndexValid(N) then Result:= N;
+end;
+
+function TATSynEdit.GetLastUncollapsedLineNumber: integer;
+var
+  N: integer;
+begin
+  Result:= Strings.Count-1;
+  N:= Result;
+  while IsLineCollapsedFull(N) and Strings.IsIndexValid(N) do Dec(N);
+  if Strings.IsIndexValid(N) then Result:= N;
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
