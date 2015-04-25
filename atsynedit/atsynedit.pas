@@ -62,6 +62,7 @@ type
     RulerBG,
     CollapseLine,
     CollapseFont,
+    CollapseBG,
     UnprintedFont,
     UnprintedBG,
     UnprintedHexFont,
@@ -419,10 +420,7 @@ type
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
     procedure DoPaintMarginsTo(C: TCanvas);
-    procedure DoPaintCollapseMark(C: TCanvas;
-      const Str: atString;
-      ALineStart: TPoint;
-      AScrollPos: integer);
+    procedure DoPaintCollapseMark(C: TCanvas; ACoord: TPoint; const AMarkText: string);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
@@ -1495,7 +1493,11 @@ begin
     //draw collapsed-mark
     if WrapItem.NFinal=cWrapItemCollapsed then
       if AMainText then
-        DoPaintCollapseMark(C, Str, CurrPoint, AScrollHorz.NPos);
+        DoPaintCollapseMark(C,
+          Point(
+            CurrPointText.X+NOutputStrWidth,
+            CurrPointText.Y),
+          '...');
 
     //draw gutter
     if AWithGutter then
@@ -1642,31 +1644,29 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintCollapseMark(C: TCanvas; const Str: atString;
-  ALineStart: TPoint; AScrollPos: integer);
+procedure TATSynEdit.DoPaintCollapseMark(C: TCanvas;
+  ACoord: TPoint; const AMarkText: string);
 var
-  SMark: atString;
-  NSize: integer;
+  NWidth: integer;
 begin
-  Dec(ALineStart.X, FCharSize.X*AScrollPos);
-  Inc(ALineStart.X, CanvasTextWidth(Str, FTabSize, FCharSize));
-  Inc(ALineStart.X, cCollapseMarkIndent);
+  Inc(ACoord.X, cCollapseMarkIndent);
+
+  //paint bg
+  C.Font.Color:= FColors.CollapseFont;
+  C.Brush.Color:= FColors.CollapseBG;
 
   //paint text
-  C.Font.Color:= FColors.CollapseFont;
-  C.Brush.Color:= FColors.TextBG;
-
-  SMark:= '...';
   C.TextOut(
-    ALineStart.X+cCollapseMarkIndent,
-    ALineStart.Y,
-    SMark);
-  NSize:= C.TextWidth(SMark) + 2*cCollapseMarkIndent;
+    ACoord.X+cCollapseMarkIndent,
+    ACoord.Y,
+    AMarkText);
+  NWidth:= C.TextWidth(AMarkText) + 2*cCollapseMarkIndent;
 
   //paint frame
   C.Pen.Color:= FColors.CollapseFont;
   C.Brush.Style:= bsClear;
-  C.Rectangle(ALineStart.X, ALineStart.Y, ALineStart.X+NSize, ALineStart.Y+FCharSize.Y);
+  C.Rectangle(ACoord.X, ACoord.Y, ACoord.X+NWidth, ACoord.Y+FCharSize.Y);
+  C.Brush.Style:= bsSolid;
 end;
 
 function TATSynEdit.GetCharSpacingX: integer;
@@ -3160,6 +3160,7 @@ begin
   FColors.RulerFont:= clGray;
   FColors.CollapseLine:= clNavy;
   FColors.CollapseFont:= clBlue;
+  FColors.CollapseBG:= clWhite;
   FColors.MarginRight:= clLtGray;
   FColors.MarginCaret:= clLime;
   FColors.MarginUser:= clYellow;
