@@ -1,0 +1,119 @@
+unit ATSynEdit_Lists;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils;
+
+type
+  { TATSynRange }
+
+  TATSynRange = class
+  public
+    X, Y, //start pos
+    Y2: integer; //end line which is fully folded (can't partially fold)
+    constructor Create(AX, AY, AY2: integer); virtual;
+    function IsOneLine: boolean;
+  end;
+
+type
+  { TATSynRanges }
+
+  TATSynRanges = class
+  private
+    FList: TList;
+    function GetCount: integer;
+    function IsIndexValid(N: integer): boolean;
+    function GetItems(Index: integer): TATSynRange;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    property Count: integer read GetCount;
+    procedure Clear;
+    procedure Add(AX, AY, AY2: integer);
+    procedure Insert(Index: integer; AX, AY, AY2: integer);
+    procedure Delete(Index: integer);
+    property Items[Index: integer]: TATSynRange read GetItems; default;
+  end;
+
+implementation
+
+{ TATSynRange }
+
+constructor TATSynRange.Create(AX, AY, AY2: integer);
+begin
+  X:= AX;
+  Y:= AY;
+  Y2:= AY2;
+end;
+
+function TATSynRange.IsOneLine: boolean;
+begin
+  Result:= Y>=Y2;
+end;
+
+{ TATSynRanges }
+
+function TATSynRanges.IsIndexValid(N: integer): boolean;
+begin
+  Result:= (N>=0) and (N<FList.Count);
+end;
+
+function TATSynRanges.GetCount: integer;
+begin
+  Result:= FList.Count;
+end;
+
+function TATSynRanges.GetItems(Index: integer): TATSynRange;
+begin
+  if IsIndexValid(Index) then
+    Result:= TATSynRange(FList[Index])
+  else
+    Result:= nil;
+end;
+
+constructor TATSynRanges.Create;
+begin
+  FList:= TList.Create;
+  FList.Capacity:= 2000;
+end;
+
+destructor TATSynRanges.Destroy;
+begin
+  Clear;
+  FreeAndNil(FList);
+  inherited;
+end;
+
+procedure TATSynRanges.Clear;
+var
+  i: integer;
+begin
+  for i:= Count-1 downto 0 do
+    TObject(FList[i]).Free;
+  FList.Clear;
+end;
+
+procedure TATSynRanges.Add(AX, AY, AY2: integer);
+begin
+  FList.Add(TATSynRange.Create(AX, AY, AY2));
+end;
+
+procedure TATSynRanges.Insert(Index: integer; AX, AY, AY2: integer);
+begin
+  FList.Insert(Index, TATSynRange.Create(AX, AY, AY2));
+end;
+
+procedure TATSynRanges.Delete(Index: integer);
+begin
+  if IsIndexValid(Index) then
+  begin
+    TObject(FList[Index]).Free;
+    FList.Delete(Index);
+  end;
+end;
+
+end.
+

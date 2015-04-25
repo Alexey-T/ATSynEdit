@@ -21,7 +21,7 @@ uses
   atsynedit,
   atsynedit_commands,
   atsynedit_keymapping,
-  atsynedit_wrapinfo, ATEdits, formcombo;
+  atsynedit_wrapinfo, ATEdits, formcombo, ATSynEdit_Lists;
 
 {$R *.res}
 

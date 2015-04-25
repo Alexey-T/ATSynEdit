@@ -34,7 +34,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="32">
+    <Units Count="33">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -104,7 +104,6 @@
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atcarets.pas"/>
@@ -113,7 +112,6 @@
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
@@ -177,6 +175,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit31>
+      <Unit32>
+        <Filename Value="..\..\atsynedit\atsynedit_lists.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Lists"/>
+      </Unit32>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
