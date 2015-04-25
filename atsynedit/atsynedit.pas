@@ -3265,23 +3265,13 @@ begin
 end;
 
 function TATSynEdit.GetFirstUncollapsedLineNumber: integer;
-var
-  N: integer;
 begin
-  Result:= 0;
-  N:= Result;
-  while IsLineCollapsedFull(N) and Strings.IsIndexValid(N) do Inc(N);
-  if Strings.IsIndexValid(N) then Result:= N;
+  Result:= GetNextUncollapsedLineNumber(0, true);
 end;
 
 function TATSynEdit.GetLastUncollapsedLineNumber: integer;
-var
-  N: integer;
 begin
-  Result:= Strings.Count-1;
-  N:= Result;
-  while IsLineCollapsedFull(N) and Strings.IsIndexValid(N) do Dec(N);
-  if Strings.IsIndexValid(N) then Result:= N;
+  Result:= GetNextUncollapsedLineNumber(Strings.Count-1, false);
 end;
 
 function TATSynEdit.GetNextUncollapsedLineNumber(ALine: integer; ADown: boolean): integer;
