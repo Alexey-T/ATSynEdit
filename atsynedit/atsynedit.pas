@@ -373,12 +373,12 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
-    procedure DoUncollapseLine(ALineNum: integer);
+    procedure DoUnfoldLine(ALineNum: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
-    function GetFirstUncollapsedLineNumber: integer;
-    function GetLastUncollapsedLineNumber: integer;
+    function GetFirstUnfoldedLineNumber: integer;
+    function GetLastUnfoldedLineNumber: integer;
     function GetModified: boolean;
-    function GetNextUncollapsedLineNumber(ALine: integer; ADown: boolean): integer;
+    function GetNextUnfoldedLineNumber(ALine: integer; ADown: boolean): integer;
     function GetOneLine: boolean;
     function GetRedoCount: integer;
     function GetScrollTopRelative: integer;
@@ -388,8 +388,8 @@ type
     function GetUndoLimit: integer;
     procedure DoInitColors;
     procedure DoInitPopupMenu;
-    function IsLineCollapsed(ALineNum: integer; ADetectPartiallyCollapsed: boolean = false): boolean;
-    function IsLineCollapsedFull(ALineNum: integer): boolean;
+    function IsLineFolded(ALineNum: integer; ADetectPartiallyFolded: boolean = false): boolean;
+    function IsLineFoldedFull(ALineNum: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
@@ -423,7 +423,7 @@ type
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
     procedure DoPaintMarginsTo(C: TCanvas);
-    procedure DoPaintCollapseMark(C: TCanvas; ACoord: TPoint; const AMarkText: string);
+    procedure DoPaintFoldedMark(C: TCanvas; ACoord: TPoint; const AMarkText: string);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
@@ -593,7 +593,7 @@ type
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
-    function IsPosCollapsed(AX, AY: integer): boolean;
+    function IsPosFolded(AX, AY: integer): boolean;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -623,7 +623,7 @@ type
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
-    procedure DoCollapseUncollapseLines(ALineFrom, ALineTo, ACollapseFromCharIndex: integer; ACollapse: boolean);
+    procedure DoFoldUnfoldLines(ALineFrom, ALineTo, AFoldFromCharIndex: integer; ACollapse: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
@@ -1498,7 +1498,7 @@ begin
     //draw collapsed-mark
     if WrapItem.NFinal=cWrapItemCollapsed then
       if AMainText then
-        DoPaintCollapseMark(C,
+        DoPaintFoldedMark(C,
           Point(
             CurrPointText.X+NOutputStrWidth,
             CurrPointText.Y),
@@ -1649,7 +1649,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintCollapseMark(C: TCanvas;
+procedure TATSynEdit.DoPaintFoldedMark(C: TCanvas;
   ACoord: TPoint; const AMarkText: string);
 var
   NWidth: integer;
@@ -1769,7 +1769,7 @@ begin
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
 
   FWrapInfo:= TATSynWrapInfo.Create;
-  FWrapInfo.OnCheckLineCollapsed:= @IsLineCollapsedFull;
+  FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
   FWrapUpdateNeeded:= true;
   FWrapMode:= cWrapOn;
   FWrapColumn:= cInitMarginRight;
@@ -1973,14 +1973,14 @@ begin
   DoEventState; //modified
 end;
 
-procedure TATSynEdit.DoCollapseUncollapseLines(ALineFrom, ALineTo, ACollapseFromCharIndex: integer;
+procedure TATSynEdit.DoFoldUnfoldLines(ALineFrom, ALineTo, AFoldFromCharIndex: integer;
   ACollapse: boolean);
 var
   i: integer;
 begin
   if ACollapse then
   begin
-    Strings.LinesHidden[ALineFrom]:= ACollapseFromCharIndex;
+    Strings.LinesHidden[ALineFrom]:= AFoldFromCharIndex;
     for i:= ALineFrom+1 to ALineTo do
       Strings.LinesHidden[i]:= -1;
   end
@@ -1993,9 +1993,9 @@ begin
   FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.DoUncollapseLine(ALineNum: integer);
+procedure TATSynEdit.DoUnfoldLine(ALineNum: integer);
 begin
-  DoCollapseUncollapseLines(ALineNum, ALineNum, 0, false);
+  DoFoldUnfoldLines(ALineNum, ALineNum, 0, false);
 end;
 
 
@@ -3268,44 +3268,43 @@ begin
   end;
 end;
 
-function TATSynEdit.IsLineCollapsed(ALineNum: integer;
-  ADetectPartiallyCollapsed: boolean): boolean;
+function TATSynEdit.IsLineFolded(ALineNum: integer; ADetectPartiallyFolded: boolean): boolean;
 var
   Flag: integer;
 begin
   Flag:= Strings.LinesHidden[ALineNum];
-  Result:= (Flag=-1) or (ADetectPartiallyCollapsed and (Flag>0));
+  Result:= (Flag=-1) or (ADetectPartiallyFolded and (Flag>0));
 end;
 
-function TATSynEdit.IsLineCollapsedFull(ALineNum: integer): boolean;
+function TATSynEdit.IsLineFoldedFull(ALineNum: integer): boolean;
 begin
-  Result:= IsLineCollapsed(ALineNum, false);
+  Result:= IsLineFolded(ALineNum, false);
 end;
 
-function TATSynEdit.GetFirstUncollapsedLineNumber: integer;
+function TATSynEdit.GetFirstUnfoldedLineNumber: integer;
 begin
-  Result:= GetNextUncollapsedLineNumber(0, true);
+  Result:= GetNextUnfoldedLineNumber(0, true);
 end;
 
-function TATSynEdit.GetLastUncollapsedLineNumber: integer;
+function TATSynEdit.GetLastUnfoldedLineNumber: integer;
 begin
-  Result:= GetNextUncollapsedLineNumber(Strings.Count-1, false);
+  Result:= GetNextUnfoldedLineNumber(Strings.Count-1, false);
 end;
 
-function TATSynEdit.GetNextUncollapsedLineNumber(ALine: integer; ADown: boolean): integer;
+function TATSynEdit.GetNextUnfoldedLineNumber(ALine: integer; ADown: boolean): integer;
 var
   N: integer;
 begin
   Result:= ALine;
   N:= Result;
-  while IsLineCollapsed(N) and Strings.IsIndexValid(N) do
+  while IsLineFolded(N) and Strings.IsIndexValid(N) do
     N:= N+BoolToPlusMinusOne(ADown);
   if Strings.IsIndexValid(N) then Result:= N;
 end;
 
-function TATSynEdit.IsPosCollapsed(AX, AY: integer): boolean;
+function TATSynEdit.IsPosFolded(AX, AY: integer): boolean;
 begin
-  Result:= Strings.IsPosCollapsed(AX, AY);
+  Result:= Strings.IsPosFolded(AX, AY);
 end;
 
 {$I atsynedit_carets.inc}

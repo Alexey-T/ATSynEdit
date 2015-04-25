@@ -260,7 +260,7 @@ begin
   mnuTFold.Checked:= not mnuTFold.Checked;
   for i:= 0 to (ed.Strings.Count-1) div 10 do
     if Odd(i) then
-      ed.DoCollapseUncollapseLines(i*10, i*10+9, 4, mnuTFold.Checked);
+      ed.DoFoldUnfoldLines(i*10, i*10+9, 4, mnuTFold.Checked);
   ed.Update;
 end;
 

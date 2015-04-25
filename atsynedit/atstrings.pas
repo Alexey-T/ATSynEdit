@@ -117,7 +117,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
-    function IsPosCollapsed(AX, AY: integer): boolean;
+    function IsPosFolded(AX, AY: integer): boolean;
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(N: integer; const AString: atString);
@@ -947,7 +947,7 @@ begin
   end;
 end;
 
-function TATStrings.IsPosCollapsed(AX, AY: integer): boolean;
+function TATStrings.IsPosFolded(AX, AY: integer): boolean;
 var
   Flag: integer;
 begin
