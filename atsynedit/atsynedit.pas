@@ -1301,7 +1301,7 @@ var
   BmKind: integer;
   BmColor: TColor;
   Str, StrOut, StrOutUncut: atString;
-  CurrPoint, CurrPointText: TPoint;
+  CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineWithCaret, LineEolSelected: boolean;
   Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
@@ -1469,6 +1469,10 @@ begin
         AScrollHorz);
     end;
 
+    CoordAfterText:= Point(
+      CurrPointText.X+NOutputStrWidth,
+      CurrPointText.Y);
+
     if WrapItem.NFinal=cWrapItemFinal then
     begin
       //for OptHiliteSelFull=false paint eol bg
@@ -1476,19 +1480,17 @@ begin
       begin
         C.Brush.Color:= FColors.TextSelBG;
         C.FillRect(
-          CurrPointText.X+NOutputStrWidth,
-          CurrPointText.Y,
-          CurrPointText.X+NOutputStrWidth+ACharSize.X,
-          CurrPointText.Y+ACharSize.Y);
+          CoordAfterText.X,
+          CoordAfterText.Y,
+          CoordAfterText.X+ACharSize.X,
+          CoordAfterText.Y+ACharSize.Y);
       end;
 
       //paint eol mark
       if AMainText and FUnprintedVisible and FUnprintedEnds then
         DoPaintUnprintedEol(C,
           cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
-          Point(
-            CurrPointText.X+NOutputStrWidth,
-            CurrPointText.Y),
+          CoordAfterText,
           ACharSize,
           FColors.UnprintedFont,
           FColors.UnprintedBG,
@@ -1498,11 +1500,7 @@ begin
     //draw collapsed-mark
     if WrapItem.NFinal=cWrapItemCollapsed then
       if AMainText then
-        DoPaintFoldedMark(C,
-          Point(
-            CurrPointText.X+NOutputStrWidth,
-            CurrPointText.Y),
-          '...');
+        DoPaintFoldedMark(C, CoordAfterText, '...');
 
     //draw gutter
     if AWithGutter then
