@@ -52,12 +52,20 @@ begin
       end;
     cDirUp:
       begin
-        if FSelRectEnd.Y>0 then Dec(FSelRectEnd.Y);
+        if FSelRectEnd.Y>0 then
+        begin
+          Dec(FSelRectEnd.Y);
+          FSelRectEnd.Y:= GetNextUncollapsedLineNumber(FSelRectEnd.Y, false);
+        end;
         Result:= [cResultKeepColumnSel, cResultCaretTop];
       end;
     cDirDown:
       begin
-        if FSelRectEnd.Y<Strings.Count-1 then Inc(FSelRectEnd.Y);
+        if FSelRectEnd.Y<Strings.Count-1 then
+        begin
+          Inc(FSelRectEnd.Y);
+          FSelRectEnd.Y:= GetNextUncollapsedLineNumber(FSelRectEnd.Y, true);
+        end;
         Result:= [cResultKeepColumnSel, cResultCaretBottom];
       end;
   end;
