@@ -156,12 +156,19 @@ end;
 function TATSynEdit.DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
 var
   Caret: TATCaretItem;
-  i: integer;
+  i, Y: integer;
 begin
-  for i:= 0 to FCarets.Count-1 do
+  for i:= 0 to Carets.Count-1 do
   begin
-    Caret:= FCarets[i];
-    Caret.PosY:= Max(0, Min(Strings.Count-1, Caret.PosY + ALines*BoolToPlusMinusOne(ADown)));
+    Caret:= Carets[i];
+    Y:= Caret.PosY;
+
+    repeat
+      Y:= Y+ALines*BoolToPlusMinusOne(ADown);
+    until not Strings.IsIndexValid(Y) or not IsLineCollapsedFull(Y);
+
+    if Strings.IsIndexValid(Y) then
+      Caret.PosY:= Y;
   end;
 
   if ADown then

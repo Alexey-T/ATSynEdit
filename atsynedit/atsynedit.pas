@@ -371,7 +371,6 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
-    function DoOnCheckLineCollapsed(ALineNum: integer): boolean;
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetModified: boolean;
     function GetOneLine: boolean;
@@ -383,6 +382,7 @@ type
     function GetUndoLimit: integer;
     procedure DoInitColors;
     procedure DoInitPopupMenu;
+    function IsLineCollapsedFull(ALineNum: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
@@ -1762,7 +1762,7 @@ begin
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
 
   FWrapInfo:= TATSynWrapInfo.Create;
-  FWrapInfo.OnCheckLineCollapsed:= @DoOnCheckLineCollapsed;
+  FWrapInfo.OnCheckLineCollapsed:= @IsLineCollapsedFull;
   FWrapUpdateNeeded:= true;
   FWrapMode:= cWrapOn;
   FWrapColumn:= cInitMarginRight;
@@ -3242,7 +3242,7 @@ begin
 end;
 
 
-function TATSynEdit.DoOnCheckLineCollapsed(ALineNum: integer): boolean;
+function TATSynEdit.IsLineCollapsedFull(ALineNum: integer): boolean;
 begin
   Result:= Strings.LinesHidden[ALineNum] = -1;
 end;
