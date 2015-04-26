@@ -33,9 +33,7 @@ type
   TATFoldBarState = (
     cFoldBegin,
     cFoldEnd,
-    cFoldMiddle,
-    cFoldMiddleAndBegin,
-    cFoldMiddleAndEnd
+    cFoldMiddle
     );
 
   TATCommandResult = (
@@ -62,6 +60,8 @@ type
     GutterFont,
     GutterBG,
     GutterCaretBG,
+    GutterPlusBorder,
+    GutterPlusBG,
     CurLineBG,
     MarginRight,
     MarginCaret,
@@ -184,7 +184,8 @@ const
   cSpeedScrollNiceVert = 1; //... speed y
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldTriangle = 4;
-  cSizeGutterFoldLineDx = 2;
+  cSizeGutterFoldPlus = 4; //must be odd
+  cSizeGutterFoldLineDx = 3;
   cSizeGutterNumOffsetLeft = 5; //offset lefter line-num, px
   cSizeGutterNumOffsetRight = 4; //offset righter line-num
   cSizeRulerHeight = 19;
@@ -3199,6 +3200,8 @@ begin
   FColors.GutterFont:= clGray;
   FColors.GutterBG:= $e0e0e0;
   FColors.GutterCaretBG:= $c8c8c8;
+  FColors.GutterPlusBorder:= clBlack;
+  FColors.GutterPlusBG:= $f4f4f4;
   FColors.CurLineBG:= $e0f0f0;
   FColors.RulerBG:= FColors.GutterBG;
   FColors.RulerFont:= clGray;
@@ -3388,12 +3391,20 @@ begin
           CoordXM,
           ACoordY2
           );
+        CanvasPaintPlusMinus(C,
+          FColors.GutterPlusBorder,
+          FColors.GutterPlusBG,
+          Point(CoordXM, CoordYM),
+          cSizeGutterFoldPlus,
+          false);
+        {
         CanvasPaintTriangleDown(C, FColors.GutterFont,
           Point(
             CoordXM - cSizeGutterFoldTriangle,
             CoordYM - cSizeGutterFoldTriangle div 2),
           cSizeGutterFoldTriangle
           );
+          }
       end;
     cFoldEnd:
       begin

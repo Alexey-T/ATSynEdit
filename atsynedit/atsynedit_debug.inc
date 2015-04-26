@@ -27,7 +27,12 @@ var
   i: integer;
 begin
   FFoldList.Clear;
-  for i:= 0 to (Strings.Count-1) div 10 do
+
+  FFoldList.Add(4, 4, 8);
+  FFoldList.Add(4, 10, 12);
+  FFoldList.Add(0, 3, 14);
+
+  for i:= 2 to (Strings.Count-1) div 10 do
     if Odd(i) then
       FFoldList.Add(4, i*10, i*10+9);
 end;

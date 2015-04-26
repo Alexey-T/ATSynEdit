@@ -61,6 +61,7 @@ function CanvasFontSizes(C: TCanvas): TSize;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
+procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
 
 
 implementation
@@ -431,6 +432,17 @@ begin
     Point(ACoord.X+ASize*2, ACoord.Y),
     Point(ACoord.X+ASize, ACoord.Y+ASize)
     ]);
+end;
+
+procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor;
+  ACenter: TPoint; ASize: integer; APlus: boolean);
+begin
+  C.Brush.Color:= AColorBG;
+  C.Pen.Color:= AColorBorder;
+  C.Rectangle(ACenter.X-ASize, ACenter.Y-ASize, ACenter.X+ASize+1, ACenter.Y+ASize+1);
+  C.Line(ACenter.X-ASize+2, ACenter.Y, ACenter.X+ASize-1, ACenter.Y);
+  if APlus then
+    C.Line(ACenter.X, ACenter.Y-ASize+2, ACenter.X, ACenter.Y+ASize-1);
 end;
 
 
