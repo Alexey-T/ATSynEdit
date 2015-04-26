@@ -108,6 +108,7 @@
       <Unit16>
         <Filename Value="..\..\atsynedit\atcarets.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATCarets"/>
       </Unit16>
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
@@ -184,7 +185,6 @@
       <Unit33>
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="Unit1"/>
       </Unit33>
     </Units>
   </ProjectOptions>

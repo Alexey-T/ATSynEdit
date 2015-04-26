@@ -60,19 +60,20 @@ begin
     for i:= ALineFrom to ALineTo do
     begin
       //find other folded ranges
-      List:= FFoldList.FindRangesContainingLine(i, true);
+      List:= FFoldList.FindRangesContainingLine(i, ALineFrom, ALineTo, true{OnlyFolded}, true{TopLevel});
+
       //line not in other ranges? unfold
       if Length(List)=0 then
       begin
         Strings.LinesHidden[i]:= 0;
         Continue;
       end;
+
       //line in range: unfold only 1st line of range
       for j:= Low(List) to High(List) do
       begin
         R:= FFoldList[List[j]];
-        if R.Y=i then
-          Strings.LinesHidden[i]:= R.X;
+        Strings.LinesHidden[R.Y]:= R.X;
       end;
     end;
   end;

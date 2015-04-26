@@ -1,3 +1,7 @@
+
+//todo....
+//optim function TATSynRanges.FindRangesContainingLine
+
 unit ATSynEdit_Ranges;
 
 {$mode objfpc}{$H+}
@@ -40,14 +44,18 @@ type
     procedure Insert(Index: integer; AX, AY, AY2: integer);
     procedure Delete(Index: integer);
     property Items[Index: integer]: TATSynRange read GetItems; default;
-    function FindRangesContainingLine(ALine: integer; AOnlyFolded: boolean= false
-      ): TATIntegerArray;
-    function IsLineInFoldedRange(ALine: integer): boolean;
+    function IsRangeInsideOther(R1, R2: TATSynRange): boolean;
+    function FindRangesContainingLine(ALine: integer;
+      ALineFrom: integer = - 1;
+      ALineTo: integer = - 1;
+      AOnlyFolded: boolean = false;
+      ATopLevelOnly: boolean = false): TATIntegerArray;
   end;
 
 implementation
 
-uses Dialogs;
+uses
+  ATCarets;
 
 { TATSynRange }
 
@@ -124,31 +132,39 @@ begin
   end;
 end;
 
-function TATSynRanges.FindRangesContainingLine(ALine: integer; AOnlyFolded: boolean = false): TATIntegerArray;
-var
-  i: integer;
+function TATSynRanges.IsRangeInsideOther(R1, R2: TATSynRange): boolean;
 begin
-  //!!!todo... make bin-search...
+  Result:=
+    IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true) and
+    (R1.Y2<=R2.Y2);
+end;
+
+function TATSynRanges.FindRangesContainingLine(ALine: integer;
+  ALineFrom: integer; ALineTo: integer; AOnlyFolded: boolean;
+  ATopLevelOnly: boolean): TATIntegerArray;
+var
+  i, j: integer;
+begin
   SetLength(Result, 0);
+
+  //todo... make bin-search...
   for i:= 0 to Count-1 do
     with Items[i] do
       if (not IsSimple) and (Y<=ALine) and (Y2>=ALine) and (not AOnlyFolded or Folded) then
-      begin
-        SetLength(Result, Length(Result)+1);
-        Result[High(Result)]:= i;
-      end;
-end;
+        if (ALineFrom=-1) or ((Y>=ALineFrom) and (Y2<=ALineTo)) then
+        begin
+          SetLength(Result, Length(Result)+1);
+          Result[High(Result)]:= i;
+        end;
 
-function TATSynRanges.IsLineInFoldedRange(ALine: integer): boolean;
-var
-  List: TATIntegerArray;
-  i: integer;
-begin
-  Result:= false;
-  List:= FindRangesContainingLine(ALine, true);
-  for i:= 0 to High(List) do
-    if Items[List[i]].Y<>ALine then
-      begin Result:= true; Break end;
+  //todo...optim...
+  if ATopLevelOnly then
+    for i:= High(Result) downto 0 do
+      for j:= 0 to i-1 do
+      begin
+        if IsRangeInsideOther(Items[i], Items[j]) then
+          SetLength(Result, Length(Result)-1);
+      end;
 end;
 
 end.
