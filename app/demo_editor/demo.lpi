@@ -140,7 +140,6 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="formopt"/>
       </Unit23>
       <Unit24>
         <Filename Value="..\..\atsynedit\atstrings_load.inc"/>
@@ -180,6 +179,7 @@
       <Unit32>
         <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Ranges"/>
       </Unit32>
       <Unit33>
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>

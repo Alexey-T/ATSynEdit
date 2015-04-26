@@ -1,11 +1,11 @@
 {$ifdef nn}begin end;{$endif}
 
-function TATSynEdit.IsLineFolded(ALine: integer; ADetectPartiallyFolded: boolean): boolean;
+function TATSynEdit.IsLineFolded(ALine: integer; ADetectPartialFold: boolean): boolean;
 var
   Flag: integer;
 begin
   Flag:= Strings.LinesHidden[ALine];
-  Result:= (Flag=-1) or (ADetectPartiallyFolded and (Flag>0));
+  Result:= (Flag=-1) or (ADetectPartialFold and (Flag>0));
 end;
 
 function TATSynEdit.IsLineFoldedFull(ALine: integer): boolean;
@@ -56,11 +56,11 @@ begin
   else
   begin
     //unfold is hard. need to unfold only those lines
-    //which aren't inside other folded ranges (nested)
+    //which aren't inside other folded ranges
     for i:= ARange.Y to ARange.Y2 do
     begin
       //find other folded ranges
-      List:= FFold.FindRangesContainingLine(i, ARange.Y, ARange.Y2, true{OnlyFolded}, true{TopLevel});
+      List:= FFold.FindRangesContainingLine(i, ARange, true{OnlyFolded}, true{TopLevel});
 
       //line not in other ranges? unfold
       if Length(List)=0 then
@@ -86,7 +86,7 @@ var
   List: TATIntegerArray;
   i: integer;
 begin
-  List:= FFold.FindRangesContainingLine(ALine, -1, -1, true);
+  List:= FFold.FindRangesContainingLine(ALine, nil, true);
   for i:= Low(List) to High(List) do
     DoFold_SetRangeFolding(FFold[List[i]], false);
 end;

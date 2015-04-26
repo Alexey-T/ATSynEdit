@@ -46,8 +46,7 @@ type
     property Items[Index: integer]: TATSynRange read GetItems; default;
     function IsRangeInsideOther(R1, R2: TATSynRange): boolean;
     function FindRangesContainingLine(ALine: integer;
-      ALineFrom: integer = - 1;
-      ALineTo: integer = - 1;
+      AInRange: TATSynRange;
       AOnlyFolded: boolean = false;
       ATopLevelOnly: boolean = false): TATIntegerArray;
     function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
@@ -62,6 +61,10 @@ uses
 
 constructor TATSynRange.Create(AX, AY, AY2: integer);
 begin
+  if (AX<=0) then raise Exception.Create('Incorrect range with x<=0');
+  if (AY<0) then raise Exception.Create('Incorrect range with y<0');
+  if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2');
+
   X:= AX;
   Y:= AY;
   Y2:= AY2;
@@ -69,7 +72,7 @@ end;
 
 function TATSynRange.IsSimple: boolean;
 begin
-  Result:= Y>=Y2;
+  Result:= Y=Y2;
 end;
 
 { TATSynRanges }
@@ -141,8 +144,8 @@ begin
 end;
 
 function TATSynRanges.FindRangesContainingLine(ALine: integer;
-  ALineFrom: integer; ALineTo: integer; AOnlyFolded: boolean;
-  ATopLevelOnly: boolean): TATIntegerArray;
+  AInRange: TATSynRange; AOnlyFolded: boolean; ATopLevelOnly: boolean
+  ): TATIntegerArray;
 var
   i, j: integer;
 begin
@@ -152,7 +155,7 @@ begin
   for i:= 0 to Count-1 do
     with Items[i] do
       if (not IsSimple) and (Y<=ALine) and (Y2>=ALine) and (not AOnlyFolded or Folded) then
-        if (ALineFrom=-1) or ((Y>=ALineFrom) and (Y2<=ALineTo)) then
+        if (AInRange=nil) or ((Y>=AInRange.Y) and (Y2<=AInRange.Y2)) then
         begin
           SetLength(Result, Length(Result)+1);
           Result[High(Result)]:= i;

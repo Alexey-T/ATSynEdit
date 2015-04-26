@@ -405,7 +405,7 @@ type
     procedure DoInitColors;
     procedure DoInitPopupMenu;
     procedure DoDebugInitFoldList;
-    function IsLineFolded(ALine: integer; ADetectPartiallyFolded: boolean = false): boolean;
+    function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
@@ -3309,7 +3309,7 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
-  List:= FFold.FindRangesContainingLine(LineIndex);
+  List:= FFold.FindRangesContainingLine(LineIndex, nil);
   if Length(List)=0 then Exit;
 
   State:= cFoldMiddle;
