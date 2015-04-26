@@ -40,27 +40,27 @@ begin
 end;
 
 
-procedure TATSynEdit.DoFoldUnfoldLines(ALineFrom, ALineTo, AFoldFromCharIndex: integer;
-  ADoFold: boolean);
+procedure TATSynEdit.DoFold_SetRangeFolding(ARange: TATSynRange; AFolded: boolean);
 var
   List: TATIntegerArray;
   R: TATSynRange;
   i, j: integer;
 begin
-  if ADoFold then
+  ARange.Folded:= AFolded;
+  if AFolded then
   begin
-    Strings.LinesHidden[ALineFrom]:= AFoldFromCharIndex;
-    for i:= ALineFrom+1 to ALineTo do
+    Strings.LinesHidden[ARange.Y]:= ARange.X;
+    for i:= ARange.Y+1 to ARange.Y2 do
       Strings.LinesHidden[i]:= -1;
   end
   else
   begin
     //unfold is hard. need to unfold only those lines
     //which aren't inside other folded ranges (nested)
-    for i:= ALineFrom to ALineTo do
+    for i:= ARange.Y to ARange.Y2 do
     begin
       //find other folded ranges
-      List:= FFoldList.FindRangesContainingLine(i, ALineFrom, ALineTo, true{OnlyFolded}, true{TopLevel});
+      List:= FFold.FindRangesContainingLine(i, ARange.Y, ARange.Y2, true{OnlyFolded}, true{TopLevel});
 
       //line not in other ranges? unfold
       if Length(List)=0 then
@@ -72,7 +72,7 @@ begin
       //line in range: unfold only 1st line of range
       for j:= Low(List) to High(List) do
       begin
-        R:= FFoldList[List[j]];
+        R:= FFold[List[j]];
         Strings.LinesHidden[R.Y]:= R.X;
       end;
     end;
@@ -81,34 +81,25 @@ begin
   FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.DoUnfoldLine(ALineNum: integer);
-begin
-  DoFoldUnfoldLines(ALineNum, ALineNum, 0, false);
-end;
-
-procedure TATSynEdit.DoFold_ClickFoldingBar(ALineNum: integer);
+procedure TATSynEdit.DoUnfoldLine(ALine: integer);
 var
   List: TATIntegerArray;
-  Range: TATSynRange;
   i: integer;
 begin
-  List:= FFoldList.FindRangesContainingLine(ALineNum);
+  List:= FFold.FindRangesContainingLine(ALine, -1, -1, true);
   for i:= 0 to High(List) do
+    DoFold_SetRangeFolding(FFold[List[i]], false);
+end;
+
+procedure TATSynEdit.DoFold_ClickFoldingBar(ALine: integer);
+var
+  R: TATSynRange;
+begin
+  R:= FFold.FindRangeWithPlusAtLine(ALine);
+  if Assigned(R) then
   begin
-    Range:= FFoldList[List[i]];
-    if (not Range.IsSimple) and (Range.Y=ALineNum) then
-    begin
-      DoFold_ToggleFoldRange(Range);
-      Break
-    end;
+    DoFold_SetRangeFolding(R, not R.Folded);
+    Update;
   end;
 end;
-
-procedure TATSynEdit.DoFold_ToggleFoldRange(R: TATSynRange);
-begin
-  R.Folded:= not R.Folded;
-  DoFoldUnfoldLines(R.Y, R.Y2, R.X, R.Folded);
-  Update;
-end;
-
 

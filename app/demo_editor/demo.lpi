@@ -45,6 +45,7 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -108,7 +109,6 @@
       <Unit16>
         <Filename Value="..\..\atsynedit\atcarets.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATCarets"/>
       </Unit16>
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>

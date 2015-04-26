@@ -57,7 +57,6 @@ type
     mnuHlp: TMenuItem;
     MenuItem5: TMenuItem;
     mnuTst: TMenuItem;
-    mnuTFold: TMenuItem;
     mnuTCaretK: TMenuItem;
     mnuEndW: TMenuItem;
     mnuEndUn: TMenuItem;
@@ -107,7 +106,6 @@ type
     procedure mnuLockClick(Sender: TObject);
     procedure mnuTBmsClick(Sender: TObject);
     procedure mnuTCaret1Click(Sender: TObject);
-    procedure mnuTFoldClick(Sender: TObject);
     procedure mnuTMarginClick(Sender: TObject);
     procedure mnuUnlockClick(Sender: TObject);
   private
@@ -251,17 +249,6 @@ begin
   ed.Carets.Sort;
   ed.Update;
   UpdateStatus;
-end;
-
-procedure TfmMain.mnuTFoldClick(Sender: TObject);
-var
-  i: integer;
-begin
-  mnuTFold.Checked:= not mnuTFold.Checked;
-  for i:= 0 to (ed.Strings.Count-1) div 10 do
-    if Odd(i) then
-      ed.DoFoldUnfoldLines(i*10, i*10+9, 4, mnuTFold.Checked);
-  ed.Update;
 end;
 
 procedure TfmMain.mnuTMarginClick(Sender: TObject);

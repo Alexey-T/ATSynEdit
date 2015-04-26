@@ -26,17 +26,17 @@ procedure TATSynEdit.DoDebugInitFoldList;
 var
   i: integer;
 begin
-  FFoldList.Clear;
+  FFold.Clear;
 
   //sorted
-  FFoldList.Add(1, 4, 15);
-  FFoldList.Add(1, 5, 9);
-  FFoldList.Add(1, 7, 8);
-  FFoldList.Add(1, 11, 14);
+  FFold.Add(1, 4, 15);
+  FFold.Add(1, 5, 9);
+  FFold.Add(1, 7, 8);
+  FFold.Add(1, 11, 14);
 
   for i:= 2 to (Strings.Count-1) div 10 do
     if Odd(i) then
-      FFoldList.Add(4, i*10, i*10+9);
+      FFold.Add(4, i*10, i*10+9);
 end;
 
 

@@ -50,6 +50,7 @@ type
       ALineTo: integer = - 1;
       AOnlyFolded: boolean = false;
       ATopLevelOnly: boolean = false): TATIntegerArray;
+    function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
   end;
 
 implementation
@@ -165,6 +166,23 @@ begin
         if IsRangeInsideOther(Items[i], Items[j]) then
           SetLength(Result, Length(Result)-1);
       end;
+end;
+
+function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
+var
+  i: integer;
+  R: TATSynRange;
+begin
+  Result:= nil;
+  for i:= 0 to Count-1 do
+  begin
+    R:= Items[i];
+    if (not R.IsSimple) and (R.Y=ALine) then
+    begin
+      Result:= R;
+      Break
+    end;
+  end;
 end;
 
 end.

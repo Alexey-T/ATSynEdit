@@ -335,10 +335,6 @@ object fmMain: TfmMain
         Caption = 'go to..'
         OnClick = bGotoClick
       end
-      object mnuTFold: TMenuItem
-        Caption = 'fold (11..20 etc)'
-        OnClick = mnuTFoldClick
-      end
       object mnuTCaret1: TMenuItem
         Caption = 'set 100 cr''s'
         OnClick = mnuTCaret1Click

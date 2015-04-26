@@ -245,7 +245,7 @@ type
     FMarginList: TList;
     FStringsInt,
     FStringsExternal: TATStrings;
-    FFoldList: TATSynRanges;
+    FFold: TATSynRanges;
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
@@ -382,15 +382,13 @@ type
     //
     procedure DebugFindWrapIndex;
     procedure DoCaretsAssign(NewCarets: TATCarets);
-    procedure DoFold_ClickFoldingBar(ALineNum: integer);
     procedure DoDropText;
-    procedure DoFold_ToggleFoldRange(R: TATSynRange);
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
-    procedure DoUnfoldLine(ALineNum: integer);
+    procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
     function GetLastUnfoldedLineNumber: integer;
@@ -632,6 +630,9 @@ type
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
     procedure DoGotoPosEx(APnt: TPoint);
+    //fold
+    procedure DoFold_SetRangeFolding(ARange: TATSynRange; AFolded: boolean);
+    procedure DoFold_ClickFoldingBar(ALine: integer);
     //misc
     procedure BeginUpdate;
     procedure EndUpdate;
@@ -641,7 +642,6 @@ type
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
-    procedure DoFoldUnfoldLines(ALineFrom, ALineTo, AFoldFromCharIndex: integer; ADoFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
@@ -1798,7 +1798,7 @@ begin
   FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
 
-  FFoldList:= TATSynRanges.Create;
+  FFold:= TATSynRanges.Create;
 
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
@@ -1929,7 +1929,7 @@ begin
   FreeAndNil(FHintWnd);
   FreeAndNil(FMenu);
   DoPaintModeStatic;
-  FreeAndNil(FFoldList);
+  FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
@@ -3307,14 +3307,14 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
-  List:= FFoldList.FindRangesContainingLine(LineIndex);
+  List:= FFold.FindRangesContainingLine(LineIndex);
   if Length(List)=0 then Exit;
 
   State:= cFoldMiddle;
   bPlus:= false;
 
   for i:= Low(List) to High(List) do
-    with FFoldList[List[i]] do
+    with FFold[List[i]] do
     begin
       if Y=LineIndex then begin State:= cFoldBegin; bPlus:= Folded; Break end;
       if Y2=LineIndex then State:= cFoldEnd;
