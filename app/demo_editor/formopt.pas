@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkShowFoldAlways: TCheckBox;
     chkCrPreferLeft: TCheckBox;
     chkGutterFold: TCheckBox;
     chkKeepCol: TCheckBox;
@@ -162,6 +163,7 @@ begin
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
     chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
+    chkShowFoldAlways.Checked:= ed.OptGutterShowFoldAlways;
     edRulerSize.Value:= ed.OptRulerSize;
     edRulerFSize.Value:= ed.OptRulerFontSize;
 
@@ -245,6 +247,7 @@ begin
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
       ed.OptNumbersSkippedChar:= edNumSkip.Text;
+      ed.OptGutterShowFoldAlways := chkShowFoldAlways.Checked;
       ed.OptGutterPlusSize:= edPlusSize.Value;
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;

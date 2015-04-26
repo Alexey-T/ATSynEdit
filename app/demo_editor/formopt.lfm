@@ -188,7 +188,7 @@ object fmOpt: TfmOpt
         Width = 50
         MaxValue = 80
         MinValue = 4
-        TabOrder = 5
+        TabOrder = 6
         Value = 4
       end
       object edRulerFSize: TSpinEdit
@@ -197,7 +197,7 @@ object fmOpt: TfmOpt
         Top = 52
         Width = 50
         MaxValue = 40
-        TabOrder = 6
+        TabOrder = 7
         Value = 4
       end
       object Label2: TLabel
@@ -261,7 +261,7 @@ object fmOpt: TfmOpt
         Top = 84
         Width = 50
         MaxValue = 40
-        TabOrder = 7
+        TabOrder = 8
         Value = 5
       end
       object Label1: TLabel
@@ -286,13 +286,13 @@ object fmOpt: TfmOpt
       end
       object GroupBox2: TGroupBox
         Left = 224
-        Height = 154
+        Height = 166
         Top = 4
         Width = 176
         Caption = 'columns'
-        ClientHeight = 134
+        ClientHeight = 146
         ClientWidth = 172
-        TabOrder = 9
+        TabOrder = 5
         object chkGutterBm: TCheckBox
           Left = 8
           Height = 19
@@ -304,7 +304,7 @@ object fmOpt: TfmOpt
         object chkGutterNum: TCheckBox
           Left = 8
           Height = 19
-          Top = 24
+          Top = 28
           Width = 50
           Caption = 'nums'
           TabOrder = 1
@@ -312,7 +312,7 @@ object fmOpt: TfmOpt
         object chkGutterStat: TCheckBox
           Left = 8
           Height = 19
-          Top = 76
+          Top = 84
           Width = 50
           Caption = 'states'
           TabOrder = 3
@@ -320,7 +320,7 @@ object fmOpt: TfmOpt
         object chkGutterEmpty: TCheckBox
           Left = 8
           Height = 19
-          Top = 104
+          Top = 112
           Width = 54
           Caption = 'indent'
           TabOrder = 4
@@ -337,7 +337,7 @@ object fmOpt: TfmOpt
         object edSizeState: TSpinEdit
           Left = 112
           Height = 23
-          Top = 76
+          Top = 84
           Width = 50
           MinValue = 1
           TabOrder = 7
@@ -346,7 +346,7 @@ object fmOpt: TfmOpt
         object edSizeEmpty: TSpinEdit
           Left = 112
           Height = 23
-          Top = 104
+          Top = 112
           Width = 50
           MinValue = 1
           TabOrder = 8
@@ -355,7 +355,7 @@ object fmOpt: TfmOpt
         object chkGutterFold: TCheckBox
           Left = 8
           Height = 19
-          Top = 48
+          Top = 56
           Width = 41
           Caption = 'fold'
           TabOrder = 2
@@ -363,7 +363,7 @@ object fmOpt: TfmOpt
         object edSizeFold: TSpinEdit
           Left = 112
           Height = 23
-          Top = 48
+          Top = 56
           Width = 50
           MinValue = 1
           TabOrder = 6
@@ -371,16 +371,16 @@ object fmOpt: TfmOpt
         end
       end
       object edNumSkip: TEdit
-        Left = 8
+        Left = 560
         Height = 23
-        Top = 124
-        Width = 24
-        TabOrder = 4
+        Top = 156
+        Width = 48
+        TabOrder = 10
       end
       object Label13: TLabel
-        Left = 40
+        Left = 407
         Height = 15
-        Top = 128
+        Top = 160
         Width = 105
         Caption = 'char if num skipped'
         ParentColor = False
@@ -391,7 +391,7 @@ object fmOpt: TfmOpt
         Top = 124
         Width = 50
         MaxValue = 40
-        TabOrder = 8
+        TabOrder = 9
         Value = 5
       end
       object Label14: TLabel
@@ -401,6 +401,14 @@ object fmOpt: TfmOpt
         Width = 70
         Caption = 'fold-plus size'
         ParentColor = False
+      end
+      object chkShowFoldAlways: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 116
+        Width = 132
+        Caption = 'show fold-bar always'
+        TabOrder = 4
       end
     end
     object TabSheet5: TTabSheet

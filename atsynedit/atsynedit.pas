@@ -272,6 +272,7 @@ type
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
     FCursorOnMinimap: boolean;
+    FCursorOnGutter: boolean;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
@@ -340,6 +341,7 @@ type
     FOptRulerMarkSizeBig: integer;
     FOptGutterVisible: boolean;
     FOptGutterPlusSize: integer;
+    FOptGutterShowFoldAlways: boolean;
     FOptNumbersFontSize: integer;
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
@@ -710,6 +712,7 @@ type
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize;
+    property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
@@ -1822,6 +1825,7 @@ begin
   FGutter:= TATGutter.Create;
   FOptGutterVisible:= true;
   FOptGutterPlusSize:= cInitGutterPlusSize;
+  FOptGutterShowFoldAlways:= true;
 
   FGutterBandBm:= 0;
   FGutterBandNum:= 1;
@@ -1911,6 +1915,8 @@ begin
   FMouseNiceScrollPos:= Point(0, 0);
 
   FSelRect:= cRectEmpty;
+  FCursorOnMinimap:= false;
+  FCursorOnGutter:= false;
   FLastTextCmd:= 0;
   FLastTextCmdText:= '';
 
@@ -2484,21 +2490,31 @@ var
   P: TPoint;
   RectNums: TRect;
   nIndex: integer;
-  bMap, bEolPos: boolean;
+  bOnMinimap, bOnGutter, bEolPos: boolean;
 begin
   inherited;
 
   P:= Point(X, Y);
   UpdateCursor;
 
-  //minimap
+  //detect cursor on minimap
   if FMinimapVisible then
   begin
-    bMap:= PtInRect(FRectMinimap, P);
+    bOnMinimap:= PtInRect(FRectMinimap, P);
     if not FMinimapShowSelAlways then
-      if bMap<>FCursorOnMinimap then
+      if bOnMinimap<>FCursorOnMinimap then
         Invalidate;
-    FCursorOnMinimap:= bMap;
+    FCursorOnMinimap:= bOnMinimap;
+  end;
+
+  //detect cursor on gutter
+  if FOptGutterVisible then
+  begin
+    bOnGutter:= PtInRect(FRectGutter, P);
+    if not FOptGutterShowFoldAlways then
+      if bOnGutter<>FCursorOnGutter then
+        Invalidate;
+    FCursorOnGutter:= bOnGutter;
   end;
 
   //numbers
@@ -3306,6 +3322,9 @@ var
   i: integer;
   IsPlus: boolean;
 begin
+  if not FOptGutterShowFoldAlways then
+    if not FCursorOnGutter then Exit;
+
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
