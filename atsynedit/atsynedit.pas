@@ -342,6 +342,7 @@ type
     FOptGutterVisible: boolean;
     FOptGutterPlusSize: integer;
     FOptGutterShowFoldAlways: boolean;
+    FOptGutterShowFoldLines: boolean;
     FOptNumbersFontSize: integer;
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
@@ -713,6 +714,7 @@ type
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize;
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways;
+    property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
@@ -1826,6 +1828,7 @@ begin
   FOptGutterVisible:= true;
   FOptGutterPlusSize:= cInitGutterPlusSize;
   FOptGutterShowFoldAlways:= true;
+  FOptGutterShowFoldLines:= true;
 
   FGutterBandBm:= 0;
   FGutterBandNum:= 1;
@@ -3341,17 +3344,20 @@ begin
       if Y2=LineIndex then State:= cFoldEnd;
     end;
 
-  //correct end-state
+  //correct end-state (wrapped line)
   if State=cFoldEnd then
     if WrapItem.NFinal=cWrapItemMiddle then
       State:= cFoldMiddle;
 
-  //correct begin-state
+  //correct begin-state (wrapped line)
   if State=cFoldBegin then
     if not FWrapInfo.IsItemInitial(AWrapItemIndex) then
       State:= cFoldMiddle;
 
-  C.Pen.Color:= FColors.GutterFoldLine;
+  if FOptGutterShowFoldLines then
+    C.Pen.Color:= FColors.GutterFoldLine
+  else
+    C.Pen.Color:= FColors.GutterBG;
   CoordXM:= (ACoordX1+ACoordX2) div 2;
   CoordYM:= (ACoordY1+ACoordY2) div 2;
 
