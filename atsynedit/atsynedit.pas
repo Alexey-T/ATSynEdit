@@ -163,6 +163,7 @@ const
   cInitNumbersStyle = cNumbersEach5th;
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
+  cInitGutterPlusSize = 4;
 
   cGutterBands = 5;
   cGutterSizeBm = 16;
@@ -183,8 +184,6 @@ const
   cSpeedScrollNiceHorz = 4; //browser-scroll (middle-click): speed x
   cSpeedScrollNiceVert = 1; //... speed y
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
-  cSizeGutterFoldTriangle = 4;
-  cSizeGutterFoldPlus = 4; //must be odd
   cSizeGutterFoldLineDx = 3;
   cSizeGutterNumOffsetLeft = 5; //offset lefter line-num, px
   cSizeGutterNumOffsetRight = 4; //offset righter line-num
@@ -339,6 +338,7 @@ type
     FOptRulerMarkSizeSmall: integer;
     FOptRulerMarkSizeBig: integer;
     FOptGutterVisible: boolean;
+    FOptGutterPlusSize: integer;
     FOptNumbersFontSize: integer;
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
@@ -706,6 +706,7 @@ type
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
+    property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
@@ -1817,6 +1818,7 @@ begin
 
   FGutter:= TATGutter.Create;
   FOptGutterVisible:= true;
+  FOptGutterPlusSize:= cInitGutterPlusSize;
 
   FGutterBandBm:= 0;
   FGutterBandNum:= 1;
@@ -3395,7 +3397,7 @@ begin
           FColors.GutterPlusBorder,
           FColors.GutterPlusBG,
           Point(CoordXM, CoordYM),
-          cSizeGutterFoldPlus,
+          FOptGutterPlusSize,
           false);
         {
         CanvasPaintTriangleDown(C, FColors.GutterFont,
@@ -3417,7 +3419,7 @@ begin
         C.Line(
           CoordXM,
           ACoordY2 - cSizeGutterFoldLineDx,
-          CoordXM + cSizeGutterFoldTriangle,
+          CoordXM + FOptGutterPlusSize,
           ACoordY2 - cSizeGutterFoldLineDx
           );
       end;

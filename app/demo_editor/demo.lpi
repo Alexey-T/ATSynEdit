@@ -88,7 +88,6 @@
       <Unit11>
         <Filename Value="..\..\atsynedit\atcanvasproc.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATCanvasProc"/>
       </Unit11>
       <Unit12>
         <Filename Value="..\..\atsynedit\atkeymapping.pas"/>

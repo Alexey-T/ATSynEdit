@@ -28,9 +28,9 @@ var
 begin
   FFoldList.Clear;
 
-  FFoldList.Add(4, 4, 8);
-  FFoldList.Add(4, 10, 12);
-  FFoldList.Add(0, 3, 14);
+  FFoldList.Add(4, 5, 9);
+  FFoldList.Add(4, 11, 14);
+  FFoldList.Add(0, 4, 15);
 
   for i:= 2 to (Strings.Count-1) div 10 do
     if Odd(i) then
