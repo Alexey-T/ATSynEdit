@@ -641,7 +641,7 @@ type
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
-    procedure DoFoldUnfoldLines(ALineFrom, ALineTo, AFoldFromCharIndex: integer; ACollapse: boolean);
+    procedure DoFoldUnfoldLines(ALineFrom, ALineTo, AFoldFromCharIndex: integer; ADoFold: boolean);
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
@@ -2011,31 +2011,6 @@ begin
   DoEventState; //modified
 end;
 
-procedure TATSynEdit.DoFoldUnfoldLines(ALineFrom, ALineTo, AFoldFromCharIndex: integer;
-  ACollapse: boolean);
-var
-  i: integer;
-begin
-  if ACollapse then
-  begin
-    Strings.LinesHidden[ALineFrom]:= AFoldFromCharIndex;
-    for i:= ALineFrom+1 to ALineTo do
-      Strings.LinesHidden[i]:= -1;
-  end
-  else
-  begin
-    for i:= ALineFrom to ALineTo do
-      Strings.LinesHidden[i]:= 0;
-  end;
-
-  FWrapUpdateNeeded:= true;
-end;
-
-procedure TATSynEdit.DoUnfoldLine(ALineNum: integer);
-begin
-  DoFoldUnfoldLines(ALineNum, ALineNum, 0, false);
-end;
-
 
 function TATSynEdit.GetStrings: TATStrings;
 begin
@@ -3317,45 +3292,6 @@ begin
   end;
 end;
 
-function TATSynEdit.IsLineFolded(ALineNum: integer; ADetectPartiallyFolded: boolean): boolean;
-var
-  Flag: integer;
-begin
-  Flag:= Strings.LinesHidden[ALineNum];
-  Result:= (Flag=-1) or (ADetectPartiallyFolded and (Flag>0));
-end;
-
-function TATSynEdit.IsLineFoldedFull(ALineNum: integer): boolean;
-begin
-  Result:= IsLineFolded(ALineNum, false);
-end;
-
-function TATSynEdit.GetFirstUnfoldedLineNumber: integer;
-begin
-  Result:= GetNextUnfoldedLineNumber(0, true);
-end;
-
-function TATSynEdit.GetLastUnfoldedLineNumber: integer;
-begin
-  Result:= GetNextUnfoldedLineNumber(Strings.Count-1, false);
-end;
-
-function TATSynEdit.GetNextUnfoldedLineNumber(ALine: integer; ADown: boolean): integer;
-var
-  N: integer;
-begin
-  Result:= ALine;
-  N:= Result;
-  while IsLineFolded(N) and Strings.IsIndexValid(N) do
-    N:= N+BoolToPlusMinusOne(ADown);
-  if Strings.IsIndexValid(N) then Result:= N;
-end;
-
-function TATSynEdit.IsPosFolded(AX, AY: integer): boolean;
-begin
-  Result:= Strings.IsPosFolded(AX, AY);
-end;
-
 procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
   AWrapItemIndex: integer;
   ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
@@ -3449,34 +3385,10 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoFold_ClickFoldingBar(ALineNum: integer);
-var
-  List: TATIntegerArray;
-  Range: TATSynRange;
-  i: integer;
-begin
-  List:= FFoldList.FindRangesContainingLine(ALineNum);
-  for i:= 0 to High(List) do
-  begin
-    Range:= FFoldList[List[i]];
-    if (not Range.IsSimple) and (Range.Y=ALineNum) then
-    begin
-      DoFold_ToggleFoldRange(Range);
-      Break
-    end;
-  end;
-end;
-
-procedure TATSynEdit.DoFold_ToggleFoldRange(R: TATSynRange);
-begin
-  R.Folded:= not R.Folded;
-  DoFoldUnfoldLines(R.Y, R.Y2, R.X, R.Folded);
-  Update;
-end;
-
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
 {$I atsynedit_sel.inc}
+{$I atsynedit_fold.inc}
 {$I atsynedit_debug.inc}
 {$R res/nicescroll.res}
 

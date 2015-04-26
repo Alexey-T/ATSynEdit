@@ -30,6 +30,7 @@ begin
 
   FFoldList.Add(4, 5, 9);
   FFoldList.Add(4, 11, 14);
+  FFoldList.Add(1, 7, 8);
   FFoldList.Add(1, 4, 15);
 
   for i:= 2 to (Strings.Count-1) div 10 do

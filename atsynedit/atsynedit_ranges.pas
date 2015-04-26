@@ -40,7 +40,9 @@ type
     procedure Insert(Index: integer; AX, AY, AY2: integer);
     procedure Delete(Index: integer);
     property Items[Index: integer]: TATSynRange read GetItems; default;
-    function FindRangesContainingLine(ALine: integer): TATIntegerArray;
+    function FindRangesContainingLine(ALine: integer; AOnlyFolded: boolean= false
+      ): TATIntegerArray;
+    function IsLineInFoldedRange(ALine: integer): boolean;
   end;
 
 implementation
@@ -122,20 +124,31 @@ begin
   end;
 end;
 
-function TATSynRanges.FindRangesContainingLine(ALine: integer): TATIntegerArray;
+function TATSynRanges.FindRangesContainingLine(ALine: integer; AOnlyFolded: boolean = false): TATIntegerArray;
 var
   i: integer;
 begin
   //!!!todo... make bin-search...
-
   SetLength(Result, 0);
   for i:= 0 to Count-1 do
     with Items[i] do
-      if (not IsSimple) and (Y<=ALine) and (Y2>=ALine) then
+      if (not IsSimple) and (Y<=ALine) and (Y2>=ALine) and (not AOnlyFolded or Folded) then
       begin
         SetLength(Result, Length(Result)+1);
         Result[High(Result)]:= i;
       end;
+end;
+
+function TATSynRanges.IsLineInFoldedRange(ALine: integer): boolean;
+var
+  List: TATIntegerArray;
+  i: integer;
+begin
+  Result:= false;
+  List:= FindRangesContainingLine(ALine, true);
+  for i:= 0 to High(List) do
+    if Items[List[i]].Y<>ALine then
+      begin Result:= true; Break end;
 end;
 
 end.
