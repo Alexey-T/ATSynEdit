@@ -401,7 +401,7 @@ object fmMain: TfmMain
     left = 523
     top = 93
     object MenuItem3: TMenuItem
-      Caption = 'test for nums'
+      Caption = 'test nums'
       Enabled = False
     end
   end

@@ -134,7 +134,6 @@
       <Unit22>
         <Filename Value="..\..\atsynedit\atgutter.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATGutter"/>
       </Unit22>
       <Unit23>
         <Filename Value="formopt.pas"/>

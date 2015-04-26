@@ -260,7 +260,8 @@ type
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
-    FMenu: TPopupMenu;
+    FMenuStd,
+    FMenuText,
     FMenuBm,
     FMenuNum,
     FMenuFold: TPopupMenu;
@@ -617,9 +618,11 @@ type
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsPosFolded(AX, AY: integer): boolean;
-    property PopupBm: TPopupMenu read FMenuBm write FMenuBm;
-    property PopupNum: TPopupMenu read FMenuNum write FMenuNum;
-    property PopupFold: TPopupMenu read FMenuFold write FMenuFold;
+    //menu
+    property PopupText: TPopupMenu read FMenuText write FMenuText;
+    property PopupGutterBm: TPopupMenu read FMenuBm write FMenuBm;
+    property PopupGutterNum: TPopupMenu read FMenuNum write FMenuNum;
+    property PopupGutterFold: TPopupMenu read FMenuFold write FMenuFold;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -1933,11 +1936,13 @@ begin
   DoClearScrollInfo(FScrollVert);
 
   FKeyMapping:= TATKeyMapping.Create;
-  FMenu:= TPopupMenu.Create(Self);
+  FHintWnd:= THintWindow.Create(Self);
+
+  FMenuStd:= TPopupMenu.Create(Self);
+  FMenuText:= nil;
   FMenuBm:= nil;
   FMenuNum:= nil;
   FMenuFold:= nil;
-  FHintWnd:= THintWindow.Create(Self);
 
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitPopupMenu;
@@ -1946,7 +1951,7 @@ end;
 destructor TATSynEdit.Destroy;
 begin
   FreeAndNil(FHintWnd);
-  FreeAndNil(FMenu);
+  FreeAndNil(FMenuStd);
   DoPaintModeStatic;
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
@@ -2414,6 +2419,12 @@ begin
           DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
           DoSelect_None;
         end;
+
+      //ok if show on mousedown, it's nice to use
+      if Assigned(FMenuText) then
+        FMenuText.PopUp
+      else
+        FMenuStd.PopUp;
     end;
   end;
 
@@ -2422,22 +2433,17 @@ begin
     if Shift=[ssRight] then
     begin
       Index:= FGutter.IndexAt(X);
-
       if Index=FGutterBandBm then
-        if Assigned(FMenuBm) then
-          FMenuBm.PopUp;
+        if Assigned(FMenuBm) then FMenuBm.PopUp;
       if Index=FGutterBandNum then
-        if Assigned(FMenuNum) then
-          FMenuNum.PopUp;
+        if Assigned(FMenuNum) then FMenuNum.PopUp;
       if Index=FGutterBandFold then
-        if Assigned(FMenuFold) then
-          FMenuFold.PopUp;
+        if Assigned(FMenuFold) then FMenuFold.PopUp;
     end;
 
     if Shift=[ssLeft] then
     begin
       Index:= FGutter.IndexAt(X);
-
       if Index=FGutterBandNum then
       begin
         if FOptMouseGutterClickSelectsLine then
@@ -3061,8 +3067,8 @@ procedure TATSynEdit.MenuPopup(Sender: TObject);
 var
   i: integer;
 begin
-  for i:= 0 to FMenu.Items.Count-1 do
-    with FMenu.Items[i] do
+  for i:= 0 to FMenuStd.Items.Count-1 do
+    with FMenuStd.Items[i] do
       case Tag of
         cCommand_ClipboardCut: Enabled:= not ModeReadOnly;
         cCommand_ClipboardPaste: Enabled:= not ModeReadOnly and Clipboard.HasFormat(CF_Text);
@@ -3078,17 +3084,16 @@ procedure TATSynEdit.DoInitPopupMenu;
   var
     MI: TMenuItem;
   begin
-    MI:= TMenuItem.Create(FMenu);
+    MI:= TMenuItem.Create(FMenuStd);
     MI.Caption:= SName;
     MI.ShortCut:= FKeyMapping.GetShortcutFromCommand(Cmd);
     MI.Tag:= Cmd;
     MI.OnClick:= @MenuClick;
-    FMenu.Items.Add(MI);
+    FMenuStd.Items.Add(MI);
   end;
   //
 begin
-  FMenu.OnPopup:= @MenuPopup;
-  PopupMenu:= FMenu;
+  FMenuStd.OnPopup:= @MenuPopup;
 
   Add('Undo', cCommand_Undo);
   Add('Redo', cCommand_Redo);

@@ -170,9 +170,9 @@ begin
   ed.Font.Name:= 'Courier New';
   {$endif}
 
-  ed.PopupBm:= PopupBookmk;
-  ed.PopupNum:= PopupNums;
-  ed.PopupFold:= PopupFold;
+  ed.PopupGutterBm:= PopupBookmk;
+  ed.PopupGutterNum:= PopupNums;
+  ed.PopupGutterFold:= PopupFold;
 
   ed.OnChanged:= @EditChanged;
   ed.OnCaretMoved:= @EditCaretMoved;
