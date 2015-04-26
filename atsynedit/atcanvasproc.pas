@@ -32,7 +32,6 @@ type
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: array of integer) of object;
 
-
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
   Str: atString;
@@ -61,6 +60,7 @@ function CanvasTextWidth(const S: atString; ATabSize: integer; ACharSize: TPoint
 function CanvasFontSizes(C: TCanvas): TSize;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
+procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
 
 
 implementation
@@ -420,6 +420,19 @@ begin
     if Odd(j) then
       C.Pixels[X, j]:= AColor;
 end;
+
+
+procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
+begin
+  C.Brush.Color:= AColor;
+  C.Pen.Color:= AColor;
+  C.Polygon([
+    Point(ACoord.X, ACoord.Y),
+    Point(ACoord.X+ASize*2, ACoord.Y),
+    Point(ACoord.X+ASize, ACoord.Y+ASize)
+    ]);
+end;
+
 
 
 initialization

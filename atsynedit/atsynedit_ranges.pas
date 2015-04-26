@@ -20,6 +20,9 @@ type
   end;
 
 type
+  TATIntegerArray = array of integer;
+
+type
   { TATSynRanges }
 
   TATSynRanges = class
@@ -37,9 +40,12 @@ type
     procedure Insert(Index: integer; AX, AY, AY2: integer);
     procedure Delete(Index: integer);
     property Items[Index: integer]: TATSynRange read GetItems; default;
+    function FindRangesContainingLine(ALine: integer): TATIntegerArray;
   end;
 
 implementation
+
+uses Dialogs;
 
 { TATSynRange }
 
@@ -114,6 +120,22 @@ begin
     TObject(FList[Index]).Free;
     FList.Delete(Index);
   end;
+end;
+
+function TATSynRanges.FindRangesContainingLine(ALine: integer): TATIntegerArray;
+var
+  i: integer;
+begin
+  //!!!todo... make bin-search...
+
+  SetLength(Result, 0);
+  for i:= 0 to Count-1 do
+    with Items[i] do
+      if (not IsSimple) and (Y<=ALine) and (Y2>=ALine) then
+      begin
+        SetLength(Result, Length(Result)+1);
+        Result[High(Result)]:= i;
+      end;
 end;
 
 end.

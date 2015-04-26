@@ -5,7 +5,7 @@ unit ATEdits;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Controls, ATSynEdit, Menus;
+  Classes, SysUtils, Graphics, Controls, ATSynEdit, ATCanvasProc, Menus;
 
 type
   { TATEdit }
@@ -37,7 +37,7 @@ type
 implementation
 
 uses
-  ATSynEdit_Commands;
+  Types, ATSynEdit_Commands;
 
 { TATEdit }
 
@@ -62,25 +62,21 @@ end;
 procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
   const ARect: TRect);
 const
-  dx = 4;
+  dx=4;
 var
   cl: TColor;
-  size, dy: integer;
+  size: integer;
 begin
   cl:= Colors.GutterFont;
-  size:= OptMicromapWidth - 2*dx;
-  dy:= (ClientHeight-size div 2) div 2;
+  size:= (OptMicromapWidth-2*dx) div 2;
 
   C.Brush.Color:= Colors.TextBG;
   C.FillRect(ARect);
 
-  C.Brush.Color:= cl;
-  C.Pen.Color:= cl;
-  C.Polygon([
-    Point(ARect.Left+dx, ARect.Top+dy),
-    Point(ARect.Left+dx+size, ARect.Top+dy),
-    Point(ARect.Left+dx+size div 2, ARect.Top+dy+size div 2)
-    ]);
+  CanvasPaintTriangleDown(C, cl, Point(
+    ARect.Left+dx,
+    (ARect.Top+ARect.Bottom) div 2 - size div 2),
+    size);
 end;
 
 procedure TATComboEdit.DoMenu;

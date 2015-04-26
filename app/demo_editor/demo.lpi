@@ -45,7 +45,6 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -180,7 +179,6 @@
       <Unit32>
         <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Ranges"/>
       </Unit32>
     </Units>
   </ProjectOptions>

@@ -8,6 +8,7 @@ License: MPL 2.0
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
+{$define test_foldlist}
 
 unit ATSynEdit;
 
@@ -158,7 +159,7 @@ const
   cGutterBands = 5;
   cGutterSizeBm = 16;
   cGutterSizeNum = 10;
-  cGutterSizeFold = 0;
+  cGutterSizeFold = 14;
   cGutterSizeState = 3;
   cGutterSizeEmpty = 2;
 
@@ -174,6 +175,7 @@ const
   cSpeedScrollNiceHorz = 4; //browser-scroll (middle-click): speed x
   cSpeedScrollNiceVert = 1; //... speed y
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
+  cSizeGutterFoldTriangle = 4;
   cSizeGutterNumOffsetLeft = 5; //offset lefter line-num, px
   cSizeGutterNumOffsetRight = 4; //offset righter line-num
   cSizeRulerHeight = 19;
@@ -374,6 +376,8 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
+    procedure DoPaintGutterFolding(C: TCanvas; ACoordX1, ACoordX2, ACoordY1,
+      ACoordY2, ALineIndex: integer);
     procedure DoUnfoldLine(ALineNum: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
@@ -1295,6 +1299,7 @@ var
   //NGutterFoldX1, NGutterFoldX2,
   NGutterEmptyX1, NGutterEmptyX2,
   NGutterStateX1, NGutterStateX2,
+  NGutterFoldX1, NGutterFoldX2,
   NCoordTop, NCoordLeftNums: integer;
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
@@ -1327,7 +1332,7 @@ begin
     with FGutter[FGutterBandBm] do begin NGutterBmX1:= Left; NGutterBmX2:= Right; end;
     with FGutter[FGutterBandNum] do begin NGutterNumsX1:= Left; NGutterNumsX2:= Right; end;
     with FGutter[FGutterBandState] do begin NGutterStateX1:= Left; NGutterStateX2:= Right; end;
-    //with FGutter[FGutterBandFold] do begin NGutterFoldX1:= Left; NGutterFoldX2:= Right; end;
+    with FGutter[FGutterBandFold] do begin NGutterFoldX1:= Left; NGutterFoldX2:= Right; end;
     with FGutter[FGutterBandEmpty] do begin NGutterEmptyX1:= Left; NGutterEmptyX2:= Right; end;
 
     C.Brush.Color:= FColors.GutterBG;
@@ -1542,9 +1547,20 @@ begin
         end;
 
       //gutter band: state
+      if FGutter[FGutterBandFold].Visible then
+      begin
+        DoPaintGutterFolding(C,
+          NGutterFoldX1,
+          NGutterFoldX2,
+          NCoordTop,
+          NCoordTop+ACharSize.Y,
+          NLinesIndex);
+      end;
+
+      //gutter band: state
       if FGutter[FGutterBandState].Visible then
       begin
-        case Strings.LinesState[WrapItem.NLineIndex] of
+        case Strings.LinesState[NLinesIndex] of
           cLineStateChanged: DoPaintState(NCoordTop, FColors.StateChanged);
           cLineStateAdded: DoPaintState(NCoordTop, FColors.StateAdded);
           cLineStateSaved: DoPaintState(NCoordTop, FColors.StateSaved);
@@ -1891,7 +1907,6 @@ begin
 
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitPopupMenu;
-  DoDebugInitFoldList;
 end;
 
 destructor TATSynEdit.Destroy;
@@ -1957,6 +1972,10 @@ begin
   DoPaintModeBlinking;
   DoEventChange;
   DoEventCarets;
+
+  {$ifdef test_foldlist}
+  DoDebugInitFoldList;
+  {$endif}
 end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
@@ -3309,6 +3328,36 @@ end;
 function TATSynEdit.IsPosFolded(AX, AY: integer): boolean;
 begin
   Result:= Strings.IsPosFolded(AX, AY);
+end;
+
+procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
+  ACoordX1, ACoordX2, ACoordY1, ACoordY2, ALineIndex: integer);
+var
+  List: TATIntegerArray;
+  Str: string;
+  i: integer;
+begin
+  List:= FFoldList.FindRangesContainingLine(ALineIndex);
+  if Length(List)=0 then Exit;
+
+  Str:= '|';
+  for i:= Low(List) to High(List) do
+    with FFoldList[List[i]] do
+    begin
+      if Y=ALineIndex then begin Str:= '['; Break end;
+      if Y2=ALineIndex then Str:= ']';
+    end;
+
+  C.Font.Color:= FColors.GutterFont;
+  C.TextOut(ACoordX1, ACoordY1, Str);
+  {
+  CanvasPaintTriangleDown(C, FColors.GutterFont,
+    Point(
+      (ACoordX1+ACoordX2) div 2 - cSizeGutterFoldTriangle,
+      ACoordY + FCharSize.Y div 2 - cSizeGutterFoldTriangle div 2),
+    cSizeGutterFoldTriangle
+    );
+    }
 end;
 
 {$I atsynedit_carets.inc}
