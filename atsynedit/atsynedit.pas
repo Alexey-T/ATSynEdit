@@ -404,8 +404,8 @@ type
     procedure DoInitColors;
     procedure DoInitPopupMenu;
     procedure DoDebugInitFoldList;
-    function IsLineFolded(ALineNum: integer; ADetectPartiallyFolded: boolean = false): boolean;
-    function IsLineFoldedFull(ALineNum: integer): boolean;
+    function IsLineFolded(ALine: integer; ADetectPartiallyFolded: boolean = false): boolean;
+    function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
@@ -3302,7 +3302,7 @@ var
   LineIndex: integer;
   CoordXM, CoordYM: integer;
   i: integer;
-  bPlus: boolean;
+  IsPlus: boolean;
 begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
@@ -3311,12 +3311,12 @@ begin
   if Length(List)=0 then Exit;
 
   State:= cFoldMiddle;
-  bPlus:= false;
+  IsPlus:= false;
 
   for i:= Low(List) to High(List) do
     with FFold[List[i]] do
     begin
-      if Y=LineIndex then begin State:= cFoldBegin; bPlus:= Folded; Break end;
+      if Y=LineIndex then begin State:= cFoldBegin; IsPlus:= Folded; Break end;
       if Y2=LineIndex then State:= cFoldEnd;
     end;
 
@@ -3337,18 +3337,19 @@ begin
   case State of
     cFoldBegin:
       begin
-        C.Line(
-          CoordXM,
-          CoordYM,
-          CoordXM,
-          ACoordY2
-          );
+        if not IsPlus then
+          C.Line(
+            CoordXM,
+            CoordYM,
+            CoordXM,
+            ACoordY2
+            );
         CanvasPaintPlusMinus(C,
           FColors.GutterPlusBorder,
           FColors.GutterPlusBG,
           Point(CoordXM, CoordYM),
           FOptGutterPlusSize,
-          bPlus);
+          IsPlus);
         {
         CanvasPaintTriangleDown(C, FColors.GutterFont,
           Point(

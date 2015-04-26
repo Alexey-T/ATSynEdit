@@ -1,16 +1,16 @@
 {$ifdef nn}begin end;{$endif}
 
-function TATSynEdit.IsLineFolded(ALineNum: integer; ADetectPartiallyFolded: boolean): boolean;
+function TATSynEdit.IsLineFolded(ALine: integer; ADetectPartiallyFolded: boolean): boolean;
 var
   Flag: integer;
 begin
-  Flag:= Strings.LinesHidden[ALineNum];
+  Flag:= Strings.LinesHidden[ALine];
   Result:= (Flag=-1) or (ADetectPartiallyFolded and (Flag>0));
 end;
 
-function TATSynEdit.IsLineFoldedFull(ALineNum: integer): boolean;
+function TATSynEdit.IsLineFoldedFull(ALine: integer): boolean;
 begin
-  Result:= IsLineFolded(ALineNum, false);
+  Result:= IsLineFolded(ALine, false);
 end;
 
 function TATSynEdit.GetFirstUnfoldedLineNumber: integer;
@@ -87,7 +87,7 @@ var
   i: integer;
 begin
   List:= FFold.FindRangesContainingLine(ALine, -1, -1, true);
-  for i:= 0 to High(List) do
+  for i:= Low(List) to High(List) do
     DoFold_SetRangeFolding(FFold[List[i]], false);
 end;
 
