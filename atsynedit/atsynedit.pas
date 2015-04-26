@@ -30,6 +30,14 @@ type
     cDirDown
     );
 
+  TATFoldBarState = (
+    cFoldBegin,
+    cFoldEnd,
+    cFoldMiddle,
+    cFoldMiddleAndBegin,
+    cFoldMiddleAndEnd
+    );
+
   TATCommandResult = (
     cResultText,
     cResultCaretAny,
@@ -176,6 +184,7 @@ const
   cSpeedScrollNiceVert = 1; //... speed y
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldTriangle = 4;
+  cSizeGutterFoldLineDx = 2;
   cSizeGutterNumOffsetLeft = 5; //offset lefter line-num, px
   cSizeGutterNumOffsetRight = 4; //offset righter line-num
   cSizeRulerHeight = 19;
@@ -376,8 +385,8 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
-    procedure DoPaintGutterFolding(C: TCanvas; ACoordX1, ACoordX2, ACoordY1,
-      ACoordY2, ALineIndex: integer);
+    procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
+      ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoUnfoldLine(ALineNum: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
@@ -1550,11 +1559,12 @@ begin
       if FGutter[FGutterBandFold].Visible then
       begin
         DoPaintGutterFolding(C,
+          NWrapIndex,
           NGutterFoldX1,
           NGutterFoldX2,
           NCoordTop,
-          NCoordTop+ACharSize.Y,
-          NLinesIndex);
+          NCoordTop+ACharSize.Y
+          );
       end;
 
       //gutter band: state
@@ -3331,33 +3341,85 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
-  ACoordX1, ACoordX2, ACoordY1, ACoordY2, ALineIndex: integer);
+  AWrapItemIndex: integer;
+  ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
 var
   List: TATIntegerArray;
-  Str: string;
+  State: TATFoldBarState;
+  WrapItem: TATSynWrapItem;
+  LineIndex: integer;
+  CoordXM, CoordYM: integer;
   i: integer;
 begin
-  List:= FFoldList.FindRangesContainingLine(ALineIndex);
+  WrapItem:= FWrapInfo[AWrapItemIndex];
+  LineIndex:= WrapItem.NLineIndex;
+
+  List:= FFoldList.FindRangesContainingLine(LineIndex);
   if Length(List)=0 then Exit;
 
-  Str:= '|';
+  State:= cFoldMiddle;
   for i:= Low(List) to High(List) do
     with FFoldList[List[i]] do
     begin
-      if Y=ALineIndex then begin Str:= '['; Break end;
-      if Y2=ALineIndex then Str:= ']';
+      if Y=LineIndex then begin State:= cFoldBegin; Break end;
+      if Y2=LineIndex then State:= cFoldEnd;
     end;
 
-  C.Font.Color:= FColors.GutterFont;
-  C.TextOut(ACoordX1, ACoordY1, Str);
-  {
-  CanvasPaintTriangleDown(C, FColors.GutterFont,
-    Point(
-      (ACoordX1+ACoordX2) div 2 - cSizeGutterFoldTriangle,
-      ACoordY + FCharSize.Y div 2 - cSizeGutterFoldTriangle div 2),
-    cSizeGutterFoldTriangle
-    );
-    }
+  //correct end-state
+  if State=cFoldEnd then
+    if WrapItem.NFinal=cWrapItemMiddle then
+      State:= cFoldMiddle;
+
+  //correct begin-state
+  if State=cFoldBegin then
+    if not FWrapInfo.IsItemInitial(AWrapItemIndex) then
+      State:= cFoldMiddle;
+
+  C.Pen.Color:= FColors.GutterFont;
+  CoordXM:= (ACoordX1+ACoordX2) div 2;
+  CoordYM:= (ACoordY1+ACoordY2) div 2;
+
+  case State of
+    cFoldBegin:
+      begin
+        C.Line(
+          CoordXM,
+          CoordYM,
+          CoordXM,
+          ACoordY2
+          );
+        CanvasPaintTriangleDown(C, FColors.GutterFont,
+          Point(
+            CoordXM - cSizeGutterFoldTriangle,
+            CoordYM - cSizeGutterFoldTriangle div 2),
+          cSizeGutterFoldTriangle
+          );
+      end;
+    cFoldEnd:
+      begin
+        C.Line(
+          CoordXM,
+          ACoordY1,
+          CoordXM,
+          ACoordY2 - cSizeGutterFoldLineDx
+          );
+        C.Line(
+          CoordXM,
+          ACoordY2 - cSizeGutterFoldLineDx,
+          CoordXM + cSizeGutterFoldTriangle,
+          ACoordY2 - cSizeGutterFoldLineDx
+          );
+      end;
+    cFoldMiddle:
+      begin
+        C.Line(
+          CoordXM,
+          ACoordY1,
+          CoordXM,
+          ACoordY2
+          );
+      end;
+  end;
 end;
 
 {$I atsynedit_carets.inc}

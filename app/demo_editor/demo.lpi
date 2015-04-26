@@ -156,6 +156,7 @@
       <Unit27>
         <Filename Value="..\..\atsynedit\atsynedit_wrapinfo.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_WrapInfo"/>
       </Unit27>
       <Unit28>
         <Filename Value="..\..\atsynedit\atsynedit_cmd_sel.inc"/>
