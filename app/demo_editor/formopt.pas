@@ -14,6 +14,7 @@ type
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
     chkCrPreferLeft: TCheckBox;
+    chkGutterFold: TCheckBox;
     chkKeepCol: TCheckBox;
     chkCurLineMin: TCheckBox;
     chkHint: TCheckBox;
@@ -66,6 +67,7 @@ type
     edCrTime: TSpinEdit;
     edChars: TEdit;
     edIndent: TSpinEdit;
+    edPlusSize: TSpinEdit;
     edNumSkip: TEdit;
     edMapFont: TSpinEdit;
     edNum: TComboBox;
@@ -75,6 +77,7 @@ type
     edSizeBm: TSpinEdit;
     edSizeEmpty: TSpinEdit;
     edSizeState: TSpinEdit;
+    edSizeFold: TSpinEdit;
     edTabArrow: TSpinEdit;
     GroupBox2: TGroupBox;
     LabChars: TLabel;
@@ -83,6 +86,7 @@ type
     Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
+    Label14: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -154,6 +158,7 @@ begin
     edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
     edNumSize.Value:= ed.OptNumbersFontSize;
     edNumSkip.Text:= ed.OptNumbersSkippedChar;
+    edPlusSize.Value:= ed.OptGutterPlusSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
     chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
@@ -162,9 +167,11 @@ begin
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
+    chkGutterFold.Checked:= ed.Gutter[ed.GutterBandFold].Visible;
     chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
     chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
     edSizeBm.Value:= ed.Gutter[ed.GutterBandBm].Size;
+    edSizeFold.Value:= ed.Gutter[ed.GutterBandFold].Size;
     edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
 
@@ -238,15 +245,18 @@ begin
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
       ed.OptNumbersSkippedChar:= edNumSkip.Text;
+      ed.OptGutterPlusSize:= edPlusSize.Value;
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;
       ed.OptRulerFontSize:= edRulerFSize.Value;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
+      ed.Gutter[ed.GutterBandFold].Visible:= chkGutterFold.Checked;
       ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
       ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
       ed.Gutter[ed.GutterBandBm].Size:= edSizeBm.Value;
+      ed.Gutter[ed.GutterBandFold].Size:= edSizeFold.Value;
       ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
 

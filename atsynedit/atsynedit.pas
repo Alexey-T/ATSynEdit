@@ -62,6 +62,7 @@ type
     GutterCaretBG,
     GutterPlusBorder,
     GutterPlusBG,
+    GutterFoldLine,
     CurLineBG,
     MarginRight,
     MarginCaret,
@@ -3188,8 +3189,9 @@ begin
   FColors.GutterFont:= clGray;
   FColors.GutterBG:= $e0e0e0;
   FColors.GutterCaretBG:= $c8c8c8;
-  FColors.GutterPlusBorder:= clBlack;
+  FColors.GutterPlusBorder:= clGray;
   FColors.GutterPlusBG:= $f4f4f4;
+  FColors.GutterFoldLine:= clGray;
   FColors.CurLineBG:= $e0f0f0;
   FColors.RulerBG:= FColors.GutterBG;
   FColors.RulerFont:= clGray;
@@ -3330,7 +3332,7 @@ begin
     if not FWrapInfo.IsItemInitial(AWrapItemIndex) then
       State:= cFoldMiddle;
 
-  C.Pen.Color:= FColors.GutterFont;
+  C.Pen.Color:= FColors.GutterFoldLine;
   CoordXM:= (ACoordX1+ACoordX2) div 2;
   CoordYM:= (ACoordY1+ACoordY2) div 2;
 
