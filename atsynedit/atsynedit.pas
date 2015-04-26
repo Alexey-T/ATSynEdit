@@ -382,7 +382,9 @@ type
     //
     procedure DebugFindWrapIndex;
     procedure DoCaretsAssign(NewCarets: TATCarets);
+    procedure DoFold_ClickFoldingBar(ALineNum: integer);
     procedure DoDropText;
+    procedure DoFold_ToggleFoldRange(R: TATSynRange);
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
@@ -1557,7 +1559,7 @@ begin
             DoEventDrawBookmarkIcon(C, NLinesIndex, Rect(NGutterBmX1, NCoordTop, NGutterBmX2, NCoordTop+ACharSize.Y));
         end;
 
-      //gutter band: state
+      //gutter band: fold
       if FGutter[FGutterBandFold].Visible then
       begin
         DoPaintGutterFolding(C,
@@ -2423,8 +2425,9 @@ begin
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
     if Shift=[ssLeft] then
     begin
-      //handle click on numbers here
+      //click on numbers
       if FOptMouseGutterClickSelectsLine and
+        FGutter[FGutterBandNum].Visible and
         (X>=FGutter[FGutterBandNum].Left) and
         (X<FGutter[FGutterBandNum].Right) then
       begin
@@ -2433,7 +2436,15 @@ begin
         DoSelect_Line(PCaret);
       end
       else
-        //on other bands- event
+      //click on folding bar
+      if FGutter[FGutterBandFold].Visible and
+        (X>=FGutter[FGutterBandFold].Left) and
+        (X<FGutter[FGutterBandFold].Right) then
+      begin
+        DoFold_ClickFoldingBar(PCaret.Y);
+      end
+      else
+      //click on other bands- event
         DoEventClickGutter(FGutter.IndexAt(X), PCaret.Y);
     end;
 
@@ -3355,6 +3366,7 @@ var
   LineIndex: integer;
   CoordXM, CoordYM: integer;
   i: integer;
+  bPlus: boolean;
 begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
@@ -3363,10 +3375,12 @@ begin
   if Length(List)=0 then Exit;
 
   State:= cFoldMiddle;
+  bPlus:= false;
+
   for i:= Low(List) to High(List) do
     with FFoldList[List[i]] do
     begin
-      if Y=LineIndex then begin State:= cFoldBegin; Break end;
+      if Y=LineIndex then begin State:= cFoldBegin; bPlus:= Folded; Break end;
       if Y2=LineIndex then State:= cFoldEnd;
     end;
 
@@ -3398,7 +3412,7 @@ begin
           FColors.GutterPlusBG,
           Point(CoordXM, CoordYM),
           FOptGutterPlusSize,
-          false);
+          bPlus);
         {
         CanvasPaintTriangleDown(C, FColors.GutterFont,
           Point(
@@ -3433,6 +3447,31 @@ begin
           );
       end;
   end;
+end;
+
+procedure TATSynEdit.DoFold_ClickFoldingBar(ALineNum: integer);
+var
+  List: TATIntegerArray;
+  Range: TATSynRange;
+  i: integer;
+begin
+  List:= FFoldList.FindRangesContainingLine(ALineNum);
+  for i:= 0 to High(List) do
+  begin
+    Range:= FFoldList[List[i]];
+    if (not Range.IsSimple) and (Range.Y=ALineNum) then
+    begin
+      DoFold_ToggleFoldRange(Range);
+      Break
+    end;
+  end;
+end;
+
+procedure TATSynEdit.DoFold_ToggleFoldRange(R: TATSynRange);
+begin
+  R.Folded:= not R.Folded;
+  DoFoldUnfoldLines(R.Y, R.Y2, R.X, R.Folded);
+  Update;
 end;
 
 {$I atsynedit_carets.inc}

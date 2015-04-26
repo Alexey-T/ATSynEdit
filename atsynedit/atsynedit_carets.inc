@@ -315,10 +315,7 @@ begin
   DoCaretSingle(APnt.X, APnt.Y);
 
   if IsLineFolded(APnt.Y, true) then
-  begin
     DoUnfoldLine(APnt.Y);
-    UpdateWrapInfo;
-  end;
 
   DoGotoPos(APnt, cScrollIndentGotoHorz, cScrollIndentGotoVert);
   Update;
