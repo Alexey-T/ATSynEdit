@@ -961,6 +961,7 @@ begin
   Result:= false;
 end;
 
+
 {$I atstrings_editing.inc}
 {$I atstrings_load.inc}
 {$I atstrings_save.inc}

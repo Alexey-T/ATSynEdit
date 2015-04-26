@@ -3215,7 +3215,7 @@ begin
   FColors.RulerBG:= FColors.GutterBG;
   FColors.RulerFont:= clGray;
   FColors.CollapseLine:= clNavy;
-  FColors.CollapseFont:= clBlue;
+  FColors.CollapseFont:= clGray;
   FColors.CollapseBG:= clWhite;
   FColors.MarginRight:= clLtGray;
   FColors.MarginCaret:= clLime;
@@ -3334,6 +3334,7 @@ begin
   List:= FFold.FindRangesContainingLine(LineIndex, nil);
   if Length(List)=0 then Exit;
 
+  //calc state
   State:= cFoldMiddle;
   IsPlus:= false;
 
@@ -3344,20 +3345,19 @@ begin
       if Y2=LineIndex then State:= cFoldEnd;
     end;
 
-  //correct end-state (wrapped line)
-  if State=cFoldEnd then
-    if WrapItem.NFinal=cWrapItemMiddle then
-      State:= cFoldMiddle;
-
-  //correct begin-state (wrapped line)
+  //correct states for wrapped line
   if State=cFoldBegin then
     if not FWrapInfo.IsItemInitial(AWrapItemIndex) then
       State:= cFoldMiddle;
 
-  if FOptGutterShowFoldLines then
-    C.Pen.Color:= FColors.GutterFoldLine
-  else
-    C.Pen.Color:= FColors.GutterBG;
+  if State=cFoldEnd then
+    if WrapItem.NFinal=cWrapItemMiddle then
+      State:= cFoldMiddle;
+
+  C.Pen.Color:= IfThen(FOptGutterShowFoldLines,
+    FColors.GutterFoldLine,
+    FColors.GutterBG);
+
   CoordXM:= (ACoordX1+ACoordX2) div 2;
   CoordYM:= (ACoordY1+ACoordY2) div 2;
 
@@ -3377,28 +3377,21 @@ begin
           Point(CoordXM, CoordYM),
           FOptGutterPlusSize,
           IsPlus);
-        {
-        CanvasPaintTriangleDown(C, FColors.GutterFont,
-          Point(
-            CoordXM - cSizeGutterFoldTriangle,
-            CoordYM - cSizeGutterFoldTriangle div 2),
-          cSizeGutterFoldTriangle
-          );
-          }
       end;
     cFoldEnd:
       begin
+        Dec(ACoordY2, cSizeGutterFoldLineDx);
         C.Line(
           CoordXM,
           ACoordY1,
           CoordXM,
-          ACoordY2 - cSizeGutterFoldLineDx
+          ACoordY2
           );
         C.Line(
           CoordXM,
-          ACoordY2 - cSizeGutterFoldLineDx,
+          ACoordY2,
           CoordXM + FOptGutterPlusSize,
-          ACoordY2 - cSizeGutterFoldLineDx
+          ACoordY2
           );
       end;
     cFoldMiddle:

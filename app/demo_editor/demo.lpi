@@ -104,6 +104,7 @@
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atcarets.pas"/>
@@ -140,7 +141,6 @@
         <ComponentName Value="fmOpt"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="formopt"/>
       </Unit23>
       <Unit24>
         <Filename Value="..\..\atsynedit\atstrings_load.inc"/>
