@@ -46,6 +46,9 @@ type
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
     btnHlp: TMenuItem;
+    MenuItem3: TMenuItem;
+    MenuItem4: TMenuItem;
+    mnuBms: TMenuItem;
     mnuOneLine: TMenuItem;
     mnuPane: TMenuItem;
     mnuHilit: TMenuItem;
@@ -68,6 +71,9 @@ type
     OpenDialog1: TOpenDialog;
     PanelMain: TPanel;
     PanelRt: TPanel;
+    PopupBookmk: TPopupMenu;
+    PopupFold: TPopupMenu;
+    PopupNums: TPopupMenu;
     SaveDialog1: TSaveDialog;
     Status: TStatusBar;
     procedure bGotoClick(Sender: TObject);
@@ -81,6 +87,7 @@ type
     procedure chkGutterChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
+    procedure mnuBmsClick(Sender: TObject);
     procedure mnuOneLineClick(Sender: TObject);
     procedure mnuPaneClick(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
@@ -162,6 +169,10 @@ begin
   {$else}
   ed.Font.Name:= 'Courier New';
   {$endif}
+
+  ed.PopupBm:= PopupBookmk;
+  ed.PopupNum:= PopupNums;
+  ed.PopupFold:= PopupFold;
 
   ed.OnChanged:= @EditChanged;
   ed.OnCaretMoved:= @EditCaretMoved;
@@ -534,6 +545,11 @@ begin
   if wait then Exit;
   ed.OptMinimapVisible:= chkMinimap.Checked;
   ed.Update;
+end;
+
+procedure TfmMain.mnuBmsClick(Sender: TObject);
+begin
+  mnuTBmsClick(Self);
 end;
 
 procedure TfmMain.mnuOneLineClick(Sender: TObject);

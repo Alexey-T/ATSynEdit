@@ -261,6 +261,9 @@ type
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
     FMenu: TPopupMenu;
+    FMenuBm,
+    FMenuNum,
+    FMenuFold: TPopupMenu;
     FOverwrite: boolean;
     FHintWnd: THintWindow;
     FMouseDownPnt: TPoint;
@@ -614,6 +617,9 @@ type
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsPosFolded(AX, AY: integer): boolean;
+    property PopupBm: TPopupMenu read FMenuBm write FMenuBm;
+    property PopupNum: TPopupMenu read FMenuNum write FMenuNum;
+    property PopupFold: TPopupMenu read FMenuFold write FMenuFold;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -1928,6 +1934,9 @@ begin
 
   FKeyMapping:= TATKeyMapping.Create;
   FMenu:= TPopupMenu.Create(Self);
+  FMenuBm:= nil;
+  FMenuNum:= nil;
+  FMenuFold:= nil;
   FHintWnd:= THintWindow.Create(Self);
 
   DoInitDefaultKeymapping(FKeyMapping);
@@ -2325,6 +2334,7 @@ procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: I
 var
   PCaret: TPoint;
   EolPos: boolean;
+  Index: integer;
 begin
   inherited;
   SetFocus;
@@ -2408,30 +2418,45 @@ begin
   end;
 
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
+  begin
+    if Shift=[ssRight] then
+    begin
+      Index:= FGutter.IndexAt(X);
+
+      if Index=FGutterBandBm then
+        if Assigned(FMenuBm) then
+          FMenuBm.PopUp;
+      if Index=FGutterBandNum then
+        if Assigned(FMenuNum) then
+          FMenuNum.PopUp;
+      if Index=FGutterBandFold then
+        if Assigned(FMenuFold) then
+          FMenuFold.PopUp;
+    end;
+
     if Shift=[ssLeft] then
     begin
-      //click on numbers
-      if FOptMouseGutterClickSelectsLine and
-        FGutter[FGutterBandNum].Visible and
-        (X>=FGutter[FGutterBandNum].Left) and
-        (X<FGutter[FGutterBandNum].Right) then
+      Index:= FGutter.IndexAt(X);
+
+      if Index=FGutterBandNum then
       begin
-        FSelRect:= cRectEmpty;
-        FMouseDownNumber:= PCaret.Y;
-        DoSelect_Line(PCaret);
+        if FOptMouseGutterClickSelectsLine then
+        begin
+          FSelRect:= cRectEmpty;
+          FMouseDownNumber:= PCaret.Y;
+          DoSelect_Line(PCaret);
+        end;
       end
       else
-      //click on folding bar
-      if FGutter[FGutterBandFold].Visible and
-        (X>=FGutter[FGutterBandFold].Left) and
-        (X<FGutter[FGutterBandFold].Right) then
+      if Index=FGutterBandFold then
       begin
         DoFold_ClickFoldingBar(PCaret.Y);
       end
       else
-      //click on other bands- event
+        //click on other bands- event
         DoEventClickGutter(FGutter.IndexAt(X), PCaret.Y);
     end;
+  end;
 
   if FMicromapVisible and PtInRect(FRectMicromap, Point(X, Y)) then
     if Shift=[ssLeft] then
@@ -3214,8 +3239,8 @@ begin
   FColors.CurLineBG:= $e0f0f0;
   FColors.RulerBG:= FColors.GutterBG;
   FColors.RulerFont:= clGray;
-  FColors.CollapseLine:= clNavy;
-  FColors.CollapseFont:= clGray;
+  FColors.CollapseLine:= $a06060;
+  FColors.CollapseFont:= $e08080;
   FColors.CollapseBG:= clWhite;
   FColors.MarginRight:= clLtGray;
   FColors.MarginCaret:= clLime;

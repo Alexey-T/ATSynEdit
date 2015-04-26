@@ -389,4 +389,28 @@ object fmMain: TfmMain
       end
     end
   end
+  object PopupBookmk: TPopupMenu
+    left = 488
+    top = 80
+    object mnuBms: TMenuItem
+      Caption = 'toggle all bm''s'
+      OnClick = mnuBmsClick
+    end
+  end
+  object PopupNums: TPopupMenu
+    left = 523
+    top = 93
+    object MenuItem3: TMenuItem
+      Caption = 'test for nums'
+      Enabled = False
+    end
+  end
+  object PopupFold: TPopupMenu
+    left = 561
+    top = 104
+    object MenuItem4: TMenuItem
+      Caption = 'test fold'
+      Enabled = False
+    end
+  end
 end
