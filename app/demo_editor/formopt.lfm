@@ -1,11 +1,11 @@
 object fmOpt: TfmOpt
   Left = 422
-  Height = 357
+  Height = 390
   Top = 225
   Width = 640
   BorderStyle = bsDialog
   Caption = 'Editor opts'
-  ClientHeight = 357
+  ClientHeight = 390
   ClientWidth = 640
   OnCreate = FormCreate
   Position = poScreenCenter
@@ -13,7 +13,7 @@ object fmOpt: TfmOpt
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 25
-    Top = 326
+    Top = 359
     Width = 628
     AutoSize = False
     OKButton.Name = 'OKButton'
@@ -31,7 +31,7 @@ object fmOpt: TfmOpt
   end
   object PageControl1: TPageControl
     Left = 8
-    Height = 311
+    Height = 344
     Top = 8
     Width = 624
     ActivePage = TabSheet2
@@ -39,8 +39,8 @@ object fmOpt: TfmOpt
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
-      ClientHeight = 283
-      ClientWidth = 616
+      ClientHeight = 313
+      ClientWidth = 620
       object chkCurLine: TCheckBox
         Left = 8
         Height = 19
@@ -179,7 +179,7 @@ object fmOpt: TfmOpt
     end
     object TabSheet2: TTabSheet
       Caption = 'gutter'
-      ClientHeight = 283
+      ClientHeight = 316
       ClientWidth = 616
       object edRulerSize: TSpinEdit
         Left = 560
@@ -286,11 +286,11 @@ object fmOpt: TfmOpt
       end
       object GroupBox2: TGroupBox
         Left = 224
-        Height = 272
+        Height = 300
         Top = 4
         Width = 176
         Caption = 'columns'
-        ClientHeight = 252
+        ClientHeight = 280
         ClientWidth = 172
         TabOrder = 6
         object chkGutterBm: TCheckBox
@@ -340,7 +340,7 @@ object fmOpt: TfmOpt
           Top = 56
           Width = 50
           MinValue = 1
-          TabOrder = 7
+          TabOrder = 6
           Value = 1
         end
         object edSizeEmpty: TSpinEdit
@@ -366,22 +366,23 @@ object fmOpt: TfmOpt
           Top = 84
           Width = 50
           MinValue = 1
-          TabOrder = 6
+          TabOrder = 7
           Value = 1
         end
         object ListCol: TListBox
           Left = 8
-          Height = 88
-          Top = 156
+          Height = 124
+          Top = 148
           Width = 98
           ItemHeight = 0
+          ScrollWidth = 40
           TabOrder = 9
         end
         object bColUp: TButton
           Left = 112
           Height = 25
-          Top = 156
-          Width = 40
+          Top = 148
+          Width = 50
           Caption = '^'
           OnClick = bColUpClick
           TabOrder = 10
@@ -389,8 +390,8 @@ object fmOpt: TfmOpt
         object bColDown: TButton
           Left = 112
           Height = 25
-          Top = 184
-          Width = 40
+          Top = 176
+          Width = 50
           Caption = 'v'
           OnClick = bColDownClick
           TabOrder = 11
@@ -447,8 +448,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet5: TTabSheet
       Caption = 'keys'
-      ClientHeight = 283
-      ClientWidth = 616
+      ClientHeight = 313
+      ClientWidth = 620
       object chkNavWrap: TCheckBox
         Left = 8
         Height = 19
@@ -611,8 +612,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet3: TTabSheet
       Caption = 'mouse'
-      ClientHeight = 283
-      ClientWidth = 616
+      ClientHeight = 313
+      ClientWidth = 620
       object chkClick2: TCheckBox
         Left = 8
         Height = 19
@@ -680,8 +681,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet4: TTabSheet
       Caption = 'carets'
-      ClientHeight = 283
-      ClientWidth = 616
+      ClientHeight = 313
+      ClientWidth = 620
       object edCrTime: TSpinEdit
         Left = 8
         Height = 23
@@ -772,8 +773,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet6: TTabSheet
       Caption = 'undo'
-      ClientHeight = 283
-      ClientWidth = 616
+      ClientHeight = 313
+      ClientWidth = 620
       object edUndo: TSpinEdit
         Left = 8
         Height = 23
@@ -812,8 +813,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet7: TTabSheet
       Caption = 'minimap'
-      ClientHeight = 283
-      ClientWidth = 616
+      ClientHeight = 313
+      ClientWidth = 620
       object edMapFont: TSpinEdit
         Left = 8
         Height = 23
