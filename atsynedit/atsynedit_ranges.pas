@@ -52,7 +52,7 @@ type
 implementation
 
 uses
-  ATCarets;
+  ATSynEdit_Carets;
 
 { TATSynRange }
 

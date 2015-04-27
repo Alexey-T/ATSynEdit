@@ -1,4 +1,4 @@
-unit ATGutter;
+unit ATSynEdit_Gutter;
 
 {$mode objfpc}{$H+}
 

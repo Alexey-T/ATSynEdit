@@ -18,8 +18,14 @@ uses
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms,
   LMessages, LCLType,
-  ATStringProc, ATStrings, ATCanvasProc, ATGutter,
-  ATCarets, ATKeyMapping, ATSynEdit_WrapInfo, ATSynEdit_Ranges;
+  ATStringProc,
+  ATStrings,
+  ATCanvasProc,
+  ATKeyMapping,
+  ATSynEdit_Carets,
+  ATSynEdit_Gutter,
+  ATSynEdit_WrapInfo,
+  ATSynEdit_Ranges;
 
 type
   TATDirection = (

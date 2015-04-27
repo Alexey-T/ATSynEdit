@@ -1,4 +1,4 @@
-unit ATCarets;
+unit atsynedit_carets;
 
 {$mode objfpc}{$H+}
 

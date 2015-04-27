@@ -16,12 +16,12 @@ uses
   atstringproc_wordjump,
   atstrings,
   atstrings_undo,
-  atcarets,
-  atgutter,
+  atsynedit_carets,
   atsynedit,
+  atsynedit_gutter,
   atsynedit_commands,
   atsynedit_keymapping,
-  atsynedit_wrapinfo, ATEdits, atsynedit_ranges, formcombo;
+  atsynedit_wrapinfo, atsynedit_edits, atsynedit_ranges, formcombo;
 
 {$R *.res}
 

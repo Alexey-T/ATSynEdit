@@ -6,10 +6,9 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ATEdits;
+  StdCtrls, ATSynEdit_Edits;
 
 type
-
   { TfmCombo }
 
   TfmCombo = class(TForm)

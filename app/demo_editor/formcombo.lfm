@@ -3,7 +3,7 @@ object fmCombo: TfmCombo
   Height = 240
   Top = 370
   Width = 397
-  Caption = 'Edit test'
+  Caption = 'Combo'
   ClientHeight = 240
   ClientWidth = 397
   OnCreate = FormCreate

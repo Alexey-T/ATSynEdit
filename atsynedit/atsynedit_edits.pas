@@ -1,4 +1,4 @@
-unit ATEdits;
+unit ATSynEdit_Edits;
 
 {$mode objfpc}{$H+}
 
