@@ -401,13 +401,13 @@ begin
   SwapInt(Item.PosY, Item.EndY);
 end;
 
-function TATSynEdit.GetCaretsArray: TPointArray;
+function TATSynEdit.GetCaretsArray: TATPointArray;
 begin
   if Assigned(FCarets) then
     Result:= FCarets.SaveToArray;
 end;
 
-procedure TATSynEdit.SetCaretsArray(const L: TPointArray);
+procedure TATSynEdit.SetCaretsArray(const L: TATPointArray);
 begin
   if Assigned(FCarets) then
     FCarets.LoadFromArray(L);

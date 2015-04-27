@@ -49,8 +49,8 @@ type
   end;
 
 type
-  TATStringsGetCarets = function: TPointArray of object;
-  TATStringsSetCarets = procedure(const ACarets: TPointArray) of object;
+  TATStringsGetCarets = function: TATPointArray of object;
+  TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
 
 type
   { TATStrings }
@@ -79,7 +79,7 @@ type
     function DoCheckFilled: boolean;
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
-    function GetCaretsArray: TPointArray;
+    function GetCaretsArray: TATPointArray;
     function GetLine(N: integer): atString;
     function GetLineBm(Index: integer): integer;
     function GetLineBmColor(Index: integer): integer;
@@ -93,7 +93,7 @@ type
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
     procedure LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
     procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
-    procedure SetCaretsArray(const L: TPointArray);
+    procedure SetCaretsArray(const L: TATPointArray);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
     procedure SetLineBm(Index: integer; AValue: integer);
@@ -729,7 +729,7 @@ var
   AText: atString;
   AIndex: integer;
   AEnd: TATLineEnds;
-  ACarets: TPointArray;
+  ACarets: TATPointArray;
 begin
   Result:= true;
   if FReadOnly then Exit;
@@ -798,13 +798,13 @@ begin
   end;
 end;
 
-function TATStrings.GetCaretsArray: TPointArray;
+function TATStrings.GetCaretsArray: TATPointArray;
 begin
   if Assigned(FOnGetCaretsArray) then
     Result:= FOnGetCaretsArray();
 end;
 
-procedure TATStrings.SetCaretsArray(const L: TPointArray);
+procedure TATStrings.SetCaretsArray(const L: TATPointArray);
 begin
   if Assigned(FOnSetCaretsArray) then
     FOnSetCaretsArray(L);

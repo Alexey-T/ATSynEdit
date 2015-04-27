@@ -11,7 +11,11 @@ uses
 type
   atString = UnicodeString;
   atChar = WideChar;
-  TPointArray = array of TPoint;
+
+type
+  TATIntArray = array of Longint;
+  TATRealArray = array of real;
+  TATPointArray = array of TPoint;
 
 type
   TATLineEnds = (cEndNone, cEndWin, cEndUnix, cEndMac);
@@ -46,7 +50,7 @@ function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString): atString;
 
-procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
+procedure SCalcCharOffsets(const AStr: atString; var AList: TATRealArray;
   ATabSize: integer; ACharsSkipped: integer = 0);
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
@@ -120,7 +124,7 @@ begin
 end;
 
 
-procedure DoDebugOffsets(const List: array of real);
+procedure DoDebugOffsets(const List: TATRealArray);
 var
   i: integer;
   s: string;
@@ -135,7 +139,7 @@ function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
 var
   N, NMin, NAvg: integer;
-  List: array of real;
+  List: TATRealArray;
 begin
   if S='' then
     begin Result:= 0; Exit end;
@@ -284,7 +288,7 @@ const
   cScaleTest = 1.9; //debug, for test code, commented
 {$endif}
 
-procedure SCalcCharOffsets(const AStr: atString; var AList: array of real;
+procedure SCalcCharOffsets(const AStr: atString; var AList: TATRealArray;
   ATabSize: integer; ACharsSkipped: integer);
 var
   S: atString;
@@ -349,8 +353,8 @@ function SFindClickedPosition(const Str: atString;
   AAllowVirtualPos: boolean;
   out AEndOfLinePos: boolean): integer;
 var
-  ListReal: array of real;
-  ListEnds, ListMid: array of integer;
+  ListReal: TATRealArray;
+  ListEnds, ListMid: TATIntArray;
   i: integer;
 begin
   AEndOfLinePos:= false;
@@ -396,7 +400,7 @@ end;
 procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
   out ACharsSkipped: integer; out ASpacesSkipped: real);
 var
-  List: array of real;
+  List: TATRealArray;
 begin
   ACharsSkipped:= 0;
   ASpacesSkipped:= 0;

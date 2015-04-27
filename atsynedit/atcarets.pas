@@ -72,8 +72,8 @@ type
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
     property OneLine: boolean read FOneLine write FOneLine;
-    function SaveToArray: TPointArray;
-    procedure LoadFromArray(const L: TPointArray);
+    function SaveToArray: TATPointArray;
+    procedure LoadFromArray(const L: TATPointArray);
     procedure UpdateColumnCoord(ASaveColumn: boolean);
   end;
 
@@ -81,7 +81,7 @@ type
 implementation
 
 uses
-  Math;
+  Math{%H-};
 
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
 begin
@@ -498,7 +498,7 @@ begin
         ])+sLineBreak;
 end;
 
-function TATCarets.SaveToArray: TPointArray;
+function TATCarets.SaveToArray: TATPointArray;
 var
   Item: TATCaretItem;
   i: integer;
@@ -514,7 +514,7 @@ begin
   end;
 end;
 
-procedure TATCarets.LoadFromArray(const L: TPointArray);
+procedure TATCarets.LoadFromArray(const L: TATPointArray);
 var
   i: integer;
   Item: TATCaretItem;

@@ -597,8 +597,8 @@ type
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
     function DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
-    function GetCaretsArray: TPointArray;
-    procedure SetCaretsArray(const L: TPointArray);
+    function GetCaretsArray: TATPointArray;
+    procedure SetCaretsArray(const L: TATPointArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
 
   public
@@ -2481,8 +2481,6 @@ begin
 end;
 
 procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
-var
-  Index: integer;
 begin
   inherited;
 
@@ -3400,7 +3398,7 @@ procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
   AWrapItemIndex: integer;
   ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
 var
-  List: TATIntegerArray;
+  List: TATIntArray;
   State: TATFoldBarState;
   WrapItem: TATSynWrapItem;
   LineIndex: integer;

@@ -42,7 +42,7 @@ end;
 
 procedure TATSynEdit.DoFold_SetRangeFolding(ARange: TATSynRange; AFolded: boolean);
 var
-  List: TATIntegerArray;
+  List: TATIntArray;
   R: TATSynRange;
   i, j: integer;
 begin
@@ -83,7 +83,7 @@ end;
 
 procedure TATSynEdit.DoUnfoldLine(ALine: integer);
 var
-  List: TATIntegerArray;
+  List: TATIntArray;
   i: integer;
 begin
   List:= FFold.FindRangesContainingLine(ALine, nil, true);

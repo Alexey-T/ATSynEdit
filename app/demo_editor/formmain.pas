@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, ATStringProc,
+  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, ATStringProc, ATCanvasProc,
   formkey, formopt, formcombo;
 
 type
@@ -130,7 +130,7 @@ type
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
-      const AStr: atString; ACharSize: TPoint; const AExtent: array of integer);
+      const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
@@ -679,7 +679,7 @@ begin
 end;
 
 procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas;
-  AX, AY: integer; const AStr: atString; ACharSize: TPoint; const AExtent: array of integer);
+  AX, AY: integer; const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
 var
   X1, X2, Y, i: integer;
 begin

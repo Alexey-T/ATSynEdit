@@ -9,7 +9,7 @@ unit ATSynEdit_Ranges;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, ATStringProc;
 
 type
   { TATSynRange }
@@ -22,9 +22,6 @@ type
     constructor Create(AX, AY, AY2: integer); virtual;
     function IsSimple: boolean;
   end;
-
-type
-  TATIntegerArray = array of integer;
 
 type
   { TATSynRanges }
@@ -48,7 +45,7 @@ type
     function FindRangesContainingLine(ALine: integer;
       AInRange: TATSynRange;
       AOnlyFolded: boolean = false;
-      ATopLevelOnly: boolean = false): TATIntegerArray;
+      ATopLevelOnly: boolean = false): TATIntArray;
     function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
   end;
 
@@ -145,7 +142,7 @@ end;
 
 function TATSynRanges.FindRangesContainingLine(ALine: integer;
   AInRange: TATSynRange; AOnlyFolded: boolean; ATopLevelOnly: boolean
-  ): TATIntegerArray;
+  ): TATIntArray;
 var
   i, j: integer;
 begin

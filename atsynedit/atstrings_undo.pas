@@ -24,11 +24,11 @@ type
     ItemIndex: integer;
     ItemText: atString;
     ItemEnd: TATLineEnds;
-    ItemCarets: array of TPoint;
+    ItemCarets: TATPointArray;
     GroupMark: boolean;
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; AGroupMark: boolean;
-      const ACarets: TPointArray); virtual;
+      const ACarets: TATPointArray); virtual;
   end;
 
 type
@@ -56,7 +56,7 @@ type
     procedure Delete(N: integer);
     procedure DeleteLast;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
-      AEnd: TATLineEnds; const ACarets: TPointArray);
+      AEnd: TATLineEnds; const ACarets: TATPointArray);
     procedure DebugShow;
   end;
 
@@ -70,7 +70,7 @@ uses
 
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; AGroupMark: boolean;
-  const ACarets: TPointArray);
+  const ACarets: TATPointArray);
 var
   i: integer;
 begin
@@ -161,7 +161,7 @@ end;
 
 procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds;
-  const ACarets: TPointArray);
+  const ACarets: TATPointArray);
 var
   Item: TATUndoItem;
 begin

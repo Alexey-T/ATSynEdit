@@ -30,7 +30,7 @@ type
 type
   TATSynEditDrawLineEvent = procedure(Sender: TObject; C: TCanvas;
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
-    const AExtent: array of integer) of object;
+    const AExtent: TATIntArray) of object;
 
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
@@ -137,7 +137,7 @@ end;
 
 procedure DoPaintUnprintedChars(C: TCanvas;
   const AString: atString;
-  const AOffsets: array of integer;
+  const AOffsets: TATIntArray;
   APoint: TPoint;
   ACharSize: TPoint;
   AColorFont: TColor;
@@ -248,7 +248,7 @@ end;
 
 function CanvasTextSpaces(const S: atString; ATabSize: integer): real;
 var
-  List: array of real;
+  List: TATRealArray;
 begin
   Result:= 0;
   if S='' then Exit;
@@ -268,9 +268,9 @@ procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   AStrWidth: integer; ACharsSkipped: integer; AArrowSize: integer;
   AParts: PATLineParts; AEvent: TATSynEditDrawLineEvent);
 var
-  ListReal: array of real;
-  ListInt: array of Longint;
-  Dx: array of Longint;
+  ListReal: TATRealArray;
+  ListInt: TATIntArray;
+  Dx: TATIntArray;
   i, j: integer;
   PartStr: atString;
   PartOffset, PartLen,
