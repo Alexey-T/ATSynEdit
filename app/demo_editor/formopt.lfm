@@ -286,11 +286,11 @@ object fmOpt: TfmOpt
       end
       object GroupBox2: TGroupBox
         Left = 224
-        Height = 188
+        Height = 272
         Top = 4
         Width = 176
         Caption = 'columns'
-        ClientHeight = 168
+        ClientHeight = 252
         ClientWidth = 172
         TabOrder = 6
         object chkGutterBm: TCheckBox
@@ -369,13 +369,31 @@ object fmOpt: TfmOpt
           TabOrder = 6
           Value = 1
         end
-        object chkColOrder: TCheckBox
+        object ListCol: TListBox
           Left = 8
-          Height = 19
-          Top = 144
-          Width = 111
-          Caption = 'order: fold, states'
+          Height = 88
+          Top = 156
+          Width = 98
+          ItemHeight = 0
           TabOrder = 9
+        end
+        object bColUp: TButton
+          Left = 112
+          Height = 25
+          Top = 156
+          Width = 40
+          Caption = '^'
+          OnClick = bColUpClick
+          TabOrder = 10
+        end
+        object bColDown: TButton
+          Left = 112
+          Height = 25
+          Top = 184
+          Width = 40
+          Caption = 'v'
+          OnClick = bColDownClick
+          TabOrder = 11
         end
       end
       object edNumSkip: TEdit

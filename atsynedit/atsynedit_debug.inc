@@ -28,7 +28,7 @@ var
 begin
   FFold.Clear;
 
-  //sorted
+  //sorted by 2nd param
   FFold.Add(1, 4, 15);
   FFold.Add(1, 5, 9);
   FFold.Add(1, 7, 8);

@@ -12,8 +12,9 @@ type
   { TfmOpt }
 
   TfmOpt = class(TForm)
+    bColUp: TButton;
+    bColDown: TButton;
     ButtonPanel1: TButtonPanel;
-    chkColOrder: TCheckBox;
     chkPopupDown: TCheckBox;
     chkShowFoldLines: TCheckBox;
     chkShowFoldAlways: TCheckBox;
@@ -100,6 +101,7 @@ type
     Label8: TLabel;
     Label9: TLabel;
     LabelArr: TLabel;
+    ListCol: TListBox;
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
@@ -110,6 +112,8 @@ type
     TabSheet5: TTabSheet;
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
+    procedure bColDownClick(Sender: TObject);
+    procedure bColUpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     { private declarations }
@@ -128,10 +132,31 @@ implementation
 
 {$R *.lfm}
 
+const
+  nameBm = 'bookmk';
+  nameNums = 'nums';
+  nameState = 'states';
+  nameFold = 'fold';
+
 procedure DoConfigEditor(ed: TATSynEdit);
+var
+  i: integer;
 begin
   with fmOpt do
   begin
+    with ListCol do
+    begin
+      Items.Clear;
+      for i:= 0 to 3 do
+      begin
+        if i=ed.GutterBandBm then Items.Add(nameBm);
+        if i=ed.GutterBandNum then Items.Add(nameNums);
+        if i=ed.GutterBandState then Items.Add(nameState);
+        if i=ed.GutterBandFold then Items.Add(nameFold);
+      end;
+      ItemIndex:= 0;
+    end;
+
     //general
     chkCurLine.Checked:= ed.OptShowCurLine;
     chkCurLineMin.Checked:= ed.OptShowCurLineMinimal;
@@ -181,7 +206,6 @@ begin
     edSizeFold.Value:= ed.Gutter[ed.GutterBandFold].Size;
     edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
-    chkColOrder.Checked:= ed.GutterBandState>ed.GutterBandFold;
 
     //minimap
     edMapFont.Value:= ed.OptMinimapFontSize;
@@ -221,6 +245,11 @@ begin
 
     if ShowModal=mrOk then
     begin
+      ed.GutterBandBm:= ListCol.Items.IndexOf(nameBm);
+      ed.GutterBandNum:= ListCol.Items.IndexOf(nameNums);
+      ed.GutterBandState:= ListCol.Items.IndexOf(nameState);
+      ed.GutterBandFold:= ListCol.Items.IndexOf(nameFold);
+
       //general
       ed.OptShowCurLine:= chkCurLine.Checked;
       ed.OptShowCurLineMinimal:= chkCurLineMin.Checked;
@@ -260,17 +289,6 @@ begin
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;
       ed.OptRulerFontSize:= edRulerFSize.Value;
-
-      if chkColOrder.Checked then
-      begin
-        ed.GutterBandFold:= 2;
-        ed.GutterBandState:= 3;
-      end
-      else
-      begin
-        ed.GutterBandFold:= 3;
-        ed.GutterBandState:= 2;
-      end;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
@@ -332,6 +350,30 @@ procedure TfmOpt.FormCreate(Sender: TObject);
 begin
   InitShape(edCrShape);
   InitShape(edCrShape2);
+end;
+
+procedure SwapItems(L: TListbox; n1, n2: integer);
+var
+  s: string;
+begin
+  s:= L.Items[n1];
+  L.Items[n1]:= L.Items[n2];
+  L.Items[n2]:= s;
+  L.ItemIndex:= n2;
+end;
+
+procedure TfmOpt.bColUpClick(Sender: TObject);
+begin
+  with ListCol do
+    if ItemIndex>0 then
+      SwapItems(ListCol, ItemIndex, ItemIndex-1);
+end;
+
+procedure TfmOpt.bColDownClick(Sender: TObject);
+begin
+  with ListCol do
+    if ItemIndex<Count-1 then
+      SwapItems(ListCol, ItemIndex, ItemIndex+1);
 end;
 
 procedure TfmOpt.InitShape(ed: TCombobox);
