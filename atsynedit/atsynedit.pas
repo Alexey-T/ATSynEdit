@@ -1381,6 +1381,14 @@ begin
 
     C.Brush.Color:= FColors.GutterBG;
     C.FillRect(FRectGutter);
+
+    //paint empty column (later it's painted again for each visible ln)
+    if FGutter[FGutterBandEmpty].Visible then
+    begin
+      C.Brush.Color:= FColors.TextBG;
+      C.FillRect(NGutterEmptyX1, FRectGutter.Top, NGutterEmptyX2, FRectGutter.Bottom);
+      C.Brush.Color:= FColors.GutterBG;
+    end;
   end;
 
   NCoordTop:= ARect.Top;
