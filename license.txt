@@ -1,2 +1,3 @@
 This code is MPL 2.0 licensed.
+https://www.mozilla.org/MPL/2.0/
 Copyright (C) Alexey Torgashin

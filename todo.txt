@@ -1,6 +1,4 @@
 
 
-unfold range if goto into range (or Enter before range)
-fold-bar
-tokens hilite (styles, adapt SynEdit)
-marker triangles(drop/collect/goto)
+optimize atsynedit_ranges (slow Find..)
+tokens hilite (adapt EControl)
