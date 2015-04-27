@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkColOrder: TCheckBox;
     chkPopupDown: TCheckBox;
     chkShowFoldLines: TCheckBox;
     chkShowFoldAlways: TCheckBox;
@@ -180,6 +181,7 @@ begin
     edSizeFold.Value:= ed.Gutter[ed.GutterBandFold].Size;
     edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
+    chkColOrder.Checked:= ed.GutterBandState>ed.GutterBandFold;
 
     //minimap
     edMapFont.Value:= ed.OptMinimapFontSize;
@@ -258,6 +260,17 @@ begin
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;
       ed.OptRulerFontSize:= edRulerFSize.Value;
+
+      if chkColOrder.Checked then
+      begin
+        ed.GutterBandFold:= 2;
+        ed.GutterBandState:= 3;
+      end
+      else
+      begin
+        ed.GutterBandFold:= 3;
+        ed.GutterBandState:= 2;
+      end;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
