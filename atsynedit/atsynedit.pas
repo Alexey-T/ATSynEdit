@@ -63,6 +63,7 @@ type
     GutterPlusBorder,
     GutterPlusBG,
     GutterFoldLine,
+    GutterFoldBG,
     CurLineBG,
     MarginRight,
     MarginCaret,
@@ -1587,6 +1588,9 @@ begin
       //gutter band: fold
       if FGutter[FGutterBandFold].Visible then
       begin
+        C.Brush.Color:= FColors.GutterFoldBG;
+        C.FillRect(NGutterFoldX1, NCoordTop, NGutterFoldX2, NCoordTop+ACharSize.Y);
+
         DoPaintGutterFolding(C,
           NWrapIndex,
           NGutterFoldX1,
@@ -1851,8 +1855,8 @@ begin
 
   FGutterBandBm:= 0;
   FGutterBandNum:= 1;
-  FGutterBandFold:= 2;
-  FGutterBandState:= 3;
+  FGutterBandState:= 2;
+  FGutterBandFold:= 3;
   FGutterBandEmpty:= 4;
 
   for i:= 1 to cGutterBands do FGutter.Add(10);
@@ -3292,6 +3296,7 @@ begin
   FColors.GutterPlusBorder:= clGray;
   FColors.GutterPlusBG:= $f4f4f4;
   FColors.GutterFoldLine:= clGray;
+  FColors.GutterFoldBG:= FColors.GutterBG;
   FColors.CurLineBG:= $e0f0f0;
   FColors.RulerBG:= FColors.GutterBG;
   FColors.RulerFont:= clGray;
