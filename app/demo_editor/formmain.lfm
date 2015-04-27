@@ -413,4 +413,28 @@ object fmMain: TfmMain
       Enabled = False
     end
   end
+  object PopupMinimap: TPopupMenu
+    left = 477
+    top = 156
+    object MenuItem6: TMenuItem
+      Caption = 'minimap'
+      Enabled = False
+    end
+  end
+  object PopupMicromap: TPopupMenu
+    left = 513
+    top = 166
+    object MenuItem7: TMenuItem
+      Caption = 'micromap'
+      Enabled = False
+    end
+  end
+  object PopupRuler: TPopupMenu
+    left = 544
+    top = 180
+    object MenuItem8: TMenuItem
+      Caption = 'ruler'
+      Enabled = False
+    end
+  end
 end

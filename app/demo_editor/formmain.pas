@@ -48,6 +48,9 @@ type
     btnHlp: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
+    MenuItem6: TMenuItem;
+    MenuItem7: TMenuItem;
+    MenuItem8: TMenuItem;
     mnuBms: TMenuItem;
     mnuOneLine: TMenuItem;
     mnuPane: TMenuItem;
@@ -73,6 +76,9 @@ type
     PanelRt: TPanel;
     PopupBookmk: TPopupMenu;
     PopupFold: TPopupMenu;
+    PopupMinimap: TPopupMenu;
+    PopupMicromap: TPopupMenu;
+    PopupRuler: TPopupMenu;
     PopupNums: TPopupMenu;
     SaveDialog1: TSaveDialog;
     Status: TStatusBar;
@@ -173,6 +179,9 @@ begin
   ed.PopupGutterBm:= PopupBookmk;
   ed.PopupGutterNum:= PopupNums;
   ed.PopupGutterFold:= PopupFold;
+  ed.PopupMinimap:= PopupMinimap;
+  ed.PopupMicromap:= PopupMicromap;
+  ed.PopupRuler:= PopupRuler;
 
   ed.OnChanged:= @EditChanged;
   ed.OnCaretMoved:= @EditCaretMoved;

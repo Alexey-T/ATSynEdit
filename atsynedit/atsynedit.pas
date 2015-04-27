@@ -262,14 +262,18 @@ type
     FCaretStopUnfocused: boolean;
     FMenuStd,
     FMenuText,
-    FMenuBm,
-    FMenuNum,
-    FMenuFold: TPopupMenu;
+    FMenuGutterBm,
+    FMenuGutterNum,
+    FMenuGutterFold,
+    FMenuMinimap,
+    FMenuMicromap,
+    FMenuRuler: TPopupMenu;
     FOverwrite: boolean;
     FHintWnd: THintWindow;
     FMouseDownPnt: TPoint;
     FMouseDownNumber: integer;
     FMouseDownDouble: boolean;
+    FMouseDownRight: boolean;
     FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
     FMouseAutoScroll: TATDirection;
@@ -620,9 +624,12 @@ type
     function IsPosFolded(AX, AY: integer): boolean;
     //menu
     property PopupText: TPopupMenu read FMenuText write FMenuText;
-    property PopupGutterBm: TPopupMenu read FMenuBm write FMenuBm;
-    property PopupGutterNum: TPopupMenu read FMenuNum write FMenuNum;
-    property PopupGutterFold: TPopupMenu read FMenuFold write FMenuFold;
+    property PopupGutterBm: TPopupMenu read FMenuGutterBm write FMenuGutterBm;
+    property PopupGutterNum: TPopupMenu read FMenuGutterNum write FMenuGutterNum;
+    property PopupGutterFold: TPopupMenu read FMenuGutterFold write FMenuGutterFold;
+    property PopupMinimap: TPopupMenu read FMenuMinimap write FMenuMinimap;
+    property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
+    property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -1923,6 +1930,7 @@ begin
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
+  FMouseDownRight:= false;
   FMouseDragDropping:= false;
   FMouseNiceScrollPos:= Point(0, 0);
 
@@ -1940,9 +1948,12 @@ begin
 
   FMenuStd:= TPopupMenu.Create(Self);
   FMenuText:= nil;
-  FMenuBm:= nil;
-  FMenuNum:= nil;
-  FMenuFold:= nil;
+  FMenuGutterBm:= nil;
+  FMenuGutterNum:= nil;
+  FMenuGutterFold:= nil;
+  FMenuMinimap:= nil;
+  FMenuMicromap:= nil;
+  FMenuRuler:= nil;
 
   DoInitDefaultKeymapping(FKeyMapping);
   DoInitPopupMenu;
@@ -2348,6 +2359,7 @@ begin
   FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
   FMouseDragDropping:= false;
+  FMouseDownRight:= Shift=[ssRight];
 
   if MouseNiceScroll then
   begin
@@ -2419,28 +2431,11 @@ begin
           DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
           DoSelect_None;
         end;
-
-      //ok if show on mousedown, it's nice to use
-      if Assigned(FMenuText) then
-        FMenuText.PopUp
-      else
-        FMenuStd.PopUp;
     end;
   end;
 
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
   begin
-    if Shift=[ssRight] then
-    begin
-      Index:= FGutter.IndexAt(X);
-      if Index=FGutterBandBm then
-        if Assigned(FMenuBm) then FMenuBm.PopUp;
-      if Index=FGutterBandNum then
-        if Assigned(FMenuNum) then FMenuNum.PopUp;
-      if Index=FGutterBandFold then
-        if Assigned(FMenuFold) then FMenuFold.PopUp;
-    end;
-
     if Shift=[ssLeft] then
     begin
       Index:= FGutter.IndexAt(X);
@@ -2477,6 +2472,8 @@ begin
 end;
 
 procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  Index: integer;
 begin
   inherited;
 
@@ -2490,8 +2487,47 @@ begin
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDragDropping:= false;
-
   FTimerScroll.Enabled:= false;
+
+  //popup menu
+  if FMouseDownRight then
+  begin
+    FMouseDownRight:= false;
+
+    if PtInRect(FRectMain, Point(X, Y)) then
+    begin
+      if Assigned(FMenuText) then
+        FMenuText.PopUp
+      else
+        FMenuStd.PopUp;
+    end
+    else
+    if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
+    begin
+      Index:= FGutter.IndexAt(X);
+      if Index=FGutterBandBm then
+        if Assigned(FMenuGutterBm) then FMenuGutterBm.PopUp;
+      if Index=FGutterBandNum then
+        if Assigned(FMenuGutterNum) then FMenuGutterNum.PopUp;
+      if Index=FGutterBandFold then
+        if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp;
+    end
+    else
+    if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
+    begin
+      if Assigned(FMenuMinimap) then FMenuMinimap.PopUp;
+    end
+    else
+    if FMicromapVisible and PtInRect(FRectMicromap, Point(X, Y)) then
+    begin
+      if Assigned(FMenuMicromap) then FMenuMicromap.PopUp;
+    end
+    else
+    if FOptRulerVisible and PtInRect(FRectRuler, Point(X, Y)) then
+    begin
+      if Assigned(FMenuRuler) then FMenuRuler.PopUp;
+    end;
+  end;
 end;
 
 procedure TATSynEdit.UpdateCursor;
