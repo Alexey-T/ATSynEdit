@@ -334,6 +334,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptPopupOnMouseDown: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptShowScrollHint: boolean;
     FOptOffsetTop: integer;
@@ -395,6 +396,7 @@ type
     procedure DebugFindWrapIndex;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
+    procedure DoHandleRightClick(X, Y: integer);
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
@@ -720,6 +722,7 @@ type
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
+    property OptPopupOnMouseDown: boolean read FOptPopupOnMouseDown write FOptPopupOnMouseDown;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual;
     property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
@@ -1926,6 +1929,7 @@ begin
   FOptSavingTrimSpaces:= false;
   FOptShowScrollHint:= false;
   FOptCaretPreferLeftSide:= true;
+  FOptPopupOnMouseDown:= false;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -2430,9 +2434,14 @@ begin
         begin
           DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
           DoSelect_None;
+          Invalidate;
         end;
     end;
   end;
+
+  if Shift=[ssRight] then
+    if FOptPopupOnMouseDown then
+      DoHandleRightClick(X, Y);
 
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
   begin
@@ -2493,40 +2502,48 @@ begin
   if FMouseDownRight then
   begin
     FMouseDownRight:= false;
+    if not FOptPopupOnMouseDown then
+      DoHandleRightClick(X, Y);
+  end;
+end;
 
-    if PtInRect(FRectMain, Point(X, Y)) then
-    begin
-      if Assigned(FMenuText) then
-        FMenuText.PopUp
-      else
-        FMenuStd.PopUp;
-    end
+
+procedure TATSynEdit.DoHandleRightClick(X, Y: integer);
+var
+  Index: integer;
+begin
+  if PtInRect(FRectMain, Point(X, Y)) then
+  begin
+    if Assigned(FMenuText) then
+      FMenuText.PopUp
     else
-    if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
-    begin
-      Index:= FGutter.IndexAt(X);
-      if Index=FGutterBandBm then
-        if Assigned(FMenuGutterBm) then FMenuGutterBm.PopUp;
-      if Index=FGutterBandNum then
-        if Assigned(FMenuGutterNum) then FMenuGutterNum.PopUp;
-      if Index=FGutterBandFold then
-        if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp;
-    end
-    else
-    if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
-    begin
-      if Assigned(FMenuMinimap) then FMenuMinimap.PopUp;
-    end
-    else
-    if FMicromapVisible and PtInRect(FRectMicromap, Point(X, Y)) then
-    begin
-      if Assigned(FMenuMicromap) then FMenuMicromap.PopUp;
-    end
-    else
-    if FOptRulerVisible and PtInRect(FRectRuler, Point(X, Y)) then
-    begin
-      if Assigned(FMenuRuler) then FMenuRuler.PopUp;
-    end;
+      FMenuStd.PopUp;
+  end
+  else
+  if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
+  begin
+    Index:= FGutter.IndexAt(X);
+    if Index=FGutterBandBm then
+      if Assigned(FMenuGutterBm) then FMenuGutterBm.PopUp;
+    if Index=FGutterBandNum then
+      if Assigned(FMenuGutterNum) then FMenuGutterNum.PopUp;
+    if Index=FGutterBandFold then
+      if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp;
+  end
+  else
+  if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
+  begin
+    if Assigned(FMenuMinimap) then FMenuMinimap.PopUp;
+  end
+  else
+  if FMicromapVisible and PtInRect(FRectMicromap, Point(X, Y)) then
+  begin
+    if Assigned(FMenuMicromap) then FMenuMicromap.PopUp;
+  end
+  else
+  if FOptRulerVisible and PtInRect(FRectRuler, Point(X, Y)) then
+  begin
+    if Assigned(FMenuRuler) then FMenuRuler.PopUp;
   end;
 end;
 

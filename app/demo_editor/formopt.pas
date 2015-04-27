@@ -13,6 +13,7 @@ type
 
   TfmOpt = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkPopupDown: TCheckBox;
     chkShowFoldLines: TCheckBox;
     chkShowFoldAlways: TCheckBox;
     chkCrPreferLeft: TCheckBox;
@@ -136,6 +137,7 @@ begin
     chkCurCol.Checked:= ed.OptShowCurColumn;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
     chkColorSel.Checked:= ed.OptHiliteSelFull;
+    chkPopupDown.Checked:= ed.OptPopupOnMouseDown;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
@@ -226,6 +228,7 @@ begin
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
       ed.OptHiliteSelFull:= chkColorSel.Checked;
+      ed.OptPopupOnMouseDown := chkPopupDown.Checked;
       ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;

@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 311
     Top = 8
     Width = 624
-    ActivePage = TabSheet2
-    TabIndex = 1
+    ActivePage = TabSheet1
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -642,6 +642,14 @@ object fmOpt: TfmOpt
         Width = 262
         Caption = 'browser-scroll: middle click and mouse-move'
         TabOrder = 6
+      end
+      object chkPopupDown: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 148
+        Width = 207
+        Caption = 'right click: menu on down (else up)'
+        TabOrder = 7
       end
     end
     object TabSheet4: TTabSheet
