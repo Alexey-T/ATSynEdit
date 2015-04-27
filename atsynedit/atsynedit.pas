@@ -1335,10 +1335,9 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
 var
   NGutterBmX1, NGutterBmX2,
   NGutterNumsX1, NGutterNumsX2,
-  //NGutterFoldX1, NGutterFoldX2,
-  NGutterEmptyX1, NGutterEmptyX2,
   NGutterStateX1, NGutterStateX2,
   NGutterFoldX1, NGutterFoldX2,
+  NGutterEmptyX1, NGutterEmptyX2,
   NCoordTop, NCoordLeftNums: integer;
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
@@ -1359,7 +1358,7 @@ var
   end;
   //
 begin
-  //wrap turned off can cause bad scrollpos
+  //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
@@ -1376,13 +1375,6 @@ begin
 
     C.Brush.Color:= FColors.GutterBG;
     C.FillRect(FRectGutter);
-
-    if FGutter[FGutterBandEmpty].Visible then
-    begin
-      C.Brush.Color:= FColors.TextBG;
-      C.FillRect(NGutterEmptyX1, FRectGutter.Top, NGutterEmptyX2, FRectGutter.Bottom);
-      C.Brush.Color:= FColors.GutterBG;
-    end;
   end;
 
   NCoordTop:= ARect.Top;
@@ -3442,7 +3434,7 @@ begin
 
   C.Pen.Color:= IfThen(FOptGutterShowFoldLines,
     FColors.GutterFoldLine,
-    FColors.GutterBG);
+    FColors.GutterFoldBG);
 
   CoordXM:= (ACoordX1+ACoordX2) div 2;
   CoordYM:= (ACoordY1+ACoordY2) div 2;
