@@ -112,6 +112,7 @@
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
@@ -174,7 +175,6 @@
         <ComponentName Value="fmCombo"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <UnitName Value="formcombo"/>
       </Unit31>
       <Unit32>
         <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>

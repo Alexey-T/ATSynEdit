@@ -424,7 +424,6 @@ type
     function GetUndoLimit: integer;
     procedure DoInitColors;
     procedure DoInitPopupMenu;
-    procedure DoDebugInitFoldList;
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
@@ -674,6 +673,7 @@ type
     procedure DoCommandExec(ACmd: integer; const AText: atString = '');
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
+    procedure DoDebugInitFoldList;
 
   protected
     procedure Paint; override;
@@ -1382,7 +1382,15 @@ begin
     C.Brush.Color:= FColors.GutterBG;
     C.FillRect(FRectGutter);
 
-    //paint empty column (later it's painted again for each visible ln)
+    //paint fold bg
+    if FGutter[FGutterBandFold].Visible then
+    begin
+      C.Brush.Color:= FColors.GutterFoldBG;
+      C.FillRect(NGutterFoldX1, FRectGutter.Top, NGutterFoldX2, FRectGutter.Bottom);
+      C.Brush.Color:= FColors.GutterBG;
+    end;
+
+    //paint empty column (later it's painted again)
     if FGutter[FGutterBandEmpty].Visible then
     begin
       C.Brush.Color:= FColors.TextBG;
