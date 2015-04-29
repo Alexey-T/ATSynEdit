@@ -16,6 +16,7 @@ type
     bColDown: TButton;
     ButtonPanel1: TButtonPanel;
     chkPopupDown: TCheckBox;
+    chkUnprintAsciiRep: TCheckBox;
     chkShowFoldLines: TCheckBox;
     chkShowFoldAlways: TCheckBox;
     chkCrPreferLeft: TCheckBox;
@@ -30,7 +31,6 @@ type
     chkGutterNum: TCheckBox;
     chkGutterStat: TCheckBox;
     chkNice: TCheckBox;
-    chkRepSpec: TCheckBox;
     chkSaveEol: TCheckBox;
     chkSaveTrim: TCheckBox;
     chkShowNum1st: TCheckBox;
@@ -66,6 +66,10 @@ type
     chkCurLine: TCheckBox;
     chkLastOnTop: TCheckBox;
     chkOvrPaste: TCheckBox;
+    chkUnprintEnd: TCheckBox;
+    chkUnprintEndDet: TCheckBox;
+    chkUnprintSpace: TCheckBox;
+    chkUnprintEn: TCheckBox;
     edAutoInd: TComboBox;
     edCrShape: TComboBox;
     edCrShape2: TComboBox;
@@ -83,7 +87,7 @@ type
     edSizeEmpty: TSpinEdit;
     edSizeState: TSpinEdit;
     edSizeFold: TSpinEdit;
-    edTabArrow: TSpinEdit;
+    edTabArrowSize: TSpinEdit;
     edTabArrowPnt: TSpinEdit;
     GroupBox2: TGroupBox;
     LabChars: TLabel;
@@ -114,6 +118,7 @@ type
     TabSheet5: TTabSheet;
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
+    TabSheet8: TTabSheet;
     procedure bColDownClick(Sender: TObject);
     procedure bColUpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -169,14 +174,20 @@ begin
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
-    chkRepSpec.Checked:= ed.OptUnprintedReplaceSpec;
     chkDotLn.Checked:= ed.OptShowIndentLines;
     edChars.Text:= ed.OptWordChars;
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
-    edTabArrow.Value:= ed.OptUnprintedArrowSize;
-    edTabArrowPnt.Value:= ed.OptUnprintedArrowPointer;
     chkHint.Checked:= ed.OptShowScrollHint;
+
+    //unprint
+    chkUnprintEn.Checked:= ed.OptUnprintedVisible;
+    chkUnprintSpace.Checked:= ed.OptUnprintedSpaces;
+    chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
+    chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
+    chkUnprintAsciiRep.Checked:= ed.OptUnprintedReplaceSpec;
+    edTabArrowSize.Value:= ed.OptUnprintedArrowSize;
+    edTabArrowPnt.Value:= ed.OptUnprintedArrowPointer;
 
     //caret
     chkCrVirt.Checked:= ed.OptCaretVirtual;
@@ -263,14 +274,20 @@ begin
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
       ed.OptHiliteSelFull:= chkColorSel.Checked;
       ed.OptPopupOnMouseDown := chkPopupDown.Checked;
-      ed.OptUnprintedReplaceSpec:= chkRepSpec.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
       ed.OptSavingTrimSpaces:= chkSaveTrim.Checked;
-      ed.OptUnprintedArrowSize:= edTabArrow.Value;
-      ed.OptUnprintedArrowPointer := edTabArrowPnt.Value;
       ed.OptShowScrollHint:= chkHint.Checked;
+
+      //unprint
+      ed.OptUnprintedVisible     := chkUnprintEn.Checked;
+      ed.OptUnprintedSpaces      := chkUnprintSpace.Checked;
+      ed.OptUnprintedEnds        := chkUnprintEnd.Checked;
+      ed.OptUnprintedEndsDetails := chkUnprintEndDet.Checked;
+      ed.OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
+      ed.OptUnprintedArrowSize:= edTabArrowSize.Value;
+      ed.OptUnprintedArrowPointer := edTabArrowPnt.Value;
 
       //caret
       ed.OptCaretVirtual:= chkCrVirt.Checked;
