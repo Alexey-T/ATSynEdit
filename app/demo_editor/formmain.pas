@@ -519,6 +519,14 @@ end;
 procedure TfmMain.bOptClick(Sender: TObject);
 begin
   DoConfigEditor(ed);
+
+  wait:= true;
+  chkUnprintVis.Checked:= ed.OptUnprintedVisible;
+  chkUnprintSp.Checked:= ed.OptUnprintedSpaces;
+  chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
+  chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
+  wait:= false;
+
   ed.SetFocus;
 end;
 
