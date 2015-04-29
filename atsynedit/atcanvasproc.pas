@@ -44,6 +44,7 @@ procedure CanvasTextOut(C: TCanvas;
   out AStrWidth: integer;
   ACharsSkipped: integer;
   AArrowSize: integer;
+  AArrowPointerScale: integer;
   AParts: PATLineParts;
   AEvent: TATSynEditDrawLineEvent);
 
@@ -102,10 +103,9 @@ begin
   C.FillRect(R);
 end;
 
-procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor; ACharSizeX, AArrowSize: integer);
+procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor; ACharSizeX, AArrowSize, AArrowPointerScale: integer);
 const
   cIndent = 1; //offset left/rt
-  cScale = 4; //part 1/N of height
 var
   XLeft, XRight, X1, X2, Y, Dx: integer;
 begin
@@ -124,7 +124,7 @@ begin
   end;
 
   Y:= (ARect.Top+ARect.Bottom) div 2;
-  Dx:= (ARect.Bottom-ARect.Top) div cScale;
+  Dx:= (ARect.Bottom-ARect.Top) * AArrowPointerScale div 100;
   C.Pen.Color:= AColorFont;
 
   C.MoveTo(X2, Y);
@@ -141,7 +141,8 @@ procedure DoPaintUnprintedChars(C: TCanvas;
   APoint: TPoint;
   ACharSize: TPoint;
   AColorFont: TColor;
-  AArrowSize: integer);
+  AArrowSize: integer;
+  AArrowPointerScale: integer);
 var
   R: TRect;
   i: integer;
@@ -163,7 +164,7 @@ begin
       if AString[i]=' ' then
         DoPaintUnprintedSpace(C, R, cUnprintedDotScale, AColorFont)
       else
-        DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X, AArrowSize);
+        DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X, AArrowSize, AArrowPointerScale);
     end;
 end;
 
@@ -266,7 +267,8 @@ procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   ATabSize: integer; ACharSize: TPoint; AReplaceSpecs: boolean;
   AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
   AStrWidth: integer; ACharsSkipped: integer; AArrowSize: integer;
-  AParts: PATLineParts; AEvent: TATSynEditDrawLineEvent);
+  AArrowPointerScale: integer; AParts: PATLineParts;
+  AEvent: TATSynEditDrawLineEvent);
 var
   ListReal: TATRealArray;
   ListInt: TATIntArray;
@@ -368,7 +370,7 @@ begin
     end;
 
   if AShowUnprintable then
-    DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable, AArrowSize);
+    DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable, AArrowSize, AArrowPointerScale);
 
   AStrWidth:= ListInt[High(ListInt)];
 

@@ -84,6 +84,7 @@ type
     edSizeState: TSpinEdit;
     edSizeFold: TSpinEdit;
     edTabArrow: TSpinEdit;
+    edTabArrowPnt: TSpinEdit;
     GroupBox2: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
@@ -101,6 +102,7 @@ type
     Label8: TLabel;
     Label9: TLabel;
     LabelArr: TLabel;
+    LabelArr1: TLabel;
     ListCol: TListBox;
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
@@ -172,7 +174,8 @@ begin
     edChars.Text:= ed.OptWordChars;
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
-    edTabArrow.Value:= ed.OptTabArrowSize;
+    edTabArrow.Value:= ed.OptUnprintedArrowSize;
+    edTabArrowPnt.Value:= ed.OptUnprintedArrowPointer;
     chkHint.Checked:= ed.OptShowScrollHint;
 
     //caret
@@ -265,7 +268,8 @@ begin
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
       ed.OptSavingTrimSpaces:= chkSaveTrim.Checked;
-      ed.OptTabArrowSize:= edTabArrow.Value;
+      ed.OptUnprintedArrowSize:= edTabArrow.Value;
+      ed.OptUnprintedArrowPointer := edTabArrowPnt.Value;
       ed.OptShowScrollHint:= chkHint.Checked;
 
       //caret
