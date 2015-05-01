@@ -70,16 +70,16 @@ type
     GutterPlusBG,
     GutterFoldLine,
     GutterFoldBG,
-    CurLineBG,
+    CurrentLineBG,
     MarginRight,
     MarginCaret,
     MarginUser,
-    IndentLines,
+    IndentVertLines,
     RulerFont,
     RulerBG,
     CollapseLine,
-    CollapseFont,
-    CollapseBG,
+    CollapseMarkFont,
+    CollapseMarkBG,
     UnprintedFont,
     UnprintedBG,
     UnprintedHexFont,
@@ -1448,12 +1448,12 @@ begin
       if FOptShowCurLineMinimal then
       begin
         if LineWithCaret and IsLinePartWithCaret(NLinesIndex, NCoordTop) then
-          BmColor:= FColors.CurLineBG;
+          BmColor:= FColors.CurrentLineBG;
       end
       else
       begin
         if LineWithCaret then
-          BmColor:= FColors.CurLineBG;
+          BmColor:= FColors.CurrentLineBG;
       end;
     end;
 
@@ -1733,8 +1733,8 @@ begin
   Inc(ACoord.X, cCollapseMarkIndent);
 
   //paint bg
-  C.Font.Color:= FColors.CollapseFont;
-  C.Brush.Color:= FColors.CollapseBG;
+  C.Font.Color:= FColors.CollapseMarkFont;
+  C.Brush.Color:= FColors.CollapseMarkBG;
 
   //paint text
   C.TextOut(
@@ -1744,7 +1744,7 @@ begin
   NWidth:= C.TextWidth(AMarkText) + 2*cCollapseMarkIndent;
 
   //paint frame
-  C.Pen.Color:= FColors.CollapseFont;
+  C.Pen.Color:= FColors.CollapseMarkFont;
   C.Brush.Style:= bsClear;
   C.Rectangle(ACoord.X, ACoord.Y, ACoord.X+NWidth, ACoord.Y+FCharSize.Y);
   C.Brush.Style:= bsSolid;
@@ -3001,7 +3001,7 @@ begin
   if AIndentLines then
     for i:= 0 to AIndentSize-1 do
       if i mod FTabSize = 0 then
-        CanvasDottedVertLine(C, ARect.Left + (i-AScrollPos)*ACharSize.X, ACoordY, ACoordY+ACharSize.Y, FColors.IndentLines);
+        CanvasDottedVertLine(C, ARect.Left + (i-AScrollPos)*ACharSize.X, ACoordY, ACoordY+ACharSize.Y, FColors.IndentVertLines);
 end;
 
 procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
@@ -3304,8 +3304,8 @@ end;
 
 procedure TATSynEdit.DoInitColors;
 begin
-  FColors.TextBG:= clWhite;
   FColors.TextFont:= clBlack;
+  FColors.TextBG:= clWhite;
   FColors.TextSelFont:= clHighlightText;
   FColors.TextSelBG:= clHighlight;
   FColors.Caret:= clBlack;
@@ -3316,16 +3316,16 @@ begin
   FColors.GutterPlusBG:= $f4f4f4;
   FColors.GutterFoldLine:= clGray;
   FColors.GutterFoldBG:= FColors.GutterBG;
-  FColors.CurLineBG:= $e0f0f0;
+  FColors.CurrentLineBG:= $e0f0f0;
   FColors.RulerBG:= FColors.GutterBG;
   FColors.RulerFont:= clGray;
   FColors.CollapseLine:= $a06060;
-  FColors.CollapseFont:= $e08080;
-  FColors.CollapseBG:= clWhite;
+  FColors.CollapseMarkFont:= $e08080;
+  FColors.CollapseMarkBG:= clWhite;
   FColors.MarginRight:= clLtGray;
   FColors.MarginCaret:= clLime;
   FColors.MarginUser:= clYellow;
-  FColors.IndentLines:= clMedGray;
+  FColors.IndentVertLines:= clMedGray;
   FColors.UnprintedFont:= $5050f0;
   FColors.UnprintedBG:= $e0e0e0;
   FColors.UnprintedHexFont:= clMedGray;
