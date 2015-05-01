@@ -410,6 +410,8 @@ type
     procedure DoMinimapClick(APosY: integer);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
+    procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
+      ABottom: integer);
     procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
@@ -1335,17 +1337,25 @@ begin
   Result.Y:= Max(1, Size.cy + ACharSpacing.Y);
 end;
 
+procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop, ABottom: integer);
+var
+  X1, X2: integer;
+begin
+  with FGutter[ABand] do
+    begin X1:= Left; X2:= Right; end;
+  C.Brush.Color:= AColor;
+  if ATop>=0 then
+    C.FillRect(X1, ATop, X2, ABottom)
+  else
+    C.FillRect(X1, FRectGutter.Top, X2, FRectGutter.Bottom)
+end;
+
 procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   const ARect: TRect;
   const ACharSize: TPoint;
   AWithGutter, AMainText: boolean;
   var AScrollHorz, AScrollVert: TATSynScrollInfo);
 var
-  NGutterBmX1, NGutterBmX2,
-  NGutterNumsX1, NGutterNumsX2,
-  NGutterStateX1, NGutterStateX2,
-  NGutterFoldX1, NGutterFoldX2,
-  NGutterEmptyX1, NGutterEmptyX2,
   NCoordTop, NCoordLeftNums: integer;
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
@@ -1359,10 +1369,9 @@ var
   Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
   //
-  procedure DoPaintState(ATop: integer; AColor: TColor);
+  procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
   begin
-    C.Brush.Color:= AColor;
-    C.FillRect(NGutterStateX1, ATop, NGutterStateX2, ATop+ACharSize.Y);
+    DoPaintGutterBandBG(C, FGutterBandState, AColor, ATop, ATop+ACharSize.Y);
   end;
   //
 begin
@@ -1375,30 +1384,14 @@ begin
 
   if AWithGutter then
   begin
-    with FGutter[FGutterBandBm] do begin NGutterBmX1:= Left; NGutterBmX2:= Right; end;
-    with FGutter[FGutterBandNum] do begin NGutterNumsX1:= Left; NGutterNumsX2:= Right; end;
-    with FGutter[FGutterBandState] do begin NGutterStateX1:= Left; NGutterStateX2:= Right; end;
-    with FGutter[FGutterBandFold] do begin NGutterFoldX1:= Left; NGutterFoldX2:= Right; end;
-    with FGutter[FGutterBandEmpty] do begin NGutterEmptyX1:= Left; NGutterEmptyX2:= Right; end;
-
     C.Brush.Color:= FColors.GutterBG;
     C.FillRect(FRectGutter);
 
-    //paint fold bg
+    //paint some bands, for full height coloring
     if FGutter[FGutterBandFold].Visible then
-    begin
-      C.Brush.Color:= FColors.GutterFoldBG;
-      C.FillRect(NGutterFoldX1, FRectGutter.Top, NGutterFoldX2, FRectGutter.Bottom);
-      C.Brush.Color:= FColors.GutterBG;
-    end;
-
-    //paint empty column (later it's painted again)
+      DoPaintGutterBandBG(C, FGutterBandFold, FColors.GutterFoldBG, -1, -1);
     if FGutter[FGutterBandEmpty].Visible then
-    begin
-      C.Brush.Color:= FColors.TextBG;
-      C.FillRect(NGutterEmptyX1, FRectGutter.Top, NGutterEmptyX2, FRectGutter.Bottom);
-      C.Brush.Color:= FColors.GutterBG;
-    end;
+      DoPaintGutterBandBG(C, FGutterBandEmpty, FColors.TextBG, -1, -1);
   end;
 
   NCoordTop:= ARect.Top;
@@ -1568,6 +1561,7 @@ begin
     //draw gutter
     if AWithGutter then
     begin
+      //paint area over scrolled text
       C.Brush.Color:= FColors.GutterBG;
       C.FillRect(FRectGutter.Left, NCoordTop, FRectGutter.Right, NCoordTop+ACharSize.Y);
 
@@ -1575,20 +1569,17 @@ begin
       if FGutter[FGutterBandNum].Visible then
       begin
         if LineWithCaret and FOptShowGutterCaretBG then
-        begin
-          C.Brush.Color:= FColors.GutterCaretBG;
-          C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
-        end;
+          DoPaintGutterBandBG(C, FGutterBandNum, FColors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y);
 
         if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
           C.Font.Color:= FColors.GutterFont;
-          C.FillRect(NGutterNumsX1, NCoordTop, NGutterNumsX2, NCoordTop+ACharSize.Y);
-
           if FOptNumbersFontSize<>0 then
             C.Font.Size:= FOptNumbersFontSize;
+
           Str:= DoFormatLineNumber(NLinesIndex+1);
-          NCoordLeftNums:= NGutterNumsX2 - C.TextWidth(Str) - cSizeGutterNumOffsetRight;
+          NCoordLeftNums:= FGutter[FGutterBandNum].Right - C.TextWidth(Str) - cSizeGutterNumOffsetRight;
+
           C.TextOut(NCoordLeftNums, NCoordTop, Str);
           C.Font.Size:= Font.Size;
         end;
@@ -1599,19 +1590,23 @@ begin
         if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
           if Strings.LinesBm[NLinesIndex]<>0 then
-            DoEventDrawBookmarkIcon(C, NLinesIndex, Rect(NGutterBmX1, NCoordTop, NGutterBmX2, NCoordTop+ACharSize.Y));
+            DoEventDrawBookmarkIcon(C, NLinesIndex,
+              Rect(
+                FGutter[FGutterBandBm].Left,
+                NCoordTop,
+                FGutter[FGutterBandBm].Right,
+                NCoordTop+ACharSize.Y
+                ));
         end;
 
       //gutter band: fold
       if FGutter[FGutterBandFold].Visible then
       begin
-        C.Brush.Color:= FColors.GutterFoldBG;
-        C.FillRect(NGutterFoldX1, NCoordTop, NGutterFoldX2, NCoordTop+ACharSize.Y);
-
+        DoPaintGutterBandBG(C, FGutterBandFold, FColors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y);
         DoPaintGutterFolding(C,
           NWrapIndex,
-          NGutterFoldX1,
-          NGutterFoldX2,
+          FGutter[FGutterBandFold].Left,
+          FGutter[FGutterBandFold].Right,
           NCoordTop,
           NCoordTop+ACharSize.Y
           );
@@ -1621,18 +1616,15 @@ begin
       if FGutter[FGutterBandState].Visible then
       begin
         case Strings.LinesState[NLinesIndex] of
-          cLineStateChanged: DoPaintState(NCoordTop, FColors.StateChanged);
-          cLineStateAdded: DoPaintState(NCoordTop, FColors.StateAdded);
-          cLineStateSaved: DoPaintState(NCoordTop, FColors.StateSaved);
+          cLineStateChanged: DoPaintGutterBandState(NCoordTop, FColors.StateChanged);
+          cLineStateAdded: DoPaintGutterBandState(NCoordTop, FColors.StateAdded);
+          cLineStateSaved: DoPaintGutterBandState(NCoordTop, FColors.StateSaved);
         end;
       end;
 
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
-      begin
-        C.Brush.Color:= FColors.TextBG;
-        C.FillRect(NGutterEmptyX1, NCoordTop, NGutterEmptyX2, NCoordTop+ACharSize.Y);
-      end;
+        DoPaintGutterBandBG(C, FGutterBandEmpty, FColors.TextBG, NCoordTop, NCoordTop+ACharSize.Y);
     end;
 
     //end of painting line
@@ -3315,7 +3307,7 @@ begin
   FColors.GutterPlusBorder:= clGray;
   FColors.GutterPlusBG:= $f4f4f4;
   FColors.GutterFoldLine:= clGray;
-  FColors.GutterFoldBG:= FColors.GutterBG;
+  FColors.GutterFoldBG:= $c8c8c8;
   FColors.CurrentLineBG:= $e0f0f0;
   FColors.RulerBG:= FColors.GutterBG;
   FColors.RulerFont:= clGray;
