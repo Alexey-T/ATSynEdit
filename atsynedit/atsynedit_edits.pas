@@ -5,7 +5,7 @@ unit ATSynEdit_Edits;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Controls, ATSynEdit, ATCanvasProc, Menus;
+  Classes, SysUtils, Graphics, Controls, ATSynEdit, ATCanvasProc, Menus, ATStringProc;
 
 type
   { TATEdit }
@@ -30,6 +30,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Items: TStringList read FItems;
+    procedure DoCommandExec(ACmd: integer; const AText: atString = ''); override;
   end;
 
 
@@ -115,6 +116,15 @@ begin
   end;
 end;
 
+procedure TATComboEdit.DoCommandExec(ACmd: integer; const AText: atString);
+begin
+  inherited;
+  if ACmd=cCommand_RecentsPopup then
+  begin
+    DoMenu;
+  end;
+end;
+
 constructor TATComboEdit.Create(AOwner: TComponent);
 begin
   inherited;
@@ -126,6 +136,13 @@ begin
   OptMicromapWidth:= 16;
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
+
+  with KeyMapping do
+  begin
+    Items[IndexOf(cCommand_MoveSelectionDown)].Keys1[0]:= 0;
+    Items[IndexOf(cCommand_MoveSelectionUp)].Keys1[0]:= 0;
+    Add(cCommand_RecentsPopup, 'recents popup menu', ['Alt+Down'], []);
+  end;
 end;
 
 destructor TATComboEdit.Destroy;

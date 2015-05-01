@@ -24,3 +24,4 @@ begin
   Result:= [cResultState];
 end;
 
+

@@ -45,6 +45,7 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -117,10 +118,12 @@
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Commands"/>
       </Unit18>
       <Unit19>
         <Filename Value="..\..\atsynedit\atsynedit_keymapping.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Keymapping"/>
       </Unit19>
       <Unit20>
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
@@ -168,6 +171,7 @@
       <Unit30>
         <Filename Value="..\..\atsynedit\atsynedit_edits.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Edits"/>
       </Unit30>
       <Unit31>
         <Filename Value="formcombo.pas"/>

@@ -30,6 +30,7 @@ type
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATKeyMappingItem read GetItem; default;
     procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string);
+    function IndexOf(ACmd: integer): integer;
     function GetShortcutFromCommand(ACode: integer): TShortcut;
   end;
 
@@ -111,6 +112,16 @@ begin
   for i:= 0 to High(AKeys2) do Item.Keys2[i]:= _TextToShortcut(AKeys2[i]);
 
   FList.Add(Item);
+end;
+
+function TATKeyMapping.IndexOf(ACmd: integer): integer;
+var
+  i: integer;
+begin
+  Result:= -1;
+  for i:= 0 to Count-1 do
+    if Items[i].Command=ACmd then
+      begin Result:= i; Exit end;
 end;
 
 function TATKeyMapping.GetShortcutFromCommand(ACode: integer): TShortcut;

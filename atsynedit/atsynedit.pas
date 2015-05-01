@@ -619,8 +619,8 @@ type
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
-    property Modified: boolean read GetModified;
     property KeyMapping: TATKeyMapping read FKeyMapping;
+    property Modified: boolean read GetModified;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
     property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
     property ModeOverwrite: boolean read FOverwrite write FOverwrite;
@@ -665,6 +665,7 @@ type
     procedure DoFold_SetRangeFolding(ARange: TATSynRange; AFolded: boolean);
     procedure DoFold_ClickFoldingBar(ALine: integer);
     //misc
+    procedure DoCommandExec(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
     procedure DoSelect_All;
@@ -673,7 +674,6 @@ type
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
-    procedure DoCommandExec(ACmd: integer; const AText: atString = '');
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
     procedure DoDebugInitFoldList;
