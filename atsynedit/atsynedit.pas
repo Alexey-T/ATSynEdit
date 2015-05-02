@@ -229,6 +229,7 @@ const
   crNiceScrollRight = TCursor(-34);
 
 type
+  TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
@@ -288,6 +289,8 @@ type
     FLastTextCmdText: atString;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
+    FOnClickDbl,
+    FOnClickTriple: TATSynEditClickEvent;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
@@ -696,6 +699,8 @@ type
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
   published
     //events
+    property OnClickDbl: TATSynEditClickEvent read FOnClickDbl write FOnClickDbl;
+    property OnClickTriple: TATSynEditClickEvent read FOnClickTriple write FOnClickTriple;
     property OnCaretMoved: TNotifyEvent read FOnCaretMoved write FOnCaretMoved;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnScrolled: TNotifyEvent read FOnScrolled write FOnScrolled;
@@ -2728,8 +2733,17 @@ end;
 
 
 procedure TATSynEdit.DblClick;
+var
+  Handled: boolean;
 begin
   inherited;
+
+  if Assigned(FOnClickDbl) then
+  begin
+    Handled:= false;
+    FOnClickDbl(Self, Handled);
+    if Handled then Exit;
+  end;
 
   if FOptMouse2ClickSelectsLine then
     DoSelect_Line_ByClick
@@ -2741,8 +2755,17 @@ begin
 end;
 
 procedure TATSynEdit.TripleClick;
+var
+  Handled: boolean;
 begin
   inherited;
+
+  if Assigned(FOnClickTriple) then
+  begin
+    Handled:= false;
+    FOnClickTriple(Self, Handled);
+    if Handled then Exit;
+  end;
 
   if FOptMouse3ClickSelectsLine then
     DoSelect_Line_ByClick;

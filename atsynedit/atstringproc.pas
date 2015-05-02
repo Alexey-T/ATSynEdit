@@ -39,6 +39,7 @@ function IsCharAsciiControl(ch: atChar): boolean;
 function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
 
+function SBegin(const S, SubStr: atString): boolean;
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
@@ -555,6 +556,10 @@ begin
   Result:= Copy(S, 1, N);
 end;
 
+function SBegin(const S, SubStr: atString): boolean;
+begin
+  Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
+end;
 
 initialization
   _InitCharsHex;
