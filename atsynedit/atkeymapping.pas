@@ -25,7 +25,6 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
-    procedure Delete(N: integer);
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATKeyMappingItem read GetItem; default;
@@ -67,16 +66,8 @@ var
   i: integer;
 begin
   for i:= FList.Count-1 downto 0 do
-    Delete(i);
-end;
-
-procedure TATKeyMapping.Delete(N: integer);
-begin
-  if IsIndexValid(N) then
-  begin
-    TObject(FList[N]).Free;
-    FList.Delete(N);
-  end;
+    TObject(FList[i]).Free;
+  FList.Clear;
 end;
 
 function TATKeyMapping.Count: integer;

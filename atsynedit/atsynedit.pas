@@ -2063,6 +2063,7 @@ begin
 
   Strings.SaveToFile(AFilename);
   DoEventState; //modified
+  Update;
 end;
 
 
