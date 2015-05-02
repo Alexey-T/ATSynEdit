@@ -18,7 +18,7 @@ begin
     (Info1.NPage=Info2.NPage);
 end;
 
-function IsKeyMappingMatchedItem(const AKey: TShortcut; const AItem: TATKeyMappingItem): boolean;
+function IsKeyMappingMatchedItem(const AKey: TShortcut; const AItem: TATKeymapItem): boolean;
 begin
   Result:=
     (AKey=AItem.Keys1[0]) or

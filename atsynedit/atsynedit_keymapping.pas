@@ -6,8 +6,12 @@ uses
   ATKeyMapping,
   ATSynEdit_Commands;
 
-procedure InitKeymappingFull(var M: TATKeyMapping);
-procedure InitKeymappingCombo(var M: TATKeyMapping);
+procedure InitKeymapFull(var M: TATKeymap);
+procedure InitKeymapCombo(var M: TATKeymap);
+
+var
+  KeymapFull: TATKeymap = nil;
+  KeymapCombo: TATKeymap = nil;
 
 implementation
 
@@ -21,7 +25,7 @@ const
   cXControl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
 
 
-procedure InitKeymappingFull(var M: TATKeyMapping);
+procedure InitKeymapFull(var M: TATKeymap);
 begin
   M.Clear;
 
@@ -123,7 +127,7 @@ begin
   M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
 end;
 
-procedure InitKeymappingCombo(var M: TATKeyMapping);
+procedure InitKeymapCombo(var M: TATKeymap);
 begin
   M.Clear;
 
@@ -162,8 +166,19 @@ begin
   M.Add(cCommand_ClipboardCut, 'clipboard: cut', [cXControl+'+X'], ['Shift+Del']);
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXControl+'+V'], ['Shift+Ins']);
 
-  M.Add(cCommand_RecentsPopup, 'recents popup menu', ['Alt+Down'], []);
+  M.Add(cCommand_RecentsPopup, 'recents popup menu', ['Alt+Down'], [cXControl+'+Down']);
 end;
+
+
+initialization
+  KeymapFull:= TATKeymap.Create;
+  KeymapCombo:= TATKeymap.Create;
+  InitKeymapFull(KeymapFull);
+  InitKeymapCombo(KeymapCombo);
+
+finalization
+  FreeAndNil(KeymapFull);
+  FreeAndNil(KeymapCombo);
 
 end.
 

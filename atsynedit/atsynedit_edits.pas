@@ -34,14 +34,10 @@ type
   end;
 
 
-
 implementation
 
 uses
-  Types, ATSynEdit_Commands, ATKeyMapping, ATSynEdit_Keymapping;
-
-var
-  KeymapSimple: TATKeyMapping = nil;
+  Types, ATSynEdit_Commands, ATSynEdit_Keymapping;
 
 
 { TATEdit }
@@ -53,7 +49,7 @@ begin
   ModeOneLine:= true;
   BorderStyle:= bsSingle;
 
-  KeyMapping:= KeymapSimple;
+  Keymap:= KeymapCombo;
 
   OptOffsetTop:= 2;
   Height:= 26;
@@ -151,12 +147,6 @@ begin
   inherited;
 end;
 
-initialization
-  KeymapSimple:= TATKeyMapping.Create;
-  InitKeymappingCombo(KeymapSimple);
-
-finalization
-  FreeAndNil(KeymapSimple);
 
 end.
 

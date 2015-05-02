@@ -7,7 +7,6 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, ATStringProc, ATCanvasProc,
-  ATKeyMapping, ATSynEdit_Keymapping,
   formkey, formopt, formcombo;
 
 type
@@ -128,7 +127,6 @@ type
     ed: TATSynEdit;
     wait: boolean;
     FDir: string;
-    FKeyMap: TATKeyMapping;
     procedure DoOpen(const fn: string);
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
@@ -178,10 +176,6 @@ begin
   {$else}
   ed.Font.Name:= 'Courier New';
   {$endif}
-
-  FKeyMap:= TATKeyMapping.Create;
-  InitKeymappingFull(FKeyMap);
-  ed.KeyMapping:= FKeyMap;
 
   ed.PopupGutterBm:= PopupBookmk;
   ed.PopupGutterNum:= PopupNums;
@@ -573,7 +567,7 @@ end;
 
 procedure TfmMain.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(FKeyMap);
+  //
 end;
 
 procedure TfmMain.mnuBmsClick(Sender: TObject);

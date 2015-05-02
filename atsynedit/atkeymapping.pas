@@ -8,26 +8,26 @@ uses
   Classes, SysUtils;
 
 type
-  TATKeyMappingItem = class
+  TATKeymapItem = class
     Command: integer;
     Name: string;
     Keys1, Keys2: array[0..0] of TShortcut;
   end;
 
 type
-  { TATKeyMapping }
+  { TATKeymap }
 
-  TATKeyMapping = class
+  TATKeymap = class
   private
     FList: TList;
-    function GetItem(N: integer): TATKeyMappingItem;
+    function GetItem(N: integer): TATKeymapItem;
   public
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
-    property Items[N: integer]: TATKeyMappingItem read GetItem; default;
+    property Items[N: integer]: TATKeymapItem read GetItem; default;
     procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string);
     function IndexOf(ACmd: integer): integer;
     function GetShortcutFromCommand(ACode: integer): TShortcut;
@@ -39,29 +39,29 @@ uses
   LCLProc,
   Dialogs;
 
-{ TATKeyMapping }
+{ TATKeymap }
 
-constructor TATKeyMapping.Create;
+constructor TATKeymap.Create;
 begin
   FList:= TList.Create;
 end;
 
-destructor TATKeyMapping.Destroy;
+destructor TATKeymap.Destroy;
 begin
   Clear;
   FreeAndNil(FList);
   inherited;
 end;
 
-function TATKeyMapping.GetItem(N: integer): TATKeyMappingItem;
+function TATKeymap.GetItem(N: integer): TATKeymapItem;
 begin
   if IsIndexValid(N) then
-    Result:= TATKeyMappingItem(FList[N])
+    Result:= TATKeymapItem(FList[N])
   else
     Result:= nil;
 end;
 
-procedure TATKeyMapping.Clear;
+procedure TATKeymap.Clear;
 var
   i: integer;
 begin
@@ -70,12 +70,12 @@ begin
   FList.Clear;
 end;
 
-function TATKeyMapping.Count: integer;
+function TATKeymap.Count: integer;
 begin
   Result:= FList.Count;
 end;
 
-function TATKeyMapping.IsIndexValid(N: integer): boolean;
+function TATKeymap.IsIndexValid(N: integer): boolean;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
@@ -86,13 +86,13 @@ begin
   if Result=0 then Showmessage('Incorrect key: '+S);
 end;
 
-procedure TATKeyMapping.Add(ACmd: integer; const AName: string; const AKeys1,
+procedure TATKeymap.Add(ACmd: integer; const AName: string; const AKeys1,
   AKeys2: array of string);
 var
-  Item: TATKeyMappingItem;
+  Item: TATKeymapItem;
   i: integer;
 begin
-  Item:= TATKeyMappingItem.Create;
+  Item:= TATKeymapItem.Create;
   Item.Command:= ACmd;
   Item.Name:= AName;
 
@@ -105,7 +105,7 @@ begin
   FList.Add(Item);
 end;
 
-function TATKeyMapping.IndexOf(ACmd: integer): integer;
+function TATKeymap.IndexOf(ACmd: integer): integer;
 var
   i: integer;
 begin
@@ -115,7 +115,7 @@ begin
       begin Result:= i; Exit end;
 end;
 
-function TATKeyMapping.GetShortcutFromCommand(ACode: integer): TShortcut;
+function TATKeymap.GetShortcutFromCommand(ACode: integer): TShortcut;
 var
   i: integer;
 begin

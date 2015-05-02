@@ -55,8 +55,8 @@ procedure TfmCmd.FormShow(Sender: TObject);
 var
   i: integer;
 begin
-  for i:= 0 to edit.KeyMapping.Count-1 do
-    with edit.KeyMapping.Items[i] do
+  for i:= 0 to edit.Keymap.Count-1 do
+    with edit.Keymap.Items[i] do
       with List.Items.Add do
       begin
         Caption:= Name;

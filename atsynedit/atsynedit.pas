@@ -249,7 +249,7 @@ type
     FPaintFlags: TATSynPaintFlags;
     FPaintLocked: integer;
     FBitmap: TBitmap;
-    FKeyMapping: TATKeyMapping;
+    FKeymap: TATKeymap;
     FMarginRight: integer;
     FMarginList: TList;
     FStringsInt,
@@ -622,7 +622,7 @@ type
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
-    property KeyMapping: TATKeyMapping read FKeyMapping write FKeyMapping;
+    property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
     property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
@@ -1968,7 +1968,7 @@ begin
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
 
-  FKeyMapping:= nil;
+  FKeymap:= KeymapFull;
   FHintWnd:= THintWindow.Create(Self);
 
   FMenuStd:= TPopupMenu.Create(Self);
@@ -3158,6 +3158,10 @@ var
 begin
   for i:= 0 to FMenuStd.Items.Count-1 do
     with FMenuStd.Items[i] do
+    begin
+      if Assigned(FKeymap) then
+        ShortCut:= FKeymap.GetShortcutFromCommand(Tag);
+
       case Tag of
         cCommand_ClipboardCut: Enabled:= not ModeReadOnly;
         cCommand_ClipboardPaste: Enabled:= not ModeReadOnly and Clipboard.HasFormat(CF_Text);
@@ -3165,6 +3169,7 @@ begin
         cCommand_Undo: Enabled:= not ModeReadOnly and (UndoCount>0);
         cCommand_Redo: Enabled:= not ModeReadOnly and (RedoCount>0);
       end;
+    end;
 end;
 
 procedure TATSynEdit.DoInitPopupMenu;
@@ -3175,8 +3180,6 @@ procedure TATSynEdit.DoInitPopupMenu;
   begin
     MI:= TMenuItem.Create(FMenuStd);
     MI.Caption:= SName;
-    //if Assigned(FKeyMapping) then
-    //  MI.ShortCut:= FKeyMapping.GetShortcutFromCommand(Cmd);
     MI.Tag:= Cmd;
     MI.OnClick:= @MenuClick;
     FMenuStd.Items.Add(MI);

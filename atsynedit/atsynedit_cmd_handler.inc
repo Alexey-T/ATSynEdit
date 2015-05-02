@@ -27,7 +27,7 @@ end;
 function TATSynEdit.GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
 var
   Shortcut: TShortcut;
-  Item: TATKeyMappingItem;
+  Item: TATKeymapItem;
   i: integer;
 begin
   Result:= 0;
@@ -44,15 +44,15 @@ begin
 
   Shortcut:= KeyToShortCut(Key, Shift);
 
-  if not Assigned(FKeyMapping) then
+  if not Assigned(FKeymap) then
   begin
     ShowMessage('Keymapping prop not assigned: can''t use keys');
     Exit
   end;
 
-  for i:= 0 to FKeyMapping.Count-1 do
+  for i:= 0 to FKeymap.Count-1 do
   begin
-    Item:= FKeyMapping[i];
+    Item:= FKeymap[i];
     if IsKeyMappingMatchedItem(Shortcut, Item) then
     begin
       Result:= Item.Command;
