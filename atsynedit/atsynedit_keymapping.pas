@@ -6,7 +6,8 @@ uses
   ATKeyMapping,
   ATSynEdit_Commands;
 
-procedure DoInitDefaultKeymapping(var M: TATKeyMapping);
+procedure InitKeymappingFull(var M: TATKeyMapping);
+procedure InitKeymappingCombo(var M: TATKeyMapping);
 
 implementation
 
@@ -20,7 +21,7 @@ const
   cXControl = {$ifdef darwin} 'Meta' {$else} 'Ctrl' {$endif};
 
 
-procedure DoInitDefaultKeymapping(var M: TATKeyMapping);
+procedure InitKeymappingFull(var M: TATKeyMapping);
 begin
   M.Clear;
 
@@ -122,6 +123,47 @@ begin
   M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
 end;
 
+procedure InitKeymappingCombo(var M: TATKeyMapping);
+begin
+  M.Clear;
+
+  M.Add(cCommand_KeyLeft,         'caret char left',               ['Left'], []);
+  M.Add(cCommand_KeyLeft_Sel,     'caret char left + select',      ['Shift+Left'], []);
+  M.Add(cCommand_KeyRight,        'caret char right',              ['Right'], []);
+  M.Add(cCommand_KeyRight_Sel,    'caret char right + select',     ['Shift+Right'], []);
+  M.Add(cCommand_KeyHome,         'caret to line start',           ['Home'], []);
+  M.Add(cCommand_KeyHome_Sel,     'caret to line start + select',  ['Shift+Home'], []);
+  M.Add(cCommand_KeyEnd,          'caret to line end',             ['End'], []);
+  M.Add(cCommand_KeyEnd_Sel,      'caret to line end + select',    ['Shift+End'], []);
+
+  M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
+  M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
+  M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Enter'], []);
+  M.Add(cCommand_KeyTab, 'tabulation key', [], []);
+
+  M.Add(cCommand_GotoWordPrev,       'goto word left',           [cXControl+'+Left'], []);
+  M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  [cXControl+'+Shift+Left'], []);
+  M.Add(cCommand_GotoWordNext,       'goto word right',          [cXControl+'+Right'], []);
+  M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXControl+'+Shift+Right'], []);
+
+  M.Add(cCommand_SelectAll, 'selection: select all', [cXControl+'+A'], []);
+  M.Add(cCommand_TextDeleteSelection, 'selection: delete selected text', [], []);
+
+  M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
+
+  M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
+  M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);
+
+  M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
+  M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Shift+Z'], []);
+
+  M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXControl+'+C'], [cXControl+'+Ins']);
+  M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/append', [], []);
+  M.Add(cCommand_ClipboardCut, 'clipboard: cut', [cXControl+'+X'], ['Shift+Del']);
+  M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXControl+'+V'], ['Shift+Ins']);
+
+  M.Add(cCommand_RecentsPopup, 'recents popup menu', ['Alt+Down'], []);
+end;
 
 end.
 

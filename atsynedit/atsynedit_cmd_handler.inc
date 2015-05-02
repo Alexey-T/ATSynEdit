@@ -44,6 +44,12 @@ begin
 
   Shortcut:= KeyToShortCut(Key, Shift);
 
+  if not Assigned(FKeyMapping) then
+  begin
+    ShowMessage('Keymapping prop not assigned: can''t use keys');
+    Exit
+  end;
+
   for i:= 0 to FKeyMapping.Count-1 do
   begin
     Item:= FKeyMapping[i];

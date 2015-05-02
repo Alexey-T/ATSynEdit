@@ -622,7 +622,7 @@ type
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
-    property KeyMapping: TATKeyMapping read FKeyMapping;
+    property KeyMapping: TATKeyMapping read FKeyMapping write FKeyMapping;
     property Modified: boolean read GetModified;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
     property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
@@ -1968,7 +1968,7 @@ begin
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
 
-  FKeyMapping:= TATKeyMapping.Create;
+  FKeyMapping:= nil;
   FHintWnd:= THintWindow.Create(Self);
 
   FMenuStd:= TPopupMenu.Create(Self);
@@ -1980,7 +1980,6 @@ begin
   FMenuMicromap:= nil;
   FMenuRuler:= nil;
 
-  DoInitDefaultKeymapping(FKeyMapping);
   DoInitPopupMenu;
 end;
 
@@ -1993,7 +1992,6 @@ begin
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
-  FreeAndNil(FKeyMapping);
   FreeAndNil(FCarets);
   FreeAndNil(FGutter);
   FreeAndNil(FMarginList);
@@ -3177,7 +3175,8 @@ procedure TATSynEdit.DoInitPopupMenu;
   begin
     MI:= TMenuItem.Create(FMenuStd);
     MI.Caption:= SName;
-    MI.ShortCut:= FKeyMapping.GetShortcutFromCommand(Cmd);
+    //if Assigned(FKeyMapping) then
+    //  MI.ShortCut:= FKeyMapping.GetShortcutFromCommand(Cmd);
     MI.Tag:= Cmd;
     MI.OnClick:= @MenuClick;
     FMenuStd.Items.Add(MI);

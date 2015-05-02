@@ -38,7 +38,11 @@ type
 implementation
 
 uses
-  Types, ATSynEdit_Commands;
+  Types, ATSynEdit_Commands, ATKeyMapping, ATSynEdit_Keymapping;
+
+var
+  KeymapSimple: TATKeyMapping = nil;
+
 
 { TATEdit }
 
@@ -48,6 +52,8 @@ begin
 
   ModeOneLine:= true;
   BorderStyle:= bsSingle;
+
+  KeyMapping:= KeymapSimple;
 
   OptOffsetTop:= 2;
   Height:= 26;
@@ -136,13 +142,6 @@ begin
   OptMicromapWidth:= 16;
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
-
-  with KeyMapping do
-  begin
-    Items[IndexOf(cCommand_MoveSelectionDown)].Keys1[0]:= 0;
-    Items[IndexOf(cCommand_MoveSelectionUp)].Keys1[0]:= 0;
-    Add(cCommand_RecentsPopup, 'recents popup menu', ['Alt+Down'], []);
-  end;
 end;
 
 destructor TATComboEdit.Destroy;
@@ -152,6 +151,12 @@ begin
   inherited;
 end;
 
+initialization
+  KeymapSimple:= TATKeyMapping.Create;
+  InitKeymappingCombo(KeymapSimple);
+
+finalization
+  FreeAndNil(KeymapSimple);
 
 end.
 
