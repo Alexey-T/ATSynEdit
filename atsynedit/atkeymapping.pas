@@ -8,10 +8,15 @@ uses
   Classes, SysUtils;
 
 type
+
+  { TATKeymapItem }
+
   TATKeymapItem = class
+  public
     Command: integer;
     Name: string;
     Keys1, Keys2: array[0..0] of TShortcut;
+    function IsItemMatches(AKey: TShortcut): boolean;
   end;
 
 type
@@ -38,6 +43,14 @@ implementation
 uses
   LCLProc,
   Dialogs;
+
+{ TATKeymapItem }
+
+function TATKeymapItem.IsItemMatches(AKey: TShortcut): boolean;
+begin
+  Result:=
+    (AKey=Keys1[0]) or (AKey=Keys2[0]);
+end;
 
 { TATKeymap }
 

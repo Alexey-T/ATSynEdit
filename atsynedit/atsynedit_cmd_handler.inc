@@ -46,14 +46,14 @@ begin
 
   if not Assigned(FKeymap) then
   begin
-    ShowMessage('Keymapping prop not assigned: can''t use keys');
+    ShowMessage('Keymap not assigned: can''t use keys');
     Exit
   end;
 
   for i:= 0 to FKeymap.Count-1 do
   begin
     Item:= FKeymap[i];
-    if IsKeyMappingMatchedItem(Shortcut, Item) then
+    if Item.IsItemMatches(Shortcut) then
     begin
       Result:= Item.Command;
       Key:= 0;
