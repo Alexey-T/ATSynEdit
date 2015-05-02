@@ -1791,6 +1791,7 @@ begin
   Height:= 200;
   Font.Name:= 'Courier New';
   Font.Size:= {$ifndef darwin} 9 {$else} 14 {$endif};
+  FCharSize:= Point(4, 4); //not nul
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
