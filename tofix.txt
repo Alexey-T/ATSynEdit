@@ -1,0 +1,2 @@
+
+caret: empty ed, cr don't blink first (IsFocused gets false on win)
