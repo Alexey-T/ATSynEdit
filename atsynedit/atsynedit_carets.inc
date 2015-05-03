@@ -451,4 +451,7 @@ begin
     DoCaretSingle(0, 0);
 end;
 
-
+function TATSynEdit.IsCaretBlocked: boolean;
+begin
+  Result:= FCaretStopUnfocused and not Focused;
+end;

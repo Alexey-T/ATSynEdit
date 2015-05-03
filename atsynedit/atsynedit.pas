@@ -430,6 +430,7 @@ type
     function GetUndoLimit: integer;
     procedure DoInitColors;
     procedure DoInitPopupMenu;
+    function IsCaretBlocked: boolean;
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
@@ -2251,6 +2252,7 @@ begin
         DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX, FColors.MarginCaret);
     end;
 
+    FCaretShown:= false;
     DoPaintCarets(FBitmap.Canvas, false);
   end;
 
@@ -2822,18 +2824,6 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  if FCaretStopUnfocused then
-    if not Focused then
-    begin
-      if FCaretShown then
-      begin
-        FCaretShown:= not FCaretShown;
-        DoPaintCarets(FBitmap.Canvas, true);
-      end;
-      Exit;
-    end;
-
-  FCaretShown:= not FCaretShown;
   DoPaintCarets(FBitmap.Canvas, true);
 end;
 
@@ -2927,6 +2917,12 @@ var
   Item: TATCaretItem;
   Shape: TATSynCaretShape;
 begin
+  if IsCaretBlocked then
+  begin
+    if not FCaretShown then Exit;
+  end;
+  FCaretShown:= not FCaretShown;
+
   if ModeOverwrite then
     Shape:= FCaretShapeOvr
   else
@@ -2978,7 +2974,6 @@ procedure TATSynEdit.DoPaintModeStatic;
 begin
   FPaintStatic:= true;
   FTimerBlink.Enabled:= false;
-  FCaretShown:= false;
   Invalidate;
 end;
 
