@@ -155,7 +155,7 @@ type
     );
 
 const
-  cInitCaretShape = cCaretShapeVert2px;
+  cInitCaretShape = cCaretShapeVert1px;
   cInitSpacingText = 1;
   cInitSpacingMinimap = -1;
   cInitTimerBlink = 600;

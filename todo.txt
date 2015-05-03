@@ -1,5 +1,4 @@
 
-caret: hide on unfocus
 
 hard:
 tokens hilite (adapt EControl)
@@ -7,4 +6,4 @@ optimize atsynedit_ranges (slow Find..)
 
 need?
 tab-mode SmartTab
-smart unindent
+auto-unindent like Laz

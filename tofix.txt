@@ -1,2 +1,2 @@
 
-caret: empty ed, cr don't blink first (IsFocused gets false on win)
+caret: empty ed, cr don't blink first (Focused gets false on win)
