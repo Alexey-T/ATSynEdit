@@ -12,10 +12,10 @@ type
   { TfmMain }
 
   TfmMain = class(TForm)
-    ATComboEdit1: TATComboEdit;
-    ATEdit1: TATEdit;
-    ATSynEdit1: TATSynEdit;
+    combo: TATComboEdit;
+    ed: TATSynEdit;
     Panel1: TPanel;
+    procedure FormShow(Sender: TObject);
   private
     { private declarations }
   public
@@ -28,6 +28,17 @@ var
 implementation
 
 {$R *.lfm}
+
+{ TfmMain }
+
+procedure TfmMain.FormShow(Sender: TObject);
+begin
+  ed.Strings.Clear;
+  ed.Strings.LineAdd('This is demo text');
+  ed.Strings.LineAdd('test');
+  ed.Strings.LineAdd('test...');
+  ed.Update(true);
+end;
 
 end.
 
