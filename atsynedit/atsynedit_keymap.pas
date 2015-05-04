@@ -1,4 +1,4 @@
-unit ATKeyMapping;
+unit ATSynEdit_Keymap;
 
 {$mode objfpc}{$H+}
 

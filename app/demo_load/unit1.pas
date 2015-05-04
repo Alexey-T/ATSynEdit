@@ -56,7 +56,7 @@ var
   s: string;
 begin
   s:= List.GetPathFromItem(List.Selected);
-  if not FileExists(s) then Exit;
+  if not FileExistsUTF8(s) then Exit;
 
   ed.BeginUpdate;
   Application.ProcessMessages;

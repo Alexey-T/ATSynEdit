@@ -20,8 +20,8 @@ uses
   LMessages, LCLType,
   ATStringProc,
   ATStrings,
-  ATCanvasProc,
-  ATKeyMapping,
+  ATSynEdit_Keymap,
+  ATSynEdit_CanvasProc,
   ATSynEdit_Carets,
   ATSynEdit_Gutter,
   ATSynEdit_WrapInfo,
@@ -866,7 +866,7 @@ uses
   Math,
   Clipbrd,
   ATSynEdit_Commands,
-  ATSynEdit_KeyMapping,
+  ATSynEdit_Keymap_Init,
   ATStringProc_WordJump;
 
 {$I atsynedit_proc.inc}

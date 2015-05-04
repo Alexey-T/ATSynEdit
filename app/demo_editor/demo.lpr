@@ -10,8 +10,8 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms,
   formmain, formkey, formopt,
-  atcanvasproc,
-  atkeymapping,
+  atsynedit_canvasproc,
+  atsynedit_keymap,
   atstringproc,
   atstringproc_wordjump,
   atstrings,
@@ -20,7 +20,7 @@ uses
   atsynedit,
   atsynedit_gutter,
   atsynedit_commands,
-  atsynedit_keymapping,
+  atsynedit_keymap_init,
   atsynedit_wrapinfo, atsynedit_edits, atsynedit_ranges, formcombo;
 
 {$R *.res}

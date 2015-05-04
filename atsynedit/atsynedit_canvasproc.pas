@@ -1,4 +1,4 @@
-unit ATCanvasProc;
+unit ATSynEdit_CanvasProc;
 
 {$mode objfpc}{$H+}
 //{$define win_fast} //use Windows api

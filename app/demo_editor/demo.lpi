@@ -86,13 +86,13 @@
         <IsPartOfProject Value="True"/>
       </Unit10>
       <Unit11>
-        <Filename Value="..\..\atsynedit\atcanvasproc.pas"/>
+        <Filename Value="..\..\atsynedit\atsynedit_canvasproc.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit11>
       <Unit12>
-        <Filename Value="..\..\atsynedit\atkeymapping.pas"/>
+        <Filename Value="..\..\atsynedit\atsynedit_keymap.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATKeyMapping"/>
+        <UnitName Value="ATSynEdit_Keymap"/>
       </Unit12>
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
@@ -120,9 +120,9 @@
         <IsPartOfProject Value="True"/>
       </Unit18>
       <Unit19>
-        <Filename Value="..\..\atsynedit\atsynedit_keymapping.pas"/>
+        <Filename Value="..\..\atsynedit\atsynedit_keymap_init.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Keymapping"/>
+        <UnitName Value="ATSynEdit_Keymap_Init"/>
       </Unit19>
       <Unit20>
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
@@ -170,6 +170,7 @@
       <Unit30>
         <Filename Value="..\..\atsynedit\atsynedit_edits.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Edits"/>
       </Unit30>
       <Unit31>
         <Filename Value="formcombo.pas"/>

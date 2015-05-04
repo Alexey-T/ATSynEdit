@@ -5,7 +5,11 @@ unit ATSynEdit_Edits;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Controls, ATSynEdit, ATCanvasProc, Menus, ATStringProc;
+  Classes, SysUtils, Graphics, Controls,
+  Menus,
+  ATSynEdit,
+  ATSynEdit_CanvasProc,
+  ATStringProc;
 
 type
   { TATEdit }
@@ -37,7 +41,9 @@ type
 implementation
 
 uses
-  Types, ATSynEdit_Commands, ATSynEdit_Keymapping;
+  Types,
+  ATSynEdit_Commands,
+  ATSynEdit_Keymap_Init;
 
 
 { TATEdit }

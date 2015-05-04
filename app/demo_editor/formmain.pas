@@ -6,8 +6,14 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Spin, ComCtrls, Menus, ATStrings, ATSynEdit, ATStringProc, ATCanvasProc,
-  formkey, formopt, formcombo;
+  ExtCtrls, Spin, ComCtrls, Menus,
+  ATStrings,
+  ATStringProc,
+  ATSynEdit,
+  ATSynEdit_CanvasProc,
+  formkey,
+  formopt,
+  formcombo;
 
 type
   { TfmMain }

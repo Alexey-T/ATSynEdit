@@ -1,9 +1,9 @@
-unit ATSynEdit_Keymapping;
+unit ATSynEdit_Keymap_Init;
 
 interface
 
 uses
-  ATKeyMapping,
+  ATSynEdit_Keymap,
   ATSynEdit_Commands;
 
 procedure InitKeymapFull(var M: TATKeymap);
