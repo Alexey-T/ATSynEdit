@@ -765,7 +765,7 @@ type
     //misc
     property CursorText: TCursor read FCursorText write FCursorText;
     property CursorBm: TCursor read FCursorBm write FCursorBm;
-    property Colors: TATSynEditColors read FColors;
+    property Colors: TATSynEditColors read FColors write FColors;
 
     //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
