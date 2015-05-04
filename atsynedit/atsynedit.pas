@@ -376,6 +376,7 @@ type
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptUseOverOnPaste: boolean;
+    FOptKeyBackspaceUnindent: boolean;
     FOptKeyPageKeepsRelativePos: boolean;
     FOptKeyUpDownNavigateWrapped: boolean;
     FOptKeyHomeEndNavigateWrapped: boolean;
@@ -590,9 +591,10 @@ type
     function DoCommand_KeyUpDown(ADown: boolean; ALines: integer; AKeepRelativePos: boolean): TATCommandResults;
     function DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer): TATCommandResults;
+    function DoCommand_TextBackspace: TATCommandResults;
     function DoCommand_TextDelete: TATCommandResults;
     function DoCommand_TextDeleteSelection: TATCommandResults;
-    function DoCommand_TextDeleteLeft(ALen: integer): TATCommandResults;
+    function DoCommand_TextDeleteLeft(ALen: integer; AAllowUnindent: boolean): TATCommandResults;
     function DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
     function DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
     function DoCommand_TextDeleteLines: TATCommandResults;
@@ -785,6 +787,7 @@ type
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine;
+    property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped;
     property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn;
@@ -1910,6 +1913,7 @@ begin
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;
+  FOptKeyBackspaceUnindent:= true;
   FOptKeyPageKeepsRelativePos:= true;
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyHomeEndNavigateWrapped:= true;

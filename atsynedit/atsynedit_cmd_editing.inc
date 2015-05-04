@@ -137,10 +137,12 @@ begin
   Result:= [cResultText, cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_TextDeleteLeft(ALen: integer): TATCommandResults;
+function TATSynEdit.DoCommand_TextDeleteLeft(ALen: integer; AAllowUnindent: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
+  Str: atString;
+  NIndent, NDeleteLen: integer;
   i: integer;
 begin
   Result:= [];
@@ -151,7 +153,28 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
-    Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, ALen, Shift, PosAfter);
+    NDeleteLen:= ALen;
+
+    if AAllowUnindent and (Caret.PosY>0) then
+    //do only if caret on 1st nonspace char (Delphi)
+    begin
+      Str:= Strings.Lines[Caret.PosY];
+      NIndent:= SGetIndentChars(Str);
+      if (Caret.PosX=NIndent) and (NIndent>0) then
+      begin
+        Str:= Strings.Lines[Caret.PosY-1];
+        NIndent:= SGetIndentChars(Str);
+        //from indent of prev line: delete to 0
+        if Caret.PosX=NIndent then
+          NDeleteLen:= NIndent
+        else
+        //from bigger indent: delete to prev indent
+        if Caret.PosX>NIndent then
+          NDeleteLen:= (Caret.PosX-NIndent);
+      end;
+    end;
+
+    Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
     DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;

@@ -220,6 +220,11 @@ begin
     Result:= [cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_TextBackspace: TATCommandResults;
+begin
+  Result:= DoCommand_TextDeleteLeft(1, FOptKeyBackspaceUnindent);
+end;
+
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;
 var
   Item: TATSynWrapItem;

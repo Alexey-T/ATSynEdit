@@ -167,7 +167,7 @@ begin
 
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
     cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
-    cCommand_KeyBackspace:        Res:= DoCommand_TextDeleteLeft(1);
+    cCommand_KeyBackspace:        Res:= DoCommand_TextBackspace;
     cCommand_KeyDelete:           Res:= DoCommand_TextDelete;
     cCommand_KeyTab:              Res:= DoCommand_TextTabulation;
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);

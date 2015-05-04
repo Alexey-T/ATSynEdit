@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet8
-    TabIndex = 7
+    ActivePage = TabSheet5
+    TabIndex = 2
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -424,9 +424,9 @@ object fmOpt: TfmOpt
     end
     object TabSheet5: TTabSheet
       Caption = 'keys'
-      ClientHeight = 313
-      ClientWidth = 620
-      object chkNavWrap: TCheckBox
+      ClientHeight = 316
+      ClientWidth = 616
+      object chkNavUpDown: TCheckBox
         Left = 8
         Height = 19
         Top = 8
@@ -434,7 +434,7 @@ object fmOpt: TfmOpt
         Caption = 'up/down: navigate in wrapped lines'
         TabOrder = 0
       end
-      object chkLeftRt: TCheckBox
+      object chkLeftRtSwap: TCheckBox
         Left = 8
         Height = 19
         Top = 48
@@ -442,7 +442,7 @@ object fmOpt: TfmOpt
         Caption = 'left/right: swap edge of sel'
         TabOrder = 2
       end
-      object chkHome: TCheckBox
+      object chkHomeNonspace: TCheckBox
         Left = 8
         Height = 19
         Top = 68
@@ -450,10 +450,10 @@ object fmOpt: TfmOpt
         Caption = 'home: to nonspace chr'
         TabOrder = 3
       end
-      object edPage: TComboBox
+      object edPageSize: TComboBox
         Left = 8
         Height = 23
-        Top = 252
+        Top = 280
         Width = 106
         ItemHeight = 15
         Items.Strings = (
@@ -462,90 +462,25 @@ object fmOpt: TfmOpt
           'size/2'
         )
         Style = csDropDownList
-        TabOrder = 13
+        TabOrder = 9
       end
       object Label3: TLabel
         Left = 120
         Height = 15
-        Top = 256
+        Top = 284
         Width = 102
         Caption = 'page-up/down size'
         ParentColor = False
       end
       object chkOvrSel: TCheckBox
-        Left = 296
+        Left = 8
         Height = 19
-        Top = 8
+        Top = 148
         Width = 124
         Caption = 'overwrite sel by text'
-        TabOrder = 8
+        TabOrder = 7
       end
-      object chkTabInd: TCheckBox
-        Left = 8
-        Height = 19
-        Top = 128
-        Width = 118
-        Caption = 'tab: also indent sel'
-        TabOrder = 6
-      end
-      object Label5: TLabel
-        Left = 64
-        Height = 15
-        Top = 200
-        Width = 188
-        Caption = 'indent/unindent size, if <0: use tabs'
-        ParentColor = False
-      end
-      object chkAutoInd: TCheckBox
-        Left = 8
-        Height = 19
-        Top = 108
-        Width = 116
-        Caption = 'enter: auto-indent'
-        TabOrder = 5
-      end
-      object edAutoInd: TComboBox
-        Left = 8
-        Height = 23
-        Top = 224
-        Width = 106
-        ItemHeight = 15
-        Items.Strings = (
-          'as is'
-          'spaces'
-          'tabs+spaces'
-          'tabs only'
-        )
-        Style = csDropDownList
-        TabOrder = 12
-      end
-      object edIndent: TSpinEdit
-        Left = 8
-        Height = 23
-        Top = 196
-        Width = 50
-        MaxValue = 30
-        MinValue = -10
-        TabOrder = 11
-        Value = 1
-      end
-      object Label4: TLabel
-        Left = 120
-        Height = 15
-        Top = 228
-        Width = 89
-        Caption = 'auto-indent kind'
-        ParentColor = False
-      end
-      object chkUninKeep: TCheckBox
-        Left = 296
-        Height = 19
-        Top = 48
-        Width = 130
-        Caption = 'unindent keeps align'
-        TabOrder = 10
-      end
-      object chkEnd: TCheckBox
+      object chkEndNonspace: TCheckBox
         Left = 8
         Height = 19
         Top = 88
@@ -553,15 +488,15 @@ object fmOpt: TfmOpt
         Caption = 'end: to nonspace chr'
         TabOrder = 4
       end
-      object chkTabSp: TCheckBox
-        Left = 296
+      object chkTabSpaces: TCheckBox
+        Left = 8
         Height = 19
-        Top = 28
+        Top = 168
         Width = 89
         Caption = 'tab as spaces'
-        TabOrder = 9
+        TabOrder = 8
       end
-      object chkNavWrap2: TCheckBox
+      object chkNavHomeEnd: TCheckBox
         Left = 8
         Height = 19
         Top = 28
@@ -572,18 +507,101 @@ object fmOpt: TfmOpt
       object chkPageKeepRel: TCheckBox
         Left = 8
         Height = 19
-        Top = 148
+        Top = 108
         Width = 226
         Caption = 'page-up/down: keep relative top offset'
-        TabOrder = 7
+        TabOrder = 5
       end
       object chkKeepCol: TCheckBox
         Left = 8
         Height = 19
-        Top = 168
+        Top = 128
         Width = 253
         Caption = 'up/down: keep column (caret after eol =off)'
-        TabOrder = 14
+        TabOrder = 6
+      end
+      object groupIndent: TGroupBox
+        Left = 304
+        Height = 177
+        Top = 4
+        Width = 304
+        Caption = 'indents'
+        ClientHeight = 157
+        ClientWidth = 300
+        TabOrder = 10
+        object chkUnindentKeepAlign: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 64
+          Width = 130
+          Caption = 'unindent keeps align'
+          TabOrder = 3
+        end
+        object edIndentSize: TSpinEdit
+          Left = 8
+          Height = 23
+          Top = 88
+          Width = 50
+          MaxValue = 30
+          MinValue = -10
+          TabOrder = 4
+          Value = 1
+        end
+        object Label5: TLabel
+          Left = 64
+          Height = 15
+          Top = 92
+          Width = 188
+          Caption = 'indent/unindent size, if <0: use tabs'
+          ParentColor = False
+        end
+        object edIndentKind: TComboBox
+          Left = 8
+          Height = 23
+          Top = 120
+          Width = 106
+          ItemHeight = 15
+          Items.Strings = (
+            'as is'
+            'spaces'
+            'tabs+spaces'
+            'tabs only'
+          )
+          Style = csDropDownList
+          TabOrder = 5
+        end
+        object Label4: TLabel
+          Left = 120
+          Height = 15
+          Top = 124
+          Width = 89
+          Caption = 'auto-indent kind'
+          ParentColor = False
+        end
+        object chkEnterIndent: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 4
+          Width = 116
+          Caption = 'enter: auto-indent'
+          TabOrder = 0
+        end
+        object chkTabIndent: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 44
+          Width = 118
+          Caption = 'tab: also indent sel'
+          TabOrder = 2
+        end
+        object chkBackspUnindent: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 24
+          Width = 236
+          Caption = 'backspace: unindent (if on 1st nonspace)'
+          TabOrder = 1
+        end
       end
     end
     object TabSheet3: TTabSheet

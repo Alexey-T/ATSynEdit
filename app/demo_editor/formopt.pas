@@ -15,7 +15,11 @@ type
     bColUp: TButton;
     bColDown: TButton;
     ButtonPanel1: TButtonPanel;
+    chkBackspUnindent: TCheckBox;
+    chkEnterIndent: TCheckBox;
     chkPopupDown: TCheckBox;
+    chkTabIndent: TCheckBox;
+    chkUnindentKeepAlign: TCheckBox;
     chkUnprintAsciiRep: TCheckBox;
     chkShowFoldLines: TCheckBox;
     chkShowFoldAlways: TCheckBox;
@@ -25,7 +29,7 @@ type
     chkCurLineMin: TCheckBox;
     chkHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
-    chkNavWrap2: TCheckBox;
+    chkNavHomeEnd: TCheckBox;
     chkGutterBm: TCheckBox;
     chkGutterEmpty: TCheckBox;
     chkGutterNum: TCheckBox;
@@ -38,20 +42,17 @@ type
     chkMapBord: TCheckBox;
     chkMapAlw: TCheckBox;
     chkShowNumBg: TCheckBox;
-    chkTabSp: TCheckBox;
+    chkTabSpaces: TCheckBox;
     chkUndoSv: TCheckBox;
     chkUndoGr: TCheckBox;
     chkCutNoSel: TCheckBox;
     chkDotLn: TCheckBox;
     chkClickNm: TCheckBox;
     chkCrUnfocus: TCheckBox;
-    chkEnd: TCheckBox;
-    chkUninKeep: TCheckBox;
-    chkAutoInd: TCheckBox;
-    chkTabInd: TCheckBox;
-    chkHome: TCheckBox;
-    chkLeftRt: TCheckBox;
-    chkNavWrap: TCheckBox;
+    chkEndNonspace: TCheckBox;
+    chkHomeNonspace: TCheckBox;
+    chkLeftRtSwap: TCheckBox;
+    chkNavUpDown: TCheckBox;
     chkOvrSel: TCheckBox;
     chkRtMove: TCheckBox;
     chkDnD: TCheckBox;
@@ -70,17 +71,17 @@ type
     chkUnprintEndDet: TCheckBox;
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
-    edAutoInd: TComboBox;
+    edIndentKind: TComboBox;
     edCrShape: TComboBox;
     edCrShape2: TComboBox;
     edCrTime: TSpinEdit;
     edChars: TEdit;
-    edIndent: TSpinEdit;
+    edIndentSize: TSpinEdit;
     edPlusSize: TSpinEdit;
     edNumSkip: TEdit;
     edMapFont: TSpinEdit;
     edNum: TComboBox;
-    edPage: TComboBox;
+    edPageSize: TComboBox;
     edRulerFSize: TSpinEdit;
     edRulerSize: TSpinEdit;
     edSizeBm: TSpinEdit;
@@ -89,6 +90,7 @@ type
     edSizeFold: TSpinEdit;
     edTabArrowSize: TSpinEdit;
     edTabArrowPnt: TSpinEdit;
+    groupIndent: TGroupBox;
     GroupBox2: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
@@ -227,20 +229,21 @@ begin
     chkMapAlw.Checked:= ed.OptMinimapShowSelAlways;
 
     //key
-    chkTabSp.Checked:= ed.OptTabSpaces;
+    chkTabSpaces.Checked:= ed.OptTabSpaces;
     chkOvrSel.Checked:= ed.OptOverwriteSel;
-    chkNavWrap.Checked:= ed.OptKeyUpDownNavigateWrapped;
-    chkNavWrap2.Checked:= ed.OptKeyHomeEndNavigateWrapped;
+    chkNavUpDown.Checked:= ed.OptKeyUpDownNavigateWrapped;
+    chkNavHomeEnd.Checked:= ed.OptKeyHomeEndNavigateWrapped;
     chkKeepCol.Checked:= ed.OptKeyUpDownKeepColumn;
-    chkLeftRt.Checked:= ed.OptKeyLeftRightSwapSel;
-    chkHome.Checked:= ed.OptKeyHomeToNonSpace;
-    chkEnd.Checked:= ed.OptKeyEndToNonSpace;
-    chkTabInd.Checked:= ed.OptKeyTabIndents;
-    chkAutoInd.Checked:= ed.OptAutoIndent;
-    edAutoInd.ItemIndex:= Ord(ed.OptAutoIndentKind);
-    edIndent.Value:= ed.OptIndentSize;
-    chkUninKeep.Checked:= ed.OptIndentKeepsAlign;
-    edPage.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
+    chkLeftRtSwap.Checked:= ed.OptKeyLeftRightSwapSel;
+    chkHomeNonspace.Checked:= ed.OptKeyHomeToNonSpace;
+    chkEndNonspace.Checked:= ed.OptKeyEndToNonSpace;
+    chkTabIndent.Checked:= ed.OptKeyTabIndents;
+    chkEnterIndent.Checked:= ed.OptAutoIndent;
+    chkBackspUnindent.Checked:= ed.OptKeyBackspaceUnindent;
+    edIndentKind.ItemIndex:= Ord(ed.OptAutoIndentKind);
+    edIndentSize.Value:= ed.OptIndentSize;
+    chkUnindentKeepAlign.Checked:= ed.OptIndentKeepsAlign;
+    edPageSize.ItemIndex:= Ord(ed.OptKeyPageUpDownSize);
     chkPageKeepRel.Checked:= ed.OptKeyPageKeepsRelativePos;
 
     //mouse
@@ -327,21 +330,22 @@ begin
       ed.OptMinimapShowSelAlways:= chkMapAlw.Checked;
 
       //key
-      ed.OptTabSpaces:= chkTabSp.Checked;
+      ed.OptTabSpaces:= chkTabSpaces.Checked;
       ed.OptOverwriteSel:= chkOvrSel.Checked;
       ed.OptKeyUpDownKeepColumn:= chkKeepCol.Checked;
-      ed.OptKeyUpDownNavigateWrapped:= chkNavWrap.Checked;
-      ed.OptKeyHomeEndNavigateWrapped:= chkNavWrap2.Checked;
-      ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPage.ItemIndex);
-      ed.OptKeyLeftRightSwapSel:= chkLeftRt.Checked;
-      ed.OptKeyHomeToNonSpace:= chkHome.Checked;
-      ed.OptKeyEndToNonSpace:= chkEnd.Checked;
+      ed.OptKeyUpDownNavigateWrapped:= chkNavUpDown.Checked;
+      ed.OptKeyHomeEndNavigateWrapped:= chkNavHomeEnd.Checked;
+      ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPageSize.ItemIndex);
+      ed.OptKeyLeftRightSwapSel:= chkLeftRtSwap.Checked;
+      ed.OptKeyHomeToNonSpace:= chkHomeNonspace.Checked;
+      ed.OptKeyEndToNonSpace:= chkEndNonspace.Checked;
       ed.OptKeyPageKeepsRelativePos:= chkPageKeepRel.Checked;
-      ed.OptKeyTabIndents:= chkTabInd.Checked;
-      ed.OptAutoIndent:= chkAutoInd.Checked;
-      ed.OptAutoIndentKind:= TATAutoIndentKind(edAutoInd.ItemIndex);
-      ed.OptIndentSize:= edIndent.Value;
-      ed.OptIndentKeepsAlign:= chkUninKeep.Checked;
+      ed.OptKeyTabIndents:= chkTabIndent.Checked;
+      ed.OptAutoIndent:= chkEnterIndent.Checked;
+      ed.OptKeyBackspaceUnindent := chkBackspUnindent.Checked;
+      ed.OptAutoIndentKind:= TATAutoIndentKind(edIndentKind.ItemIndex);
+      ed.OptIndentSize:= edIndentSize.Value;
+      ed.OptIndentKeepsAlign:= chkUnindentKeepAlign.Checked;
 
       //mouse
       ed.OptMouse2ClickSelectsLine:= chkClick2.Checked;

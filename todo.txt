@@ -3,7 +3,3 @@
 hard:
 tokens hilite (adapt EControl)
 optimize atsynedit_ranges (slow Find..)
-
-need?
-tab-mode SmartTab
-auto-unindent like Laz
