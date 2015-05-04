@@ -41,4 +41,39 @@ begin
   FreeAndNil(cBitmapNiceScroll);
 end;
 
+procedure InitDefaultColors(C: TATSynEditColors);
+begin
+  C.TextFont:= clBlack;
+  C.TextBG:= clWhite;
+  C.TextSelFont:= clHighlightText;
+  C.TextSelBG:= clHighlight;
+  C.Caret:= clBlack;
+  C.GutterFont:= clGray;
+  C.GutterBG:= $e0e0e0;
+  C.GutterCaretBG:= $c8c8c8;
+  C.GutterPlusBorder:= clGray;
+  C.GutterPlusBG:= $f4f4f4;
+  C.GutterFoldLine:= clGray;
+  C.GutterFoldBG:= $c8c8c8;
+  C.CurrentLineBG:= $e0f0f0;
+  C.RulerBG:= C.GutterBG;
+  C.RulerFont:= clGray;
+  C.CollapseLine:= $a06060;
+  C.CollapseMarkFont:= $e08080;
+  C.CollapseMarkBG:= clWhite;
+  C.MarginRight:= clLtGray;
+  C.MarginCaret:= clLime;
+  C.MarginUser:= clYellow;
+  C.IndentVertLines:= clMedGray;
+  C.UnprintedFont:= $5050f0;
+  C.UnprintedBG:= $e0e0e0;
+  C.UnprintedHexFont:= clMedGray;
+  C.MinimapBorder:= clLtGray;
+  C.MinimapSelBG:= $eeeeee;
+  C.StateChanged:= $00f0f0;
+  C.StateAdded:= $20c020;
+  C.StateSaved:= clMedGray;
+  C.LockedBG:= $e0e0e0;
+end;
+
 

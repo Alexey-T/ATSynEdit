@@ -5,17 +5,17 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ATSynEdit,
-  ATSynEdit_Edits;
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
+  ATSynEdit, ATSynEdit_Edits;
 
 type
+  { TfmMain }
 
-  { TForm1 }
-
-  TForm1 = class(TForm)
+  TfmMain = class(TForm)
     ATComboEdit1: TATComboEdit;
     ATEdit1: TATEdit;
     ATSynEdit1: TATSynEdit;
+    Panel1: TPanel;
   private
     { private declarations }
   public
@@ -23,7 +23,7 @@ type
   end;
 
 var
-  Form1: TForm1;
+  fmMain: TfmMain;
 
 implementation
 

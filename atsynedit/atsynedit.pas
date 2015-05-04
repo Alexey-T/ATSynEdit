@@ -56,39 +56,71 @@ type
   TATCommandResults = set of TATCommandResult;
 
 type
-  TATSynEditColors = class
-  public
-    TextFont,
-    TextBG,
-    TextSelFont,
-    TextSelBG,
-    Caret,
-    GutterFont,
-    GutterBG,
-    GutterCaretBG,
-    GutterPlusBorder,
-    GutterPlusBG,
-    GutterFoldLine,
-    GutterFoldBG,
-    CurrentLineBG,
-    MarginRight,
-    MarginCaret,
-    MarginUser,
-    IndentVertLines,
-    RulerFont,
-    RulerBG,
-    CollapseLine,
-    CollapseMarkFont,
-    CollapseMarkBG,
-    UnprintedFont,
-    UnprintedBG,
-    UnprintedHexFont,
-    MinimapBorder,
-    MinimapSelBG,
-    StateChanged,
-    StateAdded,
-    StateSaved,
-    LockedBG: TColor;
+  TATSynEditColors = class(TPersistent)
+  private
+    FTextFont,
+    FTextBG,
+    FTextSelFont,
+    FTextSelBG,
+    FCaret,
+    FGutterFont,
+    FGutterBG,
+    FGutterCaretBG,
+    FGutterPlusBorder,
+    FGutterPlusBG,
+    FGutterFoldLine,
+    FGutterFoldBG,
+    FCurrentLineBG,
+    FMarginRight,
+    FMarginCaret,
+    FMarginUser,
+    FIndentVertLines,
+    FRulerFont,
+    FRulerBG,
+    FCollapseLine,
+    FCollapseMarkFont,
+    FCollapseMarkBG,
+    FUnprintedFont,
+    FUnprintedBG,
+    FUnprintedHexFont,
+    FMinimapBorder,
+    FMinimapSelBG,
+    FStateChanged,
+    FStateAdded,
+    FStateSaved,
+    FLockedBG: TColor;
+  published
+    property TextFont: TColor read FTextFont write FTextFont;
+    property TextBG: TColor read FTextBG write FTextBG;
+    property TextSelFont: TColor read FTextSelFont write FTextSelFont;
+    property TextSelBG: TColor read FTextSelBG write FTextSelBG;
+    property Caret: TColor read FCaret write FCaret;
+    property GutterFont: TColor read FGutterFont write FGutterFont;
+    property GutterBG: TColor read FGutterBG write FGutterBG;
+    property GutterCaretBG: TColor read FGutterCaretBG write FGutterCaretBG;
+    property GutterPlusBorder: TColor read FGutterPlusBorder write FGutterPlusBorder;
+    property GutterPlusBG: TColor read FGutterPlusBG write FGutterPlusBG;
+    property GutterFoldLine: TColor read FGutterFoldLine write FGutterFoldLine;
+    property GutterFoldBG: TColor read FGutterFoldBG write FGutterFoldBG;
+    property CurrentLineBG: TColor read FCurrentLineBG write FCurrentLineBG;
+    property MarginRight: TColor read FMarginRight write FMarginRight;
+    property MarginCaret: TColor read FMarginCaret write FMarginCaret;
+    property MarginUser: TColor read FMarginUser write FMarginUser;
+    property IndentVertLines: TColor read FIndentVertLines write FIndentVertLines;
+    property RulerFont: TColor read FRulerFont write FRulerFont;
+    property RulerBG: TColor read FRulerBG write FRulerBG;
+    property CollapseLine: TColor read FCollapseLine write FCollapseLine;
+    property CollapseMarkFont: TColor read FCollapseMarkFont write FCollapseMarkFont;
+    property CollapseMarkBG: TColor read FCollapseMarkBG write FCollapseMarkBG;
+    property UnprintedFont: TColor read FUnprintedFont write FUnprintedFont;
+    property UnprintedBG: TColor read FUnprintedBG write FUnprintedBG;
+    property UnprintedHexFont: TColor read FUnprintedHexFont write FUnprintedHexFont;
+    property MinimapBorder: TColor read FMinimapBorder write FMinimapBorder;
+    property MinimapSelBG: TColor read FMinimapSelBG write FMinimapSelBG;
+    property StateChanged: TColor read FStateChanged write FStateChanged;
+    property StateAdded: TColor read FStateAdded write FStateAdded;
+    property StateSaved: TColor read FStateSaved write FStateSaved;
+    property LockedBG: TColor read FLockedBG write FLockedBG;
   end;
 
   TATAutoIndentKind = (
@@ -438,7 +470,6 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
-    procedure DoInitColors;
     procedure DoInitPopupMenu;
     function IsCaretBlocked: boolean;
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
@@ -648,14 +679,6 @@ type
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsPosFolded(AX, AY: integer): boolean;
-    //menu
-    property PopupText: TPopupMenu read FMenuText write FMenuText;
-    property PopupGutterBm: TPopupMenu read FMenuGutterBm write FMenuGutterBm;
-    property PopupGutterNum: TPopupMenu read FMenuGutterNum write FMenuGutterNum;
-    property PopupGutterFold: TPopupMenu read FMenuGutterFold write FMenuGutterFold;
-    property PopupMinimap: TPopupMenu read FMenuMinimap write FMenuMinimap;
-    property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
-    property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -710,17 +733,29 @@ type
     procedure WMHScroll(var Msg: TLMHScroll); message LM_HSCROLL;
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
   published
+    property Align;
+    property BorderStyle;
+    property BorderSpacing;
+    property BorderWidth;
+    //menu
+    property PopupText: TPopupMenu read FMenuText write FMenuText;
+    property PopupGutterBm: TPopupMenu read FMenuGutterBm write FMenuGutterBm;
+    property PopupGutterNum: TPopupMenu read FMenuGutterNum write FMenuGutterNum;
+    property PopupGutterFold: TPopupMenu read FMenuGutterFold write FMenuGutterFold;
+    property PopupMinimap: TPopupMenu read FMenuMinimap write FMenuMinimap;
+    property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
+    property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
     //events
-    property OnClickDbl: TATSynEditClickEvent read FOnClickDbl write FOnClickDbl;
+    property OnClickDouble: TATSynEditClickEvent read FOnClickDbl write FOnClickDbl;
     property OnClickTriple: TATSynEditClickEvent read FOnClickTriple write FOnClickTriple;
     property OnClickMiddle: TATSynEditClickEvent read FOnClickMiddle write FOnClickMiddle;
+    property OnClickGutter: TATSynEditClickGutterEvent read FOnClickGutter write FOnClickGutter;
+    property OnClickMicromap: TATSynEditClickMicromapEvent read FOnClickMicromap write FOnClickMicromap;
     property OnCaretMoved: TNotifyEvent read FOnCaretMoved write FOnCaretMoved;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnScrolled: TNotifyEvent read FOnScrolled write FOnScrolled;
     property OnStateChanged: TNotifyEvent read FOnStateChanged write FOnStateChanged;
     property OnCommand: TATSynEditCommandEvent read FOnCommand write FOnCommand;
-    property OnClickGutter: TATSynEditClickGutterEvent read FOnClickGutter write FOnClickGutter;
-    property OnClickMicromap: TATSynEditClickMicromapEvent read FOnClickMicromap write FOnClickMicromap;
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
@@ -1826,7 +1861,7 @@ begin
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
   FColors:= TATSynEditColors.Create;
-  DoInitColors;
+  InitDefaultColors(FColors);
 
   FCursorText:= crIBeam;
   FCursorBm:= crHandPoint;
@@ -3330,41 +3365,6 @@ begin
     FScrollVert.NPos:= Min(NItem, FScrollVert.NMax);
     Update;
   end;
-end;
-
-procedure TATSynEdit.DoInitColors;
-begin
-  FColors.TextFont:= clBlack;
-  FColors.TextBG:= clWhite;
-  FColors.TextSelFont:= clHighlightText;
-  FColors.TextSelBG:= clHighlight;
-  FColors.Caret:= clBlack;
-  FColors.GutterFont:= clGray;
-  FColors.GutterBG:= $e0e0e0;
-  FColors.GutterCaretBG:= $c8c8c8;
-  FColors.GutterPlusBorder:= clGray;
-  FColors.GutterPlusBG:= $f4f4f4;
-  FColors.GutterFoldLine:= clGray;
-  FColors.GutterFoldBG:= $c8c8c8;
-  FColors.CurrentLineBG:= $e0f0f0;
-  FColors.RulerBG:= FColors.GutterBG;
-  FColors.RulerFont:= clGray;
-  FColors.CollapseLine:= $a06060;
-  FColors.CollapseMarkFont:= $e08080;
-  FColors.CollapseMarkBG:= clWhite;
-  FColors.MarginRight:= clLtGray;
-  FColors.MarginCaret:= clLime;
-  FColors.MarginUser:= clYellow;
-  FColors.IndentVertLines:= clMedGray;
-  FColors.UnprintedFont:= $5050f0;
-  FColors.UnprintedBG:= $e0e0e0;
-  FColors.UnprintedHexFont:= clMedGray;
-  FColors.MinimapBorder:= clLtGray;
-  FColors.MinimapSelBG:= $eeeeee;
-  FColors.StateChanged:= $00f0f0;
-  FColors.StateAdded:= $20c020;
-  FColors.StateSaved:= clMedGray;
-  FColors.LockedBG:= $e0e0e0;
 end;
 
 function TATSynEdit.GetUndoLimit: integer;
