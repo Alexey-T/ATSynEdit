@@ -134,28 +134,35 @@ type
 
   TATSynCaretShape = (
     cCaretShapeFull,
-    cCaretShapeVert1px,
-    cCaretShapeVert2px,
-    cCaretShapeVert3px,
-    cCaretShapeVert4px,
-    cCaretShapeVert10percent,
-    cCaretShapeVert20percent,
-    cCaretShapeVert30percent,
-    cCaretShapeVert40percent,
-    cCaretShapeVert50percent,
-    cCaretShapeHorz1px,
-    cCaretShapeHorz2px,
-    cCaretShapeHorz3px,
-    cCaretShapeHorz4px,
-    cCaretShapeHorz10percent,
-    cCaretShapeHorz20percent,
-    cCaretShapeHorz30percent,
-    cCaretShapeHorz40percent,
-    cCaretShapeHorz50percent
+    cCaretShapeVertPixels1,
+    cCaretShapeVertPixels2,
+    cCaretShapeVertPixels3,
+    cCaretShapeVertPixels4,
+    cCaretShapeVertPercents10,
+    cCaretShapeVertPercents15,
+    cCaretShapeVertPercents20,
+    cCaretShapeVertPercents25,
+    cCaretShapeVertPercents30,
+    cCaretShapeVertPercents35,
+    cCaretShapeVertPercents40,
+    cCaretShapeVertPercents50,
+    cCaretShapeHorzPixels1,
+    cCaretShapeHorzPixels2,
+    cCaretShapeHorzPixels3,
+    cCaretShapeHorzPixels4,
+    cCaretShapeHorzPixels5,
+    cCaretShapeHorzPercents10,
+    cCaretShapeHorzPercents15,
+    cCaretShapeHorzPercents20,
+    cCaretShapeHorzPercents25,
+    cCaretShapeHorzPercents30,
+    cCaretShapeHorzPercents35,
+    cCaretShapeHorzPercents40,
+    cCaretShapeHorzPercents50
     );
 
 const
-  cInitCaretShape = cCaretShapeVert1px;
+  cInitCaretShape = cCaretShapeVertPixels1;
   cInitSpacingText = 1;
   cInitSpacingMinimap = -1;
   cInitTimerBlink = 600;
@@ -2943,24 +2950,31 @@ begin
     if R.Top<0 then Continue;
 
     case Shape of
-      cCaretShapeVert1px:       begin R.Right:= R.Left+1; end;
-      cCaretShapeVert2px:       begin R.Right:= R.Left+2; end;
-      cCaretShapeVert3px:       begin R.Right:= R.Left+3; end;
-      cCaretShapeVert4px:       begin R.Right:= R.Left+4; end;
-      cCaretShapeVert10percent: begin R.Right:= R.Left+Trunc(FCharSize.X*0.10); end;
-      cCaretShapeVert20percent: begin R.Right:= R.Left+Trunc(FCharSize.X*0.20); end;
-      cCaretShapeVert30percent: begin R.Right:= R.Left+Trunc(FCharSize.X*0.30); end;
-      cCaretShapeVert40percent: begin R.Right:= R.Left+Trunc(FCharSize.X*0.40); end;
-      cCaretShapeVert50percent: begin R.Right:= R.Left+FCharSize.X div 2; end;
-      cCaretShapeHorz1px:       begin R.Top:= R.Bottom-1; end;
-      cCaretShapeHorz2px:       begin R.Top:= R.Bottom-2; end;
-      cCaretShapeHorz3px:       begin R.Top:= R.Bottom-3; end;
-      cCaretShapeHorz4px:       begin R.Top:= R.Bottom-4; end;
-      cCaretShapeHorz10percent: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.10); end;
-      cCaretShapeHorz20percent: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.20); end;
-      cCaretShapeHorz30percent: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.30); end;
-      cCaretShapeHorz40percent: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.40); end;
-      cCaretShapeHorz50percent: begin R.Top:= R.Bottom-FCharSize.Y div 2; end;
+      cCaretShapeVertPixels1: begin R.Right:= R.Left+1; end;
+      cCaretShapeVertPixels2: begin R.Right:= R.Left+2; end;
+      cCaretShapeVertPixels3: begin R.Right:= R.Left+3; end;
+      cCaretShapeVertPixels4: begin R.Right:= R.Left+4; end;
+      cCaretShapeVertPercents10: begin R.Right:= R.Left+Trunc(FCharSize.X*0.10); end;
+      cCaretShapeVertPercents15: begin R.Right:= R.Left+Trunc(FCharSize.X*0.15); end;
+      cCaretShapeVertPercents20: begin R.Right:= R.Left+Trunc(FCharSize.X*0.20); end;
+      cCaretShapeVertPercents25: begin R.Right:= R.Left+Trunc(FCharSize.X*0.25); end;
+      cCaretShapeVertPercents30: begin R.Right:= R.Left+Trunc(FCharSize.X*0.30); end;
+      cCaretShapeVertPercents35: begin R.Right:= R.Left+Trunc(FCharSize.X*0.35); end;
+      cCaretShapeVertPercents40: begin R.Right:= R.Left+Trunc(FCharSize.X*0.40); end;
+      cCaretShapeVertPercents50: begin R.Right:= R.Left+FCharSize.X div 2; end;
+      cCaretShapeHorzPixels1: begin R.Top:= R.Bottom-1; end;
+      cCaretShapeHorzPixels2: begin R.Top:= R.Bottom-2; end;
+      cCaretShapeHorzPixels3: begin R.Top:= R.Bottom-3; end;
+      cCaretShapeHorzPixels4: begin R.Top:= R.Bottom-4; end;
+      cCaretShapeHorzPixels5: begin R.Top:= R.Bottom-5; end;
+      cCaretShapeHorzPercents10: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.10); end;
+      cCaretShapeHorzPercents15: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.15); end;
+      cCaretShapeHorzPercents20: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.20); end;
+      cCaretShapeHorzPercents25: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.25); end;
+      cCaretShapeHorzPercents30: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.30); end;
+      cCaretShapeHorzPercents35: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.35); end;
+      cCaretShapeHorzPercents40: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.40); end;
+      cCaretShapeHorzPercents50: begin R.Top:= R.Bottom-FCharSize.Y div 2; end;
     end;
 
     if IntersectRect(R, R, FRectMain) then
