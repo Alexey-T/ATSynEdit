@@ -562,7 +562,7 @@ object fmOpt: TfmOpt
           Width = 106
           ItemHeight = 15
           Items.Strings = (
-            'as is'
+            'as prev line'
             'spaces'
             'tabs+spaces'
             'tabs only'
@@ -598,8 +598,8 @@ object fmOpt: TfmOpt
           Left = 8
           Height = 19
           Top = 24
-          Width = 236
-          Caption = 'backspace: unindent (if on 1st nonspace)'
+          Width = 225
+          Caption = 'bksp: auto-unindent (on 1st nonspace)'
           TabOrder = 1
         end
       end
