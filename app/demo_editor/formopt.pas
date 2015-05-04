@@ -109,6 +109,7 @@ type
     Label9: TLabel;
     LabelArr: TLabel;
     LabelArr1: TLabel;
+    ListShapes: TListBox;
     ListCol: TListBox;
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
@@ -404,25 +405,7 @@ end;
 procedure TfmOpt.InitShape(ed: TCombobox);
 begin
   ed.Items.Clear;
-  ed.Items.Add('full');
-  ed.Items.Add('vert 1px');
-  ed.Items.Add('vert 2px');
-  ed.Items.Add('vert 3px');
-  ed.Items.Add('vert 4px');
-  ed.Items.Add('vert 10%');
-  ed.Items.Add('vert 20%');
-  ed.Items.Add('vert 30%');
-  ed.Items.Add('vert 40%');
-  ed.Items.Add('vert 50%');
-  ed.Items.Add('horz 1px');
-  ed.Items.Add('horz 2px');
-  ed.Items.Add('horz 3px');
-  ed.Items.Add('horz 4px');
-  ed.Items.Add('horz 10%');
-  ed.Items.Add('horz 20%');
-  ed.Items.Add('horz 30%');
-  ed.Items.Add('horz 40%');
-  ed.Items.Add('horz 50%');
+  ed.Items.AddStrings(ListShapes.Items);
 end;
 
 end.

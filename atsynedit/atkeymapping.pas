@@ -2,13 +2,14 @@ unit ATKeyMapping;
 
 {$mode objfpc}{$H+}
 
+//{$define test_correct_keynames}
+
 interface
 
 uses
   Classes, SysUtils;
 
 type
-
   { TATKeymapItem }
 
   TATKeymapItem = class
@@ -96,7 +97,10 @@ end;
 function _TextToShortcut(const S: string): TShortcut;
 begin
   Result:= TextToShortCut(S);
-  if Result=0 then Showmessage('Incorrect key: '+S);
+  {$ifdef test_correct_keynames}
+  if Result=0 then
+    Showmessage('Incorrect key in keymap: "'+S+'"');
+  {$endif}
 end;
 
 procedure TATKeymap.Add(ACmd: integer; const AName: string; const AKeys1,

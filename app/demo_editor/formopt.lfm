@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet8
-    TabIndex = 7
+    ActivePage = TabSheet4
+    TabIndex = 4
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -675,8 +675,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet4: TTabSheet
       Caption = 'carets'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 316
+      ClientWidth = 616
       object edCrTime: TSpinEdit
         Left = 8
         Height = 23
@@ -763,6 +763,43 @@ object fmOpt: TfmOpt
         Width = 233
         Caption = 'end of wrapped part: prefer next line pos'
         TabOrder = 6
+      end
+      object ListShapes: TListBox
+        Left = 312
+        Height = 196
+        Top = 212
+        Width = 117
+        Items.Strings = (
+          'Full'
+          'VertPixels1'
+          'VertPixels2'
+          'VertPixels3'
+          'VertPixels4'
+          'VertPercents10'
+          'VertPercents15'
+          'VertPercents20'
+          'VertPercents25'
+          'VertPercents30'
+          'VertPercents35'
+          'VertPercents40'
+          'VertPercents50'
+          'HorzPixels1'
+          'HorzPixels2'
+          'HorzPixels3'
+          'HorzPixels4'
+          'HorzPixels5'
+          'HorzPercents10'
+          'HorzPercents15'
+          'HorzPercents20'
+          'HorzPercents25'
+          'HorzPercents30'
+          'HorzPercents35'
+          'HorzPercents40'
+          'HorzPercents50'
+        )
+        ItemHeight = 15
+        TabOrder = 7
+        Visible = False
       end
     end
     object TabSheet6: TTabSheet
