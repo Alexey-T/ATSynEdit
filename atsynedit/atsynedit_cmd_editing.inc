@@ -155,22 +155,28 @@ begin
     Caret:= FCarets[i];
     NDeleteLen:= ALen;
 
-    if AAllowUnindent and (Caret.PosY>0) then
+    if AAllowUnindent then
     //do only if caret on 1st nonspace char (Delphi)
     begin
       Str:= Strings.Lines[Caret.PosY];
       NIndent:= SGetIndentChars(Str);
       if (Caret.PosX=NIndent) and (NIndent>0) then
       begin
-        Str:= Strings.Lines[Caret.PosY-1];
-        NIndent:= SGetIndentChars(Str);
-        //from indent of prev line: delete to 0
-        if Caret.PosX=NIndent then
+        //on 1st line: delete to 0
+        if Caret.PosY=0 then
           NDeleteLen:= NIndent
         else
-        //from bigger indent: delete to prev indent
-        if Caret.PosX>NIndent then
-          NDeleteLen:= (Caret.PosX-NIndent);
+        begin
+          Str:= Strings.Lines[Caret.PosY-1];
+          NIndent:= SGetIndentChars(Str);
+          //from indent of prev line: delete to 0
+          if Caret.PosX=NIndent then
+            NDeleteLen:= NIndent
+          else
+          //from bigger indent: delete to prev indent
+          if Caret.PosX>NIndent then
+            NDeleteLen:= (Caret.PosX-NIndent);
+        end;
       end;
     end;
 

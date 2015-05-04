@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet5
-    TabIndex = 2
+    ActivePage = TabSheet8
+    TabIndex = 7
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
