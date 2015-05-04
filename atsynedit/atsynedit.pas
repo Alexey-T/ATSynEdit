@@ -290,7 +290,8 @@ type
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
     FOnClickDbl,
-    FOnClickTriple: TATSynEditClickEvent;
+    FOnClickTriple,
+    FOnClickMiddle: TATSynEditClickEvent;
     FOnCaretMoved: TNotifyEvent;
     FOnChanged: TNotifyEvent;
     FOnScrolled: TNotifyEvent;
@@ -409,6 +410,7 @@ type
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
     procedure DoHandleRightClick(X, Y: integer);
+    function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
@@ -704,6 +706,7 @@ type
     //events
     property OnClickDbl: TATSynEditClickEvent read FOnClickDbl write FOnClickDbl;
     property OnClickTriple: TATSynEditClickEvent read FOnClickTriple write FOnClickTriple;
+    property OnClickMiddle: TATSynEditClickEvent read FOnClickMiddle write FOnClickMiddle;
     property OnCaretMoved: TNotifyEvent read FOnCaretMoved write FOnCaretMoved;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnScrolled: TNotifyEvent read FOnScrolled write FOnScrolled;
@@ -2409,12 +2412,15 @@ begin
     FMouseDownPnt:= PCaret;
 
     if Shift=[ssMiddle] then
+    begin
+      if DoHandleClickEvent(FOnClickMiddle) then Exit;
       if FOptMouseNiceScroll then
       begin
         FMouseNiceScrollPos:= Point(X, Y);
         MouseNiceScroll:= true;
-        Exit
       end;
+      Exit
+    end;
 
     if Shift=[ssLeft] then
     begin
@@ -2735,19 +2741,18 @@ begin
     Result:= false;
 end;
 
+function TATSynEdit.DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
+begin
+  Result:= false;
+  if Assigned(AEvent) then
+    AEvent(Self, Result);
+end;
 
 procedure TATSynEdit.DblClick;
-var
-  Handled: boolean;
 begin
   inherited;
 
-  if Assigned(FOnClickDbl) then
-  begin
-    Handled:= false;
-    FOnClickDbl(Self, Handled);
-    if Handled then Exit;
-  end;
+  if DoHandleClickEvent(FOnClickDbl) then Exit;
 
   if FOptMouse2ClickSelectsLine then
     DoSelect_Line_ByClick
@@ -2759,17 +2764,10 @@ begin
 end;
 
 procedure TATSynEdit.TripleClick;
-var
-  Handled: boolean;
 begin
   inherited;
 
-  if Assigned(FOnClickTriple) then
-  begin
-    Handled:= false;
-    FOnClickTriple(Self, Handled);
-    if Handled then Exit;
-  end;
+  if DoHandleClickEvent(FOnClickTriple) then Exit;
 
   if FOptMouse3ClickSelectsLine then
     DoSelect_Line_ByClick;
