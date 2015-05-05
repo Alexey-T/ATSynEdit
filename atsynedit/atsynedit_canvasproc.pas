@@ -42,8 +42,6 @@ procedure CanvasTextOut(C: TCanvas;
   AColorHex: TColor;
   out AStrWidth: integer;
   ACharsSkipped: integer;
-  AArrowSize: integer;
-  AArrowPointerScale: integer;
   AParts: PATLineParts;
   AEvent: TATSynEditDrawLineEvent);
 
@@ -64,9 +62,11 @@ procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; AS
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
 
 var
-  OptUnprintedSpaceDotScale: real = 0.15;
-  OptUnprintedEndDotScale: real = 0.30;
-  OptUnprintedEndFontScale: real = 0.80;
+  OptUnprintedTabCharLength: integer = 2;
+  OptUnprintedTabPointerScale: integer = 25;
+  OptUnprintedSpaceDotScale: integer = 15;
+  OptUnprintedEndDotScale: integer = 30;
+  OptUnprintedEndFontScale: integer = 80;
   OptUnprintedEndFontDx: integer = 3;
   OptUnprintedEndFontDy: integer = 2;
 
@@ -82,14 +82,14 @@ var
   _Pen: TPen = nil;
 
 
-procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: real; AFontColor: TColor);
+procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer; AFontColor: TColor);
 const
   cMinDotSize = 2;
 var
   R: TRect;
   NSize: integer;
 begin
-  NSize:= Max(cMinDotSize, Trunc((ARect.Bottom-ARect.Top)*AScale));
+  NSize:= Max(cMinDotSize, (ARect.Bottom-ARect.Top) * AScale div 100);
   R.Left:= (ARect.Left+ARect.Right) div 2 - NSize div 2;
   R.Top:= (ARect.Top+ARect.Bottom) div 2 - NSize div 2;
   R.Right:= R.Left + NSize;
@@ -99,7 +99,10 @@ begin
   C.FillRect(R);
 end;
 
-procedure DoPaintUnprintedTabulation(C: TCanvas; const ARect: TRect; AColorFont: TColor; ACharSizeX, AArrowSize, AArrowPointerScale: integer);
+procedure DoPaintUnprintedTabulation(C: TCanvas;
+  const ARect: TRect;
+  AColorFont: TColor;
+  ACharSizeX: integer);
 const
   cIndent = 1; //offset left/rt
 var
@@ -108,7 +111,7 @@ begin
   XLeft:= ARect.Left+cIndent;
   XRight:= ARect.Right-cIndent;
 
-  if AArrowSize=0 then
+  if OptUnprintedTabCharLength=0 then
   begin;
     X1:= XLeft;
     X2:= XRight;
@@ -116,11 +119,11 @@ begin
   else
   begin
     X1:= XLeft;
-    X2:= Min(XRight, X1+AArrowSize*ACharSizeX);
+    X2:= Min(XRight, X1+OptUnprintedTabCharLength*ACharSizeX);
   end;
 
   Y:= (ARect.Top+ARect.Bottom) div 2;
-  Dx:= (ARect.Bottom-ARect.Top) * AArrowPointerScale div 100;
+  Dx:= (ARect.Bottom-ARect.Top) * OptUnprintedTabPointerScale div 100;
   C.Pen.Color:= AColorFont;
 
   C.MoveTo(X2, Y);
@@ -136,9 +139,7 @@ procedure DoPaintUnprintedChars(C: TCanvas;
   const AOffsets: TATIntArray;
   APoint: TPoint;
   ACharSize: TPoint;
-  AColorFont: TColor;
-  AArrowSize: integer;
-  AArrowPointerScale: integer);
+  AColorFont: TColor);
 var
   R: TRect;
   i: integer;
@@ -160,7 +161,7 @@ begin
       if AString[i]=' ' then
         DoPaintUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
       else
-        DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X, AArrowSize, AArrowPointerScale);
+        DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X);
     end;
 end;
 
@@ -219,7 +220,7 @@ begin
   if ADetails then
   begin
     NPrevSize:= C.Font.Size;
-    C.Font.Size:= Trunc(C.Font.Size*OptUnprintedEndFontScale);
+    C.Font.Size:= C.Font.Size * OptUnprintedEndFontScale div 100;
     C.Font.Color:= AColorFont;
     C.Brush.Color:= AColorBG;
     C.TextOut(
@@ -262,8 +263,7 @@ end;
 procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   ATabSize: integer; ACharSize: TPoint; AReplaceSpecs: boolean;
   AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
-  AStrWidth: integer; ACharsSkipped: integer; AArrowSize: integer;
-  AArrowPointerScale: integer; AParts: PATLineParts;
+  AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
   AEvent: TATSynEditDrawLineEvent);
 var
   ListReal: TATRealArray;
@@ -366,7 +366,7 @@ begin
     end;
 
   if AShowUnprintable then
-    DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable, AArrowSize, AArrowPointerScale);
+    DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable);
 
   AStrWidth:= ListInt[High(ListInt)];
 

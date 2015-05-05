@@ -9,8 +9,8 @@ uses
   ExtCtrls, ShellCtrls, atstrings, atsynedit, atstringproc;
 
 type
-  { TForm1 }
-  TForm1 = class(TForm)
+  { TfmMain }
+  TfmMain = class(TForm)
     bGettext: TButton;
     Panel1: TPanel;
     Panel2: TPanel;
@@ -28,15 +28,15 @@ type
   end;
 
 var
-  Form1: TForm1;
+  fmMain: TfmMain;
 
 implementation
 
 {$R *.lfm}
 
-{ TForm1 }
+{ TfmMain }
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TfmMain.FormCreate(Sender: TObject);
 begin
   ed:= TATSynEdit.Create(Self);
   ed.Parent:= Panel1;
@@ -46,12 +46,12 @@ begin
   fDir:= ExtractFilePath(Application.Exename)+'..\..\test_files';
 end;
 
-procedure TForm1.FormShow(Sender: TObject);
+procedure TfmMain.FormShow(Sender: TObject);
 begin
   List.Root:= fDir;
 end;
 
-procedure TForm1.ListClick(Sender: TObject);
+procedure TfmMain.ListClick(Sender: TObject);
 var
   s: string;
 begin
@@ -67,7 +67,7 @@ begin
   Caption:= 'App - '+ExtractFileName(s);
 end;
 
-procedure TForm1.bGettextClick(Sender: TObject);
+procedure TfmMain.bGettextClick(Sender: TObject);
 begin
   ShowMessage(UTF8Encode(ed.Strings.TextAll));
 end;

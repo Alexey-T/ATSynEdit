@@ -1,7 +1,7 @@
 object fmMain: TfmMain
-  Left = 503
+  Left = 340
   Height = 419
-  Top = 320
+  Top = 340
   Width = 685
   Caption = 'Test'
   ClientHeight = 419
@@ -77,6 +77,7 @@ object fmMain: TfmMain
     OptGutterPlusSize = 4
     OptGutterShowFoldAlways = True
     OptGutterShowFoldLines = True
+    OptGutterShowFoldLinesAll = False
     OptRulerVisible = True
     OptRulerSize = 19
     OptRulerFontSize = 8
@@ -98,13 +99,13 @@ object fmMain: TfmMain
     OptNumbersShowFirst = True
     OptNumbersShowCarets = False
     OptNumbersSkippedChar = '.'
+    OptNumbersIndentLeft = 5
+    OptNumbersIndentRight = 5
     OptUnprintedVisible = False
     OptUnprintedSpaces = True
     OptUnprintedEnds = True
     OptUnprintedEndsDetails = True
     OptUnprintedReplaceSpec = True
-    OptUnprintedArrowSize = 2
-    OptUnprintedArrowPointer = 25
     OptMouse2ClickSelectsLine = False
     OptMouse3ClickSelectsLine = True
     OptMouse2ClickDragSelectsWords = True
@@ -210,6 +211,7 @@ object fmMain: TfmMain
       OptGutterPlusSize = 4
       OptGutterShowFoldAlways = True
       OptGutterShowFoldLines = True
+      OptGutterShowFoldLinesAll = False
       OptRulerVisible = False
       OptRulerSize = 19
       OptRulerFontSize = 8
@@ -231,13 +233,13 @@ object fmMain: TfmMain
       OptNumbersShowFirst = True
       OptNumbersShowCarets = False
       OptNumbersSkippedChar = '.'
+      OptNumbersIndentLeft = 5
+      OptNumbersIndentRight = 5
       OptUnprintedVisible = False
       OptUnprintedSpaces = True
       OptUnprintedEnds = True
       OptUnprintedEndsDetails = True
       OptUnprintedReplaceSpec = True
-      OptUnprintedArrowSize = 2
-      OptUnprintedArrowPointer = 25
       OptMouse2ClickSelectsLine = False
       OptMouse3ClickSelectsLine = True
       OptMouse2ClickDragSelectsWords = True

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ButtonPanel, Spin, ComCtrls, ATSynedit;
+  ButtonPanel, Spin, ComCtrls, ATSynEdit, ATSynEdit_CanvasProc;
 
 type
   { TfmOpt }
@@ -192,8 +192,8 @@ begin
     chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
     chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
     chkUnprintAsciiRep.Checked:= ed.OptUnprintedReplaceSpec;
-    edTabArrowSize.Value:= ed.OptUnprintedArrowSize;
-    edTabArrowPnt.Value:= ed.OptUnprintedArrowPointer;
+    edTabArrowSize.Value:= OptUnprintedTabCharLength;
+    edTabArrowPnt.Value:= OptUnprintedTabPointerScale;
 
     //caret
     chkCrVirt.Checked:= ed.OptCaretVirtual;
@@ -291,13 +291,13 @@ begin
       ed.OptShowScrollHint:= chkHint.Checked;
 
       //unprint
-      ed.OptUnprintedVisible     := chkUnprintEn.Checked;
-      ed.OptUnprintedSpaces      := chkUnprintSpace.Checked;
-      ed.OptUnprintedEnds        := chkUnprintEnd.Checked;
-      ed.OptUnprintedEndsDetails := chkUnprintEndDet.Checked;
+      ed.OptUnprintedVisible:= chkUnprintEn.Checked;
+      ed.OptUnprintedSpaces:= chkUnprintSpace.Checked;
+      ed.OptUnprintedEnds:= chkUnprintEnd.Checked;
+      ed.OptUnprintedEndsDetails:= chkUnprintEndDet.Checked;
       ed.OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
-      ed.OptUnprintedArrowSize:= edTabArrowSize.Value;
-      ed.OptUnprintedArrowPointer := edTabArrowPnt.Value;
+      OptUnprintedTabCharLength:= edTabArrowSize.Value;
+      OptUnprintedTabPointerScale:= edTabArrowPnt.Value;
 
       //caret
       ed.OptCaretVirtual:= chkCrVirt.Checked;

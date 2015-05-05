@@ -345,8 +345,6 @@ type
     FUnprintedEnds,
     FUnprintedEndsDetails,
     FUnprintedReplaceSpec: boolean;
-    FUnprintedArrowSize: integer;
-    FUnprintedArrowPointer: integer;
     FPrevVisibleColumns: integer;
     FCharSize: TPoint;
     FCharSizeMinimap: TPoint;
@@ -821,8 +819,6 @@ type
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
     property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
-    property OptUnprintedArrowSize: integer read FUnprintedArrowSize write FUnprintedArrowSize;
-    property OptUnprintedArrowPointer: integer read FUnprintedArrowPointer write FUnprintedArrowPointer;
     property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords;
@@ -1561,8 +1557,6 @@ begin
         Trunc(NOutputSpacesSkipped), //todo:
           //needed number of chars of all chars counted as 1.0,
           //while NOutputSpacesSkipped is with cjk counted as 1.7
-        FUnprintedArrowSize,
-        FUnprintedArrowPointer,
         @Parts,
         Event
         );
@@ -1969,8 +1963,6 @@ begin
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsIs;
   FOptTabSpaces:= false;
-  FUnprintedArrowSize:= 2;
-  FUnprintedArrowPointer:= 25; //25% of height
 
   FOptLastLineOnTop:= false;
   FOptOverwriteSel:= true;
