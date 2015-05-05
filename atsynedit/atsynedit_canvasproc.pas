@@ -1,9 +1,8 @@
 unit ATSynEdit_CanvasProc;
 
 {$mode objfpc}{$H+}
-//{$define win_fast} //use Windows api
-//{$define invert_pixels} //slow invert-rect
 
+//{$define invert_pixels} //set to test Mac drawing
 {$ifdef darwin}
   {$define invert_pixels}
 {$endif}
@@ -22,7 +21,7 @@ type
   end;
 
 const
-  cMaxLineParts = 1000;
+  cMaxLineParts = 1000; //big two monitors have sum of 1000 chars
 type
   TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
@@ -64,21 +63,18 @@ procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
 
-const
-  FOptUnprintedDotScale: real = 0.15;
-  FOptUnprintedEndScale: real = 0.30;
-  FOptUnprintedFontScale: real = 0.80;
-  FOptUnprintedFontOffsetX: integer = 3;
-  FOptUnprintedFontOffsetY: integer = 2;
+var
+  OptUnprintedSpaceDotScale: real = 0.15;
+  OptUnprintedEndDotScale: real = 0.30;
+  OptUnprintedEndFontScale: real = 0.80;
+  OptUnprintedEndFontDx: integer = 3;
+  OptUnprintedEndFontDy: integer = 2;
 
 
 implementation
 
 uses
   Math,
-  {$ifdef win_fast}
-  Windows,
-  {$endif}
   LCLType,
   LCLIntf;
 
@@ -162,7 +158,7 @@ begin
       R.Bottom:= R.Top+ACharSize.Y;
 
       if AString[i]=' ' then
-        DoPaintUnprintedSpace(C, R, FOptUnprintedDotScale, AColorFont)
+        DoPaintUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
       else
         DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X, AArrowSize, AArrowPointerScale);
     end;
@@ -223,12 +219,12 @@ begin
   if ADetails then
   begin
     NPrevSize:= C.Font.Size;
-    C.Font.Size:= Trunc(C.Font.Size*FOptUnprintedFontScale);
+    C.Font.Size:= Trunc(C.Font.Size*OptUnprintedEndFontScale);
     C.Font.Color:= AColorFont;
     C.Brush.Color:= AColorBG;
     C.TextOut(
-      APoint.X+FOptUnprintedFontOffsetX,
-      APoint.Y+FOptUnprintedFontOffsetY,
+      APoint.X+OptUnprintedEndFontDx,
+      APoint.Y+OptUnprintedEndFontDy,
       AStrEol);
     C.Font.Size:= NPrevSize;
   end
@@ -236,7 +232,7 @@ begin
   begin
     DoPaintUnprintedSpace(C,
       Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
-      FOptUnprintedEndScale,
+      OptUnprintedEndDotScale,
       AColorFont);
   end;
 end;
