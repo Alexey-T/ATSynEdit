@@ -88,6 +88,8 @@ type
     edSizeEmpty: TSpinEdit;
     edSizeState: TSpinEdit;
     edSizeFold: TSpinEdit;
+    edSizeNum1: TSpinEdit;
+    edSizeNum2: TSpinEdit;
     edTabArrowSize: TSpinEdit;
     edTabArrowPnt: TSpinEdit;
     groupIndent: TGroupBox;
@@ -223,6 +225,8 @@ begin
     edSizeFold.Value:= ed.Gutter[ed.GutterBandFold].Size;
     edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
+    edSizeNum1.Value:= ed.OptNumbersIndentLeft;
+    edSizeNum2.Value:= ed.OptNumbersIndentRight;
 
     //minimap
     edMapFont.Value:= ed.OptMinimapFontSize;
@@ -324,6 +328,8 @@ begin
       ed.Gutter[ed.GutterBandFold].Size:= edSizeFold.Value;
       ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
+      ed.OptNumbersIndentLeft:= edSizeNum1.Value;
+      ed.OptNumbersIndentRight:= edSizeNum2.Value;
 
       //minimap
       ed.OptMinimapFontSize:= edMapFont.Value;

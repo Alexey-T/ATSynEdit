@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet4
-    TabIndex = 4
+    ActivePage = TabSheet8
+    TabIndex = 7
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -316,7 +316,7 @@ object fmOpt: TfmOpt
           Top = 56
           Width = 50
           MinValue = 1
-          TabOrder = 6
+          TabOrder = 8
           Value = 1
         end
         object edSizeEmpty: TSpinEdit
@@ -325,7 +325,7 @@ object fmOpt: TfmOpt
           Top = 112
           Width = 50
           MinValue = 1
-          TabOrder = 8
+          TabOrder = 10
           Value = 1
         end
         object chkGutterFold: TCheckBox
@@ -342,7 +342,7 @@ object fmOpt: TfmOpt
           Top = 84
           Width = 50
           MinValue = 1
-          TabOrder = 7
+          TabOrder = 9
           Value = 1
         end
         object ListCol: TListBox
@@ -352,7 +352,7 @@ object fmOpt: TfmOpt
           Width = 98
           ItemHeight = 0
           ScrollWidth = 40
-          TabOrder = 9
+          TabOrder = 11
         end
         object bColUp: TButton
           Left = 112
@@ -361,7 +361,7 @@ object fmOpt: TfmOpt
           Width = 50
           Caption = '^'
           OnClick = bColUpClick
-          TabOrder = 10
+          TabOrder = 12
         end
         object bColDown: TButton
           Left = 112
@@ -370,7 +370,25 @@ object fmOpt: TfmOpt
           Width = 50
           Caption = 'v'
           OnClick = bColDownClick
-          TabOrder = 11
+          TabOrder = 13
+        end
+        object edSizeNum1: TSpinEdit
+          Left = 72
+          Height = 23
+          Top = 28
+          Width = 42
+          MinValue = 1
+          TabOrder = 6
+          Value = 1
+        end
+        object edSizeNum2: TSpinEdit
+          Left = 120
+          Height = 23
+          Top = 28
+          Width = 42
+          MinValue = 1
+          TabOrder = 7
+          Value = 1
         end
       end
       object edNumSkip: TEdit
