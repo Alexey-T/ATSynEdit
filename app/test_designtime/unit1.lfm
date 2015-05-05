@@ -1,17 +1,17 @@
 object fmMain: TfmMain
   Left = 503
-  Height = 434
+  Height = 419
   Top = 320
   Width = 685
   Caption = 'Test'
-  ClientHeight = 434
+  ClientHeight = 419
   ClientWidth = 685
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.5'
   object ed: TATSynEdit
     Left = 6
-    Height = 368
+    Height = 353
     Top = 6
     Width = 673
     Align = alClient
@@ -138,7 +138,7 @@ object fmMain: TfmMain
   object Panel1: TPanel
     Left = 0
     Height = 54
-    Top = 380
+    Top = 365
     Width = 685
     Align = alBottom
     ClientHeight = 54

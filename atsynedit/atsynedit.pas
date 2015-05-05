@@ -232,8 +232,6 @@ const
   cSpeedScrollNiceVert = 1; //... speed y
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldLineDx = 3;
-  cSizeGutterNumOffsetLeft = 5; //offset lefter line-num, px
-  cSizeGutterNumOffsetRight = 4; //offset righter line-num
   cSizeRulerHeight = 19;
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 7;
@@ -409,6 +407,8 @@ type
     FOptNumbersShowFirst,
     FOptNumbersShowCarets: boolean;
     FOptNumbersSkippedChar: atString;
+    FOptNumbersIndentLeft,
+    FOptNumbersIndentRight: integer;
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
@@ -818,6 +818,8 @@ type
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst;
     property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets;
     property OptNumbersSkippedChar: atString read FOptNumbersSkippedChar write FOptNumbersSkippedChar;
+    property OptNumbersIndentLeft: integer read FOptNumbersIndentLeft write FOptNumbersIndentLeft;
+    property OptNumbersIndentRight: integer read FOptNumbersIndentRight write FOptNumbersIndentRight;
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible;
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
@@ -1632,7 +1634,7 @@ begin
             C.Font.Size:= FOptNumbersFontSize;
 
           Str:= DoFormatLineNumber(NLinesIndex+1);
-          NCoordLeftNums:= FGutter[FGutterBandNum].Right - C.TextWidth(Str) - cSizeGutterNumOffsetRight;
+          NCoordLeftNums:= FGutter[FGutterBandNum].Right - C.TextWidth(Str) - FOptNumbersIndentRight;
 
           C.TextOut(NCoordLeftNums, NCoordTop, Str);
           C.Font.Size:= Font.Size;
@@ -1936,6 +1938,8 @@ begin
   FOptNumbersShowFirst:= true;
   FOptNumbersShowCarets:= false;
   FOptNumbersSkippedChar:= '.';
+  FOptNumbersIndentLeft:= 5;
+  FOptNumbersIndentRight:= 5;
 
   FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
@@ -2265,8 +2269,8 @@ begin
   Str:= IntToStr(Max(10, Strings.Count));
   Result:=
     Length(Str)*CharSize+
-    cSizeGutterNumOffsetLeft+
-    cSizeGutterNumOffsetRight;
+    FOptNumbersIndentLeft+
+    FOptNumbersIndentRight;
 
   if FOptNumbersFontSize<>0 then
     C.Font.Size:= Font.Size;
