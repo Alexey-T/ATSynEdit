@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet8
-    TabIndex = 7
+    ActivePage = TabSheet2
+    TabIndex = 1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -164,7 +164,7 @@ object fmOpt: TfmOpt
         Width = 50
         MaxValue = 80
         MinValue = 4
-        TabOrder = 7
+        TabOrder = 8
         Value = 4
       end
       object edRulerFSize: TSpinEdit
@@ -173,7 +173,7 @@ object fmOpt: TfmOpt
         Top = 52
         Width = 50
         MaxValue = 40
-        TabOrder = 8
+        TabOrder = 9
         Value = 4
       end
       object Label2: TLabel
@@ -237,7 +237,7 @@ object fmOpt: TfmOpt
         Top = 84
         Width = 50
         MaxValue = 40
-        TabOrder = 9
+        TabOrder = 10
         Value = 5
       end
       object Label1: TLabel
@@ -268,7 +268,7 @@ object fmOpt: TfmOpt
         Caption = 'columns'
         ClientHeight = 280
         ClientWidth = 172
-        TabOrder = 6
+        TabOrder = 7
         object chkGutterBm: TCheckBox
           Left = 8
           Height = 19
@@ -396,7 +396,7 @@ object fmOpt: TfmOpt
         Height = 23
         Top = 156
         Width = 50
-        TabOrder = 11
+        TabOrder = 12
       end
       object Label13: TLabel
         Left = 407
@@ -412,7 +412,7 @@ object fmOpt: TfmOpt
         Top = 124
         Width = 50
         MaxValue = 40
-        TabOrder = 10
+        TabOrder = 11
         Value = 5
       end
       object Label14: TLabel
@@ -438,6 +438,14 @@ object fmOpt: TfmOpt
         Width = 101
         Caption = 'show fold-lines'
         TabOrder = 5
+      end
+      object chkShowFoldLinesAll: TCheckBox
+        Left = 24
+        Height = 19
+        Top = 156
+        Width = 83
+        Caption = 'all line parts'
+        TabOrder = 6
       end
     end
     object TabSheet5: TTabSheet

@@ -15,6 +15,7 @@ type
     bColUp: TButton;
     bColDown: TButton;
     ButtonPanel1: TButtonPanel;
+    chkShowFoldLinesAll: TCheckBox;
     chkBackspUnindent: TCheckBox;
     chkEnterIndent: TCheckBox;
     chkPopupDown: TCheckBox;
@@ -213,6 +214,7 @@ begin
     chkShowNumBg.Checked:= ed.OptShowGutterCaretBG;
     chkShowFoldAlways.Checked:= ed.OptGutterShowFoldAlways;
     chkShowFoldLines.Checked:= ed.OptGutterShowFoldLines;
+    chkShowFoldLinesAll.Checked:= ed.OptGutterShowFoldLinesAll;
     edRulerSize.Value:= ed.OptRulerSize;
     edRulerFSize.Value:= ed.OptRulerFontSize;
 
@@ -314,6 +316,7 @@ begin
       ed.OptNumbersSkippedChar:= edNumSkip.Text;
       ed.OptGutterShowFoldAlways := chkShowFoldAlways.Checked;
       ed.OptGutterShowFoldLines := chkShowFoldLines.Checked;
+      ed.OptGutterShowFoldLinesAll := chkShowFoldLinesAll.Checked;
       ed.OptGutterPlusSize:= edPlusSize.Value;
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;

@@ -36,12 +36,6 @@ type
     cDirDown
     );
 
-  TATFoldBarState = (
-    cFoldBegin,
-    cFoldEnd,
-    cFoldMiddle
-    );
-
   TATCommandResult = (
     cResultText,
     cResultCaretAny,
@@ -402,6 +396,7 @@ type
     FOptGutterPlusSize: integer;
     FOptGutterShowFoldAlways: boolean;
     FOptGutterShowFoldLines: boolean;
+    FOptGutterShowFoldLinesAll: boolean;
     FOptNumbersFontSize: integer;
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
@@ -796,6 +791,7 @@ type
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize;
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways;
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines;
+    property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
@@ -1918,6 +1914,7 @@ begin
   FOptGutterPlusSize:= cInitGutterPlusSize;
   FOptGutterShowFoldAlways:= true;
   FOptGutterShowFoldLines:= true;
+  FOptGutterShowFoldLinesAll:= false;
 
   FGutterBandBm:= 0;
   FGutterBandNum:= 1;
@@ -3457,12 +3454,34 @@ procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
   ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
 var
   List: TATIntArray;
-  State: TATFoldBarState;
+  State: (cFoldbarNone, cFoldbarBegin, cFoldbarEnd, cFoldbarMiddle);
+  CoordXM, CoordYM: integer;
   WrapItem: TATSynWrapItem;
   LineIndex: integer;
-  CoordXM, CoordYM: integer;
+  IsPlus, IsLineUp, IsLineDown: boolean;
   i: integer;
-  IsPlus: boolean;
+  //
+  procedure DrawUp;
+  begin
+    if IsLineUp then
+      C.Line(
+        CoordXM,
+        ACoordY1,
+        CoordXM,
+        CoordYM
+        );
+  end;
+  procedure DrawDown;
+  begin
+    if IsLineDown then
+      C.Line(
+        CoordXM,
+        CoordYM,
+        CoordXM,
+        ACoordY2
+        );
+  end;
+  //
 begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then Exit;
@@ -3474,24 +3493,31 @@ begin
   if Length(List)=0 then Exit;
 
   //calc state
-  State:= cFoldMiddle;
+  State:= cFoldbarNone;
   IsPlus:= false;
+  IsLineUp:= false;
+  IsLineDown:= false;
 
   for i:= Low(List) to High(List) do
     with FFold[List[i]] do
     begin
-      if Y=LineIndex then begin State:= cFoldBegin; IsPlus:= Folded; Break end;
-      if Y2=LineIndex then State:= cFoldEnd;
+      if Y<LineIndex then IsLineUp:= true;
+      if Y2>LineIndex then IsLineDown:= true;
+      if Y=LineIndex then
+        begin State:= cFoldbarBegin; IsPlus:= Folded; end;
+      if Y2=LineIndex then
+        if State<>cFoldbarBegin then State:= cFoldbarEnd;
     end;
 
-  //correct states for wrapped line
-  if State=cFoldBegin then
+  //correct state for wrapped line
+  if State=cFoldbarBegin then
     if not FWrapInfo.IsItemInitial(AWrapItemIndex) then
-      State:= cFoldMiddle;
+      State:= cFoldbarMiddle;
 
-  if State=cFoldEnd then
+  //correct state for wrapped line
+  if State=cFoldbarEnd then
     if WrapItem.NFinal=cWrapItemMiddle then
-      State:= cFoldMiddle;
+      State:= cFoldbarMiddle;
 
   C.Pen.Color:= IfThen(FOptGutterShowFoldLines,
     FColors.GutterFoldLine,
@@ -3501,15 +3527,14 @@ begin
   CoordYM:= (ACoordY1+ACoordY2) div 2;
 
   case State of
-    cFoldBegin:
+    cFoldbarBegin:
       begin
+        if FOptGutterShowFoldLinesAll then
+          begin DrawUp; DrawDown; end;
+
         if not IsPlus then
-          C.Line(
-            CoordXM,
-            CoordYM,
-            CoordXM,
-            ACoordY2
-            );
+          DrawDown;
+
         CanvasPaintPlusMinus(C,
           FColors.GutterPlusBorder,
           FColors.GutterPlusBG,
@@ -3517,8 +3542,11 @@ begin
           FOptGutterPlusSize,
           IsPlus);
       end;
-    cFoldEnd:
+    cFoldbarEnd:
       begin
+        if FOptGutterShowFoldLinesAll then
+          begin DrawUp; DrawDown; end;
+
         Dec(ACoordY2, cSizeGutterFoldLineDx);
         C.Line(
           CoordXM,
@@ -3533,7 +3561,7 @@ begin
           ACoordY2
           );
       end;
-    cFoldMiddle:
+    cFoldbarMiddle:
       begin
         C.Line(
           CoordXM,
@@ -3541,6 +3569,11 @@ begin
           CoordXM,
           ACoordY2
           );
+      end;
+    else
+      begin
+        DrawUp;
+        DrawDown;
       end;
   end;
 end;
