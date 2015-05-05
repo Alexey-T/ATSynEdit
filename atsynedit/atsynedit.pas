@@ -921,7 +921,7 @@ var
 begin
   CharBig:= FCharSize.X;
   C.Font.Size:= FMinimapFontSize;
-  CharSmall:= CanvasFontSizes(C).cx;
+  CharSmall:= CanvasFontSizes(C).X;
   C.Font.Size:= Font.Size;
 
   FMinimapWidth:= (ClientWidth - IfThen(FMicromapVisible, FMicromapWidth) - FTextOffset.X)*CharSmall div (CharSmall+CharBig);
@@ -1378,11 +1378,11 @@ end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
 var
-  Size: TSize;
+  Size: TPoint;
 begin
   Size:= CanvasFontSizes(C);
-  Result.X:= Max(1, Size.cx + ACharSpacing.X);
-  Result.Y:= Max(1, Size.cy + ACharSpacing.Y);
+  Result.X:= Max(1, Size.X + ACharSpacing.X);
+  Result.Y:= Max(1, Size.Y + ACharSpacing.Y);
 end;
 
 procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop, ABottom: integer);

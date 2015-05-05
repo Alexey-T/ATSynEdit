@@ -2,7 +2,7 @@ unit ATSynEdit_CanvasProc;
 
 {$mode objfpc}{$H+}
 
-//{$define invert_pixels} //set to test Mac drawing
+//{$define invert_pixels} //test Mac caret blinking
 {$ifdef darwin}
   {$define invert_pixels}
 {$endif}
@@ -21,7 +21,7 @@ type
   end;
 
 const
-  cMaxLineParts = 1000; //big two monitors have sum of 1000 chars
+  cMaxLineParts = 1000; //big two monitors have sum linelen about 1000
 type
   TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
@@ -55,7 +55,7 @@ procedure DoPaintUnprintedEol(C: TCanvas;
 function CanvasTextSpaces(const S: atString; ATabSize: integer): real;
 function CanvasTextWidth(const S: atString; ATabSize: integer; ACharSize: TPoint): integer;
 
-function CanvasFontSizes(C: TCanvas): TSize;
+function CanvasFontSizes(C: TCanvas): TPoint;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
@@ -239,9 +239,13 @@ begin
 end;
 
 
-function CanvasFontSizes(C: TCanvas): TSize;
+function CanvasFontSizes(C: TCanvas): TPoint;
+var
+  Size: TSize;
 begin
-  Result:= C.TextExtent('M');
+  Size:= C.TextExtent('M');
+  Result.X:= Size.cx;
+  Result.Y:= Size.cy;
 end;
 
 function CanvasTextSpaces(const S: atString; ATabSize: integer): real;
