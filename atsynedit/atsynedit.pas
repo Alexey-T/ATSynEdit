@@ -241,7 +241,7 @@ const
   cMaxCaretTime = 2000;
   cMinCharsAfterAnyIndent = 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
   cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
-  cHintScrollPrefix = 'Line';
+  cHintScrollPrefix: string = 'Line';
   cHintScrollDx = 5;
 
 var

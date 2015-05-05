@@ -64,6 +64,13 @@ procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
 
+const
+  FOptUnprintedDotScale: real = 0.15;
+  FOptUnprintedEndScale: real = 0.30;
+  FOptUnprintedFontScale: real = 0.80;
+  FOptUnprintedFontOffsetX: integer = 3;
+  FOptUnprintedFontOffsetY: integer = 2;
+
 
 implementation
 
@@ -74,13 +81,6 @@ uses
   {$endif}
   LCLType,
   LCLIntf;
-
-const
-  cUnprintedDotScale = 0.15;
-  cUnprintedEndScale = 0.30;
-  cUnprintedFontScale = 0.80;
-  cUnprintedFontOffsetX = 3;
-  cUnprintedFontOffsetY = 2;
 
 var
   _Pen: TPen = nil;
@@ -162,7 +162,7 @@ begin
       R.Bottom:= R.Top+ACharSize.Y;
 
       if AString[i]=' ' then
-        DoPaintUnprintedSpace(C, R, cUnprintedDotScale, AColorFont)
+        DoPaintUnprintedSpace(C, R, FOptUnprintedDotScale, AColorFont)
       else
         DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X, AArrowSize, AArrowPointerScale);
     end;
@@ -223,12 +223,12 @@ begin
   if ADetails then
   begin
     NPrevSize:= C.Font.Size;
-    C.Font.Size:= Trunc(C.Font.Size*cUnprintedFontScale);
+    C.Font.Size:= Trunc(C.Font.Size*FOptUnprintedFontScale);
     C.Font.Color:= AColorFont;
     C.Brush.Color:= AColorBG;
     C.TextOut(
-      APoint.X+cUnprintedFontOffsetX,
-      APoint.Y+cUnprintedFontOffsetY,
+      APoint.X+FOptUnprintedFontOffsetX,
+      APoint.Y+FOptUnprintedFontOffsetY,
       AStrEol);
     C.Font.Size:= NPrevSize;
   end
@@ -236,7 +236,7 @@ begin
   begin
     DoPaintUnprintedSpace(C,
       Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
-      cUnprintedEndScale,
+      FOptUnprintedEndScale,
       AColorFont);
   end;
 end;
