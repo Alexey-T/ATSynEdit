@@ -560,8 +560,13 @@ end;
 
 procedure TfmMain.btnLoadClick(Sender: TObject);
 begin
+  wait:= true;
+
   LoadComponentFromFile(ed, FIniName, nil);
   ed.Update(true);
+
+  UpdateChecks;
+  wait:= false;
 end;
 
 
