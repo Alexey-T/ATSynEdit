@@ -21,7 +21,8 @@ uses
   atsynedit_gutter,
   atsynedit_commands,
   atsynedit_keymap_init,
-  atsynedit_wrapinfo, atsynedit_edits, atsynedit_ranges, formcombo;
+  atsynedit_wrapinfo, atsynedit_edits, atsynedit_ranges, formcombo,
+  atsavecomp;
 
 {$R *.res}
 

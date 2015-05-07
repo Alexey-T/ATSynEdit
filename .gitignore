@@ -27,3 +27,4 @@ backup/
 *.copy
 project?
 demo
+*.ini

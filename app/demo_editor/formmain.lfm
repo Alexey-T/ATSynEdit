@@ -369,13 +369,26 @@ object fmMain: TfmMain
         OnClick = mnuPaneClick
       end
     end
-    object mnuHlp: TMenuItem
-      Caption = 'Help'
+    object MenuItem9: TMenuItem
+      Caption = 'Options'
       object mnuOpt: TMenuItem
         Caption = 'options..'
         ShortCut = 120
         OnClick = bOptClick
       end
+      object mnuSave: TMenuItem
+        Caption = 'save'
+        ShortCut = 113
+        OnClick = btnSaveClick
+      end
+      object mnuLoad: TMenuItem
+        Caption = 'load'
+        ShortCut = 32881
+        OnClick = btnLoadClick
+      end
+    end
+    object mnuHlp: TMenuItem
+      Caption = 'Help'
       object mnuKey: TMenuItem
         Caption = 'commands..'
         ShortCut = 112

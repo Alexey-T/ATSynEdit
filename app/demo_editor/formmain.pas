@@ -13,7 +13,7 @@ uses
   ATSynEdit_CanvasProc,
   formkey,
   formopt,
-  formcombo;
+  formcombo, atsavecomp;
 
 type
   { TfmMain }
@@ -50,6 +50,8 @@ type
     Label9: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
+    mnuSave: TMenuItem;
+    mnuLoad: TMenuItem;
     MenuItem2: TMenuItem;
     btnHlp: TMenuItem;
     MenuItem3: TMenuItem;
@@ -57,6 +59,7 @@ type
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     MenuItem8: TMenuItem;
+    MenuItem9: TMenuItem;
     mnuBms: TMenuItem;
     mnuOneLine: TMenuItem;
     mnuPane: TMenuItem;
@@ -96,6 +99,8 @@ type
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
     procedure btnHlpClick(Sender: TObject);
+    procedure btnLoadClick(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
@@ -133,6 +138,7 @@ type
     ed: TATSynEdit;
     wait: boolean;
     FDir: string;
+    FIniName: string;
     procedure DoOpen(const fn: string);
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
@@ -209,6 +215,8 @@ procedure TfmMain.FormShow(Sender: TObject);
 var
   fn: string;
 begin
+  FIniName:= ExtractFilePath(Application.ExeName)+'saved.ini';
+
   if wait then UpdateChecks;
   wait:= false;
   ActiveControl:= ed;
@@ -550,6 +558,18 @@ begin
   Showmessage(txt);
 end;
 
+procedure TfmMain.btnLoadClick(Sender: TObject);
+begin
+  LoadComponentFromFile(ed, FIniName, nil);
+  ed.Update(true);
+end;
+
+
+procedure TfmMain.btnSaveClick(Sender: TObject);
+begin
+  SaveComponentToFile(ed, FIniName);
+end;
+
 procedure TfmMain.chkGutterChange(Sender: TObject);
 begin
   if wait then Exit;
@@ -636,23 +656,44 @@ begin
 end;
 
 procedure TfmMain.chkWrapMarginChange(Sender: TObject);
+var
+  N: integer;
 begin
   if wait then Exit;
+  N:= ed.ScrollTop;
   ed.OptWrapMode:= cWrapAtMargin;
+  ed.update;
+
+  Application.ProcessMessages;
+  ed.ScrollTop:= N;
   ed.update;
 end;
 
 procedure TfmMain.chkWrapOffChange(Sender: TObject);
+var
+  N: integer;
 begin
   if wait then Exit;
+  N:= ed.ScrollTop;
   ed.OptWrapMode:= cWrapOff;
+  ed.update;
+
+  Application.ProcessMessages;
+  ed.ScrollTop:= N;
   ed.update;
 end;
 
 procedure TfmMain.chkWrapOnChange(Sender: TObject);
+var
+  N: integer;
 begin
   if wait then Exit;
+  N:= ed.ScrollTop;
   ed.OptWrapMode:= cWrapOn;
+  ed.update;
+
+  Application.ProcessMessages;
+  ed.ScrollTop:= N;
   ed.update;
 end;
 

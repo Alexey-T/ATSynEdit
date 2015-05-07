@@ -730,6 +730,7 @@ type
     property BorderStyle;
     property BorderSpacing;
     property BorderWidth;
+    property Font;
     //menu
     property PopupText: TPopupMenu read FMenuText write FMenuText;
     property PopupGutterBm: TPopupMenu read FMenuGutterBm write FMenuGutterBm;
