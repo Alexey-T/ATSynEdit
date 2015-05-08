@@ -11,11 +11,12 @@ object fmCmd: TfmCmd
   Position = poScreenCenter
   LCLVersion = '1.5'
   object List: TListView
-    Left = 0
-    Height = 583
-    Top = 0
-    Width = 679
+    Left = 6
+    Height = 577
+    Top = 6
+    Width = 667
     Align = alClient
+    BorderSpacing.Around = 6
     Columns = <    
       item
         Caption = 'name'

@@ -1,4 +1,4 @@
-unit atsavecomp;
+unit proc_StreamComponent;
 
 {$mode objfpc}{$H+}
 

@@ -13,7 +13,8 @@ uses
   ATSynEdit_CanvasProc,
   formkey,
   formopt,
-  formcombo, atsavecomp;
+  formcombo, 
+  proc_streamcomponent;
 
 type
   { TfmMain }

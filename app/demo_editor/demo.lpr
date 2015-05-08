@@ -9,7 +9,6 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
-  formmain, formkey, formopt,
   atsynedit_canvasproc,
   atsynedit_keymap,
   atstringproc,
@@ -21,8 +20,14 @@ uses
   atsynedit_gutter,
   atsynedit_commands,
   atsynedit_keymap_init,
-  atsynedit_wrapinfo, atsynedit_edits, atsynedit_ranges, formcombo,
-  atsavecomp;
+  atsynedit_wrapinfo,
+  atsynedit_edits,
+  atsynedit_ranges,
+  formmain,
+  formkey,
+  formopt,
+  formcombo,
+  proc_StreamComponent;
 
 {$R *.res}
 
