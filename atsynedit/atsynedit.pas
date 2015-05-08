@@ -2677,7 +2677,9 @@ begin
   RectNums.Bottom:= FRectMain.Bottom;
 
   //start scroll timer
-  FTimerScroll.Enabled:= (ssLeft in Shift) and (not PtInRect(FRectMain, P));
+  FTimerScroll.Enabled:=
+    (ssLeft in Shift) and
+    (not PtInRect(ClientRect, P) or FCursorOnGutter);
   FMouseAutoScroll:= cDirNone;
   if P.Y<FRectMain.Top then FMouseAutoScroll:= cDirUp else
   if P.Y>=FRectMain.Bottom then FMouseAutoScroll:= cDirDown else
