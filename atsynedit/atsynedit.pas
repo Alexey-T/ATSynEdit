@@ -9,10 +9,7 @@ License: MPL 2.0
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
 //{$define test_foldlist}
-
-{$ifndef LCL_QT}
-  {$define allow_proc_msg}
-{$endif}
+{$define allow_proc_msg}
 
 unit ATSynEdit;
 
