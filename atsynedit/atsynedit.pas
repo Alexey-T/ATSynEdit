@@ -8,7 +8,11 @@ License: MPL 2.0
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
-{$define test_foldlist}
+//{$define test_foldlist}
+
+{$ifndef LCL_QT}
+  {$define allow_proc_msg}
+{$endif}
 
 unit ATSynEdit;
 
@@ -1195,7 +1199,7 @@ begin
     FScrollHorz.NPos:= 0;
 
   Invalidate;
-  Application.ProcessMessages;
+  AppProcessMessages;
   ScrollTop:= NLine;
   Invalidate;
 end;
@@ -2361,7 +2365,7 @@ begin
   end;
 
   Invalidate;
-  Application.ProcessMessages; //for ScrollTop
+  AppProcessMessages;
   ScrollTop:= NLine;
   Invalidate;
 end;
@@ -3420,7 +3424,7 @@ begin
   NTop:= ScrollTop;
   Font.Size:= Font.Size+BoolToPlusMinusOne(AInc);
   Update;
-  Application.ProcessMessages; //needed to apply Scrolltop
+  AppProcessMessages;
 
   ScrollTop:= NTop;
   Update;

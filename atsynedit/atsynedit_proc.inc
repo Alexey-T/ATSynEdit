@@ -77,3 +77,10 @@ begin
 end;
 
 
+procedure AppProcessMessages;
+begin
+  {$ifdef allow_proc_msg}
+  Application.ProcessMessages;
+  {$endif}
+end;
+
