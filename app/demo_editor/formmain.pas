@@ -106,6 +106,7 @@ type
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormResize(Sender: TObject);
     procedure mnuBmsClick(Sender: TObject);
     procedure mnuOneLineClick(Sender: TObject);
     procedure mnuPaneClick(Sender: TObject);
@@ -602,6 +603,11 @@ begin
   //
 end;
 
+procedure TfmMain.FormResize(Sender: TObject);
+begin
+  //
+end;
+
 procedure TfmMain.mnuBmsClick(Sender: TObject);
 begin
   mnuTBmsClick(Self);
@@ -662,45 +668,21 @@ begin
 end;
 
 procedure TfmMain.chkWrapMarginChange(Sender: TObject);
-var
-  N: integer;
 begin
   if wait then Exit;
-  N:= ed.ScrollTop;
   ed.OptWrapMode:= cWrapAtMargin;
-  ed.update;
-
-  Application.ProcessMessages;
-  ed.ScrollTop:= N;
-  ed.update;
 end;
 
 procedure TfmMain.chkWrapOffChange(Sender: TObject);
-var
-  N: integer;
 begin
   if wait then Exit;
-  N:= ed.ScrollTop;
   ed.OptWrapMode:= cWrapOff;
-  ed.update;
-
-  Application.ProcessMessages;
-  ed.ScrollTop:= N;
-  ed.update;
 end;
 
 procedure TfmMain.chkWrapOnChange(Sender: TObject);
-var
-  N: integer;
 begin
   if wait then Exit;
-  N:= ed.ScrollTop;
   ed.OptWrapMode:= cWrapOn;
-  ed.update;
-
-  Application.ProcessMessages;
-  ed.ScrollTop:= N;
-  ed.update;
 end;
 
 procedure TfmMain.chkWrapIndentChange(Sender: TObject);

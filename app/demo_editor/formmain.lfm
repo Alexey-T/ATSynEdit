@@ -9,6 +9,7 @@ object fmMain: TfmMain
   Menu = MainMenu1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnResize = FormResize
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.5'

@@ -1181,13 +1181,23 @@ begin
 end;
 
 procedure TATSynEdit.SetWrapMode(AValue: TATSynWrapMode);
+var
+  NLine: integer;
 begin
   if FWrapMode=AValue then Exit;
+
+  NLine:= ScrollTop;
+
   FWrapMode:= AValue;
   FWrapUpdateNeeded:= true;
 
   if FWrapMode<>cWrapOff then
     FScrollHorz.NPos:= 0;
+
+  Invalidate;
+  Application.ProcessMessages;
+  ScrollTop:= NLine;
+  Invalidate;
 end;
 
 procedure TATSynEdit.SetWrapIndented(AValue: boolean);
@@ -2333,13 +2343,16 @@ end;
 procedure TATSynEdit.DoOnResize;
 var
   SizeX, SizeY: integer;
+  NLine: integer;
 begin
   inherited;
 
+  NLine:= ScrollTop;
+
   if Assigned(FBitmap) then
   begin
-    SizeX:= ((Width div cResizeBitmapStep)+1)*cResizeBitmapStep;
-    SizeY:= ((Height div cResizeBitmapStep)+1)*cResizeBitmapStep;
+    SizeX:= (Width div cResizeBitmapStep + 1)*cResizeBitmapStep;
+    SizeY:= (Height div cResizeBitmapStep + 1)*cResizeBitmapStep;
     if (SizeX>FBitmap.Width) or (SizeY>FBitmap.Height) then
     begin
       FBitmap.SetSize(SizeX, SizeY);
@@ -2347,6 +2360,9 @@ begin
     end;
   end;
 
+  Invalidate;
+  Application.ProcessMessages; //for ScrollTop
+  ScrollTop:= NLine;
   Invalidate;
 end;
 
