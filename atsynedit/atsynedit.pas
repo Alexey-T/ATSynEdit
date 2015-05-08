@@ -395,6 +395,7 @@ type
     FOptGutterShowFoldAlways: boolean;
     FOptGutterShowFoldLines: boolean;
     FOptGutterShowFoldLinesAll: boolean;
+    FOptNumbersAutosize: boolean;
     FOptNumbersFontSize: integer;
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
@@ -808,6 +809,7 @@ type
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented;
     property OptMarginRight: integer read FMarginRight write SetMarginRight;
     property OptMarginString: string read GetMarginString write SetMarginString;
+    property OptNumbersAutosize: boolean read FOptNumbersAutosize write FOptNumbersAutosize;
     property OptNumbersFontSize: integer read FOptNumbersFontSize write FOptNumbersFontSize;
     property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle;
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst;
@@ -1345,8 +1347,10 @@ begin
   FCharSize:= GetCharSize(C, FCharSpacingText);
   FCharSizeMinimap:= Point(8, 8);
 
-  if FOptGutterVisible then UpdateGutterAutosize(C);
-  if FMinimapVisible then UpdateMinimapAutosize(C);
+  if FOptGutterVisible and FOptNumbersAutosize then
+    UpdateGutterAutosize(C);
+  if FMinimapVisible then
+    UpdateMinimapAutosize(C);
 
   FTextOffset:= GetTextOffset; //after gutter autosize
   FRectMinimap:= GetRectMinimap;
@@ -1925,6 +1929,7 @@ begin
   FGutter[FGutterBandEmpty].Size:= cGutterSizeEmpty;
   FGutter.Update;
 
+  FOptNumbersAutosize:= true;
   FOptNumbersFontSize:= 0;
   FOptNumbersStyle:= cInitNumbersStyle;
   FOptNumbersShowFirst:= true;

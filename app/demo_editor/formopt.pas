@@ -15,6 +15,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkGutterNumAuto: TCheckBox;
     chkGutterBm: TCheckBox;
     chkGutterEmpty: TCheckBox;
     chkGutterFold: TCheckBox;
@@ -90,7 +91,7 @@ type
     edSizeFold: TSpinEdit;
     edSizeNum1: TSpinEdit;
     edSizeNum2: TSpinEdit;
-    edSizeNum0: TSpinEdit;
+    edSizeNum: TSpinEdit;
     edSizeState: TSpinEdit;
     edTabArrowSize: TSpinEdit;
     edTabArrowPnt: TSpinEdit;
@@ -233,8 +234,10 @@ begin
     edSizeFold.Value:= ed.Gutter[ed.GutterBandFold].Size;
     edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
+    edSizeNum.Value:= ed.Gutter[ed.GutterBandNum].Size;
     edSizeNum1.Value:= ed.OptNumbersIndentLeft;
     edSizeNum2.Value:= ed.OptNumbersIndentRight;
+    chkGutterNumAuto.Checked:= ed.OptNumbersAutosize;
 
     //minimap
     edMapFont.Value:= ed.OptMinimapFontSize;
@@ -334,9 +337,11 @@ begin
       ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
       ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
       ed.Gutter[ed.GutterBandBm].Size:= edSizeBm.Value;
+      ed.Gutter[ed.GutterBandNum].Size:= edSizeNum.Value;
       ed.Gutter[ed.GutterBandFold].Size:= edSizeFold.Value;
       ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
+      ed.OptNumbersAutosize:= chkGutterNumAuto.Checked;
       ed.OptNumbersIndentLeft:= edSizeNum1.Value;
       ed.OptNumbersIndentRight:= edSizeNum2.Value;
 
