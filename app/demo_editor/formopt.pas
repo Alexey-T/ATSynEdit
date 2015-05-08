@@ -12,9 +12,14 @@ type
   { TfmOpt }
 
   TfmOpt = class(TForm)
-    bColUp: TButton;
     bColDown: TButton;
+    bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkGutterBm: TCheckBox;
+    chkGutterEmpty: TCheckBox;
+    chkGutterFold: TCheckBox;
+    chkGutterNum: TCheckBox;
+    chkGutterStat: TCheckBox;
     chkShowFoldLinesAll: TCheckBox;
     chkBackspUnindent: TCheckBox;
     chkEnterIndent: TCheckBox;
@@ -25,16 +30,11 @@ type
     chkShowFoldLines: TCheckBox;
     chkShowFoldAlways: TCheckBox;
     chkCrPreferLeft: TCheckBox;
-    chkGutterFold: TCheckBox;
     chkKeepCol: TCheckBox;
     chkCurLineMin: TCheckBox;
     chkHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
     chkNavHomeEnd: TCheckBox;
-    chkGutterBm: TCheckBox;
-    chkGutterEmpty: TCheckBox;
-    chkGutterNum: TCheckBox;
-    chkGutterStat: TCheckBox;
     chkNice: TCheckBox;
     chkSaveEol: TCheckBox;
     chkSaveTrim: TCheckBox;
@@ -79,22 +79,24 @@ type
     edChars: TEdit;
     edIndentSize: TSpinEdit;
     edPlusSize: TSpinEdit;
-    edNumSkip: TEdit;
+    edNumChar: TEdit;
     edMapFont: TSpinEdit;
-    edNum: TComboBox;
+    edNumStyle: TComboBox;
     edPageSize: TComboBox;
     edRulerFSize: TSpinEdit;
     edRulerSize: TSpinEdit;
     edSizeBm: TSpinEdit;
     edSizeEmpty: TSpinEdit;
-    edSizeState: TSpinEdit;
     edSizeFold: TSpinEdit;
     edSizeNum1: TSpinEdit;
     edSizeNum2: TSpinEdit;
+    edSizeNum0: TSpinEdit;
+    edSizeState: TSpinEdit;
     edTabArrowSize: TSpinEdit;
     edTabArrowPnt: TSpinEdit;
-    groupIndent: TGroupBox;
+    GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
+    groupIndent: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
     Label10: TLabel;
@@ -102,6 +104,9 @@ type
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
+    Label18: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -112,8 +117,8 @@ type
     Label9: TLabel;
     LabelArr: TLabel;
     LabelArr1: TLabel;
-    ListShapes: TListBox;
     ListCol: TListBox;
+    ListShapes: TListBox;
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
@@ -125,6 +130,7 @@ type
     TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TabSheet8: TTabSheet;
+    TabSheet9: TTabSheet;
     procedure bColDownClick(Sender: TObject);
     procedure bColUpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -205,9 +211,9 @@ begin
     edCrShape2.ItemIndex:= Ord(ed.OptCaretShapeOvr);
 
     //gutter
-    edNum.ItemIndex:= Ord(ed.OptNumbersStyle);
+    edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
     edNumSize.Value:= ed.OptNumbersFontSize;
-    edNumSkip.Text:= ed.OptNumbersSkippedChar;
+    edNumChar.Text:= ed.OptNumbersSkippedChar;
     edPlusSize.Value:= ed.OptGutterPlusSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
@@ -310,10 +316,10 @@ begin
 
       //gutter
       ed.OptNumbersFontSize:= edNumSize.Value;
-      ed.OptNumbersStyle:= TATSynNumbersStyle(edNum.ItemIndex);
+      ed.OptNumbersStyle:= TATSynNumbersStyle(edNumStyle.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
-      ed.OptNumbersSkippedChar:= edNumSkip.Text;
+      ed.OptNumbersSkippedChar:= edNumChar.Text;
       ed.OptGutterShowFoldAlways := chkShowFoldAlways.Checked;
       ed.OptGutterShowFoldLines := chkShowFoldLines.Checked;
       ed.OptGutterShowFoldLinesAll := chkShowFoldLinesAll.Checked;

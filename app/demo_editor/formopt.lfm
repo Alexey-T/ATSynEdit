@@ -158,28 +158,28 @@ object fmOpt: TfmOpt
       ClientHeight = 316
       ClientWidth = 616
       object edRulerSize: TSpinEdit
-        Left = 560
+        Left = 296
         Height = 23
-        Top = 20
+        Top = 8
         Width = 50
         MaxValue = 80
         MinValue = 4
-        TabOrder = 8
+        TabOrder = 7
         Value = 4
       end
       object edRulerFSize: TSpinEdit
-        Left = 560
+        Left = 296
         Height = 23
-        Top = 52
+        Top = 36
         Width = 50
         MaxValue = 40
-        TabOrder = 9
+        TabOrder = 8
         Value = 4
       end
       object Label2: TLabel
-        Left = 408
+        Left = 352
         Height = 15
-        Top = 20
+        Top = 12
         Width = 46
         Caption = 'ruler size'
         ParentColor = False
@@ -192,7 +192,7 @@ object fmOpt: TfmOpt
         Caption = 'numbers style'
         ParentColor = False
       end
-      object edNum: TComboBox
+      object edNumStyle: TComboBox
         Left = 8
         Height = 23
         Top = 20
@@ -232,193 +232,60 @@ object fmOpt: TfmOpt
         TabOrder = 2
       end
       object edNumSize: TSpinEdit
-        Left = 560
+        Left = 296
         Height = 23
-        Top = 84
+        Top = 64
         Width = 50
         MaxValue = 40
-        TabOrder = 10
+        TabOrder = 9
         Value = 5
       end
       object Label1: TLabel
-        Left = 408
-        Height = 34
-        Top = 84
-        Width = 144
-        AutoSize = False
+        Left = 352
+        Height = 15
+        Top = 68
+        Width = 142
         Caption = 'numbers font size (if not 0)'
         ParentColor = False
         WordWrap = True
       end
       object Label12: TLabel
-        Left = 408
-        Height = 32
-        Top = 48
-        Width = 144
-        AutoSize = False
+        Left = 352
+        Height = 15
+        Top = 40
+        Width = 119
         Caption = 'ruler font size (if not 0)'
         ParentColor = False
         WordWrap = True
       end
-      object GroupBox2: TGroupBox
-        Left = 224
-        Height = 300
-        Top = 4
-        Width = 176
-        Caption = 'columns'
-        ClientHeight = 280
-        ClientWidth = 172
-        TabOrder = 7
-        object chkGutterBm: TCheckBox
-          Left = 8
-          Height = 19
-          Top = 0
-          Width = 64
-          Caption = 'bookmk'
-          TabOrder = 0
-        end
-        object chkGutterNum: TCheckBox
-          Left = 8
-          Height = 19
-          Top = 28
-          Width = 50
-          Caption = 'nums'
-          TabOrder = 1
-        end
-        object chkGutterStat: TCheckBox
-          Left = 8
-          Height = 19
-          Top = 56
-          Width = 50
-          Caption = 'states'
-          TabOrder = 2
-        end
-        object chkGutterEmpty: TCheckBox
-          Left = 8
-          Height = 19
-          Top = 112
-          Width = 54
-          Caption = 'empty'
-          TabOrder = 4
-        end
-        object edSizeBm: TSpinEdit
-          Left = 112
-          Height = 23
-          Top = 0
-          Width = 50
-          MinValue = 1
-          TabOrder = 5
-          Value = 1
-        end
-        object edSizeState: TSpinEdit
-          Left = 112
-          Height = 23
-          Top = 56
-          Width = 50
-          MinValue = 1
-          TabOrder = 8
-          Value = 1
-        end
-        object edSizeEmpty: TSpinEdit
-          Left = 112
-          Height = 23
-          Top = 112
-          Width = 50
-          MinValue = 1
-          TabOrder = 10
-          Value = 1
-        end
-        object chkGutterFold: TCheckBox
-          Left = 8
-          Height = 19
-          Top = 84
-          Width = 41
-          Caption = 'fold'
-          TabOrder = 3
-        end
-        object edSizeFold: TSpinEdit
-          Left = 112
-          Height = 23
-          Top = 84
-          Width = 50
-          MinValue = 1
-          TabOrder = 9
-          Value = 1
-        end
-        object ListCol: TListBox
-          Left = 8
-          Height = 124
-          Top = 148
-          Width = 98
-          ItemHeight = 0
-          ScrollWidth = 40
-          TabOrder = 11
-        end
-        object bColUp: TButton
-          Left = 112
-          Height = 25
-          Top = 148
-          Width = 50
-          Caption = '^'
-          OnClick = bColUpClick
-          TabOrder = 12
-        end
-        object bColDown: TButton
-          Left = 112
-          Height = 25
-          Top = 176
-          Width = 50
-          Caption = 'v'
-          OnClick = bColDownClick
-          TabOrder = 13
-        end
-        object edSizeNum1: TSpinEdit
-          Left = 72
-          Height = 23
-          Top = 28
-          Width = 42
-          MinValue = 1
-          TabOrder = 6
-          Value = 1
-        end
-        object edSizeNum2: TSpinEdit
-          Left = 120
-          Height = 23
-          Top = 28
-          Width = 42
-          MinValue = 1
-          TabOrder = 7
-          Value = 1
-        end
-      end
-      object edNumSkip: TEdit
-        Left = 560
+      object edNumChar: TEdit
+        Left = 296
         Height = 23
-        Top = 156
+        Top = 120
         Width = 50
-        TabOrder = 12
+        TabOrder = 11
       end
       object Label13: TLabel
-        Left = 407
+        Left = 352
         Height = 15
-        Top = 160
+        Top = 124
         Width = 105
         Caption = 'char if num skipped'
         ParentColor = False
       end
       object edPlusSize: TSpinEdit
-        Left = 560
+        Left = 296
         Height = 23
-        Top = 124
+        Top = 92
         Width = 50
         MaxValue = 40
-        TabOrder = 11
+        TabOrder = 10
         Value = 5
       end
       object Label14: TLabel
-        Left = 407
+        Left = 352
         Height = 15
-        Top = 124
+        Top = 96
         Width = 70
         Caption = 'fold-plus size'
         ParentColor = False
@@ -446,6 +313,187 @@ object fmOpt: TfmOpt
         Width = 83
         Caption = 'all line parts'
         TabOrder = 6
+      end
+    end
+    object TabSheet9: TTabSheet
+      Caption = 'gutter cols'
+      ClientHeight = 316
+      ClientWidth = 616
+      object GroupBox2: TGroupBox
+        Left = 8
+        Height = 232
+        Top = 4
+        Width = 272
+        Caption = 'sizes of columns'
+        ClientHeight = 212
+        ClientWidth = 268
+        TabOrder = 0
+        object chkGutterBm: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 0
+          Width = 64
+          Caption = 'bookmk'
+          TabOrder = 0
+        end
+        object chkGutterNum: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 28
+          Width = 50
+          Caption = 'nums'
+          TabOrder = 1
+        end
+        object chkGutterStat: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 124
+          Width = 50
+          Caption = 'states'
+          TabOrder = 2
+        end
+        object chkGutterEmpty: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 180
+          Width = 54
+          Caption = 'empty'
+          TabOrder = 4
+        end
+        object edSizeBm: TSpinEdit
+          Left = 112
+          Height = 23
+          Top = 0
+          Width = 50
+          MinValue = 1
+          TabOrder = 5
+          Value = 1
+        end
+        object edSizeState: TSpinEdit
+          Left = 112
+          Height = 23
+          Top = 124
+          Width = 50
+          MinValue = 1
+          TabOrder = 9
+          Value = 1
+        end
+        object edSizeEmpty: TSpinEdit
+          Left = 112
+          Height = 23
+          Top = 180
+          Width = 50
+          MinValue = 1
+          TabOrder = 11
+          Value = 1
+        end
+        object chkGutterFold: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 152
+          Width = 41
+          Caption = 'fold'
+          TabOrder = 3
+        end
+        object edSizeFold: TSpinEdit
+          Left = 112
+          Height = 23
+          Top = 152
+          Width = 50
+          MinValue = 1
+          TabOrder = 10
+          Value = 1
+        end
+        object edSizeNum1: TSpinEdit
+          Left = 112
+          Height = 23
+          Top = 28
+          Width = 50
+          MinValue = 1
+          TabOrder = 6
+          Value = 1
+        end
+        object edSizeNum2: TSpinEdit
+          Left = 112
+          Height = 23
+          Top = 84
+          Width = 50
+          MinValue = 1
+          TabOrder = 8
+          Value = 1
+        end
+        object edSizeNum0: TSpinEdit
+          Left = 112
+          Height = 23
+          Top = 56
+          Width = 50
+          Enabled = False
+          MinValue = 1
+          TabOrder = 7
+          Value = 1
+        end
+        object Label16: TLabel
+          Left = 168
+          Height = 15
+          Top = 32
+          Width = 54
+          Caption = 'indent left'
+          ParentColor = False
+        end
+        object Label17: TLabel
+          Left = 167
+          Height = 15
+          Top = 59
+          Width = 58
+          Caption = 'num width'
+          Enabled = False
+          ParentColor = False
+        end
+        object Label18: TLabel
+          Left = 167
+          Height = 15
+          Top = 88
+          Width = 62
+          Caption = 'indent right'
+          ParentColor = False
+        end
+      end
+      object GroupBox1: TGroupBox
+        Left = 288
+        Height = 168
+        Top = 4
+        Width = 191
+        Caption = 'order of columns'
+        ClientHeight = 148
+        ClientWidth = 187
+        TabOrder = 1
+        object ListCol: TListBox
+          Left = 8
+          Height = 136
+          Top = 0
+          Width = 98
+          ItemHeight = 0
+          ScrollWidth = 40
+          TabOrder = 0
+        end
+        object bColUp: TButton
+          Left = 112
+          Height = 25
+          Top = 0
+          Width = 65
+          Caption = 'up'
+          OnClick = bColUpClick
+          TabOrder = 1
+        end
+        object bColDown: TButton
+          Left = 112
+          Height = 25
+          Top = 28
+          Width = 66
+          Caption = 'down'
+          OnClick = bColDownClick
+          TabOrder = 2
+        end
       end
     end
     object TabSheet5: TTabSheet
