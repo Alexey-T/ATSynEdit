@@ -73,6 +73,7 @@ type
     chkUnprintEndDet: TCheckBox;
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
+    edNumAlign: TComboBox;
     edIndentKind: TComboBox;
     edCrShape: TComboBox;
     edCrShape2: TComboBox;
@@ -105,6 +106,7 @@ type
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
+    Label15: TLabel;
     Label16: TLabel;
     Label17: TLabel;
     Label18: TLabel;
@@ -215,6 +217,7 @@ begin
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
     edNumSize.Value:= ed.OptNumbersFontSize;
     edNumChar.Text:= ed.OptNumbersSkippedChar;
+    edNumAlign.ItemIndex:= Ord(ed.OptNumbersAlignment);
     edPlusSize.Value:= ed.OptGutterPlusSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
@@ -323,6 +326,7 @@ begin
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
       ed.OptNumbersSkippedChar:= edNumChar.Text;
+      ed.OptNumbersAlignment:= TAlignment(edNumAlign.ItemIndex);
       ed.OptGutterShowFoldAlways := chkShowFoldAlways.Checked;
       ed.OptGutterShowFoldLines := chkShowFoldLines.Checked;
       ed.OptGutterShowFoldLinesAll := chkShowFoldLinesAll.Checked;

@@ -397,6 +397,7 @@ type
     FOptGutterShowFoldLines: boolean;
     FOptGutterShowFoldLinesAll: boolean;
     FOptNumbersAutosize: boolean;
+    FOptNumbersAlignment: TAlignment;
     FOptNumbersFontSize: integer;
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
@@ -811,6 +812,7 @@ type
     property OptMarginRight: integer read FMarginRight write SetMarginRight;
     property OptMarginString: string read GetMarginString write SetMarginString;
     property OptNumbersAutosize: boolean read FOptNumbersAutosize write FOptNumbersAutosize;
+    property OptNumbersAlignment: TAlignment read FOptNumbersAlignment write FOptNumbersAlignment;
     property OptNumbersFontSize: integer read FOptNumbersFontSize write FOptNumbersFontSize;
     property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle;
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst;
@@ -1640,7 +1642,11 @@ begin
             C.Font.Size:= FOptNumbersFontSize;
 
           Str:= DoFormatLineNumber(NLinesIndex+1);
-          NCoordLeftNums:= FGutter[FGutterBandNum].Right - C.TextWidth(Str) - FOptNumbersIndentRight;
+          case FOptNumbersAlignment of
+            taLeftJustify: NCoordLeftNums:= FGutter[FGutterBandNum].Left + FOptNumbersIndentLeft;
+            taRightJustify: NCoordLeftNums:= FGutter[FGutterBandNum].Right - C.TextWidth(Str) - FOptNumbersIndentRight;
+            taCenter: NCoordLeftNums:= (FGutter[FGutterBandNum].Left + FGutter[FGutterBandNum].Right - C.TextWidth(Str)) div 2;
+          end;
 
           C.TextOut(NCoordLeftNums, NCoordTop, Str);
           C.Font.Size:= Font.Size;
@@ -1941,6 +1947,7 @@ begin
   FGutter.Update;
 
   FOptNumbersAutosize:= true;
+  FOptNumbersAlignment:= taRightJustify;
   FOptNumbersFontSize:= 0;
   FOptNumbersStyle:= cInitNumbersStyle;
   FOptNumbersShowFirst:= true;

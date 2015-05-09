@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet9
-    TabIndex = 2
+    ActivePage = TabSheet2
+    TabIndex = 1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -313,6 +313,28 @@ object fmOpt: TfmOpt
         Width = 83
         Caption = 'all line parts'
         TabOrder = 6
+      end
+      object edNumAlign: TComboBox
+        Left = 296
+        Height = 23
+        Top = 148
+        Width = 104
+        ItemHeight = 15
+        Items.Strings = (
+          'left'
+          'right'
+          'center'
+        )
+        Style = csDropDownList
+        TabOrder = 12
+      end
+      object Label15: TLabel
+        Left = 408
+        Height = 15
+        Top = 152
+        Width = 99
+        Caption = 'number alignment'
+        ParentColor = False
       end
     end
     object TabSheet9: TTabSheet
