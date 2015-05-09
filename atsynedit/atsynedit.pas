@@ -1474,11 +1474,12 @@ begin
   end;
 
   if (Strings.Count=0) or ((Strings.Count=1) and (Strings.Lines[0]='')) then
-  begin
-    if AMainText then
-      DoPaintTextHintTo(C);
-    Exit
-  end;
+    if FTextHint<>'' then
+    begin
+      if AMainText then
+        DoPaintTextHintTo(C);
+      Exit
+    end;
 
   NCoordTop:= ARect.Top;
   NWrapIndex:= AScrollVert.NPos;
@@ -3664,7 +3665,6 @@ begin
   C.Font.Style:= FTextHintFontStyle;
 
   Size:= C.TextExtent(FTextHint);
-
   if FTextHintCenter then
   begin
     Pos:= CenterPoint(FRectMain);
