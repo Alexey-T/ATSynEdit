@@ -215,9 +215,9 @@ begin
 
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
+    edNumAlign.ItemIndex:= Ord(ed.OptNumbersAlignment);
     edNumSize.Value:= ed.OptNumbersFontSize;
     edNumChar.Text:= ed.OptNumbersSkippedChar;
-    edNumAlign.ItemIndex:= Ord(ed.OptNumbersAlignment);
     edPlusSize.Value:= ed.OptGutterPlusSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
@@ -323,13 +323,13 @@ begin
       //gutter
       ed.OptNumbersFontSize:= edNumSize.Value;
       ed.OptNumbersStyle:= TATSynNumbersStyle(edNumStyle.ItemIndex);
+      ed.OptNumbersAlignment:= TAlignment(edNumAlign.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
       ed.OptNumbersSkippedChar:= edNumChar.Text;
-      ed.OptNumbersAlignment:= TAlignment(edNumAlign.ItemIndex);
-      ed.OptGutterShowFoldAlways := chkShowFoldAlways.Checked;
-      ed.OptGutterShowFoldLines := chkShowFoldLines.Checked;
-      ed.OptGutterShowFoldLinesAll := chkShowFoldLinesAll.Checked;
+      ed.OptGutterShowFoldAlways:= chkShowFoldAlways.Checked;
+      ed.OptGutterShowFoldLines:= chkShowFoldLines.Checked;
+      ed.OptGutterShowFoldLinesAll:= chkShowFoldLinesAll.Checked;
       ed.OptGutterPlusSize:= edPlusSize.Value;
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;
