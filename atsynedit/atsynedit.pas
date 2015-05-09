@@ -294,6 +294,7 @@ type
     FTextOffset: TPoint;
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
+    FTextHintCenter: boolean;
     FSelRect: TRect;
     FSelRectBegin,
     FSelRectEnd: TPoint;
@@ -769,8 +770,9 @@ type
     property CursorText: TCursor read FCursorText write FCursorText;
     property CursorBm: TCursor read FCursorBm write FCursorBm;
     property Colors: TATSynEditColors read FColors write FColors;
-    property TextHint: string read FTextHint write FTextHint;
-    property TextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
+    property OptTextHint: string read FTextHint write FTextHint;
+    property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
+    property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter;
 
     //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
@@ -1950,6 +1952,7 @@ begin
 
   FTextHint:= '(empty)';
   FTextHintFontStyle:= [fsItalic];
+  FTextHintCenter:= false;
 
   FGutter:= TATGutter.Create;
   FOptGutterVisible:= true;
@@ -3658,9 +3661,17 @@ begin
   C.Font.Style:= FTextHintFontStyle;
 
   Size:= C.TextExtent(FTextHint);
-  Pos:= CenterPoint(FRectMain);
-  Dec(Pos.X, Size.cx div 2);
-  Dec(Pos.Y, Size.cy div 2);
+
+  if FTextHintCenter then
+  begin
+    Pos:= CenterPoint(FRectMain);
+    Dec(Pos.X, Size.cx div 2);
+    Dec(Pos.Y, Size.cy div 2);
+  end
+  else
+  begin
+    Pos:= FTextOffset;
+  end;
 
   C.TextOut(Pos.X, Pos.Y, FTextHint);
 end;
