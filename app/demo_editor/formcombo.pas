@@ -41,6 +41,7 @@ begin
   ed.Align:= alBottom;
   ed.OnCommand:= @ComboCommand;
   ed.Text:= 'Test';
+  ed.OptTextHint:= '(empty)';
 end;
 
 procedure TfmCombo.ComboCommand(Snd: TObject; ACmd: integer;

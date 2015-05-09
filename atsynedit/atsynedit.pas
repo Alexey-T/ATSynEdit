@@ -1473,11 +1473,10 @@ begin
       DoPaintGutterBandBG(C, FGutterBandEmpty, FColors.TextBG, -1, -1);
   end;
 
-  if (Strings.Count=0) or ((Strings.Count=1) and (Strings.Lines[0]='')) then
-    if FTextHint<>'' then
+  if AMainText and (FTextHint<>'') then
+    if (Strings.Count=0) or ((Strings.Count=1) and (Strings.Lines[0]='')) then
     begin
-      if AMainText then
-        DoPaintTextHintTo(C);
+      DoPaintTextHintTo(C);
       Exit
     end;
 
@@ -1954,7 +1953,7 @@ begin
   FUnprintedReplaceSpec:= true;
 
   FTextLocked:= 'wait...';
-  FTextHint:= '(empty)';
+  FTextHint:= '';
   FTextHintFontStyle:= [fsItalic];
   FTextHintCenter:= false;
 

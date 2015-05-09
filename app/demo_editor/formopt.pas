@@ -33,7 +33,7 @@ type
     chkCrPreferLeft: TCheckBox;
     chkKeepCol: TCheckBox;
     chkCurLineMin: TCheckBox;
-    chkHint: TCheckBox;
+    chkScrollHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
     chkNavHomeEnd: TCheckBox;
     chkNice: TCheckBox;
@@ -78,7 +78,7 @@ type
     edCrShape: TComboBox;
     edCrShape2: TComboBox;
     edCrTime: TSpinEdit;
-    edChars: TEdit;
+    edWordChars: TEdit;
     edIndentSize: TSpinEdit;
     edPlusSize: TSpinEdit;
     edNumChar: TEdit;
@@ -97,6 +97,7 @@ type
     edSizeState: TSpinEdit;
     edTabArrowSize: TSpinEdit;
     edTabArrowPnt: TSpinEdit;
+    edTextHint: TEdit;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
     groupIndent: TGroupBox;
@@ -122,6 +123,7 @@ type
     Label9: TLabel;
     LabelArr: TLabel;
     LabelArr1: TLabel;
+    LabelHint: TLabel;
     ListCol: TListBox;
     ListShapes: TListBox;
     PageControl1: TPageControl;
@@ -192,10 +194,11 @@ begin
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
     chkDotLn.Checked:= ed.OptShowIndentLines;
-    edChars.Text:= ed.OptWordChars;
+    edTextHint.Text:= ed.OptTextHint;
+    edWordChars.Text:= ed.OptWordChars;
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
-    chkHint.Checked:= ed.OptShowScrollHint;
+    chkScrollHint.Checked:= ed.OptShowScrollHint;
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -293,7 +296,8 @@ begin
       ed.OptShowCurLine:= chkCurLine.Checked;
       ed.OptShowCurLineMinimal:= chkCurLineMin.Checked;
       ed.OptShowCurColumn:= chkCurCol.Checked;
-      ed.OptWordChars:= edChars.Text;
+      ed.OptTextHint:= edTextHint.Text;
+      ed.OptWordChars:= edWordChars.Text;
       ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
@@ -303,7 +307,7 @@ begin
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
       ed.OptSavingTrimSpaces:= chkSaveTrim.Checked;
-      ed.OptShowScrollHint:= chkHint.Checked;
+      ed.OptShowScrollHint:= chkScrollHint.Checked;
 
       //unprint
       ed.OptUnprintedVisible:= chkUnprintEn.Checked;
