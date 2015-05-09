@@ -1424,7 +1424,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   AWithGutter, AMainText: boolean;
   var AScrollHorz, AScrollVert: TATSynScrollInfo);
 var
-  NCoordTop, NCoordLeftNums: integer;
+  NCoordTop: integer;
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: real;
@@ -1432,10 +1432,11 @@ var
   BmKind: integer;
   BmColor: TColor;
   Str, StrOut, StrOutUncut: atString;
-  CurrPoint, CurrPointText, CoordAfterText: TPoint;
+  CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineWithCaret, LineEolSelected: boolean;
   Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
+  StrSize: TSize;
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
   begin
@@ -1644,13 +1645,20 @@ begin
             C.Font.Size:= FOptNumbersFontSize;
 
           Str:= DoFormatLineNumber(NLinesIndex+1);
+          StrSize:= C.TextExtent(Str);
+
           case FOptNumbersAlignment of
-            taLeftJustify: NCoordLeftNums:= FGutter[FGutterBandNum].Left + FOptNumbersIndentLeft;
-            taRightJustify: NCoordLeftNums:= FGutter[FGutterBandNum].Right - C.TextWidth(Str) - FOptNumbersIndentRight;
-            taCenter: NCoordLeftNums:= (FGutter[FGutterBandNum].Left + FGutter[FGutterBandNum].Right - C.TextWidth(Str)) div 2;
+            taLeftJustify: CoordNums.X:= FGutter[FGutterBandNum].Left + FOptNumbersIndentLeft;
+            taRightJustify: CoordNums.X:= FGutter[FGutterBandNum].Right - StrSize.cx - FOptNumbersIndentRight;
+            taCenter: CoordNums.X:= (FGutter[FGutterBandNum].Left + FGutter[FGutterBandNum].Right - StrSize.cx) div 2;
           end;
 
-          C.TextOut(NCoordLeftNums, NCoordTop, Str);
+          if FOptNumbersFontSize=0 then
+            CoordNums.Y:= NCoordTop
+          else
+            CoordNums.Y:= NCoordTop + ACharSize.y div 2 - StrSize.cy div 2;
+
+          C.TextOut(CoordNums.X, CoordNums.Y, Str);
           C.Font.Size:= Font.Size;
         end;
       end;
