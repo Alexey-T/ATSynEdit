@@ -3316,13 +3316,32 @@ begin
   begin
     Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
     Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
-    DoCaretSingle(P.X, P.Y);
+
+    //select moved text
+    DoCaretSingle(0, 0);
+    with Carets[0] do
+    begin
+      PosX:= PosAfter.X;
+      PosY:= PosAfter.Y;
+      EndX:= P.X;
+      EndY:= P.Y;
+    end;
   end
   else
   begin
     Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
+
+    //select moved text
+    DoCaretSingle(0, 0);
+    with Carets[0] do
+    begin
+      PosX:= PosAfter.X;
+      PosY:= PosAfter.Y;
+      EndX:= P.X;
+      EndY:= P.Y;
+    end;
+
     Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
-    DoCaretSingle(P.X, P.Y);
     DoCaretsShift(X1, Y1, Shift.X, Shift.Y);
   end;
 
