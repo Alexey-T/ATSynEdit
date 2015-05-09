@@ -391,6 +391,7 @@ type
     FOptRulerFontSize: integer;
     FOptRulerMarkSizeSmall: integer;
     FOptRulerMarkSizeBig: integer;
+    FOptRulerTextIndent: integer;
     FOptGutterVisible: boolean;
     FOptGutterPlusSize: integer;
     FOptGutterShowFoldAlways: boolean;
@@ -799,6 +800,7 @@ type
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall;
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig;
+    property OptRulerTextIndent: integer read FOptRulerTextIndent write FOptRulerTextIndent;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
     property OptMinimapFontSize: integer read FMinimapFontSize write FMinimapFontSize;
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder;
@@ -902,7 +904,7 @@ begin
     if i mod 10 = 0 then
     begin
       Str:= IntToStr(i);
-      C.TextOut(NX - C.TextWidth(Str) div 2, 0, Str);
+      C.TextOut(NX - C.TextWidth(Str) div 2, FOptRulerTextIndent, Str);
     end;
   end;
 
@@ -1956,11 +1958,12 @@ begin
   FOptNumbersIndentLeft:= 5;
   FOptNumbersIndentRight:= 5;
 
+  FOptRulerVisible:= true;
   FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
   FOptRulerFontSize:= 8;
-  FOptRulerVisible:= true;
+  FOptRulerTextIndent:= 0;
 
   FMinimapWidth:= cInitMinimapWidth;
   FMinimapFontSize:= cInitMinimapFontSize;

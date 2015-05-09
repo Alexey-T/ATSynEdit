@@ -86,6 +86,7 @@ type
     edNumStyle: TComboBox;
     edPageSize: TComboBox;
     edRulerFSize: TSpinEdit;
+    edRulerIndent: TSpinEdit;
     edRulerSize: TSpinEdit;
     edSizeBm: TSpinEdit;
     edSizeEmpty: TSpinEdit;
@@ -110,6 +111,7 @@ type
     Label16: TLabel;
     Label17: TLabel;
     Label18: TLabel;
+    Label19: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -227,6 +229,7 @@ begin
     chkShowFoldLinesAll.Checked:= ed.OptGutterShowFoldLinesAll;
     edRulerSize.Value:= ed.OptRulerSize;
     edRulerFSize.Value:= ed.OptRulerFontSize;
+    edRulerIndent.Value:= ed.OptRulerTextIndent;
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
@@ -334,6 +337,7 @@ begin
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerSize:= edRulerSize.Value;
       ed.OptRulerFontSize:= edRulerFSize.Value;
+      ed.OptRulerTextIndent:= edRulerIndent.Value;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;

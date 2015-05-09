@@ -234,16 +234,16 @@ object fmOpt: TfmOpt
       object edNumSize: TSpinEdit
         Left = 296
         Height = 23
-        Top = 64
+        Top = 92
         Width = 50
         MaxValue = 40
-        TabOrder = 10
+        TabOrder = 11
         Value = 5
       end
       object Label1: TLabel
         Left = 352
         Height = 15
-        Top = 68
+        Top = 96
         Width = 142
         Caption = 'numbers font size (if not 0)'
         ParentColor = False
@@ -261,14 +261,14 @@ object fmOpt: TfmOpt
       object edNumChar: TEdit
         Left = 296
         Height = 23
-        Top = 120
+        Top = 148
         Width = 50
-        TabOrder = 12
+        TabOrder = 13
       end
       object Label13: TLabel
         Left = 352
         Height = 15
-        Top = 124
+        Top = 152
         Width = 105
         Caption = 'char if num skipped'
         ParentColor = False
@@ -276,18 +276,18 @@ object fmOpt: TfmOpt
       object edPlusSize: TSpinEdit
         Left = 296
         Height = 23
-        Top = 92
+        Top = 120
         Width = 50
         MaxValue = 40
-        TabOrder = 11
+        TabOrder = 12
         Value = 5
       end
       object Label14: TLabel
         Left = 352
         Height = 15
-        Top = 96
-        Width = 70
-        Caption = 'fold-plus size'
+        Top = 124
+        Width = 100
+        Caption = 'fold plus-mark size'
         ParentColor = False
       end
       object chkShowFoldAlways: TCheckBox
@@ -335,6 +335,25 @@ object fmOpt: TfmOpt
         Width = 82
         Caption = 'num alignment'
         ParentColor = False
+      end
+      object edRulerIndent: TSpinEdit
+        Left = 296
+        Height = 23
+        Top = 64
+        Width = 50
+        MaxValue = 20
+        MinValue = -10
+        TabOrder = 10
+        Value = 4
+      end
+      object Label19: TLabel
+        Left = 352
+        Height = 15
+        Top = 68
+        Width = 106
+        Caption = 'ruler text vert indent'
+        ParentColor = False
+        WordWrap = True
       end
     end
     object TabSheet9: TTabSheet
