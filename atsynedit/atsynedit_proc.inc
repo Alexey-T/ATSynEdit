@@ -85,6 +85,7 @@ begin
   C.StateChanged:= $00f0f0;
   C.StateAdded:= $20c020;
   C.StateSaved:= clMedGray;
+  C.TextHintFont:= clGray;
   C.LockedBG:= $e0e0e0;
 end;
 

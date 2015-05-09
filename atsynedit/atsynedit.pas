@@ -83,6 +83,7 @@ type
     FStateChanged,
     FStateAdded,
     FStateSaved,
+    FTextHintFont,
     FLockedBG: TColor;
   published
     property TextFont: TColor read FTextFont write FTextFont;
@@ -116,6 +117,7 @@ type
     property StateAdded: TColor read FStateAdded write FStateAdded;
     property StateSaved: TColor read FStateSaved write FStateSaved;
     property LockedBG: TColor read FLockedBG write FLockedBG;
+    property TextHintFont: TColor read FTextHintFont write FTextHintFont;
   end;
 
   TATAutoIndentKind = (
@@ -290,6 +292,8 @@ type
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
+    FTextHint: string;
+    FTextHintFontStyle: TFontStyles;
     FSelRect: TRect;
     FSelRectBegin,
     FSelRectEnd: TPoint;
@@ -454,6 +458,7 @@ type
       ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
       ABottom: integer);
+    procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
@@ -764,6 +769,8 @@ type
     property CursorText: TCursor read FCursorText write FCursorText;
     property CursorBm: TCursor read FCursorBm write FCursorBm;
     property Colors: TATSynEditColors read FColors write FColors;
+    property TextHint: string read FTextHint write FTextHint;
+    property TextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
 
     //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
@@ -1463,6 +1470,12 @@ begin
       DoPaintGutterBandBG(C, FGutterBandEmpty, FColors.TextBG, -1, -1);
   end;
 
+  if (Strings.Count=0) or ((Strings.Count=1) and (Strings.Lines[0]='')) then
+  begin
+    DoPaintTextHintTo(C);
+    Exit
+  end;
+
   NCoordTop:= ARect.Top;
   NWrapIndex:= AScrollVert.NPos;
   AScrollHorz.NMax:= 1;
@@ -1934,6 +1947,9 @@ begin
   FUnprintedEnds:= true;
   FUnprintedEndsDetails:= true;
   FUnprintedReplaceSpec:= true;
+
+  FTextHint:= '(empty)';
+  FTextHintFontStyle:= [fsItalic];
 
   FGutter:= TATGutter.Create;
   FOptGutterVisible:= true;
@@ -3630,6 +3646,23 @@ begin
         DrawDown;
       end;
   end;
+end;
+
+procedure TATSynEdit.DoPaintTextHintTo(C: TCanvas);
+var
+  Size: TSize;
+  Pos: TPoint;
+begin
+  C.Brush.Color:= FColors.TextBG;
+  C.Font.Color:= FColors.TextHintFont;
+  C.Font.Style:= FTextHintFontStyle;
+
+  Size:= C.TextExtent(FTextHint);
+  Pos:= CenterPoint(FRectMain);
+  Dec(Pos.X, Size.cx div 2);
+  Dec(Pos.Y, Size.cy div 2);
+
+  C.TextOut(Pos.X, Pos.Y, FTextHint);
 end;
 
 {$I atsynedit_carets.inc}
