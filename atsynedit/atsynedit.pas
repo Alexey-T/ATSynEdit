@@ -216,7 +216,6 @@ const
   cGutterSizeState = 3;
   cGutterSizeEmpty = 2;
 
-  cShowLockedText: string = 'wait...';
   cCollapseMarkIndent = 3; //collapse-mark [...] for line partly folded
   cScrollKeepHorz = 1; //keep char, allow handy clicking after eol of longest line
   cScrollIndentCaretHorz = 10; //offsets for caret-moving: if caret goes out of control
@@ -292,6 +291,7 @@ type
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
+    FTextLocked: string;
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
     FTextHintCenter: boolean;
@@ -770,13 +770,14 @@ type
     property CursorText: TCursor read FCursorText write FCursorText;
     property CursorBm: TCursor read FCursorBm write FCursorBm;
     property Colors: TATSynEditColors read FColors write FColors;
-    property OptTextHint: string read FTextHint write FTextHint;
-    property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
-    property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter;
 
     //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
+    property OptTextLocked: string read FTextLocked write FTextLocked;
+    property OptTextHint: string read FTextHint write FTextHint;
+    property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
+    property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter;
     property OptOffsetTop: integer read FOptOffsetTop write FOptOffsetTop;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
@@ -1474,7 +1475,8 @@ begin
 
   if (Strings.Count=0) or ((Strings.Count=1) and (Strings.Lines[0]='')) then
   begin
-    DoPaintTextHintTo(C);
+    if AMainText then
+      DoPaintTextHintTo(C);
     Exit
   end;
 
@@ -1950,6 +1952,7 @@ begin
   FUnprintedEndsDetails:= true;
   FUnprintedReplaceSpec:= true;
 
+  FTextLocked:= 'wait...';
   FTextHint:= '(empty)';
   FTextHintFontStyle:= [fsItalic];
   FTextHintCenter:= false;
@@ -2367,7 +2370,7 @@ begin
     Canvas.Brush.Color:= FColors.LockedBG;
     Canvas.FillRect(ClientRect);
     Canvas.Font.Assign(Self.Font);
-    Canvas.TextOut(10, 5, cShowLockedText);
+    Canvas.TextOut(10, 5, FTextLocked);
     Exit;
   end;
 
