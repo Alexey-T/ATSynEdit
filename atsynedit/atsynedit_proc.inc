@@ -67,6 +67,7 @@ begin
   C.GutterPlusBG:= $f4f4f4;
   C.GutterFoldLine:= clGray;
   C.GutterFoldBG:= $c8c8c8;
+  C.GutterSeparatorBG:= clBlack;
   C.CurrentLineBG:= $e0f0f0;
   C.RulerBG:= C.GutterBG;
   C.RulerFont:= clGray;

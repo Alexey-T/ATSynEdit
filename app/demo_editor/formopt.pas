@@ -15,6 +15,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkGutterSep: TCheckBox;
     chkGutterNumAuto: TCheckBox;
     chkGutterBm: TCheckBox;
     chkGutterEmpty: TCheckBox;
@@ -78,6 +79,7 @@ type
     edCrShape: TComboBox;
     edCrShape2: TComboBox;
     edCrTime: TSpinEdit;
+    edSizeSep: TSpinEdit;
     edWordChars: TEdit;
     edIndentSize: TSpinEdit;
     edPlusSize: TSpinEdit;
@@ -163,6 +165,7 @@ const
   nameNums = 'nums';
   nameState = 'states';
   nameFold = 'fold';
+  nameSep = 'separator';
 
 procedure DoConfigEditor(ed: TATSynEdit);
 var
@@ -173,12 +176,13 @@ begin
     with ListCol do
     begin
       Items.Clear;
-      for i:= 0 to 3 do
+      for i:= 0 to 4 do
       begin
         if i=ed.GutterBandBm then Items.Add(nameBm);
         if i=ed.GutterBandNum then Items.Add(nameNums);
         if i=ed.GutterBandState then Items.Add(nameState);
         if i=ed.GutterBandFold then Items.Add(nameFold);
+        if i=ed.GutterBandSep then Items.Add(nameSep);
       end;
       ItemIndex:= 0;
     end;
@@ -238,10 +242,12 @@ begin
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
     chkGutterFold.Checked:= ed.Gutter[ed.GutterBandFold].Visible;
     chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
+    chkGutterSep.Checked:= ed.Gutter[ed.GutterBandSep].Visible;
     chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
     edSizeBm.Value:= ed.Gutter[ed.GutterBandBm].Size;
     edSizeFold.Value:= ed.Gutter[ed.GutterBandFold].Size;
     edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
+    edSizeSep.Value:= ed.Gutter[ed.GutterBandSep].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
     edSizeNum.Value:= ed.Gutter[ed.GutterBandNum].Size;
     edSizeNum1.Value:= ed.OptNumbersIndentLeft;
@@ -291,6 +297,7 @@ begin
       ed.GutterBandNum:= ListCol.Items.IndexOf(nameNums);
       ed.GutterBandState:= ListCol.Items.IndexOf(nameState);
       ed.GutterBandFold:= ListCol.Items.IndexOf(nameFold);
+      ed.GutterBandSep:= ListCol.Items.IndexOf(nameSep);
 
       //general
       ed.OptShowCurLine:= chkCurLine.Checked;
@@ -347,11 +354,13 @@ begin
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
       ed.Gutter[ed.GutterBandFold].Visible:= chkGutterFold.Checked;
       ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
+      ed.Gutter[ed.GutterBandSep].Visible:= chkGutterSep.Checked;
       ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
       ed.Gutter[ed.GutterBandBm].Size:= edSizeBm.Value;
       ed.Gutter[ed.GutterBandNum].Size:= edSizeNum.Value;
       ed.Gutter[ed.GutterBandFold].Size:= edSizeFold.Value;
       ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
+      ed.Gutter[ed.GutterBandSep].Size:= edSizeSep.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
       ed.OptNumbersAutosize:= chkGutterNumAuto.Checked;
       ed.OptNumbersIndentLeft:= edSizeNum1.Value;

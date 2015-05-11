@@ -65,6 +65,7 @@ type
     FGutterPlusBG,
     FGutterFoldLine,
     FGutterFoldBG,
+    FGutterSeparatorBG,
     FCurrentLineBG,
     FMarginRight,
     FMarginCaret,
@@ -98,6 +99,7 @@ type
     property GutterPlusBG: TColor read FGutterPlusBG write FGutterPlusBG;
     property GutterFoldLine: TColor read FGutterFoldLine write FGutterFoldLine;
     property GutterFoldBG: TColor read FGutterFoldBG write FGutterFoldBG;
+    property GutterSeparatorBG: TColor read FGutterSeparatorBG write FGutterSeparatorBG;
     property CurrentLineBG: TColor read FCurrentLineBG write FCurrentLineBG;
     property MarginRight: TColor read FMarginRight write FMarginRight;
     property MarginCaret: TColor read FMarginCaret write FMarginCaret;
@@ -209,11 +211,12 @@ const
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
 
-  cGutterBands = 5;
+  cGutterBands = 6;
   cGutterSizeBm = 16;
   cGutterSizeNum = 10;
   cGutterSizeFold = 14;
   cGutterSizeState = 3;
+  cGutterSizeSep = 1;
   cGutterSizeEmpty = 2;
 
   cCollapseMarkIndent = 3; //collapse-mark [...] for line partly folded
@@ -362,6 +365,7 @@ type
     FGutterBandNum,
     FGutterBandState,
     FGutterBandFold,
+    FGutterBandSep,
     FGutterBandEmpty: integer;
     FColors: TATSynEditColors;
     FRectMain,
@@ -688,6 +692,7 @@ type
     property GutterBandNum: integer read FGutterBandNum write FGutterBandNum;
     property GutterBandState: integer read FGutterBandState write FGutterBandState;
     property GutterBandFold: integer read FGutterBandFold write FGutterBandFold;
+    property GutterBandSep: integer read FGutterBandSep write FGutterBandSep;
     property GutterBandEmpty: integer read FGutterBandEmpty write FGutterBandEmpty;
     //files
     procedure LoadFromFile(const AFilename: string);
@@ -1469,6 +1474,8 @@ begin
     //paint some bands, for full height coloring
     if FGutter[FGutterBandFold].Visible then
       DoPaintGutterBandBG(C, FGutterBandFold, FColors.GutterFoldBG, -1, -1);
+    if FGutter[FGutterBandSep].Visible then
+      DoPaintGutterBandBG(C, FGutterBandSep, FColors.GutterSeparatorBG, -1, -1);
     if FGutter[FGutterBandEmpty].Visible then
       DoPaintGutterBandBG(C, FGutterBandEmpty, FColors.TextBG, -1, -1);
   end;
@@ -1717,6 +1724,9 @@ begin
         end;
       end;
 
+      //gutter band: separator
+      if FGutter[FGutterBandSep].Visible then
+        DoPaintGutterBandBG(C, FGutterBandSep, FColors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y);
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
         DoPaintGutterBandBG(C, FGutterBandEmpty, FColors.TextBG, NCoordTop, NCoordTop+ACharSize.Y);
@@ -1968,14 +1978,18 @@ begin
   FGutterBandNum:= 1;
   FGutterBandState:= 2;
   FGutterBandFold:= 3;
-  FGutterBandEmpty:= 4;
+  FGutterBandSep:= 4;
+  FGutterBandEmpty:= 5;
 
-  for i:= 1 to cGutterBands do FGutter.Add(10);
+  for i:= 1 to cGutterBands do
+    FGutter.Add(10);
   FGutter[FGutterBandBm].Size:= cGutterSizeBm;
   FGutter[FGutterBandNum].Size:= cGutterSizeNum;
   FGutter[FGutterBandState].Size:= cGutterSizeState;
   FGutter[FGutterBandFold].Size:= cGutterSizeFold;
+  FGutter[FGutterBandSep].Size:= cGutterSizeSep;
   FGutter[FGutterBandEmpty].Size:= cGutterSizeEmpty;
+  FGutter[FGutterBandSep].Visible:= false;
   FGutter.Update;
 
   FOptNumbersAutosize:= true;

@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet1
-    TabIndex = 0
+    ActivePage = TabSheet9
+    TabIndex = 2
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -377,11 +377,11 @@ object fmOpt: TfmOpt
       ClientWidth = 616
       object GroupBox2: TGroupBox
         Left = 8
-        Height = 232
+        Height = 248
         Top = 4
         Width = 272
         Caption = 'sizes of columns'
-        ClientHeight = 212
+        ClientHeight = 228
         ClientWidth = 268
         TabOrder = 0
         object chkGutterBm: TCheckBox
@@ -403,7 +403,7 @@ object fmOpt: TfmOpt
         object chkGutterStat: TCheckBox
           Left = 8
           Height = 19
-          Top = 124
+          Top = 112
           Width = 50
           Caption = 'states'
           TabOrder = 3
@@ -411,10 +411,10 @@ object fmOpt: TfmOpt
         object chkGutterEmpty: TCheckBox
           Left = 8
           Height = 19
-          Top = 180
+          Top = 196
           Width = 54
           Caption = 'empty'
-          TabOrder = 5
+          TabOrder = 6
         end
         object edSizeBm: TSpinEdit
           Left = 112
@@ -422,31 +422,31 @@ object fmOpt: TfmOpt
           Top = 0
           Width = 50
           MinValue = 1
-          TabOrder = 6
+          TabOrder = 7
           Value = 1
         end
         object edSizeState: TSpinEdit
           Left = 112
           Height = 23
-          Top = 124
+          Top = 112
           Width = 50
           MinValue = 1
-          TabOrder = 10
+          TabOrder = 11
           Value = 1
         end
         object edSizeEmpty: TSpinEdit
           Left = 112
           Height = 23
-          Top = 180
+          Top = 196
           Width = 50
           MinValue = 1
-          TabOrder = 12
+          TabOrder = 14
           Value = 1
         end
         object chkGutterFold: TCheckBox
           Left = 8
           Height = 19
-          Top = 152
+          Top = 140
           Width = 41
           Caption = 'fold'
           TabOrder = 4
@@ -454,10 +454,10 @@ object fmOpt: TfmOpt
         object edSizeFold: TSpinEdit
           Left = 112
           Height = 23
-          Top = 152
+          Top = 140
           Width = 50
           MinValue = 1
-          TabOrder = 11
+          TabOrder = 12
           Value = 1
         end
         object edSizeNum1: TSpinEdit
@@ -466,7 +466,7 @@ object fmOpt: TfmOpt
           Top = 28
           Width = 50
           MinValue = 1
-          TabOrder = 7
+          TabOrder = 8
           Value = 1
         end
         object edSizeNum2: TSpinEdit
@@ -475,7 +475,7 @@ object fmOpt: TfmOpt
           Top = 84
           Width = 50
           MinValue = 1
-          TabOrder = 9
+          TabOrder = 10
           Value = 1
         end
         object edSizeNum: TSpinEdit
@@ -484,7 +484,7 @@ object fmOpt: TfmOpt
           Top = 56
           Width = 50
           MinValue = 1
-          TabOrder = 8
+          TabOrder = 9
           Value = 1
         end
         object Label16: TLabel
@@ -519,19 +519,36 @@ object fmOpt: TfmOpt
           Caption = 'autosize'
           TabOrder = 2
         end
+        object chkGutterSep: TCheckBox
+          Left = 8
+          Height = 19
+          Top = 168
+          Width = 69
+          Caption = 'separator'
+          TabOrder = 5
+        end
+        object edSizeSep: TSpinEdit
+          Left = 112
+          Height = 23
+          Top = 168
+          Width = 50
+          MinValue = 1
+          TabOrder = 13
+          Value = 1
+        end
       end
       object GroupBox1: TGroupBox
         Left = 288
-        Height = 168
+        Height = 248
         Top = 4
         Width = 191
         Caption = 'order of columns'
-        ClientHeight = 148
+        ClientHeight = 228
         ClientWidth = 187
         TabOrder = 1
         object ListCol: TListBox
           Left = 8
-          Height = 136
+          Height = 218
           Top = 0
           Width = 98
           ItemHeight = 0
