@@ -17,6 +17,8 @@ object fmMain: TfmMain
     Align = alClient
     BorderStyle = bsSingle
     BorderSpacing.Around = 6
+    Font.Height = -12
+    Font.Name = 'Courier New'
     CursorText = crIBeam
     CursorBm = crHandPoint
     Colors.TextFont = clBlack
@@ -50,8 +52,12 @@ object fmMain: TfmMain
     Colors.StateAdded = 2146336
     Colors.StateSaved = clMedGray
     Colors.LockedBG = 14737632
+    Colors.TextHintFont = clGray
     OptTabSpaces = False
     OptTabSize = 10
+    OptTextLocked = 'wait...'
+    OptTextHintFontStyle = [fsItalic]
+    OptTextHintCenter = False
     OptOffsetTop = 0
     OptAutoIndent = True
     OptAutoIndentKind = cIndentAsIs
@@ -83,6 +89,7 @@ object fmMain: TfmMain
     OptRulerFontSize = 8
     OptRulerMarkSizeSmall = 3
     OptRulerMarkSizeBig = 7
+    OptRulerTextIndent = 0
     OptMinimapVisible = False
     OptMinimapFontSize = 2
     OptMinimapShowSelBorder = False
@@ -94,6 +101,8 @@ object fmMain: TfmMain
     OptWrapMode = cWrapOn
     OptWrapIndented = True
     OptMarginRight = 80
+    OptNumbersAutosize = True
+    OptNumbersAlignment = taRightJustify
     OptNumbersFontSize = 0
     OptNumbersStyle = cNumbersEach5th
     OptNumbersShowFirst = True
@@ -151,6 +160,8 @@ object fmMain: TfmMain
       Top = 12
       Width = 300
       BorderStyle = bsSingle
+      Font.Height = -12
+      Font.Name = 'Courier New'
       CursorText = crIBeam
       CursorBm = crHandPoint
       Colors.TextFont = clBlack
@@ -184,8 +195,12 @@ object fmMain: TfmMain
       Colors.StateAdded = 2146336
       Colors.StateSaved = clMedGray
       Colors.LockedBG = 14737632
+      Colors.TextHintFont = clGray
       OptTabSpaces = False
       OptTabSize = 10
+      OptTextLocked = 'wait...'
+      OptTextHintFontStyle = [fsItalic]
+      OptTextHintCenter = False
       OptOffsetTop = 2
       OptAutoIndent = True
       OptAutoIndentKind = cIndentAsIs
@@ -217,6 +232,7 @@ object fmMain: TfmMain
       OptRulerFontSize = 8
       OptRulerMarkSizeSmall = 3
       OptRulerMarkSizeBig = 7
+      OptRulerTextIndent = 0
       OptMinimapVisible = False
       OptMinimapFontSize = 2
       OptMinimapShowSelBorder = False
@@ -228,6 +244,8 @@ object fmMain: TfmMain
       OptWrapMode = cWrapOff
       OptWrapIndented = True
       OptMarginRight = 1000
+      OptNumbersAutosize = True
+      OptNumbersAlignment = taRightJustify
       OptNumbersFontSize = 0
       OptNumbersStyle = cNumbersEach5th
       OptNumbersShowFirst = True
