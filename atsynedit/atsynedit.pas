@@ -332,9 +332,9 @@ type
     FOnClickDbl,
     FOnClickTriple,
     FOnClickMiddle: TATSynEditClickEvent;
-    FOnCaretMoved: TNotifyEvent;
-    FOnChanged: TNotifyEvent;
-    FOnScrolled: TNotifyEvent;
+    FOnChangeCaretPos: TNotifyEvent;
+    FOnChange: TNotifyEvent;
+    FOnScroll: TNotifyEvent;
     FOnClickGutter: TATSynEditClickGutterEvent;
     FOnClickMicromap: TATSynEditClickMicromapEvent;
     FOnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent;
@@ -342,7 +342,7 @@ type
     FOnDrawMicromap: TATSynEditDrawRectEvent;
     FOnDrawEditor: TATSynEditDrawRectEvent;
     FOnDrawRuler: TATSynEditDrawRectEvent;
-    FOnStateChanged: TNotifyEvent;
+    FOnChangeState: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
     FWrapInfo: TATSynWrapInfo;
     FWrapColumn: integer;
@@ -742,10 +742,17 @@ type
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
   published
     property Align;
-    property BorderStyle;
+    property Anchors;
     property BorderSpacing;
-    property BorderWidth;
+    property BorderStyle;
+    property Enabled;
     property Font;
+    property ParentFont;
+    property ParentShowHint;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    property Visible;
     //menu
     property PopupText: TPopupMenu read FMenuText write FMenuText;
     property PopupGutterBm: TPopupMenu read FMenuGutterBm write FMenuGutterBm;
@@ -754,16 +761,31 @@ type
     property PopupMinimap: TPopupMenu read FMenuMinimap write FMenuMinimap;
     property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
     property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
-    //events
+    //events std
+    property OnEnter;
+    property OnExit;
+    property OnKeyDown;
+    property OnKeyPress;
+    property OnKeyUp;
+    property OnMouseDown;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseWheelDown;
+    property OnMouseWheelUp;
+    property OnUTF8KeyPress;
+    //events new
     property OnClickDouble: TATSynEditClickEvent read FOnClickDbl write FOnClickDbl;
     property OnClickTriple: TATSynEditClickEvent read FOnClickTriple write FOnClickTriple;
     property OnClickMiddle: TATSynEditClickEvent read FOnClickMiddle write FOnClickMiddle;
     property OnClickGutter: TATSynEditClickGutterEvent read FOnClickGutter write FOnClickGutter;
     property OnClickMicromap: TATSynEditClickMicromapEvent read FOnClickMicromap write FOnClickMicromap;
-    property OnCaretMoved: TNotifyEvent read FOnCaretMoved write FOnCaretMoved;
-    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
-    property OnScrolled: TNotifyEvent read FOnScrolled write FOnScrolled;
-    property OnStateChanged: TNotifyEvent read FOnStateChanged write FOnStateChanged;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
+    property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
+    property OnScroll: TNotifyEvent read FOnScroll write FOnScroll;
     property OnCommand: TATSynEditCommandEvent read FOnCommand write FOnCommand;
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
@@ -3210,26 +3232,26 @@ end;
 
 procedure TATSynEdit.DoEventCarets;
 begin
-  if Assigned(FOnCaretMoved) then
-    FOnCaretMoved(Self);
+  if Assigned(FOnChangeCaretPos) then
+    FOnChangeCaretPos(Self);
 end;
 
 procedure TATSynEdit.DoEventScroll;
 begin
-  if Assigned(FOnScrolled) then
-    FOnScrolled(Self);
+  if Assigned(FOnScroll) then
+    FOnScroll(Self);
 end;
 
 procedure TATSynEdit.DoEventChange;
 begin
-  if Assigned(FOnChanged) then
-    FOnChanged(Self);
+  if Assigned(FOnChange) then
+    FOnChange(Self);
 end;
 
 procedure TATSynEdit.DoEventState;
 begin
-  if Assigned(FOnStateChanged) then
-    FOnStateChanged(Self);
+  if Assigned(FOnChangeState) then
+    FOnChangeState(Self);
 end;
 
 procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer);

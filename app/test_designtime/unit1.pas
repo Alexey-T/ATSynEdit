@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  ATSynEdit, ATSynEdit_Edits;
+  StdCtrls, ATSynEdit, ATSynEdit_Edits, LCLType;
 
 type
   { TfmMain }
@@ -14,6 +14,7 @@ type
   TfmMain = class(TForm)
     combo: TATComboEdit;
     ed: TATSynEdit;
+    Memo1: TMemo;
     Panel1: TPanel;
     procedure FormShow(Sender: TObject);
   private
@@ -39,6 +40,7 @@ begin
   ed.Strings.LineAdd('test...');
   ed.Update(true);
 end;
+
 
 end.
 

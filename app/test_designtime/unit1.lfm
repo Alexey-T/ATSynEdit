@@ -33,6 +33,7 @@ object fmMain: TfmMain
     Colors.GutterPlusBG = 16053492
     Colors.GutterFoldLine = clGray
     Colors.GutterFoldBG = 13158600
+    Colors.GutterSeparatorBG = clBlack
     Colors.CurrentLineBG = 14741744
     Colors.MarginRight = clSilver
     Colors.MarginCaret = clLime
@@ -176,6 +177,7 @@ object fmMain: TfmMain
       Colors.GutterPlusBG = 16053492
       Colors.GutterFoldLine = clGray
       Colors.GutterFoldBG = 13158600
+      Colors.GutterSeparatorBG = clBlack
       Colors.CurrentLineBG = 14741744
       Colors.MarginRight = clSilver
       Colors.MarginCaret = clLime
@@ -287,6 +289,17 @@ object fmMain: TfmMain
       OptUndoAfterSave = True
       OptSavingForceFinalEol = False
       OptSavingTrimSpaces = False
+    end
+    object Memo1: TMemo
+      Left = 325
+      Height = 54
+      Top = -4
+      Width = 150
+      Lines.Strings = (
+        'Memo1'
+      )
+      TabOrder = 1
+      Visible = False
     end
   end
 end

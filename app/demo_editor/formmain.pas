@@ -198,10 +198,10 @@ begin
   ed.PopupMicromap:= PopupMicromap;
   ed.PopupRuler:= PopupRuler;
 
-  ed.OnChanged:= @EditChanged;
-  ed.OnCaretMoved:= @EditCaretMoved;
-  ed.OnScrolled:= @EditCaretMoved;
-  ed.OnStateChanged:= @EditCaretMoved;
+  ed.OnChange:= @EditChanged;
+  ed.OnChangeCaretPos:= @EditCaretMoved;
+  ed.OnChangeState:= @EditCaretMoved;
+  ed.OnScroll:= @EditCaretMoved;
   ed.OnCommand:= @EditCommand;
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnClickMicromap:= @EditClickMicromap;
