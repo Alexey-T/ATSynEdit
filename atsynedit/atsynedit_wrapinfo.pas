@@ -15,11 +15,11 @@ type
   public
     NLineIndex,
     NCharIndex,
-    NLength,
-    NIndent: integer;
+    NLength: integer;
+    NIndent: word;
     NFinal: TATSynWrapFinal;
-    constructor Create(ALineIndex, ACharIndex, ALength, AIndent: integer;
-      AFinal: TATSynWrapFinal); virtual;
+    constructor Create(ALineIndex, ACharIndex, ALength: integer;
+      AIndent: word; AFinal: TATSynWrapFinal); virtual;
     procedure Assign(Item: TATSynWrapItem);
   end;
 
@@ -60,8 +60,8 @@ uses
 
 { TATSynWrapItem }
 
-constructor TATSynWrapItem.Create(ALineIndex, ACharIndex, ALength,
-  AIndent: integer; AFinal: TATSynWrapFinal);
+constructor TATSynWrapItem.Create(ALineIndex, ACharIndex, ALength: integer;
+  AIndent: word; AFinal: TATSynWrapFinal);
 begin
   NLineIndex:= ALineIndex;
   NCharIndex:= ACharIndex;

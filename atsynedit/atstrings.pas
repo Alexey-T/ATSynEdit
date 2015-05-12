@@ -11,6 +11,7 @@ interface
 
 uses
   Classes, SysUtils,
+  Graphics,
   ATStringProc,
   ATStrings_Undo;
 
@@ -32,7 +33,9 @@ type
 const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2);
 
-  cMaxUpdatesCountEasy = 200;
+const
+  cMaxUpdatesCountEasy = 200; //if update count is less, do smarter wrapinfo update
+                              //(find index, replace items)
 
 type
   { TATStringItem }
@@ -41,9 +44,9 @@ type
     ItemString: atString;
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
-    ItemHidden: integer; //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
-    ItemBm: integer;
-    ItemBmColor: integer;
+    ItemHidden: smallint; //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
+    ItemBm: byte;
+    ItemBmColor: TColor;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
     function IsFake: boolean;
   end;
