@@ -13,6 +13,7 @@ uses
   Classes, SysUtils,
   Graphics,
   ATStringProc,
+  ATStringProc_Utf8Detect,
   ATStrings_Undo;
 
 type
@@ -194,46 +195,6 @@ const
 procedure DoEncError;
 begin
   raise Exception.Create('Unknown enc value');
-end;
-
-function IsStreamWithSignature(Stream: TStream; const Sign: AnsiString): boolean;
-var
-  Buf: AnsiString;
-begin
-  Result:= false;
-  if Stream.Size<Length(Sign) then Exit;
-  SetLength(Buf, Length(Sign));
-  Stream.Position:= 0;
-  Stream.ReadBuffer(Buf[1], Length(Sign));
-  Stream.Position:= 0;
-  Result:= Buf=Sign;
-end;
-
-procedure DoDetectStreamEncoding(Stream: TStream; out Enc: TATFileEncoding; out SignLen: integer);
-begin
-  Enc:= cEncAnsi;
-  SignLen:= 0;
-
-  if IsStreamWithSignature(Stream, cSignUTF8) then
-  begin
-    Enc:= cEncUTF8;
-    SignLen:= Length(cSignUTF8);
-    Exit
-  end;
-
-  if IsStreamWithSignature(Stream, cSignWideLE) then
-  begin
-    Enc:= cEncWideLE;
-    SignLen:= Length(cSignWideLE);
-    Exit
-  end;
-
-  if IsStreamWithSignature(Stream, cSignWideBE) then
-  begin
-    Enc:= cEncWideBE;
-    SignLen:= Length(cSignWideBE);
-    Exit
-  end;
 end;
 
 

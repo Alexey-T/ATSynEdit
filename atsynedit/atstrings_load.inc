@@ -1,5 +1,70 @@
 {$ifdef nn}begin end;{$endif}
 
+function IsStreamWithSignature(Stream: TStream; const Sign: AnsiString): boolean;
+var
+  Buf: AnsiString;
+begin
+  Result:= false;
+  if Stream.Size<Length(Sign) then Exit;
+  SetLength(Buf, Length(Sign));
+  Stream.Position:= 0;
+  Stream.ReadBuffer(Buf[1], Length(Sign));
+  Stream.Position:= 0;
+  Result:= Buf=Sign;
+end;
+
+function IsStreamWithUt8NoBom(Stream: TStream): boolean;
+const
+  cBufSize = 16*1024;
+  cMinLen = 8;
+var
+  Buf: array[0..cBufSize-1] of char;
+begin
+  Result:= false;
+  if Stream.Size<cMinLen then Exit;
+  FillChar(Buf{%H-}, SizeOf(Buf), 0);
+  Stream.Position:= 0;
+  Stream.Read(Buf, SizeOf(Buf)-1); //not ReadBuffer, no need exception
+  Stream.Position:= 0;
+  Result:= IsBufferUtf8(@Buf, true);
+end;
+
+procedure DoDetectStreamEncoding(Stream: TStream; out Enc: TATFileEncoding; out SignLen: integer; out EncWithBom: boolean);
+begin
+  Enc:= cEncAnsi;
+  EncWithBom:= true;
+  SignLen:= 0;
+
+  if IsStreamWithSignature(Stream, cSignUTF8) then
+  begin
+    Enc:= cEncUTF8;
+    SignLen:= Length(cSignUTF8);
+    Exit
+  end;
+
+  if IsStreamWithSignature(Stream, cSignWideLE) then
+  begin
+    Enc:= cEncWideLE;
+    SignLen:= Length(cSignWideLE);
+    Exit
+  end;
+
+  if IsStreamWithSignature(Stream, cSignWideBE) then
+  begin
+    Enc:= cEncWideBE;
+    SignLen:= Length(cSignWideBE);
+    Exit
+  end;
+
+  if IsStreamWithUt8NoBom(Stream) then
+  begin
+    Enc:= cEncUTF8;
+    EncWithBom:= false;
+    Exit
+  end;
+end;
+
+
 procedure TATStrings.LoadFromString(const AText: atString);
 var
   MS: TMemoryStream;
@@ -58,12 +123,20 @@ var
   SA: AnsiString;
   SW: UnicodeString;
   LineEnd: TATLineEnds;
+  WithBom: boolean;
 begin
   Clear;
 
   Len:= 0;
   if FEncodingDetect then
-    DoDetectStreamEncoding(Stream, FEncoding, Len);
+  begin
+    DoDetectStreamEncoding(Stream, FEncoding, Len, WithBom);
+    case FEncoding of
+      cEncUTF8: SaveSignUtf8:= WithBom;
+      cEncWideBE,
+      cEncWideLE: SaveSignWide:= WithBom;
+    end;
+  end;
   CharSize:= cEncodingSize[FEncoding];
 
   BufSize:= Stream.Size-Len;
