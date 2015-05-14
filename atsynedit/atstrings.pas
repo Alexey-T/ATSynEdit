@@ -70,6 +70,7 @@ type
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
     FEncodingCodepage: string;
+    FEncodingDetectBufSizeKb: integer;
     FModified: boolean;
     FSaveSignUtf8: boolean;
     FSaveSignWide: boolean;
@@ -137,6 +138,7 @@ type
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
+    property EncodingDetectBufSizeKb: integer read FEncodingDetectBufSizeKb write FEncodingDetectBufSizeKb;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
@@ -399,6 +401,7 @@ begin
   FEncoding:= cEncAnsi;
   FEncodingDetect:= true;
   FEncodingCodepage:= '';
+  FEncodingDetectBufSizeKb:= 16;
   FEndings:= cEndWin;
 
   FModified:= false;
