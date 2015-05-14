@@ -1,0 +1,2 @@
+Ger "o umlaut" öÖ
+Ger "u umlaut" üÜ

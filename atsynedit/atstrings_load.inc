@@ -185,13 +185,13 @@ begin
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
 
-              //if codepage set, convert 1) codepage->utf8, 2) utf8->UnicodeString
-              //else just do string->UnicodeString
+              //if codepage set, convert string->utf8->UnicodeString
+              //else just string->UnicodeString
               if FEncodingCodepage='' then
                 SW:= SA
               else
               begin
-                SA:= ConvertEncoding(SA, FEncodingCodepage, 'utf8');
+                SA:= ConvertEncoding(SA, FEncodingCodepage, ''{means utf8});
                 SW:= UTF8Decode(SA);
               end;
 

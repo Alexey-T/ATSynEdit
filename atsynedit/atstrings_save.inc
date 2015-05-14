@@ -28,12 +28,14 @@ begin
     case AEncoding of
       cEncAnsi:
         begin
+          //if codepage set, convert UnicodeString->utf8->Ansistring
+          //else just UnicodeString->Ansistring
           if FEncodingCodepage='' then
             SA:= SW
           else
           begin
             SA:= UTF8Encode(SW);
-            SA:= ConvertEncoding(SA, 'utf8', FEncodingCodepage);
+            SA:= ConvertEncoding(SA, ''{means utf8}, FEncodingCodepage);
           end;
 
           Stream.WriteBuffer(SA[1], Length(SA));
