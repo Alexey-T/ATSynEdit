@@ -69,6 +69,7 @@ type
     FEndings: TATLineEnds;
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
+    FEncodingCodepage: string;
     FModified: boolean;
     FSaveSignUtf8: boolean;
     FSaveSignWide: boolean;
@@ -134,6 +135,7 @@ type
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesBmColor[Index: integer]: integer read GetLineBmColor write SetLineBmColor;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
+    property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
@@ -185,7 +187,8 @@ implementation
 uses
   Dialogs,
   Math,
-  LazUtf8Classes;
+  LazUtf8Classes,
+  LConvEncoding;
 
 const
   cSignUTF8: AnsiString = #$EF#$BB#$BF;
@@ -395,6 +398,7 @@ begin
 
   FEncoding:= cEncAnsi;
   FEncodingDetect:= true;
+  FEncodingCodepage:= '';
   FEndings:= cEndWin;
 
   FModified:= false;

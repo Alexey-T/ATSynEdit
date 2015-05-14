@@ -184,7 +184,18 @@ begin
               SA:= '';
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
-              LineAddRaw(SA, LineEnd);
+
+              //if codepage set, convert 1) codepage->utf8, 2) utf8->UnicodeString
+              //else just do string->UnicodeString
+              if FEncodingCodepage='' then
+                SW:= SA
+              else
+              begin
+                SA:= ConvertEncoding(SA, FEncodingCodepage, 'utf8');
+                SW:= UTF8Decode(SA);
+              end;
+
+              LineAddRaw(SW, LineEnd);
             end;
 
           cEncUTF8:

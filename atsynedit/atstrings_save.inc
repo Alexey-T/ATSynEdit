@@ -28,14 +28,23 @@ begin
     case AEncoding of
       cEncAnsi:
         begin
-          SA:= SW;
+          if FEncodingCodepage='' then
+            SA:= SW
+          else
+          begin
+            SA:= UTF8Encode(SW);
+            SA:= ConvertEncoding(SA, 'utf8', FEncodingCodepage);
+          end;
+
           Stream.WriteBuffer(SA[1], Length(SA));
         end;
+
       cEncUTF8:
         begin
           SA:= UTF8Encode(SW);
           Stream.WriteBuffer(SA[1], Length(SA));
         end;
+
       cEncWideLE,
       cEncWideBE:
         begin
@@ -43,6 +52,7 @@ begin
             SW:= SSwapEndian(SW);
           Stream.WriteBuffer(SW[1], Length(SW)*2);
         end;
+
       else
         DoEncError;
     end;

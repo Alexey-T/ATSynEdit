@@ -51,35 +51,40 @@ type
     Label9: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
-    mnuSave: TMenuItem;
-    mnuLoad: TMenuItem;
+    mnuEncAnsi: TMenuItem;
+    mnuFileEnc: TMenuItem;
+    mnuEncCP1250: TMenuItem;
+    mnuEncCP1251: TMenuItem;
+    mnuEncCP1253: TMenuItem;
+    mnuOptSave: TMenuItem;
+    mnuOptLoad: TMenuItem;
     MenuItem2: TMenuItem;
-    btnHlp: TMenuItem;
+    mnuHelpMous: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
     MenuItem8: TMenuItem;
-    MenuItem9: TMenuItem;
+    mnuOpts: TMenuItem;
     mnuBms: TMenuItem;
     mnuOneLine: TMenuItem;
     mnuPane: TMenuItem;
     mnuHilit: TMenuItem;
     mnuTCaret1: TMenuItem;
-    mnuOpt: TMenuItem;
+    mnuOptDlg: TMenuItem;
     mnuTBms: TMenuItem;
     mnuTMargin: TMenuItem;
     mnuFile: TMenuItem;
     mnuHlp: TMenuItem;
-    MenuItem5: TMenuItem;
+    mnuFileEnd: TMenuItem;
     mnuTst: TMenuItem;
     mnuTCaretK: TMenuItem;
-    mnuEndW: TMenuItem;
-    mnuEndUn: TMenuItem;
-    mnuEndMc: TMenuItem;
-    mnuKey: TMenuItem;
-    mnuOpn: TMenuItem;
-    mnuSav: TMenuItem;
+    mnuEndWin: TMenuItem;
+    mnuEndUnix: TMenuItem;
+    mnuEndMac: TMenuItem;
+    mnuHelpKey: TMenuItem;
+    mnuFileOpen: TMenuItem;
+    mnuFileSav: TMenuItem;
     mnuGoto: TMenuItem;
     OpenDialog1: TOpenDialog;
     PanelMain: TPanel;
@@ -99,7 +104,11 @@ type
     procedure bSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
-    procedure btnHlpClick(Sender: TObject);
+    procedure mnuEncAnsiClick(Sender: TObject);
+    procedure mnuEncCP1250Click(Sender: TObject);
+    procedure mnuEncCP1251Click(Sender: TObject);
+    procedure mnuEncCP1253Click(Sender: TObject);
+    procedure mnuHelpMousClick(Sender: TObject);
     procedure btnLoadClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
@@ -126,9 +135,9 @@ type
     procedure edTabsizeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure mnuEndMcClick(Sender: TObject);
-    procedure mnuEndUnClick(Sender: TObject);
-    procedure mnuEndWClick(Sender: TObject);
+    procedure mnuEndMacClick(Sender: TObject);
+    procedure mnuEndUnixClick(Sender: TObject);
+    procedure mnuEndWinClick(Sender: TObject);
     procedure mnuHilitClick(Sender: TObject);
     procedure mnuLockClick(Sender: TObject);
     procedure mnuTBmsClick(Sender: TObject);
@@ -228,21 +237,21 @@ begin
     DoOpen(fn);
 end;
 
-procedure TfmMain.mnuEndMcClick(Sender: TObject);
+procedure TfmMain.mnuEndMacClick(Sender: TObject);
 begin
   ed.Strings.Endings:= cEndMac;
   ed.Update;
   UpdateStatus;
 end;
 
-procedure TfmMain.mnuEndUnClick(Sender: TObject);
+procedure TfmMain.mnuEndUnixClick(Sender: TObject);
 begin
   ed.Strings.Endings:= cEndUnix;
   ed.Update;
   UpdateStatus;
 end;
 
-procedure TfmMain.mnuEndWClick(Sender: TObject);
+procedure TfmMain.mnuEndWinClick(Sender: TObject);
 begin
   ed.Strings.Endings:= cEndWin;
   ed.Update;
@@ -547,7 +556,27 @@ begin
   ed.SetFocus;
 end;
 
-procedure TfmMain.btnHlpClick(Sender: TObject);
+procedure TfmMain.mnuEncAnsiClick(Sender: TObject);
+begin
+  Ed.Strings.EncodingCodepage:= '';
+end;
+
+procedure TfmMain.mnuEncCP1250Click(Sender: TObject);
+begin
+  Ed.Strings.EncodingCodepage:= 'cp1250';
+end;
+
+procedure TfmMain.mnuEncCP1251Click(Sender: TObject);
+begin
+  Ed.Strings.EncodingCodepage:= 'cp1251';
+end;
+
+procedure TfmMain.mnuEncCP1253Click(Sender: TObject);
+begin
+  Ed.Strings.EncodingCodepage:= 'cp1253';
+end;
+
+procedure TfmMain.mnuHelpMousClick(Sender: TObject);
 const
   txt =
     'Ctrl+click - add/del caret'#13+

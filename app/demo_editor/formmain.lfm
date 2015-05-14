@@ -305,29 +305,48 @@ object fmMain: TfmMain
     top = 72
     object mnuFile: TMenuItem
       Caption = 'File'
-      object mnuOpn: TMenuItem
+      object mnuFileOpen: TMenuItem
         Caption = 'Open..'
         ShortCut = 16463
         OnClick = bOpenClick
       end
-      object mnuSav: TMenuItem
+      object mnuFileSav: TMenuItem
         Caption = 'Save..'
         ShortCut = 16467
         OnClick = bSaveClick
       end
-      object MenuItem5: TMenuItem
+      object mnuFileEnc: TMenuItem
+        Caption = 'Set codepage'
+        object mnuEncAnsi: TMenuItem
+          Caption = 'ansi'
+          OnClick = mnuEncAnsiClick
+        end
+        object mnuEncCP1250: TMenuItem
+          Caption = 'cp1250'
+          OnClick = mnuEncCP1250Click
+        end
+        object mnuEncCP1251: TMenuItem
+          Caption = 'cp1251'
+          OnClick = mnuEncCP1251Click
+        end
+        object mnuEncCP1253: TMenuItem
+          Caption = 'cp1253'
+          OnClick = mnuEncCP1253Click
+        end
+      end
+      object mnuFileEnd: TMenuItem
         Caption = 'Set ends'
-        object mnuEndW: TMenuItem
+        object mnuEndWin: TMenuItem
           Caption = 'win'
-          OnClick = mnuEndWClick
+          OnClick = mnuEndWinClick
         end
-        object mnuEndUn: TMenuItem
+        object mnuEndUnix: TMenuItem
           Caption = 'unix'
-          OnClick = mnuEndUnClick
+          OnClick = mnuEndUnixClick
         end
-        object mnuEndMc: TMenuItem
+        object mnuEndMac: TMenuItem
           Caption = 'mac'
-          OnClick = mnuEndMcClick
+          OnClick = mnuEndMacClick
         end
       end
     end
@@ -370,19 +389,19 @@ object fmMain: TfmMain
         OnClick = mnuPaneClick
       end
     end
-    object MenuItem9: TMenuItem
+    object mnuOpts: TMenuItem
       Caption = 'Options'
-      object mnuOpt: TMenuItem
+      object mnuOptDlg: TMenuItem
         Caption = 'options..'
         ShortCut = 120
         OnClick = bOptClick
       end
-      object mnuSave: TMenuItem
+      object mnuOptSave: TMenuItem
         Caption = 'save'
         ShortCut = 113
         OnClick = btnSaveClick
       end
-      object mnuLoad: TMenuItem
+      object mnuOptLoad: TMenuItem
         Caption = 'load'
         ShortCut = 32881
         OnClick = btnLoadClick
@@ -390,7 +409,7 @@ object fmMain: TfmMain
     end
     object mnuHlp: TMenuItem
       Caption = 'Help'
-      object mnuKey: TMenuItem
+      object mnuHelpKey: TMenuItem
         Caption = 'commands..'
         ShortCut = 112
         OnClick = bKeymapClick
@@ -398,9 +417,9 @@ object fmMain: TfmMain
       object MenuItem2: TMenuItem
         Caption = '-'
       end
-      object btnHlp: TMenuItem
+      object mnuHelpMous: TMenuItem
         Caption = 'mouse help..'
-        OnClick = btnHlpClick
+        OnClick = mnuHelpMousClick
       end
     end
   end
