@@ -612,9 +612,10 @@ begin
     Ed.Strings.EncodingCodepage:= Str;
   end;
 
-  if Application.Messagebox('Encoding changed in mem. Also reload file in this encoding?',
-    'Editor', MB_OKCANCEL or MB_ICONQUESTION) = id_ok then
-    DoOpen(FFileName, false);
+  if FFileName<>'' then
+    if Application.Messagebox('Encoding changed in mem. Also reload file in this encoding?',
+      'Editor', MB_OKCANCEL or MB_ICONQUESTION) = id_ok then
+      DoOpen(FFileName, false);
 end;
 
 procedure TfmMain.DoAddEnc(Sub, SName: string);
@@ -666,24 +667,26 @@ begin
   DoAddEnc('Europe', 'CP1252');
   DoAddEnc('Europe', 'CP1253');
   DoAddEnc('Europe', 'CP1257');
+  DoAddEnc('Europe', '-');
   DoAddEnc('Europe', 'CP437');
   DoAddEnc('Europe', 'CP850');
   DoAddEnc('Europe', 'CP852');
   DoAddEnc('Europe', 'CP866');
   DoAddEnc('Europe', 'CP874');
+  DoAddEnc('Europe', '-');
   DoAddEnc('Europe', 'ISO-8859-1');
   DoAddEnc('Europe', 'ISO-8859-2');
   DoAddEnc('Europe', 'Macintosh');
 
-  DoAddEnc('Oth', 'CP1254');
-  DoAddEnc('Oth', 'CP1255');
-  DoAddEnc('Oth', 'CP1256');
+  DoAddEnc('Other', 'CP1254');
+  DoAddEnc('Other', 'CP1255');
+  DoAddEnc('Other', 'CP1256');
 
-  DoAddEnc('Asian', 'CP1258');
   DoAddEnc('Asian', 'CP932');
   DoAddEnc('Asian', 'CP936');
   DoAddEnc('Asian', 'CP949');
   DoAddEnc('Asian', 'CP950');
+  DoAddEnc('Asian', 'CP1258');
 end;
 
 procedure TfmMain.mnuHelpMousClick(Sender: TObject);
