@@ -308,12 +308,12 @@ object fmMain: TfmMain
       object mnuFileOpen: TMenuItem
         Caption = 'Open..'
         ShortCut = 16463
-        OnClick = bOpenClick
+        OnClick = mnuFileOpenClick
       end
       object mnuFileSav: TMenuItem
         Caption = 'Save..'
         ShortCut = 16467
-        OnClick = bSaveClick
+        OnClick = mnuFileSaveClick
       end
       object mnuFileEnd: TMenuItem
         Caption = 'Set ends'

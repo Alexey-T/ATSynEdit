@@ -94,10 +94,10 @@ type
     SaveDialog1: TSaveDialog;
     Status: TStatusBar;
     procedure bGotoClick(Sender: TObject);
-    procedure bOpenClick(Sender: TObject);
+    procedure mnuFileOpenClick(Sender: TObject);
     procedure bFontClick(Sender: TObject);
     procedure bAddCrtClick(Sender: TObject);
-    procedure bSaveClick(Sender: TObject);
+    procedure mnuFileSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
     procedure UpdateEnc;
@@ -145,7 +145,7 @@ type
     FIniName: string;
     FFileName: string;
     procedure DoAddEnc(Sub, SName: string);
-    procedure DoOpen(const fn: string);
+    procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
@@ -242,7 +242,7 @@ begin
 
   fn:= FDir+'\fn.txt';
   if FileExists(fn) then
-    DoOpen(fn);
+    DoOpen(fn, true);
 end;
 
 procedure TfmMain.mnuEndMacClick(Sender: TObject);
@@ -456,27 +456,28 @@ begin
   C.Rectangle(ARect);
 end;
 
-procedure TfmMain.bOpenClick(Sender: TObject);
+procedure TfmMain.mnuFileOpenClick(Sender: TObject);
 begin
   with OpenDialog1 do
   begin
     InitialDir:= FDir;
     if not Execute then Exit;
-
-    ed.Strings.EncodingCodepage:= '';
-    ed.Strings.EncodingDetect:= true;
-    DoOpen(FileName);
+    DoOpen(FileName, true);
   end;
 end;
 
-procedure TfmMain.DoOpen(const fn: string);
+procedure TfmMain.DoOpen(const fn: string; ADetectEnc: boolean);
 begin
   Application.ProcessMessages;
   FFileName:= fn;
 
   ed.BeginUpdate;
   try
+    if ADetectEnc then
+      ed.Strings.EncodingCodepage:= '';
+    ed.Strings.EncodingDetect:= ADetectEnc;
     ed.LoadFromFile(fn);
+    ed.Strings.EncodingDetect:= true;
   finally
     ed.EndUpdate;
   end;
@@ -532,7 +533,7 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.bSaveClick(Sender: TObject);
+procedure TfmMain.mnuFileSaveClick(Sender: TObject);
 begin
   with SaveDialog1 do
   begin
@@ -613,11 +614,7 @@ begin
 
   if Application.Messagebox('Encoding changed in mem. Also reload file in this encoding?',
     'Editor', MB_OKCANCEL or MB_ICONQUESTION) = id_ok then
-    begin
-      Ed.Strings.EncodingDetect:= false;
-      DoOpen(FFileName);
-      Ed.Strings.EncodingDetect:= true;
-    end;
+    DoOpen(FFileName, false);
 end;
 
 procedure TfmMain.DoAddEnc(Sub, SName: string);
