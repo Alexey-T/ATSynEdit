@@ -51,11 +51,7 @@ type
     Label9: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
-    mnuEncAnsi: TMenuItem;
     mnuFileEnc: TMenuItem;
-    mnuEncCP1250: TMenuItem;
-    mnuEncCP1251: TMenuItem;
-    mnuEncCP1253: TMenuItem;
     mnuOptSave: TMenuItem;
     mnuOptLoad: TMenuItem;
     MenuItem2: TMenuItem;
@@ -104,10 +100,7 @@ type
     procedure bSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
-    procedure mnuEncAnsiClick(Sender: TObject);
-    procedure mnuEncCP1250Click(Sender: TObject);
-    procedure mnuEncCP1251Click(Sender: TObject);
-    procedure mnuEncCP1253Click(Sender: TObject);
+    procedure mnuFileClick(Sender: TObject);
     procedure mnuHelpMousClick(Sender: TObject);
     procedure btnLoadClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
@@ -150,7 +143,10 @@ type
     wait: boolean;
     FDir: string;
     FIniName: string;
+    FFileName: string;
+    procedure DoAddEnc(Sub, SName: string);
     procedure DoOpen(const fn: string);
+    procedure DoSetEnc(const Str: string);
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
@@ -162,6 +158,7 @@ type
     procedure EditDrawBm(Snd: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Snd: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawTest(Snd: TObject; C: TCanvas; const ARect: TRect);
+    procedure MenuEncClick(Sender: TObject);
     procedure UpdateStatus;
     procedure UpdateChecks;
   public
@@ -176,6 +173,8 @@ implementation
 uses
   Math,
   Types,
+  LCLType,
+  LCLProc,
   atsynedit_commands{%H-};
 
 {$R *.lfm}
@@ -454,16 +453,24 @@ begin
   begin
     InitialDir:= FDir;
     if not Execute then Exit;
+
+    ed.Strings.EncodingCodepage:= '';
+    ed.Strings.EncodingDetect:= true;
     DoOpen(FileName);
   end;
 end;
 
 procedure TfmMain.DoOpen(const fn: string);
 begin
-  ed.BeginUpdate;
   Application.ProcessMessages;
-  ed.LoadFromFile(fn);
-  ed.EndUpdate;
+  FFileName:= fn;
+
+  ed.BeginUpdate;
+  try
+    ed.LoadFromFile(fn);
+  finally
+    ed.EndUpdate;
+  end;
 
   Caption:= 'Demo - '+ExtractFileName(fn);
 end;
@@ -556,24 +563,79 @@ begin
   ed.SetFocus;
 end;
 
-procedure TfmMain.mnuEncAnsiClick(Sender: TObject);
+procedure TfmMain.DoSetEnc(const Str: string);
 begin
-  Ed.Strings.EncodingCodepage:= '';
+  Ed.Strings.EncodingCodepage:= Str;
+
+  if Application.Messagebox('Encoding changed in mem. Also reload file in this encoding?',
+    'Editor', mb_okcancel or MB_ICONQUESTION) = id_ok then
+    begin
+      Ed.Strings.EncodingDetect:= false;
+      DoOpen(FFileName);
+      Ed.Strings.EncodingDetect:= true;
+    end;
 end;
 
-procedure TfmMain.mnuEncCP1250Click(Sender: TObject);
+procedure TfmMain.DoAddEnc(Sub, SName: string);
+var
+  mi, miSub: TMenuItem;
+  n: integer;
+  PopupEnc: TMenuItem;
 begin
-  Ed.Strings.EncodingCodepage:= 'cp1250';
+  PopupEnc:= mnuFileEnc;
+  miSub:= nil;
+  if Sub<>'' then
+  begin
+    n:= PopupEnc.IndexOfCaption(Sub);
+    if n<0 then
+    begin
+      mi:= TMenuItem.Create(Self);
+      mi.Caption:= Sub;
+      PopupEnc.Add(mi);
+      n:= PopupEnc.IndexOfCaption(Sub);
+    end;
+    miSub:= PopupEnc.Items[n]
+  end;
+  if miSub=nil then miSub:= PopupEnc;
+  mi:= TMenuItem.Create(Self);
+  mi.Caption:= SName;
+  mi.OnClick:= @MenuEncClick;
+  miSub.Add(mi);
 end;
 
-procedure TfmMain.mnuEncCP1251Click(Sender: TObject);
+procedure TfmMain.MenuEncClick(Sender: TObject);
 begin
-  Ed.Strings.EncodingCodepage:= 'cp1251';
+  DoSetEnc((Sender as TMenuItem).Caption);
 end;
 
-procedure TfmMain.mnuEncCP1253Click(Sender: TObject);
+
+procedure TfmMain.mnuFileClick(Sender: TObject);
 begin
-  Ed.Strings.EncodingCodepage:= 'cp1253';
+  mnuFileEnc.Clear;
+
+  DoAddEnc('Europe', 'CP1250');
+  DoAddEnc('Europe', 'CP1251');
+  DoAddEnc('Europe', 'CP1252');
+  DoAddEnc('Europe', 'CP1253');
+  DoAddEnc('Europe', 'CP1257');
+  DoAddEnc('Europe', 'CP437');
+  DoAddEnc('Europe', 'CP850');
+  DoAddEnc('Europe', 'CP852');
+  DoAddEnc('Europe', 'CP866');
+  DoAddEnc('Europe', 'CP874');
+  DoAddEnc('Europe', 'ISO-8859-1');
+  DoAddEnc('Europe', 'ISO-8859-2');
+  DoAddEnc('Europe', 'Macintosh');
+
+  DoAddEnc('Oth', 'CP1254');
+  DoAddEnc('Oth', 'CP1255');
+  DoAddEnc('Oth', 'CP1256');
+
+  DoAddEnc('Asia', 'CP1258');
+  DoAddEnc('Asia', 'CP932');
+  DoAddEnc('Asia', 'CP936');
+  DoAddEnc('Asia', 'CP949');
+  DoAddEnc('Asia', 'CP950');
 end;
 
 procedure TfmMain.mnuHelpMousClick(Sender: TObject);
