@@ -182,6 +182,7 @@ uses
 const
   sEncAnsi = 'ANSI';
   sEncUtf8 = 'UTF-8';
+  sEncUtf8NoBom = 'UTF-8 no bom';
   sEncUtf16LE = 'UTF-16 LE';
   sEncUtf16BE = 'UTF-16 BE';
 
@@ -582,6 +583,14 @@ begin
   if Str=sEncUtf8 then
   begin
     Ed.Strings.Encoding:= cEncUTF8;
+    Ed.Strings.SaveSignUtf8:= true;
+    Ed.Strings.EncodingCodepage:= '';
+  end
+  else
+  if Str=sEncUtf8NoBom then
+  begin
+    Ed.Strings.Encoding:= cEncUTF8;
+    Ed.Strings.SaveSignUtf8:= false;
     Ed.Strings.EncodingCodepage:= '';
   end
   else
@@ -650,6 +659,7 @@ begin
 
   DoAddEnc('', sEncAnsi);
   DoAddEnc('', sEncUtf8);
+  DoAddEnc('', sEncUtf8NoBom);
   DoAddEnc('', sEncUtf16LE);
   DoAddEnc('', sEncUtf16BE);
   DoAddEnc('', '-');
@@ -672,11 +682,11 @@ begin
   DoAddEnc('Oth', 'CP1255');
   DoAddEnc('Oth', 'CP1256');
 
-  DoAddEnc('Asia', 'CP1258');
-  DoAddEnc('Asia', 'CP932');
-  DoAddEnc('Asia', 'CP936');
-  DoAddEnc('Asia', 'CP949');
-  DoAddEnc('Asia', 'CP950');
+  DoAddEnc('Asian', 'CP1258');
+  DoAddEnc('Asian', 'CP932');
+  DoAddEnc('Asian', 'CP936');
+  DoAddEnc('Asian', 'CP949');
+  DoAddEnc('Asian', 'CP950');
 end;
 
 procedure TfmMain.mnuHelpMousClick(Sender: TObject);
