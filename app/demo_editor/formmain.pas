@@ -51,7 +51,7 @@ type
     Label9: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
-    mnuFileEnc: TMenuItem;
+    mnuEnc: TMenuItem;
     mnuOptSave: TMenuItem;
     mnuOptLoad: TMenuItem;
     MenuItem2: TMenuItem;
@@ -100,7 +100,7 @@ type
     procedure bSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
-    procedure mnuFileClick(Sender: TObject);
+    procedure UpdateEnc;
     procedure mnuHelpMousClick(Sender: TObject);
     procedure btnLoadClick(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
@@ -180,6 +180,12 @@ uses
 {$R *.lfm}
 
 const
+  sEncAnsi = 'ANSI';
+  sEncUtf8 = 'UTF-8';
+  sEncUtf16LE = 'UTF-16 LE';
+  sEncUtf16BE = 'UTF-16 BE';
+
+const
   cColorBmLine = clMoneyGreen;
   cColorBmIco = clMedGray;
 
@@ -187,6 +193,8 @@ const
 
 procedure TfmMain.FormCreate(Sender: TObject);
 begin
+  UpdateEnc;
+
   FDir:= ExtractFilePath(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'test_files';
   wait:= true;
 
@@ -565,10 +573,37 @@ end;
 
 procedure TfmMain.DoSetEnc(const Str: string);
 begin
-  Ed.Strings.EncodingCodepage:= Str;
+  if Str=sEncAnsi then
+  begin
+    Ed.Strings.Encoding:= cEncAnsi;
+    Ed.Strings.EncodingCodepage:= '';
+  end
+  else
+  if Str=sEncUtf8 then
+  begin
+    Ed.Strings.Encoding:= cEncUTF8;
+    Ed.Strings.EncodingCodepage:= '';
+  end
+  else
+  if Str=sEncUtf16LE then
+  begin
+    Ed.Strings.Encoding:= cEncWideLE;
+    Ed.Strings.EncodingCodepage:= '';
+  end
+  else
+  if Str=sEncUtf16BE then
+  begin
+    Ed.Strings.Encoding:= cEncWideBE;
+    Ed.Strings.EncodingCodepage:= '';
+  end
+  else
+  begin
+    Ed.Strings.Encoding:= cEncAnsi;
+    Ed.Strings.EncodingCodepage:= Str;
+  end;
 
   if Application.Messagebox('Encoding changed in mem. Also reload file in this encoding?',
-    'Editor', mb_okcancel or MB_ICONQUESTION) = id_ok then
+    'Editor', MB_OKCANCEL or MB_ICONQUESTION) = id_ok then
     begin
       Ed.Strings.EncodingDetect:= false;
       DoOpen(FFileName);
@@ -580,23 +615,23 @@ procedure TfmMain.DoAddEnc(Sub, SName: string);
 var
   mi, miSub: TMenuItem;
   n: integer;
-  PopupEnc: TMenuItem;
+  subEnc: TMenuItem;
 begin
-  PopupEnc:= mnuFileEnc;
+  subEnc:= mnuEnc;
   miSub:= nil;
   if Sub<>'' then
   begin
-    n:= PopupEnc.IndexOfCaption(Sub);
+    n:= subEnc.IndexOfCaption(Sub);
     if n<0 then
     begin
       mi:= TMenuItem.Create(Self);
       mi.Caption:= Sub;
-      PopupEnc.Add(mi);
-      n:= PopupEnc.IndexOfCaption(Sub);
+      subEnc.Add(mi);
+      n:= subEnc.IndexOfCaption(Sub);
     end;
-    miSub:= PopupEnc.Items[n]
+    miSub:= subEnc.Items[n]
   end;
-  if miSub=nil then miSub:= PopupEnc;
+  if miSub=nil then miSub:= subEnc;
   mi:= TMenuItem.Create(Self);
   mi.Caption:= SName;
   mi.OnClick:= @MenuEncClick;
@@ -609,9 +644,15 @@ begin
 end;
 
 
-procedure TfmMain.mnuFileClick(Sender: TObject);
+procedure TfmMain.UpdateEnc;
 begin
-  mnuFileEnc.Clear;
+  mnuEnc.Clear;
+
+  DoAddEnc('', sEncAnsi);
+  DoAddEnc('', sEncUtf8);
+  DoAddEnc('', sEncUtf16LE);
+  DoAddEnc('', sEncUtf16BE);
+  DoAddEnc('', '-');
 
   DoAddEnc('Europe', 'CP1250');
   DoAddEnc('Europe', 'CP1251');

@@ -305,7 +305,6 @@ object fmMain: TfmMain
     top = 72
     object mnuFile: TMenuItem
       Caption = 'File'
-      OnClick = mnuFileClick
       object mnuFileOpen: TMenuItem
         Caption = 'Open..'
         ShortCut = 16463
@@ -315,9 +314,6 @@ object fmMain: TfmMain
         Caption = 'Save..'
         ShortCut = 16467
         OnClick = bSaveClick
-      end
-      object mnuFileEnc: TMenuItem
-        Caption = 'Set codepage'
       end
       object mnuFileEnd: TMenuItem
         Caption = 'Set ends'
@@ -334,6 +330,9 @@ object fmMain: TfmMain
           OnClick = mnuEndMacClick
         end
       end
+    end
+    object mnuEnc: TMenuItem
+      Caption = 'Encoding'
     end
     object mnuTst: TMenuItem
       Caption = 'Test'
