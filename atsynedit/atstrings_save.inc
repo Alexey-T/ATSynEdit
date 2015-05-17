@@ -7,6 +7,7 @@ var
   SA: AnsiString;
   SW: UnicodeString;
   Sign: AnsiString;
+  bEncoded: boolean;
 begin
   if AWithSignature then
   begin
@@ -35,7 +36,7 @@ begin
           else
           begin
             SA:= UTF8Encode(SW);
-            SA:= ConvertEncoding(SA, ''{means utf8}, FEncodingCodepage);
+            SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
           end;
 
           Stream.WriteBuffer(SA[1], Length(SA));

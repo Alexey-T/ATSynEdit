@@ -672,7 +672,6 @@ begin
   DoAddEnc('Europe', 'CP850');
   DoAddEnc('Europe', 'CP852');
   DoAddEnc('Europe', 'CP866');
-  DoAddEnc('Europe', 'CP874');
   DoAddEnc('Europe', '-');
   DoAddEnc('Europe', 'ISO-8859-1');
   DoAddEnc('Europe', 'ISO-8859-2');
@@ -682,6 +681,7 @@ begin
   DoAddEnc('Other', 'CP1255');
   DoAddEnc('Other', 'CP1256');
 
+  DoAddEnc('Asian', 'CP874');
   DoAddEnc('Asian', 'CP932');
   DoAddEnc('Asian', 'CP936');
   DoAddEnc('Asian', 'CP949');

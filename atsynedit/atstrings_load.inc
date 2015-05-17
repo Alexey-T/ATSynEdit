@@ -135,18 +135,18 @@ var
   SA: AnsiString;
   SW: UnicodeString;
   LineEnd: TATLineEnds;
-  WithBom: boolean;
+  bWithBom, bEncoded: boolean;
 begin
   Clear;
 
   Len:= 0;
   if FEncodingDetect then
   begin
-    DoDetectStreamEncoding(Stream, FEncoding, Len, WithBom, FEncodingDetectBufSizeKb);
+    DoDetectStreamEncoding(Stream, FEncoding, Len, bWithBom, FEncodingDetectBufSizeKb);
     case FEncoding of
-      cEncUTF8: SaveSignUtf8:= WithBom;
+      cEncUTF8: SaveSignUtf8:= bWithBom;
       cEncWideBE,
-      cEncWideLE: SaveSignWide:= WithBom;
+      cEncWideLE: SaveSignWide:= bWithBom;
     end;
   end;
   CharSize:= cEncodingSize[FEncoding];
@@ -203,7 +203,7 @@ begin
                 SW:= SA
               else
               begin
-                SA:= ConvertEncoding(SA, FEncodingCodepage, ''{means utf8});
+                SA:= ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded);
                 SW:= UTF8Decode(SA);
               end;
 
