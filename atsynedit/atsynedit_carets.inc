@@ -392,11 +392,20 @@ begin
   Item:= Carets[0];
   Item.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then Exit;
+  Result:= true;
 
   bAtLeft:= IsPosSorted(Item.PosX, Item.PosY, Item.EndX, Item.EndY, true);
-  if bAtLeft=AMoveLeft then Exit;
 
-  Result:= true;
+  //Left/Rt pressed at left/rt side of selection?
+  //yes: cancel selection, don't move caret
+  if bAtLeft=AMoveLeft then
+  begin
+    Item.EndX:= -1;
+    Item.EndY:= -1;
+    Exit
+  end;
+
+  //else swap edge
   SwapInt(Item.PosX, Item.EndX);
   SwapInt(Item.PosY, Item.EndY);
 
