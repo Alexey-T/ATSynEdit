@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet9
-    TabIndex = 2
+    ActivePage = TabSheet5
+    TabIndex = 3
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -598,10 +598,10 @@ object fmOpt: TfmOpt
       object chkHomeNonspace: TCheckBox
         Left = 8
         Height = 19
-        Top = 68
+        Top = 88
         Width = 142
         Caption = 'home: to nonspace chr'
-        TabOrder = 3
+        TabOrder = 4
       end
       object edPageSize: TComboBox
         Left = 8
@@ -615,7 +615,7 @@ object fmOpt: TfmOpt
           'size/2'
         )
         Style = csDropDownList
-        TabOrder = 9
+        TabOrder = 10
       end
       object Label3: TLabel
         Left = 120
@@ -628,26 +628,26 @@ object fmOpt: TfmOpt
       object chkOvrSel: TCheckBox
         Left = 8
         Height = 19
-        Top = 148
+        Top = 168
         Width = 124
         Caption = 'overwrite sel by text'
-        TabOrder = 7
+        TabOrder = 8
       end
       object chkEndNonspace: TCheckBox
         Left = 8
         Height = 19
-        Top = 88
+        Top = 108
         Width = 131
         Caption = 'end: to nonspace chr'
-        TabOrder = 4
+        TabOrder = 5
       end
       object chkTabSpaces: TCheckBox
         Left = 8
         Height = 19
-        Top = 168
+        Top = 188
         Width = 89
         Caption = 'tab as spaces'
-        TabOrder = 8
+        TabOrder = 9
       end
       object chkNavHomeEnd: TCheckBox
         Left = 8
@@ -660,18 +660,18 @@ object fmOpt: TfmOpt
       object chkPageKeepRel: TCheckBox
         Left = 8
         Height = 19
-        Top = 108
+        Top = 128
         Width = 226
         Caption = 'page-up/down: keep relative top offset'
-        TabOrder = 5
+        TabOrder = 6
       end
       object chkKeepCol: TCheckBox
         Left = 8
         Height = 19
-        Top = 128
+        Top = 148
         Width = 253
         Caption = 'up/down: keep column (caret after eol =off)'
-        TabOrder = 6
+        TabOrder = 7
       end
       object groupIndent: TGroupBox
         Left = 304
@@ -681,7 +681,7 @@ object fmOpt: TfmOpt
         Caption = 'indents'
         ClientHeight = 157
         ClientWidth = 300
-        TabOrder = 10
+        TabOrder = 11
         object chkUnindentKeepAlign: TCheckBox
           Left = 8
           Height = 19
@@ -755,6 +755,14 @@ object fmOpt: TfmOpt
           Caption = 'bksp: auto-unindent (on 1st nonspace)'
           TabOrder = 1
         end
+      end
+      object chkLeftRtSwapAndSel: TCheckBox
+        Left = 24
+        Height = 19
+        Top = 68
+        Width = 85
+        Caption = 'and keep sel'
+        TabOrder = 3
       end
     end
     object TabSheet3: TTabSheet

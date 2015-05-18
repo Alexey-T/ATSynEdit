@@ -399,6 +399,12 @@ begin
   Result:= true;
   SwapInt(Item.PosX, Item.EndX);
   SwapInt(Item.PosY, Item.EndY);
+
+  if not FOptKeyLeftRightSwapSelAndSelect then
+  begin
+    Item.EndX:= -1;
+    Item.EndY:= -1;
+  end;
 end;
 
 function TATSynEdit.GetCaretsArray: TATPointArray;

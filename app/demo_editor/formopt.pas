@@ -15,6 +15,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkLeftRtSwapAndSel: TCheckBox;
     chkGutterSep: TCheckBox;
     chkGutterNumAuto: TCheckBox;
     chkGutterBm: TCheckBox;
@@ -266,6 +267,7 @@ begin
     chkNavHomeEnd.Checked:= ed.OptKeyHomeEndNavigateWrapped;
     chkKeepCol.Checked:= ed.OptKeyUpDownKeepColumn;
     chkLeftRtSwap.Checked:= ed.OptKeyLeftRightSwapSel;
+    chkLeftRtSwapAndSel.Checked:= ed.OptKeyLeftRightSwapSelAndSelect;
     chkHomeNonspace.Checked:= ed.OptKeyHomeToNonSpace;
     chkEndNonspace.Checked:= ed.OptKeyEndToNonSpace;
     chkTabIndent.Checked:= ed.OptKeyTabIndents;
@@ -379,6 +381,7 @@ begin
       ed.OptKeyHomeEndNavigateWrapped:= chkNavHomeEnd.Checked;
       ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPageSize.ItemIndex);
       ed.OptKeyLeftRightSwapSel:= chkLeftRtSwap.Checked;
+      ed.OptKeyLeftRightSwapSelAndSelect:= chkLeftRtSwapAndSel.Checked;
       ed.OptKeyHomeToNonSpace:= chkHomeNonspace.Checked;
       ed.OptKeyEndToNonSpace:= chkEndNonspace.Checked;
       ed.OptKeyPageKeepsRelativePos:= chkPageKeepRel.Checked;

@@ -442,6 +442,7 @@ type
     FOptMouseNiceScroll: boolean;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
+    FOptKeyLeftRightSwapSelAndSelect: boolean;
     FOptKeyHomeToNonSpace: boolean;
     FOptKeyEndToNonSpace: boolean;
     FOptKeyTabIndents: boolean;
@@ -878,6 +879,7 @@ type
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel;
+    property OptKeyLeftRightSwapSelAndSelect: boolean read FOptKeyLeftRightSwapSelAndSelect write FOptKeyLeftRightSwapSelAndSelect;
     property OptKeyHomeToNonSpace: boolean read FOptKeyHomeToNonSpace write FOptKeyHomeToNonSpace;
     property OptKeyEndToNonSpace: boolean read FOptKeyEndToNonSpace write FOptKeyEndToNonSpace;
     property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents;
@@ -2074,6 +2076,7 @@ begin
   FOptShowCurColumn:= false;
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
   FOptKeyLeftRightSwapSel:= true;
+  FOptKeyLeftRightSwapSelAndSelect:= false;
   FOptKeyHomeToNonSpace:= true;
   FOptKeyEndToNonSpace:= true;
   FOptKeyTabIndents:= true;
