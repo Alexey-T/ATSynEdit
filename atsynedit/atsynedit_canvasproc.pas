@@ -13,6 +13,16 @@ uses
   Classes, SysUtils, Graphics, Types,
   ATStringProc;
 
+var
+  OptUnprintedTabCharLength: integer = 2;
+  OptUnprintedTabPointerScale: integer = 22;
+  OptUnprintedSpaceDotScale: integer = 15;
+  OptUnprintedEndDotScale: integer = 30;
+  OptUnprintedEndFontScale: integer = 80;
+  OptUnprintedEndFontDx: integer = 3;
+  OptUnprintedEndFontDy: integer = 2;
+
+
 type
   TATLinePart = record
     Offset, Len: integer;
@@ -60,16 +70,6 @@ procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
-
-var
-  OptUnprintedTabCharLength: integer = 2;
-  OptUnprintedTabPointerScale: integer = 25;
-  OptUnprintedSpaceDotScale: integer = 15;
-  OptUnprintedEndDotScale: integer = 30;
-  OptUnprintedEndFontScale: integer = 80;
-  OptUnprintedEndFontDx: integer = 3;
-  OptUnprintedEndFontDy: integer = 2;
-
 
 implementation
 
