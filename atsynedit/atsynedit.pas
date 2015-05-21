@@ -193,7 +193,9 @@ type
     );
 
 const
-  cInitCaretShape = cCaretShapeVertPixels1;
+  cInitCaretShapeIns = cCaretShapeVertPixels1;
+  cInitCaretShapeOvr = cCaretShapeFull;
+  cInitCaretShapeRO = cCaretShapeHorzPixels1;
   cInitSpacingText = 1;
   cInitSpacingMinimap = -1;
   cInitTimerBlink = 600;
@@ -231,12 +233,12 @@ const
   cSpeedScrollNiceVert = 1; //... speed y
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldLineDx = 3;
-  cSizeRulerHeight = 19;
+  cSizeRulerHeight = 20;
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 7;
   cMinFontSize = 6;
   cMinTabSize = 1;
-  cMaxTabSize = 16;
+  cMaxTabSize = 64;
   cMinMinimapWidth = 30;
   cMaxCharsForOutput = 1000; //don't paint more chars in line
   cMinWrapColumn = 20; //too small width won't give smaller wrap-column
@@ -286,6 +288,7 @@ type
     FPaintLocked: integer;
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
+    FWantTabs: boolean;
     FMarginRight: integer;
     FMarginList: TList;
     FStringsInt,
@@ -302,8 +305,9 @@ type
     FSelRectBegin,
     FSelRectEnd: TPoint;
     FCarets: TATCarets;
-    FCaretShape,
-    FCaretShapeOvr: TATSynCaretShape;
+    FCaretShapeIns,
+    FCaretShapeOvr,
+    FCaretShapeRO: TATSynCaretShape;
     FCaretShown: boolean;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
@@ -550,10 +554,11 @@ type
     function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
     function GetMouseNiceScroll: boolean;
+    procedure SetCaretShapeRO(AValue: TATSynCaretShape);
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretTime(AValue: integer);
-    procedure SetCaretShape(AValue: TATSynCaretShape);
+    procedure SetCaretShapeIns(AValue: TATSynCaretShape);
     procedure SetCaretShapeOvr(AValue: TATSynCaretShape);
     procedure SetCharSpacingX(AValue: integer);
     procedure SetCharSpacingY(AValue: integer);
@@ -738,6 +743,7 @@ type
     procedure DblClick; override;
     procedure TripleClick; override;
     //messages
+    procedure WMGetDlgCode(var Msg: TLMNoParams); message LM_GETDLGCODE;
     procedure WMEraseBkgnd(var Msg: TLMEraseBkgnd); message LM_ERASEBKGND;
     procedure WMHScroll(var Msg: TLMHScroll); message LM_HSCROLL;
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
@@ -798,6 +804,7 @@ type
     property CursorText: TCursor read FCursorText write FCursorText;
     property CursorBm: TCursor read FCursorBm write FCursorBm;
     property Colors: TATSynEditColors read FColors write FColors;
+    property WantTabs: boolean read FWantTabs write FWantTabs;
 
     //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
@@ -823,8 +830,9 @@ type
     property OptPopupOnMouseDown: boolean read FOptPopupOnMouseDown write FOptPopupOnMouseDown;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual;
-    property OptCaretShape: TATSynCaretShape read FCaretShape write SetCaretShape;
+    property OptCaretShape: TATSynCaretShape read FCaretShapeIns write SetCaretShapeIns;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
+    property OptCaretShapeRO: TATSynCaretShape read FCaretShapeRO write SetCaretShapeRO;
     property OptCaretTime: integer read GetCaretTime write SetCaretTime;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide;
@@ -1920,13 +1928,16 @@ begin
   Height:= 200;
   Font.Name:= 'Courier New';
   Font.Size:= {$ifndef darwin} 9 {$else} 14 {$endif};
+
+  FWantTabs:= true;
   FCharSize:= Point(4, 4); //not nul
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
   FCaretShown:= false;
-  FCaretShape:= cInitCaretShape;
-  FCaretShapeOvr:= cCaretShapeFull;
+  FCaretShapeIns:= cInitCaretShapeIns;
+  FCaretShapeOvr:= cInitCaretShapeOvr;
+  FCaretShapeRO:= cInitCaretShapeRO;
   FCaretVirtual:= true;
   FCaretSpecPos:= false;
   FCaretStopUnfocused:= true;
@@ -3064,10 +3075,13 @@ begin
   end;
   FCaretShown:= not FCaretShown;
 
+  if ModeReadOnly then
+    Shape:= FCaretShapeRO
+  else
   if ModeOverwrite then
     Shape:= FCaretShapeOvr
   else
-    Shape:= FCaretShape;
+    Shape:= FCaretShapeIns;
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -3715,6 +3729,15 @@ begin
   end;
 
   C.TextOut(Pos.X, Pos.Y, FTextHint);
+end;
+
+
+procedure TATSynEdit.WMGetDlgCode(var Msg: TLMNoParams);
+begin
+  inherited;
+  Msg.Result:= DLGC_WANTARROWS or DLGC_WANTCHARS or DLGC_WANTALLKEYS;
+  if FWantTabs and (GetKeyState(VK_CONTROL) >= 0) then
+    Msg.Result:= Msg.Result or DLGC_WANTTAB;
 end;
 
 {$I atsynedit_carets.inc}

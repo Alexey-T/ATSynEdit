@@ -80,7 +80,7 @@ begin
   M.Add(cCommand_Cancel, 'selection: cancel carets, selection, drag-drop', ['Esc'], []);
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
-  M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [{cXControl+'+R'}], []);
+  M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXControl+'+R'], []);
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);

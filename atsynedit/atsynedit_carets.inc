@@ -248,11 +248,11 @@ begin
     AEndOfLinePos);
 end;
 
-procedure TATSynEdit.SetCaretShape(AValue: TATSynCaretShape);
+procedure TATSynEdit.SetCaretShapeIns(AValue: TATSynCaretShape);
 begin
-  if FCaretShape=AValue then Exit;
+  if FCaretShapeIns=AValue then Exit;
   DoPaintModeStatic;
-  FCaretShape:= AValue;
+  FCaretShapeIns:= AValue;
   DoPaintModeBlinking;
 end;
 
@@ -263,6 +263,15 @@ begin
   FCaretShapeOvr:= AValue;
   DoPaintModeBlinking;
 end;
+
+procedure TATSynEdit.SetCaretShapeRO(AValue: TATSynCaretShape);
+begin
+  if FCaretShapeRO=AValue then Exit;
+  DoPaintModeStatic;
+  FCaretShapeRO:= AValue;
+  DoPaintModeBlinking;
+end;
+
 
 procedure TATSynEdit.DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
 var
