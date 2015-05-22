@@ -2,6 +2,9 @@
 
 procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
+  if not FWantTabs then
+    if Key=vk_tab then Exit;
+
   DoPaintModeStatic;
   try
     DoCommandExec(GetCommandFromKey(Key, Shift));
