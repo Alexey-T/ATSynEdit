@@ -57,7 +57,7 @@ object fmMain: TfmMain
     Colors.StateSaved = clMedGray
     Colors.LockedBG = 14737632
     Colors.TextHintFont = clGray
-    WantTabs = False
+    WantTabs = True
     OptTabSpaces = False
     OptTabSize = 10
     OptTextLocked = 'wait...'
@@ -206,7 +206,7 @@ object fmMain: TfmMain
       Colors.StateSaved = clMedGray
       Colors.LockedBG = 14737632
       Colors.TextHintFont = clGray
-      WantTabs = True
+      WantTabs = False
       OptTabSpaces = False
       OptTabSize = 10
       OptTextLocked = 'wait...'
@@ -300,17 +300,6 @@ object fmMain: TfmMain
       OptSavingForceFinalEol = False
       OptSavingTrimSpaces = False
     end
-    object Memo1: TMemo
-      Left = 325
-      Height = 54
-      Top = -4
-      Width = 150
-      Lines.Strings = (
-        'Memo1'
-      )
-      TabOrder = 1
-      Visible = False
-    end
     object combo1: TATComboEdit
       Left = 8
       Height = 26
@@ -320,7 +309,7 @@ object fmMain: TfmMain
       Font.Height = -12
       Font.Name = 'Courier New'
       ParentFont = False
-      TabOrder = 2
+      TabOrder = 1
       TabStop = True
       CursorText = crIBeam
       CursorBm = crHandPoint
@@ -456,7 +445,7 @@ object fmMain: TfmMain
       Height = 23
       Top = 60
       Width = 144
-      TabOrder = 3
+      TabOrder = 2
     end
   end
 end

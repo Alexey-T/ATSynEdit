@@ -16,7 +16,6 @@ type
     combo1: TATComboEdit;
     ed: TATSynEdit;
     Edit1: TEdit;
-    Memo1: TMemo;
     Panel1: TPanel;
     procedure FormShow(Sender: TObject);
   private

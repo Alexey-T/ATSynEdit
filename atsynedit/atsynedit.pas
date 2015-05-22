@@ -85,7 +85,8 @@ type
     FStateAdded,
     FStateSaved,
     FTextHintFont,
-    FLockedBG: TColor;
+    FLockedBG,
+    FComboboxArrow: TColor;
   published
     property TextFont: TColor read FTextFont write FTextFont;
     property TextBG: TColor read FTextBG write FTextBG;
@@ -120,6 +121,7 @@ type
     property StateSaved: TColor read FStateSaved write FStateSaved;
     property LockedBG: TColor read FLockedBG write FLockedBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
+    property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
   end;
 
   TATAutoIndentKind = (

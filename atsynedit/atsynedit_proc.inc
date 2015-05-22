@@ -88,5 +88,6 @@ begin
   C.StateSaved:= clMedGray;
   C.TextHintFont:= clGray;
   C.LockedBG:= $e0e0e0;
+  C.ComboboxArrow:= clGray;
 end;
 
