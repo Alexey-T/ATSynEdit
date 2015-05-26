@@ -203,7 +203,11 @@ begin
                 SW:= SA
               else
               begin
+                {$ifdef laz15}
                 SA:= ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded);
+                {$else}
+                SA:= ConvertEncoding(SA, FEncodingCodepage, '');
+                {$endif}
                 SW:= UTF8Decode(SA);
               end;
 

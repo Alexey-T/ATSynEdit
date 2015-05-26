@@ -4,6 +4,7 @@ License: MPL 2.0
 }
 
 {$mode objfpc}{$H+}
+//{$define laz15}
 
 unit ATStrings;
 

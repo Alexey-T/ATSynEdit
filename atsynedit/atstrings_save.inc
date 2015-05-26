@@ -36,7 +36,11 @@ begin
           else
           begin
             SA:= UTF8Encode(SW);
+            {$ifdef laz15}
             SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
+            {$else}
+            SA:= ConvertEncoding(SA, '', FEncodingCodepage);
+            {$endif}
           end;
 
           Stream.WriteBuffer(SA[1], Length(SA));
