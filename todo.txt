@@ -1,5 +1,9 @@
 
+ed1 and ed2, common textsource (not enouth ed1.Strings:= ed2.Strings, need also sync Wrapinfo and sync update)
 
 hard:
-tokens hilite (adapt EControl)
-optimize atsynedit_ranges (slow Find..)
+adapt ECon regex to this strings obj //hard: ECon uses one str
+
+latr:
+tokens hilite; adapt EControl
+optimize atsynedit_ranges //slow finds
