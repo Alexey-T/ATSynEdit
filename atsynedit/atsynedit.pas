@@ -275,6 +275,7 @@ type
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
+  TATSynEditCalcLineHiliteEvent = procedure(Sender: TObject; const AWrapItem: TATSynWrapItem; var AParts: TATLineParts) of object;
 
 
 type
@@ -350,6 +351,7 @@ type
     FOnDrawRuler: TATSynEditDrawRectEvent;
     FOnChangeState: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
+    FOnCalcLineHilite: TATSynEditCalcLineHiliteEvent;
     FWrapInfo: TATSynWrapInfo;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
@@ -802,6 +804,7 @@ type
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
+    property OnCalcLineHilite: TATSynEditCalcLineHiliteEvent read FOnCalcLineHilite write FOnCalcLineHilite;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText;

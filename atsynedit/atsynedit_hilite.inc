@@ -9,6 +9,13 @@ var
 begin
   FillChar(AParts, SizeOf(AParts), 0);
 
+  if Assigned(FOnCalcLineHilite) then
+  begin
+    FOnCalcLineHilite(Self, AItem, AParts);
+    Exit
+    //todo:Do own calc OVER event calc!!!
+  end;
+
   bSel:= false;
   bSelPrev:= false;
   nIndex:= -1;
