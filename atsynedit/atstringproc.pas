@@ -11,6 +11,7 @@ uses
 type
   atString = UnicodeString;
   atChar = WideChar;
+  PatChar = PWideChar;
 
 type
   TATIntArray = array of Longint;

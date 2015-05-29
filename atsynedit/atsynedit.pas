@@ -3489,7 +3489,7 @@ end;
 
 function TATSynEdit.GetText: atString;
 begin
-  Result:= Strings.TextAll;
+  Result:= Strings.TextString;
 end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);

@@ -108,7 +108,7 @@ type
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
     procedure SetLineHidden(Index: integer; AValue: integer);
     procedure SetLineState(Index: integer; AValue: TATLineState);
-    function GetTextAll: atString;
+    function GetTextString: atString;
     procedure DoLoadFromStream(Stream: TStream);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
@@ -160,7 +160,7 @@ type
     property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
-    property TextAll: atString read GetTextAll;
+    property TextString: atString read GetTextString;
     procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
     procedure TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings;
@@ -371,22 +371,41 @@ begin
 end;
 
 
-function TATStrings.GetTextAll: atString;
+function TATStrings.GetTextString: atString;
+const
+  LenEol = 1;
+  CharEol: atChar = #10;
+  CharSize = SizeOf(atChar);
 var
-  Stream: TMemoryStream;
+  Len, i: integer;
+  Item: TATStringItem;
+  Ptr: pointer;
 begin
   Result:= '';
-  Stream:= TMemoryStream.Create;
-  try
-    SaveToStream(Stream, cEncWideLE, false);
-    Stream.Position:= 0;
-    if Stream.Size>0 then
+  if Count=0 then Exit;
+
+  Len:= 0;
+  for i:= 0 to Count-1 do
+  begin
+    Item:= TATStringItem(FList[i]);
+    Inc(Len, Length(Item.ItemString)+LenEol);
+  end;
+  if Len=0 then Exit;
+
+  SetLength(Result, Len);
+  Ptr:= @Result[1];
+
+  for i:= 0 to Count-1 do
+  begin
+    Item:= TATStringItem(FList[i]);
+    Len:= Length(Item.ItemString);
+    if Len>0 then
     begin
-      SetLength(Result, Stream.Size div SizeOf(atChar));
-      Stream.ReadBuffer(Result[1], Stream.Size);
+      Move(Item.ItemString[1], Ptr^, Len*CharSize);
+      Inc(Ptr, Len*CharSize);
     end;
-  finally
-    FreeAndNil(Stream);
+    PatChar(Ptr)^:= CharEol;
+    Inc(Ptr, LenEol*CharSize);
   end;
 end;
 

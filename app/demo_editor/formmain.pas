@@ -2,6 +2,8 @@ unit formmain;
 
 {$mode objfpc}{$H+}
 
+//{$define test_text}
+
 interface
 
 uses
@@ -50,6 +52,7 @@ type
     Label6: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
+    Memo1: TMemo;
     MenuItem1: TMenuItem;
     mnuEnc: TMenuItem;
     mnuOptSave: TMenuItem;
@@ -488,6 +491,16 @@ end;
 procedure TfmMain.EditChanged(Sender: TObject);
 begin
   UpdateStatus;
+
+  {$ifdef test_text}
+  with Memo1 do
+  begin
+    Lines.Clear;
+    Lines.Text:= utf8encode(ed.Strings.TextString);
+  end;
+  {$else}
+  Memo1.Hide;
+  {$endif}
 end;
 
 procedure TfmMain.bGotoClick(Sender: TObject);

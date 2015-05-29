@@ -282,6 +282,18 @@ object fmMain: TfmMain
       OnClick = bOptClick
       TabOrder = 5
     end
+    object Memo1: TMemo
+      Left = 8
+      Height = 478
+      Top = 420
+      Width = 273
+      Lines.Strings = (
+        'Memo1'
+      )
+      ReadOnly = True
+      ScrollBars = ssBoth
+      TabOrder = 13
+    end
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]
