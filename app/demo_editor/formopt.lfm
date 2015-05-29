@@ -769,7 +769,7 @@ object fmOpt: TfmOpt
       Caption = 'mouse'
       ClientHeight = 316
       ClientWidth = 616
-      object chkClick2: TCheckBox
+      object chkMsClick2: TCheckBox
         Left = 8
         Height = 19
         Top = 8
@@ -777,7 +777,7 @@ object fmOpt: TfmOpt
         Caption = 'dbl click selects line (else word)'
         TabOrder = 0
       end
-      object chkClick3: TCheckBox
+      object chkMsClick3: TCheckBox
         Left = 8
         Height = 19
         Top = 28
@@ -785,7 +785,7 @@ object fmOpt: TfmOpt
         Caption = 'triple click selects line'
         TabOrder = 1
       end
-      object chkClick2W: TCheckBox
+      object chkMsClick2Drag: TCheckBox
         Left = 8
         Height = 19
         Top = 48
@@ -793,7 +793,7 @@ object fmOpt: TfmOpt
         Caption = 'dbl click + drag selects words'
         TabOrder = 2
       end
-      object chkDnD: TCheckBox
+      object chkMsDragDrop: TCheckBox
         Left = 8
         Height = 19
         Top = 68
@@ -801,7 +801,7 @@ object fmOpt: TfmOpt
         Caption = 'drag-drop of txt'
         TabOrder = 3
       end
-      object chkRtMove: TCheckBox
+      object chkMsRtClickMove: TCheckBox
         Left = 8
         Height = 19
         Top = 88
@@ -809,7 +809,7 @@ object fmOpt: TfmOpt
         Caption = 'right click moves caret'
         TabOrder = 4
       end
-      object chkClickNm: TCheckBox
+      object chkMsClickNumSel: TCheckBox
         Left = 8
         Height = 19
         Top = 108
@@ -817,7 +817,7 @@ object fmOpt: TfmOpt
         Caption = 'click on number selects line'
         TabOrder = 5
       end
-      object chkNice: TCheckBox
+      object chkMsNiceScroll: TCheckBox
         Left = 8
         Height = 19
         Top = 128
@@ -825,15 +825,15 @@ object fmOpt: TfmOpt
         Caption = 'browser-scroll: middle click and mouse-move'
         TabOrder = 6
       end
-      object chkPopupDown: TCheckBox
+      object chkMsMenuDown: TCheckBox
         Left = 8
         Height = 19
         Top = 148
-        Width = 207
-        Caption = 'right click: menu on down (else up)'
+        Width = 246
+        Caption = 'right click: menu on mouse down (else up)'
         TabOrder = 7
       end
-      object chkHideCursor: TCheckBox
+      object chkMsHideCursor: TCheckBox
         Left = 9
         Height = 19
         Top = 170

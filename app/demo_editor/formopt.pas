@@ -15,7 +15,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
-    chkHideCursor: TCheckBox;
+    chkMsHideCursor: TCheckBox;
     chkLeftRtSwapAndSel: TCheckBox;
     chkGutterSep: TCheckBox;
     chkGutterNumAuto: TCheckBox;
@@ -27,7 +27,7 @@ type
     chkShowFoldLinesAll: TCheckBox;
     chkBackspUnindent: TCheckBox;
     chkEnterIndent: TCheckBox;
-    chkPopupDown: TCheckBox;
+    chkMsMenuDown: TCheckBox;
     chkTabIndent: TCheckBox;
     chkUnindentKeepAlign: TCheckBox;
     chkUnprintAsciiRep: TCheckBox;
@@ -39,7 +39,7 @@ type
     chkScrollHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
     chkNavHomeEnd: TCheckBox;
-    chkNice: TCheckBox;
+    chkMsNiceScroll: TCheckBox;
     chkSaveEol: TCheckBox;
     chkSaveTrim: TCheckBox;
     chkShowNum1st: TCheckBox;
@@ -52,20 +52,20 @@ type
     chkUndoGr: TCheckBox;
     chkCutNoSel: TCheckBox;
     chkDotLn: TCheckBox;
-    chkClickNm: TCheckBox;
+    chkMsClickNumSel: TCheckBox;
     chkCrUnfocus: TCheckBox;
     chkEndNonspace: TCheckBox;
     chkHomeNonspace: TCheckBox;
     chkLeftRtSwap: TCheckBox;
     chkNavUpDown: TCheckBox;
     chkOvrSel: TCheckBox;
-    chkRtMove: TCheckBox;
-    chkDnD: TCheckBox;
+    chkMsRtClickMove: TCheckBox;
+    chkMsDragDrop: TCheckBox;
     chkCrMul: TCheckBox;
     chkCrVirt: TCheckBox;
-    chkClick2: TCheckBox;
-    chkClick2W: TCheckBox;
-    chkClick3: TCheckBox;
+    chkMsClick2: TCheckBox;
+    chkMsClick2Drag: TCheckBox;
+    chkMsClick3: TCheckBox;
     chkColorSel: TCheckBox;
     chkCopyNoSel: TCheckBox;
     chkCurCol: TCheckBox;
@@ -280,15 +280,15 @@ begin
     chkPageKeepRel.Checked:= ed.OptKeyPageKeepsRelativePos;
 
     //mouse
-    chkClick2.Checked:= ed.OptMouse2ClickSelectsLine;
-    chkClick3.Checked:= ed.OptMouse3ClickSelectsLine;
-    chkClick2W.Checked:= ed.OptMouse2ClickDragSelectsWords;
-    chkClickNm.Checked:= ed.OptMouseGutterClickSelectsLine;
-    chkDnD.Checked:= ed.OptMouseDragDrop;
-    chkRtMove.Checked:= ed.OptMouseRightClickMovesCaret;
-    chkNice.Checked:= ed.OptMouseNiceScroll;
-    chkHideCursor.Checked:= ed.OptMouseHideCursorOnType;
-    chkPopupDown.Checked:= ed.OptPopupOnMouseDown;
+    chkMsClick2.Checked:= ed.OptMouse2ClickSelectsLine;
+    chkMsClick3.Checked:= ed.OptMouse3ClickSelectsLine;
+    chkMsClick2Drag.Checked:= ed.OptMouse2ClickDragSelectsWords;
+    chkMsClickNumSel.Checked:= ed.OptMouseGutterClickSelectsLine;
+    chkMsDragDrop.Checked:= ed.OptMouseDragDrop;
+    chkMsRtClickMove.Checked:= ed.OptMouseRightClickMovesCaret;
+    chkMsNiceScroll.Checked:= ed.OptMouseNiceScroll;
+    chkMsHideCursor.Checked:= ed.OptMouseHideCursor;
+    chkMsMenuDown.Checked:= ed.OptMouseDownForPopup;
 
     //undo
     edUndo.Value:= ed.OptUndoLimit;
@@ -394,15 +394,15 @@ begin
       ed.OptIndentKeepsAlign:= chkUnindentKeepAlign.Checked;
 
       //mouse
-      ed.OptMouse2ClickSelectsLine:= chkClick2.Checked;
-      ed.OptMouse3ClickSelectsLine:= chkClick3.Checked;
-      ed.OptMouse2ClickDragSelectsWords:= chkClick2W.Checked;
-      ed.OptMouseGutterClickSelectsLine:= chkClickNm.Checked;
-      ed.OptMouseDragDrop:= chkDnD.Checked;
-      ed.OptMouseRightClickMovesCaret:= chkRtMove.Checked;
-      ed.OptMouseNiceScroll:= chkNice.Checked;
-      ed.OptMouseHideCursorOnType:= chkHideCursor.Checked;
-      ed.OptPopupOnMouseDown:= chkPopupDown.Checked;
+      ed.OptMouse2ClickSelectsLine:= chkMsClick2.Checked;
+      ed.OptMouse3ClickSelectsLine:= chkMsClick3.Checked;
+      ed.OptMouse2ClickDragSelectsWords:= chkMsClick2Drag.Checked;
+      ed.OptMouseGutterClickSelectsLine:= chkMsClickNumSel.Checked;
+      ed.OptMouseDragDrop:= chkMsDragDrop.Checked;
+      ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
+      ed.OptMouseNiceScroll:= chkMsNiceScroll.Checked;
+      ed.OptMouseHideCursor:= chkMsHideCursor.Checked;
+      ed.OptMouseDownForPopup:= chkMsMenuDown.Checked;
 
       //undo
       ed.OptUndoLimit:= edUndo.Value;

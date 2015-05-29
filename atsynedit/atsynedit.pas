@@ -392,7 +392,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
-    FOptPopupOnMouseDown: boolean;
+    FOptMouseDownForPopup: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptShowScrollHint: boolean;
     FOptOffsetTop: integer;
@@ -439,7 +439,7 @@ type
     FOptShowCurLine: boolean;
     FOptShowCurLineMinimal: boolean;
     FOptShowCurColumn: boolean;
-    FOptMouseHideCursorOnType: boolean;
+    FOptMouseHideCursor: boolean;
     FOptMouse2ClickSelectsLine: boolean;
     FOptMouse3ClickSelectsLine: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
@@ -830,7 +830,6 @@ type
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
-    property OptPopupOnMouseDown: boolean read FOptPopupOnMouseDown write FOptPopupOnMouseDown;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual;
     property OptCaretShape: TATSynCaretShape read FCaretShapeIns write SetCaretShapeIns;
@@ -876,7 +875,8 @@ type
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
     property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
-    property OptMouseHideCursorOnType: boolean read FOptMouseHideCursorOnType write FOptMouseHideCursorOnType;
+    property OptMouseDownForPopup: boolean read FOptMouseDownForPopup write FOptMouseDownForPopup;
+    property OptMouseHideCursor: boolean read FOptMouseHideCursor write FOptMouseHideCursor;
     property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords;
@@ -2078,7 +2078,7 @@ begin
   FOptOverwriteSel:= true;
   FOptMouseDragDrop:= true;
   FOptMouseNiceScroll:= true;
-  FOptMouseHideCursorOnType:= false;
+  FOptMouseHideCursor:= false;
   FOptMouse2ClickSelectsLine:= false;
   FOptMouse3ClickSelectsLine:= true;
   FOptMouse2ClickDragSelectsWords:= true;
@@ -2105,7 +2105,7 @@ begin
   FOptSavingTrimSpaces:= false;
   FOptShowScrollHint:= false;
   FOptCaretPreferLeftSide:= true;
-  FOptPopupOnMouseDown:= false;
+  FOptMouseDownForPopup:= false;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -2625,7 +2625,7 @@ begin
   end;
 
   if Shift=[ssRight] then
-    if FOptPopupOnMouseDown then
+    if FOptMouseDownForPopup then
       DoHandleRightClick(X, Y);
 
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
@@ -2685,7 +2685,7 @@ begin
   if FMouseDownRight then
   begin
     FMouseDownRight:= false;
-    if not FOptPopupOnMouseDown then
+    if not FOptMouseDownForPopup then
       DoHandleRightClick(X, Y);
   end;
 end;

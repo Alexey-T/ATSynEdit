@@ -72,7 +72,7 @@ begin
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
 
-    if FOptMouseHideCursorOnType then
+    if FOptMouseHideCursor then
       if PtInRect(FRectMain, ScreenToClient(Mouse.CursorPos)) then
         SetCursor(crNone);
   end;
