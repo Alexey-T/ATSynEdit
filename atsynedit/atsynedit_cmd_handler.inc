@@ -71,6 +71,10 @@ begin
   begin
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
+
+    if FOptMouseHideCursorOnType then
+      if PtInRect(FRectMain, ScreenToClient(Mouse.CursorPos)) then
+        SetCursor(crNone);
   end;
 
   DoCaretsSort;

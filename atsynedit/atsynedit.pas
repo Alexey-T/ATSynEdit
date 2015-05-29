@@ -439,6 +439,7 @@ type
     FOptShowCurLine: boolean;
     FOptShowCurLineMinimal: boolean;
     FOptShowCurColumn: boolean;
+    FOptMouseHideCursorOnType: boolean;
     FOptMouse2ClickSelectsLine: boolean;
     FOptMouse3ClickSelectsLine: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
@@ -875,6 +876,7 @@ type
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
     property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
+    property OptMouseHideCursorOnType: boolean read FOptMouseHideCursorOnType write FOptMouseHideCursorOnType;
     property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords;
@@ -2076,6 +2078,7 @@ begin
   FOptOverwriteSel:= true;
   FOptMouseDragDrop:= true;
   FOptMouseNiceScroll:= true;
+  FOptMouseHideCursorOnType:= false;
   FOptMouse2ClickSelectsLine:= false;
   FOptMouse3ClickSelectsLine:= true;
   FOptMouse2ClickDragSelectsWords:= true;

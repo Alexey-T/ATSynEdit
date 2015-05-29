@@ -15,6 +15,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkHideCursor: TCheckBox;
     chkLeftRtSwapAndSel: TCheckBox;
     chkGutterSep: TCheckBox;
     chkGutterNumAuto: TCheckBox;
@@ -194,7 +195,6 @@ begin
     chkCurCol.Checked:= ed.OptShowCurColumn;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
     chkColorSel.Checked:= ed.OptHiliteSelFull;
-    chkPopupDown.Checked:= ed.OptPopupOnMouseDown;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
     chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
@@ -287,6 +287,8 @@ begin
     chkDnD.Checked:= ed.OptMouseDragDrop;
     chkRtMove.Checked:= ed.OptMouseRightClickMovesCaret;
     chkNice.Checked:= ed.OptMouseNiceScroll;
+    chkHideCursor.Checked:= ed.OptMouseHideCursorOnType;
+    chkPopupDown.Checked:= ed.OptPopupOnMouseDown;
 
     //undo
     edUndo.Value:= ed.OptUndoLimit;
@@ -311,7 +313,6 @@ begin
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
       ed.OptHiliteSelFull:= chkColorSel.Checked;
-      ed.OptPopupOnMouseDown := chkPopupDown.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
@@ -400,6 +401,8 @@ begin
       ed.OptMouseDragDrop:= chkDnD.Checked;
       ed.OptMouseRightClickMovesCaret:= chkRtMove.Checked;
       ed.OptMouseNiceScroll:= chkNice.Checked;
+      ed.OptMouseHideCursorOnType:= chkHideCursor.Checked;
+      ed.OptPopupOnMouseDown:= chkPopupDown.Checked;
 
       //undo
       ed.OptUndoLimit:= edUndo.Value;

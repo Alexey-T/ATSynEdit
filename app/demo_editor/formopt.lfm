@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet1
-    TabIndex = 0
+    ActivePage = TabSheet3
+    TabIndex = 4
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -767,8 +767,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet3: TTabSheet
       Caption = 'mouse'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 316
+      ClientWidth = 616
       object chkClick2: TCheckBox
         Left = 8
         Height = 19
@@ -832,6 +832,14 @@ object fmOpt: TfmOpt
         Width = 207
         Caption = 'right click: menu on down (else up)'
         TabOrder = 7
+      end
+      object chkHideCursor: TCheckBox
+        Left = 9
+        Height = 19
+        Top = 170
+        Width = 155
+        Caption = 'hide cursor on typing text'
+        TabOrder = 8
       end
     end
     object TabSheet4: TTabSheet
