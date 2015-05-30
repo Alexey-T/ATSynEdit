@@ -158,7 +158,7 @@ type
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
-    procedure EditorCalcLine(Sender: TObject; const AWrapItem: TATSynWrapItem;
+    procedure EditCalcLine(Sender: TObject; const AWrapItem: TATSynWrapItem;
       var AParts: TATLineParts);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
@@ -596,7 +596,7 @@ procedure TfmMain.mnuSyntaxClick(Sender: TObject);
 begin
   mnuSyntax.Checked:= not mnuSyntax.Checked;
   if mnuSyntax.Checked then
-    ed.OnCalcLineHilite:= @EditorCalcLine
+    ed.OnCalcLineHilite:= @EditCalcLine
   else
     ed.OnCalcLineHilite:= nil;
   ed.Update;
@@ -925,12 +925,10 @@ begin
   C.Pen.Width:= 1;
 end;
 
-procedure TfmMain.EditorCalcLine(Sender: TObject; const AWrapItem: TATSynWrapItem; var AParts: TATLineParts);
+procedure TfmMain.EditCalcLine(Sender: TObject; const AWrapItem: TATSynWrapItem; var AParts: TATLineParts);
 var
-  i, nlen, npart, noffset: integer;
-  isword, isword_new: boolean;
-  Str: atString;
-  ch: atChar;
+  nlen, npart, noffset: integer;
+  kind, kindnew: integer;
   //
   procedure Add;
   begin
@@ -938,39 +936,49 @@ var
     if npart>High(AParts) then exit;
     with AParts[npart] do
     begin
-      if isword then
-        Color:= clgreen
-      else
-        Color:= clgray;
-      Colorbg:= clnone;
+      case kind of
+        1: begin Color:= clblue; Colorbg:= clnone; end;
+        2: begin Color:= clred; Colorbg:= clyellow; end;
+        else begin Color:= clgray; Colorbg:= clnone; end;
+      end;
       Offset:= noffset;
       Len:= nlen;
     end;
   end;
   //
+var
+  Str: atString;
+  ch: atChar;
+  i: integer;
 begin
-  Str:= ed.Strings.Lines[AWrapItem.NLineIndex];
-  Str:= Copy(Str, AWrapItem.NCharIndex, AWrapItem.NLength);
+  Str:= ed.Strings.Lines[AWrapItem.NLineIndex]; //whole line
+  Str:= Copy(Str, AWrapItem.NCharIndex, AWrapItem.NLength); //current part
 
   npart:= -1;
   noffset:= 0;
   nlen:= 1;
+  kind:= 0;
   i:= 0;
-  isword:= false;
 
   repeat
     inc(i);
     if i>Length(Str) then
       begin Add; break end;
     ch:= Str[i];
-    isword_new:= (ch='w');
-    if isword_new=isword then
+
+    case ch of
+      '0'..'9': kindnew:= 2;
+      'w': kindnew:= 1;
+      else kindnew:= 0;
+    end;
+
+    if kindnew=kind then
     begin
       inc(nlen);
       Continue;
     end;
     Add;
-    isword:= isword_new;
+    kind:= kindnew;
     nlen:= 1;
     noffset:= i-1;
   until false;
