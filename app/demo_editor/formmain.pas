@@ -13,6 +13,7 @@ uses
   ATStringProc,
   ATSynEdit,
   ATSynEdit_CanvasProc,
+  ATSynEdit_WrapInfo,
   formkey,
   formopt,
   formcombo, 
@@ -54,6 +55,8 @@ type
     MainMenu1: TMainMenu;
     Memo1: TMemo;
     MenuItem1: TMenuItem;
+    MenuItem5: TMenuItem;
+    mnuSyntax: TMenuItem;
     mnuEnc: TMenuItem;
     mnuOptSave: TMenuItem;
     mnuOptLoad: TMenuItem;
@@ -68,7 +71,7 @@ type
     mnuBms: TMenuItem;
     mnuOneLine: TMenuItem;
     mnuPane: TMenuItem;
-    mnuHilit: TMenuItem;
+    mnuUnderline: TMenuItem;
     mnuTCaret1: TMenuItem;
     mnuOptDlg: TMenuItem;
     mnuTBms: TMenuItem;
@@ -103,6 +106,7 @@ type
     procedure mnuFileSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
+    procedure mnuSyntaxClick(Sender: TObject);
     procedure UpdateEnc;
     procedure mnuHelpMousClick(Sender: TObject);
     procedure btnLoadClick(Sender: TObject);
@@ -134,7 +138,7 @@ type
     procedure mnuEndMacClick(Sender: TObject);
     procedure mnuEndUnixClick(Sender: TObject);
     procedure mnuEndWinClick(Sender: TObject);
-    procedure mnuHilitClick(Sender: TObject);
+    procedure mnuUnderlineClick(Sender: TObject);
     procedure mnuLockClick(Sender: TObject);
     procedure mnuTBmsClick(Sender: TObject);
     procedure mnuTCaret1Click(Sender: TObject);
@@ -154,6 +158,8 @@ type
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
+    procedure EditorCalcLine(Sender: TObject; const AWrapItem: TATSynWrapItem;
+      var AParts: TATLineParts);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
@@ -269,9 +275,9 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.mnuHilitClick(Sender: TObject);
+procedure TfmMain.mnuUnderlineClick(Sender: TObject);
 begin
-  with mnuHilit do Checked:= not Checked;
+  with mnuUnderline do Checked:= not Checked;
   ed.Update;
 end;
 
@@ -586,6 +592,16 @@ begin
   ed.SetFocus;
 end;
 
+procedure TfmMain.mnuSyntaxClick(Sender: TObject);
+begin
+  mnuSyntax.Checked:= not mnuSyntax.Checked;
+  if mnuSyntax.Checked then
+    ed.OnCalcLineHilite:= @EditorCalcLine
+  else
+    ed.OnCalcLineHilite:= nil;
+  ed.Update;
+end;
+
 procedure TfmMain.DoSetEnc(const Str: string);
 begin
   if Str=sEncAnsi then
@@ -888,7 +904,7 @@ var
   X1, X2, Y, i: integer;
 begin
   if AStr='' then Exit;
-  if not mnuHilit.Checked then Exit;
+  if not mnuUnderline.Checked then Exit;
 
   C.Pen.Color:= clBlue;
   C.Pen.Width:= 2;
@@ -907,6 +923,57 @@ begin
     end;
 
   C.Pen.Width:= 1;
+end;
+
+procedure TfmMain.EditorCalcLine(Sender: TObject; const AWrapItem: TATSynWrapItem; var AParts: TATLineParts);
+var
+  i, nlen, npart, noffset: integer;
+  isword, isword_new: boolean;
+  Str: atString;
+  ch: atChar;
+  //
+  procedure Add;
+  begin
+    inc(npart);
+    if npart>High(AParts) then exit;
+    with AParts[npart] do
+    begin
+      if isword then
+        Color:= clgreen
+      else
+        Color:= clgray;
+      Colorbg:= clnone;
+      Offset:= noffset;
+      Len:= nlen;
+    end;
+  end;
+  //
+begin
+  Str:= ed.Strings.Lines[AWrapItem.NLineIndex];
+  Str:= Copy(Str, AWrapItem.NCharIndex, AWrapItem.NLength);
+
+  npart:= -1;
+  noffset:= 0;
+  nlen:= 1;
+  i:= 0;
+  isword:= false;
+
+  repeat
+    inc(i);
+    if i>Length(Str) then
+      begin Add; break end;
+    ch:= Str[i];
+    isword_new:= (ch='w');
+    if isword_new=isword then
+    begin
+      inc(nlen);
+      Continue;
+    end;
+    Add;
+    isword:= isword_new;
+    nlen:= 1;
+    noffset:= i-1;
+  until false;
 end;
 
 end.

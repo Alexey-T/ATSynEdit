@@ -372,9 +372,16 @@ object fmMain: TfmMain
         Caption = 'toggle bookm'
         OnClick = mnuTBmsClick
       end
-      object mnuHilit: TMenuItem
-        Caption = 'hilite ''w'''
-        OnClick = mnuHilitClick
+      object MenuItem5: TMenuItem
+        Caption = '-'
+      end
+      object mnuUnderline: TMenuItem
+        Caption = 'hilite ''w'' underline'
+        OnClick = mnuUnderlineClick
+      end
+      object mnuSyntax: TMenuItem
+        Caption = 'hilite ''w'' color'
+        OnClick = mnuSyntaxClick
       end
       object MenuItem1: TMenuItem
         Caption = '-'
