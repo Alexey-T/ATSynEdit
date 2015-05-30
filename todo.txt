@@ -1,6 +1,5 @@
 
 hard:
-adapt ECon regex to this strings obj //hard: ECon uses one str
 adapt ECon analyzer
 
 latr:

@@ -681,6 +681,7 @@ type
     procedure SetFocus; override;
     procedure Invalidate; override;
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
+    procedure UpdateIncorrectCaretPositions;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
     property Keymap: TATKeymap read FKeymap write FKeymap;
@@ -2171,6 +2172,11 @@ begin
   if AUpdateCaretsCoords then
     Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Invalidate;
+end;
+
+procedure TATSynEdit.UpdateIncorrectCaretPositions;
+begin
+  Carets.UpdateIncorrectCaretPositions(Strings.Count-1);
 end;
 
 procedure TATSynEdit.SetFocus;
