@@ -21,7 +21,7 @@ begin
     Str:= SRemoveNewlineChars(Str);
 
   DoCommand_TextDeleteSelection;
-  Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOverwrite and FOptUseOverOnPaste, ASelectThen);
+  Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOverwrite and FOptOverwriteAllowedOnPaste, ASelectThen);
 
   //workaround: paste on last line end
   if Carets.Count>0 then

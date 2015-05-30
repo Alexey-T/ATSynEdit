@@ -194,10 +194,10 @@ begin
     chkCurLineMin.Checked:= ed.OptShowCurLineMinimal;
     chkCurCol.Checked:= ed.OptShowCurColumn;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
-    chkColorSel.Checked:= ed.OptHiliteSelFull;
+    chkColorSel.Checked:= ed.OptShowSelFull;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
-    chkOvrPaste.Checked:= ed.OptUseOverOnPaste;
+    chkOvrPaste.Checked:= ed.OptOverwriteAllowedOnPaste;
     chkDotLn.Checked:= ed.OptShowIndentLines;
     edTextHint.Text:= ed.OptTextHint;
     edWordChars.Text:= ed.OptWordChars;
@@ -287,7 +287,7 @@ begin
     chkMsDragDrop.Checked:= ed.OptMouseDragDrop;
     chkMsRtClickMove.Checked:= ed.OptMouseRightClickMovesCaret;
     chkMsNiceScroll.Checked:= ed.OptMouseNiceScroll;
-    chkMsHideCursor.Checked:= ed.OptMouseHideCursor;
+    chkMsHideCursor.Checked:= ed.OptMouseHideCursorOnType;
     chkMsMenuDown.Checked:= ed.OptMouseDownForPopup;
 
     //undo
@@ -309,10 +309,10 @@ begin
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptTextHint:= edTextHint.Text;
       ed.OptWordChars:= edWordChars.Text;
-      ed.OptUseOverOnPaste:= chkOvrPaste.Checked;
+      ed.OptOverwriteAllowedOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
-      ed.OptHiliteSelFull:= chkColorSel.Checked;
+      ed.OptShowSelFull:= chkColorSel.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
@@ -401,7 +401,7 @@ begin
       ed.OptMouseDragDrop:= chkMsDragDrop.Checked;
       ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
       ed.OptMouseNiceScroll:= chkMsNiceScroll.Checked;
-      ed.OptMouseHideCursor:= chkMsHideCursor.Checked;
+      ed.OptMouseHideCursorOnType:= chkMsHideCursor.Checked;
       ed.OptMouseDownForPopup:= chkMsMenuDown.Checked;
 
       //undo

@@ -60,7 +60,7 @@ begin
 
   Keymap:= KeymapCombo;
 
-  OptOffsetTop:= 2;
+  OptTextOffsetTop:= 2;
   Height:= 26;
 end;
 

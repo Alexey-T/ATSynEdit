@@ -75,7 +75,7 @@ type
     function SaveToArray: TATPointArray;
     procedure LoadFromArray(const L: TATPointArray);
     procedure UpdateColumnCoord(ASaveColumn: boolean);
-    procedure UpdateIncorrectCaretPositions(AMaxLine: integer);
+    procedure UpdateIncorrectPositions(AMaxLine: integer);
   end;
 
 
@@ -563,7 +563,7 @@ begin
   end;
 end;
 
-procedure TATCarets.UpdateIncorrectCaretPositions(AMaxLine: integer);
+procedure TATCarets.UpdateIncorrectPositions(AMaxLine: integer);
 var
   i: integer;
   Caret: TATCaretItem;

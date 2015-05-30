@@ -479,3 +479,10 @@ function TATSynEdit.IsCaretBlocked: boolean;
 begin
   Result:= FCaretStopUnfocused and not Focused;
 end;
+
+procedure TATSynEdit.UpdateIncorrectCaretPositions;
+begin
+  Carets.UpdateIncorrectPositions(Strings.Count-1);
+end;
+
+

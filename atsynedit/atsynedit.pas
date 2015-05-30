@@ -397,7 +397,7 @@ type
     FOptMouseDownForPopup: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptShowScrollHint: boolean;
-    FOptOffsetTop: integer;
+    FOptTextOffsetTop: integer;
     FOptSavingForceFinalEol: boolean;
     FOptSavingTrimSpaces: boolean;
     FOptUndoGrouped: boolean;
@@ -429,7 +429,7 @@ type
     FOptTabSpaces: boolean;
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
-    FOptUseOverOnPaste: boolean;
+    FOptOverwriteAllowedOnPaste: boolean;
     FOptKeyBackspaceUnindent: boolean;
     FOptKeyPageKeepsRelativePos: boolean;
     FOptKeyUpDownNavigateWrapped: boolean;
@@ -437,7 +437,7 @@ type
     FOptKeyUpDownKeepColumn: boolean;
     FOptCopyLinesIfNoSel: boolean;
     FOptCutLinesIfNoSel: boolean;
-    FOptHiliteSelFull: boolean;
+    FOptShowSelFull: boolean;
     FOptShowCurLine: boolean;
     FOptShowCurLineMinimal: boolean;
     FOptShowCurColumn: boolean;
@@ -820,19 +820,19 @@ type
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter;
-    property OptOffsetTop: integer read FOptOffsetTop write FOptOffsetTop;
+    property OptTextOffsetTop: integer read FOptTextOffsetTop write FOptTextOffsetTop;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind;
-    property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel;
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel;
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
-    property OptHiliteSelFull: boolean read FOptHiliteSelFull write FOptHiliteSelFull;
-    property OptUseOverOnPaste: boolean read FOptUseOverOnPaste write FOptUseOverOnPaste;
+    property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste;
+    property OptShowSelFull: boolean read FOptShowSelFull write FOptShowSelFull;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal;
+    property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual;
@@ -880,7 +880,7 @@ type
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
     property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
     property OptMouseDownForPopup: boolean read FOptMouseDownForPopup write FOptMouseDownForPopup;
-    property OptMouseHideCursor: boolean read FOptMouseHideCursor write FOptMouseHideCursor;
+    property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor;
     property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords;
@@ -1662,7 +1662,7 @@ begin
 
     if WrapItem.NFinal=cWrapItemFinal then
     begin
-      //for OptHiliteSelFull=false paint eol bg
+      //for OptShowSelFull=false paint eol bg
       if LineEolSelected then
       begin
         C.Brush.Color:= FColors.TextSelBG;
@@ -2063,7 +2063,7 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
-  FOptOffsetTop:= 0;
+  FOptTextOffsetTop:= 0;
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;
@@ -2072,7 +2072,7 @@ begin
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptKeyUpDownKeepColumn:= true;
-  FOptUseOverOnPaste:= false;
+  FOptOverwriteAllowedOnPaste:= false;
   FOptWordChars:= '';
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsIs;
@@ -2090,7 +2090,7 @@ begin
   FOptMouseGutterClickSelectsLine:= true;
   FOptCopyLinesIfNoSel:= true;
   FOptCutLinesIfNoSel:= false;
-  FOptHiliteSelFull:= false;
+  FOptShowSelFull:= false;
   FOptShowCurLine:= false;
   FOptShowCurLineMinimal:= true;
   FOptShowCurColumn:= false;
@@ -2172,11 +2172,6 @@ begin
   if AUpdateCaretsCoords then
     Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Invalidate;
-end;
-
-procedure TATSynEdit.UpdateIncorrectCaretPositions;
-begin
-  Carets.UpdateIncorrectCaretPositions(Strings.Count-1);
 end;
 
 procedure TATSynEdit.SetFocus;
@@ -2362,7 +2357,7 @@ begin
   if FOptGutterVisible then
     Inc(Result.X, FGutter.Width);
 
-  Result.Y:= FOptOffsetTop;
+  Result.Y:= FOptTextOffsetTop;
   if FOptRulerVisible then
     Inc(Result.Y, FOptRulerSize);
 end;
@@ -3216,7 +3211,7 @@ begin
     end;
   end
   else
-  if FOptHiliteSelFull then
+  if FOptShowSelFull then
     if AEolSelected then
     begin
       C.Brush.Color:= FColors.TextSelBG;
