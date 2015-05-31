@@ -474,6 +474,7 @@ type
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
       ABottom: integer);
     procedure DoPaintTextHintTo(C: TCanvas);
+    procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
     procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;

@@ -4,21 +4,20 @@ procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor);
 var
-  nIndex, nMaxOffset, i: integer;
-  bSel, bSelPrev, bAdd: boolean;
+  nIndex, nMaxOffset, nPartLen, i: integer;
+  bSel, bSelPrev, bAdd, bApplyOver: boolean;
+  Part: TATLinePart;
 begin
   FillChar(AParts, SizeOf(AParts), 0);
 
   if Assigned(FOnCalcLineHilite) then
-  begin
     FOnCalcLineHilite(Self, AItem, AParts);
-    Exit
-    //todo:Do own calc OVER event calc!!!
-  end;
 
+  bApplyOver:= AParts[0].Len>0; //event returned some parts
   bSel:= false;
   bSelPrev:= false;
   nIndex:= -1;
+  nPartLen:= 0;
 
   nMaxOffset:= Min(ACharsMax, AItem.NLength-1-ACharsSkipped +2{space eol});
 
@@ -34,16 +33,19 @@ begin
 
     if not bAdd then
     begin
-      Inc(AParts[nIndex].Len);
+      Inc(nPartLen);
+      AParts[nIndex].Len:= nPartLen;
     end
     else
+    if not bApplyOver then
     begin
       Inc(nIndex);
       if nIndex>=High(AParts) then Break;
       with AParts[nIndex] do
       begin
         Offset:= i;
-        Len:= 1;
+        nPartLen:= 1;
+        Len:= nPartLen;
         if bSel then
         begin
           Color:= FColors.TextSelFont;//random($ffff);
@@ -55,7 +57,22 @@ begin
           ColorBG:= AColorBG;
         end;
       end;
+    end
+    else
+    if bSel then
+    begin
+      FillChar(Part, SizeOf(Part), 0);
+      Part.Offset:= i;
+      Part.Len:= nPartLen;
+      Part.Color:= FColors.TextSelFont;
+      Part.ColorBG:= Colors.TextSelBG;
+      DoPartInsert(AParts, Part);
     end;
   end;
+end;
+
+procedure TATSynEdit.DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
+begin
+
 end;
 
