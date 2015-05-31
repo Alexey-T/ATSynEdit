@@ -4,93 +4,112 @@ procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor);
 var
-  nIndex, nMaxOffset, i: integer;
-  bSel, bSelPrev, bAdd, bApplyOver: boolean;
-  Part: TATLinePart;
+  nMaxOffset, nCharIndexBase, nLineIndex: integer;
 begin
   FillChar(AParts, SizeOf(AParts), 0);
 
   if Assigned(FOnCalcLineHilite) then
     FOnCalcLineHilite(Self, AItem, AParts);
 
-  bApplyOver:= AParts[0].Len>0; //event returned some parts
+  nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped); //try +-1 if incorrect
+  nCharIndexBase:= AItem.NCharIndex-1+ACharsSkipped; //same
+  nLineIndex:= AItem.NLineIndex;
+
+  if AParts[0].Len>0 then //event-handler made parts?
+    DoPartCalc_ApplyOver(AParts, nMaxOffset, nCharIndexBase, nLineIndex)
+  else
+    DoPartCalc_CreateNew(AParts, nMaxOffset, nCharIndexBase, nLineIndex, AColorBG);
+end;
+
+
+procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
+  AOffsetMax, ACharIndexBase, ALineIndex: integer;
+  AColorBG: TColor);
+var
+  bSel, bSelPrev, bAdd: boolean;
+  nIndex, i: integer;
+begin
   bSel:= false;
   bSelPrev:= false;
   nIndex:= -1;
 
-  FillChar(Part{%H-}, SizeOf(Part), 0);
-  Part.Color:= FColors.TextSelFont;
-  Part.ColorBG:= Colors.TextSelBG;
-
-  nMaxOffset:= Min(ACharsMax, AItem.NLength-1-ACharsSkipped +2{space eol});
-  for i:= 0 to nMaxOffset-1 do
+  for i:= 0 to AOffsetMax do
   begin
-    bSel:= IsPosSelected(AItem.NCharIndex-1+i+ACharsSkipped, AItem.NLineIndex);
+    bSel:= IsPosSelected(ACharIndexBase+i, ALineIndex);
 
-    if bApplyOver then
-    //---------------------------------
-    //event was called and made AParts,
-    //now calculate selected parts and insert them over AParts
+    if nIndex<0 then
+      bAdd:= true
+    else
+      bAdd:= bSel<>bSelPrev;
+    bSelPrev:= bSel;
+
+    if not bAdd then
     begin
-      if bSel and (i=nMaxOffset-1) then
-      begin
-        DoPartInsert(AParts, Part);
-        Break
-      end;
-
-      if bSel and bSelPrev then
-        Inc(Part.Len)
-      else
-      if not bSelPrev and bSel then
-      begin
-        Part.Offset:= i;
-        Part.Len:= 1;
-      end
-      else
-      if bSelPrev and not bSel then
-      begin
-        DoPartInsert(AParts, Part);
-      end;
-      bSelPrev:= bSel;
+      Inc(AParts[nIndex].Len);
     end
     else
-    //---------------------------------
-    //event wasnt called, make all Parts based on selection
     begin
-      if nIndex<0 then
-        bAdd:= true
-      else
-        bAdd:= bSel<>bSelPrev;
-      bSelPrev:= bSel;
-
-      if not bAdd then
+      Inc(nIndex);
+      if nIndex>=High(AParts) then Break;
+      with AParts[nIndex] do
       begin
-        Inc(AParts[nIndex].Len);
-      end
-      else
-      begin
-        Inc(nIndex);
-        if nIndex>=High(AParts) then Break;
-        with AParts[nIndex] do
+        Offset:= i;
+        Len:= 1;
+        if bSel then
         begin
-          Offset:= i;
-          Len:= 1;
-          if bSel then
-          begin
-            Color:= FColors.TextSelFont;//random($ffff);
-            ColorBG:= FColors.TextSelBG;
-          end
-          else
-          begin
-            Color:= FColors.TextFont;//random($ffff);
-            ColorBG:= AColorBG;
-          end;
+          Color:= FColors.TextSelFont;//random($ffff);
+          ColorBG:= FColors.TextSelBG;
+        end
+        else
+        begin
+          Color:= FColors.TextFont;//random($ffff);
+          ColorBG:= AColorBG;
         end;
       end;
     end;
   end;
 end;
 
+procedure TATSynEdit.DoPartCalc_ApplyOver(var AParts: TATLineParts;
+  AOffsetMax, ACharIndexBase, ALineIndex: integer);
+var
+  bSel, bSelPrev: boolean;
+  Part: TATLinePart;
+  i: integer;
+begin
+  FillChar(Part{%H-}, SizeOf(Part), 0);
+  Part.Color:= FColors.TextSelFont;
+  Part.ColorBG:= Colors.TextSelBG;
+
+  bSel:= false;
+  bSelPrev:= false;
+
+  for i:= 0 to AOffsetMax do
+  begin
+    bSel:= IsPosSelected(ACharIndexBase+i, ALineIndex);
+
+    if bSel and (i=AOffsetMax) then
+    begin
+      DoPartInsert(AParts, Part);
+      Break
+    end;
+
+    if bSel and bSelPrev then
+      Inc(Part.Len)
+    else
+    if not bSelPrev and bSel then
+    begin
+      Part.Offset:= i;
+      Part.Len:= 1;
+    end
+    else
+    if bSelPrev and not bSel then
+    begin
+      DoPartInsert(AParts, Part);
+    end;
+    bSelPrev:= bSel;
+  end;
+end;
 
 procedure TATSynEdit.DoPartFind(const AParts: TATLineParts; APos: integer; out
   AIndex, AOffsetLeft: integer);

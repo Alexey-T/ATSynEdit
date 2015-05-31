@@ -474,6 +474,10 @@ type
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
       ABottom: integer);
     procedure DoPaintTextHintTo(C: TCanvas);
+    procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
+      ACharIndexBase, ALineIndex: integer);
+    procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
+      ACharIndexBase, ALineIndex: integer; AColorBG: TColor);
     procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex,
       AOffsetLeft: integer);
     procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
