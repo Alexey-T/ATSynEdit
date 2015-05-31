@@ -18,7 +18,7 @@ begin
   bSelPrev:= false;
   nIndex:= -1;
 
-  FillChar(Part, SizeOf(Part), 0);
+  FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.Color:= FColors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;
 
@@ -28,9 +28,16 @@ begin
     bSel:= IsPosSelected(AItem.NCharIndex-1+i+ACharsSkipped, AItem.NLineIndex);
 
     if bApplyOver then
-    //event was called and did hiliting,
+    //---------------------------------
+    //event was called and made AParts,
     //now calculate selected parts and insert them over AParts
     begin
+      if bSel and (i=nMaxOffset-1) then
+      begin
+        DoPartInsert(AParts, Part);
+        Break
+      end;
+
       if bSel and bSelPrev then
         Inc(Part.Len)
       else
@@ -43,14 +50,12 @@ begin
       if bSelPrev and not bSel then
       begin
         DoPartInsert(AParts, Part);
-        Part.Offset:= 0;
-        Part.Len:= 0;
       end;
       bSelPrev:= bSel;
     end
     else
-    //event OnCalcLine wasnt called,
-    //make all Parts based on selection
+    //---------------------------------
+    //event wasnt called, make all Parts based on selection
     begin
       if nIndex<0 then
         bAdd:= true
@@ -86,9 +91,38 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
+
+procedure TATSynEdit.DoPartFindPos(const AParts: TATLineParts; APos: integer;
+  out AIndex, AIncLeft, AIncRight: integer);
+var
+  iStart, iEnd, i: integer;
 begin
-  //AParts[0].ColorBG:= clgreen;
-  //AParts[1].ColorBG:= clyellow;
+  AIndex:= -1;
+  AIncLeft:= -1;
+  AIncRight:= -1;
+  for i:= 0 to High(AParts) do
+  begin
+    if AParts[i].Len=0 then Break;
+    iStart:= AParts[i].Offset;
+    iEnd:= iStart+AParts[i].Len;
+    if APos=iStart then
+      begin AIndex:= i; Break end;
+    if (APos>=iStart) and (APos<iEnd) then
+      begin AIndex:= i; AIncLeft:= APos-iStart; AIncRight:= iEnd-APos; Break end;
+  end;
+end;
+
+procedure TATSynEdit.DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
+var
+  nStart, nEnd: integer;
+  nIndex1, nIndex2, nInc1L, nInc1R, nInc2L, nInc2R: integer;
+  ResParts: TATLineParts;
+begin
+  nStart:= APart.Offset;
+  nEnd:= nStart+APart.Len;
+
+  DoPartFindPos(AParts, nStart, nIndex1, nInc1L, nInc1R);
+  DoPartFindPos(AParts, nEnd, nIndex2, nInc2L, nInc2R);
+  ////////////////////todo
 end;
 
