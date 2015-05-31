@@ -138,13 +138,24 @@ var
   //
 var
   nIndex1, nIndex2,
-  nOffset1, nOffset2: integer;
+  nOffset1, nOffset2,
+  newLen1, newLen2, newOffset2: integer;
   i: integer;
 begin
   DoPartFind(AParts, APart.Offset, nIndex1, nOffset1);
   DoPartFind(AParts, APart.Offset+APart.Len, nIndex2, nOffset2);
   if nIndex1<0 then Exit;
   if nIndex2<0 then Exit;
+
+  with AParts[nIndex1] do
+  begin
+    newLen1:= nOffset1;
+  end;
+  with AParts[nIndex2] do
+  begin
+    newLen2:= Len-nOffset2;
+    newOffset2:= Offset+nOffset2;
+  end;
 
   FillChar(ResParts, SizeOf(ResParts), 0);
   nResPart:= 0;
@@ -153,7 +164,7 @@ begin
   for i:= 0 to nIndex1-1 do AddPart(AParts[i]);
   if nOffset1>0 then
   begin
-    AParts[nIndex1].Len:= nOffset1;
+    AParts[nIndex1].Len:= newLen1;
     AddPart(AParts[nIndex1]);
   end;
 
@@ -162,12 +173,19 @@ begin
 
   //add parts after selection
   if nOffset2>0 then
-    with AParts[nIndex2] do
-    begin
-      Dec(Len, nOffset2);
-      Inc(Offset, nOffset2);
-    end;
-  for i:= nIndex2 to High(AParts) do AddPart(AParts[i]);
+  begin
+    AParts[nIndex2].Len:= newLen2;
+    AParts[nIndex2].Offset:= newOffset2;
+  end;
+
+  for i:= nIndex2 to High(AParts) do
+  begin
+    if AParts[i].Len=0 then Break;
+    AddPart(AParts[i]);
+  end;
+
+  //application.mainform.caption:= format('n1 %d, n2 %d, of len %d %d',
+  //  [nindex1, nindex2, aparts[nindex2].offset, aparts[nindex2].len]);
 
   //copy result
   Move(ResParts, AParts, SizeOf(AParts));
