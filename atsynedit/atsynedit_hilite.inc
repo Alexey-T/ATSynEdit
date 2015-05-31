@@ -92,37 +92,84 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPartFindPos(const AParts: TATLineParts; APos: integer;
-  out AIndex, AIncLeft, AIncRight: integer);
+procedure TATSynEdit.DoPartFind(const AParts: TATLineParts; APos: integer; out
+  AIndex, AOffsetLeft: integer);
 var
   iStart, iEnd, i: integer;
 begin
   AIndex:= -1;
-  AIncLeft:= -1;
-  AIncRight:= -1;
-  for i:= 0 to High(AParts) do
+  AOffsetLeft:= 0;
+
+  for i:= Low(AParts) to High(AParts)-1 do
   begin
-    if AParts[i].Len=0 then Break;
+    if AParts[i].Len=0 then
+    begin
+      //pos after last part?
+      if i>Low(AParts) then
+        if APos>=AParts[i-1].Offset+AParts[i-1].Len then
+          AIndex:= i;
+      Break;
+    end;
+
     iStart:= AParts[i].Offset;
     iEnd:= iStart+AParts[i].Len;
+
+    //pos at part begin?
     if APos=iStart then
       begin AIndex:= i; Break end;
+
+    //pos at part middle?
     if (APos>=iStart) and (APos<iEnd) then
-      begin AIndex:= i; AIncLeft:= APos-iStart; AIncRight:= iEnd-APos; Break end;
+      begin AIndex:= i; AOffsetLeft:= APos-iStart; Break end;
   end;
 end;
 
 procedure TATSynEdit.DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
 var
-  nStart, nEnd: integer;
-  nIndex1, nIndex2, nInc1L, nInc1R, nInc2L, nInc2R: integer;
   ResParts: TATLineParts;
+  nResPart: integer;
+  //
+  procedure AddPart(const P: TATLinePart);
+  begin
+    if P.Len=0 then Exit;
+    Move(P, ResParts[nResPart], SizeOf(P));
+    Inc(nResPart);
+  end;
+  //
+var
+  nIndex1, nIndex2,
+  nOffset1, nOffset2: integer;
+  i: integer;
 begin
-  nStart:= APart.Offset;
-  nEnd:= nStart+APart.Len;
+  DoPartFind(AParts, APart.Offset, nIndex1, nOffset1);
+  DoPartFind(AParts, APart.Offset+APart.Len, nIndex2, nOffset2);
+  if nIndex1<0 then Exit;
+  if nIndex2<0 then Exit;
 
-  DoPartFindPos(AParts, nStart, nIndex1, nInc1L, nInc1R);
-  DoPartFindPos(AParts, nEnd, nIndex2, nInc2L, nInc2R);
-  ////////////////////todo
+  FillChar(ResParts, SizeOf(ResParts), 0);
+  nResPart:= 0;
+
+  //add to result parts before selection
+  for i:= 0 to nIndex1-1 do AddPart(AParts[i]);
+  if nOffset1>0 then
+  begin
+    AParts[nIndex1].Len:= nOffset1;
+    AddPart(AParts[nIndex1]);
+  end;
+
+  //add APart
+  AddPart(APart);
+
+  //add parts after selection
+  if nOffset2>0 then
+    with AParts[nIndex2] do
+    begin
+      Dec(Len, nOffset2);
+      Inc(Offset, nOffset2);
+    end;
+  for i:= nIndex2 to High(AParts) do AddPart(AParts[i]);
+
+  //copy result
+  Move(ResParts, AParts, SizeOf(AParts));
 end;
 
