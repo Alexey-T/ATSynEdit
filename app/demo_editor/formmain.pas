@@ -938,7 +938,8 @@ var
     begin
       case kind of
         1: begin Color:= clblue; Colorbg:= clnone; end;
-        2: begin Color:= clred; Colorbg:= clyellow; end;
+        2: begin Color:= clgreen; Colorbg:= clnone; end;
+        3: begin Color:= clred; Colorbg:= clyellow; end;
         else begin Color:= clgray; Colorbg:= clnone; end;
       end;
       Offset:= noffset;
@@ -948,7 +949,6 @@ var
   //
 var
   Str: atString;
-  ch: atChar;
   i: integer;
 begin
   Str:= ed.Strings.Lines[AWrapItem.NLineIndex]; //whole line
@@ -964,11 +964,11 @@ begin
     inc(i);
     if i>Length(Str) then
       begin Add; break end;
-    ch:= Str[i];
 
-    case ch of
-      '0'..'9': kindnew:= 2;
+    case Str[i] of
       'w': kindnew:= 1;
+      'e': kindnew:= 2;
+      '0'..'9': kindnew:= 3;
       else kindnew:= 0;
     end;
 
