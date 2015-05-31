@@ -324,7 +324,6 @@ object fmMain: TfmMain
       end
       object mnuFileSav: TMenuItem
         Caption = 'Save..'
-        ShortCut = 16467
         OnClick = mnuFileSaveClick
       end
       object mnuFileEnd: TMenuItem
@@ -381,6 +380,7 @@ object fmMain: TfmMain
       end
       object mnuSyntax: TMenuItem
         Caption = 'hilite ''w'' color'
+        ShortCut = 16467
         OnClick = mnuSyntaxClick
       end
       object MenuItem1: TMenuItem

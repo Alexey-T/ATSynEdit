@@ -932,7 +932,6 @@ var
   //
   procedure Add;
   begin
-    inc(npart);
     if npart>High(AParts) then exit;
     with AParts[npart] do
     begin
@@ -945,6 +944,7 @@ var
       Offset:= noffset;
       Len:= nlen;
     end;
+    inc(npart);
   end;
   //
 var
@@ -954,17 +954,13 @@ begin
   Str:= ed.Strings.Lines[AWrapItem.NLineIndex]; //whole line
   Str:= Copy(Str, AWrapItem.NCharIndex, AWrapItem.NLength); //current part
 
-  npart:= -1;
+  npart:= 0;
   noffset:= 0;
   nlen:= 1;
-  kind:= 0;
-  i:= 0;
+  kind:= -1;
 
-  repeat
-    inc(i);
-    if i>Length(Str) then
-      begin Add; break end;
-
+  for i:= 1 to Length(Str) do
+  begin
     case Str[i] of
       'w': kindnew:= 1;
       'e': kindnew:= 2;
@@ -977,11 +973,17 @@ begin
       inc(nlen);
       Continue;
     end;
-    Add;
+    if kind>=0 then Add;
     kind:= kindnew;
     nlen:= 1;
     noffset:= i-1;
-  until false;
+  end;
+
+  Add;
+
+  //test
+  //AParts[0].Colorbg:= clgreen;
+  //AParts[1].Colorbg:= clyellow;
 end;
 
 end.
