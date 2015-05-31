@@ -1,3 +1,14 @@
+//for browser-scroll feature
+var
+  cBitmapNiceScroll: TBitmap = nil;
+const
+  cBitmapNiceScrollRadius = 16;
+  crNiceScrollNone  = TCursor(-30);
+  crNiceScrollUp    = TCursor(-31);
+  crNiceScrollDown  = TCursor(-32);
+  crNiceScrollLeft  = TCursor(-33);
+  crNiceScrollRight = TCursor(-34);
+
 const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};

@@ -258,16 +258,6 @@ var
   cClipFormatId: integer = 0; //must be inited
   cClipSignatureColumn: integer = $1000;
 
-var
-  cBitmapNiceScroll: TBitmap = nil; //must be inited
-const
-  cBitmapNiceScrollRadius = 16;
-  crNiceScrollNone  = TCursor(-30);
-  crNiceScrollUp    = TCursor(-31);
-  crNiceScrollDown  = TCursor(-32);
-  crNiceScrollLeft  = TCursor(-33);
-  crNiceScrollRight = TCursor(-34);
-
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;
@@ -275,7 +265,7 @@ type
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
-  TATSynEditCalcLineHiliteEvent = procedure(Sender: TObject; const AWrapItem: TATSynWrapItem; var AParts: TATLineParts) of object;
+  TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts; const AWrapItem: TATSynWrapItem; ACharIndexFrom: integer) of object;
 
 
 type
@@ -351,7 +341,7 @@ type
     FOnDrawRuler: TATSynEditDrawRectEvent;
     FOnChangeState: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
-    FOnCalcLineHilite: TATSynEditCalcLineHiliteEvent;
+    FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FWrapInfo: TATSynWrapInfo;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
@@ -812,7 +802,7 @@ type
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
-    property OnCalcLineHilite: TATSynEditCalcLineHiliteEvent read FOnCalcLineHilite write FOnCalcLineHilite;
+    property OnCalcHilite: TATSynEditCalcHiliteEvent read FOnCalcHilite write FOnCalcHilite;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText;

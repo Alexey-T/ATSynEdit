@@ -6,14 +6,13 @@ procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
 var
   nMaxOffset, nCharIndexBase, nLineIndex: integer;
 begin
-  FillChar(AParts, SizeOf(AParts), 0);
-
-  if Assigned(FOnCalcLineHilite) then
-    FOnCalcLineHilite(Self, AItem, AParts);
-
   nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped); //try +-1 if incorrect
   nCharIndexBase:= AItem.NCharIndex-1+ACharsSkipped; //same
   nLineIndex:= AItem.NLineIndex;
+
+  FillChar(AParts, SizeOf(AParts), 0);
+  if Assigned(FOnCalcHilite) then
+    FOnCalcHilite(Self, AParts, AItem, nCharIndexBase+1);
 
   if AParts[0].Len>0 then //event-handler made parts?
     DoPartCalc_ApplyOver(AParts, nMaxOffset, nCharIndexBase, nLineIndex)

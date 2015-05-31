@@ -158,8 +158,10 @@ type
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
-    procedure EditCalcLine(Sender: TObject; const AWrapItem: TATSynWrapItem;
-      var AParts: TATLineParts);
+    procedure EditCalcLine(Sender: TObject;
+      var AParts: TATLineParts;
+      const AWrapItem: TATSynWrapItem;
+      ACharIndexFrom: integer);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
@@ -596,9 +598,9 @@ procedure TfmMain.mnuSyntaxClick(Sender: TObject);
 begin
   mnuSyntax.Checked:= not mnuSyntax.Checked;
   if mnuSyntax.Checked then
-    ed.OnCalcLineHilite:= @EditCalcLine
+    ed.OnCalcHilite:= @EditCalcLine
   else
-    ed.OnCalcLineHilite:= nil;
+    ed.OnCalcHilite:= nil;
   ed.Update;
 end;
 
@@ -925,7 +927,8 @@ begin
   C.Pen.Width:= 1;
 end;
 
-procedure TfmMain.EditCalcLine(Sender: TObject; const AWrapItem: TATSynWrapItem; var AParts: TATLineParts);
+procedure TfmMain.EditCalcLine(Sender: TObject; var AParts: TATLineParts;
+  const AWrapItem: TATSynWrapItem; ACharIndexFrom: integer);
 var
   nlen, npart, noffset: integer;
   kind, kindnew: integer;
@@ -952,7 +955,7 @@ var
   i: integer;
 begin
   Str:= ed.Strings.Lines[AWrapItem.NLineIndex]; //whole line
-  Str:= Copy(Str, AWrapItem.NCharIndex, AWrapItem.NLength); //current part
+  Str:= Copy(Str, ACharIndexFrom, AWrapItem.NLength); //current part
 
   npart:= 0;
   noffset:= 0;
