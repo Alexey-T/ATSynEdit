@@ -468,9 +468,6 @@ type
       ACharIndexBase, ALineIndex: integer);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
       ACharIndexBase, ALineIndex: integer; AColorBG: TColor);
-    procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex,
-      AOffsetLeft: integer);
-    procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
     procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;

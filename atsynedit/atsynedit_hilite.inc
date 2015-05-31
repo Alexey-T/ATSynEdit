@@ -4,22 +4,120 @@ procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor);
 var
-  nMaxOffset, nCharIndexBase, nLineIndex: integer;
+  nMaxOffset, nCharIndex, nLineIndex: integer;
 begin
-  nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped); //try +-1 if incorrect
-  nCharIndexBase:= AItem.NCharIndex-1+ACharsSkipped; //same
+  nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped);
+  nCharIndex:= AItem.NCharIndex+ACharsSkipped;
   nLineIndex:= AItem.NLineIndex;
 
   FillChar(AParts, SizeOf(AParts), 0);
   if Assigned(FOnCalcHilite) then
-    FOnCalcHilite(Self, AParts, AItem, nCharIndexBase+1);
+    FOnCalcHilite(Self, AParts, AItem, nCharIndex);
 
-  if AParts[0].Len>0 then //event-handler made parts?
-    DoPartCalc_ApplyOver(AParts, nMaxOffset, nCharIndexBase, nLineIndex)
+  if AParts[0].Len>0 then
+    DoPartCalc_ApplyOver(AParts, nMaxOffset, nCharIndex-1, nLineIndex)
   else
-    DoPartCalc_CreateNew(AParts, nMaxOffset, nCharIndexBase, nLineIndex, AColorBG);
+    DoPartCalc_CreateNew(AParts, nMaxOffset, nCharIndex-1, nLineIndex, AColorBG);
 end;
 
+procedure DoPartFind(const AParts: TATLineParts; APos: integer; out
+  AIndex, AOffsetLeft: integer);
+var
+  iStart, iEnd, i: integer;
+begin
+  AIndex:= -1;
+  AOffsetLeft:= 0;
+
+  for i:= Low(AParts) to High(AParts)-1 do
+  begin
+    if AParts[i].Len=0 then
+    begin
+      //pos after last part?
+      if i>Low(AParts) then
+        if APos>=AParts[i-1].Offset+AParts[i-1].Len then
+          AIndex:= i;
+      Break;
+    end;
+
+    iStart:= AParts[i].Offset;
+    iEnd:= iStart+AParts[i].Len;
+
+    //pos at part begin?
+    if APos=iStart then
+      begin AIndex:= i; Break end;
+
+    //pos at part middle?
+    if (APos>=iStart) and (APos<iEnd) then
+      begin AIndex:= i; AOffsetLeft:= APos-iStart; Break end;
+  end;
+end;
+
+procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
+var
+  ResParts: TATLineParts;
+  nResPart: integer;
+  //
+  procedure AddPart(const P: TATLinePart);
+  begin
+    if P.Len=0 then Exit;
+    Move(P, ResParts[nResPart], SizeOf(P));
+    Inc(nResPart);
+  end;
+  //
+var
+  nIndex1, nIndex2,
+  nOffset1, nOffset2,
+  newLen1, newLen2, newOffset2: integer;
+  i: integer;
+begin
+  DoPartFind(AParts, APart.Offset, nIndex1, nOffset1);
+  DoPartFind(AParts, APart.Offset+APart.Len, nIndex2, nOffset2);
+  if nIndex1<0 then Exit;
+  if nIndex2<0 then Exit;
+
+  with AParts[nIndex1] do
+  begin
+    newLen1:= nOffset1;
+  end;
+  with AParts[nIndex2] do
+  begin
+    newLen2:= Len-nOffset2;
+    newOffset2:= Offset+nOffset2;
+  end;
+
+  FillChar(ResParts, SizeOf(ResParts), 0);
+  nResPart:= 0;
+
+  //add to result parts before selection
+  for i:= 0 to nIndex1-1 do AddPart(AParts[i]);
+  if nOffset1>0 then
+  begin
+    AParts[nIndex1].Len:= newLen1;
+    AddPart(AParts[nIndex1]);
+  end;
+
+  //add APart
+  AddPart(APart);
+
+  //add parts after selection
+  if nOffset2>0 then
+  begin
+    AParts[nIndex2].Len:= newLen2;
+    AParts[nIndex2].Offset:= newOffset2;
+  end;
+
+  for i:= nIndex2 to High(AParts) do
+  begin
+    if AParts[i].Len=0 then Break;
+    AddPart(AParts[i]);
+  end;
+
+  //application.mainform.caption:= format('n1 %d, n2 %d, of len %d %d',
+  //  [nindex1, nindex2, aparts[nindex2].offset, aparts[nindex2].len]);
+
+  //copy result
+  Move(ResParts, AParts, SizeOf(AParts));
+end;
 
 procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
   AOffsetMax, ACharIndexBase, ALineIndex: integer;
@@ -110,102 +208,4 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPartFind(const AParts: TATLineParts; APos: integer; out
-  AIndex, AOffsetLeft: integer);
-var
-  iStart, iEnd, i: integer;
-begin
-  AIndex:= -1;
-  AOffsetLeft:= 0;
-
-  for i:= Low(AParts) to High(AParts)-1 do
-  begin
-    if AParts[i].Len=0 then
-    begin
-      //pos after last part?
-      if i>Low(AParts) then
-        if APos>=AParts[i-1].Offset+AParts[i-1].Len then
-          AIndex:= i;
-      Break;
-    end;
-
-    iStart:= AParts[i].Offset;
-    iEnd:= iStart+AParts[i].Len;
-
-    //pos at part begin?
-    if APos=iStart then
-      begin AIndex:= i; Break end;
-
-    //pos at part middle?
-    if (APos>=iStart) and (APos<iEnd) then
-      begin AIndex:= i; AOffsetLeft:= APos-iStart; Break end;
-  end;
-end;
-
-procedure TATSynEdit.DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
-var
-  ResParts: TATLineParts;
-  nResPart: integer;
-  //
-  procedure AddPart(const P: TATLinePart);
-  begin
-    if P.Len=0 then Exit;
-    Move(P, ResParts[nResPart], SizeOf(P));
-    Inc(nResPart);
-  end;
-  //
-var
-  nIndex1, nIndex2,
-  nOffset1, nOffset2,
-  newLen1, newLen2, newOffset2: integer;
-  i: integer;
-begin
-  DoPartFind(AParts, APart.Offset, nIndex1, nOffset1);
-  DoPartFind(AParts, APart.Offset+APart.Len, nIndex2, nOffset2);
-  if nIndex1<0 then Exit;
-  if nIndex2<0 then Exit;
-
-  with AParts[nIndex1] do
-  begin
-    newLen1:= nOffset1;
-  end;
-  with AParts[nIndex2] do
-  begin
-    newLen2:= Len-nOffset2;
-    newOffset2:= Offset+nOffset2;
-  end;
-
-  FillChar(ResParts, SizeOf(ResParts), 0);
-  nResPart:= 0;
-
-  //add to result parts before selection
-  for i:= 0 to nIndex1-1 do AddPart(AParts[i]);
-  if nOffset1>0 then
-  begin
-    AParts[nIndex1].Len:= newLen1;
-    AddPart(AParts[nIndex1]);
-  end;
-
-  //add APart
-  AddPart(APart);
-
-  //add parts after selection
-  if nOffset2>0 then
-  begin
-    AParts[nIndex2].Len:= newLen2;
-    AParts[nIndex2].Offset:= newOffset2;
-  end;
-
-  for i:= nIndex2 to High(AParts) do
-  begin
-    if AParts[i].Len=0 then Break;
-    AddPart(AParts[i]);
-  end;
-
-  //application.mainform.caption:= format('n1 %d, n2 %d, of len %d %d',
-  //  [nindex1, nindex2, aparts[nindex2].offset, aparts[nindex2].len]);
-
-  //copy result
-  Move(ResParts, AParts, SizeOf(AParts));
-end;
 
