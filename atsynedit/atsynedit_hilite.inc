@@ -7,17 +7,17 @@ var
   nMaxOffset, nCharIndex, nLineIndex: integer;
 begin
   nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped);
-  nCharIndex:= AItem.NCharIndex+ACharsSkipped;
   nLineIndex:= AItem.NLineIndex;
+  nCharIndex:= AItem.NCharIndex+ACharsSkipped;
 
   FillChar(AParts, SizeOf(AParts), 0);
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, AItem, nCharIndex);
 
   if AParts[0].Len>0 then
-    DoPartCalc_ApplyOver(AParts, nMaxOffset, nCharIndex-1, nLineIndex)
+    DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1)
   else
-    DoPartCalc_CreateNew(AParts, nMaxOffset, nCharIndex-1, nLineIndex, AColorBG);
+    DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 end;
 
 procedure DoPartFind(const AParts: TATLineParts; APos: integer; out
@@ -120,8 +120,7 @@ begin
 end;
 
 procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
-  AOffsetMax, ACharIndexBase, ALineIndex: integer;
-  AColorBG: TColor);
+  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
 var
   bSel, bSelPrev, bAdd: boolean;
   nIndex, i: integer;
@@ -132,7 +131,7 @@ begin
 
   for i:= 0 to AOffsetMax do
   begin
-    bSel:= IsPosSelected(ACharIndexBase+i, ALineIndex);
+    bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
 
     if nIndex<0 then
       bAdd:= true
@@ -168,7 +167,7 @@ begin
 end;
 
 procedure TATSynEdit.DoPartCalc_ApplyOver(var AParts: TATLineParts;
-  AOffsetMax, ACharIndexBase, ALineIndex: integer);
+  AOffsetMax, ALineIndex, ACharIndex: integer);
 var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
@@ -183,7 +182,7 @@ begin
 
   for i:= 0 to AOffsetMax do
   begin
-    bSel:= IsPosSelected(ACharIndexBase+i, ALineIndex);
+    bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
 
     if bSel and (i=AOffsetMax) then
     begin

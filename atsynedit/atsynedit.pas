@@ -465,9 +465,9 @@ type
       ABottom: integer);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
-      ACharIndexBase, ALineIndex: integer);
+      ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
-      ACharIndexBase, ALineIndex: integer; AColorBG: TColor);
+      ALineIndex, ACharIndex: integer; AColorBG: TColor);
     procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
