@@ -24,7 +24,13 @@ var
 
 
 type
-  TATLineBorderStyle = (cBorderNone, cBorderSingle, cBorderDot, cBorderWave);
+  TATLineBorderStyle = (
+    cBorderNone,
+    cBorderLine,
+    cBorderLineDot,
+    cBorderDotted,
+    cBorderWave
+    );
 
 type
   TATLinePart = record
@@ -180,12 +186,19 @@ var
   i: integer;
 begin
   case Style of
-    cBorderSingle:
+    cBorderLine:
       begin
         C.Pen.Color:= Color;
         C.Line(P1, P2);
       end;
-    cBorderDot:
+    cBorderLineDot:
+      begin
+        C.Pen.Style:= psDot;
+        C.Pen.Color:= Color;
+        C.Line(P1, P2);
+        C.Pen.Style:= psSolid;
+      end;
+    cBorderDotted:
       begin
         if P1.Y=P2.Y then
         begin

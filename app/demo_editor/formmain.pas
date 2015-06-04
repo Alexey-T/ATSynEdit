@@ -946,11 +946,13 @@ var
         2: begin
              ColorFont:= clgreen;
              Colorbg:= clnone;
+             ColorBorder:= clgreen;
+             BorderDown:= cBorderLineDot;
            end;
         3: begin
              ColorFont:= clred;
              Colorbg:= clyellow;
-             ColorBorder:= clGreen;
+             ColorBorder:= clred;
              BorderDown:= cBorderWave;
              BorderLeft:= cBorderNone;
              BorderRight:= cBorderNone;
