@@ -24,7 +24,7 @@ var
 
 
 type
-  TATLineBorderStyle = (cBorderNone, cBorderSingle, cBorderDot);
+  TATLineBorderStyle = (cBorderNone, cBorderSingle, cBorderDot, cBorderWave);
 
 type
   TATLinePart = record
@@ -172,9 +172,9 @@ end;
 type
   TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
 
-procedure DoPaintLine(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint);
+procedure DoPaintLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint);
 var
-  i: integer;
+  i, dy: integer;
 begin
   case Style of
     cBorderSingle:
@@ -187,14 +187,27 @@ begin
         if P1.Y=P2.Y then
         begin
           for i:= P1.X to P2.X do
-            if Odd(i) then
+            if Odd(i-P1.X+1) then
               C.Pixels[i, P2.Y]:= Color;
         end
         else
         begin
           for i:= P1.Y to P2.Y do
-            if Odd(i) then
+            if Odd(i-P1.Y+1) then
               C.Pixels[P1.X, i]:= Color;
+        end;
+      end;
+    cBorderWave:
+      begin
+        for i:= P1.X to P2.X do
+        begin
+          case (i-P1.X) mod 4 of
+            0: dy:= 0;
+            1: dy:= 1;
+            2: dy:= 2;
+            3: dy:= 1;
+          end;
+          C.Pixels[i, P2.Y-dy]:= Color;
         end;
       end;
   end;
@@ -205,13 +218,13 @@ begin
   if Style=cBorderNone then Exit;
   case Side of
     cSideDown:
-      DoPaintLine(C, Color, Style, Point(R.Left, R.Bottom-1), Point(R.Right-1, R.Bottom-1));
+      DoPaintLineEx(C, Color, Style, Point(R.Left, R.Bottom-1), Point(R.Right-1, R.Bottom-1));
     cSideLeft:
-      DoPaintLine(C, Color, Style, Point(R.Left, R.Top), Point(R.Left, R.Bottom));
+      DoPaintLineEx(C, Color, Style, Point(R.Left, R.Top), Point(R.Left, R.Bottom));
     cSideRight:
-      DoPaintLine(C, Color, Style, Point(R.Right-1, R.Top), Point(R.Right-1, R.Bottom));
+      DoPaintLineEx(C, Color, Style, Point(R.Right-1, R.Top), Point(R.Right-1, R.Bottom));
     cSideUp:
-      DoPaintLine(C, Color, Style, Point(R.Left, R.Top), Point(R.Right-1, R.Top));
+      DoPaintLineEx(C, Color, Style, Point(R.Left, R.Top), Point(R.Right-1, R.Top));
   end;
 end;
 
