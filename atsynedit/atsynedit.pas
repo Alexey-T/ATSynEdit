@@ -3176,7 +3176,11 @@ begin
   if AIndentLines then
     for i:= 0 to AIndentSize-1 do
       if i mod FTabSize = 0 then
-        CanvasDottedVertLine(C, ARect.Left + (i-AScrollPos)*ACharSize.X, ACoordY, ACoordY+ACharSize.Y, FColors.IndentVertLines);
+        CanvasDottedVertLine_Alt(C,
+          FColors.IndentVertLines,
+          ARect.Left + (i-AScrollPos)*ACharSize.X,
+          ACoordY,
+          ACoordY+ACharSize.Y);
 end;
 
 procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;

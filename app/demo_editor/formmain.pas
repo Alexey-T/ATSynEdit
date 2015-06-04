@@ -947,16 +947,17 @@ var
              ColorFont:= clgreen;
              Colorbg:= clnone;
              ColorBorder:= clgreen;
-             BorderDown:= cBorderLineDot;
+             //BorderLeft:= cBorderDotted;
+             BorderDown:= cBorderDotted;
            end;
         3: begin
              ColorFont:= clred;
              Colorbg:= clyellow;
              ColorBorder:= clred;
              BorderDown:= cBorderWave;
-             BorderLeft:= cBorderNone;
-             BorderRight:= cBorderNone;
-             BorderUp:= cBorderNone;
+             //BorderLeft:= cBorderNone;
+             //BorderRight:= cBorderNone;
+             //BorderUp:= cBorderWave;
           end;
         else
           begin

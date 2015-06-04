@@ -77,7 +77,10 @@ function CanvasTextWidth(const S: atString; ATabSize: integer; ACharSize: TPoint
 
 function CanvasFontSizes(C: TCanvas): TPoint;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
-procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
+procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer);
+procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
+procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
+
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
 
@@ -178,12 +181,41 @@ begin
     end;
 end;
 
-procedure DoPaintLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint);
+
+procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
 const
   cWavePeriod = 4;
   cWaveInc: array[0..cWavePeriod-1] of integer = (0, 1, 2, 1);
 var
+  i, y, sign: integer;
+begin
+  if AtDown then sign:= -1 else sign:= 1;
+  for i:= P1.X to P2.X do
+  begin
+    y:= P2.Y + sign * cWaveInc[(i-P1.X) mod cWavePeriod];
+    C.Pixels[i, y]:= Color;
+  end;
+end;
+
+procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
+var
   i: integer;
+begin
+  if P1.Y=P2.Y then
+  begin
+    for i:= P1.X to P2.X do
+      if Odd(i-P1.X+1) then
+        C.Pixels[i, P2.Y]:= Color;
+  end
+  else
+  begin
+    for i:= P1.Y to P2.Y do
+      if Odd(i-P1.Y+1) then
+        C.Pixels[P1.X, i]:= Color;
+  end;
+end;
+
+procedure DoPaintLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint; AtDown: boolean);
 begin
   case Style of
     cBorderLine:
@@ -200,23 +232,11 @@ begin
       end;
     cBorderDotted:
       begin
-        if P1.Y=P2.Y then
-        begin
-          for i:= P1.X to P2.X do
-            if Odd(i-P1.X+1) then
-              C.Pixels[i, P2.Y]:= Color;
-        end
-        else
-        begin
-          for i:= P1.Y to P2.Y do
-            if Odd(i-P1.Y+1) then
-              C.Pixels[P1.X, i]:= Color;
-        end;
+        CanvasDottedHorzVertLine(C, Color, P1, P2);
       end;
     cBorderWave:
       begin
-        for i:= P1.X to P2.X do
-          C.Pixels[i, P2.Y-cWaveInc[(i-P1.X) mod cWavePeriod]]:= Color;
+        CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
       end;
   end;
 end;
@@ -226,13 +246,25 @@ begin
   if Style=cBorderNone then Exit;
   case Side of
     cSideDown:
-      DoPaintLineEx(C, Color, Style, Point(R.Left, R.Bottom-1), Point(R.Right-1, R.Bottom-1));
+      DoPaintLineEx(C, Color, Style,
+        Point(R.Left, R.Bottom-1),
+        Point(R.Right-1, R.Bottom-1),
+        true);
     cSideLeft:
-      DoPaintLineEx(C, Color, Style, Point(R.Left, R.Top), Point(R.Left, R.Bottom));
+      DoPaintLineEx(C, Color, Style,
+        Point(R.Left, R.Top),
+        Point(R.Left, R.Bottom),
+        false);
     cSideRight:
-      DoPaintLineEx(C, Color, Style, Point(R.Right-1, R.Top), Point(R.Right-1, R.Bottom));
+      DoPaintLineEx(C, Color, Style,
+        Point(R.Right-1, R.Top),
+        Point(R.Right-1, R.Bottom),
+        false);
     cSideUp:
-      DoPaintLineEx(C, Color, Style, Point(R.Left, R.Top), Point(R.Right-1, R.Top));
+      DoPaintLineEx(C, Color, Style,
+        Point(R.Left, R.Top),
+        Point(R.Right-1, R.Top),
+        false);
   end;
 end;
 
@@ -498,13 +530,13 @@ begin
 end;
 {$endif}
 
-procedure CanvasDottedVertLine(C: TCanvas; X, Y1, Y2: integer; AColor: TColor);
+procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer);
 var
   j: integer;
 begin
   for j:= Y1 to Y2 do
     if Odd(j) then
-      C.Pixels[X, j]:= AColor;
+      C.Pixels[X1, j]:= Color;
 end;
 
 
