@@ -24,14 +24,18 @@ var
 
 
 type
+  TATLineBorderStyle = (cBorderNone, cBorderSingle, cBorderDot);
+
+type
   TATLinePart = record
     Offset, Len: integer;
-    Color, ColorBG: TColor;
-    Styles: TFontStyles;
+    ColorFont, ColorBG, ColorBorder: TColor;
+    FontStyle: TFontStyles;
+    BorderUp, BorderDown, BorderLeft, BorderRight: TATLineBorderStyle;
   end;
 
 const
-  cMaxLineParts = 1000; //big two monitors have sum linelen about 1000
+  cMaxLineParts = 1000; //big two monitors have total about 1000 chars (small font)
 type
   TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
@@ -165,6 +169,25 @@ begin
     end;
 end;
 
+type
+  TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
+
+procedure DoPaintBorderLine(C: TCanvas; Color: TColor; const R: TRect; Side: TATBorderSide);
+begin
+  C.Pen.Color:= Color;
+  case Side of
+    cSideDown:
+      C.Line(Point(R.Left, R.Bottom-1), Point(R.Right-1, R.Bottom-1));
+    cSideUp:
+      C.Line(Point(R.Left, R.Top), Point(R.Right-1, R.Top));
+    cSideLeft:
+      C.Line(Point(R.Left, R.Top), Point(R.Left, R.Bottom));
+    cSideRight:
+      C.Line(Point(R.Right-1, R.Top), Point(R.Right-1, R.Bottom));
+  end;
+end;
+
+
 procedure DoPaintHexChars(C: TCanvas;
   const AString: atString;
   ADx: PIntegerArray;
@@ -277,8 +300,9 @@ var
   PartStr: atString;
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
-  PartColor, PartColorBG: TColor;
-  PartStyles: TFontStyles;
+  PartColorFont, PartColorBG, PartColorBorder: TColor;
+  PartFontStyle: TFontStyles;
+  PartBorderL, PartBorderR, PartBorderU, PartBorderD: TATLineBorderStyle;
   PartRect: TRect;
   Buf: AnsiString;
 begin
@@ -324,9 +348,14 @@ begin
       PartOffset:= AParts^[j].Offset;
       PartStr:= Copy(Str, PartOffset+1, PartLen);
       if PartStr='' then Break;
-      PartColor:= AParts^[j].Color;
+      PartColorFont:= AParts^[j].ColorFont;
       PartColorBG:= AParts^[j].ColorBG;
-      PartStyles:= AParts^[j].Styles;
+      PartColorBorder:= AParts^[j].ColorBorder;
+      PartFontStyle:= AParts^[j].FontStyle;
+      PartBorderL:= AParts^[j].BorderLeft;
+      PartBorderR:= AParts^[j].BorderRight;
+      PartBorderU:= AParts^[j].BorderUp;
+      PartBorderD:= AParts^[j].BorderDown;
 
       if PartOffset>0 then
         PixOffset1:= ListInt[PartOffset-1]
@@ -339,8 +368,8 @@ begin
       else
         PixOffset2:= 0;
 
-      C.Font.Color:= PartColor;
-      C.Font.Style:= PartStyles;
+      C.Font.Color:= PartColorFont;
+      C.Font.Style:= PartFontStyle;
       C.Brush.Color:= PartColorBG;
 
       PartRect:= Rect(
@@ -367,6 +396,15 @@ begin
         AColorHex,
         PartColorBG
         );
+
+      if PartBorderD<>cBorderNone then
+        DoPaintBorderLine(C, PartColorBorder, PartRect, cSideDown);
+      if PartBorderU<>cBorderNone then
+        DoPaintBorderLine(C, PartColorBorder, PartRect, cSideUp);
+      if PartBorderL<>cBorderNone then
+        DoPaintBorderLine(C, PartColorBorder, PartRect, cSideLeft);
+      if PartBorderR<>cBorderNone then
+        DoPaintBorderLine(C, PartColorBorder, PartRect, cSideRight);
     end;
 
   if AShowUnprintable then

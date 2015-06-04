@@ -939,10 +939,15 @@ var
     with AParts[npart] do
     begin
       case kind of
-        1: begin Color:= clblue; Colorbg:= clnone; end;
-        2: begin Color:= clgreen; Colorbg:= clnone; end;
-        3: begin Color:= clred; Colorbg:= clyellow; end;
-        else begin Color:= clgray; Colorbg:= clnone; end;
+        1: begin ColorFont:= clblue; Colorbg:= clnone; end;
+        2: begin ColorFont:= clgreen; Colorbg:= clnone; end;
+        3: begin ColorFont:= clred; Colorbg:= clyellow; ColorBorder:= clGreen;
+             BorderDown:= cBorderSingle;
+             BorderLeft:= cBorderSingle;
+             BorderRight:= cBorderSingle;
+             BorderUp:= cBorderSingle;
+        end;
+        else begin ColorFont:= clgray; Colorbg:= clnone; end;
       end;
       Offset:= noffset;
       Len:= nlen;

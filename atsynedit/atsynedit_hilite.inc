@@ -153,12 +153,12 @@ begin
         Len:= 1;
         if bSel then
         begin
-          Color:= FColors.TextSelFont;//random($ffff);
+          ColorFont:= FColors.TextSelFont;//random($ffff);
           ColorBG:= FColors.TextSelBG;
         end
         else
         begin
-          Color:= FColors.TextFont;//random($ffff);
+          ColorFont:= FColors.TextFont;//random($ffff);
           ColorBG:= AColorBG;
         end;
       end;
@@ -174,7 +174,7 @@ var
   i: integer;
 begin
   FillChar(Part{%H-}, SizeOf(Part), 0);
-  Part.Color:= FColors.TextSelFont;
+  Part.ColorFont:= FColors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;
 
   bSel:= false;
