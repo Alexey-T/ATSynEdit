@@ -85,6 +85,9 @@ uses
 var
   _Pen: TPen = nil;
 
+type
+  TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
+
 
 procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer; AFontColor: TColor);
 const
@@ -169,12 +172,12 @@ begin
     end;
 end;
 
-type
-  TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
-
 procedure DoPaintLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint);
+const
+  cWavePeriod = 4;
+  cWaveInc: array[0..cWavePeriod-1] of integer = (0, 1, 2, 1);
 var
-  i, dy: integer;
+  i: integer;
 begin
   case Style of
     cBorderSingle:
@@ -200,15 +203,7 @@ begin
     cBorderWave:
       begin
         for i:= P1.X to P2.X do
-        begin
-          case (i-P1.X) mod 4 of
-            0: dy:= 0;
-            1: dy:= 1;
-            2: dy:= 2;
-            3: dy:= 1;
-          end;
-          C.Pixels[i, P2.Y-dy]:= Color;
-        end;
+          C.Pixels[i, P2.Y-cWaveInc[(i-P1.X) mod cWavePeriod]]:= Color;
       end;
   end;
 end;
