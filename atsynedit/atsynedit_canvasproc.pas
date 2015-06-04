@@ -172,18 +172,46 @@ end;
 type
   TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
 
-procedure DoPaintBorderLine(C: TCanvas; Color: TColor; const R: TRect; Side: TATBorderSide);
+procedure DoPaintLine(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint);
+var
+  i: integer;
 begin
-  C.Pen.Color:= Color;
+  case Style of
+    cBorderSingle:
+      begin
+        C.Pen.Color:= Color;
+        C.Line(P1, P2);
+      end;
+    cBorderDot:
+      begin
+        if P1.Y=P2.Y then
+        begin
+          for i:= P1.X to P2.X do
+            if Odd(i) then
+              C.Pixels[i, P2.Y]:= Color;
+        end
+        else
+        begin
+          for i:= P1.Y to P2.Y do
+            if Odd(i) then
+              C.Pixels[P1.X, i]:= Color;
+        end;
+      end;
+  end;
+end;
+
+procedure DoPaintBorder(C: TCanvas; Color: TColor; const R: TRect; Side: TATBorderSide; Style: TATLineBorderStyle);
+begin
+  if Style=cBorderNone then Exit;
   case Side of
     cSideDown:
-      C.Line(Point(R.Left, R.Bottom-1), Point(R.Right-1, R.Bottom-1));
-    cSideUp:
-      C.Line(Point(R.Left, R.Top), Point(R.Right-1, R.Top));
+      DoPaintLine(C, Color, Style, Point(R.Left, R.Bottom-1), Point(R.Right-1, R.Bottom-1));
     cSideLeft:
-      C.Line(Point(R.Left, R.Top), Point(R.Left, R.Bottom));
+      DoPaintLine(C, Color, Style, Point(R.Left, R.Top), Point(R.Left, R.Bottom));
     cSideRight:
-      C.Line(Point(R.Right-1, R.Top), Point(R.Right-1, R.Bottom));
+      DoPaintLine(C, Color, Style, Point(R.Right-1, R.Top), Point(R.Right-1, R.Bottom));
+    cSideUp:
+      DoPaintLine(C, Color, Style, Point(R.Left, R.Top), Point(R.Right-1, R.Top));
   end;
 end;
 
@@ -397,14 +425,10 @@ begin
         PartColorBG
         );
 
-      if PartBorderD<>cBorderNone then
-        DoPaintBorderLine(C, PartColorBorder, PartRect, cSideDown);
-      if PartBorderU<>cBorderNone then
-        DoPaintBorderLine(C, PartColorBorder, PartRect, cSideUp);
-      if PartBorderL<>cBorderNone then
-        DoPaintBorderLine(C, PartColorBorder, PartRect, cSideLeft);
-      if PartBorderR<>cBorderNone then
-        DoPaintBorderLine(C, PartColorBorder, PartRect, cSideRight);
+      DoPaintBorder(C, PartColorBorder, PartRect, cSideDown, PartBorderD);
+      DoPaintBorder(C, PartColorBorder, PartRect, cSideUp, PartBorderU);
+      DoPaintBorder(C, PartColorBorder, PartRect, cSideLeft, PartBorderL);
+      DoPaintBorder(C, PartColorBorder, PartRect, cSideRight, PartBorderR);
     end;
 
   if AShowUnprintable then

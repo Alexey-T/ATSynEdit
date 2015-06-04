@@ -944,8 +944,8 @@ var
         3: begin ColorFont:= clred; Colorbg:= clyellow; ColorBorder:= clGreen;
              BorderDown:= cBorderSingle;
              BorderLeft:= cBorderSingle;
-             BorderRight:= cBorderSingle;
-             BorderUp:= cBorderSingle;
+             BorderRight:= cBorderDot;
+             BorderUp:= cBorderDot;
         end;
         else begin ColorFont:= clgray; Colorbg:= clnone; end;
       end;
