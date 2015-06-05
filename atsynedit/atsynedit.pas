@@ -463,6 +463,7 @@ type
       ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
       ABottom: integer);
+    procedure DoPaintLockedWarning(C: TCanvas);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer);
@@ -1631,6 +1632,7 @@ begin
         StrOut,
         FTabSize,
         ACharSize,
+        AMainText,
         AMainText and FUnprintedVisible and FUnprintedSpaces,
         FColors.UnprintedFont,
         FColors.UnprintedHexFont,
@@ -1639,7 +1641,6 @@ begin
           //needed number of chars of all chars counted as 1.0,
           //while NOutputSpacesSkipped is with cjk counted as 1.7
         @Parts,
-        AMainText,
         Event
         );
     end
@@ -2191,6 +2192,11 @@ begin
   DoClearScrollInfo(FScrollVert);
 
   BeginUpdate;
+    //show "wait" text
+    Strings.Clear;
+    Update(true);
+    AppProcessMessages;
+
   try
     Strings.LoadFromFile(AFilename);
   finally
@@ -2418,16 +2424,28 @@ begin
     Result:= UpdateScrollbars;
 end;
 
+procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
+var
+  N: integer;
+  Str: string;
+begin
+  C.Brush.Color:= FColors.LockedBG;
+  C.FillRect(ClientRect);
+  C.Font.Assign(Self.Font);
+  Str:= FTextLocked;
+  N:= Strings.LoadPercents;
+  if N>0 then
+    Str:= Str+' '+IntToStr(N)+'%';
+  C.TextOut(10, 5, Str);
+end;
+
 
 procedure TATSynEdit.Paint;
 begin
   if FPaintLocked>0 then
   begin
-    Canvas.Brush.Color:= FColors.LockedBG;
-    Canvas.FillRect(ClientRect);
-    Canvas.Font.Assign(Self.Font);
-    Canvas.TextOut(10, 5, FTextLocked);
-    Exit;
+    DoPaintLockedWarning(Canvas);
+    Exit
   end;
 
   //if scrollbars shown, paint again

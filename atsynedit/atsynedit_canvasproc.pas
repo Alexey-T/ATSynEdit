@@ -58,13 +58,13 @@ procedure CanvasTextOut(C: TCanvas;
   const Str: atString;
   ATabSize: integer;
   ACharSize: TPoint;
+  AMainText: boolean;
   AShowUnprintable: boolean;
   AColorUnprintable: TColor;
   AColorHex: TColor;
   out AStrWidth: integer;
   ACharsSkipped: integer;
   AParts: PATLineParts;
-  AMainText: boolean;
   ADrawEvent: TATSynEditDrawLineEvent);
 
 procedure DoPaintUnprintedEol(C: TCanvas;
@@ -431,9 +431,9 @@ begin
 end;
 
 procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; const Str: atString;
-  ATabSize: integer; ACharSize: TPoint; AShowUnprintable: boolean;
-  AColorUnprintable: TColor; AColorHex: TColor; out AStrWidth: integer;
-  ACharsSkipped: integer; AParts: PATLineParts; AMainText: boolean;
+  ATabSize: integer; ACharSize: TPoint; AMainText: boolean;
+  AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
+  AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
   ADrawEvent: TATSynEditDrawLineEvent);
 var
   ListReal: TATRealArray;

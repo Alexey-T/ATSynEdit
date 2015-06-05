@@ -275,6 +275,7 @@ begin
   DoClearLineStates(false);
   DoClearUndo;
   FModified:= false;
+  FLoadPercents:= 0;
 end;
 
 

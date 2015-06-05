@@ -78,6 +78,7 @@ type
     FReadOnly: boolean;
     FUndoAfterSave: boolean;
     FOneLine: boolean;
+    FLoadPercents: integer;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
@@ -145,6 +146,7 @@ type
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
     property Modified: boolean read FModified;
     property OneLine: boolean read FOneLine write FOneLine;
+    property LoadPercents: integer read FLoadPercents write FLoadPercents;
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteDupFakeLines;
     procedure ActionAddFakeLineIfNeeded;
@@ -429,6 +431,7 @@ begin
   FSaveSignWide:= true;
   FUndoAfterSave:= true;
   FOneLine:= false;
+  FLoadPercents:= 0;
 
   ActionAddFakeLineIfNeeded;
   DoClearUndo;

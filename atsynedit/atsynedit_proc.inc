@@ -15,9 +15,11 @@ const
 
 procedure AppProcessMessages;
 begin
-  //why we need it? ScrollTop:=N applies for drawed control (it needs wrapinfo),
-  //and it needs paint called. paint called only passive, QT+Mac needs it. so need to call
-  //processmsg to wait for paint..
+  //why we need it?
+  //1) ScrollTop:=N applies for drawed control (it needs wrapinfo),
+  //and it needs paint called. paint called only passive, QT+Mac needs it.
+  //so need to call processmessages to wait for paint..
+  //2) for showing "wait" on loading huge file
 
   {$ifdef allow_proc_msg}
   Application.ProcessMessages;
