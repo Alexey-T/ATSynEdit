@@ -28,6 +28,7 @@ type
     cBorderNone,
     cBorderLine,
     cBorderLineDot,
+    cBorderLine2px,
     cBorderDotted,
     cBorderWave
     );
@@ -223,6 +224,7 @@ begin
         C.Pen.Color:= Color;
         C.Line(P1, P2);
       end;
+
     cBorderLineDot:
       begin
         C.Pen.Style:= psDot;
@@ -230,10 +232,32 @@ begin
         C.Line(P1, P2);
         C.Pen.Style:= psSolid;
       end;
+
+    cBorderLine2px:
+      begin
+        C.Pen.Color:= Color;
+        C.Line(P1, P2);
+        if P1.Y=P2.Y then
+        begin
+          if AtDown then
+            C.Line(Point(P1.X, P1.Y-1), Point(P2.X, P2.Y-1))
+          else
+            C.Line(Point(P1.X, P1.Y+1), Point(P2.X, P2.Y+1))
+        end
+        else
+        begin
+          if AtDown then
+            C.Line(Point(P1.X-1, P1.Y), Point(P2.X-1, P2.Y))
+          else
+            C.Line(Point(P1.X+1, P1.Y), Point(P2.X+1, P2.Y));
+        end;
+      end;
+
     cBorderDotted:
       begin
         CanvasDottedHorzVertLine(C, Color, P1, P2);
       end;
+
     cBorderWave:
       begin
         CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
@@ -259,7 +283,7 @@ begin
       DoPaintLineEx(C, Color, Style,
         Point(R.Right-1, R.Top),
         Point(R.Right-1, R.Bottom),
-        false);
+        true);
     cSideUp:
       DoPaintLineEx(C, Color, Style,
         Point(R.Left, R.Top),
