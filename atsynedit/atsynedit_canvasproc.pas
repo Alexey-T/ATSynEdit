@@ -37,7 +37,7 @@ type
   TATLinePart = record
     Offset, Len: integer;
     ColorFont, ColorBG, ColorBorder: TColor;
-    FontStyle: TFontStyles;
+    FontBold, FontItalic: boolean;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineBorderStyle;
   end;
 
@@ -414,8 +414,8 @@ var
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
   PartColorFont, PartColorBG, PartColorBorder: TColor;
-  PartFontStyle: TFontStyles;
   PartBorderL, PartBorderR, PartBorderU, PartBorderD: TATLineBorderStyle;
+  PartFontStyle: TFontStyles;
   PartRect: TRect;
   Buf: AnsiString;
 begin
@@ -461,10 +461,15 @@ begin
       PartOffset:= AParts^[j].Offset;
       PartStr:= Copy(Str, PartOffset+1, PartLen);
       if PartStr='' then Break;
+
       PartColorFont:= AParts^[j].ColorFont;
       PartColorBG:= AParts^[j].ColorBG;
       PartColorBorder:= AParts^[j].ColorBorder;
-      PartFontStyle:= AParts^[j].FontStyle;
+
+      PartFontStyle:= [];
+      if AParts^[j].FontBold then Include(PartFontStyle, fsBold);
+      if AParts^[j].FontItalic then Include(PartFontStyle, fsItalic);
+
       PartBorderL:= AParts^[j].BorderLeft;
       PartBorderR:= AParts^[j].BorderRight;
       PartBorderU:= AParts^[j].BorderUp;
@@ -482,8 +487,8 @@ begin
         PixOffset2:= 0;
 
       C.Font.Color:= PartColorFont;
-      C.Font.Style:= PartFontStyle;
       C.Brush.Color:= PartColorBG;
+      C.Font.Style:= PartFontStyle;
 
       PartRect:= Rect(
         PosX+PixOffset1,

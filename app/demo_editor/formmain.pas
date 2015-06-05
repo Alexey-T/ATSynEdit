@@ -951,6 +951,8 @@ var
              BorderDown:= BorderLeft;
              //BorderRight:= BorderLeft;
              //BorderUp:= BorderLeft;
+             FontItalic:= true;
+             FontBold:= true;
            end;
         3: begin
              ColorFont:= clred;
