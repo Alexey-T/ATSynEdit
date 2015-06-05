@@ -1622,13 +1622,15 @@ begin
       else
         Event:= nil;
 
+      if FUnprintedReplaceSpec then
+        StrOut:= SRemoveAsciiControlChars(StrOut);
+
       CanvasTextOut(C,
         CurrPointText.X,
         CurrPointText.Y,
         StrOut,
         FTabSize,
         ACharSize,
-        FUnprintedReplaceSpec,
         AMainText and FUnprintedVisible and FUnprintedSpaces,
         FColors.UnprintedFont,
         FColors.UnprintedHexFont,

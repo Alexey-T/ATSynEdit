@@ -55,17 +55,16 @@ type
 
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
-  Str: atString;
+  const Str: atString;
   ATabSize: integer;
   ACharSize: TPoint;
-  AReplaceSpecs: boolean;
   AShowUnprintable: boolean;
   AColorUnprintable: TColor;
   AColorHex: TColor;
   out AStrWidth: integer;
   ACharsSkipped: integer;
   AParts: PATLineParts;
-  APartsBordersAllowed: boolean;
+  AMainText: boolean;
   ADrawEvent: TATSynEditDrawLineEvent);
 
 procedure DoPaintUnprintedEol(C: TCanvas;
@@ -431,11 +430,11 @@ begin
   Result:= Trunc(CanvasTextSpaces(S, ATabSize)*ACharSize.X);
 end;
 
-procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
-  ATabSize: integer; ACharSize: TPoint; AReplaceSpecs: boolean;
-  AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
-  AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
-  APartsBordersAllowed: boolean; ADrawEvent: TATSynEditDrawLineEvent);
+procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; const Str: atString;
+  ATabSize: integer; ACharSize: TPoint; AShowUnprintable: boolean;
+  AColorUnprintable: TColor; AColorHex: TColor; out AStrWidth: integer;
+  ACharsSkipped: integer; AParts: PATLineParts; AMainText: boolean;
+  ADrawEvent: TATSynEditDrawLineEvent);
 var
   ListReal: TATRealArray;
   ListInt: TATIntArray;
@@ -451,9 +450,6 @@ var
   Buf: AnsiString;
 begin
   if Str='' then Exit;
-
-  if AReplaceSpecs then
-    Str:= SRemoveAsciiControlChars(Str);
 
   SetLength(ListReal, Length(Str));
   SetLength(ListInt, Length(Str));
@@ -546,7 +542,7 @@ begin
         PartColorBG
         );
 
-      if APartsBordersAllowed then
+      if AMainText then
       begin
         DoPaintBorder(C, PartColorBorder, PartRect, cSideDown, PartBorderD);
         DoPaintBorder(C, PartColorBorder, PartRect, cSideUp, PartBorderU);
