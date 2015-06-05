@@ -30,7 +30,8 @@ type
     cBorderLineDot,
     cBorderLine2px,
     cBorderDotted,
-    cBorderWave
+    cBorderWave,
+    cBorderWave2px
     );
 
 type
@@ -261,6 +262,12 @@ begin
     cBorderWave:
       begin
         CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
+      end;
+
+    cBorderWave2px:
+      begin
+        CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
+        CanvasWavyHorzLine(C, Color, Point(P1.X+1, P1.Y), P2, AtDown);
       end;
   end;
 end;

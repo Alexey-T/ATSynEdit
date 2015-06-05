@@ -949,8 +949,8 @@ var
              ColorBorder:= clgreen;
              BorderLeft:= cBorderDotted;//cBorderLine2px;
              BorderDown:= BorderLeft;
-             BorderRight:= BorderLeft;
-             BorderUp:= BorderLeft;
+             //BorderRight:= BorderLeft;
+             //BorderUp:= BorderLeft;
            end;
         3: begin
              ColorFont:= clred;
