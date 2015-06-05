@@ -313,29 +313,32 @@ begin
   end;
 end;
 
-procedure DoPaintBorder(C: TCanvas; Color: TColor; const R: TRect; Side: TATBorderSide; Style: TATLineBorderStyle);
+procedure DoPaintBorder(C: TCanvas; Color: TColor; R: TRect; Side: TATBorderSide; Style: TATLineBorderStyle);
 begin
   if Style=cBorderNone then Exit;
+  Dec(R.Right);
+  Dec(R.Bottom);
+
   case Side of
     cSideDown:
       DoPaintLineEx(C, Color, Style,
-        Point(R.Left, R.Bottom-1),
-        Point(R.Right-1, R.Bottom-1),
+        Point(R.Left, R.Bottom),
+        Point(R.Right, R.Bottom),
         true);
     cSideLeft:
       DoPaintLineEx(C, Color, Style,
         Point(R.Left, R.Top),
-        Point(R.Left, R.Bottom-1),
+        Point(R.Left, R.Bottom),
         false);
     cSideRight:
       DoPaintLineEx(C, Color, Style,
-        Point(R.Right-1, R.Top),
-        Point(R.Right-1, R.Bottom-1),
+        Point(R.Right, R.Top),
+        Point(R.Right, R.Bottom),
         true);
     cSideUp:
       DoPaintLineEx(C, Color, Style,
         Point(R.Left, R.Top),
-        Point(R.Right-1, R.Top),
+        Point(R.Right, R.Top),
         false);
   end;
 end;
