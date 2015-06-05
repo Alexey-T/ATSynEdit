@@ -65,7 +65,8 @@ procedure CanvasTextOut(C: TCanvas;
   out AStrWidth: integer;
   ACharsSkipped: integer;
   AParts: PATLineParts;
-  AEvent: TATSynEditDrawLineEvent);
+  APartsBordersAllowed: boolean;
+  ADrawEvent: TATSynEditDrawLineEvent);
 
 procedure DoPaintUnprintedEol(C: TCanvas;
   const AStrEol: atString;
@@ -434,7 +435,7 @@ procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   ATabSize: integer; ACharSize: TPoint; AReplaceSpecs: boolean;
   AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
   AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
-  AEvent: TATSynEditDrawLineEvent);
+  APartsBordersAllowed: boolean; ADrawEvent: TATSynEditDrawLineEvent);
 var
   ListReal: TATRealArray;
   ListInt: TATIntArray;
@@ -545,10 +546,13 @@ begin
         PartColorBG
         );
 
-      DoPaintBorder(C, PartColorBorder, PartRect, cSideDown, PartBorderD);
-      DoPaintBorder(C, PartColorBorder, PartRect, cSideUp, PartBorderU);
-      DoPaintBorder(C, PartColorBorder, PartRect, cSideLeft, PartBorderL);
-      DoPaintBorder(C, PartColorBorder, PartRect, cSideRight, PartBorderR);
+      if APartsBordersAllowed then
+      begin
+        DoPaintBorder(C, PartColorBorder, PartRect, cSideDown, PartBorderD);
+        DoPaintBorder(C, PartColorBorder, PartRect, cSideUp, PartBorderU);
+        DoPaintBorder(C, PartColorBorder, PartRect, cSideLeft, PartBorderL);
+        DoPaintBorder(C, PartColorBorder, PartRect, cSideRight, PartBorderR);
+      end;
     end;
 
   if AShowUnprintable then
@@ -557,8 +561,8 @@ begin
   AStrWidth:= ListInt[High(ListInt)];
 
   if Str<>'' then
-    if Assigned(AEvent) then
-      AEvent(nil, C, PosX, PosY, Str, ACharSize, ListInt);
+    if Assigned(ADrawEvent) then
+      ADrawEvent(nil, C, PosX, PosY, Str, ACharSize, ListInt);
 end;
 
 

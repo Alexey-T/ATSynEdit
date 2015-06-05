@@ -1637,6 +1637,7 @@ begin
           //needed number of chars of all chars counted as 1.0,
           //while NOutputSpacesSkipped is with cjk counted as 1.7
         @Parts,
+        AMainText,
         Event
         );
     end
