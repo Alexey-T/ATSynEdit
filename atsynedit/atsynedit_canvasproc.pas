@@ -30,6 +30,7 @@ type
     cBorderLineDot,
     cBorderLine2px,
     cBorderDotted,
+    cBorderRounded,
     cBorderWave
     );
 
@@ -183,6 +184,45 @@ begin
 end;
 
 
+procedure CanvasRoundedLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
+var
+  cPixel: TColor;
+begin
+  cPixel:= Color;
+  if P1.Y=P2.Y then
+  begin
+    C.Pen.Color:= Color;
+    C.Line(P1.X+2, P1.Y, P2.X-1, P2.Y);
+    if AtDown then
+    begin
+      C.Pixels[P1.X+1, P1.Y-1]:= cPixel;
+      C.Pixels[P2.X-1, P2.Y-1]:= cPixel;
+    end
+    else
+    begin
+      C.Pixels[P1.X+1, P1.Y+1]:= cPixel;
+      C.Pixels[P2.X-1, P2.Y+1]:= cPixel;
+    end
+  end
+  else
+  begin
+    C.Pen.Color:= Color;
+    C.Line(P1.X, P1.Y+2, P2.X, P2.Y-2);
+    {
+    if AtDown then
+    begin
+      C.Pixels[P1.X-1, P1.Y+1]:= cPixel;
+      C.Pixels[P2.X-1, P2.Y-1]:= cPixel;
+    end
+    else
+    begin
+      C.Pixels[P1.X+1, P1.Y+1]:= cPixel;
+      C.Pixels[P2.X+1, P2.Y-1]:= cPixel;
+    end
+    }
+  end;
+end;
+
 procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
 const
   cWavePeriod = 4;
@@ -258,18 +298,15 @@ begin
         CanvasDottedHorzVertLine(C, Color, P1, P2);
       end;
 
+    cBorderRounded:
+      begin
+        CanvasRoundedLine(C, Color, P1, P2, AtDown);
+      end;
+
     cBorderWave:
       begin
         CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
       end;
-
-    {
-    cBorderWave2px:
-      begin
-        CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
-        CanvasWavyHorzLine(C, Color, Point(P1.X+1, P1.Y), P2, AtDown);
-      end;
-      }
   end;
 end;
 

@@ -959,9 +959,9 @@ var
              Colorbg:= clyellow;
              ColorBorder:= clred;
              BorderDown:= cBorderWave;
-             //BorderLeft:= cBorderNone;
-             //BorderRight:= cBorderNone;
-             //BorderUp:= cBorderWave;
+             //BorderLeft:= cBorderDotted;
+             //BorderRight:= cBorderRounded;
+             //BorderUp:= cBorderRounded;
           end;
         else
           begin
