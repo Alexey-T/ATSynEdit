@@ -256,57 +256,60 @@ begin
   end;
 end;
 
+procedure CanvasSimpleLine(C: TCanvas; P1, P2: TPoint);
+begin
+  if P1.Y=P2.Y then
+    C.Line(P1.X, P1.Y, P2.X+1, P2.Y)
+  else
+    C.Line(P1.X, P1.Y, P2.X, P2.Y+1);
+end;
+
 procedure DoPaintLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint; AtDown: boolean);
 begin
   case Style of
     cBorderLine:
       begin
         C.Pen.Color:= Color;
-        C.Line(P1, P2);
-      end;
-
-    cBorderLineDot:
-      begin
-        C.Pen.Style:= psDot;
-        C.Pen.Color:= Color;
-        C.Line(P1, P2);
-        C.Pen.Style:= psSolid;
+        CanvasSimpleLine(C, P1, P2);
       end;
 
     cBorderLine2px:
       begin
         C.Pen.Color:= Color;
-        C.Line(P1, P2);
+        CanvasSimpleLine(C, P1, P2);
         if P1.Y=P2.Y then
         begin
           if AtDown then
-            C.Line(Point(P1.X, P1.Y-1), Point(P2.X, P2.Y-1))
+            begin Dec(P1.Y); Dec(P2.Y) end
           else
-            C.Line(Point(P1.X, P1.Y+1), Point(P2.X, P2.Y+1))
+            begin Inc(P1.Y); Inc(P2.Y) end;
         end
         else
         begin
           if AtDown then
-            C.Line(Point(P1.X-1, P1.Y), Point(P2.X-1, P2.Y))
+            begin Dec(P1.X); Dec(P2.X) end
           else
-            C.Line(Point(P1.X+1, P1.Y), Point(P2.X+1, P2.Y));
+            begin Inc(P1.X); Inc(P2.X) end;
         end;
+        CanvasSimpleLine(C, P1, P2);
+      end;
+
+    cBorderLineDot:
+      begin
+        C.Pen.Color:= Color;
+        C.Pen.Style:= psDot;
+        CanvasSimpleLine(C, P1, P2);
+        C.Pen.Style:= psSolid;
       end;
 
     cBorderDotted:
-      begin
-        CanvasDottedHorzVertLine(C, Color, P1, P2);
-      end;
+      CanvasDottedHorzVertLine(C, Color, P1, P2);
 
     cBorderRounded:
-      begin
-        CanvasRoundedLine(C, Color, P1, P2, AtDown);
-      end;
+      CanvasRoundedLine(C, Color, P1, P2, AtDown);
 
     cBorderWave:
-      begin
-        CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
-      end;
+      CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
   end;
 end;
 
@@ -322,12 +325,12 @@ begin
     cSideLeft:
       DoPaintLineEx(C, Color, Style,
         Point(R.Left, R.Top),
-        Point(R.Left, R.Bottom),
+        Point(R.Left, R.Bottom-1),
         false);
     cSideRight:
       DoPaintLineEx(C, Color, Style,
         Point(R.Right-1, R.Top),
-        Point(R.Right-1, R.Bottom),
+        Point(R.Right-1, R.Bottom-1),
         true);
     cSideUp:
       DoPaintLineEx(C, Color, Style,
