@@ -183,15 +183,22 @@ begin
     end;
 end;
 
+procedure CanvasSimpleLine(C: TCanvas; P1, P2: TPoint);
+begin
+  if P1.Y=P2.Y then
+    C.Line(P1.X, P1.Y, P2.X+1, P2.Y)
+  else
+    C.Line(P1.X, P1.Y, P2.X, P2.Y+1);
+end;
 
 procedure CanvasRoundedLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
 var
   cPixel: TColor;
 begin
   cPixel:= Color;
+  C.Pen.Color:= Color;
   if P1.Y=P2.Y then
   begin
-    C.Pen.Color:= Color;
     C.Line(P1.X+2, P1.Y, P2.X-1, P2.Y);
     if AtDown then
     begin
@@ -206,20 +213,8 @@ begin
   end
   else
   begin
-    C.Pen.Color:= Color;
-    C.Line(P1.X, P1.Y+2, P2.X, P2.Y-2);
-    {
-    if AtDown then
-    begin
-      C.Pixels[P1.X-1, P1.Y+1]:= cPixel;
-      C.Pixels[P2.X-1, P2.Y-1]:= cPixel;
-    end
-    else
-    begin
-      C.Pixels[P1.X+1, P1.Y+1]:= cPixel;
-      C.Pixels[P2.X+1, P2.Y-1]:= cPixel;
-    end
-    }
+    C.Line(P1.X, P1.Y+2, P2.X, P2.Y-1);
+    //don't draw pixels, other lines did it
   end;
 end;
 
@@ -254,14 +249,6 @@ begin
       if Odd(i-P1.Y+1) then
         C.Pixels[P1.X, i]:= Color;
   end;
-end;
-
-procedure CanvasSimpleLine(C: TCanvas; P1, P2: TPoint);
-begin
-  if P1.Y=P2.Y then
-    C.Line(P1.X, P1.Y, P2.X+1, P2.Y)
-  else
-    C.Line(P1.X, P1.Y, P2.X, P2.Y+1);
 end;
 
 procedure DoPaintLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint; AtDown: boolean);
