@@ -16,10 +16,10 @@ type
     NLineIndex,
     NCharIndex,
     NLength: integer;
-    NIndent: word;
+    NIndent: integer;
     NFinal: TATSynWrapFinal;
     constructor Create(ALineIndex, ACharIndex, ALength: integer;
-      AIndent: word; AFinal: TATSynWrapFinal); virtual;
+      AIndent: integer; AFinal: TATSynWrapFinal); virtual;
     procedure Assign(Item: TATSynWrapItem);
   end;
 
@@ -61,7 +61,7 @@ uses
 { TATSynWrapItem }
 
 constructor TATSynWrapItem.Create(ALineIndex, ACharIndex, ALength: integer;
-  AIndent: word; AFinal: TATSynWrapFinal);
+  AIndent: integer; AFinal: TATSynWrapFinal);
 begin
   NLineIndex:= ALineIndex;
   NCharIndex:= ACharIndex;

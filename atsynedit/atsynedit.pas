@@ -343,7 +343,7 @@ type
     FOnCommand: TATSynEditCommandEvent;
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FWrapInfo: TATSynWrapInfo;
-    FWrapProgress: integer;
+    //FWrapProgress: integer;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
     FWrapUpdateNeeded: boolean;
@@ -1063,7 +1063,7 @@ var
   NLine, NIndexFrom, NIndexTo: integer;
   UseCachedUpdate: boolean;
 begin
-  FWrapProgress:= 0;
+  //FWrapProgress:= 0;
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
 
@@ -1994,7 +1994,7 @@ begin
   FWrapMode:= cWrapOn;
   FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
-  FWrapProgress:= 0;
+  //FWrapProgress:= 0;
 
   FOverwrite:= false;
   FTabSize:= cInitTabSize;
@@ -2431,7 +2431,8 @@ end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
 var
-  N1, N2: integer;
+  N1: integer;
+  //N2: integer;
   Str: string;
 begin
   C.Brush.Color:= FColors.LockedBG;
@@ -2442,8 +2443,8 @@ begin
   N1:= Strings.Progress;
   if N1>0 then Str:= Str+' loading '+IntToStr(N1)+'%';
 
-  N2:= FWrapProgress;
-  if N2>0 then Str:= Str+' wrapping '+IntToStr(N2)+'%';
+  //N2:= FWrapProgress;
+  //if N2>0 then Str:= Str+' wrapping '+IntToStr(N2)+'%';
 
   C.TextOut(10, 5, Str);
 end;
