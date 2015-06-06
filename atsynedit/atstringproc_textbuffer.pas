@@ -8,16 +8,16 @@ uses
   Classes, SysUtils, ATStringProc;
 
 type
-  { TATStringBuffer }
+  { TATStringBufferHelper }
 
-  TATStringBuffer = class
+  TATStringBufferHelper = class
   private
-    FStarts: TList; //contains offsets of lines from FText
-    FText: atString;
+    FStarts: TList; //contains offsets of lines
+    FLenEol: integer;
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure SetText(const AText: atString; ALineLens: TList);
+    procedure Setup(ALineLens: TList; ALenEol: integer);
     function CaretToOffset(APnt: TPoint): integer;
     function OffsetToCaret(APos: integer): TPoint;
   end;
@@ -25,27 +25,40 @@ type
 implementation
 
 const
-  cInitListCapacity = 5000;
-  cLenEol = 1;
+  cInitListCapacity = 10000;
 
-{ TATStringBuffer }
+{ TATStringBufferHelper }
 
-procedure TATStringBuffer.SetText(const AText: atString; ALineLens: TList);
-var
-  i, pos: integer;
+constructor TATStringBufferHelper.Create;
 begin
-  FText:= AText;
-  FStarts.Clear;
+  FStarts:= TList.Create;
+  FStarts.Capacity:= cInitListCapacity;
+  FLenEol:= 1;
+end;
 
-  pos:= 0;
+destructor TATStringBufferHelper.Destroy;
+begin
+  FStarts.Clear;
+  FreeAndNil(FStarts);
+  inherited;
+end;
+
+procedure TATStringBufferHelper.Setup(ALineLens: TList; ALenEol: integer);
+var
+  Pos, i: integer;
+begin
+  FLenEol:= ALenEol;
+  FStarts.Clear;
+  Pos:= 0;
+  FStarts.Add(nil);
   for i:= 0 to ALineLens.Count-1 do
   begin
-    FStarts.Add(pointer(pos));
-    Inc(pos, integer(ALineLens[i])+cLenEol);
+    Inc(Pos, integer(ALineLens[i])+FLenEol);
+    FStarts.Add(pointer(Pos));
   end;
 end;
 
-function TATStringBuffer.CaretToOffset(APnt: TPoint): integer;
+function TATStringBufferHelper.CaretToOffset(APnt: TPoint): integer;
 begin
   Result:= -1;
   if (APnt.Y<0) or (APnt.X<0) then Exit;
@@ -53,7 +66,7 @@ begin
   Result:= integer(FStarts[APnt.Y])+APnt.X;
 end;
 
-function TATStringBuffer.OffsetToCaret(APos: integer): TPoint;
+function TATStringBufferHelper.OffsetToCaret(APos: integer): TPoint;
 var
   a, b, m, dif: integer;
 begin
@@ -82,21 +95,6 @@ begin
 
   Result.Y:= m;
   Result.X:= APos-integer(FStarts[Result.Y]);
-end;
-
-constructor TATStringBuffer.Create;
-begin
-  FStarts:= TList.Create;
-  FStarts.Capacity:= cInitListCapacity;
-  FText:= '';
-end;
-
-destructor TATStringBuffer.Destroy;
-begin
-  FStarts.Clear;
-  FreeAndNil(FStarts);
-
-  inherited;
 end;
 
 end.

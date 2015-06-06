@@ -32,7 +32,7 @@ implementation
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  tt: TATStringBuffer;
+  tt: TATStringBufferHelper;
   s: tstringlist;
   list: tlist;
   i: integer;
@@ -41,19 +41,18 @@ var
   str: string;
 begin
   s:= tstringlist.create;
-  for i:= 0 to 1000 do
-    s.add(stringofchar('t', random(5)));
+  for i:= 0 to 20 do
+    s.add(stringofchar('t', random(40)));
 
   list:= tlist.create;
   for i:= 0 to s.count-1 do
     list.add(pointer(length(s[i])));
-  list.add(nil);
 
-  tt:= TATStringBuffer.create;
+  tt:= TATStringBufferHelper.create;
   str:= s.text;
-  tt.settext(str, list);
+  tt.Setup(list, 1);
 
-  for i:= 0 to 100 do
+  for i:= 0 to 1000 do
   begin
     pnt0.y:= random(s.count);
     pnt0.x:= random(length(s[pnt0.y]));
