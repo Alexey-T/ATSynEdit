@@ -1,18 +1,19 @@
 object Form1: TForm1
   Left = 350
-  Height = 266
+  Height = 259
   Top = 362
-  Width = 564
+  Width = 508
   Caption = 'Form1'
-  ClientHeight = 266
-  ClientWidth = 564
+  ClientHeight = 259
+  ClientWidth = 508
   OnCreate = FormCreate
+  Position = poScreenCenter
   LCLVersion = '1.5'
   object Memo1: TMemo
     Left = 0
-    Height = 266
+    Height = 259
     Top = 0
-    Width = 564
+    Width = 508
     Align = alClient
     Font.CharSet = RUSSIAN_CHARSET
     Font.Height = -12

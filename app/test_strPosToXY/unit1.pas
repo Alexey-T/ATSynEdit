@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  atstringproc_textbuffer;
+  atstringproc_textbuffer, Types;
 
 type
 
@@ -36,7 +36,8 @@ var
   s: tstringlist;
   list: tlist;
   i: integer;
-  x0, y0, x1, y1, pos: integer;
+  pos: integer;
+  pnt0, pnt: tpoint;
   str: string;
 begin
   s:= tstringlist.create;
@@ -54,15 +55,13 @@ begin
 
   for i:= 0 to 20 do
   begin
-    y0:= random(s.count);
-    x0:= random(length(s[y0]));
-    tt.CaretPosToStrPos(y0, x0, pos);
-    tt.StrPosToCaretPos(pos, y1, x1);
-    if (x0=x1) and (y0=y1) then
-      continue
-    else
+    pnt0.y:= random(s.count);
+    pnt0.x:= random(length(s[pnt0.y]));
+    pos:= tt.CaretToOffset(pnt0);
+    pnt:= tt.OffsetToCaret(pos);
+    if not PointsEqual(pnt, pnt0) then
     begin
-      memo1.lines.add('bad test: line:col '+inttostr(y0)+':'+inttostr(x0));
+      memo1.lines.add('bad test: line:col '+inttostr(pnt0.y)+':'+inttostr(pnt0.x));
       exit;
     end;
   end;

@@ -48,6 +48,7 @@
       <Unit2>
         <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc_TextBuffer"/>
       </Unit2>
     </Units>
   </ProjectOptions>
