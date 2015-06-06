@@ -252,7 +252,6 @@ const
   cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
   cHintScrollPrefix: string = 'Line';
   cHintScrollDx = 5;
-  cMinIncForWrapProgress = 5;
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -1063,7 +1062,6 @@ var
   i, j: integer;
   NLine, NIndexFrom, NIndexTo: integer;
   UseCachedUpdate: boolean;
-  NProgress: integer;
 begin
   FWrapProgress:= 0;
   NNewVisibleColumns:= GetVisibleColumns;
@@ -1108,19 +1106,6 @@ begin
       FWrapInfo.SetCapacity(Strings.Count);
       for i:= 0 to Strings.Count-1 do
       begin
-        {
-        ////////////todo
-        if FPaintLocked>0 then
-        begin
-          NProgress:= Int64(i)*100 div (Strings.Count+1);
-          if Abs(NProgress-FWrapProgress)>=cMinIncForWrapProgress then
-          begin
-            FWrapProgress:= NProgress;
-            DoShowProgress(nil);
-          end;
-        end;
-        }
-
         DoCalcWrapInfos(i, NIndentMaximal, Items);
         for j:= 0 to Items.Count-1 do
           FWrapInfo.Add(TATSynWrapItem(Items[j]));
