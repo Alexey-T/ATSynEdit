@@ -53,7 +53,7 @@ begin
   str:= s.text;
   tt.settext(str, list);
 
-  for i:= 0 to 20 do
+  for i:= 0 to 100 do
   begin
     pnt0.y:= random(s.count);
     pnt0.x:= random(length(s[pnt0.y]));

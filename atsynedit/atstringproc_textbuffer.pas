@@ -55,20 +55,33 @@ end;
 
 function TATStringBuffer.OffsetToCaret(APos: integer): TPoint;
 var
-  i: integer;
+  a, b, m, dif: integer;
 begin
   Result.Y:= -1;
   Result.X:= 0;
   if APos<=0 then
     begin Result.Y:= 0; Exit end;
 
-  for i:= 1{!} to FStarts.Count-1 do
-    if integer(FStarts[i])>APos then
-    begin
-      Result.Y:= i-1;
-      Result.X:= APos-integer(FStarts[Result.Y]);
-      Exit
-    end;
+  a:= 0;
+  b:= FStarts.Count-1;
+  if b<0 then Exit;
+
+  repeat
+    dif:= integer(FStarts[a])-APos;
+    if dif=0 then begin m:= a; Break end;
+
+    //middle, which is near b if not exact middle
+    m:= (a+b+1) div 2;
+
+    dif:= integer(FStarts[m])-APos;
+    if dif=0 then Break;
+
+    if Abs(a-b)<=1 then begin m:= a; Break end;
+    if dif>0 then b:= m else a:= m;
+  until false;
+
+  Result.Y:= m;
+  Result.X:= APos-integer(FStarts[Result.Y]);
 end;
 
 constructor TATStringBuffer.Create;
