@@ -252,6 +252,7 @@ const
   cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
   cHintScrollPrefix: string = 'Line';
   cHintScrollDx = 5;
+  cMinIncForWrapProgress = 5;
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -343,6 +344,7 @@ type
     FOnCommand: TATSynEditCommandEvent;
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FWrapInfo: TATSynWrapInfo;
+    FWrapProgress: integer;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
     FWrapUpdateNeeded: boolean;
@@ -588,6 +590,7 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
+    procedure DoShowProgress(Sender: TObject);
     procedure UpdateCursor;
     procedure UpdateGutterAutosize(C: TCanvas);
     procedure UpdateMinimapAutosize(C: TCanvas);
@@ -1060,7 +1063,9 @@ var
   i, j: integer;
   NLine, NIndexFrom, NIndexTo: integer;
   UseCachedUpdate: boolean;
+  NProgress: integer;
 begin
+  FWrapProgress:= 0;
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
 
@@ -1103,6 +1108,19 @@ begin
       FWrapInfo.SetCapacity(Strings.Count);
       for i:= 0 to Strings.Count-1 do
       begin
+        {
+        ////////////todo
+        if FPaintLocked>0 then
+        begin
+          NProgress:= Int64(i)*100 div (Strings.Count+1);
+          if Abs(NProgress-FWrapProgress)>=cMinIncForWrapProgress then
+          begin
+            FWrapProgress:= NProgress;
+            DoShowProgress(nil);
+          end;
+        end;
+        }
+
         DoCalcWrapInfos(i, NIndentMaximal, Items);
         for j:= 0 to Items.Count-1 do
           FWrapInfo.Add(TATSynWrapItem(Items[j]));
@@ -1991,6 +2009,7 @@ begin
   FWrapMode:= cWrapOn;
   FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
+  FWrapProgress:= 0;
 
   FOverwrite:= false;
   FTabSize:= cInitTabSize;
@@ -2185,6 +2204,7 @@ begin
   FCarets.Add(0, 0);
 
   Strings.Clear;
+  Strings.OnProgress:= @DoShowProgress;
   FWrapInfo.Clear;
   FWrapUpdateNeeded:= true;
 
@@ -2426,16 +2446,20 @@ end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
 var
-  N: integer;
+  N1, N2: integer;
   Str: string;
 begin
   C.Brush.Color:= FColors.LockedBG;
   C.FillRect(ClientRect);
   C.Font.Assign(Self.Font);
   Str:= FTextLocked;
-  N:= Strings.LoadPercents;
-  if N>0 then
-    Str:= Str+' '+IntToStr(N)+'%';
+
+  N1:= Strings.Progress;
+  if N1>0 then Str:= Str+' loading '+IntToStr(N1)+'%';
+
+  N2:= FWrapProgress;
+  if N2>0 then Str:= Str+' wrapping '+IntToStr(N2)+'%';
+
   C.TextOut(10, 5, Str);
 end;
 
@@ -3766,6 +3790,12 @@ begin
   Msg.Result:= DLGC_WANTARROWS or DLGC_WANTCHARS or DLGC_WANTALLKEYS;
   if FWantTabs and (GetKeyState(VK_CONTROL) >= 0) then
     Msg.Result:= Msg.Result or DLGC_WANTTAB;
+end;
+
+procedure TATSynEdit.DoShowProgress(Sender: TObject);
+begin
+  Invalidate;
+  AppProcessMessages;
 end;
 
 {$I atsynedit_carets.inc}

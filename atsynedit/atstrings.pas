@@ -78,9 +78,10 @@ type
     FReadOnly: boolean;
     FUndoAfterSave: boolean;
     FOneLine: boolean;
-    FLoadPercents: integer;
+    FProgress: integer;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
+    FOnProgress: TNotifyEvent;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
@@ -146,7 +147,7 @@ type
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
     property Modified: boolean read FModified;
     property OneLine: boolean read FOneLine write FOneLine;
-    property LoadPercents: integer read FLoadPercents write FLoadPercents;
+    property Progress: integer read FProgress write FProgress;
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteDupFakeLines;
     procedure ActionAddFakeLineIfNeeded;
@@ -185,6 +186,8 @@ type
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
+    //misc
+    property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
   end;
 
 implementation
@@ -199,6 +202,10 @@ const
   cSignUTF8: AnsiString = #$EF#$BB#$BF;
   cSignWideLE: AnsiString = #$FF#$FE;
   cSignWideBE: AnsiString = #$FE#$FF;
+
+const
+  cMinSizeForProgress = 200*1024;
+  cMinIncForProgress = 5;
 
 procedure DoEncError;
 begin
@@ -431,7 +438,7 @@ begin
   FSaveSignWide:= true;
   FUndoAfterSave:= true;
   FOneLine:= false;
-  FLoadPercents:= 0;
+  FProgress:= 0;
 
   ActionAddFakeLineIfNeeded;
   DoClearUndo;

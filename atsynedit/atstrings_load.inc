@@ -136,6 +136,7 @@ var
   SW: UnicodeString;
   LineEnd: TATLineEnds;
   bWithBom, bEncoded: boolean;
+  NPercents: integer;
 begin
   Clear;
 
@@ -163,6 +164,17 @@ begin
     repeat
       NEnd:= _FindNextEol(NStart);
       Len:= NEnd-NStart;
+
+      if Stream.Size>=cMinSizeForProgress then
+      begin
+        NPercents:= Int64(NEnd)*100 div Stream.Size;
+        if Abs(NPercents-FProgress)>=cMinIncForProgress then
+        begin
+          FProgress:= NPercents;
+          if Assigned(FOnProgress) then
+            FOnProgress(Self);
+        end;
+      end;
 
       //detect+skip Eol
       LineEnd:= cEndNone;
@@ -275,7 +287,7 @@ begin
   DoClearLineStates(false);
   DoClearUndo;
   FModified:= false;
-  FLoadPercents:= 0;
+  FProgress:= 0;
 end;
 
 
