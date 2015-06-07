@@ -16,18 +16,25 @@ uses
   ecSyntAnal;
 
 type
+  TATSubRange = class
+    P1, P2: TPoint;
+    An: TSyntAnalyzer;
+  end;
+
+type
   { TATAdapterEControl }
 
   TATAdapterEControl = class(TATSynEdit_AdapterOfHilite)
   private
-    ed: TATSynEdit;
+    Ed: TATSynEdit;
     memostrings: TSyntMemoStrings;
     An: TSyntAnalyzer;
     AnClient: TClientSyntAnalyzer;
     helper: TATStringBufferHelper;
     datatext: atString;
+    sublist: TList;
     function GetMemoObj: TSyntMemoStrings;
-    function IsPosInSublexer(AOffset: integer): TSyntAnalyzer;
+    procedure UpdateSublexerRanges;
     procedure UpdateData;
   public
     constructor Create; virtual;
@@ -55,8 +62,8 @@ var
     FillChar(part{%H-}, SizeOf(part), 0);
     part.Offset:= AOffset;
     part.Len:= ALen;
-    part.ColorFont:= ed.Colors.TextFont;
-    part.ColorBG:= ed.Colors.TextBG;
+    part.ColorFont:= Ed.Colors.TextFont;
+    part.ColorBG:= Ed.Colors.TextBG;
     Move(part, AParts[partindex], SizeOf(part));
     Inc(partindex);
   end;
@@ -70,13 +77,13 @@ var
   tokenStyle: TSyntaxFormat;
   part: TATLinePart;
 begin
-  ed:= Sender as TATSynEdit;
+  Ed:= Sender as TATSynEdit;
   if not Assigned(An) then Exit;
   if not Assigned(AnClient) then Exit;
 
   nLine:= AWrapItem.NLineIndex;
   nCol:= ACharIndexFrom;
-  Str:= Copy(ed.Strings.Lines[nLine], nCol, AWrapItem.NLength);
+  Str:= Copy(Ed.Strings.Lines[nLine], nCol, AWrapItem.NLength);
   nLen:= Length(Str);
 
   partindex:= 0;
@@ -106,8 +113,8 @@ begin
       else
         Len:= tokenEnd.X-Offset;
 
-      ColorFont:= ed.Colors.TextFont;
-      ColorBG:= ed.Colors.TextBG;
+      ColorFont:= Ed.Colors.TextFont;
+      ColorBG:= Ed.Colors.TextBG;
 
       tokenStyle:= token.Style;
       if tokenStyle<>nil then
@@ -157,33 +164,42 @@ end;
 
 constructor TATAdapterEControl.Create;
 begin
-  ed:= nil;
+  Ed:= nil;
   An:= nil;
   AnClient:= nil;
   memostrings:= TSyntMemoStrings.Create;
   helper:= TATStringBufferHelper.Create;
   datatext:= '';
+
+  sublist:= TList.Create;
+  sublist.Capacity:= 5000;
 end;
 
 destructor TATAdapterEControl.Destroy;
+var
+  i: integer;
 begin
+  for i:= sublist.Count-1 downto 0 do
+    TObject(sublist[i]).Free;
+  FreeAndNil(sublist);
+
   FreeAndNil(helper);
   FreeAndNil(memostrings);
   FreeAndNil(AnClient);
   An:= nil;
-  ed:= nil;
+  Ed:= nil;
 
   inherited;
 end;
 
 procedure TATAdapterEControl.InitLexer(AManager: TSyntaxManager; const ALexerName: string);
 begin
+  An:= nil;
+  if Assigned(AnClient) then
+    FreeAndNil(AnClient);
+
   An:= AManager.FindAnalyzer(ALexerName);
-  if An=nil then
-  begin
-    Showmessage('Cannot find lexer: '+ALexerName);
-    Exit
-  end;
+  if An=nil then Exit;
   AnClient:= TClientSyntAnalyzer.Create(An, @GetMemoObj, nil);
 
   UpdateData;
@@ -191,10 +207,10 @@ end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
-  ed:= Sender as TATSynEdit;
+  Ed:= Sender as TATSynEdit;
 
   UpdateData;
-  ed.Update;
+  Ed.Update;
 end;
 
 procedure TATAdapterEControl.UpdateData;
@@ -202,17 +218,17 @@ var
   list_len: TList;
   i: integer;
 begin
-  if not Assigned(ed) then Exit;
+  if not Assigned(Ed) then Exit;
   if not Assigned(An) then Exit;
   if not Assigned(AnClient) then Exit;
 
-  datatext:= ed.Strings.TextString;
+  datatext:= Ed.Strings.TextString;
 
   list_len:= TList.Create;
   try
     list_len.Clear;
-    for i:= 0 to ed.Strings.Count-1 do
-      list_len.Add(pointer(Length(ed.Strings.Lines[i])));
+    for i:= 0 to Ed.Strings.Count-1 do
+      list_len.Add(pointer(Length(Ed.Strings.Lines[i])));
     helper.Setup(list_len, 1);
   finally
     FreeAndNil(list_len);
@@ -220,6 +236,7 @@ begin
 
   AnClient.Clear;
   AnClient.Analyze;
+  UpdateSublexerRanges;
 end;
 
 function TATAdapterEControl.GetMemoObj: TSyntMemoStrings;
@@ -228,20 +245,21 @@ begin
   Result:= memostrings;
 end;
 
-function TATAdapterEControl.IsPosInSublexer(AOffset: integer): TSyntAnalyzer;
+procedure TATAdapterEControl.UpdateSublexerRanges;
 var
-  i: integer;
   R: TSublexerRange;
+  RSub: TATSubRange;
+  i: integer;
 begin
-  Result:= nil;
+  sublist.Clear;
   for i:= 0 to AnClient.SubLexerRangeCount-1 do
   begin
     R:= AnClient.SubLexerRanges[i];
-    if (AOffset>=R.CondStartPos) and (AOffset<R.CondEndPos) then
-    begin
-      Result:= R.Rule.SyntAnalyzer;
-      Exit
-    end;
+    RSub:= TATSubRange.Create;
+    RSub.P1:= helper.OffsetToCaret(R.CondStartPos);
+    RSub.P2:= helper.OffsetToCaret(R.CondEndPos);
+    RSub.An:= R.Rule.SyntAnalyzer;
+    sublist.Add(RSub);
   end;
 end;
 
