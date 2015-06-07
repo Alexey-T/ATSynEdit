@@ -1,0 +1,3 @@
+
+-optimize 'for' (tags[i])
+-drop out TecMemoStrings
