@@ -29,5 +29,16 @@ object fmMain: TfmMain
       State = cbChecked
       TabOrder = 0
     end
+    object comboLexer: TComboBox
+      Left = 123
+      Height = 23
+      Top = 4
+      Width = 189
+      DropDownCount = 24
+      ItemHeight = 15
+      OnChange = comboLexerChange
+      Style = csDropDownList
+      TabOrder = 1
+    end
   end
 end
