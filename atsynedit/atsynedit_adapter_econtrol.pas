@@ -26,8 +26,8 @@ type
     AnClient: TClientSyntAnalyzer;
     helper: TATStringBufferHelper;
     sublist: TList;
-    procedure DoCalcPartsForLine(var AParts: TATLineParts; ALine, AX,
-      ALen: integer; AColorFont, AColorBG: TColor);
+    procedure DoCalcPartsForLine(var AParts: TATLineParts;
+      ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
     function GetMemoObj: TSyntMemoStrings;
     function GetTokenColorBG(APos1, APos2: integer; AColorBG: TColor): TColor;
     procedure __UpdateSubList;
@@ -97,6 +97,7 @@ procedure TATAdapterEControl.DoCalcPartsForLine(var AParts: TATLineParts;
   ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
 var
   partindex: integer;
+  tokenLastOffset: integer;
   //
   procedure AddMissingPart(AOffset, ALen: integer);
   var
@@ -106,31 +107,35 @@ var
     part.Offset:= AOffset;
     part.Len:= ALen;
     part.ColorFont:= AColorFont;
-    part.ColorBG:= AColorBG;
-    if partindex>0 then
-      part.ColorBG:= AParts[partindex-1].ColorBG;
-
+    part.ColorBG:= GetTokenColorBG(tokenLastOffset, tokenLastOffset+1, AColorBG);
     Move(part, AParts[partindex], SizeOf(part));
     Inc(partindex);
   end;
   //
 var
   tokenStart, tokenEnd: TPoint;
-  nMustOffset, i: integer;
+  nMustOffset, startindex, i: integer;
   token: TSyntToken;
   tokenStyle: TSyntaxFormat;
   part: TATLinePart;
 begin
+  tokenLastOffset:= 0;
   partindex:= 0;
-  for i:= 0 to AnClient.TagCount-1 do
+
+  startindex:= AnClient.PriorTokenAt(helper.CaretToOffset(Point(0, ALine)));
+  if startindex<0 then Exit;
+
+  for i:= startindex to AnClient.TagCount-1 do
   begin
     token:= AnClient.Tags[i];
     tokenStart:= helper.OffsetToCaret(token.StartPos);
     tokenEnd:= helper.OffsetToCaret(token.EndPos);
+    tokenLastOffset:= token.EndPos;
 
     Dec(tokenStart.x, AX);
     Dec(tokenEnd.x, AX);
 
+    if (tokenStart.y>ALine) then Break;
     if (tokenStart.y>ALine) or (tokenEnd.y<ALine) then Continue;
     if (tokenEnd.y<=ALine) and (tokenEnd.x<0) then Continue;
     if (tokenStart.y>=ALine) and (tokenStart.x>=ALen) then Continue;

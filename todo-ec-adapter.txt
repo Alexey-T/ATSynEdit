@@ -1,3 +1,4 @@
 
 -optimize 'for' (tags[i])
 -drop out TecMemoStrings
+-fix regex with trail eol

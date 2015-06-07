@@ -7,6 +7,7 @@ object fmMain: TfmMain
   ClientHeight = 370
   ClientWidth = 770
   OnCreate = FormCreate
+  OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.5'
   object Panel1: TPanel
@@ -29,16 +30,32 @@ object fmMain: TfmMain
       State = cbChecked
       TabOrder = 0
     end
-    object comboLexer: TComboBox
+    object edLexer: TComboBox
       Left = 123
       Height = 23
       Top = 4
       Width = 189
       DropDownCount = 24
       ItemHeight = 15
-      OnChange = comboLexerChange
+      OnChange = edLexerChange
       Style = csDropDownList
       TabOrder = 1
+    end
+    object edFiles: TComboBox
+      Left = 320
+      Height = 23
+      Top = 4
+      Width = 189
+      DropDownCount = 24
+      ItemHeight = 15
+      Items.Strings = (
+        'test.pas'
+        'test-mid.pas'
+        'test-big.pas'
+      )
+      OnChange = edFilesChange
+      Style = csDropDownList
+      TabOrder = 2
     end
   end
 end

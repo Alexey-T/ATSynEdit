@@ -17,14 +17,18 @@ type
 
   TfmMain = class(TForm)
     chkWrap: TCheckBox;
-    comboLexer: TComboBox;
+    edLexer: TComboBox;
+    edFiles: TComboBox;
     Panel1: TPanel;
     procedure chkWrapChange(Sender: TObject);
-    procedure comboLexerChange(Sender: TObject);
+    procedure edLexerChange(Sender: TObject);
+    procedure edFilesChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { private declarations }
     ed: TATSynEdit;
+    procedure DoOpen(const fname: string);
     procedure UpdateLexList;
   public
     { public declarations }
@@ -53,19 +57,23 @@ begin
     for i:= 0 to manager.AnalyzerCount-1 do
       sl.Add(manager.Analyzers[i].LexerName);
     sl.sort;
-    comboLexer.Items.AddStrings(sl);
+    edLexer.Items.AddStrings(sl);
   finally
     sl.free;
   end;
+end;
+
+procedure TfmMain.DoOpen(const fname: string);
+begin
+  ed.LoadFromFile(fname);
 end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
 const
   lexername = 'Pascal';
 var
-  fname, fname_lxl: string;
+  fname_lxl: string;
 begin
-  fname:= ExtractFilePath(Application.ExeName)+'test.pas';
   fname_lxl:= ExtractFilePath(Application.ExeName)+'lexlib.lxl';
 
   manager:= TSyntaxManager.Create(Self);
@@ -83,9 +91,14 @@ begin
   adapter:= TATAdapterEControl.Create;
   ed.AdapterOfHilite:= adapter;
 
-  ed.LoadFromFile(fname);
-  comboLexer.ItemIndex:= comboLexer.Items.IndexOf(lexername);
-  comboLexerChange(nil);
+  edLexer.ItemIndex:= edLexer.Items.IndexOf(lexername);
+  edLexer.OnChange(nil);
+end;
+
+procedure TfmMain.FormShow(Sender: TObject);
+begin
+  edFiles.ItemIndex:= 0;
+  edFiles.OnChange(nil);
 end;
 
 procedure TfmMain.chkWrapChange(Sender: TObject);
@@ -96,10 +109,19 @@ begin
     ed.OptWrapMode:= cWrapOff;
 end;
 
-procedure TfmMain.comboLexerChange(Sender: TObject);
+procedure TfmMain.edLexerChange(Sender: TObject);
 begin
-  adapter.InitLexer(manager, comboLexer.Text);
+  adapter.InitLexer(manager, edLexer.Text);
   ed.Update;
+end;
+
+procedure TfmMain.edFilesChange(Sender: TObject);
+var
+  fn: string;
+begin
+  fn:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'\test_files\syntax\';
+  fn:= fn+edFiles.Text;
+  DoOpen(fn);
 end;
 
 end.

@@ -15629,6 +15629,7 @@ object SyntaxManager: TSyntaxManager
         StartExpression = 'asm\b'
         EndExpression = 'end'
         SyntAnalyzer = SyntAnalyzer13
+        IncludeBounds = True
       end>
     SampleText.Strings = (
       'unit Test;    '
