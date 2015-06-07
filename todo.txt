@@ -1,6 +1,2 @@
 
-hard:
-adapt ECon analyzer
-
-latr:
 optimize atsynedit_ranges //slow finds

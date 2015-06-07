@@ -22,49 +22,37 @@ type
     Ed: TATSynEdit;
     An: TSyntAnalyzer;
     AnClient: TClientSyntAnalyzer;
-    buffer: TATStringBuffer;
-    sublist: TList;
-    procedure DoCalcPartsForLine(var AParts: TATLineParts;
-      ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
+    Buffer: TATStringBuffer;
+    procedure DoCalcParts(var AParts: TATLineParts; ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
     function GetTokenColorBG(APos1, APos2: integer; ADefColor: TColor): TColor;
-    procedure __UpdateSubList;
     procedure UpdateData;
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure InitLexer(AManager: TSyntaxManager; const ALexerName: string);
+    procedure SetLexer(AAnalizer: TSyntAnalyzer);
     procedure OnEditorChange(Sender: TObject); override;
-    procedure OnEditorCalcHilite(Sender: TObject; var AParts: TATLineParts;
-      const AWrapItem: TATSynWrapItem; ACharIndexFrom: integer); override;
+    procedure OnEditorCalcHilite(Sender: TObject;
+      var AParts: TATLineParts;
+      ALineIndex, ACharIndex, ALineLen: integer); override;
   end;
 
 implementation
 
-type
-  TATSubRange = class
-    P1, P2: TPoint;
-    An: TSyntAnalyzer;
-  end;
-
 { TATAdapterEControl }
 
 procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
-  var AParts: TATLineParts; const AWrapItem: TATSynWrapItem;
-  ACharIndexFrom: integer);
+  var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer);
 var
-  nLine, nCol, nLen: integer;
   Str: atString;
 begin
   Ed:= Sender as TATSynEdit;
   if not Assigned(An) then Exit;
   if not Assigned(AnClient) then Exit;
 
-  nLine:= AWrapItem.NLineIndex;
-  nCol:= ACharIndexFrom;
-  Str:= Copy(Ed.Strings.Lines[nLine], nCol, AWrapItem.NLength);
-  nLen:= Length(Str);
+  Str:= Copy(Ed.Strings.Lines[ALineIndex], ACharIndex, ALineLen);
+  ALineLen:= Length(Str);
 
-  DoCalcPartsForLine(AParts, nLine, nCol-1, nLen, Ed.Colors.TextFont, Ed.Colors.TextBG);
+  DoCalcParts(AParts, ALineIndex, ACharIndex-1, ALineLen, Ed.Colors.TextFont, Ed.Colors.TextBG);
 end;
 
 function TATAdapterEControl.GetTokenColorBG(APos1, APos2: integer; ADefColor: TColor): TColor;
@@ -90,7 +78,7 @@ begin
 end;
 
 
-procedure TATAdapterEControl.DoCalcPartsForLine(var AParts: TATLineParts;
+procedure TATAdapterEControl.DoCalcParts(var AParts: TATLineParts;
   ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
 var
   partindex: integer;
@@ -119,14 +107,14 @@ begin
   tokenLastOffset:= 0;
   partindex:= 0;
 
-  startindex:= AnClient.PriorTokenAt(buffer.CaretToStr(Point(0, ALine)));
+  startindex:= AnClient.PriorTokenAt(Buffer.CaretToStr(Point(0, ALine)));
   if startindex<0 then Exit;
 
   for i:= startindex to AnClient.TagCount-1 do
   begin
     token:= AnClient.Tags[i];
-    tokenStart:= buffer.StrToCaret(token.StartPos);
-    tokenEnd:= buffer.StrToCaret(token.EndPos);
+    tokenStart:= Buffer.StrToCaret(token.StartPos);
+    tokenEnd:= Buffer.StrToCaret(token.EndPos);
     tokenLastOffset:= token.EndPos;
 
     Dec(tokenStart.x, AX);
@@ -204,21 +192,12 @@ begin
   Ed:= nil;
   An:= nil;
   AnClient:= nil;
-  buffer:= TATStringBuffer.Create;
-
-  sublist:= TList.Create;
-  sublist.Capacity:= 5000;
+  Buffer:= TATStringBuffer.Create;
 end;
 
 destructor TATAdapterEControl.Destroy;
-var
-  i: integer;
 begin
-  for i:= sublist.Count-1 downto 0 do
-    TObject(sublist[i]).Free;
-  FreeAndNil(sublist);
-
-  FreeAndNil(buffer);
+  FreeAndNil(Buffer);
   FreeAndNil(AnClient);
   An:= nil;
   Ed:= nil;
@@ -226,15 +205,14 @@ begin
   inherited;
 end;
 
-procedure TATAdapterEControl.InitLexer(AManager: TSyntaxManager; const ALexerName: string);
+procedure TATAdapterEControl.SetLexer(AAnalizer: TSyntAnalyzer);
 begin
-  An:= nil;
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
-  An:= AManager.FindAnalyzer(ALexerName);
+  An:= AAnalizer;
   if An=nil then Exit;
-  AnClient:= TClientSyntAnalyzer.Create(An, buffer, nil);
+  AnClient:= TClientSyntAnalyzer.Create(An, Buffer, nil);
 
   UpdateData;
 end;
@@ -261,31 +239,13 @@ begin
     list_len.Clear;
     for i:= 0 to Ed.Strings.Count-1 do
       list_len.Add(pointer(Length(Ed.Strings.Lines[i])));
-    buffer.Setup(Ed.Strings.TextString, list_len, 1);
+    Buffer.Setup(Ed.Strings.TextString, list_len, 1);
   finally
     FreeAndNil(list_len);
   end;
 
   AnClient.Clear;
   AnClient.Analyze;
-end;
-
-procedure TATAdapterEControl.__UpdateSubList;
-var
-  R: TSublexerRange;
-  RSub: TATSubRange;
-  i: integer;
-begin
-  sublist.Clear;
-  for i:= 0 to AnClient.SubLexerRangeCount-1 do
-  begin
-    R:= AnClient.SubLexerRanges[i];
-    RSub:= TATSubRange.Create;
-    RSub.P1:= buffer.StrToCaret(R.CondStartPos);
-    RSub.P2:= buffer.StrToCaret(R.CondEndPos);
-    RSub.An:= R.Rule.SyntAnalyzer;
-    sublist.Add(RSub);
-  end;
 end;
 
 end.

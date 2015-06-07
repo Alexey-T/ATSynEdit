@@ -14,7 +14,7 @@ type
   public
     procedure OnEditorChange(Sender: TObject); virtual; abstract;
     procedure OnEditorCalcHilite(Sender: TObject; var AParts: TATLineParts;
-      const AWrapItem: TATSynWrapItem; ACharIndexFrom: integer); virtual; abstract;
+      ALineIndex, ACharIndex, ALineLen: integer); virtual; abstract;
   end;
 
 implementation

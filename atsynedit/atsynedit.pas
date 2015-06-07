@@ -266,7 +266,8 @@ type
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
-  TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts; const AWrapItem: TATSynWrapItem; ACharIndexFrom: integer) of object;
+  TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
+    ALineIndex, ACharIndex, ALineLen: integer) of object;
 
 
 type

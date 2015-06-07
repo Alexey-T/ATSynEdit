@@ -111,7 +111,7 @@ end;
 
 procedure TfmMain.edLexerChange(Sender: TObject);
 begin
-  adapter.InitLexer(manager, edLexer.Text);
+  adapter.SetLexer(manager.FindAnalyzer(edLexer.Text));
   ed.Update;
 end;
 
