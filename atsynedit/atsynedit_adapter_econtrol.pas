@@ -12,7 +12,6 @@ uses
   ATSynEdit_Adapters,
   ATStringProc,
   ATStringProc_TextBuffer,
-  ecMemoStrings,
   ecSyntAnal;
 
 type
@@ -21,14 +20,12 @@ type
   TATAdapterEControl = class(TATSynEdit_AdapterOfHilite)
   private
     Ed: TATSynEdit;
-    memostrings: TSyntMemoStrings;
     An: TSyntAnalyzer;
     AnClient: TClientSyntAnalyzer;
-    helper: TATStringBufferHelper;
+    helper: TATStringBuffer;
     sublist: TList;
     procedure DoCalcPartsForLine(var AParts: TATLineParts;
       ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
-    function GetMemoObj: TSyntMemoStrings;
     function GetTokenColorBG(APos1, APos2: integer; AColorBG: TColor): TColor;
     procedure __UpdateSubList;
     procedure UpdateData;
@@ -122,14 +119,14 @@ begin
   tokenLastOffset:= 0;
   partindex:= 0;
 
-  startindex:= AnClient.PriorTokenAt(helper.CaretToOffset(Point(0, ALine)));
+  startindex:= AnClient.PriorTokenAt(helper.CaretToStr(Point(0, ALine)));
   if startindex<0 then Exit;
 
   for i:= startindex to AnClient.TagCount-1 do
   begin
     token:= AnClient.Tags[i];
-    tokenStart:= helper.OffsetToCaret(token.StartPos);
-    tokenEnd:= helper.OffsetToCaret(token.EndPos);
+    tokenStart:= helper.StrToCaret(token.StartPos);
+    tokenEnd:= helper.StrToCaret(token.EndPos);
     tokenLastOffset:= token.EndPos;
 
     Dec(tokenStart.x, AX);
@@ -207,8 +204,7 @@ begin
   Ed:= nil;
   An:= nil;
   AnClient:= nil;
-  memostrings:= TSyntMemoStrings.Create;
-  helper:= TATStringBufferHelper.Create;
+  helper:= TATStringBuffer.Create;
 
   sublist:= TList.Create;
   sublist.Capacity:= 5000;
@@ -223,7 +219,6 @@ begin
   FreeAndNil(sublist);
 
   FreeAndNil(helper);
-  FreeAndNil(memostrings);
   FreeAndNil(AnClient);
   An:= nil;
   Ed:= nil;
@@ -239,7 +234,7 @@ begin
 
   An:= AManager.FindAnalyzer(ALexerName);
   if An=nil then Exit;
-  AnClient:= TClientSyntAnalyzer.Create(An, @GetMemoObj, nil);
+  AnClient:= TClientSyntAnalyzer.Create(An, helper, nil);
 
   UpdateData;
 end;
@@ -275,13 +270,6 @@ begin
   AnClient.Analyze;
 end;
 
-function TATAdapterEControl.GetMemoObj: TSyntMemoStrings;
-begin
-  memostrings.Text:= helper.FText;
-  Result:= memostrings;
-end;
-
-
 procedure TATAdapterEControl.__UpdateSubList;
 var
   R: TSublexerRange;
@@ -293,8 +281,8 @@ begin
   begin
     R:= AnClient.SubLexerRanges[i];
     RSub:= TATSubRange.Create;
-    RSub.P1:= helper.OffsetToCaret(R.CondStartPos);
-    RSub.P2:= helper.OffsetToCaret(R.CondEndPos);
+    RSub.P1:= helper.StrToCaret(R.CondStartPos);
+    RSub.P2:= helper.StrToCaret(R.CondEndPos);
     RSub.An:= R.Rule.SyntAnalyzer;
     sublist.Add(RSub);
   end;

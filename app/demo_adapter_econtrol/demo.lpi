@@ -32,7 +32,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="7">
+    <Units Count="8">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -68,6 +68,11 @@
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit6>
+      <Unit7>
+        <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc_TextBuffer"/>
+      </Unit7>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

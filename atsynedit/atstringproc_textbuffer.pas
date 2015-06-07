@@ -8,19 +8,31 @@ uses
   Classes, SysUtils, ATStringProc;
 
 type
-  { TATStringBufferHelper }
+  TTextChangedEvent = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
 
-  TATStringBufferHelper = class
+type
+  { TATStringBuffer }
+
+  TATStringBuffer = class
   private
     FStarts: TList; //contains offsets of lines
     FLenEol: integer;
+    FOnChange: TTextChangedEvent;
   public
     FText: atString;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Setup(const AText: atString; ALineLens: TList; ALenEol: integer);
-    function CaretToOffset(APnt: TPoint): integer;
-    function OffsetToCaret(APos: integer): TPoint;
+    procedure Clear;
+    function CaretToStr(APnt: TPoint): integer;
+    function StrToCaret(APos: integer): TPoint;
+    function SubString(AFrom, ALen: integer): atString;
+    function TextLength: integer;
+    function LineIndex(N: integer): integer;
+    function LineLength(N: integer): integer;
+    function LineSpace(N: integer): integer;
+    function Count: integer;
+    property OnChange: TTextChangedEvent read FOnChange write FOnChange;
   end;
 
 implementation
@@ -28,9 +40,9 @@ implementation
 const
   cInitListCapacity = 10000;
 
-{ TATStringBufferHelper }
+{ TATStringBuffer }
 
-constructor TATStringBufferHelper.Create;
+constructor TATStringBuffer.Create;
 begin
   FText:= '';
   FStarts:= TList.Create;
@@ -38,14 +50,14 @@ begin
   FLenEol:= 1;
 end;
 
-destructor TATStringBufferHelper.Destroy;
+destructor TATStringBuffer.Destroy;
 begin
   FStarts.Clear;
   FreeAndNil(FStarts);
   inherited;
 end;
 
-procedure TATStringBufferHelper.Setup(const AText: atString; ALineLens: TList;
+procedure TATStringBuffer.Setup(const AText: atString; ALineLens: TList;
   ALenEol: integer);
 var
   Pos, i: integer;
@@ -63,7 +75,13 @@ begin
   end;
 end;
 
-function TATStringBufferHelper.CaretToOffset(APnt: TPoint): integer;
+procedure TATStringBuffer.Clear;
+begin
+  FText:= '';
+  FStarts.Clear;
+end;
+
+function TATStringBuffer.CaretToStr(APnt: TPoint): integer;
 begin
   Result:= -1;
   if (APnt.Y<0) or (APnt.X<0) then Exit;
@@ -71,7 +89,7 @@ begin
   Result:= integer(FStarts[APnt.Y])+APnt.X;
 end;
 
-function TATStringBufferHelper.OffsetToCaret(APos: integer): TPoint;
+function TATStringBuffer.StrToCaret(APos: integer): TPoint;
 var
   a, b, m, dif: integer;
 begin
@@ -100,6 +118,44 @@ begin
 
   Result.Y:= m;
   Result.X:= APos-integer(FStarts[Result.Y]);
+end;
+
+function TATStringBuffer.SubString(AFrom, ALen: integer): atString;
+begin
+  Result:= Copy(FText, AFrom, ALen);
+end;
+
+function TATStringBuffer.TextLength: integer;
+begin
+  Result:= Length(FText);
+end;
+
+function TATStringBuffer.LineIndex(N: integer): integer;
+begin
+  if N<0 then Result:= 0
+  else
+  if N>=FStarts.Count then Result:= TextLength-1
+  else
+    Result:= integer(FStarts[N]);
+end;
+
+function TATStringBuffer.LineLength(N: integer): integer;
+begin
+  if N<0 then Result:= 0
+  else
+  if N>=FStarts.Count-1 then Result:= 0
+  else
+    Result:= integer(FStarts[N+1])-integer(FStarts[N])-FLenEol;
+end;
+
+function TATStringBuffer.LineSpace(N: integer): integer;
+begin
+  Result:= LineLength(N)+FLenEol;
+end;
+
+function TATStringBuffer.Count: integer;
+begin
+  Result:= FStarts.Count;
 end;
 
 end.
