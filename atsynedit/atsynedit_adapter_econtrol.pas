@@ -21,27 +21,23 @@ type
   TATSynEdit_Adapter_EControl = class(TATSynEdit_AdapterOfHilite)
   private
     ed: TATSynEdit;
+    memostrings: TSyntMemoStrings;
+    An: TSyntAnalyzer;
+    AnClient: TClientSyntAnalyzer;
     helper: TATStringBufferHelper;
     datatext: atString;
-    list_len: TList;
     function GetMemoObj: TSyntMemoStrings;
     procedure UpdateData;
   public
-    constructor Create(const ALexlibFilename: string); virtual; reintroduce;
+    constructor Create; virtual;
     destructor Destroy; override;
-    procedure InitLexer(const ALexerName: string);
+    procedure InitLexer(AManager: TSyntaxManager; const ALexerName: string);
     procedure OnEditorChange(Sender: TObject); override;
     procedure OnEditorCalcHilite(Sender: TObject; var AParts: TATLineParts;
       const AWrapItem: TATSynWrapItem; ACharIndexFrom: integer); override;
   end;
 
 implementation
-
-var
-  manager: TSyntaxManager;
-  memostrings: TSyntMemoStrings;
-  An: TSyntAnalyzer;
-  AnClient: TClientSyntAnalyzer;
 
 { TATSynEdit_Adapter_EControl }
 
@@ -157,13 +153,12 @@ begin
     AddMissingPart(nMustOffset, nLen-nMustOffset);
 end;
 
-constructor TATSynEdit_Adapter_EControl.Create(const ALexlibFilename: string);
+constructor TATSynEdit_Adapter_EControl.Create;
 begin
-  manager:= TSyntaxManager.Create(Self);
-  manager.LoadFromFile(ALexlibFilename);
-  memostrings:= TSyntMemoStrings.Create();
-
-  list_len:= TList.Create;
+  ed:= nil;
+  An:= nil;
+  AnClient:= nil;
+  memostrings:= TSyntMemoStrings.Create;
   helper:= TATStringBufferHelper.Create;
   datatext:= '';
 end;
@@ -171,18 +166,20 @@ end;
 destructor TATSynEdit_Adapter_EControl.Destroy;
 begin
   FreeAndNil(helper);
-  list_len.Clear;
-  FreeAndNil(list_len);
+  FreeAndNil(memostrings);
+  FreeAndNil(AnClient);
+  An:= nil;
+  ed:= nil;
 
   inherited;
 end;
 
-procedure TATSynEdit_Adapter_EControl.InitLexer(const ALexerName: string);
+procedure TATSynEdit_Adapter_EControl.InitLexer(AManager: TSyntaxManager; const ALexerName: string);
 begin
-  An:= manager.FindAnalyzer(ALexerName);
+  An:= AManager.FindAnalyzer(ALexerName);
   if An=nil then
   begin
-    Showmessage('Cannot find analizer: '+ALexerName);
+    Showmessage('Cannot find lexer: '+ALexerName);
     Exit
   end;
   AnClient:= TClientSyntAnalyzer.Create(An, @GetMemoObj, nil);
@@ -200,6 +197,7 @@ end;
 
 procedure TATSynEdit_Adapter_EControl.UpdateData;
 var
+  list_len: TList;
   i: integer;
 begin
   if not Assigned(ed) then Exit;
@@ -208,10 +206,15 @@ begin
 
   datatext:= ed.Strings.TextString;
 
-  list_len.Clear;
-  for i:= 0 to ed.Strings.Count-1 do
-    list_len.Add(pointer(Length(ed.Strings.Lines[i])));
-  helper.Setup(list_len, 1);
+  list_len:= TList.Create;
+  try
+    list_len.Clear;
+    for i:= 0 to ed.Strings.Count-1 do
+      list_len.Add(pointer(Length(ed.Strings.Lines[i])));
+    helper.Setup(list_len, 1);
+  finally
+    FreeAndNil(list_len);
+  end;
 
   AnClient.Clear;
   AnClient.Analyze;

@@ -10,7 +10,7 @@ uses
   ATSynEdit_WrapInfo;
 
 type
-  TATSynEdit_AdapterOfHilite = class(TComponent)
+  TATSynEdit_AdapterOfHilite = class(TObject)
   public
     procedure OnEditorChange(Sender: TObject); virtual; abstract;
     procedure OnEditorCalcHilite(Sender: TObject; var AParts: TATLineParts;

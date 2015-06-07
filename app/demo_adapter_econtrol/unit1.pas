@@ -9,7 +9,8 @@ uses
   StdCtrls,
   ATSynEdit,
   ATStringProc,
-  ATSynEdit_Adapter_EControl;
+  ATSynEdit_Adapter_EControl,
+  ecSyntAnal;
 
 type
   { TfmMain }
@@ -34,6 +35,7 @@ implementation
 {$R *.lfm}
 
 var
+  manager: TSyntaxManager;
   adapter: TATSynEdit_Adapter_EControl;
 
 { TfmMain }
@@ -47,6 +49,9 @@ begin
   fname:= ExtractFilePath(Application.ExeName)+'test.pas';
   fname_lxl:= ExtractFilePath(Application.ExeName)+'lexlib.lxl';
 
+  manager:= TSyntaxManager.Create(Self);
+  manager.LoadFromFile(fname_lxl);
+
   ed:= TATSynEdit.Create(Self);
   ed.Font.Name:= 'Consolas';
   ed.Parent:= Self;
@@ -55,8 +60,8 @@ begin
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
 
-  adapter:= TATSynEdit_Adapter_EControl.Create(fname_lxl);
-  adapter.InitLexer(lexername);
+  adapter:= TATSynEdit_Adapter_EControl.Create;
+  adapter.InitLexer(manager, lexername);
   ed.AdapterOfHilite:= adapter;
 
   ed.LoadFromFile(fname);
