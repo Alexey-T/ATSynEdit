@@ -39,7 +39,7 @@ implementation
 
 var
   manager: TSyntaxManager;
-  adapter: TATSynEdit_Adapter_EControl;
+  adapter: TATAdapterEControl;
 
 { TfmMain }
 
@@ -80,7 +80,7 @@ begin
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
 
-  adapter:= TATSynEdit_Adapter_EControl.Create;
+  adapter:= TATAdapterEControl.Create;
   ed.AdapterOfHilite:= adapter;
 
   ed.LoadFromFile(fname);

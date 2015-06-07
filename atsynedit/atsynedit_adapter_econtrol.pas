@@ -16,9 +16,9 @@ uses
   ecSyntAnal;
 
 type
-  { TATSynEdit_Adapter_EControl }
+  { TATAdapterEControl }
 
-  TATSynEdit_Adapter_EControl = class(TATSynEdit_AdapterOfHilite)
+  TATAdapterEControl = class(TATSynEdit_AdapterOfHilite)
   private
     ed: TATSynEdit;
     memostrings: TSyntMemoStrings;
@@ -27,6 +27,7 @@ type
     helper: TATStringBufferHelper;
     datatext: atString;
     function GetMemoObj: TSyntMemoStrings;
+    function IsPosInSublexer(AOffset: integer): TSyntAnalyzer;
     procedure UpdateData;
   public
     constructor Create; virtual;
@@ -39,9 +40,9 @@ type
 
 implementation
 
-{ TATSynEdit_Adapter_EControl }
+{ TATAdapterEControl }
 
-procedure TATSynEdit_Adapter_EControl.OnEditorCalcHilite(Sender: TObject;
+procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
   var AParts: TATLineParts; const AWrapItem: TATSynWrapItem;
   ACharIndexFrom: integer);
 var
@@ -154,7 +155,7 @@ begin
     AddMissingPart(nMustOffset, nLen-nMustOffset);
 end;
 
-constructor TATSynEdit_Adapter_EControl.Create;
+constructor TATAdapterEControl.Create;
 begin
   ed:= nil;
   An:= nil;
@@ -164,7 +165,7 @@ begin
   datatext:= '';
 end;
 
-destructor TATSynEdit_Adapter_EControl.Destroy;
+destructor TATAdapterEControl.Destroy;
 begin
   FreeAndNil(helper);
   FreeAndNil(memostrings);
@@ -175,7 +176,7 @@ begin
   inherited;
 end;
 
-procedure TATSynEdit_Adapter_EControl.InitLexer(AManager: TSyntaxManager; const ALexerName: string);
+procedure TATAdapterEControl.InitLexer(AManager: TSyntaxManager; const ALexerName: string);
 begin
   An:= AManager.FindAnalyzer(ALexerName);
   if An=nil then
@@ -188,7 +189,7 @@ begin
   UpdateData;
 end;
 
-procedure TATSynEdit_Adapter_EControl.OnEditorChange(Sender: TObject);
+procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
   ed:= Sender as TATSynEdit;
 
@@ -196,7 +197,7 @@ begin
   ed.Update;
 end;
 
-procedure TATSynEdit_Adapter_EControl.UpdateData;
+procedure TATAdapterEControl.UpdateData;
 var
   list_len: TList;
   i: integer;
@@ -221,12 +222,28 @@ begin
   AnClient.Analyze;
 end;
 
-function TATSynEdit_Adapter_EControl.GetMemoObj: TSyntMemoStrings;
+function TATAdapterEControl.GetMemoObj: TSyntMemoStrings;
 begin
   memostrings.Text:= datatext;
   Result:= memostrings;
 end;
 
+function TATAdapterEControl.IsPosInSublexer(AOffset: integer): TSyntAnalyzer;
+var
+  i: integer;
+  R: TSublexerRange;
+begin
+  Result:= nil;
+  for i:= 0 to AnClient.SubLexerRangeCount-1 do
+  begin
+    R:= AnClient.SubLexerRanges[i];
+    if (AOffset>=R.CondStartPos) and (AOffset<R.CondEndPos) then
+    begin
+      Result:= R.Rule.SyntAnalyzer;
+      Exit
+    end;
+  end;
+end;
 
 end.
 
