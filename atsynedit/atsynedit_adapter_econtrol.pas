@@ -33,8 +33,8 @@ type
     helper: TATStringBufferHelper;
     datatext: atString;
     sublist: TList;
-    procedure DoCalcPartsForLine(var AParts: TATLineParts; ALine, AX, ALen: integer
-      );
+    procedure DoCalcPartsForLine(var AParts: TATLineParts; ALine, AX,
+      ALen: integer; AColorFont, AColorBG: TColor);
     function GetMemoObj: TSyntMemoStrings;
     procedure UpdateSublexerRanges;
     procedure UpdateData;
@@ -67,11 +67,13 @@ begin
   Str:= Copy(Ed.Strings.Lines[nLine], nCol, AWrapItem.NLength);
   nLen:= Length(Str);
 
-  DoCalcPartsForLine(AParts, nLine, nCol-1, nLen);
+  DoCalcPartsForLine(AParts, nLine, nCol-1, nLen,
+    Ed.Colors.TextFont,
+    Ed.Colors.TextBG);
 end;
 
 procedure TATAdapterEControl.DoCalcPartsForLine(var AParts: TATLineParts;
-  ALine, AX, ALen: integer);
+  ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
 var
   partindex: integer;
   //
@@ -82,8 +84,8 @@ var
     FillChar(part{%H-}, SizeOf(part), 0);
     part.Offset:= AOffset;
     part.Len:= ALen;
-    part.ColorFont:= Ed.Colors.TextFont;
-    part.ColorBG:= Ed.Colors.TextBG;
+    part.ColorFont:= AColorFont;
+    part.ColorBG:= AColorBG;
     Move(part, AParts[partindex], SizeOf(part));
     Inc(partindex);
   end;
@@ -122,8 +124,8 @@ begin
       else
         Len:= tokenEnd.X-Offset;
 
-      ColorFont:= Ed.Colors.TextFont;
-      ColorBG:= Ed.Colors.TextBG;
+      ColorFont:= AColorFont;
+      ColorBG:= AColorBG;
 
       tokenStyle:= token.Style;
       if tokenStyle<>nil then

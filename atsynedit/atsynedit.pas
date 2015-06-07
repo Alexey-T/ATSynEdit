@@ -912,6 +912,7 @@ type
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces;
   end;
 
+
 implementation
 
 uses
