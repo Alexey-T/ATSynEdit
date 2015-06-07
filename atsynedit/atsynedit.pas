@@ -26,7 +26,8 @@ uses
   ATSynEdit_Carets,
   ATSynEdit_Gutter,
   ATSynEdit_WrapInfo,
-  ATSynEdit_Ranges, ATSynEdit_AdapterOfHilite;
+  ATSynEdit_Ranges,
+  ATSynEdit_Adapters;
 
 type
   TATDirection = (

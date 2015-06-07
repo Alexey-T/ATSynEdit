@@ -61,9 +61,8 @@
         <UnitName Value="ATSynEdit_CanvasProc"/>
       </Unit4>
       <Unit5>
-        <Filename Value="..\..\atsynedit\atsynedit_adapterofhilite.pas"/>
+        <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_AdapterOfHilite"/>
       </Unit5>
       <Unit6>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>

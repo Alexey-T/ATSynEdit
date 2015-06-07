@@ -9,7 +9,7 @@ uses
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATSynEdit_WrapInfo,
-  ATSynEdit_AdapterOfHilite,
+  ATSynEdit_Adapters,
   ATStringProc,
   ATStringProc_TextBuffer,
   ecMemoStrings,

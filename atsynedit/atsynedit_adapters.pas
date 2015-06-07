@@ -1,4 +1,4 @@
-unit ATSynEdit_AdapterOfHilite;
+unit ATSynEdit_Adapters;
 
 {$mode objfpc}{$H+}
 
