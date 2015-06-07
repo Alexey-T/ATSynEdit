@@ -16,12 +16,6 @@ uses
   ecSyntAnal;
 
 type
-  TATSubRange = class
-    P1, P2: TPoint;
-    An: TSyntAnalyzer;
-  end;
-
-type
   { TATAdapterEControl }
 
   TATAdapterEControl = class(TATSynEdit_AdapterOfHilite)
@@ -50,6 +44,12 @@ type
   end;
 
 implementation
+
+type
+  TATSubRange = class
+    P1, P2: TPoint;
+    An: TSyntAnalyzer;
+  end;
 
 { TATAdapterEControl }
 
@@ -312,7 +312,8 @@ begin
     sublist.Add(RSub);
   end;
 
-  //Showmessage('sub ranges '+inttostr(sublist.count));
+  if sublist.count>0 then
+    Showmessage('sub ranges: '+inttostr(sublist.count));
 end;
 
 end.
