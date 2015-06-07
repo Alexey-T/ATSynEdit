@@ -33,6 +33,8 @@ type
     helper: TATStringBufferHelper;
     datatext: atString;
     sublist: TList;
+    procedure DoCalcPartsForLine(var AParts: TATLineParts; ALine, AX, ALen: integer
+      );
     function GetMemoObj: TSyntMemoStrings;
     procedure UpdateSublexerRanges;
     procedure UpdateData;
@@ -53,6 +55,24 @@ procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
   var AParts: TATLineParts; const AWrapItem: TATSynWrapItem;
   ACharIndexFrom: integer);
 var
+  nLine, nCol, nLen: integer;
+  Str: atString;
+begin
+  Ed:= Sender as TATSynEdit;
+  if not Assigned(An) then Exit;
+  if not Assigned(AnClient) then Exit;
+
+  nLine:= AWrapItem.NLineIndex;
+  nCol:= ACharIndexFrom;
+  Str:= Copy(Ed.Strings.Lines[nLine], nCol, AWrapItem.NLength);
+  nLen:= Length(Str);
+
+  DoCalcPartsForLine(AParts, nLine, nCol-1, nLen);
+end;
+
+procedure TATAdapterEControl.DoCalcPartsForLine(var AParts: TATLineParts;
+  ALine, AX, ALen: integer);
+var
   partindex: integer;
   //
   procedure AddMissingPart(AOffset, ALen: integer);
@@ -69,23 +89,12 @@ var
   end;
   //
 var
-  nLine, nCol, nLen: integer;
-  Str: atString;
   tokenStart, tokenEnd: TPoint;
   nMustOffset, i: integer;
   token: TSyntToken;
   tokenStyle: TSyntaxFormat;
   part: TATLinePart;
 begin
-  Ed:= Sender as TATSynEdit;
-  if not Assigned(An) then Exit;
-  if not Assigned(AnClient) then Exit;
-
-  nLine:= AWrapItem.NLineIndex;
-  nCol:= ACharIndexFrom;
-  Str:= Copy(Ed.Strings.Lines[nLine], nCol, AWrapItem.NLength);
-  nLen:= Length(Str);
-
   partindex:= 0;
   for i:= 0 to AnClient.TagCount-1 do
   begin
@@ -93,23 +102,23 @@ begin
     tokenStart:= helper.OffsetToCaret(token.StartPos);
     tokenEnd:= helper.OffsetToCaret(token.EndPos);
 
-    Dec(tokenStart.x, nCol-1);
-    Dec(tokenEnd.x, nCol-1);
+    Dec(tokenStart.x, AX);
+    Dec(tokenEnd.x, AX);
 
-    if (tokenStart.y>nLine) or (tokenEnd.y<nLine) then Continue;
-    if (tokenEnd.y<=nLine) and (tokenEnd.x<0) then Continue;
-    if (tokenStart.y>=nLine) and (tokenStart.x>=nLen) then Continue;
+    if (tokenStart.y>ALine) or (tokenEnd.y<ALine) then Continue;
+    if (tokenEnd.y<=ALine) and (tokenEnd.x<0) then Continue;
+    if (tokenStart.y>=ALine) and (tokenStart.x>=ALen) then Continue;
 
     FillChar(part{%H-}, SizeOf(part), 0);
     with part do
     begin
-      if (tokenStart.y<nLine) or (tokenStart.x<0) then
+      if (tokenStart.y<ALine) or (tokenStart.x<0) then
         Offset:= 0
       else
         Offset:= tokenStart.X;
 
-      if (tokenEnd.y>nLine) or (tokenEnd.x>=nLen) then
-        Len:= nLen-Offset
+      if (tokenEnd.y>ALine) or (tokenEnd.x>=ALen) then
+        Len:= ALen-Offset
       else
         Len:= tokenEnd.X-Offset;
 
@@ -158,8 +167,8 @@ begin
 
   //add ending missing part
   nMustOffset:= part.Offset+part.Len;
-  if nMustOffset<nLen then
-    AddMissingPart(nMustOffset, nLen-nMustOffset);
+  if nMustOffset<ALen then
+    AddMissingPart(nMustOffset, ALen-nMustOffset);
 end;
 
 constructor TATAdapterEControl.Create;
