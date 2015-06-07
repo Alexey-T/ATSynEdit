@@ -15,9 +15,10 @@ type
     FStarts: TList; //contains offsets of lines
     FLenEol: integer;
   public
+    FText: atString;
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure Setup(ALineLens: TList; ALenEol: integer);
+    procedure Setup(const AText: atString; ALineLens: TList; ALenEol: integer);
     function CaretToOffset(APnt: TPoint): integer;
     function OffsetToCaret(APos: integer): TPoint;
   end;
@@ -31,6 +32,7 @@ const
 
 constructor TATStringBufferHelper.Create;
 begin
+  FText:= '';
   FStarts:= TList.Create;
   FStarts.Capacity:= cInitListCapacity;
   FLenEol:= 1;
@@ -43,11 +45,14 @@ begin
   inherited;
 end;
 
-procedure TATStringBufferHelper.Setup(ALineLens: TList; ALenEol: integer);
+procedure TATStringBufferHelper.Setup(const AText: atString; ALineLens: TList;
+  ALenEol: integer);
 var
   Pos, i: integer;
 begin
+  FText:= AText;
   FLenEol:= ALenEol;
+
   FStarts.Clear;
   Pos:= 0;
   FStarts.Add(nil);

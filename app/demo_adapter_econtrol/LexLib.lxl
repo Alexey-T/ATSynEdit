@@ -14804,6 +14804,7 @@ object SyntaxManager: TSyntaxManager
       end
       item
         DisplayName = 'asm'
+        Enabled = False
         StyleName = 'Assembler'
         ConditionList = <
           item
@@ -15624,8 +15625,9 @@ object SyntaxManager: TSyntaxManager
     SubAnalyzers = <
       item
         DisplayName = 'asm section'
-        StartExpression = 'asm\b'#13#10
-        EndExpression = 'end'#13#10
+        StyleName = 'Assembler'
+        StartExpression = 'asm\b'
+        EndExpression = 'end'
         SyntAnalyzer = SyntAnalyzer13
       end>
     SampleText.Strings = (

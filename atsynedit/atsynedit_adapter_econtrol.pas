@@ -25,14 +25,12 @@ type
     An: TSyntAnalyzer;
     AnClient: TClientSyntAnalyzer;
     helper: TATStringBufferHelper;
-    datatext: atString;
     sublist: TList;
     procedure DoCalcPartsForLine(var AParts: TATLineParts; ALine, AX,
       ALen: integer; AColorFont, AColorBG: TColor);
-    procedure DoCalcPartsForSublexers(var AParts: TATLineParts; ALine, AX,
-      ALen: integer);
     function GetMemoObj: TSyntMemoStrings;
-    procedure UpdateSubList;
+    function GetTokenColorBG(APos1, APos2: integer; AColorBG: TColor): TColor;
+    procedure __UpdateSubList;
     procedure UpdateData;
   public
     constructor Create; virtual;
@@ -70,44 +68,30 @@ begin
   nLen:= Length(Str);
 
   DoCalcPartsForLine(AParts, nLine, nCol-1, nLen, Ed.Colors.TextFont, Ed.Colors.TextBG);
-  DoCalcPartsForSublexers(AParts, nLine, nCol-1, nLen);
 end;
 
-
-procedure TATAdapterEControl.DoCalcPartsForSublexers(var AParts: TATLineParts;
-  ALine, AX, ALen: integer);
+function TATAdapterEControl.GetTokenColorBG(APos1, APos2: integer; AColorBG: TColor): TColor;
 var
-  RSub: TATSubRange;
-  Part: TATLinePart;
   i: integer;
+  R: TSubLexerRange;
+  Style: TSyntaxFormat;
 begin
-  for i:= 0 to sublist.Count-1 do
+  Result:= AColorBG;
+  for i:= 0 to AnClient.SubLexerRangeCount-1 do
   begin
-    RSub:= TATSubRange(sublist[i]);
-    if RSub.P1.Y>ALine then Continue;
-    if RSub.P2.Y<ALine then Continue;
-
-    Dec(RSub.P1.X, AX);
-    Dec(RSub.P2.X, AX);
-    if RSub.P1.X>=ALen then Continue;
-    if RSub.P2.X<0 then Continue;
-
-    FillChar(Part{%H-}, Sizeof(Part), 0);
-    Part.ColorBG:= clMoneyGreen;
-
-    if RSub.P1.Y<ALine then
-      Part.Offset:= 0
-    else
-      Part.Offset:= RSub.P1.X;
-
-    if RSub.P2.Y>ALine then
-      Part.Len:= ALen
-    else
-      Part.Len:= RSub.P2.X-Part.Offset;
-
-    DoPartInsert(AParts, Part);
+    R:= AnClient.SubLexerRanges[i];
+    if ((APos1>R.CondStartPos) or (R.Rule.IncludeBounds and (APos1=R.CondStartPos))) and
+       ((APos2<R.CondEndPos) or (R.Rule.IncludeBounds and (APos2=R.CondEndPos))) then
+    begin
+      Style:= R.Rule.Style;
+      if Assigned(Style) then
+        if Style.BgColor<>clNone then
+          Result:= Style.BgColor;
+      Exit
+    end;
   end;
 end;
+
 
 procedure TATAdapterEControl.DoCalcPartsForLine(var AParts: TATLineParts;
   ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
@@ -123,6 +107,9 @@ var
     part.Len:= ALen;
     part.ColorFont:= AColorFont;
     part.ColorBG:= AColorBG;
+    if partindex>0 then
+      part.ColorBG:= AParts[partindex-1].ColorBG;
+
     Move(part, AParts[partindex], SizeOf(part));
     Inc(partindex);
   end;
@@ -162,7 +149,7 @@ begin
         Len:= tokenEnd.X-Offset;
 
       ColorFont:= AColorFont;
-      ColorBG:= AColorBG;
+      ColorBG:= GetTokenColorBG(token.StartPos, token.EndPos, AColorBG);
 
       tokenStyle:= token.Style;
       if tokenStyle<>nil then
@@ -217,7 +204,6 @@ begin
   AnClient:= nil;
   memostrings:= TSyntMemoStrings.Create;
   helper:= TATStringBufferHelper.Create;
-  datatext:= '';
 
   sublist:= TList.Create;
   sublist.Capacity:= 5000;
@@ -270,32 +256,28 @@ begin
   if not Assigned(An) then Exit;
   if not Assigned(AnClient) then Exit;
 
-  datatext:= Ed.Strings.TextString;
-
   list_len:= TList.Create;
   try
     list_len.Clear;
     for i:= 0 to Ed.Strings.Count-1 do
       list_len.Add(pointer(Length(Ed.Strings.Lines[i])));
-    helper.Setup(list_len, 1);
+    helper.Setup(Ed.Strings.TextString, list_len, 1);
   finally
     FreeAndNil(list_len);
   end;
 
   AnClient.Clear;
   AnClient.Analyze;
-
-  UpdateSubList;
 end;
 
 function TATAdapterEControl.GetMemoObj: TSyntMemoStrings;
 begin
-  memostrings.Text:= datatext;
+  memostrings.Text:= helper.FText;
   Result:= memostrings;
 end;
 
 
-procedure TATAdapterEControl.UpdateSubList;
+procedure TATAdapterEControl.__UpdateSubList;
 var
   R: TSublexerRange;
   RSub: TATSubRange;
@@ -311,9 +293,6 @@ begin
     RSub.An:= R.Rule.SyntAnalyzer;
     sublist.Add(RSub);
   end;
-
-  if sublist.count>0 then
-    Showmessage('sub ranges: '+inttostr(sublist.count));
 end;
 
 end.
