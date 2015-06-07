@@ -1,0 +1,33 @@
+object fmMain: TfmMain
+  Left = 214
+  Height = 370
+  Top = 380
+  Width = 770
+  Caption = 'Demo'
+  ClientHeight = 370
+  ClientWidth = 770
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '1.5'
+  object Panel1: TPanel
+    Left = 0
+    Height = 34
+    Top = 336
+    Width = 770
+    Align = alBottom
+    ClientHeight = 34
+    ClientWidth = 770
+    TabOrder = 0
+    object chkWrap: TCheckBox
+      Left = 13
+      Height = 19
+      Top = 8
+      Width = 46
+      Caption = 'wrap'
+      Checked = True
+      OnChange = chkWrapChange
+      State = cbChecked
+      TabOrder = 0
+    end
+  end
+end
