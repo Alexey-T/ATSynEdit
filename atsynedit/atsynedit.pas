@@ -1650,6 +1650,7 @@ begin
         @Parts,
         Event
         );
+      C.Font.Style:= Font.Style; //restore after textout
     end
     else
     begin
