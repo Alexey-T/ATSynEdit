@@ -2,13 +2,15 @@ unit Test;
 
 interface
 
-uses aa.aa, bb, cc.cc.cc;                          
-
 const
   cColorCodes: array[0..1] of TColorCode = (
     (sName: 'AliceBlue'; sVal: '#00'),
     (sName: 'AntiqueWhite'; sVal: '#00'),
     );
+ asm
+   MOV  AX, 1234H
+   MOV Number, AX
+ end;
     
 type                        
   TForm1 = class(TForm)    

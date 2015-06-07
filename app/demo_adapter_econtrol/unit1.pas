@@ -61,7 +61,7 @@ end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
 const
-  lexername = 'Pascal Script';
+  lexername = 'Pascal';
 var
   fname, fname_lxl: string;
 begin

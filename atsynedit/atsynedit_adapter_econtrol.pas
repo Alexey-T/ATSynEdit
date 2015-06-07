@@ -2,8 +2,6 @@ unit ATSynEdit_Adapter_EControl;
 
 {$mode objfpc}{$H+}
 
-//{$define show_sub}
-
 interface
 
 uses
@@ -40,7 +38,6 @@ type
     procedure DoCalcPartsForSublexers(var AParts: TATLineParts; ALine, AX,
       ALen: integer);
     function GetMemoObj: TSyntMemoStrings;
-    procedure ShowSublexers;
     procedure UpdateSubList;
     procedure UpdateData;
   public
@@ -73,7 +70,7 @@ begin
   nLen:= Length(Str);
 
   DoCalcPartsForLine(AParts, nLine, nCol-1, nLen, Ed.Colors.TextFont, Ed.Colors.TextBG);
-  //DoCalcPartsForSublexers(AParts, nLine, nCol-1, nLen);
+  DoCalcPartsForSublexers(AParts, nLine, nCol-1, nLen);
 end;
 
 
@@ -84,9 +81,6 @@ var
   Part: TATLinePart;
   i: integer;
 begin
-  showmessage('todo');
-  exit;
-
   for i:= 0 to sublist.Count-1 do
   begin
     RSub:= TATSubRange(sublist[i]);
@@ -290,11 +284,8 @@ begin
 
   AnClient.Clear;
   AnClient.Analyze;
-  UpdateSubList;
 
-  {$ifdef show_sub}
-  ShowSublexers;
-  {$endif}
+  UpdateSubList;
 end;
 
 function TATAdapterEControl.GetMemoObj: TSyntMemoStrings;
@@ -303,16 +294,6 @@ begin
   Result:= memostrings;
 end;
 
-
-procedure TATAdapterEControl.ShowSublexers;
-var
-  i: integer;
-begin
-  if An.SubAnalyzers.Count=0 then
-    Showmessage('no sub');
-  for i:= 0 to An.SubAnalyzers.Count-1 do
-    Showmessage('sub '+An.SubAnalyzers[i].SyntAnalyzer.LexerName);
-end;
 
 procedure TATAdapterEControl.UpdateSubList;
 var
@@ -330,6 +311,8 @@ begin
     RSub.An:= R.Rule.SyntAnalyzer;
     sublist.Add(RSub);
   end;
+
+  //Showmessage('sub ranges '+inttostr(sublist.count));
 end;
 
 end.
