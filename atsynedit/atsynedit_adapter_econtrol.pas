@@ -124,6 +124,7 @@ begin
         begin
           FontBold:= fsBold in tokenStyle.Font.Style;
           FontItalic:= fsItalic in tokenStyle.Font.Style;
+          FontStrikeOut:= fsStrikeOut in tokenStyle.Font.Style;
         end;
       end;
     end;

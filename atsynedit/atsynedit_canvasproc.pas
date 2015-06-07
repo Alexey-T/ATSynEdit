@@ -38,7 +38,7 @@ type
   TATLinePart = record
     Offset, Len: integer;
     ColorFont, ColorBG, ColorBorder: TColor;
-    FontBold, FontItalic: boolean;
+    FontBold, FontItalic, FontStrikeOut: boolean;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineBorderStyle;
   end;
 
@@ -496,6 +496,7 @@ begin
       PartFontStyle:= [];
       if AParts^[j].FontBold then Include(PartFontStyle, fsBold);
       if AParts^[j].FontItalic then Include(PartFontStyle, fsItalic);
+      if AParts^[j].FontStrikeOut then Include(PartFontStyle, fsStrikeOut);
 
       PartBorderL:= AParts^[j].BorderLeft;
       PartBorderR:= AParts^[j].BorderRight;
