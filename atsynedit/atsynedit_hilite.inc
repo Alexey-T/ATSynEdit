@@ -11,6 +11,8 @@ begin
   nCharIndex:= AItem.NCharIndex+ACharsSkipped;
 
   FillChar(AParts, SizeOf(AParts), 0);
+  if Assigned(FAdapterOfHilite) then
+    FAdapterOfHilite.OnEditorCalcHilite(Self, AParts, AItem, nCharIndex);
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, AItem, nCharIndex);
 

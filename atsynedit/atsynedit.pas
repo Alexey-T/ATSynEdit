@@ -26,7 +26,7 @@ uses
   ATSynEdit_Carets,
   ATSynEdit_Gutter,
   ATSynEdit_WrapInfo,
-  ATSynEdit_Ranges;
+  ATSynEdit_Ranges, ATSynEdit_AdapterOfHilite;
 
 type
   TATDirection = (
@@ -286,6 +286,7 @@ type
     FMarginList: TList;
     FStringsInt,
     FStringsExternal: TATStrings;
+    FAdapterOfHilite: TATSynEdit_AdapterOfHilite;
     FFold: TATSynRanges;
     FCursorText,
     FCursorBm: TCursor;
@@ -683,6 +684,7 @@ type
     property Strings: TATStrings read GetStrings write SetStrings;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified;
+    property AdapterOfHilite: TATSynEdit_AdapterOfHilite read FAdapterOfHilite write FAdapterOfHilite;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
     property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
     property ModeOverwrite: boolean read FOverwrite write FOverwrite;
@@ -3299,6 +3301,8 @@ end;
 
 procedure TATSynEdit.DoEventChange;
 begin
+  if Assigned(FAdapterOfHilite) then
+    FAdapterOfHilite.OnEditorChange(Self);
   if Assigned(FOnChange) then
     FOnChange(Self);
 end;
