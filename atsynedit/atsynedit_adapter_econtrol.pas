@@ -22,11 +22,11 @@ type
     Ed: TATSynEdit;
     An: TSyntAnalyzer;
     AnClient: TClientSyntAnalyzer;
-    helper: TATStringBuffer;
+    buffer: TATStringBuffer;
     sublist: TList;
     procedure DoCalcPartsForLine(var AParts: TATLineParts;
       ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
-    function GetTokenColorBG(APos1, APos2: integer; AColorBG: TColor): TColor;
+    function GetTokenColorBG(APos1, APos2: integer; ADefColor: TColor): TColor;
     procedure __UpdateSubList;
     procedure UpdateData;
   public
@@ -67,13 +67,13 @@ begin
   DoCalcPartsForLine(AParts, nLine, nCol-1, nLen, Ed.Colors.TextFont, Ed.Colors.TextBG);
 end;
 
-function TATAdapterEControl.GetTokenColorBG(APos1, APos2: integer; AColorBG: TColor): TColor;
+function TATAdapterEControl.GetTokenColorBG(APos1, APos2: integer; ADefColor: TColor): TColor;
 var
   i: integer;
   R: TSubLexerRange;
   Style: TSyntaxFormat;
 begin
-  Result:= AColorBG;
+  Result:= ADefColor;
   for i:= 0 to AnClient.SubLexerRangeCount-1 do
   begin
     R:= AnClient.SubLexerRanges[i];
@@ -111,7 +111,7 @@ var
   //
 var
   tokenStart, tokenEnd: TPoint;
-  nMustOffset, startindex, i: integer;
+  mustOffset, startindex, i: integer;
   token: TSyntToken;
   tokenStyle: TSyntaxFormat;
   part: TATLinePart;
@@ -119,14 +119,14 @@ begin
   tokenLastOffset:= 0;
   partindex:= 0;
 
-  startindex:= AnClient.PriorTokenAt(helper.CaretToStr(Point(0, ALine)));
+  startindex:= AnClient.PriorTokenAt(buffer.CaretToStr(Point(0, ALine)));
   if startindex<0 then Exit;
 
   for i:= startindex to AnClient.TagCount-1 do
   begin
     token:= AnClient.Tags[i];
-    tokenStart:= helper.StrToCaret(token.StartPos);
-    tokenEnd:= helper.StrToCaret(token.EndPos);
+    tokenStart:= buffer.StrToCaret(token.StartPos);
+    tokenEnd:= buffer.StrToCaret(token.EndPos);
     tokenLastOffset:= token.EndPos;
 
     Dec(tokenStart.x, AX);
@@ -176,14 +176,14 @@ begin
 
     //add missing part
     if partindex=0 then
-      nMustOffset:= 0
+      mustOffset:= 0
     else
       with AParts[partindex-1] do
-        nMustOffset:= Offset+Len;
+        mustOffset:= Offset+Len;
 
-    if part.Offset>nMustOffset then
+    if part.Offset>mustOffset then
     begin
-      AddMissingPart(nMustOffset, part.Offset-nMustOffset);
+      AddMissingPart(mustOffset, part.Offset-mustOffset);
       if partindex>=High(AParts) then Exit;
     end;
 
@@ -194,9 +194,9 @@ begin
   end;
 
   //add ending missing part
-  nMustOffset:= part.Offset+part.Len;
-  if nMustOffset<ALen then
-    AddMissingPart(nMustOffset, ALen-nMustOffset);
+  mustOffset:= part.Offset+part.Len;
+  if mustOffset<ALen then
+    AddMissingPart(mustOffset, ALen-mustOffset);
 end;
 
 constructor TATAdapterEControl.Create;
@@ -204,7 +204,7 @@ begin
   Ed:= nil;
   An:= nil;
   AnClient:= nil;
-  helper:= TATStringBuffer.Create;
+  buffer:= TATStringBuffer.Create;
 
   sublist:= TList.Create;
   sublist.Capacity:= 5000;
@@ -218,7 +218,7 @@ begin
     TObject(sublist[i]).Free;
   FreeAndNil(sublist);
 
-  FreeAndNil(helper);
+  FreeAndNil(buffer);
   FreeAndNil(AnClient);
   An:= nil;
   Ed:= nil;
@@ -234,7 +234,7 @@ begin
 
   An:= AManager.FindAnalyzer(ALexerName);
   if An=nil then Exit;
-  AnClient:= TClientSyntAnalyzer.Create(An, helper, nil);
+  AnClient:= TClientSyntAnalyzer.Create(An, buffer, nil);
 
   UpdateData;
 end;
@@ -261,7 +261,7 @@ begin
     list_len.Clear;
     for i:= 0 to Ed.Strings.Count-1 do
       list_len.Add(pointer(Length(Ed.Strings.Lines[i])));
-    helper.Setup(Ed.Strings.TextString, list_len, 1);
+    buffer.Setup(Ed.Strings.TextString, list_len, 1);
   finally
     FreeAndNil(list_len);
   end;
@@ -281,8 +281,8 @@ begin
   begin
     R:= AnClient.SubLexerRanges[i];
     RSub:= TATSubRange.Create;
-    RSub.P1:= helper.StrToCaret(R.CondStartPos);
-    RSub.P2:= helper.StrToCaret(R.CondEndPos);
+    RSub.P1:= buffer.StrToCaret(R.CondStartPos);
+    RSub.P2:= buffer.StrToCaret(R.CondEndPos);
     RSub.An:= R.Rule.SyntAnalyzer;
     sublist.Add(RSub);
   end;

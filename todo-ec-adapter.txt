@@ -1,4 +1,3 @@
 
--optimize 'for' (tags[i])
--drop out TecMemoStrings
+-slow-slow-slow edit on 100K, pascal
 -fix regex with trail eol
