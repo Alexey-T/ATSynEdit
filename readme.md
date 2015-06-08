@@ -2,9 +2,9 @@ Editor control for Lazarus. Implemented much. Implemented multi-carets from birt
 
 Later:
 
-- adapter for EControl.ru lexers (done 20-30%)
+- adapter for EControl.ru lexers (done 20-30%);
   uses code https://github.com/Alexey-T/EControl 
-- adapter for tmLanguage (SublimeText) lexers (not started)
+- adapter for tmLanguage (Sublime text) lexers
 
 Shots
 ![img](screen.png?raw=true)
