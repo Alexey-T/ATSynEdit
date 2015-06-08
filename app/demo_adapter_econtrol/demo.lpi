@@ -88,7 +88,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\..\atsynedit;..\..\..\GitCudaText\comp\ec"/>
+      <OtherUnitFiles Value="..\..\atsynedit;..\..\..\GitCudaText\comp\ec;..\..\proc_lexer"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

@@ -1,10 +1,10 @@
 object fmMain: TfmMain
   Left = 214
-  Height = 438
+  Height = 457
   Top = 380
   Width = 770
   Caption = 'Demo'
-  ClientHeight = 438
+  ClientHeight = 457
   ClientWidth = 770
   OnCreate = FormCreate
   OnShow = FormShow
@@ -12,12 +12,12 @@ object fmMain: TfmMain
   LCLVersion = '1.5'
   object Panel1: TPanel
     Left = 0
-    Height = 114
-    Top = 324
+    Height = 154
+    Top = 303
     Width = 770
     Align = alBottom
     BevelOuter = bvNone
-    ClientHeight = 114
+    ClientHeight = 154
     ClientWidth = 770
     TabOrder = 0
     object chkWrap: TCheckBox
@@ -44,9 +44,10 @@ object fmMain: TfmMain
     end
     object files: TShellListView
       Left = 304
-      Height = 108
+      Height = 144
       Top = 4
       Width = 306
+      Anchors = [akTop, akLeft, akBottom]
       Color = clDefault
       TabOrder = 2
       ViewStyle = vsList

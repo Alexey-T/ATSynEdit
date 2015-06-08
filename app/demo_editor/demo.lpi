@@ -206,7 +206,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);..\..\comp\atsynedit;..\..\atsynedit"/>
-      <OtherUnitFiles Value="..\..\atsynedit"/>
+      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
