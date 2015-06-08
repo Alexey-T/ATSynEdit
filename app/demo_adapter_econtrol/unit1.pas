@@ -28,6 +28,8 @@ type
   private
     { private declarations }
     ed: TATSynEdit;
+    filedir: string;
+    procedure DoLexer(const aname: string);
     procedure DoOpen(const fname: string);
     procedure UpdateLexList;
   public
@@ -69,11 +71,10 @@ begin
 end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
-const
-  lexername = 'Pascal';
 var
   fname_lxl: string;
 begin
+  filedir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'\test_files\syntax\';
   fname_lxl:= ExtractFilePath(Application.ExeName)+'lexlib.lxl';
 
   manager:= TSyntaxManager.Create(Self);
@@ -90,15 +91,16 @@ begin
 
   adapter:= TATAdapterEControl.Create;
   ed.AdapterOfHilite:= adapter;
-
-  edLexer.ItemIndex:= edLexer.Items.IndexOf(lexername);
-  edLexer.OnChange(nil);
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
 begin
   edFiles.ItemIndex:= 0;
   edFiles.OnChange(nil);
+  Application.ProcessMessages;
+
+  edLexer.ItemIndex:= edLexer.Items.IndexOf('Pascal');
+  edLexer.OnChange(nil);
 end;
 
 procedure TfmMain.chkWrapChange(Sender: TObject);
@@ -109,19 +111,20 @@ begin
     ed.OptWrapMode:= cWrapOff;
 end;
 
-procedure TfmMain.edLexerChange(Sender: TObject);
+procedure TfmMain.DoLexer(const aname: string);
 begin
-  adapter.SetLexer(manager.FindAnalyzer(edLexer.Text));
+  adapter.SetLexer(manager.FindAnalyzer(aname));
   ed.Update;
 end;
 
-procedure TfmMain.edFilesChange(Sender: TObject);
-var
-  fn: string;
+procedure TfmMain.edLexerChange(Sender: TObject);
 begin
-  fn:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'\test_files\syntax\';
-  fn:= fn+edFiles.Text;
-  DoOpen(fn);
+  DoLexer(edLexer.Text);
+end;
+
+procedure TfmMain.edFilesChange(Sender: TObject);
+begin
+  DoOpen(filedir+edFiles.Text);
 end;
 
 end.
