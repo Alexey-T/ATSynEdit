@@ -3727,6 +3727,7 @@ object SyntaxManager: TSyntaxManager
               'void'
               'while')
             TokenTypes = 4
+            IgnoreCase = True
           end>
         HighlightPos = cpBound
         IgnoreAsParent = False
@@ -6764,28 +6765,12 @@ object SyntaxManager: TSyntaxManager
         Font.Style = []
       end
       item
-        DisplayName = 'Id keyword'
+        DisplayName = 'Reserved word'
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = clNavy
+        Font.Color = clBlack
         Font.Height = -13
         Font.Name = 'Courier New'
-        Font.Style = []
-      end
-      item
-        DisplayName = 'Id standard'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clPurple
-        Font.Height = -13
-        Font.Name = 'Courier New'
-        Font.Style = []
-      end
-      item
-        DisplayName = 'Id jquery'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBlue
-        Font.Height = -13
-        Font.Name = 'Courier New'
-        Font.Style = []
+        Font.Style = [fsBold]
       end
       item
         DisplayName = 'Comment'
@@ -6815,7 +6800,7 @@ object SyntaxManager: TSyntaxManager
       end>
     TokenRules = <
       item
-        DisplayName = 'Comment'
+        DisplayName = 'Comment 1'
         StyleName = 'Comment'
         TokenType = 1
         Expression = '(?s)/\*.*?(\*/|\Z)'
@@ -6823,10 +6808,10 @@ object SyntaxManager: TSyntaxManager
         ColumnTo = 0
       end
       item
-        DisplayName = 'Comment line'
+        DisplayName = 'Comment 2'
         StyleName = 'Comment'
         TokenType = 1
-        Expression = '#handle comment before </script>'#13#10'//.*? (?=<[/\w]) |'#13#10'//.* '
+        Expression = '// .*? (>|$) #handle > char for JS inside html'
         ColumnFrom = 0
         ColumnTo = 0
       end
@@ -6860,7 +6845,7 @@ object SyntaxManager: TSyntaxManager
         DisplayName = 'Id'
         StyleName = 'Identifier'
         TokenType = 2
-        Expression = '[a-z_\$]\w*'
+        Expression = '[a-z_]\w*'
         ColumnFrom = 0
         ColumnTo = 0
       end
@@ -6906,21 +6891,15 @@ object SyntaxManager: TSyntaxManager
       end>
     BlockRules = <
       item
-        DisplayName = 'id keywords'
-        StyleName = 'Id keyword'
+        DisplayName = 'keywords'
+        StyleName = 'Reserved word'
         BlockType = btTagDetect
         ConditionList = <
           item
             TagList.Strings = (
-              'abstract'
-              'arguments'
-              'await'
-              'boolean'
               'break'
-              'byte'
               'case'
               'catch'
-              'char'
               'class'
               'const'
               'continue'
@@ -6928,377 +6907,34 @@ object SyntaxManager: TSyntaxManager
               'default'
               'delete'
               'do'
-              'double'
               'else'
               'enum'
-              'eval'
               'export'
               'extends'
               'false'
-              'final'
               'finally'
-              'float'
               'for'
               'function'
-              'goto'
               'if'
-              'implements'
               'import'
               'in'
-              'instanceof'
-              'int'
-              'interface'
-              'let'
-              'long'
-              'native'
               'new'
               'null'
-              'package'
-              'private'
-              'protected'
-              'public'
               'return'
-              'short'
-              'static'
               'super'
               'switch'
-              'synchronized'
               'this'
               'throw'
-              'throws'
-              'transient'
               'true'
               'try'
               'typeof'
               'var'
               'void'
-              'volatile'
               'while'
-              'with'
-              'yield')
+              'with')
             TokenTypes = 4
           end>
         HighlightPos = cpBound
-        IgnoreAsParent = False
-      end
-      item
-        DisplayName = 'id standard'
-        StyleName = 'Id standard'
-        BlockType = btTagDetect
-        ConditionList = <
-          item
-            TagList.Strings = (
-              'Array'
-              'Date'
-              'hasOwnProperty'
-              'Infinity'
-              'isFinite'
-              'isNaN'
-              'isPrototypeOf'
-              'length'
-              'Math'
-              'name'
-              'NaN'
-              'Number'
-              'Object'
-              'prototype'
-              'String'
-              'toString'
-              'undefined'
-              'valueOf')
-            TokenTypes = 4
-          end>
-        HighlightPos = cpAny
-        IgnoreAsParent = False
-      end
-      item
-        DisplayName = 'id jquery'
-        StyleName = 'Id jquery'
-        BlockType = btTagDetect
-        ConditionList = <
-          item
-            TagList.Strings = (
-              '$'
-              'add'
-              'addBack'
-              'addClass'
-              'after'
-              'ajax'
-              'ajaxComplete'
-              'ajaxError'
-              'ajaxPrefilter'
-              'ajaxSend'
-              'ajaxSetup'
-              'ajaxStart'
-              'ajaxStop'
-              'ajaxSuccess'
-              'ajaxTransport'
-              'altKey'
-              'always'
-              'andSelf'
-              'animate'
-              'animated'
-              'append'
-              'appendTo'
-              'attr'
-              'before'
-              'bind'
-              'blur'
-              'bottom'
-              'boxModel'
-              'browser'
-              'button'
-              'callbacks'
-              'cancelBubble'
-              'change'
-              'checkbox'
-              'checked'
-              'children'
-              'clearQueue'
-              'click'
-              'clone'
-              'closest'
-              'contains'
-              'contents'
-              'context'
-              'core'
-              'css'
-              'cssHooks'
-              'cssNumber'
-              'ctrlKey'
-              'currentTarget'
-              'data'
-              'dblclick'
-              'deferred'
-              'delay'
-              'delegate'
-              'delegateTarget'
-              'dequeue'
-              'detach'
-              'die'
-              'disable'
-              'disabled'
-              'done'
-              'each'
-              'empty'
-              'enabled'
-              'end'
-              'eq'
-              'error'
-              'even'
-              'event'
-              'extend'
-              'fadeIn'
-              'fadeOut'
-              'fadeTo'
-              'fadeToggle'
-              'fail'
-              'file'
-              'filter'
-              'find'
-              'finish'
-              'fire'
-              'fired'
-              'fireWith'
-              'first'
-              'first-child'
-              'first-of-type'
-              'fn'
-              'focus'
-              'focusin'
-              'focusout'
-              'fx'
-              'get'
-              'getJSON'
-              'getScript'
-              'globalEval'
-              'grep'
-              'gt'
-              'has'
-              'hasClass'
-              'hasData'
-              'header'
-              'height'
-              'hidden'
-              'hide'
-              'holdReady'
-              'hover'
-              'html'
-              'image'
-              'inArray'
-              'index'
-              'init'
-              'innerHeight'
-              'innerWidth'
-              'input'
-              'insertAfter'
-              'insertBefore'
-              'interval'
-              'is'
-              'isArray'
-              'isDefaultPrevented'
-              'isEmptyObject'
-              'isFunction'
-              'isImmediatePropagationStopped'
-              'isNumeric'
-              'isPlainObject'
-              'isPropagationStopped'
-              'isRejected'
-              'isResolved'
-              'isWindow'
-              'isXMLDoc'
-              'jquery'
-              'keyCode'
-              'keydown'
-              'keypress'
-              'keyup'
-              'lang'
-              'last'
-              'last-child'
-              'last-of-type'
-              'length'
-              'live'
-              'load'
-              'lock'
-              'locked'
-              'lt'
-              'makeArray'
-              'map'
-              'merge'
-              'metaKey'
-              'mousedown'
-              'mouseenter'
-              'mouseleave'
-              'mousemove'
-              'mouseout'
-              'mouseover'
-              'mouseup'
-              'namespace'
-              'next'
-              'nextAll'
-              'nextUntil'
-              'noConflict'
-              'noop'
-              'not'
-              'notify'
-              'notifyWith'
-              'now'
-              'nth-child'
-              'nth-child-last'
-              'nth-first-of-type'
-              'nth-last-child'
-              'nth-last-of-type'
-              'nth-of-type'
-              'obj'
-              'odd'
-              'off'
-              'offset'
-              'offsetParent'
-              'on'
-              'one'
-              'only-child'
-              'only-of-type'
-              'outerHeight'
-              'outerWidth'
-              'pageX'
-              'pageY'
-              'param'
-              'parent'
-              'parents'
-              'parentsUntil'
-              'parseHTML'
-              'parseInt'
-              'parseJSON'
-              'parseXML'
-              'password'
-              'pipe'
-              'position'
-              'post'
-              'prepend'
-              'prependTo'
-              'prev'
-              'prevAll'
-              'preventDefault'
-              'prevUntil'
-              'progress'
-              'promise'
-              'prop'
-              'proxy'
-              'pushStack'
-              'queue'
-              'radio'
-              'ready'
-              'reject'
-              'rejectWith'
-              'relatedTarget'
-              'remove'
-              'removeAttr'
-              'removeClass'
-              'removeData'
-              'removeProp'
-              'replaceAll'
-              'replaceWith'
-              'reset'
-              'resize'
-              'resolve'
-              'resolved'
-              'resolveWith'
-              'result'
-              'root'
-              'scroll'
-              'scrollLeft'
-              'scrollTop'
-              'select'
-              'selected'
-              'selector'
-              'self'
-              'serialize'
-              'serializeArray'
-              'setTimeout'
-              'shiftKey'
-              'show'
-              'siblings'
-              'size'
-              'slice'
-              'slideDown'
-              'slideToggle'
-              'slideUp'
-              'state'
-              'stop'
-              'stopImmediatePropagation'
-              'stopPropagation'
-              'sub'
-              'submit'
-              'support'
-              'target'
-              'text'
-              'then'
-              'timeStamp'
-              'toArray'
-              'toggle'
-              'toggleClass'
-              'top'
-              'trigger'
-              'triggerHandler'
-              'trim'
-              'type'
-              'unbind'
-              'undelegate'
-              'unique'
-              'unload'
-              'unwrap'
-              'val'
-              'visible'
-              'when'
-              'which'
-              'width'
-              'window'
-              'wrap'
-              'wrapAll'
-              'wrapInner')
-            TokenTypes = 4
-          end>
-        HighlightPos = cpAny
         IgnoreAsParent = False
       end
       item
@@ -7489,15 +7125,14 @@ object SyntaxManager: TSyntaxManager
     CodeTemplates = <>
     SubAnalyzers = <>
     SampleText.Strings = (
-      '//text text'
-      'NaN Object $ offset'
-      ''
-      'function init() {'
+      '// example function'
+      'function Init() {'
       #9'addMenuItem('#39'Txt'#39', '#39'Ctrl+\'#39#39');'
+      #9'addMenuItem('#39'Txt2'#39', '#39'Ctrl+Alt+\'#39#39');'
       #9'addMenuItem('#39'Txt3'#39', '#39'Ctrl+Alt+;'#39');'
       '}'
       ''
-      'var s_regex = /^<\/?\w.*?>/gi;'
+      'var s_regex = /^<\/?\w[\w\:\-]*.*?>/gi;'
       '    not_regex = 1 / 2 + (0xFF+10) / 3;'
       '    '
       'findNewEditPoint: function(inc, offset) {'
@@ -7512,7 +7147,7 @@ object SyntaxManager: TSyntaxManager
       ''
       'function render(){'
       #9#9'$('#39'#basket'#39').html('#39#39');'
-      #9#9'for (id in basket){'
+      #9#9'for(id in basket){'
       #9#9#9'if(basket[id].q>0){'
       #9#9#9#9'b=b+" \'
       #9#9#9#9#9'<div class='#39'"+cl+"'#39'> \'
@@ -7543,9 +7178,7 @@ object SyntaxManager: TSyntaxManager
       '-strings oneline '#39'...'#39
       '-strings multiline "..."'
       '-strings regex /.../gi'
-      '-strings heredoc'
-      ''
-      'Keywords: http://www.w3schools.com/js/js_reserved.asp')
+      '-strings heredoc')
     LineComment = '//'
     Charset = DEFAULT_CHARSET
   end
@@ -8884,38 +8517,16 @@ object SyntaxManager: TSyntaxManager
         ConditionList = <
           item
             TagList.Strings = (
-              'accelerator'
-              'align-content'
-              'align-items'
-              'alignment-baseline'
-              'align-self'
-              'all'
-              'animation'
-              'animation-delay'
-              'animation-direction'
-              'animation-duration'
-              'animation-fill-mode'
-              'animation-iteration-count'
-              'animation-name'
-              'animation-play-state'
-              'animation-timing-function'
               'azimuth'
-              'backface-visibility'
               'background'
               'background-attachment'
-              'background-blend-mode'
               'background-clip'
               'background-color'
               'background-image'
               'background-origin'
               'background-position'
-              'background-position-x'
-              'background-position-y'
               'background-repeat'
-              'background-repeat-x'
-              'background-repeat-y'
               'background-size'
-              'baseline-shift'
               'behavior'
               'border'
               'border-bottom'
@@ -8927,11 +8538,6 @@ object SyntaxManager: TSyntaxManager
               'border-collapse'
               'border-color'
               'border-image'
-              'border-image-outset'
-              'border-image-repeat'
-              'border-image-slice'
-              'border-image-source'
-              'border-image-width'
               'border-left'
               'border-left-color'
               'border-left-style'
@@ -8951,107 +8557,41 @@ object SyntaxManager: TSyntaxManager
               'border-top-width'
               'border-width'
               'bottom'
-              'box-decoration-break'
               'box-shadow'
               'box-sizing'
-              'break-after'
-              'break-before'
-              'break-inside'
-              'buffered-rendering'
               'caption-side'
               'clear'
               'clip'
-              'clip-path'
-              'clip-rule'
               'color'
-              'color-interpolation'
-              'color-interpolation-filters'
-              'color-rendering'
               'column-count'
-              'column-fill'
               'column-gap'
               'column-rule'
-              'column-rule-color'
-              'column-rule-style'
-              'column-rule-width'
               'columns'
-              'column-span'
               'column-width'
               'content'
               'counter-increment'
               'counter-reset'
-              'css-float'
-              'css-text'
               'cue'
               'cue-after'
               'cue-before'
               'cursor'
-              'cx'
-              'cy'
               'data'
               'direction'
               'display'
-              'dominant-baseline'
               'elevation'
               'empty-cells'
-              'enable-background'
-              'fill'
-              'fill-opacity'
-              'fill-rule'
-              'filter'
-              'flex'
-              'flex-basis'
-              'flex-direction'
-              'flex-flow'
-              'flex-grow'
-              'flex-shrink'
-              'flex-wrap'
               'float'
-              'flood-color'
-              'flood-opacity'
               'font'
               'font-family'
-              'font-feature-settings'
-              'font-kerning'
-              'font-language-override'
               'font-size'
               'font-size-adjust'
               'font-stretch'
               'font-style'
-              'font-synthesis'
               'font-variant'
-              'font-variant-alternates'
-              'font-variant-caps'
-              'font-variant-east-asian'
-              'font-variant-ligatures'
-              'font-variant-numeric'
-              'font-variant-position'
               'font-weight'
-              'get-attribute'
-              'get-property-cs-svalue'
-              'get-property-priority'
-              'get-property-value'
-              'glyph-orientation-horizontal'
-              'glyph-orientation-vertical'
               'height'
-              'image-orientation'
-              'image-rendering'
-              'ime-mode'
-              'isolation'
-              'item'
-              'justify-content'
-              'kerning'
-              'layout-flow'
-              'layout-grid'
-              'layout-grid-char'
-              'layout-grid-line'
-              'layout-grid-mode'
-              'layout-grid-type'
               'left'
-              'length'
               'letter-spacing'
-              'lighting-color'
-              'line-break'
               'line-height'
               'list-style'
               'list-style-image'
@@ -9062,30 +8602,13 @@ object SyntaxManager: TSyntaxManager
               'margin-left'
               'margin-right'
               'margin-top'
-              'marker'
-              'marker-end'
-              'marker-mid'
               'marker-offset'
-              'marker-start'
               'marks'
-              'mask'
-              'mask-type'
               'max-height'
               'max-width'
-              'max-zoom'
               'min-height'
               'min-width'
-              'min-zoom'
-              'mix-blend-mode'
-              'nav-down'
-              'nav-left'
-              'nav-right'
-              'nav-up'
-              'object-fit'
-              'object-position'
               'opacity'
-              'order'
-              'orientation'
               'orphans'
               'outline'
               'outline-color'
@@ -9093,7 +8616,6 @@ object SyntaxManager: TSyntaxManager
               'outline-style'
               'outline-width'
               'overflow'
-              'overflow-wrap'
               'overflow-x'
               'overflow-y'
               'padding'
@@ -9101,61 +8623,21 @@ object SyntaxManager: TSyntaxManager
               'padding-left'
               'padding-right'
               'padding-top'
-              'page'
               'page-break-after'
               'page-break-before'
               'page-break-inside'
-              'paint-order'
-              'parent-rule'
               'pause'
               'pause-after'
               'pause-before'
-              'perspective'
-              'perspective-origin'
               'pitch'
               'pitch-range'
-              'pixel-bottom'
-              'pixel-height'
-              'pixel-left'
-              'pixel-right'
-              'pixel-top'
-              'pixel-width'
               'play-during'
               'pointer-events'
-              'pos-bottom'
-              'pos-height'
               'position'
-              'pos-left'
-              'pos-right'
-              'pos-top'
-              'pos-width'
               'quotes'
-              'r'
-              'remove-attribute'
-              'remove-property'
               'resize'
               'richness'
               'right'
-              'ruby-align'
-              'ruby-overhang'
-              'ruby-position'
-              'rx'
-              'ry'
-              'scrollbar3d-light-color'
-              'scrollbar-arrow-color'
-              'scrollbar-base-color'
-              'scrollbar-dark-shadow-color'
-              'scrollbar-face-color'
-              'scrollbar-highlight-color'
-              'scrollbar-shadow-color'
-              'scrollbar-track-color'
-              'scroll-behavior'
-              'set-attribute'
-              'set-property'
-              'shape-image-threshold'
-              'shape-margin'
-              'shape-outside'
-              'shape-rendering'
               'size'
               'speak'
               'speak-header'
@@ -9163,58 +8645,20 @@ object SyntaxManager: TSyntaxManager
               'speak-punctuation'
               'speech-rate'
               'src'
-              'stop-color'
-              'stop-opacity'
               'stress'
-              'stroke'
-              'stroke-dasharray'
-              'stroke-dashoffset'
-              'stroke-linecap'
-              'stroke-linejoin'
-              'stroke-miterlimit'
-              'stroke-opacity'
-              'stroke-width'
-              'style-float'
               'table-layout'
-              'tab-size'
               'text-align'
               'text-align-last'
-              'text-anchor'
-              'text-autospace'
               'text-decoration'
-              'text-decoration-blink'
-              'text-decoration-color'
-              'text-decoration-line'
-              'text-decoration-line-through'
-              'text-decoration-none'
-              'text-decoration-overline'
-              'text-decoration-style'
-              'text-decoration-underline'
               'text-indent'
-              'text-justify'
-              'text-justify-trim'
-              'text-kashida'
-              'text-kashida-space'
               'text-overflow'
-              'text-rendering'
               'text-shadow'
               'text-transform'
-              'text-underline-position'
               'top'
-              'touch-action'
               'transform'
-              'transform-origin'
-              'transform-style'
               'transition'
-              'transition-delay'
-              'transition-duration'
-              'transition-property'
-              'transition-timing-function'
               'unicode-bidi'
-              'unicode-range'
               'user-select'
-              'user-zoom'
-              'vector-effect'
               'vertical-align'
               'visibility'
               'voice-family'
@@ -9222,16 +8666,13 @@ object SyntaxManager: TSyntaxManager
               'white-space'
               'widows'
               'width'
-              'will-change'
-              'word-break'
               'word-spacing'
               'word-wrap'
               'writing-mode'
-              'x'
-              'y'
               'z-index'
               'zoom')
             TokenTypes = 4
+            IgnoreCase = True
           end>
         HighlightPos = cpAny
         IgnoreAsParent = False
@@ -9326,16 +8767,6 @@ object SyntaxManager: TSyntaxManager
               '-moz-user-select'
               '-moz-window-shadow'
               '-ms-accelerator'
-              '-ms-animation'
-              '-ms-animation-delay'
-              '-ms-animation-direction'
-              '-ms-animation-duration'
-              '-ms-animation-fill-mode'
-              '-ms-animation-iteration-count'
-              '-ms-animation-name'
-              '-ms-animation-play-state'
-              '-ms-animation-timing-function'
-              '-ms-backface-visibility'
               '-ms-background-position-x'
               '-ms-background-position-y'
               '-ms-behavior'
@@ -9352,18 +8783,11 @@ object SyntaxManager: TSyntaxManager
               '-ms-flex'
               '-ms-flex-align'
               '-ms-flex-direction'
-              '-ms-flex-flow'
-              '-ms-flex-item-align'
-              '-ms-flex-line-pack'
-              '-ms-flex-negative'
               '-ms-flex-order'
               '-ms-flex-pack'
-              '-ms-flex-positive'
-              '-ms-flex-preferred-size'
               '-ms-flex-wrap'
               '-ms-flow-from'
               '-ms-flow-into'
-              '-ms-font-feature-settings'
               '-ms-grid-column'
               '-ms-grid-column-align'
               '-ms-grid-columns'
@@ -9377,7 +8801,6 @@ object SyntaxManager: TSyntaxManager
               '-ms-hyphenate-limit-lines'
               '-ms-hyphenate-limit-zone'
               '-ms-hyphens'
-              '-ms-ime-align'
               '-ms-ime-mode'
               '-ms-interpolation-mode'
               '-ms-layout-flow'
@@ -9389,8 +8812,6 @@ object SyntaxManager: TSyntaxManager
               '-ms-overflow-style'
               '-ms-overflow-x'
               '-ms-overflow-y'
-              '-ms-perspective'
-              '-ms-perspective-origin'
               '-ms-progress-appearance'
               '-ms-scrollbar-arrow-color'
               '-ms-scrollbar-base-color'
@@ -9401,13 +8822,9 @@ object SyntaxManager: TSyntaxManager
               '-ms-scrollbar-track-color'
               '-ms-scroll-chaining'
               '-ms-scroll-limit'
-              '-ms-scroll-limit-xmax'
               '-ms-scroll-limit-x-max'
-              '-ms-scroll-limit-xmin'
               '-ms-scroll-limit-x-min'
-              '-ms-scroll-limit-ymax'
               '-ms-scroll-limit-y-max'
-              '-ms-scroll-limit-ymin'
               '-ms-scroll-limit-y-min'
               '-ms-scroll-rails'
               '-ms-scroll-snap-points-x'
@@ -9418,22 +8835,13 @@ object SyntaxManager: TSyntaxManager
               '-ms-scroll-translation'
               '-ms-text-align-last'
               '-ms-text-autospace'
-              '-ms-text-combine-horizontal'
               '-ms-text-justify'
               '-ms-text-kashida-space'
               '-ms-text-overflow'
               '-ms-text-size-adjust'
               '-ms-text-underline-position'
               '-ms-touch-action'
-              '-ms-touch-select'
               '-ms-transform'
-              '-ms-transform-origin'
-              '-ms-transform-style'
-              '-ms-transition'
-              '-ms-transition-delay'
-              '-ms-transition-duration'
-              '-ms-transition-property'
-              '-ms-transition-timing-function'
               '-ms-user-select'
               '-ms-word-break'
               '-ms-word-wrap'
@@ -9649,16 +9057,12 @@ object SyntaxManager: TSyntaxManager
               '-webkit-svg-shadow'
               '-webkit-tap-highlight-color'
               '-webkit-text-align-last'
-              '-webkit-text-combine'
               '-webkit-text-decoration-color'
               '-webkit-text-decoration-line'
               '-webkit-text-decorations-in-effect'
               '-webkit-text-decoration-style'
-              '-webkit-text-emphasis-color'
               '-webkit-text-emphasis-position'
-              '-webkit-text-emphasis-style'
               '-webkit-text-fill-color'
-              '-webkit-text-orientation'
               '-webkit-text-security'
               '-webkit-text-size-adjust'
               '-webkit-text-stroke'
@@ -9683,7 +9087,6 @@ object SyntaxManager: TSyntaxManager
               '-webkit-wrap'
               '-webkit-wrap-flow'
               '-webkit-wrap-through'
-              '-webkit-writing-mode'
               '-xv-interpret-as'
               '-xv-phonemes'
               '-xv-voice-balance'
@@ -9694,6 +9097,7 @@ object SyntaxManager: TSyntaxManager
               '-xv-voice-stress'
               '-xv-voice-volume')
             TokenTypes = 4
+            IgnoreCase = True
           end>
         HighlightPos = cpAny
         IgnoreAsParent = False
@@ -14904,6 +14308,8 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = [fsBold]
+        BorderTypeBottom = blSolid
+        BorderColorBottom = clRed
       end
       item
         DisplayName = 'String'
@@ -14912,6 +14318,8 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
+        BorderTypeBottom = blDot
+        BorderColorBottom = clGreen
       end
       item
         DisplayName = 'Identifier'
@@ -14920,6 +14328,8 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
+        BorderTypeBottom = blWavyLine
+        BorderColorBottom = clOlive
       end
       item
         DisplayName = 'Reserved word'
@@ -15095,7 +14505,7 @@ object SyntaxManager: TSyntaxManager
         DisplayName = 'String'
         StyleName = 'String'
         TokenType = 4
-        Expression = #39'.*?('#39'|$)'#13#10
+        Expression = #39'.*?('#39'|$)'
         ColumnFrom = 0
         ColumnTo = 0
       end
@@ -15149,7 +14559,7 @@ object SyntaxManager: TSyntaxManager
         StyleName = 'Comment'
         AlwaysEnabled = True
         TokenType = 1
-        Expression = '(?s)\{.*?(\}|\Z)'#13#10
+        Expression = '(?s)\{.*?(\}|\Z)'
         ColumnFrom = 0
         ColumnTo = 0
       end
@@ -15201,7 +14611,6 @@ object SyntaxManager: TSyntaxManager
         ConditionList = <
           item
             TagList.Strings = (
-              'absolute'
               'abstract'
               'and'
               'array'
@@ -15230,7 +14639,6 @@ object SyntaxManager: TSyntaxManager
               'finally'
               'for'
               'function'
-              'generic'
               'goto'
               'if'
               'implementation'
@@ -15273,7 +14681,6 @@ object SyntaxManager: TSyntaxManager
               'set'
               'shl'
               'shr'
-              'specialize'
               'stdcall'
               'strict'
               'string'
@@ -15403,6 +14810,7 @@ object SyntaxManager: TSyntaxManager
       end
       item
         DisplayName = 'asm'
+        Enabled = False
         StyleName = 'Assembler'
         ConditionList = <
           item
@@ -15519,38 +14927,6 @@ object SyntaxManager: TSyntaxManager
         HighlightPos = cpBound
         CollapseFmt = '%s-2 %s0'
         GrammaRuleName = 'ClassDecl'
-        TreeItemStyle = 'class (tree)'
-        TreeGroupStyle = 'Group (tree)'
-        TreeItemImage = 1
-        TreeGroupImage = 0
-        IgnoreAsParent = False
-      end
-      item
-        DisplayName = 'class-object declaration'
-        ConditionList = <>
-        BlockEnd = 'end of type'
-        NameFmt = 'class %s0'
-        GroupFmt = 'classes'
-        RefToCondEnd = True
-        HighlightPos = cpAny
-        CollapseFmt = 'class %s0'
-        GrammaRuleName = 'ObjectDecl'
-        TreeItemStyle = 'class (tree)'
-        TreeGroupStyle = 'Group (tree)'
-        TreeItemImage = 1
-        TreeGroupImage = 0
-        IgnoreAsParent = False
-      end
-      item
-        DisplayName = 'generic declaration'
-        ConditionList = <>
-        BlockEnd = 'end of type'
-        NameFmt = 'class %s-1'
-        GroupFmt = 'classes'
-        RefToCondEnd = True
-        HighlightPos = cpAny
-        CollapseFmt = 'class %s-1'
-        GrammaRuleName = 'GenericDecl'
         TreeItemStyle = 'class (tree)'
         TreeGroupStyle = 'Group (tree)'
         TreeItemImage = 1
@@ -16255,9 +15631,11 @@ object SyntaxManager: TSyntaxManager
     SubAnalyzers = <
       item
         DisplayName = 'asm section'
-        StartExpression = 'asm\b'#13#10
-        EndExpression = 'end'#13#10
+        StyleName = 'Assembler'
+        StartExpression = 'asm\b'
+        EndExpression = 'end'
         SyntAnalyzer = SyntAnalyzer13
+        IncludeBounds = True
       end>
     SampleText.Strings = (
       'unit Test;    '
@@ -16319,14 +15697,12 @@ object SyntaxManager: TSyntaxManager
       'Forward')
     Gramma.Gramma = 
       'Skip = <Comment> | <Preprocessor>;'#13#10#13#10'// Class declaration'#13#10'Clas' +
-      'sDecl = <Identifier> '#39'='#39' '#39'class'#39' InheritedList? <Identifier>;'#13#10'E' +
-      'mptyClass = <Identifier> '#39'='#39' "class" InheritedList '#39';'#39';'#13#10#13#10'// Ge' +
-      'neric'#13#10'ObjectDecl = <Identifier> '#39'='#39' "object"'#13#10'GenericDecl = "ge' +
-      'neric" <Identifier>'#13#10#13#10'// Interface declaration'#13#10'IntfDecl = <Ide' +
-      'ntifier> '#39'='#39' ("interface" | "dispinterface") InheritedList? Intf' +
-      'NextToken;'#13#10'IntfNextToken = '#39'['#39' | <Identifier>; '#13#10#13#10'InheritedLis' +
-      't = '#39'('#39' IdentList '#39')'#39';'#13#10'IdentList = <Identifier> ('#39','#39' <Identifie' +
-      'r>)*;'#13#10
+      'sDecl = <Identifier> '#39'='#39' '#39'class'#39' InheritedList? <Identifier>;'#13#10#13 +
+      #10'EmptyClass = <Identifier> '#39'='#39' "class" InheritedList '#39';'#39'; '#13#10#13#10'//' +
+      ' Interface declaration'#13#10'IntfDecl = <Identifier> '#39'='#39' ("interface"' +
+      ' | "dispinterface") InheritedList? IntfNextToken;'#13#10'IntfNextToken' +
+      ' = '#39'['#39' | <Identifier>; '#13#10#13#10'InheritedList = '#39'('#39' IdentList '#39')'#39';'#13#10'I' +
+      'dentList = <Identifier> ('#39','#39' <Identifier>)*;'#13#10
     CurrentLineStyle = 'Current Line'
     Extentions = 'pas inc dpr dpk lpr p pp'
     LexerName = 'Pascal'
@@ -17895,7 +17271,7 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = [fsBold]
-        BgColor = 15528434
+        BgColor = 15527922
         BorderColorRight = clLime
         BorderColorBottom = clLime
       end
@@ -17906,7 +17282,7 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
-        BgColor = 15528434
+        BgColor = 14477031
         FormatType = ftBackGround
       end
       item
@@ -17916,7 +17292,7 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
-        BgColor = 41984
+        BgColor = 243833
       end>
     TokenRules = <
       item
@@ -22947,6 +22323,7 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = [fsBold]
+        FormatType = ftColor
       end
       item
         DisplayName = 'String'
@@ -22955,6 +22332,8 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
+        BgColor = clMoneyGreen
+        FormatType = ftBackGround
       end
       item
         DisplayName = 'Identifier'
@@ -24163,13 +23542,6 @@ object SyntaxManager: TSyntaxManager
         Expression = '^Index: .*'
         ColumnFrom = 0
         ColumnTo = 0
-      end
-      item
-        DisplayName = 'Other lines'
-        TokenType = 6
-        Expression = '.*'
-        ColumnFrom = 0
-        ColumnTo = 0
       end>
     BlockRules = <
       item
@@ -24186,12 +23558,6 @@ object SyntaxManager: TSyntaxManager
     CodeTemplates = <>
     SubAnalyzers = <>
     SampleText.Strings = (
-      'Index: components/chmhelp/lhelp/lhelp.ico'
-      
-        '================================================================' +
-        '==='
-      'Cannot display: file marked as a binary type.'
-      'svn:mime-type = image/icon'
       'Index: ide/filename'
       'some text'
       'simple text'
@@ -24218,8 +23584,7 @@ object SyntaxManager: TSyntaxManager
       'line'
       'context'
       'default'
-      'index'
-      'unknown')
+      'index')
     Extentions = 'diff dif patch'
     LexerName = 'Diff'
     SkipSpaces = False
@@ -26403,6 +25768,910 @@ object SyntaxManager: TSyntaxManager
       
         'http://www.subdude-site.com/WebPages_Local/RefInfo/Computer/TclT' +
         'k/others_tcltkCode/others_tcltkCode.htm')
+    LineComment = '# '
+    Charset = DEFAULT_CHARSET
+  end
+  object SyntAnal9: TLibSyntAnalyzer
+    Formats = <
+      item
+        DisplayName = 'Default'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 15266806
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+        BgColor = 2368548
+        FormatType = ftCustomFont
+      end
+      item
+        DisplayName = 'Current_Line'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clNone
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+        BgColor = 4601382
+      end
+      item
+        DisplayName = 'Comment'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 11515315
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Identifier'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = clNone
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'String'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 5563541
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Number'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 7635158
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = [fsBold]
+      end
+      item
+        DisplayName = 'Sqaurebracket'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 12043460
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Key_Events'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 5563541
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Vars1'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 5563541
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Vars2'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 15910538
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Vars3'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 8697523
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Defines'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 9085849
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Statements'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 9813727
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'State'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 13608378
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = [fsBold]
+      end
+      item
+        DisplayName = 'Sub'
+        Font.Charset = ANSI_CHARSET
+        Font.Color = 10931878
+        Font.Height = -13
+        Font.Name = 'Consolas'
+        Font.Style = [fsBold]
+      end
+      item
+        DisplayName = 'ConnectionObject'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 3697138
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'ConnectionMethods'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 8560884
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'STBObject'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 15259748
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'STBMethods'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 11971151
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'OSDObject'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 8449010
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'OSDMethods'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 6666687
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end>
+    TokenRules = <
+      item
+        DisplayName = 'comment'
+        StyleName = 'Comment'
+        TokenType = 1
+        Expression = '\#.*'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'string'
+        StyleName = 'String'
+        TokenType = 4
+        Expression = '".*?("|$)'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'state'
+        TokenType = 6
+        Expression = '^state\s+?'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'sub'
+        TokenType = 8
+        Expression = '^sub\s+'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'event'
+        TokenType = 7
+        Expression = '(?<!\.)event\s+'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'end'
+        TokenType = 9
+        Expression = '(?<!\.)(?<!\!)end\s+?'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'squarebracket'
+        StyleName = 'Sqaurebracket'
+        TokenType = 3
+        Expression = '[\[\]]'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'connection_ob'
+        StyleName = 'ConnectionObject'
+        TokenType = 2
+        Expression = 'connection'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'connection_meth'
+        TokenType = 2
+        Expression = '(?<=connection\.)[\w\.]+'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'stb_object'
+        Enabled = False
+        StyleName = 'STBObject'
+        TokenType = 2
+        Expression = 'stb(?=\.)'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'osd_object'
+        Enabled = False
+        StyleName = 'OSDObject'
+        TokenType = 2
+        Expression = 'osd(?=\.)'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'identifier'
+        TokenType = 2
+        Expression = '[a-z_]\w*'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'dot'
+        TokenType = 10
+        Expression = '[\.]'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'symbol'
+        Expression = '[;:=<>/\?\(\)]'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'number'
+        StyleName = 'Number'
+        TokenType = 5
+        Expression = '\d+'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end>
+    BlockRules = <
+      item
+        DisplayName = 'defines'
+        StyleName = 'Defines'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'define')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'vars1'
+        StyleName = 'Vars1'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'string')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpBound
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'vars2'
+        StyleName = 'Vars2'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'integer'
+              'xmlElement')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'vars3'
+        StyleName = 'Vars3'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'timecode')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'statements'
+        StyleName = 'Statements'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'else'
+              'elseif'
+              'endif'
+              'if')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'key_events'
+        StyleName = 'Key_Events'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'Key_0'
+              'Key_084'
+              'Key_085'
+              'Key_1'
+              'Key_2'
+              'Key_222'
+              'Key_3'
+              'Key_4'
+              'Key_5'
+              'Key_6'
+              'Key_7'
+              'Key_8'
+              'Key_9'
+              'Key_Back'
+              'Key_Blue'
+              'Key_Channel_Down'
+              'Key_Channel_Up'
+              'Key_Del'
+              'Key_Digit'
+              'Key_Down'
+              'Key_Epg'
+              'Key_Folder'
+              'Key_Fp_Down'
+              'Key_Fp_Esc'
+              'Key_Fp_Ok'
+              'Key_Fp_Power'
+              'Key_Fp_Tvr'
+              'Key_Fp_Up'
+              'Key_Green'
+              'Key_Help'
+              'Key_Info'
+              'Key_Left'
+              'Key_Mail'
+              'Key_Menu'
+              'Key_Mute'
+              'Key_Ocilion'
+              'Key_Ok'
+              'Key_OnOff'
+              'Key_Pause'
+              'Key_Play'
+              'Key_Ratio'
+              'Key_Rec_FastFwd'
+              'Key_Rec_FastRev'
+              'Key_Rec_Pause'
+              'Key_Rec_SlowFwd'
+              'Key_Rec_SlowRev'
+              'Key_Rec_Stop'
+              'Key_Record'
+              'Key_Red'
+              'Key_Right'
+              'Key_Stop'
+              'Key_Tv'
+              'Key_Txt'
+              'Key_Up Repeat_Key_Up'
+              'Key_Vol_Down'
+              'Key_Vol_Up'
+              'Key_WWW'
+              'Key_Yellow'
+              'Repeat_Key_0'
+              'Repeat_Key_1'
+              'Repeat_Key_2'
+              'Repeat_Key_3'
+              'Repeat_Key_4'
+              'Repeat_Key_5'
+              'Repeat_Key_6'
+              'Repeat_Key_7'
+              'Repeat_Key_8'
+              'Repeat_Key_9'
+              'Repeat_Key_Channel_Down'
+              'Repeat_Key_Channel_Up'
+              'Repeat_Key_Del'
+              'Repeat_Key_Down'
+              'Repeat_Key_OnOff'
+              'Repeat_Key_Rec_FastFwd'
+              'Repeat_Key_Rec_FastRev'
+              'Repeat_Key_Rec_SlowFwd'
+              'Repeat_Key_Rec_SlowRev'
+              'Repeat_Key_Txt'
+              'Repeat_Key_Vol_Down'
+              'Repeat_Key_Vol_Up')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'gostate'
+        StyleName = 'State'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'gostate')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'gosub'
+        StyleName = 'Sub'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'gosub')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'connection_methods'
+        StyleName = 'ConnectionMethods'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'fte.counter.receive.bytes'
+              'fte.counter.receive.packets'
+              'fte.counter.send.bytes'
+              'fte.counter.send.free'
+              'fte.counter.send.pkts'
+              'fte.mtu'
+              'fte.rcvspeed'
+              'fte.sendspeed'
+              'fte.setsendspeed'
+              'hostip'
+              'id'
+              'inactive'
+              'ip'
+              'laststate'
+              'online'
+              'port'
+              'script'
+              'state'
+              'type')
+            TokenTypes = 4
+            IgnoreCase = True
+          end
+          item
+            TokenTypes = 1024
+            IgnoreCase = True
+          end
+          item
+            TagList.Strings = (
+              'connection')
+            TokenTypes = 4
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'stb_methods'
+        StyleName = 'STBMethods'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'balance'
+              'firmware'
+              'hwrelease'
+              'hwversion'
+              'keymap.clear'
+              'keymap.clear.all'
+              'keymap.load'
+              'keymap.load.default'
+              'led'
+              'mapkey'
+              'model'
+              'mpegversion'
+              'mute'
+              'prepareratio'
+              'reboot'
+              'serial'
+              'setattribute'
+              'standby'
+              'test'
+              'vendor'
+              'version'
+              'volume2')
+            TokenTypes = 4
+            IgnoreCase = True
+          end
+          item
+            TokenTypes = 1024
+          end
+          item
+            TagList.Strings = (
+              'stb')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'osd_methods'
+        StyleName = 'OSDMethods'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'switch')
+            TokenTypes = 4
+            IgnoreCase = True
+          end
+          item
+            TokenTypes = 1024
+          end
+          item
+            TagList.Strings = (
+              'alpha'
+              'animation.alpha'
+              'animation.bgcolor'
+              'animation.clear'
+              'animation.create'
+              'animation.darkness'
+              'animation.direction'
+              'animation.image'
+              'animation.limit'
+              'animation.pos'
+              'animation.select'
+              'animation.speed'
+              'animation.start'
+              'animation.stop'
+              'animation.transpmode'
+              'buffer'
+              'buffer.clear'
+              'buffer.clear.all'
+              'buffer.copy'
+              'buffer.copypos'
+              'buffer.create'
+              'buffer.select'
+              'clear'
+              'darkness'
+              'date.ddmmyyyy'
+              'font.create'
+              'image'
+              'image.capture'
+              'image.clear'
+              'image.clear.all'
+              'image.create'
+              'image.draw'
+              'image.draw.ext'
+              'image.ext'
+              'image.find'
+              'integer'
+              'line'
+              'off'
+              'on'
+              'ready'
+              'rect'
+              'rect.ext'
+              'reset'
+              'resetfont'
+              'scroll'
+              'scroll.buffer'
+              'scroll.clear'
+              'scroll.clear.all'
+              'scroll.create'
+              'scroll.direction'
+              'scroll.pos'
+              'scroll.speed'
+              'scroll.start'
+              'scroll.stop'
+              'setalign'
+              'setalphawindow'
+              'setbgcolor'
+              'setfgcolor'
+              'setfont'
+              'setfontcharset'
+              'setfontfixedwidth'
+              'setfontscalex'
+              'setfontscaley'
+              'setfontsize'
+              'setfontspace'
+              'setpos'
+              'setstringlimit'
+              'settranspmode'
+              'setvideowindow'
+              'softshow'
+              'string'
+              'time.hhmm'
+              'time.hhmmss'
+              'zoom'
+              'zoomsteps')
+            TokenTypes = 4
+            IgnoreCase = True
+          end
+          item
+            TokenTypes = 1024
+            IgnoreCase = True
+          end
+          item
+            TagList.Strings = (
+              'osd')
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'state start'
+        StyleName = 'State'
+        ConditionList = <
+          item
+            TokenTypes = 64
+            IgnoreCase = True
+          end>
+        BlockEnd = 'end state|event|sub'
+        DisplayInTree = False
+        DynHighlight = dhBound
+        HighlightPos = cpAny
+        DrawStaple = True
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'start event'
+        StyleName = 'Vars2'
+        ConditionList = <
+          item
+            TokenTypes = 128
+            IgnoreCase = True
+          end>
+        BlockEnd = 'end state|event|sub'
+        DisplayInTree = False
+        DynHighlight = dhBound
+        HighlightPos = cpAny
+        DrawStaple = True
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'start sub'
+        StyleName = 'Sub'
+        ConditionList = <
+          item
+            TokenTypes = 256
+            IgnoreCase = True
+          end>
+        BlockEnd = 'end state|event|sub'
+        DisplayInTree = False
+        DynHighlight = dhBound
+        HighlightPos = cpAny
+        DrawStaple = True
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'end state|event|sub'
+        BlockType = btRangeEnd
+        ConditionList = <
+          item
+            TokenTypes = 512
+            IgnoreCase = True
+          end>
+        DisplayInTree = False
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'start state list'
+        Enabled = False
+        ConditionList = <
+          item
+            TokenTypes = 64
+            IgnoreCase = True
+          end>
+        BlockEnd = 'end state|sub list'
+        NameFmt = '%s0%s-1'
+        GroupFmt = 'states'
+        HighlightPos = cpAny
+        TreeItemImage = 4
+        TreeGroupImage = 4
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'start sub list'
+        ConditionList = <
+          item
+            TokenTypes = 256
+            IgnoreCase = True
+          end>
+        BlockEnd = 'end state|sub list'
+        NameFmt = '%s0%s-1'
+        GroupFmt = 'subs'
+        HighlightPos = cpAny
+        TreeItemImage = 6
+        TreeGroupImage = 6
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'end state|sub list'
+        BlockType = btRangeEnd
+        ConditionList = <
+          item
+            TokenTypes = 512
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end>
+    CodeTemplates = <>
+    SubAnalyzers = <>
+    SampleText.Strings = (
+      ''
+      'connection.hostip    '
+      'connection.fte.counter.send.pkts'
+      'connection.fteeeeeesddddddddddddd   '
+      '   '
+      'state aa'
+      '  ddd'
+      'end '
+      ''
+      
+        '# ==============================================================' +
+        '=========================================='
+      '# state: Default'
+      
+        '# ==============================================================' +
+        '=========================================='
+      'state default'
+      ''
+      '  # event Key_Menu'
+      '  event Key_Menu'
+      '    integer li_switchOnOsd'
+      ''
+      '    gosub checkSmartPause'
+      '    if oi_enableSmartPauseMessage = 1'
+      '      gostate "TestState"'
+      '    endif    '
+      '    '
+      '    gosub RenderTextBox'
+      ''
+      '    object1.start custom.end'
+      '    '
+      '    osd.setpos 0, 98'
+      '  '#9'osd.image.draw "image1.jpg"'
+      ''
+      '  '#9'osd.setbgcolor 9, 47, 73'
+      '  '#9'osd.setpos 0, 0, 767, 720'
+      '  '#9'osd.alpha 230'
+      '  '#9'osd.rect 0, 1'
+      ''
+      '  '#9'osd.setpos 755, 0'
+      '  '#9'osd.image.draw.ext "image2.png"'
+      '    '
+      '    connection.end'
+      ''
+      '    hostip = 1'
+      '    connection.hostip'
+      '    value.hostip'
+      '    '
+      '    if connection.state = "XXX"'
+      '      li_switchOnOsd = 1'
+      '    elseif connection.state = "YYY"'
+      '      li_switchOnOsd = 1'
+      '    elseif connection.state = "ZZZ"'
+      '      li_switchOnOsd = 1'
+      '    endif'
+      '    '
+      '    stb.vendor = "test"'
+      '  end # end of event open'
+      ''
+      
+        '  # ------------------------------------------------------------' +
+        '------------------------------------------'
+      '  event Key_OnOff'
+      '    integer ei_var1'
+      ''
+      '    ei_var1 = 1'
+      '    if ei_var1'
+      '      gosub TestSub'
+      '    endif'
+      '  end'
+      ''
+      
+        '  # ------------------------------------------------------------' +
+        '------------------------------------------'
+      '  event Key_Vol_Up'
+      '    script.event.filter.clear'
+      '    gosub HandleTest'
+      '  end'
+      'end'
+      '  '
+      
+        '# --------------------------------------------------------------' +
+        '------------------------------------------'
+      '# sub: HandleTest'
+      
+        '# --------------------------------------------------------------' +
+        '------------------------------------------'
+      'sub HandleTest'
+      '  integer ei_test'
+      '  '
+      '  ei_test = 0'
+      'end'
+      ''
+      
+        '# ==============================================================' +
+        '=========================================='
+      '# state: TestState'
+      
+        '# ==============================================================' +
+        '=========================================='
+      'state TestState'
+      ''
+      '  event open'
+      '  '
+      '  end'
+      'end')
+    TokenTypeNames.Strings = (
+      'Unknown'
+      'Comment'
+      'Identifier'
+      'Symbol'
+      'String'
+      'Number'
+      'State'
+      'Event'
+      'Sub'
+      'End'
+      'Dot')
+    CurrentLineStyle = 'Current_Line'
+    DefaultStyleName = 'Default'
+    Extentions = 'tvs'
+    LexerName = 'TVScript'
+    Notes.Strings = (
+      '')
     LineComment = '# '
     Charset = DEFAULT_CHARSET
   end

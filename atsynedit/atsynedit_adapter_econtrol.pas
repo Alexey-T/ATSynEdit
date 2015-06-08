@@ -38,6 +38,20 @@ type
 
 implementation
 
+const
+  cBorderEc: array[TBorderLineType] of  TATLineBorderStyle = (
+    cBorderNone,
+    cBorderLine,
+    cBorderLineDot,
+    cBorderLineDot,
+    cBorderLineDot,
+    cBorderLineDot,
+    cBorderLine2px,
+    cBorderLine2px,
+    cBorderWave,
+    cBorderLine2px
+    );
+
 { TATAdapterEControl }
 
 procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
@@ -157,6 +171,11 @@ begin
         part.FontItalic:= fsItalic in tokenStyle.Font.Style;
         part.FontStrikeOut:= fsStrikeOut in tokenStyle.Font.Style;
       end;
+      part.ColorBorder:= tokenStyle.BorderColorBottom;
+      part.BorderUp:= cBorderEc[tokenStyle.BorderTypeTop];
+      part.BorderDown:= cBorderEc[tokenStyle.BorderTypeBottom];
+      part.BorderLeft:= cBorderEc[tokenStyle.BorderTypeLeft];
+      part.BorderRight:= cBorderEc[tokenStyle.BorderTypeRight];
     end;
 
     //add missing part
