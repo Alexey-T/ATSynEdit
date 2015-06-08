@@ -24,7 +24,7 @@ type
     AnClient: TClientSyntAnalyzer;
     Buffer: TATStringBuffer;
     procedure DoCalcParts(var AParts: TATLineParts; ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
-    function GetTokenColorBG(APos1, APos2: integer; ADefColor: TColor): TColor;
+    function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure UpdateData;
   public
     constructor Create; virtual;
@@ -55,7 +55,7 @@ begin
   DoCalcParts(AParts, ALineIndex, ACharIndex-1, ALineLen, Ed.Colors.TextFont, Ed.Colors.TextBG);
 end;
 
-function TATAdapterEControl.GetTokenColorBG(APos1, APos2: integer; ADefColor: TColor): TColor;
+function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
 var
   i: integer;
   R: TSubLexerRange;
@@ -65,8 +65,8 @@ begin
   for i:= 0 to AnClient.SubLexerRangeCount-1 do
   begin
     R:= AnClient.SubLexerRanges[i];
-    if ((APos1>R.CondStartPos) or (R.Rule.IncludeBounds and (APos1=R.CondStartPos))) and
-       ((APos2<R.CondEndPos) or (R.Rule.IncludeBounds and (APos2=R.CondEndPos))) then
+    if ((APos>R.CondStartPos) or (R.Rule.IncludeBounds and (APos=R.CondStartPos))) and
+       (APos<R.CondEndPos) then
     begin
       Style:= R.Rule.Style;
       if Assigned(Style) then
@@ -82,17 +82,18 @@ procedure TATAdapterEControl.DoCalcParts(var AParts: TATLineParts;
   ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
 var
   partindex: integer;
-  tokenLastOffset: integer;
   //
   procedure AddMissingPart(AOffset, ALen: integer);
   var
     part: TATLinePart;
+    strpos: integer;
   begin
+    strpos:= Buffer.CaretToStr(Point(AX+AOffset, ALine));
     FillChar(part{%H-}, SizeOf(part), 0);
     part.Offset:= AOffset;
     part.Len:= ALen;
     part.ColorFont:= AColorFont;
-    part.ColorBG:= GetTokenColorBG(tokenLastOffset, tokenLastOffset+1, AColorBG);
+    part.ColorBG:= GetTokenColorBG(strpos, AColorBG);
     Move(part, AParts[partindex], SizeOf(part));
     Inc(partindex);
   end;
@@ -104,8 +105,8 @@ var
   tokenStyle: TSyntaxFormat;
   part: TATLinePart;
 begin
-  tokenLastOffset:= 0;
   partindex:= 0;
+  FillChar(part{%H-}, SizeOf(part), 0);
 
   startindex:= AnClient.PriorTokenAt(Buffer.CaretToStr(Point(0, ALine)));
   if startindex<0 then Exit;
@@ -115,7 +116,6 @@ begin
     token:= AnClient.Tags[i];
     tokenStart:= Buffer.StrToCaret(token.StartPos);
     tokenEnd:= Buffer.StrToCaret(token.EndPos);
-    tokenLastOffset:= token.EndPos;
 
     Dec(tokenStart.x, AX);
     Dec(tokenEnd.x, AX);
@@ -126,39 +126,36 @@ begin
     if (tokenStart.y>=ALine) and (tokenStart.x>=ALen) then Continue;
 
     FillChar(part{%H-}, SizeOf(part), 0);
-    with part do
+    if (tokenStart.y<ALine) or (tokenStart.x<0) then
+      part.Offset:= 0
+    else
+      part.Offset:= tokenStart.X;
+
+    if (tokenEnd.y>ALine) or (tokenEnd.x>=ALen) then
+      part.Len:= ALen-part.Offset
+    else
+      part.Len:= tokenEnd.X-part.Offset;
+
+    part.ColorFont:= AColorFont;
+    part.ColorBG:= GetTokenColorBG(token.StartPos, AColorBG);
+
+    tokenStyle:= token.Style;
+    if tokenStyle<>nil then
     begin
-      if (tokenStart.y<ALine) or (tokenStart.x<0) then
-        Offset:= 0
-      else
-        Offset:= tokenStart.X;
-
-      if (tokenEnd.y>ALine) or (tokenEnd.x>=ALen) then
-        Len:= ALen-Offset
-      else
-        Len:= tokenEnd.X-Offset;
-
-      ColorFont:= AColorFont;
-      ColorBG:= GetTokenColorBG(token.StartPos, token.EndPos, AColorBG);
-
-      tokenStyle:= token.Style;
-      if tokenStyle<>nil then
+      if tokenStyle.FormatType in [ftCustomFont, ftFontAttr, ftColor] then
       begin
-        if tokenStyle.FormatType in [ftCustomFont, ftFontAttr, ftColor] then
-        begin
-          ColorFont:= tokenStyle.Font.Color;
-        end;
-        if tokenStyle.FormatType in [ftCustomFont, ftFontAttr, ftColor, ftBackGround] then
-        begin
-          if tokenStyle.BgColor<>clNone then
-            ColorBG:= tokenStyle.BgColor;
-        end;
-        if tokenStyle.FormatType in [ftCustomFont, ftFontAttr] then
-        begin
-          FontBold:= fsBold in tokenStyle.Font.Style;
-          FontItalic:= fsItalic in tokenStyle.Font.Style;
-          FontStrikeOut:= fsStrikeOut in tokenStyle.Font.Style;
-        end;
+        part.ColorFont:= tokenStyle.Font.Color;
+      end;
+      if tokenStyle.FormatType in [ftCustomFont, ftFontAttr, ftColor, ftBackGround] then
+      begin
+        if tokenStyle.BgColor<>clNone then
+          part.ColorBG:= tokenStyle.BgColor;
+      end;
+      if tokenStyle.FormatType in [ftCustomFont, ftFontAttr] then
+      begin
+        part.FontBold:= fsBold in tokenStyle.Font.Style;
+        part.FontItalic:= fsItalic in tokenStyle.Font.Style;
+        part.FontStrikeOut:= fsStrikeOut in tokenStyle.Font.Style;
       end;
     end;
 
