@@ -14308,8 +14308,7 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = [fsBold]
-        BorderTypeBottom = blSolid
-        BorderColorBottom = clRed
+        BorderColorBottom = clNavy
       end
       item
         DisplayName = 'String'
@@ -14318,7 +14317,6 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
-        BorderTypeBottom = blDot
         BorderColorBottom = clGreen
       end
       item
@@ -14328,7 +14326,6 @@ object SyntaxManager: TSyntaxManager
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
-        BorderTypeBottom = blWavyLine
         BorderColorBottom = clOlive
       end
       item

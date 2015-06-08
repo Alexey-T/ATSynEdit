@@ -39,7 +39,7 @@ type
 implementation
 
 const
-  cBorderEc: array[TBorderLineType] of  TATLineBorderStyle = (
+  cBorderEc: array[TBorderLineType] of TATLineBorderStyle = (
     cBorderNone,
     cBorderLine,
     cBorderLineDot,
@@ -49,7 +49,7 @@ const
     cBorderLine2px,
     cBorderLine2px,
     cBorderWave,
-    cBorderLine2px
+    cBorderDotted
     );
 
 { TATAdapterEControl }

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ShellCtrls, ComCtrls,
+  StdCtrls, ShellCtrls,
   ATSynEdit,
   ATStringProc,
   ATSynEdit_Adapter_EControl,
