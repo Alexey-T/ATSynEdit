@@ -6,8 +6,7 @@ interface
 
 uses
   Classes, SysUtils,
-  ATSynEdit_CanvasProc,
-  ATSynEdit_WrapInfo;
+  ATSynEdit_CanvasProc;
 
 type
   TATSynEdit_AdapterOfHilite = class(TObject)

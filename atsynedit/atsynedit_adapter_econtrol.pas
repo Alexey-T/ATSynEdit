@@ -8,12 +8,10 @@ uses
   Classes, SysUtils, Graphics, Dialogs,
   ATSynEdit,
   ATSynEdit_CanvasProc,
-  ATSynEdit_WrapInfo,
   ATSynEdit_Adapters,
   ATStringProc,
   ATStringProc_TextBuffer,
-  ecSyntAnal,
-  ecLists;
+  ecSyntAnal;
 
 type
   { TATAdapterEControl }

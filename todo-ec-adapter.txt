@@ -1,3 +1,5 @@
 
--slow-slow-slow edit on 100K, pascal
 -fix regex with trail eol
+-onchange event: wrk
+-slow-slow-slow edit on 100K, pascal
+-keep +- state (fold) on edit
