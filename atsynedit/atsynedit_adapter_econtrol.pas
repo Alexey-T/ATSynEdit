@@ -259,6 +259,8 @@ begin
   for i:= 0 to AnClient.RangeCount-1 do
   begin
     R:= AnClient.Ranges[i];
+    if R.StartIdx<0 then Continue;
+    if R.EndIdx<0 then Continue;
     P1:= Buffer.StrToCaret(AnClient.Tags[R.StartIdx].StartPos);
     P2:= Buffer.StrToCaret(AnClient.Tags[R.EndIdx].StartPos);
     Ed.Fold.Add(P1.X+1, P1.Y, P2.Y);

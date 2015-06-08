@@ -1,10 +1,10 @@
 object fmMain: TfmMain
   Left = 214
-  Height = 370
+  Height = 438
   Top = 380
   Width = 770
   Caption = 'Demo'
-  ClientHeight = 370
+  ClientHeight = 438
   ClientWidth = 770
   OnCreate = FormCreate
   OnShow = FormShow
@@ -12,19 +12,20 @@ object fmMain: TfmMain
   LCLVersion = '1.5'
   object Panel1: TPanel
     Left = 0
-    Height = 34
-    Top = 336
+    Height = 114
+    Top = 324
     Width = 770
     Align = alBottom
-    ClientHeight = 34
+    BevelOuter = bvNone
+    ClientHeight = 114
     ClientWidth = 770
     TabOrder = 0
     object chkWrap: TCheckBox
       Left = 13
       Height = 19
       Top = 8
-      Width = 46
-      Caption = 'wrap'
+      Width = 76
+      Caption = 'word wrap'
       Checked = True
       OnChange = chkWrapChange
       State = cbChecked
@@ -34,28 +35,23 @@ object fmMain: TfmMain
       Left = 123
       Height = 23
       Top = 4
-      Width = 189
+      Width = 173
       DropDownCount = 24
       ItemHeight = 15
       OnChange = edLexerChange
       Style = csDropDownList
       TabOrder = 1
     end
-    object edFiles: TComboBox
-      Left = 320
-      Height = 23
+    object files: TShellListView
+      Left = 304
+      Height = 108
       Top = 4
-      Width = 189
-      DropDownCount = 24
-      ItemHeight = 15
-      Items.Strings = (
-        'test.pas'
-        'test-mid.pas'
-        'test-big.pas'
-      )
-      OnChange = edFilesChange
-      Style = csDropDownList
+      Width = 306
+      Color = clDefault
       TabOrder = 2
+      ViewStyle = vsList
+      OnClick = filesClick
+      ObjectTypes = [otNonFolders]
     end
   end
 end

@@ -6,11 +6,12 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls,
+  StdCtrls, ShellCtrls, ComCtrls,
   ATSynEdit,
   ATStringProc,
   ATSynEdit_Adapter_EControl,
-  ecSyntAnal;
+  ecSyntAnal,
+  proc_lexer;
 
 type
   { TfmMain }
@@ -18,11 +19,11 @@ type
   TfmMain = class(TForm)
     chkWrap: TCheckBox;
     edLexer: TComboBox;
-    edFiles: TComboBox;
+    files: TShellListView;
     Panel1: TPanel;
     procedure chkWrapChange(Sender: TObject);
     procedure edLexerChange(Sender: TObject);
-    procedure edFilesChange(Sender: TObject);
+    procedure filesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
@@ -30,7 +31,7 @@ type
     ed: TATSynEdit;
     filedir: string;
     procedure DoLexer(const aname: string);
-    procedure DoOpen(const fname: string);
+    procedure DoOpen(const fn: string);
     procedure UpdateLexList;
   public
     { public declarations }
@@ -65,16 +66,24 @@ begin
   end;
 end;
 
-procedure TfmMain.DoOpen(const fname: string);
+procedure TfmMain.DoOpen(const fn: string);
+var
+  an: TSyntAnalyzer;
 begin
-  ed.LoadFromFile(fname);
+  adapter.SetLexer(nil);
+  ed.LoadFromFile(fn);
+  an:= DoFindLexerForFilename(manager, fn);
+  adapter.SetLexer(an);
+
+  edLexer.ItemIndex:= edLexer.Items.IndexOf(an.LexerName);
+  ed.SetFocus;
 end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
 var
   fname_lxl: string;
 begin
-  filedir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'\test_files\syntax\';
+  filedir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'\test_syntax_files\';
   fname_lxl:= ExtractFilePath(Application.ExeName)+'lexlib.lxl';
 
   manager:= TSyntaxManager.Create(Self);
@@ -95,12 +104,7 @@ end;
 
 procedure TfmMain.FormShow(Sender: TObject);
 begin
-  edFiles.ItemIndex:= 0;
-  edFiles.OnChange(nil);
-  Application.ProcessMessages;
-
-  edLexer.ItemIndex:= edLexer.Items.IndexOf('Pascal');
-  edLexer.OnChange(nil);
+  files.Root:= filedir;
 end;
 
 procedure TfmMain.chkWrapChange(Sender: TObject);
@@ -122,9 +126,14 @@ begin
   DoLexer(edLexer.Text);
 end;
 
-procedure TfmMain.edFilesChange(Sender: TObject);
+procedure TfmMain.filesClick(Sender: TObject);
+var
+  fn: string;
 begin
-  DoOpen(filedir+edFiles.Text);
+  if files.Selected=nil then exit;
+  fn:= files.GetPathFromItem(files.Selected);
+  if FileExistsUTF8(fn) then
+    DoOpen(fn);
 end;
 
 end.

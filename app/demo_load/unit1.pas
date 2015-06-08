@@ -42,6 +42,7 @@ begin
   ed.Parent:= Panel1;
   ed.Align:= alClient;
   ed.Font.Name:= 'Courier New';
+  ed.OptUnprintedVisible:= false;
 
   fDir:= ExtractFilePath(Application.Exename)+'..\..\test_files';
 end;
@@ -58,11 +59,7 @@ begin
   s:= List.GetPathFromItem(List.Selected);
   if not FileExistsUTF8(s) then Exit;
 
-  ed.BeginUpdate;
-  Application.ProcessMessages;
   ed.LoadFromFile(s);
-  ed.EndUpdate;
-
   ed.SetFocus;
   Caption:= 'App - '+ExtractFileName(s);
 end;

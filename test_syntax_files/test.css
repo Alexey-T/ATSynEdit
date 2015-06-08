@@ -1,0 +1,9 @@
+BODY {background: #FFFFFF}
+A:link {color: #80FF00; background-image: url(img.gif); }
+A:visited {
+  color: #FF00FF; font-size: 1.2em
+}
+h1, h2, h3 {
+  font-size: 24pt; font-family: 'arial', 'Tahoma';
+}
+/* comment */
