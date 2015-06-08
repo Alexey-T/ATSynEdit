@@ -1,11 +1,11 @@
 object fmMain: TfmMain
-  Left = 214
+  Left = 382
   Height = 457
-  Top = 380
-  Width = 770
+  Top = 394
+  Width = 777
   Caption = 'Demo'
   ClientHeight = 457
-  ClientWidth = 770
+  ClientWidth = 777
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
@@ -14,11 +14,11 @@ object fmMain: TfmMain
     Left = 0
     Height = 154
     Top = 303
-    Width = 770
+    Width = 777
     Align = alBottom
     BevelOuter = bvNone
     ClientHeight = 154
-    ClientWidth = 770
+    ClientWidth = 777
     TabOrder = 0
     object chkWrap: TCheckBox
       Left = 13
@@ -49,6 +49,9 @@ object fmMain: TfmMain
       Width = 306
       Anchors = [akTop, akLeft, akBottom]
       Color = clDefault
+      HideSelection = False
+      ReadOnly = True
+      SortType = stText
       TabOrder = 2
       ViewStyle = vsList
       OnClick = filesClick
