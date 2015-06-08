@@ -684,6 +684,7 @@ type
     procedure UpdateIncorrectCaretPositions;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
+    property Fold: TATSynRanges read FFold;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified;
     property AdapterOfHilite: TATSynEdit_AdapterOfHilite read FAdapterOfHilite write FAdapterOfHilite;

@@ -12,7 +12,8 @@ uses
   ATSynEdit_Adapters,
   ATStringProc,
   ATStringProc_TextBuffer,
-  ecSyntAnal;
+  ecSyntAnal,
+  ecLists;
 
 type
   { TATAdapterEControl }
@@ -26,6 +27,7 @@ type
     procedure DoCalcParts(var AParts: TATLineParts; ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure UpdateData;
+    procedure UpdateFold;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -224,25 +226,45 @@ end;
 
 procedure TATAdapterEControl.UpdateData;
 var
-  list_len: TList;
+  Lens: TList;
   i: integer;
 begin
   if not Assigned(Ed) then Exit;
-  if not Assigned(An) then Exit;
   if not Assigned(AnClient) then Exit;
 
-  list_len:= TList.Create;
+  Lens:= TList.Create;
   try
-    list_len.Clear;
+    Lens.Clear;
     for i:= 0 to Ed.Strings.Count-1 do
-      list_len.Add(pointer(Length(Ed.Strings.Lines[i])));
-    Buffer.Setup(Ed.Strings.TextString, list_len, 1);
+      Lens.Add(pointer(Length(Ed.Strings.Lines[i])));
+    Buffer.Setup(Ed.Strings.TextString, Lens, 1);
   finally
-    FreeAndNil(list_len);
+    FreeAndNil(Lens);
   end;
 
   AnClient.Clear;
   AnClient.Analyze;
+
+  UpdateFold;
+end;
+
+procedure TATAdapterEControl.UpdateFold;
+var
+  R: TTextRange;
+  P1, P2: TPoint;
+  i: integer;
+begin
+  if not Assigned(Ed) then Exit;
+  if not Assigned(AnClient) then Exit;
+
+  Ed.Fold.Clear;
+  for i:= 0 to AnClient.RangeCount-1 do
+  begin
+    R:= AnClient.Ranges[i];
+    P1:= Buffer.StrToCaret(AnClient.Tags[R.StartIdx].StartPos);
+    P2:= Buffer.StrToCaret(AnClient.Tags[R.EndIdx].StartPos);
+    Ed.Fold.Add(P1.X+1, P1.Y, P2.Y);
+  end;
 end;
 
 end.
