@@ -1613,13 +1613,6 @@ begin
         Inc(CurrPointText.X, Trunc(NOutputSpacesSkipped*ACharSize.X));
       end;
 
-      DoPaintSelectedLineBG(C, ACharSize, ARect,
-        CurrPoint,
-        CurrPointText,
-        NLinesIndex,
-        LineEolSelected,
-        AScrollHorz);
-
       DoPaintLineIndent(C, ARect, ACharSize,
         NCoordTop, WrapItem.NIndent,
         IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
@@ -1631,13 +1624,21 @@ begin
         IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
         NColorAfterEol);
 
-      //adapter may return ColorAfterEol, use it
+      //adapter may return ColorAfterEol, paint it
       if FOptShowSelFull then
         if NColorAfterEol<>clNone then
         begin
           C.Brush.Color:= NColorAfterEol;
           C.FillRect(CurrPointText.X, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
         end;
+
+      //paint selection bg, after applying ColorAfterEol
+      DoPaintSelectedLineBG(C, ACharSize, ARect,
+        CurrPoint,
+        CurrPointText,
+        NLinesIndex,
+        LineEolSelected,
+        AScrollHorz);
 
       if AWithGutter then
         Event:= FOnDrawLine

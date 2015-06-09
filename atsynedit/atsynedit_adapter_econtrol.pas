@@ -205,16 +205,16 @@ begin
     if partindex>=High(AParts) then Exit;
   end;
 
+  //add ending missing part
   if part.Len>0 then
   begin
-    //add ending missing part
     mustOffset:= part.Offset+part.Len;
     if mustOffset<ALen then
       AddMissingPart(mustOffset, ALen-mustOffset);
-
-    mustOffset:= Buffer.CaretToStr(Point(AX+ALen, ALine));
-    AColorAfterEol:= GetTokenColorBG(mustOffset, AColorAfterEol);
   end;
+
+  mustOffset:= Buffer.CaretToStr(Point(AX+ALen, ALine));
+  AColorAfterEol:= GetTokenColorBG(mustOffset, AColorAfterEol);
 end;
 
 constructor TATAdapterEControl.Create;
