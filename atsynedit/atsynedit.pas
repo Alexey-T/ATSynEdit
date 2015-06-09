@@ -3840,7 +3840,7 @@ end;
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
   ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
 var
-  nLine1, nLine2, nIndent: integer;
+  nLineFrom, nLineTo, nIndent: integer;
   Indexes: TATIntArray;
   Range: TATSynRange;
   P1, P2: TPoint;
@@ -3849,9 +3849,9 @@ var
   NColor: TColor;
 begin
   if FOptShowStapleStyle=cBorderNone then Exit;
-  nLine1:= LineVisibleFirst;
-  nLine2:= LineVisibleLast;
-  Indexes:= FFold.FindRangesContainingLines(nLine1, nLine2, nil,
+  nLineFrom:= LineVisibleFirst;
+  nLineTo:= LineVisibleLast;
+  Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, nil,
     false{OnlyFolded}, false{TopLevelOnly}, false{AllLines});
 
   //c.font.color:= clblue;
@@ -3863,10 +3863,13 @@ begin
     if not Range.WithStaple then Continue;
     if Range.Folded then Continue;
 
+    if IsLineFolded(Range.Y, true) then Continue;
+    if IsLineFolded(Range.Y2, true) then Continue;
+
     P1:= CaretPosToClientPos(Point(0, Range.Y));
     P2:= CaretPosToClientPos(Point(0, Range.Y2));
-    if (P1.X<0) or (P1.Y<0) then Continue;
-    if (P2.X<0) or (P2.Y<0) then Continue;
+    if (P1.Y<0) and (Range.Y>=nLineFrom) then Continue;
+    if (P2.Y<0) and (Range.Y2>=nLineFrom) then Continue;
 
     NIndent:= SGetIndentExpanded(Strings.Lines[Range.Y], FTabSize);
     Inc(P1.X, NIndent*ACharSize.X);
