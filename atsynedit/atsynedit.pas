@@ -267,7 +267,8 @@ type
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
-    ALineIndex, ACharIndex, ALineLen: integer) of object;
+    ALineIndex, ACharIndex, ALineLen: integer;
+    var AColorAfterEol: TColor) of object;
 
 
 type
@@ -494,8 +495,9 @@ type
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
-    procedure DoCalcLineHilite(const AItem: TATSynWrapItem; var AParts: TATLineParts;
-      ACharsSkipped, ACharsMax: integer; AColorBG: TColor);
+    procedure DoCalcLineHilite(const AItem: TATSynWrapItem;
+      var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
+      AColorBG: TColor; var AColorAfterEol: TColor);
     //select
     procedure DoSelectionDeleteOrReset;
     procedure DoSelect_ExtendSelectionByLine;
@@ -1489,7 +1491,7 @@ var
   NOutputSpacesSkipped: real;
   WrapItem: TATSynWrapItem;
   BmKind: integer;
-  BmColor: TColor;
+  BmColor, NColorAfterEol: TColor;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineWithCaret, LineEolSelected: boolean;
@@ -1623,9 +1625,19 @@ begin
         IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
         AScrollHorz.NPos, AMainText and FOptShowIndentLines);
 
+      NColorAfterEol:= clNone;
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
-        IfThen(BmColor<>clNone, BmColor, FColors.TextBG));
+        IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
+        NColorAfterEol);
+
+      //adapter may return ColorAfterEol, use it
+      if FOptShowSelFull then
+        if NColorAfterEol<>clNone then
+        begin
+          C.Brush.Color:= NColorAfterEol;
+          C.FillRect(CurrPointText.X, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+        end;
 
       if AWithGutter then
         Event:= FOnDrawLine

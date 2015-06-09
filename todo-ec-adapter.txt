@@ -1,5 +1,4 @@
 
--fix regex with trail eol
--onchange event: wrk
+-onchange event: wrk, more param
 -slow-slow-slow edit on 100K, pascal
 -keep +- state (fold) on edit

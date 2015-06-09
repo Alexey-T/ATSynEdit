@@ -17,10 +17,12 @@ type
   { TfmMain }
 
   TfmMain = class(TForm)
+    chkSelFull: TCheckBox;
     chkWrap: TCheckBox;
     edLexer: TComboBox;
     files: TShellListView;
     Panel1: TPanel;
+    procedure chkSelFullChange(Sender: TObject);
     procedure chkWrapChange(Sender: TObject);
     procedure edLexerChange(Sender: TObject);
     procedure filesClick(Sender: TObject);
@@ -113,6 +115,12 @@ begin
     ed.OptWrapMode:= cWrapOn
   else
     ed.OptWrapMode:= cWrapOff;
+end;
+
+procedure TfmMain.chkSelFullChange(Sender: TObject);
+begin
+  ed.OptShowSelFull:= chkSelFull.Checked;
+  ed.Update;
 end;
 
 procedure TfmMain.DoLexer(const aname: string);

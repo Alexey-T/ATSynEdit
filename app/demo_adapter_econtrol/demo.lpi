@@ -32,7 +32,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="10">
+    <Units Count="8">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -53,14 +53,17 @@
       <Unit3>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\atsynedit\atsynedit_canvasproc.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_CanvasProc"/>
       </Unit4>
       <Unit5>
         <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Adapters"/>
       </Unit5>
       <Unit6>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
@@ -70,14 +73,6 @@
         <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit7>
-      <Unit8>
-        <Filename Value="proc_lexer.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="E:\GitEControl\ec\ecwidestringlist.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit9>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

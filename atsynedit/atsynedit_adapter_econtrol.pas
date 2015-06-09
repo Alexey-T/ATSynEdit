@@ -22,7 +22,10 @@ type
     An: TSyntAnalyzer;
     AnClient: TClientSyntAnalyzer;
     Buffer: TATStringBuffer;
-    procedure DoCalcParts(var AParts: TATLineParts; ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
+    procedure DoCalcParts(var AParts: TATLineParts;
+      ALine, AX, ALen: integer;
+      AColorFont, AColorBG: TColor;
+      var AColorAfterEol: TColor);
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure UpdateData;
     procedure UpdateFold;
@@ -33,7 +36,8 @@ type
     procedure OnEditorChange(Sender: TObject); override;
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
-      ALineIndex, ACharIndex, ALineLen: integer); override;
+      ALineIndex, ACharIndex, ALineLen: integer;
+      var AColorAfterEol: TColor); override;
   end;
 
 implementation
@@ -55,7 +59,8 @@ const
 { TATAdapterEControl }
 
 procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
-  var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer);
+  var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer;
+  var AColorAfterEol: TColor);
 var
   Str: atString;
 begin
@@ -66,7 +71,11 @@ begin
   Str:= Copy(Ed.Strings.Lines[ALineIndex], ACharIndex, ALineLen);
   ALineLen:= Length(Str);
 
-  DoCalcParts(AParts, ALineIndex, ACharIndex-1, ALineLen, Ed.Colors.TextFont, Ed.Colors.TextBG);
+  AColorAfterEol:= clNone;
+  DoCalcParts(AParts, ALineIndex, ACharIndex-1, ALineLen,
+    Ed.Colors.TextFont,
+    Ed.Colors.TextBG,
+    AColorAfterEol);
 end;
 
 function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
@@ -91,8 +100,8 @@ begin
 end;
 
 
-procedure TATAdapterEControl.DoCalcParts(var AParts: TATLineParts;
-  ALine, AX, ALen: integer; AColorFont, AColorBG: TColor);
+procedure TATAdapterEControl.DoCalcParts(var AParts: TATLineParts; ALine, AX,
+  ALen: integer; AColorFont, AColorBG: TColor; var AColorAfterEol: TColor);
 var
   partindex: integer;
   //
@@ -196,10 +205,16 @@ begin
     if partindex>=High(AParts) then Exit;
   end;
 
-  //add ending missing part
-  mustOffset:= part.Offset+part.Len;
-  if mustOffset<ALen then
-    AddMissingPart(mustOffset, ALen-mustOffset);
+  if part.Len>0 then
+  begin
+    //add ending missing part
+    mustOffset:= part.Offset+part.Len;
+    if mustOffset<ALen then
+      AddMissingPart(mustOffset, ALen-mustOffset);
+
+    mustOffset:= Buffer.CaretToStr(Point(AX+ALen, ALine));
+    AColorAfterEol:= GetTokenColorBG(mustOffset, AColorAfterEol);
+  end;
 end;
 
 constructor TATAdapterEControl.Create;

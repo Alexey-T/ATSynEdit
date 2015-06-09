@@ -2,7 +2,7 @@
 
 procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
-  AColorBG: TColor);
+  AColorBG: TColor; var AColorAfterEol: TColor);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
 begin
@@ -13,9 +13,9 @@ begin
 
   FillChar(AParts, SizeOf(AParts), 0);
   if Assigned(FAdapterOfHilite) then
-    FAdapterOfHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen);
+    FAdapterOfHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
   if Assigned(FOnCalcHilite) then
-    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen);
+    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
 
   if AParts[0].Len>0 then
     DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1)
