@@ -15,13 +15,21 @@ type
   { TATSynRange }
 
   TATSynRange = class
+  private
+    FX, //start column
+    FY, //start line
+    FY2: integer; //end line which is fully folded (can't partially fold)
+    FFolded: boolean;
+    FWithStaple: boolean;
+    FHintText: string;
   public
-    X, Y, //start pos
-    Y2: integer; //end line which is fully folded (can't partially fold)
-    Folded: boolean;
-    WithStaple: boolean;
-    Hint: string;
-    constructor Create(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string); virtual;
+    property X: integer read FX;
+    property Y: integer read FY;
+    property Y2: integer read FY2;
+    property Folded: boolean read FFolded write FFolded;
+    property WithStaple: boolean read FWithStaple;
+    property HintText: string read FHintText;
+    constructor Create(AX, AY, AY2: integer; AWithStaple: boolean; const AHintText: string); virtual;
     function IsSimple: boolean;
   end;
 
@@ -58,17 +66,17 @@ uses
 { TATSynRange }
 
 constructor TATSynRange.Create(AX, AY, AY2: integer; AWithStaple: boolean;
-  const AHint: string);
+  const AHintText: string);
 begin
   if (AX<=0) then raise Exception.Create('Incorrect range with x<=0');
   if (AY<0) then raise Exception.Create('Incorrect range with y<0');
   if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2');
 
-  X:= AX;
-  Y:= AY;
-  Y2:= AY2;
-  WithStaple:= AWithStaple;
-  Hint:= AHint;
+  FX:= AX;
+  FY:= AY;
+  FY2:= AY2;
+  FWithStaple:= AWithStaple;
+  FHintText:= AHintText;
 end;
 
 function TATSynRange.IsSimple: boolean;

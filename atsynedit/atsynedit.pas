@@ -3890,7 +3890,7 @@ begin
   Result:= '...';
   R:= FFold.FindRangeWithPlusAtLine(ALine);
   if Assigned(R) then
-    Result:= R.Hint;
+    Result:= R.HintText;
 end;
 
 {$I atsynedit_carets.inc}
