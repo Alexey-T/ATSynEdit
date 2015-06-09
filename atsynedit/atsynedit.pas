@@ -268,6 +268,7 @@ type
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
+  TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
     ALineIndex, ACharIndex, ALineLen: integer;
     AColorBG: TColor; var AColorAfterEol: TColor) of object;
@@ -348,6 +349,7 @@ type
     FOnChangeState: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
+    FOnCalcStaple: TATSynEditCalcStapleEvent;
     FWrapInfo: TATSynWrapInfo;
     //FWrapProgress: integer;
     FWrapColumn: integer;
@@ -819,6 +821,7 @@ type
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
     property OnCalcHilite: TATSynEditCalcHiliteEvent read FOnCalcHilite write FOnCalcHilite;
+    property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText;
@@ -3841,6 +3844,7 @@ var
   P1, P2: TPoint;
   i: integer;
   RSt: TRect;
+  NColor: TColor;
 begin
   if FOptShowStapleStyle=cBorderNone then Exit;
   nLine1:= LineVisibleFirst;
@@ -3866,7 +3870,12 @@ begin
     RSt:= Rect(P1.X, P1.Y, P2.X+ACharSize.X, P2.Y+ACharSize.Y-1);
     if (RSt.Right>ARect.Left) and
       (RSt.Left<ARect.Right) then
-      DoPaintStaple(C, RSt, Colors.BlockStaple);
+    begin
+      NColor:= Colors.BlockStaple;
+      if Assigned(FOnCalcStaple) then
+        FOnCalcStaple(Self, Range.Y, NIndent, NColor);
+      DoPaintStaple(C, RSt, NColor);
+    end;
   end;
 end;
 

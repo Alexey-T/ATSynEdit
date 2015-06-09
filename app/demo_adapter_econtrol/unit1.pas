@@ -34,6 +34,8 @@ type
     filedir: string;
     procedure DoLexer(const aname: string);
     procedure DoOpen(const fn: string);
+    procedure EditCalcStaple(Snd: TObject; ALine, AIndent: integer;
+      var AColor: TColor);
     procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
     procedure UpdateLexList;
   public
@@ -101,6 +103,7 @@ begin
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
   ed.OnClickGutter:= @EditClickGutter;
+  ed.OnCalcStaple:= @EditCalcStaple;
 
   adapter:= TATAdapterEControl.Create;
   ed.AdapterOfHilite:= adapter;
@@ -159,6 +162,14 @@ begin
     end;
     ed.Update;
   end;
+end;
+
+procedure TfmMain.EditCalcStaple(Snd: TObject; ALine, AIndent: integer; var AColor: TColor);
+const
+  nColors = 10;
+  cl: array[0..nColors-1] of TColor = (clgray, clblue, clred, clgreen, clyellow, clmaroon, cllime, clMoneyGreen, clnavy, clteal);
+begin
+  AColor:= cl[AIndent div 2 mod nColors];
 end;
 
 end.
