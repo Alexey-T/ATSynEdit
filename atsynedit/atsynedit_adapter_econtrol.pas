@@ -71,16 +71,15 @@ end;
 
 function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
 var
-  i: integer;
   R: TSubLexerRange;
   Style: TSyntaxFormat;
+  i: integer;
 begin
   Result:= ADefColor;
   for i:= 0 to AnClient.SubLexerRangeCount-1 do
   begin
     R:= AnClient.SubLexerRanges[i];
-    if ((APos>R.CondStartPos) or (R.Rule.IncludeBounds and (APos=R.CondStartPos))) and
-       (APos<R.CondEndPos) then
+    if (APos>=R.StartPos) and (APos<R.EndPos) then
     begin
       Style:= R.Rule.Style;
       if Assigned(Style) then
