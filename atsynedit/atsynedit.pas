@@ -377,6 +377,7 @@ type
     FRectMicromap,
     FRectGutter,
     FRectRuler: TRect;
+    FLineVisibleLast: integer;
     FScrollVert,
     FScrollHorz: TATSynScrollInfo;
     FScrollVertMinimap,
@@ -470,8 +471,9 @@ type
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
       ABottom: integer);
     procedure DoPaintLockedWarning(C: TCanvas);
+    procedure DoPaintStaple(C: TCanvas; const R: TRect);
     procedure DoPaintStaples(C: TCanvas; ALineTop, ALineBottom: integer;
-      ARect: TRect; ACharSize: TPoint; const AScroll: TATSynScrollInfo);
+      const ARect: TRect; ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
@@ -696,6 +698,8 @@ type
     property AdapterOfHilite: TATSynEdit_AdapterOfHilite read FAdapterOfHilite write FAdapterOfHilite;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
     property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
+    property LineVisibleFirst: integer read GetScrollTop;
+    property LineVisibleLast: integer read FLineVisibleLast;
     property ModeOverwrite: boolean read FOverwrite write FOverwrite;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property ModeOneLine: boolean read GetOneLine write SetOneLine;
@@ -1548,6 +1552,7 @@ begin
     WrapItem:= FWrapInfo.Items[NWrapIndex];
     NLinesIndex:= WrapItem.NLineIndex;
     if not Strings.IsIndexValid(NLinesIndex) then Break;
+    FLineVisibleLast:= NLinesIndex;
 
     if FWrapInfo.IsItemAfterCollapsed(NWrapIndex) then
     begin
@@ -1801,6 +1806,10 @@ begin
     Inc(NCoordTop, ACharSize.Y);
     Inc(NWrapIndex);
   until false;
+
+  //staples
+  if AMainText then
+    DoPaintStaples(C, LineVisibleFirst, LineVisibleLast, ARect, ACharSize, AScrollHorz);
 end;
 
 procedure TATSynEdit.DoPaintMinimapSelTo(C: TCanvas);
@@ -3813,10 +3822,32 @@ begin
   AppProcessMessages;
 end;
 
-procedure TATSynEdit.DoPaintStaples(C: TCanvas; ALineTop, ALineBottom: integer;
-  ARect: TRect; ACharSize: TPoint; const AScroll: TATSynScrollInfo);
+
+procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect);
 begin
-  ////todo
+  C.Pen.Color:= clblue;
+  C.Line(R.Left, R.Top, R.Right, R.Top);
+  C.Line(R.Left, R.Top, R.Left, R.Bottom);
+  C.Line(R.Left, R.Bottom, R.Right, R.Bottom);
+end;
+
+procedure TATSynEdit.DoPaintStaples(C: TCanvas; ALineTop, ALineBottom: integer;
+  const ARect: TRect; ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
+var
+  RSt: TRect;
+begin
+  exit;//
+  //c.font.color:= clblue;
+  //c.textout(arect.left, arect.top, format('line %d-%d', [alinetop, ALineBottom]));
+
+  RSt.Left:= ARect.Left+(2-AScrollHorz.NPos)*ACharSize.X;
+  RSt.Top:= ARect.Top;
+  RSt.Right:= RSt.Left+ACharSize.X*1;
+  RSt.Bottom:= RSt.Top+ACharSize.Y*4;
+
+  if RSt.Right<=ARect.Left then exit;
+  if RSt.Left>=ARect.Right then exit;
+  DoPaintStaple(C, RSt);
 end;
 
 {$I atsynedit_carets.inc}
