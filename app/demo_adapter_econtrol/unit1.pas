@@ -34,6 +34,7 @@ type
     filedir: string;
     procedure DoLexer(const aname: string);
     procedure DoOpen(const fn: string);
+    procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
     procedure UpdateLexList;
   public
     { public declarations }
@@ -99,6 +100,7 @@ begin
   ed.OptUnprintedVisible:= false;
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
+  ed.OnClickGutter:= @EditClickGutter;
 
   adapter:= TATAdapterEControl.Create;
   ed.AdapterOfHilite:= adapter;
@@ -142,6 +144,21 @@ begin
   fn:= files.GetPathFromItem(files.Selected);
   if FileExistsUTF8(fn) then
     DoOpen(fn);
+end;
+
+procedure TfmMain.EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
+begin
+  if ABand=ed.GutterBandBm then
+  begin
+    if ed.Strings.LinesBm[ALine]<>0 then
+      ed.Strings.LinesBm[ALine]:= 0
+    else
+    begin
+      ed.Strings.LinesBm[ALine]:= 1;
+      ed.Strings.LinesBmColor[ALine]:= clMoneyGreen;
+    end;
+    ed.Update;
+  end;
 end;
 
 end.
