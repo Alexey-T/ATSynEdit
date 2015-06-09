@@ -486,6 +486,7 @@ type
     procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
+    function GetFoldedMarkText(ALine: integer): string;
     function GetLastUnfoldedLineNumber: integer;
     function GetModified: boolean;
     function GetNextUnfoldedLineNumber(ALine: integer; ADown: boolean): integer;
@@ -1720,9 +1721,9 @@ begin
     end;
 
     //draw collapsed-mark
-    if WrapItem.NFinal=cWrapItemCollapsed then
-      if AMainText then
-        DoPaintFoldedMark(C, CoordAfterText, '...');
+    if AMainText then
+      if WrapItem.NFinal=cWrapItemCollapsed then
+        DoPaintFoldedMark(C, CoordAfterText, GetFoldedMarkText(NLinesIndex));
 
     //draw gutter
     if AWithGutter then
@@ -3859,9 +3860,12 @@ begin
   begin
     Range:= FFold[Indexes[i]];
     if not Range.WithStaple then Continue;
+    if Range.Folded then Continue;
 
     P1:= CaretPosToClientPos(Point(0, Range.Y));
     P2:= CaretPosToClientPos(Point(0, Range.Y2));
+    if (P1.X<0) or (P1.Y<0) then Continue;
+    if (P2.X<0) or (P2.Y<0) then Continue;
 
     NIndent:= SGetIndentExpanded(Strings.Lines[Range.Y], FTabSize);
     Inc(P1.X, NIndent*ACharSize.X);
@@ -3877,6 +3881,16 @@ begin
       DoPaintStaple(C, RSt, NColor);
     end;
   end;
+end;
+
+function TATSynEdit.GetFoldedMarkText(ALine: integer): string;
+var
+  R: TATSynRange;
+begin
+  Result:= '...';
+  R:= FFold.FindRangeWithPlusAtLine(ALine);
+  if Assigned(R) then
+    Result:= R.Hint;
 end;
 
 {$I atsynedit_carets.inc}

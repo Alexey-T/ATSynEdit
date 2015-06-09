@@ -20,7 +20,8 @@ type
     Y2: integer; //end line which is fully folded (can't partially fold)
     Folded: boolean;
     WithStaple: boolean;
-    constructor Create(AX, AY, AY2: integer; AWithStaple: boolean); virtual;
+    Hint: string;
+    constructor Create(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string); virtual;
     function IsSimple: boolean;
   end;
 
@@ -38,14 +39,14 @@ type
     property Count: integer read GetCount;
     function IsIndexValid(N: integer): boolean;
     procedure Clear;
-    procedure Add(AX, AY, AY2: integer; AWithStaple: boolean);
-    procedure Insert(Index: integer; AX, AY, AY2: integer; AWithStaple: boolean);
+    procedure Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string);
+    procedure Insert(Index: integer; AX, AY, AY2: integer; AWithStaple: boolean;
+      const AHint: string);
     procedure Delete(Index: integer);
     property Items[Index: integer]: TATSynRange read GetItems; default;
     function IsRangeInsideOther(R1, R2: TATSynRange): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
-      AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly, AAllLines: boolean
-  ): TATIntArray;
+      AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly, AAllLines: boolean): TATIntArray;
     function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
   end;
 
@@ -56,7 +57,8 @@ uses
 
 { TATSynRange }
 
-constructor TATSynRange.Create(AX, AY, AY2: integer; AWithStaple: boolean);
+constructor TATSynRange.Create(AX, AY, AY2: integer; AWithStaple: boolean;
+  const AHint: string);
 begin
   if (AX<=0) then raise Exception.Create('Incorrect range with x<=0');
   if (AY<0) then raise Exception.Create('Incorrect range with y<0');
@@ -66,6 +68,7 @@ begin
   Y:= AY;
   Y2:= AY2;
   WithStaple:= AWithStaple;
+  Hint:= AHint;
 end;
 
 function TATSynRange.IsSimple: boolean;
@@ -115,14 +118,14 @@ begin
   FList.Clear;
 end;
 
-procedure TATSynRanges.Add(AX, AY, AY2: integer; AWithStaple: boolean);
+procedure TATSynRanges.Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string);
 begin
-  FList.Add(TATSynRange.Create(AX, AY, AY2, AWithStaple));
+  FList.Add(TATSynRange.Create(AX, AY, AY2, AWithStaple, AHint));
 end;
 
-procedure TATSynRanges.Insert(Index: integer; AX, AY, AY2: integer; AWithStaple: boolean);
+procedure TATSynRanges.Insert(Index: integer; AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string);
 begin
-  FList.Insert(Index, TATSynRange.Create(AX, AY, AY2, AWithStaple));
+  FList.Insert(Index, TATSynRange.Create(AX, AY, AY2, AWithStaple, AHint));
 end;
 
 procedure TATSynRanges.Delete(Index: integer);

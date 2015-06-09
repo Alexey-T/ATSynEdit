@@ -34,8 +34,7 @@ type
     filedir: string;
     procedure DoLexer(const aname: string);
     procedure DoOpen(const fn: string);
-    procedure EditCalcStaple(Snd: TObject; ALine, AIndent: integer;
-      var AColor: TColor);
+    procedure EditCalcStaple(Snd: TObject; ALine, AIndent: integer; var AColor: TColor);
     procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
     procedure UpdateLexList;
   public
