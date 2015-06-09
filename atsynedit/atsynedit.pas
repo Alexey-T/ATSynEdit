@@ -8,7 +8,7 @@ License: MPL 2.0
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
-{$define test_foldlist}
+//{$define test_foldlist}
 {$define allow_proc_msg}
 
 unit ATSynEdit;
@@ -392,6 +392,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptShowStapleStyle: TATLineBorderStyle;
     FOptMouseDownForPopup: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptShowScrollHint: boolean;
@@ -841,6 +842,7 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste;
+    property OptShowStapleStyle: TATLineBorderStyle read FOptShowStapleStyle write FOptShowStapleStyle;
     property OptShowSelFull: boolean read FOptShowSelFull write FOptShowSelFull;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal;
@@ -2098,6 +2100,7 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
+  FOptShowStapleStyle:= cBorderLine;
   FOptTextOffsetTop:= 0;
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
@@ -3823,10 +3826,10 @@ end;
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin
-  C.Pen.Color:= AColor;
-  C.Line(R.Left, R.Top, R.Right, R.Top);
-  C.Line(R.Left, R.Top, R.Left, R.Bottom);
-  C.Line(R.Left, R.Bottom, R.Right, R.Bottom);
+  if FOptShowStapleStyle=cBorderNone then Exit;
+  CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
+  CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Left, R.Bottom), false);
+  CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
 end;
 
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
@@ -3839,6 +3842,7 @@ var
   i: integer;
   RSt: TRect;
 begin
+  if FOptShowStapleStyle=cBorderNone then Exit;
   nLine1:= LineVisibleFirst;
   nLine2:= LineVisibleLast;
   Indexes:= FFold.FindRangesContainingLines(nLine1, nLine2, nil,
@@ -3850,6 +3854,8 @@ begin
   for i:= 0 to High(Indexes) do
   begin
     Range:= FFold[Indexes[i]];
+    if not Range.WithStaple then Continue;
+
     P1:= CaretPosToClientPos(Point(0, Range.Y));
     P2:= CaretPosToClientPos(Point(0, Range.Y2));
 

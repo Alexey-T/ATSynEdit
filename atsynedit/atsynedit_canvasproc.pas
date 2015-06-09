@@ -53,6 +53,9 @@ type
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: TATIntArray) of object;
 
+procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle;
+  P1, P2: TPoint; AtDown: boolean);
+
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
   const Str: atString;
@@ -255,7 +258,7 @@ begin
   end;
 end;
 
-procedure DoPaintLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint; AtDown: boolean);
+procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint; AtDown: boolean);
 begin
   case Style of
     cBorderLine:
@@ -312,22 +315,22 @@ begin
 
   case Side of
     cSideDown:
-      DoPaintLineEx(C, Color, Style,
+      CanvasLineEx(C, Color, Style,
         Point(R.Left, R.Bottom),
         Point(R.Right, R.Bottom),
         true);
     cSideLeft:
-      DoPaintLineEx(C, Color, Style,
+      CanvasLineEx(C, Color, Style,
         Point(R.Left, R.Top),
         Point(R.Left, R.Bottom),
         false);
     cSideRight:
-      DoPaintLineEx(C, Color, Style,
+      CanvasLineEx(C, Color, Style,
         Point(R.Right, R.Top),
         Point(R.Right, R.Bottom),
         true);
     cSideUp:
-      DoPaintLineEx(C, Color, Style,
+      CanvasLineEx(C, Color, Style,
         Point(R.Left, R.Top),
         Point(R.Right, R.Top),
         false);

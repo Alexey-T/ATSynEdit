@@ -29,14 +29,14 @@ begin
   FFold.Clear;
 
   //sorted by 2nd param
-  FFold.Add(1, 4, 15);
-  FFold.Add(1, 5, 9);
-  FFold.Add(1, 7, 8);
-  FFold.Add(1, 11, 14);
+  FFold.Add(1, 4, 15, false);
+  FFold.Add(1, 5, 9, false);
+  FFold.Add(1, 7, 8, false);
+  FFold.Add(1, 11, 14, false);
 
   for i:= 2 to (Strings.Count-1) div 10 do
     if Odd(i) then
-      FFold.Add(4, i*10, i*10+9);
+      FFold.Add(4, i*10, i*10+9, false);
 end;
 
 

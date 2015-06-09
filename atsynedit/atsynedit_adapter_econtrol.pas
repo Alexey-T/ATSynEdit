@@ -296,7 +296,7 @@ begin
     if R.EndIdx<0 then Continue;
     P1:= Buffer.StrToCaret(AnClient.Tags[R.StartIdx].StartPos);
     P2:= Buffer.StrToCaret(AnClient.Tags[R.EndIdx].StartPos);
-    Ed.Fold.Add(P1.X+1, P1.Y, P2.Y);
+    Ed.Fold.Add(P1.X+1, P1.Y, P2.Y, R.Rule.DrawStaple);
   end;
 end;
 
