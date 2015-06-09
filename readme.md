@@ -7,6 +7,6 @@ Later:
 - adapter for tmLanguage (Sublime text) lexers
 
 Shots
-![img](screen.png?raw=true)
-![img](syntax_cs.png?raw=true)
-![img](syntax_css.png?raw=true)
+![img](img/screen.png?raw=true)
+![img](img/syntax_cs.png?raw=true)
+![img](img/syntax_css.png?raw=true)

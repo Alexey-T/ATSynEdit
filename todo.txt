@@ -1,2 +1,3 @@
 
+blk staples
 optimize atsynedit_ranges //slow finds
