@@ -1,7 +1,7 @@
 object fmMain: TfmMain
   Left = 382
   Height = 457
-  Top = 394
+  Top = 188
   Width = 777
   Caption = 'Demo'
   ClientHeight = 457
@@ -9,7 +9,7 @@ object fmMain: TfmMain
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.4.0.4'
   object Panel1: TPanel
     Left = 0
     Height = 154
@@ -22,9 +22,9 @@ object fmMain: TfmMain
     TabOrder = 0
     object chkWrap: TCheckBox
       Left = 13
-      Height = 19
+      Height = 24
       Top = 8
-      Width = 76
+      Width = 98
       Caption = 'word wrap'
       Checked = True
       OnChange = chkWrapChange
@@ -33,11 +33,11 @@ object fmMain: TfmMain
     end
     object edLexer: TComboBox
       Left = 123
-      Height = 23
+      Height = 31
       Top = 4
       Width = 173
       DropDownCount = 24
-      ItemHeight = 15
+      ItemHeight = 0
       OnChange = edLexerChange
       Style = csDropDownList
       TabOrder = 1

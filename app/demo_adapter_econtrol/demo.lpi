@@ -53,17 +53,14 @@
       <Unit3>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\atsynedit\atsynedit_canvasproc.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_CanvasProc"/>
       </Unit4>
       <Unit5>
         <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Adapters"/>
       </Unit5>
       <Unit6>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
@@ -72,7 +69,6 @@
       <Unit7>
         <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc_TextBuffer"/>
       </Unit7>
       <Unit8>
         <Filename Value="proc_lexer.pas"/>
@@ -81,7 +77,6 @@
       <Unit9>
         <Filename Value="E:\GitEControl\ec\ecwidestringlist.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ecWideStringlist"/>
       </Unit9>
     </Units>
   </ProjectOptions>
@@ -93,7 +88,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer;E:\GitEControl\ec\"/>
+      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer;..\..\..\GitEControl\ec"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

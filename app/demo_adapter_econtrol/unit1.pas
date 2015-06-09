@@ -83,7 +83,7 @@ procedure TfmMain.FormCreate(Sender: TObject);
 var
   fname_lxl: string;
 begin
-  filedir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'\test_syntax_files\';
+  filedir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'/test_syntax_files/';
   fname_lxl:= ExtractFilePath(Application.ExeName)+'lexlib.lxl';
 
   manager:= TSyntaxManager.Create(Self);
@@ -91,7 +91,7 @@ begin
   UpdateLexList;
 
   ed:= TATSynEdit.Create(Self);
-  ed.Font.Name:= 'Consolas';
+  ed.Font.Name:= 'Courier New';
   ed.Parent:= Self;
   ed.Align:= alClient;
   ed.OptUnprintedVisible:= false;
