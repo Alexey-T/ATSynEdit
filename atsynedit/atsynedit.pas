@@ -291,6 +291,7 @@ type
     FStringsExternal: TATStrings;
     FAdapterOfHilite: TATSynEdit_AdapterOfHilite;
     FFold: TATSynRanges;
+    FStaples: TATSynRanges;
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
@@ -687,6 +688,7 @@ type
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
+    property Staples: TATSynRanges read FStaples;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified;
     property AdapterOfHilite: TATSynEdit_AdapterOfHilite read FAdapterOfHilite write FAdapterOfHilite;
@@ -2007,6 +2009,7 @@ begin
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
 
   FFold:= TATSynRanges.Create;
+  FStaples:= TATSynRanges.Create;
 
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
@@ -2169,6 +2172,7 @@ begin
   FreeAndNil(FHintWnd);
   FreeAndNil(FMenuStd);
   DoPaintModeStatic;
+  FreeAndNil(FStaples);
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
@@ -3678,7 +3682,7 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
-  List:= FFold.FindRangesContainingLine(LineIndex, nil);
+  List:= FFold.FindRangesContainingLines(LineIndex, LineIndex, nil, false, false);
   if Length(List)=0 then Exit;
 
   //calc state

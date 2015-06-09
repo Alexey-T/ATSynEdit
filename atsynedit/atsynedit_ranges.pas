@@ -42,10 +42,8 @@ type
     procedure Delete(Index: integer);
     property Items[Index: integer]: TATSynRange read GetItems; default;
     function IsRangeInsideOther(R1, R2: TATSynRange): boolean;
-    function FindRangesContainingLine(ALine: integer;
-      AInRange: TATSynRange;
-      AOnlyFolded: boolean = false;
-      ATopLevelOnly: boolean = false): TATIntArray;
+    function FindRangesContainingLines(ALineFrom, ALineTo: integer;
+      AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean): TATIntArray;
     function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
   end;
 
@@ -140,32 +138,40 @@ begin
     (R1.Y2<=R2.Y2);
 end;
 
-function TATSynRanges.FindRangesContainingLine(ALine: integer;
-  AInRange: TATSynRange; AOnlyFolded: boolean; ATopLevelOnly: boolean
-  ): TATIntArray;
+function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
+  AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean): TATIntArray;
 var
   i, j: integer;
+  L: TList;
 begin
   SetLength(Result, 0);
+  L:= TList.Create;
+  try
+    L.Capacity:= 1000;
 
-  //todo... make bin-search...
-  for i:= 0 to Count-1 do
-    with Items[i] do
-      if (not IsSimple) and (Y<=ALine) and (Y2>=ALine) and (not AOnlyFolded or Folded) then
-        if (AInRange=nil) or ((Y>=AInRange.Y) and (Y2<=AInRange.Y2)) then
+    //todo... make bin-search...
+    for i:= 0 to Count-1 do
+      with Items[i] do
+        if (not IsSimple) and (Y<=ALineFrom) and (Y2>=ALineTo) and (not AOnlyFolded or Folded) then
+          if (AInRange=nil) or ((Y>=AInRange.Y) and (Y2<=AInRange.Y2)) then
+            L.Add(pointer(i));
+
+    //todo...optim...
+    if ATopLevelOnly then
+      for i:= L.Count-1 downto 0 do
+        for j:= 0 to i-1 do
         begin
-          SetLength(Result, Length(Result)+1);
-          Result[High(Result)]:= i;
+          if IsRangeInsideOther(Items[i], Items[j]) then
+            L.Delete(L.Count-1);
         end;
 
-  //todo...optim...
-  if ATopLevelOnly then
-    for i:= High(Result) downto 0 do
-      for j:= 0 to i-1 do
-      begin
-        if IsRangeInsideOther(Items[i], Items[j]) then
-          SetLength(Result, Length(Result)-1);
-      end;
+    //copy to result
+    SetLength(Result, L.Count);
+    for i:= 0 to L.Count-1 do
+      Result[i]:= integer(L[i]);
+  finally
+    FreeAndNil(L);
+  end;
 end;
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): TATSynRange;

@@ -186,6 +186,7 @@
       <Unit32>
         <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Ranges"/>
       </Unit32>
       <Unit33>
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>

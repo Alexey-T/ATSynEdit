@@ -60,7 +60,7 @@ begin
     for i:= ARange.Y to ARange.Y2 do
     begin
       //find other folded ranges
-      List:= FFold.FindRangesContainingLine(i, ARange, true{OnlyFolded}, true{TopLevel});
+      List:= FFold.FindRangesContainingLines(i, i, ARange, true{OnlyFolded}, true{TopLevel});
 
       //line not in other ranges? unfold
       if Length(List)=0 then
@@ -86,7 +86,7 @@ var
   List: TATIntArray;
   i: integer;
 begin
-  List:= FFold.FindRangesContainingLine(ALine, nil, true);
+  List:= FFold.FindRangesContainingLines(ALine, ALine, nil, true, false);
   for i:= Low(List) to High(List) do
     DoFold_SetRangeFolding(FFold[List[i]], false);
 end;
