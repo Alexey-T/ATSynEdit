@@ -86,6 +86,7 @@ type
     FStateAdded,
     FStateSaved,
     FTextHintFont,
+    FBlockStaple,
     FLockedBG,
     FComboboxArrow: TColor;
   published
@@ -120,6 +121,7 @@ type
     property StateChanged: TColor read FStateChanged write FStateChanged;
     property StateAdded: TColor read FStateAdded write FStateAdded;
     property StateSaved: TColor read FStateSaved write FStateSaved;
+    property BlockStaple: TColor read FBlockStaple write FBlockStaple;
     property LockedBG: TColor read FLockedBG write FLockedBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
     property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
@@ -291,7 +293,6 @@ type
     FStringsExternal: TATStrings;
     FAdapterOfHilite: TATSynEdit_AdapterOfHilite;
     FFold: TATSynRanges;
-    FStaples: TATSynRanges;
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
@@ -471,9 +472,9 @@ type
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
       ABottom: integer);
     procedure DoPaintLockedWarning(C: TCanvas);
-    procedure DoPaintStaple(C: TCanvas; const R: TRect);
-    procedure DoPaintStaples(C: TCanvas; ALineTop, ALineBottom: integer;
-      const ARect: TRect; ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
+    procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
+    procedure DoPaintStaples(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
+      const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
@@ -692,7 +693,6 @@ type
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
-    property Staples: TATSynRanges read FStaples;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified;
     property AdapterOfHilite: TATSynEdit_AdapterOfHilite read FAdapterOfHilite write FAdapterOfHilite;
@@ -1445,16 +1445,16 @@ begin
 
   UpdateWrapInfo;
 
+  DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert);
+  DoPaintMarginsTo(C);
+  DoPaintNiceScroll(C);
+
   if FOptRulerVisible then
   begin
     DoPaintRulerTo(C);
     if Assigned(FOnDrawRuler) then
       FOnDrawRuler(Self, C, FRectRuler);
   end;
-
-  DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert);
-  DoPaintMarginsTo(C);
-  DoPaintNiceScroll(C);
 
   if Assigned(FOnDrawEditor) then
     FOnDrawEditor(Self, C, FRectMain);
@@ -1809,7 +1809,7 @@ begin
 
   //staples
   if AMainText then
-    DoPaintStaples(C, LineVisibleFirst, LineVisibleLast, ARect, ACharSize, AScrollHorz);
+    DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
 end;
 
 procedure TATSynEdit.DoPaintMinimapSelTo(C: TCanvas);
@@ -2020,7 +2020,6 @@ begin
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
 
   FFold:= TATSynRanges.Create;
-  FStaples:= TATSynRanges.Create;
 
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
@@ -2183,7 +2182,6 @@ begin
   FreeAndNil(FHintWnd);
   FreeAndNil(FMenuStd);
   DoPaintModeStatic;
-  FreeAndNil(FStaples);
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
@@ -3823,31 +3821,47 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect);
+procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin
-  C.Pen.Color:= clblue;
+  C.Pen.Color:= AColor;
   C.Line(R.Left, R.Top, R.Right, R.Top);
   C.Line(R.Left, R.Top, R.Left, R.Bottom);
   C.Line(R.Left, R.Bottom, R.Right, R.Bottom);
 end;
 
-procedure TATSynEdit.DoPaintStaples(C: TCanvas; ALineTop, ALineBottom: integer;
-  const ARect: TRect; ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
+procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
+  ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
 var
+  nLine1, nLine2, nIndent: integer;
+  Indexes: TATIntArray;
+  Range: TATSynRange;
+  P1, P2: TPoint;
+  i: integer;
   RSt: TRect;
 begin
-  exit;//
+  nLine1:= LineVisibleFirst;
+  nLine2:= LineVisibleLast;
+  Indexes:= FFold.FindRangesContainingLines(nLine1, nLine2, nil,
+    false{OnlyFolded}, false{TopLevelOnly}, false{AllLines});
+
   //c.font.color:= clblue;
-  //c.textout(arect.left, arect.top, format('line %d-%d', [alinetop, ALineBottom]));
+  //c.textout(arect.right-150, arect.top, format('staples vis %d', [length(indexes)]));
 
-  RSt.Left:= ARect.Left+(2-AScrollHorz.NPos)*ACharSize.X;
-  RSt.Top:= ARect.Top;
-  RSt.Right:= RSt.Left+ACharSize.X*1;
-  RSt.Bottom:= RSt.Top+ACharSize.Y*4;
+  for i:= 0 to High(Indexes) do
+  begin
+    Range:= FFold[Indexes[i]];
+    P1:= CaretPosToClientPos(Point(0, Range.Y));
+    P2:= CaretPosToClientPos(Point(0, Range.Y2));
 
-  if RSt.Right<=ARect.Left then exit;
-  if RSt.Left>=ARect.Right then exit;
-  DoPaintStaple(C, RSt);
+    NIndent:= SGetIndentExpanded(Strings.Lines[Range.Y], FTabSize);
+    Inc(P1.X, NIndent*ACharSize.X);
+    Inc(P2.X, NIndent*ACharSize.X);
+
+    RSt:= Rect(P1.X, P1.Y, P2.X+ACharSize.X, P2.Y+ACharSize.Y-1);
+    if (RSt.Right>ARect.Left) and
+      (RSt.Left<ARect.Right) then
+      DoPaintStaple(C, RSt, Colors.BlockStaple);
+  end;
 end;
 
 {$I atsynedit_carets.inc}

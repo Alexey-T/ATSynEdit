@@ -100,6 +100,7 @@ begin
   C.StateAdded:= $20c020;
   C.StateSaved:= clMedGray;
   C.TextHintFont:= clGray;
+  C.BlockStaple:= clMedGray;
   C.LockedBG:= $e0e0e0;
   C.ComboboxArrow:= clGray;
 end;
