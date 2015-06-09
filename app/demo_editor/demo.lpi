@@ -192,9 +192,9 @@
         <IsPartOfProject Value="True"/>
       </Unit33>
       <Unit34>
-        <Filename Value="..\..\atsynedit\atsynedit_adapterofhilite.pas"/>
+        <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_AdapterOfHilite"/>
+        <UnitName Value="ATSynEdit_Adapters"/>
       </Unit34>
     </Units>
   </ProjectOptions>

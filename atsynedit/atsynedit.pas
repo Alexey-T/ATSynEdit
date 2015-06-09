@@ -268,7 +268,7 @@ type
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
     ALineIndex, ACharIndex, ALineLen: integer;
-    var AColorAfterEol: TColor) of object;
+    AColorBG: TColor; var AColorAfterEol: TColor) of object;
 
 
 type
@@ -471,7 +471,7 @@ type
     procedure DoPaintLockedWarning(C: TCanvas);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
-      ALineIndex, ACharIndex: integer);
+      ALineIndex, ACharIndex: integer; AColorBG: TColor);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
     procedure DoUnfoldLine(ALine: integer);

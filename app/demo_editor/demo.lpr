@@ -22,7 +22,7 @@ uses
   atsynedit_keymap_init,
   atsynedit_wrapinfo,
   atsynedit_edits,
-  atsynedit_ranges,
+  atsynedit_ranges, ATSynEdit_Adapters,
   formmain,
   formkey,
   formopt,

@@ -13,12 +13,12 @@ begin
 
   FillChar(AParts, SizeOf(AParts), 0);
   if Assigned(FAdapterOfHilite) then
-    FAdapterOfHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
+    FAdapterOfHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorBG, AColorAfterEol);
   if Assigned(FOnCalcHilite) then
-    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
+    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorBG, AColorAfterEol);
 
   if AParts[0].Len>0 then
-    DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1)
+    DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG)
   else
     DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 end;
@@ -71,15 +71,15 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPartCalc_ApplyOver(var AParts: TATLineParts;
-  AOffsetMax, ALineIndex, ACharIndex: integer);
+procedure TATSynEdit.DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
+  ALineIndex, ACharIndex: integer; AColorBG: TColor);
 var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
   i: integer;
 begin
   FillChar(Part{%H-}, SizeOf(Part), 0);
-  Part.ColorFont:= FColors.TextSelFont;
+  Part.ColorFont:= Colors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;
 
   bSel:= false;

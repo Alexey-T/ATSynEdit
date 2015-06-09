@@ -15,7 +15,7 @@ type
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
-      var AColorAfterEol: TColor); virtual; abstract;
+      AColorBG: TColor; var AColorAfterEol: TColor); virtual; abstract;
   end;
 
 implementation

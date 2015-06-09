@@ -158,7 +158,7 @@ type
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
-      ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
+      ALineIndex, ACharIndex, ALineLen: integer; AColorBG: TColor; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
@@ -925,7 +925,8 @@ begin
 end;
 
 procedure TfmMain.EditCalcLine(Sender: TObject; var AParts: TATLineParts;
-  ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
+  ALineIndex, ACharIndex, ALineLen: integer; AColorBG: TColor;
+  var AColorAfterEol: TColor);
 var
   nlen, npart, noffset: integer;
   kind, kindnew: integer;
@@ -935,14 +936,13 @@ var
     if npart>High(AParts) then exit;
     with AParts[npart] do
     begin
+      ColorBG:= AColorBG;
       case kind of
         1: begin
              ColorFont:= clblue;
-             Colorbg:= clnone;
            end;
         2: begin
              ColorFont:= clgreen;
-             Colorbg:= clnone;
              ColorBorder:= clgreen;
              BorderLeft:= cBorderDotted;
              BorderDown:= BorderLeft;
@@ -963,7 +963,6 @@ var
         else
           begin
             ColorFont:= clgray;
-            Colorbg:= clnone;
           end;
       end;
       Offset:= noffset;
