@@ -166,7 +166,18 @@ end;
 procedure TfmMain.EditCalcStaple(Snd: TObject; ALine, AIndent: integer; var AColor: TColor);
 const
   nColors = 10;
-  cl: array[0..nColors-1] of TColor = (clgray, clblue, clred, clgreen, clyellow, clmaroon, cllime, clMoneyGreen, clnavy, clteal);
+  cl: array[0..nColors-1] of TColor = (
+    clGray,
+    clBlue,
+    clRed,
+    clGreen,
+    clOlive,
+    clMaroon,
+    clLime,
+    clMoneyGreen,
+    clNavy,
+    clTeal
+    );
 begin
   AColor:= cl[AIndent div 2 mod nColors];
 end;

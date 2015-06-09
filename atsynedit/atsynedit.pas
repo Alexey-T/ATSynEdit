@@ -226,7 +226,8 @@ const
   cGutterSizeSep = 1;
   cGutterSizeEmpty = 2;
 
-  cCollapseMarkIndent = 3; //collapse-mark [...] for line partly folded
+  cFoldedMarkIndentInner = 2;
+  cFoldedMarkIndentOuter = 0;
   cScrollKeepHorz = 1; //keep char, allow handy clicking after eol of longest line
   cScrollIndentCaretHorz = 10; //offsets for caret-moving: if caret goes out of control
   cScrollIndentCaretVert = 0; //must be 0, >0 gives jumps on move-down
@@ -1907,7 +1908,7 @@ procedure TATSynEdit.DoPaintFoldedMark(C: TCanvas;
 var
   NWidth: integer;
 begin
-  Inc(ACoord.X, cCollapseMarkIndent);
+  Inc(ACoord.X, cFoldedMarkIndentOuter);
 
   //paint bg
   C.Font.Color:= FColors.CollapseMarkFont;
@@ -1915,10 +1916,10 @@ begin
 
   //paint text
   C.TextOut(
-    ACoord.X+cCollapseMarkIndent,
+    ACoord.X+cFoldedMarkIndentInner,
     ACoord.Y,
     AMarkText);
-  NWidth:= C.TextWidth(AMarkText) + 2*cCollapseMarkIndent;
+  NWidth:= C.TextWidth(AMarkText) + 2*cFoldedMarkIndentInner;
 
   //paint frame
   C.Pen.Color:= FColors.CollapseMarkFont;
@@ -3887,10 +3888,12 @@ function TATSynEdit.GetFoldedMarkText(ALine: integer): string;
 var
   R: TATSynRange;
 begin
-  Result:= '...';
+  Result:= '';
   R:= FFold.FindRangeWithPlusAtLine(ALine);
   if Assigned(R) then
     Result:= R.HintText;
+  if Result='' then
+    Result:= '...';
 end;
 
 {$I atsynedit_carets.inc}

@@ -86,7 +86,7 @@ begin
   C.RulerFont:= clGray;
   C.CollapseLine:= $a06060;
   C.CollapseMarkFont:= $e08080;
-  C.CollapseMarkBG:= clWhite;
+  C.CollapseMarkBG:= clCream;
   C.MarginRight:= clLtGray;
   C.MarginCaret:= clLime;
   C.MarginUser:= clYellow;
