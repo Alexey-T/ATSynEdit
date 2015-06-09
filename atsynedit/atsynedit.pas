@@ -8,7 +8,7 @@ License: MPL 2.0
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
-//{$define test_foldlist}
+{$define test_foldlist}
 {$define allow_proc_msg}
 
 unit ATSynEdit;
@@ -470,6 +470,8 @@ type
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
       ABottom: integer);
     procedure DoPaintLockedWarning(C: TCanvas);
+    procedure DoPaintStaples(C: TCanvas; ALineTop, ALineBottom: integer;
+      ARect: TRect; ACharSize: TPoint; const AScroll: TATSynScrollInfo);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
@@ -3682,7 +3684,8 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
-  List:= FFold.FindRangesContainingLines(LineIndex, LineIndex, nil, false, false);
+  List:= FFold.FindRangesContainingLines(LineIndex, LineIndex, nil,
+    false{OnlyFolded}, false{TopLevelOnly}, true{All});
   if Length(List)=0 then Exit;
 
   //calc state
@@ -3808,6 +3811,12 @@ procedure TATSynEdit.DoShowProgress(Sender: TObject);
 begin
   Invalidate;
   AppProcessMessages;
+end;
+
+procedure TATSynEdit.DoPaintStaples(C: TCanvas; ALineTop, ALineBottom: integer;
+  ARect: TRect; ACharSize: TPoint; const AScroll: TATSynScrollInfo);
+begin
+  ////todo
 end;
 
 {$I atsynedit_carets.inc}
