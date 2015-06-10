@@ -2,6 +2,8 @@ unit ATSynEdit_Adapter_EControl;
 
 {$mode objfpc}{$H+}
 
+//{$define skip_some_rules}
+
 interface
 
 uses
@@ -310,7 +312,9 @@ begin
     //rule "function begin", "prop begin";
     //e.g. range from } bracket to some token before "else"
     //temp workard: skip rule with 'parent'
+    {$ifdef skip_some_rules}
     if R.Rule.NotParent then Continue;
+    {$endif}
 
     if R.StartIdx<0 then Continue;
     if R.EndIdx<0 then Continue;

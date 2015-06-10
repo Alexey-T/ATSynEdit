@@ -7,11 +7,9 @@ uses
   cthreads,
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, Unit1,
-  ATSynEdit,
-  atsynedit_adapters,
-  ATSynEdit_CanvasProc,
-  ATStringProc_TextBuffer, ATSynEdit_Ranges
+  Forms, Unit1, ATSynEdit, atsynedit_adapters, ATSynEdit_CanvasProc,
+  ATStringProc_TextBuffer, ATSynEdit_Ranges, ecLists, ecStrUtils, ecSyntAnal,
+  eczregexpr
   { you can add units after this };
 
 {$R *.res}

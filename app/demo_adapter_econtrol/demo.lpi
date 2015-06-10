@@ -32,7 +32,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="10">
+    <Units Count="16">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -72,6 +72,7 @@
       <Unit7>
         <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc_TextBuffer"/>
       </Unit7>
       <Unit8>
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>
@@ -82,6 +83,34 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="ATSynEdit_Ranges"/>
       </Unit9>
+      <Unit10>
+        <Filename Value="E:\GitEControl\ec\ecsyntanal.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ecSyntAnal"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="E:\GitEControl\ec\eczregexpr.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="E:\GitEControl\ec\ecstrutils.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ecStrUtils"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="E:\GitEControl\ec\eclists.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ecLists"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="E:\GitEControl\ec\ecsyntgramma.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ecSyntGramma"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="E:\GitEControl\ec\ecsysutils.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit15>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -23,6 +23,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Setup(const AText: atString; ALineLens: TList; ALenEol: integer);
+    procedure SetupSlow(const AText: atString);
     procedure Clear;
     function CaretToStr(APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
@@ -72,6 +73,35 @@ begin
   begin
     Inc(Pos, integer(ALineLens[i])+FLenEol);
     FStarts.Add(pointer(Pos));
+  end;
+end;
+
+procedure TATStringBuffer.SetupSlow(const AText: atString);
+var
+  STextFinal: atString;
+  L: TStringList;
+  Lens: TList;
+  i: integer;
+begin
+  if Trim(AText)='' then
+  begin
+    FText:= '';
+    FStarts.Clear;
+    Exit
+  end;
+
+  L:= TStringList.Create;
+  Lens:= TList.Create;
+  try
+    L.TextLineBreakStyle:= tlbsLF;
+    L.Text:= UTF8Encode(AText);
+    STextFinal:= UTF8Decode(L.Text); //this converts eol to LF
+    for i:= 0 to L.Count-1 do
+      Lens.Add(pointer(Length(UTF8Decode(L[i]))));
+    Setup(STextFinal, Lens, 1);
+  finally
+    FreeAndNil(Lens);
+    FreeAndNil(L);
   end;
 end;
 
