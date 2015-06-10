@@ -2,3 +2,10 @@
 -onchange event: wrk, more param
 -slow-slow-slow edit on 100K, pascal
 -keep +- state (fold) on edit
+
+
+-C#. rules 'function begin' etc dont work. they have 'parent' and 'not a parent' set.
+-Tcl. parser 'commt' no work. cannot catch line "# Test". regex:
+  \#[\s\#\-].*$
+  | \#\z
+-Autoit. 1st line of example don't work. 'dim' not hilited, all line.
