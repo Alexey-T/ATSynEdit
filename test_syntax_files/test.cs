@@ -1,29 +1,19 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using EVControls;
 
 namespace Burray
 {
     public class HotWaterGuidedSchedulingScreen : CommonScreen
     {
-        // External users should look here ONLY!
+        //Test
         #region Public Interface
 
-        /// <summary>
-        /// Force HVAC_GS1 to be the starting screen.
-        /// </summary>
         public void SetFirstScreen()
         {
             currentScreenIndex = ScreensEnum.HVAC_GS1;
             backStack.Clear();
         }
 
-        /// <summary>
-        /// Sets the previously selected days of week.
-        /// </summary>
         public List<DayOfWeek> SelectedDaysOfWeek
         {
             set
@@ -59,9 +49,6 @@ namespace Burray
 
         #region Private Data-Structure
 
-        /// <summary>
-        /// Enum that describes all the specific screens.
-        /// </summary>
         private static enum ScreensEnum
         {
             HVAC_GS1 = 0,

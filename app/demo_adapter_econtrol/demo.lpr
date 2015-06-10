@@ -11,7 +11,7 @@ uses
   ATSynEdit,
   atsynedit_adapters,
   ATSynEdit_CanvasProc,
-  ATStringProc_TextBuffer
+  ATStringProc_TextBuffer, ATSynEdit_Ranges
   { you can add units after this };
 
 {$R *.res}

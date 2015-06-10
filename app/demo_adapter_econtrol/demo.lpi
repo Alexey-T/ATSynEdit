@@ -32,7 +32,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="9">
+    <Units Count="10">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -77,6 +77,11 @@
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit8>
+      <Unit9>
+        <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Ranges"/>
+      </Unit9>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -284,6 +284,7 @@ var
   R: TTextRange;
   P1, P2: TPoint;
   i: integer;
+  HintText: string;
 begin
   if not Assigned(Ed) then Exit;
   if not Assigned(AnClient) then Exit;
@@ -293,12 +294,16 @@ begin
   begin
     R:= AnClient.Ranges[i];
     if R.Rule.NotCollapsed then Continue;
+    if R.Rule.BlockType<>btRangeStart then Continue;
+    /////todo skip
+
     if R.StartIdx<0 then Continue;
     if R.EndIdx<0 then Continue;
     P1:= Buffer.StrToCaret(AnClient.Tags[R.StartIdx].StartPos);
     P2:= Buffer.StrToCaret(AnClient.Tags[R.EndIdx].StartPos);
-    Ed.Fold.Add(P1.X+1, P1.Y, P2.Y, R.Rule.DrawStaple,
-      AnClient.GetCollapsedText(R));
+
+    HintText:= AnClient.GetCollapsedText(R)+'/'+R.Rule.GetNamePath;
+    Ed.Fold.Add(P1.X+1, P1.Y, P2.Y, R.Rule.DrawStaple, HintText);
   end;
 end;
 
