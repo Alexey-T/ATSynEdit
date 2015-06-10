@@ -58,6 +58,7 @@ type
     procedure Delete(Index: integer);
     property Items[Index: integer]: TATSynRange read GetItems; default;
     function IsRangeInsideOther(R1, R2: TATSynRange): boolean;
+    function IsRangesSame(R1, R2: TATSynRange): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
       AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean;
   ALineMode: TATRangeHasLines): TATIntArray;
@@ -116,16 +117,19 @@ end;
 
 function TATSynRanges.GetItems(Index: integer): TATSynRange;
 begin
+  Result:= TATSynRange(FList[Index]);
+  {
   if IsIndexValid(Index) then
     Result:= TATSynRange(FList[Index])
   else
     Result:= nil;
+    }
 end;
 
 constructor TATSynRanges.Create;
 begin
   FList:= TList.Create;
-  FList.Capacity:= 2000;
+  FList.Capacity:= 4000;
 end;
 
 destructor TATSynRanges.Destroy;
@@ -172,6 +176,16 @@ begin
       //needed for block hanging out by Y2 by 1 line
 end;
 
+function TATSynRanges.IsRangesSame(R1, R2: TATSynRange): boolean;
+begin
+  if R1=R2 then
+    begin Result:= true; Exit end;
+  if (R1.X=R2.X) and (R1.Y=R2.Y) and (Abs(R1.Y2-R2.Y2)<=1) then
+    begin Result:= true; Exit end;
+
+  Result:= false;
+end;
+
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
   AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean; ALineMode: TATRangeHasLines): TATIntArray;
 var
@@ -187,7 +201,7 @@ begin
 
   SetLength(Result, 0);
   L:= TList.Create;
-  L.Capacity:= 300;
+  L.Capacity:= 512;
   try
     for i:= 0 to Count-1 do
     begin
@@ -196,16 +210,17 @@ begin
         if (not AOnlyFolded or R.Folded) then
         begin
           case ALineMode of
+            cRngIgnore: Ok:= true;
             cRngHasAllLines: Ok:= (R.Y<=ALineFrom) and (R.Y2>=ALineTo);
             cRngHasAnyOfLines: Ok:= (R.Y<=ALineTo) and (R.Y2>=ALineFrom);
-            else Ok:= true;
+            else raise Exception.Create('unknown linemode');
           end;
           if not Ok then Continue;
 
           if AInRange=nil then
             Ok:= true
           else
-            Ok:= (AInRange<>R) and IsRangeInsideOther(R, AInRange);
+            Ok:= not IsRangesSame(AInRange, R) and IsRangeInsideOther(R, AInRange);
 
           if Ok then
             L.Add(pointer(i));
