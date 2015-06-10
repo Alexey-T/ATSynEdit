@@ -3861,7 +3861,7 @@ begin
   for i:= 0 to High(Indexes) do
   begin
     Range:= FFold[Indexes[i]];
-    /////if not Range.WithStaple then Continue;
+    if not Range.WithStaple then Continue;
     if Range.Folded then Continue;
 
     if IsLineFolded(Range.Y, true) then Continue;

@@ -295,7 +295,12 @@ begin
     R:= AnClient.Ranges[i];
     if R.Rule.NotCollapsed then Continue;
     if R.Rule.BlockType<>btRangeStart then Continue;
-    /////todo skip
+
+    /////issue: rules in C# with 'parent' set give wrong ranges;
+    //rule "function begin", "prop begin";
+    //e.g. range from } bracket to some token before "else"
+    //temp workard: skip rule with 'parent'
+    if R.Rule.NotParent then Continue;
 
     if R.StartIdx<0 then Continue;
     if R.EndIdx<0 then Continue;
