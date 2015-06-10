@@ -396,6 +396,8 @@ type
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
     FOptShowStapleStyle: TATLineBorderStyle;
+    FOptShowStapleIndent: integer;
+    FOptShowStapleWidthPercent: integer;
     FOptMouseDownForPopup: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptShowScrollHint: boolean;
@@ -850,6 +852,8 @@ type
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste;
     property OptShowStapleStyle: TATLineBorderStyle read FOptShowStapleStyle write FOptShowStapleStyle;
+    property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent;
+    property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent;
     property OptShowSelFull: boolean read FOptShowSelFull write FOptShowSelFull;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal;
@@ -2108,6 +2112,9 @@ begin
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
   FOptShowStapleStyle:= cBorderLine;
+  FOptShowStapleIndent:= -1;
+  FOptShowStapleWidthPercent:= 100;
+
   FOptTextOffsetTop:= 0;
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
@@ -3876,7 +3883,11 @@ begin
     Inc(P1.X, NIndent*ACharSize.X);
     Inc(P2.X, NIndent*ACharSize.X);
 
-    RSt:= Rect(P1.X, P1.Y, P2.X+ACharSize.X, P2.Y+ACharSize.Y-1);
+    RSt.Left:= P1.X + FOptShowStapleIndent;
+    RSt.Top:= P1.Y;
+    RSt.Right:= RSt.Left+ (ACharSize.X * FOptShowStapleWidthPercent div 100);
+    RSt.Bottom:= P2.Y + ACharSize.Y-1;
+
     if (RSt.Right>ARect.Left) and
       (RSt.Left<ARect.Right) then
     begin
