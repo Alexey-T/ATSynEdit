@@ -1,5 +1,3 @@
 
-unfold: logic of unfold of -nested- ranges bad (or nested of nested, nested of nested of nested)
-
 empty ed, not modified: click (move caret), modified is set
 caret: empty ed, cr don't blink first (Focused gets false on win)

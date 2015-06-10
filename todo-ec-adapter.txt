@@ -8,4 +8,3 @@
 -Tcl. parser 'commt' no work. cannot catch line "# Test". regex:
   \#[\s\#\-].*$
   | \#\z
--Autoit. 1st line of example don't work. 'dim' not hilited, all line.

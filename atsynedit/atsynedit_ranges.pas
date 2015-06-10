@@ -1,10 +1,8 @@
-
-//todo....
-//optim function TATSynRanges.FindRangesContainingLine
-
 unit ATSynEdit_Ranges;
 
 {$mode objfpc}{$H+}
+
+//{$define show_unfold_rng}
 
 interface
 
@@ -33,7 +31,11 @@ type
     constructor Create(AX, AY, AY2: integer; AWithStaple: boolean; const AHintText: string); virtual;
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;
+    function MessageText: string;
   end;
+
+type
+  TATRangeHasLines = (cRngIgnore, cRngHasAllLines, cRngHasAnyOfLines);
 
 type
   { TATSynRanges }
@@ -43,6 +45,7 @@ type
     FList: TList;
     function GetCount: integer;
     function GetItems(Index: integer): TATSynRange;
+    function MessageTextForIndexList(L: TList): string;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -56,27 +59,26 @@ type
     property Items[Index: integer]: TATSynRange read GetItems; default;
     function IsRangeInsideOther(R1, R2: TATSynRange): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
-      AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly, AAllLines: boolean): TATIntArray;
+      AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean;
+  ALineMode: TATRangeHasLines): TATIntArray;
     function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
+    function MessageText(Cnt: integer): string;
   end;
 
 implementation
 
 uses
+  Math,
   ATSynEdit_Carets;
 
 { TATSynRange }
 
 constructor TATSynRange.Create(AX, AY, AY2: integer; AWithStaple: boolean;
   const AHintText: string);
-  function Msg: string;
-  begin
-    Result:= Format('[Y=%d, Y2=%d, X=%d]', [AY, AY2, AX]);
-  end;
 begin
-  if (AX<=0) then raise Exception.Create('Incorrect range with x<=0: '+Msg);
-  if (AY<0) then raise Exception.Create('Incorrect range with y<0: '+Msg);
-  if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2: '+Msg);
+  if (AX<=0) then raise Exception.Create('Incorrect range with x<=0: '+MessageText);
+  if (AY<0) then raise Exception.Create('Incorrect range with y<0: '+MessageText);
+  if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2: '+MessageText);
 
   FX:= AX;
   FY:= AY;
@@ -93,6 +95,11 @@ end;
 function TATSynRange.IsLineInside(ALine: integer): boolean;
 begin
   Result:= (ALine>=Y) and (ALine<=Y2);
+end;
+
+function TATSynRange.MessageText: string;
+begin
+  Result:= Format('%d..%d', [Y+1, Y2+1]);
 end;
 
 { TATSynRanges }
@@ -158,48 +165,71 @@ end;
 
 function TATSynRanges.IsRangeInsideOther(R1, R2: TATSynRange): boolean;
 begin
-  //if not Assigned(R1) or not Assigned(R2) then
-  //  raise Exception.Create('nil range: IsRangeInsideOther');
   Result:=
-    IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true) and
-    (R1.Y2<=R2.Y2);
+    IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true)
+      and (R1.Y2<=R2.Y2);
 end;
 
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
-  AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly, AAllLines: boolean): TATIntArray;
+  AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean; ALineMode: TATRangeHasLines): TATIntArray;
 var
   L: TList;
   R: TATSynRange;
   i, j: integer;
+  Ok: boolean;
+  s1, s2: string;
 begin
+  //if AInRange<>nil then
+  //if Count>0 then
+  //  Showmessage('Ranges'#13+MessageText(25));
+
   SetLength(Result, 0);
   L:= TList.Create;
+  L.Capacity:= 300;
   try
     for i:= 0 to Count-1 do
     begin
       R:= Items[i];
       if (not R.IsSimple) then
         if (not AOnlyFolded or R.Folded) then
-          if (AAllLines and (R.Y<=ALineFrom) and (R.Y2>=ALineTo)) or
-             (not AAllLines and (R.Y<=ALineTo) and (R.Y2>=ALineFrom)) then
-            if (AInRange=nil) or
-              (Assigned(AInRange) and (AInRange<>R) and (R.Y>=AInRange.Y) and (R.Y2<=AInRange.Y2)) then
-            begin
-              L.Add(pointer(i));
-            end;
+        begin
+          case ALineMode of
+            cRngHasAllLines: Ok:= (R.Y<=ALineFrom) and (R.Y2>=ALineTo);
+            cRngHasAnyOfLines: Ok:= (R.Y<=ALineTo) and (R.Y2>=ALineFrom);
+            else Ok:= true;
+          end;
+          if not Ok then Continue;
+
+          if AInRange=nil then
+            Ok:= true
+          else
+            Ok:= (AInRange<>R) and IsRangeInsideOther(R, AInRange);
+
+          if Ok then
+            L.Add(pointer(i));
+        end;
     end;
 
     if ATopLevelOnly then
+    begin
+      {$ifdef show_unfold_rng}
+      s1:= 'toplevel: ranges shortlist'#13+MessageTextForIndexList(L);
+      {$endif}
+
       for i:= L.Count-1 downto 1 do
         for j:= 0 to i-1 do
-        begin
           if IsRangeInsideOther(Items[integer(L[i])], Items[integer(L[j])]) then
           begin
-            if L.Count>0 then
-              L.Delete(L.Count-1);
+            L.Delete(i);
             Break
           end;
-        end;
+
+      {$ifdef show_unfold_rng}
+      s2:= 'toplevel: ranges done'#13+MessageTextForIndexList(L);
+      if l.count>0 then
+        showmessage(s1+#13+s2);
+      {$endif}
+    end;
 
     SetLength(Result, L.Count);
     for i:= 0 to L.Count-1 do
@@ -224,6 +254,25 @@ begin
       Break
     end;
   end;
+end;
+
+function TATSynRanges.MessageText(Cnt: integer): string;
+var
+  i: integer;
+begin
+  Result:= '';
+  for i:= 0 to Min(Count-1, Cnt) do
+    Result:= Result+Items[i].MessageText+#13;
+end;
+
+function TATSynRanges.MessageTextForIndexList(L: TList): string;
+var
+  i: integer;
+begin
+  Result:= '';
+  if L.Count=0 then exit;
+  for i:= 0 to L.Count-1 do
+    Result:= Result+items[integer(L[i])].MessageText+#13;
 end;
 
 end.

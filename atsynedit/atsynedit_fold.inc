@@ -79,8 +79,8 @@ begin
   ARange.Folded:= false;
   FWrapUpdateNeeded:= true;
 
-  List:= FFold.FindRangesContainingLines(ARange.Y, ARange.Y2, ARange,
-    false{OnlyFolded}, true{TopLevel}, false{AllLines});
+  List:= FFold.FindRangesContainingLines(-1, -1, ARange,
+    false{OnlyFolded}, true{TopLevel}, cRngIgnore);
 
   //show all lines not in subranges
   for i:= ARange.Y to ARange.Y2 do
@@ -138,7 +138,7 @@ var
   i: integer;
 begin
   List:= FFold.FindRangesContainingLines(ALine, ALine, nil,
-    true{OnlyFolded}, false{TopLevelOnly}, true{All});
+    true{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
   for i:= Low(List) to High(List) do
     DoFold_RangeFoldUnfold(FFold[List[i]], false);
 end;

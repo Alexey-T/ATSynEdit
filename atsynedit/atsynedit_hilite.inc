@@ -23,7 +23,7 @@ begin
   //Maybe possible to always use Applyover but it's slower so i made Createnew for
   //faster render w/out adapter
   if AParts[0].Len>0 then
-    DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG)
+    DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1)
   else
     DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 end;
@@ -77,7 +77,7 @@ begin
 end;
 
 procedure TATSynEdit.DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
-  ALineIndex, ACharIndex: integer; AColorBG: TColor);
+  ALineIndex, ACharIndex: integer);
 var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;

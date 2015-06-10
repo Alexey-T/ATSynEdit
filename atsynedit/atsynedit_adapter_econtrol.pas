@@ -231,8 +231,6 @@ begin
 end;
 
 destructor TATAdapterEControl.Destroy;
-var
-  i: integer;
 begin
   FreeAndNil(LColors);
   FreeAndNil(Buffer);

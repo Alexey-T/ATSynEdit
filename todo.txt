@@ -1,3 +1,0 @@
-
-optimize atsynedit_ranges
-  //slow find

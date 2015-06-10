@@ -483,7 +483,7 @@ type
       const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
-      ALineIndex, ACharIndex: integer; AColorBG: TColor);
+      ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
     procedure DoUnfoldLine(ALine: integer);
@@ -3702,7 +3702,7 @@ begin
   LineIndex:= WrapItem.NLineIndex;
 
   List:= FFold.FindRangesContainingLines(LineIndex, LineIndex, nil,
-    false{OnlyFolded}, false{TopLevelOnly}, true{All});
+    false{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
   if Length(List)=0 then Exit;
 
   //calc state
@@ -3853,7 +3853,7 @@ begin
   nLineFrom:= LineVisibleFirst;
   nLineTo:= LineVisibleLast;
   Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, nil,
-    false{OnlyFolded}, false{TopLevelOnly}, false{AllLines});
+    false{OnlyFolded}, false{TopLevelOnly}, cRngHasAnyOfLines);
 
   //c.font.color:= clblue;
   //c.textout(arect.right-150, arect.top, format('staples vis %d', [length(indexes)]));
