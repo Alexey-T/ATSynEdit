@@ -23,15 +23,15 @@ type
     An: TSyntAnalyzer;
     AnClient: TClientSyntAnalyzer;
     Buffer: TATStringBuffer;
-    LColored: TATSynRanges;
+    LColors: TATSynRanges;
     procedure DoCalcParts(var AParts: TATLineParts;
       ALine, AX, ALen: integer;
       AColorFont, AColorBG: TColor;
       var AColorAfterEol: TColor);
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
-    procedure UpdateColoredRanges;
+    procedure UpdateSublexRanges;
     procedure UpdateData;
-    procedure UpdateFold;
+    procedure UpdateFoldRanges;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -87,10 +87,10 @@ var
   i: integer;
 begin
   Result:= ADefColor;
-  for i:= 0 to LColored.Count-1 do
+  for i:= 0 to LColors.Count-1 do
   begin
-    R:= LColored[i];
-    if (APos>=R.Y) and (APos<=R.Y2) then
+    R:= LColors[i];
+    if (APos>=R.Y) and (APos<R.Y2) then
     begin
       Result:= R.X;
       Exit;
@@ -109,6 +109,7 @@ var
     part: TATLinePart;
     strpos: integer;
   begin
+    if ALen<=0 then Exit;
     strpos:= Buffer.CaretToStr(Point(AX+AOffset, ALine));
     FillChar(part{%H-}, SizeOf(part), 0);
     part.Offset:= AOffset;
@@ -130,7 +131,8 @@ begin
   FillChar(part{%H-}, SizeOf(part), 0);
 
   startindex:= AnClient.PriorTokenAt(Buffer.CaretToStr(Point(0, ALine)));
-  if startindex<0 then Exit;
+  if startindex<0 then
+    startindex:= 0;
 
   for i:= startindex to AnClient.TagCount-1 do
   begin
@@ -199,9 +201,12 @@ begin
     end;
 
     //add calculated part
-    Move(part, AParts[partindex], SizeOf(part));
-    Inc(partindex);
-    if partindex>=High(AParts) then Exit;
+    if part.Len>0 then
+    begin
+      Move(part, AParts[partindex], SizeOf(part));
+      Inc(partindex);
+      if partindex>=High(AParts) then Exit;
+    end;
   end;
 
   //add ending missing part
@@ -222,14 +227,14 @@ begin
   An:= nil;
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
-  LColored:= TATSynRanges.Create;
+  LColors:= TATSynRanges.Create;
 end;
 
 destructor TATAdapterEControl.Destroy;
 var
   i: integer;
 begin
-  FreeAndNil(LColored);
+  FreeAndNil(LColors);
   FreeAndNil(Buffer);
   FreeAndNil(AnClient);
   An:= nil;
@@ -279,17 +284,18 @@ begin
   AnClient.Clear;
   AnClient.Analyze;
 
-  UpdateColoredRanges; //starts LColored
-  UpdateFold; //adds more to LColored
+  LColors.Clear;
+  UpdateSublexRanges;
+  UpdateFoldRanges;
 end;
 
-procedure TATAdapterEControl.UpdateFold;
+procedure TATAdapterEControl.UpdateFoldRanges;
 var
   R: TTextRange;
-  P1, P2: TPoint;
+  Pnt1, Pnt2: TPoint;
   Pos1, Pos2: integer;
   i: integer;
-  HintText: string;
+  SHint: string;
   Style: TSyntaxFormat;
 begin
   if not Assigned(Ed) then Exit;
@@ -311,39 +317,43 @@ begin
     if R.StartIdx<0 then Continue;
     if R.EndIdx<0 then Continue;
     Pos1:= AnClient.Tags[R.StartIdx].StartPos;
-    Pos2:= AnClient.Tags[R.EndIdx].StartPos;
-    P1:= Buffer.StrToCaret(Pos1);
-    P2:= Buffer.StrToCaret(Pos2);
+    Pos2:= AnClient.Tags[R.EndIdx].EndPos;
+    Pnt1:= Buffer.StrToCaret(Pos1);
+    Pnt2:= Buffer.StrToCaret(Pos2);
+    if Pnt1.Y<0 then Continue;
+    if Pnt2.Y<0 then Continue;
 
-    HintText:= AnClient.GetCollapsedText(R);
+    SHint:= AnClient.GetCollapsedText(R);
       //+'/'+R.Rule.GetNamePath;
-    Ed.Fold.Add(P1.X+1, P1.Y, P2.Y, R.Rule.DrawStaple, HintText);
+    Ed.Fold.Add(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
 
     if R.Rule.HighlightPos=cpAny then
     begin
       Style:= R.Rule.Style;
       if Style<>nil then
         if Style.BgColor<>clNone then
-          LColored.Add(Style.BgColor, Pos1, Pos2, false, '');
+          LColors.Add(Style.BgColor, Pos1, Pos2, false, '');
     end;
   end;
 end;
 
-procedure TATAdapterEControl.UpdateColoredRanges;
+procedure TATAdapterEControl.UpdateSublexRanges;
 var
   R: TSubLexerRange;
   Style: TSyntaxFormat;
   i: integer;
 begin
-  LColored.Clear;
   for i:= 0 to AnClient.SubLexerRangeCount-1 do
   begin
     R:= AnClient.SubLexerRanges[i];
     if R.Rule=nil then Continue;
+    if R.StartPos<0 then Continue;
+    if R.EndPos<0 then Continue;
+
     Style:= R.Rule.Style;
     if Style=nil then Continue;
     if Style.BgColor<>clNone then
-      LColored.Add(Style.BgColor, R.StartPos, R.EndPos, false, '');
+      LColors.Add(Style.BgColor, R.StartPos, R.EndPos, false, '');
   end;
 end;
 

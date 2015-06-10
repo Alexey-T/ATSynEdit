@@ -69,10 +69,14 @@ uses
 
 constructor TATSynRange.Create(AX, AY, AY2: integer; AWithStaple: boolean;
   const AHintText: string);
+  function Msg: string;
+  begin
+    Result:= Format('[Y=%d, Y2=%d, X=%d]', [AY, AY2, AX]);
+  end;
 begin
-  if (AX<=0) then raise Exception.Create('Incorrect range with x<=0');
-  if (AY<0) then raise Exception.Create('Incorrect range with y<0');
-  if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2');
+  if (AX<=0) then raise Exception.Create('Incorrect range with x<=0: '+Msg);
+  if (AY<0) then raise Exception.Create('Incorrect range with y<0: '+Msg);
+  if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2: '+Msg);
 
   FX:= AX;
   FY:= AY;
