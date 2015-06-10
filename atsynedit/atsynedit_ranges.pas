@@ -31,6 +31,7 @@ type
     property HintText: string read FHintText;
     constructor Create(AX, AY, AY2: integer; AWithStaple: boolean; const AHintText: string); virtual;
     function IsSimple: boolean;
+    function IsLineInside(ALine: integer): boolean;
   end;
 
 type
@@ -82,6 +83,11 @@ end;
 function TATSynRange.IsSimple: boolean;
 begin
   Result:= Y=Y2;
+end;
+
+function TATSynRange.IsLineInside(ALine: integer): boolean;
+begin
+  Result:= (ALine>=Y) and (ALine<=Y2);
 end;
 
 { TATSynRanges }
@@ -147,6 +153,8 @@ end;
 
 function TATSynRanges.IsRangeInsideOther(R1, R2: TATSynRange): boolean;
 begin
+  if not Assigned(R1) or not Assigned(R2) then
+    raise Exception.Create('nil range: IsRangeInsideOther');
   Result:=
     IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true) and
     (R1.Y2<=R2.Y2);
@@ -156,39 +164,35 @@ function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
   AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly, AAllLines: boolean): TATIntArray;
 var
   i, j: integer;
-  L: TList;
+  R: TATSynRange;
 begin
   SetLength(Result, 0);
-  L:= TList.Create;
-  try
-    L.Capacity:= 1000;
 
-    //todo... make bin-search...
-    for i:= 0 to Count-1 do
-      with Items[i] do
-        if (not IsSimple) then
-          if (AAllLines and (Y<=ALineFrom) and (Y2>=ALineTo)) or
-            (not AAllLines and (Y<=ALineTo) and (Y2>=ALineFrom)) then
-            if (not AOnlyFolded or Folded) then
-              if (AInRange=nil) or ((Y>=AInRange.Y) and (Y2<=AInRange.Y2)) then
-                L.Add(pointer(i));
-
-    //todo...optim...
-    if ATopLevelOnly then
-      for i:= L.Count-1 downto 0 do
-        for j:= 0 to i-1 do
-        begin
-          if IsRangeInsideOther(Items[i], Items[j]) then
-            L.Delete(L.Count-1);
-        end;
-
-    //copy to result
-    SetLength(Result, L.Count);
-    for i:= 0 to L.Count-1 do
-      Result[i]:= integer(L[i]);
-  finally
-    FreeAndNil(L);
+  for i:= 0 to Count-1 do
+  begin
+    R:= Items[i];
+    if (not R.IsSimple) then
+      if (not AOnlyFolded or R.Folded) then
+        if (AAllLines and (R.Y<=ALineFrom) and (R.Y2>=ALineTo)) or
+           (not AAllLines and (R.Y<=ALineTo) and (R.Y2>=ALineFrom)) then
+          if (AInRange=nil) or
+            (Assigned(AInRange) and (AInRange<>R) and (R.Y>=AInRange.Y) and (R.Y2<=AInRange.Y2)) then
+          begin
+            SetLength(Result, Length(Result)+1);
+            Result[Length(Result)-1]:= i;
+          end;
   end;
+
+  if ATopLevelOnly then
+    for i:= Length(Result)-1 downto 1 do
+      for j:= 0 to i-1 do
+      begin
+        if IsRangeInsideOther(Items[Result[i]], Items[Result[j]]) then
+        begin
+          SetLength(Result, Length(Result)-1);
+          Break
+        end;
+      end;
 end;
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): TATSynRange;

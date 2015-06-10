@@ -39,48 +39,98 @@ begin
   Result:= Strings.IsPosFolded(AX, AY);
 end;
 
+(*
+example of CPP file which is hard to unfold (if nested ranges folded).
+ {
+ d1
+   {
+   d2a
+   }
+   {
+   d2b
+     {
+     d3a
+     }
+     {
+     d3b
+       {
+       d4a
+       }
+       {
+       d4b
+       }
+     }
+   }
+ }
 
-procedure TATSynEdit.DoFold_SetRangeFolding(ARange: TATSynRange; AFolded: boolean);
+what we do. for each line in range:
+a) if line not in any subrange, show it
+b) for all subranges at top level:
+  b1) if subrange marked folded, unfold 1st line "[...]"
+  b2) if subrange marked unfolded, recursion
+*)
+procedure TATSynEdit.DoFold_RangeUnfold(ARange: TATSynRange);
 var
   List: TATIntArray;
   R: TATSynRange;
   i, j: integer;
+  InSubrange: boolean;
 begin
-  ARange.Folded:= AFolded;
-  if AFolded then
-  begin
-    Strings.LinesHidden[ARange.Y]:= ARange.X;
-    for i:= ARange.Y+1 to ARange.Y2 do
-      Strings.LinesHidden[i]:= -1;
-  end
-  else
-  begin
-    //unfold is hard. need to unfold only those lines
-    //which aren't inside other folded ranges
-    for i:= ARange.Y to ARange.Y2 do
-    begin
-      //find other folded ranges
-      List:= FFold.FindRangesContainingLines(i, i, ARange,
-        true{OnlyFolded}, true{TopLevel}, true{All});
+  ARange.Folded:= false;
+  FWrapUpdateNeeded:= true;
 
-      //line not in other ranges? unfold
-      if Length(List)=0 then
+  List:= FFold.FindRangesContainingLines(ARange.Y, ARange.Y2, ARange,
+    false{OnlyFolded}, true{TopLevel}, false{AllLines});
+
+  //show all lines not in subranges
+  for i:= ARange.Y to ARange.Y2 do
+  begin
+    InSubrange:= false;
+    for j:= Low(List) to High(List) do
+      if FFold[List[j]].IsLineInside(i) then
       begin
-        Strings.LinesHidden[i]:= 0;
-        Continue;
+        InSubrange:= true;
+        Break
       end;
 
-      //line in range: unfold only 1st line of range
-      for j:= Low(List) to High(List) do
-      begin
-        R:= FFold[List[j]];
-        Strings.LinesHidden[R.Y]:= R.X;
-      end;
-    end;
+    if not InSubrange then
+      Strings.LinesHidden[i]:= 0;
   end;
 
-  FWrapUpdateNeeded:= true;
+  //unfold subranges, resursion
+  for i:= Low(List) to High(List) do
+  begin
+    R:= FFold[List[i]];
+    if R.Folded then
+      Strings.LinesHidden[R.Y]:= R.X
+    else
+      DoFold_RangeUnfold(R);
+  end;
 end;
+
+procedure TATSynEdit.DoFold_RangeFold(ARange: TATSynRange);
+var
+  i: integer;
+begin
+  ARange.Folded:= true;
+  FWrapUpdateNeeded:= true;
+
+  //partially fold 1st line
+  Strings.LinesHidden[ARange.Y]:= ARange.X;
+  //fully fold next lines
+  for i:= ARange.Y+1 to ARange.Y2 do
+    Strings.LinesHidden[i]:= -1;
+end;
+
+
+procedure TATSynEdit.DoFold_RangeFoldUnfold(ARange: TATSynRange; ADoFold: boolean);
+begin
+  if ADoFold then
+    DoFold_RangeFold(ARange)
+  else
+    DoFold_RangeUnfold(ARange);
+end;
+
 
 procedure TATSynEdit.DoUnfoldLine(ALine: integer);
 var
@@ -90,7 +140,7 @@ begin
   List:= FFold.FindRangesContainingLines(ALine, ALine, nil,
     true{OnlyFolded}, false{TopLevelOnly}, true{All});
   for i:= Low(List) to High(List) do
-    DoFold_SetRangeFolding(FFold[List[i]], false);
+    DoFold_RangeFoldUnfold(FFold[List[i]], false);
 end;
 
 procedure TATSynEdit.DoFold_ClickFoldingBar(ALine: integer);
@@ -100,8 +150,21 @@ begin
   R:= FFold.FindRangeWithPlusAtLine(ALine);
   if Assigned(R) then
   begin
-    DoFold_SetRangeFolding(R, not R.Folded);
+    DoFold_RangeFoldUnfold(R, not R.Folded);
     Update;
   end;
+end;
+
+
+function TATSynEdit.GetFoldedMarkText(ALine: integer): string;
+var
+  R: TATSynRange;
+begin
+  Result:= '';
+  R:= FFold.FindRangeWithPlusAtLine(ALine);
+  if Assigned(R) then
+    Result:= R.HintText;
+  if Result='' then
+    Result:= '...';
 end;
 

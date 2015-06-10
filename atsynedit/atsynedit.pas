@@ -466,6 +466,8 @@ type
     procedure DebugFindWrapIndex;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
+    procedure DoFold_RangeFold(ARange: TATSynRange);
+    procedure DoFold_RangeUnfold(ARange: TATSynRange);
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHintShow;
@@ -737,7 +739,7 @@ type
     procedure DoGotoCaret(AEdge: TATCaretEdge);
     procedure DoGotoPosEx(APnt: TPoint);
     //fold
-    procedure DoFold_SetRangeFolding(ARange: TATSynRange; AFolded: boolean);
+    procedure DoFold_RangeFoldUnfold(ARange: TATSynRange; ADoFold: boolean);
     procedure DoFold_ClickFoldingBar(ALine: integer);
     //misc
     procedure DoCommandExec(ACmd: integer; const AText: atString = ''); virtual;
@@ -3828,7 +3830,6 @@ begin
   AppProcessMessages;
 end;
 
-
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin
   if FOptShowStapleStyle=cBorderNone then Exit;
@@ -3887,17 +3888,6 @@ begin
   end;
 end;
 
-function TATSynEdit.GetFoldedMarkText(ALine: integer): string;
-var
-  R: TATSynRange;
-begin
-  Result:= '';
-  R:= FFold.FindRangeWithPlusAtLine(ALine);
-  if Assigned(R) then
-    Result:= R.HintText;
-  if Result='' then
-    Result:= '...';
-end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
