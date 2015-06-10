@@ -167,7 +167,9 @@ function TATSynRanges.IsRangeInsideOther(R1, R2: TATSynRange): boolean;
 begin
   Result:=
     IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true)
-      and (R1.Y2<=R2.Y2);
+      and (R1.Y2-1<=R2.Y2);
+      //-1 is ok, only non-simple ranges seen in 'for'
+      //needed for block hanging out by Y2 by 1 line
 end;
 
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
