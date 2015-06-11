@@ -155,10 +155,11 @@ end;
 
 procedure TfmMain.chkLexerChange(Sender: TObject);
 begin
+  adapter.SetLexer(nil);
+  ed.Fold.Clear;
+
   if chkLexer.Checked then
-    adapter.SetLexer(DoFindLexerForFilename(manager, FFilename))
-  else
-    DoLexer('');
+    adapter.SetLexer(DoFindLexerForFilename(manager, FFilename));
   ed.Update;
 end;
 

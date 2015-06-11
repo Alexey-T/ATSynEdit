@@ -254,6 +254,7 @@ end;
 
 procedure TATAdapterEControl.SetLexer(AAnalizer: TSyntAnalyzer);
 begin
+  LColors.Clear;
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
