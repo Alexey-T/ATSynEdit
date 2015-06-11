@@ -25,9 +25,15 @@ begin
   //Maybe possible to always use Applyover but it's slower so i made Createnew for
   //faster render w/out adapter
   if AParts[0].Len>0 then
-    DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1)
+  begin
+    DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
+    //aparts[0].ColorBG:= clgreen;
+  end
   else
+  begin
     DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+    //aparts[0].ColorBG:= clyellow;
+  end;
 end;
 
 

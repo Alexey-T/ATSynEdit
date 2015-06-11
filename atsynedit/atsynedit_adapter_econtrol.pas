@@ -129,7 +129,7 @@ var
     part.Len:= ALen;
     part.ColorFont:= AColorFont;
     part.ColorBG:= GetTokenColorBG(strpos, AColorBG);
-    Move(part, AParts[partindex], SizeOf(part));
+    AParts[partindex]:= part;
     Inc(partindex);
   end;
   //
@@ -216,7 +216,7 @@ begin
     //add calculated part
     if part.Len>0 then
     begin
-      Move(part, AParts[partindex], SizeOf(part));
+      AParts[partindex]:= part;
       Inc(partindex);
       if partindex>=High(AParts) then Exit;
     end;
