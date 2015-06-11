@@ -26,33 +26,31 @@ object fmMain: TfmMain
       Top = 8
       Width = 76
       Caption = 'word wrap'
-      Checked = True
       OnChange = chkWrapChange
-      State = cbChecked
       TabOrder = 0
     end
     object edLexer: TComboBox
-      Left = 123
+      Left = 144
       Height = 23
-      Top = 4
-      Width = 173
+      Top = 36
+      Width = 152
       DropDownCount = 24
       ItemHeight = 15
       OnChange = edLexerChange
       Style = csDropDownList
-      TabOrder = 1
+      TabOrder = 4
     end
     object files: TShellListView
       Left = 304
       Height = 144
       Top = 4
-      Width = 306
+      Width = 464
       Anchors = [akTop, akLeft, akBottom]
       Color = clDefault
       HideSelection = False
       ReadOnly = True
       SortType = stText
-      TabOrder = 2
+      TabOrder = 5
       ViewStyle = vsList
       OnClick = filesClick
       ObjectTypes = [otNonFolders]
@@ -64,7 +62,7 @@ object fmMain: TfmMain
       Width = 104
       Caption = 'show full sel-bg'
       OnChange = chkFullSelChange
-      TabOrder = 3
+      TabOrder = 1
     end
     object chkFullHilite: TCheckBox
       Left = 9
@@ -73,7 +71,20 @@ object fmMain: TfmMain
       Width = 123
       Caption = 'show full syntax-bg'
       OnChange = chkFullHiliteChange
-      TabOrder = 4
+      TabOrder = 2
     end
+    object bOpen: TButton
+      Left = 144
+      Height = 25
+      Top = 8
+      Width = 88
+      Caption = 'open...'
+      OnClick = bOpenClick
+      TabOrder = 3
+    end
+  end
+  object OpenDialog1: TOpenDialog
+    left = 285
+    top = 348
   end
 end

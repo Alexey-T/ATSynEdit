@@ -17,12 +17,15 @@ type
   { TfmMain }
 
   TfmMain = class(TForm)
+    bOpen: TButton;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
     chkWrap: TCheckBox;
     edLexer: TComboBox;
     files: TShellListView;
+    OpenDialog1: TOpenDialog;
     Panel1: TPanel;
+    procedure bOpenClick(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
     procedure chkFullSelChange(Sender: TObject);
     procedure chkWrapChange(Sender: TObject);
@@ -108,6 +111,10 @@ begin
 
   adapter:= TATAdapterEControl.Create;
   ed.AdapterOfHilite:= adapter;
+
+  chkWrap.Checked:= ed.OptWrapMode=cWrapOn;
+  chkFullSel.Checked:= ed.OptShowFullSel;
+  chkFullHilite.Checked:= ed.OptShowFullHilite;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -133,6 +140,17 @@ procedure TfmMain.chkFullHiliteChange(Sender: TObject);
 begin
   ed.OptShowFullHilite:= chkFullHilite.Checked;
   ed.Update;
+end;
+
+procedure TfmMain.bOpenClick(Sender: TObject);
+begin
+  with OpenDialog1 do
+  begin
+    Filename:= '';
+    InitialDir:= filedir;
+    if not Execute then exit;
+    DoOpen(Filename);
+  end;
 end;
 
 procedure TfmMain.DoLexer(const aname: string);

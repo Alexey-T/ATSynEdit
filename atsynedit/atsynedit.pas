@@ -3903,7 +3903,7 @@ begin
     RSt.Right:= RSt.Left+ (ACharSize.X * FOptShowStapleWidthPercent div 100);
     RSt.Bottom:= P2.Y + ACharSize.Y-1;
 
-    if (RSt.Right>ARect.Left) and
+    if (RSt.Left>=ARect.Left) and
       (RSt.Left<ARect.Right) then
     begin
       NColor:= Colors.BlockStaple;
