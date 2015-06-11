@@ -84,11 +84,13 @@ var
 begin
   adapter.SetLexer(nil);
   ed.LoadFromFile(fn);
+  ed.SetFocus;
+
   an:= DoFindLexerForFilename(manager, fn);
   adapter.SetLexer(an);
 
-  edLexer.ItemIndex:= edLexer.Items.IndexOf(an.LexerName);
-  ed.SetFocus;
+  if Assigned(an) then
+    edLexer.ItemIndex:= edLexer.Items.IndexOf(an.LexerName);
 end;
 
 procedure TfmMain.FormCreate(Sender: TObject);

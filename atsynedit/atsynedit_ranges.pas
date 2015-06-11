@@ -72,6 +72,13 @@ uses
   Math,
   ATSynEdit_Carets;
 
+//we allow one block to hangout 1 line by Y2 from outer block:
+//it's needed for Pascal econtrol lexer
+//(don't know why it gives such blocks)
+const
+  cAllowHangoutLines = 1; //0 or 1, do not bigger
+
+
 { TATSynRange }
 
 constructor TATSynRange.Create(AX, AY, AY2: integer; AWithStaple: boolean;
@@ -171,16 +178,14 @@ function TATSynRanges.IsRangeInsideOther(R1, R2: TATSynRange): boolean;
 begin
   Result:=
     IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true)
-      and (R1.Y2-1<=R2.Y2);
-      //-1 is ok, only non-simple ranges seen in 'for'
-      //needed for block hanging out by Y2 by 1 line
+    and (R1.Y2-cAllowHangoutLines<=R2.Y2);
 end;
 
 function TATSynRanges.IsRangesSame(R1, R2: TATSynRange): boolean;
 begin
   if R1=R2 then
     begin Result:= true; Exit end;
-  if (R1.X=R2.X) and (R1.Y=R2.Y) and (Abs(R1.Y2-R2.Y2)<=1) then
+  if (R1.X=R2.X) and (R1.Y=R2.Y) and (Abs(R1.Y2-R2.Y2)<=cAllowHangoutLines) then
     begin Result:= true; Exit end;
 
   Result:= false;
