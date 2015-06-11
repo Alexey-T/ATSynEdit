@@ -123,7 +123,7 @@ end;
 
 procedure TfmMain.chkSelFullChange(Sender: TObject);
 begin
-  ed.OptShowSelFull:= chkSelFull.Checked;
+  ed.OptShowFullSel:= chkSelFull.Checked;
   ed.Update;
 end;
 

@@ -15,6 +15,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkShowFullHilite: TCheckBox;
     chkMsHideCursor: TCheckBox;
     chkLeftRtSwapAndSel: TCheckBox;
     chkGutterSep: TCheckBox;
@@ -66,7 +67,7 @@ type
     chkMsClick2: TCheckBox;
     chkMsClick2Drag: TCheckBox;
     chkMsClick3: TCheckBox;
-    chkColorSel: TCheckBox;
+    chkShowFullSel: TCheckBox;
     chkCopyNoSel: TCheckBox;
     chkCurCol: TCheckBox;
     chkCurLine: TCheckBox;
@@ -194,7 +195,8 @@ begin
     chkCurLineMin.Checked:= ed.OptShowCurLineMinimal;
     chkCurCol.Checked:= ed.OptShowCurColumn;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
-    chkColorSel.Checked:= ed.OptShowSelFull;
+    chkShowFullSel.Checked:= ed.OptShowFullSel;
+    chkShowFullHilite.Checked:= ed.OptShowFullHilite;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
     chkOvrPaste.Checked:= ed.OptOverwriteAllowedOnPaste;
@@ -312,7 +314,8 @@ begin
       ed.OptOverwriteAllowedOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
-      ed.OptShowSelFull:= chkColorSel.Checked;
+      ed.OptShowFullSel:= chkShowFullSel.Checked;
+      ed.OptShowFullHilite:= chkShowFullHilite.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;

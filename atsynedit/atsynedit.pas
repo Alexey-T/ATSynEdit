@@ -441,7 +441,8 @@ type
     FOptKeyUpDownKeepColumn: boolean;
     FOptCopyLinesIfNoSel: boolean;
     FOptCutLinesIfNoSel: boolean;
-    FOptShowSelFull: boolean;
+    FOptShowFullSel: boolean;
+    FOptShowFullHilite: boolean;
     FOptShowCurLine: boolean;
     FOptShowCurLineMinimal: boolean;
     FOptShowCurColumn: boolean;
@@ -466,6 +467,7 @@ type
     FOptAllowReadOnly: boolean;
     //
     procedure DebugFindWrapIndex;
+    procedure DoCalcLineEmptyColor(ALine: integer; var AColor: TColor);
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
     procedure DoFold_RangeFold(ARange: TATSynRange);
@@ -854,7 +856,8 @@ type
     property OptShowStapleStyle: TATLineBorderStyle read FOptShowStapleStyle write FOptShowStapleStyle;
     property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent;
     property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent;
-    property OptShowSelFull: boolean read FOptShowSelFull write FOptShowSelFull;
+    property OptShowFullSel: boolean read FOptShowFullSel write FOptShowFullSel;
+    property OptShowFullHilite: boolean read FOptShowFullHilite write FOptShowFullHilite;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal;
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint;
@@ -1647,7 +1650,7 @@ begin
         NColorAfterEol);
 
       //adapter may return ColorAfterEol, paint it
-      if FOptShowSelFull then
+      if FOptShowFullHilite then
         if NColorAfterEol<>clNone then
         begin
           C.Brush.Color:= NColorAfterEol;
@@ -1691,6 +1694,17 @@ begin
     end
     else
     begin
+      if FOptShowFullHilite then
+      begin
+        NColorAfterEol:= clNone;
+        DoCalcLineEmptyColor(NLinesIndex, NColorAfterEol);
+        if NColorAfterEol<>clNone then
+        begin
+          C.Brush.Color:= NColorAfterEol;
+          C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+        end;
+      end;
+
       DoPaintSelectedLineBG(C, ACharSize, ARect,
         CurrPoint,
         CurrPointText,
@@ -1705,7 +1719,7 @@ begin
 
     if WrapItem.NFinal=cWrapItemFinal then
     begin
-      //for OptShowSelFull=false paint eol bg
+      //for OptShowFullSel=false paint eol bg
       if LineEolSelected then
       begin
         C.Brush.Color:= FColors.TextSelBG;
@@ -2142,7 +2156,8 @@ begin
   FOptMouseGutterClickSelectsLine:= true;
   FOptCopyLinesIfNoSel:= true;
   FOptCutLinesIfNoSel:= false;
-  FOptShowSelFull:= false;
+  FOptShowFullSel:= false;
+  FOptShowFullHilite:= true;
   FOptShowCurLine:= false;
   FOptShowCurLineMinimal:= true;
   FOptShowCurColumn:= false;
@@ -3290,7 +3305,7 @@ begin
     end;
   end
   else
-  if FOptShowSelFull then
+  if FOptShowFullSel then
     if AEolSelected then
     begin
       C.Brush.Color:= FColors.TextSelBG;
@@ -3902,6 +3917,7 @@ end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
+
 {$I atsynedit_sel.inc}
 {$I atsynedit_fold.inc}
 {$I atsynedit_debug.inc}

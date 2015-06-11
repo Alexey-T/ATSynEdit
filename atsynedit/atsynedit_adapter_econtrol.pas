@@ -43,6 +43,8 @@ type
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
       AColorBG: TColor; var AColorAfterEol: TColor); override;
+    procedure OnEditorCalcEmptyColor(Sender: TObject;
+      ALineIndex: integer; var AColor: TColor); override;
   end;
 
 implementation
@@ -81,6 +83,15 @@ begin
     Ed.Colors.TextFont,
     AColorBG,
     AColorAfterEol);
+end;
+
+procedure TATAdapterEControl.OnEditorCalcEmptyColor(Sender: TObject;
+  ALineIndex: integer; var AColor: TColor);
+var
+  Pos: integer;
+begin
+  Pos:= Buffer.CaretToStr(Point(0, ALineIndex));
+  AColor:= GetTokenColorBG(Pos, AColor);
 end;
 
 function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;

@@ -118,3 +118,9 @@ begin
 end;
 
 
+procedure TATSynEdit.DoCalcLineEmptyColor(ALine: integer; var AColor: TColor);
+begin
+  if Assigned(FAdapterOfHilite) then
+    FAdapterOfHilite.OnEditorCalcEmptyColor(Self, ALine, AColor);
+end;
+

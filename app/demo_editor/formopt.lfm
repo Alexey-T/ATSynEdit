@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet3
-    TabIndex = 4
+    ActivePage = TabSheet1
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -73,12 +73,12 @@ object fmOpt: TfmOpt
         Caption = 'copy lines if no sel'
         TabOrder = 5
       end
-      object chkColorSel: TCheckBox
+      object chkShowFullSel: TCheckBox
         Left = 8
         Height = 19
         Top = 88
-        Width = 141
-        Caption = 'hilite selection till edge'
+        Width = 159
+        Caption = 'show selection-bg full line'
         TabOrder = 4
       end
       object chkOvrPaste: TCheckBox
@@ -166,6 +166,14 @@ object fmOpt: TfmOpt
         Width = 98
         Caption = 'hint for empty text'
         ParentColor = False
+      end
+      object chkShowFullHilite: TCheckBox
+        Left = 8
+        Height = 19
+        Top = 108
+        Width = 145
+        Caption = 'show syntax-bg full line'
+        TabOrder = 14
       end
     end
     object TabSheet2: TTabSheet
