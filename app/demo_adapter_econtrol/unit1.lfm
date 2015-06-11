@@ -21,7 +21,7 @@ object fmMain: TfmMain
     ClientWidth = 777
     TabOrder = 0
     object chkWrap: TCheckBox
-      Left = 13
+      Left = 9
       Height = 19
       Top = 8
       Width = 76
@@ -57,14 +57,23 @@ object fmMain: TfmMain
       OnClick = filesClick
       ObjectTypes = [otNonFolders]
     end
-    object chkSelFull: TCheckBox
-      Left = 14
+    object chkFullSel: TCheckBox
+      Left = 9
       Height = 19
-      Top = 31
-      Width = 85
-      Caption = 'show sel full'
-      OnChange = chkSelFullChange
+      Top = 28
+      Width = 104
+      Caption = 'show full sel-bg'
+      OnChange = chkFullSelChange
       TabOrder = 3
+    end
+    object chkFullHilite: TCheckBox
+      Left = 9
+      Height = 19
+      Top = 48
+      Width = 123
+      Caption = 'show full syntax-bg'
+      OnChange = chkFullHiliteChange
+      TabOrder = 4
     end
   end
 end

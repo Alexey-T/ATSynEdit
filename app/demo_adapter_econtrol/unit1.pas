@@ -17,12 +17,14 @@ type
   { TfmMain }
 
   TfmMain = class(TForm)
-    chkSelFull: TCheckBox;
+    chkFullHilite: TCheckBox;
+    chkFullSel: TCheckBox;
     chkWrap: TCheckBox;
     edLexer: TComboBox;
     files: TShellListView;
     Panel1: TPanel;
-    procedure chkSelFullChange(Sender: TObject);
+    procedure chkFullHiliteChange(Sender: TObject);
+    procedure chkFullSelChange(Sender: TObject);
     procedure chkWrapChange(Sender: TObject);
     procedure edLexerChange(Sender: TObject);
     procedure filesClick(Sender: TObject);
@@ -121,9 +123,15 @@ begin
     ed.OptWrapMode:= cWrapOff;
 end;
 
-procedure TfmMain.chkSelFullChange(Sender: TObject);
+procedure TfmMain.chkFullSelChange(Sender: TObject);
 begin
-  ed.OptShowFullSel:= chkSelFull.Checked;
+  ed.OptShowFullSel:= chkFullSel.Checked;
+  ed.Update;
+end;
+
+procedure TfmMain.chkFullHiliteChange(Sender: TObject);
+begin
+  ed.OptShowFullHilite:= chkFullHilite.Checked;
   ed.Update;
 end;
 
