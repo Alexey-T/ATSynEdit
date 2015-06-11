@@ -112,6 +112,17 @@ object fmMain: TfmMain
       OnChange = chkShowCurChange
       TabOrder = 7
     end
+    object chkLexer: TCheckBox
+      Left = 144
+      Height = 19
+      Top = 62
+      Width = 82
+      Caption = 'enable lexer'
+      Checked = True
+      OnChange = chkLexerChange
+      State = cbChecked
+      TabOrder = 8
+    end
   end
   object OpenDialog1: TOpenDialog
     left = 285

@@ -20,6 +20,7 @@ type
     bOpen: TButton;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
+    chkLexer: TCheckBox;
     chkShowCur: TCheckBox;
     chkUnpri: TCheckBox;
     chkWrap: TCheckBox;
@@ -31,6 +32,7 @@ type
     procedure bOpenClick(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
     procedure chkFullSelChange(Sender: TObject);
+    procedure chkLexerChange(Sender: TObject);
     procedure chkShowCurChange(Sender: TObject);
     procedure chkUnpriChange(Sender: TObject);
     procedure chkWrapChange(Sender: TObject);
@@ -42,6 +44,7 @@ type
     { private declarations }
     ed: TATSynEdit;
     FDir: string;
+    FFilename: string;
     procedure DoLexer(const aname: string);
     procedure DoOpen(const fn: string);
     procedure EditCalcStaple(Snd: TObject; ALine, AIndent: integer; var AColor: TColor);
@@ -84,6 +87,8 @@ procedure TfmMain.DoOpen(const fn: string);
 var
   an: TSyntAnalyzer;
 begin
+  FFilename:= fn;
+
   adapter.SetLexer(nil);
   ed.LoadFromFile(fn);
   ed.SetFocus;
@@ -145,6 +150,15 @@ end;
 procedure TfmMain.chkFullSelChange(Sender: TObject);
 begin
   ed.OptShowFullSel:= chkFullSel.Checked;
+  ed.Update;
+end;
+
+procedure TfmMain.chkLexerChange(Sender: TObject);
+begin
+  if chkLexer.Checked then
+    adapter.SetLexer(DoFindLexerForFilename(manager, FFilename))
+  else
+    DoLexer('');
   ed.Update;
 end;
 

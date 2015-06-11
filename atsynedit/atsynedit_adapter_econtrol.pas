@@ -143,7 +143,7 @@ begin
   partindex:= 0;
   FillChar(part{%H-}, SizeOf(part), 0);
 
-  startindex:= AnClient.PriorTokenAt(Buffer.CaretToStr(Point(0, ALine)));
+  startindex:= AnClient.TokenAtPos(Buffer.CaretToStr(Point(0, ALine)));
   if startindex<0 then
     startindex:= 0;
 

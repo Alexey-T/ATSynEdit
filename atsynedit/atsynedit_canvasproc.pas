@@ -451,8 +451,7 @@ var
   PartStr: atString;
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
-  PartColorFont, PartColorBG, PartColorBorder: TColor;
-  PartBorderL, PartBorderR, PartBorderU, PartBorderD: TATLineBorderStyle;
+  PartPtr: ^TATLinePart;
   PartFontStyle: TFontStyles;
   PartRect: TRect;
   Buf: AnsiString;
@@ -491,25 +490,17 @@ begin
   else
   for j:= 0 to High(TATLineParts) do
     begin
-      PartLen:= AParts^[j].Len;
+      PartPtr:= @AParts^[j];
+      PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
-      PartOffset:= AParts^[j].Offset;
+      PartOffset:= PartPtr^.Offset;
       PartStr:= Copy(Str, PartOffset+1, PartLen);
       if PartStr='' then Break;
 
-      PartColorFont:= AParts^[j].ColorFont;
-      PartColorBG:= AParts^[j].ColorBG;
-      PartColorBorder:= AParts^[j].ColorBorder;
-
       PartFontStyle:= [];
-      if AParts^[j].FontBold then Include(PartFontStyle, fsBold);
-      if AParts^[j].FontItalic then Include(PartFontStyle, fsItalic);
-      if AParts^[j].FontStrikeOut then Include(PartFontStyle, fsStrikeOut);
-
-      PartBorderL:= AParts^[j].BorderLeft;
-      PartBorderR:= AParts^[j].BorderRight;
-      PartBorderU:= AParts^[j].BorderUp;
-      PartBorderD:= AParts^[j].BorderDown;
+      if PartPtr^.FontBold then Include(PartFontStyle, fsBold);
+      if PartPtr^.FontItalic then Include(PartFontStyle, fsItalic);
+      if PartPtr^.FontStrikeOut then Include(PartFontStyle, fsStrikeOut);
 
       if PartOffset>0 then
         PixOffset1:= ListInt[PartOffset-1]
@@ -522,8 +513,8 @@ begin
       else
         PixOffset2:= 0;
 
-      C.Font.Color:= PartColorFont;
-      C.Brush.Color:= PartColorBG;
+      C.Font.Color:= PartPtr^.ColorFont;
+      C.Brush.Color:= PartPtr^.ColorBG;
       C.Font.Style:= PartFontStyle;
 
       PartRect:= Rect(
@@ -548,15 +539,15 @@ begin
         Point(PosX+PixOffset1, PosY),
         ACharSize,
         AColorHex,
-        PartColorBG
+        PartPtr^.ColorBG
         );
 
       if AMainText then
       begin
-        DoPaintBorder(C, PartColorBorder, PartRect, cSideDown, PartBorderD);
-        DoPaintBorder(C, PartColorBorder, PartRect, cSideUp, PartBorderU);
-        DoPaintBorder(C, PartColorBorder, PartRect, cSideLeft, PartBorderL);
-        DoPaintBorder(C, PartColorBorder, PartRect, cSideRight, PartBorderR);
+        DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideDown, PartPtr^.BorderDown);
+        DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideUp, PartPtr^.BorderUp);
+        DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideLeft, PartPtr^.BorderLeft);
+        DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideRight, PartPtr^.BorderRight);
       end;
     end;
 

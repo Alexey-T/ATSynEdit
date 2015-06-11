@@ -1624,7 +1624,7 @@ begin
       CurrPoint.Y);
     NOutputStrWidth:= 0;
 
-    //draw line
+    //paint line
     if StrOut<>'' then
     begin
       NOutputCharsSkipped:= 0;
@@ -1692,6 +1692,7 @@ begin
       C.Font.Style:= Font.Style; //restore after textout
     end
     else
+    //paint empty line bg
     begin
       if FOptShowFullHilite then
       begin
