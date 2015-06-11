@@ -5,3 +5,7 @@
 
 
 (solved) C#. rules 'function begin' etc dont work. they have 'parent', 'not a parent' set.
+Js. rule 'comment' dont work. 
+  ex1. not hilited: //<![CDATA[
+  ex2. not hilited till tag: //]]></script>
+  
