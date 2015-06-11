@@ -20,6 +20,7 @@ type
     bOpen: TButton;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
+    chkShowCur: TCheckBox;
     chkUnpri: TCheckBox;
     chkWrap: TCheckBox;
     edLexer: TComboBox;
@@ -30,6 +31,7 @@ type
     procedure bOpenClick(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
     procedure chkFullSelChange(Sender: TObject);
+    procedure chkShowCurChange(Sender: TObject);
     procedure chkUnpriChange(Sender: TObject);
     procedure chkWrapChange(Sender: TObject);
     procedure edLexerChange(Sender: TObject);
@@ -111,6 +113,8 @@ begin
   ed.OptUnprintedVisible:= false;
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
+  ed.Colors.CurrentLineBG:= clTeal;
+
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnCalcStaple:= @EditCalcStaple;
 
@@ -121,6 +125,7 @@ begin
   chkFullSel.Checked:= ed.OptShowFullSel;
   chkFullHilite.Checked:= ed.OptShowFullHilite;
   chkUnpri.Checked:= ed.OptUnprintedVisible;
+  chkShowCur.Checked:= ed.OptShowCurLine;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -140,6 +145,12 @@ end;
 procedure TfmMain.chkFullSelChange(Sender: TObject);
 begin
   ed.OptShowFullSel:= chkFullSel.Checked;
+  ed.Update;
+end;
+
+procedure TfmMain.chkShowCurChange(Sender: TObject);
+begin
+  ed.OptShowCurLine:= chkShowCur.Checked;
   ed.Update;
 end;
 

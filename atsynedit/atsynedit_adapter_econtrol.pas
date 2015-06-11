@@ -42,7 +42,7 @@ type
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
-      AColorBG: TColor; var AColorAfterEol: TColor); override;
+      var AColorAfterEol: TColor); override;
     procedure OnEditorCalcEmptyColor(Sender: TObject;
       ALineIndex: integer; var AColor: TColor); override;
   end;
@@ -67,7 +67,7 @@ const
 
 procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
   var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer;
-  AColorBG: TColor; var AColorAfterEol: TColor);
+  var AColorAfterEol: TColor);
 var
   Str: atString;
 begin
@@ -81,7 +81,7 @@ begin
   AColorAfterEol:= clNone;
   DoCalcParts(AParts, ALineIndex, ACharIndex-1, ALineLen,
     Ed.Colors.TextFont,
-    AColorBG,
+    clNone,
     AColorAfterEol);
 end;
 

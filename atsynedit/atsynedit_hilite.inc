@@ -13,9 +13,11 @@ begin
 
   FillChar(AParts, SizeOf(AParts), 0);
   if Assigned(FAdapterOfHilite) then
-    FAdapterOfHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorBG, AColorAfterEol);
+    FAdapterOfHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
   if Assigned(FOnCalcHilite) then
-    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorBG, AColorAfterEol);
+    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
+
+  DoPartSetColorBG(AParts, AColorBG);
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts

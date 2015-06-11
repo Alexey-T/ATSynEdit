@@ -91,6 +91,7 @@ procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACent
 
 procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
+procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor);
 
 
 implementation
@@ -739,6 +740,17 @@ begin
 end;
 
 
+procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor);
+var
+  i: integer;
+begin
+  for i:= Low(AParts) to High(AParts) do
+  begin
+    if AParts[i].Len=0 then Break;
+    if AParts[i].ColorBG=clNone then
+      AParts[i].ColorBG:= AColor;
+  end;
+end;
 
 initialization
   _Pen:= TPen.Create;

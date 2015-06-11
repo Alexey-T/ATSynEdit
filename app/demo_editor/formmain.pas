@@ -158,7 +158,7 @@ type
     procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
-      ALineIndex, ACharIndex, ALineLen: integer; AColorBG: TColor; var AColorAfterEol: TColor);
+      ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
     procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
     procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
@@ -925,8 +925,7 @@ begin
 end;
 
 procedure TfmMain.EditCalcLine(Sender: TObject; var AParts: TATLineParts;
-  ALineIndex, ACharIndex, ALineLen: integer; AColorBG: TColor;
-  var AColorAfterEol: TColor);
+  ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
 var
   nlen, npart, noffset: integer;
   kind, kindnew: integer;
@@ -936,7 +935,7 @@ var
     if npart>High(AParts) then exit;
     with AParts[npart] do
     begin
-      ColorBG:= AColorBG;
+      ColorBG:= clNone;
       case kind of
         1: begin
              ColorFont:= clblue;

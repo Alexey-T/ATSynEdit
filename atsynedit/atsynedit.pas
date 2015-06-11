@@ -271,8 +271,7 @@ type
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
   TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
-    ALineIndex, ACharIndex, ALineLen: integer;
-    AColorBG: TColor; var AColorAfterEol: TColor) of object;
+    ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor) of object;
 
 
 type
