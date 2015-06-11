@@ -9,14 +9,14 @@ uses
   ATSynEdit_CanvasProc;
 
 type
-  TATSynEdit_AdapterOfHilite = class(TObject)
+  TATAdapterHilite = class(TObject)
   public
     procedure OnEditorChange(Sender: TObject); virtual; abstract;
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
       var AColorAfterEol: TColor); virtual; abstract;
-    procedure OnEditorCalcEmptyColor(Sender: TObject;
+    procedure OnEditorCalcLineColor(Sender: TObject;
       ALineIndex: integer; var AColor: TColor); virtual; abstract;
   end;
 

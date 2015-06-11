@@ -292,7 +292,7 @@ type
     FMarginList: TList;
     FStringsInt,
     FStringsExternal: TATStrings;
-    FAdapterOfHilite: TATSynEdit_AdapterOfHilite;
+    FAdapterHilite: TATAdapterHilite;
     FFold: TATSynRanges;
     FCursorText,
     FCursorBm: TCursor;
@@ -466,7 +466,7 @@ type
     FOptAllowReadOnly: boolean;
     //
     procedure DebugFindWrapIndex;
-    procedure DoCalcLineEmptyColor(ALine: integer; var AColor: TColor);
+    procedure DoCalcLineStartColor(ALine: integer; var AColor: TColor);
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
     procedure DoFold_RangeFold(ARange: TATSynRange);
@@ -705,7 +705,7 @@ type
     property Fold: TATSynRanges read FFold;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified;
-    property AdapterOfHilite: TATSynEdit_AdapterOfHilite read FAdapterOfHilite write FAdapterOfHilite;
+    property AdapterOfHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property ScrollTop: integer read GetScrollTop write SetScrollTop;
     property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
     property LineVisibleFirst: integer read GetScrollTop;
@@ -1697,7 +1697,7 @@ begin
       if FOptShowFullHilite then
       begin
         NColorAfterEol:= clNone;
-        DoCalcLineEmptyColor(NLinesIndex, NColorAfterEol);
+        DoCalcLineStartColor(NLinesIndex, NColorAfterEol);
         if NColorAfterEol<>clNone then
         begin
           C.Brush.Color:= NColorAfterEol;
@@ -3364,8 +3364,8 @@ end;
 
 procedure TATSynEdit.DoEventChange;
 begin
-  if Assigned(FAdapterOfHilite) then
-    FAdapterOfHilite.OnEditorChange(Self);
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorChange(Self);
   if Assigned(FOnChange) then
     FOnChange(Self);
 end;

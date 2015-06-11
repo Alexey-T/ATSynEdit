@@ -12,8 +12,8 @@ begin
   nCharIndex:= AItem.NCharIndex+ACharsSkipped;
 
   FillChar(AParts, SizeOf(AParts), 0);
-  if Assigned(FAdapterOfHilite) then
-    FAdapterOfHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
 
@@ -126,9 +126,11 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcLineEmptyColor(ALine: integer; var AColor: TColor);
+procedure TATSynEdit.DoCalcLineStartColor(ALine: integer; var AColor: TColor);
 begin
-  if Assigned(FAdapterOfHilite) then
-    FAdapterOfHilite.OnEditorCalcEmptyColor(Self, ALine, AColor);
+  //no event yet
+  //...
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorCalcLineColor(Self, ALine, AColor);
 end;
 

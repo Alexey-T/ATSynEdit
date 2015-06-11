@@ -19,7 +19,7 @@ uses
 type
   { TATAdapterEControl }
 
-  TATAdapterEControl = class(TATSynEdit_AdapterOfHilite)
+  TATAdapterEControl = class(TATAdapterHilite)
   private
     Ed: TATSynEdit;
     An: TSyntAnalyzer;
@@ -43,7 +43,7 @@ type
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
       var AColorAfterEol: TColor); override;
-    procedure OnEditorCalcEmptyColor(Sender: TObject;
+    procedure OnEditorCalcLineColor(Sender: TObject;
       ALineIndex: integer; var AColor: TColor); override;
   end;
 
@@ -85,7 +85,7 @@ begin
     AColorAfterEol);
 end;
 
-procedure TATAdapterEControl.OnEditorCalcEmptyColor(Sender: TObject;
+procedure TATAdapterEControl.OnEditorCalcLineColor(Sender: TObject;
   ALineIndex: integer; var AColor: TColor);
 var
   Pos: integer;
@@ -223,12 +223,10 @@ begin
   end;
 
   //add ending missing part
-  if part.Len>0 then
-  begin
-    mustOffset:= part.Offset+part.Len;
-    if mustOffset<ALen then
-      AddMissingPart(mustOffset, ALen-mustOffset);
-  end;
+  //(not only if part.Len>0)
+  mustOffset:= part.Offset+part.Len;
+  if mustOffset<ALen then
+    AddMissingPart(mustOffset, ALen-mustOffset);
 
   mustOffset:= Buffer.CaretToStr(Point(AX+ALen, ALine));
   AColorAfterEol:= GetTokenColorBG(mustOffset, AColorAfterEol);
