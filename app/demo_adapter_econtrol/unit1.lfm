@@ -38,7 +38,7 @@ object fmMain: TfmMain
       ItemHeight = 15
       OnChange = edLexerChange
       Style = csDropDownList
-      TabOrder = 4
+      TabOrder = 5
     end
     object files: TShellListView
       Left = 304
@@ -50,7 +50,7 @@ object fmMain: TfmMain
       HideSelection = False
       ReadOnly = True
       SortType = stText
-      TabOrder = 5
+      TabOrder = 6
       ViewStyle = vsList
       OnClick = filesClick
       ObjectTypes = [otNonFolders]
@@ -58,20 +58,20 @@ object fmMain: TfmMain
     object chkFullSel: TCheckBox
       Left = 9
       Height = 19
-      Top = 28
+      Top = 48
       Width = 104
       Caption = 'show full sel-bg'
       OnChange = chkFullSelChange
-      TabOrder = 1
+      TabOrder = 2
     end
     object chkFullHilite: TCheckBox
       Left = 9
       Height = 19
-      Top = 48
+      Top = 68
       Width = 123
       Caption = 'show full syntax-bg'
       OnChange = chkFullHiliteChange
-      TabOrder = 2
+      TabOrder = 3
     end
     object bOpen: TButton
       Left = 144
@@ -80,7 +80,28 @@ object fmMain: TfmMain
       Width = 88
       Caption = 'open...'
       OnClick = bOpenClick
-      TabOrder = 3
+      TabOrder = 4
+    end
+    object Label1: TLabel
+      Left = 8
+      Height = 15
+      Top = 132
+      Width = 179
+      Caption = 'editing with lexer: not ok, slow yet'
+      Color = clDefault
+      Font.Color = clRed
+      ParentColor = False
+      ParentFont = False
+      Transparent = False
+    end
+    object chkUnpri: TCheckBox
+      Left = 9
+      Height = 19
+      Top = 28
+      Width = 103
+      Caption = 'show unprinted'
+      OnChange = chkUnpriChange
+      TabOrder = 1
     end
   end
   object OpenDialog1: TOpenDialog

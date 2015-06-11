@@ -20,14 +20,17 @@ type
     bOpen: TButton;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
+    chkUnpri: TCheckBox;
     chkWrap: TCheckBox;
     edLexer: TComboBox;
     files: TShellListView;
+    Label1: TLabel;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
     procedure bOpenClick(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
     procedure chkFullSelChange(Sender: TObject);
+    procedure chkUnpriChange(Sender: TObject);
     procedure chkWrapChange(Sender: TObject);
     procedure edLexerChange(Sender: TObject);
     procedure filesClick(Sender: TObject);
@@ -36,7 +39,7 @@ type
   private
     { private declarations }
     ed: TATSynEdit;
-    filedir: string;
+    FDir: string;
     procedure DoLexer(const aname: string);
     procedure DoOpen(const fn: string);
     procedure EditCalcStaple(Snd: TObject; ALine, AIndent: integer; var AColor: TColor);
@@ -92,7 +95,7 @@ procedure TfmMain.FormCreate(Sender: TObject);
 var
   fname_lxl: string;
 begin
-  filedir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'/test_syntax_files/';
+  FDir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'/test_syntax_files/';
   fname_lxl:= ExtractFilePath(Application.ExeName)+'lexlib.lxl';
 
   manager:= TSyntaxManager.Create(Self);
@@ -115,11 +118,13 @@ begin
   chkWrap.Checked:= ed.OptWrapMode=cWrapOn;
   chkFullSel.Checked:= ed.OptShowFullSel;
   chkFullHilite.Checked:= ed.OptShowFullHilite;
+  chkUnpri.Checked:= ed.OptUnprintedVisible;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
 begin
-  files.Root:= filedir;
+  if DirectoryExists(FDir) then
+    files.Root:= FDir;
 end;
 
 procedure TfmMain.chkWrapChange(Sender: TObject);
@@ -136,6 +141,12 @@ begin
   ed.Update;
 end;
 
+procedure TfmMain.chkUnpriChange(Sender: TObject);
+begin
+  ed.OptUnprintedVisible:= chkUnpri.Checked;
+  ed.Update;
+end;
+
 procedure TfmMain.chkFullHiliteChange(Sender: TObject);
 begin
   ed.OptShowFullHilite:= chkFullHilite.Checked;
@@ -147,7 +158,7 @@ begin
   with OpenDialog1 do
   begin
     Filename:= '';
-    InitialDir:= filedir;
+    InitialDir:= FDir;
     if not Execute then exit;
     DoOpen(Filename);
   end;
