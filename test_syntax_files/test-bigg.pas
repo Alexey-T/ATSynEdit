@@ -1,11 +1,7 @@
 {
 SynWrite main UI form.
 }
-//SPELL word must be defined in project options (if Addict lib available)
-//PERLRE word must be defined in project options
 {$Q-} //Disable int-checks to avoid integer exception in TabCtrl_GetXRect
-//{$define TabOrder} //Debug: show tabs switch-order in form caption
-{$define FixRepaint} //Fix repaint problem when resizing SpTBX panels and moving toolbars
 
 unit unMain;
 
