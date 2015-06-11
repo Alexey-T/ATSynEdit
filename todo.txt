@@ -1,0 +1,2 @@
+
+lexer paints line bg: indent bg not painted(used textbg)

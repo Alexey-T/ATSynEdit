@@ -91,6 +91,7 @@
       <Unit11>
         <Filename Value="E:\GitEControl\ec\eczregexpr.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ecZRegExpr"/>
       </Unit11>
       <Unit12>
         <Filename Value="E:\GitEControl\ec\ecstrutils.pas"/>
