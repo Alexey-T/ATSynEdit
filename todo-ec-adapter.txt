@@ -3,9 +3,9 @@
 -slow-slow-slow edit on 100K, pascal
 -keep +- state (fold) on edit
 
+-slow scrollin on 500K file, pas. 
+need to redo FindTag, write new one with bin-srch. 
+need to cache found tag index on paint top line.
 
-(solved) C#. rules 'function begin' etc dont work. they have 'parent', 'not a parent' set.
-Js. rule 'comment' dont work. 
-  ex1. not hilited: //<![CDATA[
-  ex2. not hilited till tag: //]]></script>
-  
+solved.
+(workarnd) C#. rules 'function begin' etc dont work. they have 'parent', 'not a parent' set.
