@@ -479,7 +479,7 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
-    procedure DoPaint_FromLine(ALine: integer);
+    procedure PaintEx(ALine: integer);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
@@ -2506,10 +2506,10 @@ end;
 
 procedure TATSynEdit.Paint;
 begin
-  DoPaint_FromLine(-1);
+  PaintEx(-1);
 end;
 
-procedure TATSynEdit.DoPaint_FromLine(ALine: integer);
+procedure TATSynEdit.PaintEx(ALine: integer);
 begin
   if FPaintLocked>0 then
   begin
@@ -2545,7 +2545,7 @@ begin
   Include(FPaintFlags, cPaintUpdateScrollbars);
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Include(FPaintFlags, cPaintUpdateBitmap);
-  DoPaint_FromLine(ScrollTop);
+  PaintEx(ScrollTop);
 end;
 
 //needed to remove flickering on resize and mouse-over
