@@ -79,6 +79,7 @@
       <Unit9>
         <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Ranges"/>
       </Unit9>
       <Unit10>
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>

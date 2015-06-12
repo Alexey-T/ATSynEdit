@@ -471,6 +471,7 @@ type
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
+    procedure DoFold_ClickFoldingBar(ALine: integer);
     procedure DoFold_RangeFold(ARange: TATSynRange);
     procedure DoFold_RangeUnfold(ARange: TATSynRange);
     procedure DoHandleRightClick(X, Y: integer);
@@ -478,6 +479,7 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
+    procedure DoPaint_FromLine(ALine: integer);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
@@ -690,7 +692,6 @@ type
     function DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
     function GetCaretsArray: TATPointArray;
     procedure SetCaretsArray(const L: TATPointArray);
-    procedure DoPaint_FromLine(ALine: integer);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
 
   public
@@ -742,9 +743,6 @@ type
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
     procedure DoGotoPosEx(APnt: TPoint);
-    //fold
-    procedure DoFold_RangeFoldUnfold(ARange: TATSynRange; ADoFold: boolean);
-    procedure DoFold_ClickFoldingBar(ALine: integer);
     //misc
     procedure DoCommandExec(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
@@ -2529,7 +2527,6 @@ end;
 procedure TATSynEdit.DoOnResize;
 var
   SizeX, SizeY: integer;
-  NLine: integer;
 begin
   inherited;
 
@@ -2544,12 +2541,11 @@ begin
     end;
   end;
 
-  NLine:= ScrollTop;
   FWrapUpdateNeeded:= true;
   Include(FPaintFlags, cPaintUpdateScrollbars);
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Include(FPaintFlags, cPaintUpdateBitmap);
-  DoPaint_FromLine(NLine);
+  DoPaint_FromLine(ScrollTop);
 end;
 
 //needed to remove flickering on resize and mouse-over
@@ -3735,9 +3731,14 @@ begin
       if Y<LineIndex then IsLineUp:= true;
       if Y2>LineIndex then IsLineDown:= true;
       if Y=LineIndex then
-        begin State:= cFoldbarBegin; IsPlus:= Folded; end;
+      begin
+        State:= cFoldbarBegin;
+        //don't override found [+], 2 blocks can start at same pos
+        if not IsPlus then IsPlus:= Folded;
+      end;
       if Y2=LineIndex then
-        if State<>cFoldbarBegin then State:= cFoldbarEnd;
+        if State<>cFoldbarBegin then
+          State:= cFoldbarEnd;
     end;
 
   //correct state for wrapped line

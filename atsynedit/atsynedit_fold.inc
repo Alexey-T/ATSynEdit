@@ -123,15 +123,6 @@ begin
 end;
 
 
-procedure TATSynEdit.DoFold_RangeFoldUnfold(ARange: TATSynRange; ADoFold: boolean);
-begin
-  if ADoFold then
-    DoFold_RangeFold(ARange)
-  else
-    DoFold_RangeUnfold(ARange);
-end;
-
-
 procedure TATSynEdit.DoUnfoldLine(ALine: integer);
 var
   List: TATIntArray;
@@ -140,7 +131,7 @@ begin
   List:= FFold.FindRangesContainingLines(ALine, ALine, nil,
     true{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
   for i:= Low(List) to High(List) do
-    DoFold_RangeFoldUnfold(FFold[List[i]], false);
+    DoFold_RangeUnfold(FFold[List[i]]);
 end;
 
 procedure TATSynEdit.DoFold_ClickFoldingBar(ALine: integer);
@@ -150,7 +141,10 @@ begin
   R:= FFold.FindRangeWithPlusAtLine(ALine);
   if Assigned(R) then
   begin
-    DoFold_RangeFoldUnfold(R, not R.Folded);
+    if R.Folded then
+      DoFold_RangeUnfold(R)
+    else
+      DoFold_RangeFold(R);
     Update;
   end;
 end;
