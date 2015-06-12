@@ -380,7 +380,7 @@ type
     FRectMicromap,
     FRectGutter,
     FRectRuler: TRect;
-    FLineVisibleLast: integer;
+    FLineBottom: integer;
     FScrollVert,
     FScrollHorz: TATSynScrollInfo;
     FScrollVertMinimap,
@@ -502,7 +502,7 @@ type
     function GetNextUnfoldedLineNumber(ALine: integer; ADown: boolean): integer;
     function GetOneLine: boolean;
     function GetRedoCount: integer;
-    function GetScrollTopRelative: integer;
+    function GetLinesFromTop: integer;
     function GetText: atString;
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
@@ -573,7 +573,7 @@ type
     function GetEndOfFilePos: TPoint;
     function GetMarginString: string;
     function GetReadOnly: boolean;
-    function GetScrollTop: integer;
+    function GetLineTop: integer;
     function GetTextForClipboard: string;
     function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
@@ -591,8 +591,8 @@ type
     procedure SetMinimapVisible(AValue: boolean);
     procedure SetOneLine(AValue: boolean);
     procedure SetReadOnly(AValue: boolean);
-    procedure SetScrollTop(AValue: integer);
-    procedure SetScrollTopRelative(AValue: integer);
+    procedure SetLineTop(AValue: integer);
+    procedure SetLinesFromTop(AValue: integer);
     procedure SetStrings(Obj: TATStrings);
     function GetRectMain: TRect;
     function GetRectMinimap: TRect;
@@ -707,11 +707,10 @@ type
     property Fold: TATSynRanges read FFold;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified;
-    property AdapterOfHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
-    property ScrollTop: integer read GetScrollTop write SetScrollTop;
-    property ScrollTopRelative: integer read GetScrollTopRelative write SetScrollTopRelative;
-    property LineVisibleFirst: integer read GetScrollTop;
-    property LineVisibleLast: integer read FLineVisibleLast;
+    property AdapterHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
+    property LineTop: integer read GetLineTop write SetLineTop;
+    property LineBottom: integer read FLineBottom;
+    property LinesFromTop: integer read GetLinesFromTop write SetLinesFromTop;
     property ModeOverwrite: boolean read FOverwrite write FOverwrite;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property ModeOneLine: boolean read GetOneLine write SetOneLine;
@@ -1274,7 +1273,7 @@ var
 begin
   if FWrapMode=AValue then Exit;
 
-  NLine:= ScrollTop;
+  NLine:= LineTop;
 
   FWrapMode:= AValue;
   FWrapUpdateNeeded:= true;
@@ -1284,7 +1283,7 @@ begin
 
   Invalidate;
   AppProcessMessages;
-  ScrollTop:= NLine;
+  LineTop:= NLine;
   Invalidate;
 end;
 
@@ -1573,7 +1572,7 @@ begin
     WrapItem:= FWrapInfo.Items[NWrapIndex];
     NLinesIndex:= WrapItem.NLineIndex;
     if not Strings.IsIndexValid(NLinesIndex) then Break;
-    FLineVisibleLast:= NLinesIndex;
+    FLineBottom:= NLinesIndex;
 
     if FWrapInfo.IsItemAfterCollapsed(NWrapIndex) then
     begin
@@ -1961,7 +1960,7 @@ begin
   Result:= Strings.ReadOnly;
 end;
 
-function TATSynEdit.GetScrollTop: integer;
+function TATSynEdit.GetLineTop: integer;
 var
   Item: TATSynWrapItem;
 begin
@@ -2380,7 +2379,7 @@ begin
   Strings.ReadOnly:= AValue;
 end;
 
-procedure TATSynEdit.SetScrollTop(AValue: integer);
+procedure TATSynEdit.SetLineTop(AValue: integer);
 var
   NFrom, NTo, i: integer;
 begin
@@ -2402,10 +2401,10 @@ begin
       end;
 end;
 
-procedure TATSynEdit.SetScrollTopRelative(AValue: integer);
+procedure TATSynEdit.SetLinesFromTop(AValue: integer);
 begin
   with FScrollVert do
-    NPos:= Max(0, NPos + (GetScrollTopRelative - AValue));
+    NPos:= Max(0, NPos + (GetLinesFromTop - AValue));
 end;
 
 procedure TATSynEdit.SetStrings(Obj: TATStrings);
@@ -2545,7 +2544,7 @@ begin
   Include(FPaintFlags, cPaintUpdateScrollbars);
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Include(FPaintFlags, cPaintUpdateBitmap);
-  PaintEx(ScrollTop);
+  PaintEx(LineTop);
 end;
 
 //needed to remove flickering on resize and mouse-over
@@ -2562,7 +2561,7 @@ var
 begin
   if not FOptShowScrollHint then Exit;
 
-  S:= cHintScrollPrefix+' '+IntToStr(ScrollTop+1);
+  S:= cHintScrollPrefix+' '+IntToStr(LineTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
   P:= ClientToScreen(Point(ClientWidth-(R.Right-R.Left), 0));
@@ -3564,7 +3563,7 @@ begin
   Result:= Strings.RedoCount;
 end;
 
-function TATSynEdit.GetScrollTopRelative: integer;
+function TATSynEdit.GetLinesFromTop: integer;
 var
   P: TPoint;
 begin
@@ -3627,12 +3626,12 @@ begin
   if not AInc then
     if Font.Size<=cMinFontSize then Exit;
 
-  NTop:= ScrollTop;
+  NTop:= LineTop;
   Font.Size:= Font.Size+BoolToPlusMinusOne(AInc);
   Update;
   AppProcessMessages;
 
-  ScrollTop:= NTop;
+  LineTop:= NTop;
   Update;
 end;
 
@@ -3869,8 +3868,8 @@ var
   NColor: TColor;
 begin
   if FOptShowStapleStyle=cBorderNone then Exit;
-  nLineFrom:= LineVisibleFirst;
-  nLineTo:= LineVisibleLast;
+  nLineFrom:= LineTop;
+  nLineTo:= LineBottom;
   Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, nil,
     false{OnlyFolded}, false{TopLevelOnly}, cRngHasAnyOfLines);
 

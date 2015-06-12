@@ -124,7 +124,7 @@ begin
   ed.OnCalcStaple:= @EditCalcStaple;
 
   adapter:= TATAdapterEControl.Create;
-  ed.AdapterOfHilite:= adapter;
+  ed.AdapterHilite:= adapter;
 
   chkWrap.Checked:= ed.OptWrapMode=cWrapOn;
   chkFullSel.Checked:= ed.OptShowFullSel;

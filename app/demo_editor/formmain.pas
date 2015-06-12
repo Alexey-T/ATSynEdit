@@ -354,7 +354,7 @@ begin
   Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d', [
     sPos,
     ed.Carets.Count,
-    ed.ScrollTop+1,
+    ed.LineTop+1,
     cEnd[ed.Strings.Endings],
     cOvr[ed.ModeOverwrite],
     cRo[ed.ModeReadOnly],
@@ -513,16 +513,14 @@ var
   s: string;
   n: integer;
 begin
-  s:= Inttostr(ed.ScrollTop+1);
+  s:= Inttostr(ed.LineTop+1);
   if not InputQuery('Go to', 'Line:', s) then Exit;
   if s='' then Exit;
   n:= StrToIntDef(s, 0)-1;
-  if (n<0) or (n>=ed.Strings.Count) then
-  begin
-    Showmessage('Incorr index: '+s);
-    Exit
-  end;
-  ed.DoGotoPosEx(Point(0, n));
+  if (n>=0) and (n<ed.Strings.Count) then
+    ed.DoGotoPosEx(Point(0, n))
+  else
+    Showmessage('Incorrect index: '+s);
 end;
 
 procedure TfmMain.bFontClick(Sender: TObject);

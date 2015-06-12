@@ -141,7 +141,7 @@ begin
   FCaretSpecPos:= true;
 
   if AKeepRelativePos then
-    NRelative:= ScrollTopRelative;
+    NRelative:= LinesFromTop;
 
   //don't check here FWrapMode<>cWrapOff
   if FOptKeyUpDownNavigateWrapped then
@@ -150,7 +150,7 @@ begin
     Result:= DoCommand_KeyUpDown_NextLine(ADown, ALines);
 
   if AKeepRelativePos then
-    ScrollTopRelative:= NRelative;
+    LinesFromTop:= NRelative;
 end;
 
 function TATSynEdit.DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
