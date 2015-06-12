@@ -1,8 +1,5 @@
 
--slow scrollin on 500K file, pas, "implem" part.
- 
 -onchange event: wrk, more param
 -keep +- state (fold) on edit
 
-
-(solved) C#. rules 'function begin' etc dont work. they have 'parent', 'not a parent' set.
+(solved) C#. rule 'function begin' dont work.
