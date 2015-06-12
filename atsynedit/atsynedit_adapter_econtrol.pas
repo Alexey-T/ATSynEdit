@@ -29,10 +29,12 @@ type
       ALine, AX, ALen: integer;
       AColorFont, AColorBG: TColor;
       var AColorAfterEol: TColor);
+    function DoFindToken(APos: integer): integer;
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure UpdateSublexRanges;
     procedure UpdateData;
     procedure UpdateFoldRanges;
+    procedure UpdateTokensXY;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -141,15 +143,15 @@ begin
   partindex:= 0;
   FillChar(part{%H-}, SizeOf(part), 0);
 
-  startindex:= AnClient.TokenAtPos(Buffer.CaretToStr(Point(0, ALine)));
+  startindex:= DoFindToken(Buffer.CaretToStr(Point(0, ALine)));
   if startindex<0 then
     startindex:= 0;
 
   for i:= startindex to AnClient.TagCount-1 do
   begin
     token:= AnClient.Tags[i];
-    tokenStart:= Buffer.StrToCaret(token.StartPos);
-    tokenEnd:= Buffer.StrToCaret(token.EndPos);
+    tokenStart:= token.PntStart;
+    tokenEnd:= token.PntEnd;
 
     Dec(tokenStart.x, AX);
     Dec(tokenEnd.x, AX);
@@ -290,6 +292,7 @@ begin
   AnClient.Clear;
   AnClient.Analyze;
 
+  UpdateTokensXY;
   LColors.Clear;
   UpdateSublexRanges;
   UpdateFoldRanges;
@@ -303,6 +306,7 @@ var
   i: integer;
   SHint: string;
   Style: TSyntaxFormat;
+  tokenStart, tokenEnd: TSyntToken;
 begin
   if not Assigned(Ed) then Exit;
   if not Assigned(AnClient) then Exit;
@@ -324,10 +328,13 @@ begin
 
     if R.StartIdx<0 then Continue;
     if R.EndIdx<0 then Continue;
-    Pos1:= AnClient.Tags[R.StartIdx].StartPos;
-    Pos2:= AnClient.Tags[R.EndIdx].EndPos;
-    Pnt1:= Buffer.StrToCaret(Pos1);
-    Pnt2:= Buffer.StrToCaret(Pos2);
+
+    tokenStart:= AnClient.Tags[R.StartIdx];
+    tokenEnd:= AnClient.Tags[R.EndIdx];
+    Pos1:= tokenStart.StartPos;
+    Pos2:= tokenEnd.EndPos;
+    Pnt1:= tokenStart.PntStart;
+    Pnt2:= tokenEnd.PntEnd;
     if Pnt1.Y<0 then Continue;
     if Pnt2.Y<0 then Continue;
 
@@ -362,6 +369,54 @@ begin
     if Style=nil then Continue;
     if Style.BgColor<>clNone then
       LColors.Add(Style.BgColor, R.StartPos, R.EndPos, false, '');
+  end;
+end;
+
+function TATAdapterEControl.DoFindToken(APos: integer): integer;
+var
+  a, b, m, dif: integer;
+begin
+  {$ifdef usual_find_token}
+  Result:= AnClient.TokenAtPos(APos);
+  Exit;
+  {$endif}
+
+  Result:= -1;
+
+  a:= 0;
+  b:= AnClient.TagCount-1;
+  if b<0 then Exit;
+
+  repeat
+    dif:= AnClient.Tags[a].StartPos-APos;
+    if dif=0 then begin m:= a; Break end;
+
+    //middle, which is near b if not exact middle
+    m:= (a+b+1) div 2;
+
+    dif:= AnClient.Tags[m].StartPos-APos;
+    if dif=0 then Break;
+
+    if Abs(a-b)<=1 then Exit;
+    if dif>0 then b:= m else a:= m;
+  until false;
+
+  if m=0 then
+    Result:= 0
+  else
+    Result:= m-1;
+end;
+
+procedure TATAdapterEControl.UpdateTokensXY;
+var
+  token: TSyntToken;
+  i: integer;
+begin
+  for i:= 0 to AnClient.TagCount-1 do
+  begin
+    token:= AnClient.Tags[i];
+    token.PntStart:= Buffer.StrToCaret(token.StartPos);
+    token.PntEnd:= Buffer.StrToCaret(token.EndPos);
   end;
 end;
 

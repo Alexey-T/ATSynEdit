@@ -71,6 +71,7 @@
       <Unit7>
         <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc_TextBuffer"/>
       </Unit7>
       <Unit8>
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>
