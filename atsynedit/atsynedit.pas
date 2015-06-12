@@ -467,6 +467,8 @@ type
     //
     procedure DebugFindWrapIndex;
     procedure DoCalcLineStartColor(ALine: integer; var AColor: TColor);
+    procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
+      ALineWithCaret: boolean; var AColor: TColor);
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
     procedure DoFold_RangeFold(ARange: TATSynRange);
@@ -1513,8 +1515,7 @@ var
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: real;
   WrapItem: TATSynWrapItem;
-  BmKind: integer;
-  BmColor, NColorAfterEol: TColor;
+  NColorEntire, NColorAfter: TColor;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineWithCaret, LineEolSelected: boolean;
@@ -1593,31 +1594,9 @@ begin
     C.Brush.Color:= FColors.TextBG;
     C.Font.Color:= FColors.TextFont;
 
-    //draw bookmark bg
-    BmColor:= clNone;
-    BmKind:= Strings.LinesBm[NLinesIndex];
-    if BmKind<>0 then
-      BmColor:= Strings.LinesBmColor[NLinesIndex];
-
-    if FOptShowCurLine then
-    begin
-      if FOptShowCurLineMinimal then
-      begin
-        if LineWithCaret and IsLinePartWithCaret(NLinesIndex, NCoordTop) then
-          BmColor:= FColors.CurrentLineBG;
-      end
-      else
-      begin
-        if LineWithCaret then
-          BmColor:= FColors.CurrentLineBG;
-      end;
-    end;
-
-    if BmColor<>clNone then
-    begin
-      C.Brush.Color:= BmColor;
-      C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-    end;
+    DoCalcLineEntireColor(NLinesIndex, NCoordTop, LineWithCaret, NColorEntire);
+    C.Brush.Color:= NColorEntire;
+    C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
 
     CurrPointText:= Point(
       Int64(CurrPoint.X) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
@@ -1639,20 +1618,20 @@ begin
 
       DoPaintLineIndent(C, ARect, ACharSize,
         NCoordTop, WrapItem.NIndent,
-        IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
+        NColorEntire,
         AScrollHorz.NPos, AMainText and FOptShowIndentLines);
 
-      NColorAfterEol:= clNone;
+      NColorAfter:= clNone;
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
-        IfThen(BmColor<>clNone, BmColor, FColors.TextBG),
-        NColorAfterEol);
+        NColorEntire,
+        NColorAfter);
 
       //adapter may return ColorAfterEol, paint it
       if FOptShowFullHilite then
-        if NColorAfterEol<>clNone then
+        if NColorAfter<>clNone then
         begin
-          C.Brush.Color:= NColorAfterEol;
+          C.Brush.Color:= NColorAfter;
           C.FillRect(CurrPointText.X, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
         end;
 
@@ -1696,11 +1675,11 @@ begin
     begin
       if FOptShowFullHilite then
       begin
-        NColorAfterEol:= clNone;
-        DoCalcLineStartColor(NLinesIndex, NColorAfterEol);
-        if NColorAfterEol<>clNone then
+        NColorAfter:= clNone;
+        DoCalcLineStartColor(NLinesIndex, NColorAfter);
+        if NColorAfter<>clNone then
         begin
-          C.Brush.Color:= NColorAfterEol;
+          C.Brush.Color:= NColorAfter;
           C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
         end;
       end;

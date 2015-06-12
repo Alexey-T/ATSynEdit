@@ -5,6 +5,7 @@ procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   AColorBG: TColor; var AColorAfterEol: TColor);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
+  ForceColor: boolean;
 begin
   nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped);
   nLineIndex:= AItem.NLineIndex;
@@ -17,7 +18,10 @@ begin
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
 
-  DoPartSetColorBG(AParts, AColorBG);
+  ForceColor:= AColorBG<>Colors.TextBG;
+  DoPartSetColorBG(AParts, AColorBG, ForceColor);
+  if ForceColor then
+    AColorAfterEol:= AColorBG;
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
@@ -129,8 +133,34 @@ end;
 procedure TATSynEdit.DoCalcLineStartColor(ALine: integer; var AColor: TColor);
 begin
   //no event yet
-  //...
+  //
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorCalcLineColor(Self, ALine, AColor);
+end;
+
+procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
+  ALineWithCaret: boolean; var AColor: TColor);
+var
+  BmKind: integer;
+begin
+  AColor:= Colors.TextBG;
+
+  BmKind:= Strings.LinesBm[ALine];
+  if BmKind<>0 then
+    AColor:= Strings.LinesBmColor[ALine];
+
+  if FOptShowCurLine then
+  begin
+    if FOptShowCurLineMinimal then
+    begin
+      if ALineWithCaret and IsLinePartWithCaret(ALine, ACoordTop) then
+        AColor:= Colors.CurrentLineBG;
+    end
+    else
+    begin
+      if ALineWithCaret then
+        AColor:= Colors.CurrentLineBG;
+    end;
+  end;
 end;
 
