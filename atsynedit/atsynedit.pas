@@ -526,16 +526,14 @@ type
     procedure DoSelect_Line_ByClick;
     procedure DoSelect_None;
     //paint
-    function DoPaint(AFlags: TATSynPaintFlags): boolean;
+    function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
-    procedure DoPaintTo(C: TCanvas);
+    procedure DoPaintTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintRulerTo(C: TCanvas);
-    procedure DoPaintTextTo(C: TCanvas;
-      const ARect: TRect;
-      const ACharSize: TPoint;
-      AWithGutter, AMainText: boolean;
-      var AScrollHorz, AScrollVert: TATSynScrollInfo);
+    procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
+      const ACharSize: TPoint; AWithGutter, AMainText: boolean;
+      var AScrollHorz, AScrollVert: TATSynScrollInfo; ALineFrom: integer);
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
@@ -692,6 +690,7 @@ type
     function DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
     function GetCaretsArray: TATPointArray;
     procedure SetCaretsArray(const L: TATPointArray);
+    procedure DoPaint_FromLine(ALine: integer);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
 
   public
@@ -1439,7 +1438,7 @@ begin
     Result:= cRectEmpty;
 end;
 
-procedure TATSynEdit.DoPaintTo(C: TCanvas);
+procedure TATSynEdit.DoPaintTo(C: TCanvas; ALineFrom: integer);
 begin
   C.Brush.Color:= FColors.TextBG;
   C.FillRect(ClientRect);
@@ -1462,7 +1461,7 @@ begin
 
   UpdateWrapInfo;
 
-  DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert);
+  DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMarginsTo(C);
   DoPaintNiceScroll(C);
 
@@ -1508,7 +1507,8 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   const ARect: TRect;
   const ACharSize: TPoint;
   AWithGutter, AMainText: boolean;
-  var AScrollHorz, AScrollVert: TATSynScrollInfo);
+  var AScrollHorz, AScrollVert: TATSynScrollInfo;
+  ALineFrom: integer);
 var
   NCoordTop: integer;
   NWrapIndex, NLinesIndex: integer;
@@ -1557,9 +1557,16 @@ begin
       Exit
     end;
 
-  NCoordTop:= ARect.Top;
-  NWrapIndex:= AScrollVert.NPos;
   AScrollHorz.NMax:= 1;
+  NCoordTop:= ARect.Top;
+
+  if ALineFrom>=0 then
+  begin
+    FWrapInfo.FindIndexesOfLineNumber(ALineFrom, NWrapIndex, NColorAfter{dummy});
+    AScrollVert.NPos:= NWrapIndex;
+  end
+  else
+    NWrapIndex:= AScrollVert.NPos;
 
   repeat
     if NCoordTop>ARect.Bottom then Break;
@@ -1857,7 +1864,7 @@ begin
   FCharSizeMinimap:= GetCharSize(C, FCharSpacingMinimap);
   FScrollVertMinimap.NPos:= GetMinimapScrollPos;
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
-  DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap);
+  DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
   C.Font.Size:= Font.Size;
 
   DoPaintMinimapSelTo(C);
@@ -1958,12 +1965,12 @@ end;
 
 function TATSynEdit.GetScrollTop: integer;
 var
-  N: integer;
+  Item: TATSynWrapItem;
 begin
   Result:= 0;
-  N:= FScrollVert.NPos;
-  if not FWrapInfo.IsIndexValid(N) then Exit;
-  Result:= FWrapInfo.Items[N].NLineIndex;
+  Item:= FWrapInfo.Items[FScrollVert.NPos];
+  if Assigned(Item) then
+    Result:= Item.NLineIndex;
 end;
 
 constructor TATSynEdit.Create(AOwner: TComponent);
@@ -2449,7 +2456,7 @@ begin
   end;
 end;
 
-function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags): boolean;
+function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
 var
   ARect: TRect;
 begin
@@ -2458,7 +2465,7 @@ begin
 
   if cPaintUpdateBitmap in AFlags then
   begin
-    DoPaintTo(FBitmap.Canvas);
+    DoPaintTo(FBitmap.Canvas, ALineFrom);
 
     if cPaintUpdateCaretsCoords in AFlags then
     begin
@@ -2501,6 +2508,11 @@ end;
 
 procedure TATSynEdit.Paint;
 begin
+  DoPaint_FromLine(-1);
+end;
+
+procedure TATSynEdit.DoPaint_FromLine(ALine: integer);
+begin
   if FPaintLocked>0 then
   begin
     DoPaintLockedWarning(Canvas);
@@ -2508,8 +2520,8 @@ begin
   end;
 
   //if scrollbars shown, paint again
-  if DoPaint(FPaintFlags) then
-    DoPaint(FPaintFlags);
+  if DoPaint(FPaintFlags, ALine) then
+    DoPaint(FPaintFlags, ALine);
 
   Exclude(FPaintFlags, cPaintUpdateBitmap);
 end;
@@ -2520,8 +2532,6 @@ var
   NLine: integer;
 begin
   inherited;
-
-  NLine:= ScrollTop;
 
   if Assigned(FBitmap) then
   begin
@@ -2534,10 +2544,12 @@ begin
     end;
   end;
 
-  Invalidate;
-  AppProcessMessages;
-  ScrollTop:= NLine;
-  Invalidate;
+  NLine:= ScrollTop;
+  FWrapUpdateNeeded:= true;
+  Include(FPaintFlags, cPaintUpdateScrollbars);
+  Include(FPaintFlags, cPaintUpdateCaretsCoords);
+  Include(FPaintFlags, cPaintUpdateBitmap);
+  DoPaint_FromLine(NLine);
 end;
 
 //needed to remove flickering on resize and mouse-over
