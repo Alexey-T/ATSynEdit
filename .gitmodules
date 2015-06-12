@@ -1,0 +1,3 @@
+[submodule "EControl"]
+	path = EControl
+	url = https://github.com/Alexey-T/EControl.git

@@ -32,7 +32,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="17">
+    <Units Count="12">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -53,17 +53,14 @@
       <Unit3>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit"/>
       </Unit3>
       <Unit4>
         <Filename Value="..\..\atsynedit\atsynedit_canvasproc.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_CanvasProc"/>
       </Unit4>
       <Unit5>
         <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Adapters"/>
       </Unit5>
       <Unit6>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
@@ -72,7 +69,6 @@
       <Unit7>
         <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc_TextBuffer"/>
       </Unit7>
       <Unit8>
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>
@@ -81,41 +77,16 @@
       <Unit9>
         <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Ranges"/>
       </Unit9>
       <Unit10>
-        <Filename Value="E:\GitEControl\ec\ecsyntanal.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ecSyntAnal"/>
-      </Unit10>
-      <Unit11>
-        <Filename Value="E:\GitEControl\ec\eczregexpr.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ecZRegExpr"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="E:\GitEControl\ec\ecstrutils.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ecStrUtils"/>
-      </Unit12>
-      <Unit13>
-        <Filename Value="E:\GitEControl\ec\eclists.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ecLists"/>
-      </Unit13>
-      <Unit14>
-        <Filename Value="E:\GitEControl\ec\ecsyntgramma.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ecSyntGramma"/>
-      </Unit14>
-      <Unit15>
-        <Filename Value="E:\GitEControl\ec\ecsysutils.pas"/>
-        <IsPartOfProject Value="True"/>
-      </Unit15>
-      <Unit16>
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
         <IsPartOfProject Value="True"/>
-      </Unit16>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\..\EControl\ec\ecsyntanal.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ecsyntanal"/>
+      </Unit11>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -126,7 +97,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);..\..\atsynedit"/>
-      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer;..\..\..\GitEControl\ec"/>
+      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer;..\..\..\GitEControl\ec;..\..\EControl\ec"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
