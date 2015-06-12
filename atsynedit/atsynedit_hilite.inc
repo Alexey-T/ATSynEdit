@@ -2,10 +2,9 @@
 
 procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
-  AColorBG: TColor; var AColorAfterEol: TColor);
+  AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
-  ForceColor: boolean;
 begin
   nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped);
   nLineIndex:= AItem.NLineIndex;
@@ -14,14 +13,13 @@ begin
 
   FillChar(AParts, SizeOf(AParts), 0);
   if Assigned(FAdapterHilite) then
-    FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
+    FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
   if Assigned(FOnCalcHilite) then
-    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfterEol);
+    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
 
-  ForceColor:= AColorBG<>Colors.TextBG;
-  DoPartSetColorBG(AParts, AColorBG, ForceColor);
-  if ForceColor then
-    AColorAfterEol:= AColorBG;
+  DoPartSetColorBG(AParts, AColorBG, AColorForced);
+  if AColorForced then
+    AColorAfter:= AColorBG;
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
@@ -139,11 +137,11 @@ begin
 end;
 
 procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
-  ALineWithCaret: boolean; var AColor: TColor);
+  ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
 var
   BmKind: integer;
 begin
-  AColor:= Colors.TextBG;
+  AColor:= clNone;
 
   BmKind:= Strings.LinesBm[ALine];
   if BmKind<>0 then
@@ -162,5 +160,9 @@ begin
         AColor:= Colors.CurrentLineBG;
     end;
   end;
+
+  AColorForced:= AColor<>clNone;
+  if not AColorForced then
+    AColor:= Colors.TextBG;
 end;
 

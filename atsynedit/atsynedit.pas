@@ -468,7 +468,7 @@ type
     procedure DebugFindWrapIndex;
     procedure DoCalcLineStartColor(ALine: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
-      ALineWithCaret: boolean; var AColor: TColor);
+      ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
     procedure DoFold_RangeFold(ARange: TATSynRange);
@@ -515,7 +515,7 @@ type
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
-      AColorBG: TColor; var AColorAfterEol: TColor);
+  AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
     //select
     procedure DoSelectionDeleteOrReset;
     procedure DoSelect_ExtendSelectionByLine;
@@ -1518,7 +1518,7 @@ var
   NColorEntire, NColorAfter: TColor;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
-  LineWithCaret, LineEolSelected: boolean;
+  LineWithCaret, LineEolSelected, LineColorForced: boolean;
   Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
   StrSize: TSize;
@@ -1594,7 +1594,7 @@ begin
     C.Brush.Color:= FColors.TextBG;
     C.Font.Color:= FColors.TextFont;
 
-    DoCalcLineEntireColor(NLinesIndex, NCoordTop, LineWithCaret, NColorEntire);
+    DoCalcLineEntireColor(NLinesIndex, NCoordTop, LineWithCaret, NColorEntire, LineColorForced);
     C.Brush.Color:= NColorEntire;
     C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
 
@@ -1624,7 +1624,7 @@ begin
       NColorAfter:= clNone;
       DoCalcLineHilite(WrapItem, Parts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
-        NColorEntire,
+        NColorEntire, LineColorForced,
         NColorAfter);
 
       //adapter may return ColorAfterEol, paint it
