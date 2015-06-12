@@ -85,7 +85,6 @@
       <Unit11>
         <Filename Value="..\..\EControl\ec\ecsyntanal.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ecsyntanal"/>
       </Unit11>
     </Units>
   </ProjectOptions>

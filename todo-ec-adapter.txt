@@ -1,11 +1,9 @@
 
 -onchange event: wrk, more param
--slow-slow-slow edit on 100K, pascal
 -keep +- state (fold) on edit
 
 -slow scrollin on 500K file, pas. 
 need to redo FindTag, write new one with bin-srch. 
 need to cache found tag index on paint top line.
 
-solved.
-(workarnd) C#. rules 'function begin' etc dont work. they have 'parent', 'not a parent' set.
+(solved) C#. rules 'function begin' etc dont work. they have 'parent', 'not a parent' set.

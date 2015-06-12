@@ -22,7 +22,6 @@ type
   TATAdapterEControl = class(TATAdapterHilite)
   private
     Ed: TATSynEdit;
-    An: TSyntAnalyzer;
     AnClient: TClientSyntAnalyzer;
     Buffer: TATStringBuffer;
     LColors: TATSynRanges;
@@ -72,7 +71,6 @@ var
   Str: atString;
 begin
   Ed:= Sender as TATSynEdit;
-  if not Assigned(An) then Exit;
   if not Assigned(AnClient) then Exit;
 
   Str:= Copy(Ed.Strings.Lines[ALineIndex], ACharIndex, ALineLen);
@@ -235,7 +233,6 @@ end;
 constructor TATAdapterEControl.Create;
 begin
   Ed:= nil;
-  An:= nil;
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
   LColors:= TATSynRanges.Create;
@@ -245,8 +242,8 @@ destructor TATAdapterEControl.Destroy;
 begin
   FreeAndNil(LColors);
   FreeAndNil(Buffer);
-  FreeAndNil(AnClient);
-  An:= nil;
+  if Assigned(AnClient) then
+    FreeAndNil(AnClient);
   Ed:= nil;
 
   inherited;
@@ -258,9 +255,8 @@ begin
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
-  An:= AAnalizer;
-  if An=nil then Exit;
-  AnClient:= TClientSyntAnalyzer.Create(An, Buffer, nil);
+  if AAnalizer=nil then Exit;
+  AnClient:= TClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
 
   UpdateData;
 end;
