@@ -466,7 +466,7 @@ type
     FOptAllowReadOnly: boolean;
     //
     procedure DebugFindWrapIndex;
-    procedure DoCalcLineStartColor(ALine: integer; var AColor: TColor);
+    procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsAssign(NewCarets: TATCarets);
@@ -1616,10 +1616,15 @@ begin
         Inc(CurrPointText.X, Trunc(NOutputSpacesSkipped*ACharSize.X));
       end;
 
-      DoPaintLineIndent(C, ARect, ACharSize,
-        NCoordTop, WrapItem.NIndent,
-        NColorEntire,
-        AScrollHorz.NPos, AMainText and FOptShowIndentLines);
+      if WrapItem.NIndent>0 then
+      begin
+        NColorAfter:= Colors.TextBG;
+        DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter);
+        DoPaintLineIndent(C, ARect, ACharSize,
+          NCoordTop, WrapItem.NIndent,
+          NColorAfter,
+          AScrollHorz.NPos, AMainText and FOptShowIndentLines);
+      end;
 
       NColorAfter:= clNone;
       DoCalcLineHilite(WrapItem, Parts{%H-},
@@ -1676,7 +1681,7 @@ begin
       if FOptShowFullHilite then
       begin
         NColorAfter:= clNone;
-        DoCalcLineStartColor(NLinesIndex, NColorAfter);
+        DoCalcPosColor(0, NLinesIndex, NColorAfter);
         if NColorAfter<>clNone then
         begin
           C.Brush.Color:= NColorAfter;

@@ -16,8 +16,8 @@ type
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
       var AColorAfterEol: TColor); virtual; abstract;
-    procedure OnEditorCalcLineColor(Sender: TObject;
-      ALineIndex: integer; var AColor: TColor); virtual; abstract;
+    procedure OnEditorCalcPosColor(Sender: TObject;
+      AX, AY: integer; var AColor: TColor); virtual; abstract;
   end;
 
 implementation

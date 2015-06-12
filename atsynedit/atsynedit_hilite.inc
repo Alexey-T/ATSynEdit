@@ -128,12 +128,10 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcLineStartColor(ALine: integer; var AColor: TColor);
+procedure TATSynEdit.DoCalcPosColor(AX, AY: integer; var AColor: TColor);
 begin
-  //no event yet
-  //
   if Assigned(FAdapterHilite) then
-    FAdapterHilite.OnEditorCalcLineColor(Self, ALine, AColor);
+    FAdapterHilite.OnEditorCalcPosColor(Self, AX, AY, AColor);
 end;
 
 procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
