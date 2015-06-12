@@ -389,13 +389,15 @@ begin
 
   repeat
     dif:= AnClient.Tags[a].StartPos-APos;
-    if dif=0 then begin m:= a; Break end;
+    if dif=0 then
+      begin Result:= a; Exit end;
 
     //middle, which is near b if not exact middle
     m:= (a+b+1) div 2;
 
     dif:= AnClient.Tags[m].StartPos-APos;
-    if dif=0 then Break;
+    if dif=0 then
+      begin Result:= m; Exit end;
 
     if Abs(a-b)<=1 then Exit;
     if dif>0 then b:= m else a:= m;
