@@ -288,7 +288,7 @@ type
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
     FWantTabs: boolean;
-    FEditorSlave: boolean;
+    FEditorIndex: integer;
     FMarginRight: integer;
     FMarginList: TList;
     FStringsInt,
@@ -709,7 +709,7 @@ type
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified;
     property AdapterHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
-    property EditorSlave: boolean read FEditorSlave write FEditorSlave;
+    property EditorIndex: integer read FEditorIndex write FEditorIndex;
     property LineTop: integer read GetLineTop write SetLineTop;
     property LineBottom: integer read FLineBottom;
     property LinesFromTop: integer read GetLinesFromTop write SetLinesFromTop;
@@ -1190,7 +1190,7 @@ var
 begin
   AItems.Clear;
 
-  NHiddenIndex:= Strings.LinesHidden[ALine];
+  NHiddenIndex:= Strings.LinesHidden[ALine, FEditorIndex];
   if NHiddenIndex<0 then Exit;
 
   Str:= Strings.Lines[ALine];
@@ -1990,6 +1990,7 @@ begin
 
   FWantTabs:= true;
   FCharSize:= Point(4, 4); //not nul
+  FEditorIndex:= 0;
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
@@ -3357,7 +3358,7 @@ end;
 
 procedure TATSynEdit.DoEventChange;
 begin
-  if not FEditorSlave then
+  if FEditorIndex=0 then
     if Assigned(FAdapterHilite) then
       FAdapterHilite.OnEditorChange(Self);
 

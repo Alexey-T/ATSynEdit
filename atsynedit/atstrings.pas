@@ -17,6 +17,11 @@ uses
   ATStringProc_Utf8Detect,
   ATStrings_Undo;
 
+const
+  //set to 2 to allow 2 editors to use one Strings obj, with different LinesHidden[i][nClient]
+  //set to 1 to allow only one editor for Strings obj (saves memory)
+  cMaxStringsClients = 2;
+
 type
   TATLineState = (
     cLineStateNone,
@@ -46,7 +51,8 @@ type
     ItemString: atString;
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
-    ItemHidden: smallint; //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
+    ItemHidden: array[0..cMaxStringsClients-1] of smallint;
+      //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
     ItemBm: byte;
     ItemBmColor: TColor;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
@@ -93,7 +99,7 @@ type
     function GetLineBm(Index: integer): integer;
     function GetLineBmColor(Index: integer): integer;
     function GetLineEnd(N: integer): TATLineEnds;
-    function GetLineHidden(N: integer): integer;
+    function GetLineHidden(NLine, NClient: integer): integer;
     function GetLineState(Index: integer): TATLineState;
     function GetRedoCount: integer;
     function GetUndoCount: integer;
@@ -108,7 +114,7 @@ type
     procedure SetLineBm(Index: integer; AValue: integer);
     procedure SetLineBmColor(Index: integer; AValue: integer);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
-    procedure SetLineHidden(Index: integer; AValue: integer);
+    procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: integer);
     procedure SetLineState(Index: integer; AValue: TATLineState);
     function GetTextString: atString;
     procedure DoLoadFromStream(Stream: TStream);
@@ -126,7 +132,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
-    function IsPosFolded(AX, AY: integer): boolean;
+    function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(N: integer; const AString: atString);
@@ -134,7 +140,7 @@ type
     procedure LineDelete(N: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
-    property LinesHidden[Index: integer]: integer read GetLineHidden write SetLineHidden;
+    property LinesHidden[IndexLine, IndexClient: integer]: integer read GetLineHidden write SetLineHidden;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesBmColor[Index: integer]: integer read GetLineBmColor write SetLineBmColor;
@@ -216,11 +222,14 @@ end;
 { TATStringItem }
 
 constructor TATStringItem.Create(const AString: atString; AEnd: TATLineEnds);
+var
+  i: integer;
 begin
   ItemString:= AString;
   ItemEnd:= AEnd;
   ItemState:= cLineStateNone;
-  ItemHidden:= 0;
+  for i:= 0 to High(ItemHidden) do
+    ItemHidden[i]:= 0;
   ItemBm:= 0;
   ItemBmColor:= 0;
 end;
@@ -264,10 +273,10 @@ begin
     Result:= cEndNone;
 end;
 
-function TATStrings.GetLineHidden(N: integer): integer;
+function TATStrings.GetLineHidden(NLine, NClient: integer): integer;
 begin
-  if IsIndexValid(N) then
-    Result:= TATStringItem(FList[N]).ItemHidden
+  if IsIndexValid(NLine) then
+    Result:= TATStringItem(FList[NLine]).ItemHidden[NClient]
   else
     Result:= 0;
 end;
@@ -321,6 +330,7 @@ end;
 procedure TATStrings.SetLine(Index: integer; const AValue: atString);
 var
   Item: TATStringItem;
+  i: integer;
 begin
   if FReadOnly then Exit;
 
@@ -331,7 +341,10 @@ begin
     DoAddUndo(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
 
     Item.ItemString:= AValue;
-    Item.ItemHidden:= 0;
+
+    for i:= 0 to High(Item.ItemHidden) do
+      Item.ItemHidden[i]:= 0;
+
     if Item.ItemState<>cLineStateAdded then
       Item.ItemState:= cLineStateChanged;
   end;
@@ -367,10 +380,11 @@ begin
   end;
 end;
 
-procedure TATStrings.SetLineHidden(Index: integer; AValue: integer);
+procedure TATStrings.SetLineHidden(IndexLine, IndexClient: integer;
+  AValue: integer);
 begin
-  if IsIndexValid(Index) then
-    TATStringItem(FList[Index]).ItemHidden:= AValue;
+  if IsIndexValid(IndexLine) then
+    TATStringItem(FList[IndexLine]).ItemHidden[IndexClient]:= AValue;
 end;
 
 procedure TATStrings.SetLineState(Index: integer; AValue: TATLineState);
@@ -948,7 +962,7 @@ begin
   end;
 end;
 
-function TATStrings.IsPosFolded(AX, AY: integer): boolean;
+function TATStrings.IsPosFolded(AX, AY, AIndexClient: integer): boolean;
 var
   Flag: integer;
 begin
@@ -956,7 +970,7 @@ begin
   if not IsIndexValid(AY) then Exit;
 
   //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
-  Flag:= LinesHidden[AY];
+  Flag:= LinesHidden[AY, AIndexClient];
   if (Flag=-1) then Exit;
   if (Flag>0) and (AX>=Flag) then Exit;
   Result:= false;

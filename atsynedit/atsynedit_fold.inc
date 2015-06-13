@@ -4,7 +4,7 @@ function TATSynEdit.IsLineFolded(ALine: integer; ADetectPartialFold: boolean): b
 var
   Flag: integer;
 begin
-  Flag:= Strings.LinesHidden[ALine];
+  Flag:= Strings.LinesHidden[ALine, FEditorIndex];
   Result:= (Flag=-1) or (ADetectPartialFold and (Flag>0));
 end;
 
@@ -36,7 +36,7 @@ end;
 
 function TATSynEdit.IsPosFolded(AX, AY: integer): boolean;
 begin
-  Result:= Strings.IsPosFolded(AX, AY);
+  Result:= Strings.IsPosFolded(AX, AY, FEditorIndex);
 end;
 
 (*
@@ -94,7 +94,7 @@ begin
       end;
 
     if not InSubrange then
-      Strings.LinesHidden[i]:= 0;
+      Strings.LinesHidden[i, FEditorIndex]:= 0;
   end;
 
   //unfold subranges, resursion
@@ -102,7 +102,7 @@ begin
   begin
     R:= FFold[List[i]];
     if R.Folded then
-      Strings.LinesHidden[R.Y]:= R.X
+      Strings.LinesHidden[R.Y, FEditorIndex]:= R.X
     else
       DoFold_RangeUnfold(R);
   end;
@@ -116,10 +116,10 @@ begin
   FWrapUpdateNeeded:= true;
 
   //partially fold 1st line
-  Strings.LinesHidden[ARange.Y]:= ARange.X;
+  Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
   //fully fold next lines
   for i:= ARange.Y+1 to ARange.Y2 do
-    Strings.LinesHidden[i]:= -1;
+    Strings.LinesHidden[i, FEditorIndex]:= -1;
 end;
 
 
