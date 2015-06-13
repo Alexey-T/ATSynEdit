@@ -1,0 +1,4 @@
+
+Url adapter-
+do field: UrlList: TList, in which adapter stores list of ranges for each *visible line.
+later handle list: a)adapter may modifi Lineparts (horz line), or b)control may do it. control must: consider list in UpdateCursor and Onclick.
