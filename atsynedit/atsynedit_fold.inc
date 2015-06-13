@@ -162,3 +162,28 @@ begin
     Result:= '...';
 end;
 
+procedure TATSynEdit.UpdateFoldedFromLinesHidden;
+var
+  i, j: integer;
+  N: integer;
+  R: TATSynRange;
+begin
+  for i:= 0 to Strings.Count-1 do
+  begin
+    N:= Strings.LinesHidden[i, FEditorIndex];
+    if N<=0 then Continue;
+
+    for j:= 0 to Fold.Count-1 do
+    begin
+      R:= Fold.Items[j];
+      if (R.Y>i) then Break;
+      if (R.Y=i) and (R.X=N) then
+      begin
+        R.Folded:= true;
+        Break
+      end;
+    end;
+  end;
+end;
+
+

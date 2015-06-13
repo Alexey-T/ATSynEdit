@@ -26,13 +26,14 @@ type
     AnClient: TecClientSyntAnalyzer;
     Buffer: TATStringBuffer;
     ListColors: TATSynRanges;
-    procedure DoAddFold(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
+    procedure DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
     procedure DoCalcParts(var AParts: TATLineParts;
       ALine, AX, ALen: integer;
       AColorFont, AColorBG: TColor;
       var AColorAfterEol: TColor);
     procedure DoClearData;
     function DoFindToken(APos: integer): integer;
+    procedure DoFoldFromLinesHidden;
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure UpdateSublexRanges;
     procedure UpdateData;
@@ -331,16 +332,34 @@ begin
 end;
 
 
-procedure TATAdapterEControl.DoAddFold(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
+procedure TATAdapterEControl.DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
 var
   j: integer;
 begin
   if EdList.Count=0 then
-    Ed.Fold.Add(AX, AY, AY2, AStaple, AHint)
+  begin
+    if Assigned(Ed) then
+      Ed.Fold.Add(AX, AY, AY2, AStaple, AHint)
+  end
   else
   for j:= 0 to EdList.Count-1 do
     TATSynEdit(EdList[j]).Fold.Add(AX, AY, AY2, AStaple, AHint);
 end;
+
+procedure TATAdapterEControl.DoFoldFromLinesHidden;
+var
+  j: integer;
+begin
+  if EdList.Count=0 then
+  begin
+    if Assigned(Ed) then
+      Ed.UpdateFoldedFromLinesHidden
+  end
+  else
+  for j:= 0 to EdList.Count-1 do
+    TATSynEdit(EdList[j]).UpdateFoldedFromLinesHidden;
+end;
+
 
 
 procedure TATAdapterEControl.UpdateFoldRanges;
@@ -384,7 +403,7 @@ begin
 
     SHint:= AnClient.GetCollapsedText(R);
       //+'/'+R.Rule.GetNamePath;
-    DoAddFold(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
+    DoFoldAdd(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
 
     if R.Rule.HighlightPos=cpAny then
     begin
@@ -394,6 +413,9 @@ begin
           ListColors.Add(Style.BgColor, Pos1, Pos2, false, '');
     end;
   end;
+
+  //keep folded blks that were folded
+  DoFoldFromLinesHidden;
 end;
 
 procedure TATAdapterEControl.UpdateSublexRanges;

@@ -52,7 +52,9 @@ type
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
     ItemHidden: array[0..cMaxStringsClients-1] of smallint;
-      //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
+      //if 0: usual (visible),
+      //if -1: line hidden,
+      //if >0: line hidden from this char-pos
     ItemBm: byte;
     ItemBmColor: TColor;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;

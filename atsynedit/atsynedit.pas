@@ -703,6 +703,7 @@ type
     procedure Invalidate; override;
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     procedure UpdateIncorrectCaretPositions;
+    procedure UpdateFoldedFromLinesHidden;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
