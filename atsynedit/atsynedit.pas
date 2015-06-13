@@ -3358,9 +3358,8 @@ end;
 
 procedure TATSynEdit.DoEventChange;
 begin
-  if FEditorIndex=0 then
-    if Assigned(FAdapterHilite) then
-      FAdapterHilite.OnEditorChange(Self);
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorChange(Self);
 
   if Assigned(FOnChange) then
     FOnChange(Self);

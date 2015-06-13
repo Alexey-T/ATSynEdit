@@ -25,17 +25,19 @@ type
     EdList: TList;
     AnClient: TClientSyntAnalyzer;
     Buffer: TATStringBuffer;
-    LColors: TATSynRanges;
+    ListColors: TATSynRanges;
+    procedure DoAddFold(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
     procedure DoCalcParts(var AParts: TATLineParts;
       ALine, AX, ALen: integer;
       AColorFont, AColorBG: TColor;
       var AColorAfterEol: TColor);
+    procedure DoClearData;
     function DoFindToken(APos: integer): integer;
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure UpdateSublexRanges;
     procedure UpdateData;
     procedure UpdateFoldRanges;
-    procedure UpdateTokensXY;
+    procedure UpdateTokensPos;
     function GetLexer: TSyntAnalyzer;
     procedure SetLexer(AAnalizer: TSyntAnalyzer);
   public
@@ -104,9 +106,9 @@ var
   i: integer;
 begin
   Result:= ADefColor;
-  for i:= 0 to LColors.Count-1 do
+  for i:= 0 to ListColors.Count-1 do
   begin
-    R:= LColors[i];
+    R:= ListColors[i];
     if (APos>=R.Y) and (APos<R.Y2) then
     begin
       Result:= R.X;
@@ -236,18 +238,31 @@ begin
   AColorAfterEol:= GetTokenColorBG(mustOffset, AColorAfterEol);
 end;
 
+procedure TATAdapterEControl.DoClearData;
+var
+  j: integer;
+begin
+  ListColors.Clear;
+
+  if EdList.Count=0 then
+    Ed.Fold.Clear
+  else
+  for j:= 0 to EdList.Count-1 do
+    TATSynEdit(EdList[j]).Fold.Clear;
+end;
+
 constructor TATAdapterEControl.Create;
 begin
   Ed:= nil;
   EdList:= TList.Create;
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
-  LColors:= TATSynRanges.Create;
+  ListColors:= TATSynRanges.Create;
 end;
 
 destructor TATAdapterEControl.Destroy;
 begin
-  FreeAndNil(LColors);
+  FreeAndNil(ListColors);
   FreeAndNil(Buffer);
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
@@ -265,7 +280,7 @@ end;
 
 procedure TATAdapterEControl.SetLexer(AAnalizer: TSyntAnalyzer);
 begin
-  LColors.Clear;
+  DoClearData;
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
@@ -304,32 +319,38 @@ begin
   AnClient.Clear;
   AnClient.Analyze;
 
-  UpdateTokensXY;
-  LColors.Clear;
+  DoClearData;
+  UpdateTokensPos;
   UpdateSublexRanges;
   UpdateFoldRanges;
 end;
+
+
+procedure TATAdapterEControl.DoAddFold(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
+var
+  j: integer;
+begin
+  if EdList.Count=0 then
+    Ed.Fold.Add(AX, AY, AY2, AStaple, AHint)
+  else
+  for j:= 0 to EdList.Count-1 do
+    TATSynEdit(EdList[j]).Fold.Add(AX, AY, AY2, AStaple, AHint);
+end;
+
 
 procedure TATAdapterEControl.UpdateFoldRanges;
 var
   R: TTextRange;
   Pnt1, Pnt2: TPoint;
   Pos1, Pos2: integer;
-  i, j: integer;
+  i: integer;
   SHint: string;
   Style: TSyntaxFormat;
   tokenStart, tokenEnd: TSyntToken;
-  //
-  procedure EdAddFold(AEd: TATSynEdit);
-  begin
-    AEd.Fold.Add(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
-  end;
-  //
 begin
   if not Assigned(Ed) then Exit;
   if not Assigned(AnClient) then Exit;
 
-  Ed.Fold.Clear;
   for i:= 0 to AnClient.RangeCount-1 do
   begin
     R:= AnClient.Ranges[i];
@@ -358,19 +379,14 @@ begin
 
     SHint:= AnClient.GetCollapsedText(R);
       //+'/'+R.Rule.GetNamePath;
-
-    if EdList.Count=0 then
-      EdAddFold(Ed)
-    else
-    for j:= 0 to EdList.Count-1 do
-      EdAddFold(TATSynEdit(EdList[j]));
+    DoAddFold(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
 
     if R.Rule.HighlightPos=cpAny then
     begin
       Style:= R.Rule.Style;
       if Style<>nil then
         if Style.BgColor<>clNone then
-          LColors.Add(Style.BgColor, Pos1, Pos2, false, '');
+          ListColors.Add(Style.BgColor, Pos1, Pos2, false, '');
     end;
   end;
 end;
@@ -391,7 +407,7 @@ begin
     Style:= R.Rule.Style;
     if Style=nil then Continue;
     if Style.BgColor<>clNone then
-      LColors.Add(Style.BgColor, R.StartPos, R.EndPos, false, '');
+      ListColors.Add(Style.BgColor, R.StartPos, R.EndPos, false, '');
   end;
 end;
 
@@ -432,7 +448,7 @@ begin
     Result:= m-1;
 end;
 
-procedure TATAdapterEControl.UpdateTokensXY;
+procedure TATAdapterEControl.UpdateTokensPos;
 var
   token: TSyntToken;
   i: integer;
@@ -452,6 +468,7 @@ begin
   else
     Result:= nil;
 end;
+
 
 end.
 
