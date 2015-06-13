@@ -941,7 +941,7 @@ var
         2: begin
              ColorFont:= clgreen;
              ColorBorder:= clgreen;
-             BorderLeft:= cBorderDotted;
+             BorderLeft:= cLineDotted;
              BorderDown:= BorderLeft;
              BorderRight:= BorderLeft;
              BorderUp:= BorderLeft;
@@ -952,10 +952,10 @@ var
              ColorFont:= clred;
              Colorbg:= clyellow;
              ColorBorder:= clred;
-             BorderDown:= cBorderWave;
-             //BorderLeft:= cBorderDotted;
-             //BorderRight:= cBorderRounded;
-             //BorderUp:= cBorderRounded;
+             BorderDown:= cLineWave;
+             //BorderLeft:= cLineDotted;
+             //BorderRight:= cLineRounded;
+             //BorderUp:= cLineRounded;
           end;
         else
           begin

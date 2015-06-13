@@ -57,17 +57,17 @@ type
 implementation
 
 const
-  cBorderEc: array[TBorderLineType] of TATLineBorderStyle = (
-    cBorderNone,
-    cBorderLine,
-    cBorderLineDot,
-    cBorderLineDot,
-    cBorderLineDot,
-    cBorderLineDot,
-    cBorderLine2px,
-    cBorderLine2px,
-    cBorderWave,
-    cBorderDotted
+  cBorderEc: array[TBorderLineType] of TATLineStyle = (
+    cLineNone,
+    cLineSolid,
+    cLineDash,
+    cLineDash,
+    cLineDash,
+    cLineDash,
+    cLineSolid2px,
+    cLineSolid2px,
+    cLineWave,
+    cLineDotted
     );
 
 { TATAdapterEControl }
@@ -245,10 +245,15 @@ begin
   ListColors.Clear;
 
   if EdList.Count=0 then
-    Ed.Fold.Clear
+  begin
+    if Assigned(Ed) then
+      Ed.Fold.Clear;
+  end
   else
-  for j:= 0 to EdList.Count-1 do
-    TATSynEdit(EdList[j]).Fold.Clear;
+  begin
+    for j:= 0 to EdList.Count-1 do
+      TATSynEdit(EdList[j]).Fold.Clear;
+  end;
 end;
 
 constructor TATAdapterEControl.Create;

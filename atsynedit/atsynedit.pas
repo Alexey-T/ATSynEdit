@@ -395,7 +395,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
-    FOptShowStapleStyle: TATLineBorderStyle;
+    FOptShowStapleStyle: TATLineStyle;
     FOptShowStapleIndent: integer;
     FOptShowStapleWidthPercent: integer;
     FOptMouseDownForPopup: boolean;
@@ -852,7 +852,7 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste;
-    property OptShowStapleStyle: TATLineBorderStyle read FOptShowStapleStyle write FOptShowStapleStyle;
+    property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle;
     property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent;
     property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent;
     property OptShowFullSel: boolean read FOptShowFullSel write FOptShowFullSel;
@@ -2116,7 +2116,7 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
-  FOptShowStapleStyle:= cBorderLine;
+  FOptShowStapleStyle:= cLineSolid;
   FOptShowStapleIndent:= -1;
   FOptShowStapleWidthPercent:= 100;
 
@@ -3854,7 +3854,7 @@ end;
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin
-  if FOptShowStapleStyle=cBorderNone then Exit;
+  if FOptShowStapleStyle=cLineNone then Exit;
   CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
   CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Left, R.Bottom), false);
   CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
@@ -3871,7 +3871,7 @@ var
   RSt: TRect;
   NColor: TColor;
 begin
-  if FOptShowStapleStyle=cBorderNone then Exit;
+  if FOptShowStapleStyle=cLineNone then Exit;
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
   Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, nil,

@@ -24,14 +24,14 @@ var
 
 
 type
-  TATLineBorderStyle = (
-    cBorderNone,
-    cBorderLine,
-    cBorderLineDot,
-    cBorderLine2px,
-    cBorderDotted,
-    cBorderRounded,
-    cBorderWave
+  TATLineStyle = (
+    cLineNone,
+    cLineSolid,
+    cLineDash,
+    cLineSolid2px,
+    cLineDotted,
+    cLineRounded,
+    cLineWave
     );
 
 type
@@ -39,7 +39,7 @@ type
     Offset, Len: integer;
     ColorFont, ColorBG, ColorBorder: TColor;
     FontBold, FontItalic, FontStrikeOut: boolean;
-    BorderUp, BorderDown, BorderLeft, BorderRight: TATLineBorderStyle;
+    BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
 
 const
@@ -53,7 +53,7 @@ type
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: TATIntArray) of object;
 
-procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle;
+procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle;
   P1, P2: TPoint; AtDown: boolean);
 
 procedure CanvasTextOut(C: TCanvas;
@@ -259,16 +259,16 @@ begin
   end;
 end;
 
-procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineBorderStyle; P1, P2: TPoint; AtDown: boolean);
+procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle; P1, P2: TPoint; AtDown: boolean);
 begin
   case Style of
-    cBorderLine:
+    cLineSolid:
       begin
         C.Pen.Color:= Color;
         CanvasSimpleLine(C, P1, P2);
       end;
 
-    cBorderLine2px:
+    cLineSolid2px:
       begin
         C.Pen.Color:= Color;
         CanvasSimpleLine(C, P1, P2);
@@ -289,7 +289,7 @@ begin
         CanvasSimpleLine(C, P1, P2);
       end;
 
-    cBorderLineDot:
+    cLineDash:
       begin
         C.Pen.Color:= Color;
         C.Pen.Style:= psDot;
@@ -297,20 +297,20 @@ begin
         C.Pen.Style:= psSolid;
       end;
 
-    cBorderDotted:
+    cLineDotted:
       CanvasDottedHorzVertLine(C, Color, P1, P2);
 
-    cBorderRounded:
+    cLineRounded:
       CanvasRoundedLine(C, Color, P1, P2, AtDown);
 
-    cBorderWave:
+    cLineWave:
       CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
   end;
 end;
 
-procedure DoPaintBorder(C: TCanvas; Color: TColor; R: TRect; Side: TATBorderSide; Style: TATLineBorderStyle);
+procedure DoPaintBorder(C: TCanvas; Color: TColor; R: TRect; Side: TATBorderSide; Style: TATLineStyle);
 begin
-  if Style=cBorderNone then Exit;
+  if Style=cLineNone then Exit;
   Dec(R.Right);
   Dec(R.Bottom);
 
