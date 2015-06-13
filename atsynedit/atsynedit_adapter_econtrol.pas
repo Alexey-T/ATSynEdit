@@ -22,6 +22,7 @@ type
   TATAdapterEControl = class(TATAdapterHilite)
   private
     Ed: TATSynEdit;
+    EdList: TList;
     AnClient: TClientSyntAnalyzer;
     Buffer: TATStringBuffer;
     LColors: TATSynRanges;
@@ -35,10 +36,13 @@ type
     procedure UpdateData;
     procedure UpdateFoldRanges;
     procedure UpdateTokensXY;
+    function GetLexer: TSyntAnalyzer;
+    procedure SetLexer(AAnalizer: TSyntAnalyzer);
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure SetLexer(AAnalizer: TSyntAnalyzer);
+    procedure AddEditor(AEd: TATSynEdit);
+    property Lexer: TSyntAnalyzer read GetLexer write SetLexer;
     procedure OnEditorChange(Sender: TObject); override;
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
@@ -235,6 +239,7 @@ end;
 constructor TATAdapterEControl.Create;
 begin
   Ed:= nil;
+  EdList:= TList.Create;
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
   LColors:= TATSynRanges.Create;
@@ -246,9 +251,16 @@ begin
   FreeAndNil(Buffer);
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
+  FreeAndNil(EdList);
   Ed:= nil;
 
   inherited;
+end;
+
+procedure TATAdapterEControl.AddEditor(AEd: TATSynEdit);
+begin
+  if EdList.IndexOf(AEd)<0 then
+    EdList.Add(AEd);
 end;
 
 procedure TATAdapterEControl.SetLexer(AAnalizer: TSyntAnalyzer);
@@ -303,10 +315,16 @@ var
   R: TTextRange;
   Pnt1, Pnt2: TPoint;
   Pos1, Pos2: integer;
-  i: integer;
+  i, j: integer;
   SHint: string;
   Style: TSyntaxFormat;
   tokenStart, tokenEnd: TSyntToken;
+  //
+  procedure EdAddFold(AEd: TATSynEdit);
+  begin
+    AEd.Fold.Add(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
+  end;
+  //
 begin
   if not Assigned(Ed) then Exit;
   if not Assigned(AnClient) then Exit;
@@ -340,7 +358,12 @@ begin
 
     SHint:= AnClient.GetCollapsedText(R);
       //+'/'+R.Rule.GetNamePath;
-    Ed.Fold.Add(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
+
+    if EdList.Count=0 then
+      EdAddFold(Ed)
+    else
+    for j:= 0 to EdList.Count-1 do
+      EdAddFold(TATSynEdit(EdList[j]));
 
     if R.Rule.HighlightPos=cpAny then
     begin
@@ -420,6 +443,14 @@ begin
     token.PntStart:= Buffer.StrToCaret(token.StartPos);
     token.PntEnd:= Buffer.StrToCaret(token.EndPos);
   end;
+end;
+
+function TATAdapterEControl.GetLexer: TSyntAnalyzer;
+begin
+  if Assigned(AnClient) then
+    Result:= AnClient.Owner
+  else
+    Result:= nil;
 end;
 
 end.

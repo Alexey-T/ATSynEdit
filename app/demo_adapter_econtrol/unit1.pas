@@ -89,12 +89,12 @@ var
 begin
   FFilename:= fn;
 
-  adapter.SetLexer(nil);
+  adapter.Lexer:= nil;
   ed.LoadFromFile(fn);
   ed.SetFocus;
 
   an:= DoFindLexerForFilename(manager, fn);
-  adapter.SetLexer(an);
+  adapter.Lexer:= an;
 
   if Assigned(an) then
     edLexer.ItemIndex:= edLexer.Items.IndexOf(an.LexerName);
@@ -155,11 +155,11 @@ end;
 
 procedure TfmMain.chkLexerChange(Sender: TObject);
 begin
-  adapter.SetLexer(nil);
+  adapter.Lexer:= nil;
   ed.Fold.Clear;
 
   if chkLexer.Checked then
-    adapter.SetLexer(DoFindLexerForFilename(manager, FFilename));
+    adapter.Lexer:= DoFindLexerForFilename(manager, FFilename);
   ed.Update;
 end;
 
@@ -194,7 +194,7 @@ end;
 
 procedure TfmMain.DoLexer(const aname: string);
 begin
-  adapter.SetLexer(manager.FindAnalyzer(aname));
+  adapter.Lexer:= manager.FindAnalyzer(aname);
   ed.Update;
 end;
 
