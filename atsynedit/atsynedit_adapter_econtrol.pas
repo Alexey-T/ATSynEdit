@@ -23,7 +23,7 @@ type
   private
     Ed: TATSynEdit;
     EdList: TList;
-    AnClient: TClientSyntAnalyzer;
+    AnClient: TecClientSyntAnalyzer;
     Buffer: TATStringBuffer;
     ListColors: TATSynRanges;
     procedure DoAddFold(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
@@ -38,13 +38,13 @@ type
     procedure UpdateData;
     procedure UpdateFoldRanges;
     procedure UpdateTokensPos;
-    function GetLexer: TSyntAnalyzer;
-    procedure SetLexer(AAnalizer: TSyntAnalyzer);
+    function GetLexer: TecSyntAnalyzer;
+    procedure SetLexer(AAnalizer: TecSyntAnalyzer);
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure AddEditor(AEd: TATSynEdit);
-    property Lexer: TSyntAnalyzer read GetLexer write SetLexer;
+    property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     procedure OnEditorChange(Sender: TObject); override;
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
@@ -57,7 +57,7 @@ type
 implementation
 
 const
-  cBorderEc: array[TBorderLineType] of TATLineStyle = (
+  cBorderEc: array[TecBorderLineType] of TATLineStyle = (
     cLineNone,
     cLineSolid,
     cLineDash,
@@ -142,8 +142,8 @@ var
 var
   tokenStart, tokenEnd: TPoint;
   mustOffset, startindex, i: integer;
-  token: TSyntToken;
-  tokenStyle: TSyntaxFormat;
+  token: TecSyntToken;
+  tokenStyle: TecSyntaxFormat;
   part: TATLinePart;
 begin
   partindex:= 0;
@@ -283,14 +283,14 @@ begin
     EdList.Add(AEd);
 end;
 
-procedure TATAdapterEControl.SetLexer(AAnalizer: TSyntAnalyzer);
+procedure TATAdapterEControl.SetLexer(AAnalizer: TecSyntAnalyzer);
 begin
   DoClearData;
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
   if AAnalizer=nil then Exit;
-  AnClient:= TClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
+  AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
 
   UpdateData;
 end;
@@ -345,13 +345,13 @@ end;
 
 procedure TATAdapterEControl.UpdateFoldRanges;
 var
-  R: TTextRange;
+  R: TecTextRange;
   Pnt1, Pnt2: TPoint;
   Pos1, Pos2: integer;
   i: integer;
   SHint: string;
-  Style: TSyntaxFormat;
-  tokenStart, tokenEnd: TSyntToken;
+  Style: TecSyntaxFormat;
+  tokenStart, tokenEnd: TecSyntToken;
 begin
   if not Assigned(Ed) then Exit;
   if not Assigned(AnClient) then Exit;
@@ -398,8 +398,8 @@ end;
 
 procedure TATAdapterEControl.UpdateSublexRanges;
 var
-  R: TSubLexerRange;
-  Style: TSyntaxFormat;
+  R: TecSubLexerRange;
+  Style: TecSyntaxFormat;
   i: integer;
 begin
   for i:= 0 to AnClient.SubLexerRangeCount-1 do
@@ -455,7 +455,7 @@ end;
 
 procedure TATAdapterEControl.UpdateTokensPos;
 var
-  token: TSyntToken;
+  token: TecSyntToken;
   i: integer;
 begin
   for i:= 0 to AnClient.TagCount-1 do
@@ -466,7 +466,7 @@ begin
   end;
 end;
 
-function TATAdapterEControl.GetLexer: TSyntAnalyzer;
+function TATAdapterEControl.GetLexer: TecSyntAnalyzer;
 begin
   if Assigned(AnClient) then
     Result:= AnClient.Owner

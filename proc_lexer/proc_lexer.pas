@@ -10,11 +10,11 @@ uses
   ecStrUtils,
   ATStringProc;
 
-function DoFindLexerForFilename(LexLib: TSyntaxManager; const FileName: string): TSyntAnalyzer;
+function DoFindLexerForFilename(LexLib: TecSyntaxManager; const FileName: string): TecSyntAnalyzer;
 
 implementation
 
-function DoFindLexerForFilename(LexLib: TSyntaxManager; const FileName: string): TSyntAnalyzer;
+function DoFindLexerForFilename(LexLib: TecSyntaxManager; const FileName: string): TecSyntAnalyzer;
 var
   fname, ext1, ext2: string;
   i: integer;

@@ -62,7 +62,7 @@ implementation
 {$R *.lfm}
 
 var
-  manager: TSyntaxManager;
+  manager: TecSyntaxManager;
   adapter: TATAdapterEControl;
 
 { TfmMain }
@@ -85,7 +85,7 @@ end;
 
 procedure TfmMain.DoOpen(const fn: string);
 var
-  an: TSyntAnalyzer;
+  an: TecSyntAnalyzer;
 begin
   FFilename:= fn;
 
@@ -107,7 +107,7 @@ begin
   FDir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'/test_syntax_files/';
   fname_lxl:= ExtractFilePath(Application.ExeName)+'lexlib.lxl';
 
-  manager:= TSyntaxManager.Create(Self);
+  manager:= TecSyntaxManager.Create(Self);
   manager.LoadFromFile(fname_lxl);
   UpdateLexList;
 
