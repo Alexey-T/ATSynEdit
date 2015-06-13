@@ -14,7 +14,7 @@ uses
   ATStringProc;
 
 var
-  OptUnprintedTabCharLength: integer = 2;
+  OptUnprintedTabCharLength: integer = 1;
   OptUnprintedTabPointerScale: integer = 22;
   OptUnprintedSpaceDotScale: integer = 15;
   OptUnprintedEndDotScale: integer = 30;

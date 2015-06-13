@@ -157,7 +157,7 @@ begin
   Result:= '';
   R:= FFold.FindRangeWithPlusAtLine(ALine);
   if Assigned(R) then
-    Result:= R.HintText;
+    Result:= R.Hint;
   if Result='' then
     Result:= '...';
 end;

@@ -209,7 +209,7 @@ const
   cInitMinimapVisible = false;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
-  cInitTabSize = 10;
+  cInitTabSize = 8;
   cInitMicromapWidth = 30;
   cInitMinimapWidth = 160;
   cInitMinimapFontSize = {$ifdef darwin} 4 {$else} 2 {$endif};
@@ -3883,7 +3883,7 @@ begin
   for i:= 0 to High(Indexes) do
   begin
     Range:= FFold[Indexes[i]];
-    if not Range.WithStaple then Continue;
+    if not Range.Staple then Continue;
     if Range.Folded then Continue;
 
     if IsLineFolded(Range.Y, true) then Continue;
