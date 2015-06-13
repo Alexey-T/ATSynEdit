@@ -32,7 +32,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="12">
+    <Units Count="13">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -87,9 +87,15 @@
         <IsPartOfProject Value="True"/>
       </Unit10>
       <Unit11>
-        <Filename Value="..\..\EControl\ec\ecsyntanal.pas"/>
+        <Filename Value="E:\GitEControl\ec\ecsyntanal.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ecSyntAnal"/>
       </Unit11>
+      <Unit12>
+        <Filename Value="E:\GitEControl\ec\eczregexpr.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ecZRegExpr"/>
+      </Unit12>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -100,7 +106,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);..\..\atsynedit"/>
-      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer;..\..\..\GitEControl\ec;..\..\EControl\ec"/>
+      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer;..\..\..\GitEControl\ec"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

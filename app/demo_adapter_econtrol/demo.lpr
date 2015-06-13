@@ -9,8 +9,7 @@ uses
   Interfaces, // this includes the LCL widgetset
   Forms, Unit1, ATSynEdit, atsynedit_adapters, ATSynEdit_CanvasProc,
   ATStringProc_TextBuffer, ATSynEdit_Ranges, ecLists, ecStrUtils,
-  eczregexpr, ecsyntanal
-  { you can add units after this };
+  eczregexpr, ecSyntAnal;
 
 {$R *.res}
 
