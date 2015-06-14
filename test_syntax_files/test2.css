@@ -1,0 +1,10 @@
+p.new:after {
+  content: "new"; /* text */ 
+  background-color: #fc0;
+  font-size: 90%;
+  padding: 2px;
+}
+ 
+:test, name {
+  name:name;
+}

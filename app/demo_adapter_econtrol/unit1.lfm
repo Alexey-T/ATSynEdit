@@ -43,15 +43,17 @@ object fmMain: TfmMain
     object files: TShellListView
       Left = 304
       Height = 144
-      Top = 4
+      Top = 3
       Width = 464
       Anchors = [akTop, akLeft, akBottom]
       Color = clDefault
       HideSelection = False
       ReadOnly = True
+      ShowColumnHeaders = False
       SortType = stText
       TabOrder = 6
-      ViewStyle = vsList
+      ToolTips = False
+      ViewStyle = vsSmallIcon
       OnClick = filesClick
       ObjectTypes = [otNonFolders]
     end
