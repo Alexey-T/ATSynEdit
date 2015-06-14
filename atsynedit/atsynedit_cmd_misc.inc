@@ -6,6 +6,16 @@ begin
   Result:= [cResultState];
 end;
 
+function TATSynEdit.DoCommand_ToggleWordWrap: TATCommandResults;
+begin
+  if FWrapMode=cWrapOff then
+    FWrapMode:= cWrapOn
+  else
+    FWrapMode:= cWrapOff;
+  FWrapUpdateNeeded:= true;
+  Result:= [cResultState];
+end;
+
 function TATSynEdit.DoCommand_ToggleReadOnly: TATCommandResults;
 begin
   ModeReadOnly:= not ModeReadOnly;

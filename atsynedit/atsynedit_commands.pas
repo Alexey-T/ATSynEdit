@@ -99,8 +99,9 @@ const
   cCommand_TextInsertEmptyAbove = 270 or cCmdSelReset or cCmdCaret;
   cCommand_TextInsertEmptyBelow = 271 or cCmdSelReset or cCmdCaret;
 
-  cCommand_ToggleReadOnly = 300;
-  cCommand_ToggleOverwrite = 301;
+  cCommand_ToggleOverwrite = 300;
+  cCommand_ToggleReadOnly = 301;
+  cCommand_ToggleWordWrap = 302;
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;

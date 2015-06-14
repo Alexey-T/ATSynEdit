@@ -658,6 +658,7 @@ type
     function DoCommand_Cancel: TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;
+    function DoCommand_ToggleWordWrap: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
     function DoCommand_ScrollVert(ALines: integer): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,

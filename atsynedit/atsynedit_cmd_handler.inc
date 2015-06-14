@@ -209,8 +209,9 @@ begin
     cCommand_GotoWordPrev,
     cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(false);
 
-    cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
     cCommand_ToggleOverwrite:          Res:= DoCommand_ToggleOverwrite;
+    cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
+    cCommand_ToggleWordWrap:           Res:= DoCommand_ToggleWordWrap;
 
     cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);
