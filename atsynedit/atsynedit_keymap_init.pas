@@ -82,6 +82,10 @@ begin
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXControl+'+R'], []);
   M.Add(cCommand_ToggleWordWrap, 'toggle word-wrap mode', [cXControl+'+U'], []);
+  M.Add(cCommand_ToggleUnprinted, 'toggle show unprinted chars', [], []);
+  M.Add(cCommand_ToggleLineNums, 'toggle show line numbers', [], []);
+  M.Add(cCommand_ToggleFolding, 'toggle show folding bar', [], []);
+  M.Add(cCommand_ToggleRuler, 'toggle show ruler', [], []);
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);

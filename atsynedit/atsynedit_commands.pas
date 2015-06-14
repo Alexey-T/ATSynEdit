@@ -102,6 +102,10 @@ const
   cCommand_ToggleOverwrite = 300;
   cCommand_ToggleReadOnly = 301;
   cCommand_ToggleWordWrap = 302;
+  cCommand_ToggleUnprinted = 303;
+  cCommand_ToggleLineNums = 304;
+  cCommand_ToggleFolding = 305;
+  cCommand_ToggleRuler = 306;
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;

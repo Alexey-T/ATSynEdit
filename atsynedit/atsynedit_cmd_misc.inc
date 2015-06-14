@@ -16,6 +16,32 @@ begin
   Result:= [cResultState];
 end;
 
+function TATSynEdit.DoCommand_ToggleUnprinted: TATCommandResults;
+begin
+  OptUnprintedVisible:= not OptUnprintedVisible;
+  Result:= [cResultState];
+end;
+
+function TATSynEdit.DoCommand_ToggleLineNums: TATCommandResults;
+begin
+  with Gutter.Items[GutterBandNum] do
+    Visible:= not Visible;
+  Result:= [cResultState];
+end;
+
+function TATSynEdit.DoCommand_ToggleFolding: TATCommandResults;
+begin
+  with Gutter.Items[GutterBandFold] do
+    Visible:= not Visible;
+  Result:= [cResultState];
+end;
+
+function TATSynEdit.DoCommand_ToggleRuler: TATCommandResults;
+begin
+  OptRulerVisible:= not OptRulerVisible;
+  Result:= [cResultState];
+end;
+
 function TATSynEdit.DoCommand_ToggleReadOnly: TATCommandResults;
 begin
   ModeReadOnly:= not ModeReadOnly;
