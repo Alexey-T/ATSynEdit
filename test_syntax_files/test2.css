@@ -1,10 +1,11 @@
-p.new:after {
-  content: "new"; /* text */ 
-  background-color: #fc0;
-  font-size: 90%;
-  padding: 2px;
-}
- 
-:test, name {
-  name:name;
+/* Test */
+p.new:after, p.new::after, ddddd {
+	content: "Test"; 
+	color: #333; 
+	background-color: #fc0;  
+	font-size: 90%; 
+	padding: 2px; 
+  }
+:test {
+  name:aaa
 }

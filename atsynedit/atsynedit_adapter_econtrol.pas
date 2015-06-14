@@ -375,7 +375,7 @@ begin
       Ed.Strings.LinesSep[i]:= 0;
 
     Break:= TecLineBreak(AnClient.LineBreaks[0]);
-    Ed.Colors.BlockSeparator:= Break.Rule.Style.BgColor;
+    Ed.Colors.BlockSepLine:= Break.Rule.Style.BgColor;
 
     for i:= 0 to AnClient.LineBreaks.Count-1 do
     begin

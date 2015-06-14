@@ -8795,12 +8795,10 @@ object SyntaxManager: TSyntaxManager
       item
         DisplayName = 'StyleSuffix'
         Font.Charset = DEFAULT_CHARSET
-        Font.Color = clNavy
+        Font.Color = clGreen
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = []
-        BorderTypeBottom = blDot
-        BorderColorBottom = clRed
       end>
     TokenRules = <
       item
@@ -8845,12 +8843,12 @@ object SyntaxManager: TSyntaxManager
         ColumnTo = 0
       end
       item
-        DisplayName = 'StyleAfter'
+        DisplayName = 'StyleSuffix'
         StyleName = 'StyleSuffix'
         BlockName = 'Style begin'
         NotParent = True
         TokenType = 2
-        Expression = ':\w+'
+        Expression = ':{1,2}\w+'
         ColumnFrom = 0
         ColumnTo = 0
       end

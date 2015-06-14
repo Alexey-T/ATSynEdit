@@ -87,7 +87,7 @@ type
     FStateSaved,
     FTextHintFont,
     FBlockStaple,
-    FBlockSeparator,
+    FBlockSepLine,
     FLockedBG,
     FComboboxArrow: TColor;
   published
@@ -123,7 +123,7 @@ type
     property StateAdded: TColor read FStateAdded write FStateAdded;
     property StateSaved: TColor read FStateSaved write FStateSaved;
     property BlockStaple: TColor read FBlockStaple write FBlockStaple;
-    property BlockSeparator: TColor read FBlockSeparator write FBlockSeparator;
+    property BlockSepLine: TColor read FBlockSepLine write FBlockSepLine;
     property LockedBG: TColor read FLockedBG write FLockedBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
     property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
@@ -1587,8 +1587,9 @@ begin
 
     if FWrapInfo.IsItemAfterCollapsed(NWrapIndex) then
     begin
-      C.Pen.Color:= FColors.CollapseLine;
-      C.Line(ARect.Left, NCoordTop-1, ARect.Right, NCoordTop-1);
+      NCoordSep:= NCoordTop-1;
+      C.Pen.Color:= Colors.CollapseLine;
+      C.Line(ARect.Left, NCoordSep, ARect.Right, NCoordSep);
     end;
 
     //prepare line
@@ -1753,7 +1754,7 @@ begin
         NCoordSep:= NCoordTop
       else
         NCoordSep:= NCoordTop+ACharSize.Y-1;
-      C.Pen.Color:= Colors.BlockSeparator;
+      C.Pen.Color:= Colors.BlockSepLine;
       C.Line(ARect.Left, NCoordSep, ARect.Right, NCoordSep);
     end;
 

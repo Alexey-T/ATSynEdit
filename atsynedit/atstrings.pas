@@ -18,9 +18,13 @@ uses
   ATStrings_Undo;
 
 const
-  //set to 2 to allow 2 editors to use one Strings obj, with different LinesHidden[i][nClient]
+  //set to 2 to allow 2 editors to use one Strings obj, with different LinesHidden[n, nClient]
   //set to 1 to allow only one editor for Strings obj (saves memory)
   cMaxStringsClients = 2;
+
+  //if update count is less, do smarter wrapinfo update (find, replace items)
+  //smart update used only if lines chged (not deleted/inserted)
+  cMaxUpdatesCountEasy = 200;
 
 type
   TATLineState = (
@@ -40,23 +44,22 @@ type
 const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2);
 
-const
-  cMaxUpdatesCountEasy = 200; //if update count is less, do smarter wrapinfo update
-                              //(find index, replace items)
-
 type
   { TATStringItem }
 
   TATStringItem = class
+  public
     ItemString: atString;
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
     ItemHidden: array[0..cMaxStringsClients-1] of smallint;
-      //if 0: usual (visible),
-      //if -1: line hidden,
-      //if >0: line hidden from this char-pos
-    ItemBm: byte;
+      //0: line visible,
+      //-1: line hidden,
+      //>0: line hidden from this char-pos
     ItemSep: byte;
+      //bit 0: show top sep line
+      //bit 1: show bottom sep line
+    ItemBm: byte;
     ItemBmColor: TColor;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
     function IsFake: boolean;

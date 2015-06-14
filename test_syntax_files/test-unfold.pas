@@ -2,13 +2,18 @@ unit Test;
 
 interface
 
-begin end;
-                   
+procedure aa;                                                                       
+
 implementation                                      
-                                                                       
+
+procedure aa;                                                                       
 begin
-  if A then
+  if some then
   begin
-    Do_;
+    begin
+      Test;
+    end;  
   end;
+end;
+
 end.
