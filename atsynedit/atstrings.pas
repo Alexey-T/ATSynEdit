@@ -26,6 +26,7 @@ const
   //smart update used only if lines chged (not deleted/inserted)
   cMaxUpdatesCountEasy = 200;
 
+{$Z1}
 type
   TATLineState = (
     cLineStateNone,
@@ -335,40 +336,36 @@ var
   Item: TATStringItem;
   i: integer;
 begin
+  Assert(IsIndexValid(Index));
   if FReadOnly then Exit;
 
-  if IsIndexValid(Index) then
-  begin
-    Item:= TATStringItem(FList[Index]);
+  Item:= TATStringItem(FList[Index]);
+  DoAddUndo(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
+  Item.ItemString:= AValue;
 
-    DoAddUndo(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
+  for i:= 0 to High(Item.ItemHidden) do
+    Item.ItemHidden[i]:= 0;
 
-    Item.ItemString:= AValue;
-
-    for i:= 0 to High(Item.ItemHidden) do
-      Item.ItemHidden[i]:= 0;
-
-    if Item.ItemState<>cLineStateAdded then
-      Item.ItemState:= cLineStateChanged;
-  end;
+  if Item.ItemState<>cLineStateAdded then
+    Item.ItemState:= cLineStateChanged;
 end;
 
 procedure TATStrings.SetLineBm(Index: integer; AValue: integer);
 begin
-  if IsIndexValid(Index) then
-    TATStringItem(FList[Index]).ItemBm:= AValue;
+  Assert(IsIndexValid(Index));
+  TATStringItem(FList[Index]).ItemBm:= AValue;
 end;
 
 procedure TATStrings.SetLineBmColor(Index: integer; AValue: integer);
 begin
-  if IsIndexValid(Index) then
-    TATStringItem(FList[Index]).ItemBmColor:= AValue;
+  Assert(IsIndexValid(Index));
+  TATStringItem(FList[Index]).ItemBmColor:= AValue;
 end;
 
 procedure TATStrings.SetLineSep(Index: integer; AValue: byte);
 begin
-  if IsIndexValid(Index) then
-    TATStringItem(FList[Index]).ItemSep:= AValue;
+  Assert(IsIndexValid(Index));
+  TATStringItem(FList[Index]).ItemSep:= AValue;
 end;
 
 
@@ -376,31 +373,29 @@ procedure TATStrings.SetLineEnd(Index: integer; AValue: TATLineEnds);
 var
   Item: TATStringItem;
 begin
+  Assert(IsIndexValid(Index));
   if FReadOnly then Exit;
 
-  if IsIndexValid(Index) then
-  begin
-    Item:= TATStringItem(FList[Index]);
+  Item:= TATStringItem(FList[Index]);
 
-    DoAddUndo(cEditActionChangeEol, Index, '', Item.ItemEnd);
+  DoAddUndo(cEditActionChangeEol, Index, '', Item.ItemEnd);
 
-    Item.ItemEnd:= AValue;
-    if Item.ItemState<>cLineStateAdded then
-      Item.ItemState:= cLineStateChanged;
-  end;
+  Item.ItemEnd:= AValue;
+  if Item.ItemState<>cLineStateAdded then
+    Item.ItemState:= cLineStateChanged;
 end;
 
 procedure TATStrings.SetLineHidden(IndexLine, IndexClient: integer;
   AValue: integer);
 begin
-  if IsIndexValid(IndexLine) then
-    TATStringItem(FList[IndexLine]).ItemHidden[IndexClient]:= AValue;
+  Assert(IsIndexValid(IndexLine));
+  TATStringItem(FList[IndexLine]).ItemHidden[IndexClient]:= AValue;
 end;
 
 procedure TATStrings.SetLineState(Index: integer; AValue: TATLineState);
 begin
-  if IsIndexValid(Index) then
-    TATStringItem(FList[Index]).ItemState:= AValue;
+  Assert(IsIndexValid(Index));
+  TATStringItem(FList[Index]).ItemState:= AValue;
 end;
 
 

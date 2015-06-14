@@ -18,6 +18,7 @@ type
   TATRealArray = array of real;
   TATPointArray = array of TPoint;
 
+{$Z1}
 type
   TATLineEnds = (cEndNone, cEndWin, cEndUnix, cEndMac);
 const
