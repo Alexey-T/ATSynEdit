@@ -56,6 +56,7 @@ type
       //if -1: line hidden,
       //if >0: line hidden from this char-pos
     ItemBm: byte;
+    ItemSep: byte;
     ItemBmColor: TColor;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
     function IsFake: boolean;
@@ -102,6 +103,7 @@ type
     function GetLineBmColor(Index: integer): integer;
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(NLine, NClient: integer): integer;
+    function GetLineSep(Index: integer): byte;
     function GetLineState(Index: integer): TATLineState;
     function GetRedoCount: integer;
     function GetUndoCount: integer;
@@ -117,6 +119,7 @@ type
     procedure SetLineBmColor(Index: integer; AValue: integer);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
     procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: integer);
+    procedure SetLineSep(Index: integer; AValue: byte);
     procedure SetLineState(Index: integer; AValue: TATLineState);
     function GetTextString: atString;
     procedure DoLoadFromStream(Stream: TStream);
@@ -146,6 +149,7 @@ type
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesBmColor[Index: integer]: integer read GetLineBmColor write SetLineBmColor;
+    property LinesSep[Index: integer]: byte read GetLineSep write SetLineSep;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
@@ -234,6 +238,7 @@ begin
     ItemHidden[i]:= 0;
   ItemBm:= 0;
   ItemBmColor:= 0;
+  ItemSep:= 0;
 end;
 
 function TATStringItem.IsFake: boolean;
@@ -245,52 +250,45 @@ end;
 
 function TATStrings.GetLine(N: integer): atString;
 begin
-  if IsIndexValid(N) then
-    Result:= TATStringItem(FList[N]).ItemString
-  else
-    Result:= '';
+  Assert(IsIndexValid(N));
+  Result:= TATStringItem(FList[N]).ItemString;
 end;
 
 function TATStrings.GetLineBm(Index: integer): integer;
 begin
-  if IsIndexValid(Index) then
-    Result:= TATStringItem(FList[Index]).ItemBm
-  else
-    Result:= 0;
+  Assert(IsIndexValid(Index));
+  Result:= TATStringItem(FList[Index]).ItemBm;
 end;
 
 function TATStrings.GetLineBmColor(Index: integer): integer;
 begin
-  if IsIndexValid(Index) then
-    Result:= TATStringItem(FList[Index]).ItemBmColor
-  else
-    Result:= 0;
+  Assert(IsIndexValid(Index));
+  Result:= TATStringItem(FList[Index]).ItemBmColor;
 end;
 
 function TATStrings.GetLineEnd(N: integer): TATLineEnds;
 begin
-  if IsIndexValid(N) then
-    Result:= TATStringItem(FList[N]).ItemEnd
-  else
-    Result:= cEndNone;
+  Assert(IsIndexValid(N));
+  Result:= TATStringItem(FList[N]).ItemEnd;
 end;
 
 function TATStrings.GetLineHidden(NLine, NClient: integer): integer;
 begin
-  if IsIndexValid(NLine) then
-    Result:= TATStringItem(FList[NLine]).ItemHidden[NClient]
-  else
-    Result:= 0;
+  Assert(IsIndexValid(NLine));
+  Result:= TATStringItem(FList[NLine]).ItemHidden[NClient];
 end;
 
 function TATStrings.GetLineState(Index: integer): TATLineState;
 begin
-  if IsIndexValid(Index) then
-    Result:= TATStringItem(FList[Index]).ItemState
-  else
-    Result:= cLineStateNone;
+  Assert(IsIndexValid(Index));
+  Result:= TATStringItem(FList[Index]).ItemState;
 end;
 
+function TATStrings.GetLineSep(Index: integer): byte;
+begin
+  Assert(IsIndexValid(Index));
+  Result:= TATStringItem(FList[Index]).ItemSep;
+end;
 
 function TATStrings.GetUndoCount: integer;
 begin
@@ -363,6 +361,13 @@ begin
   if IsIndexValid(Index) then
     TATStringItem(FList[Index]).ItemBmColor:= AValue;
 end;
+
+procedure TATStrings.SetLineSep(Index: integer; AValue: byte);
+begin
+  if IsIndexValid(Index) then
+    TATStringItem(FList[Index]).ItemSep:= AValue;
+end;
+
 
 procedure TATStrings.SetLineEnd(Index: integer; AValue: TATLineEnds);
 var

@@ -14,7 +14,8 @@ uses
   ATSynEdit_Ranges,
   ATStringProc,
   ATStringProc_TextBuffer,
-  ecSyntAnal;
+  ecSyntAnal,
+  Math;
 
 type
   { TATAdapterEControl }
@@ -35,6 +36,7 @@ type
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
+    procedure UpdateSeps;
     procedure UpdateSublexRanges;
     procedure UpdateData;
     procedure UpdateFoldRanges;
@@ -329,6 +331,7 @@ begin
   UpdateTokensPos;
   UpdateSublexRanges;
   UpdateFoldRanges;
+  UpdateSeps;
 end;
 
 
@@ -361,6 +364,26 @@ begin
 end;
 
 
+procedure TATAdapterEControl.UpdateSeps;
+var
+  Break: TecLineBreak;
+  i: integer;
+begin
+  if AnClient.LineBreaks.Count>0 then
+  begin
+    for i:= 0 to Ed.Strings.Count-1 do
+      Ed.Strings.LinesSep[i]:= 0;
+
+    Break:= TecLineBreak(AnClient.LineBreaks[0]);
+    Ed.Colors.BlockSeparator:= Break.Rule.Style.BgColor;
+
+    for i:= 0 to AnClient.LineBreaks.Count-1 do
+    begin
+      Break:= TecLineBreak(AnClient.LineBreaks[i]);
+      Ed.Strings.LinesSep[Break.Line]:= IfThen(Break.Rule.LinePos=lbTop, 1, 2);
+    end;
+  end;
+end;
 
 procedure TATAdapterEControl.UpdateFoldRanges;
 var
@@ -378,8 +401,8 @@ begin
   for i:= 0 to AnClient.RangeCount-1 do
   begin
     R:= AnClient.Ranges[i];
-    if R.Rule.NotCollapsed then Continue;
     if R.Rule.BlockType<>btRangeStart then Continue;
+    if R.Rule.NotCollapsed then Continue;
 
     /////issue: rules in C# with 'parent' set give wrong ranges;
     //rule "function begin", "prop begin";

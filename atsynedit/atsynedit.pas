@@ -87,6 +87,7 @@ type
     FStateSaved,
     FTextHintFont,
     FBlockStaple,
+    FBlockSeparator,
     FLockedBG,
     FComboboxArrow: TColor;
   published
@@ -122,6 +123,7 @@ type
     property StateAdded: TColor read FStateAdded write FStateAdded;
     property StateSaved: TColor read FStateSaved write FStateSaved;
     property BlockStaple: TColor read FBlockStaple write FBlockStaple;
+    property BlockSeparator: TColor read FBlockSeparator write FBlockSeparator;
     property LockedBG: TColor read FLockedBG write FLockedBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
     property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
@@ -1515,10 +1517,11 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   var AScrollHorz, AScrollVert: TATSynScrollInfo;
   ALineFrom: integer);
 var
-  NCoordTop: integer;
+  NCoordTop, NCoordSep: integer;
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: real;
+  NLineSep: byte;
   WrapItem: TATSynWrapItem;
   NColorEntire, NColorAfter: TColor;
   Str, StrOut, StrOutUncut: atString;
@@ -1592,6 +1595,7 @@ begin
     Str:= Strings.Lines[NLinesIndex];
     Str:= Copy(Str, WrapItem.NCharIndex, WrapItem.NLength);
 
+    NLineSep:= Strings.LinesSep[NLinesIndex];
     LineWithCaret:= IsLineWithCaret(NLinesIndex);
     LineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
@@ -1741,6 +1745,17 @@ begin
     if AMainText then
       if WrapItem.NFinal=cWrapItemCollapsed then
         DoPaintFoldedMark(C, CoordAfterText, GetFoldedMarkText(NLinesIndex));
+
+    //draw separators
+    if NLineSep<>0 then
+    begin
+      if (NLineSep and 1)<>0 then
+        NCoordSep:= NCoordTop
+      else
+        NCoordSep:= NCoordTop+ACharSize.Y-1;
+      C.Pen.Color:= Colors.BlockSeparator;
+      C.Line(ARect.Left, NCoordSep, ARect.Right, NCoordSep);
+    end;
 
     //draw gutter
     if AWithGutter then
