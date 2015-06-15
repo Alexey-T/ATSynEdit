@@ -533,7 +533,7 @@ begin
   if DoCheckFilled then Exit;
 
   DoAddUndo(cEditActionInsert, Count, '', cEndNone);
-  DoEventLog(MaxInt, Length(AString));
+  DoEventLog(Count, Length(AString));
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
