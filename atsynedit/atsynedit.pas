@@ -482,6 +482,7 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMinimapClick(APosY: integer);
+    function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
     procedure PaintEx(ALine: integer);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
@@ -1585,7 +1586,7 @@ begin
     if not Strings.IsIndexValid(NLinesIndex) then Break;
     FLineBottom:= NLinesIndex;
 
-    if FWrapInfo.IsItemAfterCollapsed(NWrapIndex) then
+    if IsFoldLineNeededBeforeWrapitem(NWrapIndex) then
     begin
       NCoordSep:= NCoordTop-1;
       C.Pen.Color:= Colors.CollapseLine;
@@ -3939,7 +3940,6 @@ end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
-
 {$I atsynedit_sel.inc}
 {$I atsynedit_fold.inc}
 {$I atsynedit_debug.inc}

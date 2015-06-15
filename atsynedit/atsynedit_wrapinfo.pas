@@ -41,7 +41,6 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsItemInitial(N: integer): boolean;
-    function IsItemAfterCollapsed(N: integer): boolean;
     property Items[N: integer]: TATSynWrapItem read GetItem; default;
     procedure Add(AItem: TATSynWrapItem);
     procedure Delete(N: integer);
@@ -133,16 +132,6 @@ begin
   end
   else
     Result:= true;
-end;
-
-function TATSynWrapInfo.IsItemAfterCollapsed(N: integer): boolean;
-begin
-  if IsIndexValid(N) and (N>0) then
-  begin
-    Result:= Items[N].NLineIndex-Items[N-1].NLineIndex > 1;
-  end
-  else
-    Result:= false;
 end;
 
 procedure TATSynWrapInfo.Add(AItem: TATSynWrapItem);

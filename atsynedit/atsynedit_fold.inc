@@ -186,4 +186,22 @@ begin
   end;
 end;
 
+function TATSynEdit.IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
+var
+  NLineCur, NLinePrev: integer;
+begin
+  if FWrapInfo.IsIndexValid(N) and (N>0) then
+  begin
+    NLineCur:= FWrapInfo.Items[N].NLineIndex;
+    NLinePrev:= FWrapInfo.Items[N-1].NLineIndex;
+    //before this line some is skipped
+    Result:= NLineCur-NLinePrev > 1;
+    //and prev visible line is fully folded
+    if Result then
+      Result:= Strings.LinesHidden[NLinePrev, FEditorIndex]<0;
+  end
+  else
+    Result:= false;
+end;
+
 
