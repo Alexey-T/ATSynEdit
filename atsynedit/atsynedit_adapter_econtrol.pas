@@ -392,8 +392,6 @@ begin
 end;
 
 procedure TATAdapterEControl.UpdateFoldRanges;
-const
-  cMaxDefHint = 50;
 var
   R: TecTextRange;
   Pnt1, Pnt2: TPoint;

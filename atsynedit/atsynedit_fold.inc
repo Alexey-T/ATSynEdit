@@ -122,14 +122,18 @@ begin
   end
   else
   case FFoldStyle of
-    cFoldWithDots:
+    cFoldHereWithDots:
     begin
       Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
     end;
-    cFoldWithTruncatedText:
+    cFoldHereWithTruncatedText:
     begin
       Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
       ARange.Hint:= Copy(Strings.Lines[ARange.Y], ARange.X+1, cFoldedLenOfEmptyHint)+'...';
+    end;
+    cFoldFromEndOfLine:
+    begin
+      Strings.LinesHidden[ARange.Y, FEditorIndex]:= Length(Strings.Lines[ARange.Y])+1;
     end;
     cFoldFromNextLine:
     begin

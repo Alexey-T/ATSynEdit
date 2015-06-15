@@ -52,8 +52,9 @@ type
   TATCommandResults = set of TATCommandResult;
 
   TATFoldStyle = (
-    cFoldWithDots, //looks like Sublime Text
-    cFoldWithTruncatedText, //show folded line in mark
+    cFoldHereWithDots, //show "..." from fold-pos
+    cFoldHereWithTruncatedText, //show truncated line instead of "..."
+    cFoldFromEndOfLine, //looks like Lazarus
     cFoldFromNextLine //looks like SynWrite
     );
 
@@ -225,7 +226,7 @@ const
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
-  cInitFoldStyle = cFoldWithDots;
+  cInitFoldStyle = cFoldHereWithDots;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
