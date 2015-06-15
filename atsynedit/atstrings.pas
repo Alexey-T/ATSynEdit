@@ -73,6 +73,7 @@ type
 type
   TATStringsGetCarets = function: TATPointArray of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
+  TATStringsLogEvent = procedure(Sender: TObject; ALine, ALen: integer) of object;
 
 type
   { TATStrings }
@@ -99,10 +100,12 @@ type
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnProgress: TNotifyEvent;
+    FOnLog: TATStringsLogEvent;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
     function DoCheckFilled: boolean;
+    procedure DoEventLog(ALine, ALen: integer);
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
@@ -208,6 +211,7 @@ type
     property RedoCount: integer read GetRedoCount;
     //misc
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
+    property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
   end;
 
 implementation
@@ -345,8 +349,12 @@ begin
 
   Item:= TATStringItem(FList[Index]);
   DoAddUndo(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
+  DoEventLog(Index, -Length(Item.ItemString));
+  DoEventLog(Index, Length(AValue));
+
   Item.ItemString:= AValue;
 
+  //fully unfold this line
   for i:= 0 to High(Item.ItemHidden) do
     Item.ItemHidden[i]:= 0;
 
@@ -525,6 +533,7 @@ begin
   if DoCheckFilled then Exit;
 
   DoAddUndo(cEditActionInsert, Count, '', cEndNone);
+  DoEventLog(MaxInt, Length(AString));
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -577,6 +586,7 @@ begin
   if DoCheckFilled then Exit;
 
   DoAddUndo(cEditActionInsert, N, '', cEndNone);
+  DoEventLog(N, Length(AString));
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -619,6 +629,7 @@ begin
   for i:= 0 to Cnt-1 do
   begin
     DoAddUndo(cEditActionInsert, N+i, '', cEndNone);
+    DoEventLog(N+i, Length(AList.Lines[i]));
 
     Item:= TATStringItem.Create(AList.Lines[i], Endings);
     Item.ItemState:= cLineStateAdded;
@@ -648,6 +659,7 @@ begin
     Item:= TATStringItem(FList[N]);
 
     DoAddUndo(cEditActionDelete, N, Item.ItemString, Item.ItemEnd);
+    DoEventLog(N, -Length(Item.ItemString));
 
     Item.Free;
     FList.Delete(N);
@@ -985,6 +997,11 @@ begin
   Result:= false;
 end;
 
+procedure TATStrings.DoEventLog(ALine, ALen: integer);
+begin
+  if Assigned(FOnLog) then
+    FOnLog(Self, ALine, ALen);
+end;
 
 {$I atstrings_editing.inc}
 {$I atstrings_load.inc}
