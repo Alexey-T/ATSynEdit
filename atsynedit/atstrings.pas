@@ -35,17 +35,17 @@ type
     cLineStateSaved
     );
 
+  TATLineSeparator = (
+    cLineSepNone,
+    cLineSepTop,
+    cLineSepBottom
+    );
+
   TATFileEncoding = (
     cEncAnsi,
     cEncUTF8,
     cEncWideLE,
     cEncWideBE
-    );
-
-  TATLineSeparatorState = (
-    cLineSepNone,
-    cLineSepTop,
-    cLineSepBottom
     );
 
 const
@@ -59,7 +59,7 @@ type
     ItemString: atString;
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
-    ItemSeparator: TATLineSeparatorState;
+    ItemSeparator: TATLineSeparator;
     ItemHidden: array[0..cMaxStringsClients-1] of smallint;
       //0: line visible,
       //-1: line hidden,
@@ -111,7 +111,7 @@ type
     function GetLineBmColor(Index: integer): integer;
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(NLine, NClient: integer): integer;
-    function GetLineSep(Index: integer): TATLineSeparatorState;
+    function GetLineSep(Index: integer): TATLineSeparator;
     function GetLineState(Index: integer): TATLineState;
     function GetRedoCount: integer;
     function GetUndoCount: integer;
@@ -127,7 +127,7 @@ type
     procedure SetLineBmColor(Index: integer; AValue: integer);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
     procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: integer);
-    procedure SetLineSep(Index: integer; AValue: TATLineSeparatorState);
+    procedure SetLineSep(Index: integer; AValue: TATLineSeparator);
     procedure SetLineState(Index: integer; AValue: TATLineState);
     function GetTextString: atString;
     procedure DoLoadFromStream(Stream: TStream);
@@ -157,7 +157,7 @@ type
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesBmColor[Index: integer]: integer read GetLineBmColor write SetLineBmColor;
-    property LinesSeparator[Index: integer]: TATLineSeparatorState read GetLineSep write SetLineSep;
+    property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
@@ -292,7 +292,7 @@ begin
   Result:= TATStringItem(FList[Index]).ItemState;
 end;
 
-function TATStrings.GetLineSep(Index: integer): TATLineSeparatorState;
+function TATStrings.GetLineSep(Index: integer): TATLineSeparator;
 begin
   Assert(IsIndexValid(Index));
   Result:= TATStringItem(FList[Index]).ItemSeparator;
@@ -366,7 +366,7 @@ begin
   TATStringItem(FList[Index]).ItemBmColor:= AValue;
 end;
 
-procedure TATStrings.SetLineSep(Index: integer; AValue: TATLineSeparatorState);
+procedure TATStrings.SetLineSep(Index: integer; AValue: TATLineSeparator);
 begin
   Assert(IsIndexValid(Index));
   TATStringItem(FList[Index]).ItemSeparator:= AValue;

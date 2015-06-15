@@ -25,13 +25,13 @@ var
 
 type
   TATLineStyle = (
-    cLineNone,
-    cLineSolid,
-    cLineDash,
-    cLineSolid2px,
-    cLineDotted,
-    cLineRounded,
-    cLineWave
+    cLineStyleNone,
+    cLineStyleSolid,
+    cLineStyleDash,
+    cLineStyleSolid2px,
+    cLineStyleDotted,
+    cLineStyleRounded,
+    cLineStyleWave
     );
 
 type
@@ -262,13 +262,13 @@ end;
 procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle; P1, P2: TPoint; AtDown: boolean);
 begin
   case Style of
-    cLineSolid:
+    cLineStyleSolid:
       begin
         C.Pen.Color:= Color;
         CanvasSimpleLine(C, P1, P2);
       end;
 
-    cLineSolid2px:
+    cLineStyleSolid2px:
       begin
         C.Pen.Color:= Color;
         CanvasSimpleLine(C, P1, P2);
@@ -289,7 +289,7 @@ begin
         CanvasSimpleLine(C, P1, P2);
       end;
 
-    cLineDash:
+    cLineStyleDash:
       begin
         C.Pen.Color:= Color;
         C.Pen.Style:= psDot;
@@ -297,20 +297,20 @@ begin
         C.Pen.Style:= psSolid;
       end;
 
-    cLineDotted:
+    cLineStyleDotted:
       CanvasDottedHorzVertLine(C, Color, P1, P2);
 
-    cLineRounded:
+    cLineStyleRounded:
       CanvasRoundedLine(C, Color, P1, P2, AtDown);
 
-    cLineWave:
+    cLineStyleWave:
       CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
   end;
 end;
 
 procedure DoPaintBorder(C: TCanvas; Color: TColor; R: TRect; Side: TATBorderSide; Style: TATLineStyle);
 begin
-  if Style=cLineNone then Exit;
+  if Style=cLineStyleNone then Exit;
   Dec(R.Right);
   Dec(R.Bottom);
 

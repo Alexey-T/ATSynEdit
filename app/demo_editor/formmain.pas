@@ -52,7 +52,6 @@ type
     Label6: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
-    Memo1: TMemo;
     MenuItem1: TMenuItem;
     MenuItem5: TMenuItem;
     mnuSyntax: TMenuItem;
@@ -504,7 +503,7 @@ begin
     Lines.Text:= utf8encode(ed.Strings.TextString);
   end;
   {$else}
-  Memo1.Hide;
+  //Memo1.Hide;
   {$endif}
 end;
 
@@ -941,7 +940,7 @@ var
         2: begin
              ColorFont:= clgreen;
              ColorBorder:= clgreen;
-             BorderLeft:= cLineDotted;
+             BorderLeft:= cLineStyleDotted;
              BorderDown:= BorderLeft;
              BorderRight:= BorderLeft;
              BorderUp:= BorderLeft;
@@ -952,7 +951,7 @@ var
              ColorFont:= clred;
              Colorbg:= clyellow;
              ColorBorder:= clred;
-             BorderDown:= cLineWave;
+             BorderDown:= cLineStyleWave;
              //BorderLeft:= cLineDotted;
              //BorderRight:= cLineRounded;
              //BorderUp:= cLineRounded;

@@ -1526,7 +1526,7 @@ var
   NColorEntire, NColorAfter: TColor;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
-  LineSeparator: TATLineSeparatorState;
+  LineSeparator: TATLineSeparator;
   LineWithCaret, LineEolSelected, LineColorForced: boolean;
   Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
@@ -2139,7 +2139,7 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
 
-  FOptShowStapleStyle:= cLineSolid;
+  FOptShowStapleStyle:= cLineStyleSolid;
   FOptShowStapleIndent:= -1;
   FOptShowStapleWidthPercent:= 100;
 
@@ -3877,7 +3877,7 @@ end;
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin
-  if FOptShowStapleStyle=cLineNone then Exit;
+  if FOptShowStapleStyle=cLineStyleNone then Exit;
   CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
   CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Left, R.Bottom), false);
   CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
@@ -3894,7 +3894,7 @@ var
   RSt: TRect;
   NColor: TColor;
 begin
-  if FOptShowStapleStyle=cLineNone then Exit;
+  if FOptShowStapleStyle=cLineStyleNone then Exit;
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
   Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, nil,

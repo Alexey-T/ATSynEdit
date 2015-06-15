@@ -62,16 +62,16 @@ implementation
 
 const
   cBorderEc: array[TecBorderLineType] of TATLineStyle = (
-    cLineNone,
-    cLineSolid,
-    cLineDash,
-    cLineDash,
-    cLineDash,
-    cLineDash,
-    cLineSolid2px,
-    cLineSolid2px,
-    cLineWave,
-    cLineDotted
+    cLineStyleNone,
+    cLineStyleSolid,
+    cLineStyleDash,
+    cLineStyleDash,
+    cLineStyleDash,
+    cLineStyleDash,
+    cLineStyleSolid2px,
+    cLineStyleSolid2px,
+    cLineStyleWave,
+    cLineStyleDotted
     );
 
 { TATAdapterEControl }
@@ -368,7 +368,7 @@ end;
 procedure TATAdapterEControl.UpdateSeps;
 var
   Break: TecLineBreak;
-  Sep: TATLineSeparatorState;
+  Sep: TATLineSeparator;
   i: integer;
 begin
   if AnClient.LineBreaks.Count>0 then
@@ -392,6 +392,8 @@ begin
 end;
 
 procedure TATAdapterEControl.UpdateFoldRanges;
+const
+  cMaxDefHint = 50;
 var
   R: TecTextRange;
   Pnt1, Pnt2: TPoint;
@@ -432,6 +434,8 @@ begin
 
     SHint:= AnClient.GetCollapsedText(R);
       //+'/'+R.Rule.GetNamePath;
+    if SHint='' then
+      SHint:= Copy(Ed.Strings.Lines[Pnt1.Y], Pnt1.X+1, cMaxDefHint)+'...';
     DoFoldAdd(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
 
     if R.Rule.HighlightPos=cpAny then
