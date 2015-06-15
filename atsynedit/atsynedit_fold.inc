@@ -116,7 +116,27 @@ begin
   FWrapUpdateNeeded:= true;
 
   //partially fold 1st line
-  Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
+  if ARange.Hint<>'' then
+  begin
+    Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
+  end
+  else
+  case FFoldStyle of
+    cFoldWithDots:
+    begin
+      Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
+    end;
+    cFoldWithTruncatedText:
+    begin
+      Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
+      ARange.Hint:= Copy(Strings.Lines[ARange.Y], ARange.X+1, cFoldedLenOfEmptyHint)+'...';
+    end;
+    cFoldFromNextLine:
+    begin
+      //don't fold line
+    end;
+  end;
+
   //fully fold next lines
   for i:= ARange.Y+1 to ARange.Y2 do
     Strings.LinesHidden[i, FEditorIndex]:= -1;
@@ -196,9 +216,9 @@ begin
     NLinePrev:= FWrapInfo.Items[N-1].NLineIndex;
     //before this line some is skipped
     Result:= NLineCur-NLinePrev > 1;
-    //and prev visible line is fully folded
+    //and prev visible line is fully visible
     if Result then
-      Result:= Strings.LinesHidden[NLinePrev, FEditorIndex]<0;
+      Result:= Strings.LinesHidden[NLinePrev, FEditorIndex]=0;
   end
   else
     Result:= false;

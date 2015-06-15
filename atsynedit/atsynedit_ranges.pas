@@ -27,7 +27,7 @@ type
     property Y2: integer read FY2;
     property Folded: boolean read FFolded write FFolded;
     property Staple: boolean read FStaple;
-    property Hint: string read FHint;
+    property Hint: string read FHint write FHint;
     constructor Create(AX, AY, AY2: integer; AStaple: boolean; const AHint: string); virtual;
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;

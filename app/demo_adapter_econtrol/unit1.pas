@@ -47,7 +47,7 @@ type
     FFilename: string;
     procedure DoLexer(const aname: string);
     procedure DoOpen(const fn: string);
-    procedure EditCalcStaple(Snd: TObject; ALine, AIndent: integer; var AColor: TColor);
+    procedure EditCalcStaple(Sender: TObject; ALine, AIndent: integer; var AColor: TColor);
     procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
     procedure UpdateLexList;
   public
@@ -228,7 +228,7 @@ begin
   end;
 end;
 
-procedure TfmMain.EditCalcStaple(Snd: TObject; ALine, AIndent: integer; var AColor: TColor);
+procedure TfmMain.EditCalcStaple(Sender: TObject; ALine, AIndent: integer; var AColor: TColor);
 const
   nColors = 10;
   cl: array[0..nColors-1] of TColor = (

@@ -51,6 +51,12 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
+  TATFoldStyle = (
+    cFoldWithDots, //looks like Sublime Text
+    cFoldWithTruncatedText, //show folded line in mark
+    cFoldFromNextLine //looks like SynWrite
+    );
+
 type
   TATSynEditColors = class(TPersistent)
   private
@@ -219,6 +225,7 @@ const
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
+  cInitFoldStyle = cFoldWithDots;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
@@ -228,6 +235,8 @@ const
   cGutterSizeSep = 1;
   cGutterSizeEmpty = 2;
 
+const
+  cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2;
   cFoldedMarkIndentOuter = 0;
   cScrollKeepHorz = 1; //keep char, allow handy clicking after eol of longest line
@@ -297,6 +306,7 @@ type
     FStringsExternal: TATStrings;
     FAdapterHilite: TATAdapterHilite;
     FFold: TATSynRanges;
+    FFoldStyle: TATFoldStyle;
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
@@ -848,12 +858,13 @@ type
     //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces;
     property OptTabSize: integer read FTabSize write SetTabSize;
+    property OptWordChars: atString read FOptWordChars write FOptWordChars;
+    property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle;
     property OptTextLocked: string read FTextLocked write FTextLocked;
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter;
     property OptTextOffsetTop: integer read FOptTextOffsetTop write FOptTextOffsetTop;
-    property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel;
@@ -2061,6 +2072,7 @@ begin
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
 
   FFold:= TATSynRanges.Create;
+  FFoldStyle:= cInitFoldStyle;
 
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;

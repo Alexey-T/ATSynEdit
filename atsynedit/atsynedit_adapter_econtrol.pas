@@ -434,8 +434,6 @@ begin
 
     SHint:= AnClient.GetCollapsedText(R);
       //+'/'+R.Rule.GetNamePath;
-    if SHint='' then
-      SHint:= Copy(Ed.Strings.Lines[Pnt1.Y], Pnt1.X+1, cMaxDefHint)+'...';
     DoFoldAdd(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
 
     if R.Rule.HighlightPos=cpAny then
