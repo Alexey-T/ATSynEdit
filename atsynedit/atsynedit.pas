@@ -51,11 +51,11 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
-  TATFoldStyle = (
+  TATFoldStyle = ( //affects folding of blocks without "text hint" passed from adapter
     cFoldHereWithDots, //show "..." from fold-pos
     cFoldHereWithTruncatedText, //show truncated line instead of "..."
-    cFoldFromEndOfLine, //looks like Lazarus
-    cFoldFromNextLine //looks like SynWrite
+    cFoldFromEndOfLine, //looks like Lazarus: show "..." after line, bad with 2 blocks starting at the same line
+    cFoldFromNextLine //looks like SynWrite: don't show "...", show separator line
     );
 
 type
@@ -226,7 +226,7 @@ const
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
-  cInitFoldStyle = cFoldHereWithDots;
+  cInitFoldStyle = cFoldHereWithTruncatedText;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
