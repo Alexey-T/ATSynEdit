@@ -16,7 +16,7 @@ type
     Panel1: TPanel;
     procedure FormCreate(Sender: TObject);
   private
-    procedure ComboCommand(Snd: TObject; ACmd: integer; var AHandled: boolean);
+    procedure ComboCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
     { private declarations }
   public
     { public declarations }
@@ -44,7 +44,7 @@ begin
   ed.OptTextHint:= '(empty)';
 end;
 
-procedure TfmCombo.ComboCommand(Snd: TObject; ACmd: integer;
+procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;
   var AHandled: boolean);
 var
   s: string;

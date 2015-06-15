@@ -160,12 +160,12 @@ type
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
-    procedure EditCommand(Snd: TObject; ACmd{%H-}: integer; var AHandled: boolean);
-    procedure EditClickGutter(Snd: TObject; ABand, ALine: integer);
-    procedure EditClickMicromap(Snd: TObject; AX, AY: integer);
-    procedure EditDrawBm(Snd: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
-    procedure EditDrawMicromap(Snd: TObject; C: TCanvas; const ARect: TRect);
-    procedure EditDrawTest(Snd: TObject; C: TCanvas; const ARect: TRect);
+    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; var AHandled: boolean);
+    procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
+    procedure EditClickMicromap(Sender: TObject; AX, AY: integer);
+    procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
+    procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
+    procedure EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure MenuEncClick(Sender: TObject);
     procedure UpdateStatus;
     procedure UpdateChecks;
@@ -393,7 +393,7 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.EditCommand(Snd: TObject; ACmd: integer; var AHandled: boolean);
+procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
 begin
   AHandled:= false;
   {
@@ -405,7 +405,7 @@ begin
   }
 end;
 
-procedure TfmMain.EditClickGutter(Snd: TObject; ABand, ALine: integer);
+procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer);
 begin
   if ABand=ed.GutterBandBm then
   begin
@@ -427,12 +427,12 @@ begin
   }
 end;
 
-procedure TfmMain.EditClickMicromap(Snd: TObject; AX, AY: integer);
+procedure TfmMain.EditClickMicromap(Sender: TObject; AX, AY: integer);
 begin
   Showmessage(Format('Micromap click: %d:%d', [AX, AY]));
 end;
 
-procedure TfmMain.EditDrawBm(Snd: TObject; C: TCanvas; ALineNum: integer;
+procedure TfmMain.EditDrawBm(Sender: TObject; C: TCanvas; ALineNum: integer;
   const ARect: TRect);
 var
   r: trect;
@@ -448,7 +448,7 @@ begin
   c.Polygon([Point(r.left, r.top), Point(r.left+dx, r.top+dx), Point(r.left, r.top+2*dx)]);
 end;
 
-procedure TfmMain.EditDrawMicromap(Snd: TObject; C: TCanvas; const ARect: TRect);
+procedure TfmMain.EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
 begin
   C.Pen.Color:= $c0c0c0;
   C.Brush.Color:= $eeeeee;
@@ -456,7 +456,7 @@ begin
   C.TextOut(ARect.Left+2, ARect.Top+2, 'tst');
 end;
 
-procedure TfmMain.EditDrawTest(Snd: TObject; C: TCanvas; const ARect: TRect);
+procedure TfmMain.EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
 begin
   //Exit;
   C.Pen.Color:= clred;

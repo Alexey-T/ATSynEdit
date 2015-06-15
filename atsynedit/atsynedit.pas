@@ -1521,11 +1521,11 @@ var
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: real;
-  NLineSep: byte;
   WrapItem: TATSynWrapItem;
   NColorEntire, NColorAfter: TColor;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
+  LineSeparator: TATLineSeparatorState;
   LineWithCaret, LineEolSelected, LineColorForced: boolean;
   Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
@@ -1596,7 +1596,7 @@ begin
     Str:= Strings.Lines[NLinesIndex];
     Str:= Copy(Str, WrapItem.NCharIndex, WrapItem.NLength);
 
-    NLineSep:= Strings.LinesSep[NLinesIndex];
+    LineSeparator:= Strings.LinesSeparator[NLinesIndex];
     LineWithCaret:= IsLineWithCaret(NLinesIndex);
     LineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
@@ -1748,9 +1748,9 @@ begin
         DoPaintFoldedMark(C, CoordAfterText, GetFoldedMarkText(NLinesIndex));
 
     //draw separators
-    if NLineSep<>0 then
+    if LineSeparator<>cLineSepNone then
     begin
-      if (NLineSep and 1)<>0 then
+      if LineSeparator=cLineSepTop then
         NCoordSep:= NCoordTop
       else
         NCoordSep:= NCoordTop+ACharSize.Y-1;

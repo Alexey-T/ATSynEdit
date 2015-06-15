@@ -42,6 +42,12 @@ type
     cEncWideBE
     );
 
+  TATLineSeparatorState = (
+    cLineSepNone,
+    cLineSepTop,
+    cLineSepBottom
+    );
+
 const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2);
 
@@ -53,13 +59,11 @@ type
     ItemString: atString;
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
+    ItemSeparator: TATLineSeparatorState;
     ItemHidden: array[0..cMaxStringsClients-1] of smallint;
       //0: line visible,
       //-1: line hidden,
       //>0: line hidden from this char-pos
-    ItemSep: byte;
-      //bit 0: show top sep line
-      //bit 1: show bottom sep line
     ItemBm: byte;
     ItemBmColor: TColor;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
@@ -107,7 +111,7 @@ type
     function GetLineBmColor(Index: integer): integer;
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(NLine, NClient: integer): integer;
-    function GetLineSep(Index: integer): byte;
+    function GetLineSep(Index: integer): TATLineSeparatorState;
     function GetLineState(Index: integer): TATLineState;
     function GetRedoCount: integer;
     function GetUndoCount: integer;
@@ -123,7 +127,7 @@ type
     procedure SetLineBmColor(Index: integer; AValue: integer);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
     procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: integer);
-    procedure SetLineSep(Index: integer; AValue: byte);
+    procedure SetLineSep(Index: integer; AValue: TATLineSeparatorState);
     procedure SetLineState(Index: integer; AValue: TATLineState);
     function GetTextString: atString;
     procedure DoLoadFromStream(Stream: TStream);
@@ -153,7 +157,7 @@ type
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesBmColor[Index: integer]: integer read GetLineBmColor write SetLineBmColor;
-    property LinesSep[Index: integer]: byte read GetLineSep write SetLineSep;
+    property LinesSeparator[Index: integer]: TATLineSeparatorState read GetLineSep write SetLineSep;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
@@ -238,11 +242,11 @@ begin
   ItemString:= AString;
   ItemEnd:= AEnd;
   ItemState:= cLineStateNone;
+  ItemSeparator:= cLineSepNone;
   for i:= 0 to High(ItemHidden) do
     ItemHidden[i]:= 0;
   ItemBm:= 0;
   ItemBmColor:= 0;
-  ItemSep:= 0;
 end;
 
 function TATStringItem.IsFake: boolean;
@@ -288,10 +292,10 @@ begin
   Result:= TATStringItem(FList[Index]).ItemState;
 end;
 
-function TATStrings.GetLineSep(Index: integer): byte;
+function TATStrings.GetLineSep(Index: integer): TATLineSeparatorState;
 begin
   Assert(IsIndexValid(Index));
-  Result:= TATStringItem(FList[Index]).ItemSep;
+  Result:= TATStringItem(FList[Index]).ItemSeparator;
 end;
 
 function TATStrings.GetUndoCount: integer;
@@ -362,10 +366,10 @@ begin
   TATStringItem(FList[Index]).ItemBmColor:= AValue;
 end;
 
-procedure TATStrings.SetLineSep(Index: integer; AValue: byte);
+procedure TATStrings.SetLineSep(Index: integer; AValue: TATLineSeparatorState);
 begin
   Assert(IsIndexValid(Index));
-  TATStringItem(FList[Index]).ItemSep:= AValue;
+  TATStringItem(FList[Index]).ItemSeparator:= AValue;
 end;
 
 

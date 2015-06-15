@@ -14,6 +14,7 @@ uses
   ATSynEdit_Ranges,
   ATStringProc,
   ATStringProc_TextBuffer,
+  ATStrings,
   ecSyntAnal,
   Math;
 
@@ -367,12 +368,13 @@ end;
 procedure TATAdapterEControl.UpdateSeps;
 var
   Break: TecLineBreak;
+  Sep: TATLineSeparatorState;
   i: integer;
 begin
   if AnClient.LineBreaks.Count>0 then
   begin
     for i:= 0 to Ed.Strings.Count-1 do
-      Ed.Strings.LinesSep[i]:= 0;
+      Ed.Strings.LinesSeparator[i]:= cLineSepNone;
 
     Break:= TecLineBreak(AnClient.LineBreaks[0]);
     Ed.Colors.BlockSepLine:= Break.Rule.Style.BgColor;
@@ -380,7 +382,11 @@ begin
     for i:= 0 to AnClient.LineBreaks.Count-1 do
     begin
       Break:= TecLineBreak(AnClient.LineBreaks[i]);
-      Ed.Strings.LinesSep[Break.Line]:= IfThen(Break.Rule.LinePos=lbTop, 1, 2);
+      if Break.Rule.LinePos=lbTop then
+        Sep:= cLineSepTop
+      else
+        Sep:= cLineSepBottom;
+      Ed.Strings.LinesSeparator[Break.Line]:= Sep;
     end;
   end;
 end;
