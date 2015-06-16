@@ -54,7 +54,6 @@ type
     procedure DoFoldFromLinesHidden;
     procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
     function IsCaretInRange(AEdit: TATSynEdit; APos1, APos2: integer; ACond: TATRangeCond): boolean;
-    procedure SetEditor(AEdit: TATSynEdit);
     procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
     procedure UpdateEds;
     function GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
@@ -125,7 +124,7 @@ var
   Str: atString;
 begin
   Ed:= Sender as TATSynEdit;
-  SetEditor(Ed);
+  AddEditor(Ed);
   if not Assigned(AnClient) then Exit;
 
   Str:= Copy(Ed.Strings.Lines[ALineIndex], ACharIndex, ALineLen);
@@ -441,8 +440,11 @@ begin
   if AEdit=nil then
     EdList.Clear
   else
-  if EdList.IndexOf(AEdit)<0 then
-    EdList.Add(AEdit);
+  begin
+    if EdList.IndexOf(AEdit)<0 then
+      EdList.Add(AEdit);
+    AEdit.Strings.OnLog:= @DoChangeLog;
+  end;
 end;
 
 procedure TATAdapterEControl.OnEditorCaretMove(Sender: TObject);
@@ -450,12 +452,6 @@ begin
   UpdateRangesActive(Sender as TATSynEdit);
 end;
 
-
-procedure TATAdapterEControl.SetEditor(AEdit: TATSynEdit);
-begin
-  AddEditor(AEdit);
-  AEdit.Strings.OnLog:= @DoChangeLog;
-end;
 
 procedure TATAdapterEControl.SetLexer(AAnalizer: TecSyntAnalyzer);
 begin
@@ -466,15 +462,12 @@ begin
   if AAnalizer=nil then Exit;
   AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
 
-  if EdList.Count>0 then
-    SetEditor(TATSynEdit(EdList[0]));
-
   UpdateData;
 end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
-  SetEditor(Sender as TATSynEdit);
+  AddEditor(Sender as TATSynEdit);
   UpdateData;
 end;
 
