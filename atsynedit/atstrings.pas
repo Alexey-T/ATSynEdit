@@ -676,6 +676,7 @@ var
   i: integer;
 begin
   DoClearUndo(FUndoList.Locked);
+  DoEventLog(-1, 0);
 
   for i:= Count-1 downto 0 do
     TObject(FList[i]).Free;

@@ -7,7 +7,7 @@ unit ATSynEdit_Adapter_EControl;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Dialogs,
+  Classes, SysUtils, Graphics, Dialogs, Forms,
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATSynEdit_Adapters,
@@ -15,8 +15,7 @@ uses
   ATStringProc,
   ATStringProc_TextBuffer,
   ATStrings,
-  ecSyntAnal,
-  Math;
+  ecSyntAnal;
 
 type
   { TATAdapterEControl }
@@ -42,7 +41,6 @@ type
     procedure UpdateSublexRanges;
     procedure UpdateData;
     procedure UpdateFoldRanges;
-    procedure UpdateTokensPos;
     function GetLexer: TecSyntAnalyzer;
     procedure SetLexer(AAnalizer: TecSyntAnalyzer);
   public
@@ -146,23 +144,27 @@ var
   //
 var
   tokenStart, tokenEnd: TPoint;
-  mustOffset, startindex, i: integer;
+  mustOffset, startindex, lineoffset: integer;
   token: TecSyntToken;
   tokenStyle: TecSyntaxFormat;
   part: TATLinePart;
+  i, count: integer;
 begin
   partindex:= 0;
   FillChar(part{%H-}, SizeOf(part), 0);
 
-  startindex:= DoFindToken(Buffer.CaretToStr(Point(0, ALine)));
+  lineoffset:= Buffer.CaretToStr(Point(0, ALine));
+  startindex:= DoFindToken(lineoffset);
   if startindex<0 then
     startindex:= 0;
 
+  count:= 0;
   for i:= startindex to AnClient.TagCount-1 do
   begin
+    inc(count);
     token:= AnClient.Tags[i];
-    tokenStart:= token.PntStart;
-    tokenEnd:= token.PntEnd;
+    tokenStart:= Buffer.StrToCaret(token.StartPos);
+    tokenEnd:= Buffer.StrToCaret(token.EndPos);
 
     Dec(tokenStart.x, AX);
     Dec(tokenEnd.x, AX);
@@ -232,6 +234,8 @@ begin
       if partindex>=High(AParts) then Exit;
     end;
   end;
+
+  //application.MainForm.Caption:= 'startindex '+inttostr(startindex)+' count-tokens '+inttostr(count);
 
   //add ending missing part
   //(not only if part.Len>0)
@@ -329,13 +333,10 @@ begin
     FreeAndNil(Lens);
   end;
 
-  //analize w/out reset
   AnClient.Analyze(false);
-  //AnClient.CompleteAnalysis; //tried to fix bad fold on editing. no help
+  AnClient.CompleteAnalysis;
 
   DoClearData;
-  UpdateTokensPos;
-
   UpdateSublexRanges;
   UpdateFoldRanges;
   UpdateSeps;
@@ -431,8 +432,8 @@ begin
     tokenEnd:= AnClient.Tags[R.EndIdx];
     Pos1:= tokenStart.StartPos;
     Pos2:= tokenEnd.EndPos;
-    Pnt1:= tokenStart.PntStart;
-    Pnt2:= tokenEnd.PntEnd;
+    Pnt1:= Buffer.StrToCaret(Pos1);
+    Pnt2:= Buffer.StrToCaret(Pos2);
     if Pnt1.Y<0 then Continue;
     if Pnt2.Y<0 then Continue;
 
@@ -477,11 +478,6 @@ function TATAdapterEControl.DoFindToken(APos: integer): integer;
 var
   a, b, m, dif: integer;
 begin
-  {$ifdef usual_find_token}
-  Result:= AnClient.TokenAtPos(APos);
-  Exit;
-  {$endif}
-
   Result:= -1;
 
   a:= 0;
@@ -500,7 +496,7 @@ begin
     if dif=0 then
       begin Result:= m; Exit end;
 
-    if Abs(a-b)<=1 then Exit;
+    if Abs(a-b)<=1 then Break;
     if dif>0 then b:= m else a:= m;
   until false;
 
@@ -508,24 +504,6 @@ begin
     Result:= 0
   else
     Result:= m-1;
-end;
-
-procedure TATAdapterEControl.UpdateTokensPos;
-var
-  token: TecSyntToken;
-  count, i: integer;
-begin
-  count:= 0;
-  for i:= 0 to AnClient.TagCount-1 do
-  begin
-    token:= AnClient.Tags[i];
-    //if token.PntInited then Continue;
-    //token.PntInited:= true;
-    token.PntStart:= Buffer.StrToCaret(token.StartPos);
-    token.PntEnd:= Buffer.StrToCaret(token.EndPos);
-    Inc(count);
-  end;
-  //showmessage('count tokens '+inttostr(count));
 end;
 
 function TATAdapterEControl.GetLexer: TecSyntAnalyzer;
@@ -540,8 +518,17 @@ procedure TATAdapterEControl.DoChangeLog(Sender: TObject; ALine, ACount: integer
 var
   Pos: integer;
 begin
-  //add to Count EolLen=1
-  //(Count<0 means delete, minus 1)
+  if not Assigned(AnClient) then Exit;
+
+  //clear?
+  if ALine=-1 then
+  begin
+    AnClient.TextChanged(-1, 0);
+    Exit
+  end;
+
+  //Count>0: add EolLen=1
+  //Count<0 means delete: minus EolLen
   if ACount>0 then Inc(ACount) else
     if ACount<0 then Dec(ACount);
 
