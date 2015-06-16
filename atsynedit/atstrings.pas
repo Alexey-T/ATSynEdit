@@ -533,7 +533,7 @@ begin
   if DoCheckFilled then Exit;
 
   DoAddUndo(cEditActionInsert, Count, '', cEndNone);
-  DoEventLog(MaxInt, Length(AString));
+  DoEventLog(Count, Length(AString));
 
   Item:= TATStringItem.Create(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
@@ -676,6 +676,7 @@ var
   i: integer;
 begin
   DoClearUndo(FUndoList.Locked);
+  DoEventLog(-1, 0);
 
   for i:= Count-1 downto 0 do
     TObject(FList[i]).Free;
