@@ -28,7 +28,7 @@ type
     Token1, Token2: integer;
     Color: TColor;
     Rule: TecTagBlockCondition;
-    Active: boolean;
+    Active: array[0..Pred(cMaxStringsClients)] of boolean;
     constructor Create(APos1, APos2, AToken1, AToken2: integer; AColor: TColor; ARule: TecTagBlockCondition);
   end;
 
@@ -39,7 +39,6 @@ type
 
   TATAdapterEControl = class(TATAdapterHilite)
   private
-    Ed: TATSynEdit;
     EdList: TList;
     AnClient: TecClientSyntAnalyzer;
     Buffer: TATStringBuffer;
@@ -47,10 +46,9 @@ type
     Timer: TTimer;
     procedure DoAnalize(AEdit: TATSynEdit);
     procedure DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
-    procedure DoCalcParts(var AParts: TATLineParts;
-      ALine, AX, ALen: integer;
-      AColorFont, AColorBG: TColor;
-      var AColorAfter: TColor);
+    procedure DoCalcParts(var AParts: TATLineParts; ALine, AX, ALen: integer;
+      AColorFont, AColorBG: TColor; var AColorAfter: TColor;
+  AEditorIndex: integer);
     procedure DoClearRanges;
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
@@ -59,10 +57,10 @@ type
     procedure SetEditor(AEdit: TATSynEdit);
     procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
     procedure UpdateEds;
-    function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
+    function GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
     procedure TimerTimer(Sender: TObject);
     procedure UpdateRanges;
-    procedure UpdateRangesActive;
+    procedure UpdateRangesActive(AEdit: TATSynEdit);
     procedure UpdateSeps;
     procedure UpdateRangesSublex;
     procedure UpdateData;
@@ -72,7 +70,7 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure AddEditor(AEd: TATSynEdit);
+    procedure AddEditor(AEdit: TATSynEdit);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     procedure OnEditorCaretMove(Sender: TObject); override;
     procedure OnEditorChange(Sender: TObject); override;
@@ -114,7 +112,7 @@ begin
   Token2:= AToken2;
   Color:= AColor;
   Rule:= ARule;
-  Active:= false;
+  FillChar(Active, Sizeof(Active), 0);
 end;
 
 { TATAdapterEControl }
@@ -123,9 +121,11 @@ procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
   var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer;
   var AColorAfterEol: TColor);
 var
+  Ed: TATSynEdit;
   Str: atString;
 begin
-  SetEditor(Sender as TATSynEdit);
+  Ed:= Sender as TATSynEdit;
+  SetEditor(Ed);
   if not Assigned(AnClient) then Exit;
 
   Str:= Copy(Ed.Strings.Lines[ALineIndex], ACharIndex, ALineLen);
@@ -135,16 +135,19 @@ begin
   DoCalcParts(AParts, ALineIndex, ACharIndex-1, ALineLen,
     Ed.Colors.TextFont,
     clNone,
-    AColorAfterEol);
+    AColorAfterEol,
+    (Sender as TATSynEdit).EditorIndex);
 end;
 
 procedure TATAdapterEControl.OnEditorCalcPosColor(Sender: TObject; AX,
   AY: integer; var AColor: TColor);
 var
+  AEdit: TATSynEdit;
   Pos: integer;
 begin
+  AEdit:= Sender as TATSynEdit;
   Pos:= Buffer.CaretToStr(Point(AX, AY));
-  AColor:= GetTokenColorBG(Pos, AColor);
+  AColor:= GetTokenColorBG(Pos, AColor, AEdit.EditorIndex);
 end;
 
 {
@@ -187,7 +190,7 @@ begin
   end;
 end;
 
-function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
+function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
 var
   Rng: TATRangeColored;
   i: integer;
@@ -196,7 +199,7 @@ begin
   for i:= ListColors.Count-1 downto 0 do
   begin
     Rng:= TATRangeColored(ListColors[i]);
-    if not Rng.Active then Continue;
+    if not Rng.Active[AEditorIndex] then Continue;
     if Rng.Rule<>nil then
       if not (Rng.Rule.DynHighlight in [dhRange, dhRangeNoBound]) then
         Continue;
@@ -209,38 +212,40 @@ begin
   end;
 end;
 
-procedure TATAdapterEControl.UpdateRangesActive;
+procedure TATAdapterEControl.UpdateRangesActive(AEdit: TATSynEdit);
 var
   Rng, RngOut: TATRangeColored;
   i, j: integer;
+  act: boolean;
 begin
   for i:= 0 to ListColors.Count-1 do
   begin
     Rng:= TATRangeColored(ListColors[i]);
     if Rng.Rule=nil then
     begin
-      Rng.Active:= true;
+      act:= true;
     end
     else
     begin
       if not (Rng.Rule.DynHighlight in [dhRange, dhRangeNoBound, dhBound]) then Continue;
       case Rng.Rule.HighlightPos of
         cpAny:
-          Rng.Active:= true;
+          act:= true;
         cpBound:
-          Rng.Active:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondAtBound);
+          act:= IsCaretInRange(AEdit, Rng.Pos1, Rng.Pos2, cCondAtBound);
         cpBoundTag:
-          Rng.Active:= false;//todo
+          act:= false;//todo
         cpRange:
-          Rng.Active:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondInside);
+          act:= IsCaretInRange(AEdit, Rng.Pos1, Rng.Pos2, cCondInside);
         cpBoundTagBegin:
-          Rng.Active:= false;//todo
+          act:= false;//todo
         cpOutOfRange:
-          Rng.Active:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondOutside);
+          act:= IsCaretInRange(AEdit, Rng.Pos1, Rng.Pos2, cCondOutside);
         else
-          Rng.Active:= false;
+          act:= false;
       end;
     end;
+    Rng.Active[AEdit.EditorIndex]:= act;
   end;
 
   //deactivate ranges by DynSelectMin
@@ -248,7 +253,7 @@ begin
   for i:= ListColors.Count-1 downto 0 do
   begin
     Rng:= TATRangeColored(ListColors[i]);
-    if not Rng.Active then Continue;
+    if not Rng.Active[AEdit.EditorIndex] then Continue;
     if Rng.Rule=nil then Continue;
     if not Rng.Rule.DynSelectMin then Continue;
     if Rng.Rule.DynHighlight<>dhBound then Continue;
@@ -256,16 +261,17 @@ begin
     for j:= i-1 downto 0 do
     begin
       RngOut:= TATRangeColored(ListColors[j]);
-      if RngOut.Active then
-        if (RngOut.Pos1<=Rng.Pos1) and (RngOut.Pos2>=Rng.Pos2) then
-          RngOut.Active:= false;
+      if RngOut.Rule=Rng.Rule then
+        if RngOut.Active[AEdit.EditorIndex] then
+          if (RngOut.Pos1<=Rng.Pos1) and (RngOut.Pos2>=Rng.Pos2) then
+            RngOut.Active[AEdit.EditorIndex]:= false;
     end;
   end;
 end;
 
 
 procedure TATAdapterEControl.DoCalcParts(var AParts: TATLineParts; ALine, AX,
-  ALen: integer; AColorFont, AColorBG: TColor; var AColorAfter: TColor);
+  ALen: integer; AColorFont, AColorBG: TColor; var AColorAfter: TColor; AEditorIndex: integer);
 var
   partindex: integer;
   //
@@ -280,7 +286,7 @@ var
     part.Offset:= AOffset;
     part.Len:= ALen;
     part.ColorFont:= AColorFont;
-    part.ColorBG:= GetTokenColorBG(strpos, AColorBG);
+    part.ColorBG:= GetTokenColorBG(strpos, AColorBG, AEditorIndex);
     AParts[partindex]:= part;
     Inc(partindex);
   end;
@@ -331,7 +337,7 @@ begin
       part.Len:= tokenEnd.X-part.Offset;
 
     part.ColorFont:= AColorFont;
-    part.ColorBG:= GetTokenColorBG(token.StartPos, AColorBG);
+    part.ColorBG:= GetTokenColorBG(token.StartPos, AColorBG, AEditorIndex);
 
     tokenStyle:= token.Style;
 
@@ -339,7 +345,7 @@ begin
     for k:= 0 to ListColors.Count-1 do
     begin
       Rng:= TATRangeColored(ListColors[k]);
-      if Rng.Active then
+      if Rng.Active[AEditorIndex] then
         if Rng.Rule<>nil then
           if Rng.Rule.DynHighlight=dhBound then
             if (Rng.Token1=i) or (Rng.Token2=i) then
@@ -384,9 +390,9 @@ begin
 
   //calc AColorAfter
   mustOffset:= Buffer.CaretToStr(Point(AX+ALen, ALine));
-  nColor:= GetTokenColorBG(mustOffset, clNone);
+  nColor:= GetTokenColorBG(mustOffset, clNone, AEditorIndex);
   if (nColor=clNone) and (ALen>0) then
-    nColor:= GetTokenColorBG(mustOffset-1, clNone);
+    nColor:= GetTokenColorBG(mustOffset-1, clNone, AEditorIndex);
   if (nColor=clNone) then
     nColor:= AColorAfter;
   AColorAfter:= nColor;
@@ -397,22 +403,12 @@ var
   j: integer;
 begin
   ListColors.Clear;
-
-  if EdList.Count=0 then
-  begin
-    if Assigned(Ed) then
-      Ed.Fold.Clear;
-  end
-  else
-  begin
-    for j:= 0 to EdList.Count-1 do
-      TATSynEdit(EdList[j]).Fold.Clear;
-  end;
+  for j:= 0 to EdList.Count-1 do
+    TATSynEdit(EdList[j]).Fold.Clear;
 end;
 
 constructor TATAdapterEControl.Create;
 begin
-  Ed:= nil;
   EdList:= TList.Create;
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
@@ -436,29 +432,29 @@ begin
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
   FreeAndNil(EdList);
-  Ed:= nil;
 
   inherited;
 end;
 
-procedure TATAdapterEControl.AddEditor(AEd: TATSynEdit);
+procedure TATAdapterEControl.AddEditor(AEdit: TATSynEdit);
 begin
-  if EdList.IndexOf(AEd)<0 then
-    EdList.Add(AEd);
+  if AEdit=nil then
+    EdList.Clear
+  else
+  if EdList.IndexOf(AEdit)<0 then
+    EdList.Add(AEdit);
 end;
 
 procedure TATAdapterEControl.OnEditorCaretMove(Sender: TObject);
 begin
-  if not Assigned(Ed) then Exit;
-  UpdateRangesActive;
+  UpdateRangesActive(Sender as TATSynEdit);
 end;
 
 
 procedure TATAdapterEControl.SetEditor(AEdit: TATSynEdit);
 begin
-  Ed:= AEdit;
-  if Assigned(Ed) then
-    Ed.Strings.OnLog:= @DoChangeLog;
+  AddEditor(AEdit);
+  AEdit.Strings.OnLog:= @DoChangeLog;
 end;
 
 procedure TATAdapterEControl.SetLexer(AAnalizer: TecSyntAnalyzer);
@@ -469,7 +465,9 @@ begin
 
   if AAnalizer=nil then Exit;
   AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
-  SetEditor(Ed);
+
+  if EdList.Count>0 then
+    SetEditor(TATSynEdit(EdList[0]));
 
   UpdateData;
 end;
@@ -482,11 +480,13 @@ end;
 
 procedure TATAdapterEControl.UpdateData;
 var
+  Ed: TATSynEdit;
   Lens: TList;
   i: integer;
 begin
-  if not Assigned(Ed) then Exit;
+  if EdList.Count=0 then Exit;
   if not Assigned(AnClient) then Exit;
+  Ed:= TATSynEdit(EdList[0]);
 
   Lens:= TList.Create;
   try
@@ -503,12 +503,17 @@ begin
 end;
 
 procedure TATAdapterEControl.UpdateRanges;
+var
+  i: integer;
 begin
   DoClearRanges;
   UpdateRangesFold;
   UpdateRangesSublex; //sublexer ranges last
-  UpdateRangesActive;
   UpdateSeps;
+
+  if EdList.Count>0 then
+    for i:= 0 to EdList.Count-1 do
+      UpdateRangesActive(TATSynEdit(EdList[i]));
 end;
 
 procedure TATAdapterEControl.DoAnalize(AEdit: TATSynEdit);
@@ -530,26 +535,15 @@ procedure TATAdapterEControl.DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; c
 var
   j: integer;
 begin
-  if EdList.Count=0 then
-  begin
-    if Assigned(Ed) then
-      Ed.Fold.Add(AX, AY, AY2, AStaple, AHint)
-  end
-  else
-  for j:= 0 to EdList.Count-1 do
-    TATSynEdit(EdList[j]).Fold.Add(AX, AY, AY2, AStaple, AHint);
+  if EdList.Count>0 then
+    for j:= 0 to EdList.Count-1 do
+      TATSynEdit(EdList[j]).Fold.Add(AX, AY, AY2, AStaple, AHint);
 end;
 
 procedure TATAdapterEControl.UpdateEds;
 var
   j: integer;
 begin
-  if EdList.Count=0 then
-  begin
-    if Assigned(Ed) then
-      Ed.Update;
-  end
-  else
   for j:= 0 to EdList.Count-1 do
     TATSynEdit(EdList[j]).Update;
 end;
@@ -559,12 +553,6 @@ procedure TATAdapterEControl.DoFoldFromLinesHidden;
 var
   j: integer;
 begin
-  if EdList.Count=0 then
-  begin
-    if Assigned(Ed) then
-      Ed.UpdateFoldedFromLinesHidden
-  end
-  else
   for j:= 0 to EdList.Count-1 do
     TATSynEdit(EdList[j]).UpdateFoldedFromLinesHidden;
 end;
@@ -572,10 +560,14 @@ end;
 
 procedure TATAdapterEControl.UpdateSeps;
 var
+  Ed: TATSynEdit;
   Break: TecLineBreak;
   Sep: TATLineSeparator;
   i: integer;
 begin
+  if EdList.Count=0 then Exit;
+  Ed:= TATSynEdit(EdList[0]);
+
   if AnClient.LineBreaks.Count>0 then
   begin
     for i:= 0 to Ed.Strings.Count-1 do
@@ -601,12 +593,11 @@ var
   R: TecTextRange;
   Pnt1, Pnt2: TPoint;
   Pos1, Pos2: integer;
-  i: integer;
-  SHint: string;
   Style: TecSyntaxFormat;
+  SHint: string;
   tokenStart, tokenEnd: TecSyntToken;
+  i: integer;
 begin
-  if not Assigned(Ed) then Exit;
   if not Assigned(AnClient) then Exit;
 
   for i:= 0 to AnClient.RangeCount-1 do
