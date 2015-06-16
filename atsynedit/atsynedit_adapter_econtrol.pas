@@ -332,11 +332,11 @@ begin
   end;
 
   if AnClient.TagCount=0 then
-    AnClient.Analyze
+    AnClient.Analyze(true)
   else
   begin
     AnClient.Analyze(false);
-    AnClient.CompleteAnalysis;
+    //AnClient.CompleteAnalysis; //need?
   end;
 
   DoClearData;
