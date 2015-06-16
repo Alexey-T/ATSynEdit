@@ -9,7 +9,6 @@ uses
   ATSynEdit_CanvasProc;
 
 type
-
   { TATAdapterHilite }
 
   TATAdapterHilite = class(TObject)
