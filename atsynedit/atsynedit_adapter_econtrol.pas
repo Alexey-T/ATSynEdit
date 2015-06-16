@@ -613,7 +613,6 @@ begin
   begin
     R:= AnClient.Ranges[i];
     if R.Rule.BlockType<>btRangeStart then Continue;
-    if R.Rule.NotCollapsed then Continue;
 
     /////issue: rules in C# with 'parent' set give wrong ranges;
     //rule "function begin", "prop begin";
@@ -635,8 +634,11 @@ begin
     if Pnt1.Y<0 then Continue;
     if Pnt2.Y<0 then Continue;
 
-    SHint:= AnClient.GetCollapsedText(R); //+'/'+R.Rule.GetNamePath;
-    DoFoldAdd(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
+    if not R.Rule.NotCollapsed then
+    begin
+      SHint:= AnClient.GetCollapsedText(R); //+'/'+R.Rule.GetNamePath;
+      DoFoldAdd(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
+    end;
 
     if R.Rule.DynHighlight<>dhNone then
     begin
