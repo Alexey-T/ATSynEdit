@@ -53,9 +53,10 @@ type
     procedure DoClearRanges;
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
-    procedure DoLog(Sender: TObject; ALine, ACount: integer);
+    procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
     function IsCaretInRange(AEdit: TATSynEdit; APos1, APos2: integer; ACond: TATRangeCond): boolean;
-    procedure SetEd(AEdit: TATSynEdit);
+    procedure SetEditor(AEdit: TATSynEdit);
+    procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
     procedure UpdateEds;
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure TimerTimer(Sender: TObject);
@@ -120,7 +121,7 @@ procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
 var
   Str: atString;
 begin
-  SetEd(Sender as TATSynEdit);
+  SetEditor(Sender as TATSynEdit);
   if not Assigned(AnClient) then Exit;
 
   Str:= Copy(Ed.Strings.Lines[ALineIndex], ACharIndex, ALineLen);
@@ -293,28 +294,7 @@ begin
 
     tokenStyle:= token.Style;
     if tokenStyle<>nil then
-    begin
-      if tokenStyle.FormatType in [ftCustomFont, ftFontAttr, ftColor] then
-      begin
-        part.ColorFont:= tokenStyle.Font.Color;
-      end;
-      if tokenStyle.FormatType in [ftCustomFont, ftFontAttr, ftColor, ftBackGround] then
-      begin
-        if tokenStyle.BgColor<>clNone then
-          part.ColorBG:= tokenStyle.BgColor;
-      end;
-      if tokenStyle.FormatType in [ftCustomFont, ftFontAttr] then
-      begin
-        part.FontBold:= fsBold in tokenStyle.Font.Style;
-        part.FontItalic:= fsItalic in tokenStyle.Font.Style;
-        part.FontStrikeOut:= fsStrikeOut in tokenStyle.Font.Style;
-      end;
-      part.ColorBorder:= tokenStyle.BorderColorBottom;
-      part.BorderUp:= cBorderEc[tokenStyle.BorderTypeTop];
-      part.BorderDown:= cBorderEc[tokenStyle.BorderTypeBottom];
-      part.BorderLeft:= cBorderEc[tokenStyle.BorderTypeLeft];
-      part.BorderRight:= cBorderEc[tokenStyle.BorderTypeRight];
-    end;
+      SetPartStyleFromEcStyle(part, tokenStyle);
 
     //add missing part
     if partindex=0 then
@@ -412,11 +392,11 @@ begin
 end;
 
 
-procedure TATAdapterEControl.SetEd(AEdit: TATSynEdit);
+procedure TATAdapterEControl.SetEditor(AEdit: TATSynEdit);
 begin
   Ed:= AEdit;
   if Assigned(Ed) then
-    Ed.Strings.OnLog:= @DoLog;
+    Ed.Strings.OnLog:= @DoChangeLog;
 end;
 
 procedure TATAdapterEControl.SetLexer(AAnalizer: TecSyntAnalyzer);
@@ -427,14 +407,14 @@ begin
 
   if AAnalizer=nil then Exit;
   AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
-  SetEd(Ed);
+  SetEditor(Ed);
 
   UpdateData;
 end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
-  SetEd(Sender as TATSynEdit);
+  SetEditor(Sender as TATSynEdit);
   UpdateData;
 end;
 
@@ -668,7 +648,7 @@ begin
     Result:= nil;
 end;
 
-procedure TATAdapterEControl.DoLog(Sender: TObject; ALine, ACount: integer);
+procedure TATAdapterEControl.DoChangeLog(Sender: TObject; ALine, ACount: integer);
 var
   Pos: integer;
 begin
@@ -704,6 +684,32 @@ begin
     UpdateEds;
   end;
 end;
+
+
+procedure TATAdapterEControl.SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
+begin
+  if st.FormatType in [ftCustomFont, ftFontAttr, ftColor] then
+  begin
+    part.ColorFont:= st.Font.Color;
+  end;
+  if st.FormatType in [ftCustomFont, ftFontAttr, ftColor, ftBackGround] then
+  begin
+    if st.BgColor<>clNone then
+      part.ColorBG:= st.BgColor;
+  end;
+  if st.FormatType in [ftCustomFont, ftFontAttr] then
+  begin
+    part.FontBold:= fsBold in st.Font.Style;
+    part.FontItalic:= fsItalic in st.Font.Style;
+    part.FontStrikeOut:= fsStrikeOut in st.Font.Style;
+  end;
+  part.ColorBorder:= st.BorderColorBottom;
+  part.BorderUp:= cBorderEc[st.BorderTypeTop];
+  part.BorderDown:= cBorderEc[st.BorderTypeBottom];
+  part.BorderLeft:= cBorderEc[st.BorderTypeLeft];
+  part.BorderRight:= cBorderEc[st.BorderTypeRight];
+end;
+
 
 end.
 
