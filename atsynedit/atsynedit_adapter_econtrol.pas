@@ -36,6 +36,7 @@ type
     procedure DoClearData;
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
+    procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure UpdateSeps;
     procedure UpdateSublexRanges;
@@ -296,6 +297,9 @@ begin
   if AAnalizer=nil then Exit;
   AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
 
+  if Assigned(Ed) then
+    Ed.Strings.OnLog:= @DoChangeLog;
+
   UpdateData;
 end;
 
@@ -325,11 +329,13 @@ begin
     FreeAndNil(Lens);
   end;
 
-  AnClient.Clear;
-  AnClient.Analyze;
+  //analize w/out reset
+  AnClient.Analyze(false);
+  //AnClient.CompleteAnalysis; //tried to fix bad fold on editing. no help
 
   DoClearData;
   UpdateTokensPos;
+
   UpdateSublexRanges;
   UpdateFoldRanges;
   UpdateSeps;
@@ -507,14 +513,19 @@ end;
 procedure TATAdapterEControl.UpdateTokensPos;
 var
   token: TecSyntToken;
-  i: integer;
+  count, i: integer;
 begin
+  count:= 0;
   for i:= 0 to AnClient.TagCount-1 do
   begin
     token:= AnClient.Tags[i];
+    //if token.PntInited then Continue;
+    //token.PntInited:= true;
     token.PntStart:= Buffer.StrToCaret(token.StartPos);
     token.PntEnd:= Buffer.StrToCaret(token.EndPos);
+    Inc(count);
   end;
+  //showmessage('count tokens '+inttostr(count));
 end;
 
 function TATAdapterEControl.GetLexer: TecSyntAnalyzer;
@@ -525,6 +536,22 @@ begin
     Result:= nil;
 end;
 
+procedure TATAdapterEControl.DoChangeLog(Sender: TObject; ALine, ACount: integer);
+var
+  Pos: integer;
+begin
+  //add to Count EolLen=1
+  //(Count<0 means delete, minus 1)
+  if ACount>0 then Inc(ACount) else
+    if ACount<0 then Dec(ACount);
+
+  if ALine>=Buffer.Count then
+    Pos:= Buffer.TextLength
+  else
+    Pos:= Buffer.CaretToStr(Point(0, ALine));
+
+  AnClient.TextChanged(Pos, ACount);
+end;
 
 end.
 
