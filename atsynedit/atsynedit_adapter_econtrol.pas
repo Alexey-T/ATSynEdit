@@ -211,8 +211,8 @@ end;
 
 procedure TATAdapterEControl.UpdateRangesActive;
 var
-  Rng: TATRangeColored;
-  i: integer;
+  Rng, RngOut: TATRangeColored;
+  i, j: integer;
 begin
   for i:= 0 to ListColors.Count-1 do
   begin
@@ -240,6 +240,25 @@ begin
         else
           Rng.Active:= false;
       end;
+    end;
+  end;
+
+  //deactivate ranges by DynSelectMin
+  //cycle back, to see first nested ranges
+  for i:= ListColors.Count-1 downto 0 do
+  begin
+    Rng:= TATRangeColored(ListColors[i]);
+    if not Rng.Active then Continue;
+    if Rng.Rule=nil then Continue;
+    if not Rng.Rule.DynSelectMin then Continue;
+    if Rng.Rule.DynHighlight<>dhBound then Continue;
+    //take prev ranges which contain this range
+    for j:= i-1 downto 0 do
+    begin
+      RngOut:= TATRangeColored(ListColors[j]);
+      if RngOut.Active then
+        if (RngOut.Pos1<=Rng.Pos1) and (RngOut.Pos2>=Rng.Pos2) then
+          RngOut.Active:= false;
     end;
   end;
 end;
