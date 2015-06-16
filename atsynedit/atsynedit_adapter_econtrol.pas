@@ -45,7 +45,7 @@ type
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure TimerTimer(Sender: TObject);
     procedure UpdateRanges;
-    procedure UpdateRangesSep;
+    procedure UpdateSeps;
     procedure UpdateRangesSublex;
     procedure UpdateData;
     procedure UpdateRangesFold;
@@ -128,7 +128,9 @@ var
   i: integer;
 begin
   Result:= ADefColor;
-  for i:= 0 to ListColors.Count-1 do
+  //search back, take last range which contains APos
+  //(sublexer ranges must go last)
+  for i:= ListColors.Count-1 downto 0 do
   begin
     R:= ListColors[i];
     if (APos>=R.Y) and (APos<R.Y2) then
@@ -368,9 +370,9 @@ end;
 procedure TATAdapterEControl.UpdateRanges;
 begin
   DoClearRanges;
-  UpdateRangesSublex;
   UpdateRangesFold;
-  UpdateRangesSep;
+  UpdateRangesSublex; //sublexer ranges last
+  UpdateSeps;
 end;
 
 procedure TATAdapterEControl.DoAnalize(AEdit: TATSynEdit);
@@ -432,7 +434,7 @@ begin
 end;
 
 
-procedure TATAdapterEControl.UpdateRangesSep;
+procedure TATAdapterEControl.UpdateSeps;
 var
   Break: TecLineBreak;
   Sep: TATLineSeparator;

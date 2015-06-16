@@ -129,7 +129,7 @@ begin
     cFoldHereWithTruncatedText:
     begin
       Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
-      ARange.Hint:= Copy(Strings.Lines[ARange.Y], ARange.X+1, cFoldedLenOfEmptyHint)+'...';
+      ARange.Hint:= Copy(Strings.Lines[ARange.Y], ARange.X, cFoldedLenOfEmptyHint)+'...';
     end;
     cFoldFromEndOfLine:
     begin
