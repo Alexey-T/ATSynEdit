@@ -10,7 +10,6 @@ uses
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATSynEdit_Adapters,
-  ATSynEdit_Ranges,
   ATStringProc,
   ATStringProc_TextBuffer,
   ATStrings,
@@ -18,6 +17,13 @@ uses
 
 const
   cTimerInterval = 200;
+
+type
+  TATRangeColored = class
+    Pos1, Pos2: integer;
+    Color: TColor;
+    Token1, Token2: integer;
+  end;
 
 type
   { TATAdapterEControl }
@@ -28,14 +34,14 @@ type
     EdList: TList;
     AnClient: TecClientSyntAnalyzer;
     Buffer: TATStringBuffer;
-    ListColors: TATSynRanges;
+    ListColors: TList;
     Timer: TTimer;
     procedure DoAnalize(AEdit: TATSynEdit);
     procedure DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
     procedure DoCalcParts(var AParts: TATLineParts;
       ALine, AX, ALen: integer;
       AColorFont, AColorBG: TColor;
-      var AColorAfterEol: TColor);
+      var AColorAfter: TColor);
     procedure DoClearRanges;
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
@@ -124,7 +130,7 @@ end;
 
 function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
 var
-  R: TATSynRange;
+  R: TATRangeColored;
   i: integer;
 begin
   Result:= ADefColor;
@@ -132,10 +138,10 @@ begin
   //(sublexer ranges must go last)
   for i:= ListColors.Count-1 downto 0 do
   begin
-    R:= ListColors[i];
-    if (APos>=R.Y) and (APos<R.Y2) then
+    R:= TATRangeColored(ListColors[i]);
+    if (APos>=R.Pos1) and (APos<R.Pos2) then
     begin
-      Result:= R.X;
+      Result:= R.Color;
       Exit;
     end;
   end;
@@ -143,7 +149,7 @@ end;
 
 
 procedure TATAdapterEControl.DoCalcParts(var AParts: TATLineParts; ALine, AX,
-  ALen: integer; AColorFont, AColorBG: TColor; var AColorAfterEol: TColor);
+  ALen: integer; AColorFont, AColorBG: TColor; var AColorAfter: TColor);
 var
   partindex: integer;
   //
@@ -169,6 +175,7 @@ var
   token: TecSyntToken;
   tokenStyle: TecSyntaxFormat;
   part: TATLinePart;
+  nColor: TColor;
   i, count: integer;
 begin
   partindex:= 0;
@@ -264,8 +271,14 @@ begin
   if mustOffset<ALen then
     AddMissingPart(mustOffset, ALen-mustOffset);
 
+  //calc AColorAfter
   mustOffset:= Buffer.CaretToStr(Point(AX+ALen, ALine));
-  AColorAfterEol:= GetTokenColorBG(mustOffset, AColorAfterEol);
+  nColor:= GetTokenColorBG(mustOffset, clNone);
+  if (nColor=clNone) and (ALen>0) then
+    nColor:= GetTokenColorBG(mustOffset-1, clNone);
+  if (nColor=clNone) then
+    nColor:= AColorAfter;
+  AColorAfter:= nColor;
 end;
 
 procedure TATAdapterEControl.DoClearRanges;
@@ -292,7 +305,7 @@ begin
   EdList:= TList.Create;
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
-  ListColors:= TATSynRanges.Create;
+  ListColors:= TList.Create;
 
   Timer:= TTimer.Create(nil);
   Timer.Enabled:= false;
@@ -301,8 +314,13 @@ begin
 end;
 
 destructor TATAdapterEControl.Destroy;
+var
+  i: integer;
 begin
+  for i:= ListColors.Count-1 downto 0 do
+    TObject(ListColors[i]).Free;
   FreeAndNil(ListColors);
+
   FreeAndNil(Buffer);
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
@@ -469,6 +487,7 @@ var
   SHint: string;
   Style: TecSyntaxFormat;
   tokenStart, tokenEnd: TecSyntToken;
+  RColored: TATRangeColored;
 begin
   if not Assigned(Ed) then Exit;
   if not Assigned(AnClient) then Exit;
@@ -499,8 +518,7 @@ begin
     if Pnt1.Y<0 then Continue;
     if Pnt2.Y<0 then Continue;
 
-    SHint:= AnClient.GetCollapsedText(R);
-      //+'/'+R.Rule.GetNamePath;
+    SHint:= AnClient.GetCollapsedText(R); //+'/'+R.Rule.GetNamePath;
     DoFoldAdd(Pnt1.X+1, Pnt1.Y, Pnt2.Y, R.Rule.DrawStaple, SHint);
 
     if R.Rule.HighlightPos=cpAny then
@@ -508,7 +526,15 @@ begin
       Style:= R.Rule.Style;
       if Style<>nil then
         if Style.BgColor<>clNone then
-          ListColors.Add(Style.BgColor, Pos1, Pos2, false, '');
+        begin
+          RColored:= TATRangeColored.Create;
+          RColored.Pos1:= Pos1;
+          RColored.Pos2:= Pos2;
+          RColored.Color:= Style.BgColor;
+          RColored.Token1:= R.StartIdx;
+          RColored.Token2:= R.EndIdx;
+          ListColors.Add(RColored);
+        end;
     end;
   end;
 
@@ -519,6 +545,7 @@ end;
 procedure TATAdapterEControl.UpdateRangesSublex;
 var
   R: TecSubLexerRange;
+  RColored: TATRangeColored;
   Style: TecSyntaxFormat;
   i: integer;
 begin
@@ -532,7 +559,15 @@ begin
     Style:= R.Rule.Style;
     if Style=nil then Continue;
     if Style.BgColor<>clNone then
-      ListColors.Add(Style.BgColor, R.StartPos, R.EndPos, false, '');
+    begin
+      RColored:= TATRangeColored.Create;
+      RColored.Pos1:= R.StartPos;
+      RColored.Pos2:= R.EndPos;
+      RColored.Color:= Style.BgColor;
+      RColored.Token1:= -1;
+      RColored.Token2:= -1;
+      ListColors.Add(RColored);
+    end;
   end;
 end;
 
