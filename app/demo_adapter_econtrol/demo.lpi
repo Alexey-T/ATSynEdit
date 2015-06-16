@@ -68,6 +68,7 @@
       <Unit6>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATStringProc"/>
       </Unit6>
       <Unit7>
         <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
