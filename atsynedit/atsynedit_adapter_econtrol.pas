@@ -5,8 +5,8 @@ unit ATSynEdit_Adapter_EControl;
 interface
 
 uses
-  Classes, SysUtils, Graphics, Dialogs, Forms,
-  ExtCtrls,
+  Classes, SysUtils, Graphics, ExtCtrls,
+  Forms, Dialogs,
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATSynEdit_Adapters,
@@ -16,8 +16,8 @@ uses
   ATStrings,
   ecSyntAnal;
 
-const
-  cTimerInterval = 200;
+var
+  cAdapterTimerInterval: integer = 200;
 
 type
   { TATRangeColored }
@@ -28,6 +28,7 @@ type
     Token1, Token2: integer;
     Color: TColor;
     Rule: TecTagBlockCondition;
+    Active: boolean;
     constructor Create(APos1, APos2, AToken1, AToken2: integer; AColor: TColor; ARule: TecTagBlockCondition);
   end;
 
@@ -61,6 +62,7 @@ type
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure TimerTimer(Sender: TObject);
     procedure UpdateRanges;
+    procedure UpdateRangesActive;
     procedure UpdateSeps;
     procedure UpdateRangesSublex;
     procedure UpdateData;
@@ -72,6 +74,7 @@ type
     destructor Destroy; override;
     procedure AddEditor(AEd: TATSynEdit);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
+    procedure OnEditorCaretMove(Sender: TObject); override;
     procedure OnEditorChange(Sender: TObject); override;
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
@@ -111,6 +114,7 @@ begin
   Token2:= AToken2;
   Color:= AColor;
   Rule:= ARule;
+  Active:= false;
 end;
 
 { TATAdapterEControl }
@@ -183,43 +187,60 @@ begin
   end;
 end;
 
-
 function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
 var
   Rng: TATRangeColored;
-  ok: boolean;
   i: integer;
 begin
   Result:= ADefColor;
-  //search back, take last range which contains APos
-  //(sublexer ranges must go last)
   for i:= ListColors.Count-1 downto 0 do
   begin
     Rng:= TATRangeColored(ListColors[i]);
-    ok:= (APos>=Rng.Pos1) and (APos<Rng.Pos2);
-    if not ok then Continue;
+    if not Rng.Active then Continue;
+    if Rng.Rule<>nil then
+      if not (Rng.Rule.DynHighlight in [dhRange, dhRangeNoBound]) then
+        Continue;
 
+    if (APos>=Rng.Pos1) and (APos<Rng.Pos2) then
+    begin
+      Result:= Rng.Color;
+      Exit
+    end;
+  end;
+end;
+
+procedure TATAdapterEControl.UpdateRangesActive;
+var
+  Rng: TATRangeColored;
+  i: integer;
+begin
+  for i:= 0 to ListColors.Count-1 do
+  begin
+    Rng:= TATRangeColored(ListColors[i]);
     if Rng.Rule=nil then
     begin
-      ok:= true;
+      Rng.Active:= true;
     end
     else
     begin
-      if not (Rng.Rule.DynHighlight in [dhRange, dhRangeNoBound]) then Continue;
+      if not (Rng.Rule.DynHighlight in [dhRange, dhRangeNoBound, dhBound]) then Continue;
       case Rng.Rule.HighlightPos of
-        cpAny: ok:= true;
-        cpBound: ok:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondAtBound);
-        cpBoundTag: ok:= false;//todo
-        cpRange: ok:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondInside);
-        cpBoundTagBegin: ok:= false;//todo
-        cpOutOfRange: ok:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondOutside);
-        else ok:= false;
+        cpAny:
+          Rng.Active:= true;
+        cpBound:
+          Rng.Active:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondAtBound);
+        cpBoundTag:
+          Rng.Active:= false;//todo
+        cpRange:
+          Rng.Active:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondInside);
+        cpBoundTagBegin:
+          Rng.Active:= false;//todo
+        cpOutOfRange:
+          Rng.Active:= IsCaretInRange(Ed, Rng.Pos1, Rng.Pos2, cCondOutside);
+        else
+          Rng.Active:= false;
       end;
     end;
-    if not ok then Continue;
-
-    Result:= Rng.Color;
-    Exit;
   end;
 end;
 
@@ -252,7 +273,8 @@ var
   tokenStyle: TecSyntaxFormat;
   part: TATLinePart;
   nColor: TColor;
-  i, count: integer;
+  Rng: TATRangeColored;
+  i, k, count: integer;
 begin
   partindex:= 0;
   FillChar(part{%H-}, SizeOf(part), 0);
@@ -293,6 +315,21 @@ begin
     part.ColorBG:= GetTokenColorBG(token.StartPos, AColorBG);
 
     tokenStyle:= token.Style;
+
+    //override style by range dynamic-hilite
+    for k:= 0 to ListColors.Count-1 do
+    begin
+      Rng:= TATRangeColored(ListColors[k]);
+      if Rng.Active then
+        if Rng.Rule<>nil then
+          if Rng.Rule.DynHighlight=dhBound then
+            if (Rng.Token1=i) or (Rng.Token2=i) then
+            begin
+              tokenStyle:= Rng.Rule.Style;
+              Break
+            end;
+    end;
+
     if tokenStyle<>nil then
       SetPartStyleFromEcStyle(part, tokenStyle);
 
@@ -364,7 +401,7 @@ begin
 
   Timer:= TTimer.Create(nil);
   Timer.Enabled:= false;
-  Timer.Interval:= cTimerInterval;
+  Timer.Interval:= cAdapterTimerInterval;
   Timer.OnTimer:= @TimerTimer;
 end;
 
@@ -389,6 +426,12 @@ procedure TATAdapterEControl.AddEditor(AEd: TATSynEdit);
 begin
   if EdList.IndexOf(AEd)<0 then
     EdList.Add(AEd);
+end;
+
+procedure TATAdapterEControl.OnEditorCaretMove(Sender: TObject);
+begin
+  if not Assigned(Ed) then Exit;
+  UpdateRangesActive;
 end;
 
 
@@ -445,6 +488,7 @@ begin
   DoClearRanges;
   UpdateRangesFold;
   UpdateRangesSublex; //sublexer ranges last
+  UpdateRangesActive;
   UpdateSeps;
 end;
 
@@ -690,7 +734,8 @@ procedure TATAdapterEControl.SetPartStyleFromEcStyle(var part: TATLinePart; st: 
 begin
   if st.FormatType in [ftCustomFont, ftFontAttr, ftColor] then
   begin
-    part.ColorFont:= st.Font.Color;
+    if st.Font.Color<>clNone then
+      part.ColorFont:= st.Font.Color;
   end;
   if st.FormatType in [ftCustomFont, ftFontAttr, ftColor, ftBackGround] then
   begin

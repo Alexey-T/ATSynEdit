@@ -3384,6 +3384,9 @@ end;
 
 procedure TATSynEdit.DoEventCarets;
 begin
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorCaretMove(Self);
+
   if Assigned(FOnChangeCaretPos) then
     FOnChangeCaretPos(Self);
 end;

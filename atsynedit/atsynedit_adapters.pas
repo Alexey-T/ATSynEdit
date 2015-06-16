@@ -20,7 +20,7 @@ type
       var AColorAfterEol: TColor); virtual;
     procedure OnEditorCalcPosColor(Sender: TObject;
       AX, AY: integer; var AColor: TColor); virtual;
-    //procedure OnEditorScroll(Sender: TObject); virtual;
+    procedure OnEditorCaretMove(Sender: TObject); virtual;
   end;
 
 implementation
@@ -41,6 +41,11 @@ end;
 
 procedure TATAdapterHilite.OnEditorCalcPosColor(Sender: TObject; AX,
   AY: integer; var AColor: TColor);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorCaretMove(Sender: TObject);
 begin
   //
 end;
