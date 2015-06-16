@@ -1952,7 +1952,9 @@ procedure TATSynEdit.DoPaintFoldedMark(C: TCanvas;
   ACoord: TPoint; const AMarkText: string);
 var
   NWidth: integer;
+  Str: string;
 begin
+  Str:= STabsToSpaces(AMarkText, FTabSize);
   Inc(ACoord.X, cFoldedMarkIndentOuter);
 
   //paint bg
@@ -1963,8 +1965,8 @@ begin
   C.TextOut(
     ACoord.X+cFoldedMarkIndentInner,
     ACoord.Y,
-    AMarkText);
-  NWidth:= C.TextWidth(AMarkText) + 2*cFoldedMarkIndentInner;
+    Str);
+  NWidth:= C.TextWidth(Str) + 2*cFoldedMarkIndentInner;
 
   //paint frame
   C.Pen.Color:= FColors.CollapseMarkFont;

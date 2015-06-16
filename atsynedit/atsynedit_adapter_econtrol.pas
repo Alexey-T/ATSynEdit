@@ -2,8 +2,6 @@ unit ATSynEdit_Adapter_EControl;
 
 {$mode objfpc}{$H+}
 
-//{$define skip_some_rules}
-
 interface
 
 uses
@@ -333,8 +331,13 @@ begin
     FreeAndNil(Lens);
   end;
 
-  AnClient.Analyze(false);
-  AnClient.CompleteAnalysis;
+  if AnClient.TagCount=0 then
+    AnClient.Analyze
+  else
+  begin
+    AnClient.Analyze(false);
+    AnClient.CompleteAnalysis;
+  end;
 
   DoClearData;
   UpdateSublexRanges;
