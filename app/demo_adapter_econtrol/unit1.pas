@@ -26,7 +26,6 @@ type
     chkWrap: TCheckBox;
     edLexer: TComboBox;
     files: TShellListView;
-    Label1: TLabel;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
     procedure bOpenClick(Sender: TObject);

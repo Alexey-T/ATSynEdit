@@ -17,6 +17,7 @@ object fmMain: TfmMain
     Width = 777
     Align = alBottom
     BevelOuter = bvNone
+    Caption = 'Demo'
     ClientHeight = 154
     ClientWidth = 777
     TabOrder = 0
@@ -84,18 +85,6 @@ object fmMain: TfmMain
       OnClick = bOpenClick
       TabOrder = 4
     end
-    object Label1: TLabel
-      Left = 8
-      Height = 15
-      Top = 132
-      Width = 179
-      Caption = 'editing with lexer: not ok, slow yet'
-      Color = clDefault
-      Font.Color = clRed
-      ParentColor = False
-      ParentFont = False
-      Transparent = False
-    end
     object chkUnpri: TCheckBox
       Left = 9
       Height = 19
@@ -127,7 +116,7 @@ object fmMain: TfmMain
     end
   end
   object OpenDialog1: TOpenDialog
-    left = 285
-    top = 348
+    left = 304
+    top = 344
   end
 end

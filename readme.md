@@ -8,3 +8,4 @@ Shots
 ![img](img/syntax_pas.png?raw=true)
 ![img](img/syntax_cs.png?raw=true)
 ![img](img/syntax_css.png?raw=true)
+![img](img/syntax_py.png?raw=true)
