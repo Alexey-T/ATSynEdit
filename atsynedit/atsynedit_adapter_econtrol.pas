@@ -6,6 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Dialogs, Forms,
+  ExtCtrls,
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATSynEdit_Adapters,
@@ -14,6 +15,9 @@ uses
   ATStringProc_TextBuffer,
   ATStrings,
   ecSyntAnal;
+
+const
+  cTimerInterval = 300;
 
 type
   { TATAdapterEControl }
@@ -25,20 +29,25 @@ type
     AnClient: TecClientSyntAnalyzer;
     Buffer: TATStringBuffer;
     ListColors: TATSynRanges;
+    Timer: TTimer;
+    procedure DoAnalize(AEdit: TATSynEdit);
     procedure DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
     procedure DoCalcParts(var AParts: TATLineParts;
       ALine, AX, ALen: integer;
       AColorFont, AColorBG: TColor;
       var AColorAfterEol: TColor);
-    procedure DoClearData;
+    procedure DoClearRanges;
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
     procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
+    procedure UpdateEds;
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
-    procedure UpdateSeps;
-    procedure UpdateSublexRanges;
+    procedure TimerTimer(Sender: TObject);
+    procedure UpdateRanges;
+    procedure UpdateRangesSep;
+    procedure UpdateRangesSublex;
     procedure UpdateData;
-    procedure UpdateFoldRanges;
+    procedure UpdateRangesFold;
     function GetLexer: TecSyntAnalyzer;
     procedure SetLexer(AAnalizer: TecSyntAnalyzer);
   public
@@ -53,6 +62,7 @@ type
       var AColorAfterEol: TColor); override;
     procedure OnEditorCalcPosColor(Sender: TObject;
       AX, AY: integer; var AColor: TColor); override;
+    //procedure OnEditorScroll(Sender: TObject); override;
   end;
 
 implementation
@@ -100,6 +110,14 @@ begin
   Pos:= Buffer.CaretToStr(Point(AX, AY));
   AColor:= GetTokenColorBG(Pos, AColor);
 end;
+
+{
+procedure TATAdapterEControl.OnEditorScroll(Sender: TObject);
+begin
+  if not Assigned(AnClient) then Exit;
+  DoAnalize(Sender as TATSynEdit);
+end;
+}
 
 function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
 var
@@ -245,7 +263,7 @@ begin
   AColorAfterEol:= GetTokenColorBG(mustOffset, AColorAfterEol);
 end;
 
-procedure TATAdapterEControl.DoClearData;
+procedure TATAdapterEControl.DoClearRanges;
 var
   j: integer;
 begin
@@ -270,6 +288,11 @@ begin
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
   ListColors:= TATSynRanges.Create;
+
+  Timer:= TTimer.Create(nil);
+  Timer.Enabled:= false;
+  Timer.Interval:= cTimerInterval;
+  Timer.OnTimer:= @TimerTimer;
 end;
 
 destructor TATAdapterEControl.Destroy;
@@ -292,7 +315,7 @@ end;
 
 procedure TATAdapterEControl.SetLexer(AAnalizer: TecSyntAnalyzer);
 begin
-  DoClearData;
+  DoClearRanges;
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
@@ -331,20 +354,29 @@ begin
     FreeAndNil(Lens);
   end;
 
-  if AnClient.TagCount=0 then
-    AnClient.Analyze(true)
-  else
-  begin
-    AnClient.Analyze(false);
-    //AnClient.CompleteAnalysis; //need?
-  end;
-
-  DoClearData;
-  UpdateSublexRanges;
-  UpdateFoldRanges;
-  UpdateSeps;
+  DoAnalize(Ed);
+  UpdateRanges;
 end;
 
+procedure TATAdapterEControl.UpdateRanges;
+begin
+  DoClearRanges;
+  UpdateRangesSublex;
+  UpdateRangesFold;
+  UpdateRangesSep;
+end;
+
+procedure TATAdapterEControl.DoAnalize(AEdit: TATSynEdit);
+var
+  NPos: integer;
+begin
+  NPos:= Buffer.CaretToStr(Point(0, AEdit.LineBottom+1));
+
+  AnClient.AppendToPos(NPos);
+  AnClient.IdleAppend;
+  if not AnClient.IsFinished then
+    Timer.Enabled:= true;
+end;
 
 procedure TATAdapterEControl.DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
 var
@@ -359,6 +391,21 @@ begin
   for j:= 0 to EdList.Count-1 do
     TATSynEdit(EdList[j]).Fold.Add(AX, AY, AY2, AStaple, AHint);
 end;
+
+procedure TATAdapterEControl.UpdateEds;
+var
+  j: integer;
+begin
+  if EdList.Count=0 then
+  begin
+    if Assigned(Ed) then
+      Ed.Update;
+  end
+  else
+  for j:= 0 to EdList.Count-1 do
+    TATSynEdit(EdList[j]).Update;
+end;
+
 
 procedure TATAdapterEControl.DoFoldFromLinesHidden;
 var
@@ -375,7 +422,7 @@ begin
 end;
 
 
-procedure TATAdapterEControl.UpdateSeps;
+procedure TATAdapterEControl.UpdateRangesSep;
 var
   Break: TecLineBreak;
   Sep: TATLineSeparator;
@@ -401,7 +448,7 @@ begin
   end;
 end;
 
-procedure TATAdapterEControl.UpdateFoldRanges;
+procedure TATAdapterEControl.UpdateRangesFold;
 var
   R: TecTextRange;
   Pnt1, Pnt2: TPoint;
@@ -457,7 +504,7 @@ begin
   DoFoldFromLinesHidden;
 end;
 
-procedure TATAdapterEControl.UpdateSublexRanges;
+procedure TATAdapterEControl.UpdateRangesSublex;
 var
   R: TecSubLexerRange;
   Style: TecSyntaxFormat;
@@ -541,6 +588,17 @@ begin
     Pos:= Buffer.CaretToStr(Point(0, ALine));
 
   AnClient.TextChanged(Pos, ACount);
+end;
+
+procedure TATAdapterEControl.TimerTimer(Sender: TObject);
+begin
+  if not Assigned(AnClient) then Exit;
+  if AnClient.IsFinished then
+  begin
+    Timer.Enabled:= false;
+    UpdateRanges;
+    UpdateEds;
+  end;
 end;
 
 end.

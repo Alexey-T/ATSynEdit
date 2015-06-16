@@ -18,6 +18,7 @@ type
       var AColorAfterEol: TColor); virtual; abstract;
     procedure OnEditorCalcPosColor(Sender: TObject;
       AX, AY: integer; var AColor: TColor); virtual; abstract;
+    //procedure OnEditorScroll(Sender: TObject); virtual; abstract;
   end;
 
 implementation

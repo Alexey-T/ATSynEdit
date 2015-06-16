@@ -1180,7 +1180,7 @@ begin
         FWrapInfo.FindIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
         if NIndexFrom<0 then
         begin
-          Showmessage('Cant find wrap-index for line '+Inttostr(NLine));
+          //Showmessage('Cant find wrap-index for line '+Inttostr(NLine));
           Continue;
         end;
 
@@ -3390,6 +3390,9 @@ end;
 
 procedure TATSynEdit.DoEventScroll;
 begin
+  //if Assigned(FAdapterHilite) then
+  //  FAdapterHilite.OnEditorScroll(Self);
+
   if Assigned(FOnScroll) then
     FOnScroll(Self);
 end;
