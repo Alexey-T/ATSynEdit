@@ -9,19 +9,42 @@ uses
   ATSynEdit_CanvasProc;
 
 type
+
+  { TATAdapterHilite }
+
   TATAdapterHilite = class(TObject)
   public
-    procedure OnEditorChange(Sender: TObject); virtual; abstract;
+    procedure OnEditorChange(Sender: TObject); virtual;
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
-      var AColorAfterEol: TColor); virtual; abstract;
+      var AColorAfterEol: TColor); virtual;
     procedure OnEditorCalcPosColor(Sender: TObject;
-      AX, AY: integer; var AColor: TColor); virtual; abstract;
-    //procedure OnEditorScroll(Sender: TObject); virtual; abstract;
+      AX, AY: integer; var AColor: TColor); virtual;
+    //procedure OnEditorScroll(Sender: TObject); virtual;
   end;
 
 implementation
+
+{ TATAdapterHilite }
+
+procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorCalcHilite(Sender: TObject;
+  var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer;
+  var AColorAfterEol: TColor);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorCalcPosColor(Sender: TObject; AX,
+  AY: integer; var AColor: TColor);
+begin
+  //
+end;
 
 end.
 

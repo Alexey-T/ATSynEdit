@@ -17,7 +17,7 @@ uses
   ecSyntAnal;
 
 const
-  cTimerInterval = 300;
+  cTimerInterval = 200;
 
 type
   { TATAdapterEControl }
@@ -39,7 +39,8 @@ type
     procedure DoClearRanges;
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
-    procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
+    procedure DoLog(Sender: TObject; ALine, ACount: integer);
+    procedure SetEd(AEdit: TATSynEdit);
     procedure UpdateEds;
     function GetTokenColorBG(APos: integer; ADefColor: TColor): TColor;
     procedure TimerTimer(Sender: TObject);
@@ -67,6 +68,8 @@ type
 
 implementation
 
+uses Math;
+
 const
   cBorderEc: array[TecBorderLineType] of TATLineStyle = (
     cLineStyleNone,
@@ -89,7 +92,7 @@ procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
 var
   Str: atString;
 begin
-  Ed:= Sender as TATSynEdit;
+  SetEd(Sender as TATSynEdit);
   if not Assigned(AnClient) then Exit;
 
   Str:= Copy(Ed.Strings.Lines[ALineIndex], ACharIndex, ALineLen);
@@ -313,6 +316,14 @@ begin
     EdList.Add(AEd);
 end;
 
+
+procedure TATAdapterEControl.SetEd(AEdit: TATSynEdit);
+begin
+  Ed:= AEdit;
+  if Assigned(Ed) then
+    Ed.Strings.OnLog:= @DoLog;
+end;
+
 procedure TATAdapterEControl.SetLexer(AAnalizer: TecSyntAnalyzer);
 begin
   DoClearRanges;
@@ -321,19 +332,15 @@ begin
 
   if AAnalizer=nil then Exit;
   AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
-
-  if Assigned(Ed) then
-    Ed.Strings.OnLog:= @DoChangeLog;
+  SetEd(Ed);
 
   UpdateData;
 end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
-  Ed:= Sender as TATSynEdit;
-
+  SetEd(Sender as TATSynEdit);
   UpdateData;
-  Ed.Update;
 end;
 
 procedure TATAdapterEControl.UpdateData;
@@ -368,13 +375,16 @@ end;
 
 procedure TATAdapterEControl.DoAnalize(AEdit: TATSynEdit);
 var
-  NPos: integer;
+  NLine, NPos: integer;
 begin
-  NPos:= Buffer.CaretToStr(Point(0, AEdit.LineBottom+1));
+  NLine:= Min(AEdit.LineBottom+1, Buffer.Count-1);
+  NPos:= Buffer.CaretToStr(Point(0, NLine));
 
   AnClient.AppendToPos(NPos);
   AnClient.IdleAppend;
-  if not AnClient.IsFinished then
+  if AnClient.IsFinished then
+    UpdateEds
+  else
     Timer.Enabled:= true;
 end;
 
@@ -564,7 +574,7 @@ begin
     Result:= nil;
 end;
 
-procedure TATAdapterEControl.DoChangeLog(Sender: TObject; ALine, ACount: integer);
+procedure TATAdapterEControl.DoLog(Sender: TObject; ALine, ACount: integer);
 var
   Pos: integer;
 begin

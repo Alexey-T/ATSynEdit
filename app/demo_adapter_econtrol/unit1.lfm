@@ -92,6 +92,7 @@ object fmMain: TfmMain
       Caption = 'editing with lexer: not ok, slow yet'
       Color = clDefault
       Font.Color = clRed
+      ParentColor = False
       ParentFont = False
       Transparent = False
     end
