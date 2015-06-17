@@ -45,6 +45,8 @@ type
     ListColors: TList;
     Timer: TTimer;
     procedure DoAnalize(AEdit: TATSynEdit);
+    procedure DoFindTokenOverrideStyle(var ATokenStyle: TecSyntaxFormat;
+      ATokenIndex, AEditorIndex: integer);
     procedure DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
     procedure DoCalcParts(var AParts: TATLineParts; ALine, AX, ALen: integer;
       AColorFont, AColorBG: TColor; var AColorAfter: TColor;
@@ -297,8 +299,7 @@ var
   tokenStyle: TecSyntaxFormat;
   part: TATLinePart;
   nColor: TColor;
-  Rng: TATRangeColored;
-  i, k, count: integer;
+  i: integer;
 begin
   partindex:= 0;
   FillChar(part{%H-}, SizeOf(part), 0);
@@ -308,10 +309,8 @@ begin
   if startindex<0 then
     startindex:= 0;
 
-  count:= 0;
   for i:= startindex to AnClient.TagCount-1 do
   begin
-    inc(count);
     token:= AnClient.Tags[i];
     tokenStart:= Buffer.StrToCaret(token.StartPos);
     tokenEnd:= Buffer.StrToCaret(token.EndPos);
@@ -339,21 +338,7 @@ begin
     part.ColorBG:= GetTokenColorBG(token.StartPos, AColorBG, AEditorIndex);
 
     tokenStyle:= token.Style;
-
-    //override style by range dynamic-hilite
-    for k:= 0 to ListColors.Count-1 do
-    begin
-      Rng:= TATRangeColored(ListColors[k]);
-      if Rng.Active[AEditorIndex] then
-        if Rng.Rule<>nil then
-          if Rng.Rule.DynHighlight=dhBound then
-            if (Rng.Token1=i) or (Rng.Token2=i) then
-            begin
-              tokenStyle:= Rng.Rule.Style;
-              Break
-            end;
-    end;
-
+    DoFindTokenOverrideStyle(tokenStyle, i, AEditorIndex);
     if tokenStyle<>nil then
       SetPartStyleFromEcStyle(part, tokenStyle);
 
@@ -761,6 +746,25 @@ begin
   part.BorderRight:= cBorderEc[st.BorderTypeRight];
 end;
 
+procedure TATAdapterEControl.DoFindTokenOverrideStyle(var ATokenStyle: TecSyntaxFormat;
+  ATokenIndex, AEditorIndex: integer);
+var
+  Rng: TATRangeColored;
+  i: integer;
+begin
+  for i:= 0 to ListColors.Count-1 do
+  begin
+    Rng:= TATRangeColored(ListColors[i]);
+    if Rng.Active[AEditorIndex] then
+      if Rng.Rule<>nil then
+        if Rng.Rule.DynHighlight=dhBound then
+          if (Rng.Token1=ATokenIndex) or (Rng.Token2=ATokenIndex) then
+          begin
+            ATokenStyle:= Rng.Rule.Style;
+            Exit
+          end;
+  end;
+end;
 
 end.
 
