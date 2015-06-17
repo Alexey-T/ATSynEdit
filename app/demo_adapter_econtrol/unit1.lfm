@@ -17,7 +17,6 @@ object fmMain: TfmMain
     Width = 777
     Align = alBottom
     BevelOuter = bvNone
-    Caption = 'Demo'
     ClientHeight = 154
     ClientWidth = 777
     TabOrder = 0
@@ -39,7 +38,7 @@ object fmMain: TfmMain
       ItemHeight = 15
       OnChange = edLexerChange
       Style = csDropDownList
-      TabOrder = 5
+      TabOrder = 6
     end
     object files: TShellListView
       Left = 304
@@ -52,7 +51,7 @@ object fmMain: TfmMain
       ReadOnly = True
       ShowColumnHeaders = False
       SortType = stText
-      TabOrder = 6
+      TabOrder = 9
       ToolTips = False
       ViewStyle = vsSmallIcon
       OnClick = filesClick
@@ -83,7 +82,7 @@ object fmMain: TfmMain
       Width = 88
       Caption = 'open...'
       OnClick = bOpenClick
-      TabOrder = 4
+      TabOrder = 5
     end
     object chkUnpri: TCheckBox
       Left = 9
@@ -101,7 +100,7 @@ object fmMain: TfmMain
       Width = 107
       Caption = 'show cur line bg'
       OnChange = chkShowCurChange
-      TabOrder = 7
+      TabOrder = 4
     end
     object chkLexer: TCheckBox
       Left = 144
@@ -112,7 +111,7 @@ object fmMain: TfmMain
       Checked = True
       OnChange = chkLexerChange
       State = cbChecked
-      TabOrder = 8
+      TabOrder = 7
     end
     object chkDyn: TCheckBox
       Left = 144
@@ -121,7 +120,7 @@ object fmMain: TfmMain
       Width = 95
       Caption = 'dynamic hilite'
       OnChange = chkDynChange
-      TabOrder = 9
+      TabOrder = 8
     end
   end
   object OpenDialog1: TOpenDialog
