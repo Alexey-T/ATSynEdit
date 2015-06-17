@@ -556,7 +556,7 @@ var
   Ed: TATSynEdit;
   Break: TecLineBreak;
   Sep: TATLineSeparator;
-  i: integer;
+  i, j: integer;
 begin
   if EdList.Count=0 then Exit;
   Ed:= TATSynEdit(EdList[0]);
@@ -567,7 +567,8 @@ begin
       Ed.Strings.LinesSeparator[i]:= cLineSepNone;
 
     Break:= TecLineBreak(AnClient.LineBreaks[0]);
-    Ed.Colors.BlockSepLine:= Break.Rule.Style.BgColor;
+    for j:= 0 to EdList.Count-1 do
+      TATSynEdit(EdList[j]).Colors.BlockSepLine:= Break.Rule.Style.BgColor;
 
     for i:= 0 to AnClient.LineBreaks.Count-1 do
     begin
