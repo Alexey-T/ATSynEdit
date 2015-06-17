@@ -44,13 +44,13 @@ type
     Buffer: TATStringBuffer;
     ListColors: TList;
     Timer: TTimer;
+    FDynEnabled: boolean;
     procedure DoAnalize(AEdit: TATSynEdit);
     procedure DoFindTokenOverrideStyle(var ATokenStyle: TecSyntaxFormat;
       ATokenIndex, AEditorIndex: integer);
     procedure DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
     procedure DoCalcParts(var AParts: TATLineParts; ALine, AX, ALen: integer;
-      AColorFont, AColorBG: TColor; var AColorAfter: TColor;
-  AEditorIndex: integer);
+      AColorFont, AColorBG: TColor; var AColorAfter: TColor; AEditorIndex: integer);
     procedure DoClearRanges;
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
@@ -73,6 +73,8 @@ type
     destructor Destroy; override;
     procedure AddEditor(AEdit: TATSynEdit);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
+    property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
+  public
     procedure OnEditorCaretMove(Sender: TObject); override;
     procedure OnEditorChange(Sender: TObject); override;
     procedure OnEditorCalcHilite(Sender: TObject;
@@ -81,7 +83,6 @@ type
       var AColorAfterEol: TColor); override;
     procedure OnEditorCalcPosColor(Sender: TObject;
       AX, AY: integer; var AColor: TColor); override;
-    //procedure OnEditorScroll(Sender: TObject); override;
   end;
 
 implementation
@@ -151,13 +152,6 @@ begin
   AColor:= GetTokenColorBG(Pos, AColor, AEdit.EditorIndex);
 end;
 
-{
-procedure TATAdapterEControl.OnEditorScroll(Sender: TObject);
-begin
-  if not Assigned(AnClient) then Exit;
-  DoAnalize(Sender as TATSynEdit);
-end;
-}
 function TATAdapterEControl.IsCaretInRange(AEdit: TATSynEdit; APos1,
   APos2: integer; ACond: TATRangeCond): boolean;
 var
@@ -167,6 +161,8 @@ var
   ok: boolean;
 begin
   Result:= false;
+  if not FDynEnabled then Exit;
+
   for i:= 0 to AEdit.Carets.Count-1 do
   begin
     Caret:= AEdit.Carets[i];
@@ -397,6 +393,7 @@ begin
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
   ListColors:= TList.Create;
+  FDynEnabled:= true;
 
   Timer:= TTimer.Create(nil);
   Timer.Enabled:= false;

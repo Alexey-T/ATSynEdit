@@ -114,6 +114,15 @@ object fmMain: TfmMain
       State = cbChecked
       TabOrder = 8
     end
+    object chkDyn: TCheckBox
+      Left = 144
+      Height = 19
+      Top = 81
+      Width = 95
+      Caption = 'dynamic hilite'
+      OnChange = chkDynChange
+      TabOrder = 9
+    end
   end
   object OpenDialog1: TOpenDialog
     left = 304

@@ -18,6 +18,7 @@ type
 
   TfmMain = class(TForm)
     bOpen: TButton;
+    chkDyn: TCheckBox;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
     chkLexer: TCheckBox;
@@ -29,6 +30,7 @@ type
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
     procedure bOpenClick(Sender: TObject);
+    procedure chkDynChange(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
     procedure chkFullSelChange(Sender: TObject);
     procedure chkLexerChange(Sender: TObject);
@@ -130,6 +132,7 @@ begin
   chkFullHilite.Checked:= ed.OptShowFullHilite;
   chkUnpri.Checked:= ed.OptUnprintedVisible;
   chkShowCur.Checked:= ed.OptShowCurLine;
+  chkDyn.Checked:= adapter.DynamicHiliteEnabled;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -189,6 +192,12 @@ begin
     if not Execute then exit;
     DoOpen(Filename);
   end;
+end;
+
+procedure TfmMain.chkDynChange(Sender: TObject);
+begin
+  adapter.DynamicHiliteEnabled:= chkDyn.Checked;
+  Ed.Update;
 end;
 
 procedure TfmMain.DoLexer(const aname: string);
