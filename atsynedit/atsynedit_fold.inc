@@ -229,9 +229,6 @@ begin
 end;
 
 procedure TATSynEdit.DoMenuGutterFold;
-const
-  cPlus: array[boolean] of string = ('[-]', '[+]');
-  cLineLen = 60;
 var
   Pnt: TPoint;
   AtEnd: boolean;
@@ -242,8 +239,7 @@ var
   Menu: TPopupMenu;
   mi: TMenuItem;
 begin
-  Pnt:= Mouse.CursorPos;
-  Pnt:= ScreenToClient(Pnt);
+  Pnt:= ScreenToClient(Mouse.CursorPos);
   Pnt:= ClientPosToCaretPos(Pnt, AtEnd);
   NLine:= Pnt.Y;
   if NLine<0 then Exit;
@@ -251,7 +247,6 @@ begin
   IntList:= Fold.FindRangesContainingLines(NLine, NLine, nil,
     false{OnlyFolded}, false{TopLevel}, cRngHasAllLines);
   if Length(IntList)=0 then Exit;
-
 
   InitResourcesFoldbar;
   if FMenuGutterFoldStd=nil then

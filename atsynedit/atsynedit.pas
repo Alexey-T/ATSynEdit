@@ -489,8 +489,6 @@ type
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
     procedure DoFold_ClickFoldingBar(ALine: integer);
-    procedure DoFold_RangeFold(ARange: TATSynRange);
-    procedure DoFold_RangeUnfold(ARange: TATSynRange);
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHintShow;
@@ -718,12 +716,14 @@ type
     function GetCaretsArray: TATPointArray;
     procedure SetCaretsArray(const L: TATPointArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
+    procedure DoDebugInitFoldList;
 
   public
-    //override
+    //overrides
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetFocus; override;
+    //updates
     procedure Invalidate; override;
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     procedure UpdateIncorrectCaretPositions;
@@ -779,9 +779,10 @@ type
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
+    procedure DoFold_RangeFold(ARange: TATSynRange);
+    procedure DoFold_RangeUnfold(ARange: TATSynRange);
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
-    procedure DoDebugInitFoldList;
 
   protected
     procedure Paint; override;
