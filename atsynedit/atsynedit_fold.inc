@@ -258,7 +258,9 @@ begin
   begin
     Rng:= Fold[IntList[i]];
     mi:= TMenuItem.Create(Self);
-    mi.Caption:= 'Line '+Inttostr(Rng.Y+1)+': '+Copy(Strings.Lines[Rng.Y], 1, cLineLen);
+    mi.Caption:=
+      cHintScrollPrefix+' '+Inttostr(Rng.Y+1)+': '+
+      UTF8Encode(Copy(Strings.Lines[Rng.Y], 1, cFoldedLenOfEmptyHint));
     mi.Tag:= integer(Rng);
     mi.OnClick:= @MenuFoldStdClick;
     if Rng.Folded then
