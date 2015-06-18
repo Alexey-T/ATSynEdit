@@ -331,6 +331,7 @@ type
     FMenuGutterBm,
     FMenuGutterNum,
     FMenuGutterFold,
+    FMenuGutterFoldStd,
     FMenuMinimap,
     FMenuMicromap,
     FMenuRuler: TPopupMenu;
@@ -492,8 +493,10 @@ type
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHintShow;
     procedure DoHintHide;
+    procedure DoMenuGutterFold;
     procedure DoMinimapClick(APosY: integer);
     function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
+    procedure MenuFoldStdClick(Sender: TObject);
     procedure PaintEx(ALine: integer);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
@@ -2231,6 +2234,7 @@ begin
   FMenuGutterBm:= nil;
   FMenuGutterNum:= nil;
   FMenuGutterFold:= nil;
+  FMenuGutterFoldStd:= TPopupMenu.Create(Self);
   FMenuMinimap:= nil;
   FMenuMicromap:= nil;
   FMenuRuler:= nil;
@@ -2837,7 +2841,7 @@ begin
     if Index=FGutterBandNum then
       if Assigned(FMenuGutterNum) then FMenuGutterNum.PopUp;
     if Index=FGutterBandFold then
-      if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp;
+      if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp else DoMenuGutterFold;
   end
   else
   if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then

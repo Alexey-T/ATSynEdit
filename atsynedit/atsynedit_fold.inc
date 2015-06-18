@@ -228,4 +228,54 @@ begin
     Result:= false;
 end;
 
+procedure TATSynEdit.DoMenuGutterFold;
+const
+  cPlus: array[boolean] of string = ('[-]', '[+]');
+  cLineLen = 60;
+var
+  Pnt: TPoint;
+  AtEnd: boolean;
+  NLine: integer;
+  IntList: TATIntArray;
+  Rng: TATSynRange;
+  i: integer;
+  Menu: TPopupMenu;
+  mi: TMenuItem;
+begin
+  Pnt:= Mouse.CursorPos;
+  Pnt:= ScreenToClient(Pnt);
+  Pnt:= ClientPosToCaretPos(Pnt, AtEnd);
+  NLine:= Pnt.Y;
+  if NLine<0 then Exit;
+
+  IntList:= Fold.FindRangesContainingLines(NLine, NLine, nil,
+    false{OnlyFolded}, false{TopLevel}, cRngHasAllLines);
+  if Length(IntList)=0 then Exit;
+
+  Menu:= FMenuGutterFoldStd;
+  Menu.Items.Clear;
+  for i:= 0 to High(IntList) do
+  begin
+    Rng:= Fold[IntList[i]];
+    mi:= TMenuItem.Create(Self);
+    mi.Caption:= cPlus[Rng.Folded]+' '+Inttostr(Rng.Y+1)+': '+Copy(Strings.Lines[Rng.Y], 1, cLineLen);
+    mi.Tag:= integer(Rng);
+    mi.OnClick:= @MenuFoldStdClick;
+    Menu.Items.Add(mi);
+  end;
+  Menu.Popup;
+end;
+
+
+procedure TATSynEdit.MenuFoldStdClick(Sender: TObject);
+var
+  Rng: TATSynRange;
+begin
+  Rng:= TATSynRange((Sender as TComponent).Tag);
+  if Rng.Folded then
+    DoFold_RangeUnfold(Rng)
+  else
+    DoFold_RangeFold(Rng);
+  Update;
+end;
 
