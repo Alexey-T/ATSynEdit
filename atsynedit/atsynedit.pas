@@ -2234,7 +2234,7 @@ begin
   FMenuGutterBm:= nil;
   FMenuGutterNum:= nil;
   FMenuGutterFold:= nil;
-  FMenuGutterFoldStd:= TPopupMenu.Create(Self);
+  FMenuGutterFoldStd:= nil;
   FMenuMinimap:= nil;
   FMenuMicromap:= nil;
   FMenuRuler:= nil;
@@ -3981,7 +3981,7 @@ end;
 
 initialization
   InitClipboardFormat;
-  InitResources;
+  InitResourcesNicescroll;
 
 finalization
   FreeResources;

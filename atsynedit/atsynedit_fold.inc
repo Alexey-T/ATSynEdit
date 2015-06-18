@@ -252,21 +252,28 @@ begin
     false{OnlyFolded}, false{TopLevel}, cRngHasAllLines);
   if Length(IntList)=0 then Exit;
 
+
+  InitResourcesFoldbar;
+  if FMenuGutterFoldStd=nil then
+    FMenuGutterFoldStd:= TPopupMenu.Create(Self);
+
   Menu:= FMenuGutterFoldStd;
   Menu.Items.Clear;
   for i:= 0 to High(IntList) do
   begin
     Rng:= Fold[IntList[i]];
     mi:= TMenuItem.Create(Self);
+    mi.Tag:= ptrint(Rng);
+    mi.OnClick:= @MenuFoldStdClick;
+
     mi.Caption:=
       cHintScrollPrefix+' '+Inttostr(Rng.Y+1)+': '+
       UTF8Encode(Copy(Strings.Lines[Rng.Y], 1, cFoldedLenOfEmptyHint));
-    mi.Tag:= integer(Rng);
-    mi.OnClick:= @MenuFoldStdClick;
     if Rng.Folded then
       mi.Bitmap:= cBitmapFoldPlus
     else
       mi.Bitmap:= cBitmapFoldMinus;
+
     Menu.Items.Add(mi);
   end;
   Menu.Popup;

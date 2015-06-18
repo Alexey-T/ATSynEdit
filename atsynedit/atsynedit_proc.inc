@@ -53,25 +53,34 @@ begin
   cClipFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
 end;
 
-procedure InitResources;
+procedure InitResourcesNicescroll;
 begin
   cBitmapNiceScroll:= TBitmap.Create;
   cBitmapNiceScroll.LoadFromResourceName(HInstance, 'AB_MOVE');
   cBitmapNiceScroll.Transparent:= true;
 
-  cBitmapFoldPlus:= TBitmap.Create;
-  cBitmapFoldPlus.LoadFromResourceName(HInstance, 'FOLDBAR_P');
-  cBitmapFoldPlus.Transparent:= true;
+  Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'AB_MOVE');
+  Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'AB_MOVE_U');
+  Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'AB_MOVE_D');
+  Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'AB_MOVE_L');
+  Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'AB_MOVE_R');
+end;
 
-  cBitmapFoldMinus:= TBitmap.Create;
-  cBitmapFoldMinus.LoadFromResourceName(HInstance, 'FOLDBAR_M');
-  cBitmapFoldMinus.Transparent:= true;
+procedure InitResourcesFoldbar;
+begin
+  if cBitmapFoldPlus=nil then
+  begin
+    cBitmapFoldPlus:= TBitmap.Create;
+    cBitmapFoldPlus.LoadFromResourceName(HInstance, 'FOLDBAR_P');
+    cBitmapFoldPlus.Transparent:= true;
+  end;
 
-  Screen.Cursors[crNiceScrollNone]  := LoadCursor(HInstance, 'AB_MOVE');
-  Screen.Cursors[crNiceScrollUp]    := LoadCursor(HInstance, 'AB_MOVE_U');
-  Screen.Cursors[crNiceScrollDown]  := LoadCursor(HInstance, 'AB_MOVE_D');
-  Screen.Cursors[crNiceScrollLeft]  := LoadCursor(HInstance, 'AB_MOVE_L');
-  Screen.Cursors[crNiceScrollRight] := LoadCursor(HInstance, 'AB_MOVE_R');
+  if cBitmapFoldMinus=nil then
+  begin
+    cBitmapFoldMinus:= TBitmap.Create;
+    cBitmapFoldMinus.LoadFromResourceName(HInstance, 'FOLDBAR_M');
+    cBitmapFoldMinus.Transparent:= true;
+  end;
 end;
 
 procedure FreeResources;
