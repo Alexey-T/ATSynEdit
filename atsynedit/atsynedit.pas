@@ -210,6 +210,7 @@ const
   cInitCaretShapeIns = cCaretShapeVertPixels1;
   cInitCaretShapeOvr = cCaretShapeFull;
   cInitCaretShapeRO = cCaretShapeHorzPixels1;
+  cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
   cInitSpacingText = 1;
   cInitSpacingMinimap = -1;
   cInitTimerBlink = 600;
@@ -416,6 +417,7 @@ type
     FOptCaretPreferLeftSide: boolean;
     FOptShowScrollHint: boolean;
     FOptTextOffsetTop: integer;
+    FOptTextOffsetFromLine: integer;
     FOptSavingForceFinalEol: boolean;
     FOptSavingTrimSpaces: boolean;
     FOptUndoGrouped: boolean;
@@ -869,6 +871,7 @@ type
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter;
     property OptTextOffsetTop: integer read FOptTextOffsetTop write FOptTextOffsetTop;
+    property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel;
@@ -1704,7 +1707,8 @@ begin
           //needed number of chars of all chars counted as 1.0,
           //while NOutputSpacesSkipped is with cjk counted as 1.7
         @Parts,
-        Event
+        Event,
+        FOptTextOffsetFromLine
         );
       C.Font.Style:= Font.Style; //restore after textout
     end
@@ -1967,7 +1971,7 @@ begin
   //paint text
   C.TextOut(
     ACoord.X+cFoldedMarkIndentInner,
-    ACoord.Y,
+    ACoord.Y+FOptTextOffsetFromLine,
     Str);
   NWidth:= C.TextWidth(Str) + 2*cFoldedMarkIndentInner;
 
@@ -2162,6 +2166,7 @@ begin
   FOptShowStapleWidthPercent:= 100;
 
   FOptTextOffsetTop:= 0;
+  FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
   FOptAllowScrollbars:= true;
   FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;

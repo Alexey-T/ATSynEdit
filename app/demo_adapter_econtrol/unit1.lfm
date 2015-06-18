@@ -1,24 +1,24 @@
 object fmMain: TfmMain
   Left = 382
-  Height = 457
+  Height = 488
   Top = 188
-  Width = 777
+  Width = 790
   Caption = 'Demo'
-  ClientHeight = 457
-  ClientWidth = 777
+  ClientHeight = 488
+  ClientWidth = 790
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.5'
   object Panel1: TPanel
     Left = 0
-    Height = 154
-    Top = 303
-    Width = 777
+    Height = 178
+    Top = 310
+    Width = 790
     Align = alBottom
     BevelOuter = bvNone
-    ClientHeight = 154
-    ClientWidth = 777
+    ClientHeight = 178
+    ClientWidth = 790
     TabOrder = 0
     object chkWrap: TCheckBox
       Left = 9
@@ -30,7 +30,7 @@ object fmMain: TfmMain
       TabOrder = 0
     end
     object edLexer: TComboBox
-      Left = 144
+      Left = 192
       Height = 23
       Top = 36
       Width = 152
@@ -41,10 +41,10 @@ object fmMain: TfmMain
       TabOrder = 6
     end
     object files: TShellListView
-      Left = 304
-      Height = 144
+      Left = 352
+      Height = 168
       Top = 3
-      Width = 464
+      Width = 432
       Anchors = [akTop, akLeft, akBottom]
       Color = clDefault
       HideSelection = False
@@ -76,7 +76,7 @@ object fmMain: TfmMain
       TabOrder = 3
     end
     object bOpen: TButton
-      Left = 144
+      Left = 192
       Height = 25
       Top = 8
       Width = 88
@@ -103,7 +103,7 @@ object fmMain: TfmMain
       TabOrder = 4
     end
     object chkLexer: TCheckBox
-      Left = 144
+      Left = 192
       Height = 19
       Top = 62
       Width = 82
@@ -114,7 +114,7 @@ object fmMain: TfmMain
       TabOrder = 7
     end
     object chkDyn: TCheckBox
-      Left = 144
+      Left = 192
       Height = 19
       Top = 81
       Width = 95
@@ -124,7 +124,7 @@ object fmMain: TfmMain
     end
   end
   object OpenDialog1: TOpenDialog
-    left = 304
-    top = 344
+    left = 344
+    top = 376
   end
 end

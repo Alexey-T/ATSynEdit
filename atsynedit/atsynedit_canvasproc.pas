@@ -68,7 +68,9 @@ procedure CanvasTextOut(C: TCanvas;
   out AStrWidth: integer;
   ACharsSkipped: integer;
   AParts: PATLineParts;
-  ADrawEvent: TATSynEditDrawLineEvent);
+  ADrawEvent: TATSynEditDrawLineEvent;
+  ATextOffsetFromLine: integer
+  );
 
 procedure DoPaintUnprintedEol(C: TCanvas;
   const AStrEol: atString;
@@ -442,7 +444,7 @@ procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; const Str: atString;
   ATabSize: integer; ACharSize: TPoint; AMainText: boolean;
   AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
   AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
-  ADrawEvent: TATSynEditDrawLineEvent);
+  ADrawEvent: TATSynEditDrawLineEvent; ATextOffsetFromLine: integer);
 var
   ListReal: TATRealArray;
   ListInt: TATIntArray;
@@ -526,7 +528,7 @@ begin
       Buf:= UTF8Encode(SRemoveHexChars(PartStr));
       ExtTextOut(C.Handle,
         PosX+PixOffset1,
-        PosY,
+        PosY+ATextOffsetFromLine,
         ETO_CLIPPED+ETO_OPAQUE,
         @PartRect,
         PChar(Buf),
