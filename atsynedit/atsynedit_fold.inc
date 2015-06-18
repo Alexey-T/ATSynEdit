@@ -258,9 +258,13 @@ begin
   begin
     Rng:= Fold[IntList[i]];
     mi:= TMenuItem.Create(Self);
-    mi.Caption:= cPlus[Rng.Folded]+' '+Inttostr(Rng.Y+1)+': '+Copy(Strings.Lines[Rng.Y], 1, cLineLen);
+    mi.Caption:= 'Line '+Inttostr(Rng.Y+1)+': '+Copy(Strings.Lines[Rng.Y], 1, cLineLen);
     mi.Tag:= integer(Rng);
     mi.OnClick:= @MenuFoldStdClick;
+    if Rng.Folded then
+      mi.Bitmap:= cBitmapFoldPlus
+    else
+      mi.Bitmap:= cBitmapFoldMinus;
     Menu.Items.Add(mi);
   end;
   Menu.Popup;
