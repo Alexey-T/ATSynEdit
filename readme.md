@@ -1,5 +1,6 @@
 Editor control for Lazarus. Implemented much. Implemented multi-carets from birth (see help dialog in demo_editor how to use).
 
+- Doc: http://wiki.freepascal.org/ATSynEdit
 - Exists: adapter for SynWrite lexers (done 95%); uses code https://github.com/Alexey-T/EControl
 - Wanted: adapter for tmLanguage (Sublime Text) lexers.
 
