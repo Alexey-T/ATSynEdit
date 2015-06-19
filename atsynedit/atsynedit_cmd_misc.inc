@@ -42,6 +42,12 @@ begin
   Result:= [cResultState];
 end;
 
+function TATSynEdit.DoCommand_ToggleMinimap: TATCommandResults;
+begin
+  OptMinimapVisible:= not OptMinimapVisible;
+  Result:= [cResultState];
+end;
+
 function TATSynEdit.DoCommand_ToggleReadOnly: TATCommandResults;
 begin
   ModeReadOnly:= not ModeReadOnly;

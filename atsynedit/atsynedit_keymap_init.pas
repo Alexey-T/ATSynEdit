@@ -86,6 +86,7 @@ begin
   M.Add(cCommand_ToggleLineNums, 'toggle show line numbers', [], []);
   M.Add(cCommand_ToggleFolding, 'toggle show folding bar', [], []);
   M.Add(cCommand_ToggleRuler, 'toggle show ruler', [], []);
+  M.Add(cCommand_ToggleMinimap, 'toggle show minimap', [], []);
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);

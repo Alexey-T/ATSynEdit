@@ -106,6 +106,7 @@ const
   cCommand_ToggleLineNums = 304;
   cCommand_ToggleFolding = 305;
   cCommand_ToggleRuler = 306;
+  cCommand_ToggleMinimap = 307;
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;

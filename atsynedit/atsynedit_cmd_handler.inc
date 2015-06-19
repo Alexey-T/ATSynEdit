@@ -216,6 +216,7 @@ begin
     cCommand_ToggleLineNums:           Res:= DoCommand_ToggleLineNums;
     cCommand_ToggleFolding:            Res:= DoCommand_ToggleFolding;
     cCommand_ToggleRuler:              Res:= DoCommand_ToggleRuler;
+    cCommand_ToggleMinimap:            Res:= DoCommand_ToggleMinimap;
 
     cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);
