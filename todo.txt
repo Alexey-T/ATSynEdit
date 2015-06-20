@@ -1,2 +1,1 @@
 
-Strings: event OnChangePos which pass [Pos, Count] for adapter for ECon

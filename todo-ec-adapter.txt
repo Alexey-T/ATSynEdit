@@ -1,5 +1,4 @@
 
-onchange event: wrk
 
 (solved) keep fold state on edit
 (solved) C#. rule 'function begin' dont work.
