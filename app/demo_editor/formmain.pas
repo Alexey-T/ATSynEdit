@@ -15,8 +15,7 @@ uses
   ATSynEdit_CanvasProc,
   formkey,
   formopt,
-  formcombo, 
-  proc_streamcomponent;
+  formcombo;
 
 type
   { TfmMain }
@@ -729,6 +728,7 @@ end;
 
 procedure TfmMain.btnLoadClick(Sender: TObject);
 begin
+  {
   wait:= true;
 
   LoadComponentFromFile(ed, FIniName, nil);
@@ -736,12 +736,15 @@ begin
 
   UpdateChecks;
   wait:= false;
+  }
 end;
 
 
 procedure TfmMain.btnSaveClick(Sender: TObject);
 begin
+  {
   SaveComponentToFile(ed, FIniName);
+  }
 end;
 
 procedure TfmMain.chkGutterChange(Sender: TObject);

@@ -26,8 +26,7 @@ uses
   formmain,
   formkey,
   formopt,
-  formcombo,
-  proc_StreamComponent;
+  formcombo;
 
 {$R *.res}
 

@@ -389,12 +389,12 @@ object fmMain: TfmMain
       end
       object mnuOptSave: TMenuItem
         Caption = 'save'
-        ShortCut = 113
+        Visible = False
         OnClick = btnSaveClick
       end
       object mnuOptLoad: TMenuItem
         Caption = 'load'
-        ShortCut = 32881
+        Visible = False
         OnClick = btnLoadClick
       end
     end
