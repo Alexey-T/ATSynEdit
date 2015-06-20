@@ -8,8 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, Unit1, ATSynEdit, atsynedit_adapters, ATSynEdit_CanvasProc,
-  ATStringProc_TextBuffer, ATSynEdit_Ranges, ecLists, ecStrUtils,
-  eczregexpr, ecSyntAnal;
+  ATStringProc_TextBuffer, ATSynEdit_Ranges, ecLists, ecStrUtils;
 
 {$R *.res}
 

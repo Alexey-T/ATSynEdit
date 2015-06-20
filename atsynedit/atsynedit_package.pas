@@ -7,7 +7,8 @@ unit atsynedit_package;
 interface
 
 uses
-  ATSynEdit, ATSynEdit_Edits, ATSynEdit_Register, LazarusPackageIntf;
+  ATSynEdit, ATSynEdit_Edits, ATSynEdit_Register, ATStringProc_TextBuffer, 
+  proc_StreamComponent, LazarusPackageIntf;
 
 implementation
 

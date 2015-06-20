@@ -27,12 +27,15 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="1">
+    <RequiredPackages Count="2">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="econtrol_package"/>
       </Item1>
+      <Item2>
+        <PackageName Value="LCL"/>
+      </Item2>
     </RequiredPackages>
-    <Units Count="13">
+    <Units Count="11">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -88,16 +91,6 @@
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
         <IsPartOfProject Value="True"/>
       </Unit10>
-      <Unit11>
-        <Filename Value="E:\GitEControl\ec\ecsyntanal.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ecSyntAnal"/>
-      </Unit11>
-      <Unit12>
-        <Filename Value="E:\GitEControl\ec\eczregexpr.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ecZRegExpr"/>
-      </Unit12>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -108,7 +101,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir);..\..\atsynedit"/>
-      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer;..\..\..\GitEControl\ec"/>
+      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

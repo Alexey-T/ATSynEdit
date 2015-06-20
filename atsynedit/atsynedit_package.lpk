@@ -9,14 +9,14 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value="."/>
+        <OtherUnitFiles Value=".;..\proc_lexer"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
     <Description Value="ATSynEdit"/>
     <License Value="MPL 2.0"/>
     <Version Major="1"/>
-    <Files Count="3">
+    <Files Count="5">
       <Item1>
         <Filename Value="atsynedit.pas"/>
         <UnitName Value="ATSynEdit"/>
@@ -30,6 +30,14 @@
         <HasRegisterProc Value="True"/>
         <UnitName Value="ATSynEdit_Register"/>
       </Item3>
+      <Item4>
+        <Filename Value="atstringproc_textbuffer.pas"/>
+        <UnitName Value="ATStringProc_TextBuffer"/>
+      </Item4>
+      <Item5>
+        <Filename Value="..\proc_lexer\proc_streamcomponent.pas"/>
+        <UnitName Value="proc_StreamComponent"/>
+      </Item5>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
