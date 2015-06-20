@@ -488,7 +488,7 @@ type
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
-    procedure DoFold_ClickFoldingBar(ALine: integer);
+    procedure DoFoldbarClick(ALine: integer);
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHintShow;
@@ -780,8 +780,8 @@ type
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
-    procedure DoFold_RangeFold(ARange: TATSynRange);
-    procedure DoFold_RangeUnfold(ARange: TATSynRange);
+    procedure DoRangeFold(ARange: TATSynRange);
+    procedure DoRangeUnfold(ARange: TATSynRange);
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
 
@@ -2782,7 +2782,7 @@ begin
       else
       if Index=FGutterBandFold then
       begin
-        DoFold_ClickFoldingBar(PCaret.Y);
+        DoFoldbarClick(PCaret.Y);
       end
       else
         //click on other bands- event

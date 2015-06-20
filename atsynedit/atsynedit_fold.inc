@@ -69,7 +69,7 @@ b) for all subranges at top level:
   b1) if subrange marked folded, unfold 1st line "[...]"
   b2) if subrange marked unfolded, recursion
 *)
-procedure TATSynEdit.DoFold_RangeUnfold(ARange: TATSynRange);
+procedure TATSynEdit.DoRangeUnfold(ARange: TATSynRange);
 var
   List: TATIntArray;
   R: TATSynRange;
@@ -104,11 +104,11 @@ begin
     if R.Folded then
       Strings.LinesHidden[R.Y, FEditorIndex]:= R.X
     else
-      DoFold_RangeUnfold(R);
+      DoRangeUnfold(R);
   end;
 end;
 
-procedure TATSynEdit.DoFold_RangeFold(ARange: TATSynRange);
+procedure TATSynEdit.DoRangeFold(ARange: TATSynRange);
 var
   i: integer;
 begin
@@ -155,10 +155,10 @@ begin
   List:= FFold.FindRangesContainingLines(ALine, ALine, nil,
     true{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
   for i:= Low(List) to High(List) do
-    DoFold_RangeUnfold(FFold[List[i]]);
+    DoRangeUnfold(FFold[List[i]]);
 end;
 
-procedure TATSynEdit.DoFold_ClickFoldingBar(ALine: integer);
+procedure TATSynEdit.DoFoldbarClick(ALine: integer);
 var
   R: TATSynRange;
 begin
@@ -166,9 +166,9 @@ begin
   if Assigned(R) then
   begin
     if R.Folded then
-      DoFold_RangeUnfold(R)
+      DoRangeUnfold(R)
     else
-      DoFold_RangeFold(R);
+      DoRangeFold(R);
     Update;
   end;
 end;
@@ -281,9 +281,9 @@ var
 begin
   Rng:= TATSynRange((Sender as TComponent).Tag);
   if Rng.Folded then
-    DoFold_RangeUnfold(Rng)
+    DoRangeUnfold(Rng)
   else
-    DoFold_RangeFold(Rng);
+    DoRangeFold(Rng);
   Update;
 end;
 
