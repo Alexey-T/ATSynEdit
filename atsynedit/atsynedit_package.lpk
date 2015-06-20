@@ -16,28 +16,88 @@
     <Description Value="ATSynEdit"/>
     <License Value="MPL 2.0"/>
     <Version Major="1"/>
-    <Files Count="5">
+    <Files Count="20">
       <Item1>
-        <Filename Value="atsynedit.pas"/>
-        <UnitName Value="ATSynEdit"/>
-      </Item1>
-      <Item2>
-        <Filename Value="atsynedit_edits.pas"/>
-        <UnitName Value="ATSynEdit_Edits"/>
-      </Item2>
-      <Item3>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="ATSynEdit_Register"/>
+      </Item1>
+      <Item2>
+        <Filename Value="..\proc_lexer\proc_streamcomponent.pas"/>
+        <UnitName Value="proc_StreamComponent"/>
+      </Item2>
+      <Item3>
+        <Filename Value="atstringproc.pas"/>
+        <UnitName Value="ATStringProc"/>
       </Item3>
       <Item4>
         <Filename Value="atstringproc_textbuffer.pas"/>
         <UnitName Value="ATStringProc_TextBuffer"/>
       </Item4>
       <Item5>
-        <Filename Value="..\proc_lexer\proc_streamcomponent.pas"/>
-        <UnitName Value="proc_StreamComponent"/>
+        <Filename Value="atstringproc_utf8detect.pas"/>
+        <UnitName Value="atstringproc_utf8detect"/>
       </Item5>
+      <Item6>
+        <Filename Value="atstringproc_wordjump.pas"/>
+        <UnitName Value="ATStringProc_WordJump"/>
+      </Item6>
+      <Item7>
+        <Filename Value="atstrings.pas"/>
+        <UnitName Value="ATStrings"/>
+      </Item7>
+      <Item8>
+        <Filename Value="atstrings_undo.pas"/>
+        <UnitName Value="ATStrings_Undo"/>
+      </Item8>
+      <Item9>
+        <Filename Value="atsynedit.pas"/>
+        <UnitName Value="ATSynEdit"/>
+      </Item9>
+      <Item10>
+        <Filename Value="atsynedit_adapters.pas"/>
+        <UnitName Value="ATSynEdit_Adapters"/>
+      </Item10>
+      <Item11>
+        <Filename Value="atsynedit_canvasproc.pas"/>
+        <UnitName Value="ATSynEdit_CanvasProc"/>
+      </Item11>
+      <Item12>
+        <Filename Value="atsynedit_carets.pas"/>
+        <UnitName Value="atsynedit_carets"/>
+      </Item12>
+      <Item13>
+        <Filename Value="atsynedit_commands.pas"/>
+        <UnitName Value="ATSynEdit_Commands"/>
+      </Item13>
+      <Item14>
+        <Filename Value="atsynedit_edits.pas"/>
+        <UnitName Value="ATSynEdit_Edits"/>
+      </Item14>
+      <Item15>
+        <Filename Value="atsynedit_gutter.pas"/>
+        <UnitName Value="ATSynEdit_Gutter"/>
+      </Item15>
+      <Item16>
+        <Filename Value="atsynedit_keymap.pas"/>
+        <UnitName Value="ATSynEdit_Keymap"/>
+      </Item16>
+      <Item17>
+        <Filename Value="atsynedit_keymap_init.pas"/>
+        <UnitName Value="ATSynEdit_Keymap_Init"/>
+      </Item17>
+      <Item18>
+        <Filename Value="atsynedit_package.pas"/>
+        <UnitName Value="atsynedit_package"/>
+      </Item18>
+      <Item19>
+        <Filename Value="atsynedit_ranges.pas"/>
+        <UnitName Value="ATSynEdit_Ranges"/>
+      </Item19>
+      <Item20>
+        <Filename Value="atsynedit_wrapinfo.pas"/>
+        <UnitName Value="ATSynEdit_WrapInfo"/>
+      </Item20>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
@@ -48,7 +108,7 @@
       </Item2>
     </RequiredPkgs>
     <UsageOptions>
-      <UnitPath Value="$(PkgOutDir)"/>
+      <UnitPath Value="$(PkgDir);$(PkgDir)\..\proc_lexer"/>
     </UsageOptions>
     <PublishOptions>
       <Version Value="2"/>

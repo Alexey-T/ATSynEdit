@@ -4,6 +4,8 @@
 
 unit atstringproc_utf8detect;
 
+{$mode objfpc}{$H+}
+
 interface
 
 //PartialAllowed must be set to true if the buffer is smaller than the file.
