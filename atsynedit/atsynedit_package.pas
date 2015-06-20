@@ -7,12 +7,12 @@ unit atsynedit_package;
 interface
 
 uses
-  ATSynEdit_Register, proc_StreamComponent, ATStringProc, 
-  ATStringProc_TextBuffer, atstringproc_utf8detect, ATStringProc_WordJump, 
-  ATStrings, ATStrings_Undo, ATSynEdit, ATSynEdit_Adapters, 
-  ATSynEdit_CanvasProc, atsynedit_carets, ATSynEdit_Commands, ATSynEdit_Edits, 
-  ATSynEdit_Gutter, ATSynEdit_Keymap, ATSynEdit_Keymap_Init, ATSynEdit_Ranges, 
-  ATSynEdit_WrapInfo, LazarusPackageIntf;
+  ATSynEdit_Register, ATStringProc, ATStringProc_TextBuffer, 
+  atstringproc_utf8detect, ATStringProc_WordJump, ATStrings, ATStrings_Undo, 
+  ATSynEdit, ATSynEdit_Adapters, ATSynEdit_CanvasProc, atsynedit_carets, 
+  ATSynEdit_Commands, ATSynEdit_Edits, ATSynEdit_Gutter, ATSynEdit_Keymap, 
+  ATSynEdit_Keymap_Init, ATSynEdit_Ranges, ATSynEdit_WrapInfo, 
+  LazarusPackageIntf;
 
 implementation
 
