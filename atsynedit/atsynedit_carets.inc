@@ -320,7 +320,7 @@ end;
 
 procedure TATSynEdit.DoGotoPosEx(APnt: TPoint);
 begin
-  DoCommandExec(cCommand_Cancel);
+  DoCommand(cCommand_Cancel);
   DoCaretSingle(APnt.X, APnt.Y);
 
   if IsLineFolded(APnt.Y, true) then

@@ -34,7 +34,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Items: TStringList read FItems;
-    procedure DoCommandExec(ACmd: integer; const AText: atString = ''); override;
+    procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
   end;
 
 
@@ -119,13 +119,13 @@ begin
   if n>=0 then
   begin
     Text:= UTF8Decode(FItems[n]);
-    DoCommandExec(cCommand_SelectNone);
+    DoCommand(cCommand_SelectNone);
     DoCaretSingle(Length(Text), 0);
-    DoCommandExec(cCommand_ScrollToCaretRight);
+    DoCommand(cCommand_ScrollToCaretRight);
   end;
 end;
 
-procedure TATComboEdit.DoCommandExec(ACmd: integer; const AText: atString);
+procedure TATComboEdit.DoCommand(ACmd: integer; const AText: atString);
 begin
   inherited;
   if ACmd=cCommand_RecentsPopup then

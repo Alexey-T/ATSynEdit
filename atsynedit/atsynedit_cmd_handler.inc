@@ -7,7 +7,7 @@ begin
 
   DoPaintModeStatic;
   try
-    DoCommandExec(GetCommandFromKey(Key, Shift));
+    DoCommand(GetCommandFromKey(Key, Shift));
   finally
     DoPaintModeBlinking;
   end;
@@ -24,7 +24,7 @@ begin
   if Length(Str)>0 then
     if AnsiChar(Str[1])<' ' then Exit;
 
-  DoCommandExec(cCommand_TextInsert, Str);
+  DoCommand(cCommand_TextInsert, Str);
 end;
 
 function TATSynEdit.GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
@@ -107,7 +107,7 @@ begin
     DoEventState;
 end;
 
-procedure TATSynEdit.DoCommandExec(ACmd: integer; const AText: atString = '');
+procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');
 var
   Caret: TATCaretItem;
   Res: TATCommandResults;
@@ -253,7 +253,7 @@ begin
 
     cCommand_ZoomIn:                   Res:= DoCommand_SizeChange(true);
     cCommand_ZoomOut:                  Res:= DoCommand_SizeChange(false);
-    cCommand_RepeatTextCommand:        DoCommandExec(FLastTextCmd, FLastTextCmdText);
+    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
 
   if cResultText in Res then

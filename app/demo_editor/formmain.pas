@@ -568,7 +568,7 @@ begin
   Cmd:= DoCommandDialog(ed);
   if Cmd>0 then
   begin
-    ed.DoCommandExec(Cmd);
+    ed.DoCommand(Cmd);
     ed.Update;
   end;
 end;

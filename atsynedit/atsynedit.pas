@@ -771,7 +771,7 @@ type
     procedure DoGotoCaret(AEdge: TATCaretEdge);
     procedure DoGotoPosEx(APnt: TPoint);
     //misc
-    procedure DoCommandExec(ACmd: integer; const AText: atString = ''); virtual;
+    procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
     procedure DoSelect_All;
@@ -3459,7 +3459,7 @@ begin
   Cmd:= (Sender as TMenuItem).Tag;
   if Cmd>0 then
   begin
-    DoCommandExec(Cmd);
+    DoCommand(Cmd);
     Update;
   end;
 end;
