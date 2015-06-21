@@ -320,6 +320,8 @@ end;
 
 procedure TATSynEdit.DoGotoPosEx(APnt: TPoint);
 begin
+  if not Strings.IsIndexValid(APnt.Y) then Exit;
+
   DoCommand(cCommand_Cancel);
   DoCaretSingle(APnt.X, APnt.Y);
 
