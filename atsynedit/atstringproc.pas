@@ -20,6 +20,7 @@ type
 
 function SCaseTitle(const S, SWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
+function SCaseSentence(const S, SWordChars: atString): atString;
 
 {$Z1}
 type
@@ -599,6 +600,29 @@ begin
       Result[i]:= _CharUp(Result[i])
     else
       Result[i]:= _CharLow(Result[i]);
+end;
+
+function SCaseSentence(const S, SWordChars: atString): atString;
+var
+  dot: boolean;
+  i: Integer;
+begin
+  Result:= S;
+  dot:= True;
+  for i:= 1 to Length(Result) do
+  begin
+    if IsCharWord(Result[i], SWordChars) then
+    begin
+      if dot then
+        Result[i]:= _CharUp(Result[i])
+      else
+        Result[i]:= _CharLow(Result[i]);
+      dot:= False;
+    end
+    else
+      if (Result[i] = '.') or (Result[i] = '!') or (Result[i] = '?') then
+        dot:= True;
+  end;
 end;
 
 initialization

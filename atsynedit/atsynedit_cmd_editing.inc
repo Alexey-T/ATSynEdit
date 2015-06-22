@@ -614,6 +614,7 @@ begin
       cCaseUpper: Str2:= UnicodeUpperCase(Str1);
       cCaseTitle: Str2:= SCaseTitle(Str1, FOptWordChars);
       cCaseInvert: Str2:= SCaseInvert(Str1);
+      cCaseSentence: Str2:= SCaseSentence(Str1, FOptWordChars);
     end;
     if Str1=Str2 then Continue;
 

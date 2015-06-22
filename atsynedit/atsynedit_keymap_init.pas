@@ -134,7 +134,8 @@ begin
   M.Add(cCommand_TextCaseLower, 'convert case: lower case', [], []);
   M.Add(cCommand_TextCaseUpper, 'convert case: upper case', [], []);
   M.Add(cCommand_TextCaseTitle, 'convert case: title case', [], []);
-  M.Add(cCommand_TextCaseInvert, 'convert case: inverted case', [], []);
+  M.Add(cCommand_TextCaseInvert, 'convert case: invert case', [], []);
+  M.Add(cCommand_TextCaseSentence, 'convert case: sentence case', [], []);
 
   M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
 end;

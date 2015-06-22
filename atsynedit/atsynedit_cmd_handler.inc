@@ -246,9 +246,9 @@ begin
     cCommand_TextCaseUpper:            Res:= DoCommand_TextChangeCase(cCaseUpper);
     cCommand_TextCaseTitle:            Res:= DoCommand_TextChangeCase(cCaseTitle);
     cCommand_TextCaseInvert:           Res:= DoCommand_TextChangeCase(cCaseInvert);
+    cCommand_TextCaseSentence:         Res:= DoCommand_TextChangeCase(cCaseSentence);
 
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
-
     cCommand_CaretsExtendUpLine:       Res:= DoCommand_CaretsExtend(false, 1);
     cCommand_CaretsExtendUpPage:       Res:= DoCommand_CaretsExtend(false, GetPageLines);
     cCommand_CaretsExtendUpToTop:      Res:= DoCommand_CaretsExtend(false, Strings.Count);

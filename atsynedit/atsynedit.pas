@@ -42,7 +42,8 @@ type
     cCaseLower,
     cCaseUpper,
     cCaseTitle,
-    cCaseInvert
+    cCaseInvert,
+    cCaseSentence
     );
 
   TATCommandResult = (

@@ -121,6 +121,7 @@ const
   cCommand_TextCaseUpper = 1021;
   cCommand_TextCaseTitle = 1022;
   cCommand_TextCaseInvert = 1023;
+  cCommand_TextCaseSentence = 1024;
 
   cCommand_Cancel = 2001;
   cCommand_RepeatTextCommand = 2002;
