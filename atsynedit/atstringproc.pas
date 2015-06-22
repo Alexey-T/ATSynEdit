@@ -18,6 +18,8 @@ type
   TATRealArray = array of real;
   TATPointArray = array of TPoint;
 
+function SCharUpper(ch: atChar): atChar;
+function SCharLower(ch: atChar): atChar;
 function SCaseTitle(const S, SWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SWordChars: atString): atString;
@@ -567,12 +569,12 @@ begin
   Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
 end;
 
-function _CharUp(ch: Widechar): Widechar;
+function SCharUpper(ch: atChar): atChar;
 begin
   Result:= UnicodeUpperCase(ch)[1];
 end;
 
-function _CharLow(ch: Widechar): Widechar;
+function SCharLower(ch: atChar): atChar;
 begin
   Result:= UnicodeLowerCase(ch)[1];
 end;
@@ -585,9 +587,9 @@ begin
   Result:= S;
   for i:= 1 to Length(Result) do
     if (i=1) or not IsCharWord(S[i-1], SWordChars) then
-      Result[i]:= _CharUp(Result[i])
+      Result[i]:= SCharUpper(Result[i])
     else
-      Result[i]:= _CharLow(Result[i]);
+      Result[i]:= SCharLower(Result[i]);
 end;
 
 function SCaseInvert(const S: atString): atString;
@@ -596,10 +598,10 @@ var
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
-    if S[i]<>UpCase(S[i]) then
-      Result[i]:= _CharUp(Result[i])
+    if S[i]<>SCharUpper(S[i]) then
+      Result[i]:= SCharUpper(Result[i])
     else
-      Result[i]:= _CharLow(Result[i]);
+      Result[i]:= SCharLower(Result[i]);
 end;
 
 function SCaseSentence(const S, SWordChars: atString): atString;
@@ -614,9 +616,9 @@ begin
     if IsCharWord(Result[i], SWordChars) then
     begin
       if dot then
-        Result[i]:= _CharUp(Result[i])
+        Result[i]:= SCharUpper(Result[i])
       else
-        Result[i]:= _CharLow(Result[i]);
+        Result[i]:= SCharLower(Result[i]);
       dot:= False;
     end
     else
