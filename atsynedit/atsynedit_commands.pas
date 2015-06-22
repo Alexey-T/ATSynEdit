@@ -117,6 +117,11 @@ const
   cCommand_ClipboardCopyAdd = 1007;
   cCommand_ClipboardCut = 1008;
 
+  cCommand_TextCaseLower = 1020;
+  cCommand_TextCaseUpper = 1021;
+  cCommand_TextCaseTitle = 1022;
+  cCommand_TextCaseInvert = 1023;
+
   cCommand_Cancel = 2001;
   cCommand_RepeatTextCommand = 2002;
   cCommand_ZoomIn = 2003;

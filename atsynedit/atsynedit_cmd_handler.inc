@@ -242,6 +242,11 @@ begin
     cCommand_TextInsertEmptyAbove:     Res:= DoCommand_TextInsertEmptyAboveBelow(false);
     cCommand_TextInsertEmptyBelow:     Res:= DoCommand_TextInsertEmptyAboveBelow(true);
 
+    cCommand_TextCaseLower:            Res:= DoCommand_TextChangeCase(cCaseLower);
+    cCommand_TextCaseUpper:            Res:= DoCommand_TextChangeCase(cCaseUpper);
+    cCommand_TextCaseTitle:            Res:= DoCommand_TextChangeCase(cCaseTitle);
+    cCommand_TextCaseInvert:           Res:= DoCommand_TextChangeCase(cCaseInvert);
+
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
 
     cCommand_CaretsExtendUpLine:       Res:= DoCommand_CaretsExtend(false, 1);

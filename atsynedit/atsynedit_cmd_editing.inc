@@ -590,3 +590,37 @@ begin
   Result:= [cResultText, cResultCaretAny];
 end;
 
+function TATSynEdit.DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
+var
+  Caret: TATCaretItem;
+  Str1, Str2: atString;
+  X1, Y1, X2, Y2: integer;
+  Shift, PosAfter: TPoint;
+  bSel: boolean;
+  i: integer;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  for i:= Carets.Count-1 downto 0 do
+  begin
+    Caret:= Carets[i];
+    Caret.GetRange(X1, Y1, X2, Y2, bSel);
+    if not bSel then Continue;
+
+    Str1:= Strings.TextSubstring(X1, Y1, X2, Y2);
+    case AMode of
+      cCaseLower: Str2:= UnicodeLowerCase(Str1);
+      cCaseUpper: Str2:= UnicodeUpperCase(Str1);
+      cCaseTitle: Str2:= SCaseTitle(Str1, FOptWordChars);
+      cCaseInvert: Str2:= SCaseInvert(Str1);
+    end;
+    if Str1=Str2 then Continue;
+
+    Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+    Strings.TextInsert(X1, Y1, Str2, false, Shift, PosAfter);
+  end;
+
+  Result:= [cResultText, cResultCaretAny];
+end;
+

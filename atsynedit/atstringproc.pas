@@ -18,6 +18,9 @@ type
   TATRealArray = array of real;
   TATPointArray = array of TPoint;
 
+function SCaseTitle(const S, SWordChars: atString): atString;
+function SCaseInvert(const S: atString): atString;
+
 {$Z1}
 type
   TATLineEnds = (cEndNone, cEndWin, cEndUnix, cEndMac);
@@ -561,6 +564,41 @@ end;
 function SBegin(const S, SubStr: atString): boolean;
 begin
   Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
+end;
+
+function _CharUp(ch: Widechar): Widechar;
+begin
+  Result:= UnicodeUpperCase(ch)[1];
+end;
+
+function _CharLow(ch: Widechar): Widechar;
+begin
+  Result:= UnicodeLowerCase(ch)[1];
+end;
+
+
+function SCaseTitle(const S, SWordChars: atString): atString;
+var
+  i: integer;
+begin
+  Result:= S;
+  for i:= 1 to Length(Result) do
+    if (i=1) or not IsCharWord(S[i-1], SWordChars) then
+      Result[i]:= _CharUp(Result[i])
+    else
+      Result[i]:= _CharLow(Result[i]);
+end;
+
+function SCaseInvert(const S: atString): atString;
+var
+  i: integer;
+begin
+  Result:= S;
+  for i:= 1 to Length(Result) do
+    if S[i]<>UpCase(S[i]) then
+      Result[i]:= _CharUp(Result[i])
+    else
+      Result[i]:= _CharLow(Result[i]);
 end;
 
 initialization

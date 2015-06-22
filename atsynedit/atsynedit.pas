@@ -38,6 +38,13 @@ type
     cDirDown
     );
 
+  TATCaseConvert = (
+    cCaseLower,
+    cCaseUpper,
+    cCaseTitle,
+    cCaseInvert
+    );
+
   TATCommandResult = (
     cResultText,
     cResultCaretAny,
@@ -487,6 +494,7 @@ type
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsAssign(NewCarets: TATCarets);
+    function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
     procedure DoDropText;
     procedure DoFoldbarClick(ALine: integer);
     procedure DoHandleRightClick(X, Y: integer);
