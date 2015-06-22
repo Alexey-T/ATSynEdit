@@ -606,7 +606,13 @@ begin
   begin
     Caret:= Carets[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
-    if not bSel then Continue;
+    if not bSel then
+    begin
+      SFindWordBounds(Strings.Lines[Caret.PosY], Caret.PosX, X1, X2, FOptWordChars);
+      if X1<0 then Continue;
+      Y1:= Caret.PosY;
+      Y2:= Caret.PosY;
+    end;
 
     Str1:= Strings.TextSubstring(X1, Y1, X2, Y2);
     case AMode of
