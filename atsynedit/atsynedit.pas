@@ -211,7 +211,8 @@ type
     cCaretShapeHorzPercents30,
     cCaretShapeHorzPercents35,
     cCaretShapeHorzPercents40,
-    cCaretShapeHorzPercents50
+    cCaretShapeHorzPercents50,
+    cCaretShapeFrameFull
     );
 
 const
@@ -3277,6 +3278,11 @@ begin
     if IntersectRect(R, R, FRectMain) then
     begin
       CanvasInvertRect(C, R, FColors.Caret);
+
+      //frame-shape: invert second time inner area
+      if Shape=cCaretShapeFrameFull then
+        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), FColors.Caret);
+
       if AWithInvalidate then
         InvalidateRect(Handle, @R, false);
     end;
