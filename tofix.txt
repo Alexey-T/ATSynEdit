@@ -1,3 +1,4 @@
 
+--==
 empty ed, not modified: click (move caret), modified is set
 caret: empty ed, cr don't blink first (Focused gets false on win)
