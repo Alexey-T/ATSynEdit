@@ -272,6 +272,13 @@ begin
   DoPaintModeBlinking;
 end;
 
+procedure TATSynEdit.SetCaretBlinkEnabled(AValue: boolean);
+begin
+  if FCaretBlinkEnabled=AValue then Exit;
+  FCaretBlinkEnabled:= AValue;
+  FTimerBlink.Enabled:= FCaretBlinkEnabled;
+end;
+
 
 procedure TATSynEdit.DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
 var

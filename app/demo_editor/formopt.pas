@@ -221,7 +221,7 @@ begin
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
     chkCrUnfocus.Checked:= ed.OptCaretStopUnfocused;
     chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
-    edCrTime.Value:= ed.OptCaretTime;
+    edCrTime.Value:= ed.OptCaretBlinkTime;
     edCrShape.ItemIndex:= Ord(ed.OptCaretShape);
     edCrShape2.ItemIndex:= Ord(ed.OptCaretShapeOvr);
 
@@ -333,7 +333,7 @@ begin
 
       //caret
       ed.OptCaretVirtual:= chkCrVirt.Checked;
-      ed.OptCaretTime:= edCrTime.Value;
+      ed.OptCaretBlinkTime:= edCrTime.Value;
       ed.OptCaretShape:= TATSynCaretShape(edCrShape.ItemIndex);
       ed.OptCaretShapeOvr:= TATSynCaretShape(edCrShape2.ItemIndex);
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
