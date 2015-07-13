@@ -5,13 +5,16 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ATSynEdit;
 
 type
   { TForm1 }
 
   TForm1 = class(TForm)
+    Button1: TButton;
+    procedure Button1Click(Sender: TObject);
+    procedure CheckBox1Change(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     { private declarations }
@@ -39,6 +42,17 @@ begin
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
   ed.LoadFromFile(ExtractFilePath(Application.ExeName)+'unit1.pas');
+end;
+
+procedure TForm1.CheckBox1Change(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  ed.OptCaretBlinkEnabled:= not ed.OptCaretBlinkEnabled;
+  ed.SetFocus;
 end;
 
 end.

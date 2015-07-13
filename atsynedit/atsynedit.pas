@@ -329,6 +329,7 @@ type
     FSelRectBegin,
     FSelRectEnd: TPoint;
     FCarets: TATCarets;
+    FCaretBlinkEnabled: boolean;
     FCaretShapeIns,
     FCaretShapeOvr,
     FCaretShapeRO: TATSynCaretShape;
@@ -583,7 +584,7 @@ type
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
-    function GetCaretTime: integer;
+    function GetCaretBlinkTime: integer;
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoCaretsSort;
     //events
@@ -607,9 +608,10 @@ type
     function GetStrings: TATStrings;
     function GetMouseNiceScroll: boolean;
     procedure SetCaretShapeRO(AValue: TATSynCaretShape);
+    procedure SetCaretBlinkEnabled(AValue: boolean);
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
-    procedure SetCaretTime(AValue: integer);
+    procedure SetCaretBlinkTime(AValue: integer);
     procedure SetCaretShapeIns(AValue: TATSynCaretShape);
     procedure SetCaretShapeOvr(AValue: TATSynCaretShape);
     procedure SetCharSpacingX(AValue: integer);
@@ -905,7 +907,8 @@ type
     property OptCaretShape: TATSynCaretShape read FCaretShapeIns write SetCaretShapeIns;
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr;
     property OptCaretShapeRO: TATSynCaretShape read FCaretShapeRO write SetCaretShapeRO;
-    property OptCaretTime: integer read GetCaretTime write SetCaretTime;
+    property OptCaretBlinkTime: integer read GetCaretBlinkTime write SetCaretBlinkTime;
+    property OptCaretBlinkEnabled: boolean read FCaretBlinkEnabled write SetCaretBlinkEnabled;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
@@ -2050,6 +2053,7 @@ begin
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
+  FCaretBlinkEnabled:= true;
   FCaretShown:= false;
   FCaretShapeIns:= cInitCaretShapeIns;
   FCaretShapeOvr:= cInitCaretShapeOvr;
@@ -2361,7 +2365,7 @@ begin
     Result:= FStringsInt;
 end;
 
-procedure TATSynEdit.SetCaretTime(AValue: integer);
+procedure TATSynEdit.SetCaretBlinkTime(AValue: integer);
 begin
   AValue:= Max(AValue, cMinCaretTime);
   AValue:= Min(AValue, cMaxCaretTime);
@@ -3302,7 +3306,7 @@ begin
   if Assigned(FTimerBlink) then
   begin
     FTimerBlink.Enabled:= false;
-    FTimerBlink.Enabled:= true;
+    FTimerBlink.Enabled:= FCaretBlinkEnabled;
   end;
 end;
 
@@ -3392,7 +3396,7 @@ begin
     FOnCommand(Self, ACommand, Result);
 end;
 
-function TATSynEdit.GetCaretTime: integer;
+function TATSynEdit.GetCaretBlinkTime: integer;
 begin
   Result:= FTimerBlink.Interval;
 end;
