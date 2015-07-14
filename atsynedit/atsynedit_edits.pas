@@ -46,7 +46,8 @@ uses
   ATSynEdit_Keymap_Init;
 
 const
-  cComboDropdownArrowDx = 4;
+  cComboArrowSpace = 24;
+  cComboArrowSize = 4;
 
 { TATEdit }
 
@@ -73,20 +74,15 @@ end;
 
 procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
   const ARect: TRect);
-var
-  dx, size: integer;
 begin
-  dx:= cComboDropdownArrowDx;
-  size:= (OptMicromapWidth-2*dx) div 2;
-
-  C.Brush.Color:= Colors.TextBG;
+  C.Brush.Color:= Colors.ComboboxArrowBG;
   C.FillRect(ARect);
 
   CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
     Point(
-      ARect.Left+dx,
-      (ARect.Top+ARect.Bottom) div 2 - size div 2),
-    size);
+      (ARect.Left+ARect.Right) div 2 - cComboArrowSize,
+      (ARect.Top+ARect.Bottom) div 2 - cComboArrowSize div 2),
+    cComboArrowSize);
 end;
 
 procedure TATComboEdit.DoMenu;
@@ -142,7 +138,7 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapWidth:= 16;
+  OptMicromapWidth:= cComboArrowSpace;
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
 end;

@@ -104,7 +104,8 @@ type
     FBlockStaple,
     FBlockSepLine,
     FLockedBG,
-    FComboboxArrow: TColor;
+    FComboboxArrow,
+    FComboboxArrowBG: TColor;
   published
     property TextFont: TColor read FTextFont write FTextFont;
     property TextBG: TColor read FTextBG write FTextBG;
@@ -142,6 +143,7 @@ type
     property LockedBG: TColor read FLockedBG write FLockedBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
     property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
+    property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
   end;
 
   TATAutoIndentKind = (
