@@ -60,6 +60,7 @@ object fmMain: TfmMain
     Colors.LockedBG = 14737632
     Colors.TextHintFont = clGray
     Colors.ComboboxArrow = clGray
+    Colors.ComboboxArrowBG = 15790320
     WantTabs = True
     OptTabSpaces = False
     OptTabSize = 10
@@ -221,6 +222,7 @@ object fmMain: TfmMain
       Colors.LockedBG = 14737632
       Colors.TextHintFont = clGray
       Colors.ComboboxArrow = clGray
+      Colors.ComboboxArrowBG = 15790320
       WantTabs = False
       OptTabSpaces = False
       OptTabSize = 10
@@ -271,7 +273,7 @@ object fmMain: TfmMain
       OptMinimapShowSelBorder = False
       OptMinimapShowSelAlways = True
       OptMicromapVisible = True
-      OptMicromapWidth = 16
+      OptMicromapWidth = 32
       OptCharSpacingX = 0
       OptCharSpacingY = 1
       OptWrapMode = cWrapOff
@@ -323,6 +325,7 @@ object fmMain: TfmMain
       OptUndoAfterSave = True
       OptSavingForceFinalEol = False
       OptSavingTrimSpaces = False
+      OptComboboxArrowSize = 6
     end
     object combo1: TATComboEdit
       Left = 8
@@ -373,6 +376,7 @@ object fmMain: TfmMain
       Colors.LockedBG = 14737632
       Colors.TextHintFont = clGray
       Colors.ComboboxArrow = clGray
+      Colors.ComboboxArrowBG = 15790320
       WantTabs = False
       OptTabSpaces = False
       OptTabSize = 10
@@ -475,6 +479,7 @@ object fmMain: TfmMain
       OptUndoAfterSave = True
       OptSavingForceFinalEol = False
       OptSavingTrimSpaces = False
+      OptComboboxArrowSize = 4
     end
     object Edit1: TEdit
       Left = 8
