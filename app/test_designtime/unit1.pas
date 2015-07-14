@@ -19,7 +19,8 @@ type
     Panel1: TPanel;
     procedure FormShow(Sender: TObject);
   private
-    { private declarations }
+   combo2: TATComboedit;
+   { private declarations }
   public
     { public declarations }
   end;
@@ -40,8 +41,14 @@ begin
   ed.Strings.LineAdd('test');
   ed.Strings.LineAdd('test...');
   ed.Update(true);
-end;
 
+  combo2:= tatcomboedit.create(Self);
+  combo2.parent:= panel1;
+  combo2.left:= 350;
+  combo2.width:= 300;
+  combo2.top:= 20;
+
+end;
 
 end.
 

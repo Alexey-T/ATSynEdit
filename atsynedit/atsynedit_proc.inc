@@ -126,5 +126,6 @@ begin
   C.BlockSepLine:= clMedGray;
   C.LockedBG:= $e0e0e0;
   C.ComboboxArrow:= clGray;
+  C.ComboboxArrowBG:= $f0f0f0;
 end;
 

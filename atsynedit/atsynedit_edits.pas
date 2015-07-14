@@ -26,6 +26,7 @@ type
   private
     FItems: TStringList;
     FMenu: TPopupMenu;
+    FArrowSize: integer;
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure DoMenu;
@@ -35,6 +36,8 @@ type
     destructor Destroy; override;
     property Items: TStringList read FItems;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
+  published
+    property OptComboboxArrowSize: integer read FArrowSize write FArrowSize;
   end;
 
 
@@ -44,9 +47,6 @@ uses
   Types,
   ATSynEdit_Commands,
   ATSynEdit_Keymap_Init;
-
-const
-  cComboDropdownArrowDx = 4;
 
 { TATEdit }
 
@@ -66,6 +66,20 @@ end;
 
 { TATComboEdit }
 
+constructor TATComboEdit.Create(AOwner: TComponent);
+begin
+  inherited;
+
+  FItems:= TStringList.Create;
+  FMenu:= TPopupMenu.Create(Self);
+
+  OptMicromapVisible:= true;
+  OptMicromapWidth:= 22;
+  OptComboboxArrowSize:= 4;
+  OnClickMicromap:= @MicromapClick;
+  OnDrawMicromap:= @MicromapDraw;
+end;
+
 procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
 begin
   DoMenu;
@@ -73,20 +87,15 @@ end;
 
 procedure TATComboEdit.MicromapDraw(Sender: TObject; C: TCanvas;
   const ARect: TRect);
-var
-  dx, size: integer;
 begin
-  dx:= cComboDropdownArrowDx;
-  size:= (OptMicromapWidth-2*dx) div 2;
-
-  C.Brush.Color:= Colors.TextBG;
+  C.Brush.Color:= Colors.ComboboxArrowBG;
   C.FillRect(ARect);
 
   CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
     Point(
-      ARect.Left+dx,
-      (ARect.Top+ARect.Bottom) div 2 - size div 2),
-    size);
+      (ARect.Left+ARect.Right) div 2 - FArrowSize,
+      (ARect.Top+ARect.Bottom) div 2 - FArrowSize div 2),
+    FArrowSize);
 end;
 
 procedure TATComboEdit.DoMenu;
@@ -132,19 +141,6 @@ begin
   begin
     DoMenu;
   end;
-end;
-
-constructor TATComboEdit.Create(AOwner: TComponent);
-begin
-  inherited;
-
-  FItems:= TStringList.Create;
-  FMenu:= TPopupMenu.Create(Self);
-
-  OptMicromapVisible:= true;
-  OptMicromapWidth:= 16;
-  OnClickMicromap:= @MicromapClick;
-  OnDrawMicromap:= @MicromapDraw;
 end;
 
 destructor TATComboEdit.Destroy;
