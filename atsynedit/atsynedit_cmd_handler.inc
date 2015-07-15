@@ -53,7 +53,7 @@ begin
     Exit
   end;
 
-  Result:= FKeymap.FindCommand(Shortcut);
+  Result:= FKeymap.GetCommandFromShortcut(Shortcut);
 end;
 
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);

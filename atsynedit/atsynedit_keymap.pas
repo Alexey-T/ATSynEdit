@@ -10,17 +10,20 @@ uses
   Classes, SysUtils;
 
 const
-  cMaxKeyCombo = 8;
+  cMaxKeyCombo = 6;
+
+type
+  TATKeyArray = array[0..Pred(cMaxKeyCombo)] of TShortcut;
 
 type
   { TATKeymapItem }
-  TATKeymapKeys = array[0..Pred(cMaxKeyCombo)] of TShortcut;
+
   TATKeymapItem = class
   public
     Command: integer;
     Name: string;
     Keys1,
-    Keys2: TATKeymapKeys;
+    Keys2: TATKeyArray;
   end;
 
 type
@@ -29,10 +32,12 @@ type
   TATKeymap = class
   private
     FList: TList;
-    FStack: TATKeymapKeys;
+    FHistory: TATKeyArray;
     function GetItem(N: integer): TATKeymapItem;
-    function GetKeysLen(const AKeys: TATKeymapKeys): integer;
-  public
+    procedure ClearHistory;
+    procedure AddToHistory(sh: TShortcut);
+    function IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut): boolean;
+ public
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
@@ -42,10 +47,7 @@ type
     procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string);
     function IndexOf(ACmd: integer): integer;
     function GetShortcutFromCommand(ACode: integer): TShortcut;
-    function FindCommand(AKey: TShortcut): integer;
-    function IsMatchedKeys(const AKeys: TATKeymapKeys; AKey: TShortcut): boolean;
-    procedure ClearStack;
-    procedure AddToStack(sh: TShortcut);
+    function GetCommandFromShortcut(AKey: TShortcut): integer;
   end;
 
 implementation
@@ -55,17 +57,27 @@ uses
   LCLProc,
   Dialogs;
 
+function GetKeysLen(const AKeys: TATKeyArray): integer;
+var
+  i: integer;
+begin
+  Result:= 0;
+  for i:= Low(AKeys) to High(AKeys) do
+    if AKeys[i]<>0 then
+      Inc(Result);
+end;
+
 { TATKeymap }
 
 constructor TATKeymap.Create;
 begin
   FList:= TList.Create;
-  ClearStack;
+  ClearHistory;
 end;
 
 destructor TATKeymap.Destroy;
 begin
-  ClearStack;
+  ClearHistory;
   Clear;
   FreeAndNil(FList);
   inherited;
@@ -149,7 +161,7 @@ begin
     end;
 end;
 
-function TATKeymap.FindCommand(AKey: TShortcut): integer;
+function TATKeymap.GetCommandFromShortcut(AKey: TShortcut): integer;
 var
   i: integer;
 begin
@@ -159,14 +171,14 @@ begin
       IsMatchedKeys(Items[i].Keys2, AKey) then
     begin
       Result:= Items[i].Command;
-      ClearStack;
+      ClearHistory;
       Exit
     end;
 
-  AddToStack(AKey);
+  AddToHistory(AKey);
 end;
 
-function TATKeymap.IsMatchedKeys(const AKeys: TATKeymapKeys; AKey: TShortcut): boolean;
+function TATKeymap.IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut): boolean;
 var
   i, len, lenst, index_st: integer;
 begin
@@ -185,47 +197,38 @@ begin
   if AKeys[len-1]<>AKey then Exit;
 
   //stack filled?
-  lenst:= GetKeysLen(FStack);
+  lenst:= GetKeysLen(FHistory);
   if lenst<len-1 then Exit;
 
   //first keys (except last) of combo lie in stack?
   for i:= len-2 downto 0 do
   begin
     index_st:= lenst-1-(len-2-i);
-    if (index_st>=Low(FStack)) and (index_st<=High(FStack)) then
-      if AKeys[i]<>FStack[index_st] then Exit;
+    if (index_st>=Low(FHistory)) and (index_st<=High(FHistory)) then
+      if AKeys[i]<>FHistory[index_st] then Exit;
   end;
 
   Result:= true;
 end;
 
-procedure TATKeymap.ClearStack;
+procedure TATKeymap.ClearHistory;
 begin
-  FillChar(FStack, Sizeof(FStack), 0);
+  FillChar(FHistory, Sizeof(FHistory), 0);
 end;
 
-procedure TATKeymap.AddToStack(sh: TShortcut);
+procedure TATKeymap.AddToHistory(sh: TShortcut);
 var
   len: integer;
 begin
-  len:= GetKeysLen(FStack);
-  if len>=Length(FStack) then
+  len:= GetKeysLen(FHistory);
+  if len>=Length(FHistory) then
   begin
-    ClearStack;
-    len:= GetKeysLen(FStack);
+    ClearHistory;
+    len:= GetKeysLen(FHistory);
   end;
-  FStack[len]:= sh;
+  FHistory[len]:= sh;
 end;
 
-function TATKeymap.GetKeysLen(const AKeys: TATKeymapKeys): integer;
-var
-  i: integer;
-begin
-  Result:= 0;
-  for i:= Low(AKeys) to High(AKeys) do
-    if AKeys[i]<>0 then
-      Inc(Result);
-end;
 
 end.
 
