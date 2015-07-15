@@ -1,6 +1,6 @@
 unit ATSynEdit_Keymap_Init;
 
-{$define test_combo}
+//{$define test_combo}
 
 interface
 
