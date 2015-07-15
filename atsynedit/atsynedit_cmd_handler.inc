@@ -53,16 +53,7 @@ begin
     Exit
   end;
 
-  for i:= 0 to FKeymap.Count-1 do
-  begin
-    Item:= FKeymap[i];
-    if Item.IsItemMatches(Shortcut) then
-    begin
-      Result:= Item.Command;
-      Key:= 0;
-      Break
-    end;
-  end;
+  Result:= FKeymap.FindCommand(Shortcut);
 end;
 
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);

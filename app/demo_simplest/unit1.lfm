@@ -4,19 +4,7 @@ object Form1: TForm1
   Top = 262
   Width = 690
   Caption = 'Demo'
-  ClientHeight = 391
-  ClientWidth = 690
   OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.4.0.4'
-  object Button1: TButton
-    Left = 0
-    Height = 25
-    Top = 366
-    Width = 690
-    Align = alBottom
-    Caption = 'toggle crt blink'
-    OnClick = Button1Click
-    TabOrder = 0
-  end
 end

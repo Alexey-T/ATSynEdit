@@ -1,5 +1,7 @@
 unit ATSynEdit_Keymap_Init;
 
+{$define test_combo}
+
 interface
 
 uses
@@ -128,8 +130,13 @@ begin
   M.Add(cCommand_CaretsExtendDownPage, 'carets extend: down a page', [], []);
   M.Add(cCommand_CaretsExtendDownToEnd, 'carets extend: down to end', [], []);
 
+  {$ifdef test_combo}
+  M.Add(cCommand_ZoomIn, 'zoom in', ['Ctrl+B', 'Ctrl+P'], []);
+  M.Add(cCommand_ZoomOut, 'zoom out', ['Ctrl+B', 'Ctrl+B', 'Ctrl+M'], []);
+  {$else}
   M.Add(cCommand_ZoomIn, 'zoom in', [], []);
   M.Add(cCommand_ZoomOut, 'zoom out', [], []);
+  {$endif}
 
   M.Add(cCommand_TextCaseLower, 'convert case: lower case', [], []);
   M.Add(cCommand_TextCaseUpper, 'convert case: upper case', [], []);
