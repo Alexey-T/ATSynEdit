@@ -21,7 +21,7 @@ var
   OptUnprintedEndFontScale: integer = 80;
   OptUnprintedEndFontDx: integer = 3;
   OptUnprintedEndFontDy: integer = 2;
-
+  OptUnprintedEndArrowOrDot: boolean = true;
 
 type
   TATLineStyle = (
@@ -160,6 +160,30 @@ begin
   C.LineTo(X2-Dx, Y-Dx);
   C.MoveTo(X2, Y);
   C.LineTo(X2-Dx, Y+Dx);
+end;
+
+
+procedure DoPaintUnprintedArrowDown(C: TCanvas;
+  const ARect: TRect;
+  AColorFont: TColor);
+const
+  cIndent = 3; //offset up/down
+var
+  X, Y1, Y2, Dx: integer;
+begin
+  X:= (ARect.Left+ARect.Right) div 2;
+  Dx:= (ARect.Bottom-ARect.Top) * OptUnprintedTabPointerScale div 100;
+  C.Pen.Color:= AColorFont;
+
+  Y1:= ARect.Top+cIndent;
+  Y2:= ARect.Bottom-cIndent;
+
+  C.MoveTo(X, Y1);
+  C.LineTo(X, Y2);
+  C.MoveTo(X, Y2);
+  C.LineTo(X-Dx, Y2-Dx);
+  C.MoveTo(X, Y2);
+  C.LineTo(X+Dx, Y2-Dx);
 end;
 
 procedure DoPaintUnprintedChars(C: TCanvas;
@@ -407,10 +431,15 @@ begin
   end
   else
   begin
-    DoPaintUnprintedSpace(C,
-      Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
-      OptUnprintedEndDotScale,
-      AColorFont);
+    if OptUnprintedEndArrowOrDot then
+      DoPaintUnprintedArrowDown(C,
+        Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+        AColorFont)
+    else
+      DoPaintUnprintedSpace(C,
+        Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+        OptUnprintedEndDotScale,
+        AColorFont);
   end;
 end;
 

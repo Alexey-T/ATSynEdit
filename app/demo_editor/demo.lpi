@@ -10,7 +10,6 @@
       <Title Value="Demo"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
-      <Icon Value="0"/>
     </General>
     <i18n>
       <EnableI18N LFM="False"/>
@@ -45,6 +44,7 @@
         <ComponentName Value="fmMain"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+        <UnitName Value="formmain"/>
       </Unit1>
       <Unit2>
         <Filename Value="formkey.pas"/>
@@ -93,12 +93,10 @@
       <Unit12>
         <Filename Value="..\..\atsynedit\atsynedit_keymap.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Keymap"/>
       </Unit12>
       <Unit13>
         <Filename Value="..\..\atsynedit\atstringproc.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc"/>
       </Unit13>
       <Unit14>
         <Filename Value="..\..\atsynedit\atstringproc_wordjump.pas"/>
@@ -107,7 +105,6 @@
       <Unit15>
         <Filename Value="..\..\atsynedit\atstrings.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStrings"/>
       </Unit15>
       <Unit16>
         <Filename Value="..\..\atsynedit\atsynedit_carets.pas"/>
@@ -116,17 +113,14 @@
       <Unit17>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit"/>
       </Unit17>
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Commands"/>
       </Unit18>
       <Unit19>
         <Filename Value="..\..\atsynedit\atsynedit_keymap_init.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Keymap_Init"/>
       </Unit19>
       <Unit20>
         <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
@@ -154,7 +148,6 @@
       <Unit25>
         <Filename Value="..\..\atsynedit\atstrings_undo.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStrings_Undo"/>
       </Unit25>
       <Unit26>
         <Filename Value="..\..\atsynedit\atstrings_save.inc"/>
@@ -163,7 +156,6 @@
       <Unit27>
         <Filename Value="..\..\atsynedit\atsynedit_wrapinfo.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_WrapInfo"/>
       </Unit27>
       <Unit28>
         <Filename Value="..\..\atsynedit\atsynedit_cmd_sel.inc"/>
@@ -176,7 +168,6 @@
       <Unit30>
         <Filename Value="..\..\atsynedit\atsynedit_edits.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Edits"/>
       </Unit30>
       <Unit31>
         <Filename Value="formcombo.pas"/>
@@ -188,7 +179,6 @@
       <Unit32>
         <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Ranges"/>
       </Unit32>
       <Unit33>
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>
@@ -197,7 +187,6 @@
       <Unit34>
         <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Adapters"/>
       </Unit34>
     </Units>
   </ProjectOptions>
