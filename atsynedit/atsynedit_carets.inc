@@ -276,7 +276,8 @@ procedure TATSynEdit.SetCaretBlinkEnabled(AValue: boolean);
 begin
   if FCaretBlinkEnabled=AValue then Exit;
   FCaretBlinkEnabled:= AValue;
-  FTimerBlink.Enabled:= FCaretBlinkEnabled;
+  DoPaintModeStatic;
+  DoPaintModeBlinking;
 end;
 
 
