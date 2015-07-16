@@ -12,10 +12,8 @@ type
   { TfmMain }
 
   TfmMain = class(TForm)
-    combo: TATComboEdit;
-    combo1: TATComboEdit;
+    ATComboEdit1: TATComboEdit;
     ed: TATSynEdit;
-    Edit1: TEdit;
     Panel1: TPanel;
     procedure FormShow(Sender: TObject);
   private

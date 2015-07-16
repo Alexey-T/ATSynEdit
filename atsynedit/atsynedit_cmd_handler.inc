@@ -45,15 +45,15 @@ begin
   if IsEditableTextKey(Key) and ((Shift=[]) or (Shift=[ssShift])) then
     Exit;
 
-  Shortcut:= KeyToShortCut(Key, Shift);
-
   if not Assigned(FKeymap) then
   begin
     ShowMessage('Keymap not assigned: can''t use keys');
     Exit
   end;
 
+  Shortcut:= KeyToShortCut(Key, Shift);
   Result:= FKeymap.GetCommandFromShortcut(Shortcut);
+  Key:= 0;
 end;
 
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);

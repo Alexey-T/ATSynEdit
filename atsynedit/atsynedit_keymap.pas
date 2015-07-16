@@ -7,7 +7,7 @@ unit ATSynEdit_Keymap;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, Forms;
 
 const
   cMaxKeyCombo = 6;
@@ -175,7 +175,8 @@ begin
       Exit
     end;
 
-  AddToHistory(AKey);
+  if AKey>0 then
+    AddToHistory(AKey);
 end;
 
 function TATKeymap.IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut): boolean;
