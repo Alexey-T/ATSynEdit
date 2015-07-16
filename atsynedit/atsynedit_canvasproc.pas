@@ -22,6 +22,7 @@ var
   OptUnprintedEndFontDx: integer = 3;
   OptUnprintedEndFontDy: integer = 2;
   OptUnprintedEndArrowOrDot: boolean = true;
+  OptUnprintedEndArrowLength: integer = 70;
 
 type
   TATLineStyle = (
@@ -166,17 +167,16 @@ end;
 procedure DoPaintUnprintedArrowDown(C: TCanvas;
   const ARect: TRect;
   AColorFont: TColor);
-const
-  cIndent = 3; //offset up/down
 var
-  X, Y1, Y2, Dx: integer;
+  Len, X, Y1, Y2, Dx: integer;
 begin
   X:= (ARect.Left+ARect.Right) div 2;
+  Len:= (ARect.Bottom-ARect.Top) * OptUnprintedEndArrowLength div 100;
   Dx:= (ARect.Bottom-ARect.Top) * OptUnprintedTabPointerScale div 100;
   C.Pen.Color:= AColorFont;
 
-  Y1:= ARect.Top+cIndent;
-  Y2:= ARect.Bottom-cIndent;
+  Y1:= (ARect.Bottom+ARect.Top-Len) div 2;
+  Y2:= Y1+Len;
 
   C.MoveTo(X, Y1);
   C.LineTo(X, Y2);
