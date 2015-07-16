@@ -51,6 +51,7 @@
       <Unit2>
         <Filename Value="..\..\atsynedit\atsynedit.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit"/>
       </Unit2>
     </Units>
   </ProjectOptions>
