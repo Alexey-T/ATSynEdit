@@ -1483,6 +1483,8 @@ end;
 
 procedure TATSynEdit.DoPaintTo(C: TCanvas; ALineFrom: integer);
 begin
+  if csLoading in ComponentState then Exit;
+
   C.Brush.Color:= FColors.TextBG;
   C.FillRect(ClientRect);
 

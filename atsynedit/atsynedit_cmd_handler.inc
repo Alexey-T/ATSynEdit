@@ -18,12 +18,11 @@ var
   Str: atString;
 begin
   inherited;
-  Str:= UTF8Decode(UTF8Key);
 
   //skip control Ascii chars
-  if Length(Str)>0 then
-    if AnsiChar(Str[1])<' ' then Exit;
+  if Ord(UTF8Key[1])<32 then Exit;
 
+  Str:= Utf8Decode(Utf8Key);
   DoCommand(cCommand_TextInsert, Str);
 end;
 
