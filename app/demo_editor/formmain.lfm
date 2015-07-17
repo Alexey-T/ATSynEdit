@@ -4,7 +4,7 @@ object fmMain: TfmMain
   Top = 111
   Width = 953
   Caption = 'Demo'
-  ClientHeight = 478
+  ClientHeight = 498
   ClientWidth = 953
   Menu = MainMenu1
   OnCreate = FormCreate
@@ -12,65 +12,65 @@ object fmMain: TfmMain
   OnResize = FormResize
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.4.2.0'
   object PanelMain: TPanel
     Left = 0
-    Height = 478
+    Height = 498
     Top = 0
     Width = 672
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 478
+    ClientHeight = 498
     ClientWidth = 672
     TabOrder = 0
     object Status: TStatusBar
       Left = 0
-      Height = 23
-      Top = 455
+      Height = 21
+      Top = 477
       Width = 672
       Panels = <>
     end
   end
   object PanelRt: TPanel
     Left = 672
-    Height = 478
+    Height = 498
     Top = 0
     Width = 281
     Align = alRight
     BevelOuter = bvNone
-    ClientHeight = 478
+    ClientHeight = 498
     ClientWidth = 281
     TabOrder = 1
     object chkGutter: TCheckBox
       Left = 8
-      Height = 19
+      Height = 24
       Top = 8
-      Width = 52
+      Width = 68
       Caption = 'gutter'
       OnChange = chkGutterChange
       TabOrder = 0
     end
     object chkRuler: TCheckBox
       Left = 8
-      Height = 19
+      Height = 24
       Top = 28
-      Width = 44
+      Width = 58
       Caption = 'ruler'
       OnChange = chkRulerChange
       TabOrder = 1
     end
     object chkMinimap: TCheckBox
       Left = 8
-      Height = 19
+      Height = 24
       Top = 48
-      Width = 68
+      Width = 85
       Caption = 'minimap'
       OnChange = chkMinimapChange
       TabOrder = 2
     end
     object edSpaceX: TSpinEdit
       Left = 8
-      Height = 23
+      Height = 27
       Top = 240
       Width = 52
       MaxValue = 10
@@ -80,23 +80,23 @@ object fmMain: TfmMain
     end
     object Label1: TLabel
       Left = 67
-      Height = 15
+      Height = 17
       Top = 244
-      Width = 51
+      Width = 63
       Caption = 'spacing-x'
       ParentColor = False
     end
     object Label2: TLabel
       Left = 67
-      Height = 15
+      Height = 17
       Top = 308
-      Width = 38
+      Width = 47
       Caption = 'margin'
       ParentColor = False
     end
     object edMarRt: TSpinEdit
       Left = 8
-      Height = 23
+      Height = 27
       Top = 304
       Width = 52
       MaxValue = 200
@@ -111,14 +111,14 @@ object fmMain: TfmMain
       Top = 4
       Width = 128
       Caption = 'wrap'
-      ClientHeight = 84
+      ClientHeight = 85
       ClientWidth = 124
       TabOrder = 11
       object chkWrapOff: TRadioButton
         Left = 8
-        Height = 19
+        Height = 24
         Top = 0
-        Width = 35
+        Width = 46
         Caption = 'off'
         Checked = True
         OnChange = chkWrapOffChange
@@ -127,27 +127,27 @@ object fmMain: TfmMain
       end
       object chkWrapOn: TRadioButton
         Left = 8
-        Height = 19
+        Height = 24
         Top = 20
-        Width = 59
+        Width = 76
         Caption = 'at edge'
         OnChange = chkWrapOnChange
         TabOrder = 1
       end
       object chkWrapMargin: TRadioButton
         Left = 8
-        Height = 19
+        Height = 24
         Top = 40
-        Width = 71
+        Width = 90
         Caption = 'at margin'
         OnChange = chkWrapMarginChange
         TabOrder = 2
       end
       object chkWrapIndent: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 60
-        Width = 80
+        Width = 101
         Caption = 'with indent'
         OnChange = chkWrapIndentChange
         TabOrder = 3
@@ -155,7 +155,7 @@ object fmMain: TfmMain
     end
     object edFontsize: TSpinEdit
       Left = 8
-      Height = 23
+      Height = 27
       Top = 176
       Width = 52
       MaxValue = 40
@@ -166,9 +166,9 @@ object fmMain: TfmMain
     end
     object Label4: TLabel
       Left = 67
-      Height = 15
+      Height = 17
       Top = 180
-      Width = 44
+      Width = 58
       Caption = 'font size'
       ParentColor = False
     end
@@ -178,41 +178,41 @@ object fmMain: TfmMain
       Top = 108
       Width = 128
       Caption = 'unprintable'
-      ClientHeight = 84
+      ClientHeight = 85
       ClientWidth = 124
       TabOrder = 12
       object chkUnprintVis: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 1
-        Width = 48
+        Width = 61
         Caption = 'show'
         OnChange = chkUnprintVisChange
         TabOrder = 0
       end
       object chkUnprintSp: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 20
-        Width = 55
+        Width = 72
         Caption = 'spaces'
         OnChange = chkUnprintSpChange
         TabOrder = 1
       end
       object chkUnprintEnd: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 40
-        Width = 45
+        Width = 58
         Caption = 'ends'
         OnChange = chkUnprintEndChange
         TabOrder = 2
       end
       object chkUnprintEndDet: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 60
-        Width = 79
+        Width = 101
         Caption = 'end-details'
         OnChange = chkUnprintEndDetChange
         TabOrder = 3
@@ -220,7 +220,7 @@ object fmMain: TfmMain
     end
     object edTabsize: TSpinEdit
       Left = 8
-      Height = 23
+      Height = 27
       Top = 208
       Width = 52
       MaxValue = 12
@@ -231,9 +231,9 @@ object fmMain: TfmMain
     end
     object Label5: TLabel
       Left = 67
-      Height = 15
+      Height = 17
       Top = 212
-      Width = 39
+      Width = 52
       Caption = 'tab size'
       ParentColor = False
     end
@@ -248,16 +248,16 @@ object fmMain: TfmMain
     end
     object chkMicromap: TCheckBox
       Left = 8
-      Height = 19
+      Height = 24
       Top = 68
-      Width = 75
+      Width = 95
       Caption = 'micromap'
       OnChange = chkMicromapChange
       TabOrder = 3
     end
     object edSpaceY: TSpinEdit
       Left = 8
-      Height = 23
+      Height = 27
       Top = 272
       Width = 52
       MaxValue = 10
@@ -267,9 +267,9 @@ object fmMain: TfmMain
     end
     object Label6: TLabel
       Left = 67
-      Height = 15
+      Height = 17
       Top = 276
-      Width = 52
+      Width = 62
       Caption = 'spacing-y'
       ParentColor = False
     end
