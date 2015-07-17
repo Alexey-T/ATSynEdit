@@ -15,6 +15,8 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkMsNormalSel: TCheckBox;
+    chkMsColumnSel: TCheckBox;
     chkUnprintArrowDown: TCheckBox;
     chkShowFullHilite: TCheckBox;
     chkMsHideCursor: TCheckBox;
@@ -284,6 +286,8 @@ begin
     chkPageKeepRel.Checked:= ed.OptKeyPageKeepsRelativePos;
 
     //mouse
+    chkMsNormalSel.Checked:= ed.OptMouseEnableNormalSelection;
+    chkMsColumnSel.Checked:= ed.OptMouseEnableColumnSelection;
     chkMsClick2.Checked:= ed.OptMouse2ClickSelectsLine;
     chkMsClick3.Checked:= ed.OptMouse3ClickSelectsLine;
     chkMsClick2Drag.Checked:= ed.OptMouse2ClickDragSelectsWords;
@@ -400,6 +404,8 @@ begin
       ed.OptIndentKeepsAlign:= chkUnindentKeepAlign.Checked;
 
       //mouse
+      ed.OptMouseEnableNormalSelection:= chkMsNormalSel.Checked;
+      ed.OptMouseEnableColumnSelection:= chkMsColumnSel.Checked;
       ed.OptMouse2ClickSelectsLine:= chkMsClick2.Checked;
       ed.OptMouse3ClickSelectsLine:= chkMsClick3.Checked;
       ed.OptMouse2ClickDragSelectsWords:= chkMsClick2Drag.Checked;
