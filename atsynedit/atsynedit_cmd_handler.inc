@@ -24,13 +24,12 @@ begin
 
   Str:= Utf8Decode(Utf8Key);
   DoCommand(cCommand_TextInsert, Str);
+  Utf8Key:= '';
 end;
 
 function TATSynEdit.GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
 var
   Shortcut: TShortcut;
-  Item: TATKeymapItem;
-  i: integer;
 begin
   Result:= 0;
 
