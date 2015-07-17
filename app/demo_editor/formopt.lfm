@@ -9,7 +9,7 @@ object fmOpt: TfmOpt
   ClientWidth = 640
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.4.0.4'
+  LCLVersion = '1.4.2.0'
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 25
@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet8
-    TabIndex = 8
+    ActivePage = TabSheet3
+    TabIndex = 4
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -780,75 +780,91 @@ object fmOpt: TfmOpt
       ClientWidth = 620
       object chkMsClick2: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 8
-        Width = 185
+        Width = 236
         Caption = 'dbl click selects line (else word)'
         TabOrder = 0
       end
       object chkMsClick3: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 28
-        Width = 134
+        Width = 173
         Caption = 'triple click selects line'
         TabOrder = 1
       end
       object chkMsClick2Drag: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 48
-        Width = 175
+        Width = 221
         Caption = 'dbl click + drag selects words'
         TabOrder = 2
       end
       object chkMsDragDrop: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 68
-        Width = 104
+        Width = 135
         Caption = 'drag-drop of txt'
         TabOrder = 3
       end
       object chkMsRtClickMove: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 88
-        Width = 139
+        Width = 176
         Caption = 'right click moves caret'
         TabOrder = 4
       end
       object chkMsClickNumSel: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 108
-        Width = 166
+        Width = 208
         Caption = 'click on number selects line'
         TabOrder = 5
       end
       object chkMsNiceScroll: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 128
-        Width = 262
+        Width = 327
         Caption = 'browser-scroll: middle click and mouse-move'
         TabOrder = 6
       end
       object chkMsMenuDown: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 148
-        Width = 246
+        Width = 303
         Caption = 'right click: menu on mouse down (else up)'
         TabOrder = 7
       end
       object chkMsHideCursor: TCheckBox
         Left = 9
-        Height = 19
+        Height = 24
         Top = 170
-        Width = 155
+        Width = 197
         Caption = 'hide cursor on typing text'
         TabOrder = 8
+      end
+      object chkMsNormalSel: TCheckBox
+        Left = 304
+        Height = 24
+        Top = 8
+        Width = 218
+        Caption = 'normal selection with mouse'
+        TabOrder = 9
+      end
+      object chkMsColumnSel: TCheckBox
+        Left = 304
+        Height = 24
+        Top = 28
+        Width = 260
+        Caption = 'column selection (Alt+) with mouse'
+        TabOrder = 10
       end
     end
     object TabSheet4: TTabSheet
@@ -976,9 +992,10 @@ object fmOpt: TfmOpt
           'HorzPercents50'
           'Frame'
         )
-        ItemHeight = 23
+        ItemHeight = 0
         ScrollWidth = 115
         TabOrder = 7
+        TopIndex = -1
         Visible = False
       end
     end

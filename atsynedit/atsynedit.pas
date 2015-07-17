@@ -425,6 +425,8 @@ type
     FOptShowStapleStyle: TATLineStyle;
     FOptShowStapleIndent: integer;
     FOptShowStapleWidthPercent: integer;
+    FOptMouseEnableNormalSelection: boolean;
+    FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptShowScrollHint: boolean;
@@ -950,6 +952,8 @@ type
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
     property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
+    property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection;
+    property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection;
     property OptMouseDownForPopup: boolean read FOptMouseDownForPopup write FOptMouseDownForPopup;
     property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor;
     property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine;
@@ -2234,6 +2238,8 @@ begin
   FOptShowScrollHint:= false;
   FOptCaretPreferLeftSide:= true;
   FOptMouseDownForPopup:= false;
+  FOptMouseEnableNormalSelection:= true;
+  FOptMouseEnableColumnSelection:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
@@ -2987,14 +2993,15 @@ begin
           if P.Y>=0 then
           begin
             //drag w/out button pressed: single selection
-            if [ssXControl, ssShift, ssAlt]*Shift=[] then
-            begin
-              DoCaretSingleAsIs;
-              if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
-                DoSelect_WordRange(0, FMouseDownPnt, P)
-              else
-                DoSelect_CharRange(0, P);
-            end;
+            if FOptMouseEnableNormalSelection then
+              if [ssXControl, ssShift, ssAlt]*Shift=[] then
+              begin
+                DoCaretSingleAsIs;
+                if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
+                  DoSelect_WordRange(0, FMouseDownPnt, P)
+                else
+                  DoSelect_CharRange(0, P);
+              end;
 
             //drag with Ctrl pressed: add selection
             if Shift=[ssXControl, ssLeft] then
@@ -3004,12 +3011,13 @@ begin
             end;
 
             //drag with Alt pressed
-            if Shift=[ssAlt, ssLeft] then
-            begin
-              DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
-              DoSelect_None;
-              DoSelect_ColumnBlock(FMouseDownPnt, P);
-            end;
+            if FOptMouseEnableColumnSelection then
+              if Shift=[ssAlt, ssLeft] then
+              begin
+                DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+                DoSelect_None;
+                DoSelect_ColumnBlock(FMouseDownPnt, P);
+              end;
 
             DoCaretsSort;
             DoEventCarets;
