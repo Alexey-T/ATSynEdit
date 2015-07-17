@@ -24,13 +24,12 @@ begin
 
   Str:= Utf8Decode(Utf8Key);
   DoCommand(cCommand_TextInsert, Str);
+  Utf8Key:= '';
 end;
 
 function TATSynEdit.GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
 var
   Shortcut: TShortcut;
-  Item: TATKeymapItem;
-  i: integer;
 begin
   Result:= 0;
 
@@ -46,13 +45,14 @@ begin
 
   if not Assigned(FKeymap) then
   begin
-    ShowMessage('Keymap not assigned: can''t use keys');
+    ShowMessage('Keymap not assigned: cannot input keys');
     Exit
   end;
 
   Shortcut:= KeyToShortCut(Key, Shift);
   Result:= FKeymap.GetCommandFromShortcut(Shortcut);
-  Key:= 0;
+  if Result>0 then
+    Key:= 0;
 end;
 
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
