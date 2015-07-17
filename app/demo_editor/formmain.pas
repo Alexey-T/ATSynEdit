@@ -146,7 +146,6 @@ type
     ed: TATSynEdit;
     wait: boolean;
     FDir: string;
-    FIniName: string;
     FFileName: string;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
@@ -240,13 +239,11 @@ procedure TfmMain.FormShow(Sender: TObject);
 var
   fn: string;
 begin
-  FIniName:= ExtractFilePath(Application.ExeName)+'saved.ini';
-
   if wait then UpdateChecks;
   wait:= false;
   ActiveControl:= ed;
 
-  fn:= FDir+'\fn.txt';
+  fn:= FDir+'/fn.txt';
   if FileExists(fn) then
     DoOpen(fn, true);
 end;
