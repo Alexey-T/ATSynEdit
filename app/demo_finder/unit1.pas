@@ -15,6 +15,7 @@ type
   TForm1 = class(TForm)
     bFIndNext: TButton;
     bFInd: TButton;
+    chkRegex: TCheckBox;
     chkForw: TCheckBox;
     chkCase: TCheckBox;
     chkWords: TCheckBox;
@@ -68,23 +69,38 @@ end;
 
 procedure TForm1.DoFind(ANext: boolean);
 var
-  s, f: Unicodestring;
+  StrS, StrF: Unicodestring;
+  MPos, MLen: integer;
 begin
-  f:= trim(Memo1.Text);
-  s:= trim(Memo2.Text);
+  StrF:= trim(Memo1.Text);
+  StrS:= trim(Memo2.Text);
+
+  //----------------------
+  if chkRegex.Checked then
+  begin
+    if not ANext then FPos:= 0;
+    if not SFindRegex(StrF, StrS, FPos+1, chkCase.Checked, MPos, MLen) then
+      memo3.text:= '(not found)'
+    else
+    begin
+      FPos:= MPos;
+      memo3.text:= Copy(StrS, MPos-2, MLen+4);
+    end;
+    Exit
+  end;
 
   if not ANext then
     if chkForw.Checked then FPos:= 1
-    else FPos:= Length(s);
+    else FPos:= Length(StrS);
 
   if ANext then
     if FPos=0 then Exit else
     if chkForw.Checked then Inc(FPos) else Dec(FPos);
 
-  FPos:= SFindTextW(f, s, @Iswordchar, FPos,
+  FPos:= SFindText(StrF, StrS, @Iswordchar, FPos,
     chkForw.Checked, chkWords.Checked, chkCase.Checked);
   if FPos=0 then memo3.text:= '(not found)'
-  else memo3.text:= copy(s, FPos-2, length(f)+4);
+  else memo3.text:= copy(StrS, FPos-2, length(StrF)+4);
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);

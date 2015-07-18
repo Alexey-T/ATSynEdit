@@ -3,7 +3,7 @@ unit atstringproc_finder;
 interface
 
 uses
-  SysUtils;
+  SysUtils, RegExpr;
 
 type
   TStringDecodeRec = record
@@ -12,15 +12,18 @@ type
 type
   TWordCharFunc = function (ch: Widechar): boolean;
 
-function SDecodeW(const S: UnicodeString; const Decode: array of TStringDecodeRec): UnicodeString;
-function SFindTextW(const F, S: UnicodeString;
+function SDecode(const S: UnicodeString; const Decode: array of TStringDecodeRec): UnicodeString;
+function SFindText(const F, S: UnicodeString;
   IsWordChar: TWordCharFunc;
   FromPos: integer;
   OptForward, OptWholeWords, OptCaseSens: Boolean): Integer;
+function SFindRegex(const F, S: UnicodeString; FromPos: integer;
+  OptCaseSens: Boolean; out MatchPos, MatchLen: integer): boolean;
+
 
 implementation
 
-function SDecodeW(const S: UnicodeString; const Decode: array of TStringDecodeRec): UnicodeString;
+function SDecode(const S: UnicodeString; const Decode: array of TStringDecodeRec): UnicodeString;
 var
   i, j: Integer;
   DoDecode: Boolean;
@@ -46,7 +49,7 @@ begin
 end;
 
 
-function SFindTextW(const F, S: UnicodeString; IsWordChar: TWordCharFunc;
+function SFindText(const F, S: UnicodeString; IsWordChar: TWordCharFunc;
   FromPos: integer; OptForward, OptWholeWords, OptCaseSens: Boolean): Integer;
 var
   SBuf, FBuf: UnicodeString;
@@ -102,6 +105,32 @@ begin
         Break
       end;
     end;
+end;
+
+function SFindRegex(const F, S: UnicodeString; FromPos: integer;
+  OptCaseSens: Boolean; out MatchPos, MatchLen: integer): boolean;
+var
+  Obj: TRegExpr;
+begin
+  Result:= false;
+  MatchPos:= 0;
+  MatchLen:= 0;
+
+  Obj:= TRegExpr.Create;
+  try
+    Obj.ModifierM:= true;
+    Obj.ModifierI:= not OptCaseSens;
+    Obj.Expression:= F;
+    Obj.InputString:= S;
+    Result:= Obj.ExecPos(FromPos);
+    if Result then
+    begin
+      MatchPos:= Obj.MatchPos[0];
+      MatchLen:= Obj.MatchLen[0];
+    end;
+  finally
+    FreeAndNil(Obj);
+  end;
 end;
 
 end.

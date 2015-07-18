@@ -73,7 +73,7 @@ object Form1: TForm1
   object Memo3: TMemo
     Left = 464
     Height = 50
-    Top = 192
+    Top = 256
     Width = 230
     Lines.Strings = (
       ''
@@ -112,9 +112,17 @@ object Form1: TForm1
   object Label3: TLabel
     Left = 464
     Height = 17
-    Top = 175
+    Top = 232
     Width = 39
     Caption = 'result'
     ParentColor = False
+  end
+  object chkRegex: TCheckBox
+    Left = 471
+    Height = 24
+    Top = 168
+    Width = 64
+    Caption = 'regex'
+    TabOrder = 8
   end
 end
