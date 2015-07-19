@@ -22,12 +22,11 @@ object fmFind: TfmFind
   object bCancel: TButton
     Left = 376
     Height = 25
-    Top = 80
+    Top = 112
     Width = 99
-    Cancel = True
     Caption = 'cancel'
     ModalResult = 2
-    TabOrder = 11
+    TabOrder = 12
   end
   object Label1: TLabel
     Left = 9
@@ -119,5 +118,14 @@ object fmFind: TfmFind
     Width = 98
     Caption = 'from caret'
     TabOrder = 7
+  end
+  object bCount: TButton
+    Left = 376
+    Height = 25
+    Top = 80
+    Width = 99
+    Caption = 'count all'
+    ModalResult = 5
+    TabOrder = 11
   end
 end

@@ -13,6 +13,7 @@ type
   { TfmFind }
 
   TfmFind = class(TForm)
+    bCount: TButton;
     bFind: TButton;
     bCancel: TButton;
     bRep: TButton;

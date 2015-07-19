@@ -18,6 +18,7 @@ type
   private
     FMatchPos: integer;
     FMatchLen: integer;
+    FProgress: integer;
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
@@ -29,11 +30,20 @@ type
     OptRegex: boolean;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer
-      ): boolean;
+    function FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer): boolean;
     property MatchPos: integer read FMatchPos; //these have meaning only if Find returned True
     property MatchLen: integer read FMatchLen;
+    property Progress: integer read FProgress;
   end;
+
+type
+  TATEditorFinderFlag = (
+    fflagReplace,
+    fflagMoveCaret,
+    fflagWithSelect,
+    fflagUpdateBuffer
+    );
+  TATEditorFinderFlags = set of TATEditorFinderFlag;
 
 type
   { TATEditorFinder }
@@ -42,13 +52,14 @@ type
   private
     FBuffer: TATStringBuffer;
     FEditor: TATSynEdit;
-    procedure UpdateBufferText(Ed: TATSynEdit);
+    procedure UpdateBuffer(Ed: TATSynEdit);
   public
     OptFromCaret: boolean;
     constructor Create;
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
-    function FindOrReplace(ANext: boolean; AWithReplace: boolean): boolean;
+    function FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
+    procedure UpdateEditor(AfterReplace: boolean);
  end;
 
 implementation
@@ -151,7 +162,7 @@ end;
 
 { TATEditorFinder }
 
-procedure TATEditorFinder.UpdateBufferText(Ed: TATSynEdit);
+procedure TATEditorFinder.UpdateBuffer(Ed: TATSynEdit);
 var
   Lens: TList;
   i: integer;
@@ -184,7 +195,7 @@ begin
   inherited;
 end;
 
-function TATEditorFinder.FindOrReplace(ANext: boolean; AWithReplace: boolean
+function TATEditorFinder.FindAction(ANext: boolean; AFlags: TATEditorFinderFlags
   ): boolean;
 var
   P1, P2: TPoint;
@@ -208,9 +219,10 @@ begin
     Exit
   end;
 
-  UpdateBufferText(FEditor);
+  if fflagUpdateBuffer in AFlags then
+    UpdateBuffer(FEditor);
 
-  if AWithReplace then
+  if fflagReplace in AFlags then
     AMatchLen:= Length(StrReplacedTo)
   else
     AMatchLen:= FMatchLen;
@@ -235,25 +247,32 @@ begin
   Result:= FindMatch(ANext, AMatchLen, AStartPos);
   if Result then
   begin
-    P1:= FBuffer.StrToCaret(MatchPos-1);
-    P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
-    FEditor.DoCaretSingle(P1.X, P1.Y);
-
-    if AWithReplace then
+    if fflagMoveCaret in AFlags then
     begin
-      FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
-      FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacedTo, false, Shift, PosAfter);
+      P1:= FBuffer.StrToCaret(MatchPos-1);
+      P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
+      FEditor.DoCaretSingle(P1.X, P1.Y);
+
+      if fflagReplace in AFlags then
+      begin
+        FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
+        FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacedTo, false, Shift, PosAfter);
+      end;
+
+      if fflagWithSelect in AFlags then
+        with FEditor.Carets[0] do
+          if fflagReplace in AFlags then
+            begin EndX:= -1; EndY:= -1; end
+          else
+            begin EndX:= P2.X; EndY:= P2.Y; end;
     end;
-
-    with FEditor.Carets[0] do
-      if AWithReplace then
-        begin EndX:= -1; EndY:= -1; end
-      else
-        begin EndX:= P2.X; EndY:= P2.Y; end;
-
-    FEditor.Update(AWithReplace);
-    FEditor.DoCommand(cCommand_ScrollToCaretTop);
   end;
+end;
+
+procedure TATEditorFinder.UpdateEditor(AfterReplace: boolean);
+begin
+  FEditor.Update(AfterReplace);
+  FEditor.DoCommand(cCommand_ScrollToCaretTop);
 end;
 
 { TATTextFinder }
@@ -282,6 +301,8 @@ var
   FromPos: integer;
 begin
   Result:= false;
+  if StrText='' then Exit;
+  if StrFind='' then Exit;
 
   //regex
   if OptRegex then
@@ -293,6 +314,7 @@ begin
     Result:= SFindRegex(StrFind, StrText, StrReplace,
       FromPos, OptCase,
       FMatchPos, FMatchLen, StrReplacedTo);
+    FProgress:= FMatchPos * 100 div Length(StrText);
     Exit
   end;
 
@@ -312,9 +334,8 @@ begin
     OptBack, OptWords, OptCase);
   Result:= FMatchPos>0;
   if Result then
-  begin
     FMatchLen:= Length(StrFind);
-  end;
+  FProgress:= FMatchPos * 100 div Length(StrText);
 end;
 
 end.
