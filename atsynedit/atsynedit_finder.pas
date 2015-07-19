@@ -12,19 +12,6 @@ uses
   ATStringProc_TextBuffer;
 
 type
-  TWordCharFunc = function (ch: Widechar): boolean;
-
-function SFindText(const StrFind, StrText: UnicodeString;
-  IsWordChar: TWordCharFunc;
-  FromPos: integer;
-  OptBack, OptWords, OptCase: boolean): integer;
-
-function SFindRegex(const StrFind, StrText: UnicodeString;
-  FromPos: integer;
-  OptCase: boolean;
-  var MatchPos, MatchLen: integer): boolean;
-
-type
   { TATTextFinder }
 
   TATTextFinder = class
@@ -34,13 +21,16 @@ type
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
+    StrReplace: UnicodeString;
+    StrReplacedTo: UnicodeString;
     OptBack: boolean; //for non-regex
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for all cases
     OptRegex: boolean;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch(ANext: boolean): boolean;
+    function FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer
+      ): boolean;
     property MatchPos: integer read FMatchPos; //these have meaning only if Find returned True
     property MatchLen: integer read FMatchLen;
   end;
@@ -52,16 +42,19 @@ type
   private
     FBuffer: TATStringBuffer;
     FEditor: TATSynEdit;
-    procedure ReadTextFromEditor(Ed: TATSynEdit);
+    procedure UpdateBufferText(Ed: TATSynEdit);
   public
+    OptFromCaret: boolean;
     constructor Create;
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
-    function FindAndMark(ANext: boolean): boolean;
+    function FindOrReplace(ANext: boolean; AWithReplace: boolean): boolean;
  end;
 
 implementation
 
+type
+  TWordCharFunc = function (ch: Widechar): boolean;
 
 function SFindText(const StrFind, StrText: UnicodeString; IsWordChar: TWordCharFunc;
   FromPos: integer; OptBack, OptWords, OptCase: Boolean): Integer;
@@ -120,8 +113,12 @@ begin
     end;
 end;
 
-function SFindRegex(const StrFind, StrText: UnicodeString; FromPos: integer;
-  OptCase: Boolean; var MatchPos, MatchLen: integer): boolean;
+function SFindRegex(
+  const StrFind, StrText, StrReplace: UnicodeString;
+  FromPos: integer;
+  OptCase: Boolean;
+  var MatchPos, MatchLen: integer;
+  var StrReplacedTo: UnicodeString): boolean;
 var
   Obj: TRegExpr;
 begin
@@ -139,6 +136,8 @@ begin
     begin
       MatchPos:= Obj.MatchPos[0];
       MatchLen:= Obj.MatchLen[0];
+      if StrReplace<>'' then
+        StrReplacedTo:= Obj.Replace(Obj.Match[0], StrReplace, true);
     end;
   finally
     FreeAndNil(Obj);
@@ -152,7 +151,7 @@ end;
 
 { TATEditorFinder }
 
-procedure TATEditorFinder.ReadTextFromEditor(Ed: TATSynEdit);
+procedure TATEditorFinder.UpdateBufferText(Ed: TATSynEdit);
 var
   Lens: TList;
   i: integer;
@@ -175,18 +174,22 @@ begin
   inherited;
   FEditor:= nil;
   FBuffer:= TATStringBuffer.Create;
+  OptFromCaret:= false;
 end;
 
 destructor TATEditorFinder.Destroy;
 begin
   FEditor:= nil;
   FreeAndNil(FBuffer);
-  inherited Destroy;
+  inherited;
 end;
 
-function TATEditorFinder.FindAndMark(ANext: boolean): boolean;
+function TATEditorFinder.FindOrReplace(ANext: boolean; AWithReplace: boolean
+  ): boolean;
 var
   P1, P2: TPoint;
+  Shift, PosAfter: TPoint;
+  AMatchLen, AStartPos: integer;
 begin
   Result:= false;
   if not Assigned(FEditor) then
@@ -199,20 +202,56 @@ begin
     Showmessage('Finder.StrFind not set');
     Exit
   end;
+  if FEditor.Carets.Count=0 then
+  begin
+    Showmessage('Editor has not caret');
+    Exit
+  end;
 
-  ReadTextFromEditor(FEditor);
-  Result:= FindMatch(ANext);
+  UpdateBufferText(FEditor);
+
+  if AWithReplace then
+    AMatchLen:= Length(StrReplacedTo)
+  else
+    AMatchLen:= FMatchLen;
+
+  if OptFromCaret then
+  begin
+    with FEditor.Carets[0] do
+      begin P1.X:= PosX; P1.Y:= PosY; end;
+    AStartPos:= FBuffer.CaretToStr(P1);
+    if AStartPos<0 then
+      Showmessage('Strange CaretToStr<0');
+  end
+  else
+  if OptRegex then
+    AStartPos:= 1
+  else
+  if OptBack then
+    AStartPos:= Length(StrText)
+  else
+    AStartPos:= 1;
+
+  Result:= FindMatch(ANext, AMatchLen, AStartPos);
   if Result then
   begin
     P1:= FBuffer.StrToCaret(MatchPos-1);
     P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
     FEditor.DoCaretSingle(P1.X, P1.Y);
-    with FEditor.Carets[0] do
+
+    if AWithReplace then
     begin
-      EndX:= P2.X;
-      EndY:= P2.Y;
+      FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
+      FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacedTo, false, Shift, PosAfter);
     end;
-    FEditor.Update;
+
+    with FEditor.Carets[0] do
+      if AWithReplace then
+        begin EndX:= -1; EndY:= -1; end
+      else
+        begin EndX:= P2.X; EndY:= P2.Y; end;
+
+    FEditor.Update(AWithReplace);
     FEditor.DoCommand(cCommand_ScrollToCaretTop);
   end;
 end;
@@ -223,8 +262,10 @@ constructor TATTextFinder.Create;
 begin
   StrFind:= '';
   StrText:= '';
+  StrReplace:= '__$0__';
+  StrReplacedTo:= '';
   OptBack:= false;
-  OptCase:= true;
+  OptCase:= false;
   OptWords:= false;
   OptRegex:= false;
   FMatchPos:= 0;
@@ -236,7 +277,7 @@ begin
   inherited Destroy;
 end;
 
-function TATTextFinder.FindMatch(ANext: boolean): boolean;
+function TATTextFinder.FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer): boolean;
 var
   FromPos: integer;
 begin
@@ -245,17 +286,20 @@ begin
   //regex
   if OptRegex then
   begin
-    if not ANext then FromPos:= 1
-    else FromPos:= FMatchPos+FMatchLen;
-    Result:= SFindRegex(StrFind, StrText, FromPos, OptCase, FMatchPos, FMatchLen);
+    if not ANext then
+      FromPos:= AStartPos
+    else
+      FromPos:= FMatchPos+AMatchLen;
+    Result:= SFindRegex(StrFind, StrText, StrReplace,
+      FromPos, OptCase,
+      FMatchPos, FMatchLen, StrReplacedTo);
     Exit
   end;
 
   //non-regex
   if not ANext then
   begin
-    if not OptBack then FMatchPos:= 1
-    else FMatchPos:= Length(StrText);
+    FMatchPos:= AStartPos;
   end
   else
   begin
@@ -263,6 +307,7 @@ begin
     if not OptBack then Inc(FMatchPos) else Dec(FMatchPos);
   end;
 
+  StrReplacedTo:= StrReplace;
   FMatchPos:= SFindText(StrFind, StrText, @IsWordChar, FMatchPos,
     OptBack, OptWords, OptCase);
   Result:= FMatchPos>0;

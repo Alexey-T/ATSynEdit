@@ -153,7 +153,7 @@ type
     wait: boolean;
     FDir: string;
     FFileName: string;
-    FFInder: TATEditorFinder;
+    FFinder: TATEditorFinder;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
@@ -244,6 +244,7 @@ begin
 
   FFinder:= TATEditorFinder.Create;
   FFinder.Editor:= ed;
+  FFinder.OptRegex:= true;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -598,26 +599,55 @@ end;
 procedure TfmMain.mnuFindClick(Sender: TObject);
 var
   res: TModalResult;
+  cnt: integer;
 begin
   with TfmFind.Create(nil) do
   try
     edFind.Text:= FFinder.StrFind;
+    edRep.Text:= FFinder.StrReplace;
     chkBack.Checked:= FFinder.OptBack;
     chkCase.Checked:= FFinder.OptCase;
     chkWords.Checked:= FFinder.OptWords;
     chkRegex.Checked:= FFinder.OptRegex;
+    chkFromCaret.Checked:= FFinder.OptFromCaret;
 
     res:= ShowModal;
     if res=mrCancel then Exit;
     if edFind.Text='' then Exit;
 
     FFinder.StrFind:= edFind.Text;
+    FFinder.StrReplace:= edRep.Text;
     FFinder.OptBack:= chkBack.Checked;
     FFinder.OptCase:= chkCase.Checked;
     FFinder.OptWords:= chkWords.Checked;
     FFinder.OptRegex:= chkRegex.Checked;
-    if not FFinder.FindAndMark(false) then
-      DoFindError;
+    FFinder.OptFromCaret:= chkFromCaret.Checked;
+
+    case res of
+      mrOk:
+        begin
+          if not FFinder.FindOrReplace(false, false) then DoFindError;
+        end;
+      mrYes:
+        begin
+          if not FFinder.FindOrReplace(false, true) then DoFindError;
+        end;
+      mrYesToAll:
+        begin
+          cnt:= 0;
+          if FFinder.FindOrReplace(false, true) then
+          begin
+            Inc(cnt);
+            while FFinder.FindOrReplace(true, true) do
+            begin
+              Inc(cnt);
+              if cnt mod 500=0 then
+                Application.ProcessMessages;
+            end;
+          end;
+          Showmessage('Replaces made: '+Inttostr(cnt));
+        end;
+    end;
   finally
     Free;
   end;
@@ -631,7 +661,7 @@ begin
     Exit
   end;
 
-  if not FFinder.FindAndMark(true) then
+  if not FFinder.FindOrReplace(true, false) then
     DoFindError;
 end;
 
