@@ -1,13 +1,12 @@
-unit atsynedit_finder;
+unit ATSynEdit_Finder;
 
 {$mode objfpc}{$H+}
 
 interface
 
 uses
-  SysUtils, Classes,
-  Dialogs,
-  RegExpr,
+  SysUtils, Classes, Dialogs,
+  RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Commands,
   ATStringProc_TextBuffer;
@@ -15,13 +14,15 @@ uses
 type
   TWordCharFunc = function (ch: Widechar): boolean;
 
-function SFindText(const StrF, StrText: UnicodeString;
+function SFindText(const StrFind, StrText: UnicodeString;
   IsWordChar: TWordCharFunc;
   FromPos: integer;
-  OptBack, OptWholeWords, OptCaseSens: Boolean): Integer;
+  OptBack, OptWords, OptCase: boolean): integer;
 
-function SFindRegex(const StrF, StrText: UnicodeString; FromPos: integer;
-  OptCaseSens: Boolean; var MatchPos, MatchLen: integer): boolean;
+function SFindRegex(const StrFind, StrText: UnicodeString;
+  FromPos: integer;
+  OptCase: boolean;
+  var MatchPos, MatchLen: integer): boolean;
 
 type
   { TATTextFinder }
@@ -62,25 +63,25 @@ type
 implementation
 
 
-function SFindText(const StrF, StrText: UnicodeString; IsWordChar: TWordCharFunc;
-  FromPos: integer; OptBack, OptWholeWords, OptCaseSens: Boolean): Integer;
+function SFindText(const StrFind, StrText: UnicodeString; IsWordChar: TWordCharFunc;
+  FromPos: integer; OptBack, OptWords, OptCase: Boolean): Integer;
 var
   SBuf, FBuf: UnicodeString;
   Match: Boolean;
   LastPos, LenF, i: Integer;
 begin
   Result := 0;
-  if (StrText = '') or (StrF = '') then Exit;
+  if (StrText = '') or (StrFind = '') then Exit;
 
   SBuf := StrText;
-  FBuf := StrF;
-  if not OptCaseSens then
+  FBuf := StrFind;
+  if not OptCase then
   begin
     SBuf := UnicodeLowerCase(SBuf);
     FBuf := UnicodeLowerCase(FBuf);
   end;
 
-  LenF := Length(StrF);
+  LenF := Length(StrFind);
   LastPos := Length(StrText) - LenF + 1;
 
   if not OptBack then
@@ -89,7 +90,7 @@ begin
     begin
       Match := CompareMem(@FBuf[1], @SBuf[i], LenF * 2);
 
-      if OptWholeWords then
+      if OptWords then
         Match := Match
           and ((i <= 1) or (not IsWordChar(StrText[i - 1])))
           and ((i >= LastPos) or (not IsWordChar(StrText[i + LenF])));
@@ -106,7 +107,7 @@ begin
     begin
       Match := CompareMem(@FBuf[1], @SBuf[i], LenF * 2);
 
-      if OptWholeWords then
+      if OptWords then
         Match := Match
           and ((i <= 1) or (not IsWordChar(StrText[i - 1])))
           and ((i >= LastPos) or (not IsWordChar(StrText[i + LenF])));
@@ -119,8 +120,8 @@ begin
     end;
 end;
 
-function SFindRegex(const StrF, StrText: UnicodeString; FromPos: integer;
-  OptCaseSens: Boolean; var MatchPos, MatchLen: integer): boolean;
+function SFindRegex(const StrFind, StrText: UnicodeString; FromPos: integer;
+  OptCase: Boolean; var MatchPos, MatchLen: integer): boolean;
 var
   Obj: TRegExpr;
 begin
@@ -128,9 +129,10 @@ begin
 
   Obj:= TRegExpr.Create;
   try
-    Obj.ModifierM:= true;
-    Obj.ModifierI:= not OptCaseSens;
-    Obj.Expression:= StrF;
+    Obj.ModifierS:= false; //don't catch all text by .*
+    Obj.ModifierM:= true; //allow to work with ^$
+    Obj.ModifierI:= not OptCase;
+    Obj.Expression:= StrFind;
     Obj.InputString:= StrText;
     Result:= Obj.ExecPos(FromPos);
     if Result then
@@ -171,7 +173,6 @@ end;
 constructor TATEditorFinder.Create;
 begin
   inherited;
-
   FEditor:= nil;
   FBuffer:= TATStringBuffer.Create;
 end;
@@ -236,14 +237,17 @@ begin
 end;
 
 function TATTextFinder.FindMatch(ANext: boolean): boolean;
+var
+  FromPos: integer;
 begin
   Result:= false;
 
   //regex
   if OptRegex then
   begin
-    if not ANext then FMatchPos:= 0;
-    Result:= SFindRegex(StrFind, StrText, FMatchPos+1, OptCase, FMatchPos, FMatchLen);
+    if not ANext then FromPos:= 1
+    else FromPos:= FMatchPos+FMatchLen;
+    Result:= SFindRegex(StrFind, StrText, FromPos, OptCase, FMatchPos, FMatchLen);
     Exit
   end;
 
