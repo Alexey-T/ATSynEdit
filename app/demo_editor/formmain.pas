@@ -13,9 +13,10 @@ uses
   ATStringProc,
   ATSynEdit,
   ATSynEdit_CanvasProc,
+  ATSynEdit_Finder,
   formkey,
   formopt,
-  formcombo;
+  formcombo, formfind;
 
 type
   { TfmMain }
@@ -52,7 +53,10 @@ type
     Label9: TLabel;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
+    mnuFindNext: TMenuItem;
+    mnuFind: TMenuItem;
     MenuItem5: TMenuItem;
+    MenuItem9: TMenuItem;
     mnuSyntax: TMenuItem;
     mnuEnc: TMenuItem;
     mnuOptSave: TMenuItem;
@@ -103,6 +107,8 @@ type
     procedure mnuFileSaveClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
+    procedure mnuFindClick(Sender: TObject);
+    procedure mnuFindNextClick(Sender: TObject);
     procedure mnuSyntaxClick(Sender: TObject);
     procedure UpdateEnc;
     procedure mnuHelpMousClick(Sender: TObject);
@@ -147,7 +153,9 @@ type
     wait: boolean;
     FDir: string;
     FFileName: string;
+    FFInder: TATEditorFinder;
     procedure DoAddEnc(Sub, SName: string);
+    procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
     procedure EditChanged(Sender: TObject);
@@ -233,6 +241,9 @@ begin
   //ed.OnDrawRuler:= EditDrawTest;//test
 
   ed.SetFocus;
+
+  FFinder:= TATEditorFinder.Create;
+  FFinder.Editor:= ed;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -582,6 +593,46 @@ begin
   wait:= false;
 
   ed.SetFocus;
+end;
+
+procedure TfmMain.mnuFindClick(Sender: TObject);
+var
+  res: TModalResult;
+begin
+  with TfmFind.Create(nil) do
+  try
+    edFind.Text:= FFinder.StrFind;
+    chkBack.Checked:= FFinder.OptBack;
+    chkCase.Checked:= FFinder.OptCase;
+    chkWords.Checked:= FFinder.OptWords;
+    chkRegex.Checked:= FFinder.OptRegex;
+
+    res:= ShowModal;
+    if res=mrCancel then Exit;
+    if edFind.Text='' then Exit;
+
+    FFinder.StrFind:= edFind.Text;
+    FFinder.OptBack:= chkBack.Checked;
+    FFinder.OptCase:= chkCase.Checked;
+    FFinder.OptWords:= chkWords.Checked;
+    FFinder.OptRegex:= chkRegex.Checked;
+    if not FFinder.FindAndMark(false) then
+      DoFindError;
+  finally
+    Free;
+  end;
+end;
+
+procedure TfmMain.mnuFindNextClick(Sender: TObject);
+begin
+  if FFinder.StrFind='' then
+  begin
+    mnuFind.Click;
+    Exit
+  end;
+
+  if not FFinder.FindAndMark(true) then
+    DoFindError;
 end;
 
 procedure TfmMain.mnuSyntaxClick(Sender: TObject);
@@ -1003,6 +1054,12 @@ begin
   //test
   //AParts[0].Colorbg:= clgreen;
   //AParts[1].Colorbg:= clyellow;
+end;
+
+procedure TfmMain.DoFindError;
+begin
+  Beep;
+  Showmessage('Cannot find string');
 end;
 
 end.

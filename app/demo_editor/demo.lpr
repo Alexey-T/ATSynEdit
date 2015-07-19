@@ -26,7 +26,7 @@ uses
   formmain,
   formkey,
   formopt,
-  formcombo;
+  formcombo, formfind;
 
 {$R *.res}
 

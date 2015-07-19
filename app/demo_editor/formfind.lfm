@@ -1,0 +1,79 @@
+object fmFind: TfmFind
+  Left = 512
+  Height = 228
+  Top = 259
+  Width = 516
+  BorderStyle = bsDialog
+  Caption = 'Find text'
+  ClientHeight = 228
+  ClientWidth = 516
+  Position = poScreenCenter
+  LCLVersion = '1.5'
+  object bFindFirst: TButton
+    Left = 400
+    Height = 25
+    Top = 8
+    Width = 99
+    Caption = 'find'
+    Default = True
+    ModalResult = 1
+    TabOrder = 5
+  end
+  object bCancel: TButton
+    Left = 400
+    Height = 25
+    Top = 40
+    Width = 99
+    Cancel = True
+    Caption = 'cancel'
+    ModalResult = 2
+    TabOrder = 6
+  end
+  object Label1: TLabel
+    Left = 9
+    Height = 17
+    Top = 8
+    Width = 66
+    Caption = 'find what:'
+    ParentColor = False
+  end
+  object edFind: TEdit
+    Left = 9
+    Height = 27
+    Top = 32
+    Width = 351
+    TabOrder = 0
+  end
+  object chkRegex: TCheckBox
+    Left = 8
+    Height = 24
+    Top = 71
+    Width = 64
+    Caption = 'regex'
+    TabOrder = 1
+  end
+  object chkBack: TCheckBox
+    Left = 9
+    Height = 24
+    Top = 144
+    Width = 92
+    Caption = 'backward'
+    TabOrder = 4
+  end
+  object chkCase: TCheckBox
+    Left = 8
+    Height = 24
+    Top = 96
+    Width = 118
+    Caption = 'case sensitive'
+    TabOrder = 2
+  end
+  object chkWords: TCheckBox
+    Left = 8
+    Height = 24
+    Top = 120
+    Width = 142
+    Caption = 'whole words only'
+    TabOrder = 3
+  end
+end
