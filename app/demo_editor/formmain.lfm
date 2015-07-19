@@ -283,6 +283,22 @@ object fmMain: TfmMain
       TabOrder = 5
     end
   end
+  object progress: TProgressBar
+    AnchorSideLeft.Control = PanelMain
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideRight.Control = PanelRt
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = PanelRt
+    AnchorSideBottom.Side = asrBottom
+    Left = 672
+    Height = 10
+    Top = 488
+    Width = 281
+    Anchors = [akLeft, akRight, akBottom]
+    Smooth = True
+    Step = 1
+    TabOrder = 2
+  end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]
     left = 472

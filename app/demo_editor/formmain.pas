@@ -98,6 +98,7 @@ type
     PopupMicromap: TPopupMenu;
     PopupRuler: TPopupMenu;
     PopupNums: TPopupMenu;
+    progress: TProgressBar;
     SaveDialog1: TSaveDialog;
     Status: TStatusBar;
     procedure bGotoClick(Sender: TObject);
@@ -600,6 +601,7 @@ procedure TfmMain.mnuFindClick(Sender: TObject);
 var
   res: TModalResult;
   cnt: integer;
+  ok: boolean;
 begin
   with TfmFind.Create(nil) do
   try
@@ -624,36 +626,63 @@ begin
     FFinder.OptFromCaret:= chkFromCaret.Checked;
 
     case res of
-      mrOk:
+      mrOk: //find
         begin
-          if not FFinder.FindOrReplace(false, false) then DoFindError;
+          ok:= FFinder.FindAction(false, [fflagMoveCaret, fflagWithSelect, fflagUpdateBuffer]);
+          FFinder.UpdateEditor(false);
+          if not ok then DoFindError;
         end;
-      mrYes:
+      mrYes: //replace
         begin
-          if not FFinder.FindOrReplace(false, true) then DoFindError;
+          ok:= FFinder.FindAction(false, [fflagReplace, fflagMoveCaret, fflagWithSelect, fflagUpdateBuffer]);
+          FFinder.UpdateEditor(true);
+          if not ok then DoFindError;
         end;
-      mrYesToAll:
+      mrYesToAll: //replace all
         begin
           cnt:= 0;
-          if FFinder.FindOrReplace(false, true) then
+          if FFinder.FindAction(false, [fflagReplace, fflagMoveCaret, fflagUpdateBuffer]) then
           begin
             Inc(cnt);
-            while FFinder.FindOrReplace(true, true) do
+            while FFinder.FindAction(true, [fflagReplace, fflagMoveCaret, fflagUpdateBuffer]) do
             begin
               Inc(cnt);
-              if cnt mod 500=0 then
+              progress.Position:= FFinder.Progress;
+              if cnt mod 100=0 then
                 Application.ProcessMessages;
             end;
           end;
+          FFinder.UpdateEditor(true);
           Showmessage('Replaces made: '+Inttostr(cnt));
+        end;
+      mrIgnore: //count all
+        begin
+          cnt:= 0;
+          if FFinder.FindAction(false, [fflagUpdateBuffer]) then
+          begin
+            Inc(cnt);
+            while FFinder.FindAction(true, []) do
+            begin
+              Inc(cnt);
+              progress.Position:= FFinder.Progress;
+              if cnt mod 100=0 then
+                Application.ProcessMessages;
+            end;
+          end;
+          FFinder.UpdateEditor(false);
+          Showmessage('Counted: '+Inttostr(cnt));
         end;
     end;
   finally
     Free;
   end;
+
+  progress.Position:= 0;
 end;
 
 procedure TfmMain.mnuFindNextClick(Sender: TObject);
+var
+  ok: boolean;
 begin
   if FFinder.StrFind='' then
   begin
@@ -661,8 +690,9 @@ begin
     Exit
   end;
 
-  if not FFinder.FindOrReplace(true, false) then
-    DoFindError;
+  ok:= FFinder.FindAction(true, [fflagMoveCaret, fflagWithSelect, fflagUpdateBuffer]);
+  FFinder.UpdateEditor(false);
+  if not ok then DoFindError;
 end;
 
 procedure TfmMain.mnuSyntaxClick(Sender: TObject);
