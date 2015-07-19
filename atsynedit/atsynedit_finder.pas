@@ -31,8 +31,8 @@ type
     constructor Create;
     destructor Destroy; override;
     function FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer): boolean;
-    property MatchPos: integer read FMatchPos; //these have meaning only if Find returned True
-    property MatchLen: integer read FMatchLen;
+    property MatchPos: integer read FMatchPos; //have meaning if FindMatch returned True
+    property MatchLen: integer read FMatchLen; //too
     property Progress: integer read FProgress;
   end;
 
@@ -40,7 +40,6 @@ type
   TATEditorFinderFlag = (
     fflagReplace,
     fflagMoveCaret,
-    fflagWithSelect,
     fflagUpdateBuffer
     );
   TATEditorFinderFlags = set of TATEditorFinderFlag;
@@ -59,7 +58,7 @@ type
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
     function FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
-    procedure UpdateEditor(AfterReplace: boolean);
+    procedure UpdateEditor(AUpdateText: boolean);
  end;
 
 implementation
@@ -259,19 +258,23 @@ begin
         FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacedTo, false, Shift, PosAfter);
       end;
 
-      if fflagWithSelect in AFlags then
-        with FEditor.Carets[0] do
-          if fflagReplace in AFlags then
-            begin EndX:= -1; EndY:= -1; end
-          else
-            begin EndX:= P2.X; EndY:= P2.Y; end;
+      with FEditor.Carets[0] do
+      begin
+        EndX:= -1;
+        EndY:= -1;
+        if not (fflagReplace in AFlags) then
+        begin
+          EndX:= P2.X;
+          EndY:= P2.Y;
+        end;
+      end;
     end;
   end;
 end;
 
-procedure TATEditorFinder.UpdateEditor(AfterReplace: boolean);
+procedure TATEditorFinder.UpdateEditor(AUpdateText: boolean);
 begin
-  FEditor.Update(AfterReplace);
+  FEditor.Update(AUpdateText);
   FEditor.DoCommand(cCommand_ScrollToCaretTop);
 end;
 
