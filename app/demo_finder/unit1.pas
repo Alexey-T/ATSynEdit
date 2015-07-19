@@ -29,10 +29,10 @@ type
     procedure bFIndClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
+    Finder: TATTextFinder;
     procedure DoFind(ANext: boolean);
     { private declarations }
   public
-    FPos: integer;
     { public declarations }
   end;
 
@@ -45,67 +45,36 @@ implementation
 
 { TForm1 }
 
-function Iswordchar(ch: widechar): boolean;
-begin
-  case ch of
-    '0'..'9',
-    'a'..'z',
-    'A'..'Z',
-    '_': result:= true;
-  else
-    result:= false;
-  end;
-end;
-
 procedure TForm1.bFIndClick(Sender: TObject);
 begin
-  DoFInd(false);
+  DoFind(false);
 end;
 
 procedure TForm1.bFIndNextClick(Sender: TObject);
 begin
-  DoFInd(true);
+  DoFind(true);
 end;
 
 procedure TForm1.DoFind(ANext: boolean);
-var
-  StrS, StrF: Unicodestring;
-  MPos, MLen: integer;
 begin
-  StrF:= trim(Memo1.Text);
-  StrS:= trim(Memo2.Text);
-
-  //----------------------
-  if chkRegex.Checked then
+  FInder.StrFind:= trim(Memo1.Text);
+  FInder.StrText:= trim(Memo2.Text);
+  Finder.OptCaseSens:= chkCase.Checked;
+  Finder.OptWholeWords:= chkWords.Checked;
+  Finder.OptForward:= chkForw.Checked;
+  FInder.OptRegex:= chkRegex.Checked;
+  if not FInder.Find(ANext) then
+    memo3.text:= '(not found)'
+  else
   begin
-    if not ANext then FPos:= 0;
-    if not SFindRegex(StrF, StrS, FPos+1, chkCase.Checked, MPos, MLen) then
-      memo3.text:= '(not found)'
-    else
-    begin
-      FPos:= MPos;
-      memo3.text:= Copy(StrS, MPos-2, MLen+4);
-    end;
-    Exit
+    memo3.text:= Copy(Finder.StrText, Finder.MatchPos-2, FInder.MatchLen+4);
   end;
 
-  if not ANext then
-    if chkForw.Checked then FPos:= 1
-    else FPos:= Length(StrS);
-
-  if ANext then
-    if FPos=0 then Exit else
-    if chkForw.Checked then Inc(FPos) else Dec(FPos);
-
-  FPos:= SFindText(StrF, StrS, @Iswordchar, FPos,
-    chkForw.Checked, chkWords.Checked, chkCase.Checked);
-  if FPos=0 then memo3.text:= '(not found)'
-  else memo3.text:= copy(StrS, FPos-2, length(StrF)+4);
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  FPos:= 1;
+  FInder:= TATTextFinder.Create;
 end;
 
 end.
