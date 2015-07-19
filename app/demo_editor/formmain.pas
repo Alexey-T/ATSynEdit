@@ -628,13 +628,13 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.FindAction(false, [fflagMoveCaret, fflagWithSelect, fflagUpdateBuffer]);
+          ok:= FFinder.FindAction(false, [fflagMoveCaret, fflagUpdateBuffer]);
           FFinder.UpdateEditor(false);
           if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.FindAction(false, [fflagReplace, fflagMoveCaret, fflagWithSelect, fflagUpdateBuffer]);
+          ok:= FFinder.FindAction(false, [fflagReplace, fflagMoveCaret, fflagUpdateBuffer]);
           FFinder.UpdateEditor(true);
           if not ok then DoFindError;
         end;
@@ -690,7 +690,7 @@ begin
     Exit
   end;
 
-  ok:= FFinder.FindAction(true, [fflagMoveCaret, fflagWithSelect, fflagUpdateBuffer]);
+  ok:= FFinder.FindAction(true, [fflagMoveCaret, fflagUpdateBuffer]);
   FFinder.UpdateEditor(false);
   if not ok then DoFindError;
 end;
