@@ -1,7 +1,5 @@
 unit RegExpr;
 
-{$define Unicode} //ATSynEdit needs buffer of UnicodeString
-
 {
      TRegExpr class library
      Delphi Regular Expressions
@@ -84,7 +82,7 @@ interface
 {$ENDIF}
 
 // ======== Define options for TRegExpr engine
-{.$DEFINE UniCode} // Unicode support
+{$DEFINE UniCode} // ATSynEdit needs Unicode support
 {$DEFINE RegExpPCodeDump} // p-code dumping (see Dump method)
 {$IFNDEF FPC} // the option is not supported in FreePascal
  {$DEFINE reRealExceptionAddr} // exceptions will point to appropriate source line, not to Error procedure

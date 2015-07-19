@@ -373,12 +373,12 @@ object fmMain: TfmMain
         Caption = '-'
       end
       object mnuSyntax: TMenuItem
-        Caption = 'hilite hilite'
+        Caption = 'hilite syntax'
         ShortCut = 16467
         OnClick = mnuSyntaxClick
       end
       object mnuUnderline: TMenuItem
-        Caption = 'hilite underline'
+        Caption = 'underline ''www'''
         OnClick = mnuUnderlineClick
       end
       object MenuItem1: TMenuItem

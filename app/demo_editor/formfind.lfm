@@ -1,33 +1,33 @@
 object fmFind: TfmFind
-  Left = 512
-  Height = 228
-  Top = 259
-  Width = 516
+  Left = 521
+  Height = 258
+  Top = 265
+  Width = 489
   BorderStyle = bsDialog
-  Caption = 'Find text'
-  ClientHeight = 228
-  ClientWidth = 516
+  Caption = 'Find/Replace'
+  ClientHeight = 258
+  ClientWidth = 489
+  OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.5'
-  object bFindFirst: TButton
-    Left = 400
+  object bFind: TButton
+    Left = 376
     Height = 25
-    Top = 8
+    Top = 48
     Width = 99
     Caption = 'find'
-    Default = True
     ModalResult = 1
-    TabOrder = 5
+    TabOrder = 8
   end
   object bCancel: TButton
-    Left = 400
+    Left = 376
     Height = 25
-    Top = 40
+    Top = 80
     Width = 99
     Cancel = True
     Caption = 'cancel'
     ModalResult = 2
-    TabOrder = 6
+    TabOrder = 11
   end
   object Label1: TLabel
     Left = 9
@@ -41,39 +41,83 @@ object fmFind: TfmFind
     Left = 9
     Height = 27
     Top = 32
-    Width = 351
+    Width = 359
     TabOrder = 0
   end
   object chkRegex: TCheckBox
-    Left = 8
+    Left = 9
     Height = 24
-    Top = 71
+    Top = 128
     Width = 64
     Caption = 'regex'
-    TabOrder = 1
+    OnChange = chkRegexChange
+    TabOrder = 3
   end
   object chkBack: TCheckBox
     Left = 9
     Height = 24
-    Top = 144
+    Top = 200
     Width = 92
     Caption = 'backward'
-    TabOrder = 4
+    TabOrder = 6
   end
   object chkCase: TCheckBox
-    Left = 8
+    Left = 9
     Height = 24
-    Top = 96
+    Top = 152
     Width = 118
     Caption = 'case sensitive'
-    TabOrder = 2
+    TabOrder = 4
   end
   object chkWords: TCheckBox
-    Left = 8
+    Left = 9
     Height = 24
-    Top = 120
+    Top = 176
     Width = 142
     Caption = 'whole words only'
-    TabOrder = 3
+    TabOrder = 5
+  end
+  object edRep: TEdit
+    Left = 9
+    Height = 27
+    Top = 88
+    Width = 359
+    TabOrder = 2
+  end
+  object chkRep: TCheckBox
+    Left = 9
+    Height = 24
+    Top = 64
+    Width = 112
+    Caption = 'replace with:'
+    OnChange = chkRepChange
+    TabOrder = 1
+  end
+  object bRep: TButton
+    Left = 376
+    Height = 25
+    Top = 16
+    Width = 99
+    Caption = 'replace'
+    Default = True
+    ModalResult = 6
+    TabOrder = 9
+  end
+  object bRepAll: TButton
+    Left = 376
+    Height = 25
+    Top = 48
+    Width = 99
+    Caption = 'replace all'
+    ModalResult = 10
+    TabOrder = 10
+  end
+  object chkFromCaret: TCheckBox
+    Left = 9
+    Height = 24
+    Top = 224
+    Width = 98
+    Caption = 'from caret'
+    TabOrder = 7
   end
 end
