@@ -66,6 +66,9 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <CustomOptions Value="-dUnicode"/>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">
