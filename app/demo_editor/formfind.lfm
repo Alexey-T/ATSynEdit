@@ -4,7 +4,7 @@ object fmFind: TfmFind
   Top = 265
   Width = 489
   BorderStyle = bsDialog
-  Caption = 'Find/replace'
+  Caption = 'Find/Replace'
   ClientHeight = 258
   ClientWidth = 489
   OnShow = FormShow
@@ -85,7 +85,7 @@ object fmFind: TfmFind
     TabOrder = 2
   end
   object chkRep: TCheckBox
-    Left = 8
+    Left = 9
     Height = 24
     Top = 64
     Width = 112
@@ -116,8 +116,8 @@ object fmFind: TfmFind
     Left = 9
     Height = 24
     Top = 224
-    Width = 129
-    Caption = 'from first caret'
+    Width = 98
+    Caption = 'from caret'
     TabOrder = 7
   end
 end

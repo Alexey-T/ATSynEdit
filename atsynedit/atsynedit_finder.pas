@@ -262,7 +262,7 @@ constructor TATTextFinder.Create;
 begin
   StrFind:= '';
   StrText:= '';
-  StrReplace:= '__$0__';
+  StrReplace:= '';
   StrReplacedTo:= '';
   OptBack:= false;
   OptCase:= false;
