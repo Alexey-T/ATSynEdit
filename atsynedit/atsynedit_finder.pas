@@ -1,9 +1,11 @@
-unit atstringproc_finder;
+unit atsynedit_finder;
+
+{$mode objfpc}{$H+}
 
 interface
 
 uses
-  SysUtils, RegExpr, Dialogs;
+  SysUtils, RegExpr;
 
 type
   TWordCharFunc = function (ch: Widechar): boolean;
@@ -17,13 +19,8 @@ function SFindRegex(const StrF, StrText: UnicodeString; FromPos: integer;
   OptCaseSens: Boolean; out MatchPos, MatchLen: integer): boolean;
 
 type
-  TStringDecodeRec = record
-    SFrom, STo: UnicodeString;
-  end;
-function SDecode(const S: UnicodeString; const Decode: array of TStringDecodeRec): UnicodeString;
-
-type
   { TATTextFinder }
+
   TATTextFinder = class
   private
     FMatchPos: integer;
@@ -38,36 +35,11 @@ type
     constructor Create;
     destructor Destroy; override;
     function Find(ANext: boolean): boolean;
-    property MatchPos: integer read FMatchPos;
+    property MatchPos: integer read FMatchPos; //these have meaning only if Find returned True
     property MatchLen: integer read FMatchLen;
   end;
 
 implementation
-
-function SDecode(const S: UnicodeString; const Decode: array of TStringDecodeRec): UnicodeString;
-var
-  i, j: Integer;
-  DoDecode: Boolean;
-begin
-  Result := '';
-  i := 1;
-  repeat
-    if i > Length(S) then Break;
-    DoDecode := False;
-    for j := Low(Decode) to High(Decode) do
-      with Decode[j] do
-        if SFrom = Copy(S, i, Length(SFrom)) then
-        begin
-          DoDecode := True;
-          Result := Result + STo;
-          Inc(i, Length(SFrom));
-          Break
-        end;
-    if DoDecode then Continue;
-    Result := Result + S[i];
-    Inc(i);
-  until False;
-end;
 
 
 function SFindText(const StrF, StrText: UnicodeString; IsWordChar: TWordCharFunc;

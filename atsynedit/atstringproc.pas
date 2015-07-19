@@ -79,6 +79,13 @@ function SWithBreaks(const S: atString): boolean;
 function BoolToPlusMinusOne(b: boolean): integer;
 procedure TrimStringList(L: TStringList);
 
+type
+  TATDecodeRec = record
+    SFrom, STo: UnicodeString;
+  end;
+function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
+
+
 
 implementation
 
@@ -626,6 +633,33 @@ begin
         dot:= True;
   end;
 end;
+
+
+function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
+var
+  i, j: Integer;
+  DoDecode: Boolean;
+begin
+  Result := '';
+  i := 1;
+  repeat
+    if i > Length(S) then Break;
+    DoDecode := False;
+    for j := Low(Decode) to High(Decode) do
+      with Decode[j] do
+        if SFrom = Copy(S, i, Length(SFrom)) then
+        begin
+          DoDecode := True;
+          Result := Result + STo;
+          Inc(i, Length(SFrom));
+          Break
+        end;
+    if DoDecode then Continue;
+    Result := Result + S[i];
+    Inc(i);
+  until False;
+end;
+
 
 initialization
   _InitCharsHex;
