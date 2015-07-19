@@ -5,7 +5,12 @@ unit atsynedit_finder;
 interface
 
 uses
-  SysUtils, RegExpr;
+  SysUtils, Classes,
+  Dialogs,
+  RegExpr,
+  ATSynEdit,
+  ATSynEdit_Commands,
+  ATStringProc_TextBuffer;
 
 type
   TWordCharFunc = function (ch: Widechar): boolean;
@@ -13,10 +18,10 @@ type
 function SFindText(const StrF, StrText: UnicodeString;
   IsWordChar: TWordCharFunc;
   FromPos: integer;
-  OptForward, OptWholeWords, OptCaseSens: Boolean): Integer;
+  OptBack, OptWholeWords, OptCaseSens: Boolean): Integer;
 
 function SFindRegex(const StrF, StrText: UnicodeString; FromPos: integer;
-  OptCaseSens: Boolean; out MatchPos, MatchLen: integer): boolean;
+  OptCaseSens: Boolean; var MatchPos, MatchLen: integer): boolean;
 
 type
   { TATTextFinder }
@@ -26,24 +31,39 @@ type
     FMatchPos: integer;
     FMatchLen: integer;
   public
-    StrFind: UnicodeString;
     StrText: UnicodeString;
-    OptForward: boolean; //for non-regex
-    OptWholeWords: boolean; //for non-regex
-    OptCaseSens: boolean; //for all cases
+    StrFind: UnicodeString;
+    OptBack: boolean; //for non-regex
+    OptWords: boolean; //for non-regex
+    OptCase: boolean; //for all cases
     OptRegex: boolean;
     constructor Create;
     destructor Destroy; override;
-    function Find(ANext: boolean): boolean;
+    function FindMatch(ANext: boolean): boolean;
     property MatchPos: integer read FMatchPos; //these have meaning only if Find returned True
     property MatchLen: integer read FMatchLen;
   end;
+
+type
+  { TATEditorFinder }
+
+  TATEditorFinder = class(TATTextFinder)
+  private
+    FBuffer: TATStringBuffer;
+    FEditor: TATSynEdit;
+    procedure ReadTextFromEditor(Ed: TATSynEdit);
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property Editor: TATSynEdit read FEditor write FEditor;
+    function FindAndMark(ANext: boolean): boolean;
+ end;
 
 implementation
 
 
 function SFindText(const StrF, StrText: UnicodeString; IsWordChar: TWordCharFunc;
-  FromPos: integer; OptForward, OptWholeWords, OptCaseSens: Boolean): Integer;
+  FromPos: integer; OptBack, OptWholeWords, OptCaseSens: Boolean): Integer;
 var
   SBuf, FBuf: UnicodeString;
   Match: Boolean;
@@ -63,7 +83,7 @@ begin
   LenF := Length(StrF);
   LastPos := Length(StrText) - LenF + 1;
 
-  if OptForward then
+  if not OptBack then
     //Search forward
     for i := FromPos to LastPos do
     begin
@@ -100,13 +120,11 @@ begin
 end;
 
 function SFindRegex(const StrF, StrText: UnicodeString; FromPos: integer;
-  OptCaseSens: Boolean; out MatchPos, MatchLen: integer): boolean;
+  OptCaseSens: Boolean; var MatchPos, MatchLen: integer): boolean;
 var
   Obj: TRegExpr;
 begin
   Result:= false;
-  MatchPos:= 0;
-  MatchLen:= 0;
 
   Obj:= TRegExpr.Create;
   try
@@ -130,15 +148,83 @@ begin
   Result:= Pos(ch, RegExprWordChars)>0;
 end;
 
+{ TATEditorFinder }
+
+procedure TATEditorFinder.ReadTextFromEditor(Ed: TATSynEdit);
+var
+  Lens: TList;
+  i: integer;
+begin
+  Lens:= TList.Create;
+  try
+    Lens.Clear;
+    for i:= 0 to Ed.Strings.Count-1 do
+      Lens.Add(pointer(Length(Ed.Strings.Lines[i])));
+    FBuffer.Setup(Ed.Strings.TextString, Lens, 1);
+  finally
+    FreeAndNil(Lens);
+  end;
+
+  StrText:= FBuffer.FText;
+end;
+
+constructor TATEditorFinder.Create;
+begin
+  inherited;
+
+  FEditor:= nil;
+  FBuffer:= TATStringBuffer.Create;
+end;
+
+destructor TATEditorFinder.Destroy;
+begin
+  FEditor:= nil;
+  FreeAndNil(FBuffer);
+  inherited Destroy;
+end;
+
+function TATEditorFinder.FindAndMark(ANext: boolean): boolean;
+var
+  P1, P2: TPoint;
+begin
+  Result:= false;
+  if not Assigned(FEditor) then
+  begin
+    Showmessage('Finder.Editor not set');
+    Exit
+  end;
+  if StrFind='' then
+  begin
+    Showmessage('Finder.StrFind not set');
+    Exit
+  end;
+
+  ReadTextFromEditor(FEditor);
+  Result:= FindMatch(ANext);
+  if Result then
+  begin
+    P1:= FBuffer.StrToCaret(MatchPos-1);
+    P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
+    FEditor.DoCaretSingle(P1.X, P1.Y);
+    with FEditor.Carets[0] do
+    begin
+      EndX:= P2.X;
+      EndY:= P2.Y;
+    end;
+    FEditor.Update;
+    FEditor.DoCommand(cCommand_ScrollToCaretTop);
+  end;
+end;
+
 { TATTextFinder }
 
 constructor TATTextFinder.Create;
 begin
   StrFind:= '';
   StrText:= '';
-  OptForward:= true;
-  OptCaseSens:= true;
-  OptWholeWords:= false;
+  OptBack:= false;
+  OptCase:= true;
+  OptWords:= false;
   OptRegex:= false;
   FMatchPos:= 0;
   FMatchLen:= 0;
@@ -149,7 +235,7 @@ begin
   inherited Destroy;
 end;
 
-function TATTextFinder.Find(ANext: boolean): boolean;
+function TATTextFinder.FindMatch(ANext: boolean): boolean;
 begin
   Result:= false;
 
@@ -157,24 +243,24 @@ begin
   if OptRegex then
   begin
     if not ANext then FMatchPos:= 0;
-    Result:= SFindRegex(StrFind, StrText, FMatchPos+1, OptCaseSens, FMatchPos, FMatchLen);
+    Result:= SFindRegex(StrFind, StrText, FMatchPos+1, OptCase, FMatchPos, FMatchLen);
     Exit
   end;
 
   //non-regex
   if not ANext then
   begin
-    if OptForward then FMatchPos:= 1
+    if not OptBack then FMatchPos:= 1
     else FMatchPos:= Length(StrText);
   end
   else
   begin
     if FMatchPos=0 then Exit;
-    if OptForward then Inc(FMatchPos) else Dec(FMatchPos);
+    if not OptBack then Inc(FMatchPos) else Dec(FMatchPos);
   end;
 
   FMatchPos:= SFindText(StrFind, StrText, @IsWordChar, FMatchPos,
-    OptForward, OptWholeWords, OptCaseSens);
+    OptBack, OptWords, OptCase);
   Result:= FMatchPos>0;
   if Result then
   begin

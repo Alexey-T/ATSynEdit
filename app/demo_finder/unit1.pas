@@ -57,19 +57,18 @@ end;
 
 procedure TForm1.DoFind(ANext: boolean);
 begin
-  FInder.StrFind:= trim(Memo1.Text);
-  FInder.StrText:= trim(Memo2.Text);
+  Finder.StrFind:= trim(Memo1.Text);
+  Finder.StrText:= trim(Memo2.Text);
   Finder.OptCaseSens:= chkCase.Checked;
   Finder.OptWholeWords:= chkWords.Checked;
   Finder.OptForward:= chkForw.Checked;
-  FInder.OptRegex:= chkRegex.Checked;
-  if not FInder.Find(ANext) then
+  Finder.OptRegex:= chkRegex.Checked;
+  if not FInder.FindMatch(ANext) then
     memo3.text:= '(not found)'
   else
   begin
     memo3.text:= Copy(Finder.StrText, Finder.MatchPos-2, FInder.MatchLen+4);
   end;
-
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);

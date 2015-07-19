@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="35">
+    <Units Count="36">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -190,6 +190,13 @@
         <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit34>
+      <Unit35>
+        <Filename Value="formfind.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="fmFind"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit35>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
