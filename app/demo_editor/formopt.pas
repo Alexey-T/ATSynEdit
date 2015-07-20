@@ -15,6 +15,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkCrBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
     chkMsColumnSel: TCheckBox;
     chkUnprintArrowDown: TCheckBox;
@@ -57,7 +58,7 @@ type
     chkCutNoSel: TCheckBox;
     chkDotLn: TCheckBox;
     chkMsClickNumSel: TCheckBox;
-    chkCrUnfocus: TCheckBox;
+    chkCrStopUnfocus: TCheckBox;
     chkEndNonspace: TCheckBox;
     chkHomeNonspace: TCheckBox;
     chkLeftRtSwap: TCheckBox;
@@ -221,11 +222,12 @@ begin
     edTabArrowPnt.Value:= OptUnprintedTabPointerScale;
 
     //caret
+    chkCrBlinkEn.Checked:= ed.OptCaretBlinkEnabled;
+    edCrTime.Value:= ed.OptCaretBlinkTime;
     chkCrVirt.Checked:= ed.OptCaretVirtual;
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
-    chkCrUnfocus.Checked:= ed.OptCaretStopUnfocused;
+    chkCrStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
     chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
-    edCrTime.Value:= ed.OptCaretBlinkTime;
     edCrShape.ItemIndex:= Ord(ed.OptCaretShape);
     edCrShape2.ItemIndex:= Ord(ed.OptCaretShapeOvr);
 
@@ -339,12 +341,13 @@ begin
       OptUnprintedEndArrowOrDot:= chkUnprintArrowDown.Checked;
 
       //caret
-      ed.OptCaretVirtual:= chkCrVirt.Checked;
+      ed.OptCaretBlinkEnabled:= chkCrBlinkEn.Checked;
       ed.OptCaretBlinkTime:= edCrTime.Value;
       ed.OptCaretShape:= TATSynCaretShape(edCrShape.ItemIndex);
       ed.OptCaretShapeOvr:= TATSynCaretShape(edCrShape2.ItemIndex);
+      ed.OptCaretVirtual:= chkCrVirt.Checked;
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
-      ed.OptCaretStopUnfocused:= chkCrUnfocus.Checked;
+      ed.OptCaretStopUnfocused:= chkCrStopUnfocus.Checked;
       ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
 
       //gutter
