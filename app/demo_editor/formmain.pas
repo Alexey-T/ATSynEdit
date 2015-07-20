@@ -642,23 +642,23 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.FindAction(false, [fflagMoveCaret, fflagUpdateBuffer]);
+          ok:= FFinder.FindAction(false, []);
           FFinder.UpdateEditor(false);
           if not ok then DoFindError(FFinder.StrFind);
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.FindAction(false, [fflagReplace, fflagMoveCaret, fflagUpdateBuffer]);
+          ok:= FFinder.FindAction(false, [fflagReplace]);
           FFinder.UpdateEditor(true);
           if not ok then DoFindError(FFinder.StrFind);;
         end;
       mrYesToAll: //replace all
         begin
           cnt:= 0;
-          if FFinder.FindAction(false, [fflagReplace, fflagMoveCaret, fflagUpdateBuffer]) then
+          if FFinder.FindAction(false, [fflagReplace]) then
           begin
             Inc(cnt);
-            while FFinder.FindAction(true, [fflagReplace, fflagMoveCaret, fflagUpdateBuffer]) do
+            while FFinder.FindAction(true, [fflagReplace]) do
             begin
               Inc(cnt);
               progress.Position:= FFinder.Progress;
@@ -673,10 +673,10 @@ begin
       mrIgnore: //count all
         begin
           cnt:= 0;
-          if FFinder.FindAction(false, [fflagUpdateBuffer]) then
+          if FFinder.FindAction(false, [fflagDontMoveCaret]) then
           begin
             Inc(cnt);
-            while FFinder.FindAction(true, []) do
+            while FFinder.FindAction(true, [fflagDontMoveCaret, fflagDontRereadBuffer]) do
             begin
               Inc(cnt);
               progress.Position:= FFinder.Progress;
@@ -706,7 +706,7 @@ begin
     Exit
   end;
 
-  ok:= FFinder.FindAction(true, [fflagMoveCaret, fflagUpdateBuffer]);
+  ok:= FFinder.FindAction(true, []);
   FFinder.UpdateEditor(false);
   if not ok then DoFindError(FFinder.StrFind);
 end;
