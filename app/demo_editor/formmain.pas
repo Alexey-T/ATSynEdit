@@ -165,7 +165,7 @@ type
     procedure DoAddEnc(Sub, SName: string);
     procedure DoConfirmReplace(Sender: TObject; const AString: UnicodeString;
       APos1, APos2: TPoint; var AConfirm: boolean);
-    procedure DoFindError(const S: string);
+    procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
     procedure EditChanged(Sender: TObject);
@@ -654,13 +654,13 @@ begin
         begin
           ok:= FFinder.FindAction(false, []);
           FFinder.UpdateEditor(false);
-          if not ok then DoFindError(FFinder.StrFind);
+          if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
           ok:= FFinder.FindAction(false, [fflagReplace]);
           FFinder.UpdateEditor(true);
-          if not ok then DoFindError(FFinder.StrFind);;
+          if not ok then DoFindError;
         end;
       mrYesToAll: //replace all
         begin
@@ -719,7 +719,7 @@ begin
 
   ok:= FFinder.FindAction(true, []);
   FFinder.UpdateEditor(false);
-  if not ok then DoFindError(FFinder.StrFind);
+  if not ok then DoFindError;
 end;
 
 procedure TfmMain.mnuSyntaxClick(Sender: TObject);
@@ -1156,9 +1156,9 @@ begin
   TimerHint.Enabled:= true;
 end;
 
-procedure TfmMain.DoFindError(const S: string);
+procedure TfmMain.DoFindError;
 begin
-  MsgStatus('Cannot find: '+S);
+  MsgStatus('Cannot find: '+FFinder.StrFind);
 end;
 
 procedure TfmMain.DoConfirmReplace(Sender: TObject;
