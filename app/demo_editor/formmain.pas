@@ -163,8 +163,7 @@ type
     FStopped: boolean;
     FConfirmAll: TModalResult;
     procedure DoAddEnc(Sub, SName: string);
-    procedure DoConfirmReplace(Sender: TObject; const AString: UnicodeString;
-      APos1, APos2: TPoint; var AConfirm: boolean);
+    procedure DoConfirmReplace(Sender: TObject; APos1, APos2: TPoint; var AConfirm: boolean);
     procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
@@ -1162,9 +1161,10 @@ begin
 end;
 
 procedure TfmMain.DoConfirmReplace(Sender: TObject;
-  const AString: UnicodeString; APos1, APos2: TPoint; var AConfirm: boolean);
+  APos1, APos2: TPoint; var AConfirm: boolean);
 var
   Res: TModalResult;
+  Str: atString;
 begin
   case FConfirmAll of
     mrYesToAll: begin AConfirm:= true; exit end;
@@ -1181,10 +1181,11 @@ begin
   Ed.DoCommand(cCommand_ScrollToCaretTop);
   Ed.Update(true);
 
+  Str:= Ed.Strings.TextSubstring(APos1.X, APos1.Y, APos2.X, APos2.Y);
   Res:= MessageDlg(
     'Confirm replace',
     'Replace string:'#13+
-      Utf8Encode(AString)+#13+
+      Utf8Encode(Str)+#13+
       Format('at line %d', [APos1.Y+1]),
     mtConfirmation,
     [mbYes, mbYesToAll, mbNo, mbNoToAll], '');
