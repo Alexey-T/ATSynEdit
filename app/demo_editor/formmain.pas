@@ -161,7 +161,10 @@ type
     FFileName: string;
     FFinder: TATEditorFinder;
     FStopped: boolean;
+    FConfirmAll: TModalResult;
     procedure DoAddEnc(Sub, SName: string);
+    procedure DoConfirmReplace(Sender: TObject; const AString: UnicodeString;
+      APos1, APos2: TPoint; var AConfirm: boolean);
     procedure DoFindError(const S: string);
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
@@ -253,6 +256,7 @@ begin
   FFinder:= TATEditorFinder.Create;
   FFinder.Editor:= ed;
   FFinder.OptRegex:= true;
+  FFinder.OnConfirmReplace:= @DoConfirmReplace;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -615,8 +619,6 @@ var
   cnt: integer;
   ok: boolean;
 begin
-  FStopped:= false;
-
   with TfmFind.Create(nil) do
   try
     edFind.Text:= FFinder.StrFind;
@@ -626,6 +628,7 @@ begin
     chkWords.Checked:= FFinder.OptWords;
     chkRegex.Checked:= FFinder.OptRegex;
     chkFromCaret.Checked:= FFinder.OptFromCaret;
+    chkConfirm.Checked:= FFinder.OptConfirmReplace;
 
     res:= ShowModal;
     if res=mrCancel then Exit;
@@ -638,6 +641,13 @@ begin
     FFinder.OptWords:= chkWords.Checked;
     FFinder.OptRegex:= chkRegex.Checked;
     FFinder.OptFromCaret:= chkFromCaret.Checked;
+    FFinder.OptConfirmReplace:= chkConfirm.Checked;
+
+    FStopped:= false;
+    FConfirmAll:= mrNone;
+    btnStop.Show;
+    progress.Show;
+    progress.Position:= 0;
 
     case res of
       mrOk: //find
@@ -693,7 +703,8 @@ begin
     Free;
   end;
 
-  progress.Position:= 0;
+  btnStop.Hide;
+  progress.Hide;
 end;
 
 procedure TfmMain.mnuFindNextClick(Sender: TObject);
@@ -1138,7 +1149,7 @@ begin
   //AParts[1].Colorbg:= clyellow;
 end;
 
-procedure Tfmmain.MsgStatus(const S: string);
+procedure TfmMain.MsgStatus(const S: string);
 begin
   StatusMsg.SimpleText:= S;
   TimerHint.Enabled:= false;
@@ -1148,6 +1159,39 @@ end;
 procedure TfmMain.DoFindError(const S: string);
 begin
   MsgStatus('Cannot find: '+S);
+end;
+
+procedure TfmMain.DoConfirmReplace(Sender: TObject;
+  const AString: UnicodeString; APos1, APos2: TPoint; var AConfirm: boolean);
+var
+  Res: TModalResult;
+begin
+  case FConfirmAll of
+    mrYesToAll: begin AConfirm:= true; exit end;
+    mrNoToAll: begin AConfirm:= false; exit end;
+  end;
+
+  with Ed.Carets[0] do
+  begin
+    PosX:= APos1.X;
+    PosY:= APos1.Y;
+    EndX:= APos2.X;
+    EndY:= APos2.Y;
+  end;
+  Ed.DoCommand(cCommand_ScrollToCaretTop);
+  Ed.Update(true);
+
+  Res:= MessageDlg(
+    'Confirm replace',
+    'Replace string:'#13+
+      Utf8Encode(AString)+#13+
+      Format('at line %d', [APos1.Y+1]),
+    mtConfirmation,
+    [mbYes, mbYesToAll, mbNo, mbNoToAll], '');
+
+  AConfirm:= Res in [mrYes, mrYesToAll];
+  if Res in [mrYesToAll, mrNoToAll] then
+    FConfirmAll:= Res;
 end;
 
 end.

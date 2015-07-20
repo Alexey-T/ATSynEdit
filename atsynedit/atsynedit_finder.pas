@@ -5,7 +5,7 @@ unit ATSynEdit_Finder;
 interface
 
 uses
-  SysUtils, Classes, Dialogs,
+  SysUtils, Classes, Dialogs, Forms, Controls,
   RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Commands,
@@ -34,7 +34,7 @@ type
     OptRegex: boolean;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer;
+    function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer;
       IsWordChar: TWordCharFunc): boolean;
     property MatchPos: integer read FMatchPos; //have meaning if FindMatch returned True
     property MatchLen: integer read FMatchLen; //too
@@ -50,18 +50,29 @@ type
   TATEditorFinderFlags = set of TATEditorFinderFlag;
 
 type
+  TATEditorFinderComfirmReplace = procedure(
+    Sender: TObject;
+    const AString: UnicodeString;
+    APos1, APos2: TPoint; var AConfirm: boolean) of object;
+
+type
   { TATEditorFinder }
 
   TATEditorFinder = class(TATTextFinder)
   private
     FBuffer: TATStringBuffer;
     FEditor: TATSynEdit;
+    FSkipLen: integer;
+    FOnConfirmReplace: TATEditorFinderComfirmReplace;
+    function GetOffsetOfCaret: integer;
     procedure UpdateBuffer(Ed: TATSynEdit);
   public
     OptFromCaret: boolean;
+    OptConfirmReplace: boolean;
     constructor Create;
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
+    property OnConfirmReplace: TATEditorFinderComfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
     function FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
     procedure UpdateEditor(AUpdateText: boolean);
  end;
@@ -185,6 +196,7 @@ begin
   FEditor:= nil;
   FBuffer:= TATStringBuffer.Create;
   OptFromCaret:= false;
+  OptConfirmReplace:= false;
 end;
 
 destructor TATEditorFinder.Destroy;
@@ -194,13 +206,29 @@ begin
   inherited;
 end;
 
+function TATEditorFinder.GetOffsetOfCaret: integer;
+var
+  P1: TPoint;
+begin
+  with FEditor.Carets[0] do
+  begin
+    P1.X:= PosX;
+    P1.Y:= PosY;
+  end;
+  Result:= FBuffer.CaretToStr(P1);
+  if Result<0 then
+    Showmessage('Strange OffsetOfCaret<0');
+end;
+
 function TATEditorFinder.FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
 var
   P1, P2: TPoint;
   Shift, PosAfter: TPoint;
-  AMatchLen, AStartPos: integer;
+  AStartPos: integer;
+  Cfm: boolean;
 begin
   Result:= false;
+
   if not Assigned(FEditor) then
   begin
     Showmessage('Finder.Editor not set');
@@ -220,19 +248,8 @@ begin
   if not (fflagDontRereadBuffer in AFlags) then
     UpdateBuffer(FEditor);
 
-  if fflagReplace in AFlags then
-    AMatchLen:= Length(StrReplacement)
-  else
-    AMatchLen:= FMatchLen;
-
   if OptFromCaret then
-  begin
-    with FEditor.Carets[0] do
-      begin P1.X:= PosX; P1.Y:= PosY; end;
-    AStartPos:= FBuffer.CaretToStr(P1);
-    if AStartPos<0 then
-      Showmessage('Strange CaretToStr<0');
-  end
+    AStartPos:= GetOffsetOfCaret
   else
   if OptRegex then
     AStartPos:= 1
@@ -242,7 +259,9 @@ begin
   else
     AStartPos:= 1;
 
-  Result:= FindMatch(ANext, AMatchLen, AStartPos, @FEditor.IsCharWord);
+  Result:= FindMatch(ANext, FSkipLen, AStartPos, @FEditor.IsCharWord);
+  FSkipLen:= FMatchLen;
+
   if Result then
   begin
     if not (fflagDontMoveCaret in AFlags) then
@@ -253,8 +272,21 @@ begin
 
       if fflagReplace in AFlags then
       begin
-        FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
-        FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacement, false, Shift, PosAfter);
+        Cfm:= true;
+        if OptConfirmReplace then
+          if Assigned(FOnConfirmReplace) then
+          begin
+            FOnConfirmReplace(Self,
+              FEditor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y),
+              P1, P2, Cfm);
+          end;
+
+        if Cfm then
+        begin
+          FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
+          FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacement, false, Shift, PosAfter);
+          FSkipLen:= Length(StrReplacement);
+        end;
       end;
 
       with FEditor.Carets[0] do
@@ -298,7 +330,7 @@ begin
   inherited Destroy;
 end;
 
-function TATTextFinder.FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer;
+function TATTextFinder.FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer;
   IsWordChar: TWordCharFunc): boolean;
 var
   FromPos: integer;
@@ -313,7 +345,7 @@ begin
     if not ANext then
       FromPos:= AStartPos
     else
-      FromPos:= FMatchPos+AMatchLen;
+      FromPos:= FMatchPos+ASkipLen;
     Result:= SFindRegex(StrText, StrFind, StrReplace,
       FromPos, OptCase,
       FMatchPos, FMatchLen, StrReplacement);
