@@ -5,7 +5,7 @@
     <General>
       <SessionStorage Value="InProjectDir"/>
       <MainUnit Value="0"/>
-      <Title Value="Demo finder"/>
+      <Title Value="Finder test"/>
       <ResourceType Value="res"/>
       <UseXPManifest Value="True"/>
     </General>
