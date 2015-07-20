@@ -1,17 +1,18 @@
-object Form1: TForm1
-  Left = 528
+object fmMain: TfmMain
+  Left = 516
   Height = 320
-  Top = 251
+  Top = 250
   Width = 667
   BorderStyle = bsDialog
   Caption = 'Test Finder.FindMatch'
   ClientHeight = 320
   ClientWidth = 667
   OnCreate = FormCreate
+  Position = poScreenCenter
   LCLVersion = '1.5'
   object Memo1: TMemo
     Left = 8
-    Height = 83
+    Height = 48
     Top = 24
     Width = 407
     Lines.Strings = (
@@ -21,8 +22,8 @@ object Form1: TForm1
   end
   object Memo2: TMemo
     Left = 8
-    Height = 176
-    Top = 136
+    Height = 216
+    Top = 96
     Width = 407
     Lines.Strings = (
       'TForm1 = class(TForm)'
@@ -37,22 +38,22 @@ object Form1: TForm1
     )
     TabOrder = 1
   end
-  object bFIndNext: TButton
+  object bFindNext: TButton
     Left = 431
     Height = 25
     Top = 62
     Width = 120
     Caption = 'find next'
-    OnClick = bFIndNextClick
+    OnClick = bFindNextClick
     TabOrder = 3
   end
-  object bFInd: TButton
+  object bFind: TButton
     Left = 431
     Height = 25
     Top = 30
     Width = 120
     Caption = 'find first'
-    OnClick = bFIndClick
+    OnClick = bFindClick
     TabOrder = 2
   end
   object Label1: TLabel
@@ -66,7 +67,7 @@ object Form1: TForm1
   object Label2: TLabel
     Left = 8
     Height = 17
-    Top = 116
+    Top = 80
     Width = 70
     Caption = 'find where'
     ParentColor = False
@@ -96,8 +97,6 @@ object Form1: TForm1
     Top = 126
     Width = 89
     Caption = 'case sens'
-    Checked = True
-    State = cbChecked
     TabOrder = 5
   end
   object chkWords: TCheckBox
