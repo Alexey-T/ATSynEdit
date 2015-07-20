@@ -2,10 +2,10 @@ object fmMain: TfmMain
   Left = 222
   Height = 442
   Top = 254
-  Width = 859
+  Width = 932
   Caption = 'App'
   ClientHeight = 442
-  ClientWidth = 859
+  ClientWidth = 932
   OnCreate = FormCreate
   OnShow = FormShow
   LCLVersion = '1.5'
@@ -13,21 +13,21 @@ object fmMain: TfmMain
     Left = 0
     Height = 442
     Top = 0
-    Width = 694
+    Width = 626
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 0
   end
   object Panel2: TPanel
-    Left = 694
+    Left = 632
     Height = 442
     Top = 0
-    Width = 165
+    Width = 300
     Align = alRight
     BevelOuter = bvNone
     ClientHeight = 442
-    ClientWidth = 165
+    ClientWidth = 300
     TabOrder = 1
     object bGettext: TButton
       Left = 0
@@ -40,9 +40,10 @@ object fmMain: TfmMain
     end
     object List: TShellListView
       Left = 0
-      Height = 388
-      Top = 8
-      Width = 162
+      Height = 442
+      Top = 0
+      Width = 300
+      Align = alClient
       Color = clWhite
       HideSelection = False
       ReadOnly = True
@@ -50,9 +51,18 @@ object fmMain: TfmMain
       SortColumn = 0
       SortType = stText
       TabOrder = 1
-      ViewStyle = vsList
+      ViewStyle = vsSmallIcon
       OnClick = ListClick
       ObjectTypes = [otNonFolders]
     end
+  end
+  object Splitter1: TSplitter
+    Left = 626
+    Height = 442
+    Top = 0
+    Width = 6
+    Align = alRight
+    Beveled = True
+    ResizeAnchor = akRight
   end
 end

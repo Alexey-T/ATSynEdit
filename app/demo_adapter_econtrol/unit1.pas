@@ -106,7 +106,7 @@ var
   fname_lxl: string;
 begin
   FDir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'/test_syntax_files/';
-  fname_lxl:= ExtractFilePath(Application.ExeName)+'lexlib.lxl';
+  fname_lxl:= ExtractFilePath(Application.ExeName)+'lib.lxl';
 
   manager:= TecSyntaxManager.Create(Self);
   manager.LoadFromFile(fname_lxl);
