@@ -163,9 +163,8 @@ type
     FStopped: boolean;
     FConfirmAll: TModalResult;
     procedure DoAddEnc(Sub, SName: string);
-    procedure DoConfirmReplace(Sender: TObject; const AString: UnicodeString;
-      APos1, APos2: TPoint; var AConfirm: boolean);
-    procedure DoFindError(const S: string);
+    procedure DoConfirmReplace(Sender: TObject; APos1, APos2: TPoint; var AConfirm: boolean);
+    procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
     procedure EditChanged(Sender: TObject);
@@ -654,13 +653,13 @@ begin
         begin
           ok:= FFinder.FindAction(false, []);
           FFinder.UpdateEditor(false);
-          if not ok then DoFindError(FFinder.StrFind);
+          if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
           ok:= FFinder.FindAction(false, [fflagReplace]);
           FFinder.UpdateEditor(true);
-          if not ok then DoFindError(FFinder.StrFind);;
+          if not ok then DoFindError;
         end;
       mrYesToAll: //replace all
         begin
@@ -719,7 +718,7 @@ begin
 
   ok:= FFinder.FindAction(true, []);
   FFinder.UpdateEditor(false);
-  if not ok then DoFindError(FFinder.StrFind);
+  if not ok then DoFindError;
 end;
 
 procedure TfmMain.mnuSyntaxClick(Sender: TObject);
@@ -1156,15 +1155,16 @@ begin
   TimerHint.Enabled:= true;
 end;
 
-procedure TfmMain.DoFindError(const S: string);
+procedure TfmMain.DoFindError;
 begin
-  MsgStatus('Cannot find: '+S);
+  MsgStatus('Cannot find: '+FFinder.StrFind);
 end;
 
 procedure TfmMain.DoConfirmReplace(Sender: TObject;
-  const AString: UnicodeString; APos1, APos2: TPoint; var AConfirm: boolean);
+  APos1, APos2: TPoint; var AConfirm: boolean);
 var
   Res: TModalResult;
+  Str: atString;
 begin
   case FConfirmAll of
     mrYesToAll: begin AConfirm:= true; exit end;
@@ -1181,10 +1181,11 @@ begin
   Ed.DoCommand(cCommand_ScrollToCaretTop);
   Ed.Update(true);
 
+  Str:= Ed.Strings.TextSubstring(APos1.X, APos1.Y, APos2.X, APos2.Y);
   Res:= MessageDlg(
     'Confirm replace',
     'Replace string:'#13+
-      Utf8Encode(AString)+#13+
+      Utf8Encode(Str)+#13+
       Format('at line %d', [APos1.Y+1]),
     mtConfirmation,
     [mbYes, mbYesToAll, mbNo, mbNoToAll], '');

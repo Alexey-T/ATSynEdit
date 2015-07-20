@@ -518,7 +518,7 @@ object fmMain: TfmMain
   end
   object TimerHint: TTimer
     Enabled = False
-    Interval = 3500
+    Interval = 4500
     OnTimer = TimerHintTimer
     left = 560
     top = 303

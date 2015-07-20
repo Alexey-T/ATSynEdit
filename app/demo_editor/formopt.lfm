@@ -9,7 +9,7 @@ object fmOpt: TfmOpt
   ClientWidth = 640
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.4.2.0'
+  LCLVersion = '1.5'
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 25
@@ -34,8 +34,8 @@ object fmOpt: TfmOpt
     Height = 344
     Top = 8
     Width = 624
-    ActivePage = TabSheet3
-    TabIndex = 4
+    ActivePage = TabSheet4
+    TabIndex = 5
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -875,7 +875,7 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 27
         Top = 8
-        Width = 59
+        Width = 64
         Increment = 100
         MaxValue = 2000
         MinValue = 300
@@ -883,7 +883,7 @@ object fmOpt: TfmOpt
         Value = 500
       end
       object Label8: TLabel
-        Left = 71
+        Left = 80
         Height = 17
         Top = 12
         Width = 67
@@ -893,31 +893,31 @@ object fmOpt: TfmOpt
       object chkCrVirt: TCheckBox
         Left = 8
         Height = 24
-        Top = 40
-        Width = 154
-        Caption = 'caret after line-end'
-        TabOrder = 1
+        Top = 128
+        Width = 210
+        Caption = 'caret allowed after line-end'
+        TabOrder = 4
       end
       object chkCrMul: TCheckBox
         Left = 8
         Height = 24
-        Top = 60
+        Top = 104
         Width = 107
         Caption = 'multi-carets'
-        TabOrder = 2
-      end
-      object chkCrUnfocus: TCheckBox
-        Left = 8
-        Height = 24
-        Top = 80
-        Width = 143
-        Caption = 'stop if unfocused'
         TabOrder = 3
       end
+      object chkCrStopUnfocus: TCheckBox
+        Left = 8
+        Height = 24
+        Top = 64
+        Width = 184
+        Caption = 'don''t blink if unfocused'
+        TabOrder = 2
+      end
       object Label7: TLabel
-        Left = 432
+        Left = 448
         Height = 17
-        Top = 12
+        Top = 16
         Width = 95
         Caption = 'shape, normal'
         ParentColor = False
@@ -926,42 +926,42 @@ object fmOpt: TfmOpt
         Left = 312
         Height = 31
         Top = 8
-        Width = 114
+        Width = 128
         DropDownCount = 40
         ItemHeight = 0
         Style = csDropDownList
-        TabOrder = 4
+        TabOrder = 6
       end
       object edCrShape2: TComboBox
         Left = 312
         Height = 31
-        Top = 36
-        Width = 114
+        Top = 40
+        Width = 128
         DropDownCount = 40
         ItemHeight = 0
         Style = csDropDownList
-        TabOrder = 5
+        TabOrder = 7
       end
       object Label9: TLabel
-        Left = 432
+        Left = 448
         Height = 17
-        Top = 40
-        Width = 69
-        Caption = 'shape, ovr'
+        Top = 48
+        Width = 112
+        Caption = 'shape, overwrite'
         ParentColor = False
       end
       object chkCrPreferLeft: TCheckBox
         Left = 8
         Height = 24
-        Top = 100
+        Top = 152
         Width = 302
         Caption = 'end of wrapped part: prefer next line pos'
-        TabOrder = 6
+        TabOrder = 5
       end
       object ListShapes: TListBox
-        Left = 312
+        Left = 336
         Height = 196
-        Top = 212
+        Top = 232
         Width = 117
         Items.Strings = (
           'Full'
@@ -992,11 +992,18 @@ object fmOpt: TfmOpt
           'HorzPercents50'
           'Frame'
         )
-        ItemHeight = 0
+        ItemHeight = 23
         ScrollWidth = 115
-        TabOrder = 7
-        TopIndex = -1
+        TabOrder = 8
         Visible = False
+      end
+      object chkCrBlinkEn: TCheckBox
+        Left = 8
+        Height = 24
+        Top = 43
+        Width = 116
+        Caption = 'blink enabled'
+        TabOrder = 1
       end
     end
     object TabSheet6: TTabSheet

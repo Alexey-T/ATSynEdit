@@ -50,9 +50,7 @@ type
   TATEditorFinderFlags = set of TATEditorFinderFlag;
 
 type
-  TATEditorFinderComfirmReplace = procedure(
-    Sender: TObject;
-    const AString: UnicodeString;
+  TATEditorFinderComfirmReplace = procedure(Sender: TObject;
     APos1, APos2: TPoint; var AConfirm: boolean) of object;
 
 type
@@ -275,11 +273,7 @@ begin
         Cfm:= true;
         if OptConfirmReplace then
           if Assigned(FOnConfirmReplace) then
-          begin
-            FOnConfirmReplace(Self,
-              FEditor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y),
-              P1, P2, Cfm);
-          end;
+            FOnConfirmReplace(Self, P1, P2, Cfm);
 
         if Cfm then
         begin
