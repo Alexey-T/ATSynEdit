@@ -15,6 +15,7 @@ type
     Panel1: TPanel;
     Panel2: TPanel;
     List: TShellListView;
+    Splitter1: TSplitter;
     procedure bGettextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -43,8 +44,10 @@ begin
   ed.Align:= alClient;
   ed.Font.Name:= 'Courier New';
   ed.OptUnprintedVisible:= false;
+  ed.OptRulerVisible:= false;
+  ed.OptWrapMode:= cWrapOff;
 
-  fDir:= ExtractFilePath(Application.Exename)+'..\..\test_files';
+  fDir:= ExtractFilePath(Application.Exename)+'../../test_files';
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);

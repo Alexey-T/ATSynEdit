@@ -22,20 +22,20 @@ object fmMain: TfmMain
     TabOrder = 0
     object chkWrap: TCheckBox
       Left = 9
-      Height = 19
+      Height = 24
       Top = 8
-      Width = 76
+      Width = 98
       Caption = 'word wrap'
       OnChange = chkWrapChange
       TabOrder = 0
     end
     object edLexer: TComboBox
       Left = 192
-      Height = 23
+      Height = 31
       Top = 36
       Width = 152
       DropDownCount = 24
-      ItemHeight = 15
+      ItemHeight = 0
       OnChange = edLexerChange
       Style = csDropDownList
       TabOrder = 6
@@ -59,18 +59,18 @@ object fmMain: TfmMain
     end
     object chkFullSel: TCheckBox
       Left = 9
-      Height = 19
+      Height = 24
       Top = 48
-      Width = 104
+      Width = 129
       Caption = 'show full sel-bg'
       OnChange = chkFullSelChange
       TabOrder = 2
     end
     object chkFullHilite: TCheckBox
       Left = 9
-      Height = 19
+      Height = 24
       Top = 68
-      Width = 123
+      Width = 154
       Caption = 'show full syntax-bg'
       OnChange = chkFullHiliteChange
       TabOrder = 3
@@ -86,27 +86,27 @@ object fmMain: TfmMain
     end
     object chkUnpri: TCheckBox
       Left = 9
-      Height = 19
+      Height = 24
       Top = 28
-      Width = 103
+      Width = 130
       Caption = 'show unprinted'
       OnChange = chkUnpriChange
       TabOrder = 1
     end
     object chkShowCur: TCheckBox
       Left = 9
-      Height = 19
+      Height = 24
       Top = 88
-      Width = 107
+      Width = 132
       Caption = 'show cur line bg'
       OnChange = chkShowCurChange
       TabOrder = 4
     end
     object chkLexer: TCheckBox
       Left = 192
-      Height = 19
+      Height = 24
       Top = 62
-      Width = 82
+      Width = 108
       Caption = 'enable lexer'
       Checked = True
       OnChange = chkLexerChange
@@ -115,9 +115,9 @@ object fmMain: TfmMain
     end
     object chkDyn: TCheckBox
       Left = 192
-      Height = 19
+      Height = 24
       Top = 81
-      Width = 95
+      Width = 119
       Caption = 'dynamic hilite'
       OnChange = chkDynChange
       TabOrder = 8
