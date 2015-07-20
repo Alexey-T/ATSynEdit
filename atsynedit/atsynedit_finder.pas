@@ -44,8 +44,8 @@ type
 type
   TATEditorFinderFlag = (
     fflagReplace,
-    fflagMoveCaret,
-    fflagUpdateBuffer
+    fflagDontMoveCaret,
+    fflagDontRereadBuffer
     );
   TATEditorFinderFlags = set of TATEditorFinderFlag;
 
@@ -194,8 +194,7 @@ begin
   inherited;
 end;
 
-function TATEditorFinder.FindAction(ANext: boolean; AFlags: TATEditorFinderFlags
-  ): boolean;
+function TATEditorFinder.FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
 var
   P1, P2: TPoint;
   Shift, PosAfter: TPoint;
@@ -218,7 +217,7 @@ begin
     Exit
   end;
 
-  if fflagUpdateBuffer in AFlags then
+  if not (fflagDontRereadBuffer in AFlags) then
     UpdateBuffer(FEditor);
 
   if fflagReplace in AFlags then
@@ -246,7 +245,7 @@ begin
   Result:= FindMatch(ANext, AMatchLen, AStartPos, @FEditor.IsCharWord);
   if Result then
   begin
-    if fflagMoveCaret in AFlags then
+    if not (fflagDontMoveCaret in AFlags) then
     begin
       P1:= FBuffer.StrToCaret(MatchPos-1);
       P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
