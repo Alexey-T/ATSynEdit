@@ -1,11 +1,11 @@
 object fmFind: TfmFind
   Left = 521
-  Height = 258
+  Height = 233
   Top = 265
   Width = 489
   BorderStyle = bsDialog
   Caption = 'Find/Replace'
-  ClientHeight = 258
+  ClientHeight = 233
   ClientWidth = 489
   OnShow = FormShow
   Position = poScreenCenter
@@ -17,7 +17,7 @@ object fmFind: TfmFind
     Width = 99
     Caption = 'find'
     ModalResult = 1
-    TabOrder = 8
+    TabOrder = 9
   end
   object bCancel: TButton
     Left = 376
@@ -26,7 +26,7 @@ object fmFind: TfmFind
     Width = 99
     Caption = 'cancel'
     ModalResult = 2
-    TabOrder = 12
+    TabOrder = 13
   end
   object Label1: TLabel
     Left = 9
@@ -100,7 +100,7 @@ object fmFind: TfmFind
     Caption = 'replace'
     Default = True
     ModalResult = 6
-    TabOrder = 9
+    TabOrder = 10
   end
   object bRepAll: TButton
     Left = 376
@@ -109,12 +109,12 @@ object fmFind: TfmFind
     Width = 99
     Caption = 'replace all'
     ModalResult = 10
-    TabOrder = 10
+    TabOrder = 11
   end
   object chkFromCaret: TCheckBox
-    Left = 9
+    Left = 216
     Height = 24
-    Top = 224
+    Top = 128
     Width = 98
     Caption = 'from caret'
     TabOrder = 7
@@ -126,6 +126,14 @@ object fmFind: TfmFind
     Width = 99
     Caption = 'count all'
     ModalResult = 5
-    TabOrder = 11
+    TabOrder = 12
+  end
+  object chkConfirm: TCheckBox
+    Left = 216
+    Height = 24
+    Top = 152
+    Width = 131
+    Caption = 'confirm replace'
+    TabOrder = 8
   end
 end

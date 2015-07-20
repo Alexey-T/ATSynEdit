@@ -19,6 +19,7 @@ type
     bRep: TButton;
     bRepAll: TButton;
     chkFromCaret: TCheckBox;
+    chkConfirm: TCheckBox;
     chkRep: TCheckBox;
     chkRegex: TCheckBox;
     chkBack: TCheckBox;
@@ -62,16 +63,21 @@ begin
 end;
 
 procedure TfmFInd.Update;
+var
+  rep: boolean;
 begin
+  rep:= chkRep.Checked;
+
   chkWords.Enabled:= not chkRegex.Checked;
   chkBack.Enabled:= not chkRegex.Checked;
-  edRep.Enabled:= chkRep.Checked;
-  bFind.Visible:= not chkRep.Checked;
-  bRep.Visible:= chkRep.Checked;
-  bRepAll.Visible:= chkRep.Checked;
+  chkConfirm.Enabled:= rep;
+  edRep.Enabled:= rep;
+  bFind.Visible:= not rep;
+  bRep.Visible:= rep;
+  bRepAll.Visible:= rep;
 
-  if chkRep.Checked then Caption:= 'Replace' else Caption:= 'Find';
-  if chkRep.Checked then bRep.Default:= true else bFind.Default:= true;
+  if rep then Caption:= 'Replace' else Caption:= 'Find';
+  if rep then bRep.Default:= true else bFind.Default:= true;
 end;
 
 end.

@@ -53,6 +53,7 @@ object fmMain: TfmMain
       Smooth = True
       Step = 1
       TabOrder = 2
+      Visible = False
     end
     object btnStop: TButton
       AnchorSideRight.Control = progress
@@ -67,6 +68,7 @@ object fmMain: TfmMain
       Caption = 'stop'
       OnClick = btnStopClick
       TabOrder = 3
+      Visible = False
     end
   end
   object PanelRt: TPanel
