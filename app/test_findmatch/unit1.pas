@@ -10,11 +10,11 @@ uses
 
 type
 
-  { TForm1 }
+  { TfmMain }
 
-  TForm1 = class(TForm)
-    bFIndNext: TButton;
-    bFInd: TButton;
+  TfmMain = class(TForm)
+    bFindNext: TButton;
+    bFind: TButton;
     chkRegex: TCheckBox;
     chkBack: TCheckBox;
     chkCase: TCheckBox;
@@ -25,8 +25,8 @@ type
     Memo1: TMemo;
     Memo2: TMemo;
     Memo3: TMemo;
-    procedure bFIndNextClick(Sender: TObject);
-    procedure bFIndClick(Sender: TObject);
+    procedure bFindNextClick(Sender: TObject);
+    procedure bFindClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     Finder: TATTextFinder;
@@ -38,30 +38,30 @@ type
   end;
 
 var
-  Form1: TForm1;
+  fmMain: TfmMain;
 
 implementation
 
 {$R *.lfm}
 
-{ TForm1 }
+{ TfmMain }
 
-procedure TForm1.bFIndClick(Sender: TObject);
+procedure TfmMain.bFindClick(Sender: TObject);
 begin
   DoFind(false);
 end;
 
-procedure TForm1.bFIndNextClick(Sender: TObject);
+procedure TfmMain.bFindNextClick(Sender: TObject);
 begin
   DoFind(true);
 end;
 
-function TForm1.IsWordChar(ch: Widechar): boolean;
+function TfmMain.IsWordChar(ch: Widechar): boolean;
 begin
   Result:= Pos(ch, RegExprWordChars)>0;
 end;
 
-procedure TForm1.DoFind(ANext: boolean);
+procedure TfmMain.DoFind(ANext: boolean);
 var
   FromPos, SkipLen: integer;
 begin
@@ -76,7 +76,10 @@ begin
   if ANext then
     FromPos:= Finder.MatchPos
   else
-  if FInder.OptBack then
+  if Finder.OptRegex then
+    FromPos:= 1
+  else
+  if Finder.OptBack then
     FromPos:= Length(Finder.StrText)
   else
     FromPos:= 1;
@@ -87,7 +90,7 @@ begin
     memo3.text:= 'context:'#13+Copy(Finder.StrText, Finder.MatchPos-2, FInder.MatchLen+4);
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TfmMain.FormCreate(Sender: TObject);
 begin
   FInder:= TATTextFinder.Create;
 end;
