@@ -1,7 +1,7 @@
 object fmMain: TfmMain
   Left = 282
   Height = 498
-  Top = 111
+  Top = 147
   Width = 953
   Caption = 'Demo'
   ClientHeight = 498
@@ -29,6 +29,44 @@ object fmMain: TfmMain
       Top = 477
       Width = 672
       Panels = <>
+    end
+    object StatusMsg: TStatusBar
+      Left = 0
+      Height = 21
+      Top = 456
+      Width = 672
+      Panels = <>
+    end
+    object progress: TProgressBar
+      AnchorSideLeft.Control = PanelMain
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideRight.Control = StatusMsg
+      AnchorSideRight.Side = asrBottom
+      AnchorSideBottom.Control = StatusMsg
+      AnchorSideBottom.Side = asrCenter
+      Left = 474
+      Height = 14
+      Top = 459
+      Width = 193
+      Anchors = [akRight, akBottom]
+      BorderSpacing.Right = 5
+      Smooth = True
+      Step = 1
+      TabOrder = 2
+    end
+    object btnStop: TButton
+      AnchorSideRight.Control = progress
+      AnchorSideBottom.Control = StatusMsg
+      AnchorSideBottom.Side = asrCenter
+      Left = 386
+      Height = 19
+      Top = 456
+      Width = 83
+      Anchors = [akRight, akBottom]
+      BorderSpacing.Right = 5
+      Caption = 'stop'
+      OnClick = btnStopClick
+      TabOrder = 3
     end
   end
   object PanelRt: TPanel
@@ -283,22 +321,6 @@ object fmMain: TfmMain
       TabOrder = 5
     end
   end
-  object progress: TProgressBar
-    AnchorSideLeft.Control = PanelMain
-    AnchorSideLeft.Side = asrBottom
-    AnchorSideRight.Control = PanelRt
-    AnchorSideRight.Side = asrBottom
-    AnchorSideBottom.Control = PanelRt
-    AnchorSideBottom.Side = asrBottom
-    Left = 672
-    Height = 10
-    Top = 488
-    Width = 281
-    Anchors = [akLeft, akRight, akBottom]
-    Smooth = True
-    Step = 1
-    TabOrder = 2
-  end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]
     left = 472
@@ -491,5 +513,12 @@ object fmMain: TfmMain
       Caption = 'ruler'
       Enabled = False
     end
+  end
+  object TimerHint: TTimer
+    Enabled = False
+    Interval = 3500
+    OnTimer = TimerHintTimer
+    left = 560
+    top = 303
   end
 end

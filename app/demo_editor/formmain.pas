@@ -23,6 +23,7 @@ type
   TfmMain = class(TForm)
     bFont: TButton;
     bOpt: TButton;
+    btnStop: TButton;
     chkGutter: TCheckBox;
     chkMicromap: TCheckBox;
     chkMinimap: TCheckBox;
@@ -101,7 +102,10 @@ type
     progress: TProgressBar;
     SaveDialog1: TSaveDialog;
     Status: TStatusBar;
+    StatusMsg: TStatusBar;
+    TimerHint: TTimer;
     procedure bGotoClick(Sender: TObject);
+    procedure btnStopClick(Sender: TObject);
     procedure mnuFileOpenClick(Sender: TObject);
     procedure bFontClick(Sender: TObject);
     procedure bAddCrtClick(Sender: TObject);
@@ -111,6 +115,7 @@ type
     procedure mnuFindClick(Sender: TObject);
     procedure mnuFindNextClick(Sender: TObject);
     procedure mnuSyntaxClick(Sender: TObject);
+    procedure TimerHintTimer(Sender: TObject);
     procedure UpdateEnc;
     procedure mnuHelpMousClick(Sender: TObject);
     procedure btnLoadClick(Sender: TObject);
@@ -155,8 +160,9 @@ type
     FDir: string;
     FFileName: string;
     FFinder: TATEditorFinder;
+    FStopped: boolean;
     procedure DoAddEnc(Sub, SName: string);
-    procedure DoFindError;
+    procedure DoFindError(const S: string);
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
     procedure EditChanged(Sender: TObject);
@@ -173,6 +179,7 @@ type
     procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure MenuEncClick(Sender: TObject);
+    procedure MsgStatus(const S: string);
     procedure UpdateStatus;
     procedure UpdateChecks;
   public
@@ -531,6 +538,11 @@ begin
     Showmessage('Incorrect index: '+s);
 end;
 
+procedure TfmMain.btnStopClick(Sender: TObject);
+begin
+  FStopped:= true;
+end;
+
 procedure TfmMain.bFontClick(Sender: TObject);
 begin
   with FontDialog1 do
@@ -603,6 +615,8 @@ var
   cnt: integer;
   ok: boolean;
 begin
+  FStopped:= false;
+
   with TfmFind.Create(nil) do
   try
     edFind.Text:= FFinder.StrFind;
@@ -630,13 +644,13 @@ begin
         begin
           ok:= FFinder.FindAction(false, [fflagMoveCaret, fflagUpdateBuffer]);
           FFinder.UpdateEditor(false);
-          if not ok then DoFindError;
+          if not ok then DoFindError(FFinder.StrFind);
         end;
       mrYes: //replace
         begin
           ok:= FFinder.FindAction(false, [fflagReplace, fflagMoveCaret, fflagUpdateBuffer]);
           FFinder.UpdateEditor(true);
-          if not ok then DoFindError;
+          if not ok then DoFindError(FFinder.StrFind);;
         end;
       mrYesToAll: //replace all
         begin
@@ -650,10 +664,11 @@ begin
               progress.Position:= FFinder.Progress;
               if cnt mod 100=0 then
                 Application.ProcessMessages;
+              if FStopped then Break;
             end;
           end;
           FFinder.UpdateEditor(true);
-          Showmessage('Replaces made: '+Inttostr(cnt));
+          MsgStatus('Replaces made: '+Inttostr(cnt));
         end;
       mrIgnore: //count all
         begin
@@ -667,10 +682,11 @@ begin
               progress.Position:= FFinder.Progress;
               if cnt mod 100=0 then
                 Application.ProcessMessages;
+              if FStopped then Break;
             end;
           end;
           FFinder.UpdateEditor(false);
-          Showmessage('Counted: '+Inttostr(cnt));
+          MsgStatus('Counted: '+Inttostr(cnt));
         end;
     end;
   finally
@@ -692,7 +708,7 @@ begin
 
   ok:= FFinder.FindAction(true, [fflagMoveCaret, fflagUpdateBuffer]);
   FFinder.UpdateEditor(false);
-  if not ok then DoFindError;
+  if not ok then DoFindError(FFinder.StrFind);
 end;
 
 procedure TfmMain.mnuSyntaxClick(Sender: TObject);
@@ -703,6 +719,12 @@ begin
   else
     ed.OnCalcHilite:= nil;
   ed.Update;
+end;
+
+procedure TfmMain.TimerHintTimer(Sender: TObject);
+begin
+  TimerHint.Enabled:= false;
+  StatusMsg.SimpleText:= '';
 end;
 
 procedure TfmMain.DoSetEnc(const Str: string);
@@ -1116,10 +1138,16 @@ begin
   //AParts[1].Colorbg:= clyellow;
 end;
 
-procedure TfmMain.DoFindError;
+procedure Tfmmain.MsgStatus(const S: string);
 begin
-  Beep;
-  Showmessage('Cannot find string');
+  StatusMsg.SimpleText:= S;
+  TimerHint.Enabled:= false;
+  TimerHint.Enabled:= true;
+end;
+
+procedure TfmMain.DoFindError(const S: string);
+begin
+  MsgStatus('Cannot find: '+S);
 end;
 
 end.

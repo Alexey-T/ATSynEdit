@@ -9,7 +9,11 @@ uses
   RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Commands,
+  ATStringProc,
   ATStringProc_TextBuffer;
+
+type
+  TWordCharFunc = function(ch: Widechar): boolean of object;
 
 type
   { TATTextFinder }
@@ -23,14 +27,15 @@ type
     StrText: UnicodeString;
     StrFind: UnicodeString;
     StrReplace: UnicodeString;
-    StrReplacedTo: UnicodeString;
+    StrReplacement: UnicodeString;
     OptBack: boolean; //for non-regex
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for all cases
     OptRegex: boolean;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer): boolean;
+    function FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer;
+      IsWordChar: TWordCharFunc): boolean;
     property MatchPos: integer read FMatchPos; //have meaning if FindMatch returned True
     property MatchLen: integer read FMatchLen; //too
     property Progress: integer read FProgress;
@@ -63,11 +68,11 @@ type
 
 implementation
 
-type
-  TWordCharFunc = function (ch: Widechar): boolean;
-
-function SFindText(const StrFind, StrText: UnicodeString; IsWordChar: TWordCharFunc;
-  FromPos: integer; OptBack, OptWords, OptCase: Boolean): Integer;
+function SFindText(
+  const StrText, StrFind: UnicodeString;
+  FromPos: integer;
+  OptBack, OptWords, OptCase: Boolean;
+  IsWordChar: TWordCharFunc): Integer;
 var
   SBuf, FBuf: UnicodeString;
   Match: Boolean;
@@ -124,7 +129,7 @@ begin
 end;
 
 function SFindRegex(
-  const StrFind, StrText, StrReplace: UnicodeString;
+  const StrText, StrFind, StrReplace: UnicodeString;
   FromPos: integer;
   OptCase: Boolean;
   var MatchPos, MatchLen: integer;
@@ -152,11 +157,6 @@ begin
   finally
     FreeAndNil(Obj);
   end;
-end;
-
-function IsWordChar(ch: Widechar): boolean;
-begin
-  Result:= Pos(ch, RegExprWordChars)>0;
 end;
 
 { TATEditorFinder }
@@ -222,7 +222,7 @@ begin
     UpdateBuffer(FEditor);
 
   if fflagReplace in AFlags then
-    AMatchLen:= Length(StrReplacedTo)
+    AMatchLen:= Length(StrReplacement)
   else
     AMatchLen:= FMatchLen;
 
@@ -243,7 +243,7 @@ begin
   else
     AStartPos:= 1;
 
-  Result:= FindMatch(ANext, AMatchLen, AStartPos);
+  Result:= FindMatch(ANext, AMatchLen, AStartPos, @FEditor.IsCharWord);
   if Result then
   begin
     if fflagMoveCaret in AFlags then
@@ -255,7 +255,7 @@ begin
       if fflagReplace in AFlags then
       begin
         FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
-        FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacedTo, false, Shift, PosAfter);
+        FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacement, false, Shift, PosAfter);
       end;
 
       with FEditor.Carets[0] do
@@ -285,7 +285,7 @@ begin
   StrFind:= '';
   StrText:= '';
   StrReplace:= '';
-  StrReplacedTo:= '';
+  StrReplacement:= '';
   OptBack:= false;
   OptCase:= false;
   OptWords:= false;
@@ -299,7 +299,8 @@ begin
   inherited Destroy;
 end;
 
-function TATTextFinder.FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer): boolean;
+function TATTextFinder.FindMatch(ANext: boolean; AMatchLen: integer; AStartPos: integer;
+  IsWordChar: TWordCharFunc): boolean;
 var
   FromPos: integer;
 begin
@@ -314,9 +315,9 @@ begin
       FromPos:= AStartPos
     else
       FromPos:= FMatchPos+AMatchLen;
-    Result:= SFindRegex(StrFind, StrText, StrReplace,
+    Result:= SFindRegex(StrText, StrFind, StrReplace,
       FromPos, OptCase,
-      FMatchPos, FMatchLen, StrReplacedTo);
+      FMatchPos, FMatchLen, StrReplacement);
     FProgress:= FMatchPos * 100 div Length(StrText);
     Exit
   end;
@@ -332,9 +333,9 @@ begin
     if not OptBack then Inc(FMatchPos) else Dec(FMatchPos);
   end;
 
-  StrReplacedTo:= StrReplace;
-  FMatchPos:= SFindText(StrFind, StrText, @IsWordChar, FMatchPos,
-    OptBack, OptWords, OptCase);
+  StrReplacement:= StrReplace;
+  FMatchPos:= SFindText(StrText, StrFind, FMatchPos,
+    OptBack, OptWords, OptCase, IsWordChar);
   Result:= FMatchPos>0;
   if Result then
     FMatchLen:= Length(StrFind);
