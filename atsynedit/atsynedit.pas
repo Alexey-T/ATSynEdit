@@ -765,6 +765,7 @@ type
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsPosFolded(AX, AY: integer): boolean;
+    function IsCharWord(ch: Widechar): boolean;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
@@ -4000,6 +4001,11 @@ begin
   end;
 end;
 
+
+function TATSynEdit.IsCharWord(ch: Widechar): boolean;
+begin
+  Result:= ATStringProc.IsCharWord(ch, OptWordChars);
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
