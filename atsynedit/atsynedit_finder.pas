@@ -14,6 +14,7 @@ uses
 
 type
   TWordCharFunc = function(ch: Widechar): boolean of object;
+  TATTextFinderProgress = procedure(Sender: TObject; ACurPos, AMaxPos: integer; var AContinue: boolean) of object;
 
 type
   { TATTextFinder }
@@ -23,6 +24,13 @@ type
     FMatchPos: integer;
     FMatchLen: integer;
     FProgress: integer;
+    FOnProgress: TATTextFinderProgress;
+    function CountMatchesRegex(FromPos: integer): integer;
+    function CountMatchesUsual(FromPos: integer; IsWordChar: TWordCharFunc
+      ): Integer;
+    function FindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
+    function FindMatchUsual(FromPos: integer; IsWordChar: TWordCharFunc
+      ): Integer;
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
@@ -39,6 +47,7 @@ type
     property MatchPos: integer read FMatchPos; //have meaning if FindMatch returned True
     property MatchLen: integer read FMatchLen; //too
     property Progress: integer read FProgress;
+    property OnProgress: TATTextFinderProgress read FOnProgress write FOnProgress;
   end;
 
 type
@@ -72,15 +81,14 @@ type
     property Editor: TATSynEdit read FEditor write FEditor;
     property OnConfirmReplace: TATEditorFinderComfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
     function FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
+    function CountMatches: integer;
     procedure UpdateEditor(AUpdateText: boolean);
  end;
 
 implementation
 
-function SFindText(
-  const StrText, StrFind: UnicodeString;
+function TATTextFinder.FindMatchUsual(
   FromPos: integer;
-  OptBack, OptWords, OptCase: Boolean;
   IsWordChar: TWordCharFunc): Integer;
 var
   SBuf, FBuf: UnicodeString;
@@ -88,7 +96,8 @@ var
   LastPos, LenF, i: Integer;
 begin
   Result := 0;
-  if (StrText = '') or (StrFind = '') then Exit;
+  if StrText='' then exit;
+  if StrFind='' then exit;
 
   SBuf := StrText;
   FBuf := StrFind;
@@ -137,16 +146,14 @@ begin
     end;
 end;
 
-function SFindRegex(
-  const StrText, StrFind, StrReplace: UnicodeString;
-  FromPos: integer;
-  OptCase: Boolean;
-  var MatchPos, MatchLen: integer;
-  var StrReplacedTo: UnicodeString): boolean;
+function TATTextFinder.FindMatchRegex(FromPos: integer; var MatchPos,
+  MatchLen: integer): boolean;
 var
   Obj: TRegExpr;
 begin
   Result:= false;
+  if StrText='' then exit;
+  if StrFind='' then exit;
 
   Obj:= TRegExpr.Create;
   try
@@ -161,7 +168,88 @@ begin
       MatchPos:= Obj.MatchPos[0];
       MatchLen:= Obj.MatchLen[0];
       if StrReplace<>'' then
-        StrReplacedTo:= Obj.Replace(Obj.Match[0], StrReplace, true);
+        StrReplacement:= Obj.Replace(Obj.Match[0], StrReplace, true);
+    end;
+  finally
+    FreeAndNil(Obj);
+  end;
+end;
+
+function TATTextFinder.CountMatchesUsual(
+  FromPos: integer;
+  IsWordChar: TWordCharFunc): Integer;
+var
+  SBuf, FBuf: UnicodeString;
+  Match: Boolean;
+  LastPos, LenF, i: Integer;
+  Ok: boolean;
+begin
+  Result := 0;
+  if StrText='' then exit;
+  if StrFind='' then exit;
+
+  SBuf := StrText;
+  FBuf := StrFind;
+  if not OptCase then
+  begin
+    SBuf := UnicodeLowerCase(SBuf);
+    FBuf := UnicodeLowerCase(FBuf);
+  end;
+
+  LenF := Length(StrFind);
+  LastPos := Length(StrText) - LenF + 1;
+
+  for i := FromPos to LastPos do
+  begin
+    Match := CompareMem(@FBuf[1], @SBuf[i], LenF * 2);
+
+    if OptWords then
+      Match := Match
+        and ((i <= 1) or (not IsWordChar(StrText[i - 1])))
+        and ((i >= LastPos) or (not IsWordChar(StrText[i + LenF])));
+
+    if Match then
+    begin
+      Inc(Result);
+      if Assigned(FOnProgress) then
+      begin
+        Ok:= true;
+        FOnProgress(Self, i, LastPos, Ok);
+        if not Ok then Break;
+      end;
+    end;
+  end;
+end;
+
+function TATTextFinder.CountMatchesRegex(FromPos: integer): integer;
+var
+  Obj: TRegExpr;
+  Ok: boolean;
+begin
+  Result:= 0;
+  if StrFind='' then exit;
+  if StrText='' then exit;
+
+  Obj:= TRegExpr.Create;
+  try
+    Obj.ModifierS:= false;
+    Obj.ModifierM:= true;
+    Obj.ModifierI:= not OptCase;
+    Obj.Expression:= StrFind;
+    Obj.InputString:= StrText;
+    if Obj.ExecPos(FromPos) then
+    begin
+      Inc(Result);
+      while Obj.ExecNext do
+      begin
+        Inc(Result);
+        if Assigned(FOnProgress) then
+        begin
+          Ok:= true;
+          FOnProgress(Self, Obj.MatchPos[0], Length(StrText), Ok);
+          if not Ok then Break;
+        end;
+      end;
     end;
   finally
     FreeAndNil(Obj);
@@ -216,6 +304,15 @@ begin
   Result:= FBuffer.CaretToStr(P1);
   if Result<0 then
     Showmessage('Strange OffsetOfCaret<0');
+end;
+
+function TATEditorFinder.CountMatches: integer;
+begin
+  UpdateBuffer(FEditor);
+  if OptRegex then
+    Result:= CountMatchesRegex(1)
+  else
+    Result:= CountMatchesUsual(1, @FEditor.IsCharWord);
 end;
 
 function TATEditorFinder.FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
@@ -340,9 +437,7 @@ begin
       FromPos:= AStartPos
     else
       FromPos:= FMatchPos+ASkipLen;
-    Result:= SFindRegex(StrText, StrFind, StrReplace,
-      FromPos, OptCase,
-      FMatchPos, FMatchLen, StrReplacement);
+    Result:= FindMatchRegex(FromPos, FMatchPos, FMatchLen);
     FProgress:= FMatchPos * 100 div Length(StrText);
     Exit
   end;
@@ -359,8 +454,7 @@ begin
   end;
 
   StrReplacement:= StrReplace;
-  FMatchPos:= SFindText(StrText, StrFind, FMatchPos,
-    OptBack, OptWords, OptCase, IsWordChar);
+  FMatchPos:= FindMatchUsual(FMatchPos, IsWordChar);
   Result:= FMatchPos>0;
   if Result then
     FMatchLen:= Length(StrFind);

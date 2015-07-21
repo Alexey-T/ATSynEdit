@@ -106,6 +106,8 @@ type
     TimerHint: TTimer;
     procedure bGotoClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
+    procedure FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
+      var AContinue: boolean);
     procedure mnuFileOpenClick(Sender: TObject);
     procedure bFontClick(Sender: TObject);
     procedure bAddCrtClick(Sender: TObject);
@@ -163,7 +165,7 @@ type
     FStopped: boolean;
     FConfirmAll: TModalResult;
     procedure DoAddEnc(Sub, SName: string);
-    procedure DoConfirmReplace(Sender: TObject; APos1, APos2: TPoint; var AConfirm: boolean);
+    procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint; var AConfirm: boolean);
     procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
@@ -255,7 +257,8 @@ begin
   FFinder:= TATEditorFinder.Create;
   FFinder.Editor:= ed;
   FFinder.OptRegex:= true;
-  FFinder.OnConfirmReplace:= @DoConfirmReplace;
+  FFinder.OnConfirmReplace:= @FinderConfirmReplace;
+  FFinder.OnProgress:=@FinderProgress;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -546,6 +549,18 @@ begin
   FStopped:= true;
 end;
 
+procedure TfmMain.FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
+  var AContinue: boolean);
+var
+  num: integer;
+begin
+  num:= ACurPos * 100 div AMaxPos;
+  if num>progress.Position then
+    Application.ProcessMessages;
+  progress.Position:= num;
+  if FStopped then AContinue:= false;
+end;
+
 procedure TfmMain.bFontClick(Sender: TObject);
 begin
   with FontDialog1 do
@@ -681,21 +696,8 @@ begin
         end;
       mrIgnore: //count all
         begin
-          cnt:= 0;
-          if FFinder.FindAction(false, [fflagDontMoveCaret]) then
-          begin
-            Inc(cnt);
-            while FFinder.FindAction(true, [fflagDontMoveCaret, fflagDontRereadBuffer]) do
-            begin
-              Inc(cnt);
-              progress.Position:= FFinder.Progress;
-              if cnt mod 100=0 then
-                Application.ProcessMessages;
-              if FStopped then Break;
-            end;
-          end;
-          FFinder.UpdateEditor(false);
-          MsgStatus('Counted: '+Inttostr(cnt));
+          cnt:= FFinder.CountMatches;
+          MsgStatus('Count of "'+FFinder.StrFind+'": '+Inttostr(cnt));
         end;
     end;
   finally
@@ -1160,7 +1162,7 @@ begin
   MsgStatus('Cannot find: '+FFinder.StrFind);
 end;
 
-procedure TfmMain.DoConfirmReplace(Sender: TObject;
+procedure TfmMain.FinderConfirmReplace(Sender: TObject;
   APos1, APos2: TPoint; var AConfirm: boolean);
 var
   Res: TModalResult;
@@ -1176,8 +1178,7 @@ begin
     PosX:= APos1.X;
     PosY:= APos1.Y;
     EndX:= APos2.X;
-    EndY:= APos2.Y;
-  end;
+    EndY:= APos2.Y;        end;
   Ed.DoCommand(cCommand_ScrollToCaretTop);
   Ed.Update(true);
 
