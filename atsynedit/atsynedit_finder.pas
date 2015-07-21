@@ -6,6 +6,8 @@ interface
 
 uses
   SysUtils, Classes, Dialogs, Forms, Controls,
+  LclType,
+  LclProc,
   RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Commands,
@@ -31,6 +33,7 @@ type
     function FindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function FindMatchUsual(FromPos: integer; IsWordChar: TWordCharFunc
       ): Integer;
+    procedure MsgBadRegex(const StrFind: UnicodeString);
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
@@ -146,6 +149,14 @@ begin
     end;
 end;
 
+procedure TATTextFinder.MsgBadRegex(const StrFind: UnicodeString);
+begin
+  Application.MessageBox(
+    PChar('Incorrect regex passed:'#13+Utf8Encode(StrFind)),
+    PChar(Application.Title),
+    mb_ok or mb_iconerror);
+end;
+
 function TATTextFinder.FindMatchRegex(FromPos: integer; var MatchPos,
   MatchLen: integer): boolean;
 var
@@ -160,9 +171,14 @@ begin
     Obj.ModifierS:= false; //don't catch all text by .*
     Obj.ModifierM:= true; //allow to work with ^$
     Obj.ModifierI:= not OptCase;
-    Obj.Expression:= StrFind;
-    Obj.InputString:= StrText;
-    Result:= Obj.ExecPos(FromPos);
+      try
+        Obj.Expression:= StrFind;
+        Obj.InputString:= StrText;
+        Result:= Obj.ExecPos(FromPos);
+      except
+        MsgBadRegex(StrFind);
+        Result:= false;
+      end;
     if Result then
     begin
       MatchPos:= Obj.MatchPos[0];
@@ -235,9 +251,18 @@ begin
     Obj.ModifierS:= false;
     Obj.ModifierM:= true;
     Obj.ModifierI:= not OptCase;
-    Obj.Expression:= StrFind;
-    Obj.InputString:= StrText;
-    if Obj.ExecPos(FromPos) then
+
+    try
+      Obj.Expression:= StrFind;
+      Obj.InputString:= StrText;
+      Ok:= Obj.ExecPos(FromPos);
+    except
+      MsgBadRegex(StrFind);
+      Result:= 0;
+      Exit;
+    end;
+
+    if Ok then
     begin
       Inc(Result);
       while Obj.ExecNext do
