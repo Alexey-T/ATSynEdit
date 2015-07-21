@@ -54,7 +54,7 @@ begin
   begin
     with ed do
     begin
-      s:= UTF8Encode(Text);
+      s:= UTF8Encode(Trim(Text));
       ShowMessage('Enter: '+s);
 
       Text:= '';

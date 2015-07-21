@@ -10,9 +10,9 @@ object fmCombo: TfmCombo
   Position = poScreenCenter
   LCLVersion = '1.5'
   object Panel1: TPanel
-    Left = 32
+    Left = 16
     Height = 49
-    Top = 124
+    Top = 32
     Width = 335
     BevelOuter = bvNone
     ClientHeight = 49
@@ -20,9 +20,9 @@ object fmCombo: TfmCombo
     TabOrder = 0
     object Label1: TLabel
       Left = 0
-      Height = 15
+      Height = 17
       Top = 4
-      Width = 78
+      Width = 97
       Caption = 'ATComboEdit:'
       ParentColor = False
     end
