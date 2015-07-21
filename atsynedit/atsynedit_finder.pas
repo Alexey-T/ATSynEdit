@@ -33,7 +33,7 @@ type
     function FindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function FindMatchUsual(FromPos: integer; IsWordChar: TWordCharFunc
       ): Integer;
-    procedure MsgBadRegex(const StrFind: UnicodeString);
+    procedure MsgBadRegex;
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
@@ -149,7 +149,7 @@ begin
     end;
 end;
 
-procedure TATTextFinder.MsgBadRegex(const StrFind: UnicodeString);
+procedure TATTextFinder.MsgBadRegex;
 begin
   Application.MessageBox(
     PChar('Incorrect regex passed:'#13+Utf8Encode(StrFind)),
@@ -171,14 +171,16 @@ begin
     Obj.ModifierS:= false; //don't catch all text by .*
     Obj.ModifierM:= true; //allow to work with ^$
     Obj.ModifierI:= not OptCase;
-      try
-        Obj.Expression:= StrFind;
-        Obj.InputString:= StrText;
-        Result:= Obj.ExecPos(FromPos);
-      except
-        MsgBadRegex(StrFind);
-        Result:= false;
-      end;
+
+    try
+      Obj.Expression:= StrFind;
+      Obj.InputString:= StrText;
+      Result:= Obj.ExecPos(FromPos);
+    except
+      MsgBadRegex;
+      Result:= false;
+    end;
+
     if Result then
     begin
       MatchPos:= Obj.MatchPos[0];
@@ -257,7 +259,7 @@ begin
       Obj.InputString:= StrText;
       Ok:= Obj.ExecPos(FromPos);
     except
-      MsgBadRegex(StrFind);
+      MsgBadRegex;
       Result:= 0;
       Exit;
     end;
@@ -475,7 +477,7 @@ begin
   else
   begin
     if FMatchPos=0 then Exit;
-    if not OptBack then Inc(FMatchPos) else Dec(FMatchPos);
+    if not OptBack then Inc(FMatchPos, FMatchLen) else Dec(FMatchPos, FMatchLen);
   end;
 
   StrReplacement:= StrReplace;
