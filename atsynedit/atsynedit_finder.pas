@@ -477,7 +477,7 @@ begin
   else
   begin
     if FMatchPos=0 then Exit;
-    if not OptBack then Inc(FMatchPos) else Dec(FMatchPos);
+    if not OptBack then Inc(FMatchPos, FMatchLen) else Dec(FMatchPos, FMatchLen);
   end;
 
   StrReplacement:= StrReplace;
