@@ -638,8 +638,8 @@ var
 begin
   with TfmFind.Create(nil) do
   try
-    edFind.Text:= FFinder.StrFind;
-    edRep.Text:= FFinder.StrReplace;
+    edFind.Text:= Utf8Encode(FFinder.StrFind);
+    edRep.Text:= Utf8Encode(FFinder.StrReplace);
     chkBack.Checked:= FFinder.OptBack;
     chkCase.Checked:= FFinder.OptCase;
     chkWords.Checked:= FFinder.OptWords;
@@ -651,8 +651,8 @@ begin
     if res=mrCancel then Exit;
     if edFind.Text='' then Exit;
 
-    FFinder.StrFind:= edFind.Text;
-    FFinder.StrReplace:= edRep.Text;
+    FFinder.StrFind:= Utf8Decode(edFind.Text);
+    FFinder.StrReplace:= Utf8Decode(edRep.Text);
     FFinder.OptBack:= chkBack.Checked;
     FFinder.OptCase:= chkCase.Checked;
     FFinder.OptWords:= chkWords.Checked;
