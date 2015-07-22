@@ -666,23 +666,23 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.FindAction(false, []);
+          ok:= FFinder.FindAction(false, false);
           FFinder.UpdateEditor(false);
           if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.FindAction(false, [fflagReplace]);
+          ok:= FFinder.FindAction(false, true);
           FFinder.UpdateEditor(true);
           if not ok then DoFindError;
         end;
       mrYesToAll: //replace all
         begin
           cnt:= 0;
-          if FFinder.FindAction(false, [fflagReplace]) then
+          if FFinder.FindAction(false, true) then
           begin
             Inc(cnt);
-            while FFinder.FindAction(true, [fflagReplace]) do
+            while FFinder.FindAction(true, true) do
             begin
               Inc(cnt);
               progress.Position:= FFinder.Progress;
@@ -718,7 +718,8 @@ begin
     Exit
   end;
 
-  ok:= FFinder.FindAction(true, []);
+  FFinder.OptFromCaret:= true;
+  ok:= FFinder.FindAction(false, false);
   FFinder.UpdateEditor(false);
   if not ok then DoFindError;
 end;
