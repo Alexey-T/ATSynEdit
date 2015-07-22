@@ -112,10 +112,22 @@ begin
 end;
 
 function TATStringBuffer.CaretToStr(APnt: TPoint): integer;
+var
+  Len: integer;
 begin
   Result:= -1;
-  if (APnt.Y<0) or (APnt.X<0) then Exit;
+  if (APnt.Y<0) then Exit;
+  if (APnt.X<0) then Exit;
   if (APnt.Y>=FStarts.Count) then Exit;
+
+  //handle caret pos after eol
+  if APnt.Y+1<FStarts.Count then
+  begin
+    Len:= FStarts[APnt.Y+1]-FStarts[APnt.Y];
+    if APnt.X>Len then
+      APnt.X:= Len;
+  end;
+
   Result:= integer(FStarts[APnt.Y])+APnt.X;
 end;
 
