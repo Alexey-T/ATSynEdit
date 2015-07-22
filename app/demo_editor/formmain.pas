@@ -185,6 +185,7 @@ type
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
+    procedure FinderUpdateEditor(AUpdateText: boolean);
     procedure MenuEncClick(Sender: TObject);
     procedure MsgStatus(const S: string);
     procedure UpdateStatus;
@@ -555,13 +556,9 @@ end;
 
 procedure TfmMain.FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
   var AContinue: boolean);
-var
-  num: integer;
 begin
-  num:= ACurPos * 100 div AMaxPos;
-  if num>progress.Position then
-    Application.ProcessMessages;
-  progress.Position:= num;
+  progress.Position:= ACurPos * 100 div AMaxPos;
+  Application.ProcessMessages;
   if FStopped then AContinue:= false;
 end;
 
@@ -670,25 +667,25 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.FindAction(false, false, false, fchanged);
-          FFinder.UpdateEditor(false);
+          ok:= FFinder.DoFindOrReplace(false, false, false, fchanged);
+          FinderUpdateEditor(false);
           if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.FindAction(false, true, false, fchanged);
-          FFinder.UpdateEditor(true);
+          ok:= FFinder.DoFindOrReplace(false, true, false, fchanged);
+          FinderUpdateEditor(true);
           if not ok then DoFindError;
         end;
       mrYesToAll: //replace all
         begin
-          cnt:= FFinder.ReplaceMatches;
-          FFinder.UpdateEditor(true);
+          cnt:= FFinder.DoReplaceAll;
+          FinderUpdateEditor(true);
           MsgStatus('Replaces made: '+Inttostr(cnt));
         end;
       mrIgnore: //count all
         begin
-          cnt:= FFinder.CountMatches;
+          cnt:= FFinder.DoCountAll;
           MsgStatus('Count of "'+FFinder.StrFind+'": '+Inttostr(cnt));
         end;
     end;
@@ -711,8 +708,8 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
-  ok:= FFinder.FindAction(false, false, false, fchanged);
-  FFinder.UpdateEditor(false);
+  ok:= FFinder.DoFindOrReplace(false, false, false, fchanged);
+  FinderUpdateEditor(false);
   if not ok then DoFindError;
 end;
 
@@ -1192,14 +1189,17 @@ end;
 
 
 procedure TfmMain.FinderBadRegex(Sender: TObject);
-var
-  AFinder: TATEditorFinder;
 begin
-  AFinder:= Sender as TATEditorFInder;
   Application.MessageBox(
-    PChar('Incorrect regex passed:'#13+Utf8Encode(AFinder.StrFind)),
+    PChar('Incorrect regex passed:'#13+Utf8Encode(FFinder.StrFind)),
     PChar(Application.Title),
     mb_ok or mb_iconerror);
+end;
+
+procedure TfmMain.FinderUpdateEditor(AUpdateText: boolean);
+begin
+  FFinder.Editor.Update(AUpdateText);
+  FFinder.Editor.DoCommand(cCommand_ScrollToCaretTop);
 end;
 
 

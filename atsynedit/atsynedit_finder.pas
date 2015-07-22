@@ -60,6 +60,7 @@ type
     FEditor: TATSynEdit;
     FSkipLen: integer;
     FOnConfirmReplace: TATEditorFinderComfirmReplace;
+    procedure DoReplaceTextInEditor(P1, P2: TPoint);
     function GetOffsetOfCaret: integer;
     procedure UpdateBuffer(Ed: TATSynEdit);
   public
@@ -69,10 +70,9 @@ type
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
     property OnConfirmReplace: TATEditorFinderComfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
-    function FindAction(ANext, AReplace, AReplaceForMany: boolean; out AChanged: boolean): boolean;
-    function CountMatches: integer;
-    function ReplaceMatches: integer;
-    procedure UpdateEditor(AUpdateText: boolean);
+    function DoFindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
+    function DoCountAll: integer;
+    function DoReplaceAll: integer;
  end;
 
 implementation
@@ -322,7 +322,7 @@ begin
     Showmessage('Strange OffsetOfCaret<0');
 end;
 
-function TATEditorFinder.CountMatches: integer;
+function TATEditorFinder.DoCountAll: integer;
 begin
   UpdateBuffer(FEditor);
   if OptRegex then
@@ -331,15 +331,15 @@ begin
     Result:= CountMatchesUsual(1, @FEditor.IsCharWord);
 end;
 
-function TATEditorFinder.ReplaceMatches: integer;
+function TATEditorFinder.DoReplaceAll: integer;
 var
   Ok, Changed: boolean;
 begin
   Result:= 0;
-  if FindAction(false, true, true, Changed) then
+  if DoFindOrReplace(false, true, true, Changed) then
   begin
     if Changed then Inc(Result);
-    while FindAction(true, true, true, Changed) do
+    while DoFindOrReplace(true, true, true, Changed) do
     begin
       if Changed then Inc(Result);
       if Assigned(FOnProgress) then
@@ -352,12 +352,20 @@ begin
   end;
 end;
 
-function TATEditorFinder.FindAction(ANext, AReplace, AReplaceForMany: boolean;
+procedure TATEditorFinder.DoReplaceTextInEditor(P1, P2: TPoint);
+var
+  Shift, PosAfter: TPoint;
+begin
+  FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
+  FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacement, false, Shift, PosAfter);
+end;
+
+function TATEditorFinder.DoFindOrReplace(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
 var
   P1, P2: TPoint;
   Shift, PosAfter: TPoint;
-  AStartPos: integer;
+  NStartPos: integer;
   Cfm: boolean;
 begin
   Result:= false;
@@ -383,17 +391,17 @@ begin
   UpdateBuffer(FEditor);
 
   if OptFromCaret then
-    AStartPos:= GetOffsetOfCaret
+    NStartPos:= GetOffsetOfCaret
   else
   if OptRegex then
-    AStartPos:= 1
+    NStartPos:= 1
   else
   if OptBack then
-    AStartPos:= Length(StrText)
+    NStartPos:= Length(StrText)
   else
-    AStartPos:= 1;
+    NStartPos:= 1;
 
-  Result:= FindMatch(ANext, FSkipLen, AStartPos, @FEditor.IsCharWord);
+  Result:= FindMatch(ANext, FSkipLen, NStartPos, @FEditor.IsCharWord);
   FSkipLen:= FMatchLen;
 
   if Result then
@@ -407,12 +415,11 @@ begin
       Cfm:= true;
       if OptConfirmReplace then
         if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, P1, P2, AReplaceForMany, Cfm);
+          FOnConfirmReplace(Self, P1, P2, AForMany, Cfm);
 
       if Cfm then
       begin
-        FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
-        FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacement, false, Shift, PosAfter);
+        DoReplaceTextInEditor(P1, P2);
         FSkipLen:= Length(StrReplacement);
         AChanged:= true;
       end;
@@ -431,11 +438,6 @@ begin
   end;
 end;
 
-procedure TATEditorFinder.UpdateEditor(AUpdateText: boolean);
-begin
-  FEditor.Update(AUpdateText);
-  FEditor.DoCommand(cCommand_ScrollToCaretTop);
-end;
 
 { TATTextFinder }
 

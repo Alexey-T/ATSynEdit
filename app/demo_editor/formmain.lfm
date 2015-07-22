@@ -1,7 +1,7 @@
 object fmMain: TfmMain
   Left = 266
   Height = 498
-  Top = 300
+  Top = 242
   Width = 953
   Caption = 'Demo'
   ClientHeight = 498
@@ -518,7 +518,7 @@ object fmMain: TfmMain
   end
   object TimerHint: TTimer
     Enabled = False
-    Interval = 4500
+    Interval = 5500
     OnTimer = TimerHintTimer
     left = 560
     top = 303
