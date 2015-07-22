@@ -27,16 +27,16 @@ type
     FMatchLen: integer;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
-    function CountMatchesRegex(FromPos: integer): integer;
-    function CountMatchesUsual(FromPos: integer): Integer;
-    function FindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
-    function FindMatchUsual(FromPos: integer): Integer;
+    function DoCountMatchesRegex(FromPos: integer): integer;
+    function DoCountMatchesUsual(FromPos: integer): Integer;
+    function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
+    function DoFindMatchUsual(FromPos: integer): Integer;
     function IsMatchUsual(APos: integer): boolean;
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
     StrReplace: UnicodeString;
-    StrReplacement: UnicodeString;
+    StrReplacement: UnicodeString; //for regex
     OptBack: boolean; //for non-regex
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
@@ -60,8 +60,6 @@ type
     FSkipLen: integer;
     FOnConfirmReplace: TATFinderConfirmReplace;
     procedure DoReplaceTextInEditor(P1, P2: TPoint);
-    procedure DoReplaceTextInString(var SText: UnicodeString;
-      const SFind: UnicodeString; APos: integer);
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
   public
@@ -109,7 +107,7 @@ begin
         ((APos >= LastPos) or (not IsWordChar(StrText[APos + LenF])));
 end;
 
-function TATTextFinder.FindMatchUsual(FromPos: integer): Integer;
+function TATTextFinder.DoFindMatchUsual(FromPos: integer): Integer;
 var
   LastPos, i: integer;
 begin
@@ -138,7 +136,7 @@ begin
     end;
 end;
 
-function TATTextFinder.FindMatchRegex(FromPos: integer; var MatchPos,
+function TATTextFinder.DoFindMatchRegex(FromPos: integer; var MatchPos,
   MatchLen: integer): boolean;
 var
   Obj: TRegExpr;
@@ -175,7 +173,7 @@ begin
   end;
 end;
 
-function TATTextFinder.CountMatchesUsual(FromPos: integer): Integer;
+function TATTextFinder.DoCountMatchesUsual(FromPos: integer): Integer;
 var
   LastPos, i: Integer;
   Ok: boolean;
@@ -198,7 +196,7 @@ begin
     end;
 end;
 
-function TATTextFinder.CountMatchesRegex(FromPos: integer): integer;
+function TATTextFinder.DoCountMatchesRegex(FromPos: integer): integer;
 var
   Obj: TRegExpr;
   Ok: boolean;
@@ -303,9 +301,9 @@ function TATEditorFinder.DoCountAll: integer;
 begin
   UpdateBuffer;
   if OptRegex then
-    Result:= CountMatchesRegex(1)
+    Result:= DoCountMatchesRegex(1)
   else
-    Result:= CountMatchesUsual(1);
+    Result:= DoCountMatchesUsual(1);
 end;
 
 function TATEditorFinder.DoReplaceAll: integer;
@@ -341,14 +339,6 @@ begin
 
   FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
   FEditor.Strings.TextInsert(P1.X, P1.Y, Str, false, Shift, PosAfter);
-end;
-
-procedure TATEditorFinder.DoReplaceTextInString(
-  var SText: UnicodeString;
-  const SFind: UnicodeString; APos: integer);
-begin
-  Delete(SText, APos, Length(SFind));
-  Insert(StrReplace, SText, APos);
 end;
 
 function TATEditorFinder.GetOffsetStartPos: integer;
@@ -469,7 +459,7 @@ begin
       FromPos:= AStartPos
     else
       FromPos:= FMatchPos+ASkipLen;
-    Result:= FindMatchRegex(FromPos, FMatchPos, FMatchLen);
+    Result:= DoFindMatchRegex(FromPos, FMatchPos, FMatchLen);
     Exit
   end;
 
@@ -488,7 +478,7 @@ begin
       Dec(FMatchPos, ASkipLen);
   end;
 
-  FMatchPos:= FindMatchUsual(FMatchPos);
+  FMatchPos:= DoFindMatchUsual(FMatchPos);
   Result:= FMatchPos>0;
   if Result then
     FMatchLen:= Length(StrFind);
