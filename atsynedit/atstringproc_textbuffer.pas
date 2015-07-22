@@ -5,7 +5,9 @@ unit ATStringProc_TextBuffer;
 interface
 
 uses
-  Classes, SysUtils, ATStringProc;
+  Classes, SysUtils,
+  Dialogs,
+  ATStringProc;
 
 type
   TTextChangedEvent = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
@@ -121,12 +123,9 @@ begin
   if (APnt.Y>=FStarts.Count) then Exit;
 
   //handle caret pos after eol
-  if APnt.Y+1<FStarts.Count then
-  begin
-    Len:= FStarts[APnt.Y+1]-FStarts[APnt.Y];
-    if APnt.X>Len then
-      APnt.X:= Len;
-  end;
+  Len:= LineLength(APnt.Y);
+  if APnt.X>Len then
+    APnt.X:= Len;
 
   Result:= integer(FStarts[APnt.Y])+APnt.X;
 end;
