@@ -6,7 +6,6 @@ interface
 
 uses
   SysUtils, Classes, Dialogs, Forms, Controls,
-  LclType, LclProc,
   RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Commands,
