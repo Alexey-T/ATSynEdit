@@ -664,6 +664,7 @@ begin
     progress.Show;
     progress.Position:= 0;
 
+    FFinder.UpdateBuffer;
     case res of
       mrOk: //find
         begin
@@ -708,6 +709,7 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
+  FFinder.UpdateBuffer;
   ok:= FFinder.DoFindOrReplace(false, false, false, fchanged);
   FinderUpdateEditor(false);
   if not ok then DoFindError;

@@ -35,7 +35,9 @@ object fmMain: TfmMain
       Height = 21
       Top = 456
       Width = 672
+      Font.Color = clBlue
       Panels = <>
+      ParentFont = False
     end
     object progress: TProgressBar
       AnchorSideLeft.Control = PanelMain
@@ -44,10 +46,10 @@ object fmMain: TfmMain
       AnchorSideRight.Side = asrBottom
       AnchorSideBottom.Control = StatusMsg
       AnchorSideBottom.Side = asrCenter
-      Left = 474
+      Left = 507
       Height = 14
       Top = 459
-      Width = 193
+      Width = 160
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
       Smooth = True
@@ -59,10 +61,10 @@ object fmMain: TfmMain
       AnchorSideRight.Control = progress
       AnchorSideBottom.Control = StatusMsg
       AnchorSideBottom.Side = asrCenter
-      Left = 386
-      Height = 19
-      Top = 456
-      Width = 83
+      Left = 412
+      Height = 22
+      Top = 455
+      Width = 90
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
       Caption = 'stop'
