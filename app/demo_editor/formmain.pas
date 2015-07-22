@@ -167,7 +167,8 @@ type
     FConfirmAll: TModalResult;
     procedure DoAddEnc(Sub, SName: string);
     procedure FinderBadRegex(Sender: TObject);
-    procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint; var AConfirm: boolean);
+    procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
+      AForMany: boolean; var AConfirm: boolean);
     procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
@@ -669,13 +670,13 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.FindAction(false, false, fchanged);
+          ok:= FFinder.FindAction(false, false, false, fchanged);
           FFinder.UpdateEditor(false);
           if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.FindAction(false, true, fchanged);
+          ok:= FFinder.FindAction(false, true, false, fchanged);
           FFinder.UpdateEditor(true);
           if not ok then DoFindError;
         end;
@@ -710,7 +711,7 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
-  ok:= FFinder.FindAction(false, false, fchanged);
+  ok:= FFinder.FindAction(false, false, false, fchanged);
   FFinder.UpdateEditor(false);
   if not ok then DoFindError;
 end;
@@ -1154,11 +1155,11 @@ begin
   MsgStatus('Cannot find: '+FFinder.StrFind);
 end;
 
-procedure TfmMain.FinderConfirmReplace(Sender: TObject;
-  APos1, APos2: TPoint; var AConfirm: boolean);
+procedure TfmMain.FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
+  AForMany: boolean; var AConfirm: boolean);
 var
   Res: TModalResult;
-  Str: atString;
+  Buttons: TMsgDlgButtons;
 begin
   case FConfirmAll of
     mrYesToAll: begin AConfirm:= true; exit end;
@@ -1174,14 +1175,15 @@ begin
   Ed.DoCommand(cCommand_ScrollToCaretTop);
   Ed.Update(true);
 
-  Str:= Ed.Strings.TextSubstring(APos1.X, APos1.Y, APos2.X, APos2.Y);
+  Buttons:= [mbYes, mbNo];
+  if AForMany then
+    Buttons:= Buttons+[mbYesToAll, mbNoToAll];
+  //Str:= Ed.Strings.TextSubstring(APos1.X, APos1.Y, APos2.X, APos2.Y);
   Res:= MessageDlg(
     'Confirm replace',
-    'Replace string:'#13+
-      Utf8Encode(Str)+#13+
-      Format('at line %d', [APos1.Y+1]),
+    'Replace string at line '+Inttostr(APos1.Y+1),
     mtConfirmation,
-    [mbYes, mbYesToAll, mbNo, mbNoToAll], '');
+    Buttons, '');
 
   AConfirm:= Res in [mrYes, mrYesToAll];
   if Res in [mrYesToAll, mrNoToAll] then
