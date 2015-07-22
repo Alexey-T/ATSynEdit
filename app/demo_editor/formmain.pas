@@ -16,7 +16,8 @@ uses
   ATSynEdit_Finder,
   formkey,
   formopt,
-  formcombo, formfind;
+  formcombo,
+  formfind;
 
 type
   { TfmMain }
@@ -165,6 +166,7 @@ type
     FStopped: boolean;
     FConfirmAll: TModalResult;
     procedure DoAddEnc(Sub, SName: string);
+    procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint; var AConfirm: boolean);
     procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
@@ -258,7 +260,8 @@ begin
   FFinder.Editor:= ed;
   FFinder.OptRegex:= true;
   FFinder.OnConfirmReplace:= @FinderConfirmReplace;
-  FFinder.OnProgress:=@FinderProgress;
+  FFinder.OnProgress:= @FinderProgress;
+  FFinder.OnBadRegex:= @FinderBadRegex;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -1184,5 +1187,18 @@ begin
   if Res in [mrYesToAll, mrNoToAll] then
     FConfirmAll:= Res;
 end;
+
+
+procedure TfmMain.FinderBadRegex(Sender: TObject);
+var
+  AFinder: TATEditorFinder;
+begin
+  AFinder:= Sender as TATEditorFInder;
+  Application.MessageBox(
+    PChar('Incorrect regex passed:'#13+Utf8Encode(AFinder.StrFind)),
+    PChar(Application.Title),
+    mb_ok or mb_iconerror);
+end;
+
 
 end.
