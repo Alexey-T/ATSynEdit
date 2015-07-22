@@ -631,7 +631,7 @@ procedure TfmMain.mnuFindClick(Sender: TObject);
 var
   res: TModalResult;
   cnt: integer;
-  ok: boolean;
+  ok, fchanged: boolean;
 begin
   with TfmFind.Create(nil) do
   try
@@ -666,31 +666,19 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.FindAction(false, false);
+          ok:= FFinder.FindAction(false, false, fchanged);
           FFinder.UpdateEditor(false);
           if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.FindAction(false, true);
+          ok:= FFinder.FindAction(false, true, fchanged);
           FFinder.UpdateEditor(true);
           if not ok then DoFindError;
         end;
       mrYesToAll: //replace all
         begin
-          cnt:= 0;
-          if FFinder.FindAction(false, true) then
-          begin
-            Inc(cnt);
-            while FFinder.FindAction(true, true) do
-            begin
-              Inc(cnt);
-              progress.Position:= FFinder.Progress;
-              if cnt mod 100=0 then
-                Application.ProcessMessages;
-              if FStopped then Break;
-            end;
-          end;
+          cnt:= FFinder.ReplaceMatches;
           FFinder.UpdateEditor(true);
           MsgStatus('Replaces made: '+Inttostr(cnt));
         end;
@@ -710,7 +698,7 @@ end;
 
 procedure TfmMain.mnuFindNextClick(Sender: TObject);
 var
-  ok: boolean;
+  ok, fchanged: boolean;
 begin
   if FFinder.StrFind='' then
   begin
@@ -719,7 +707,7 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
-  ok:= FFinder.FindAction(false, false);
+  ok:= FFinder.FindAction(false, false, fchanged);
   FFinder.UpdateEditor(false);
   if not ok then DoFindError;
 end;

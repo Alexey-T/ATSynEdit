@@ -75,8 +75,9 @@ type
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
     property OnConfirmReplace: TATEditorFinderComfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
-    function FindAction(ANext, AReplace: boolean): boolean;
+    function FindAction(ANext, AReplace: boolean; out AChanged: boolean): boolean;
     function CountMatches: integer;
+    function ReplaceMatches: integer;
     procedure UpdateEditor(AUpdateText: boolean);
  end;
 
@@ -342,7 +343,29 @@ begin
     Result:= CountMatchesUsual(1, @FEditor.IsCharWord);
 end;
 
-function TATEditorFinder.FindAction(ANext, AReplace: boolean): boolean;
+function TATEditorFinder.ReplaceMatches: integer;
+var
+  Ok, Changed: boolean;
+begin
+  Result:= 0;
+  if FindAction(false, true, Changed) then
+  begin
+    if Changed then Inc(Result);
+    while FindAction(true, true, Changed) do
+    begin
+      if Changed then Inc(Result);
+      if Assigned(FOnProgress) then
+      begin
+        Ok:= true;
+        FOnProgress(Self, FMatchPos, Length(StrText), Ok);
+        if not Ok then Break;
+      end;
+    end;
+  end;
+end;
+
+function TATEditorFinder.FindAction(ANext, AReplace: boolean; out
+  AChanged: boolean): boolean;
 var
   P1, P2: TPoint;
   Shift, PosAfter: TPoint;
@@ -350,6 +373,7 @@ var
   Cfm: boolean;
 begin
   Result:= false;
+  AChanged:= false;
 
   if not Assigned(FEditor) then
   begin
@@ -367,6 +391,7 @@ begin
     Exit
   end;
 
+  if AReplace and FEditor.ModeReadOnly then exit;
   UpdateBuffer(FEditor);
 
   if OptFromCaret then
@@ -401,6 +426,7 @@ begin
         FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
         FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacement, false, Shift, PosAfter);
         FSkipLen:= Length(StrReplacement);
+        AChanged:= true;
       end;
     end;
 
