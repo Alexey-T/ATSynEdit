@@ -6,8 +6,7 @@ interface
 
 uses
   SysUtils, Classes, Dialogs, Forms, Controls,
-  LclType,
-  LclProc,
+  LclType, LclProc,
   RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Commands,
@@ -15,7 +14,7 @@ uses
   ATStringProc_TextBuffer;
 
 type
-  TWordCharFunc = function(ch: Widechar): boolean of object;
+  TATIsWordChar = function(ch: Widechar): boolean of object;
   TATTextFinderProgress = procedure(Sender: TObject; ACurPos, AMaxPos: integer; var AContinue: boolean) of object;
 
 type
@@ -25,15 +24,12 @@ type
   private
     FMatchPos: integer;
     FMatchLen: integer;
-    FProgress: integer;
     FOnProgress: TATTextFinderProgress;
+    FOnBadRegex: TNotifyEvent;
     function CountMatchesRegex(FromPos: integer): integer;
-    function CountMatchesUsual(FromPos: integer; IsWordChar: TWordCharFunc
-      ): Integer;
+    function CountMatchesUsual(FromPos: integer; IsWordChar: TATIsWordChar): Integer;
     function FindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
-    function FindMatchUsual(FromPos: integer; IsWordChar: TWordCharFunc
-      ): Integer;
-    procedure MsgBadRegex;
+    function FindMatchUsual(FromPos: integer; IsWordChar: TATIsWordChar): Integer;
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
@@ -46,11 +42,11 @@ type
     constructor Create;
     destructor Destroy; override;
     function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer;
-      IsWordChar: TWordCharFunc): boolean;
+      IsWordChar: TATIsWordChar): boolean;
     property MatchPos: integer read FMatchPos; //have meaning if FindMatch returned True
     property MatchLen: integer read FMatchLen; //too
-    property Progress: integer read FProgress;
     property OnProgress: TATTextFinderProgress read FOnProgress write FOnProgress;
+    property OnBadRegex: TNotifyEvent read FOnBadRegex write FOnBadRegex;
   end;
 
 type
@@ -85,7 +81,7 @@ implementation
 
 function TATTextFinder.FindMatchUsual(
   FromPos: integer;
-  IsWordChar: TWordCharFunc): Integer;
+  IsWordChar: TATIsWordChar): Integer;
 var
   SBuf, FBuf: UnicodeString;
   Match: Boolean;
@@ -142,14 +138,6 @@ begin
     end;
 end;
 
-procedure TATTextFinder.MsgBadRegex;
-begin
-  Application.MessageBox(
-    PChar('Incorrect regex passed:'#13+Utf8Encode(StrFind)),
-    PChar(Application.Title),
-    mb_ok or mb_iconerror);
-end;
-
 function TATTextFinder.FindMatchRegex(FromPos: integer; var MatchPos,
   MatchLen: integer): boolean;
 var
@@ -170,7 +158,8 @@ begin
       Obj.InputString:= StrText;
       Result:= Obj.ExecPos(FromPos);
     except
-      MsgBadRegex;
+      if Assigned(FOnBadRegex) then
+        FOnBadRegex(Self);
       Result:= false;
     end;
 
@@ -188,7 +177,7 @@ end;
 
 function TATTextFinder.CountMatchesUsual(
   FromPos: integer;
-  IsWordChar: TWordCharFunc): Integer;
+  IsWordChar: TATIsWordChar): Integer;
 var
   SBuf, FBuf: UnicodeString;
   Match: Boolean;
@@ -252,7 +241,8 @@ begin
       Obj.InputString:= StrText;
       Ok:= Obj.ExecPos(FromPos);
     except
-      MsgBadRegex;
+      if Assigned(FOnBadRegex) then
+        FOnBadRegex(Self);
       Result:= 0;
       Exit;
     end;
@@ -471,7 +461,7 @@ begin
 end;
 
 function TATTextFinder.FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer;
-  IsWordChar: TWordCharFunc): boolean;
+  IsWordChar: TATIsWordChar): boolean;
 var
   FromPos: integer;
 begin
@@ -487,7 +477,7 @@ begin
     else
       FromPos:= FMatchPos+ASkipLen;
     Result:= FindMatchRegex(FromPos, FMatchPos, FMatchLen);
-    FProgress:= FMatchPos * 100 div Length(StrText);
+    //FProgress:= FMatchPos * 100 div Length(StrText);
     Exit
   end;
 
@@ -498,8 +488,12 @@ begin
   end
   else
   begin
-    if FMatchPos=0 then Exit;
-    if not OptBack then Inc(FMatchPos, FMatchLen) else Dec(FMatchPos, FMatchLen);
+    if FMatchPos=0 then
+      FMatchPos:= 1;
+    if not OptBack then
+      Inc(FMatchPos, ASkipLen)
+    else
+      Dec(FMatchPos, ASkipLen);
   end;
 
   StrReplacement:= StrReplace;
@@ -507,7 +501,7 @@ begin
   Result:= FMatchPos>0;
   if Result then
     FMatchLen:= Length(StrFind);
-  FProgress:= FMatchPos * 100 div Length(StrText);
+  //FProgress:= FMatchPos * 100 div Length(StrText);
 end;
 
 end.
