@@ -5,19 +5,18 @@ unit ATSynEdit_Finder;
 interface
 
 uses
-  SysUtils, Classes, Dialogs, Forms, Controls,
+  SysUtils, Classes, Dialogs, Forms,
   RegExpr, //must be with {$define Unicode}
   ATSynEdit,
-  ATSynEdit_Commands,
   ATStringProc,
   ATStringProc_TextBuffer;
 
 type
-  TATIsWordChar = function(ch: Widechar): boolean of object;
-  TATTextFinderProgress = procedure(Sender: TObject; ACurPos, AMaxPos: integer; var AContinue: boolean) of object;
-  TATEditorFinderComfirmReplace = procedure(Sender: TObject;
-    APos1, APos2: TPoint; AForMany: boolean; var AConfirm: boolean) of object;
-
+  TATFinderProgress = procedure(Sender: TObject; ACurPos, AMaxPos: integer;
+    var AContinue: boolean) of object;
+  TATFinderConfirmReplace = procedure(Sender: TObject;
+    APos1, APos2: TPoint; AForMany: boolean;
+    var AConfirm: boolean) of object;
 
 type
   { TATTextFinder }
@@ -26,14 +25,13 @@ type
   private
     FMatchPos: integer;
     FMatchLen: integer;
-    FOnProgress: TATTextFinderProgress;
+    FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
     function CountMatchesRegex(FromPos: integer): integer;
-    function CountMatchesUsual(FromPos: integer; IsWordChar: TATIsWordChar): Integer;
+    function CountMatchesUsual(FromPos: integer): Integer;
     function FindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
-    function FindMatchUsual(FromPos: integer; IsWordChar: TATIsWordChar): Integer;
-    function IsMatchUsual(const SBuf, FBuf: UnicodeString; APos: integer;
-      IsWordChar: TATIsWordChar): boolean;
+    function FindMatchUsual(FromPos: integer): Integer;
+    function IsMatchUsual(const BufText, BufFind: UnicodeString; APos: integer): boolean;
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
@@ -45,11 +43,10 @@ type
     OptRegex: boolean;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer;
-      IsWordChar: TATIsWordChar): boolean;
+    function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
     property MatchPos: integer read FMatchPos; //have meaning if FindMatch returned True
     property MatchLen: integer read FMatchLen; //too
-    property OnProgress: TATTextFinderProgress read FOnProgress write FOnProgress;
+    property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
     property OnBadRegex: TNotifyEvent read FOnBadRegex write FOnBadRegex;
   end;
 
@@ -61,7 +58,7 @@ type
     FBuffer: TATStringBuffer;
     FEditor: TATSynEdit;
     FSkipLen: integer;
-    FOnConfirmReplace: TATEditorFinderComfirmReplace;
+    FOnConfirmReplace: TATFinderConfirmReplace;
     procedure DoReplaceTextInEditor(P1, P2: TPoint);
     function GetOffsetOfCaret: integer;
     procedure UpdateBuffer(Ed: TATSynEdit);
@@ -71,7 +68,7 @@ type
     constructor Create;
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
-    property OnConfirmReplace: TATEditorFinderComfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
+    property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
     function DoFindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoCountAll: integer;
     function DoReplaceAll: integer;
@@ -79,15 +76,20 @@ type
 
 implementation
 
-function TATTextFinder.IsMatchUsual(const SBuf, FBuf: UnicodeString;
-  APos: integer; IsWordChar: TATIsWordChar): boolean;
+function IsWordChar(ch: Widechar): boolean;
+begin
+  Result:= ATStringProc.IsCharWord(ch, '');
+end;
+
+function TATTextFinder.IsMatchUsual(const BufText, BufFind: UnicodeString;
+  APos: integer): boolean;
 var
   LenF, LastPos: integer;
 begin
   LenF:= Length(StrFind);
   LastPos:= Length(StrText) - LenF + 1;
 
-  Result:= CompareMem(@FBuf[1], @SBuf[APos], LenF*2);
+  Result:= CompareMem(@BufFind[1], @BufText[APos], LenF*2);
   if Result then
     if OptWords then
       Result:=
@@ -95,9 +97,7 @@ begin
         ((APos >= LastPos) or (not IsWordChar(StrText[APos + LenF])));
 end;
 
-function TATTextFinder.FindMatchUsual(
-  FromPos: integer;
-  IsWordChar: TATIsWordChar): Integer;
+function TATTextFinder.FindMatchUsual(FromPos: integer): Integer;
 var
   BufText, BufFind: UnicodeString;
   LastPos, i: integer;
@@ -118,7 +118,7 @@ begin
   if not OptBack then
     for i:= FromPos to LastPos do
     begin
-      if IsMatchUsual(BufText, BufFind, i, IsWordChar) then
+      if IsMatchUsual(BufText, BufFind, i) then
       begin
         Result:= i;
         Break
@@ -127,7 +127,7 @@ begin
   else
     for i:= FromPos downto 1 do
     begin
-     if IsMatchUsual(BufText, BufFind, i, IsWordChar) then
+     if IsMatchUsual(BufText, BufFind, i) then
       begin
         Result:= i;
         Break
@@ -172,9 +172,7 @@ begin
   end;
 end;
 
-function TATTextFinder.CountMatchesUsual(
-  FromPos: integer;
-  IsWordChar: TATIsWordChar): Integer;
+function TATTextFinder.CountMatchesUsual(FromPos: integer): Integer;
 var
   BufText, BufFind: UnicodeString;
   LastPos, i: Integer;
@@ -194,7 +192,7 @@ begin
   LastPos:= Length(StrText) - Length(StrFind) + 1;
 
   for i:= FromPos to LastPos do
-    if IsMatchUsual(BufText, BufFind, i, IsWordChar) then
+    if IsMatchUsual(BufText, BufFind, i) then
     begin
       Inc(Result);
       if Assigned(FOnProgress) then
@@ -317,7 +315,7 @@ begin
   if OptRegex then
     Result:= CountMatchesRegex(1)
   else
-    Result:= CountMatchesUsual(1, @FEditor.IsCharWord);
+    Result:= CountMatchesUsual(1);
 end;
 
 function TATEditorFinder.DoReplaceAll: integer;
@@ -390,7 +388,7 @@ begin
   else
     NStartPos:= 1;
 
-  Result:= FindMatch(ANext, FSkipLen, NStartPos, @FEditor.IsCharWord);
+  Result:= FindMatch(ANext, FSkipLen, NStartPos);
   FSkipLen:= FMatchLen;
 
   if Result then
@@ -449,8 +447,7 @@ begin
   inherited Destroy;
 end;
 
-function TATTextFinder.FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer;
-  IsWordChar: TATIsWordChar): boolean;
+function TATTextFinder.FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
 var
   FromPos: integer;
 begin
@@ -458,7 +455,7 @@ begin
   if StrText='' then Exit;
   if StrFind='' then Exit;
 
-  //regex
+  //regex code
   if OptRegex then
   begin
     if not ANext then
@@ -466,11 +463,10 @@ begin
     else
       FromPos:= FMatchPos+ASkipLen;
     Result:= FindMatchRegex(FromPos, FMatchPos, FMatchLen);
-    //FProgress:= FMatchPos * 100 div Length(StrText);
     Exit
   end;
 
-  //non-regex
+  //usual code
   if not ANext then
   begin
     FMatchPos:= AStartPos;
@@ -486,11 +482,10 @@ begin
   end;
 
   StrReplacement:= StrReplace;
-  FMatchPos:= FindMatchUsual(FMatchPos, IsWordChar);
+  FMatchPos:= FindMatchUsual(FMatchPos);
   Result:= FMatchPos>0;
   if Result then
     FMatchLen:= Length(StrFind);
-  //FProgress:= FMatchPos * 100 div Length(StrText);
 end;
 
 end.
