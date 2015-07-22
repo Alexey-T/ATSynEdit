@@ -32,6 +32,8 @@ type
     function CountMatchesUsual(FromPos: integer; IsWordChar: TATIsWordChar): Integer;
     function FindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function FindMatchUsual(FromPos: integer; IsWordChar: TATIsWordChar): Integer;
+    function IsMatchUsual(const SBuf, FBuf: UnicodeString; APos: integer;
+      IsWordChar: TATIsWordChar): boolean;
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
@@ -77,60 +79,57 @@ type
 
 implementation
 
+function TATTextFinder.IsMatchUsual(const SBuf, FBuf: UnicodeString;
+  APos: integer; IsWordChar: TATIsWordChar): boolean;
+var
+  LenF, LastPos: integer;
+begin
+  LenF:= Length(StrFind);
+  LastPos:= Length(StrText) - LenF + 1;
+
+  Result:= CompareMem(@FBuf[1], @SBuf[APos], LenF*2);
+  if Result then
+    if OptWords then
+      Result:=
+        ((APos <= 1) or (not IsWordChar(StrText[APos - 1]))) and
+        ((APos >= LastPos) or (not IsWordChar(StrText[APos + LenF])));
+end;
+
 function TATTextFinder.FindMatchUsual(
   FromPos: integer;
   IsWordChar: TATIsWordChar): Integer;
 var
-  SBuf, FBuf: UnicodeString;
-  Match: Boolean;
-  LastPos, LenF, i: Integer;
+  BufText, BufFind: UnicodeString;
+  LastPos, i: integer;
 begin
-  Result := 0;
+  Result:= 0;
   if StrText='' then exit;
   if StrFind='' then exit;
 
-  SBuf := StrText;
-  FBuf := StrFind;
+  BufText:= StrText;
+  BufFind:= StrFind;
   if not OptCase then
   begin
-    SBuf := UnicodeLowerCase(SBuf);
-    FBuf := UnicodeLowerCase(FBuf);
+    BufText:= UnicodeLowerCase(BufText);
+    BufFind:= UnicodeLowerCase(BufFind);
   end;
-
-  LenF := Length(StrFind);
-  LastPos := Length(StrText) - LenF + 1;
+  LastPos:= Length(StrText) - Length(StrFind) + 1;
 
   if not OptBack then
-    //Search forward
-    for i := FromPos to LastPos do
+    for i:= FromPos to LastPos do
     begin
-      Match := CompareMem(@FBuf[1], @SBuf[i], LenF * 2);
-
-      if OptWords then
-        Match := Match
-          and ((i <= 1) or (not IsWordChar(StrText[i - 1])))
-          and ((i >= LastPos) or (not IsWordChar(StrText[i + LenF])));
-
-      if Match then
+      if IsMatchUsual(BufText, BufFind, i, IsWordChar) then
       begin
-        Result := i;
+        Result:= i;
         Break
       end;
     end
-    else
-    //Search backward
-    for i := FromPos downto 1 do
+  else
+    for i:= FromPos downto 1 do
     begin
-      Match := CompareMem(@FBuf[1], @SBuf[i], LenF * 2);
-
-      if OptWords then
-        Match := Match
-          and ((i <= 1) or (not IsWordChar(StrText[i - 1])))
-          and ((i >= LastPos) or (not IsWordChar(StrText[i + LenF])));
-
-      if Match then
+     if IsMatchUsual(BufText, BufFind, i, IsWordChar) then
       begin
-        Result := i;
+        Result:= i;
         Break
       end;
     end;
@@ -182,27 +181,27 @@ var
   LastPos, LenF, i: Integer;
   Ok: boolean;
 begin
-  Result := 0;
+  Result:= 0;
   if StrText='' then exit;
   if StrFind='' then exit;
 
-  SBuf := StrText;
-  FBuf := StrFind;
+  SBuf:= StrText;
+  FBuf:= StrFind;
   if not OptCase then
   begin
-    SBuf := UnicodeLowerCase(SBuf);
-    FBuf := UnicodeLowerCase(FBuf);
+    SBuf:= UnicodeLowerCase(SBuf);
+    FBuf:= UnicodeLowerCase(FBuf);
   end;
 
-  LenF := Length(StrFind);
-  LastPos := Length(StrText) - LenF + 1;
+  LenF:= Length(StrFind);
+  LastPos:= Length(StrText) - LenF + 1;
 
-  for i := FromPos to LastPos do
+  for i:= FromPos to LastPos do
   begin
-    Match := CompareMem(@FBuf[1], @SBuf[i], LenF * 2);
+    Match:= CompareMem(@FBuf[1], @SBuf[i], LenF * 2);
 
     if OptWords then
-      Match := Match
+      Match:= Match
         and ((i <= 1) or (not IsWordChar(StrText[i - 1])))
         and ((i >= LastPos) or (not IsWordChar(StrText[i + LenF])));
 
@@ -264,7 +263,9 @@ begin
   end;
 end;
 
+
 { TATEditorFinder }
+
 
 procedure TATEditorFinder.UpdateBuffer(Ed: TATSynEdit);
 var
