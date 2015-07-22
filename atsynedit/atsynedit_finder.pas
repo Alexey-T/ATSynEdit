@@ -15,6 +15,9 @@ uses
 type
   TATIsWordChar = function(ch: Widechar): boolean of object;
   TATTextFinderProgress = procedure(Sender: TObject; ACurPos, AMaxPos: integer; var AContinue: boolean) of object;
+  TATEditorFinderComfirmReplace = procedure(Sender: TObject;
+    APos1, APos2: TPoint; AForMany: boolean; var AConfirm: boolean) of object;
+
 
 type
   { TATTextFinder }
@@ -49,10 +52,6 @@ type
   end;
 
 type
-  TATEditorFinderComfirmReplace = procedure(Sender: TObject;
-    APos1, APos2: TPoint; var AConfirm: boolean) of object;
-
-type
   { TATEditorFinder }
 
   TATEditorFinder = class(TATTextFinder)
@@ -70,7 +69,7 @@ type
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
     property OnConfirmReplace: TATEditorFinderComfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
-    function FindAction(ANext, AReplace: boolean; out AChanged: boolean): boolean;
+    function FindAction(ANext, AReplace, AReplaceForMany: boolean; out AChanged: boolean): boolean;
     function CountMatches: integer;
     function ReplaceMatches: integer;
     procedure UpdateEditor(AUpdateText: boolean);
@@ -337,10 +336,10 @@ var
   Ok, Changed: boolean;
 begin
   Result:= 0;
-  if FindAction(false, true, Changed) then
+  if FindAction(false, true, true, Changed) then
   begin
     if Changed then Inc(Result);
-    while FindAction(true, true, Changed) do
+    while FindAction(true, true, true, Changed) do
     begin
       if Changed then Inc(Result);
       if Assigned(FOnProgress) then
@@ -353,8 +352,8 @@ begin
   end;
 end;
 
-function TATEditorFinder.FindAction(ANext, AReplace: boolean; out
-  AChanged: boolean): boolean;
+function TATEditorFinder.FindAction(ANext, AReplace, AReplaceForMany: boolean;
+  out AChanged: boolean): boolean;
 var
   P1, P2: TPoint;
   Shift, PosAfter: TPoint;
@@ -408,7 +407,7 @@ begin
       Cfm:= true;
       if OptConfirmReplace then
         if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, P1, P2, Cfm);
+          FOnConfirmReplace(Self, P1, P2, AReplaceForMany, Cfm);
 
       if Cfm then
       begin
