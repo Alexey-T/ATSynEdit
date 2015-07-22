@@ -54,14 +54,6 @@ type
   end;
 
 type
-  TATEditorFinderFlag = (
-    fflagReplace,
-    fflagDontMoveCaret,
-    fflagDontRereadBuffer
-    );
-  TATEditorFinderFlags = set of TATEditorFinderFlag;
-
-type
   TATEditorFinderComfirmReplace = procedure(Sender: TObject;
     APos1, APos2: TPoint; var AConfirm: boolean) of object;
 
@@ -83,7 +75,7 @@ type
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
     property OnConfirmReplace: TATEditorFinderComfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
-    function FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
+    function FindAction(ANext, AReplace: boolean): boolean;
     function CountMatches: integer;
     procedure UpdateEditor(AUpdateText: boolean);
  end;
@@ -321,15 +313,23 @@ end;
 
 function TATEditorFinder.GetOffsetOfCaret: integer;
 var
-  P1: TPoint;
+  Pos1, Pos2: TPoint;
 begin
   with FEditor.Carets[0] do
   begin
-    P1.X:= PosX;
-    P1.Y:= PosY;
+    Pos1.X:= PosX;
+    Pos1.Y:= PosY;
+    Pos2.X:= EndX;
+    Pos2.Y:= EndY;
   end;
-  Result:= FBuffer.CaretToStr(P1);
-  if Result<0 then
+
+  if Pos2.Y>=0 then
+    Result:= FBuffer.CaretToStr(Pos2)
+  else
+    Result:= FBuffer.CaretToStr(Pos1);
+
+  Inc(Result);
+  if Result<1 then
     Showmessage('Strange OffsetOfCaret<0');
 end;
 
@@ -342,7 +342,7 @@ begin
     Result:= CountMatchesUsual(1, @FEditor.IsCharWord);
 end;
 
-function TATEditorFinder.FindAction(ANext: boolean; AFlags: TATEditorFinderFlags): boolean;
+function TATEditorFinder.FindAction(ANext, AReplace: boolean): boolean;
 var
   P1, P2: TPoint;
   Shift, PosAfter: TPoint;
@@ -367,8 +367,7 @@ begin
     Exit
   end;
 
-  if not (fflagDontRereadBuffer in AFlags) then
-    UpdateBuffer(FEditor);
+  UpdateBuffer(FEditor);
 
   if OptFromCaret then
     AStartPos:= GetOffsetOfCaret
@@ -386,36 +385,33 @@ begin
 
   if Result then
   begin
-    if not (fflagDontMoveCaret in AFlags) then
+    P1:= FBuffer.StrToCaret(MatchPos-1);
+    P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
+    FEditor.DoCaretSingle(P1.X, P1.Y);
+
+    if AReplace then
     begin
-      P1:= FBuffer.StrToCaret(MatchPos-1);
-      P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
-      FEditor.DoCaretSingle(P1.X, P1.Y);
+      Cfm:= true;
+      if OptConfirmReplace then
+        if Assigned(FOnConfirmReplace) then
+          FOnConfirmReplace(Self, P1, P2, Cfm);
 
-      if fflagReplace in AFlags then
+      if Cfm then
       begin
-        Cfm:= true;
-        if OptConfirmReplace then
-          if Assigned(FOnConfirmReplace) then
-            FOnConfirmReplace(Self, P1, P2, Cfm);
-
-        if Cfm then
-        begin
-          FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
-          FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacement, false, Shift, PosAfter);
-          FSkipLen:= Length(StrReplacement);
-        end;
+        FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
+        FEditor.Strings.TextInsert(P1.X, P1.Y, StrReplacement, false, Shift, PosAfter);
+        FSkipLen:= Length(StrReplacement);
       end;
+    end;
 
-      with FEditor.Carets[0] do
+    with FEditor.Carets[0] do
+    begin
+      EndX:= -1;
+      EndY:= -1;
+      if not AReplace then
       begin
-        EndX:= -1;
-        EndY:= -1;
-        if not (fflagReplace in AFlags) then
-        begin
-          EndX:= P2.X;
-          EndY:= P2.Y;
-        end;
+        EndX:= P2.X;
+        EndY:= P2.Y;
       end;
     end;
   end;
