@@ -176,36 +176,25 @@ function TATTextFinder.CountMatchesUsual(
   FromPos: integer;
   IsWordChar: TATIsWordChar): Integer;
 var
-  SBuf, FBuf: UnicodeString;
-  Match: Boolean;
-  LastPos, LenF, i: Integer;
+  BufText, BufFind: UnicodeString;
+  LastPos, i: Integer;
   Ok: boolean;
 begin
   Result:= 0;
   if StrText='' then exit;
   if StrFind='' then exit;
 
-  SBuf:= StrText;
-  FBuf:= StrFind;
+  BufText:= StrText;
+  BufFind:= StrFind;
   if not OptCase then
   begin
-    SBuf:= UnicodeLowerCase(SBuf);
-    FBuf:= UnicodeLowerCase(FBuf);
+    BufText:= UnicodeLowerCase(BufText);
+    BufFind:= UnicodeLowerCase(BufFind);
   end;
-
-  LenF:= Length(StrFind);
-  LastPos:= Length(StrText) - LenF + 1;
+  LastPos:= Length(StrText) - Length(StrFind) + 1;
 
   for i:= FromPos to LastPos do
-  begin
-    Match:= CompareMem(@FBuf[1], @SBuf[i], LenF * 2);
-
-    if OptWords then
-      Match:= Match
-        and ((i <= 1) or (not IsWordChar(StrText[i - 1])))
-        and ((i >= LastPos) or (not IsWordChar(StrText[i + LenF])));
-
-    if Match then
+    if IsMatchUsual(BufText, BufFind, i, IsWordChar) then
     begin
       Inc(Result);
       if Assigned(FOnProgress) then
@@ -215,7 +204,6 @@ begin
         if not Ok then Break;
       end;
     end;
-  end;
 end;
 
 function TATTextFinder.CountMatchesRegex(FromPos: integer): integer;
