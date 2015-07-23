@@ -525,4 +525,10 @@ object fmMain: TfmMain
     left = 560
     top = 303
   end
+  object ApplicationProperties1: TApplicationProperties
+    ShowButtonGlyphs = sbgNever
+    ShowMenuGlyphs = sbgNever
+    left = 548
+    top = 366
+  end
 end

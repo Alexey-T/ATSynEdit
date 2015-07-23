@@ -1,7 +1,7 @@
 object fmCmd: TfmCmd
   Left = 425
   Height = 620
-  Top = 250
+  Top = 120
   Width = 679
   ActiveControl = List
   Caption = 'Commands'
@@ -12,10 +12,11 @@ object fmCmd: TfmCmd
   LCLVersion = '1.5'
   object List: TListView
     Left = 6
-    Height = 577
+    Height = 573
     Top = 6
     Width = 667
     Align = alClient
+    AutoSort = False
     BorderSpacing.Around = 6
     Columns = <    
       item
@@ -30,6 +31,7 @@ object fmCmd: TfmCmd
         Caption = 'key2'
         Width = 150
       end>
+    ColumnClick = False
     ReadOnly = True
     RowSelect = True
     TabOrder = 0
@@ -38,10 +40,9 @@ object fmCmd: TfmCmd
   end
   object ButtonPanel1: TButtonPanel
     Left = 6
-    Height = 25
-    Top = 589
+    Height = 29
+    Top = 585
     Width = 667
-    AutoSize = False
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'

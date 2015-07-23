@@ -22,6 +22,7 @@ uses
 type
   { TfmMain }
   TfmMain = class(TForm)
+    ApplicationProperties1: TApplicationProperties;
     bFont: TButton;
     bOpt: TButton;
     btnStop: TButton;

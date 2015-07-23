@@ -4,7 +4,7 @@ object fmOpt: TfmOpt
   Top = 225
   Width = 640
   BorderStyle = bsDialog
-  Caption = 'Editor opts'
+  Caption = 'Options'
   ClientHeight = 390
   ClientWidth = 640
   OnCreate = FormCreate
@@ -12,10 +12,9 @@ object fmOpt: TfmOpt
   LCLVersion = '1.5'
   object ButtonPanel1: TButtonPanel
     Left = 6
-    Height = 25
-    Top = 359
+    Height = 29
+    Top = 355
     Width = 628
-    AutoSize = False
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
@@ -30,17 +29,19 @@ object fmOpt: TfmOpt
     ShowBevel = False
   end
   object PageControl1: TPageControl
-    Left = 8
-    Height = 344
-    Top = 8
-    Width = 624
+    Left = 6
+    Height = 343
+    Top = 6
+    Width = 628
     ActivePage = TabSheet4
+    Align = alClient
+    BorderSpacing.Around = 6
     TabIndex = 5
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object chkCurLine: TCheckBox
         Left = 8
         Height = 24
@@ -178,8 +179,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet2: TTabSheet
       Caption = 'gutter'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object edRulerSize: TSpinEdit
         Left = 296
         Height = 23
@@ -381,8 +382,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet9: TTabSheet
       Caption = 'gutter cols'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object GroupBox2: TGroupBox
         Left = 8
         Height = 248
@@ -586,8 +587,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet5: TTabSheet
       Caption = 'keys'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object chkNavUpDown: TCheckBox
         Left = 8
         Height = 19
@@ -776,8 +777,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet3: TTabSheet
       Caption = 'mouse'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object chkMsClick2: TCheckBox
         Left = 8
         Height = 24
@@ -869,8 +870,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet4: TTabSheet
       Caption = 'carets'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object edCrTime: TSpinEdit
         Left = 8
         Height = 27
@@ -1008,8 +1009,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet6: TTabSheet
       Caption = 'undo'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object edUndo: TSpinEdit
         Left = 8
         Height = 23
@@ -1048,8 +1049,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet7: TTabSheet
       Caption = 'minimap'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object edMapFont: TSpinEdit
         Left = 8
         Height = 23
@@ -1087,8 +1088,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet8: TTabSheet
       Caption = 'unprinted'
-      ClientHeight = 313
-      ClientWidth = 620
+      ClientHeight = 312
+      ClientWidth = 624
       object chkUnprintAsciiRep: TCheckBox
         Left = 8
         Height = 24

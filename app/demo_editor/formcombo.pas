@@ -6,12 +6,13 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ATSynEdit_Edits;
+  StdCtrls, ButtonPanel, ATSynEdit_Edits;
 
 type
   { TfmCombo }
 
   TfmCombo = class(TForm)
+    ButtonPanel1: TButtonPanel;
     Label1: TLabel;
     Panel1: TPanel;
     procedure FormCreate(Sender: TObject);
