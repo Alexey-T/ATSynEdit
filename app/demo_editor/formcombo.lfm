@@ -27,4 +27,21 @@ object fmCombo: TfmCombo
       ParentColor = False
     end
   end
+  object ButtonPanel1: TButtonPanel
+    Left = 6
+    Height = 29
+    Top = 205
+    Width = 385
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    TabOrder = 1
+    ShowButtons = [pbClose]
+    ShowBevel = False
+  end
 end
