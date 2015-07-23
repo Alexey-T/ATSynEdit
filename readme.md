@@ -1,6 +1,8 @@
-Editor control for Lazarus. Implemented much. Implemented multi-carets from birth (see help dialog in demo_editor how to use).
+Editor control for Lazarus, alternate to SynEdit "for human beings" (Python requests). 
+Implemented much. 
+Implemented multi-carets from birth.
 
-- Doc: http://wiki.freepascal.org/ATSynEdit
+- Doc wiki: http://wiki.freepascal.org/ATSynEdit
 - Adapter for SynWrite lexers exists; uses code https://github.com/Alexey-T/EControl
 
 Shots
