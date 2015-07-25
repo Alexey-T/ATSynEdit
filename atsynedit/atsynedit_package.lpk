@@ -4,7 +4,7 @@
     <PathDelim Value="\"/>
     <Name Value="atsynedit_package"/>
     <Type Value="RunAndDesignTime"/>
-    <Author Value="A. Torgashin"/>
+    <Author Value="Alexey Torgashin"/>
     <CompilerOptions>
       <Version Value="11"/>
       <PathDelim Value="\"/>
