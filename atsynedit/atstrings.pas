@@ -709,6 +709,7 @@ end;
 
 procedure TATStrings.DoDetectEndings;
 begin
+  if not IsIndexValid(0) then Exit;
   FEndings:= LinesEnds[0]; //no range-chk
   if FEndings=cEndNone then
     FEndings:= cEndWin;
