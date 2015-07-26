@@ -277,6 +277,12 @@ begin
   end;
 end;
 
+{
+http://www.unicode.org/charts/PDF/U0E80.pdf
+Consider some chars as fullwidth,
+cannot render them ok anyway as accents:
+0EB1, 0EB4..0EBC, 0EC8..0ECD
+}
 function IsCharFullWidth(ch: atChar): boolean;
 begin
   case Ord(ch) of
@@ -288,6 +294,11 @@ begin
     $4E00..$9FC3,
     $A000..$A4C6,
     $AC00..$D7A3,
+
+    {$ifdef unix}
+    $0EB1, $0EB4..$0EBC, $0EC8..$0ECD, //Lao accent chars
+    {$endif}
+
     $F900..$FAD9,
     $FE10..$FE19,
     $FE30..$FE6B,
