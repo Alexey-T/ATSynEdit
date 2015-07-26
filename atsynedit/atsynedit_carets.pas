@@ -1,4 +1,4 @@
-unit atsynedit_carets;
+unit ATSynEdit_Carets;
 
 {$mode objfpc}{$H+}
 
