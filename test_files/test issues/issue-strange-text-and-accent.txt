@@ -1,0 +1,5 @@
+﻿> "ຂອ້ຍກິນແກ້ວໄດ້ໂດຍທີ່ມັນບໍໄດ້ເຮັດໃຫ້ຂອ້ຍເຈັບ"
+
+Win32: rendered much better: accents over text
+Linux gtk2: rendered awful: accents not over but next to chars (accents with some /circles/ added)
+
