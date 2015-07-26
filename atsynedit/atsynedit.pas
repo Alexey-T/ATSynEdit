@@ -9,7 +9,9 @@ License: MPL 2.0
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
 //{$define test_foldlist}
-{$define allow_proc_msg}
+////{$define allow_proc_msg}
+    //not sure: maybe it caused strange hangs of app with editor 1st tab
+    //partly resized, on Linux gtk2, each 20% runs
 
 unit ATSynEdit;
 

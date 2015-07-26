@@ -82,7 +82,7 @@ begin
   M.Add(cCommand_Cancel, 'selection: cancel carets, selection, drag-drop', ['Esc'], []);
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
-  M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXControl+'+R'], []);
+  M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', [cXControl+'+Q'], []);
   M.Add(cCommand_ToggleWordWrap, 'toggle word-wrap mode', [cXControl+'+U'], []);
   M.Add(cCommand_ToggleUnprinted, 'toggle show unprinted chars', [], []);
   M.Add(cCommand_ToggleLineNums, 'toggle show line numbers', [], []);
