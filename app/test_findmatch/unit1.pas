@@ -31,7 +31,6 @@ type
   private
     Finder: TATTextFinder;
     procedure DoFind(ANext: boolean);
-    function IsWordChar(ch: widechar): boolean;
     { private declarations }
   public
     { public declarations }
@@ -56,14 +55,9 @@ begin
   DoFind(true);
 end;
 
-function TfmMain.IsWordChar(ch: Widechar): boolean;
-begin
-  Result:= Pos(ch, RegExprWordChars)>0;
-end;
-
 procedure TfmMain.DoFind(ANext: boolean);
 var
-  FromPos, SkipLen: integer;
+  NFromPos, NSkipLen: integer;
 begin
   Finder.StrFind:= trim(Memo1.Text);
   Finder.StrText:= trim(Memo2.Text);
@@ -72,19 +66,19 @@ begin
   Finder.OptBack:= chkBack.Checked;
   Finder.OptRegex:= chkRegex.Checked;
 
-  SkipLen:= Finder.MatchLen;
+  NSkipLen:= Finder.MatchLen;
   if ANext then
-    FromPos:= Finder.MatchPos
+    NFromPos:= Finder.MatchPos
   else
   if Finder.OptRegex then
-    FromPos:= 1
+    NFromPos:= 1
   else
   if Finder.OptBack then
-    FromPos:= Length(Finder.StrText)
+    NFromPos:= Length(Finder.StrText)
   else
-    FromPos:= 1;
+    NFromPos:= 1;
 
-  if not FInder.FindMatch(ANext, SkipLen, FromPos, @IsWordChar) then
+  if not FInder.FindMatch(ANext, NSkipLen, NFromPos) then
     memo3.text:= '(not found)'
   else
     memo3.text:= 'context:'#13+Copy(Finder.StrText, Finder.MatchPos-2, FInder.MatchLen+4);
