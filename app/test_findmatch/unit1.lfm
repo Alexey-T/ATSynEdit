@@ -16,7 +16,7 @@ object fmMain: TfmMain
     Top = 24
     Width = 407
     Lines.Strings = (
-      'Memo'
+      'register'
     )
     TabOrder = 0
   end
@@ -26,15 +26,26 @@ object fmMain: TfmMain
     Top = 96
     Width = 407
     Lines.Strings = (
-      'TForm1 = class(TForm)'
-      '    Memo1: TMemo;'
-      '    Memo2: TMemo;'
-      '  private'
-      '    { private declarations }'
-      '  public'
-      '    { public declarations }'
-      '  end;'
-      '  '
+      'unit shapeline_reg;'
+      ''
+      'interface'
+      ''
+      'uses'
+      '  SysUtils, Classes, Controls, LResources, shapeline;'
+      ''
+      'procedure Register;'
+      ''
+      'implementation'
+      ''
+      'procedure Register;'
+      'begin'
+      '  RegisterComponents(''Misc'', [TShapeLine]);'
+      'end;'
+      ''
+      'initialization'
+      '  {$I res/icons.lrs}'
+      ''
+      'end.'
     )
     TabOrder = 1
   end
