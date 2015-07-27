@@ -2,8 +2,6 @@ unit formmain;
 
 {$mode objfpc}{$H+}
 
-//{$define test_text}
-
 interface
 
 uses
@@ -13,6 +11,7 @@ uses
   ATStringProc,
   ATSynEdit,
   ATSynEdit_CanvasProc,
+  ATSynEdit_Carets,
   ATSynEdit_Finder,
   formkey,
   formopt,
@@ -1202,7 +1201,8 @@ end;
 procedure TfmMain.FinderUpdateEditor(AUpdateText: boolean);
 begin
   FFinder.Editor.Update(AUpdateText);
-  FFinder.Editor.DoCommand(cCommand_ScrollToCaretTop);
+  FFinder.Editor.DoGotoCaret(cEdgeTop);
+  UpdateStatus;
 end;
 
 
