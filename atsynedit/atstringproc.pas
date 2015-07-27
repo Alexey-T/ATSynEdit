@@ -263,6 +263,11 @@ Combining Diacritical Marks Supplement (1DC0–1DFF), versions 4.1 to 5.2
 Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
 Combining Half Marks (FE20–FE2F), versions 1.0, updates in 5.2
 }
+{
+http://www.unicode.org/charts/PDF/U0E80.pdf
+cannot render them ok anyway as accents:
+0EB1, 0EB4..0EBC, 0EC8..0ECD
+}
 function IsCharAccent(ch: atChar): boolean;
 begin
   case Ord(ch) of
@@ -270,6 +275,9 @@ begin
     $1AB0..$1AFF,
     $1DC0..$1DFF,
     $20D0..$20FF,
+    {$ifdef unix}
+    $0EB1, $0EB4..$0EBC, $0EC8..$0ECD, //Lao accent chars
+    {$endif}
     $FE20..$FE2F:
       Result:= true;
     else
@@ -277,12 +285,6 @@ begin
   end;
 end;
 
-{
-http://www.unicode.org/charts/PDF/U0E80.pdf
-Consider some chars as fullwidth,
-cannot render them ok anyway as accents:
-0EB1, 0EB4..0EBC, 0EC8..0ECD
-}
 function IsCharFullWidth(ch: atChar): boolean;
 begin
   case Ord(ch) of
@@ -294,11 +296,6 @@ begin
     $4E00..$9FC3,
     $A000..$A4C6,
     $AC00..$D7A3,
-
-    {$ifdef unix}
-    $0EB1, $0EB4..$0EBC, $0EC8..$0ECD, //Lao accent chars
-    {$endif}
-
     $F900..$FAD9,
     $FE10..$FE19,
     $FE30..$FE6B,
