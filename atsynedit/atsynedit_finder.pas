@@ -16,7 +16,7 @@ type
     var AContinue: boolean) of object;
   TATFinderConfirmReplace = procedure(Sender: TObject;
     APos1, APos2: TPoint; AForMany: boolean;
-    var AConfirm: boolean) of object;
+    var AConfirm, AContinue: boolean) of object;
 
 type
   { TATTextFinder }
@@ -359,7 +359,7 @@ function TATEditorFinder.DoFindOrReplace(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
 var
   P1, P2: TPoint;
-  Cfm: boolean;
+  Cfm, CfmCont: boolean;
 begin
   Result:= false;
   AChanged:= false;
@@ -394,9 +394,17 @@ begin
     if AReplace then
     begin
       Cfm:= true;
+      CfmCont:= true;
+
       if OptConfirmReplace then
         if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, P1, P2, AForMany, Cfm);
+          FOnConfirmReplace(Self, P1, P2, AForMany, Cfm, CfmCont);
+
+      if not CfmCont then
+      begin
+        Result:= false;
+        Exit;
+      end;
 
       if Cfm then
       begin
