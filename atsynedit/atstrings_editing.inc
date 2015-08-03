@@ -114,6 +114,10 @@ begin
   if not IsIndexValid(AY) then Exit;
   Str:= Lines[AY];
 
+  //special case: last fake line
+  if (AY=Count-1) and (Str='') and (LinesEnds[AY]=cEndNone) then
+    Exit;
+
   DelEol:= false;
   if AX<Length(Str) then
   begin
