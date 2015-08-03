@@ -78,7 +78,7 @@ begin
         end
         else
         begin
-          ColorFont:= FColors.TextFont;//random($ffff);
+          ColorFont:= GetColorTextFont;//random($ffff);
           ColorBG:= AColorBG;
         end;
       end;
@@ -161,6 +161,6 @@ begin
 
   AColorForced:= AColor<>clNone;
   if not AColorForced then
-    AColor:= Colors.TextBG;
+    AColor:= GetColorTextBG;
 end;
 

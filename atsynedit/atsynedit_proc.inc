@@ -94,6 +94,8 @@ begin
   C.TextBG:= clWhite;
   C.TextSelFont:= clHighlightText;
   C.TextSelBG:= clHighlight;
+  C.TextDisabledFont:= clMedGray;
+  C.TextDisabledBG:= $e0e0e0;
   C.Caret:= clBlack;
   C.GutterFont:= clGray;
   C.GutterBG:= $e0e0e0;
