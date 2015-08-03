@@ -15,6 +15,8 @@ type
   { TATEdit }
 
   TATEdit = class(TATSynEdit)
+  protected
+    function DoGetTextString: atString; override;
   public
     constructor Create(AOwner: TComponent); override;
   end;
@@ -49,6 +51,13 @@ uses
   ATSynEdit_Keymap_Init;
 
 { TATEdit }
+
+function TATEdit.DoGetTextString: atString;
+begin
+  //base function gets text with EOLs,
+  //strip them
+  Result:= Trim(inherited);
+end;
 
 constructor TATEdit.Create(AOwner: TComponent);
 begin

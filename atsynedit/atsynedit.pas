@@ -816,6 +816,7 @@ type
     function DoMouseWheelUp(Shift: TShiftState; MousePos{%H-}: TPoint): boolean; override;
     procedure DblClick; override;
     procedure TripleClick; override;
+    function DoGetTextString: atString; virtual;
     //messages
     procedure WMGetDlgCode(var Msg: TLMNoParams); message LM_GETDLGCODE;
     procedure WMEraseBkgnd(var Msg: TLMEraseBkgnd); message LM_ERASEBKGND;
@@ -1317,6 +1318,7 @@ end;
 procedure TATSynEdit.SetText(AValue: atString);
 begin
   Strings.LoadFromString(AValue);
+  DoCaretSingle(0, 0);
   Update(true);
 end;
 
@@ -3670,6 +3672,12 @@ end;
 
 function TATSynEdit.GetText: atString;
 begin
+  Result:= DoGetTextString;
+end;
+
+function TATSynEdit.DoGetTextString: atString;
+begin
+  //TATEdit overrides it
   Result:= Strings.TextString;
 end;
 
