@@ -168,7 +168,7 @@ type
     procedure DoAddEnc(Sub, SName: string);
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
-      AForMany: boolean; var AConfirm: boolean);
+      AForMany: boolean; var AConfirm, AContinue: boolean);
     procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
@@ -1155,7 +1155,7 @@ begin
 end;
 
 procedure TfmMain.FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
-  AForMany: boolean; var AConfirm: boolean);
+  AForMany: boolean; var AConfirm, AContinue: boolean);
 var
   Res: TModalResult;
   Buttons: TMsgDlgButtons;
@@ -1185,6 +1185,7 @@ begin
     Buttons, '');
 
   AConfirm:= Res in [mrYes, mrYesToAll];
+  AContinue:= Res<>mrNoToAll;
   if Res in [mrYesToAll, mrNoToAll] then
     FConfirmAll:= Res;
 end;
