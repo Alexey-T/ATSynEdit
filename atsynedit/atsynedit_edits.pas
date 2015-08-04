@@ -54,9 +54,11 @@ uses
 
 function TATEdit.DoGetTextString: atString;
 begin
-  //base function gets text with EOLs,
-  //strip them
-  Result:= Trim(inherited);
+  Result:= inherited;
+  //gets text with EOLs, strip them
+  while (Result<>'') and
+    IsCodeEol(Ord(Result[Length(Result)])) do
+    SetLength(Result, Length(Result)-1);
 end;
 
 constructor TATEdit.Create(AOwner: TComponent);
