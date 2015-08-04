@@ -799,6 +799,8 @@ type
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
+    function TextSelected: atString;
+    function TextCurrentWord: atString;
     procedure DoSelect_All;
     procedure DoSelect_Inverted;
     procedure DoSelect_SplitSelectionToLines;
@@ -3753,6 +3755,33 @@ begin
   Dec(FPaintLocked);
   if FPaintLocked=0 then
     Invalidate;
+end;
+
+function TATSynEdit.TextSelected: atString;
+var
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  Result:= '';
+  if Carets.Count=0 then Exit;
+  Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
+  if bSel then
+    Result:= Strings.TextSubstring(X1, Y1, X2, Y2);
+end;
+
+function TATSynEdit.TextCurrentWord: atString;
+var
+  Str: atString;
+  Caret: TATCaretItem;
+  N1, N2: integer;
+begin
+  Result:= '';
+  if Carets.Count=0 then Exit;
+  Caret:= Carets[0];
+  Str:= Strings.Lines[Caret.PosY];
+  SFindWordBounds(Str, Caret.PosX, N1, N2, OptWordChars);
+  if N2>N1 then
+    Result:= Copy(Str, N1+1, N2-N1);
 end;
 
 function TATSynEdit.GetMouseNiceScroll: boolean;
