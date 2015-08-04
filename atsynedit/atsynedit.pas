@@ -600,10 +600,6 @@ type
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoCaretsSort;
     //events
-    procedure DoEventCarets;
-    procedure DoEventScroll;
-    procedure DoEventChange;
-    procedure DoEventState;
     procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     function DoEventCommand(ACommand: integer): boolean;
@@ -753,6 +749,10 @@ type
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     procedure UpdateIncorrectCaretPositions;
     procedure UpdateFoldedFromLinesHidden;
+    procedure DoEventCarets;
+    procedure DoEventScroll;
+    procedure DoEventChange;
+    procedure DoEventState;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
