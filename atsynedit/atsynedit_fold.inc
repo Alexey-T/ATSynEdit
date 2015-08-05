@@ -4,6 +4,12 @@ function TATSynEdit.IsLineFolded(ALine: integer; ADetectPartialFold: boolean): b
 var
   Flag: integer;
 begin
+  if not Strings.IsIndexValid(ALine) then
+  begin
+    Result:= false;
+    Exit;
+  end;
+
   Flag:= Strings.LinesHidden[ALine, FEditorIndex];
   Result:= (Flag=-1) or (ADetectPartialFold and (Flag>0));
 end;
