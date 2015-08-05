@@ -291,10 +291,16 @@ begin
     Result:= FBuffer.CaretToStr(Pos2)
   else
     Result:= FBuffer.CaretToStr(Pos1);
+  Inc(Result); //was 0-based
 
-  Inc(Result);
-  if Result<1 then
-    Showmessage('Strange OffsetOfCaret<0');
+  //find-back must goto previous match
+  if OptBack then
+    Dec(Result, Length(StrFind)*2);
+
+  if Result<0 then
+    Result:= 0;
+  if Result=0 then
+    Showmessage('Strange GetOffsetOfCaret=0');
 end;
 
 function TATEditorFinder.DoCountAll: integer;
