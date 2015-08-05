@@ -297,10 +297,8 @@ begin
   if OptBack then
     Dec(Result, Length(StrFind)*2);
 
-  if Result<0 then
-    Result:= 0;
-  if Result=0 then
-    Showmessage('Strange GetOffsetOfCaret=0');
+  if Result<1 then
+    Result:= 1;
 end;
 
 function TATEditorFinder.DoCountAll: integer;
