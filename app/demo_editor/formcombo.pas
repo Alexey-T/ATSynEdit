@@ -13,8 +13,10 @@ type
 
   TfmCombo = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkEnabled: TCheckBox;
     Label1: TLabel;
     Panel1: TPanel;
+    procedure chkEnabledChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     procedure ComboCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
@@ -43,6 +45,11 @@ begin
   ed.OnCommand:= @ComboCommand;
   ed.Text:= 'Test';
   ed.OptTextHint:= '(empty)';
+end;
+
+procedure TfmCombo.chkEnabledChange(Sender: TObject);
+begin
+  ed.Enabled:= chkEnabled.Checked;
 end;
 
 procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;

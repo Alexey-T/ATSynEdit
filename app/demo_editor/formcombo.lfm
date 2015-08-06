@@ -44,4 +44,15 @@ object fmCombo: TfmCombo
     ShowButtons = [pbClose]
     ShowBevel = False
   end
+  object chkEnabled: TCheckBox
+    Left = 17
+    Height = 24
+    Top = 174
+    Width = 80
+    Caption = 'Enabled'
+    Checked = True
+    OnChange = chkEnabledChange
+    State = cbChecked
+    TabOrder = 2
+  end
 end

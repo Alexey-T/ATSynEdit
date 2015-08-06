@@ -120,6 +120,7 @@
       <Unit18>
         <Filename Value="..\..\atsynedit\atsynedit_commands.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Commands"/>
       </Unit18>
       <Unit19>
         <Filename Value="..\..\atsynedit\atsynedit_keymap_init.pas"/>
@@ -172,6 +173,7 @@
       <Unit30>
         <Filename Value="..\..\atsynedit\atsynedit_edits.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Edits"/>
       </Unit30>
       <Unit31>
         <Filename Value="formcombo.pas"/>

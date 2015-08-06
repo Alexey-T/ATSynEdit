@@ -139,9 +139,9 @@ begin
   if n>=0 then
   begin
     Text:= UTF8Decode(FItems[n]);
-    DoCommand(cCommand_SelectNone);
-    DoCaretSingle(Length(Text), 0);
-    DoCommand(cCommand_ScrollToCaretRight);
+
+    DoScrollByDelta(-10000, 0);
+    DoCommand(cCommand_SelectAll);
   end;
 end;
 
