@@ -166,6 +166,7 @@ type
     FStopped: boolean;
     FConfirmAll: TModalResult;
     procedure DoAddEnc(Sub, SName: string);
+    procedure EditProgress(Sender: TObject);
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean);
@@ -254,6 +255,7 @@ begin
   ed.OnDrawBookmarkIcon:= @EditDrawBm;
   ed.OnDrawLine:= @EditDrawLine;
   ed.OnDrawMicromap:= @EditDrawMicromap;
+  ed.Strings.OnProgress:= @EditProgress;
   //ed.OnDrawRuler:= EditDrawTest;//test
 
   ed.SetFocus;
@@ -504,6 +506,8 @@ procedure TfmMain.DoOpen(const fn: string; ADetectEnc: boolean);
 begin
   Application.ProcessMessages;
   FFileName:= fn;
+  Progress.Show;
+  Progress.Position:= 0;
 
   ed.BeginUpdate;
   try
@@ -516,6 +520,7 @@ begin
     ed.EndUpdate;
   end;
 
+  Progress.Hide;
   Caption:= 'Demo - '+ExtractFileName(fn);
 end;
 
@@ -1206,5 +1211,15 @@ begin
   UpdateStatus;
 end;
 
+procedure TfmMain.EditProgress(Sender: TObject);
+var
+  Str: TATStrings;
+begin
+  Str:= Sender as TATStrings;
+  Progress.Min:= 0;
+  Progress.Max:= 100;
+  Progress.Position:= Str.Progress;
+  Application.ProcessMessages;
+end;
 
 end.

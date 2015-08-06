@@ -650,7 +650,6 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
-    procedure DoShowProgress(Sender: TObject);
     procedure UpdateCursor;
     procedure UpdateGutterAutosize(C: TCanvas);
     procedure UpdateMinimapAutosize(C: TCanvas);
@@ -2331,7 +2330,6 @@ begin
   FCarets.Add(0, 0);
 
   Strings.Clear;
-  Strings.OnProgress:= @DoShowProgress;
   FWrapInfo.Clear;
   FWrapUpdateNeeded:= true;
 
@@ -2573,22 +2571,13 @@ end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
 var
-  N1: integer;
-  //N2: integer;
   Str: string;
 begin
-  C.Brush.Color:= FColors.LockedBG;
+  C.Brush.Color:= Colors.LockedBG;
   C.FillRect(ClientRect);
   C.Font.Assign(Self.Font);
   Str:= FTextLocked;
-
-  N1:= Strings.Progress;
-  if N1>0 then Str:= Str+' loading '+IntToStr(N1)+'%';
-
-  //N2:= FWrapProgress;
-  //if N2>0 then Str:= Str+' wrapping '+IntToStr(N2)+'%';
-
-  C.TextOut(10, 5, Str);
+  C.TextOut(10, 10, Str);
 end;
 
 
@@ -3976,12 +3965,6 @@ begin
   Msg.Result:= DLGC_WANTARROWS or DLGC_WANTCHARS or DLGC_WANTALLKEYS;
   if FWantTabs and (GetKeyState(VK_CONTROL) >= 0) then
     Msg.Result:= Msg.Result or DLGC_WANTTAB;
-end;
-
-procedure TATSynEdit.DoShowProgress(Sender: TObject);
-begin
-  Invalidate;
-  AppProcessMessages;
 end;
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
