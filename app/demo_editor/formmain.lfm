@@ -331,6 +331,7 @@ object fmMain: TfmMain
       Width = 162
       ScrollBars = ssBoth
       TabOrder = 13
+      Visible = False
     end
   end
   object OpenDialog1: TOpenDialog

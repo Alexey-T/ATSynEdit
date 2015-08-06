@@ -164,8 +164,9 @@ type
     FDir: string;
     FFileName: string;
     FFinder: TATEditorFinder;
-    FStopped: boolean;
-    FConfirmAll: TModalResult;
+    FFindStopped: boolean;
+    FFindConfirmAll: TModalResult;
+    FFindMarkAll: boolean;
     procedure DoAddEnc(Sub, SName: string);
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
@@ -222,11 +223,6 @@ const
   cColorBmIco = clMedGray;
 
 { TfmMain }
-
-procedure TfmMain.FinderFound(Sender: TObject; APos1, APos2: TPoint);
-begin
-  Memo1.Lines.Add(Format('Found %d:%d', [APos1.Y+1, APos1.X+1]));
-end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
 begin
@@ -561,7 +557,7 @@ end;
 
 procedure TfmMain.btnStopClick(Sender: TObject);
 begin
-  FStopped:= true;
+  FFindStopped:= true;
 end;
 
 procedure TfmMain.FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
@@ -569,7 +565,7 @@ procedure TfmMain.FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
 begin
   progress.Position:= ACurPos * 100 div AMaxPos;
   Application.ProcessMessages;
-  if FStopped then AContinue:= false;
+  if FFindStopped then AContinue:= false;
 end;
 
 procedure TfmMain.bFontClick(Sender: TObject);
@@ -668,8 +664,9 @@ begin
     FFinder.OptFromCaret:= chkFromCaret.Checked;
     FFinder.OptConfirmReplace:= chkConfirm.Checked;
 
-    FStopped:= false;
-    FConfirmAll:= mrNone;
+    FFindStopped:= false;
+    FFindConfirmAll:= mrNone;
+    FFindMarkAll:= false;
     btnStop.Show;
     progress.Show;
     progress.Position:= 0;
@@ -694,11 +691,18 @@ begin
           FinderUpdateEditor(true);
           MsgStatus('Replaces made: '+Inttostr(cnt));
         end;
-      mrIgnore, //count all
+      mrIgnore: //count all
+        begin
+          cnt:= FFinder.DoCountAll(false);
+          MsgStatus('Count of "'+FFinder.StrFind+'": '+Inttostr(cnt));
+        end;
       mrRetry: //mark all
         begin
-          cnt:= FFinder.DoCountAll(res=mrRetry);
-          MsgStatus('Count of "'+FFinder.StrFind+'": '+Inttostr(cnt));
+          FFindMarkAll:= true;
+          cnt:= FFinder.DoCountAll(true);
+          FFindMarkAll:= false;
+          FinderUpdateEditor(false);
+          MsgStatus('Marked matches: '+Inttostr(cnt));
         end;
     end;
   finally
@@ -1171,7 +1175,7 @@ var
   Res: TModalResult;
   Buttons: TMsgDlgButtons;
 begin
-  case FConfirmAll of
+  case FFindConfirmAll of
     mrYesToAll: begin AConfirm:= true; exit end;
     mrNoToAll: begin AConfirm:= false; exit end;
   end;
@@ -1198,7 +1202,7 @@ begin
   AConfirm:= Res in [mrYes, mrYesToAll];
   AContinue:= Res<>mrNoToAll;
   if Res in [mrYesToAll, mrNoToAll] then
-    FConfirmAll:= Res;
+    FFindConfirmAll:= Res;
 end;
 
 
@@ -1216,5 +1220,21 @@ begin
   FFinder.Editor.DoGotoCaret(cEdgeTop);
   UpdateStatus;
 end;
+
+procedure TfmMain.FinderFound(Sender: TObject; APos1, APos2: TPoint);
+begin
+  if FFindMarkAll then
+  begin
+    ed.Carets.Add(APos1.X, APos1.Y);
+    with ed.Carets[ed.Carets.Count-1] do
+    begin
+      EndX:= APos2.X;
+      EndY:= APos2.Y;
+    end;
+    ed.Carets.Sort;
+  end;
+  //Memo1.Lines.Add(Format('Found %d:%d', [APos1.Y+1, APos1.X+1]));
+end;
+
 
 end.
