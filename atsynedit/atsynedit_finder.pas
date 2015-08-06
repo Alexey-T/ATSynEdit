@@ -14,6 +14,7 @@ uses
 type
   TATFinderProgress = procedure(Sender: TObject; ACurPos, AMaxPos: integer;
     var AContinue: boolean) of object;
+  TATFinderFound = procedure(Sender: TObject; APos1, APos2: TPoint) of object;
   TATFinderConfirmReplace = procedure(Sender: TObject;
     APos1, APos2: TPoint; AForMany: boolean;
     var AConfirm, AContinue: boolean) of object;
@@ -27,11 +28,13 @@ type
     FMatchLen: integer;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
-    function DoCountMatchesRegex(FromPos: integer): integer;
-    function DoCountMatchesUsual(FromPos: integer): Integer;
+    function DoCountMatchesRegex(FromPos: integer; AWithEvent: boolean): integer;
+    function DoCountMatchesUsual(FromPos: integer; AWithEvent: boolean): Integer;
     function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function DoFindMatchUsual(FromPos: integer): Integer;
     function IsMatchUsual(APos: integer): boolean;
+  protected
+    procedure DoOnFound; virtual;
   public
     StrText: UnicodeString;
     StrFind: UnicodeString;
@@ -58,10 +61,13 @@ type
     FBuffer: TATStringBuffer;
     FEditor: TATSynEdit;
     FSkipLen: integer;
+    FOnFound: TATFinderFound;
     FOnConfirmReplace: TATFinderConfirmReplace;
     procedure DoReplaceTextInEditor(P1, P2: TPoint);
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
+  protected
+    procedure DoOnFound; override;
   public
     OptFromCaret: boolean;
     OptConfirmReplace: boolean;
@@ -69,9 +75,10 @@ type
     destructor Destroy; override;
     procedure UpdateBuffer;
     property Editor: TATSynEdit read FEditor write FEditor;
+    property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
     function DoFindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoCountAll: integer;
+    function DoCountAll(AWithEvent: boolean): integer;
     function DoReplaceAll: integer;
  end;
 
@@ -105,6 +112,11 @@ begin
       Result:=
         ((APos <= 1) or (not IsWordChar(StrText[APos - 1]))) and
         ((APos >= LastPos) or (not IsWordChar(StrText[APos + LenF])));
+end;
+
+procedure TATTextFinder.DoOnFound;
+begin
+  //
 end;
 
 function TATTextFinder.DoFindMatchUsual(FromPos: integer): Integer;
@@ -173,7 +185,8 @@ begin
   end;
 end;
 
-function TATTextFinder.DoCountMatchesUsual(FromPos: integer): Integer;
+function TATTextFinder.DoCountMatchesUsual(FromPos: integer; AWithEvent: boolean
+  ): Integer;
 var
   LastPos, i: Integer;
   Ok: boolean;
@@ -187,6 +200,13 @@ begin
     if IsMatchUsual(i) then
     begin
       Inc(Result);
+      if AWithEvent then
+      begin
+        FMatchPos:= i;
+        FMatchLen:= Length(StrFind);
+        DoOnFound;
+      end;
+
       if Assigned(FOnProgress) then
       begin
         Ok:= true;
@@ -196,7 +216,8 @@ begin
     end;
 end;
 
-function TATTextFinder.DoCountMatchesRegex(FromPos: integer): integer;
+function TATTextFinder.DoCountMatchesRegex(FromPos: integer; AWithEvent: boolean
+  ): integer;
 var
   Obj: TRegExpr;
   Ok: boolean;
@@ -225,9 +246,23 @@ begin
     if Ok then
     begin
       Inc(Result);
+      if AWithEvent then
+      begin
+        FMatchPos:= Obj.MatchPos[0];
+        FMatchLen:= Obj.MatchLen[0];
+        DoOnFound;
+      end;
+
       while Obj.ExecNext do
       begin
         Inc(Result);
+        if AWithEvent then
+        begin
+          FMatchPos:= Obj.MatchPos[0];
+          FMatchLen:= Obj.MatchLen[0];
+          DoOnFound;
+        end;
+
         if Assigned(FOnProgress) then
         begin
           Ok:= true;
@@ -301,13 +336,13 @@ begin
     Result:= 1;
 end;
 
-function TATEditorFinder.DoCountAll: integer;
+function TATEditorFinder.DoCountAll(AWithEvent: boolean): integer;
 begin
   UpdateBuffer;
   if OptRegex then
-    Result:= DoCountMatchesRegex(1)
+    Result:= DoCountMatchesRegex(1, AWithEvent)
   else
-    Result:= DoCountMatchesUsual(1);
+    Result:= DoCountMatchesUsual(1, AWithEvent);
 end;
 
 function TATEditorFinder.DoReplaceAll: integer;
@@ -385,6 +420,7 @@ begin
   end;
 
   if AReplace and FEditor.ModeReadOnly then exit;
+  if OptRegex then OptBack:= false;
 
   Result:= FindMatch(ANext, FSkipLen, GetOffsetStartPos);
   FSkipLen:= FMatchLen;
@@ -472,6 +508,7 @@ begin
     else
       FromPos:= FMatchPos+ASkipLen;
     Result:= DoFindMatchRegex(FromPos, FMatchPos, FMatchLen);
+    if Result then DoOnFound;
     Exit
   end;
 
@@ -493,7 +530,22 @@ begin
   FMatchPos:= DoFindMatchUsual(FMatchPos);
   Result:= FMatchPos>0;
   if Result then
+  begin
     FMatchLen:= Length(StrFind);
+    DoOnFound;
+  end;
+end;
+
+procedure TATEditorFinder.DoOnFound;
+var
+  P1, P2: TPoint;
+begin
+  if Assigned(FOnFound) then
+  begin
+    P1:= FBuffer.StrToCaret(MatchPos-1);
+    P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
+    FOnFound(Self, P1, P2);
+  end;
 end;
 
 end.

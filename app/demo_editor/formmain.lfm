@@ -324,6 +324,14 @@ object fmMain: TfmMain
       OnClick = bOptClick
       TabOrder = 5
     end
+    object Memo1: TMemo
+      Left = 14
+      Height = 151
+      Top = 337
+      Width = 162
+      ScrollBars = ssBoth
+      TabOrder = 13
+    end
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]

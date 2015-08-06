@@ -14,6 +14,7 @@ type
 
   TfmFind = class(TForm)
     bCount: TButton;
+    bMarkAll: TButton;
     bFind: TButton;
     bCancel: TButton;
     bRep: TButton;

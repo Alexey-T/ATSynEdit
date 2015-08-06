@@ -54,6 +54,7 @@ type
     Label6: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
+    Memo1: TMemo;
     MenuItem1: TMenuItem;
     mnuFindNext: TMenuItem;
     mnuFind: TMenuItem;
@@ -185,6 +186,7 @@ type
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
+    procedure FinderFound(Sender: TObject; APos1, APos2: TPoint);
     procedure FinderUpdateEditor(AUpdateText: boolean);
     procedure MenuEncClick(Sender: TObject);
     procedure MsgStatus(const S: string);
@@ -221,6 +223,11 @@ const
 
 { TfmMain }
 
+procedure TfmMain.FinderFound(Sender: TObject; APos1, APos2: TPoint);
+begin
+  Memo1.Lines.Add(Format('Found %d:%d', [APos1.Y+1, APos1.X+1]));
+end;
+
 procedure TfmMain.FormCreate(Sender: TObject);
 begin
   UpdateEnc;
@@ -254,8 +261,6 @@ begin
   ed.OnDrawBookmarkIcon:= @EditDrawBm;
   ed.OnDrawLine:= @EditDrawLine;
   ed.OnDrawMicromap:= @EditDrawMicromap;
-  //ed.Strings.OnProgress:= @EditProgress;
-  //ed.OnDrawRuler:= EditDrawTest;//test
 
   ed.SetFocus;
 
@@ -265,6 +270,7 @@ begin
   FFinder.OnConfirmReplace:= @FinderConfirmReplace;
   FFinder.OnProgress:= @FinderProgress;
   FFinder.OnBadRegex:= @FinderBadRegex;
+  FFinder.OnFound:= @FinderFound; //slower
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -688,9 +694,10 @@ begin
           FinderUpdateEditor(true);
           MsgStatus('Replaces made: '+Inttostr(cnt));
         end;
-      mrIgnore: //count all
+      mrIgnore, //count all
+      mrRetry: //mark all
         begin
-          cnt:= FFinder.DoCountAll;
+          cnt:= FFinder.DoCountAll(res=mrRetry);
           MsgStatus('Count of "'+FFinder.StrFind+'": '+Inttostr(cnt));
         end;
     end;
