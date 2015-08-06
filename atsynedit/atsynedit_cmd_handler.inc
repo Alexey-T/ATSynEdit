@@ -95,6 +95,8 @@ begin
 
   if cResultState in Res then
     DoEventState;
+
+  Update;
 end;
 
 procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');
