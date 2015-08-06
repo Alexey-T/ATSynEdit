@@ -327,7 +327,7 @@ object fmMain: TfmMain
     object Memo1: TMemo
       Left = 14
       Height = 151
-      Top = 337
+      Top = 336
       Width = 162
       ScrollBars = ssBoth
       TabOrder = 13

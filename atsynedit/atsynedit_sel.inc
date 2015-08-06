@@ -120,14 +120,14 @@ begin
       if not Sel then Continue;
 
       //add range
-      NewCarets.AddRange(XPrev, YPrev, X1, Y1);
+      NewCarets.Add(XPrev, YPrev, X1, Y1);
       XPrev:= X2;
       YPrev:= Y2;
     end;
 
     //add range after last caret
     PosLast:= GetEndOfFilePos;
-    NewCarets.AddRange(XPrev, YPrev, PosLast.X, PosLast.Y);
+    NewCarets.Add(XPrev, YPrev, PosLast.X, PosLast.Y);
 
     DoCaretsAssign(NewCarets);
   finally
@@ -155,13 +155,13 @@ begin
 
       if Y1=Y2 then
       begin
-        NewCarets.AddRange(X1, Y1, X2, Y2);
+        NewCarets.Add(X1, Y1, X2, Y2);
         Continue;
       end;
 
       //add first part
       if X1<Length(Strings.Lines[Y1]) then
-        NewCarets.AddRange(X1, Y1, Length(Strings.Lines[Y1]), Y1)
+        NewCarets.Add(X1, Y1, Length(Strings.Lines[Y1]), Y1)
       else
         NewCarets.Add(X1, Y1);
 
@@ -171,11 +171,11 @@ begin
         if Strings.Lines[j]='' then
           NewCarets.Add(0, j)
         else
-          NewCarets.AddRange(0, j, Length(Strings.Lines[j]), j);
+          NewCarets.Add(0, j, Length(Strings.Lines[j]), j);
       end;
 
       //add last part
-      NewCarets.AddRange(0, Y2, X2, Y2);
+      NewCarets.Add(0, Y2, X2, Y2);
     end;
 
     DoCaretsAssign(NewCarets);
@@ -215,7 +215,7 @@ begin
         Y2:= PosLast.Y;
       end;
 
-      NewCarets.AddRange(X1, Y1, X2, Y2);
+      NewCarets.Add(X1, Y1, X2, Y2);
     end;
 
     DoCaretsAssign(NewCarets);
