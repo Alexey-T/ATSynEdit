@@ -1225,12 +1225,7 @@ procedure TfmMain.FinderFound(Sender: TObject; APos1, APos2: TPoint);
 begin
   if FFindMarkAll then
   begin
-    ed.Carets.Add(APos1.X, APos1.Y);
-    with ed.Carets[ed.Carets.Count-1] do
-    begin
-      EndX:= APos2.X;
-      EndY:= APos2.Y;
-    end;
+    ed.Carets.Add(APos1.X, APos1.Y, APos2.X, APos2.Y);
     ed.Carets.Sort;
   end;
   //Memo1.Lines.Add(Format('Found %d:%d', [APos1.Y+1, APos1.X+1]));

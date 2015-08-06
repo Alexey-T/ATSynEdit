@@ -58,7 +58,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATCaretItem read GetItem; default;
-    procedure Add(APosX, APosY: integer);
+    procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     procedure AddRange(XFrom, YFrom, XTo, YTo: integer);
     procedure Sort;
     procedure Assign(Obj: TATCarets);
@@ -225,7 +225,7 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATCarets.Add(APosX, APosY: integer);
+procedure TATCarets.Add(APosX, APosY: integer; AEndX: integer = -1; AEndY: integer = -1);
 var
   Item: TATCaretItem;
 begin
@@ -236,10 +236,10 @@ begin
   Item:= TATCaretItem.Create;
   Item.PosX:= APosX;
   Item.PosY:= APosY;
+  Item.EndX:= AEndX;
+  Item.EndY:= AEndY;
   Item.CoordX:= -1;
   Item.CoordY:= -1;
-  Item.EndX:= -1;
-  Item.EndY:= -1;
   FList.Add(Item);
 end;
 
