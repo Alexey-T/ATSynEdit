@@ -166,7 +166,6 @@ type
     FStopped: boolean;
     FConfirmAll: TModalResult;
     procedure DoAddEnc(Sub, SName: string);
-    procedure EditProgress(Sender: TObject);
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean);
@@ -255,7 +254,7 @@ begin
   ed.OnDrawBookmarkIcon:= @EditDrawBm;
   ed.OnDrawLine:= @EditDrawLine;
   ed.OnDrawMicromap:= @EditDrawMicromap;
-  ed.Strings.OnProgress:= @EditProgress;
+  //ed.Strings.OnProgress:= @EditProgress;
   //ed.OnDrawRuler:= EditDrawTest;//test
 
   ed.SetFocus;
@@ -1209,17 +1208,6 @@ begin
   FFinder.Editor.Update(AUpdateText);
   FFinder.Editor.DoGotoCaret(cEdgeTop);
   UpdateStatus;
-end;
-
-procedure TfmMain.EditProgress(Sender: TObject);
-var
-  Str: TATStrings;
-begin
-  Str:= Sender as TATStrings;
-  Progress.Min:= 0;
-  Progress.Max:= 100;
-  Progress.Position:= Str.Progress;
-  Application.ProcessMessages;
 end;
 
 end.
