@@ -8,6 +8,7 @@ uses
   SysUtils, Classes, Dialogs, Forms,
   RegExpr, //must be with {$define Unicode}
   ATSynEdit,
+  ATSynEdit_Carets,
   ATStringProc,
   ATStringProc_TextBuffer;
 
@@ -78,6 +79,7 @@ type
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
     function DoFindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
+    function DoReplaceSelectedMatch: boolean;
     function DoCountAll(AWithEvent: boolean): integer;
     function DoReplaceAll: integer;
  end;
@@ -470,6 +472,42 @@ begin
       end;
     end;
   end;
+end;
+
+function TATEditorFinder.DoReplaceSelectedMatch: boolean;
+var
+  Caret: TATCaretItem;
+  P1, P2: TPoint;
+  X1, Y1, X2, Y2: integer;
+  NPos: integer;
+  bSel: boolean;
+begin
+  Result:= false;
+  if FEditor.Carets.Count=0 then exit;
+  Caret:= FEditor.Carets[0];
+
+  Caret.GetRange(X1, Y1, X2, Y2, bSel);
+  if not bSel then exit;
+  P1:= Point(X1, Y1);
+  P2:= Point(X2, Y2);
+
+  NPos:= FBuffer.CaretToStr(P1)+1;
+  if NPos<>FMatchPos then
+  begin
+    Showmessage('Please call "Replace" for found match, which is selected');
+    exit;
+  end;
+
+  Caret.EndX:= -1;
+  Caret.EndY:= -1;
+
+  DoReplaceTextInEditor(P1, P2);
+  UpdateBuffer;
+
+  if OptRegex then
+    FSkipLen:= Length(StrReplacement)
+  else
+    FSkipLen:= Length(StrReplace);
 end;
 
 
