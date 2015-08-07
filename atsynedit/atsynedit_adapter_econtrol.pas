@@ -45,6 +45,7 @@ type
     ListColors: TList;
     Timer: TTimer;
     FDynEnabled: boolean;
+    FLocked: boolean;
     procedure DoAnalize(AEdit: TATSynEdit);
     procedure DoFindTokenOverrideStyle(var ATokenStyle: TecSyntaxFormat;
       ATokenIndex, AEditorIndex: integer);
@@ -56,6 +57,7 @@ type
     procedure DoFoldFromLinesHidden;
     procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
     function IsCaretInRange(AEdit: TATSynEdit; APos1, APos2: integer; ACond: TATRangeCond): boolean;
+    procedure SetLocked(AValue: boolean);
     procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
     procedure UpdateEds;
     function GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
@@ -74,6 +76,7 @@ type
     procedure AddEditor(AEdit: TATSynEdit);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
+    property Locked: boolean read FLocked write SetLocked;
   public
     procedure OnEditorCaretMove(Sender: TObject); override;
     procedure OnEditorChange(Sender: TObject); override;
@@ -126,6 +129,7 @@ var
   Ed: TATSynEdit;
   Str: atString;
 begin
+  if FLocked then Exit;
   Ed:= Sender as TATSynEdit;
   AddEditor(Ed);
   if not Assigned(AnClient) then Exit;
@@ -147,6 +151,7 @@ var
   AEdit: TATSynEdit;
   Pos: integer;
 begin
+  if FLocked then Exit;
   AEdit:= Sender as TATSynEdit;
   Pos:= Buffer.CaretToStr(Point(AX, AY));
   AColor:= GetTokenColorBG(Pos, AColor, AEdit.EditorIndex);
@@ -185,6 +190,11 @@ begin
       Exit
     end;
   end;
+end;
+
+procedure TATAdapterEControl.SetLocked(AValue: boolean);
+begin
+  FLocked:=AValue;
 end;
 
 function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
@@ -431,6 +441,7 @@ end;
 
 procedure TATAdapterEControl.OnEditorCaretMove(Sender: TObject);
 begin
+  if FLocked then Exit;
   UpdateRangesActive(Sender as TATSynEdit);
 end;
 
@@ -449,6 +460,7 @@ end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
+  if FLocked then Exit;
   AddEditor(Sender as TATSynEdit);
   UpdateData;
 end;
