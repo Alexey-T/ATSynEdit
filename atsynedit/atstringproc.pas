@@ -48,7 +48,7 @@ function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
 
 type TATCommentAction = (cCommentAdd, cCommentAddIfNone, cCommentRemove, cCommentToggle);
-function SCommentLineAction(L: TStringList; const SComment: atString; Act: TATCommentAction): boolean;
+function SCommentLineAction(L: TStringList; const AComment: atString; Act: TATCommentAction): boolean;
 
 function SBegin(const S, SubStr: atString): boolean;
 function STrimRight(const S: atString): atString;
@@ -673,47 +673,55 @@ end;
 
 
 function SCommentLineAction(L: TStringList;
-  const SComment: atString; Act: TATCommentAction): boolean;
+  const AComment: atString; Act: TATCommentAction): boolean;
 var
-  Indent, IndentAll, i: integer;
   Str, Str0: atString;
-  IsCmt: boolean;
+  Indent0, IndentAll, i: integer;
+  IsCmt0, IsCmtAll: boolean;
 begin
   Result:= false;
   if L.Count=0 then exit;
 
   IndentAll:= MaxInt;
   for i:= 0 to L.Count-1 do
-    IndentAll:= Min(IndentAll, SGetIndentChars(L[i])); //no need Utf8decode
+    IndentAll:= Min(IndentAll, SGetIndentChars(L[i])+1);
+    //no need Utf8decode
 
   for i:= 0 to L.Count-1 do
   begin
     Str:= Utf8Decode(L[i]);
     Str0:= Str;
-    Indent:= Min(SGetIndentChars(Str), IndentAll)+1;
-    IsCmt:= Copy(Str, Indent, Length(SComment))=SComment;
+
+    //Indent0, IsCmt0: regarding indent if this line
+    //IndentAll, IsCmtAll: regarding minimal indent of block
+    Indent0:= SGetIndentChars(Str)+1;
+    IsCmt0:= Copy(Str, Indent0, Length(AComment))=AComment;
+    IsCmtAll:= Copy(Str, IndentAll, Length(AComment))=AComment;
 
     case Act of
       cCommentAdd:
         begin
-          Insert(SComment, Str, Indent);
+          Insert(AComment, Str, IndentAll);
         end;
       cCommentAddIfNone:
         begin
-          if not IsCmt then
-            Insert(SComment, Str, Indent);
+          if not IsCmtAll then
+            Insert(AComment, Str, IndentAll);
         end;
       cCommentRemove:
         begin
-          if IsCmt then
-            Delete(Str, Indent, Length(SComment));
+          if IsCmtAll then
+            Delete(Str, IndentAll, Length(AComment))
+          else
+          if IsCmt0 then
+            Delete(Str, Indent0, Length(AComment))
         end;
       cCommentToggle:
         begin
-          if IsCmt then
-            Delete(Str, Indent, Length(SComment))
+          if IsCmtAll then
+            Delete(Str, IndentAll, Length(AComment))
           else
-            Insert(SComment, Str, Indent);
+            Insert(AComment, Str, IndentAll);
         end;
     end;
 
