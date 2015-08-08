@@ -631,3 +631,37 @@ begin
   Result:= [cResultText, cResultCaretAny];
 end;
 
+
+procedure TATSynEdit.DoCommentSelectionLines(Act: TATCommentAction; const AComment: atString);
+var
+  Caret: TATCaretItem;
+  L: TStringList;
+  NFrom, NTo, i: integer;
+  Shift, PosAfter: TPoint;
+  bChange: boolean;
+begin
+  if Carets.Count=0 then exit;
+  Caret:= Carets[0];
+  Caret.GetSelLines(NFrom, NTo, true);
+  if NFrom<0 then exit;
+  if NTo<0 then exit;
+
+  L:= TStringList.Create;
+  try
+    for i:= NFrom to NTo do
+      L.Add(Utf8Encode(Strings.Lines[i]));
+
+    bChange:= SCommentLineAction(L, AComment, Act);
+    if not bChange then exit;
+    Assert(L.Count=(NTo-NFrom+1), 'DoCommentSel changed line count');
+
+    for i:= NFrom to NTo do
+      Strings.Lines[i]:= Utf8Decode(L[i-NFrom]);
+  finally
+    L.Free;
+  end;
+
+  DoEventChange;
+  Update(true);
+end;
+

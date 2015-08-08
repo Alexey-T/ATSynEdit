@@ -18,6 +18,8 @@ type
 
   TfmMain = class(TForm)
     bOpen: TButton;
+    bComment: TButton;
+    bUncomment: TButton;
     chkDyn: TCheckBox;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
@@ -29,7 +31,9 @@ type
     files: TShellListView;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
+    procedure bCommentClick(Sender: TObject);
     procedure bOpenClick(Sender: TObject);
+    procedure bUncommentClick(Sender: TObject);
     procedure chkDynChange(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
     procedure chkFullSelChange(Sender: TObject);
@@ -46,10 +50,12 @@ type
     ed: TATSynEdit;
     FDir: string;
     FFilename: string;
+    procedure DoCommentAct(Act: TATCommentAction);
     procedure DoLexer(const aname: string);
     procedure DoOpen(const fn: string);
     procedure EditCalcStaple(Sender: TObject; ALine, AIndent: integer; var AColor: TColor);
     procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
+    function GetComment: string;
     procedure UpdateLexList;
   public
     { public declarations }
@@ -192,6 +198,37 @@ begin
     if not Execute then exit;
     DoOpen(Filename);
   end;
+end;
+
+function TfmMain.GetComment: string;
+var
+  an: TecSyntAnalyzer;
+begin
+  Result:= '';
+  an:= adapter.Lexer;
+  if Assigned(an) then
+    Result:= an.LineComment;
+end;
+
+procedure TfmMain.bCommentClick(Sender: TObject);
+begin
+  DoCommentAct(cCommentAddIfNone);
+end;
+
+procedure TfmMain.bUncommentClick(Sender: TObject);
+begin
+  DoCommentAct(cCommentRemove);
+end;
+
+procedure TfmMain.DoCommentAct(Act: TATCommentAction);
+var
+  Str: string;
+begin
+  Str:= GetComment;
+  if Str='' then
+    Showmessage('No line comment defined for lexer')
+  else
+    Ed.DoCommentSelectionLines(Act, Str);
 end;
 
 procedure TfmMain.chkDynChange(Sender: TObject);

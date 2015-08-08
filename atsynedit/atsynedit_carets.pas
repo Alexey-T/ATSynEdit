@@ -27,7 +27,7 @@ type
     CoordColumn: integer; //saved CoordX to use in keys Up/Down cmd
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
-    procedure GetSelLines(out AFrom, ATo: integer);
+    procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
   end;
 
 type
@@ -148,7 +148,8 @@ begin
   end;
 end;
 
-procedure TATCaretItem.GetSelLines(out AFrom, ATo: integer);
+procedure TATCaretItem.GetSelLines(out AFrom, ATo: integer;
+  AllowNoSel: boolean = false);
 var
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
@@ -157,7 +158,12 @@ begin
   ATo:= -1;
 
   GetRange(X1, Y1, X2, Y2, bSel);
-  if not bSel then Exit;
+  if not bSel then
+  begin
+    if AllowNoSel then
+      begin AFrom:= PosY; ATo:= PosY; end;
+    Exit
+  end;
 
   AFrom:= Y1;
   ATo:= Y2;

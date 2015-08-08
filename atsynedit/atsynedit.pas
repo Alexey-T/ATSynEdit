@@ -507,7 +507,6 @@ type
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsAssign(NewCarets: TATCarets);
-    function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
     procedure DoDropText;
     procedure DoFoldbarClick(ALine: integer);
     procedure DoHandleRightClick(X, Y: integer);
@@ -676,6 +675,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
     function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
@@ -810,6 +810,8 @@ type
     procedure DoRangeUnfold(ARange: TATSynRange);
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
+    procedure DoCommentSelectionLines(Act: TATCommentAction;
+      const AComment: atString);
 
   protected
     procedure Paint; override;

@@ -122,6 +122,24 @@ object fmMain: TfmMain
       OnChange = chkDynChange
       TabOrder = 8
     end
+    object bComment: TButton
+      Left = 192
+      Height = 25
+      Top = 112
+      Width = 152
+      Caption = 'comment sel'
+      OnClick = bCommentClick
+      TabOrder = 10
+    end
+    object bUncomment: TButton
+      Left = 192
+      Height = 25
+      Top = 144
+      Width = 152
+      Caption = 'uncomment sel'
+      OnClick = bUncommentClick
+      TabOrder = 11
+    end
   end
   object OpenDialog1: TOpenDialog
     left = 344

@@ -47,6 +47,9 @@ function IsCharAsciiControl(ch: atChar): boolean;
 function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
 
+type TATCommentAction = (cCommentAdd, cCommentAddIfNone, cCommentRemove, cCommentToggle);
+function SCommentLineAction(L: TStringList; const SComment: atString; Act: TATCommentAction): boolean;
+
 function SBegin(const S, SubStr: atString): boolean;
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
@@ -668,6 +671,57 @@ begin
   until False;
 end;
 
+
+function SCommentLineAction(L: TStringList;
+  const SComment: atString; Act: TATCommentAction): boolean;
+var
+  Indent, IndentAll, i: integer;
+  Str, Str0: atString;
+  IsCmt: boolean;
+begin
+  Result:= false;
+  if L.Count=0 then exit;
+
+  IndentAll:= MaxInt;
+  for i:= 0 to L.Count-1 do
+    IndentAll:= Min(IndentAll, SGetIndentChars(L[i])); //no need Utf8decode
+
+  for i:= 0 to L.Count-1 do
+  begin
+    Str:= Utf8Decode(L[i]);
+    Str0:= Str;
+    Indent:= Min(SGetIndentChars(Str), IndentAll)+1;
+    IsCmt:= Copy(Str, Indent, Length(SComment))=SComment;
+
+    case Act of
+      cCommentAdd:
+        begin
+          Insert(SComment, Str, Indent);
+        end;
+      cCommentAddIfNone:
+        begin
+          if not IsCmt then
+            Insert(SComment, Str, Indent);
+        end;
+      cCommentRemove:
+        begin
+          if IsCmt then
+            Delete(Str, Indent, Length(SComment));
+        end;
+      cCommentToggle:
+        begin
+          if IsCmt then
+            Delete(Str, Indent, Length(SComment))
+          else
+            Insert(SComment, Str, Indent);
+        end;
+    end;
+
+    if Str<>Str0 then
+      Result:= true;
+    L[i]:= Utf8Encode(Str);
+  end;
+end;
 
 initialization
   _InitCharsHex;
