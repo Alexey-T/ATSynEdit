@@ -210,16 +210,6 @@ begin
     Result:= an.LineComment;
 end;
 
-procedure TfmMain.bCommentClick(Sender: TObject);
-begin
-  DoCommentAct(cCommentAddIfNone);
-end;
-
-procedure TfmMain.bUncommentClick(Sender: TObject);
-begin
-  DoCommentAct(cCommentRemove);
-end;
-
 procedure TfmMain.DoCommentAct(Act: TATCommentAction);
 var
   Str: string;
@@ -229,6 +219,16 @@ begin
     Showmessage('No line comment defined for lexer')
   else
     Ed.DoCommentSelectionLines(Act, Str);
+end;
+
+procedure TfmMain.bCommentClick(Sender: TObject);
+begin
+  DoCommentAct(cCommentAddIfNone);
+end;
+
+procedure TfmMain.bUncommentClick(Sender: TObject);
+begin
+  DoCommentAct(cCommentRemove);
 end;
 
 procedure TfmMain.chkDynChange(Sender: TObject);

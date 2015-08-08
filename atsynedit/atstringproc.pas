@@ -47,9 +47,6 @@ function IsCharAsciiControl(ch: atChar): boolean;
 function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
 
-type TATCommentAction = (cCommentAdd, cCommentAddIfNone, cCommentRemove, cCommentToggle);
-function SCommentLineAction(L: TStringList; const AComment: atString; Act: TATCommentAction): boolean;
-
 function SBegin(const S, SubStr: atString): boolean;
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
@@ -57,6 +54,15 @@ function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+
+type
+  TATCommentAction = (
+    cCommentAdd,
+    cCommentAddIfNone,
+    cCommentRemove,
+    cCommentToggle
+    );
+function SCommentLineAction(L: TStringList; const AComment: atString; Act: TATCommentAction): boolean;
 
 function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
@@ -676,8 +682,8 @@ function SCommentLineAction(L: TStringList;
   const AComment: atString; Act: TATCommentAction): boolean;
 var
   Str, Str0: atString;
-  Indent0, IndentAll, i: integer;
-  IsCmt0, IsCmtAll: boolean;
+  IndentThis, IndentAll, i: integer;
+  IsCmtThis, IsCmtAll: boolean;
 begin
   Result:= false;
   if L.Count=0 then exit;
@@ -692,10 +698,10 @@ begin
     Str:= Utf8Decode(L[i]);
     Str0:= Str;
 
-    //Indent0, IsCmt0: regarding indent if this line
+    //IndentThis, IsCmtThis: regarding indent if this line
     //IndentAll, IsCmtAll: regarding minimal indent of block
-    Indent0:= SGetIndentChars(Str)+1;
-    IsCmt0:= Copy(Str, Indent0, Length(AComment))=AComment;
+    IndentThis:= SGetIndentChars(Str)+1;
+    IsCmtThis:= Copy(Str, IndentThis, Length(AComment))=AComment;
     IsCmtAll:= Copy(Str, IndentAll, Length(AComment))=AComment;
 
     case Act of
@@ -713,8 +719,8 @@ begin
           if IsCmtAll then
             Delete(Str, IndentAll, Length(AComment))
           else
-          if IsCmt0 then
-            Delete(Str, Indent0, Length(AComment))
+          if IsCmtThis then
+            Delete(Str, IndentThis, Length(AComment))
         end;
       cCommentToggle:
         begin
@@ -726,10 +732,13 @@ begin
     end;
 
     if Str<>Str0 then
-      Result:= true;
-    L[i]:= Utf8Encode(Str);
+    begin
+      Result:= true; //modified
+      L[i]:= Utf8Encode(Str);
+    end;
   end;
 end;
+
 
 initialization
   _InitCharsHex;
