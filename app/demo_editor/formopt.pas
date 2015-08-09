@@ -49,8 +49,8 @@ type
     chkSaveTrim: TCheckBox;
     chkShowNum1st: TCheckBox;
     chkShowNumCr: TCheckBox;
-    chkMapBord: TCheckBox;
-    chkMapAlw: TCheckBox;
+    chkMapSelBorder: TCheckBox;
+    chkMapSelAlways: TCheckBox;
     chkShowNumBg: TCheckBox;
     chkTabSpaces: TCheckBox;
     chkUndoSv: TCheckBox;
@@ -81,6 +81,7 @@ type
     chkUnprintEndDet: TCheckBox;
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
+    edMapCharWidth: TSpinEdit;
     edNumAlign: TComboBox;
     edIndentKind: TComboBox;
     edCrShape: TComboBox;
@@ -123,6 +124,7 @@ type
     Label18: TLabel;
     Label19: TLabel;
     Label2: TLabel;
+    Label20: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
@@ -265,8 +267,9 @@ begin
 
     //minimap
     edMapFont.Value:= ed.OptMinimapFontSize;
-    chkMapBord.Checked:= ed.OptMinimapShowSelBorder;
-    chkMapAlw.Checked:= ed.OptMinimapShowSelAlways;
+    edMapCharWidth.Value:= ed.OptMinimapCharWidth;
+    chkMapSelBorder.Checked:= ed.OptMinimapShowSelBorder;
+    chkMapSelAlways.Checked:= ed.OptMinimapShowSelAlways;
 
     //key
     chkTabSpaces.Checked:= ed.OptTabSpaces;
@@ -384,8 +387,9 @@ begin
 
       //minimap
       ed.OptMinimapFontSize:= edMapFont.Value;
-      ed.OptMinimapShowSelBorder:= chkMapBord.Checked;
-      ed.OptMinimapShowSelAlways:= chkMapAlw.Checked;
+      ed.OptMinimapCharWidth:= edMapCharWidth.Value;
+      ed.OptMinimapShowSelBorder:= chkMapSelBorder.Checked;
+      ed.OptMinimapShowSelAlways:= chkMapSelAlways.Checked;
 
       //key
       ed.OptTabSpaces:= chkTabSpaces.Checked;

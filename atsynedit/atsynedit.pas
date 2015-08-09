@@ -422,6 +422,7 @@ type
     FPrevHorz,
     FPrevVert: TATSynScrollInfo;
     FMinimapWidth: integer;
+    FMinimapCharWidth: integer;
     FMinimapFontSize: integer;
     FMinimapVisible: boolean;
     FMinimapShowSelBorder: boolean;
@@ -940,6 +941,7 @@ type
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig;
     property OptRulerTextIndent: integer read FOptRulerTextIndent write FOptRulerTextIndent;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
+    property OptMinimapCharWidth: integer read FMinimapCharWidth write FMinimapCharWidth;
     property OptMinimapFontSize: integer read FMinimapFontSize write FMinimapFontSize;
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder;
     property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways;
@@ -1076,7 +1078,14 @@ begin
   CharSmall:= CanvasFontSizes(C).X;
   C.Font.Size:= Font.Size;
 
-  FMinimapWidth:= (ClientWidth - IfThen(FMicromapVisible, FMicromapWidth) - FTextOffset.X)*CharSmall div (CharSmall+CharBig);
+  if FMinimapCharWidth=0 then
+  begin
+    FMinimapWidth:= (ClientWidth - IfThen(FMicromapVisible, FMicromapWidth) - FTextOffset.X)
+      * CharSmall div (CharSmall+CharBig);
+  end
+  else
+    FMinimapWidth:= CharSmall*FMinimapCharWidth;
+
   FMinimapWidth:= Max(cMinMinimapWidth, FMinimapWidth);
 end;
 
@@ -2189,6 +2198,7 @@ begin
   FOptRulerTextIndent:= 0;
 
   FMinimapWidth:= cInitMinimapWidth;
+  FMinimapCharWidth:= 0;
   FMinimapFontSize:= cInitMinimapFontSize;
   FMinimapVisible:= cInitMinimapVisible;
   FMinimapShowSelBorder:= false;
