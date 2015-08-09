@@ -2659,6 +2659,7 @@ begin
   OffsetRect(R, -cHintScrollDx, cHintScrollDx);
 
   FHintWnd.ActivateHint(R, S);
+  FHintWnd.Invalidate; //for Win
 end;
 
 procedure TATSynEdit.DoHintHide;
