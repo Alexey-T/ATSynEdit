@@ -103,10 +103,13 @@ const
   cCommand_ToggleReadOnly = 301;
   cCommand_ToggleWordWrap = 302;
   cCommand_ToggleUnprinted = 303;
-  cCommand_ToggleLineNums = 304;
-  cCommand_ToggleFolding = 305;
-  cCommand_ToggleRuler = 306;
-  cCommand_ToggleMinimap = 307;
+  cCommand_ToggleUnprintedSpaces = 304;
+  cCommand_ToggleUnprintedEnds = 305;
+  cCommand_ToggleUnprintedEndDetails = 306;
+  cCommand_ToggleLineNums = 307;
+  cCommand_ToggleFolding = 308;
+  cCommand_ToggleRuler = 309;
+  cCommand_ToggleMinimap = 310;
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;

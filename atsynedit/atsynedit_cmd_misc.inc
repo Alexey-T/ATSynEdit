@@ -22,6 +22,24 @@ begin
   Result:= [cResultState];
 end;
 
+function TATSynEdit.DoCommand_ToggleUnprintedSpaces: TATCommandResults;
+begin
+  OptUnprintedSpaces:= not OptUnprintedSpaces;
+  Result:= [cResultState];
+end;
+
+function TATSynEdit.DoCommand_ToggleUnprintedEnds: TATCommandResults;
+begin
+  OptUnprintedEnds:= not OptUnprintedEnds;
+  Result:= [cResultState];
+end;
+
+function TATSynEdit.DoCommand_ToggleUnprintedEndDetails: TATCommandResults;
+begin
+  OptUnprintedEndsDetails:= not OptUnprintedEndsDetails;
+  Result:= [cResultState];
+end;
+
 function TATSynEdit.DoCommand_ToggleLineNums: TATCommandResults;
 begin
   with Gutter.Items[GutterBandNum] do

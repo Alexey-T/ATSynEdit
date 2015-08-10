@@ -205,6 +205,9 @@ begin
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
     cCommand_ToggleWordWrap:           Res:= DoCommand_ToggleWordWrap;
     cCommand_ToggleUnprinted:          Res:= DoCommand_ToggleUnprinted;
+    cCommand_ToggleUnprintedSpaces:    Res:= DoCommand_ToggleUnprintedSpaces;
+    cCommand_ToggleUnprintedEnds:      Res:= DoCommand_ToggleUnprintedEnds;
+    cCommand_ToggleUnprintedEndDetails: Res:= DoCommand_ToggleUnprintedEndDetails;
     cCommand_ToggleLineNums:           Res:= DoCommand_ToggleLineNums;
     cCommand_ToggleFolding:            Res:= DoCommand_ToggleFolding;
     cCommand_ToggleRuler:              Res:= DoCommand_ToggleRuler;
