@@ -10,13 +10,13 @@ object fmMain: TfmMain
   OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.5'
-  object Button1: TButton
+  object bShow: TButton
     Left = 144
     Height = 40
     Top = 80
     Width = 152
     Caption = 'Lexer lib dialog'
-    OnClick = Button1Click
+    OnClick = bShowClick
     TabOrder = 0
   end
   object Label1: TLabel

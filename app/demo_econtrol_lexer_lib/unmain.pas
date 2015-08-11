@@ -6,6 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  LclIntf, LclProc, LclType,
   ecSyntAnal,
   formlexerlib;
 
@@ -13,11 +14,12 @@ type
   { TfmMain }
 
   TfmMain = class(TForm)
-    Button1: TButton;
+    bShow: TButton;
     Label1: TLabel;
-    procedure Button1Click(Sender: TObject);
+    procedure bShowClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
+    procedure UpdStatus;
     { private declarations }
   public
     { public declarations }
@@ -35,13 +37,16 @@ var
 
 { TfmMain }
 
-procedure TfmMain.Button1Click(Sender: TObject);
+procedure TfmMain.bShowClick(Sender: TObject);
 begin
-  DoShowDialogLexerLib(Manager, 'Courier new', 10);
+  DoShowDialogLexerLib(Manager, 'Courier new', 9);
   if Manager.Modified then
   begin
+    UpdStatus;
     Manager.Modified:= false;
-    Showmessage('Lib was modified');
+    if Application.MessageBox('Lib was modified. Save file?', 'Demo',
+      MB_OKCANCEL or MB_ICONQUESTION)=id_ok then
+      Manager.SaveToFile(Manager.FileName);
   end;
 end;
 
@@ -53,7 +58,13 @@ begin
     'lexlib'+DirectorySeparator+'small.lxl';
   Manager:= TecSyntaxManager.Create(Self);
   Manager.LoadFromFile(fn);
-  Label1.Caption:= 'library "'+Extractfilename(fn)+'" has '+Inttostr(Manager.AnalyzerCount)+ ' lexers';
+  UpdStatus;
+end;
+
+procedure TfmMain.UpdStatus;
+begin
+  Label1.Caption:= Format('library "%s" has %d lexers',
+    [Extractfilename(Manager.FileName), Manager.AnalyzerCount]);
 end;
 
 end.
