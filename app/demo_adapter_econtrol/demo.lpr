@@ -3,6 +3,7 @@ program demo;
 {$mode objfpc}{$H+}
 
 uses
+  //heaptrc,
   {$IFDEF UNIX}{$IFDEF UseCThreads}
   cthreads,
   {$ENDIF}{$ENDIF}

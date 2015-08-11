@@ -477,6 +477,13 @@ end;
 
 destructor TATStrings.Destroy;
 begin
+  //disable events: so Clear wont call
+  FOnGetCaretsArray:= nil;
+  FOnSetCaretsArray:= nil;
+  FOnProgress:= nil;
+  FOnLog:= nil;
+  //
+
   DoClearUndo(true);
 
   Clear;

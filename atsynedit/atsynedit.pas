@@ -315,6 +315,7 @@ type
     FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
     FPaintLocked: integer;
+    FPaintBusy: boolean;
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
     FWantTabs: boolean;
@@ -1741,25 +1742,31 @@ begin
       if FUnprintedReplaceSpec then
         StrOut:= SRemoveAsciiControlChars(StrOut);
 
-      CanvasTextOut(C,
-        CurrPointText.X,
-        CurrPointText.Y,
-        StrOut,
-        FTabSize,
-        ACharSize,
-        AMainText,
-        AMainText and FUnprintedVisible and FUnprintedSpaces,
-        FColors.UnprintedFont,
-        FColors.UnprintedHexFont,
-        NOutputStrWidth,
-        Trunc(NOutputSpacesSkipped), //todo:
-          //needed number of chars of all chars counted as 1.0,
-          //while NOutputSpacesSkipped is with cjk counted as 1.7
-        @Parts,
-        Event,
-        FOptTextOffsetFromLine
-        );
-      C.Font.Style:= Font.Style; //restore after textout
+      if not FPaintBusy then
+      try
+        FPaintBusy:= true;
+        CanvasTextOut(C,
+          CurrPointText.X,
+          CurrPointText.Y,
+          StrOut,
+          FTabSize,
+          ACharSize,
+          AMainText,
+          AMainText and FUnprintedVisible and FUnprintedSpaces,
+          FColors.UnprintedFont,
+          FColors.UnprintedHexFont,
+          NOutputStrWidth,
+          Trunc(NOutputSpacesSkipped), //todo:
+            //needed number of chars of all chars counted as 1.0,
+            //while NOutputSpacesSkipped is with cjk counted as 1.7
+          @Parts,
+          Event,
+          FOptTextOffsetFromLine
+          );
+        C.Font.Style:= Font.Style; //restore after textout
+      finally
+        FPaintBusy:= false;
+      end;
     end
     else
     //paint empty line bg
@@ -2099,6 +2106,7 @@ begin
   FPaintLocked:= 0;
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
+  FPaintBusy:= false;
 
   FColors:= TATSynEditColors.Create;
   InitDefaultColors(FColors);
