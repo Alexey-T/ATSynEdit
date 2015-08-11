@@ -20,11 +20,12 @@
 *.zip
 *.ppu
 *.bak
+*.ini
+*.lps
+*.copy
 
 lib/
 backup/
-*.lps
-*.copy
 project?
 demo
-*.ini
+lex_lib_demo
