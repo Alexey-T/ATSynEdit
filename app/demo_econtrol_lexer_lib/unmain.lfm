@@ -1,0 +1,30 @@
+object fmMain: TfmMain
+  Left = 428
+  Height = 231
+  Top = 408
+  Width = 454
+  BorderStyle = bsDialog
+  Caption = 'Demo'
+  ClientHeight = 231
+  ClientWidth = 454
+  OnCreate = FormCreate
+  Position = poScreenCenter
+  LCLVersion = '1.5'
+  object Button1: TButton
+    Left = 144
+    Height = 40
+    Top = 80
+    Width = 152
+    Caption = 'Lexer lib dialog'
+    OnClick = Button1Click
+    TabOrder = 0
+  end
+  object Label1: TLabel
+    Left = 8
+    Height = 17
+    Top = 184
+    Width = 45
+    Caption = 'Label1'
+    ParentColor = False
+  end
+end
