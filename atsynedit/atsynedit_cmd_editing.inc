@@ -148,7 +148,13 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  DoSelectionDeleteOrReset;
+  //first, see if selection exists.
+  //yes: clear selection, exit. no: delete text.
+  if Carets.IsSelection then
+  begin
+    Result:= DoCommand_TextDeleteSelection;
+    Exit
+  end;
 
   for i:= 0 to FCarets.Count-1 do
   begin
