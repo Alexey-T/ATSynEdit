@@ -1,2 +1,5 @@
 
 empty ed, not modified: click (move caret), modified is set
+
+freeze of linux gtk2 (inside gtk2 LCL code, cannot fix): open LexLibrary dialog,
+call "NSL" lexer, drag v-scroll, up-down 10-20-30 times: freeze

@@ -1,0 +1,3 @@
+do map paint as pixels paint //instead of txt of fontsize=2(win/linux), =6(mac)
+map causes slow painting big syntax colored files.
+scroll(v) slower.. repaint too
