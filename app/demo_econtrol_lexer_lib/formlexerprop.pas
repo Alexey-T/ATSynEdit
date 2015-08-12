@@ -21,14 +21,24 @@ type
     chkItalic: TCheckBox;
     chkStrik: TCheckBox;
     chkUnder: TCheckBox;
+    cbBorderL: TComboBox;
+    cbBorderT: TComboBox;
+    cbBorderR: TComboBox;
+    cbBorderB: TComboBox;
     edColorFont: TColorBox;
     edColorBG: TColorBox;
+    edColorBorder: TColorBox;
     edStyleType: TComboBox;
     edExt: TEdit;
     edLineCmt: TEdit;
     edName: TEdit;
     edSample: TATSynEdit;
     Label1: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    Label14: TLabel;
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;
@@ -37,6 +47,7 @@ type
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
+    Label9: TLabel;
     ListStyles: TListBox;
     chkBorderT: TPageControl;
     Panel1: TPanel;
@@ -51,6 +62,7 @@ type
   private
     { private declarations }
     FAn: TecSyntAnalyzer;
+    procedure InitBorder(cb: TCombobox);
     procedure UpdateStl;
     procedure UpdateStlEn(fmt: TecFormatType);
     procedure UpdateStlFromList;
@@ -76,6 +88,11 @@ procedure TfmLexerProp.FormCreate(Sender: TObject);
 begin
   Adapter:= TATAdapterEControl.Create;
   edSample.AdapterHilite:= Adapter;
+
+  InitBorder(cbBorderL);
+  InitBorder(cbBorderT);
+  InitBorder(cbBorderR);
+  InitBorder(cbBorderB);
 end;
 
 procedure TfmLexerProp.bApplyStlClick(Sender: TObject);
@@ -126,17 +143,22 @@ begin
   n:= ListStyles.ItemIndex;
   if n<0 then exit;
   fmt:= FAn.Formats[n];
+  UpdateStlEn(fmt.FormatType);
 
   edStyleType.ItemIndex:= Ord(fmt.FormatType);
   edColorFont.Selected:= fmt.Font.Color;
   edColorBG.Selected:= fmt.BgColor;
+  edColorBorder.Selected:= fmt.BorderColorBottom;
 
   chkBold.Checked:= fsBold in fmt.Font.Style;
   chkItalic.Checked:= fsItalic in fmt.Font.Style;
   chkUnder.Checked:= fsUnderline in fmt.Font.Style;
   chkStrik.Checked:= fsStrikeOut in fmt.Font.Style;
 
-  UpdateStlEn(fmt.FormatType);
+  cbBorderL.ItemIndex:= Ord(fmt.BorderTypeLeft);
+  cbBorderT.ItemIndex:= Ord(fmt.BorderTypeTop);
+  cbBorderR.ItemIndex:= Ord(fmt.BorderTypeRight);
+  cbBorderB.ItemIndex:= Ord(fmt.BorderTypeBottom);
 end;
 
 procedure TfmLexerProp.UpdateStlEn(fmt: TecFormatType);
@@ -163,6 +185,7 @@ begin
   fmt.FormatType:= TecFormatType(edStyleType.ItemIndex);
   fmt.Font.Color:= edColorFont.Selected;
   fmt.BgColor:= edColorBG.Selected;
+  fmt.BorderColorBottom:= edColorBorder.Selected;
 
   fs:= [];
   if chkBold.Checked then Include(fs, fsBold);
@@ -170,6 +193,11 @@ begin
   if chkUnder.Checked then Include(fs, fsUnderline);
   if chkStrik.Checked then Include(fs, fsStrikeOut);
   fmt.Font.Style:= fs;
+
+  fmt.BorderTypeLeft:= TecBorderLineType(cbBorderL.ItemIndex);
+  fmt.BorderTypeTop:= TecBorderLineType(cbBorderT.ItemIndex);
+  fmt.BorderTypeRight:= TecBorderLineType(cbBorderR.ItemIndex);
+  fmt.BorderTypeBottom:= TecBorderLineType(cbBorderB.ItemIndex);
 end;
 
 
@@ -215,6 +243,23 @@ begin
   end;
 end;
 
+procedure TfmLexerProp.InitBorder(cb: TCombobox);
+begin
+  with cb.Items do
+  begin
+    Clear;
+    Add('none');
+    Add('solid');
+    Add('dash');
+    Add('dot');
+    Add('dash dot');
+    Add('dash dot dot');
+    Add('solid2');
+    Add('solid3');
+    Add('wave');
+    Add('double');
+  end;
+end;
 
 end.
 

@@ -312,10 +312,10 @@ object fmLexerProp: TfmLexerProp
         ClientWidth = 425
         TabOrder = 1
         object edColorFont: TColorBox
-          Left = 200
+          Left = 208
           Height = 31
           Top = 65
-          Width = 176
+          Width = 190
           ColorRectWidth = 22
           Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor, cbPrettyNames]
           DropDownCount = 20
@@ -326,7 +326,7 @@ object fmLexerProp: TfmLexerProp
           Left = 8
           Height = 31
           Top = 65
-          Width = 176
+          Width = 190
           ColorRectWidth = 22
           Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor, cbPrettyNames]
           DropDownCount = 20
@@ -334,24 +334,24 @@ object fmLexerProp: TfmLexerProp
           TabOrder = 1
         end
         object Label5: TLabel
-          Left = 200
+          Left = 208
           Height = 17
           Top = 49
-          Width = 74
-          Caption = 'Fore-color:'
+          Width = 91
+          Caption = 'Color of font:'
           ParentColor = False
         end
         object edStyleType: TComboBox
           Left = 8
           Height = 31
           Top = 18
-          Width = 176
+          Width = 190
           ItemHeight = 0
           Items.Strings = (
-            'Custom font'
+            'Misc font (not supp.)'
             'Colors, styles'
-            'Back-, Fore-colors'
-            'Back-color only'
+            'Colors'
+            'Color BG only'
           )
           OnChange = edStyleTypeChange
           Style = csDropDownList
@@ -369,8 +369,8 @@ object fmLexerProp: TfmLexerProp
           Left = 8
           Height = 17
           Top = 48
-          Width = 75
-          Caption = 'Back-color:'
+          Width = 81
+          Caption = 'Color of BG:'
           ParentColor = False
         end
         object Label8: TLabel
@@ -414,13 +414,112 @@ object fmLexerProp: TfmLexerProp
           TabOrder = 5
         end
         object bApplyStl: TButton
-          Left = 8
-          Height = 25
-          Top = 184
-          Width = 213
+          Left = 216
+          Height = 29
+          Top = 296
+          Width = 204
           Caption = 'Apply style changes'
           OnClick = bApplyStlClick
+          TabOrder = 12
+        end
+        object Label9: TLabel
+          Left = 8
+          Height = 17
+          Top = 152
+          Width = 58
+          Caption = 'Borders:'
+          ParentColor = False
+        end
+        object cbBorderL: TComboBox
+          Left = 8
+          Height = 31
+          Top = 184
+          Width = 100
+          DropDownCount = 20
+          ItemHeight = 0
+          Style = csDropDownList
           TabOrder = 7
+        end
+        object cbBorderT: TComboBox
+          Left = 112
+          Height = 31
+          Top = 184
+          Width = 100
+          DropDownCount = 20
+          ItemHeight = 0
+          Style = csDropDownList
+          TabOrder = 8
+        end
+        object cbBorderR: TComboBox
+          Left = 216
+          Height = 31
+          Top = 184
+          Width = 100
+          DropDownCount = 20
+          ItemHeight = 0
+          Style = csDropDownList
+          TabOrder = 9
+        end
+        object cbBorderB: TComboBox
+          Left = 320
+          Height = 31
+          Top = 184
+          Width = 100
+          DropDownCount = 20
+          ItemHeight = 0
+          Style = csDropDownList
+          TabOrder = 10
+        end
+        object Label10: TLabel
+          Left = 8
+          Height = 17
+          Top = 168
+          Width = 28
+          Caption = 'Left'
+          ParentColor = False
+        end
+        object Label11: TLabel
+          Left = 112
+          Height = 17
+          Top = 168
+          Width = 25
+          Caption = 'Top'
+          ParentColor = False
+        end
+        object Label12: TLabel
+          Left = 216
+          Height = 17
+          Top = 168
+          Width = 35
+          Caption = 'Right'
+          ParentColor = False
+        end
+        object Label13: TLabel
+          Left = 320
+          Height = 17
+          Top = 168
+          Width = 52
+          Caption = 'Bottom'
+          ParentColor = False
+        end
+        object Label14: TLabel
+          Left = 8
+          Height = 17
+          Top = 216
+          Width = 109
+          Caption = 'Color of border:'
+          ParentColor = False
+        end
+        object edColorBorder: TColorBox
+          Left = 8
+          Height = 31
+          Top = 232
+          Width = 190
+          ColorRectWidth = 22
+          Style = [cbStandardColors, cbExtendedColors, cbSystemColors, cbIncludeNone, cbCustomColor, cbPrettyNames]
+          DropDownCount = 20
+          ItemHeight = 0
+          TabOrder = 11
         end
       end
     end
@@ -429,11 +528,12 @@ object fmLexerProp: TfmLexerProp
       ClientHeight = 494
       ClientWidth = 619
       object edNotes: TMemo
-        Left = 0
-        Height = 494
-        Top = 0
-        Width = 619
+        Left = 6
+        Height = 482
+        Top = 6
+        Width = 607
         Align = alClient
+        BorderSpacing.Around = 6
         ScrollBars = ssBoth
         TabOrder = 0
       end
