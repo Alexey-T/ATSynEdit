@@ -38,7 +38,8 @@ const
   cMinWordWrapOffset = 3;
 
 var
-  SOptionCharsHex: UnicodeString = ''; //show these chars as "<NNNN>"
+  OptHexCharsDefault: UnicodeString = ''; //show these chars as "<NNNN>"
+  OptHexCharsUser: UnicodeString = ''; //these too
 
 function IsCodeEol(N: Word): boolean;
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
@@ -145,7 +146,7 @@ end;
 
 function IsCharHex(ch: atChar): boolean;
 begin
-  Result:= Pos(ch, SOptionCharsHex)>0;
+  Result:= Pos(ch, OptHexCharsDefault+OptHexCharsUser)>0;
 end;
 
 
@@ -562,20 +563,23 @@ Implicit Directional Formatting Characters 	LRM, RLM, ALM
 Explicit Directional Embedding and Override Formatting Characters 	LRE, RLE, LRO, RLO, PDF
 Explicit Directional Isolate Formatting Characters 	LRI, RLI, FSI, PDI
 }
-procedure _InitCharsHex;
 const
   cDirCodes: UnicodeString =
     #$202A {LRE} + #$202B {RLE} + #$202D {LRO} + #$202E {RLO} + #$202C {PDF} +
     #$2066 {LRI} + #$2067 {RLI} + #$2068 {FSI} + #$2069 {PDI} +
     #$200E {LRM} + #$200F {RLM} + #$061C {ALM};
+
+procedure _InitCharsHex;
 var
   i: integer;
 begin
+  OptHexCharsDefault:= '';
+
   for i:= 0 to 31 do
     if (i<>13) and (i<>10) and (i<>9) then
-      SOptionCharsHex:= SOptionCharsHex+Chr(i);
+      OptHexCharsDefault:= OptHexCharsDefault+Chr(i);
 
-  SOptionCharsHex:= SOptionCharsHex + cDirCodes;
+  OptHexCharsDefault:= OptHexCharsDefault + cDirCodes;
 end;
 
 
