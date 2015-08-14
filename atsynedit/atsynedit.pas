@@ -227,7 +227,6 @@ const
   cInitCaretShapeRO = cCaretShapeHorzPixels1;
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
   cInitSpacingText = 1;
-  cInitSpacingMinimap = -1;
   cInitTimerBlink = 600;
   cInitTimerAutoScroll = 80;
   cInitTimerNiceScroll = 200;
@@ -237,7 +236,6 @@ const
   cInitTabSize = 8;
   cInitMicromapWidth = 30;
   cInitMinimapWidth = 160;
-  cInitMinimapFontSize = {$ifdef darwin} 4 {$else} 2 {$endif};
   cInitNumbersStyle = cNumbersEach5th;
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
@@ -313,7 +311,6 @@ type
     FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
     FPaintLocked: integer;
-    FPaintBusy: boolean;
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
     FWantTabs: boolean;
@@ -397,8 +394,7 @@ type
     FPrevVisibleColumns: integer;
     FCharSize: TPoint;
     FCharSizeMinimap: TPoint;
-    FCharSpacingText,
-    FCharSpacingMinimap: TPoint;
+    FCharSpacingText: TPoint;
     FTabSize: integer;
     FGutter: TATGutter;
     FGutterBandBm,
@@ -422,7 +418,6 @@ type
     FPrevVert: TATSynScrollInfo;
     FMinimapWidth: integer;
     FMinimapCharWidth: integer;
-    FMinimapFontSize: integer;
     FMinimapVisible: boolean;
     FMinimapShowSelBorder: boolean;
     FMinimapShowSelAlways: boolean;
@@ -944,7 +939,6 @@ type
     property OptRulerTextIndent: integer read FOptRulerTextIndent write FOptRulerTextIndent;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible;
     property OptMinimapCharWidth: integer read FMinimapCharWidth write FMinimapCharWidth;
-    property OptMinimapFontSize: integer read FMinimapFontSize write FMinimapFontSize;
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder;
     property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
@@ -1076,9 +1070,7 @@ var
   CharSmall, CharBig: integer;
 begin
   CharBig:= FCharSize.X;
-  C.Font.Size:= FMinimapFontSize;
-  CharSmall:= CanvasFontSizes(C).X;
-  C.Font.Size:= Font.Size;
+  CharSmall:= FCharSizeMinimap.X;
 
   if FMinimapCharWidth=0 then
   begin
@@ -1519,7 +1511,6 @@ begin
 
   C.Font.Assign(Font);
   FCharSize:= GetCharSize(C, FCharSpacingText);
-  FCharSizeMinimap:= Point(8, 8);
 
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize(C);
@@ -1740,12 +1731,7 @@ begin
       if FUnprintedReplaceSpec then
         StrOut:= SRemoveAsciiControlChars(StrOut);
 
-      if not FPaintBusy then
-      try
-        FPaintBusy:= true;
-          //paintbusy added to try to fix gtk2 freezing
-          //(app freezes on dragging v-scrollbar with "nsl" econtrol lexer)
-          //but didn't help. it isn't bad.
+      if AMainText then
         CanvasTextOut(C,
           CurrPointText.X,
           CurrPointText.Y,
@@ -1763,11 +1749,18 @@ begin
           @Parts,
           Event,
           FOptTextOffsetFromLine
+          )
+      else
+        CanvasTextOutMinimap(C,
+          StrOut,
+          CurrPointText,
+          FCharSizeMinimap,
+          FTabSize,
+          @Parts
           );
-        C.Font.Style:= Font.Style; //restore after textout
-      finally
-        FPaintBusy:= false;
-      end;
+
+      //restore after textout
+      C.Font.Style:= Font.Style;
     end
     else
     //paint empty line bg
@@ -1958,12 +1951,9 @@ begin
   DoClearScrollInfo(FScrollHorzMinimap);
   DoClearScrollInfo(FScrollVertMinimap);
 
-  C.Font.Size:= FMinimapFontSize;
-  FCharSizeMinimap:= GetCharSize(C, FCharSpacingMinimap);
   FScrollVertMinimap.NPos:= GetMinimapScrollPos;
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
   DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
-  C.Font.Size:= Font.Size;
 
   DoPaintMinimapSelTo(C);
 
@@ -2107,7 +2097,6 @@ begin
   FPaintLocked:= 0;
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
-  FPaintBusy:= false;
 
   FColors:= TATSynEditColors.Create;
   InitDefaultColors(FColors);
@@ -2211,7 +2200,6 @@ begin
 
   FMinimapWidth:= cInitMinimapWidth;
   FMinimapCharWidth:= 0;
-  FMinimapFontSize:= cInitMinimapFontSize;
   FMinimapVisible:= cInitMinimapVisible;
   FMinimapShowSelBorder:= false;
   FMinimapShowSelAlways:= true;
@@ -2219,7 +2207,7 @@ begin
   FMicromapVisible:= cInitMicromapVisible;
 
   FCharSpacingText:= Point(0, cInitSpacingText);
-  FCharSpacingMinimap:= Point(0, cInitSpacingMinimap);
+  FCharSizeMinimap:= Point(1, 2);
 
   FOptShowStapleStyle:= cLineStyleSolid;
   FOptShowStapleIndent:= -1;

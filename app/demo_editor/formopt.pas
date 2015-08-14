@@ -92,7 +92,6 @@ type
     edIndentSize: TSpinEdit;
     edPlusSize: TSpinEdit;
     edNumChar: TEdit;
-    edMapFont: TSpinEdit;
     edNumStyle: TComboBox;
     edPageSize: TComboBox;
     edRulerFSize: TSpinEdit;
@@ -114,7 +113,6 @@ type
     LabChars: TLabel;
     Label1: TLabel;
     Label10: TLabel;
-    Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
@@ -266,7 +264,6 @@ begin
     chkGutterNumAuto.Checked:= ed.OptNumbersAutosize;
 
     //minimap
-    edMapFont.Value:= ed.OptMinimapFontSize;
     edMapCharWidth.Value:= ed.OptMinimapCharWidth;
     chkMapSelBorder.Checked:= ed.OptMinimapShowSelBorder;
     chkMapSelAlways.Checked:= ed.OptMinimapShowSelAlways;
@@ -386,7 +383,6 @@ begin
       ed.OptNumbersIndentRight:= edSizeNum2.Value;
 
       //minimap
-      ed.OptMinimapFontSize:= edMapFont.Value;
       ed.OptMinimapCharWidth:= edMapCharWidth.Value;
       ed.OptMinimapShowSelBorder:= chkMapSelBorder.Checked;
       ed.OptMinimapShowSelAlways:= chkMapSelAlways.Checked;

@@ -73,6 +73,14 @@ procedure CanvasTextOut(C: TCanvas;
   ATextOffsetFromLine: integer
   );
 
+procedure CanvasTextOutMinimap(C: TCanvas;
+  const AStr: atString;
+  APos: TPoint;
+  ACharSize: TPoint;
+  ATabSize: integer;
+  AParts: PATLineParts
+  );
+
 procedure DoPaintUnprintedEol(C: TCanvas;
   const AStrEol: atString;
   APoint: TPoint;
@@ -775,6 +783,52 @@ begin
   end;
 end;
 
+
+procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString; APos: TPoint;
+  ACharSize: TPoint; ATabSize: integer; AParts: PATLineParts);
+const
+  cLowChars = '.,:;_''-+`~=^*';
+var
+  Offsets: TATIntArray;
+  Part: ^TATLinePart;
+  ch: Widechar;
+  nPos, nCharSize: integer;
+  i, j: integer;
+  X1, Y1, Y2: integer;
+begin
+  if AStr='' then exit;
+  SetLength(Offsets, Length(AStr)+1);
+  Offsets[0]:= 0;
+  for i:= 2 to Length(AStr) do
+    Offsets[i-1]:= Offsets[i-2]+IfThen(AStr[i]=#9, ATabSize, 1);
+
+  for i:= Low(TATLineParts) to High(TATLineParts) do
+  begin
+    Part:= @AParts^[i];
+    if Part^.Len=0 then Break;
+    for j:= 1 to Part^.Len do
+    begin
+      nPos:= Part^.Offset+j;
+      if nPos>Length(AStr) then Continue;
+      ch:= AStr[nPos];
+      if IsCharSpace(ch) then Continue;
+
+      if Pos(ch, cLowChars)>0 then
+        nCharSize:= 1
+      else
+        nCharSize:= 2;
+
+      X1:= APos.X+ACharSize.X*Offsets[nPos-1];
+      Y2:= APos.Y+ACharSize.Y;
+      Y1:= Y2-nCharSize;
+
+      C.Pen.Color:= Part^.ColorFont;
+      C.Line(X1, Y1, X1, Y2);
+    end;
+  end;
+end;
+
+//------------------
 initialization
   _Pen:= TPen.Create;
 
