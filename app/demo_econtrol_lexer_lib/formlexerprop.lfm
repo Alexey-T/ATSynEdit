@@ -1,7 +1,7 @@
 object fmLexerProp: TfmLexerProp
-  Left = 407
+  Left = 367
   Height = 566
-  Top = 424
+  Top = 425
   Width = 623
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
@@ -223,7 +223,7 @@ object fmLexerProp: TfmLexerProp
         OptRulerMarkSizeBig = 7
         OptRulerTextIndent = 0
         OptMinimapVisible = False
-        OptMinimapFontSize = 2
+        OptMinimapCharWidth = 0
         OptMinimapShowSelBorder = False
         OptMinimapShowSelAlways = True
         OptMicromapVisible = False
