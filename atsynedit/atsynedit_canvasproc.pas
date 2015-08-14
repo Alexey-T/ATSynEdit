@@ -813,10 +813,9 @@ begin
       ch:= AStr[nPos];
       if IsCharSpace(ch) then Continue;
 
+      nCharSize:= ACharSize.Y;
       if Pos(ch, cLowChars)>0 then
-        nCharSize:= 1
-      else
-        nCharSize:= 2;
+        nCharSize:= nCharSize div 2;
 
       X1:= APos.X+ACharSize.X*Offsets[nPos-1];
       Y2:= APos.Y+ACharSize.Y;
