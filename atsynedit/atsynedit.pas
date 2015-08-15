@@ -10,6 +10,9 @@ License: MPL 2.0 or LGPL
 //{$define beep_cached_update}
 //{$define test_foldlist}
 //{$define allow_proc_msg}
+{$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
+                         //when horz-scroll hides/shows/hides/...
+                         //ok also for win32
 
 unit ATSynEdit;
 
@@ -1432,7 +1435,7 @@ begin
 
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
-  si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL;
+  si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; don't work
   si.nMin:= FScrollHorz.NMin;
   si.nMax:= FScrollHorz.NMax;
   si.nPage:= FScrollHorz.NPage;
@@ -1623,7 +1626,9 @@ begin
       Exit
     end;
 
+  {$ifndef fix_horzscroll}
   AScrollHorz.NMax:= 1;
+  {$endif}
   NCoordTop:= ARect.Top;
 
   if ALineFrom>=0 then
