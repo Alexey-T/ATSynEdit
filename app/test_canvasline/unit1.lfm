@@ -6,21 +6,15 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 278
   ClientWidth = 500
+  OnPaint = FormPaint
   LCLVersion = '1.5'
   object Button1: TButton
-    Left = 90
+    Left = 154
     Height = 25
-    Top = 35
+    Top = 68
     Width = 75
-    Caption = 'line'
+    Caption = 'close'
     OnClick = Button1Click
     TabOrder = 0
-  end
-  object Panel1: TPanel
-    Left = 90
-    Height = 100
-    Top = 89
-    Width = 200
-    TabOrder = 1
   end
 end

@@ -14,8 +14,8 @@ type
 
   TForm1 = class(TForm)
     Button1: TButton;
-    Panel1: TPanel;
     procedure Button1Click(Sender: TObject);
+    procedure FormPaint(Sender: TObject);
   private
     { private declarations }
   public
@@ -31,11 +31,11 @@ implementation
 
 { TForm1 }
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.FormPaint(Sender: TObject);
 var
   c: tcanvas;
 begin
-  c:= panel1.canvas;
+  c:= self.canvas;
   c.brush.color:= clyellow;
   c.fillrect(0, 0, 200, 200);
 
@@ -47,7 +47,11 @@ begin
   c.line(10,10,10,30);
   c.line(10,30,10,50);
   c.line(10,50,10,80);
+end;
 
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  close;
 end;
 
 end.
