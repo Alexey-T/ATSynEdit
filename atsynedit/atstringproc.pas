@@ -164,13 +164,13 @@ end;
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
   //
-  //override IsWordChar to check also commas,dots,quotes
+  //override IsCharWord to check also commas,dots,quotes
   //to wrap them with wordchars
   function _IsWord(ch: atChar): boolean;
   const
-    cCommas = '.,;:''"`~?!&<>';
+    cCommas: atString = '.,;:''"`~?!&%$';
   begin
-    Result:= IsCharWord(ch, AWordChars) or (Pos(ch, cCommas)>0);
+    Result:= IsCharWord(ch, AWordChars+cCommas);
   end;
   //
 var
