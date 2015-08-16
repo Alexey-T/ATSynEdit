@@ -6,7 +6,7 @@ unit ATStringProc;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, StrUtils;
 
 type
   atString = UnicodeString;
@@ -87,6 +87,7 @@ function SIndentUnindent(const Str: atString; ARight: boolean;
 function SGetItem(var S: string; const sep: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SWithBreaks(const S: atString): boolean;
+function SFindFuzzyPositions(SText, SFind: string): TATIntArray;
 
 function BoolToPlusMinusOne(b: boolean): integer;
 procedure TrimStringList(L: TStringList);
@@ -741,6 +742,30 @@ begin
     end;
   end;
 end;
+
+
+function SFindFuzzyPositions(SText, SFind: string): TATIntArray;
+var
+  i, N: integer;
+begin
+  SetLength(result, 0);
+
+  SText:= Lowercase(SText);
+  SFind:= Lowercase(SFind);
+
+  N:= 0;
+  for i:= 1 to Length(SFind) do
+  begin
+    N:= PosEx(SFind[i], SText, N+1);
+    if N=0 then Break;
+    SetLength(result, Length(result)+1);
+    result[high(result)]:= N;
+  end;
+
+  if Length(result)<Length(SFind) then
+    SetLength(result, 0);
+end;
+
 
 
 initialization
