@@ -126,6 +126,9 @@ const
   cCommand_TextCaseInvert = 1023;
   cCommand_TextCaseSentence = 1024;
 
+  cCommand_FoldAll = 1030;
+  cCommand_UnfoldAll = 1031;
+
   cCommand_Cancel = 2001;
   cCommand_RepeatTextCommand = 2002;
   cCommand_ZoomIn = 2003;

@@ -150,6 +150,9 @@ begin
   M.Add(cCommand_TextCaseSentence, 'convert case: sentence case', [], []);
 
   M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
+
+  M.Add(cCommand_FoldAll, 'folding: fold all', [], []);
+  M.Add(cCommand_UnfoldAll, 'folding: unfold all', [], []);
 end;
 
 procedure InitKeymapCombo(var M: TATKeymap);

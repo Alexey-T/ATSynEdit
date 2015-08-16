@@ -673,6 +673,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
     function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
     function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;

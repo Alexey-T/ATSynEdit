@@ -61,7 +61,7 @@ type
     function IsRangesSame(R1, R2: TATSynRange): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
       AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean;
-  ALineMode: TATRangeHasLines): TATIntArray;
+      ALineMode: TATRangeHasLines): TATIntArray;
     function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
     function MessageText(Cnt: integer): string;
   end;
