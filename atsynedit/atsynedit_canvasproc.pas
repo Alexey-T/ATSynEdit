@@ -800,7 +800,7 @@ begin
   SetLength(Offsets, Length(AStr)+1);
   Offsets[0]:= 0;
   for i:= 2 to Length(AStr) do
-    Offsets[i-1]:= Offsets[i-2]+IfThen(AStr[i]=#9, ATabSize, 1);
+    Offsets[i-1]:= Offsets[i-2]+IfThen(AStr[i-1]=#9, ATabSize, 1);
 
   for i:= Low(TATLineParts) to High(TATLineParts) do
   begin

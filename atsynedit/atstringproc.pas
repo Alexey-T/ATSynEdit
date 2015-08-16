@@ -163,6 +163,16 @@ end;
 
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
+  //
+  //override IsWordChar to check also commas,dots,quotes
+  //to wrap them with wordchars
+  function _IsWord(ch: atChar): boolean;
+  const
+    cCommas = '.,;:''"`~?!&<>';
+  begin
+    Result:= IsCharWord(ch, AWordChars) or (Pos(ch, cCommas)>0);
+  end;
+  //
 var
   N, NMin, NAvg: integer;
   List: TATRealArray;
@@ -193,8 +203,7 @@ begin
   //b) space as 2nd char (not nice look for Python src)
   NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and
-    ((IsCharWord(S[N], AWordChars) and
-      IsCharWord(S[N+1], AWordChars)) or
+    ((_IsWord(S[N]) and _IsWord(S[N+1])) or
      (AWrapIndented and IsCharSpace(S[N+1])))
     do Dec(N);
 
