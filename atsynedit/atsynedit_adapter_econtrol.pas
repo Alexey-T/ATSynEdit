@@ -69,7 +69,7 @@ type
     function GetLexer: TecSyntAnalyzer;
     procedure SetLexer(AAnalizer: TecSyntAnalyzer);
   public
-    constructor Create; virtual;
+    constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AddEditor(AEdit: TATSynEdit);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
@@ -387,15 +387,17 @@ begin
     TATSynEdit(EdList[j]).Fold.Clear;
 end;
 
-constructor TATAdapterEControl.Create;
+constructor TATAdapterEControl.Create(AOwner: TComponent);
 begin
+  inherited;
+
   EdList:= TList.Create;
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
   ListColors:= TList.Create;
   FDynEnabled:= true;
 
-  Timer:= TTimer.Create(nil);
+  Timer:= TTimer.Create(Self);
   Timer.Enabled:= false;
   Timer.Interval:= cAdapterTimerInterval;
   Timer.OnTimer:= @TimerTimer;

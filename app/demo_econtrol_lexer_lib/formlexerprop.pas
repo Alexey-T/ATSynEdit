@@ -86,7 +86,7 @@ implementation
 
 procedure TfmLexerProp.FormCreate(Sender: TObject);
 begin
-  Adapter:= TATAdapterEControl.Create;
+  Adapter:= TATAdapterEControl.Create(Self);
   edSample.AdapterHilite:= Adapter;
 
   InitBorder(cbBorderL);

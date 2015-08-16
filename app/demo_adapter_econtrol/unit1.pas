@@ -130,7 +130,7 @@ begin
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnCalcStaple:= @EditCalcStaple;
 
-  adapter:= TATAdapterEControl.Create;
+  adapter:= TATAdapterEControl.Create(Self);
   ed.AdapterHilite:= adapter;
 
   chkWrap.Checked:= ed.OptWrapMode=cWrapOn;

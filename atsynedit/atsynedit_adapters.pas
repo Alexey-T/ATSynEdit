@@ -11,7 +11,7 @@ uses
 type
   { TATAdapterHilite }
 
-  TATAdapterHilite = class(TObject)
+  TATAdapterHilite = class(TComponent)
   public
     procedure OnEditorChange(Sender: TObject); virtual;
     procedure OnEditorCalcHilite(Sender: TObject;
