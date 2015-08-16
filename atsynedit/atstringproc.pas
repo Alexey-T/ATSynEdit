@@ -34,12 +34,14 @@ const
 const
   cMaxTabPositionToExpand = 500; //no sense to expand too far tabs
   cCharScaleFullwidth = 1.7; //width of CJK chars
-  cCharScaleHex = 6.0; //show as hex: "<NNNN>"
+  cCharScaleHex = 6.0; //width of hex show: "<NNNN>"
   cMinWordWrapOffset = 3;
 
 var
   OptHexCharsDefault: UnicodeString = ''; //show these chars as "<NNNN>"
   OptHexCharsUser: UnicodeString = ''; //these too
+  OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
+
 
 function IsCodeEol(N: Word): boolean;
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
@@ -167,10 +169,8 @@ function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   //override IsCharWord to check also commas,dots,quotes
   //to wrap them with wordchars
   function _IsWord(ch: atChar): boolean;
-  const
-    cCommas: atString = '.,;:''"`~?!&%$';
   begin
-    Result:= IsCharWord(ch, AWordChars+cCommas);
+    Result:= IsCharWord(ch, AWordChars+OptCommaCharsWrapWithWords);
   end;
   //
 var
