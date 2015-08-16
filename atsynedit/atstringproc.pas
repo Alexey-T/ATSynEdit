@@ -71,7 +71,7 @@ function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString): atString;
 
-procedure SCalcCharOffsets(const AStr: atString; var AList: TATRealArray;
+procedure SCalcCharOffsets(const S: atString; var AList: TATRealArray;
   ATabSize: integer; ACharsSkipped: integer = 0);
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
@@ -331,24 +331,22 @@ const
   cScaleTest = 1.9; //debug, for test code, commented
 {$endif}
 
-procedure SCalcCharOffsets(const AStr: atString; var AList: TATRealArray;
+procedure SCalcCharOffsets(const S: atString; var AList: TATRealArray;
   ATabSize: integer; ACharsSkipped: integer);
 var
-  S: atString;
-  NOffset, NTabSize, NListIndex, i: integer;
+  NSize, NTabSize, NCharsSkipped: integer;
   Scale: real;
+  i: integer;
 begin
-  if AStr='' then Exit;
-  if Length(AList)<>Length(AStr) then
-    raise Exception.Create('Bad list len in CalcCharOffsets');
+  if S='' then Exit;
+  if Length(AList)<>Length(S) then
+    raise Exception.Create('Bad list len: CalcCharOffsets');
 
-  S:= AStr;
-  i:= 0;
-  NListIndex:= 0;
+  NCharsSkipped:= ACharsSkipped;
 
-  repeat
-    Inc(i);
-    if i>Length(S) then Break;
+  for i:= 1 to Length(S) do
+  begin
+    Inc(NCharsSkipped);
 
     Scale:= 1.0;
     if IsCharHex(S[i]) then
@@ -365,31 +363,23 @@ begin
     {$endif}
 
     if S[i]<>#9 then
-      NOffset:= 1
+      NSize:= 1
     else
     begin
-      NTabSize:= SCalcTabulationSize(ATabSize, i+ACharsSkipped);
-      NOffset:= NTabSize;
-      S[i]:= ' ';
-      if NTabSize>1 then
-        Insert(StringOfChar(' ', NTabSize-1), S, i);
-      Inc(i, NTabSize-1);
+      NTabSize:= SCalcTabulationSize(ATabSize, NCharsSkipped);
+      NSize:= NTabSize;
+      Inc(NCharsSkipped, NTabSize-1);
     end;
 
     if (i<Length(S)) and IsCharAccent(S[i+1]) then
-    begin
-      NOffset:= 0;
-    end;
+      NSize:= 0;
 
-    if NListIndex=0 then
-      AList[NListIndex]:= NOffset*Scale
+    if i=1 then
+      AList[i-1]:= NSize*Scale
     else
-      AList[NListIndex]:= AList[NListIndex-1]+NOffset*Scale;
-
-    Inc(NListIndex);
-  until false;
+      AList[i-1]:= AList[i-2]+NSize*Scale;
+  end;
 end;
-
 
 function SFindClickedPosition(const Str: atString;
   APixelsFromLeft, ACharSize, ATabSize: integer;
