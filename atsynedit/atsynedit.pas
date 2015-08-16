@@ -1251,7 +1251,7 @@ end;
 
 procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
 var
-  NHiddenIndex, NOffset, NLen, NIndent: integer;
+  NHiddenIndex, NOffset, NLen, NIndent, NVisColumns: integer;
   NFinal: TATSynWrapFinal;
   Str: atString;
 begin
@@ -1262,6 +1262,7 @@ begin
 
   Str:= Strings.Lines[ALine];
   NLen:= Length(Str);
+  NVisColumns:= Max(GetVisibleColumns, cMinWrapColumnAbs);
 
   //line collapsed partially?
   if NHiddenIndex>0 then
@@ -1281,7 +1282,15 @@ begin
   NIndent:= 0;
 
   repeat
-    NLen:= SFindWordWrapOffset(Str, Max(FWrapColumn-NIndent, cMinWrapColumnAbs), FTabSize, FOptWordChars, FWrapIndented);
+    NLen:= SFindWordWrapOffset(
+      //very slow to calc for entire line (eg len=70K),
+      //calc for first NVisColumns chars
+      Copy(Str, 1, NVisColumns),
+      Max(FWrapColumn-NIndent, cMinWrapColumnAbs),
+      FTabSize,
+      FOptWordChars,
+      FWrapIndented);
+
     if NLen>=Length(Str) then
       NFinal:= cWrapItemFinal
     else
