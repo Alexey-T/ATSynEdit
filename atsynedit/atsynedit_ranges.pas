@@ -198,12 +198,7 @@ var
   R: TATSynRange;
   i, j: integer;
   Ok: boolean;
-  s1, s2: string;
 begin
-  //if AInRange<>nil then
-  //if Count>0 then
-  //  Showmessage('Ranges'#13+MessageText(25));
-
   SetLength(Result, 0);
   L:= TList.Create;
   L.Capacity:= 512;

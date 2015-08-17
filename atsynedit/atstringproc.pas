@@ -43,7 +43,7 @@ var
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
 
 
-function IsCodeEol(N: Word): boolean;
+function IsCharEol(ch: atChar): boolean;
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
 function IsCharSpace(ch: atChar): boolean;
 function IsCharAsciiControl(ch: atChar): boolean;
@@ -93,21 +93,17 @@ function BoolToPlusMinusOne(b: boolean): integer;
 procedure TrimStringList(L: TStringList);
 
 type
-  TATDecodeRec = record
-    SFrom, STo: UnicodeString;
-  end;
+  TATDecodeRec = record SFrom, STo: UnicodeString; end;
 function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
-
-
 
 implementation
 
 uses
-  Dialogs, Math{%H-};
+  Dialogs, Math;
 
-function IsCodeEol(N: Word): boolean;
+function IsCharEol(ch: atChar): boolean;
 begin
-  Result:= (N=10) or (N=13);
+  Result:= (ch=#10) or (ch=#13);
 end;
 
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
@@ -552,7 +548,7 @@ var
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
-    if IsCodeEol(Ord(Result[i])) then
+    if IsCharEol(Result[i]) then
       Result[i]:= ' ';
 end;
 
@@ -757,15 +753,15 @@ begin
   for i:= 1 to Length(SFind) do
   begin
     N:= PosEx(SFind[i], SText, N+1);
-    if N=0 then Break;
+    if N=0 then
+    begin
+      SetLength(result, 0);
+      Exit
+    end;
     SetLength(result, Length(result)+1);
     result[high(result)]:= N;
   end;
-
-  if Length(result)<Length(SFind) then
-    SetLength(result, 0);
 end;
-
 
 
 initialization

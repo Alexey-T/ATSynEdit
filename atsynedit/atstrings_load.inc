@@ -126,7 +126,7 @@ var
   function _FindNextEol(NPos: integer): integer;
   begin
     Result:= NPos;
-    while (Result<BufSize) and not IsCodeEol(_BufferCharCode(Result)) do
+    while (Result<BufSize) and not IsCharEol(Widechar(_BufferCharCode(Result))) do
       Inc(Result, CharSize);
   end;
 
