@@ -581,7 +581,8 @@ type
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
     procedure DoPaintMarginsTo(C: TCanvas);
-    procedure DoPaintFoldedMark(C: TCanvas; ACoord: TPoint; const AMarkText: string);
+    procedure DoPaintFoldedMark(C: TCanvas; APos: TPoint; ACoord: TPoint;
+      const AMarkText: string);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
@@ -1830,7 +1831,10 @@ begin
     //draw collapsed-mark
     if AMainText then
       if WrapItem.NFinal=cWrapItemCollapsed then
-        DoPaintFoldedMark(C, CoordAfterText, GetFoldedMarkText(NLinesIndex));
+        DoPaintFoldedMark(C,
+          Point(Strings.LinesHidden[NLinesIndex, FEditorIndex]-1, NLinesIndex),
+          CoordAfterText,
+          GetFoldedMarkText(NLinesIndex));
 
     //draw separators
     if LineSeparator<>cLineSepNone then
@@ -2018,7 +2022,7 @@ end;
 
 
 procedure TATSynEdit.DoPaintFoldedMark(C: TCanvas;
-  ACoord: TPoint; const AMarkText: string);
+  APos: TPoint; ACoord: TPoint; const AMarkText: string);
 var
   NWidth: integer;
   Str: string;
@@ -2026,9 +2030,18 @@ begin
   Str:= STabsToSpaces(AMarkText, FTabSize);
   Inc(ACoord.X, cFoldedMarkIndentOuter);
 
-  //paint bg
-  C.Font.Color:= FColors.CollapseMarkFont;
-  C.Brush.Color:= FColors.CollapseMarkBG;
+  //set colors:
+  //if 1st chars selected, then use selection-color
+  if IsPosSelected(APos.X, APos.Y) then
+  begin
+    C.Font.Color:= Colors.TextSelFont;
+    C.Brush.Color:= Colors.TextSelBG;
+  end
+  else
+  begin
+    C.Font.Color:= Colors.CollapseMarkFont;
+    C.Brush.Color:= Colors.CollapseMarkBG;
+  end;
 
   //paint text
   C.TextOut(
