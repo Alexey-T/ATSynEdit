@@ -233,18 +233,27 @@ begin
   Str:= Lines[AY];
   StrMove:= '';
 
-  if (AX<Length(Str)) then
+  //special case AX=0: just insert empty line
+  //(less changes in undo)
+  if AX=0 then
   begin
-    StrMove:= Copy(Str, AX+1, MaxInt);
-    Delete(Str, AX+1, MaxInt);
-    Lines[AY]:= Str;
-  end;
+    LineInsertRaw(AY, '', Endings);
+  end
+  else
+  begin
+    if (AX<Length(Str)) then
+    begin
+      StrMove:= Copy(Str, AX+1, MaxInt);
+      Delete(Str, AX+1, MaxInt);
+      Lines[AY]:= Str;
+    end;
 
-  //handle situation when we at non-eol line, this must give
-  //inserted line also w/o eol
-  NewEnd:= LinesEnds[AY];
-  LinesEnds[AY]:= Endings; //force eol to cur line
-  LineInsertRaw(AY+1, AStrIndent+StrMove, NewEnd);
+    //handle situation when we at non-eol line, this must give
+    //inserted line also w/o eol
+    NewEnd:= LinesEnds[AY];
+    LinesEnds[AY]:= Endings; //force eol to cur line
+    LineInsertRaw(AY+1, AStrIndent+StrMove, NewEnd);
+  end;
 
   if not AKeepCaret then
   begin
