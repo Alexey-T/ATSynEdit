@@ -209,7 +209,7 @@ begin
       if (R.Y>i) then Break;
       if (R.Y=i) and (R.X=N) then
       begin
-        R.Folded:= true;
+        DoRangeFold(R); //do not just R.Folded:= true;
         Break
       end;
     end;
