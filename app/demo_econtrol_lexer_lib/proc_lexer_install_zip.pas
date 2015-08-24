@@ -11,6 +11,9 @@ uses
 function DoInstallLexerFromZip(const fn_zip: string;
   Manager: TecSyntaxManager; out s_installed: string): boolean;
 
+var
+  cInstallLexerZipTitle: string = 'Install zip';
+
 implementation
 
 uses
@@ -20,49 +23,64 @@ uses
 
 function MsgBox(const msg: string; flags: integer): integer;
 begin
-  Result:= Application.MessageBox(PChar(msg), 'Install lexer', flags);
+  Result:= Application.MessageBox(PChar(msg), PChar(cInstallLexerZipTitle), flags);
 end;
 
-function DoInstallLexerFromZip(const fn_zip: string;
-  Manager: TecSyntaxManager; out s_installed: string): boolean;
+function DoInstallLexerFromZip(const fn_zip: string; Manager: TecSyntaxManager;
+  out s_installed: string): boolean;
 var
   unzip: TUnZipper;
+  list: TStringlist;
   dir, fn_inf, fn_lexer: string;
-  s_title, s_type, s_subdir, s_lexer: string;
+  s_title, s_type, s_lexer: string;
   an, an_sub: TecSyntAnalyzer;
   i_lexer, i_sub: integer;
 begin
   Result:= false;
   dir:= GetTempDir(false)+DirectorySeparator+'zip_lexer';
-  CreateDirUTF8(dir);
-  if not DirectoryExistsUTF8(dir) then
+  if not DirectoryExists(dir) then
+    CreateDir(dir);
+  if not DirectoryExists(dir) then
   begin
     MsgBox('Cannot create dir:'#13+dir, mb_ok or mb_iconerror);
     exit
   end;
+
+  fn_inf:= dir+DirectorySeparator+'install.inf';
+  if FileExists(fn_inf) then
+    DeleteFile(fn_inf);
 
   unzip:= TUnZipper.Create;
   try
     unzip.FileName:= fn_zip;
     unzip.OutputPath:= dir;
     unzip.Examine;
+
+    list:= TStringlist.create;
+    try
+      list.Add('install.inf');
+      unzip.UnZipFiles(list);
+    finally
+      FreeAndNil(list);
+    end;
+
+    if not FileExists(fn_inf) then
+    begin
+      MsgBox('Cannot find install.inf in zip', mb_ok or mb_iconerror);
+      exit
+    end;
+
+    unzip.Files.Clear;
     unzip.UnZipAllFiles;
   finally
     unzip.Free;
-  end;
-
-  fn_inf:= dir+DirectorySeparator+'install.inf';
-  if not FileExistsUTF8(fn_inf) then
-  begin
-    MsgBox('Cannot find install.inf in zip', mb_ok or mb_iconerror);
-    exit
   end;
 
   with TIniFile.Create(fn_inf) do
   try
     s_title:= ReadString('info', 'title', '');
     s_type:= ReadString('info', 'type', '');
-    s_subdir:= ReadString('info', 'subdir', '');
+    //s_subdir:= ReadString('info', 'subdir', '');
   finally
     Free
   end;
@@ -95,10 +113,10 @@ begin
 
       //lexer file
       fn_lexer:= ExtractFileDir(fn_inf)+DirectorySeparator+s_lexer+'.lcf';
-      if not FileExistsUTF8(fn_lexer) then
+      if not FileExists(fn_lexer) then
       begin
         MsgBox('Cannot find lexer file: '+fn_lexer, mb_ok or mb_iconerror);
-        Break
+        exit
       end;
 
       an:= Manager.FindAnalyzer(s_lexer);

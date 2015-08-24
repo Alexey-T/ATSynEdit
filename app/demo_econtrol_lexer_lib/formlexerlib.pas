@@ -9,7 +9,7 @@ uses
   StdCtrls, ComCtrls, CheckLst,
   LCLIntf, LCLType, LCLProc,
   ecSyntAnal,
-  formlexerprop,
+  formlexerprop, proc_lexer_install_zip,
   math;
 
 type
@@ -18,9 +18,12 @@ type
   TfmLexerLib = class(TForm)
     ButtonPanel1: TButtonPanel;
     List: TCheckListBox;
+    OpenDlg: TOpenDialog;
     ToolBar1: TToolBar;
     bProp: TToolButton;
     bDel: TToolButton;
+    bAdd: TToolButton;
+    procedure bAddClick(Sender: TObject);
     procedure bDelClick(Sender: TObject);
     procedure bPropClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -131,6 +134,21 @@ begin
     FManager.Modified:= true;
     UpdateList;
     List.ItemIndex:= Min(n, List.Count-1);
+  end;
+end;
+
+procedure TfmLexerLib.bAddClick(Sender: TObject);
+var
+  msg: string;
+begin
+  OpenDlg.Filename:= '';
+  if not OpenDlg.Execute then exit;
+  if DoInstallLexerFromZip(OpenDlg.FileName, FManager, msg) then
+  begin
+    UpdateList;
+    Application.MessageBox(
+      PChar('Installed:'#13+msg),
+      PChar(Caption), MB_OK or MB_ICONINFORMATION);
   end;
 end;
 
