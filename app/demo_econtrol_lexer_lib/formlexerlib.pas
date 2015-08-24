@@ -138,6 +138,7 @@ procedure TfmLexerLib.UpdateList;
 var
   sl: tstringlist;
   an: TecSyntAnalyzer;
+  an_sub: TecSubAnalyzerRule;
   links: string;
   i, j: integer;
 begin
@@ -165,7 +166,10 @@ begin
             links:= 'links: '
           else
             links:= links+', ';
-          links:= links+an.SubAnalyzers[j].SyntAnalyzer.LexerName;
+          an_sub:= an.SubAnalyzers[j];
+          if an_sub<>nil then
+            if an_sub.SyntAnalyzer<>nil then
+              links:= links+an_sub.SyntAnalyzer.LexerName;
         end;
       if links<>'' then links:= '  ('+links+')';
 
