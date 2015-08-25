@@ -470,6 +470,7 @@ begin
   else
     NDecSpaces:= Abs(FOptIndentSize)*FTabSize;
 
+  //calc minimal indent of all
   NMinSpaces:= MaxInt;
   for i:= Y1 to Y2 do
   begin
@@ -479,9 +480,11 @@ begin
   end;
   if NMinSpaces=MaxInt then Exit;
 
+  //consider "Unindent keeps align"
   if FOptIndentKeepsAlign then
     if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
+  //do indent
   for i:= Y1 to Y2 do
   begin
     Str:= Strings.Lines[i];
