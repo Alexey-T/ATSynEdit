@@ -456,11 +456,13 @@ var
   Y1, Y2: integer;
   NDecSpaces, NMinSpaces, i: integer;
   Str: atString;
+  Caret: TATCaretItem;
 begin
   Result:= [];
   DoCaretSingleAsIs;
 
-  Carets[0].GetSelLines(Y1, Y2);
+  Caret:= Carets[0];
+  Caret.GetSelLines(Y1, Y2);
   if Y1<0 then Exit;
 
   if FOptIndentSize>=0 then
@@ -489,7 +491,13 @@ begin
       Strings.Lines[i]:= Str;
   end;
 
-  Result:= [cResultText, cResultCaretTop];
+  //correct selection: select entire lines y1..y2
+  Caret.EndX:= 0;
+  Caret.EndY:= Y1;
+  Caret.PosX:= Length(Strings.Lines[Y2]);
+  Caret.PosY:= Y2;
+
+  Result:= [cResultText, cResultCaretAny];
 end;
 
 function TATSynEdit.DoCommand_Undo: TATCommandResults;
