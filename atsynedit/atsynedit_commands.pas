@@ -126,6 +126,10 @@ const
   cCommand_TextCaseInvert = 1023;
   cCommand_TextCaseSentence = 1024;
 
+  cCommand_TextTrimSpacesLeft = 1026;
+  cCommand_TextTrimSpacesRight = 1027;
+  cCommand_TextTrimSpacesAll = 1028;
+
   cCommand_FoldAll = 1030;
   cCommand_UnfoldAll = 1031;
 

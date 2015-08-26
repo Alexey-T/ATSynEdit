@@ -149,6 +149,10 @@ begin
   M.Add(cCommand_TextCaseInvert, 'convert case: invert case', [], []);
   M.Add(cCommand_TextCaseSentence, 'convert case: sentence case', [], []);
 
+  M.Add(cCommand_TextTrimSpacesLeft, 'trim spaces: left', [], []);
+  M.Add(cCommand_TextTrimSpacesRight, 'trim spaces: right', [], []);
+  M.Add(cCommand_TextTrimSpacesAll, 'trim spaces: all', [], []);
+
   M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
 
   M.Add(cCommand_FoldAll, 'folding: fold all', [], []);

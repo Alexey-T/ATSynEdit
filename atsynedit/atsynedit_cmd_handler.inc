@@ -274,6 +274,10 @@ begin
     cCommand_TextCaseInvert:           Res:= DoCommand_TextChangeCase(cCaseInvert);
     cCommand_TextCaseSentence:         Res:= DoCommand_TextChangeCase(cCaseSentence);
 
+    cCommand_TextTrimSpacesLeft:       Res:= DoCommand_TextTrimSpaces(cTrimLeft);
+    cCommand_TextTrimSpacesRight:      Res:= DoCommand_TextTrimSpaces(cTrimRight);
+    cCommand_TextTrimSpacesAll:        Res:= DoCommand_TextTrimSpaces(cTrimAll);
+
     cCommand_FoldAll:                  Res:= DoCommand_FoldUnfoldAll(true);
     cCommand_UnfoldAll:                Res:= DoCommand_FoldUnfoldAll(false);
 

@@ -682,3 +682,14 @@ begin
   Update(true);
 end;
 
+
+function TATSynEdit.DoCommand_TextTrimSpaces(AMode: TATTrimSpaces
+  ): TATCommandResults;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  if Strings.ActionTrimSpaces(AMode) then
+    Result:= [cResultCaretAny, cResultText];
+end;
+

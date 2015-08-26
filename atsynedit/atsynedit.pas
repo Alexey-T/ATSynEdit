@@ -675,6 +675,7 @@ type
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
     function DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
+    function DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
     function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
     function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
@@ -2408,7 +2409,7 @@ begin
   if FOptSavingForceFinalEol then
     Change1:= Strings.ActionEnsureFinalEol;
   if FOptSavingTrimSpaces then
-    Change2:= Strings.ActionTrimTrailSpaces;
+    Change2:= Strings.ActionTrimSpaces(cTrimRight);
   if Change1 or Change2 then
     Update(true);
 

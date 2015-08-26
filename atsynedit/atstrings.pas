@@ -52,6 +52,13 @@ const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2);
 
 type
+  TATTrimSpaces = (
+    cTrimLeft,
+    cTrimRight,
+    cTrimAll
+    );
+
+type
   { TATStringItem }
 
   TATStringItem = class
@@ -174,7 +181,7 @@ type
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteDupFakeLines;
     procedure ActionAddFakeLineIfNeeded;
-    function ActionTrimTrailSpaces: boolean;
+    function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
     //file
     procedure LoadFromStream(Stream: TStream);
@@ -974,7 +981,7 @@ begin
   end;
 end;
 
-function TATStrings.ActionTrimTrailSpaces: boolean;
+function TATStrings.ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
 var
   i: integer;
   S1, S2: atString;
@@ -983,7 +990,11 @@ begin
   for i:= 0 to Count-1 do
   begin
     S1:= Lines[i];
-    S2:= STrimRight(S1);
+    case AMode of
+      cTrimLeft: S2:= TrimLeft(S1);
+      cTrimRight: S2:= TrimRight(S1);
+      cTrimAll: S2:= Trim(S1);
+    end;
     if S2<>S1 then
     begin
       Lines[i]:= S2;
