@@ -20,6 +20,7 @@ object FormATSynEditComplete: TFormATSynEditComplete
     BorderSpacing.Around = 4
     Color = clSilver
     ItemHeight = 28
+    OnClick = ListClick
     OnDrawItem = ListDrawItem
   end
 end

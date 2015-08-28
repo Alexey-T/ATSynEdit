@@ -11,16 +11,18 @@ uses
   ATSynEdit_Carets,
   ATStringProc,
   ATListbox,
-  math;
+  Math;
 
 //AText is #13 separated strings, each str is id+'|'+name.
 //e.g. 'func|MyFunc1'+#13+'var|MyVar1'+#13+'var|MyVar2'
-//ACharsReplace: how many chars replace in editor before caret.
-//result is name or ''.
-function DoEditorCompletionDialog(Ed: TATSynEdit;
-  const AText: string; ACharsIndent: integer): string;
+//AChars: how many chars to replace before caret.
+
+//result is "name" part of item.
+function DoEditorCompletionDialogOnlySelect(Ed: TATSynEdit;
+  const AText: string; AChars: integer): string;
+//result is bool: item selected, text replaced.
 function DoEditorCompletionDialogAndReplace(Ed: TATSynEdit;
-  const AText: string; ACharsReplace: integer): boolean;
+  const AText: string; AChars: integer): boolean;
 
 type
   { TFormATSynEditComplete }
@@ -30,6 +32,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ListClick(Sender: TObject);
     procedure ListDrawItem(Sender: TObject; C: TCanvas; AIndex: integer;
       const ARect: TRect);
   private
@@ -49,7 +52,7 @@ var
   cCompleteFontSize: integer = 10;
   cCompleteBorderSize: integer = 4;
   cCompleteFormSizeX: integer = 400;
-  cCompleteFormSizeY: integer = 180;
+  cCompleteFormSizeY: integer = 200;
   cCompleteFontStylePre: TFontStyles = [fsBold];
   cCompleteFontStyleText: TFontStyles = [];
   cCompleteTextIndent1: integer = 4;
@@ -60,7 +63,7 @@ implementation
 {$R *.lfm}
 
 function DoEditorCompletionDialogAndReplace(Ed: TATSynEdit;
-  const AText: string; ACharsReplace: integer): boolean;
+  const AText: string; AChars: integer): boolean;
 var
   Str: string;
   Pos, Shift, PosAfter: TPoint;
@@ -70,7 +73,7 @@ begin
   if Ed.ModeReadOnly then exit;
   if Ed.Carets.Count<>1 then exit;
 
-  Str:= DoEditorCompletionDialog(Ed, AText, ACharsReplace);
+  Str:= DoEditorCompletionDialogOnlySelect(Ed, AText, AChars);
   Result:= Str<>'';
   if Result then
   begin
@@ -78,8 +81,8 @@ begin
     Pos.X:= Caret.PosX;
     Pos.Y:= Caret.PosY;
 
-    Ed.Strings.TextDeleteLeft(Pos.X, Pos.Y, ACharsReplace, Shift, PosAfter);
-    Pos.X:= Max(0, Pos.X-ACharsReplace);
+    Ed.Strings.TextDeleteLeft(Pos.X, Pos.Y, AChars, Shift, PosAfter);
+    Pos.X:= Max(0, Pos.X-AChars);
     Ed.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
 
     Caret.PosX:= Pos.X+Length(Str);
@@ -91,8 +94,8 @@ begin
   end;
 end;
 
-function DoEditorCompletionDialog(Ed: TATSynEdit; const AText: string;
-  ACharsIndent: integer): string;
+function DoEditorCompletionDialogOnlySelect(Ed: TATSynEdit; const AText: string;
+  AChars: integer): string;
 var
   P: TPoint;
   SPre, SText: string;
@@ -115,7 +118,7 @@ begin
     List.ItemHeight:= Trunc(List.Font.Size*1.8);
     List.BorderSpacing.Around:= cCompleteBorderSize;
 
-    P.X:= Ed.Carets[0].CoordX-Ed.TextCharSize.X*ACharsIndent;
+    P.X:= Ed.Carets[0].CoordX-Ed.TextCharSize.X*AChars;
     P.Y:= Ed.Carets[0].CoordY+Ed.TextCharSize.Y;
     P:= Ed.ClientToScreen(P);
     SetBounds(P.X, P.Y, cCompleteFormSizeX, cCompleteFormSizeY);
@@ -195,6 +198,11 @@ begin
   end;
 end;
 
+procedure TFormATSynEditComplete.ListClick(Sender: TObject);
+begin
+  Modalresult:= mrOk;
+end;
+
 procedure TFormATSynEditComplete.GetItems(Str: string; out StrPre, StrText: string);
 begin
   StrPre:= SGetItem(Str, '|');
@@ -213,16 +221,15 @@ begin
   else
     C.Brush.Color:= cCompleteColorBg;
   C.FillRect(ARect);
-  C.Font.Assign(List.Font);
 
+  C.Font.Assign(List.Font);
   C.Font.Style:= cCompleteFontStylePre;
   C.Font.Color:= cCompleteColorFontPre;
   C.TextOut(ARect.Left+cCompleteTextIndent1, ARect.Top, SPre);
   C.Font.Style:= cCompleteFontStyleText;
   C.Font.Color:= cCompleteColorFontText;
-  C.TextOut(ARect.Left+
-    cCompleteTextIndent1+cCompleteTextIndent2+C.TextWidth(SPre),
-    ARect.Top, SText);
+  C.TextOut(ARect.Left+cCompleteTextIndent1+
+    C.TextWidth(SPre)+cCompleteTextIndent2, ARect.Top, SText);
 end;
 
 end.
