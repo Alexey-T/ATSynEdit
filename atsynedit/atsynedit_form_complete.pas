@@ -8,13 +8,19 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs,
   LclProc, LclType,
   ATSynEdit,
+  ATSynEdit_Carets,
   ATStringProc,
-  ATListbox;
+  ATListbox,
+  math;
 
-//AText is #13 separated strings, each str is '|' separated two strings:
+//AText is #13 separated strings, each str a) name, or b) id+'|'+name.
 //e.g. 'func|MyFunc1'+#13+'var|MyVar1'+#13+'var|MyVar2'
-//result is item index or -1 if cancelled
-function DoEditorCompletionDialog(Ed: TATSynEdit; const AText: string): integer;
+//ACharsReplace: how many chars replace in editor before caret.
+//result is name or ''.
+function DoEditorCompletionDialog(Ed: TATSynEdit;
+  const AText: string; ACharsIndent: integer): string;
+function DoEditorCompletionDialogAndReplace(Ed: TATSynEdit;
+  const AText: string; ACharsReplace: integer): boolean;
 
 type
   { TFormATSynEditComplete }
@@ -29,6 +35,7 @@ type
   private
     { private declarations }
     SList: TStringlist;
+    procedure GetItems(Str: string; out StrPre, StrText: string);
   public
     { public declarations }
   end;
@@ -52,12 +59,46 @@ implementation
 
 {$R *.lfm}
 
-function DoEditorCompletionDialog(Ed: TATSynEdit; const AText: string): integer;
+function DoEditorCompletionDialogAndReplace(Ed: TATSynEdit;
+  const AText: string; ACharsReplace: integer): boolean;
+var
+  Str: string;
+  Pos, Shift, PosAfter: TPoint;
+  Caret: TATCaretItem;
+begin
+  Result:= false;
+  if Ed.ModeReadOnly then exit;
+  if Ed.Carets.Count<>1 then exit;
+
+  Str:= DoEditorCompletionDialog(Ed, AText, ACharsReplace);
+  Result:= Str<>'';
+  if Result then
+  begin
+    Caret:= Ed.Carets[0];
+    Pos.X:= Caret.PosX;
+    Pos.Y:= Caret.PosY;
+
+    Ed.Strings.TextDeleteLeft(Pos.X, Pos.Y, ACharsReplace, Shift, PosAfter);
+    Pos.X:= Max(0, Pos.X-ACharsReplace);
+    Ed.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
+
+    Caret.PosX:= Pos.X+Length(Str);
+    Caret.EndX:= -1;
+    Caret.EndY:= -1;
+
+    Ed.Update(true);
+    Ed.DoEventChange;
+  end;
+end;
+
+function DoEditorCompletionDialog(Ed: TATSynEdit; const AText: string;
+  ACharsIndent: integer): string;
 var
   P: TPoint;
+  SPre, SText: string;
 begin
-  Result:= -1;
-  if Ed.Carets.Count=0 then exit;
+  Result:= '';
+  if Ed.Carets.Count<>1 then exit;
 
   with TFormATSynEditComplete.Create(nil) do
   try
@@ -74,13 +115,17 @@ begin
     List.ItemHeight:= Trunc(List.Font.Size*1.8);
     List.BorderSpacing.Around:= cCompleteBorderSize;
 
-    P.X:= Ed.Carets[0].CoordX;
+    P.X:= Ed.Carets[0].CoordX-Ed.TextCharSize.X*ACharsIndent;
     P.Y:= Ed.Carets[0].CoordY+Ed.TextCharSize.Y;
     P:= Ed.ClientToScreen(P);
     SetBounds(P.X, P.Y, cCompleteFormSizeX, cCompleteFormSizeY);
 
     if ShowModal=mrOk then
-      Result:= List.ItemIndex;
+      if List.ItemIndex>=0 then
+      begin
+        GetItems(SList[List.ItemIndex], SPre, SText);
+        Result:= SText;
+      end;
   finally
     Free
   end;
@@ -136,14 +181,23 @@ begin
   end;
 end;
 
+procedure TFormATSynEditComplete.GetItems(Str: string; out StrPre, StrText: string);
+begin
+  StrPre:= SGetItem(Str, '|');
+  StrText:= SGetItem(Str, '|');
+  if StrText='' then
+  begin
+    StrText:= StrPre;
+    StrPre:= '';
+  end;
+end;
+
 procedure TFormATSynEditComplete.ListDrawItem(Sender: TObject; C: TCanvas;
   AIndex: integer; const ARect: TRect);
 var
-  S, S1, S2: string;
+  SPre, SText: string;
 begin
-  S:= SList[AIndex];
-  S1:= SGetItem(S, '|');
-  S2:= SGetItem(S, '|');
+  GetItems(SList[AIndex], SPre, SText);
 
   if AIndex=List.ItemIndex then
     C.Brush.Color:= cCompleteColorSelBg
@@ -152,20 +206,22 @@ begin
   C.FillRect(ARect);
   C.Font.Assign(List.Font);
 
-  if S2='' then
+  if SPre='' then
   begin
     if cCompleteTextBold2 then C.Font.Style:= [fsBold] else C.Font.Style:= [];
     C.Font.Color:= cCompleteColorFontText;
-    C.TextOut(ARect.Left+cCompleteTextIndent1, ARect.Top, S1);
+    C.TextOut(ARect.Left+cCompleteTextIndent1, ARect.Top, SText);
   end
   else
   begin
     if cCompleteTextBold1 then C.Font.Style:= [fsBold] else C.Font.Style:= [];
     C.Font.Color:= cCompleteColorFontPre;
-    C.TextOut(ARect.Left+cCompleteTextIndent1, ARect.Top, S1);
+    C.TextOut(ARect.Left+cCompleteTextIndent1, ARect.Top, SPre);
     if cCompleteTextBold2 then C.Font.Style:= [fsBold] else C.Font.Style:= [];
     C.Font.Color:= cCompleteColorFontText;
-    C.TextOut(ARect.Left+cCompleteTextIndent1+cCompleteTextIndent2+C.TextWidth(S1), ARect.Top, S2);
+    C.TextOut(ARect.Left+
+      cCompleteTextIndent1+cCompleteTextIndent2+C.TextWidth(SPre),
+      ARect.Top, SText);
   end
 end;
 
