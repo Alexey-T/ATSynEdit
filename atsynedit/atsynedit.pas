@@ -777,6 +777,7 @@ type
     function IsPosSelected(AX, AY: integer): boolean;
     function IsPosFolded(AX, AY: integer): boolean;
     function IsCharWord(ch: Widechar): boolean;
+    property TextCharSize: TPoint read FCharSize;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;

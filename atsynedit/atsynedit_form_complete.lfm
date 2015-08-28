@@ -1,0 +1,25 @@
+object FormATSynEditComplete: TFormATSynEditComplete
+  Left = 472
+  Height = 240
+  Top = 442
+  Width = 320
+  BorderStyle = bsNone
+  ClientHeight = 240
+  ClientWidth = 320
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyDown = FormKeyDown
+  LCLVersion = '1.5'
+  object List: TATListbox
+    Left = 4
+    Height = 232
+    Top = 4
+    Width = 312
+    Align = alClient
+    BorderSpacing.Around = 4
+    Color = clSilver
+    ItemHeight = 28
+    OnDrawItem = ListDrawItem
+  end
+end
