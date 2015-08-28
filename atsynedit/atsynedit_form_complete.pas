@@ -13,7 +13,7 @@ uses
   ATListbox,
   math;
 
-//AText is #13 separated strings, each str a) name, or b) id+'|'+name.
+//AText is #13 separated strings, each str is id+'|'+name.
 //e.g. 'func|MyFunc1'+#13+'var|MyVar1'+#13+'var|MyVar2'
 //ACharsReplace: how many chars replace in editor before caret.
 //result is name or ''.
@@ -50,10 +50,10 @@ var
   cCompleteBorderSize: integer = 4;
   cCompleteFormSizeX: integer = 400;
   cCompleteFormSizeY: integer = 180;
+  cCompleteFontStylePre: TFontStyles = [fsBold];
+  cCompleteFontStyleText: TFontStyles = [];
   cCompleteTextIndent1: integer = 4;
   cCompleteTextIndent2: integer = 8;
-  cCompleteTextBold1: boolean = true;
-  cCompleteTextBold2: boolean = false;
 
 implementation
 
@@ -166,6 +166,20 @@ begin
     exit
   end;
 
+  if (key=vk_home) then
+  begin
+    List.ItemIndex:= 0;
+    key:= 0;
+    exit
+  end;
+
+  if (key=vk_end) then
+  begin
+    List.ItemIndex:= List.ItemCount-1;
+    key:= 0;
+    exit
+  end;
+
   if (key=VK_ESCAPE) then
   begin
     Modalresult:= mrCancel;
@@ -185,11 +199,6 @@ procedure TFormATSynEditComplete.GetItems(Str: string; out StrPre, StrText: stri
 begin
   StrPre:= SGetItem(Str, '|');
   StrText:= SGetItem(Str, '|');
-  if StrText='' then
-  begin
-    StrText:= StrPre;
-    StrPre:= '';
-  end;
 end;
 
 procedure TFormATSynEditComplete.ListDrawItem(Sender: TObject; C: TCanvas;
@@ -206,23 +215,14 @@ begin
   C.FillRect(ARect);
   C.Font.Assign(List.Font);
 
-  if SPre='' then
-  begin
-    if cCompleteTextBold2 then C.Font.Style:= [fsBold] else C.Font.Style:= [];
-    C.Font.Color:= cCompleteColorFontText;
-    C.TextOut(ARect.Left+cCompleteTextIndent1, ARect.Top, SText);
-  end
-  else
-  begin
-    if cCompleteTextBold1 then C.Font.Style:= [fsBold] else C.Font.Style:= [];
-    C.Font.Color:= cCompleteColorFontPre;
-    C.TextOut(ARect.Left+cCompleteTextIndent1, ARect.Top, SPre);
-    if cCompleteTextBold2 then C.Font.Style:= [fsBold] else C.Font.Style:= [];
-    C.Font.Color:= cCompleteColorFontText;
-    C.TextOut(ARect.Left+
-      cCompleteTextIndent1+cCompleteTextIndent2+C.TextWidth(SPre),
-      ARect.Top, SText);
-  end
+  C.Font.Style:= cCompleteFontStylePre;
+  C.Font.Color:= cCompleteColorFontPre;
+  C.TextOut(ARect.Left+cCompleteTextIndent1, ARect.Top, SPre);
+  C.Font.Style:= cCompleteFontStyleText;
+  C.Font.Color:= cCompleteColorFontText;
+  C.TextOut(ARect.Left+
+    cCompleteTextIndent1+cCompleteTextIndent2+C.TextWidth(SPre),
+    ARect.Top, SText);
 end;
 
 end.
