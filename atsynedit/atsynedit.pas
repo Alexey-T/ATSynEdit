@@ -512,6 +512,7 @@ type
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoMenuGutterFold;
+    procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;

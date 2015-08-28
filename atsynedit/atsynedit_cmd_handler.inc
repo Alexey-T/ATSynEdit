@@ -1,9 +1,26 @@
 {$ifdef none}begin end;{$endif}
 
+procedure TATSynEdit.DoMenuText;
+var
+  P: TPoint;
+begin
+  P:= ClientToScreen(Point(0, 0));
+  if Assigned(FMenuText) then
+    FMenuText.PopUp(P.X, P.Y)
+  else
+    FMenuStd.PopUp(P.X, P.Y);
+end;
+
 procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   if not FWantTabs then
     if Key=vk_tab then Exit;
+
+  if Key=vk_apps then
+  begin
+    DoMenuText;
+    Exit
+  end;
 
   DoPaintModeStatic;
   try
