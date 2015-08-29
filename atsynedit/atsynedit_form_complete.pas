@@ -13,14 +13,14 @@ uses
   ATListbox,
   Math;
 
-//AText is #13 separated strings, each str is id+'|'+name.
+//AText is #13 separated strings, each str is id+'|'+text.
 //e.g. 'func|MyFunc1'+#13+'var|MyVar1'+#13+'var|MyVar2'
 //AChars: how many chars to replace before caret.
 
-//result is "name" part of item.
+//result: "text" part selected.
 function DoEditorCompletionDialogOnlySelect(Ed: TATSynEdit;
   const AText: string; AChars: integer): string;
-//result is bool: item selected, text replaced.
+//result: item selected, text replaced.
 function DoEditorCompletionDialogAndReplace(Ed: TATSynEdit;
   const AText: string; AChars: integer): boolean;
 
@@ -44,6 +44,8 @@ type
   end;
 
 var
+  cCompleteListSort: boolean = false;
+  cCompleteKeyUpDownWrap: boolean = true;
   cCompleteColorFontPre: TColor = clPurple;
   cCompleteColorFontText: TColor = clBlack;
   cCompleteColorBg: TColor = $e0e0e0;
@@ -107,6 +109,7 @@ begin
   try
     SList.Text:= AText;
     if SList.Count=0 then exit;
+    if cCompleteListSort then SList.Sort;
 
     List.ItemCount:= SList.Count;
     List.ItemIndex:= 0;
@@ -154,6 +157,7 @@ begin
     if List.ItemIndex>0 then
       List.ItemIndex:= List.ItemIndex-1
     else
+    if cCompleteKeyUpDownWrap then
       List.ItemIndex:= List.ItemCount-1;
     key:= 0;
     exit
@@ -164,6 +168,7 @@ begin
     if List.ItemIndex<List.ItemCount-1 then
       List.ItemIndex:= List.ItemIndex+1
     else
+    if cCompleteKeyUpDownWrap then
       List.ItemIndex:= 0;
     key:= 0;
     exit
