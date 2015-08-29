@@ -176,6 +176,20 @@ begin
     exit
   end;
 
+  if (key=VK_PRIOR) and (shift=[]) then
+  begin
+    List.ItemIndex:= Max(0, List.ItemIndex-List.VisibleItems);
+    key:= 0;
+    exit
+  end;
+
+  if (key=VK_NEXT) and (shift=[]) then
+  begin
+    List.ItemIndex:= Min(List.Itemcount-1, List.ItemIndex+List.VisibleItems);
+    key:= 0;
+    exit
+  end;
+
   if (key=vk_home) then
   begin
     List.ItemIndex:= 0;
@@ -197,7 +211,7 @@ begin
     exit
   end;
 
-  if (key=VK_RETURN) then
+  if (key=VK_RETURN) or (key=VK_SPACE) then
   begin
     Modalresult:= mrOk;
     key:= 0;
