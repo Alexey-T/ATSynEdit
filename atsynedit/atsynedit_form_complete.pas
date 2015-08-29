@@ -13,14 +13,17 @@ uses
   ATListbox,
   Math;
 
-//AText is #13 separated strings, each str is id+'|'+text+'|'+desc.
+//AText is #13-separated strings, each string is '|'-separated items.
+//Usually item_0 is prefix to show,
+//item_1 is actual text (result of function),
+//item_2..etc are only to show.
 //e.g. 'func|Func1|(param1, param2)'+#13+'var|Var1'+#13+'var|Var2'
 //AChars: how many chars to replace before caret.
 
-//result: "text" part selected.
+//result: text part selected.
 function DoEditorCompletionDialogOnlySelect(Ed: TATSynEdit;
   const AText: string; AChars: integer): string;
-//result: item selected, text replaced.
+//result: is item selected (text replaced).
 function DoEditorCompletionDialogAndReplace(Ed: TATSynEdit;
   const AText: string; AChars: integer): boolean;
 
@@ -38,29 +41,32 @@ type
   private
     { private declarations }
     SList: TStringlist;
-    procedure GetItems(Str: string; out StrPre, StrText, StrDesc: string);
+    function GetItemText(S: string): string;
   public
     { public declarations }
   end;
 
+const
+  cCompleteItemCount = 5;
 var
-  cCompleteListSort: boolean = false;
-  cCompleteKeyUpDownWrap: boolean = true;
-  cCompleteColorFontPre: TColor = clPurple;
-  cCompleteColorFontText: TColor = clBlack;
-  cCompleteColorFontDesc: TColor = clNavy;
+  cCompleteColorFont: array[0..cCompleteItemCount-1] of TColor =
+    (clPurple, clBlack, clNavy, clBlack, clBlack);
+  cCompleteFontStyles: array[0..cCompleteItemCount-1] of TFontStyles =
+    ([fsBold], [], [], [], []);
   cCompleteColorBg: TColor = $e0e0e0;
   cCompleteColorSelBg: TColor = clMedGray;
+
+  cCompleteIndexOfText: integer = 1;
+  cCompleteSepChar: char = '|';
+  cCompleteListSort: boolean = false;
+  cCompleteKeyUpDownWrap: boolean = true;
   cCompleteFontName: string = 'default';
   cCompleteFontSize: integer = 10;
   cCompleteBorderSize: integer = 4;
   cCompleteFormSizeX: integer = 450;
   cCompleteFormSizeY: integer = 200;
-  cCompleteFontStylePre: TFontStyles = [fsBold];
-  cCompleteFontStyleText: TFontStyles = [];
-  cCompleteFontStyleDesc: TFontStyles = [];
-  cCompleteTextIndent1: integer = 4;
-  cCompleteTextIndent2: integer = 8;
+  cCompleteTextIndent0: integer = 4;
+  cCompleteTextIndent: integer = 8;
 
 implementation
 
@@ -102,7 +108,6 @@ function DoEditorCompletionDialogOnlySelect(Ed: TATSynEdit; const AText: string;
   AChars: integer): string;
 var
   P: TPoint;
-  SPre, SText, SDesc: string;
 begin
   Result:= '';
   if Ed.Carets.Count<>1 then exit;
@@ -130,10 +135,7 @@ begin
 
     if ShowModal=mrOk then
       if List.ItemIndex>=0 then
-      begin
-        GetItems(SList[List.ItemIndex], SPre, SText, SDesc);
-        Result:= SText;
-      end;
+        Result:= GetItemText(SList[List.ItemIndex]);
   finally
     Free
   end;
@@ -224,20 +226,21 @@ begin
   Modalresult:= mrOk;
 end;
 
-procedure TFormATSynEditComplete.GetItems(Str: string; out StrPre, StrText, StrDesc: string);
+function TFormATSynEditComplete.GetItemText(S: string): string;
+var
+  i: integer;
 begin
-  StrPre:= SGetItem(Str, '|');
-  StrText:= SGetItem(Str, '|');
-  StrDesc:= SGetItem(Str, '|');
+  for i:= 0 to cCompleteIndexOfText do
+    Result:= SGetItem(S, cCompleteSepChar);
 end;
 
 procedure TFormATSynEditComplete.ListDrawItem(Sender: TObject; C: TCanvas;
   AIndex: integer; const ARect: TRect);
 var
-  SPre, SText, SDesc: string;
-  NSize: integer;
+  Str, SItem: string;
+  NSize, i: integer;
 begin
-  GetItems(SList[AIndex], SPre, SText, SDesc);
+  Str:= SList[AIndex];
 
   if AIndex=List.ItemIndex then
     C.Brush.Color:= cCompleteColorSelBg
@@ -246,22 +249,16 @@ begin
   C.FillRect(ARect);
 
   C.Font.Assign(List.Font);
-  NSize:= cCompleteTextIndent1;
+  NSize:= cCompleteTextIndent0;
 
-  C.Font.Style:= cCompleteFontStylePre;
-  C.Font.Color:= cCompleteColorFontPre;
-  C.TextOut(ARect.Left+NSize, ARect.Top, SPre);
-  Inc(NSize, C.TextWidth(SPre)+cCompleteTextIndent2);
-
-  C.Font.Style:= cCompleteFontStyleText;
-  C.Font.Color:= cCompleteColorFontText;
-  C.TextOut(ARect.Left+NSize, ARect.Top, SText);
-  Inc(NSize, C.TextWidth(SText)+cCompleteTextIndent2);
-
-  C.Font.Style:= cCompleteFontStyleDesc;
-  C.Font.Color:= cCompleteColorFontDesc;
-  C.TextOut(ARect.Left+NSize, ARect.Top, SDesc);
-  Inc(NSize, C.TextWidth(SDesc)+cCompleteTextIndent2);
+  for i:= 0 to cCompleteItemCount-1 do
+  begin
+    SItem:= SGetItem(Str, cCompleteSepChar);
+    C.Font.Style:= cCompleteFontStyles[i];
+    C.Font.Color:= cCompleteColorFont[i];
+    C.TextOut(ARect.Left+NSize, ARect.Top, SItem);
+    Inc(NSize, C.TextWidth(SItem)+cCompleteTextIndent);
+  end;
 end;
 
 end.
