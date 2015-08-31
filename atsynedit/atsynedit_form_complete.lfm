@@ -6,10 +6,15 @@ object FormATSynEditComplete: TFormATSynEditComplete
   BorderStyle = bsNone
   ClientHeight = 240
   ClientWidth = 320
+  FormStyle = fsStayOnTop
   KeyPreview = True
+  OnClose = FormClose
   OnCreate = FormCreate
+  OnDeactivate = FormDeactivate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
+  OnUTF8KeyPress = FormUTF8KeyPress
   LCLVersion = '1.5'
   object List: TATListbox
     Left = 4

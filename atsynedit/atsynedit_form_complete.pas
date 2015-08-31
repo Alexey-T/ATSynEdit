@@ -9,9 +9,14 @@ uses
   LclProc, LclType,
   ATSynEdit,
   ATSynEdit_Carets,
+  ATSynEdit_Commands,
   ATStringProc,
   ATListbox,
   Math;
+
+type
+  TATStringEvent = procedure (Sender: TObject; const Str: string) of object;
+  TATGetCompletionPropEvent = procedure (Sender: TObject; out AText: string; out AChars: integer) of object;
 
 //AText is #13-separated strings, each string is '|'-separated items.
 //Usually item_0 is prefix to show,
@@ -20,31 +25,44 @@ uses
 //e.g. 'func|Func1|(param1, param2)'+#13+'var|Var1'+#13+'var|Var2'
 //AChars: how many chars to replace before caret.
 
-//result: text part selected.
-function DoEditorCompletionDialogOnlySelect(Ed: TATSynEdit;
-  const AText: string; AChars: integer): string;
-//result: is item selected (text replaced).
-function DoEditorCompletionDialogAndReplace(Ed: TATSynEdit;
-  const AText: string; AChars: integer): boolean;
+procedure DoEditorCompletionListbox(
+  AOwner: TForm; AEd: TATSynEdit;
+  AOnGetProp: TATGetCompletionPropEvent);
 
 type
   { TFormATSynEditComplete }
 
   TFormATSynEditComplete = class(TForm)
     List: TATListbox;
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+    procedure FormDeactivate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
+    procedure FormUTF8KeyPress(Sender: TObject; var UTF8Key: TUTF8Char);
     procedure ListClick(Sender: TObject);
     procedure ListDrawItem(Sender: TObject; C: TCanvas; AIndex: integer;
       const ARect: TRect);
   private
     { private declarations }
     SList: TStringlist;
+    FOnResult: TATStringEvent;
+    FOnGetProp: TATGetCompletionPropEvent;
+    FEdit: TATSynEdit;
+    procedure DoResult;
+    procedure UpdateShow;
     function GetItemText(S: string): string;
+    function GetResultText: string;
   public
     { public declarations }
+    property Editor: TATSynEdit read FEdit write FEdit;
+    property OnResult: TATStringEvent read FOnResult write FOnResult;
+    property OnGetProp: TATGetCompletionPropEvent read FOnGetProp write FOnGetProp;
   end;
+
+var
+  FormComplete: TFormATSynEditComplete = nil;
 
 const
   cCompleteItemCount = 5;
@@ -72,72 +90,60 @@ implementation
 
 {$R *.lfm}
 
-function DoEditorCompletionDialogAndReplace(Ed: TATSynEdit;
-  const AText: string; AChars: integer): boolean;
-var
-  Str: string;
-  Pos, Shift, PosAfter: TPoint;
-  Caret: TATCaretItem;
-begin
-  Result:= false;
-  if Ed.ModeReadOnly then exit;
-  if Ed.Carets.Count<>1 then exit;
+type
+  TEdReplacer = class
+  public
+    FEd: TATSynEdit;
+    FChars: integer;
+    procedure OnResult(Sender: TObject; const Str: string);
+  end;
 
-  Str:= DoEditorCompletionDialogOnlySelect(Ed, AText, AChars);
-  Result:= Str<>'';
-  if Result then
+var
+  EdReplacer: TEdReplacer = nil;
+
+procedure DoEditorCompletionListbox(AOwner: TForm; AEd: TATSynEdit;
+  AOnGetProp: TATGetCompletionPropEvent);
+begin
+  if AEd.ModeReadOnly then exit;
+  if AEd.Carets.Count<>1 then exit;
+
+  if EdReplacer=nil then
+    EdReplacer:= TEdReplacer.Create;
+  if FormComplete=nil then
+    FormComplete:= TFormATSynEditComplete.Create(AOwner);
+
+  EdReplacer.FEd:= AEd;
+  EdReplacer.FChars:= 0;
+
+  FormComplete.Editor:= AEd;
+  FormComplete.OnGetProp:= AOnGetProp;
+  FormComplete.OnResult:= @EdReplacer.OnResult;
+  FormComplete.UpdateShow;
+end;
+
+{ TReplaceForm }
+
+procedure TEdReplacer.OnResult(Sender: TObject; const Str: string);
+var
+  Caret: TATCaretItem;
+  Pos, Shift, PosAfter: TPoint;
+begin
+  if Str<>'' then
   begin
-    Caret:= Ed.Carets[0];
+    Caret:= FEd.Carets[0];
     Pos.X:= Caret.PosX;
     Pos.Y:= Caret.PosY;
 
-    Ed.Strings.TextDeleteLeft(Pos.X, Pos.Y, AChars, Shift, PosAfter);
-    Pos.X:= Max(0, Pos.X-AChars);
-    Ed.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
+    FEd.Strings.TextDeleteLeft(Pos.X, Pos.Y, FChars, Shift, PosAfter);
+    Pos.X:= Max(0, Pos.X-FChars);
+    FEd.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
 
     Caret.PosX:= Pos.X+Length(Str);
     Caret.EndX:= -1;
     Caret.EndY:= -1;
 
-    Ed.Update(true);
-    Ed.DoEventChange;
-  end;
-end;
-
-function DoEditorCompletionDialogOnlySelect(Ed: TATSynEdit; const AText: string;
-  AChars: integer): string;
-var
-  P: TPoint;
-begin
-  Result:= '';
-  if Ed.Carets.Count<>1 then exit;
-
-  with TFormATSynEditComplete.Create(nil) do
-  try
-    SList.Text:= AText;
-    if SList.Count=0 then exit;
-    if cCompleteListSort then SList.Sort;
-
-    List.ItemCount:= SList.Count;
-    List.ItemIndex:= 0;
-
-    Color:= cCompleteColorBg;
-    List.Color:= cCompleteColorBg;
-    List.Font.Name:= cCompleteFontName;
-    List.Font.Size:= cCompleteFontSize;
-    List.ItemHeight:= Trunc(List.Font.Size*1.8);
-    List.BorderSpacing.Around:= cCompleteBorderSize;
-
-    P.X:= Ed.Carets[0].CoordX-Ed.TextCharSize.X*AChars;
-    P.Y:= Ed.Carets[0].CoordY+Ed.TextCharSize.Y;
-    P:= Ed.ClientToScreen(P);
-    SetBounds(P.X, P.Y, cCompleteFormSizeX, cCompleteFormSizeY);
-
-    if ShowModal=mrOk then
-      if List.ItemIndex>=0 then
-        Result:= GetItemText(SList[List.ItemIndex]);
-  finally
-    Free
+    FEd.Update(true);
+    FEd.DoEventChange;
   end;
 end;
 
@@ -145,12 +151,25 @@ end;
 
 procedure TFormATSynEditComplete.FormCreate(Sender: TObject);
 begin
-  SList:= tstringlist.create;
+  SList:= TStringList.Create;
+end;
+
+procedure TFormATSynEditComplete.FormDeactivate(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TFormATSynEditComplete.FormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+  if Assigned(FEdit) then
+    FEdit.OptCaretStopUnfocused:= true;
+  CloseAction:= caHide;
 end;
 
 procedure TFormATSynEditComplete.FormDestroy(Sender: TObject);
 begin
-  SList.free;
+  SList.Free;
 end;
 
 procedure TFormATSynEditComplete.FormKeyDown(Sender: TObject; var Key: Word;
@@ -208,22 +227,53 @@ begin
 
   if (key=VK_ESCAPE) then
   begin
-    Modalresult:= mrCancel;
+    Close;
     key:= 0;
     exit
   end;
 
-  if (key=VK_RETURN) or (key=VK_SPACE) then
+  if (key=VK_RETURN) {or (key=VK_SPACE)} then
   begin
-    Modalresult:= mrOk;
+    DoResult;
     key:= 0;
     exit
   end;
 end;
 
+procedure TFormATSynEditComplete.FormShow(Sender: TObject);
+begin
+  if Assigned(FEdit) then
+    FEdit.OptCaretStopUnfocused:= false;
+end;
+
+procedure TFormATSynEditComplete.FormUTF8KeyPress(Sender: TObject;
+  var UTF8Key: TUTF8Char);
+var
+  Str: atString;
+begin
+  inherited;
+
+  //backsp
+  if (UTF8Key=#8) then
+  begin
+    FEdit.DoCommand(cCommand_KeyBackspace, '');
+    UpdateShow;
+    Utf8Key:= '';
+    exit;
+  end;
+
+  //skip control Ascii chars
+  if Ord(UTF8Key[1])<32 then Exit;
+
+  Str:= Utf8Decode(Utf8Key);
+  FEdit.DoCommand(cCommand_TextInsert, Str);
+  UpdateShow;
+  Utf8Key:= '';
+end;
+
 procedure TFormATSynEditComplete.ListClick(Sender: TObject);
 begin
-  Modalresult:= mrOk;
+  DoResult;
 end;
 
 function TFormATSynEditComplete.GetItemText(S: string): string;
@@ -232,6 +282,13 @@ var
 begin
   for i:= 0 to cCompleteIndexOfText do
     Result:= SGetItem(S, cCompleteSepChar);
+end;
+
+function TFormATSynEditComplete.GetResultText: string;
+begin
+  Result:= '';
+  if List.ItemIndex>=0 then
+    Result:= GetItemText(SList[List.ItemIndex]);
 end;
 
 procedure TFormATSynEditComplete.ListDrawItem(Sender: TObject; C: TCanvas;
@@ -259,6 +316,51 @@ begin
     C.TextOut(ARect.Left+NSize, ARect.Top, SItem);
     Inc(NSize, C.TextWidth(SItem)+cCompleteTextIndent);
   end;
+end;
+
+procedure TFormATSynEditComplete.DoResult;
+begin
+  if Assigned(FOnResult) then
+    FOnResult(Self, GetResultText);
+  Close;
+end;
+
+procedure TFormATSynEditComplete.UpdateShow;
+var
+  AText: string;
+  AChars: integer;
+  P: TPoint;
+begin
+  if Assigned(FOnGetProp) then
+  begin
+    FOnGetProp(Editor, AText, AChars);
+    EdReplacer.FChars:= AChars;
+  end;
+
+  if (AText='') or (AChars<=0) then
+    begin Close; exit end;
+
+  SList.Text:= AText;
+  if SList.Count=0 then exit;
+  if cCompleteListSort then SList.Sort;
+
+  List.ItemCount:= SList.Count;
+  List.ItemIndex:= 0;
+
+  Color:= cCompleteColorBg;
+  List.Color:= cCompleteColorBg;
+  List.Font.Name:= cCompleteFontName;
+  List.Font.Size:= cCompleteFontSize;
+  List.ItemHeight:= Trunc(List.Font.Size*1.8);
+  List.BorderSpacing.Around:= cCompleteBorderSize;
+  List.Invalidate;
+
+  P.X:= Editor.Carets[0].CoordX-Editor.TextCharSize.X*AChars;
+  P.Y:= Editor.Carets[0].CoordY+Editor.TextCharSize.Y;
+  P:= Editor.ClientToScreen(P);
+
+  SetBounds(P.X, P.Y, cCompleteFormSizeX, cCompleteFormSizeY);
+  Show;
 end;
 
 end.
