@@ -1,7 +1,7 @@
 object FormATSynEditComplete: TFormATSynEditComplete
-  Left = 472
+  Left = 528
   Height = 240
-  Top = 442
+  Top = 447
   Width = 320
   BorderStyle = bsNone
   ClientHeight = 240

@@ -26,7 +26,7 @@ type
 //AChars: how many chars to replace before caret.
 
 procedure DoEditorCompletionListbox(
-  AOwner: TForm; AEd: TATSynEdit;
+  AOwner: TComponent; AEd: TATSynEdit;
   AOnGetProp: TATGetCompletionPropEvent);
 
 type
@@ -47,9 +47,10 @@ type
   private
     { private declarations }
     SList: TStringlist;
-    FOnResult: TATStringEvent;
     FOnGetProp: TATGetCompletionPropEvent;
     FEdit: TATSynEdit;
+    FChars: integer;
+    procedure DoReplaceTo(const Str: string);
     procedure DoResult;
     procedure UpdateShow;
     function GetItemText(S: string): string;
@@ -57,7 +58,6 @@ type
   public
     { public declarations }
     property Editor: TATSynEdit read FEdit write FEdit;
-    property OnResult: TATStringEvent read FOnResult write FOnResult;
     property OnGetProp: TATGetCompletionPropEvent read FOnGetProp write FOnGetProp;
   end;
 
@@ -90,60 +90,41 @@ implementation
 
 {$R *.lfm}
 
-type
-  TEdReplacer = class
-  public
-    FEd: TATSynEdit;
-    FChars: integer;
-    procedure OnResult(Sender: TObject; const Str: string);
-  end;
-
-var
-  EdReplacer: TEdReplacer = nil;
-
-procedure DoEditorCompletionListbox(AOwner: TForm; AEd: TATSynEdit;
+procedure DoEditorCompletionListbox(AOwner: TComponent; AEd: TATSynEdit;
   AOnGetProp: TATGetCompletionPropEvent);
 begin
   if AEd.ModeReadOnly then exit;
   if AEd.Carets.Count<>1 then exit;
 
-  if EdReplacer=nil then
-    EdReplacer:= TEdReplacer.Create;
   if FormComplete=nil then
     FormComplete:= TFormATSynEditComplete.Create(AOwner);
 
-  EdReplacer.FEd:= AEd;
-  EdReplacer.FChars:= 0;
-
   FormComplete.Editor:= AEd;
   FormComplete.OnGetProp:= AOnGetProp;
-  FormComplete.OnResult:= @EdReplacer.OnResult;
   FormComplete.UpdateShow;
 end;
 
-{ TReplaceForm }
-
-procedure TEdReplacer.OnResult(Sender: TObject; const Str: string);
+procedure TFormATSynEditComplete.DoReplaceTo(const Str: string);
 var
   Caret: TATCaretItem;
   Pos, Shift, PosAfter: TPoint;
 begin
   if Str<>'' then
   begin
-    Caret:= FEd.Carets[0];
+    Caret:= Editor.Carets[0];
     Pos.X:= Caret.PosX;
     Pos.Y:= Caret.PosY;
 
-    FEd.Strings.TextDeleteLeft(Pos.X, Pos.Y, FChars, Shift, PosAfter);
+    Editor.Strings.TextDeleteLeft(Pos.X, Pos.Y, FChars, Shift, PosAfter);
     Pos.X:= Max(0, Pos.X-FChars);
-    FEd.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
+    Editor.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
 
     Caret.PosX:= Pos.X+Length(Str);
     Caret.EndX:= -1;
     Caret.EndY:= -1;
 
-    FEd.Update(true);
-    FEd.DoEventChange;
+    Editor.Update(true);
+    Editor.DoEventChange;
   end;
 end;
 
@@ -320,24 +301,19 @@ end;
 
 procedure TFormATSynEditComplete.DoResult;
 begin
-  if Assigned(FOnResult) then
-    FOnResult(Self, GetResultText);
+  DoReplaceTo(GetResultText);
   Close;
 end;
 
 procedure TFormATSynEditComplete.UpdateShow;
 var
   AText: string;
-  AChars: integer;
   P: TPoint;
 begin
   if Assigned(FOnGetProp) then
-  begin
-    FOnGetProp(Editor, AText, AChars);
-    EdReplacer.FChars:= AChars;
-  end;
+    FOnGetProp(Editor, AText, FChars);
 
-  if (AText='') or (AChars<=0) then
+  if (AText='') or (FChars<=0) then
     begin Close; exit end;
 
   SList.Text:= AText;
@@ -355,7 +331,7 @@ begin
   List.BorderSpacing.Around:= cCompleteBorderSize;
   List.Invalidate;
 
-  P.X:= Editor.Carets[0].CoordX-Editor.TextCharSize.X*AChars;
+  P.X:= Editor.Carets[0].CoordX-Editor.TextCharSize.X*FChars;
   P.Y:= Editor.Carets[0].CoordY+Editor.TextCharSize.Y;
   P:= Editor.ClientToScreen(P);
 
