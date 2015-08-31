@@ -15,8 +15,7 @@ uses
   Math;
 
 type
-  TATStringEvent = procedure (Sender: TObject; const Str: string) of object;
-  TATGetCompletionPropEvent = procedure (Sender: TObject; out AText: string; out AChars: integer) of object;
+  TATCompletionPropEvent = procedure (Sender: TObject; out AText: string; out AChars: integer) of object;
 
 //AText is #13-separated strings, each string is '|'-separated items.
 //Usually item_0 is prefix to show,
@@ -27,7 +26,7 @@ type
 
 procedure DoEditorCompletionListbox(
   AOwner: TComponent; AEd: TATSynEdit;
-  AOnGetProp: TATGetCompletionPropEvent);
+  AOnGetProp: TATCompletionPropEvent);
 
 type
   { TFormATSynEditComplete }
@@ -47,7 +46,7 @@ type
   private
     { private declarations }
     SList: TStringlist;
-    FOnGetProp: TATGetCompletionPropEvent;
+    FOnGetProp: TATCompletionPropEvent;
     FEdit: TATSynEdit;
     FChars: integer;
     procedure DoReplaceTo(const Str: string);
@@ -58,11 +57,8 @@ type
   public
     { public declarations }
     property Editor: TATSynEdit read FEdit write FEdit;
-    property OnGetProp: TATGetCompletionPropEvent read FOnGetProp write FOnGetProp;
+    property OnGetProp: TATCompletionPropEvent read FOnGetProp write FOnGetProp;
   end;
-
-var
-  FormComplete: TFormATSynEditComplete = nil;
 
 const
   cCompleteItemCount = 5;
@@ -90,8 +86,11 @@ implementation
 
 {$R *.lfm}
 
+var
+  FormComplete: TFormATSynEditComplete = nil;
+
 procedure DoEditorCompletionListbox(AOwner: TComponent; AEd: TATSynEdit;
-  AOnGetProp: TATGetCompletionPropEvent);
+  AOnGetProp: TATCompletionPropEvent);
 begin
   if AEd.ModeReadOnly then exit;
   if AEd.Carets.Count<>1 then exit;
