@@ -51,7 +51,7 @@ type
     FChars: integer;
     procedure DoReplaceTo(const Str: string);
     procedure DoResult;
-    procedure UpdateShow;
+    procedure DoUpdate;
     function GetItemText(S: string): string;
     function GetResultText: string;
   public
@@ -100,7 +100,7 @@ begin
 
   FormComplete.Editor:= AEd;
   FormComplete.OnGetProp:= AOnGetProp;
-  FormComplete.UpdateShow;
+  FormComplete.DoUpdate;
 end;
 
 procedure TFormATSynEditComplete.DoReplaceTo(const Str: string);
@@ -212,9 +212,25 @@ begin
     exit
   end;
 
-  if (key=VK_RETURN) {or (key=VK_SPACE)} then
+  if (key=VK_RETURN) or (key=VK_TAB) then
   begin
     DoResult;
+    key:= 0;
+    exit
+  end;
+
+  if (key=VK_LEFT) and (shift=[]) then
+  begin
+    Editor.DoCommand(cCommand_KeyLeft, '');
+    DoUpdate;
+    key:= 0;
+    exit
+  end;
+
+  if (key=VK_RIGHT) and (shift=[]) then
+  begin
+    Editor.DoCommand(cCommand_KeyRight, '');
+    DoUpdate;
     key:= 0;
     exit
   end;
@@ -237,7 +253,7 @@ begin
   if (UTF8Key=#8) then
   begin
     FEdit.DoCommand(cCommand_KeyBackspace, '');
-    UpdateShow;
+    DoUpdate;
     Utf8Key:= '';
     exit;
   end;
@@ -247,7 +263,7 @@ begin
 
   Str:= Utf8Decode(Utf8Key);
   FEdit.DoCommand(cCommand_TextInsert, Str);
-  UpdateShow;
+  DoUpdate;
   Utf8Key:= '';
 end;
 
@@ -304,7 +320,7 @@ begin
   Close;
 end;
 
-procedure TFormATSynEditComplete.UpdateShow;
+procedure TFormATSynEditComplete.DoUpdate;
 var
   AText: string;
   P: TPoint;
