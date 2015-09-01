@@ -139,7 +139,9 @@ begin
   if n>=0 then
   begin
     Text:= UTF8Decode(FItems[n]);
+    DoEventChange;
 
+    //scroll to left, select all
     DoScrollByDelta(-10000, 0);
     DoCommand(cCommand_SelectAll);
   end;
