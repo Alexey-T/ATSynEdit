@@ -55,7 +55,7 @@ type
     procedure DoReplaceTo(const Str: string);
     procedure DoResult;
     procedure DoUpdate;
-    function GetItemText(S: string): string;
+    function GetItemText(S: string; AIndex: integer): string;
     function GetResultText: string;
   public
     { public declarations }
@@ -74,9 +74,11 @@ var
   cCompleteColorSelBg: TColor = clMedGray;
 
   cCompleteIndexOfText: integer = 1;
+  cCompleteIndexOfDesc: integer = 2;
   cCompleteSepChar: char = '|';
   cCompleteListSort: boolean = false;
   cCompleteKeyUpDownWrap: boolean = true;
+  cCompleteInsertAlsoBracket: boolean = true;
   cCompleteFontName: string = 'default';
   cCompleteFontSize: integer = 10;
   cCompleteBorderSize: integer = 4;
@@ -276,19 +278,28 @@ begin
   DoResult;
 end;
 
-function TFormATSynEditComplete.GetItemText(S: string): string;
+function TFormATSynEditComplete.GetItemText(S: string; AIndex: integer): string;
 var
   i: integer;
 begin
-  for i:= 0 to cCompleteIndexOfText do
+  for i:= 0 to AIndex do
     Result:= SGetItem(S, cCompleteSepChar);
 end;
 
 function TFormATSynEditComplete.GetResultText: string;
+var
+  SText, SDesc: string;
 begin
   Result:= '';
   if List.ItemIndex>=0 then
-    Result:= GetItemText(SList[List.ItemIndex]);
+  begin
+    SText:= GetItemText(SList[List.ItemIndex], cCompleteIndexOfText);
+    SDesc:= GetItemText(SList[List.ItemIndex], cCompleteIndexOfDesc);
+    Result:= SText;
+    if cCompleteInsertAlsoBracket then
+      if SBegin(SDesc, '(') then
+        Result:= Result+'(';
+  end;
 end;
 
 procedure TFormATSynEditComplete.ListDrawItem(Sender: TObject; C: TCanvas;

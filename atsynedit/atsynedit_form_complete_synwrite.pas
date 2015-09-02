@@ -241,8 +241,11 @@ initialization
   Acp:= TAcp.Create;
 
   cCompleteFormSizeX:= 550;
+  cCompleteFontStyles[0]:= [];
+  cCompleteColorFont[0]:= clPurple;
+  cCompleteColorFont[1]:= clBlack;
   cCompleteColorFont[2]:= clGray;
-  cCompleteColorFont[3]:= clTeal;
+  cCompleteColorFont[3]:= clGreen;
 
 finalization
   FreeAndNil(Acp);
