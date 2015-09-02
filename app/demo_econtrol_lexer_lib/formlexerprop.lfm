@@ -1,7 +1,7 @@
 object fmLexerProp: TfmLexerProp
-  Left = 367
+  Left = 365
   Height = 566
-  Top = 425
+  Top = 299
   Width = 623
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
@@ -343,7 +343,7 @@ object fmLexerProp: TfmLexerProp
         end
         object edStyleType: TComboBox
           Left = 8
-          Height = 31
+          Height = 27
           Top = 18
           Width = 190
           ItemHeight = 0
@@ -414,10 +414,11 @@ object fmLexerProp: TfmLexerProp
           TabOrder = 5
         end
         object bApplyStl: TButton
-          Left = 216
+          Left = 8
           Height = 29
-          Top = 296
-          Width = 204
+          Top = 304
+          Width = 143
+          AutoSize = True
           Caption = 'Apply style changes'
           OnClick = bApplyStlClick
           TabOrder = 12

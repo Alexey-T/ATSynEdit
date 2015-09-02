@@ -38,8 +38,13 @@ var
 { TfmMain }
 
 procedure TfmMain.bShowClick(Sender: TObject);
+var
+  dirAcp: string;
 begin
-  DoShowDialogLexerLib(Manager, 'Courier new', 9);
+  dirAcp:= ExtractFileDir(Application.ExeName)+DirectorySeparator+'acp';
+  CreateDir(dirAcp);
+
+  DoShowDialogLexerLib(Manager, dirAcp, 'Courier new', 9);
   if Manager.Modified then
   begin
     UpdStatus;

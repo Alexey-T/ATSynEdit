@@ -35,6 +35,7 @@ type
     FManager: TecSyntaxManager;
     FFontName: string;
     FFontSize: integer;
+    FDirAcp: string;
     { public declarations }
   end;
 
@@ -42,14 +43,16 @@ var
   fmLexerLib: TfmLexerLib;
 
 function DoShowDialogLexerLib(ALexerManager: TecSyntaxManager;
-  const AFontName: string; AFontSize: integer): boolean;
+  const ADirAcp: string;
+  const AFontName: string;
+  AFontSize: integer): boolean;
 
 implementation
 
 {$R *.lfm}
 
 function DoShowDialogLexerLib(ALexerManager: TecSyntaxManager;
-  const AFontName: string; AFontSize: integer): boolean;
+  const ADirAcp: string; const AFontName: string; AFontSize: integer): boolean;
 var
   F: TfmLexerLib;
 begin
@@ -58,6 +61,7 @@ begin
     F.FManager:= ALexerManager;
     F.FFontName:= AFontName;
     F.FFontSize:= AFontSize;
+    F.FDirAcp:= ADirAcp;
     F.ShowModal;
     Result:= F.FManager.Modified;
   finally
@@ -83,7 +87,8 @@ end;
 procedure TfmLexerLib.FormShow(Sender: TObject);
 begin
   UpdateList;
-  List.ItemIndex:= 0;
+  if List.Items.Count>0 then
+    List.ItemIndex:= 0;
 end;
 
 procedure TfmLexerLib.ListClickCheck(Sender: TObject);
@@ -143,7 +148,7 @@ var
 begin
   OpenDlg.Filename:= '';
   if not OpenDlg.Execute then exit;
-  if DoInstallLexerFromZip(OpenDlg.FileName, FManager, msg) then
+  if DoInstallLexerFromZip(OpenDlg.FileName, FManager, FDirAcp, msg) then
   begin
     UpdateList;
     Application.MessageBox(

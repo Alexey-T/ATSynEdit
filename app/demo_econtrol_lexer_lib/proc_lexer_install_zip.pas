@@ -9,7 +9,9 @@ uses
   ecSyntAnal;
 
 function DoInstallLexerFromZip(const fn_zip: string;
-  Manager: TecSyntaxManager; out s_installed: string): boolean;
+  Manager: TecSyntaxManager;
+  const dir_acp: string;
+  out s_installed: string): boolean;
 
 var
   cInstallLexerZipTitle: string = 'Install zip';
@@ -26,12 +28,14 @@ begin
   Result:= Application.MessageBox(PChar(msg), PChar(cInstallLexerZipTitle), flags);
 end;
 
-function DoInstallLexerFromZip(const fn_zip: string; Manager: TecSyntaxManager;
+function DoInstallLexerFromZip(const fn_zip: string;
+  Manager: TecSyntaxManager;
+  const dir_acp: string;
   out s_installed: string): boolean;
 var
   unzip: TUnZipper;
   list: TStringlist;
-  dir, fn_inf, fn_lexer: string;
+  dir, fn_inf, fn_lexer, fn_acp: string;
   s_title, s_type, s_lexer: string;
   an, an_sub: TecSyntAnalyzer;
   i_lexer, i_sub: integer;
@@ -118,6 +122,11 @@ begin
         MsgBox('Cannot find lexer file: '+fn_lexer, mb_ok or mb_iconerror);
         exit
       end;
+
+      fn_acp:= ExtractFileDir(fn_inf)+DirectorySeparator+s_lexer+'.acp';
+      if FileExists(fn_acp) then
+        if dir_acp<>'' then
+          CopyFile(fn_acp, dir_acp+DirectorySeparator+s_lexer+'.acp');
 
       an:= Manager.FindAnalyzer(s_lexer);
       if an=nil then
