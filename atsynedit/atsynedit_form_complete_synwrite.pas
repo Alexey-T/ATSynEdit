@@ -27,6 +27,7 @@ type
     ListAcpType: TStringlist;
     ListAcpText: TStringlist;
     ListAcpDesc: TStringlist;
+    FWordChars: string;
     procedure DoLoadAcpFile(const fn, ALexer: string);
     procedure DoOnGetCompleteProp(Sender: TObject; out AText: string; out
       ACharsLeft, ACharsRight: integer);
@@ -130,13 +131,11 @@ begin
       if s='' then
         Continue;
 
-      {
       if s[1]='#' then
       begin
-        SParseString_AcpControlLine(s, opAcpChars, IsBracketSep);
+        SParseString_AcpControlLine(s, FWordChars, IsBracketSep);
         Continue;
       end;
-      }
 
       SParseString_AcpStd(s, IsBracketSep, SType, SText, SPar, SHint);
       if SText<>'' then
@@ -173,9 +172,9 @@ begin
   s_word:= '';
 
   n:= Ed.Carets[0].PosX;
-  if (n>=Length(s_line)) then exit;
+  if (n>Length(s_line)) then exit;
 
-  while (n>0) and (IsCharWord(s_line[n], '')) do
+  while (n>0) and (IsCharWord(s_line[n], FWordChars)) do
   begin
     s_word:= s_line[n]+s_word;
     Dec(n);
@@ -183,7 +182,7 @@ begin
   end;
 
   n:= Ed.Carets[0].PosX;
-  while (n<Length(s_line)) and (IsCharWord(s_line[n+1], '')) do
+  while (n<Length(s_line)) and (IsCharWord(s_line[n+1], FWordChars)) do
   begin
     Inc(n);
     Inc(ACharsRight);
