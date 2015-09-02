@@ -6,10 +6,11 @@ interface
 
 uses
   Classes, SysUtils, StrUtils, Graphics,
+  Dialogs,
   ATSynEdit;
 
 procedure DoEditorCompletionFromAcp(AEdit: TATSynEdit;
-  const AFilenameAcp: string; ACaseSens: boolean);
+  const AFilenameAcp: string; ACaseSens, AIsPascal: boolean);
 
 
 implementation
@@ -23,17 +24,15 @@ type
 
   TAcp = class
   private
-    LexerName: string;
     ListAcpType: TStringlist;
     ListAcpText: TStringlist;
     ListAcpDesc: TStringlist;
     FWordChars: string;
-    procedure DoLoadAcpFile(const fn, ALexer: string);
+    procedure DoLoadAcpFile(const fn: string; IsPascal: boolean);
     procedure DoOnGetCompleteProp(Sender: TObject; out AText: string; out
       ACharsLeft, ACharsRight: integer);
   public
     Ed: TATSynEdit;
-    FilenameAcp: string;
     CaseSens: boolean;
     constructor Create; virtual;
     destructor Destroy; override;
@@ -44,20 +43,20 @@ var
 
 //parse control string from .acp file (starts with #)
 procedure SParseString_AcpControlLine(const s: string;
-  var AcpChars: string;
+  var WordChars: string;
   var IsBracketSep: boolean);
 var
   n: Integer;
 begin
   if SBegin(s, '#chars') then
   begin
-    AcpChars:= '';
+    WordChars:= '';
     IsBracketSep:= true;
     n:= Pos(' ', s);
     if n>0 then
     begin
-      AcpChars:= Copy(s, n+1, MaxInt);
-      IsBracketSep:= Pos('(', AcpChars)=0;
+      WordChars:= Copy(s, n+1, MaxInt);
+      IsBracketSep:= Pos('(', WordChars)=0;
     end;
   end;
 end;
@@ -67,7 +66,7 @@ end;
 procedure SParseString_AcpStd(
   const S: string;
   IsBracketSep: boolean;
-  var SType, SId, SPar, SHint: string);
+  out SType, SId, SPar, SHint: string);
 const
   cMaxHintLen = 300;
 var
@@ -107,19 +106,19 @@ begin
   SReplaceAll(SPar, '[,', ',['); //for optional params
 end;
 
-procedure TAcp.DoLoadAcpFile(const fn, ALexer: string);
+
+procedure TAcp.DoLoadAcpFile(const fn: string; IsPascal: boolean);
 var
   List: TStringList;
   s, SType, SText, SPar, SHint: string;
+  IsBracketSep: boolean;
   i: Integer;
-  IsPas, IsBracketSep: boolean;
 begin
-  LexerName:= ALexer;
   ListAcpType.Clear;
   ListAcpText.Clear;
   ListAcpDesc.Clear;
 
-  IsPas:= Pos('Pascal', ALexer)>0;
+  FWordChars:= '';
   IsBracketSep:= true;
 
   List:= TStringList.Create;
@@ -140,11 +139,16 @@ begin
       SParseString_AcpStd(s, IsBracketSep, SType, SText, SPar, SHint);
       if SText<>'' then
       begin
-        if IsPas and (Pos('):', SPar)>0) then
+        if IsPascal then
         begin
-          SDeleteFrom(SPar, '):');
-          SPar:= SPar+')';
+          SDeleteFrom(SText, ':');
+          if Pos('):', SPar)>0 then
+          begin
+            SDeleteFrom(SPar, '):');
+            SPar:= SPar+')';
+          end;
         end;
+
         ListAcpType.Add(SType);
         ListAcpText.Add(SText);
         ListAcpDesc.Add(SPar+'|'+SHint);
@@ -188,9 +192,6 @@ begin
     Inc(ACharsRight);
   end;
 
-  if not FileExists(FilenameAcp) then exit;
-  DoLoadAcpFile(FilenameAcp, LexerName);
-
   for n:= 0 to ListAcpText.Count-1 do
   begin
     s_type:= ListAcpType[n];
@@ -227,10 +228,11 @@ begin
 end;
 
 procedure DoEditorCompletionFromAcp(AEdit: TATSynEdit;
-  const AFilenameAcp: string; ACaseSens: boolean);
+  const AFilenameAcp: string; ACaseSens, AIsPascal: boolean);
 begin
+  if not FileExists(AFilenameAcp) then exit;
+  Acp.DoLoadAcpFile(AFilenameAcp, AIsPascal);
   Acp.Ed:= AEdit;
-  Acp.FilenameAcp:= AFilenameAcp;
   Acp.CaseSens:= ACaseSens;
   DoEditorCompletionListbox(AEdit, AEdit, @Acp.DoOnGetCompleteProp);
 end;
