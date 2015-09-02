@@ -96,6 +96,11 @@ type
   TATDecodeRec = record SFrom, STo: UnicodeString; end;
 function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
 
+procedure SReplaceAll(var s: string; const SFrom, STo: string);
+procedure SReplaceAllPercentChars(var S: string);
+procedure SDeleteFrom(var s: string; const SFrom: string);
+
+
 implementation
 
 uses
@@ -763,6 +768,30 @@ begin
   end;
 end;
 
+procedure SReplaceAll(var s: string; const SFrom, STo: string);
+begin
+  S:= StringReplace(S, SFrom, STo, [rfReplaceAll]);
+end;
+
+procedure SReplaceAllPercentChars(var S: string);
+var
+  i: Integer;
+begin
+  for i:= $20 to $2F do
+    SReplaceAll(S, '%'+IntToHex(i, 2), Chr(i));
+
+  i:= $7C;
+  SReplaceAll(S, '%'+IntToHex(i, 2), Chr(i));
+end;
+
+procedure SDeleteFrom(var s: string; const SFrom: string);
+var
+  n: integer;
+begin
+  n:= Pos(SFrom, S);
+  if n>0 then
+    Delete(S, n, MaxInt);
+end;
 
 initialization
   _InitCharsHex;

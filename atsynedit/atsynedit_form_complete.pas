@@ -6,6 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics,
+  Dialogs,
   LclProc, LclType,
   ATSynEdit,
   ATSynEdit_Carets,
@@ -15,7 +16,8 @@ uses
   Math;
 
 type
-  TATCompletionPropEvent = procedure (Sender: TObject; out AText: string; out AChars: integer) of object;
+  TATCompletionPropEvent = procedure (Sender: TObject;
+    out AText: string; out ACharsLeft, ACharsRight: integer) of object;
 
 //AText is #13-separated strings, each string is '|'-separated items.
 //Usually item_0 is prefix to show,
@@ -48,7 +50,8 @@ type
     SList: TStringlist;
     FOnGetProp: TATCompletionPropEvent;
     FEdit: TATSynEdit;
-    FChars: integer;
+    FCharsLeft,
+    FCharsRight: integer;
     procedure DoReplaceTo(const Str: string);
     procedure DoResult;
     procedure DoUpdate;
@@ -114,8 +117,9 @@ begin
     Pos.X:= Caret.PosX;
     Pos.Y:= Caret.PosY;
 
-    Editor.Strings.TextDeleteLeft(Pos.X, Pos.Y, FChars, Shift, PosAfter);
-    Pos.X:= Max(0, Pos.X-FChars);
+    FCharsLeft:= Min(Pos.X, FCharsLeft);
+    Dec(Pos.X, FCharsLeft);
+    Editor.Strings.TextDeleteRight(Pos.X, Pos.Y, FCharsLeft+FCharsRight, Shift, PosAfter);
     Editor.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
 
     Caret.PosX:= Pos.X+Length(Str);
@@ -326,9 +330,9 @@ var
   P: TPoint;
 begin
   if Assigned(FOnGetProp) then
-    FOnGetProp(Editor, AText, FChars);
+    FOnGetProp(Editor, AText, FCharsLeft, FCharsRight);
 
-  if (AText='') or (FChars<=0) then
+  if (AText='') then
     begin Close; exit end;
 
   SList.Text:= AText;
@@ -346,7 +350,7 @@ begin
   List.BorderSpacing.Around:= cCompleteBorderSize;
   List.Invalidate;
 
-  P.X:= Editor.Carets[0].CoordX-Editor.TextCharSize.X*FChars;
+  P.X:= Editor.Carets[0].CoordX-Editor.TextCharSize.X*FCharsLeft;
   P.Y:= Editor.Carets[0].CoordY+Editor.TextCharSize.Y;
   P:= Editor.ClientToScreen(P);
 
