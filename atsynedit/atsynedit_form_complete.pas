@@ -82,7 +82,7 @@ var
   cCompleteFontName: string = 'default';
   cCompleteFontSize: integer = 10;
   cCompleteBorderSize: integer = 4;
-  cCompleteFormSizeX: integer = 450;
+  cCompleteFormSizeX: integer = 500;
   cCompleteFormSizeY: integer = 200;
   cCompleteTextIndent0: integer = 4;
   cCompleteTextIndent: integer = 8;

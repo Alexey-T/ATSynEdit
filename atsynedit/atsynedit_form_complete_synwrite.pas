@@ -9,7 +9,7 @@ uses
   Dialogs,
   ATSynEdit;
 
-procedure DoEditorCompletionFromAcp(AEdit: TATSynEdit;
+procedure DoEditorCompletionAcp(AEdit: TATSynEdit;
   const AFilenameAcp: string; ACaseSens, AIsPascal: boolean);
 
 
@@ -160,15 +160,12 @@ begin
 end;
 
 
-procedure TAcp.DoOnGetCompleteProp(Sender: TObject;
-  out AText: string; out ACharsLeft, ACharsRight: integer);
+procedure EditorGetCurWord(Ed: TATSynEdit; const cWordChars: atString;
+  out s_word: atString; out ACharsLeft, ACharsRight: integer);
 var
-  s_line, s_word: atString;
+  s_line: atString;
   n: integer;
-  s_type, s_text, s_desc: string;
-  ok: boolean;
 begin
-  AText:= '';
   ACharsLeft:= 0;
   ACharsRight:= 0;
 
@@ -178,7 +175,7 @@ begin
   n:= Ed.Carets[0].PosX;
   if (n>Length(s_line)) then exit;
 
-  while (n>0) and (IsCharWord(s_line[n], FWordChars)) do
+  while (n>0) and (IsCharWord(s_line[n], cWordChars)) do
   begin
     s_word:= s_line[n]+s_word;
     Dec(n);
@@ -186,11 +183,26 @@ begin
   end;
 
   n:= Ed.Carets[0].PosX;
-  while (n<Length(s_line)) and (IsCharWord(s_line[n+1], FWordChars)) do
+  while (n<Length(s_line)) and (IsCharWord(s_line[n+1], cWordChars)) do
   begin
     Inc(n);
     Inc(ACharsRight);
   end;
+end;
+
+
+procedure TAcp.DoOnGetCompleteProp(Sender: TObject;
+  out AText: string; out ACharsLeft, ACharsRight: integer);
+var
+  s_word: atString;
+  s_type, s_text, s_desc: string;
+  n: integer;
+  ok: boolean;
+begin
+  AText:= '';
+  ACharsLeft:= 0;
+  ACharsRight:= 0;
+  EditorGetCurWord(Ed, FWordChars, s_word, ACharsLeft, ACharsRight);
 
   for n:= 0 to ListAcpText.Count-1 do
   begin
@@ -227,7 +239,7 @@ begin
   inherited;
 end;
 
-procedure DoEditorCompletionFromAcp(AEdit: TATSynEdit;
+procedure DoEditorCompletionAcp(AEdit: TATSynEdit;
   const AFilenameAcp: string; ACaseSens, AIsPascal: boolean);
 begin
   if not FileExists(AFilenameAcp) then exit;
@@ -240,7 +252,6 @@ end;
 initialization
   Acp:= TAcp.Create;
 
-  cCompleteFormSizeX:= 550;
   cCompleteFontStyles[0]:= [];
   cCompleteColorFont[0]:= clPurple;
   cCompleteColorFont[1]:= clBlack;
