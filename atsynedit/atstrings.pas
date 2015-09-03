@@ -199,7 +199,8 @@ type
     procedure TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings;
       AOverwrite: boolean);
     procedure TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
-    procedure TextDeleteRight(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
+    procedure TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
+      APosAfter: TPoint; ACanDelEol: boolean=true);
     procedure TextDeleteRange(AFromX, AFromY, AToX, AToY: integer; out AShift, APosAfter: TPoint);
     procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);

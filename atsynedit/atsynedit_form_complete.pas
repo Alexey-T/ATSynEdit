@@ -17,7 +17,7 @@ uses
 
 type
   TATCompletionPropEvent = procedure (Sender: TObject;
-    out AText: string; out ACharsLeft, ACharsRight: integer) of object;
+    out AText, ASuffix: string; out ACharsLeft, ACharsRight: integer) of object;
 
 //AText is #13-separated strings, each string is '|'-separated items.
 //Usually item_0 is prefix to show,
@@ -29,6 +29,9 @@ type
 procedure DoEditorCompletionListbox(
   AOwner: TComponent; AEd: TATSynEdit;
   AOnGetProp: TATCompletionPropEvent);
+
+procedure EditorGetCurrentWord(Ed: TATSynEdit; const AWordChars: atString;
+  out AWord: atString; out ACharsLeft, ACharsRight: integer);
 
 type
   { TFormATSynEditComplete }
@@ -52,6 +55,7 @@ type
     FEdit: TATSynEdit;
     FCharsLeft,
     FCharsRight: integer;
+    FSuffix: string;
     procedure DoReplaceTo(const Str: string);
     procedure DoResult;
     procedure DoUpdate;
@@ -121,7 +125,7 @@ begin
 
     FCharsLeft:= Min(Pos.X, FCharsLeft);
     Dec(Pos.X, FCharsLeft);
-    Editor.Strings.TextDeleteRight(Pos.X, Pos.Y, FCharsLeft+FCharsRight, Shift, PosAfter);
+    Editor.Strings.TextDeleteRight(Pos.X, Pos.Y, FCharsLeft+FCharsRight, Shift, PosAfter, false);
     Editor.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
 
     Caret.PosX:= Pos.X+Length(Str);
@@ -296,6 +300,10 @@ begin
     SText:= GetItemText(SList[List.ItemIndex], cCompleteIndexOfText);
     SDesc:= GetItemText(SList[List.ItemIndex], cCompleteIndexOfDesc);
     Result:= SText;
+
+    if FSuffix<>'' then
+      Result:= Result+FSuffix
+    else
     if cCompleteInsertAlsoBracket then
       if SBegin(SDesc, '(') then
         Result:= Result+'(';
@@ -341,7 +349,7 @@ var
   P: TPoint;
 begin
   if Assigned(FOnGetProp) then
-    FOnGetProp(Editor, AText, FCharsLeft, FCharsRight);
+    FOnGetProp(Editor, AText, FSuffix, FCharsLeft, FCharsRight);
 
   if (AText='') then
     begin Close; exit end;
@@ -368,6 +376,37 @@ begin
   SetBounds(P.X, P.Y, cCompleteFormSizeX, cCompleteFormSizeY);
   Show;
 end;
+
+
+procedure EditorGetCurrentWord(Ed: TATSynEdit; const AWordChars: atString;
+  out AWord: atString; out ACharsLeft, ACharsRight: integer);
+var
+  str: atString;
+  n: integer;
+begin
+  AWord:= '';
+  ACharsLeft:= 0;
+  ACharsRight:= 0;
+
+  str:= Ed.Strings.Lines[Ed.Carets[0].PosY];
+  n:= Ed.Carets[0].PosX;
+  if (n>Length(str)) then exit;
+
+  while (n>0) and (IsCharWord(str[n], AWordChars)) do
+  begin
+    AWord:= str[n]+AWord;
+    Dec(n);
+    Inc(ACharsLeft);
+  end;
+
+  n:= Ed.Carets[0].PosX;
+  while (n<Length(str)) and (IsCharWord(str[n+1], AWordChars)) do
+  begin
+    Inc(n);
+    Inc(ACharsRight);
+  end;
+end;
+
 
 end.
 

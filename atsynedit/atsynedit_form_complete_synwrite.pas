@@ -29,8 +29,9 @@ type
     ListAcpDesc: TStringlist;
     FWordChars: string;
     procedure DoLoadAcpFile(const fn: string; IsPascal: boolean);
-    procedure DoOnGetCompleteProp(Sender: TObject; out AText: string; out
-      ACharsLeft, ACharsRight: integer);
+    procedure DoOnGetCompleteProp(Sender: TObject;
+      out AText, ASuffix: string;
+      out ACharsLeft, ACharsRight: integer);
   public
     Ed: TATSynEdit;
     CaseSens: boolean;
@@ -160,39 +161,8 @@ begin
 end;
 
 
-procedure EditorGetCurWord(Ed: TATSynEdit; const cWordChars: atString;
-  out s_word: atString; out ACharsLeft, ACharsRight: integer);
-var
-  s_line: atString;
-  n: integer;
-begin
-  ACharsLeft:= 0;
-  ACharsRight:= 0;
-
-  s_line:= Ed.Strings.Lines[Ed.Carets[0].PosY];
-  s_word:= '';
-
-  n:= Ed.Carets[0].PosX;
-  if (n>Length(s_line)) then exit;
-
-  while (n>0) and (IsCharWord(s_line[n], cWordChars)) do
-  begin
-    s_word:= s_line[n]+s_word;
-    Dec(n);
-    Inc(ACharsLeft);
-  end;
-
-  n:= Ed.Carets[0].PosX;
-  while (n<Length(s_line)) and (IsCharWord(s_line[n+1], cWordChars)) do
-  begin
-    Inc(n);
-    Inc(ACharsRight);
-  end;
-end;
-
-
-procedure TAcp.DoOnGetCompleteProp(Sender: TObject;
-  out AText: string; out ACharsLeft, ACharsRight: integer);
+procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
+  out ACharsLeft, ACharsRight: integer);
 var
   s_word: atString;
   s_type, s_text, s_desc: string;
@@ -200,9 +170,10 @@ var
   ok: boolean;
 begin
   AText:= '';
+  ASuffix:= '';
   ACharsLeft:= 0;
   ACharsRight:= 0;
-  EditorGetCurWord(Ed, FWordChars, s_word, ACharsLeft, ACharsRight);
+  EditorGetCurrentWord(Ed, FWordChars, s_word, ACharsLeft, ACharsRight);
 
   for n:= 0 to ListAcpText.Count-1 do
   begin

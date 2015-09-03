@@ -102,7 +102,7 @@ begin
 end;
 
 procedure TATStrings.TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
-  APosAfter: TPoint);
+  APosAfter: TPoint; ACanDelEol: boolean = true);
 var
   Str: atString;
   DelEol: boolean;
@@ -126,7 +126,7 @@ begin
     AShift.X:= -ALen;
   end
   else
-    DelEol:= true;
+    DelEol:= ACanDelEol;
 
   if DelEol then
     if Str='' then //handle for simpler line-states

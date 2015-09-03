@@ -11,6 +11,7 @@ uses
   RegExpr,
   Dialogs;
 
+//it needs file css_list.ini from SynWrite distro
 procedure DoEditorCompletionCss(AEdit: TATSynEdit;
   const AFilenameCssList: string);
 
@@ -27,8 +28,8 @@ type
   TAcp = class
   private
     List: TStringlist;
-    procedure DoOnGetCompleteProp(Sender: TObject; out AText: string; out
-      ACharsLeft, ACharsRight: integer);
+    procedure DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
+      out ACharsLeft, ACharsRight: integer);
   public
     Ed: TATSynEdit;
     constructor Create; virtual;
@@ -80,38 +81,8 @@ begin
 end;
 
 
-procedure EditorGetCurWord(Ed: TATSynEdit; const cWordChars: atString;
-  out s_word: atString; out ACharsLeft, ACharsRight: integer);
-var
-  s_line: atString;
-  n: integer;
-begin
-  ACharsLeft:= 0;
-  ACharsRight:= 0;
-
-  s_line:= Ed.Strings.Lines[Ed.Carets[0].PosY];
-  s_word:= '';
-
-  n:= Ed.Carets[0].PosX;
-  if (n>Length(s_line)) then exit;
-
-  while (n>0) and (IsCharWord(s_line[n], cWordChars)) do
-  begin
-    s_word:= s_line[n]+s_word;
-    Dec(n);
-    Inc(ACharsLeft);
-  end;
-
-  n:= Ed.Carets[0].PosX;
-  while (n<Length(s_line)) and (IsCharWord(s_line[n+1], cWordChars)) do
-  begin
-    Inc(n);
-    Inc(ACharsRight);
-  end;
-end;
-
-procedure TAcp.DoOnGetCompleteProp(Sender: TObject;
-  out AText: string; out ACharsLeft, ACharsRight: integer);
+procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
+  out ACharsLeft, ACharsRight: integer);
 const
   cWordChars = '-#!@.'; //don't include ':'
 var
@@ -121,6 +92,7 @@ var
   ok: boolean;
 begin
   AText:= '';
+  ASuffix:= '';
   ACharsLeft:= 0;
   ACharsRight:= 0;
 
@@ -137,13 +109,16 @@ begin
     until false;
   end
   else
-  //show list of all tags (matching cur word)
+  //show list of all tags
   begin
-    EditorGetCurWord(Ed, cWordChars, s_word, ACharsLeft, ACharsRight);
+    ASuffix:= ': ';
+    EditorGetCurrentWord(Ed, cWordChars, s_word, ACharsLeft, ACharsRight);
 
     for n:= 0 to List.Count-1 do
     begin
       s_item:= List.Names[n];
+
+      //filter by cur word (not case sens)
       if s_word<>'' then
       begin
         ok:= SBegin(UpperCase(s_item), UpperCase(s_word));
@@ -172,7 +147,7 @@ procedure DoEditorCompletionCss(AEdit: TATSynEdit;
 begin
   Acp.Ed:= AEdit;
 
-  //load file once
+  //load file only once
   if Acp.List.Count=0 then
   begin
     if not FileExists(AFilenameCssList) then exit;
