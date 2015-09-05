@@ -15,6 +15,8 @@ const
 type
   TATKeyArray = array[0..Pred(cMaxKeyCombo)] of TShortcut;
 
+function KeyArrayToString(const K: TATKeyArray): string;
+
 type
   { TATKeymapItem }
 
@@ -235,6 +237,21 @@ begin
     len:= GetKeysLen(FHistory);
   end;
   FHistory[len]:= sh;
+end;
+
+
+function KeyArrayToString(const K: TATKeyArray): string;
+var
+  i: integer;
+begin
+  result:= '';
+  for i:= Low(K) to High(K) do
+    if K[i]<>0 then
+    begin
+      if result<>'' then
+        result:= result+' * ';
+      result:= result+ShortcutToText(K[i]);
+    end;
 end;
 
 

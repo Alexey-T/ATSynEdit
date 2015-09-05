@@ -152,7 +152,7 @@ begin
 
         ListAcpType.Add(SType);
         ListAcpText.Add(SText);
-        ListAcpDesc.Add(SPar+'|'+SHint);
+        ListAcpDesc.Add(SPar+cCompleteHintChar+SHint);
       end;
     end;
   finally

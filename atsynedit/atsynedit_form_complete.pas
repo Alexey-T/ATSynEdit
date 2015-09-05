@@ -56,6 +56,9 @@ type
     FCharsLeft,
     FCharsRight: integer;
     FSuffix: string;
+    FHintWnd: THintWindow;
+    procedure DoHintHide;
+    procedure DoHintShow(const AHint: string);
     procedure DoReplaceTo(const Str: string);
     procedure DoResult;
     procedure DoUpdate;
@@ -80,6 +83,7 @@ var
   cCompleteIndexOfText: integer = 1;
   cCompleteIndexOfDesc: integer = 2;
   cCompleteSepChar: char = '|';
+  cCompleteHintChar: char = #9;
   cCompleteListSort: boolean = false;
   cCompleteKeyUpDownWrap: boolean = true;
   cCompleteInsertAlsoBracket: boolean = true;
@@ -88,6 +92,7 @@ var
   cCompleteBorderSize: integer = 4;
   cCompleteFormSizeX: integer = 500;
   cCompleteFormSizeY: integer = 200;
+  cCompleteHintSizeX: integer = 400;
   cCompleteTextIndent0: integer = 4;
   cCompleteTextIndent: integer = 8;
 
@@ -142,6 +147,7 @@ end;
 procedure TFormATSynEditComplete.FormCreate(Sender: TObject);
 begin
   SList:= TStringList.Create;
+  FHintWnd:= THintWindow.Create(Self);
 end;
 
 procedure TFormATSynEditComplete.FormDeactivate(Sender: TObject);
@@ -152,6 +158,7 @@ end;
 procedure TFormATSynEditComplete.FormClose(Sender: TObject;
   var CloseAction: TCloseAction);
 begin
+  DoHintHide;
   if Assigned(FEdit) then
     FEdit.OptCaretStopUnfocused:= true;
   CloseAction:= caHide;
@@ -313,10 +320,14 @@ end;
 procedure TFormATSynEditComplete.ListDrawItem(Sender: TObject; C: TCanvas;
   AIndex: integer; const ARect: TRect);
 var
-  Str, SItem: string;
+  Str, SItem, SHint: string;
   NSize, i: integer;
 begin
   Str:= SList[AIndex];
+  SHint:= SGetItemAtEnd(Str, cCompleteHintChar);
+
+  if AIndex=List.ItemIndex then
+    DoHintShow(SHint);
 
   if AIndex=List.ItemIndex then
     C.Brush.Color:= cCompleteColorSelBg
@@ -405,6 +416,26 @@ begin
     Inc(n);
     Inc(ACharsRight);
   end;
+end;
+
+procedure TFormATSynEditComplete.DoHintShow(const AHint: string);
+var
+  P: TPoint;
+  R: TRect;
+begin
+  R:= FHintWnd.CalcHintRect(cCompleteHintSizeX, AHint, nil);
+
+  P:= ClientToScreen(Point(Width, 0));
+  OffsetRect(R, P.X, P.Y);
+
+  FHintWnd.ActivateHint(R, AHint);
+  FHintWnd.Invalidate; //for Win
+end;
+
+procedure TFormATSynEditComplete.DoHintHide;
+begin
+  if Assigned(FHintWnd) then
+    FHintWnd.Hide;
 end;
 
 

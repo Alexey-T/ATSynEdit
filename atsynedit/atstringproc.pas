@@ -85,6 +85,7 @@ procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer
 function SIndentUnindent(const Str: atString; ARight: boolean;
   AIndentSize, ATabSize: integer): atString;
 function SGetItem(var S: string; const sep: Char = ','): string;
+function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SWithBreaks(const S: atString): boolean;
 function SFindFuzzyPositions(SText, SFind: string): TATIntArray;
@@ -467,6 +468,18 @@ begin
   Delete(s, 1, i);
 end;
 
+function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
+var
+  i: integer;
+begin
+  Result:= '';
+  i:= Pos(sep, S);
+  if i>0 then
+  begin
+    Result:= Copy(S, i+1, MaxInt);
+    Delete(S, i, MaxInt);
+  end;
+end;
 
 procedure TrimStringList(L: TStringList);
 begin
