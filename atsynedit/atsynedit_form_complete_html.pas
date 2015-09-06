@@ -27,6 +27,7 @@ type
 //detect tag and its attribute at caret pos
 procedure EditorGetHtmlTag(Ed: TATSynedit; out STag, SAttr: string;
   out AMode: TCompleteHtmlMode);
+function EditorHasCssAtCaret(Ed: TATSynEdit): boolean;
 
 
 implementation
@@ -128,6 +129,15 @@ begin
   end
   else
     AMode:= acpModeTags;
+end;
+
+function EditorHasCssAtCaret(Ed: TATSynEdit): boolean;
+var
+  STag, SAttr: string;
+  Mode: TCompleteHtmlMode;
+begin
+  EditorGetHtmlTag(Ed, STag, SAttr, Mode);
+  Result:= (Mode=acpModeVals) and (LowerCase(SAttr)='style');
 end;
 
 
