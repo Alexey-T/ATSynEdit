@@ -74,14 +74,15 @@ const
   //regex to catch tag name at line start
   cRegexTagPart = '^\w+\b';
   cRegexTagOnly = '^\w*$';
-  cRegexTagClose = '^/(\w*)$';
+  cRegexTagClose = '^/\w*$';
   //character class for all chars inside quotes
   cRegexChars = '[\s\w,\.:;\-\+\*\?=\(\)\[\]\{\}/\\\|~`\^\$&%\#@!]';
   //regex to catch attrib name, followed by "=" and not-closed quote, only at line end
   cRegexAttr = '\b([\w\-]+)\s*\=\s*([''"]' + cRegexChars + '*)?$';
   //regex group
-  cGroupTag = 0;
-  cGroupTagClose = 1;
+  cGroupTagPart = 0;
+  cGroupTagOnly = 0;
+  cGroupTagClose = 0;
   cGroupAttr = 1;
 var
   Caret: TATCaretItem;
@@ -108,11 +109,11 @@ begin
   if STag<>'' then
     begin AMode:= modeTagsClose; exit end;
 
-  STag:= SFindRegex(S, cRegexTagOnly, cGroupTag);
+  STag:= SFindRegex(S, cRegexTagOnly, cGroupTagOnly);
   if STag<>'' then
     begin AMode:= modeTags; exit end;
 
-  STag:= SFindRegex(S, cRegexTagPart, cGroupTag);
+  STag:= SFindRegex(S, cRegexTagPart, cGroupTagPart);
   if STag<>'' then
   begin
     SAttr:= SFindRegex(S, cRegexAttr, cGroupAttr);
@@ -120,7 +121,9 @@ begin
       AMode:= modeVals
     else
       AMode:= modeAttrs;
-  end;
+  end
+  else
+    AMode:= modeTags;
 end;
 
 
