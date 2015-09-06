@@ -26,8 +26,7 @@ type
 //e.g. 'func|Func1|(param1, param2)'+#13+'var|Var1'+#13+'var|Var2'
 //AChars: how many chars to replace before caret.
 
-procedure DoEditorCompletionListbox(
-  AOwner: TComponent; AEd: TATSynEdit;
+procedure DoEditorCompletionListbox(AEd: TATSynEdit;
   AOnGetProp: TATCompletionPropEvent);
 
 procedure EditorGetCurrentWord(Ed: TATSynEdit; const AWordChars: atString;
@@ -103,14 +102,14 @@ implementation
 var
   FormComplete: TFormATSynEditComplete = nil;
 
-procedure DoEditorCompletionListbox(AOwner: TComponent; AEd: TATSynEdit;
+procedure DoEditorCompletionListbox(AEd: TATSynEdit;
   AOnGetProp: TATCompletionPropEvent);
 begin
   if AEd.ModeReadOnly then exit;
   if AEd.Carets.Count<>1 then exit;
 
   if FormComplete=nil then
-    FormComplete:= TFormATSynEditComplete.Create(AOwner);
+    FormComplete:= TFormATSynEditComplete.Create(nil);
 
   FormComplete.Editor:= AEd;
   FormComplete.OnGetProp:= AOnGetProp;
@@ -430,6 +429,7 @@ begin
 
   FHintWnd.ActivateHint(R, AHint);
   FHintWnd.Invalidate; //for Win
+  Editor.Invalidate; //for Win
 end;
 
 procedure TFormATSynEditComplete.DoHintHide;
@@ -438,6 +438,9 @@ begin
     FHintWnd.Hide;
 end;
 
+finalization
+  if Assigned(FormComplete) then
+    FormComplete.Free;
 
 end.
 

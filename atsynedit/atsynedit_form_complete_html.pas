@@ -246,7 +246,7 @@ begin
     Acp.List.LoadFromFile(AFilenameHtmlList);
   end;
 
-  DoEditorCompletionListbox(AEdit, AEdit, @Acp.DoOnGetCompleteProp);
+  DoEditorCompletionListbox(AEdit, @Acp.DoOnGetCompleteProp);
 end;
 
 initialization

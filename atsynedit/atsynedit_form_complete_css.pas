@@ -154,7 +154,7 @@ begin
     Acp.List.LoadFromFile(AFilenameCssList);
   end;
 
-  DoEditorCompletionListbox(AEdit, AEdit, @Acp.DoOnGetCompleteProp);
+  DoEditorCompletionListbox(AEdit, @Acp.DoOnGetCompleteProp);
 end;
 
 initialization
