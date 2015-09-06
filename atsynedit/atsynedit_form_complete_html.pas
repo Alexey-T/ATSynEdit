@@ -15,6 +15,19 @@ uses
 procedure DoEditorCompletionHtml(AEdit: TATSynEdit;
   const AFilenameHtmlList: string);
 
+type
+  TCompleteHtmlMode = (
+    acpModeNone,
+    acpModeTags,
+    acpModeTagsClose,
+    acpModeAttrs,
+    acpModeVals
+    );
+
+//detect tag and its attribute at caret pos
+procedure EditorGetHtmlTag(Ed: TATSynedit; out STag, SAttr: string;
+  out AMode: TCompleteHtmlMode);
+
 
 implementation
 
@@ -39,15 +52,6 @@ type
 var
   Acp: TAcp = nil;
 
-type
-  TAcpMode = (
-    modeNone,
-    modeTags,
-    modeTagsClose,
-    modeAttrs,
-    modeVals
-    );
-
 function SFindRegex(const SText, SRegex: string; NGroup: integer): string;
 var
   R: TRegExpr;
@@ -69,7 +73,7 @@ begin
   end;
 end;
 
-procedure EditorGetHtmlTag(Ed: TATSynedit; out STag, SAttr: string; out AMode: TAcpMode);
+procedure EditorGetHtmlTag(Ed: TATSynedit; out STag, SAttr: string; out AMode: TCompleteHtmlMode);
 const
   //regex to catch tag name at line start
   cRegexTagPart = '^\w+\b';
@@ -91,7 +95,7 @@ var
 begin
   STag:= '';
   SAttr:= '';
-  AMode:= modeNone;
+  AMode:= acpModeNone;
 
   //str before caret
   Caret:= Ed.Carets[0];
@@ -107,23 +111,23 @@ begin
 
   STag:= SFindRegex(S, cRegexTagClose, cGroupTagClose);
   if STag<>'' then
-    begin AMode:= modeTagsClose; exit end;
+    begin AMode:= acpModeTagsClose; exit end;
 
   STag:= SFindRegex(S, cRegexTagOnly, cGroupTagOnly);
   if STag<>'' then
-    begin AMode:= modeTags; exit end;
+    begin AMode:= acpModeTags; exit end;
 
   STag:= SFindRegex(S, cRegexTagPart, cGroupTagPart);
   if STag<>'' then
   begin
     SAttr:= SFindRegex(S, cRegexAttr, cGroupAttr);
     if SAttr<>'' then
-      AMode:= modeVals
+      AMode:= acpModeVals
     else
-      AMode:= modeAttrs;
+      AMode:= acpModeAttrs;
   end
   else
-    AMode:= modeTags;
+    AMode:= acpModeTags;
 end;
 
 
@@ -132,7 +136,7 @@ procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
 const
   cWordChars = '-';
 var
-  mode: TAcpMode;
+  mode: TCompleteHtmlMode;
   s_word: atString;
   s_tag, s_attr, s_item, s_subitem, s_value: string;
   i: integer;
@@ -147,10 +151,10 @@ begin
   EditorGetCurrentWord(Ed, cWordChars, s_word, ACharsLeft, ACharsRight);
 
   case mode of
-    modeTags,
-    modeTagsClose:
+    acpModeTags,
+    acpModeTagsClose:
       begin
-        if mode=modeTagsClose then
+        if mode=acpModeTagsClose then
           ASuffix:= '>'
         else
           ASuffix:= ' ';
@@ -169,7 +173,7 @@ begin
         end;
       end;
 
-    modeAttrs:
+    acpModeAttrs:
       begin
         ASuffix:='=';
         s_item:= List.Values[s_tag];
@@ -189,7 +193,7 @@ begin
         until false;
       end;
 
-    modeVals:
+    acpModeVals:
       begin
         ASuffix:=' ';
         s_item:= List.Values[s_tag];
