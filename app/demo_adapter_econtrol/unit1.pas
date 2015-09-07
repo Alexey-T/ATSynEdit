@@ -267,7 +267,6 @@ begin
     else
     begin
       ed.Strings.LinesBm[ALine]:= 1;
-      ed.Strings.LinesBmColor[ALine]:= clMoneyGreen;
     end;
     ed.Update;
   end;

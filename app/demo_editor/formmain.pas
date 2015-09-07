@@ -203,11 +203,9 @@ var
 implementation
 
 uses
-  Math,
-  Types,
-  LCLType,
-  LCLProc,
-  atsynedit_commands{%H-};
+  Types, Math,
+  LCLType, LCLProc,
+  atsynedit_commands;
 
 {$R *.lfm}
 
@@ -219,7 +217,6 @@ const
   sEncUtf16BE = 'UTF-16 BE';
 
 const
-  cColorBmLine = clMoneyGreen;
   cColorBmIco = clMedGray;
 
 { TfmMain }
@@ -440,18 +437,9 @@ begin
     if ed.Strings.LinesBm[ALine]<>0 then
       ed.Strings.LinesBm[ALine]:= 0
     else
-    begin
       ed.Strings.LinesBm[ALine]:= 1;
-    end;
     ed.Update;
   end;
-
-  {//in control
-  if ABand=ed.GutterBandNum then
-  begin
-    ed.DoSelect_Line(Point(0, ALine), true);
-  end;
-  }
 end;
 
 procedure TfmMain.EditClickMicromap(Sender: TObject; AX, AY: integer);
