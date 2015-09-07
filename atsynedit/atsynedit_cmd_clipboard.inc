@@ -8,7 +8,7 @@ begin
   if ModeReadOnly then Exit;
 
   //column block
-  if Clipboard.HasFormat(cClipFormatId) then
+  if Clipboard.HasFormat(cATClipboardFormatId) then
   begin
     if ModeOneLine then Exit;
     Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret);
@@ -67,7 +67,7 @@ begin
   if not IsSelRectEmpty then
   begin
     Clipboard.AsText:= GetTextForClipboard;
-    Clipboard.AddFormat(cClipFormatId, cClipSignatureColumn, SizeOf(cClipSignatureColumn));
+    Clipboard.AddFormat(cATClipboardFormatId, cATClipboardSignatureColBlock, SizeOf(cATClipboardSignatureColBlock));
   end
   else
   begin

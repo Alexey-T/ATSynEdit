@@ -50,7 +50,7 @@ end;
 
 procedure InitClipboardFormat;
 begin
-  cClipFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
+  cATClipboardFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
 end;
 
 procedure InitResourcesNicescroll;

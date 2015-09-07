@@ -290,8 +290,8 @@ const
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
-  cClipFormatId: integer = 0; //must be inited
-  cClipSignatureColumn: integer = $1000;
+  cATClipboardFormatId: integer = 0; //must be inited
+  cATClipboardSignatureColBlock: integer = $1000;
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
@@ -300,10 +300,10 @@ type
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
+  TATSynEditCalcBookmarkColorEvent = procedure(Sender: TObject; ABookmarkKind: integer; out AColor: TColor) of object;
   TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
     ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor) of object;
-  TATSynEditCalcBookmarkColorEvent = procedure(Sender: TObject; ABookmarkIndex: integer; out AColor: TColor) of object;
 
 
 type
