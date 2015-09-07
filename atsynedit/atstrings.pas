@@ -67,12 +67,11 @@ type
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
     ItemSeparator: TATLineSeparator;
+    ItemBm: byte;
     ItemHidden: array[0..cMaxStringsClients-1] of smallint;
       //0: line visible,
       //-1: line hidden,
       //>0: line hidden from this char-pos
-    ItemBm: byte;
-    ItemBmColor: TColor;
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
     function IsFake: boolean;
   end;
@@ -118,7 +117,6 @@ type
     function GetCaretsArray: TATPointArray;
     function GetLine(N: integer): atString;
     function GetLineBm(Index: integer): integer;
-    function GetLineBmColor(Index: integer): integer;
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(NLine, NClient: integer): integer;
     function GetLineSep(Index: integer): TATLineSeparator;
@@ -134,7 +132,6 @@ type
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
     procedure SetLineBm(Index: integer; AValue: integer);
-    procedure SetLineBmColor(Index: integer; AValue: integer);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
     procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: integer);
     procedure SetLineSep(Index: integer; AValue: TATLineSeparator);
@@ -166,7 +163,6 @@ type
     property LinesHidden[IndexLine, IndexClient: integer]: integer read GetLineHidden write SetLineHidden;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
-    property LinesBmColor[Index: integer]: integer read GetLineBmColor write SetLineBmColor;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
@@ -258,7 +254,6 @@ begin
   for i:= 0 to High(ItemHidden) do
     ItemHidden[i]:= 0;
   ItemBm:= 0;
-  ItemBmColor:= 0;
 end;
 
 function TATStringItem.IsFake: boolean;
@@ -278,12 +273,6 @@ function TATStrings.GetLineBm(Index: integer): integer;
 begin
   Assert(IsIndexValid(Index));
   Result:= TATStringItem(FList[Index]).ItemBm;
-end;
-
-function TATStrings.GetLineBmColor(Index: integer): integer;
-begin
-  Assert(IsIndexValid(Index));
-  Result:= TATStringItem(FList[Index]).ItemBmColor;
 end;
 
 function TATStrings.GetLineEnd(N: integer): TATLineEnds;
@@ -374,12 +363,6 @@ procedure TATStrings.SetLineBm(Index: integer; AValue: integer);
 begin
   Assert(IsIndexValid(Index));
   TATStringItem(FList[Index]).ItemBm:= AValue;
-end;
-
-procedure TATStrings.SetLineBmColor(Index: integer; AValue: integer);
-begin
-  Assert(IsIndexValid(Index));
-  TATStringItem(FList[Index]).ItemBmColor:= AValue;
 end;
 
 procedure TATStrings.SetLineSep(Index: integer; AValue: TATLineSeparator);

@@ -323,7 +323,6 @@ begin
     if ed.Strings.LinesBm[i]=0 then
     begin
       ed.Strings.LinesBm[i]:= 1;
-      ed.Strings.LinesBmColor[i]:= cColorBmLine;
     end
     else
       ed.Strings.LinesBm[i]:= 0;
@@ -443,7 +442,6 @@ begin
     else
     begin
       ed.Strings.LinesBm[ALine]:= 1;
-      ed.Strings.LinesBmColor[ALine]:= cColorBmLine;
     end;
     ed.Update;
   end;

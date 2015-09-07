@@ -92,6 +92,7 @@ type
     FMarginCaret,
     FMarginUser,
     FIndentVertLines,
+    FBookmarkBG,
     FRulerFont,
     FRulerBG,
     FCollapseLine,
@@ -132,6 +133,7 @@ type
     property MarginCaret: TColor read FMarginCaret write FMarginCaret;
     property MarginUser: TColor read FMarginUser write FMarginUser;
     property IndentVertLines: TColor read FIndentVertLines write FIndentVertLines;
+    property BookmarkBG: TColor read FBookmarkBG write FBookmarkBG;
     property RulerFont: TColor read FRulerFont write FRulerFont;
     property RulerBG: TColor read FRulerBG write FRulerBG;
     property CollapseLine: TColor read FCollapseLine write FCollapseLine;
@@ -301,6 +303,7 @@ type
   TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
     ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor) of object;
+  TATSynEditCalcBookmarkColorEvent = procedure(Sender: TObject; ABookmarkIndex: integer; out AColor: TColor) of object;
 
 
 type
@@ -383,6 +386,7 @@ type
     FOnCommand: TATSynEditCommandEvent;
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FOnCalcStaple: TATSynEditCalcStapleEvent;
+    FOnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent;
     FWrapInfo: TATSynWrapInfo;
     //FWrapProgress: integer;
     FWrapColumn: integer;
@@ -891,6 +895,7 @@ type
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
     property OnCalcHilite: TATSynEditCalcHiliteEvent read FOnCalcHilite write FOnCalcHilite;
     property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
+    property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText;

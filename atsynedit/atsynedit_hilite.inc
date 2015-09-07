@@ -143,7 +143,11 @@ begin
 
   BmKind:= Strings.LinesBm[ALine];
   if BmKind<>0 then
-    AColor:= Strings.LinesBmColor[ALine];
+  begin
+    AColor:= Colors.BookmarkBG;
+    if Assigned(FOnCalcBookmarkColor) then
+      FOnCalcBookmarkColor(Self, BmKind, AColor);
+  end;
 
   if FOptShowCurLine then
   begin
