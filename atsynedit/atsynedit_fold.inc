@@ -250,6 +250,7 @@ begin
     FMenuGutterFoldStd:= TPopupMenu.Create(Self);
 
   Menu:= FMenuGutterFoldStd;
+  Menu.Images:= FFoldImageList;
   Menu.Items.Clear;
 
   //items "fold all", "unfold all"
@@ -289,15 +290,29 @@ begin
     mi.Caption:=
       cHintScrollPrefix+' '+Inttostr(Rng.Y+1)+': '+
       UTF8Encode(Copy(Strings.Lines[Rng.Y], 1, cFoldedLenOfEmptyHint));
+
     if Rng.Folded then
-      mi.Bitmap:= cBitmapFoldPlus
+      mi.ImageIndex:= 0
     else
-      mi.Bitmap:= cBitmapFoldMinus;
+      mi.ImageIndex:= 1;
 
     Menu.Items.Add(mi);
   end;
   Menu.Popup;
 end;
+
+procedure TATSynEdit.InitResourcesFoldbar;
+begin
+  if FFoldImageList=nil then
+  begin
+    FFoldImageList:= TImageList.Create(Self);
+    FFoldImageList.Width:= 12;
+    FFoldImageList.Height:= 12;
+    FFoldImageList.AddResourceName(HInstance, 'FOLDBAR_P');
+    FFoldImageList.AddResourceName(HInstance, 'FOLDBAR_M');
+  end;
+end;
+
 
 
 procedure TATSynEdit.MenuFoldStdClick(Sender: TObject);

@@ -9,11 +9,6 @@ const
   crNiceScrollLeft  = TCursor(-33);
   crNiceScrollRight = TCursor(-34);
 
-//fold gutter fold
-var
-  cBitmapFoldPlus: TBitmap = nil;
-  cBitmapFoldMinus: TBitmap = nil;
-
 const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
@@ -64,23 +59,6 @@ begin
   Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'AB_MOVE_D');
   Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'AB_MOVE_L');
   Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'AB_MOVE_R');
-end;
-
-procedure InitResourcesFoldbar;
-begin
-  if cBitmapFoldPlus=nil then
-  begin
-    cBitmapFoldPlus:= TBitmap.Create;
-    cBitmapFoldPlus.LoadFromResourceName(HInstance, 'FOLDBAR_P');
-    cBitmapFoldPlus.Transparent:= true;
-  end;
-
-  if cBitmapFoldMinus=nil then
-  begin
-    cBitmapFoldMinus:= TBitmap.Create;
-    cBitmapFoldMinus.LoadFromResourceName(HInstance, 'FOLDBAR_M');
-    cBitmapFoldMinus.Transparent:= true;
-  end;
 end;
 
 procedure FreeResources;

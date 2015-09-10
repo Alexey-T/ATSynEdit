@@ -331,6 +331,7 @@ type
     FStringsExternal: TATStrings;
     FAdapterHilite: TATAdapterHilite;
     FFold: TATSynRanges;
+    FFoldImageList: TImageList;
     FFoldStyle: TATFoldStyle;
     FCursorText,
     FCursorBm: TCursor;
@@ -524,6 +525,7 @@ type
     procedure DoMinimapClick(APosY: integer);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;
+    procedure InitResourcesFoldbar;
     function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
     procedure MenuFoldStdClick(Sender: TObject);
     procedure PaintEx(ALine: integer);
