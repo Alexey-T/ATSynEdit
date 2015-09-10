@@ -236,15 +236,34 @@ end;
 
 procedure TATSynEdit.DoMenuGutterFold;
 var
+  Menu: TPopupMenu;
   Pnt: TPoint;
   AtEnd: boolean;
   NLine: integer;
   IntList: TATIntArray;
   Rng: TATSynRange;
-  i: integer;
-  Menu: TPopupMenu;
   mi: TMenuItem;
+  i: integer;
 begin
+  InitResourcesFoldbar;
+  if FMenuGutterFoldStd=nil then
+    FMenuGutterFoldStd:= TPopupMenu.Create(Self);
+
+  Menu:= FMenuGutterFoldStd;
+  Menu.Items.Clear;
+
+  //items "fold all", "unfold all"
+  mi:= TMenuItem.Create(Self);
+  mi.Caption:= cStrMenuItemFoldAll;
+  mi.OnClick:= @MenuFoldFoldAllClick;
+  Menu.Items.Add(mi);
+
+  mi:= TMenuItem.Create(Self);
+  mi.Caption:= cStrMenuItemUnfoldAll;
+  mi.OnClick:= @MenuFoldUnfoldAllClick;
+  Menu.Items.Add(mi);
+
+  //calc ranges for curr line
   Pnt:= ScreenToClient(Mouse.CursorPos);
   Pnt:= ClientPosToCaretPos(Pnt, AtEnd);
   NLine:= Pnt.Y;
@@ -254,12 +273,12 @@ begin
     false{OnlyFolded}, false{TopLevel}, cRngHasAllLines);
   if Length(IntList)=0 then Exit;
 
-  InitResourcesFoldbar;
-  if FMenuGutterFoldStd=nil then
-    FMenuGutterFoldStd:= TPopupMenu.Create(Self);
+  //separator
+  mi:= TMenuItem.Create(Self);
+  mi.Caption:= '-';
+  Menu.Items.Add(mi);
 
-  Menu:= FMenuGutterFoldStd;
-  Menu.Items.Clear;
+  //items for ranges for current line
   for i:= 0 to High(IntList) do
   begin
     Rng:= Fold[IntList[i]];
@@ -291,5 +310,15 @@ begin
   else
     DoRangeFold(Rng);
   Update;
+end;
+
+procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);
+begin
+  DoCommand(cCommand_FoldAll);
+end;
+
+procedure TATSynEdit.MenuFoldUnfoldAllClick(Sender: TObject);
+begin
+  DoCommand(cCommand_UnfoldAll);
 end;
 

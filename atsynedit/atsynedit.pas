@@ -287,6 +287,8 @@ const
   cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
   cHintScrollPrefix: string = 'Line';
   cHintScrollDx = 5;
+  cStrMenuItemFoldAll: string = 'Fold all';
+  cStrMenuItemUnfoldAll: string = 'Unfold all';
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -310,6 +312,8 @@ type
   { TATSynEdit }
 
   TATSynEdit = class(TCustomControl)
+    procedure MenuFoldFoldAllClick(Sender: TObject);
+    procedure MenuFoldUnfoldAllClick(Sender: TObject);
   private
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
