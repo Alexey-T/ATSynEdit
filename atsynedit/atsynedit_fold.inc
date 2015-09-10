@@ -237,13 +237,7 @@ end;
 procedure TATSynEdit.DoMenuGutterFold;
 var
   Menu: TPopupMenu;
-  Pnt: TPoint;
-  AtEnd: boolean;
-  NLine: integer;
-  IntList: TATIntArray;
-  Rng: TATSynRange;
   mi: TMenuItem;
-  i: integer;
 begin
   InitResourcesFoldbar;
   if FMenuGutterFoldStd=nil then
@@ -264,6 +258,23 @@ begin
   mi.OnClick:= @MenuFoldUnfoldAllClick;
   Menu.Items.Add(mi);
 
+  //dynamic items
+  DoMenuGutterFold_AddDynamicItems(Menu);
+
+  Menu.Popup;
+end;
+
+
+procedure TATSynEdit.DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
+var
+  Pnt: TPoint;
+  AtEnd: boolean;
+  NLine: integer;
+  IntList: TATIntArray;
+  Rng: TATSynRange;
+  mi: TMenuItem;
+  i: integer;
+begin
   //calc ranges for curr line
   Pnt:= ScreenToClient(Mouse.CursorPos);
   Pnt:= ClientPosToCaretPos(Pnt, AtEnd);
@@ -298,7 +309,6 @@ begin
 
     Menu.Items.Add(mi);
   end;
-  Menu.Popup;
 end;
 
 procedure TATSynEdit.InitResourcesFoldbar;

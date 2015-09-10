@@ -520,6 +520,7 @@ type
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHintShow;
     procedure DoHintHide;
+    procedure DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
     procedure DoMenuGutterFold;
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
