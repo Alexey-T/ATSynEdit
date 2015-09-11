@@ -61,7 +61,7 @@ type
 type
   { TATStringItem }
 
-  TATStringItem = class
+  TATStringItem = packed class
   public
     ItemString: atString;
     ItemEnd: TATLineEnds;

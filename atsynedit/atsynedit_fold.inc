@@ -251,11 +251,13 @@ begin
   mi:= TMenuItem.Create(Self);
   mi.Caption:= cStrMenuItemFoldAll;
   mi.OnClick:= @MenuFoldFoldAllClick;
+  mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
 
   mi:= TMenuItem.Create(Self);
   mi.Caption:= cStrMenuItemUnfoldAll;
   mi.OnClick:= @MenuFoldUnfoldAllClick;
+  mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
 
   //dynamic items
