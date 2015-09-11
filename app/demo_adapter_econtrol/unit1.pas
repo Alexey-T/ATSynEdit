@@ -293,6 +293,8 @@ var
   fn: string;
 begin
   if files.Selected=nil then exit;
+  //while adapter.IsBusy do Application.ProcessMessages;
+
   fn:= files.GetPathFromItem(files.Selected);
   if FileExistsUTF8(fn) then
     DoOpenFile(fn);

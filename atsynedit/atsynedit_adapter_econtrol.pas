@@ -442,12 +442,12 @@ end;
 
 procedure TATAdapterEControl.TreeFill(ATree: TTreeView);
 var
-  R: TecTextRange;
+  R, RangeParent: TecTextRange;
   NodeParent, NodeGroup: TTreeNode;
   NodeText: string;
   NodeTextGroup, SItem: string;
   NodeData: pointer;
-  i, j: integer;
+  i: integer;
 begin
   FBusy:= true;
   try
@@ -459,19 +459,17 @@ begin
       R:= AnClient.Ranges[i];
       if not R.Rule.DisplayInTree then Continue;
 
-      NodeText:= AnClient.GetRangeName(R);
-      NodeTextGroup:= AnClient.GetRangeGroup(R);
+      NodeText:= Trim(AnClient.GetRangeName(R));
+      NodeTextGroup:= Trim(AnClient.GetRangeGroup(R));
       NodeData:= R;
       NodeParent:= nil;
       NodeGroup:= nil;
 
-      if R.Parent<>nil then
-        for j:= ATree.Items.Count-1 downto 0 do
-          if TecTextRange(ATree.Items[j].Data)=R.Parent then
-          begin
-            NodeParent:= ATree.Items[j];
-            Break
-          end;
+      RangeParent:= R.Parent;
+      while (RangeParent<>nil) and (not RangeParent.Rule.DisplayInTree) do
+        RangeParent:= RangeParent.Parent;
+      if RangeParent<>nil then
+        NodeParent:= ATree.Items.FindNodeWithData(RangeParent);
 
       if NodeTextGroup<>'' then
         repeat
@@ -489,7 +487,7 @@ begin
           NodeParent:= NodeGroup;
         until false;
 
-      ATree.Items.AddChildObject(NodeParent, Trim(NodeText), NodeData);
+      ATree.Items.AddChildObject(NodeParent, NodeText, NodeData);
     end;
   finally
     ATree.Invalidate;
