@@ -30,6 +30,7 @@ type
     chkWrap: TCheckBox;
     edLexer: TComboBox;
     files: TShellListView;
+    ImageListTree: TImageList;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
     PanelText: TPanel;

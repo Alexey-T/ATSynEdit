@@ -455,15 +455,16 @@ begin
     end;
 end;
 
-function TreeFindNode(Tree: TTreeView; NodeParent: TTreeNode; const NodeText: string): TTreeNode;
+function TreeFindNode(ATree: TTreeView; ANode: TTreeNode; const ANodeText: string): TTreeNode;
 var
   N: TTreeNode;
 begin
   Result:= nil;
-  N:= NodeParent.GetFirstChild;
+  if ANode=nil then exit;
+  N:= ANode.GetFirstChild;
   repeat
     if N=nil then exit;
-    if N.Text=NodeText then begin Result:= N; exit; end;
+    if N.Text=ANodeText then begin Result:= N; exit; end;
     N:= N.GetNextSibling;
   until false;
 end;
