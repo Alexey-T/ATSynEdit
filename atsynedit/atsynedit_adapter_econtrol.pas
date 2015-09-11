@@ -455,6 +455,19 @@ begin
     end;
 end;
 
+function TreeFindNode(Tree: TTreeView; NodeParent: TTreeNode; const NodeText: string): TTreeNode;
+var
+  N: TTreeNode;
+begin
+  Result:= nil;
+  N:= NodeParent.GetFirstChild;
+  repeat
+    if N=nil then exit;
+    if N.Text=NodeText then begin Result:= N; exit; end;
+    N:= N.GetNextSibling;
+  until false;
+end;
+
 procedure TATAdapterEControl.TreeFill(ATree: TTreeView);
 var
   R, RangeParent: TecTextRange;
@@ -495,9 +508,13 @@ begin
             NodeGroup:= nil
           else
           begin
-            NodeGroup:= ATree.Items.FindNodeWithText(SItem);
+            NodeGroup:= TreeFindNode(ATree, NodeParent, SItem);
             if NodeGroup=nil then
+            begin
               NodeGroup:= ATree.Items.AddChild(NodeParent, SItem);
+              NodeGroup.ImageIndex:= R.Rule.GroupIndex;
+              NodeGroup.SelectedIndex:= NodeGroup.ImageIndex;
+            end;
           end;
           NodeParent:= NodeGroup;
         until false;
