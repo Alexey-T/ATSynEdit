@@ -47,6 +47,7 @@ type
     procedure chkShowCurChange(Sender: TObject);
     procedure chkUnpriChange(Sender: TObject);
     procedure chkWrapChange(Sender: TObject);
+    procedure EditoChangeCaretPos(Sender: TObject);
     procedure edLexerChange(Sender: TObject);
     procedure filesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -141,6 +142,7 @@ begin
 
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnCalcStaple:= @EditCalcStaple;
+  ed.OnChangeCaretPos:=@EditoChangeCaretPos;
 
   adapter:= TATAdapterEControl.Create(Self);
   adapter.OnParseBegin:=@AdapterParseBegin;
@@ -183,6 +185,11 @@ begin
     ed.OptWrapMode:= cWrapOn
   else
     ed.OptWrapMode:= cWrapOff;
+end;
+
+procedure TfmMain.EditoChangeCaretPos(Sender: TObject);
+begin
+  adapter.TreeShowItemForCaret(Tree, Point(ed.Carets[0].PosX, ed.Carets[0].PosY));
 end;
 
 procedure TfmMain.chkFullSelChange(Sender: TObject);

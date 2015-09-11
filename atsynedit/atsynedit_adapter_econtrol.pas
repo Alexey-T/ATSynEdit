@@ -76,10 +76,12 @@ type
     destructor Destroy; override;
     procedure AddEditor(AEdit: TATSynEdit);
     procedure TreeFill(ATree: TTreeView);
+    procedure TreeShowItemForCaret(Tree: TTreeView; P: TPoint);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
     property IsBusy: boolean read FBusy;
     function GetPositionOfRange(R: TecTextRange): TPoint;
+    function GetRangeOfPosition(P: TPoint): TecTextRange;
   public
     procedure OnEditorCaretMove(Sender: TObject); override;
     procedure OnEditorChange(Sender: TObject); override;
@@ -440,12 +442,23 @@ begin
   end;
 end;
 
+function _getParent(R: TecTextRange): TecTextRange;
+begin
+  //to fix bug: Python give wrong parent of "class Command"
+  Result:= R.Parent;
+  if Result<>nil then
+    if not ((Result.StartIdx<=R.StartIdx) and (Result.EndIdx>=R.StartIdx)) then
+    begin
+      //Showmessage(format('bad parent %d-%d for %d-%d', [result.StartIdx, result.EndIdx, r.StartIdx, r.EndIdx]));
+      Result:= nil;
+    end;
+end;
+
 procedure TATAdapterEControl.TreeFill(ATree: TTreeView);
 var
   R, RangeParent: TecTextRange;
   NodeParent, NodeGroup: TTreeNode;
-  NodeText: string;
-  NodeTextGroup, SItem: string;
+  NodeText, NodeTextGroup, SItem: string;
   NodeData: pointer;
   i: integer;
 begin
@@ -465,9 +478,9 @@ begin
       NodeParent:= nil;
       NodeGroup:= nil;
 
-      RangeParent:= R.Parent;
+      RangeParent:= _getParent(R);
       while (RangeParent<>nil) and (not RangeParent.Rule.DisplayInTree) do
-        RangeParent:= RangeParent.Parent;
+        RangeParent:= _getParent(RangeParent);
       if RangeParent<>nil then
         NodeParent:= ATree.Items.FindNodeWithData(RangeParent);
 
@@ -499,6 +512,41 @@ function TATAdapterEControl.GetPositionOfRange(R: TecTextRange): TPoint;
 begin
   Result:= Buffer.StrToCaret(R.StartPos);
 end;
+
+function TATAdapterEControl.GetRangeOfPosition(P: TPoint): TecTextRange;
+var
+  i: integer;
+  R: TecTextRange;
+  NPos, NToken: integer;
+begin
+  Result:= nil;
+  NPos:= Buffer.CaretToStr(P);
+  NToken:= AnClient.NextTokenAt(NPos);
+  if NToken<0 then exit;
+
+  for i:= AnClient.RangeCount-1 downto 0 do
+  begin
+    R:= AnClient.Ranges[i];
+    if not R.Rule.DisplayInTree then Continue;
+    if (R.StartPos<=NPos) and (R.EndIdx>=NToken) then
+      begin Result:= R; Break; end;
+  end;
+end;
+
+procedure TATAdapterEControl.TreeShowItemForCaret(Tree: TTreeView; P: TPoint);
+var
+  R: TecTextRange;
+  Node: TTreeNode;
+begin
+  if Tree.Items.Count=0 then exit;
+  R:= GetRangeOfPosition(P);
+  if R=nil then begin {showmessage('r=nil');} exit; end;
+  Node:= Tree.Items.FindNodeWithData(R);
+  if Node=nil then begin {showmessage('node=nil');} exit; end;
+  Node.MakeVisible;
+  Tree.Selected:= Node;
+end;
+
 
 procedure TATAdapterEControl.OnEditorCaretMove(Sender: TObject);
 begin
