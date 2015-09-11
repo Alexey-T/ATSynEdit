@@ -464,6 +464,7 @@ var
   i: integer;
 begin
   FBusy:= true;
+  //ATree.Items.BeginUpdate;
   try
     ATree.Items.Clear;
     if AnClient=nil then exit;
@@ -501,9 +502,12 @@ begin
           NodeParent:= NodeGroup;
         until false;
 
-      ATree.Items.AddChildObject(NodeParent, NodeText, NodeData);
+      NodeParent:= ATree.Items.AddChildObject(NodeParent, NodeText, NodeData);
+      NodeParent.ImageIndex:= R.Rule.TreeItemImage;
+      NodeParent.SelectedIndex:= NodeParent.ImageIndex;
     end;
   finally
+    //ATree.Items.EndUpdate;
     ATree.Invalidate;
     FBusy:= false;
   end;
