@@ -6,10 +6,11 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ShellCtrls,
+  StdCtrls, ShellCtrls, ComCtrls,
   ATSynEdit,
   ATStringProc,
   ATSynEdit_Adapter_EControl,
+  ATSynEdit_Carets,
   ecSyntAnal,
   proc_lexer;
 
@@ -31,6 +32,11 @@ type
     files: TShellListView;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
+    PanelText: TPanel;
+    Splitter1: TSplitter;
+    Tree: TTreeView;
+    procedure AdapterParseBegin(Sender: TObject);
+    procedure AdapterParseDone(Sender: TObject);
     procedure bCommentClick(Sender: TObject);
     procedure bOpenClick(Sender: TObject);
     procedure bUncommentClick(Sender: TObject);
@@ -45,6 +51,7 @@ type
     procedure filesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure TreeClick(Sender: TObject);
   private
     { private declarations }
     ed: TATSynEdit;
@@ -52,7 +59,7 @@ type
     FFilename: string;
     procedure DoCommentAct(Act: TATCommentAction);
     procedure DoLexer(const aname: string);
-    procedure DoOpen(const fn: string);
+    procedure DoOpenFile(const fn: string);
     procedure EditCalcStaple(Sender: TObject; ALine, AIndent: integer; var AColor: TColor);
     procedure EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
     function GetComment: string;
@@ -90,13 +97,15 @@ begin
   end;
 end;
 
-procedure TfmMain.DoOpen(const fn: string);
+procedure TfmMain.DoOpenFile(const fn: string);
 var
   an: TecSyntAnalyzer;
 begin
   FFilename:= fn;
 
   adapter.Lexer:= nil;
+  Tree.Items.Clear;
+
   ed.LoadFromFile(fn);
   ed.SetFocus;
 
@@ -120,17 +129,22 @@ begin
 
   ed:= TATSynEdit.Create(Self);
   ed.Font.Name:= 'Courier New';
-  ed.Parent:= Self;
+  ed.Parent:= PanelText;
   ed.Align:= alClient;
   ed.OptUnprintedVisible:= false;
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
   ed.Colors.CurrentLineBG:= clTeal;
 
+  ed.Gutter[ed.GutterBandNum].Visible:= false;
+  ed.Gutter.Update;
+
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnCalcStaple:= @EditCalcStaple;
 
   adapter:= TATAdapterEControl.Create(Self);
+  adapter.OnParseBegin:=@AdapterParseBegin;
+  adapter.OnParseDone:=@AdapterParseDone;
   ed.AdapterHilite:= adapter;
 
   chkWrap.Checked:= ed.OptWrapMode=cWrapOn;
@@ -145,6 +159,22 @@ procedure TfmMain.FormShow(Sender: TObject);
 begin
   if DirectoryExists(FDir) then
     files.Root:= FDir;
+end;
+
+procedure TfmMain.TreeClick(Sender: TObject);
+var
+  R: TecTextRange;
+  P: TPoint;
+begin
+  if adapter.IsBusy then exit;
+  if Tree.Selected=nil then exit;
+  if Tree.Selected.Data=nil then exit;
+
+  R:= TecTextRange(Tree.Selected.Data);
+  P:= adapter.GetPositionOfRange(R);
+
+  ed.DoGotoPosEx(P);
+  ed.SetFocus;
 end;
 
 procedure TfmMain.chkWrapChange(Sender: TObject);
@@ -196,7 +226,7 @@ begin
     Filename:= '';
     InitialDir:= FDir;
     if not Execute then exit;
-    DoOpen(Filename);
+    DoOpenFile(Filename);
   end;
 end;
 
@@ -224,6 +254,16 @@ end;
 procedure TfmMain.bCommentClick(Sender: TObject);
 begin
   DoCommentAct(cCommentAddIfNone);
+end;
+
+procedure TfmMain.AdapterParseDone(Sender: TObject);
+begin
+  adapter.TreeFill(Tree);
+end;
+
+procedure TfmMain.AdapterParseBegin(Sender: TObject);
+begin
+  Tree.Items.Clear;
 end;
 
 procedure TfmMain.bUncommentClick(Sender: TObject);
@@ -255,7 +295,7 @@ begin
   if files.Selected=nil then exit;
   fn:= files.GetPathFromItem(files.Selected);
   if FileExistsUTF8(fn) then
-    DoOpen(fn);
+    DoOpenFile(fn);
 end;
 
 procedure TfmMain.EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
@@ -265,9 +305,7 @@ begin
     if ed.Strings.LinesBm[ALine]<>0 then
       ed.Strings.LinesBm[ALine]:= 0
     else
-    begin
       ed.Strings.LinesBm[ALine]:= 1;
-    end;
     ed.Update;
   end;
 end;

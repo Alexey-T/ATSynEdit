@@ -5,7 +5,7 @@ unit ATSynEdit_Adapter_EControl;
 interface
 
 uses
-  Classes, SysUtils, Graphics, ExtCtrls,
+  Classes, SysUtils, Graphics, ExtCtrls, ComCtrls,
   Forms, Dialogs,
   ATSynEdit,
   ATSynEdit_CanvasProc,
@@ -45,6 +45,9 @@ type
     ListColors: TList;
     Timer: TTimer;
     FDynEnabled: boolean;
+    FBusy: boolean;
+    FOnParseBegin: TNotifyEvent;
+    FOnParseDone: TNotifyEvent;
     procedure DoAnalize(AEdit: TATSynEdit);
     procedure DoFindTokenOverrideStyle(var ATokenStyle: TecSyntaxFormat;
       ATokenIndex, AEditorIndex: integer);
@@ -72,8 +75,11 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AddEditor(AEdit: TATSynEdit);
+    procedure TreeFill(ATree: TTreeView);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
+    property IsBusy: boolean read FBusy;
+    function GetPositionOfRange(R: TecTextRange): TPoint;
   public
     procedure OnEditorCaretMove(Sender: TObject); override;
     procedure OnEditorChange(Sender: TObject); override;
@@ -83,6 +89,9 @@ type
       var AColorAfterEol: TColor); override;
     procedure OnEditorCalcPosColor(Sender: TObject;
       AX, AY: integer; var AColor: TColor); override;
+  published
+    property OnParseBegin: TNotifyEvent read FOnParseBegin write FOnParseBegin;
+    property OnParseDone: TNotifyEvent read FOnParseDone write FOnParseDone;
   end;
 
 implementation
@@ -431,6 +440,38 @@ begin
   end;
 end;
 
+procedure TATAdapterEControl.TreeFill(ATree: TTreeView);
+var
+  R: TecTextRange;
+  Node: TTreeNode;
+  i: integer;
+begin
+  FBusy:= true;
+  try
+    ATree.Items.Clear;
+    if AnClient=nil then exit;
+
+    for i:= 0 to AnClient.RangeCount-1 do
+    begin
+      R:= AnClient.Ranges[i];
+      if not R.Rule.DisplayInTree then Continue;
+
+      Node:= TTreeNode.Create(ATree.Items);
+      Node.Text:= AnClient.GetRangeName(R);
+      Node.Data:= R;
+      ATree.Items.AddObject(Node, Node.Text, Node.Data);
+    end;
+  finally
+    ATree.Invalidate;
+    FBusy:= false;
+  end;
+end;
+
+function TATAdapterEControl.GetPositionOfRange(R: TecTextRange): TPoint;
+begin
+  Result:= Buffer.StrToCaret(R.StartPos);
+end;
+
 procedure TATAdapterEControl.OnEditorCaretMove(Sender: TObject);
 begin
   UpdateRangesActive(Sender as TATSynEdit);
@@ -497,6 +538,9 @@ procedure TATAdapterEControl.DoAnalize(AEdit: TATSynEdit);
 var
   NLine, NPos: integer;
 begin
+  if Assigned(FOnParseBegin) then
+    FOnParseBegin(Self);
+
   NLine:= Min(AEdit.LineBottom+1, Buffer.Count-1);
   NPos:= Buffer.CaretToStr(Point(0, NLine));
 
@@ -716,6 +760,8 @@ begin
     Timer.Enabled:= false;
     UpdateRanges;
     UpdateEds;
+    if Assigned(FOnParseDone) then
+      FOnParseDone(Self);
   end;
 end;
 
