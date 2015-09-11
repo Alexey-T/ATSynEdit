@@ -443,8 +443,11 @@ end;
 procedure TATAdapterEControl.TreeFill(ATree: TTreeView);
 var
   R: TecTextRange;
-  Node: TTreeNode;
-  i: integer;
+  NodeParent, NodeGroup: TTreeNode;
+  NodeText: string;
+  NodeTextGroup, SItem: string;
+  NodeData: pointer;
+  i, j: integer;
 begin
   FBusy:= true;
   try
@@ -456,10 +459,37 @@ begin
       R:= AnClient.Ranges[i];
       if not R.Rule.DisplayInTree then Continue;
 
-      Node:= TTreeNode.Create(ATree.Items);
-      Node.Text:= AnClient.GetRangeName(R);
-      Node.Data:= R;
-      ATree.Items.AddObject(Node, Node.Text, Node.Data);
+      NodeText:= AnClient.GetRangeName(R);
+      NodeTextGroup:= AnClient.GetRangeGroup(R);
+      NodeData:= R;
+      NodeParent:= nil;
+      NodeGroup:= nil;
+
+      if R.Parent<>nil then
+        for j:= ATree.Items.Count-1 downto 0 do
+          if TecTextRange(ATree.Items[j].Data)=R.Parent then
+          begin
+            NodeParent:= ATree.Items[j];
+            Break
+          end;
+
+      if NodeTextGroup<>'' then
+        repeat
+          SItem:= SGetItem(NodeTextGroup, '\');
+          if (SItem='') and (NodeTextGroup='') then Break;
+
+          if SItem='' then
+            NodeGroup:= nil
+          else
+          begin
+            NodeGroup:= ATree.Items.FindNodeWithText(SItem);
+            if NodeGroup=nil then
+              NodeGroup:= ATree.Items.AddChild(NodeParent, SItem);
+          end;
+          NodeParent:= NodeGroup;
+        until false;
+
+      ATree.Items.AddChildObject(NodeParent, Trim(NodeText), NodeData);
     end;
   finally
     ATree.Invalidate;
@@ -547,7 +577,11 @@ begin
   AnClient.AppendToPos(NPos);
   AnClient.IdleAppend;
   if AnClient.IsFinished then
-    UpdateEds
+  begin
+    UpdateEds;
+    if Assigned(FOnParseDone) then
+      FOnParseDone(Self);
+  end
   else
     Timer.Enabled:= true;
 end;
