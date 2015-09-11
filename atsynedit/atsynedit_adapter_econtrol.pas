@@ -75,13 +75,14 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AddEditor(AEdit: TATSynEdit);
-    procedure TreeFill(ATree: TTreeView);
-    procedure TreeShowItemForCaret(Tree: TTreeView; P: TPoint);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
-    property IsBusy: boolean read FBusy;
-    function GetPositionOfRange(R: TecTextRange): TPoint;
-    function GetRangeOfPosition(P: TPoint): TecTextRange;
+    //support for syntax-tree
+    property TreeBusy: boolean read FBusy;
+    procedure TreeFill(ATree: TTreeView);
+    procedure TreeShowItemForCaret(Tree: TTreeView; P: TPoint);
+    function TreeGetPositionOfRange(R: TecTextRange): TPoint;
+    function TreeGetRangeOfPosition(P: TPoint): TecTextRange;
   public
     procedure OnEditorCaretMove(Sender: TObject); override;
     procedure OnEditorChange(Sender: TObject); override;
@@ -508,12 +509,12 @@ begin
   end;
 end;
 
-function TATAdapterEControl.GetPositionOfRange(R: TecTextRange): TPoint;
+function TATAdapterEControl.TreeGetPositionOfRange(R: TecTextRange): TPoint;
 begin
   Result:= Buffer.StrToCaret(R.StartPos);
 end;
 
-function TATAdapterEControl.GetRangeOfPosition(P: TPoint): TecTextRange;
+function TATAdapterEControl.TreeGetRangeOfPosition(P: TPoint): TecTextRange;
 var
   i: integer;
   R: TecTextRange;
@@ -539,7 +540,7 @@ var
   Node: TTreeNode;
 begin
   if Tree.Items.Count=0 then exit;
-  R:= GetRangeOfPosition(P);
+  R:= TreeGetRangeOfPosition(P);
   if R=nil then begin {showmessage('r=nil');} exit; end;
   Node:= Tree.Items.FindNodeWithData(R);
   if Node=nil then begin {showmessage('node=nil');} exit; end;

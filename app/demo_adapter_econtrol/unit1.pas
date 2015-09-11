@@ -47,7 +47,7 @@ type
     procedure chkShowCurChange(Sender: TObject);
     procedure chkUnpriChange(Sender: TObject);
     procedure chkWrapChange(Sender: TObject);
-    procedure EditoChangeCaretPos(Sender: TObject);
+    procedure EditorChangeCaretPos(Sender: TObject);
     procedure edLexerChange(Sender: TObject);
     procedure filesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -142,7 +142,7 @@ begin
 
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnCalcStaple:= @EditCalcStaple;
-  ed.OnChangeCaretPos:=@EditoChangeCaretPos;
+  ed.OnChangeCaretPos:=@EditorChangeCaretPos;
 
   adapter:= TATAdapterEControl.Create(Self);
   adapter.OnParseBegin:=@AdapterParseBegin;
@@ -168,12 +168,12 @@ var
   R: TecTextRange;
   P: TPoint;
 begin
-  if adapter.IsBusy then exit;
+  if adapter.TreeBusy then exit;
   if Tree.Selected=nil then exit;
   if Tree.Selected.Data=nil then exit;
 
   R:= TecTextRange(Tree.Selected.Data);
-  P:= adapter.GetPositionOfRange(R);
+  P:= adapter.TreeGetPositionOfRange(R);
 
   ed.DoGotoPosEx(P);
   ed.SetFocus;
@@ -187,7 +187,7 @@ begin
     ed.OptWrapMode:= cWrapOff;
 end;
 
-procedure TfmMain.EditoChangeCaretPos(Sender: TObject);
+procedure TfmMain.EditorChangeCaretPos(Sender: TObject);
 begin
   adapter.TreeShowItemForCaret(Tree, Point(ed.Carets[0].PosX, ed.Carets[0].PosY));
 end;
@@ -266,6 +266,7 @@ end;
 procedure TfmMain.AdapterParseDone(Sender: TObject);
 begin
   adapter.TreeFill(Tree);
+  EditorChangeCaretPos(Self);
 end;
 
 procedure TfmMain.AdapterParseBegin(Sender: TObject);
@@ -300,7 +301,7 @@ var
   fn: string;
 begin
   if files.Selected=nil then exit;
-  //while adapter.IsBusy do Application.ProcessMessages;
+  //while adapter.TreeBusy do Application.ProcessMessages;
 
   fn:= files.GetPathFromItem(files.Selected);
   if FileExistsUTF8(fn) then
