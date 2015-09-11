@@ -460,8 +460,11 @@ var
   N: TTreeNode;
 begin
   Result:= nil;
-  if ANode=nil then exit;
-  N:= ANode.GetFirstChild;
+  if ATree.Items.Count=0 then exit;
+  if ANode<>nil then
+    N:= ANode.GetFirstChild
+  else
+    N:= ATree.Items[0];
   repeat
     if N=nil then exit;
     if N.Text=ANodeText then begin Result:= N; exit; end;
