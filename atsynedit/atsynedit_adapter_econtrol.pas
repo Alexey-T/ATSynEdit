@@ -516,7 +516,7 @@ begin
             if NodeGroup=nil then
             begin
               NodeGroup:= ATree.Items.AddChild(NodeParent, SItem);
-              NodeGroup.ImageIndex:= R.Rule.GroupIndex;
+              NodeGroup.ImageIndex:= R.Rule.TreeGroupImage;
               NodeGroup.SelectedIndex:= NodeGroup.ImageIndex;
             end;
           end;
