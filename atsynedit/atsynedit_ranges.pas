@@ -35,7 +35,12 @@ type
   end;
 
 type
-  TATRangeHasLines = (cRngIgnore, cRngHasAllLines, cRngHasAnyOfLines);
+  TATRangeHasLines = (
+    cRngIgnore,
+    cRngHasAllLines,
+    cRngHasAnyOfLines,
+    cRngExceptThisRange
+    );
 
 type
   { TATSynRanges }
@@ -213,7 +218,8 @@ begin
             cRngIgnore: Ok:= true;
             cRngHasAllLines: Ok:= (R.Y<=ALineFrom) and (R.Y2>=ALineTo);
             cRngHasAnyOfLines: Ok:= (R.Y<=ALineTo) and (R.Y2>=ALineFrom);
-            else raise Exception.Create('unknown linemode');
+            cRngExceptThisRange: Ok:= R<>AInRange;
+            else raise Exception.Create('unknown LineMode');
           end;
           if not Ok then Continue;
 

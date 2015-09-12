@@ -289,6 +289,7 @@ const
   cHintScrollDx = 5;
   cStrMenuItemFoldAll: string = 'Fold all';
   cStrMenuItemUnfoldAll: string = 'Unfold all';
+  cStrMenuItemFoldLevel: string = 'Fold level';
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -312,8 +313,6 @@ type
   { TATSynEdit }
 
   TATSynEdit = class(TCustomControl)
-    procedure MenuFoldFoldAllClick(Sender: TObject);
-    procedure MenuFoldUnfoldAllClick(Sender: TObject);
   private
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
@@ -516,6 +515,9 @@ type
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoDropText;
     procedure DoFoldbarClick(ALine: integer);
+    procedure DoFoldForLevel(ALevel: integer);
+    procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
+      AForThisRange: TATSynRange);
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHintShow;
@@ -528,7 +530,10 @@ type
     function GetColorTextFont: TColor;
     procedure InitResourcesFoldbar;
     function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
-    procedure MenuFoldStdClick(Sender: TObject);
+    procedure MenuFoldFoldAllClick(Sender: TObject);
+    procedure MenuFoldLevelClick(Sender: TObject);
+    procedure MenuFoldUnfoldAllClick(Sender: TObject);
+    procedure MenuFoldPlusMinusClick(Sender: TObject);
     procedure PaintEx(ALine: integer);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);

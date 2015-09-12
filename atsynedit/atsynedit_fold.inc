@@ -237,7 +237,8 @@ end;
 procedure TATSynEdit.DoMenuGutterFold;
 var
   Menu: TPopupMenu;
-  mi: TMenuItem;
+  mi, miSub: TMenuItem;
+  i: integer;
 begin
   InitResourcesFoldbar;
   if FMenuGutterFoldStd=nil then
@@ -260,7 +261,22 @@ begin
   mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
 
-  //dynamic items
+  //submenu "fold level"
+  miSub:= TMenuItem.Create(Self);
+  miSub.Caption:= cStrMenuItemFoldLevel;
+  miSub.Enabled:= Fold.Count>0;
+  Menu.Items.Add(miSub);
+
+  for i:= 2 to 9 do
+  begin
+    mi:= TMenuItem.Create(Self);
+    mi.Caption:= Inttostr(i);
+    mi.Tag:= i-1;
+    mi.OnClick:=@MenuFoldLevelClick;
+    miSub.Add(mi);
+  end;
+
+  //dynamic items [+], [-]
   DoMenuGutterFold_AddDynamicItems(Menu);
 
   Menu.Popup;
@@ -298,7 +314,7 @@ begin
     Rng:= Fold[IntList[i]];
     mi:= TMenuItem.Create(Self);
     mi.Tag:= ptrint(Rng);
-    mi.OnClick:= @MenuFoldStdClick;
+    mi.OnClick:= @MenuFoldPlusMinusClick;
 
     mi.Caption:=
       cHintScrollPrefix+' '+Inttostr(Rng.Y+1)+': '+
@@ -326,8 +342,7 @@ begin
 end;
 
 
-
-procedure TATSynEdit.MenuFoldStdClick(Sender: TObject);
+procedure TATSynEdit.MenuFoldPlusMinusClick(Sender: TObject);
 var
   Rng: TATSynRange;
 begin
@@ -344,8 +359,47 @@ begin
   DoCommand(cCommand_FoldAll);
 end;
 
+procedure TATSynEdit.MenuFoldLevelClick(Sender: TObject);
+begin
+  DoFoldForLevel((Sender as TComponent).Tag);
+end;
+
 procedure TATSynEdit.MenuFoldUnfoldAllClick(Sender: TObject);
 begin
   DoCommand(cCommand_UnfoldAll);
+end;
+
+
+procedure TATSynEdit.DoFoldForLevelAndLines(ALineFrom, ALineTo: integer;
+  ALevel: integer; AForThisRange: TATSynRange);
+var
+  List: TATIntArray;
+  R: TATSynRange;
+  i: integer;
+begin
+  //this func recursive. it calls itself with ALevel-1.
+  //folds ranges if ALevel=0, else goes to subranges until found ALevel=0.
+  if ALevel<0 then exit;
+
+  List:= Fold.FindRangesContainingLines(ALineFrom, ALineTo, AForThisRange,
+    false{OnlyFolded}, true{TopLevel}, cRngExceptThisRange);
+
+  for i:= Low(List) to High(List) do
+  begin
+    R:= Fold.Items[List[i]];
+    if R.IsSimple then Continue;
+    if R.Folded then Continue;
+    if ALevel=0 then
+      DoRangeFold(R)
+    else
+      DoFoldForLevelAndLines(R.Y, R.Y2, ALevel-1, R);
+  end;
+end;
+
+procedure TATSynEdit.DoFoldForLevel(ALevel: integer);
+begin
+  DoCommand(cCommand_UnfoldAll);
+  DoFoldForLevelAndLines(0, Strings.Count-1, ALevel, nil);
+  Update;
 end;
 
