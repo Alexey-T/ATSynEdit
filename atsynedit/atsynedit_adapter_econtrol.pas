@@ -58,6 +58,7 @@ type
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
     procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
+    function GetRangeParent(R: TecTextRange): TecTextRange;
     function IsCaretInRange(AEdit: TATSynEdit; APos1, APos2: integer; ACond: TATRangeCond): boolean;
     procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
     procedure UpdateEds;
@@ -443,16 +444,24 @@ begin
   end;
 end;
 
-function _getParent(R: TecTextRange): TecTextRange;
+function TATAdapterEControl.GetRangeParent(R: TecTextRange): TecTextRange;
+//cannot use R.Parent!
+var
+  RTest: TecTextRange;
+  i: integer;
 begin
-  //to fix bug: Python give wrong parent of "class Command"
-  Result:= R.Parent;
-  if Result<>nil then
-    if not ((Result.StartIdx<=R.StartIdx) and (Result.EndIdx>=R.StartIdx)) then
+  Result:= nil;
+  for i:= R.Index-1 downto 0 do
+  begin
+    RTest:= AnClient.Ranges[i];
+    if (RTest.StartIdx<=R.StartIdx) and
+       (RTest.EndIdx>=R.EndIdx) and
+       (RTest.Level<R.Level) then
     begin
-      //Showmessage(format('bad parent %d-%d for %d-%d', [result.StartIdx, result.EndIdx, r.StartIdx, r.EndIdx]));
-      Result:= nil;
+      Result:= RTest;
+      Exit
     end;
+  end;
 end;
 
 function TreeFindNode(ATree: TTreeView; ANode: TTreeNode; const ANodeText: string): TTreeNode;
@@ -497,9 +506,9 @@ begin
       NodeParent:= nil;
       NodeGroup:= nil;
 
-      RangeParent:= _getParent(R);
+      RangeParent:= GetRangeParent(R);
       while (RangeParent<>nil) and (not RangeParent.Rule.DisplayInTree) do
-        RangeParent:= _getParent(RangeParent);
+        RangeParent:= GetRangeParent(RangeParent);
       if RangeParent<>nil then
         NodeParent:= ATree.Items.FindNodeWithData(RangeParent);
 
