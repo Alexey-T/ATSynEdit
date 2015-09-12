@@ -595,6 +595,9 @@ begin
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
+  if Assigned(FOnParseBegin) then
+    FOnParseBegin(Self);
+
   if AAnalizer=nil then Exit;
   AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
 
