@@ -85,3 +85,42 @@ begin
 end;
 
 
+function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
+var
+  Ar: TATIntArray;
+  R: TATSynRange;
+  i: integer;
+begin
+  if ADoFold then
+  begin
+    Ar:= Fold.FindRangesContainingLines(
+      0, Strings.Count-1, nil,
+      false{OnlyFolded}, true{TopLevelOnly}, cRngHasAnyOfLines);
+    for i:= Low(Ar) to High(Ar) do
+    begin
+      R:= Fold.Items[Ar[i]];
+      if not R.Folded then
+        DoRangeFold(R);
+    end;
+  end
+  else
+  begin
+    for i:= 0 to Fold.Count-1 do
+    begin
+      R:= Fold.Items[i];
+      if R.Folded then
+        DoRangeUnfold(R);
+    end;
+  end;
+
+  Result:= [cResultCaretAny, cResultScroll];
+end;
+
+
+function TATSynEdit.DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
+begin
+  DoFoldForLevel(ALevel);
+  Result:= [cResultCaretAny, cResultScroll];
+end;
+
+

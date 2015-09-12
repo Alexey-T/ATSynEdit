@@ -132,6 +132,14 @@ const
 
   cCommand_FoldAll = 1030;
   cCommand_UnfoldAll = 1031;
+  cCommand_FoldLevel2 = 1032;
+  cCommand_FoldLevel3 = 1033;
+  cCommand_FoldLevel4 = 1034;
+  cCommand_FoldLevel5 = 1035;
+  cCommand_FoldLevel6 = 1036;
+  cCommand_FoldLevel7 = 1037;
+  cCommand_FoldLevel8 = 1038;
+  cCommand_FoldLevel9 = 1039;
 
   cCommand_Cancel = 2001;
   cCommand_RepeatTextCommand = 2002;

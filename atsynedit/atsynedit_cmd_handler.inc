@@ -116,37 +116,6 @@ begin
   Update;
 end;
 
-function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
-var
-  Ar: TATIntArray;
-  R: TATSynRange;
-  i: integer;
-begin
-  if ADoFold then
-  begin
-    Ar:= Fold.FindRangesContainingLines(
-      0, Strings.Count-1, nil,
-      false{OnlyFolded}, true{TopLevelOnly}, cRngHasAnyOfLines);
-    for i:= Low(Ar) to High(Ar) do
-    begin
-      R:= Fold.Items[Ar[i]];
-      if not R.Folded then
-        DoRangeFold(R);
-    end;
-  end
-  else
-  begin
-    for i:= 0 to Fold.Count-1 do
-    begin
-      R:= Fold.Items[i];
-      if R.Folded then
-        DoRangeUnfold(R);
-    end;
-  end;
-
-  Result:= [cResultCaretAny, cResultScroll];
-end;
-
 procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');
 var
   Caret: TATCaretItem;
@@ -297,6 +266,8 @@ begin
 
     cCommand_FoldAll:                  Res:= DoCommand_FoldUnfoldAll(true);
     cCommand_UnfoldAll:                Res:= DoCommand_FoldUnfoldAll(false);
+    cCommand_FoldLevel2..
+    cCommand_FoldLevel9:               Res:= DoCommand_FoldLevel(ACmd-cCommand_FoldLevel2+1);
 
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
     cCommand_CaretsExtendUpLine:       Res:= DoCommand_CaretsExtend(false, 1);
@@ -320,6 +291,5 @@ begin
 
   DoCommandResults(Res);
 end;
-
 
 

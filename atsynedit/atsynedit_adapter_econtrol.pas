@@ -498,6 +498,7 @@ begin
     for i:= 0 to AnClient.RangeCount-1 do
     begin
       R:= AnClient.Ranges[i];
+      if R.Rule=nil then Continue;
       if not R.Rule.DisplayInTree then Continue;
 
       NodeText:= Trim(AnClient.GetRangeName(R));

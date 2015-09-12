@@ -157,6 +157,14 @@ begin
 
   M.Add(cCommand_FoldAll, 'folding: fold all', [], []);
   M.Add(cCommand_UnfoldAll, 'folding: unfold all', [], []);
+  M.Add(cCommand_FoldLevel2, 'folding: fold level 2', [], []);
+  M.Add(cCommand_FoldLevel3, 'folding: fold level 3', [], []);
+  M.Add(cCommand_FoldLevel4, 'folding: fold level 4', [], []);
+  M.Add(cCommand_FoldLevel5, 'folding: fold level 5', [], []);
+  M.Add(cCommand_FoldLevel6, 'folding: fold level 6', [], []);
+  M.Add(cCommand_FoldLevel7, 'folding: fold level 7', [], []);
+  M.Add(cCommand_FoldLevel8, 'folding: fold level 8', [], []);
+  M.Add(cCommand_FoldLevel9, 'folding: fold level 9', [], []);
 end;
 
 procedure InitKeymapCombo(var M: TATKeymap);
