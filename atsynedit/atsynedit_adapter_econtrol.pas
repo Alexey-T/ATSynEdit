@@ -546,6 +546,8 @@ end;
 
 function TATAdapterEControl.TreeGetPositionOfRange(R: TecTextRange): TPoint;
 begin
+  Result:= Point(0, 0);
+  if AnClient=nil then exit;
   Result:= Buffer.StrToCaret(R.StartPos);
 end;
 
@@ -556,6 +558,8 @@ var
   NPos, NToken: integer;
 begin
   Result:= nil;
+  if AnClient=nil then exit;
+
   NPos:= Buffer.CaretToStr(P);
   NToken:= AnClient.NextTokenAt(NPos);
   if NToken<0 then exit;
