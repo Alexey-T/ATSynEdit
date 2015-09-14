@@ -12,13 +12,14 @@ uses
 
 procedure DoEditorExportToHTML(Ed: TATSynEdit;
   const AFilename, APageTitle, AFontName: string;
-  AFontSize: integer; AWithNumbers: boolean; AColorBg: TColor);
+  AFontSize: integer; AWithNumbers: boolean;
+  AColorBg, AColorNumbers: TColor);
 
 implementation
 
-procedure DoEditorExportToHTML(Ed: TATSynEdit;
-  const AFilename, APageTitle, AFontName: string;
-  AFontSize: integer; AWithNumbers: boolean; AColorBg: TColor);
+procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename, APageTitle,
+  AFontName: string; AFontSize: integer; AWithNumbers: boolean; AColorBg,
+  AColorNumbers: TColor);
 var
   F: TextFile;
   Parts: TATLineParts;
@@ -60,7 +61,7 @@ begin
              '      vertical-align: top;'+sLineBreak+
              '    }'+sLineBreak+
              '    td.num {'+sLineBreak+
-             '      color: '+SColorToHtmlColor(Ed.Colors.GutterFont)+';'+sLineBreak+
+             '      color: '+SColorToHtmlColor(AColorNumbers)+';'+sLineBreak+
              '      text-align: right;'+sLineBreak+
              '    }'+sLineBreak+
              '  </style>'+sLineBreak+
