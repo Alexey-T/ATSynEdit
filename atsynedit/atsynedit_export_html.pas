@@ -7,27 +7,22 @@ interface
 uses
   Classes, SysUtils, Graphics, StrUtils,
   ATSynEdit,
-  ATSynEdit_CanvasProc;
+  ATSynEdit_CanvasProc,
+  ATStringProc;
 
-procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename, APageTitle: string);
+procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename, APageTitle: string;
+  AFontSize: integer);
 
 implementation
 
-function ColorToHtmlColor(C: TColor): string;
-begin
-  Result:= IntToHex(C, 6);
-  Result:= '#'+Copy(Result, 5, 2)+Copy(Result, 3, 2)+Copy(Result, 1, 2);
-end;
-
 procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename,
-  APageTitle: string);
-var
-  NColorFont: TColor;
-  NColorBG: TColor;
+  APageTitle: string; AFontSize: integer);
 var
   F: TextFile;
   Parts: TATLineParts;
   PPart: ^TATLinePart;
+  NColorFont: TColor;
+  NColorBG: TColor;
   NColorAfter: TColor;
   NeedStyle: boolean;
   i, j: integer;
@@ -48,7 +43,7 @@ begin
   Writeln(F, '  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />');
   Writeln(F, '  <title>'+APageTitle+'</title>');
   Writeln(F, '  <style>');
-  Writeln(F, '    body { font-family: "Courier New", sans-serif; font-size: 12px; color: #000; }');
+  Writeln(F, '    body { font-family: "Courier New", sans-serif; font-size: '+IntToStr(AFontSize)+'px; color: #000; }');
   Writeln(F, '    span { background-color: #FFF; }');
   Writeln(F, '  </style>');
   Writeln(F, '</head>');
@@ -73,8 +68,8 @@ begin
         (PPart^.ColorBG<>NColorBG);
       if NeedStyle then
         Write(F, '<span style="'+
-          IfThen(PPart^.ColorFont<>NColorFont, 'color: '+ColorToHtmlColor(PPart^.ColorFont)+'; ')+
-          IfThen(PPart^.ColorBG<>NColorBG, 'background: '+ColorToHtmlColor(PPart^.ColorBG)+'; ')+
+          IfThen(PPart^.ColorFont<>NColorFont, 'color: '+SColorToHtmlColor(PPart^.ColorFont)+'; ')+
+          IfThen(PPart^.ColorBG<>NColorBG, 'background: '+SColorToHtmlColor(PPart^.ColorBG)+'; ')+
           '">');
 
       Write(F, Utf8Encode(Copy(Ed.Strings.Lines[i], PPart^.Offset+1, PPart^.Len)));
@@ -89,7 +84,6 @@ begin
   end;
 
   Writeln(F, '</code></pre>');
-  Writeln(F, '</font>');
   Writeln(F, '</body>');
   Writeln(F, '</html>');
 

@@ -562,7 +562,7 @@ begin
   if not SaveDialog1.Execute then exit;
 
   ed.DoCommand(cCommand_SelectNone);
-  DoEditorExportToHTML(ed, SaveDialog1.FileName, 'Export test');
+  DoEditorExportToHTML(ed, SaveDialog1.FileName, 'Export test', 12);
 end;
 
 procedure TfmMain.bFontClick(Sender: TObject);

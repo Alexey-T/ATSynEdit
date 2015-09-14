@@ -6,7 +6,7 @@ unit ATStringProc;
 interface
 
 uses
-  Classes, SysUtils, StrUtils;
+  Classes, SysUtils, StrUtils, Graphics;
 
 type
   atString = UnicodeString;
@@ -57,6 +57,7 @@ function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+function SColorToHtmlColor(Color: TColor): string;
 
 type
   TATCommentAction = (
@@ -805,6 +806,13 @@ begin
   if n>0 then
     Delete(S, n, MaxInt);
 end;
+
+function SColorToHtmlColor(Color: TColor): string;
+begin
+  Result:= IntToHex(Color, 6);
+  Result:= '#'+Copy(Result, 5, 2)+Copy(Result, 3, 2)+Copy(Result, 1, 2);
+end;
+
 
 initialization
   _InitCharsHex;
