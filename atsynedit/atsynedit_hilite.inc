@@ -16,7 +16,7 @@ begin
   Str:= Strings.Lines[ALineIndex];
   if Str='' then exit;
 
-  WrapItem:= TATSynWrapItem.Create(ALineIndex, 0, Length(Str), 0, cWrapItemFinal);
+  WrapItem:= TATSynWrapItem.Create(ALineIndex, 1, Length(Str), 0, cWrapItemFinal);
   try
     AColorAfter:= AColorBG;
     DoCalcLineHilite(WrapItem, AParts, 0, cMaxCharsInLine,

@@ -25,6 +25,7 @@ var
   NColorBG: TColor;
   NColorAfter: TColor;
   NeedStyle: boolean;
+  Str: string;
   i, j: integer;
 begin
   if FileExists(AFilename) then
@@ -72,7 +73,10 @@ begin
           IfThen(PPart^.ColorBG<>NColorBG, 'background: '+SColorToHtmlColor(PPart^.ColorBG)+'; ')+
           '">');
 
-      Write(F, Utf8Encode(Copy(Ed.Strings.Lines[i], PPart^.Offset+1, PPart^.Len)));
+      Str:= Utf8Encode(Copy(Ed.Strings.Lines[i], PPart^.Offset+1, PPart^.Len));
+      Str:= StringReplace(Str, '<', '&lt;', [rfReplaceAll]);
+      Str:= StringReplace(Str, '>', '&gt;', [rfReplaceAll]);
+      Write(F, Str);
       if NeedStyle then
         Write(F, '</span>');
 
