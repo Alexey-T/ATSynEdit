@@ -1,5 +1,33 @@
 {$ifdef nnn}begin end;{$endif}
 
+function TATSynEdit.DoCalcLineHiliteEx(ALineIndex: integer;
+  var AParts: TATLineParts;
+  AColorBG: TColor; out AColorAfter: TColor): boolean;
+const
+  cMaxCharsInLine = 50*1024;
+var
+  WrapItem: TATSynWrapItem;
+  Str: atString;
+begin
+  Result:= Strings.IsIndexValid(ALineIndex);
+  if not Result then exit;
+  FillChar(AParts, SizeOf(AParts), 0);
+
+  Str:= Strings.Lines[ALineIndex];
+  if Str='' then exit;
+
+  WrapItem:= TATSynWrapItem.Create(ALineIndex, 0, Length(Str), 0, cWrapItemFinal);
+  try
+    AColorAfter:= AColorBG;
+    DoCalcLineHilite(WrapItem, AParts, 0, cMaxCharsInLine,
+      AColorBG, false, AColorAfter);
+  finally
+    FreeAndNil(WrapItem);
+  end;
+end;
+
+
+
 procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);

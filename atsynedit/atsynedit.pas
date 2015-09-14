@@ -835,6 +835,8 @@ type
     procedure DoSizeChange(AInc: boolean);
     procedure DoCommentSelectionLines(Act: TATCommentAction;
       const AComment: atString);
+    function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
+      AColorBG: TColor; out AColorAfter: TColor): boolean;
 
   protected
     procedure Paint; override;
