@@ -380,6 +380,10 @@ object fmMain: TfmMain
           OnClick = mnuEndMacClick
         end
       end
+      object mnuFileHtml: TMenuItem
+        Caption = 'Export HTML'
+        OnClick = mnuFileHtmlClick
+      end
     end
     object MenuItem9: TMenuItem
       Caption = 'Search'

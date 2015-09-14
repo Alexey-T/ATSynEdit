@@ -12,7 +12,7 @@ uses
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATSynEdit_Carets,
-  ATSynEdit_Finder,
+  ATSynEdit_Finder, ATSynEdit_Export_HTML,
   formkey,
   formopt,
   formcombo,
@@ -56,6 +56,7 @@ type
     MainMenu1: TMainMenu;
     Memo1: TMemo;
     MenuItem1: TMenuItem;
+    mnuFileHtml: TMenuItem;
     mnuFindNext: TMenuItem;
     mnuFind: TMenuItem;
     MenuItem5: TMenuItem;
@@ -110,6 +111,7 @@ type
     procedure btnStopClick(Sender: TObject);
     procedure FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
       var AContinue: boolean);
+    procedure mnuFileHtmlClick(Sender: TObject);
     procedure mnuFileOpenClick(Sender: TObject);
     procedure bFontClick(Sender: TObject);
     procedure bAddCrtClick(Sender: TObject);
@@ -552,6 +554,15 @@ begin
   progress.Position:= ACurPos * 100 div AMaxPos;
   Application.ProcessMessages;
   if FFindStopped then AContinue:= false;
+end;
+
+procedure TfmMain.mnuFileHtmlClick(Sender: TObject);
+begin
+  SaveDialog1.Filename:= '_export.html';
+  if not SaveDialog1.Execute then exit;
+
+  ed.DoCommand(cCommand_SelectNone);
+  DoEditorExportToHTML(ed, SaveDialog1.FileName, 'Export test');
 end;
 
 procedure TfmMain.bFontClick(Sender: TObject);

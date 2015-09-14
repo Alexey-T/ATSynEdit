@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="36">
+    <Units Count="37">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -205,6 +205,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit35>
+      <Unit36>
+        <Filename Value="..\..\atsynedit\atsynedit_export_html.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Export_HTML"/>
+      </Unit36>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
