@@ -3501,8 +3501,8 @@ end;
 
 procedure TATSynEdit.DoEventScroll;
 begin
-  //if Assigned(FAdapterHilite) then
-  //  FAdapterHilite.OnEditorScroll(Self);
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorScroll(Self);
 
   if Assigned(FOnScroll) then
     FOnScroll(Self);

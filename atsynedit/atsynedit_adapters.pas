@@ -21,6 +21,7 @@ type
     procedure OnEditorCalcPosColor(Sender: TObject;
       AX, AY: integer; var AColor: TColor); virtual;
     procedure OnEditorCaretMove(Sender: TObject); virtual;
+    procedure OnEditorScroll(Sender: TObject); virtual;
   end;
 
 implementation
@@ -46,6 +47,11 @@ begin
 end;
 
 procedure TATAdapterHilite.OnEditorCaretMove(Sender: TObject);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorScroll(Sender: TObject);
 begin
   //
 end;

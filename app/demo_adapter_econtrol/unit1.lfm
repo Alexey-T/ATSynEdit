@@ -1,10 +1,10 @@
 object fmMain: TfmMain
   Left = 391
-  Height = 516
+  Height = 578
   Top = 237
   Width = 889
   Caption = 'Demo'
-  ClientHeight = 516
+  ClientHeight = 578
   ClientWidth = 889
   OnCreate = FormCreate
   OnShow = FormShow
@@ -12,12 +12,12 @@ object fmMain: TfmMain
   LCLVersion = '1.5'
   object Panel1: TPanel
     Left = 0
-    Height = 178
-    Top = 338
+    Height = 218
+    Top = 360
     Width = 889
     Align = alBottom
     BevelOuter = bvNone
-    ClientHeight = 178
+    ClientHeight = 218
     ClientWidth = 889
     TabOrder = 0
     object chkWrap: TCheckBox
@@ -30,19 +30,19 @@ object fmMain: TfmMain
       TabOrder = 0
     end
     object edLexer: TComboBox
-      Left = 192
+      Left = 9
       Height = 31
-      Top = 36
-      Width = 152
+      Top = 120
+      Width = 176
       DropDownCount = 24
       ItemHeight = 0
       OnChange = edLexerChange
       Style = csDropDownList
-      TabOrder = 7
+      TabOrder = 5
     end
     object files: TShellListView
       Left = 352
-      Height = 168
+      Height = 208
       Top = 3
       Width = 528
       Anchors = [akTop, akLeft, akBottom]
@@ -51,7 +51,7 @@ object fmMain: TfmMain
       ReadOnly = True
       ShowColumnHeaders = False
       SortType = stText
-      TabOrder = 11
+      TabOrder = 12
       ToolTips = False
       ViewStyle = vsSmallIcon
       OnClick = filesClick
@@ -79,10 +79,10 @@ object fmMain: TfmMain
       Left = 192
       Height = 25
       Top = 8
-      Width = 88
+      Width = 152
       Caption = 'open...'
       OnClick = bOpenClick
-      TabOrder = 6
+      TabOrder = 8
     end
     object chkUnpri: TCheckBox
       Left = 9
@@ -103,29 +103,29 @@ object fmMain: TfmMain
       TabOrder = 4
     end
     object chkLexer: TCheckBox
-      Left = 192
+      Left = 9
       Height = 24
-      Top = 72
+      Top = 152
       Width = 108
       Caption = 'enable lexer'
       Checked = True
       OnChange = chkLexerChange
       State = cbChecked
-      TabOrder = 8
+      TabOrder = 6
     end
     object chkDyn: TCheckBox
       Left = 9
       Height = 24
-      Top = 112
+      Top = 176
       Width = 119
       Caption = 'dynamic hilite'
       OnChange = chkDynChange
-      TabOrder = 5
+      TabOrder = 7
     end
     object bComment: TButton
       Left = 192
       Height = 25
-      Top = 112
+      Top = 40
       Width = 152
       Caption = 'comment sel'
       OnClick = bCommentClick
@@ -134,16 +134,25 @@ object fmMain: TfmMain
     object bUncomment: TButton
       Left = 192
       Height = 25
-      Top = 144
+      Top = 72
       Width = 152
       Caption = 'uncomment sel'
       OnClick = bUncommentClick
       TabOrder = 10
     end
+    object bExport: TButton
+      Left = 192
+      Height = 25
+      Top = 104
+      Width = 152
+      Caption = 'export html'
+      OnClick = bExportClick
+      TabOrder = 11
+    end
   end
   object Tree: TTreeView
     Left = 0
-    Height = 338
+    Height = 360
     Top = 0
     Width = 240
     Align = alLeft
@@ -158,7 +167,7 @@ object fmMain: TfmMain
   end
   object PanelText: TPanel
     Left = 245
-    Height = 338
+    Height = 360
     Top = 0
     Width = 644
     Align = alClient
@@ -168,7 +177,7 @@ object fmMain: TfmMain
   end
   object Splitter1: TSplitter
     Left = 240
-    Height = 338
+    Height = 360
     Top = 0
     Width = 5
   end

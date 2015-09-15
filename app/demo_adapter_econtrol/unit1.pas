@@ -7,10 +7,12 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
   StdCtrls, ShellCtrls, ComCtrls,
+  LclIntf, LclType,
   ATSynEdit,
   ATStringProc,
   ATSynEdit_Adapter_EControl,
   ATSynEdit_Carets,
+  ATSynEdit_Export_HTML,
   ecSyntAnal,
   proc_lexer;
 
@@ -21,6 +23,7 @@ type
     bOpen: TButton;
     bComment: TButton;
     bUncomment: TButton;
+    bExport: TButton;
     chkDyn: TCheckBox;
     chkFullHilite: TCheckBox;
     chkFullSel: TCheckBox;
@@ -39,6 +42,7 @@ type
     procedure AdapterParseBegin(Sender: TObject);
     procedure AdapterParseDone(Sender: TObject);
     procedure bCommentClick(Sender: TObject);
+    procedure bExportClick(Sender: TObject);
     procedure bOpenClick(Sender: TObject);
     procedure bUncommentClick(Sender: TObject);
     procedure chkDynChange(Sender: TObject);
@@ -262,6 +266,18 @@ end;
 procedure TfmMain.bCommentClick(Sender: TObject);
 begin
   DoCommentAct(cCommentAddIfNone);
+end;
+
+procedure TfmMain.bExportClick(Sender: TObject);
+var
+  fn: string;
+begin
+  fn:=     GetTempDir+DirectorySeparator+'_export.html';
+  DoEditorExportToHTML(Ed, fn, 'Export test',
+    'Courier New', 12, false,
+    clWhite, clMedGray);
+  if FileExists(fn) then
+    OpenDocument(fn);
 end;
 
 procedure TfmMain.AdapterParseDone(Sender: TObject);

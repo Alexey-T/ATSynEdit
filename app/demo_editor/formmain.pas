@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Spin, ComCtrls, Menus,
+  ExtCtrls, Spin, ComCtrls, Menus, LclIntf,
   ATStrings,
   ATStringProc,
   ATSynEdit,
@@ -557,13 +557,17 @@ begin
 end;
 
 procedure TfmMain.mnuFileHtmlClick(Sender: TObject);
+var
+  fn: string;
 begin
-  SaveDialog1.Filename:= '_export.html';
-  if not SaveDialog1.Execute then exit;
-
-  ed.DoCommand(cCommand_SelectNone);
-  DoEditorExportToHTML(ed, SaveDialog1.FileName, 'Export test', 12);
+  fn:=     GetTempDir+DirectorySeparator+'_export.html';
+  DoEditorExportToHTML(Ed, fn, 'Export test',
+    'Courier New', 12, false,
+    clWhite, clMedGray);
+  if FileExists(fn) then
+    OpenDocument(fn);
 end;
+
 
 procedure TfmMain.bFontClick(Sender: TObject);
 begin
