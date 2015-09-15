@@ -57,7 +57,11 @@ function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+
+//LCL color -> HTML color string #rrggbb
 function SColorToHtmlColor(Color: TColor): string;
+//string starts with HTML color token #rgb, #rrggbb -> LCL color, len of color-string
+function SHtmlColorToColor(s: string; out Len: integer; Default: TColor): TColor;
 
 type
   TATCommentAction = (
@@ -812,6 +816,45 @@ begin
   Result:= IntToHex(ColorToRGB(Color), 6);
   Result:= '#'+Copy(Result, 5, 2)+Copy(Result, 3, 2)+Copy(Result, 1, 2);
 end;
+
+function SHtmlColorToColor(s: string; out Len: integer; Default: TColor): TColor;
+var
+  N1, N2, N3: integer;
+  i: integer;
+begin
+  Result:= Default;
+  Len:= 0;
+  if (s<>'') and (s[1]='#') then Delete(s, 1, 1);
+  if (s='') then exit;
+
+  //delete after first nonword char
+  i:= 1;
+  while (i<=Length(s)) and IsCharWord(s[i], '') do Inc(i);
+  Delete(s, i, Maxint);
+
+  //allow only #rgb, #rrggbb
+  Len:= Length(s);
+  if (Len<>3) and (Len<>6) then exit;
+
+  for i:= 1 to Len do
+    if not (s[i] in ['0'..'9', 'a'..'f', 'A'..'F']) then exit;
+
+  if Len=6 then
+  begin
+    N1:= StrToInt('$'+Copy(s, 1, 2));
+    N2:= StrToInt('$'+Copy(s, 3, 2));
+    N3:= StrToInt('$'+Copy(s, 5, 2));
+  end
+  else
+  begin
+    N1:= StrToInt('$'+s[1]+s[1]);
+    N2:= StrToInt('$'+s[2]+s[2]);
+    N3:= StrToInt('$'+s[3]+s[3]);
+  end;
+
+  Result:= N1 + N2 shl 8 + N3 shl 16;
+end;
+
 
 
 initialization
