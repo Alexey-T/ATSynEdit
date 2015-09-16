@@ -813,6 +813,8 @@ end;
 
 function SColorToHtmlColor(Color: TColor): string;
 begin
+  if Color=clNone then
+    begin Result:= ''; exit end;
   Result:= IntToHex(ColorToRGB(Color), 6);
   Result:= '#'+Copy(Result, 5, 2)+Copy(Result, 3, 2)+Copy(Result, 1, 2);
 end;
