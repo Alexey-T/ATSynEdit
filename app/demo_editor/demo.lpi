@@ -197,6 +197,7 @@
       <Unit34>
         <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Adapters"/>
       </Unit34>
       <Unit35>
         <Filename Value="formfind.pas"/>

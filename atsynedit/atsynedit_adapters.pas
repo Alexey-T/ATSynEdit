@@ -22,6 +22,7 @@ type
       AX, AY: integer; var AColor: TColor); virtual;
     procedure OnEditorCaretMove(Sender: TObject); virtual;
     procedure OnEditorScroll(Sender: TObject); virtual;
+    procedure OnEditorPaintText(Sender: TObject); virtual;
   end;
 
 implementation
@@ -52,6 +53,11 @@ begin
 end;
 
 procedure TATAdapterHilite.OnEditorScroll(Sender: TObject);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorPaintText(Sender: TObject);
 begin
   //
 end;
