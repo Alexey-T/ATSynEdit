@@ -373,7 +373,7 @@ type
     FLastTextCmdText: atString;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
-    FOnPaintText: TNotifyEvent;
+    FOnBeforeCalcHilite: TNotifyEvent;
     FOnClickDbl,
     FOnClickTriple,
     FOnClickMiddle: TATSynEditClickEvent;
@@ -616,7 +616,7 @@ type
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoCaretsSort;
     //events
-    procedure DoEventPaintText;
+    procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     function DoEventCommand(ACommand: integer): boolean;
@@ -913,7 +913,7 @@ type
     property OnCalcHilite: TATSynEditCalcHiliteEvent read FOnCalcHilite write FOnCalcHilite;
     property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
     property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
-    property OnPaintText: TNotifyEvent read FOnPaintText write FOnPaintText;
+    property OnBeforeCalcHilite: TNotifyEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText;
@@ -1676,7 +1676,7 @@ begin
   else
     NWrapIndex:= AScrollVert.NPos;
 
-  DoEventPaintText;
+  DoEventBeforeCalcHilite;
 
   repeat
     if NCoordTop>ARect.Bottom then Break;
@@ -3546,13 +3546,13 @@ begin
     FOnDrawBookmarkIcon(Self, C, ALineNumber, ARect);
 end;
 
-procedure TATSynEdit.DoEventPaintText;
+procedure TATSynEdit.DoEventBeforeCalcHilite;
 begin
   if Assigned(FAdapterHilite) then
-    FAdapterHilite.OnEditorPaintText(Self);
+    FAdapterHilite.OnEditorBeforeCalcHilite(Self);
 
-  if Assigned(FOnPaintText) then
-    FOnPaintText(Self);
+  if Assigned(FOnBeforeCalcHilite) then
+    FOnBeforeCalcHilite(Self);
 end;
 
 
