@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Graphics, StrUtils,
   ATSynEdit,
   ATSynEdit_CanvasProc,
-  ATStringProc;
+  ATStringProc_HtmlColor;
 
 procedure DoEditorExportToHTML(Ed: TATSynEdit;
   const AFilename, APageTitle, AFontName: string;

@@ -577,12 +577,10 @@ type
     //select
     procedure DoSelectionDeleteOrReset;
     procedure DoSelect_ExtendSelectionByLine;
-    procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_Word_ByClick;
     procedure DoSelect_Line_ByClick;
-    procedure DoSelect_None;
     //paint
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
     procedure DoPaintNiceScroll(C: TCanvas);
@@ -826,11 +824,13 @@ type
     function TextSelected: atString;
     function TextCurrentWord: atString;
     procedure DoSelect_All;
+    procedure DoSelect_None;
     procedure DoSelect_Inverted;
     procedure DoSelect_SplitSelectionToLines;
     procedure DoSelect_Line(P: TPoint);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
+    procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoRangeFold(ARange: TATSynRange);
     procedure DoRangeUnfold(ARange: TATSynRange);
     procedure DoScrollByDelta(Dx, Dy: integer);
