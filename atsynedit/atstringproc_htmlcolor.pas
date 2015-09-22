@@ -26,11 +26,16 @@ begin
 end;
 
 function SColorToHtmlColor(Color: TColor): string;
+var
+  N: Longint;
 begin
   if Color=clNone then
     begin Result:= ''; exit end;
-  Result:= IntToHex(ColorToRGB(Color), 6);
-  Result:= '#'+Copy(Result, 5, 2)+Copy(Result, 3, 2)+Copy(Result, 1, 2);
+  N:= ColorToRGB(Color);
+  Result:= '#'+
+    IntToHex(Red(N), 2)+
+    IntToHex(Green(N), 2)+
+    IntToHex(Blue(N), 2);
 end;
 
 function SHtmlColorToColor(s: string; out Len: integer; Default: TColor): TColor;
@@ -68,7 +73,7 @@ begin
     N3:= StrToInt('$'+s[3]+s[3]);
   end;
 
-  Result:= N1 + N2 shl 8 + N3 shl 16;
+  Result:= RGBToColor(N1, N2, N3);
 end;
 
 
