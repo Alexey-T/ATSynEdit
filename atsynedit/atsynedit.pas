@@ -505,7 +505,8 @@ type
     FOptKeyTabIndents: boolean;
     FOptShowIndentLines: boolean;
     FOptShowGutterCaretBG: boolean;
-    FOptAllowScrollbars: boolean;
+    FOptAllowScrollbarVert: boolean;
+    FOptAllowScrollbarHorz: boolean;
     FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
     //
@@ -1020,7 +1021,8 @@ type
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG;
-    property OptAllowScrollbars: boolean read FOptAllowScrollbars write FOptAllowScrollbars;
+    property OptAllowScrollbarVert: boolean read FOptAllowScrollbarVert write FOptAllowScrollbarVert;
+    property OptAllowScrollbarHorz: boolean read FOptAllowScrollbarHorz write FOptAllowScrollbarHorz;
     property OptAllowZooming: boolean read FOptAllowZooming write FOptAllowZooming;
     property OptAllowReadOnly: boolean read FOptAllowReadOnly write FOptAllowReadOnly;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit;
@@ -1452,7 +1454,7 @@ procedure TATSynEdit.UpdateScrollbarVert;
 var
   si: TScrollInfo;
 begin
-  if not FOptAllowScrollbars then Exit;
+  if not FOptAllowScrollbarVert then Exit;
 
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
@@ -1468,7 +1470,7 @@ procedure TATSynEdit.UpdateScrollbarHorz;
 var
   si: TScrollInfo;
 begin
-  if not FOptAllowScrollbars then Exit;
+  if not FOptAllowScrollbarHorz then Exit;
 
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
@@ -2271,7 +2273,8 @@ begin
 
   FOptTextOffsetTop:= 0;
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
-  FOptAllowScrollbars:= true;
+  FOptAllowScrollbarVert:= true;
+  FOptAllowScrollbarHorz:= true;
   FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;
   FOptKeyBackspaceUnindent:= true;
@@ -2518,7 +2521,8 @@ begin
     OptCaretManyAllowed:= false;
     OptUnprintedVisible:= false;
     OptWrapMode:= cWrapOff;
-    OptAllowScrollbars:= false;
+    OptAllowScrollbarVert:= false;
+    OptAllowScrollbarHorz:= false;
     OptAllowZooming:= false;
     OptAllowReadOnly:= false;
     OptMouseNiceScroll:= false;

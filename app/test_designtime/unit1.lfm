@@ -1,7 +1,7 @@
 object fmMain: TfmMain
-  Left = 221
+  Left = 359
   Height = 419
-  Top = 309
+  Top = 457
   Width = 685
   Caption = 'Test'
   ClientHeight = 419
@@ -44,6 +44,7 @@ object fmMain: TfmMain
     Colors.MarginCaret = clLime
     Colors.MarginUser = clYellow
     Colors.IndentVertLines = clMedGray
+    Colors.BookmarkBG = clMoneyGreen
     Colors.RulerFont = clGray
     Colors.RulerBG = 14737632
     Colors.CollapseLine = 10510432
@@ -159,7 +160,8 @@ object fmMain: TfmMain
     OptIndentKeepsAlign = True
     OptShowIndentLines = True
     OptShowGutterCaretBG = True
-    OptAllowScrollbars = True
+    OptAllowScrollbarVert = True
+    OptAllowScrollbarHorz = True
     OptAllowZooming = True
     OptAllowReadOnly = True
     OptUndoLimit = 5000
@@ -210,6 +212,7 @@ object fmMain: TfmMain
       Colors.MarginCaret = clLime
       Colors.MarginUser = clYellow
       Colors.IndentVertLines = clMedGray
+      Colors.BookmarkBG = clMoneyGreen
       Colors.RulerFont = clGray
       Colors.RulerBG = 14737632
       Colors.CollapseLine = 10510432
@@ -325,7 +328,8 @@ object fmMain: TfmMain
       OptIndentKeepsAlign = True
       OptShowIndentLines = True
       OptShowGutterCaretBG = True
-      OptAllowScrollbars = False
+      OptAllowScrollbarVert = False
+      OptAllowScrollbarHorz = False
       OptAllowZooming = False
       OptAllowReadOnly = False
       OptUndoLimit = 200
