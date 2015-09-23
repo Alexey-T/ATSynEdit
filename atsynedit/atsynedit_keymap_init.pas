@@ -206,7 +206,7 @@ begin
   M.Add(cCommand_ClipboardCut, 'clipboard: cut', [cXControl+'+X'], ['Shift+Del']);
   M.Add(cCommand_ClipboardPaste, 'clipboard: paste', [cXControl+'+V'], ['Shift+Ins']);
 
-  M.Add(cCommand_RecentsPopup, 'combo: recents popup menu', ['Alt+Down'], [cXControl+'+Down']);
+  M.Add(cCommand_ComboboxRecentsMenu, 'combobox: recent items menu', ['Alt+Down'], [cXControl+'+Down']);
 
   M.Add(cCommand_KeyUp,        'blocked: caret line up',   ['Up'], []);
   M.Add(cCommand_KeyDown,      'blocked: caret line down', ['Down'], []);

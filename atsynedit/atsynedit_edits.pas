@@ -150,7 +150,7 @@ end;
 procedure TATComboEdit.DoCommand(ACmd: integer; const AText: atString);
 begin
   inherited;
-  if ACmd=cCommand_RecentsPopup then
+  if ACmd=cCommand_ComboboxRecentsMenu then
   begin
     DoMenu;
   end;
