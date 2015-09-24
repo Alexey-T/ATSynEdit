@@ -73,7 +73,7 @@ object fmLexerLib: TfmLexerLib
   end
   object OpenDlg: TOpenDialog
     Filter = 'Zip files|*.zip'
-    Options = [ofFileMustExist, ofEnableSizing, ofViewDetail]
+    Options = [ofHideReadOnly, ofFileMustExist, ofEnableSizing, ofViewDetail]
     left = 280
     top = 360
   end
