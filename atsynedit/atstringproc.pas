@@ -88,7 +88,6 @@ function SGetItem(var S: string; const sep: Char = ','): string;
 function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SWithBreaks(const S: atString): boolean;
-function SFindFuzzyPositions(SText, SFind: atString): TATIntArray;
 
 function BoolToPlusMinusOne(b: boolean): integer;
 procedure TrimStringList(L: TStringList);
@@ -757,31 +756,6 @@ begin
   end;
 end;
 
-
-function SFindFuzzyPositions(SText, SFind: atString): TATIntArray;
-var
-  i, N, NPos: integer;
-begin
-  SetLength(result, 0);
-
-  SText:= UnicodeLowerCase(SText);
-  SFind:= UnicodeLowercase(SFind);
-
-  N:= 0;
-  for i:= 1 to Length(SFind) do
-  begin
-    //PosEx don't supp Unicodestring, Pos does
-    NPos:= Pos(SFind[i], Copy(SText, N+1, MaxInt));
-    if NPos=0 then
-    begin
-      SetLength(result, 0);
-      Exit
-    end;
-    Inc(N, NPos);
-    SetLength(result, Length(result)+1);
-    result[high(result)]:= N;
-  end;
-end;
 
 procedure SReplaceAll(var s: string; const SFrom, STo: string);
 begin
