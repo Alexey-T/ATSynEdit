@@ -311,7 +311,7 @@ begin
       Result:= Result+FSuffix
     else
     if cCompleteInsertAlsoBracket then
-      if SBegin(SDesc, '(') then
+      if SBeginsWith(SDesc, '(') then
         Result:= Result+'(';
   end;
 end;

@@ -49,7 +49,7 @@ procedure SParseString_AcpControlLine(const s: string;
 var
   n: Integer;
 begin
-  if SBegin(s, '#chars') then
+  if SBeginsWith(s, '#chars') then
   begin
     WordChars:= '';
     IsBracketSep:= true;
@@ -164,8 +164,8 @@ end;
 procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
   out ACharsLeft, ACharsRight: integer);
 var
-  s_word: atString;
-  s_type, s_text, s_desc: string;
+  s_word_w: atString;
+  s_type, s_text, s_desc, s_word: string;
   n: integer;
   ok: boolean;
 begin
@@ -173,7 +173,8 @@ begin
   ASuffix:= '';
   ACharsLeft:= 0;
   ACharsRight:= 0;
-  EditorGetCurrentWord(Ed, FWordChars, s_word, ACharsLeft, ACharsRight);
+  EditorGetCurrentWord(Ed, FWordChars, s_word_w, ACharsLeft, ACharsRight);
+  s_word:= Utf8Encode(s_word_w);
 
   for n:= 0 to ListAcpText.Count-1 do
   begin
@@ -184,9 +185,9 @@ begin
     if s_word<>'' then
     begin
       if CaseSens then
-        ok:= SBegin(s_text, s_word)
+        ok:= SBeginsWith(s_text, s_word)
       else
-        ok:= SBegin(UpperCase(s_text), UpperCase(s_word));
+        ok:= SBeginsWith(UpperCase(s_text), UpperCase(s_word));
       if not ok then Continue;
     end;
 

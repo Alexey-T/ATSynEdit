@@ -50,7 +50,11 @@ function IsCharAsciiControl(ch: atChar): boolean;
 function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
 
-function SBegin(const S, SubStr: atString): boolean;
+function SBeginsWith(const S, SubStr: atString): boolean;
+function SBeginsWith(const S, SubStr: string): boolean;
+function SEndsWith(const S, SubStr: atString): boolean;
+function SEndsWith(const S, SubStr: string): boolean;
+
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
@@ -605,10 +609,28 @@ begin
   Result:= Copy(S, 1, N);
 end;
 
-function SBegin(const S, SubStr: atString): boolean;
+function SBeginsWith(const S, SubStr: atString): boolean;
 begin
   Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
 end;
+
+function SBeginsWith(const S, SubStr: string): boolean;
+begin
+  Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
+end;
+
+function SEndsWith(const S, SubStr: atString): boolean;
+begin
+  Result:= (SubStr<>'') and (Length(SubStr)<=Length(S)) and
+    (Copy(S, Length(S)-Length(SubStr)+1, MaxInt)=SubStr);
+end;
+
+function SEndsWith(const S, SubStr: string): boolean;
+begin
+  Result:= (SubStr<>'') and (Length(SubStr)<=Length(S)) and
+    (Copy(S, Length(S)-Length(SubStr)+1, MaxInt)=SubStr);
+end;
+
 
 function SCharUpper(ch: atChar): atChar;
 begin

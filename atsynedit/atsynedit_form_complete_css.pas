@@ -121,7 +121,7 @@ begin
       //filter by cur word (not case sens)
       if s_word<>'' then
       begin
-        ok:= SBegin(UpperCase(s_item), UpperCase(s_word));
+        ok:= SBeginsWith(UpperCase(s_item), UpperCase(s_word));
         if not ok then Continue;
       end;
 

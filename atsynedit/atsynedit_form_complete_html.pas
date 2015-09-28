@@ -176,7 +176,7 @@ begin
           //filter items
           if s_word<>'' then
           begin
-            ok:= SBegin(UpperCase(s_item), UpperCase(s_word));
+            ok:= SBeginsWith(UpperCase(s_item), UpperCase(s_word));
             if not ok then Continue;
           end;
           AText:= AText+'tag|'+s_item+#13;
@@ -196,7 +196,7 @@ begin
           //filter items
           if s_word<>'' then
           begin
-            ok:= SBegin(UpperCase(s_subitem), UpperCase(s_word));
+            ok:= SBeginsWith(UpperCase(s_subitem), UpperCase(s_word));
             if not ok then Continue;
           end;
           AText:= AText+s_tag+' attrib|'+s_subitem+#13;
