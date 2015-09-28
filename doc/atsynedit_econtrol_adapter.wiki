@@ -1,0 +1,91 @@
+__TOC__
+=Intro=
+
+[[ATSynEdit]] has adapter for lexers from SynWrite editor. It's EControl lexer engine. Use these:
+
+* units from https://github.com/Alexey-T/EControl
+* unit from ATSynEdit: ATSynEdit_Adapter_EControl which contains class TATAdapterEControl. You must create object of this class and assign this object to editor property AdapterHilite.
+
+For ex, if you have editor object:
+
+<syntaxhighlight>
+  //form's OnCreate
+  Adapter:= TATAdapterEControl.Create(Self);
+  Edit1.AdapterHilite:= Adapter;
+</syntaxhighlight>
+
+For ex, if you have 2 editor objects with the same text-source (see help topic [[ATSynEdit]]):
+
+<syntaxhighlight>
+  Adapter:= TATAdapterEControl.Create(Self);
+  Adapter.AddEditor(Ed1);
+  Adapter.AddEditor(Ed2);
+  Ed1.AdapterHilite:= Adapter;
+  Ed2.AdapterHilite:= Adapter;
+</syntaxhighlight>
+
+=Properties=
+
+* Lexer: TecSyntAnalyzer. You must set this prop from SyntaxManager object. SyntaxManager is a collection of lexers, which is loaded from .lxl file. After you load SyntaxManager, get its any item and assign it to Lexer prop. Example exists in demo of ATSynEdit. Set to nil to disable adapter.
+
+
+* DynamicHiliteEnabled: boolean. This enables dynamic highlight, ie highlight of tokens depending on caret position. If enabled, adapter reads editor's caret-pos-changed event and recalculates hiliting if needed. Some lexers use this feature: HTML hilites tags with green if caret is inside tag; Pascal hilites "begin"/"end" with green if caret is inside block; rare C-like lexers hilite brackets.
+
+[[File:atsynedit dyn hilite.png]]
+
+
+* OnParseBegin, OnParseDone: these events called by adapter on analyzing start and after analyzing finish. If big file parsed, OnParseDone will fire after few seconds, during which user may edit/scroll file.
+
+
+* procedure AddEditor(AEdit: TATSynEdit). This adds editor to internal list. This is to support 2+ editors which have single text-source (application has split-tab feature). Pass nil to clear internal list and disable adapter.
+
+=Syntax tree=
+
+Support for syntax tree exists like in SynWrite. Many lexers support tree (most C-based, Pascal, HTML, CSS, Python...). You need to add TTreeView to your form and use it in this API. Set tree read/only.
+
+[[File:atsynedit_tree.png]]
+
+<syntaxhighlight>
+    procedure TreeFill(ATree: TTreeView);
+</syntaxhighlight>
+It fills tree with nodes from adapter. Call it only after parsing is done. On parsing start, better clear the tree.
+
+<syntaxhighlight>
+    property TreeBusy: boolean
+</syntaxhighlight>
+It is true during filling of tree by TreeFill.
+
+<syntaxhighlight>
+    procedure TreeShowItemForCaret(Tree: TTreeView; P: TPoint);
+</syntaxhighlight>
+This focuses tree node, for given caret position. Only if position has a node.
+
+<syntaxhighlight>
+    function TreeGetPositionOfRange(R: TecTextRange): TPoint;
+    function TreeGetRangeOfPosition(P: TPoint): TecTextRange;
+</syntaxhighlight>
+
+These get caret position from a range, or range from caret position. Range is object, it's stored in TTreeNode.Data of nodes. If you want to goto clicked tree item, add OnDblClick event to tree, and use this API. Example:
+
+<syntaxhighlight>
+procedure TfmMain.TreeDblClick(Sender: TObject);
+var
+  R: TecTextRange;
+  P: TPoint;
+begin
+  if Tree.Selected=nil then exit;
+  if Tree.Selected.Data=nil then exit;
+  R:= TecTextRange(Tree.Selected.Data);
+  P:= CurrentFrame.Adapter.TreeGetPositionOfRange(R);
+  FTreeClick:= true;
+  CurrentEditor.DoGotoPosEx(P);
+  CurrentEditor.SetFocus;
+  FTreeClick:= false;
+end;
+</syntaxhighlight>
+
+=Syntax tree icons=
+
+Many lexers support icons in tree (e.g. Pascal, C#). To show icons, use for tree ImageList with these icons (same count, images are examples, you may change them):
+
+[[File:atsynedit_tree_img.png]]
