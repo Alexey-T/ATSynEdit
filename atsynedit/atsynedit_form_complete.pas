@@ -375,7 +375,7 @@ begin
   List.Color:= cCompleteColorBg;
   List.Font.Name:= cCompleteFontName;
   List.Font.Size:= cCompleteFontSize;
-  List.ItemHeight:= Trunc(List.Font.Size*1.8);
+  List.ItemHeight:= Canvas.TextHeight('H');
   List.BorderSpacing.Around:= cCompleteBorderSize;
   List.Invalidate;
 
