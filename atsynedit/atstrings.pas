@@ -171,7 +171,7 @@ type
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
-    property Modified: boolean read FModified;
+    property Modified: boolean read FModified write FModified;
     property OneLine: boolean read FOneLine write FOneLine;
     property Progress: integer read FProgress write FProgress;
     procedure ActionDeleteFakeLine;

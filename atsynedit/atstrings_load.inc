@@ -80,6 +80,7 @@ end;
 procedure TATStrings.LoadFromString(const AText: atString);
 var
   MS: TMemoryStream;
+  i: integer;
 begin
   Clear;
   if AText='' then
@@ -100,6 +101,10 @@ begin
   finally
     FreeAndNil(MS);
   end;
+
+  Modified:= true;
+  for i:= 0 to Count-1 do
+    SetLineState(i, cLineStateAdded);
 end;
 
 procedure TATStrings.DoLoadFromStream(Stream: TStream);
