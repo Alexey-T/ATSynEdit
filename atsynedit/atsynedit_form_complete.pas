@@ -88,6 +88,7 @@ var
   cCompleteInsertAlsoBracket: boolean = true;
   cCompleteFontName: string = 'default';
   cCompleteFontSize: integer = 10;
+  cCompleteItemHeight: integer = 17;
   cCompleteBorderSize: integer = 4;
   cCompleteFormSizeX: integer = 500;
   cCompleteFormSizeY: integer = 200;
@@ -375,7 +376,7 @@ begin
   List.Color:= cCompleteColorBg;
   List.Font.Name:= cCompleteFontName;
   List.Font.Size:= cCompleteFontSize;
-  List.ItemHeight:= Canvas.TextHeight('H');
+  List.ItemHeight:= cCompleteItemHeight;
   List.BorderSpacing.Around:= cCompleteBorderSize;
   List.Invalidate;
 
