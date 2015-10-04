@@ -2730,6 +2730,17 @@ end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
 begin
+  {
+  application.MainForm.caption:= format('min %d max %d page %d pos %d',
+                                 [info.nmin, info.nmax, info.npage, info.npos]);
+  }
+  with Info do
+    if (NMax-NMin)<NPage then
+    begin
+      DoClearScrollInfo(Info);
+      Exit(true);
+    end;
+
   case Msg.ScrollCode of
     SB_TOP:        Info.NPos:= Info.NMin;
     SB_BOTTOM:     Info.NPos:= Info.NPosLast;
