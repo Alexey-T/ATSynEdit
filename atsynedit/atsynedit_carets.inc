@@ -376,6 +376,8 @@ begin
   begin
     PosX:= AX;
     PosY:= AY;
+    EndX:= -1;
+    EndY:= -1;
   end;
 end;
 
