@@ -809,7 +809,7 @@ type
     procedure LoadFromFile(const AFilename: string);
     procedure SaveToFile(const AFilename: string);
     //carets
-    procedure DoCaretSingle(AX, AY: integer);
+    procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
     procedure DoCaretSingleAsIs;
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;

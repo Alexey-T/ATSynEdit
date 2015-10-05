@@ -231,7 +231,7 @@ var
 begin
   Item:= FWrapInfo[0];
   if Assigned(Item) then
-    DoCaretSingle(0, Item.NLineIndex);
+    DoCaretSingle(0, Item.NLineIndex, false);
 
   FScrollHorz.NPos:= 0;
   FScrollVert.NPos:= 0;
@@ -245,7 +245,7 @@ var
 begin
   Item:= FWrapInfo[FWrapInfo.Count-1];
   if Assigned(Item) then
-    DoCaretSingle(Item.NLength, Item.NLineIndex);
+    DoCaretSingle(Item.NLength, Item.NLineIndex, false);
 
   Result:= [cResultCaretBottom];
 end;

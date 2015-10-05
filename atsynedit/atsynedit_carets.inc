@@ -362,7 +362,7 @@ begin
     Carets.Delete(Carets.Count-1);
 end;
 
-procedure TATSynEdit.DoCaretSingle(AX, AY: integer);
+procedure TATSynEdit.DoCaretSingle(AX, AY: integer; AClearSelection: boolean);
 begin
   FSelRect:= cRectEmpty;
 
@@ -376,8 +376,11 @@ begin
   begin
     PosX:= AX;
     PosY:= AY;
-    EndX:= -1;
-    EndY:= -1;
+    if AClearSelection then
+    begin
+      EndX:= -1;
+      EndY:= -1;
+    end;
   end;
 end;
 
