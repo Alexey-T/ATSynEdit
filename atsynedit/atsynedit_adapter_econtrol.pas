@@ -77,6 +77,7 @@ type
     destructor Destroy; override;
     procedure AddEditor(AEdit: TATSynEdit);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
+    function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
     property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
     //support for syntax-tree
     property TreeBusy: boolean read FBusy;
@@ -442,6 +443,13 @@ begin
       EdList.Add(AEdit);
     AEdit.Strings.OnLog:= @DoChangeLog;
   end;
+end;
+
+function TATAdapterEControl.LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
+begin
+  Result:= nil;
+  if AnClient<>nil then
+    Result:= AnClient.AnalyzerAtPos(Buffer.CaretToStr(Pnt));
 end;
 
 function TATAdapterEControl.GetRangeParent(R: TecTextRange): TecTextRange;
