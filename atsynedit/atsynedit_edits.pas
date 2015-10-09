@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Controls,
-  Menus,
+  Menus, Math,
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATStringProc;
@@ -29,6 +29,8 @@ type
     FItems: TStringList;
     FMenu: TPopupMenu;
     FArrowSize: integer;
+    FSelectedIndex: integer;
+    procedure DoComboUpDown(ADown: boolean);
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure DoMenu;
@@ -83,6 +85,7 @@ begin
 
   FItems:= TStringList.Create;
   FMenu:= TPopupMenu.Create(Self);
+  FSelectedIndex:= -1;
 
   OptMicromapVisible:= true;
   OptMicromapWidth:= 22;
@@ -150,10 +153,27 @@ end;
 procedure TATComboEdit.DoCommand(ACmd: integer; const AText: atString);
 begin
   inherited;
-  if ACmd=cCommand_ComboboxRecentsMenu then
-  begin
-    DoMenu;
+  case ACmd of
+    cCommand_ComboboxRecentsMenu:
+      begin
+        DoMenu;
+      end;
+    cCommand_KeyDown,
+    cCommand_KeyUp:
+      begin
+        DoComboUpDown(ACmd=cCommand_KeyDown);
+      end;
   end;
+end;
+
+procedure TATComboEdit.DoComboUpDown(ADown: boolean);
+begin
+  if FItems.Count=0 then exit;
+  if ADown then Inc(FSelectedIndex) else Dec(FSelectedIndex);
+  FSelectedIndex:= Max(0, Min(FItems.Count-1, FSelectedIndex));
+
+  Text:= Utf8Decode(FItems[FSelectedIndex]);
+  DoEventChange;
 end;
 
 destructor TATComboEdit.Destroy;
