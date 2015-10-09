@@ -174,6 +174,7 @@ begin
 
   Text:= Utf8Decode(FItems[FSelectedIndex]);
   DoEventChange;
+  DoCommand(cCommand_SelectAll);
 end;
 
 destructor TATComboEdit.Destroy;
