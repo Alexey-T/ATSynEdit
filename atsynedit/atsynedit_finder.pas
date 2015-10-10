@@ -314,20 +314,15 @@ end;
 
 function TATEditorFinder.GetOffsetOfCaret: integer;
 var
-  Pos1, Pos2: TPoint;
+  Pnt: TPoint;
 begin
   with FEditor.Carets[0] do
   begin
-    Pos1.X:= PosX;
-    Pos1.Y:= PosY;
-    Pos2.X:= EndX;
-    Pos2.Y:= EndY;
+    Pnt.X:= PosX;
+    Pnt.Y:= PosY;
   end;
 
-  if Pos2.Y>=0 then
-    Result:= FBuffer.CaretToStr(Pos2)
-  else
-    Result:= FBuffer.CaretToStr(Pos1);
+  Result:= FBuffer.CaretToStr(Pnt);
   Inc(Result); //was 0-based
 
   //find-back must goto previous match
@@ -461,16 +456,15 @@ begin
       end;
     end;
 
-    with FEditor.Carets[0] do
-    begin
-      EndX:= -1;
-      EndY:= -1;
-      if not AReplace then
-      begin
-        EndX:= P2.X;
-        EndY:= P2.Y;
-      end;
-    end;
+    if AReplace then
+      //don't select
+      FEditor.DoCaretSingle(P1.X, P1.Y)
+    else
+    //select to right (find forward) or to left (find back)
+    if OptBack then
+      FEditor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y, true)
+    else
+      FEditor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y, true);
   end;
 end;
 

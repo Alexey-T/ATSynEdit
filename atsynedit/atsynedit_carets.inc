@@ -362,26 +362,32 @@ begin
     Carets.Delete(Carets.Count-1);
 end;
 
-procedure TATSynEdit.DoCaretSingle(AX, AY: integer; AClearSelection: boolean);
+
+procedure TATSynEdit.DoCaretSingle(APosX, APosY, AEndX, AEndY: integer; AUseEndXY: boolean);
 begin
   FSelRect:= cRectEmpty;
 
   if Carets.Count=0 then
-    Carets.Add(AX, AY);
+    Carets.Add(0, 0);
 
   while Carets.Count>1 do
     Carets.Delete(Carets.Count-1);
 
   with Carets[0] do
   begin
-    PosX:= AX;
-    PosY:= AY;
-    if AClearSelection then
+    PosX:= APosX;
+    PosY:= APosY;
+    if AUseEndXY then
     begin
-      EndX:= -1;
-      EndY:= -1;
+      EndX:= AEndX;
+      EndY:= AEndY;
     end;
   end;
+end;
+
+procedure TATSynEdit.DoCaretSingle(AX, AY: integer; AClearSelection: boolean);
+begin
+  DoCaretSingle(AX, AY, -1, -1, AClearSelection);
 end;
 
 function TATSynEdit.GetCaretSelectionIndex(P: TPoint): integer;
