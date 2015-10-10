@@ -57,11 +57,13 @@ var
   Str: atString;
   N1, N2: integer;
 begin
+  //multiline selection?
+  //instead of tabulation, do indent
   if FOptKeyTabIndents then
     if Carets.Count=1 then
     begin
       Carets[0].GetSelLines(N1, N2);
-      if N1>=0 then
+      if (N1>=0) and (N2>N1) then
       begin
         Result:= DoCommand_TextIndentUnindent(true);
         Exit
