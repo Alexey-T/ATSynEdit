@@ -327,7 +327,7 @@ begin
 
   //find-back must goto previous match
   if OptBack then
-    Dec(Result, Length(StrFind)*2);
+    Dec(Result, Length(StrFind));
 
   if Result<1 then
     Result:= 1;
