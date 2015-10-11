@@ -16,6 +16,7 @@ type
   TATKeyArray = array[0..Pred(cMaxKeyCombo)] of TShortcut;
 
 function KeyArrayToString(const K: TATKeyArray): string;
+function KeyArraysEqualNotEmpty(const a1, a2: TATKeyArray): boolean;
 
 type
   { TATKeymapItem }
@@ -252,6 +253,19 @@ begin
         result:= result+' * ';
       result:= result+ShortcutToText(K[i]);
     end;
+end;
+
+function KeyArraysEqualNotEmpty(const a1, a2: TATKeyArray): boolean;
+var
+  i: integer;
+begin
+  Result:= true;
+
+  if a1[0]=0 then Exit(false);
+  if a2[0]=0 then Exit(false);
+
+  for i:= Low(a1) to High(a1) do
+    if a1[i]<>a2[i] then Exit(false);
 end;
 
 
