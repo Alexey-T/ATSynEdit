@@ -66,6 +66,8 @@ type
   TATCommentAction = (
     cCommentAdd,
     cCommentAddIfNone,
+    cCommentAddAtStart,
+    cCommentAddIfNoneAtStart,
     cCommentRemove,
     cCommentToggle
     );
@@ -752,6 +754,15 @@ begin
         begin
           if not IsCmtAll then
             Insert(AComment, Str, IndentAll);
+        end;
+      cCommentAddAtStart:
+        begin
+          Insert(AComment, Str, 1);
+        end;
+      cCommentAddIfNoneAtStart:
+        begin
+          if not IsCmtAll then
+            Insert(AComment, Str, 1);
         end;
       cCommentRemove:
         begin
