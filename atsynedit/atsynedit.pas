@@ -368,6 +368,7 @@ type
     FMouseDownRight: boolean;
     FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
+    FMouseDragMinimap: boolean;
     FMouseAutoScroll: TATDirection;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
@@ -533,6 +534,7 @@ type
     function GetColorTextFont: TColor;
     function GetMinimapSelTop_InPixels: integer;
     function GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
+    function GetRectMinimapSel: TRect;
     procedure InitResourcesFoldbar;
     function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
     procedure MenuFoldFoldAllClick(Sender: TObject);
@@ -1509,6 +1511,14 @@ begin
     Result:= cRectEmpty;
 end;
 
+function TATSynEdit.GetRectMinimapSel: TRect;
+begin
+  Result.Left:= FRectMinimap.Left;
+  Result.Right:= FRectMinimap.Right;
+  Result.Top:= GetMinimapSelTop_InPixels;
+  Result.Bottom:= Result.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y;
+end;
+
 function TATSynEdit.GetRectMicromap: TRect;
 begin
   if FMicromapVisible then
@@ -1984,6 +1994,7 @@ var
   Percent: double;
 const
   PercentFix: double = 0.02;
+  //PercentFixRaw: double = 0.05;
 begin
   {
   1) calculate percent position of mouse
@@ -1991,6 +2002,9 @@ begin
     must scroll to end if almost at the end - do this by increment n%
   }
   Percent:= (APixels-FRectMinimap.Top) / (FRectMinimap.Bottom-FRectMinimap.Top);
+
+  //if Percent<0.6 then Percent:= Max(0.0, Percent-PercentFixRaw);
+
   if Percent<0.1 then Percent:= Max(0.0, Percent-PercentFix) else
    if Percent>0.9 then Percent:= Min(100.0, Percent+PercentFix);
 
@@ -2004,11 +2018,7 @@ begin
   if not FMinimapShowSelAlways then
     if not FCursorOnMinimap then Exit;
 
-  R.Left:= FRectMinimap.Left;
-  R.Right:= FRectMinimap.Right;
-  R.Top:= GetMinimapSelTop_InPixels;
-  R.Bottom:= R.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y;
-
+  R:= GetRectMinimapSel;
   if IntersectRect(R, R, FRectMinimap) then
   begin
     CanvasInvertRect(C, R, FColors.MinimapSelBG);
@@ -2828,11 +2838,15 @@ begin
   end;
 
   if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
+  begin
+    if PtInRect(GetRectMinimapSel, Point(X, Y)) then
+      FMouseDragMinimap:= true;
     if Shift=[ssLeft] then
     begin
       DoMinimapClick(Y);
       Exit
     end;
+  end;
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
@@ -2953,6 +2967,7 @@ begin
   FMouseDownNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDragDropping:= false;
+  FMouseDragMinimap:= false;
   FTimerScroll.Enabled:= false;
 
   //popup menu
@@ -3142,13 +3157,12 @@ begin
 
   //mouse dragged on minimap
   if PtInRect(FRectMinimap, P) then
-  begin
-    if Shift=[ssLeft] then
+    if FMouseDragMinimap then
     begin
-      DoMinimapDrag(Y);
+      if Shift=[ssLeft] then
+        DoMinimapDrag(Y);
+      Exit
     end;
-    Exit
-  end;
 end;
 
 function TATSynEdit.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean;
