@@ -64,13 +64,15 @@ function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
 
 type
   TATCommentAction = (
-    cCommentAdd,
-    cCommentAddIfNone,
-    cCommentAddAtStart,
-    cCommentAddIfNoneAtStart,
+    cCommentAdd_AtNonspace,
+    cCommentAdd_AtNonespace_IfNone,
+    cCommentAdd_AtStart,
+    cCommentAdd_AtStart_IfNone,
     cCommentRemove,
-    cCommentToggle
+    cCommentToggle_AtNonspace,
+    cCommentToggle_AtStart
     );
+
 function SCommentLineAction(L: TStringList; const AComment: atString; Act: TATCommentAction): boolean;
 
 function SRemoveNewlineChars(const S: atString): atString;
@@ -746,20 +748,20 @@ begin
     IsCmtAll:= Copy(Str, IndentAll, Length(AComment))=AComment;
 
     case Act of
-      cCommentAdd:
+      cCommentAdd_AtNonspace:
         begin
           Insert(AComment, Str, IndentAll);
         end;
-      cCommentAddIfNone:
+      cCommentAdd_AtNonespace_IfNone:
         begin
           if not IsCmtAll then
             Insert(AComment, Str, IndentAll);
         end;
-      cCommentAddAtStart:
+      cCommentAdd_AtStart:
         begin
           Insert(AComment, Str, 1);
         end;
-      cCommentAddIfNoneAtStart:
+      cCommentAdd_AtStart_IfNone:
         begin
           if not IsCmtAll then
             Insert(AComment, Str, 1);
@@ -772,12 +774,19 @@ begin
           if IsCmtThis then
             Delete(Str, IndentThis, Length(AComment))
         end;
-      cCommentToggle:
+      cCommentToggle_AtNonspace:
         begin
           if IsCmtAll then
             Delete(Str, IndentAll, Length(AComment))
           else
             Insert(AComment, Str, IndentAll);
+        end;
+      cCommentToggle_AtStart:
+        begin
+          if IsCmtAll then
+            Delete(Str, IndentAll, Length(AComment))
+          else
+            Insert(AComment, Str, 1);
         end;
     end;
 

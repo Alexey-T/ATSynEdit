@@ -1,7 +1,2 @@
 
-200k lines/minimap--
-- click ok..
-- drag wrong. must drag only if sel dragged (not all rect)/ must drag ok at begin/end of file
-- test drag- folded txt
-
 bad: initial restor of topline dont work 50% cases: in Cudatext
