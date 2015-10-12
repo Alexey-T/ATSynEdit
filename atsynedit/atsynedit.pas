@@ -1516,7 +1516,11 @@ begin
   Result.Left:= FRectMinimap.Left;
   Result.Right:= FRectMinimap.Right;
   Result.Top:= GetMinimapSelTop_InPixels;
-  Result.Bottom:= Result.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y;
+  Result.Bottom:= Result.Top +
+    Min(
+      (FScrollVert.NPage+1)*FCharSizeMinimap.Y,
+      FWrapInfo.Count*FCharSizeMinimap.Y
+      );
 end;
 
 function TATSynEdit.GetRectMicromap: TRect;
@@ -1994,16 +1998,17 @@ var
   Percent: double;
 const
   PercentFix: double = 0.02;
-  //PercentFixRaw: double = 0.05;
 begin
   {
   1) calculate percent position of mouse
   2) must correct this! we must scroll to 0 if almost at the top;
     must scroll to end if almost at the end - do this by increment n%
   }
-  Percent:= (APixels-FRectMinimap.Top) / (FRectMinimap.Bottom-FRectMinimap.Top);
-
-  //if Percent<0.6 then Percent:= Max(0.0, Percent-PercentFixRaw);
+  Percent:= (APixels-FRectMinimap.Top) /
+    Min(
+      FRectMinimap.Bottom-FRectMinimap.Top,
+      (FWrapInfo.Count+1)*FCharSizeMinimap.Y
+      );
 
   if Percent<0.1 then Percent:= Max(0.0, Percent-PercentFix) else
    if Percent>0.9 then Percent:= Min(100.0, Percent+PercentFix);
@@ -3035,6 +3040,9 @@ begin
   if FMouseDragDropping then
     Cursor:= crDrag
   else
+  //if FMouseDragMinimap then
+  //  Cursor:= crSizeNS
+  //else
   if PtInRect(FRectMain, P) then
     Cursor:= FCursorText
   else
