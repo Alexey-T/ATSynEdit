@@ -293,15 +293,20 @@ begin
   if NIndex<0 then Exit;
 
   //for y
-  if NIndex<FScrollVert.NPos then
+  //negative AIndentVert: indent always from top
+  //positive: from top (goto up) or bottom (goto down)
+  if (NIndex<FScrollVert.NPos) then
   begin
-    FScrollVert.NPos:= Max(0, NIndex-AIndentVert);
+    FScrollVert.NPos:= Max(0, NIndex-Abs(AIndentVert));
     UpdateScrollbars;
   end
   else
-  if NIndex>FScrollVert.NPos+NVisLines-1 then
+  if (NIndex>FScrollVert.NPos+NVisLines-1) then
   begin
-    FScrollVert.NPos:= Max(0, NIndex-NVisLines+1+AIndentVert);
+    if AIndentVert<0 then
+      FScrollVert.NPos:= Max(0, NIndex-Abs(AIndentVert))
+    else
+      FScrollVert.NPos:= Max(0, NIndex-NVisLines+1+Abs(AIndentVert));
     UpdateScrollbars;
   end;
 
