@@ -528,8 +528,11 @@ type
     procedure DoMenuGutterFold;
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
+    procedure DoMinimapDrag(APosY: integer);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;
+    function GetMinimapSelTop_InPixels: integer;
+    function GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
     procedure InitResourcesFoldbar;
     function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
     procedure MenuFoldFoldAllClick(Sender: TObject);
@@ -1971,6 +1974,29 @@ begin
     DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
 end;
 
+function TATSynEdit.GetMinimapSelTop_InPixels: integer;
+begin
+  Result:= FRectMinimap.Top + (FScrollVert.NPos-FScrollVertMinimap.NPos)*FCharSizeMinimap.Y;
+end;
+
+function TATSynEdit.GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
+var
+  Percent: double;
+const
+  PercentFix: double = 0.02;
+begin
+  {
+  1) calculate percent position of mouse
+  2) must correct this! we must scroll to 0 if almost at the top;
+    must scroll to end if almost at the end - do this by increment n%
+  }
+  Percent:= (APixels-FRectMinimap.Top) / (FRectMinimap.Bottom-FRectMinimap.Top);
+  if Percent<0.1 then Percent:= Max(0.0, Percent-PercentFix) else
+   if Percent>0.9 then Percent:= Min(100.0, Percent+PercentFix);
+
+  Result:= Round(Percent * FWrapInfo.Count);
+end;
+
 procedure TATSynEdit.DoPaintMinimapSelTo(C: TCanvas);
 var
   R: TRect;
@@ -1980,7 +2006,7 @@ begin
 
   R.Left:= FRectMinimap.Left;
   R.Right:= FRectMinimap.Right;
-  R.Top:= FRectMinimap.Top + (FScrollVert.NPos-FScrollVertMinimap.NPos)*FCharSizeMinimap.Y;
+  R.Top:= GetMinimapSelTop_InPixels;
   R.Bottom:= R.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y;
 
   if IntersectRect(R, R, FRectMinimap) then
@@ -3119,7 +3145,7 @@ begin
   begin
     if Shift=[ssLeft] then
     begin
-      DoMinimapClick(Y);
+      DoMinimapDrag(Y);
     end;
     Exit
   end;
@@ -3784,6 +3810,15 @@ begin
     FScrollVert.NPos:= Min(NItem, FScrollVert.NMax);
     Update;
   end;
+end;
+
+procedure TATSynEdit.DoMinimapDrag(APosY: integer);
+var
+  NIndex: integer;
+begin
+  NIndex:= GetMinimapSelTop_PixelsToWrapIndex(APosY);
+  FScrollVert.NPos:= Max(0, Min(NIndex, FScrollVert.NMax));
+  Update;
 end;
 
 function TATSynEdit.GetUndoLimit: integer;
