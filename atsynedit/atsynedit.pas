@@ -532,7 +532,8 @@ type
     procedure DoMinimapDrag(APosY: integer);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;
-    function GetMinimapSelTop_InPixels: integer;
+    function GetMinimapActualHeight: integer;
+    function GetMinimapSelTop: integer;
     function GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
     function GetRectMinimapSel: TRect;
     procedure InitResourcesFoldbar;
@@ -1515,11 +1516,11 @@ function TATSynEdit.GetRectMinimapSel: TRect;
 begin
   Result.Left:= FRectMinimap.Left;
   Result.Right:= FRectMinimap.Right;
-  Result.Top:= GetMinimapSelTop_InPixels;
+  Result.Top:= GetMinimapSelTop;
   Result.Bottom:= Result.Top +
     Min(
       (FScrollVert.NPage+1)*FCharSizeMinimap.Y,
-      FWrapInfo.Count*FCharSizeMinimap.Y
+      GetMinimapActualHeight
       );
 end;
 
@@ -1988,9 +1989,18 @@ begin
     DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
 end;
 
-function TATSynEdit.GetMinimapSelTop_InPixels: integer;
+function TATSynEdit.GetMinimapSelTop: integer;
 begin
   Result:= FRectMinimap.Top + (FScrollVert.NPos-FScrollVertMinimap.NPos)*FCharSizeMinimap.Y;
+end;
+
+function TATSynEdit.GetMinimapActualHeight: integer;
+begin
+  Result:=
+    Max(2, Min(
+      FRectMinimap.Bottom-FRectMinimap.Top,
+      FWrapInfo.Count*FCharSizeMinimap.Y
+      ));
 end;
 
 function TATSynEdit.GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
@@ -2004,11 +2014,7 @@ begin
   2) must correct this! we must scroll to 0 if almost at the top;
     must scroll to end if almost at the end - do this by increment n%
   }
-  Percent:= (APixels-FRectMinimap.Top) /
-    Min(
-      FRectMinimap.Bottom-FRectMinimap.Top,
-      (FWrapInfo.Count+1)*FCharSizeMinimap.Y
-      );
+  Percent:= (APixels-FRectMinimap.Top) / GetMinimapActualHeight;
 
   if Percent<0.1 then Percent:= Max(0.0, Percent-PercentFix) else
    if Percent>0.9 then Percent:= Min(100.0, Percent+PercentFix);
