@@ -6,6 +6,7 @@ interface
 
 uses
   SysUtils, Classes, Dialogs, Forms,
+  Math,
   RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Carets,
@@ -45,6 +46,7 @@ type
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
     OptRegex: boolean;
+    OptWrapped: boolean;
     constructor Create;
     destructor Destroy; override;
     function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
@@ -64,6 +66,8 @@ type
     FSkipLen: integer;
     FOnFound: TATFinderFound;
     FOnConfirmReplace: TATFinderConfirmReplace;
+    function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean; out
+      AChanged: boolean; AStartPos: integer): boolean;
     procedure DoReplaceTextInEditor(P1, P2: TPoint);
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
@@ -394,8 +398,7 @@ end;
 function TATEditorFinder.DoFindOrReplace(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
 var
-  P1, P2: TPoint;
-  Cfm, CfmCont: boolean;
+  NStartPos: integer;
 begin
   Result:= false;
   AChanged:= false;
@@ -419,7 +422,41 @@ begin
   if AReplace and FEditor.ModeReadOnly then exit;
   if OptRegex then OptBack:= false;
 
-  Result:= FindMatch(ANext, FSkipLen, GetOffsetStartPos);
+  NStartPos:= GetOffsetStartPos;
+  Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
+
+  if not Result and OptWrapped then
+    if (not OptBack and (NStartPos>1)) or
+       (OptBack and (NStartPos<Length(StrText))) then
+    begin
+      //we must have AReplace=false
+      //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
+      //
+      if DoFindOrReplace_Internal(ANext, false, AForMany, AChanged,
+        IfThen(not OptBack, 1, Length(StrText))) then
+      begin
+        Result:= (not OptBack and (MatchPos<NStartPos)) or
+                 (OptBack and (MatchPos>NStartPos));
+        if not Result then
+        begin
+          FMatchPos:= -1;
+          FMatchLen:= 0;
+        end;
+      end;
+    end;
+end;
+
+
+function TATEditorFinder.DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
+  out AChanged: boolean; AStartPos: integer): boolean;
+  //function usually called 1 time in outer func,
+  //or 1-2 times if OptWrap=true
+var
+  P1, P2: TPoint;
+  Cfm, CfmCont: boolean;
+begin
+  AChanged:= false;
+  Result:= FindMatch(ANext, FSkipLen, AStartPos);
   FSkipLen:= FMatchLen;
 
   if Result then
