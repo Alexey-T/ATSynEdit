@@ -68,6 +68,7 @@ type
     FOnConfirmReplace: TATFinderConfirmReplace;
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean; out
       AChanged: boolean; AStartPos: integer): boolean;
+    procedure DoFixCaretSelectionDirection;
     procedure DoReplaceTextInEditor(P1, P2: TPoint);
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
@@ -395,6 +396,33 @@ begin
     Result:= 1;
 end;
 
+procedure TATEditorFinder.DoFixCaretSelectionDirection;
+var
+  Caret: TATCaretItem;
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  if FEditor.Carets.Count=0 then exit;
+  Caret:= FEditor.Carets[0];
+  Caret.GetRange(X1, Y1, X2, Y2, bSel);
+  if not bSel then exit;
+
+  if OptBack then
+  begin
+    Caret.PosX:= X1;
+    Caret.PosY:= Y1;
+    Caret.EndX:= X2;
+    Caret.EndY:= Y2;
+  end
+  else
+  begin
+    Caret.PosX:= X2;
+    Caret.PosY:= Y2;
+    Caret.EndX:= X1;
+    Caret.EndY:= Y1;
+  end;
+end;
+
 function TATEditorFinder.DoFindOrReplace(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
 var
@@ -421,6 +449,8 @@ begin
 
   if AReplace and FEditor.ModeReadOnly then exit;
   if OptRegex then OptBack:= false;
+
+  DoFixCaretSelectionDirection;
 
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
