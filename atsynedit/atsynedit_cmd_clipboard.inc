@@ -95,8 +95,11 @@ begin
   begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
-      Str:= Strings.TextSubstring(FSelRect.Left, i, FSelRect.Right, i);
-      NLen:= FSelRect.Right-FSelRect.Left - Length(Str);
+      Str:= Strings.Lines[i];
+      X1:= SColumnPosToCharPos(Str, FSelRectColumnLeft, OptTabSize);
+      X2:= SColumnPosToCharPos(Str, FSelRectColumnRight, OptTabSize);
+      Str:= Strings.TextSubstring(X1, i, X2, i);
+      NLen:= X2-X1-Length(Str);
       if NLen>0 then
         Str:= Str+StringOfChar(' ', NLen);
       Result:= Result+UTF8Encode(Str)+sLineBreak;

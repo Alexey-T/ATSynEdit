@@ -342,6 +342,8 @@ type
     FSelRect: TRect;
     FSelRectBegin,
     FSelRectEnd: TPoint;
+    FSelRectColumnLeft,
+    FSelRectColumnRight: integer;
     FCarets: TATCarets;
     FCaretBlinkEnabled: boolean;
     FCaretShapeIns,
