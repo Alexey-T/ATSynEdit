@@ -61,6 +61,7 @@ function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+function SCharPosToColumnPos(const S: atString; APosX, ATabSize: integer): integer;
 
 type
   TATCommentAction = (
@@ -505,6 +506,13 @@ end;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
 begin
   Result:= StringReplace(S, StringOfChar(' ', ATabSize), #9, [rfReplaceAll]);
+end;
+
+function SCharPosToColumnPos(const S: atString; APosX, ATabSize: integer): integer;
+begin
+  Result:= Length(STabsToSpaces(Copy(S, 1, APosX), ATabSize));
+  if APosX>Length(S) then
+    Inc(Result, APosX-Length(S));
 end;
 
 function SIndentUnindent(const Str: atString; ARight: boolean;
