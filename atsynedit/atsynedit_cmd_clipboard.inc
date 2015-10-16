@@ -96,8 +96,8 @@ begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
       Str:= Strings.Lines[i];
-      X1:= SColumnPosToCharPos(Str, FSelRectColumnLeft, OptTabSize);
-      X2:= SColumnPosToCharPos(Str, FSelRectColumnRight, OptTabSize);
+      X1:= SColumnPosToCharPos(Str, FSelRect.Left, OptTabSize);
+      X2:= SColumnPosToCharPos(Str, FSelRect.Right, OptTabSize);
       Str:= Strings.TextSubstring(X1, i, X2, i);
       NLen:= X2-X1-Length(Str);
       if NLen>0 then

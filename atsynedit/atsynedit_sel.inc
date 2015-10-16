@@ -11,8 +11,8 @@ begin
     if not ((AY>=FSelRect.Top) and (AY<=FSelRect.Bottom)) then exit(False);
 
     SLine:= Strings.Lines[AY];
-    NPosLeft:= SColumnPosToCharPos(SLine, FSelRectColumnLeft, OptTabSize);
-    NPosRight:= SColumnPosToCharPos(SLine, FSelRectColumnRight, OptTabSize);
+    NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
+    NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
     Result:= (AX>=NPosLeft) and (AX<NPosRight);
   end
   else
@@ -286,19 +286,15 @@ begin
   FSelRect.Top:= P1.Y;
   FSelRect.Bottom:= P2.Y;
 
-  FSelRectColumnLeft:= SCharPosToColumnPos(Strings.Lines[FSelRect.Top], FSelRect.Left, OptTabSize);
-  FSelRectColumnRight:= SCharPosToColumnPos(Strings.Lines[FSelRect.Bottom], FSelRect.Right, OptTabSize);
-  FSelRectColumnRight:= Max(FSelRectColumnRight, FSelRectColumnLeft);
-
   for i:= P1.Y to P2.Y do
   begin
     if i=P1.Y then Carets.Clear;
     Carets.Add(0, 0);
     with Carets[Carets.Count-1] do
     begin
-      PosX:= SColumnPosToCharPos(Strings.Lines[i], FSelRectColumnRight, OptTabSize);
+      PosX:= SColumnPosToCharPos(Strings.Lines[i], FSelRect.Right, OptTabSize);
       PosY:= i;
-      EndX:= SColumnPosToCharPos(Strings.Lines[i], FSelRectColumnLeft, OptTabSize);
+      EndX:= SColumnPosToCharPos(Strings.Lines[i], FSelRect.Left, OptTabSize);
       EndY:= i;
     end;
   end;

@@ -25,29 +25,38 @@ begin
 end;
 
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
+var
+  Caret: TATCaretItem;
+  N: integer;
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
+  Caret:= Carets[0];
 
   if IsSelRectEmpty or (FSelRectBegin.X<0) then
   begin
     DoCaretSingleAsIs;
     DoSelect_None;
-    FSelRectBegin.X:= Carets[0].PosX;
-    FSelRectBegin.Y:= Carets[0].PosY;
-    FSelRectEnd.X:= FSelRectBegin.X;
-    FSelRectEnd.Y:= FSelRectBegin.Y;
+    FSelRectBegin.X:= SCharPosToColumnPos(Strings.Lines[Caret.PosY], Caret.PosX, OptTabSize);
+    FSelRectBegin.Y:= Caret.PosY;
+    FSelRectEnd:= FSelRectBegin;
   end;
 
   case ADir of
     cDirLeft:
       begin
-        if FSelRectEnd.X>0 then Dec(FSelRectEnd.X);
+        N:= SColumnPosToCharPos(Strings.Lines[FSelRectEnd.Y], FSelRectEnd.X, OptTabSize);
+        if N>0 then Dec(N);
+        N:= SCharPosToColumnPos(Strings.Lines[FSelRectEnd.Y], N, OptTabSize);
+        FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretLeft];
       end;
     cDirRight:
       begin
-        Inc(FSelRectEnd.X);
+        N:= SColumnPosToCharPos(Strings.Lines[FSelRectEnd.Y], FSelRectEnd.X, OptTabSize);
+        Inc(N);
+        N:= SCharPosToColumnPos(Strings.Lines[FSelRectEnd.Y], N, OptTabSize);
+        FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretRight];
       end;
     cDirUp:
