@@ -59,9 +59,11 @@ function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetNonSpaceLength(const S: atString): integer;
+
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
-function SCharPosToColumnPos(const S: atString; APosX, ATabSize: integer): integer;
+function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
+function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
 
 type
   TATCommentAction = (
@@ -508,11 +510,32 @@ begin
   Result:= StringReplace(S, StringOfChar(' ', ATabSize), #9, [rfReplaceAll]);
 end;
 
-function SCharPosToColumnPos(const S: atString; APosX, ATabSize: integer): integer;
+function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
 begin
-  Result:= Length(STabsToSpaces(Copy(S, 1, APosX), ATabSize));
-  if APosX>Length(S) then
-    Inc(Result, APosX-Length(S));
+  Result:= Length(STabsToSpaces(Copy(S, 1, APos), ATabSize));
+  if APos>Length(S) then
+    Inc(Result, APos-Length(S));
+end;
+
+function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
+var
+  size, i: integer;
+begin
+  if AColumn=0 then exit(AColumn);
+  if Pos(#9, S)=0 then exit(AColumn);
+
+  size:= 0;
+  for i:= 1 to Length(S) do
+  begin
+    if S[i]<>#9 then
+      Inc(size)
+    else
+      Inc(size, SCalcTabulationSize(ATabSize, size+1));
+    if size>=AColumn then
+      exit(i);
+  end;
+
+  Result:= AColumn-Length(STabsToSpaces(S, ATabSize))+Length(S);
 end;
 
 function SIndentUnindent(const Str: atString; ARight: boolean;

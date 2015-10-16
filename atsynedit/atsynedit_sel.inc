@@ -1,11 +1,21 @@
 {$ifdef nnn}begin end;{$endif}
 
 function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
+var
+  NColumnLeft, NColumnRight,
+  NPosLeft, NPosRight: integer;
 begin
   if not IsSelRectEmpty then
-    //a) faster, b) works w/o mul-carets
-    Result:= (AY>=FSelRect.Top) and (AY<=FSelRect.Bottom) and
-             (AX>=FSelRect.Left) and (AX<FSelRect.Right)
+  begin
+    if not ((AY>=FSelRect.Top) and (AY<=FSelRect.Bottom)) then exit(False);
+
+    NColumnLeft:= SCharPosToColumnPos(Strings.Lines[FSelRect.Top], FSelRect.Left, OptTabSize);
+    NColumnRight:= SCharPosToColumnPos(Strings.Lines[FSelRect.Bottom], FSelRect.Right, OptTabSize);
+    NPosLeft:= SColumnPosToCharPos(Strings.Lines[AY], NColumnLeft, OptTabSize);
+    NPosRight:= SColumnPosToCharPos(Strings.Lines[AY], NColumnRight, OptTabSize);
+
+    Result:= (AX>=NPosLeft) and (AX<NPosRight);
+  end
   else
     Result:= Carets.IsPosSelected(AX, AY);
 end;
@@ -266,6 +276,8 @@ end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
 var
+  NColumnLeft, NColumnRight,
+  NPosLeft, NPosRight: integer;
   i: integer;
 begin
   if P1.Y>P2.Y then
@@ -276,15 +288,18 @@ begin
   FSelRect.Top:= P1.Y;
   FSelRect.Bottom:= P2.Y;
 
+  NColumnLeft:= SCharPosToColumnPos(Strings.Lines[P1.Y], P1.X, OptTabSize);
+  NColumnRight:= SCharPosToColumnPos(Strings.Lines[P2.Y], P2.X, OptTabSize);
+
   for i:= P1.Y to P2.Y do
   begin
     if i=P1.Y then Carets.Clear;
     Carets.Add(0, 0);
     with Carets[Carets.Count-1] do
     begin
-      PosX:= P2.X;
+      PosX:= SColumnPosToCharPos(Strings.Lines[i], P2.X, OptTabSize);
       PosY:= i;
-      EndX:= P1.X;
+      EndX:= SColumnPosToCharPos(Strings.Lines[i], P1.X, OptTabSize);
       EndY:= i;
     end;
   end;
