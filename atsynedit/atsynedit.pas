@@ -800,6 +800,8 @@ type
     property RedoCount: integer read GetRedoCount;
     property Text: atString read GetText write SetText;
     property SelRect: TRect read FSelRect;
+    property SelRectColumnLeft: integer read FSelRectColumnLeft;
+    property SelRectColumnRight: integer read FSelRectColumnRight;
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsPosFolded(AX, AY: integer): boolean;
@@ -3511,8 +3513,8 @@ begin
   begin
     if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
     begin
-      NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
-      NRight:= NLeft+ACharSize.X*(FSelRect.Right-FSelRect.Left);
+      NLeft:= APointLeft.X+ACharSize.X*(FSelRectColumnLeft-AScrollHorz.NPos);
+      NRight:= NLeft+ACharSize.X*(FSelRectColumnRight-FSelRectColumnLeft);
       C.Brush.Color:= FColors.TextSelBG;
       C.FillRect(
         NLeft,

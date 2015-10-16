@@ -288,6 +288,7 @@ begin
 
   FSelRectColumnLeft:= SCharPosToColumnPos(Strings.Lines[FSelRect.Top], FSelRect.Left, OptTabSize);
   FSelRectColumnRight:= SCharPosToColumnPos(Strings.Lines[FSelRect.Bottom], FSelRect.Right, OptTabSize);
+  FSelRectColumnRight:= Max(FSelRectColumnRight, FSelRectColumnLeft);
 
   for i:= P1.Y to P2.Y do
   begin
