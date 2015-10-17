@@ -347,7 +347,9 @@ Encodings
 
 Carets object contains list of caret items. Each caret item has props PosY (line index in Strings object), PosX (char offset from line start). Strings object holds UnicodeString's, where each WideChar gives offset=1, and even Tab char gives offset=1. Before painting, PosX/PosY converted to properties CoordX/CoordY, screen coordinates. CoordY is pixels from top control edge (you don't need to change by ruler height), CoordX is pixels from left edge (you don't need to change by gutter width). Don't touch CoordX/CoordY. Change PosX/PosY (caret item position) and EndX/EndY (selection end for caret item, both -1 if no selection present for this item).
 
-Use these funcs if needed to convert caret-pos to screen-pos:
+===== Caret pos to/from screen coords =====
+
+Use these funcs if needed to convert caret-pos to screen-pos in pixels:
 
 *    function CaretPosToClientPos(P: TPoint): TPoint.
 *    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint. Last param: returned true if caret pos is after real end-of-line, false if caret pos is inside line.
@@ -355,6 +357,13 @@ Use these funcs if needed to convert caret-pos to screen-pos:
 Functions give result.Y<0 if cannot calculate pos. For example, if line index is too big or line with this index is fully folded.
 
 Property OptCaretVirtual exists. If true, caret is allowed after end-of-line. Functions (above) consider it.
+
+===== Caret pos to/from column index =====
+
+Use these funcs (unit ATStringProc) to convert tab-char-indenendent caret pos x, to/from tab-char-dependant column index:
+
+* function SCharPosToColumnPos
+* function SColumnPosToCharPos
 
 == How to manage the caret, the selection? ==
 
