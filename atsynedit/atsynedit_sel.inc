@@ -308,4 +308,23 @@ begin
     DoSelect_None;
 end;
 
+procedure TATSynEdit.DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
+var
+  Caret: TATCaretItem;
+begin
+  Caret:= Carets[0];
+  if (Caret.EndY>=0) and (Caret.EndX>=0) then
+  begin
+    ABegin.X:= SCharPosToColumnPos(Strings.Lines[Caret.EndY], Caret.EndX, OptTabSize);
+    ABegin.Y:= Caret.EndY;
+    AEnd.X:= SCharPosToColumnPos(Strings.Lines[Caret.PosY], Caret.PosX, OptTabSize);
+    AEnd.Y:= Caret.PosY;
+  end
+  else
+  begin
+    ABegin.X:= SCharPosToColumnPos(Strings.Lines[Caret.PosY], Caret.PosX, OptTabSize);
+    ABegin.Y:= Caret.PosY;
+    AEnd:= ABegin;
+  end;
+end;
 

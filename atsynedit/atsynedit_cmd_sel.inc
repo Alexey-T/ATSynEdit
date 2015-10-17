@@ -27,6 +27,7 @@ end;
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
 var
   Caret: TATCaretItem;
+  PntBegin, PntEnd: TPoint;
   N: integer;
 begin
   Result:= [];
@@ -35,11 +36,11 @@ begin
 
   if IsSelRectEmpty or (FSelRectBegin.X<0) then
   begin
+    DoSelect_NormalSelToColumnSel(PntBegin, PntEnd);
     DoCaretSingleAsIs;
     DoSelect_None;
-    FSelRectBegin.X:= SCharPosToColumnPos(Strings.Lines[Caret.PosY], Caret.PosX, OptTabSize);
-    FSelRectBegin.Y:= Caret.PosY;
-    FSelRectEnd:= FSelRectBegin;
+    FSelRectBegin:= PntBegin;
+    FSelRectEnd:= PntEnd;
   end;
 
   case ADir of
