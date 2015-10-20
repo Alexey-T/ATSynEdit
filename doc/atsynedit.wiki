@@ -112,8 +112,8 @@ Some details about this:
 == What limitations it has? ==
 * Cannot set different fonts for different text parts 
 * All lines have the same height
-* No highlighter components like SynEdit (other method used)
 * Not supported RTL mode, limited support for Arabic text
+* Not adapted/ not tested with IME
 
 == What features it has? ==
 * Fast editing of big texts (tested 10M log) 
@@ -343,13 +343,13 @@ Encodings
 
 * How to save file: call "ed.SaveToFile()".
 
-==     How does it manage the coordinates? ==
+== How does it manage the coordinates? ==
 
 Carets object contains list of caret items. Each caret item has props PosY (line index in Strings object), PosX (char offset from line start). Strings object holds UnicodeString's, where each WideChar gives offset=1, and even Tab char gives offset=1. Before painting, PosX/PosY converted to properties CoordX/CoordY, screen coordinates. CoordY is pixels from top control edge (you don't need to change by ruler height), CoordX is pixels from left edge (you don't need to change by gutter width). Don't touch CoordX/CoordY. Change PosX/PosY (caret item position) and EndX/EndY (selection end for caret item, both -1 if no selection present for this item).
 
-===== Caret pos to/from screen coords =====
+=== Caret pos to/from screen coords ===
 
-Use these funcs if needed to convert caret-pos to screen-pos in pixels:
+Use these funcs if needed to convert caret pos to screen coordinates in pixels:
 
 *    function CaretPosToClientPos(P: TPoint): TPoint.
 *    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint. Last param: returned true if caret pos is after real end-of-line, false if caret pos is inside line.
@@ -358,7 +358,7 @@ Functions give result.Y<0 if cannot calculate pos. For example, if line index is
 
 Property OptCaretVirtual exists. If true, caret is allowed after end-of-line. Functions (above) consider it.
 
-===== Caret pos to/from column index =====
+=== Caret pos to/from column index ===
 
 Use these funcs (unit ATStringProc) to convert tab-char-indenendent caret pos x, to/from tab-char-dependant column index:
 
@@ -691,6 +691,7 @@ To use it, create Finder object and set its props:
 ** OptCase: case-sensitive (for normal and regex modes) 
 ** OptWords: whole-words search (for non-regex mode, for regex you must use "\b" specifier in search-string)
 ** OptBack: backward search (for non-regex mode)
+** OptWrapped: continue search from top, if bottom reached (for back-search: continue from bottom, if top reached)
 ** OptFromCaret: search goes from position of first caret (else: from start/end of text)
 ** OptConfirmReplace: each replace will occur after event OnConfirmReplace
 
