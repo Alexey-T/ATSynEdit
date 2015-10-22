@@ -530,6 +530,7 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
+    procedure DoSelectionDeleteColumnBlock;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;

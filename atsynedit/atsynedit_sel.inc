@@ -328,3 +328,28 @@ begin
   end;
 end;
 
+procedure TATSynEdit.DoSelectionDeleteColumnBlock;
+var
+  X1, X2, i: Integer;
+  Str, StrNew: atString;
+begin
+  if IsSelRectEmpty then exit;
+
+  for i:= FSelRect.Top to FSelRect.Bottom do
+  begin
+    Str:= Strings.Lines[i];
+    X1:= SColumnPosToCharPos(Str, FSelRect.Left, OptTabSize);
+    X2:= SColumnPosToCharPos(Str, FSelRect.Right, OptTabSize);
+
+    StrNew:= Str;
+    Delete(StrNew, X1+1, X2-X1);
+    if StrNew<>Str then
+      Strings.Lines[i]:= StrNew;
+  end;
+
+  DoSelect_None;
+
+  if Carets.Count>0 then
+    Carets[0].PosX:= X1;
+end;
+

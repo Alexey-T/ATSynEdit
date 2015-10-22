@@ -222,7 +222,10 @@ end;
 
 function TATSynEdit.DoCommand_TextBackspace: TATCommandResults;
 begin
-  Result:= DoCommand_TextDeleteLeft(1, FOptKeyBackspaceUnindent);
+  if not IsSelRectEmpty then
+    Result:= DoCommand_TextDeleteSelection
+  else
+    Result:= DoCommand_TextDeleteLeft(1, FOptKeyBackspaceUnindent);
 end;
 
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;

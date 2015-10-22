@@ -199,7 +199,7 @@ end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
 begin
-  if Carets.IsSelection then
+  if not IsSelRectEmpty or Carets.IsSelection then
     Result:= DoCommand_TextDeleteSelection
   else
     Result:= DoCommand_TextDeleteRight(1);
@@ -215,6 +215,14 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+
+  if not IsSelRectEmpty and not OptCaretManyAllowed then
+  begin
+    DoSelectionDeleteColumnBlock;
+    Result:= [cResultText, cResultCaretTop];
+    Exit
+  end;
+
   if not Carets.IsSelection then Exit;
 
   for i:= FCarets.Count-1 downto 0 do
