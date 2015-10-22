@@ -82,6 +82,7 @@ var
   MS: TMemoryStream;
   i: integer;
 begin
+  if ReadOnly then exit;
   Clear;
   if AText='' then
   begin
