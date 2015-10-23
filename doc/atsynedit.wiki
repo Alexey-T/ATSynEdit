@@ -616,6 +616,50 @@ ATSynEdit has API which allows to make report to any format. It's function DoCal
 * OnDrawRuler: Called after painting ruler area.
 * OnScroll: Called after any command which scrolls text.
 
+==What is logic of grouped-undo?==
+
+There're kinds of group-marks in undo-items: hard-marks, soft-marks. 
+
+* Hard-marks are placed on undo-items if you call Strings.BeginUndoGroup, editing, Strings.EndUndoGroup. All items marked with hard-marks are undone as group, even of UndoGrouped=false.
+* Soft-marks used only if UndoGrouped=true. Soft-marks are placed on one next undo-item, when user does mouse click (or some similar action); or in code by call Strings.SetGroupMark. All items beginning with last soft-marked item are undone as group.
+
+Example, UndoGrouped=true, such undo-items exist:
+
+* item1
+* item2
+* item3, soft-mark
+* item4
+* item5, hard-mark
+* item6, hard-mark
+* item7
+* item8, soft-mark
+* item9
+* item10
+
+Undo:
+
+* undone: item10..8; until soft-mark.
+* undone: item7..3; until soft-mark.
+* undone: item2..1.
+
+Example, UndoGrouped=false, undo-items:
+
+* item1
+* item2
+* item3, hard-mark
+* item4, hard-mark
+* item5, hard-mark
+* item6
+* item7
+
+Undo:
+
+* Undone: item7
+* Undone: item6
+* Undone: item5..3
+* Undone: item2
+* Undone: item1
+
 ==more==
 
 = Auto-completion lists =
