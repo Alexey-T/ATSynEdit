@@ -25,9 +25,10 @@ type
     ItemText: atString;
     ItemEnd: TATLineEnds;
     ItemCarets: TATPointArray;
-    GroupMark: boolean;
+    SoftMark: boolean;
+    HardMark: boolean;
     constructor Create(AAction: TATEditAction; AIndex: integer;
-      const AText: atString; AEnd: TATLineEnds; AGroupMark: boolean;
+      const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray); virtual;
   end;
 
@@ -38,8 +39,9 @@ type
   private
     FList: TList;
     FMaxCount: integer;
-    FGroupMark: boolean;
     FLocked: boolean;
+    FSoftMark: boolean;
+    FHardMark: boolean;
     function GetItem(N: integer): TATUndoItem;
   public
     constructor Create; virtual;
@@ -50,7 +52,8 @@ type
     function Last: TATUndoItem;
     property Items[N: integer]: TATUndoItem read GetItem; default;
     property MaxCount: integer read FMaxCount write FMaxCount;
-    property GroupMark: boolean read FGroupMark write FGroupMark;
+    property SoftMark: boolean read FSoftMark write FSoftMark;
+    property HardMark: boolean read FHardMark write FHardMark;
     property Locked: boolean read FLocked write FLocked;
     procedure Clear;
     procedure Delete(N: integer);
@@ -69,7 +72,7 @@ uses
 { TATUndoItem }
 
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
-  const AText: atString; AEnd: TATLineEnds; AGroupMark: boolean;
+  const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
   const ACarets: TATPointArray);
 var
   i: integer;
@@ -78,7 +81,7 @@ begin
   ItemIndex:= AIndex;
   ItemText:= AText;
   ItemEnd:= AEnd;
-  GroupMark:= AGroupMark;
+  SoftMark:= ASoftMark;
 
   SetLength(ItemCarets, Length(ACarets));
   for i:= 0 to High(ACarets) do
@@ -101,7 +104,7 @@ constructor TATUndoList.Create;
 begin
   FList:= TList.Create;
   FMaxCount:= 5000;
-  FGroupMark:= false;
+  FSoftMark:= false;
   FLocked:= false;
 end;
 
@@ -189,9 +192,9 @@ begin
       end;
   end;
 
-  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, FGroupMark, ACarets);
+  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, FSoftMark, FHardMark, ACarets);
   FList.Add(Item);
-  FGroupMark:= false;
+  FSoftMark:= false;
 
   while Count>MaxCount do
     Delete(0);

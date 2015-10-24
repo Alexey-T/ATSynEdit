@@ -207,6 +207,8 @@ type
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
     procedure SetGroupMark;
+    procedure BeginUndoGroup;
+    procedure EndUndoGroup;
     procedure Undo(AGrouped: boolean);
     procedure Redo(AGrouped: boolean);
     property UndoLimit: integer read GetUndoLimit write SetUndoLimit;
@@ -755,7 +757,19 @@ end;
 procedure TATStrings.SetGroupMark;
 begin
   if Assigned(FUndoList) then
-    FUndoList.GroupMark:= true;
+    FUndoList.SoftMark:= true;
+end;
+
+procedure TATStrings.BeginUndoGroup;
+begin
+  if Assigned(FUndoList) then
+    FUndoList.HardMark:= true;
+end;
+
+procedure TATStrings.EndUndoGroup;
+begin
+  if Assigned(FUndoList) then
+    FUndoList.HardMark:= false;
 end;
 
 function TATStrings.DoUndoSingle(AUndoList: TATUndoList): boolean;
@@ -778,7 +792,7 @@ begin
   AText:= Item.ItemText;
   AEnd:= Item.ItemEnd;
   ACarets:= Item.ItemCarets;
-  Result:= Item.GroupMark;
+  Result:= Item.SoftMark;
 
   Item:= nil;
   AUndoList.DeleteLast;
@@ -887,7 +901,7 @@ begin
 
   //if grouped: mark undone group in ListOther
   if bEnd and AGrouped then
-    ListOther.GroupMark:= true;
+    ListOther.SoftMark:= true;
 end;
 
 procedure TATStrings.Undo(AGrouped: boolean);
