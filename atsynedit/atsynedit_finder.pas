@@ -378,8 +378,10 @@ begin
   else
     Str:= StrReplace;
 
+  FEditor.Strings.BeginUndoGroup;
   FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
   FEditor.Strings.TextInsert(P1.X, P1.Y, Str, false, Shift, PosAfter);
+  FEditor.Strings.EndUndoGroup;
 end;
 
 function TATEditorFinder.GetOffsetStartPos: integer;
