@@ -764,7 +764,10 @@ end;
 procedure TATStrings.BeginUndoGroup;
 begin
   if Assigned(FUndoList) then
+  begin
     FUndoList.HardMark:= true;
+    FUndoList.SoftMark:= true;
+  end;
 end;
 
 procedure TATStrings.EndUndoGroup;
@@ -909,9 +912,12 @@ begin
     //apply Hardmark to ListOther
     if bHardMarked then
       if ListOther.Count>0 then
-        ListOther.Last.ItemHardMark:= true;
+      begin
+        ListOther.Last.ItemHardMark:= bHardMarked;
+        //ListOther.Last.ItemSoftMark:= ?? //for redo needed Softmark too but don't know how
+      end;
 
-    if bHardMarked and bHardMarkedNext then Continue;
+    if bHardMarked and bHardMarkedNext and not bSoftMarked then Continue;
     if (not AGrouped) or bSoftMarked then Break;
   until false;
 
