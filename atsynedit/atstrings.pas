@@ -142,7 +142,8 @@ type
     procedure DoFinalizeLoading;
     procedure DoClearLineStates(ASaved: boolean);
     procedure SetUndoLimit(AValue: integer);
-    function DoUndoSingle(AUndoList: TATUndoList): boolean;
+    procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
+      AHardMarkedNext: boolean);
     procedure DoClearUndo(ALocked: boolean = false);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   public
@@ -772,7 +773,8 @@ begin
     FUndoList.HardMark:= false;
 end;
 
-function TATStrings.DoUndoSingle(AUndoList: TATUndoList): boolean;
+procedure TATStrings.DoUndoSingle(AUndoList: TATUndoList;
+  out ASoftMarked, AHardMarked, AHardMarkedNext: boolean);
 var
   Item: TATUndoItem;
   AAction: TATEditAction;
@@ -781,7 +783,9 @@ var
   AEnd: TATLineEnds;
   ACarets: TATPointArray;
 begin
-  Result:= true;
+  ASoftMarked:= true;
+  AHardMarked:= false;
+  AHardMarkedNext:= false;
   if FReadOnly then Exit;
   if not Assigned(AUndoList) then Exit;
 
@@ -792,7 +796,9 @@ begin
   AText:= Item.ItemText;
   AEnd:= Item.ItemEnd;
   ACarets:= Item.ItemCarets;
-  Result:= Item.SoftMark;
+  ASoftMarked:= Item.ItemSoftMark;
+  AHardMarked:= Item.ItemHardMark;
+  AHardMarkedNext:= (AUndoList.Count>1) and (AUndoList[AUndoList.Count-2].ItemHardMark);
 
   Item:= nil;
   AUndoList.DeleteLast;
@@ -885,7 +891,9 @@ end;
 procedure TATStrings.DoUndoRedo(AUndo: boolean; AGrouped: boolean);
 var
   List, ListOther: TATUndoList;
-  bEnd: boolean;
+  bSoftMarked,
+  bHardMarked,
+  bHardMarkedNext: boolean;
 begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
@@ -896,11 +904,19 @@ begin
     begin List:= FRedoList; ListOther:= FUndoList end;
 
   repeat
-    bEnd:= DoUndoSingle(List);
-  until (not AGrouped) or bEnd;
+    DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext);
 
-  //if grouped: mark undone group in ListOther
-  if bEnd and AGrouped then
+    //apply Hardmark to ListOther
+    if bHardMarked then
+      if ListOther.Count>0 then
+        ListOther.Last.ItemHardMark:= true;
+
+    if bHardMarked and bHardMarkedNext then Continue;
+    if (not AGrouped) or bSoftMarked then Break;
+  until false;
+
+  //apply Softmark to ListOther
+  if bSoftMarked and AGrouped then
     ListOther.SoftMark:= true;
 end;
 

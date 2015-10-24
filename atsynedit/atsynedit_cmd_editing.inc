@@ -495,13 +495,18 @@ begin
     if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
   //do indent
-  for i:= Y1 to Y2 do
-  begin
-    Str:= Strings.Lines[i];
-    if Trim(Str)='' then Continue;
-    Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize);
-    if Strings.Lines[i]<>Str then
-      Strings.Lines[i]:= Str;
+  Strings.BeginUndoGroup;
+  try
+    for i:= Y1 to Y2 do
+    begin
+      Str:= Strings.Lines[i];
+      if Trim(Str)='' then Continue;
+      Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize);
+      if Strings.Lines[i]<>Str then
+        Strings.Lines[i]:= Str;
+    end;
+  finally
+    Strings.EndUndoGroup;
   end;
 
   //correct selection: select entire lines y1..y2

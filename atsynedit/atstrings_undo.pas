@@ -25,8 +25,8 @@ type
     ItemText: atString;
     ItemEnd: TATLineEnds;
     ItemCarets: TATPointArray;
-    SoftMark: boolean;
-    HardMark: boolean;
+    ItemSoftMark: boolean;
+    ItemHardMark: boolean;
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray); virtual;
@@ -81,7 +81,8 @@ begin
   ItemIndex:= AIndex;
   ItemText:= AText;
   ItemEnd:= AEnd;
-  SoftMark:= ASoftMark;
+  ItemSoftMark:= ASoftMark;
+  ItemHardMark:= AHardMark;
 
   SetLength(ItemCarets, Length(ACarets));
   for i:= 0 to High(ACarets) do
@@ -105,6 +106,7 @@ begin
   FList:= TList.Create;
   FMaxCount:= 5000;
   FSoftMark:= false;
+  FHardMark:= false;
   FLocked:= false;
 end;
 
