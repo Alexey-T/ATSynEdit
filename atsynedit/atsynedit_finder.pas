@@ -89,12 +89,42 @@ type
     function DoReplaceAll: integer;
  end;
 
+function SRegexReplaceSubstring(const AStr, AStrFind, AStrReplace: string): string;
+
+
 implementation
 
 function IsWordChar(ch: Widechar): boolean;
 begin
   Result:= ATStringProc.IsCharWord(ch, '');
 end;
+
+function SRegexReplaceSubstring(const AStr, AStrFind, AStrReplace: string): string;
+var
+  Obj: TRegExpr;
+begin
+  Result:= AStr;
+  if AStr='' then exit;
+
+  Obj:= TRegExpr.Create;
+  try
+    try
+      Obj.ModifierS:= false;
+      Obj.ModifierI:= false;
+      Obj.Expression:= AStrFind;
+      Result:= Obj.Replace(AStr, AStrReplace, false);
+    except
+    end;
+  finally
+    Obj.Free;
+  end;
+end;
+
+function SRegexReplaceEscapedTabs(const AStr: string): string;
+begin
+  Result:= SRegexReplaceSubstring(AStr, '\\t', #9);
+end;
+
 
 function TATTextFinder.IsMatchUsual(APos: integer): boolean;
 var
@@ -185,7 +215,7 @@ begin
       MatchPos:= Obj.MatchPos[0];
       MatchLen:= Obj.MatchLen[0];
       if StrReplace<>'' then
-        StrReplacement:= Obj.Replace(Obj.Match[0], StrReplace, true);
+        StrReplacement:= Obj.Replace(Obj.Match[0], SRegexReplaceEscapedTabs(StrReplace), true);
     end;
   finally
     FreeAndNil(Obj);
