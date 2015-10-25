@@ -585,7 +585,6 @@ begin
   Result:= false;
   if not IsSelectionStartsAtFoundMatch then
   begin
-    //Showmessage('Please call "Replace" for found match, which is selected');
     //do Find-next (from caret)
     DoFindOrReplace(false, false, false, bSel);
     exit;
@@ -607,6 +606,7 @@ begin
     FSkipLen:= Length(StrReplacement)
   else
     FSkipLen:= Length(StrReplace);
+  Result:= true;
 end;
 
 
