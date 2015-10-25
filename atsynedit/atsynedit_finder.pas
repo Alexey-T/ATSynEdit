@@ -28,6 +28,9 @@ type
   private
     FMatchPos: integer;
     FMatchLen: integer;
+    FStrFind: UnicodeString;
+    FStrReplace: UnicodeString;
+    FStrReplacement: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
     function DoCountMatchesRegex(FromPos: integer; AWithEvent: boolean): integer;
@@ -35,18 +38,20 @@ type
     function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function DoFindMatchUsual(FromPos: integer): Integer;
     function IsMatchUsual(APos: integer): boolean;
+    procedure SetStrFind(const AValue: UnicodeString);
+    procedure SetStrReplace(const AValue: UnicodeString);
   protected
     procedure DoOnFound; virtual;
   public
-    StrText: UnicodeString;
-    StrFind: UnicodeString;
-    StrReplace: UnicodeString;
-    StrReplacement: UnicodeString; //for regex
     OptBack: boolean; //for non-regex
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
     OptRegex: boolean;
     OptWrapped: boolean;
+    StrText: UnicodeString;
+    property StrFind: UnicodeString read FStrFind write SetStrFind;
+    property StrReplace: UnicodeString read FStrReplace write SetStrReplace;
+    property StrReplacement: UnicodeString read FStrReplacement; //for regex
     constructor Create;
     destructor Destroy; override;
     function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
@@ -132,6 +137,20 @@ begin
         ((APos >= LastPos) or (not IsWordChar(StrText[APos + LenF])));
 end;
 
+procedure TATTextFinder.SetStrFind(const AValue: UnicodeString);
+begin
+  if FStrFind=AValue then Exit;
+  FStrFind:= AValue;
+  FMatchPos:= -1;
+  FMatchLen:= 0;
+end;
+
+procedure TATTextFinder.SetStrReplace(const AValue: UnicodeString);
+begin
+  if FStrReplace=AValue then Exit;
+  FStrReplace:= AValue;
+end;
+
 procedure TATTextFinder.DoOnFound;
 begin
   //
@@ -196,7 +215,7 @@ begin
       MatchPos:= Obj.MatchPos[0];
       MatchLen:= Obj.MatchLen[0];
       if StrReplace<>'' then
-        StrReplacement:= Obj.Replace(Obj.Match[0], SRegexReplaceEscapedTabs(StrReplace), true);
+        FStrReplacement:= Obj.Replace(Obj.Match[0], SRegexReplaceEscapedTabs(StrReplace), true);
     end;
   finally
     FreeAndNil(Obj);
@@ -557,8 +576,7 @@ function TATEditorFinder.IsSelectionStartsAtFoundMatch: boolean;
 var
   Caret: TATCaretItem;
   X1, Y1, X2, Y2: integer;
-  P1: TPoint;
-  NPos: integer;
+  PosOfBegin, PosOfEnd: integer;
   bSel: boolean;
 begin
   Result:= false;
@@ -567,11 +585,12 @@ begin
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
 
-  P1:= Point(X1, Y1);
-  NPos:= FBuffer.CaretToStr(P1)+1;
+  PosOfBegin:= FBuffer.CaretToStr(Point(X1, Y1))+1;
+  PosOfEnd:= FBuffer.CaretToStr(Point(X2, Y2))+1;
 
-  //allow to replace, also if selection = Strfind
-  Result:= (NPos=FMatchPos) or
+  //allow to replace, also if selection=Strfind
+  Result:=
+    ((PosOfBegin=FMatchPos) and (PosOfEnd=FMatchPos+FMatchLen)) or
     ((StrFind<>'') and (FEditor.TextSelected=StrFind));
 end;
 
@@ -612,15 +631,15 @@ end;
 
 constructor TATTextFinder.Create;
 begin
-  StrFind:= '';
   StrText:= '';
-  StrReplace:= '';
-  StrReplacement:= '';
+  FStrFind:= '';
+  FStrReplace:= '';
+  FStrReplacement:= '';
   OptBack:= false;
   OptCase:= false;
   OptWords:= false;
   OptRegex:= false;
-  FMatchPos:= 0;
+  FMatchPos:= -1;
   FMatchLen:= 0;
 end;
 
@@ -656,7 +675,7 @@ begin
   end
   else
   begin
-    if FMatchPos=0 then
+    if FMatchPos<=0 then
       FMatchPos:= 1;
     if not OptBack then
       Inc(FMatchPos, ASkipLen)
