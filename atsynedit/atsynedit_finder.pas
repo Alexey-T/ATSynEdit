@@ -87,6 +87,7 @@ type
     function DoReplaceSelectedMatch: boolean;
     function DoCountAll(AWithEvent: boolean): integer;
     function DoReplaceAll: integer;
+    function IsSelectionStartsAtFoundMatch: boolean;
  end;
 
 
@@ -547,29 +548,49 @@ begin
   end;
 end;
 
-function TATEditorFinder.DoReplaceSelectedMatch: boolean;
+function TATEditorFinder.IsSelectionStartsAtFoundMatch: boolean;
 var
   Caret: TATCaretItem;
-  P1, P2: TPoint;
   X1, Y1, X2, Y2: integer;
+  P1: TPoint;
   NPos: integer;
   bSel: boolean;
 begin
   Result:= false;
   if FEditor.Carets.Count=0 then exit;
   Caret:= FEditor.Carets[0];
+  Caret.GetRange(X1, Y1, X2, Y2, bSel);
+  if not bSel then exit;
 
+  P1:= Point(X1, Y1);
+  NPos:= FBuffer.CaretToStr(P1)+1;
+
+  //allow to replace, also if selection = Strfind
+  Result:= (NPos=FMatchPos) or
+    ((StrFind<>'') and (FEditor.TextSelected=StrFind));
+end;
+
+function TATEditorFinder.DoReplaceSelectedMatch: boolean;
+var
+  Caret: TATCaretItem;
+  P1, P2: TPoint;
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  Result:= false;
+  if not IsSelectionStartsAtFoundMatch then
+  begin
+    //Showmessage('Please call "Replace" for found match, which is selected');
+    //do Find-next (from caret)
+    DoFindOrReplace(false, false, false, bSel);
+    exit;
+  end;
+
+  Caret:= FEditor.Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
   P1:= Point(X1, Y1);
   P2:= Point(X2, Y2);
-
-  NPos:= FBuffer.CaretToStr(P1)+1;
-  if NPos<>FMatchPos then
-  begin
-    Showmessage('Please call "Replace" for found match, which is selected');
-    exit;
-  end;
 
   Caret.EndX:= -1;
   Caret.EndY:= -1;
