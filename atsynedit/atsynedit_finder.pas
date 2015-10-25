@@ -393,6 +393,11 @@ begin
   FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
   FEditor.Strings.TextInsert(P1.X, P1.Y, Str, false, Shift, PosAfter);
   FEditor.Strings.EndUndoGroup;
+
+  //correct caret pos
+  //(e.g. replace "dddddd" to "--": move lefter)
+  if not OptBack then
+    FEditor.Carets[0].PosX:= P1.X+Length(Str);
 end;
 
 function TATEditorFinder.GetOffsetStartPos: integer;
