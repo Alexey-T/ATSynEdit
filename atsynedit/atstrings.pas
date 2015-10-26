@@ -733,6 +733,8 @@ begin
 
   L:= TStringList.Create;
   try
+    L.TextLineBreakStyle:= tlbsLF; //force eol=#10
+
     //first line
     Str:= Copy(Lines[AY1], AX1+1, MaxInt);
     L.Add(UTF8Encode(Str));
@@ -750,6 +752,11 @@ begin
 
     TrimStringList(L);
     Result:= UTF8Decode(L.Text);
+
+    //L.Text gives final eol
+    if Result<>'' then
+      if Result[Length(Result)]=#10 then
+        SetLength(Result, Length(Result)-1);
   finally
     FreeAndNil(L);
   end;
