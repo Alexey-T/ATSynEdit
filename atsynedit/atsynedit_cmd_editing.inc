@@ -709,8 +709,13 @@ begin
     if not bChange then exit;
     Assert(L.Count=(NTo-NFrom+1), 'DoCommentSel changed line count');
 
-    for i:= NFrom to NTo do
-      Strings.Lines[i]:= Utf8Decode(L[i-NFrom]);
+    Strings.BeginUndoGroup;
+    try
+      for i:= NFrom to NTo do
+        Strings.Lines[i]:= Utf8Decode(L[i-NFrom]);
+    finally
+      Strings.EndUndoGroup;
+    end;
   finally
     L.Free;
   end;
