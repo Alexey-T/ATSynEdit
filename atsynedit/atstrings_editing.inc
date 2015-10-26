@@ -166,6 +166,7 @@ procedure TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
   out AShift, APosAfter: TPoint);
 var
   Str: atString;
+  bDelEmpty: boolean;
   i: integer;
 begin
   AShift.X:= 0;
@@ -188,17 +189,27 @@ begin
   end
   else
   begin
-    //correct 1st line
-    Str:= Copy(Lines[AFromY], 1, AFromX)+Copy(Lines[AToY], AToX+1, MaxInt);
+    bDelEmpty:= false;
+    //correct AToX/AToY to not del extra empty line
+    if AToX=0 then
+    begin
+      AToY:= Max(0, AToY-1);
+      AToX:= Length(Lines[AToY]);
+      bDelEmpty:= true;
+    end;
+
+    //place ramaining parts of 1st+last lines
+    Str:= Copy(Lines[AFromY], 1, AFromX) + Copy(Lines[AToY], AToX+1, MaxInt);
     Lines[AFromY]:= Str;
 
-    //del oth lines
+    //del middle lines
     for i:= AToY downto AFromY+1 do
       LineDelete(i);
 
-    //del 1st line too?
-    if Str='' then
-      LineDelete(AFromY);
+    //del empty line?
+    if bDelEmpty then
+      if Str='' then
+        LineDelete(AFromY);
 
     AShift.Y:= -(AToY-AFromY);
   end;

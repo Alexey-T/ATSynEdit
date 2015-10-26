@@ -40,6 +40,7 @@ type
     destructor Destroy; override;
     property Items: TStringList read FItems;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
+    procedure DoComboResetSelectedIndex;
   published
     property OptComboboxArrowSize: integer read FArrowSize write FArrowSize;
   end;
@@ -164,6 +165,11 @@ begin
         DoComboUpDown(ACmd=cCommand_KeyDown);
       end;
   end;
+end;
+
+procedure TATComboEdit.DoComboResetSelectedIndex;
+begin
+  FSelectedIndex:= 0;
 end;
 
 procedure TATComboEdit.DoComboUpDown(ADown: boolean);
