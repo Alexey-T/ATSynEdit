@@ -99,6 +99,7 @@ function SGetItem(var S: string; const sep: Char = ','): string;
 function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SWithBreaks(const S: atString): boolean;
+procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
 
 function BoolToPlusMinusOne(b: boolean): integer;
 procedure TrimStringList(L: TStringList);
@@ -853,6 +854,22 @@ begin
   n:= Pos(SFrom, S);
   if n>0 then
     Delete(S, n, MaxInt);
+end;
+
+procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
+var
+  n: integer;
+begin
+  if s<>'' then
+  begin
+    n:= List.IndexOf(s);
+    if n>=0 then
+      List.Delete(n);
+    List.Insert(0, s);
+  end;
+
+  while List.Count>MaxItems do
+    List.Delete(List.Count-1);
 end;
 
 

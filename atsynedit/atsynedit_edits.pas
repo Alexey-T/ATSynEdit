@@ -40,7 +40,7 @@ type
     destructor Destroy; override;
     property Items: TStringList read FItems;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
-    procedure DoComboResetSelectedIndex;
+    procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
     property OptComboboxArrowSize: integer read FArrowSize write FArrowSize;
   end;
@@ -167,9 +167,11 @@ begin
   end;
 end;
 
-procedure TATComboEdit.DoComboResetSelectedIndex;
+procedure TATComboEdit.DoAddLineToHistory(const AStr: atString;
+  AMaxItems: integer);
 begin
   FSelectedIndex:= 0;
+  SAddStringToHistory(Utf8Encode(AStr), FItems, AMaxItems);
 end;
 
 procedure TATComboEdit.DoComboUpDown(ADown: boolean);
