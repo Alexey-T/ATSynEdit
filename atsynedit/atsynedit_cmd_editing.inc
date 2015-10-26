@@ -98,42 +98,47 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  DoSelectionDeleteOrReset;
-
-  //list allows to insert each clip-line into one caret
-  List:= nil;
-  if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
-  begin
-    List:= TStringList.Create;
-    List.Text:= UTF8Encode(AText);
-  end;
-
   try
-    for i:= FCarets.Count-1 downto 0 do
-    begin
-      Caret:= FCarets[i];
-      Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
-      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+    Strings.BeginUndoGroup;
+    DoSelectionDeleteOrReset;
 
-      if not AKeepCaret then
+    //list allows to insert each clip-line into one caret
+    List:= nil;
+    if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
+    begin
+      List:= TStringList.Create;
+      List.Text:= UTF8Encode(AText);
+    end;
+
+    try
+      for i:= FCarets.Count-1 downto 0 do
       begin
-        if ASelectThen then
+        Caret:= FCarets[i];
+        Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
+        DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+
+        if not AKeepCaret then
         begin
-          Caret.EndX:= Caret.PosX;
-          Caret.EndY:= Caret.PosY;
-        end
-        else
-        begin
-          Caret.EndX:= -1;
-          Caret.EndY:= -1;
+          if ASelectThen then
+          begin
+            Caret.EndX:= Caret.PosX;
+            Caret.EndY:= Caret.PosY;
+          end
+          else
+          begin
+            Caret.EndX:= -1;
+            Caret.EndY:= -1;
+          end;
+          Caret.PosX:= PosAfter.X;
+          Caret.PosY:= PosAfter.Y;
         end;
-        Caret.PosX:= PosAfter.X;
-        Caret.PosY:= PosAfter.Y;
       end;
+    finally
+      if Assigned(List) then
+        FreeAndNil(List);
     end;
   finally
-    if Assigned(List) then
-      FreeAndNil(List);
+    Strings.EndUndoGroup;
   end;
 
   Result:= [cResultText, cResultCaretBottom];
