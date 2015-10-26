@@ -335,16 +335,21 @@ var
 begin
   if IsSelRectEmpty then exit;
 
-  for i:= FSelRect.Top to FSelRect.Bottom do
-  begin
-    Str:= Strings.Lines[i];
-    X1:= SColumnPosToCharPos(Str, FSelRect.Left, OptTabSize);
-    X2:= SColumnPosToCharPos(Str, FSelRect.Right, OptTabSize);
+  Strings.BeginUndoGroup;
+  try
+    for i:= FSelRect.Top to FSelRect.Bottom do
+    begin
+      Str:= Strings.Lines[i];
+      X1:= SColumnPosToCharPos(Str, FSelRect.Left, OptTabSize);
+      X2:= SColumnPosToCharPos(Str, FSelRect.Right, OptTabSize);
 
-    StrNew:= Str;
-    Delete(StrNew, X1+1, X2-X1);
-    if StrNew<>Str then
-      Strings.Lines[i]:= StrNew;
+      StrNew:= Str;
+      Delete(StrNew, X1+1, X2-X1);
+      if StrNew<>Str then
+        Strings.Lines[i]:= StrNew;
+    end;
+  finally
+    Strings.EndUndoGroup;
   end;
 
   DoSelect_None;

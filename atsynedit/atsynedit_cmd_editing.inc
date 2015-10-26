@@ -230,18 +230,23 @@ begin
 
   if not Carets.IsSelection then Exit;
 
-  for i:= FCarets.Count-1 downto 0 do
-  begin
-    Caret:= Carets[i];
-    Caret.GetRange(AX1, AY1, AX2, AY2, bSel);
-    if not bSel then Continue;
+  Strings.BeginUndoGroup;
+  try
+    for i:= FCarets.Count-1 downto 0 do
+    begin
+      Caret:= Carets[i];
+      Caret.GetRange(AX1, AY1, AX2, AY2, bSel);
+      if not bSel then Continue;
 
-    Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
-    DoCaretsShift(AX1, AY1, Shift.X, Shift.Y);
-    Caret.PosX:= PosAfter.X;
-    Caret.PosY:= PosAfter.Y;
-    Caret.EndX:= -1;
-    Caret.EndY:= -1;
+      Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
+      DoCaretsShift(AX1, AY1, Shift.X, Shift.Y);
+      Caret.PosX:= PosAfter.X;
+      Caret.PosY:= PosAfter.Y;
+      Caret.EndX:= -1;
+      Caret.EndY:= -1;
+    end;
+  finally
+    Strings.EndUndoGroup;
   end;
 
   Result:= [cResultText, cResultCaretTop];
@@ -312,15 +317,21 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
-  DoCaretsDeleteOnSameLines;
 
-  for i:= FCarets.Count-1 downto 0 do
-  begin
-    Caret:= FCarets[i];
-    Strings.TextDeleteLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
-    Caret.PosX:= PosAfter.X;
-    Caret.PosY:= PosAfter.Y;
+  Strings.BeginUndoGroup;
+  try
+    DoCaretsDeleteOnSameLines;
+
+    for i:= FCarets.Count-1 downto 0 do
+    begin
+      Caret:= FCarets[i];
+      Strings.TextDeleteLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
+      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+      Caret.PosX:= PosAfter.X;
+      Caret.PosY:= PosAfter.Y;
+    end;
+  finally
+    Strings.EndUndoGroup;
   end;
 
   Result:= [cResultText, cResultCaretTop];
@@ -334,15 +345,21 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
-  DoCaretsDeleteOnSameLines;
 
-  for i:= FCarets.Count-1 downto 0 do
-  begin
-    Caret:= FCarets[i];
-    Strings.TextDuplicateLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
-    Caret.PosX:= PosAfter.X;
-    Caret.PosY:= PosAfter.Y;
+  Strings.BeginUndoGroup;
+  try
+    DoCaretsDeleteOnSameLines;
+
+    for i:= FCarets.Count-1 downto 0 do
+    begin
+      Caret:= FCarets[i];
+      Strings.TextDuplicateLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
+      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+      Caret.PosX:= PosAfter.X;
+      Caret.PosY:= PosAfter.Y;
+    end;
+  finally
+    Strings.EndUndoGroup;
   end;
 
   Result:= [cResultText, cResultCaretAny];
