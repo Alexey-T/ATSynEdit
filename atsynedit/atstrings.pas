@@ -754,9 +754,11 @@ begin
     Result:= UTF8Decode(L.Text);
 
     //L.Text gives final eol
+    //let's keep it if AX2=0 (substr till column=0)
     if Result<>'' then
-      if Result[Length(Result)]=#10 then
-        SetLength(Result, Length(Result)-1);
+      if AX2<>0 then
+        if Result[Length(Result)]=#10 then
+          SetLength(Result, Length(Result)-1);
   finally
     FreeAndNil(L);
   end;
