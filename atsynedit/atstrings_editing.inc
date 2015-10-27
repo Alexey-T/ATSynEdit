@@ -46,6 +46,7 @@ begin
   //Insert multi-line text
 
   List:= TATStrings.Create;
+  BeginUndoGroup;
   try
     List.LoadFromString(StrLead+AText);
     List.ActionDeleteFakeLine;
@@ -64,6 +65,7 @@ begin
     AShift.Y:= APosAfter.Y-AY;
   finally
     FreeAndNil(List);
+    EndUndoGroup;
   end;
 end;
 
