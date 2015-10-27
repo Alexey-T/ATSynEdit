@@ -13,6 +13,8 @@ end;
 
 procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
+  inherited;
+
   if not FWantTabs then
     if Key=vk_tab then Exit;
 
