@@ -4,6 +4,7 @@ procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwri
 var
   Str, StrLead, StrTail: atString;
   List: TATStrings;
+  bWithEol: boolean;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -58,11 +59,22 @@ begin
     if Lines[AY]<>'' then
       LineDelete(AY);
 
-    LineInsertStrings(AY, List);
+    bWithEol:= SEndsWith(AText, #10) or
+               SEndsWith(AText, #13);
+    LineInsertStrings(AY, List, bWithEol);
 
-    APosAfter.X:= 0;
-    APosAfter.Y:= AY+List.Count;
+    if bWithEol then
+    begin
+      APosAfter.X:= 0;
+      APosAfter.Y:= AY+List.Count;
+    end
+    else
+    begin
+      APosAfter.X:= Length(List.Lines[List.Count-1]);
+      APosAfter.Y:= AY+List.Count-1;
+    end;
     AShift.Y:= APosAfter.Y-AY;
+
   finally
     FreeAndNil(List);
     EndUndoGroup;

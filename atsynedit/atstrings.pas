@@ -157,7 +157,7 @@ type
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(N: integer; const AString: atString);
-    procedure LineInsertStrings(N: integer; AList: TATStrings);
+    procedure LineInsertStrings(N: integer; AList: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(N: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
@@ -612,29 +612,47 @@ begin
   LineInsertEx(N, AString, FEndings);
 end;
 
-procedure TATStrings.LineInsertStrings(N: integer; AList: TATStrings);
+procedure TATStrings.LineInsertStrings(N: integer; AList: TATStrings; AWithFinalEol: boolean);
 var
   Cnt, CntMove: integer;
   Item: TATStringItem;
+  Str: atString;
   i: integer;
 begin
+  if AList.Count=0 then exit;
+
   Cnt:= AList.Count;
-  if Cnt=0 then Exit;
-  CntMove:= FList.Count-N;
+  if not AWithFinalEol then Dec(Cnt);
 
-  //fast! insert many
-  FList.Count:= FList.Count+Cnt;
-  System.Move(FList.List^[N], FList.List^[N+Cnt], CntMove*SizeOf(Pointer));
-  FillChar(FList.List^[N], Cnt*SizeOf(Pointer), 0);
-
-  for i:= 0 to Cnt-1 do
+  if Cnt>0 then
   begin
-    DoAddUndo(cEditActionInsert, N+i, '', cEndNone);
-    DoEventLog(N+i, Length(AList.Lines[i]));
+    CntMove:= FList.Count-N;
 
-    Item:= TATStringItem.Create(AList.Lines[i], Endings);
-    Item.ItemState:= cLineStateAdded;
-    FList[N+i]:= Item;
+    //fast! insert many
+    FList.Count:= FList.Count+Cnt;
+    System.Move(FList.List^[N], FList.List^[N+Cnt], CntMove*SizeOf(Pointer));
+    FillChar(FList.List^[N], Cnt*SizeOf(Pointer), 0);
+
+    for i:= 0 to Cnt-1 do
+    begin
+      DoAddUndo(cEditActionInsert, N+i, '', cEndNone);
+      DoEventLog(N+i, Length(AList.Lines[i]));
+
+      Item:= TATStringItem.Create(AList.Lines[i], Endings);
+      Item.ItemState:= cLineStateAdded;
+      FList[N+i]:= Item;
+    end;
+  end;
+
+  //insert last item specially, if no eol
+  if not AWithFinalEol then
+  begin
+    i:= N+AList.Count-1;
+    Str:= AList.Lines[AList.Count-1];
+    if IsIndexValid(i) then
+      Lines[i]:= Str+Lines[i]
+    else
+      LineAdd(Str);
   end;
 end;
 
