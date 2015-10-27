@@ -882,6 +882,7 @@ type
     property TabStop;
     property Visible;
     //menu
+    property PopupTextDefault: TPopupMenu read FMenuStd;
     property PopupText: TPopupMenu read FMenuText write FMenuText;
     property PopupGutterBm: TPopupMenu read FMenuGutterBm write FMenuGutterBm;
     property PopupGutterNum: TPopupMenu read FMenuGutterNum write FMenuGutterNum;
