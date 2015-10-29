@@ -494,7 +494,7 @@ begin
   DoCaretSingleAsIs;
 
   Caret:= Carets[0];
-  Caret.GetSelLines(Y1, Y2);
+  Caret.GetSelLines(Y1, Y2, true{Allow no sel});
   if Y1<0 then Exit;
 
   if FOptIndentSize>=0 then
