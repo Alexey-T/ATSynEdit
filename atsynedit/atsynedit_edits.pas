@@ -170,7 +170,7 @@ end;
 procedure TATComboEdit.DoAddLineToHistory(const AStr: atString;
   AMaxItems: integer);
 begin
-  FSelectedIndex:= 0;
+  FSelectedIndex:= -1;
   SAddStringToHistory(Utf8Encode(AStr), FItems, AMaxItems);
 end;
 
