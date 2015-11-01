@@ -735,6 +735,7 @@ type
     function DoCommand_ScrollVert(ALines: integer): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;
+    function DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
     function DoCommand_TextTabulation: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
     function DoCommand_KeyEnd: TATCommandResults;

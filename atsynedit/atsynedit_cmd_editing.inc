@@ -71,10 +71,9 @@ begin
     end;
 
   if FOptTabSpaces then
-    Str:= StringOfChar(' ', FTabSize)
+    Result:= DoCommand_TextInsertTabSpacesAtCarets(FOverwrite)
   else
-    Str:= #9;
-  Result:= DoCommand_TextInsertAtCarets(Str, false, FOverwrite, false);
+    Result:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
 end;
 
 
@@ -136,6 +135,39 @@ begin
     finally
       if Assigned(List) then
         FreeAndNil(List);
+    end;
+  finally
+    Strings.EndUndoGroup;
+  end;
+
+  Result:= [cResultText, cResultCaretBottom];
+end;
+
+function TATSynEdit.DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
+var
+  Caret: TATCaretItem;
+  Shift, PosAfter: TPoint;
+  StrSpaces: atString;
+  i: integer;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  Strings.BeginUndoGroup;
+  try
+    DoSelectionDeleteOrReset;
+
+    for i:= Carets.Count-1 downto 0 do
+    begin
+      Caret:= Carets[i];
+      StrSpaces:= StringOfChar(' ', FTabSize - Caret.PosX mod FTabSize);
+      Strings.TextInsert(Caret.PosX, Caret.PosY, StrSpaces, AOvrMode, Shift, PosAfter);
+      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+
+      Caret.PosX:= PosAfter.X;
+      Caret.PosY:= PosAfter.Y;
+      Caret.EndX:= -1;
+      Caret.EndY:= -1;
     end;
   finally
     Strings.EndUndoGroup;
