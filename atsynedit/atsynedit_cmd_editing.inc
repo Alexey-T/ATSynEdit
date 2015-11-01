@@ -80,10 +80,7 @@ end;
 function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
   AKeepCaret, AOvrMode, ASelectThen: boolean): TATCommandResults;
 var
-  Caret: TATCaretItem;
-  Shift, PosAfter: TPoint;
   List: TStringList;
-  i: integer;
   //
   function TextItem(i: integer): atString;
   begin
@@ -93,16 +90,20 @@ var
       Result:= AText;
   end;
   //
+var
+  Caret: TATCaretItem;
+  Shift, PosAfter: TPoint;
+  i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
+  List:= nil;
+  Strings.BeginUndoGroup;
   try
-    Strings.BeginUndoGroup;
     DoSelectionDeleteOrReset;
 
     //list allows to insert each clip-line into one caret
-    List:= nil;
     if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
     begin
       List:= TStringList.Create;
@@ -110,24 +111,16 @@ begin
     end;
 
     try
-      for i:= FCarets.Count-1 downto 0 do
+      for i:= Carets.Count-1 downto 0 do
       begin
-        Caret:= FCarets[i];
+        Caret:= Carets[i];
         Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
         DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
 
         if not AKeepCaret then
         begin
-          if ASelectThen then
-          begin
-            Caret.EndX:= Caret.PosX;
-            Caret.EndY:= Caret.PosY;
-          end
-          else
-          begin
-            Caret.EndX:= -1;
-            Caret.EndY:= -1;
-          end;
+          Caret.EndX:= IfThen(ASelectThen, Caret.PosX, -1);
+          Caret.EndY:= IfThen(ASelectThen, Caret.PosY, -1);
           Caret.PosX:= PosAfter.X;
           Caret.PosY:= PosAfter.Y;
         end;
