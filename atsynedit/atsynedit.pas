@@ -3661,11 +3661,31 @@ begin
         ShortCut:= FKeymap.GetShortcutFromCommand(Tag);
 
       case Tag of
-        cCommand_ClipboardCut: Enabled:= not ModeReadOnly;
-        cCommand_ClipboardPaste: Enabled:= not ModeReadOnly and Clipboard.HasFormat(CF_Text);
-        cCommand_TextDeleteSelection: Enabled:= not ModeReadOnly and Carets.IsSelection;
-        cCommand_Undo: Enabled:= not ModeReadOnly and (UndoCount>0);
-        cCommand_Redo: Enabled:= not ModeReadOnly and (RedoCount>0);
+        cCommand_ClipboardCut:
+          begin
+            Enabled:= not ModeReadOnly;
+            Visible:= not ModeReadOnly;
+          end;
+        cCommand_ClipboardPaste:
+          begin
+            Enabled:= not ModeReadOnly and Clipboard.HasFormat(CF_Text);
+            Visible:= not ModeReadOnly;
+          end;
+        cCommand_TextDeleteSelection:
+          begin
+            Enabled:= not ModeReadOnly and Carets.IsSelection;
+            Visible:= not ModeReadOnly;
+          end;
+        cCommand_Undo:
+          begin
+            Enabled:= not ModeReadOnly and (UndoCount>0);
+            Visible:= not ModeReadOnly;
+          end;
+        cCommand_Redo:
+          begin
+            Enabled:= not ModeReadOnly and (RedoCount>0);
+            Visible:= not ModeReadOnly;
+          end;
       end;
     end;
 end;
