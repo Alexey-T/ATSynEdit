@@ -512,6 +512,7 @@ type
     FOptAllowReadOnly: boolean;
     //
     procedure DebugFindWrapIndex;
+    function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
