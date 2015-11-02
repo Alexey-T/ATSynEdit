@@ -436,6 +436,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptMaxLinesToCountUnindent: integer;
     FOptShowStapleStyle: TATLineStyle;
     FOptShowStapleIndent: integer;
     FOptShowStapleWidthPercent: integer;
@@ -1031,6 +1032,7 @@ type
     property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents;
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize;
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign;
+    property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG;
     property OptAllowScrollbarVert: boolean read FOptAllowScrollbarVert write FOptAllowScrollbarVert;
@@ -2324,6 +2326,7 @@ begin
   FOptShowStapleIndent:= -1;
   FOptShowStapleWidthPercent:= 100;
 
+  FOptMaxLinesToCountUnindent:= 100;
   FOptTextOffsetTop:= 0;
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
   FOptAllowScrollbarVert:= true;

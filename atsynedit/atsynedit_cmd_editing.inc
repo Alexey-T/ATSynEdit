@@ -172,16 +172,28 @@ end;
 function TATSynEdit.DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
 var
   Str: atString;
-  NIndent: integer;
+  NIndent, i: integer;
 begin
   Result:= -1;
+  if not Strings.IsIndexValid(AY) then Exit;
+
+  //allow smart unindent only if caret on 1st nonspace char
+  //(else Bksp must delete 1 char)
   Str:= Strings.Lines[AY];
   NIndent:= SGetIndentChars(Str);
-  if (AX=NIndent) and (NIndent>0) then
+  if not ((AX=NIndent) and (NIndent>0)) then Exit;
+
+  //calc indent of N prev lines.
+  //if indent<AX then ok
+  for i:= 1 to FOptMaxLinesToCountUnindent do
   begin
-    if AY=0 then Exit(0);
-    Str:= Strings.Lines[AY-1];
-    Exit(SGetIndentChars(Str));
+    Dec(AY);
+    if not Strings.IsIndexValid(AY) then Exit;
+
+    Str:= Strings.Lines[AY];
+    NIndent:= SGetIndentChars(Str);
+    if NIndent<AX then
+      Exit(NIndent);
   end;
 end;
 
@@ -189,7 +201,6 @@ function TATSynEdit.DoCommand_TextDeleteLeft(ALen: integer; AAllowUnindent: bool
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  Str: atString;
   NIndent, NDeleteLen: integer;
   i: integer;
 begin
