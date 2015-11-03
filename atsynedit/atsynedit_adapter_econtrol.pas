@@ -509,8 +509,8 @@ begin
       if R.Rule=nil then Continue;
       if not R.Rule.DisplayInTree then Continue;
 
-      NodeText:= Trim(AnClient.GetRangeName(R));
-      NodeTextGroup:= Trim(AnClient.GetRangeGroup(R));
+      NodeText:= Trim(Utf8Encode(AnClient.GetRangeName(R)));
+      NodeTextGroup:= Trim(Utf8Encode(AnClient.GetRangeGroup(R)));
       NodeData:= R;
       NodeParent:= nil;
       NodeGroup:= nil;
