@@ -514,6 +514,7 @@ type
     FOptAllowScrollbarHorz: boolean;
     FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
+
     //
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
@@ -2884,7 +2885,7 @@ begin
               select text if it is not GCS_RESULTSTR }
             res:=DoCommand_TextInsertAtCarets(p, False,
                                  (imeCode=GCS_RESULTSTR) and FOverwrite,
-                                 imeCode<>GCS_RESULTSTR);
+                                 (imeCode<>GCS_RESULTSTR) and (Len>0));
             DoCommandResults(res);
          finally
            FreeMem(p);
