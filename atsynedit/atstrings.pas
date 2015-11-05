@@ -364,14 +364,14 @@ end;
 
 procedure TATStrings.SetLineBm(Index: integer; AValue: integer);
 begin
-  Assert(IsIndexValid(Index));
-  TATStringItem(FList[Index]).ItemBm:= AValue;
+  if IsIndexValid(Index) then
+    TATStringItem(FList[Index]).ItemBm:= AValue;
 end;
 
 procedure TATStrings.SetLineSep(Index: integer; AValue: TATLineSeparator);
 begin
-  Assert(IsIndexValid(Index));
-  TATStringItem(FList[Index]).ItemSeparator:= AValue;
+  if IsIndexValid(Index) then
+    TATStringItem(FList[Index]).ItemSeparator:= AValue;
 end;
 
 
