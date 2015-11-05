@@ -20,7 +20,7 @@ interface
 
 uses
   {$ifdef Windows}
-  imm, messages,
+  windows, imm, messages,
   {$endif}
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms,
@@ -775,6 +775,11 @@ type
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     procedure DoDebugInitFoldList;
 
+    {$ifdef Windows}
+    procedure OnCanvasFontChanged(Sender:TObject);
+  protected
+    procedure DoSendShowHideToInterface; override;
+    {$endif}
   public
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -2419,6 +2424,9 @@ begin
   FMenuRuler:= nil;
 
   DoInitPopupMenu;
+  {$ifdef Windows}
+  Canvas.Font.OnChange:=@OnCanvasFontChanged;
+  {$endif}
 end;
 
 destructor TATSynEdit.Destroy;
@@ -3701,6 +3709,27 @@ begin
     FOnBeforeCalcHilite(Self);
 end;
 
+{$ifdef Windows}
+// Get cCharScaleFullWidth
+procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
+var
+  a, b : ABCFLOAT;
+begin
+  ATStringProc.cCharScaleFullwidth:=ATStringProc.cCharScaleFullwidth_Default;
+  if GetCharABCWidthsFloatW(Canvas.Handle,$3000,$3000,a) and
+     GetCharABCWidthsFloatW(Canvas.Handle,$0020,$0020,b) then
+  begin
+    if b.abcfB+b.abcfC>0 then
+      ATStringProc.cCharScaleFullwidth:=(a.abcfB+a.abcfC) / (b.abcfB+b.abcfC);
+  end;
+end;
+
+procedure TATSynEdit.DoSendShowHideToInterface;
+begin
+  inherited DoSendShowHideToInterface;
+  OnCanvasFontChanged(Canvas.Font);
+end;
+{$endif}
 
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin

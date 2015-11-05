@@ -33,7 +33,7 @@ const
 
 const
   cMaxTabPositionToExpand = 500; //no sense to expand too far tabs
-  cCharScaleFullwidth = 1.7; //width of CJK chars
+  cCharScaleFullwidth_Default = 1.7; //width of CJK chars
   cCharScaleHex = 6.0; //width of hex show: "<NNNN>"
   cMinWordWrapOffset = 3;
 
@@ -41,6 +41,7 @@ var
   OptHexCharsDefault: UnicodeString = ''; //show these chars as "<NNNN>"
   OptHexCharsUser: UnicodeString = ''; //these too
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
+  cCharScaleFullwidth: Single = cCharScaleFullwidth_Default;
 
 
 function IsCharEol(ch: atChar): boolean;
