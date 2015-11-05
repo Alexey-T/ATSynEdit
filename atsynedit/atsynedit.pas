@@ -19,6 +19,9 @@ unit ATSynEdit;
 interface
 
 uses
+  {$ifdef Windows}
+  windows, imm, messages,
+  {$endif}
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms,
   LMessages, LCLType,
@@ -511,6 +514,7 @@ type
     FOptAllowScrollbarHorz: boolean;
     FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
+
     //
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
@@ -772,6 +776,11 @@ type
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     procedure DoDebugInitFoldList;
 
+    {$ifdef Windows}
+    procedure OnCanvasFontChanged(Sender:TObject);
+  protected
+    procedure DoSendShowHideToInterface; override;
+    {$endif}
   public
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -871,6 +880,12 @@ type
     procedure WMEraseBkgnd(var Msg: TLMEraseBkgnd); message LM_ERASEBKGND;
     procedure WMHScroll(var Msg: TLMHScroll); message LM_HSCROLL;
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
+    // Windows IME Support
+    {$ifdef Windows}
+    procedure WMIME_STARTCOMPOSITION(var Msg:TMessage); message WM_IME_STARTCOMPOSITION;
+    procedure WMIME_COMPOSITION(var Msg:TMessage); message WM_IME_COMPOSITION;
+    procedure WMIME_ENDCOMPOSITION(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
+    {$endif}
   published
     property Align;
     property Anchors;
@@ -2410,6 +2425,9 @@ begin
   FMenuRuler:= nil;
 
   DoInitPopupMenu;
+  {$ifdef Windows}
+  Canvas.Font.OnChange:=@OnCanvasFontChanged;
+  {$endif}
 end;
 
 destructor TATSynEdit.Destroy;
@@ -2826,6 +2844,65 @@ begin
   UpdateScrollInfoFromMessage(Msg, FScrollVert);
   Invalidate;
 end;
+
+{ Simple Windows IME support, only tested with Korean }
+{$ifdef Windows}
+procedure TATSynEdit.WMIME_STARTCOMPOSITION(var Msg: TMessage);
+begin
+  Msg.Result:=-1;
+end;
+
+procedure TATSynEdit.WMIME_COMPOSITION(var Msg: TMessage);
+var
+  IMC:HIMC;
+  imeCode, len:Integer;
+  p:PWideChar;
+  res:TATCommandResults;
+begin
+  if not ModeReadOnly then
+  begin
+    { work with GCS_COMPSTR and GCS_RESULTSTR }
+    if Msg.lParam and GCS_COMPSTR <> 0 then
+       imeCode := GCS_COMPSTR
+       else if Msg.lParam and GCS_RESULTSTR <> 0 then
+            imeCode := GCS_RESULTSTR
+            else
+                imeCode := 0;
+    { check compositon state }
+    if imeCode<>0 then
+    begin
+      IMC := ImmGetContext(Handle);
+      try
+         { Get Result string length }
+         len := ImmGetCompositionStringW(IMC,imeCode,nil,0);
+         GetMem(p,len+2);
+         try
+            { get compositon string }
+            ImmGetCompositionStringW(IMC,imeCode,p,len);
+            len := len shr 1;
+            p[len]:=#0;
+            { Insert text and
+              select text if it is not GCS_RESULTSTR }
+            res:=DoCommand_TextInsertAtCarets(p, False,
+                                 (imeCode=GCS_RESULTSTR) and FOverwrite,
+                                 (imeCode<>GCS_RESULTSTR) and (Len>0));
+            DoCommandResults(res);
+         finally
+           FreeMem(p);
+         end;
+      finally
+        ImmReleaseContext(Handle,IMC);
+      end;
+    end;
+  end;
+  Msg.Result:=-1;
+end;
+
+procedure TATSynEdit.WMIME_ENDCOMPOSITION(var Msg: TMessage);
+begin
+  Msg.Result:=-1;
+end;
+{$endif}
 
 procedure TATSynEdit.WMHScroll(var Msg: TLMHScroll);
 begin
@@ -3633,6 +3710,27 @@ begin
     FOnBeforeCalcHilite(Self);
 end;
 
+{$ifdef Windows}
+// Get cCharScaleFullWidth
+procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
+var
+  a, b : ABCFLOAT;
+begin
+  ATStringProc.cCharScaleFullwidth:=ATStringProc.cCharScaleFullwidth_Default;
+  if GetCharABCWidthsFloatW(Canvas.Handle,$3000,$3000,a) and
+     GetCharABCWidthsFloatW(Canvas.Handle,$0020,$0020,b) then
+  begin
+    if b.abcfB+b.abcfC>0 then
+      ATStringProc.cCharScaleFullwidth:=(a.abcfB+a.abcfC) / (b.abcfB+b.abcfC);
+  end;
+end;
+
+procedure TATSynEdit.DoSendShowHideToInterface;
+begin
+  inherited DoSendShowHideToInterface;
+  OnCanvasFontChanged(Canvas.Font);
+end;
+{$endif}
 
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
