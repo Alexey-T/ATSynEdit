@@ -720,11 +720,11 @@ begin
   if EdList.Count=0 then Exit;
   Ed:= TATSynEdit(EdList[0]);
 
+  for i:= 0 to Ed.Strings.Count-1 do
+    Ed.Strings.LinesSeparator[i]:= cLineSepNone;
+
   if AnClient.LineBreaks.Count>0 then
   begin
-    for i:= 0 to Ed.Strings.Count-1 do
-      Ed.Strings.LinesSeparator[i]:= cLineSepNone;
-
     Break:= TecLineBreak(AnClient.LineBreaks[0]);
     for j:= 0 to EdList.Count-1 do
       TATSynEdit(EdList[j]).Colors.BlockSepLine:= Break.Rule.Style.BgColor;
@@ -736,7 +736,9 @@ begin
         Sep:= cLineSepTop
       else
         Sep:= cLineSepBottom;
-      Ed.Strings.LinesSeparator[Break.Line]:= Sep;
+
+      if Ed.Strings.IsIndexValid(Break.Line) then
+        Ed.Strings.LinesSeparator[Break.Line]:= Sep;
     end;
   end;
 end;
