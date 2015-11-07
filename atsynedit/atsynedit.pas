@@ -3711,16 +3711,27 @@ end;
 // Get cCharScaleFullWidth
 procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
 var
-  a, b : ABCFLOAT;
+  a : ABCFLOAT;
+  d, e: single;
 begin
   ATStringProc.cCharScaleFullwidth:=ATStringProc.cCharScaleFullwidth_Default;
   if assigned(Parent) then
-    if GetCharABCWidthsFloatW(Canvas.Handle,$3000,$3000,a) and
-       GetCharABCWidthsFloatW(Canvas.Handle,$0020,$0020,b) then
-    begin
-      if b.abcfB+b.abcfC>0 then
-        ATStringProc.cCharScaleFullwidth:=(a.abcfB+a.abcfC) / (b.abcfB+b.abcfC);
-    end;
+  begin
+    // 'M' alphabet
+    // half width alphabet
+    if GetCharABCWidthsFloatW(Canvas.Handle,$20+$2d,$20+$2d,a) then
+      d := a.abcfA+a.abcfB+a.abcfC
+      else
+        d:=1;
+    // CJK Full Width alphabet
+    if GetCharABCWidthsFloatW(Canvas.Handle,$FF00+$2d,$FF00+$2d,a) then
+      e := a.abcfA+a.abcfB+a.abcfC
+      else
+        e:=1;
+    if d<1 then
+     d:=1;
+    ATStringProc.cCharScaleFullwidth:= e / d;
+  end;
 end;
 
 procedure TATSynEdit.DoSendShowHideToInterface;
