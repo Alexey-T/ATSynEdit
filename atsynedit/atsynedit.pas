@@ -776,11 +776,9 @@ type
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     procedure DoDebugInitFoldList;
 
-    {$ifdef Windows}
     procedure OnCanvasFontChanged(Sender:TObject);
   protected
     procedure DoSendShowHideToInterface; override;
-    {$endif}
   public
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -3707,16 +3705,18 @@ begin
     FOnBeforeCalcHilite(Self);
 end;
 
-{$ifdef Windows}
 // Get cCharScaleFullWidth
 procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
+{$ifdef windows}
 var
   a : ABCFLOAT;
   d, e: single;
+{$endif}
 begin
   ATStringProc.cCharScaleFullwidth:=ATStringProc.cCharScaleFullwidth_Default;
   if assigned(Parent) then
   begin
+    {$ifdef windows}
     // 'M' alphabet
     // half width alphabet
     if GetCharABCWidthsFloatW(Canvas.Handle,$20+$2d,$20+$2d,a) then
@@ -3731,6 +3731,10 @@ begin
     if d<1 then
      d:=1;
     ATStringProc.cCharScaleFullwidth:= e / d;
+    {$else}
+    // $FF2D / $004D
+    ATStringProc.cCharScaleFullwidth := Canvas.GetTextWidth(#$ef#$bc#$ad) / Canvas.GetTextWidth('M');
+    {$endif}
   end;
 end;
 
@@ -3740,7 +3744,6 @@ begin
   Canvas.Font.OnChange:=@OnCanvasFontChanged;
   OnCanvasFontChanged(Canvas.Font);
 end;
-{$endif}
 
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
