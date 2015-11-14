@@ -3708,6 +3708,9 @@ end;
 // Get cCharScaleFullWidth
 procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
 {$ifdef windows}
+const
+  cCodeM = $20+$2d;
+  cCodeCJKM = $FF00+$2d;
 var
   a : ABCFLOAT;
   d, e: single;
@@ -3719,12 +3722,12 @@ begin
     {$ifdef windows}
     // 'M' alphabet
     // half width alphabet
-    if GetCharABCWidthsFloatW(Canvas.Handle,$20+$2d,$20+$2d,a) then
+    if GetCharABCWidthsFloatW(Canvas.Handle,cCodeM,cCodeM,a) then
       d := a.abcfA+a.abcfB+a.abcfC
       else
         d:=1;
     // CJK Full Width alphabet
-    if GetCharABCWidthsFloatW(Canvas.Handle,$FF00+$2d,$FF00+$2d,a) then
+    if GetCharABCWidthsFloatW(Canvas.Handle,cCodeCJKM,cCodeCJKM,a) then
       e := a.abcfA+a.abcfB+a.abcfC
       else
         e:=1;
