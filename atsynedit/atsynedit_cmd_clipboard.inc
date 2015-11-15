@@ -20,8 +20,10 @@ begin
   if ModeOneLine then
     Str:= SRemoveNewlineChars(Str);
 
+  Strings.BeginUndoGroup;
   DoCommand_TextDeleteSelection;
   Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOverwrite and FOptOverwriteAllowedOnPaste, ASelectThen);
+  Strings.EndUndoGroup;
 
   //workaround: paste on last line end
   if Carets.Count>0 then

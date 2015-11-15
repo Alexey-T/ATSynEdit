@@ -101,6 +101,7 @@ type
     FSaveSignWide: boolean;
     FReadOnly: boolean;
     FUndoAfterSave: boolean;
+    FUndoGroupCounter: integer;
     FOneLine: boolean;
     FProgress: integer;
     FOnGetCaretsArray: TATStringsGetCarets;
@@ -790,17 +791,23 @@ end;
 
 procedure TATStrings.BeginUndoGroup;
 begin
+  Inc(FUndoGroupCounter);
   if Assigned(FUndoList) then
   begin
+    //softmark if not-nested call
+    if FUndoGroupCounter=1 then
+      FUndoList.SoftMark:= true;
+    //hardmark always
     FUndoList.HardMark:= true;
-    FUndoList.SoftMark:= true;
   end;
 end;
 
 procedure TATStrings.EndUndoGroup;
 begin
-  if Assigned(FUndoList) then
-    FUndoList.HardMark:= false;
+  FUndoGroupCounter:= Max(0, FUndoGroupCounter-1);
+  if FUndoGroupCounter=0 then
+    if Assigned(FUndoList) then
+      FUndoList.HardMark:= false;
 end;
 
 procedure TATStrings.DoUndoSingle(AUndoList: TATUndoList;
