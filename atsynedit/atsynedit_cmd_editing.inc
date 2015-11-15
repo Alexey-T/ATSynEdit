@@ -526,7 +526,7 @@ var
   NDecSpaces, NMinSpaces, i: integer;
   Str: atString;
   Caret: TATCaretItem;
-  CaretShift: integer;
+  NShiftInit, NShift1, NShift2, NIndent1, NIndent2: integer;
 begin
   Result:= [];
   DoCaretSingleAsIs;
@@ -534,6 +534,12 @@ begin
   Caret:= Carets[0];
   Caret.GetSelLines(Y1, Y2, true{Allow no sel});
   if Y1<0 then Exit;
+
+  if Caret.EndY<0 then
+  begin
+    Caret.EndX:= Caret.PosX;
+    Caret.EndY:= Caret.PosY;
+  end;
 
   if FOptIndentSize>=0 then
     NDecSpaces:= FOptIndentSize
@@ -554,6 +560,13 @@ begin
   if FOptIndentKeepsAlign then
     if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
+  //calc shifts (emulate Laz ide indent)
+  NIndent1:= SGetIndentChars(Strings.Lines[Caret.PosY]);
+  NIndent2:= SGetIndentChars(Strings.Lines[Caret.EndY]);
+  NShiftInit:= Abs(FOptIndentSize) * IfThen(ARight, 1, -1);
+  NShift1:= IfThen((Caret.PosX>=NIndent1) and (Caret.PosX>0), NShiftInit, 0);
+  NShift2:= IfThen((Caret.EndX>=NIndent2), NShiftInit, 0);
+
   //do indent
   Strings.BeginUndoGroup;
   try
@@ -570,14 +583,8 @@ begin
   end;
 
   //correct selection
-  CaretShift:= Abs(FOptIndentSize) * IfThen(ARight, 1, -1);
-  if Caret.EndY<0 then
-  begin
-    Caret.EndX:= Caret.PosX;
-    Caret.EndY:= Caret.PosY;
-  end;
-  Caret.PosX:= Max(0, Caret.PosX+CaretShift);
-  Caret.EndX:= Max(0, Caret.EndX+CaretShift);
+  Caret.PosX:= Max(0, Caret.PosX+NShift1);
+  Caret.EndX:= Max(0, Caret.EndX+NShift2);
 
   Result:= [cResultText, cResultCaretAny];
 end;
