@@ -205,7 +205,7 @@ begin
   begin
     bDelEmpty:= false;
     //correct AToX/AToY to not del extra empty line
-    if AToX=0 then
+    if (AToX=0) and (Lines[AToY]='') then //for empty last line
     begin
       AToY:= Max(0, AToY-1);
       AToX:= Length(Lines[AToY]);
