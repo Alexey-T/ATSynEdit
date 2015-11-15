@@ -526,6 +526,7 @@ var
   NDecSpaces, NMinSpaces, i: integer;
   Str: atString;
   Caret: TATCaretItem;
+  CaretShift: integer;
 begin
   Result:= [];
   DoCaretSingleAsIs;
@@ -568,11 +569,15 @@ begin
     Strings.EndUndoGroup;
   end;
 
-  //correct selection: select entire lines y1..y2
-  Caret.EndX:= 0;
-  Caret.EndY:= Y1;
-  Caret.PosX:= Length(Strings.Lines[Y2]);
-  Caret.PosY:= Y2;
+  //correct selection
+  CaretShift:= Abs(FOptIndentSize) * IfThen(ARight, 1, -1);
+  if Caret.EndY<0 then
+  begin
+    Caret.EndX:= Caret.PosX;
+    Caret.EndY:= Caret.PosY;
+  end;
+  Caret.PosX:= Max(0, Caret.PosX+CaretShift);
+  Caret.EndX:= Max(0, Caret.EndX+CaretShift);
 
   Result:= [cResultText, cResultCaretAny];
 end;
