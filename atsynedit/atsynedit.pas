@@ -776,11 +776,9 @@ type
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     procedure DoDebugInitFoldList;
 
-    {$ifdef Windows}
     procedure OnCanvasFontChanged(Sender:TObject);
   protected
     procedure DoSendShowHideToInterface; override;
-    {$endif}
   public
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -3707,20 +3705,44 @@ begin
     FOnBeforeCalcHilite(Self);
 end;
 
-{$ifdef Windows}
 // Get cCharScaleFullWidth
 procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
+{$ifdef windows}
+const
+  cCodeM = $20+$2d;
+  cCodeCJKM = $FF00+$2d;
 var
-  a, b : ABCFLOAT;
+  a : ABCFLOAT;
+  d, e: single;
+{$else}
+const
+  cCodeM = 'M'; // $20+$2d;
+  cCodeCJKM = #$ef#$bc#$ad; // $FF00+$2d, utf-8
+{$endif}
 begin
   ATStringProc.cCharScaleFullwidth:=ATStringProc.cCharScaleFullwidth_Default;
   if assigned(Parent) then
-    if GetCharABCWidthsFloatW(Canvas.Handle,$3000,$3000,a) and
-       GetCharABCWidthsFloatW(Canvas.Handle,$0020,$0020,b) then
-    begin
-      if b.abcfB+b.abcfC>0 then
-        ATStringProc.cCharScaleFullwidth:=(a.abcfB+a.abcfC) / (b.abcfB+b.abcfC);
-    end;
+  begin
+    {$ifdef windows}
+    // 'M' alphabet
+    // half width alphabet
+    if GetCharABCWidthsFloatW(Canvas.Handle,cCodeM,cCodeM,a) then
+      d := a.abcfA+a.abcfB+a.abcfC
+      else
+        d:=1;
+    // CJK Full Width alphabet
+    if GetCharABCWidthsFloatW(Canvas.Handle,cCodeCJKM,cCodeCJKM,a) then
+      e := a.abcfA+a.abcfB+a.abcfC
+      else
+        e:=1;
+    if d<1 then
+     d:=1;
+    ATStringProc.cCharScaleFullwidth:= e / d;
+    {$else}
+    // $FF2D / $004D
+    ATStringProc.cCharScaleFullwidth := Canvas.GetTextWidth(cCodeCJKM) / Canvas.GetTextWidth(cCodeM);
+    {$endif}
+  end;
 end;
 
 procedure TATSynEdit.DoSendShowHideToInterface;
@@ -3729,7 +3751,6 @@ begin
   Canvas.Font.OnChange:=@OnCanvasFontChanged;
   OnCanvasFontChanged(Canvas.Font);
 end;
-{$endif}
 
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
