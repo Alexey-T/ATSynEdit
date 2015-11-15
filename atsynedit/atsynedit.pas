@@ -3714,6 +3714,10 @@ const
 var
   a : ABCFLOAT;
   d, e: single;
+{$else}
+const
+  cCodeM = 'M'; // $20+$2d;
+  cCodeCJKM = #$ef#$bc#$ad; // $FF00+$2d, utf-8
 {$endif}
 begin
   ATStringProc.cCharScaleFullwidth:=ATStringProc.cCharScaleFullwidth_Default;
@@ -3736,7 +3740,7 @@ begin
     ATStringProc.cCharScaleFullwidth:= e / d;
     {$else}
     // $FF2D / $004D
-    ATStringProc.cCharScaleFullwidth := Canvas.GetTextWidth(#$ef#$bc#$ad) / Canvas.GetTextWidth('M');
+    ATStringProc.cCharScaleFullwidth := Canvas.GetTextWidth(cCodeCJKM) / Canvas.GetTextWidth(cCodeM);
     {$endif}
   end;
 end;
