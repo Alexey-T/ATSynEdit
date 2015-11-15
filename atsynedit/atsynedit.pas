@@ -3705,42 +3705,36 @@ begin
     FOnBeforeCalcHilite(Self);
 end;
 
-// Get cCharScaleFullWidth
+
 procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
+const
+  cCodeM: Widechar = #$4d; //half-width M
+  cCodeFullM: Widechar = #$ff2d; //full-width M
 {$ifdef windows}
-const
-  cCodeM = $20+$2d;
-  cCodeCJKM = $FF00+$2d;
 var
-  a : ABCFLOAT;
-  d, e: single;
-{$else}
-const
-  cCodeM = 'M'; // $20+$2d;
-  cCodeCJKM = #$ef#$bc#$ad; // $FF00+$2d, utf-8
+  sizeSmall, sizeFull: single;
+  a: ABCFLOAT;
 {$endif}
 begin
-  ATStringProc.cCharScaleFullwidth:=ATStringProc.cCharScaleFullwidth_Default;
+  ATStringProc.cCharScaleFullwidth:= ATStringProc.cCharScaleFullwidth_Default;
   if assigned(Parent) then
   begin
     {$ifdef windows}
-    // 'M' alphabet
-    // half width alphabet
-    if GetCharABCWidthsFloatW(Canvas.Handle,cCodeM,cCodeM,a) then
-      d := a.abcfA+a.abcfB+a.abcfC
-      else
-        d:=1;
-    // CJK Full Width alphabet
-    if GetCharABCWidthsFloatW(Canvas.Handle,cCodeCJKM,cCodeCJKM,a) then
-      e := a.abcfA+a.abcfB+a.abcfC
-      else
-        e:=1;
-    if d<1 then
-     d:=1;
-    ATStringProc.cCharScaleFullwidth:= e / d;
+    //half width
+    if GetCharABCWidthsFloatW(Canvas.Handle, Ord(cCodeM), Ord(cCodeM), a) then
+      sizeSmall:= Max(1.0, a.abcfA+a.abcfB+a.abcfC)
+    else
+      sizeSmall:= 1;
+    //full width
+    if GetCharABCWidthsFloatW(Canvas.Handle, Ord(cCodeFullM), Ord(cCodeFullM), a) then
+      sizeFull:= a.abcfA+a.abcfB+a.abcfC
+    else
+      sizeFull:= 1;
+    ATStringProc.cCharScaleFullwidth:= sizeFull/sizeSmall;
     {$else}
-    // $FF2D / $004D
-    ATStringProc.cCharScaleFullwidth := Canvas.GetTextWidth(cCodeCJKM) / Canvas.GetTextWidth(cCodeM);
+    ATStringProc.cCharScaleFullwidth:=
+      Canvas.TextWidth(Utf8Encode(cCodeFullM)) /
+      Canvas.TextWidth(Utf8Encode(cCodeM));
     {$endif}
   end;
 end;
