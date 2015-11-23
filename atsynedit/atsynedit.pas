@@ -3776,6 +3776,10 @@ begin
       if Assigned(FKeymap) then
         ShortCut:= FKeymap.GetShortcutFromCommand(Tag);
 
+      //separator items: hide if read-only, nicer menu
+      if Caption='-' then
+        Visible:= not ModeReadOnly;
+
       case Tag of
         cCommand_ClipboardCut:
           begin
