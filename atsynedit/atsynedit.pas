@@ -101,6 +101,7 @@ type
     FCollapseLine,
     FCollapseMarkFont,
     FCollapseMarkBG,
+    FCollapseMarkBorder,
     FUnprintedFont,
     FUnprintedBG,
     FUnprintedHexFont,
@@ -142,6 +143,7 @@ type
     property CollapseLine: TColor read FCollapseLine write FCollapseLine;
     property CollapseMarkFont: TColor read FCollapseMarkFont write FCollapseMarkFont;
     property CollapseMarkBG: TColor read FCollapseMarkBG write FCollapseMarkBG;
+    property CollapseMarkBorder: TColor read FCollapseMarkBorder write FCollapseMarkBorder;
     property UnprintedFont: TColor read FUnprintedFont write FUnprintedFont;
     property UnprintedBG: TColor read FUnprintedBG write FUnprintedBG;
     property UnprintedHexFont: TColor read FUnprintedHexFont write FUnprintedHexFont;
@@ -2149,7 +2151,7 @@ begin
   NWidth:= C.TextWidth(Str) + 2*cFoldedMarkIndentInner;
 
   //paint frame
-  C.Pen.Color:= FColors.CollapseMarkFont;
+  C.Pen.Color:= FColors.CollapseMarkBorder;
   C.Brush.Style:= bsClear;
   C.Rectangle(ACoord.X, ACoord.Y, ACoord.X+NWidth, ACoord.Y+FCharSize.Y);
   C.Brush.Style:= bsSolid;
