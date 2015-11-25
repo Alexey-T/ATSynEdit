@@ -2232,9 +2232,9 @@ begin
   FCaretStopUnfocused:= true;
 
   FMarkers:= TATMarkers.Create;
-  //FMarkers.Add(0,0); //debug
-  //FMarkers.Add(1,1);
-  //FMarkers.Add(2,2);
+  //FMarkers.Add(0, 0); //debug
+  //FMarkers.Add(1, 1);
+  //FMarkers.Add(100, 2);
 
   FPaintLocked:= 0;
   FPaintStatic:= false;
@@ -4379,16 +4379,16 @@ begin
   for i:= 0 to Markers.Count-1 do
   begin
     M:= Markers[i];
-    if (M.CoordX>=0) and
-      (M.CoordY>=0) then
-      begin
-        C.Brush.Color:= Colors.Markers;
-        C.Pen.Color:= Colors.Markers;
-        C.Polygon([
-          Point(M.CoordX, M.CoordY+FCharSize.Y-FOptMarkersSize-1),
-          Point(M.CoordX-FOptMarkersSize, M.CoordY+FCharSize.Y-1),
-          Point(M.CoordX+FOptMarkersSize, M.CoordY+FCharSize.Y-1) ]);
-      end;
+    if M.CoordX<0 then Continue;
+    if M.CoordY<0 then Continue;
+    if not PtInRect(FRectMain, Point(M.CoordX, M.CoordY)) then Continue;
+
+    C.Brush.Color:= Colors.Markers;
+    C.Pen.Color:= Colors.Markers;
+    C.Polygon([
+      Point(M.CoordX, M.CoordY+FCharSize.Y-FOptMarkersSize-1),
+      Point(M.CoordX-FOptMarkersSize, M.CoordY+FCharSize.Y-1),
+      Point(M.CoordX+FOptMarkersSize, M.CoordY+FCharSize.Y-1) ]);
   end;
 end;
 
