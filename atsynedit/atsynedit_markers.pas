@@ -91,6 +91,8 @@ begin
   Item:= TATMarkerItem.Create;
   Item.PosX:= APosX;
   Item.PosY:= APosY;
+  Item.CoordX:= -1;
+  Item.CoordY:= -1;
   FList.Add(Item);
 end;
 

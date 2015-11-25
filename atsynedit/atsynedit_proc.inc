@@ -75,6 +75,7 @@ begin
   C.TextDisabledFont:= clGray;
   C.TextDisabledBG:= $f0f0f0;
   C.Caret:= clBlack;
+  C.Markers:= $0000c0;
   C.GutterFont:= clGray;
   C.GutterBG:= $e0e0e0;
   C.GutterCaretBG:= $c8c8c8;

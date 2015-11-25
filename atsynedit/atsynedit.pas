@@ -30,6 +30,7 @@ uses
   ATSynEdit_Keymap,
   ATSynEdit_CanvasProc,
   ATSynEdit_Carets,
+  ATSynEdit_Markers,
   ATSynEdit_Gutter,
   ATSynEdit_WrapInfo,
   ATSynEdit_Ranges,
@@ -82,6 +83,7 @@ type
     FTextSelFont,
     FTextSelBG,
     FCaret,
+    FMarkers,
     FGutterFont,
     FGutterBG,
     FGutterCaretBG,
@@ -124,6 +126,7 @@ type
     property TextSelFont: TColor read FTextSelFont write FTextSelFont;
     property TextSelBG: TColor read FTextSelBG write FTextSelBG;
     property Caret: TColor read FCaret write FCaret;
+    property Markers: TColor read FMarkers write FMarkers;
     property GutterFont: TColor read FGutterFont write FGutterFont;
     property GutterBG: TColor read FGutterBG write FGutterBG;
     property GutterCaretBG: TColor read FGutterCaretBG write FGutterCaretBG;
@@ -356,6 +359,7 @@ type
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
+    FMarkers: TATMarkers;
     FMenuStd,
     FMenuText,
     FMenuGutterBm,
@@ -449,6 +453,7 @@ type
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
     FOptCaretPreferLeftSide: boolean;
+    FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
     FOptTextOffsetTop: integer;
     FOptTextOffsetFromLine: integer;
@@ -538,6 +543,7 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
+    procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoSelectionDeleteColumnBlock;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     function GetColorTextBG: TColor;
@@ -835,6 +841,7 @@ type
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;
     property Carets: TATCarets read FCarets;
+    property Markers: TATMarkers read FMarkers;
     function IsLineWithCaret(ALine: integer): boolean;
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
@@ -986,6 +993,7 @@ type
     property OptCaretBlinkEnabled: boolean read FCaretBlinkEnabled write SetCaretBlinkEnabled;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide;
+    property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize;
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways;
@@ -1611,6 +1619,7 @@ begin
 
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMarginsTo(C);
+  DoPaintMarkersTo(C);
   DoPaintNiceScroll(C);
 
   if FOptRulerVisible then
@@ -2222,6 +2231,11 @@ begin
   FCaretSpecPos:= false;
   FCaretStopUnfocused:= true;
 
+  FMarkers:= TATMarkers.Create;
+  //FMarkers.Add(0,0); //debug
+  //FMarkers.Add(1,1);
+  //FMarkers.Add(2,2);
+
   FPaintLocked:= 0;
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
@@ -2391,6 +2405,7 @@ begin
   FOptSavingTrimSpaces:= false;
   FOptShowScrollHint:= false;
   FOptCaretPreferLeftSide:= true;
+  FOptMarkersSize:= 4;
   FOptMouseDownForPopup:= false;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
@@ -2437,6 +2452,7 @@ begin
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
+  FreeAndNil(FMarkers);
   FreeAndNil(FGutter);
   FreeAndNil(FMarginList);
   FreeAndNil(FWrapInfo);
@@ -4353,6 +4369,27 @@ begin
     Result:= Colors.TextFont
   else
     Result:= Colors.TextDisabledFont;
+end;
+
+procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
+var
+  M: TATMarkerItem;
+  i: integer;
+begin
+  for i:= 0 to Markers.Count-1 do
+  begin
+    M:= Markers[i];
+    if (M.CoordX>=0) and
+      (M.CoordY>=0) then
+      begin
+        C.Brush.Color:= Colors.Markers;
+        C.Pen.Color:= Colors.Markers;
+        C.Polygon([
+          Point(M.CoordX, M.CoordY+FCharSize.Y-FOptMarkersSize-1),
+          Point(M.CoordX-FOptMarkersSize, M.CoordY+FCharSize.Y-1),
+          Point(M.CoordX+FOptMarkersSize, M.CoordY+FCharSize.Y-1) ]);
+      end;
+  end;
 end;
 
 

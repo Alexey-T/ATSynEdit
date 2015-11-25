@@ -89,6 +89,7 @@ var
   P: TPoint;
   NStart, i: integer;
   Caret: TATCaretItem;
+  Marker: TATMarkerItem;
 begin
   if AOnlyLast then
     NStart:= Carets.Count-1
@@ -110,6 +111,24 @@ begin
       P:= CaretPosToClientPos(P);
       Caret.CoordX:= P.X;
       Caret.CoordY:= P.Y;
+    end;
+  end;
+
+  for i:= 0 to Markers.Count-1 do
+  begin
+    Marker:= Markers[i];
+    P.X:= Marker.PosX;
+    P.Y:= Marker.PosY;
+    if IsPosFolded(P.X, P.Y) then
+    begin
+      Marker.CoordX:= -1;
+      Marker.CoordY:= -1;
+    end
+    else
+    begin
+      P:= CaretPosToClientPos(P);
+      Marker.CoordX:= P.X;
+      Marker.CoordY:= P.Y;
     end;
   end;
 end;
