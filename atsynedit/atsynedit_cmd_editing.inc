@@ -5,6 +5,7 @@ procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
 var
   iStart, i: integer;
   Caret: TATCaretItem;
+  Mark: TATMarkerItem;
 begin
   if APosX<0 then Exit;
   if APosY<0 then Exit;
@@ -12,6 +13,7 @@ begin
   iStart:= FCarets.IndexOfPosYAvg(APosY);
   if iStart<0 then Exit;
 
+  //adjust carets
   for i:= iStart to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
@@ -49,6 +51,33 @@ begin
 
     if Caret.PosX<0 then Caret.PosX:= 0;
     if Caret.PosY<0 then Caret.PosY:= 0;
+  end;
+
+  //adjust markers
+  for i:= 0 to Markers.Count-1 do
+  begin
+    Mark:= Markers[i];
+
+    //marker below src, apply ShiftY/ShiftBelowX
+    if Mark.PosY>APosY then
+    begin
+      if AShiftY=0 then Exit;
+
+      if Mark.PosY=APosY+1 then
+        Inc(Mark.PosX, AShiftBelowX);
+
+      Inc(Mark.PosY, AShiftY);
+    end
+    else
+    //marker on same line as src, apply ShiftX
+    if Mark.PosY=APosY then
+    begin
+      if Mark.PosX>APosX then
+        Inc(Mark.PosX, AShiftX);
+    end;
+
+    if Mark.PosX<0 then Mark.PosX:= 0;
+    if Mark.PosY<0 then Mark.PosY:= 0;
   end;
 end;
 
