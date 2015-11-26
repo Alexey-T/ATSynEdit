@@ -110,10 +110,10 @@ Some details about this:
 
 = Help topics =
 == What limitations it has? ==
-* Cannot set different fonts for different text parts 
+* Cannot set different fonts for different parts 
 * All lines have the same height
 * Not supported RTL mode, limited support for Arabic text
-* Not adapted/ not tested with IME
+* Not supported Unicode code points >0xFFFF, caret pos incorrect
 
 == What features it has? ==
 * Fast editing of big texts (tested 10M log) 
@@ -251,6 +251,36 @@ Example adds few ranges to text:
 To fold/unfold a range, don't change Folded field, use methods of ATSynEdit: DoRangeFold, DoRangeUnfold.
 
 To fold/unfold all, use commands via DoCommand method: cCommand_FoldAll, cCommand_UnfoldAll.
+
+=== Markers object ===
+
+type TATMarkers in unit atsynedit_markers. Holds list of marker items. Each marker item has properties: 
+
+* PosX, PosY: position of marker, like caret pos
+* CoordX, CoordY: screen coordinates (don't change them)
+
+Markers are painted as red triangles below their positions (PosX, PosY). They are needed e.g. for making snippets, where user needs to jump over snippet's insert points and wants to see these points. Also it's good for IDE to have commands like "drop marker here", "remove last marker", "swap caret and last marker" etc (like CodeRush).
+
+Example code from CudaText:
+
+<syntaxhighlight>
+procedure EditorMarkerGotoLast(Ed: TATSynEdit; AndDelete: boolean);
+var
+  Caret: TATCaretItem;
+  Mark: TATMarkerItem;
+begin
+  if Ed.Carets.Count<>1 then exit;
+  if Ed.Markers.Count=0 then exit;
+  Caret:= Ed.Carets[0];
+  Mark:= Ed.Markers[Ed.Markers.Count-1];
+  Caret.PosX:= Mark.PosX;
+  Caret.PosY:= Mark.PosY;
+  if AndDelete then
+    Ed.Markers.Delete(Ed.Markers.Count-1);
+  Ed.DoGotoCaret(cEdgeTop);
+  Ed.Update;
+end;
+</syntaxhighlight>
 
 === Colors object ===
 
@@ -620,10 +650,10 @@ ATSynEdit has API which allows to make report to any format. It's function DoCal
 
 There're kinds of group-marks in undo-items: hard-marks, soft-marks. 
 
-* Hard-marks are placed on undo-items if you call Strings.BeginUndoGroup, editing, Strings.EndUndoGroup. All items marked with hard-marks are undone as group, even of UndoGrouped=false.
-* Soft-marks used only if UndoGrouped=true. Soft-marks are placed on one next undo-item, when user does mouse click (or some similar action); or in code by call Strings.SetGroupMark. All items beginning with last soft-marked item are undone as group.
+* Hard-marks are placed on undo-items if you call Strings.BeginUndoGroup, editing, Strings.EndUndoGroup. All items marked with hard-marks are undone as group, even of OptUndoGrouped=false.
+* Soft-marks used only if OptUndoGrouped=true. Soft-marks are placed on one next undo-item, when user does mouse click (or some similar action); or in code by call Strings.SetGroupMark. All items beginning with last soft-marked item are undone as group.
 
-Example, UndoGrouped=true, such undo-items exist:
+Example 1. OptUndoGrouped=true, such undo-items exist:
 
 * item1
 * item2
@@ -642,7 +672,7 @@ Undo:
 * undone: item7..3; until soft-mark.
 * undone: item2..1.
 
-Example, UndoGrouped=false, undo-items:
+Example 2. OptUndoGrouped=false, undo-items:
 
 * item1
 * item2
@@ -659,6 +689,23 @@ Undo:
 * Undone: item5..3
 * Undone: item2
 * Undone: item1
+
+Soft-marks also used together with hard-marks. Soft-mark is placed with first hard-mark after call Strings.BeginUndoGroup. This allows to undo N groups of edits, if many items hard-marked (w/out gaps).
+
+Example 3. Undo-items:
+
+* item1, hard-mark
+* item2, hard-mark, soft-mark
+* item3, hard-mark
+* item4, hard-mark, soft-mark
+* item5, hard-mark
+* item6, hard-mark
+
+Undo:
+
+* undone: item6..4
+* undone: item3..2
+* undone: item1
 
 ==more==
 
