@@ -1,7 +1,7 @@
 {$ifdef nnn}begin end;{$endif}
 
 procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
-  AShiftY: integer; AShiftBelowX: integer);
+  AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
 var
   iStart, i: integer;
   Caret: TATCaretItem;
@@ -69,12 +69,22 @@ begin
       Inc(Mark.PosY, AShiftY);
     end
     else
-    //marker on same line as src, apply ShiftX
+    //marker on same line as src
     if Mark.PosY=APosY then
-    begin
-      if Mark.PosX>APosX then
-        Inc(Mark.PosX, AShiftX);
-    end;
+      if Mark.PosX=APosX then
+      begin
+        Mark.PosX:= APosAfter.X;
+        Mark.PosY:= APosAfter.Y;
+      end
+      else
+      if Mark.PosX>=APosX then
+        if AShiftY=0 then
+          Inc(Mark.PosX, AShiftX)
+        else
+        begin
+          Inc(Mark.PosX, -APosX+APosAfter.X);
+          Inc(Mark.PosY, AShiftY);
+        end;
 
     if Mark.PosX<0 then Mark.PosX:= 0;
     if Mark.PosY<0 then Mark.PosY:= 0;
@@ -144,7 +154,7 @@ begin
       begin
         Caret:= Carets[i];
         Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
-        DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+        DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
         if not AKeepCaret then
         begin
@@ -184,7 +194,7 @@ begin
       Caret:= Carets[i];
       StrSpaces:= StringOfChar(' ', FTabSize - Caret.PosX mod FTabSize);
       Strings.TextInsert(Caret.PosX, Caret.PosY, StrSpaces, AOvrMode, Shift, PosAfter);
-      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
       Caret.PosX:= PosAfter.X;
       Caret.PosY:= PosAfter.Y;
@@ -260,7 +270,7 @@ begin
     end;
 
     Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
@@ -305,7 +315,7 @@ begin
       if not bSel then Continue;
 
       Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
-      DoCaretsShift(AX1, AY1, Shift.X, Shift.Y);
+      DoCaretsShift(AX1, AY1, Shift.X, Shift.Y, PosAfter);
       Caret.PosX:= PosAfter.X;
       Caret.PosY:= PosAfter.Y;
       Caret.EndX:= -1;
@@ -341,7 +351,7 @@ begin
       ShiftBelowX:= Len;
 
     Strings.TextDeleteRight(Caret.PosX, Caret.PosY, ALen, Shift, PosAfter);
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, ShiftBelowX);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter, ShiftBelowX);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
@@ -367,7 +377,7 @@ begin
     Caret:= FCarets[i];
     Str:= GetAutoIndentString(Caret.PosX, Caret.PosY);
     Strings.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
@@ -392,7 +402,7 @@ begin
     begin
       Caret:= FCarets[i];
       Strings.TextDeleteLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
-      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
       Caret.PosX:= PosAfter.X;
       Caret.PosY:= PosAfter.Y;
     end;
@@ -420,7 +430,7 @@ begin
     begin
       Caret:= FCarets[i];
       Strings.TextDuplicateLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
-      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
       Caret.PosX:= PosAfter.X;
       Caret.PosY:= PosAfter.Y;
     end;
@@ -528,7 +538,7 @@ begin
       end;
     end;
 
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y);
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
     if ((Caret.PosX<>PosAfter.X) or (Caret.PosY<>PosAfter.Y)) and
       (FCarets.IndexOfPosXY(PosAfter.X, PosAfter.Y)>=0) then
@@ -701,6 +711,7 @@ end;
 function TATSynEdit.DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  PosAfter: TPoint;
   i: integer;
 begin
   Result:= [];
@@ -712,11 +723,14 @@ begin
   begin
     Caret:= Carets[i];
     Strings.LineInsert(Caret.PosY + IfThen(ADown, 1), '');
-    DoCaretsShift(0, Caret.PosY, 0, 1);
 
-    Caret.PosX:= 0;
-    if ADown then
-      Inc(Caret.PosY);
+    PosAfter.X:= 0;
+    PosAfter.Y:= Caret.PosY+IfThen(ADown, 1);
+
+    DoCaretsShift(0, Caret.PosY, 0, 1, PosAfter);
+
+    Caret.PosX:= PosAfter.X;
+    Caret.PosY:= PosAfter.Y;
   end;
 
   Result:= [cResultText, cResultCaretAny];

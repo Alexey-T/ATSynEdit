@@ -333,6 +333,15 @@ object fmMain: TfmMain
       TabOrder = 13
       Visible = False
     end
+    object btnMarker: TButton
+      Left = 144
+      Height = 25
+      Top = 224
+      Width = 96
+      Caption = 'marker'
+      OnClick = btnMarkerClick
+      TabOrder = 14
+    end
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]

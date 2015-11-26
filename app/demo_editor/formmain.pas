@@ -26,6 +26,7 @@ type
     bFont: TButton;
     bOpt: TButton;
     btnStop: TButton;
+    btnMarker: TButton;
     chkGutter: TCheckBox;
     chkMicromap: TCheckBox;
     chkMinimap: TCheckBox;
@@ -109,6 +110,7 @@ type
     StatusMsg: TStatusBar;
     TimerHint: TTimer;
     procedure bGotoClick(Sender: TObject);
+    procedure btnMarkerClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
       var AContinue: boolean);
@@ -542,6 +544,15 @@ begin
     ed.DoGotoPosEx(Point(0, n))
   else
     Showmessage('Incorrect index: '+s);
+end;
+
+procedure TfmMain.btnMarkerClick(Sender: TObject);
+begin
+  if ed.Carets.Count=1 then
+  begin
+    ed.Markers.Add(ed.Carets[0].PosX, ed.Carets[0].PosY);
+    ed.Update;
+  end;
 end;
 
 procedure TfmMain.btnStopClick(Sender: TObject);

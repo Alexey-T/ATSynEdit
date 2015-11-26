@@ -709,7 +709,8 @@ type
     //carets
     procedure DoCaretAddToPoint(AX, AY: integer);
     procedure DoCaretsColumnToPoint(AX, AY: integer);
-    procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer; AShiftBelowX: integer = 0);
+    procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
+      APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoCaretsDeleteOnSameLines;
 
     //editing
@@ -3918,7 +3919,7 @@ begin
     end;
 
     Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
-    DoCaretsShift(X1, Y1, Shift.X, Shift.Y);
+    DoCaretsShift(X1, Y1, Shift.X, Shift.Y, PosAfter);
   end;
 
   Update(true);
