@@ -12,6 +12,8 @@ type
   public
     PosX, PosY: integer;
     CoordX, CoordY: integer; //screen coords
+    Tag: integer; //used in CudaText: when "collect marker" runs, for all markers
+                  //with the same Tag>0 multi-carets placed
   end;
 
 type
@@ -29,7 +31,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATMarkerItem read GetItem; default;
-    procedure Add(APosX, APosY: integer);
+    procedure Add(APosX, APosY: integer; ATag: integer=0);
   end;
 
 implementation
@@ -84,7 +86,7 @@ begin
     Result:= nil;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer);
+procedure TATMarkers.Add(APosX, APosY: integer; ATag: integer = 0);
 var
   Item: TATMarkerItem;
 begin
@@ -93,6 +95,8 @@ begin
   Item.PosY:= APosY;
   Item.CoordX:= -1;
   Item.CoordY:= -1;
+  Item.Tag:= ATag;
+
   FList.Add(Item);
 end;
 
