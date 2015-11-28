@@ -1,11 +1,13 @@
 {$ifdef nnn}begin end;{$endif}
+//{$define debug_markers_shift}
 
 procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
   AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
 var
-  iStart, i: integer;
   Caret: TATCaretItem;
   Mark: TATMarkerItem;
+  iStart, i: integer;
+  S: string;
 begin
   if APosX<0 then Exit;
   if APosY<0 then Exit;
@@ -21,7 +23,7 @@ begin
     //carets below src, apply ShiftY/ShiftBelowX
     if Caret.PosY>APosY then
     begin
-      if AShiftY=0 then Exit;
+      if AShiftY=0 then Continue;
 
       if Caret.PosY=APosY+1 then
         Inc(Caret.PosX, AShiftBelowX);
@@ -53,6 +55,17 @@ begin
     if Caret.PosY<0 then Caret.PosY:= 0;
   end;
 
+
+  //debug
+  {$ifdef debug_markers_shift}
+  S:= '';
+  for i:= 0 to Markers.Count-1 do
+    S:= S+Format('mark[%d] %d %d, ', [i, Markers[i].PosX, Markers[i].PosY]);
+  Application.Mainform.Caption:= S+' -- '+Format(
+    'pos %d %d, shift %d %d, posafter %d %d',
+    [APosX, APosY, AShiftX, AShiftY, APosAfter.X, APosAfter.Y]);
+  {$endif}
+
   //adjust markers
   for i:= 0 to Markers.Count-1 do
   begin
@@ -61,7 +74,7 @@ begin
     //marker below src, apply ShiftY/ShiftBelowX
     if Mark.PosY>APosY then
     begin
-      if AShiftY=0 then Exit;
+      if AShiftY=0 then Continue;
 
       if Mark.PosY=APosY+1 then
         Inc(Mark.PosX, AShiftBelowX);
@@ -71,6 +84,7 @@ begin
     else
     //marker on same line as src
     if Mark.PosY=APosY then
+    begin
       if Mark.PosX=APosX then
       begin
         Mark.PosX:= APosAfter.X;
@@ -85,6 +99,7 @@ begin
           Inc(Mark.PosX, -APosX+APosAfter.X);
           Inc(Mark.PosY, AShiftY);
         end;
+    end;
 
     if Mark.PosX<0 then Mark.PosX:= 0;
     if Mark.PosY<0 then Mark.PosY:= 0;
@@ -93,7 +108,6 @@ end;
 
 function TATSynEdit.DoCommand_TextTabulation: TATCommandResults;
 var
-  Str: atString;
   N1, N2: integer;
 begin
   //multiline selection?
