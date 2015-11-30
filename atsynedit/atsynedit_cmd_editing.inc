@@ -146,18 +146,14 @@ var
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  bNeedGroup: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
   List:= nil;
-
-  //command called for paste and type-char: Grouped undo needed not always
-  bNeedGroup:= Length(AText)>1;
-  if bNeedGroup then
-    Strings.BeginUndoGroup;
+  //if AAddUndoGroup then
+  //  Strings.BeginUndoGroup;
 
   try
     DoSelectionDeleteOrReset;
@@ -189,8 +185,8 @@ begin
         FreeAndNil(List);
     end;
   finally
-    if bNeedGroup then
-      Strings.EndUndoGroup;
+    //if AAddUndoGroup then
+    //  Strings.EndUndoGroup;
   end;
 
   Result:= [cResultText, cResultCaretBottom];

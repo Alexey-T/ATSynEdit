@@ -22,7 +22,10 @@ begin
 
   Strings.BeginUndoGroup;
   DoCommand_TextDeleteSelection;
-  Result:= DoCommand_TextInsertAtCarets(Str, AKeepCaret, FOverwrite and FOptOverwriteAllowedOnPaste, ASelectThen);
+  Result:= DoCommand_TextInsertAtCarets(Str,
+             AKeepCaret,
+             FOverwrite and FOptOverwriteAllowedOnPaste,
+             ASelectThen);
   Strings.EndUndoGroup;
 
   //workaround: paste on last line end
