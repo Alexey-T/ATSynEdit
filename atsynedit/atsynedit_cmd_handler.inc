@@ -125,7 +125,7 @@ var
   i: integer;
 begin
   if ACmd<=0 then Exit;
-  if DoEventCommand(ACmd) then Exit;
+  if DoEventCommand(ACmd, AText) then Exit;
 
   Res:= [];
   FCaretSpecPos:= false;

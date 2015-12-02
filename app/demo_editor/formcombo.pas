@@ -19,7 +19,7 @@ type
     procedure chkEnabledChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    procedure ComboCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
+    procedure ComboCommand(Sender: TObject; ACmd: integer; const AText: string; var AHandled: boolean);
     { private declarations }
   public
     { public declarations }
@@ -53,7 +53,7 @@ begin
 end;
 
 procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;
-  var AHandled: boolean);
+  const AText: string; var AHandled: boolean);
 var
   s: string;
   n: integer;

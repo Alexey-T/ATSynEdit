@@ -306,7 +306,7 @@ var
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
-  TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; var AHandled: boolean) of object;
+  TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; const AText: string; var AHandled: boolean) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
@@ -640,7 +640,7 @@ type
     procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
-    function DoEventCommand(ACommand: integer): boolean;
+    function DoEventCommand(ACommand: integer; const AText: string): boolean;
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
     //
     function GetCharSpacingX: integer;
@@ -3643,11 +3643,11 @@ begin
 end;
 
 
-function TATSynEdit.DoEventCommand(ACommand: integer): boolean;
+function TATSynEdit.DoEventCommand(ACommand: integer; const AText: string): boolean;
 begin
   Result:= false;
   if Assigned(FOnCommand) then
-    FOnCommand(Self, ACommand, Result);
+    FOnCommand(Self, ACommand, AText, Result);
 end;
 
 function TATSynEdit.GetCaretBlinkTime: integer;

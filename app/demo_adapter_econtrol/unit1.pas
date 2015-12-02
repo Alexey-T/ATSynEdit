@@ -265,7 +265,7 @@ end;
 
 procedure TfmMain.bCommentClick(Sender: TObject);
 begin
-  DoCommentAct(cCommentAddIfNone);
+  DoCommentAct(cCommentAdd_AtNonespace_IfNone);
 end;
 
 procedure TfmMain.bExportClick(Sender: TObject);

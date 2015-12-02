@@ -186,7 +186,7 @@ type
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
-    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; var AHandled: boolean);
+    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; const AText: string; var AHandled: boolean);
     procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
     procedure EditClickMicromap(Sender: TObject; AX, AY: integer);
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
@@ -423,7 +423,8 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer; var AHandled: boolean);
+procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer;
+  const AText: string; var AHandled: boolean);
 begin
   AHandled:= false;
   {
