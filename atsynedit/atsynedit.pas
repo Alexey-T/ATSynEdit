@@ -306,6 +306,7 @@ var
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
+  TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; const AText: string; var AHandled: boolean) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
@@ -387,6 +388,7 @@ type
     FOnClickDbl,
     FOnClickTriple,
     FOnClickMiddle: TATSynEditClickEvent;
+    FOnClickMoveCaret: TATSynEditClickMoveCaretEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChange: TNotifyEvent;
     FOnScroll: TNotifyEvent;
@@ -937,6 +939,7 @@ type
     property OnClickMiddle: TATSynEditClickEvent read FOnClickMiddle write FOnClickMiddle;
     property OnClickGutter: TATSynEditClickGutterEvent read FOnClickGutter write FOnClickGutter;
     property OnClickMicromap: TATSynEditClickMicromapEvent read FOnClickMicromap write FOnClickMicromap;
+    property OnClickMoveCaret: TATSynEditClickMoveCaretEvent read FOnClickMoveCaret write FOnClickMoveCaret;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
@@ -2988,6 +2991,9 @@ begin
       end
       else
       begin
+        if Assigned(FOnClickMoveCaret) then
+          FOnClickMoveCaret(Self, Point(Carets[0].PosX, Carets[0].PosY), FMouseDownPnt);
+
         DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
         DoSelect_None;
       end;
