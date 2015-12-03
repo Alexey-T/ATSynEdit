@@ -389,6 +389,7 @@ type
     FOnClickTriple,
     FOnClickMiddle: TATSynEditClickEvent;
     FOnClickMoveCaret: TATSynEditClickMoveCaretEvent;
+    FOnClickEndSelect: TATSynEditClickMoveCaretEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChange: TNotifyEvent;
     FOnScroll: TNotifyEvent;
@@ -940,6 +941,7 @@ type
     property OnClickGutter: TATSynEditClickGutterEvent read FOnClickGutter write FOnClickGutter;
     property OnClickMicromap: TATSynEditClickMicromapEvent read FOnClickMicromap write FOnClickMicromap;
     property OnClickMoveCaret: TATSynEditClickMoveCaretEvent read FOnClickMoveCaret write FOnClickMoveCaret;
+    property OnClickEndSelect: TATSynEditClickMoveCaretEvent read FOnClickEndSelect write FOnClickEndSelect;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
@@ -3095,6 +3097,12 @@ begin
     if not FOptMouseDownForPopup then
       DoHandleRightClick(X, Y);
   end;
+
+  if Carets.Count=1 then
+    with Carets[0] do
+      if EndY>=0 then
+        if Assigned(FOnClickEndSelect) then
+          FOnClickEndSelect(Self, Point(EndX, EndY), Point(PosX, PosY));
 end;
 
 
