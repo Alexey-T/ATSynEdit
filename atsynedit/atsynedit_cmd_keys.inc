@@ -248,7 +248,7 @@ var
 begin
   Item:= FWrapInfo[FWrapInfo.Count-1];
   if Assigned(Item) then
-    DoCaretSingle(Item.NLength, Item.NLineIndex, false);
+    DoCaretSingle(Length(Strings.Lines[Item.NLineIndex]), Item.NLineIndex, false);
 
   Result:= [cResultCaretBottom];
 end;
