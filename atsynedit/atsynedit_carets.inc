@@ -531,3 +531,114 @@ begin
 end;
 
 
+procedure TATSynEdit.DoCaretsShift_CaretItem(Caret: TATCaretItem;
+  APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer);
+begin
+  //carets below src, apply ShiftY/ShiftBelowX
+  if Caret.PosY>APosY then
+  begin
+    if AShiftY=0 then exit;
+
+    if Caret.PosY=APosY+1 then
+      Inc(Caret.PosX, AShiftBelowX);
+
+    Inc(Caret.PosY, AShiftY);
+  end
+  else
+  //carets on same line as src, apply ShiftX
+  begin
+    if Caret.PosX>APosX then
+      Inc(Caret.PosX, AShiftX);
+  end;
+
+  //same, but for EndX/EndY
+  if Caret.EndY>APosY then
+  begin
+    if Caret.EndY=APosY+1 then
+      Inc(Caret.EndX, AShiftBelowX);
+
+    Inc(Caret.EndY, AShiftY);
+  end
+  else
+  begin
+    if Caret.EndX>APosX then
+      Inc(Caret.EndX, AShiftX);
+  end;
+
+  if Caret.PosX<0 then Caret.PosX:= 0;
+  if Caret.PosY<0 then Caret.PosY:= 0;
+end;
+
+
+procedure TATSynEdit.DoCaretsShift_MarkerItem(Mark: TATMarkerItem;
+  APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
+  APosAfter: TPoint);
+begin
+  //marker below src, apply ShiftY/ShiftBelowX
+  if Mark.PosY>APosY then
+  begin
+    if AShiftY=0 then exit;
+
+    if Mark.PosY=APosY+1 then
+      Inc(Mark.PosX, AShiftBelowX);
+
+    Inc(Mark.PosY, AShiftY);
+  end
+  else
+  //marker on same line as src
+  if Mark.PosY=APosY then
+  begin
+    if Mark.PosX=APosX then
+    begin
+      Mark.PosX:= APosAfter.X;
+      Mark.PosY:= APosAfter.Y;
+    end
+    else
+    if Mark.PosX>=APosX then
+      if AShiftY=0 then
+        Inc(Mark.PosX, AShiftX)
+      else
+      begin
+        Inc(Mark.PosX, -APosX+APosAfter.X);
+        Inc(Mark.PosY, AShiftY);
+      end;
+  end;
+
+  if Mark.PosX<0 then Mark.PosX:= 0;
+  if Mark.PosY<0 then Mark.PosY:= 0;
+end;
+
+
+procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
+  AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
+var
+  NStart, i: integer;
+  S: string;
+begin
+  if APosX<0 then Exit;
+  if APosY<0 then Exit;
+
+  //adjust carets
+  //(optimized, from index NStart, to fast do on 200 carets)
+  NStart:= Carets.IndexOfPosYAvg(APosY);
+  if NStart>=0 then
+    for i:= NStart to Carets.Count-1 do
+      DoCaretsShift_CaretItem(Carets[i],
+        APosX, APosY, AShiftX, AShiftY, AShiftBelowX);
+
+  {$ifdef debug_markers_shift}
+  S:= '';
+  for i:= 0 to Markers.Count-1 do
+    S:= S+Format('mark[%d] %d %d, ', [i, Markers[i].PosX, Markers[i].PosY]);
+  Application.Mainform.Caption:= S+' -- '+Format(
+    'pos %d %d, shift %d %d, posafter %d %d',
+    [APosX, APosY, AShiftX, AShiftY, APosAfter.X, APosAfter.Y]);
+  {$endif}
+
+  //adjust markers
+  //(cannot optimize, markers not sorted)
+  for i:= 0 to Markers.Count-1 do
+    DoCaretsShift_MarkerItem(Markers[i],
+      APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+end;
+

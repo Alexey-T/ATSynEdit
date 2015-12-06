@@ -532,6 +532,10 @@ type
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsAssign(NewCarets: TATCarets);
+    procedure DoCaretsShift_CaretItem(Caret: TATCaretItem; APosX, APosY, AShiftX,
+      AShiftY, AShiftBelowX: integer);
+    procedure DoCaretsShift_MarkerItem(Mark: TATMarkerItem; APosX, APosY, AShiftX,
+      AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
     procedure DoDropText;
     procedure DoFoldbarClick(ALine: integer);
     procedure DoFoldForLevel(ALevel: integer);
