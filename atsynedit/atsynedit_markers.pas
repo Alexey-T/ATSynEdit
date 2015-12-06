@@ -12,12 +12,14 @@ type
   public
     PosX, PosY: integer;
     CoordX, CoordY: integer; //screen coords
-    Tag: PtrInt;
+    Tag: integer;
       //used in CudaText: when "collect marker" runs, for all markers
       //with the same Tag>0 multi-carets placed
     SelLen: integer;
       //used in CudaText: when "collect marker" runs, caret will
       //be with selection of this len
+    Ptr: TObject;
+      //used in Attribs object of ATSynedit
   end;
 
 type
@@ -35,7 +37,8 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATMarkerItem read GetItem; default;
-    procedure Add(APosX, APosY: integer; ATag: integer=0; ASelLen: integer=0);
+    procedure Add(APosX, APosY: integer;
+      ATag: integer=0; ASelLen: integer=0; APtr: TObject=nil);
   end;
 
 implementation
@@ -64,10 +67,16 @@ begin
 end;
 
 procedure TATMarkers.Delete(N: integer);
+var
+  Mark: TATMarkerItem;
 begin
   if IsIndexValid(N) then
   begin
-    TObject(FList[N]).Free;
+    Mark:= TATMarkerItem(FList[N]);
+    if Assigned(Mark.Ptr) then
+      Mark.Ptr.Free;
+    Mark.Free;
+
     FList.Delete(N);
   end;
 end;
@@ -90,7 +99,8 @@ begin
     Result:= nil;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer; ATag: integer; ASelLen: integer);
+procedure TATMarkers.Add(APosX, APosY: integer; ATag: integer;
+  ASelLen: integer; APtr: TObject);
 var
   Item: TATMarkerItem;
 begin
@@ -101,6 +111,7 @@ begin
   Item.CoordY:= -1;
   Item.Tag:= ATag;
   Item.SelLen:= ASelLen;
+  Item.Ptr:= APtr;
 
   FList.Add(Item);
 end;

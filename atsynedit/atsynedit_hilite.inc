@@ -205,19 +205,20 @@ var
   i: integer;
   Attr: TATMarkerItem;
   Part: TATLinePart;
+  PartObj: TATLinePartClass;
 begin
   for i:= 0 to Attribs.Count-1 do
   begin
     Attr:= Attribs[i];
-    if Attr.PosY=ALineIndex then
-    begin
-      FillChar(Part, SizeOf(Part), 0);
-      Part.Len:= Attr.SelLen;
-      Part.Offset:= Attr.PosX-ACharIndex;
-      Part.ColorBG:= clgreen;
-      Part.ColorFont:= clwhite;
-      DoPartInsert(AParts, Part);
-    end;
+    PartObj:= TATLinePartClass(Attr.Ptr);
+    if Assigned(PartObj) then
+      if Attr.PosY=ALineIndex then
+      begin
+        Part:= PartObj.Data;
+        Part.Len:= Attr.SelLen;
+        Part.Offset:= Attr.PosX-ACharIndex;
+        DoPartInsert(AParts, Part);
+      end;
   end;
 end;
 

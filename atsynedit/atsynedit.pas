@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 
 {$mode objfpc}{$H+}
 
+//{$define test_attribs}
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
@@ -449,6 +450,7 @@ type
       AShiftY, AShiftBelowX: integer);
     procedure DoCaretsShift_MarkerItem(Mark: TATMarkerItem; APosX, APosY, AShiftX,
       AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
+    procedure DoDebugAddAttribs;
     procedure DoDropText;
     procedure DoFoldbarClick(ALine: integer);
     procedure DoFoldForLevel(ALevel: integer);
@@ -2159,9 +2161,9 @@ begin
 
   FMarkers:= TATMarkers.Create;
   FAttribs:= TATMarkers.Create;
-  //debug
-  //FAttribs.Add(2, 0, 0, 4);
-  //FAttribs.Add(2, 1, 0, 1);
+  {$ifdef test_attribs}
+  DoDebugAddAttribs;
+  {$endif}
 
   FPaintLocked:= 0;
   FPaintStatic:= false;
@@ -4329,6 +4331,30 @@ begin
       Point(M.CoordX-FOptMarkersSize, M.CoordY+FCharSize.Y-1),
       Point(M.CoordX+FOptMarkersSize, M.CoordY+FCharSize.Y-1) ]);
   end;
+end;
+
+
+procedure TATSynEdit.DoDebugAddAttribs;
+var
+  p1, p2, p3: TATLinePartClass;
+begin
+  p1:= TATLinePartClass.Create;
+  p2:= TATLinePartClass.Create;
+  p3:= TATLinePartClass.Create;
+
+  p1.Data.ColorBG:= clgreen;
+  p1.Data.ColorFont:= clwhite;
+  p1.data.BorderDown:= cLineStyleDotted;
+  Attribs.Add(1,1, 0, 4, p1);
+
+  p2.Data.ColorBG:= clYellow;
+  p2.Data.ColorFont:= clBlue;
+  p2.data.BorderDown:= cLineStyleSolid;
+  Attribs.Add(2,2, 0, 4, p2);
+
+  p3.Data.ColorBG:= clRed;
+  p3.Data.ColorFont:= clYellow;
+  Attribs.Add(3,3, 0, 4, p3);
 end;
 
 

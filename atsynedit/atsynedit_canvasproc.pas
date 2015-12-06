@@ -43,6 +43,12 @@ type
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
 
+type
+  TATLinePartClass = class
+  public
+    Data: TATLinePart;
+  end;
+
 const
   cMaxLineParts = 1000; //big two monitors have total about 1000 chars (small font)
 type
