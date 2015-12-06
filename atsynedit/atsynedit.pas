@@ -361,6 +361,7 @@ type
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
     FMarkers: TATMarkers;
+    FAttribs: TATMarkers;
     FMenuStd,
     FMenuText,
     FMenuGutterBm,
@@ -850,6 +851,7 @@ type
     function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;
     property Carets: TATCarets read FCarets;
     property Markers: TATMarkers read FMarkers;
+    property Attribs: TATMarkers read FAttribs;
     function IsLineWithCaret(ALine: integer): boolean;
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
@@ -2242,9 +2244,10 @@ begin
   FCaretStopUnfocused:= true;
 
   FMarkers:= TATMarkers.Create;
-  //FMarkers.Add(0, 0); //debug
-  //FMarkers.Add(1, 1);
-  //FMarkers.Add(100, 2);
+  FAttribs:= TATMarkers.Create;
+  //debug
+  FAttribs.Add(2, 0, 0, 4);
+  FAttribs.Add(2, 1, 0, 1);
 
   FPaintLocked:= 0;
   FPaintStatic:= false;
@@ -2463,6 +2466,7 @@ begin
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
   FreeAndNil(FMarkers);
+  FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
   FreeAndNil(FMarginList);
   FreeAndNil(FWrapInfo);
