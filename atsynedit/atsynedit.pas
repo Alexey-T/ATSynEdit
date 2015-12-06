@@ -27,6 +27,7 @@ uses
   LMessages, LCLType,
   ATStringProc,
   ATStrings,
+  ATSynEdit_Colors,
   ATSynEdit_Keymap,
   ATSynEdit_CanvasProc,
   ATSynEdit_Carets,
@@ -74,95 +75,6 @@ type
     );
 
 type
-  TATSynEditColors = class(TPersistent)
-  private
-    FTextFont,
-    FTextBG,
-    FTextDisabledFont,
-    FTextDisabledBG,
-    FTextSelFont,
-    FTextSelBG,
-    FCaret,
-    FMarkers,
-    FGutterFont,
-    FGutterBG,
-    FGutterCaretBG,
-    FGutterPlusBorder,
-    FGutterPlusBG,
-    FGutterFoldLine,
-    FGutterFoldBG,
-    FGutterSeparatorBG,
-    FCurrentLineBG,
-    FMarginRight,
-    FMarginCaret,
-    FMarginUser,
-    FIndentVertLines,
-    FBookmarkBG,
-    FRulerFont,
-    FRulerBG,
-    FCollapseLine,
-    FCollapseMarkFont,
-    FCollapseMarkBG,
-    FCollapseMarkBorder,
-    FUnprintedFont,
-    FUnprintedBG,
-    FUnprintedHexFont,
-    FMinimapBorder,
-    FMinimapSelBG,
-    FStateChanged,
-    FStateAdded,
-    FStateSaved,
-    FTextHintFont,
-    FBlockStaple,
-    FBlockSepLine,
-    FLockedBG,
-    FComboboxArrow,
-    FComboboxArrowBG: TColor;
-  published
-    property TextFont: TColor read FTextFont write FTextFont;
-    property TextBG: TColor read FTextBG write FTextBG;
-    property TextDisabledFont: TColor read FTextDisabledFont write FTextDisabledFont;
-    property TextDisabledBG: TColor read FTextDisabledBG write FTextDisabledBG;
-    property TextSelFont: TColor read FTextSelFont write FTextSelFont;
-    property TextSelBG: TColor read FTextSelBG write FTextSelBG;
-    property Caret: TColor read FCaret write FCaret;
-    property Markers: TColor read FMarkers write FMarkers;
-    property GutterFont: TColor read FGutterFont write FGutterFont;
-    property GutterBG: TColor read FGutterBG write FGutterBG;
-    property GutterCaretBG: TColor read FGutterCaretBG write FGutterCaretBG;
-    property GutterPlusBorder: TColor read FGutterPlusBorder write FGutterPlusBorder;
-    property GutterPlusBG: TColor read FGutterPlusBG write FGutterPlusBG;
-    property GutterFoldLine: TColor read FGutterFoldLine write FGutterFoldLine;
-    property GutterFoldBG: TColor read FGutterFoldBG write FGutterFoldBG;
-    property GutterSeparatorBG: TColor read FGutterSeparatorBG write FGutterSeparatorBG;
-    property CurrentLineBG: TColor read FCurrentLineBG write FCurrentLineBG;
-    property MarginRight: TColor read FMarginRight write FMarginRight;
-    property MarginCaret: TColor read FMarginCaret write FMarginCaret;
-    property MarginUser: TColor read FMarginUser write FMarginUser;
-    property IndentVertLines: TColor read FIndentVertLines write FIndentVertLines;
-    property BookmarkBG: TColor read FBookmarkBG write FBookmarkBG;
-    property RulerFont: TColor read FRulerFont write FRulerFont;
-    property RulerBG: TColor read FRulerBG write FRulerBG;
-    property CollapseLine: TColor read FCollapseLine write FCollapseLine;
-    property CollapseMarkFont: TColor read FCollapseMarkFont write FCollapseMarkFont;
-    property CollapseMarkBG: TColor read FCollapseMarkBG write FCollapseMarkBG;
-    property CollapseMarkBorder: TColor read FCollapseMarkBorder write FCollapseMarkBorder;
-    property UnprintedFont: TColor read FUnprintedFont write FUnprintedFont;
-    property UnprintedBG: TColor read FUnprintedBG write FUnprintedBG;
-    property UnprintedHexFont: TColor read FUnprintedHexFont write FUnprintedHexFont;
-    property MinimapBorder: TColor read FMinimapBorder write FMinimapBorder;
-    property MinimapSelBG: TColor read FMinimapSelBG write FMinimapSelBG;
-    property StateChanged: TColor read FStateChanged write FStateChanged;
-    property StateAdded: TColor read FStateAdded write FStateAdded;
-    property StateSaved: TColor read FStateSaved write FStateSaved;
-    property BlockStaple: TColor read FBlockStaple write FBlockStaple;
-    property BlockSepLine: TColor read FBlockSepLine write FBlockSepLine;
-    property LockedBG: TColor read FLockedBG write FLockedBG;
-    property TextHintFont: TColor read FTextHintFont write FTextHintFont;
-    property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
-    property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
-  end;
-
   TATAutoIndentKind = (
     cIndentAsIs,
     cIndentSpaces,
