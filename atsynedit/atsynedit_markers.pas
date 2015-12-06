@@ -12,10 +12,12 @@ type
   public
     PosX, PosY: integer;
     CoordX, CoordY: integer; //screen coords
-    Tag: integer; //used in CudaText: when "collect marker" runs, for all markers
-                  //with the same Tag>0 multi-carets placed
-    SelLen: integer; //used in CudaText: when "collect marker" runs, caret will
-                  //be with selection of this len
+    Tag: PtrInt;
+      //used in CudaText: when "collect marker" runs, for all markers
+      //with the same Tag>0 multi-carets placed
+    SelLen: integer;
+      //used in CudaText: when "collect marker" runs, caret will
+      //be with selection of this len
   end;
 
 type

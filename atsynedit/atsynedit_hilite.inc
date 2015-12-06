@@ -64,6 +64,8 @@ begin
     DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
     //aparts[0].ColorBG:= clyellow;
   end;
+
+  DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
 end;
 
 
@@ -194,5 +196,28 @@ begin
   AColorForced:= AColor<>clNone;
   if not AColorForced then
     AColor:= GetColorTextBG;
+end;
+
+
+procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
+  AOffsetMax, ALineIndex, ACharIndex: integer);
+var
+  i: integer;
+  Attr: TATMarkerItem;
+  Part: TATLinePart;
+begin
+  for i:= 0 to Attribs.Count-1 do
+  begin
+    Attr:= Attribs[i];
+    if Attr.PosY=ALineIndex then
+    begin
+      FillChar(Part, SizeOf(Part), 0);
+      Part.Len:= Attr.SelLen;
+      Part.Offset:= Attr.PosX-ACharIndex;
+      Part.ColorBG:= clgreen;
+      Part.ColorFont:= clwhite;
+      DoPartInsert(AParts, Part);
+    end;
+  end;
 end;
 

@@ -613,7 +613,9 @@ procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
   AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
 var
   NStart, i: integer;
+  {$ifdef debug_markers_shift}
   S: string;
+  {$endif}
 begin
   if APosX<0 then Exit;
   if APosY<0 then Exit;
@@ -639,6 +641,10 @@ begin
   //(cannot optimize, markers not sorted)
   for i:= 0 to Markers.Count-1 do
     DoCaretsShift_MarkerItem(Markers[i],
+      APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+
+  for i:= 0 to Attribs.Count-1 do
+    DoCaretsShift_MarkerItem(Attribs[i],
       APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 end;
 

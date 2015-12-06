@@ -492,6 +492,8 @@ type
       ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
+    procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
+      ALineIndex, ACharIndex: integer);
     procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
@@ -2158,8 +2160,8 @@ begin
   FMarkers:= TATMarkers.Create;
   FAttribs:= TATMarkers.Create;
   //debug
-  FAttribs.Add(2, 0, 0, 4);
-  FAttribs.Add(2, 1, 0, 1);
+  //FAttribs.Add(2, 0, 0, 4);
+  //FAttribs.Add(2, 1, 0, 1);
 
   FPaintLocked:= 0;
   FPaintStatic:= false;

@@ -1,5 +1,4 @@
 {$ifdef nnn}begin end;{$endif}
-//{$define debug_markers_shift}
 
 function TATSynEdit.DoCommand_TextTabulation: TATCommandResults;
 var
