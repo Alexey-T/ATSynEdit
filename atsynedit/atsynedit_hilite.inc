@@ -49,6 +49,10 @@ begin
   if AColorForced then
     AColorAfter:= AColorBG;
 
+  //first add Attribs,
+  //selection must be over attribs
+  DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
+
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
   //calculated before (in adapter or OnCalc event).
@@ -57,15 +61,11 @@ begin
   if AParts[0].Len>0 then
   begin
     DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
-    //aparts[0].ColorBG:= clgreen;
   end
   else
   begin
     DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
-    //aparts[0].ColorBG:= clyellow;
   end;
-
-  DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
 end;
 
 
