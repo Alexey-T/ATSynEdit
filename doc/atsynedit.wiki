@@ -256,8 +256,11 @@ To fold/unfold all, use commands via DoCommand method: cCommand_FoldAll, cComman
 
 type TATMarkers in unit atsynedit_markers. Holds list of marker items. Each marker item has properties: 
 
-* PosX, PosY: position of marker, like caret pos
-* CoordX, CoordY: screen coordinates (don't change them)
+* PosX, PosY: position of marker (like caret pos).
+* CoordX, CoordY: screen coordinates (don't change them).
+* Tag: integer field, useful for apps: e.g. CudaText holds here tabstop-index (several markers with the same index >0 give multi-carets, when user jumps to one of markers).
+* SelLen: integer field, useful for apps: e.g. CudaText holds here selection length for marker (caret will have this selection when user jumps to this marker).
+* Ptr: object field (to store app specific objects, TObject). Object is freed automatically when marker item freed.
 
 Markers are painted as red triangles below their positions (PosX, PosY). They are needed e.g. for making snippets, where user needs to jump over snippet's insert points and wants to see these points. Also it's good for IDE to have commands like "drop marker here", "remove last marker", "swap caret and last marker" etc (like CodeRush).
 
@@ -282,6 +285,18 @@ begin
 end;
 </syntaxhighlight>
 
+=== Attribs object ===
+
+type TATMarkers (same as for Markers). Holds list of additional color/font attribute items, these items are added to syntax hiliting and selection hiliting. Each item has properties:
+
+* PosX, PosY: position of attr, like caret pos.
+* SelLen: length if attr (attr is single line).
+* Ptr: object of type TATLinePartClass, which has Data field. This Data is record, it contains all color/font/borders properties of this attr.
+
+Attribs object is used in CudaText: app adds attr items to hilite brackets, to hilite misspelled words, etc. 
+
+If you add attrib item, create new object of type TATLinePartClass, fill its Data, and pass object to TATMarkers.Add. This object is freed automatically if attrib item deleted or all attribs cleared.
+
 === Colors object ===
 
 Contains color properties of type TColor. For ex, Colors.TextFont is text font color, Colors.TextBG is text background color.
@@ -295,6 +310,8 @@ Objects
 *    property Gutter: Gutter object
 *    property Keymap: Keymap object
 *    property Fold: Fold object
+*    property Markers: Markers object
+*    property Attribs: Attribs object
 *    property Colors: Colors object
 
 Files
@@ -638,7 +655,9 @@ ATSynEdit has API which allows to make report to any format. It's function DoCal
 * OnClickMicromap: Called on click on micromap area.
 * OnClickMiddle: Called on middle button click on text area.
 * OnClickTriple: Called on triple-click on text area.
-* OnCommand: Called before running any command. You can disable any command code, or perform custom code for any command code.
+* OnClickMoveCaret: Called just before changing caret pos via mouse click (you get prev caret pos, new caret pos).
+* OnClickEndSelect: Called just after mouse-up, if single selection made (you get selection start pos, end pos).
+* OnCommand: Called before running any command. You can disable any command processing, or perform custom processing for any command.
 * OnDrawBookmarkIcon: Called on painting gutter mark for line with bookmark. 
 * OnDrawEditor: Called after painting entire text area.
 * OnDrawLine: Called after painting line (or wrapped part of line) on canvas. You can paint some "image" over this line.
