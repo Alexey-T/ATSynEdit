@@ -1,2 +1,2 @@
 
-bad: initial restor of topline dont work 50% cases: in Cudatext
+atsynedit.wiki: select all, del, now paste text (also wiki of big size): caret jumps to selection end(it OK) but caret not visible(not blinking)
