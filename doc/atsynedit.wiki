@@ -835,3 +835,4 @@ See [[ATSynEdit EControl adapter]]
 = more =
 
 [[Category:Components]]
+
