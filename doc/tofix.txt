@@ -8,3 +8,4 @@ now marks adjusted auto on edit (DoCaretsShift) BUT not good:
 3)delete at attrib: must shorten attr/ or delete attr- not done
 
 
+
