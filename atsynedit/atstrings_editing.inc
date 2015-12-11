@@ -4,7 +4,7 @@ procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwri
 var
   Str, StrLead, StrTail: atString;
   List: TATStrings;
-  bWithEol: boolean;
+  bWithEol, bInsertAtEnd: boolean;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -16,8 +16,9 @@ begin
   if AText='' then Exit;
 
   Str:= Lines[AY];
+  bInsertAtEnd:= AX>=Length(Str);
 
-  if AX<=Length(Str) then
+  if not bInsertAtEnd then
   begin
     StrLead:= Copy(Str, 1, AX);
     StrTail:= Copy(Str, AX+1, MaxInt);
@@ -60,7 +61,9 @@ begin
       LineDelete(AY);
 
     bWithEol:= SEndsWith(AText, #10) or
-               SEndsWith(AText, #13);
+               SEndsWith(AText, #13) or
+               bInsertAtEnd //need for (paste N lines, no final eol, at end of line)
+               ;
     LineInsertStrings(AY, List, bWithEol);
 
     if bWithEol then
