@@ -521,7 +521,7 @@ function TATEditorFinder.DoFindOrReplace_Internal(ANext, AReplace, AForMany: boo
   //or 1-2 times if OptWrap=true
 var
   P1, P2: TPoint;
-  Cfm, CfmCont: boolean;
+  ConfirmThis, ConfirmContinue: boolean;
 begin
   AChanged:= false;
   Result:= FindMatch(ANext, FSkipLen, AStartPos);
@@ -535,20 +535,20 @@ begin
 
     if AReplace then
     begin
-      Cfm:= true;
-      CfmCont:= true;
+      ConfirmThis:= true;
+      ConfirmContinue:= true;
 
       if OptConfirmReplace then
         if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, P1, P2, AForMany, Cfm, CfmCont);
+          FOnConfirmReplace(Self, P1, P2, AForMany, ConfirmThis, ConfirmContinue);
 
-      if not CfmCont then
+      if not ConfirmContinue then
       begin
         Result:= false;
         Exit;
       end;
 
-      if Cfm then
+      if ConfirmThis then
       begin
         DoReplaceTextInEditor(P1, P2);
         UpdateBuffer;
