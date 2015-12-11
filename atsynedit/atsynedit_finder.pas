@@ -77,6 +77,7 @@ type
     procedure DoReplaceTextInEditor(P1, P2: TPoint);
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
+    function GetRegexSkipIncrement: integer;
   protected
     procedure DoOnFound; override;
   public
@@ -553,7 +554,7 @@ begin
         UpdateBuffer;
 
         if OptRegex then
-          FSkipLen:= Length(StrReplacement)
+          FSkipLen:= Length(StrReplacement)+GetRegexSkipIncrement
         else
           FSkipLen:= Length(StrReplace);
         AChanged:= true;
@@ -702,6 +703,14 @@ begin
     P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
     FOnFound(Self, P1, P2);
   end;
+end;
+
+function TATEditorFinder.GetRegexSkipIncrement: integer;
+//this is to solve loop-forever if regex "$" replaced-all to eg "==="
+//(need to skip one more char)
+begin
+  Result:= 0;
+  if StrFind='$' then Result:= 1;
 end;
 
 end.
