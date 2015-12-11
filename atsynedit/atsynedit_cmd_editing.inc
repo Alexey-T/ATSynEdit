@@ -44,43 +44,34 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
-
   List:= nil;
-  //if AAddUndoGroup then
-  //  Strings.BeginUndoGroup;
+  DoSelectionDeleteOrReset;
+
+  //list allows to insert each clip-line into one caret
+  if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
+  begin
+    List:= TStringList.Create;
+    List.Text:= UTF8Encode(AText);
+  end;
 
   try
-    DoSelectionDeleteOrReset;
-
-    //list allows to insert each clip-line into one caret
-    if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
+    for i:= Carets.Count-1 downto 0 do
     begin
-      List:= TStringList.Create;
-      List.Text:= UTF8Encode(AText);
-    end;
+      Caret:= Carets[i];
+      Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
+      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
-    try
-      for i:= Carets.Count-1 downto 0 do
+      if not AKeepCaret then
       begin
-        Caret:= Carets[i];
-        Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
-        DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
-
-        if not AKeepCaret then
-        begin
-          Caret.EndX:= IfThen(ASelectThen, Caret.PosX, -1);
-          Caret.EndY:= IfThen(ASelectThen, Caret.PosY, -1);
-          Caret.PosX:= PosAfter.X;
-          Caret.PosY:= PosAfter.Y;
-        end;
+        Caret.EndX:= IfThen(ASelectThen, Caret.PosX, -1);
+        Caret.EndY:= IfThen(ASelectThen, Caret.PosY, -1);
+        Caret.PosX:= PosAfter.X;
+        Caret.PosY:= PosAfter.Y;
       end;
-    finally
-      if Assigned(List) then
-        FreeAndNil(List);
     end;
   finally
-    //if AAddUndoGroup then
-    //  Strings.EndUndoGroup;
+    if Assigned(List) then
+      FreeAndNil(List);
   end;
 
   Result:= [cResultText, cResultCaretBottom];
