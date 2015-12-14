@@ -43,7 +43,9 @@ begin
   if ModeReadOnly then Exit;
 
   Str:= UTF8Decode(Clipboard.AsText);
+  Strings.BeginUndoGroup;
   Result:= DoCommand_TextInsertColumnBlockOnce(Str, AKeepCaret);
+  Strings.EndUndoGroup;
 end;
 
 
