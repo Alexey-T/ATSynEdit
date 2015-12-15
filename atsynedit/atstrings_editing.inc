@@ -96,6 +96,19 @@ begin
   if not IsIndexValid(AY) then Exit;
   Str:= Lines[AY];
 
+  //handle spec case: caret on last fake line, BkSp pressed:
+  //delete fake line,
+  //delete EOL at prev line
+  if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake then
+  begin
+    LineDelete(AY, false);
+    LinesEnds[AY-1]:= cEndNone;
+    AShift.Y:= -1;
+    APosAfter.X:= Length(Lines[AY-1]);
+    APosAfter.Y:= AY-1;
+    exit
+  end;
+
   if AX>0 then
   begin
     if AX<=Length(Str) then
