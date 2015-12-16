@@ -17,6 +17,7 @@ type
 
 function KeyArrayToString(const K: TATKeyArray): string;
 function KeyArraysEqualNotEmpty(const a1, a2: TATKeyArray): boolean;
+function KeyArrayLength(const K: TATKeyArray): integer;
 
 type
   { TATKeymapItem }
@@ -62,13 +63,13 @@ uses
   LCLProc,
   Dialogs;
 
-function GetKeysLen(const AKeys: TATKeyArray): integer;
+function KeyArrayLength(const K: TATKeyArray): integer;
 var
   i: integer;
 begin
   Result:= 0;
-  for i:= Low(AKeys) to High(AKeys) do
-    if AKeys[i]<>0 then
+  for i:= Low(K) to High(K) do
+    if K[i]<>0 then
       Inc(Result);
 end;
 
@@ -203,7 +204,7 @@ var
 begin
   Result:= false;
 
-  LenThis:= GetKeysLen(AKeys);
+  LenThis:= KeyArrayLength(AKeys);
   if LenThis=0 then Exit;
 
   if LenThis=1 then
@@ -216,7 +217,7 @@ begin
   if AKeys[LenThis-1]<>AKey then Exit;
 
   //stack filled?
-  LenStack:= GetKeysLen(FHistory);
+  LenStack:= KeyArrayLength(FHistory);
   if LenStack<LenThis-1 then
   begin
     //showmessage('no match: if lenstack');
@@ -247,11 +248,11 @@ procedure TATKeymap.AddToHistory(sh: TShortcut);
 var
   len: integer;
 begin
-  len:= GetKeysLen(FHistory);
+  len:= KeyArrayLength(FHistory);
   if len>=Length(FHistory) then
   begin
     ClearHistory;
-    len:= GetKeysLen(FHistory);
+    len:= KeyArrayLength(FHistory);
   end;
   FHistory[len]:= sh;
 end;
