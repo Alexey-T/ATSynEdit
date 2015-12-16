@@ -39,7 +39,8 @@ type
     function GetItem(N: integer): TATKeymapItem;
     procedure ClearHistory;
     procedure AddToHistory(sh: TShortcut);
-    function IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut): boolean;
+    function IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut;
+      AAllowOneKey: boolean): boolean;
  public
     constructor Create;
     destructor Destroy; override;
@@ -173,50 +174,65 @@ end;
 
 function TATKeymap.GetCommandFromShortcut(AKey: TShortcut): integer;
 var
+  bCheckSingle: boolean;
   i: integer;
 begin
   Result:= 0;
-  for i:= 0 to Count-1 do
-    if IsMatchedKeys(Items[i].Keys1, AKey) or
-      IsMatchedKeys(Items[i].Keys2, AKey) then
-    begin
-      Result:= Items[i].Command;
-      ClearHistory;
-      Exit
-    end;
+
+  //first check combos, then check single-keys
+  for bCheckSingle:= false to true do
+    for i:= 0 to Count-1 do
+      if IsMatchedKeys(Items[i].Keys1, AKey, bCheckSingle) or
+         IsMatchedKeys(Items[i].Keys2, AKey, bCheckSingle) then
+      begin
+        Result:= Items[i].Command;
+        ClearHistory;
+        Exit
+      end;
 
   if AKey>0 then
     AddToHistory(AKey);
 end;
 
-function TATKeymap.IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut): boolean;
+function TATKeymap.IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut;
+  AAllowOneKey: boolean): boolean;
+//function called first for all items with Allow=false (for combos)
+//if not found, called for all items with Allow=true (for single keys)
 var
-  i, len, lenst, index_st: integer;
+  LenThis, LenStack, IndexStack, i: integer;
 begin
   Result:= false;
 
-  len:= GetKeysLen(AKeys);
-  if len=0 then Exit;
+  LenThis:= GetKeysLen(AKeys);
+  if LenThis=0 then Exit;
 
-  if len=1 then
+  if LenThis=1 then
   begin
-    Result:= AKeys[0]=AKey;
+    Result:= AAllowOneKey and (AKeys[0]=AKey);
     Exit
   end;
 
-  //typed key is last in combo?
-  if AKeys[len-1]<>AKey then Exit;
+  //AKey is last in combo AKeys?
+  if AKeys[LenThis-1]<>AKey then Exit;
 
   //stack filled?
-  lenst:= GetKeysLen(FHistory);
-  if lenst<len-1 then Exit;
+  LenStack:= GetKeysLen(FHistory);
+  if LenStack<LenThis-1 then
+  begin
+    //showmessage('no match: if lenstack');
+    Exit;
+  end;
 
   //first keys (except last) of combo lie in stack?
-  for i:= len-2 downto 0 do
+  for i:= LenThis-2 downto 0 do
   begin
-    index_st:= lenst-1-(len-2-i);
-    if (index_st>=Low(FHistory)) and (index_st<=High(FHistory)) then
-      if AKeys[i]<>FHistory[index_st] then Exit;
+    IndexStack:= LenStack-1-(LenThis-2-i);
+    if (IndexStack>=Low(FHistory)) and (IndexStack<=High(FHistory)) then
+      if AKeys[i]<>FHistory[IndexStack] then
+      begin
+        //showmessage('no match: check items');
+        Exit;
+      end;
   end;
 
   Result:= true;
