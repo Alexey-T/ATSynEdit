@@ -3259,6 +3259,8 @@ begin
     FMouseDownDouble:= true;
     DoSelect_Word_ByClick;
   end;
+
+  DoEventCarets;
 end;
 
 procedure TATSynEdit.TripleClick;
