@@ -10,7 +10,7 @@ uses
   Classes, SysUtils, Forms;
 
 const
-  cMaxKeyCombo = 6;
+  cMaxKeyCombo = 3; //3 must be enougth for everybody..
 
 type
   TATKeyArray = array[0..Pred(cMaxKeyCombo)] of TShortcut;
