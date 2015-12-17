@@ -214,6 +214,15 @@ begin
     if Assigned(PartObj) then
       if Attr.PosY=ALineIndex then
       begin
+        //empty parts? init part for while line, for DoPartInsert to work
+        if AParts[0].Len=0 then
+        begin
+          AParts[0].Offset:= 0;
+          AParts[0].Len:= AOffsetMax;
+          AParts[0].ColorBG:= Colors.TextBG;
+          AParts[0].ColorFont:= Colors.TextFont;
+        end;
+
         Part:= PartObj.Data;
         Part.Len:= Attr.SelLen;
         Part.Offset:= Attr.PosX-ACharIndex;
@@ -221,4 +230,5 @@ begin
       end;
   end;
 end;
+
 
