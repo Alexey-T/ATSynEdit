@@ -282,6 +282,8 @@ begin
   end
   else
   begin
+    BeginUndoGroup;
+
     if (AX<Length(Str)) then
     begin
       StrMove:= Copy(Str, AX+1, MaxInt);
@@ -294,6 +296,8 @@ begin
     NewEnd:= LinesEnds[AY];
     LinesEnds[AY]:= Endings; //force eol to cur line
     LineInsertRaw(AY+1, AStrIndent+StrMove, NewEnd);
+
+    EndUndoGroup;
   end;
 
   if not AKeepCaret then
