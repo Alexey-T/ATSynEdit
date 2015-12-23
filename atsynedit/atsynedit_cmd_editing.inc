@@ -283,12 +283,16 @@ function TATSynEdit.DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResu
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  i: integer;
   Str: atString;
+  bNeedGroup: boolean;
+  i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   if ModeOneLine then Exit;
+
+  bNeedGroup:= Carets.Count>1;
+  if bNeedGroup then Strings.BeginUndoGroup;
 
   DoSelectionDeleteOrReset;
 
@@ -301,6 +305,8 @@ begin
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
+
+  if bNeedGroup then Strings.EndUndoGroup;
 
   Result:= [cResultText, cResultCaretBottom];
 end;
