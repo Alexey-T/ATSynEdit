@@ -40,6 +40,7 @@ var
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
+  bNeedGroup: boolean;
   i: integer;
 begin
   Result:= [];
@@ -53,6 +54,9 @@ begin
     List:= TStringList.Create;
     List.Text:= UTF8Encode(AText);
   end;
+
+  bNeedGroup:= Carets.Count>1;
+  if bNeedGroup then Strings.BeginUndoGroup;
 
   try
     for i:= Carets.Count-1 downto 0 do
@@ -73,6 +77,8 @@ begin
     if Assigned(List) then
       FreeAndNil(List);
   end;
+
+  if bNeedGroup then Strings.EndUndoGroup;
 
   Result:= [cResultText, cResultCaretBottom];
 end;
@@ -143,6 +149,7 @@ var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   NIndent, NDeleteLen: integer;
+  bNeedGroup: boolean;
   i: integer;
 begin
   Result:= [];
@@ -155,6 +162,9 @@ begin
     Result:= DoCommand_TextDeleteSelection;
     Exit
   end;
+
+  bNeedGroup:= Carets.Count>1;
+  if bNeedGroup then Strings.BeginUndoGroup;
 
   for i:= 0 to Carets.Count-1 do
   begin
@@ -176,6 +186,8 @@ begin
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
+
+  if bNeedGroup then Strings.EndUndoGroup;
 
   Result:= [cResultText, cResultCaretAny];
 end;
@@ -236,9 +248,13 @@ var
   Caret: TATCaretItem;
   i, Len, ShiftBelowX: integer;
   Shift, PosAfter: TPoint;
+  bNeedGroup: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+
+  bNeedGroup:= Carets.Count>1;
+  if bNeedGroup then Strings.BeginUndoGroup;
 
   DoSelectionDeleteOrReset;
 
@@ -257,6 +273,8 @@ begin
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
+
+  if bNeedGroup then Strings.EndUndoGroup;
 
   Result:= [cResultText, cResultCaretAny];
 end;
