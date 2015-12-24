@@ -343,6 +343,8 @@ begin
     Inc(FScrollHorz.NPos, NChars);
     UpdateScrollbars;
   end;
+
+  Carets.InvalidateCoords;
 end;
 
 procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge);
@@ -350,7 +352,8 @@ begin
   DoGotoPos(Carets.CaretAtEdge(AEdge), cScrollIndentCaretHorz, cScrollIndentCaretVert);
 end;
 
-procedure TATSynEdit.DoGotoPosEx(APnt: TPoint);
+procedure TATSynEdit.DoGotoPos_AndUnfold(APnt: TPoint;
+  AIndentHorz, AIndentVert: integer);
 begin
   if not Strings.IsIndexValid(APnt.Y) then Exit;
 
@@ -360,7 +363,7 @@ begin
   if IsLineFolded(APnt.Y, true) then
     DoUnfoldLine(APnt.Y);
 
-  DoGotoPos(APnt, cScrollIndentGotoHorz, cScrollIndentGotoVert);
+  DoGotoPos(APnt, AIndentHorz, AIndentVert);
   Update;
 end;
 

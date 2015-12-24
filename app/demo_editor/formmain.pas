@@ -542,7 +542,7 @@ begin
   if s='' then Exit;
   n:= StrToIntDef(s, 0)-1;
   if (n>=0) and (n<ed.Strings.Count) then
-    ed.DoGotoPosEx(Point(0, n))
+    ed.DoGotoPos_AndUnfold(Point(0, n), 5, 5)
   else
     Showmessage('Incorrect index: '+s);
 end;
