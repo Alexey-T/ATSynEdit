@@ -185,6 +185,7 @@ begin
   if EndY<0 then EndY:= PosY;
   PosX:= AX;
   PosY:= AY;
+  InvalidateCoord;
 end;
 
 { TATCarets }
@@ -295,6 +296,7 @@ begin
       Item2.PosY:= OutPosY;
       Item2.EndX:= OutEndX;
       Item2.EndY:= OutEndY;
+      Item2.InvalidateCoord;
     end;
   end;
 end;
@@ -314,6 +316,7 @@ begin
       PosY:= Obj[i].PosY;
       EndX:= Obj[i].EndX;
       EndY:= Obj[i].EndY;
+      InvalidateCoord;
     end;
   end;
 end;
@@ -543,6 +546,7 @@ begin
     Item.PosY:= L[i*2].Y;
     Item.EndX:= L[i*2+1].X;
     Item.EndY:= L[i*2+1].Y;
+    Item.InvalidateCoord;
   end;
 end;
 
@@ -556,6 +560,7 @@ begin
     PosY:= YTo;
     EndX:= XFrom;
     EndY:= YFrom;
+    InvalidateCoord;
   end;
 end;
 
@@ -585,8 +590,10 @@ begin
   for i:= 0 to Count-1 do
   begin
     Caret:= Items[i];
-    if Caret.PosY>AMaxLine then Caret.PosY:= AMaxLine;
-    if Caret.EndY>AMaxLine then Caret.EndY:= AMaxLine;
+    if Caret.PosY>AMaxLine then
+      begin Caret.PosY:= AMaxLine; Caret.InvalidateCoord; end;
+    if Caret.EndY>AMaxLine then
+      begin Caret.EndY:= AMaxLine; Caret.InvalidateCoord; end;
   end;
 end;
 
