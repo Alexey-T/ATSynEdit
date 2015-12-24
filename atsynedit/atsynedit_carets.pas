@@ -28,6 +28,7 @@ type
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
+    procedure InvalidateCoord;
   end;
 
 type
@@ -76,6 +77,7 @@ type
     procedure LoadFromArray(const L: TATPointArray);
     procedure UpdateColumnCoord(ASaveColumn: boolean);
     procedure UpdateIncorrectPositions(AMaxLine: integer);
+    procedure InvalidateCoords;
   end;
 
 
@@ -171,6 +173,12 @@ begin
   if (X2=0) and (Y2>0) then Dec(ATo);
 end;
 
+procedure TATCaretItem.InvalidateCoord;
+begin
+  CoordX:= -1;
+  CoordY:= -1;
+end;
+
 procedure TATCaretItem.SelectToPoint(AX, AY: integer);
 begin
   if EndX<0 then EndX:= PosX;
@@ -244,8 +252,8 @@ begin
   Item.PosY:= APosY;
   Item.EndX:= -1;
   Item.EndY:= -1;
-  Item.CoordX:= -1;
-  Item.CoordY:= -1;
+  Item.InvalidateCoord;
+
   FList.Add(Item);
 end;
 
@@ -580,6 +588,14 @@ begin
     if Caret.PosY>AMaxLine then Caret.PosY:= AMaxLine;
     if Caret.EndY>AMaxLine then Caret.EndY:= AMaxLine;
   end;
+end;
+
+procedure TATCarets.InvalidateCoords;
+var
+  i: integer;
+begin
+  for i:= 0 to Count-1 do
+    Items[i].InvalidateCoord;
 end;
 
 end.
