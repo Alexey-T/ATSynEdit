@@ -175,8 +175,9 @@ end;
 
 procedure TATCaretItem.InvalidateCoord;
 begin
-  CoordX:= -1;
-  CoordY:= -1;
+  //seems no effect of this-not used -1 value now
+  //CoordX:= -1;
+  //CoordY:= -1;
 end;
 
 procedure TATCaretItem.SelectToPoint(AX, AY: integer);
