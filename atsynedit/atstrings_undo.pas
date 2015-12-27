@@ -13,7 +13,8 @@ type
     cEditActionChange,
     cEditActionChangeEol,
     cEditActionInsert,
-    cEditActionDelete
+    cEditActionDelete,
+    cEditActionClearModified
     );
 
 type
@@ -60,6 +61,7 @@ type
     procedure DeleteLast;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; const ACarets: TATPointArray);
+    procedure AddUnmodifiedMark;
     procedure DebugShow;
   end;
 
@@ -202,6 +204,25 @@ begin
     Delete(0);
 end;
 
+
+procedure TATUndoList.AddUnmodifiedMark;
+var
+  Item: TATUndoItem;
+  Carets: TATPointArray;
+begin
+  if FLocked then exit;
+
+  //don't do two marks
+  Item:= Last;
+  if Assigned(Item) then
+    if Item.ItemAction=cEditActionClearModified then exit;
+
+  SetLength(Carets, 0);
+  Item:= TATUndoItem.Create(cEditActionClearModified, 0, '', cEndNone, false, false, Carets);
+  FList.Add(Item);
+end;
+
+
 procedure TATUndoList.DebugShow;
 var
   i: integer;
@@ -229,7 +250,10 @@ end;
 
 function TATUndoList.Last: TATUndoItem;
 begin
-  Result:= Items[Count-1];
+  if Count>0 then
+    Result:= Items[Count-1]
+  else
+    Result:= nil;
 end;
 
 end.

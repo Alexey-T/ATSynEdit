@@ -142,9 +142,10 @@ type
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure DoClearLineStates(ASaved: boolean);
+    procedure SetModified(AValue: boolean);
     procedure SetUndoLimit(AValue: integer);
     procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
-      AHardMarkedNext: boolean);
+      AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoClearUndo(ALocked: boolean = false);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   public
@@ -173,7 +174,7 @@ type
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
-    property Modified: boolean read FModified write FModified;
+    property Modified: boolean read FModified write SetModified;
     property OneLine: boolean read FOneLine write FOneLine;
     property Progress: integer read FProgress write FProgress;
     procedure ActionDeleteFakeLine;
@@ -721,6 +722,13 @@ begin
   end;
 end;
 
+procedure TATStrings.SetModified(AValue: boolean);
+begin
+  FModified:= AValue;
+  if not FModified then
+    FUndoList.AddUnmodifiedMark;
+end;
+
 procedure TATStrings.SetUndoLimit(AValue: integer);
 begin
   if Assigned(FUndoList) then
@@ -811,7 +819,7 @@ begin
 end;
 
 procedure TATStrings.DoUndoSingle(AUndoList: TATUndoList;
-  out ASoftMarked, AHardMarked, AHardMarkedNext: boolean);
+  out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean);
 var
   Item: TATUndoItem;
   AAction: TATEditAction;
@@ -819,10 +827,12 @@ var
   AIndex: integer;
   AEnd: TATLineEnds;
   ACarets: TATPointArray;
+  NCount: integer;
 begin
   ASoftMarked:= true;
   AHardMarked:= false;
   AHardMarkedNext:= false;
+  AUnmodifiedNext:= false;
   if FReadOnly then Exit;
   if not Assigned(AUndoList) then Exit;
 
@@ -835,7 +845,12 @@ begin
   ACarets:= Item.ItemCarets;
   ASoftMarked:= Item.ItemSoftMark;
   AHardMarked:= Item.ItemHardMark;
-  AHardMarkedNext:= (AUndoList.Count>1) and (AUndoList[AUndoList.Count-2].ItemHardMark);
+  NCount:= AUndoList.Count;
+  AHardMarkedNext:= (NCount>1) and (AUndoList[NCount-2].ItemHardMark);
+  AUnmodifiedNext:= (NCount>1) and (AUndoList[NCount-2].ItemAction=cEditActionClearModified);
+
+  //don't undo if one item left: unmodified-mark
+  if (NCount=1) and (AUndoList[0].ItemAction=cEditActionClearModified) then exit;
 
   Item:= nil;
   AUndoList.DeleteLast;
@@ -866,6 +881,11 @@ begin
           else
             LineInsertRaw(AIndex, AText, AEnd);
         end;
+
+      cEditActionClearModified:
+        begin
+          exit;
+        end
 
       else
         raise Exception.Create('Unknown undo action');
@@ -930,7 +950,8 @@ var
   List, ListOther: TATUndoList;
   bSoftMarked,
   bHardMarked,
-  bHardMarkedNext: boolean;
+  bHardMarkedNext,
+  bMarkedUnmodified: boolean;
 begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
@@ -941,7 +962,11 @@ begin
     begin List:= FRedoList; ListOther:= FUndoList end;
 
   repeat
-    DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext);
+    DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);
+
+    //handle unmodified
+    if bMarkedUnmodified then
+      FModified:= false;
 
     //apply Hardmark to ListOther
     if bHardMarked then
