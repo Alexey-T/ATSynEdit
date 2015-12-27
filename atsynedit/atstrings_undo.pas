@@ -5,7 +5,7 @@ unit ATStrings_Undo;
 interface
 
 uses
-  Classes, SysUtils,
+  Classes, SysUtils, StrUtils,
   ATStringProc;
 
 type
@@ -15,6 +15,15 @@ type
     cEditActionInsert,
     cEditActionDelete,
     cEditActionClearModified
+    );
+
+const
+  StrEditActionDescriptions: array[TATEditAction] of string = (
+    'change',
+    'change-eol',
+    'insert',
+    'delete',
+    'clear-mod'
     );
 
 type
@@ -226,23 +235,18 @@ end;
 procedure TATUndoList.DebugShow;
 var
   i: integer;
-  s, sa, s1: string;
+  s: string;
   Item: TATUndoItem;
 begin
   s:= '';
   for i:= 0 to Min(40, Count)-1 do
   begin
     Item:= Items[i];
-    case Item.ItemAction of
-      cEditActionChange: sa:= 'ch';
-      cEditActionChangeEol: sa:= 'eol';
-      cEditActionDelete: sa:= 'del';
-      cEditActionInsert: sa:= 'ins';
-    end;
-    if Item.ItemEnd=cEndNone then
-      s1:= '-' else s1:= '';
     s:= s+Format('%s, text "%s", %s, index %d', [
-      sa, UTF8Encode(Item.ItemText), s1, Item.ItemIndex
+      StrEditActionDescriptions[Item.ItemAction],
+      UTF8Encode(Item.ItemText),
+      IfThen(Item.ItemEnd=cEndNone, 'no-eol', ''),
+      Item.ItemIndex
       ])+#13;
   end;
   ShowMessage('Undo list:'#13+s);

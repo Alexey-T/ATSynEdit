@@ -146,7 +146,6 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
-    procedure DoClearUndo(ALocked: boolean = false);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   public
     constructor Create; virtual;
@@ -218,6 +217,7 @@ type
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
+    procedure DoClearUndo(ALocked: boolean = false);
     //misc
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
