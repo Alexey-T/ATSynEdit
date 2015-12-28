@@ -884,6 +884,11 @@ begin
 
       cEditActionClearModified:
         begin
+          //add unmodified mark to undo/redo
+          if AUndoList=FUndoList then
+            FRedoList.AddUnmodifiedMark
+          else
+            FUndoList.AddUnmodifiedMark;
           exit;
         end
 
