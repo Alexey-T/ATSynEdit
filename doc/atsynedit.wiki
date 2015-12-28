@@ -726,6 +726,19 @@ Undo:
 * undone: item3..2
 * undone: item1
 
+==How to record/playback macros?==
+
+Macro support must be done on app level, component does support by event OnCommand. Handle OnCommand and you get all command codes which run.
+Real app adds more commands in Keymap object and it must decide which of them it wants to record (e.g. don't record commands to show dialogs, and record commands which comment/uncomment lines).
+
+To playback macro, call DoCommand for all codes in macro.
+
+Hint. CudaText also adds 3 commands to help with macros: 
+
+* "mouse click" (command recorded in OnClick event of editor)
+* "goto pos" (command recorded by GoTo dialog)
+* "finder action" (command recorded when doing find/replace actions)
+
 ==more==
 
 = Auto-completion lists =
