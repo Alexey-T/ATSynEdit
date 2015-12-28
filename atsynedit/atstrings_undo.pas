@@ -68,6 +68,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteLast;
+    procedure DeleteUnmodifiedMarks;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; const ACarets: TATPointArray);
     procedure AddUnmodifiedMark;
@@ -219,7 +220,7 @@ var
   Item: TATUndoItem;
   Carets: TATPointArray;
 begin
-  if FLocked then exit;
+  //if FLocked then exit; //on load file called with Locked=true
 
   //don't do two marks
   Item:= Last;
@@ -231,6 +232,14 @@ begin
   FList.Add(Item);
 end;
 
+procedure TATUndoList.DeleteUnmodifiedMarks;
+var
+  i: integer;
+begin
+  for i:= Count-1 downto 0 do
+    if Items[i].ItemAction=cEditActionClearModified then
+      Delete(i);
+end;
 
 procedure TATUndoList.DebugShow;
 var

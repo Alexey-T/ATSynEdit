@@ -292,7 +292,7 @@ begin
   ActionAddFakeLineIfNeeded;
   DoClearLineStates(false);
   DoClearUndo;
-  FModified:= false;
+  Modified:= false;
   FProgress:= 0;
 end;
 

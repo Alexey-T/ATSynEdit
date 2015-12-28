@@ -88,8 +88,15 @@ end;
 procedure TATStrings.DoFinalizeSaving;
 begin
   DoClearLineStates(true);
+
   if not FUndoAfterSave then
-    DoClearUndo;
-  FModified:= false;
+    DoClearUndo
+  else
+  begin
+    FUndoList.DeleteUnmodifiedMarks;
+    FRedoList.DeleteUnmodifiedMarks;
+  end;
+
+  Modified:= false;
 end;
 

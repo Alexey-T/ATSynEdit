@@ -962,6 +962,7 @@ begin
     begin List:= FRedoList; ListOther:= FUndoList end;
 
   repeat
+    //FUndolist.DebugShow; ////debug
     DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);
 
     //handle unmodified
