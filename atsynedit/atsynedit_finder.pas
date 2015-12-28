@@ -235,6 +235,8 @@ begin
   LastPos:= Length(StrText) - Length(StrFind) + 1;
 
   for i:= FromPos to LastPos do
+  begin
+    if Application.Terminated then exit;
     if IsMatchUsual(i) then
     begin
       Inc(Result);
@@ -252,6 +254,7 @@ begin
         if not Ok then Break;
       end;
     end;
+  end;
 end;
 
 function TATTextFinder.DoCountMatchesRegex(FromPos: integer; AWithEvent: boolean
@@ -293,6 +296,7 @@ begin
 
       while Obj.ExecNext do
       begin
+        if Application.Terminated then exit;
         Inc(Result);
         if AWithEvent then
         begin
@@ -388,6 +392,7 @@ begin
     if Changed then Inc(Result);
     while DoFindOrReplace(true, true, true, Changed) do
     begin
+      if Application.Terminated then exit;
       if Changed then Inc(Result);
       if Assigned(FOnProgress) then
       begin
