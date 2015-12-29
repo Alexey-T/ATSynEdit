@@ -46,6 +46,10 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
   List:= nil;
+
+  bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
+  if bNeedGroup then Strings.BeginUndoGroup;
+
   DoSelectionDeleteOrReset;
 
   //list allows to insert each clip-line into one caret
@@ -54,9 +58,6 @@ begin
     List:= TStringList.Create;
     List.Text:= UTF8Encode(AText);
   end;
-
-  bNeedGroup:= Carets.Count>1;
-  if bNeedGroup then Strings.BeginUndoGroup;
 
   try
     for i:= Carets.Count-1 downto 0 do
