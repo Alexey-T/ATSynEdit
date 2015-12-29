@@ -156,8 +156,7 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  //first, see if selection exists.
-  //yes: clear selection, exit. no: delete text.
+  //selection? delete it, exit.
   if Carets.IsSelection then
   begin
     Result:= DoCommand_TextDeleteSelection;
@@ -254,10 +253,15 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
+  //selection? delete it, exit.
+  if Carets.IsSelection then
+  begin
+    Result:= DoCommand_TextDeleteSelection;
+    exit
+  end;
+
   bNeedGroup:= Carets.Count>1;
   if bNeedGroup then Strings.BeginUndoGroup;
-
-  DoSelectionDeleteOrReset;
 
   for i:= 0 to FCarets.Count-1 do
   begin
