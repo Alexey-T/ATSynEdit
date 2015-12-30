@@ -63,7 +63,7 @@ end;
 procedure TATStringBuffer.Setup(const AText: atString; ALineLens: TList;
   ALenEol: integer);
 var
-  Pos, i: integer;
+  Pos, NLen, i: integer;
 begin
   FText:= AText;
   FLenEol:= ALenEol;
@@ -73,7 +73,8 @@ begin
   FStarts.Add(nil);
   for i:= 0 to ALineLens.Count-1 do
   begin
-    Inc(Pos, integer(ALineLens[i])+FLenEol);
+    NLen:= integer(ALineLens[i]);
+    Inc(Pos, NLen+FLenEol);
     FStarts.Add(pointer(Pos));
   end;
 end;
