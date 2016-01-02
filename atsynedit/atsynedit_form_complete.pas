@@ -131,9 +131,9 @@ begin
     FCharsLeft:= Min(Pos.X, FCharsLeft);
     Dec(Pos.X, FCharsLeft);
     Editor.Strings.TextDeleteRight(Pos.X, Pos.Y, FCharsLeft+FCharsRight, Shift, PosAfter, false);
-    Editor.Strings.TextInsert(Pos.X, Pos.Y, Str, false, Shift, PosAfter);
+    Editor.Strings.TextInsert(Pos.X, Pos.Y, Utf8Decode(Str), false, Shift, PosAfter);
 
-    Caret.PosX:= Pos.X+Length(Str);
+    Caret.PosX:= Pos.X+Length(Utf8Decode(Str));
     Caret.EndX:= -1;
     Caret.EndY:= -1;
 
