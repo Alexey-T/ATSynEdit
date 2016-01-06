@@ -613,10 +613,11 @@ begin
   if Assigned(FOnParseBegin) then
     FOnParseBegin(Self);
 
-  if AAnalizer=nil then Exit;
-  AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
-
-  UpdateData;
+  if Assigned(AAnalizer) then
+  begin
+    AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
+    UpdateData;
+  end;
 
   if Assigned(FOnLexerChange) then
     FOnLexerChange(Self);
