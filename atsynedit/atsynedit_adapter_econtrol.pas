@@ -46,6 +46,7 @@ type
     Timer: TTimer;
     FDynEnabled: boolean;
     FBusy: boolean;
+    FOnLexerChange: TNotifyEvent;
     FOnParseBegin: TNotifyEvent;
     FOnParseDone: TNotifyEvent;
     procedure DoAnalize(AEdit: TATSynEdit);
@@ -95,6 +96,7 @@ type
     procedure OnEditorCalcPosColor(Sender: TObject;
       AX, AY: integer; var AColor: TColor); override;
   published
+    property OnLexerChange: TNotifyEvent read FOnLexerChange write FOnLexerChange;
     property OnParseBegin: TNotifyEvent read FOnParseBegin write FOnParseBegin;
     property OnParseDone: TNotifyEvent read FOnParseDone write FOnParseDone;
   end;
@@ -615,6 +617,9 @@ begin
   AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
 
   UpdateData;
+
+  if Assigned(FOnLexerChange) then
+    FOnLexerChange(Self);
 end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
