@@ -796,8 +796,8 @@ type
       const AComment: atString);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor): boolean;
-    procedure DoSetMarkedRange(ALine1, ALine2: integer);
-    procedure DoGetMarkedRange(out ALine1, ALine2: integer);
+    procedure DoSetMarkedLines(ALine1, ALine2: integer);
+    procedure DoGetMarkedLines(out ALine1, ALine2: integer);
 
   protected
     procedure Paint; override;
@@ -4372,7 +4372,7 @@ begin
   Attribs.Add(3,3, 0, 4, p3);
 end;
 
-procedure TATSynEdit.DoSetMarkedRange(ALine1, ALine2: integer);
+procedure TATSynEdit.DoSetMarkedLines(ALine1, ALine2: integer);
 begin
   FMarkedRange.Clear;
   if (ALine1>=0) and (ALine2>=ALine1) then
@@ -4382,7 +4382,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoGetMarkedRange(out ALine1, ALine2: integer);
+procedure TATSynEdit.DoGetMarkedLines(out ALine1, ALine2: integer);
 begin
   ALine1:= -1;
   ALine2:= -1;
