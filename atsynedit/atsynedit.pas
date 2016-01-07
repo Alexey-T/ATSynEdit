@@ -2640,13 +2640,21 @@ begin
 
   if cPaintUpdateBitmap in AFlags then
   begin
+    //before DoPaintTo
     if cPaintUpdateCaretsCoords in AFlags then
-      UpdateCaretsCoords; //before DoPaintTo, calc markers
+    begin
+      //markers need calculated carets coords
+      if Markers.Count>0 then
+        UpdateCaretsCoords;
+    end;
 
     DoPaintTo(FBitmap.Canvas, ALineFrom);
 
+    //after DoPaintTo
     if cPaintUpdateCaretsCoords in AFlags then
-    begin //after DoPaintTo, paint margin
+    begin
+      UpdateCaretsCoords;
+      //paint margin
       if FOptShowCurColumn and (Carets.Count>0) then
         DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX, FColors.MarginCaret);
     end;
