@@ -344,7 +344,7 @@ begin
     UpdateScrollbars;
   end;
 
-  Carets.InvalidateCoords;
+  UpdateCaretsCoords();
 end;
 
 procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge);
@@ -357,17 +357,17 @@ procedure TATSynEdit.DoGotoPos_AndUnfold(APnt: TPoint;
 begin
   if not Strings.IsIndexValid(APnt.Y) then Exit;
 
-  DoCommand(cCommand_Cancel);
-  DoCaretSingle(APnt.X, APnt.Y);
-
   if IsLineFolded(APnt.Y, true) then
   begin
     DoUnfoldLine(APnt.Y);
     Update;
   end;
 
+  DoCaretSingle(APnt.X, APnt.Y);
+  DoEventCarets;
+
   DoGotoPos(APnt, AIndentHorz, AIndentVert);
-  LineTop:= APnt.Y-AIndentVert; //force scroll to pos, DoGotoPos don't help
+  LineTop:= APnt.Y-AIndentVert; //force scroll to pos
   Update;
 end;
 

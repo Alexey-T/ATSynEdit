@@ -2564,7 +2564,6 @@ begin
   if NFrom>=0 then
   begin
     FScrollVert.NPos:= NFrom;
-    UpdateCaretsCoords();
     Update;
     Exit
   end;
@@ -2575,7 +2574,6 @@ begin
       if NLineIndex>=AValue then
       begin
         FScrollVert.NPos:= i;
-        UpdateCaretsCoords();
         Update;
         Exit
       end;
