@@ -5,7 +5,7 @@ License: MPL 2.0 or LGPL
 
 {$mode objfpc}{$H+}
 
-{$define test_markedrange}
+//{$define test_markedrange}
 //{$define test_attribs}
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}

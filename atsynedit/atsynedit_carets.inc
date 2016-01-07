@@ -653,5 +653,9 @@ begin
   for i:= 0 to Attribs.Count-1 do
     DoCaretsShift_MarkerItem(Attribs[i],
       APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+
+  for i:= 0 to FMarkedRange.Count-1 do
+    DoCaretsShift_MarkerItem(FMarkedRange[i],
+      APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 end;
 
