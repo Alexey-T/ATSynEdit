@@ -3716,7 +3716,6 @@ begin
     NPos:= Max(0, Min(NPosLast, NPos+Dx));
   with FScrollVert do
     NPos:= Max(0, Min(NPosLast, NPos+Dy));
-  Carets.InvalidateCoords;
 end;
 
 procedure TATSynEdit.MenuClick(Sender: TObject);

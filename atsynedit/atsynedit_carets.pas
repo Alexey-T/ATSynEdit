@@ -28,7 +28,6 @@ type
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
-    procedure InvalidateCoord;
   end;
 
 type
@@ -77,7 +76,6 @@ type
     procedure LoadFromArray(const L: TATPointArray);
     procedure UpdateColumnCoord(ASaveColumn: boolean);
     procedure UpdateIncorrectPositions(AMaxLine: integer);
-    procedure InvalidateCoords;
   end;
 
 
@@ -173,20 +171,12 @@ begin
   if (X2=0) and (Y2>0) then Dec(ATo);
 end;
 
-procedure TATCaretItem.InvalidateCoord;
-begin
-  //seems no effect of this-not used -1 value now
-  //CoordX:= -1;
-  //CoordY:= -1;
-end;
-
 procedure TATCaretItem.SelectToPoint(AX, AY: integer);
 begin
   if EndX<0 then EndX:= PosX;
   if EndY<0 then EndY:= PosY;
   PosX:= AX;
   PosY:= AY;
-  InvalidateCoord;
 end;
 
 { TATCarets }
@@ -254,7 +244,6 @@ begin
   Item.PosY:= APosY;
   Item.EndX:= -1;
   Item.EndY:= -1;
-  Item.InvalidateCoord;
 
   FList.Add(Item);
 end;
@@ -297,7 +286,6 @@ begin
       Item2.PosY:= OutPosY;
       Item2.EndX:= OutEndX;
       Item2.EndY:= OutEndY;
-      Item2.InvalidateCoord;
     end;
   end;
 end;
@@ -317,7 +305,6 @@ begin
       PosY:= Obj[i].PosY;
       EndX:= Obj[i].EndX;
       EndY:= Obj[i].EndY;
-      InvalidateCoord;
     end;
   end;
 end;
@@ -547,7 +534,6 @@ begin
     Item.PosY:= L[i*2].Y;
     Item.EndX:= L[i*2+1].X;
     Item.EndY:= L[i*2+1].Y;
-    Item.InvalidateCoord;
   end;
 end;
 
@@ -561,7 +547,6 @@ begin
     PosY:= YTo;
     EndX:= XFrom;
     EndY:= YFrom;
-    InvalidateCoord;
   end;
 end;
 
@@ -591,20 +576,11 @@ begin
   for i:= 0 to Count-1 do
   begin
     Caret:= Items[i];
-    if Caret.PosY>AMaxLine then
-      begin Caret.PosY:= AMaxLine; Caret.InvalidateCoord; end;
-    if Caret.EndY>AMaxLine then
-      begin Caret.EndY:= AMaxLine; Caret.InvalidateCoord; end;
+    if Caret.PosY>AMaxLine then Caret.PosY:= AMaxLine;
+    if Caret.EndY>AMaxLine then Caret.EndY:= AMaxLine;
   end;
 end;
 
-procedure TATCarets.InvalidateCoords;
-var
-  i: integer;
-begin
-  for i:= 0 to Count-1 do
-    Items[i].InvalidateCoord;
-end;
 
 end.
 

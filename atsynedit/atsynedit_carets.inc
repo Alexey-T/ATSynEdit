@@ -413,7 +413,6 @@ begin
       EndX:= AEndX;
       EndY:= AEndY;
     end;
-    InvalidateCoord;
   end;
 end;
 
