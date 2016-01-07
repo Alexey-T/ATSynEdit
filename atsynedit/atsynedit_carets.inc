@@ -361,7 +361,10 @@ begin
   DoCaretSingle(APnt.X, APnt.Y);
 
   if IsLineFolded(APnt.Y, true) then
+  begin
     DoUnfoldLine(APnt.Y);
+    Update(true);
+  end;
 
   DoGotoPos(APnt, AIndentHorz, AIndentVert);
   Update;
