@@ -363,10 +363,11 @@ begin
   if IsLineFolded(APnt.Y, true) then
   begin
     DoUnfoldLine(APnt.Y);
-    Update(true);
+    Update;
   end;
 
   DoGotoPos(APnt, AIndentHorz, AIndentVert);
+  LineTop:= APnt.Y-AIndentVert; //force scroll to pos, DoGotoPos don't help
   Update;
 end;
 

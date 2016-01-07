@@ -496,7 +496,6 @@ type
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer);
-    procedure DoUnfoldLine(ALine: integer);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
     function GetFoldedMarkText(ALine: integer): string;
@@ -512,7 +511,6 @@ type
     function GetUndoLimit: integer;
     procedure DoInitPopupMenu;
     function IsCaretBlocked: boolean;
-    function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
@@ -746,8 +744,10 @@ type
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsPosFolded(AX, AY: integer): boolean;
+    function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsCharWord(ch: Widechar): boolean;
     property TextCharSize: TPoint read FCharSize;
+    procedure DoUnfoldLine(ALine: integer);
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
