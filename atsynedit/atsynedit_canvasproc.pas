@@ -107,7 +107,7 @@ procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; AS
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
 
 procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
-procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
+procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart; AKeepFontStyles: boolean);
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
 
 
@@ -708,19 +708,23 @@ begin
 end;
 
 
-procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart);
+procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart;
+  AKeepFontStyles: boolean);
 var
-  ResParts: TATLineParts;
-  nResPart: integer;
+  ResultParts: TATLineParts;
+  ResultPartIndex: integer;
   //
   procedure AddPart(const P: TATLinePart);
   begin
-    if P.Len=0 then Exit;
-    Move(P, ResParts[nResPart], SizeOf(P));
-    Inc(nResPart);
+    if P.Len>0 then
+    begin
+      Move(P, ResultParts[ResultPartIndex], SizeOf(P));
+      Inc(ResultPartIndex);
+    end;
   end;
   //
 var
+  PartSelBegin, PartSelEnd: TATLinePart;
   nIndex1, nIndex2,
   nOffset1, nOffset2,
   newLen1, newLen2, newOffset2: integer;
@@ -730,6 +734,26 @@ begin
   DoPartFind(AParts, APart.Offset+APart.Len, nIndex2, nOffset2);
   if nIndex1<0 then Exit;
   if nIndex2<0 then Exit;
+
+  //these 2 parts are for edges of selection
+  FillChar(PartSelBegin{%H-}, SizeOf(TATLinePart), 0);
+  FillChar(PartSelEnd{%H-}, SizeOf(TATLinePart), 0);
+
+  PartSelBegin.ColorFont:= APart.ColorFont;
+  PartSelBegin.ColorBG:= APart.ColorBG;
+  PartSelBegin.Offset:= AParts[nIndex1].Offset+nOffset1;
+  PartSelBegin.Len:= AParts[nIndex1].Len-nOffset1;
+  PartSelBegin.FontBold:= AParts[nIndex1].FontBold;
+  PartSelBegin.FontItalic:= AParts[nIndex1].FontItalic;
+  PartSelBegin.FontStrikeOut:= AParts[nIndex1].FontStrikeOut;
+
+  PartSelEnd.ColorFont:= APart.ColorFont;
+  PartSelEnd.ColorBG:= APart.ColorBG;
+  PartSelEnd.Offset:= AParts[nIndex2].Offset;
+  PartSelEnd.Len:= nOffset2;
+  PartSelEnd.FontBold:= AParts[nIndex2].FontBold;
+  PartSelEnd.FontItalic:= AParts[nIndex2].FontItalic;
+  PartSelEnd.FontStrikeOut:= AParts[nIndex2].FontStrikeOut;
 
   with AParts[nIndex1] do
   begin
@@ -741,19 +765,35 @@ begin
     newOffset2:= Offset+nOffset2;
   end;
 
-  FillChar(ResParts, SizeOf(ResParts), 0);
-  nResPart:= 0;
+  FillChar(ResultParts, SizeOf(ResultParts), 0);
+  ResultPartIndex:= 0;
 
-  //add to result parts before selection
-  for i:= 0 to nIndex1-1 do AddPart(AParts[i]);
+  //add parts before selection
+  for i:= 0 to nIndex1-1 do
+    AddPart(AParts[i]);
   if nOffset1>0 then
   begin
     AParts[nIndex1].Len:= newLen1;
     AddPart(AParts[nIndex1]);
   end;
 
-  //add APart
-  AddPart(APart);
+  //add middle (one APart of many parts)
+  if not AKeepFontStyles then
+    AddPart(APart)
+  else
+  begin
+    AddPart(PartSelBegin);
+
+    for i:= nIndex1+1 to nIndex2-1 do
+    begin
+      AParts[i].ColorFont:= APart.ColorFont;
+      AParts[i].ColorBG:= APart.ColorBG;
+      AddPart(AParts[i]);
+    end;
+
+    if nIndex1<nIndex2 then
+      AddPart(PartSelEnd);
+  end;
 
   //add parts after selection
   if nOffset2>0 then
@@ -772,7 +812,7 @@ begin
   //  [nindex1, nindex2, aparts[nindex2].offset, aparts[nindex2].len]);
 
   //copy result
-  Move(ResParts, AParts, SizeOf(AParts));
+  Move(ResultParts, AParts, SizeOf(AParts));
 end;
 
 

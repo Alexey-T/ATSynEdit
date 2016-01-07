@@ -136,7 +136,7 @@ begin
 
     if bSel and (i=AOffsetMax) then
     begin
-      DoPartInsert(AParts, Part);
+      DoPartInsert(AParts, Part, true);
       Break
     end;
 
@@ -151,7 +151,7 @@ begin
     else
     if bSelPrev and not bSel then
     begin
-      DoPartInsert(AParts, Part);
+      DoPartInsert(AParts, Part, true);
     end;
     bSelPrev:= bSel;
   end;
@@ -214,7 +214,7 @@ begin
     if Assigned(PartObj) then
       if Attr.PosY=ALineIndex then
       begin
-        //empty parts? init part for while line, for DoPartInsert to work
+        //empty parts? init part for whole line, for DoPartInsert to work
         if AParts[0].Len=0 then
         begin
           AParts[0].Offset:= 0;
@@ -226,7 +226,7 @@ begin
         Part:= PartObj.Data;
         Part.Len:= Attr.SelLen;
         Part.Offset:= Attr.PosX-ACharIndex;
-        DoPartInsert(AParts, Part);
+        DoPartInsert(AParts, Part, false);
       end;
   end;
 end;
