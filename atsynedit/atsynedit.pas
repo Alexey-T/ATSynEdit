@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 
 {$mode objfpc}{$H+}
 
+{$define test_markedrange}
 //{$define test_attribs}
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
@@ -275,6 +276,7 @@ type
     FCaretStopUnfocused: boolean;
     FMarkers: TATMarkers;
     FAttribs: TATMarkers;
+    FMarkedRange: TATMarkers;
     FMenuStd,
     FMenuText,
     FMenuGutterBm,
@@ -794,6 +796,7 @@ type
       const AComment: atString);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor): boolean;
+    procedure DoSetMarkedRange(ALine1, ALine2: integer);
 
   protected
     procedure Paint; override;
@@ -2160,6 +2163,11 @@ begin
 
   FMarkers:= TATMarkers.Create;
   FAttribs:= TATMarkers.Create;
+  FMarkedRange:= TATMarkers.Create;
+
+  {$ifdef test_markedrange}
+  DoSetMarkedRange(1, 3);
+  {$endif}
   {$ifdef test_attribs}
   DoDebugAddAttribs;
   {$endif}
@@ -2380,6 +2388,7 @@ begin
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
+  FreeAndNil(FMarkedRange);
   FreeAndNil(FMarkers);
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
@@ -4360,6 +4369,16 @@ begin
   p3.Data.ColorBG:= clRed;
   p3.Data.ColorFont:= clYellow;
   Attribs.Add(3,3, 0, 4, p3);
+end;
+
+procedure TATSynEdit.DoSetMarkedRange(ALine1, ALine2: integer);
+begin
+  FMarkedRange.Clear;
+  if (ALine1>=0) and (ALine2>=ALine1) then
+  begin
+    FMarkedRange.Add(0, ALine1);
+    FMarkedRange.Add(0, ALine2);
+  end;
 end;
 
 

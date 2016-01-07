@@ -50,6 +50,7 @@ type
     FBlockStaple,
     FBlockSepLine,
     FLockedBG,
+    FMarkedLinesBG,
     FComboboxArrow,
     FComboboxArrowBG: TColor;
   published
@@ -93,6 +94,7 @@ type
     property BlockSepLine: TColor read FBlockSepLine write FBlockSepLine;
     property LockedBG: TColor read FLockedBG write FLockedBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
+    property MarkedLinesBG: TColor read FMarkedLinesBG write FMarkedLinesBG;
     property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
     property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
   end;
@@ -144,6 +146,7 @@ begin
   C.BlockStaple:= clMedGray;
   C.BlockSepLine:= clMedGray;
   C.LockedBG:= $e0e0e0;
+  C.MarkedLinesBG:= $f0e0b0;
   C.ComboboxArrow:= clGray;
   C.ComboboxArrowBG:= $f0f0f0;
 end;
