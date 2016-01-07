@@ -1547,7 +1547,6 @@ begin
 
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMarginsTo(C);
-  DoPaintMarkersTo(C);
   DoPaintNiceScroll(C);
 
   if FOptRulerVisible then
@@ -2640,17 +2639,8 @@ begin
 
   if cPaintUpdateBitmap in AFlags then
   begin
-    //before DoPaintTo
-    if cPaintUpdateCaretsCoords in AFlags then
-    begin
-      //markers need calculated carets coords
-      if Markers.Count>0 then
-        UpdateCaretsCoords;
-    end;
-
     DoPaintTo(FBitmap.Canvas, ALineFrom);
 
-    //after DoPaintTo
     if cPaintUpdateCaretsCoords in AFlags then
     begin
       UpdateCaretsCoords;
@@ -2658,6 +2648,9 @@ begin
       if FOptShowCurColumn and (Carets.Count>0) then
         DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX, FColors.MarginCaret);
     end;
+
+    //paint markers after calc carets
+    DoPaintMarkersTo(FBitmap.Canvas);
 
     FCaretShown:= false;
     DoPaintCarets(FBitmap.Canvas, false);
