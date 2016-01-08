@@ -365,9 +365,7 @@ begin
 
   DoCaretSingle(APnt.X, APnt.Y);
   DoEventCarets;
-
   DoGotoPos(APnt, AIndentHorz, AIndentVert);
-  LineTop:= APnt.Y-AIndentVert; //force scroll to pos
   Update;
 end;
 
