@@ -571,7 +571,8 @@ begin
     DoTabs:= Pos(#9, StrIndent)>0;
 
     StrIndent:= STabsToSpaces(StrIndent, ATabSize);
-    if Length(StrIndent)<DecSpaces then Exit;
+    if DecSpaces>Length(StrIndent) then
+      DecSpaces:= Length(StrIndent);
     Delete(StrIndent, 1, DecSpaces);
 
     if DoTabs then
