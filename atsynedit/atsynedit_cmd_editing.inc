@@ -193,8 +193,18 @@ begin
 end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
+var
+  bColBlock: boolean;
 begin
-  if not IsSelRectEmpty or Carets.IsSelection then
+  bColBlock:= not IsSelRectEmpty;
+  if bColBlock then
+    if FSelRect.Left=FSelRect.Right then
+    begin
+      DoSelect_None;
+      bColBlock:= false;
+    end;
+
+  if bColBlock or Carets.IsSelection then
     Result:= DoCommand_TextDeleteSelection
   else
     Result:= DoCommand_TextDeleteRight(1);

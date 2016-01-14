@@ -221,8 +221,18 @@ begin
 end;
 
 function TATSynEdit.DoCommand_TextBackspace: TATCommandResults;
+var
+  bColBlock: boolean;
 begin
-  if not IsSelRectEmpty then
+  bColBlock:= not IsSelRectEmpty;
+  if bColBlock then
+    if FSelRect.Left=FSelRect.Right then
+    begin
+      DoSelect_None;
+      bColBlock:= false;
+    end;
+
+  if bColBlock then
     Result:= DoCommand_TextDeleteSelection
   else
     Result:= DoCommand_TextDeleteLeft(1, FOptKeyBackspaceUnindent);
