@@ -1775,7 +1775,8 @@ begin
             //while NOutputSpacesSkipped is with cjk counted as 1.7
           @Parts,
           Event,
-          FOptTextOffsetFromLine
+          FOptTextOffsetFromLine,
+          ClientWidth
           )
       else
         CanvasTextOutMinimap(C,

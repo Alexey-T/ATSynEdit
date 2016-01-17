@@ -65,7 +65,7 @@ procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle;
 
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
-  const Str: atString;
+  Str: atString;
   ATabSize: integer;
   ACharSize: TPoint;
   AMainText: boolean;
@@ -76,7 +76,8 @@ procedure CanvasTextOut(C: TCanvas;
   ACharsSkipped: integer;
   AParts: PATLineParts;
   ADrawEvent: TATSynEditDrawLineEvent;
-  ATextOffsetFromLine: integer
+  ATextOffsetFromLine: integer;
+  AControlWidth: integer
   );
 
 procedure CanvasTextOutMinimap(C: TCanvas;
@@ -483,11 +484,12 @@ begin
   Result:= Trunc(CanvasTextSpaces(S, ATabSize)*ACharSize.X);
 end;
 
-procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; const Str: atString;
+procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   ATabSize: integer; ACharSize: TPoint; AMainText: boolean;
   AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
   AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
-  ADrawEvent: TATSynEditDrawLineEvent; ATextOffsetFromLine: integer);
+  ADrawEvent: TATSynEditDrawLineEvent; ATextOffsetFromLine: integer;
+  AControlWidth: integer);
 var
   ListReal: TATRealArray;
   ListInt: TATIntArray;
@@ -511,6 +513,14 @@ begin
 
   for i:= 0 to High(ListReal) do
     ListInt[i]:= Trunc(ListReal[i]*ACharSize.X);
+
+  //truncate str, to not paint over screen
+  for i:= 1 to High(ListInt) do
+    if ListInt[i]>AControlWidth+ACharSize.X then
+    begin
+      SetLength(Str, i);
+      break;
+    end;
 
   for i:= 0 to High(ListReal) do
     if i=0 then
