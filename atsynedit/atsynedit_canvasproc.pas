@@ -502,6 +502,7 @@ var
   PartFontStyle: TFontStyles;
   PartRect: TRect;
   Buf: AnsiString;
+  DxPointer: PInteger;
 begin
   if Str='' then Exit;
 
@@ -531,7 +532,11 @@ begin
   if AParts=nil then
   begin
     Buf:= UTF8Encode(SRemoveHexChars(Str));
-    ExtTextOut(C.Handle, PosX, PosY, 0, nil, PChar(Buf), Length(Buf), @Dx[0]);
+    if IsStringWithUnicodeChars(Str) then
+      DxPointer:= @Dx[0]
+    else
+      DxPointer:= nil;
+    ExtTextOut(C.Handle, PosX, PosY, 0, nil, PChar(Buf), Length(Buf), DxPointer);
 
     DoPaintHexChars(C,
       Str,
@@ -579,6 +584,11 @@ begin
         PosY+ACharSize.Y);
 
       Buf:= UTF8Encode(SRemoveHexChars(PartStr));
+      if IsStringWithUnicodeChars(PartStr) then
+        DxPointer:= @Dx[PartOffset]
+      else
+        DxPointer:= nil;
+
       ExtTextOut(C.Handle,
         PosX+PixOffset1,
         PosY+ATextOffsetFromLine,
@@ -586,7 +596,7 @@ begin
         @PartRect,
         PChar(Buf),
         Length(Buf),
-        @Dx[PartOffset]);
+        DxPointer);
 
       DoPaintHexChars(C,
         PartStr,

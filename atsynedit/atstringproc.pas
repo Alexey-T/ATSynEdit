@@ -50,6 +50,7 @@ function IsCharSpace(ch: atChar): boolean;
 function IsCharAsciiControl(ch: atChar): boolean;
 function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
+function IsStringWithUnicodeChars(const S: atString): boolean;
 
 function SBeginsWith(const S, SubStr: atString): boolean;
 function SBeginsWith(const S, SubStr: string): boolean;
@@ -164,6 +165,18 @@ end;
 function IsCharHex(ch: atChar): boolean;
 begin
   Result:= Pos(ch, OptHexCharsDefault+OptHexCharsUser)>0;
+end;
+
+function IsStringWithUnicodeChars(const S: atString): boolean;
+var
+  i, N: integer;
+begin
+  Result:= false;
+  for i:= 1 to Length(S) do
+  begin
+    N:= Ord(S[i]);
+    if (N<32) or (N>126) then exit(true);
+  end;
 end;
 
 
