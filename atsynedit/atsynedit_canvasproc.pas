@@ -517,7 +517,7 @@ begin
 
   //truncate str, to not paint over screen
   for i:= 1 to High(ListInt) do
-    if ListInt[i]>AControlWidth+ACharSize.X then
+    if ListInt[i]>AControlWidth then
     begin
       SetLength(Str, i);
       break;
