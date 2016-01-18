@@ -11,8 +11,7 @@ unit ATStrings;
 interface
 
 uses
-  Classes, SysUtils,
-  Graphics,
+  Classes, SysUtils, Graphics,
   ATStringProc,
   ATStringProc_Utf8Detect,
   ATStrings_Undo;
@@ -968,6 +967,9 @@ begin
 
   repeat
     //FUndolist.DebugShow; ////debug
+    if (List.Count=0) then Break;
+    if (List.Count=1) and (List[0].ItemAction=cEditActionClearModified) then Break;
+
     DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);
 
     //handle unmodified
