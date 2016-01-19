@@ -182,6 +182,8 @@ begin
     cCommand_ColSelectRight:     Res:= DoCommand_SelectColumn(cDirRight);
     cCommand_ColSelectUp:        Res:= DoCommand_SelectColumn(cDirUp);
     cCommand_ColSelectDown:      Res:= DoCommand_SelectColumn(cDirDown);
+    cCommand_ColSelectToLineBegin: Res:= DoCommand_SelectColumnToLineEdge(false);
+    cCommand_ColSelectToLineEnd: Res:= DoCommand_SelectColumnToLineEdge(true);
 
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
     cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);

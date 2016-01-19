@@ -52,6 +52,8 @@ begin
   M.Add(cCommand_ColSelectRight, 'column select: right', ['Shift+Alt+Right'], []);
   M.Add(cCommand_ColSelectUp,    'column select: up',    ['Shift+Alt+Up'], []);
   M.Add(cCommand_ColSelectDown,  'column select: down',  ['Shift+Alt+Down'], []);
+  M.Add(cCommand_ColSelectToLineBegin, 'column select: to line begin', ['Shift+Alt+Home'], []);
+  M.Add(cCommand_ColSelectToLineEnd, 'column select: to line end', ['Shift+Alt+End'], []);
 
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);

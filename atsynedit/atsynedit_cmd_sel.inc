@@ -26,13 +26,11 @@ end;
 
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
 var
-  Caret: TATCaretItem;
   PntBegin, PntEnd: TPoint;
   N: integer;
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
-  Caret:= Carets[0];
 
   if IsSelRectEmpty or (FSelRectBegin.X<0) then
   begin
@@ -81,6 +79,34 @@ begin
   end;
 
   DoSelect_ColumnBlock(FSelRectBegin, FSelRectEnd);
+end;
+
+function TATSynEdit.DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
+var
+  NPos, i: integer;
+begin
+  Result:= [];
+  if Carets.Count=0 then Exit;
+
+  if IsSelRectEmpty or (FSelRectBegin.X<0) then Exit;
+  //maybe todo: make column sel if normal sel active here
+  //like DoCommand_SelectColumn
+
+  if not AToEnd then
+  begin
+    FSelRectEnd.X:= 0;
+  end
+  else
+  begin
+    NPos:= 0;
+    for i:= FSelRectBegin.Y to FSelRectEnd.Y do
+      if Strings.IsIndexValid(i) then
+        NPos:= Max(NPos, Length(STabsToSpaces(Strings.Lines[i], FTabSize)));
+    FSelRectEnd.X:= NPos;
+  end;
+
+  DoSelect_ColumnBlock(FSelRectBegin, FSelRectEnd);
+  Result:= [cResultKeepColumnSel, cResultCaretBottom];
 end;
 
 function TATSynEdit.DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
