@@ -48,6 +48,15 @@ type
     cDirDown
     );
 
+  TATSelectColumnDirection = (
+    cDirColumnLeft,
+    cDirColumnRight,
+    cDirColumnUp,
+    cDirColumnDown,
+    cDirColumnPageUp,
+    cDirColumnPageDown
+    );
+
   TATCaseConvert = (
     cCaseLower,
     cCaseUpper,
@@ -646,7 +655,8 @@ type
     function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
-    function DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
+    function DoCommand_SelectColumn(ADir: TATSelectColumnDirection
+      ): TATCommandResults;
     function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;

@@ -178,12 +178,14 @@ begin
     cCommand_KeyPageDown,
     cCommand_KeyPageDown_Sel:     Res:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
 
-    cCommand_ColSelectLeft:      Res:= DoCommand_SelectColumn(cDirLeft);
-    cCommand_ColSelectRight:     Res:= DoCommand_SelectColumn(cDirRight);
-    cCommand_ColSelectUp:        Res:= DoCommand_SelectColumn(cDirUp);
-    cCommand_ColSelectDown:      Res:= DoCommand_SelectColumn(cDirDown);
+    cCommand_ColSelectLeft:        Res:= DoCommand_SelectColumn(cDirColumnLeft);
+    cCommand_ColSelectRight:       Res:= DoCommand_SelectColumn(cDirColumnRight);
+    cCommand_ColSelectUp:          Res:= DoCommand_SelectColumn(cDirColumnUp);
+    cCommand_ColSelectDown:        Res:= DoCommand_SelectColumn(cDirColumnDown);
+    cCommand_ColSelectPageUp:      Res:= DoCommand_SelectColumn(cDirColumnPageUp);
+    cCommand_ColSelectPageDown:    Res:= DoCommand_SelectColumn(cDirColumnPageDown);
     cCommand_ColSelectToLineBegin: Res:= DoCommand_SelectColumnToLineEdge(false);
-    cCommand_ColSelectToLineEnd: Res:= DoCommand_SelectColumnToLineEdge(true);
+    cCommand_ColSelectToLineEnd:   Res:= DoCommand_SelectColumnToLineEdge(true);
 
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
     cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);

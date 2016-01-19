@@ -24,10 +24,10 @@ begin
   Result:= [cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_SelectColumn(ADir: TATDirection): TATCommandResults;
+function TATSynEdit.DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATCommandResults;
 var
   PntBegin, PntEnd: TPoint;
-  N: integer;
+  N, NPageLines, i: integer;
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
@@ -41,8 +41,13 @@ begin
     FSelRectEnd:= PntEnd;
   end;
 
+  if ADir in [cDirColumnPageUp, cDirColumnPageDown] then
+    NPageLines:= GetPageLines
+  else
+    NPageLines:= 1;
+
   case ADir of
-    cDirLeft:
+    cDirColumnLeft:
       begin
         N:= SColumnPosToCharPos(Strings.Lines[FSelRectEnd.Y], FSelRectEnd.X, OptTabSize);
         if N>0 then Dec(N);
@@ -50,7 +55,7 @@ begin
         FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretLeft];
       end;
-    cDirRight:
+    cDirColumnRight:
       begin
         N:= SColumnPosToCharPos(Strings.Lines[FSelRectEnd.Y], FSelRectEnd.X, OptTabSize);
         Inc(N);
@@ -58,22 +63,26 @@ begin
         FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretRight];
       end;
-    cDirUp:
+    cDirColumnUp,
+    cDirColumnPageUp:
       begin
-        if FSelRectEnd.Y>0 then
-        begin
-          Dec(FSelRectEnd.Y);
-          FSelRectEnd.Y:= GetNextUnfoldedLineNumber(FSelRectEnd.Y, false);
-        end;
+        for i:= 1 to NPageLines do
+          if FSelRectEnd.Y>0 then
+          begin
+            Dec(FSelRectEnd.Y);
+            FSelRectEnd.Y:= GetNextUnfoldedLineNumber(FSelRectEnd.Y, false);
+          end;
         Result:= [cResultKeepColumnSel, cResultCaretTop];
       end;
-    cDirDown:
+    cDirColumnDown,
+    cDirColumnPageDown:
       begin
-        if FSelRectEnd.Y<Strings.Count-1 then
-        begin
-          Inc(FSelRectEnd.Y);
-          FSelRectEnd.Y:= GetNextUnfoldedLineNumber(FSelRectEnd.Y, true);
-        end;
+        for i:= 1 to NPageLines do
+          if FSelRectEnd.Y<Strings.Count-1 then
+          begin
+            Inc(FSelRectEnd.Y);
+            FSelRectEnd.Y:= GetNextUnfoldedLineNumber(FSelRectEnd.Y, true);
+          end;
         Result:= [cResultKeepColumnSel, cResultCaretBottom];
       end;
   end;
