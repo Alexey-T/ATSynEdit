@@ -461,29 +461,29 @@ procedure TATAdapterEControl.GetTokenAtPos(Pnt: TPoint;
   out ATokenString, ATokenStyle: string);
 var
   token: TecSyntToken;
-  offset: integer;
-  i: integer;
+  offset, i: integer;
 begin
   APntFrom:= Point(0, 0);
   APntTo:= Point(0, 0);
   ATokenString:= '';
   ATokenStyle:= '';
+
   if AnClient=nil then exit;
   if Buffer=nil then exit;
-
   offset:= Buffer.CaretToStr(Pnt);
+
   for i:= 0 to AnClient.TagCount-1 do
   begin
     token:= AnClient.Tags[i];
     if (offset>=token.StartPos) and (offset<token.EndPos) then
-      if token.StartPos<token.EndPos then
-      begin
-        APntFrom:= Buffer.StrToCaret(token.StartPos);
-        APntTo:= Buffer.StrToCaret(token.EndPos);
-        ATokenString:= Utf8Encode(Buffer.SubString(token.StartPos+1, token.EndPos-token.StartPos));
-        if Assigned(token.Style) then
-          ATokenStyle:= token.Style.DisplayName;
-      end;
+    begin
+      APntFrom:= Buffer.StrToCaret(token.StartPos);
+      APntTo:= Buffer.StrToCaret(token.EndPos);
+      ATokenString:= Utf8Encode(Buffer.SubString(token.StartPos+1, token.EndPos-token.StartPos));
+      if Assigned(token.Style) then
+        ATokenStyle:= token.Style.DisplayName;
+      exit;
+    end;
   end;
 end;
 
