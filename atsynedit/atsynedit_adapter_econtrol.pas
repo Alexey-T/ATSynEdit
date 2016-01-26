@@ -60,6 +60,8 @@ type
     procedure DoFoldFromLinesHidden;
     procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
     function GetRangeParent(R: TecTextRange): TecTextRange;
+    procedure GetTokenProps(token: TecSyntToken; out APntFrom, APntTo: TPoint; out
+      ATokenString, ATokenStyle: string);
     function IsCaretInRange(AEdit: TATSynEdit; APos1, APos2: integer; ACond: TATRangeCond): boolean;
     procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
     procedure UpdateEds;
@@ -79,9 +81,12 @@ type
     procedure AddEditor(AEdit: TATSynEdit);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
+    property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
+    //tokens
+    procedure GetTokenWithIndex(AIndex: integer; out APntFrom, APntTo: TPoint; out
+      ATokenString, ATokenStyle: string);
     procedure GetTokenAtPos(Pnt: TPoint; out APntFrom, APntTo: TPoint; out
       ATokenString, ATokenStyle: string);
-    property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
     //support for syntax-tree
     property TreeBusy: boolean read FBusy;
     procedure TreeFill(ATree: TTreeView);
@@ -456,6 +461,34 @@ begin
     Result:= AnClient.AnalyzerAtPos(Buffer.CaretToStr(Pnt));
 end;
 
+
+procedure TATAdapterEControl.GetTokenProps(token: TecSyntToken;
+  out APntFrom, APntTo: TPoint; out ATokenString, ATokenStyle: string);
+begin
+  APntFrom:= Buffer.StrToCaret(token.StartPos);
+  APntTo:= Buffer.StrToCaret(token.EndPos);
+  ATokenString:= Utf8Encode(Buffer.SubString(token.StartPos+1, token.EndPos-token.StartPos));
+  if Assigned(token.Style) then
+    ATokenStyle:= token.Style.DisplayName
+  else
+    ATokenStyle:= '';
+end;
+
+procedure TATAdapterEControl.GetTokenWithIndex(AIndex: integer;
+  out APntFrom, APntTo: TPoint; out ATokenString, ATokenStyle: string);
+begin
+  APntFrom:= Point(-1, -1);
+  APntTo:= Point(-1, -1);
+  ATokenString:= '';
+  ATokenStyle:= '';
+
+  if AnClient=nil then exit;
+  if Buffer=nil then exit;
+
+  if (AIndex>=0) and (AIndex<AnClient.TagCount) then
+    GetTokenProps(AnClient.Tags[AIndex], APntFrom, APntTo, ATokenString, ATokenStyle);
+end;
+
 procedure TATAdapterEControl.GetTokenAtPos(Pnt: TPoint;
   out APntFrom, APntTo: TPoint;
   out ATokenString, ATokenStyle: string);
@@ -477,15 +510,12 @@ begin
     token:= AnClient.Tags[i];
     if (offset>=token.StartPos) and (offset<token.EndPos) then
     begin
-      APntFrom:= Buffer.StrToCaret(token.StartPos);
-      APntTo:= Buffer.StrToCaret(token.EndPos);
-      ATokenString:= Utf8Encode(Buffer.SubString(token.StartPos+1, token.EndPos-token.StartPos));
-      if Assigned(token.Style) then
-        ATokenStyle:= token.Style.DisplayName;
+      GetTokenProps(token, APntFrom, APntTo, ATokenString, ATokenStyle);
       exit;
     end;
   end;
 end;
+
 
 function TATAdapterEControl.GetRangeParent(R: TecTextRange): TecTextRange;
 //cannot use R.Parent!
