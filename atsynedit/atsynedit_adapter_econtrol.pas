@@ -463,8 +463,8 @@ var
   token: TecSyntToken;
   offset, i: integer;
 begin
-  APntFrom:= Point(0, 0);
-  APntTo:= Point(0, 0);
+  APntFrom:= Point(-1, -1);
+  APntTo:= Point(-1, -1);
   ATokenString:= '';
   ATokenStyle:= '';
 
