@@ -484,6 +484,13 @@ begin
   Result:= Trunc(CanvasTextSpaces(S, ATabSize)*ACharSize.X);
 end;
 
+
+function CanvasTextOutNeedsOffsets(const Str: atString): boolean;
+begin
+  {$ifdef darwin} exit(true); {$endif}
+  Result:= IsStringWithUnicodeChars(Str);
+end;
+
 procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   ATabSize: integer; ACharSize: TPoint; AMainText: boolean;
   AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
@@ -532,7 +539,7 @@ begin
   if AParts=nil then
   begin
     Buf:= UTF8Encode(SRemoveHexChars(Str));
-    if {$ifdef darwin} true {$else} IsStringWithUnicodeChars(Str) {$endif} then
+    if CanvasTextOutNeedsOffsets(Str) then
       DxPointer:= @Dx[0]
     else
       DxPointer:= nil;
@@ -584,7 +591,7 @@ begin
         PosY+ACharSize.Y);
 
       Buf:= UTF8Encode(SRemoveHexChars(PartStr));
-      if {$ifdef darwin} true {$else} IsStringWithUnicodeChars(PartStr) {$endif} then
+      if CanvasTextOutNeedsOffsets(PartStr) then
         DxPointer:= @Dx[PartOffset]
       else
         DxPointer:= nil;
