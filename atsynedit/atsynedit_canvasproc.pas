@@ -532,7 +532,7 @@ begin
   if AParts=nil then
   begin
     Buf:= UTF8Encode(SRemoveHexChars(Str));
-    if IsStringWithUnicodeChars(Str) then
+    if {$ifdef darwin} true {$else} IsStringWithUnicodeChars(Str) {$endif} then
       DxPointer:= @Dx[0]
     else
       DxPointer:= nil;
@@ -584,7 +584,7 @@ begin
         PosY+ACharSize.Y);
 
       Buf:= UTF8Encode(SRemoveHexChars(PartStr));
-      if IsStringWithUnicodeChars(PartStr) then
+      if {$ifdef darwin} true {$else} IsStringWithUnicodeChars(PartStr) {$endif} then
         DxPointer:= @Dx[PartOffset]
       else
         DxPointer:= nil;
