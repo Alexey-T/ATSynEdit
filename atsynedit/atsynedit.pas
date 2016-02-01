@@ -611,9 +611,6 @@ type
     function GetTextOffset: TPoint;
     function GetGutterNumbersWidth(C: TCanvas): integer;
     function GetPageLines: integer;
-    function GetVisibleLines: integer;
-    function GetVisibleColumns: integer;
-    function GetVisibleLinesMinimap: integer;
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
     procedure SetText(AValue: atString);
@@ -786,6 +783,9 @@ type
     procedure DoGotoPos_AndUnfold(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
     //misc
+    function GetVisibleLines: integer;
+    function GetVisibleColumns: integer;
+    function GetVisibleLinesMinimap: integer;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
@@ -803,8 +803,7 @@ type
     procedure DoRangeUnfold(ARange: TATSynRange);
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
-    procedure DoCommentSelectionLines(Act: TATCommentAction;
-      const AComment: atString);
+    procedure DoCommentSelectionLines(Act: TATCommentAction; const AComment: atString);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor): boolean;
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
