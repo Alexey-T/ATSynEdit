@@ -1561,7 +1561,9 @@ begin
 
   UpdateWrapInfo;
 
-  DoUpdateFontNeedsOffsets(C);
+  if not OptAlwaysUseOffsetsInTextout then
+    DoUpdateFontNeedsOffsets(C);
+
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMarginsTo(C);
   DoPaintNiceScroll(C);
