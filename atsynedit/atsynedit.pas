@@ -4412,10 +4412,12 @@ end;
 
 procedure TATSynEdit.DoUpdateFontNeedsOffsets(C: TCanvas);
 const
-  cTest = 'WWWwww';
+  cTest = 'WWWww';
 var
   N1, N2: integer;
+  PrevStyle: TFontStyles;
 begin
+  PrevStyle:= C.Font.Style;
   C.Font.Style:= [];
   N1:= C.TextWidth('n');
   N2:= C.TextWidth(cTest);
@@ -4433,6 +4435,7 @@ begin
   N2:= C.TextWidth(cTest);
   FFontNeedsOffsets.ForBoldItalic:= N2<>N1*Length(cTest);
 
+  C.Font.Style:= PrevStyle;
   {
   application.MainForm.caption:= (format('norm %d, b %d, i %d, bi %d', [
     Ord(FFontNeedsOffsets.ForNormal),
