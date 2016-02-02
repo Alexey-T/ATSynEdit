@@ -494,13 +494,14 @@ end;
 
 
 function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: atString; const AOffsets: TATFontNeedsOffsets): boolean;
+//Win: seems no slowdown from offsets
+//OSX: better use offsets, fonts have float-width, e.g. 10.2 pixels
+//Linux gtk2: big slowdown from offsets
 var
   St: TFontStyles;
 begin
-  {$ifdef darwin}
-  //OSX: fonts have float-width, e.g. 10.2 pixels
-  exit(true);
-  {$endif}
+  {$ifdef windows} exit(true); {$endif}
+  {$ifdef darwin} exit(true); {$endif}
 
   //ignore fsUnderline, fsStrikeout
   St:= C.Font.Style * [fsBold, fsItalic];
