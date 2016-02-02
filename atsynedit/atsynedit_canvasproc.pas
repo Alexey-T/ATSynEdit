@@ -486,8 +486,12 @@ end;
 
 
 function CanvasTextOutNeedsOffsets(const Str: atString): boolean;
+//OSX: must be true: fonts have float-width, e.g. 10.2 pixels
+//Win: should be true to correct render eg "Andale Mono" font (bold has must bigger width)
+//Linux: better use false as much as possible (gtk2 rendering much faster w/o offsets)
 begin
   {$ifdef darwin} exit(true); {$endif}
+  {$ifdef windows} exit(true); {$endif}
   Result:= IsStringWithUnicodeChars(Str);
 end;
 
