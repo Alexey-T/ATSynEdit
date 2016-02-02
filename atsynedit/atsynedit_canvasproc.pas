@@ -35,6 +35,13 @@ type
     cLineStyleWave
     );
 
+  TATFontNeedsOffsets = record
+    ForNormal: boolean;
+    ForBold: boolean;
+    ForItalic: boolean;
+    ForBoldItalic: boolean;
+  end;
+
 type
   TATLinePart = record
     Offset, Len: integer;
@@ -66,6 +73,7 @@ procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle;
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
   Str: atString;
+  const ANeedOffsets: TATFontNeedsOffsets;
   ATabSize: integer;
   ACharSize: TPoint;
   AMainText: boolean;
@@ -485,20 +493,33 @@ begin
 end;
 
 
-function CanvasTextOutNeedsOffsets(const Str: atString): boolean;
-//OSX: must be true: fonts have float-width, e.g. 10.2 pixels
-//Win: should be true to correct render eg "Andale Mono" font (bold has must bigger width)
-//Linux: better use false as much as possible (gtk2 rendering much faster w/o offsets)
+function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: atString; const AOffsets: TATFontNeedsOffsets): boolean;
+var
+  St: TFontStyles;
 begin
-  {$ifdef darwin} exit(true); {$endif}
-  {$ifdef windows} exit(true); {$endif}
-  Result:= IsStringWithUnicodeChars(Str);
+  {$ifdef darwin}
+  //OSX: fonts have float-width, e.g. 10.2 pixels
+  exit(true);
+  {$endif}
+
+  //ignore fsUnderline, fsStrikeout
+  St:= C.Font.Style * [fsBold, fsItalic];
+
+  if St=[] then Result:= AOffsets.ForNormal else
+   if St=[fsBold] then Result:= AOffsets.ForBold else
+    if St=[fsItalic] then Result:= AOffsets.ForItalic else
+     if St=[fsBold, fsItalic] then Result:= AOffsets.ForBoldItalic else
+      Result:= false;
+
+  if Result then exit;
+  Result:= IsStringWithUnicodeChars(AStr);
 end;
 
 procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
-  ATabSize: integer; ACharSize: TPoint; AMainText: boolean;
-  AShowUnprintable: boolean; AColorUnprintable: TColor; AColorHex: TColor; out
-  AStrWidth: integer; ACharsSkipped: integer; AParts: PATLineParts;
+  const ANeedOffsets: TATFontNeedsOffsets; ATabSize: integer;
+  ACharSize: TPoint; AMainText: boolean; AShowUnprintable: boolean;
+  AColorUnprintable: TColor; AColorHex: TColor; out AStrWidth: integer;
+  ACharsSkipped: integer; AParts: PATLineParts;
   ADrawEvent: TATSynEditDrawLineEvent; ATextOffsetFromLine: integer;
   AControlWidth: integer);
 var
@@ -543,7 +564,7 @@ begin
   if AParts=nil then
   begin
     Buf:= UTF8Encode(SRemoveHexChars(Str));
-    if CanvasTextOutNeedsOffsets(Str) then
+    if CanvasTextOutNeedsOffsets(C, Str, ANeedOffsets) then
       DxPointer:= @Dx[0]
     else
       DxPointer:= nil;
@@ -595,7 +616,7 @@ begin
         PosY+ACharSize.Y);
 
       Buf:= UTF8Encode(SRemoveHexChars(PartStr));
-      if CanvasTextOutNeedsOffsets(PartStr) then
+      if CanvasTextOutNeedsOffsets(C, PartStr, ANeedOffsets) then
         DxPointer:= @Dx[PartOffset]
       else
         DxPointer:= nil;

@@ -264,6 +264,7 @@ type
     FFold: TATSynRanges;
     FFoldImageList: TImageList;
     FFoldStyle: TATFoldStyle;
+    FFontNeedsOffsets: TATFontNeedsOffsets;
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
@@ -479,6 +480,7 @@ type
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoSelectionDeleteColumnBlock;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
+    procedure DoUpdateFontNeedsOffsets(C: TCanvas);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;
     function GetMinimapActualHeight: integer;
@@ -1559,6 +1561,7 @@ begin
 
   UpdateWrapInfo;
 
+  DoUpdateFontNeedsOffsets(C);
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMarginsTo(C);
   DoPaintNiceScroll(C);
@@ -1773,6 +1776,7 @@ begin
           CurrPointText.X,
           CurrPointText.Y,
           StrOut,
+          FFontNeedsOffsets,
           FTabSize,
           ACharSize,
           AMainText,
@@ -4404,6 +4408,38 @@ begin
   end;
 end;
 
+procedure TATSynEdit.DoUpdateFontNeedsOffsets(C: TCanvas);
+const
+  cTest = 'WWWwww';
+var
+  N1, N2: integer;
+begin
+  C.Font.Style:= [];
+  N1:= C.TextWidth('n');
+  N2:= C.TextWidth(cTest);
+  FFontNeedsOffsets.ForNormal:= N2<>N1*Length(cTest);
+
+  C.Font.Style:= [fsBold];
+  N2:= C.TextWidth(cTest);
+  FFontNeedsOffsets.ForBold:= N2<>N1*Length(cTest);
+
+  C.Font.Style:= [fsItalic];
+  N2:= C.TextWidth(cTest);
+  FFontNeedsOffsets.ForItalic:= N2<>N1*Length(cTest);
+
+  C.Font.Style:= [fsBold, fsItalic];
+  N2:= C.TextWidth(cTest);
+  FFontNeedsOffsets.ForBoldItalic:= N2<>N1*Length(cTest);
+
+  {
+  application.MainForm.caption:= (format('norm %d, b %d, i %d, bi %d', [
+    Ord(FFontNeedsOffsets.ForNormal),
+    Ord(FFontNeedsOffsets.ForBold),
+    Ord(FFontNeedsOffsets.ForItalic),
+    Ord(FFontNeedsOffsets.ForBoldItalic)
+    ]));
+    }
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
