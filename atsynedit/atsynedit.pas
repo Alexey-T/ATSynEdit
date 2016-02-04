@@ -231,6 +231,7 @@ type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; const AText: string; var AHandled: boolean) of object;
+  TATSynEditCommandAfterEvent = procedure(Sender: TObject; ACommand: integer; const AText: string) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
@@ -328,6 +329,7 @@ type
     FOnDrawRuler: TATSynEditDrawRectEvent;
     FOnChangeState: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
+    FOnCommandAfter: TATSynEditCommandAfterEvent;
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FOnCalcStaple: TATSynEditCalcStapleEvent;
     FOnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent;
@@ -464,6 +466,7 @@ type
       AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
     procedure DoDebugAddAttribs;
     procedure DoDropText;
+    procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     procedure DoFoldbarClick(ALine: integer);
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
@@ -885,6 +888,7 @@ type
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
     property OnScroll: TNotifyEvent read FOnScroll write FOnScroll;
     property OnCommand: TATSynEditCommandEvent read FOnCommand write FOnCommand;
+    property OnCommandAfter: TATSynEditCommandAfterEvent read FOnCommandAfter write FOnCommandAfter;
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
@@ -3619,6 +3623,13 @@ begin
   if Assigned(FOnCommand) then
     FOnCommand(Self, ACommand, AText, Result);
 end;
+
+procedure TATSynEdit.DoEventCommandAfter(ACommand: integer; const AText: string);
+begin
+  if Assigned(FOnCommandAfter) then
+    FOnCommandAfter(Self, ACommand, AText);
+end;
+
 
 function TATSynEdit.GetCaretBlinkTime: integer;
 begin

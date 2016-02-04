@@ -296,6 +296,7 @@ begin
     end;
 
   DoCommandResults(Res);
+  DoEventCommandAfter(ACmd, AText);
 end;
 
 
