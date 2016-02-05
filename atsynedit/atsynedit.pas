@@ -3037,8 +3037,13 @@ begin
 
   if FMouseDragDropping then
   begin
-    DoDropText;
-    Update;
+    Strings.BeginUndoGroup;
+    try
+      DoDropText;
+    finally
+      Strings.EndUndoGroup;
+      Update;
+    end;
   end;
 
   FMouseDownPnt:= Point(-1, -1);
