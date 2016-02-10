@@ -1,2 +1,2 @@
-FOLDBAR_P   BITMAP fold_plus.bmp
-FOLDBAR_M   BITMAP fold_minus.bmp
+ATSYN_FOLD_P   BITMAP fold_plus.bmp
+ATSYN_FOLD_M   BITMAP fold_minus.bmp

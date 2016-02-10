@@ -4469,6 +4469,7 @@ end;
 {$I atsynedit_sel.inc}
 {$I atsynedit_fold.inc}
 {$I atsynedit_debug.inc}
+
 {$R res/nicescroll.res}
 {$R res/foldbar.res}
 

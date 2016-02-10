@@ -336,8 +336,8 @@ begin
     FFoldImageList:= TImageList.Create(Self);
     FFoldImageList.Width:= 12;
     FFoldImageList.Height:= 12;
-    FFoldImageList.AddResourceName(HInstance, 'FOLDBAR_P');
-    FFoldImageList.AddResourceName(HInstance, 'FOLDBAR_M');
+    FFoldImageList.AddResourceName(HInstance, 'ATSYN_FOLD_P');
+    FFoldImageList.AddResourceName(HInstance, 'ATSYN_FOLD_M');
   end;
 end;
 

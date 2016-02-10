@@ -51,14 +51,14 @@ end;
 procedure InitResourcesNicescroll;
 begin
   cBitmapNiceScroll:= TBitmap.Create;
-  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'AB_MOVE');
+  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_MOVE');
   cBitmapNiceScroll.Transparent:= true;
 
-  Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'AB_MOVE');
-  Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'AB_MOVE_U');
-  Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'AB_MOVE_D');
-  Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'AB_MOVE_L');
-  Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'AB_MOVE_R');
+  Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
+  Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
+  Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
+  Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'ATSYN_MOVE_L');
+  Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
 end;
 
 procedure FreeResources;
