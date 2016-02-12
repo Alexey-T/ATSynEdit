@@ -1,6 +1,5 @@
 {$ifdef nnnn}begin end;{$endif}
 
-
 function TATSynEdit.IsLineWithCaret(ALine: integer): boolean;
 begin
   Result:= FCarets.IsLineListed(ALine);
@@ -298,7 +297,6 @@ begin
   DoPaintModeStatic;
   DoPaintModeBlinking;
 end;
-
 
 procedure TATSynEdit.DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
 var

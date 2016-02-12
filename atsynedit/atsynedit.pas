@@ -593,6 +593,7 @@ type
     function GetMouseNiceScroll: boolean;
     procedure SetCaretShapeRO(AValue: TATSynCaretShape);
     procedure SetCaretBlinkEnabled(AValue: boolean);
+    procedure SetModified(AValue: boolean);
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretBlinkTime(AValue: integer);
@@ -743,7 +744,7 @@ type
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
     property Keymap: TATKeymap read FKeymap write FKeymap;
-    property Modified: boolean read GetModified;
+    property Modified: boolean read GetModified write SetModified;
     property AdapterHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property EditorIndex: integer read FEditorIndex write FEditorIndex;
     property LineTop: integer read GetLineTop write SetLineTop;
@@ -3945,6 +3946,11 @@ end;
 function TATSynEdit.GetModified: boolean;
 begin
   Result:= Strings.Modified;
+end;
+
+procedure TATSynEdit.SetModified(AValue: boolean);
+begin
+  Strings.Modified:= AValue;
 end;
 
 function TATSynEdit.GetOneLine: boolean;
