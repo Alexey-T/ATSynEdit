@@ -3951,6 +3951,8 @@ end;
 procedure TATSynEdit.SetModified(AValue: boolean);
 begin
   Strings.Modified:= AValue;
+  if AValue then
+    DoEventChange;
 end;
 
 function TATSynEdit.GetOneLine: boolean;
