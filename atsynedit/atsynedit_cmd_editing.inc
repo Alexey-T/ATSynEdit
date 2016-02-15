@@ -238,6 +238,9 @@ begin
       Caret.GetRange(AX1, AY1, AX2, AY2, bSel);
       if not bSel then Continue;
 
+      Markers.DeleteInRange(AX1, AY1, AX2, AY2);
+      Attribs.DeleteInRange(AX1, AY1, AX2, AY2);
+
       Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
       DoCaretsShift(AX1, AY1, Shift.X, Shift.Y, PosAfter);
       Caret.PosX:= PosAfter.X;

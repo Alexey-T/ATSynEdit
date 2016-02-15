@@ -5,7 +5,8 @@ unit ATSynEdit_Markers;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils,
+  ATSynEdit_Carets;
 
 type
   TATMarkerItem = class
@@ -39,6 +40,7 @@ type
     property Items[N: integer]: TATMarkerItem read GetItem; default;
     procedure Add(APosX, APosY: integer;
       ATag: integer=0; ASelLen: integer=0; APtr: TObject=nil);
+    procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
   end;
 
 implementation
@@ -114,6 +116,16 @@ begin
   Item.Ptr:= APtr;
 
   FList.Add(Item);
+end;
+
+procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
+var
+  i: integer;
+begin
+  for i:= Count-1 downto 0 do
+    with Items[i] do
+      if IsPosInRange(PosX, PosY, AX1, AY1, AX2, AY2)=cRelateInside then
+        Delete(i);
 end;
 
 end.
