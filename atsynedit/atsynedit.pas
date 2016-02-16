@@ -4129,15 +4129,17 @@ var
   LineIndex: integer;
   IsPlus, IsLineUp, IsLineDown: boolean;
   i: integer;
+const
+  cFixLine = {$ifdef darwin} 2 {$else} 0 {$endif};
   //
   procedure DrawUp;
   begin
     if IsLineUp then
       C.Line(
         CoordXM,
-        ACoordY1,
+        ACoordY1-cFixLine,
         CoordXM,
-        CoordYM
+        CoordYM+cFixLine
         );
   end;
   procedure DrawDown;
@@ -4145,9 +4147,9 @@ var
     if IsLineDown then
       C.Line(
         CoordXM,
-        CoordYM,
+        CoordYM-cFixLine,
         CoordXM,
-        ACoordY2
+        ACoordY2+cFixLine
         );
   end;
   //
