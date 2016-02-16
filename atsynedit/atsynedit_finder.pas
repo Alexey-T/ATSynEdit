@@ -40,6 +40,8 @@ type
     function IsMatchUsual(APos: integer): boolean;
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
+    procedure UpdateRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString);
+    procedure UpdateRegexStrReplacement_FromText(const ASelText: UnicodeString);
   protected
     procedure DoOnFound; virtual;
   public
@@ -215,16 +217,46 @@ begin
     begin
       MatchPos:= Obj.MatchPos[0];
       MatchLen:= Obj.MatchLen[0];
-      if StrReplace<>'' then
-        FStrReplacement:= Obj.Replace(Obj.Match[0], SRegexReplaceEscapedTabs(StrReplace), true);
+      UpdateRegexStrReplacement_WithObj(Obj, Obj.Match[0]);
     end;
   finally
     FreeAndNil(Obj);
   end;
 end;
 
-function TATTextFinder.DoCountMatchesUsual(FromPos: integer; AWithEvent: boolean
-  ): Integer;
+procedure TATTextFinder.UpdateRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString);
+begin
+  if StrReplace='' then
+    FStrReplacement:= ''
+  else
+    FStrReplacement:= Obj.Replace(AFoundString, SRegexReplaceEscapedTabs(StrReplace), true);
+end;
+
+procedure TATTextFinder.UpdateRegexStrReplacement_FromText(const ASelText: UnicodeString);
+var
+  Obj: TRegExpr;
+begin
+  Obj:= TRegExpr.Create;
+  try
+    Obj.ModifierS:= false; //don't catch all text by .*
+    Obj.ModifierM:= true; //allow to work with ^$
+    Obj.ModifierI:= not OptCase;
+
+    try
+      Obj.Expression:= StrFind;
+    except
+      if Assigned(FOnBadRegex) then
+        FOnBadRegex(Self);
+      exit;
+    end;
+
+    UpdateRegexStrReplacement_WithObj(Obj, ASelText);
+  finally
+    FreeAndNil(Obj);
+  end;
+end;
+
+function TATTextFinder.DoCountMatchesUsual(FromPos: integer; AWithEvent: boolean): Integer;
 var
   LastPos, i: Integer;
   Ok: boolean;
@@ -607,6 +639,7 @@ var
   P1, P2: TPoint;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
+  SSelText: UnicodeString;
 begin
   Result:= false;
   if not IsSelectionStartsAtFoundMatch then
@@ -622,8 +655,13 @@ begin
   P1:= Point(X1, Y1);
   P2:= Point(X2, Y2);
 
+  SSelText:= FEditor.TextSelected;
+
   Caret.EndX:= -1;
   Caret.EndY:= -1;
+
+  if OptRegex then
+    UpdateRegexStrReplacement_FromText(SSelText);
 
   DoReplaceTextInEditor(P1, P2);
   UpdateBuffer;
