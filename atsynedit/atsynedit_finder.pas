@@ -418,6 +418,7 @@ begin
   FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
   FEditor.Strings.TextInsert(P1.X, P1.Y, Str, false, Shift, PosAfter);
   FEditor.Strings.EndUndoGroup;
+  FEditor.DoEventChange;
 
   //correct caret pos
   //(e.g. replace "dddddd" to "--": move lefter)
