@@ -383,7 +383,12 @@ end;
 procedure TATStrings.SetLineBm(Index: integer; AValue: integer);
 begin
   if IsIndexValid(Index) then
-    TATStringItem(FList[Index]).ItemBm:= AValue;
+    with TATStringItem(FList[Index]) do
+    begin
+      ItemBm:= AValue;
+      if AValue=0 then
+        ItemHint:= 0;
+    end;
 end;
 
 procedure TATStrings.SetLineSep(Index: integer; AValue: TATLineSeparator);
@@ -732,6 +737,8 @@ begin
   for i:= Count-1 downto 0 do
     TObject(FList[i]).Free;
   FList.Clear;
+
+  FHintList.Clear;
 end;
 
 procedure TATStrings.ClearHints;

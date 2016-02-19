@@ -826,6 +826,7 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
+    procedure MouseLeave; override;
     function DoMouseWheelDown(Shift: TShiftState; MousePos{%H-}: TPoint): boolean; override;
     function DoMouseWheelUp(Shift: TShiftState; MousePos{%H-}: TPoint): boolean; override;
     procedure DblClick; override;
@@ -3293,6 +3294,12 @@ begin
         DoMinimapDrag(Y);
       Exit
     end;
+end;
+
+procedure TATSynEdit.MouseLeave;
+begin
+  inherited;
+  DoHintHide;
 end;
 
 function TATSynEdit.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean;
