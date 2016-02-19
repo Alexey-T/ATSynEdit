@@ -14,7 +14,8 @@ uses
   Classes, SysUtils, Graphics,
   ATStringProc,
   ATStringProc_Utf8Detect,
-  ATStrings_Undo;
+  ATStrings_Undo,
+  ATStrings_Hints;
 
 const
   //set to 2 to allow 2 editors to use one Strings obj, with different LinesHidden[n, nClient]
@@ -66,7 +67,8 @@ type
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
     ItemSeparator: TATLineSeparator;
-    ItemBm: byte;
+    ItemBm: byte; //kind of bookmark, 0: none
+    ItemHint: byte; //max 250 hints per control, 0: no hint
     ItemHidden: array[0..cMaxStringsClients-1] of smallint;
       //0: line visible,
       //-1: line hidden,
@@ -88,6 +90,7 @@ type
     FList: TList;
     FListUpdates: TList;
     FListUpdatesHard: boolean;
+    FHintList: TATHintList;
     FUndoList,
     FRedoList: TATUndoList;
     FEndings: TATLineEnds;
@@ -119,6 +122,7 @@ type
     function GetLineBm(Index: integer): integer;
     function GetLineEnd(N: integer): TATLineEnds;
     function GetLineHidden(NLine, NClient: integer): integer;
+    function GetLineHint(Index: integer): string;
     function GetLineSep(Index: integer): TATLineSeparator;
     function GetLineState(Index: integer): TATLineState;
     function GetRedoCount: integer;
@@ -134,6 +138,7 @@ type
     procedure SetLineBm(Index: integer; AValue: integer);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
     procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: integer);
+    procedure SetLineHint(Index: integer; const AValue: string);
     procedure SetLineSep(Index: integer; AValue: TATLineSeparator);
     procedure SetLineState(Index: integer; AValue: TATLineState);
     function GetTextString: atString;
@@ -150,6 +155,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
+    procedure ClearHints;
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
@@ -164,6 +170,7 @@ type
     property LinesHidden[IndexLine, IndexClient: integer]: integer read GetLineHidden write SetLineHidden;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
+    property LinesHint[Index: integer]: string read GetLineHint write SetLineHint;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
@@ -258,6 +265,7 @@ begin
   for i:= 0 to High(ItemHidden) do
     ItemHidden[i]:= 0;
   ItemBm:= 0;
+  ItemHint:= 0;
 end;
 
 function TATStringItem.IsFake: boolean;
@@ -277,6 +285,15 @@ function TATStrings.GetLineBm(Index: integer): integer;
 begin
   Assert(IsIndexValid(Index));
   Result:= TATStringItem(FList[Index]).ItemBm;
+end;
+
+function TATStrings.GetLineHint(Index: integer): string;
+var
+  N: integer;
+begin
+  Assert(IsIndexValid(Index));
+  N:= TATStringItem(FList[Index]).ItemHint;
+  Result:= FHintList[N];
 end;
 
 function TATStrings.GetLineEnd(N: integer): TATLineEnds;
@@ -399,6 +416,12 @@ begin
   TATStringItem(FList[IndexLine]).ItemHidden[IndexClient]:= AValue;
 end;
 
+procedure TATStrings.SetLineHint(Index: integer; const AValue: string);
+begin
+  Assert(IsIndexValid(Index));
+  TATStringItem(FList[Index]).ItemHint:= FHintList.Add(AValue);
+end;
+
 procedure TATStrings.SetLineState(Index: integer; AValue: TATLineState);
 begin
   Assert(IsIndexValid(Index));
@@ -452,6 +475,7 @@ begin
   FListUpdatesHard:= false;
   FUndoList:= TATUndoList.Create;
   FRedoList:= TATUndoList.Create;
+  FHintList:= TATHintList.Create;
 
   FEncoding:= cEncAnsi;
   FEncodingDetect:= true;
@@ -487,6 +511,7 @@ begin
   FreeAndNil(FListUpdates);
   FreeAndNil(FUndoList);
   FreeAndNil(FRedoList);
+  FreeAndNil(FHintList);
 
   inherited;
 end;
@@ -701,6 +726,17 @@ begin
   for i:= Count-1 downto 0 do
     TObject(FList[i]).Free;
   FList.Clear;
+end;
+
+procedure TATStrings.ClearHints;
+var
+  i: integer;
+begin
+  FHintList.Clear;
+  for i:= 0 to Count-1 do
+    with TATStringItem(FList[i]) do
+      if ItemHint<>0 then
+        ItemHint:= 0;
 end;
 
 procedure TATStrings.DoClearLineStates(ASaved: boolean);
