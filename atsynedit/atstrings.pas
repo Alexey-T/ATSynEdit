@@ -417,9 +417,15 @@ begin
 end;
 
 procedure TATStrings.SetLineHint(Index: integer; const AValue: string);
+var
+  N: integer;
 begin
   Assert(IsIndexValid(Index));
-  TATStringItem(FList[Index]).ItemHint:= FHintList.Add(AValue);
+  if AValue='' then
+    N:= 0
+  else
+    N:= FHintList.Add(AValue);
+  TATStringItem(FList[Index]).ItemHint:= N
 end;
 
 procedure TATStrings.SetLineState(Index: integer; AValue: TATLineState);

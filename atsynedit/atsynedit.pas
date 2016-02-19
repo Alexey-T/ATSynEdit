@@ -475,6 +475,7 @@ type
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHintShow;
     procedure DoHintHide;
+    procedure DoHintShowForBookmark(ALine: integer);
     procedure DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
     procedure DoMenuGutterFold;
     procedure DoMenuText;
@@ -2776,6 +2777,26 @@ begin
   FHintWnd.Invalidate; //for Win
 end;
 
+procedure TATSynEdit.DoHintShowForBookmark(ALine: integer);
+var
+  S: string;
+  P: TPoint;
+  R: TRect;
+begin
+  S:= Strings.LinesHint[ALine];
+  if S='' then
+    begin DoHintHide; exit end;
+
+  R:= FHintWnd.CalcHintRect(500, S, nil);
+
+  P:= Mouse.CursorPos;
+  OffsetRect(R, P.X+4, P.Y);
+
+  FHintWnd.ActivateHint(R, S);
+  FHintWnd.Invalidate; //for Win
+end;
+
+
 procedure TATSynEdit.DoHintHide;
 begin
   if Assigned(FHintWnd) then
@@ -3140,7 +3161,7 @@ end;
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   P: TPoint;
-  RectNums: TRect;
+  RectNums, RectBookmk: TRect;
   nIndex: integer;
   bOnMinimap, bOnGutter, bEolPos: boolean;
 begin
@@ -3174,6 +3195,20 @@ begin
   RectNums.Right:= FGutter[FGutterBandNum].Right;
   RectNums.Top:= FRectMain.Top;
   RectNums.Bottom:= FRectMain.Bottom;
+  //bookmarks
+  RectBookmk.Left:= FGutter[FGutterBandBm].Left;
+  RectBookmk.Right:= FGutter[FGutterBandBm].Right;
+  RectBookmk.Top:= FRectMain.Top;
+  RectBookmk.Bottom:= FRectMain.Bottom;
+
+  //show/hide bookmark hint
+  if PtInRect(RectBookmk, P) then
+  begin
+    P:= ClientPosToCaretPos(Point(X, Y), bEolPos);
+    DoHintShowForBookmark(P.Y);
+  end
+  else
+    DoHintHide;
 
   //start scroll timer
   FTimerScroll.Enabled:=

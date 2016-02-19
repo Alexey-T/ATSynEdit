@@ -441,9 +441,15 @@ begin
   if ABand=ed.GutterBandBm then
   begin
     if ed.Strings.LinesBm[ALine]<>0 then
-      ed.Strings.LinesBm[ALine]:= 0
+    begin
+      ed.Strings.LinesBm[ALine]:= 0;
+      ed.Strings.LinesHint[ALine]:= '';
+    end
     else
+    begin
       ed.Strings.LinesBm[ALine]:= 1;
+      ed.Strings.LinesHint[ALine]:= Format('Bookmark for line %d', [ALine+1]);
+    end;
     ed.Update;
   end;
 end;
