@@ -218,6 +218,8 @@ const
   cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
   cHintScrollPrefix: string = 'Line';
   cHintScrollDx = 5;
+  cHintBookmarkDx = 6;
+  cHintBookmarkDy = 16;
   cStrMenuItemFoldAll: string = 'Fold all';
   cStrMenuItemUnfoldAll: string = 'Unfold all';
   cStrMenuItemFoldLevel: string = 'Fold level';
@@ -2790,7 +2792,7 @@ begin
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
   P:= Mouse.CursorPos;
-  OffsetRect(R, P.X+4, P.Y);
+  OffsetRect(R, P.X+cHintBookmarkDx, P.Y+cHintBookmarkDy);
 
   FHintWnd.ActivateHint(R, S);
   FHintWnd.Invalidate; //for Win
