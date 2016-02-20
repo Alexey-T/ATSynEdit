@@ -118,7 +118,7 @@ uses
 type
  {$IFDEF UniCode}
  PRegExprChar = PWideChar;
- RegExprString = WideString;
+ RegExprString = UnicodeString; //AT
  REChar = WideChar;
  {$ELSE}
  PRegExprChar = PChar;
