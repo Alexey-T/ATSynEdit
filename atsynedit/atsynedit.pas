@@ -224,8 +224,8 @@ const
   cStrMenuItemFoldAll: string = 'Fold all';
   cStrMenuItemUnfoldAll: string = 'Unfold all';
   cStrMenuItemFoldLevel: string = 'Fold level';
-  cUrlTag = -100; //any int<0
-  cUrlRegexInitial = '\b(https?://|ftp://|www\.)[^<>''"\x20\x09]+';
+  cUrlMarkerTag = -100;
+  cUrlRegexInitial = '\b(https?://|ftp://|magnet:|www\.)[^<>''"\s]+';
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -4537,7 +4537,7 @@ var
   SLine: atString;
   MatchPos, MatchLen, NLine, i: integer;
 begin
-  Attribs.DeleteWithTag(cUrlTag);
+  Attribs.DeleteWithTag(cUrlMarkerTag);
   if not OptShowURLs then exit;
 
   ReObj:= TRegExpr.Create;
@@ -4567,7 +4567,7 @@ begin
         AtrObj.Data.ColorBG:= Colors.TextBG;
         AtrObj.Data.ColorBorder:= Colors.Links;
         AtrObj.Data.BorderDown:= cLineStyleSolid;
-        Attribs.Add(MatchPos-1, i, cUrlTag, MatchLen, AtrObj);
+        Attribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, AtrObj);
       end;
     end;
   finally
