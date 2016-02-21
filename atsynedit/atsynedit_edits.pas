@@ -74,6 +74,7 @@ begin
 
   Keymap:= KeymapCombo;
 
+  OptShowURLs:= false;
   OptTextOffsetTop:= 2;
   Height:= 26;
 end;
