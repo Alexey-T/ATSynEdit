@@ -41,6 +41,7 @@ type
     procedure Add(APosX, APosY: integer;
       ATag: integer=0; ASelLen: integer=0; APtr: TObject=nil);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
+    procedure DeleteWithTag(ATag: integer);
   end;
 
 implementation
@@ -126,6 +127,15 @@ begin
     with Items[i] do
       if IsPosInRange(PosX, PosY, AX1, AY1, AX2, AY2)=cRelateInside then
         Delete(i);
+end;
+
+procedure TATMarkers.DeleteWithTag(ATag: integer);
+var
+  i: integer;
+begin
+  for i:= Count-1 downto 0 do
+    if Items[i].Tag=ATag then
+      Delete(i);
 end;
 
 end.

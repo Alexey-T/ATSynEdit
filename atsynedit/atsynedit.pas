@@ -27,6 +27,7 @@ uses
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms,
   LMessages, LCLType,
+  RegExpr,
   ATStringProc,
   ATStrings,
   ATSynEdit_Colors,
@@ -223,6 +224,8 @@ const
   cStrMenuItemFoldAll: string = 'Fold all';
   cStrMenuItemUnfoldAll: string = 'Unfold all';
   cStrMenuItemFoldLevel: string = 'Fold level';
+  cUrlTag = -100; //any int<0
+  cUrlRegexInitial = '\b(https?://|ftp://|www\.)[^<>''"\x20\x09]+';
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -379,6 +382,8 @@ type
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
     FOptMaxLinesToCountUnindent: integer;
+    FOptShowURLs: boolean;
+    FOptShowURLsRegex: string;
     FOptShowStapleStyle: TATLineStyle;
     FOptShowStapleIndent: integer;
     FOptShowStapleWidthPercent: integer;
@@ -458,6 +463,7 @@ type
     //
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
+    procedure DoCalcLinks;
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
@@ -928,6 +934,8 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste;
+    property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs;
+    property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
     property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle;
     property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent;
     property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent;
@@ -1573,6 +1581,7 @@ begin
   if not OptAlwaysUseOffsetsInTextout then
     DoUpdateFontNeedsOffsets(C);
 
+  DoCalcLinks;
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMarginsTo(C);
   DoPaintNiceScroll(C);
@@ -2313,6 +2322,9 @@ begin
 
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSizeMinimap:= Point(1, 2);
+
+  FOptShowURLs:= true;
+  FOptShowURLsRegex:= cUrlRegexInitial;
 
   FOptShowStapleStyle:= cLineStyleSolid;
   FOptShowStapleIndent:= -1;
@@ -4516,6 +4528,51 @@ begin
     Ord(FFontNeedsOffsets.ForBoldItalic)
     ]));
     }
+end;
+
+procedure TATSynEdit.DoCalcLinks;
+var
+  ReObj: TRegExpr;
+  AtrObj: TATLinePartClass;
+  SLine: atString;
+  MatchPos, MatchLen, NLine, i: integer;
+begin
+  Attribs.DeleteWithTag(cUrlTag);
+  if not OptShowURLs then exit;
+
+  ReObj:= TRegExpr.Create;
+  try
+    ReObj.ModifierS:= false;
+    ReObj.ModifierM:= true;
+    ReObj.ModifierI:= true;
+    ReObj.Expression:= FOptShowURLsRegex;
+
+    NLine:= LineTop;
+    for i:= NLine to NLine+GetVisibleLines do
+    begin
+      if not Strings.IsIndexValid(i) then Break;
+      SLine:= Strings.Lines[i];
+      ReObj.InputString:= SLine;
+
+      MatchPos:= 0;
+      MatchLen:= 0;
+
+      while ReObj.ExecPos(MatchPos+MatchLen+1) do
+      begin
+        MatchPos:= ReObj.MatchPos[0];
+        MatchLen:= ReObj.MatchLen[0];
+
+        AtrObj:= TATLinePartClass.Create;
+        AtrObj.Data.ColorFont:= Colors.Links;
+        AtrObj.Data.ColorBG:= Colors.TextBG;
+        AtrObj.Data.ColorBorder:= Colors.Links;
+        AtrObj.Data.BorderDown:= cLineStyleSolid;
+        Attribs.Add(MatchPos-1, i, cUrlTag, MatchLen, AtrObj);
+      end;
+    end;
+  finally
+    FreeAndNil(ReObj);
+  end;
 end;
 
 {$I atsynedit_carets.inc}

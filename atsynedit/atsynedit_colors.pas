@@ -49,6 +49,7 @@ type
     FTextHintFont,
     FBlockStaple,
     FBlockSepLine,
+    FLinks,
     FLockedBG,
     FMarkedLinesBG,
     FComboboxArrow,
@@ -92,6 +93,7 @@ type
     property StateSaved: TColor read FStateSaved write FStateSaved;
     property BlockStaple: TColor read FBlockStaple write FBlockStaple;
     property BlockSepLine: TColor read FBlockSepLine write FBlockSepLine;
+    property Links: TColor read FLinks write FLinks;
     property LockedBG: TColor read FLockedBG write FLockedBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
     property MarkedLinesBG: TColor read FMarkedLinesBG write FMarkedLinesBG;
@@ -145,6 +147,7 @@ begin
   C.TextHintFont:= clGray;
   C.BlockStaple:= clMedGray;
   C.BlockSepLine:= clMedGray;
+  C.Links:= clBlue;
   C.LockedBG:= $e0e0e0;
   C.MarkedLinesBG:= $f0e0b0;
   C.ComboboxArrow:= clGray;
