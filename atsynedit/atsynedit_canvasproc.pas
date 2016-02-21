@@ -126,7 +126,7 @@ procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; AS
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
 
 procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
-procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart; AKeepFontStyles: boolean);
+procedure DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean);
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
 
 
@@ -734,8 +734,8 @@ begin
 end;
 
 
-procedure DoPartFind(const AParts: TATLineParts; APos: integer; out
-  AIndex, AOffsetLeft: integer);
+procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex,
+  AOffsetLeft: integer);
 var
   iStart, iEnd, i: integer;
 begin
@@ -757,7 +757,7 @@ begin
     iEnd:= iStart+AParts[i].Len;
 
     //pos at part begin?
-    if APos=iStart then
+    if (APos=iStart) then
       begin AIndex:= i; Break end;
 
     //pos at part middle?
@@ -767,7 +767,7 @@ begin
 end;
 
 
-procedure DoPartInsert(var AParts: TATLineParts; const APart: TATLinePart;
+procedure DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart;
   AKeepFontStyles: boolean);
 var
   ResultParts: TATLineParts;
@@ -789,6 +789,14 @@ var
   newLen1, newLen2, newOffset2: integer;
   i: integer;
 begin
+  //if editor scrolled to right, passed parts have Offset<0,
+  //shrink such parts
+  if (APart.Offset<0) and (APart.Offset+APart.Len>0) then
+  begin
+    Inc(APart.Len, APart.Offset);
+    APart.Offset:= 0;
+  end;
+
   DoPartFind(AParts, APart.Offset, nIndex1, nOffset1);
   DoPartFind(AParts, APart.Offset+APart.Len, nIndex2, nOffset2);
   if nIndex1<0 then Exit;
