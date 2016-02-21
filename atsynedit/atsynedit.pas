@@ -225,7 +225,7 @@ const
   cStrMenuItemUnfoldAll: string = 'Unfold all';
   cStrMenuItemFoldLevel: string = 'Fold level';
   cUrlMarkerTag = -100;
-  cUrlRegexInitial = '\b(https?://|ftp://|magnet:|www\.)[^<>''"\s]+';
+  cUrlRegexInitial = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+';
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -823,6 +823,8 @@ type
       AColorBG: TColor; out AColorAfter: TColor): boolean;
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
     procedure DoGetMarkedLines(out ALine1, ALine2: integer);
+    procedure DoGetMarkerAtPos(APosX, APosY: integer; ATag: integer; out
+      AMarkerBegin, AMarkerEnd: TPoint);
 
   protected
     procedure Paint; override;
@@ -4493,6 +4495,29 @@ begin
     ALine2:= FMarkedRange.Items[1].PosY;
   end;
 end;
+
+procedure TATSynEdit.DoGetMarkerAtPos(APosX, APosY: integer; ATag: integer; out AMarkerBegin, AMarkerEnd: TPoint);
+var
+  Atr: TATMarkerItem;
+  i: integer;
+begin
+  AMarkerBegin:= Point(0, 0);
+  AMarkerEnd:= Point(0, 0);
+  if not Strings.IsIndexValid(APosY) then exit;
+
+  for i:= 0 to Attribs.Count-1 do
+  begin
+    Atr:= Attribs[i];
+    if (ATag<>0) and (Atr.Tag<>ATag) then Continue;
+    if (Atr.PosY=APosY) and (Atr.PosX<=APosX) and (Atr.PosX+Atr.SelLen>APosX) then
+    begin
+      AMarkerBegin:= Point(Atr.PosX, Atr.PosY);
+      AMarkerEnd:= Point(Atr.PosX+Atr.SelLen, Atr.PosY);
+      exit
+    end;
+  end;
+end;
+
 
 procedure TATSynEdit.DoUpdateFontNeedsOffsets(C: TCanvas);
 const
