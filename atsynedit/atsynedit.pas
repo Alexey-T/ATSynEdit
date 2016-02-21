@@ -823,8 +823,7 @@ type
       AColorBG: TColor; out AColorAfter: TColor): boolean;
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
     procedure DoGetMarkedLines(out ALine1, ALine2: integer);
-    procedure DoGetMarkerAtPos(APosX, APosY: integer; ATag: integer; out
-      AMarkerBegin, AMarkerEnd: TPoint);
+    function DoGetLinkAtPos(AX, AY: integer): atString;
 
   protected
     procedure Paint; override;
@@ -4496,29 +4495,6 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoGetMarkerAtPos(APosX, APosY: integer; ATag: integer; out AMarkerBegin, AMarkerEnd: TPoint);
-var
-  Atr: TATMarkerItem;
-  i: integer;
-begin
-  AMarkerBegin:= Point(0, 0);
-  AMarkerEnd:= Point(0, 0);
-  if not Strings.IsIndexValid(APosY) then exit;
-
-  for i:= 0 to Attribs.Count-1 do
-  begin
-    Atr:= Attribs[i];
-    if (ATag<>0) and (Atr.Tag<>ATag) then Continue;
-    if (Atr.PosY=APosY) and (Atr.PosX<=APosX) and (Atr.PosX+Atr.SelLen>APosX) then
-    begin
-      AMarkerBegin:= Point(Atr.PosX, Atr.PosY);
-      AMarkerEnd:= Point(Atr.PosX+Atr.SelLen, Atr.PosY);
-      exit
-    end;
-  end;
-end;
-
-
 procedure TATSynEdit.DoUpdateFontNeedsOffsets(C: TCanvas);
 const
   cTest = 'WWWww';
@@ -4599,6 +4575,22 @@ begin
     FreeAndNil(ReObj);
   end;
 end;
+
+
+function TATSynEdit.DoGetLinkAtPos(AX, AY: integer): atString;
+var
+  Atr: TATMarkerItem;
+begin
+  Result:= '';
+  if not Strings.IsIndexValid(AY) then exit;
+  Atr:= Attribs.FindMarkerAtPos(AX, AY);
+  if Atr=nil then exit;
+  if Atr.Tag<>cUrlMarkerTag then exit;
+
+  Result:= Strings.Lines[AY];
+  Result:= Copy(Result, Atr.PosX+1, Atr.SelLen);
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

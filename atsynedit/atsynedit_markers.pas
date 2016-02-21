@@ -42,6 +42,7 @@ type
       ATag: integer=0; ASelLen: integer=0; APtr: TObject=nil);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(ATag: integer);
+    function FindMarkerAtPos(AX, AY: integer): TATMarkerItem;
   end;
 
 implementation
@@ -136,6 +137,20 @@ begin
   for i:= Count-1 downto 0 do
     if Items[i].Tag=ATag then
       Delete(i);
+end;
+
+function TATMarkers.FindMarkerAtPos(AX, AY: integer): TATMarkerItem;
+var
+  Item: TATMarkerItem;
+  i: integer;
+begin
+  Result:= nil;
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    if (Item.PosY=AY) and (Item.PosX<=AX) and (Item.PosX+Item.SelLen>AX) then
+      exit(Item);
+  end;
 end;
 
 end.
