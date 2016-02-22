@@ -813,6 +813,11 @@ begin
   PartSelBegin.FontBold:= AParts[nIndex1].FontBold;
   PartSelBegin.FontItalic:= AParts[nIndex1].FontItalic;
   PartSelBegin.FontStrikeOut:= AParts[nIndex1].FontStrikeOut;
+  PartSelBegin.BorderDown:= AParts[nIndex1].BorderDown;
+  PartSelBegin.BorderLeft:= AParts[nIndex1].BorderLeft;
+  PartSelBegin.BorderRight:= AParts[nIndex1].BorderRight;
+  PartSelBegin.BorderUp:= AParts[nIndex1].BorderUp;
+  PartSelBegin.ColorBorder:= AParts[nIndex1].ColorBorder;
 
   PartSelEnd.ColorFont:= APart.ColorFont;
   PartSelEnd.ColorBG:= APart.ColorBG;
@@ -821,6 +826,11 @@ begin
   PartSelEnd.FontBold:= AParts[nIndex2].FontBold;
   PartSelEnd.FontItalic:= AParts[nIndex2].FontItalic;
   PartSelEnd.FontStrikeOut:= AParts[nIndex2].FontStrikeOut;
+  PartSelEnd.BorderDown:= AParts[nIndex2].BorderDown;
+  PartSelEnd.BorderLeft:= AParts[nIndex2].BorderLeft;
+  PartSelEnd.BorderRight:= AParts[nIndex2].BorderRight;
+  PartSelEnd.BorderUp:= AParts[nIndex2].BorderUp;
+  PartSelEnd.ColorBorder:= AParts[nIndex2].ColorBorder;
 
   with AParts[nIndex1] do
   begin
