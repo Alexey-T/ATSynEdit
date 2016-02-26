@@ -379,6 +379,7 @@ type
     FMinimapVisible: boolean;
     FMinimapShowSelBorder: boolean;
     FMinimapShowSelAlways: boolean;
+    FMinimapAtLeft: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
     FOptMaxLinesToCountUnindent: integer;
@@ -971,6 +972,7 @@ type
     property OptMinimapCharWidth: integer read FMinimapCharWidth write FMinimapCharWidth;
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder;
     property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways;
+    property OptMinimapAtLeft: boolean read FMinimapAtLeft write FMinimapAtLeft;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible;
     property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX;
@@ -1070,7 +1072,7 @@ begin
 
   for i:= NRulerStart to NRulerStart+GetVisibleColumns+1 do
   begin
-    NX:= FTextOffset.X+(i-NRulerStart)*FCharSize.X;
+    NX:= FRectMain.Left + (i-NRulerStart)*FCharSize.X;
     NSize:= IfThen(i mod 5 = 0, FOptRulerMarkSizeBig, FOptRulerMarkSizeSmall);
     C.Line(NX, FRectRuler.Bottom-1,
            NX, FRectRuler.Bottom-1-NSize);
@@ -1483,25 +1485,26 @@ end;
 
 function TATSynEdit.GetRectMain: TRect;
 begin
-  Result.Left:= FTextOffset.X;
+  Result.Left:= FRectGutter.Left + FTextOffset.X;
   Result.Top:= FTextOffset.Y;
   Result.Right:= ClientWidth
-    - IfThen(FMinimapVisible, FMinimapWidth)
+    - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
     - IfThen(FMicromapVisible, FMicromapWidth);
   Result.Bottom:= ClientHeight;
 end;
 
 function TATSynEdit.GetRectMinimap: TRect;
 begin
-  if FMinimapVisible then
-  begin
-    Result.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible, FMicromapWidth);
-    Result.Top:= 0;
-    Result.Right:= Result.Left+FMinimapWidth;
-    Result.Bottom:= ClientHeight;
-  end
+  if not FMinimapVisible then exit(cRectEmpty);
+
+  if FMinimapAtLeft then
+    Result.Left:= 0
   else
-    Result:= cRectEmpty;
+    Result.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible, FMicromapWidth);
+
+  Result.Right:= Result.Left+FMinimapWidth;
+  Result.Top:= 0;
+  Result.Bottom:= ClientHeight;
 end;
 
 function TATSynEdit.GetRectMinimapSel: TRect;
@@ -1518,41 +1521,35 @@ end;
 
 function TATSynEdit.GetRectMicromap: TRect;
 begin
-  if FMicromapVisible then
-  begin
-    Result.Left:= ClientWidth-FMicromapWidth;
-    Result.Top:= 0;
-    Result.Right:= ClientWidth;
-    Result.Bottom:= ClientHeight;
-  end
-  else
-    Result:= cRectEmpty;
+  if not FMicromapVisible then exit(cRectEmpty);
+
+  Result.Left:= ClientWidth-FMicromapWidth;
+  Result.Top:= 0;
+  Result.Right:= ClientWidth;
+  Result.Bottom:= ClientHeight;
 end;
 
 function TATSynEdit.GetRectGutter: TRect;
 begin
-  if FOptGutterVisible then
-  begin
-    Result.Left:= 0;
-    Result.Top:= IfThen(FOptRulerVisible, FOptRulerSize);
-    Result.Right:= FGutter.Width;
-    Result.Bottom:= ClientHeight;
-  end
-  else
-    Result:= cRectEmpty;
+  if not FOptGutterVisible then exit(cRectEmpty);
+
+  Result.Left:= IfThen(FMinimapVisible and FMinimapAtLeft, FMinimapWidth);
+  Result.Top:= IfThen(FOptRulerVisible, FOptRulerSize);
+  Result.Right:= Result.Left + FGutter.Width;
+  Result.Bottom:= ClientHeight;
+
+  Gutter.GutterLeft:= Result.Left;
+  Gutter.Update;
 end;
 
 function TATSynEdit.GetRectRuler: TRect;
 begin
-  if FOptRulerVisible then
-  begin
-    Result.Left:= 0;
-    Result.Right:= FRectMain.Right;
-    Result.Top:= 0;
-    Result.Bottom:= Result.Top+FOptRulerSize;
-  end
-  else
-    Result:= cRectEmpty;
+  if not FOptRulerVisible then exit(cRectEmpty);
+
+  Result.Left:= FRectGutter.Left;
+  Result.Right:= FRectMain.Right;
+  Result.Top:= 0;
+  Result.Bottom:= Result.Top+FOptRulerSize;
 end;
 
 procedure TATSynEdit.DoPaintTo(C: TCanvas; ALineFrom: integer);
@@ -1816,6 +1813,7 @@ begin
       else
         CanvasTextOutMinimap(C,
           StrOut,
+          ARect,
           CurrPointText,
           FCharSizeMinimap,
           FTabSize,
@@ -2318,6 +2316,7 @@ begin
   FMinimapVisible:= cInitMinimapVisible;
   FMinimapShowSelBorder:= false;
   FMinimapShowSelAlways:= true;
+  FMinimapAtLeft:= false;
   FMicromapWidth:= cInitMicromapWidth;
   FMicromapVisible:= cInitMicromapVisible;
 

@@ -12,7 +12,7 @@ object fmMain: TfmMain
   OnResize = FormResize
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
   object PanelMain: TPanel
     Left = 0
     Height = 498
@@ -325,7 +325,7 @@ object fmMain: TfmMain
       TabOrder = 5
     end
     object Memo1: TMemo
-      Left = 14
+      Left = 8
       Height = 151
       Top = 336
       Width = 162
@@ -341,6 +341,15 @@ object fmMain: TfmMain
       Caption = 'marker'
       OnClick = btnMarkerClick
       TabOrder = 14
+    end
+    object chkMinimapLeft: TCheckBox
+      Left = 96
+      Height = 24
+      Top = 48
+      Width = 36
+      Caption = 'lt'
+      OnChange = chkMinimapLeftChange
+      TabOrder = 15
     end
   end
   object OpenDialog1: TOpenDialog

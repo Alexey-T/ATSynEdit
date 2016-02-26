@@ -100,6 +100,7 @@ procedure CanvasTextOut(C: TCanvas;
 
 procedure CanvasTextOutMinimap(C: TCanvas;
   const AStr: atString;
+  const ARect: TRect;
   APos: TPoint;
   ACharSize: TPoint;
   ATabSize: integer;
@@ -907,8 +908,9 @@ begin
 end;
 
 
-procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString; APos: TPoint;
-  ACharSize: TPoint; ATabSize: integer; AParts: PATLineParts);
+procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString;
+  const ARect: TRect; APos: TPoint; ACharSize: TPoint; ATabSize: integer;
+  AParts: PATLineParts);
 const
   cLowChars = '.,:;_''-+`~=^*';
 var
@@ -944,8 +946,11 @@ begin
       Y2:= APos.Y+ACharSize.Y;
       Y1:= Y2-nCharSize;
 
-      C.Pen.Color:= Part^.ColorFont;
-      C.Line(X1, Y1, X1, Y2);
+      if (X1>=ARect.Left) and (X1<ARect.Right) then
+      begin
+        C.Pen.Color:= Part^.ColorFont;
+        C.Line(X1, Y1, X1, Y2);
+      end;
     end;
   end;
 end;
