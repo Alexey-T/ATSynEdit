@@ -80,6 +80,7 @@ type
   TATCommandResults = set of TATCommandResult;
 
   TATPasteCaret = (
+    cPasteCaretNoChange,
     cPasteCaretLeftBottom,
     cPasteCaretRightBottom,
     cPasteCaretRightTop,

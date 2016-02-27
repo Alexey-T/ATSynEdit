@@ -616,18 +616,21 @@ begin
 
     if not AKeepCaret then
       case FOptCaretPosAfterPasteColumn of
+        cPasteCaretNoChange:
+          begin
+          end;
         cPasteCaretLeftBottom:
           begin
-            Caret.PosY:= Caret.PosY + Block.Count-1;
+            Inc(Caret.PosY, Block.Count-1);
           end;
         cPasteCaretRightBottom:
           begin
-            Caret.PosX:= Caret.PosX + Length(Block.Lines[0]);
-            Caret.PosY:= Caret.PosY + Block.Count-1;
+            Inc(Caret.PosX, Length(Block.Lines[0]));
+            Inc(Caret.PosY, Block.Count-1);
           end;
         cPasteCaretRightTop:
           begin
-            Caret.PosX:= Caret.PosX + Length(Block.Lines[0]);
+            Inc(Caret.PosX, Length(Block.Lines[0]));
           end;
         cPasteCaretColumnLeft:
           begin
@@ -635,7 +638,7 @@ begin
           end;
         cPasteCaretColumnRight:
           begin
-            Caret.PosX:= Caret.PosX + Length(Block.Lines[0]);
+            Inc(Caret.PosX, Length(Block.Lines[0]));
             DoCaretsColumnToPoint(Caret.PosX, Caret.PosY + Block.Count-1);
           end;
       end;
