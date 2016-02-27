@@ -18,6 +18,8 @@ uses
 
 var
   cAdapterTimerInterval: integer = 200;
+  //repaint editor after NNN msec after parsing started
+  cAdapterInitialPauseToRepaint: integer = 500;
 
 type
   { TATRangeColored }
@@ -45,7 +47,10 @@ type
     ListColors: TList;
     Timer: TTimer;
     FDynEnabled: boolean;
-    FBusy: boolean;
+    FBusyTreeUpdate: boolean;
+    FBusyTimer: boolean;
+    FParsePausePassed: boolean;
+    FParseStartTick: Int64;
     FOnLexerChange: TNotifyEvent;
     FOnParseBegin: TNotifyEvent;
     FOnParseDone: TNotifyEvent;
@@ -82,13 +87,16 @@ type
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
     property DynamicHiliteEnabled: boolean read FDynEnabled write FDynEnabled;
+    procedure Stop;
+
     //tokens
     procedure GetTokenWithIndex(AIndex: integer; out APntFrom, APntTo: TPoint; out
       ATokenString, ATokenStyle: string);
     procedure GetTokenAtPos(Pnt: TPoint; out APntFrom, APntTo: TPoint; out
       ATokenString, ATokenStyle: string);
+
     //support for syntax-tree
-    property TreeBusy: boolean read FBusy;
+    property TreeBusy: boolean read FBusyTreeUpdate;
     procedure TreeFill(ATree: TTreeView);
     procedure TreeShowItemForCaret(Tree: TTreeView; P: TPoint);
     function TreeGetPositionOfRange(R: TecTextRange): TPoint;
@@ -430,13 +438,18 @@ destructor TATAdapterEControl.Destroy;
 var
   i: integer;
 begin
+  Stop;
+
   for i:= ListColors.Count-1 downto 0 do
     TObject(ListColors[i]).Free;
   FreeAndNil(ListColors);
 
   FreeAndNil(Buffer);
   if Assigned(AnClient) then
+  begin
+    AnClient.Clear;
     FreeAndNil(AnClient);
+  end;
   FreeAndNil(EdList);
 
   inherited;
@@ -459,6 +472,13 @@ begin
   Result:= nil;
   if AnClient<>nil then
     Result:= AnClient.AnalyzerAtPos(Buffer.CaretToStr(Pnt));
+end;
+
+procedure TATAdapterEControl.Stop;
+begin
+  Timer.Enabled:= false;
+  while FBusyTreeUpdate do Sleep(50);
+  while FBusyTimer do Sleep(50);
 end;
 
 
@@ -562,7 +582,7 @@ var
   NodeData: pointer;
   i: integer;
 begin
-  FBusy:= true;
+  FBusyTreeUpdate:= true;
   //ATree.Items.BeginUpdate;
   try
     ATree.Items.Clear;
@@ -613,7 +633,7 @@ begin
   finally
     //ATree.Items.EndUpdate;
     ATree.Invalidate;
-    FBusy:= false;
+    FBusyTreeUpdate:= false;
   end;
 end;
 
@@ -737,6 +757,9 @@ begin
   if Assigned(FOnParseBegin) then
     FOnParseBegin(Self);
 
+  FParsePausePassed:= false;
+  FParseStartTick:= GetTickCount64;
+
   NLine:= Min(AEdit.LineBottom+1, Buffer.Count-1);
   NPos:= Buffer.CaretToStr(Point(0, NLine));
 
@@ -744,6 +767,7 @@ begin
   AnClient.IdleAppend;
   if AnClient.IsFinished then
   begin
+    FParsePausePassed:= true;
     UpdateEds;
     if Assigned(FOnParseDone) then
       FOnParseDone(Self);
@@ -957,13 +981,29 @@ end;
 procedure TATAdapterEControl.TimerTimer(Sender: TObject);
 begin
   if not Assigned(AnClient) then Exit;
-  if AnClient.IsFinished then
-  begin
-    Timer.Enabled:= false;
-    UpdateRanges;
-    UpdateEds;
-    if Assigned(FOnParseDone) then
-      FOnParseDone(Self);
+
+  FBusyTimer:= true;
+  try
+    if AnClient.IsFinished then
+    begin
+      FParsePausePassed:= true;
+      Timer.Enabled:= false;
+      UpdateRanges;
+      UpdateEds;
+      if Assigned(FOnParseDone) then
+        FOnParseDone(Self);
+    end
+    else
+    begin
+      if not FParsePausePassed then
+        if GetTickCount64-FParseStartTick>=cAdapterInitialPauseToRepaint then
+        begin
+          FParsePausePassed:= true;
+          UpdateEds;
+        end;
+    end;
+  finally
+    FBusyTimer:= false;
   end;
 end;
 
