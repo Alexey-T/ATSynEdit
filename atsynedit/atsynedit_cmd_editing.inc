@@ -613,8 +613,32 @@ begin
     if Block.Count=0 then Exit;
 
     Strings.TextInsertColumnBlock(Caret.PosX, Caret.PosY, Block, FOverwrite);
+
     if not AKeepCaret then
-      Inc(Caret.PosY, Block.Count-1);
+      case FOptCaretPosAfterPasteColumn of
+        cPasteCaretLeftBottom:
+          begin
+            Caret.PosY:= Caret.PosY + Block.Count-1;
+          end;
+        cPasteCaretRightBottom:
+          begin
+            Caret.PosX:= Caret.PosX + Length(Block.Lines[0]);
+            Caret.PosY:= Caret.PosY + Block.Count-1;
+          end;
+        cPasteCaretRightTop:
+          begin
+            Caret.PosX:= Caret.PosX + Length(Block.Lines[0]);
+          end;
+        cPasteCaretColumnLeft:
+          begin
+            DoCaretsColumnToPoint(Caret.PosX, Caret.PosY + Block.Count-1);
+          end;
+        cPasteCaretColumnRight:
+          begin
+            Caret.PosX:= Caret.PosX + Length(Block.Lines[0]);
+            DoCaretsColumnToPoint(Caret.PosX, Caret.PosY + Block.Count-1);
+          end;
+      end;
   finally
     FreeAndNil(Block);
   end;

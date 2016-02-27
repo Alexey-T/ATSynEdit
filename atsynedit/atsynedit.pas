@@ -79,6 +79,14 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
+  TATPasteCaret = (
+    cPasteCaretLeftBottom,
+    cPasteCaretRightBottom,
+    cPasteCaretRightTop,
+    cPasteCaretColumnLeft,
+    cPasteCaretColumnRight
+    );
+
   TATFoldStyle = ( //affects folding of blocks without "text hint" passed from adapter
     cFoldHereWithDots, //show "..." from fold-pos
     cFoldHereWithTruncatedText, //show truncated line instead of "..."
@@ -392,6 +400,7 @@ type
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
     FOptCaretPreferLeftSide: boolean;
+    FOptCaretPosAfterPasteColumn: TATPasteCaret;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
     FOptTextOffsetTop: integer;
@@ -668,8 +677,7 @@ type
     function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
-    function DoCommand_SelectColumn(ADir: TATSelectColumnDirection
-      ): TATCommandResults;
+    function DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATCommandResults;
     function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
@@ -956,6 +964,7 @@ type
     property OptCaretBlinkEnabled: boolean read FCaretBlinkEnabled write SetCaretBlinkEnabled;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide;
+    property OptCaretPosAfterPasteColumn: TATPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize;
@@ -2380,6 +2389,7 @@ begin
   FOptSavingTrimSpaces:= false;
   FOptShowScrollHint:= false;
   FOptCaretPreferLeftSide:= true;
+  FOptCaretPosAfterPasteColumn:= cPasteCaretColumnRight;
   FOptMarkersSize:= 4;
   FOptMouseDownForPopup:= false;
   FOptMouseEnableNormalSelection:= true;
