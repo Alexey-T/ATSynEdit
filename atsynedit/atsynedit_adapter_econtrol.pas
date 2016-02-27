@@ -438,18 +438,16 @@ destructor TATAdapterEControl.Destroy;
 var
   i: integer;
 begin
-  Stop;
+  if Assigned(AnClient) then
+  begin
+    FreeAndNil(AnClient);
+  end;
 
   for i:= ListColors.Count-1 downto 0 do
     TObject(ListColors[i]).Free;
   FreeAndNil(ListColors);
 
   FreeAndNil(Buffer);
-  if Assigned(AnClient) then
-  begin
-    AnClient.Clear;
-    FreeAndNil(AnClient);
-  end;
   FreeAndNil(EdList);
 
   inherited;
@@ -477,8 +475,11 @@ end;
 procedure TATAdapterEControl.Stop;
 begin
   Timer.Enabled:= false;
-  while FBusyTreeUpdate do Sleep(50);
-  while FBusyTimer do Sleep(50);
+  while FBusyTreeUpdate do begin Sleep(50); end;
+  while FBusyTimer do begin Sleep(50); end;
+
+  if Assigned(AnClient) then
+    AnClient.Stop;
 end;
 
 
