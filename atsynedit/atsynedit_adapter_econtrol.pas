@@ -18,8 +18,7 @@ uses
 
 var
   cAdapterTimerInterval: integer = 200;
-  //repaint editor after NNN msec after parsing started
-  cAdapterInitialPauseToRepaint: integer = 500;
+  cAdapterTimerTicksToInitialUpdate: integer = 2;
 
 type
   { TATRangeColored }
@@ -50,7 +49,7 @@ type
     FBusyTreeUpdate: boolean;
     FBusyTimer: boolean;
     FParsePausePassed: boolean;
-    FParseStartTick: Int64;
+    FParseTicks: integer;
     FOnLexerChange: TNotifyEvent;
     FOnParseBegin: TNotifyEvent;
     FOnParseDone: TNotifyEvent;
@@ -759,7 +758,7 @@ begin
     FOnParseBegin(Self);
 
   FParsePausePassed:= false;
-  FParseStartTick:= GetTickCount64;
+  FParseTicks:= 0;
 
   NLine:= Min(AEdit.LineBottom+1, Buffer.Count-1);
   NPos:= Buffer.CaretToStr(Point(0, NLine));
@@ -982,6 +981,7 @@ end;
 procedure TATAdapterEControl.TimerTimer(Sender: TObject);
 begin
   if not Assigned(AnClient) then Exit;
+  Inc(FParseTicks);
 
   FBusyTimer:= true;
   try
@@ -997,7 +997,7 @@ begin
     else
     begin
       if not FParsePausePassed then
-        if GetTickCount64-FParseStartTick>=cAdapterInitialPauseToRepaint then
+        if FParseTicks>=cAdapterTimerTicksToInitialUpdate then
         begin
           FParsePausePassed:= true;
           UpdateEds;
