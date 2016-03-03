@@ -777,10 +777,11 @@ var
   procedure AddPart(const P: TATLinePart);
   begin
     if P.Len>0 then
-    begin
-      Move(P, ResultParts[ResultPartIndex], SizeOf(P));
-      Inc(ResultPartIndex);
-    end;
+      if ResultPartIndex<High(ResultParts) then
+      begin
+        Move(P, ResultParts[ResultPartIndex], SizeOf(P));
+        Inc(ResultPartIndex);
+      end;
   end;
   //
 var
