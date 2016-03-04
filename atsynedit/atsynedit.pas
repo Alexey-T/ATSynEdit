@@ -526,6 +526,7 @@ type
     procedure DoPaintStaples(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintTextHintTo(C: TCanvas);
+    procedure DoPartShow(const P: TATLineParts);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,

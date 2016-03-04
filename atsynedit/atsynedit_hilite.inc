@@ -152,6 +152,7 @@ begin
     if bSelPrev and not bSel then
     begin
       DoPartInsert(AParts, Part, true);
+      //DoPartShow(AParts); /////////////debug
     end;
     bSelPrev:= bSel;
   end;

@@ -127,7 +127,7 @@ procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; AS
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
 
 procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
-procedure DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean);
+function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
 
 
@@ -768,8 +768,20 @@ begin
 end;
 
 
-procedure DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart;
-  AKeepFontStyles: boolean);
+function DoPartsGetTotalLen(const AParts: TATLineParts): integer;
+var
+  N: integer;
+begin
+  N:= 0;
+  while (N<=High(AParts)) and (AParts[N].Len>0) do Inc(N);
+  if N=0 then
+    Result:= 0
+  else
+    Result:= AParts[N-1].Offset+AParts[N-1].Len;
+end;
+
+function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart;
+  AKeepFontStyles: boolean): boolean;
 var
   ResultParts: TATLineParts;
   ResultPartIndex: integer;
@@ -791,6 +803,21 @@ var
   newLen1, newLen2, newOffset2: integer;
   i: integer;
 begin
+  Result:= false;
+
+  (*
+  //speedup: for KeepStyles=off
+  //if inserting big part of total AParts len,
+  //then make one big part
+  if APart.Offset=0 then
+    if APart.Len>=DoPartsGetTotalLen(AParts) then
+    begin
+      FillChar(AParts, SizeOf(AParts), 0);
+      Move(APart, AParts[0], SizeOf(APart));
+      exit(true);
+    end;
+    *)
+
   //if editor scrolled to right, passed parts have Offset<0,
   //shrink such parts
   if (APart.Offset<0) and (APart.Offset+APart.Len>0) then
@@ -810,8 +837,22 @@ begin
 
   PartSelBegin.ColorFont:= APart.ColorFont;
   PartSelBegin.ColorBG:= APart.ColorBG;
+
   PartSelBegin.Offset:= AParts[nIndex1].Offset+nOffset1;
   PartSelBegin.Len:= AParts[nIndex1].Len-nOffset1;
+  {
+  if nIndex1>0 then
+  begin
+    PartSelBegin.Offset:= AParts[nIndex1].Offset+nOffset1;
+    PartSelBegin.Len:= AParts[nIndex1].Len-nOffset1;
+  end
+  else //test- does it help?
+  begin
+    PartSelBegin.Offset:= 0;
+    PartSelBegin.Len:= APart.Len;
+  end;
+  }
+
   PartSelBegin.FontBold:= AParts[nIndex1].FontBold;
   PartSelBegin.FontItalic:= AParts[nIndex1].FontItalic;
   PartSelBegin.FontStrikeOut:= AParts[nIndex1].FontStrikeOut;
@@ -892,6 +933,7 @@ begin
 
   //copy result
   Move(ResultParts, AParts, SizeOf(AParts));
+  Result:= true;
 end;
 
 
@@ -955,6 +997,7 @@ begin
     end;
   end;
 end;
+
 
 //------------------
 initialization
