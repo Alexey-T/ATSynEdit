@@ -230,9 +230,6 @@ const
   cHintScrollDx = 5;
   cHintBookmarkDx = 6;
   cHintBookmarkDy = 16;
-  cStrMenuItemFoldAll: string = 'Fold all';
-  cStrMenuItemUnfoldAll: string = 'Unfold all';
-  cStrMenuItemFoldLevel: string = 'Fold level';
   cUrlMarkerTag = -100;
   cUrlRegexInitial = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+';
 
@@ -747,6 +744,17 @@ type
   protected
     procedure DoSendShowHideToInterface; override;
   public
+    MenuitemTextCut: TMenuItem;
+    MenuitemTextCopy: TMenuItem;
+    MenuitemTextPaste: TMenuItem;
+    MenuitemTextDelete: TMenuItem;
+    MenuitemTextSelAll: TMenuItem;
+    MenuitemTextUndo: TMenuItem;
+    MenuitemTextRedo: TMenuItem;
+    MenuitemFoldAll: TMenuItem;
+    MenuitemUnfoldAll: TMenuItem;
+    MenuitemFoldLevel: TMenuItem;
+
     //overrides
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -3888,7 +3896,7 @@ end;
 
 procedure TATSynEdit.DoInitPopupMenu;
   //
-  procedure Add(const SName: string; Cmd: integer);
+  function Add(const SName: string; Cmd: integer): TMenuItem;
   var
     MI: TMenuItem;
   begin
@@ -3896,21 +3904,22 @@ procedure TATSynEdit.DoInitPopupMenu;
     MI.Caption:= SName;
     MI.Tag:= Cmd;
     MI.OnClick:= @MenuClick;
+    Result:= MI;
     FMenuStd.Items.Add(MI);
   end;
   //
 begin
   FMenuStd.OnPopup:= @MenuPopup;
 
-  Add('Undo', cCommand_Undo);
-  Add('Redo', cCommand_Redo);
+  MenuitemTextUndo:= Add('Undo', cCommand_Undo);
+  MenuitemTextRedo:= Add('Redo', cCommand_Redo);
   Add('-', 0);
-  Add('Cut', cCommand_ClipboardCut);
-  Add('Copy', cCommand_ClipboardCopy);
-  Add('Paste', cCommand_ClipboardPaste);
-  Add('Delete', cCommand_TextDeleteSelection);
+  MenuitemTextCut:= Add('Cut', cCommand_ClipboardCut);
+  MenuitemTextCopy:= Add('Copy', cCommand_ClipboardCopy);
+  MenuitemTextPaste:= Add('Paste', cCommand_ClipboardPaste);
+  MenuitemTextDelete:= Add('Delete', cCommand_TextDeleteSelection);
   Add('-', 0);
-  Add('Select all', cCommand_SelectAll);
+  MenuitemTextSelAll:= Add('Select all', cCommand_SelectAll);
 end;
 
 //drop selection of 1st caret into mouse-pos
