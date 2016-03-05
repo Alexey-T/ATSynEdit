@@ -805,19 +805,6 @@ var
 begin
   Result:= false;
 
-  (*
-  //speedup: for KeepStyles=off
-  //if inserting big part of total AParts len,
-  //then make one big part
-  if APart.Offset=0 then
-    if APart.Len>=DoPartsGetTotalLen(AParts) then
-    begin
-      FillChar(AParts, SizeOf(AParts), 0);
-      Move(APart, AParts[0], SizeOf(APart));
-      exit(true);
-    end;
-    *)
-
   //if editor scrolled to right, passed parts have Offset<0,
   //shrink such parts
   if (APart.Offset<0) and (APart.Offset+APart.Len>0) then
