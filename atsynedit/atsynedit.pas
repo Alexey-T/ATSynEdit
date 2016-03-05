@@ -232,6 +232,9 @@ const
   cHintBookmarkDy = 16;
   cUrlMarkerTag = -100;
   cUrlRegexInitial = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+';
+  cStrMenuitemFoldAll: string = 'Fold all';
+  cStrMenuitemUnfoldAll: string = 'Unfold all';
+  cStrMenuitemFoldLevel: string = 'Fold level';
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -751,9 +754,6 @@ type
     MenuitemTextSelAll: TMenuItem;
     MenuitemTextUndo: TMenuItem;
     MenuitemTextRedo: TMenuItem;
-    MenuitemFoldAll: TMenuItem;
-    MenuitemUnfoldAll: TMenuItem;
-    MenuitemFoldLevel: TMenuItem;
 
     //overrides
     constructor Create(AOwner: TComponent); override;

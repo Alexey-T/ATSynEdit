@@ -250,25 +250,22 @@ begin
 
   //items "fold all", "unfold all"
   mi:= TMenuItem.Create(Self);
-  mi.Caption:= 'Fold all';
+  mi.Caption:= cStrMenuitemFoldAll;
   mi.OnClick:= @MenuFoldFoldAllClick;
   mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
-  MenuitemFoldAll:= mi;
 
   mi:= TMenuItem.Create(Self);
-  mi.Caption:= 'Unfold all';
+  mi.Caption:= cStrMenuitemUnfoldAll;
   mi.OnClick:= @MenuFoldUnfoldAllClick;
   mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
-  MenuitemUnfoldAll:= mi;
 
   //submenu "fold level"
   miSub:= TMenuItem.Create(Self);
-  miSub.Caption:= 'Fold level';
+  miSub.Caption:= cStrMenuitemFoldLevel;
   miSub.Enabled:= Fold.Count>0;
   Menu.Items.Add(miSub);
-  MenuitemFoldLevel:= miSub;
 
   for i:= 2 to 9 do
   begin
