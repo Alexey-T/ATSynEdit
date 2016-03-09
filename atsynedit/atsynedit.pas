@@ -3247,6 +3247,7 @@ begin
 
   //start scroll timer
   FTimerScroll.Enabled:=
+    (not ModeOneLine) and
     (ssLeft in Shift) and
     (not PtInRect(ClientRect, P) or FCursorOnGutter);
   FMouseAutoScroll:= cDirNone;

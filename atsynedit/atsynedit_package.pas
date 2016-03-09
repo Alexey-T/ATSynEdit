@@ -4,12 +4,13 @@
 
 unit atsynedit_package;
 
+{$warn 5023 off : no warning about unused units}
 interface
 
 uses
   ATSynEdit_Register, ATStringProc, ATStringProc_TextBuffer, 
   atstringproc_utf8detect, ATStringProc_WordJump, ATStrings, ATStrings_Undo, 
-  ATSynEdit, ATSynEdit_Adapters, ATSynEdit_CanvasProc, atsynedit_carets, 
+  ATSynEdit, ATSynEdit_Adapters, ATSynEdit_CanvasProc, ATSynEdit_Carets, 
   ATSynEdit_Commands, ATSynEdit_Edits, ATSynEdit_Gutter, ATSynEdit_Keymap, 
   ATSynEdit_Keymap_Init, ATSynEdit_Ranges, ATSynEdit_WrapInfo, 
   LazarusPackageIntf;
