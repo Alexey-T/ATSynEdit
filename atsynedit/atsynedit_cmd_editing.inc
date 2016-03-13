@@ -436,10 +436,14 @@ var
   Caret: TATCaretItem;
   Str: atString;
   Shift, PosAfter: TPoint;
+  bNeedGroup: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+
+  bNeedGroup:= Carets.Count>1;
+  if bNeedGroup then Strings.BeginUndoGroup;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
@@ -496,6 +500,8 @@ begin
       Caret.PosY:= PosAfter.Y;
     end;
   end;
+
+  if bNeedGroup then Strings.EndUndoGroup;
 
   if ANext then
     Result:= [cResultText, cResultCaretBottom]
