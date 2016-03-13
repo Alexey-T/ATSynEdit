@@ -532,7 +532,7 @@ type
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
-      ALineIndex, ACharIndex: integer);
+      ALineIndex, ACharIndex: integer; AColorBG: TColor);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
     function GetFoldedMarkText(ALine: integer): string;
@@ -4586,7 +4586,7 @@ begin
 
         AtrObj:= TATLinePartClass.Create;
         AtrObj.Data.ColorFont:= Colors.Links;
-        AtrObj.Data.ColorBG:= Colors.TextBG;
+        AtrObj.Data.ColorBG:= clNone;
         AtrObj.Data.ColorBorder:= Colors.Links;
         AtrObj.Data.BorderDown:= cLineStyleSolid;
         Attribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, AtrObj);

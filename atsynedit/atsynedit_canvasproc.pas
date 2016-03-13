@@ -894,7 +894,8 @@ begin
     for i:= nIndex1+1 to nIndex2-1 do
     begin
       AParts[i].ColorFont:= APart.ColorFont;
-      AParts[i].ColorBG:= APart.ColorBG;
+      if APart.ColorBG<>clNone then
+        AParts[i].ColorBG:= APart.ColorBG;
       AddPart(AParts[i]);
     end;
 

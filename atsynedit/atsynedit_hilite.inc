@@ -51,7 +51,7 @@ begin
 
   //first add Attribs,
   //selection must be over attribs
-  DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
+  DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
@@ -206,7 +206,7 @@ end;
 
 
 procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
-  AOffsetMax, ALineIndex, ACharIndex: integer);
+  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
 var
   i: integer;
   Attr: TATMarkerItem;
@@ -225,13 +225,15 @@ begin
         begin
           AParts[0].Offset:= 0;
           AParts[0].Len:= AOffsetMax;
-          AParts[0].ColorBG:= Colors.TextBG;
+          AParts[0].ColorBG:= AColorBG;
           AParts[0].ColorFont:= Colors.TextFont;
         end;
 
         Part:= PartObj.Data;
         Part.Len:= Attr.SelLen;
         Part.Offset:= Attr.PosX-ACharIndex;
+        if Part.ColorBG=clNone then
+          Part.ColorBG:= AColorBG;
         DoPartInsert(AParts, Part, false);
       end;
   end;
