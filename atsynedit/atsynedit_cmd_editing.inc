@@ -572,8 +572,10 @@ begin
   end;
 
   //correct selection
-  Caret.PosX:= Max(0, Caret.PosX+NShift1);
-  Caret.EndX:= Max(0, Caret.EndX+NShift2);
+  if Caret.PosX>0 then
+    Caret.PosX:= Max(0, Caret.PosX+NShift1);
+  if Caret.EndX>0 then
+    Caret.EndX:= Max(0, Caret.EndX+NShift2);
 
   Result:= [cResultText, cResultCaretAny];
 end;
