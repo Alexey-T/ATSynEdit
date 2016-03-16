@@ -16,7 +16,7 @@
     <Description Value="ATSynEdit"/>
     <License Value="MPL 2.0"/>
     <Version Major="1"/>
-    <Files Count="19">
+    <Files Count="28">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -60,7 +60,7 @@
       </Item10>
       <Item11>
         <Filename Value="atsynedit_carets.pas"/>
-        <UnitName Value="atsynedit_carets"/>
+        <UnitName Value="ATSynEdit_Carets"/>
       </Item11>
       <Item12>
         <Filename Value="atsynedit_commands.pas"/>
@@ -94,6 +94,40 @@
         <Filename Value="atsynedit_wrapinfo.pas"/>
         <UnitName Value="ATSynEdit_WrapInfo"/>
       </Item19>
+      <Item20>
+        <AddToUsesPkgSection Value="False"/>
+      </Item20>
+      <Item21>
+        <Filename Value="atsynedit_finder.pas"/>
+        <UnitName Value="ATSynEdit_Finder"/>
+      </Item21>
+      <Item22>
+        <AddToUsesPkgSection Value="False"/>
+      </Item22>
+      <Item23>
+        <Filename Value="atstringproc_htmlcolor.pas"/>
+        <UnitName Value="ATStringProc_HtmlColor"/>
+      </Item23>
+      <Item24>
+        <Filename Value="atstrings_hints.pas"/>
+        <UnitName Value="atstrings_hints"/>
+      </Item24>
+      <Item25>
+        <Filename Value="atsynedit_colors.pas"/>
+        <UnitName Value="ATSynEdit_Colors"/>
+      </Item25>
+      <Item26>
+        <Filename Value="atsynedit_export_html.pas"/>
+        <UnitName Value="ATSynEdit_Export_HTML"/>
+      </Item26>
+      <Item27>
+        <Filename Value="atsynedit_markers.pas"/>
+        <UnitName Value="ATSynEdit_Markers"/>
+      </Item27>
+      <Item28>
+        <Filename Value="regexpr.pas"/>
+        <UnitName Value="RegExpr"/>
+      </Item28>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

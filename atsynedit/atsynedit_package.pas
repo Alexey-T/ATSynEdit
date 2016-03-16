@@ -13,7 +13,8 @@ uses
   ATSynEdit, ATSynEdit_Adapters, ATSynEdit_CanvasProc, ATSynEdit_Carets, 
   ATSynEdit_Commands, ATSynEdit_Edits, ATSynEdit_Gutter, ATSynEdit_Keymap, 
   ATSynEdit_Keymap_Init, ATSynEdit_Ranges, ATSynEdit_WrapInfo, 
-  LazarusPackageIntf;
+  ATSynEdit_Finder, ATStringProc_HtmlColor, atstrings_hints, ATSynEdit_Colors, 
+  ATSynEdit_Export_HTML, ATSynEdit_Markers, RegExpr, LazarusPackageIntf;
 
 implementation
 
