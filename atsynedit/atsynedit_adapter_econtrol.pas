@@ -411,10 +411,16 @@ end;
 procedure TATAdapterEControl.DoClearRanges;
 var
   j: integer;
+  Ed: TATSynEdit;
 begin
   ListColors.Clear;
+
   for j:= 0 to EdList.Count-1 do
-    TATSynEdit(EdList[j]).Fold.Clear;
+  begin
+    Ed:= TATSynEdit(EdList[j]);
+    Ed.Fold.Clear;
+    Ed.Strings.ClearSeparators;
+  end;
 end;
 
 constructor TATAdapterEControl.Create(AOwner: TComponent);

@@ -156,6 +156,7 @@ type
     destructor Destroy; override;
     procedure Clear;
     procedure ClearHints;
+    procedure ClearSeparators;
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
@@ -1157,6 +1158,14 @@ procedure TATStrings.DoEventLog(ALine, ALen: integer);
 begin
   if Assigned(FOnLog) then
     FOnLog(Self, ALine, ALen);
+end;
+
+procedure TATStrings.ClearSeparators;
+var
+  i: integer;
+begin
+  for i:= 0 to Count-1 do
+    TATStringItem(FList[i]).ItemSeparator:= cLineSepNone;
 end;
 
 {$I atstrings_editing.inc}
