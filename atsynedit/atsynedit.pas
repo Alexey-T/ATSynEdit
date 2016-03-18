@@ -3225,16 +3225,26 @@ begin
     FCursorOnGutter:= bOnGutter;
   end;
 
-  //numbers
-  RectNums.Left:= FGutter[FGutterBandNum].Left;
-  RectNums.Right:= FGutter[FGutterBandNum].Right;
-  RectNums.Top:= FRectMain.Top;
-  RectNums.Bottom:= FRectMain.Bottom;
-  //bookmarks
-  RectBookmk.Left:= FGutter[FGutterBandBm].Left;
-  RectBookmk.Right:= FGutter[FGutterBandBm].Right;
-  RectBookmk.Top:= FRectMain.Top;
-  RectBookmk.Bottom:= FRectMain.Bottom;
+  RectNums:= Rect(0, 0, 0, 0);
+  RectBookmk:= Rect(0, 0, 0, 0);
+  if FOptGutterVisible then
+  begin
+    if FGutter[FGutterBandNum].Visible then
+    begin
+      RectNums.Left:= FGutter[FGutterBandNum].Left;
+      RectNums.Right:= FGutter[FGutterBandNum].Right;
+      RectNums.Top:= FRectMain.Top;
+      RectNums.Bottom:= FRectMain.Bottom;
+    end;
+
+    if FGutter[FGutterBandBm].Visible then
+    begin
+      RectBookmk.Left:= FGutter[FGutterBandBm].Left;
+      RectBookmk.Right:= FGutter[FGutterBandBm].Right;
+      RectBookmk.Top:= FRectMain.Top;
+      RectBookmk.Bottom:= FRectMain.Bottom;
+    end;
+  end;
 
   //show/hide bookmark hint
   if PtInRect(RectBookmk, P) then
