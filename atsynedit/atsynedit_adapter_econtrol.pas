@@ -831,10 +831,12 @@ begin
     for i:= 0 to AnClient.LineBreaks.Count-1 do
     begin
       Break:= TecLineBreak(AnClient.LineBreaks[i]);
-      if Break.Rule.LinePos=lbTop then
-        Sep:= cLineSepTop
-      else
-        Sep:= cLineSepBottom;
+
+      Sep:= cLineSepTop; //parser considered top/bottom already
+      //if Break.Rule.LinePos=lbTop then
+      //  Sep:= cLineSepTop
+      //else
+      //  Sep:= cLineSepBottom;
 
       if Ed.Strings.IsIndexValid(Break.Line) then
         Ed.Strings.LinesSeparator[Break.Line]:= Sep;
