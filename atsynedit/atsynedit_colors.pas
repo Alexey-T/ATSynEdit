@@ -52,6 +52,7 @@ type
     FLinks,
     FLockedBG,
     FMarkedLinesBG,
+    FBorderLine,
     FComboboxArrow,
     FComboboxArrowBG: TColor;
   published
@@ -97,6 +98,7 @@ type
     property LockedBG: TColor read FLockedBG write FLockedBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
     property MarkedLinesBG: TColor read FMarkedLinesBG write FMarkedLinesBG;
+    property BorderLine: TColor read FBorderLine write FBorderLine;
     property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
     property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
   end;
@@ -150,6 +152,7 @@ begin
   C.Links:= clBlue;
   C.LockedBG:= $e0e0e0;
   C.MarkedLinesBG:= $f0e0b0;
+  C.BorderLine:= clMedGray;
   C.ComboboxArrow:= clGray;
   C.ComboboxArrowBG:= $f0f0f0;
 end;

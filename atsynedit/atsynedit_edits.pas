@@ -70,12 +70,15 @@ begin
 
   WantTabs:= false;
   ModeOneLine:= true;
-  BorderStyle:= bsSingle;
 
   Keymap:= KeymapCombo;
 
+  BorderStyle:= bsNone;
+  OptBorderVisible:= true;
   OptShowURLs:= false;
-  OptTextOffsetTop:= 2;
+  OptTextOffsetLeft:= 2;
+  OptTextOffsetTop:= 3;
+
   Height:= 26;
 end;
 

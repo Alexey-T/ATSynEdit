@@ -404,6 +404,7 @@ type
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
+    FOptTextOffsetLeft: integer;
     FOptTextOffsetTop: integer;
     FOptTextOffsetFromLine: integer;
     FOptSavingForceFinalEol: boolean;
@@ -411,6 +412,7 @@ type
     FOptUndoGrouped: boolean;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
+    FOptBorderVisible: boolean;
     FOptRulerVisible: boolean;
     FOptRulerSize: integer;
     FOptRulerFontSize: integer;
@@ -945,6 +947,7 @@ type
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter;
+    property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft;
     property OptTextOffsetTop: integer read FOptTextOffsetTop write FOptTextOffsetTop;
     property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent;
@@ -981,6 +984,7 @@ type
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways;
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll;
+    property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize;
@@ -1617,6 +1621,12 @@ begin
     DoPaintMinimapTo(C);
   if FMicromapVisible then
     DoPaintMicromapTo(C);
+
+  if FOptBorderVisible then
+  begin
+    C.Pen.Color:= Colors.BorderLine;
+    C.Frame(0, 0, ClientWidth, ClientHeight);
+  end;
 end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
@@ -2350,6 +2360,7 @@ begin
   FOptShowStapleWidthPercent:= 100;
 
   FOptMaxLinesToCountUnindent:= 100;
+  FOptTextOffsetLeft:= 0;
   FOptTextOffsetTop:= 0;
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
   FOptAllowScrollbarVert:= true;
@@ -2659,7 +2670,7 @@ end;
 
 function TATSynEdit.GetTextOffset: TPoint;
 begin
-  Result.X:= 0;
+  Result.X:= FOptTextOffsetLeft;
   if FOptGutterVisible then
     Inc(Result.X, FGutter.Width);
 
