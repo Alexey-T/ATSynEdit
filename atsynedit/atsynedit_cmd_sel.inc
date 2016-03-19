@@ -72,7 +72,11 @@ begin
             Dec(FSelRectEnd.Y);
             FSelRectEnd.Y:= GetNextUnfoldedLineNumber(FSelRectEnd.Y, false);
           end;
-        Result:= [cResultKeepColumnSel, cResultCaretTop];
+
+        if FSelRectEnd.Y>=FSelRectBegin.Y then
+          Result:= [cResultKeepColumnSel, cResultCaretBottom]
+        else
+          Result:= [cResultKeepColumnSel, cResultCaretTop];
       end;
     cDirColumnDown,
     cDirColumnPageDown:
@@ -83,7 +87,11 @@ begin
             Inc(FSelRectEnd.Y);
             FSelRectEnd.Y:= GetNextUnfoldedLineNumber(FSelRectEnd.Y, true);
           end;
-        Result:= [cResultKeepColumnSel, cResultCaretBottom];
+
+        if FSelRectEnd.Y>=FSelRectBegin.Y then
+          Result:= [cResultKeepColumnSel, cResultCaretBottom]
+        else
+          Result:= [cResultKeepColumnSel, cResultCaretTop];
       end;
   end;
 
