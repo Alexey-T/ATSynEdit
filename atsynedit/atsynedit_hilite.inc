@@ -226,7 +226,7 @@ begin
           AParts[0].Offset:= 0;
           AParts[0].Len:= AOffsetMax;
           AParts[0].ColorBG:= AColorBG;
-          AParts[0].ColorFont:= Colors.TextFont;
+          AParts[0].ColorFont:= GetColorTextFont;
         end;
 
         Part:= PartObj.Data;
