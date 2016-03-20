@@ -377,6 +377,9 @@ begin
     Inc(NCharsSkipped);
 
     Scale:= 1.0;
+    if IsCharAsciiControl(S[i]) then
+      Scale:= 1.0
+    else
     if IsCharHex(S[i]) then
       Scale:= cCharScaleHex
     else
