@@ -1728,7 +1728,10 @@ begin
     WrapItem:= FWrapInfo.Items[NWrapIndex];
     NLinesIndex:= WrapItem.NLineIndex;
     if not Strings.IsIndexValid(NLinesIndex) then Break;
-    FLineBottom:= NLinesIndex;
+
+    //don't update FLineBottom if minimap paints
+    if AMainText then
+      FLineBottom:= NLinesIndex;
 
     if IsFoldLineNeededBeforeWrapitem(NWrapIndex) then
     begin
