@@ -2829,6 +2829,7 @@ var
   P: TPoint;
   R: TRect;
 begin
+  if not Strings.IsIndexValid(ALine) then exit;
   S:= Strings.LinesHint[ALine];
   if S='' then
     begin DoHintHide; exit end;
