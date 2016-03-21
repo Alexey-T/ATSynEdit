@@ -1935,11 +1935,15 @@ begin
       if FGutter[FGutterBandNum].Visible then
       begin
         if LineWithCaret and FOptShowGutterCaretBG then
+        begin
           DoPaintGutterBandBG(C, FGutterBandNum, FColors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y);
+          C.Font.Color:= FColors.GutterCaretFont;
+        end
+        else
+          C.Font.Color:= FColors.GutterFont;
 
         if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
-          C.Font.Color:= FColors.GutterFont;
           if FOptNumbersFontSize<>0 then
             C.Font.Size:= FOptNumbersFontSize;
 

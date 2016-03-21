@@ -20,6 +20,7 @@ type
     FMarkers,
     FGutterFont,
     FGutterBG,
+    FGutterCaretFont,
     FGutterCaretBG,
     FGutterPlusBorder,
     FGutterPlusBG,
@@ -66,6 +67,7 @@ type
     property Markers: TColor read FMarkers write FMarkers;
     property GutterFont: TColor read FGutterFont write FGutterFont;
     property GutterBG: TColor read FGutterBG write FGutterBG;
+    property GutterCaretFont: TColor read FGutterCaretFont write FGutterCaretFont;
     property GutterCaretBG: TColor read FGutterCaretBG write FGutterCaretBG;
     property GutterPlusBorder: TColor read FGutterPlusBorder write FGutterPlusBorder;
     property GutterPlusBG: TColor read FGutterPlusBG write FGutterPlusBG;
@@ -120,6 +122,7 @@ begin
   C.Markers:= $0000c0;
   C.GutterFont:= clGray;
   C.GutterBG:= $e0e0e0;
+  C.GutterCaretFont:= clGray;
   C.GutterCaretBG:= $c8c8c8;
   C.GutterPlusBorder:= clGray;
   C.GutterPlusBG:= $f4f4f4;
