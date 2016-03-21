@@ -114,6 +114,9 @@ procedure SReplaceAll(var s: string; const SFrom, STo: string);
 procedure SReplaceAllPercentChars(var S: string);
 procedure SDeleteFrom(var s: string; const SFrom: string);
 
+var
+  OptUnprintedReplaceSpec: boolean = false;
+
 
 implementation
 
@@ -159,7 +162,7 @@ end;
 
 function IsCharAsciiControl(ch: atChar): boolean;
 begin
-  Result:= (ch<>#9) and (AnsiChar(ch)<' ');
+  Result:= (ch<>#9) and (Ord(ch)<$20);
 end;
 
 function IsCharHex(ch: atChar): boolean;
@@ -377,7 +380,7 @@ begin
     Inc(NCharsSkipped);
 
     Scale:= 1.0;
-    if IsCharAsciiControl(S[i]) then
+    if OptUnprintedReplaceSpec and IsCharAsciiControl(S[i]) then
       Scale:= 1.0
     else
     if IsCharHex(S[i]) then
@@ -602,9 +605,10 @@ var
   i: integer;
 begin
   Result:= S;
-  for i:= 1 to Length(Result) do
-    if IsCharAsciiControl(Result[i]) then
-      Result[i]:= '.';
+  if OptUnprintedReplaceSpec then
+    for i:= 1 to Length(Result) do
+      if IsCharAsciiControl(Result[i]) then
+        Result[i]:= '.';
 end;
 
 function SRemoveHexChars(const S: atString): atString;

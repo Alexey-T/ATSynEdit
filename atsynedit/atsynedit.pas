@@ -356,8 +356,7 @@ type
     FUnprintedVisible,
     FUnprintedSpaces,
     FUnprintedEnds,
-    FUnprintedEndsDetails,
-    FUnprintedReplaceSpec: boolean;
+    FUnprintedEndsDetails: boolean;
     FPrevVisibleColumns: integer;
     FCharSize: TPoint;
     FCharSizeMinimap: TPoint;
@@ -1017,7 +1016,6 @@ type
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
-    property OptUnprintedReplaceSpec: boolean read FUnprintedReplaceSpec write FUnprintedReplaceSpec;
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection;
     property OptMouseDownForPopup: boolean read FOptMouseDownForPopup write FOptMouseDownForPopup;
@@ -1818,8 +1816,7 @@ begin
       else
         Event:= nil;
 
-      if FUnprintedReplaceSpec then
-        StrOut:= SRemoveAsciiControlChars(StrOut);
+      StrOut:= SRemoveAsciiControlChars(StrOut);
 
       if AMainText then
         CanvasTextOut(C,
@@ -2298,7 +2295,6 @@ begin
   FUnprintedSpaces:= true;
   FUnprintedEnds:= true;
   FUnprintedEndsDetails:= true;
-  FUnprintedReplaceSpec:= true;
 
   FTextLocked:= 'wait...';
   FTextHint:= '';
