@@ -29,19 +29,10 @@ begin
     case AEncoding of
       cEncAnsi:
         begin
-          //if codepage set, convert UnicodeString->utf8->Ansistring
-          //else just UnicodeString->Ansistring
           if FEncodingCodepage='' then
-            SA:= SW
+            SA:= SConvertUnicodeToAnsi(SW)
           else
-          begin
-            SA:= UTF8Encode(SW);
-            {$ifdef laz15}
-            SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
-            {$else}
-            SA:= ConvertEncoding(SA, '', FEncodingCodepage);
-            {$endif}
-          end;
+            SA:= ConvertEncodingFromUTF8(UTF8Encode(SW), FEncodingCodepage, bEncoded);
 
           Stream.WriteBuffer(SA[1], Length(SA));
         end;

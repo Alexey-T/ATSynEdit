@@ -1,5 +1,49 @@
 {$ifdef nn}begin end;{$endif}
 
+function SConvertAnsiToUnicode(const SA: string): UnicodeString;
+begin
+  {$ifdef windows}
+  case Windows.GetACP of
+    1250: Result:= UTF8Decode(CP1250ToUTF8(SA));
+    1251: Result:= UTF8Decode(CP1251ToUTF8(SA));
+    1252: Result:= UTF8Decode(CP1252ToUTF8(SA));
+    1253: Result:= UTF8Decode(CP1253ToUTF8(SA));
+    1254: Result:= UTF8Decode(CP1254ToUTF8(SA));
+    1255: Result:= UTF8Decode(CP1255ToUTF8(SA));
+    1256: Result:= UTF8Decode(CP1256ToUTF8(SA));
+    1257: Result:= UTF8Decode(CP1257ToUTF8(SA));
+    1258: Result:= UTF8Decode(CP1258ToUTF8(SA));
+    437: Result:= UTF8Decode(CP437ToUTF8(SA));
+    else Result:= UTF8Decode(CP1250ToUTF8(SA));
+  end;
+  {$else}
+  Result:= UTF8Decode(CP1250ToUTF8(SA));
+  {$endif}
+end;
+
+function SConvertUnicodeToAnsi(const SW: UnicodeString): string;
+begin
+  {$ifdef windows}
+  case Windows.GetACP of
+    1250: Result:= UTF8ToCP1250(UTF8Encode(SW));
+    1251: Result:= UTF8ToCP1251(UTF8Encode(SW));
+    1252: Result:= UTF8ToCP1252(UTF8Encode(SW));
+    1253: Result:= UTF8ToCP1253(UTF8Encode(SW));
+    1254: Result:= UTF8ToCP1254(UTF8Encode(SW));
+    1255: Result:= UTF8ToCP1255(UTF8Encode(SW));
+    1256: Result:= UTF8ToCP1256(UTF8Encode(SW));
+    1257: Result:= UTF8ToCP1257(UTF8Encode(SW));
+    1258: Result:= UTF8ToCP1258(UTF8Encode(SW));
+    437: Result:= UTF8ToCP437(UTF8Encode(SW));
+    else Result:= UTF8ToCP1250(UTF8Encode(SW));
+  end;
+  {$else}
+  Result:= UTF8ToCP1250(UTF8Encode(SW));
+  {$endif}
+end;
+
+
+
 function IsStreamWithSignature(Stream: TStream; const Sign: AnsiString): boolean;
 var
   Buf: AnsiString;
@@ -215,19 +259,10 @@ begin
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
 
-              //if codepage set, convert string->utf8->UnicodeString
-              //else just string->UnicodeString
               if FEncodingCodepage='' then
-                SW:= SA
+                SW:= SConvertAnsiToUnicode(SA)
               else
-              begin
-                {$ifdef laz15}
-                SA:= ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded);
-                {$else}
-                SA:= ConvertEncoding(SA, FEncodingCodepage, '');
-                {$endif}
-                SW:= UTF8Decode(SA);
-              end;
+                SW:= UTF8Decode(ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded));
 
               LineAddRaw(SW, LineEnd);
             end;
