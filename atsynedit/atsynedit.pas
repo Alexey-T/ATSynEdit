@@ -3114,6 +3114,7 @@ procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Int
 begin
   inherited;
 
+  if PtInRect(ClientRect, Point(X, Y)) then
   if FMouseDragDropping then
   begin
     Strings.BeginUndoGroup;
