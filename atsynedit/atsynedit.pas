@@ -4679,6 +4679,10 @@ begin
     DoCommand(cCommand_TextInsert, SText);
     if OptMouseDragDropFocusesTargetEditor then
       SetFocus;
+
+    //Ctrl not pressed: delete block from src
+    if not (GetKeyState(VK_CONTROL)<0) then
+      (Source as TATSynedit).DoCommand(cCommand_TextDeleteSelection);
   end;
 end;
 
