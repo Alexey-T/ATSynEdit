@@ -747,6 +747,9 @@ type
     procedure OnCanvasFontChanged(Sender:TObject);
   protected
     procedure DoSendShowHideToInterface; override;
+    procedure DragOver(Source: TObject; X, Y: Integer; State: TDragState;
+      var Accept: Boolean); override;
+    procedure DragDrop(Source: TObject; X, Y: Integer); override;
   public
     MenuitemTextCut: TMenuItem;
     MenuitemTextCopy: TMenuItem;
@@ -875,6 +878,8 @@ type
     property Anchors;
     property BorderSpacing;
     property BorderStyle;
+    property DragMode;
+    property DragKind;
     property Enabled;
     property Font;
     property ParentFont;
@@ -893,6 +898,8 @@ type
     property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
     property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
     //events std
+    property OnDragOver;
+    property OnDragDrop;
     property OnEnter;
     property OnExit;
     property OnKeyDown;
@@ -4635,6 +4642,38 @@ begin
 
   Result:= Strings.Lines[AY];
   Result:= Copy(Result, Atr.PosX+1, Atr.SelLen);
+end;
+
+
+procedure TATSynEdit.DragOver(Source: TObject; X, Y: Integer;
+  State: TDragState; var Accept: Boolean);
+begin
+  Accept:=
+    (not ModeReadOnly) and
+    (not ModeOneLine) and
+    (Source<>Self) and
+    (Source is TATSynEdit) and
+    ((Source as TATSynEdit).TextSelected<>'');
+end;
+
+procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
+var
+  SText: atString;
+  Pnt: TPoint;
+  bEnd: boolean;
+begin
+  if not (Source is TATSynEdit) then exit;
+  if (Source=Self) then exit;
+  SText:= (Source as TATSynedit).TextSelected;
+  if SText='' then exit;
+
+  Pnt:= ClientPosToCaretPos(Point(X, Y), bEnd);
+  if Strings.IsIndexValid(Pnt.Y) then
+  begin
+    DoCaretSingle(Pnt.X, Pnt.Y);
+    DoCommand(cCommand_TextInsert, SText);
+    SetFocus;
+  end;
 end;
 
 
