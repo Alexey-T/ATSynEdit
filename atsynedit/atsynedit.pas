@@ -1061,6 +1061,10 @@ type
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces;
   end;
 
+var
+  //better to have as global bar (for many editors)
+  OptMouseDragDropFocusesTargetEditor: boolean = true;
+
 
 implementation
 
@@ -4673,7 +4677,8 @@ begin
   begin
     DoCaretSingle(Pnt.X, Pnt.Y);
     DoCommand(cCommand_TextInsert, SText);
-    SetFocus;
+    if OptMouseDragDropFocusesTargetEditor then
+      SetFocus;
   end;
 end;
 
