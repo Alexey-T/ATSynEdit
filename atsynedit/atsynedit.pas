@@ -4656,7 +4656,6 @@ begin
   Accept:=
     (not ModeReadOnly) and
     (not ModeOneLine) and
-    (Source<>Self) and
     (Source is TATSynEdit) and
     ((Source as TATSynEdit).TextSelected<>'');
 end;
