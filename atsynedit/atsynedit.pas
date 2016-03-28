@@ -4654,6 +4654,7 @@ procedure TATSynEdit.DragOver(Source: TObject; X, Y: Integer;
   State: TDragState; var Accept: Boolean);
 begin
   Accept:=
+    FOptMouseDragDrop and
     (not ModeReadOnly) and
     (not ModeOneLine) and
     (Source is TATSynEdit) and
