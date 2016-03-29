@@ -6,7 +6,10 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ButtonPanel, Spin, ComCtrls, ATSynEdit, ATSynEdit_CanvasProc;
+  ButtonPanel, Spin, ComCtrls,
+  ATStringProc,
+  ATSynEdit,
+  ATSynEdit_CanvasProc;
 
 type
   { TfmOpt }
@@ -217,7 +220,7 @@ begin
     chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
     chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
     chkUnprintArrowDown.Checked:= OptUnprintedEndArrowOrDot;
-    chkUnprintAsciiRep.Checked:= ed.OptUnprintedReplaceSpec;
+    chkUnprintAsciiRep.Checked:= OptUnprintedReplaceSpec;
     edTabArrowSize.Value:= OptUnprintedTabCharLength;
     edTabArrowPnt.Value:= OptUnprintedTabPointerScale;
 
@@ -335,7 +338,7 @@ begin
       ed.OptUnprintedSpaces:= chkUnprintSpace.Checked;
       ed.OptUnprintedEnds:= chkUnprintEnd.Checked;
       ed.OptUnprintedEndsDetails:= chkUnprintEndDet.Checked;
-      ed.OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
+      OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
       OptUnprintedTabCharLength:= edTabArrowSize.Value;
       OptUnprintedTabPointerScale:= edTabArrowPnt.Value;
       OptUnprintedEndArrowOrDot:= chkUnprintArrowDown.Checked;
