@@ -6,6 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
+  StrUtils,
   ATSynEdit,
   ATSynEdit_Carets,
   RegExpr,
@@ -35,6 +36,33 @@ implementation
 uses
   ATStringProc,
   ATSynEdit_form_complete;
+
+function IsTagNeedsClosingTag(const s: string): boolean;
+const
+  cList: array[0..14] of string = (
+  'area',
+  'base',
+  'basefont',
+  'br',
+  'embed',
+  'frame',
+  'hr',
+  'img',
+  'input',
+  'keygen',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track'
+  );
+var
+  i: integer;
+begin
+  Result:= true;
+  for i:= Low(cList) to High(cList) do
+    if cList[i]=s then exit(false);
+end;
 
 type
   { TAcp }
@@ -168,7 +196,7 @@ begin
           s_item:= List.Names[i];
 
           if mode=acpModeTagsClose then
-            s_item:= s_item+#1'>'#1'</'+s_item+'>'
+            s_item:= s_item+ #1'>'+ IfThen(IsTagNeedsClosingTag(s_item), #1'</'+s_item+'>')
           else
             s_item:= s_item+' ';
 
