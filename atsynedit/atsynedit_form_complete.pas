@@ -84,7 +84,6 @@ var
   cCompleteHintChar: char = #9;
   cCompleteListSort: boolean = false;
   cCompleteKeyUpDownWrap: boolean = true;
-  cCompleteInsertAlsoBracket: boolean = true;
   cCompleteFontName: string = 'default';
   cCompleteFontSize: integer = 10;
   cCompleteItemHeight: integer = 17;
@@ -312,9 +311,8 @@ begin
     SDesc:= GetItemText(SList[List.ItemIndex], cCompleteIndexOfDesc);
     Result:= SText;
 
-    if cCompleteInsertAlsoBracket then
-      if SBeginsWith(SDesc, '(') then
-        Result:= Result+'(';
+    if SBeginsWith(SDesc, '(') then
+      Result:= Result+#1'(';
   end;
 end;
 
