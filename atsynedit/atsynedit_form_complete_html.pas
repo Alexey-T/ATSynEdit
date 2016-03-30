@@ -20,7 +20,6 @@ type
   TCompleteHtmlMode = (
     acpModeNone,
     acpModeTags,
-    acpModeTagsClose,
     acpModeAttrs,
     acpModeVals
     );
@@ -140,11 +139,11 @@ begin
 
   STag:= SFindRegex(S, cRegexTagClose, cGroupTagClose);
   if STag<>'' then
-    begin AMode:= acpModeTagsClose; exit end;
+    begin AMode:= acpModeTags; exit end;
 
   STag:= SFindRegex(S, cRegexTagOnly, cGroupTagOnly);
   if STag<>'' then
-    begin AMode:= {acpModeTags}acpModeTagsClose; exit end;
+    begin AMode:= acpModeTags; exit end;
 
   STag:= SFindRegex(S, cRegexTagPart, cGroupTagPart);
   if STag<>'' then
@@ -156,7 +155,7 @@ begin
       AMode:= acpModeAttrs;
   end
   else
-    AMode:= {acpModeTags}acpModeTagsClose;
+    AMode:= acpModeTags;
 end;
 
 function EditorHasCssAtCaret(Ed: TATSynEdit): boolean;
@@ -188,17 +187,18 @@ begin
   EditorGetCurrentWord(Ed, cWordChars, s_word, ACharsLeft, ACharsRight);
 
   case mode of
-    acpModeTags,
-    acpModeTagsClose:
+    acpModeTags:
       begin
         for i:= 0 to List.Count-1 do
         begin
           s_item:= List.Names[i];
 
-          if mode=acpModeTagsClose then
-            s_item:= s_item+ #1'>'+ IfThen(IsTagNeedsClosingTag(s_item), #1'</'+s_item+'>')
-          else
-            s_item:= s_item+' ';
+          //special handle of some tags: a, img, link...
+          if s_item='a' then s_item:= 'a'#1' href="'#1'"></a>' else
+          if s_item='img' then s_item:= 'img'#1' src="'#1'">' else
+          if s_item='link' then s_item:= 'link'#1' rel="stylesheet" type="text/css" href="'#1'">' else
+          //usual handle of all tags
+          s_item:= s_item+ #1'>'+ IfThen(IsTagNeedsClosingTag(s_item), #1'</'+s_item+'>');
 
           //filter items
           if s_word<>'' then
