@@ -17,14 +17,14 @@ uses
 
 type
   TATCompletionPropEvent = procedure (Sender: TObject;
-    out AText, ASuffix: string; out ACharsLeft, ACharsRight: integer) of object;
+    out AText: string; out ACharsLeft, ACharsRight: integer) of object;
 
 //AText is #13-separated strings, each string is '|'-separated items.
 //Usually item_0 is prefix to show,
-//item_1 is actual text (result of function),
-//item_2..etc are only to show.
+//        item_1 is actual text (inserted on Enter),
+//        item_2..etc are only to show.
 //e.g. 'func|Func1|(param1, param2)'+#13+'var|Var1'+#13+'var|Var2'
-//AChars: how many chars to replace before caret.
+//Item for text can have suffixes after #1: text+#1+suffix_before_caret+#1+suffix_after_caret
 
 procedure DoEditorCompletionListbox(AEd: TATSynEdit;
   AOnGetProp: TATCompletionPropEvent);
@@ -54,11 +54,10 @@ type
     FEdit: TATSynEdit;
     FCharsLeft,
     FCharsRight: integer;
-    FSuffix: string;
     FHintWnd: THintWindow;
     procedure DoHintHide;
     procedure DoHintShow(const AHint: string);
-    procedure DoReplaceTo(const Str: string);
+    procedure DoReplaceTo(AStr: string);
     procedure DoResult;
     procedure DoUpdate;
     function GetItemText(S: string; AIndex: integer): string;
@@ -117,12 +116,17 @@ begin
   FormComplete.DoUpdate;
 end;
 
-procedure TFormATSynEditComplete.DoReplaceTo(const Str: string);
+procedure TFormATSynEditComplete.DoReplaceTo(AStr: string);
 var
   Caret: TATCaretItem;
   Pos, Shift, PosAfter: TPoint;
+  StrText, Str1, Str2: atString;
 begin
-  if Str<>'' then
+  if AStr='' then exit;
+  StrText:= Utf8Decode(SGetItem(AStr, #1));
+  Str1:= Utf8Decode(SGetItem(AStr, #1));
+  Str2:= Utf8Decode(SGetItem(AStr, #1));
+
   begin
     Caret:= Editor.Carets[0];
     Pos.X:= Caret.PosX;
@@ -131,9 +135,9 @@ begin
     FCharsLeft:= Min(Pos.X, FCharsLeft);
     Dec(Pos.X, FCharsLeft);
     Editor.Strings.TextDeleteRight(Pos.X, Pos.Y, FCharsLeft+FCharsRight, Shift, PosAfter, false);
-    Editor.Strings.TextInsert(Pos.X, Pos.Y, Utf8Decode(Str), false, Shift, PosAfter);
+    Editor.Strings.TextInsert(Pos.X, Pos.Y, StrText+Str1+Str2, false, Shift, PosAfter);
 
-    Caret.PosX:= Pos.X+Length(Utf8Decode(Str));
+    Caret.PosX:= Pos.X+Length(StrText)+Length(Str1);
     Caret.EndX:= -1;
     Caret.EndY:= -1;
 
@@ -308,9 +312,6 @@ begin
     SDesc:= GetItemText(SList[List.ItemIndex], cCompleteIndexOfDesc);
     Result:= SText;
 
-    if FSuffix<>'' then
-      Result:= Result+FSuffix
-    else
     if cCompleteInsertAlsoBracket then
       if SBeginsWith(SDesc, '(') then
         Result:= Result+'(';
@@ -341,6 +342,9 @@ begin
   for i:= 0 to cCompleteItemCount-1 do
   begin
     SItem:= SGetItem(Str, cCompleteSepChar);
+    if i=cCompleteIndexOfText then
+      SItem:= SGetItem(SItem, #1);
+
     C.Font.Style:= cCompleteFontStyles[i];
     C.Font.Color:= cCompleteColorFont[i];
     C.TextOut(ARect.Left+NSize, ARect.Top, SItem);
@@ -360,7 +364,7 @@ var
   P: TPoint;
 begin
   if Assigned(FOnGetProp) then
-    FOnGetProp(Editor, AText, FSuffix, FCharsLeft, FCharsRight);
+    FOnGetProp(Editor, AText, FCharsLeft, FCharsRight);
 
   if (AText='') then
     begin Close; exit end;

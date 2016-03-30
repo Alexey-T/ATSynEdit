@@ -30,7 +30,7 @@ type
     FWordChars: string;
     procedure DoLoadAcpFile(const fn: string; IsPascal: boolean);
     procedure DoOnGetCompleteProp(Sender: TObject;
-      out AText, ASuffix: string;
+      out AText: string;
       out ACharsLeft, ACharsRight: integer);
   public
     Ed: TATSynEdit;
@@ -161,8 +161,8 @@ begin
 end;
 
 
-procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
-  out ACharsLeft, ACharsRight: integer);
+procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText: string; out
+  ACharsLeft, ACharsRight: integer);
 var
   s_word_w: atString;
   s_type, s_text, s_desc, s_word: string;
@@ -170,7 +170,6 @@ var
   ok: boolean;
 begin
   AText:= '';
-  ASuffix:= '';
   ACharsLeft:= 0;
   ACharsRight:= 0;
   EditorGetCurrentWord(Ed, FWordChars, s_word_w, ACharsLeft, ACharsRight);

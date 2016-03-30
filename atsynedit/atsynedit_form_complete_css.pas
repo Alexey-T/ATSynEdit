@@ -28,7 +28,7 @@ type
   TAcp = class
   private
     List: TStringlist;
-    procedure DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
+    procedure DoOnGetCompleteProp(Sender: TObject; out AText: string;
       out ACharsLeft, ACharsRight: integer);
   public
     Ed: TATSynEdit;
@@ -81,8 +81,8 @@ begin
 end;
 
 
-procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
-  out ACharsLeft, ACharsRight: integer);
+procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText: string; out
+  ACharsLeft, ACharsRight: integer);
 const
   cWordChars = '-#!@.'; //don't include ':'
 var
@@ -92,7 +92,6 @@ var
   ok: boolean;
 begin
   AText:= '';
-  ASuffix:= '';
   ACharsLeft:= 0;
   ACharsRight:= 0;
 
@@ -105,13 +104,12 @@ begin
     repeat
       s_val:= SGetItem(s_item);
       if s_val='' then Break;
-      AText:= AText+'css '+s_tag+'|'+s_val+#13;
+      AText:= AText+'css '+s_tag+'|'+s_val+#1' '#13;
     until false;
   end
   else
   //show list of all tags
   begin
-    ASuffix:= ': ';
     EditorGetCurrentWord(Ed, cWordChars, s_word, ACharsLeft, ACharsRight);
 
     for n:= 0 to List.Count-1 do
@@ -125,7 +123,7 @@ begin
         if not ok then Continue;
       end;
 
-      AText:= AText+'css'+'|'+s_item+#13;
+      AText:= AText+'css'+'|'+s_item+#1': '#13;
     end;
   end;
 end;

@@ -42,7 +42,7 @@ type
   TAcp = class
   private
     List: TStringlist;
-    procedure DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
+    procedure DoOnGetCompleteProp(Sender: TObject; out AText: string;
       out ACharsLeft, ACharsRight: integer);
   public
     Ed: TATSynEdit;
@@ -116,7 +116,7 @@ begin
 
   STag:= SFindRegex(S, cRegexTagOnly, cGroupTagOnly);
   if STag<>'' then
-    begin AMode:= acpModeTags; exit end;
+    begin AMode:= {acpModeTags}acpModeTagsClose; exit end;
 
   STag:= SFindRegex(S, cRegexTagPart, cGroupTagPart);
   if STag<>'' then
@@ -128,7 +128,7 @@ begin
       AMode:= acpModeAttrs;
   end
   else
-    AMode:= acpModeTags;
+    AMode:= {acpModeTags}acpModeTagsClose;
 end;
 
 function EditorHasCssAtCaret(Ed: TATSynEdit): boolean;
@@ -141,8 +141,8 @@ begin
 end;
 
 
-procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText, ASuffix: string;
-  out ACharsLeft, ACharsRight: integer);
+procedure TAcp.DoOnGetCompleteProp(Sender: TObject; out AText: string; out
+  ACharsLeft, ACharsRight: integer);
 const
   cWordChars = '-';
 var
@@ -153,7 +153,6 @@ var
   ok: boolean;
 begin
   AText:= '';
-  ASuffix:= '';
   ACharsLeft:= 0;
   ACharsRight:= 0;
 
@@ -164,14 +163,14 @@ begin
     acpModeTags,
     acpModeTagsClose:
       begin
-        if mode=acpModeTagsClose then
-          ASuffix:= '>'
-        else
-          ASuffix:= ' ';
-
         for i:= 0 to List.Count-1 do
         begin
           s_item:= List.Names[i];
+
+          if mode=acpModeTagsClose then
+            s_item:= s_item+#1'>'#1'</'+s_item+'>'
+          else
+            s_item:= s_item+' ';
 
           //filter items
           if s_word<>'' then
@@ -185,7 +184,6 @@ begin
 
     acpModeAttrs:
       begin
-        ASuffix:='=';
         s_item:= List.Values[s_tag];
         if s_item='' then exit;
         repeat
@@ -199,13 +197,12 @@ begin
             ok:= SBeginsWith(UpperCase(s_subitem), UpperCase(s_word));
             if not ok then Continue;
           end;
-          AText:= AText+s_tag+' attrib|'+s_subitem+#13;
+          AText:= AText+s_tag+' attrib|'+s_subitem+#1'='#13;
         until false;
       end;
 
     acpModeVals:
       begin
-        ASuffix:=' ';
         s_item:= List.Values[s_tag];
         if s_item='' then exit;
         repeat
@@ -215,7 +212,7 @@ begin
           repeat
             s_value:= SGetItem(s_subitem, '?');
             if s_value='' then Break;
-            AText:= AText+s_attr+' value|"'+s_value+'"'+#13;
+            AText:= AText+s_attr+' value|"'+s_value+'"'+#1' '#13;
           until false;
         until false;
       end;
