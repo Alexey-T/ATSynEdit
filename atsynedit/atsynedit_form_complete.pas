@@ -82,6 +82,7 @@ var
   cCompleteIndexOfDesc: integer = 2;
   cCompleteSepChar: char = '|';
   cCompleteHintChar: char = #9;
+  cCompleteSuffixChar: char = #1;
   cCompleteListSort: boolean = false;
   cCompleteKeyUpDownWrap: boolean = true;
   cCompleteFontName: string = 'default';
@@ -122,9 +123,9 @@ var
   StrText, Str1, Str2: atString;
 begin
   if AStr='' then exit;
-  StrText:= Utf8Decode(SGetItem(AStr, #1));
-  Str1:= Utf8Decode(SGetItem(AStr, #1));
-  Str2:= Utf8Decode(SGetItem(AStr, #1));
+  StrText:= Utf8Decode(SGetItem(AStr, cCompleteSuffixChar));
+  Str1:= Utf8Decode(SGetItem(AStr, cCompleteSuffixChar));
+  Str2:= Utf8Decode(SGetItem(AStr, cCompleteSuffixChar));
 
   begin
     Caret:= Editor.Carets[0];
@@ -312,7 +313,7 @@ begin
     Result:= SText;
 
     if SBeginsWith(SDesc, '(') then
-      Result:= Result+#1'(';
+      Result:= Result+cCompleteSuffixChar+'(';
   end;
 end;
 
@@ -341,7 +342,7 @@ begin
   begin
     SItem:= SGetItem(Str, cCompleteSepChar);
     if i=cCompleteIndexOfText then
-      SItem:= SGetItem(SItem, #1);
+      SItem:= SGetItem(SItem, cCompleteSuffixChar);
 
     C.Font.Style:= cCompleteFontStyles[i];
     C.Font.Color:= cCompleteColorFont[i];
