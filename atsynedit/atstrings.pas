@@ -98,6 +98,7 @@ type
     FEncodingCodepage: string;
     FEncodingDetectBufSizeKb: integer;
     FModified: boolean;
+    FModifiedVersion: Int64;
     FSaveSignUtf8: boolean;
     FSaveSignWide: boolean;
     FReadOnly: boolean;
@@ -180,6 +181,7 @@ type
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
     property Modified: boolean read FModified write SetModified;
+    property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
     property Progress: integer read FProgress write FProgress;
     procedure ActionDeleteFakeLine;
@@ -496,6 +498,7 @@ begin
   FEndings:= cEndWin;
 
   FModified:= false;
+  FModifiedVersion:= 0;
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
   FUndoAfterSave:= true;
@@ -774,7 +777,9 @@ end;
 procedure TATStrings.SetModified(AValue: boolean);
 begin
   FModified:= AValue;
-  if not FModified then
+  if FModified then
+    Inc(FModifiedVersion)
+  else
     FUndoList.AddUnmodifiedMark;
 end;
 
@@ -980,6 +985,7 @@ end;
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
 begin
   FModified:= true;
+  Inc(FModifiedVersion);
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 
