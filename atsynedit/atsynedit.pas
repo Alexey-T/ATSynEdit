@@ -3029,8 +3029,9 @@ begin
 
       if FOptMouseDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
       begin
+        //DragMode must be dmManual, drag started by code
         FMouseDragDropping:= true;
-        UpdateCursor;
+        BeginDrag(true);
       end
       else
       begin
@@ -3205,9 +3206,9 @@ begin
   RectBm.Top:= FRectMain.Top;
   RectBm.Bottom:= FRectMain.Bottom;
 
-  if FMouseDragDropping then
-    Cursor:= crDrag
-  else
+  //if FMouseDragDropping then
+  //  Cursor:= crDrag
+  //else
   //if FMouseDragMinimap then
   //  Cursor:= crSizeNS
   //else
