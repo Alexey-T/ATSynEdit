@@ -667,8 +667,6 @@ type
     //carets
     procedure DoCaretAddToPoint(AX, AY: integer);
     procedure DoCaretsColumnToPoint(AX, AY: integer);
-    procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
-      APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoCaretsDeleteOnSameLines;
 
     //editing
@@ -811,6 +809,8 @@ type
     procedure DoCaretSingle(APosX, APosY, AEndX, AEndY: integer; AUseEndXY: boolean);
     procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
     procedure DoCaretSingleAsIs;
+    procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
+      APosAfter: TPoint; AShiftBelowX: integer = 0);
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;
     property Carets: TATCarets read FCarets;
