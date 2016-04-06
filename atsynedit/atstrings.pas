@@ -62,7 +62,7 @@ type
 
   TATStringItem = packed class
   public
-    ItemString: atString;
+    ItemString: UTF8String;
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
     ItemSeparator: TATLineSeparator;
@@ -261,7 +261,7 @@ constructor TATStringItem.Create(const AString: atString; AEnd: TATLineEnds);
 var
   i: integer;
 begin
-  ItemString:= AString;
+  ItemString:= UTF8Encode(AString);
   ItemEnd:= AEnd;
   ItemState:= cLineStateNone;
   ItemSeparator:= cLineSepNone;
@@ -281,7 +281,7 @@ end;
 function TATStrings.GetLine(N: integer): atString;
 begin
   Assert(IsIndexValid(N));
-  Result:= TATStringItem(FList[N]).ItemString;
+  Result:= UTF8Decode(TATStringItem(FList[N]).ItemString);
 end;
 
 function TATStrings.GetLineBm(Index: integer): integer;
@@ -363,17 +363,19 @@ end;
 procedure TATStrings.SetLine(Index: integer; const AValue: atString);
 var
   Item: TATStringItem;
+  Str: atString;
   i: integer;
 begin
   Assert(IsIndexValid(Index));
   if FReadOnly then Exit;
 
   Item:= TATStringItem(FList[Index]);
-  DoAddUndo(cEditActionChange, Index, Item.ItemString, Item.ItemEnd);
-  DoEventLog(Index, -Length(Item.ItemString));
+  Str:= UTF8Decode(Item.ItemString);
+  DoAddUndo(cEditActionChange, Index, Str, Item.ItemEnd);
+  DoEventLog(Index, -Length(Str));
   DoEventLog(Index, Length(AValue));
 
-  Item.ItemString:= AValue;
+  Item.ItemString:= UTF8Encode(AValue);
 
   //fully unfold this line
   for i:= 0 to High(Item.ItemHidden) do
@@ -452,6 +454,7 @@ var
   Len, i: integer;
   Item: TATStringItem;
   Ptr: pointer;
+  Str: atString;
 begin
   Result:= '';
   if Count=0 then Exit;
@@ -460,7 +463,8 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= TATStringItem(FList[i]);
-    Inc(Len, Length(Item.ItemString)+LenEol);
+    Str:= UTF8Decode(Item.ItemString);
+    Inc(Len, Length(Str)+LenEol);
   end;
   if Len=0 then Exit;
 
@@ -470,10 +474,11 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= TATStringItem(FList[i]);
-    Len:= Length(Item.ItemString);
+    Str:= UTF8Decode(Item.ItemString);
+    Len:= Length(Str);
     if Len>0 then
     begin
-      Move(Item.ItemString[1], Ptr^, Len*CharSize);
+      Move(Str[1], Ptr^, Len*CharSize);
       Inc(Ptr, Len*CharSize);
     end;
     PatChar(Ptr)^:= CharEol;
@@ -711,15 +716,17 @@ end;
 procedure TATStrings.LineDelete(N: integer; AForceLast: boolean = true);
 var
   Item: TATStringItem;
+  Str: atString;
 begin
   if FReadOnly then Exit;
 
   if IsIndexValid(N) then
   begin
     Item:= TATStringItem(FList[N]);
+    Str:= UTF8Decode(Item.ItemString);
 
-    DoAddUndo(cEditActionDelete, N, Item.ItemString, Item.ItemEnd);
-    DoEventLog(N, -Length(Item.ItemString));
+    DoAddUndo(cEditActionDelete, N, Str, Item.ItemEnd);
+    DoEventLog(N, -Length(Str));
 
     Item.Free;
     FList.Delete(N);
@@ -966,7 +973,7 @@ begin
   for i:= 0 to Min(20, Count-1) do
   begin
     Item:= TATStringItem(FList[i]);
-    Result:= Result+Format('[%d] "%s" <%s>', [i, UTF8Encode(Item.ItemString), cLineEndNiceNames[Item.ItemEnd] ])+#13;
+    Result:= Result+Format('[%d] "%s" <%s>', [i, Item.ItemString, cLineEndNiceNames[Item.ItemEnd] ])+#13;
   end;
 end;
 
