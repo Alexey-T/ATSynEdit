@@ -1,6 +1,7 @@
 unit ATSynEdit_WrapInfo;
 
 {$mode objfpc}{$H+}
+{$Z1}
 
 interface
 
@@ -8,18 +9,19 @@ uses
   Classes, SysUtils;
 
 type
-  { TATSynWrapItem }
-
   TATSynWrapFinal = (cWrapItemFinal, cWrapItemCollapsed, cWrapItemMiddle);
-  TATSynWrapItem = class
+
+type
+  { TATSynWrapItem }
+  TATSynWrapItem = packed class
   public
     NLineIndex,
     NCharIndex,
     NLength: integer;
-    NIndent: integer;
+    NIndent: word;
     NFinal: TATSynWrapFinal;
     constructor Create(ALineIndex, ACharIndex, ALength: integer;
-      AIndent: integer; AFinal: TATSynWrapFinal); virtual;
+      AIndent: word; AFinal: TATSynWrapFinal); virtual;
     procedure Assign(Item: TATSynWrapItem);
   end;
 
@@ -60,7 +62,7 @@ uses
 { TATSynWrapItem }
 
 constructor TATSynWrapItem.Create(ALineIndex, ACharIndex, ALength: integer;
-  AIndent: integer; AFinal: TATSynWrapFinal);
+  AIndent: word; AFinal: TATSynWrapFinal);
 begin
   NLineIndex:= ALineIndex;
   NCharIndex:= ACharIndex;
