@@ -25,7 +25,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= TATStringItem(FList[i]);
-    SUtf8:= Item.ItemString + cLineEndStrings_UTF8[Item.ItemEnd];
+    SUtf8:= Item.ItemString + cLineEndStrings[Item.ItemEnd];
     if SUtf8<>'' then
     case AEncoding of
       cEncAnsi:
