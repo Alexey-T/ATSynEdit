@@ -4,6 +4,7 @@ License: MPL 2.0
 }
 
 {$mode objfpc}{$H+}
+{$Z1}
 
 unit ATStrings;
 
@@ -25,7 +26,6 @@ const
   //smart update used only if lines chged (not deleted/inserted)
   cMaxUpdatesCountEasy = 200;
 
-{$Z1}
 type
   TATLineState = (
     cLineStateNone,
@@ -72,6 +72,7 @@ type
       //0: line visible,
       //-1: line hidden,
       //>0: line hidden from this char-pos
+    constructor Create_UTF8(const AString: UTF8String; AEnd: TATLineEnds);
     constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
     function IsFake: boolean;
   end;
@@ -161,6 +162,7 @@ type
     function IsIndexValid(N: integer): boolean;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
+    procedure LineAddRaw_UTF8_NoUndo(const AString: UTF8String; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(N: integer; const AString: atString);
@@ -258,10 +260,15 @@ end;
 { TATStringItem }
 
 constructor TATStringItem.Create(const AString: atString; AEnd: TATLineEnds);
+begin
+  Create_UTF8(UTF8Encode(AString), AEnd);
+end;
+
+constructor TATStringItem.Create_UTF8(const AString: UTF8String; AEnd: TATLineEnds);
 var
   i: integer;
 begin
-  ItemString:= UTF8Encode(AString);
+  ItemString:= AString;
   ItemEnd:= AEnd;
   ItemState:= cLineStateNone;
   ItemSeparator:= cLineSepNone;
@@ -1165,6 +1172,16 @@ begin
   if (Flag=-1) then Exit;
   if (Flag>0) and (AX>=Flag) then Exit;
   Result:= false;
+end;
+
+procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: UTF8String;
+  AEnd: TATLineEnds);
+var
+  Item: TATStringItem;
+begin
+  Item:= TATStringItem.Create_UTF8(AString, AEnd);
+  Item.ItemState:= cLineStateAdded;
+  FList.Add(Item);
 end;
 
 procedure TATStrings.DoEventLog(ALine, ALen: integer);

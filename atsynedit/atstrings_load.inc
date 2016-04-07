@@ -1,44 +1,44 @@
 {$ifdef nn}begin end;{$endif}
 
-function SConvertAnsiToUnicode(const SA: string): UnicodeString;
+function SConvertAnsiToUtf8(const SA: string): UTF8String;
 begin
   {$ifdef windows}
   case Windows.GetACP of
-    1250: Result:= UTF8Decode(CP1250ToUTF8(SA));
-    1251: Result:= UTF8Decode(CP1251ToUTF8(SA));
-    1252: Result:= UTF8Decode(CP1252ToUTF8(SA));
-    1253: Result:= UTF8Decode(CP1253ToUTF8(SA));
-    1254: Result:= UTF8Decode(CP1254ToUTF8(SA));
-    1255: Result:= UTF8Decode(CP1255ToUTF8(SA));
-    1256: Result:= UTF8Decode(CP1256ToUTF8(SA));
-    1257: Result:= UTF8Decode(CP1257ToUTF8(SA));
-    1258: Result:= UTF8Decode(CP1258ToUTF8(SA));
-    437: Result:= UTF8Decode(CP437ToUTF8(SA));
-    else Result:= UTF8Decode(CP1250ToUTF8(SA));
+    1250: Result:= CP1250ToUTF8(SA);
+    1251: Result:= CP1251ToUTF8(SA);
+    1252: Result:= CP1252ToUTF8(SA);
+    1253: Result:= CP1253ToUTF8(SA);
+    1254: Result:= CP1254ToUTF8(SA);
+    1255: Result:= CP1255ToUTF8(SA);
+    1256: Result:= CP1256ToUTF8(SA);
+    1257: Result:= CP1257ToUTF8(SA);
+    1258: Result:= CP1258ToUTF8(SA);
+    437: Result:= CP437ToUTF8(SA);
+    else Result:= CP1250ToUTF8(SA);
   end;
   {$else}
-  Result:= UTF8Decode(CP1250ToUTF8(SA));
+  Result:= CP1250ToUTF8(SA);
   {$endif}
 end;
 
-function SConvertUnicodeToAnsi(const SW: UnicodeString): string;
+function SConvertUtf8ToAnsi(const S: UTF8String): string;
 begin
   {$ifdef windows}
   case Windows.GetACP of
-    1250: Result:= UTF8ToCP1250(UTF8Encode(SW));
-    1251: Result:= UTF8ToCP1251(UTF8Encode(SW));
-    1252: Result:= UTF8ToCP1252(UTF8Encode(SW));
-    1253: Result:= UTF8ToCP1253(UTF8Encode(SW));
-    1254: Result:= UTF8ToCP1254(UTF8Encode(SW));
-    1255: Result:= UTF8ToCP1255(UTF8Encode(SW));
-    1256: Result:= UTF8ToCP1256(UTF8Encode(SW));
-    1257: Result:= UTF8ToCP1257(UTF8Encode(SW));
-    1258: Result:= UTF8ToCP1258(UTF8Encode(SW));
-    437: Result:= UTF8ToCP437(UTF8Encode(SW));
-    else Result:= UTF8ToCP1250(UTF8Encode(SW));
+    1250: Result:= UTF8ToCP1250(S);
+    1251: Result:= UTF8ToCP1251(S);
+    1252: Result:= UTF8ToCP1252(S);
+    1253: Result:= UTF8ToCP1253(S);
+    1254: Result:= UTF8ToCP1254(S);
+    1255: Result:= UTF8ToCP1255(S);
+    1256: Result:= UTF8ToCP1256(S);
+    1257: Result:= UTF8ToCP1257(S);
+    1258: Result:= UTF8ToCP1258(S);
+    437: Result:= UTF8ToCP437(S);
+    else Result:= UTF8ToCP1250(S);
   end;
   {$else}
-  Result:= UTF8ToCP1250(UTF8Encode(SW));
+  Result:= UTF8ToCP1250(S);
   {$endif}
 end;
 
@@ -183,7 +183,8 @@ var
 var
   NStart, NEnd, Len: integer;
   SA: AnsiString;
-  SW: UnicodeString;
+  SUtf8: UTF8String;
+  SWide: UnicodeString;
   LineEnd: TATLineEnds;
   bWithBom, bEncoded: boolean;
   NPercents: integer;
@@ -249,7 +250,7 @@ begin
         Inc(NEnd, CharSize);
 
       if Len=0 then
-        LineAddRaw('', LineEnd)
+        LineAddRaw_UTF8_NoUndo('', LineEnd)
       else
       begin
         case FEncoding of
@@ -260,11 +261,11 @@ begin
               Move(Buf[NStart], SA[1], Len);
 
               if FEncodingCodepage='' then
-                SW:= SConvertAnsiToUnicode(SA)
+                SUtf8:= SConvertAnsiToUTF8(SA)
               else
-                SW:= UTF8Decode(ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded));
+                SUtf8:= ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded);
 
-              LineAddRaw(SW, LineEnd);
+              LineAddRaw_UTF8_NoUndo(SUtf8, LineEnd);
             end;
 
           cEncUTF8:
@@ -272,19 +273,18 @@ begin
               SA:= '';
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
-              SW:= UTF8Decode(SA);
-              LineAddRaw(SW, LineEnd);
+              LineAddRaw_UTF8_NoUndo(SA, LineEnd);
             end;
 
           cEncWideLE,
           cEncWideBE:
             begin
-              SW:= '';
-              SetLength(SW, Len div 2);
-              Move(Buf[NStart], SW[1], Len);
+              SWide:= '';
+              SetLength(SWide, Len div 2);
+              Move(Buf[NStart], SWide[1], Len);
               if FEncoding=cEncWideBE then
-                SW:= SSwapEndian(SW);
-              LineAddRaw(SW, LineEnd);
+                SWide:= SSwapEndian(SWide);
+              LineAddRaw_UTF8_NoUndo(UTF8Encode(SWide), LineEnd);
             end;
 
           else

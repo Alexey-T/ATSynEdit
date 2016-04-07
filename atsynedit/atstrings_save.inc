@@ -5,7 +5,8 @@ var
   i: integer;
   Item: TATStringItem;
   SA: AnsiString;
-  SW: UnicodeString;
+  SWide: UnicodeString;
+  SUtf8: UTF8String;
   Sign: AnsiString;
   bEncoded: boolean;
 begin
@@ -24,31 +25,32 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= TATStringItem(FList[i]);
-    SW:= Item.ItemString + cLineEndStrings[Item.ItemEnd];
-    if SW<>'' then
+    SUtf8:= Item.ItemString + cLineEndStrings_UTF8[Item.ItemEnd];
+    if SUtf8<>'' then
     case AEncoding of
       cEncAnsi:
         begin
           if FEncodingCodepage='' then
-            SA:= SConvertUnicodeToAnsi(SW)
+            SA:= SConvertUtf8ToAnsi(SUtf8)
           else
-            SA:= ConvertEncodingFromUTF8(UTF8Encode(SW), FEncodingCodepage, bEncoded);
+            SA:= ConvertEncodingFromUTF8(SUtf8, FEncodingCodepage, bEncoded);
 
           Stream.WriteBuffer(SA[1], Length(SA));
         end;
 
       cEncUTF8:
         begin
-          SA:= UTF8Encode(SW);
+          SA:= SUtf8;
           Stream.WriteBuffer(SA[1], Length(SA));
         end;
 
       cEncWideLE,
       cEncWideBE:
         begin
+          SWide:= UTF8Decode(SUtf8);
           if AEncoding=cEncWideBE then
-            SW:= SSwapEndian(SW);
-          Stream.WriteBuffer(SW[1], Length(SW)*2);
+            SWide:= SSwapEndian(SWide);
+          Stream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
 
       else
