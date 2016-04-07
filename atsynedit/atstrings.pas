@@ -73,7 +73,7 @@ type
       //-1: line hidden,
       //>0: line hidden from this char-pos
     constructor Create_UTF8(const AString: UTF8String; AEnd: TATLineEnds);
-    constructor Create(const AString: atString; AEnd: TATLineEnds); virtual;
+    constructor Create_Uni(const AString: atString; AEnd: TATLineEnds);
     function IsFake: boolean;
   end;
 
@@ -259,7 +259,7 @@ end;
 
 { TATStringItem }
 
-constructor TATStringItem.Create(const AString: atString; AEnd: TATLineEnds);
+constructor TATStringItem.Create_Uni(const AString: atString; AEnd: TATLineEnds);
 begin
   Create_UTF8(UTF8Encode(AString), AEnd);
 end;
@@ -270,7 +270,7 @@ var
 begin
   ItemString:= AString;
   ItemEnd:= AEnd;
-  ItemState:= cLineStateNone;
+  ItemState:= cLineStateAdded;
   ItemSeparator:= cLineSepNone;
   for i:= 0 to High(ItemHidden) do
     ItemHidden[i]:= 0;
@@ -589,8 +589,7 @@ begin
   DoAddUndo(cEditActionInsert, Count, '', cEndNone);
   DoEventLog(Count, Length(AString));
 
-  Item:= TATStringItem.Create(AString, AEnd);
-  Item.ItemState:= cLineStateAdded;
+  Item:= TATStringItem.Create_Uni(AString, AEnd);
   FList.Add(Item);
 end;
 
@@ -642,8 +641,7 @@ begin
   DoAddUndo(cEditActionInsert, N, '', cEndNone);
   DoEventLog(N, Length(AString));
 
-  Item:= TATStringItem.Create(AString, AEnd);
-  Item.ItemState:= cLineStateAdded;
+  Item:= TATStringItem.Create_Uni(AString, AEnd);
   FList.Insert(N, Item);
 end;
 
@@ -668,7 +666,6 @@ end;
 procedure TATStrings.LineInsertStrings(N: integer; AList: TATStrings; AWithFinalEol: boolean);
 var
   Cnt, CntMove: integer;
-  Item: TATStringItem;
   Str: atString;
   i: integer;
 begin
@@ -691,9 +688,9 @@ begin
       DoAddUndo(cEditActionInsert, N+i, '', cEndNone);
       DoEventLog(N+i, Length(AList.Lines[i]));
 
-      Item:= TATStringItem.Create(AList.Lines[i], Endings);
-      Item.ItemState:= cLineStateAdded;
-      FList[N+i]:= Item;
+      FList[N+i]:= TATStringItem.Create_UTF8(
+        TATStringItem(AList.FList[i]).ItemString,
+        Endings);
     end;
   end;
 
