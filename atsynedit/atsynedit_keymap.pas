@@ -7,7 +7,7 @@ unit ATSynEdit_Keymap;
 interface
 
 uses
-  Classes, SysUtils, Forms;
+  Classes, SysUtils, Forms, ATStringProc;
 
 const
   cMaxKeyCombo = 3; //3 must be enougth for everybody..
@@ -16,6 +16,7 @@ type
   TATKeyArray = array[0..Pred(cMaxKeyCombo)] of TShortcut;
 
 function KeyArrayToString(const K: TATKeyArray): string;
+procedure KeyArraySetFromString(var K: TATKeyArray; StrKeys: string);
 function KeyArraysEqualNotEmpty(const a1, a2: TATKeyArray): boolean;
 function KeyArrayLength(const K: TATKeyArray): integer;
 
@@ -271,6 +272,19 @@ begin
       result:= result+ShortcutToText(K[i]);
     end;
 end;
+
+procedure KeyArraySetFromString(var K: TATKeyArray; StrKeys: string);
+var
+  S: string;
+  i: integer;
+begin
+  for i:= Low(K) to High(K) do
+  begin
+    S:= Trim(SGetItem(StrKeys, '*')); //allow '*' with near spaces
+    K[i]:= TextToShortCut(S);
+  end;
+end;
+
 
 function KeyArraysEqualNotEmpty(const a1, a2: TATKeyArray): boolean;
 var

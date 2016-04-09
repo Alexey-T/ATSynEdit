@@ -409,7 +409,7 @@ procedure DoPaintHexChars(C: TCanvas;
 var
   Buf: string;
   R: TRect;
-  i, j: integer;
+  i, j, NCode: integer;
 begin
   if AString='' then Exit;
 
@@ -429,7 +429,9 @@ begin
       C.Font.Color:= AColorFont;
       C.Brush.Color:= AColorBg;
 
-      Buf:= '<'+IntToHex(Ord(AString[i]), 4)+'>';
+      NCode:= Ord(AString[i]);
+      Buf:= 'x'+IntToHex(NCode, IfThen(NCode<$100, 2, 4));
+
       ExtTextOut(C.Handle,
         R.Left, R.Top,
         ETO_CLIPPED+ETO_OPAQUE,

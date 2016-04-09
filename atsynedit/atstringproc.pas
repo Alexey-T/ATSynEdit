@@ -34,7 +34,8 @@ const
 const
   cMaxTabPositionToExpand = 500; //no sense to expand too far tabs
   cCharScaleFullwidth_Default = 1.7; //width of CJK chars
-  cCharScaleHex = 6.0; //width of hex show: "<NNNN>"
+  cCharScaleHex_Small = 3.0; //width of hex show: "xNN"
+  cCharScaleHex_Big = 5.0; //width of hex show: "xNNNN"
   cMinWordWrapOffset = 3;
 
 var
@@ -384,7 +385,12 @@ begin
       Scale:= 1.0
     else
     if IsCharHex(S[i]) then
-      Scale:= cCharScaleHex
+    begin
+      if Ord(S[i])<$100 then
+        Scale:= cCharScaleHex_Small
+      else
+        Scale:= cCharScaleHex_Big;
+    end
     else
     if IsCharFullWidth(S[i]) then
       Scale:= cCharScaleFullwidth;
