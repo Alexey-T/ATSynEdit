@@ -351,6 +351,15 @@ object fmMain: TfmMain
       OnChange = chkMinimapLeftChange
       TabOrder = 15
     end
+    object chkNewScroll: TCheckBox
+      Left = 144
+      Height = 24
+      Top = 256
+      Width = 123
+      Caption = 'new scrollbars'
+      OnChange = chkNewScrollChange
+      TabOrder = 16
+    end
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]

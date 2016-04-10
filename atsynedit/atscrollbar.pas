@@ -709,6 +709,7 @@ begin
 end;
 
 initialization
+  ATScrollbarTheme.ColorBG:= $d0d0d0;
   ATScrollbarTheme.ColorBorder:= clLtGray;
   ATScrollbarTheme.ColorThumbBorder:= $808080;
   ATScrollbarTheme.ColorThumbFill:= $c0c0c0;

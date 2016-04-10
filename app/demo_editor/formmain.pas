@@ -27,6 +27,7 @@ type
     bOpt: TButton;
     btnStop: TButton;
     btnMarker: TButton;
+    chkNewScroll: TCheckBox;
     chkMinimapLeft: TCheckBox;
     chkGutter: TCheckBox;
     chkMicromap: TCheckBox;
@@ -114,6 +115,7 @@ type
     procedure btnMarkerClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure chkMinimapLeftChange(Sender: TObject);
+    procedure chkNewScrollChange(Sender: TObject);
     procedure FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
       var AContinue: boolean);
     procedure mnuFileHtmlClick(Sender: TObject);
@@ -573,6 +575,13 @@ procedure TfmMain.chkMinimapLeftChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptMinimapAtLeft:= chkMinimapLeft.Checked;
+  ed.Update;
+end;
+
+procedure TfmMain.chkNewScrollChange(Sender: TObject);
+begin
+  if wait then Exit;
+  ed.OptScrollbarsNew:= chkNewScroll.Checked;
   ed.Update;
 end;
 
