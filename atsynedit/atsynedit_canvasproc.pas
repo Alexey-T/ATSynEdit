@@ -574,6 +574,7 @@ begin
   if AParts=nil then
   begin
     Buf:= UTF8Encode(SRemoveHexChars(Str));
+    SReplaceAllTabsToOneSpace(Buf);
     if CanvasTextOutNeedsOffsets(C, Str, ANeedOffsets) then
       DxPointer:= @Dx[0]
     else
@@ -626,6 +627,7 @@ begin
         PosY+ACharSize.Y);
 
       Buf:= UTF8Encode(SRemoveHexChars(PartStr));
+      SReplaceAllTabsToOneSpace(Buf);
       if CanvasTextOutNeedsOffsets(C, PartStr, ANeedOffsets) then
         DxPointer:= @Dx[PartOffset]
       else
