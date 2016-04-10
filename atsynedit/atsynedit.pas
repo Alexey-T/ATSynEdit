@@ -384,6 +384,7 @@ type
     FScrollHorzMinimap: TATSynScrollInfo;
     FScrollbarVert,
     FScrollbarHorz: TATScroll;
+    FScrollbarLock: boolean;
     FPrevHorz,
     FPrevVert: TATSynScrollInfo;
     FMinimapWidth: integer;
@@ -1502,10 +1503,12 @@ begin
   FScrollbarVert.Visible:= FOptScrollbarsNew;
   if FOptScrollbarsNew then
   begin
+    FScrollbarLock:= true;
     FScrollbarVert.Min:= FScrollVert.NMin;
     FScrollbarVert.Max:= FScrollVert.NMax;
     FScrollbarVert.PageSize:= FScrollVert.NPage;
     FScrollbarVert.Position:= FScrollVert.NPos;
+    FScrollbarLock:= false;
   end;
 
   FillChar(si{%H-}, SizeOf(si), 0);
@@ -1528,10 +1531,12 @@ begin
   FScrollbarHorz.Visible:= FOptScrollbarsNew and (FScrollHorz.NMax-FScrollHorz.NMin>FScrollHorz.NPage);
   if FOptScrollbarsNew then
   begin
+    FScrollbarLock:= true;
     FScrollbarHorz.Min:= FScrollHorz.NMin;
     FScrollbarHorz.Max:= FScrollHorz.NMax;
     FScrollbarHorz.PageSize:= FScrollHorz.NPage;
     FScrollbarHorz.Position:= FScrollHorz.NPos;
+    FScrollbarLock:= false;
   end;
 
   FillChar(si{%H-}, SizeOf(si), 0);
@@ -2934,26 +2939,25 @@ end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
 begin
-  {
-  application.MainForm.caption:= format('min %d max %d page %d pos %d',
-                                 [info.nmin, info.nmax, info.npage, info.npos]);
-  }
-  with Info do
-    if (NMax-NMin)<NPage then
-    begin
-      DoClearScrollInfo(Info);
-      Exit(true);
-    end;
+  //debug
+  //application.MainForm.Caption:= format('min %d, max %d, pagesize %d, pos %d, pos-last %d',
+  //                               [info.nmin, info.nmax, info.npage, info.npos, info.NPosLast]);
+
+  if (Info.NMax-Info.NMin)<Info.NPage then
+  begin
+    DoClearScrollInfo(Info);
+    Exit(true);
+  end;
 
   case Msg.ScrollCode of
     SB_TOP:        Info.NPos:= Info.NMin;
     SB_BOTTOM:     Info.NPos:= Info.NPosLast;
 
-    SB_LINEUP:     Info.NPos:= Max(Info.NPos-1, Info.NMin);
-    SB_LINEDOWN:   Info.NPos:= Min(Info.NPos+1, Info.NPosLast);
+    SB_LINEUP:     Info.NPos:= Info.NPos-1;
+    SB_LINEDOWN:   Info.NPos:= Info.NPos+1;
 
-    SB_PAGEUP:     Info.NPos:= Max(Info.NPos-Info.NPage, Info.NMin);
-    SB_PAGEDOWN:   Info.NPos:= Min(Info.NPos+Info.NPage, Info.NPosLast);
+    SB_PAGEUP:     Info.NPos:= Info.NPos-Info.NPage;
+    SB_PAGEDOWN:   Info.NPos:= Info.NPos+Info.NPage;
 
     SB_THUMBPOSITION: Info.NPos:= Msg.Pos;
     SB_THUMBTRACK:
@@ -2964,6 +2968,10 @@ begin
     SB_ENDSCROLL:
       DoHintHide;
   end;
+
+  //correct value (if -1)
+  Info.NPos:= Min(Info.NPos, Info.NPosLast);
+  Info.NPos:= Max(Info.NPos, Info.NMin);
 
   Result:= Msg.ScrollCode<>SB_THUMBTRACK;
 end;
@@ -4759,6 +4767,7 @@ procedure TATSynEdit.OnNewScrollbarVertChanged(Sender: TObject);
 var
   Msg: TLMVScroll;
 begin
+  if FScrollbarLock then exit;
   FillChar(Msg, SizeOf(Msg), 0);
   Msg.ScrollCode:= SB_THUMBPOSITION;
   Msg.Pos:= FScrollbarVert.Position;
@@ -4769,6 +4778,7 @@ procedure TATSynEdit.OnNewScrollbarHorzChanged(Sender: TObject);
 var
   Msg: TLMHScroll;
 begin
+  if FScrollbarLock then exit;
   FillChar(Msg, SizeOf(Msg), 0);
   Msg.ScrollCode:= SB_THUMBPOSITION;
   Msg.Pos:= FScrollbarHorz.Position;
