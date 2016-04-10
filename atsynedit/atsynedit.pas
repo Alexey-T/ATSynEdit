@@ -15,7 +15,6 @@ License: MPL 2.0 or LGPL
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
                          //when horz-scroll hides/shows/hides/...
                          //ok also for win32
-
 unit ATSynEdit;
 
 interface
@@ -28,6 +27,7 @@ uses
   Controls, ExtCtrls, Menus, Forms,
   LMessages, LCLType,
   RegExpr,
+  ATScrollBar,
   ATStringProc,
   ATStrings,
   ATSynEdit_Colors,
@@ -235,6 +235,8 @@ const
   cStrMenuitemFoldAll: string = 'Fold all';
   cStrMenuitemUnfoldAll: string = 'Unfold all';
   cStrMenuitemFoldLevel: string = 'Fold level';
+  cEditorScrollbarWidth: integer = 18;
+  cEditorScrollbarBorderSize: integer = 0;
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -377,9 +379,11 @@ type
     FRectRuler: TRect;
     FLineBottom: integer;
     FScrollVert,
-    FScrollHorz: TATSynScrollInfo;
+    FScrollHorz,
     FScrollVertMinimap,
     FScrollHorzMinimap: TATSynScrollInfo;
+    FScrollbarVert,
+    FScrollbarHorz: TATScroll;
     FPrevHorz,
     FPrevVert: TATSynScrollInfo;
     FMinimapWidth: integer;
@@ -391,6 +395,7 @@ type
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
     FOptMaxLinesToCountUnindent: integer;
+    FOptScrollbarsNew: boolean;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
     FOptShowStapleStyle: TATLineStyle;
@@ -517,6 +522,8 @@ type
     procedure MenuFoldLevelClick(Sender: TObject);
     procedure MenuFoldUnfoldAllClick(Sender: TObject);
     procedure MenuFoldPlusMinusClick(Sender: TObject);
+    procedure OnNewScrollbarHorzChanged(Sender: TObject);
+    procedure OnNewScrollbarVertChanged(Sender: TObject);
     procedure PaintEx(ALine: integer);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
@@ -761,6 +768,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetFocus; override;
+    function ClientWidth: integer;
+    function ClientHeight: integer;
     //updates
     procedure Invalidate; override;
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
@@ -963,6 +972,7 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste;
+    property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
     property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle;
@@ -1489,12 +1499,22 @@ var
 begin
   if not FOptAllowScrollbarVert then Exit;
 
+  FScrollbarVert.Visible:= FOptScrollbarsNew;
+  if FOptScrollbarsNew then
+  begin
+    FScrollbarVert.Min:= FScrollVert.NMin;
+    FScrollbarVert.Max:= FScrollVert.NMax;
+    FScrollbarVert.PageSize:= FScrollVert.NPage;
+    FScrollbarVert.Position:= FScrollVert.NPos;
+  end;
+
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
   si.nMin:= FScrollVert.NMin;
   si.nMax:= FScrollVert.NMax;
   si.nPage:= FScrollVert.NPage;
+  if FOptScrollbarsNew then si.nPage:= si.nMax+1;
   si.nPos:= FScrollVert.NPos;
   SetScrollInfo(Handle, SB_VERT, si, True);
 end;
@@ -1505,12 +1525,22 @@ var
 begin
   if not FOptAllowScrollbarHorz then Exit;
 
+  FScrollbarHorz.Visible:= FOptScrollbarsNew and (FScrollHorz.NMax-FScrollHorz.NMin>FScrollHorz.NPage);
+  if FOptScrollbarsNew then
+  begin
+    FScrollbarHorz.Min:= FScrollHorz.NMin;
+    FScrollbarHorz.Max:= FScrollHorz.NMax;
+    FScrollbarHorz.PageSize:= FScrollHorz.NPage;
+    FScrollbarHorz.Position:= FScrollHorz.NPos;
+  end;
+
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; don't work
   si.nMin:= FScrollHorz.NMin;
   si.nMax:= FScrollHorz.NMax;
   si.nPage:= FScrollHorz.NPage;
+  if FOptScrollbarsNew then si.nPage:= si.nMax+1;
   si.nPos:= FScrollHorz.NPos;
   SetScrollInfo(Handle, SB_HORZ, si, True);
 end;
@@ -2225,6 +2255,27 @@ begin
   Font.Name:= 'Courier New';
   Font.Size:= {$ifndef darwin} 9 {$else} 14 {$endif};
 
+  FScrollbarVert:= TATScroll.Create(Self);
+  FScrollbarVert.Hide;
+  FScrollbarVert.Parent:= Self;
+  FScrollbarVert.Align:= alRight;
+  FScrollbarVert.Kind:= sbVertical;
+  FScrollbarVert.Cursor:= crArrow;
+  FScrollbarVert.Width:= cEditorScrollbarWidth;
+  FScrollbarVert.IndentBorder:= cEditorScrollbarBorderSize;
+  FScrollbarVert.OnChange:= @OnNewScrollbarVertChanged;
+
+  FScrollbarHorz:= TATScroll.Create(Self);
+  FScrollbarHorz.Hide;
+  FScrollbarHorz.Parent:= Self;
+  FScrollbarHorz.Align:= alBottom;
+  FScrollbarHorz.Kind:= sbHorizontal;
+  FScrollbarHorz.Cursor:= crArrow;
+  FScrollbarHorz.Height:= cEditorScrollbarWidth;
+  FScrollbarHorz.IndentCorner:= cEditorScrollbarWidth;
+  FScrollbarHorz.IndentBorder:= cEditorScrollbarBorderSize;
+  FScrollbarHorz.OnChange:= @OnNewScrollbarHorzChanged;
+
   FWantTabs:= true;
   FCharSize:= Point(4, 4); //not nul
   FEditorIndex:= 0;
@@ -2366,6 +2417,7 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSizeMinimap:= Point(1, 2);
 
+  FOptScrollbarsNew:= false;
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
 
@@ -2500,6 +2552,22 @@ end;
 procedure TATSynEdit.SetFocus;
 begin
   LCLIntf.SetFocus(Handle);
+end;
+
+function TATSynEdit.ClientWidth: integer;
+begin
+  Result:= inherited ClientWidth;
+  if FScrollbarVert.Visible then
+    Dec(Result, cEditorScrollbarWidth);
+  if Result<1 then Result:= 1;
+end;
+
+function TATSynEdit.ClientHeight: integer;
+begin
+  Result:= inherited ClientHeight;
+  if FScrollbarHorz.Visible then
+    Dec(Result, cEditorScrollbarWidth);
+  if Result<1 then Result:= 1;
 end;
 
 procedure TATSynEdit.LoadFromFile(const AFilename: string);
@@ -4685,6 +4753,26 @@ begin
     if not (GetKeyState(VK_CONTROL)<0) then
       (Source as TATSynedit).DoCommand(cCommand_TextDeleteSelection);
   end;
+end;
+
+procedure TATSynEdit.OnNewScrollbarVertChanged(Sender: TObject);
+var
+  Msg: TLMVScroll;
+begin
+  FillChar(Msg, SizeOf(Msg), 0);
+  Msg.ScrollCode:= SB_THUMBPOSITION;
+  Msg.Pos:= FScrollbarVert.Position;
+  WMVScroll(Msg);
+end;
+
+procedure TATSynEdit.OnNewScrollbarHorzChanged(Sender: TObject);
+var
+  Msg: TLMHScroll;
+begin
+  FillChar(Msg, SizeOf(Msg), 0);
+  Msg.ScrollCode:= SB_THUMBPOSITION;
+  Msg.Pos:= FScrollbarHorz.Position;
+  WMHScroll(Msg);
 end;
 
 
