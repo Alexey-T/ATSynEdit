@@ -3467,7 +3467,13 @@ begin
     Result:= true;
   end
   else
-    Result:= false;
+  begin
+    //reason to handle wheel here exists.
+    //w/o this handler wheel works only with OS scrollbars, need with new-scrollbar too
+    DoScrollByDelta(0, IfThen(AUp, -1, 1)*Mouse.WheelScrollLines);
+    Update;
+    Result:= true;
+  end;
 end;
 
 function TATSynEdit.DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
