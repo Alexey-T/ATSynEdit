@@ -1508,6 +1508,7 @@ begin
     FScrollbarVert.Max:= FScrollVert.NMax;
     FScrollbarVert.PageSize:= FScrollVert.NPage;
     FScrollbarVert.Position:= FScrollVert.NPos;
+    FScrollbarVert.Update;
     FScrollbarLock:= false;
   end;
 
@@ -1536,6 +1537,7 @@ begin
     FScrollbarHorz.Max:= FScrollHorz.NMax;
     FScrollbarHorz.PageSize:= FScrollHorz.NPage;
     FScrollbarHorz.Position:= FScrollHorz.NPos;
+    FScrollbarHorz.Update;
     FScrollbarLock:= false;
   end;
 
