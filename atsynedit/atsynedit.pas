@@ -235,7 +235,7 @@ const
   cStrMenuitemFoldAll: string = 'Fold all';
   cStrMenuitemUnfoldAll: string = 'Unfold all';
   cStrMenuitemFoldLevel: string = 'Fold level';
-  cEditorScrollbarWidth: integer = 18;
+  cEditorScrollbarWidth: integer = 14;
   cEditorScrollbarBorderSize: integer = 0;
 
 var
