@@ -3469,6 +3469,7 @@ begin
     Result:= true;
   end
   else
+  if (Shift=[]) and not (ModeOneLine) then
   begin
     //reason to handle wheel here exists.
     //w/o this handler wheel works only with OS scrollbars, need with new-scrollbar too
