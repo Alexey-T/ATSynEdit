@@ -465,6 +465,10 @@ type
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseGutterClickSelectsLine: boolean;
     FOptMouseNiceScroll: boolean;
+    FOptMouseWheelScrollVert: boolean;
+    FOptMouseWheelScrollHorz: boolean;
+    FOptMouseWheelScrollHorzColumns: integer;
+    FOptMouseWheelWithCtrlChangeSize: boolean;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyLeftRightSwapSelAndSelect: boolean;
@@ -1045,6 +1049,10 @@ type
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine;
+    property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert;
+    property OptMouseWheelScrollHorz: boolean read FOptMouseWheelScrollHorz write FOptMouseWheelScrollHorz;
+    property OptMouseWheelScrollHorzColumns: integer read FOptMouseWheelScrollHorzColumns write FOptMouseWheelScrollHorzColumns;
+    property OptMouseWheelWithCtrlChangeSize: boolean read FOptMouseWheelWithCtrlChangeSize write FOptMouseWheelWithCtrlChangeSize;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped;
@@ -2461,6 +2469,11 @@ begin
   FOptMouse2ClickDragSelectsWords:= true;
   FOptMouseRightClickMovesCaret:= false;
   FOptMouseGutterClickSelectsLine:= true;
+  FOptMouseWheelScrollVert:= true;
+  FOptMouseWheelScrollHorz:= true;
+  FOptMouseWheelScrollHorzColumns:= 30;
+  FOptMouseWheelWithCtrlChangeSize:= true;
+
   FOptCopyLinesIfNoSel:= true;
   FOptCutLinesIfNoSel:= false;
   FOptShowFullSel:= false;
@@ -3463,19 +3476,29 @@ end;
 
 function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
 begin
-  if Shift=[ssCtrl] then
+  if (Shift=[ssCtrl]) and FOptMouseWheelWithCtrlChangeSize then
   begin
     DoSizeChange(AUp);
     Result:= true;
-  end
-  else
-  if (Shift=[]) and not (ModeOneLine) then
+    exit
+  end;
+
+  if (Shift=[]) and (not ModeOneLine) and FOptMouseWheelScrollVert then
   begin
     //reason to handle wheel here exists.
     //w/o this handler wheel works only with OS scrollbars, need with new-scrollbar too
     DoScrollByDelta(0, IfThen(AUp, -1, 1)*Mouse.WheelScrollLines);
     Update;
     Result:= true;
+    exit
+  end;
+
+  if (Shift=[ssShift]) and (not ModeOneLine) and FOptMouseWheelScrollHorz then
+  begin
+    DoScrollByDelta(IfThen(AUp, -1, 1)*FOptMouseWheelScrollHorzColumns, 0);
+    Update;
+    Result:= true;
+    exit
   end;
 end;
 
