@@ -344,18 +344,40 @@ var
   NSize, i: integer;
 begin
   Str:= SList[AIndex];
-  SHint:= SGetItemAtEnd(Str, cCompleteHintChar);
-
-  if AIndex=List.ItemIndex then
-    DoHintShow(SHint);
 
   if AIndex=List.ItemIndex then
     C.Brush.Color:= cCompleteColorSelBg
   else
     C.Brush.Color:= cCompleteColorBg;
   C.FillRect(ARect);
-
   C.Font.Assign(List.Font);
+
+  //alternate listbox: OnResult is set, then 3 columns, tab-separated:
+  //paint column1 at left,
+  //paint column2 at right
+  if Assigned(FOnResult) then
+  begin
+    SItem:= SGetItem(Str, #9);
+    SHint:= SGetItem(Str, #9);
+
+    //prefix
+    C.Font.Style:= cCompleteFontStyles[0];
+    C.Font.Color:= cCompleteColorFont[0];
+    C.TextOut(ARect.Left+List.ClientWidth-List.Canvas.TextWidth(SHint), ARect.Top, SHint);
+
+    //text
+    C.Font.Style:= cCompleteFontStyles[1];
+    C.Font.Color:= cCompleteColorFont[1];
+    C.TextOut(ARect.Left, ARect.Top, SItem);
+
+    exit;
+  end;
+
+  //usual case, n columns, tab-char separates hint (in hint window)
+  SHint:= SGetItemAtEnd(Str, cCompleteHintChar);
+  if AIndex=List.ItemIndex then
+    DoHintShow(SHint);
+
   NSize:= cCompleteTextIndent0;
 
   for i:= 0 to cCompleteItemCount-1 do
