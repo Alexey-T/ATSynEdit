@@ -21,6 +21,8 @@ uses
 type
   TATCompletionPropEvent = procedure (Sender: TObject;
     out AText: string; out ACharsLeft, ACharsRight: integer) of object;
+  TATCompletionResultEvent = procedure (Sender: TObject;
+    const ASnippetId: string; ASnippetIndex: integer) of object;
 
 //AText is #13-separated strings, each string is '|'-separated items.
 //Usually item_0 is prefix to show,
@@ -30,7 +32,9 @@ type
 //Item for text can have suffixes after #1: text+#1+suffix_before_caret+#1+suffix_after_caret
 
 procedure DoEditorCompletionListbox(AEd: TATSynEdit;
-  AOnGetProp: TATCompletionPropEvent);
+  AOnGetProp: TATCompletionPropEvent;
+  AOnResult: TATCompletionResultEvent = nil;
+  const ASnippetId: string = '');
 
 procedure EditorGetCurrentWord(Ed: TATSynEdit; const AWordChars: atString;
   out AWord: atString; out ACharsLeft, ACharsRight: integer);
@@ -59,10 +63,12 @@ type
     { private declarations }
     SList: TStringlist;
     FOnGetProp: TATCompletionPropEvent;
+    FOnResult: TATCompletionResultEvent;
     FEdit: TATSynEdit;
     FCharsLeft,
     FCharsRight: integer;
     FHintWnd: THintWindow;
+    FSnippetId: string;
     procedure DoHintHide;
     procedure DoHintShow(const AHint: string);
     procedure DoReplaceTo(AStr: string);
@@ -74,6 +80,8 @@ type
     { public declarations }
     property Editor: TATSynEdit read FEdit write FEdit;
     property OnGetProp: TATCompletionPropEvent read FOnGetProp write FOnGetProp;
+    property OnResult: TATCompletionResultEvent read FOnResult write FOnResult;
+    property SnippetId: string read FSnippetId write FSnippetId;
   end;
 
 const
@@ -111,7 +119,9 @@ var
   FormComplete: TFormATSynEditComplete = nil;
 
 procedure DoEditorCompletionListbox(AEd: TATSynEdit;
-  AOnGetProp: TATCompletionPropEvent);
+  AOnGetProp: TATCompletionPropEvent;
+  AOnResult: TATCompletionResultEvent = nil;
+  const ASnippetId: string = '');
 begin
   if AEd.ModeReadOnly then exit;
   if AEd.Carets.Count<>1 then exit;
@@ -120,7 +130,9 @@ begin
     FormComplete:= TFormATSynEditComplete.Create(nil);
 
   FormComplete.Editor:= AEd;
+  FormComplete.SnippetId:= ASnippetId;
   FormComplete.OnGetProp:= AOnGetProp;
+  FormComplete.OnResult:= AOnResult;
   FormComplete.DoUpdate;
 end;
 
@@ -361,7 +373,11 @@ end;
 
 procedure TFormATSynEditComplete.DoResult;
 begin
-  DoReplaceTo(GetResultText);
+  if Assigned(FOnResult) then
+    FOnResult(Self, FSnippetId, List.ItemIndex)
+  else
+    DoReplaceTo(GetResultText);
+
   Close;
 end;
 
