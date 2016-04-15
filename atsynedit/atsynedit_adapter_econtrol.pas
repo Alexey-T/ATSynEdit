@@ -17,7 +17,8 @@ uses
   ecSyntAnal;
 
 var
-  cAdapterTimerInterval: integer = 200;
+  cAdapterTimerDuringAnalyzeInterval: integer = 200;
+  cAdapterTimerBeforeAnalyzeInterval: integer = 300;
   cAdapterTimerTicksToInitialUpdate: integer = 2;
 
 type
@@ -44,7 +45,8 @@ type
     AnClient: TecClientSyntAnalyzer;
     Buffer: TATStringBuffer;
     ListColors: TList;
-    Timer: TTimer;
+    TimerDuringAnalyze: TTimer;
+    TimerBeforeAnalyze: TTimer;
     FDynEnabled: boolean;
     FBusyTreeUpdate: boolean;
     FBusyTimer: boolean;
@@ -70,7 +72,8 @@ type
     procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
     procedure UpdateEds;
     function GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
-    procedure TimerTimer(Sender: TObject);
+    procedure TimerDuringAnalyzeTimer(Sender: TObject);
+    procedure TimerBeforeAnalyzeTimer(Sender: TObject);
     procedure UpdateRanges;
     procedure UpdateRangesActive(AEdit: TATSynEdit);
     procedure UpdateSeps;
@@ -433,10 +436,15 @@ begin
   ListColors:= TList.Create;
   FDynEnabled:= true;
 
-  Timer:= TTimer.Create(Self);
-  Timer.Enabled:= false;
-  Timer.Interval:= cAdapterTimerInterval;
-  Timer.OnTimer:= @TimerTimer;
+  TimerDuringAnalyze:= TTimer.Create(Self);
+  TimerDuringAnalyze.Enabled:= false;
+  TimerDuringAnalyze.Interval:= cAdapterTimerDuringAnalyzeInterval;
+  TimerDuringAnalyze.OnTimer:= @TimerDuringAnalyzeTimer;
+
+  TimerBeforeAnalyze:= TTimer.Create(Self);
+  TimerBeforeAnalyze.Enabled:= false;
+  TimerBeforeAnalyze.Interval:= cAdapterTimerBeforeAnalyzeInterval;
+  TimerBeforeAnalyze.OnTimer:= @TimerBeforeAnalyzeTimer;
 end;
 
 destructor TATAdapterEControl.Destroy;
@@ -479,7 +487,7 @@ end;
 
 procedure TATAdapterEControl.Stop;
 begin
-  Timer.Enabled:= false;
+  TimerDuringAnalyze.Enabled:= false;
   while FBusyTreeUpdate do begin Sleep(50); end;
   while FBusyTimer do begin Sleep(50); end;
 
@@ -715,6 +723,12 @@ end;
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
   AddEditor(Sender as TATSynEdit);
+
+  {
+  //timer works bad, gives incorrect hilited tokens
+  TimerBeforeAnalyze.Enabled:= false;
+  TimerBeforeAnalyze.Enabled:= true;
+  }
   UpdateData;
 end;
 
@@ -779,7 +793,7 @@ begin
       FOnParseDone(Self);
   end
   else
-    Timer.Enabled:= true;
+    TimerDuringAnalyze.Enabled:= true;
 end;
 
 procedure TATAdapterEControl.DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
@@ -986,7 +1000,7 @@ begin
   AnClient.TextChanged(Pos, ACount);
 end;
 
-procedure TATAdapterEControl.TimerTimer(Sender: TObject);
+procedure TATAdapterEControl.TimerDuringAnalyzeTimer(Sender: TObject);
 begin
   if not Assigned(AnClient) then Exit;
   Inc(FParseTicks);
@@ -996,7 +1010,7 @@ begin
     if AnClient.IsFinished then
     begin
       FParsePausePassed:= true;
-      Timer.Enabled:= false;
+      TimerDuringAnalyze.Enabled:= false;
       UpdateRanges;
       UpdateEds;
       if Assigned(FOnParseDone) then
@@ -1014,6 +1028,12 @@ begin
   finally
     FBusyTimer:= false;
   end;
+end;
+
+procedure TATAdapterEControl.TimerBeforeAnalyzeTimer(Sender: TObject);
+begin
+  TimerBeforeAnalyze.Enabled:= false;
+  UpdateData;
 end;
 
 
