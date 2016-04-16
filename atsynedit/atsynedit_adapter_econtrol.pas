@@ -18,7 +18,6 @@ uses
 
 var
   cAdapterTimerDuringAnalyzeInterval: integer = 200;
-  cAdapterTimerBeforeAnalyzeInterval: integer = 300;
   cAdapterTimerTicksToInitialUpdate: integer = 2;
 
 type
@@ -46,7 +45,6 @@ type
     Buffer: TATStringBuffer;
     ListColors: TList;
     TimerDuringAnalyze: TTimer;
-    TimerBeforeAnalyze: TTimer;
     FDynEnabled: boolean;
     FBusyTreeUpdate: boolean;
     FBusyTimer: boolean;
@@ -73,7 +71,6 @@ type
     procedure UpdateEds;
     function GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
     procedure TimerDuringAnalyzeTimer(Sender: TObject);
-    procedure TimerBeforeAnalyzeTimer(Sender: TObject);
     procedure UpdateRanges;
     procedure UpdateRangesActive(AEdit: TATSynEdit);
     procedure UpdateSeps;
@@ -440,11 +437,6 @@ begin
   TimerDuringAnalyze.Enabled:= false;
   TimerDuringAnalyze.Interval:= cAdapterTimerDuringAnalyzeInterval;
   TimerDuringAnalyze.OnTimer:= @TimerDuringAnalyzeTimer;
-
-  TimerBeforeAnalyze:= TTimer.Create(Self);
-  TimerBeforeAnalyze.Enabled:= false;
-  TimerBeforeAnalyze.Interval:= cAdapterTimerBeforeAnalyzeInterval;
-  TimerBeforeAnalyze.OnTimer:= @TimerBeforeAnalyzeTimer;
 end;
 
 destructor TATAdapterEControl.Destroy;
@@ -723,12 +715,6 @@ end;
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
   AddEditor(Sender as TATSynEdit);
-
-  {
-  //timer works bad, gives incorrect hilited tokens
-  TimerBeforeAnalyze.Enabled:= false;
-  TimerBeforeAnalyze.Enabled:= true;
-  }
   UpdateData;
 end;
 
@@ -1028,12 +1014,6 @@ begin
   finally
     FBusyTimer:= false;
   end;
-end;
-
-procedure TATAdapterEControl.TimerBeforeAnalyzeTimer(Sender: TObject);
-begin
-  TimerBeforeAnalyze.Enabled:= false;
-  UpdateData;
 end;
 
 
