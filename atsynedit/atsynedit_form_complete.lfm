@@ -26,7 +26,7 @@ object FormATSynEditComplete: TFormATSynEditComplete
     CanGetFocus = False
     Color = clSilver
     ItemHeight = 28
-    ShowScrollbar = True
+    ShowScrollbar = False
     OnClick = ListClick
     OnDrawItem = ListDrawItem
   end
