@@ -342,8 +342,6 @@ procedure TFormATSynEditComplete.ListDrawItem(Sender: TObject; C: TCanvas;
 var
   Str, SItem, SHint: string;
   NSize, i: integer;
-const
-  nIndentRight = 2;
 begin
   Str:= SList[AIndex];
 
@@ -365,12 +363,12 @@ begin
     //prefix
     C.Font.Style:= cCompleteFontStyles[0];
     C.Font.Color:= cCompleteColorFont[0];
-    C.TextOut(ARect.Left+List.ClientWidth-List.Canvas.TextWidth(SHint)-nIndentRight, ARect.Top, SHint);
+    C.TextOut(ARect.Left+List.ClientWidth-List.Canvas.TextWidth(SHint)-cCompleteTextIndent0, ARect.Top, SHint);
 
     //text
     C.Font.Style:= cCompleteFontStyles[1];
     C.Font.Color:= cCompleteColorFont[1];
-    C.TextOut(ARect.Left, ARect.Top, SItem);
+    C.TextOut(ARect.Left+cCompleteTextIndent0, ARect.Top, SItem);
 
     exit;
   end;
