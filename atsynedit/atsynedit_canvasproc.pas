@@ -947,8 +947,6 @@ function ColorBlend(c1, c2: Longint; A: Longint): Longint;
 var
   r, g, b, v1, v2: byte;
 begin
-  //c1:= c1 and $FFFFFF;
-  //c2:= c2 and $FFFFFF;
   v1:= Byte(c1);
   v2:= Byte(c2);
   r:= A * (v1 - v2) shr 8 + v2;
@@ -960,6 +958,23 @@ begin
   b:= A * (v1 - v2) shr 8 + v2;
   Result := (b shl 16) + (g shl 8) + r;
 end;
+
+function ColorBlendHalf(c1, c2: Longint): Longint;
+var
+  r, g, b, v1, v2: byte;
+begin
+  v1:= Byte(c1);
+  v2:= Byte(c2);
+  r:= (v1+v2) shr 1;
+  v1:= Byte(c1 shr 8);
+  v2:= Byte(c2 shr 8);
+  g:= (v1+v2) shr 1;
+  v1:= Byte(c1 shr 16);
+  v2:= Byte(c2 shr 16);
+  b:= (v1+v2) shr 1;
+  Result := (b shl 16) + (g shl 8) + r;
+end;
+
 
 procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString;
   const ARect: TRect; APos: TPoint; ACharSize: TPoint; ATabSize: integer;
@@ -973,7 +988,6 @@ var
   nPos, nCharSize: integer;
   i, j: integer;
   X1, Y1, Y2: integer;
-  nColor: integer;
 begin
   if AStr='' then exit;
   SetLength(Offsets, Length(AStr)+1);
@@ -1002,8 +1016,7 @@ begin
 
       if (X1>=ARect.Left) and (X1<ARect.Right) then
       begin
-        nColor:= ColorBlend(Part^.ColorBG, Part^.ColorFont, 128);
-        C.Pen.Color:= nColor;
+        C.Pen.Color:= ColorBlendHalf(Part^.ColorBG, Part^.ColorFont);
         C.Line(X1, Y1, X1, Y2);
       end;
     end;
