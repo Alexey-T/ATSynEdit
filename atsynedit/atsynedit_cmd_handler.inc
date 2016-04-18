@@ -105,7 +105,8 @@ begin
 
   if cResultText in Res then
   begin
-    FSelRect:= cRectEmpty;
+    if not (cResultKeepColumnSel in Res) then
+      FSelRect:= cRectEmpty;
     DoEventChange;
   end;
 

@@ -3,19 +3,26 @@
 function TATSynEdit.DoCommand_TextTabulation: TATCommandResults;
 var
   N1, N2: integer;
+  bBlockSel: boolean;
 begin
   //multiline selection?
   //instead of tabulation, do indent
   if FOptKeyTabIndents then
-    if Carets.Count=1 then
+  begin
+    if not IsSelRectEmpty then
+      bBlockSel:= true
+    else
+    if Carets.Count<>1 then
+      bBlockSel:= false
+    else
     begin
       Carets[0].GetSelLines(N1, N2);
-      if (N1>=0) and (N2>N1) then
-      begin
-        Result:= DoCommand_TextIndentUnindent(true);
-        Exit
-      end;
+      bBlockSel:= (N1>=0) and (N2>N1);
     end;
+
+    if bBlockSel then
+      Exit(DoCommand_TextIndentUnindent(true));
+  end;
 
   if FOptTabSpaces then
     Result:= DoCommand_TextInsertTabSpacesAtCarets(FOverwrite)
@@ -511,23 +518,37 @@ end;
 
 function TATSynEdit.DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
 var
-  Y1, Y2: integer;
   NDecSpaces, NMinSpaces, i: integer;
   Str: atString;
   Caret: TATCaretItem;
   NShiftInit, NShift1, NShift2, NIndent1, NIndent2: integer;
+  NBlockBeginX, NBlockBeginY, NBlockEndX, NBlockEndY: integer;
+  bColBlock: boolean;
 begin
   Result:= [];
-  DoCaretSingleAsIs;
+  if Strings.Count=0 then exit;
+  if Carets.Count=0 then exit;
 
-  Caret:= Carets[0];
-  Caret.GetSelLines(Y1, Y2, true{Allow no sel});
-  if Y1<0 then Exit;
-
-  if Caret.EndY<0 then
+  bColBlock:= not IsSelRectEmpty;
+  if bColBlock then
   begin
-    Caret.EndX:= Caret.PosX;
-    Caret.EndY:= Caret.PosY;
+    NBlockBeginY:= Min(SelRect.Top, Strings.Count-1);
+    NBlockEndY:= Min(SelRect.Bottom, Strings.Count-1);
+    NBlockBeginX:= SelRect.Left;
+    NBlockEndX:= SelRect.Right;
+  end
+  else
+  begin
+    Caret:= Carets[0];
+    Caret.GetSelLines(NBlockBeginY, NBlockEndY, true{Allow no sel});
+    if NBlockBeginY<0 then exit;
+    if Caret.EndY<0 then
+    begin
+      Caret.EndX:= Caret.PosX;
+      Caret.EndY:= Caret.PosY;
+    end;
+    NBlockBeginX:= Caret.PosX;
+    NBlockEndX:= Caret.EndX;
   end;
 
   if FOptIndentSize>=0 then
@@ -537,7 +558,7 @@ begin
 
   //calc minimal indent of all
   NMinSpaces:= MaxInt;
-  for i:= Y1 to Y2 do
+  for i:= NBlockBeginY to NBlockEndY do
   begin
     Str:= Strings.Lines[i];
     if Trim(Str)='' then Continue;
@@ -550,16 +571,16 @@ begin
     if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
   //calc shifts (emulate Laz ide indent)
-  NIndent1:= SGetIndentChars(Strings.Lines[Caret.PosY]);
-  NIndent2:= SGetIndentChars(Strings.Lines[Caret.EndY]);
+  NIndent1:= SGetIndentChars(Strings.Lines[NBlockBeginY]);
+  NIndent2:= SGetIndentChars(Strings.Lines[NBlockEndY]);
   NShiftInit:= Abs(FOptIndentSize) * IfThen(ARight, 1, -1);
-  NShift1:= IfThen((Caret.PosX>=NIndent1) and (Caret.PosX>0), NShiftInit, 0);
-  NShift2:= IfThen((Caret.EndX>=NIndent2), NShiftInit, 0);
+  NShift1:= IfThen((NBlockBeginX>=NIndent1) and (NBlockBeginX>0), NShiftInit, 0);
+  NShift2:= IfThen((NBlockEndX>=NIndent2), NShiftInit, 0);
 
   //do indent
   Strings.BeginUndoGroup;
   try
-    for i:= Y1 to Y2 do
+    for i:= NBlockBeginY to NBlockEndY do
     begin
       Str:= Strings.Lines[i];
       if Trim(Str)='' then Continue;
@@ -572,12 +593,25 @@ begin
   end;
 
   //correct selection
-  if Caret.PosX>0 then
-    Caret.PosX:= Max(0, Caret.PosX+NShift1);
-  if Caret.EndX>0 then
-    Caret.EndX:= Max(0, Caret.EndX+NShift2);
+  if bColBlock then
+  begin
+    DoSelect_ColumnBlock(
+      Point(Max(0, NBlockBeginX+NShift1), NBlockBeginY),
+      Point(Max(0, NBlockEndX+NShift2), NBlockEndY)
+      );
+  end
+  else
+  begin
+    if NBlockBeginX>0 then
+      Caret.PosX:= Max(0, NBlockBeginX+NShift1);
+    if NBlockEndX>0 then
+      Caret.EndX:= Max(0, NBlockEndX+NShift2);
+  end;
 
-  Result:= [cResultText, cResultCaretAny];
+  if bColBlock then
+    Result:= [cResultText, cResultCaretAny, cResultKeepColumnSel]
+  else
+    Result:= [cResultText, cResultCaretAny];
 end;
 
 function TATSynEdit.DoCommand_Undo: TATCommandResults;
