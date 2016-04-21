@@ -34,6 +34,10 @@ type
     function LineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
     function LineSpace(N: integer): integer;
+    function OffsetToDistanceFromLineStart(APos: integer): integer;
+    function OffsetToDistanceFromLineEnd(APos: integer): integer;
+    function OffsetToOffsetOfLineStart(APos: integer): integer;
+    function OffsetToOffsetOfLineEnd(APos: integer): integer;
     function Count: integer;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
   end;
@@ -199,6 +203,66 @@ function TATStringBuffer.Count: integer;
 begin
   Result:= FStarts.Count;
 end;
+
+(*
+function TATStringBuffer.OffsetToOffsetOfLineStart(APos: integer): integer;
+var
+  N: integer;
+begin
+  N:= StrToCaret(APos).Y;
+  Result:= LineIndex(N);
+end;
+
+function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer;
+var
+  N: integer;
+begin
+  N:= StrToCaret(APos).Y;
+  Result:= LineIndex(N)+LineLength(N);
+end;
+*)
+
+function TATStringBuffer.OffsetToOffsetOfLineStart(APos: integer): integer;
+begin
+  Result:= APos-OffsetToDistanceFromLineStart(APos);
+end;
+
+function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer;
+begin
+  Result:= APos+OffsetToDistanceFromLineEnd(APos);
+end;
+
+function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer;
+const
+  CharEol = #10;
+var
+  NPos: integer;
+begin
+  Result:= 0;
+  NPos:= APos+1;
+  while (NPos>1) and (FText[NPos-1]<>CharEol) do
+  begin
+    Inc(Result);
+    Dec(NPos);
+  end;
+end;
+
+function TATStringBuffer.OffsetToDistanceFromLineEnd(APos: integer): integer;
+const
+  CharEol = #10;
+var
+  NLen, NPos: integer;
+begin
+  Result:= 0;
+  NPos:= APos+1;
+  NLen:= TextLength;
+  while (NPos<NLen) and (FText[NPos+1]<>CharEol) do
+  begin
+    Inc(Result);
+    Inc(NPos);
+  end;
+end;
+
 
 end.
 
