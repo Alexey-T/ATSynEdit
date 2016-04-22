@@ -856,6 +856,10 @@ var
 begin
   if not Assigned(AnClient) then Exit;
 
+  //check folding enabled
+  if EdList.Count>0 then
+    if not TATSynEdit(EdList[0]).OptFoldEnabled then exit;
+
   for i:= 0 to AnClient.RangeCount-1 do
   begin
     R:= AnClient.Ranges[i];

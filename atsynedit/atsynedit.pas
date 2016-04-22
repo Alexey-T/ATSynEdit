@@ -281,6 +281,7 @@ type
     FFold: TATSynRanges;
     FFoldImageList: TImageList;
     FFoldStyle: TATFoldStyle;
+    FFoldEnabled: boolean;
     FFontNeedsOffsets: TATFontNeedsOffsets;
     FCursorText,
     FCursorBm: TCursor;
@@ -627,6 +628,7 @@ type
     function GetMouseNiceScroll: boolean;
     procedure SetCaretShapeRO(AValue: TATSynCaretShape);
     procedure SetCaretBlinkEnabled(AValue: boolean);
+    procedure SetFoldEnabled(AValue: boolean);
     procedure SetModified(AValue: boolean);
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
@@ -963,6 +965,7 @@ type
     property OptTabSize: integer read FTabSize write SetTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle;
+    property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled;
     property OptTextLocked: string read FTextLocked write FTextLocked;
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
@@ -2354,6 +2357,7 @@ begin
 
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
+  FFoldEnabled:= true;
 
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
