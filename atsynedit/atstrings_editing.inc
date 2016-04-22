@@ -328,7 +328,6 @@ begin
   if not IsIndexValid(AY) then Exit;
 
   AShift.Y:= -1;
-  APosAfter.X:= 0;
 
   LineDelete(AY);
   if AY>=Count then
