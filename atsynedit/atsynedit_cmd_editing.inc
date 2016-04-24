@@ -523,6 +523,7 @@ var
   Caret: TATCaretItem;
   NShiftInit, NShift1, NShift2, NIndent1, NIndent2: integer;
   NBlockBeginX, NBlockBeginY, NBlockEndX, NBlockEndY: integer;
+  NIndentAtCol: integer;
   bColBlock: boolean;
 begin
   Result:= [];
@@ -536,6 +537,7 @@ begin
     NBlockEndY:= Min(SelRect.Bottom, Strings.Count-1);
     NBlockBeginX:= SelRect.Left;
     NBlockEndX:= SelRect.Right;
+    NIndentAtCol:= SelRect.Left;
   end
   else
   begin
@@ -549,6 +551,7 @@ begin
     end;
     NBlockBeginX:= Caret.PosX;
     NBlockEndX:= Caret.EndX;
+    NIndentAtCol:= 0;
   end;
 
   if FOptIndentSize>=0 then
@@ -556,19 +559,24 @@ begin
   else
     NDecSpaces:= Abs(FOptIndentSize)*FTabSize;
 
-  //calc minimal indent of all
-  NMinSpaces:= MaxInt;
-  for i:= NBlockBeginY to NBlockEndY do
+  if bColBlock then
+    NMinSpaces:= 0
+  else
   begin
-    Str:= Strings.Lines[i];
-    if Trim(Str)='' then Continue;
-    NMinSpaces:= Min(NMinSpaces, SGetIndentExpanded(Str, FTabSize));
-  end;
-  if NMinSpaces=MaxInt then Exit;
+    //calc minimal indent of all
+    NMinSpaces:= MaxInt;
+    for i:= NBlockBeginY to NBlockEndY do
+    begin
+      Str:= Strings.Lines[i];
+      if Trim(Str)='' then Continue;
+      NMinSpaces:= Min(NMinSpaces, SGetIndentExpanded(Str, FTabSize));
+    end;
+    if NMinSpaces=MaxInt then Exit;
 
-  //consider "Unindent keeps align"
-  if FOptIndentKeepsAlign then
-    if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
+    //consider "Unindent keeps align"
+    if FOptIndentKeepsAlign then
+      if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
+  end;
 
   //calc shifts (emulate Laz ide indent)
   NIndent1:= SGetIndentChars(Strings.Lines[NBlockBeginY]);
@@ -584,7 +592,14 @@ begin
     begin
       Str:= Strings.Lines[i];
       if Trim(Str)='' then Continue;
-      Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize);
+
+      if NIndentAtCol=0 then
+        Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize)
+      else
+        Str:= Copy(Str, 1, NIndentAtCol) +
+              SIndentUnindent(
+                Copy(Str, NIndentAtCol+1, MaxInt), ARight, FOptIndentSize, FTabSize);
+
       if Strings.Lines[i]<>Str then
         Strings.Lines[i]:= Str;
     end;
@@ -592,15 +607,8 @@ begin
     Strings.EndUndoGroup;
   end;
 
-  //correct selection
-  if bColBlock then
-  begin
-    DoSelect_ColumnBlock(
-      Point(Max(0, NBlockBeginX+NShift1), NBlockBeginY),
-      Point(Max(0, NBlockEndX+NShift2), NBlockEndY)
-      );
-  end
-  else
+  //correct selection (only stream block)
+  if not bColBlock then
   begin
     if NBlockBeginX>0 then
       Caret.PosX:= Max(0, NBlockBeginX+NShift1);
