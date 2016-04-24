@@ -517,66 +517,54 @@ begin
 end;
 
 function TATSynEdit.DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
+begin
+  Result:= [];
+  if Strings.Count=0 then exit;
+  if Carets.Count=0 then exit;
+
+  if IsSelRectEmpty then
+    Result:= DoCommand_TextIndentUnindent_StreamBlock(ARight)
+  else
+    Result:= DoCommand_TextIndentUnindent_ColumnBlock(ARight);
+end;
+
+function TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): TATCommandResults;
 var
   NDecSpaces, NMinSpaces, i: integer;
   Str: atString;
   Caret: TATCaretItem;
   NShiftInit, NShift1, NShift2, NIndent1, NIndent2: integer;
   NBlockBeginX, NBlockBeginY, NBlockEndX, NBlockEndY: integer;
-  NIndentAtCol: integer;
-  bColBlock: boolean;
 begin
-  Result:= [];
-  if Strings.Count=0 then exit;
-  if Carets.Count=0 then exit;
-
-  bColBlock:= not IsSelRectEmpty;
-  if bColBlock then
+  Caret:= Carets[0];
+  Caret.GetSelLines(NBlockBeginY, NBlockEndY, true{Allow no sel});
+  if NBlockBeginY<0 then exit;
+  if Caret.EndY<0 then
   begin
-    NBlockBeginY:= Min(SelRect.Top, Strings.Count-1);
-    NBlockEndY:= Min(SelRect.Bottom, Strings.Count-1);
-    NBlockBeginX:= SelRect.Left;
-    NBlockEndX:= SelRect.Right;
-    NIndentAtCol:= SelRect.Left;
-  end
-  else
-  begin
-    Caret:= Carets[0];
-    Caret.GetSelLines(NBlockBeginY, NBlockEndY, true{Allow no sel});
-    if NBlockBeginY<0 then exit;
-    if Caret.EndY<0 then
-    begin
-      Caret.EndX:= Caret.PosX;
-      Caret.EndY:= Caret.PosY;
-    end;
-    NBlockBeginX:= Caret.PosX;
-    NBlockEndX:= Caret.EndX;
-    NIndentAtCol:= 0;
+    Caret.EndX:= Caret.PosX;
+    Caret.EndY:= Caret.PosY;
   end;
+  NBlockBeginX:= Caret.PosX;
+  NBlockEndX:= Caret.EndX;
 
   if FOptIndentSize>=0 then
     NDecSpaces:= FOptIndentSize
   else
     NDecSpaces:= Abs(FOptIndentSize)*FTabSize;
 
-  if bColBlock then
-    NMinSpaces:= 0
-  else
+  //calc minimal indent of all
+  NMinSpaces:= MaxInt;
+  for i:= NBlockBeginY to NBlockEndY do
   begin
-    //calc minimal indent of all
-    NMinSpaces:= MaxInt;
-    for i:= NBlockBeginY to NBlockEndY do
-    begin
-      Str:= Strings.Lines[i];
-      if Trim(Str)='' then Continue;
-      NMinSpaces:= Min(NMinSpaces, SGetIndentExpanded(Str, FTabSize));
-    end;
-    if NMinSpaces=MaxInt then Exit;
-
-    //consider "Unindent keeps align"
-    if FOptIndentKeepsAlign then
-      if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
+    Str:= Strings.Lines[i];
+    if Trim(Str)='' then Continue;
+    NMinSpaces:= Min(NMinSpaces, SGetIndentExpanded(Str, FTabSize));
   end;
+  if NMinSpaces=MaxInt then Exit;
+
+  //consider "Unindent keeps align"
+  if FOptIndentKeepsAlign then
+    if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
   //calc shifts (emulate Laz ide indent)
   NIndent1:= SGetIndentChars(Strings.Lines[NBlockBeginY]);
@@ -592,13 +580,44 @@ begin
     begin
       Str:= Strings.Lines[i];
       if Trim(Str)='' then Continue;
+      Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize);
+      if Strings.Lines[i]<>Str then
+        Strings.Lines[i]:= Str;
+    end;
+  finally
+    Strings.EndUndoGroup;
+  end;
 
-      if NIndentAtCol=0 then
-        Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize)
-      else
-        Str:= Copy(Str, 1, NIndentAtCol) +
-              SIndentUnindent(
-                Copy(Str, NIndentAtCol+1, MaxInt), ARight, FOptIndentSize, FTabSize);
+  //correct selection
+  if NBlockBeginX>0 then
+    Caret.PosX:= Max(0, NBlockBeginX+NShift1);
+  if NBlockEndX>0 then
+    Caret.EndX:= Max(0, NBlockEndX+NShift2);
+
+  Result:= [cResultText, cResultCaretAny];
+end;
+
+
+function TATSynEdit.DoCommand_TextIndentUnindent_ColumnBlock(ARight: boolean): TATCommandResults;
+var
+  NBlockBeginY, NBlockEndY, NIndentAtCol: integer;
+  Str: atString;
+  i: integer;
+begin
+  NBlockBeginY:= Min(SelRect.Top, Strings.Count-1);
+  NBlockEndY:= Min(SelRect.Bottom, Strings.Count-1);
+  NIndentAtCol:= SelRect.Left;
+
+  //do indent
+  Strings.BeginUndoGroup;
+  try
+    for i:= NBlockBeginY to NBlockEndY do
+    begin
+      Str:= Strings.Lines[i];
+      if Trim(Str)='' then Continue;
+
+      Str:= Copy(Str, 1, NIndentAtCol) + SIndentUnindent(
+              Copy(Str, NIndentAtCol+1, MaxInt), ARight, FOptIndentSize, FTabSize);
 
       if Strings.Lines[i]<>Str then
         Strings.Lines[i]:= Str;
@@ -607,20 +626,9 @@ begin
     Strings.EndUndoGroup;
   end;
 
-  //correct selection (only stream block)
-  if not bColBlock then
-  begin
-    if NBlockBeginX>0 then
-      Caret.PosX:= Max(0, NBlockBeginX+NShift1);
-    if NBlockEndX>0 then
-      Caret.EndX:= Max(0, NBlockEndX+NShift2);
-  end;
-
-  if bColBlock then
-    Result:= [cResultText, cResultCaretAny, cResultKeepColumnSel]
-  else
-    Result:= [cResultText, cResultCaretAny];
+  Result:= [cResultText, cResultCaretAny, cResultKeepColumnSel];
 end;
+
 
 function TATSynEdit.DoCommand_Undo: TATCommandResults;
 begin

@@ -699,6 +699,8 @@ type
     function DoCommand_Undo: TATCommandResults;
     function DoCommand_Redo: TATCommandResults;
     function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
+    function DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): TATCommandResults;
+    function DoCommand_TextIndentUnindent_ColumnBlock(ARight: boolean): TATCommandResults;
     function DoCommand_SelectWords: TATCommandResults;
     function DoCommand_SelectLines: TATCommandResults;
     function DoCommand_SelectAll: TATCommandResults;
