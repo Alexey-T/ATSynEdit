@@ -606,6 +606,10 @@ begin
       NodeParent:= nil;
       NodeGroup:= nil;
 
+      //strip tree items from #10
+      SDeleteFrom(NodeText, #10);
+      SDeleteFrom(NodeTextGroup, #10);
+
       RangeParent:= GetRangeParent(R);
       while (RangeParent<>nil) and (not RangeParent.Rule.DisplayInTree) do
         RangeParent:= GetRangeParent(RangeParent);
