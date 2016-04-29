@@ -99,6 +99,7 @@ type
     procedure TreeFill(ATree: TTreeView);
     procedure TreeShowItemForCaret(Tree: TTreeView; P: TPoint);
     function TreeGetPositionOfRange(R: TecTextRange): TPoint;
+    procedure TreeGetPositionOfRange(R: TecTextRange; out P1, P2: TPoint);
     function TreeGetRangeOfPosition(P: TPoint): TecTextRange;
   public
     procedure OnEditorCaretMove(Sender: TObject); override;
@@ -650,8 +651,27 @@ end;
 function TATAdapterEControl.TreeGetPositionOfRange(R: TecTextRange): TPoint;
 begin
   Result:= Point(0, 0);
+  if R=nil then exit;
   if AnClient=nil then exit;
   Result:= Buffer.StrToCaret(R.StartPos);
+end;
+
+procedure TATAdapterEControl.TreeGetPositionOfRange(R: TecTextRange; out P1, P2: TPoint);
+var
+  tokenStart, tokenEnd: TecSyntToken;
+  Pos1, Pos2: integer;
+begin
+  P1:= Point(-1, -1);
+  P2:= Point(-1, -1);
+  if R=nil then exit;
+  if AnClient=nil then exit;
+
+  tokenStart:= AnClient.Tags[R.StartIdx];
+  tokenEnd:= AnClient.Tags[R.EndIdx];
+  Pos1:= tokenStart.StartPos;
+  Pos2:= tokenEnd.EndPos;
+  P1:= Buffer.StrToCaret(Pos1);
+  P2:= Buffer.StrToCaret(Pos2);
 end;
 
 function TATAdapterEControl.TreeGetRangeOfPosition(P: TPoint): TecTextRange;
