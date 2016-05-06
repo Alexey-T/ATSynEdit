@@ -121,12 +121,6 @@ begin
   ARange.Folded:= true;
   FWrapUpdateNeeded:= true;
 
-  //partially fold 1st line
-  if ARange.Hint<>'' then
-  begin
-    Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
-  end
-  else
   case FFoldStyle of
     cFoldHereWithDots:
     begin
@@ -135,11 +129,20 @@ begin
     cFoldHereWithTruncatedText:
     begin
       Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X;
-      ARange.Hint:= Copy(Strings.Lines[ARange.Y], ARange.X, cFoldedLenOfEmptyHint)+'...';
+      if ARange.Hint='' then
+        ARange.Hint:= Copy(Strings.Lines[ARange.Y], ARange.X, cFoldedLenOfEmptyHint)+'...';
     end;
     cFoldFromEndOfLine:
     begin
+      if ARange.Hint<>'' then
+        Strings.LinesHidden[ARange.Y, FEditorIndex]:= ARange.X
+      else
+        Strings.LinesHidden[ARange.Y, FEditorIndex]:= Length(Strings.Lines[ARange.Y])+1;
+    end;
+    cFoldFromEndOfLineAlways:
+    begin
       Strings.LinesHidden[ARange.Y, FEditorIndex]:= Length(Strings.Lines[ARange.Y])+1;
+      ARange.Hint:= '...';
     end;
     cFoldFromNextLine:
     begin

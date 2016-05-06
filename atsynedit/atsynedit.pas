@@ -92,6 +92,7 @@ type
     cFoldHereWithDots, //show "..." from fold-pos
     cFoldHereWithTruncatedText, //show truncated line instead of "..."
     cFoldFromEndOfLine, //looks like Lazarus: show "..." after line, bad with 2 blocks starting at the same line
+    cFoldFromEndOfLineAlways, //same, even if HintText not empty
     cFoldFromNextLine //looks like SynWrite: don't show "...", show separator line
     );
 
