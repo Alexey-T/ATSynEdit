@@ -624,6 +624,30 @@ begin
 end;
 
 
+procedure TATSynEdit.DoCaretsFixIfInsideCollapsedPart;
+var
+  Caret: TATCaretItem;
+  i, NFoldPos: integer;
+begin
+  for i:= Carets.Count-1 downto 0 do
+  begin
+    Caret:= Carets[i];
+    if Caret.EndY>=0 then Continue;
+    if not Strings.IsIndexValid(Caret.PosY) then Continue;
+
+    NFoldPos:= Strings.LinesHidden[Caret.PosY, FEditorIndex];
+    //0: full visible
+    //-1: full hidden
+    //>0: folded
+    case NFoldPos of
+      0: Continue;
+      -1: Caret.PosX:= 0;
+      else Caret.PosX:= Min(Caret.PosX, NFoldPos-1);
+    end;
+  end;
+end;
+
+
 procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
   AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
 var

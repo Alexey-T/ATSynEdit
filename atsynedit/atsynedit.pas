@@ -496,6 +496,7 @@ type
       AShiftY, AShiftBelowX: integer);
     procedure DoCaretsShift_MarkerItem(Mark: TATMarkerItem; APosX, APosY, AShiftX,
       AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
+    procedure DoCaretsFixIfInsideCollapsedPart;
     procedure DoDebugAddAttribs;
     procedure DoDropText;
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
