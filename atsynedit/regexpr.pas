@@ -3732,7 +3732,7 @@ var
   n : PtrInt;
   Ch : REChar;
   Mode: TSubstMode;
-  LineEnd: String = LineEnding;
+  LineEnd: String = #10; //AT, not LineEnding, chr(10)
 
   function ParseVarName (var APtr : PRegExprChar) : PtrInt;
   // extract name of variable (digits, may be enclosed with
@@ -3804,7 +3804,7 @@ begin
         Ch := p^;
         inc (p);
         case Ch of
-          'n' : inc(ResultLen, Length(LineEnding));
+          'n' : inc(ResultLen, 1); //AT
           'u', 'l', 'U', 'L': {nothing};
           else inc(ResultLen);
         end;
@@ -3845,7 +3845,7 @@ begin
         case Ch of
           'n' : begin
               p0 := @LineEnd[1];
-              p1 := p0 + Length(LineEnding);
+              p1 := p0 + 1; //AT
             end;
           'l' : begin
               Mode := smodeOneLower;
