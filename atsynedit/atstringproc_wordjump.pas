@@ -91,6 +91,9 @@ begin
   AOffset2:= AOffset;
   if S='' then exit;
 
+  //pos at end
+  if (AOffset=Length(S)) then Dec(AOffset);
+
   if (AOffset>=0) and (AOffset<Length(S)) then
   begin
     //not on wrdchar?
