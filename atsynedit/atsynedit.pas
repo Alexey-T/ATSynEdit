@@ -4812,6 +4812,9 @@ begin
   Msg.ScrollCode:= SB_THUMBPOSITION;
   Msg.Pos:= FScrollbarVert.Position;
   WMVScroll(Msg);
+
+  //show scroll hint
+  DoHintShow;
 end;
 
 procedure TATSynEdit.OnNewScrollbarHorzChanged(Sender: TObject);
