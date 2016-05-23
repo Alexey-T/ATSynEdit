@@ -53,7 +53,6 @@ type
     FOnLexerChange: TNotifyEvent;
     FOnParseBegin: TNotifyEvent;
     FOnParseDone: TNotifyEvent;
-    procedure DoAnalize(AEdit: TATSynEdit);
     procedure DoFindTokenOverrideStyle(var ATokenStyle: TecSyntaxFormat;
       ATokenIndex, AEditorIndex: integer);
     procedure DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
@@ -86,6 +85,7 @@ type
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
     property EnabledDynamicHilite: boolean read FEnabledDynHilite write FEnabledDynHilite;
+    procedure DoAnalize(AEdit: TATSynEdit; AForceAnalizeAll: boolean);
     procedure Stop;
 
     //tokens
@@ -762,7 +762,7 @@ begin
     FreeAndNil(Lens);
   end;
 
-  DoAnalize(Ed);
+  DoAnalize(Ed, false);
   UpdateRanges;
 end;
 
@@ -780,7 +780,7 @@ begin
       UpdateRangesActive(TATSynEdit(EdList[i]));
 end;
 
-procedure TATAdapterEControl.DoAnalize(AEdit: TATSynEdit);
+procedure TATAdapterEControl.DoAnalize(AEdit: TATSynEdit; AForceAnalizeAll: boolean);
 var
   NLine, NPos: integer;
 begin
@@ -790,11 +790,20 @@ begin
   FParsePausePassed:= false;
   FParseTicks:= 0;
 
-  NLine:= Min(AEdit.LineBottom+1, Buffer.Count-1);
-  NPos:= Buffer.CaretToStr(Point(0, NLine));
+  if AForceAnalizeAll then
+  begin
+    AnClient.TextChanged(0, 1); //chg 1 char at pos 0
+    AnClient.Analyze;
+    AnClient.IdleAppend;
+  end
+  else
+  begin
+    NLine:= Min(AEdit.LineBottom+1, Buffer.Count-1);
+    NPos:= Buffer.CaretToStr(Point(0, NLine));
+    AnClient.AppendToPos(NPos);
+    AnClient.IdleAppend;
+  end;
 
-  AnClient.AppendToPos(NPos);
-  AnClient.IdleAppend;
   if AnClient.IsFinished then
   begin
     FParsePausePassed:= true;
