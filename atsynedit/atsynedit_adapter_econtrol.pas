@@ -784,6 +784,9 @@ procedure TATAdapterEControl.DoAnalize(AEdit: TATSynEdit; AForceAnalizeAll: bool
 var
   NLine, NPos: integer;
 begin
+  if AnClient=nil then exit;
+  if Buffer.TextLength=0 then exit;
+
   if Assigned(FOnParseBegin) then
     FOnParseBegin(Self);
 
