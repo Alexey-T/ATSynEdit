@@ -357,14 +357,18 @@ end;
 
 procedure TATStrings.SetEndings(AValue: TATLineEnds);
 var
+  typ: TATLineEnds;
   i: integer;
 begin
   if FReadOnly then Exit;
 
   FEndings:= AValue;
   for i:= 0 to Count-1 do
-    if LinesEnds[i]<>AValue then
+  begin
+    typ:= LinesEnds[i];
+    if (typ<>AValue) and (typ<>cEndNone) then
       LinesEnds[i]:= AValue;
+  end;
 end;
 
 procedure TATStrings.SetLine(Index: integer; const AValue: atString);
