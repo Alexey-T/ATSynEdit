@@ -83,7 +83,7 @@ function SCommentLineAction(L: TStringList; const AComment: atString; Act: TATCo
 
 function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
-function SRemoveAsciiControlChars(const S: atString): atString;
+function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
 
 procedure SCalcCharOffsets(const S: atString; var AList: TATRealArray;
   ATabSize: integer; ACharsSkipped: integer = 0);
@@ -607,7 +607,7 @@ begin
   end;
 end;
 
-function SRemoveAsciiControlChars(const S: atString): atString;
+function SRemoveAsciiControlChars(const S: atString; AReplaceChar: WideChar): atString;
 var
   i: integer;
 begin
@@ -615,7 +615,7 @@ begin
   if OptUnprintedReplaceSpec then
     for i:= 1 to Length(Result) do
       if IsCharAsciiControl(Result[i]) then
-        Result[i]:= '.';
+        Result[i]:= AReplaceChar;
 end;
 
 function SRemoveHexChars(const S: atString): atString;
