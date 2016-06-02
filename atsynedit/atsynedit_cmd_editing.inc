@@ -340,7 +340,7 @@ function TATSynEdit.DoCommand_TextDeleteLines: TATCommandResults;
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  i: integer;
+  YFrom, YTo, i, j: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -352,10 +352,18 @@ begin
     for i:= FCarets.Count-1 downto 0 do
     begin
       Caret:= FCarets[i];
-      Strings.TextDeleteLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
-      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
-      Caret.PosX:= PosAfter.X;
-      Caret.PosY:= PosAfter.Y;
+      Caret.GetSelLines(YFrom, YTo, true);
+
+      Caret.PosX:= 0;
+      Caret.PosY:= YFrom;
+      Caret.EndX:= -1;
+      Caret.EndY:= -1;
+
+      for j:= YTo downto YFrom do
+      begin
+        Strings.TextDeleteLine(0, j, Shift, PosAfter);
+        DoCaretsShift(0, j, Shift.X, Shift.Y, PosAfter);
+      end;
     end;
   finally
     Strings.EndUndoGroup;
