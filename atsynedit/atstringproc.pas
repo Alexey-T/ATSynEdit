@@ -118,6 +118,7 @@ procedure SDeleteFrom(var s: string; const SFrom: string);
 
 var
   OptUnprintedReplaceSpec: boolean = false;
+  OptUnprintedReplaceSpecToCode: integer = 164; //char 164 is small circle
 
 
 implementation
