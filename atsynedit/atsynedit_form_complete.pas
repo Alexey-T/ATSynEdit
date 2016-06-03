@@ -34,7 +34,8 @@ type
 procedure DoEditorCompletionListbox(AEd: TATSynEdit;
   AOnGetProp: TATCompletionPropEvent;
   AOnResult: TATCompletionResultEvent = nil;
-  const ASnippetId: string = '');
+  const ASnippetId: string = '';
+  ASelectedIndex: integer = 0);
 
 procedure EditorGetCurrentWord(Ed: TATSynEdit; const AWordChars: atString;
   out AWord: atString; out ACharsLeft, ACharsRight: integer);
@@ -69,6 +70,7 @@ type
     FCharsRight: integer;
     FHintWnd: THintWindow;
     FSnippetId: string;
+    FSelectedIndex: integer;
     procedure DoHintHide;
     procedure DoHintShow(const AHint: string);
     procedure DoReplaceTo(AStr: string);
@@ -82,6 +84,7 @@ type
     property OnGetProp: TATCompletionPropEvent read FOnGetProp write FOnGetProp;
     property OnResult: TATCompletionResultEvent read FOnResult write FOnResult;
     property SnippetId: string read FSnippetId write FSnippetId;
+    property SelectedIndex: integer read FSelectedIndex write FSelectedIndex;
   end;
 
 const
@@ -121,7 +124,8 @@ var
 procedure DoEditorCompletionListbox(AEd: TATSynEdit;
   AOnGetProp: TATCompletionPropEvent;
   AOnResult: TATCompletionResultEvent = nil;
-  const ASnippetId: string = '');
+  const ASnippetId: string = '';
+  ASelectedIndex: integer = 0);
 begin
   if AEd.ModeReadOnly then exit;
   if AEd.Carets.Count<>1 then exit;
@@ -130,6 +134,7 @@ begin
     FormComplete:= TFormATSynEditComplete.Create(nil);
 
   FormComplete.Editor:= AEd;
+  FormComplete.SelectedIndex:= ASelectedIndex;
   FormComplete.SnippetId:= ASnippetId;
   FormComplete.OnGetProp:= AOnGetProp;
   FormComplete.OnResult:= AOnResult;
@@ -281,6 +286,9 @@ procedure TFormATSynEditComplete.FormShow(Sender: TObject);
 begin
   if Assigned(FEdit) then
     FEdit.OptCaretStopUnfocused:= false;
+
+  if (FSelectedIndex>=0) and (FSelectedIndex<List.ItemCount) then
+    List.ItemIndex:= FSelectedIndex;
 end;
 
 procedure TFormATSynEditComplete.FormUTF8KeyPress(Sender: TObject;
