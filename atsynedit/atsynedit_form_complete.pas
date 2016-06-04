@@ -159,8 +159,14 @@ begin
 
     FCharsLeft:= Min(Pos.X, FCharsLeft);
     Dec(Pos.X, FCharsLeft);
-    Editor.Strings.TextDeleteRight(Pos.X, Pos.Y, FCharsLeft+FCharsRight, Shift, PosAfter, false);
-    Editor.Strings.TextInsert(Pos.X, Pos.Y, StrText+Str1+Str2, false, Shift, PosAfter);
+
+    Editor.Strings.BeginUndoGroup;
+    try
+      Editor.Strings.TextDeleteRight(Pos.X, Pos.Y, FCharsLeft+FCharsRight, Shift, PosAfter, false);
+      Editor.Strings.TextInsert(Pos.X, Pos.Y, StrText+Str1+Str2, false, Shift, PosAfter);
+    finally
+      Editor.Strings.EndUndoGroup;
+    end;
 
     Caret.PosX:= Pos.X+Length(StrText)+Length(Str1);
     Caret.EndX:= -1;
