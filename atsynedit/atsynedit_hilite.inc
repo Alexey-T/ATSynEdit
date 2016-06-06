@@ -180,7 +180,7 @@ begin
       FOnCalcBookmarkColor(Self, BmKind, AColor);
   end;
 
-  if FOptShowCurLine then
+  if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or Self.Focused) then
   begin
     if FOptShowCurLineMinimal then
     begin

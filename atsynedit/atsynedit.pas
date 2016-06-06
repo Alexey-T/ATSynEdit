@@ -458,6 +458,7 @@ type
     FOptShowFullHilite: boolean;
     FOptShowCurLine: boolean;
     FOptShowCurLineMinimal: boolean;
+    FOptShowCurLineOnlyFocused: boolean;
     FOptShowCurColumn: boolean;
     FOptMouseHideCursor: boolean;
     FOptMouse2ClickSelectsLine: boolean;
@@ -882,6 +883,8 @@ type
     procedure DblClick; override;
     procedure TripleClick; override;
     function DoGetTextString: atString; virtual;
+    procedure DoEnter; override;
+    procedure DoExit; override;
     //messages
     procedure WMGetDlgCode(var Msg: TLMNoParams); message LM_GETDLGCODE;
     procedure WMEraseBkgnd(var Msg: TLMEraseBkgnd); message LM_ERASEBKGND;
@@ -994,6 +997,7 @@ type
     property OptShowFullHilite: boolean read FOptShowFullHilite write FOptShowFullHilite;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal;
+    property OptShowCurLineOnlyFocused: boolean read FOptShowCurLineOnlyFocused write FOptShowCurLineOnlyFocused;
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed;
@@ -2488,6 +2492,7 @@ begin
   FOptShowFullHilite:= true;
   FOptShowCurLine:= false;
   FOptShowCurLineMinimal:= true;
+  FOptShowCurLineOnlyFocused:= false;
   FOptShowCurColumn:= false;
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
   FOptKeyLeftRightSwapSel:= true;
@@ -4218,6 +4223,18 @@ function TATSynEdit.DoGetTextString: atString;
 begin
   //TATEdit overrides it
   Result:= Strings.TextString;
+end;
+
+procedure TATSynEdit.DoEnter;
+begin
+  inherited;
+  if FOptShowCurLineOnlyFocused then Update;
+end;
+
+procedure TATSynEdit.DoExit;
+begin
+  inherited;
+  if FOptShowCurLineOnlyFocused then Update;
 end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);

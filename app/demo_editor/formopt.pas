@@ -153,6 +153,7 @@ type
     procedure bColDownClick(Sender: TObject);
     procedure bColUpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { private declarations }
   public
@@ -441,6 +442,11 @@ procedure TfmOpt.FormCreate(Sender: TObject);
 begin
   InitShape(edCrShape);
   InitShape(edCrShape2);
+end;
+
+procedure TfmOpt.FormShow(Sender: TObject);
+begin
+  PageControl1.ActivePageIndex:= 0;
 end;
 
 procedure SwapItems(L: TListbox; n1, n2: integer);
