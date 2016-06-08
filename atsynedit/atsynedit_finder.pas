@@ -64,6 +64,15 @@ type
   end;
 
 type
+  { TATEditorFragment }
+
+  TATEditorFragment = class
+  public
+    X1, Y1, X2, Y2: integer;
+    Text: atString;
+  end;
+
+type
   { TATEditorFinder }
 
   TATEditorFinder = class(TATTextFinder)
@@ -73,6 +82,7 @@ type
     FSkipLen: integer;
     FOnFound: TATFinderFound;
     FOnConfirmReplace: TATFinderConfirmReplace;
+    FFragments: TList;
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean; out
       AChanged: boolean; AStartPos: integer): boolean;
     procedure DoFixCaretSelectionDirection;
@@ -80,11 +90,16 @@ type
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
     function GetRegexSkipIncrement: integer;
+    //fragments
+    procedure DoFragmentsClear;
+    procedure DoFragmentsInit;
+    procedure DoFragmentsShow;
   protected
     procedure DoOnFound; override;
   public
     OptFromCaret: boolean;
     OptConfirmReplace: boolean;
+    OptInSelection: boolean;
     constructor Create;
     destructor Destroy; override;
     procedure UpdateBuffer;
@@ -381,6 +396,7 @@ destructor TATEditorFinder.Destroy;
 begin
   FEditor:= nil;
   FreeAndNil(FBuffer);
+  DoFragmentsClear;
   inherited;
 end;
 
@@ -519,7 +535,7 @@ begin
   end;
   if FEditor.Carets.Count=0 then
   begin
-    Showmessage('Editor has not caret');
+    Showmessage('Editor has no caret');
     Exit
   end;
 
@@ -527,6 +543,8 @@ begin
   if OptRegex then OptBack:= false;
 
   DoFixCaretSelectionDirection;
+
+  if OptInSelection then DoFragmentsInit;
 
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
@@ -755,6 +773,61 @@ function TATEditorFinder.GetRegexSkipIncrement: integer;
 begin
   Result:= 0;
   if StrFind='$' then Result:= 1;
+end;
+
+
+procedure TATEditorFinder.DoFragmentsInit;
+var
+  Caret: TATCaretItem;
+  X1, Y1, X2, Y2: integer;
+  Fr: TATEditorFragment;
+  bSel: boolean;
+  i: integer;
+begin
+  DoFragmentsClear;
+  if FEditor=nil then exit;
+  FFragments:= TList.Create;
+
+  for i:= 0 to FEditor.Carets.Count-1 do
+  begin
+    Caret:= FEditor.Carets[i];
+    Caret.GetRange(X1, Y1, X2, Y2, bSel);
+    if not bSel then Continue;
+    Fr:= TATEditorFragment.Create;
+    Fr.X1:= X1;
+    Fr.X2:= X2;
+    Fr.Y1:= Y1;
+    Fr.Y2:= Y2;
+    Fr.Text:= FEditor.Strings.TextSubstring(X1, Y1, X2, Y2);
+    FFragments.Add(Fr);
+  end;
+
+  //debug
+  //DoFragmentsShow;
+end;
+
+procedure TATEditorFinder.DoFragmentsShow;
+var
+  S: string;
+  i: integer;
+begin
+  S:= '';
+  for i:= 0 to FFragments.Count-1 do
+    S:= S+ Utf8Encode(TATEditorFragment(FFragments[i]).Text) + #10'---------'#10;
+  ShowMessage(S);
+end;
+
+procedure TATEditorFinder.DoFragmentsClear;
+var
+  i: integer;
+begin
+  if Assigned(FFragments) then
+  begin
+    for i:= FFragments.Count-1 downto 0 do
+      TObject(FFragments[i]).Free;
+    FFragments.Clear;
+    FreeAndNil(FFragments);
+  end;
 end;
 
 end.
