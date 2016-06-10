@@ -214,7 +214,7 @@ type
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
     procedure TextDuplicateLine(AX, AY: integer; out AShift, APosAfter: TPoint);
-    function TextSubstring(AX1, AY1, AX2, AY2: integer): atString;
+    function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: string = #10): atString;
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
@@ -812,7 +812,8 @@ begin
     FEndings:= cEndWin;
 end;
 
-function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: integer): atString;
+function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: integer;
+  const AEolString: string = #10): atString;
 var
   L: TStringList;
   i: integer;
@@ -829,7 +830,7 @@ begin
 
   L:= TStringList.Create;
   try
-    L.TextLineBreakStyle:= tlbsLF; //force eol=#10
+    L.LineBreak:= AEolString;
 
     //first line
     Str:= Copy(Lines[AY1], AX1+1, MaxInt);

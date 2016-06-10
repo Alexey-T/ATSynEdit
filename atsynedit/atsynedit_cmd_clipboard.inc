@@ -95,8 +95,10 @@ var
   i, NLen, X1, Y1, X2, Y2: integer;
   bSel: boolean;
   Str: atString;
+  EolString: string;
 begin
   Result:= '';
+  EolString:= cLineEndStrings[Strings.Endings];
 
   if not IsSelRectEmpty then
   begin
@@ -109,7 +111,7 @@ begin
       NLen:= X2-X1-Length(Str);
       if NLen>0 then
         Str:= Str+StringOfChar(' ', NLen);
-      Result:= Result+UTF8Encode(Str)+sLineBreak;
+      Result:= Result+UTF8Encode(Str)+EolString;
     end;
     Exit;
   end;
@@ -118,6 +120,8 @@ begin
   ListStr:= TStringList.Create;
 
   try
+    ListStr.LineBreak:= EolString;
+
     for i:= 0 to Carets.Count-1 do
     begin
       Caret:= Carets[i];
@@ -148,13 +152,13 @@ begin
         Caret.GetRange(X1, Y1, X2, Y2, bSel);
         if not bSel then Continue;
 
-        Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
+        Str:= Strings.TextSubstring(X1, Y1, X2, Y2, EolString);
         if Str<>'' then
           ListStr.Add(UTF8Encode(Str));
       end;
 
       if ListStr.Count=1 then
-        Result:= ListStr[0] //don't use Text to skip eol
+        Result:= ListStr[0] //don't use Text, to skip eol
       else
         Result:= ListStr.Text;
     end;
