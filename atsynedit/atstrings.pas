@@ -854,8 +854,8 @@ begin
     //let's keep it if AX2=0 (substr till column=0)
     if Result<>'' then
       if AX2<>0 then
-        if Result[Length(Result)]=#10 then
-          SetLength(Result, Length(Result)-1);
+        if SEndsWith(Result, AEolString) then
+          SetLength(Result, Length(Result)-Length(AEolString));
   finally
     FreeAndNil(L);
   end;
