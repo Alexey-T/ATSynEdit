@@ -39,7 +39,8 @@ type
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATMarkerItem read GetItem; default;
     procedure Add(APosX, APosY: integer;
-      ATag: integer=0; ASelLen: integer=0; APtr: TObject=nil);
+      ATag: integer=0; ASelLen: integer=0; APtr: TObject=nil;
+      AInsertToBegin: boolean=false);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(ATag: integer);
     function FindMarkerAtPos(AX, AY: integer): TATMarkerItem;
@@ -104,7 +105,7 @@ begin
 end;
 
 procedure TATMarkers.Add(APosX, APosY: integer; ATag: integer;
-  ASelLen: integer; APtr: TObject);
+  ASelLen: integer; APtr: TObject; AInsertToBegin: boolean);
 var
   Item: TATMarkerItem;
 begin
@@ -117,7 +118,10 @@ begin
   Item.SelLen:= ASelLen;
   Item.Ptr:= APtr;
 
-  FList.Add(Item);
+  if AInsertToBegin then
+    FList.Insert(0, Item)
+  else
+    FList.Add(Item);
 end;
 
 procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
