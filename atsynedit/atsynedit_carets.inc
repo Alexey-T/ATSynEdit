@@ -362,20 +362,20 @@ begin
   DoGotoPos(Carets.CaretAtEdge(AEdge), cScrollIndentCaretHorz, cScrollIndentCaretVert);
 end;
 
-procedure TATSynEdit.DoGotoPos_AndUnfold(APnt: TPoint;
+procedure TATSynEdit.DoGotoPos_AndUnfold(const APos, APosEnd: TPoint;
   AIndentHorz, AIndentVert: integer);
 begin
-  if not Strings.IsIndexValid(APnt.Y) then Exit;
+  if not Strings.IsIndexValid(APos.Y) then Exit;
 
-  if IsLineFolded(APnt.Y, true) then
+  if IsLineFolded(APos.Y, true) then
   begin
-    DoUnfoldLine(APnt.Y);
+    DoUnfoldLine(APos.Y);
     Update;
   end;
 
-  DoCaretSingle(APnt.X, APnt.Y);
+  DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y, true);
   DoEventCarets;
-  DoGotoPos(APnt, AIndentHorz, AIndentVert);
+  DoGotoPos(APos, AIndentHorz, AIndentVert);
   Update;
 end;
 

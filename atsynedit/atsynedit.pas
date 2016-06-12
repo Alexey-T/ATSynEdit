@@ -839,7 +839,8 @@ type
     property Attribs: TATMarkers read FAttribs;
     function IsLineWithCaret(ALine: integer): boolean;
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
-    procedure DoGotoPos_AndUnfold(APnt: TPoint; AIndentHorz, AIndentVert: integer);
+    procedure DoGotoPos_AndUnfold(const APos, APosEnd: TPoint; AIndentHorz,
+      AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
     //misc
     function GetVisibleLines: integer;
