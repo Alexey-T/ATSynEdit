@@ -721,7 +721,8 @@ type
     function DoCommand_ToggleLineNums: TATCommandResults;
     function DoCommand_ToggleFolding: TATCommandResults;
     function DoCommand_ToggleRuler: TATCommandResults;
-    function DoCommand_ToggleMinimap: TATCommandResults;
+    function DoCommand_ToggleMiniMap: TATCommandResults;
+    function DoCommand_ToggleMicroMap: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
     function DoCommand_ScrollVert(ALines: integer): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,

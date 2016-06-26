@@ -60,9 +60,15 @@ begin
   Result:= [cResultState];
 end;
 
-function TATSynEdit.DoCommand_ToggleMinimap: TATCommandResults;
+function TATSynEdit.DoCommand_ToggleMiniMap: TATCommandResults;
 begin
   OptMinimapVisible:= not OptMinimapVisible;
+  Result:= [cResultState];
+end;
+
+function TATSynEdit.DoCommand_ToggleMicroMap: TATCommandResults;
+begin
+  OptMicromapVisible:= not OptMicromapVisible;
   Result:= [cResultState];
 end;
 
