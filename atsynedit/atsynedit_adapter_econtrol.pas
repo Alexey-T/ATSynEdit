@@ -101,6 +101,12 @@ type
     function TreeGetPositionOfRange(R: TecTextRange): TPoint;
     procedure TreeGetPositionOfRange(R: TecTextRange; out P1, P2: TPoint);
     function TreeGetRangeOfPosition(P: TPoint): TecTextRange;
+
+    //sublexers
+    function SublexerRangeCount: integer;
+    function SublexerRangeProps(AIndex: integer; out AStart, AEnd: TPoint; out
+      ALexerName: string): boolean;
+
   public
     procedure OnEditorCaretMove(Sender: TObject); override;
     procedure OnEditorChange(Sender: TObject); override;
@@ -693,6 +699,39 @@ begin
     if not R.Rule.DisplayInTree then Continue;
     if (R.StartPos<=NPos) and (R.EndIdx>=NToken) then
       begin Result:= R; Break; end;
+  end;
+end;
+
+function TATAdapterEControl.SublexerRangeCount: integer;
+begin
+  if Assigned(AnClient) then
+    Result:= AnClient.SubLexerRangeCount
+  else
+    Result:= 0;
+end;
+
+function TATAdapterEControl.SublexerRangeProps(AIndex: integer;
+  out AStart, AEnd: TPoint; out ALexerName: string): boolean;
+var
+  Range: TecSubLexerRange;
+begin
+  Result:= false;
+  AStart:= Point(0, 0);
+  AEnd:= Point(0, 0);
+  ALexerName:= '';
+
+  if AnClient=nil then exit;
+  if Buffer=nil then exit;
+
+  Result:= (AIndex>=0) and (AIndex<SublexerRangeCount);
+  if Result then
+  begin
+    Range:= AnClient.SubLexerRanges[AIndex];
+    if Range=nil then exit;
+    AStart:= Buffer.StrToCaret(Range.StartPos);
+    AEnd:= Buffer.StrToCaret(Range.EndPos);
+    if Assigned(Range.Rule) and Assigned(Range.Rule.SyntAnalyzer) then
+      ALexerName:= Range.Rule.SyntAnalyzer.LexerName;
   end;
 end;
 
