@@ -166,7 +166,8 @@ begin
     cCommand_KeyDown,
     cCommand_KeyUp:
       begin
-        DoComboUpDown(ACmd=cCommand_KeyDown);
+        if ModeOneLine then
+          DoComboUpDown(ACmd=cCommand_KeyDown);
       end;
   end;
 end;

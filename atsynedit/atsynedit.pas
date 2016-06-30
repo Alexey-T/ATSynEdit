@@ -2728,7 +2728,7 @@ begin
     OptGutterVisible:= false;
     OptRulerVisible:= false;
     OptMinimapVisible:= false;
-    OptMicromapVisible:= false;
+    //OptMicromapVisible:= false;
     OptCaretVirtual:= false;
     OptCaretManyAllowed:= false;
     OptUnprintedVisible:= false;

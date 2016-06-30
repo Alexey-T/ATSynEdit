@@ -187,7 +187,7 @@ begin
 
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
-  M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Enter'], []);
+  M.Add(cCommand_KeyEnter, 'insert line-break (ctrl+enter)', [cXControl+'+Enter'], []);
   M.Add(cCommand_KeyTab, 'tabulation key', [], []);
 
   M.Add(cCommand_GotoWordPrev,       'goto word left',           [cXControl+'+Left'], []);
