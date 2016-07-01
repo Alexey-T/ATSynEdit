@@ -466,16 +466,20 @@ var
   Item: TATStringItem;
   Ptr: pointer;
   Str: atString;
+  bFinalEol: boolean;
 begin
   Result:= '';
   if Count=0 then Exit;
+  bFinalEol:= LinesEnds[Count-1]<>cEndNone;
 
   Len:= 0;
   for i:= 0 to Count-1 do
   begin
     Item:= TATStringItem(FList[i]);
     Str:= UTF8Decode(Item.ItemString);
-    Inc(Len, Length(Str)+LenEol);
+    Inc(Len, Length(Str));
+    if bFinalEol or (i<Count-1) then
+      Inc(Len, LenEol);
   end;
   if Len=0 then Exit;
 
@@ -487,13 +491,18 @@ begin
     Item:= TATStringItem(FList[i]);
     Str:= UTF8Decode(Item.ItemString);
     Len:= Length(Str);
+    //copy string
     if Len>0 then
     begin
       Move(Str[1], Ptr^, Len*CharSize);
       Inc(Ptr, Len*CharSize);
     end;
-    PatChar(Ptr)^:= CharEol;
-    Inc(Ptr, LenEol*CharSize);
+    //copy eol
+    if bFinalEol or (i<Count-1) then
+    begin
+      PatChar(Ptr)^:= CharEol;
+      Inc(Ptr, LenEol*CharSize);
+    end;
   end;
 end;
 
