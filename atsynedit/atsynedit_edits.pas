@@ -58,10 +58,13 @@ uses
 function TATEdit.DoGetTextString: atString;
 begin
   Result:= inherited;
-  //gets text with EOLs, strip them
-  while (Result<>'') and
-    IsCharEol(Result[Length(Result)]) do
-    SetLength(Result, Length(Result)-1);
+
+  //ModeOneLine can be off (multi-line find in Cudatext)
+  if ModeOneLine then
+    //inherited gets text with EOLs, strip them
+    while (Result<>'') and
+      IsCharEol(Result[Length(Result)]) do
+      SetLength(Result, Length(Result)-1);
 end;
 
 constructor TATEdit.Create(AOwner: TComponent);
