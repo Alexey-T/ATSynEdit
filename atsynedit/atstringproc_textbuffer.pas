@@ -205,6 +205,7 @@ begin
 end;
 
 (*
+//old code, seems it's slower so del'ed
 function TATStringBuffer.OffsetToOffsetOfLineStart(APos: integer): integer;
 var
   N: integer;
@@ -236,11 +237,12 @@ function TATStringBuffer.OffsetToDistanceFromLineStart(APos: integer): integer;
 const
   CharEol = #10;
 var
-  NPos: integer;
+  NPos, NLen: integer;
 begin
   Result:= 0;
   NPos:= APos+1;
-  while (NPos>1) and (NPos-1<=Length(FText)) and (FText[NPos-1]<>CharEol) do
+  NLen:= TextLength;
+  while (NPos>1) and (NPos-1<=NLen) and (FText[NPos-1]<>CharEol) do
   begin
     Inc(Result);
     Dec(NPos);
