@@ -240,7 +240,7 @@ var
 begin
   Result:= 0;
   NPos:= APos+1;
-  while (NPos>1) and (FText[NPos-1]<>CharEol) do
+  while (NPos>1) and (NPos-1<=Length(FText)) and (FText[NPos-1]<>CharEol) do
   begin
     Inc(Result);
     Dec(NPos);
