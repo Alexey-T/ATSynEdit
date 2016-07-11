@@ -451,7 +451,7 @@ object fmMain: TfmMain
         OnClick = mnuTestMarginsClick
       end
       object mnuTestBookmk: TMenuItem
-        Caption = 'toggle bookmk at caret'
+        Caption = 'toggle bookmks at all lines'
         OnClick = mnuTestBookmkClick
       end
       object mnuTestMarker: TMenuItem
@@ -489,16 +489,6 @@ object fmMain: TfmMain
         Caption = 'options..'
         ShortCut = 120
         OnClick = bOptClick
-      end
-      object mnuOptSave: TMenuItem
-        Caption = 'save'
-        Visible = False
-        OnClick = btnSaveClick
-      end
-      object mnuOptLoad: TMenuItem
-        Caption = 'load'
-        Visible = False
-        OnClick = btnLoadClick
       end
     end
     object mnuHlp: TMenuItem

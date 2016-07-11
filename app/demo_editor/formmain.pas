@@ -71,8 +71,6 @@ type
     MenuItem9: TMenuItem;
     mnuTestSyntax: TMenuItem;
     mnuEnc: TMenuItem;
-    mnuOptSave: TMenuItem;
-    mnuOptLoad: TMenuItem;
     MenuItem2: TMenuItem;
     mnuHelpMous: TMenuItem;
     MenuItem3: TMenuItem;
@@ -138,8 +136,6 @@ type
     procedure TimerHintTimer(Sender: TObject);
     procedure UpdateEnc;
     procedure mnuHelpMousClick(Sender: TObject);
-    procedure btnLoadClick(Sender: TObject);
-    procedure btnSaveClick(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
@@ -921,34 +917,14 @@ procedure TfmMain.mnuHelpMousClick(Sender: TObject);
 const
   txt =
     'Ctrl+click - add/del caret'#13+
-    'Ctrl+drag - add caret with select'#13+
-    'Ctrl+Shift+click - add caret column'#13+
+    'Ctrl+drag - add caret with selection'#13+
+    'Ctrl+Shift+click - add carets as column'#13+
     #13+
     'Alt+drag - column-select (looks weird with wrap, ignores tab-width)'#13+
-    'drag on line numbers - line-select'#13;
+    'drag on line numbers - line-select'#13+
+    'Shift+wheel - horiz scroll'#13;
 begin
   Showmessage(txt);
-end;
-
-procedure TfmMain.btnLoadClick(Sender: TObject);
-begin
-  {
-  wait:= true;
-
-  LoadComponentFromFile(ed, FIniName, nil);
-  ed.Update(true);
-
-  UpdateChecks;
-  wait:= false;
-  }
-end;
-
-
-procedure TfmMain.btnSaveClick(Sender: TObject);
-begin
-  {
-  SaveComponentToFile(ed, FIniName);
-  }
 end;
 
 procedure TfmMain.chkGutterChange(Sender: TObject);
