@@ -26,7 +26,6 @@ type
     bFont: TButton;
     bOpt: TButton;
     btnStop: TButton;
-    btnMarker: TButton;
     chkNewScroll: TCheckBox;
     chkMinimapLeft: TCheckBox;
     chkGutter: TCheckBox;
@@ -58,14 +57,18 @@ type
     Label6: TLabel;
     Label9: TLabel;
     MainMenu1: TMainMenu;
-    Memo1: TMemo;
     MenuItem1: TMenuItem;
+    MenuItem10: TMenuItem;
+    mnuTestMarker: TMenuItem;
+    MenuItem5: TMenuItem;
+    mnuFileExit: TMenuItem;
+    MenuItem12: TMenuItem;
+    mnuFileSave: TMenuItem;
     mnuFileHtml: TMenuItem;
     mnuFindNext: TMenuItem;
     mnuFind: TMenuItem;
-    MenuItem5: TMenuItem;
     MenuItem9: TMenuItem;
-    mnuSyntax: TMenuItem;
+    mnuTestSyntax: TMenuItem;
     mnuEnc: TMenuItem;
     mnuOptSave: TMenuItem;
     mnuOptLoad: TMenuItem;
@@ -78,24 +81,24 @@ type
     MenuItem8: TMenuItem;
     mnuOpts: TMenuItem;
     mnuBms: TMenuItem;
-    mnuOneLine: TMenuItem;
-    mnuPane: TMenuItem;
-    mnuUnderline: TMenuItem;
-    mnuTCaret1: TMenuItem;
+    mnuTestCombo: TMenuItem;
+    mnuShowPane: TMenuItem;
+    mnuTestHiliteWww: TMenuItem;
+    mnuTestCaret1: TMenuItem;
     mnuOptDlg: TMenuItem;
-    mnuTBms: TMenuItem;
-    mnuTMargin: TMenuItem;
+    mnuTestBookmk: TMenuItem;
+    mnuTestMargins: TMenuItem;
     mnuFile: TMenuItem;
     mnuHlp: TMenuItem;
     mnuFileEnd: TMenuItem;
     mnuTst: TMenuItem;
-    mnuTCaretK: TMenuItem;
+    mnuTestCaret2: TMenuItem;
     mnuEndWin: TMenuItem;
     mnuEndUnix: TMenuItem;
     mnuEndMac: TMenuItem;
     mnuHelpKey: TMenuItem;
     mnuFileOpen: TMenuItem;
-    mnuFileSav: TMenuItem;
+    mnuFileSaveAs: TMenuItem;
     mnuGoto: TMenuItem;
     OpenDialog1: TOpenDialog;
     PanelMain: TPanel;
@@ -118,16 +121,18 @@ type
     procedure chkNewScrollChange(Sender: TObject);
     procedure FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
       var AContinue: boolean);
+    procedure mnuFileExitClick(Sender: TObject);
     procedure mnuFileHtmlClick(Sender: TObject);
     procedure mnuFileOpenClick(Sender: TObject);
     procedure bFontClick(Sender: TObject);
     procedure bAddCrtClick(Sender: TObject);
-    procedure mnuFileSaveClick(Sender: TObject);
+    procedure mnuFileSaveAsClick(Sender: TObject);
     procedure bKeymapClick(Sender: TObject);
     procedure bOptClick(Sender: TObject);
+    procedure mnuFileSaveClick(Sender: TObject);
     procedure mnuFindClick(Sender: TObject);
     procedure mnuFindNextClick(Sender: TObject);
-    procedure mnuSyntaxClick(Sender: TObject);
+    procedure mnuTestSyntaxClick(Sender: TObject);
     procedure TimerHintTimer(Sender: TObject);
     procedure UpdateEnc;
     procedure mnuHelpMousClick(Sender: TObject);
@@ -136,11 +141,9 @@ type
     procedure chkGutterChange(Sender: TObject);
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure FormResize(Sender: TObject);
     procedure mnuBmsClick(Sender: TObject);
-    procedure mnuOneLineClick(Sender: TObject);
-    procedure mnuPaneClick(Sender: TObject);
+    procedure mnuTestComboClick(Sender: TObject);
+    procedure mnuShowPaneClick(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
     procedure chkUnprintVisChange(Sender: TObject);
     procedure chkUnprintEndChange(Sender: TObject);
@@ -160,11 +163,11 @@ type
     procedure mnuEndMacClick(Sender: TObject);
     procedure mnuEndUnixClick(Sender: TObject);
     procedure mnuEndWinClick(Sender: TObject);
-    procedure mnuUnderlineClick(Sender: TObject);
+    procedure mnuTestHiliteWwwClick(Sender: TObject);
     procedure mnuLockClick(Sender: TObject);
-    procedure mnuTBmsClick(Sender: TObject);
-    procedure mnuTCaret1Click(Sender: TObject);
-    procedure mnuTMarginClick(Sender: TObject);
+    procedure mnuTestBookmkClick(Sender: TObject);
+    procedure mnuTestCaret1Click(Sender: TObject);
+    procedure mnuTestMarginsClick(Sender: TObject);
     procedure mnuUnlockClick(Sender: TObject);
   private
     { private declarations }
@@ -309,9 +312,9 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.mnuUnderlineClick(Sender: TObject);
+procedure TfmMain.mnuTestHiliteWwwClick(Sender: TObject);
 begin
-  with mnuUnderline do Checked:= not Checked;
+  with mnuTestHiliteWww do Checked:= not Checked;
   ed.Update;
 end;
 
@@ -320,7 +323,7 @@ begin
   ed.BeginUpdate;
 end;
 
-procedure TfmMain.mnuTBmsClick(Sender: TObject);
+procedure TfmMain.mnuTestBookmkClick(Sender: TObject);
 var
   i: integer;
 begin
@@ -336,7 +339,7 @@ begin
   ed.Update;
 end;
 
-procedure TfmMain.mnuTCaret1Click(Sender: TObject);
+procedure TfmMain.mnuTestCaret1Click(Sender: TObject);
 var
   i: integer;
 begin
@@ -347,7 +350,7 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.mnuTMarginClick(Sender: TObject);
+procedure TfmMain.mnuTestMarginsClick(Sender: TObject);
 var
   S: string;
 begin
@@ -530,16 +533,6 @@ end;
 procedure TfmMain.EditChanged(Sender: TObject);
 begin
   UpdateStatus;
-
-  {$ifdef test_text}
-  with Memo1 do
-  begin
-    Lines.Clear;
-    Lines.Text:= utf8encode(ed.Strings.TextString);
-  end;
-  {$else}
-  //Memo1.Hide;
-  {$endif}
 end;
 
 procedure TfmMain.bGotoClick(Sender: TObject);
@@ -552,9 +545,9 @@ begin
   if s='' then Exit;
   n:= StrToIntDef(s, 0)-1;
   if (n>=0) and (n<ed.Strings.Count) then
-    ed.DoGotoPos_AndUnfold(Point(0, n), 5, 5)
+    ed.DoGotoPos_AndUnfold(Point(0, n), Point(-1, -1), 5, 5)
   else
-    Showmessage('Incorrect index: '+s);
+    Showmessage('Incorrect line index: '+s);
 end;
 
 procedure TfmMain.btnMarkerClick(Sender: TObject);
@@ -593,11 +586,16 @@ begin
   if FFindStopped then AContinue:= false;
 end;
 
+procedure TfmMain.mnuFileExitClick(Sender: TObject);
+begin
+  Close;
+end;
+
 procedure TfmMain.mnuFileHtmlClick(Sender: TObject);
 var
   fn: string;
 begin
-  fn:=     GetTempDir+DirectorySeparator+'_export.html';
+  fn:= GetTempDir+DirectorySeparator+'_export.html';
   DoEditorExportToHTML(Ed, fn, 'Export test',
     'Courier New', 12, false,
     clWhite, clMedGray);
@@ -632,7 +630,7 @@ begin
   UpdateStatus;
 end;
 
-procedure TfmMain.mnuFileSaveClick(Sender: TObject);
+procedure TfmMain.mnuFileSaveAsClick(Sender: TObject);
 begin
   with SaveDialog1 do
   begin
@@ -670,6 +668,13 @@ begin
   wait:= false;
 
   ed.SetFocus;
+end;
+
+procedure TfmMain.mnuFileSaveClick(Sender: TObject);
+begin
+  if FFileName='' then exit;
+  ed.SaveToFile(FFileName);
+  ed.Update;
 end;
 
 procedure TfmMain.mnuFindClick(Sender: TObject);
@@ -768,10 +773,10 @@ begin
   if not ok then DoFindError;
 end;
 
-procedure TfmMain.mnuSyntaxClick(Sender: TObject);
+procedure TfmMain.mnuTestSyntaxClick(Sender: TObject);
 begin
-  mnuSyntax.Checked:= not mnuSyntax.Checked;
-  if mnuSyntax.Checked then
+  mnuTestSyntax.Checked:= not mnuTestSyntax.Checked;
+  if mnuTestSyntax.Checked then
     ed.OnCalcHilite:= @EditCalcLine
   else
     ed.OnCalcHilite:= nil;
@@ -955,22 +960,12 @@ begin
   ed.Update;
 end;
 
-procedure TfmMain.FormDestroy(Sender: TObject);
-begin
-  //
-end;
-
-procedure TfmMain.FormResize(Sender: TObject);
-begin
-  //
-end;
-
 procedure TfmMain.mnuBmsClick(Sender: TObject);
 begin
-  mnuTBmsClick(Self);
+  mnuTestBookmkClick(Self);
 end;
 
-procedure TfmMain.mnuOneLineClick(Sender: TObject);
+procedure TfmMain.mnuTestComboClick(Sender: TObject);
 begin
   with TfmCombo.Create(Self) do
   try
@@ -980,9 +975,9 @@ begin
   end;
 end;
 
-procedure TfmMain.mnuPaneClick(Sender: TObject);
+procedure TfmMain.mnuShowPaneClick(Sender: TObject);
 begin
-  with mnuPane do
+  with mnuShowPane do
   begin
     Checked:= not Checked;
     PanelRt.Visible:= Checked;
@@ -1090,7 +1085,7 @@ var
   X1, X2, Y, i: integer;
 begin
   if AStr='' then Exit;
-  if not mnuUnderline.Checked then Exit;
+  if not mnuTestHiliteWww.Checked then Exit;
 
   C.Pen.Color:= clBlue;
   C.Pen.Width:= 2;
@@ -1266,7 +1261,6 @@ begin
     ed.Carets.Add(APos1.X, APos1.Y, APos2.X, APos2.Y);
     ed.Carets.Sort;
   end;
-  //Memo1.Lines.Add(Format('Found %d:%d', [APos1.Y+1, APos1.X+1]));
 end;
 
 

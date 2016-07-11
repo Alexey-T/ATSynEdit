@@ -8,8 +8,6 @@ object fmMain: TfmMain
   ClientWidth = 953
   Menu = MainMenu1
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
-  OnResize = FormResize
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.7'
@@ -113,17 +111,17 @@ object fmMain: TfmMain
     object edSpaceX: TSpinEdit
       Left = 8
       Height = 27
-      Top = 240
+      Top = 280
       Width = 52
       MaxValue = 10
       MinValue = -5
       OnChange = edSpaceXChange
-      TabOrder = 8
+      TabOrder = 10
     end
     object Label1: TLabel
       Left = 67
       Height = 17
-      Top = 244
+      Top = 284
       Width = 63
       Caption = 'spacing-x'
       ParentColor = False
@@ -131,7 +129,7 @@ object fmMain: TfmMain
     object Label2: TLabel
       Left = 67
       Height = 17
-      Top = 308
+      Top = 348
       Width = 47
       Caption = 'margin'
       ParentColor = False
@@ -139,12 +137,12 @@ object fmMain: TfmMain
     object edMarRt: TSpinEdit
       Left = 8
       Height = 27
-      Top = 304
+      Top = 344
       Width = 52
       MaxValue = 200
       MinValue = 20
       OnChange = edMarRtChange
-      TabOrder = 10
+      TabOrder = 12
       Value = 20
     end
     object gWrap: TGroupBox
@@ -155,7 +153,7 @@ object fmMain: TfmMain
       Caption = 'wrap'
       ClientHeight = 85
       ClientWidth = 124
-      TabOrder = 11
+      TabOrder = 13
       object chkWrapOff: TRadioButton
         Left = 8
         Height = 24
@@ -198,18 +196,18 @@ object fmMain: TfmMain
     object edFontsize: TSpinEdit
       Left = 8
       Height = 27
-      Top = 176
+      Top = 216
       Width = 52
       MaxValue = 40
       MinValue = 4
       OnChange = edFontsizeChange
-      TabOrder = 6
+      TabOrder = 8
       Value = 10
     end
     object Label4: TLabel
       Left = 67
       Height = 17
-      Top = 180
+      Top = 220
       Width = 58
       Caption = 'font size'
       ParentColor = False
@@ -222,7 +220,7 @@ object fmMain: TfmMain
       Caption = 'unprintable'
       ClientHeight = 85
       ClientWidth = 124
-      TabOrder = 12
+      TabOrder = 14
       object chkUnprintVis: TCheckBox
         Left = 8
         Height = 24
@@ -263,18 +261,18 @@ object fmMain: TfmMain
     object edTabsize: TSpinEdit
       Left = 8
       Height = 27
-      Top = 208
+      Top = 248
       Width = 52
       MaxValue = 12
       MinValue = 1
       OnChange = edTabsizeChange
-      TabOrder = 7
+      TabOrder = 9
       Value = 8
     end
     object Label5: TLabel
       Left = 67
       Height = 17
-      Top = 212
+      Top = 252
       Width = 52
       Caption = 'tab size'
       ParentColor = False
@@ -282,35 +280,35 @@ object fmMain: TfmMain
     object bFont: TButton
       Left = 8
       Height = 25
-      Top = 92
-      Width = 81
+      Top = 144
+      Width = 96
       Caption = 'font...'
       OnClick = bFontClick
-      TabOrder = 4
+      TabOrder = 6
     end
     object chkMicromap: TCheckBox
       Left = 8
       Height = 24
-      Top = 68
+      Top = 90
       Width = 95
       Caption = 'micromap'
       OnChange = chkMicromapChange
-      TabOrder = 3
+      TabOrder = 4
     end
     object edSpaceY: TSpinEdit
       Left = 8
       Height = 27
-      Top = 272
+      Top = 312
       Width = 52
       MaxValue = 10
       MinValue = -5
       OnChange = edSpaceYChange
-      TabOrder = 9
+      TabOrder = 11
     end
     object Label6: TLabel
       Left = 67
       Height = 17
-      Top = 276
+      Top = 316
       Width = 62
       Caption = 'spacing-y'
       ParentColor = False
@@ -318,47 +316,29 @@ object fmMain: TfmMain
     object bOpt: TButton
       Left = 8
       Height = 25
-      Top = 120
-      Width = 81
+      Top = 176
+      Width = 96
       Caption = 'opts...'
       OnClick = bOptClick
-      TabOrder = 5
-    end
-    object Memo1: TMemo
-      Left = 8
-      Height = 151
-      Top = 336
-      Width = 162
-      ScrollBars = ssBoth
-      TabOrder = 13
-      Visible = False
-    end
-    object btnMarker: TButton
-      Left = 144
-      Height = 25
-      Top = 224
-      Width = 96
-      Caption = 'marker'
-      OnClick = btnMarkerClick
-      TabOrder = 14
+      TabOrder = 7
     end
     object chkMinimapLeft: TCheckBox
-      Left = 96
+      Left = 30
       Height = 24
-      Top = 48
-      Width = 36
-      Caption = 'lt'
+      Top = 70
+      Width = 67
+      Caption = 'at left'
       OnChange = chkMinimapLeftChange
-      TabOrder = 15
+      TabOrder = 3
     end
     object chkNewScroll: TCheckBox
-      Left = 144
+      Left = 8
       Height = 24
-      Top = 256
+      Top = 112
       Width = 123
       Caption = 'new scrollbars'
       OnChange = chkNewScrollChange
-      TabOrder = 16
+      TabOrder = 5
     end
   end
   object OpenDialog1: TOpenDialog
@@ -384,16 +364,23 @@ object fmMain: TfmMain
     object mnuFile: TMenuItem
       Caption = 'File'
       object mnuFileOpen: TMenuItem
-        Caption = 'Open..'
+        Caption = 'open..'
         ShortCut = 16463
         OnClick = mnuFileOpenClick
       end
-      object mnuFileSav: TMenuItem
-        Caption = 'Save..'
+      object mnuFileSave: TMenuItem
+        Caption = 'save'
         OnClick = mnuFileSaveClick
       end
+      object mnuFileSaveAs: TMenuItem
+        Caption = 'save as..'
+        OnClick = mnuFileSaveAsClick
+      end
+      object MenuItem10: TMenuItem
+        Caption = '-'
+      end
       object mnuFileEnd: TMenuItem
-        Caption = 'Set ends'
+        Caption = 'set line-ends'
         object mnuEndWin: TMenuItem
           Caption = 'win'
           OnClick = mnuEndWinClick
@@ -408,8 +395,15 @@ object fmMain: TfmMain
         end
       end
       object mnuFileHtml: TMenuItem
-        Caption = 'Export HTML'
+        Caption = 'export HTML'
         OnClick = mnuFileHtmlClick
+      end
+      object MenuItem12: TMenuItem
+        Caption = '-'
+      end
+      object mnuFileExit: TMenuItem
+        Caption = 'quit'
+        OnClick = mnuFileExitClick
       end
     end
     object MenuItem9: TMenuItem
@@ -434,46 +428,49 @@ object fmMain: TfmMain
       Caption = 'Encoding'
     end
     object mnuTst: TMenuItem
-      Caption = 'Test'
-      object mnuTCaret1: TMenuItem
-        Caption = 'set 100 cr''s'
-        OnClick = mnuTCaret1Click
+      Caption = 'Tests'
+      object mnuTestCaret1: TMenuItem
+        Caption = 'set 100 carets'
+        OnClick = mnuTestCaret1Click
       end
-      object mnuTCaretK: TMenuItem
-        Caption = 'set 2000 cr''s'
+      object mnuTestCaret2: TMenuItem
+        Caption = 'set 2000 carets'
         OnClick = bAddCrtClick
       end
-      object mnuTMargin: TMenuItem
+      object mnuTestMargins: TMenuItem
         Caption = 'set margins..'
-        OnClick = mnuTMarginClick
+        OnClick = mnuTestMarginsClick
       end
-      object mnuTBms: TMenuItem
-        Caption = 'toggle bookm'
-        OnClick = mnuTBmsClick
+      object mnuTestBookmk: TMenuItem
+        Caption = 'toggle bookmk at caret'
+        OnClick = mnuTestBookmkClick
+      end
+      object mnuTestMarker: TMenuItem
+        Caption = 'place marker at caret'
       end
       object MenuItem5: TMenuItem
         Caption = '-'
       end
-      object mnuSyntax: TMenuItem
-        Caption = 'hilite syntax'
+      object mnuTestSyntax: TMenuItem
+        Caption = 'hilite "fake" syntax'
         ShortCut = 16467
-        OnClick = mnuSyntaxClick
+        OnClick = mnuTestSyntaxClick
       end
-      object mnuUnderline: TMenuItem
-        Caption = 'underline ''www'''
-        OnClick = mnuUnderlineClick
+      object mnuTestHiliteWww: TMenuItem
+        Caption = 'underline str "www"'
+        OnClick = mnuTestHiliteWwwClick
       end
       object MenuItem1: TMenuItem
         Caption = '-'
       end
-      object mnuPane: TMenuItem
+      object mnuShowPane: TMenuItem
         Caption = 'show pane'
         Checked = True
-        OnClick = mnuPaneClick
+        OnClick = mnuShowPaneClick
       end
-      object mnuOneLine: TMenuItem
-        Caption = 'combo..'
-        OnClick = mnuOneLineClick
+      object mnuTestCombo: TMenuItem
+        Caption = 'combobox mode..'
+        OnClick = mnuTestComboClick
       end
     end
     object mnuOpts: TMenuItem
