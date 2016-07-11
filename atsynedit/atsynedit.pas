@@ -1621,12 +1621,17 @@ end;
 
 function TATSynEdit.GetRectGutter: TRect;
 begin
-  if not FOptGutterVisible then exit(cRectEmpty);
-
   Result.Left:= IfThen(FMinimapVisible and FMinimapAtLeft, FMinimapWidth);
   Result.Top:= IfThen(FOptRulerVisible, FOptRulerSize);
   Result.Right:= Result.Left + FGutter.Width;
   Result.Bottom:= ClientHeight;
+
+  if not FOptGutterVisible then
+  begin
+    Result.Right:= Result.Left;
+    Result.Bottom:= Result.Top;
+    exit
+  end;
 
   Gutter.GutterLeft:= Result.Left;
   Gutter.Update;
