@@ -26,6 +26,7 @@ type
     bFont: TButton;
     bOpt: TButton;
     btnStop: TButton;
+    chkTabSpaces: TCheckBox;
     chkNewScroll: TCheckBox;
     chkMinimapLeft: TCheckBox;
     chkGutter: TCheckBox;
@@ -41,7 +42,7 @@ type
     chkWrapOff: TRadioButton;
     chkWrapOn: TRadioButton;
     edFontsize: TSpinEdit;
-    edMarRt: TSpinEdit;
+    edMarginFixed: TSpinEdit;
     edSpaceX: TSpinEdit;
     edSpaceY: TSpinEdit;
     edTabsize: TSpinEdit;
@@ -119,6 +120,7 @@ type
     procedure btnStopClick(Sender: TObject);
     procedure chkMinimapLeftChange(Sender: TObject);
     procedure chkNewScrollChange(Sender: TObject);
+    procedure chkTabSpacesChange(Sender: TObject);
     procedure FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
       var AContinue: boolean);
     procedure mnuFileExitClick(Sender: TObject);
@@ -154,7 +156,7 @@ type
     procedure chkWrapOnChange(Sender: TObject);
     procedure chkWrapIndentChange(Sender: TObject);
     procedure edFontsizeChange(Sender: TObject);
-    procedure edMarRtChange(Sender: TObject);
+    procedure edMarginFixedChange(Sender: TObject);
     procedure edSpaceXChange(Sender: TObject);
     procedure edSpaceYChange(Sender: TObject);
     procedure edTabsizeChange(Sender: TObject);
@@ -173,7 +175,7 @@ type
     { private declarations }
     ed: TATSynEdit;
     wait: boolean;
-    FDir: string;
+    FFilesDir: string;
     FFileName: string;
     FFinder: TATEditorFinder;
     FFindStopped: boolean;
@@ -237,7 +239,7 @@ procedure TfmMain.FormCreate(Sender: TObject);
 begin
   UpdateEnc;
 
-  FDir:= ExtractFilePath(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'test_files';
+  FFilesDir:= ExtractFilePath(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'test_files';
   wait:= true;
 
   ed:= TATSynEdit.Create(Self);
@@ -286,7 +288,7 @@ begin
   wait:= false;
   ActiveControl:= ed;
 
-  fn:= FDir+'/fn.txt';
+  fn:= FFilesDir+'/fn.txt';
   if FileExists(fn) then
     DoOpen(fn, true);
 end;
@@ -407,12 +409,15 @@ begin
   chkGutter.Checked:= ed.OptGutterVisible;
   chkRuler.Checked:= ed.OptRulerVisible;
   chkMinimap.Checked:= ed.OptMinimapVisible;
+  chkMinimapLeft.Checked:= ed.OptMinimapAtLeft;
   chkMicromap.Checked:= ed.OptMicromapVisible;
+  chkTabSpaces.Checked:= ed.OptTabSpaces;
+  chkNewScroll.Checked:= ed.OptScrollbarsNew;
   edFontsize.Value:= ed.Font.Size;
   edTabsize.Value:= ed.OptTabSize;
   edSpaceX.Value:= ed.OptCharSpacingX;
   edSpaceY.Value:= ed.OptCharSpacingY;
-  edMarRt.Value:= ed.OptMarginRight;
+  edMarginFixed.Value:= ed.OptMarginRight;
   case ed.OptWrapMode of
     cWrapOff: chkWrapOff.Checked:= true;
     cWrapOn: chkWrapOn.Checked:= true;
@@ -502,7 +507,7 @@ procedure TfmMain.mnuFileOpenClick(Sender: TObject);
 begin
   with OpenDialog1 do
   begin
-    InitialDir:= FDir;
+    InitialDir:= FFilesDir;
     if not Execute then Exit;
     DoOpen(FileName, true);
   end;
@@ -578,6 +583,13 @@ begin
   ed.Update;
 end;
 
+procedure TfmMain.chkTabSpacesChange(Sender: TObject);
+begin
+  if wait then exit;
+  ed.OptTabSpaces:= chkTabSpaces.Checked;
+  ed.Update;
+end;
+
 procedure TfmMain.FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
   var AContinue: boolean);
 begin
@@ -634,7 +646,7 @@ procedure TfmMain.mnuFileSaveAsClick(Sender: TObject);
 begin
   with SaveDialog1 do
   begin
-    InitialDir:= FDir;
+    InitialDir:= FFilesDir;
     FileName:= '';
     if Execute then
     begin
@@ -1051,10 +1063,10 @@ begin
   ed.Update(true);
 end;
 
-procedure TfmMain.edMarRtChange(Sender: TObject);
+procedure TfmMain.edMarginFixedChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptMarginRight:= edMarRt.Value;
+  ed.OptMarginRight:= edMarginFixed.Value;
   ed.Update;
 end;
 
