@@ -3627,7 +3627,7 @@ begin
   if DoubleBuffered then
     DoPaintCarets(FBitmap.Canvas, true)
   else
-    DoPaintCarets(Canvas, true);
+    DoPaintCarets(Canvas, false);
 end;
 
 procedure TATSynEdit.TimerScrollTick(Sender: TObject);
@@ -4011,8 +4011,12 @@ end;
 procedure TATSynEdit.DoSendShowHideToInterface;
 begin
   inherited DoSendShowHideToInterface;
-  Canvas.Font.OnChange:=@OnCanvasFontChanged;
+
+  {
+  //breaks painting in non-doublebuffered mode
+  Canvas.Font.OnChange:= @OnCanvasFontChanged;
   OnCanvasFontChanged(Canvas.Font);
+  }
 end;
 
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
