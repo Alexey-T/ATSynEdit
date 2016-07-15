@@ -150,6 +150,7 @@ type
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
     {$endif}
   published
+    property DoubleBuffered;
     property Kind: TScrollBarKind read FKind write SetKind;
     property IndentBorder: Integer read FIndentBorder write FIndentBorder;
     property IndentCorner: Integer read FIndentCorner write FIndentCorner;
@@ -165,6 +166,23 @@ implementation
 uses
   SysUtils, Math;
 
+function IsDoubleBufferedNeeded: boolean;
+begin
+  Result:= false;
+
+  {$ifdef windows}
+  exit(true);
+  {$endif}
+
+  {$ifdef darwin}
+  exit(false);
+  {$endif}
+
+  {$ifdef linux}
+  exit(false);
+  {$endif}
+end;
+
 { TATScroll }
 
 constructor TATScroll.Create(AOnwer: TComponent);
@@ -174,6 +192,7 @@ begin
   Caption:= '';
   BorderStyle:= bsNone;
   ControlStyle:= ControlStyle+[csOpaque];
+  DoubleBuffered:= IsDoubleBufferedNeeded;
   Width:= 200;
   Height:= 20;
 
@@ -213,11 +232,16 @@ end;
 
 procedure TATScroll.Paint;
 begin
-  if Assigned(FBitmap) then
+  if DoubleBuffered then
   begin
-    DoPaintTo(FBitmap.Canvas);
-    Canvas.CopyRect(ClientRect, FBitmap.Canvas, ClientRect);
-  end;
+    if Assigned(FBitmap) then
+    begin
+      DoPaintTo(FBitmap.Canvas);
+      Canvas.CopyRect(ClientRect, FBitmap.Canvas, ClientRect);
+    end;
+  end
+  else
+    DoPaintTo(Canvas);
 end;
 
 procedure TATScroll.DoPaintTo(C: TCanvas);
