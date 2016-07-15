@@ -66,3 +66,21 @@ begin
   FreeAndNil(cBitmapNiceScroll);
 end;
 
+function IsDoubleBufferedNeeded: boolean;
+begin
+  Result:= false;
+
+  {$ifdef windows}
+  exit(true);
+  {$endif}
+
+  {$ifdef darwin}
+  exit(false);
+  {$endif}
+
+  {$ifdef linux}
+  exit(true);
+  {$endif}
+end;
+
+

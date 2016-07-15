@@ -515,7 +515,6 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
-    procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoSelectionDeleteColumnBlock;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
@@ -533,16 +532,6 @@ type
     procedure MenuFoldPlusMinusClick(Sender: TObject);
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
     procedure OnNewScrollbarVertChanged(Sender: TObject);
-    procedure PaintEx(ALine: integer);
-    procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
-      ACoordX2, ACoordY1, ACoordY2: integer);
-    procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
-      ABottom: integer);
-    procedure DoPaintLockedWarning(C: TCanvas);
-    procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
-    procedure DoPaintStaples(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
-      const AScrollHorz: TATSynScrollInfo);
-    procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPartShow(const P: TATLineParts);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer);
@@ -581,10 +570,12 @@ type
     procedure DoSelect_Word_ByClick;
     procedure DoSelect_Line_ByClick;
     //paint
+    procedure PaintFromLine(ALineNumber: integer);
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
+    procedure DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
+    procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
-    procedure DoPaintTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintRulerTo(C: TCanvas);
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
@@ -605,6 +596,16 @@ type
       const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
       ALineIndex: integer; AEolSelected: boolean;
       const AScrollHorz: TATSynScrollInfo);
+    procedure DoPaintMarkersTo(C: TCanvas);
+    procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
+      ACoordX2, ACoordY1, ACoordY2: integer);
+    procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
+      ABottom: integer);
+    procedure DoPaintLockedWarning(C: TCanvas);
+    procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
+    procedure DoPaintStaples(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
+      const AScrollHorz: TATSynScrollInfo);
+    procedure DoPaintTextHintTo(C: TCanvas);
     //carets
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
@@ -903,6 +904,7 @@ type
     property Anchors;
     property BorderSpacing;
     property BorderStyle;
+    property DoubleBuffered;
     property DragMode;
     property DragKind;
     property Enabled;
@@ -1647,7 +1649,7 @@ begin
   Result.Bottom:= Result.Top+FOptRulerSize;
 end;
 
-procedure TATSynEdit.DoPaintTo(C: TCanvas; ALineFrom: integer);
+procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
 begin
   if csLoading in ComponentState then Exit;
 
@@ -2280,6 +2282,7 @@ begin
 
   Caption:= '';
   ControlStyle:= ControlStyle+[csOpaque, csDoubleClicks, csTripleClicks];
+  DoubleBuffered:= IsDoubleBufferedNeeded;
   BorderStyle:= bsNone;
   TabStop:= true;
 
@@ -2831,34 +2834,45 @@ begin
   end;
 end;
 
-function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
-var
-  ARect: TRect;
+procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
 begin
-  Result:= false;
-  if not Assigned(FBitmap) then Exit;
-
   if cPaintUpdateBitmap in AFlags then
   begin
-    DoPaintTo(FBitmap.Canvas, ALineFrom);
+    DoPaintMainTo(C, ALineFrom);
 
     if cPaintUpdateCaretsCoords in AFlags then
     begin
       UpdateCaretsCoords;
       //paint margin
       if FOptShowCurColumn and (Carets.Count>0) then
-        DoPaintMarginLineTo(FBitmap.Canvas, Carets[0].CoordX, FColors.MarginCaret);
+        DoPaintMarginLineTo(C, Carets[0].CoordX, FColors.MarginCaret);
     end;
 
     //paint markers after calc carets
-    DoPaintMarkersTo(FBitmap.Canvas);
+    DoPaintMarkersTo(C);
 
     FCaretShown:= false;
-    DoPaintCarets(FBitmap.Canvas, false);
+    DoPaintCarets(C, false);
   end;
+end;
 
-  ARect:= Canvas.ClipRect;
-  Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
+function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
+var
+  ARect: TRect;
+begin
+  Result:= false;
+
+  if DoubleBuffered then
+  begin
+    if Assigned(FBitmap) then
+    begin
+      DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
+      ARect:= Canvas.ClipRect;
+      Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
+    end;
+  end
+  else
+    DoPaintAllTo(Canvas, AFlags, ALineFrom);
 
   if cPaintUpdateScrollbars in AFlags then
     Result:= UpdateScrollbars;
@@ -2878,10 +2892,10 @@ end;
 
 procedure TATSynEdit.Paint;
 begin
-  PaintEx(-1);
+  PaintFromLine(-1);
 end;
 
-procedure TATSynEdit.PaintEx(ALine: integer);
+procedure TATSynEdit.PaintFromLine(ALineNumber: integer);
 begin
   if FPaintLocked>0 then
   begin
@@ -2890,8 +2904,8 @@ begin
   end;
 
   //if scrollbars shown, paint again
-  if DoPaint(FPaintFlags, ALine) then
-    DoPaint(FPaintFlags, ALine);
+  if DoPaint(FPaintFlags, ALineNumber) then
+    DoPaint(FPaintFlags, ALineNumber);
 
   Exclude(FPaintFlags, cPaintUpdateBitmap);
 end;
@@ -2902,6 +2916,7 @@ var
 begin
   inherited;
 
+  if DoubleBuffered then
   if Assigned(FBitmap) then
   begin
     SizeX:= (Width div cResizeBitmapStep + 1)*cResizeBitmapStep;
@@ -2917,7 +2932,7 @@ begin
   Include(FPaintFlags, cPaintUpdateScrollbars);
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Include(FPaintFlags, cPaintUpdateBitmap);
-  PaintEx(LineTop);
+  PaintFromLine(LineTop);
 end;
 
 //needed to remove flickering on resize and mouse-over
@@ -3609,7 +3624,10 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  DoPaintCarets(FBitmap.Canvas, true);
+  if DoubleBuffered then
+    DoPaintCarets(FBitmap.Canvas, true)
+  else
+    DoPaintCarets(Canvas, true);
 end;
 
 procedure TATSynEdit.TimerScrollTick(Sender: TObject);
