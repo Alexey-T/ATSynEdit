@@ -288,17 +288,23 @@ end;
 
 procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
 const
-  cWavePeriod = 4;
-  cWaveInc: array[0..cWavePeriod-1] of integer = (0, 1, 2, 1);
+  cWavePeriod = 2;
+  cWaveInc: array[0..cWavePeriod-1] of integer = (0, 2);
 var
-  i, y, sign: integer;
+  Points: array of TPoint;
+  x, y, sign: integer;
 begin
+  SetLength(Points, 0);
   if AtDown then sign:= -1 else sign:= 1;
-  for i:= P1.X to P2.X do
-  begin
-    y:= P2.Y + sign * cWaveInc[(i-P1.X) mod cWavePeriod];
-    C.Pixels[i, y]:= Color;
-  end;
+  for x:= P1.X to P2.X do
+    if not Odd(x) then
+    begin
+      y:= P2.Y + sign * cWaveInc[(x-P1.X) div 2 mod cWavePeriod];
+      SetLength(Points, Length(Points)+1);
+      Points[Length(Points)-1]:= Point(x, y);
+    end;
+  if Length(Points)>0 then
+    C.Polyline(Points);
 end;
 
 procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
