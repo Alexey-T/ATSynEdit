@@ -4277,15 +4277,13 @@ end;
 procedure TATSynEdit.DoEnter;
 begin
   inherited;
-  if not DoubleBuffered then Update else
-    if FOptShowCurLineOnlyFocused then Update;
+  if FOptShowCurLineOnlyFocused then Update;
 end;
 
 procedure TATSynEdit.DoExit;
 begin
   inherited;
-  if not DoubleBuffered then Update else
-    if FOptShowCurLineOnlyFocused then Update;
+  if FOptShowCurLineOnlyFocused then Update;
 end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);
