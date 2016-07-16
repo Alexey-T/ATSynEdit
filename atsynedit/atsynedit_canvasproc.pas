@@ -303,6 +303,8 @@ begin
       SetLength(Points, Length(Points)+1);
       Points[Length(Points)-1]:= Point(x, y);
     end;
+
+  C.Pen.Color:= Color;
   if Length(Points)>0 then
     C.Polyline(Points);
 end;
