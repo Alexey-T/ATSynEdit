@@ -131,6 +131,7 @@ begin
 
   Res:= [];
   FCaretSpecPos:= false;
+  FCaretDontBlink:= false;
 
   //---handle special command bits (cCmdNNNNN)
   if ACmd and cCmdSelKeep <> 0 then

@@ -126,7 +126,8 @@ type
   TATSynPaintFlag = (
     cPaintUpdateBitmap,
     cPaintUpdateCaretsCoords,
-    cPaintUpdateScrollbars
+    cPaintUpdateScrollbars,
+    cPaintOnlyCarets
     );
   TATSynPaintFlags = set of TATSynPaintFlag;
 
@@ -300,6 +301,7 @@ type
     FCaretShapeOvr,
     FCaretShapeRO: TATSynCaretShape;
     FCaretShown: boolean;
+    FCaretDontBlink: boolean;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
@@ -2836,7 +2838,8 @@ end;
 
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
 begin
-  if cPaintUpdateBitmap in AFlags then
+  if (not DoubleBuffered) or
+    (cPaintUpdateBitmap in AFlags) then
   begin
     DoPaintMainTo(C, ALineFrom);
 
@@ -2896,11 +2899,30 @@ begin
 end;
 
 procedure TATSynEdit.PaintFromLine(ALineNumber: integer);
+var
+  ARect: TRect;
 begin
   if FPaintLocked>0 then
   begin
     DoPaintLockedWarning(Canvas);
     Exit
+  end;
+
+  if cPaintOnlyCarets in FPaintFlags then
+  begin
+    Exclude(FPaintFlags, cPaintOnlyCarets);
+    if DoubleBuffered then
+    begin
+      DoPaintCarets(FBitmap.Canvas, true);
+      ARect:= Canvas.ClipRect;
+      Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
+      Exit;
+    end
+    else
+    begin
+      FCaretDontBlink:= not FCaretDontBlink;
+      //then do usual painting (with or without caret)
+    end;
   end;
 
   //if scrollbars shown, paint again
@@ -2935,9 +2957,9 @@ begin
   PaintFromLine(LineTop);
 end;
 
-//needed to remove flickering on resize and mouse-over
 procedure TATSynEdit.WMEraseBkgnd(var Msg: TLMEraseBkgnd);
 begin
+  //needed to remove flickering on resize and mouse-over
   Msg.Result:= 1;
 end;
 
@@ -3624,10 +3646,8 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  if DoubleBuffered then
-    DoPaintCarets(FBitmap.Canvas, true)
-  else
-    DoPaintCarets(Canvas, false);
+  Include(FPaintFlags, cPaintOnlyCarets);
+  inherited Invalidate;
 end;
 
 procedure TATSynEdit.TimerScrollTick(Sender: TObject);
@@ -3721,9 +3741,9 @@ var
   Shape: TATSynCaretShape;
 begin
   if IsCaretBlocked then
-  begin
     if not FCaretShown then Exit;
-  end;
+
+  if FCaretDontBlink then Exit;
   FCaretShown:= not FCaretShown;
 
   if ModeReadOnly then
