@@ -272,12 +272,12 @@ begin
     if AtDown then
     begin
       Points[0]:= Point(P1.X, P1.Y-2);
-      Points[3]:= Point(P2.X, P2.Y-2);
+      Points[3]:= Point(P2.X+1, P2.Y-3);
     end
     else
     begin
       Points[0]:= Point(P1.X, P1.Y+2);
-      Points[3]:= Point(P2.X, P2.Y+2);
+      Points[3]:= Point(P2.X+1, P2.Y+3);
     end;
     C.Polyline(Points);
   end

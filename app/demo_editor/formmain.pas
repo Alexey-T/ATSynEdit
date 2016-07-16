@@ -1113,10 +1113,10 @@ var
         2: begin
              ColorFont:= clgreen;
              ColorBorder:= clgreen;
+             BorderDown:= cLineStyleRounded;
+             BorderUp:= cLineStyleRounded;
              BorderLeft:= cLineStyleRounded;
-             BorderDown:= BorderLeft;
-             BorderRight:= BorderLeft;
-             BorderUp:= BorderLeft;
+             BorderRight:= cLineStyleRounded;
              FontItalic:= true;
              FontBold:= true;
            end;
