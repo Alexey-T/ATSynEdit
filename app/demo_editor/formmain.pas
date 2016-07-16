@@ -1113,7 +1113,7 @@ var
         2: begin
              ColorFont:= clgreen;
              ColorBorder:= clgreen;
-             BorderLeft:= cLineStyleDotted;
+             BorderLeft:= cLineStyleRounded;
              BorderDown:= BorderLeft;
              BorderRight:= BorderLeft;
              BorderUp:= BorderLeft;

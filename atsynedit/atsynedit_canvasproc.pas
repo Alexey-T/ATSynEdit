@@ -261,23 +261,25 @@ end;
 
 procedure CanvasRoundedLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
 var
-  cPixel: TColor;
+  Points: array[0..3] of TPoint;
 begin
-  cPixel:= Color;
   C.Pen.Color:= Color;
   if P1.Y=P2.Y then
   begin
-    C.Line(P1.X+2, P1.Y, P2.X-1, P2.Y);
+    //paint polyline, 4 points, horz line and 2 edges
+    Points[1]:= Point(P1.X+2, P1.Y);
+    Points[2]:= Point(P2.X-2, P2.Y);
     if AtDown then
     begin
-      C.Pixels[P1.X+1, P1.Y-1]:= cPixel;
-      C.Pixels[P2.X-1, P2.Y-1]:= cPixel;
+      Points[0]:= Point(P1.X, P1.Y-2);
+      Points[3]:= Point(P2.X, P2.Y-2);
     end
     else
     begin
-      C.Pixels[P1.X+1, P1.Y+1]:= cPixel;
-      C.Pixels[P2.X-1, P2.Y+1]:= cPixel;
-    end
+      Points[0]:= Point(P1.X, P1.Y+2);
+      Points[3]:= Point(P2.X, P2.Y+2);
+    end;
+    C.Polyline(Points);
   end
   else
   begin
