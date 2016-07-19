@@ -126,8 +126,8 @@ type
   TATSynPaintFlag = (
     cPaintUpdateBitmap,
     cPaintUpdateCaretsCoords,
-    cPaintUpdateScrollbars,
-    cPaintOnlyCarets
+    cPaintUpdateScrollbars
+    //cPaintOnlyCarets
     );
   TATSynPaintFlags = set of TATSynPaintFlag;
 
@@ -2852,7 +2852,6 @@ begin
   DoPaintMarkersTo(C);
 
   FCaretShown:= false;
-  DoPaintCarets(C, false);
 end;
 
 function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
@@ -2897,7 +2896,7 @@ end;
 
 procedure TATSynEdit.PaintFromLine(ALineNumber: integer);
 var
-  ARect: TRect;
+  R: TRect;
 begin
   if FPaintLocked>0 then
   begin
@@ -2905,28 +2904,31 @@ begin
     Exit
   end;
 
-  //handle carets/non-buffered before paint
-  if cPaintOnlyCarets in FPaintFlags then
-    if not DoubleBuffered then
-    begin
-      Exclude(FPaintFlags, cPaintOnlyCarets);
-      FCaretDontBlink:= not FCaretDontBlink;
-    end;
-
   //if scrollbars shown, paint again
   if DoPaint(FPaintFlags, ALineNumber) then
     DoPaint(FPaintFlags, ALineNumber);
   Exclude(FPaintFlags, cPaintUpdateBitmap);
 
-  //handle carets/buffered after paint
-  if cPaintOnlyCarets in FPaintFlags then
+  //if cPaintOnlyCarets in FPaintFlags then
     if DoubleBuffered then
+    //buf mode: timer tick don't give painting of whole bitmap
+    //(cPaintUpdateBitmap off),
+    //so always invert carets (dont use FCaretDontBlink)
     begin
-      //don't exclude cPaintOnlyCarets
       DoPaintCarets(FBitmap.Canvas, true);
-      ARect:= Canvas.ClipRect;
-      Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
+      R:= Canvas.ClipRect;
+      Canvas.CopyRect(R, FBitmap.Canvas, R);
     end
+    else
+    //non-buf mode: timer tick clears whole canvas first.
+    //we already painted bitmap above,
+    //and now we invert carets or dont invert (use FCaretDontBlink)
+    begin
+      if not FCaretDontBlink then
+        DoPaintCarets(Canvas, true);
+    end;
+
+  //Exclude(FPaintFlags, cPaintOnlyCarets);
 end;
 
 procedure TATSynEdit.DoOnResize;
@@ -3643,7 +3645,10 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  Include(FPaintFlags, cPaintOnlyCarets);
+  //Include(FPaintFlags, cPaintOnlyCarets);
+  if not DoubleBuffered then
+    FCaretDontBlink:= not FCaretDontBlink;
+
   inherited Invalidate;
 end;
 
@@ -3740,7 +3745,6 @@ begin
   if IsCaretBlocked then
     if not FCaretShown then Exit;
 
-  if FCaretDontBlink then Exit;
   FCaretShown:= not FCaretShown;
 
   if ModeReadOnly then

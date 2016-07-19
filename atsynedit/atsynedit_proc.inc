@@ -74,12 +74,12 @@ begin
   exit(true);
   {$endif}
 
-  {$ifdef darwin}
-  exit(false);
-  {$endif}
-
   {$ifdef linux}
   exit(true);
+  {$endif}
+
+  {$ifdef darwin}
+  exit(false);
   {$endif}
 end;
 
