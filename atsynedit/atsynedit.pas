@@ -125,9 +125,9 @@ type
 
   TATSynPaintFlag = (
     cPaintUpdateBitmap,
+    cPaintUpdateScrollbars,
     cPaintUpdateCaretsCoords,
-    cPaintUpdateScrollbars
-    //cPaintOnlyCarets
+    cPaintUpdateCarets
     );
   TATSynPaintFlags = set of TATSynPaintFlag;
 
@@ -301,10 +301,10 @@ type
     FCaretShapeOvr,
     FCaretShapeRO: TATSynCaretShape;
     FCaretShown: boolean;
-    FCaretDontBlink: boolean;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
+    FCaretAllowNextBlink: boolean;
     FMarkers: TATMarkers;
     FAttribs: TATMarkers;
     FMarkedRange: TATMarkers;
@@ -572,7 +572,7 @@ type
     procedure DoSelect_Word_ByClick;
     procedure DoSelect_Line_ByClick;
     //paint
-    procedure PaintFromLine(ALineNumber: integer);
+    procedure PaintEx(ALineNumber: integer);
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
     procedure DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
@@ -2855,8 +2855,6 @@ begin
 end;
 
 function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
-var
-  ARect: TRect;
 begin
   Result:= false;
 
@@ -2866,8 +2864,6 @@ begin
       if cPaintUpdateBitmap in AFlags then
       begin
         DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
-        ARect:= Canvas.ClipRect;
-        Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
       end;
   end
   else
@@ -2891,10 +2887,10 @@ end;
 
 procedure TATSynEdit.Paint;
 begin
-  PaintFromLine(-1);
+  PaintEx(-1);
 end;
 
-procedure TATSynEdit.PaintFromLine(ALineNumber: integer);
+procedure TATSynEdit.PaintEx(ALineNumber: integer);
 var
   R: TRect;
 begin
@@ -2904,31 +2900,39 @@ begin
     Exit
   end;
 
+  if DoubleBuffered then
+    if not Assigned(FBitmap) then exit;
+
   //if scrollbars shown, paint again
   if DoPaint(FPaintFlags, ALineNumber) then
     DoPaint(FPaintFlags, ALineNumber);
   Exclude(FPaintFlags, cPaintUpdateBitmap);
 
-  //if cPaintOnlyCarets in FPaintFlags then
+  if cPaintUpdateCarets in FPaintFlags then
+  begin
+    Exclude(FPaintFlags, cPaintUpdateCarets);
     if DoubleBuffered then
     //buf mode: timer tick don't give painting of whole bitmap
-    //(cPaintUpdateBitmap off),
-    //so always invert carets (dont use FCaretDontBlink)
+    //(cPaintUpdateBitmap off)
     begin
       DoPaintCarets(FBitmap.Canvas, true);
-      R:= Canvas.ClipRect;
-      Canvas.CopyRect(R, FBitmap.Canvas, R);
     end
     else
     //non-buf mode: timer tick clears whole canvas first.
     //we already painted bitmap above,
-    //and now we invert carets or dont invert (use FCaretDontBlink)
+    //and now we invert carets or dont invert (use FCaretAllowNextBlink)
     begin
-      if not FCaretDontBlink then
+      if FCaretAllowNextBlink then
         DoPaintCarets(Canvas, true);
     end;
+  end;
 
-  //Exclude(FPaintFlags, cPaintOnlyCarets);
+  if DoubleBuffered then
+  begin
+    //single place where we flush bitmap to canvas
+    R:= Canvas.ClipRect;
+    Canvas.CopyRect(R, FBitmap.Canvas, R);
+  end;
 end;
 
 procedure TATSynEdit.DoOnResize;
@@ -2953,7 +2957,7 @@ begin
   Include(FPaintFlags, cPaintUpdateScrollbars);
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Include(FPaintFlags, cPaintUpdateBitmap);
-  PaintFromLine(LineTop);
+  PaintEx(LineTop);
 end;
 
 procedure TATSynEdit.WMEraseBkgnd(var Msg: TLMEraseBkgnd);
@@ -3645,9 +3649,9 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  //Include(FPaintFlags, cPaintOnlyCarets);
+  Include(FPaintFlags, cPaintUpdateCarets);
   if not DoubleBuffered then
-    FCaretDontBlink:= not FCaretDontBlink;
+    FCaretAllowNextBlink:= not FCaretAllowNextBlink;
 
   inherited Invalidate;
 end;
