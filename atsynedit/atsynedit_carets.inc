@@ -691,3 +691,10 @@ begin
       APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 end;
 
+
+procedure TATSynEdit.DoCaretForceShow;
+begin
+  Include(FPaintFlags, cPaintUpdateCarets);
+  FCaretAllowNextBlink:= true;
+end;
+

@@ -494,6 +494,7 @@ type
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
+    procedure DoCaretForceShow;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoCaretsShift_CaretItem(Caret: TATCaretItem; APosX, APosY, AShiftX,
       AShiftY, AShiftBelowX: integer);

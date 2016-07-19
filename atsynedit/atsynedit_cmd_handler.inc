@@ -132,10 +132,8 @@ begin
   Res:= [];
   FCaretSpecPos:= false;
 
-  //on every command, force show caret
-  //(caret moving must be with visible caret)
-  Include(FPaintFlags, cPaintUpdateCarets);
-  FCaretAllowNextBlink:= true;
+  //moving must be with visible caret
+  DoCaretForceShow;
 
   //---handle special command bits (cCmdNNNNN)
   if ACmd and cCmdSelKeep <> 0 then
