@@ -230,7 +230,7 @@ begin
         end;
 
         Part:= PartObj.Data;
-        Part.Len:= Attr.SelLen;
+        Part.Len:= Attr.LenX;
         Part.Offset:= Attr.PosX-ACharIndex;
         if Part.ColorBG=clNone then
           Part.ColorBG:= AColorBG;

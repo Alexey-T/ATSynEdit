@@ -4707,16 +4707,16 @@ begin
   p1.Data.ColorBG:= clgreen;
   p1.Data.ColorFont:= clwhite;
   p1.data.BorderDown:= cLineStyleDotted;
-  Attribs.Add(1,1, 0, 4, p1);
+  Attribs.Add(1,1, 0,0, 4, p1);
 
   p2.Data.ColorBG:= clYellow;
   p2.Data.ColorFont:= clBlue;
   p2.data.BorderDown:= cLineStyleSolid;
-  Attribs.Add(2,2, 0, 4, p2);
+  Attribs.Add(2,2, 0,0, 4, p2);
 
   p3.Data.ColorBG:= clRed;
   p3.Data.ColorFont:= clYellow;
-  Attribs.Add(3,3, 0, 4, p3);
+  Attribs.Add(3,3, 0,0, 4, p3);
 end;
 
 procedure TATSynEdit.DoSetMarkedLines(ALine1, ALine2: integer);
@@ -4813,7 +4813,7 @@ begin
         AtrObj.Data.ColorBG:= clNone;
         AtrObj.Data.ColorBorder:= Colors.Links;
         AtrObj.Data.BorderDown:= cLineStyleSolid;
-        Attribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, AtrObj);
+        Attribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, 0, AtrObj);
       end;
     end;
   finally
@@ -4831,9 +4831,10 @@ begin
   Atr:= Attribs.FindMarkerAtPos(AX, AY);
   if Atr=nil then exit;
   if Atr.Tag<>cUrlMarkerTag then exit;
+  if Atr.LenY>0 then exit;
 
   Result:= Strings.Lines[AY];
-  Result:= Copy(Result, Atr.PosX+1, Atr.SelLen);
+  Result:= Copy(Result, Atr.PosX+1, Atr.LenX);
 end;
 
 
