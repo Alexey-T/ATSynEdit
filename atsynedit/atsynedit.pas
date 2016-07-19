@@ -2838,25 +2838,21 @@ end;
 
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
 begin
-  if (not DoubleBuffered) or
-    (cPaintUpdateBitmap in AFlags) then
+  DoPaintMainTo(C, ALineFrom);
+
+  if cPaintUpdateCaretsCoords in AFlags then
   begin
-    DoPaintMainTo(C, ALineFrom);
-
-    if cPaintUpdateCaretsCoords in AFlags then
-    begin
-      UpdateCaretsCoords;
-      //paint margin
-      if FOptShowCurColumn and (Carets.Count>0) then
-        DoPaintMarginLineTo(C, Carets[0].CoordX, FColors.MarginCaret);
-    end;
-
-    //paint markers after calc carets
-    DoPaintMarkersTo(C);
-
-    FCaretShown:= false;
-    DoPaintCarets(C, false);
+    UpdateCaretsCoords;
+    //paint margin
+    if FOptShowCurColumn and (Carets.Count>0) then
+      DoPaintMarginLineTo(C, Carets[0].CoordX, FColors.MarginCaret);
   end;
+
+  //paint markers after calc carets
+  DoPaintMarkersTo(C);
+
+  FCaretShown:= false;
+  DoPaintCarets(C, false);
 end;
 
 function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
@@ -2868,11 +2864,12 @@ begin
   if DoubleBuffered then
   begin
     if Assigned(FBitmap) then
-    begin
-      DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
-      ARect:= Canvas.ClipRect;
-      Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
-    end;
+      if cPaintUpdateBitmap in AFlags then
+      begin
+        DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
+        ARect:= Canvas.ClipRect;
+        Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
+      end;
   end
   else
     DoPaintAllTo(Canvas, AFlags, ALineFrom);
@@ -2908,28 +2905,28 @@ begin
     Exit
   end;
 
+  //handle carets/non-buffered before paint
   if cPaintOnlyCarets in FPaintFlags then
-  begin
-    Exclude(FPaintFlags, cPaintOnlyCarets);
-    if DoubleBuffered then
+    if not DoubleBuffered then
     begin
-      DoPaintCarets(FBitmap.Canvas, true);
-      ARect:= Canvas.ClipRect;
-      Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
-      Exit;
-    end
-    else
-    begin
+      Exclude(FPaintFlags, cPaintOnlyCarets);
       FCaretDontBlink:= not FCaretDontBlink;
-      //then do usual painting (with or without caret)
     end;
-  end;
 
   //if scrollbars shown, paint again
   if DoPaint(FPaintFlags, ALineNumber) then
     DoPaint(FPaintFlags, ALineNumber);
-
   Exclude(FPaintFlags, cPaintUpdateBitmap);
+
+  //handle carets/buffered after paint
+  if cPaintOnlyCarets in FPaintFlags then
+    if DoubleBuffered then
+    begin
+      //don't exclude cPaintOnlyCarets
+      DoPaintCarets(FBitmap.Canvas, true);
+      ARect:= Canvas.ClipRect;
+      Canvas.CopyRect(ARect, FBitmap.Canvas, ARect);
+    end
 end;
 
 procedure TATSynEdit.DoOnResize;
