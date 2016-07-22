@@ -1453,17 +1453,14 @@ begin
   if FWrapMode=AValue then Exit;
 
   NLine:= LineTop;
-
   FWrapMode:= AValue;
   FWrapUpdateNeeded:= true;
-
   if FWrapMode<>cWrapOff then
     FScrollHorz.NPos:= 0;
 
-  Invalidate;
-  AppProcessMessages;
+  Update;
   LineTop:= NLine;
-  Invalidate;
+  Update;
 end;
 
 procedure TATSynEdit.SetWrapIndented(AValue: boolean);
@@ -2631,10 +2628,15 @@ begin
   DoClearScrollInfo(FScrollVert);
 
   BeginUpdate;
+
     //show "wait" text
     Strings.Clear;
-    Update(true);
-    AppProcessMessages;
+    FWrapUpdateNeeded:= true;
+    Paint;
+    Invalidate;
+    {$ifdef allow_proc_msg}
+    Application.ProcessMessages;
+    {$endif}
 
   try
     Strings.LoadFromFile(AFilename);
@@ -2894,6 +2896,7 @@ end;
 
 procedure TATSynEdit.Paint;
 begin
+  if not HandleAllocated then exit;
   PaintEx(-1);
 end;
 
@@ -4355,9 +4358,6 @@ begin
 
   NTop:= LineTop;
   Font.Size:= Font.Size+BoolToPlusMinusOne(AInc);
-  Update;
-  AppProcessMessages;
-
   LineTop:= NTop;
   Update;
 end;
