@@ -2765,6 +2765,12 @@ procedure TATSynEdit.SetLineTop(AValue: integer);
 var
   NFrom, NTo, i: integer;
 begin
+  //first let's call Paint; it makes sure that WrapInfo is filled with data;
+  //then we can read WrapInfo and calc scroll pos;
+  //this is required for restoring LineTop for n tabs, on opening CudaText
+  if not HandleAllocated then exit;
+  Paint;
+
   //find exact match
   FWrapInfo.FindIndexesOfLineNumber(AValue, NFrom, NTo);
   if NFrom>=0 then
