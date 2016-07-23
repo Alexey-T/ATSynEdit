@@ -516,7 +516,7 @@ begin
   FRedoList:= TATUndoList.Create;
   FHintList:= TATHintList.Create;
 
-  FEncoding:= cEncAnsi;
+  FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
   FEncodingCodepage:= '';
   FEncodingDetectBufSizeKb:= 16;

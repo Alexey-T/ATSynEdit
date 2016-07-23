@@ -87,7 +87,7 @@ procedure DoDetectStreamEncoding(Stream: TStream;
   out EncWithBom: boolean;
   BufSizeKb: integer);
 begin
-  Enc:= cEncAnsi;
+  Enc:= cEncUTF8;
   EncWithBom:= true;
   SignLen:= 0;
 
