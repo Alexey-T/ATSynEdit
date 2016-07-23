@@ -88,12 +88,13 @@ procedure DoDetectStreamEncoding(Stream: TStream;
   BufSizeKb: integer);
 begin
   Enc:= cEncUTF8;
-  EncWithBom:= true;
+  EncWithBom:= false;
   SignLen:= 0;
 
   if IsStreamWithSignature(Stream, cSignUTF8) then
   begin
     Enc:= cEncUTF8;
+    EncWithBom:= true;
     SignLen:= Length(cSignUTF8);
     Exit
   end;
@@ -101,6 +102,7 @@ begin
   if IsStreamWithSignature(Stream, cSignWideLE) then
   begin
     Enc:= cEncWideLE;
+    EncWithBom:= true;
     SignLen:= Length(cSignWideLE);
     Exit
   end;
@@ -108,6 +110,7 @@ begin
   if IsStreamWithSignature(Stream, cSignWideBE) then
   begin
     Enc:= cEncWideBE;
+    EncWithBom:= true;
     SignLen:= Length(cSignWideBE);
     Exit
   end;
