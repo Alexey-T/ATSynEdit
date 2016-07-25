@@ -2628,17 +2628,14 @@ begin
   DoClearScrollInfo(FScrollVert);
 
   BeginUpdate;
-
+  try
     //show "wait" text
-    Strings.Clear;
-    FWrapUpdateNeeded:= true;
     Paint;
     Invalidate;
     {$ifdef allow_proc_msg}
     Application.ProcessMessages;
     {$endif}
 
-  try
     Strings.LoadFromFile(AFilename);
   finally
     EndUpdate;
