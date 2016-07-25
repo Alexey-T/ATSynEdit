@@ -96,6 +96,7 @@ type
     FEndings: TATLineEnds;
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
+    FEncodingDetectDefaultUtf8: boolean;
     FEncodingCodepage: string;
     FEncodingDetectBufSizeKb: integer;
     FModified: boolean;
@@ -178,6 +179,7 @@ type
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
+    property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property EncodingDetectBufSizeKb: integer read FEncodingDetectBufSizeKb write FEncodingDetectBufSizeKb;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
@@ -232,6 +234,7 @@ type
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
   end;
+
 
 implementation
 
@@ -518,6 +521,7 @@ begin
 
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
+  FEncodingDetectDefaultUtf8:= true;
   FEncodingCodepage:= '';
   FEncodingDetectBufSizeKb:= 16;
   FEndings:= cEndWin;

@@ -85,10 +85,20 @@ procedure DoDetectStreamEncoding(Stream: TStream;
   out Enc: TATFileEncoding;
   out SignLen: integer;
   out EncWithBom: boolean;
-  BufSizeKb: integer);
+  BufSizeKb: integer;
+  DefaultIsUtf8: boolean);
 begin
-  Enc:= cEncUTF8;
-  EncWithBom:= false;
+  if DefaultIsUtf8 then
+  begin
+    Enc:= cEncUTF8;
+    EncWithBom:= false;
+  end
+  else
+  begin
+    Enc:= cEncAnsi;
+    EncWithBom:= false;
+  end;
+
   SignLen:= 0;
 
   if IsStreamWithSignature(Stream, cSignUTF8) then
@@ -197,7 +207,9 @@ begin
   Len:= 0;
   if FEncodingDetect then
   begin
-    DoDetectStreamEncoding(Stream, FEncoding, Len, bWithBom, FEncodingDetectBufSizeKb);
+    DoDetectStreamEncoding(Stream, FEncoding, Len, bWithBom,
+      FEncodingDetectBufSizeKb,
+      FEncodingDetectDefaultUtf8);
     case FEncoding of
       cEncUTF8: SaveSignUtf8:= bWithBom;
       cEncWideBE,
