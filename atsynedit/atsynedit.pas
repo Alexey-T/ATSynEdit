@@ -2630,11 +2630,11 @@ begin
   BeginUpdate;
   try
     //show "wait" text
-    Paint;
-    Invalidate;
-    {$ifdef allow_proc_msg}
-    Application.ProcessMessages;
-    {$endif}
+    //Paint;
+    //Invalidate;
+    //{$ifdef allow_proc_msg}
+    //Application.ProcessMessages;
+    //{$endif}
 
     Strings.LoadFromFile(AFilename);
   finally
