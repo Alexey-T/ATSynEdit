@@ -629,6 +629,7 @@ type
     function GetMarginString: string;
     function GetReadOnly: boolean;
     function GetLineTop: integer;
+    function GetColumnLeft: integer;
     function GetTextForClipboard: string;
     function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
@@ -650,6 +651,7 @@ type
     procedure SetOneLine(AValue: boolean);
     procedure SetReadOnly(AValue: boolean);
     procedure SetLineTop(AValue: integer);
+    procedure SetColumnLeft(AValue: integer);
     procedure SetLinesFromTop(AValue: integer);
     procedure SetStrings(Obj: TATStrings);
     function GetRectMain: TRect;
@@ -806,6 +808,7 @@ type
     property LineTop: integer read GetLineTop write SetLineTop;
     property LineBottom: integer read FLineBottom;
     property LinesFromTop: integer read GetLinesFromTop write SetLinesFromTop;
+    property ColumnLeft: integer read GetColumnLeft write SetColumnLeft;
     property ModeOverwrite: boolean read FOverwrite write FOverwrite;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property ModeOneLine: boolean read GetOneLine write SetOneLine;
@@ -2274,6 +2277,11 @@ begin
     Result:= Item.NLineIndex;
 end;
 
+function TATSynEdit.GetColumnLeft: integer;
+begin
+  Result:= FScrollHorz.NPos;
+end;
+
 constructor TATSynEdit.Create(AOwner: TComponent);
 var
   i: integer;
@@ -2788,6 +2796,12 @@ begin
         Update;
         Exit
       end;
+end;
+
+procedure TATSynEdit.SetColumnLeft(AValue: integer);
+begin
+  FScrollHorz.NPos:= AValue;
+  Update;
 end;
 
 procedure TATSynEdit.SetLinesFromTop(AValue: integer);
