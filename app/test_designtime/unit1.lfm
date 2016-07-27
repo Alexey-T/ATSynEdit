@@ -68,7 +68,6 @@ object fmMain: TfmMain
     OptTabSpaces = False
     OptTabSize = 10
     OptFoldStyle = cFoldHereWithTruncatedText
-    OptTextLocked = 'wait...'
     OptTextHintFontStyle = [fsItalic]
     OptTextHintCenter = False
     OptTextOffsetTop = 0
@@ -236,7 +235,6 @@ object fmMain: TfmMain
       OptTabSpaces = False
       OptTabSize = 8
       OptFoldStyle = cFoldHereWithTruncatedText
-      OptTextLocked = 'wait...'
       OptTextHintFontStyle = [fsItalic]
       OptTextHintCenter = False
       OptTextOffsetTop = 2

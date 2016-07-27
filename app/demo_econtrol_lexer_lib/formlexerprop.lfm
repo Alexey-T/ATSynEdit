@@ -182,7 +182,6 @@ object fmLexerProp: TfmLexerProp
         OptTabSpaces = False
         OptTabSize = 8
         OptFoldStyle = cFoldHereWithTruncatedText
-        OptTextLocked = 'wait...'
         OptTextHintFontStyle = [fsItalic]
         OptTextHintCenter = False
         OptTextOffsetTop = 0

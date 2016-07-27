@@ -228,6 +228,7 @@ const
   cMaxCaretTime = 2000;
   cMinCharsAfterAnyIndent = 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
   cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
+  cTextEditorLocked: string = 'Wait...';
   cHintScrollPrefix: string = 'Line';
   cHintScrollDx = 5;
   cHintBookmarkDx = 6;
@@ -288,7 +289,6 @@ type
     FCursorText,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
-    FTextLocked: string;
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
     FTextHintCenter: boolean;
@@ -983,7 +983,6 @@ type
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled;
-    property OptTextLocked: string read FTextLocked write FTextLocked;
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle;
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter;
@@ -2403,7 +2402,6 @@ begin
   FUnprintedEnds:= true;
   FUnprintedEndsDetails:= true;
 
-  FTextLocked:= 'wait...';
   FTextHint:= '';
   FTextHintFontStyle:= [fsItalic];
   FTextHintCenter:= false;
@@ -2894,14 +2892,11 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
-var
-  Str: string;
 begin
   C.Brush.Color:= Colors.LockedBG;
   C.FillRect(ClientRect);
   C.Font.Assign(Self.Font);
-  Str:= FTextLocked;
-  C.TextOut(10, 10, Str);
+  C.TextOut(10, 10, cTextEditorLocked);
 end;
 
 
