@@ -4382,6 +4382,8 @@ end;
 procedure TATSynEdit.EndUpdate;
 begin
   Dec(FPaintLocked);
+  if FPaintLocked<0 then
+    FPaintLocked:= 0;
   if FPaintLocked=0 then
     Invalidate;
 end;
