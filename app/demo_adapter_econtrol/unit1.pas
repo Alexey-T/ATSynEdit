@@ -159,7 +159,7 @@ begin
   chkFullHilite.Checked:= ed.OptShowFullHilite;
   chkUnpri.Checked:= ed.OptUnprintedVisible;
   chkShowCur.Checked:= ed.OptShowCurLine;
-  chkDyn.Checked:= adapter.DynamicHiliteEnabled;
+  chkDyn.Checked:= adapter.EnabledDynamicHilite;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -180,7 +180,7 @@ begin
   R:= TecTextRange(Tree.Selected.Data);
   P:= adapter.TreeGetPositionOfRange(R);
 
-  ed.DoGotoPos_AndUnfold(P, 5, 5);
+  ed.DoGotoPos_AndUnfold(P, Point(-1, -1), 5, 5);
   ed.SetFocus;
 end;
 
@@ -298,7 +298,7 @@ end;
 
 procedure TfmMain.chkDynChange(Sender: TObject);
 begin
-  adapter.DynamicHiliteEnabled:= chkDyn.Checked;
+  adapter.EnabledDynamicHilite:= chkDyn.Checked;
   Ed.Update;
 end;
 
@@ -321,7 +321,7 @@ begin
   //while adapter.TreeBusy do Application.ProcessMessages;
 
   fn:= files.GetPathFromItem(files.Selected);
-  if FileExistsUTF8(fn) then
+  if FileExists(fn) then
     DoOpenFile(fn);
 end;
 
