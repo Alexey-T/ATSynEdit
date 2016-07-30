@@ -9,7 +9,6 @@ uses
   atstringproc_textbuffer, Types;
 
 type
-
   { TForm1 }
 
   TForm1 = class(TForm)

@@ -1,22 +1,23 @@
 object fmMain: TfmMain
   Left = 359
-  Height = 419
+  Height = 402
   Top = 457
   Width = 685
   Caption = 'Test'
-  ClientHeight = 419
+  ClientHeight = 402
   ClientWidth = 685
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
   object ed: TATSynEdit
     Left = 6
-    Height = 308
+    Height = 291
     Top = 6
     Width = 673
     Align = alClient
     BorderSpacing.Around = 6
     BorderStyle = bsSingle
+    DoubleBuffered = True
     Font.Height = -12
     Font.Name = 'Courier New'
     ParentFont = False
@@ -31,8 +32,10 @@ object fmMain: TfmMain
     Colors.TextSelFont = clHighlightText
     Colors.TextSelBG = clHighlight
     Colors.Caret = clBlack
+    Colors.Markers = 192
     Colors.GutterFont = clGray
     Colors.GutterBG = 14737632
+    Colors.GutterCaretFont = clGray
     Colors.GutterCaretBG = 13158600
     Colors.GutterPlusBorder = clGray
     Colors.GutterPlusBG = 16053492
@@ -50,6 +53,7 @@ object fmMain: TfmMain
     Colors.CollapseLine = 10510432
     Colors.CollapseMarkFont = 14712960
     Colors.CollapseMarkBG = clWhite
+    Colors.CollapseMarkBorder = 14712960
     Colors.UnprintedFont = 5263600
     Colors.UnprintedBG = 14737632
     Colors.UnprintedHexFont = clMedGray
@@ -60,16 +64,21 @@ object fmMain: TfmMain
     Colors.StateSaved = clMedGray
     Colors.BlockStaple = clMedGray
     Colors.BlockSepLine = clMedGray
+    Colors.Links = clBlue
     Colors.LockedBG = 14737632
     Colors.TextHintFont = clGray
+    Colors.MarkedLinesBG = 15786160
+    Colors.BorderLine = clMedGray
     Colors.ComboboxArrow = clGray
     Colors.ComboboxArrowBG = 15790320
     WantTabs = True
     OptTabSpaces = False
     OptTabSize = 10
     OptFoldStyle = cFoldHereWithTruncatedText
+    OptFoldEnabled = True
     OptTextHintFontStyle = [fsItalic]
     OptTextHintCenter = False
+    OptTextOffsetLeft = 0
     OptTextOffsetTop = 0
     OptTextOffsetFromLine = 1
     OptAutoIndent = True
@@ -79,6 +88,9 @@ object fmMain: TfmMain
     OptLastLineOnTop = False
     OptOverwriteSel = True
     OptOverwriteAllowedOnPaste = False
+    OptScrollbarsNew = False
+    OptShowURLs = True
+    OptShowURLsRegex = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s\(\)]+'
     OptShowStapleStyle = cLineStyleSolid
     OptShowStapleIndent = -1
     OptShowStapleWidthPercent = 100
@@ -86,6 +98,7 @@ object fmMain: TfmMain
     OptShowFullHilite = True
     OptShowCurLine = False
     OptShowCurLineMinimal = True
+    OptShowCurLineOnlyFocused = False
     OptShowScrollHint = False
     OptShowCurColumn = False
     OptCaretManyAllowed = True
@@ -97,11 +110,14 @@ object fmMain: TfmMain
     OptCaretBlinkEnabled = True
     OptCaretStopUnfocused = True
     OptCaretPreferLeftSide = True
+    OptCaretPosAfterPasteColumn = cPasteCaretColumnRight
+    OptMarkersSize = 4
     OptGutterVisible = True
     OptGutterPlusSize = 4
     OptGutterShowFoldAlways = True
     OptGutterShowFoldLines = True
     OptGutterShowFoldLinesAll = False
+    OptBorderVisible = False
     OptRulerVisible = True
     OptRulerSize = 19
     OptRulerFontSize = 8
@@ -112,6 +128,7 @@ object fmMain: TfmMain
     OptMinimapCharWidth = 0
     OptMinimapShowSelBorder = False
     OptMinimapShowSelAlways = True
+    OptMinimapAtLeft = False
     OptMicromapVisible = False
     OptMicromapWidth = 30
     OptCharSpacingX = 0
@@ -132,7 +149,6 @@ object fmMain: TfmMain
     OptUnprintedSpaces = True
     OptUnprintedEnds = True
     OptUnprintedEndsDetails = True
-    OptUnprintedReplaceSpec = True
     OptMouseEnableNormalSelection = True
     OptMouseEnableColumnSelection = True
     OptMouseDownForPopup = False
@@ -144,6 +160,10 @@ object fmMain: TfmMain
     OptMouseNiceScroll = True
     OptMouseRightClickMovesCaret = False
     OptMouseGutterClickSelectsLine = True
+    OptMouseWheelScrollVert = True
+    OptMouseWheelScrollHorz = True
+    OptMouseWheelScrollHorzColumns = 30
+    OptMouseWheelWithCtrlChangeSize = True
     OptKeyBackspaceUnindent = True
     OptKeyPageKeepsRelativePos = True
     OptKeyUpDownNavigateWrapped = True
@@ -157,6 +177,7 @@ object fmMain: TfmMain
     OptKeyTabIndents = True
     OptIndentSize = 2
     OptIndentKeepsAlign = True
+    OptMaxLinesToCountUnindent = 100
     OptShowIndentLines = True
     OptShowGutterCaretBG = True
     OptAllowScrollbarVert = True
@@ -172,7 +193,7 @@ object fmMain: TfmMain
   object Panel1: TPanel
     Left = 0
     Height = 99
-    Top = 320
+    Top = 303
     Width = 685
     Align = alBottom
     ClientHeight = 99
@@ -181,9 +202,10 @@ object fmMain: TfmMain
     object ATComboEdit1: TATComboEdit
       Left = 8
       Height = 26
-      Top = 0
+      Top = 64
       Width = 300
       BorderStyle = bsSingle
+      DoubleBuffered = True
       Font.Height = -12
       Font.Name = 'Courier New'
       ParentFont = False
@@ -198,8 +220,10 @@ object fmMain: TfmMain
       Colors.TextSelFont = clHighlightText
       Colors.TextSelBG = clHighlight
       Colors.Caret = clBlack
+      Colors.Markers = 192
       Colors.GutterFont = clGray
       Colors.GutterBG = 14737632
+      Colors.GutterCaretFont = clGray
       Colors.GutterCaretBG = 13158600
       Colors.GutterPlusBorder = clGray
       Colors.GutterPlusBG = 16053492
@@ -217,6 +241,7 @@ object fmMain: TfmMain
       Colors.CollapseLine = 10510432
       Colors.CollapseMarkFont = 14712960
       Colors.CollapseMarkBG = clCream
+      Colors.CollapseMarkBorder = 14712960
       Colors.UnprintedFont = 5263600
       Colors.UnprintedBG = 14737632
       Colors.UnprintedHexFont = clMedGray
@@ -227,16 +252,21 @@ object fmMain: TfmMain
       Colors.StateSaved = clMedGray
       Colors.BlockStaple = clMedGray
       Colors.BlockSepLine = clMedGray
+      Colors.Links = clBlue
       Colors.LockedBG = 14737632
       Colors.TextHintFont = clGray
+      Colors.MarkedLinesBG = 15786160
+      Colors.BorderLine = clMedGray
       Colors.ComboboxArrow = clGray
       Colors.ComboboxArrowBG = 15790320
       WantTabs = False
       OptTabSpaces = False
       OptTabSize = 8
       OptFoldStyle = cFoldHereWithTruncatedText
+      OptFoldEnabled = True
       OptTextHintFontStyle = [fsItalic]
       OptTextHintCenter = False
+      OptTextOffsetLeft = 2
       OptTextOffsetTop = 2
       OptTextOffsetFromLine = 1
       OptAutoIndent = True
@@ -246,6 +276,9 @@ object fmMain: TfmMain
       OptLastLineOnTop = False
       OptOverwriteSel = True
       OptOverwriteAllowedOnPaste = False
+      OptScrollbarsNew = False
+      OptShowURLs = False
+      OptShowURLsRegex = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s\(\)]+'
       OptShowStapleStyle = cLineStyleSolid
       OptShowStapleIndent = -1
       OptShowStapleWidthPercent = 100
@@ -253,6 +286,7 @@ object fmMain: TfmMain
       OptShowFullHilite = True
       OptShowCurLine = False
       OptShowCurLineMinimal = True
+      OptShowCurLineOnlyFocused = False
       OptShowScrollHint = False
       OptShowCurColumn = False
       OptCaretManyAllowed = False
@@ -264,11 +298,14 @@ object fmMain: TfmMain
       OptCaretBlinkEnabled = True
       OptCaretStopUnfocused = True
       OptCaretPreferLeftSide = True
+      OptCaretPosAfterPasteColumn = cPasteCaretColumnRight
+      OptMarkersSize = 4
       OptGutterVisible = False
       OptGutterPlusSize = 4
       OptGutterShowFoldAlways = True
       OptGutterShowFoldLines = True
       OptGutterShowFoldLinesAll = False
+      OptBorderVisible = True
       OptRulerVisible = False
       OptRulerSize = 20
       OptRulerFontSize = 8
@@ -279,6 +316,7 @@ object fmMain: TfmMain
       OptMinimapCharWidth = 0
       OptMinimapShowSelBorder = False
       OptMinimapShowSelAlways = True
+      OptMinimapAtLeft = False
       OptMicromapVisible = True
       OptMicromapWidth = 22
       OptCharSpacingX = 0
@@ -299,7 +337,6 @@ object fmMain: TfmMain
       OptUnprintedSpaces = True
       OptUnprintedEnds = True
       OptUnprintedEndsDetails = True
-      OptUnprintedReplaceSpec = True
       OptMouseEnableNormalSelection = True
       OptMouseEnableColumnSelection = True
       OptMouseDownForPopup = False
@@ -311,6 +348,10 @@ object fmMain: TfmMain
       OptMouseNiceScroll = False
       OptMouseRightClickMovesCaret = False
       OptMouseGutterClickSelectsLine = True
+      OptMouseWheelScrollVert = True
+      OptMouseWheelScrollHorz = True
+      OptMouseWheelScrollHorzColumns = 30
+      OptMouseWheelWithCtrlChangeSize = True
       OptKeyBackspaceUnindent = True
       OptKeyPageKeepsRelativePos = True
       OptKeyUpDownNavigateWrapped = True
@@ -324,6 +365,7 @@ object fmMain: TfmMain
       OptKeyTabIndents = True
       OptIndentSize = 2
       OptIndentKeepsAlign = True
+      OptMaxLinesToCountUnindent = 100
       OptShowIndentLines = True
       OptShowGutterCaretBG = True
       OptAllowScrollbarVert = False

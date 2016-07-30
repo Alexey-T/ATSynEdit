@@ -60,7 +60,7 @@ var
   s: string;
 begin
   s:= List.GetPathFromItem(List.Selected);
-  if not FileExistsUTF8(s) then Exit;
+  if not FileExists(s) then Exit;
 
   ed.LoadFromFile(s);
   ed.SetFocus;

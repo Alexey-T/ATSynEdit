@@ -1,15 +1,15 @@
 object fmMain: TfmMain
-  Left = 516
-  Height = 320
-  Top = 250
+  Left = 396
+  Height = 321
+  Top = 258
   Width = 667
   BorderStyle = bsDialog
   Caption = 'Test Finder.FindMatch'
-  ClientHeight = 320
+  ClientHeight = 321
   ClientWidth = 667
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
   object Memo1: TMemo
     Left = 8
     Height = 48

@@ -1,17 +1,17 @@
 object Form1: TForm1
   Left = 350
-  Height = 259
-  Top = 362
+  Height = 255
+  Top = 366
   Width = 508
-  Caption = 'Form1'
-  ClientHeight = 259
+  Caption = 'Test CaretToStr'
+  ClientHeight = 255
   ClientWidth = 508
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
   object Memo1: TMemo
     Left = 0
-    Height = 259
+    Height = 255
     Top = 0
     Width = 508
     Align = alClient
