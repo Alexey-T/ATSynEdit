@@ -73,6 +73,7 @@ type
       AEnd: TATLineEnds; const ACarets: TATPointArray);
     procedure AddUnmodifiedMark;
     procedure DebugShow;
+    function LastEditingPoint: TPoint;
   end;
 
 
@@ -259,6 +260,15 @@ begin
       ])+#13;
   end;
   ShowMessage('Undo list:'#13+s);
+end;
+
+function TATUndoList.LastEditingPoint: TPoint;
+begin
+  Result:= Point(-1, -1);
+  if Count>0 then
+    with Items[Count-1] do
+      if Length(ItemCarets)>0 then
+        Result:= ItemCarets[0];
 end;
 
 function TATUndoList.Last: TATUndoItem;

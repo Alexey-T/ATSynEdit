@@ -230,6 +230,7 @@ type
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
     procedure DoClearUndo(ALocked: boolean = false);
+    function LastEditingPoint: TPoint;
     //misc
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
@@ -1107,6 +1108,11 @@ begin
     FListUpdates.Clear;
     FListUpdatesHard:= false;
   end;
+end;
+
+function TATStrings.LastEditingPoint: TPoint;
+begin
+  Result:= FUndoList.LastEditingPoint;
 end;
 
 procedure TATStrings.ActionDeleteDupFakeLines;

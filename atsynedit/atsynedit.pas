@@ -854,6 +854,7 @@ type
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
     function GetVisibleLinesMinimap: integer;
+    function GetLastEditingPoint: TPoint;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
@@ -1424,6 +1425,11 @@ end;
 function TATSynEdit.GetVisibleLinesMinimap: integer;
 begin
   Result:= (FRectMinimap.Bottom-FRectMinimap.Top) div FCharSizeMinimap.Y - 1;
+end;
+
+function TATSynEdit.GetLastEditingPoint: TPoint;
+begin
+  Result:= Strings.LastEditingPoint;
 end;
 
 function TATSynEdit.GetMinimapScrollPos: integer;
