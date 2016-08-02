@@ -66,14 +66,14 @@ begin
   M.Add(cCommand_TextDeleteLine, 'delete line', [cXControl+'+Y'], []);
   M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXControl+'+D'], []);
 
-  M.Add(cCommand_GotoTextBegin,      'goto text begin',          [cXControl+'+Home'], []);
-  M.Add(cCommand_GotoTextBegin_Sel,  'goto text begin + select', [cXControl+'+Shift+Home'], []);
-  M.Add(cCommand_GotoTextEnd,        'goto text end',            [cXControl+'+End'], []);
-  M.Add(cCommand_GotoTextEnd_Sel,    'goto text end + select',   [cXControl+'+Shift+End'], []);
-  M.Add(cCommand_GotoWordPrev,       'goto word left',           [cXControl+'+Left'], []);
-  M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  [cXControl+'+Shift+Left'], []);
-  M.Add(cCommand_GotoWordNext,       'goto word right',          [cXControl+'+Right'], []);
-  M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXControl+'+Shift+Right'], []);
+  M.Add(cCommand_GotoTextBegin,      'go to text begin',          [cXControl+'+Home'], []);
+  M.Add(cCommand_GotoTextBegin_Sel,  'go to text begin + select', [cXControl+'+Shift+Home'], []);
+  M.Add(cCommand_GotoTextEnd,        'go to text end',            [cXControl+'+End'], []);
+  M.Add(cCommand_GotoTextEnd_Sel,    'go to text end + select',   [cXControl+'+Shift+End'], []);
+  M.Add(cCommand_GotoWordPrev,       'go to word left',           [cXControl+'+Left'], []);
+  M.Add(cCommand_GotoWordPrev_Sel,   'go to word left + select',  [cXControl+'+Shift+Left'], []);
+  M.Add(cCommand_GotoWordNext,       'go to word right',          [cXControl+'+Right'], []);
+  M.Add(cCommand_GotoWordNext_Sel,   'go to word right + select', [cXControl+'+Shift+Right'], []);
 
   M.Add(cCommand_SelectAll, 'selection: select all', [cXControl+'+A'], []);
   M.Add(cCommand_TextDeleteSelection, 'selection: delete selected text', [], []);
@@ -190,10 +190,10 @@ begin
   M.Add(cCommand_KeyEnter, 'insert line-break (enter, ctrl+enter)', ['Enter'], [cXControl+'+Enter']);
   M.Add(cCommand_KeyTab, 'tabulation key', [], []);
 
-  M.Add(cCommand_GotoWordPrev,       'goto word left',           [cXControl+'+Left'], []);
-  M.Add(cCommand_GotoWordPrev_Sel,   'goto word left + select',  [cXControl+'+Shift+Left'], []);
-  M.Add(cCommand_GotoWordNext,       'goto word right',          [cXControl+'+Right'], []);
-  M.Add(cCommand_GotoWordNext_Sel,   'goto word right + select', [cXControl+'+Shift+Right'], []);
+  M.Add(cCommand_GotoWordPrev,       'go to word left',           [cXControl+'+Left'], []);
+  M.Add(cCommand_GotoWordPrev_Sel,   'go to word left + select',  [cXControl+'+Shift+Left'], []);
+  M.Add(cCommand_GotoWordNext,       'go to word right',          [cXControl+'+Right'], []);
+  M.Add(cCommand_GotoWordNext_Sel,   'go to word right + select', [cXControl+'+Shift+Right'], []);
 
   M.Add(cCommand_SelectAll, 'selection: select all', [cXControl+'+A'], []);
   M.Add(cCommand_TextDeleteSelection, 'selection: delete selected text', [], []);
