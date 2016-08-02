@@ -846,15 +846,16 @@ type
     property Markers: TATMarkers read FMarkers;
     property Attribs: TATMarkers read FAttribs;
     function IsLineWithCaret(ALine: integer): boolean;
+    //goto
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoGotoPos_AndUnfold(const APos, APosEnd: TPoint; AIndentHorz,
       AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
+    procedure DoGotoLastEditPos;
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
     function GetVisibleLinesMinimap: integer;
-    function GetLastEditingPoint: TPoint;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
@@ -1427,9 +1428,11 @@ begin
   Result:= (FRectMinimap.Bottom-FRectMinimap.Top) div FCharSizeMinimap.Y - 1;
 end;
 
-function TATSynEdit.GetLastEditingPoint: TPoint;
+procedure TATSynEdit.DoGotoLastEditPos;
 begin
-  Result:= Strings.LastEditingPoint;
+  Strings.DoGotoLastEditPos;
+  DoGotoCaret(cEdgeTop);
+  Update;
 end;
 
 function TATSynEdit.GetMinimapScrollPos: integer;
