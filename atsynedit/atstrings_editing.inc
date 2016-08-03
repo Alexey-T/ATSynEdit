@@ -96,6 +96,9 @@ begin
   if not IsIndexValid(AY) then Exit;
   Str:= Lines[AY];
 
+ BeginUndoGroup;
+ try
+
   //handle spec case: caret on last fake line, BkSp pressed:
   //delete fake line,
   //delete EOL at prev line
@@ -129,6 +132,10 @@ begin
     APosAfter.X:= Length(StrPrev);
     APosAfter.Y:= AY-1;
   end;
+
+ finally
+   EndUndoGroup;
+ end;
 end;
 
 procedure TATStrings.TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
