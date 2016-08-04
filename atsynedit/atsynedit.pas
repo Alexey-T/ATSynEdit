@@ -2677,8 +2677,12 @@ begin
     Change1:= Strings.ActionEnsureFinalEol;
   if FOptSavingTrimSpaces then
     Change2:= Strings.ActionTrimSpaces(cTrimRight);
+
   if Change1 or Change2 then
+  begin
     Update(true);
+    DoEventChange;
+  end;
 
   Strings.SaveToFile(AFilename);
   DoEventState; //modified
