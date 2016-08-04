@@ -899,10 +899,15 @@ end;
 
 procedure TATStrings.EndUndoGroup;
 begin
-  FUndoGroupCounter:= Max(0, FUndoGroupCounter-1);
+  Dec(FUndoGroupCounter);
+  if FUndoGroupCounter<0 then
+    FUndoGroupCounter:= 0;
+
   if FUndoGroupCounter=0 then
     if Assigned(FUndoList) then
       FUndoList.HardMark:= false;
+
+  DoSaveLastEditPos;
 end;
 
 procedure TATStrings.DoUndoSingle(AUndoList: TATUndoList;
