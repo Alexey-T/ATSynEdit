@@ -164,6 +164,7 @@ begin
     try
       Editor.Strings.TextDeleteRight(Pos.X, Pos.Y, FCharsLeft+FCharsRight, Shift, PosAfter, false);
       Editor.Strings.TextInsert(Pos.X, Pos.Y, StrText+Str1+Str2, false, Shift, PosAfter);
+      Editor.Strings.DoSaveLastEditPos;
     finally
       Editor.Strings.EndUndoGroup;
     end;
