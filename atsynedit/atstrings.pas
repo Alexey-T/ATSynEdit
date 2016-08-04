@@ -112,6 +112,7 @@ type
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnProgress: TNotifyEvent;
     FOnLog: TATStringsLogEvent;
+    FSavedCaretsArray: TATPointArray;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
@@ -230,6 +231,8 @@ type
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
     procedure DoClearUndo(ALocked: boolean = false);
+    //
+    procedure DoSaveLastEditPos;
     procedure DoGotoLastEditPos;
     //misc
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
@@ -1110,14 +1113,15 @@ begin
   end;
 end;
 
-procedure TATStrings.DoGotoLastEditPos;
-var
-  Item: TATUndoItem;
+procedure TATStrings.DoSaveLastEditPos;
 begin
-  Item:= FUndoList.Last;
-  if Assigned(Item) then
-    if Length(Item.ItemCarets)>0 then
-      SetCaretsArray(Item.ItemCarets);
+  FSavedCaretsArray:= GetCaretsArray;
+end;
+
+procedure TATStrings.DoGotoLastEditPos;
+begin
+  if Length(FSavedCaretsArray)>0 then
+    SetCaretsArray(FSavedCaretsArray);
 end;
 
 procedure TATStrings.ActionDeleteDupFakeLines;

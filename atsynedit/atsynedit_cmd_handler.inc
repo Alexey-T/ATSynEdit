@@ -299,6 +299,7 @@ begin
     begin
       FLastTextCmd:= ACmd;
       FLastTextCmdText:= AText;
+      Strings.DoSaveLastEditPos;
     end;
 
   DoCommandResults(Res);
