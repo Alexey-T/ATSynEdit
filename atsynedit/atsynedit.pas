@@ -699,6 +699,7 @@ type
     function DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
     function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
     function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
+    function DoCommand_GotoLastEditPos: TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
     function DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATCommandResults;
@@ -851,7 +852,6 @@ type
     procedure DoGotoPos_AndUnfold(const APos, APosEnd: TPoint; AIndentHorz,
       AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
-    procedure DoGotoLastEditPos;
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
@@ -1426,13 +1426,6 @@ end;
 function TATSynEdit.GetVisibleLinesMinimap: integer;
 begin
   Result:= (FRectMinimap.Bottom-FRectMinimap.Top) div FCharSizeMinimap.Y - 1;
-end;
-
-procedure TATSynEdit.DoGotoLastEditPos;
-begin
-  Strings.DoGotoLastEditPos;
-  DoGotoCaret(cEdgeTop);
-  Update;
 end;
 
 function TATSynEdit.GetMinimapScrollPos: integer;
