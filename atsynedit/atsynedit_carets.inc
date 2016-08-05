@@ -373,7 +373,7 @@ begin
     Update;
   end;
 
-  DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y, true);
+  DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y);
   DoEventCarets;
   DoGotoPos(APos, AIndentHorz, AIndentVert);
   Update;
@@ -402,22 +402,29 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretSingle(APosX, APosY, AEndX, AEndY: integer; AUseEndXY: boolean);
+procedure TATSynEdit.DoCaretSingle(APosX, APosY, AEndX, AEndY: integer);
 begin
   FSelRect:= cRectEmpty;
-
-  if not AUseEndXY then
-  begin
-    AEndX:= -1;
-    AEndY:= -1;
-  end;
   Carets.Clear;
   Carets.Add(APosX, APosY, AEndX, AEndY);
 end;
 
 procedure TATSynEdit.DoCaretSingle(AX, AY: integer; AClearSelection: boolean);
+var
+  NEndX, NEndY: integer;
+  Caret: TATCaretItem;
 begin
-  DoCaretSingle(AX, AY, -1, -1, AClearSelection);
+  NEndX:= -1;
+  NEndY:= -1;
+
+  if (not AClearSelection) and (Carets.Count>0) then
+  begin
+    Caret:= Carets[0];
+    NEndX:= Caret.EndX;
+    NEndY:= Caret.EndY;
+  end;
+
+  DoCaretSingle(AX, AY, NEndX, NEndY);
 end;
 
 function TATSynEdit.GetCaretSelectionIndex(P: TPoint): integer;

@@ -623,9 +623,9 @@ begin
     else
     //select to right (find forward) or to left (find back)
     if OptBack then
-      FEditor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y, true)
+      FEditor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y)
     else
-      FEditor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y, true);
+      FEditor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y);
   end;
 end;
 
