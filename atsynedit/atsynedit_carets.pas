@@ -52,6 +52,8 @@ type
     function IsJoinNeeded(N1, N2: integer;
       out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
     procedure DoChanged;
+    function GetAsArray: TATPointArray;
+    procedure SetAsArray(const Res: TATPointArray);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -73,8 +75,7 @@ type
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
     property OneLine: boolean read FOneLine write FOneLine;
-    function SaveToArray: TATPointArray;
-    procedure LoadFromArray(const L: TATPointArray);
+    property AsArray: TATPointArray read GetAsArray write SetAsArray;
     procedure UpdateColumnCoord(ASaveColumn: boolean);
     procedure UpdateIncorrectPositions(AMaxLine: integer);
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
@@ -516,7 +517,7 @@ begin
         ])+sLineBreak;
 end;
 
-function TATCarets.SaveToArray: TATPointArray;
+function TATCarets.GetAsArray: TATPointArray;
 var
   Item: TATCaretItem;
   i: integer;
@@ -532,17 +533,17 @@ begin
   end;
 end;
 
-procedure TATCarets.LoadFromArray(const L: TATPointArray);
+procedure TATCarets.SetAsArray(const Res: TATPointArray);
 var
   i: integer;
 begin
   Clear;
-  for i:= 0 to Length(L) div 2 - 1 do
+  for i:= 0 to Length(Res) div 2 - 1 do
     Add(
-      L[i*2].X,
-      L[i*2].Y,
-      L[i*2+1].X,
-      L[i*2+1].Y
+      Res[i*2].X,
+      Res[i*2].Y,
+      Res[i*2+1].X,
+      Res[i*2+1].Y
       );
   DoChanged;
 end;

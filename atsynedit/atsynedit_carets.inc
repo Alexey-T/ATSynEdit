@@ -485,14 +485,15 @@ end;
 
 function TATSynEdit.GetCaretsArray: TATPointArray;
 begin
+  SetLength(Result, 0);
   if Assigned(FCarets) then
-    Result:= FCarets.SaveToArray;
+    Result:= FCarets.AsArray;
 end;
 
-procedure TATSynEdit.SetCaretsArray(const L: TATPointArray);
+procedure TATSynEdit.SetCaretsArray(const Ar: TATPointArray);
 begin
   if Assigned(FCarets) then
-    FCarets.LoadFromArray(L);
+    FCarets.AsArray:= Ar;
 end;
 
 procedure TATSynEdit.DoCaretsExtend(ADown: boolean; ALines: integer);

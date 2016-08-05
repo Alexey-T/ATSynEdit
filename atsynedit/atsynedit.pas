@@ -766,7 +766,7 @@ type
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
     function DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
     function GetCaretsArray: TATPointArray;
-    procedure SetCaretsArray(const L: TATPointArray);
+    procedure SetCaretsArray(const Ar: TATPointArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     procedure DoDebugInitFoldList;
 
