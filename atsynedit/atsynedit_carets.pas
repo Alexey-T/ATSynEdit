@@ -51,7 +51,6 @@ type
     procedure DeleteDups;
     function IsJoinNeeded(N1, N2: integer;
       out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
-    procedure DoChanged;
     function GetAsArray: TATPointArray;
     procedure SetAsArray(const Res: TATPointArray);
   public
@@ -76,9 +75,10 @@ type
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
     property OneLine: boolean read FOneLine write FOneLine;
     property AsArray: TATPointArray read GetAsArray write SetAsArray;
+    property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
     procedure UpdateColumnCoord(ASaveColumn: boolean);
     procedure UpdateIncorrectPositions(AMaxLine: integer);
-    property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
+    procedure DoChanged;
   end;
 
 

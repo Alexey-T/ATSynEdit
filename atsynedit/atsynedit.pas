@@ -4925,10 +4925,11 @@ end;
 procedure TATSynEdit.DoCaretsOnChanged(Sender: TObject);
 begin
   if Strings.ModifiedRecent then
-  begin
-    Strings.ModifiedRecent:= false;
-    Strings.DoSaveLastEditPos;
-  end;
+    if Assigned(FCarets) and (FCarets.Count>0) then
+    begin
+      Strings.ModifiedRecent:= false;
+      Strings.DoSaveLastEditPos;
+    end;
 end;
 
 {$I atsynedit_carets.inc}
