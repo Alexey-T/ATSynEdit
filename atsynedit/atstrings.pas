@@ -100,6 +100,7 @@ type
     FEncodingCodepage: string;
     FEncodingDetectBufSizeKb: integer;
     FModified: boolean;
+    FModifiedRecent: boolean;
     FModifiedVersion: Int64;
     FSaveSignUtf8: boolean;
     FSaveSignWide: boolean;
@@ -186,6 +187,7 @@ type
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
     property Modified: boolean read FModified write SetModified;
+    property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
     property Progress: integer read FProgress write FProgress;
@@ -531,7 +533,9 @@ begin
   FEndings:= cEndWin;
 
   FModified:= false;
+  FModifiedRecent:= false;
   FModifiedVersion:= 0;
+
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
   FUndoAfterSave:= true;
@@ -906,8 +910,6 @@ begin
   if FUndoGroupCounter=0 then
     if Assigned(FUndoList) then
       FUndoList.HardMark:= false;
-
-  DoSaveLastEditPos;
 end;
 
 procedure TATStrings.DoUndoSingle(AUndoList: TATUndoList;
@@ -1023,7 +1025,9 @@ end;
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
 begin
   FModified:= true;
+  FModifiedRecent:= true;
   Inc(FModifiedVersion);
+
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
 

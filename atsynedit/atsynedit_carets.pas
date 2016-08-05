@@ -46,10 +46,12 @@ type
     FList: TList;
     FManyAllowed: boolean;
     FOneLine: boolean;
+    FOnCaretChanged: TNotifyEvent;
     function GetItem(N: integer): TATCaretItem;
     procedure DeleteDups;
     function IsJoinNeeded(N1, N2: integer;
       out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
+    procedure DoChanged;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -76,6 +78,7 @@ type
     procedure LoadFromArray(const L: TATPointArray);
     procedure UpdateColumnCoord(ASaveColumn: boolean);
     procedure UpdateIncorrectPositions(AMaxLine: integer);
+    property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
   end;
 
 
@@ -218,6 +221,7 @@ begin
   begin
     TObject(FList[N]).Free;
     FList.Delete(N);
+    DoChanged;
   end;
 end;
 
@@ -246,6 +250,7 @@ begin
   Item.EndY:= -1;
 
   FList.Add(Item);
+  DoChanged;
 end;
 
 function _ListCaretsCompare(Item1, Item2: Pointer): Integer;
@@ -288,6 +293,8 @@ begin
       Item2.EndY:= OutEndY;
     end;
   end;
+
+  DoChanged;
 end;
 
 
@@ -307,6 +314,7 @@ begin
       EndY:= Obj[i].EndY;
     end;
   end;
+  DoChanged;
 end;
 
 function TATCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
@@ -492,6 +500,12 @@ begin
   Result:= true; //ranges overlap
 end;
 
+procedure TATCarets.DoChanged;
+begin
+  if Assigned(FOnCaretChanged) then
+    FOnCaretChanged(Self);
+end;
+
 function TATCarets.DebugText: string;
 var
   i: integer;
@@ -535,6 +549,7 @@ begin
     Item.EndX:= L[i*2+1].X;
     Item.EndY:= L[i*2+1].Y;
   end;
+  DoChanged;
 end;
 
 procedure TATCarets.Add(XFrom, YFrom, XTo, YTo: integer);
@@ -548,6 +563,7 @@ begin
     EndX:= XFrom;
     EndY:= YFrom;
   end;
+  DoChanged;
 end;
 
 procedure TATCarets.UpdateColumnCoord(ASaveColumn: boolean);
@@ -570,15 +586,22 @@ end;
 
 procedure TATCarets.UpdateIncorrectPositions(AMaxLine: integer);
 var
-  i: integer;
   Caret: TATCaretItem;
+  chg: boolean;
+  i: integer;
 begin
+  chg:= false;
   for i:= 0 to Count-1 do
   begin
     Caret:= Items[i];
-    if Caret.PosY>AMaxLine then Caret.PosY:= AMaxLine;
-    if Caret.EndY>AMaxLine then Caret.EndY:= AMaxLine;
+    if Caret.PosY>AMaxLine then
+      begin Caret.PosY:= AMaxLine; chg:= true; end;
+    if Caret.EndY>AMaxLine then
+      begin Caret.EndY:= AMaxLine; chg:= true; end;
   end;
+
+  if chg then
+    DoChanged;
 end;
 
 
