@@ -473,7 +473,6 @@ begin
   if not OptBack then
   begin
     FEditor.DoCaretSingle(P1.X+Length(Str), P1.Y);
-    FEditor.Strings.DoSaveLastEditPos;
   end;
 end;
 
