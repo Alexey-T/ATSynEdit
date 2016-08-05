@@ -541,6 +541,7 @@ begin
   FUndoAfterSave:= true;
   FOneLine:= false;
   FProgress:= 0;
+  SetLength(FSavedCaretsArray, 0);
 
   ActionAddFakeLineIfNeeded;
   DoClearUndo;
@@ -1123,8 +1124,12 @@ begin
 end;
 
 procedure TATStrings.DoSaveLastEditPos;
+var
+  Ar: TATPointArray;
 begin
-  FSavedCaretsArray:= GetCaretsArray;
+  Ar:= GetCaretsArray;
+  if Length(Ar)>0 then
+    FSavedCaretsArray:= Ar;
 end;
 
 procedure TATStrings.DoGotoLastEditPos;
