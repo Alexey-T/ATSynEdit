@@ -60,9 +60,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATCaretItem read GetItem; default;
-    procedure Add_Internal(APosX, APosY, AEndX, AEndY: integer);
-    procedure Add(APosX, APosY: integer);
-    procedure Add(XFrom, YFrom, XTo, YTo: integer);
+    procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     procedure Sort;
     procedure Assign(Obj: TATCarets);
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
@@ -236,12 +234,17 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATCarets.Add_Internal(APosX, APosY, AEndX, AEndY: integer);
+procedure TATCarets.Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
 var
   Item: TATCaretItem;
 begin
-  if (not FManyAllowed) and (Count>=1) then Exit;
-  if FOneLine then APosY:= 0;
+  if (APosX=AEndX) and (APosY=AEndY) then Exit;
+  if (not ManyAllowed) and (Count>=1) then Exit;
+  if OneLine then
+  begin
+    APosY:= 0;
+    if AEndY>0 then AEndY:= 0;
+  end;
 
   Item:= TATCaretItem.Create;
   Item.PosX:= APosX;
@@ -252,18 +255,6 @@ begin
   FList.Add(Item);
   DoChanged;
 end;
-
-procedure TATCarets.Add(APosX, APosY: integer);
-begin
-  Add_Internal(APosX, APosY, -1, -1);
-end;
-
-procedure TATCarets.Add(XFrom, YFrom, XTo, YTo: integer);
-begin
-  if (XFrom=XTo) and (YFrom=YTo) then Exit;
-  Add_Internal(XTo, YTo, XFrom, YFrom);
-end;
-
 
 function _ListCaretsCompare(Item1, Item2: Pointer): Integer;
 var
@@ -316,7 +307,7 @@ var
 begin
   Clear;
   for i:= 0 to Obj.Count-1 do
-    Add_Internal(
+    Add(
       Obj[i].PosX,
       Obj[i].PosY,
       Obj[i].EndX,
@@ -547,7 +538,7 @@ var
 begin
   Clear;
   for i:= 0 to Length(L) div 2 - 1 do
-    Add_Internal(
+    Add(
       L[i*2].X,
       L[i*2].Y,
       L[i*2+1].X,
