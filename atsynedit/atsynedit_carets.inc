@@ -406,22 +406,13 @@ procedure TATSynEdit.DoCaretSingle(APosX, APosY, AEndX, AEndY: integer; AUseEndX
 begin
   FSelRect:= cRectEmpty;
 
-  if Carets.Count=0 then
-    Carets.Add(0, 0);
-
-  while Carets.Count>1 do
-    Carets.Delete(Carets.Count-1);
-
-  with Carets[0] do
+  if not AUseEndXY then
   begin
-    PosX:= APosX;
-    PosY:= APosY;
-    if AUseEndXY then
-    begin
-      EndX:= AEndX;
-      EndY:= AEndY;
-    end;
+    AEndX:= -1;
+    AEndY:= -1;
   end;
+  Carets.Clear;
+  Carets.Add(APosX, APosY, AEndX, AEndY);
 end;
 
 procedure TATSynEdit.DoCaretSingle(AX, AY: integer; AClearSelection: boolean);
