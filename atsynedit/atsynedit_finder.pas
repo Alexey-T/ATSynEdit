@@ -471,7 +471,10 @@ begin
   //correct caret pos
   //(e.g. replace "dddddd" to "--": move lefter)
   if not OptBack then
-    FEditor.Carets[0].PosX:= P1.X+Length(Str);
+  begin
+    FEditor.DoCaretSingle(P1.X+Length(Str), P1.Y);
+    FEditor.Strings.DoSaveLastEditPos;
+  end;
 end;
 
 function TATEditorFinder.GetOffsetStartPos: integer;
