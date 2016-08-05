@@ -494,6 +494,7 @@ type
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
+    procedure DoCaretsOnChanged(Sender: TObject);
     procedure DoCaretForceShow;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoCaretsShift_CaretItem(Caret: TATCaretItem; APosX, APosY, AShiftX,
@@ -2327,6 +2328,8 @@ begin
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
+  FCarets.OnCaretChanged:= @DoCaretsOnChanged;
+
   FCaretBlinkEnabled:= true;
   FCaretShown:= false;
   FCaretShapeIns:= cInitCaretShapeIns;
@@ -4919,6 +4922,14 @@ begin
   WMHScroll(Msg);
 end;
 
+procedure TATSynEdit.DoCaretsOnChanged(Sender: TObject);
+begin
+  if Strings.ModifiedRecent then
+  begin
+    Strings.ModifiedRecent:= false;
+    Strings.DoSaveLastEditPos;
+  end;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
