@@ -72,7 +72,7 @@ type
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; const ACarets: TATPointArray);
     procedure AddUnmodifiedMark;
-    procedure DebugShow;
+    function DebugText: string;
   end;
 
 
@@ -241,25 +241,28 @@ begin
       Delete(i);
 end;
 
-procedure TATUndoList.DebugShow;
+function TATUndoList.DebugText: string;
 var
-  i: integer;
-  s: string;
+  s_action, s_text: string;
+  i, n_carets: integer;
   Item: TATUndoItem;
+const
+  MaxItems=40;
+  MaxLen=30;
 begin
-  s:= '';
-  for i:= 0 to Min(40, Count)-1 do
+  Result:= '';
+  for i:= 0 to Min(MaxItems, Count)-1 do
   begin
     Item:= Items[i];
-    s:= s+Format('%s, text "%s", %s, index %d', [
-      StrEditActionDescriptions[Item.ItemAction],
-      UTF8Encode(Item.ItemText),
-      IfThen(Item.ItemEnd=cEndNone, 'no-eol', ''),
-      Item.ItemIndex
-      ])+#13;
+    s_action:= StrEditActionDescriptions[Item.ItemAction];
+    s_text:= UTF8Encode(Item.ItemText);
+    if Length(s_text)>MaxLen then
+      s_text:= Copy(s_text, 1, MaxLen)+'...';
+    n_carets:= Length(Item.ItemCarets) div 2;
+    Result:= Result+Format('actn "%s", text "%s", crts %d'#10, [s_action, s_text, n_carets]);
   end;
-  ShowMessage('Undo list:'#13+s);
 end;
+
 
 function TATUndoList.Last: TATUndoItem;
 begin
