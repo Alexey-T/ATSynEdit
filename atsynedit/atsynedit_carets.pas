@@ -239,7 +239,6 @@ procedure TATCarets.Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer
 var
   Item: TATCaretItem;
 begin
-  if (APosX=AEndX) and (APosY=AEndY) then Exit;
   if (not ManyAllowed) and (Count>=1) then Exit;
   if OneLine then
   begin
