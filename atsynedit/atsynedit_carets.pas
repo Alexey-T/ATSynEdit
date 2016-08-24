@@ -212,7 +212,8 @@ var
   i: integer;
 begin
   for i:= FList.Count-1 downto 0 do
-    Delete(i);
+    TObject(FList[i]).Free;
+  FList.Clear;
 end;
 
 procedure TATCarets.Delete(N: integer);
