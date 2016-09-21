@@ -68,7 +68,10 @@ type
     function IsCaretInRange(AEdit: TATSynEdit; APos1, APos2: integer; ACond: TATRangeCond): boolean;
     procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
     procedure UpdateEds;
-    function GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
+    function GetTokenColorBG_FromColoredRanges(APos: integer;
+      ADefColor: TColor; AEditorIndex: integer): TColor;
+    function GetTokenColorBG_FromMultiLineTokens(APos: integer;
+      ADefColor: TColor; AEditorIndex: integer): TColor;
     procedure TimerDuringAnalyzeTimer(Sender: TObject);
     procedure UpdateRanges;
     procedure UpdateRangesActive(AEdit: TATSynEdit);
@@ -186,7 +189,7 @@ var
 begin
   Ed:= Sender as TATSynEdit;
   Pos:= Buffer.CaretToStr(Point(AX, AY));
-  AColor:= GetTokenColorBG(Pos, AColor, Ed.EditorIndex);
+  AColor:= GetTokenColorBG_FromColoredRanges(Pos, AColor, Ed.EditorIndex);
 end;
 
 function TATAdapterEControl.IsCaretInRange(AEdit: TATSynEdit; APos1,
@@ -224,7 +227,23 @@ begin
   end;
 end;
 
-function TATAdapterEControl.GetTokenColorBG(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
+
+function TATAdapterEControl.GetTokenColorBG_FromMultiLineTokens(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
+var
+  Token: TecSyntToken;
+  n: integer;
+begin
+  Result:= ADefColor;
+  n:= DoFindToken(APos);
+  if n<0 then exit;
+
+  Token:= AnClient.Tags[n];
+  if (Token.StartPos<APos) and (APos<Token.EndPos) then
+    if Token.Style<>nil then
+      Result:= Token.Style.BgColor;
+end;
+
+function TATAdapterEControl.GetTokenColorBG_FromColoredRanges(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
 var
   Rng: TATRangeColored;
   i: integer;
@@ -320,7 +339,7 @@ var
     part.Offset:= AOffset;
     part.Len:= ALen;
     part.ColorFont:= AColorFont;
-    part.ColorBG:= GetTokenColorBG(strpos, AColorBG, AEditorIndex);
+    part.ColorBG:= GetTokenColorBG_FromColoredRanges(strpos, AColorBG, AEditorIndex);
     AParts[partindex]:= part;
     Inc(partindex);
   end;
@@ -368,7 +387,7 @@ begin
       part.Len:= tokenEnd.X-part.Offset;
 
     part.ColorFont:= AColorFont;
-    part.ColorBG:= GetTokenColorBG(token.StartPos, AColorBG, AEditorIndex);
+    part.ColorBG:= GetTokenColorBG_FromColoredRanges(token.StartPos, AColorBG, AEditorIndex);
 
     tokenStyle:= token.Style;
     DoFindTokenOverrideStyle(tokenStyle, i, AEditorIndex);
@@ -407,9 +426,16 @@ begin
 
   //calc AColorAfter
   mustOffset:= Buffer.CaretToStr(Point(AX+ALen, ALine));
-  nColor:= GetTokenColorBG(mustOffset, clNone, AEditorIndex);
+
+  //a) calc it from colored-ranges
+  nColor:= GetTokenColorBG_FromColoredRanges(mustOffset, clNone, AEditorIndex);
   if (nColor=clNone) and (ALen>0) then
-    nColor:= GetTokenColorBG(mustOffset-1, clNone, AEditorIndex);
+    nColor:= GetTokenColorBG_FromColoredRanges(mustOffset-1, clNone, AEditorIndex);
+
+  //b) calc it from multi-line tokens (with bg-color)
+  if (nColor=clNone) then
+    nColor:= GetTokenColorBG_FromMultiLineTokens(mustOffset, clNone, AEditorIndex);
+
   if (nColor=clNone) then
     nColor:= AColorAfter;
   AColorAfter:= nColor;
