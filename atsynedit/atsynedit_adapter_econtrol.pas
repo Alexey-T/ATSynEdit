@@ -1054,7 +1054,12 @@ begin
   if m=0 then
     Result:= 0
   else
+  begin
+    Result:= m;
+    with AnClient.Tags[Result] do
+      if (StartPos<=APos) and (APos<EndPos) then exit;
     Result:= m-1;
+  end;
 end;
 
 function TATAdapterEControl.GetLexer: TecSyntAnalyzer;
