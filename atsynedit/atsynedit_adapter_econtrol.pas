@@ -30,7 +30,9 @@ type
     Color: TColor;
     Rule: TecTagBlockCondition;
     Active: array[0..Pred(cMaxStringsClients)] of boolean;
-    constructor Create(APos1, APos2, AToken1, AToken2: integer; AColor: TColor; ARule: TecTagBlockCondition);
+    constructor Create(APos1, APos2, AToken1, AToken2: integer;
+      AColor: TColor;
+      ARule: TecTagBlockCondition);
   end;
 
   TATRangeCond = (cCondInside, cCondAtBound, cCondOutside);
@@ -258,10 +260,7 @@ begin
         Continue;
 
     if (APos>=Rng.Pos1) and (APos<Rng.Pos2) then
-    begin
-      Result:= Rng.Color;
-      Exit
-    end;
+      Exit(Rng.Color);
   end;
 end;
 
@@ -997,7 +996,16 @@ begin
       Style:= R.Rule.Style;
       if Style<>nil then
         if Style.BgColor<>clNone then
+        begin
+          //support lexer opt "Hilite lines of block"
+          if R.Rule.Highlight then
+          begin
+            Pnt2.X:= Buffer.LineLength(Pnt2.Y);
+            Pos2:= Buffer.CaretToStr(Pnt2);
+          end;
+
           ListColors.Add(TATRangeColored.Create(Pos1, Pos2, R.StartIdx, R.EndIdx, Style.BgColor, R.Rule));
+        end;
     end;
   end;
 
