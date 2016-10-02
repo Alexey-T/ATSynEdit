@@ -137,6 +137,7 @@ end;
 procedure TATStrings.LoadFromString(const AText: atString);
 var
   MS: TMemoryStream;
+  Str: atString;
   i: integer;
 begin
   if ReadOnly then exit;
@@ -147,17 +148,27 @@ begin
     Exit;
   end;
 
-  MS:= TMemoryStream.Create;
-  try
-    MS.Write(AText[1], Length(AText)*SizeOf(atChar));
-    MS.Position:= 0;
+  if OneLine then
+  begin
+    Str:= AText;
+    SDeleteFromW(Str, #13);
+    SDeleteFromW(Str, #10);
+    LineAddEx(Str, cEndNone);
+  end
+  else
+  begin
+    MS:= TMemoryStream.Create;
+    try
+      MS.Write(AText[1], Length(AText)*SizeOf(atChar));
+      MS.Position:= 0;
 
-    Encoding:= cEncWideLE;
-    EncodingDetect:= false;
-    LoadFromStream(MS);
-    ActionAddFakeLineIfNeeded;
-  finally
-    FreeAndNil(MS);
+      Encoding:= cEncWideLE;
+      EncodingDetect:= false;
+      LoadFromStream(MS);
+      ActionAddFakeLineIfNeeded;
+    finally
+      FreeAndNil(MS);
+    end;
   end;
 
   Modified:= true;

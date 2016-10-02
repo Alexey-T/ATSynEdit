@@ -666,7 +666,7 @@ type
     function GetPageLines: integer;
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
-    procedure SetText(AValue: atString);
+    procedure SetText(const AValue: atString);
     procedure SetUndoAfterSave(AValue: boolean);
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
@@ -1446,7 +1446,7 @@ begin
   FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.SetText(AValue: atString);
+procedure TATSynEdit.SetText(const AValue: atString);
 begin
   Strings.LoadFromString(AValue);
   DoCaretSingle(0, 0);

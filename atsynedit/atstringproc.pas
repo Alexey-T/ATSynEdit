@@ -115,6 +115,7 @@ procedure SReplaceAll(var s: string; const SFrom, STo: string);
 procedure SReplaceAllPercentChars(var S: string);
 procedure SReplaceAllTabsToOneSpace(var S: string);
 procedure SDeleteFrom(var s: string; const SFrom: string);
+procedure SDeleteFromW(var s: UnicodeString; const SFrom: UnicodeString);
 
 var
   OptUnprintedReplaceSpec: boolean = false;
@@ -888,6 +889,15 @@ end;
 
 
 procedure SDeleteFrom(var s: string; const SFrom: string);
+var
+  n: integer;
+begin
+  n:= Pos(SFrom, S);
+  if n>0 then
+    Delete(S, n, MaxInt);
+end;
+
+procedure SDeleteFromW(var s: UnicodeString; const SFrom: UnicodeString);
 var
   n: integer;
 begin
