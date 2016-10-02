@@ -3,6 +3,7 @@
 function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
 var
   Str: atString;
+  bNeedFixLastEol: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -20,6 +21,21 @@ begin
   if ModeOneLine then
     Str:= SRemoveNewlineChars(Str);
 
+  //we delete unneeded eol after paste, if:
+  //- OptPasteAtEndMakesFinalEmptyLine off
+  //- one caret, on last line
+  //- last line w/o eol
+  //- pasted text w/o final eol
+  bNeedFixLastEol:=
+    (not OptPasteAtEndMakesFinalEmptyLine) and
+    (not ASelectThen) and
+    (Strings.Count>0) and
+    (Carets.Count=1) and
+    (Carets[0].PosY=Strings.Count-1) and
+    (Strings.LinesEnds[Strings.Count-1]=cEndNone) and
+    not (SEndsWith(Str, #13) or SEndsWith(Str, #10));
+
+  //paste
   Strings.BeginUndoGroup;
   DoCommand_TextDeleteSelection;
   Result:= DoCommand_TextInsertAtCarets(Str,
@@ -28,10 +44,22 @@ begin
              ASelectThen);
   Strings.EndUndoGroup;
 
-  //workaround: paste on last line end
+  //special case: paste on text end
   if Carets.Count>0 then
-    if Carets[0].PosY>=Strings.Count then
-      Strings.ActionAddFakeLineIfNeeded;
+    if bNeedFixLastEol then
+    begin
+      Strings.ActionDeleteFakeLineAndFinalEol;
+      if not AKeepCaret then
+        DoCaretSingle(
+          Length(Strings.Lines[Strings.Count-1]),
+          Strings.Count-1
+          );
+    end
+    else
+    begin
+      if Carets[Carets.Count-1].PosY>=Strings.Count then
+        Strings.ActionAddFakeLineIfNeeded;
+    end;
 end;
 
 

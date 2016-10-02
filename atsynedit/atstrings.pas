@@ -191,7 +191,9 @@ type
     property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
     property Progress: integer read FProgress write FProgress;
+    //actions
     procedure ActionDeleteFakeLine;
+    procedure ActionDeleteFakeLineAndFinalEol;
     procedure ActionDeleteDupFakeLines;
     procedure ActionAddFakeLineIfNeeded;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
@@ -586,6 +588,14 @@ procedure TATStrings.ActionDeleteFakeLine;
 begin
   if IsLastLineFake then
     LineDelete(Count-1, false{dont force});
+end;
+
+procedure TATStrings.ActionDeleteFakeLineAndFinalEol;
+begin
+  ActionDeleteFakeLine;
+  if Count>0 then
+    if LinesEnds[Count-1]<>cEndNone then
+      LinesEnds[Count-1]:= cEndNone;
 end;
 
 procedure TATStrings.ActionAddFakeLineIfNeeded;

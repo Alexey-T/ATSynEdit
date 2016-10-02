@@ -399,6 +399,7 @@ type
     FMinimapAtLeft: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
     FOptScrollbarsNew: boolean;
     FOptShowURLs: boolean;
@@ -1101,6 +1102,7 @@ type
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave;
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces;
+    property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine;
   end;
 
 var
@@ -2535,6 +2537,7 @@ begin
   FOptMouseDownForPopup:= false;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
+  FOptPasteAtEndMakesFinalEmptyLine:= true;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownNumber:= -1;
