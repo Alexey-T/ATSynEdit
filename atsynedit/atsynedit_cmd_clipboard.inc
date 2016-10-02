@@ -22,18 +22,18 @@ begin
     Str:= SRemoveNewlineChars(Str);
 
   //we delete unneeded eol after paste, if:
-  //- OptPasteAtEndMakesFinalEmptyLine off
   //- one caret, on last line
   //- last line w/o eol
   //- pasted text w/o final eol
-  bNeedFixLastEol:=
-    (not OptPasteAtEndMakesFinalEmptyLine) and
-    (not ASelectThen) and
-    (Strings.Count>0) and
-    (Carets.Count=1) and
-    (Carets[0].PosY=Strings.Count-1) and
-    (Strings.LinesEnds[Strings.Count-1]=cEndNone) and
-    not (SEndsWith(Str, #13) or SEndsWith(Str, #10));
+  if OptPasteAtEndMakesFinalEmptyLine or ASelectThen then
+    bNeedFixLastEol:= false
+  else
+    bNeedFixLastEol:=
+      (Strings.Count>0) and
+      (Carets.Count=1) and
+      (Carets[0].PosY=Strings.Count-1) and
+      (Strings.LinesEnds[Strings.Count-1]=cEndNone) and
+      not (SEndsWith(Str, #13) or SEndsWith(Str, #10));
 
   //paste
   Strings.BeginUndoGroup;
