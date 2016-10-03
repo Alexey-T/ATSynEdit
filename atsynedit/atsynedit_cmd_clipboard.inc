@@ -33,7 +33,7 @@ begin
       (Carets.Count=1) and
       (Carets[0].PosY=Strings.Count-1) and
       (Strings.LinesEnds[Strings.Count-1]=cEndNone) and
-      not (SEndsWith(Str, #13) or SEndsWith(Str, #10));
+      not SEndsWithEol(Str);
 
   //paste
   Strings.BeginUndoGroup;

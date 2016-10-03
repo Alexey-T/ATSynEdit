@@ -151,8 +151,7 @@ begin
   if OneLine then
   begin
     Str:= AText;
-    SDeleteFromW(Str, #13);
-    SDeleteFromW(Str, #10);
+    SDeleteFromEol(Str);
     LineAddEx(Str, cEndNone);
   end
   else

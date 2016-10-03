@@ -60,10 +60,9 @@ begin
     if Lines[AY]<>'' then
       LineDelete(AY);
 
-    bWithEol:= SEndsWith(AText, #10) or
-               SEndsWith(AText, #13) or
-               bInsertAtEnd //need for (paste N lines, no final eol, at end of line)
-               ;
+    bWithEol:= SEndsWithEol(AText) or
+               bInsertAtEnd; //need for (paste N lines, no final eol, at end of line)
+
     LineInsertStrings(AY, List, bWithEol);
 
     if bWithEol then

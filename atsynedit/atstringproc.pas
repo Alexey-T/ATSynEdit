@@ -57,6 +57,8 @@ function SBeginsWith(const S, SubStr: atString): boolean;
 function SBeginsWith(const S, SubStr: string): boolean;
 function SEndsWith(const S, SubStr: atString): boolean;
 function SEndsWith(const S, SubStr: string): boolean;
+function SEndsWithEol(const S: string): boolean;
+function SEndsWithEol(const S: atString): boolean;
 
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
@@ -115,7 +117,9 @@ procedure SReplaceAll(var s: string; const SFrom, STo: string);
 procedure SReplaceAllPercentChars(var S: string);
 procedure SReplaceAllTabsToOneSpace(var S: string);
 procedure SDeleteFrom(var s: string; const SFrom: string);
-procedure SDeleteFromW(var s: UnicodeString; const SFrom: UnicodeString);
+procedure SDeleteFrom(var s: atString; const SFrom: atString);
+procedure SDeleteFromEol(var s: string);
+procedure SDeleteFromEol(var s: atString);
 
 var
   OptUnprintedReplaceSpec: boolean = false;
@@ -609,7 +613,8 @@ begin
   end;
 end;
 
-function SRemoveAsciiControlChars(const S: atString; AReplaceChar: WideChar): atString;
+function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar
+  ): atString;
 var
   i: integer;
 begin
@@ -696,6 +701,16 @@ function SEndsWith(const S, SubStr: string): boolean;
 begin
   Result:= (SubStr<>'') and (Length(SubStr)<=Length(S)) and
     (Copy(S, Length(S)-Length(SubStr)+1, MaxInt)=SubStr);
+end;
+
+function SEndsWithEol(const S: string): boolean;
+begin
+  Result:= (S<>'') and IsCharEol(S[Length(S)]);
+end;
+
+function SEndsWithEol(const S: atString): boolean;
+begin
+  Result:= (S<>'') and IsCharEol(S[Length(S)]);
 end;
 
 
@@ -897,13 +912,25 @@ begin
     Delete(S, n, MaxInt);
 end;
 
-procedure SDeleteFromW(var s: UnicodeString; const SFrom: UnicodeString);
+procedure SDeleteFrom(var s: atString; const SFrom: atString);
 var
   n: integer;
 begin
   n:= Pos(SFrom, S);
   if n>0 then
     Delete(S, n, MaxInt);
+end;
+
+procedure SDeleteFromEol(var s: string);
+begin
+  SDeleteFrom(s, #10);
+  SDeleteFrom(s, #13);
+end;
+
+procedure SDeleteFromEol(var s: atString);
+begin
+  SDeleteFrom(s, #10);
+  SDeleteFrom(s, #13);
 end;
 
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);

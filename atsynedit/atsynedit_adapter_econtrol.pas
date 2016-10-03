@@ -639,8 +639,8 @@ begin
       NodeGroup:= nil;
 
       //strip tree items from #10
-      SDeleteFrom(NodeText, #10);
-      SDeleteFrom(NodeTextGroup, #10);
+      SDeleteFromEol(NodeText);
+      SDeleteFromEol(NodeTextGroup);
 
       RangeParent:= GetRangeParent(R);
       while (RangeParent<>nil) and (not RangeParent.Rule.DisplayInTree) do
