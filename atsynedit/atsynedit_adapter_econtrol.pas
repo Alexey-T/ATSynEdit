@@ -428,8 +428,8 @@ begin
 
   //a) calc it from colored-ranges
   nColor:= GetTokenColorBG_FromColoredRanges(mustOffset, clNone, AEditorIndex);
-  if (nColor=clNone) and (ALen>0) then
-    nColor:= GetTokenColorBG_FromColoredRanges(mustOffset-1, clNone, AEditorIndex);
+  //if (nColor=clNone) and (ALen>0) then
+  //  nColor:= GetTokenColorBG_FromColoredRanges(mustOffset-1, clNone, AEditorIndex);
 
   //b) calc it from multi-line tokens (with bg-color)
   if (nColor=clNone) then
@@ -1001,7 +1001,8 @@ begin
           if R.Rule.Highlight then
           begin
             Pnt2.X:= Buffer.LineLength(Pnt2.Y);
-            Pos2:= Buffer.CaretToStr(Pnt2);
+            Pos2:= Buffer.CaretToStr(Pnt2)+1;
+              //+1 to make range longer, to hilite line to screen end
           end;
 
           ListColors.Add(TATRangeColored.Create(Pos1, Pos2, R.StartIdx, R.EndIdx, Style.BgColor, R.Rule));
