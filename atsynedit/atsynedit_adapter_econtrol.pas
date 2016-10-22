@@ -1138,6 +1138,7 @@ end;
 
 procedure TATAdapterEControl.SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
 begin
+  if Assigned(st.Font) then
   if st.FormatType in [ftCustomFont, ftFontAttr, ftColor] then
   begin
     if st.Font.Color<>clNone then
@@ -1148,6 +1149,7 @@ begin
     if st.BgColor<>clNone then
       part.ColorBG:= st.BgColor;
   end;
+  if Assigned(st.Font) then
   if st.FormatType in [ftCustomFont, ftFontAttr] then
   begin
     part.FontBold:= fsBold in st.Font.Style;
