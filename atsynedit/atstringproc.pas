@@ -32,7 +32,7 @@ const
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'win', 'un', 'mac');
 
 const
-  cMaxTabPositionToExpand = 500; //no sense to expand too far tabs
+  cMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
   cCharScaleFullwidth_Default = 1.7; //width of CJK chars
   cCharScaleHex_Small = 3.0; //width of hex show: "xNN"
   cCharScaleHex_Big = 5.0; //width of hex show: "xNNNN"
