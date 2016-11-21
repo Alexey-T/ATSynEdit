@@ -4028,37 +4028,37 @@ begin
 end;
 
 
-procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
 const
-  cCodeM: Widechar = #$4d; //half-width M
-  cCodeFullM: Widechar = #$ff2d; //full-width M
+  _CharCodeM: WideChar = #$4d; //half-width M
+  _CharCodeFullM: WideChar = #$ff2d; //full-width M
+
 {$ifdef windows}
+procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
 var
   sizeSmall, sizeFull: single;
   a: ABCFLOAT;
-{$endif}
 begin
-  if Assigned(Parent) then
-  begin
-    {$ifdef windows}
-    //half width
-    if GetCharABCWidthsFloatW(Canvas.Handle, Ord(cCodeM), Ord(cCodeM), a) then
-      sizeSmall:= Max(1.0, a.abcfA+a.abcfB+a.abcfC)
-    else
-      sizeSmall:= 1;
-    //full width
-    if GetCharABCWidthsFloatW(Canvas.Handle, Ord(cCodeFullM), Ord(cCodeFullM), a) then
-      sizeFull:= a.abcfA+a.abcfB+a.abcfC
-    else
-      sizeFull:= 1;
-    ATStringProc.cCharScaleFullwidth:= sizeFull/sizeSmall;
-    {$else}
-    ATStringProc.cCharScaleFullwidth_Default:=
-      Canvas.TextWidth(Utf8Encode(cCodeFullM)) /
-      Canvas.TextWidth(Utf8Encode(cCodeM));
-    {$endif}
-  end;
+  if not Assigned(Parent) then exit;
+  //half width
+  if GetCharABCWidthsFloatW(Canvas.Handle, Ord(_CharCodeM), Ord(_CharCodeM), a) then
+    sizeSmall:= Max(1.0, a.abcfA+a.abcfB+a.abcfC)
+  else
+    sizeSmall:= 1.0;
+  //full width
+  if GetCharABCWidthsFloatW(Canvas.Handle, Ord(_CharCodeFullM), Ord(_CharCodeFullM), a) then
+    sizeFull:= a.abcfA+a.abcfB+a.abcfC
+  else
+    sizeFull:= 1.0;
+  ATStringProc.cCharScaleFullwidth_Default:= sizeFull/sizeSmall;
 end;
+{$else}
+procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
+begin
+  ATStringProc.cCharScaleFullwidth_Default:=
+    Canvas.TextWidth(Utf8Encode(_CharCodeFullM)) /
+    Canvas.TextWidth(Utf8Encode(_CharCodeM));
+end;
+{$endif}
 
 procedure TATSynEdit.DoSendShowHideToInterface;
 begin
