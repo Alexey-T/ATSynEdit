@@ -4038,8 +4038,7 @@ var
   a: ABCFLOAT;
 {$endif}
 begin
-  ATStringProc.cCharScaleFullwidth:= ATStringProc.cCharScaleFullwidth_Default;
-  if assigned(Parent) then
+  if Assigned(Parent) then
   begin
     {$ifdef windows}
     //half width
@@ -4054,7 +4053,7 @@ begin
       sizeFull:= 1;
     ATStringProc.cCharScaleFullwidth:= sizeFull/sizeSmall;
     {$else}
-    ATStringProc.cCharScaleFullwidth:=
+    ATStringProc.cCharScaleFullwidth_Default:=
       Canvas.TextWidth(Utf8Encode(cCodeFullM)) /
       Canvas.TextWidth(Utf8Encode(cCodeM));
     {$endif}

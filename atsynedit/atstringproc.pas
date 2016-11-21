@@ -33,16 +33,15 @@ const
 
 const
   cMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
-  cCharScaleFullwidth_Default = 1.7; //width of CJK chars
-  cCharScaleHex_Small = 3.0; //width of hex show: "xNN"
-  cCharScaleHex_Big = 5.0; //width of hex show: "xNNNN"
-  cMinWordWrapOffset = 3;
+  cCharScaleFullwidth_Default: single = 1.7; //width of CJK chars
+  cCharScaleHex_Small: single = 3.0; //width of hex show: "xNN"
+  cCharScaleHex_Big: single = 5.0; //width of hex show: "xNNNN"
+  cMinWordWrapOffset: integer = 3;
 
 var
   OptHexCharsDefault: UnicodeString = ''; //show these chars as "<NNNN>"
   OptHexCharsUser: UnicodeString = ''; //these too
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
-  cCharScaleFullwidth: Single = cCharScaleFullwidth_Default;
 
 
 function IsCharEol(ch: atChar): boolean;
@@ -400,7 +399,7 @@ begin
     end
     else
     if IsCharFullWidth(S[i]) then
-      Scale:= cCharScaleFullwidth;
+      Scale:= cCharScaleFullwidth_Default;
 
     {$ifdef test_wide_char}
     if IsSpaceChar(S[i]) then
