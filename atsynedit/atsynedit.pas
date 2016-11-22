@@ -2217,7 +2217,13 @@ var
   NWidth: integer;
   Str: string;
 begin
-  Str:= STabsToSpaces(AMarkText, FTabSize);
+  Str:= AMarkText;
+  SReplaceAll(Str, #9, '  ');
+    //this quick tabs replace is ok
+  SReplaceAll(Str, #10, '');
+    //todo: for some reason, for Python, for "if/for" blocks, text has #10 at AMarkText begin
+    //this is workaround
+
   Inc(ACoord.X, cFoldedMarkIndentOuter);
 
   //set colors:
