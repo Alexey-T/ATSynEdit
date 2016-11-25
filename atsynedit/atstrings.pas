@@ -18,7 +18,8 @@ uses
   ATStrings_Hints;
 
 const
-  //set to 2 to allow 2 editors to use one Strings obj, with different LinesHidden[n, nClient]
+  //set it to number of editors, which share same Strings obj
+  //(needed when UI tab is splitted to N parts, for the same file)
   //set to 1 to allow only one editor for Strings obj (saves memory)
   cMaxStringsClients = 2;
 
@@ -108,7 +109,9 @@ type
     FUndoAfterSave: boolean;
     FUndoGroupCounter: integer;
     FOneLine: boolean;
-    FProgress: integer;
+    FProgressValue: integer;
+    FProgressMinSize: integer;
+    FProgressMinIncrement: integer;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnProgress: TNotifyEvent;
@@ -193,7 +196,9 @@ type
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
     property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
-    property Progress: integer read FProgress write FProgress;
+    property ProgressValue: integer read FProgressValue write FProgressValue;
+    property ProgressMinSize: integer read FProgressMinSize write FProgressMinSize;
+    property ProgressMinIncrement: integer read FProgressMinIncrement write FProgressMinIncrement;
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
@@ -260,10 +265,6 @@ const
   cSignUTF8: AnsiString = #$EF#$BB#$BF;
   cSignWideLE: AnsiString = #$FF#$FE;
   cSignWideBE: AnsiString = #$FE#$FF;
-
-const
-  cMinSizeForProgress = 200*1024;
-  cMinIncForProgress = 5;
 
 procedure DoEncError;
 begin
@@ -561,7 +562,9 @@ begin
   FSaveSignWide:= true;
   FUndoAfterSave:= true;
   FOneLine:= false;
-  FProgress:= 0;
+  FProgressValue:= 0;
+  FProgressMinSize:= 200*1024;
+  FProgressMinIncrement:= 5;
   SetLength(FSavedCaretsArray, 0);
 
   ActionAddFakeLineIfNeeded;

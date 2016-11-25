@@ -241,12 +241,12 @@ begin
       NEnd:= _FindNextEol(NStart);
       Len:= NEnd-NStart;
 
-      if Stream.Size>=cMinSizeForProgress then
+      if Stream.Size>=FProgressMinSize then
       begin
         NPercents:= Int64(NEnd)*100 div Stream.Size;
-        if Abs(NPercents-FProgress)>=cMinIncForProgress then
+        if Abs(NPercents-FProgressValue)>=FProgressMinIncrement then
         begin
-          FProgress:= NPercents;
+          FProgressValue:= NPercents;
           if Assigned(FOnProgress) then
             FOnProgress(Self);
         end;
@@ -353,7 +353,7 @@ begin
   DoClearLineStates(false);
   DoClearUndo;
   Modified:= false;
-  FProgress:= 0;
+  FProgressValue:= 0;
 end;
 
 
