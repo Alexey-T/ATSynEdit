@@ -1358,23 +1358,26 @@ end;
 
 procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
 var
-  NHiddenIndex, NOffset, NLen, NIndent, NVisColumns: integer;
+  NOffset, NLen, NIndent, NVisColumns: integer;
+  bHidden: boolean;
+  NFoldFrom: integer;
   NFinal: TATSynWrapFinal;
   Str: atString;
 begin
   AItems.Clear;
 
-  NHiddenIndex:= Strings.LinesHidden[ALine, FEditorIndex];
-  if NHiddenIndex<0 then Exit;
+  bHidden:= Strings.LinesHidden[ALine, FEditorIndex];
+  if bHidden then Exit;
 
   Str:= Strings.Lines[ALine];
   NLen:= Length(Str);
   NVisColumns:= Max(GetVisibleColumns, cMinWrapColumnAbs);
 
   //line collapsed partially?
-  if NHiddenIndex>0 then
+  NFoldFrom:= Strings.LinesFoldFrom[ALine, FEditorIndex];
+  if NFoldFrom>0 then
   begin
-    AItems.Add(TATSynWrapItem.Create(ALine, 1, Min(NLen, NHiddenIndex-1), 0, cWrapItemCollapsed));
+    AItems.Add(TATSynWrapItem.Create(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed));
     Exit;
   end;
 
@@ -1989,7 +1992,7 @@ begin
     if AMainText then
       if WrapItem.NFinal=cWrapItemCollapsed then
         DoPaintFoldedMark(C,
-          Point(Strings.LinesHidden[NLinesIndex, FEditorIndex]-1, NLinesIndex),
+          Point(Strings.LinesFoldFrom[NLinesIndex, FEditorIndex]-1, NLinesIndex),
           CoordAfterText,
           GetFoldedMarkText(NLinesIndex));
 

@@ -68,10 +68,10 @@ type
     ItemSeparator: TATLineSeparator;
     ItemBm: byte; //kind of bookmark, 0: none
     ItemHint: byte; //max 250 hints per control, 0: no hint
-    ItemHidden: array[0..cMaxStringsClients-1] of smallint;
-      //0: line visible,
-      //-1: line hidden,
-      //>0: line hidden from this char-pos
+    ItemHidden: packed array[0..cMaxStringsClients-1] of ByteBool;
+    ItemFoldFrom: packed array[0..cMaxStringsClients-1] of byte;
+      //0: line not folded
+      //>0: line folded from this char-pos
     constructor Create_UTF8(const AString: UTF8String; AEnd: TATLineEnds);
     constructor Create_Uni(const AString: atString; AEnd: TATLineEnds);
     function IsFake: boolean;
@@ -125,7 +125,8 @@ type
     function GetLine(N: integer): atString;
     function GetLineBm(Index: integer): integer;
     function GetLineEnd(N: integer): TATLineEnds;
-    function GetLineHidden(NLine, NClient: integer): integer;
+    function GetLineFoldFrom(NLine, NClient: integer): integer;
+    function GetLineHidden(NLine, NClient: integer): boolean;
     function GetLineHint(Index: integer): string;
     function GetLineSep(Index: integer): TATLineSeparator;
     function GetLineState(Index: integer): TATLineState;
@@ -141,7 +142,8 @@ type
     procedure SetLine(Index: integer; const AValue: atString);
     procedure SetLineBm(Index: integer; AValue: integer);
     procedure SetLineEnd(Index: integer; AValue: TATLineEnds);
-    procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: integer);
+    procedure SetLineFoldFrom(IndexLine, IndexClient: integer; AValue: integer);
+    procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: boolean);
     procedure SetLineHint(Index: integer; const AValue: string);
     procedure SetLineSep(Index: integer; AValue: TATLineSeparator);
     procedure SetLineState(Index: integer; AValue: TATLineState);
@@ -173,7 +175,8 @@ type
     procedure LineDelete(N: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
-    property LinesHidden[IndexLine, IndexClient: integer]: integer read GetLineHidden write SetLineHidden;
+    property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
+    property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesHint[Index: integer]: string read GetLineHint write SetLineHint;
@@ -284,7 +287,10 @@ begin
   ItemState:= cLineStateAdded;
   ItemSeparator:= cLineSepNone;
   for i:= 0 to High(ItemHidden) do
-    ItemHidden[i]:= 0;
+  begin
+    ItemHidden[i]:= false;
+    ItemFoldFrom[i]:= 0;
+  end;
   ItemBm:= 0;
   ItemHint:= 0;
 end;
@@ -323,7 +329,13 @@ begin
   Result:= TATStringItem(FList[N]).ItemEnd;
 end;
 
-function TATStrings.GetLineHidden(NLine, NClient: integer): integer;
+function TATStrings.GetLineFoldFrom(NLine, NClient: integer): integer;
+begin
+  Assert(IsIndexValid(NLine));
+  Result:= TATStringItem(FList[NLine]).ItemFoldFrom[NClient];
+end;
+
+function TATStrings.GetLineHidden(NLine, NClient: integer): boolean;
 begin
   Assert(IsIndexValid(NLine));
   Result:= TATStringItem(FList[NLine]).ItemHidden[NClient];
@@ -401,7 +413,7 @@ begin
 
   //fully unfold this line
   for i:= 0 to High(Item.ItemHidden) do
-    Item.ItemHidden[i]:= 0;
+    Item.ItemFoldFrom[i]:= 0;
 
   if Item.ItemState<>cLineStateAdded then
     Item.ItemState:= cLineStateChanged;
@@ -441,8 +453,15 @@ begin
     Item.ItemState:= cLineStateChanged;
 end;
 
-procedure TATStrings.SetLineHidden(IndexLine, IndexClient: integer;
+procedure TATStrings.SetLineFoldFrom(IndexLine, IndexClient: integer;
   AValue: integer);
+begin
+  Assert(IsIndexValid(IndexLine));
+  TATStringItem(FList[IndexLine]).ItemFoldFrom[IndexClient]:= AValue;
+end;
+
+procedure TATStrings.SetLineHidden(IndexLine, IndexClient: integer;
+  AValue: boolean);
 begin
   Assert(IsIndexValid(IndexLine));
   TATStringItem(FList[IndexLine]).ItemHidden[IndexClient]:= AValue;
@@ -1217,15 +1236,16 @@ end;
 
 function TATStrings.IsPosFolded(AX, AY, AIndexClient: integer): boolean;
 var
-  Flag: integer;
+  ValueHidden: boolean;
+  ValueFoldFrom: integer;
 begin
   Result:= true;
   if not IsIndexValid(AY) then Exit;
 
-  //if -1: line hidden, if 0: not hidden, if >0: line hidden from this char-pos
-  Flag:= LinesHidden[AY, AIndexClient];
-  if (Flag=-1) then Exit;
-  if (Flag>0) and (AX>=Flag) then Exit;
+  ValueHidden:= LinesHidden[AY, AIndexClient];
+  ValueFoldFrom:= LinesFoldFrom[AY, AIndexClient];
+  if ValueHidden then Exit;
+  if (ValueFoldFrom>0) and (AX>=ValueFoldFrom) then Exit;
   Result:= false;
 end;
 
