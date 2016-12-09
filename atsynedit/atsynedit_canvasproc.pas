@@ -655,7 +655,9 @@ begin
       DoPaintHexChars(C,
         PartStr,
         @Dx[PartOffset],
-        Point(PosX+PixOffset1, PosY),
+        Point(
+          PosX+PixOffset1,
+          PosY+ATextOffsetFromLine),
         ACharSize,
         AColorHex,
         PartPtr^.ColorBG
