@@ -128,8 +128,8 @@ var
 begin
   FDirApp:= ExtractFileDir(Application.ExeName);
   {$ifdef darwin}
-  // dir_exe/name.app/MacOS/name
-  FDirApp:= ExtractFileDir(ExtractFileDir(FDirApp));
+  //out of app bundle
+  FDirApp:= ExtractFileDir(ExtractFileDir(ExtractFileDir(FDirApp)));
   {$endif}
 
   fname_lxl:= FDirApp+DirectorySeparator+'lib.lxl';
