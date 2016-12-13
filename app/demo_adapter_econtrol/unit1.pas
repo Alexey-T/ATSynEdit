@@ -61,7 +61,7 @@ type
   private
     { private declarations }
     ed: TATSynEdit;
-    FDir: string;
+    FDirApp: string;
     FFilename: string;
     procedure DoCommentAct(Act: TATCommentAction);
     procedure DoLexer(const aname: string);
@@ -126,8 +126,13 @@ procedure TfmMain.FormCreate(Sender: TObject);
 var
   fname_lxl: string;
 begin
-  FDir:= ExtractFileDir(ExtractFileDir(ExtractFileDir(Application.ExeName)))+'/test_syntax_files/';
-  fname_lxl:= ExtractFilePath(Application.ExeName)+'lib.lxl';
+  FDirApp:= ExtractFileDir(Application.ExeName);
+  {$ifdef darwin}
+  // dir_exe/name.app/MacOS/name
+  FDirApp:= ExtractFileDir(ExtractFileDir(FDirApp));
+  {$endif}
+
+  fname_lxl:= FDirApp+DirectorySeparator+'lib.lxl';
 
   manager:= TecSyntaxManager.Create(Self);
   manager.LoadFromFile(fname_lxl);
@@ -164,8 +169,8 @@ end;
 
 procedure TfmMain.FormShow(Sender: TObject);
 begin
-  if DirectoryExists(FDir) then
-    files.Root:= FDir;
+  if DirectoryExists(FDirApp) then
+    files.Root:= ExtractFileDir(ExtractFileDir(FDirApp))+DirectorySeparator+'test_syntax_files';
 end;
 
 procedure TfmMain.TreeClick(Sender: TObject);
@@ -236,7 +241,7 @@ begin
   with OpenDialog1 do
   begin
     Filename:= '';
-    InitialDir:= FDir;
+    InitialDir:= FDirApp;
     if not Execute then exit;
     DoOpenFile(Filename);
   end;

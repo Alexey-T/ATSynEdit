@@ -9,7 +9,8 @@ object fmMain: TfmMain
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
+  Visible = False
   object Panel1: TPanel
     Left = 0
     Height = 218
@@ -156,6 +157,7 @@ object fmMain: TfmMain
     Top = 0
     Width = 240
     Align = alLeft
+    ExpandSignSize = 7
     HideSelection = False
     Images = ImageListTree
     ReadOnly = True
