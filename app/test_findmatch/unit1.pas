@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  atsynedit_finder, regexpr;
+  atsynedit_finder, atsynedit_regexpr;
 
 type
 

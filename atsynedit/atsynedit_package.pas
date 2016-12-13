@@ -14,7 +14,7 @@ uses
   ATSynEdit_Commands, ATSynEdit_Edits, ATSynEdit_Gutter, ATSynEdit_Keymap, 
   ATSynEdit_Keymap_Init, ATSynEdit_Ranges, ATSynEdit_WrapInfo, 
   ATSynEdit_Finder, ATStringProc_HtmlColor, atstrings_hints, ATSynEdit_Colors, 
-  ATSynEdit_Export_HTML, ATSynEdit_Markers, RegExpr, LazarusPackageIntf;
+  ATSynEdit_Export_HTML, ATSynEdit_Markers, ATSynEdit_RegExpr, LazarusPackageIntf;
 
 implementation
 

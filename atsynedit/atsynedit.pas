@@ -26,7 +26,7 @@ uses
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms,
   LMessages, LCLType,
-  RegExpr,
+  ATSynEdit_RegExpr,
   ATScrollBar,
   ATStringProc,
   ATStrings,

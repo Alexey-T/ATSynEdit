@@ -7,7 +7,7 @@ interface
 uses
   SysUtils, Classes, Dialogs, Forms,
   Math,
-  RegExpr, //must be with {$define Unicode}
+  ATSynEdit_RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Carets,
   ATStringProc,

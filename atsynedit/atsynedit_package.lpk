@@ -125,8 +125,8 @@
         <UnitName Value="ATSynEdit_Markers"/>
       </Item27>
       <Item28>
-        <Filename Value="regexpr.pas"/>
-        <UnitName Value="RegExpr"/>
+        <Filename Value="atsynedit_regexpr.pas"/>
+        <UnitName Value="ATSynEdit_RegExpr"/>
       </Item28>
     </Files>
     <RequiredPkgs Count="2">

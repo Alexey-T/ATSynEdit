@@ -9,7 +9,7 @@ uses
   StrUtils,
   ATSynEdit,
   ATSynEdit_Carets,
-  RegExpr,
+  ATSynEdit_RegExpr,
   Dialogs;
 
 //it needs file html_list.ini from SynWrite distro

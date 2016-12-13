@@ -1,4 +1,4 @@
-unit RegExpr;
+unit ATSynEdit_RegExpr;
 
 {
      TRegExpr class library

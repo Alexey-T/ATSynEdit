@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, Graphics,
   ATSynEdit,
   ATSynEdit_Carets,
-  RegExpr,
+  ATSynEdit_RegExpr,
   Dialogs;
 
 //it needs file css_list.ini from SynWrite distro

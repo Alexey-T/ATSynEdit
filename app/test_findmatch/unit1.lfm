@@ -10,6 +10,7 @@ object fmMain: TfmMain
   OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.7'
+  Visible = False
   object Memo1: TMemo
     Left = 8
     Height = 48
