@@ -818,9 +818,9 @@ begin
 
   Lens:= TList.Create;
   try
-    Lens.Clear;
-    for i:= 0 to Ed.Strings.Count-1 do
-      Lens.Add(pointer(Length(Ed.Strings.Lines[i])));
+    Lens.Count:= Ed.Strings.Count;
+    for i:= 0 to Lens.Count-1 do
+      Lens[i]:= Pointer(Length(Ed.Strings.Lines[i]));
     Buffer.Setup(Ed.Strings.TextString, Lens, 1);
   finally
     FreeAndNil(Lens);

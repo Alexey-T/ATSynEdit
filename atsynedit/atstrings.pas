@@ -166,8 +166,8 @@ type
     procedure Clear;
     procedure ClearHints;
     procedure ClearSeparators;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
     procedure LineAddRaw_UTF8_NoUndo(const AString: UTF8String; AEnd: TATLineEnds);
@@ -765,12 +765,12 @@ begin
 end;
 
 
-function TATStrings.IsIndexValid(N: integer): boolean;
+function TATStrings.IsIndexValid(N: integer): boolean; inline;
 begin
-  Result:= (N>=0) and (N<Count);
+  Result:= (N>=0) and (N<FList.Count);
 end;
 
-function TATStrings.Count: integer;
+function TATStrings.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
