@@ -48,6 +48,7 @@ type
     ListColors: TList;
     TimerDuringAnalyze: TTimer;
     FEnabledDynHilite: boolean;
+    FEnabledLineSeparators: boolean;
     FBusyTreeUpdate: boolean;
     FBusyTimer: boolean;
     FParsePausePassed: boolean;
@@ -77,7 +78,7 @@ type
     procedure TimerDuringAnalyzeTimer(Sender: TObject);
     procedure UpdateRanges;
     procedure UpdateRangesActive(AEdit: TATSynEdit);
-    procedure UpdateSeps;
+    procedure UpdateSeparators;
     procedure UpdateRangesSublex;
     procedure UpdateData;
     procedure UpdateRangesFold;
@@ -90,6 +91,7 @@ type
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
     property EnabledDynamicHilite: boolean read FEnabledDynHilite write FEnabledDynHilite;
+    property EnabledLineSeparators: boolean read FEnabledLineSeparators write FEnabledLineSeparators;
     procedure DoAnalize(AEdit: TATSynEdit; AForceAnalizeAll: boolean);
     procedure Stop;
 
@@ -464,6 +466,7 @@ begin
   Buffer:= TATStringBuffer.Create;
   ListColors:= TList.Create;
   FEnabledDynHilite:= true;
+  FEnabledLineSeparators:= false;
 
   TimerDuringAnalyze:= TTimer.Create(Self);
   TimerDuringAnalyze.Enabled:= false;
@@ -793,6 +796,7 @@ begin
   if Assigned(AAnalizer) then
   begin
     AnClient:= TecClientSyntAnalyzer.Create(AAnalizer, Buffer, nil);
+    AnClient.EnabledLineSeparators:= EnabledLineSeparators;
     UpdateData;
   end;
 
@@ -837,7 +841,9 @@ begin
   DoClearRanges;
   UpdateRangesFold;
   UpdateRangesSublex; //sublexer ranges last
-  UpdateSeps;
+
+  if EnabledLineSeparators then
+    UpdateSeparators;
 
   if EdList.Count>0 then
     for i:= 0 to EdList.Count-1 do
@@ -909,7 +915,7 @@ begin
 end;
 
 
-procedure TATAdapterEControl.UpdateSeps;
+procedure TATAdapterEControl.UpdateSeparators;
 var
   Ed: TATSynEdit;
   Break: TecLineBreak;
