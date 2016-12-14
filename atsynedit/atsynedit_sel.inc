@@ -275,7 +275,6 @@ end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
 var
-  NPosLeft, NPosRight: integer;
   i: integer;
 begin
   if P1.Y>P2.Y then

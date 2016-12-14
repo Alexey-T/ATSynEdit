@@ -822,7 +822,6 @@ var
   Caret: TATCaretItem;
   L: TStringList;
   NFrom, NTo, i: integer;
-  Shift, PosAfter: TPoint;
   bChange: boolean;
 begin
   if Carets.Count=0 then exit;

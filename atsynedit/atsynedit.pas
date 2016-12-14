@@ -776,7 +776,6 @@ type
     procedure DoSendShowHideToInterface; override;
     procedure DragOver(Source: TObject; X, Y: Integer; State: TDragState;
       var Accept: Boolean); override;
-    procedure DragDrop(Source: TObject; X, Y: Integer); override;
   public
     MenuitemTextCut: TMenuItem;
     MenuitemTextCopy: TMenuItem;
@@ -792,6 +791,7 @@ type
     procedure SetFocus; override;
     function ClientWidth: integer;
     function ClientHeight: integer;
+    procedure DragDrop(Source: TObject; X, Y: Integer); override;
     //updates
     procedure Invalidate; override;
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
