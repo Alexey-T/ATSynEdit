@@ -7,6 +7,7 @@ interface
 uses
   Classes, SysUtils,
   Dialogs,
+  LazUTF8,
   ATStringProc;
 
 type
@@ -32,15 +33,15 @@ type
     procedure Clear;
     function CaretToStr(APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
-    function SubString(AFrom, ALen: integer): atString;
-    function TextLength: integer;
+    function SubString(AFrom, ALen: integer): atString; inline;
+    function TextLength: integer; inline;
     function LineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
-    function LineSpace(N: integer): integer;
+    function LineSpace(N: integer): integer; inline;
     function OffsetToDistanceFromLineStart(APos: integer): integer;
     function OffsetToDistanceFromLineEnd(APos: integer): integer;
-    function OffsetToOffsetOfLineStart(APos: integer): integer;
-    function OffsetToOffsetOfLineEnd(APos: integer): integer;
+    function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
+    function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
     property Count: integer read FListCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
   end;
@@ -124,7 +125,7 @@ begin
 
     Lens.Count:= L.Count;
     for i:= 0 to L.Count-1 do
-      Lens[i]:= Pointer(Length(UTF8Decode(L[i])));
+      Lens[i]:= Pointer(UTF8LengthFast(L[i]));
 
     Setup(STextFinal, Lens, 1);
   finally
@@ -187,12 +188,12 @@ begin
   Result.X:= APos-FList[Result.Y];
 end;
 
-function TATStringBuffer.SubString(AFrom, ALen: integer): atString;
+function TATStringBuffer.SubString(AFrom, ALen: integer): atString; inline;
 begin
   Result:= Copy(FText, AFrom, ALen);
 end;
 
-function TATStringBuffer.TextLength: integer;
+function TATStringBuffer.TextLength: integer; inline;
 begin
   Result:= Length(FText);
 end;
@@ -215,7 +216,7 @@ begin
     Result:= FList[N+1]-FList[N]-FLenEol;
 end;
 
-function TATStringBuffer.LineSpace(N: integer): integer;
+function TATStringBuffer.LineSpace(N: integer): integer; inline;
 begin
   Result:= LineLength(N)+FLenEol;
 end;
@@ -239,12 +240,12 @@ begin
 end;
 *)
 
-function TATStringBuffer.OffsetToOffsetOfLineStart(APos: integer): integer;
+function TATStringBuffer.OffsetToOffsetOfLineStart(APos: integer): integer; inline;
 begin
   Result:= APos-OffsetToDistanceFromLineStart(APos);
 end;
 
-function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer;
+function TATStringBuffer.OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
 begin
   Result:= APos+OffsetToDistanceFromLineEnd(APos);
 end;

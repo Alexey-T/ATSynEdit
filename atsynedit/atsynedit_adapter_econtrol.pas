@@ -833,7 +833,7 @@ begin
   try
     Lens.Count:= Ed.Strings.Count;
     for i:= 0 to Lens.Count-1 do
-      Lens[i]:= Pointer(Length(Ed.Strings.Lines[i]));
+      Lens[i]:= Pointer(PtrInt(Ed.Strings.LinesLength[i]));
     Buffer.Setup(Ed.Strings.TextString, Lens, 1);
   finally
     FreeAndNil(Lens);

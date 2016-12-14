@@ -4,7 +4,8 @@ License: MPL 2.0
 }
 
 {$mode objfpc}{$H+}
-{$Z1}
+{$MinEnumSize 1}
+{$Assertions on}
 
 unit ATStrings;
 
@@ -15,7 +16,8 @@ uses
   ATStringProc,
   ATStringProc_Utf8Detect,
   ATStrings_Undo,
-  ATStrings_Hints;
+  ATStrings_Hints,
+  LazUTF8;
 
 const
   //set it to number of editors, which share same Strings obj
@@ -133,6 +135,7 @@ type
     function GetLineHint(Index: integer): string;
     function GetLineSep(Index: integer): TATLineSeparator;
     function GetLineState(Index: integer): TATLineState;
+    function GetLineLength(Index: integer): integer;
     function GetRedoCount: integer;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
@@ -177,6 +180,7 @@ type
     procedure LineInsertStrings(N: integer; AList: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(N: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
+    property LinesLength[Index: integer]: integer read GetLineLength;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
@@ -346,6 +350,13 @@ function TATStrings.GetLineState(Index: integer): TATLineState;
 begin
   Assert(IsIndexValid(Index));
   Result:= TATStringItem(FList[Index]).ItemState;
+end;
+
+function TATStrings.GetLineLength(Index: integer): integer;
+begin
+  Result:= UTF8LengthFast(
+    TATStringItem(FList[Index]).ItemString
+    );
 end;
 
 function TATStrings.GetLineSep(Index: integer): TATLineSeparator;
