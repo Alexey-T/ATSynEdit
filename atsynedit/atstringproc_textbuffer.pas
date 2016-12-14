@@ -17,9 +17,12 @@ type
 
   TATStringBuffer = class
   private
-    FStarts: TList; //contains offsets of lines
+    FList: array of integer;
+    FListCapacity: integer;
+    FListCount: integer;
     FLenEol: integer;
     FOnChange: TTextChangedEvent;
+    procedure SetCount(AValue: integer);
   public
     FText: atString;
     constructor Create; virtual;
@@ -38,29 +41,44 @@ type
     function OffsetToDistanceFromLineEnd(APos: integer): integer;
     function OffsetToOffsetOfLineStart(APos: integer): integer;
     function OffsetToOffsetOfLineEnd(APos: integer): integer;
-    function Count: integer;
+    property Count: integer read FListCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
   end;
 
 implementation
 
-const
-  cInitListCapacity = 10000;
-
 { TATStringBuffer }
+
+procedure TATStringBuffer.SetCount(AValue: integer);
+const
+  cMinCap = 4*1024;
+begin
+  FListCount:= AValue;
+
+  if AValue<0 then
+    raise Exception.Create('StringBuffer Count<0');
+  if AValue<=cMinCap then
+    FListCapacity:= cMinCap
+  else
+  //first, round value to nearest N, which divides cMinCap
+  //then, double the N
+    FListCapacity:= AValue div cMinCap * (cMinCap*2);
+
+  if Length(FList)<>FListCapacity then
+    SetLength(FList, FListCapacity);
+end;
 
 constructor TATStringBuffer.Create;
 begin
   FText:= '';
-  FStarts:= TList.Create;
-  FStarts.Capacity:= cInitListCapacity;
   FLenEol:= 1;
+  SetLength(FList, 0);
+  SetCount(0);
 end;
 
 destructor TATStringBuffer.Destroy;
 begin
-  FStarts.Clear;
-  FreeAndNil(FStarts);
+  SetLength(FList, 0);
   inherited;
 end;
 
@@ -72,14 +90,14 @@ begin
   FText:= AText;
   FLenEol:= ALenEol;
 
-  FStarts.Clear;
+  SetCount(ALineLens.Count+1);
   Pos:= 0;
-  FStarts.Add(nil);
+  FList[0]:= 0;
   for i:= 0 to ALineLens.Count-1 do
   begin
-    NLen:= PtrUInt(ALineLens[i]);
+    NLen:= PtrInt(ALineLens[i]);
     Inc(Pos, NLen+FLenEol);
-    FStarts.Add(Pointer(PtrUInt(Pos)));
+    FList[i+1]:= Pos;
   end;
 end;
 
@@ -93,7 +111,7 @@ begin
   if Trim(AText)='' then
   begin
     FText:= '';
-    FStarts.Clear;
+    SetCount(0);
     Exit
   end;
 
@@ -104,7 +122,7 @@ begin
     L.Text:= UTF8Encode(AText);
     STextFinal:= UTF8Decode(L.Text); //this converts eol to LF
     for i:= 0 to L.Count-1 do
-      Lens.Add(pointer(Length(UTF8Decode(L[i]))));
+      Lens.Add(Pointer(Length(UTF8Decode(L[i]))));
     Setup(STextFinal, Lens, 1);
   finally
     FreeAndNil(Lens);
@@ -115,7 +133,7 @@ end;
 procedure TATStringBuffer.Clear;
 begin
   FText:= '';
-  FStarts.Clear;
+  SetCount(0);
 end;
 
 function TATStringBuffer.CaretToStr(APnt: TPoint): integer;
@@ -125,14 +143,14 @@ begin
   Result:= -1;
   if (APnt.Y<0) then Exit;
   if (APnt.X<0) then Exit;
-  if (APnt.Y>=FStarts.Count) then Exit;
+  if (APnt.Y>=FListCount) then Exit;
 
   //handle caret pos after eol
   Len:= LineLength(APnt.Y);
   if APnt.X>Len then
     APnt.X:= Len;
 
-  Result:= PtrUInt(FStarts[APnt.Y])+APnt.X;
+  Result:= FList[APnt.Y]+APnt.X;
 end;
 
 function TATStringBuffer.StrToCaret(APos: integer): TPoint;
@@ -145,17 +163,17 @@ begin
     begin Result.Y:= 0; Exit end;
 
   a:= 0;
-  b:= FStarts.Count-1;
+  b:= FListCount-1;
   if b<0 then Exit;
 
   repeat
-    dif:= PtrUInt(FStarts[a])-PtrUInt(APos);
+    dif:= FList[a]-APos;
     if dif=0 then begin m:= a; Break end;
 
     //middle, which is near b if not exact middle
     m:= (a+b+1) div 2;
 
-    dif:= PtrUInt(FStarts[m])-PtrUInt(APos);
+    dif:= FList[m]-APos;
     if dif=0 then Break;
 
     if Abs(a-b)<=1 then begin m:= a; Break end;
@@ -163,7 +181,7 @@ begin
   until false;
 
   Result.Y:= m;
-  Result.X:= PtrUInt(APos)-PtrUInt(FStarts[Result.Y]);
+  Result.X:= APos-FList[Result.Y];
 end;
 
 function TATStringBuffer.SubString(AFrom, ALen: integer): atString;
@@ -180,28 +198,23 @@ function TATStringBuffer.LineIndex(N: integer): integer;
 begin
   if N<0 then Result:= 0
   else
-  if N>=FStarts.Count then Result:= TextLength-1
+  if N>=FListCount then Result:= TextLength-1
   else
-    Result:= PtrUInt(FStarts[N]);
+    Result:= FList[N];
 end;
 
 function TATStringBuffer.LineLength(N: integer): integer;
 begin
   if N<0 then Result:= 0
   else
-  if N>=FStarts.Count-1 then Result:= 0
+  if N>=FListCount-1 then Result:= 0
   else
-    Result:= PtrUInt(FStarts[N+1])-PtrUInt(FStarts[N])-FLenEol;
+    Result:= FList[N+1]-FList[N]-FLenEol;
 end;
 
 function TATStringBuffer.LineSpace(N: integer): integer;
 begin
   Result:= LineLength(N)+FLenEol;
-end;
-
-function TATStringBuffer.Count: integer;
-begin
-  Result:= FStarts.Count;
 end;
 
 (*
