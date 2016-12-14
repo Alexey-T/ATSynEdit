@@ -121,8 +121,11 @@ begin
     L.TextLineBreakStyle:= tlbsLF;
     L.Text:= UTF8Encode(AText);
     STextFinal:= UTF8Decode(L.Text); //this converts eol to LF
+
+    Lens.Count:= L.Count;
     for i:= 0 to L.Count-1 do
-      Lens.Add(Pointer(Length(UTF8Decode(L[i]))));
+      Lens[i]:= Pointer(Length(UTF8Decode(L[i])));
+
     Setup(STextFinal, Lens, 1);
   finally
     FreeAndNil(Lens);
