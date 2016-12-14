@@ -84,6 +84,7 @@ type
     procedure UpdateRangesFold;
     function GetLexer: TecSyntAnalyzer;
     procedure SetLexer(AAnalizer: TecSyntAnalyzer);
+    procedure SetEnabledLineSeparators(AValue: boolean);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -91,7 +92,7 @@ type
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
     property EnabledDynamicHilite: boolean read FEnabledDynHilite write FEnabledDynHilite;
-    property EnabledLineSeparators: boolean read FEnabledLineSeparators write FEnabledLineSeparators;
+    property EnabledLineSeparators: boolean read FEnabledLineSeparators write SetEnabledLineSeparators;
     procedure DoAnalize(AEdit: TATSynEdit; AForceAnalizeAll: boolean);
     procedure Stop;
 
@@ -229,6 +230,14 @@ begin
       Exit
     end;
   end;
+end;
+
+procedure TATAdapterEControl.SetEnabledLineSeparators(AValue: boolean);
+begin
+  if FEnabledLineSeparators=AValue then Exit;
+  FEnabledLineSeparators:= AValue;
+  if Assigned(AnClient) then
+    AnClient.EnabledLineSeparators:= EnabledLineSeparators;
 end;
 
 
