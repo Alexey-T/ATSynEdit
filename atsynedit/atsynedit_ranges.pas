@@ -229,7 +229,7 @@ begin
             Ok:= not IsRangesSame(AInRange, R) and IsRangeInsideOther(R, AInRange);
 
           if Ok then
-            L.Add(pointer(i));
+            L.Add(Pointer(PtrInt(i)));
         end;
     end;
 
@@ -241,7 +241,7 @@ begin
 
       for i:= L.Count-1 downto 1 do
         for j:= 0 to i-1 do
-          if IsRangeInsideOther(Items[integer(L[i])], Items[integer(L[j])]) then
+          if IsRangeInsideOther(Items[PtrInt(L[i])], Items[PtrInt(L[j])]) then
           begin
             L.Delete(i);
             Break
@@ -256,7 +256,7 @@ begin
 
     SetLength(Result, L.Count);
     for i:= 0 to L.Count-1 do
-      Result[i]:= integer(L[i]);
+      Result[i]:= PtrInt(L[i]);
   finally
     FreeAndNil(L);
   end;
@@ -295,7 +295,7 @@ begin
   Result:= '';
   if L.Count=0 then exit;
   for i:= 0 to L.Count-1 do
-    Result:= Result+items[integer(L[i])].MessageText+#13;
+    Result:= Result+Items[PtrInt(L[i])].MessageText+#13;
 end;
 
 end.

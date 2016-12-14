@@ -77,9 +77,9 @@ begin
   FStarts.Add(nil);
   for i:= 0 to ALineLens.Count-1 do
   begin
-    NLen:= integer(ALineLens[i]);
+    NLen:= PtrInt(ALineLens[i]);
     Inc(Pos, NLen+FLenEol);
-    FStarts.Add(pointer(Pos));
+    FStarts.Add(Pointer(PtrInt(Pos)));
   end;
 end;
 
@@ -132,7 +132,7 @@ begin
   if APnt.X>Len then
     APnt.X:= Len;
 
-  Result:= integer(FStarts[APnt.Y])+APnt.X;
+  Result:= PtrInt(FStarts[APnt.Y])+APnt.X;
 end;
 
 function TATStringBuffer.StrToCaret(APos: integer): TPoint;
@@ -149,13 +149,13 @@ begin
   if b<0 then Exit;
 
   repeat
-    dif:= integer(FStarts[a])-APos;
+    dif:= PtrInt(FStarts[a])-PtrInt(APos);
     if dif=0 then begin m:= a; Break end;
 
     //middle, which is near b if not exact middle
     m:= (a+b+1) div 2;
 
-    dif:= integer(FStarts[m])-APos;
+    dif:= PtrInt(FStarts[m])-PtrInt(APos);
     if dif=0 then Break;
 
     if Abs(a-b)<=1 then begin m:= a; Break end;
@@ -163,7 +163,7 @@ begin
   until false;
 
   Result.Y:= m;
-  Result.X:= APos-integer(FStarts[Result.Y]);
+  Result.X:= PtrInt(APos)-PtrInt(FStarts[Result.Y]);
 end;
 
 function TATStringBuffer.SubString(AFrom, ALen: integer): atString;
@@ -182,7 +182,7 @@ begin
   else
   if N>=FStarts.Count then Result:= TextLength-1
   else
-    Result:= integer(FStarts[N]);
+    Result:= PtrInt(FStarts[N]);
 end;
 
 function TATStringBuffer.LineLength(N: integer): integer;
@@ -191,7 +191,7 @@ begin
   else
   if N>=FStarts.Count-1 then Result:= 0
   else
-    Result:= integer(FStarts[N+1])-integer(FStarts[N])-FLenEol;
+    Result:= PtrInt(FStarts[N+1])-PtrInt(FStarts[N])-FLenEol;
 end;
 
 function TATStringBuffer.LineSpace(N: integer): integer;

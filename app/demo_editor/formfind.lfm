@@ -9,7 +9,8 @@ object fmFind: TfmFind
   ClientWidth = 489
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
+  Visible = False
   object bFind: TButton
     Left = 376
     Height = 25

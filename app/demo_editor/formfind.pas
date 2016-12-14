@@ -33,7 +33,7 @@ type
     procedure chkRepChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
-    procedure Update;
+    procedure Update; reintroduce;
     { private declarations }
   public
     { public declarations }
