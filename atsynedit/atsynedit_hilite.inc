@@ -33,6 +33,7 @@ procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
+  bFound: boolean;
 begin
   nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped);
   nLineIndex:= AItem.NLineIndex;
@@ -40,8 +41,23 @@ begin
   nCharIndex:= AItem.NCharIndex+ACharsSkipped;
 
   FillChar(AParts, SizeOf(AParts), 0);
+
+  //1) get hilites from adapter
   if Assigned(FAdapterHilite) then
-    FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
+  begin
+    //DynamicHilite must disable cache
+    bFound:= false;
+    if not FAdapterHilite.EnabledDynamicHilite then
+      bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
+    if not bFound then
+    begin
+      FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
+      if not FAdapterHilite.EnabledDynamicHilite then
+        FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
+    end;
+  end;
+
+  //2) get hilites from OnCalcHilite
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
 

@@ -282,6 +282,7 @@ type
     FStringsInt,
     FStringsExternal: TATStrings;
     FAdapterHilite: TATAdapterHilite;
+    FAdapterCache: TATAdapterHiliteCache;
     FFold: TATSynRanges;
     FFoldImageList: TImageList;
     FFoldStyle: TATFoldStyle;
@@ -2355,6 +2356,7 @@ begin
   FMarkers:= TATMarkers.Create;
   FAttribs:= TATMarkers.Create;
   FMarkedRange:= TATMarkers.Create;
+  FAdapterCache:= TATAdapterHiliteCache.Create;
 
   {$ifdef test_markedrange}
   DoSetMarkedRange(1, 3);
@@ -2601,6 +2603,7 @@ begin
   FreeAndNil(FStringsInt);
   FreeAndNil(FBitmap);
   FreeAndNil(FColors);
+  FreeAndNil(FAdapterCache);
   inherited;
 end;
 

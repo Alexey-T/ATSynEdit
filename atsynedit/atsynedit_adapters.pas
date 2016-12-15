@@ -16,7 +16,10 @@ type
   { TATAdapterHilite }
 
   TATAdapterHilite = class(TComponent)
+  private
+    FEnabledDynamicHilite: boolean;
   public
+    constructor Create(AOwner: TComponent); override;
     procedure OnEditorChange(Sender: TObject); virtual;
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
@@ -27,11 +30,18 @@ type
     procedure OnEditorCaretMove(Sender: TObject); virtual;
     procedure OnEditorScroll(Sender: TObject); virtual;
     procedure OnEditorBeforeCalcHilite(Sender: TObject); virtual;
+    property EnabledDynamicHilite: boolean read FEnabledDynamicHilite write FEnabledDynamicHilite;
   end;
 
 implementation
 
 { TATAdapterHilite }
+
+constructor TATAdapterHilite.Create(AOwner: TComponent);
+begin
+  inherited;
+  FEnabledDynamicHilite:= true;
+end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
 begin

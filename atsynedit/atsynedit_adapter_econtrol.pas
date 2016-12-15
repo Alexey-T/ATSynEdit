@@ -51,7 +51,6 @@ type
     Buffer: TATStringBuffer;
     ListColors: TList;
     TimerDuringAnalyze: TTimer;
-    FEnabledDynHilite: boolean;
     FEnabledLineSeparators: boolean;
     FBusyTreeUpdate: boolean;
     FBusyTimer: boolean;
@@ -95,7 +94,6 @@ type
     procedure AddEditor(AEdit: TATSynEdit);
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
-    property EnabledDynamicHilite: boolean read FEnabledDynHilite write FEnabledDynHilite;
     property EnabledLineSeparators: boolean read FEnabledLineSeparators write SetEnabledLineSeparators;
     procedure DoAnalize(AEdit: TATSynEdit; AForceAnalizeAll: boolean);
     procedure Stop;
@@ -210,7 +208,7 @@ var
   ok: boolean;
 begin
   Result:= false;
-  if not FEnabledDynHilite then Exit;
+  if not EnabledDynamicHilite then Exit;
 
   for i:= 0 to AEdit.Carets.Count-1 do
   begin
@@ -481,7 +479,6 @@ begin
   AnClient:= nil;
   Buffer:= TATStringBuffer.Create;
   ListColors:= TList.Create;
-  FEnabledDynHilite:= true;
   FEnabledLineSeparators:= false;
 
   TimerDuringAnalyze:= TTimer.Create(Self);
