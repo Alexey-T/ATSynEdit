@@ -1,4 +1,8 @@
-unit atsynedit_form_complete_css;
+{
+Copyright (C) Alexey Torgashin, uvviewsoft.com
+License: MPL 2.0 or LGPL
+}
+unit ATSynEdit_Form_Complete_CSS;
 
 {$mode objfpc}{$H+}
 

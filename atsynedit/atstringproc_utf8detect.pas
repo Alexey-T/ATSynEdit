@@ -1,8 +1,8 @@
-
-//Code by Christian Ghisler (ghisler.com)
-//Christian gave code to open-source at TCmd forum
-
-unit atstringproc_utf8detect;
+{
+Code by Christian Ghisler (ghisler.com)
+Christian gave code to open-source at Total Commander public forum
+}
+unit ATStringProc_UTF8Detect;
 
 {$mode objfpc}{$H+}
 

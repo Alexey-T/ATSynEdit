@@ -1,3 +1,7 @@
+{
+Copyright (C) Alexey Torgashin, uvviewsoft.com
+License: MPL 2.0 or LGPL
+}
 unit ATSynEdit_Keymap_Init;
 
 //{$define test_combo}
