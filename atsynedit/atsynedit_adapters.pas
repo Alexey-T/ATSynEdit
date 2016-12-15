@@ -17,12 +17,13 @@ type
 
   TATAdapterHilite = class(TComponent)
   private
-    FEnabledDynamicHilite: boolean;
-    FEnabledDynamicHiliteMaxLines: integer;
+    FDynamicHiliteEnabled: boolean;
+    FDynamicHiliteMaxLines: integer;
+    FDynamicHiliteSupportedInCurLexer: boolean;
     FEditorLineCount: integer;
-    function GetEnabledDynamicHilite: boolean;
   public
     constructor Create(AOwner: TComponent); override;
+    //
     procedure OnEditorChange(Sender: TObject); virtual;
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
@@ -34,8 +35,10 @@ type
     procedure OnEditorScroll(Sender: TObject); virtual;
     procedure OnEditorBeforeCalcHilite(Sender: TObject); virtual;
     //
-    property EnabledDynamicHilite: boolean read GetEnabledDynamicHilite write FEnabledDynamicHilite;
-    property EnabledDynamicHiliteMaxLines: integer read FEnabledDynamicHiliteMaxLines write FEnabledDynamicHiliteMaxLines;
+    property DynamicHiliteEnabled: boolean read FDynamicHiliteEnabled write FDynamicHiliteEnabled;
+    property DynamicHiliteMaxLines: integer read FDynamicHiliteMaxLines write FDynamicHiliteMaxLines;
+    property DynamicHiliteSupportedInCurLexer: boolean read FDynamicHiliteSupportedInCurLexer write FDynamicHiliteSupportedInCurLexer;
+    function DynamicHiliteActiveNow: boolean;
     property EditorLineCount: integer write FEditorLineCount;
   end;
 
@@ -46,8 +49,9 @@ implementation
 constructor TATAdapterHilite.Create(AOwner: TComponent);
 begin
   inherited;
-  FEnabledDynamicHilite:= true;
-  FEnabledDynamicHiliteMaxLines:= 1000;
+  FDynamicHiliteEnabled:= true;
+  FDynamicHiliteSupportedInCurLexer:= true;
+  FDynamicHiliteMaxLines:= 1000;
   FEditorLineCount:= 0;
 end;
 
@@ -84,10 +88,12 @@ begin
   //
 end;
 
-function TATAdapterHilite.GetEnabledDynamicHilite: boolean;
+function TATAdapterHilite.DynamicHiliteActiveNow: boolean;
 begin
-  Result:= FEnabledDynamicHilite and
-    (FEditorLineCount<=FEnabledDynamicHiliteMaxLines);
+  Result:=
+    FDynamicHiliteEnabled and
+    FDynamicHiliteSupportedInCurLexer and
+    (FEditorLineCount<=FDynamicHiliteMaxLines);
 end;
 
 

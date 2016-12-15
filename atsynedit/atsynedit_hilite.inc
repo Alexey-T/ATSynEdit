@@ -46,8 +46,8 @@ begin
   if Assigned(FAdapterHilite) then
   begin
     //DynamicHilite must disable cache
-    FAdapterHilite.EditorLineCount:= Strings.Count; //affects EnabledDynamicHilite
-    FAdapterCache.Enabled:= not FAdapterHilite.EnabledDynamicHilite;
+    FAdapterHilite.EditorLineCount:= Strings.Count;
+    FAdapterCache.Enabled:= not FAdapterHilite.DynamicHiliteActiveNow;
     bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
     if not bFound then
     begin
