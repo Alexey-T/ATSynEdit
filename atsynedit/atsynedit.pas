@@ -38,7 +38,8 @@ uses
   ATSynEdit_Gutter,
   ATSynEdit_WrapInfo,
   ATSynEdit_Ranges,
-  ATSynEdit_Adapters;
+  ATSynEdit_Adapters,
+  ATSynEdit_Adapter_Cache;
 
 type
   TATDirection = (

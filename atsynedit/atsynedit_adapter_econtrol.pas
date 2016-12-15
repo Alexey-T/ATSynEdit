@@ -375,6 +375,9 @@ begin
   if startindex<0 then
     startindex:= 0;
 
+  //debug
+  //Application.MainForm.Caption:= Format('adapter startindex %d', [startindex]);
+
   for i:= startindex to AnClient.TagCount-1 do
   begin
     token:= AnClient.Tags[i];
