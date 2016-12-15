@@ -16,8 +16,8 @@ type
   TATAdapterHiliteCacheItem = class
   public
     LineIndex, CharIndex, LineLen: integer;
-    Parts: TATLineParts;
     ColorAfterEol: TColor;
+    Parts: TATLineParts;
   end;
 
 type
@@ -30,13 +30,14 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    property MaxCount: integer read FMaxCount write FMaxCount;
     procedure Clear;
     procedure Add(
-      ALineIndex, ACharIndex, ALineLen: integer;
+      const ALineIndex, ACharIndex, ALineLen: integer;
       const AParts: TATLineParts;
-      AColorAfterEol: TColor);
+      const AColorAfterEol: TColor);
     function Get(
-      var ALineIndex, ACharIndex, ALineLen: integer;
+      const ALineIndex, ACharIndex, ALineLen: integer;
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
   end;
@@ -70,8 +71,10 @@ begin
   end;
 end;
 
-procedure TATAdapterHiliteCache.Add(ALineIndex, ACharIndex, ALineLen: integer;
-  const AParts: TATLineParts; AColorAfterEol: TColor);
+procedure TATAdapterHiliteCache.Add(
+  const ALineIndex, ACharIndex, ALineLen: integer;
+  const AParts: TATLineParts;
+  const AColorAfterEol: TColor);
 var
   N: integer;
   Item: TATAdapterHiliteCacheItem;
@@ -94,7 +97,7 @@ begin
 end;
 
 function TATAdapterHiliteCache.Get(
-  var ALineIndex, ACharIndex, ALineLen: integer;
+  const ALineIndex, ACharIndex, ALineLen: integer;
   var AParts: TATLineParts;
   var AColorAfterEol: TColor): boolean;
 var
@@ -111,8 +114,7 @@ begin
       begin
         Move(Item.Parts, AParts, SizeOf(AParts));
         AColorAfterEol:= Item.ColorAfterEol;
-        Result:= true;
-        exit
+        exit(true);
       end;
   end;
 end;
