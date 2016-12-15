@@ -826,22 +826,17 @@ end;
 procedure TATAdapterEControl.UpdateData;
 var
   Ed: TATSynEdit;
-  Lens: TList;
+  Lens: array of integer;
   i: integer;
 begin
   if EdList.Count=0 then Exit;
   if not Assigned(AnClient) then Exit;
   Ed:= TATSynEdit(EdList[0]);
 
-  Lens:= TList.Create;
-  try
-    Lens.Count:= Ed.Strings.Count;
-    for i:= 0 to Lens.Count-1 do
-      Lens[i]:= Pointer(PtrUInt(Ed.Strings.LinesLen[i]));
-    Buffer.Setup(Ed.Strings.TextString, Lens, 1);
-  finally
-    FreeAndNil(Lens);
-  end;
+  SetLength(Lens, Ed.Strings.Count);
+  for i:= 0 to Length(Lens)-1 do
+    Lens[i]:= Ed.Strings.LinesLen[i];
+  Buffer.Setup(Ed.Strings.TextString, Lens);
 
   DoAnalize(Ed, false);
   UpdateRanges;

@@ -31,7 +31,7 @@ type
     FText: atString;
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure Setup(const AText: atString; ALineLens: TList; ALenEol: integer);
+    procedure Setup(const AText: atString; const ALineLens: array of integer);
     procedure SetupSlow(const AText: atString);
     procedure Clear;
     function CaretToStr(APnt: TPoint): integer;
@@ -66,7 +66,7 @@ end;
 constructor TATStringBuffer.Create;
 begin
   FText:= '';
-  FLenEol:= 1;
+  FLenEol:= 1; //no apps should use other
   FCount:= 0;
   SetCount(0);
 end;
@@ -77,20 +77,20 @@ begin
   inherited;
 end;
 
-procedure TATStringBuffer.Setup(const AText: atString; ALineLens: TList;
-  ALenEol: integer);
+procedure TATStringBuffer.Setup(const AText: atString;
+  const ALineLens: array of integer);
 var
   Pos, NLen, i: integer;
 begin
   FText:= AText;
-  FLenEol:= ALenEol;
+  //FLenEol:= ALenEol;
 
-  SetCount(ALineLens.Count+1);
+  SetCount(Length(ALineLens)+1);
   Pos:= 0;
   FList[0]:= 0;
-  for i:= 0 to ALineLens.Count-1 do
+  for i:= 0 to Length(ALineLens)-1 do
   begin
-    NLen:= PtrInt(ALineLens[i]);
+    NLen:= ALineLens[i];
     Inc(Pos, NLen+FLenEol);
     FList[i+1]:= Pos;
   end;
@@ -100,7 +100,7 @@ procedure TATStringBuffer.SetupSlow(const AText: atString);
 var
   STextFinal: atString;
   L: TStringList;
-  Lens: TList;
+  Lens: array of integer;
   i: integer;
 begin
   if Trim(AText)='' then
@@ -111,19 +111,17 @@ begin
   end;
 
   L:= TStringList.Create;
-  Lens:= TList.Create;
   try
     L.TextLineBreakStyle:= tlbsLF;
     L.Text:= UTF8Encode(AText);
-    STextFinal:= UTF8Decode(L.Text); //this converts eol to LF
+    STextFinal:= UTF8Decode(L.Text); //this converts all ends to LF
 
-    Lens.Count:= L.Count;
+    SetLength(Lens, L.Count);
     for i:= 0 to L.Count-1 do
-      Lens[i]:= Pointer(UTF8Length(L[i]));
+      Lens[i]:= UTF8Length(L[i]);
 
-    Setup(STextFinal, Lens, 1);
+    Setup(STextFinal, Lens);
   finally
-    FreeAndNil(Lens);
     FreeAndNil(L);
   end;
 end;

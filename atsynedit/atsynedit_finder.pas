@@ -371,18 +371,13 @@ end;
 
 procedure TATEditorFinder.UpdateBuffer;
 var
-  Lens: TList;
+  Lens: array of integer;
   i: integer;
 begin
-  Lens:= TList.Create;
-  try
-    Lens.Clear;
-    for i:= 0 to FEditor.Strings.Count-1 do
-      Lens.Add(Pointer(PtrUInt(FEditor.Strings.LinesLen[i])));
-    FBuffer.Setup(FEditor.Strings.TextString, Lens, 1);
-  finally
-    FreeAndNil(Lens);
-  end;
+  SetLength(Lens, FEditor.Strings.Count);
+  for i:= 0 to Length(Lens)-1 do
+    Lens[i]:= FEditor.Strings.LinesLen[i];
+  FBuffer.Setup(FEditor.Strings.TextString, Lens);
 
   StrText:= FBuffer.FText;
 end;
