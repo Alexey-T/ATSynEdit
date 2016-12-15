@@ -148,7 +148,7 @@ procedure TATSynEdit.DoSelect_SplitSelectionToLines;
 var
   NewCarets: TATCarets;
   X1, Y1, X2, Y2: integer;
-  i, j: integer;
+  i, j, NLen: integer;
   Sel: boolean;
 begin
   NewCarets:= TATCarets.Create;
@@ -169,18 +169,20 @@ begin
       end;
 
       //add first part
-      if X1<Length(Strings.Lines[Y1]) then
-        NewCarets.Add(Length(Strings.Lines[Y1]), Y1, X1, Y1)
+      NLen:= Strings.LinesLength[Y1];
+      if X1<NLen then
+        NewCarets.Add(NLen, Y1, X1, Y1)
       else
         NewCarets.Add(X1, Y1);
 
       //add middle parts
       for j:= Y1+1 to Y2-1 do
       begin
-        if Strings.Lines[j]='' then
+        NLen:= Strings.LinesLength[j];
+        if NLen=0 then
           NewCarets.Add(0, j)
         else
-          NewCarets.Add(Length(Strings.Lines[j]), j, 0, j);
+          NewCarets.Add(NLen, j, 0, j);
       end;
 
       //add last part

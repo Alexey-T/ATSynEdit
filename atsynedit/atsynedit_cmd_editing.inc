@@ -289,7 +289,7 @@ begin
 
     //offsetX for carets in line[PosY+1]
     ShiftBelowX:= 0;
-    Len:= Length(Strings.Lines[Caret.PosY]);
+    Len:= Strings.LinesLength[Caret.PosY];
     if Caret.PosX=Len then
       ShiftBelowX:= Len;
 

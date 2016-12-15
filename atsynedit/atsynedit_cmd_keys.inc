@@ -100,7 +100,7 @@ begin
     if (Caret.PosY>0) and not FCaretVirtual then
     begin
       Dec(Caret.PosY);
-      Caret.PosX:= Length(Strings.Lines[Caret.PosY]);
+      Caret.PosX:= Strings.LinesLength[Caret.PosY];
     end;
   end;
 end;
@@ -122,7 +122,7 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
-    if (Caret.PosX<Length(Strings.Lines[Caret.PosY])) or FCaretVirtual then
+    if (Caret.PosX<Strings.LinesLength[Caret.PosY]) or FCaretVirtual then
       Inc(Caret.PosX)
     else
     if (Caret.PosY<Strings.Count-1) then
@@ -258,7 +258,7 @@ var
 begin
   Item:= FWrapInfo[FWrapInfo.Count-1];
   if Assigned(Item) then
-    DoCaretSingle(Length(Strings.Lines[Item.NLineIndex]), Item.NLineIndex, false);
+    DoCaretSingle(Strings.LinesLength[Item.NLineIndex], Item.NLineIndex, false);
 
   Result:= [cResultCaretBottom];
 end;
@@ -288,7 +288,7 @@ begin
       if Caret.PosY>0 then
       begin
         Dec(Caret.PosY);
-        Caret.PosX:= Length(Strings.Lines[Caret.PosY]);
+        Caret.PosX:= Strings.LinesLength[Caret.PosY];
       end;
     end
     else

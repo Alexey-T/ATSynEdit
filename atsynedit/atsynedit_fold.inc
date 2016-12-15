@@ -140,11 +140,11 @@ begin
       if ARange.Hint<>'' then
         Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= ARange.X
       else
-        Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= Length(Strings.Lines[ARange.Y])+1;
+        Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= Strings.LinesLength[ARange.Y]+1;
     end;
     cFoldFromEndOfLineAlways:
     begin
-      Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= Length(Strings.Lines[ARange.Y])+1;
+      Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= Strings.LinesLength[ARange.Y]+1;
       ARange.Hint:= '...';
     end;
     cFoldFromNextLine:
