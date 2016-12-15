@@ -75,10 +75,8 @@ var
   i: integer;
 begin
   for i:= FList.Count-1 downto 0 do
-  begin
     TObject(FList[i]).Free;
-    FList.Delete(i);
-  end;
+  FList.Clear;
 end;
 
 procedure TATAdapterHiliteCache.Add(
