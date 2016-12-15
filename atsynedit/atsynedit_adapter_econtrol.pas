@@ -88,6 +88,7 @@ type
     function GetLexer: TecSyntAnalyzer;
     procedure SetLexer(AAnalizer: TecSyntAnalyzer);
     procedure SetEnabledLineSeparators(AValue: boolean);
+    procedure DoClearEditorCaches;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -240,6 +241,18 @@ begin
   FEnabledLineSeparators:= AValue;
   if Assigned(AnClient) then
     AnClient.EnabledLineSeparators:= EnabledLineSeparators;
+end;
+
+procedure TATAdapterEControl.DoClearEditorCaches;
+var
+  Ed: TATSynEdit;
+  i: integer;
+begin
+  for i:= 0 to EdList.Count-1 do
+  begin
+    Ed:= TATSynEdit(EdList[i]);
+    Ed.InvalidateHilitingCache;
+  end;
 end;
 
 
@@ -815,6 +828,8 @@ begin
 
   if Assigned(FOnLexerChange) then
     FOnLexerChange(Self);
+
+  DoClearEditorCaches;
 end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);

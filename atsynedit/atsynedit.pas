@@ -796,6 +796,7 @@ type
     procedure DragDrop(Source: TObject; X, Y: Integer); override;
     //updates
     procedure Invalidate; override;
+    procedure InvalidateHilitingCache;
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     procedure UpdateIncorrectCaretPositions;
     procedure UpdateFoldedFromLinesHidden;
@@ -3687,6 +3688,11 @@ procedure TATSynEdit.Invalidate;
 begin
   Include(FPaintFlags, cPaintUpdateBitmap);
   inherited;
+end;
+
+procedure TATSynEdit.InvalidateHilitingCache;
+begin
+  FAdapterCache.Clear;
 end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
