@@ -169,7 +169,7 @@ begin
       end;
 
       //add first part
-      NLen:= Strings.LinesLength[Y1];
+      NLen:= Strings.LinesLen[Y1];
       if X1<NLen then
         NewCarets.Add(NLen, Y1, X1, Y1)
       else
@@ -178,7 +178,7 @@ begin
       //add middle parts
       for j:= Y1+1 to Y2-1 do
       begin
-        NLen:= Strings.LinesLength[j];
+        NLen:= Strings.LinesLen[j];
         if NLen=0 then
           NewCarets.Add(0, j)
         else

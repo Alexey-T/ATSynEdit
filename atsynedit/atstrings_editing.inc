@@ -72,7 +72,7 @@ begin
     end
     else
     begin
-      APosAfter.X:= Length(List.Lines[List.Count-1]);
+      APosAfter.X:= List.LinesLen[List.Count-1];
       APosAfter.Y:= AY+List.Count-1;
     end;
     AShift.Y:= APosAfter.Y-AY;

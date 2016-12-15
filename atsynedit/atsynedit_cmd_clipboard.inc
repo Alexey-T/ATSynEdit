@@ -51,7 +51,7 @@ begin
       Strings.ActionDeleteFakeLineAndFinalEol;
       if not AKeepCaret then
         DoCaretSingle(
-          Strings.LinesLength[Strings.Count-1],
+          Strings.LinesLen[Strings.Count-1],
           Strings.Count-1
           );
     end

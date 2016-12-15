@@ -4451,7 +4451,7 @@ begin
   if Strings.Count>0 then
   begin
     Result.Y:= Strings.Count-1;
-    Result.X:= Strings.LinesLength[Result.Y];
+    Result.X:= Strings.LinesLen[Result.Y];
     if Strings.LinesEnds[Result.Y]<>cEndNone then
       Inc(Result.X);
   end;

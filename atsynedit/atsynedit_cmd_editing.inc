@@ -289,7 +289,7 @@ begin
 
     //offsetX for carets in line[PosY+1]
     ShiftBelowX:= 0;
-    Len:= Strings.LinesLength[Caret.PosY];
+    Len:= Strings.LinesLen[Caret.PosY];
     if Caret.PosX=Len then
       ShiftBelowX:= Len;
 
@@ -691,12 +691,12 @@ begin
           end;
         cPasteCaretRightBottom:
           begin
-            Inc(Caret.PosX, Length(Block.Lines[0]));
+            Inc(Caret.PosX, Block.LinesLen[0]);
             Inc(Caret.PosY, Block.Count-1);
           end;
         cPasteCaretRightTop:
           begin
-            Inc(Caret.PosX, Length(Block.Lines[0]));
+            Inc(Caret.PosX, Block.LinesLen[0]);
           end;
         cPasteCaretColumnLeft:
           begin
@@ -704,7 +704,7 @@ begin
           end;
         cPasteCaretColumnRight:
           begin
-            Inc(Caret.PosX, Length(Block.Lines[0]));
+            Inc(Caret.PosX, Block.LinesLen[0]);
             DoCaretsColumnToPoint(Caret.PosX, Caret.PosY + Block.Count-1);
           end;
       end;

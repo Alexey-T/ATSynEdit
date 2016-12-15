@@ -133,7 +133,7 @@ type
     function GetLineHint(Index: integer): string;
     function GetLineSep(Index: integer): TATLineSeparator;
     function GetLineState(Index: integer): TATLineState;
-    function GetLineLength(Index: integer): integer;
+    function GetLineLen(Index: integer): integer;
     function GetRedoCount: integer;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
@@ -178,7 +178,7 @@ type
     procedure LineInsertStrings(N: integer; AList: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(N: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
-    property LinesLength[Index: integer]: integer read GetLineLength;
+    property LinesLen[Index: integer]: integer read GetLineLen;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
@@ -350,9 +350,9 @@ begin
   Result:= TATStringItem(FList[Index]).ItemState;
 end;
 
-function TATStrings.GetLineLength(Index: integer): integer;
+function TATStrings.GetLineLen(Index: integer): integer;
 begin
-  //do not use Utf8LengthFast here
+  //do not use Utf8LengthFast
   Result:= UTF8Length(
     TATStringItem(FList[Index]).ItemString
     );
@@ -754,7 +754,7 @@ begin
     for i:= 0 to Cnt-1 do
     begin
       DoAddUndo(cEditActionInsert, N+i, '', cEndNone);
-      DoEventLog(N+i, Length(AList.Lines[i]));
+      DoEventLog(N+i, AList.LinesLen[i]);
 
       FList[N+i]:= TATStringItem.Create_UTF8(
         TATStringItem(AList.FList[i]).ItemString,

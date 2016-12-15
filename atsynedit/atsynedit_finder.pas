@@ -378,7 +378,7 @@ begin
   try
     Lens.Clear;
     for i:= 0 to FEditor.Strings.Count-1 do
-      Lens.Add(pointer(Length(FEditor.Strings.Lines[i])));
+      Lens.Add(Pointer(PtrUInt(FEditor.Strings.LinesLen[i])));
     FBuffer.Setup(FEditor.Strings.TextString, Lens, 1);
   finally
     FreeAndNil(Lens);
