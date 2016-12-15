@@ -4008,7 +4008,10 @@ end;
 procedure TATSynEdit.DoEventChange;
 begin
   if Assigned(FAdapterHilite) then
+  begin
+    InvalidateHilitingCache;
     FAdapterHilite.OnEditorChange(Self);
+  end;
 
   if Assigned(FOnChange) then
     FOnChange(Self);
