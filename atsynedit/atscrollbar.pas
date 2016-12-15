@@ -1,7 +1,7 @@
 {
 ATScrollBar for Delphi/Lazarus
 Copyright (c) Alexey Torgashin (UVViewSoft)
-License: MPL 2.0
+License: MPL 2.0 or LGPL
 
 Supports most of needed features:
 - default look is flat

@@ -2,7 +2,7 @@
 Copyright (C) Alexey Torgashin, uvviewsoft.com
 License: MPL 2.0 or LGPL
 }
-unit atstrings_hints;
+unit ATStrings_Hints;
 
 {$mode objfpc}{$H+}
 

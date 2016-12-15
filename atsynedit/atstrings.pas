@@ -1,23 +1,21 @@
 {
 Copyright (C) Alexey Torgashin, uvviewsoft.com
-License: MPL 2.0
+License: MPL 2.0 or LGPL
 }
+unit ATStrings;
 
 {$mode objfpc}{$H+}
 {$MinEnumSize 1}
-{$Assertions on}
-
-unit ATStrings;
 
 interface
 
 uses
   Classes, SysUtils, Graphics,
+  LazUTF8,
   ATStringProc,
   ATStringProc_Utf8Detect,
   ATStrings_Undo,
-  ATStrings_Hints,
-  LazUTF8;
+  ATStrings_Hints;
 
 const
   //set it to number of editors, which share same Strings obj
@@ -26,7 +24,7 @@ const
   cMaxStringsClients = 2;
 
   //if update count is less, do smarter wrapinfo update (find, replace items)
-  //smart update used only if lines chged (not deleted/inserted)
+  //smart update used only if lines changed, not deleted/inserted
   cMaxUpdatesCountEasy = 200;
 
 type
