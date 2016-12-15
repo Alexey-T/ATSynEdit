@@ -352,7 +352,8 @@ end;
 
 function TATStrings.GetLineLength(Index: integer): integer;
 begin
-  Result:= UTF8LengthFast(
+  //do not use Utf8LengthFast here
+  Result:= UTF8Length(
     TATStringItem(FList[Index]).ItemString
     );
 end;

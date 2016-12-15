@@ -119,7 +119,7 @@ begin
 
     Lens.Count:= L.Count;
     for i:= 0 to L.Count-1 do
-      Lens[i]:= Pointer(UTF8LengthFast(L[i]));
+      Lens[i]:= Pointer(UTF8Length(L[i]));
 
     Setup(STextFinal, Lens, 1);
   finally

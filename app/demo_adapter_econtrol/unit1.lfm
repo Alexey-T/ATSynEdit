@@ -9,7 +9,6 @@ object fmMain: TfmMain
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.7'
   Visible = False
   object Panel1: TPanel
     Left = 0
