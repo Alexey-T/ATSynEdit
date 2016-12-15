@@ -3944,6 +3944,7 @@ object TecSyntaxManager
       'Code Start'
       'Code End'
     )
+    Extentions = 'php'
     LexerName = 'PHP'
     Notes.Strings = (
       'Original: EControl'

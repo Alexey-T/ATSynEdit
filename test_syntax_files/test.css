@@ -1,9 +1,11 @@
-BODY {background: #FFFFFF}
-A:link {color: #80FF00; background-image: url(img.gif); }
-A:visited {
-  color: #FF00FF; font-size: 1.2em
+/* Test */
+p.new:after, p.new::after, ddddd {
+	content: "Test"; 
+	color: #333; 
+	background-color: #fc0;  
+	font-size: 90%; 
+	padding: 2px; 
+  }
+:test {
+  name:aaa
 }
-h1, h2, h3 {
-  font-size: 24pt; font-family: 'arial', 'Tahoma';
-}
-/* comment */

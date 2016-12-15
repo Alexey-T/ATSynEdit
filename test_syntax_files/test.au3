@@ -1,18 +1,18 @@
   dim $t[3][2] = [["test;1;2;3", 123], _
     [';', Asc(';')], _ ; This comment
     ["", 0]]           ; comment
-  #region		Begin region 
-	;	#endregion
-	If @error Then
-		If @error = 2 Then $iMinIndex = $i
-	Else
-		Exit
-	EndIf 
-  #endregion	End region
+  #region       Begin region 
+    ;   #endregion
+    If @error Then
+        If @error = 2 Then $iMinIndex = $i
+    Else
+        Exit
+    EndIf 
+  #endregion    End region
 
  #comments-start test
   If SetIcon ($btnIcon, $sModulesPath & "\" & GUICtrlRead ($cmbSFXModule) & ",0") Then _
-	$bIsDefaultIcon = True
+    $bIsDefaultIcon = True
   #cs test
     test
   #ce
