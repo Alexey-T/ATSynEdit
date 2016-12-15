@@ -59,8 +59,9 @@ procedure TfmMain.FormCreate(Sender: TObject);
 var
   fn: string;
 begin
-  fn:= ExtractFileDir(Application.ExeName)+DirectorySeparator+
-    'lexlib'+DirectorySeparator+'small.lxl';
+  fn:= ExtractFileDir(ExtractFileDir(Application.ExeName))+DirectorySeparator+
+    'lexlib'+DirectorySeparator+'lib.lxl';
+
   Manager:= TecSyntaxManager.Create(Self);
   Manager.LoadFromFile(fn);
   UpdStatus;

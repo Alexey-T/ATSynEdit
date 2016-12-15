@@ -124,7 +124,7 @@ end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
 var
-  fname_lxl: string;
+  fn_lexlib: string;
 begin
   FDirApp:= ExtractFileDir(Application.ExeName);
   {$ifdef darwin}
@@ -132,10 +132,10 @@ begin
   FDirApp:= ExtractFileDir(ExtractFileDir(ExtractFileDir(FDirApp)));
   {$endif}
 
-  fname_lxl:= FDirApp+DirectorySeparator+'lib.lxl';
+  fn_lexlib:= ExtractFileDir(FDirApp)+DirectorySeparator+'lexlib'+DirectorySeparator+'lib.lxl';
 
   manager:= TecSyntaxManager.Create(Self);
-  manager.LoadFromFile(fname_lxl);
+  manager.LoadFromFile(fn_lexlib);
   UpdateLexList;
 
   ed:= TATSynEdit.Create(Self);

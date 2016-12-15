@@ -9,7 +9,8 @@ object fmMain: TfmMain
   ClientWidth = 454
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
+  Visible = False
   object bShow: TButton
     Left = 144
     Height = 40

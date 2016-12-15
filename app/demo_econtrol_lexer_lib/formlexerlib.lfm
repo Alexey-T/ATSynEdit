@@ -10,7 +10,7 @@ object fmLexerLib: TfmLexerLib
   OnShow = FormShow
   Position = poScreenCenter
   ShowInTaskBar = stNever
-  LCLVersion = '1.5'
+  Visible = False
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 29
