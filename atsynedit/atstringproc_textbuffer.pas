@@ -23,8 +23,7 @@ type
   TATStringBuffer = class
   private
     FList: array of integer;
-    FListCapacity: integer;
-    FListCount: integer;
+    FCount: integer;
     FLenEol: integer;
     FOnChange: TTextChangedEvent;
     procedure SetCount(AValue: integer);
@@ -46,7 +45,7 @@ type
     function OffsetToDistanceFromLineEnd(APos: integer): integer;
     function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
-    property Count: integer read FListCount;
+    property Count: integer read FCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
   end;
 
@@ -55,35 +54,26 @@ implementation
 { TATStringBuffer }
 
 procedure TATStringBuffer.SetCount(AValue: integer);
-const
-  cMinCap = 4*1024;
 begin
-  FListCount:= AValue;
-
   if AValue<0 then
     raise Exception.Create('StringBuffer Count<0');
-  if AValue<=cMinCap then
-    FListCapacity:= cMinCap
-  else
-  //first, round value to nearest N, which divides cMinCap
-  //then, double the N
-    FListCapacity:= AValue div cMinCap * (cMinCap*2);
 
-  if Length(FList)<>FListCapacity then
-    SetLength(FList, FListCapacity);
+  FCount:= AValue;
+  if Length(FList)<>FCount then
+    SetLength(FList, FCount);
 end;
 
 constructor TATStringBuffer.Create;
 begin
   FText:= '';
   FLenEol:= 1;
-  SetLength(FList, 0);
+  FCount:= 0;
   SetCount(0);
 end;
 
 destructor TATStringBuffer.Destroy;
 begin
-  SetLength(FList, 0);
+  SetCount(0);
   inherited;
 end;
 
@@ -151,7 +141,7 @@ begin
   Result:= -1;
   if (APnt.Y<0) then Exit;
   if (APnt.X<0) then Exit;
-  if (APnt.Y>=FListCount) then Exit;
+  if (APnt.Y>=FCount) then Exit;
 
   //handle caret pos after eol
   Len:= LineLength(APnt.Y);
@@ -171,7 +161,7 @@ begin
     begin Result.Y:= 0; Exit end;
 
   a:= 0;
-  b:= FListCount-1;
+  b:= FCount-1;
   if b<0 then Exit;
 
   repeat
@@ -206,7 +196,7 @@ function TATStringBuffer.LineIndex(N: integer): integer;
 begin
   if N<0 then Result:= 0
   else
-  if N>=FListCount then Result:= TextLength-1
+  if N>=FCount then Result:= TextLength-1
   else
     Result:= FList[N];
 end;
@@ -215,7 +205,7 @@ function TATStringBuffer.LineLength(N: integer): integer;
 begin
   if N<0 then Result:= 0
   else
-  if N>=FListCount-1 then Result:= 0
+  if N>=FCount-1 then Result:= 0
   else
     Result:= FList[N+1]-FList[N]-FLenEol;
 end;
