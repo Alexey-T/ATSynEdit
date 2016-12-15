@@ -91,9 +91,9 @@ end;
 function TATAdapterHilite.DynamicHiliteActiveNow: boolean;
 begin
   Result:=
-    FDynamicHiliteEnabled and
-    FDynamicHiliteSupportedInCurLexer and
-    (FEditorLineCount<=FDynamicHiliteMaxLines);
+    DynamicHiliteEnabled and
+    DynamicHiliteSupportedInCurLexer and
+    (FEditorLineCount<=DynamicHiliteMaxLines);
 end;
 
 

@@ -89,6 +89,7 @@ type
     procedure SetLexer(AAnalizer: TecSyntAnalyzer);
     procedure SetEnabledLineSeparators(AValue: boolean);
     procedure DoClearEditorCaches;
+    function GetLexerSuportsDynamicHilite: boolean;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -813,6 +814,8 @@ end;
 procedure TATAdapterEControl.SetLexer(AAnalizer: TecSyntAnalyzer);
 begin
   DoClearRanges;
+  DoClearEditorCaches;
+
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
@@ -829,7 +832,7 @@ begin
   if Assigned(FOnLexerChange) then
     FOnLexerChange(Self);
 
-  DoClearEditorCaches;
+  DynamicHiliteSupportedInCurLexer:= GetLexerSuportsDynamicHilite;
 end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
@@ -1209,6 +1212,24 @@ begin
             ATokenStyle:= Rng.Rule.Style;
             Exit
           end;
+  end;
+end;
+
+function TATAdapterEControl.GetLexerSuportsDynamicHilite: boolean;
+var
+  An: TecSyntAnalyzer;
+  Rule: TecTagBlockCondition;
+  i: integer;
+begin
+  Result:= false;
+  if not Assigned(AnClient) then exit;
+  An:= AnClient.Owner;
+  for i:= 0 to An.BlockRules.Count-1 do
+  begin
+    Rule:= An.BlockRules[i];
+    if Assigned(Rule) and
+      (Rule.HighlightPos in [cpBound, cpRange, cpOutOfRange]) and
+      (Rule.DynHighlight in [dhRange, dhRangeNoBound, dhBound]) then exit(true);
   end;
 end;
 
