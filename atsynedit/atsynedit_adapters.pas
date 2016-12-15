@@ -18,6 +18,7 @@ type
   TATAdapterHilite = class(TComponent)
   private
     FEnabledDynamicHilite: boolean;
+    FEnabledDynamicHiliteMaxLines: integer;
   public
     constructor Create(AOwner: TComponent); override;
     procedure OnEditorChange(Sender: TObject); virtual;
@@ -31,6 +32,7 @@ type
     procedure OnEditorScroll(Sender: TObject); virtual;
     procedure OnEditorBeforeCalcHilite(Sender: TObject); virtual;
     property EnabledDynamicHilite: boolean read FEnabledDynamicHilite write FEnabledDynamicHilite;
+    property EnabledDynamicHiliteMaxLines: integer read FEnabledDynamicHiliteMaxLines write FEnabledDynamicHiliteMaxLines;
   end;
 
 implementation
@@ -41,6 +43,7 @@ constructor TATAdapterHilite.Create(AOwner: TComponent);
 begin
   inherited;
   FEnabledDynamicHilite:= true;
+  FEnabledDynamicHiliteMaxLines:= 1000;
 end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
