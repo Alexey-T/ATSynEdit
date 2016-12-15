@@ -33,7 +33,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 var
   buf: TATStringBuffer;
   s: tstringlist;
-  list: tlist;
+  list: array of integer;
   i: integer;
   pos: integer;
   pnt0, pnt: tpoint;
@@ -42,12 +42,12 @@ begin
   for i:= 0 to 20 do
     s.add(stringofchar('t', random(40)));
 
-  list:= tlist.create;
+  setlength(list, s.count);
   for i:= 0 to s.count-1 do
-    list.add(pointer(length(s[i])));
+    list[i]:= length(s[i]);
 
   buf:= TATStringBuffer.create;
-  buf.Setup(s.text, list, 1);
+  buf.Setup(s.text, list);
 
   for i:= 0 to 1000 do
   begin

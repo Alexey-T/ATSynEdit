@@ -9,6 +9,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.7'
+  Visible = False
   object Memo1: TMemo
     Left = 0
     Height = 255
