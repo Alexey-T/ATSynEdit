@@ -27,10 +27,13 @@ type
   private
     FList: TList;
     FMaxCount: integer;
+    FEnabled: boolean;
+    procedure SetEnabled(AValue: boolean);
   public
     constructor Create; virtual;
     destructor Destroy; override;
     property MaxCount: integer read FMaxCount write FMaxCount;
+    property Enabled: boolean read FEnabled write SetEnabled;
     procedure Clear;
     procedure Add(
       const ALineIndex, ACharIndex, ALineLen: integer;
@@ -46,6 +49,13 @@ type
 implementation
 
 { TATAdapterHiliteCache }
+
+procedure TATAdapterHiliteCache.SetEnabled(AValue: boolean);
+begin
+  if FEnabled=AValue then Exit;
+  FEnabled:= AValue;
+  if not AValue then Clear;
+end;
 
 constructor TATAdapterHiliteCache.Create;
 begin
@@ -79,6 +89,8 @@ var
   N: integer;
   Item: TATAdapterHiliteCacheItem;
 begin
+  if not Enabled then exit;
+
   //ignore if no parts
   if (AParts[0].Len=0) then exit;
 
@@ -116,6 +128,8 @@ var
   i: integer;
 begin
   Result:= false;
+  if not Enabled then exit;
+
   for i:= 0 to FList.Count-1 do
   begin
     Item:= TATAdapterHiliteCacheItem(FList[i]);

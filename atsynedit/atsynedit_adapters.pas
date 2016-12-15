@@ -19,6 +19,8 @@ type
   private
     FEnabledDynamicHilite: boolean;
     FEnabledDynamicHiliteMaxLines: integer;
+    FEditorLineCount: integer;
+    function GetEnabledDynamicHilite: boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure OnEditorChange(Sender: TObject); virtual;
@@ -31,8 +33,10 @@ type
     procedure OnEditorCaretMove(Sender: TObject); virtual;
     procedure OnEditorScroll(Sender: TObject); virtual;
     procedure OnEditorBeforeCalcHilite(Sender: TObject); virtual;
-    property EnabledDynamicHilite: boolean read FEnabledDynamicHilite write FEnabledDynamicHilite;
+    //
+    property EnabledDynamicHilite: boolean read GetEnabledDynamicHilite write FEnabledDynamicHilite;
     property EnabledDynamicHiliteMaxLines: integer read FEnabledDynamicHiliteMaxLines write FEnabledDynamicHiliteMaxLines;
+    property EditorLineCount: integer write FEditorLineCount;
   end;
 
 implementation
@@ -44,6 +48,7 @@ begin
   inherited;
   FEnabledDynamicHilite:= true;
   FEnabledDynamicHiliteMaxLines:= 1000;
+  FEditorLineCount:= 0;
 end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
@@ -78,6 +83,13 @@ procedure TATAdapterHilite.OnEditorBeforeCalcHilite(Sender: TObject);
 begin
   //
 end;
+
+function TATAdapterHilite.GetEnabledDynamicHilite: boolean;
+begin
+  Result:= FEnabledDynamicHilite and
+    (FEditorLineCount<=FEnabledDynamicHiliteMaxLines);
+end;
+
 
 end.
 

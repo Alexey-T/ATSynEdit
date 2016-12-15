@@ -33,7 +33,7 @@ procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
-  bFound, bDynamicHilite: boolean;
+  bFound: boolean;
 begin
   nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped);
   nLineIndex:= AItem.NLineIndex;
@@ -46,16 +46,13 @@ begin
   if Assigned(FAdapterHilite) then
   begin
     //DynamicHilite must disable cache
-    bFound:= false;
-    bDynamicHilite:= FAdapterHilite.EnabledDynamicHilite and
-      (Strings.Count<=FAdapterHilite.EnabledDynamicHiliteMaxLines);
-    if not bDynamicHilite then
-      bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
+    FAdapterHilite.EditorLineCount:= Strings.Count; //affects EnabledDynamicHilite
+    FAdapterCache.Enabled:= not FAdapterHilite.EnabledDynamicHilite;
+    bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
     if not bFound then
     begin
       FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
-      if not bDynamicHilite then
-        FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
+      FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
     end;
   end;
 
