@@ -68,12 +68,12 @@ type
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
     procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
+    procedure DoParseDone;
     function GetRangeParent(R: TecTextRange): TecTextRange;
     procedure GetTokenProps(token: TecSyntToken; out APntFrom, APntTo: TPoint; out
       ATokenString, ATokenStyle: string);
     function IsCaretInRange(AEdit: TATSynEdit; APos1, APos2: integer; ACond: TATRangeCond): boolean;
     procedure SetPartStyleFromEcStyle(var part: TATLinePart; st: TecSyntaxFormat);
-    procedure UpdateEds;
     function GetTokenColorBG_FromColoredRanges(APos: integer;
       ADefColor: TColor; AEditorIndex: integer): TColor;
     function GetTokenColorBG_FromMultiLineTokens(APos: integer;
@@ -85,10 +85,10 @@ type
     procedure UpdateRangesSublex;
     procedure UpdateData;
     procedure UpdateRangesFold;
+    procedure UpdateEditors(ARepaint, AClearCache: boolean);
     function GetLexer: TecSyntAnalyzer;
     procedure SetLexer(AAnalizer: TecSyntAnalyzer);
     procedure SetEnabledLineSeparators(AValue: boolean);
-    procedure DoClearEditorCaches;
     function GetLexerSuportsDynamicHilite: boolean;
   public
     constructor Create(AOwner: TComponent); override;
@@ -243,19 +243,6 @@ begin
   if Assigned(AnClient) then
     AnClient.EnabledLineSeparators:= EnabledLineSeparators;
 end;
-
-procedure TATAdapterEControl.DoClearEditorCaches;
-var
-  Ed: TATSynEdit;
-  i: integer;
-begin
-  for i:= 0 to EdList.Count-1 do
-  begin
-    Ed:= TATSynEdit(EdList[i]);
-    Ed.InvalidateHilitingCache;
-  end;
-end;
-
 
 function TATAdapterEControl.GetTokenColorBG_FromMultiLineTokens(APos: integer; ADefColor: TColor; AEditorIndex: integer): TColor;
 var
@@ -814,7 +801,7 @@ end;
 procedure TATAdapterEControl.SetLexer(AAnalizer: TecSyntAnalyzer);
 begin
   DoClearRanges;
-  DoClearEditorCaches;
+  UpdateEditors(false, true);
 
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
@@ -906,9 +893,7 @@ begin
   if AnClient.IsFinished then
   begin
     FParsePausePassed:= true;
-    UpdateEds;
-    if Assigned(FOnParseDone) then
-      FOnParseDone(Self);
+    DoParseDone;
   end
   else
     TimerDuringAnalyze.Enabled:= true;
@@ -923,21 +908,28 @@ begin
       TATSynEdit(EdList[j]).Fold.Add(AX, AY, AY2, AStaple, AHint);
 end;
 
-procedure TATAdapterEControl.UpdateEds;
+procedure TATAdapterEControl.UpdateEditors(ARepaint, AClearCache: boolean);
 var
-  j: integer;
+  Ed: TATSynEdit;
+  i: integer;
 begin
-  for j:= 0 to EdList.Count-1 do
-    TATSynEdit(EdList[j]).Update;
+  for i:= 0 to EdList.Count-1 do
+  begin
+    Ed:= TATSynEdit(EdList[i]);
+    if AClearCache then
+      Ed.InvalidateHilitingCache;
+    if ARepaint then
+      Ed.Update;
+  end;
 end;
 
 
 procedure TATAdapterEControl.DoFoldFromLinesHidden;
 var
-  j: integer;
+  i: integer;
 begin
-  for j:= 0 to EdList.Count-1 do
-    TATSynEdit(EdList[j]).UpdateFoldedFromLinesHidden;
+  for i:= 0 to EdList.Count-1 do
+    TATSynEdit(EdList[i]).UpdateFoldedFromLinesHidden;
 end;
 
 
@@ -1149,9 +1141,7 @@ begin
       FParsePausePassed:= true;
       TimerDuringAnalyze.Enabled:= false;
       UpdateRanges;
-      UpdateEds;
-      if Assigned(FOnParseDone) then
-        FOnParseDone(Self);
+      DoParseDone;
     end
     else
     begin
@@ -1159,7 +1149,7 @@ begin
         if FParseTicks>=cAdapterTimerTicksToInitialUpdate then
         begin
           FParsePausePassed:= true;
-          UpdateEds;
+          UpdateEditors(true, false);
         end;
     end;
   finally
@@ -1231,6 +1221,13 @@ begin
       (Rule.HighlightPos in [cpBound, cpRange, cpOutOfRange]) and
       (Rule.DynHighlight in [dhRange, dhRangeNoBound, dhBound]) then exit(true);
   end;
+end;
+
+procedure TATAdapterEControl.DoParseDone;
+begin
+  if Assigned(FOnParseDone) then
+    FOnParseDone(Self);
+  UpdateEditors(true, true);
 end;
 
 end.

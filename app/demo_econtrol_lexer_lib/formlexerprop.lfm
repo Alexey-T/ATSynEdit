@@ -12,6 +12,7 @@ object fmLexerProp: TfmLexerProp
   OnDestroy = FormDestroy
   Position = poScreenCenter
   ShowInTaskBar = stNever
+  LCLVersion = '1.7'
   Visible = False
   object ButtonPanel1: TButtonPanel
     Left = 6
