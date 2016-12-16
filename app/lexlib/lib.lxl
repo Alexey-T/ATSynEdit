@@ -17261,13 +17261,20 @@ object TecSyntaxManager
         Font.Style = [fsItalic]
       end    
       item
-        DisplayName = 'Identifier'
+        DisplayName = 'Id'
         Font.Color = clBlack
         Font.Height = -13
         Font.Name = 'Courier New'
       end    
       item
         DisplayName = 'Id keyword'
+        Font.Color = clPurple
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = [fsBold]
+      end    
+      item
+        DisplayName = 'Id keyword def'
         Font.Color = clBlack
         Font.Height = -13
         Font.Name = 'Courier New'
@@ -17281,15 +17288,15 @@ object TecSyntaxManager
       end>
     TokenRules = <    
       item
-        DisplayName = 'Word1stTreeItem'
-        StyleName = 'Id keyword'
+        DisplayName = '1st Tree item'
+        StyleName = 'Id keyword def'
         TokenType = 11
-        Expression = '^[\x20\x09]*(def|class)\b'
+        Expression = '^[\x20\x09]*(def|class|async [\x20\x09]+ def)\b'
         ColumnFrom = 0
         ColumnTo = 0
       end    
       item
-        DisplayName = 'Word1stKeyword'
+        DisplayName = '1st Keyword'
         StyleName = 'Id keyword'
         TokenType = 10
         Expression = '^[\x20\x09]*(if|else|elif|for|while|try|except|finally|switch|case|with)\b'
@@ -17297,7 +17304,7 @@ object TecSyntaxManager
         ColumnTo = 0
       end    
       item
-        DisplayName = 'Word1stInteger'
+        DisplayName = '1st Number'
         StyleName = 'Number'
         TokenType = 9
         Expression = '^[\x20\x09]* \d+(\.\d+)?'
@@ -17305,15 +17312,23 @@ object TecSyntaxManager
         ColumnTo = 0
       end    
       item
-        DisplayName = 'Word1stId'
-        StyleName = 'Identifier'
+        DisplayName = '1st String'
+        StyleName = 'String'
+        TokenType = 4
+        Expression = '(?s) ^[\x20\x09]* [rbu] ("""|'''''') .*? (\1|\Z)'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end    
+      item
+        DisplayName = '1st Id'
+        StyleName = 'Id'
         TokenType = 9
         Expression = '^[\x20\x09]*\w+'
         ColumnFrom = 0
         ColumnTo = 0
       end    
       item
-        DisplayName = 'Word1stAttrib'
+        DisplayName = '1st Attrib'
         StyleName = 'Symbol'
         TokenType = 9
         Expression = '^[\x20\x09]*@'
@@ -17321,7 +17336,8 @@ object TecSyntaxManager
         ColumnTo = 0
       end    
       item
-        DisplayName = 'Word1stComment'
+        DisplayName = '1st Comment'
+        Enabled = False
         StyleName = 'Comment'
         TokenType = 13
         Expression = '^[\x20\x09]* \#.*'
@@ -17329,48 +17345,24 @@ object TecSyntaxManager
         ColumnTo = 0
       end    
       item
-        DisplayName = 'String raw'
+        DisplayName = 'String2'
         StyleName = 'String'
         TokenType = 4
-        Expression = 'r(''|") .*? (\1|$)'
+        Expression = '(?s) [rbu]? ("""|'''''') .*? (\1|\Z)'
         ColumnFrom = 0
         ColumnTo = 0
       end    
       item
-        DisplayName = 'String """'
+        DisplayName = 'String'
         StyleName = 'String'
         TokenType = 4
-        Expression = '(?s) ("""|'''''') .*? (\1|\Z)'
-        ColumnFrom = 0
-        ColumnTo = 0
-      end    
-      item
-        DisplayName = 'String '''
-        StyleName = 'String'
-        TokenType = 4
-        Expression = '(?s)'' (\\.|.)*? (''|$)'
-        ColumnFrom = 0
-        ColumnTo = 0
-      end    
-      item
-        DisplayName = 'String "'
-        StyleName = 'String'
-        TokenType = 4
-        Expression = '(?s)" (\\.|.)*? ("|$)'
-        ColumnFrom = 0
-        ColumnTo = 0
-      end    
-      item
-        DisplayName = 'Id __init__'
-        StyleName = 'Identifier'
-        TokenType = 2
-        Expression = '__\w+'
+        Expression = '[rbu]? ("|'') (\\.|.)*? (\1|$)'
         ColumnFrom = 0
         ColumnTo = 0
       end    
       item
         DisplayName = 'Id'
-        StyleName = 'Identifier'
+        StyleName = 'Id'
         TokenType = 2
         Expression = '[a-z_]\w*'
         ColumnFrom = 0
@@ -17418,6 +17410,24 @@ object TecSyntaxManager
       end>
     BlockRules = <    
       item
+        DisplayName = 'Keywords def'
+        StyleName = 'Id keyword def'
+        BlockType = btTagDetect
+        ConditionList = <        
+          item
+            TagList.Strings = (
+              'class'
+              'def'
+              'global'
+              'lambda'
+              'nonlocal'
+            )
+            TokenTypes = 1540
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end    
+      item
         DisplayName = 'Keywords'
         StyleName = 'Id keyword'
         BlockType = btTagDetect
@@ -17427,10 +17437,10 @@ object TecSyntaxManager
               'and'
               'as'
               'assert'
+              'async'
+              'await'
               'break'
-              'class'
               'continue'
-              'def'
               'del'
               'elif'
               'else'
@@ -17439,12 +17449,10 @@ object TecSyntaxManager
               'finally'
               'for'
               'from'
-              'global'
               'if'
               'import'
               'in'
               'is'
-              'lambda'
               'not'
               'or'
               'pass'
@@ -17453,6 +17461,7 @@ object TecSyntaxManager
               'return'
               'try'
               'while'
+              'with'
               'yield'
             )
             TokenTypes = 516
@@ -17674,18 +17683,26 @@ object TecSyntaxManager
     SubAnalyzers = <>
     SampleText.Strings = (
       '#Comment'
-      '"""Doc'
-      'string"""'
+      'test = u"""Doc'
+      'string""" +'
+      'r"""test'
+      '"""'
       'import sys, sys2, sys3'
       'from csv import aa, bb'
       'str = r''\test\test'' + u''test'' + r"\test"'
+      'func = lambda x: x'
       ''
-      '  def func(num):'
+      'def func(num):'
       '    for n in range(len(sys.argv)):'
       '      print "Arg %s" % sys.argv[n]'
       '      if n>2:'
       '        return True'
-      '    return False        '
+      '    return False'
+      '    '
+      'async def get_json(client, url):  '
+      '    async with client.get(url) as response:'
+      '        assert response.status == 100'
+      '        return await response.read()'
       ''
       'class MyName(object):      '
       '  @staticmethod'

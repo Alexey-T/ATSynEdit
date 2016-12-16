@@ -69,6 +69,7 @@ type
   private
     { private declarations }
     FAn: TecSyntAnalyzer;
+    procedure AdapterParseDone(Sender: TObject);
     procedure InitBorder(cb: TCombobox);
     procedure UpdateStl;
     procedure UpdateStlEn(fmt: TecFormatType);
@@ -94,6 +95,7 @@ implementation
 procedure TfmLexerProp.FormCreate(Sender: TObject);
 begin
   Adapter:= TATAdapterEControl.Create(Self);
+  Adapter.OnParseDone:=@AdapterParseDone;
   edSample.AdapterHilite:= Adapter;
 
   InitBorder(cbBorderL);
@@ -266,6 +268,13 @@ begin
     Add('wave');
     Add('double');
   end;
+end;
+
+procedure TfmLexerProp.AdapterParseDone(Sender: TObject);
+begin
+  //parsing is done after Editor painted, cache filled
+  edSample.InvalidateHilitingCache;
+  edSample.Update;
 end;
 
 end.

@@ -164,7 +164,7 @@ begin
   chkFullHilite.Checked:= ed.OptShowFullHilite;
   chkUnpri.Checked:= ed.OptUnprintedVisible;
   chkShowCur.Checked:= ed.OptShowCurLine;
-  chkDyn.Checked:= adapter.EnabledDynamicHilite;
+  chkDyn.Checked:= adapter.DynamicHiliteEnabled;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -303,7 +303,7 @@ end;
 
 procedure TfmMain.chkDynChange(Sender: TObject);
 begin
-  adapter.EnabledDynamicHilite:= chkDyn.Checked;
+  adapter.DynamicHiliteEnabled:= chkDyn.Checked;
   Ed.Update;
 end;
 

@@ -158,6 +158,7 @@ begin
   if DoInstallLexerFromZip(OpenDlg.FileName, FManager, FDirAcp, msg) then
   begin
     UpdateList;
+    FManager.Modified:= true;
     Application.MessageBox(
       PChar('Installed:'#13+msg),
       PChar(Caption), MB_OK or MB_ICONINFORMATION);

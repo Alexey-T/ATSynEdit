@@ -92,6 +92,7 @@ begin
   //ignore if no parts
   if (AParts[0].Len=0) then exit;
 
+  {
   //ignore if single part, and no bold/italic/underline attr
   //e.g. lexer didnt parse end of file yet
   if (AParts[1].Len=0) and
@@ -99,6 +100,7 @@ begin
     (AParts[0].FontItalic=false) and
     (AParts[0].FontStrikeOut=false)
     then exit;
+    }
 
   //new item adds to begin, last item deleted
   if FList.Count>=FMaxCount then
