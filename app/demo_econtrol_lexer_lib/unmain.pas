@@ -19,7 +19,8 @@ type
     procedure bShowClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    procedure UpdStatus;
+    FDirLib: string;
+    procedure UpdateStatus;
     { private declarations }
   public
     { public declarations }
@@ -38,19 +39,14 @@ var
 { TfmMain }
 
 procedure TfmMain.bShowClick(Sender: TObject);
-var
-  dirAcp: string;
 begin
-  dirAcp:= ExtractFileDir(Application.ExeName)+DirectorySeparator+'acp';
-  CreateDir(dirAcp);
-
-  DoShowDialogLexerLib(Manager, dirAcp, 'Courier new', 9);
+  DoShowDialogLexerLib(Manager, FDirLib, 'Courier new', 9);
   if Manager.Modified then
   begin
-    UpdStatus;
+    UpdateStatus;
     Manager.Modified:= false;
-    if Application.MessageBox('Lib was modified. Save file?', 'Demo',
-      MB_OKCANCEL or MB_ICONQUESTION)=id_ok then
+    if Application.MessageBox('Library was modified. Save file?',
+      PChar(Caption), MB_OKCANCEL or MB_ICONQUESTION)=ID_OK then
       Manager.SaveToFile(Manager.FileName);
   end;
 end;
@@ -59,15 +55,16 @@ procedure TfmMain.FormCreate(Sender: TObject);
 var
   fn: string;
 begin
-  fn:= ExtractFileDir(ExtractFileDir(Application.ExeName))+DirectorySeparator+
-    'lexlib'+DirectorySeparator+'lib.lxl';
+  FDirLib:= ExtractFileDir(ExtractFileDir(Application.ExeName))+DirectorySeparator+
+    'lexlib';
+  fn:= FDirLib+DirectorySeparator+'lib.lxl';
 
   Manager:= TecSyntaxManager.Create(Self);
   Manager.LoadFromFile(fn);
-  UpdStatus;
+  UpdateStatus;
 end;
 
-procedure TfmMain.UpdStatus;
+procedure TfmMain.UpdateStatus;
 begin
   Label1.Caption:= Format('library "%s" has %d lexers',
     [Extractfilename(Manager.FileName), Manager.AnalyzerCount]);

@@ -4,12 +4,11 @@ object fmMain: TfmMain
   Top = 408
   Width = 454
   BorderStyle = bsDialog
-  Caption = 'Demo'
+  Caption = 'Lexer-lib demo'
   ClientHeight = 231
   ClientWidth = 454
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.7'
   Visible = False
   object bShow: TButton
     Left = 144
