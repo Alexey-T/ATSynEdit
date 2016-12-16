@@ -1149,7 +1149,7 @@ begin
         if FParseTicks>=cAdapterTimerTicksToInitialUpdate then
         begin
           FParsePausePassed:= true;
-          UpdateEditors(true, false);
+          UpdateEditors(true, true);
         end;
     end;
   finally
