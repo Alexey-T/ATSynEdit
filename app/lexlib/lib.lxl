@@ -12553,10 +12553,16 @@ object TecSyntaxManager
         Font.Name = 'Courier New'
         Font.Style = [fsStrikeOut]
         BgColor = clYellow
+      end    
+      item
+        DisplayName = 'Id exit'
+        Font.Color = clPurple
+        Font.Height = -13
+        Font.Name = 'Courier New'
       end>
     TokenRules = <    
       item
-        DisplayName = 'Any name'
+        DisplayName = 'Id'
         StyleName = 'Identifier'
         TokenType = 2
         Expression = '[a-z_]\w*'
@@ -12575,7 +12581,7 @@ object TecSyntaxManager
         DisplayName = 'Float'
         StyleName = 'Number'
         TokenType = 6
-        Expression = '(\d+ \.)? \d+ e [\+\-]? \d+ |  \d+ \. \d+'
+        Expression = '(\d+ \.)? \d+ e [\+\-]? \d+ | \d+ \. \d+'
         ColumnFrom = 0
         ColumnTo = 0
       end    
@@ -12633,7 +12639,7 @@ object TecSyntaxManager
         ColumnTo = 0
       end    
       item
-        DisplayName = 'HEX'
+        DisplayName = 'Hex'
         StyleName = 'Number'
         TokenType = 7
         Expression = '\$[a-f\d]+'
@@ -12665,7 +12671,7 @@ object TecSyntaxManager
       end>
     BlockRules = <    
       item
-        DisplayName = 'Key words'
+        DisplayName = 'Id keywords'
         StyleName = 'Reserved word'
         BlockType = btTagDetect
         ConditionList = <        
@@ -12684,6 +12690,7 @@ object TecSyntaxManager
               'const'
               'constructor'
               'contains'
+              'default'
               'destructor'
               'dispinterface'
               'div'
@@ -12705,7 +12712,6 @@ object TecSyntaxManager
               'if'
               'implementation'
               'in'
-              'index'
               'inherited'
               'initialization'
               'inline'
@@ -12740,6 +12746,7 @@ object TecSyntaxManager
               'requires'
               'resourcestring'
               'safecall'
+              'self'
               'set'
               'shl'
               'shr'
@@ -12766,6 +12773,23 @@ object TecSyntaxManager
             IgnoreCase = True
           end>
         HighlightPos = cpBound
+        IgnoreAsParent = False
+      end    
+      item
+        DisplayName = 'Id exit'
+        StyleName = 'Id exit'
+        BlockType = btTagDetect
+        ConditionList = <        
+          item
+            TagList.Strings = (
+              'Exit'
+              'Halt'
+              'Result'
+            )
+            TokenTypes = 4
+            IgnoreCase = True
+          end>
+        HighlightPos = cpAny
         IgnoreAsParent = False
       end    
       item
@@ -13110,7 +13134,6 @@ object TecSyntaxManager
       end    
       item
         DisplayName = 'Interface section'
-        StyleName = 'Interface section'
         BlockName = 'program'
         StrictParent = True
         StatesAdd = 1
@@ -13149,7 +13172,6 @@ object TecSyntaxManager
       end    
       item
         DisplayName = 'Implementation section'
-        StyleName = 'Implemenation Section'
         StatesAdd = 2
         StatesRemove = 15
         ConditionList = <        
@@ -13811,9 +13833,10 @@ object TecSyntaxManager
       ' Number: integer;'
       ' FloatNumber: double;'
       'begin'
-      ' Number := 123;  // View integer number style'
-      ' Caption := ''This Number is '' + IntToStr(Number); // View string style'
-      ' Inc(Number, $1FA7); // View HEX style'
+      ' Number := 10 + 1.2e-3 + $eb;'
+      ' Caption := ''Number is '' + IntToStr(Number);'
+      ' Result := Number;'
+      ' if Result>1 then Exit;'
       ' {Assembler style}'
       ' asm'
       '   MOV  AX, 1234H'
@@ -13822,7 +13845,7 @@ object TecSyntaxManager
       'end;'
       ''
       'begin'
-      '  if A then'
+      '  if Flag then'
       '  begin'
       '    Do_;'
       '  end;'
@@ -13843,7 +13866,7 @@ object TecSyntaxManager
     )
     Gramma.Gramma = 'Skip = <Comment> | <Preprocessor>;'#10#10'// Class declaration'#10'ClassDecl = <Identifier> ''='' ''class'' InheritedList? <Identifier>;'#10'EmptyClass = <Identifier> ''='' "class" InheritedList '';'';'#10#10'// Generic'#10'ObjectDecl = <Identifier> ''='' "object"'#10'GenericDecl = "generic" <Identifier>'#10#10'// Interface declaration'#10'IntfDecl = <Identifier> ''='' ("interface" | "dispinterface") InheritedList? IntfNextToken;'#10'IntfNextToken = ''['' | <Identifier>; '#10#10'InheritedList = ''('' IdentList '')'';'#10'IdentList = <Identifier> ('','' <Identifier>)*;'#10
     CurrentLineStyle = 'Current Line'
-    Extentions = 'pas inc dpr dpk lpr p pp'
+    Extentions = 'pas inc dpr dpk lpr lpk p pp'
     LexerName = 'Pascal'
     Notes.Strings = (
       'Changed by Alexey'
