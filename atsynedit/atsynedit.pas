@@ -1288,6 +1288,8 @@ begin
   Beep;
   {$endif}
 
+  InvalidateHilitingCache;
+
   case FWrapMode of
     cWrapOff:
       FWrapColumn:= 0;
