@@ -59,6 +59,7 @@ type
     FOnLexerChange: TNotifyEvent;
     FOnParseBegin: TNotifyEvent;
     FOnParseDone: TNotifyEvent;
+    procedure DoCheckEditorList;
     procedure DoFindTokenOverrideStyle(var ATokenStyle: TecSyntaxFormat;
       ATokenIndex, AEditorIndex: integer);
     procedure DoFoldAdd(AX, AY, AY2: integer; AStaple: boolean; const AHint: string);
@@ -93,7 +94,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure AddEditor(AEdit: TATSynEdit);
+    procedure AddEditor(AEditor: TComponent); override;
+    //
     property Lexer: TecSyntAnalyzer read GetLexer write SetLexer;
     function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
     property EnabledLineSeparators: boolean read FEnabledLineSeparators write SetEnabledLineSeparators;
@@ -168,6 +170,12 @@ end;
 
 { TATAdapterEControl }
 
+procedure TATAdapterEControl.DoCheckEditorList;
+begin
+  if EdList.Count=0 then
+    raise Exception.Create('Adapter: Empty editor list');
+end;
+
 procedure TATAdapterEControl.OnEditorCalcHilite(Sender: TObject;
   var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer;
   var AColorAfterEol: TColor);
@@ -175,8 +183,8 @@ var
   Ed: TATSynEdit;
   Str: atString;
 begin
+  DoCheckEditorList;
   Ed:= Sender as TATSynEdit;
-  AddEditor(Ed);
   if not Assigned(AnClient) then Exit;
 
   Str:= Copy(Ed.Strings.Lines[ALineIndex], ACharIndex, ALineLen);
@@ -507,15 +515,15 @@ begin
   inherited;
 end;
 
-procedure TATAdapterEControl.AddEditor(AEdit: TATSynEdit);
+procedure TATAdapterEControl.AddEditor(AEditor: TComponent);
 begin
-  if AEdit=nil then
+  if AEditor=nil then
     EdList.Clear
   else
   begin
-    if EdList.IndexOf(AEdit)<0 then
-      EdList.Add(AEdit);
-    AEdit.Strings.OnLog:= @DoChangeLog;
+    if EdList.IndexOf(AEditor)<0 then
+      EdList.Add(AEditor);
+    TATSynEdit(AEditor).Strings.OnLog:= @DoChangeLog;
   end;
 end;
 
@@ -824,7 +832,7 @@ end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);
 begin
-  AddEditor(Sender as TATSynEdit);
+  DoCheckEditorList;
   UpdateData;
 end;
 

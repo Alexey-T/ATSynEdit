@@ -23,6 +23,7 @@ type
     FEditorLineCount: integer;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure AddEditor(AEditor: TComponent); virtual;
     //
     procedure OnEditorChange(Sender: TObject); virtual;
     procedure OnEditorCalcHilite(Sender: TObject;
@@ -53,6 +54,13 @@ begin
   FDynamicHiliteSupportedInCurLexer:= true;
   FDynamicHiliteMaxLines:= 1000;
   FEditorLineCount:= 0;
+end;
+
+procedure TATAdapterHilite.AddEditor(AEditor: TComponent);
+begin
+  // not nil: adapter adds this editor object to his editors list,
+  //   and should setup editor's OnLog
+  // nil: adapter forgets about all editors
 end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
