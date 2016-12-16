@@ -20,16 +20,14 @@ EControl files licensed under special license (readme.txt), usage allowed only i
 
 = Requirements =
 
-Lazarus: 1.4.0.
+Lazarus: 1.4+
 
 One of the last versions was tested on:
 
-* Windows 
-* Linux Gtk2 (Ubuntu 14.04)
+* Windows (x32) 
+* Linux GTK2 (x32, x64)
 * Qt (Linux, Windows) (main problem was moving all painting code into Paint event, it's done)
-* OS X 10.8:
-** a) was same problem as QT,
-** b) many hotkeys with Ctrl don't work, changed Ctrl+keys to Meta+keys
+* macOS (10.8 and later)
 
 = Keyboard shortcuts =
 
@@ -124,8 +122,8 @@ Some details about this:
 * Word-wrap (wrap at control edge, wrap at column)
 * Undo/redo
 * Column blocks
-* Gutter (line numbers, fold, colored line states)
-* Bookmarks 
+* Gutter (line numbers, folding, colored line states)
+* Bookmarks (with icons)
 * Supports Win/Unix/Mac line ends
 * Minimap like Sublime Text
 * Micromap (owner drawn)
@@ -134,6 +132,8 @@ Some details about this:
 * Renders CJK chars with big width 
 * Renders some Unicode chars as "AABB" hex code
 * Renders unprintable chars (space, tab, line end)
+* Can highlight URLs
+* Can set color attributes for ranges (to hilite brackets, words)
 
 == Difference from other components? ==
 
@@ -157,13 +157,14 @@ type TATStrings in unit atstrings. Holds text lines.
 
 * To add text lines, use procedures of Strings: LineAdd, LineInsert, LineDelete.
 * To get/set text lines, use properties:
-** Lines[i]: type UnicodeString
-** LinesEnds[i]: enum (kind of end-of-line)
-** LinesBm[i]: integer (bookmark index, or 0 if no bookmark)
-** LinesBmColor[i]: color of bookmark (used if bookmark set)
-** LinesHidden[i]: integer (0: line is fully visible, -1: line is fully hidden, >0: line is hidden from this char-index)
-** LinesState[i]: enum (colored state of line shown on gutter)
-
+** Lines[i]: text, of type UnicodeString
+** LinesLen[i]: integer: same as getting Length of item (in WideChars), but faster
+** LinesEnds[i]: enum: kind of end-of-line chars
+** LinesHidden[i]: bool: true if line is fully hidden (inside folded block)
+** LinesFoldFrom[i]: byte: 0 if line is not folded, >0 if line is folded from this char-pos
+** LinesState[i]: enum: state normal/changed/saved, it's shown by color on gutter
+** LinesBm[i]: integer: bookmark kind (each kind has assigned color), or 0 if no bookmark
+** LinesHint[i]: string: hint which shows by moving mouse over bookmark icon (for items with bookmark only)
 
 === Carets object ===
 
@@ -171,8 +172,10 @@ type TATCarets in unit atsynedit_carets. Holds list of items of type TATCaretIte
 
 * PosY: index of line in Strings object, 0-based
 * PosX: offset of caret from line start, 0-based
-* EndY, EndX: position for selection end for this caret (used if multi-carets have selections); -1 of selection not exists for caret
-* CoordY, CoordX: screen coordinates (don't use it)
+* EndY, EndX: position for selection edge for this caret, or -1/-1 if no selection for this caret
+* CoordY, CoordX: screen coordinates (usually you don't need these)
+
+Note: for forward sel, pair (PosY, PosX) is after pair (EndY, EndX); for backward sel the order is reversed. So if you want to get pos of selection start (e.g. to delete this selection), get minimal pair.
 
 === Keymap object ===
 
@@ -203,7 +206,7 @@ type TATSynWrapInfo in unit atsynedit_wrapinfo. Holds list of wrap items, each i
 * its indent size (if feature "wrapped indent" is on)
 * its final-state: is it first/middle part of wrapped line, or final part
 
-One wrap item renders on control as one short line. It is part of wrapped line or entire line. Also used for wrap-mode off, this is simple case - one wrap item per one line. Wrap items exist only for lines not hidden by folding feature (Strings object has LinesHidden[i]>=0).
+One wrap item renders on control as one short line. It is part of wrapped line or entire line. Also used for wrap-mode off, this is simple case - one wrap item per one line. Wrap items exist only for lines not hidden by folding feature (with Strings.LinesHidden[i]=true).
 
 === Undo object ===
 
@@ -327,7 +330,7 @@ States
 
 More
 
-*     procedure Update(AUpdateWrapInfo: boolean = false): use it to repaint, pass true to force update of WrapInfo object (if detection of text change cannot work)
+*     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true): to repaint+invalidate; 1st param must be True to recalculate WrapInfo object (usually it's auto updated, but if text change detection don't work, e.g. Strings object changed directly, pass True here)
 *    procedure DoCommand(ACmd: integer; const AText: UnicodeString = ""): command runner, pass command code to run it (see file atsynedit_commands)
 *    property Text: unicodestring which gives entire editor text with LF separator
 
@@ -352,8 +355,9 @@ Selection
 
 View
 
-*    property LineTop: index of line visible at top of control
-*    property LineBottom: index of line visible at bottom of control (because of folding you cannot simply calculate it)
+*    property LineTop: index of line visible at the top of control (almost vertical scroll, though exact scroll pos is different, it considers WrapInfo object)
+*    property LineBottom: index of line visible at the bottom of control (because of folding you cannot simply calculate it)
+*    property ColumnLeft: index of left visible column (ie, horizontal scroll)
 *    procedure DoRangeFold(ARange: TATSynRange): fold range, which exists in the Fold object
 *    procedure DoRangeUnfold(ARange: TATSynRange): unfold range
 *    procedure DoScrollByDelta(Dx, Dy: integer): scroll editor area by Dx chars right and Dy lines down
@@ -488,12 +492,16 @@ Several editors can have same text source, text source is ATStrings object which
 Each editor holds its own WrapInfo object so wrapped states are separate.
 Each editor holds its own Carets object, so carets/selections are separate.
 
-In ATStrings object this field exists:
+Tech details: items in ATStrings object have fields:
 
-* ItemHidden: array[0..cMaxStringsClients-1] of smallint; 
+    ItemHidden: packed array[0..cMaxStringsClients-1] of ByteBool;
+      //this line is fully hidden
+    ItemFoldFrom: packed array[0..cMaxStringsClients-1] of byte;
+      //0: line not folded
+      //>0: line folded from this char-pos
 
 (constant can be changed in source).
-This field allows to hold separate fold-info for each "editor client" of ATStrings. Each client must have it's own EditorIndex (0 to cMaxStringsClients-1). Example, make 4 editors ed0..ed3.
+These fields allow to hold separate fold-info for each "editor client" of ATStrings. Each client must have it's own EditorIndex (0 to cMaxStringsClients-1). Example, make 4 editors ed0..ed3.
 
 * change cMaxStringsClients to 4
 * set ed0.EditorIndex:=0
@@ -605,6 +613,7 @@ end;
 * tab-char width: OptTabSize
 * tab-char entered by spaces: OptTabSpaces
 * index of top visible line: LineTop
+* index of left visible column: ColumnLeft
 * modified state: Modified
 * read-only mode: ModeReadOnly
 * insert/overwrite mode: ModeOverwrite
@@ -657,7 +666,8 @@ ATSynEdit has API which allows to make report to any format. It's function DoCal
 * OnClickTriple: Called on triple-click on text area.
 * OnClickMoveCaret: Called just before changing caret pos via mouse click (you get prev caret pos, new caret pos).
 * OnClickEndSelect: Called just after mouse-up, if single selection made (you get selection start pos, end pos).
-* OnCommand: Called before running any command. You can disable any command processing, or perform custom processing for any command.
+* OnCommand: Called before running any command. You can disable any command processing, or perform custom processing before/instead of command.
+* OnCommandAfter: Called after running command.
 * OnDrawBookmarkIcon: Called on painting gutter mark for line with bookmark. 
 * OnDrawEditor: Called after painting entire text area.
 * OnDrawLine: Called after painting line (or wrapped part of line) on canvas. You can paint some "image" over this line.
@@ -750,21 +760,22 @@ Listbox is not modal. It keeps editor caret blinking. While listbox shown, edito
 <syntaxhighlight>
 type
   TATCompletionPropEvent = procedure (Sender: TObject;
-    out AText, ASuffix: string; out ACharsLeft, ACharsRight: integer) of object;
+    out AText: string; out ACharsLeft, ACharsRight: integer) of object;
 
 procedure DoEditorCompletionListbox(AEd: TATSynEdit; AOnGetProp: TATCompletionPropEvent);
 </syntaxhighlight>
 
 Callback params:
 
-* AText: Chr(13)-separated strings, each string is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor. After id/text several items may exist, all '|'-separated. After items you may add Chr(9)+S_hint: item shows outside of listbox, in a hint window.
+* AText: Chr(13)-separated strings, each string is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. After items you may add Chr(9)+S_hint: item shows outside of listbox, in a hint window. 
 For ex, this gives listbox with 3 items:
 
 <syntaxhighlight>
 AText:= 'func|Func1|(param1, param2)'#9'Func desc' + #13 + 'var|Var1' + #13 + 'var|Var2';
 </syntaxhighlight>
 
-* ASuffix: string which is added to text items, when inserted into editor. For ex, it may be string ": " if CSS attributes used.
+If you need to insert not only S_text but also additional substr, use such S_text: S_text+#1+S_before_caret+#1+S_after_caret (also substrings will be added before and after caret). This is used by HTML autocompletion: here S_before_caret is ">" and S_after_caret is "</tag>".
+
 * ACharsLeft, ACharsRight: count of chars, to the left and right of the caret, which will be replaced by selected listbox item. These counts must be detected by app. Some app may need to count only word chars, some may need spaces/brackets.
 
 Notes:
