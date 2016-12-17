@@ -459,12 +459,13 @@ There're 2 ways:
 
 You can set handler of OnCalcHilite event. Adapter is different way to do the same. Instead of using event, you write code in the new class which is child of TATAdapterHilite, in method OnEditorCalcHilite. Then you set this adapter to editor:
 
-  atsynedit1.AdapterHilite:= MyAdapter;
+  Adapter1.AddEditor(editor1);
+  Adapter1.AddEditor(editor2); //if 2 editors share the same text buffer
 
-If adapter assigned, editor will call adapter's funcs (first called adapter, next event handler).
+If adapter assigned, editor will call adapter's funcs (first called adapter, next OnCalcHilite).
 
-See small file "atsynedit_adapters.pas". Small class with empty code.
-Other methods needed for adapters to react to text change, etc.
+See file "atsynedit_adapters.pas". It has base class for such adapters.
+Main method in adapter, which is called by ATSynEdit is:
 
   procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
