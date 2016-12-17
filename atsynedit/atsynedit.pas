@@ -938,6 +938,7 @@ type
     property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
     property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
     //events std
+    property OnContextPopup;
     property OnDragOver;
     property OnDragDrop;
     property OnEnter;
@@ -953,6 +954,7 @@ type
     property OnMouseWheel;
     property OnMouseWheelDown;
     property OnMouseWheelUp;
+    property OnResize;
     property OnUTF8KeyPress;
     //events new
     property OnClickDouble: TATSynEditClickEvent read FOnClickDbl write FOnClickDbl;
