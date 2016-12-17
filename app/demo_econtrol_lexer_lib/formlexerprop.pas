@@ -94,7 +94,7 @@ implementation
 procedure TfmLexerProp.FormCreate(Sender: TObject);
 begin
   Adapter:= TATAdapterEControl.Create(Self);
-  edSample.AdapterHilite:= Adapter;
+  Adapter.AddEditor(edSample);
 
   InitBorder(cbBorderL);
   InitBorder(cbBorderT);
@@ -114,7 +114,7 @@ end;
 
 procedure TfmLexerProp.FormDestroy(Sender: TObject);
 begin
-  edSample.AdapterHilite:= nil;
+  Adapter.AddEditor(nil);
   FreeAndNil(Adapter);
 end;
 

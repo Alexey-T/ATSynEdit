@@ -809,7 +809,7 @@ type
     property Fold: TATSynRanges read FFold;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property Modified: boolean read GetModified write SetModified;
-    property AdapterHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
+    property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property EditorIndex: integer read FEditorIndex write FEditorIndex;
     property LineTop: integer read GetLineTop write SetLineTop;
     property LineBottom: integer read FLineBottom;

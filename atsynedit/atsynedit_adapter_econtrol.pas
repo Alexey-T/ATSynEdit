@@ -516,14 +516,23 @@ begin
 end;
 
 procedure TATAdapterEControl.AddEditor(AEditor: TComponent);
+var
+  i: integer;
 begin
   if AEditor=nil then
-    EdList.Clear
+  begin
+    for i:= 0 to EdList.Count-1 do
+      TATSynEdit(EdList[i]).AdapterForHilite:= nil;
+    EdList.Clear;
+  end
   else
   begin
     if EdList.IndexOf(AEditor)<0 then
+    begin
       EdList.Add(AEditor);
-    TATSynEdit(AEditor).Strings.OnLog:= @DoChangeLog;
+      TATSynEdit(AEditor).Strings.OnLog:= @DoChangeLog;
+      TATSynEdit(AEditor).AdapterForHilite:= Self;
+    end;
   end;
 end;
 

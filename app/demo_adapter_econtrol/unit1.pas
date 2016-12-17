@@ -157,7 +157,7 @@ begin
   adapter:= TATAdapterEControl.Create(Self);
   adapter.OnParseBegin:=@AdapterParseBegin;
   adapter.OnParseDone:=@AdapterParseDone;
-  ed.AdapterHilite:= adapter;
+  adapter.AddEditor(ed);
 
   chkWrap.Checked:= ed.OptWrapMode=cWrapOn;
   chkFullSel.Checked:= ed.OptShowFullSel;
