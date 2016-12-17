@@ -500,10 +500,10 @@ destructor TATAdapterEControl.Destroy;
 var
   i: integer;
 begin
+  AddEditor(nil);
+
   if Assigned(AnClient) then
-  begin
     FreeAndNil(AnClient);
-  end;
 
   for i:= ListColors.Count-1 downto 0 do
     TObject(ListColors[i]).Free;
