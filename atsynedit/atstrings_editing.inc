@@ -340,21 +340,4 @@ begin
     LineAddEx('', cEndNone);
 end;
 
-procedure TATStrings.TextDuplicateLine(AX, AY: integer; out AShift, APosAfter: TPoint);
-begin
-  AShift.X:= 0;
-  AShift.Y:= 0;
-  APosAfter.X:= AX;
-  APosAfter.Y:= AY;
-  if not IsIndexValid(AY) then Exit;
-
-  LineInsert(AY+1, Lines[AY]);
-
-  if LinesEnds[AY]<>Endings then
-    LinesEnds[AY]:= Endings;
-  LinesEnds[AY+1]:= Endings;
-
-  AShift.Y:= 1;
-end;
-
 

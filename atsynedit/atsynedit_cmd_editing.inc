@@ -375,29 +375,31 @@ end;
 function TATSynEdit.DoCommand_TextDuplicateLine: TATCommandResults;
 var
   Caret: TATCaretItem;
-  Shift, PosAfter: TPoint;
-  i: integer;
+  Y1, Y2, i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
+  //cmd handles only 1 caret, to handle seltext
+  Caret:= Carets[0];
+  if not Strings.IsIndexValid(Caret.PosY) then Exit;
+
   Strings.BeginUndoGroup;
   try
-    DoCaretsDeleteOnSameLines;
-
-    for i:= FCarets.Count-1 downto 0 do
+    //universal code, for selection or not
+    Caret.GetSelLines(Y1, Y2, true);
+    Strings.LinesEnds[Y2]:= Strings.Endings;
+    for i:= Y2 downto Y1 do
     begin
-      Caret:= FCarets[i];
-      Strings.TextDuplicateLine(Caret.PosX, Caret.PosY, Shift, PosAfter);
-      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
-      Caret.PosX:= PosAfter.X;
-      Caret.PosY:= PosAfter.Y;
+      Strings.LineInsert(Y2+1, Strings.Lines[i]);
+      Strings.LinesEnds[Y2+1]:= Strings.Endings;
     end;
   finally
     Strings.EndUndoGroup;
   end;
 
-  Result:= [cResultText, cResultCaretAny];
+  DoCaretSingleAsIs;
+  Result:= [cResultText, cResultCaretTop];
 end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineBegin: TATCommandResults;

@@ -59,7 +59,7 @@ const
 
   cCommand_TextDeleteSelection = 170;
   cCommand_TextDeleteLine = 171;
-  cCommand_TextDuplicateLine = 172 or cCmdSelReset;
+  cCommand_TextDuplicateLine = 172;
   cCommand_TextDeleteToLineBegin = 173 or cCmdSelReset;
   cCommand_TextDeleteToLineEnd = 174 or cCmdSelReset;
   cCommand_TextDeleteToTextEnd = 175 or cCmdSelReset;

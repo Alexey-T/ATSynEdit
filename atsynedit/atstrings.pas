@@ -230,7 +230,6 @@ type
     procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
-    procedure TextDuplicateLine(AX, AY: integer; out AShift, APosAfter: TPoint);
     function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: string = #10): atString;
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
