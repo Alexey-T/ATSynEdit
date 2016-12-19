@@ -23,6 +23,7 @@ function KeyArrayToString(const K: TATKeyArray): string;
 procedure KeyArraySetFromString(var K: TATKeyArray; StrKeys: string);
 function KeyArraysEqualNotEmpty(const a1, a2: TATKeyArray): boolean;
 function KeyArrayLength(const K: TATKeyArray): integer;
+procedure KeyArrayClear(var K: TATKeyArray);
 
 type
   { TATKeymapItem }
@@ -76,6 +77,11 @@ begin
   for i:= Low(K) to High(K) do
     if K[i]<>0 then
       Inc(Result);
+end;
+
+procedure KeyArrayClear(var K: TATKeyArray);
+begin
+  FillChar(K, SizeOf(K), 0);
 end;
 
 { TATKeymap }
