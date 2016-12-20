@@ -13,10 +13,10 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Description Value="ATSynEdit"/>
-    <License Value="MPL 2.0"/>
+    <Description Value="Multi-line editor control, analog to SynEdit, but with much more features. Supports syntax highlighting using EControl engine."/>
+    <License Value="MPL 2.0, LGPL"/>
     <Version Major="1"/>
-    <Files Count="28">
+    <Files Count="29">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -128,6 +128,10 @@
         <Filename Value="atsynedit_regexpr.pas"/>
         <UnitName Value="ATSynEdit_RegExpr"/>
       </Item28>
+      <Item29>
+        <Filename Value="atsynedit_adapter_cache.pas"/>
+        <UnitName Value="ATSynEdit_Adapter_Cache"/>
+      </Item29>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

@@ -9,12 +9,13 @@ interface
 
 uses
   ATSynEdit_Register, ATStringProc, ATStringProc_TextBuffer, 
-  atstringproc_utf8detect, ATStringProc_WordJump, ATStrings, ATStrings_Undo, 
+  ATStringProc_UTF8Detect, ATStringProc_WordJump, ATStrings, ATStrings_Undo, 
   ATSynEdit, ATSynEdit_Adapters, ATSynEdit_CanvasProc, ATSynEdit_Carets, 
   ATSynEdit_Commands, ATSynEdit_Edits, ATSynEdit_Gutter, ATSynEdit_Keymap, 
   ATSynEdit_Keymap_Init, ATSynEdit_Ranges, ATSynEdit_WrapInfo, 
-  ATSynEdit_Finder, ATStringProc_HtmlColor, atstrings_hints, ATSynEdit_Colors, 
-  ATSynEdit_Export_HTML, ATSynEdit_Markers, ATSynEdit_RegExpr, LazarusPackageIntf;
+  ATSynEdit_Finder, ATStringProc_HtmlColor, ATStrings_Hints, ATSynEdit_Colors, 
+  ATSynEdit_Export_HTML, ATSynEdit_Markers, ATSynEdit_RegExpr, 
+  ATSynEdit_Adapter_Cache, LazarusPackageIntf;
 
 implementation
 
