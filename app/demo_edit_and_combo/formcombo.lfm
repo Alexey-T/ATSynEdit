@@ -86,15 +86,13 @@ object fmCombo: TfmCombo
     MaxValue = 1000
     OnChange = edMaxLenChange
     TabOrder = 3
-    Visible = False
   end
   object LabelMaxLen: TLabel
     Left = 96
     Height = 17
     Top = 188
-    Width = 100
-    Caption = 'Max len of edit'
+    Width = 116
+    Caption = 'Max length (if >0)'
     ParentColor = False
-    Visible = False
   end
 end

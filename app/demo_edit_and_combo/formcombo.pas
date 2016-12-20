@@ -67,7 +67,8 @@ end;
 
 procedure TfmCombo.edMaxLenChange(Sender: TObject);
 begin
-  //
+  ed0.OptMaxLen:= edMaxLen.Value;
+  ed.OptMaxLen:= edMaxLen.Value;
 end;
 
 procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;

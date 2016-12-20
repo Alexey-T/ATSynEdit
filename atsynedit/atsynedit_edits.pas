@@ -19,10 +19,16 @@ type
   { TATEdit }
 
   TATEdit = class(TATSynEdit)
+  private
+    FOptMaxLen: integer;
+    procedure SetOptMaxLen(AValue: integer);
   protected
     function DoGetTextString: atString; override;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure DoEventChange; override;
+  published
+    property OptMaxLen: integer read FOptMaxLen write SetOptMaxLen default 0;
   end;
 
 type
@@ -59,6 +65,16 @@ uses
 
 { TATEdit }
 
+procedure TATEdit.SetOptMaxLen(AValue: integer);
+begin
+  if FOptMaxLen=AValue then Exit;
+  FOptMaxLen:= AValue;
+
+  if Strings.Count>0 then
+    if Strings.LinesLen[0]>FOptMaxLen then
+      DoEventChange;
+end;
+
 function TATEdit.DoGetTextString: atString;
 begin
   Result:= inherited;
@@ -69,6 +85,45 @@ begin
     while (Result<>'') and
       IsCharEol(Result[Length(Result)]) do
       SetLength(Result, Length(Result)-1);
+end;
+
+procedure TATEdit.DoEventChange;
+begin
+  inherited;
+  DoCaretSingleAsIs;
+
+  if Strings.Count=0 then
+  begin
+    Strings.LineAdd('');
+    Update(true);
+  end;
+
+  if ModeOneLine then
+  begin
+    //force caret to top, eg after paste mul-line text
+    LineTop:= 0;
+    if Carets[0].PosY>0 then
+    begin
+      DoCaretSingle(0, 0);
+      ColumnLeft:= 0;
+    end;
+
+    if Strings.Count>1 then
+    begin
+      ColumnLeft:= 0;
+      while Strings.Count>1 do
+        Strings.LineDelete(1);
+      Update(true);
+    end;
+
+    if OptMaxLen>0 then
+      if Strings.LinesLen[0]>OptMaxLen then
+      begin
+        Strings.Lines[0]:= Copy(Strings.Lines[0], 1, OptMaxLen);
+        DoCaretSingle(Strings.LinesLen[0], 0);
+        Update(true);
+      end;
+  end;
 end;
 
 constructor TATEdit.Create(AOwner: TComponent);
@@ -85,6 +140,7 @@ begin
   OptShowURLs:= false;
   OptTextOffsetLeft:= 2;
   OptTextOffsetTop:= 3;
+  OptMaxLen:= 0;
 
   Height:= 26;
 end;

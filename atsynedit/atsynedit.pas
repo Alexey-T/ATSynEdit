@@ -800,10 +800,10 @@ type
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     procedure UpdateIncorrectCaretPositions;
     procedure UpdateFoldedFromLinesHidden;
-    procedure DoEventCarets;
-    procedure DoEventScroll;
-    procedure DoEventChange;
-    procedure DoEventState;
+    procedure DoEventCarets; virtual;
+    procedure DoEventScroll; virtual;
+    procedure DoEventChange; virtual;
+    procedure DoEventState; virtual;
     //general
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
