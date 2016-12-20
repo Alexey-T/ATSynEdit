@@ -80,6 +80,11 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
+  TATGutterIconsKind = (
+    cGutterIconsPlusMinus,
+    cGutterIconsTriangles
+    );
+
   TATPasteCaret = (
     cPasteCaretNoChange,
     cPasteCaretLeftBottom,
@@ -436,7 +441,7 @@ type
     FOptGutterShowFoldAlways: boolean;
     FOptGutterShowFoldLines: boolean;
     FOptGutterShowFoldLinesAll: boolean;
-    FOptGutterTriangleIcons: boolean;
+    FOptGutterIcons: TATGutterIconsKind;
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
     FOptNumbersFontSize: integer;
@@ -1036,7 +1041,7 @@ type
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways;
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll;
-    property OptGutterTriangleIcons: boolean read FOptGutterTriangleIcons write FOptGutterTriangleIcons;
+    property OptGutterIcons: TATGutterIconsKind read FOptGutterIcons write FOptGutterIcons;
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
@@ -2440,7 +2445,7 @@ begin
   FOptGutterShowFoldAlways:= true;
   FOptGutterShowFoldLines:= true;
   FOptGutterShowFoldLinesAll:= false;
-  FOptGutterTriangleIcons:= false;
+  FOptGutterIcons:= cGutterIconsPlusMinus;
 
   FGutterBandBm:= 0;
   FGutterBandNum:= 1;
@@ -4750,26 +4755,30 @@ end;
 procedure TATSynEdit.DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer;
   APlus: boolean);
 begin
-  if OptGutterTriangleIcons then
-  begin
-    if APlus then
-      CanvasPaintTriangleRight(C,
-        Colors.GutterPlusBorder,
-        Point(AX - FOptGutterPlusSize div 2, AY - FOptGutterPlusSize),
-        FOptGutterPlusSize)
-    else
-      CanvasPaintTriangleDown(C,
-        Colors.GutterPlusBorder,
-        Point(AX - FOptGutterPlusSize, AY - FOptGutterPlusSize div 2),
-        FOptGutterPlusSize)
-  end
-  else
-    CanvasPaintPlusMinus(C,
-      Colors.GutterPlusBorder,
-      Colors.GutterPlusBG,
-      Point(AX, AY),
-      FOptGutterPlusSize,
-      APlus);
+  case OptGutterIcons of
+    cGutterIconsPlusMinus:
+      begin
+        CanvasPaintPlusMinus(C,
+          Colors.GutterPlusBorder,
+          Colors.GutterPlusBG,
+          Point(AX, AY),
+          FOptGutterPlusSize,
+          APlus);
+      end;
+    cGutterIconsTriangles:
+      begin
+        if APlus then
+          CanvasPaintTriangleRight(C,
+            Colors.GutterPlusBorder,
+            Point(AX - FOptGutterPlusSize div 2, AY - FOptGutterPlusSize),
+            FOptGutterPlusSize)
+        else
+          CanvasPaintTriangleDown(C,
+            Colors.GutterPlusBorder,
+            Point(AX - FOptGutterPlusSize, AY - FOptGutterPlusSize div 2),
+            FOptGutterPlusSize)
+      end;
+  end;
 end;
 
 
