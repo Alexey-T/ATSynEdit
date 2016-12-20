@@ -1,8 +1,0 @@
-
-atsynedit.wiki: select all, del, now paste text (also wiki of big size): caret jumps to selection end(it OK) but caret not visible(not blinking)
-
-Attribs+markers. 
-now marks adjusted auto on edit (DoCaretsShift) BUT not good: 
-1)delete of block with marks: must delet them- not done
-2)delete several lines block, mark exists on line of block end (after block): must adjust mark lefter- not done
-3)delete at attrib: must shorten attr/ or delete attr- not done

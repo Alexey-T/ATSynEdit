@@ -6,17 +6,21 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ATSynEdit, ATSynEdit_Keymap_Init;
+  ExtCtrls, ATSynEdit;
 
 type
   { TForm1 }
 
   TForm1 = class(TForm)
-    procedure Button1Click(Sender: TObject);
+    ButtonOpen: TButton;
+    OpenDialog1: TOpenDialog;
+    Panel1: TPanel;
+    procedure ButtonOpenClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     { private declarations }
     ed: TATSynEdit;
+    procedure DoOpen(const fn: string);
   public
     { public declarations }
   end;
@@ -31,6 +35,8 @@ implementation
 { TForm1 }
 
 procedure TForm1.FormCreate(Sender: TObject);
+var
+  fn: string;
 begin
   ed:= TATSynEdit.Create(Self);
   ed.Parent:= Self;
@@ -39,14 +45,24 @@ begin
   ed.OptUnprintedVisible:= false;
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
-  ed.LoadFromFile(ExtractFilePath(Application.ExeName)+'unit1.pas');
+
+  fn:= ExtractFilePath(Application.ExeName)+'unit1.pas';
+  DoOpen(fn);
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.DoOpen(const fn: string);
 begin
-  ed.OptCaretBlinkEnabled:= not ed.OptCaretBlinkEnabled;
-  ed.SetFocus;
+  ed.LoadFromFile(fn);
+  Caption:= 'Demo - '+ExtractFileName(fn);
 end;
+
+procedure TForm1.ButtonOpenClick(Sender: TObject);
+begin
+  with OpenDialog1 do
+    if Execute then
+      DoOpen(FileName);
+end;
+
 
 end.
 
