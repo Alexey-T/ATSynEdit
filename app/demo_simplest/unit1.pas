@@ -17,6 +17,7 @@ type
     Panel1: TPanel;
     procedure ButtonOpenClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { private declarations }
     ed: TATSynEdit;
@@ -35,8 +36,6 @@ implementation
 { TForm1 }
 
 procedure TForm1.FormCreate(Sender: TObject);
-var
-  fn: string;
 begin
   ed:= TATSynEdit.Create(Self);
   ed.Parent:= Self;
@@ -45,7 +44,12 @@ begin
   ed.OptUnprintedVisible:= false;
   ed.OptRulerVisible:= false;
   ed.Colors.TextBG:= $e0f0f0;
+end;
 
+procedure TForm1.FormShow(Sender: TObject);
+var
+  fn: string;
+begin
   fn:= ExtractFilePath(Application.ExeName)+'unit1.pas';
   DoOpen(fn);
 end;
@@ -53,6 +57,7 @@ end;
 procedure TForm1.DoOpen(const fn: string);
 begin
   ed.LoadFromFile(fn);
+  ActiveControl:= ed;
   Caption:= 'Demo - '+ExtractFileName(fn);
 end;
 

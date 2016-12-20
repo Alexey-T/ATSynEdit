@@ -7,6 +7,7 @@ object Form1: TForm1
   ClientHeight = 391
   ClientWidth = 690
   OnCreate = FormCreate
+  OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.7'
   object Panel1: TPanel
@@ -15,11 +16,12 @@ object Form1: TForm1
     Top = 352
     Width = 690
     Align = alBottom
+    BevelOuter = bvNone
     ClientHeight = 39
     ClientWidth = 690
     TabOrder = 0
     object ButtonOpen: TButton
-      Left = 8
+      Left = 16
       Height = 25
       Top = 8
       Width = 120
