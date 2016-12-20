@@ -16,7 +16,6 @@ uses
   ATSynEdit_Export_HTML,
   formkey,
   formopt,
-  formcombo,
   formfind;
 
 type
@@ -80,7 +79,6 @@ type
     MenuItem8: TMenuItem;
     mnuOpts: TMenuItem;
     mnuBms: TMenuItem;
-    mnuTestCombo: TMenuItem;
     mnuShowPane: TMenuItem;
     mnuTestHiliteWww: TMenuItem;
     mnuTestCaret1: TMenuItem;
@@ -140,7 +138,6 @@ type
     procedure chkMicromapChange(Sender: TObject);
     procedure chkMinimapChange(Sender: TObject);
     procedure mnuBmsClick(Sender: TObject);
-    procedure mnuTestComboClick(Sender: TObject);
     procedure mnuShowPaneClick(Sender: TObject);
     procedure chkRulerChange(Sender: TObject);
     procedure chkUnprintVisChange(Sender: TObject);
@@ -951,16 +948,6 @@ end;
 procedure TfmMain.mnuBmsClick(Sender: TObject);
 begin
   mnuTestBookmkClick(Self);
-end;
-
-procedure TfmMain.mnuTestComboClick(Sender: TObject);
-begin
-  with TfmCombo.Create(Self) do
-  try
-    ShowModal
-  finally
-    Free
-  end;
 end;
 
 procedure TfmMain.mnuShowPaneClick(Sender: TObject);

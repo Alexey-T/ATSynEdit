@@ -478,10 +478,6 @@ object fmMain: TfmMain
         Checked = True
         OnClick = mnuShowPaneClick
       end
-      object mnuTestCombo: TMenuItem
-        Caption = 'combobox mode..'
-        OnClick = mnuTestComboClick
-      end
     end
     object mnuOpts: TMenuItem
       Caption = 'Options'

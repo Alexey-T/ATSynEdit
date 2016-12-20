@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="37">
+    <Units Count="36">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -179,38 +179,31 @@
         <UnitName Value="ATSynEdit_Edits"/>
       </Unit30>
       <Unit31>
-        <Filename Value="formcombo.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="fmCombo"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-      </Unit31>
-      <Unit32>
         <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ATSynEdit_Ranges"/>
-      </Unit32>
-      <Unit33>
+      </Unit31>
+      <Unit32>
         <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>
         <IsPartOfProject Value="True"/>
-      </Unit33>
-      <Unit34>
+      </Unit32>
+      <Unit33>
         <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ATSynEdit_Adapters"/>
-      </Unit34>
-      <Unit35>
+      </Unit33>
+      <Unit34>
         <Filename Value="formfind.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="fmFind"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-      </Unit35>
-      <Unit36>
+      </Unit34>
+      <Unit35>
         <Filename Value="..\..\atsynedit\atsynedit_export_html.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ATSynEdit_Export_HTML"/>
-      </Unit36>
+      </Unit35>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
