@@ -49,13 +49,13 @@ begin
   ed.Parent:= PanelCombo;
   ed.Align:= alBottom;
   ed.OnCommand:= @ComboCommand;
-  ed.Text:= 'combo';
+  //ed.Text:= 'combo';
   ed.OptTextHint:= '(empty)';
 
   ed0:= TATEdit.Create(Self);
   ed0.Parent:= PanelEdit;
   ed0.Align:= alBottom;
-  ed0.Text:= 'edit';
+  //ed0.Text:= 'edit';
   ed0.OptTextHint:= '(empty)';
 end;
 
