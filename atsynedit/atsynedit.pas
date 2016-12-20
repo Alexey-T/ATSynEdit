@@ -436,6 +436,7 @@ type
     FOptGutterShowFoldAlways: boolean;
     FOptGutterShowFoldLines: boolean;
     FOptGutterShowFoldLinesAll: boolean;
+    FOptGutterTriangleIcons: boolean;
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
     FOptNumbersFontSize: integer;
@@ -604,6 +605,7 @@ type
       ALineIndex: integer; AEolSelected: boolean;
       const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
+    procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
@@ -1034,6 +1036,7 @@ type
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways;
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll;
+    property OptGutterTriangleIcons: boolean read FOptGutterTriangleIcons write FOptGutterTriangleIcons;
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize;
@@ -2437,6 +2440,7 @@ begin
   FOptGutterShowFoldAlways:= true;
   FOptGutterShowFoldLines:= true;
   FOptGutterShowFoldLinesAll:= false;
+  FOptGutterTriangleIcons:= false;
 
   FGutterBandBm:= 0;
   FGutterBandNum:= 1;
@@ -4566,12 +4570,8 @@ begin
         if not IsPlus then
           DrawDown;
 
-        CanvasPaintPlusMinus(C,
-          FColors.GutterPlusBorder,
-          FColors.GutterPlusBG,
-          Point(CoordXM, CoordYM),
-          FOptGutterPlusSize,
-          IsPlus);
+        DoPaintGutterPlusMinus(C,
+          CoordXM, CoordYM, IsPlus);
       end;
     cFoldbarEnd:
       begin
@@ -4745,6 +4745,31 @@ begin
       Point(M.CoordX-FOptMarkersSize, M.CoordY+FCharSize.Y-1),
       Point(M.CoordX+FOptMarkersSize, M.CoordY+FCharSize.Y-1) ]);
   end;
+end;
+
+procedure TATSynEdit.DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer;
+  APlus: boolean);
+begin
+  if OptGutterTriangleIcons then
+  begin
+    if APlus then
+      CanvasPaintTriangleRight(C,
+        Colors.GutterPlusBorder,
+        Point(AX - FOptGutterPlusSize div 2, AY - FOptGutterPlusSize),
+        FOptGutterPlusSize)
+    else
+      CanvasPaintTriangleDown(C,
+        Colors.GutterPlusBorder,
+        Point(AX - FOptGutterPlusSize, AY - FOptGutterPlusSize div 2),
+        FOptGutterPlusSize)
+  end
+  else
+    CanvasPaintPlusMinus(C,
+      Colors.GutterPlusBorder,
+      Colors.GutterPlusBG,
+      Point(AX, AY),
+      FOptGutterPlusSize,
+      APlus);
 end;
 
 

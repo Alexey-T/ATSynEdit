@@ -108,14 +108,6 @@ begin
       ColumnLeft:= 0;
     end;
 
-    if Strings.Count>1 then
-    begin
-      ColumnLeft:= 0;
-      while Strings.Count>1 do
-        Strings.LineDelete(1);
-      Update(true);
-    end;
-
     if OptMaxLen>0 then
       if Strings.LinesLen[0]>OptMaxLen then
       begin
