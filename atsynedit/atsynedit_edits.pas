@@ -37,9 +37,9 @@ type
   TATComboEdit = class(TATEdit)
   private
     FItems: TStringList;
+    FItemIndex: integer;
     FMenu: TPopupMenu;
     FArrowSize: integer;
-    FSelectedIndex: integer;
     procedure DoComboUpDown(ADown: boolean);
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
@@ -152,8 +152,8 @@ begin
   inherited;
 
   FItems:= TStringList.Create;
+  FItemIndex:= -1;
   FMenu:= TPopupMenu.Create(Self);
-  FSelectedIndex:= -1;
 
   OptMicromapVisible:= true;
   OptMicromapWidth:= 22;
@@ -238,17 +238,17 @@ end;
 procedure TATComboEdit.DoAddLineToHistory(const AStr: atString;
   AMaxItems: integer);
 begin
-  FSelectedIndex:= -1;
+  FItemIndex:= -1;
   SAddStringToHistory(Utf8Encode(AStr), FItems, AMaxItems);
 end;
 
 procedure TATComboEdit.DoComboUpDown(ADown: boolean);
 begin
   if FItems.Count=0 then exit;
-  if ADown then Inc(FSelectedIndex) else Dec(FSelectedIndex);
-  FSelectedIndex:= Max(0, Min(FItems.Count-1, FSelectedIndex));
+  if ADown then Inc(FItemIndex) else Dec(FItemIndex);
+  FItemIndex:= Max(0, Min(FItems.Count-1, FItemIndex));
 
-  Text:= Utf8Decode(FItems[FSelectedIndex]);
+  Text:= Utf8Decode(FItems[FItemIndex]);
   DoEventChange;
   DoCommand(cCommand_SelectAll);
 end;
