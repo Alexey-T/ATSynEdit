@@ -457,12 +457,16 @@ There're 2 ways:
 * OnCalcHilite event (better, if your code is small, e.g. colorize few tokens)
 * Adapter (better, if your code is big, e.g. support for EControl lexers)
 
-You can set handler of OnCalcHilite event. Adapter is different way to do the same. Instead of using event, you write code in the new class which is child of TATAdapterHilite, in method OnEditorCalcHilite. Then you set this adapter to editor:
+You can set handler of OnCalcHilite event. Adapter is different way to do the same. Instead of using event, you write code in the new class which is child of TATAdapterHilite. Then you link adapter to editor:
 
-  Adapter1.AddEditor(editor1);
-  Adapter1.AddEditor(editor2); //if 2 editors share the same text buffer
+  Adapter.AddEditor(editor1);
+  Adapter.AddEditor(editor2); //if 2 editors share the same text buffer
 
-If adapter assigned, editor will call adapter's funcs (first called adapter, next OnCalcHilite).
+To unlink adapter from all editors, call:
+
+  Adapter.AddEditor(nil);
+
+If adapter assigned, editor will call adapter's methods (first called adapter, next OnCalcHilite).
 
 See file "atsynedit_adapters.pas". It has base class for such adapters.
 Main method in adapter, which is called by ATSynEdit is:
