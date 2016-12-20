@@ -414,6 +414,7 @@ type
     FOptShowStapleStyle: TATLineStyle;
     FOptShowStapleIndent: integer;
     FOptShowStapleWidthPercent: integer;
+    FOptMouseEnableAll: boolean;
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
@@ -1075,6 +1076,7 @@ type
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
+    property OptMouseEnableAll: boolean read FOptMouseEnableAll write FOptMouseEnableAll;
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection;
     property OptMouseDownForPopup: boolean read FOptMouseDownForPopup write FOptMouseDownForPopup;
@@ -2561,6 +2563,7 @@ begin
   FOptCaretPreferLeftSide:= true;
   FOptCaretPosAfterPasteColumn:= cPasteCaretColumnRight;
   FOptMarkersSize:= 4;
+  FOptMouseEnableAll:= true;
   FOptMouseDownForPopup:= false;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
@@ -3187,6 +3190,7 @@ var
   EolPos: boolean;
   Index: integer;
 begin
+  if not OptMouseEnableAll then exit;
   inherited;
   SetFocus;
 
@@ -3324,6 +3328,7 @@ end;
 
 procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 begin
+  if not OptMouseEnableAll then exit;
   inherited;
 
   if PtInRect(ClientRect, Point(X, Y)) then
@@ -3435,6 +3440,7 @@ var
   nIndex: integer;
   bOnMinimap, bOnGutter, bEolPos: boolean;
 begin
+  if not OptMouseEnableAll then exit;
   inherited;
 
   P:= Point(X, Y);
@@ -3576,22 +3582,26 @@ end;
 
 procedure TATSynEdit.MouseLeave;
 begin
+  if not OptMouseEnableAll then exit;
   inherited;
   DoHintHide;
 end;
 
 function TATSynEdit.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean;
 begin
+  if not OptMouseEnableAll then exit(false);
   Result:= DoMouseWheelAction(Shift, false);
 end;
 
 function TATSynEdit.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): boolean;
 begin
+  if not OptMouseEnableAll then exit(false);
   Result:= DoMouseWheelAction(Shift, true);
 end;
 
 function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
 begin
+  if not OptMouseEnableAll then exit(false);
   if (Shift=[ssCtrl]) and FOptMouseWheelWithCtrlChangeSize then
   begin
     DoSizeChange(AUp);
@@ -3627,6 +3637,7 @@ end;
 
 procedure TATSynEdit.DblClick;
 begin
+  if not OptMouseEnableAll then exit;
   inherited;
 
   if DoHandleClickEvent(FOnClickDbl) then Exit;
@@ -3644,6 +3655,7 @@ end;
 
 procedure TATSynEdit.TripleClick;
 begin
+  if not OptMouseEnableAll then exit;
   inherited;
 
   if DoHandleClickEvent(FOnClickTriple) then Exit;

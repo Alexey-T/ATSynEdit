@@ -1,10 +1,10 @@
 object fmCombo: TfmCombo
   Left = 426
-  Height = 265
+  Height = 279
   Top = 370
   Width = 397
   Caption = 'Demo - ATEdit, ATComboEdit'
-  ClientHeight = 265
+  ClientHeight = 279
   ClientWidth = 397
   Constraints.MinHeight = 200
   OnCreate = FormCreate
@@ -33,7 +33,7 @@ object fmCombo: TfmCombo
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 29
-    Top = 230
+    Top = 244
     Width = 385
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
@@ -43,14 +43,14 @@ object fmCombo: TfmCombo
     CloseButton.DefaultCaption = True
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
-    TabOrder = 4
+    TabOrder = 5
     ShowButtons = [pbClose]
     ShowBevel = False
   end
   object chkEnabled: TCheckBox
     Left = 8
     Height = 24
-    Top = 152
+    Top = 136
     Width = 80
     Caption = 'Enabled'
     Checked = True
@@ -81,18 +81,29 @@ object fmCombo: TfmCombo
   object edMaxLen: TSpinEdit
     Left = 8
     Height = 27
-    Top = 184
+    Top = 208
     Width = 80
     MaxValue = 1000
     OnChange = edMaxLenChange
-    TabOrder = 3
+    TabOrder = 4
   end
   object LabelMaxLen: TLabel
     Left = 96
     Height = 17
-    Top = 188
+    Top = 208
     Width = 116
     Caption = 'Max length (if >0)'
     ParentColor = False
+  end
+  object chkEnMouse: TCheckBox
+    Left = 8
+    Height = 24
+    Top = 160
+    Width = 128
+    Caption = 'Enabled mouse'
+    Checked = True
+    OnChange = chkEnMouseChange
+    State = cbChecked
+    TabOrder = 3
   end
 end

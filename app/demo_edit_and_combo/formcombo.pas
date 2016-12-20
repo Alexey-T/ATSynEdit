@@ -13,6 +13,7 @@ type
 
   TfmCombo = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkEnMouse: TCheckBox;
     chkEnabled: TCheckBox;
     Label1: TLabel;
     Label2: TLabel;
@@ -21,6 +22,7 @@ type
     PanelEdit: TPanel;
     edMaxLen: TSpinEdit;
     procedure chkEnabledChange(Sender: TObject);
+    procedure chkEnMouseChange(Sender: TObject);
     procedure edMaxLenChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -65,10 +67,16 @@ begin
   ed0.Enabled:= chkEnabled.Checked;
 end;
 
+procedure TfmCombo.chkEnMouseChange(Sender: TObject);
+begin
+  ed.OptMouseEnableAll:= chkEnMouse.Checked;
+  ed0.OptMouseEnableAll:= chkEnMouse.Checked;
+end;
+
 procedure TfmCombo.edMaxLenChange(Sender: TObject);
 begin
-  ed0.OptMaxLen:= edMaxLen.Value;
   ed.OptMaxLen:= edMaxLen.Value;
+  ed0.OptMaxLen:= edMaxLen.Value;
 end;
 
 procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;
