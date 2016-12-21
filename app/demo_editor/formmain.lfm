@@ -473,6 +473,17 @@ object fmMain: TfmMain
       object MenuItem1: TMenuItem
         Caption = '-'
       end
+      object mnuTestGapAdd: TMenuItem
+        Caption = 'add gap..'
+        OnClick = mnuTestGapAddClick
+      end
+      object mnuTestGapClear: TMenuItem
+        Caption = 'clear gaps'
+        OnClick = mnuTestGapClearClick
+      end
+      object MenuItem14: TMenuItem
+        Caption = '-'
+      end
       object mnuShowPane: TMenuItem
         Caption = 'show pane'
         Checked = True

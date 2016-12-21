@@ -136,6 +136,7 @@ function _DoCaretPosToClientPos(
   P: TPoint;
   AWrapInfo: TATSynWrapInfo;
   AStrings: TATStrings;
+  AGaps: TATSynGaps;
   ACharSize: TPoint;
   ATabSize: integer;
   const ARect: TRect;
@@ -144,7 +145,7 @@ function _DoCaretPosToClientPos(
 var
   Item: TATSynWrapItem;
   NIndex1, NIndex2, i: integer;
-  NFromStart: integer;
+  NFromStart, NGapSize: integer;
   Str: atString;
 begin
   Result.X:= -1;
@@ -173,6 +174,15 @@ begin
     Inc(Result.X, (Item.NIndent-AScrollHorz.NPos)*ACharSize.X);
     Result.Y:= (i-AScrollVert.NPos)*ACharSize.Y;
 
+    //consider line gaps
+    NGapSize:= AGaps.SizeForLineRange(
+      AWrapInfo[AScrollVert.NPos].NLineIndex, //index of top line
+      P.Y-1 //index of line before caret
+      );
+    if NGapSize>0 then
+      Inc(Result.Y, NGapSize*ACharSize.Y);
+
+    //coords of corner
     Inc(Result.X, ARect.Left);
     Inc(Result.Y, ARect.Top);
     Exit
@@ -183,6 +193,7 @@ function _DoClientPosToCaretPos(
   P: TPoint;
   AWrapInfo: TATSynWrapInfo;
   AStrings: TATStrings;
+  AGaps: TATSynGaps;
   ACharSize: TPoint;
   ATabSize: integer;
   const ARect: TRect;
@@ -192,6 +203,7 @@ function _DoClientPosToCaretPos(
 var
   NPixels, NIndex: integer;
   Item: TATSynWrapItem;
+  ItemGap: TATSynGapItem;
   Str: atString;
   AllowVirtual: boolean;
 begin
@@ -201,7 +213,33 @@ begin
   if (ACharSize.X<=0) or (ACharSize.Y<=0) then Exit;
 
   P.X:= Max(P.X, ARect.Left);
-  NIndex:= (P.Y-ARect.Top) div ACharSize.Y + AScrollVert.NPos;
+
+  //find index in WrapInfo for P.Y
+  //(because of gaps, cannot use formula)
+  NPixels:= ARect.Top;
+  NIndex:= AScrollVert.NPos;
+  repeat
+    if not AWrapInfo.IsIndexValid(NIndex) then
+      Break;
+
+    if NPixels>P.Y then
+      begin Dec(NIndex); Break; end;
+    if NPixels>=ARect.Bottom then
+      begin NIndex:= MaxInt; Break; end;
+
+    Inc(NPixels, ACharSize.Y);
+
+    //consider gap
+    Item:= AWrapInfo[NIndex];
+    if Item.NFinal=cWrapItemFinal then
+    begin
+      ItemGap:= AGaps.Find(Item.NLineIndex);
+      if Assigned(ItemGap) then
+        Inc(NPixels, ItemGap.Size*ACharSize.Y);
+    end;
+
+    Inc(NIndex);
+  until false;
 
   if NIndex<0 then
   //click above all text
@@ -243,6 +281,7 @@ begin
   Result:= _DoCaretPosToClientPos(P,
     FWrapInfo,
     Strings,
+    Gaps,
     FCharSize,
     FTabSize,
     FRectMain,
@@ -257,6 +296,7 @@ begin
   Result:= _DoClientPosToCaretPos(P,
     FWrapInfo,
     Strings,
+    Gaps,
     FCharSize,
     FTabSize,
     FRectMain,

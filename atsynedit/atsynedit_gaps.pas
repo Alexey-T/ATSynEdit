@@ -15,7 +15,7 @@ type
   TATSynGapItem = class
   public
     LineIndex: integer;
-    Height: integer;
+    Size: integer;
   end;
 
 type
@@ -33,11 +33,15 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATSynGapItem read GetItem; default;
-    procedure Add(ALineIndex, AHeight: integer);
+    function Add(ALineIndex, ASize: integer): boolean;
     function Find(ALineIndex: integer): TATSynGapItem;
+    function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
   end;
 
 implementation
+
+const
+  cMaxGapSize = 30;
 
 { TATSynGaps }
 
@@ -90,14 +94,20 @@ begin
     Result:= nil;
 end;
 
-procedure TATSynGaps.Add(ALineIndex, AHeight: integer);
+function TATSynGaps.Add(ALineIndex, ASize: integer): boolean;
 var
   Item: TATSynGapItem;
 begin
+  Result:= false;
+  if (ALineIndex<0) then exit;
+  if (ASize<1) or (ASize>cMaxGapSize) then exit;
+  if Find(ALineIndex)<>nil then exit;
+
   Item:= TATSynGapItem.Create;
   Item.LineIndex:= ALineIndex;
-  Item.Height:= AHeight;
+  Item.Size:= ASize;
   FList.Add(Item);
+  Result:= true;
 end;
 
 function TATSynGaps.Find(ALineIndex: integer): TATSynGapItem;
@@ -110,6 +120,20 @@ begin
   begin
     Item:= TATSynGapItem(FList[i]);
     if Item.LineIndex=ALineIndex then exit(Item);
+  end;
+end;
+
+function TATSynGaps.SizeForLineRange(ALineFrom, ALineTo: integer): integer;
+var
+  Item: TATSynGapItem;
+  i: integer;
+begin
+  Result:= 0;
+  for i:= ALineFrom to ALineTo do
+  begin
+    Item:= Find(i);
+    if Assigned(Item) then
+      Inc(Result, Item.Size);
   end;
 end;
 

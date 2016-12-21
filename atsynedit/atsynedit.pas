@@ -315,6 +315,7 @@ type
     FCaretAllowNextBlink: boolean;
     FMarkers: TATMarkers;
     FAttribs: TATMarkers;
+    FGaps: TATSynGaps;
     FMarkedRange: TATMarkers;
     FMenuStd,
     FMenuText,
@@ -813,10 +814,15 @@ type
     procedure DoEventScroll; virtual;
     procedure DoEventChange; virtual;
     procedure DoEventState; virtual;
-    //general
+    //lists
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
+    property Carets: TATCarets read FCarets;
+    property Markers: TATMarkers read FMarkers;
+    property Attribs: TATMarkers read FAttribs;
+    property Gaps: TATSynGaps read FGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
+    //common
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property EditorIndex: integer read FEditorIndex write FEditorIndex;
@@ -857,9 +863,6 @@ type
       APosAfter: TPoint; AShiftBelowX: integer = 0);
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;
-    property Carets: TATCarets read FCarets;
-    property Markers: TATMarkers read FMarkers;
-    property Attribs: TATMarkers read FAttribs;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
@@ -1773,6 +1776,7 @@ var
   Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
   StrSize: TSize;
+  ItemGap: TATSynGapItem;
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
   begin
@@ -2115,6 +2119,17 @@ begin
     //end of painting line
     Inc(NCoordTop, ACharSize.Y);
     Inc(NWrapIndex);
+
+    //consider gap
+    if WrapItem.NFinal=cWrapItemFinal then
+    begin
+      ItemGap:= Gaps.Find(NLinesIndex);
+      if Assigned(ItemGap) then
+      begin
+        Inc(NCoordTop, ItemGap.Size*ACharSize.Y);
+        //todo: DoPaintGap, call here
+      end;
+    end;
   until false;
 
   //staples
@@ -2371,6 +2386,7 @@ begin
 
   FMarkers:= TATMarkers.Create;
   FAttribs:= TATMarkers.Create;
+  FGaps:= TATSynGaps.Create;
   FMarkedRange:= TATMarkers.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
 
@@ -2613,6 +2629,7 @@ begin
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
   FreeAndNil(FMarkedRange);
+  FreeAndNil(FGaps);
   FreeAndNil(FMarkers);
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);

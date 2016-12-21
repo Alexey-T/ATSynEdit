@@ -59,6 +59,9 @@ type
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
+    mnuTestGapAdd: TMenuItem;
+    mnuTestGapClear: TMenuItem;
+    MenuItem14: TMenuItem;
     mnuTestMarker: TMenuItem;
     MenuItem5: TMenuItem;
     mnuFileExit: TMenuItem;
@@ -130,6 +133,8 @@ type
     procedure mnuFileSaveClick(Sender: TObject);
     procedure mnuFindClick(Sender: TObject);
     procedure mnuFindNextClick(Sender: TObject);
+    procedure mnuTestGapAddClick(Sender: TObject);
+    procedure mnuTestGapClearClick(Sender: TObject);
     procedure mnuTestSyntaxClick(Sender: TObject);
     procedure TimerHintTimer(Sender: TObject);
     procedure UpdateEnc;
@@ -776,6 +781,33 @@ begin
   ok:= FFinder.DoFindOrReplace(false, false, false, fchanged);
   FinderUpdateEditor(false);
   if not ok then DoFindError;
+end;
+
+procedure TfmMain.mnuTestGapAddClick(Sender: TObject);
+var
+  Vals: array[0..1] of string;
+  NLine, NSize: integer;
+begin
+  Vals[0]:= '2';
+  Vals[1]:= '4';
+  if not InputQuery('Enter gap props',
+    ['Line index (0-base)', 'Gap size (lines)'],
+    Vals) then exit;
+
+  NLine:= StrToInt(Vals[0]);
+  NSize:= StrToInt(Vals[1]);
+  if not ed.Gaps.Add(NLine, NSize) then
+  begin
+    ShowMessage(Format('Not correct line index (%d) or size (%d)', [NLine, NSize]));
+    exit;
+  end;
+  ed.Update;
+end;
+
+procedure TfmMain.mnuTestGapClearClick(Sender: TObject);
+begin
+  ed.Gaps.Clear;
+  ed.Update;
 end;
 
 procedure TfmMain.mnuTestSyntaxClick(Sender: TObject);
