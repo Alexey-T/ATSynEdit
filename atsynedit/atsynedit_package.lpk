@@ -16,7 +16,7 @@
     <Description Value="Multi-line editor control, analog to SynEdit, but with much more features. Supports syntax highlighting using EControl engine."/>
     <License Value="MPL 2.0, LGPL"/>
     <Version Major="1"/>
-    <Files Count="29">
+    <Files Count="30">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -132,6 +132,10 @@
         <Filename Value="atsynedit_adapter_cache.pas"/>
         <UnitName Value="ATSynEdit_Adapter_Cache"/>
       </Item29>
+      <Item30>
+        <Filename Value="atsynedit_gaps.pas"/>
+        <UnitName Value="ATSynEdit_Gaps"/>
+      </Item30>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

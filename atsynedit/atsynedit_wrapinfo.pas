@@ -45,7 +45,7 @@ type
     destructor Destroy; override;
     procedure Clear;
     function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function IsIndexValid(N: integer): boolean; inline;
     function IsItemInitial(N: integer): boolean;
     property Items[N: integer]: TATSynWrapItem read GetItem; default;
     procedure Add(AItem: TATSynWrapItem);
@@ -122,7 +122,7 @@ begin
   Result:= FList.Count;
 end;
 
-function TATSynWrapInfo.IsIndexValid(N: integer): boolean;
+function TATSynWrapInfo.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;

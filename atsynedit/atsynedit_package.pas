@@ -15,7 +15,7 @@ uses
   ATSynEdit_Keymap_Init, ATSynEdit_Ranges, ATSynEdit_WrapInfo, 
   ATSynEdit_Finder, ATStringProc_HtmlColor, ATStrings_Hints, ATSynEdit_Colors, 
   ATSynEdit_Export_HTML, ATSynEdit_Markers, ATSynEdit_RegExpr, 
-  ATSynEdit_Adapter_Cache, LazarusPackageIntf;
+  ATSynEdit_Adapter_Cache, ATSynEdit_Gaps, LazarusPackageIntf;
 
 implementation
 

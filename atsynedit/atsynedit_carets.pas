@@ -63,7 +63,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATCaretItem read GetItem; default;
     procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     procedure Sort;
@@ -235,7 +235,7 @@ begin
   Result:= FList.Count;
 end;
 
-function TATCarets.IsIndexValid(N: integer): boolean;
+function TATCarets.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;

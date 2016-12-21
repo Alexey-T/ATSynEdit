@@ -38,6 +38,7 @@ uses
   ATSynEdit_Gutter,
   ATSynEdit_WrapInfo,
   ATSynEdit_Ranges,
+  ATSynEdit_Gaps,
   ATSynEdit_Adapters,
   ATSynEdit_Adapter_Cache;
 

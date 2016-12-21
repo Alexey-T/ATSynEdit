@@ -42,7 +42,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATMarkerItem read GetItem; default;
     procedure Add(APosX, APosY: integer;
       ATag: integer=0; ALenX: integer=0; ALenY: integer=0;
@@ -75,7 +75,8 @@ var
   i: integer;
 begin
   for i:= FList.Count-1 downto 0 do
-    Delete(i);
+    TObject(FList[i]).Free;
+  FList.Clear;
 end;
 
 procedure TATMarkers.Delete(N: integer);
@@ -98,7 +99,7 @@ begin
   Result:= FList.Count;
 end;
 
-function TATMarkers.IsIndexValid(N: integer): boolean;
+function TATMarkers.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
