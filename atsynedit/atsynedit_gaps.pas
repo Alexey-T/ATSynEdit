@@ -29,10 +29,11 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    procedure Delete(N: integer);
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATSynGapItem read GetItem; default;
+    procedure Delete(N: integer);
+    function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function Add(ALineIndex, ASize: integer): boolean;
     function Find(ALineIndex: integer): TATSynGapItem;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
@@ -67,15 +68,6 @@ begin
   FList.Clear;
 end;
 
-procedure TATSynGaps.Delete(N: integer);
-begin
-  if IsIndexValid(N) then
-  begin
-    Items[N].Free;
-    FList.Delete(N);
-  end;
-end;
-
 function TATSynGaps.Count: integer;
 begin
   Result:= FList.Count;
@@ -88,10 +80,27 @@ end;
 
 function TATSynGaps.GetItem(N: integer): TATSynGapItem;
 begin
-  if IsIndexValid(N) then
-    Result:= TATSynGapItem(FList[N])
-  else
-    Result:= nil;
+  Result:= TATSynGapItem(FList[N]);
+end;
+
+procedure TATSynGaps.Delete(N: integer);
+begin
+  TObject(FList[N]).Free;
+  FList.Delete(N);
+end;
+
+function TATSynGaps.DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
+var
+  Item: TATSynGapItem;
+  i: integer;
+begin
+  Result:= false;
+  for i:= FList.Count-1 downto 0 do
+  begin
+    Item:= TATSynGapItem(FList[i]);
+    if (Item.LineIndex>=ALineFrom) and (Item.LineIndex<=ALineTo) then
+      Delete(i);
+  end;
 end;
 
 function TATSynGaps.Add(ALineIndex, ASize: integer): boolean;
