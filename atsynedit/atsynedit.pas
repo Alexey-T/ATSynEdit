@@ -262,6 +262,7 @@ type
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
+  TATSynEditDrawGapEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATSynGapItem) of object;
   TATSynEditCalcBookmarkColorEvent = procedure(Sender: TObject; ABookmarkKind: integer; out AColor: TColor) of object;
   TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
@@ -352,6 +353,7 @@ type
     FOnClickGutter: TATSynEditClickGutterEvent;
     FOnClickMicromap: TATSynEditClickMicromapEvent;
     FOnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent;
+    FOnDrawGap: TATSynEditDrawGapEvent;
     FOnDrawLine: TATSynEditDrawLineEvent;
     FOnDrawMicromap: TATSynEditDrawRectEvent;
     FOnDrawEditor: TATSynEditDrawRectEvent;
@@ -603,6 +605,7 @@ type
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
     procedure DoPaintMarginsTo(C: TCanvas);
+    procedure DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATSynGapItem);
     procedure DoPaintFoldedMark(C: TCanvas; APos: TPoint; ACoord: TPoint;
       const AMarkText: string);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
@@ -984,6 +987,7 @@ type
     property OnCommandAfter: TATSynEditCommandAfterEvent read FOnCommandAfter write FOnCommandAfter;
     property OnDrawBookmarkIcon: TATSynEditDrawBookmarkEvent read FOnDrawBookmarkIcon write FOnDrawBookmarkIcon;
     property OnDrawLine: TATSynEditDrawLineEvent read FOnDrawLine write FOnDrawLine;
+    property OnDrawGap: TATSynEditDrawGapEvent read FOnDrawGap write FOnDrawGap;
     property OnDrawMicromap: TATSynEditDrawRectEvent read FOnDrawMicromap write FOnDrawMicromap;
     property OnDrawEditor: TATSynEditDrawRectEvent read FOnDrawEditor write FOnDrawEditor;
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
@@ -1763,7 +1767,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   var AScrollHorz, AScrollVert: TATSynScrollInfo;
   ALineFrom: integer);
 var
-  NCoordTop, NCoordSep: integer;
+  NCoordTop, NCoordTopGapped, NCoordSep: integer;
   NWrapIndex, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: real;
@@ -2126,8 +2130,9 @@ begin
       ItemGap:= Gaps.Find(NLinesIndex);
       if Assigned(ItemGap) then
       begin
-        Inc(NCoordTop, ItemGap.Size*ACharSize.Y);
-        //todo: DoPaintGap, call here
+        NCoordTopGapped:= NCoordTop + ItemGap.Size*ACharSize.Y;
+        DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTopGapped), ItemGap);
+        NCoordTop:= NCoordTopGapped;
       end;
     end;
   until false;
@@ -2219,6 +2224,12 @@ begin
     C.Brush.Color:= clCream;
     C.FillRect(FRectMicromap);
   end;
+end;
+
+procedure TATSynEdit.DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATSynGapItem);
+begin
+  if Assigned(FOnDrawGap) then
+    FOnDrawGap(Self, C, ARect, AGap);
 end;
 
 procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);

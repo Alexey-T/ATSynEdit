@@ -12,6 +12,7 @@ uses
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATSynEdit_Carets,
+  ATSynEdit_Gaps,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
   formkey,
@@ -199,6 +200,7 @@ type
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
+    procedure EditDrawGap(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATSynGapItem);
     procedure FinderFound(Sender: TObject; APos1, APos2: TPoint);
     procedure FinderUpdateEditor(AUpdateText: boolean);
     procedure MenuEncClick(Sender: TObject);
@@ -266,6 +268,7 @@ begin
   ed.OnDrawBookmarkIcon:= @EditDrawBm;
   ed.OnDrawLine:= @EditDrawLine;
   ed.OnDrawMicromap:= @EditDrawMicromap;
+  ed.OnDrawGap:= @EditDrawGap;
 
   ed.SetFocus;
 
@@ -499,6 +502,19 @@ begin
   C.Pen.Color:= clred;
   C.Brush.Style:= bsClear;
   C.Rectangle(ARect);
+end;
+
+procedure TfmMain.EditDrawGap(Sender: TObject; C: TCanvas; const ARect: TRect;
+  AGap: TATSynGapItem);
+var
+  R: TRect;
+begin
+  R:= ARect;
+  InflateRect(R, -2, -1);
+  C.Brush.Color:= clCream;
+  C.FillRect(R);
+  C.Font.Color:= clGray;
+  C.TextOut(R.Left+20, R.Top+1, 'gap for line '+IntToStr(AGap.LineIndex+1));
 end;
 
 procedure TfmMain.mnuFileOpenClick(Sender: TObject);
@@ -791,12 +807,12 @@ begin
   Vals[0]:= '2';
   Vals[1]:= '4';
   if not InputQuery('Enter gap props',
-    ['Line index (0-base)', 'Gap size (lines)'],
+    ['Line number', 'Gap size (cells)'],
     Vals) then exit;
 
   NLine:= StrToInt(Vals[0]);
   NSize:= StrToInt(Vals[1]);
-  if not ed.Gaps.Add(NLine, NSize) then
+  if not ed.Gaps.Add(NLine-1, NSize) then
   begin
     ShowMessage(Format('Not correct line index (%d) or size (%d)', [NLine, NSize]));
     exit;
