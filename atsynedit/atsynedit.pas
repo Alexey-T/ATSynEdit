@@ -539,6 +539,8 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
+    procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
+    procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
     procedure DoSelectionDeleteColumnBlock;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
@@ -874,7 +876,7 @@ type
       AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
-    procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
+    procedure DoGotoPos(ACaretPos: TPoint; AIndentHorz, AIndentVert: integer);
     procedure DoGotoPos_AndUnfold(const APos, APosEnd: TPoint; AIndentHorz,
       AIndentVert: integer);
     procedure DoGotoCaret(AEdge: TATCaretEdge);

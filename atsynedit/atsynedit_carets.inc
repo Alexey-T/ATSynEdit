@@ -384,51 +384,87 @@ begin
   Update;
 end;
 
-procedure TATSynEdit.DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
+
+procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
+begin
+  FScrollVert.NPos:= Max(0, AWrapInfoIndex-AIndentVert);
+end;
+
+procedure TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
+//index: original vert scroll pos
+//do dec(index), until offset (pixels) from caret to bottom is small enough
 var
-  NIndex, NVisLines, NChars: integer;
+  NPixels, NPixelsNeeded, NIndex: integer;
+  ItemGap: TATSynGapItem;
+  i: integer;
+begin
+  NPixels:= (FRectMain.Bottom-FRectMain.Top) - FCharSize.Y;
+  NPixelsNeeded:= AIndentVert*FCharSize.Y;
+  NIndex:= AWrapInfoIndex;
+  for i:= 1 to GetVisibleLines do
+  begin
+    Dec(NIndex);
+    if NIndex<=0 then Exit;
+
+    Dec(NPixels, FCharSize.Y);
+    ItemGap:= Gaps.Find(FWrapInfo.Items[NIndex].NLineIndex);
+    if Assigned(ItemGap) then
+      Dec(NPixels, ItemGap.Size);
+
+    if NPixels<=NPixelsNeeded then
+    begin
+      FScrollVert.NPos:= NIndex;
+      Exit;
+    end;
+  end;
+end;
+
+procedure TATSynEdit.DoGotoPos(ACaretPos: TPoint; AIndentHorz, AIndentVert: integer);
+var
+  NIndex, NChars: integer;
+  Coord: TPoint;
   bScrolled: boolean;
 begin
-  if IsPosFolded(APnt.X, APnt.Y) then Exit;
-  NIndex:= FWrapInfo.FindIndexOfCaretPos(APnt);
-  if NIndex<0 then Exit;
-
+  if IsPosFolded(ACaretPos.X, ACaretPos.Y) then Exit;
   bScrolled:= false;
-  NVisLines:= GetVisibleLines;
+  Coord:= CaretPosToClientPos(ACaretPos);
 
   //for y
-  //negative AIndentVert: indent always from top
-  //positive: from top (goto up) or bottom (goto down)
-  if (NIndex<FScrollVert.NPos) then
+  //  vert indent <0: always indent from top;
+  //             >=0: indent from top (goto up) or bottom (goto down)
+  if Coord.Y<FRectMain.Top then
   begin
-    FScrollVert.NPos:= Max(0, NIndex-Abs(AIndentVert));
+    NIndex:= FWrapInfo.FindIndexOfCaretPos(ACaretPos);
+    if NIndex<0 then Exit;
+    DoScroll_IndentFromTop(NIndex, Abs(AIndentVert));
     UpdateScrollbars;
     bScrolled:= true;
   end
   else
-  if (NIndex>FScrollVert.NPos+NVisLines-1) then
+  if Coord.Y>=FRectMain.Bottom then
   begin
+    NIndex:= FWrapInfo.FindIndexOfCaretPos(ACaretPos);
+    if NIndex<0 then Exit;
     if AIndentVert<0 then
-      FScrollVert.NPos:= Max(0, NIndex-Abs(AIndentVert))
+      DoScroll_IndentFromTop(NIndex, Abs(AIndentVert))
     else
-      FScrollVert.NPos:= Max(0, NIndex-NVisLines+1+Abs(AIndentVert));
+      DoScroll_IndentFromBottom(NIndex, Abs(AIndentVert));
     UpdateScrollbars;
     bScrolled:= true;
   end;
 
   //for x
-  APnt:= CaretPosToClientPos(APnt);
-  if APnt.X<FRectMain.Left then
+  if Coord.X<FRectMain.Left then
   begin
-    NChars:= (FRectMain.Left-APnt.X) div FCharSize.X + 1 + AIndentHorz;
+    NChars:= (FRectMain.Left-Coord.X) div FCharSize.X + 1 + AIndentHorz;
     FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
     UpdateScrollbars;
     bScrolled:= true;
   end
   else
-  if APnt.X>FRectMain.Right-FCharSize.X then
+  if Coord.X>FRectMain.Right-FCharSize.X then
   begin
-    NChars:= (APnt.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
+    NChars:= (Coord.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
     Inc(FScrollHorz.NPos, NChars);
     UpdateScrollbars;
     bScrolled:= true;

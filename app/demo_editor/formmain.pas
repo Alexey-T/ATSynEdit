@@ -555,18 +555,21 @@ begin
 end;
 
 procedure TfmMain.bGotoClick(Sender: TObject);
+const
+  NIndentHorz=5;
+  NIndentVert=5;
 var
   s: string;
   n: integer;
 begin
-  s:= Inttostr(ed.LineTop+1);
+  s:= IntToStr(ed.LineTop+1);
   if not InputQuery('Go to', 'Line:', s) then Exit;
   if s='' then Exit;
   n:= StrToIntDef(s, 0)-1;
   if (n>=0) and (n<ed.Strings.Count) then
-    ed.DoGotoPos_AndUnfold(Point(0, n), Point(-1, -1), 5, 5)
+    ed.DoGotoPos_AndUnfold(Point(0, n), Point(-1, -1), NIndentHorz, NIndentVert)
   else
-    Showmessage('Incorrect line index: '+s);
+    ShowMessage('Incorrect line index: '+s);
 end;
 
 procedure TfmMain.btnMarkerClick(Sender: TObject);
@@ -806,7 +809,7 @@ var
 begin
   Vals[0]:= '2';
   Vals[1]:= '60';
-  if not InputQuery('Enter gap props',
+  if not InputQuery('Add gap (sets last_line_on_top)',
     ['Line number', 'Gap size (pixels)'],
     Vals) then exit;
 
@@ -817,6 +820,8 @@ begin
     ShowMessage(Format('Not correct line index (%d) or size (%d)', [NLine, NSize]));
     exit;
   end;
+
+  ed.OptLastLineOnTop:= true;
   ed.Update;
 end;
 
