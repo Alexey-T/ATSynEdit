@@ -42,7 +42,8 @@ type
 implementation
 
 const
-  cMaxGapSize = 600;
+  cMinGapSize = 10;
+  cMaxGapSize = 500;
 
 { TATSynGaps }
 
@@ -112,7 +113,7 @@ var
 begin
   Result:= false;
   if (ALineIndex<0) then exit;
-  if (ASize<1) or (ASize>cMaxGapSize) then exit;
+  if (ASize<cMinGapSize) or (ASize>cMaxGapSize) then exit;
   if Find(ALineIndex)<>nil then exit;
 
   Item:= TATSynGapItem.Create;
