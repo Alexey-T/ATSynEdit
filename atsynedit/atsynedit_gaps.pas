@@ -99,7 +99,10 @@ begin
   begin
     Item:= Items[i];
     if (Item.LineIndex>=ALineFrom) and (Item.LineIndex<=ALineTo) then
+    begin
       Delete(i);
+      Result:= true;
+    end;
   end;
 end;
 
@@ -138,10 +141,10 @@ var
   i: integer;
 begin
   Result:= 0;
-  for i:= ALineFrom to ALineTo do
+  for i:= 0 to FList.Count-1 do
   begin
-    Item:= Find(i);
-    if Assigned(Item) then
+    Item:= Items[i];
+    if (Item.LineIndex>=ALineFrom) and (Item.LineIndex<=ALineTo) then
       Inc(Result, Item.Size);
   end;
 end;

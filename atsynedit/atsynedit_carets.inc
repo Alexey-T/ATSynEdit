@@ -174,13 +174,11 @@ begin
     Inc(Result.X, (Item.NIndent-AScrollHorz.NPos)*ACharSize.X);
     Result.Y:= (i-AScrollVert.NPos)*ACharSize.Y;
 
-    //consider line gaps
-    NGapSize:= AGaps.SizeForLineRange(
+    //consider gaps
+    Inc(Result.Y, AGaps.SizeForLineRange(
       AWrapInfo[AScrollVert.NPos].NLineIndex, //index of top line
       P.Y-1 //index of line before caret
-      );
-    if NGapSize>0 then
-      Inc(Result.Y, NGapSize*ACharSize.Y);
+      ));
 
     //coords of corner
     Inc(Result.X, ARect.Left);
