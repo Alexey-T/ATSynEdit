@@ -191,6 +191,7 @@ begin
   end;
 end;
 
+
 function _DoClientPosToCaretPos(
   P: TPoint;
   AWrapInfo: TATSynWrapInfo;
@@ -201,14 +202,15 @@ function _DoClientPosToCaretPos(
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   AVirtualPos: boolean;
-  out AWrappedEnd: boolean): TPoint;
+  out AWrappedEnd: boolean;
+  AGapCoordAction: TATGapCoordAction): TPoint;
 var
   NIndex: integer;
   NPixels: integer;
   Item: TATSynWrapItem;
   ItemGap: TATSynGapItem;
   Str: atString;
-  AllowVirtual, bClickedGap: boolean;
+  AllowVirtual, bGapGoesToEnd: boolean;
 begin
   Result.X:= 0;
   Result.Y:= -1;
@@ -222,7 +224,7 @@ begin
   //find index in WrapInfo for P.Y
   NPixels:= ARect.Top;
   NIndex:= AScrollVert.NPos;
-  bClickedGap:= false;
+  bGapGoesToEnd:= false;
 
   repeat
     if not AWrapInfo.IsIndexValid(NIndex) then
@@ -238,10 +240,21 @@ begin
       ItemGap:= AGaps.Find(Item.NLineIndex);
       if Assigned(ItemGap) then
         Inc(NPixels, ItemGap.Size);
-    end;
 
-    if NPixels>P.Y then
-      begin bClickedGap:= true; Break; end;
+      if NPixels>P.Y then
+      begin
+        case AGapCoordAction of
+          cGapCoordToLineEnd:
+            bGapGoesToEnd:= true;
+          cGapCoordMoveDown:
+            begin
+              if AWrapInfo.IsIndexValid(NIndex+1) then
+                Inc(NIndex);
+            end;
+        end;
+        Break;
+      end;
+    end;
 
     if NPixels>=ARect.Bottom then
       begin NIndex:= MaxInt; Break; end;
@@ -275,7 +288,7 @@ begin
 
     Str:= Copy(AStrings.Lines[Result.Y], Item.NCharIndex, Item.NLength);
 
-    if bClickedGap then
+    if bGapGoesToEnd then
       Result.X:= Length(Str) + Item.NCharIndex-1
     else
     begin
@@ -304,7 +317,9 @@ begin
     );
 end;
 
-function TATSynEdit.ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;
+function TATSynEdit.ClientPosToCaretPos(P: TPoint;
+  out AEndOfLinePos: boolean;
+  AGapCoordAction: TATGapCoordAction = cGapCoordToLineEnd): TPoint;
 begin
   Result:= _DoClientPosToCaretPos(P,
     FWrapInfo,
@@ -316,7 +331,8 @@ begin
     FScrollHorz,
     FScrollVert,
     FCaretVirtual,
-    AEndOfLinePos);
+    AEndOfLinePos,
+    AGapCoordAction);
 end;
 
 procedure TATSynEdit.SetCaretShapeIns(AValue: TATSynCaretShape);

@@ -81,6 +81,12 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
+  TATGapCoordAction = (
+    cGapCoordIgnore,
+    cGapCoordToLineEnd,
+    cGapCoordMoveDown
+    );
+
   TATGutterIconsKind = (
     cGutterIconsPlusMinus,
     cGutterIconsTriangles
@@ -865,7 +871,8 @@ type
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
     function CaretPosToClientPos(P: TPoint): TPoint;
-    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint;
+    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean;
+      AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
     procedure DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);

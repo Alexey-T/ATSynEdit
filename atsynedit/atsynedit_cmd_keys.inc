@@ -185,8 +185,11 @@ function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer)
 var
   Caret: TATCaretItem;
   Pnt: TPoint;
-  i: integer;
   EolPos: boolean;
+  i: integer;
+const
+  cGapActions: array[boolean] of TATGapCoordAction =
+    (cGapCoordIgnore, cGapCoordMoveDown);
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -204,7 +207,7 @@ begin
       Pnt.X:= Caret.CoordColumn;
 
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne(ADown);
-    Pnt:= ClientPosToCaretPos(Pnt, EolPos);
+    Pnt:= ClientPosToCaretPos(Pnt, EolPos, cGapActions[ADown]);
     if Pnt.Y<0 then Continue;
 
     if EolPos and (Pnt.X>0) then
