@@ -391,12 +391,14 @@ var
 begin
   if IsPosFolded(APnt.X, APnt.Y) then Exit;
   NIndex:= FWrapInfo.FindIndexOfCaretPos(APnt);
+  if NIndex<0 then Exit;
+
   bScrolled:= false;
+  NVisLines:= GetVisibleLines;
 
   //for y
   //negative AIndentVert: indent always from top
   //positive: from top (goto up) or bottom (goto down)
-  NVisLines:= GetVisibleLines;
   if (NIndex<FScrollVert.NPos) then
   begin
     FScrollVert.NPos:= Max(0, NIndex-Abs(AIndentVert));
