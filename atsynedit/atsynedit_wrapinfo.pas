@@ -13,10 +13,15 @@ uses
   Classes, SysUtils;
 
 type
-  TATSynWrapFinal = (cWrapItemFinal, cWrapItemCollapsed, cWrapItemMiddle);
+  TATSynWrapFinal = (
+    cWrapItemFinal,
+    cWrapItemCollapsed,
+    cWrapItemMiddle
+    );
 
 type
   { TATSynWrapItem }
+
   TATSynWrapItem = packed class
   public
     NLineIndex,
@@ -25,7 +30,7 @@ type
     NIndent: word;
     NFinal: TATSynWrapFinal;
     constructor Create(ALineIndex, ACharIndex, ALength: integer;
-      AIndent: word; AFinal: TATSynWrapFinal); virtual;
+      AIndent: word; AFinal: TATSynWrapFinal);
     procedure Assign(Item: TATSynWrapItem);
   end;
 
@@ -88,10 +93,7 @@ end;
 
 function TATSynWrapInfo.GetItem(N: integer): TATSynWrapItem;
 begin
-  if IsIndexValid(N) then
-    Result:= TATSynWrapItem(FList[N])
-  else
-    Result:= nil;
+  Result:= TATSynWrapItem(FList[N]);
 end;
 
 constructor TATSynWrapInfo.Create;
@@ -111,9 +113,7 @@ var
   i: integer;
 begin
   for i:= FList.Count-1 downto 0 do
-  begin
     TObject(FList[i]).Free;
-  end;
   FList.Clear;
 end;
 
@@ -129,15 +129,9 @@ end;
 
 function TATSynWrapInfo.IsItemInitial(N: integer): boolean;
 begin
-  if IsIndexValid(N) then
-  begin
-    if N=0 then
-      Result:= true
-    else
-      Result:= Items[N].NLineIndex<>Items[N-1].NLineIndex;
-  end
-  else
-    Result:= true;
+  Result:= true;
+  if (N>0) and (N<FList.Count) then //cant use IsIndexValid, N>0
+    Result:= Items[N].NLineIndex<>Items[N-1].NLineIndex;
 end;
 
 procedure TATSynWrapInfo.Add(AItem: TATSynWrapItem);
@@ -147,8 +141,7 @@ end;
 
 procedure TATSynWrapInfo.Delete(N: integer);
 begin
-  if IsIndexValid(N) then
-    FList.Delete(N);
+  FList.Delete(N);
 end;
 
 procedure TATSynWrapInfo.Insert(N: integer; AItem: TATSynWrapItem);

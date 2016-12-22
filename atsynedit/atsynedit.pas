@@ -2327,12 +2327,12 @@ end;
 
 function TATSynEdit.GetLineTop: integer;
 var
-  Item: TATSynWrapItem;
+  N: integer;
 begin
   Result:= 0;
-  Item:= FWrapInfo.Items[FScrollVert.NPos];
-  if Assigned(Item) then
-    Result:= Item.NLineIndex;
+  N:= FScrollVert.NPos;
+  if FWrapInfo.IsIndexValid(N) then
+    Result:= FWrapInfo.Items[N].NLineIndex;
 end;
 
 function TATSynEdit.GetColumnLeft: integer;

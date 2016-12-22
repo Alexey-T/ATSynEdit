@@ -144,9 +144,9 @@ function _DoCaretPosToClientPos(
   APreferLeftSide: boolean): TPoint;
 var
   Item: TATSynWrapItem;
-  NIndex1, NIndex2, i: integer;
-  NFromStart: integer;
+  NIndex1, NIndex2, NLineIndexTop, NFromStart: integer;
   Str: atString;
+  i: integer;
 begin
   Result.X:= -1;
   Result.Y:= -1;
@@ -175,10 +175,14 @@ begin
     Result.Y:= (i-AScrollVert.NPos)*ACharSize.Y;
 
     //consider gaps
-    Inc(Result.Y, AGaps.SizeForLineRange(
-      AWrapInfo[AScrollVert.NPos].NLineIndex, //index of top line
-      P.Y-1 //index of line before caret
-      ));
+    if AWrapInfo.IsIndexValid(AScrollVert.NPos) then
+    begin
+      NLineIndexTop:= AWrapInfo[AScrollVert.NPos].NLineIndex;
+      Inc(Result.Y, AGaps.SizeForLineRange(
+        NLineIndexTop, //index of top line
+        P.Y-1 //index of line before caret
+        ));
+    end;
 
     //coords of corner
     Inc(Result.X, ARect.Left);
