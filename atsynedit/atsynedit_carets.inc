@@ -387,9 +387,11 @@ end;
 procedure TATSynEdit.DoGotoPos(APnt: TPoint; AIndentHorz, AIndentVert: integer);
 var
   NIndex, NVisLines, NChars: integer;
+  bScrolled: boolean;
 begin
   if IsPosFolded(APnt.X, APnt.Y) then Exit;
   NIndex:= FWrapInfo.FindIndexOfCaretPos(APnt);
+  bScrolled:= false;
 
   //for y
   //negative AIndentVert: indent always from top
@@ -399,6 +401,7 @@ begin
   begin
     FScrollVert.NPos:= Max(0, NIndex-Abs(AIndentVert));
     UpdateScrollbars;
+    bScrolled:= true;
   end
   else
   if (NIndex>FScrollVert.NPos+NVisLines-1) then
@@ -408,6 +411,7 @@ begin
     else
       FScrollVert.NPos:= Max(0, NIndex-NVisLines+1+Abs(AIndentVert));
     UpdateScrollbars;
+    bScrolled:= true;
   end;
 
   //for x
@@ -417,6 +421,7 @@ begin
     NChars:= (FRectMain.Left-APnt.X) div FCharSize.X + 1 + AIndentHorz;
     FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
     UpdateScrollbars;
+    bScrolled:= true;
   end
   else
   if APnt.X>FRectMain.Right-FCharSize.X then
@@ -424,9 +429,11 @@ begin
     NChars:= (APnt.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
     Inc(FScrollHorz.NPos, NChars);
     UpdateScrollbars;
+    bScrolled:= true;
   end;
 
-  UpdateCaretsCoords();
+  if bScrolled then
+    UpdateCaretsCoords;
 end;
 
 procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge);
