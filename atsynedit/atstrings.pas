@@ -15,7 +15,8 @@ uses
   ATStringProc,
   ATStringProc_Utf8Detect,
   ATStrings_Undo,
-  ATStrings_Hints;
+  ATStrings_Hints,
+  ATSynEdit_Gaps;
 
 const
   //set it to number of editors, which share same Strings obj
@@ -99,6 +100,7 @@ type
     FList: TList;
     FListUpdates: TList;
     FListUpdatesHard: boolean;
+    FGaps: TATSynGaps;
     FHintList: TATHintList;
     FUndoList,
     FRedoList: TATUndoList;
@@ -211,6 +213,7 @@ type
     property ProgressValue: integer read FProgressValue write FProgressValue;
     property ProgressMinSize: integer read FProgressMinSize write FProgressMinSize;
     property ProgressMinIncrement: integer read FProgressMinIncrement write FProgressMinIncrement;
+    property Gaps: TATSynGaps read FGaps;
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
@@ -568,6 +571,7 @@ begin
   FUndoList:= TATUndoList.Create;
   FRedoList:= TATUndoList.Create;
   FHintList:= TATHintList.Create;
+  FGaps:= TATSynGaps.Create;
 
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
@@ -606,7 +610,7 @@ begin
 
   Clear;
   FreeAndNil(FList);
-
+  FreeAndNil(FGaps);
   FreeAndNil(FListUpdates);
   FreeAndNil(FUndoList);
   FreeAndNil(FRedoList);

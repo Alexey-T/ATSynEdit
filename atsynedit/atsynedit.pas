@@ -21,7 +21,7 @@ interface
 
 uses
   {$ifdef Windows}
-  windows, imm, messages,
+  Windows, Imm, Messages,
   {$endif}
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms,
@@ -322,7 +322,6 @@ type
     FCaretAllowNextBlink: boolean;
     FMarkers: TATMarkers;
     FAttribs: TATMarkers;
-    FGaps: TATSynGaps;
     FMarkedRange: TATMarkers;
     FMenuStd,
     FMenuText,
@@ -546,6 +545,7 @@ type
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;
+    function GetGaps: TATSynGaps;
     function GetMinimapActualHeight: integer;
     function GetMinimapSelTop: integer;
     function GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
@@ -830,7 +830,7 @@ type
     property Carets: TATCarets read FCarets;
     property Markers: TATMarkers read FMarkers;
     property Attribs: TATMarkers read FAttribs;
-    property Gaps: TATSynGaps read FGaps;
+    property Gaps: TATSynGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     //common
     property Modified: boolean read GetModified write SetModified;
@@ -2405,7 +2405,6 @@ begin
 
   FMarkers:= TATMarkers.Create;
   FAttribs:= TATMarkers.Create;
-  FGaps:= TATSynGaps.Create;
   FMarkedRange:= TATMarkers.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
 
@@ -2648,7 +2647,6 @@ begin
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
   FreeAndNil(FMarkedRange);
-  FreeAndNil(FGaps);
   FreeAndNil(FMarkers);
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
@@ -4768,6 +4766,11 @@ begin
     Result:= Colors.TextFont
   else
     Result:= Colors.TextDisabledFont;
+end;
+
+function TATSynEdit.GetGaps: TATSynGaps;
+begin
+  Result:= Strings.Gaps;
 end;
 
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
