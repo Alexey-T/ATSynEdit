@@ -97,7 +97,7 @@ begin
   Result:= false;
   for i:= FList.Count-1 downto 0 do
   begin
-    Item:= TATSynGapItem(FList[i]);
+    Item:= Items[i];
     if (Item.LineIndex>=ALineFrom) and (Item.LineIndex<=ALineTo) then
       Delete(i);
   end;
@@ -127,7 +127,7 @@ begin
   Result:= nil;
   for i:= 0 to FList.Count-1 do
   begin
-    Item:= TATSynGapItem(FList[i]);
+    Item:= Items[i];
     if Item.LineIndex=ALineIndex then exit(Item);
   end;
 end;
