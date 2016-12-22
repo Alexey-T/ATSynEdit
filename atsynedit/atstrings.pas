@@ -35,6 +35,13 @@ type
     cLineStateSaved
     );
 
+  TATLineChangeKind = (
+    cLineChangeEdited,
+    cLineChangeAdded,
+    cLineChangeDeleted,
+    cLineChangeDeletedAll
+    );
+
   TATLineSeparator = (
     cLineSepNone,
     cLineSepTop,
@@ -82,6 +89,7 @@ type
   TATStringsGetCarets = function: TATPointArray of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
   TATStringsLogEvent = procedure(Sender: TObject; ALine, ALen: integer) of object;
+  TATStringsChangeEvent = procedure(Sender: TObject; ALine: integer; AChange: TATLineChangeKind) of object;
 
 type
   { TATStrings }
@@ -116,12 +124,14 @@ type
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnProgress: TNotifyEvent;
     FOnLog: TATStringsLogEvent;
+    FOnChange: TATStringsChangeEvent;
     FSavedCaretsArray: TATPointArray;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
     function DoCheckFilled: boolean;
     procedure DoEventLog(ALine, ALen: integer);
+    procedure DoEventChange(ALine: integer; AChange: TATLineChangeKind);
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
@@ -244,12 +254,13 @@ type
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
     procedure DoClearUndo(ALocked: boolean = false);
-    //
+    //misc
     procedure DoSaveLastEditPos;
     procedure DoGotoLastEditPos;
-    //misc
+    //events
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
+    property OnChange: TATStringsChangeEvent read FOnChange write FOnChange;
   end;
 
 
@@ -415,9 +426,11 @@ begin
 
   Item:= TATStringItem(FList[Index]);
   Str:= UTF8Decode(Item.ItemString);
+
   DoAddUndo(cEditActionChange, Index, Str, Item.ItemEnd);
   DoEventLog(Index, -Length(Str));
   DoEventLog(Index, Length(AValue));
+  DoEventChange(Index, cLineChangeEdited);
 
   Item.ItemString:= UTF8Encode(AValue);
 
@@ -655,6 +668,7 @@ begin
 
   DoAddUndo(cEditActionInsert, Count, '', cEndNone);
   DoEventLog(Count, Length(AString));
+  DoEventChange(Count, cLineChangeAdded);
 
   Item:= TATStringItem.Create_Uni(AString, AEnd);
   FList.Add(Item);
@@ -707,6 +721,7 @@ begin
 
   DoAddUndo(cEditActionInsert, N, '', cEndNone);
   DoEventLog(N, Length(AString));
+  DoEventChange(N, cLineChangeAdded);
 
   Item:= TATStringItem.Create_Uni(AString, AEnd);
   FList.Insert(N, Item);
@@ -754,6 +769,7 @@ begin
     begin
       DoAddUndo(cEditActionInsert, N+i, '', cEndNone);
       DoEventLog(N+i, AList.LinesLen[i]);
+      DoEventChange(N+i, cLineChangeAdded);
 
       FList[N+i]:= TATStringItem.Create_UTF8(
         TATStringItem(AList.FList[i]).ItemString,
@@ -798,6 +814,7 @@ begin
 
     DoAddUndo(cEditActionDelete, N, Str, Item.ItemEnd);
     DoEventLog(N, -Length(Str));
+    DoEventChange(N, cLineChangeDeleted);
 
     Item.Free;
     FList.Delete(N);
@@ -815,6 +832,7 @@ var
 begin
   DoClearUndo(FUndoList.Locked);
   DoEventLog(-1, 0);
+  DoEventChange(-1, cLineChangeDeletedAll);
 
   for i:= Count-1 downto 0 do
     TObject(FList[i]).Free;
@@ -1275,6 +1293,12 @@ procedure TATStrings.DoEventLog(ALine, ALen: integer);
 begin
   if Assigned(FOnLog) then
     FOnLog(Self, ALine, ALen);
+end;
+
+procedure TATStrings.DoEventChange(ALine: integer; AChange: TATLineChangeKind);
+begin
+  if Assigned(FOnChange) then
+    FOnChange(Self, ALine, AChange);
 end;
 
 procedure TATStrings.ClearSeparators;
