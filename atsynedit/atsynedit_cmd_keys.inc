@@ -242,15 +242,8 @@ begin
 end;
 
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;
-var
-  NLine: integer;
 begin
-  if FWrapInfo.Count>0 then
-  begin
-    NLine:= FWrapInfo[0].NLineIndex;
-    DoCaretSingle(0, NLine, false);
-  end;
-
+  DoCaretSingle(0, 0, false);
   FScrollHorz.NPos:= 0;
   FScrollVert.NPos:= 0;
 
