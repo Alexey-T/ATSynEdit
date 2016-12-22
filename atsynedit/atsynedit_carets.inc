@@ -145,7 +145,7 @@ function _DoCaretPosToClientPos(
 var
   Item: TATSynWrapItem;
   NIndex1, NIndex2, i: integer;
-  NFromStart, NGapSize: integer;
+  NFromStart: integer;
   Str: atString;
 begin
   Result.X:= -1;

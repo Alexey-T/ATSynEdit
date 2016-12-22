@@ -2124,8 +2124,8 @@ begin
     Inc(NCoordTop, ACharSize.Y);
     Inc(NWrapIndex);
 
-    //consider gap
-    if WrapItem.NFinal=cWrapItemFinal then
+    //consider gap (not for minimap)
+    if AMainText and (WrapItem.NFinal=cWrapItemFinal) then
     begin
       ItemGap:= Gaps.Find(NLinesIndex);
       if Assigned(ItemGap) then
