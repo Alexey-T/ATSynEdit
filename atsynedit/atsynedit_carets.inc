@@ -205,8 +205,7 @@ function _DoClientPosToCaretPos(
   out AWrappedEnd: boolean;
   AGapCoordAction: TATGapCoordAction): TPoint;
 var
-  NIndex: integer;
-  NPixels: integer;
+  NIndex, NIndexDecrement, NPixels: integer;
   Item: TATSynWrapItem;
   ItemGap: TATSynGapItem;
   Str: atString;
@@ -216,15 +215,24 @@ begin
   Result.Y:= -1;
   AWrappedEnd:= false;
 
-  if P.Y<ARect.Top then Exit;
   if (ACharSize.X<=0) or (ACharSize.Y<=0) then Exit;
-
   P.X:= Max(P.X, ARect.Left);
 
   //find index in WrapInfo for P.Y
   NPixels:= ARect.Top;
   NIndex:= AScrollVert.NPos;
   bGapGoesToEnd:= false;
+
+  //allow to work for arrow-up/ page-up, if caret at top
+  if P.Y<ARect.Top then
+    if AWrapInfo.IsIndexValid(NIndex) then
+    begin
+      //start later loop, but from decremented NIndex
+      //todo: this not correct if upper (not visible) lines have gaps...
+      NIndexDecrement:= Min((ARect.Top-P.Y) div ACharSize.Y + 1, NIndex);
+      Dec(NIndex, NIndexDecrement);
+      Dec(NPixels, NIndexDecrement*ACharSize.Y);
+    end;
 
   repeat
     if not AWrapInfo.IsIndexValid(NIndex) then
@@ -255,9 +263,6 @@ begin
         Break;
       end;
     end;
-
-    if NPixels>=ARect.Bottom then
-      begin NIndex:= MaxInt; Break; end;
 
     Inc(NIndex);
   until false;
