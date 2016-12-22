@@ -654,7 +654,6 @@ type
     function GetLineTop: integer;
     function GetColumnLeft: integer;
     function GetTextForClipboard: string;
-    function GetWrapInfoIndex(AMousePos: TPoint): integer;
     function GetStrings: TATStrings;
     function GetMouseNiceScroll: boolean;
     procedure SetCaretShapeRO(AValue: TATSynCaretShape);
@@ -4037,16 +4036,6 @@ begin
   Result:= FTimerBlink.Interval;
 end;
 
-function TATSynEdit.GetWrapInfoIndex(AMousePos: TPoint): integer;
-var
-  NPixels: integer;
-begin
-  Result:= -1;
-  NPixels:= AMousePos.Y - FRectMain.Top;
-  Result:= FScrollVert.NPos + NPixels div FCharSize.Y;
-  if not FWrapInfo.IsIndexValid(Result) then
-    Result:= -1;
-end;
 
 procedure TATSynEdit.DoEventCarets;
 begin
