@@ -203,33 +203,33 @@ function _DoClientPosToCaretPos(
   AVirtualPos: boolean;
   out AWrappedEnd: boolean): TPoint;
 var
-  NPixels, NIndex: integer;
+  NIndex: integer;
+  NPixels: integer;
   Item: TATSynWrapItem;
   ItemGap: TATSynGapItem;
   Str: atString;
-  AllowVirtual: boolean;
+  AllowVirtual, bClickedGap: boolean;
 begin
-  AWrappedEnd:= false;
   Result.X:= 0;
   Result.Y:= -1;
+  AWrappedEnd:= false;
+
+  if P.Y<ARect.Top then Exit;
   if (ACharSize.X<=0) or (ACharSize.Y<=0) then Exit;
 
   P.X:= Max(P.X, ARect.Left);
 
   //find index in WrapInfo for P.Y
-  //(because of gaps, cannot use formula)
   NPixels:= ARect.Top;
   NIndex:= AScrollVert.NPos;
+  bClickedGap:= false;
+
   repeat
     if not AWrapInfo.IsIndexValid(NIndex) then
       Break;
 
-    if NPixels>P.Y then
-      begin Dec(NIndex); Break; end;
-    if NPixels>=ARect.Bottom then
-      begin NIndex:= MaxInt; Break; end;
-
     Inc(NPixels, ACharSize.Y);
+    if NPixels>P.Y then Break;
 
     //consider gap
     Item:= AWrapInfo[NIndex];
@@ -239,6 +239,12 @@ begin
       if Assigned(ItemGap) then
         Inc(NPixels, ItemGap.Size);
     end;
+
+    if NPixels>P.Y then
+      begin bClickedGap:= true; Break; end;
+
+    if NPixels>=ARect.Bottom then
+      begin NIndex:= MaxInt; Break; end;
 
     Inc(NIndex);
   until false;
@@ -269,9 +275,14 @@ begin
 
     Str:= Copy(AStrings.Lines[Result.Y], Item.NCharIndex, Item.NLength);
 
-    AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
-    NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
-    Result.X:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize, AllowVirtual, AWrappedEnd) + Item.NCharIndex - 2;
+    if bClickedGap then
+      Result.X:= Length(Str) + Item.NCharIndex-1
+    else
+    begin
+      AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
+      NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
+      Result.X:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize, AllowVirtual, AWrappedEnd) + Item.NCharIndex - 2;
+    end;
 
     if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol
       AWrappedEnd:= false;

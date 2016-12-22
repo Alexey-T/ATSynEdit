@@ -511,7 +511,7 @@ var
 begin
   R:= ARect;
   InflateRect(R, -2, -1);
-  C.Brush.Color:= clCream;
+  C.Brush.Color:= $e0ebef;
   C.FillRect(R);
   C.Font.Color:= clGray;
   C.TextOut(R.Left+20, R.Top+1, 'gap for line '+IntToStr(AGap.LineIndex+1));
