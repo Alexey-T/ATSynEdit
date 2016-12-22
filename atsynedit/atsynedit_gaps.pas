@@ -42,7 +42,7 @@ type
 implementation
 
 const
-  cMaxGapSize = 30;
+  cMaxGapSize = 600;
 
 { TATSynGaps }
 

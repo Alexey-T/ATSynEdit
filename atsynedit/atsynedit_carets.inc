@@ -235,7 +235,7 @@ begin
     begin
       ItemGap:= AGaps.Find(Item.NLineIndex);
       if Assigned(ItemGap) then
-        Inc(NPixels, ItemGap.Size*ACharSize.Y);
+        Inc(NPixels, ItemGap.Size);
     end;
 
     Inc(NIndex);

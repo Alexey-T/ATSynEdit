@@ -2130,7 +2130,7 @@ begin
       ItemGap:= Gaps.Find(NLinesIndex);
       if Assigned(ItemGap) then
       begin
-        NCoordTopGapped:= NCoordTop + ItemGap.Size*ACharSize.Y;
+        NCoordTopGapped:= NCoordTop + ItemGap.Size;
         DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTopGapped), ItemGap);
         NCoordTop:= NCoordTopGapped;
       end;

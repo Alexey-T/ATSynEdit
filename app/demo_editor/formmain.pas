@@ -805,9 +805,9 @@ var
   NLine, NSize: integer;
 begin
   Vals[0]:= '2';
-  Vals[1]:= '4';
+  Vals[1]:= '60';
   if not InputQuery('Enter gap props',
-    ['Line number', 'Gap size (cells)'],
+    ['Line number', 'Gap size (pixels)'],
     Vals) then exit;
 
   NLine:= StrToInt(Vals[0]);
