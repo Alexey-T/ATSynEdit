@@ -411,6 +411,12 @@ begin
     if Assigned(ItemGap) then
       Dec(NPixels, ItemGap.Size);
 
+    if NPixels<0 then
+    begin
+      FScrollVert.NPos:= NIndex+1;
+      Exit;
+    end;
+
     if NPixels<=NPixelsNeeded then
     begin
       FScrollVert.NPos:= NIndex;
