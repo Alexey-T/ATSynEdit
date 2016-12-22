@@ -37,13 +37,13 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    function Count: integer;
+    function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATSynGapItem read GetItem; default;
     procedure Delete(N: integer);
-    function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function Add(ALineIndex, ASize: integer): boolean;
     function Find(ALineIndex: integer): TATSynGapItem;
+    function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
     procedure Update(ALine: integer; AChange: TATLineChangeKind);
   end;
@@ -51,7 +51,7 @@ type
 implementation
 
 const
-  cMinGapSize = 10;
+  cMinGapSize = 8;
   cMaxGapSize = 500;
 
 { TATSynGaps }
@@ -78,7 +78,7 @@ begin
   FList.Clear;
 end;
 
-function TATSynGaps.Count: integer;
+function TATSynGaps.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
