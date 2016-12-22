@@ -19,6 +19,14 @@ type
   end;
 
 type
+  TATLineChangeKind = (
+    cLineChangeEdited,
+    cLineChangeAdded,
+    cLineChangeDeleted,
+    cLineChangeDeletedAll
+    );
+
+type
   { TATSynGaps }
 
   TATSynGaps = class
@@ -37,6 +45,7 @@ type
     function Add(ALineIndex, ASize: integer): boolean;
     function Find(ALineIndex: integer): TATSynGapItem;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
+    procedure Update(ALine: integer; AChange: TATLineChangeKind);
   end;
 
 implementation
@@ -147,6 +156,44 @@ begin
     Item:= Items[i];
     if (Item.LineIndex>=ALineFrom) and (Item.LineIndex<=ALineTo) then
       Inc(Result, Item.Size);
+  end;
+end;
+
+procedure TATSynGaps.Update(ALine: integer;
+  AChange: TATLineChangeKind);
+var
+  Item: TATSynGapItem;
+  i: integer;
+begin
+  case AChange of
+    cLineChangeEdited:
+      begin
+      end;
+    cLineChangeAdded:
+      begin
+        for i:= 0 to Count-1 do
+        begin
+          Item:= Items[i];
+          if Item.LineIndex>=ALine then
+            Item.LineIndex:= Item.LineIndex+1;
+        end;
+      end;
+    cLineChangeDeletedAll:
+      begin
+        Clear;
+      end;
+    cLineChangeDeleted:
+      begin
+        for i:= Count-1 downto 0 do
+        begin
+          Item:= Items[i];
+          if Item.LineIndex=ALine then
+            Delete(i)
+          else
+          if Item.LineIndex>ALine then
+            Item.LineIndex:= Item.LineIndex-1;
+        end;
+      end;
   end;
 end;
 

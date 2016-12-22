@@ -36,13 +36,6 @@ type
     cLineStateSaved
     );
 
-  TATLineChangeKind = (
-    cLineChangeEdited,
-    cLineChangeAdded,
-    cLineChangeDeleted,
-    cLineChangeDeletedAll
-    );
-
   TATLineSeparator = (
     cLineSepNone,
     cLineSepTop,
@@ -1301,6 +1294,8 @@ end;
 
 procedure TATStrings.DoEventChange(ALine: integer; AChange: TATLineChangeKind);
 begin
+  Gaps.Update(ALine, AChange);
+
   if Assigned(FOnChange) then
     FOnChange(Self, ALine, AChange);
 end;
