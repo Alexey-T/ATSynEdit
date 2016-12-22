@@ -57,7 +57,7 @@ type
     procedure Delete(N: integer);
     procedure Insert(N: integer; AItem: TATSynWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
-    function FindIndexOfCaretPos(APnt: TPoint): integer;
+    function FindIndexOfCaretPos(APos: TPoint): integer;
     procedure SetCapacity(N: integer);
     procedure ReplaceItems(AFrom, ATo: integer; AItems: TList);
     property OnCheckLineCollapsed: TATCheckLineCollapsedEvent read FOnCheckCollapsed write FOnCheckCollapsed;
@@ -187,19 +187,19 @@ begin
   while (ATo<Count-1) and (Items[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
 end;
 
-function TATSynWrapInfo.FindIndexOfCaretPos(APnt: TPoint): integer;
+function TATSynWrapInfo.FindIndexOfCaretPos(APos: TPoint): integer;
 var
   Item: TATSynWrapItem;
   NFrom, NTo, i: integer;
 begin
   Result:= -1;
-  FindIndexesOfLineNumber(APnt.Y, NFrom, NTo);
+  FindIndexesOfLineNumber(APos.Y, NFrom, NTo);
   if NFrom<0 then Exit;
   for i:= NFrom to NTo do
   begin
     Result:= i;
     Item:= Items[i];
-    if Item.NCharIndex+Item.NLength > APnt.X then Break;
+    if Item.NCharIndex+Item.NLength > APos.X then Break;
   end;
 end;
 

@@ -1776,7 +1776,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   ALineFrom: integer);
 var
   NCoordTop, NCoordTopGapped, NCoordSep: integer;
-  NWrapIndex, NLinesIndex: integer;
+  NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: real;
   WrapItem: TATSynWrapItem;
@@ -1831,7 +1831,7 @@ begin
 
   if ALineFrom>=0 then
   begin
-    FWrapInfo.FindIndexesOfLineNumber(ALineFrom, NWrapIndex, NColorAfter{dummy});
+    FWrapInfo.FindIndexesOfLineNumber(ALineFrom, NWrapIndex, NWrapIndexDummy);
     AScrollVert.NPos:= NWrapIndex;
   end
   else
