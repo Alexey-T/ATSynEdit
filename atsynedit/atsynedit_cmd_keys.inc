@@ -243,11 +243,13 @@ end;
 
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;
 var
-  Item: TATSynWrapItem;
+  NLine: integer;
 begin
-  Item:= FWrapInfo[0];
-  if Assigned(Item) then
-    DoCaretSingle(0, Item.NLineIndex, false);
+  if FWrapInfo.Count>0 then
+  begin
+    NLine:= FWrapInfo[0].NLineIndex;
+    DoCaretSingle(0, NLine, false);
+  end;
 
   FScrollHorz.NPos:= 0;
   FScrollVert.NPos:= 0;
@@ -257,13 +259,15 @@ end;
 
 function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
 var
-  Item: TATSynWrapItem;
+  NLine: integer;
 begin
-  Item:= FWrapInfo[FWrapInfo.Count-1];
-  if Assigned(Item) then
-    DoCaretSingle(Strings.LinesLen[Item.NLineIndex], Item.NLineIndex, false);
+  if FWrapInfo.Count>0 then
+  begin
+    NLine:= FWrapInfo[FWrapInfo.Count-1].NLineIndex;
+    DoCaretSingle(Strings.LinesLen[NLine], NLine, false);
+  end;
 
-  Result:= [cResultCaretBottom];
+  Result:= [cResultCaretTop];
 end;
 
 function TATSynEdit.DoCommand_ScrollVert(ALines: integer): TATCommandResults;
