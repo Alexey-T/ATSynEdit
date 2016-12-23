@@ -26,7 +26,7 @@ uses
   formmain,
   formkey,
   formopt,
-  formfind, atsynedit_export_html;
+  formfind, atsynedit_export_html, ATSynEdit_Gaps;
 
 {$R *.res}
 

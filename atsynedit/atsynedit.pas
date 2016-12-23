@@ -2235,7 +2235,20 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATSynGapItem);
+var
+  RHere, RBmp: TRect;
 begin
+  if AGap.Bitmap<>nil then
+  begin
+    RBmp:= Rect(0, 0, AGap.Bitmap.Width, AGap.Bitmap.Height);
+    //RHere is rect of bitmap's size, located at center of ARect
+    RHere.Left:= Max(ARect.Left, (ARect.Left+ARect.Right-RBmp.Right) div 2);
+    RHere.Top:= (ARect.Top+ARect.Bottom-RBmp.Bottom) div 2;
+    RHere.Right:= RHere.Left + RBmp.Right;
+    RHere.Bottom:= RHere.Top + RBmp.Bottom;
+    C.CopyRect(RHere, AGap.Bitmap.Canvas, RBmp);
+  end
+  else
   if Assigned(FOnDrawGap) then
     FOnDrawGap(Self, C, ARect, AGap);
 end;

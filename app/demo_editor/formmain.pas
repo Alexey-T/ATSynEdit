@@ -233,6 +233,17 @@ const
 const
   cColorBmIco = clMedGray;
 
+procedure DoPaintGap(C: TCanvas; R: TRect; ALine: integer);
+begin
+  C.Brush.Color:= clMoneyGreen;
+  C.Pen.Color:= C.Brush.Color;
+  C.FillRect(R);
+  C.Font.Size:= 9;
+  C.Font.Color:= clGray;
+  C.TextOut(R.Left+20, R.Top+1, 'gap for line '+IntToStr(ALine+1));
+end;
+
+
 { TfmMain }
 
 procedure TfmMain.FormCreate(Sender: TObject);
@@ -506,15 +517,8 @@ end;
 
 procedure TfmMain.EditDrawGap(Sender: TObject; C: TCanvas; const ARect: TRect;
   AGap: TATSynGapItem);
-var
-  R: TRect;
 begin
-  R:= ARect;
-  InflateRect(R, -2, -1);
-  C.Brush.Color:= $e0ebef;
-  C.FillRect(R);
-  C.Font.Color:= clGray;
-  C.TextOut(R.Left+20, R.Top+1, 'gap for line '+IntToStr(AGap.LineIndex+1));
+  ////DoPaintGap(C, ARect, AGap.LineIndex);
 end;
 
 procedure TfmMain.mnuFileOpenClick(Sender: TObject);
@@ -806,6 +810,7 @@ procedure TfmMain.mnuTestGapAddClick(Sender: TObject);
 var
   Vals: array[0..1] of string;
   NLine, NSize: integer;
+  b: TBitmap;
 begin
   Vals[0]:= '2';
   Vals[1]:= '60';
@@ -815,7 +820,13 @@ begin
 
   NLine:= StrToInt(Vals[0]);
   NSize:= StrToInt(Vals[1]);
-  if not ed.Gaps.Add(NLine-1, NSize) then
+
+  b:= TBitmap.Create;
+  b.PixelFormat:= pf24bit;
+  b.SetSize(500, NSize-4);
+  DoPaintGap(b.Canvas, Rect(0, 0, b.Width, b.Height), NLine);
+
+  if not ed.Gaps.Add(NLine-1, NSize, b) then
   begin
     ShowMessage(Format('Not correct line index (%d) or size (%d)', [NLine, NSize]));
     exit;

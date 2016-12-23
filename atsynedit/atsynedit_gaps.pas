@@ -9,14 +9,7 @@ unit ATSynEdit_Gaps;
 interface
 
 uses
-  SysUtils, Classes;
-
-type
-  TATSynGapItem = class
-  public
-    LineIndex: integer;
-    Size: integer;
-  end;
+  SysUtils, Classes, Graphics;
 
 type
   TATLineChangeKind = (
@@ -25,6 +18,19 @@ type
     cLineChangeDeleted,
     cLineChangeDeletedAll
     );
+
+type
+
+  { TATSynGapItem }
+
+  TATSynGapItem = class
+  public
+    LineIndex: integer;
+    Size: integer;
+    Bitmap: TBitmap;
+    constructor Create; virtual;
+    destructor Destroy; override;
+  end;
 
 type
   { TATSynGaps }
@@ -41,7 +47,7 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATSynGapItem read GetItem; default;
     procedure Delete(N: integer);
-    function Add(ALineIndex, ASize: integer): boolean;
+    function Add(ALineIndex, ASize: integer; ABitmap: TBitmap): boolean;
     function Find(ALineIndex: integer): TATSynGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
@@ -53,6 +59,20 @@ implementation
 const
   cMinGapSize = 8;
   cMaxGapSize = 500;
+
+{ TATSynGapItem }
+
+constructor TATSynGapItem.Create;
+begin
+  Bitmap:= nil;
+end;
+
+destructor TATSynGapItem.Destroy;
+begin
+  if Bitmap<>nil then
+    FreeAndNil(Bitmap);
+  inherited;
+end;
 
 { TATSynGaps }
 
@@ -116,7 +136,7 @@ begin
   end;
 end;
 
-function TATSynGaps.Add(ALineIndex, ASize: integer): boolean;
+function TATSynGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap): boolean;
 var
   Item: TATSynGapItem;
 begin
@@ -128,6 +148,8 @@ begin
   Item:= TATSynGapItem.Create;
   Item.LineIndex:= ALineIndex;
   Item.Size:= ASize;
+  Item.Bitmap:= ABitmap;
+
   FList.Add(Item);
   Result:= true;
 end;

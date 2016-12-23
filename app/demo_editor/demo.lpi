@@ -33,7 +33,7 @@
         <PackageName Value="LCL"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="36">
+    <Units Count="37">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -204,6 +204,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="ATSynEdit_Export_HTML"/>
       </Unit35>
+      <Unit36>
+        <Filename Value="..\..\atsynedit\atsynedit_gaps.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ATSynEdit_Gaps"/>
+      </Unit36>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

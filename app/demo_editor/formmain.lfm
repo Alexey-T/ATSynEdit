@@ -475,6 +475,7 @@ object fmMain: TfmMain
       end
       object mnuTestGapAdd: TMenuItem
         Caption = 'add gap..'
+        ShortCut = 113
         OnClick = mnuTestGapAddClick
       end
       object mnuTestGapClear: TMenuItem
