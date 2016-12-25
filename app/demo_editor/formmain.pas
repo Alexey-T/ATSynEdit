@@ -181,6 +181,7 @@ type
     FFindConfirmAll: TModalResult;
     FFindMarkAll: boolean;
     procedure DoAddEnc(Sub, SName: string);
+    procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean);
@@ -276,6 +277,7 @@ begin
   ed.OnCommand:= @EditCommand;
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnClickMicromap:= @EditClickMicromap;
+  ed.OnClickGap:= @EditClickGap;
   ed.OnDrawBookmarkIcon:= @EditDrawBm;
   ed.OnDrawLine:= @EditDrawLine;
   ed.OnDrawMicromap:= @EditDrawMicromap;
@@ -928,6 +930,14 @@ begin
   mi.Caption:= SName;
   mi.OnClick:= @MenuEncClick;
   miSub.Add(mi);
+end;
+
+procedure TfmMain.EditClickGap(Sender: TObject; AGapItem: TATSynGapItem;
+  APos: TPoint);
+begin
+  if Assigned(AGapItem) then
+    MsgStatus(Format('OnClickGap: line %d, pos %d:%d',
+      [AGapItem.LineIndex+1, APos.X, APos.Y]));
 end;
 
 procedure TfmMain.MenuEncClick(Sender: TObject);

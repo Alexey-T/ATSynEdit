@@ -45,6 +45,9 @@ uses
 type
   TATPosDetails = record
     EndOfWrappedLine: boolean;
+    OnGap: boolean;
+    OnGapLineIndex: integer;
+    OnGapPos: TPoint;
   end;
 
   TATDirection = (
@@ -266,6 +269,7 @@ var
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
+  TATSynEditClickGapEvent = procedure(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint) of object;
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; const AText: string; var AHandled: boolean) of object;
   TATSynEditCommandAfterEvent = procedure(Sender: TObject; ACommand: integer; const AText: string) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
@@ -355,6 +359,7 @@ type
     FOnClickTriple,
     FOnClickMiddle: TATSynEditClickEvent;
     FOnClickMoveCaret: TATSynEditClickMoveCaretEvent;
+    FOnClickGap: TATSynEditClickGapEvent;
     FOnClickEndSelect: TATSynEditClickMoveCaretEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChange: TNotifyEvent;
@@ -992,6 +997,7 @@ type
     property OnClickMicromap: TATSynEditClickMicromapEvent read FOnClickMicromap write FOnClickMicromap;
     property OnClickMoveCaret: TATSynEditClickMoveCaretEvent read FOnClickMoveCaret write FOnClickMoveCaret;
     property OnClickEndSelect: TATSynEditClickMoveCaretEvent read FOnClickEndSelect write FOnClickEndSelect;
+    property OnClickGap: TATSynEditClickGapEvent read FOnClickGap write FOnClickGap;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
@@ -3243,14 +3249,14 @@ end;
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   PCaret: TPoint;
-  Details: TATPosDetails;
+  PosDetails: TATPosDetails;
   Index: integer;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
   SetFocus;
 
-  PCaret:= ClientPosToCaretPos(Point(X, Y), Details);
+  PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
   FMouseDragDropping:= false;
@@ -3293,6 +3299,12 @@ begin
       FSelRect:= cRectEmpty;
       Strings.SetGroupMark;
       DoCaretSingleAsIs;
+
+      if PosDetails.OnGap then
+      begin
+        if Assigned(FOnClickGap) then
+          FOnClickGap(Self, Gaps.Find(PosDetails.OnGapLineIndex), PosDetails.OnGapPos);
+      end;
 
       if FOptMouseDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
       begin

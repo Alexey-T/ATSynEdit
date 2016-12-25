@@ -247,10 +247,20 @@ begin
     begin
       ItemGap:= AGaps.Find(Item.NLineIndex);
       if Assigned(ItemGap) then
+      begin
+        if Assigned(ItemGap.Bitmap) then
+        begin
+          ADetails.OnGapPos.X:= P.X - (ARect.Left+ARect.Right-ItemGap.Bitmap.Width) div 2;
+          ADetails.OnGapPos.Y:= P.Y - NPixels;
+        end;
         Inc(NPixels, ItemGap.Size);
+      end;
 
       if NPixels>P.Y then
       begin
+        ADetails.OnGap:= true;
+        ADetails.OnGapLineIndex:= Item.NLineIndex;
+
         case AGapCoordAction of
           cGapCoordToLineEnd:
             bGapGoesToEnd:= true;
