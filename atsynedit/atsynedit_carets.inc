@@ -394,19 +394,28 @@ procedure TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: inte
 //index: original vert scroll pos
 //do dec(index), until offset (pixels) from caret to bottom is small enough
 var
-  NPixels, NPixelsNeeded, NIndex: integer;
+  NPixels, NPixelsNeeded, NIndex, NCell: integer;
   ItemGap: TATSynGapItem;
   i: integer;
 begin
-  NPixels:= (FRectMain.Bottom-FRectMain.Top) - FCharSize.Y;
-  NPixelsNeeded:= AIndentVert*FCharSize.Y;
   NIndex:= AWrapInfoIndex;
-  for i:= 1 to GetVisibleLines do
+  if NIndex<=0 then exit;
+
+  NCell:= FCharSize.Y;
+  NPixels:= (FRectMain.Bottom-FRectMain.Top)-NCell;
+  NPixelsNeeded:= (AIndentVert+1)*NCell-1;
+  if NPixels<=0 then exit;
+
+  for i:= 0 to (NPixels div NCell) do
   begin
     Dec(NIndex);
-    if NIndex<=0 then Exit;
+    if NIndex<0 then
+    begin
+      FScrollVert.NPos:= 0;
+      Exit;
+    end;
 
-    Dec(NPixels, FCharSize.Y);
+    Dec(NPixels, NCell);
     ItemGap:= Gaps.Find(FWrapInfo.Items[NIndex].NLineIndex);
     if Assigned(ItemGap) then
       Dec(NPixels, ItemGap.Size);
@@ -447,7 +456,7 @@ begin
     bScrolled:= true;
   end
   else
-  if Coord.Y>=FRectMain.Bottom then
+  if Coord.Y+FCharSize.Y >= FRectMain.Bottom then
   begin
     NIndex:= FWrapInfo.FindIndexOfCaretPos(ACaretPos);
     if NIndex<0 then Exit;
