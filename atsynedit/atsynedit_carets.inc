@@ -403,10 +403,13 @@ begin
 
   NCell:= FCharSize.Y;
   NPixels:= (FRectMain.Bottom-FRectMain.Top)-NCell;
-  NPixelsNeeded:= (AIndentVert+1)*NCell-1;
   if NPixels<=0 then exit;
+    //this is distance of first visible line, to bottom of control
+  NPixelsNeeded:= (AIndentVert+1)*NCell-1;
+    //this distance must be reached,
+    //can be smaller/bigger, if wrapped lines or gaps
 
-  for i:= 0 to (NPixels div NCell) do
+  for i:= 1 to GetVisibleLines do
   begin
     Dec(NIndex);
     if NIndex<0 then
@@ -416,9 +419,14 @@ begin
     end;
 
     Dec(NPixels, NCell);
-    ItemGap:= Gaps.Find(FWrapInfo.Items[NIndex].NLineIndex);
-    if Assigned(ItemGap) then
-      Dec(NPixels, ItemGap.Size);
+
+    //consider gap
+    if FWrapInfo.Items[NIndex].NFinal=cWrapItemFinal then
+    begin
+      ItemGap:= Gaps.Find(FWrapInfo.Items[NIndex].NLineIndex);
+      if Assigned(ItemGap) then
+        Dec(NPixels, ItemGap.Size);
+    end;
 
     if NPixels<0 then
     begin

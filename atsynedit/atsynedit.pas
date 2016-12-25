@@ -1453,14 +1453,11 @@ begin
 end;
 
 function TATSynEdit.GetVisibleLines: integer;
-var
-  Delta: integer;
 begin
   //Delta:= Gaps.SizeForLineRange(LineTop, LineBottom-1);
-  //gives weird jump of v-scroll at end
-  Delta:= 0;
+  //gives jumps of v-scroll at end
 
-  Result:= (FRectMain.Bottom-FRectMain.Top-Delta) div FCharSize.Y;
+  Result:= (FRectMain.Bottom-FRectMain.Top{-Delta}) div FCharSize.Y;
 end;
 
 function TATSynEdit.GetVisibleColumns: integer;
