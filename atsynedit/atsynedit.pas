@@ -45,8 +45,7 @@ uses
 type
   TATPosDetails = record
     EndOfWrappedLine: boolean;
-    OnGap: boolean;
-    OnGapLineIndex: integer;
+    OnGapItem: TATSynGapItem;
     OnGapPos: TPoint;
   end;
 
@@ -3300,10 +3299,10 @@ begin
       Strings.SetGroupMark;
       DoCaretSingleAsIs;
 
-      if PosDetails.OnGap then
+      if Assigned(PosDetails.OnGapItem) then
       begin
         if Assigned(FOnClickGap) then
-          FOnClickGap(Self, Gaps.Find(PosDetails.OnGapLineIndex), PosDetails.OnGapPos);
+          FOnClickGap(Self, PosDetails.OnGapItem, PosDetails.OnGapPos);
       end;
 
       if FOptMouseDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then

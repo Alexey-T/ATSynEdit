@@ -241,7 +241,7 @@ begin
   C.FillRect(R);
   C.Font.Size:= 9;
   C.Font.Color:= clGray;
-  C.TextOut(R.Left+20, R.Top+1, 'gap for line '+IntToStr(ALine+1));
+  C.TextOut(R.Left+20, R.Top+1, 'gap for line '+IntToStr(ALine));
 end;
 
 
