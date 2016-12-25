@@ -9,24 +9,27 @@ uses
   {$ENDIF}{$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
-  atsynedit_canvasproc,
-  atsynedit_keymap,
-  atstringproc,
-  atstringproc_wordjump,
-  atstrings,
-  atstrings_undo,
-  atsynedit_carets,
-  atsynedit,
-  atsynedit_gutter,
-  atsynedit_commands,
-  atsynedit_keymap_init,
-  atsynedit_wrapinfo,
-  atsynedit_edits,
-  atsynedit_ranges, ATSynEdit_Adapters,
+  ATStringProc,
+  ATStringProc_WordJump,
+  ATStrings,
+  ATStrings_Undo,
+  ATSynEdit,
+  ATSynEdit_Carets,
+  ATSynEdit_CanvasProc,
+  ATSynEdit_Keymap,
+  ATSynEdit_Gutter,
+  ATSynEdit_Commands,
+  ATSynEdit_Keymap_Init,
+  ATSynEdit_Wrapinfo,
+  ATSynEdit_Edits,
+  ATSynEdit_Ranges, 
+  ATSynEdit_Adapters,
+  ATSynEdit_Export_HTML,
+  ATSynEdit_Gaps,
   formmain,
   formkey,
   formopt,
-  formfind, atsynedit_export_html, ATSynEdit_Gaps;
+  formfind;
 
 {$R *.res}
 
