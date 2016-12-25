@@ -132,6 +132,7 @@ begin
   end;
 end;
 
+
 function _DoCaretPosToClientPos(
   P: TPoint;
   AWrapInfo: TATSynWrapInfo;
@@ -254,7 +255,7 @@ begin
           ADetails.OnGapItem:= ItemGap;
           ADetails.OnGapPos.Y:= P.Y - (NPixels-ItemGap.Size);
           if Assigned(ItemGap.Bitmap) then
-            ADetails.OnGapPos.X:= P.X - (ARect.Left+ARect.Right-ItemGap.Bitmap.Width) div 2
+            ADetails.OnGapPos.X:= P.X - _GapBitmapLeft(ARect, ItemGap.Bitmap)
           else
             ADetails.OnGapPos.X:= P.X - ARect.Left;
 
