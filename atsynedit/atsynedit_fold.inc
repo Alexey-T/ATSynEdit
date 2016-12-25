@@ -294,16 +294,16 @@ end;
 procedure TATSynEdit.DoMenuGutterFold_AddDynamicItems(Menu: TPopupMenu);
 var
   Pnt: TPoint;
-  AtEnd: boolean;
   NLine: integer;
   IntList: TATIntArray;
+  Details: TATPosDetails;
   Rng: TATSynRange;
   mi: TMenuItem;
   i: integer;
 begin
   //calc ranges for curr line
   Pnt:= ScreenToClient(Mouse.CursorPos);
-  Pnt:= ClientPosToCaretPos(Pnt, AtEnd);
+  Pnt:= ClientPosToCaretPos(Pnt, Details);
   NLine:= Pnt.Y;
   if NLine<0 then Exit;
 

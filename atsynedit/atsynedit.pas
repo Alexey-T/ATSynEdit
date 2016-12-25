@@ -43,6 +43,10 @@ uses
   ATSynEdit_Adapter_Cache;
 
 type
+  TATPosDetails = record
+    EndOfWrappedLine: boolean;
+  end;
+
   TATDirection = (
     cDirNone,
     cDirLeft,
@@ -872,7 +876,8 @@ type
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
     function CaretPosToClientPos(P: TPoint): TPoint;
-    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean;
+    function ClientPosToCaretPos(P: TPoint;
+      out ADetails: TATPosDetails;
       AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
@@ -3238,14 +3243,14 @@ end;
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   PCaret: TPoint;
-  EolPos: boolean;
+  Details: TATPosDetails;
   Index: integer;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
   SetFocus;
 
-  PCaret:= ClientPosToCaretPos(Point(X, Y), EolPos);
+  PCaret:= ClientPosToCaretPos(Point(X, Y), Details);
   FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
   FMouseDragDropping:= false;
@@ -3489,7 +3494,8 @@ var
   P: TPoint;
   RectNums, RectBookmk: TRect;
   nIndex: integer;
-  bOnMinimap, bOnGutter, bEolPos: boolean;
+  bOnMinimap, bOnGutter: boolean;
+  Details: TATPosDetails;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -3541,7 +3547,7 @@ begin
   //show/hide bookmark hint
   if PtInRect(RectBookmk, P) then
   begin
-    P:= ClientPosToCaretPos(Point(X, Y), bEolPos);
+    P:= ClientPosToCaretPos(Point(X, Y), Details);
     DoHintShowForBookmark(P.Y);
   end
   else
@@ -3563,7 +3569,7 @@ begin
   begin
     if Shift=[ssLeft] then
     begin
-      P:= ClientPosToCaretPos(P, bEolPos);
+      P:= ClientPosToCaretPos(P, Details);
       if (P.Y>=0) and (P.X>=0) then
         if FMouseDownNumber>=0 then
         begin
@@ -3583,7 +3589,7 @@ begin
       if ssLeft in Shift then
         if Carets.Count>0 then
         begin
-          P:= ClientPosToCaretPos(P, bEolPos);
+          P:= ClientPosToCaretPos(P, Details);
           if P.Y>=0 then
           begin
             //drag w/out button pressed: single selection
@@ -3719,12 +3725,12 @@ end;
 procedure TATSynEdit.DoSelect_Word_ByClick;
 var
   P: TPoint;
-  EolPos: boolean;
+  Details: TATPosDetails;
 begin
   P:= ScreenToClient(Mouse.CursorPos);
   if PtInRect(FRectMain, P) then
   begin
-    P:= ClientPosToCaretPos(P, EolPos);
+    P:= ClientPosToCaretPos(P, Details);
     if P.Y<0 then Exit;
     DoSelect_Word(P);
     Update;
@@ -3747,12 +3753,12 @@ end;
 procedure TATSynEdit.DoSelect_Line_ByClick;
 var
   P: TPoint;
-  EolPos: boolean;
+  Details: TATPosDetails;
 begin
   P:= ScreenToClient(Mouse.CursorPos);
   if PtInRect(FRectMain, P) then
   begin
-    P:= ClientPosToCaretPos(P, EolPos);
+    P:= ClientPosToCaretPos(P, Details);
     if P.Y<0 then Exit;
     DoSelect_Line(P);
     Update;
@@ -3784,7 +3790,7 @@ procedure TATSynEdit.TimerScrollTick(Sender: TObject);
 var
   nIndex: integer;
   PClient, PCaret: TPoint;
-  EolPos: boolean;
+  Details: TATPosDetails;
 begin
   PClient:= ScreenToClient(Mouse.CursorPos);
   PClient.X:= Max(FRectMain.Left, PClient.X);
@@ -3800,7 +3806,7 @@ begin
     else Exit;
   end;
 
-  PCaret:= ClientPosToCaretPos(PClient, EolPos);
+  PCaret:= ClientPosToCaretPos(PClient, Details);
   if (PCaret.X>=0) and (PCaret.Y>=0) then
     if FMouseDownNumber>=0 then
     begin
@@ -4257,9 +4263,10 @@ procedure TATSynEdit.DoDropText;
 var
   P, PosAfter, Shift: TPoint;
   X1, Y1, X2, Y2: integer;
-  bSel, bEolPos: boolean;
+  bSel: boolean;
   Str: atString;
   Relation: TATPosRelation;
+  Details: TATPosDetails;
 begin
   if Carets.Count<>1 then Exit; //allow only 1 caret
   Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
@@ -4270,7 +4277,7 @@ begin
 
   //calc insert-pos
   P:= ScreenToClient(Mouse.CursorPos);
-  P:= ClientPosToCaretPos(P, bEolPos);
+  P:= ClientPosToCaretPos(P, Details);
   if P.Y<0 then
     begin Beep; Exit end;
 
@@ -4997,14 +5004,14 @@ procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
 var
   SText: atString;
   Pnt: TPoint;
-  bEnd: boolean;
+  Details: TATPosDetails;
 begin
   if not (Source is TATSynEdit) then exit;
   if (Source=Self) then exit;
   SText:= (Source as TATSynedit).TextSelected;
   if SText='' then exit;
 
-  Pnt:= ClientPosToCaretPos(Point(X, Y), bEnd);
+  Pnt:= ClientPosToCaretPos(Point(X, Y), Details);
   if Strings.IsIndexValid(Pnt.Y) then
   begin
     DoCaretSingle(Pnt.X, Pnt.Y);

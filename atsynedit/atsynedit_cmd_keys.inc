@@ -5,7 +5,7 @@ var
   i, NIndent, NWrapped: integer;
   Caret: TATCaretItem;
   Pnt: TPoint;
-  EolPos: boolean;
+  Details: TATPosDetails;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -17,7 +17,7 @@ begin
     begin
       Pnt.X:= 0;
       Pnt.Y:= Caret.CoordY;
-      Pnt:= ClientPosToCaretPos(Pnt, EolPos);
+      Pnt:= ClientPosToCaretPos(Pnt, Details);
       NWrapped:= Pnt.X;
     end;
 
@@ -42,7 +42,7 @@ var
   Str: atString;
   Pnt: TPoint;
   i, NLen, NWrapped: integer;
-  EolPos: boolean;
+  Details: TATPosDetails;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -55,7 +55,7 @@ begin
     begin
       Pnt.X:= ClientWidth;
       Pnt.Y:= Caret.CoordY;
-      Pnt:= ClientPosToCaretPos(Pnt, EolPos);
+      Pnt:= ClientPosToCaretPos(Pnt, Details);
       if Pnt.X<Length(Str) then
         NWrapped:= Pnt.X-1;
         //-1 here: need to jump not to last chr but to last-1 chr
@@ -185,7 +185,7 @@ function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer)
 var
   Caret: TATCaretItem;
   Pnt: TPoint;
-  EolPos: boolean;
+  Details: TATPosDetails;
   i: integer;
 const
   cGapActions: array[boolean] of TATGapCoordAction =
@@ -207,10 +207,10 @@ begin
       Pnt.X:= Caret.CoordColumn;
 
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne(ADown);
-    Pnt:= ClientPosToCaretPos(Pnt, EolPos, cGapActions[ADown]);
+    Pnt:= ClientPosToCaretPos(Pnt, Details, cGapActions[ADown]);
     if Pnt.Y<0 then Continue;
 
-    if EolPos and (Pnt.X>0) then
+    if Details.EndOfWrappedLine and (Pnt.X>0) then
       Dec(Pnt.X); //-1 so up/down won't jump to eol pos (caret may paint on next line)
 
     Caret.PosX:= Pnt.X;

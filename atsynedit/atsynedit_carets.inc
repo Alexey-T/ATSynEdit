@@ -48,7 +48,7 @@ end;
 procedure TATSynEdit.DoCaretsColumnToPoint(AX, AY: integer);
 var
   P, PM1, PM2: TPoint;
-  EolPos: boolean;
+  Details: TATPosDetails;
 begin
   DoCaretSingleAsIs;
   with Carets[0] do
@@ -62,13 +62,13 @@ begin
     SwapInt(PM1.Y, PM2.Y);
 
   Carets.Clear;
-  P:= ClientPosToCaretPos(PM1, EolPos);
+  P:= ClientPosToCaretPos(PM1, Details);
   if P.Y>=0 then
     Carets.Add(P.X, P.Y);
 
   repeat
     Inc(PM1.Y, FCharSize.Y);
-    P:= ClientPosToCaretPos(PM1, EolPos);
+    P:= ClientPosToCaretPos(PM1, Details);
     if P.Y>=0 then
       if not Carets.IsLineListed(P.Y) then
         Carets.Add(P.X, P.Y);
@@ -202,7 +202,7 @@ function _DoClientPosToCaretPos(
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   AVirtualPos: boolean;
-  out AWrappedEnd: boolean;
+  out ADetails: TATPosDetails;
   AGapCoordAction: TATGapCoordAction): TPoint;
 var
   NIndex, NIndexDecrement, NPixels: integer;
@@ -213,7 +213,7 @@ var
 begin
   Result.X:= 0;
   Result.Y:= -1;
-  AWrappedEnd:= false;
+  FillChar(ADetails, SizeOf(ADetails), 0);
 
   if (ACharSize.X<=0) or (ACharSize.Y<=0) then Exit;
   P.X:= Max(P.X, ARect.Left);
@@ -299,11 +299,12 @@ begin
     begin
       AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
       NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
-      Result.X:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize, AllowVirtual, AWrappedEnd) + Item.NCharIndex - 2;
+      Result.X:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize,
+        AllowVirtual, ADetails.EndOfWrappedLine) + Item.NCharIndex - 2;
     end;
 
     if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol
-      AWrappedEnd:= false;
+      ADetails.EndOfWrappedLine:= false;
   end;
 end;
 
@@ -323,7 +324,7 @@ begin
 end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TPoint;
-  out AEndOfLinePos: boolean;
+  out ADetails: TATPosDetails;
   AGapCoordAction: TATGapCoordAction = cGapCoordToLineEnd): TPoint;
 begin
   Result:= _DoClientPosToCaretPos(P,
@@ -336,7 +337,7 @@ begin
     FScrollHorz,
     FScrollVert,
     FCaretVirtual,
-    AEndOfLinePos,
+    ADetails,
     AGapCoordAction);
 end;
 
