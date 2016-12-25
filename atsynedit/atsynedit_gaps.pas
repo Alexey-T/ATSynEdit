@@ -9,7 +9,7 @@ unit ATSynEdit_Gaps;
 interface
 
 uses
-  SysUtils, Classes, Graphics;
+  SysUtils, Classes, Graphics, Math;
 
 type
   TATLineChangeKind = (
@@ -54,11 +54,20 @@ type
     procedure Update(ALine: integer; AChange: TATLineChangeKind);
   end;
 
+var
+  cMinGapSize: integer = 8;
+  cMaxGapSize: integer = 500;
+
+function GetGapBitmapPosLeft(const ARect: TRect; ABitmap: TBitmap): integer;
+
+
 implementation
 
-const
-  cMinGapSize = 8;
-  cMaxGapSize = 500;
+function GetGapBitmapPosLeft(const ARect: TRect; ABitmap: TBitmap): integer;
+begin
+  Result:= Max(ARect.Left, (ARect.Left+ARect.Right-ABitmap.Width) div 2);
+end;
+
 
 { TATSynGapItem }
 

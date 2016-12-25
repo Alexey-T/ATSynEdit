@@ -255,7 +255,7 @@ begin
           ADetails.OnGapItem:= ItemGap;
           ADetails.OnGapPos.Y:= P.Y - (NPixels-ItemGap.Size);
           if Assigned(ItemGap.Bitmap) then
-            ADetails.OnGapPos.X:= P.X - _GapBitmapLeft(ARect, ItemGap.Bitmap)
+            ADetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, ItemGap.Bitmap)
           else
             ADetails.OnGapPos.X:= P.X - ARect.Left;
 
