@@ -828,7 +828,7 @@ begin
   b.SetSize(500, NSize-4);
   DoPaintGap(b.Canvas, Rect(0, 0, b.Width, b.Height), NLine);
 
-  if not ed.Gaps.Add(NLine-1, NSize, b) then
+  if not ed.Gaps.Add(NLine-1, NSize, b, 0) then
   begin
     ShowMessage(Format('Not correct line index (%d) or size (%d)', [NLine, NSize]));
     exit;

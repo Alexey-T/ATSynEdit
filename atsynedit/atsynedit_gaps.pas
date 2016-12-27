@@ -28,6 +28,7 @@ type
     LineIndex: integer;
     Size: integer;
     Bitmap: TBitmap;
+    Tag: integer;
     constructor Create; virtual;
     destructor Destroy; override;
   end;
@@ -47,8 +48,8 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATSynGapItem read GetItem; default;
     procedure Delete(N: integer);
-    function Add(ALineIndex, ASize: integer; ABitmap: TBitmap): boolean;
-    function Find(ALineIndex: integer): TATSynGapItem;
+    function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; ATag: integer): boolean;
+    function Find(ALineIndex: integer; ATag: integer=-1): TATSynGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
     procedure Update(ALine: integer; AChange: TATLineChangeKind);
@@ -145,7 +146,8 @@ begin
   end;
 end;
 
-function TATSynGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap): boolean;
+function TATSynGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap;
+  ATag: integer): boolean;
 var
   Item: TATSynGapItem;
 begin
@@ -158,12 +160,13 @@ begin
   Item.LineIndex:= ALineIndex;
   Item.Size:= ASize;
   Item.Bitmap:= ABitmap;
+  Item.Tag:= ATag;
 
   FList.Add(Item);
   Result:= true;
 end;
 
-function TATSynGaps.Find(ALineIndex: integer): TATSynGapItem;
+function TATSynGaps.Find(ALineIndex: integer; ATag: integer=-1): TATSynGapItem;
 var
   Item: TATSynGapItem;
   i: integer;
@@ -172,7 +175,7 @@ begin
   for i:= 0 to FList.Count-1 do
   begin
     Item:= Items[i];
-    if Item.LineIndex=ALineIndex then exit(Item);
+    if (Item.LineIndex=ALineIndex) and ((ATag<0) or (Item.Tag=ATag)) then exit(Item);
   end;
 end;
 
