@@ -72,6 +72,7 @@ type
       AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
     function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
+    function FindIndexOfRange(R: TATSynRange): integer;
     function MessageText(Cnt: integer): string;
   end;
 
@@ -281,6 +282,11 @@ begin
       Break
     end;
   end;
+end;
+
+function TATSynRanges.FindIndexOfRange(R: TATSynRange): integer;
+begin
+  Result:= FList.IndexOf(Pointer(R));
 end;
 
 function TATSynRanges.MessageText(Cnt: integer): string;
