@@ -76,6 +76,7 @@ type
 
   TATCommandResult = (
     cResultText,
+    cResultFoldChange,
     cResultCaretAny,
     cResultCaretLeft,
     cResultCaretTop,

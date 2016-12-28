@@ -76,11 +76,15 @@ end;
 
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
 begin
-  if cResultText in Res then
+  if (cResultText in Res) or
+     (cResultFoldChange in Res) then
   begin
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
+  end;
 
+  if cResultText in Res then
+  begin
     if FOptMouseHideCursor then
       if PtInRect(FRectMain, ScreenToClient(Mouse.CursorPos)) then
         SetCursor(crNone);

@@ -130,14 +130,14 @@ begin
     end;
   end;
 
-  Result:= [cResultCaretTop, cResultScroll];
+  Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
 end;
 
 
 function TATSynEdit.DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
 begin
   DoFoldForLevel(ALevel);
-  Result:= [cResultCaretAny, cResultScroll];
+  Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
 
 
