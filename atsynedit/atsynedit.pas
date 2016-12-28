@@ -385,6 +385,7 @@ type
     FWrapIndented: boolean;
     FUnprintedVisible,
     FUnprintedSpaces,
+    FUnprintedEof,
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
     FPrevVisibleColumns: integer;
@@ -1102,6 +1103,7 @@ type
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails;
+    property OptUnprintedEof: boolean read FUnprintedEof write FUnprintedEof;
     property OptMouseEnableAll: boolean read FOptMouseEnableAll write FOptMouseEnableAll;
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection;
@@ -1854,7 +1856,14 @@ begin
 
   repeat
     if NCoordTop>ARect.Bottom then Break;
-    if not FWrapInfo.IsIndexValid(NWrapIndex) then Break;
+    if not FWrapInfo.IsIndexValid(NWrapIndex) then
+    begin
+      if NWrapIndex>=0 then
+        if OptUnprintedVisible and OptUnprintedEof then
+          CanvasArrowHorz(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
+            Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X, false);
+      Break;
+    end;
 
     WrapItem:= FWrapInfo.Items[NWrapIndex];
     NLinesIndex:= WrapItem.NLineIndex;
@@ -2498,6 +2507,7 @@ begin
   FUnprintedSpaces:= true;
   FUnprintedEnds:= true;
   FUnprintedEndsDetails:= true;
+  FUnprintedEof:= true;
 
   FTextHint:= '';
   FTextHintFontStyle:= [fsItalic];

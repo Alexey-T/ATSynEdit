@@ -20,6 +20,7 @@ uses
 var
   OptUnprintedTabCharLength: integer = 1;
   OptUnprintedTabPointerScale: integer = 22;
+  OptUnprintedEofCharLength: integer = 1;
   OptUnprintedSpaceDotScale: integer = 15;
   OptUnprintedEndDotScale: integer = 30;
   OptUnprintedEndFontScale: integer = 80;
@@ -81,8 +82,15 @@ type
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: TATIntArray) of object;
 
-procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle;
+procedure CanvasLineEx(C: TCanvas;
+  Color: TColor; Style: TATLineStyle;
   P1, P2: TPoint; AtDown: boolean);
+
+procedure CanvasArrowHorz(C: TCanvas;
+  const ARect: TRect;
+  AColorFont: TColor;
+  AArrowLen: integer;
+  AToRight: boolean);
 
 procedure CanvasTextOut(C: TCanvas;
   PosX, PosY: integer;
@@ -150,7 +158,8 @@ type
   TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
 
 
-procedure DoPaintUnprintedSpace(C: TCanvas; const ARect: TRect; AScale: integer; AFontColor: TColor);
+procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
+  AScale: integer; AFontColor: TColor);
 const
   cMinDotSize = 2;
 var
@@ -167,10 +176,11 @@ begin
   C.FillRect(R);
 end;
 
-procedure DoPaintUnprintedTabulation(C: TCanvas;
+procedure CanvasArrowHorz(C: TCanvas;
   const ARect: TRect;
   AColorFont: TColor;
-  ACharSizeX: integer);
+  AArrowLen: integer; //OptUnprintedTabCharLength*ACharSizeX
+  AToRight: boolean);
 const
   cIndent = 1; //offset left/rt
 var
@@ -179,7 +189,7 @@ begin
   XLeft:= ARect.Left+cIndent;
   XRight:= ARect.Right-cIndent;
 
-  if OptUnprintedTabCharLength=0 then
+  if AArrowLen=0 then
   begin;
     X1:= XLeft;
     X2:= XRight;
@@ -187,23 +197,32 @@ begin
   else
   begin
     X1:= XLeft;
-    X2:= Min(XRight, X1+OptUnprintedTabCharLength*ACharSizeX);
+    X2:= Min(XRight, X1+AArrowLen);
   end;
 
   Y:= (ARect.Top+ARect.Bottom) div 2;
   Dx:= (ARect.Bottom-ARect.Top) * OptUnprintedTabPointerScale div 100;
   C.Pen.Color:= AColorFont;
 
-  C.MoveTo(X2, Y);
-  C.LineTo(X1, Y);
-  C.MoveTo(X2, Y);
-  C.LineTo(X2-Dx, Y-Dx);
-  C.MoveTo(X2, Y);
-  C.LineTo(X2-Dx, Y+Dx);
+  C.Line(X1, Y, X2, Y);
+  if AToRight then
+  begin
+    C.MoveTo(X2, Y);
+    C.LineTo(X2-Dx, Y-Dx);
+    C.MoveTo(X2, Y);
+    C.LineTo(X2-Dx, Y+Dx);
+  end
+  else
+  begin
+    C.MoveTo(X1, Y);
+    C.LineTo(X1+Dx, Y-Dx);
+    C.MoveTo(X1, Y);
+    C.LineTo(X1+Dx, Y+Dx);
+  end;
 end;
 
 
-procedure DoPaintUnprintedArrowDown(C: TCanvas;
+procedure CanvasArrowDown(C: TCanvas;
   const ARect: TRect;
   AColorFont: TColor);
 var
@@ -250,9 +269,9 @@ begin
       R.Bottom:= R.Top+ACharSize.Y;
 
       if AString[i]=' ' then
-        DoPaintUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
+        CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
       else
-        DoPaintUnprintedTabulation(C, R, AColorFont, ACharSize.X);
+        CanvasArrowHorz(C, R, AColorFont, OptUnprintedTabCharLength*ACharSize.X, true);
     end;
 end;
 
@@ -483,11 +502,11 @@ begin
   else
   begin
     if OptUnprintedEndArrowOrDot then
-      DoPaintUnprintedArrowDown(C,
+      CanvasArrowDown(C,
         Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
         AColorFont)
     else
-      DoPaintUnprintedSpace(C,
+      CanvasUnprintedSpace(C,
         Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
         OptUnprintedEndDotScale,
         AColorFont);
