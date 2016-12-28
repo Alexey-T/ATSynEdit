@@ -69,6 +69,7 @@ type
     function DoFindToken(APos: integer): integer;
     procedure DoFoldFromLinesHidden;
     procedure DoChangeLog(Sender: TObject; ALine, ACount: integer);
+    procedure DoParseBegin;
     procedure DoParseDone;
     function GetRangeParent(R: TecTextRange): TecTextRange;
     procedure GetTokenProps(token: TecSyntToken; out APntFrom, APntTo: TPoint; out
@@ -100,6 +101,7 @@ type
     function LexerAtPos(Pnt: TPoint): TecSyntAnalyzer;
     property EnabledLineSeparators: boolean read FEnabledLineSeparators write SetEnabledLineSeparators;
     procedure DoAnalize(AEdit: TATSynEdit; AForceAnalizeAll: boolean);
+    procedure DoAnalyzeFromLine(ALine: integer; AWait: boolean);
     procedure Stop;
 
     //tokens
@@ -823,8 +825,7 @@ begin
   if Assigned(AnClient) then
     FreeAndNil(AnClient);
 
-  if Assigned(FOnParseBegin) then
-    FOnParseBegin(Self);
+  DoParseBegin;
 
   if Assigned(AAnalizer) then
   begin
@@ -887,11 +888,7 @@ begin
   if AnClient=nil then exit;
   if Buffer.TextLength=0 then exit;
 
-  if Assigned(FOnParseBegin) then
-    FOnParseBegin(Self);
-
-  FParsePausePassed:= false;
-  FParseTicks:= 0;
+  DoParseBegin;
 
   if AForceAnalizeAll then
   begin
@@ -1240,11 +1237,46 @@ begin
   end;
 end;
 
+procedure TATAdapterEControl.DoParseBegin;
+begin
+  if Assigned(FOnParseBegin) then
+    FOnParseBegin(Self);
+  FParsePausePassed:= false;
+  FParseTicks:= 0;
+end;
+
 procedure TATAdapterEControl.DoParseDone;
 begin
   if Assigned(FOnParseDone) then
     FOnParseDone(Self);
   UpdateEditors(true, true);
+end;
+
+procedure TATAdapterEControl.DoAnalyzeFromLine(ALine: integer; AWait: boolean);
+var
+  NPos: integer;
+begin
+  if not Assigned(AnClient) then exit;
+  DoParseBegin;
+  NPos:= Buffer.CaretToStr(Point(0, ALine));
+  AnClient.ChangedAtPos(NPos);
+  AnClient.AppendToPos(Buffer.TextLength);
+  AnClient.IdleAppend;
+
+  if AnClient.IsFinished then
+  begin
+    DoParseDone;
+  end
+  else
+  begin
+    TimerDuringAnalyze.Enabled:= true;
+    if AWait then
+      while not AnClient.IsFinished do
+      begin
+        Sleep(150);
+        Application.ProcessMessages;
+      end;
+  end;
 end;
 
 end.
