@@ -115,6 +115,10 @@ begin
       if not R.Folded then
         DoRangeFold(R);
     end;
+
+    if Carets.Count>0 then
+      if IsLineFolded(Carets[0].PosY) then
+        DoCaretSingle(0, 0);
   end
   else
   begin
@@ -126,7 +130,7 @@ begin
     end;
   end;
 
-  Result:= [cResultCaretAny, cResultScroll];
+  Result:= [cResultCaretTop, cResultScroll];
 end;
 
 
