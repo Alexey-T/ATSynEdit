@@ -313,13 +313,13 @@ end;
 
 function TATStrings.GetLine(N: integer): atString;
 begin
-  Assert(IsIndexValid(N));
+  //Assert(IsIndexValid(N));
   Result:= UTF8Decode(TATStringItem(FList[N]).ItemString);
 end;
 
 function TATStrings.GetLineBm(Index: integer): integer;
 begin
-  Assert(IsIndexValid(Index));
+  //Assert(IsIndexValid(Index));
   Result:= TATStringItem(FList[Index]).ItemBm;
 end;
 
@@ -327,32 +327,32 @@ function TATStrings.GetLineHint(Index: integer): string;
 var
   N: integer;
 begin
-  Assert(IsIndexValid(Index));
+  //Assert(IsIndexValid(Index));
   N:= TATStringItem(FList[Index]).ItemHint;
   Result:= FHintList[N];
 end;
 
 function TATStrings.GetLineEnd(N: integer): TATLineEnds;
 begin
-  Assert(IsIndexValid(N));
+  //Assert(IsIndexValid(N));
   Result:= TATStringItem(FList[N]).ItemEnd;
 end;
 
 function TATStrings.GetLineFoldFrom(NLine, NClient: integer): integer;
 begin
-  Assert(IsIndexValid(NLine));
+  //Assert(IsIndexValid(NLine));
   Result:= TATStringItem(FList[NLine]).ItemFoldFrom[NClient];
 end;
 
 function TATStrings.GetLineHidden(NLine, NClient: integer): boolean;
 begin
-  Assert(IsIndexValid(NLine));
+  //Assert(IsIndexValid(NLine));
   Result:= TATStringItem(FList[NLine]).ItemHidden[NClient];
 end;
 
 function TATStrings.GetLineState(Index: integer): TATLineState;
 begin
-  Assert(IsIndexValid(Index));
+  //Assert(IsIndexValid(Index));
   Result:= TATStringItem(FList[Index]).ItemState;
 end;
 
@@ -366,7 +366,7 @@ end;
 
 function TATStrings.GetLineSep(Index: integer): TATLineSeparator;
 begin
-  Assert(IsIndexValid(Index));
+  //Assert(IsIndexValid(Index));
   Result:= TATStringItem(FList[Index]).ItemSeparator;
 end;
 
@@ -417,7 +417,7 @@ var
   Str: atString;
   i: integer;
 begin
-  Assert(IsIndexValid(Index));
+  //Assert(IsIndexValid(Index));
   if FReadOnly then Exit;
 
   Item:= TATStringItem(FList[Index]);
@@ -460,7 +460,7 @@ procedure TATStrings.SetLineEnd(Index: integer; AValue: TATLineEnds);
 var
   Item: TATStringItem;
 begin
-  Assert(IsIndexValid(Index));
+  //Assert(IsIndexValid(Index));
   if FReadOnly then Exit;
 
   Item:= TATStringItem(FList[Index]);
@@ -474,15 +474,19 @@ end;
 
 procedure TATStrings.SetLineFoldFrom(IndexLine, IndexClient: integer;
   AValue: integer);
+const
+  cMax=250;
 begin
-  Assert(IsIndexValid(IndexLine));
-  TATStringItem(FList[IndexLine]).ItemFoldFrom[IndexClient]:= AValue;
+  //Assert(IsIndexValid(IndexLine));
+  if AValue<0 then AValue:= 0;
+  if AValue>cMax then AValue:= cMax;
+  TATStringItem(FList[IndexLine]).ItemFoldFrom[IndexClient]:= byte(AValue);
 end;
 
 procedure TATStrings.SetLineHidden(IndexLine, IndexClient: integer;
   AValue: boolean);
 begin
-  Assert(IsIndexValid(IndexLine));
+  //Assert(IsIndexValid(IndexLine));
   TATStringItem(FList[IndexLine]).ItemHidden[IndexClient]:= AValue;
 end;
 
@@ -490,7 +494,7 @@ procedure TATStrings.SetLineHint(Index: integer; const AValue: string);
 var
   N: integer;
 begin
-  Assert(IsIndexValid(Index));
+  //Assert(IsIndexValid(Index));
   if AValue='' then
     N:= 0
   else
@@ -500,7 +504,7 @@ end;
 
 procedure TATStrings.SetLineState(Index: integer; AValue: TATLineState);
 begin
-  Assert(IsIndexValid(Index));
+  //Assert(IsIndexValid(Index));
   TATStringItem(FList[Index]).ItemState:= AValue;
 end;
 
