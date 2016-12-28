@@ -886,9 +886,11 @@ type
       AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
-    procedure DoGotoPos(ACaretPos: TPoint; AIndentHorz, AIndentVert: integer);
-    procedure DoGotoPos_AndUnfold(const APos, APosEnd: TPoint; AIndentHorz,
-      AIndentVert: integer);
+    procedure DoGotoPos(ACaretPos: TPoint;
+      AIndentHorz, AIndentVert: integer);
+    procedure DoGotoPos_AndUnfold(const APos, APosEnd: TPoint;
+      AIndentHorz, AIndentVert: integer;
+      AllowProcessMsg: boolean=true);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
     //misc
     function GetVisibleLines: integer;

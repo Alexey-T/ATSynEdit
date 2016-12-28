@@ -516,7 +516,7 @@ begin
 end;
 
 procedure TATSynEdit.DoGotoPos_AndUnfold(const APos, APosEnd: TPoint;
-  AIndentHorz, AIndentVert: integer);
+  AIndentHorz, AIndentVert: integer; AllowProcessMsg: boolean=true);
 begin
   if not Strings.IsIndexValid(APos.Y) then Exit;
 
@@ -524,6 +524,8 @@ begin
   begin
     DoUnfoldLine(APos.Y);
     Update;
+    if AllowProcessMsg then
+      Application.ProcessMessages;
   end;
 
   DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y);
