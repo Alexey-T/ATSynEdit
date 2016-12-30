@@ -3168,12 +3168,20 @@ begin
     SB_PAGEUP:     Info.NPos:= Info.NPos-Info.NPage;
     SB_PAGEDOWN:   Info.NPos:= Info.NPos+Info.NPage;
 
-    SB_THUMBPOSITION: Info.NPos:= Msg.Pos;
+    SB_THUMBPOSITION:
+      begin
+        //must ignore message with Msg.Msg set: LM_VSCROLL, LM_HSCROLL;
+        //we get it on macOS during window resize, not expected! moves v-scroll pos to 0.
+        if Msg.Msg=0 then
+          Info.NPos:= Msg.Pos;
+      end;
+
     SB_THUMBTRACK:
       begin
         Info.NPos:= Msg.Pos;
         if @Info=@FScrollVert then DoHintShow;
       end;
+
     SB_ENDSCROLL:
       DoHintHide;
   end;
