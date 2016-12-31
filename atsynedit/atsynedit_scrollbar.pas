@@ -15,7 +15,7 @@ mouse:
 - drag of thumb
 }
 
-unit ATScrollBar;
+unit ATSynEdit_ScrollBar;
 
 {$mode delphi}
 
@@ -154,6 +154,7 @@ type
   published
     property Align;
     property Anchors;
+    property BorderSpacing;
     property Enabled;
     property DoubleBuffered;
     property PopupMenu;
