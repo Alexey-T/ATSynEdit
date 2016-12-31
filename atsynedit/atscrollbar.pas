@@ -69,7 +69,7 @@ var
   ATScrollbarTheme: TATScrollbarTheme;
 
 type
-  TATScroll = class(TPanel)
+  TATScroll = class(TCustomPanel)
   private
     FKind: TScrollBarKind;
     FIndentBorder: Integer;
@@ -152,7 +152,13 @@ type
     procedure WMEraseBkgnd(var Message: TMessage); message WM_ERASEBKGND;
     {$endif}
   published
+    property Align;
+    property Anchors;
+    property Enabled;
     property DoubleBuffered;
+    property PopupMenu;
+    property ShowHint;
+    property Visible;
     property Kind: TScrollBarKind read FKind write SetKind;
     property IndentBorder: Integer read FIndentBorder write FIndentBorder;
     property IndentCorner: Integer read FIndentCorner write FIndentCorner;
@@ -161,6 +167,8 @@ type
     property TimerDelay: Integer read FTimerDelay write FTimerDelay;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnOwnerDraw: TATScrollDrawEvent read FOnOwnerDraw write FOnOwnerDraw;
+    property OnContextPopup;
+    property OnResize;
   end;
 
 implementation
