@@ -6,11 +6,6 @@ unit ATSynEdit_CanvasProc;
 
 {$mode objfpc}{$H+}
 
-//{$define invert_pixels} //test Mac caret blinking
-{$ifdef darwin}
-  {$define invert_pixels}
-{$endif}
-
 interface
 
 uses
