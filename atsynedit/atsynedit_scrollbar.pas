@@ -30,6 +30,7 @@ uses
   Windows, Messages,
   {$endif}
   {$ifdef FPC}
+  InterfaceBase,
   LCLIntf,
   {$endif}
   Classes, Types, Graphics,
@@ -179,18 +180,10 @@ uses
 
 function IsDoubleBufferedNeeded: boolean;
 begin
+  {$ifdef FPC}
+  Result:= WidgetSet.GetLCLCapability(lcCanDrawOutsideOnPaint) = LCL_CAPABILITY_NO;
+  {$else}
   Result:= false;
-
-  {$ifdef windows}
-  exit(true);
-  {$endif}
-
-  {$ifdef darwin}
-  exit(false);
-  {$endif}
-
-  {$ifdef linux}
-  exit(false);
   {$endif}
 end;
 

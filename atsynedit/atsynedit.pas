@@ -23,6 +23,7 @@ uses
   {$ifdef Windows}
   Windows, Imm, Messages,
   {$endif}
+  InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms,
   LMessages, LCLType,
