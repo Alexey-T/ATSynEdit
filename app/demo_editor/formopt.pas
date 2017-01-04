@@ -84,6 +84,7 @@ type
     chkUnprintEndDet: TCheckBox;
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
+    edScrollArrowKind: TComboBox;
     edMapCharWidth: TSpinEdit;
     edNumAlign: TComboBox;
     edIndentKind: TComboBox;
@@ -116,6 +117,7 @@ type
     LabChars: TLabel;
     Label1: TLabel;
     Label10: TLabel;
+    Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
@@ -211,6 +213,7 @@ begin
     chkDotLn.Checked:= ed.OptShowIndentLines;
     edTextHint.Text:= ed.OptTextHint;
     edWordChars.Text:= ed.OptWordChars;
+    edScrollArrowKind.ItemIndex:= Ord(ed.OptScrollbarsNewArrowsKind);
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
@@ -323,6 +326,7 @@ begin
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptTextHint:= edTextHint.Text;
       ed.OptWordChars:= edWordChars.Text;
+      ed.OptScrollbarsNewArrowsKind:= TATScrollArrowsKind(edScrollArrowKind.ItemIndex);
       ed.OptOverwriteAllowedOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;

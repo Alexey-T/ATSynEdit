@@ -52,6 +52,14 @@ type
     );
 
 type
+  TATScrollArrowsKind = (
+    asaArrowsAtEdges,
+    asaArrowsBelow,
+    asaArrowsAbove,
+    asaArrowsHidden
+    );
+
+type
   TATScrollDrawEvent = procedure (Sender: TObject; AType: TATScrollElemType;
     ACanvas: TCanvas; const ARect: TRect; var ACanDraw: boolean) of object;
 
@@ -70,9 +78,13 @@ var
   ATScrollbarTheme: TATScrollbarTheme;
 
 type
+
+  { TATScroll }
+
   TATScroll = class(TCustomPanel)
   private
     FKind: TScrollBarKind;
+    FKindArrows: TATScrollArrowsKind;
     FIndentBorder: Integer;
     FIndentCorner: Integer;
     FIndentArrow: Integer;
@@ -85,13 +97,13 @@ type
     FPage: Integer;
 
     //internal
-    FIn: TRect; //area for scrolling
-    FInUp: TRect; //area for up or left arrow
-    FInDown: TRect; //area for down or right arrow
-    FInThumb: TRect; //area for scroll-thumb
-    FInCorner: TRect;
-    FInPageUp: TRect;
-    FInPageDown: TRect;
+    FRectMain: TRect; //area for scrolling
+    FRectArrUp: TRect; //area for up or left arrow
+    FRectArrDown: TRect; //area for down or right arrow
+    FRectThumb: TRect; //area for scroll-thumb
+    FRectCorner: TRect;
+    FRectPageUp: TRect;
+    FRectPageDown: TRect;
 
     FBitmap: TBitmap;
     FTimer: TTimer;
@@ -128,7 +140,8 @@ type
     function GetPxAtScroll(APos: Integer): Integer;
 
     procedure TimerTimer(Sender: TObject);
-    procedure SetKind(Value: TScrollBarKind);
+    procedure SetKind(AValue: TScrollBarKind);
+    procedure SetKindArrows(AValue: TATScrollArrowsKind);
     procedure SetPos(Value: Integer);
     procedure SetMin(Value: Integer);
     procedure SetMax(Value: Integer);
@@ -161,12 +174,13 @@ type
     property PopupMenu;
     property ShowHint;
     property Visible;
-    property Kind: TScrollBarKind read FKind write SetKind;
-    property IndentBorder: Integer read FIndentBorder write FIndentBorder;
-    property IndentCorner: Integer read FIndentCorner write FIndentCorner;
-    property IndentArrow: Integer read FIndentArrow write FIndentArrow;
-    property IndentArrLonger: Integer read FIndentArrLonger write FIndentArrLonger;
-    property TimerDelay: Integer read FTimerDelay write FTimerDelay;
+    property Kind: TScrollBarKind read FKind write SetKind default sbHorizontal;
+    property KindArrows: TATScrollArrowsKind read FKindArrows write SetKindArrows default asaArrowsAtEdges;
+    property IndentBorder: Integer read FIndentBorder write FIndentBorder default 1;
+    property IndentCorner: Integer read FIndentCorner write FIndentCorner default 0;
+    property IndentArrow: Integer read FIndentArrow write FIndentArrow default 3;
+    property IndentArrLonger: Integer read FIndentArrLonger write FIndentArrLonger default 0;
+    property TimerDelay: Integer read FTimerDelay write FTimerDelay default 80;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnOwnerDraw: TATScrollDrawEvent read FOnOwnerDraw write FOnOwnerDraw;
     property OnContextPopup;
@@ -201,6 +215,7 @@ begin
   Height:= 20;
 
   FKind:= sbHorizontal;
+  FKindArrows:= asaArrowsAtEdges;
   FIndentBorder:= 1;
   FIndentCorner:= 0;
   FIndentArrow:= 3;
@@ -250,45 +265,79 @@ end;
 
 procedure TATScroll.DoPaintTo(C: TCanvas);
 var
-  fSize: Integer;
+  FSize: Integer;
 begin
-  FIn:= ClientRect;
+  FRectMain:= ClientRect;
+  FRectArrUp:= Rect(0, 0, 0, 0);
+  FRectArrDown:= Rect(0, 0, 0, 0);
 
   DoUpdateCornerRect;
-  if not IsRectEmpty(FInCorner) then
-    if DoDrawEvent(aseCorner, C, FInCorner) then
-      DoPaintStd_Corner(C, FInCorner);
+  if not IsRectEmpty(FRectCorner) then
+    if DoDrawEvent(aseCorner, C, FRectCorner) then
+      DoPaintStd_Corner(C, FRectCorner);
 
   C.Brush.Color:= ATScrollbarTheme.ColorBorder;
-  C.FillRect(FIn);
+  C.FillRect(FRectMain);
 
-  FIn:= Rect(
-    FIn.Left+FIndentBorder,
-    FIn.Top+FIndentBorder,
-    FIn.Right-FIndentBorder,
-    FIn.Bottom-FIndentBorder);
+  InflateRect(FRectMain, -FIndentBorder, -FIndentBorder);
 
   if IsHorz then
   begin
-    FSize:= Math.Min(FIn.Bottom-FIn.Top, (FIn.Right-FIn.Left) div 2);
+    //horz kind
+    FSize:= Math.Min(FRectMain.Bottom-FRectMain.Top, (FRectMain.Right-FRectMain.Left) div 2);
     Inc(FSize, FIndentArrLonger);
-    FInUp:= Rect(FIn.Left, FIn.Top, FIn.Left+FSize, FIn.Bottom);
-    FInDown:= Rect(FIn.Right-FSize, FIn.Top, FIn.Right, FIn.Bottom);
-    DoPaintArrow(C, FInUp, aseArrowLeft);
-    DoPaintArrow(C, FInDown, aseArrowRight);
-    Inc(FIn.Left, FSize);
-    Dec(FIn.Right, FSize);
+    case FKindArrows of
+      asaArrowsAtEdges:
+        begin
+          FRectArrUp:= Rect(FRectMain.Left, FRectMain.Top, FRectMain.Left+FSize, FRectMain.Bottom);
+          FRectArrDown:= Rect(FRectMain.Right-FSize, FRectMain.Top, FRectMain.Right, FRectMain.Bottom);
+          Inc(FRectMain.Left, FSize);
+          Dec(FRectMain.Right, FSize);
+        end;
+      asaArrowsBelow:
+        begin
+          FRectArrUp:= Rect(FRectMain.Left, FRectMain.Top, FRectMain.Left+FSize, FRectMain.Bottom);
+          FRectArrDown:= Rect(FRectMain.Left+FSize, FRectMain.Top, FRectMain.Left+2*FSize, FRectMain.Bottom);
+          Inc(FRectMain.Left, 2*FSize);
+        end;
+      asaArrowsAbove:
+        begin
+          FRectArrDown:= Rect(FRectMain.Right-FSize, FRectMain.Top, FRectMain.Right, FRectMain.Bottom);
+          FRectArrUp:= Rect(FRectMain.Right-2*FSize, FRectMain.Top, FRectMain.Right-FSize, FRectMain.Bottom);
+          Dec(FRectMain.Right, 2*FSize);
+        end;
+    end;
+    DoPaintArrow(C, FRectArrUp, aseArrowLeft);
+    DoPaintArrow(C, FRectArrDown, aseArrowRight);
   end
   else
   begin
-    FSize:= Math.Min(FIn.Right-FIn.Left, (FIn.Bottom-FIn.Top) div 2);
+    //vertical kind
+    FSize:= Math.Min(FRectMain.Right-FRectMain.Left, (FRectMain.Bottom-FRectMain.Top) div 2);
     Inc(FSize, FIndentArrLonger);
-    FInUp:= Rect(FIn.Left, FIn.Top, FIn.Right, FIn.Top+FSize);
-    FInDown:= Rect(FIn.Left, FIn.Bottom-FSize, FIn.Right, FIn.Bottom);
-    DoPaintArrow(C, FInUp, aseArrowUp);
-    DoPaintArrow(C, FInDown, aseArrowDown);
-    Inc(FIn.Top, FSize);
-    Dec(FIn.Bottom, FSize);
+    case FKindArrows of
+      asaArrowsAtEdges:
+        begin
+          FRectArrUp:= Rect(FRectMain.Left, FRectMain.Top, FRectMain.Right, FRectMain.Top+FSize);
+          FRectArrDown:= Rect(FRectMain.Left, FRectMain.Bottom-FSize, FRectMain.Right, FRectMain.Bottom);
+          Inc(FRectMain.Top, FSize);
+          Dec(FRectMain.Bottom, FSize);
+        end;
+      asaArrowsBelow:
+        begin
+          FRectArrUp:= Rect(FRectMain.Left, FRectMain.Bottom-2*FSize, FRectMain.Right, FRectMain.Bottom-FSize);
+          FRectArrDown:= Rect(FRectMain.Left, FRectMain.Bottom-FSize, FRectMain.Right, FRectMain.Bottom);
+          Dec(FRectMain.Bottom, 2*FSize);
+        end;
+      asaArrowsAbove:
+        begin
+          FRectArrUp:= Rect(FRectMain.Left, FRectMain.Top, FRectMain.Right, FRectMain.Top+FSize);
+          FRectArrDown:= Rect(FRectMain.Left, FRectMain.Top+FSize, FRectMain.Right, FRectMain.Top+2*FSize);
+          Inc(FRectMain.Top, 2*FSize);
+        end;
+    end;
+    DoPaintArrow(C, FRectArrUp, aseArrowUp);
+    DoPaintArrow(C, FRectArrDown, aseArrowDown);
   end;
 
   DoPaintBack(C);
@@ -302,8 +351,8 @@ var
   Typ: TATScrollElemType;
 begin
   if IsHorz then Typ:= aseScrollAreaH else Typ:= aseScrollAreaV;
-  if DoDrawEvent(Typ, C, FIn) then
-    DoPaintStd_Back(C, FIn);
+  if DoDrawEvent(Typ, C, FRectMain) then
+    DoPaintStd_Back(C, FRectMain);
 end;
 
 procedure TATScroll.DoPaintBackScrolled(C: TCanvas);
@@ -313,12 +362,12 @@ begin
   if IsHorz then Typ:= aseScrolledAreaH else Typ:= aseScrolledAreaV;
 
   if FMouseDown and FMouseDownOnPageUp then
-    if DoDrawEvent(Typ, C, FInPageUp) then
-      DoPaintStd_BackScrolled(C, FInPageUp);
+    if DoDrawEvent(Typ, C, FRectPageUp) then
+      DoPaintStd_BackScrolled(C, FRectPageUp);
 
   if FMouseDown and FMouseDownOnPageDown then
-    if DoDrawEvent(Typ, C, FInPageDown) then
-      DoPaintStd_BackScrolled(C, FInPageDown);
+    if DoDrawEvent(Typ, C, FRectPageDown) then
+      DoPaintStd_BackScrolled(C, FRectPageDown);
 end;
 
 
@@ -326,16 +375,16 @@ procedure TATScroll.MouseDown(Button: TMouseButton; Shift: TShiftState;
   X, Y: Integer);
 begin
   FMouseDown:= Button=mbLeft;
-  FMouseDownOnThumb:= PtInRect(FInThumb, Point(X, Y));
-  FMouseDownOnUp:= PtInRect(FInUp, Point(X, Y));
-  FMouseDownOnDown:= PtInRect(FInDown, Point(X, Y));
-  FMouseDownOnPageUp:= PtInRect(FInPageUp, Point(X, Y));
-  FMouseDownOnPageDown:= PtInRect(FInPageDown, Point(X, Y));
+  FMouseDownOnThumb:= PtInRect(FRectThumb, Point(X, Y));
+  FMouseDownOnUp:= PtInRect(FRectArrUp, Point(X, Y));
+  FMouseDownOnDown:= PtInRect(FRectArrDown, Point(X, Y));
+  FMouseDownOnPageUp:= PtInRect(FRectPageUp, Point(X, Y));
+  FMouseDownOnPageDown:= PtInRect(FRectPageDown, Point(X, Y));
 
   if IsHorz then
-    FMouseDragOffset:= X-FInThumb.Left
+    FMouseDragOffset:= X-FRectThumb.Left
   else
-    FMouseDragOffset:= Y-FInThumb.Top;
+    FMouseDragOffset:= Y-FRectThumb.Top;
 
   FTimer.Enabled:= FMouseDown and
     (FMouseDownOnUp or
@@ -394,18 +443,24 @@ begin
     FOnOwnerDraw(Self, AType, ACanvas, ARect, Result);
 end;
 
-procedure TATScroll.SetKind(Value: TScrollBarKind);
+procedure TATScroll.SetKind(AValue: TScrollBarKind);
 begin
-  if Value<>FKind then
-  begin
-    FKind:= Value;
-    Invalidate;
-  end;
+  if AValue=FKind then Exit;
+  FKind:= AValue;
+  Invalidate;
+end;
+
+procedure TATScroll.SetKindArrows(AValue: TATScrollArrowsKind);
+begin
+  if FKindArrows=AValue then Exit;
+  FKindArrows:= AValue;
+  Invalidate;
 end;
 
 procedure TATScroll.DoPaintArrow(C: TCanvas; const R: TRect;
   Typ: TATScrollElemType);
 begin
+  if IsRectEmpty(R) then exit;
   if DoDrawEvent(Typ, C, R) then
     DoPaintStd_Arrow(C, R, Typ);
 end;    
@@ -416,6 +471,7 @@ var
   P, P1, P2, P3: TPoint;
   cc: Integer;
 begin
+  if IsRectEmpty(R) then exit;
   C.Brush.Color:= ATScrollbarTheme.ColorArrowBorder;
   C.FillRect(R);
 
@@ -471,13 +527,13 @@ var
 begin
   if IsHorz then
   begin
-    N0:= FIn.Left;
-    NLen:= FIn.Right-FIn.Left
+    N0:= FRectMain.Left;
+    NLen:= FRectMain.Right-FRectMain.Left
   end
   else
   begin
-    N0:= FIn.Top;
-    NLen:= FIn.Bottom-FIn.Top;
+    N0:= FRectMain.Top;
+    NLen:= FRectMain.Bottom-FRectMain.Top;
   end;
   Result:= N0 + (APos-FMin) * NLen div Math.Max(1, FMax-FMin);
 end;
@@ -488,43 +544,43 @@ const
 var
   R: TRect;
 begin
-  FInThumb:= Rect(0, 0, 0, 0);
-  FInPageUp:= Rect(0, 0, 0, 0);
-  FInPageDown:= Rect(0, 0, 0, 0);
+  FRectThumb:= Rect(0, 0, 0, 0);
+  FRectPageUp:= Rect(0, 0, 0, 0);
+  FRectPageDown:= Rect(0, 0, 0, 0);
 
   if IsHorz then
   begin
-    if FIn.Right-FIn.Left<cMinView then Exit;
-    R.Top:= FIn.Top;
-    R.Bottom:= FIn.Bottom;
+    if FRectMain.Right-FRectMain.Left<cMinView then Exit;
+    R.Top:= FRectMain.Top;
+    R.Bottom:= FRectMain.Bottom;
     R.Left:= GetPxAtScroll(FPos);
-    R.Left:= Math.Min(R.Left, FIn.Right-cMinView);
+    R.Left:= Math.Min(R.Left, FRectMain.Right-cMinView);
     R.Right:= GetPxAtScroll(FPos+FPage);
     R.Right:= Math.Max(R.Right, R.Left+cMinView);
-    R.Right:= Math.Min(R.Right, FIn.Right);
+    R.Right:= Math.Min(R.Right, FRectMain.Right);
   end
   else
   begin
-    if FIn.Bottom-FIn.Top<cMinView then Exit;
-    R.Left:= FIn.Left;
-    R.Right:= FIn.Right;
+    if FRectMain.Bottom-FRectMain.Top<cMinView then Exit;
+    R.Left:= FRectMain.Left;
+    R.Right:= FRectMain.Right;
     R.Top:= GetPxAtScroll(FPos);
-    R.Top:= Math.Min(R.Top, FIn.Bottom-cMinView);
+    R.Top:= Math.Min(R.Top, FRectMain.Bottom-cMinView);
     R.Bottom:= GetPxAtScroll(FPos+FPage);
     R.Bottom:= Math.Max(R.Bottom, R.Top+cMinView);
-    R.Bottom:= Math.Min(R.Bottom, FIn.Bottom);
+    R.Bottom:= Math.Min(R.Bottom, FRectMain.Bottom);
   end;
-  FInThumb:= R;
+  FRectThumb:= R;
 
   if IsHorz then
   begin
-    FInPageUp:= Rect(FIn.Left, FIn.Top, FInThumb.Left, FIn.Bottom);
-    FInPageDown:= Rect(FInThumb.Right, FIn.Top, FIn.Right, FIn.Bottom);
+    FRectPageUp:= Rect(FRectMain.Left, FRectMain.Top, FRectThumb.Left, FRectMain.Bottom);
+    FRectPageDown:= Rect(FRectThumb.Right, FRectMain.Top, FRectMain.Right, FRectMain.Bottom);
   end
   else
   begin
-    FInPageUp:= Rect(FIn.Left, FIn.Top, FIn.Right, FInThumb.Top);
-    FInPageDown:= Rect(FIn.Left, FInThumb.Bottom, FIn.Right, FIn.Bottom);
+    FRectPageUp:= Rect(FRectMain.Left, FRectMain.Top, FRectMain.Right, FRectThumb.Top);
+    FRectPageDown:= Rect(FRectMain.Left, FRectThumb.Bottom, FRectMain.Right, FRectMain.Bottom);
   end;
 end;
 
@@ -532,14 +588,14 @@ procedure TATScroll.DoPaintThumb(C: TCanvas);
 var
   Typ: TATScrollElemType;
 begin
-  if IsRectEmpty(FInThumb) then Exit;
+  if IsRectEmpty(FRectThumb) then Exit;
   if IsHorz then
     Typ:= aseScrollThumbH
   else
     Typ:= aseScrollThumbV;
 
-  if DoDrawEvent(Typ, C, FInThumb) then
-    DoPaintStd_Thumb(C, FInThumb);
+  if DoDrawEvent(Typ, C, FRectThumb) then
+    DoPaintStd_Thumb(C, FRectThumb);
 end;
 
 procedure TATScroll.DoPaintStd_Thumb(C: TCanvas; const R: TRect);
@@ -637,9 +693,9 @@ end;
 function TATScroll.MouseToPos(X, Y: Integer): Integer;
 begin
   if IsHorz then
-    Result:= FMin + (X-FIn.Left) * (FMax-FMin) div Math.Max(FIn.Right-FIn.Left, 1)
+    Result:= FMin + (X-FRectMain.Left) * (FMax-FMin) div Math.Max(FRectMain.Right-FRectMain.Left, 1)
   else
-    Result:= FMin + (Y-FIn.Top) * (FMax-FMin) div Math.Max(FIn.Bottom-FIn.Top, 1);
+    Result:= FMin + (Y-FRectMain.Top) * (FMax-FMin) div Math.Max(FRectMain.Bottom-FRectMain.Top, 1);
 end;
 
 procedure TATScroll.DoUpdatePosOnDrag(X, Y: Integer);
@@ -672,66 +728,69 @@ begin
   P:= Mouse.CursorPos;
   P:= ScreenToClient(P);
 
-  if FMouseDownOnDown and PtInRect(FInDown, P) then
+  if FMouseDownOnDown and PtInRect(FRectArrDown, P) then
     DoScrollBy(1)
   else
-  if FMouseDownOnUp and PtInRect(FInUp, P) then
+  if FMouseDownOnUp and PtInRect(FRectArrUp, P) then
     DoScrollBy(-1)
   else
-  if FMouseDownOnPageDown and PtInRect(FInPageDown, P) then
+  if FMouseDownOnPageDown and PtInRect(FRectPageDown, P) then
     DoScrollBy(FPage)  
   else
-  if FMouseDownOnPageUp and PtInRect(FInPageUp, P) then
+  if FMouseDownOnPageUp and PtInRect(FRectPageUp, P) then
     DoScrollBy(-FPage);
 end;
 
 procedure TATScroll.DoPaintStd_Corner(C: TCanvas; const R: TRect);
 begin
+  if IsRectEmpty(R) then exit;
   C.Brush.Color:= ATScrollbarTheme.ColorBG;
   C.FillRect(R);
 end;
 
 procedure TATScroll.DoPaintStd_Back(C: TCanvas; const R: TRect);
 begin
+  if IsRectEmpty(R) then exit;
   C.Brush.Color:= ATScrollbarTheme.ColorBG;
   C.FillRect(R);
 end;
 
 procedure TATScroll.DoPaintStd_BackScrolled(C: TCanvas; const R: TRect);
 begin
+  if IsRectEmpty(R) then exit;
   C.Brush.Color:= ATScrollbarTheme.ColorScrolled;
   C.FillRect(R);
 end;
 
 procedure TATScroll.DoUpdateCornerRect;
 begin
-  FInCorner:= Rect(0, 0, 0, 0);
+  FRectCorner:= Rect(0, 0, 0, 0);
   if IsHorz then
   begin
     if FIndentCorner>0 then
     begin
-      FInCorner:= Rect(ClientWidth-FIndentCorner, 0, ClientWidth, ClientHeight);
-      Dec(FIn.Right, FIndentCorner);
+      FRectCorner:= Rect(ClientWidth-FIndentCorner, 0, ClientWidth, ClientHeight);
+      Dec(FRectMain.Right, FIndentCorner);
     end
     else
     if FIndentCorner<0 then
     begin
-      FInCorner:= Rect(0, 0, Abs(FIndentCorner), ClientHeight);
-      Inc(FIn.Left, Abs(FIndentCorner));
+      FRectCorner:= Rect(0, 0, Abs(FIndentCorner), ClientHeight);
+      Inc(FRectMain.Left, Abs(FIndentCorner));
     end;
   end
   else
   begin
     if FIndentCorner>0 then
     begin
-      FInCorner:= Rect(0, ClientHeight-FIndentCorner, ClientWidth, ClientHeight);
-      Dec(FIn.Bottom, FIndentCorner);
+      FRectCorner:= Rect(0, ClientHeight-FIndentCorner, ClientWidth, ClientHeight);
+      Dec(FRectMain.Bottom, FIndentCorner);
     end
     else
     if FIndentCorner<0 then
     begin
-      FInCorner:= Rect(0, 0, ClientWidth, Abs(FIndentCorner));
-      Inc(FIn.Top, Abs(FIndentCorner));
+      FRectCorner:= Rect(0, 0, ClientWidth, Abs(FIndentCorner));
+      Inc(FRectMain.Top, Abs(FIndentCorner));
     end;
   end;
 end;
@@ -744,6 +803,6 @@ initialization
   ATScrollbarTheme.ColorArrowBorder:= $808080;
   ATScrollbarTheme.ColorArrowFill:= $c0c0c0;
   ATScrollbarTheme.ColorArrowSign:= $404040;
-  ATScrollbarTheme.ColorScrolled:= $c8c8c8;
+  ATScrollbarTheme.ColorScrolled:= $d0b0b0;
 
 end.

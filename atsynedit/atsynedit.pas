@@ -67,6 +67,13 @@ type
     cDirColumnPageDown
     );
 
+  TATScrollArrowsKind = (
+    asaArrowsAtEdges,
+    asaArrowsBelow,
+    asaArrowsAbove,
+    asaArrowsHidden
+    );
+
   TATCaseConvert = (
     cCaseLower,
     cCaseUpper,
@@ -429,6 +436,7 @@ type
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
     FOptScrollbarsNew: boolean;
+    FOptScrollbarsNewArrowsKind: TATScrollArrowsKind;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
     FOptShowStapleStyle: TATLineStyle;
@@ -684,6 +692,7 @@ type
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
     procedure SetOneLine(AValue: boolean);
+    procedure SetOptScrollbarsNewArrowsKind(AValue: TATScrollArrowsKind);
     procedure SetReadOnly(AValue: boolean);
     procedure SetLineTop(AValue: integer);
     procedure SetColumnLeft(AValue: integer);
@@ -1044,7 +1053,8 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste;
-    property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew;
+    property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
+    property OptScrollbarsNewArrowsKind: TATScrollArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default asaArrowsAtEdges;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
     property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle;
@@ -2573,6 +2583,8 @@ begin
   FCharSizeMinimap:= Point(1, 2);
 
   FOptScrollbarsNew:= false;
+  FOptScrollbarsNewArrowsKind:= asaArrowsAtEdges;
+
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
 
@@ -2877,6 +2889,14 @@ begin
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
   end;
+end;
+
+procedure TATSynEdit.SetOptScrollbarsNewArrowsKind(AValue: TATScrollArrowsKind);
+begin
+  if FOptScrollbarsNewArrowsKind=AValue then Exit;
+  FOptScrollbarsNewArrowsKind:= AValue;
+  FScrollbarVert.KindArrows:= ATSynEdit_ScrollBar.TATScrollArrowsKind(AValue);
+  FScrollbarHorz.KindArrows:= FScrollbarVert.KindArrows;
 end;
 
 procedure TATSynEdit.SetReadOnly(AValue: boolean);
