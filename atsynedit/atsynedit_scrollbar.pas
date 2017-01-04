@@ -196,9 +196,9 @@ uses
 function IsDoubleBufferedNeeded: boolean;
 begin
   {$ifdef FPC}
-  Result:= WidgetSet.GetLCLCapability(lcCanDrawOutsideOnPaint) = LCL_CAPABILITY_NO;
+  Result:= WidgetSet.GetLCLCapability(lcCanDrawOutsideOnPaint) = LCL_CAPABILITY_YES;
   {$else}
-  Result:= false;
+  Result:= true;
   {$endif}
 end;
 
