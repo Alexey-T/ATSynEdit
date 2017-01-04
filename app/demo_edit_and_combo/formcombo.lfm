@@ -1,7 +1,7 @@
 object fmCombo: TfmCombo
-  Left = 426
+  Left = 418
   Height = 279
-  Top = 370
+  Top = 398
   Width = 397
   Caption = 'Demo - ATEdit, ATComboEdit'
   ClientHeight = 279

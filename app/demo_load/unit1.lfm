@@ -1,14 +1,14 @@
 object fmMain: TfmMain
-  Left = 222
+  Left = 220
   Height = 442
-  Top = 254
+  Top = 293
   Width = 932
   Caption = 'App'
   ClientHeight = 442
   ClientWidth = 932
   OnCreate = FormCreate
   OnShow = FormShow
-  LCLVersion = '1.5'
+  LCLVersion = '1.7'
   object Panel1: TPanel
     Left = 0
     Height = 442

@@ -1,7 +1,7 @@
 object fmMain: TfmMain
-  Left = 391
+  Left = 327
   Height = 578
-  Top = 237
+  Top = 221
   Width = 889
   Caption = 'Demo'
   ClientHeight = 578
@@ -10,7 +10,6 @@ object fmMain: TfmMain
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.7'
-  Visible = False
   object Panel1: TPanel
     Left = 0
     Height = 218

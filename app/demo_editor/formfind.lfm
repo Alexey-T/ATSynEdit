@@ -1,7 +1,7 @@
 object fmFind: TfmFind
-  Left = 521
+  Left = 446
   Height = 233
-  Top = 265
+  Top = 397
   Width = 489
   BorderStyle = bsDialog
   Caption = 'Find/Replace'
@@ -10,7 +10,6 @@ object fmFind: TfmFind
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.7'
-  Visible = False
   object bFind: TButton
     Left = 376
     Height = 25

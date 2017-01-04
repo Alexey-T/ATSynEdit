@@ -63,8 +63,8 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 24
         Top = 68
-        Width = 125
-        Caption = 'last line on top'
+        Width = 163
+        Caption = 'show last line on top'
         TabOrder = 3
       end
       object chkCopyNoSel: TCheckBox
@@ -73,14 +73,14 @@ object fmOpt: TfmOpt
         Top = 8
         Width = 147
         Caption = 'copy lines if no sel'
-        TabOrder = 5
+        TabOrder = 6
       end
       object chkShowFullSel: TCheckBox
         Left = 8
         Height = 24
         Top = 88
-        Width = 198
-        Caption = 'show selection-bg full line'
+        Width = 201
+        Caption = 'show selection BG full size'
         TabOrder = 4
       end
       object chkOvrPaste: TCheckBox
@@ -89,7 +89,7 @@ object fmOpt: TfmOpt
         Top = 68
         Width = 256
         Caption = 'consider overwrite-mode on paste'
-        TabOrder = 8
+        TabOrder = 9
       end
       object LabChars: TLabel
         Left = 408
@@ -104,7 +104,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 272
         Width = 106
-        TabOrder = 14
+        TabOrder = 15
       end
       object chkDotLn: TCheckBox
         Left = 296
@@ -112,7 +112,7 @@ object fmOpt: TfmOpt
         Top = 48
         Width = 235
         Caption = 'show wrapped-indent vert lines'
-        TabOrder = 7
+        TabOrder = 8
       end
       object chkCutNoSel: TCheckBox
         Left = 296
@@ -120,7 +120,7 @@ object fmOpt: TfmOpt
         Top = 28
         Width = 136
         Caption = 'cut lines if no sel'
-        TabOrder = 6
+        TabOrder = 7
       end
       object chkSaveTrim: TCheckBox
         Left = 296
@@ -128,7 +128,7 @@ object fmOpt: TfmOpt
         Top = 88
         Width = 192
         Caption = 'on save: trim trail spaces'
-        TabOrder = 9
+        TabOrder = 10
       end
       object chkSaveEol: TCheckBox
         Left = 296
@@ -136,7 +136,7 @@ object fmOpt: TfmOpt
         Top = 108
         Width = 184
         Caption = 'on save: ensure final eol'
-        TabOrder = 10
+        TabOrder = 11
       end
       object chkScrollHint: TCheckBox
         Left = 296
@@ -144,7 +144,7 @@ object fmOpt: TfmOpt
         Top = 128
         Width = 242
         Caption = 'show hint on dragging vert-scroll'
-        TabOrder = 11
+        TabOrder = 12
       end
       object chkCurLineMin: TCheckBox
         Left = 24
@@ -159,7 +159,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 244
         Width = 106
-        TabOrder = 13
+        TabOrder = 14
       end
       object LabelHint: TLabel
         Left = 408
@@ -173,9 +173,9 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 24
         Top = 108
-        Width = 181
-        Caption = 'show syntax-bg full line'
-        TabOrder = 15
+        Width = 238
+        Caption = 'show syntax-regions BG full size'
+        TabOrder = 5
       end
       object edScrollArrowKind: TComboBox
         Left = 296
@@ -190,7 +190,7 @@ object fmOpt: TfmOpt
           'no arrows'
         )
         Style = csDropDownList
-        TabOrder = 12
+        TabOrder = 13
       end
       object Label11: TLabel
         Left = 456
@@ -1017,9 +1017,10 @@ object fmOpt: TfmOpt
           'HorzPercents50'
           'Frame'
         )
-        ItemHeight = 23
+        ItemHeight = 0
         ScrollWidth = 115
         TabOrder = 8
+        TopIndex = -1
         Visible = False
       end
       object chkCrBlinkEn: TCheckBox

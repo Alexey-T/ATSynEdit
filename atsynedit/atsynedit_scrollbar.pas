@@ -3,16 +3,17 @@ ATScrollBar for Delphi/Lazarus
 Copyright (c) Alexey Torgashin (UVViewSoft)
 License: MPL 2.0 or LGPL
 
-Supports most of needed features:
-- default look is flat
-- arrow mark of any size
-- border of any size
-- corner indent (for horz+vert at same form)
-- owner-draw (you can paint OS theme)
-mouse:
+Features:
+- fully supports owner-draw of all elements (arrows, backgnd, thumb, corner empty area)
+- prop: border size
+- prop: arrow mark size
+- prop: size of corner empty area (for additional controls maybe)
+- prop: kind of arrows (normal, both above, both below, no arrows)
+
+Mouse usage:
 - click and holding mouse on arrows
 - click and holding mouse on page-up (area above thumb) / page-down (area below thumb)
-- drag of thumb
+- dragging of thumb
 }
 
 unit ATSynEdit_ScrollBar;
@@ -53,7 +54,7 @@ type
 
 type
   TATScrollArrowsKind = (
-    asaArrowsAtEdges,
+    asaArrowsNormal,
     asaArrowsBelow,
     asaArrowsAbove,
     asaArrowsHidden
@@ -175,7 +176,7 @@ type
     property ShowHint;
     property Visible;
     property Kind: TScrollBarKind read FKind write SetKind default sbHorizontal;
-    property KindArrows: TATScrollArrowsKind read FKindArrows write SetKindArrows default asaArrowsAtEdges;
+    property KindArrows: TATScrollArrowsKind read FKindArrows write SetKindArrows default asaArrowsNormal;
     property IndentBorder: Integer read FIndentBorder write FIndentBorder default 1;
     property IndentCorner: Integer read FIndentCorner write FIndentCorner default 0;
     property IndentArrow: Integer read FIndentArrow write FIndentArrow default 3;
@@ -215,7 +216,7 @@ begin
   Height:= 20;
 
   FKind:= sbHorizontal;
-  FKindArrows:= asaArrowsAtEdges;
+  FKindArrows:= asaArrowsNormal;
   FIndentBorder:= 1;
   FIndentCorner:= 0;
   FIndentArrow:= 3;
@@ -287,7 +288,7 @@ begin
     FSize:= Math.Min(FRectMain.Bottom-FRectMain.Top, (FRectMain.Right-FRectMain.Left) div 2);
     Inc(FSize, FIndentArrLonger);
     case FKindArrows of
-      asaArrowsAtEdges:
+      asaArrowsNormal:
         begin
           FRectArrUp:= Rect(FRectMain.Left, FRectMain.Top, FRectMain.Left+FSize, FRectMain.Bottom);
           FRectArrDown:= Rect(FRectMain.Right-FSize, FRectMain.Top, FRectMain.Right, FRectMain.Bottom);
@@ -316,7 +317,7 @@ begin
     FSize:= Math.Min(FRectMain.Right-FRectMain.Left, (FRectMain.Bottom-FRectMain.Top) div 2);
     Inc(FSize, FIndentArrLonger);
     case FKindArrows of
-      asaArrowsAtEdges:
+      asaArrowsNormal:
         begin
           FRectArrUp:= Rect(FRectMain.Left, FRectMain.Top, FRectMain.Right, FRectMain.Top+FSize);
           FRectArrDown:= Rect(FRectMain.Left, FRectMain.Bottom-FSize, FRectMain.Right, FRectMain.Bottom);

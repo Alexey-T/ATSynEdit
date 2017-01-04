@@ -68,7 +68,7 @@ type
     );
 
   TATScrollArrowsKind = (
-    asaArrowsAtEdges,
+    asaArrowsNormal,
     asaArrowsBelow,
     asaArrowsAbove,
     asaArrowsHidden
@@ -1054,7 +1054,7 @@ type
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
-    property OptScrollbarsNewArrowsKind: TATScrollArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default asaArrowsAtEdges;
+    property OptScrollbarsNewArrowsKind: TATScrollArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default asaArrowsNormal;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
     property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle default cLineStyleSolid;
@@ -2584,7 +2584,7 @@ begin
   FCharSizeMinimap:= Point(1, 2);
 
   FOptScrollbarsNew:= false;
-  FOptScrollbarsNewArrowsKind:= asaArrowsAtEdges;
+  FOptScrollbarsNewArrowsKind:= asaArrowsNormal;
 
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
