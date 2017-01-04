@@ -52,7 +52,7 @@ type
     procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
-    property OptComboboxArrowSize: integer read FArrowSize write FArrowSize;
+    property OptComboboxArrowSize: integer read FArrowSize write FArrowSize default 4;
   end;
 
 
