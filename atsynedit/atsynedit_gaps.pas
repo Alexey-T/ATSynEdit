@@ -28,7 +28,7 @@ type
     LineIndex: integer;
     Size: integer;
     Bitmap: TBitmap;
-    Tag: integer;
+    Tag: Int64;
     constructor Create; virtual;
     destructor Destroy; override;
   end;
@@ -48,8 +48,8 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATSynGapItem read GetItem; default;
     procedure Delete(N: integer);
-    function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; ATag: integer): boolean;
-    function Find(ALineIndex: integer; ATag: integer=-1): TATSynGapItem;
+    function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; ATag: Int64): boolean;
+    function Find(ALineIndex: integer; ATag: Int64=-1): TATSynGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
     procedure Update(ALine: integer; AChange: TATLineChangeKind);
@@ -147,7 +147,7 @@ begin
 end;
 
 function TATSynGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap;
-  ATag: integer): boolean;
+  ATag: Int64): boolean;
 var
   Item: TATSynGapItem;
 begin
@@ -166,7 +166,7 @@ begin
   Result:= true;
 end;
 
-function TATSynGaps.Find(ALineIndex: integer; ATag: integer=-1): TATSynGapItem;
+function TATSynGaps.Find(ALineIndex: integer; ATag: Int64=-1): TATSynGapItem;
 var
   Item: TATSynGapItem;
   i: integer;
