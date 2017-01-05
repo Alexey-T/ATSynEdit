@@ -144,6 +144,8 @@ constructor TATComboEdit.Create(AOwner: TComponent);
 begin
   inherited;
 
+  WantReturns:= true; //allow combo to handle Enter
+
   FItems:= TStringList.Create;
   FItemIndex:= -1;
   FMenu:= TPopupMenu.Create(Self);
