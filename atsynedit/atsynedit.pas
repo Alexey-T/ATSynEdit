@@ -305,6 +305,7 @@ type
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
     FWantTabs: boolean;
+    FWantReturns: boolean;
     FEditorIndex: integer;
     FMarginRight: integer;
     FMarginList: TList;
@@ -948,10 +949,11 @@ type
     procedure DoEnter; override;
     procedure DoExit; override;
     //messages
-    procedure WMGetDlgCode(var Msg: TLMNoParams); message LM_GETDLGCODE;
+    //procedure WMGetDlgCode(var Msg: TLMNoParams); message LM_GETDLGCODE;
     procedure WMEraseBkgnd(var Msg: TLMEraseBkgnd); message LM_ERASEBKGND;
     procedure WMHScroll(var Msg: TLMHScroll); message LM_HSCROLL;
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
+    procedure CMWantSpecialKey(var Message: TCMWantSpecialKey); message CM_WANTSPECIALKEY;
     // Windows IME Support
     {$ifdef Windows}
     procedure WMIME_STARTCOMPOSITION(var Msg:TMessage); message WM_IME_STARTCOMPOSITION;
@@ -1033,6 +1035,7 @@ type
     property CursorBm: TCursor read FCursorBm write FCursorBm default crHandPoint;
     property Colors: TATSynEditColors read FColors write FColors;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
+    property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces default false;
@@ -2437,6 +2440,7 @@ begin
   FScrollbarHorz.OnChange:= @OnNewScrollbarHorzChanged;
 
   FWantTabs:= true;
+  FWantReturns:= true;
   FCharSize:= Point(4, 4); //not nul
   FEditorIndex:= 0;
 
@@ -4754,13 +4758,19 @@ begin
 end;
 
 
-procedure TATSynEdit.WMGetDlgCode(var Msg: TLMNoParams);
+procedure TATSynEdit.CMWantSpecialKey(var Message: TCMWantSpecialKey);
 begin
-  inherited;
-  Msg.Result:= DLGC_WANTARROWS or DLGC_WANTCHARS or DLGC_WANTALLKEYS;
-  if FWantTabs and (GetKeyState(VK_CONTROL) >= 0) then
-    Msg.Result:= Msg.Result or DLGC_WANTTAB;
+  case Message.CharCode of
+    VK_RETURN: Message.Result:= Ord(WantReturns);
+    VK_TAB: Message.Result:= Ord(WantTabs);
+    VK_LEFT,
+    VK_RIGHT,
+    VK_UP,
+    VK_DOWN: Message.Result:= 1;
+    else inherited;
+  end;
 end;
+
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin

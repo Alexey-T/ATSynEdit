@@ -123,6 +123,7 @@ begin
   inherited;
 
   WantTabs:= false;
+  WantReturns:= false;
   ModeOneLine:= true;
 
   Keymap:= KeymapCombo;

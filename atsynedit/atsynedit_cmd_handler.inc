@@ -15,10 +15,12 @@ procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   inherited;
 
-  if not FWantTabs then
-    if Key=vk_tab then Exit;
+  if not WantTabs then
+    if Key=VK_TAB then Exit;
+  if not WantReturns then
+    if Key=VK_RETURN then Exit;
 
-  if Key=vk_apps then
+  if Key=VK_APPS then
   begin
     DoMenuText;
     Exit
