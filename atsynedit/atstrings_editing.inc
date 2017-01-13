@@ -238,11 +238,20 @@ begin
       bDelEmpty:= true;
     end;
 
+    if AFromX=0 then
+      bDelEmpty:= true;
+
     //remember no final Eol
     bNoEol:= (AToY=Count-1) and (LinesEnds[AToY]=cEndNone);
 
-    //place ramaining parts of 1st+last lines
-    Str:= Copy(Lines[AFromY], 1, AFromX) + Copy(Lines[AToY], AToX+1, MaxInt);
+    //place remaining parts of 1st+last lines
+    Str:= '';
+    if AFromX>0 then //from 1st line
+      Str:= Copy(Lines[AFromY], 1, AFromX);
+    if AToX>0 then //from last line
+      Str:= Str + Copy(Lines[AToY], AToX+1, MaxInt)
+    else
+      Dec(AToY);
     Lines[AFromY]:= Str;
 
     //del middle lines
