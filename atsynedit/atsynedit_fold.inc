@@ -202,7 +202,7 @@ procedure TATSynEdit.UpdateFoldedFromLinesHidden;
 var
   i, j: integer;
   bHidden: boolean;
-  NFoldFrom: integer;
+  NFoldFrom, RangeFoldFrom, NPosAfterEnd: integer;
   R: TATSynRange;
 begin
   for i:= 0 to Strings.Count-1 do
@@ -215,7 +215,16 @@ begin
     begin
       R:= Fold.Items[j];
       if (R.Y>i) then Break;
-      if (R.Y=i) and (R.X=NFoldFrom) then
+      if (R.Y<>i) then Continue;
+
+      NPosAfterEnd:= Strings.LinesLen[R.Y]+1;
+      if (OptFoldStyle in [cFoldFromEndOfLine, cFoldFromEndOfLineAlways]) and
+        (NFoldFrom=NPosAfterEnd) then
+        RangeFoldFrom:= NPosAfterEnd
+      else
+        RangeFoldFrom:= R.X;
+
+      if (RangeFoldFrom=NFoldFrom) then
       begin
         DoRangeFold(R); //do not just R.Folded:= true;
         Break
