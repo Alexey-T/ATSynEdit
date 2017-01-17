@@ -200,31 +200,31 @@ end;
 
 procedure TATSynEdit.UpdateFoldedFromLinesHidden;
 var
-  i, j: integer;
-  bHidden: boolean;
-  NFoldFrom, RangeFoldFrom, NPosAfterEnd: integer;
+  nLine, nRange: integer;
+  bOk: boolean;
+  NFoldFrom, NPosAfterEnd: integer;
   R: TATSynRange;
 begin
-  for i:= 0 to Strings.Count-1 do
+  for nLine:= 0 to Strings.Count-1 do
   begin
-    bHidden:= Strings.LinesHidden[i, FEditorIndex];
-    if bHidden then Continue;
+    if Strings.LinesHidden[nLine, FEditorIndex] then Continue;
+    NFoldFrom:= Strings.LinesFoldFrom[nLine, FEditorIndex];
 
-    NFoldFrom:= Strings.LinesFoldFrom[i, FEditorIndex];
-    for j:= 0 to Fold.Count-1 do
+    for nRange:= 0 to Fold.Count-1 do
     begin
-      R:= Fold.Items[j];
-      if (R.Y>i) then Break;
-      if (R.Y<>i) then Continue;
+      R:= Fold[nRange];
+      if R.IsSimple then Continue;
+      if (R.Y>nLine) then Break;
+      if (R.Y<>nLine) then Continue;
 
       NPosAfterEnd:= Strings.LinesLen[R.Y]+1;
       if (OptFoldStyle in [cFoldFromEndOfLine, cFoldFromEndOfLineAlways]) and
         (NFoldFrom=NPosAfterEnd) then
-        RangeFoldFrom:= NPosAfterEnd
+        bOk:= true
       else
-        RangeFoldFrom:= R.X;
+        bOk:= R.X=NFoldFrom;
 
-      if (RangeFoldFrom=NFoldFrom) then
+      if bOk then
       begin
         DoRangeFold(R); //do not just R.Folded:= true;
         Break
