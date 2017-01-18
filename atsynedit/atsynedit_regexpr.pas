@@ -163,9 +163,9 @@ const
   + 'abcdefghijklmnopqrstuvwxyz'
   + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_';
   RegExprLineSeparators : RegExprString =// default value for LineSeparators
-   #$d#$a{$IFDEF UniCode}+#$b#$c#$2028#$2029#$85{$ENDIF}; //###0.947
+    #$a; //AT, was #$d#$a{$IFDEF UniCode}+#$b#$c#$2028#$2029#$85{$ENDIF}; //###0.947
   RegExprLinePairedSeparator : RegExprString =// default value for LinePairedSeparator
-   #$d#$a;
+    ''; //AT, was #$d#$a;
   { if You need Unix-styled line separators (only \n), then use:
   RegExprLineSeparators = #$a;
   RegExprLinePairedSeparator = '';
