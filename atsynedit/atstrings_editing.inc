@@ -244,24 +244,30 @@ begin
     //remember no final Eol
     bNoEol:= (AToY=Count-1) and (LinesEnds[AToY]=cEndNone);
 
-    //place remaining parts of 1st+last lines
-    Str:= '';
-    if AFromX>0 then //from 1st line
-      Str:= Copy(Lines[AFromY], 1, AFromX);
-    if AToX>0 then //from last line
-      Str:= Str + Copy(Lines[AToY], AToX+1, MaxInt)
+    if (AFromX=0) and (AToX=0) then
+    begin
+      //special case: selected entire lines
+      for i:= AToY-1 downto AFromY do
+        LineDelete(i);
+    end
     else
-      Dec(AToY);
-    Lines[AFromY]:= Str;
+    begin
+      //concat remaining parts of 1st+last lines
+      Str:= '';
+      if AFromX>0 then
+        Str:= Copy(Lines[AFromY], 1, AFromX);
+      Str:= Str + Copy(Lines[AToY], AToX+1, MaxInt);
+      Lines[AFromY]:= Str;
 
-    //del middle lines
-    for i:= AToY downto AFromY+1 do
-      LineDelete(i);
+      //del middle lines
+      for i:= AToY downto AFromY+1 do
+        LineDelete(i);
 
-    //del empty line?
-    if bDelEmpty then
-      if Str='' then
-        LineDelete(AFromY);
+      //del empty line?
+      if bDelEmpty then
+        if Str='' then
+          LineDelete(AFromY);
+    end;
 
     if bNoEol then
     begin
