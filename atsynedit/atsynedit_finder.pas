@@ -431,16 +431,16 @@ end;
 
 function TATEditorFinder.DoReplaceAll: integer;
 var
-  Ok, Changed: boolean;
+  Ok, bChanged: boolean;
 begin
   Result:= 0;
-  if DoFindOrReplace(false, true, true, Changed) then
+  if DoFindOrReplace(false, true, true, bChanged) then
   begin
-    if Changed then Inc(Result);
-    while DoFindOrReplace(true, true, true, Changed) do
+    if bChanged then Inc(Result);
+    while DoFindOrReplace(true, true, true, bChanged) do
     begin
       if Application.Terminated then exit;
-      if Changed then Inc(Result);
+      if bChanged then Inc(Result);
       if Assigned(FOnProgress) then
       begin
         Ok:= true;
@@ -525,20 +525,11 @@ begin
   AChanged:= false;
 
   if not Assigned(FEditor) then
-  begin
-    Showmessage('Finder.Editor not set');
-    Exit
-  end;
+    raise Exception.Create('Finder.Editor not set');
   if StrFind='' then
-  begin
-    Showmessage('Finder.StrFind not set');
-    Exit
-  end;
+    raise Exception.Create('Finder.StrFind is empty');
   if FEditor.Carets.Count=0 then
-  begin
-    Showmessage('Editor has no caret');
-    Exit
-  end;
+    raise Exception.Create('Finder.Editor.Carets is empty');
 
   if AReplace and FEditor.ModeReadOnly then exit;
   if OptRegex then OptBack:= false;
