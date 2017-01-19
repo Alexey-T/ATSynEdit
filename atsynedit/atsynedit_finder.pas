@@ -14,6 +14,7 @@ uses
   ATSynEdit_RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Carets,
+  ATStrings,
   ATStringProc,
   ATStringProc_TextBuffer;
 
@@ -87,6 +88,7 @@ type
     FOnFound: TATFinderFound;
     FOnConfirmReplace: TATFinderConfirmReplace;
     FFragments: TList;
+    FReplacedAtEndOfText: boolean;
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean; out
       AChanged: boolean; AStartPos: integer): boolean;
     procedure DoFixCaretSelectionDirection;
@@ -441,6 +443,7 @@ begin
     begin
       if Application.Terminated then exit;
       if bChanged then Inc(Result);
+      if FReplacedAtEndOfText then exit;
       if Assigned(FOnProgress) then
       begin
         Ok:= true;
@@ -455,22 +458,26 @@ procedure TATEditorFinder.DoReplaceTextInEditor(P1, P2: TPoint);
 var
   Shift, PosAfter: TPoint;
   Str: UnicodeString;
+  Strs: TATStrings;
 begin
   if OptRegex then
     Str:= StrReplacement
   else
     Str:= StrReplace;
 
-  FEditor.Strings.BeginUndoGroup;
-  FEditor.Strings.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
-  FEditor.Strings.TextInsert(P1.X, P1.Y, Str, false, Shift, PosAfter);
-  FEditor.Strings.EndUndoGroup;
+  Strs:= FEditor.Strings;
+  FReplacedAtEndOfText:= (P2.Y=Strs.Count-1) and (P2.X=Strs.LinesLen[P2.Y]);
+
+  Strs.BeginUndoGroup;
+  Strs.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
+  Strs.TextInsert(P1.X, P1.Y, Str, false, Shift, PosAfter);
+  Strs.EndUndoGroup;
   FEditor.DoEventChange;
 
-  //correct caret pos
-  //(e.g. replace "dddddd" to "--": move lefter)
   if not OptBack then
   begin
+    //correct caret pos
+    //(e.g. replace "dddddd" to "--": move lefter)
     FEditor.DoCaretSingle(P1.X+Length(Str), P1.Y);
   end;
 end;
@@ -523,6 +530,7 @@ var
 begin
   Result:= false;
   AChanged:= false;
+  FReplacedAtEndOfText:= false;
 
   if not Assigned(FEditor) then
     raise Exception.Create('Finder.Editor not set');
@@ -652,6 +660,8 @@ var
   SSelText: UnicodeString;
 begin
   Result:= false;
+  FReplacedAtEndOfText:= false;
+
   if not IsSelectionStartsAtFoundMatch then
   begin
     //do Find-next (from caret)
