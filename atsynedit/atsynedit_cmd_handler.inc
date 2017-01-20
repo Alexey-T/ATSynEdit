@@ -284,8 +284,8 @@ begin
 
     cCommand_FoldAll:                  Res:= DoCommand_FoldUnfoldAll(true);
     cCommand_UnfoldAll:                Res:= DoCommand_FoldUnfoldAll(false);
-    cCommand_FoldLevel2..
-    cCommand_FoldLevel9:               Res:= DoCommand_FoldLevel(ACmd-cCommand_FoldLevel2+1);
+    cCommand_FoldLevel1..
+    cCommand_FoldLevel9:               Res:= DoCommand_FoldLevel(ACmd-cCommand_FoldLevel1);
 
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
     cCommand_CaretsExtendUpLine:       Res:= DoCommand_CaretsExtend(false, 1);

@@ -284,12 +284,12 @@ begin
   miSub.Enabled:= Fold.Count>0;
   Menu.Items.Add(miSub);
 
-  for i:= 2 to 9 do
+  for i:= 1 to 9 do
   begin
     mi:= TMenuItem.Create(Self);
-    mi.Caption:= Inttostr(i);
+    mi.Caption:= IntToStr(i);
     mi.Tag:= i-1;
-    mi.OnClick:=@MenuFoldLevelClick;
+    mi.OnClick:= @MenuFoldLevelClick;
     miSub.Add(mi);
   end;
 

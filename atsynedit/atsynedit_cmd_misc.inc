@@ -100,31 +100,35 @@ end;
 
 function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
 var
-  Ar: TATIntArray;
   R: TATSynRange;
+  NeedFixCaret: boolean;
   i: integer;
 begin
   if ADoFold then
   begin
-    Ar:= Fold.FindRangesContainingLines(
-      0, Strings.Count-1, nil,
-      false{OnlyFolded}, true{TopLevelOnly}, cRngHasAnyOfLines);
-    for i:= Low(Ar) to High(Ar) do
+    for i:= 0 to Fold.Count-1 do
     begin
-      R:= Fold.Items[Ar[i]];
-      if not R.Folded then
-        DoRangeFold(R);
+      R:= Fold[i];
+      if R.IsSimple then Continue;
+      R.Folded:= false;
+      DoRangeFold(R);
     end;
 
-    if Carets.Count>0 then
-      if IsLineFolded(Carets[0].PosY) then
-        DoCaretSingle(0, 0);
+    NeedFixCaret:= false;
+    for i:= 0 to Carets.Count-1 do
+      if IsLineFolded(Carets[i].PosY) then
+      begin
+        NeedFixCaret:= true;
+        Break;
+      end;
+    if NeedFixCaret then
+      DoCaretSingle(0, 0);
   end
   else
   begin
     for i:= 0 to Fold.Count-1 do
     begin
-      R:= Fold.Items[i];
+      R:= Fold[i];
       if R.Folded then
         DoRangeUnfold(R);
     end;

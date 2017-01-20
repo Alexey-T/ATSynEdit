@@ -167,6 +167,7 @@ begin
 
   M.Add(cCommand_FoldAll, 'folding: fold all', [], []);
   M.Add(cCommand_UnfoldAll, 'folding: unfold all', [], []);
+  M.Add(cCommand_FoldLevel1, 'folding: fold level 1', [], []);
   M.Add(cCommand_FoldLevel2, 'folding: fold level 2', [], []);
   M.Add(cCommand_FoldLevel3, 'folding: fold level 3', [], []);
   M.Add(cCommand_FoldLevel4, 'folding: fold level 4', [], []);
