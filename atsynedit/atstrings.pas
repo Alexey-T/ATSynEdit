@@ -71,7 +71,7 @@ type
     ItemBm: byte; //kind of bookmark, 0: none
     ItemHint: byte; //max 250 hints per control, 0: no hint
     ItemHidden: packed array[0..cMaxStringsClients-1] of ByteBool;
-    ItemFoldFrom: packed array[0..cMaxStringsClients-1] of byte;
+    ItemFoldFrom: packed array[0..cMaxStringsClients-1] of word;
       //0: line not folded
       //>0: line folded from this char-pos
     constructor Create_UTF8(const AString: UTF8String; AEnd: TATLineEnds);
@@ -475,12 +475,12 @@ end;
 procedure TATStrings.SetLineFoldFrom(IndexLine, IndexClient: integer;
   AValue: integer);
 const
-  cMax=250;
+  cMax = 5000;
 begin
   //Assert(IsIndexValid(IndexLine));
   if AValue<0 then AValue:= 0;
   if AValue>cMax then AValue:= cMax;
-  TATStringItem(FList[IndexLine]).ItemFoldFrom[IndexClient]:= byte(AValue);
+  TATStringItem(FList[IndexLine]).ItemFoldFrom[IndexClient]:= AValue;
 end;
 
 procedure TATStrings.SetLineHidden(IndexLine, IndexClient: integer;
