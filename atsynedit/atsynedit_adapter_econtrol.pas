@@ -220,7 +220,7 @@ var
   ok: boolean;
 begin
   Result:= false;
-  if not DynamicHiliteActiveNow then Exit;
+  if not DynamicHiliteActiveNow(AEdit.Strings.Count) then Exit;
 
   for i:= 0 to AEdit.Carets.Count-1 do
   begin

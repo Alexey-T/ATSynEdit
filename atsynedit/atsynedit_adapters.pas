@@ -20,7 +20,6 @@ type
     FDynamicHiliteEnabled: boolean;
     FDynamicHiliteMaxLines: integer;
     FDynamicHiliteSupportedInCurLexer: boolean;
-    FEditorLineCount: integer;
   public
     constructor Create(AOwner: TComponent); override;
     procedure AddEditor(AEditor: TComponent); virtual;
@@ -39,8 +38,7 @@ type
     property DynamicHiliteEnabled: boolean read FDynamicHiliteEnabled write FDynamicHiliteEnabled;
     property DynamicHiliteMaxLines: integer read FDynamicHiliteMaxLines write FDynamicHiliteMaxLines;
     property DynamicHiliteSupportedInCurLexer: boolean read FDynamicHiliteSupportedInCurLexer write FDynamicHiliteSupportedInCurLexer;
-    function DynamicHiliteActiveNow: boolean;
-    property EditorLineCount: integer write FEditorLineCount;
+    function DynamicHiliteActiveNow(ALinesCount: integer): boolean;
   end;
 
 implementation
@@ -53,7 +51,6 @@ begin
   FDynamicHiliteEnabled:= true;
   FDynamicHiliteSupportedInCurLexer:= true;
   FDynamicHiliteMaxLines:= 1000;
-  FEditorLineCount:= 0;
 end;
 
 procedure TATAdapterHilite.AddEditor(AEditor: TComponent);
@@ -96,12 +93,12 @@ begin
   //
 end;
 
-function TATAdapterHilite.DynamicHiliteActiveNow: boolean;
+function TATAdapterHilite.DynamicHiliteActiveNow(ALinesCount: integer): boolean;
 begin
   Result:=
     DynamicHiliteEnabled and
     DynamicHiliteSupportedInCurLexer and
-    (FEditorLineCount<=DynamicHiliteMaxLines);
+    (ALinesCount<=DynamicHiliteMaxLines);
 end;
 
 
