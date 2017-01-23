@@ -837,7 +837,7 @@ begin
   if Assigned(FOnLexerChange) then
     FOnLexerChange(Self);
 
-  DynamicHiliteSupportedInCurLexer:= GetLexerSuportsDynamicHilite;
+  DynamicHiliteSupportedInCurrentSyntax:= GetLexerSuportsDynamicHilite;
 end;
 
 procedure TATAdapterEControl.OnEditorChange(Sender: TObject);

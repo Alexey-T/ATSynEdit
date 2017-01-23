@@ -19,7 +19,7 @@ type
   private
     FDynamicHiliteEnabled: boolean;
     FDynamicHiliteMaxLines: integer;
-    FDynamicHiliteSupportedInCurLexer: boolean;
+    FDynamicHiliteSupportedInCurrentSyntax: boolean;
   public
     constructor Create(AOwner: TComponent); override;
     procedure AddEditor(AEditor: TComponent); virtual;
@@ -35,16 +35,22 @@ type
     procedure OnEditorScroll(Sender: TObject); virtual;
     procedure OnEditorBeforeCalcHilite(Sender: TObject); virtual;
     //
-    property DynamicHiliteEnabled: boolean read FDynamicHiliteEnabled write FDynamicHiliteEnabled;
+    property DynamicHiliteEnabled: boolean
+      read FDynamicHiliteEnabled
+      write FDynamicHiliteEnabled;
     //dyn-hiliting global enabled flag.
-    //set value from your app.
+    //app must set it.
     //dyn-hiliting is on, if some chars colors depend on caret position,
     //e.g. in EControl HTML lexer: hilites of < > change, if caret is near < >
-    property DynamicHiliteMaxLines: integer read FDynamicHiliteMaxLines write FDynamicHiliteMaxLines;
-    //pass here some int from application options, e.g. 5000 is ok
-    property DynamicHiliteSupportedInCurLexer: boolean read FDynamicHiliteSupportedInCurLexer write FDynamicHiliteSupportedInCurLexer;
-    //pass here value, which real apdater (subclass of TATAdapterHilite)
-    //detected for current syntax. EControl adapter calculates it from lexer-file.
+    property DynamicHiliteMaxLines: integer
+      read FDynamicHiliteMaxLines
+      write FDynamicHiliteMaxLines;
+    //app must set it, e.g. 5000 is ok
+    property DynamicHiliteSupportedInCurrentSyntax: boolean
+      read FDynamicHiliteSupportedInCurrentSyntax
+      write FDynamicHiliteSupportedInCurrentSyntax;
+    //real adapter (subclass of this class) must set it.
+    //EControl adapter calculates it from lexer-file.
     function DynamicHiliteActiveNow(ALinesCount: integer): boolean;
     //resulting bool, calculated from above props, and current count of lines.
     //ATSynEdit reads it.
@@ -58,7 +64,7 @@ constructor TATAdapterHilite.Create(AOwner: TComponent);
 begin
   inherited;
   FDynamicHiliteEnabled:= true;
-  FDynamicHiliteSupportedInCurLexer:= true;
+  FDynamicHiliteSupportedInCurrentSyntax:= true;
   FDynamicHiliteMaxLines:= 1000;
 end;
 
@@ -106,7 +112,7 @@ function TATAdapterHilite.DynamicHiliteActiveNow(ALinesCount: integer): boolean;
 begin
   Result:=
     DynamicHiliteEnabled and
-    DynamicHiliteSupportedInCurLexer and
+    DynamicHiliteSupportedInCurrentSyntax and
     (ALinesCount<=DynamicHiliteMaxLines);
 end;
 
