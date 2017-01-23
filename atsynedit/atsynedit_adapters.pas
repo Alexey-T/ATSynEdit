@@ -25,15 +25,30 @@ type
     procedure AddEditor(AEditor: TComponent); virtual;
     //
     procedure OnEditorChange(Sender: TObject); virtual;
+    //called when editor's text changes.
+
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
       var AColorAfterEol: TColor); virtual;
+    //called to calculate hilite of entire line.
+    //ACharIndex is starting offset in this line, >0 if editor scrolled horizontally.
+    //ALineLen is len of line part, starting from ACharIndex.
+
     procedure OnEditorCalcPosColor(Sender: TObject;
       AX, AY: integer; var AColor: TColor); virtual;
+    //called to calculate BG/background color at position (usually pos after line end).
+
     procedure OnEditorCaretMove(Sender: TObject); virtual;
+    //called after caret is moved.
+
     procedure OnEditorScroll(Sender: TObject); virtual;
+    //called after editor is scrolled horz/vert.
+
     procedure OnEditorBeforeCalcHilite(Sender: TObject); virtual;
+    //called before calculation of hilites for n lines, before 1st of these lines.
+    //adapter should prepare buffers here for next lines.
+
     //
     property DynamicHiliteEnabled: boolean
       read FDynamicHiliteEnabled
@@ -42,15 +57,19 @@ type
     //app must set it.
     //dyn-hiliting is on, if some chars colors depend on caret position,
     //e.g. in EControl HTML lexer: hilites of < > change, if caret is near < >
+
     property DynamicHiliteMaxLines: integer
       read FDynamicHiliteMaxLines
       write FDynamicHiliteMaxLines;
-    //app must set it, e.g. 5000 is ok
+    //max count of lines, to use dyn-hiliting (for EControl its slow for 10K lines)
+    //app must set it, e.g. 5K is ok
+
     property DynamicHiliteSupportedInCurrentSyntax: boolean
       read FDynamicHiliteSupportedInCurrentSyntax
       write FDynamicHiliteSupportedInCurrentSyntax;
     //real adapter (subclass of this class) must set it.
     //EControl adapter calculates it from lexer-file.
+
     function DynamicHiliteActiveNow(ALinesCount: integer): boolean;
     //resulting bool, calculated from above props, and current count of lines.
     //ATSynEdit reads it.
