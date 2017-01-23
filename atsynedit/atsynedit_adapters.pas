@@ -36,9 +36,18 @@ type
     procedure OnEditorBeforeCalcHilite(Sender: TObject); virtual;
     //
     property DynamicHiliteEnabled: boolean read FDynamicHiliteEnabled write FDynamicHiliteEnabled;
+    //dyn-hiliting global enabled flag.
+    //set value from your app.
+    //dyn-hiliting is on, if some chars colors depend on caret position,
+    //e.g. in EControl HTML lexer: hilites of < > change, if caret is near < >
     property DynamicHiliteMaxLines: integer read FDynamicHiliteMaxLines write FDynamicHiliteMaxLines;
+    //pass here some int from application options, e.g. 5000 is ok
     property DynamicHiliteSupportedInCurLexer: boolean read FDynamicHiliteSupportedInCurLexer write FDynamicHiliteSupportedInCurLexer;
+    //pass here value, which real apdater (subclass of TATAdapterHilite)
+    //detected for current syntax. EControl adapter calculates it from lexer-file.
     function DynamicHiliteActiveNow(ALinesCount: integer): boolean;
+    //resulting bool, calculated from above props, and current count of lines.
+    //ATSynEdit reads it.
   end;
 
 implementation
