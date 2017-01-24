@@ -23,7 +23,7 @@ type
 
   TATLineOffsetsInfo = record
     OffsetPercent: array of LongWord;
-    Ligatures: array of atChar;
+    Ligatures: atString; //can have less length than OffsetPercent
   end;
 
 
@@ -95,7 +95,7 @@ function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
 
-procedure SCalcCharOffsets(const S: atString; var AList: TATLineOffsetsInfo;
+procedure SCalcCharOffsets(const S: atString; var AInfo: TATLineOffsetsInfo;
   ATabSize: integer; ACharsSkipped: integer = 0);
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
@@ -373,15 +373,16 @@ begin
 end;
 
 
-procedure SCalcCharOffsets(const S: atString; var AList: TATLineOffsetsInfo;
+procedure SCalcCharOffsets(const S: atString;
+  var AInfo: TATLineOffsetsInfo;
   ATabSize: integer; ACharsSkipped: integer);
 var
   NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
   i: integer;
 begin
-  SetLength(AList.OffsetPercent, Length(S));
-  SetLength(AList.Ligatures, Length(S));
+  SetLength(AInfo.OffsetPercent, Length(S));
+  AInfo.Ligatures:= '';
   if S='' then Exit;
 
   NCharsSkipped:= ACharsSkipped;
@@ -425,9 +426,9 @@ begin
       NSize:= 0;
 
     if i=1 then
-      AList.OffsetPercent[i-1]:= NSize*NScalePercents
+      AInfo.OffsetPercent[i-1]:= NSize*NScalePercents
     else
-      AList.OffsetPercent[i-1]:= AList.OffsetPercent[i-2]+NSize*NScalePercents;
+      AInfo.OffsetPercent[i-1]:= AInfo.OffsetPercent[i-2]+NSize*NScalePercents;
   end;
 end;
 
