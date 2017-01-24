@@ -1810,7 +1810,7 @@ var
   NCoordTop, NCoordTopGapped, NCoordSep: integer;
   NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
-  NOutputSpacesSkipped: real;
+  NOutputSpacesSkipped: word;
   WrapItem: TATSynWrapItem;
   NColorEntire, NColorAfter: TColor;
   Str, StrOut, StrOutUncut: atString;
@@ -1908,7 +1908,7 @@ begin
     StrOut:= Str;
     StrOutUncut:= StrOut;
     AScrollHorz.NMax:= Max(AScrollHorz.NMax,
-      Round(CanvasTextSpaces(StrOutUncut, FTabSize)) + cScrollKeepHorz);
+      CanvasTextWidth(StrOutUncut, FTabSize, Point(1, 1){cell size=1pixel}) + cScrollKeepHorz);
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
@@ -4209,7 +4209,7 @@ end;
 procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
 begin
   ATStringProc.cCharScaleFullwidth_Default:=
-    Canvas.TextWidth(Utf8Encode(_CharCodeFullM)) /
+    Canvas.TextWidth(Utf8Encode(_CharCodeFullM)) * 100 div
     Canvas.TextWidth(Utf8Encode(_CharCodeM));
 end;
 {$endif}

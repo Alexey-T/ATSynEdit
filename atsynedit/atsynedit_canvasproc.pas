@@ -121,9 +121,7 @@ procedure DoPaintUnprintedEol(C: TCanvas;
   AColorFont, AColorBG: TColor;
   ADetails: boolean);
 
-function CanvasTextSpaces(const S: atString; ATabSize: integer): real;
 function CanvasTextWidth(const S: atString; ATabSize: integer; ACharSize: TPoint): integer;
-
 function CanvasFontSizes(C: TCanvas): TPoint;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer);
@@ -518,24 +516,21 @@ begin
   Result.Y:= Size.cy;
 end;
 
-function CanvasTextSpaces(const S: atString; ATabSize: integer): real;
+function CanvasTextWidth(const S: atString; ATabSize: integer; ACharSize: TPoint): integer;
 var
-  List: TATRealArray;
+  Offsets: TATLineOffsetsInfo;
 begin
   Result:= 0;
   if S='' then Exit;
-  SetLength(List, Length(S));
-  SCalcCharOffsets(S, List, ATabSize);
-  Result:= List[High(List)];
-end;
-
-function CanvasTextWidth(const S: atString; ATabSize: integer; ACharSize: TPoint): integer;
-begin
-  Result:= Trunc(CanvasTextSpaces(S, ATabSize)*ACharSize.X);
+  SetLength(Offsets.OffsetPercent, Length(S));
+  SetLength(Offsets.Ligatures, Length(S));
+  SCalcCharOffsets(S, Offsets, ATabSize);
+  Result:= Offsets.OffsetPercent[High(Offsets.OffsetPercent)] * ACharSize.X div 100;
 end;
 
 
-function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: atString; const AOffsets: TATFontNeedsOffsets): boolean;
+function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: atString;
+  const AOffsets: TATFontNeedsOffsets): boolean;
 var
   St: TFontStyles;
 begin
@@ -562,7 +557,7 @@ procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   ADrawEvent: TATSynEditDrawLineEvent; ATextOffsetFromLine: integer;
   AControlWidth: integer);
 var
-  ListReal: TATRealArray;
+  ListOffsets: TATLineOffsetsInfo;
   ListInt: TATIntArray;
   Dx: TATIntArray;
   i, j: integer;
@@ -577,14 +572,15 @@ var
 begin
   if Str='' then Exit;
 
-  SetLength(ListReal, Length(Str));
+  SetLength(ListOffsets.OffsetPercent, Length(Str));
+  SetLength(ListOffsets.Ligatures, Length(Str));
   SetLength(ListInt, Length(Str));
   SetLength(Dx, Length(Str));
 
-  SCalcCharOffsets(Str, ListReal, ATabSize, ACharsSkipped);
+  SCalcCharOffsets(Str, ListOffsets, ATabSize, ACharsSkipped);
 
-  for i:= 0 to High(ListReal) do
-    ListInt[i]:= Trunc(ListReal[i]*ACharSize.X);
+  for i:= 0 to High(ListOffsets.OffsetPercent) do
+    ListInt[i]:= ListOffsets.OffsetPercent[i] * ACharSize.X div 100;
 
   //truncate str, to not paint over screen
   for i:= 1 to High(ListInt) do
@@ -594,7 +590,7 @@ begin
       break;
     end;
 
-  for i:= 0 to High(ListReal) do
+  for i:= 0 to High(ListInt) do
     if i=0 then
       Dx[i]:= ListInt[i]
     else

@@ -19,8 +19,13 @@ type
 
 type
   TATIntArray = array of Longint;
-  TATRealArray = array of real;
   TATPointArray = array of TPoint;
+
+  TATLineOffsetsInfo = record
+    OffsetPercent: array of word;
+    Ligatures: array of atChar;
+  end;
+
 
 function SCharUpper(ch: atChar): atChar;
 function SCharLower(ch: atChar): atChar;
@@ -37,9 +42,9 @@ const
 
 const
   cMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
-  cCharScaleFullwidth_Default: single = 1.7; //width of CJK chars
-  cCharScaleHex_Small: single = 3.0; //width of hex show: "xNN"
-  cCharScaleHex_Big: single = 5.0; //width of hex show: "xNNNN"
+  cCharScaleFullwidth_Default: word = 170; //width of CJK chars
+  cCharScaleHex_Small: word = 300; //width of hex show: "xNN"
+  cCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
   cMinWordWrapOffset: integer = 3;
 
 var
@@ -90,7 +95,7 @@ function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
 
-procedure SCalcCharOffsets(const S: atString; var AList: TATRealArray;
+procedure SCalcCharOffsets(const S: atString; var AList: TATLineOffsetsInfo;
   ATabSize: integer; ACharsSkipped: integer = 0);
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
@@ -99,7 +104,7 @@ function SFindClickedPosition(const Str: atString;
   AAllowVirtualPos: boolean;
   out AEndOfLinePos: boolean): integer;
 procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
-  out ACharsSkipped: integer; out ASpacesSkipped: real);
+  out ACharsSkipped: integer; out ASpacesSkipped: word);
 
 function SIndentUnindent(const Str: atString; ARight: boolean;
   AIndentSize, ATabSize: integer): atString;
@@ -194,15 +199,15 @@ begin
 end;
 
 
-procedure DoDebugOffsets(const List: TATRealArray);
+procedure DoDebugOffsets(const AList: TATLineOffsetsInfo);
 var
   i: integer;
   s: string;
 begin
   s:= '';
-  for i:= Low(List) to High(List) do
-    s:= s+FloatToStr(List[i])+' ';
-  showmessage('Offsets'#13+s);
+  for i:= Low(AList.OffsetPercent) to High(AList.OffsetPercent) do
+    s:= s+IntToStr(AList.OffsetPercent[i])+'% ';
+  ShowMessage('Offsets'#10+s);
 end;
 
 function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
@@ -217,17 +222,18 @@ function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
   //
 var
   N, NMin, NAvg: integer;
-  List: TATRealArray;
+  Offsets: TATLineOffsetsInfo;
 begin
   if S='' then
     begin Result:= 0; Exit end;
   if AColumns<cMinWordWrapOffset then
     begin Result:= AColumns; Exit end;
 
-  SetLength(List, Length(S));
-  SCalcCharOffsets(S, List, ATabSize);
+  SetLength(Offsets.OffsetPercent, Length(S));
+  SetLength(Offsets.Ligatures, Length(S));
+  SCalcCharOffsets(S, Offsets, ATabSize);
 
-  if List[High(List)]<=AColumns then
+  if Offsets.OffsetPercent[High(Offsets.OffsetPercent)]<=AColumns*100 then
   begin
     Result:= Length(S);
     Exit
@@ -235,7 +241,7 @@ begin
 
   //NAvg is average wrap offset, we use it if no correct offset found
   N:= Length(S)-1;
-  while (N>0) and (List[N]>AColumns+1) do Dec(N);
+  while (N>0) and (Offsets.OffsetPercent[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
   if NAvg<cMinWordWrapOffset then
     begin Result:= cMinWordWrapOffset; Exit end;
@@ -370,19 +376,19 @@ end;
 
 {$ifdef test_wide_char}
 const
-  cScaleTest = 1.9; //debug, for test code, commented
+  cScaleTest = 190; //debug, for test code, commented
 {$endif}
 
-procedure SCalcCharOffsets(const S: atString; var AList: TATRealArray;
+procedure SCalcCharOffsets(const S: atString; var AList: TATLineOffsetsInfo;
   ATabSize: integer; ACharsSkipped: integer);
 var
   NSize, NTabSize, NCharsSkipped: integer;
-  Scale: real;
+  NScalePercents: word;
   i: integer;
 begin
   if S='' then Exit;
-  if Length(AList)<>Length(S) then
-    raise Exception.Create('Bad list len: CalcCharOffsets');
+  if Length(AList.OffsetPercent)<>Length(S) then
+    raise Exception.Create('Bad list len: SCalcCharOffsets');
 
   NCharsSkipped:= ACharsSkipped;
 
@@ -390,20 +396,20 @@ begin
   begin
     Inc(NCharsSkipped);
 
-    Scale:= 1.0;
+    NScalePercents:= 100;
     if OptUnprintedReplaceSpec and IsCharAsciiControl(S[i]) then
-      Scale:= 1.0
+      NScalePercents:= 100
     else
     if IsCharHex(S[i]) then
     begin
       if Ord(S[i])<$100 then
-        Scale:= cCharScaleHex_Small
+        NScalePercents:= cCharScaleHex_Small
       else
-        Scale:= cCharScaleHex_Big;
+        NScalePercents:= cCharScaleHex_Big;
     end
     else
     if IsCharFullWidth(S[i]) then
-      Scale:= cCharScaleFullwidth_Default;
+      NScalePercents:= cCharScaleFullwidth_Default;
 
     {$ifdef test_wide_char}
     if IsSpaceChar(S[i]) then
@@ -425,9 +431,9 @@ begin
       NSize:= 0;
 
     if i=1 then
-      AList[i-1]:= NSize*Scale
+      AList.OffsetPercent[i-1]:= NSize*NScalePercents
     else
-      AList[i-1]:= AList[i-2]+NSize*Scale;
+      AList.OffsetPercent[i-1]:= AList.OffsetPercent[i-2]+NSize*NScalePercents;
   end;
 end;
 
@@ -436,7 +442,7 @@ function SFindClickedPosition(const Str: atString;
   AAllowVirtualPos: boolean;
   out AEndOfLinePos: boolean): integer;
 var
-  ListReal: TATRealArray;
+  ListOffsets: TATLineOffsetsInfo;
   ListEnds, ListMid: TATIntArray;
   i: integer;
 begin
@@ -450,14 +456,15 @@ begin
     Exit;
   end;
 
-  SetLength(ListReal, Length(Str));
+  SetLength(ListOffsets.OffsetPercent, Length(Str));
+  SetLength(ListOffsets.Ligatures, Length(Str));
   SetLength(ListEnds, Length(Str));
   SetLength(ListMid, Length(Str));
-  SCalcCharOffsets(Str, ListReal, ATabSize);
+  SCalcCharOffsets(Str, ListOffsets, ATabSize);
 
   //positions of each char end
   for i:= 0 to High(ListEnds) do
-    ListEnds[i]:= Trunc(ListReal[i]*ACharSize);
+    ListEnds[i]:= ListOffsets.OffsetPercent[i]*ACharSize div 100;
 
   //positions of each char middle
   for i:= 0 to High(ListEnds) do
@@ -481,22 +488,24 @@ begin
 end;
 
 procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
-  out ACharsSkipped: integer; out ASpacesSkipped: real);
+  out ACharsSkipped: integer; out ASpacesSkipped: word);
 var
-  List: TATRealArray;
+  Offsets: TATLineOffsetsInfo;
 begin
   ACharsSkipped:= 0;
   ASpacesSkipped:= 0;
   if (S='') or (AScrollPos=0) then Exit;
 
-  SetLength(List, Length(S));
-  SCalcCharOffsets(S, List, ATabSize);
+  SetLength(Offsets.OffsetPercent, Length(S));
+  SetLength(Offsets.Ligatures, Length(S));
+  SCalcCharOffsets(S, Offsets, ATabSize);
 
-  while (ACharsSkipped<Length(S)) and (List[ACharsSkipped]<AScrollPos) do
+  while (ACharsSkipped<Length(S)) and
+    (Offsets.OffsetPercent[ACharsSkipped] div 100 < AScrollPos) do
     Inc(ACharsSkipped);
 
   if (ACharsSkipped>0) then
-    ASpacesSkipped:= List[ACharsSkipped-1];
+    ASpacesSkipped:= Offsets.OffsetPercent[ACharsSkipped-1];
 end;
 
 
