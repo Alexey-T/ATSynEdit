@@ -229,8 +229,6 @@ begin
   if AColumns<cMinWordWrapOffset then
     begin Result:= AColumns; Exit end;
 
-  SetLength(Offsets.OffsetPercent, Length(S));
-  SetLength(Offsets.Ligatures, Length(S));
   SCalcCharOffsets(S, Offsets, ATabSize);
 
   if Offsets.OffsetPercent[High(Offsets.OffsetPercent)]<=AColumns*100 then
@@ -382,9 +380,9 @@ var
   NScalePercents: integer;
   i: integer;
 begin
+  SetLength(AList.OffsetPercent, Length(S));
+  SetLength(AList.Ligatures, Length(S));
   if S='' then Exit;
-  if Length(AList.OffsetPercent)<>Length(S) then
-    raise Exception.Create('Bad list len: SCalcCharOffsets');
 
   NCharsSkipped:= ACharsSkipped;
 
@@ -452,8 +450,6 @@ begin
     Exit;
   end;
 
-  SetLength(ListOffsets.OffsetPercent, Length(Str));
-  SetLength(ListOffsets.Ligatures, Length(Str));
   SetLength(ListEnds, Length(Str));
   SetLength(ListMid, Length(Str));
   SCalcCharOffsets(Str, ListOffsets, ATabSize);
@@ -492,8 +488,6 @@ begin
   ASpacesSkipped:= 0;
   if (S='') or (AScrollPos=0) then Exit;
 
-  SetLength(Offsets.OffsetPercent, Length(S));
-  SetLength(Offsets.Ligatures, Length(S));
   SCalcCharOffsets(S, Offsets, ATabSize);
 
   while (ACharsSkipped<Length(S)) and

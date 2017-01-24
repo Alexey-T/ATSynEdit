@@ -522,8 +522,6 @@ var
 begin
   Result:= 0;
   if S='' then Exit;
-  SetLength(Offsets.OffsetPercent, Length(S));
-  SetLength(Offsets.Ligatures, Length(S));
   SCalcCharOffsets(S, Offsets, ATabSize);
   Result:= Offsets.OffsetPercent[High(Offsets.OffsetPercent)] * ACharSize.X div 100;
 end;
@@ -572,8 +570,6 @@ var
 begin
   if Str='' then Exit;
 
-  SetLength(ListOffsets.OffsetPercent, Length(Str));
-  SetLength(ListOffsets.Ligatures, Length(Str));
   SetLength(ListInt, Length(Str));
   SetLength(Dx, Length(Str));
 
