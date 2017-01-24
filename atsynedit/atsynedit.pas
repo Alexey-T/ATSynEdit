@@ -1810,7 +1810,7 @@ var
   NCoordTop, NCoordTopGapped, NCoordSep: integer;
   NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
-  NOutputSpacesSkipped: word;
+  NOutputSpacesSkipped: integer;
   WrapItem: TATSynWrapItem;
   NColorEntire, NColorAfter: TColor;
   Str, StrOut, StrOutUncut: atString;
@@ -1935,7 +1935,7 @@ begin
         SFindOutputSkipOffset(StrOut, FTabSize, AScrollHorz.NPos, NOutputCharsSkipped, NOutputSpacesSkipped);
         Delete(StrOut, 1, NOutputCharsSkipped);
         Delete(StrOut, cMaxCharsForOutput, MaxInt);
-        Inc(CurrPointText.X, Trunc(NOutputSpacesSkipped*ACharSize.X));
+        Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
       end;
 
       if WrapItem.NIndent>0 then
@@ -1990,9 +1990,9 @@ begin
           FColors.UnprintedFont,
           FColors.UnprintedHexFont,
           NOutputStrWidth,
-          Trunc(NOutputSpacesSkipped), //todo:
-            //needed number of chars of all chars counted as 1.0,
-            //while NOutputSpacesSkipped is with cjk counted as 1.7
+          NOutputSpacesSkipped, //todo:
+            //needed number of chars of all chars counted as 100%,
+            //while NOutputSpacesSkipped is with cjk counted as 170%
           @Parts,
           Event,
           FOptTextOffsetFromLine,

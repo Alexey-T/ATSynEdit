@@ -22,7 +22,7 @@ type
   TATPointArray = array of TPoint;
 
   TATLineOffsetsInfo = record
-    OffsetPercent: array of word;
+    OffsetPercent: array of LongWord;
     Ligatures: array of atChar;
   end;
 
@@ -104,7 +104,7 @@ function SFindClickedPosition(const Str: atString;
   AAllowVirtualPos: boolean;
   out AEndOfLinePos: boolean): integer;
 procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
-  out ACharsSkipped: integer; out ASpacesSkipped: word);
+  out ACharsSkipped: integer; out ASpacesSkipped: integer);
 
 function SIndentUnindent(const Str: atString; ARight: boolean;
   AIndentSize, ATabSize: integer): atString;
@@ -488,7 +488,7 @@ begin
 end;
 
 procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
-  out ACharsSkipped: integer; out ASpacesSkipped: word);
+  out ACharsSkipped: integer; out ASpacesSkipped: integer);
 var
   Offsets: TATLineOffsetsInfo;
 begin
@@ -501,11 +501,11 @@ begin
   SCalcCharOffsets(S, Offsets, ATabSize);
 
   while (ACharsSkipped<Length(S)) and
-    (Offsets.OffsetPercent[ACharsSkipped] div 100 < AScrollPos) do
+    (Offsets.OffsetPercent[ACharsSkipped] < AScrollPos*100) do
     Inc(ACharsSkipped);
 
   if (ACharsSkipped>0) then
-    ASpacesSkipped:= Offsets.OffsetPercent[ACharsSkipped-1];
+    ASpacesSkipped:= Offsets.OffsetPercent[ACharsSkipped-1] div 100;
 end;
 
 
