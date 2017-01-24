@@ -374,16 +374,12 @@ begin
   end;
 end;
 
-{$ifdef test_wide_char}
-const
-  cScaleTest = 190; //debug, for test code, commented
-{$endif}
 
 procedure SCalcCharOffsets(const S: atString; var AList: TATLineOffsetsInfo;
   ATabSize: integer; ACharsSkipped: integer);
 var
   NSize, NTabSize, NCharsSkipped: integer;
-  NScalePercents: word;
+  NScalePercents: integer;
   i: integer;
 begin
   if S='' then Exit;
@@ -413,9 +409,9 @@ begin
 
     {$ifdef test_wide_char}
     if IsSpaceChar(S[i]) then
-      Scale:= 1
+      NScalePercents:= 100
     else
-      Scale:= cScaleTest;
+      NScalePercents:= 190;
     {$endif}
 
     if S[i]<>#9 then
