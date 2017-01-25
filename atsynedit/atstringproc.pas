@@ -18,12 +18,12 @@ type
   PatChar = PWideChar;
 
 type
-  TATIntArray = array of Longint;
+  TATIntArray = array of integer;
   TATPointArray = array of TPoint;
 
   TATLineOffsetsInfo = record
-    OffsetPercent: array of LongWord;
-    Ligatures: atString; //can have less length than OffsetPercent
+    OffsetPercent: array of integer; //word is too small
+    Ligatures: atString;
   end;
 
 
