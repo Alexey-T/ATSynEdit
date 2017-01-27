@@ -236,14 +236,12 @@ begin
   begin
     bDelEmpty:= false;
 
-    if (AToX=0) and (LinesLen[AToY]=0) then //for empty last line
+    //for empty last line
+    if (AToY>0) and (LinesLen[AToY]=0) then
     begin
-      if (AToY>0) then
-      begin
-        LineDelete(AToY);
-        Dec(AToY);
-        AToX:= LinesLen[AToY];
-      end;
+      LineDelete(AToY);
+      Dec(AToY);
+      AToX:= LinesLen[AToY];
     end;
 
     if AFromX=0 then
