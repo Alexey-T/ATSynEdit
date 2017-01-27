@@ -198,14 +198,15 @@ begin
     end;
 end;
 
-procedure TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
-  out AShift, APosAfter: TPoint);
+function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
+  out AShift, APosAfter: TPoint): boolean;
 var
   Str: atString;
   bDelEmpty: boolean;
   bNoEol: boolean;
   i: integer;
 begin
+  Result:= false;
   AShift.X:= 0;
   AShift.Y:= 0;
   APosAfter.X:= AFromX;
@@ -214,8 +215,9 @@ begin
   if not IsIndexValid(AToY) then Exit;
   if (AFromX=AToX) and (AFromY=AToY) then Exit;
   if (AFromY>AToY) then Exit;
+  if (AFromX<0) or (AToX<0) then Exit;
 
-  if AFromY=AToY then
+  if (AFromY=AToY) then
   begin
     //delete range in one line
     Str:= Lines[AFromY];
@@ -223,6 +225,13 @@ begin
     Lines[AFromY]:= Str;
 
     AShift.X:= -(AToX-AFromX);
+  end
+  else
+  if (AFromX=0) and (AToX=0) then
+  begin
+    //selected entire lines
+    for i:= AToY-1 downto AFromY do
+      LineDelete(i);
   end
   else
   begin
@@ -244,30 +253,21 @@ begin
     //remember no final Eol
     bNoEol:= (AToY=Count-1) and (LinesEnds[AToY]=cEndNone);
 
-    if (AFromX=0) and (AToX=0) then
-    begin
-      //special case: selected entire lines
-      for i:= AToY-1 downto AFromY do
-        LineDelete(i);
-    end
-    else
-    begin
-      //concat remaining parts of 1st+last lines
-      Str:= '';
-      if AFromX>0 then
-        Str:= Copy(Lines[AFromY], 1, AFromX);
-      Str:= Str + Copy(Lines[AToY], AToX+1, MaxInt);
-      Lines[AFromY]:= Str;
+    //concat remaining parts of 1st+last lines
+    Str:= '';
+    if AFromX>0 then
+      Str:= Copy(Lines[AFromY], 1, AFromX);
+    Str:= Str + Copy(Lines[AToY], AToX+1, MaxInt);
+    Lines[AFromY]:= Str;
 
-      //del middle lines
-      for i:= AToY downto AFromY+1 do
-        LineDelete(i);
+    //del middle lines
+    for i:= AToY downto AFromY+1 do
+      LineDelete(i);
 
-      //del empty line?
-      if bDelEmpty then
-        if Str='' then
-          LineDelete(AFromY);
-    end;
+    //del empty line?
+    if bDelEmpty then
+      if Str='' then
+        LineDelete(AFromY);
 
     if bNoEol then
     begin
@@ -278,6 +278,8 @@ begin
 
     AShift.Y:= -(AToY-AFromY);
   end;
+
+  Result:= true;
 end;
 
 

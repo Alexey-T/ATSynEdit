@@ -232,7 +232,7 @@ type
     procedure TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
     procedure TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
       APosAfter: TPoint; ACanDelEol: boolean=true);
-    procedure TextDeleteRange(AFromX, AFromY, AToX, AToY: integer; out AShift, APosAfter: TPoint);
+    function TextDeleteRange(AFromX, AFromY, AToX, AToY: integer; out AShift, APosAfter: TPoint): boolean;
     procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
