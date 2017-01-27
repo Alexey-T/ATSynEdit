@@ -202,8 +202,7 @@ function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
   out AShift, APosAfter: TPoint): boolean;
 var
   Str: atString;
-  bDelEmpty: boolean;
-  bNoEol: boolean;
+  bDelEmpty, bNoEol: boolean;
   i: integer;
 begin
   Result:= false;
@@ -236,15 +235,15 @@ begin
   else
   begin
     bDelEmpty:= false;
-    //correct AToX/AToY to not del extra empty line
+
     if (AToX=0) and (LinesLen[AToY]=0) then //for empty last line
     begin
       if (AToY>0) then
       begin
+        LineDelete(AToY);
         Dec(AToY);
         AToX:= LinesLen[AToY];
       end;
-      bDelEmpty:= true;
     end;
 
     if AFromX=0 then
@@ -264,7 +263,6 @@ begin
     for i:= AToY downto AFromY+1 do
       LineDelete(i);
 
-    //del empty line?
     if bDelEmpty then
       if Str='' then
         LineDelete(AFromY);
