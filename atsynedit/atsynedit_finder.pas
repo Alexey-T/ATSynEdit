@@ -466,7 +466,9 @@ begin
     Str:= StrReplace;
 
   Strs:= FEditor.Strings;
-  FReplacedAtEndOfText:= (P2.Y=Strs.Count-1) and (P2.X=Strs.LinesLen[P2.Y]);
+  FReplacedAtEndOfText:=
+    (P2.Y>Strs.Count-1) or
+    ((P2.Y=Strs.Count-1) and (P2.X=Strs.LinesLen[P2.Y]));
 
   Strs.BeginUndoGroup;
   Strs.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
