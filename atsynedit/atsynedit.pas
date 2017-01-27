@@ -4203,7 +4203,7 @@ begin
     sizeFull:= a.abcfA+a.abcfB+a.abcfC
   else
     sizeFull:= 1.0;
-  ATStringProc.cCharScaleFullwidth_Default:= sizeFull/sizeSmall;
+  ATStringProc.cCharScaleFullwidth_Default:= Trunc(sizeFull * 100 / sizeSmall);
 end;
 {$else}
 procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
