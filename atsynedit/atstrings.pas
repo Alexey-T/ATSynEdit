@@ -130,6 +130,7 @@ type
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
+    function GetItem(Index: integer): TATStringItem;
     function GetLine(N: integer): atString;
     function GetLineBm(Index: integer): integer;
     function GetLineEnd(N: integer): TATLineEnds;
@@ -166,6 +167,9 @@ type
     procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
+  protected
+    function CreateItem_UTF8(const AString: UTF8String; AEnd: TATLineEnds): TATStringItem; virtual;
+    function CreateItem_Uni(const AString: atString; AEnd: TATLineEnds): TATStringItem; virtual;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -176,6 +180,7 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
+    property Items[Index: integer]: TATStringItem read GetItem;
     procedure LineAddRaw_UTF8_NoUndo(const AString: UTF8String; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
@@ -671,7 +676,7 @@ begin
   DoEventLog(Count, Length(AString));
   DoEventChange(Count, cLineChangeAdded);
 
-  Item:= TATStringItem.Create_Uni(AString, AEnd);
+  Item:= CreateItem_Uni(AString, AEnd);
   FList.Add(Item);
 end;
 
@@ -724,7 +729,7 @@ begin
   DoEventLog(N, Length(AString));
   DoEventChange(N, cLineChangeAdded);
 
-  Item:= TATStringItem.Create_Uni(AString, AEnd);
+  Item:= CreateItem_Uni(AString, AEnd);
   FList.Insert(N, Item);
 end;
 
@@ -772,7 +777,7 @@ begin
       DoEventLog(N+i, AList.LinesLen[i]);
       DoEventChange(N+i, cLineChangeAdded);
 
-      FList[N+i]:= TATStringItem.Create_UTF8(
+      FList[N+i]:= CreateItem_UTF8(
         TATStringItem(AList.FList[i]).ItemString,
         Endings);
     end;
@@ -1077,6 +1082,11 @@ begin
     Result:= FOnGetCaretsArray();
 end;
 
+function TATStrings.GetItem(Index: integer): TATStringItem;
+begin
+  Result:= TATStringItem(FList[Index]);
+end;
+
 procedure TATStrings.SetCaretsArray(const L: TATPointArray);
 begin
   if Assigned(FOnSetCaretsArray) then
@@ -1228,6 +1238,18 @@ begin
     if IndexOf(Ptr)<0 then Add(Ptr);
 end;
 
+function TATStrings.CreateItem_UTF8(const AString: UTF8String;
+  AEnd: TATLineEnds): TATStringItem;
+begin
+  Result:= TATStringItem.Create_UTF8(AString, AEnd);
+end;
+
+function TATStrings.CreateItem_Uni(const AString: atString;
+  AEnd: TATLineEnds): TATStringItem;
+begin
+  Result:= TATStringItem.Create_Uni(AString, AEnd);
+end;
+
 
 function TATStrings.ActionEnsureFinalEol: boolean;
 begin
@@ -1285,7 +1307,7 @@ procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: UTF8String;
 var
   Item: TATStringItem;
 begin
-  Item:= TATStringItem.Create_UTF8(AString, AEnd);
+  Item:= CreateItem_UTF8(AString, AEnd);
   Item.ItemState:= cLineStateAdded;
   FList.Add(Item);
 end;
