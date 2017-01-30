@@ -392,7 +392,10 @@ begin
     if OptRegex then
       OptBack:= false;
     if OptInSelection then
+    begin
       OptFromCaret:= false;
+      OptWrapped:= false;
+    end;
 
     DoFragmentsClear;
     if OptInSelection then
