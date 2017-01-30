@@ -91,7 +91,7 @@ type
     FReplacedAtEndOfText: boolean;
     //
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
-    function ConvertBufferPosToCaretPos(AValue: integer): TPoint;
+    function ConvertBufferPosToCaretPos(APos: integer): TPoint;
     function ConvertCaretPosToBufferPos(APos: TPoint): integer;
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
@@ -100,7 +100,7 @@ type
     //
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
-    procedure DoReplaceTextInEditor(P1, P2: TPoint);
+    procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint);
     //fragments
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
@@ -428,12 +428,12 @@ begin
   inherited;
 end;
 
-function TATEditorFinder.ConvertBufferPosToCaretPos(AValue: integer): TPoint;
+function TATEditorFinder.ConvertBufferPosToCaretPos(APos: integer): TPoint;
 var
   Fr: TATEditorFragment;
 begin
-  Dec(AValue); //was 1-based
-  Result:= FBuffer.StrToCaret(AValue);
+  Dec(APos); //was 1-based
+  Result:= FBuffer.StrToCaret(APos);
 
   Fr:= CurrentFragment;
   if Assigned(Fr) then
@@ -516,7 +516,7 @@ begin
   end;
 end;
 
-procedure TATEditorFinder.DoReplaceTextInEditor(P1, P2: TPoint);
+procedure TATEditorFinder.DoReplaceTextInEditor(APosBegin, APosEnd: TPoint);
 var
   Shift, PosAfter: TPoint;
   Str: UnicodeString;
@@ -529,12 +529,12 @@ begin
 
   Strs:= FEditor.Strings;
   FReplacedAtEndOfText:=
-    (P2.Y>Strs.Count-1) or
-    ((P2.Y=Strs.Count-1) and (P2.X=Strs.LinesLen[P2.Y]));
+    (APosEnd.Y>Strs.Count-1) or
+    ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
 
   Strs.BeginUndoGroup;
-  Strs.TextDeleteRange(P1.X, P1.Y, P2.X, P2.Y, Shift, PosAfter);
-  Strs.TextInsert(P1.X, P1.Y, Str, false, Shift, PosAfter);
+  Strs.TextDeleteRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, Shift, PosAfter);
+  Strs.TextInsert(APosBegin.X, APosBegin.Y, Str, false, Shift, PosAfter);
   Strs.EndUndoGroup;
   FEditor.DoEventChange;
 
@@ -542,7 +542,7 @@ begin
   begin
     //correct caret pos
     //(e.g. replace "dddddd" to "--": move lefter)
-    FEditor.DoCaretSingle(P1.X+Length(Str), P1.Y);
+    FEditor.DoCaretSingle(APosBegin.X+Length(Str), APosBegin.Y);
   end;
 end;
 
