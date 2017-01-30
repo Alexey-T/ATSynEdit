@@ -406,6 +406,7 @@ begin
   FBuffer:= TATStringBuffer.Create;
   OptFromCaret:= false;
   OptConfirmReplace:= false;
+  OptInSelection:= false;
 end;
 
 destructor TATEditorFinder.Destroy;
@@ -593,7 +594,6 @@ begin
     raise Exception.Create('Finder.Editor.Carets is empty');
 
   if AReplace and FEditor.ModeReadOnly then exit;
-  if OptRegex then OptBack:= false;
 
   UpdateFragments;
   UpdateBuffer;
@@ -846,7 +846,7 @@ begin
   if FEditor=nil then exit;
   FFragments:= TList.Create;
 
-  for i:= 0 to FEditor.Carets.Count-1 do
+  for i:= 0 to 0 {FEditor.Carets.Count-1} do //todo: support mul-carets
   begin
     Caret:= FEditor.Carets[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
@@ -890,13 +890,12 @@ end;
 
 procedure TATEditorFinder.UpdateFragments;
 begin
+  if OptRegex then OptBack:= false;
+  if OptInSelection then OptFromCaret:= false;
+
   DoFragmentsClear;
   if OptInSelection then
-  begin
-    if FEditor.Carets.Count<>1 then
-      raise Exception.Create('Finder.InSelection dont work with multi-carets yet');
     DoFragmentsInit;
-  end;
 end;
 
 function TATEditorFinder.CurrentFragment: TATEditorFragment;
