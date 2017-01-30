@@ -749,35 +749,34 @@ begin
     progress.Show;
     progress.Position:= 0;
 
-    FFinder.UpdateBuffer;
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.DoFindOrReplace(false, false, false, fchanged);
+          ok:= FFinder.DoAction_FindOrReplace(false, false, false, fchanged);
           FinderUpdateEditor(false);
           if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.DoFindOrReplace(false, true, false, fchanged);
+          ok:= FFinder.DoAction_FindOrReplace(false, true, false, fchanged);
           FinderUpdateEditor(true);
           if not ok then DoFindError;
         end;
       mrYesToAll: //replace all
         begin
-          cnt:= FFinder.DoReplaceAll;
+          cnt:= FFinder.DoAction_ReplaceAll;
           FinderUpdateEditor(true);
           MsgStatus('Replaces made: '+Inttostr(cnt));
         end;
       mrIgnore: //count all
         begin
-          cnt:= FFinder.DoCountAll(false);
+          cnt:= FFinder.DoAction_CountAll(false);
           MsgStatus('Count of "'+FFinder.StrFind+'": '+Inttostr(cnt));
         end;
       mrRetry: //mark all
         begin
           FFindMarkAll:= true;
-          cnt:= FFinder.DoCountAll(true);
+          cnt:= FFinder.DoAction_CountAll(true);
           FFindMarkAll:= false;
           FinderUpdateEditor(false);
           MsgStatus('Marked matches: '+Inttostr(cnt));
@@ -802,8 +801,7 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
-  FFinder.UpdateBuffer;
-  ok:= FFinder.DoFindOrReplace(false, false, false, fchanged);
+  ok:= FFinder.DoAction_FindOrReplace(false, false, false, fchanged);
   FinderUpdateEditor(false);
   if not ok then DoFindError;
 end;

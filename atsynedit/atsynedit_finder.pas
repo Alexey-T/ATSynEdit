@@ -101,6 +101,7 @@ type
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint);
+    function IsSelectionStartsAtFoundMatch: boolean;
     //fragments
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
@@ -115,13 +116,14 @@ type
     constructor Create;
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
+    //
+    function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
+    function DoAction_ReplaceSelected: boolean;
+    function DoAction_CountAll(AWithEvent: boolean): integer;
+    function DoAction_ReplaceAll: integer;
+    //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
-    function DoFindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoReplaceSelectedMatch: boolean;
-    function DoCountAll(AWithEvent: boolean): integer;
-    function DoReplaceAll: integer;
-    function IsSelectionStartsAtFoundMatch: boolean;
  end;
 
 
@@ -484,7 +486,7 @@ begin
     Result:= 1;
 end;
 
-function TATEditorFinder.DoCountAll(AWithEvent: boolean): integer;
+function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
 begin
   UpdateBuffer(true);
   if OptRegex then
@@ -493,15 +495,15 @@ begin
     Result:= DoCountMatchesUsual(1, AWithEvent);
 end;
 
-function TATEditorFinder.DoReplaceAll: integer;
+function TATEditorFinder.DoAction_ReplaceAll: integer;
 var
   Ok, bChanged: boolean;
 begin
   Result:= 0;
-  if DoFindOrReplace(false, true, true, bChanged) then
+  if DoAction_FindOrReplace(false, true, true, bChanged) then
   begin
     if bChanged then Inc(Result);
-    while DoFindOrReplace(true, true, true, bChanged) do
+    while DoAction_FindOrReplace(true, true, true, bChanged) do
     begin
       if Application.Terminated then exit;
       if bChanged then Inc(Result);
@@ -587,7 +589,7 @@ begin
   end;
 end;
 
-function TATEditorFinder.DoFindOrReplace(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
 var
   NStartPos: integer;
@@ -713,7 +715,7 @@ begin
     ((StrFind<>'') and (FEditor.TextSelected=StrFind));
 end;
 
-function TATEditorFinder.DoReplaceSelectedMatch: boolean;
+function TATEditorFinder.DoAction_ReplaceSelected: boolean;
 var
   Caret: TATCaretItem;
   P1, P2: TPoint;
@@ -729,7 +731,7 @@ begin
   if not IsSelectionStartsAtFoundMatch then
   begin
     //do Find-next (from caret)
-    DoFindOrReplace(false, false, false, bSel);
+    DoAction_FindOrReplace(false, false, false, bSel);
     exit;
   end;
 
