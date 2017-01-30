@@ -502,10 +502,15 @@ var
   Ok, bChanged: boolean;
 begin
   Result:= 0;
-  if DoAction_FindOrReplace(false, true, true, bChanged) then
+  if FEditor.ModeReadOnly then exit;
+  UpdateBuffer(true);
+
+  if DoFindOrReplace_Inner(false, true, true, bChanged) then
   begin
-    if bChanged then Inc(Result);
-    while DoAction_FindOrReplace(true, true, true, bChanged) do
+    if bChanged then
+      Inc(Result);
+
+    while DoFindOrReplace_Inner(true, true, true, bChanged) do
     begin
       if Application.Terminated then exit;
       if bChanged then Inc(Result);
@@ -603,7 +608,6 @@ begin
     raise Exception.Create('Finder.StrFind is empty');
   if FEditor.Carets.Count=0 then
     raise Exception.Create('Finder.Editor.Carets is empty');
-
   if AReplace and FEditor.ModeReadOnly then exit;
 
   UpdateBuffer(true);
@@ -735,14 +739,14 @@ var
   SSelText: UnicodeString;
 begin
   Result:= false;
+  if FEditor.ModeReadOnly then exit;
   FReplacedAtEndOfText:= false;
-
   UpdateBuffer(true);
 
   if not IsSelectionStartsAtFoundMatch then
   begin
     //do Find-next (from caret)
-    DoAction_FindOrReplace(false, false, false, bSel);
+    DoFindOrReplace_Inner(false, false, false, bSel);
     exit;
   end;
 
