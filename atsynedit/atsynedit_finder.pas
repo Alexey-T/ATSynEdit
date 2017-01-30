@@ -101,6 +101,8 @@ type
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
     procedure DoFragmentsShow;
+    procedure UpdateFragments;
+    function CurrentFragment: TATEditorFragment;
   protected
     procedure DoOnFound; override;
   public
@@ -424,6 +426,7 @@ end;
 
 function TATEditorFinder.DoCountAll(AWithEvent: boolean): integer;
 begin
+  UpdateFragments;
   UpdateBuffer;
   if OptRegex then
     Result:= DoCountMatchesRegex(1, AWithEvent)
@@ -544,15 +547,9 @@ begin
   if AReplace and FEditor.ModeReadOnly then exit;
   if OptRegex then OptBack:= false;
 
+  UpdateFragments;
   UpdateBuffer;
   DoFixCaretSelectionDirection;
-
-  if OptInSelection then
-  begin
-    if FEditor.Carets.Count<>1 then
-      raise Exception.Create('Finder option InSelection dont work with multi-carets yet');
-    DoFragmentsInit;
-  end;
 
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
@@ -669,6 +666,8 @@ var
 begin
   Result:= false;
   FReplacedAtEndOfText:= false;
+
+  UpdateFragments;
   UpdateBuffer;
 
   if not IsSelectionStartsAtFoundMatch then
@@ -840,5 +839,25 @@ begin
     FreeAndNil(FFragments);
   end;
 end;
+
+procedure TATEditorFinder.UpdateFragments;
+begin
+  DoFragmentsClear;
+  if OptInSelection then
+  begin
+    if FEditor.Carets.Count<>1 then
+      raise Exception.Create('Finder.InSelection dont work with multi-carets yet');
+    DoFragmentsInit;
+  end;
+end;
+
+function TATEditorFinder.CurrentFragment: TATEditorFragment;
+begin
+  Result:= nil;
+  if OptInSelection then
+    if FFragments.Count>0 then
+      Result:= TATEditorFragment(FFragments[0]);
+end;
+
 
 end.
