@@ -120,6 +120,7 @@ Some details about this:
 * Strings object is holder of text. 2+ editors can have 1 strings obj. (Split editor.)
 * Unicode (used UnicodeString in Strings obj)
 * Word-wrap (wrap at control edge, wrap at column)
+* Inter-line gaps (see [[#Gaps_object]])
 * Undo/redo
 * Column blocks
 * Gutter (line numbers, folding, colored line states)
@@ -137,10 +138,11 @@ Some details about this:
 
 == Difference from other components? ==
 
-* Adapters to support syntax hilight; possible to support other hiliters: from SynEdit, from EControl, from Sublime Text, from EmEditor etc
-* Carets and selections
-* Minimap
-* Diff from SynEdit: simpler set of objects, no 'markup objects'
+* Adapters to support syntax hilight; possible to support syntax files from any app: Sublime Text, Atom, EmEditor etc.
+* Muti-carets, multi-selections
+* Gaps (I didn't see this in others)
+* Minimap, Micromap (rare in others)
+* Diff from SynEdit: simpler set of objects, no "markup objects"
 
 ==     Does it need to be installed? ==
 
@@ -304,6 +306,25 @@ If you add attrib item, create new object of type TATLinePartClass, fill its Dat
 
 Contains color properties of type TColor. For ex, Colors.TextFont is text font color, Colors.TextBG is text background color.
 
+=== Gaps object ===
+
+List of gap items. Gap items have properties: line index, size (maybe more later).
+Gap item paints as rectangle (it is owner-drawn), just between lines N and N+1, not overlapping text. Example usages:
+
+* App wants to show picture preview, when picture is linked in HTML. It creates small preview picture e.g. 100x50, and adds gap: gap size=52, picture height and 2 pixels of border.
+* App runs linter on JS code, for JS errors it places bookmarks, and adds gaps with size=15 for error lines: in gaps it writes errors, maybe icons.
+
+To add/remove gaps:
+
+  ed.Gaps.Add(LineNum, Size);
+  ed.Update;
+  //to delete this gap
+  ed.Gaps.DeleteForLineRange(LineNum, LineNum);
+  ed.Update;
+
+Event OnDrawGap is used to paint gaps, it gets canvas, and rectangle on canvas.
+Note: if you add gap to the last line, you must turn on option OptLastLineOnTop, better don't turn it off later (to not scroll, when gap added/removed).
+
 == What are the basic methods/properties? ==
 
 Objects
@@ -316,6 +337,7 @@ Objects
 *    property Markers: Markers object
 *    property Attribs: Attribs object
 *    property Colors: Colors object
+*    property Gaps: Gaps object
 
 Files
 
@@ -444,6 +466,8 @@ Example:
 == How to modify text? ==
 
 See topic above about "Strings object". To change text, get Strings property of editor. "Strings.Count" is number of lines in object. Then access methods of Strings: LineAdd, LineInsert, LineDelete. To get/set lines by index, use properties of Strings: Strings.Lines[i], etc, listed above.
+
+To delete range of text, not single line, use Strings.TextDeleteRange(). To insert block of text, with multiple lines, use Strings.TextInsert().
 
 Strings.Lines[i] do not contain end-of-line chars. Usually not needed to change end-of-line chars. You can change them using Strings.LinesEnds[i].
 
@@ -819,7 +843,7 @@ Unit atsynedit_form_complete_html has function to show auto-completion listbox, 
 
 = Finder =
 
-Finder class TATEditorFinder exists in unit atsynedit_finder.
+Finder class TATEditorFinder is in unit atsynedit_finder.
 To use it, create Finder object and set its props:
 
 * Editor: editor object (text will be read automatically)
@@ -831,6 +855,7 @@ To use it, create Finder object and set its props:
 ** OptWords: whole-words search (for non-regex mode, for regex you must use "\b" specifier in search-string)
 ** OptBack: backward search (for non-regex mode)
 ** OptWrapped: continue search from top, if bottom reached (for back-search: continue from bottom, if top reached)
+** OptInSelection: do search/replace in selection only (limitation exists: only 1st selection used)
 ** OptFromCaret: search goes from position of first caret (else: from start/end of text)
 ** OptConfirmReplace: each replace will occur after event OnConfirmReplace
 
@@ -838,17 +863,16 @@ Dialog of demo:
 
 [[File:atsynedit_finder.png]]
 
-Call methods which will find/replace text (they will place selection over found match, and scroll editor to caret). You must also call UpdateBuffer before search: it reads editor text into internal buffer.
+Methods to find/replace text (they will place selection on found match, and scroll editor to caret, except method CountAll):
 
 <syntaxhighlight>
-    procedure UpdateBuffer;
-    function DoFindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoReplaceSelectedMatch: boolean;
-    function DoCountAll(AWithEvent: boolean): integer;
-    function DoReplaceAll: integer;
+    function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
+    function DoAction_ReplaceSelected: boolean;
+    function DoAction_CountAll(AWithEvent: boolean): integer;
+    function DoAction_ReplaceAll: integer;
 </syntaxhighlight>
 
-Found position and len are props MatchPos, MatchLen.
+Found position and len are saved in props: MatchPos, MatchLen.
 Internally Finder object uses ATStringBuffer to read editor lines into buffer and search inside buffer. Then ATStringBuffer methods used to calculate caret position (from buffer offset) and place caret/selection. Note for regex search: buffer contains only "\n" line ends, other ends don't happen (original file may have any ends).
 
 Finder has events:
