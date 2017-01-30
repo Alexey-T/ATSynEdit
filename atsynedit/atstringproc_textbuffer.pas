@@ -37,7 +37,6 @@ type
     function CaretToStr(APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
     function SubString(APos, ALen: integer): atString; inline;
-    procedure ReplaceRange(APos, ALen: integer; const ANewText: atString);
     function TextLength: integer; inline;
     function LineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
@@ -273,15 +272,6 @@ begin
     Inc(Result);
     Inc(NPos);
   end;
-end;
-
-procedure TATStringBuffer.ReplaceRange(APos, ALen: integer; const ANewText: atString);
-var
-  StrBegin, StrEnd: atString;
-begin
-  StrBegin:= Copy(FText, 1, APos-1);
-  StrEnd:= Copy(FText, APos+ALen, MaxInt);
-  SetupSlow(StrBegin+ANewText+StrEnd);
 end;
 
 

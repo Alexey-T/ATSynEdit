@@ -540,13 +540,14 @@ begin
     Str:= StrReplace;
   AReplacedLen:= Length(Str);
 
-  //replace in FBuffer
-  //(and sync finder buffer)
+  //replace in buffer
   NPos1:= ConvertCaretPosToBufferPos(APosBegin);
   NPos2:= ConvertCaretPosToBufferPos(APosEnd);
-  FBuffer.ReplaceRange(NPos1, NPos2-NPos1, Str);
-  Self.StrText:= FBuffer.FText;
+  System.Delete(StrText, NPos1, NPos2-NPos1);
+  System.Insert(Str, StrText, NPos1);
+  FBuffer.SetupSlow(StrText);
 
+  //replace in editor
   Strs:= FEditor.Strings;
   FReplacedAtEndOfText:=
     (APosEnd.Y>Strs.Count-1) or
