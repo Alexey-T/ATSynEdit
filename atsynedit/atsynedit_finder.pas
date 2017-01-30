@@ -89,10 +89,10 @@ type
     FOnConfirmReplace: TATFinderConfirmReplace;
     FFragments: TList;
     FReplacedAtEndOfText: boolean;
-    procedure UpdateBuffer;
+    //
+    procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
     function ConvertBufferPosToCaretPos(AValue: integer): TPoint;
     function ConvertCaretPosToBufferPos(APos: TPoint): integer;
-    //
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
     function GetRegexSkipIncrement: integer;
@@ -105,7 +105,6 @@ type
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
     procedure DoFragmentsShow;
-    procedure UpdateFragments;
     function CurrentFragment: TATEditorFragment;
   protected
     procedure DoOnFound; override;
@@ -377,12 +376,24 @@ begin
   end;
 end;
 
-procedure TATEditorFinder.UpdateBuffer;
+procedure TATEditorFinder.UpdateBuffer(AUpdateFragmentsFirst: boolean);
 var
   Fr: TATEditorFragment;
   Lens: array of integer;
   i: integer;
 begin
+  if AUpdateFragmentsFirst then
+  begin
+    if OptRegex then
+      OptBack:= false;
+    if OptInSelection then
+      OptFromCaret:= false;
+
+    DoFragmentsClear;
+    if OptInSelection then
+      DoFragmentsInit;
+  end;
+
   Fr:= CurrentFragment;
   if Assigned(Fr) then
   begin
@@ -475,8 +486,7 @@ end;
 
 function TATEditorFinder.DoCountAll(AWithEvent: boolean): integer;
 begin
-  UpdateFragments;
-  UpdateBuffer;
+  UpdateBuffer(true);
   if OptRegex then
     Result:= DoCountMatchesRegex(1, AWithEvent)
   else
@@ -595,8 +605,7 @@ begin
 
   if AReplace and FEditor.ModeReadOnly then exit;
 
-  UpdateFragments;
-  UpdateBuffer;
+  UpdateBuffer(true);
   DoFixCaretSelectionDirection;
 
   NStartPos:= GetOffsetStartPos;
@@ -660,7 +669,7 @@ begin
       if ConfirmThis then
       begin
         DoReplaceTextInEditor(P1, P2);
-        UpdateBuffer;
+        UpdateBuffer(false);
 
         if OptRegex then
           FSkipLen:= Length(StrReplacement)+GetRegexSkipIncrement
@@ -715,8 +724,7 @@ begin
   Result:= false;
   FReplacedAtEndOfText:= false;
 
-  UpdateFragments;
-  UpdateBuffer;
+  UpdateBuffer(true);
 
   if not IsSelectionStartsAtFoundMatch then
   begin
@@ -740,7 +748,7 @@ begin
     UpdateRegexStrReplacement_FromText(SSelText);
 
   DoReplaceTextInEditor(P1, P2);
-  UpdateBuffer;
+  UpdateBuffer(false);
 
   if OptRegex then
     FSkipLen:= Length(StrReplacement)
@@ -886,16 +894,6 @@ begin
     FFragments.Clear;
     FreeAndNil(FFragments);
   end;
-end;
-
-procedure TATEditorFinder.UpdateFragments;
-begin
-  if OptRegex then OptBack:= false;
-  if OptInSelection then OptFromCaret:= false;
-
-  DoFragmentsClear;
-  if OptInSelection then
-    DoFragmentsInit;
 end;
 
 function TATEditorFinder.CurrentFragment: TATEditorFragment;
