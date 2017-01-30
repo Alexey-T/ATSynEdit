@@ -102,7 +102,8 @@ type
       out AChanged: boolean): boolean;
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
-    procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint);
+    procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
+      out AReplacedLen: integer);
     function IsSelectionStartsAtFoundMatch: boolean;
     //fragments
     procedure DoFragmentsClear;
@@ -525,16 +526,26 @@ begin
   end;
 end;
 
-procedure TATEditorFinder.DoReplaceTextInEditor(APosBegin, APosEnd: TPoint);
+procedure TATEditorFinder.DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
+  out AReplacedLen: integer);
 var
   Shift, PosAfter: TPoint;
   Str: UnicodeString;
   Strs: TATStrings;
+  NPos1, NPos2: integer;
 begin
   if OptRegex then
     Str:= StrReplacement
   else
     Str:= StrReplace;
+  AReplacedLen:= Length(Str);
+
+  //replace in FBuffer
+  //(and sync finder buffer)
+  NPos1:= ConvertCaretPosToBufferPos(APosBegin);
+  NPos2:= ConvertCaretPosToBufferPos(APosEnd);
+  FBuffer.ReplaceRange(NPos1, NPos2-NPos1, Str);
+  Self.StrText:= FBuffer.FText;
 
   Strs:= FEditor.Strings;
   FReplacedAtEndOfText:=
@@ -551,7 +562,7 @@ begin
   begin
     //correct caret pos
     //(e.g. replace "dddddd" to "--": move lefter)
-    FEditor.DoCaretSingle(APosBegin.X+Length(Str), APosBegin.Y);
+    FEditor.DoCaretSingle(APosBegin.X+AReplacedLen, APosBegin.Y);
   end;
 end;
 
@@ -685,13 +696,10 @@ begin
 
       if ConfirmThis then
       begin
-        DoReplaceTextInEditor(P1, P2);
-        UpdateBuffer(false);
-
+        DoReplaceTextInEditor(P1, P2, FSkipLen);
         if OptRegex then
-          FSkipLen:= Length(StrReplacement)+GetRegexSkipIncrement
-        else
-          FSkipLen:= Length(StrReplace);
+          Inc(FSkipLen, GetRegexSkipIncrement);
+
         AChanged:= true;
       end;
     end;
@@ -764,13 +772,7 @@ begin
   if OptRegex then
     UpdateRegexStrReplacement_FromText(SSelText);
 
-  DoReplaceTextInEditor(P1, P2);
-  UpdateBuffer(false);
-
-  if OptRegex then
-    FSkipLen:= Length(StrReplacement)
-  else
-    FSkipLen:= Length(StrReplace);
+  DoReplaceTextInEditor(P1, P2, FSkipLen);
   Result:= true;
 end;
 

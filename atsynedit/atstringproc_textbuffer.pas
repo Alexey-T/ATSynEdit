@@ -31,12 +31,13 @@ type
     FText: atString;
     constructor Create; virtual;
     destructor Destroy; override;
+    procedure Clear;
     procedure Setup(const AText: atString; const ALineLens: array of integer);
     procedure SetupSlow(const AText: atString);
-    procedure Clear;
     function CaretToStr(APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
-    function SubString(AFrom, ALen: integer): atString; inline;
+    function SubString(APos, ALen: integer): atString; inline;
+    procedure ReplaceRange(APos, ALen: integer; const ANewText: atString);
     function TextLength: integer; inline;
     function LineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
@@ -180,9 +181,9 @@ begin
   Result.X:= APos-FList[Result.Y];
 end;
 
-function TATStringBuffer.SubString(AFrom, ALen: integer): atString; inline;
+function TATStringBuffer.SubString(APos, ALen: integer): atString; inline;
 begin
-  Result:= Copy(FText, AFrom, ALen);
+  Result:= Copy(FText, APos, ALen);
 end;
 
 function TATStringBuffer.TextLength: integer; inline;
@@ -272,6 +273,15 @@ begin
     Inc(Result);
     Inc(NPos);
   end;
+end;
+
+procedure TATStringBuffer.ReplaceRange(APos, ALen: integer; const ANewText: atString);
+var
+  StrBegin, StrEnd: atString;
+begin
+  StrBegin:= Copy(FText, 1, APos-1);
+  StrEnd:= Copy(FText, APos+ALen, MaxInt);
+  SetupSlow(StrBegin+ANewText+StrEnd);
 end;
 
 
