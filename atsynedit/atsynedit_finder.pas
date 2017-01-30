@@ -458,7 +458,7 @@ begin
   begin
     if (APos.Y<Fr.Y1) or ((APos.Y=Fr.Y1) and (APos.X<Fr.X1)) then
       Exit(1);
-    if (APos.Y>Fr.Y2) or ((APos.Y=Fr.Y2) and (APos.X>=Fr.X2)) then
+    if (APos.Y>Fr.Y2) then
       Exit(FBuffer.TextLength);
     if (APos.Y=Fr.Y1) then
       Dec(APos.X, Fr.X1);
