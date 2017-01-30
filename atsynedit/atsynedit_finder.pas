@@ -90,13 +90,17 @@ type
     FFragments: TList;
     FReplacedAtEndOfText: boolean;
     procedure UpdateBuffer;
-    function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
-      out AChanged: boolean; AStartPos: integer): boolean;
-    procedure DoFixCaretSelectionDirection;
-    procedure DoReplaceTextInEditor(P1, P2: TPoint);
+    function ConvertBufferPosToCaretPos(AValue: integer): TPoint;
+    function ConvertCaretPosToBufferPos(APos: TPoint): integer;
+    //
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
     function GetRegexSkipIncrement: integer;
+    procedure DoFixCaretSelectionDirection;
+    //
+    function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
+      out AChanged: boolean; AStartPos: integer): boolean;
+    procedure DoReplaceTextInEditor(P1, P2: TPoint);
     //fragments
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
@@ -375,15 +379,24 @@ end;
 
 procedure TATEditorFinder.UpdateBuffer;
 var
+  Fr: TATEditorFragment;
   Lens: array of integer;
   i: integer;
 begin
-  SetLength(Lens, FEditor.Strings.Count);
-  for i:= 0 to Length(Lens)-1 do
-    Lens[i]:= FEditor.Strings.LinesLen[i];
-  FBuffer.Setup(FEditor.Strings.TextString, Lens);
-
-  StrText:= FBuffer.FText;
+  Fr:= CurrentFragment;
+  if Assigned(Fr) then
+  begin
+    FBuffer.SetupSlow(Fr.Text);
+    StrText:= Fr.Text;
+  end
+  else
+  begin
+    SetLength(Lens, FEditor.Strings.Count);
+    for i:= 0 to Length(Lens)-1 do
+      Lens[i]:= FEditor.Strings.LinesLen[i];
+    FBuffer.Setup(FEditor.Strings.TextString, Lens);
+    StrText:= FBuffer.FText;
+  end;
 end;
 
 constructor TATEditorFinder.Create;
@@ -403,6 +416,42 @@ begin
   inherited;
 end;
 
+function TATEditorFinder.ConvertBufferPosToCaretPos(AValue: integer): TPoint;
+var
+  Fr: TATEditorFragment;
+begin
+  Dec(AValue); //was 1-based
+  Result:= FBuffer.StrToCaret(AValue);
+
+  Fr:= CurrentFragment;
+  if Assigned(Fr) then
+  begin
+    if Result.Y=0 then
+      Inc(Result.X, Fr.X1);
+    Inc(Result.Y, Fr.Y1);
+  end;
+end;
+
+function TATEditorFinder.ConvertCaretPosToBufferPos(APos: TPoint): integer;
+var
+  Fr: TATEditorFragment;
+begin
+  Fr:= CurrentFragment;
+  if Assigned(Fr) then
+  begin
+    if (APos.Y<Fr.Y1) or ((APos.Y=Fr.Y1) and (APos.X<Fr.X1)) then
+      Exit(1);
+    if (APos.Y>Fr.Y2) or ((APos.Y=Fr.Y2) and (APos.X>=Fr.X2)) then
+      Exit(FBuffer.TextLength);
+    if (APos.Y=Fr.Y1) then
+      Dec(APos.X, Fr.X1);
+    Dec(APos.Y, Fr.Y1);
+  end;
+
+  Result:= FBuffer.CaretToStr(APos);
+  Inc(Result); //was 0-based
+end;
+
 function TATEditorFinder.GetOffsetOfCaret: integer;
 var
   Pnt: TPoint;
@@ -413,8 +462,7 @@ begin
     Pnt.Y:= PosY;
   end;
 
-  Result:= FBuffer.CaretToStr(Pnt);
-  Inc(Result); //was 0-based
+  Result:= ConvertCaretPosToBufferPos(Pnt);
 
   //find-back must goto previous match
   if OptBack then
@@ -590,8 +638,8 @@ begin
 
   if Result then
   begin
-    P1:= FBuffer.StrToCaret(MatchPos-1);
-    P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
+    P1:= ConvertBufferPosToCaretPos(MatchPos);
+    P2:= ConvertBufferPosToCaretPos(MatchPos+MatchLen);
     FEditor.DoCaretSingle(P1.X, P1.Y);
 
     if AReplace then
@@ -647,8 +695,8 @@ begin
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
 
-  PosOfBegin:= FBuffer.CaretToStr(Point(X1, Y1))+1;
-  PosOfEnd:= FBuffer.CaretToStr(Point(X2, Y2))+1;
+  PosOfBegin:= ConvertCaretPosToBufferPos(Point(X1, Y1));
+  PosOfEnd:= ConvertCaretPosToBufferPos(Point(X2, Y2));
 
   //allow to replace, also if selection=Strfind
   Result:=
@@ -771,8 +819,8 @@ var
 begin
   if Assigned(FOnFound) then
   begin
-    P1:= FBuffer.StrToCaret(MatchPos-1);
-    P2:= FBuffer.StrToCaret(MatchPos-1+MatchLen);
+    P1:= ConvertBufferPosToCaretPos(MatchPos);
+    P2:= ConvertBufferPosToCaretPos(MatchPos+MatchLen);
     FOnFound(Self, P1, P2);
   end;
 end;
