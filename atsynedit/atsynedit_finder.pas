@@ -89,8 +89,9 @@ type
     FOnConfirmReplace: TATFinderConfirmReplace;
     FFragments: TList;
     FReplacedAtEndOfText: boolean;
-    function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean; out
-      AChanged: boolean; AStartPos: integer): boolean;
+    procedure UpdateBuffer;
+    function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
+      out AChanged: boolean; AStartPos: integer): boolean;
     procedure DoFixCaretSelectionDirection;
     procedure DoReplaceTextInEditor(P1, P2: TPoint);
     function GetOffsetOfCaret: integer;
@@ -108,7 +109,6 @@ type
     OptInSelection: boolean;
     constructor Create;
     destructor Destroy; override;
-    procedure UpdateBuffer;
     property Editor: TATSynEdit read FEditor write FEditor;
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
@@ -544,9 +544,15 @@ begin
   if AReplace and FEditor.ModeReadOnly then exit;
   if OptRegex then OptBack:= false;
 
+  UpdateBuffer;
   DoFixCaretSelectionDirection;
 
-  if OptInSelection then DoFragmentsInit;
+  if OptInSelection then
+  begin
+    if FEditor.Carets.Count<>1 then
+      raise Exception.Create('Finder option InSelection dont work with multi-carets yet');
+    DoFragmentsInit;
+  end;
 
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
@@ -671,6 +677,7 @@ begin
     exit;
   end;
 
+  UpdateBuffer;
   Caret:= FEditor.Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
