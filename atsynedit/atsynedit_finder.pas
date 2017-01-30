@@ -98,6 +98,8 @@ type
     function GetRegexSkipIncrement: integer;
     procedure DoFixCaretSelectionDirection;
     //
+    function DoFindOrReplace_Inner(ANext, AReplace, AForMany: boolean;
+      out AChanged: boolean): boolean;
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint);
@@ -591,12 +593,9 @@ end;
 
 function TATEditorFinder.DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
-var
-  NStartPos: integer;
 begin
   Result:= false;
   AChanged:= false;
-  FReplacedAtEndOfText:= false;
 
   if not Assigned(FEditor) then
     raise Exception.Create('Finder.Editor not set');
@@ -609,6 +608,18 @@ begin
 
   UpdateBuffer(true);
   DoFixCaretSelectionDirection;
+
+  Result:= DoFindOrReplace_Inner(ANext, AReplace, AForMany, AChanged);
+end;
+
+function TATEditorFinder.DoFindOrReplace_Inner(ANext, AReplace, AForMany: boolean;
+  out AChanged: boolean): boolean;
+var
+  NStartPos: integer;
+begin
+  Result:= false;
+  AChanged:= false;
+  FReplacedAtEndOfText:= false;
 
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
