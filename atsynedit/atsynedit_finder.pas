@@ -669,6 +669,7 @@ var
 begin
   Result:= false;
   FReplacedAtEndOfText:= false;
+  UpdateBuffer;
 
   if not IsSelectionStartsAtFoundMatch then
   begin
@@ -677,7 +678,6 @@ begin
     exit;
   end;
 
-  UpdateBuffer;
   Caret:= FEditor.Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
