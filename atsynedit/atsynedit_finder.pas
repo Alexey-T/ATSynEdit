@@ -113,6 +113,7 @@ type
     procedure DoFragmentsInit;
     procedure DoFragmentsShow;
     procedure SetFragmentIndex(AValue: integer);
+    function GetFragmentsTouched: boolean;
     function CurrentFragment: TATEditorFragment;
     property CurrentFragmentIndex: integer read FFragmentIndex write SetFragmentIndex;
   protected
@@ -524,11 +525,34 @@ begin
 end;
 
 function TATEditorFinder.DoAction_ReplaceAll: integer;
+var
+  i: integer;
 begin
   Result:= 0;
   if FEditor.ModeReadOnly then exit;
   UpdateBuffer(true);
-  Result:= DoReplaceAll;
+
+  if FFragments=nil then
+    Result:= DoReplaceAll
+  else
+  begin
+    Result:= 0;
+    //fragments touched- do loop-downto,
+    //else its safe to do loop-to
+    if GetFragmentsTouched then
+      for i:= FFragments.Count-1 downto 0 do
+      begin
+        CurrentFragmentIndex:= i;
+        Inc(Result, DoReplaceAll);
+      end
+    else
+      for i:= 0 to FFragments.Count-1 do
+      begin
+        CurrentFragmentIndex:= i;
+        Inc(Result, DoReplaceAll);
+      end;
+    CurrentFragmentIndex:= 0;
+  end;
 end;
 
 function TATEditorFinder.DoReplaceAll: integer;
@@ -962,6 +986,20 @@ begin
   if FFragmentIndex=AValue then Exit;
   FFragmentIndex:= AValue;
   StrText:= TATEditorFragment(FFragments[FFragmentIndex]).Text;
+end;
+
+function TATEditorFinder.GetFragmentsTouched: boolean;
+var
+  Fr1, Fr2: TATEditorFragment;
+  i: integer;
+begin
+  Result:= false;
+  for i:= 0 to FFragments.Count-2 do
+  begin
+    Fr1:= TATEditorFragment(FFragments[i]);
+    Fr2:= TATEditorFragment(FFragments[i+1]);
+    if Fr1.Y2=Fr2.Y1 then Exit(true);
+  end;
 end;
 
 
