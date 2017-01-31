@@ -291,7 +291,7 @@ begin
   FFinder.OnConfirmReplace:= @FinderConfirmReplace;
   FFinder.OnProgress:= @FinderProgress;
   FFinder.OnBadRegex:= @FinderBadRegex;
-  FFinder.OnFound:= @FinderFound; //slower
+  FFinder.OnFound:= @FinderFound;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -778,10 +778,11 @@ begin
       mrRetry: //mark all
         begin
           FFindMarkAll:= true;
+          ed.Markers.Clear;
           cnt:= FFinder.DoAction_CountAll(true);
           FFindMarkAll:= false;
           FinderUpdateEditor(false);
-          MsgStatus('Marked matches: '+Inttostr(cnt));
+          MsgStatus('Markers placed: '+Inttostr(cnt));
         end;
     end;
   finally
@@ -1307,8 +1308,7 @@ procedure TfmMain.FinderFound(Sender: TObject; APos1, APos2: TPoint);
 begin
   if FFindMarkAll then
   begin
-    ed.Carets.Add(APos1.X, APos1.Y, APos2.X, APos2.Y);
-    ed.Carets.Sort;
+    ed.Markers.Add(APos1.X, APos1.Y, 0, Abs(APos2.X-APos1.X), 0);
   end;
 end;
 
