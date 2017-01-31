@@ -335,8 +335,7 @@ begin
     except
       if Assigned(FOnBadRegex) then
         FOnBadRegex(Self);
-      Result:= 0;
-      Exit;
+      Exit(0);
     end;
 
     if Ok then
@@ -685,10 +684,7 @@ begin
           FOnConfirmReplace(Self, P1, P2, AForMany, ConfirmThis, ConfirmContinue);
 
       if not ConfirmContinue then
-      begin
-        Result:= false;
-        Exit;
-      end;
+        Exit(false);
 
       if ConfirmThis then
       begin
