@@ -200,27 +200,19 @@ begin
   LastPos:= Length(StrText) - Length(StrFind) + 1;
 
   if not OptBack then
+  begin
     for i:= FromPos to LastPos do
-    begin
-      if IsMatchUsual(i) then
-      begin
-        Result:= i;
-        Break
-      end;
-    end
+      if IsMatchUsual(i) then Exit(i);
+  end
   else
+  begin
     for i:= FromPos downto 1 do
-    begin
-     if IsMatchUsual(i) then
-      begin
-        Result:= i;
-        Break
-      end;
-    end;
+     if IsMatchUsual(i) then Exit(i);
+  end;
 end;
 
-function TATTextFinder.DoFindMatchRegex(FromPos: integer; var MatchPos,
-  MatchLen: integer): boolean;
+function TATTextFinder.DoFindMatchRegex(FromPos: integer;
+  var MatchPos, MatchLen: integer): boolean;
 var
   Obj: TRegExpr;
 begin
