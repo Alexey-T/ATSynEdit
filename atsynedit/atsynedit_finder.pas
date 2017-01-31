@@ -38,6 +38,7 @@ type
     FStrReplacement: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
+    function DoCountAll(AWithEvent: boolean): integer;
     function DoCountMatchesRegex(FromPos: integer; AWithEvent: boolean): integer;
     function DoCountMatchesUsual(FromPos: integer; AWithEvent: boolean): Integer;
     function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
@@ -372,6 +373,14 @@ begin
   end;
 end;
 
+function TATTextFinder.DoCountAll(AWithEvent: boolean): integer;
+begin
+  if OptRegex then
+    Result:= DoCountMatchesRegex(1, AWithEvent)
+  else
+    Result:= DoCountMatchesUsual(1, AWithEvent);
+end;
+
 procedure TATEditorFinder.UpdateBuffer(AUpdateFragmentsFirst: boolean);
 var
   Fr: TATEditorFragment;
@@ -486,10 +495,7 @@ end;
 function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
 begin
   UpdateBuffer(true);
-  if OptRegex then
-    Result:= DoCountMatchesRegex(1, AWithEvent)
-  else
-    Result:= DoCountMatchesUsual(1, AWithEvent);
+  Result:= DoCountAll(AWithEvent);
 end;
 
 function TATEditorFinder.DoAction_ReplaceAll: integer;
