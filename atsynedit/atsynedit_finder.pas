@@ -111,7 +111,9 @@ type
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
     procedure DoFragmentsShow;
+    procedure SetFragmentIndex(AValue: integer);
     function CurrentFragment: TATEditorFragment;
+    property CurrentFragmentIndex: integer read FFragmentIndex write SetFragmentIndex;
   protected
     procedure DoOnFound; override;
   public
@@ -513,11 +515,10 @@ begin
     Result:= 0;
     for i:= 0 to FFragments.Count-1 do
     begin
-      FFragmentIndex:= i;
-      StrText:= CurrentFragment.Text;
+      CurrentFragmentIndex:= i;
       Inc(Result, DoCountAll(AWithEvent));
     end;
-    FFragmentIndex:= 0;
+    CurrentFragmentIndex:= 0;
   end;
 end;
 
@@ -948,6 +949,13 @@ begin
     if Assigned(FFragments) then
       if (FFragmentIndex>=0) and (FFragmentIndex<FFragments.Count) then
         Result:= TATEditorFragment(FFragments[FFragmentIndex]);
+end;
+
+procedure TATEditorFinder.SetFragmentIndex(AValue: integer);
+begin
+  if FFragmentIndex=AValue then Exit;
+  FFragmentIndex:= AValue;
+  StrText:= TATEditorFragment(FFragments[FFragmentIndex]).Text;
 end;
 
 
