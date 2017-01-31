@@ -100,6 +100,7 @@ type
     function GetRegexSkipIncrement: integer;
     procedure DoFixCaretSelectionDirection;
     //
+    function DoFindOrReplace_Outer(AReplace: boolean): integer;
     function DoFindOrReplace_Inner(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean): boolean;
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
@@ -523,19 +524,24 @@ begin
 end;
 
 function TATEditorFinder.DoAction_ReplaceAll: integer;
-var
-  Ok, bChanged: boolean;
 begin
   Result:= 0;
   if FEditor.ModeReadOnly then exit;
   UpdateBuffer(true);
+  Result:= DoFindOrReplace_Outer(true);
+end;
 
-  if DoFindOrReplace_Inner(false, true, true, bChanged) then
+function TATEditorFinder.DoFindOrReplace_Outer(AReplace: boolean): integer;
+var
+  Ok, bChanged: boolean;
+begin
+  Result:= 0;
+  if DoFindOrReplace_Inner(false, AReplace, true, bChanged) then
   begin
     if bChanged then
       Inc(Result);
 
-    while DoFindOrReplace_Inner(true, true, true, bChanged) do
+    while DoFindOrReplace_Inner(true, AReplace, true, bChanged) do
     begin
       if Application.Terminated then exit;
       if bChanged then Inc(Result);
