@@ -906,16 +906,24 @@ begin
     Fr.Text:= FEditor.Strings.TextSubstring(X1, Y1, X2, Y2);
     FFragments.Add(Fr);
   end;
+
+  //debug
+  //DoFragmentsShow;
 end;
 
 procedure TATEditorFinder.DoFragmentsShow;
 var
+  Fr: TATEditorFragment;
   S: string;
   i: integer;
 begin
   S:= '';
   for i:= 0 to FFragments.Count-1 do
-    S:= S+ Utf8Encode(TATEditorFragment(FFragments[i]).Text) + #10'---------'#10;
+  begin
+    Fr:= TATEditorFragment(FFragments[i]);
+    S:= S+ Utf8Encode(Fr.Text) +
+      Format(#10'--[%d:%d .. %d:%d]-----'#10, [Fr.Y1, Fr.X1, Fr.Y2, Fr.X2]);
+  end;
   ShowMessage(S);
 end;
 
@@ -936,8 +944,9 @@ function TATEditorFinder.CurrentFragment: TATEditorFragment;
 begin
   Result:= nil;
   if OptInSelection then
-    if (FFragmentIndex>=0) and (FFragmentIndex<FFragments.Count) then
-      Result:= TATEditorFragment(FFragments[FFragmentIndex]);
+    if Assigned(FFragments) then
+      if (FFragmentIndex>=0) and (FFragmentIndex<FFragments.Count) then
+        Result:= TATEditorFragment(FFragments[FFragmentIndex]);
 end;
 
 
