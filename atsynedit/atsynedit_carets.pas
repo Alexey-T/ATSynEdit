@@ -15,7 +15,7 @@ uses
 type
   TATPosRelation = (cRelateBefore, cRelateInside, cRelateAfter);
 
-procedure SwapInt(var n1, n2: integer);
+procedure SwapInt(var n1, n2: integer); inline;
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
 function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer): TATPosRelation;
 
@@ -125,7 +125,7 @@ begin
     Result:= cRelateAfter;
 end;
 
-procedure SwapInt(var n1, n2: integer);
+procedure SwapInt(var n1, n2: integer); inline;
 var
   n: integer;
 begin

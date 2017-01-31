@@ -501,9 +501,23 @@ begin
 end;
 
 function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
+var
+  i: integer;
 begin
   UpdateBuffer(true);
-  Result:= DoCountAll(AWithEvent);
+
+  if FFragments=nil then
+    Result:= DoCountAll(AWithEvent)
+  else
+  begin
+    Result:= 0;
+    for i:= 0 to FFragments.Count-1 do
+    begin
+      FFragmentIndex:= i;
+      Inc(Result, DoCountAll(AWithEvent));
+    end;
+    FFragmentIndex:= 0;
+  end;
 end;
 
 function TATEditorFinder.DoAction_ReplaceAll: integer;
