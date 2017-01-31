@@ -984,8 +984,12 @@ end;
 procedure TATEditorFinder.SetFragmentIndex(AValue: integer);
 begin
   if FFragmentIndex=AValue then Exit;
-  FFragmentIndex:= AValue;
-  StrText:= TATEditorFragment(FFragments[FFragmentIndex]).Text;
+  if (AValue>=0) and (AValue<FFragments.Count) then
+  begin
+    FFragmentIndex:= AValue;
+    StrText:= TATEditorFragment(FFragments[FFragmentIndex]).Text;
+    FBuffer.SetupSlow(StrText);
+  end;
 end;
 
 function TATEditorFinder.GetFragmentsTouched: boolean;
