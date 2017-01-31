@@ -89,6 +89,7 @@ type
     FOnFound: TATFinderFound;
     FOnConfirmReplace: TATFinderConfirmReplace;
     FFragments: TList;
+    FFragmentIndex: integer;
     FReplacedAtEndOfText: boolean;
     //
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
@@ -117,6 +118,7 @@ type
     OptFromCaret: boolean;
     OptConfirmReplace: boolean;
     OptInSelection: boolean;
+    //
     constructor Create;
     destructor Destroy; override;
     property Editor: TATSynEdit read FEditor write FEditor;
@@ -421,8 +423,14 @@ end;
 constructor TATEditorFinder.Create;
 begin
   inherited;
+
   FEditor:= nil;
   FBuffer:= TATStringBuffer.Create;
+  FSkipLen:= 0;
+  FFragments:= nil;
+  FFragmentIndex:= 0;
+  FReplacedAtEndOfText:= false;
+
   OptFromCaret:= false;
   OptConfirmReplace:= false;
   OptInSelection:= false;
@@ -871,7 +879,7 @@ begin
   if FEditor=nil then exit;
   FFragments:= TList.Create;
 
-  for i:= 0 to 0 {FEditor.Carets.Count-1} do //todo: support mul-carets
+  for i:= 0 to FEditor.Carets.Count-1 do
   begin
     Caret:= FEditor.Carets[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
@@ -884,9 +892,6 @@ begin
     Fr.Text:= FEditor.Strings.TextSubstring(X1, Y1, X2, Y2);
     FFragments.Add(Fr);
   end;
-
-  //debug
-  //DoFragmentsShow;
 end;
 
 procedure TATEditorFinder.DoFragmentsShow;
@@ -917,8 +922,8 @@ function TATEditorFinder.CurrentFragment: TATEditorFragment;
 begin
   Result:= nil;
   if OptInSelection then
-    if FFragments.Count>0 then
-      Result:= TATEditorFragment(FFragments[0]);
+    if (FFragmentIndex>=0) and (FFragmentIndex<FFragments.Count) then
+      Result:= TATEditorFragment(FFragments[FFragmentIndex]);
 end;
 
 
