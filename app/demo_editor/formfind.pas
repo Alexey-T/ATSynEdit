@@ -19,6 +19,7 @@ type
     bCancel: TButton;
     bRep: TButton;
     bRepAll: TButton;
+    chkInSel: TCheckBox;
     chkFromCaret: TCheckBox;
     chkConfirm: TCheckBox;
     chkRep: TCheckBox;
@@ -63,7 +64,7 @@ begin
   Update;
 end;
 
-procedure TfmFInd.Update;
+procedure TfmFind.Update;
 var
   rep: boolean;
 begin
@@ -77,8 +78,15 @@ begin
   bRep.Visible:= rep;
   bRepAll.Visible:= rep;
 
-  if rep then Caption:= 'Replace' else Caption:= 'Find';
-  if rep then bRep.Default:= true else bFind.Default:= true;
+  if rep then
+    Caption:= 'Replace'
+  else
+    Caption:= 'Find';
+
+  if rep then
+    bRep.Default:= true
+  else
+    bFind.Default:= true;
 end;
 
 end.

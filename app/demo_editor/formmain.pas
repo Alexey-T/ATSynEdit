@@ -728,6 +728,7 @@ begin
     chkRegex.Checked:= FFinder.OptRegex;
     chkFromCaret.Checked:= FFinder.OptFromCaret;
     chkConfirm.Checked:= FFinder.OptConfirmReplace;
+    chkInSel.Enabled:= ed.Carets.IsSelection;
 
     res:= ShowModal;
     if res=mrCancel then Exit;
@@ -741,6 +742,7 @@ begin
     FFinder.OptRegex:= chkRegex.Checked;
     FFinder.OptFromCaret:= chkFromCaret.Checked;
     FFinder.OptConfirmReplace:= chkConfirm.Checked;
+    FFinder.OptInSelection:= chkInSel.Checked;
 
     FFindStopped:= false;
     FFindConfirmAll:= mrNone;

@@ -17,7 +17,7 @@ object fmFind: TfmFind
     Width = 99
     Caption = 'find'
     ModalResult = 1
-    TabOrder = 9
+    TabOrder = 10
   end
   object bCancel: TButton
     Left = 376
@@ -27,7 +27,7 @@ object fmFind: TfmFind
     Cancel = True
     Caption = 'cancel'
     ModalResult = 2
-    TabOrder = 14
+    TabOrder = 15
   end
   object Label1: TLabel
     Left = 9
@@ -101,7 +101,7 @@ object fmFind: TfmFind
     Caption = 'replace'
     Default = True
     ModalResult = 6
-    TabOrder = 10
+    TabOrder = 11
   end
   object bRepAll: TButton
     Left = 376
@@ -110,7 +110,7 @@ object fmFind: TfmFind
     Width = 99
     Caption = 'replace all'
     ModalResult = 10
-    TabOrder = 11
+    TabOrder = 12
   end
   object chkFromCaret: TCheckBox
     Left = 216
@@ -127,7 +127,7 @@ object fmFind: TfmFind
     Width = 99
     Caption = 'count all'
     ModalResult = 5
-    TabOrder = 12
+    TabOrder = 13
   end
   object chkConfirm: TCheckBox
     Left = 216
@@ -144,6 +144,14 @@ object fmFind: TfmFind
     Width = 99
     Caption = 'mark all'
     ModalResult = 4
-    TabOrder = 13
+    TabOrder = 14
+  end
+  object chkInSel: TCheckBox
+    Left = 216
+    Height = 24
+    Top = 176
+    Width = 102
+    Caption = 'in selection'
+    TabOrder = 9
   end
 end
