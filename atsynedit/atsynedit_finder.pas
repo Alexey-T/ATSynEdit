@@ -514,6 +514,7 @@ begin
     for i:= 0 to FFragments.Count-1 do
     begin
       FFragmentIndex:= i;
+      StrText:= CurrentFragment.Text;
       Inc(Result, DoCountAll(AWithEvent));
     end;
     FFragmentIndex:= 0;
