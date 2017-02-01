@@ -398,10 +398,7 @@ begin
     if OptRegex then
       OptBack:= false;
     if OptInSelection then
-    begin
       OptFromCaret:= false;
-      OptWrapped:= false;
-    end;
 
     DoFragmentsClear;
     if OptInSelection then
@@ -694,7 +691,7 @@ begin
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
 
-  if not Result and OptWrapped then
+  if (not Result) and (OptWrapped and not OptInSelection) then
     if (not OptBack and (NStartPos>1)) or
        (OptBack and (NStartPos<Length(StrText))) then
     begin
