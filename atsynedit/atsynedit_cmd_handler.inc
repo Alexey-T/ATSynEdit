@@ -297,7 +297,6 @@ begin
 
     cCommand_ZoomIn:                   Res:= DoCommand_SizeChange(true);
     cCommand_ZoomOut:                  Res:= DoCommand_SizeChange(false);
-    cCommand_GotoLastEditPos:          Res:= DoCommand_GotoLastEditPos;
     cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
 

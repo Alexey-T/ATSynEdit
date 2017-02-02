@@ -163,7 +163,6 @@ begin
   M.Add(cCommand_TextTrimSpacesAll, 'trim spaces: all', [], []);
 
   M.Add(cCommand_RepeatTextCommand, 'repeat last text command', [], []);
-  M.Add(cCommand_GotoLastEditPos, 'go to last editing pos', [], []);
 
   M.Add(cCommand_FoldAll, 'folding: fold all', [], []);
   M.Add(cCommand_UnfoldAll, 'folding: unfold all', [], []);

@@ -90,13 +90,6 @@ begin
   Result:= [cResultState];
 end;
 
-function TATSynEdit.DoCommand_GotoLastEditPos: TATCommandResults;
-begin
-  Strings.DoGotoLastEditPos;
-  DoGotoCaret(cEdgeTop);
-  Result:= [cResultCaretTop];
-end;
-
 
 function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
 var
