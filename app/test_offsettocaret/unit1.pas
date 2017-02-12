@@ -15,6 +15,7 @@ type
     Memo1: TMemo;
     procedure FormCreate(Sender: TObject);
   private
+    procedure DoTest(const SText: string);
     { private declarations }
   public
     { public declarations }
@@ -29,39 +30,57 @@ implementation
 
 { TForm1 }
 
+function GetTest1: string;
+var
+  s: TStringList;
+  i: integer;
+begin
+  s:= TStringList.Create;
+  try
+    for i:= 0 to 20 do
+      s.Add(StringOfChar('t', Random(40)));
+    Result:= s.Text;
+  finally
+    s.Free;
+  end;
+end;
+
+function GetTestPy: string;
+begin
+  Result:= ReadFileToString(ExtractFileDir(Application.ExeName)+'\py_test.txt');
+end;
+
 procedure TForm1.FormCreate(Sender: TObject);
+begin
+  memo1.Lines.Add('test 1: random len lines of "t" char...');
+  DoTest(GetTest1);
+  memo1.Lines.Add('test 2: some long python output...');
+  DoTest(GetTestPy);
+end;
+
+procedure TForm1.DoTest(const SText: string);
 var
   buf: TATStringBuffer;
-  s: tstringlist;
-  list: array of integer;
   i: integer;
   pos: integer;
   pnt0, pnt: tpoint;
 begin
-  s:= tstringlist.create;
-  for i:= 0 to 20 do
-    s.add(stringofchar('t', random(40)));
-
-  setlength(list, s.count);
-  for i:= 0 to s.count-1 do
-    list[i]:= length(s[i]);
-
   buf:= TATStringBuffer.create;
-  buf.Setup(s.text, list);
+  buf.SetupSlow(SText);
 
   for i:= 0 to 1000 do
   begin
-    pnt0.y:= random(s.count);
-    pnt0.x:= random(length(s[pnt0.y]));
+    pnt0.y:= random(buf.Count);
+    pnt0.x:= random(buf.LineLength(pnt0.y));
     pos:= buf.CaretToStr(pnt0);
     pnt:= buf.StrToCaret(pos);
     if not PointsEqual(pnt, pnt0) then
     begin
-      memo1.lines.add('bad test: line:col '+inttostr(pnt0.y)+':'+inttostr(pnt0.x));
+      memo1.Lines.Add('  failed test: line:col '+inttostr(pnt0.y)+':'+inttostr(pnt0.x));
       exit;
     end;
   end;
-  memo1.lines.add('ok test');
+  memo1.lines.add('  ok test');
 end;
 
 end.

@@ -9,19 +9,12 @@ object Form1: TForm1
   OnCreate = FormCreate
   Position = poScreenCenter
   LCLVersion = '1.7'
-  Visible = False
   object Memo1: TMemo
     Left = 0
     Height = 255
     Top = 0
     Width = 508
     Align = alClient
-    Font.CharSet = RUSSIAN_CHARSET
-    Font.Height = -12
-    Font.Name = 'Courier New'
-    Font.Pitch = fpFixed
-    Font.Quality = fqDraft
-    ParentFont = False
     ScrollBars = ssBoth
     TabOrder = 0
   end
