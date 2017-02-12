@@ -15,7 +15,10 @@ type
     Memo1: TMemo;
     procedure FormCreate(Sender: TObject);
   private
+    procedure DoLog(const s: string);
     procedure DoTest(const SText: string);
+    function GetTest1: string;
+    function GetTestPy: string;
     { private declarations }
   public
     { public declarations }
@@ -30,7 +33,7 @@ implementation
 
 { TForm1 }
 
-function GetTest1: string;
+function TForm1.GetTest1: string;
 var
   s: TStringList;
   i: integer;
@@ -45,16 +48,29 @@ begin
   end;
 end;
 
-function GetTestPy: string;
+function TForm1.GetTestPy: string;
+var
+  fn: string;
 begin
-  Result:= ReadFileToString(ExtractFileDir(Application.ExeName)+'\py_test.txt');
+  Result:= '';
+  fn:= ExtractFilePath(Application.ExeName)+'py_test.txt';
+  if not FileExists(fn) then
+    DoLog('  file not found: '+fn)
+  else
+    Result:= ReadFileToString(fn);
+end;
+
+procedure TForm1.DoLog(const s: string);
+begin
+  memo1.Lines.Add(s);
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  memo1.Lines.Add('test 1: random len lines of "t" char...');
+  DoLog('test 1: random len lines of "t" char');
   DoTest(GetTest1);
-  memo1.Lines.Add('test 2: some long python output...');
+  DoLog('');
+  DoLog('test 2: some long python output');
   DoTest(GetTestPy);
 end;
 
@@ -63,24 +79,27 @@ var
   buf: TATStringBuffer;
   i: integer;
   pos: integer;
-  pnt0, pnt: tpoint;
+  pnt0, pnt1: tpoint;
 begin
+  if SText='' then exit;
   buf:= TATStringBuffer.create;
   buf.SetupSlow(SText);
+
+  DoLog('  lines: '+IntToStr(buf.Count));
 
   for i:= 0 to 1000 do
   begin
     pnt0.y:= random(buf.Count);
     pnt0.x:= random(buf.LineLength(pnt0.y));
     pos:= buf.CaretToStr(pnt0);
-    pnt:= buf.StrToCaret(pos);
-    if not PointsEqual(pnt, pnt0) then
+    pnt1:= buf.StrToCaret(pos);
+    if not PointsEqual(pnt0, pnt1) then
     begin
-      memo1.Lines.Add('  failed test: line:col '+inttostr(pnt0.y)+':'+inttostr(pnt0.x));
+      DoLog('  failed test: line:col '+IntToStr(pnt0.y)+':'+IntToStr(pnt0.x));
       exit;
     end;
   end;
-  memo1.lines.add('  ok test');
+  DoLog('  ok test');
 end;
 
 end.
