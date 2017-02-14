@@ -559,14 +559,15 @@ begin
   Result:= 0;
   if DoFindOrReplace_Inner(false, true, true, bChanged) then
   begin
-    if bChanged then
-      Inc(Result);
+    if bChanged then Inc(Result);
+    if StrText='' then exit;
 
     while DoFindOrReplace_Inner(true, true, true, bChanged) do
     begin
-      if Application.Terminated then exit;
       if bChanged then Inc(Result);
+      if Application.Terminated then exit;
       if FReplacedAtEndOfText then exit;
+      if StrText='' then exit;
       if Assigned(FOnProgress) then
       begin
         Ok:= true;
