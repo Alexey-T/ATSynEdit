@@ -33,6 +33,10 @@ const
     {$ifdef darwin} true {$endif}
     {$ifdef linux} false {$endif}
     ;
+  OptAlwaysIgnoreOffsetsInTextout =
+    false;
+    //not good result in Qt:
+    //{$ifdef LCLQT} true {$else} false {$endif};
 
 type
   TATLineStyle = (
@@ -533,6 +537,7 @@ var
   St: TFontStyles;
 begin
   if OptAlwaysUseOffsetsInTextout then exit(true);
+  if OptAlwaysIgnoreOffsetsInTextout then exit(false);
 
   //ignore fsUnderline, fsStrikeout
   St:= C.Font.Style * [fsBold, fsItalic];
