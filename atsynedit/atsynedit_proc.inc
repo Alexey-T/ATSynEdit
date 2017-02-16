@@ -61,23 +61,21 @@ end;
 
 
 procedure InitMouseActions(var M: TATMouseActions);
-var
-  Index: integer;
   //
   procedure Add(AId: TATMouseActionId; AState: TShiftState);
   begin
-    if Index>High(M) then exit;
-    M[Index].MouseActionId:= AId;
-    M[Index].MouseState:= AState;
-    Inc(Index);
+    SetLength(M, Length(M)+1);
+    M[High(M)].MouseActionId:= AId;
+    M[High(M)].MouseState:= AState;
   end;
   //
 begin
-  FillChar(M, SizeOf(M), 0);
-  Index:= Low(M);
+  SetLength(M, 0);
   Add(cMouseActionClickSimple, [ssLeft]);
-  Add(cMouseActionClickSimple, [ssLeft, ssAlt]);
-  Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
+  Add(cMouseActionClickSimple, [ssLeft, ssAlt]); //to move caret on click
+  Add(cMouseActionClickSimple, [ssLeft, ssAltGr]); //to move caret on click
+  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssCtrl]); //to move caret on click
+  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift]); //to move caret on click
   Add(cMouseActionClickRight, [ssRight]);
   Add(cMouseActionClickAndSelBlock, [ssLeft, ssShift]);
   Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);

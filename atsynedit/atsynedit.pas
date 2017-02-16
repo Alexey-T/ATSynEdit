@@ -65,7 +65,7 @@ type
     MouseActionId: TATMouseActionId;
   end;
 
-  TATMouseActions = array[0..14] of TATMouseActionRecord;
+  TATMouseActions = array of TATMouseActionRecord;
 
   TATDirection = (
     cDirNone,
