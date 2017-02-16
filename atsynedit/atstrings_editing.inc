@@ -4,7 +4,7 @@ procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwri
 var
   Str, StrLead, StrTail: atString;
   List: TATStrings;
-  bWithEol, bInsertAtEnd: boolean;
+  bInsertAtEnd, bWithEol: boolean;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -17,6 +17,8 @@ begin
 
   Str:= Lines[AY];
   bInsertAtEnd:= AX>=Length(Str);
+  bWithEol:= SEndsWithEol(AText);
+  //note: bools used for pasting block of n lines, yes/no final eol, at end of line
 
   if not bInsertAtEnd then
   begin
@@ -51,7 +53,8 @@ begin
   BeginUndoGroup;
   try
     List.LoadFromString(StrLead+AText);
-    List.ActionDeleteFakeLine;
+    if not bWithEol then
+      List.ActionDeleteFakeLine;
     if List.Count=0 then Exit;
 
     if StrTail<>'' then
@@ -60,21 +63,10 @@ begin
     if Lines[AY]<>'' then
       LineDelete(AY);
 
-    bWithEol:= SEndsWithEol(AText) or
-               bInsertAtEnd; //need for (paste N lines, no final eol, at end of line)
+    LineInsertStrings(AY, List, bInsertAtEnd);
 
-    LineInsertStrings(AY, List, bWithEol);
-
-    if bWithEol then
-    begin
-      APosAfter.X:= 0;
-      APosAfter.Y:= AY+List.Count;
-    end
-    else
-    begin
-      APosAfter.X:= List.LinesLen[List.Count-1];
-      APosAfter.Y:= AY+List.Count-1;
-    end;
+    APosAfter.X:= List.LinesLen[List.Count-1];
+    APosAfter.Y:= AY+List.Count-1;
     AShift.Y:= APosAfter.Y-AY;
 
   finally
