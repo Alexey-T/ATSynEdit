@@ -3340,7 +3340,9 @@ begin
       Exit
     end;
 
-    if Shift=[ssLeft] then
+    if (Shift=[ssLeft]) or
+       (Shift=[ssLeft, ssAlt]) or
+       (Shift=[ssLeft, ssAltGr]) then
     begin
       FSelRect:= cRectEmpty;
       Strings.SetGroupMark;
