@@ -3,7 +3,7 @@
 procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean; out AShift, APosAfter: TPoint);
 var
   Str, StrLead, StrTail: atString;
-  List: TATStrings;
+  Block: TATStrings;
   bInsertAtEnd, bWithEol: boolean;
 begin
   AShift.X:= 0;
@@ -49,13 +49,14 @@ begin
   //----------------------
   //Insert multi-line text
 
-  List:= TATStrings.Create;
-  BeginUndoGroup;
+  Block:= TATStrings.Create;
   try
-    List.LoadFromString(StrLead+AText);
+    BeginUndoGroup;
+    Block.LoadFromString(StrLead+AText);
+
     if not bWithEol then
-      List.ActionDeleteFakeLine;
-    if List.Count=0 then Exit;
+      Block.ActionDeleteFakeLine;
+    if Block.Count=0 then Exit;
 
     if StrTail<>'' then
       Lines[AY]:= StrTail
@@ -63,14 +64,14 @@ begin
     if Lines[AY]<>'' then
       LineDelete(AY);
 
-    LineInsertStrings(AY, List, bInsertAtEnd);
+    LineInsertStrings(AY, Block, bInsertAtEnd);
 
-    APosAfter.X:= List.LinesLen[List.Count-1];
-    APosAfter.Y:= AY+List.Count-1;
+    APosAfter.X:= Block.LinesLen[Block.Count-1];
+    APosAfter.Y:= AY+Block.Count-1;
     AShift.Y:= APosAfter.Y-AY;
 
   finally
-    FreeAndNil(List);
+    FreeAndNil(Block);
     EndUndoGroup;
   end;
 end;
