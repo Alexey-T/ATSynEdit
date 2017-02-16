@@ -50,6 +50,23 @@ type
     OnGapPos: TPoint;
   end;
 
+  TATMouseActionId = (
+    cMouseActionNone,
+    cMouseActionClickSimple,
+    cMouseActionClickRight,
+    cMouseActionClickAndSelBlock,
+    cMouseActionMakeCaret,
+    cMouseActionMakeCaretsColumn,
+    cMouseActionNiceScrolling
+    );
+
+  TATMouseActionRecord = record
+    MouseState: TShiftState;
+    MouseActionId: TATMouseActionId;
+  end;
+
+  TATMouseActions = array[0..14] of TATMouseActionRecord;
+
   TATDirection = (
     cDirNone,
     cDirLeft,
@@ -359,6 +376,7 @@ type
     FMouseDragDropping: boolean;
     FMouseDragMinimap: boolean;
     FMouseAutoScroll: TATDirection;
+    FMouseActions: TATMouseActions;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
     FCursorOnMinimap: boolean;
@@ -852,6 +870,7 @@ type
     property Attribs: TATMarkers read FAttribs;
     property Gaps: TATSynGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
+    property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
     //common
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
@@ -2474,6 +2493,7 @@ begin
 
   FColors:= TATSynEditColors.Create;
   InitDefaultColors(FColors);
+  InitMouseActions(FMouseActions);
 
   FCursorText:= crIBeam;
   FCursorBm:= crHandPoint;
@@ -3297,6 +3317,7 @@ var
   PCaret: TPoint;
   PosDetails: TATPosDetails;
   Index: integer;
+  ActionId: TATMouseActionId;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -3306,7 +3327,8 @@ begin
   FCaretSpecPos:= false;
   FMouseDownNumber:= -1;
   FMouseDragDropping:= false;
-  FMouseDownRight:= Shift=[ssRight];
+  ActionId:= GetMouseActionId(FMouseActions, Shift);
+  FMouseDownRight:= ActionId=cMouseActionClickRight;
 
   if MouseNiceScroll then
   begin
@@ -3318,7 +3340,7 @@ begin
   begin
     if PtInRect(GetRectMinimapSel, Point(X, Y)) then
       FMouseDragMinimap:= true;
-    if Shift=[ssLeft] then
+    if ActionId=cMouseActionClickSimple then
     begin
       DoMinimapClick(Y);
       Exit
@@ -3330,8 +3352,10 @@ begin
     FMouseDownPnt:= PCaret;
 
     if Shift=[ssMiddle] then
-    begin
       if DoHandleClickEvent(FOnClickMiddle) then Exit;
+
+    if ActionId=cMouseActionNiceScrolling then
+    begin
       if FOptMouseNiceScroll then
       begin
         FMouseNiceScrollPos:= Point(X, Y);
@@ -3340,9 +3364,7 @@ begin
       Exit
     end;
 
-    if (Shift=[ssLeft]) or
-       (Shift=[ssLeft, ssAlt]) or
-       (Shift=[ssLeft, ssAltGr]) then
+    if ActionId=cMouseActionClickSimple then
     begin
       FSelRect:= cRectEmpty;
       Strings.SetGroupMark;
@@ -3370,26 +3392,26 @@ begin
       end;
     end;
 
-    if Shift=[ssLeft, ssShift] then
+    if ActionId=cMouseActionClickAndSelBlock then
     begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
       Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if Shift=[ssLeft, ssXControl] then
+    if ActionId=cMouseActionMakeCaret then
     begin
       FSelRect:= cRectEmpty;
       DoCaretAddToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if Shift=[ssLeft, ssXControl, ssShift] then
+    if ActionId=cMouseActionMakeCaretsColumn then
     begin
       FSelRect:= cRectEmpty;
       DoCaretsColumnToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
     end;
 
-    if Shift=[ssRight] then
+    if ActionId=cMouseActionClickRight then
     begin
       if FOptMouseRightClickMovesCaret then
         if GetCaretSelectionIndex(FMouseDownPnt)<0 then
@@ -3401,13 +3423,13 @@ begin
     end;
   end;
 
-  if Shift=[ssRight] then
+  if ActionId=cMouseActionClickRight then
     if FOptMouseDownForPopup then
       DoHandleRightClick(X, Y);
 
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
   begin
-    if Shift=[ssLeft] then
+    if ActionId=cMouseActionClickSimple then
     begin
       Index:= FGutter.IndexAt(X);
       if Index=FGutterBandNum then
@@ -3431,7 +3453,7 @@ begin
   end;
 
   if FMicromapVisible and PtInRect(FRectMicromap, Point(X, Y)) then
-    if Shift=[ssLeft] then
+    if ActionId=cMouseActionClickSimple then
     begin
       DoEventClickMicromap(X-FRectMicromap.Left, Y-FRectMicromap.Top);
       Exit
@@ -5125,6 +5147,8 @@ begin
       Strings.DoSaveLastEditPos;
     end;
 end;
+
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

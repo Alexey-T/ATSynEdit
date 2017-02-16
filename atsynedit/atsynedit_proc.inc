@@ -58,3 +58,43 @@ function IsDoubleBufferedNeeded: boolean;
 begin
   Result:= WidgetSet.GetLCLCapability(lcCanDrawOutsideOnPaint) = LCL_CAPABILITY_YES;
 end;
+
+
+procedure InitMouseActions(var M: TATMouseActions);
+var
+  Index: integer;
+  //
+  procedure Add(AId: TATMouseActionId; AState: TShiftState);
+  begin
+    if Index>High(M) then exit;
+    M[Index].MouseActionId:= AId;
+    M[Index].MouseState:= AState;
+    Inc(Index);
+  end;
+  //
+begin
+  FillChar(M, SizeOf(M), 0);
+  Index:= Low(M);
+  Add(cMouseActionClickSimple, [ssLeft]);
+  Add(cMouseActionClickSimple, [ssLeft, ssAlt]);
+  Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
+  Add(cMouseActionClickRight, [ssRight]);
+  Add(cMouseActionClickAndSelBlock, [ssLeft, ssShift]);
+  Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
+  Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
+  Add(cMouseActionNiceScrolling, [ssMiddle]);
+end;
+
+
+function GetMouseActionId(const M: TATMouseActions; State: TShiftState): TATMouseActionId;
+var
+  i: integer;
+begin
+  Result:= cMouseActionNone;
+  if State=[] then exit;
+
+  for i:= Low(M) to High(M) do
+    if M[i].MouseState=State then
+      exit(M[i].MouseActionId);
+end;
+
