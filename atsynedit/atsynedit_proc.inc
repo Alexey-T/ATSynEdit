@@ -71,16 +71,19 @@ procedure InitMouseActions(var M: TATMouseActions);
   //
 begin
   SetLength(M, 0);
+
   Add(cMouseActionClickSimple, [ssLeft]);
-  Add(cMouseActionClickSimple, [ssLeft, ssAlt]); //to move caret on click
-  Add(cMouseActionClickSimple, [ssLeft, ssAltGr]); //to move caret on click
-  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssCtrl]); //to move caret on click
-  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift]); //to move caret on click
   Add(cMouseActionClickRight, [ssRight]);
   Add(cMouseActionClickAndSelBlock, [ssLeft, ssShift]);
   Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
   Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
   Add(cMouseActionNiceScrolling, [ssMiddle]);
+
+  Add(cMouseActionClickSimple, [ssLeft, ssAlt]);
+  Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
+  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssXControl]);
+  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift]);
+  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift, ssXControl]);
 end;
 
 
