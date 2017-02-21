@@ -643,7 +643,7 @@ begin
     N:= ATree.Items[0];
   repeat
     if N=nil then exit;
-    if N.Text=ANodeText then begin Result:= N; exit; end;
+    if N.Text=ANodeText then Exit(N);
     N:= N.GetNextSibling;
   until false;
 end;
@@ -758,8 +758,7 @@ begin
   begin
     R:= AnClient.Ranges[i];
     if not R.Rule.DisplayInTree then Continue;
-    if (R.StartPos<=NPos) and (R.EndIdx>=NToken) then
-      begin Result:= R; Break; end;
+    if (R.StartPos<=NPos) and (R.EndIdx>=NToken) then exit(R);
   end;
 end;
 
@@ -1084,15 +1083,13 @@ begin
 
   repeat
     dif:= AnClient.Tags[a].StartPos-APos;
-    if dif=0 then
-      begin Result:= a; Exit end;
+    if dif=0 then Exit(a);
 
     //middle, which is near b if not exact middle
     m:= (a+b+1) div 2;
 
     dif:= AnClient.Tags[m].StartPos-APos;
-    if dif=0 then
-      begin Result:= m; Exit end;
+    if dif=0 then Exit(m);
 
     if Abs(a-b)<=1 then Break;
     if dif>0 then b:= m else a:= m;
