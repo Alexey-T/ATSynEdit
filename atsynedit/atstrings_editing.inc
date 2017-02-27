@@ -196,7 +196,7 @@ function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
 var
   Str: atString;
   bDelEmpty, bNoEol: boolean;
-  i: integer;
+  Cnt, i: integer;
 begin
   Result:= false;
   AShift.X:= 0;
@@ -204,11 +204,18 @@ begin
   APosAfter.X:= AFromX;
   APosAfter.Y:= AFromY;
   if not IsIndexValid(AFromY) then Exit;
-  if not IsIndexValid(AToY) then Exit;
   if (AFromX=AToX) and (AFromY=AToY) then Exit;
   if (AFromY>AToY) then Exit;
   if (AFromX<0) or (AToX<0) then Exit;
 
+  Cnt:= Count;
+  if (AToY<0) then Exit;
+  if (AFromY<Cnt-1) and (AToY>=Cnt-1) then
+  begin
+    LinesEnds[Cnt-1]:= cEndNone;
+    ActionDeleteFakeLineAndFinalEol;
+  end
+  else
   if (AFromY=AToY) then
   begin
     //delete range in one line
