@@ -275,6 +275,10 @@ begin
     AShift.Y:= -(AToY-AFromY);
   end;
 
+  //count=0 may be after deling block, if last line has no eol
+  if Count=0 then
+    LineAddEx('', cEndNone);
+
   Result:= true;
 end;
 
