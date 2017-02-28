@@ -210,10 +210,13 @@ begin
 
   Cnt:= Count;
   if (AToY<0) then Exit;
-  if (AFromY<Cnt-1) and (AToY>=Cnt-1) then
+  if (AToY>=Cnt-1) then
   begin
-    LinesEnds[Cnt-1]:= cEndNone;
-    ActionDeleteFakeLineAndFinalEol;
+    if (AFromY<Cnt-1) then
+    begin
+      LinesEnds[Cnt-1]:= cEndNone;
+      ActionDeleteFakeLineAndFinalEol;
+    end;
   end
   else
   if (AFromY=AToY) then
