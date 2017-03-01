@@ -26,11 +26,11 @@ type
     FStaple: boolean;
     FHint: string;
   public
-    property X: integer read FX;
-    property Y: integer read FY;
-    property Y2: integer read FY2;
+    property X: integer read FX write FX;
+    property Y: integer read FY write FY;
+    property Y2: integer read FY2 write FY2;
     property Folded: boolean read FFolded write FFolded;
-    property Staple: boolean read FStaple;
+    property Staple: boolean read FStaple write FStaple;
     property Hint: string read FHint write FHint;
     constructor Create(AX, AY, AY2: integer; AStaple: boolean; const AHint: string); virtual;
     function IsSimple: boolean;
