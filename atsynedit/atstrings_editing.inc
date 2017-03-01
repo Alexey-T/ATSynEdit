@@ -4,7 +4,7 @@ procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwri
 var
   Str, StrLead, StrTail: atString;
   Block: TATStrings;
-  bInsertAtEnd, bWithEol: boolean;
+  bInsertAtEnd, bWithEol, bAtEmptyLine: boolean;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -18,6 +18,7 @@ begin
   Str:= Lines[AY];
   bInsertAtEnd:= AX>=Length(Str);
   bWithEol:= SEndsWithEol(AText);
+  bAtEmptyLine:= Str='';
   //note: bools used for pasting block of n lines, yes/no final eol, at end of line
 
   if not bInsertAtEnd then
@@ -54,7 +55,7 @@ begin
     BeginUndoGroup;
     Block.LoadFromString(StrLead+AText);
 
-    if not bWithEol then
+    if not bWithEol or bAtEmptyLine then
       Block.ActionDeleteFakeLine;
     if Block.Count=0 then Exit;
 
