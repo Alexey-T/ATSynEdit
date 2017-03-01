@@ -76,8 +76,21 @@ begin
   end;
 end;
 
-procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift,
-  APosAfter: TPoint);
+procedure TATStrings.TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
+var
+  NX, NY: integer;
+begin
+  if Count=0 then
+    TextInsert(0, 0, AText, false, AShift, APosAfter)
+  else
+  begin
+    NY:= Count-1;
+    NX:= LinesLen[NY];
+    TextInsert(NX, NY, AText, false, AShift, APosAfter);
+  end;
+end;
+
+procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
 var
   Str, StrPrev: atString;
 begin

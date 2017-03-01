@@ -232,6 +232,7 @@ type
     property TextString: atString read GetTextString;
     procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
+    procedure TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
     procedure TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings;
       AOverwrite: boolean);
     procedure TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
