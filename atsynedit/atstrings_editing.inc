@@ -217,8 +217,14 @@ begin
   AShift.Y:= 0;
   APosAfter.X:= AFromX;
   APosAfter.Y:= AFromY;
+
+  if Count=0 then Exit;
   if not IsIndexValid(AFromY) then Exit;
-  if not IsIndexValid(AToY) then Exit;
+
+  if AToY<0 then Exit;
+  if AToY>=Count then
+    begin AToY:= Count-1; AToX:= LinesLen[AToY]; end;
+
   if (AFromX=AToX) and (AFromY=AToY) then Exit;
   if (AFromY>AToY) then Exit;
   if (AFromX<0) or (AToX<0) then Exit;
