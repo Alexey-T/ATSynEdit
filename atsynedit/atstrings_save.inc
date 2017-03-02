@@ -68,7 +68,7 @@ begin
     ((FEncoding in [cEncUTF8]) and FSaveSignUtf8) or
     ((FEncoding in [cEncWideLE, cEncWideBE]) and FSaveSignWide);
 
-  fs:= TFileStreamUtf8.Create(AFilename, fmCreate or fmOpenWrite);
+  fs:= TFileStreamUtf8.Create(AFilename, fmCreate or fmOpenWrite or fmShareDenyWrite);
   try
     SaveToStream(fs, FEncoding, WithSign);
   finally
