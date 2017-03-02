@@ -354,7 +354,7 @@ begin
       Caret:= FCarets[i];
       Caret.GetSelLines(YFrom, YTo, true);
 
-      Caret.PosX:= 0;
+      //Caret.PosX:= 0;
       Caret.PosY:= YFrom;
       Caret.EndX:= -1;
       Caret.EndY:= -1;
