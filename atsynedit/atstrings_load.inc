@@ -338,7 +338,7 @@ procedure TATStrings.LoadFromFile(const Filename: string);
 var
   fs: TFileStreamUtf8;
 begin
-  fs:= TFileStreamUtf8.Create(Filename, fmOpenRead);
+  fs:= TFileStreamUtf8.Create(Filename, fmOpenRead or fmShareDenyNone);
   try
     LoadFromStream(fs);
   finally

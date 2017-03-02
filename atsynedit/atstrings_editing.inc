@@ -209,7 +209,7 @@ function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
   out AShift, APosAfter: TPoint): boolean;
 var
   Str: atString;
-  bDelEmpty, bNoEol, bDeleteLastEol: boolean;
+  bDelEmpty, bDeleteEol, bDeleteEol_Alt: boolean;
   i: integer;
 begin
   Result:= false;
@@ -229,7 +229,8 @@ begin
   if (AFromY>AToY) then Exit;
   if (AFromX<0) or (AToX<0) then Exit;
 
-  bDeleteLastEol:= (AToY>=Count-1) and (AFromY<Count-1);
+  bDeleteEol:= (AFromY=0) and (AToY>=Count-1);
+  bDeleteEol_Alt:= false;
 
   if (AFromY=AToY) then
   begin
@@ -262,8 +263,8 @@ begin
     if AFromX=0 then
       bDelEmpty:= true;
 
-    //remember no final Eol
-    bNoEol:= (AToY=Count-1) and (LinesEnds[AToY]=cEndNone);
+    //remember no final eol
+    bDeleteEol_Alt:= (AFromY=0) and (AToY=Count-1) and (LinesEnds[AToY]=cEndNone);
 
     //concat remaining parts of 1st+last lines
     Str:= '';
@@ -280,14 +281,14 @@ begin
       if Str='' then
         LineDelete(AFromY);
 
-    if bDeleteLastEol then
+    if bDeleteEol then
     begin
       if Count>0 then
         LinesEnds[Count-1]:= cEndNone;
       ActionDeleteFakeLineAndFinalEol;
     end
     else
-    if bNoEol then
+    if bDeleteEol_Alt then
     begin
       ActionDeleteFakeLineAndFinalEol;
     end;
