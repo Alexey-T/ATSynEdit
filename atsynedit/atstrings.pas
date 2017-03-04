@@ -145,8 +145,8 @@ type
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
-    procedure LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
-    procedure LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
+    procedure LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
+    procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
     procedure SetCaretsArray(const L: TATPointArray);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(Index: integer; const AValue: atString);
@@ -184,9 +184,9 @@ type
     procedure LineAddRaw_UTF8_NoUndo(const AString: UTF8String; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
-    procedure LineInsert(N: integer; const AString: atString);
-    procedure LineInsertStrings(N: integer; ABlock: TATStrings; AWithFinalEol: boolean);
-    procedure LineDelete(N: integer; AForceLast: boolean = true);
+    procedure LineInsert(ALineIndex: integer; const AString: atString);
+    procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
+    procedure LineDelete(ALineIndex: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesLen[Index: integer]: integer read GetLineLen;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
@@ -719,40 +719,40 @@ begin
   end;
 end;
 
-procedure TATStrings.LineInsertRaw(N: integer; const AString: atString; AEnd: TATLineEnds);
+procedure TATStrings.LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
 var
   Item: TATStringItem;
 begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
-  DoAddUndo(cEditActionInsert, N, '', cEndNone);
-  DoEventLog(N, Length(AString));
-  DoEventChange(N, cLineChangeAdded);
+  DoAddUndo(cEditActionInsert, ALineIndex, '', cEndNone);
+  DoEventLog(ALineIndex, Length(AString));
+  DoEventChange(ALineIndex, cLineChangeAdded);
 
   Item:= CreateItem_Uni(AString, AEnd);
-  FList.Insert(N, Item);
+  FList.Insert(ALineIndex, Item);
 end;
 
-procedure TATStrings.LineInsertEx(N: integer; const AString: atString; AEnd: TATLineEnds);
+procedure TATStrings.LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
 begin
   if FReadOnly then Exit;
 
-  if IsIndexValid(N) then
-    LineInsertRaw(N, AString, AEnd)
+  if IsIndexValid(ALineIndex) then
+    LineInsertRaw(ALineIndex, AString, AEnd)
   else
-  if N=Count then
+  if ALineIndex=Count then
     LineAddEx(AString, AEnd)
   else
-    raise Exception.Create('Incorrect Insert index: '+IntToStr(N));
+    raise Exception.Create('Incorrect Insert index: '+IntToStr(ALineIndex));
 end;
 
-procedure TATStrings.LineInsert(N: integer; const AString: atString);
+procedure TATStrings.LineInsert(ALineIndex: integer; const AString: atString);
 begin
-  LineInsertEx(N, AString, FEndings);
+  LineInsertEx(ALineIndex, AString, FEndings);
 end;
 
-procedure TATStrings.LineInsertStrings(N: integer; ABlock: TATStrings; AWithFinalEol: boolean);
+procedure TATStrings.LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
 var
   Cnt, CntMove: integer;
   Str: atString;
@@ -765,20 +765,20 @@ begin
 
   if Cnt>0 then
   begin
-    CntMove:= FList.Count-N;
+    CntMove:= FList.Count-ALineIndex;
 
     //fast! insert many
     FList.Count:= FList.Count+Cnt;
-    System.Move(FList.List^[N], FList.List^[N+Cnt], CntMove*SizeOf(Pointer));
-    FillChar(FList.List^[N], Cnt*SizeOf(Pointer), 0);
+    System.Move(FList.List^[ALineIndex], FList.List^[ALineIndex+Cnt], CntMove*SizeOf(Pointer));
+    FillChar(FList.List^[ALineIndex], Cnt*SizeOf(Pointer), 0);
 
     for i:= 0 to Cnt-1 do
     begin
-      DoAddUndo(cEditActionInsert, N+i, '', cEndNone);
-      DoEventLog(N+i, ABlock.LinesLen[i]);
-      DoEventChange(N+i, cLineChangeAdded);
+      DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone);
+      DoEventLog(ALineIndex+i, ABlock.LinesLen[i]);
+      DoEventChange(ALineIndex+i, cLineChangeAdded);
 
-      FList[N+i]:= CreateItem_UTF8(
+      FList[ALineIndex+i]:= CreateItem_UTF8(
         TATStringItem(ABlock.FList[i]).ItemString,
         Endings);
     end;
@@ -787,7 +787,7 @@ begin
   //insert last item specially, if no eol
   if not AWithFinalEol then
   begin
-    i:= N+ABlock.Count-1;
+    i:= ALineIndex+ABlock.Count-1;
     Str:= ABlock.Lines[ABlock.Count-1];
     if IsIndexValid(i) then
       Lines[i]:= Str+Lines[i]
@@ -807,27 +807,27 @@ begin
   Result:= FList.Count;
 end;
 
-procedure TATStrings.LineDelete(N: integer; AForceLast: boolean = true);
+procedure TATStrings.LineDelete(ALineIndex: integer; AForceLast: boolean = true);
 var
   Item: TATStringItem;
   Str: atString;
 begin
   if FReadOnly then Exit;
 
-  if IsIndexValid(N) then
+  if IsIndexValid(ALineIndex) then
   begin
-    Item:= TATStringItem(FList[N]);
+    Item:= TATStringItem(FList[ALineIndex]);
     Str:= UTF8Decode(Item.ItemString);
 
-    DoAddUndo(cEditActionDelete, N, Str, Item.ItemEnd);
-    DoEventLog(N, -Length(Str));
-    DoEventChange(N, cLineChangeDeleted);
+    DoAddUndo(cEditActionDelete, ALineIndex, Str, Item.ItemEnd);
+    DoEventLog(ALineIndex, -Length(Str));
+    DoEventChange(ALineIndex, cLineChangeDeleted);
 
     Item.Free;
-    FList.Delete(N);
+    FList.Delete(ALineIndex);
   end;
   //else
-  //  raise Exception.Create('Invalid Delete index: '+IntToStr(N));
+  //  raise Exception.Create('Invalid Delete index: '+IntToStr(ALineIndex));
 
   if AForceLast then
     ActionAddFakeLineIfNeeded;
