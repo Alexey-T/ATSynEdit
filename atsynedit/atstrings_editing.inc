@@ -4,7 +4,8 @@ procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwri
 var
   Str, StrLead, StrTail: atString;
   Block: TATStrings;
-  bInsertAtEnd, bWithEol, bAtEmptyLine: boolean;
+  bAtLineEnd, bAtFileEnd, bAtEmptyLine,
+  bBlockWithEol, bUseBlockFinalEol: boolean;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -16,12 +17,13 @@ begin
   if AText='' then Exit;
 
   Str:= Lines[AY];
-  bInsertAtEnd:= AX>=Length(Str);
-  bWithEol:= SEndsWithEol(AText);
+  bBlockWithEol:= SEndsWithEol(AText);
+  bAtLineEnd:= AX>=Length(Str);
+  bAtFileEnd:= bAtLineEnd and (AY>=Count-1);
   bAtEmptyLine:= Str='';
   //note: bools used for pasting block of n lines, yes/no final eol, at end of line
 
-  if not bInsertAtEnd then
+  if not bAtLineEnd then
   begin
     StrLead:= Copy(Str, 1, AX);
     StrTail:= Copy(Str, AX+1, MaxInt);
@@ -55,9 +57,10 @@ begin
     BeginUndoGroup;
     Block.LoadFromString(StrLead+AText);
 
-    if not bWithEol or bAtEmptyLine then
+    if not bBlockWithEol or bAtEmptyLine then
       Block.ActionDeleteFakeLine;
     if Block.Count=0 then Exit;
+    //ShowMessage('block lines '+IntToStr(Block.Count));
 
     if StrTail<>'' then
       Lines[AY]:= StrTail
@@ -65,7 +68,11 @@ begin
     if Lines[AY]<>'' then
       LineDelete(AY);
 
-    LineInsertStrings(AY, Block, bInsertAtEnd);
+    if not bAtFileEnd then
+      bUseBlockFinalEol:= bAtLineEnd
+    else
+      bUseBlockFinalEol:= bBlockWithEol;
+    LineInsertStrings(AY, Block, bUseBlockFinalEol);
 
     APosAfter.X:= Block.LinesLen[Block.Count-1];
     APosAfter.Y:= AY+Block.Count-1;
