@@ -200,36 +200,29 @@ end;
 
 procedure TATSynEdit.UpdateFoldedFromLinesHidden;
 var
-  nLine, nRange: integer;
-  bOk: boolean;
   NFoldFrom, NPosAfterEnd: integer;
+  NMaxLine, iRange: integer;
   R: TATSynRange;
+  bOk: boolean;
 begin
-  for nLine:= 0 to Strings.Count-1 do
+  NMaxLine:= Strings.Count-1;
+  for iRange:= 0 to Fold.Count-1 do
   begin
-    if Strings.LinesHidden[nLine, FEditorIndex] then Continue;
-    NFoldFrom:= Strings.LinesFoldFrom[nLine, FEditorIndex];
+    R:= Fold[iRange];
+    if R.IsSimple then Continue;
+    if R.Y>NMaxLine then Continue; //same as "if not Strings.IsIndexValid"
+    if Strings.LinesHidden[R.Y, FEditorIndex] then Continue;
+    NFoldFrom:= Strings.LinesFoldFrom[R.Y, FEditorIndex];
 
-    for nRange:= 0 to Fold.Count-1 do
-    begin
-      R:= Fold[nRange];
-      if R.IsSimple then Continue;
-      if (R.Y>nLine) then Break;
-      if (R.Y<>nLine) then Continue;
+    NPosAfterEnd:= Strings.LinesLen[R.Y]+1;
+    if (OptFoldStyle in [cFoldFromEndOfLine, cFoldFromEndOfLineAlways]) and
+      (NFoldFrom=NPosAfterEnd) then
+      bOk:= true
+    else
+      bOk:= R.X=NFoldFrom;
 
-      NPosAfterEnd:= Strings.LinesLen[R.Y]+1;
-      if (OptFoldStyle in [cFoldFromEndOfLine, cFoldFromEndOfLineAlways]) and
-        (NFoldFrom=NPosAfterEnd) then
-        bOk:= true
-      else
-        bOk:= R.X=NFoldFrom;
-
-      if bOk then
-      begin
-        DoRangeFold(R); //do not just R.Folded:= true;
-        Break
-      end;
-    end;
+    if bOk then
+      DoRangeFold(R); //do not just R.Folded:= true;
   end;
 end;
 

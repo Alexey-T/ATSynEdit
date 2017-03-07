@@ -33,8 +33,8 @@ type
     property Staple: boolean read FStaple write FStaple;
     property Hint: string read FHint write FHint;
     constructor Create(AX, AY, AY2: integer; AStaple: boolean; const AHint: string); virtual;
-    function IsSimple: boolean;
-    function IsLineInside(ALine: integer): boolean;
+    function IsSimple: boolean; inline;
+    function IsLineInside(ALine: integer): boolean; inline;
     function MessageText: string;
   end;
 
