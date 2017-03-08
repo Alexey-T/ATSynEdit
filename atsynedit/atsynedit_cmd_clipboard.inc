@@ -118,8 +118,10 @@ begin
       AClipboardObject.AsText:= GetTextForClipboard;
   end;
 
-  //for gtk2
+  {$ifndef windows}
+  //for Linux gtk2, not sure about Mac
   PrimarySelection.AsText:= AClipboardObject.AsText;
+  {$endif}
 
   Result:= [];
 end;
