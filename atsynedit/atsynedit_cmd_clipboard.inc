@@ -1,6 +1,7 @@
 {$ifdef nn}begin end;{$endif}
 
-function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
+  AClipboardObject: TClipboard): TATCommandResults;
 var
   Str: atString;
   bNeedFixLastEol: boolean;
@@ -9,15 +10,15 @@ begin
   if ModeReadOnly then Exit;
 
   //column block
-  if Clipboard.HasFormat(cATClipboardFormatId) then
+  if AClipboardObject.HasFormat(cATClipboardFormatId) then
   begin
     if ModeOneLine then Exit;
-    Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret);
+    Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret, AClipboardObject);
     Exit
   end;
 
   //usual text
-  Str:= UTF8Decode(Clipboard.AsText);
+  Str:= UTF8Decode(AClipboardObject.AsText);
   if ModeOneLine then
     Str:= SRemoveNewlineChars(Str);
 
@@ -63,54 +64,62 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean;
+  AClipboardObject: TClipboard): TATCommandResults;
 var
   Str: atString;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  Str:= UTF8Decode(Clipboard.AsText);
+  Str:= UTF8Decode(AClipboardObject.AsText);
   Strings.BeginUndoGroup;
   Result:= DoCommand_TextInsertColumnBlockOnce(Str, AKeepCaret);
   Strings.EndUndoGroup;
 end;
 
 
-function TATSynEdit.DoCommand_ClipboardCut: TATCommandResults;
+function TATSynEdit.DoCommand_ClipboardCut(AClipboardObject: TClipboard): TATCommandResults;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
   if Carets.IsSelection then
   begin
-    DoCommand_ClipboardCopy;
+    DoCommand_ClipboardCopy(false, AClipboardObject);
     Result:= DoCommand_TextDeleteSelection;
   end
   else
   begin
     if FOptCutLinesIfNoSel then
     begin
-      DoCommand_ClipboardCopy;
+      DoCommand_ClipboardCopy(false, AClipboardObject);
       Result:= DoCommand_TextDeleteLines;
     end;
   end;
 end;
 
-function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean;
+  AClipboardObject: TClipboard): TATCommandResults;
 begin
   if not IsSelRectEmpty then
   begin
-    Clipboard.AsText:= GetTextForClipboard;
-    Clipboard.AddFormat(cATClipboardFormatId, cATClipboardSignatureColBlock, SizeOf(cATClipboardSignatureColBlock));
+    AClipboardObject.AsText:= GetTextForClipboard;
+    AClipboardObject.AddFormat(
+      cATClipboardFormatId,
+      cATClipboardSignatureColBlock,
+      SizeOf(cATClipboardSignatureColBlock));
   end
   else
   begin
     if Append then
-      Clipboard.AsText:= Clipboard.AsText+GetTextForClipboard
+      AClipboardObject.AsText:= AClipboardObject.AsText+GetTextForClipboard
     else
-      Clipboard.AsText:= GetTextForClipboard;
+      AClipboardObject.AsText:= GetTextForClipboard;
   end;
+
+  //for gtk2
+  PrimarySelection.AsText:= AClipboardObject.AsText;
 
   Result:= [];
 end;

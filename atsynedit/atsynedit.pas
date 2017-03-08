@@ -25,7 +25,7 @@ uses
   {$endif}
   InterfaceBase,
   Classes, SysUtils, Graphics,
-  Controls, ExtCtrls, Menus, Forms,
+  Controls, ExtCtrls, Menus, Forms, Clipbrd,
   LMessages, LCLType,
   ATStringProc,
   ATStrings,
@@ -819,10 +819,14 @@ type
     function DoCommand_TextDeleteToFileEnd: TATCommandResults;
     function DoCommand_GotoTextBegin: TATCommandResults;
     function DoCommand_GotoTextEnd: TATCommandResults;
-    function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean): TATCommandResults;
-    function DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean): TATCommandResults;
-    function DoCommand_ClipboardCopy(Append: boolean = false): TATCommandResults;
-    function DoCommand_ClipboardCut: TATCommandResults;
+    function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
+      AClipboardObject: TClipboard): TATCommandResults;
+    function DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean;
+      AClipboardObject: TClipboard): TATCommandResults;
+    function DoCommand_ClipboardCopy(Append: boolean;
+      AClipboardObject: TClipboard): TATCommandResults;
+    function DoCommand_ClipboardCut(
+      AClipboardObject: TClipboard): TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
     function DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
@@ -1196,7 +1200,6 @@ uses
   Dialogs,
   Types,
   Math,
-  Clipbrd,
   ATSynEdit_Commands,
   ATSynEdit_Keymap_Init,
   ATStringProc_WordJump;
