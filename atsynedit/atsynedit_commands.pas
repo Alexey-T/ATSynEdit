@@ -129,12 +129,14 @@ const
   cCommand_ClipboardCopyAdd = 1007;
   cCommand_ClipboardCut = 1008;
 
-  //same as above, but use PrimarySelection (has meaning on gtk2)
+  //use PrimarySelection (has meaning on gtk2)
   cCommand_ClipboardAltPaste = 1010;
   cCommand_ClipboardAltPaste_Select = 1011;
   cCommand_ClipboardAltPaste_KeepCaret = 1012;
   cCommand_ClipboardAltPaste_Column = 1013 or cCmdSelReset;
   cCommand_ClipboardAltPaste_ColumnKeepCaret = 1014 or cCmdSelReset;
+  //use SecondarySelection (has meaning on gtk2)
+  cCommand_ClipboardAltAltPaste = 1015;
 
   cCommand_TextCaseLower = 1020;
   cCommand_TextCaseUpper = 1021;
