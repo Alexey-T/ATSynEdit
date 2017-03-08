@@ -183,7 +183,10 @@ Note: for forward sel, pair (PosY, PosX) is after pair (EndY, EndX); for backwar
 
 type TATKeymap in unit atsynedit_keymap. 
 
-Holds list of keyboard actions of type TATKeymapItem. It's inited at start. And you can add more keymap items or change hotkeys for any keymap item. Each keymap item has 2 (yet) hotkeys, second is needed for Copy-to-clip (Ctrl-C and Ctrl-Ins), Paste-from-clip (Ctrl-V and Shift-Ins) etc.
+Holds list of keyboard actions of type TATKeymapItem. It's inited at start. And to init items at start, two "filling" procedures exist in code: one for TATSynEdit, and simpler one for TATEdit (single line version, less commands). 
+And you can add more keymap items or change hotkeys for any keymap item. 
+
+Each keymap item has 2 (yet) hotkeys, second is needed for e.g.: Copy-to-clipboard (Ctrl+C and Ctrl+Ins), Paste-from-clipbd (Ctrl+V and Shift+Ins) etc.
 
 When adding keymap item, you can set simple hotkeys (e.g. "Alt+Shift+F") or key combos (several simple hotkeys which must be pressed in order). Example adds commands with simple hotkey and combo:
 
@@ -191,12 +194,14 @@ When adding keymap item, you can set simple hotkeys (e.g. "Alt+Shift+F") or key 
   var 
     M: TATKeymap;
   const 
-    cmd_My1=3000; 
-    cmd_My2=3001;
-  ...
-  M.Add(cmd_My1, 'cmd with simple hotkey', ['Ctrl+Shift+F'], []);
-  M.Add(cmd_My2, 'cmd with 3 keys combo', ['Ctrl+B', 'Ctrl+B', 'Ctrl+M'], []);
+    cmd_My1 = 3000; 
+    cmd_My2 = 3001;
+  begin
+    M.Add(cmd_My1, 'cmd with simple hotkey', ['Ctrl+Shift+F'], []);
+    M.Add(cmd_My2, 'cmd with 3 keys combo', ['Ctrl+B', 'Ctrl+B', 'Ctrl+M'], []);
 </syntaxhighlight>
+
+After you added new keymap items, add reaction for them: use OnCommand event as usual.
 
 === WrapInfo object ===
 
@@ -247,15 +252,15 @@ Example adds few ranges to text:
 
 <syntaxhighlight>
   Edit1.Fold.Clear;
-  //nice to sort by 2nd param
   Edit1.Fold.Add(1, 4, 15, false, ''); //line 4 to 15, range1
   Edit1.Fold.Add(1, 5, 9, false, ''); //line 5 to 9, nested into range1
   Edit1.Fold.Add(1, 7, 8, false, ''); //line 7 to 8, nested into range2
 </syntaxhighlight>
 
-To fold/unfold a range, don't change Folded field, use methods of ATSynEdit: DoRangeFold, DoRangeUnfold.
-
-To fold/unfold all, use commands via DoCommand method: cCommand_FoldAll, cCommand_UnfoldAll.
+* To fold/unfold a range, don't change Folded field, use methods of ATSynEdit: DoRangeFold, DoRangeUnfold.
+* To fold/unfold all, use commands via DoCommand method: cCommand_FoldAll, cCommand_UnfoldAll.
+* In Fold object, items are not sorted, but usually syntax-adapters add these ranges as sorted (by Y).
+* Fold object has methods, which find ranges, e.g. all ranges which contain any line from N1 to N2, etc.
 
 === Markers object ===
 
@@ -308,19 +313,31 @@ Contains color properties of type TColor. For ex, Colors.TextFont is text font c
 
 === Gaps object ===
 
-List of gap items. Gap items have properties: line index, size (maybe more later).
-Gap item paints as rectangle (it is owner-drawn), just between lines N and N+1, not overlapping text. Example usages:
+List of gap items. Gap items have properties: 
+
+* LineIndex
+* Size: height in pixels
+* Tag: int value, to difference gaps from several plugins
+* Bitmap: TBitmap which is painted on gap, when it's visible
+
+Gap item paints as rectangle (it is owner-drawn), just between lines N and N+1, not overlapping text. 
+When user adds/deletes lines, gaps auto-shift with their lines; gap is deleted if its line is deleted.
+
+Example usages:
 
 * App wants to show picture preview, when picture is linked in HTML. It creates small preview picture e.g. 100x50, and adds gap: gap size=52, picture height and 2 pixels of border.
 * App runs linter on JS code, for JS errors it places bookmarks, and adds gaps with size=15 for error lines: in gaps it writes errors, maybe icons.
 
 To add/remove gaps:
 
-  ed.Gaps.Add(LineNum, Size);
+<syntaxhighlight>
+  //to add
+  ed.Gaps.Add(NLine, NGapHeight, FSomeBitmap, NGapTag);
   ed.Update;
   //to delete this gap
-  ed.Gaps.DeleteForLineRange(LineNum, LineNum);
+  ed.Gaps.DeleteForLineRange(NLine, NLine);
   ed.Update;
+</syntaxhighlight>
 
 Event OnDrawGap is used to paint gaps, it gets canvas, and rectangle on canvas.
 Note: if you add gap to the last line, you must turn on option OptLastLineOnTop, better don't turn it off later (to not scroll, when gap added/removed).
@@ -778,6 +795,69 @@ Hint. CudaText also adds 3 commands to help with macros:
 * "goto pos" (command recorded by GoTo dialog)
 * "finder action" (command recorded when doing find/replace actions)
 
+==How to configure modifier-keys with click?==
+
+You can configure some of mouse clicks with modifier keys: simple click, 
+Ctrl+click, Shift+click, Ctrl+Shift+click, middle click, etc. Property MouseMap configures it,
+it's array, type TATMouseActions. Default code configures it in InitMouseActions like this:
+
+<syntaxhighlight>
+procedure InitMouseActions(var M: TATMouseActions);
+//...
+begin
+  SetLength(M, 0);
+  Add(cMouseActionClickSimple, [ssLeft]);
+  Add(cMouseActionClickRight, [ssRight]);
+  Add(cMouseActionClickAndSelBlock, [ssLeft, ssShift]);
+  Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
+  Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
+  Add(cMouseActionNiceScrolling, [ssMiddle]);
+  //...
+</syntaxhighlight>
+
+==Does it use PrimarySelection on gtk?==
+
+It can use it, all methods which work with clipboard, get AClipboardObject:TClipboard, here you can pass Clipboard, PrimarySelection, SecondarySelection.
+
+Command codes for Paste: exist for Clipboard, and for PrimarySelection. This is part which reacts to command codes:
+
+<syntaxhighlight>
+    cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy(false, Clipboard);
+    cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true, Clipboard);
+    cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut(Clipboard);
+
+    //use Clipboard:TClipboard
+    cCommand_ClipboardPaste:                 Res:= DoCommand_ClipboardPaste(false, false, Clipboard);
+    cCommand_ClipboardPaste_Select:          Res:= DoCommand_ClipboardPaste(false, true, Clipboard);
+    cCommand_ClipboardPaste_KeepCaret:       Res:= DoCommand_ClipboardPaste(true, false, Clipboard);
+    cCommand_ClipboardPaste_Column:          Res:= DoCommand_ClipboardPasteColumnBlock(false, Clipboard);
+    cCommand_ClipboardPaste_ColumnKeepCaret: Res:= DoCommand_ClipboardPasteColumnBlock(true, Clipboard);
+
+    //same, but use PrimarySelection:TClipboard
+    cCommand_ClipboardAltPaste:                 Res:= DoCommand_ClipboardPaste(false, false, PrimarySelection);
+    cCommand_ClipboardAltPaste_Select:          Res:= DoCommand_ClipboardPaste(false, true, PrimarySelection);
+    cCommand_ClipboardAltPaste_KeepCaret:       Res:= DoCommand_ClipboardPaste(true, false, PrimarySelection);
+    cCommand_ClipboardAltPaste_Column:          Res:= DoCommand_ClipboardPasteColumnBlock(false, PrimarySelection);
+    cCommand_ClipboardAltPaste_ColumnKeepCaret: Res:= DoCommand_ClipboardPasteColumnBlock(true, PrimarySelection);
+</syntaxhighlight>
+
+Default code uses PrimarySelection in one place: on copy, it copies to Clipboard, then (under Linux/Mac) copies the same to PrimarySelection. 
+
+To make middle-button-click paste from PrimarySelection, you need to handle OnClickMiddle, here's example from CudaText:
+<syntaxhighlight>
+procedure TEditorFrame.EditorOnClickMiddle(Sender: TObject; var AHandled: boolean);
+begin
+  AHandled:= false;
+  if EditorOps.OpMouseMiddleClickPaste then
+  begin
+    AHandled:= true;
+    (Sender as TATSynEdit).DoCommand(cmd_MouseClickAtCursor);
+    (Sender as TATSynEdit).DoCommand(cCommand_ClipboardAltPaste); //uses PrimarySelection:TClipboard
+    exit;
+  end;
+end;
+</syntaxhighlight>
+
 ==more==
 
 = Auto-completion lists =
@@ -881,6 +961,8 @@ Finder has events:
 * OnBadRegex: called if incorrect regex passed
 * OnFound: called when result found
 * OnConfirmReplace: called before replacing text (to show confirmation) if OptConfirmReplace set
+
+Finder can handle multi-selections, by option OptInSelection. Selections are handled by CountAll, ReplaceAll. For other actions, selections don't make sense, because find-next makes new smaller selection (for found fragment) so prev big selection is lost. Tech note for replace-all: selections are looked from top to bottom, if they don't have common lines, and looked from bottom to top, if they have. This is done to not break lines, which are touched by 2+ selections. Count-all handles selections from top to bottom.
 
 = Adapter for EControl lexers=
 See [[ATSynEdit EControl adapter]]
