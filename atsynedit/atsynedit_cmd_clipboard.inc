@@ -101,10 +101,14 @@ end;
 
 function TATSynEdit.DoCommand_ClipboardCopy(Append: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
+var
+  SNewText: string;
 begin
+  SNewText:= GetTextForClipboard;
   if not IsSelRectEmpty then
   begin
-    AClipboardObject.AsText:= GetTextForClipboard;
+    //copy vertical block
+    AClipboardObject.AsText:= SNewText;
     AClipboardObject.AddFormat(
       cATClipboardFormatId,
       cATClipboardSignatureColBlock,
@@ -112,15 +116,17 @@ begin
   end
   else
   begin
+    //copy usual block
     if Append then
-      AClipboardObject.AsText:= AClipboardObject.AsText+GetTextForClipboard
+      AClipboardObject.AsText:= AClipboardObject.AsText+SNewText
     else
-      AClipboardObject.AsText:= GetTextForClipboard;
+      AClipboardObject.AsText:= SNewText;
   end;
 
   {$ifndef windows}
   //for Linux gtk2, not sure about Mac
-  PrimarySelection.AsText:= AClipboardObject.AsText;
+  if AClipboardObject=Clipboard then
+    PrimarySelection.AsText:= AClipboardObject.AsText;
   {$endif}
 
   Result:= [];
