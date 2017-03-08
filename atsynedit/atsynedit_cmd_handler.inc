@@ -261,11 +261,20 @@ begin
     cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy(false, Clipboard);
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true, Clipboard);
     cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut(Clipboard);
-    cCommand_ClipboardPaste:           Res:= DoCommand_ClipboardPaste(false, false, Clipboard);
-    cCommand_ClipboardPaste_Select:    Res:= DoCommand_ClipboardPaste(false, true, Clipboard);
-    cCommand_ClipboardPaste_KeepCaret: Res:= DoCommand_ClipboardPaste(true, false, Clipboard);
+
+    //use Clipboard:TClipboard
+    cCommand_ClipboardPaste:                 Res:= DoCommand_ClipboardPaste(false, false, Clipboard);
+    cCommand_ClipboardPaste_Select:          Res:= DoCommand_ClipboardPaste(false, true, Clipboard);
+    cCommand_ClipboardPaste_KeepCaret:       Res:= DoCommand_ClipboardPaste(true, false, Clipboard);
     cCommand_ClipboardPaste_Column:          Res:= DoCommand_ClipboardPasteColumnBlock(false, Clipboard);
     cCommand_ClipboardPaste_ColumnKeepCaret: Res:= DoCommand_ClipboardPasteColumnBlock(true, Clipboard);
+
+    //same, but use PrimarySelection:TClipboard
+    cCommand_ClipboardAltPaste:                 Res:= DoCommand_ClipboardPaste(false, false, PrimarySelection);
+    cCommand_ClipboardAltPaste_Select:          Res:= DoCommand_ClipboardPaste(false, true, PrimarySelection);
+    cCommand_ClipboardAltPaste_KeepCaret:       Res:= DoCommand_ClipboardPaste(true, false, PrimarySelection);
+    cCommand_ClipboardAltPaste_Column:          Res:= DoCommand_ClipboardPasteColumnBlock(false, PrimarySelection);
+    cCommand_ClipboardAltPaste_ColumnKeepCaret: Res:= DoCommand_ClipboardPasteColumnBlock(true, PrimarySelection);
 
     cCommand_MoveSelectionUp:          Res:= DoCommand_MoveSelectionUpDown(false);
     cCommand_MoveSelectiondown:        Res:= DoCommand_MoveSelectionUpDown(true);
