@@ -124,6 +124,7 @@ begin
   M.Add(cCommand_ClipboardPaste_KeepCaret, 'clipboard: paste, keep caret', [], []);
   M.Add(cCommand_ClipboardPaste_Column, 'clipboard: paste, force column block', [], []);
   M.Add(cCommand_ClipboardPaste_ColumnKeepCaret, 'clipboard: paste, force column block, keep caret', [], []);
+  M.Add(cCommand_ClipboardAltPaste, 'clipboard primary (gtk): paste', [], []);
 
   M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
