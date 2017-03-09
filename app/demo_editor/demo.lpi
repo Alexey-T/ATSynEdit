@@ -269,8 +269,6 @@
     <CodeGeneration>
       <Checks>
         <RangeChecks Value="True"/>
-        <OverflowChecks Value="True"/>
-        <StackChecks Value="True"/>
       </Checks>
     </CodeGeneration>
     <Linking>
