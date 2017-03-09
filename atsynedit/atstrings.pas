@@ -12,6 +12,7 @@ interface
 uses
   Classes, SysUtils, Graphics,
   LazUTF8,
+  FileUtil,
   ATStringProc,
   ATStringProc_Utf8Detect,
   ATStrings_Undo,
@@ -221,7 +222,7 @@ type
     function ActionEnsureFinalEol: boolean;
     //file
     procedure LoadFromStream(Stream: TStream);
-    procedure LoadFromFile(const Filename: string);
+    procedure LoadFromFile(const AFilename: string);
     procedure LoadFromString(const AText: atString);
     procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);
