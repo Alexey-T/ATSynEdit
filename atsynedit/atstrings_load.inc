@@ -337,15 +337,14 @@ end;
 procedure TATStrings.LoadFromFile(const AFilename: string);
 var
   fs: TFileStreamUtf8;
-  NSize: Int64;
+  //NSize: Int64;
 begin
-  NSize:= FileUtil.FileSize(AFilename);
-  if NSize<=0 then exit;
+  //NSize:= FileUtil.FileSize(AFilename);
 
   fs:= TFileStreamUtf8.Create(AFilename, fmOpenRead or fmShareDenyNone);
   try
-    if fs.Size<NSize then
-      raise Exception.Create('Cannot open file. Opened content size reported less than disk file size. File is write-only?');
+    //if fs.Size<NSize then
+    //  raise Exception.Create('Cannot open file. Opened content size reported less than disk file size. File is write-only?');
     LoadFromStream(fs);
   finally
     FreeAndNil(fs);
