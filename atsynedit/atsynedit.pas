@@ -4418,8 +4418,9 @@ var
   Str: atString;
   NChars, NSpaces: integer;
 begin
-  if not FOptAutoIndent then
-    begin Result:= ''; Exit end;
+  Result:= '';
+  if not Strings.IsIndexValid(APosY) then Exit;
+  if not FOptAutoIndent then Exit;
 
   Str:= Strings.Lines[APosY];
   NChars:= SGetIndentChars(Str); //count of chars in indent
