@@ -175,12 +175,15 @@ function TATKeymap.GetShortcutFromCommand(ACode: integer): TShortcut;
 var
   i: integer;
 begin
-  Result:= scNone;
+  Result:= 0; //scNone
+  if ACode<=0 then Exit;
   for i:= 0 to Count-1 do
     if Items[i].Command=ACode then
     begin
-      Result:= Items[i].Keys1[0];
-      Exit
+      //don't get result if combo is set
+      if Items[i].Keys1[1]=0 then
+        Result:= Items[i].Keys1[0];
+      Exit;
     end;
 end;
 
