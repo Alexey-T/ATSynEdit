@@ -160,8 +160,8 @@ begin
   adapter.AddEditor(ed);
 
   chkWrap.Checked:= ed.OptWrapMode=cWrapOn;
-  chkFullSel.Checked:= ed.OptShowFullSel;
-  chkFullHilite.Checked:= ed.OptShowFullHilite;
+  chkFullSel.Checked:= ed.OptShowFullWidthForSelection;
+  chkFullHilite.Checked:= ed.OptShowFullWidthForSyntaxHilite;
   chkUnpri.Checked:= ed.OptUnprintedVisible;
   chkShowCur.Checked:= ed.OptShowCurLine;
   chkDyn.Checked:= adapter.DynamicHiliteEnabled;
@@ -204,7 +204,7 @@ end;
 
 procedure TfmMain.chkFullSelChange(Sender: TObject);
 begin
-  ed.OptShowFullSel:= chkFullSel.Checked;
+  ed.OptShowFullWidthForSelection:= chkFullSel.Checked;
   ed.Update;
 end;
 
@@ -232,7 +232,7 @@ end;
 
 procedure TfmMain.chkFullHiliteChange(Sender: TObject);
 begin
-  ed.OptShowFullHilite:= chkFullHilite.Checked;
+  ed.OptShowFullWidthForSyntaxHilite:= chkFullHilite.Checked;
   ed.Update;
 end;
 

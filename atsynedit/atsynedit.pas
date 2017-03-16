@@ -1087,13 +1087,13 @@ type
     property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle default cLineStyleSolid;
     property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent default -1;
     property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent default 100;
-    property OptShowFullSel: boolean read FOptShowFullSel write FOptShowFullSel default false;
-    property OptShowFullHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
+    property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
+    property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal default true;
     property OptShowCurLineOnlyFocused: boolean read FOptShowCurLineOnlyFocused write FOptShowCurLineOnlyFocused default false;
-    property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn default false;
+    property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed default true;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual default true;
     property OptCaretShape: TATSynCaretShape read FCaretShapeIns write SetCaretShapeIns default cInitCaretShapeIns;
@@ -2064,7 +2064,7 @@ begin
 
     if WrapItem.NFinal=cWrapItemFinal then
     begin
-      //for OptShowFullSel=false paint eol bg
+      //for OptShowFullWidthForSelection=false paint eol bg
       if LineEolSelected then
       begin
         C.Brush.Color:= FColors.TextSelBG;

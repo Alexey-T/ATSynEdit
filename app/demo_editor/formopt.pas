@@ -205,8 +205,8 @@ begin
     chkCurLineMin.Checked:= ed.OptShowCurLineMinimal;
     chkCurCol.Checked:= ed.OptShowCurColumn;
     chkLastOnTop.Checked:= ed.OptLastLineOnTop;
-    chkShowFullSel.Checked:= ed.OptShowFullSel;
-    chkShowFullHilite.Checked:= ed.OptShowFullHilite;
+    chkShowFullSel.Checked:= ed.OptShowFullWidthForSelection;
+    chkShowFullHilite.Checked:= ed.OptShowFullWidthForSyntaxHilite;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
     chkOvrPaste.Checked:= ed.OptOverwriteAllowedOnPaste;
@@ -330,8 +330,8 @@ begin
       ed.OptOverwriteAllowedOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
-      ed.OptShowFullSel:= chkShowFullSel.Checked;
-      ed.OptShowFullHilite:= chkShowFullHilite.Checked;
+      ed.OptShowFullWidthForSelection:= chkShowFullSel.Checked;
+      ed.OptShowFullWidthForSyntaxHilite:= chkShowFullHilite.Checked;
       ed.OptLastLineOnTop:= chkLastOnTop.Checked;
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
