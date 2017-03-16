@@ -465,6 +465,7 @@ type
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
+    FOptMouseStateForDragDropCopying: TShiftStateEnum;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
     FOptMarkersSize: integer;
@@ -1147,6 +1148,7 @@ type
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection default true;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection default true;
     property OptMouseDownForPopup: boolean read FOptMouseDownForPopup write FOptMouseDownForPopup default false;
+    property OptMouseStateForDragDropCopying: TShiftStateEnum read FOptMouseStateForDragDropCopying write FOptMouseStateForDragDropCopying default ssCtrl;
     property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor default false;
     property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine default false;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
@@ -2680,6 +2682,7 @@ begin
   FOptMarkersSize:= 4;
   FOptMouseEnableAll:= true;
   FOptMouseDownForPopup:= false;
+  FOptMouseStateForDragDropCopying:= ssCtrl;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
   FOptPasteAtEndMakesFinalEmptyLine:= true;
@@ -3480,7 +3483,7 @@ begin
   begin
     Strings.BeginUndoGroup;
     try
-      bDeleteSelection:= not (ssCtrl in Shift);
+      bDeleteSelection:= not (FOptMouseStateForDragDropCopying in Shift);
       DoDropText(bDeleteSelection);
     finally
       Strings.EndUndoGroup;
