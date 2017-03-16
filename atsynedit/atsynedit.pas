@@ -465,7 +465,6 @@ type
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
-    FOptMouseStateForDragDropCopying: TShiftStateEnum;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
     FOptMarkersSize: integer;
@@ -525,6 +524,8 @@ type
     FOptMouse3ClickSelectsLine: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
     FOptMouseDragDrop: boolean;
+    FOptMouseDragDropCopying: boolean;
+    FOptMouseDragDropCopyingWithState: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseGutterClickSelectsLine: boolean;
     FOptMouseNiceScroll: boolean;
@@ -1148,12 +1149,13 @@ type
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection default true;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection default true;
     property OptMouseDownForPopup: boolean read FOptMouseDownForPopup write FOptMouseDownForPopup default false;
-    property OptMouseStateForDragDropCopying: TShiftStateEnum read FOptMouseStateForDragDropCopying write FOptMouseStateForDragDropCopying default ssCtrl;
     property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor default false;
     property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine default false;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
+    property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
+    property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssCtrl;
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine default true;
@@ -2643,6 +2645,8 @@ begin
   FOptLastLineOnTop:= false;
   FOptOverwriteSel:= true;
   FOptMouseDragDrop:= true;
+  FOptMouseDragDropCopying:= true;
+  FOptMouseDragDropCopyingWithState:= ssCtrl;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
   FOptMouse2ClickSelectsLine:= false;
@@ -2682,7 +2686,6 @@ begin
   FOptMarkersSize:= 4;
   FOptMouseEnableAll:= true;
   FOptMouseDownForPopup:= false;
-  FOptMouseStateForDragDropCopying:= ssCtrl;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
   FOptPasteAtEndMakesFinalEmptyLine:= true;
@@ -3473,7 +3476,7 @@ end;
 
 procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  bDeleteSelection: boolean;
+  bCopySelection: boolean;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -3483,8 +3486,10 @@ begin
   begin
     Strings.BeginUndoGroup;
     try
-      bDeleteSelection:= not (FOptMouseStateForDragDropCopying in Shift);
-      DoDropText(bDeleteSelection);
+      bCopySelection:=
+        FOptMouseDragDropCopying and
+        (FOptMouseDragDropCopyingWithState in Shift);
+      DoDropText(not bCopySelection);
     finally
       Strings.EndUndoGroup;
       Update;
