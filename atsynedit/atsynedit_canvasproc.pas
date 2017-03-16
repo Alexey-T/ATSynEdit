@@ -718,7 +718,7 @@ begin
   _Pen.Assign(C.Pen);
 
   X:= (R.Left+R.Right) div 2;
-  C.Pen.Mode:= pmNotXor;
+  C.Pen.Mode:= pmNot; //pmNotXor don't work on Mac on dark BG color
   C.Pen.Style:= psSolid;
   C.Pen.Color:= AColor;
   C.AntialiasingMode:= amOff;
