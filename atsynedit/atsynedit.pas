@@ -3325,6 +3325,7 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
   SetFocus;
+  DoCaretForceShow;
 
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
