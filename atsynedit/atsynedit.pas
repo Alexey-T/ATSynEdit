@@ -560,7 +560,7 @@ type
       AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
     procedure DoCaretsFixIfInsideCollapsedPart;
     procedure DoDebugAddAttribs;
-    procedure DoDropText;
+    procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     procedure DoFoldbarClick(ALine: integer);
     procedure DoFoldForLevel(ALevel: integer);
@@ -3469,6 +3469,8 @@ begin
 end;
 
 procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  bDeleteSelection: boolean;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -3478,7 +3480,8 @@ begin
   begin
     Strings.BeginUndoGroup;
     try
-      DoDropText;
+      bDeleteSelection:= not (ssCtrl in Shift);
+      DoDropText(bDeleteSelection);
     finally
       Strings.EndUndoGroup;
       Update;
@@ -4345,7 +4348,7 @@ begin
 end;
 
 //drop selection of 1st caret into mouse-pos
-procedure TATSynEdit.DoDropText;
+procedure TATSynEdit.DoDropText(AndDeleteSelection: boolean);
 var
   P, PosAfter, Shift: TPoint;
   X1, Y1, X2, Y2: integer;
@@ -4379,35 +4382,25 @@ begin
   //insert before selection?
   if Relation=cRelateBefore then
   begin
-    Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+    if AndDeleteSelection then
+      Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
     Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
 
     //select moved text
-    DoCaretSingle(0, 0);
-    with Carets[0] do
-    begin
-      PosX:= PosAfter.X;
-      PosY:= PosAfter.Y;
-      EndX:= P.X;
-      EndY:= P.Y;
-    end;
+    DoCaretSingle(PosAfter.X, PosAfter.Y, P.X, P.Y);
   end
   else
   begin
     Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
 
     //select moved text
-    DoCaretSingle(0, 0);
-    with Carets[0] do
-    begin
-      PosX:= PosAfter.X;
-      PosY:= PosAfter.Y;
-      EndX:= P.X;
-      EndY:= P.Y;
-    end;
+    DoCaretSingle(PosAfter.X, PosAfter.Y, P.X, P.Y);
 
-    Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
-    DoCaretsShift(X1, Y1, Shift.X, Shift.Y, PosAfter);
+    if AndDeleteSelection then
+    begin
+      Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+      DoCaretsShift(X1, Y1, Shift.X, Shift.Y, PosAfter);
+    end;
   end;
 
   Update(true);
