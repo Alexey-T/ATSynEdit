@@ -3905,16 +3905,23 @@ begin
 
   PCaret:= ClientPosToCaretPos(PClient, Details);
   if (PCaret.X>=0) and (PCaret.Y>=0) then
+  begin
     if FMouseDownGutterLineNumber>=0 then
     begin
       DoSelect_LineRange(FMouseDownGutterLineNumber, PCaret);
     end
     else
+    if IsSelRectEmpty then
     begin
       nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
       if nIndex>=0 then
         Carets[nIndex].SelectToPoint(PCaret.X, PCaret.Y);
+    end
+    else
+    begin
+      DoSelect_ColumnBlock(FMouseDownPnt, PCaret);
     end;
+  end;
 
   DoCaretsSort;
   DoEventCarets;
