@@ -369,7 +369,7 @@ type
     FOverwrite: boolean;
     FHintWnd: THintWindow;
     FMouseDownPnt: TPoint;
-    FMouseDownNumber: integer;
+    FMouseDownGutterLineNumber: integer;
     FMouseDownDouble: boolean;
     FMouseDownRight: boolean;
     FMouseNiceScrollPos: TPoint;
@@ -2691,7 +2691,7 @@ begin
   FOptPasteAtEndMakesFinalEmptyLine:= true;
 
   FMouseDownPnt:= Point(-1, -1);
-  FMouseDownNumber:= -1;
+  FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDownRight:= false;
   FMouseDragDropping:= false;
@@ -3335,7 +3335,7 @@ begin
 
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
-  FMouseDownNumber:= -1;
+  FMouseDownGutterLineNumber:= -1;
   FMouseDragDropping:= false;
   ActionId:= GetMouseActionId(FMouseActions, Shift);
   FMouseDownRight:= ActionId=cMouseActionClickRight;
@@ -3447,7 +3447,7 @@ begin
         if FOptMouseGutterClickSelectsLine then
         begin
           FSelRect:= cRectEmpty;
-          FMouseDownNumber:= PCaret.Y;
+          FMouseDownGutterLineNumber:= PCaret.Y;
           DoSelect_Line(PCaret);
         end;
       end
@@ -3497,7 +3497,7 @@ begin
   end;
 
   FMouseDownPnt:= Point(-1, -1);
-  FMouseDownNumber:= -1;
+  FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDragDropping:= false;
   FMouseDragMinimap:= false;
@@ -3668,9 +3668,9 @@ begin
     begin
       P:= ClientPosToCaretPos(P, Details);
       if (P.Y>=0) and (P.X>=0) then
-        if FMouseDownNumber>=0 then
+        if FMouseDownGutterLineNumber>=0 then
         begin
-          DoSelect_LineRange(FMouseDownNumber, P);
+          DoSelect_LineRange(FMouseDownGutterLineNumber, P);
           DoCaretsSort;
           DoEventCarets;
           Update;
@@ -3905,9 +3905,9 @@ begin
 
   PCaret:= ClientPosToCaretPos(PClient, Details);
   if (PCaret.X>=0) and (PCaret.Y>=0) then
-    if FMouseDownNumber>=0 then
+    if FMouseDownGutterLineNumber>=0 then
     begin
-      DoSelect_LineRange(FMouseDownNumber, PCaret);
+      DoSelect_LineRange(FMouseDownGutterLineNumber, PCaret);
     end
     else
     begin
