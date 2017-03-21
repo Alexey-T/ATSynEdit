@@ -3904,6 +3904,7 @@ begin
   end;
 
   PCaret:= ClientPosToCaretPos(PClient, Details);
+
   if (PCaret.X>=0) and (PCaret.Y>=0) then
   begin
     if FMouseDownGutterLineNumber>=0 then

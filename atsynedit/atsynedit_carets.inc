@@ -204,7 +204,8 @@ function _DoClientPosToCaretPos(
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   AVirtualPos: boolean;
   out ADetails: TATPosDetails;
-  AGapCoordAction: TATGapCoordAction): TPoint;
+  AGapCoordAction: TATGapCoordAction;
+  AAfterEofUsesLastLen: boolean): TPoint;
 var
   NIndex, NIndexDecrement, NPixels: integer;
   Item: TATSynWrapItem;
@@ -276,25 +277,30 @@ begin
     Inc(NIndex);
   until false;
 
-  if NIndex<0 then
   //click above all text
+  if NIndex<0 then
   begin
     Result.X:= 0;
     Result.Y:= 0;
-  end
-  else
-  if not AWrapInfo.IsIndexValid(NIndex) then
+    Exit
+  end;
+
   //click below all text
+  if not AWrapInfo.IsIndexValid(NIndex) then
   begin
     NIndex:= AWrapInfo.Count-1;
-    if AWrapInfo.IsIndexValid(NIndex) then
+    if AAfterEofUsesLastLen then
     begin
-      Item:= AWrapInfo.Items[NIndex];
-      Result.Y:= Item.NLineIndex;
-      Result.X:= Item.NCharIndex+Item.NLength-1;
+      if AWrapInfo.IsIndexValid(NIndex) then
+      begin
+        Item:= AWrapInfo.Items[NIndex];
+        Result.Y:= Item.NLineIndex;
+        Result.X:= Item.NCharIndex+Item.NLength-1;
+      end;
+      Exit
     end;
-  end
-  else
+  end;
+
   //click in text
   begin
     Item:= AWrapInfo.Items[NIndex];
@@ -347,7 +353,8 @@ begin
     FScrollVert,
     FCaretVirtual,
     ADetails,
-    AGapCoordAction);
+    AGapCoordAction,
+    IsSelRectEmpty);
 end;
 
 procedure TATSynEdit.SetCaretShapeIns(AValue: TATSynCaretShape);
