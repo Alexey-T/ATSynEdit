@@ -277,6 +277,7 @@ end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
 var
+  SLine: atString;
   i: integer;
 begin
   if P1.Y>P2.Y then
@@ -290,14 +291,12 @@ begin
   for i:= P1.Y to P2.Y do
   begin
     if i=P1.Y then Carets.Clear;
-    Carets.Add(0, 0);
-    with Carets[Carets.Count-1] do
-    begin
-      PosX:= SColumnPosToCharPos(Strings.Lines[i], FSelRect.Right, OptTabSize);
-      PosY:= i;
-      EndX:= SColumnPosToCharPos(Strings.Lines[i], FSelRect.Left, OptTabSize);
-      EndY:= i;
-    end;
+    SLine:= Strings.Lines[i];
+    Carets.Add(
+      SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize),
+      i,
+      SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize),
+      i );
   end;
 end;
 
