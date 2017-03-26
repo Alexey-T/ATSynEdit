@@ -82,7 +82,7 @@ type
 
   { TATScroll }
 
-  TATScroll = class(TCustomPanel)
+  TATScroll = class(TCustomControl)
   private
     FKind: TScrollBarKind;
     FKindArrows: TATScrollArrowsKind;
