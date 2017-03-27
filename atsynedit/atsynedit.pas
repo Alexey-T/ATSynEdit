@@ -531,7 +531,8 @@ type
     FOptMouseNiceScroll: boolean;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
-    FOptMouseWheelScrollHorzColumns: integer;
+    FOptMouseWheelScrollVertSpeed: integer;
+    FOptMouseWheelScrollHorzSpeed: integer;
     FOptMouseWheelScrollHorzWithState: TShiftStateEnum;
     FOptMouseWheelScrollHorzWithState2: TShiftStateEnum;
     FOptMouseWheelZooms: boolean;
@@ -1162,8 +1163,9 @@ type
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine default true;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
+    property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;
     property OptMouseWheelScrollHorz: boolean read FOptMouseWheelScrollHorz write FOptMouseWheelScrollHorz default true;
-    property OptMouseWheelScrollHorzColumns: integer read FOptMouseWheelScrollHorzColumns write FOptMouseWheelScrollHorzColumns default 10;
+    property OptMouseWheelScrollHorzSpeed: integer read FOptMouseWheelScrollHorzSpeed write FOptMouseWheelScrollHorzSpeed default 10;
     property OptMouseWheelScrollHorzWithState: TShiftStateEnum read FOptMouseWheelScrollHorzWithState write FOptMouseWheelScrollHorzWithState default ssShift;
     property OptMouseWheelScrollHorzWithState2: TShiftStateEnum read FOptMouseWheelScrollHorzWithState2 write FOptMouseWheelScrollHorzWithState2 default ssExtra1;
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
@@ -2660,8 +2662,9 @@ begin
   FOptMouseRightClickMovesCaret:= false;
   FOptMouseGutterClickSelectsLine:= true;
   FOptMouseWheelScrollVert:= true;
+  FOptMouseWheelScrollVertSpeed:= 3;
   FOptMouseWheelScrollHorz:= true;
-  FOptMouseWheelScrollHorzColumns:= 10;
+  FOptMouseWheelScrollHorzSpeed:= 10;
   FOptMouseWheelScrollHorzWithState:= ssShift;
   FOptMouseWheelScrollHorzWithState2:= ssExtra1;
   FOptMouseWheelZooms:= true;
@@ -3766,7 +3769,7 @@ type
 function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
 var
   Mode: TATMouseWheelMode;
-  NLinesCount: integer;
+  NSpeedX, NSpeedY: integer;
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
@@ -3783,15 +3786,18 @@ begin
   else
     exit;
 
+  NSpeedX:= FOptMouseWheelScrollHorzSpeed;
+  NSpeedY:= FOptMouseWheelScrollVertSpeed;
+  if AUp then NSpeedX:= -NSpeedX;
+  if AUp then NSpeedY:= -NSpeedY;
+
   case Mode of
     aWheelModeNormal:
       begin
         if (not ModeOneLine) and FOptMouseWheelScrollVert then
         begin
-          //reason to handle wheel here exists.
-          //w/o this handler wheel works only with OS scrollbars, need with new-scrollbar too
-          NLinesCount:= IfThen(AUp, -1, 1)*Mouse.WheelScrollLines;
-          DoScrollByDelta(0, NLinesCount);
+          //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
+          DoScrollByDelta(0, NSpeedY);
           Update;
           Result:= true;
         end;
@@ -3801,8 +3807,7 @@ begin
       begin
         if (not ModeOneLine) and FOptMouseWheelScrollHorz then
         begin
-          NLinesCount:= IfThen(AUp, -1, 1)*FOptMouseWheelScrollHorzColumns;
-          DoScrollByDelta(NLinesCount, 0);
+          DoScrollByDelta(NSpeedX, 0);
           Update;
           Result:= true;
         end;
