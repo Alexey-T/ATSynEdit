@@ -3757,14 +3757,15 @@ type
 function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
 var
   Mode: TATMouseWheelMode;
+  NLinesCount: integer;
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
 
-  if Shift=[ssCtrl] then
+  if (Shift=[ssCtrl]) then
     Mode:= aWheelModeZoom
   else
-  if Shift=[ssShift] then
+  if (Shift=[ssShift]) or (ssExtra1 in Shift) then //ssExtra1 is set in new LCL 1.7 patch
     Mode:= aWheelModeHoriz
   else
     Mode:= aWheelModeNormal;
@@ -3776,7 +3777,8 @@ begin
         begin
           //reason to handle wheel here exists.
           //w/o this handler wheel works only with OS scrollbars, need with new-scrollbar too
-          DoScrollByDelta(0, IfThen(AUp, -1, 1)*Mouse.WheelScrollLines);
+          NLinesCount:= IfThen(AUp, -1, 1)*Mouse.WheelScrollLines;
+          DoScrollByDelta(0, NLinesCount);
           Update;
           Result:= true;
         end;
@@ -3786,7 +3788,8 @@ begin
       begin
         if (not ModeOneLine) and FOptMouseWheelScrollHorz then
         begin
-          DoScrollByDelta(IfThen(AUp, -1, 1)*FOptMouseWheelScrollHorzColumns, 0);
+          NLinesCount:= IfThen(AUp, -1, 1)*FOptMouseWheelScrollHorzColumns;
+          DoScrollByDelta(NLinesCount, 0);
           Update;
           Result:= true;
         end;
