@@ -3747,32 +3747,59 @@ begin
   Result:= DoMouseWheelAction(Shift, WheelDelta>0);
 end;
 
+type
+  TATMouseWheelMode = (
+    aWheelModeNormal,
+    aWheelModeHoriz,
+    aWheelModeZoom
+    );
+
 function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
+var
+  Mode: TATMouseWheelMode;
 begin
-  if not OptMouseEnableAll then exit(false);
-  if (Shift=[ssCtrl]) and FOptMouseWheelWithCtrlChangeSize then
-  begin
-    DoSizeChange(AUp);
-    Result:= true;
-    exit
-  end;
+  Result:= false;
+  if not OptMouseEnableAll then exit;
 
-  if (Shift=[]) and (not ModeOneLine) and FOptMouseWheelScrollVert then
-  begin
-    //reason to handle wheel here exists.
-    //w/o this handler wheel works only with OS scrollbars, need with new-scrollbar too
-    DoScrollByDelta(0, IfThen(AUp, -1, 1)*Mouse.WheelScrollLines);
-    Update;
-    Result:= true;
-    exit
-  end;
+  if Shift=[ssCtrl] then
+    Mode:= aWheelModeZoom
+  else
+  if Shift=[ssShift] then
+    Mode:= aWheelModeHoriz
+  else
+    Mode:= aWheelModeNormal;
 
-  if (Shift=[ssShift]) and (not ModeOneLine) and FOptMouseWheelScrollHorz then
-  begin
-    DoScrollByDelta(IfThen(AUp, -1, 1)*FOptMouseWheelScrollHorzColumns, 0);
-    Update;
-    Result:= true;
-    exit
+  case Mode of
+    aWheelModeNormal:
+      begin
+        if (not ModeOneLine) and FOptMouseWheelScrollVert then
+        begin
+          //reason to handle wheel here exists.
+          //w/o this handler wheel works only with OS scrollbars, need with new-scrollbar too
+          DoScrollByDelta(0, IfThen(AUp, -1, 1)*Mouse.WheelScrollLines);
+          Update;
+          Result:= true;
+        end;
+      end;
+
+    aWheelModeHoriz:
+      begin
+        if (not ModeOneLine) and FOptMouseWheelScrollHorz then
+        begin
+          DoScrollByDelta(IfThen(AUp, -1, 1)*FOptMouseWheelScrollHorzColumns, 0);
+          Update;
+          Result:= true;
+        end;
+      end;
+
+    aWheelModeZoom:
+      begin
+        if FOptMouseWheelWithCtrlChangeSize then
+        begin
+          DoSizeChange(AUp);
+          Result:= true;
+        end;
+      end;
   end;
 end;
 
