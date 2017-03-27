@@ -526,6 +526,9 @@ type
     FOptMouseDragDrop: boolean;
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
+    FOptMouseWheelZoomWithState: TShiftStateEnum;
+    FOptMouseWheelHorizWithState: TShiftStateEnum;
+    FOptMouseWheelHorizWithState2: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseGutterClickSelectsLine: boolean;
     FOptMouseNiceScroll: boolean;
@@ -1155,6 +1158,9 @@ type
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssCtrl;
+    property OptMouseWheelZoomWithState: TShiftStateEnum read FOptMouseWheelZoomWithState write FOptMouseWheelZoomWithState default ssCtrl;
+    property OptMouseWheelHorizWithState: TShiftStateEnum read FOptMouseWheelHorizWithState write FOptMouseWheelHorizWithState default ssShift;
+    property OptMouseWheelHorizWithState2: TShiftStateEnum read FOptMouseWheelHorizWithState2 write FOptMouseWheelHorizWithState2 default ssExtra1;
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine default true;
@@ -2646,6 +2652,9 @@ begin
   FOptMouseDragDrop:= true;
   FOptMouseDragDropCopying:= true;
   FOptMouseDragDropCopyingWithState:= ssCtrl;
+  FOptMouseWheelZoomWithState:= ssCtrl;
+  FOptMouseWheelHorizWithState:= ssShift;
+  FOptMouseWheelHorizWithState2:= ssExtra1;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
   FOptMouse2ClickSelectsLine:= false;
@@ -3762,13 +3771,17 @@ begin
   Result:= false;
   if not OptMouseEnableAll then exit;
 
-  if (Shift=[ssCtrl]) then
+  if (Shift=[FOptMouseWheelZoomWithState]) then
     Mode:= aWheelModeZoom
   else
-  if (Shift=[ssShift]) or (ssExtra1 in Shift) then //ssExtra1 is set in new LCL 1.7 patch
+  if (Shift=[FOptMouseWheelHorizWithState]) or
+     (Shift=[FOptMouseWheelHorizWithState2]) then //ssExtra1 is set in new LCL 1.7 patch
     Mode:= aWheelModeHoriz
   else
-    Mode:= aWheelModeNormal;
+  if (Shift=[]) then
+    Mode:= aWheelModeNormal
+  else
+    exit;
 
   case Mode of
     aWheelModeNormal:
