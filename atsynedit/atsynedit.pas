@@ -532,10 +532,10 @@ type
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseGutterClickSelectsLine: boolean;
     FOptMouseNiceScroll: boolean;
+    FOptMouseWheelZooms: boolean;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
     FOptMouseWheelScrollHorzColumns: integer;
-    FOptMouseWheelWithCtrlChangeSize: boolean;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyLeftRightSwapSelAndSelect: boolean;
@@ -1167,7 +1167,7 @@ type
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollHorz: boolean read FOptMouseWheelScrollHorz write FOptMouseWheelScrollHorz default true;
     property OptMouseWheelScrollHorzColumns: integer read FOptMouseWheelScrollHorzColumns write FOptMouseWheelScrollHorzColumns default 30;
-    property OptMouseWheelWithCtrlChangeSize: boolean read FOptMouseWheelWithCtrlChangeSize write FOptMouseWheelWithCtrlChangeSize default true;
+    property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
@@ -2665,7 +2665,7 @@ begin
   FOptMouseWheelScrollVert:= true;
   FOptMouseWheelScrollHorz:= true;
   FOptMouseWheelScrollHorzColumns:= 30;
-  FOptMouseWheelWithCtrlChangeSize:= true;
+  FOptMouseWheelZooms:= true;
 
   FOptCopyLinesIfNoSel:= true;
   FOptCutLinesIfNoSel:= false;
@@ -3810,7 +3810,7 @@ begin
 
     aWheelModeZoom:
       begin
-        if FOptMouseWheelWithCtrlChangeSize then
+        if FOptMouseWheelZooms then
         begin
           DoSizeChange(AUp);
           Result:= true;
