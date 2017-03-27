@@ -965,8 +965,7 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
     procedure MouseLeave; override;
-    function DoMouseWheelDown(Shift: TShiftState; MousePos{%H-}: TPoint): boolean; override;
-    function DoMouseWheelUp(Shift: TShiftState; MousePos{%H-}: TPoint): boolean; override;
+    function DoMouseWheel(Shift: TShiftState; WheelDelta: integer; MousePos{%H-}: TPoint): boolean; override;
     procedure DblClick; override;
     procedure TripleClick; override;
     function DoGetTextString: atString; virtual;
@@ -3741,16 +3740,11 @@ begin
   DoHintHide;
 end;
 
-function TATSynEdit.DoMouseWheelDown(Shift: TShiftState; MousePos: TPoint): boolean;
+function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
+  MousePos: TPoint): boolean;
 begin
   if not OptMouseEnableAll then exit(false);
-  Result:= DoMouseWheelAction(Shift, false);
-end;
-
-function TATSynEdit.DoMouseWheelUp(Shift: TShiftState; MousePos: TPoint): boolean;
-begin
-  if not OptMouseEnableAll then exit(false);
-  Result:= DoMouseWheelAction(Shift, true);
+  Result:= DoMouseWheelAction(Shift, WheelDelta>0);
 end;
 
 function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
