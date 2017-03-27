@@ -526,16 +526,16 @@ type
     FOptMouseDragDrop: boolean;
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
-    FOptMouseWheelZoomWithState: TShiftStateEnum;
-    FOptMouseWheelHorizWithState: TShiftStateEnum;
-    FOptMouseWheelHorizWithState2: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseGutterClickSelectsLine: boolean;
     FOptMouseNiceScroll: boolean;
-    FOptMouseWheelZooms: boolean;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
     FOptMouseWheelScrollHorzColumns: integer;
+    FOptMouseWheelScrollHorzWithState: TShiftStateEnum;
+    FOptMouseWheelScrollHorzWithState2: TShiftStateEnum;
+    FOptMouseWheelZooms: boolean;
+    FOptMouseWheelZoomsWithState: TShiftStateEnum;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyLeftRightSwapSelAndSelect: boolean;
@@ -1158,16 +1158,16 @@ type
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssCtrl;
-    property OptMouseWheelZoomWithState: TShiftStateEnum read FOptMouseWheelZoomWithState write FOptMouseWheelZoomWithState default ssCtrl;
-    property OptMouseWheelHorizWithState: TShiftStateEnum read FOptMouseWheelHorizWithState write FOptMouseWheelHorizWithState default ssShift;
-    property OptMouseWheelHorizWithState2: TShiftStateEnum read FOptMouseWheelHorizWithState2 write FOptMouseWheelHorizWithState2 default ssExtra1;
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine default true;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollHorz: boolean read FOptMouseWheelScrollHorz write FOptMouseWheelScrollHorz default true;
-    property OptMouseWheelScrollHorzColumns: integer read FOptMouseWheelScrollHorzColumns write FOptMouseWheelScrollHorzColumns default 30;
+    property OptMouseWheelScrollHorzColumns: integer read FOptMouseWheelScrollHorzColumns write FOptMouseWheelScrollHorzColumns default 10;
+    property OptMouseWheelScrollHorzWithState: TShiftStateEnum read FOptMouseWheelScrollHorzWithState write FOptMouseWheelScrollHorzWithState default ssShift;
+    property OptMouseWheelScrollHorzWithState2: TShiftStateEnum read FOptMouseWheelScrollHorzWithState2 write FOptMouseWheelScrollHorzWithState2 default ssExtra1;
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
+    property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssCtrl;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
@@ -2652,9 +2652,6 @@ begin
   FOptMouseDragDrop:= true;
   FOptMouseDragDropCopying:= true;
   FOptMouseDragDropCopyingWithState:= ssCtrl;
-  FOptMouseWheelZoomWithState:= ssCtrl;
-  FOptMouseWheelHorizWithState:= ssShift;
-  FOptMouseWheelHorizWithState2:= ssExtra1;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
   FOptMouse2ClickSelectsLine:= false;
@@ -2664,8 +2661,11 @@ begin
   FOptMouseGutterClickSelectsLine:= true;
   FOptMouseWheelScrollVert:= true;
   FOptMouseWheelScrollHorz:= true;
-  FOptMouseWheelScrollHorzColumns:= 30;
+  FOptMouseWheelScrollHorzColumns:= 10;
+  FOptMouseWheelScrollHorzWithState:= ssShift;
+  FOptMouseWheelScrollHorzWithState2:= ssExtra1;
   FOptMouseWheelZooms:= true;
+  FOptMouseWheelZoomsWithState:= ssCtrl;
 
   FOptCopyLinesIfNoSel:= true;
   FOptCutLinesIfNoSel:= false;
@@ -3771,11 +3771,11 @@ begin
   Result:= false;
   if not OptMouseEnableAll then exit;
 
-  if (Shift=[FOptMouseWheelZoomWithState]) then
+  if (Shift=[FOptMouseWheelZoomsWithState]) then
     Mode:= aWheelModeZoom
   else
-  if (Shift=[FOptMouseWheelHorizWithState]) or
-     (Shift=[FOptMouseWheelHorizWithState2]) then //ssExtra1 is set in new LCL 1.7 patch
+  if (Shift=[FOptMouseWheelScrollHorzWithState]) or
+     (Shift=[FOptMouseWheelScrollHorzWithState2]) then //ssExtra1 is set in new LCL 1.7 patch
     Mode:= aWheelModeHoriz
   else
   if (Shift=[]) then
