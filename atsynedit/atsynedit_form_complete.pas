@@ -92,33 +92,35 @@ type
   end;
 
 const
-  cCompleteItemCount = 5;
-var
-  cCompleteColorFont: array[0..cCompleteItemCount-1] of TColor =
-    (clPurple, clBlack, clNavy, clBlack, clBlack);
-  cCompleteFontStyles: array[0..cCompleteItemCount-1] of TFontStyles =
-    ([fsBold], [], [], [], []);
-  cCompleteColorBg: TColor = $e0e0e0;
-  cCompleteColorSelBg: TColor = clMedGray;
+  cCompletionColumnCount = 5;
+
+type
+  TCompletionOptions = record
+    ColorFont: array[0..cCompletionColumnCount-1] of TColor;
+    ColorBg: TColor;
+    ColorSelBg: TColor;
+    FontStyles: array[0..cCompletionColumnCount-1] of TFontStyles;
+    FontName: string;
+    FontSize: integer;
+    CharsCloseListbox: string;
+    IndexOfText: integer;
+    IndexOfDesc: integer;
+    SepChar: char;
+    HintChar: char;
+    SuffixChar: char;
+    ListSort: boolean;
+    KeyUpDownWrap: boolean;
+    ItemHeight: integer;
+    BorderSize: integer;
+    FormSizeX: integer;
+    FormSizeY: integer;
+    HintSizeX: integer;
+    TextIndent0: integer;
+    TextIndent: integer;
+  end;
 
 var
-  cCompleteCharsWhichCloseListbox: string = ' .,;/\''"=<>()[]{}';
-  cCompleteIndexOfText: integer = 1;
-  cCompleteIndexOfDesc: integer = 2;
-  cCompleteSepChar: char = '|';
-  cCompleteHintChar: char = #9;
-  cCompleteSuffixChar: char = #1;
-  cCompleteListSort: boolean = false;
-  cCompleteKeyUpDownWrap: boolean = true;
-  cCompleteFontName: string = 'default';
-  cCompleteFontSize: integer = 10;
-  cCompleteItemHeight: integer = 17;
-  cCompleteBorderSize: integer = 4;
-  cCompleteFormSizeX: integer = 500;
-  cCompleteFormSizeY: integer = 200;
-  cCompleteHintSizeX: integer = 400;
-  cCompleteTextIndent0: integer = 4;
-  cCompleteTextIndent: integer = 8;
+  CompletionOptions: TCompletionOptions;
 
 implementation
 
@@ -154,9 +156,9 @@ var
   StrText, Str1, Str2: atString;
 begin
   if AStr='' then exit;
-  StrText:= Utf8Decode(SGetItem(AStr, cCompleteSuffixChar));
-  Str1:= Utf8Decode(SGetItem(AStr, cCompleteSuffixChar));
-  Str2:= Utf8Decode(SGetItem(AStr, cCompleteSuffixChar));
+  StrText:= Utf8Decode(SGetItem(AStr, CompletionOptions.SuffixChar));
+  Str1:= Utf8Decode(SGetItem(AStr, CompletionOptions.SuffixChar));
+  Str2:= Utf8Decode(SGetItem(AStr, CompletionOptions.SuffixChar));
 
   begin
     Caret:= Editor.Carets[0];
@@ -218,7 +220,7 @@ begin
     if List.ItemIndex>0 then
       List.ItemIndex:= List.ItemIndex-1
     else
-    if cCompleteKeyUpDownWrap then
+    if CompletionOptions.KeyUpDownWrap then
       List.ItemIndex:= List.ItemCount-1;
     key:= 0;
     exit
@@ -229,7 +231,7 @@ begin
     if List.ItemIndex<List.ItemCount-1 then
       List.ItemIndex:= List.ItemIndex+1
     else
-    if cCompleteKeyUpDownWrap then
+    if CompletionOptions.KeyUpDownWrap then
       List.ItemIndex:= 0;
     key:= 0;
     exit
@@ -326,7 +328,7 @@ begin
   FEdit.DoCommand(cCommand_TextInsert, Str);
   DoUpdate;
 
-  if Pos(UTF8Key, cCompleteCharsWhichCloseListbox)>0 then
+  if Pos(UTF8Key, CompletionOptions.CharsCloseListbox)>0 then
     Close;
   UTF8Key:= '';
 end;
@@ -341,7 +343,7 @@ var
   i: integer;
 begin
   for i:= 0 to AIndex do
-    Result:= SGetItem(S, cCompleteSepChar);
+    Result:= SGetItem(S, CompletionOptions.SepChar);
 end;
 
 function TFormATSynEditComplete.GetResultText: string;
@@ -351,12 +353,12 @@ begin
   Result:= '';
   if List.ItemIndex>=0 then
   begin
-    SText:= GetItemText(SList[List.ItemIndex], cCompleteIndexOfText);
-    SDesc:= GetItemText(SList[List.ItemIndex], cCompleteIndexOfDesc);
+    SText:= GetItemText(SList[List.ItemIndex], CompletionOptions.IndexOfText);
+    SDesc:= GetItemText(SList[List.ItemIndex], CompletionOptions.IndexOfDesc);
     Result:= SText;
 
     if SBeginsWith(SDesc, '(') then
-      Result:= Result+cCompleteSuffixChar+'(';
+      Result:= Result+CompletionOptions.SuffixChar+'(';
   end;
 end;
 
@@ -369,9 +371,9 @@ begin
   Str:= SList[AIndex];
 
   if AIndex=List.ItemIndex then
-    C.Brush.Color:= cCompleteColorSelBg
+    C.Brush.Color:= CompletionOptions.ColorSelBg
   else
-    C.Brush.Color:= cCompleteColorBg;
+    C.Brush.Color:= CompletionOptions.ColorBg;
   C.FillRect(ARect);
   C.Font.Assign(List.Font);
 
@@ -384,35 +386,35 @@ begin
     SHint:= SGetItem(Str, #9);
 
     //prefix
-    C.Font.Style:= cCompleteFontStyles[0];
-    C.Font.Color:= cCompleteColorFont[0];
-    C.TextOut(ARect.Left+List.ClientWidth-List.Canvas.TextWidth(SHint)-cCompleteTextIndent0, ARect.Top, SHint);
+    C.Font.Style:= CompletionOptions.FontStyles[0];
+    C.Font.Color:= CompletionOptions.ColorFont[0];
+    C.TextOut(ARect.Left+List.ClientWidth-List.Canvas.TextWidth(SHint)-CompletionOptions.TextIndent0, ARect.Top, SHint);
 
     //text
-    C.Font.Style:= cCompleteFontStyles[1];
-    C.Font.Color:= cCompleteColorFont[1];
-    C.TextOut(ARect.Left+cCompleteTextIndent0, ARect.Top, SItem);
+    C.Font.Style:= CompletionOptions.FontStyles[1];
+    C.Font.Color:= CompletionOptions.ColorFont[1];
+    C.TextOut(ARect.Left+CompletionOptions.TextIndent0, ARect.Top, SItem);
 
     exit;
   end;
 
   //usual case, n columns, tab-char separates hint (in hint window)
-  SHint:= SGetItemAtEnd(Str, cCompleteHintChar);
+  SHint:= SGetItemAtEnd(Str, CompletionOptions.HintChar);
   if AIndex=List.ItemIndex then
     DoHintShow(SHint);
 
-  NSize:= cCompleteTextIndent0;
+  NSize:= CompletionOptions.TextIndent0;
 
-  for i:= 0 to cCompleteItemCount-1 do
+  for i:= 0 to cCompletionColumnCount-1 do
   begin
-    SItem:= SGetItem(Str, cCompleteSepChar);
-    if i=cCompleteIndexOfText then
-      SItem:= SGetItem(SItem, cCompleteSuffixChar);
+    SItem:= SGetItem(Str, CompletionOptions.SepChar);
+    if i=CompletionOptions.IndexOfText then
+      SItem:= SGetItem(SItem, CompletionOptions.SuffixChar);
 
-    C.Font.Style:= cCompleteFontStyles[i];
-    C.Font.Color:= cCompleteColorFont[i];
+    C.Font.Style:= CompletionOptions.FontStyles[i];
+    C.Font.Color:= CompletionOptions.ColorFont[i];
     C.TextOut(ARect.Left+NSize, ARect.Top, SItem);
-    Inc(NSize, C.TextWidth(SItem)+cCompleteTextIndent);
+    Inc(NSize, C.TextWidth(SItem)+CompletionOptions.TextIndent);
   end;
 end;
 
@@ -439,24 +441,24 @@ begin
 
   SList.Text:= AText;
   if SList.Count=0 then exit;
-  if cCompleteListSort then SList.Sort;
+  if CompletionOptions.ListSort then SList.Sort;
 
   List.ItemCount:= SList.Count;
   List.ItemIndex:= 0;
 
-  Color:= cCompleteColorBg;
-  List.Color:= cCompleteColorBg;
-  List.Font.Name:= cCompleteFontName;
-  List.Font.Size:= cCompleteFontSize;
-  List.ItemHeight:= cCompleteItemHeight;
-  List.BorderSpacing.Around:= cCompleteBorderSize;
+  Color:= CompletionOptions.ColorBg;
+  List.Color:= CompletionOptions.ColorBg;
+  List.Font.Name:= CompletionOptions.FontName;
+  List.Font.Size:= CompletionOptions.FontSize;
+  List.ItemHeight:= CompletionOptions.ItemHeight;
+  List.BorderSpacing.Around:= CompletionOptions.BorderSize;
   List.Invalidate;
 
   P.X:= Editor.Carets[0].CoordX-Editor.TextCharSize.X*FCharsLeft;
   P.Y:= Editor.Carets[0].CoordY+Editor.TextCharSize.Y;
   P:= Editor.ClientToScreen(P);
 
-  SetBounds(P.X, P.Y, cCompleteFormSizeX, cCompleteFormSizeY);
+  SetBounds(P.X, P.Y, CompletionOptions.FormSizeX, CompletionOptions.FormSizeY);
   Show;
 end;
 
@@ -495,7 +497,7 @@ var
   P: TPoint;
   R: TRect;
 begin
-  R:= FHintWnd.CalcHintRect(cCompleteHintSizeX, AHint, nil);
+  R:= FHintWnd.CalcHintRect(CompletionOptions.HintSizeX, AHint, nil);
 
   P:= ClientToScreen(Point(Width, 0));
   OffsetRect(R, P.X, P.Y);
@@ -511,7 +513,41 @@ begin
     FHintWnd.Hide;
 end;
 
+
+initialization
+
+  FillChar(CompletionOptions, SizeOf(CompletionOptions), 0);
+  with CompletionOptions do
+  begin
+    ColorFont[0] := clPurple;
+    ColorFont[1] := clBlack;
+    ColorFont[2] := clNavy;
+    ColorFont[3] := clBlack;
+    ColorFont[4] := clBlack;
+    ColorBg := $e0e0e0;
+    ColorSelBg := clMedGray;
+    FontStyles[0] := [fsBold];
+    FontName := 'default';
+    FontSize := 10;
+    CharsCloseListbox := ' .,;/\''"=<>()[]{}';
+    IndexOfText := 1;
+    IndexOfDesc := 2;
+    SepChar := '|';
+    HintChar := #9;
+    SuffixChar := #1;
+    ListSort := false;
+    KeyUpDownWrap := true;
+    ItemHeight := 17;
+    BorderSize := 4;
+    FormSizeX := 500;
+    FormSizeY := 200;
+    HintSizeX := 400;
+    TextIndent0 := 4;
+    TextIndent := 8;
+  end;
+
 finalization
+
   if Assigned(FormComplete) then
     FormComplete.Free;
 
