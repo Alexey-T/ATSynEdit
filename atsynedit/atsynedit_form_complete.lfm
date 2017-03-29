@@ -25,7 +25,9 @@ object FormATSynEditComplete: TFormATSynEditComplete
     BorderSpacing.Around = 4
     CanGetFocus = False
     Color = clSilver
+    DoubleBuffered = True
     ItemHeight = 28
+    ParentColor = False
     ShowScrollbar = False
     OnClick = ListClick
     OnDrawItem = ListDrawItem

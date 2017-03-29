@@ -122,6 +122,14 @@ implementation
 
 {$R *.lfm}
 
+const
+  VK_SEMICOLON  = 186;
+  VK_EQUAL      = 187;
+  VK_COMMA      = 188;
+  VK_POINT      = 190;
+  VK_SLASH      = 191;
+
+
 var
   FormComplete: TFormATSynEditComplete = nil;
 
@@ -265,6 +273,17 @@ begin
   begin
     Close;
     key:= 0;
+    exit
+  end;
+
+  // ".,;=/<>" should input to editor, and close listbox
+  if (key=VK_COMMA) or
+     (key=VK_POINT) or
+     (key=VK_SLASH) or
+     (key=VK_SEMICOLON) or
+     (key=VK_EQUAL) then
+  begin
+    Close;
     exit
   end;
 
