@@ -156,7 +156,7 @@ begin
 
         ListAcpType.Add(SType);
         ListAcpText.Add(SText);
-        ListAcpDesc.Add(SPar+CompletionOptions.HintChar+SHint);
+        ListAcpDesc.Add(SPar+CompletionOps.HintChar+SHint);
       end;
     end;
   finally
@@ -227,11 +227,11 @@ end;
 initialization
   Acp:= TAcp.Create;
 
-  CompletionOptions.FontStyles[0]:= [];
-  CompletionOptions.ColorFont[0]:= clPurple;
-  CompletionOptions.ColorFont[1]:= clBlack;
-  CompletionOptions.ColorFont[2]:= clGray;
-  CompletionOptions.ColorFont[3]:= clGreen;
+  CompletionOps.FontStyles[0]:= [];
+  CompletionOps.ColorFont[0]:= clPurple;
+  CompletionOps.ColorFont[1]:= clBlack;
+  CompletionOps.ColorFont[2]:= clGray;
+  CompletionOps.ColorFont[3]:= clGreen;
 
 finalization
   FreeAndNil(Acp);
