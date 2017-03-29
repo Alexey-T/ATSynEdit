@@ -101,6 +101,8 @@ var
   cCompleteColorBg: TColor = $e0e0e0;
   cCompleteColorSelBg: TColor = clMedGray;
 
+var
+  cCompleteCharsWhichCloseListbox: string = ' .,;/\''"=<>()[]{}';
   cCompleteIndexOfText: integer = 1;
   cCompleteIndexOfDesc: integer = 2;
   cCompleteSepChar: char = '|';
@@ -121,14 +123,6 @@ var
 implementation
 
 {$R *.lfm}
-
-const
-  VK_SEMICOLON  = 186;
-  VK_EQUAL      = 187;
-  VK_COMMA      = 188;
-  VK_POINT      = 190;
-  VK_SLASH      = 191;
-
 
 var
   FormComplete: TFormATSynEditComplete = nil;
@@ -276,17 +270,6 @@ begin
     exit
   end;
 
-  // ".,;=/<>" should input to editor, and close listbox
-  if (key=VK_COMMA) or
-     (key=VK_POINT) or
-     (key=VK_SLASH) or
-     (key=VK_SEMICOLON) or
-     (key=VK_EQUAL) then
-  begin
-    Close;
-    exit
-  end;
-
   if (key=VK_RETURN) or (key=VK_TAB) then
   begin
     DoResult;
@@ -332,17 +315,20 @@ begin
   begin
     FEdit.DoCommand(cCommand_KeyBackspace, '');
     DoUpdate;
-    Utf8Key:= '';
+    UTF8Key:= '';
     exit;
   end;
 
   //skip control Ascii chars
   if Ord(UTF8Key[1])<32 then Exit;
 
-  Str:= Utf8Decode(Utf8Key);
+  Str:= UTF8Decode(UTF8Key);
   FEdit.DoCommand(cCommand_TextInsert, Str);
   DoUpdate;
-  Utf8Key:= '';
+
+  if Pos(UTF8Key, cCompleteCharsWhichCloseListbox)>0 then
+    Close;
+  UTF8Key:= '';
 end;
 
 procedure TFormATSynEditComplete.ListClick(Sender: TObject);
