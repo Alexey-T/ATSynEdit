@@ -3601,15 +3601,20 @@ procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   P: TPoint;
   RectNums, RectBookmk: TRect;
-  nIndex: integer;
-  bOnMinimap, bOnGutter: boolean;
+  bOnMain, bOnMinimap, bOnMicromap, bOnGutter: boolean;
   Details: TATPosDetails;
+  nIndex: integer;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
 
   P:= Point(X, Y);
   UpdateCursor;
+
+  bOnMain:= PtInRect(FRectMain, P);
+  bOnMinimap:= false;
+  bOnMicromap:= false;
+  bOnGutter:= false;
 
   //detect cursor on minimap
   if FMinimapVisible then
@@ -3619,6 +3624,12 @@ begin
       if bOnMinimap<>FCursorOnMinimap then
         Invalidate;
     FCursorOnMinimap:= bOnMinimap;
+  end;
+
+  //detect cursor on micromap
+  if FMicromapVisible then
+  begin
+    bOnMicromap:= PtInRect(FRectMicromap, P);
   end;
 
   //detect cursor on gutter
@@ -3665,7 +3676,10 @@ begin
   FTimerScroll.Enabled:=
     (not ModeOneLine) and
     (ssLeft in Shift) and
-    (not PtInRect(FRectMain, P) or FCursorOnGutter);
+    (not bOnMain) and
+    (not bOnMinimap) and
+    (not bOnMicromap);
+
   FMouseAutoScroll:= cDirNone;
   if P.Y<FRectMain.Top then FMouseAutoScroll:= cDirUp else
   if P.Y>=FRectMain.Bottom then FMouseAutoScroll:= cDirDown else
