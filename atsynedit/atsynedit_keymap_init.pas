@@ -111,7 +111,7 @@ begin
   M.Add(cCommand_TextDeleteToTextEnd, 'delete to text end', [], []);
 
   M.Add(cCommand_TextIndent, 'indent selection', [cXControl+'+I'], []);
-  M.Add(cCommand_TextUnindent, 'unindent selection', ['Shift+Tab'], []);
+  M.Add(cCommand_TextUnindent, 'unindent selection', [cXControl+'+Shift+I'], ['Shift+Tab']);
 
   M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
   M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Shift+Z'], []);
