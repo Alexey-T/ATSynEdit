@@ -93,6 +93,8 @@ type
     FReplacedAtEndOfText: boolean;
     //
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
+    procedure UpdateBuffer_FromText(const AText: atString);
+    procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
     function ConvertBufferPosToCaretPos(APos: integer): TPoint;
     function ConvertCaretPosToBufferPos(APos: TPoint): integer;
     function GetOffsetOfCaret: integer;
@@ -387,11 +389,28 @@ begin
     Result:= DoCountMatchesUsual(1, AWithEvent);
 end;
 
+
+procedure TATEditorFinder.UpdateBuffer_FromText(const AText: atString);
+begin
+  FBuffer.SetupSlow(AText);
+  StrText:= AText;
+end;
+
+procedure TATEditorFinder.UpdateBuffer_FromStrings(AStrings: TATStrings);
+var
+  Lens: array of integer;
+  i: integer;
+begin
+  SetLength(Lens, AStrings.Count);
+  for i:= 0 to Length(Lens)-1 do
+    Lens[i]:= AStrings.LinesLen[i];
+  FBuffer.Setup(AStrings.TextString, Lens);
+  StrText:= FBuffer.FText;
+end;
+
 procedure TATEditorFinder.UpdateBuffer(AUpdateFragmentsFirst: boolean);
 var
   Fr: TATEditorFragment;
-  Lens: array of integer;
-  i: integer;
 begin
   if AUpdateFragmentsFirst then
   begin
@@ -407,19 +426,11 @@ begin
 
   Fr:= CurrentFragment;
   if Assigned(Fr) then
-  begin
-    FBuffer.SetupSlow(Fr.Text);
-    StrText:= Fr.Text;
-  end
+    UpdateBuffer_FromText(Fr.Text)
   else
-  begin
-    SetLength(Lens, FEditor.Strings.Count);
-    for i:= 0 to Length(Lens)-1 do
-      Lens[i]:= FEditor.Strings.LinesLen[i];
-    FBuffer.Setup(FEditor.Strings.TextString, Lens);
-    StrText:= FBuffer.FText;
-  end;
+    UpdateBuffer_FromStrings(FEditor.Strings);
 end;
+
 
 constructor TATEditorFinder.Create;
 begin
@@ -592,13 +603,6 @@ begin
     Str:= StrReplace;
   AReplacedLen:= Length(Str);
 
-  //replace in buffer
-  NPos1:= ConvertCaretPosToBufferPos(APosBegin);
-  NPos2:= ConvertCaretPosToBufferPos(APosEnd);
-  System.Delete(StrText, NPos1, NPos2-NPos1);
-  System.Insert(Str, StrText, NPos1);
-  FBuffer.SetupSlow(StrText);
-
   //replace in editor
   Strs:= FEditor.Strings;
   FReplacedAtEndOfText:=
@@ -610,6 +614,9 @@ begin
   Strs.TextInsert(APosBegin.X, APosBegin.Y, Str, false, Shift, PosAfter);
   Strs.EndUndoGroup;
   FEditor.DoEventChange;
+
+  //sync buffer
+  UpdateBuffer_FromStrings(Strs);
 
   if not OptBack then
   begin
