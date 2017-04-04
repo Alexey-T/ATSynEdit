@@ -614,8 +614,9 @@ begin
   if not OptBack then
   begin
     //correct caret pos
-    //(e.g. replace "dddddd" to "--": move lefter)
-    FEditor.DoCaretSingle(APosBegin.X+AReplacedLen, APosBegin.Y);
+    //e.g. replace "dddddd" to "--": move lefter
+    //e.g. replace "ab" to "cd cd": move righter
+    FEditor.DoCaretSingle(PosAfter.X, PosAfter.Y);
   end;
 end;
 
