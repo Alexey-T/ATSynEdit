@@ -1167,7 +1167,7 @@ type
     property OptMouseWheelScrollHorz: boolean read FOptMouseWheelScrollHorz write FOptMouseWheelScrollHorz default true;
     property OptMouseWheelScrollHorzSpeed: integer read FOptMouseWheelScrollHorzSpeed write FOptMouseWheelScrollHorzSpeed default 10;
     property OptMouseWheelScrollHorzWithState: TShiftStateEnum read FOptMouseWheelScrollHorzWithState write FOptMouseWheelScrollHorzWithState default ssShift;
-    property OptMouseWheelScrollHorzWithState2: TShiftStateEnum read FOptMouseWheelScrollHorzWithState2 write FOptMouseWheelScrollHorzWithState2 default ssExtra1;
+    property OptMouseWheelScrollHorzWithState2: TShiftStateEnum read FOptMouseWheelScrollHorzWithState2 write FOptMouseWheelScrollHorzWithState2 default ssHyper;
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssCtrl;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
@@ -2666,7 +2666,7 @@ begin
   FOptMouseWheelScrollHorz:= true;
   FOptMouseWheelScrollHorzSpeed:= 10;
   FOptMouseWheelScrollHorzWithState:= ssShift;
-  FOptMouseWheelScrollHorzWithState2:= ssExtra1;
+  FOptMouseWheelScrollHorzWithState2:= ssHyper;
   FOptMouseWheelZooms:= true;
   FOptMouseWheelZoomsWithState:= ssCtrl;
 
@@ -3792,7 +3792,7 @@ begin
     Mode:= aWheelModeZoom
   else
   if (Shift=[FOptMouseWheelScrollHorzWithState]) or
-     (Shift=[FOptMouseWheelScrollHorzWithState2]) then //ssExtra1 is set in new LCL 1.7 patch
+     (Shift=[FOptMouseWheelScrollHorzWithState2]) then
     Mode:= aWheelModeHoriz
   else
   if (Shift=[]) then
