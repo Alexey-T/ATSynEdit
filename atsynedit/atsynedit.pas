@@ -2028,7 +2028,8 @@ begin
           @Parts,
           Event,
           FOptTextOffsetFromLine,
-          ClientWidth+ACharSize.X*2
+          ClientWidth+ACharSize.X*2,
+          LineWithCaret
           )
       else
         CanvasTextOutMinimap(C,

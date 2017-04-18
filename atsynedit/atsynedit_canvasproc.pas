@@ -109,7 +109,8 @@ procedure CanvasTextOut(C: TCanvas;
   AParts: PATLineParts;
   ADrawEvent: TATSynEditDrawLineEvent;
   ATextOffsetFromLine: integer;
-  AControlWidth: integer
+  AControlWidth: integer;
+  ALineWithCaret: boolean
   );
 
 procedure CanvasTextOutMinimap(C: TCanvas;
@@ -592,7 +593,7 @@ procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   AColorUnprintable: TColor; AColorHex: TColor; out AStrWidth: integer;
   ACharsSkipped: integer; AParts: PATLineParts;
   ADrawEvent: TATSynEditDrawLineEvent; ATextOffsetFromLine: integer;
-  AControlWidth: integer);
+  AControlWidth: integer; ALineWithCaret: boolean);
 var
   ListOffsets: TATLineOffsetsInfo;
   ListInt: TATIntArray;
@@ -696,8 +697,9 @@ begin
 
       bAllowLigatures:=
         {$ifdef windows}
-        IsStringSymbolsOnly(Buf) and
-        (Pos(#9, PartStr)=0);
+        not ALineWithCaret and
+        IsStringSymbolsOnly(Buf) and //disable if unicode chrs
+        (Pos(#9, PartStr)=0); //incorrect for str with tabs
         {$else}
         false;
         {$endif}
