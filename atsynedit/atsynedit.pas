@@ -456,6 +456,7 @@ type
     FOptMaxLinesToCountUnindent: integer;
     FOptScrollbarsNew: boolean;
     FOptScrollbarsNewArrowsKind: TATScrollArrowsKind;
+    FOptShowFontLigatures: boolean;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
     FOptShowStapleStyle: TATLineStyle;
@@ -1085,6 +1086,7 @@ type
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
     property OptScrollbarsNewArrowsKind: TATScrollArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default asaArrowsNormal;
+    property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
     property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle default cLineStyleSolid;
@@ -2029,7 +2031,7 @@ begin
           Event,
           FOptTextOffsetFromLine,
           ClientWidth+ACharSize.X*2,
-          LineWithCaret
+          FOptShowFontLigatures and not LineWithCaret
           )
       else
         CanvasTextOutMinimap(C,
@@ -2624,6 +2626,7 @@ begin
   FOptScrollbarsNew:= false;
   FOptScrollbarsNewArrowsKind:= asaArrowsNormal;
 
+  FOptShowFontLigatures:= true;
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
 
