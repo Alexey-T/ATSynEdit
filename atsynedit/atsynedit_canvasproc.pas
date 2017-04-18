@@ -9,6 +9,9 @@ unit ATSynEdit_CanvasProc;
 interface
 
 uses
+  {$ifdef windows}
+  Windows,
+  {$endif}
   Classes, SysUtils, Graphics, Types,
   ATStringProc;
 
@@ -153,6 +156,37 @@ var
 
 type
   TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
+
+function IsStringSymbolsOnly(const S: string): boolean;
+var
+  i, N: integer;
+begin
+  if S='' then exit(false);
+  for i:= 1 to Length(S) do
+  begin
+    N:= Ord(S[i]);
+    if (N<32) or (N>Ord('~')) then
+      exit(false);
+  end;
+  Result:= true;
+end;
+
+
+function _SelfTextOut(DC: HDC; X, Y: Integer; Rect: PRect;
+  const Str: string;
+  Dx: PInteger;
+  AllowLigatures: boolean
+  ): boolean;
+//override LCLIntf.ExtTextOut, on Win32 use DrawText to draw font ligatures
+//(Windows.ExtTextOut cannot)
+begin
+  {$ifdef windows}
+  if AllowLigatures then
+    Result:= Bool(Windows.DrawText(DC, PChar(Str), Length(Str), Rect^, DT_NOCLIP))
+  else
+  {$endif}
+  Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED+ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+end;
 
 
 procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
@@ -572,6 +606,7 @@ var
   PartRect: TRect;
   Buf: AnsiString;
   DxPointer: PInteger;
+  bAllowLigatures: boolean;
 begin
   if Str='' then Exit;
 
@@ -659,14 +694,22 @@ begin
       else
         DxPointer:= nil;
 
-      ExtTextOut(C.Handle,
+      bAllowLigatures:=
+        {$ifdef windows}
+        IsStringSymbolsOnly(Buf) and
+        (Pos(#9, PartStr)=0);
+        {$else}
+        false;
+        {$endif}
+
+      _SelfTextOut(C.Handle,
         PosX+PixOffset1,
         PosY+ATextOffsetFromLine,
-        ETO_CLIPPED+ETO_OPAQUE,
         @PartRect,
-        PChar(Buf),
-        Length(Buf),
-        DxPointer);
+        Buf,
+        DxPointer,
+        bAllowLigatures
+        );
 
       DoPaintHexChars(C,
         PartStr,
