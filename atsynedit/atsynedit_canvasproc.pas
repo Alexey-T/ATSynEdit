@@ -183,7 +183,7 @@ function _SelfTextOut(DC: HDC; X, Y: Integer; Rect: PRect;
 begin
   {$ifdef windows}
   if AllowLigatures then
-    Result:= Bool(Windows.DrawText(DC, PChar(Str), Length(Str), Rect^, DT_NOCLIP))
+    Result:= Bool(Windows.DrawText(DC, PChar(Str), Length(Str), Rect^, DT_NOCLIP or DT_NOPREFIX or DT_SINGLELINE))
   else
   {$endif}
   Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED+ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
