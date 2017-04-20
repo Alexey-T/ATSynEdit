@@ -2031,7 +2031,7 @@ begin
           Event,
           FOptTextOffsetFromLine,
           ClientWidth+ACharSize.X*2,
-          FOptShowFontLigatures and not LineWithCaret
+          FOptShowFontLigatures and (not LineWithCaret) and (GetCharSpacingX=0)
           )
       else
         CanvasTextOutMinimap(C,
