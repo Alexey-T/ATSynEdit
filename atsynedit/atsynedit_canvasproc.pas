@@ -173,20 +173,35 @@ begin
 end;
 
 
+//override LCLIntf.ExtTextOut on Win32 to draw font ligatures
 function _SelfTextOut(DC: HDC; X, Y: Integer; Rect: PRect;
-  const Str: string;
+  const Str: String;
   Dx: PInteger;
   AllowLigatures: boolean
   ): boolean;
-//override LCLIntf.ExtTextOut, on Win32 use DrawText to draw font ligatures
-//(Windows.ExtTextOut cannot)
+{$ifdef windows}
+var
+  CharPlaceInfo: TGCPRESULTS;
+  Glyphs: array of WideChar;
+{$endif}
 begin
   {$ifdef windows}
   if AllowLigatures then
-    Result:= Bool(Windows.DrawText(DC, PChar(Str), Length(Str), Rect^, DT_NOCLIP or DT_NOPREFIX or DT_SINGLELINE))
+  begin
+    ZeroMemory(@CharPlaceInfo, SizeOf(CharPlaceInfo));
+    CharPlaceInfo.lStructSize:= SizeOf(CharPlaceInfo);
+    SetLength(Glyphs, Length(Str));
+    CharPlaceInfo.lpGlyphs:= @Glyphs[0];
+    CharPlaceInfo.nGlyphs:= Length(Glyphs);
+
+    if GetCharacterPlacement(DC, PChar(Str), Length(Str), 0, @CharPlaceInfo, GCP_LIGATE)<> 0 then
+      Result:= Windows.ExtTextOut(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE or ETO_GLYPH_INDEX, Rect, Pointer(Glyphs), Length(Glyphs), Dx)
+    else
+      Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+  end
   else
   {$endif}
-  Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED+ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+  Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
 end;
 
 
