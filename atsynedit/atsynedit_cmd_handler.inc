@@ -15,15 +15,31 @@ procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
 begin
   inherited;
 
-  if not WantTabs then
-    if Key=VK_TAB then Exit;
-  if not WantReturns then
-    if Key=VK_RETURN then Exit;
-
-  if Key=VK_APPS then
-  begin
-    DoMenuText;
-    Exit
+  //special handle for spec keys
+  case Key of
+    VK_CONTROL,
+    VK_RCONTROL,
+    VK_MENU,
+    VK_RMENU,
+    VK_SHIFT,
+    VK_RSHIFT:
+      begin
+        //ignore Ctrl/Alt/Shift to not hide caret
+        exit;
+      end;
+    VK_TAB:
+      begin
+        if not WantTabs then exit;
+      end;
+    VK_RETURN:
+      begin
+        if not WantReturns then exit;
+      end;
+    VK_APPS:
+      begin
+        DoMenuText;
+        Exit
+      end;
   end;
 
   DoPaintModeStatic;
