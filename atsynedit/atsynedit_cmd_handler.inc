@@ -17,12 +17,10 @@ begin
 
   //special handle for spec keys
   case Key of
-    VK_CONTROL,
-    VK_RCONTROL,
-    VK_MENU,
-    VK_RMENU,
     VK_SHIFT,
-    VK_RSHIFT:
+    VK_CONTROL,
+    VK_MENU, //3 usual state keys
+    VK_LSHIFT..VK_RMENU: //also 6 state keys
       begin
         //ignore Ctrl/Alt/Shift to not hide caret
         exit;
@@ -38,7 +36,7 @@ begin
     VK_APPS:
       begin
         DoMenuText;
-        Exit
+        exit;
       end;
   end;
 
