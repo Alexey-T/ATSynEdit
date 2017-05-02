@@ -404,7 +404,7 @@ begin
   SetLength(Lens, AStrings.Count);
   for i:= 0 to Length(Lens)-1 do
     Lens[i]:= AStrings.LinesLen[i];
-  FBuffer.Setup(AStrings.TextString, Lens);
+  FBuffer.Setup(AStrings.TextString_Unicode, Lens);
   StrText:= FBuffer.FText;
 end;
 

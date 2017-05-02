@@ -858,7 +858,7 @@ begin
   SetLength(Lens, Ed.Strings.Count);
   for i:= 0 to Length(Lens)-1 do
     Lens[i]:= Ed.Strings.LinesLen[i];
-  Buffer.Setup(Ed.Strings.TextString, Lens);
+  Buffer.Setup(Ed.Strings.TextString_Unicode, Lens);
 
   DoAnalize(Ed, false);
   UpdateRanges;

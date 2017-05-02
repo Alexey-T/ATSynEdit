@@ -158,7 +158,8 @@ type
     procedure SetLineHint(Index: integer; const AValue: string);
     procedure SetLineSep(Index: integer; AValue: TATLineSeparator);
     procedure SetLineState(Index: integer; AValue: TATLineState);
-    function GetTextString: atString;
+    function GetTextString_Unicode: UnicodeString;
+    function GetTextString_UTF8: string;
     procedure DoLoadFromStream(Stream: TStream);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
@@ -230,7 +231,8 @@ type
     property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
-    property TextString: atString read GetTextString;
+    property TextString_Unicode: UnicodeString read GetTextString_Unicode;
+    property TextString_UTF8: string read GetTextString_UTF8;
     procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
     procedure TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
@@ -516,29 +518,34 @@ begin
 end;
 
 
-function TATStrings.GetTextString: atString;
+function TATStrings.GetTextString_Unicode: UnicodeString;
+begin
+  Result:= UTF8Decode(GetTextString_UTF8);
+end;
+
+function TATStrings.GetTextString_UTF8: string;
 const
   LenEol = 1;
-  CharEol: atChar = #10;
-  CharSize = SizeOf(atChar);
+  CharEol: char = #10;
 var
-  Len, i: integer;
+  Len, LastIndex, i: integer;
   Item: TATStringItem;
   Ptr: pointer;
-  Str: atString;
+  Str: string;
   bFinalEol: boolean;
 begin
   Result:= '';
   if Count=0 then Exit;
-  bFinalEol:= LinesEnds[Count-1]<>cEndNone;
+  LastIndex:= Count-1;
+  bFinalEol:= LinesEnds[LastIndex]<>cEndNone;
 
   Len:= 0;
-  for i:= 0 to Count-1 do
+  for i:= 0 to LastIndex do
   begin
     Item:= TATStringItem(FList[i]);
-    Str:= UTF8Decode(Item.ItemString);
+    Str:= Item.ItemString;
     Inc(Len, Length(Str));
-    if bFinalEol or (i<Count-1) then
+    if bFinalEol or (i<LastIndex) then
       Inc(Len, LenEol);
   end;
   if Len=0 then Exit;
@@ -546,22 +553,22 @@ begin
   SetLength(Result, Len);
   Ptr:= @Result[1];
 
-  for i:= 0 to Count-1 do
+  for i:= 0 to LastIndex do
   begin
     Item:= TATStringItem(FList[i]);
-    Str:= UTF8Decode(Item.ItemString);
+    Str:= Item.ItemString;
     Len:= Length(Str);
     //copy string
     if Len>0 then
     begin
-      Move(Str[1], Ptr^, Len*CharSize);
-      Inc(Ptr, Len*CharSize);
+      Move(Str[1], Ptr^, Len);
+      Inc(Ptr, Len);
     end;
     //copy eol
-    if bFinalEol or (i<Count-1) then
+    if bFinalEol or (i<LastIndex) then
     begin
-      PatChar(Ptr)^:= CharEol;
-      Inc(Ptr, LenEol*CharSize);
+      PChar(Ptr)^:= CharEol;
+      Inc(Ptr, LenEol);
     end;
   end;
 end;

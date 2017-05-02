@@ -4560,7 +4560,7 @@ end;
 function TATSynEdit.DoGetTextString: atString;
 begin
   //TATEdit overrides it
-  Result:= Strings.TextString;
+  Result:= Strings.TextString_Unicode;
 end;
 
 procedure TATSynEdit.DoEnter;
