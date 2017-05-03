@@ -319,7 +319,6 @@ type
     FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
     FPaintLocked: integer;
-    FPaintRunning: boolean;
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
     FWantTabs: boolean;
@@ -2506,7 +2505,6 @@ begin
   {$endif}
 
   FPaintLocked:= 0;
-  FPaintRunning:= false;
   FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
@@ -3092,9 +3090,7 @@ end;
 procedure TATSynEdit.Paint;
 begin
   if not HandleAllocated then exit;
-  FPaintRunning:= true;
   PaintEx(-1);
-  FPaintRunning:= false;
 end;
 
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
@@ -4107,7 +4103,7 @@ begin
         CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), FColors.Caret);
 
       if AWithInvalidate then
-        if not FPaintRunning then
+        if not (csCustomPaint in ControlState) then //disable during Paint
           InvalidateRect(Handle, @R, false);
     end;
   end;
