@@ -1,5 +1,44 @@
 {$ifdef none}begin end;{$endif}
 
+
+procedure TATStrings.TextReplaceInOneLine(AY, AX1, AX2: integer; const AText: atString);
+//simple, made to speedup mass-replace in CudaText
+//(usually match replaced inside one line)
+//IsIndexValid must be in outer func
+var
+  Str: atString;
+begin
+  Str:= Lines[AY];
+  Str:=
+    Copy(Str, 1, AX1-1) +
+    AText +
+    Copy(Str, AX2+1, MaxInt);
+  Lines[AY]:= Str;
+end;
+
+
+procedure TATStrings.TextReplaceRange(AFromX, AFromY, AToX, AToY: integer;
+  const AText: atString; out AShift, APosAfter: TPoint);
+var
+  bOneLine: boolean;
+begin
+  bOneLine:= (AFromY=AToY) and (Pos(#10, AText)=0);
+  if bOneLine then
+  begin
+    TextReplaceInOneLine(AFromY, AFromX, AToX, AText);
+    AShift:= Point(0, 0);
+    APosAfter:= Point(AFromX+Length(AText), AFromY);
+  end
+  else
+  begin
+    BeginUndoGroup;
+    TextDeleteRange(AFromX, AFromY, AToX, AToY, AShift, APosAfter);
+    TextInsert(AFromX, AFromY, AText, false, AShift, APosAfter);
+    EndUndoGroup;
+  end;
+end;
+
+
 procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean; out AShift, APosAfter: TPoint);
 var
   Str, StrLead, StrTail: atString;

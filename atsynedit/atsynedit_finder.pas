@@ -595,7 +595,6 @@ var
   Shift, PosAfter: TPoint;
   Str: UnicodeString;
   Strs: TATStrings;
-  NPos1, NPos2: integer;
 begin
   if OptRegex then
     Str:= StrReplacement
@@ -609,10 +608,7 @@ begin
     (APosEnd.Y>Strs.Count-1) or
     ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
 
-  Strs.BeginUndoGroup;
-  Strs.TextDeleteRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, Shift, PosAfter);
-  Strs.TextInsert(APosBegin.X, APosBegin.Y, Str, false, Shift, PosAfter);
-  Strs.EndUndoGroup;
+  Strs.TextReplaceRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, Str, Shift, PosAfter);
   FEditor.DoEventChange;
 
   //sync buffer

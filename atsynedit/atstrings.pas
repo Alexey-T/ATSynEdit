@@ -245,6 +245,9 @@ type
     procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+    procedure TextReplaceInOneLine(AY, AX1, AX2: integer; const AText: atString);
+    procedure TextReplaceRange(AFromX, AFromY, AToX, AToY: integer;
+      const AText: atString; out AShift, APosAfter: TPoint);
     function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: string = #10): atString;
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
