@@ -10,7 +10,7 @@ var
 begin
   Str:= Lines[AY];
   Str:=
-    Copy(Str, 1, AX1-1) +
+    Copy(Str, 1, AX1) +
     AText +
     Copy(Str, AX2+1, MaxInt);
   Lines[AY]:= Str;
