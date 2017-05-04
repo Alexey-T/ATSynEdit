@@ -26,8 +26,10 @@ begin
   if bOneLine then
   begin
     TextReplaceInOneLine(AFromY, AFromX, AToX, AText);
-    AShift:= Point(0, 0);
-    APosAfter:= Point(AFromX+Length(AText), AFromY);
+    AShift.X:= 0;
+    AShift.Y:= 0;
+    APosAfter.X:= AFromX+Length(AText);
+    APosAfter.Y:= AFromY;
   end
   else
   begin
