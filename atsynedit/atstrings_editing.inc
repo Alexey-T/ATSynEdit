@@ -41,6 +41,28 @@ begin
 end;
 
 
+function TATStrings.TextReplaceLines_UTF8(ALineFrom, ALineTo: integer;
+  ANewLines: TStringList): boolean;
+var
+  i: integer;
+begin
+  Result:= false;
+  if not IsIndexValid(ALineFrom) then exit;
+  if ALineTo<ALineFrom then exit;
+
+  BeginUndoGroup;
+
+  for i:= Min(ALineTo, Count-1) downto ALineFrom do
+    LineDelete(i);
+
+  for i:= ANewLines.Count-1 downto 0 do
+    LineInsert(ALineFrom, UTF8Decode(ANewLines[i]));
+
+  EndUndoGroup;
+  Result:= true;
+end;
+
+
 procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean; out AShift, APosAfter: TPoint);
 var
   Str, StrLead, StrTail: atString;
