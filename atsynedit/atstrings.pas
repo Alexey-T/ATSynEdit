@@ -764,6 +764,9 @@ begin
 end;
 
 procedure TATStrings.LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
+//AWithFinalEol:
+//  True to insert whole lines;
+//  False to insert whole lines except last + concat last item to existing line
 var
   Cnt, CntMove: integer;
   Str: atString;
