@@ -48,18 +48,18 @@ var
 begin
   Result:= false;
   if not IsIndexValid(ALineFrom) then exit;
-  if ALineTo<ALineFrom then exit;
+  Result:= true;
 
   BeginUndoGroup;
+  try
+    for i:= Min(ALineTo, Count-1) downto ALineFrom do
+      LineDelete(i);
 
-  for i:= Min(ALineTo, Count-1) downto ALineFrom do
-    LineDelete(i);
-
-  for i:= ANewLines.Count-1 downto 0 do
-    LineInsert(ALineFrom, UTF8Decode(ANewLines[i]));
-
-  EndUndoGroup;
-  Result:= true;
+    for i:= ANewLines.Count-1 downto 0 do
+      LineInsert(ALineFrom, UTF8Decode(ANewLines[i]));
+  finally
+    EndUndoGroup;
+  end;
 end;
 
 
