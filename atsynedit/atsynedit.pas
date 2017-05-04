@@ -344,6 +344,7 @@ type
     FSelRect: TRect;
     FSelRectBegin,
     FSelRectEnd: TPoint;
+    FScalePercents: integer;
     FCarets: TATCarets;
     FCaretBlinkEnabled: boolean;
     FCaretShapeIns,
@@ -583,6 +584,7 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
+    function DoScale(N: integer): integer;
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
     procedure DoSelectionDeleteColumnBlock;
@@ -723,6 +725,7 @@ type
     procedure SetLineTop(AValue: integer);
     procedure SetColumnLeft(AValue: integer);
     procedure SetLinesFromTop(AValue: integer);
+    procedure SetScalePercents(AValue: integer);
     procedure SetStrings(Obj: TATStrings);
     function GetRectMain: TRect;
     function GetRectMinimap: TRect;
@@ -883,6 +886,7 @@ type
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
     //common
+    property ScalePercents: integer read FScalePercents write SetScalePercents default 100;
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property EditorIndex: integer read FEditorIndex write FEditorIndex;
@@ -2449,9 +2453,10 @@ begin
   TabStop:= true;
 
   Width:= 300;
-  Height:= 200;
+  Height:= 250;
+  FScalePercents:= 100;
   Font.Name:= 'Courier New';
-  Font.Size:= {$ifndef darwin} 9 {$else} 14 {$endif};
+  Font.Size:= 9;
 
   FScrollbarVert:= TATScroll.Create(Self);
   FScrollbarVert.Hide;
@@ -4990,7 +4995,7 @@ begin
           Colors.GutterPlusBorder,
           Colors.GutterPlusBG,
           Point(AX, AY),
-          FOptGutterPlusSize,
+          DoScale(FOptGutterPlusSize),
           APlus);
       end;
     cGutterIconsTriangles:
@@ -4999,12 +5004,12 @@ begin
           CanvasPaintTriangleRight(C,
             Colors.GutterPlusBorder,
             Point(AX - FOptGutterPlusSize div 2, AY - FOptGutterPlusSize),
-            FOptGutterPlusSize)
+            DoScale(FOptGutterPlusSize))
         else
           CanvasPaintTriangleDown(C,
             Colors.GutterPlusBorder,
             Point(AX - FOptGutterPlusSize, AY - FOptGutterPlusSize div 2),
-            FOptGutterPlusSize)
+            DoScale(FOptGutterPlusSize))
       end;
   end;
 end;
@@ -5223,6 +5228,27 @@ begin
     end;
 end;
 
+function TATSynEdit.DoScale(N: integer): integer;
+begin
+  Result:= MulDiv(N, ScalePercents, 100);
+end;
+
+procedure TATSynEdit.SetScalePercents(AValue: integer);
+begin
+  if FScalePercents=AValue then Exit;
+  FScalePercents:= AValue;
+
+  FGutter[FGutterBandBm].Size:= DoScale(cGutterSizeBm);
+  FGutter[FGutterBandNum].Size:= DoScale(cGutterSizeNum);
+  FGutter[FGutterBandState].Size:= DoScale(cGutterSizeState);
+  FGutter[FGutterBandFold].Size:= DoScale(cGutterSizeFold);
+  FGutter[FGutterBandSep].Size:= DoScale(cGutterSizeSep);
+  FGutter[FGutterBandEmpty].Size:= DoScale(cGutterSizeEmpty);
+  FGutter.Update;
+
+  FScrollbarVert.Width:= DoScale(cEditorScrollbarWidth);
+  FScrollbarHorz.Height:= DoScale(cEditorScrollbarWidth);
+end;
 
 
 {$I atsynedit_carets.inc}
