@@ -48,6 +48,10 @@ type
 
 implementation
 
+const
+  cAdapterCacheMaxSize = 1000;
+  //500 lines in minimap on my monitor+ 100 lines in editor
+
 { TATAdapterHiliteCache }
 
 procedure TATAdapterHiliteCache.SetEnabled(AValue: boolean);
@@ -60,7 +64,7 @@ end;
 constructor TATAdapterHiliteCache.Create;
 begin
   FList:= TList.Create;
-  FMaxCount:= 200;
+  FMaxCount:= cAdapterCacheMaxSize;
 end;
 
 destructor TATAdapterHiliteCache.Destroy;
