@@ -46,10 +46,13 @@ uses ATSynEdit_Commands;
 { TfmCombo }
 
 procedure TfmCombo.FormCreate(Sender: TObject);
+const
+  cSizeY = 30;
 begin
   ed:= TATComboEdit.Create(Self);
   ed.Parent:= PanelCombo;
   ed.Align:= alBottom;
+  ed.Height:= cSizeY;
   ed.OnCommand:= @ComboCommand;
   //ed.Text:= 'combo';
   ed.OptTextHint:= '(empty)';
@@ -57,8 +60,11 @@ begin
   ed0:= TATEdit.Create(Self);
   ed0.Parent:= PanelEdit;
   ed0.Align:= alBottom;
+  ed0.Height:= cSizeY;
   //ed0.Text:= 'edit';
   ed0.OptTextHint:= '(empty)';
+
+  ActiveControl:= ed0;
 end;
 
 procedure TfmCombo.chkEnabledChange(Sender: TObject);

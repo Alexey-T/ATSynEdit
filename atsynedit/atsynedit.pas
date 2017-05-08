@@ -596,6 +596,7 @@ type
     function GetMinimapActualHeight: integer;
     function GetMinimapSelTop: integer;
     function GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
+    function GetOptTextOffsetTop: integer;
     function GetRectMinimapSel: TRect;
     procedure InitResourcesFoldbar;
     function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
@@ -1079,7 +1080,7 @@ type
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle default [fsItalic];
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
     property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft default 0;
-    property OptTextOffsetTop: integer read FOptTextOffsetTop write FOptTextOffsetTop default 0;
+    property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop default 0;
     property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine default cInitTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsIs;
@@ -2261,6 +2262,14 @@ begin
   Result:= Round(Percent * FWrapInfo.Count);
 end;
 
+function TATSynEdit.GetOptTextOffsetTop: integer;
+begin
+  if ModeOneLine then
+    Result:= (ClientHeight - TextCharSize.Y) div 2
+  else
+    Result:= FOptTextOffsetTop;
+end;
+
 procedure TATSynEdit.DoPaintMinimapSelTo(C: TCanvas);
 var
   R: TRect;
@@ -3007,11 +3016,11 @@ end;
 
 function TATSynEdit.GetTextOffset: TPoint;
 begin
-  Result.X:= FOptTextOffsetLeft;
+  Result.X:= OptTextOffsetLeft;
   if FOptGutterVisible then
     Inc(Result.X, FGutter.Width);
 
-  Result.Y:= FOptTextOffsetTop;
+  Result.Y:= OptTextOffsetTop;
   if FOptRulerVisible then
     Inc(Result.Y, FOptRulerSize);
 end;

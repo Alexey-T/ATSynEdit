@@ -3,13 +3,14 @@ object fmCombo: TfmCombo
   Height = 279
   Top = 398
   Width = 397
+  ActiveControl = PanelEdit
   Caption = 'Demo - ATEdit, ATComboEdit'
   ClientHeight = 279
   ClientWidth = 397
   Constraints.MinHeight = 200
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.7'
+  LCLVersion = '1.9.0.0'
   object PanelCombo: TPanel
     Left = 6
     Height = 58
@@ -25,7 +26,7 @@ object fmCombo: TfmCombo
       Left = 0
       Height = 17
       Top = 8
-      Width = 93
+      Width = 94
       Caption = 'ATComboEdit'
       ParentColor = False
     end
@@ -51,7 +52,7 @@ object fmCombo: TfmCombo
     Left = 8
     Height = 24
     Top = 136
-    Width = 80
+    Width = 82
     Caption = 'Enabled'
     Checked = True
     OnChange = chkEnabledChange
@@ -73,7 +74,7 @@ object fmCombo: TfmCombo
       Left = 0
       Height = 17
       Top = 8
-      Width = 44
+      Width = 45
       Caption = 'ATEdit'
       ParentColor = False
     end
@@ -88,10 +89,15 @@ object fmCombo: TfmCombo
     TabOrder = 4
   end
   object LabelMaxLen: TLabel
-    Left = 96
+    AnchorSideLeft.Control = edMaxLen
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = edMaxLen
+    AnchorSideTop.Side = asrCenter
+    Left = 94
     Height = 17
-    Top = 208
-    Width = 116
+    Top = 213
+    Width = 119
+    BorderSpacing.Left = 6
     Caption = 'Max length (if >0)'
     ParentColor = False
   end
@@ -99,7 +105,7 @@ object fmCombo: TfmCombo
     Left = 8
     Height = 24
     Top = 160
-    Width = 128
+    Width = 131
     Caption = 'Enabled mouse'
     Checked = True
     OnChange = chkEnMouseChange
