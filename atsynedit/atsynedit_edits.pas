@@ -10,7 +10,8 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Controls,
-  Menus, Math,
+  Menus, Math, Forms,
+  LCLType,
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATStringProc;
@@ -39,7 +40,7 @@ type
     FItems: TStringList;
     FItemIndex: integer;
     FMenu: TPopupMenu;
-    FArrowSize: integer;
+    FOptComboboxArrowSize: integer;
     procedure DoComboUpDown(ADown: boolean);
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
@@ -52,7 +53,7 @@ type
     procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
-    property OptComboboxArrowSize: integer read FArrowSize write FArrowSize default 4;
+    property OptComboboxArrowSize: integer read FOptComboboxArrowSize write FOptComboboxArrowSize default 2;
   end;
 
 
@@ -151,8 +152,9 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapWidth:= 22;
-  OptComboboxArrowSize:= 4;
+  OptMicromapWidth:= MulDiv(22, Screen.PixelsPerInch, 96);
+  OptComboboxArrowSize:= MulDiv(2, Screen.PixelsPerInch, 96);
+
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
 end;
@@ -170,9 +172,9 @@ begin
 
   CanvasPaintTriangleDown(C, Colors.ComboboxArrow,
     Point(
-      (ARect.Left+ARect.Right) div 2 - FArrowSize,
-      (ARect.Top+ARect.Bottom) div 2 - FArrowSize div 2),
-    FArrowSize);
+      (ARect.Left+ARect.Right) div 2,
+      (ARect.Top+ARect.Bottom) div 2),
+    FOptComboboxArrowSize);
 end;
 
 procedure TATComboEdit.DoMenu;
