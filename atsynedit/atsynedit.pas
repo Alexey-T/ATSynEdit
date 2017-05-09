@@ -867,6 +867,8 @@ type
     function ClientWidth: integer;
     function ClientHeight: integer;
     procedure DragDrop(Source: TObject; X, Y: Integer); override;
+    procedure AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy; const AFromPPI, AToPPI,
+      AOldFormWidth, ANewFormWidth: Integer); override;
     //updates
     procedure Invalidate; override;
     procedure InvalidateHilitingCache;
@@ -5256,7 +5258,18 @@ begin
   FGutter.Update;
 
   FScrollbarVert.Width:= DoScale(cEditorScrollbarWidth);
-  FScrollbarHorz.Height:= DoScale(cEditorScrollbarWidth);
+  FScrollbarVert.IndentArrow:= DoScale(FScrollbarVert.IndentArrow);
+  FScrollbarHorz.Height:= FScrollbarVert.Width;
+  FScrollbarHorz.IndentArrow:= FScrollbarVert.IndentArrow;
+  FScrollbarHorz.IndentCorner:= FScrollbarVert.Width;
+end;
+
+
+procedure TATSynEdit.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
+  const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer);
+begin
+  inherited;
+  ScalePercents:= MulDiv(100, AToPPI, AFromPPI);
 end;
 
 
