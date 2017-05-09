@@ -33,6 +33,7 @@ uses
   {$ifdef FPC}
   InterfaceBase,
   LCLIntf,
+  LCLType,
   {$endif}
   Classes, Types, Graphics,
   Controls, ExtCtrls, Forms;
@@ -156,6 +157,8 @@ type
     property Min: Integer read FMin write SetMin;
     property Max: Integer read FMax write SetMax;
     property PageSize: Integer read FPage write SetPage;
+    procedure AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy; const AFromPPI, AToPPI,
+      AOldFormWidth, ANewFormWidth: Integer); override;
   protected
     procedure Paint; override;
     procedure Resize; override;
@@ -170,8 +173,10 @@ type
     property Align;
     property Anchors;
     property BorderSpacing;
+    property Constraints;
     property Enabled;
     property DoubleBuffered;
+    property ParentShowHint;
     property PopupMenu;
     property ShowHint;
     property Visible;
@@ -248,6 +253,18 @@ begin
   FTimer.Enabled:= false;
   FreeAndNil(FBitmap);
   inherited;
+end;
+
+procedure TATScroll.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
+  const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer);
+begin
+  inherited;
+
+  Width:= MulDiv(Width, AToPPI, AFromPPI);
+  Height:= MulDiv(Height, AToPPI, AFromPPI);
+  IndentArrow:= MulDiv(IndentArrow, AToPPI, AFromPPI);
+  IndentArrLonger:= MulDiv(IndentArrLonger, AToPPI, AFromPPI);
+  IndentCorner:= MulDiv(IndentCorner, AToPPI, AFromPPI);
 end;
 
 procedure TATScroll.Paint;
@@ -406,6 +423,7 @@ end;
 procedure TATScroll.Resize;
 begin
   inherited;
+
   if Assigned(FBitmap) then
   begin
     //little complicated to speed up
@@ -420,6 +438,8 @@ begin
       FBitmap.Height:= Math.Max(FBitmap.Height, Height);
     end;
   end;
+
+  Invalidate;
 end;
 
 
@@ -464,7 +484,7 @@ begin
   if IsRectEmpty(R) then exit;
   if DoDrawEvent(Typ, C, R) then
     DoPaintStd_Arrow(C, R, Typ);
-end;    
+end;
 
 procedure TATScroll.DoPaintStd_Arrow(C: TCanvas; R: TRect;
   Typ: TATScrollElemType);
@@ -510,7 +530,7 @@ begin
       end;
     else
       Exit;
- end;     
+ end;
 
   C.Brush.Color:= ATScrollbarTheme.ColorArrowSign;
   C.Pen.Color:= ATScrollbarTheme.ColorArrowSign;
@@ -736,7 +756,7 @@ begin
     DoScrollBy(-1)
   else
   if FMouseDownOnPageDown and PtInRect(FRectPageDown, P) then
-    DoScrollBy(FPage)  
+    DoScrollBy(FPage)
   else
   if FMouseDownOnPageUp and PtInRect(FRectPageUp, P) then
     DoScrollBy(-FPage);
