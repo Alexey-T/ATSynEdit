@@ -5013,12 +5013,12 @@ begin
           CanvasPaintTriangleRight(C,
             Colors.GutterPlusBorder,
             Point(AX, AY),
-            DoScale(FOptGutterPlusSize))
+            DoScale(FOptGutterPlusSize div 2))
         else
           CanvasPaintTriangleDown(C,
             Colors.GutterPlusBorder,
             Point(AX, AY),
-            DoScale(FOptGutterPlusSize))
+            DoScale(FOptGutterPlusSize div 2))
       end;
   end;
 end;

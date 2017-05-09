@@ -809,9 +809,9 @@ begin
   C.Brush.Color:= AColor;
   C.Pen.Color:= AColor;
   C.Polygon([
-    Point(ACoord.X - ASize, ACoord.Y - ASize div 2),
-    Point(ACoord.X + ASize, ACoord.Y - ASize div 2),
-    Point(ACoord.X, ACoord.Y + ASize div 2)
+    Point(ACoord.X - ASize*2, ACoord.Y - ASize),
+    Point(ACoord.X + ASize*2, ACoord.Y - ASize),
+    Point(ACoord.X, ACoord.Y + ASize)
     ]);
 end;
 
@@ -820,9 +820,9 @@ begin
   C.Brush.Color:= AColor;
   C.Pen.Color:= AColor;
   C.Polygon([
-    Point(ACoord.X - ASize div 2, ACoord.Y - ASize),
-    Point(ACoord.X + ASize div 2, ACoord.Y),
-    Point(ACoord.X - ASize div 2, ACoord.Y + ASize)
+    Point(ACoord.X - ASize, ACoord.Y - ASize*2),
+    Point(ACoord.X + ASize, ACoord.Y),
+    Point(ACoord.X - ASize, ACoord.Y + ASize*2)
     ]);
 end;
 
