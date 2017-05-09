@@ -889,7 +889,6 @@ type
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
     //common
-    property ScalePercents: integer read FScalePercents write SetScalePercents default 100;
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property EditorIndex: integer read FEditorIndex write FEditorIndex;
@@ -5014,12 +5013,12 @@ begin
         if APlus then
           CanvasPaintTriangleRight(C,
             Colors.GutterPlusBorder,
-            Point(AX - FOptGutterPlusSize div 2, AY - FOptGutterPlusSize),
+            Point(AX, AY),
             DoScale(FOptGutterPlusSize))
         else
           CanvasPaintTriangleDown(C,
             Colors.GutterPlusBorder,
-            Point(AX - FOptGutterPlusSize, AY - FOptGutterPlusSize div 2),
+            Point(AX, AY),
             DoScale(FOptGutterPlusSize))
       end;
   end;
@@ -5241,7 +5240,7 @@ end;
 
 function TATSynEdit.DoScale(N: integer): integer;
 begin
-  Result:= MulDiv(N, ScalePercents, 100);
+  Result:= MulDiv(N, FScalePercents, 100);
 end;
 
 procedure TATSynEdit.SetScalePercents(AValue: integer);
@@ -5268,7 +5267,7 @@ procedure TATSynEdit.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
   const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer);
 begin
   inherited;
-  ScalePercents:= MulDiv(100, AToPPI, AFromPPI);
+  SetScalePercents(MulDiv(100, AToPPI, AFromPPI));
 end;
 
 
