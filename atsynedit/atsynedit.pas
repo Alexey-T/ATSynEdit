@@ -726,7 +726,6 @@ type
     procedure SetLineTop(AValue: integer);
     procedure SetColumnLeft(AValue: integer);
     procedure SetLinesFromTop(AValue: integer);
-    procedure SetScalePercents(AValue: integer);
     procedure SetStrings(Obj: TATStrings);
     function GetRectMain: TRect;
     function GetRectMinimap: TRect;
@@ -5243,10 +5242,12 @@ begin
   Result:= MulDiv(N, FScalePercents, 100);
 end;
 
-procedure TATSynEdit.SetScalePercents(AValue: integer);
+procedure TATSynEdit.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
+  const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer);
 begin
-  if FScalePercents=AValue then Exit;
-  FScalePercents:= AValue;
+  inherited;
+
+  FScalePercents:= MulDiv(100, AToPPI, AFromPPI);
 
   FGutter[FGutterBandBm].Size:= DoScale(cGutterSizeBm);
   FGutter[FGutterBandNum].Size:= DoScale(cGutterSizeNum);
@@ -5257,17 +5258,14 @@ begin
   FGutter.Update;
 
   FScrollbarVert.Width:= cEditorScrollbarWidth;
+  FScrollbarVert.IndentBorder:= cEditorScrollbarBorderSize;
+  FScrollbarVert.IndentArrow:= 3;
   FScrollbarHorz.Height:= cEditorScrollbarWidth;
-  FScrollbarVert.AutoAdjustLayout(lapDefault, 100, FScalePercents, 1, 1);
-  FScrollbarHorz.AutoAdjustLayout(lapDefault, 100, FScalePercents, 1, 1);
-end;
+  FScrollbarHorz.IndentBorder:= cEditorScrollbarBorderSize;
+  FScrollbarHorz.IndentArrow:= 3;
 
-
-procedure TATSynEdit.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
-  const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer);
-begin
-  inherited;
-  SetScalePercents(MulDiv(100, AToPPI, AFromPPI));
+  FScrollbarVert.AutoAdjustLayout(AMode, AFromPPI, AToPPI, 1, 1);
+  FScrollbarHorz.AutoAdjustLayout(AMode, AFromPPI, AToPPI, 1, 1);
 end;
 
 
