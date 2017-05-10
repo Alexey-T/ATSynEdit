@@ -4824,7 +4824,7 @@ begin
         C.Line(
           CoordXM,
           ACoordY2,
-          CoordXM + FOptGutterPlusSize,
+          CoordXM + DoScale(FOptGutterPlusSize),
           ACoordY2
           );
       end;
