@@ -581,13 +581,10 @@ var
   St: TFontStyles;
 begin
   if CanvasTextOutMustUseOffsets then exit(true);
-
-  {$ifdef linux}
-  //Linux: using offsets gives big slowdown
   if CanvasTextOutHorzSpacingUsed then exit(true);
-  {$endif}
 
-  //ignore fsUnderline, fsStrikeout
+  //detect result but presence of bold/italic tokens, for them offsets needed
+  //ignore underline, strikeout
   St:= C.Font.Style * [fsBold, fsItalic];
 
   if St=[] then Result:= AOffsets.ForNormal else
