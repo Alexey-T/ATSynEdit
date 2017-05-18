@@ -31,11 +31,7 @@ const
   //Win: seems no slowdown from offsets
   //OSX: better use offsets, fonts have float-width, e.g. 10.2 pixels
   //Linux gtk2: big slowdown from offsets
-  OptAlwaysUseOffsetsInTextout =
-    {$ifdef windows} true {$endif}
-    {$ifdef darwin} true {$endif}
-    {$ifdef linux} false {$endif}
-    ;
+  CanvasTextOutMustUseOffsets = {$ifdef linux} false {$else} true {$endif};
 var
   CanvasTextOutHorzSpacingUsed: boolean = false;
 
@@ -584,7 +580,7 @@ function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: atString;
 var
   St: TFontStyles;
 begin
-  if OptAlwaysUseOffsetsInTextout then exit(true);
+  if CanvasTextOutMustUseOffsets then exit(true);
 
   {$ifdef linux}
   //Linux: using offsets gives big slowdown

@@ -1787,7 +1787,7 @@ begin
 
   UpdateWrapInfo;
 
-  if not OptAlwaysUseOffsetsInTextout then
+  if not CanvasTextOutMustUseOffsets then
     DoUpdateFontNeedsOffsets(C);
 
   DoCalcLinks;
