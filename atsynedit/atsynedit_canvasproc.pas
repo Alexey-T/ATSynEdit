@@ -36,10 +36,8 @@ const
     {$ifdef darwin} true {$endif}
     {$ifdef linux} false {$endif}
     ;
-  OptAlwaysIgnoreOffsetsInTextout =
-    false;
-    //not good result in Qt:
-    //{$ifdef LCLQT} true {$else} false {$endif};
+var
+  CanvasTextOutHorzSpacingUsed: boolean = false;
 
 type
   TATLineStyle = (
@@ -587,7 +585,11 @@ var
   St: TFontStyles;
 begin
   if OptAlwaysUseOffsetsInTextout then exit(true);
-  if OptAlwaysIgnoreOffsetsInTextout then exit(false);
+
+  {$ifdef linux}
+  //Linux: using offsets gives big slowdown
+  if CanvasTextOutHorzSpacingUsed then exit(true);
+  {$endif}
 
   //ignore fsUnderline, fsStrikeout
   St:= C.Font.Style * [fsBold, fsItalic];

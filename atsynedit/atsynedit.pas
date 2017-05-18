@@ -2015,6 +2015,7 @@ begin
         Event:= nil;
 
       StrOut:= SRemoveAsciiControlChars(StrOut, WideChar(OptUnprintedReplaceSpecToCode));
+      CanvasTextOutHorzSpacingUsed:= OptCharSpacingX<>0;
 
       if AMainText then
         CanvasTextOut(C,
