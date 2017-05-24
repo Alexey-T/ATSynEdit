@@ -48,8 +48,8 @@ type
     FStrReplacement: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
-    procedure DoCollect_Usual(FromPos: integer; AWithEvent: boolean);
-    procedure DoCollect_Regex(FromPos: integer; AWithEvent: boolean);
+    procedure DoCollect_Usual(FromPos: integer; AWithEvent: boolean; AReplace: boolean);
+    procedure DoCollect_Regex(FromPos: integer; AWithEvent: boolean; AReplace: boolean);
     function DoCountAll(AWithEvent: boolean): integer;
     function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function DoFindMatchUsual(FromPos: integer): Integer;
@@ -313,7 +313,7 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Usual(FromPos: integer; AWithEvent: boolean);
+procedure TATTextFinder.DoCollect_Usual(FromPos: integer; AWithEvent: boolean; AReplace: boolean);
 var
   LastPos, N: Integer;
   Ok: boolean;
@@ -332,6 +332,8 @@ begin
       Res:= TATFinderResult.Create;
       Res.NPos:= N;
       Res.NLen:= Length(StrFind);
+      if AReplace then
+        Res.SReplaceTo:= StrReplace;
       MatchList.Add(Res);
 
       if AWithEvent then
@@ -356,7 +358,7 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Regex(FromPos: integer; AWithEvent: boolean);
+procedure TATTextFinder.DoCollect_Regex(FromPos: integer; AWithEvent: boolean; AReplace: boolean);
 var
   Obj: TRegExpr;
   Ok: boolean;
@@ -387,6 +389,8 @@ begin
       Res:= TATFinderResult.Create;
       Res.NPos:= Obj.MatchPos[0];
       Res.NLen:= Obj.MatchLen[0];
+      if AReplace then
+        Res.SReplaceTo:= GetRegexStrReplacement_WithObj(Obj, Obj.Match[0]);
       MatchList.Add(Res);
 
       if AWithEvent then
@@ -403,6 +407,8 @@ begin
         Res:= TATFinderResult.Create;
         Res.NPos:= Obj.MatchPos[0];
         Res.NLen:= Obj.MatchLen[0];
+        if AReplace then
+          Res.SReplaceTo:= GetRegexStrReplacement_WithObj(Obj, Obj.Match[0]);
         MatchList.Add(Res);
 
         if AWithEvent then
@@ -428,9 +434,9 @@ end;
 function TATTextFinder.DoCountAll(AWithEvent: boolean): integer;
 begin
   if OptRegex then
-    DoCollect_Regex(1, AWithEvent)
+    DoCollect_Regex(1, AWithEvent, false)
   else
-    DoCollect_Usual(1, AWithEvent);
+    DoCollect_Usual(1, AWithEvent, false);
 
   Result:= MatchList.Count;
   MatchList.Clear;
