@@ -46,14 +46,12 @@ type
     FStrReplace: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
-    procedure DoCollect_Usual(AList: TList; FromPos: integer; AWithEvent,
-      AWithConfirm: boolean);
-    procedure DoCollect_Regex(AList: TList; FromPos: integer; AWithEvent,
-      AWithConfirm: boolean);
-    function DoCountAll(AWithEvent: boolean): integer;
-    function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
-    function DoFindMatchUsual(FromPos: integer): Integer;
     function IsMatchUsual(APos: integer): boolean;
+    function DoFind_Usual(AFromPos: integer): boolean;
+    function DoFind_Regex(AFromPos: integer): boolean;
+    procedure DoCollect_Usual(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Regex(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
+    function DoCountAll(AWithEvent: boolean): integer;
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
     function GetRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString): UnicodeString;
@@ -230,28 +228,38 @@ begin
 end;
 
 
-function TATTextFinder.DoFindMatchUsual(FromPos: integer): integer;
+function TATTextFinder.DoFind_Usual(AFromPos: integer): boolean;
 var
-  LastPos, i: integer;
+  NLastPos, i: integer;
 begin
-  Result:= 0;
+  Result:= false;
   if StrText='' then exit;
   if StrFind='' then exit;
-  LastPos:= Length(StrText) - Length(StrFind) + 1;
+  NLastPos:= Length(StrText) - Length(StrFind) + 1;
 
   if not OptBack then
   begin
-    for i:= FromPos to LastPos do
-      if IsMatchUsual(i) then Exit(i);
+    for i:= AFromPos to NLastPos do
+      if IsMatchUsual(i) then
+      begin
+        FMatchPos:= i;
+        FMatchLen:= Length(StrFind);
+        exit(true);
+      end;
   end
   else
   begin
-    for i:= FromPos downto 1 do
-     if IsMatchUsual(i) then Exit(i);
+    for i:= AFromPos downto 1 do
+      if IsMatchUsual(i) then
+      begin
+        FMatchPos:= i;
+        FMatchLen:= Length(StrFind);
+        exit(true);
+      end;
   end;
 end;
 
-function TATTextFinder.DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
+function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
 var
   Obj: TRegExpr;
 begin
@@ -268,11 +276,11 @@ begin
     try
       Obj.Expression:= StrFind;
       Obj.InputString:= StrText;
-      Result:= Obj.ExecPos(FromPos);
+      Result:= Obj.ExecPos(AFromPos);
       if Result then
       begin
-        MatchPos:= Obj.MatchPos[0];
-        MatchLen:= Obj.MatchLen[0];
+        FMatchPos:= Obj.MatchPos[0];
+        FMatchLen:= Obj.MatchLen[0];
       end;
     except
       if Assigned(FOnBadRegex) then
@@ -316,7 +324,7 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Usual(AList: TList; FromPos: integer; AWithEvent, AWithConfirm: boolean);
+procedure TATTextFinder.DoCollect_Usual(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   LastPos, N: Integer;
   bOk, bContinue: boolean;
@@ -327,7 +335,7 @@ begin
   if StrFind='' then exit;
   LastPos:= Length(StrText) - Length(StrFind) + 1;
 
-  N:= FromPos;
+  N:= AFromPos;
   repeat
     if Application.Terminated then exit;
     if IsMatchUsual(N) then
@@ -364,7 +372,7 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Regex(AList: TList; FromPos: integer; AWithEvent, AWithConfirm: boolean);
+procedure TATTextFinder.DoCollect_Regex(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   Obj: TRegExpr;
   bOk, bContinue: boolean;
@@ -383,7 +391,7 @@ begin
     try
       Obj.Expression:= StrFind;
       Obj.InputString:= StrText;
-      if not Obj.ExecPos(FromPos) then exit;
+      if not Obj.ExecPos(AFromPos) then exit;
     except
       if Assigned(FOnBadRegex) then
         FOnBadRegex(Self);
@@ -967,7 +975,7 @@ begin
       FromPos:= AStartPos
     else
       FromPos:= FMatchPos+ASkipLen;
-    Result:= DoFindMatchRegex(FromPos, FMatchPos, FMatchLen);
+    Result:= DoFind_Regex(FromPos);
     if Result then DoOnFound;
     Exit
   end;
@@ -987,13 +995,8 @@ begin
       Dec(FMatchPos, ASkipLen);
   end;
 
-  FMatchPos:= DoFindMatchUsual(FMatchPos);
-  Result:= FMatchPos>0;
-  if Result then
-  begin
-    FMatchLen:= Length(StrFind);
-    DoOnFound;
-  end;
+  Result:= DoFind_Usual(FMatchPos);
+  if Result then DoOnFound;
 end;
 
 procedure TATEditorFinder.DoOnFound;
