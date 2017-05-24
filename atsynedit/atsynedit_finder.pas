@@ -27,6 +27,16 @@ type
     var AConfirm, AContinue: boolean) of object;
 
 type
+  { TATFinderResult }
+
+  TATFinderResult = class
+  public
+    NX, NY, NPos, NLen: integer;
+    SReplaceTo: UnicodeString;
+    constructor Create;
+  end;
+
+type
   { TATTextFinder }
 
   TATTextFinder = class
@@ -38,9 +48,9 @@ type
     FStrReplacement: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
+    procedure DoCollect_Usual(FromPos: integer; AWithEvent: boolean);
+    procedure DoCollect_Regex(FromPos: integer; AWithEvent: boolean);
     function DoCountAll(AWithEvent: boolean): integer;
-    function DoCountMatchesRegex(FromPos: integer; AWithEvent: boolean): integer;
-    function DoCountMatchesUsual(FromPos: integer; AWithEvent: boolean): Integer;
     function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function DoFindMatchUsual(FromPos: integer): Integer;
     function IsMatchUsual(APos: integer): boolean;
@@ -51,6 +61,7 @@ type
   protected
     procedure DoOnFound; virtual;
   public
+    MatchList: TList;
     OptBack: boolean; //for non-regex
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
@@ -154,6 +165,19 @@ begin
   Result:= StringReplace(Result, #1, '\\', [rfReplaceAll]);
 end;
 
+{ TATFinderResult }
+
+constructor TATFinderResult.Create;
+begin
+  NX:= -1;
+  NY:= -1;
+  NPos:= -1;
+  NLen:= 0;
+  SReplaceTo:= '';
+end;
+
+
+{ TATTextFinder }
 
 function TATTextFinder.IsMatchUsual(APos: integer): boolean;
 var
@@ -288,46 +312,57 @@ begin
   end;
 end;
 
-function TATTextFinder.DoCountMatchesUsual(FromPos: integer; AWithEvent: boolean): Integer;
+
+procedure TATTextFinder.DoCollect_Usual(FromPos: integer; AWithEvent: boolean);
 var
-  LastPos, i: Integer;
+  LastPos, N: Integer;
   Ok: boolean;
+  Res: TATFinderResult;
 begin
-  Result:= 0;
+  MatchList.Clear;
   if StrText='' then exit;
   if StrFind='' then exit;
   LastPos:= Length(StrText) - Length(StrFind) + 1;
 
-  for i:= FromPos to LastPos do
-  begin
+  N:= FromPos;
+  repeat
     if Application.Terminated then exit;
-    if IsMatchUsual(i) then
+    if IsMatchUsual(N) then
     begin
-      Inc(Result);
+      Res:= TATFinderResult.Create;
+      Res.NPos:= N;
+      Res.NLen:= Length(StrFind);
+      MatchList.Add(Res);
+
       if AWithEvent then
       begin
-        FMatchPos:= i;
-        FMatchLen:= Length(StrFind);
+        FMatchPos:= Res.NPos;
+        FMatchLen:= Res.NLen;
         DoOnFound;
       end;
 
       if Assigned(FOnProgress) then
       begin
         Ok:= true;
-        FOnProgress(Self, i, LastPos, Ok);
+        FOnProgress(Self, Res.NPos, LastPos, Ok);
         if not Ok then Break;
       end;
-    end;
-  end;
+
+      Inc(N, Res.NLen);
+    end
+    else
+      Inc(N);
+  until N>LastPos;
 end;
 
-function TATTextFinder.DoCountMatchesRegex(FromPos: integer; AWithEvent: boolean
-  ): integer;
+
+procedure TATTextFinder.DoCollect_Regex(FromPos: integer; AWithEvent: boolean);
 var
   Obj: TRegExpr;
   Ok: boolean;
+  Res: TATFinderResult;
 begin
-  Result:= 0;
+  MatchList.Clear;
   if StrFind='' then exit;
   if StrText='' then exit;
 
@@ -344,34 +379,43 @@ begin
     except
       if Assigned(FOnBadRegex) then
         FOnBadRegex(Self);
-      Exit(0);
+      Exit;
     end;
 
     if Ok then
     begin
-      Inc(Result);
+      Res:= TATFinderResult.Create;
+      Res.NPos:= Obj.MatchPos[0];
+      Res.NLen:= Obj.MatchLen[0];
+      MatchList.Add(Res);
+
       if AWithEvent then
       begin
-        FMatchPos:= Obj.MatchPos[0];
-        FMatchLen:= Obj.MatchLen[0];
+        FMatchPos:= Res.NPos;
+        FMatchLen:= Res.NLen;
         DoOnFound;
       end;
 
       while Obj.ExecNext do
       begin
         if Application.Terminated then exit;
-        Inc(Result);
+
+        Res:= TATFinderResult.Create;
+        Res.NPos:= Obj.MatchPos[0];
+        Res.NLen:= Obj.MatchLen[0];
+        MatchList.Add(Res);
+
         if AWithEvent then
         begin
-          FMatchPos:= Obj.MatchPos[0];
-          FMatchLen:= Obj.MatchLen[0];
+          FMatchPos:= Res.NPos;
+          FMatchLen:= Res.NLen;
           DoOnFound;
         end;
 
         if Assigned(FOnProgress) then
         begin
           Ok:= true;
-          FOnProgress(Self, Obj.MatchPos[0], Length(StrText), Ok);
+          FOnProgress(Self, Res.NPos, Length(StrText), Ok);
           if not Ok then Break;
         end;
       end;
@@ -384,9 +428,12 @@ end;
 function TATTextFinder.DoCountAll(AWithEvent: boolean): integer;
 begin
   if OptRegex then
-    Result:= DoCountMatchesRegex(1, AWithEvent)
+    DoCollect_Regex(1, AWithEvent)
   else
-    Result:= DoCountMatchesUsual(1, AWithEvent);
+    DoCollect_Usual(1, AWithEvent);
+
+  Result:= MatchList.Count;
+  MatchList.Clear;
 end;
 
 
@@ -843,10 +890,12 @@ begin
   OptRegex:= false;
   FMatchPos:= -1;
   FMatchLen:= 0;
+  MatchList:= TList.Create;
 end;
 
 destructor TATTextFinder.Destroy;
 begin
+  FreeAndNil(MatchList);
   inherited Destroy;
 end;
 
