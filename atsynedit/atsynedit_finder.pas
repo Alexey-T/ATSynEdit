@@ -47,8 +47,8 @@ type
     FStrReplacement: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
-    procedure DoCollect_Usual(FromPos: integer; AWithEvent: boolean);
-    procedure DoCollect_Regex(FromPos: integer; AWithEvent: boolean);
+    procedure DoCollect_Usual(FromPos: integer; AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Regex(FromPos: integer; AWithEvent, AWithConfirm: boolean);
     function DoCountAll(AWithEvent: boolean): integer;
     function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function DoFindMatchUsual(FromPos: integer): Integer;
@@ -59,6 +59,8 @@ type
     function GetRegexStrReplacement_FromText(const ASelText: UnicodeString): UnicodeString;
   protected
     procedure DoOnFound; virtual;
+    procedure DoConfirmReplace(APos, ALen: integer;
+      var AConfirmThis, AConfirmContinue: boolean); virtual;
   public
     MatchList: TList;
     OptBack: boolean; //for non-regex
@@ -130,6 +132,8 @@ type
     property CurrentFragmentIndex: integer read FFragmentIndex write SetFragmentIndex;
   protected
     procedure DoOnFound; override;
+    procedure DoConfirmReplace(APos, ALen: integer;
+      var AConfirmThis, AConfirmContinue: boolean); override;
   public
     OptFromCaret: boolean;
     OptConfirmReplace: boolean;
@@ -218,6 +222,14 @@ procedure TATTextFinder.DoOnFound;
 begin
   //
 end;
+
+procedure TATTextFinder.DoConfirmReplace(APos, ALen: integer;
+  var AConfirmThis, AConfirmContinue: boolean);
+begin
+  AConfirmThis:= true;
+  AConfirmContinue:= true;
+end;
+
 
 function TATTextFinder.DoFindMatchUsual(FromPos: integer): Integer;
 var
@@ -309,10 +321,10 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Usual(FromPos: integer; AWithEvent: boolean);
+procedure TATTextFinder.DoCollect_Usual(FromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   LastPos, N: Integer;
-  Ok: boolean;
+  bOk, bContinue: boolean;
   Res: TATFinderResult;
 begin
   MatchList.Clear;
@@ -325,6 +337,13 @@ begin
     if Application.Terminated then exit;
     if IsMatchUsual(N) then
     begin
+      if AWithConfirm then
+      begin
+        DoConfirmReplace(N, Length(StrFind), bOk, bContinue);
+        if not bContinue then exit;
+        if not bOk then begin Inc(N, Length(StrFind)); Continue; end;
+      end;
+
       Res:= TATFinderResult.Create(N, Length(StrFind));
       MatchList.Add(Res);
 
@@ -337,12 +356,12 @@ begin
 
       if Assigned(FOnProgress) then
       begin
-        Ok:= true;
-        FOnProgress(Self, Res.NPos, LastPos, Ok);
-        if not Ok then Break;
+        bOk:= true;
+        FOnProgress(Self, Res.NPos, LastPos, bOk);
+        if not bOk then Break;
       end;
 
-      Inc(N, Res.NLen);
+      Inc(N, Length(StrFind));
     end
     else
       Inc(N);
@@ -350,10 +369,10 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Regex(FromPos: integer; AWithEvent: boolean);
+procedure TATTextFinder.DoCollect_Regex(FromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   Obj: TRegExpr;
-  Ok: boolean;
+  bOk, bContinue: boolean;
   Res: TATFinderResult;
 begin
   MatchList.Clear;
@@ -369,14 +388,21 @@ begin
     try
       Obj.Expression:= StrFind;
       Obj.InputString:= StrText;
-      Ok:= Obj.ExecPos(FromPos);
+      if not Obj.ExecPos(FromPos) then exit;
     except
       if Assigned(FOnBadRegex) then
         FOnBadRegex(Self);
-      Exit;
+      exit;
     end;
 
-    if Ok then
+    bOk:= true;
+    if AWithConfirm then
+    begin
+      DoConfirmReplace(Obj.MatchPos[0], Obj.MatchLen[0], bOk, bContinue);
+      if not bContinue then exit;
+    end;
+
+    if bOk then
     begin
       Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
       MatchList.Add(Res);
@@ -387,10 +413,17 @@ begin
         FMatchLen:= Res.NLen;
         DoOnFound;
       end;
+    end;
 
       while Obj.ExecNext do
       begin
         if Application.Terminated then exit;
+        if AWithConfirm then
+        begin
+          DoConfirmReplace(Obj.MatchPos[0], Obj.MatchLen[0], bOk, bContinue);
+          if not bContinue then exit;
+          if not bOk then Continue;
+        end;
 
         Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
         MatchList.Add(Res);
@@ -404,12 +437,11 @@ begin
 
         if Assigned(FOnProgress) then
         begin
-          Ok:= true;
-          FOnProgress(Self, Res.NPos, Length(StrText), Ok);
-          if not Ok then Break;
+          bOk:= true;
+          FOnProgress(Self, Res.NPos, Length(StrText), bOk);
+          if not bOk then exit;
         end;
       end;
-    end;
   finally
     FreeAndNil(Obj);
   end;
@@ -418,9 +450,9 @@ end;
 function TATTextFinder.DoCountAll(AWithEvent: boolean): integer;
 begin
   if OptRegex then
-    DoCollect_Regex(1, AWithEvent)
+    DoCollect_Regex(1, AWithEvent, false)
   else
-    DoCollect_Usual(1, AWithEvent);
+    DoCollect_Usual(1, AWithEvent, false);
 
   Result:= MatchList.Count;
   MatchList.Clear;
@@ -612,9 +644,9 @@ begin
   Result:= 0;
 
   if OptRegex then
-    DoCollect_Regex(1, true)
+    DoCollect_Regex(1, true, OptConfirmReplace)
   else
-    DoCollect_Usual(1, true);
+    DoCollect_Usual(1, true, OptConfirmReplace);
 
   for i:= MatchList.Count-1 downto 0 do
   begin
@@ -1071,5 +1103,21 @@ begin
   end;
 end;
 
+procedure TATEditorFinder.DoConfirmReplace(APos, ALen: integer;
+  var AConfirmThis, AConfirmContinue: boolean);
+var
+  P1, P2: TPoint;
+begin
+  AConfirmThis:= true;
+  AConfirmContinue:= true;
+
+  if Assigned(FOnConfirmReplace) then
+  begin
+    P1:= ConvertBufferPosToCaretPos(APos);
+    P2:= ConvertBufferPosToCaretPos(APos+ALen);
+    FEditor.DoCaretSingle(P1.X, P1.Y);
+    FOnConfirmReplace(Self, P1, P2, true, AConfirmThis, AConfirmContinue);
+  end;
+end;
 
 end.
