@@ -56,8 +56,8 @@ type
     function IsMatchUsual(APos: integer): boolean;
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
-    procedure UpdateRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString);
-    procedure UpdateRegexStrReplacement_FromText(const ASelText: UnicodeString);
+    function GetRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString): UnicodeString;
+    function GetRegexStrReplacement_FromText(const ASelText: UnicodeString): UnicodeString;
   protected
     procedure DoOnFound; virtual;
   public
@@ -273,22 +273,22 @@ begin
     begin
       MatchPos:= Obj.MatchPos[0];
       MatchLen:= Obj.MatchLen[0];
-      UpdateRegexStrReplacement_WithObj(Obj, Obj.Match[0]);
+      FStrReplacement:= GetRegexStrReplacement_WithObj(Obj, Obj.Match[0]);
     end;
   finally
     FreeAndNil(Obj);
   end;
 end;
 
-procedure TATTextFinder.UpdateRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString);
+function TATTextFinder.GetRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString): UnicodeString;
 begin
   if StrReplace='' then
-    FStrReplacement:= ''
+    Result:= ''
   else
-    FStrReplacement:= Obj.Replace(AFoundString, SRegexReplaceEscapedTabs(StrReplace), true);
+    Result:= Obj.Replace(AFoundString, SRegexReplaceEscapedTabs(StrReplace), true);
 end;
 
-procedure TATTextFinder.UpdateRegexStrReplacement_FromText(const ASelText: UnicodeString);
+function TATTextFinder.GetRegexStrReplacement_FromText(const ASelText: UnicodeString): UnicodeString;
 var
   Obj: TRegExpr;
 begin
@@ -306,7 +306,7 @@ begin
       exit;
     end;
 
-    UpdateRegexStrReplacement_WithObj(Obj, ASelText);
+    Result:= GetRegexStrReplacement_WithObj(Obj, ASelText);
   finally
     FreeAndNil(Obj);
   end;
@@ -871,7 +871,7 @@ begin
   Caret.EndY:= -1;
 
   if OptRegex then
-    UpdateRegexStrReplacement_FromText(SSelText);
+    FStrReplacement:= GetRegexStrReplacement_FromText(SSelText);
 
   DoReplaceTextInEditor(P1, P2, FSkipLen);
   Result:= true;
