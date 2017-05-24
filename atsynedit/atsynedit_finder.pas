@@ -44,7 +44,6 @@ type
     FMatchLen: integer;
     FStrFind: UnicodeString;
     FStrReplace: UnicodeString;
-    FStrReplacement: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
     procedure DoCollect_Usual(AList: TList; FromPos: integer; AWithEvent,
@@ -72,7 +71,6 @@ type
     StrText: UnicodeString;
     property StrFind: UnicodeString read FStrFind write SetStrFind;
     property StrReplace: UnicodeString read FStrReplace write SetStrReplace;
-    property StrReplacement: UnicodeString read FStrReplacement; //for regex
     constructor Create;
     destructor Destroy; override;
     function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
@@ -232,7 +230,7 @@ begin
 end;
 
 
-function TATTextFinder.DoFindMatchUsual(FromPos: integer): Integer;
+function TATTextFinder.DoFindMatchUsual(FromPos: integer): integer;
 var
   LastPos, i: integer;
 begin
@@ -253,8 +251,7 @@ begin
   end;
 end;
 
-function TATTextFinder.DoFindMatchRegex(FromPos: integer;
-  var MatchPos, MatchLen: integer): boolean;
+function TATTextFinder.DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
 var
   Obj: TRegExpr;
 begin
@@ -272,17 +269,14 @@ begin
       Obj.Expression:= StrFind;
       Obj.InputString:= StrText;
       Result:= Obj.ExecPos(FromPos);
+      if Result then
+      begin
+        MatchPos:= Obj.MatchPos[0];
+        MatchLen:= Obj.MatchLen[0];
+      end;
     except
       if Assigned(FOnBadRegex) then
         FOnBadRegex(Self);
-      Result:= false;
-    end;
-
-    if Result then
-    begin
-      MatchPos:= Obj.MatchPos[0];
-      MatchLen:= Obj.MatchLen[0];
-      FStrReplacement:= GetRegexStrReplacement_WithObj(Obj, Obj.Match[0]);
     end;
   finally
     FreeAndNil(Obj);
@@ -851,7 +845,7 @@ begin
       if ConfirmThis then
       begin
         if OptRegex then
-          SNew:= StrReplacement
+          SNew:= GetRegexStrReplacement_FromText(FBuffer.SubString(MatchPos, MatchLen))
         else
           SNew:= StrReplace;
 
@@ -931,10 +925,7 @@ begin
   Caret.EndY:= -1;
 
   if OptRegex then
-  begin
-    FStrReplacement:= GetRegexStrReplacement_FromText(SSelText);
-    SNew:= StrReplacement;
-  end
+    SNew:= GetRegexStrReplacement_FromText(SSelText)
   else
     SNew:= StrReplace;
 
@@ -948,7 +939,6 @@ begin
   StrText:= '';
   FStrFind:= '';
   FStrReplace:= '';
-  FStrReplacement:= '';
   OptBack:= false;
   OptCase:= false;
   OptWords:= false;
