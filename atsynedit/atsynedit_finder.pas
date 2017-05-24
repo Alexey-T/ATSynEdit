@@ -45,6 +45,7 @@ type
     FStrFind: UnicodeString;
     FStrReplace: UnicodeString;
     FRegex: TRegExpr;
+    FPrevProgress: integer;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
     function IsMatchUsual(APos: integer): boolean;
@@ -56,6 +57,7 @@ type
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
     function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
+    function IsProgressNeeded(ANewPos: integer): boolean;
   protected
     procedure DoOnFound; virtual;
     procedure DoConfirmReplace(APos, ALen: integer;
@@ -301,6 +303,14 @@ begin
 end;
 
 
+function TATTextFinder.IsProgressNeeded(ANewPos: integer): boolean;
+begin
+  Result:= Abs(FPrevProgress-ANewPos) >= 2000;
+  if Result then
+    FPrevProgress:= ANewPos;
+end;
+
+
 procedure TATTextFinder.DoCollect_Usual(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   LastPos, N: Integer;
@@ -334,6 +344,7 @@ begin
         DoOnFound;
       end;
 
+      if IsProgressNeeded(Res.NPos) then
       if Assigned(FOnProgress) then
       begin
         bOk:= true;
@@ -410,6 +421,7 @@ begin
       DoOnFound;
     end;
 
+    if IsProgressNeeded(Res.NPos) then
     if Assigned(FOnProgress) then
     begin
       bOk:= true;
