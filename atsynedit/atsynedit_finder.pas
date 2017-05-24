@@ -47,8 +47,10 @@ type
     FStrReplacement: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
-    procedure DoCollect_Usual(FromPos: integer; AWithEvent, AWithConfirm: boolean);
-    procedure DoCollect_Regex(FromPos: integer; AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Usual(AList: TList; FromPos: integer; AWithEvent,
+      AWithConfirm: boolean);
+    procedure DoCollect_Regex(AList: TList; FromPos: integer; AWithEvent,
+      AWithConfirm: boolean);
     function DoCountAll(AWithEvent: boolean): integer;
     function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function DoFindMatchUsual(FromPos: integer): Integer;
@@ -62,7 +64,6 @@ type
     procedure DoConfirmReplace(APos, ALen: integer;
       var AConfirmThis, AConfirmContinue: boolean); virtual;
   public
-    MatchList: TList;
     OptBack: boolean; //for non-regex
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
@@ -321,13 +322,13 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Usual(FromPos: integer; AWithEvent, AWithConfirm: boolean);
+procedure TATTextFinder.DoCollect_Usual(AList: TList; FromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   LastPos, N: Integer;
   bOk, bContinue: boolean;
   Res: TATFinderResult;
 begin
-  MatchList.Clear;
+  AList.Clear;
   if StrText='' then exit;
   if StrFind='' then exit;
   LastPos:= Length(StrText) - Length(StrFind) + 1;
@@ -345,7 +346,7 @@ begin
       end;
 
       Res:= TATFinderResult.Create(N, Length(StrFind));
-      MatchList.Add(Res);
+      AList.Add(Res);
 
       if AWithEvent then
       begin
@@ -369,13 +370,13 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Regex(FromPos: integer; AWithEvent, AWithConfirm: boolean);
+procedure TATTextFinder.DoCollect_Regex(AList: TList; FromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   Obj: TRegExpr;
   bOk, bContinue: boolean;
   Res: TATFinderResult;
 begin
-  MatchList.Clear;
+  AList.Clear;
   if StrFind='' then exit;
   if StrText='' then exit;
 
@@ -405,7 +406,7 @@ begin
     if bOk then
     begin
       Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
-      MatchList.Add(Res);
+      AList.Add(Res);
 
       if AWithEvent then
       begin
@@ -426,7 +427,7 @@ begin
       end;
 
       Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
-      MatchList.Add(Res);
+      AList.Add(Res);
 
       if AWithEvent then
       begin
@@ -448,14 +449,19 @@ begin
 end;
 
 function TATTextFinder.DoCountAll(AWithEvent: boolean): integer;
+var
+  L: TList;
 begin
-  if OptRegex then
-    DoCollect_Regex(1, AWithEvent, false)
-  else
-    DoCollect_Usual(1, AWithEvent, false);
-
-  Result:= MatchList.Count;
-  MatchList.Clear;
+  L:= TList.Create;
+  try
+    if OptRegex then
+      DoCollect_Regex(L, 1, AWithEvent, false)
+    else
+      DoCollect_Usual(L, 1, AWithEvent, false);
+    Result:= L.Count;
+  finally
+    FreeAndNil(L);
+  end;
 end;
 
 
@@ -635,6 +641,7 @@ end;
 
 function TATEditorFinder.DoReplaceAll: integer;
 var
+  L: TList;
   Res: TATFinderResult;
   Str: UnicodeString;
   P1, P2: TPoint;
@@ -643,35 +650,40 @@ var
 begin
   Result:= 0;
 
-  if OptRegex then
-    DoCollect_Regex(1, true, OptConfirmReplace)
-  else
-    DoCollect_Usual(1, true, OptConfirmReplace);
-
-  for i:= MatchList.Count-1 downto 0 do
-  begin
-    Res:= TATFinderResult(MatchList[i]);
-
+  L:= TList.Create;
+  try
     if OptRegex then
-      Str:= GetRegexStrReplacement_FromText(FBuffer.SubString(Res.NPos, Res.NLen))
+      DoCollect_Regex(L, 1, true, OptConfirmReplace)
     else
-      Str:= StrReplace;
+      DoCollect_Usual(L, 1, true, OptConfirmReplace);
 
-    P1:= ConvertBufferPosToCaretPos(Res.NPos);
-    P2:= ConvertBufferPosToCaretPos(Res.NPos+Res.NLen);
-    DoReplaceTextInEditor(P1, P2, Str);
-    Inc(Result);
-
-    if Application.Terminated then exit;
-    if FReplacedAtEndOfText then exit;
-    if StrText='' then exit;
-
-    if Assigned(FOnProgress) then
+    for i:= L.Count-1 downto 0 do
     begin
-      Ok:= true;
-      FOnProgress(Self, Res.NPos, Length(StrText), Ok);
-      if not Ok then exit;
+      Res:= TATFinderResult(L[i]);
+
+      if OptRegex then
+        Str:= GetRegexStrReplacement_FromText(FBuffer.SubString(Res.NPos, Res.NLen))
+      else
+        Str:= StrReplace;
+
+      P1:= ConvertBufferPosToCaretPos(Res.NPos);
+      P2:= ConvertBufferPosToCaretPos(Res.NPos+Res.NLen);
+      DoReplaceTextInEditor(P1, P2, Str);
+      Inc(Result);
+
+      if Application.Terminated then exit;
+      if FReplacedAtEndOfText then exit;
+      if StrText='' then exit;
+
+      if Assigned(FOnProgress) then
+      begin
+        Ok:= true;
+        FOnProgress(Self, Res.NPos, Length(StrText), Ok);
+        if not Ok then exit;
+      end;
     end;
+  finally
+    FreeAndNil(L);
   end;
 end;
 
@@ -936,12 +948,10 @@ begin
   OptRegex:= false;
   FMatchPos:= -1;
   FMatchLen:= 0;
-  MatchList:= TList.Create;
 end;
 
 destructor TATTextFinder.Destroy;
 begin
-  FreeAndNil(MatchList);
   inherited Destroy;
 end;
 
