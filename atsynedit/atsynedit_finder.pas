@@ -121,7 +121,7 @@ type
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
-      const AReplacement: UnicodeString);
+      const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean);
     function IsSelectionStartsAtFoundMatch: boolean;
     //fragments
     procedure DoFragmentsClear;
@@ -653,9 +653,9 @@ begin
   L:= TList.Create;
   try
     if OptRegex then
-      DoCollect_Regex(L, 1, true, OptConfirmReplace)
+      DoCollect_Regex(L, 1, false, OptConfirmReplace)
     else
-      DoCollect_Usual(L, 1, true, OptConfirmReplace);
+      DoCollect_Usual(L, 1, false, OptConfirmReplace);
 
     for i:= L.Count-1 downto 0 do
     begin
@@ -668,20 +668,24 @@ begin
 
       P1:= ConvertBufferPosToCaretPos(Res.NPos);
       P2:= ConvertBufferPosToCaretPos(Res.NPos+Res.NLen);
-      DoReplaceTextInEditor(P1, P2, Str);
+      DoReplaceTextInEditor(P1, P2, Str, false, false);
       Inc(Result);
 
       if Application.Terminated then exit;
       if FReplacedAtEndOfText then exit;
-      if StrText='' then exit;
 
+      {
+      //gives progress rolling back
       if Assigned(FOnProgress) then
       begin
         Ok:= true;
         FOnProgress(Self, Res.NPos, Length(StrText), Ok);
         if not Ok then exit;
       end;
+      }
     end;
+
+    FEditor.DoEventChange;
   finally
     FreeAndNil(L);
   end;
@@ -689,7 +693,7 @@ end;
 
 
 procedure TATEditorFinder.DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
-  const AReplacement: UnicodeString);
+  const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean);
 var
   Shift, PosAfter: TPoint;
   Strs: TATStrings;
@@ -701,18 +705,21 @@ begin
     ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
 
   Strs.TextReplaceRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, AReplacement, Shift, PosAfter);
-  FEditor.DoEventChange;
 
-  //sync buffer
-  UpdateBuffer_FromStrings(Strs);
-
-  if not OptBack then
+  if AUpdateBuffer then
   begin
-    //correct caret pos
-    //e.g. replace "dddddd" to "--": move lefter
-    //e.g. replace "ab" to "cd cd": move righter
-    FEditor.DoCaretSingle(PosAfter.X, PosAfter.Y);
+    FEditor.DoEventChange;
+    UpdateBuffer_FromStrings(Strs);
   end;
+
+  if AUpdateCaret then
+    if not OptBack then
+    begin
+      //correct caret pos
+      //e.g. replace "dddddd" to "--": move lefter
+      //e.g. replace "ab" to "cd cd": move righter
+      FEditor.DoCaretSingle(PosAfter.X, PosAfter.Y);
+    end;
 end;
 
 function TATEditorFinder.GetOffsetStartPos: integer;
@@ -848,7 +855,7 @@ begin
         else
           SNew:= StrReplace;
 
-        DoReplaceTextInEditor(P1, P2, SNew);
+        DoReplaceTextInEditor(P1, P2, SNew, true, true);
 
         FSkipLen:= Length(SNew);
         if OptRegex then
@@ -931,7 +938,7 @@ begin
   else
     SNew:= StrReplace;
 
-  DoReplaceTextInEditor(P1, P2, SNew);
+  DoReplaceTextInEditor(P1, P2, SNew, true, true);
   Result:= true;
 end;
 
