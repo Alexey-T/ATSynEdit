@@ -620,6 +620,10 @@ function TATEditorFinder.DoReplaceAll: integer;
 var
   Ok, bChanged: boolean;
 begin
+  //todo: replace all to
+  //1) one call DoCollect (improve DoCollect?),
+  //2) loop over MatchList, downto, with replaces
+
   Result:= 0;
   if DoFindOrReplace_Inner(false, true, true, bChanged) then
   begin
