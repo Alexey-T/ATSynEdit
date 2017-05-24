@@ -415,33 +415,33 @@ begin
       end;
     end;
 
-      while Obj.ExecNext do
+    while Obj.ExecNext do
+    begin
+      if Application.Terminated then exit;
+      if AWithConfirm then
       begin
-        if Application.Terminated then exit;
-        if AWithConfirm then
-        begin
-          DoConfirmReplace(Obj.MatchPos[0], Obj.MatchLen[0], bOk, bContinue);
-          if not bContinue then exit;
-          if not bOk then Continue;
-        end;
-
-        Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
-        MatchList.Add(Res);
-
-        if AWithEvent then
-        begin
-          FMatchPos:= Res.NPos;
-          FMatchLen:= Res.NLen;
-          DoOnFound;
-        end;
-
-        if Assigned(FOnProgress) then
-        begin
-          bOk:= true;
-          FOnProgress(Self, Res.NPos, Length(StrText), bOk);
-          if not bOk then exit;
-        end;
+        DoConfirmReplace(Obj.MatchPos[0], Obj.MatchLen[0], bOk, bContinue);
+        if not bContinue then exit;
+        if not bOk then Continue;
       end;
+
+      Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
+      MatchList.Add(Res);
+
+      if AWithEvent then
+      begin
+        FMatchPos:= Res.NPos;
+        FMatchLen:= Res.NLen;
+        DoOnFound;
+      end;
+
+      if Assigned(FOnProgress) then
+      begin
+        bOk:= true;
+        FOnProgress(Self, Res.NPos, Length(StrText), bOk);
+        if not bOk then exit;
+      end;
+    end;
   finally
     FreeAndNil(Obj);
   end;
