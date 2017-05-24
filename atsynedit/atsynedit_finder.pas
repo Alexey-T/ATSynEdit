@@ -358,65 +358,65 @@ begin
   if StrFind='' then exit;
   if StrText='' then exit;
 
-    FRegex.ModifierI:= not OptCase;
+  FRegex.ModifierI:= not OptCase;
 
-    try
-      FRegex.Expression:= StrFind;
-      FRegex.InputString:= StrText;
-      if not FRegex.ExecPos(AFromPos) then exit;
-    except
-      if Assigned(FOnBadRegex) then
-        FOnBadRegex(Self);
-      exit;
+  try
+    FRegex.Expression:= StrFind;
+    FRegex.InputString:= StrText;
+    if not FRegex.ExecPos(AFromPos) then exit;
+  except
+    if Assigned(FOnBadRegex) then
+      FOnBadRegex(Self);
+    exit;
+  end;
+
+  bOk:= true;
+  if AWithConfirm then
+  begin
+    DoConfirmReplace(FRegex.MatchPos[0], FRegex.MatchLen[0], bOk, bContinue);
+    if not bContinue then exit;
+  end;
+
+  if bOk then
+  begin
+    Res:= TATFinderResult.Create(FRegex.MatchPos[0], FRegex.MatchLen[0]);
+    AList.Add(Res);
+
+    if AWithEvent then
+    begin
+      FMatchPos:= Res.NPos;
+      FMatchLen:= Res.NLen;
+      DoOnFound;
     end;
+  end;
 
-    bOk:= true;
+  while FRegex.ExecNext do
+  begin
+    if Application.Terminated then exit;
     if AWithConfirm then
     begin
       DoConfirmReplace(FRegex.MatchPos[0], FRegex.MatchLen[0], bOk, bContinue);
       if not bContinue then exit;
+      if not bOk then Continue;
     end;
 
-    if bOk then
+    Res:= TATFinderResult.Create(FRegex.MatchPos[0], FRegex.MatchLen[0]);
+    AList.Add(Res);
+
+    if AWithEvent then
     begin
-      Res:= TATFinderResult.Create(FRegex.MatchPos[0], FRegex.MatchLen[0]);
-      AList.Add(Res);
-
-      if AWithEvent then
-      begin
-        FMatchPos:= Res.NPos;
-        FMatchLen:= Res.NLen;
-        DoOnFound;
-      end;
+      FMatchPos:= Res.NPos;
+      FMatchLen:= Res.NLen;
+      DoOnFound;
     end;
 
-    while FRegex.ExecNext do
+    if Assigned(FOnProgress) then
     begin
-      if Application.Terminated then exit;
-      if AWithConfirm then
-      begin
-        DoConfirmReplace(FRegex.MatchPos[0], FRegex.MatchLen[0], bOk, bContinue);
-        if not bContinue then exit;
-        if not bOk then Continue;
-      end;
-
-      Res:= TATFinderResult.Create(FRegex.MatchPos[0], FRegex.MatchLen[0]);
-      AList.Add(Res);
-
-      if AWithEvent then
-      begin
-        FMatchPos:= Res.NPos;
-        FMatchLen:= Res.NLen;
-        DoOnFound;
-      end;
-
-      if Assigned(FOnProgress) then
-      begin
-        bOk:= true;
-        FOnProgress(Self, Res.NPos, Length(StrText), bOk);
-        if not bOk then exit;
-      end;
+      bOk:= true;
+      FOnProgress(Self, Res.NPos, Length(StrText), bOk);
+      if not bOk then exit;
     end;
+  end;
 end;
 
 function TATTextFinder.DoCountAll(AWithEvent: boolean): integer;
@@ -616,7 +616,6 @@ var
   Res: TATFinderResult;
   Str: UnicodeString;
   P1, P2: TPoint;
-  Ok: boolean;
   i: integer;
 begin
   Result:= 0;
