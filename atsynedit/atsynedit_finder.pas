@@ -31,9 +31,8 @@ type
 
   TATFinderResult = class
   public
-    NX, NY, NPos, NLen: integer;
-    SReplaceTo: UnicodeString;
-    constructor Create;
+    NPos, NLen: integer;
+    constructor Create(APos, ALen: integer);
   end;
 
 type
@@ -48,8 +47,8 @@ type
     FStrReplacement: UnicodeString;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
-    procedure DoCollect_Usual(FromPos: integer; AWithEvent: boolean; AReplace: boolean);
-    procedure DoCollect_Regex(FromPos: integer; AWithEvent: boolean; AReplace: boolean);
+    procedure DoCollect_Usual(FromPos: integer; AWithEvent: boolean);
+    procedure DoCollect_Regex(FromPos: integer; AWithEvent: boolean);
     function DoCountAll(AWithEvent: boolean): integer;
     function DoFindMatchRegex(FromPos: integer; var MatchPos, MatchLen: integer): boolean;
     function DoFindMatchUsual(FromPos: integer): Integer;
@@ -119,7 +118,7 @@ type
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
-      out AReplacedLen: integer);
+      const AReplacement: UnicodeString);
     function IsSelectionStartsAtFoundMatch: boolean;
     //fragments
     procedure DoFragmentsClear;
@@ -167,13 +166,10 @@ end;
 
 { TATFinderResult }
 
-constructor TATFinderResult.Create;
+constructor TATFinderResult.Create(APos, ALen: integer);
 begin
-  NX:= -1;
-  NY:= -1;
-  NPos:= -1;
-  NLen:= 0;
-  SReplaceTo:= '';
+  NPos:= APos;
+  NLen:= ALen;
 end;
 
 
@@ -313,7 +309,7 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Usual(FromPos: integer; AWithEvent: boolean; AReplace: boolean);
+procedure TATTextFinder.DoCollect_Usual(FromPos: integer; AWithEvent: boolean);
 var
   LastPos, N: Integer;
   Ok: boolean;
@@ -329,11 +325,7 @@ begin
     if Application.Terminated then exit;
     if IsMatchUsual(N) then
     begin
-      Res:= TATFinderResult.Create;
-      Res.NPos:= N;
-      Res.NLen:= Length(StrFind);
-      if AReplace then
-        Res.SReplaceTo:= StrReplace;
+      Res:= TATFinderResult.Create(N, Length(StrFind));
       MatchList.Add(Res);
 
       if AWithEvent then
@@ -358,7 +350,7 @@ begin
 end;
 
 
-procedure TATTextFinder.DoCollect_Regex(FromPos: integer; AWithEvent: boolean; AReplace: boolean);
+procedure TATTextFinder.DoCollect_Regex(FromPos: integer; AWithEvent: boolean);
 var
   Obj: TRegExpr;
   Ok: boolean;
@@ -386,11 +378,7 @@ begin
 
     if Ok then
     begin
-      Res:= TATFinderResult.Create;
-      Res.NPos:= Obj.MatchPos[0];
-      Res.NLen:= Obj.MatchLen[0];
-      if AReplace then
-        Res.SReplaceTo:= GetRegexStrReplacement_WithObj(Obj, Obj.Match[0]);
+      Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
       MatchList.Add(Res);
 
       if AWithEvent then
@@ -404,11 +392,7 @@ begin
       begin
         if Application.Terminated then exit;
 
-        Res:= TATFinderResult.Create;
-        Res.NPos:= Obj.MatchPos[0];
-        Res.NLen:= Obj.MatchLen[0];
-        if AReplace then
-          Res.SReplaceTo:= GetRegexStrReplacement_WithObj(Obj, Obj.Match[0]);
+        Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
         MatchList.Add(Res);
 
         if AWithEvent then
@@ -434,9 +418,9 @@ end;
 function TATTextFinder.DoCountAll(AWithEvent: boolean): integer;
 begin
   if OptRegex then
-    DoCollect_Regex(1, AWithEvent, false)
+    DoCollect_Regex(1, AWithEvent)
   else
-    DoCollect_Usual(1, AWithEvent, false);
+    DoCollect_Usual(1, AWithEvent);
 
   Result:= MatchList.Count;
   MatchList.Clear;
@@ -616,56 +600,63 @@ begin
   end;
 end;
 
+
 function TATEditorFinder.DoReplaceAll: integer;
 var
-  Ok, bChanged: boolean;
+  Res: TATFinderResult;
+  Str: UnicodeString;
+  P1, P2: TPoint;
+  Ok: boolean;
+  i: integer;
 begin
-  //todo: replace all to
-  //1) one call DoCollect (improve DoCollect?),
-  //2) loop over MatchList, downto, with replaces
-
   Result:= 0;
-  if DoFindOrReplace_Inner(false, true, true, bChanged) then
+
+  if OptRegex then
+    DoCollect_Regex(1, true)
+  else
+    DoCollect_Usual(1, true);
+
+  for i:= MatchList.Count-1 downto 0 do
   begin
-    if bChanged then Inc(Result);
+    Res:= TATFinderResult(MatchList[i]);
+
+    if OptRegex then
+      Str:= GetRegexStrReplacement_FromText(FBuffer.SubString(Res.NPos, Res.NLen))
+    else
+      Str:= StrReplace;
+
+    P1:= ConvertBufferPosToCaretPos(Res.NPos);
+    P2:= ConvertBufferPosToCaretPos(Res.NPos+Res.NLen);
+    DoReplaceTextInEditor(P1, P2, Str);
+    Inc(Result);
+
+    if Application.Terminated then exit;
+    if FReplacedAtEndOfText then exit;
     if StrText='' then exit;
 
-    while DoFindOrReplace_Inner(true, true, true, bChanged) do
+    if Assigned(FOnProgress) then
     begin
-      if bChanged then Inc(Result);
-      if Application.Terminated then exit;
-      if FReplacedAtEndOfText then exit;
-      if StrText='' then exit;
-      if Assigned(FOnProgress) then
-      begin
-        Ok:= true;
-        FOnProgress(Self, FMatchPos, Length(StrText), Ok);
-        if not Ok then Break;
-      end;
+      Ok:= true;
+      FOnProgress(Self, Res.NPos, Length(StrText), Ok);
+      if not Ok then exit;
     end;
   end;
 end;
 
+
 procedure TATEditorFinder.DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
-  out AReplacedLen: integer);
+  const AReplacement: UnicodeString);
 var
   Shift, PosAfter: TPoint;
-  Str: UnicodeString;
   Strs: TATStrings;
 begin
-  if OptRegex then
-    Str:= StrReplacement
-  else
-    Str:= StrReplace;
-  AReplacedLen:= Length(Str);
-
   //replace in editor
   Strs:= FEditor.Strings;
   FReplacedAtEndOfText:=
     (APosEnd.Y>Strs.Count-1) or
     ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
 
-  Strs.TextReplaceRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, Str, Shift, PosAfter);
+  Strs.TextReplaceRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, AReplacement, Shift, PosAfter);
   FEditor.DoEventChange;
 
   //sync buffer
@@ -782,6 +773,7 @@ function TATEditorFinder.DoFindOrReplace_Internal(ANext, AReplace, AForMany: boo
 var
   P1, P2: TPoint;
   ConfirmThis, ConfirmContinue: boolean;
+  SNew: UnicodeString;
 begin
   AChanged:= false;
   Result:= FindMatch(ANext, FSkipLen, AStartPos);
@@ -807,7 +799,14 @@ begin
 
       if ConfirmThis then
       begin
-        DoReplaceTextInEditor(P1, P2, FSkipLen);
+        if OptRegex then
+          SNew:= StrReplacement
+        else
+          SNew:= StrReplace;
+
+        DoReplaceTextInEditor(P1, P2, SNew);
+
+        FSkipLen:= Length(SNew);
         if OptRegex then
           Inc(FSkipLen, GetRegexSkipIncrement);
 
@@ -855,7 +854,7 @@ var
   P1, P2: TPoint;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
-  SSelText: UnicodeString;
+  SSelText, SNew: UnicodeString;
 begin
   Result:= false;
   if FEditor.ModeReadOnly then exit;
@@ -881,9 +880,14 @@ begin
   Caret.EndY:= -1;
 
   if OptRegex then
+  begin
     FStrReplacement:= GetRegexStrReplacement_FromText(SSelText);
+    SNew:= StrReplacement;
+  end
+  else
+    SNew:= StrReplace;
 
-  DoReplaceTextInEditor(P1, P2, FSkipLen);
+  DoReplaceTextInEditor(P1, P2, SNew);
   Result:= true;
 end;
 
