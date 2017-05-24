@@ -44,6 +44,7 @@ type
     FMatchLen: integer;
     FStrFind: UnicodeString;
     FStrReplace: UnicodeString;
+    FRegex: TRegExpr;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
     function IsMatchUsual(APos: integer): boolean;
@@ -54,8 +55,7 @@ type
     function DoCountAll(AWithEvent: boolean): integer;
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
-    function GetRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString): UnicodeString;
-    function GetRegexStrReplacement_FromText(const ASelText: UnicodeString): UnicodeString;
+    function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
   protected
     procedure DoOnFound; virtual;
     procedure DoConfirmReplace(APos, ALen: integer;
@@ -260,67 +260,44 @@ begin
 end;
 
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
-var
-  Obj: TRegExpr;
 begin
   Result:= false;
   if StrText='' then exit;
   if StrFind='' then exit;
 
-  Obj:= TRegExpr.Create;
-  try
-    Obj.ModifierS:= false; //don't catch all text by .*
-    Obj.ModifierM:= true; //allow to work with ^$
-    Obj.ModifierI:= not OptCase;
+  FRegex.ModifierI:= not OptCase;
 
-    try
-      Obj.Expression:= StrFind;
-      Obj.InputString:= StrText;
-      Result:= Obj.ExecPos(AFromPos);
-      if Result then
-      begin
-        FMatchPos:= Obj.MatchPos[0];
-        FMatchLen:= Obj.MatchLen[0];
-      end;
-    except
-      if Assigned(FOnBadRegex) then
-        FOnBadRegex(Self);
+  try
+    FRegex.Expression:= StrFind;
+    FRegex.InputString:= StrText;
+    Result:= FRegex.ExecPos(AFromPos);
+    if Result then
+    begin
+      FMatchPos:= FRegex.MatchPos[0];
+      FMatchLen:= FRegex.MatchLen[0];
     end;
-  finally
-    FreeAndNil(Obj);
+  except
+    if Assigned(FOnBadRegex) then
+      FOnBadRegex(Self);
   end;
 end;
 
-function TATTextFinder.GetRegexStrReplacement_WithObj(Obj: TRegexpr; const AFoundString: UnicodeString): UnicodeString;
+function TATTextFinder.GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
 begin
+  FRegex.ModifierI:= not OptCase;
+
+  try
+    FRegex.Expression:= StrFind;
+  except
+    if Assigned(FOnBadRegex) then
+      FOnBadRegex(Self);
+    exit;
+  end;
+
   if StrReplace='' then
     Result:= ''
   else
-    Result:= Obj.Replace(AFoundString, SRegexReplaceEscapedTabs(StrReplace), true);
-end;
-
-function TATTextFinder.GetRegexStrReplacement_FromText(const ASelText: UnicodeString): UnicodeString;
-var
-  Obj: TRegExpr;
-begin
-  Obj:= TRegExpr.Create;
-  try
-    Obj.ModifierS:= false; //don't catch all text by .*
-    Obj.ModifierM:= true; //allow to work with ^$
-    Obj.ModifierI:= not OptCase;
-
-    try
-      Obj.Expression:= StrFind;
-    except
-      if Assigned(FOnBadRegex) then
-        FOnBadRegex(Self);
-      exit;
-    end;
-
-    Result:= GetRegexStrReplacement_WithObj(Obj, ASelText);
-  finally
-    FreeAndNil(Obj);
-  end;
+    Result:= FRegex.Replace(AFromText, SRegexReplaceEscapedTabs(StrReplace), true);
 end;
 
 
@@ -374,7 +351,6 @@ end;
 
 procedure TATTextFinder.DoCollect_Regex(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
-  Obj: TRegExpr;
   bOk, bContinue: boolean;
   Res: TATFinderResult;
 begin
@@ -382,16 +358,12 @@ begin
   if StrFind='' then exit;
   if StrText='' then exit;
 
-  Obj:= TRegExpr.Create;
-  try
-    Obj.ModifierS:= false;
-    Obj.ModifierM:= true;
-    Obj.ModifierI:= not OptCase;
+    FRegex.ModifierI:= not OptCase;
 
     try
-      Obj.Expression:= StrFind;
-      Obj.InputString:= StrText;
-      if not Obj.ExecPos(AFromPos) then exit;
+      FRegex.Expression:= StrFind;
+      FRegex.InputString:= StrText;
+      if not FRegex.ExecPos(AFromPos) then exit;
     except
       if Assigned(FOnBadRegex) then
         FOnBadRegex(Self);
@@ -401,13 +373,13 @@ begin
     bOk:= true;
     if AWithConfirm then
     begin
-      DoConfirmReplace(Obj.MatchPos[0], Obj.MatchLen[0], bOk, bContinue);
+      DoConfirmReplace(FRegex.MatchPos[0], FRegex.MatchLen[0], bOk, bContinue);
       if not bContinue then exit;
     end;
 
     if bOk then
     begin
-      Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
+      Res:= TATFinderResult.Create(FRegex.MatchPos[0], FRegex.MatchLen[0]);
       AList.Add(Res);
 
       if AWithEvent then
@@ -418,17 +390,17 @@ begin
       end;
     end;
 
-    while Obj.ExecNext do
+    while FRegex.ExecNext do
     begin
       if Application.Terminated then exit;
       if AWithConfirm then
       begin
-        DoConfirmReplace(Obj.MatchPos[0], Obj.MatchLen[0], bOk, bContinue);
+        DoConfirmReplace(FRegex.MatchPos[0], FRegex.MatchLen[0], bOk, bContinue);
         if not bContinue then exit;
         if not bOk then Continue;
       end;
 
-      Res:= TATFinderResult.Create(Obj.MatchPos[0], Obj.MatchLen[0]);
+      Res:= TATFinderResult.Create(FRegex.MatchPos[0], FRegex.MatchLen[0]);
       AList.Add(Res);
 
       if AWithEvent then
@@ -445,9 +417,6 @@ begin
         if not bOk then exit;
       end;
     end;
-  finally
-    FreeAndNil(Obj);
-  end;
 end;
 
 function TATTextFinder.DoCountAll(AWithEvent: boolean): integer;
@@ -664,7 +633,7 @@ begin
       Res:= TATFinderResult(L[i]);
 
       if OptRegex then
-        Str:= GetRegexStrReplacement_FromText(FBuffer.SubString(Res.NPos, Res.NLen))
+        Str:= GetRegexReplacement(FBuffer.SubString(Res.NPos, Res.NLen))
       else
         Str:= StrReplace;
 
@@ -853,7 +822,7 @@ begin
       if ConfirmThis then
       begin
         if OptRegex then
-          SNew:= GetRegexStrReplacement_FromText(FBuffer.SubString(MatchPos, MatchLen))
+          SNew:= GetRegexReplacement(FBuffer.SubString(MatchPos, MatchLen))
         else
           SNew:= StrReplace;
 
@@ -933,7 +902,7 @@ begin
   Caret.EndY:= -1;
 
   if OptRegex then
-    SNew:= GetRegexStrReplacement_FromText(SSelText)
+    SNew:= GetRegexReplacement(SSelText)
   else
     SNew:= StrReplace;
 
@@ -953,10 +922,15 @@ begin
   OptRegex:= false;
   FMatchPos:= -1;
   FMatchLen:= 0;
+
+  FRegex:= TRegExpr.Create;
+  FRegex.ModifierS:= false; //don't catch all text by .*
+  FRegex.ModifierM:= true; //allow to work with ^$
 end;
 
 destructor TATTextFinder.Destroy;
 begin
+  FreeAndNil(FRegex);
   inherited Destroy;
 end;
 
