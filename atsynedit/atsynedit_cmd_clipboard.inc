@@ -45,12 +45,14 @@ begin
              ASelectThen);
   Strings.EndUndoGroup;
 
-  //special case: paste on text end
+  //test special case: paste on text end
   if Carets.Count>0 then
     if bNeedFixLastEol then
     begin
       Strings.ActionDeleteFakeLineAndFinalEol;
-      if not AKeepCaret then
+      //correct caret after line deleted
+      if not AKeepCaret and
+           (Carets[0].PosY>=Strings.Count) then
         DoCaretSingle(
           Strings.LinesLen[Strings.Count-1],
           Strings.Count-1
