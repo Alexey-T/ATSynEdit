@@ -573,7 +573,13 @@ begin
   if s='' then Exit;
   n:= StrToIntDef(s, 0)-1;
   if (n>=0) and (n<ed.Strings.Count) then
-    ed.DoGotoPos_AndUnfold(Point(0, n), Point(-1, -1), NIndentHorz, NIndentVert)
+    ed.DoGotoPos(
+      Point(0, n),
+      Point(-1, -1),
+      NIndentHorz,
+      NIndentVert,
+      true,
+      true)
   else
     ShowMessage('Incorrect line index: '+s);
 end;

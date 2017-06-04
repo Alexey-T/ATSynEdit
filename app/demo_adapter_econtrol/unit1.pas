@@ -185,7 +185,7 @@ begin
   R:= TecTextRange(Tree.Selected.Data);
   P:= adapter.TreeGetPositionOfRange(R);
 
-  ed.DoGotoPos_AndUnfold(P, Point(-1, -1), 5, 5);
+  ed.DoGotoPos(P, Point(-1, -1), 5, 5, true, true);
   ed.SetFocus;
 end;
 

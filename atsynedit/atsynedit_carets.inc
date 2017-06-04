@@ -459,22 +459,46 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoGotoPos(ACaretPos: TPoint; AIndentHorz, AIndentVert: integer);
+procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
+  AIndentHorz, AIndentVert: integer;
+  APlaceCaret, ADoUnfold: boolean;
+  AAllowProcessMsg: boolean=true);
 var
   NIndex, NChars: integer;
   Coord: TPoint;
   bScrolled: boolean;
 begin
-  if IsPosFolded(ACaretPos.X, ACaretPos.Y) then Exit;
+  if not Strings.IsIndexValid(APos.Y) then exit;
+
+  //if IsPosFolded(ACaretPos.X, ACaretPos.Y) -better?
+  if IsLineFolded(APos.Y, true) then
+  begin
+    if ADoUnfold then
+    begin
+      DoUnfoldLine(APos.Y);
+      Update;
+      if AAllowProcessMsg then
+        Application.ProcessMessages;
+    end
+    else
+      exit;
+  end;
+
+  if APlaceCaret then
+  begin
+    DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y);
+    DoEventCarets;
+  end;
+
   bScrolled:= false;
-  Coord:= CaretPosToClientPos(ACaretPos);
+  Coord:= CaretPosToClientPos(APos);
 
   //for y
   //  vert indent <0: always indent from top;
   //             >=0: indent from top (goto up) or bottom (goto down)
   if Coord.Y<FRectMain.Top then
   begin
-    NIndex:= FWrapInfo.FindIndexOfCaretPos(ACaretPos);
+    NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
     if NIndex<0 then Exit;
     DoScroll_IndentFromTop(NIndex, Abs(AIndentVert));
     UpdateScrollbars;
@@ -483,7 +507,7 @@ begin
   else
   if Coord.Y+FCharSize.Y >= FRectMain.Bottom then
   begin
-    NIndex:= FWrapInfo.FindIndexOfCaretPos(ACaretPos);
+    NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
     if NIndex<0 then Exit;
     if AIndentVert<0 then
       DoScroll_IndentFromTop(NIndex, Abs(AIndentVert))
@@ -510,36 +534,25 @@ begin
     bScrolled:= true;
   end;
 
-  if bScrolled then
-    UpdateCaretsCoords;
+  //if bScrolled then
+  //  UpdateCaretsCoords;
+  Update;
 end;
 
 procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge);
+var
+  Pos, PosEnd: TPoint;
 begin
-  DoGotoPos(
-    Carets.CaretAtEdge(AEdge),
+  Pos:= Carets.CaretAtEdge(AEdge);
+  PosEnd:= Point(-1, -1);
+  DoGotoPos(Pos, PosEnd,
     cScrollIndentCaretHorz,
-    cScrollIndentCaretVert);
+    cScrollIndentCaretVert,
+    false,
+    true
+    );
 end;
 
-procedure TATSynEdit.DoGotoPos_AndUnfold(const APos, APosEnd: TPoint;
-  AIndentHorz, AIndentVert: integer; AllowProcessMsg: boolean=true);
-begin
-  if not Strings.IsIndexValid(APos.Y) then Exit;
-
-  if IsLineFolded(APos.Y, true) then
-  begin
-    DoUnfoldLine(APos.Y);
-    Update;
-    if AllowProcessMsg then
-      Application.ProcessMessages;
-  end;
-
-  DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y);
-  DoEventCarets;
-  DoGotoPos(APos, AIndentHorz, AIndentVert);
-  Update;
-end;
 
 procedure TATSynEdit.DoCaretsDeleteOnSameLines;
 var
