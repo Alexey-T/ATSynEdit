@@ -96,7 +96,8 @@ constructor TATSynRange.Create(AX, AY, AY2: integer; AStaple: boolean;
 begin
   if (AX<=0) then raise Exception.Create('Incorrect range with x<=0: '+MessageText);
   if (AY<0) then raise Exception.Create('Incorrect range with y<0: '+MessageText);
-  if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2: '+MessageText);
+  //if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2: '+MessageText);
+  if (AY>AY2) then AY:= AY2;
 
   FX:= AX;
   FY:= AY;
