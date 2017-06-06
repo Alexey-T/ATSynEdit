@@ -137,6 +137,7 @@ type
     OptFromCaret: boolean;
     OptConfirmReplace: boolean;
     OptInSelection: boolean;
+    OptAllowBackwardSelection: boolean;
     //
     constructor Create;
     destructor Destroy; override;
@@ -504,6 +505,7 @@ begin
   OptFromCaret:= false;
   OptConfirmReplace:= false;
   OptInSelection:= false;
+  OptAllowBackwardSelection:= false;
 end;
 
 destructor TATEditorFinder.Destroy;
@@ -852,7 +854,7 @@ begin
       FEditor.DoCaretSingle(P1.X, P1.Y)
     else
     //select to right (find forward) or to left (find back)
-    if OptBack then
+    if OptBack and OptAllowBackwardSelection then
       FEditor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y)
     else
       FEditor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y);
