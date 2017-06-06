@@ -97,7 +97,7 @@ begin
   if (AX<=0) then raise Exception.Create('Incorrect range with x<=0: '+MessageText);
   if (AY<0) then raise Exception.Create('Incorrect range with y<0: '+MessageText);
   //if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2: '+MessageText);
-  if (AY>AY2) then AY:= AY2;
+  if (AY>AY2) then AY2:= AY; //hide this error, it happens in Rexx lexer
 
   FX:= AX;
   FY:= AY;
