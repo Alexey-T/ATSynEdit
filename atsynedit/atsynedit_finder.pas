@@ -137,7 +137,7 @@ type
     OptFromCaret: boolean;
     OptConfirmReplace: boolean;
     OptInSelection: boolean;
-    OptAllowBackwardSelection: boolean;
+    OptPutBackwardSelection: boolean; //on backward search, place backward selection, ie caret on left of selection
     //
     constructor Create;
     destructor Destroy; override;
@@ -505,7 +505,7 @@ begin
   OptFromCaret:= false;
   OptConfirmReplace:= false;
   OptInSelection:= false;
-  OptAllowBackwardSelection:= false;
+  OptPutBackwardSelection:= false;
 end;
 
 destructor TATEditorFinder.Destroy;
@@ -853,8 +853,7 @@ begin
       //don't select
       FEditor.DoCaretSingle(P1.X, P1.Y)
     else
-    //select to right (find forward) or to left (find back)
-    if OptBack and OptAllowBackwardSelection then
+    if OptBack and OptPutBackwardSelection then
       FEditor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y)
     else
       FEditor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y);
