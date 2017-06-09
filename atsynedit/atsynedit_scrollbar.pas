@@ -153,6 +153,8 @@ type
   public
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
+    function CanFocus: boolean; override;
+
     property Position: Integer read FPos write SetPos;
     property Min: Integer read FMin write SetMin;
     property Max: Integer read FMax write SetMax;
@@ -253,6 +255,11 @@ begin
   FTimer.Enabled:= false;
   FreeAndNil(FBitmap);
   inherited;
+end;
+
+function TATScroll.CanFocus: boolean;
+begin
+  Result:= false;
 end;
 
 procedure TATScroll.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
