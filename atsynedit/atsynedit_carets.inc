@@ -549,7 +549,7 @@ begin
     cScrollIndentCaretHorz,
     cScrollIndentCaretVert,
     false,
-    true
+    false //dont unfold
     );
 end;
 
