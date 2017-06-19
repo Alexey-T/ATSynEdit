@@ -479,8 +479,8 @@ type
     FOptUndoGrouped: boolean;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
-    FOptBorderVisible: boolean;
     FOptBorderWidth: integer;
+    FOptBorderWidthFocused: integer;
     FOptRulerVisible: boolean;
     FOptRulerSize: integer;
     FOptRulerFontSize: integer;
@@ -1122,8 +1122,8 @@ type
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines default true;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterIcons: TATGutterIconsKind read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
-    property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default false;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 1;
+    property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 1;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize default 8;
@@ -1812,8 +1812,7 @@ begin
   if FMicromapVisible then
     DoPaintMicromapTo(C);
 
-  if FOptBorderVisible then
-    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
+  DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
 end;
 
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
@@ -2626,8 +2625,8 @@ begin
   FOptNumbersIndentLeft:= 5;
   FOptNumbersIndentRight:= 5;
 
-  FOptBorderVisible:= false;
   FOptBorderWidth:= 1;
+  FOptBorderWidthFocused:= 1;
 
   FOptRulerVisible:= true;
   FOptRulerSize:= cSizeRulerHeight;

@@ -130,7 +130,6 @@ begin
   Keymap:= KeymapCombo;
 
   BorderStyle:= bsNone;
-  OptBorderVisible:= true;
   OptShowURLs:= false;
   OptTextOffsetLeft:= 2;
   OptTextOffsetTop:= 3;
