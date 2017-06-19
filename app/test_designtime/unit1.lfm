@@ -117,7 +117,6 @@ object fmMain: TfmMain
     OptGutterShowFoldAlways = True
     OptGutterShowFoldLines = True
     OptGutterShowFoldLinesAll = False
-    OptBorderVisible = False
     OptRulerVisible = True
     OptRulerSize = 19
     OptRulerFontSize = 8
@@ -305,8 +304,6 @@ object fmMain: TfmMain
       OptGutterShowFoldAlways = True
       OptGutterShowFoldLines = True
       OptGutterShowFoldLinesAll = False
-      OptBorderVisible = True
-      OptRulerVisible = False
       OptRulerSize = 20
       OptRulerFontSize = 8
       OptRulerMarkSizeSmall = 3
