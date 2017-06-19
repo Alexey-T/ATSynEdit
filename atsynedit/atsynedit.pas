@@ -480,6 +480,7 @@ type
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
     FOptBorderVisible: boolean;
+    FOptBorderWidth: integer;
     FOptRulerVisible: boolean;
     FOptRulerSize: integer;
     FOptRulerFontSize: integer;
@@ -646,6 +647,7 @@ type
     //paint
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
+    procedure DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
     procedure DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
@@ -1121,6 +1123,7 @@ type
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterIcons: TATGutterIconsKind read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default false;
+    property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 1;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize default 8;
@@ -1810,10 +1813,16 @@ begin
     DoPaintMicromapTo(C);
 
   if FOptBorderVisible then
-  begin
-    C.Pen.Color:= Colors.BorderLine;
-    C.Frame(0, 0, ClientWidth, ClientHeight);
-  end;
+    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
+end;
+
+procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
+var
+  i: integer;
+begin
+  C.Pen.Color:= AColor;
+  for i:= 0 to AWidth-1 do
+    C.Frame(i, i, ClientWidth-i, ClientHeight-i);
 end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
@@ -2618,6 +2627,8 @@ begin
   FOptNumbersIndentRight:= 5;
 
   FOptBorderVisible:= false;
+  FOptBorderWidth:= 1;
+
   FOptRulerVisible:= true;
   FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
