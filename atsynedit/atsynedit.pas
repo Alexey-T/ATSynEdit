@@ -481,6 +481,7 @@ type
     FOptIndentKeepsAlign: boolean;
     FOptBorderWidth: integer;
     FOptBorderWidthFocused: integer;
+    FOptBorderFocusedActive: boolean;
     FOptRulerVisible: boolean;
     FOptRulerSize: integer;
     FOptRulerFontSize: integer;
@@ -1123,6 +1124,7 @@ type
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterIcons: TATGutterIconsKind read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 1;
+    property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 1;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
@@ -1812,7 +1814,10 @@ begin
   if FMicromapVisible then
     DoPaintMicromapTo(C);
 
-  DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
+  if FOptBorderFocusedActive and Focused then
+    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
+  else
+    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
 end;
 
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
@@ -2627,6 +2632,7 @@ begin
 
   FOptBorderWidth:= 1;
   FOptBorderWidthFocused:= 1;
+  FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;
   FOptRulerSize:= cSizeRulerHeight;
@@ -4586,13 +4592,17 @@ end;
 procedure TATSynEdit.DoEnter;
 begin
   inherited;
-  if FOptShowCurLineOnlyFocused then Update;
+  //repaint only if some options set
+  if FOptShowCurLineOnlyFocused or FOptBorderFocusedActive then
+    Update;
 end;
 
 procedure TATSynEdit.DoExit;
 begin
   inherited;
-  if FOptShowCurLineOnlyFocused then Update;
+  //repaint only if some options set
+  if FOptShowCurLineOnlyFocused or FOptBorderFocusedActive then
+    Update;
 end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);
