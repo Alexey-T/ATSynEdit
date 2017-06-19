@@ -1123,9 +1123,9 @@ type
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines default true;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterIcons: TATGutterIconsKind read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
-    property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 1;
+    property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 0;
+    property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
-    property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 1;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize default 8;
@@ -2630,8 +2630,8 @@ begin
   FOptNumbersIndentLeft:= 5;
   FOptNumbersIndentRight:= 5;
 
-  FOptBorderWidth:= 1;
-  FOptBorderWidthFocused:= 1;
+  FOptBorderWidth:= 0;
+  FOptBorderWidthFocused:= 0;
   FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;

@@ -134,6 +134,8 @@ begin
   OptTextOffsetLeft:= 2;
   OptTextOffsetTop:= 3;
   OptMaxLen:= 0;
+  OptBorderWidth:= 1;
+  OptBorderWidthFocused:= 1;
 
   Height:= 26;
 end;
