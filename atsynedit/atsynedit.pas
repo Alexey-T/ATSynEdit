@@ -1722,11 +1722,10 @@ begin
   Result.Left:= FRectMinimap.Left;
   Result.Right:= FRectMinimap.Right;
   Result.Top:= GetMinimapSelTop;
-  Result.Bottom:= Result.Top +
-    Min(
-      (FScrollVert.NPage+1)*FCharSizeMinimap.Y,
-      GetMinimapActualHeight
-      );
+  Result.Bottom:= Min(
+    Result.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y,
+    FRectMinimap.Bottom
+    );
 end;
 
 function TATSynEdit.GetRectMicromap: TRect;
