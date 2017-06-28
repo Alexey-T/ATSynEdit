@@ -74,10 +74,14 @@ begin
   M.Add(cCommand_GotoTextBegin_Sel,  'go to text begin + select', [cXControl+'+Shift+Home'], []);
   M.Add(cCommand_GotoTextEnd,        'go to text end',            [cXControl+'+End'], []);
   M.Add(cCommand_GotoTextEnd_Sel,    'go to text end + select',   [cXControl+'+Shift+End'], []);
+
   M.Add(cCommand_GotoWordPrev,       'go to word left',           [cXControl+'+Left'], []);
   M.Add(cCommand_GotoWordPrev_Sel,   'go to word left + select',  [cXControl+'+Shift+Left'], []);
   M.Add(cCommand_GotoWordNext,       'go to word right',          [cXControl+'+Right'], []);
   M.Add(cCommand_GotoWordNext_Sel,   'go to word right + select', [cXControl+'+Shift+Right'], []);
+
+  M.Add(cCommand_GotoScreenTop,      'go to screen top', [], []);
+  M.Add(cCommand_GotoScreenBottom,   'go to screen bottom', [], []);
 
   M.Add(cCommand_SelectAll, 'selection: select all', [cXControl+'+A'], []);
   M.Add(cCommand_TextDeleteSelection, 'selection: delete selected text', [], []);

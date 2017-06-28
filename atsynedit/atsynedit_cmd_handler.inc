@@ -244,6 +244,10 @@ begin
     cCommand_GotoTextBegin_Sel:        Res:= DoCommand_GotoTextBegin;
     cCommand_GotoTextEnd,
     cCommand_GotoTextEnd_Sel:          Res:= DoCommand_GotoTextEnd;
+
+    cCommand_GotoScreenTop:            Res:= DoCommand_GotoScreenEdge(true);
+    cCommand_GotoScreenBottom:         Res:= DoCommand_GotoScreenEdge(false);
+
     cCommand_GotoWordNext,
     cCommand_GotoWordNext_Sel:         Res:= DoCommand_GotoWord(true);
     cCommand_GotoWordPrev,

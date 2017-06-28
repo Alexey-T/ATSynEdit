@@ -326,6 +326,18 @@ begin
     Result:= [cResultCaretTop];
 end;
 
+
+function TATSynEdit.DoCommand_GotoScreenEdge(ATop: boolean): TATCommandResults;
+begin
+  if ATop then
+    DoCaretSingle(ColumnLeft, LineTop)
+  else
+    DoCaretSingle(ColumnLeft, LineBottom-1);
+
+  Result:= [cResultCaretTop];
+end;
+
+
 function TATSynEdit.DoCommand_Cancel: TATCommandResults;
 begin
   DoCaretSingleAsIs;

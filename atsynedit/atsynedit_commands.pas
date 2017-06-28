@@ -81,6 +81,9 @@ const
   cCommand_GotoWordNext_Sel = _base_GotoWordNext or cCmdSelKeep;
   cCommand_GotoWordPrev_Sel = _base_GotoWordPrev or cCmdSelKeep;
 
+  cCommand_GotoScreenTop = 205;
+  cCommand_GotoScreenBottom = 206;
+
   cCommand_Undo = 235 or cCmdSelReset;
   cCommand_Redo = 236 or cCmdSelReset;
 
