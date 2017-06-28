@@ -130,10 +130,10 @@ begin
 
   M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
-  M.Add(cCommand_ScrollToCaretTop, 'scroll to caret, top', [], []);
-  M.Add(cCommand_ScrollToCaretBottom, 'scroll to caret, bottom', [], []);
-  M.Add(cCommand_ScrollToCaretLeft, 'scroll to caret, left', [], []);
-  M.Add(cCommand_ScrollToCaretRight, 'scroll to caret, right', [], []);
+  M.Add(cCommand_ScrollToCaretTop, 'scroll to top caret (of multi-carets)', [], []);
+  M.Add(cCommand_ScrollToCaretBottom, 'scroll to bottom caret (of multi-carets)', [], []);
+  M.Add(cCommand_ScrollToCaretLeft, 'scroll to left caret (of multi-carets)', [], []);
+  M.Add(cCommand_ScrollToCaretRight, 'scroll to right caret (of multi-carets)', [], []);
 
   M.Add(cCommand_MoveSelectionUp, 'move selected lines up', ['Alt+Up'], []);
   M.Add(cCommand_MoveSelectionDown, 'move selected lines down', ['Alt+Down'], []);
