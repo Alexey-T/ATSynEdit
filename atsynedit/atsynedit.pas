@@ -561,6 +561,7 @@ type
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
+    function DoCaretsKeepOnScreen: boolean;
     procedure DoCaretsOnChanged(Sender: TObject);
     procedure DoCaretForceShow;
     procedure DoCaretsAssign(NewCarets: TATCarets);
@@ -806,7 +807,7 @@ type
     function DoCommand_ToggleMiniMap: TATCommandResults;
     function DoCommand_ToggleMicroMap: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
-    function DoCommand_ScrollVert(ALines: integer): TATCommandResults;
+    function DoCommand_ScrollVert(ALines: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;
     function DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;

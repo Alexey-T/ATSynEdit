@@ -876,3 +876,31 @@ begin
   FCaretAllowNextBlink:= true;
 end;
 
+
+function TATSynEdit.DoCaretsKeepOnScreen: boolean;
+var
+  Caret: TATCaretItem;
+  NMinIndex, NMaxIndex, i: integer;
+begin
+  Result:= false;
+
+  NMinIndex:= LineTop;
+  NMaxIndex:= LineBottom-2; //-1 gives not ok result
+
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Caret:= Carets[i];
+    if Caret.PosY<NMinIndex then
+    begin
+      Caret.PosY:= NMinIndex;
+      Result:= true;
+    end
+    else
+    if Caret.PosY>NMaxIndex then
+    begin
+      Caret.PosY:= NMaxIndex;
+      Result:= true;
+    end;
+  end;
+end;
+
