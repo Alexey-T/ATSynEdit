@@ -192,13 +192,14 @@ begin
     end;
   end;
 
-  bSel:= false;
-  bSelPrev:= false;
-
   for iPart:= Low(AParts) to High(AParts) do
   begin
     PartOther:= @FLineOtherParts[iPart];
     if PartOther^.Len=0 then Break;
+
+    bSel:= false;
+    bSelPrev:= false;
+
     for i:= PartOther^.Offset to
             PartOther^.Offset + PartOther^.Len -1 do
     begin
