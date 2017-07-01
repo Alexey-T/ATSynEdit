@@ -144,11 +144,34 @@ begin
   Part.ColorBG:= Colors.TextSelBG;
 
   //optimiziation for select-all case.
-  //we loop over parts, and for entire-selected parts,
-  //just set them fore/back color.
+  //if entire line is selected, colorize all parts.
+
+  nRangeX1:= ACharIndex;
+  for i:= Low(AParts) to High(AParts) do
+    if AParts[i].Len=0 then
+    begin
+      if i=0 then exit;
+      nRangeX2:= ACharIndex + AParts[i-1].Offset + AParts[i-1].Len;
+      Break;
+    end;
+
+  if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) then
+  begin
+    for i:= Low(AParts) to High(AParts) do
+      if AParts[i].Len=0 then
+        Break
+      else
+        begin
+          AParts[i].ColorFont:= Part.ColorFont;
+          AParts[i].ColorBG:= Part.ColorBG; //clGreen
+        end;
+    exit;
+  end;
+
+  //we loop over parts, and for entirely selected parts, colorize them.
   //after that do slow loop (by offsets) over rest parts, saved in FLineOtherParts.
 
-  FillChar(FLineOtherParts, SizeOf(FLineOtherParts), 0);
+  FillChar(FLineOtherParts, SizeOf(TATLineParts), 0);
   iPart:= 0;
 
   for i:= Low(AParts) to High(AParts) do
