@@ -908,6 +908,7 @@ type
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
+    function IsRangeSelected(AX1, AY1, AX2, AY2: integer): boolean;
     function IsPosFolded(AX, AY: integer): boolean;
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsCharWord(ch: Widechar): boolean;

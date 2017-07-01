@@ -74,6 +74,7 @@ type
     function IsLineListed(APosY: integer): boolean;
     function IsSelection: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
+    function IsRangeSelected(AX1, AY1, AX2, AY2: integer): boolean;
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
@@ -431,10 +432,30 @@ begin
     if Y1>AY then Exit;
 
     if IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside then
-      begin Result:= true; Break end;
+      exit(true);
   end;
 end;
 
+function TATCarets.IsRangeSelected(AX1, AY1, AX2, AY2: integer): boolean;
+var
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+  i: integer;
+begin
+  Result:= false;
+  for i:= 0 to Count-1 do
+  begin
+    Items[i].GetRange(X1, Y1, X2, Y2, bSel);
+    if not bSel then Continue;
+
+    //carets sorted: can stop
+    if Y1>AY1 then Exit;
+
+    if (IsPosInRange(AX1, AY1, X1, Y1, X2, Y2)=cRelateInside) and
+       (IsPosInRange(AX2, AY2, X1, Y1, X2, Y2)=cRelateInside) then
+      exit(true);
+  end;
+end;
 
 function TATCarets.CaretAtEdge(AEdge: TATCaretEdge): TPoint;
 var

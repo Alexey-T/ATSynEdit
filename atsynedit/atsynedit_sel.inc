@@ -19,6 +19,29 @@ begin
     Result:= Carets.IsPosSelected(AX, AY);
 end;
 
+
+function TATSynEdit.IsRangeSelected(AX1, AY1, AX2, AY2: integer): boolean;
+var
+  NPosLeft,
+  NPosRight: integer;
+  SLine: atString;
+begin
+  if not IsSelRectEmpty then
+  begin
+    if AY1<>AY2 then exit(false); //dont allow multi-line range
+    if not ((AY1>=FSelRect.Top) and (AY1<=FSelRect.Bottom)) then exit(false);
+
+    SLine:= Strings.Lines[AY1];
+    NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
+    NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
+    Result:=
+      (AX1>=NPosLeft) and (AX2<NPosRight);
+  end
+  else
+    Result:= Carets.IsRangeSelected(AX1, AY1, AX2, AY2);
+end;
+
+
 function TATSynEdit.IsSelRectEmpty: boolean;
 begin
   Result:= EqualRect(FSelRect, cRectEmpty);
