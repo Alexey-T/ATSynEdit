@@ -28,16 +28,24 @@ var
 begin
   if not IsSelRectEmpty then
   begin
+    //check for y
     if AY1<>AY2 then
       exit(cRangeAllUnselected); //dont allow multi-line range
-    if not ((AY1>=FSelRect.Top) and (AY1<=FSelRect.Bottom)) then
+    if (AY1<FSelRect.Top) or (AY1>FSelRect.Bottom) then
       exit(cRangeAllUnselected);
 
+    //check for x
     SLine:= Strings.Lines[AY1];
     NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
     NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
+
     if (AX1>=NPosLeft) and (AX2<NPosRight) then
-      Result:= cRangeAllSelected;
+      Result:= cRangeAllSelected
+    else
+    if (AX1>=NPosRight) or (AX2<=NPosLeft) then
+      Result:= cRangeAllUnselected
+    else
+      Result:= cRangePartlySelected;
   end
   else
     Result:= Carets.IsRangeSelected(AX1, AY1, AX2, AY2);
