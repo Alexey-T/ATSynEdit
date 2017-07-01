@@ -74,7 +74,7 @@ begin
   //faster render w/out adapter
   if AParts[0].Len>0 then
   begin
-    DoPartCalc_ApplyOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
+    DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
   end
   else
   begin
@@ -130,7 +130,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
+procedure TATSynEdit.DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
   ALineIndex, ACharIndex: integer);
 var
   bSel, bSelPrev: boolean;

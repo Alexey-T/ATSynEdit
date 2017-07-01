@@ -609,10 +609,10 @@ type
     procedure MenuFoldPlusMinusClick(Sender: TObject);
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
     procedure OnNewScrollbarVertChanged(Sender: TObject);
-    procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
-      ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
+    procedure DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
+      ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
     function GetAutoIndentString(APosX, APosY: integer): atString;
