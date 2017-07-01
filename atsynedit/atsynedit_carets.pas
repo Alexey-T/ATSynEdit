@@ -13,11 +13,15 @@ uses
   ATStringProc;
 
 type
-  TATPosRelation = (cRelateBefore, cRelateInside, cRelateAfter);
+  TATPosRelation = (
+    cRelateBefore,
+    cRelateInside,
+    cRelateAfter
+    );
 
 procedure SwapInt(var n1, n2: integer); inline;
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
-function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer): TATPosRelation;
+function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer; AllowOnRightEdge: boolean=false): TATPosRelation;
 
 
 type
@@ -115,14 +119,15 @@ begin
 end;
 
 
-function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer): TATPosRelation;
-var
-  b1, b2: boolean;
+function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer;
+    AllowOnRightEdge: boolean=false): TATPosRelation;
 begin
-  b1:= IsPosSorted(X, Y, X1, Y1, false);
-  b2:= IsPosSorted(X, Y, X2, Y2, false);
-  if b1 then Result:= cRelateBefore else
-   if b2 then Result:= cRelateInside else
+  if IsPosSorted(X, Y, X1, Y1, false) then
+    Result:= cRelateBefore
+  else
+  if IsPosSorted(X, Y, X2, Y2, AllowOnRightEdge) then
+    Result:= cRelateInside
+  else
     Result:= cRelateAfter;
 end;
 
@@ -452,7 +457,7 @@ begin
     if Y1>AY1 then Exit;
 
     if (IsPosInRange(AX1, AY1, X1, Y1, X2, Y2)=cRelateInside) and
-       (IsPosInRange(AX2, AY2, X1, Y1, X2, Y2)=cRelateInside) then
+       (IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true)=cRelateInside) then
       exit(true);
   end;
 end;

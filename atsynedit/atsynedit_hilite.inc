@@ -163,7 +163,7 @@ begin
     if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) then
     begin
       AParts[i].ColorFont:= Part.ColorFont;
-      AParts[i].ColorBG:= Part.ColorBG;
+      AParts[i].ColorBG:= Part.ColorBG; //clGreen
     end
     else
     begin
