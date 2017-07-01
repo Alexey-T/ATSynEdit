@@ -881,10 +881,13 @@ begin
     Result:= AParts[N-1].Offset+AParts[N-1].Len;
 end;
 
+
+var
+  ResultParts: TATLineParts; //size is huge, so not local var
+
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart;
   AKeepFontStyles: boolean): boolean;
 var
-  ResultParts: TATLineParts;
   ResultPartIndex: integer;
   //
   procedure AddPart(const P: TATLinePart);

@@ -131,10 +131,6 @@ begin
 end;
 
 
-var
-  //size is huge, so dont do local variable
-  PartsOther: TATLineParts;
-
 procedure TATSynEdit.DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
   ALineIndex, ACharIndex: integer);
 var
@@ -150,9 +146,9 @@ begin
   //optimiziation for select-all case.
   //we loop over parts, and for entire-selected parts,
   //just set them fore/back color.
-  //after that do slow loop (by offsets) over rest parts, saved in PartsOther.
+  //after that do slow loop (by offsets) over rest parts, saved in FLineOtherParts.
 
-  FillChar(PartsOther, SizeOf(PartsOther), 0);
+  FillChar(FLineOtherParts, SizeOf(FLineOtherParts), 0);
   iPart:= 0;
 
   for i:= Low(AParts) to High(AParts) do
@@ -167,8 +163,8 @@ begin
     end
     else
     begin
-      PartsOther[iPart].Offset:= AParts[i].Offset;
-      PartsOther[iPart].Len:= AParts[i].Len;
+      FLineOtherParts[iPart].Offset:= AParts[i].Offset;
+      FLineOtherParts[iPart].Len:= AParts[i].Len;
       Inc(iPart);
     end;
   end;
@@ -178,7 +174,7 @@ begin
 
   for iPart:= Low(AParts) to High(AParts) do
   begin
-    PartOther:= @PartsOther[iPart];
+    PartOther:= @FLineOtherParts[iPart];
     if PartOther^.Len=0 then Break;
     for i:= PartOther^.Offset to
             PartOther^.Offset + PartOther^.Len -1 do

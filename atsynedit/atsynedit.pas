@@ -436,6 +436,8 @@ type
     FRectGutter,
     FRectRuler: TRect;
     FLineBottom: integer;
+    FLineParts: TATLineParts; //size is huge, so not local var
+    FLineOtherParts: TATLineParts; //size is huge, so not local var
     FScrollVert,
     FScrollHorz,
     FScrollVertMinimap,
@@ -1869,7 +1871,6 @@ var
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineSeparator: TATLineSeparator;
   LineWithCaret, LineEolSelected, LineColorForced: boolean;
-  Parts: TATLineParts;
   Event: TATSynEditDrawLineEvent;
   StrSize: TSize;
   ItemGap: TATSynGapItem;
@@ -2001,7 +2002,7 @@ begin
       end;
 
       NColorAfter:= clNone;
-      DoCalcLineHilite(WrapItem, Parts{%H-},
+      DoCalcLineHilite(WrapItem, FLineParts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
         NColorEntire, LineColorForced,
         NColorAfter);
@@ -2046,7 +2047,7 @@ begin
           NOutputSpacesSkipped, //todo:
             //needed number of chars of all chars counted as 100%,
             //while NOutputSpacesSkipped is with cjk counted as 170%
-          @Parts,
+          @FLineParts,
           Event,
           FOptTextOffsetFromLine,
           ClientWidth+ACharSize.X*2,
@@ -2059,7 +2060,7 @@ begin
           CurrPointText,
           FCharSizeMinimap,
           FTabSize,
-          @Parts
+          @FLineParts
           );
 
       //restore after textout
