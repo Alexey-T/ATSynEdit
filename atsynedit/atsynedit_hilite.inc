@@ -132,32 +132,32 @@ end;
 
 
 var
-  //it is huge, so dont do local variable
-  PartsTodo: TATLineParts;
+  //size is huge, so dont do local variable
+  PartsOther: TATLineParts;
 
 procedure TATSynEdit.DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
   ALineIndex, ACharIndex: integer);
 var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
-  nRangeX1, nRangeX2, nPartTodo,
-  iPart, i: integer;
+  PartOther: ^TATLinePart;
+  nRangeX1, nRangeX2, iPart, i: integer;
 begin
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;
 
   //optimiziation for select-all case.
-  //in this case we loop over parts, and for entire-selected parts,
-  //just set them back-color.
-  //after that do loop (by offsets) over rest.
+  //we loop over parts, and for entire-selected parts,
+  //just set them fore/back color.
+  //after that do slow loop (by offsets) over rest parts, saved in PartsOther.
 
-  FillChar(PartsTodo, SizeOf(PartsTodo), 0);
-  nPartTodo:= 0;
+  FillChar(PartsOther, SizeOf(PartsOther), 0);
+  iPart:= 0;
 
   for i:= Low(AParts) to High(AParts) do
   begin
-    if AParts[i].Len=0 then break;
+    if AParts[i].Len=0 then Break;
     nRangeX1:= ACharIndex + AParts[i].Offset;
     nRangeX2:= nRangeX1 + AParts[i].Len;
     if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) then
@@ -167,9 +167,9 @@ begin
     end
     else
     begin
-      PartsTodo[nPartTodo].Offset:= AParts[i].Offset;
-      PartsTodo[nPartTodo].Len:= AParts[i].Len;
-      Inc(nPartTodo);
+      PartsOther[iPart].Offset:= AParts[i].Offset;
+      PartsOther[iPart].Len:= AParts[i].Len;
+      Inc(iPart);
     end;
   end;
 
@@ -178,9 +178,10 @@ begin
 
   for iPart:= Low(AParts) to High(AParts) do
   begin
-    if PartsTodo[iPart].Len=0 then Break;
-    for i:= PartsTodo[iPart].Offset to
-            PartsTodo[iPart].Offset + PartsTodo[iPart].Len -1 do
+    PartOther:= @PartsOther[iPart];
+    if PartOther^.Len=0 then Break;
+    for i:= PartOther^.Offset to
+            PartOther^.Offset + PartOther^.Len -1 do
     begin
       bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
 
