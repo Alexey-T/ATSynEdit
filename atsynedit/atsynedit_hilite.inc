@@ -130,13 +130,18 @@ begin
   end;
 end;
 
+
+var
+  //it is huge, so dont do local variable
+  PartsTodo: TATLineParts;
+
 procedure TATSynEdit.DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
   ALineIndex, ACharIndex: integer);
 var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
-  nOffsetStart, nRangeX1, nRangeX2, nPartTodo, i: integer;
-  PartsTodo: TATLineParts;
+  nRangeX1, nRangeX2, nPartTodo,
+  iPart, i: integer;
 begin
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
@@ -146,10 +151,6 @@ begin
   //in this case we loop over parts, and for entire-selected parts,
   //just set them back-color.
   //after that do loop (by offsets) over rest.
-
-  nOffsetStart:= 0;
-  bSel:= false;
-  bSelPrev:= false;
 
   FillChar(PartsTodo, SizeOf(PartsTodo), 0);
   nPartTodo:= 0;
@@ -163,7 +164,6 @@ begin
     begin
       AParts[i].ColorFont:= Part.ColorFont;
       AParts[i].ColorBG:= Part.ColorBG;
-      nOffsetStart:= AParts[i].Offset+AParts[i].Len;
     end
     else
     begin
@@ -173,11 +173,14 @@ begin
     end;
   end;
 
-  for nPartTodo:= Low(AParts) to High(AParts) do
+  bSel:= false;
+  bSelPrev:= false;
+
+  for iPart:= Low(AParts) to High(AParts) do
   begin
-    if PartsTodo[nPartTodo].Len=0 then break;
-    for i:= PartsTodo[nPartTodo].Offset to
-            PartsTodo[nPartTodo].Offset+PartsTodo[nPartTodo].Len-1 do
+    if PartsTodo[iPart].Len=0 then Break;
+    for i:= PartsTodo[iPart].Offset to
+            PartsTodo[iPart].Offset + PartsTodo[iPart].Len -1 do
     begin
       bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
 
