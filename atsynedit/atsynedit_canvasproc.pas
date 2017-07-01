@@ -13,6 +13,7 @@ uses
   Windows,
   {$endif}
   Classes, SysUtils, Graphics, Types,
+  Forms,
   ATStringProc;
 
 var
@@ -137,6 +138,7 @@ procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACent
 procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
+procedure DoPartsShow(var P: TATLineParts);
 
 
 implementation
@@ -895,10 +897,16 @@ var
       end;
   end;
   //
+  procedure FixPartLen(var P: TATLinePart; NOffsetEnd: integer);
+  begin
+    if P.Offset+P.Len>NOffsetEnd then
+      P.Len:= NOffsetEnd-P.Offset;
+  end;
+  //
 var
   PartSelBegin, PartSelEnd: TATLinePart;
   nIndex1, nIndex2,
-  nOffset1, nOffset2,
+  nOffset1, nOffset2, nOffsetLimit,
   newLen1, newLen2, newOffset2: integer;
   i: integer;
 begin
@@ -988,6 +996,8 @@ begin
     AddPart(APart)
   else
   begin
+    nOffsetLimit:= APart.Offset+APart.Len;
+    FixPartLen(PartSelBegin, nOffsetLimit);
     AddPart(PartSelBegin);
 
     for i:= nIndex1+1 to nIndex2-1 do
@@ -995,11 +1005,15 @@ begin
       AParts[i].ColorFont:= APart.ColorFont;
       if APart.ColorBG<>clNone then
         AParts[i].ColorBG:= APart.ColorBG;
+      FixPartLen(AParts[i], nOffsetLimit);
       AddPart(AParts[i]);
     end;
 
     if nIndex1<nIndex2 then
+    begin
+      FixPartLen(PartSelEnd, nOffsetLimit);
       AddPart(PartSelEnd);
+    end;
   end;
 
   //add parts after selection
@@ -1035,6 +1049,21 @@ begin
     if AForceColor or (AParts[i].ColorBG=clNone) then
       AParts[i].ColorBG:= AColor;
   end;
+end;
+
+procedure DoPartsShow(var P: TATLineParts);
+var
+  s: string;
+  i: integer;
+begin
+  s:= '';
+  for i:= Low(P) to High(P) do
+  begin
+    if P[i].Len=0 then break;
+    s:= s+Format('[%d %d]', [P[i].Offset, P[i].Len]);
+  end;
+
+  Application.MainForm.Caption:= s;
 end;
 
 function ColorBlend(c1, c2: Longint; A: Longint): Longint;

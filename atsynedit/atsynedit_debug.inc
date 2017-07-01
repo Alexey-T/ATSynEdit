@@ -45,25 +45,4 @@ begin
   Result:= Format('[%d]: offset %d..%d', [i, P[i].Offset, P[i].Offset+P[i].Len, P[i].Len]);
 end;
 
-procedure TATSynEdit.DoPartShow(const P: TATLineParts);
-//Allows to see bugs in forming parts, do show in code which makes parts
-var
-  i: integer;
-  s: string;
-begin
-  for i:= 0 to High(P) do
-  begin
-    if (P[i].Len=0) and (P[i].Offset=0) then Break;
-    if (P[i].Offset<0) or
-      (P[i].Len<=0) or
-      ((i>0) and (P[i].Offset<>P[i-1].Offset+P[i-1].Len)) then
-      begin
-        s:= DoPartAsString(i, P);
-        if i>0 then
-          s:= DoPartAsString(i-1, P)+', '+s;
-        Application.MainForm.Caption:= s;
-        ShowMessage('part bug, see caption');
-      end;
-  end;
-end;
 

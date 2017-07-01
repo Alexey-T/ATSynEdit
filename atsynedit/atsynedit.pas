@@ -609,7 +609,6 @@ type
     procedure MenuFoldPlusMinusClick(Sender: TObject);
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
     procedure OnNewScrollbarVertChanged(Sender: TObject);
-    procedure DoPartShow(const P: TATLineParts);
     procedure DoPartCalc_ApplyOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
