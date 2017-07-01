@@ -135,16 +135,34 @@ procedure TATSynEdit.DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOf
 var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
-  i: integer;
+  nOffsetStart, nRangeX1, nRangeX2, i: integer;
 begin
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;
 
+  //optimiziation for select-all case.
+  //in this case we loop over parts, and for entire-selected parts,
+  //just set them back-color.
+  //after that do loop (by offsets) over rest.
+
+  nOffsetStart:= 0;
   bSel:= false;
   bSelPrev:= false;
 
-  for i:= 0 to AOffsetMax do
+  for i:= Low(AParts) to High(AParts) do
+  begin
+    if AParts[i].Len=0 then break;
+    nRangeX1:= ACharIndex + AParts[i].Offset;
+    nRangeX2:= nRangeX1 + AParts[i].Len;
+    if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) then
+    begin
+      AParts[i].ColorBG:= Colors.TextSelBG;
+      nOffsetStart:= AParts[i].Offset+AParts[i].Len;
+    end;
+  end;
+
+  for i:= nOffsetStart to AOffsetMax do
   begin
     bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
 
