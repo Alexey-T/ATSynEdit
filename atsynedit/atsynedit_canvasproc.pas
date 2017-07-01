@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_CanvasProc;
 
 {$mode objfpc}{$H+}
+{$MinEnumSize 1}
 
 interface
 
@@ -55,10 +56,10 @@ type
   end;
 
 type
-  TATLinePart = record
+  TATLinePart = packed record
     Offset, Len: integer;
     ColorFont, ColorBG, ColorBorder: TColor;
-    FontBold, FontItalic, FontStrikeOut: boolean;
+    FontBold, FontItalic, FontStrikeOut: ByteBool;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
 
