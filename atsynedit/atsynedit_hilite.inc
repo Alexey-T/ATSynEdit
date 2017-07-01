@@ -135,7 +135,8 @@ procedure TATSynEdit.DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOf
 var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
-  nOffsetStart, nRangeX1, nRangeX2, i: integer;
+  nOffsetStart, nRangeX1, nRangeX2, nPartTodo, i: integer;
+  PartsTodo: TATLineParts;
 begin
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
@@ -150,6 +151,9 @@ begin
   bSel:= false;
   bSelPrev:= false;
 
+  FillChar(PartsTodo, SizeOf(PartsTodo), 0);
+  nPartTodo:= 0;
+
   for i:= Low(AParts) to High(AParts) do
   begin
     if AParts[i].Len=0 then break;
@@ -157,35 +161,47 @@ begin
     nRangeX2:= nRangeX1 + AParts[i].Len;
     if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) then
     begin
-      AParts[i].ColorBG:= Colors.TextSelBG;
+      AParts[i].ColorFont:= Part.ColorFont;
+      AParts[i].ColorBG:= Part.ColorBG;
       nOffsetStart:= AParts[i].Offset+AParts[i].Len;
+    end
+    else
+    begin
+      PartsTodo[nPartTodo].Offset:= AParts[i].Offset;
+      PartsTodo[nPartTodo].Len:= AParts[i].Len;
+      Inc(nPartTodo);
     end;
   end;
 
-  for i:= nOffsetStart to AOffsetMax do
+  for nPartTodo:= Low(AParts) to High(AParts) do
   begin
-    bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
+    if PartsTodo[nPartTodo].Len=0 then break;
+    for i:= PartsTodo[nPartTodo].Offset to
+            PartsTodo[nPartTodo].Offset+PartsTodo[nPartTodo].Len-1 do
+    begin
+      bSel:= IsPosSelected(ACharIndex+i, ALineIndex);
 
-    if bSel and (i=AOffsetMax) then
-    begin
-      DoPartInsert(AParts, Part, true);
-      Break
-    end;
+      if bSel and (i=AOffsetMax) then
+      begin
+        DoPartInsert(AParts, Part, true);
+        Break
+      end;
 
-    if bSel and bSelPrev then
-      Inc(Part.Len)
-    else
-    if not bSelPrev and bSel then
-    begin
-      Part.Offset:= i;
-      Part.Len:= 1;
-    end
-    else
-    if bSelPrev and not bSel then
-    begin
-      DoPartInsert(AParts, Part, true);
+      if bSel and bSelPrev then
+        Inc(Part.Len)
+      else
+      if not bSelPrev and bSel then
+      begin
+        Part.Offset:= i;
+        Part.Len:= 1;
+      end
+      else
+      if bSelPrev and not bSel then
+      begin
+        DoPartInsert(AParts, Part, true);
+      end;
+      bSelPrev:= bSel;
     end;
-    bSelPrev:= bSel;
   end;
 
   //DoPartsShow(AParts); ////debug
