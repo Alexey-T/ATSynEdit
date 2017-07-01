@@ -39,7 +39,7 @@ begin
     NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
     NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
 
-    if (AX1>=NPosLeft) and (AX2<NPosRight) then
+    if (AX1>=NPosLeft) and (AX2<=NPosRight) then
       Result:= cRangeAllSelected
     else
     if (AX1>=NPosRight) or (AX2<=NPosLeft) then
