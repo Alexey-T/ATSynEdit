@@ -172,8 +172,11 @@ begin
       end;
   end;
 
-  //we loop over parts, and for entirely selected parts, colorize them.
-  //after that do slow loop (by offsets) over rest parts, saved in FLineOtherParts.
+  //we loop over parts
+  //- fully selected parts, colorize them.
+  //- fully unselected parts, skip.
+  //- partly selected parts, save them to FLineOtherParts,
+  //  and do slow loop (by offsets) over them.
 
   FillChar(FLineOtherParts, SizeOf(TATLineParts), 0);
   iPart:= 0;
@@ -183,16 +186,18 @@ begin
     if AParts[i].Len=0 then Break;
     nRangeX1:= ACharIndex + AParts[i].Offset;
     nRangeX2:= nRangeX1 + AParts[i].Len;
-    if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex)=cRangeAllSelected then
-    begin
-      AParts[i].ColorFont:= Part.ColorFont;
-      AParts[i].ColorBG:= Part.ColorBG; //clGreen
-    end
-    else
-    begin
-      FLineOtherParts[iPart].Offset:= AParts[i].Offset;
-      FLineOtherParts[iPart].Len:= AParts[i].Len;
-      Inc(iPart);
+    case IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) of
+      cRangeAllSelected:
+        begin
+          AParts[i].ColorFont:= Part.ColorFont;
+          AParts[i].ColorBG:= Part.ColorBG; //clGreen
+        end;
+      cRangePartlySelected:
+        begin
+          FLineOtherParts[iPart].Offset:= AParts[i].Offset;
+          FLineOtherParts[iPart].Len:= AParts[i].Len;
+          Inc(iPart);
+        end;
     end;
   end;
 
