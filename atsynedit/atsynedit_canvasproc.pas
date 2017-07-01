@@ -907,7 +907,7 @@ var
   PartSelBegin, PartSelEnd: TATLinePart;
   nIndex1, nIndex2,
   nOffset1, nOffset2, nOffsetLimit,
-  newLen1, newLen2, newOffset2: integer;
+  newLen2, newOffset2: integer;
   i: integer;
 begin
   Result:= false;
@@ -934,18 +934,6 @@ begin
 
   PartSelBegin.Offset:= AParts[nIndex1].Offset+nOffset1;
   PartSelBegin.Len:= AParts[nIndex1].Len-nOffset1;
-  {
-  if nIndex1>0 then
-  begin
-    PartSelBegin.Offset:= AParts[nIndex1].Offset+nOffset1;
-    PartSelBegin.Len:= AParts[nIndex1].Len-nOffset1;
-  end
-  else //test- does it help?
-  begin
-    PartSelBegin.Offset:= 0;
-    PartSelBegin.Len:= APart.Len;
-  end;
-  }
 
   PartSelBegin.FontBold:= AParts[nIndex1].FontBold;
   PartSelBegin.FontItalic:= AParts[nIndex1].FontItalic;
@@ -969,10 +957,6 @@ begin
   PartSelEnd.BorderUp:= AParts[nIndex2].BorderUp;
   PartSelEnd.ColorBorder:= AParts[nIndex2].ColorBorder;
 
-  with AParts[nIndex1] do
-  begin
-    newLen1:= nOffset1;
-  end;
   with AParts[nIndex2] do
   begin
     newLen2:= Len-nOffset2;
@@ -987,7 +971,7 @@ begin
     AddPart(AParts[i]);
   if nOffset1>0 then
   begin
-    AParts[nIndex1].Len:= newLen1;
+    FixPartLen(AParts[nIndex1], APart.Offset);
     AddPart(AParts[nIndex1]);
   end;
 
@@ -1029,10 +1013,6 @@ begin
     AddPart(AParts[i]);
   end;
 
-  //application.mainform.caption:= format('n1 %d, n2 %d, of len %d %d',
-  //  [nindex1, nindex2, aparts[nindex2].offset, aparts[nindex2].len]);
-
-  //copy result
   Move(ResultParts, AParts, SizeOf(AParts));
   Result:= true;
 end;
