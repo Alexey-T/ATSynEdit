@@ -20,7 +20,7 @@ begin
 end;
 
 
-function TATSynEdit.IsRangeSelected(AX1, AY1, AX2, AY2: integer): boolean;
+function TATSynEdit.IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
 var
   NPosLeft,
   NPosRight: integer;
@@ -28,14 +28,16 @@ var
 begin
   if not IsSelRectEmpty then
   begin
-    if AY1<>AY2 then exit(false); //dont allow multi-line range
-    if not ((AY1>=FSelRect.Top) and (AY1<=FSelRect.Bottom)) then exit(false);
+    if AY1<>AY2 then
+      exit(cRangeAllUnselected); //dont allow multi-line range
+    if not ((AY1>=FSelRect.Top) and (AY1<=FSelRect.Bottom)) then
+      exit(cRangeAllUnselected);
 
     SLine:= Strings.Lines[AY1];
     NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
     NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
-    Result:=
-      (AX1>=NPosLeft) and (AX2<NPosRight);
+    if (AX1>=NPosLeft) and (AX2<NPosRight) then
+      Result:= cRangeAllSelected;
   end
   else
     Result:= Carets.IsRangeSelected(AX1, AY1, AX2, AY2);

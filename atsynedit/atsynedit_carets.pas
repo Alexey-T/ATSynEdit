@@ -19,6 +19,12 @@ type
     cRelateAfter
     );
 
+  TATRangeSelection = (
+    cRangeAllSelected,
+    cRangeAllUnselected,
+    cRangePartlySelected
+    );
+
 procedure SwapInt(var n1, n2: integer); inline;
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
 function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer; AllowOnRightEdge: boolean=false): TATPosRelation;
@@ -78,7 +84,7 @@ type
     function IsLineListed(APosY: integer): boolean;
     function IsSelection: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
-    function IsRangeSelected(AX1, AY1, AX2, AY2: integer): boolean;
+    function IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
@@ -441,13 +447,14 @@ begin
   end;
 end;
 
-function TATCarets.IsRangeSelected(AX1, AY1, AX2, AY2: integer): boolean;
+function TATCarets.IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
 var
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
+  bLeft, bRight: TATPosRelation;
   i: integer;
 begin
-  Result:= false;
+  Result:= cRangeAllUnselected;
   for i:= 0 to Count-1 do
   begin
     Items[i].GetRange(X1, Y1, X2, Y2, bSel);
@@ -456,9 +463,16 @@ begin
     //carets sorted: can stop
     if Y1>AY1 then Exit;
 
-    if (IsPosInRange(AX1, AY1, X1, Y1, X2, Y2)=cRelateInside) and
-       (IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true)=cRelateInside) then
-      exit(true);
+    bLeft:= IsPosInRange(AX1, AY1, X1, Y1, X2, Y2);
+    bRight:= IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true);
+
+    if (bLeft=cRelateInside) and (bRight=cRelateInside) then
+      exit(cRangeAllSelected);
+
+    if (bLeft=cRelateAfter) or (bRight=cRelateBefore) then
+      Continue;
+
+    exit(cRangePartlySelected);
   end;
 end;
 

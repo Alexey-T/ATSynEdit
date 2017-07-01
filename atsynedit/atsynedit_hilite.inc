@@ -155,17 +155,21 @@ begin
       Break;
     end;
 
-  if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) then
-  begin
-    for i:= Low(AParts) to High(AParts) do
-      if AParts[i].Len=0 then
-        Break
-      else
-        begin
-          AParts[i].ColorFont:= Part.ColorFont;
-          AParts[i].ColorBG:= Part.ColorBG; //clGreen
-        end;
-    exit;
+  case IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) of
+    cRangeAllUnselected:
+      exit;
+    cRangeAllSelected:
+      begin
+        for i:= Low(AParts) to High(AParts) do
+          if AParts[i].Len=0 then
+            Break
+          else
+          begin
+            AParts[i].ColorFont:= Part.ColorFont;
+            AParts[i].ColorBG:= Part.ColorBG; //clGreen
+          end;
+        exit;
+      end;
   end;
 
   //we loop over parts, and for entirely selected parts, colorize them.
@@ -179,7 +183,7 @@ begin
     if AParts[i].Len=0 then Break;
     nRangeX1:= ACharIndex + AParts[i].Offset;
     nRangeX2:= nRangeX1 + AParts[i].Len;
-    if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) then
+    if IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex)=cRangeAllSelected then
     begin
       AParts[i].ColorFont:= Part.ColorFont;
       AParts[i].ColorBG:= Part.ColorBG; //clGreen
