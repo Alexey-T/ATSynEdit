@@ -230,6 +230,9 @@ begin
       end;
       bSelPrev:= bSel;
     end;
+
+    if bSelPrev then
+      DoPartInsert(AParts, Part, true);
   end;
 
   //DoPartsShow(AParts); ////debug
