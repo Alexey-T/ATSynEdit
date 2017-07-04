@@ -51,13 +51,29 @@ begin
   Result:= true;
 
   BeginUndoGroup;
+  FChangeBlockActive:= true;
   try
+    if Assigned(FOnChangeBlock) then
+      FOnChangeBlock(Self,
+        Point(0, ALineFrom),
+        Point(0, Min(ALineTo, Count-1)),
+        cBlockDeleteLines,
+        nil);
+
     for i:= Min(ALineTo, Count-1) downto ALineFrom do
       LineDelete(i);
+
+    if Assigned(FOnChangeBlock) then
+      FOnChangeBlock(Self,
+        Point(0, ALineFrom),
+        Point(0, 0),
+        cBlockInsertLines,
+        ANewLines);
 
     for i:= ANewLines.Count-1 downto 0 do
       LineInsert(ALineFrom, UTF8Decode(ANewLines[i]));
   finally
+    FChangeBlockActive:= false;
     EndUndoGroup;
   end;
 end;
@@ -67,6 +83,7 @@ procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwri
 var
   Str, StrLead, StrTail: atString;
   Block: TATStrings;
+  BlockUTF8: TStringList;
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
 begin
@@ -117,6 +134,7 @@ begin
 
   Block:= TATStrings.Create;
   try
+    FChangeBlockActive:= true;
     BeginUndoGroup;
     Block.LoadFromString(StrLead+AText);
 
@@ -131,6 +149,20 @@ begin
     if Lines[AY]<>'' then
       LineDelete(AY);
 
+    if Assigned(FOnChangeBlock) then
+    begin
+      BlockUTF8:= ATStrings_To_StringList(Block);
+      try
+        FOnChangeBlock(Self,
+          Point(0, AY),
+          Point(0, 0),
+          cBlockInsertLines,
+          BlockUTF8);
+      finally
+        FreeAndNil(BlockUTF8);
+      end;
+    end;
+
     if not bAtFileEnd then
       bUseBlockFinalEol:= bAtLineEnd
     else
@@ -144,6 +176,7 @@ begin
   finally
     FreeAndNil(Block);
     EndUndoGroup;
+    FChangeBlockActive:= false;
   end;
 end;
 
@@ -315,8 +348,17 @@ begin
   if (AFromX=0) and (AToX=0) then
   begin
     //selected entire lines
+    FChangeBlockActive:= true;
+    if Assigned(FOnChangeBlock) then
+      FOnChangeBlock(Self,
+        Point(0, AFromY),
+        Point(0, AToY-1),
+        cBlockDeleteLines,
+        nil);
+
     for i:= AToY-1 downto AFromY do
       LineDelete(i);
+    FChangeBlockActive:= false;
   end
   else
   begin
@@ -344,8 +386,18 @@ begin
     Lines[AFromY]:= Str;
 
     //del middle lines
+    FChangeBlockActive:= true;
+    if Assigned(FOnChangeBlock) then
+      FOnChangeBlock(Self,
+        Point(0, AFromY+1),
+        Point(0, AToY),
+        cBlockDeleteLines,
+        nil);
+
     for i:= AToY downto AFromY+1 do
       LineDelete(i);
+
+    FChangeBlockActive:= false;
 
     if bDelEmpty then
       if Str='' then
@@ -377,8 +429,31 @@ end;
 procedure TATStrings.TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings; AOverwrite: boolean);
 var
   Shift, PosAfter: TPoint;
+  BlockUTF8: TStringList;
   i: integer;
 begin
+  FChangeBlockActive:= true;
+
+  if Assigned(FOnChangeBlock) then
+  begin
+    BlockUTF8:= ATStrings_To_StringList(ABlock);
+    try
+      if AOverwrite then
+        FOnChangeBlock(Self,
+          Point(AX, AY),
+          Point(AX + Length(ABlock.Lines[0]), AY + ABlock.Count),
+          cBlockDeleteColumn,
+          nil);
+      FOnChangeBlock(Self,
+        Point(AX, AY),
+        Point(0, 0),
+        cBlockInsertColumn,
+        BlockUTF8);
+    finally
+      FreeAndNil(BlockUTF8);
+    end;
+  end;
+
   for i:= 0 to ABlock.Count-1 do
   begin
     TextInsert(AX, AY+i, ABlock.Lines[i], AOverwrite, Shift, PosAfter);
@@ -386,6 +461,8 @@ begin
     if not IsIndexValid(AY+i+1) then
       LineAddRaw('', cEndNone);
   end;
+
+  FChangeBlockActive:= false;
 end;
 
 procedure TATStrings.TextInsertEol(AX, AY: integer; AKeepCaret: boolean; const AStrIndent: atString; out AShift, APosAfter: TPoint);

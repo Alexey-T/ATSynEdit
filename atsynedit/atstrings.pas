@@ -50,6 +50,13 @@ type
     cEncWideBE
     );
 
+  TATBlockChangeKind = (
+    cBlockDeleteLines,
+    cBlockInsertLines,
+    cBlockDeleteColumn,
+    cBlockInsertColumn
+  );
+
 const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2);
 
@@ -85,6 +92,8 @@ type
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
   TATStringsLogEvent = procedure(Sender: TObject; ALine, ALen: integer) of object;
   TATStringsChangeEvent = procedure(Sender: TObject; ALine: integer; AChange: TATLineChangeKind) of object;
+  TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
+                                 AChange: TATBlockChangeKind; ABlock: TStringList) of object;
 
 type
   { TATStrings }
@@ -121,7 +130,12 @@ type
     FOnProgress: TNotifyEvent;
     FOnLog: TATStringsLogEvent;
     FOnChange: TATStringsChangeEvent;
+    FOnChangeBlock: TATStringsChangeBlockEvent;
     FSavedCaretsArray: TATPointArray;
+    FChangeBlockActive: boolean;
+      //to use with OnChangeBlock:
+      //indicates that program can ignore separate line changes in OnChange,
+      //because OnChangeBlock is called for all lines at once
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
@@ -213,6 +227,7 @@ type
     property ProgressValue: integer read FProgressValue write FProgressValue;
     property ProgressMinSize: integer read FProgressMinSize write FProgressMinSize;
     property ProgressMinIncrement: integer read FProgressMinIncrement write FProgressMinIncrement;
+    property ChangeBlockActive: boolean read FChangeBlockActive;
     property Gaps: TATSynGaps read FGaps;
     //actions
     procedure ActionDeleteFakeLine;
@@ -270,7 +285,10 @@ type
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
     property OnChange: TATStringsChangeEvent read FOnChange write FOnChange;
+    property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
   end;
+
+function ATStrings_To_StringList(L: TATStrings): TStringList;
 
 
 implementation
@@ -292,6 +310,14 @@ begin
   raise Exception.Create('Unknown enc value');
 end;
 
+function ATStrings_To_StringList(L: TATStrings): TStringList;
+var
+  i: integer;
+begin
+  Result:= TStringList.Create;
+  for i:= 0 to L.Count-1 do
+    Result.Add(UTF8Encode(L.Lines[i]));
+end;
 
 { TATStringItem }
 
@@ -598,6 +624,7 @@ begin
   FModified:= false;
   FModifiedRecent:= false;
   FModifiedVersion:= 0;
+  FChangeBlockActive:= false;
 
   FSaveSignUtf8:= true;
   FSaveSignWide:= true;
