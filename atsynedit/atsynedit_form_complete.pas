@@ -17,9 +17,6 @@ uses
   ATSynEdit_Commands,
   ATStringProc,
   ATListbox,
-  {$ifdef complete_at_scroll}
-  proc_scrollbars,
-  {$endif}
   Math;
 
 type
@@ -43,11 +40,6 @@ procedure DoEditorCompletionListbox(AEd: TATSynEdit;
 
 procedure EditorGetCurrentWord(Ed: TATSynEdit; const AWordChars: atString;
   out AWord: atString; out ACharsLeft, ACharsRight: integer);
-
-{$ifdef complete_at_scroll}
-type
-  TATListbox = type TATListboxMy;
-{$endif}
 
 type
   { TFormATSynEditComplete }
