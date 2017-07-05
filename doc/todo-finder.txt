@@ -1,9 +1,0 @@
-
-Issue https://github.com/Alexey-T/ATSynEdit/issues/93 needs much work:
-(slow part in replace: UpdateBuffer which is called after each replace in editor)
-
-maybe a) make regexpr.pas variant which can read TStream,
-b) make TStream over ATStrings (again use FStarts:TList), 
-c) make new finder which don't use ATStringBuffer (and StrText var) 
-at all but uses streams and directly reads-writes stream...
-

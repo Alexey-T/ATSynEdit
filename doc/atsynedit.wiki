@@ -484,12 +484,32 @@ Example:
 
 See topic above about "Strings object". To change text, get Strings property of editor. "Strings.Count" is number of lines in object. Then access methods of Strings: LineAdd, LineInsert, LineDelete. To get/set lines by index, use properties of Strings: Strings.Lines[i], etc, listed above.
 
-To delete range of text, not single line, use Strings.TextDeleteRange(). To insert block of text, with multiple lines, use Strings.TextInsert().
+To do advanced changes, use TATStrings.Text* methods:
+
+<syntaxhighlight lang="pascal">
+    procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
+      out AShift, APosAfter: TPoint);
+    procedure TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
+    procedure TextInsertColumnBlock(AX, AY: integer; ABlock: TATStrings;
+      AOverwrite: boolean);
+    procedure TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
+    procedure TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
+      APosAfter: TPoint; ACanDelEol: boolean=true);
+    function TextDeleteRange(AFromX, AFromY, AToX, AToY: integer; out AShift, APosAfter: TPoint): boolean;
+    procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
+      const AStrIndent: atString; out AShift, APosAfter: TPoint);
+    procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
+    procedure TextReplaceInOneLine(AY, AX1, AX2: integer; const AText: atString);
+    procedure TextReplaceRange(AFromX, AFromY, AToX, AToY: integer;
+      const AText: atString; out AShift, APosAfter: TPoint);
+    function TextReplaceLines_UTF8(ALineFrom, ALineTo: integer; ANewLines: TStringList): boolean;
+    function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: string = #10): atString;
+</syntaxhighlight>
 
 Strings.Lines[i] do not contain end-of-line chars. Usually not needed to change end-of-line chars. You can change them using Strings.LinesEnds[i].
 
+* After changes in Strings object, always call editor.Update(true). Update(false) only repaints editor, Update(true) invalidates WrapInfo object first (must be called after changes to Strings, or after window resize).
 * You can read Strings from one editor1 and set it to Strings of editor2. This will make editor2 having same strings object (needed for split-tab).
-* Do call editor's Update method to repaint. Call Update(true) to force invalidate WrapInfo object and repaint.
 
 == How to highlight syntax? ==
 
@@ -857,6 +877,29 @@ begin
   end;
 end;
 </syntaxhighlight>
+
+==Details about highlighting rendering==
+
+Central procedure is DoCalcLineHilite. For items of WrapInfo object, it calculates "line parts" (array TATLineParts of record TATLinePart). Each "part" here is one colored/styled fragment of string.
+After line parts are calculated, they pass to ATSynEdit_CanvasProc.CanvasTextOut to render.
+
+DoCalcLineHilite works like this:
+
+* Updates adapter's "dynamic hilites enabled" flag (to on/off) and calls adapter's OnCalcLineHilite. This makes initial version of line parts.
+* Calculated line parts are added to cache (same calculation of same WrapInfo item will not happen, only cache item is used).
+* Updates line parts via OnCalcHilite event (it's additional method to hilite, first is adapter, usually only adapter is used).
+* Calls DoPartCalc_ApplyAttribsOver to apply Attribs object to line parts. E.g. add parts for spell-checker bad words. E.g. add parts for underlined URLs.
+* Calls DoPartCalc_ApplySelectionOver to apply selection (for all multi-carets, or one column selection) to parts.
+
+DoPartCalc_ApplySelectionOver is complex function.
+It updates TATLineParts. How it works:
+
+* It tests entire TATLineParts - is it all selected (optimization for selected-all), or all unselected (optimization for selected-none), or partly selected. 
+* If all selected, it just marks all parts (already calc'ed) with selection color. If partly selected, it finds parts, which are all/partly selected.
+* For parts, which are all selected, it marks them with selection color. 
+* For parts, which are partly selected, it makes slow loop over offsets in parts. This slow loop finds chars which are selected and inserts new parts (with selection color) for them.
+
+To find/insert parts to TATLineParts, funcs DoPartFind/ DoPartInsert are used.
 
 ==more==
 
