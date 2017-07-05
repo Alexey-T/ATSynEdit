@@ -69,7 +69,7 @@ end;
 
 procedure TfmMain.bGettextClick(Sender: TObject);
 begin
-  ShowMessage(UTF8Encode(ed.Strings.TextString));
+  ShowMessage(UTF8Encode(ed.Text));
 end;
 
 

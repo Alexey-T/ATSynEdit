@@ -8,7 +8,7 @@ object fmMain: TfmMain
   ClientWidth = 932
   OnCreate = FormCreate
   OnShow = FormShow
-  LCLVersion = '1.7'
+  LCLVersion = '1.9.0.0'
   object Panel1: TPanel
     Left = 0
     Height = 442
