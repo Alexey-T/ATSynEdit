@@ -50,6 +50,9 @@ const
   cCommand_ColSelectPageUp = 116;
   cCommand_ColSelectPageDown = 117;
 
+  cCommand_ColSelectWithoutKey_On = 130;
+  cCommand_ColSelectWithoutKey_Off = 131;
+
   cCommand_TextInsert = 150;
   cCommand_TextInsertTabChar = 151;
   cCommand_KeyBackspace = 152;

@@ -469,6 +469,7 @@ type
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
+    FOptMouseColumnSelectionWithoutKey: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
     FOptMarkersSize: integer;
@@ -772,6 +773,7 @@ type
 
     //editing
     procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
     function DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
     function DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
     function DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
@@ -1185,6 +1187,7 @@ type
     property OptMouseWheelScrollHorzWithState2: TShiftStateEnum read FOptMouseWheelScrollHorzWithState2 write FOptMouseWheelScrollHorzWithState2 default ssHyper;
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssCtrl;
+    property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
@@ -3751,15 +3754,26 @@ begin
           if P.Y>=0 then
           begin
             //drag w/out button pressed: single selection
-            if FOptMouseEnableNormalSelection then
-              if [ssXControl, ssShift, ssAlt]*Shift=[] then
+            if [ssXControl, ssShift, ssAlt]*Shift=[] then
+            begin
+              if FOptMouseEnableColumnSelection and FOptMouseColumnSelectionWithoutKey then
               begin
+                //column selection
+                DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+                DoSelect_None;
+                DoSelect_ColumnBlock(FMouseDownPnt, P);
+              end
+              else
+              if FOptMouseEnableNormalSelection then
+              begin
+                //normal selection
                 DoCaretSingleAsIs;
                 if FMouseDownDouble and FOptMouse2ClickDragSelectsWords then
                   DoSelect_WordRange(0, FMouseDownPnt, P)
                 else
                   DoSelect_CharRange(0, P);
               end;
+            end;
 
             //drag with Ctrl pressed: add selection
             if Shift=[ssXControl, ssLeft] then
@@ -3768,7 +3782,7 @@ begin
               DoSelect_CharRange(nIndex, P);
             end;
 
-            //drag with Alt pressed
+            //drag with Alt pressed: column selection
             if FOptMouseEnableColumnSelection then
               if Shift=[ssAlt, ssLeft] then
               begin

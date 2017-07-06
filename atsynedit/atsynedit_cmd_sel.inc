@@ -227,4 +227,9 @@ begin
   Result:= [cResultCaretAny];
 end;
 
+function TATSynEdit.DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
+begin
+  FOptMouseColumnSelectionWithoutKey:= AValue;
+  Result:= [];
+end;
 

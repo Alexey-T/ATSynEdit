@@ -212,6 +212,9 @@ begin
     cCommand_ColSelectToLineBegin: Res:= DoCommand_SelectColumnToLineEdge(false);
     cCommand_ColSelectToLineEnd:   Res:= DoCommand_SelectColumnToLineEdge(true);
 
+    cCommand_ColSelectWithoutKey_On: Res:= DoCommand_ColumnSelectWithoutKey(true);
+    cCommand_ColSelectWithoutKey_Off: Res:= DoCommand_ColumnSelectWithoutKey(false);
+
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
     cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
     cCommand_KeyBackspace:        Res:= DoCommand_TextBackspace;
