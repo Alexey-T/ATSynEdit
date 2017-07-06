@@ -264,6 +264,9 @@ begin
   if (AY=Count-1) and (Str='') and (LinesEnds[AY]=cEndNone) then
     Exit;
 
+ BeginUndoGroup;
+ try
+
   DelEol:= false;
   if AX<Length(Str) then
   begin
@@ -306,6 +309,10 @@ begin
 
       AShift.Y:= -1;
     end;
+
+ finally
+   EndUndoGroup;
+ end;
 end;
 
 function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
