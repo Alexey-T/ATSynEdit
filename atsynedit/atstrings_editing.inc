@@ -205,46 +205,46 @@ begin
   if not IsIndexValid(AY) then Exit;
   Str:= Lines[AY];
 
- BeginUndoGroup;
- try
+  BeginUndoGroup;
+  try
 
-  //handle spec case: caret on last fake line, BkSp pressed:
-  //delete fake line,
-  //delete EOL at prev line
-  if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake then
-  begin
-    LineDelete(AY, false);
-    LinesEnds[AY-1]:= cEndNone;
-    AShift.Y:= -1;
-    APosAfter.X:= Length(Lines[AY-1]);
-    APosAfter.Y:= AY-1;
-    exit
-  end;
-
-  if AX>0 then
-  begin
-    if AX<=Length(Str) then
+    //handle spec case: caret on last fake line, BkSp pressed:
+    //delete fake line,
+    //delete EOL at prev line
+    if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake then
     begin
-      System.Delete(Str, Max(1, AX+1-ALen), ALen);
-      Lines[AY]:= Str;
+      LineDelete(AY, false);
+      LinesEnds[AY-1]:= cEndNone;
+      AShift.Y:= -1;
+      APosAfter.X:= Length(Lines[AY-1]);
+      APosAfter.Y:= AY-1;
+      exit
     end;
-    AShift.X:= -Min(AX, ALen);
-    APosAfter.X:= Max(0, AX-ALen);
-  end
-  else
-  if AY>0 then
-  begin
-    StrPrev:= Lines[AY-1];
-    Lines[AY-1]:= StrPrev+Str;
-    LineDelete(AY);
-    AShift.Y:= -1;
-    APosAfter.X:= Length(StrPrev);
-    APosAfter.Y:= AY-1;
-  end;
 
- finally
-   EndUndoGroup;
- end;
+    if AX>0 then
+    begin
+      if AX<=Length(Str) then
+      begin
+        System.Delete(Str, Max(1, AX+1-ALen), ALen);
+        Lines[AY]:= Str;
+      end;
+      AShift.X:= -Min(AX, ALen);
+      APosAfter.X:= Max(0, AX-ALen);
+    end
+    else
+    if AY>0 then
+    begin
+      StrPrev:= Lines[AY-1];
+      Lines[AY-1]:= StrPrev+Str;
+      LineDelete(AY);
+      AShift.Y:= -1;
+      APosAfter.X:= Length(StrPrev);
+      APosAfter.Y:= AY-1;
+    end;
+
+  finally
+    EndUndoGroup;
+  end;
 end;
 
 procedure TATStrings.TextDeleteRight(AX, AY: integer; ALen: integer; out AShift,
@@ -264,55 +264,55 @@ begin
   if (AY=Count-1) and (Str='') and (LinesEnds[AY]=cEndNone) then
     Exit;
 
- BeginUndoGroup;
- try
+  BeginUndoGroup;
+  try
 
-  DelEol:= false;
-  if AX<Length(Str) then
-  begin
-    System.Delete(Str, AX+1, ALen);
-    Lines[AY]:= Str;
-    AShift.X:= -ALen;
-  end
-  else
-    DelEol:= ACanDelEol;
-
-  if DelEol then
-    if Str='' then //handle for simpler line-states
+    DelEol:= false;
+    if AX<Length(Str) then
     begin
-      AShift.Y:= -1;
-      if (AY>0) and (AY=Count-1) then
-      begin
-        APosAfter.X:= 0;
-        APosAfter.Y:= AY-1;
-      end;
-      LineDelete(AY);
+      System.Delete(Str, AX+1, ALen);
+      Lines[AY]:= Str;
+      AShift.X:= -ALen;
     end
     else
-    begin
-      //add spaces if we are after eol
-      if AX>=Length(Str) then
-        Str:= Str+StringOfChar(' ', AX-Length(Str));
+      DelEol:= ACanDelEol;
 
-      //not last: del next line
-      if AY+1<Count then
+    if DelEol then
+      if Str='' then //handle for simpler line-states
       begin
-        Lines[AY]:= Str+Lines[AY+1];
-        LineDelete(AY+1, false{not force});
-        //maybe also eol
-        if AY=Count-1 then
-          LinesEnds[AY]:= cEndNone;
+        AShift.Y:= -1;
+        if (AY>0) and (AY=Count-1) then
+        begin
+          APosAfter.X:= 0;
+          APosAfter.Y:= AY-1;
+        end;
+        LineDelete(AY);
       end
       else
-        //last line: del eol
-        LinesEnds[AY]:= cEndNone;
+      begin
+        //add spaces if we are after eol
+        if AX>=Length(Str) then
+          Str:= Str+StringOfChar(' ', AX-Length(Str));
 
-      AShift.Y:= -1;
-    end;
+        //not last: del next line
+        if AY+1<Count then
+        begin
+          Lines[AY]:= Str+Lines[AY+1];
+          LineDelete(AY+1, false{not force});
+          //maybe also eol
+          if AY=Count-1 then
+            LinesEnds[AY]:= cEndNone;
+        end
+        else
+          //last line: del eol
+          LinesEnds[AY]:= cEndNone;
 
- finally
-   EndUndoGroup;
- end;
+        AShift.Y:= -1;
+      end;
+
+  finally
+    EndUndoGroup;
+  end;
 end;
 
 function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
