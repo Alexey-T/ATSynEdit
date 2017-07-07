@@ -10,14 +10,18 @@ unit ATStrings;
 interface
 
 uses
-  Classes, SysUtils, Graphics,
+  {$ifdef windows} Windows, {$endif}
+  SysUtils, Classes, Graphics,
   LazUTF8,
   FileUtil,
   ATStringProc,
   ATStringProc_Utf8Detect,
   ATStrings_Undo,
   ATStrings_Hints,
-  ATSynEdit_Gaps;
+  ATSynEdit_Gaps,
+  Math,
+  LazUtf8Classes,
+  LConvEncoding;
 
 const
   //set it to number of editors, which share same Strings obj
@@ -292,13 +296,6 @@ function ATStrings_To_StringList(L: TATStrings): TStringList;
 
 
 implementation
-
-uses
-  Dialogs,
-  Math,
-  {$ifdef windows} Windows, {$endif}
-  LazUtf8Classes,
-  LConvEncoding;
 
 const
   cSignUTF8: AnsiString = #$EF#$BB#$BF;
