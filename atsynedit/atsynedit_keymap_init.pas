@@ -61,8 +61,9 @@ begin
   M.Add(cCommand_ColSelectToLineBegin, 'column select: to line begin', ['Shift+Alt+Home'], []);
   M.Add(cCommand_ColSelectToLineEnd,   'column select: to line end',   ['Shift+Alt+End'], []);
 
-  M.Add(cCommand_ColSelectWithoutKey_On, 'column select without key modifier: on', [], []);
-  M.Add(cCommand_ColSelectWithoutKey_Off, 'column select without key modifier: off', [], []);
+  M.Add(cCommand_ColSelectWithoutKey_On, 'column selection without key modifier: on', [], []);
+  M.Add(cCommand_ColSelectWithoutKey_Off, 'column selection without key modifier: off', [], []);
+  M.Add(cCommand_ColSelectWithoutKey_Toggle, 'column selection without key modifier: toggle', [], []);
 
   M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);

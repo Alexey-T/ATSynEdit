@@ -52,6 +52,7 @@ const
 
   cCommand_ColSelectWithoutKey_On = 130;
   cCommand_ColSelectWithoutKey_Off = 131;
+  cCommand_ColSelectWithoutKey_Toggle = 132;
 
   cCommand_TextInsert = 150;
   cCommand_TextInsertTabChar = 151;
