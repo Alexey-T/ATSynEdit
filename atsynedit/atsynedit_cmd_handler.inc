@@ -228,21 +228,45 @@ begin
           Res:= DoCommand_KeyUpDown(true, 1, false);
       end;
 
-    cCommand_KeyHome,
-    cCommand_KeyHome_Sel:
+    cCommand_KeyHome:
       Res:= DoCommand_KeyHome;
+    cCommand_KeyHome_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Res:= DoCommand_SelectColumnToLineEdge(false)
+        else
+          Res:= DoCommand_KeyHome;
+      end;
 
-    cCommand_KeyEnd,
-    cCommand_KeyEnd_Sel:
+    cCommand_KeyEnd:
       Res:= DoCommand_KeyEnd;
+    cCommand_KeyEnd_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Res:= DoCommand_SelectColumnToLineEdge(true)
+        else
+          Res:= DoCommand_KeyEnd;
+      end;
 
-    cCommand_KeyPageUp,
-    cCommand_KeyPageUp_Sel:
+    cCommand_KeyPageUp:
       Res:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
+    cCommand_KeyPageUp_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Res:= DoCommand_SelectColumn(cDirColumnPageUp)
+        else
+          Res:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
+      end;
 
-    cCommand_KeyPageDown,
-    cCommand_KeyPageDown_Sel:
+    cCommand_KeyPageDown:
       Res:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
+    cCommand_KeyPageDown_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Res:= DoCommand_SelectColumn(cDirColumnPageDown)
+        else
+          Res:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
+      end;
 
     cCommand_ColSelectLeft:        Res:= DoCommand_SelectColumn(cDirColumnLeft);
     cCommand_ColSelectRight:       Res:= DoCommand_SelectColumn(cDirColumnRight);
