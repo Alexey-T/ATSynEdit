@@ -329,6 +329,8 @@ begin
     DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
+    //on Enter reset prev column for up/down
+    Caret.CoordColumn:= 0;
   end;
 
   if bNeedGroup then Strings.EndUndoGroup;
