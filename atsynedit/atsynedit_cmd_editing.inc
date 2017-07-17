@@ -578,7 +578,7 @@ begin
   if FOptIndentKeepsAlign then
     if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
-  //calc shifts (emulate Laz ide indent)
+  //calc shifts (emulate Lazarus IDE indent)
   NIndent1:= SGetIndentChars(Strings.Lines[NBlockBeginY]);
   NIndent2:= SGetIndentChars(Strings.Lines[NBlockEndY]);
   NShiftInit:= Abs(FOptIndentSize) * IfThen(ARight, 1, -1);
@@ -601,10 +601,20 @@ begin
   end;
 
   //correct selection
-  if NBlockBeginX>0 then
-    Caret.PosX:= Max(0, NBlockBeginX+NShift1);
-  if NBlockEndX>0 then
-    Caret.EndX:= Max(0, NBlockEndX+NShift2);
+  if FOptIndentMakesWholeLinesSelection then
+  begin
+    Caret.EndX:= 0;
+    Caret.EndY:= NBlockBeginY;
+    Caret.PosX:= 0;
+    Caret.PosY:= Min(NBlockEndY+1, Strings.Count-1);
+  end
+  else
+  begin
+    if NBlockBeginX>0 then
+      Caret.PosX:= Max(0, NBlockBeginX+NShift1);
+    if NBlockEndX>0 then
+      Caret.EndX:= Max(0, NBlockEndX+NShift2);
+  end;
 
   Result:= [cResultText, cResultCaretAny];
 end;

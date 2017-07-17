@@ -482,6 +482,7 @@ type
     FOptUndoGrouped: boolean;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
+    FOptIndentMakesWholeLinesSelection: boolean;
     FOptBorderWidth: integer;
     FOptBorderWidthFocused: integer;
     FOptBorderFocusedActive: boolean;
@@ -1201,6 +1202,7 @@ type
     property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents default true;
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize default 2;
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign default true;
+    property OptIndentMakesWholeLinesSelection: boolean read FOptIndentMakesWholeLinesSelection write FOptIndentMakesWholeLinesSelection default false;
     property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines default true;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG default true;
@@ -2727,6 +2729,7 @@ begin
   FOptShowGutterCaretBG:= true;
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
+  FOptIndentMakesWholeLinesSelection:= false;
   FOptUndoGrouped:= true;
   FOptSavingForceFinalEol:= false;
   FOptSavingTrimSpaces:= false;
