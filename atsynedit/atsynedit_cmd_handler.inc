@@ -344,8 +344,8 @@ begin
     cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);
 
-    cCommand_ScrollLineUp:             Res:= DoCommand_ScrollVert(-1, true);
-    cCommand_ScrollLineDown:           Res:= DoCommand_ScrollVert(1, true);
+    cCommand_ScrollLineUp:             Res:= DoCommand_ScrollVert(-1, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollLineDown:           Res:= DoCommand_ScrollVert(1, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollToCaretTop:         Res:= [cResultCaretTop];
     cCommand_ScrollToCaretBottom:      Res:= [cResultCaretBottom];
     cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];

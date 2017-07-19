@@ -459,6 +459,7 @@ type
     FOptMaxLinesToCountUnindent: integer;
     FOptScrollbarsNew: boolean;
     FOptScrollbarsNewArrowsKind: TATScrollArrowsKind;
+    FOptScrollLineCommandsKeepCaretOnScreen: boolean;
     FOptShowFontLigatures: boolean;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
@@ -1102,6 +1103,8 @@ type
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
     property OptScrollbarsNewArrowsKind: TATScrollArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default asaArrowsNormal;
+    property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
+
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
@@ -2665,6 +2668,7 @@ begin
 
   FOptScrollbarsNew:= false;
   FOptScrollbarsNewArrowsKind:= asaArrowsNormal;
+  FOptScrollLineCommandsKeepCaretOnScreen:= true;
 
   FOptShowFontLigatures:= true;
   FOptShowURLs:= true;
