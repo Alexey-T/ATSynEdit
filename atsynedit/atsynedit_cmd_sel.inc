@@ -230,6 +230,6 @@ end;
 function TATSynEdit.DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
 begin
   FOptMouseColumnSelectionWithoutKey:= AValue;
-  Result:= [];
+  Result:= [cResultState];
 end;
 

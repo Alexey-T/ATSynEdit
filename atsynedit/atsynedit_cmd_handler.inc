@@ -284,7 +284,7 @@ begin
     cCommand_ColSelectWithoutKey_Toggle:
       begin
         OptMouseColumnSelectionWithoutKey:= not OptMouseColumnSelectionWithoutKey;
-        Res:= [];
+        Res:= [cResultState];
       end;
 
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
