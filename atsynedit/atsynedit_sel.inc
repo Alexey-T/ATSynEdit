@@ -312,24 +312,19 @@ procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
 var
   PTarget: TPoint;
   SLine: atString;
-  i: integer;
 begin
   PTarget:= P2;
   if P1.Y>P2.Y then
     SwapInt(P1.Y, P2.Y);
 
+  //setting SelRect must be first, it's used later
+  FSelRect.Left:= Min(P1.X, P2.X);
+  FSelRect.Right:= Max(P1.X, P2.X);
+  FSelRect.Top:= P1.Y;
+  FSelRect.Bottom:= P2.Y;
+
   if FOptCaretsAddedToColumnSelection then
-    for i:= P1.Y to P2.Y do
-    begin
-      if i=P1.Y then Carets.Clear;
-      SLine:= Strings.Lines[i];
-      Carets.Add(
-        SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize),
-        i,
-        SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize),
-        i
-        );
-    end
+    DoCaretsAddOnColumnSelection(P1, P2)
   else
   begin
     //single caret at moving block edge
@@ -337,11 +332,6 @@ begin
     PTarget.X:= SColumnPosToCharPos(SLine, PTarget.X, OptTabSize);
     DoCaretSingle(PTarget.X, PTarget.Y);
   end;
-
-  FSelRect.Left:= Min(P1.X, P2.X);
-  FSelRect.Right:= Max(P1.X, P2.X);
-  FSelRect.Top:= P1.Y;
-  FSelRect.Bottom:= P2.Y;
 end;
 
 

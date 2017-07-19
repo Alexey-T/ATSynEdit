@@ -566,6 +566,7 @@ type
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
+    procedure DoCaretsAddOnColumnSelection(P1, P2: TPoint);
     function DoCaretsKeepOnScreen: boolean;
     procedure DoCaretsOnChanged(Sender: TObject);
     procedure DoCaretForceShow;

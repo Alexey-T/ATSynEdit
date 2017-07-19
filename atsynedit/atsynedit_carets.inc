@@ -29,6 +29,25 @@ begin
 end;
 
 
+procedure TATSynEdit.DoCaretsAddOnColumnSelection(P1, P2: TPoint);
+var
+  SLine: atString;
+  i: integer;
+begin
+  for i:= P1.Y to P2.Y do
+  begin
+    if i=P1.Y then
+      Carets.Clear;
+    SLine:= Strings.Lines[i];
+    Carets.Add(
+      SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize),
+      i,
+      SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize),
+      i
+      );
+  end
+end;
+
 procedure TATSynEdit.DoCaretAddToPoint(AX, AY: integer);
 var
   N: integer;
