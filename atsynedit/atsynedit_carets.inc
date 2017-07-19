@@ -29,20 +29,20 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsAddOnColumnSelection(P1, P2: TPoint);
+procedure TATSynEdit.DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
 var
   SLine: atString;
   i: integer;
 begin
-  for i:= P1.Y to P2.Y do
+  for i:= APos1.Y to APos2.Y do
   begin
-    if i=P1.Y then
+    if i=APos1.Y then
       Carets.Clear;
     SLine:= Strings.Lines[i];
     Carets.Add(
-      SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize),
+      SColumnPosToCharPos(SLine, ARect.Right, OptTabSize),
       i,
-      SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize),
+      SColumnPosToCharPos(SLine, ARect.Left, OptTabSize),
       i
       );
   end

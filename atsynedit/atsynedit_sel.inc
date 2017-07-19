@@ -324,7 +324,7 @@ begin
   FSelRect.Bottom:= P2.Y;
 
   if FOptCaretsAddedToColumnSelection then
-    DoCaretsAddOnColumnSelection(P1, P2)
+    DoCaretsAddOnColumnBlock(P1, P2, FSelRect)
   else
   begin
     //single caret at moving block edge
