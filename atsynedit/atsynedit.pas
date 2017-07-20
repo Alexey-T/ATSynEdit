@@ -803,7 +803,7 @@ type
     function DoCommand_Cancel: TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;
-    function DoCommand_ToggleWordWrap: TATCommandResults;
+    function DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;
     function DoCommand_ToggleUnprinted: TATCommandResults;
     function DoCommand_ToggleUnprintedSpaces: TATCommandResults;
     function DoCommand_ToggleUnprintedEnds: TATCommandResults;

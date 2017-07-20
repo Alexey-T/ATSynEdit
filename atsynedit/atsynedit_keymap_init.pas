@@ -95,7 +95,8 @@ begin
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', ['Ctrl+Shift+R'], []);
-  M.Add(cCommand_ToggleWordWrap, 'toggle word-wrap mode', [cXControl+'+U'], []);
+  M.Add(cCommand_ToggleWordWrap, 'toggle word-wrap mode (off/screen)', [cXControl+'+U'], []);
+  M.Add(cCommand_ToggleWordWrapAlt, 'toggle word-wrap mode (off/screen/margin)', [], []);
 
   M.Add(cCommand_ToggleUnprinted, 'toggle unprinted chars: enable all', [], []);
   M.Add(cCommand_ToggleUnprintedSpaces, 'toggle unprinted chars: spaces/tabs', [], []);

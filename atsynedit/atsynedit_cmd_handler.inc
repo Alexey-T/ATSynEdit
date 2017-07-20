@@ -330,7 +330,8 @@ begin
 
     cCommand_ToggleOverwrite:          Res:= DoCommand_ToggleOverwrite;
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
-    cCommand_ToggleWordWrap:           Res:= DoCommand_ToggleWordWrap;
+    cCommand_ToggleWordWrap:           Res:= DoCommand_ToggleWordWrap(false);
+    cCommand_ToggleWordWrapAlt:        Res:= DoCommand_ToggleWordWrap(true);
     cCommand_ToggleUnprinted:          Res:= DoCommand_ToggleUnprinted;
     cCommand_ToggleUnprintedSpaces:    Res:= DoCommand_ToggleUnprintedSpaces;
     cCommand_ToggleUnprintedEnds:      Res:= DoCommand_ToggleUnprintedEnds;

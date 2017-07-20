@@ -6,12 +6,26 @@ begin
   Result:= [cResultState];
 end;
 
-function TATSynEdit.DoCommand_ToggleWordWrap: TATCommandResults;
+function TATSynEdit.DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;
 begin
-  if FWrapMode=cWrapOff then
-    FWrapMode:= cWrapOn
-  else
-    FWrapMode:= cWrapOff;
+  case FWrapMode of
+    cWrapOff:
+      begin
+        FWrapMode:= cWrapOn;
+      end;
+    cWrapOn:
+      begin
+        if AltOrder then
+          FWrapMode:= cWrapAtMargin
+        else
+          FWrapMode:= cWrapOff;
+      end;
+    cWrapAtMargin:
+      begin
+        FWrapMode:= cWrapOff;
+      end;
+  end;
+
   FWrapUpdateNeeded:= true;
   Result:= [cResultState];
 end;
