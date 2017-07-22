@@ -53,22 +53,20 @@ begin
   BeginUndoGroup;
   FChangeBlockActive:= true;
   try
-    if Assigned(FOnChangeBlock) then
-      FOnChangeBlock(Self,
-        Point(0, ALineFrom),
-        Point(0, Min(ALineTo, Count-1)),
-        cBlockDeleteLines,
-        nil);
+    DoOnChangeBlock(
+      0, ALineFrom,
+      0, Min(ALineTo, Count-1),
+      cBlockDeleteLines,
+      nil);
 
     for i:= Min(ALineTo, Count-1) downto ALineFrom do
       LineDelete(i);
 
-    if Assigned(FOnChangeBlock) then
-      FOnChangeBlock(Self,
-        Point(0, ALineFrom),
-        Point(0, 0),
-        cBlockInsertLines,
-        ANewLines);
+    DoOnChangeBlock(
+      0, ALineFrom,
+      0, 0,
+      cBlockInsertLines,
+      ANewLines);
 
     for i:= ANewLines.Count-1 downto 0 do
       LineInsert(ALineFrom, UTF8Decode(ANewLines[i]));
@@ -153,9 +151,9 @@ begin
     begin
       BlockUTF8:= ATStrings_To_StringList(Block);
       try
-        FOnChangeBlock(Self,
-          Point(0, AY),
-          Point(0, 0),
+        DoOnChangeBlock(
+          0, AY,
+          0, 0,
           cBlockInsertLines,
           BlockUTF8);
       finally
@@ -213,6 +211,12 @@ begin
     //delete EOL at prev line
     if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake then
     begin
+      DoOnChangeBlock(
+        0, AY,
+        0, AY+1,
+        cBlockDeleteLines,
+        nil);
+
       LineDelete(AY, false);
       LinesEnds[AY-1]:= cEndNone;
       AShift.Y:= -1;
@@ -234,6 +238,12 @@ begin
     else
     if AY>0 then
     begin
+      DoOnChangeBlock(
+        0, AY,
+        0, AY+1,
+        cBlockDeleteLines,
+        nil);
+
       StrPrev:= Lines[AY-1];
       Lines[AY-1]:= StrPrev+Str;
       LineDelete(AY);
@@ -286,6 +296,13 @@ begin
           APosAfter.X:= 0;
           APosAfter.Y:= AY-1;
         end;
+
+        DoOnChangeBlock(
+          0, AY,
+          0, AY+1,
+          cBlockDeleteLines,
+          nil);
+
         LineDelete(AY);
       end
       else
@@ -297,6 +314,12 @@ begin
         //not last: del next line
         if AY+1<Count then
         begin
+          DoOnChangeBlock(
+            0, AY+1,
+            0, AY+2,
+            cBlockDeleteLines,
+            nil);
+
           Lines[AY]:= Str+Lines[AY+1];
           LineDelete(AY+1, false{not force});
           //maybe also eol
@@ -356,12 +379,11 @@ begin
   begin
     //selected entire lines
     FChangeBlockActive:= true;
-    if Assigned(FOnChangeBlock) then
-      FOnChangeBlock(Self,
-        Point(0, AFromY),
-        Point(0, AToY-1),
-        cBlockDeleteLines,
-        nil);
+    DoOnChangeBlock(
+      0, AFromY,
+      0, AToY-1,
+      cBlockDeleteLines,
+      nil);
 
     for i:= AToY-1 downto AFromY do
       LineDelete(i);
@@ -394,12 +416,11 @@ begin
 
     //del middle lines
     FChangeBlockActive:= true;
-    if Assigned(FOnChangeBlock) then
-      FOnChangeBlock(Self,
-        Point(0, AFromY+1),
-        Point(0, AToY),
-        cBlockDeleteLines,
-        nil);
+    DoOnChangeBlock(
+      0, AFromY+1,
+      0, AToY,
+      cBlockDeleteLines,
+      nil);
 
     for i:= AToY downto AFromY+1 do
       LineDelete(i);
@@ -446,14 +467,14 @@ begin
     BlockUTF8:= ATStrings_To_StringList(ABlock);
     try
       if AOverwrite then
-        FOnChangeBlock(Self,
-          Point(AX, AY),
-          Point(AX + Length(ABlock.Lines[0]), AY + ABlock.Count),
+        DoOnChangeBlock(
+          AX, AY,
+          AX + Length(ABlock.Lines[0]), AY + ABlock.Count,
           cBlockDeleteColumn,
           nil);
-      FOnChangeBlock(Self,
-        Point(AX, AY),
-        Point(0, 0),
+      DoOnChangeBlock(
+        AX, AY,
+        0, 0,
         cBlockInsertColumn,
         BlockUTF8);
     finally

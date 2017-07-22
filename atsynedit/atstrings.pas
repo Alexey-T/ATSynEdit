@@ -187,6 +187,8 @@ type
     procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
+    procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
+      AChange: TATBlockChangeKind; ABlock: TStringList);
   protected
     function CreateItem_UTF8(const AString: UTF8String; AEnd: TATLineEnds): TATStringItem; virtual;
     function CreateItem_Uni(const AString: atString; AEnd: TATLineEnds): TATStringItem; virtual;
@@ -1276,6 +1278,17 @@ begin
   Ptr:= pointer{%H-}(N);
   with FListUpdates do
     if IndexOf(Ptr)<0 then Add(Ptr);
+end;
+
+procedure TATStrings.DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
+  AChange: TATBlockChangeKind; ABlock: TStringList);
+begin
+  if Assigned(FOnChangeBlock) then
+    FOnChangeBlock(Self,
+      Point(AX1, AY1),
+      Point(AX2, AY2),
+      AChange,
+      ABlock);
 end;
 
 function TATStrings.CreateItem_UTF8(const AString: UTF8String;
