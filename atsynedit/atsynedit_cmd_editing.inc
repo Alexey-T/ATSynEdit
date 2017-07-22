@@ -740,8 +740,16 @@ begin
   if ModeReadOnly then Exit;
 
   DoCaretSingleAsIs;
-
   Caret:= FCarets[0];
+
+  Strings.ChangeBlockActive:= true;
+  Strings.DoOnChangeBlock(
+    Caret.PosX, Caret.PosY,
+    0, Strings.Count,
+    cBlockDeleteLines,
+    nil
+    );
+
   Str:= Strings.Lines[Caret.PosY];
   if Caret.PosX<Length(Str) then
   begin
@@ -754,6 +762,8 @@ begin
 
   if Caret.PosY>=Strings.Count-1 then
     Strings.LinesEnds[Caret.PosY]:= cEndNone;
+
+  Strings.ChangeBlockActive:= false;
 
   Result:= [cResultText, cResultCaretBottom];
 end;

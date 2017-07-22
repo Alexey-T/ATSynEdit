@@ -187,8 +187,6 @@ type
     procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
-    procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
-      AChange: TATBlockChangeKind; ABlock: TStringList);
   protected
     function CreateItem_UTF8(const AString: UTF8String; AEnd: TATLineEnds): TATStringItem; virtual;
     function CreateItem_Uni(const AString: atString; AEnd: TATLineEnds): TATStringItem; virtual;
@@ -233,7 +231,7 @@ type
     property ProgressValue: integer read FProgressValue write FProgressValue;
     property ProgressMinSize: integer read FProgressMinSize write FProgressMinSize;
     property ProgressMinIncrement: integer read FProgressMinIncrement write FProgressMinIncrement;
-    property ChangeBlockActive: boolean read FChangeBlockActive;
+    property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property Gaps: TATSynGaps read FGaps;
     //actions
     procedure ActionDeleteFakeLine;
@@ -287,6 +285,8 @@ type
     //misc
     procedure DoSaveLastEditPos;
     procedure DoGotoLastEditPos;
+    procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
+      AChange: TATBlockChangeKind; ABlock: TStringList);
     //events
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
