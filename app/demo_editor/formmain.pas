@@ -102,6 +102,7 @@ type
     mnuFileSaveAs: TMenuItem;
     mnuGoto: TMenuItem;
     OpenDialog1: TOpenDialog;
+    PanelEvent: TPanel;
     PanelMain: TPanel;
     PanelRt: TPanel;
     PopupBookmk: TPopupMenu;
@@ -181,6 +182,8 @@ type
     FFindConfirmAll: TModalResult;
     FFindMarkAll: boolean;
     procedure DoAddEnc(Sub, SName: string);
+    procedure EditChangeBlock(Sender: TObject; const AStartPos,
+      AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
@@ -271,6 +274,7 @@ begin
   ed.PopupRuler:= PopupRuler;
 
   ed.OnChange:= @EditChanged;
+  ed.Strings.OnChangeBlock:=@EditChangeBlock;
   ed.OnChangeCaretPos:= @EditCaretMoved;
   ed.OnChangeState:= @EditCaretMoved;
   ed.OnScroll:= @EditCaretMoved;
@@ -937,6 +941,23 @@ begin
   mi.Caption:= SName;
   mi.OnClick:= @MenuEncClick;
   miSub.Add(mi);
+end;
+
+procedure TfmMain.EditChangeBlock(Sender: TObject; const AStartPos,
+  AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
+const
+  cEvent: array[TATBlockChangeKind] of string = (
+    'del-ln',
+    'ins-ln',
+    'del-col',
+    'ins-col'
+    );
+begin
+  PanelEvent.Caption:= Format('OnChBlock: %d..%d, %s', [
+    AStartPos.Y,
+    AEndPos.Y,
+    cEvent[AChange]
+    ]);
 end;
 
 procedure TfmMain.EditClickGap(Sender: TObject; AGapItem: TATSynGapItem;
