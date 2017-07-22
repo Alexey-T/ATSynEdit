@@ -211,11 +211,11 @@ begin
     //delete EOL at prev line
     if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake then
     begin
-      DoOnChangeBlock(
-        0, AY,
-        0, AY+1,
-        cBlockDeleteLines,
-        nil);
+      //DoOnChangeBlock(
+      //  0, AY,
+      //  0, AY+1,
+      //  cBlockDeleteLines,
+      //  nil);
 
       LineDelete(AY, false);
       LinesEnds[AY-1]:= cEndNone;
@@ -238,11 +238,11 @@ begin
     else
     if AY>0 then
     begin
-      DoOnChangeBlock(
-        0, AY,
-        0, AY+1,
-        cBlockDeleteLines,
-        nil);
+      //DoOnChangeBlock(
+      //  0, AY,
+      //  0, AY+1,
+      //  cBlockDeleteLines,
+      //  nil);
 
       StrPrev:= Lines[AY-1];
       Lines[AY-1]:= StrPrev+Str;
@@ -297,11 +297,11 @@ begin
           APosAfter.Y:= AY-1;
         end;
 
-        DoOnChangeBlock(
-          0, AY,
-          0, AY+1,
-          cBlockDeleteLines,
-          nil);
+        //DoOnChangeBlock(
+        //  0, AY,
+        //  0, AY+1,
+        //  cBlockDeleteLines,
+        //  nil);
 
         LineDelete(AY);
       end
@@ -314,11 +314,11 @@ begin
         //not last: del next line
         if AY+1<Count then
         begin
-          DoOnChangeBlock(
-            0, AY+1,
-            0, AY+2,
-            cBlockDeleteLines,
-            nil);
+          //DoOnChangeBlock(
+          //  0, AY+1,
+          //  0, AY+2,
+          //  cBlockDeleteLines,
+          //  nil);
 
           Lines[AY]:= Str+Lines[AY+1];
           LineDelete(AY+1, false{not force});
