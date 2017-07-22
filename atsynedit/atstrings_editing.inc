@@ -551,6 +551,12 @@ begin
 
   AShift.Y:= -1;
 
+  DoOnChangeBlock(
+    0, AY,
+    0, AY+1,
+    cBlockDeleteLines,
+    nil);
+
   LineDelete(AY);
   if AY>=Count then
     LineAddEx('', cEndNone);
