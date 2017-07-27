@@ -929,6 +929,11 @@ begin
   if nIndex1<0 then Exit;
   if nIndex2<0 then Exit;
 
+  //if ColorBG=clNone, insert ColorBG of found part
+  //tested on URLs in JS inside HTML
+  if APart.ColorBG=clNone then
+    APart.ColorBG:= AParts[nIndex1].ColorBG; //clYellow;
+
   //these 2 parts are for edges of selection
   FillChar(PartSelBegin{%H-}, SizeOf(TATLinePart), 0);
   FillChar(PartSelEnd{%H-}, SizeOf(TATLinePart), 0);
@@ -991,8 +996,7 @@ begin
     for i:= nIndex1+1 to nIndex2-1 do
     begin
       AParts[i].ColorFont:= APart.ColorFont;
-      if APart.ColorBG<>clNone then
-        AParts[i].ColorBG:= APart.ColorBG;
+      AParts[i].ColorBG:= APart.ColorBG;
       FixPartLen(AParts[i], nOffsetLimit);
       AddPart(AParts[i]);
     end;

@@ -317,8 +317,7 @@ begin
         Part:= PartObj.Data;
         Part.Len:= Attr.LenX;
         Part.Offset:= Attr.PosX-ACharIndex;
-        if Part.ColorBG=clNone then
-          Part.ColorBG:= AColorBG;
+        //note: don't change Part.ColorBG here
         DoPartInsert(AParts, Part, false);
       end;
   end;
