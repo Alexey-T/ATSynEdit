@@ -216,6 +216,7 @@ type
     );
 
 const
+  cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitCaretShapeIns = cCaretShapeVertPixels1;
   cInitCaretShapeOvr = cCaretShapeFull;
   cInitCaretShapeRO = cCaretShapeHorzPixels1;
@@ -314,6 +315,7 @@ type
 
   TATSynEdit = class(TCustomControl)
   private
+    FTimerIdle: TTimer;
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
     FTimerNiceScroll: TTimer;
@@ -390,6 +392,7 @@ type
     FOnClickMoveCaret: TATSynEditClickMoveCaretEvent;
     FOnClickGap: TATSynEditClickGapEvent;
     FOnClickEndSelect: TATSynEditClickMoveCaretEvent;
+    FOnIdle: TNotifyEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChange: TNotifyEvent;
     FOnScroll: TNotifyEvent;
@@ -456,6 +459,7 @@ type
     FMinimapAtLeft: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
     FOptScrollbarsNew: boolean;
@@ -767,6 +771,9 @@ type
     function GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
+
+    //timers
+    procedure TimerIdleTick(Sender: TObject);
     procedure TimerBlinkTick(Sender: TObject);
     procedure TimerScrollTick(Sender: TObject);
     procedure TimerNiceScrollTick(Sender: TObject);
@@ -1059,6 +1066,7 @@ type
     property OnClickMoveCaret: TATSynEditClickMoveCaretEvent read FOnClickMoveCaret write FOnClickMoveCaret;
     property OnClickEndSelect: TATSynEditClickMoveCaretEvent read FOnClickEndSelect write FOnClickEndSelect;
     property OnClickGap: TATSynEditClickGapEvent read FOnClickGap write FOnClickGap;
+    property OnIdle: TNotifyEvent read FOnIdle write FOnIdle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
@@ -1084,6 +1092,7 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
+    property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
@@ -2556,6 +2565,10 @@ begin
   FCursorText:= crIBeam;
   FCursorBm:= crHandPoint;
 
+  FTimerIdle:= TTimer.Create(Self);
+  FTimerIdle.Enabled:= false;
+  FTimerIdle.OnTimer:=@TimerIdleTick;
+
   FTimerBlink:= TTimer.Create(Self);
   FTimerBlink.Interval:= cInitTimerBlink;
   FTimerBlink.OnTimer:= @TimerBlinkTick;
@@ -2597,6 +2610,7 @@ begin
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
   FMarginList:= TList.Create;
+  FOptIdleInterval:= cInitIdleInterval;
 
   FUnprintedVisible:= true;
   FUnprintedSpaces:= true;
@@ -4311,6 +4325,14 @@ begin
 
   if Assigned(FOnChange) then
     FOnChange(Self);
+
+  //fire OnIdle after pause after change
+  if FOptIdleInterval>0 then
+  begin
+    FTimerIdle.Enabled:= false;
+    FTimerIdle.Interval:= FOptIdleInterval;
+    FTimerIdle.Enabled:= true;
+  end;
 end;
 
 procedure TATSynEdit.DoEventState;
@@ -5320,6 +5342,14 @@ begin
 
   FScrollbarVert.AutoAdjustLayout(AMode, AFromPPI, AToPPI, 1, 1);
   FScrollbarHorz.AutoAdjustLayout(AMode, AFromPPI, AToPPI, 1, 1);
+end;
+
+
+procedure TATSynEdit.TimerIdleTick(Sender: TObject);
+begin
+  FTimerIdle.Enabled:= false;
+  if Assigned(FOnIdle) then
+    FOnIdle(Self);
 end;
 
 
