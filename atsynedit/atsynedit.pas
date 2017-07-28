@@ -5350,6 +5350,8 @@ begin
   FTimerIdle.Enabled:= false;
   if Assigned(FOnIdle) then
     FOnIdle(Self);
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorIdle(Self);
 end;
 
 

@@ -27,6 +27,10 @@ type
     procedure OnEditorChange(Sender: TObject); virtual;
     //called when editor's text changes.
 
+    procedure OnEditorIdle(Sender: TObject); virtual;
+    //called after text is changed, and pause passed (OptIdleInterval)
+    //fast changes (faster than OptIdleInterval): called only after last change
+
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
@@ -95,6 +99,11 @@ begin
 end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorIdle(Sender: TObject);
 begin
   //
 end;
