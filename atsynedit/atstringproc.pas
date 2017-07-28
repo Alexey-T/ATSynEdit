@@ -71,6 +71,7 @@ function SEndsWithEol(const S: atString): boolean;
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
+function SGetIndentCharsToOpeningBracket(const S: atString): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
@@ -265,6 +266,18 @@ begin
   Result:= 0;
   while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
     Inc(Result);
+end;
+
+function SGetIndentCharsToOpeningBracket(const S: atString): integer;
+var
+  n: integer;
+begin
+  Result:= 0;
+  n:= RPos('(', S);
+  if n>0 then
+    //test that found bracket is not closed
+    if PosEx(')', S, n)=0 then
+      Result:= n;
 end;
 
 function SGetNonSpaceLength(const S: atString): integer;

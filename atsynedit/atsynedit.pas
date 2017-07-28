@@ -146,7 +146,8 @@ type
     cIndentAsIs,
     cIndentSpaces,
     cIndentTabsSpaces,
-    cIndentTabsOnly
+    cIndentTabsOnly,
+    cIndentSpacesToBracketInPrevLine
     );
 
   TATPageUpDownSize = (
@@ -4543,31 +4544,37 @@ end;
 
 function TATSynEdit.GetAutoIndentString(APosX, APosY: integer): atString;
 var
-  Str: atString;
+  StrPrev, StrIndent: atString;
   NChars, NSpaces: integer;
 begin
   Result:= '';
   if not Strings.IsIndexValid(APosY) then Exit;
   if not FOptAutoIndent then Exit;
 
-  Str:= Strings.Lines[APosY];
-  NChars:= SGetIndentChars(Str); //count of chars in indent
+  StrPrev:= Strings.Lines[APosY];
+  NChars:= SGetIndentChars(StrPrev); //count of chars in indent
   NChars:= Min(APosX, NChars); //limit indent by x-pos
 
-  Str:= Copy(Str, 1, NChars);
-  NSpaces:= Length(STabsToSpaces(Str, FTabSize));
+  StrIndent:= Copy(StrPrev, 1, NChars);
+  NSpaces:= Length(STabsToSpaces(StrIndent, FTabSize));
 
   case FOptAutoIndentKind of
     cIndentAsIs:
-      Result:= Str;
+      Result:= StrIndent;
     cIndentSpaces:
       Result:= StringOfChar(' ', NSpaces);
     cIndentTabsOnly:
       Result:= StringOfChar(#9, NSpaces div FTabSize);
     cIndentTabsSpaces:
       Result:= StringOfChar(#9, NSpaces div FTabSize) + StringOfChar(' ', NSpaces mod FTabSize);
+    cIndentSpacesToBracketInPrevLine:
+      begin
+        Result:= StringOfChar(' ', SGetIndentCharsToOpeningBracket(StrPrev));
+        if Result='' then
+          Result:= StringOfChar(' ', NSpaces);
+      end
     else
-      raise Exception.Create('Unknown autoindent-kind');
+      raise Exception.Create('Unknown auto-indent-kind value');
   end;
 end;
 
