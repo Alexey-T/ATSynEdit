@@ -143,7 +143,7 @@ type
 
 type
   TATAutoIndentKind = (
-    cIndentAsIs,
+    cIndentAsPrevLine,
     cIndentSpaces,
     cIndentTabsSpaces,
     cIndentTabsOnly,
@@ -1105,7 +1105,7 @@ type
     property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop default 0;
     property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine default cInitTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
-    property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsIs;
+    property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel default true;
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel default false;
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
@@ -2709,7 +2709,7 @@ begin
   FOptOverwriteAllowedOnPaste:= false;
   FOptWordChars:= '';
   FOptAutoIndent:= true;
-  FOptAutoIndentKind:= cIndentAsIs;
+  FOptAutoIndentKind:= cIndentAsPrevLine;
   FOptTabSpaces:= false;
 
   FOptLastLineOnTop:= false;
@@ -4581,7 +4581,7 @@ begin
   NSpaces:= Length(STabsToSpaces(StrIndent, FTabSize));
 
   case FOptAutoIndentKind of
-    cIndentAsIs:
+    cIndentAsPrevLine:
       Result:= StrIndent;
     cIndentSpaces:
       Result:= StringOfChar(' ', NSpaces);
