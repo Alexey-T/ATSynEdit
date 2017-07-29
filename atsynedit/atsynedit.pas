@@ -144,10 +144,10 @@ type
 type
   TATAutoIndentKind = (
     cIndentAsPrevLine,
-    cIndentSpaces,
-    cIndentTabsSpaces,
+    cIndentSpacesOnly,
+    cIndentTabsAndSpaces,
     cIndentTabsOnly,
-    cIndentSpacesToBracketInPrevLine
+    cIndentToOpeningBracket
     );
 
   TATPageUpDownSize = (
@@ -4583,17 +4583,17 @@ begin
   case FOptAutoIndentKind of
     cIndentAsPrevLine:
       Result:= StrIndent;
-    cIndentSpaces:
+    cIndentSpacesOnly:
       Result:= StringOfChar(' ', NSpaces);
     cIndentTabsOnly:
       Result:= StringOfChar(#9, NSpaces div FTabSize);
-    cIndentTabsSpaces:
+    cIndentTabsAndSpaces:
       Result:= StringOfChar(#9, NSpaces div FTabSize) + StringOfChar(' ', NSpaces mod FTabSize);
-    cIndentSpacesToBracketInPrevLine:
+    cIndentToOpeningBracket:
       begin
-        Result:= StringOfChar(' ', SGetIndentCharsToOpeningBracket(StrPrev));
-        if Result='' then
-          Result:= StringOfChar(' ', NSpaces);
+        //indent like in prev line + spaces up to opening bracket
+        NSpaces:= SGetIndentCharsToOpeningBracket(StrPrev);
+        Result:= StrIndent + StringOfChar(' ', NSpaces-Length(StrIndent));
       end
     else
       raise Exception.Create('Unknown auto-indent-kind value');
