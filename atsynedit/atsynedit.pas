@@ -3142,20 +3142,39 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
+const
+  cRectWidth = 300;
+  cRectHeight = 10;
+  cOrigX = 40;
+  cOrigY = 20;
+  cRectX = 120;
+  cRectY = 22;
 var
-  S: string;
   NValue: integer;
 begin
   C.Brush.Color:= Colors.LockedBG;
   C.FillRect(ClientRect);
   C.Font.Assign(Self.Font);
+  C.TextOut(cOrigX, cOrigY, cTextEditorLocked);
 
-  S:= cTextEditorLocked;
   NValue:= Strings.ProgressValue;
   if NValue>0 then
-    S:= S+' '+IntToStr(NValue)+'%';
-
-  C.TextOut(40, 20, S);
+  begin
+    C.Pen.Color:= Colors.TextSelBG;
+    C.Brush.Color:= Colors.TextSelBG;
+    C.FrameRect(
+      cRectX,
+      cRectY,
+      cRectX + cRectWidth,
+      cRectY + cRectHeight
+      );
+    C.FillRect(
+      cRectX,
+      cRectY,
+      cRectX + cRectWidth * NValue div 100,
+      cRectY + cRectHeight
+      );
+  end;
 end;
 
 
