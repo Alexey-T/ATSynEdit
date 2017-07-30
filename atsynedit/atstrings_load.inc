@@ -175,31 +175,47 @@ begin
     SetLineState(i, cLineStateAdded);
 end;
 
+type
+  TATCharEnding = (
+    cCharNotEnding,
+    cCharEnding10,
+    cCharEnding13
+    );
+
 procedure TATStrings.DoLoadFromStream(Stream: TStream);
 var
   Buf: PAnsiChar;
   BufSize: int64;
   CharSize: integer;
 
-  function _BufferCharCode(NPos: integer): Word;
+  function _Ending(APos: integer): TATCharEnding;
+  var
+    code: word;
+    p: PByte absolute Buf;
   begin
     case FEncoding of
       cEncAnsi,
       cEncUTF8:
-        Result:= PByte(Buf)[NPos];
+        code:= p[APos];
       cEncWideLE:
-        Result:= PByte(Buf)[NPos] + $100 * PByte(Buf)[NPos+1];
+        code:= p[APos] + p[APos+1] shl 8;
       cEncWideBE:
-        Result:= PByte(Buf)[NPos+1] + $100 * PByte(Buf)[NPos];
+        code:= p[APos+1] + p[APos] shl 8;
       else
-        DoEncError;
+        code:= 0;
+    end;
+
+    case code of
+      10: Result:= cCharEnding10;
+      13: Result:= cCharEnding13;
+      else Result:= cCharNotEnding;
     end;
   end;
 
-  function _FindNextEol(NPos: integer): integer;
+  function _FindNextEol(APos: integer): integer;
   begin
-    Result:= NPos;
-    while (Result<BufSize) and not IsCharEol(Widechar(_BufferCharCode(Result))) do
+    Result:= APos;
+    while (Result<BufSize) and (_Ending(Result)=cCharNotEnding) do
       Inc(Result, CharSize);
   end;
 
@@ -254,19 +270,21 @@ begin
 
       //detect+skip Eol
       LineEnd:= cEndNone;
-      if (Int64(NEnd)+CharSize<BufSize) and (_BufferCharCode(NEnd)=13) and (_BufferCharCode(NEnd+CharSize)=10) then
+      if (Int64(NEnd)+CharSize<BufSize) and
+        (_Ending(NEnd)=cCharEnding13) and
+        (_Ending(NEnd+CharSize)=cCharEnding10) then
       begin
         LineEnd:= cEndWin;
         Inc(NEnd, CharSize*2);
       end
       else
-      if (NEnd<BufSize) and (_BufferCharCode(NEnd)=10) then
+      if (NEnd<BufSize) and (_Ending(NEnd)=cCharEnding10) then
       begin
         LineEnd:= cEndUnix;
         Inc(NEnd, CharSize);
       end
       else
-      if (NEnd<BufSize) and (_BufferCharCode(NEnd)=13) then
+      if (NEnd<BufSize) and (_Ending(NEnd)=cCharEnding13) then
       begin
         LineEnd:= cEndMac;
         Inc(NEnd, CharSize);
