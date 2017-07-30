@@ -599,6 +599,7 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
+    procedure DoOnStringProgress(Sender: TObject);
     function DoScale(N: integer): integer;
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
@@ -2593,6 +2594,7 @@ begin
   FStringsInt:= TATStrings.Create;
   FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
+  FStringsInt.OnProgress:= @DoOnStringProgress;
 
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
@@ -3140,11 +3142,20 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
+var
+  S: string;
+  NValue: integer;
 begin
   C.Brush.Color:= Colors.LockedBG;
   C.FillRect(ClientRect);
   C.Font.Assign(Self.Font);
-  C.TextOut(10, 10, cTextEditorLocked);
+
+  S:= cTextEditorLocked;
+  NValue:= Strings.ProgressValue;
+  if NValue>0 then
+    S:= S+' '+IntToStr(NValue)+'%';
+
+  C.TextOut(40, 20, S);
 end;
 
 
@@ -5352,6 +5363,13 @@ begin
     FOnIdle(Self);
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorIdle(Self);
+end;
+
+procedure TATSynEdit.DoOnStringProgress(Sender: TObject);
+begin
+  Invalidate;
+  Application.ProcessMessages;
+  //auto paints "wait... N%"
 end;
 
 

@@ -630,7 +630,7 @@ begin
   FUndoAfterSave:= true;
   FOneLine:= false;
   FProgressValue:= 0;
-  FProgressMinSize:= 200*1024;
+  FProgressMinSize:= 5*1024*1024;
   FProgressMinIncrement:= 5;
   SetLength(FSavedCaretsArray, 0);
 
