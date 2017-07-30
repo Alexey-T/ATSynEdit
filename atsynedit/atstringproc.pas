@@ -140,7 +140,7 @@ implementation
 uses
   Dialogs, Math;
 
-function IsCharEol(ch: atChar): boolean;
+function IsCharEol(ch: atChar): boolean; inline;
 begin
   Result:= (ch=#10) or (ch=#13);
 end;
@@ -164,7 +164,7 @@ begin
     //Greek
     $0391..$03A9,
     $03B1..$03C9:
-      begin Result:= true; Exit end;
+      exit(true);
   end;
 
   if AWordChars<>'' then
