@@ -3145,17 +3145,17 @@ procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
 const
   cRectWidth = 300;
   cRectHeight = 10;
-  cOrigX = 40;
+  cOrigX = 20;
   cOrigY = 20;
-  cRectX = 120;
-  cRectY = 22;
+  cRectX = 85;
+  cRectY = 40;
 var
   NValue: integer;
 begin
-  C.Brush.Color:= Colors.LockedBG;
+  C.Brush.Color:= Colors.TextBG;
   C.FillRect(ClientRect);
-  C.Font.Assign(Self.Font);
-  C.TextOut(cOrigX, cOrigY, cTextEditorLocked);
+
+  C.Draw(cOrigX, cOrigY, cBitmapHourglass);
 
   NValue:= Strings.ProgressValue;
   if NValue>0 then
@@ -5400,6 +5400,7 @@ end;
 
 {$R res/nicescroll.res}
 {$R res/foldbar.res}
+{$R res/hourglass.res}
 
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}
