@@ -5412,7 +5412,7 @@ end;
 
 initialization
   InitClipboardFormat;
-  InitResourcesNicescroll;
+  InitResources;
 
 finalization
   FreeResources;

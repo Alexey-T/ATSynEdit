@@ -1,7 +1,7 @@
-//for browser-scroll feature
 var
-  cBitmapNiceScroll: TBitmap = nil;
   cBitmapWait: TPortableNetworkGraphic = nil;
+  cBitmapNiceScroll: TBitmap = nil;
+
 const
   cBitmapNiceScrollRadius = 16;
   crNiceScrollNone  = TCursor(-30);
@@ -37,7 +37,7 @@ begin
   cATClipboardFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
 end;
 
-procedure InitResourcesNicescroll;
+procedure InitResources;
 begin
   cBitmapNiceScroll:= TBitmap.Create;
   cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_MOVE');
@@ -55,6 +55,7 @@ end;
 
 procedure FreeResources;
 begin
+  FreeAndNil(cBitmapWait);
   FreeAndNil(cBitmapNiceScroll);
 end;
 
