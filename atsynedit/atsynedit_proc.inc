@@ -1,7 +1,7 @@
 //for browser-scroll feature
 var
   cBitmapNiceScroll: TBitmap = nil;
-  cBitmapHourglass: TPortableNetworkGraphic = nil;
+  cBitmapWait: TPortableNetworkGraphic = nil;
 const
   cBitmapNiceScrollRadius = 16;
   crNiceScrollNone  = TCursor(-30);
@@ -43,14 +43,14 @@ begin
   cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_MOVE');
   cBitmapNiceScroll.Transparent:= true;
 
-  cBitmapHourglass:= TPortableNetworkGraphic.Create;
-  cBitmapHourglass.LoadFromResourceName(HInstance, 'HOURGLASS');
-
   Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
   Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
   Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
   Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'ATSYN_MOVE_L');
   Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
+
+  cBitmapWait:= TPortableNetworkGraphic.Create;
+  cBitmapWait.LoadFromResourceName(HInstance, 'EDITOR_WAIT');
 end;
 
 procedure FreeResources;

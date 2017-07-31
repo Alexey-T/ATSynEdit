@@ -3155,7 +3155,7 @@ begin
   C.Brush.Color:= Colors.TextBG;
   C.FillRect(ClientRect);
 
-  C.Draw(cOrigX, cOrigY, cBitmapHourglass);
+  C.Draw(cOrigX, cOrigY, cBitmapWait);
 
   NValue:= Strings.ProgressValue;
   if NValue>0 then
