@@ -1,1 +1,1 @@
-~/lazarus/tools/lazres hourglass.res hourglass.png=hourglass
+~/lazarus/tools/lazres hourglass.res hourglass.png=editor_wait
