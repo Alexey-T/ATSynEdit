@@ -647,7 +647,8 @@ type
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
-    procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
+    procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
+      AItems: TList; AConsiderFolding: boolean);
     procedure DoCalcLineHilite(const AItem: TATSynWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
@@ -764,7 +765,7 @@ type
     function DoFormatLineNumber(N: integer): atString;
     function UpdateScrollInfoFromMessage(const Msg: TLMScroll;
       var Info: TATSynScrollInfo): boolean;
-    procedure UpdateWrapInfo;
+    procedure UpdateWrapInfo(AConsiderFolding: boolean);
     function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
@@ -1387,7 +1388,7 @@ begin
   Update;
 end;
 
-procedure TATSynEdit.UpdateWrapInfo;
+procedure TATSynEdit.UpdateWrapInfo(AConsiderFolding: boolean);
 var
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
@@ -1442,7 +1443,7 @@ begin
       FWrapInfo.SetCapacity(Strings.Count);
       for i:= 0 to Strings.Count-1 do
       begin
-        DoCalcWrapInfos(i, NIndentMaximal, Items);
+        DoCalcWrapInfos(i, NIndentMaximal, Items, AConsiderFolding);
         for j:= 0 to Items.Count-1 do
           FWrapInfo.Add(TATSynWrapItem(Items[j]));
       end;
@@ -1458,7 +1459,7 @@ begin
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= NativeInt{%H-}(ListNums[i]);
-        DoCalcWrapInfos(NLine, NIndentMaximal, Items);
+        DoCalcWrapInfos(NLine, NIndentMaximal, Items, AConsiderFolding);
         if Items.Count=0 then Continue;
 
         FWrapInfo.FindIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
@@ -1487,7 +1488,8 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList);
+procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList;
+  AConsiderFolding: boolean);
 var
   NOffset, NLen, NIndent, NVisColumns: integer;
   bHidden: boolean;
@@ -1497,28 +1499,35 @@ var
 begin
   AItems.Clear;
 
-  bHidden:= Strings.LinesHidden[ALine, FEditorIndex];
-  if bHidden then Exit;
-
-  Str:= Strings.Lines[ALine];
-  NLen:= Length(Str);
-  NVisColumns:= Max(GetVisibleColumns, cMinWrapColumnAbs);
-
-  //line collapsed partially?
-  NFoldFrom:= Strings.LinesFoldFrom[ALine, FEditorIndex];
-  if NFoldFrom>0 then
+  if AConsiderFolding then
   begin
-    AItems.Add(TATSynWrapItem.Create(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed));
-    Exit;
+    //line folded entirely?
+    bHidden:= Strings.LinesHidden[ALine, FEditorIndex];
+    if bHidden then Exit;
   end;
 
-  //wrap not needed?
+  NLen:= Strings.LinesLen[ALine];
+
+  //line not wrapped?
   if (FWrapColumn<cMinWrapColumnAbs) then
   begin
     AItems.Add(TATSynWrapItem.Create(ALine, 1, NLen, 0, cWrapItemFinal));
     Exit;
   end;
 
+  if AConsiderFolding then
+  begin
+    //line folded partially?
+    NFoldFrom:= Strings.LinesFoldFrom[ALine, FEditorIndex];
+    if NFoldFrom>0 then
+    begin
+      AItems.Add(TATSynWrapItem.Create(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed));
+      Exit;
+    end;
+  end;
+
+  Str:= Strings.Lines[ALine];
+  NVisColumns:= Max(GetVisibleColumns, cMinWrapColumnAbs);
   NOffset:= 1;
   NIndent:= 0;
 
@@ -1814,7 +1823,7 @@ begin
   FRectMain:= GetRectMain; //after gutter/minimap
   FRectRuler:= GetRectRuler; //after main
 
-  UpdateWrapInfo;
+  UpdateWrapInfo(FFold.Count>0); //faster if no folding
 
   if not CanvasTextOutMustUseOffsets then
     DoUpdateFontNeedsOffsets(C);

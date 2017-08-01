@@ -96,7 +96,7 @@ begin
      (cResultFoldChange in Res) then
   begin
     FWrapUpdateNeeded:= true;
-    UpdateWrapInfo;
+    UpdateWrapInfo(true);
   end;
 
   if cResultText in Res then
