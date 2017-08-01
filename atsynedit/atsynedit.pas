@@ -1968,7 +1968,7 @@ begin
       Break;
     end;
 
-    WrapItem:= FWrapInfo.Items[NWrapIndex];
+    WrapItem:= FWrapInfo[NWrapIndex];
     NLinesIndex:= WrapItem.NLineIndex;
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
@@ -2489,7 +2489,7 @@ begin
   Result:= 0;
   N:= FScrollVert.NPos;
   if FWrapInfo.IsIndexValid(N) then
-    Result:= FWrapInfo.Items[N].NLineIndex;
+    Result:= FWrapInfo[N].NLineIndex;
 end;
 
 function TATSynEdit.GetColumnLeft: integer;
@@ -3048,7 +3048,7 @@ begin
 
   //find approx match
   for i:= 0 to FWrapInfo.Count-1 do
-    with FWrapInfo.Items[i] do
+    with FWrapInfo[i] do
       if NLineIndex>=AValue then
       begin
         FScrollVert.NPos:= i;

@@ -13,7 +13,7 @@ begin
       Exit
     end;
     for j:= n1 to n2 do
-      if FWrapInfo.Items[j].NLineIndex<>i then
+      if FWrapInfo[j].NLineIndex<>i then
       begin
         Application.MainForm.caption:= format('fail findindex: %d', [i]);
         Exit

@@ -232,8 +232,8 @@ var
 begin
   if FWrapInfo.IsIndexValid(N) and (N>0) then
   begin
-    NLineCur:= FWrapInfo.Items[N].NLineIndex;
-    NLinePrev:= FWrapInfo.Items[N-1].NLineIndex;
+    NLineCur:= FWrapInfo[N].NLineIndex;
+    NLinePrev:= FWrapInfo[N-1].NLineIndex;
     //before this line some is skipped
     Result:= NLineCur-NLinePrev > 1;
     //and prev visible line is fully visible

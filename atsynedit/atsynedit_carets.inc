@@ -176,7 +176,7 @@ begin
 
   for i:= NIndex1 to NIndex2 do
   begin
-    Item:= AWrapInfo.Items[i];
+    Item:= AWrapInfo[i];
 
     if (P.X<Item.NCharIndex-1) then Continue;
     if (Item.NFinal=cWrapItemMiddle) then
@@ -312,7 +312,7 @@ begin
     begin
       if AWrapInfo.IsIndexValid(NIndex) then
       begin
-        Item:= AWrapInfo.Items[NIndex];
+        Item:= AWrapInfo[NIndex];
         Result.Y:= Item.NLineIndex;
         Result.X:= Item.NCharIndex+Item.NLength-1;
       end;
@@ -322,7 +322,7 @@ begin
 
   //click in text
   begin
-    Item:= AWrapInfo.Items[NIndex];
+    Item:= AWrapInfo[NIndex];
     Result.Y:= Item.NLineIndex;
 
     Str:= Copy(AStrings.Lines[Result.Y], Item.NCharIndex, Item.NLength);
@@ -457,9 +457,9 @@ begin
     Dec(NPixels, NCell);
 
     //consider gap
-    if FWrapInfo.Items[NIndex].NFinal=cWrapItemFinal then
+    if FWrapInfo[NIndex].NFinal=cWrapItemFinal then
     begin
-      ItemGap:= Gaps.Find(FWrapInfo.Items[NIndex].NLineIndex);
+      ItemGap:= Gaps.Find(FWrapInfo[NIndex].NLineIndex);
       if Assigned(ItemGap) then
         Dec(NPixels, ItemGap.Size);
     end;
