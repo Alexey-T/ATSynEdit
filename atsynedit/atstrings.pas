@@ -76,7 +76,7 @@ type
 
   TATStringItem = packed class
   public
-    ItemString: UTF8String;
+    ItemString: string;
     ItemEnd: TATLineEnds;
     ItemState: TATLineState;
     ItemSeparator: TATLineSeparator;
@@ -86,7 +86,7 @@ type
     ItemFoldFrom: packed array[0..cMaxStringsClients-1] of word;
       //0: line not folded
       //>0: line folded from this char-pos
-    constructor Create_UTF8(const AString: UTF8String; AEnd: TATLineEnds);
+    constructor Create_UTF8(const AString: string; AEnd: TATLineEnds);
     constructor Create_Uni(const AString: atString; AEnd: TATLineEnds);
     function IsFake: boolean;
   end;
@@ -188,7 +188,7 @@ type
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   protected
-    function CreateItem_UTF8(const AString: UTF8String; AEnd: TATLineEnds): TATStringItem; virtual;
+    function CreateItem_UTF8(const AString: string; AEnd: TATLineEnds): TATStringItem; virtual;
     function CreateItem_Uni(const AString: atString; AEnd: TATLineEnds): TATStringItem; virtual;
   public
     constructor Create; virtual;
@@ -201,7 +201,7 @@ type
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
     property Items[Index: integer]: TATStringItem read GetItem;
-    procedure LineAddRaw_UTF8_NoUndo(const AString: UTF8String; AEnd: TATLineEnds);
+    procedure LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: integer; const AString: atString);
@@ -325,7 +325,7 @@ begin
   Create_UTF8(UTF8Encode(AString), AEnd);
 end;
 
-constructor TATStringItem.Create_UTF8(const AString: UTF8String; AEnd: TATLineEnds);
+constructor TATStringItem.Create_UTF8(const AString: string; AEnd: TATLineEnds);
 var
   i: integer;
 begin
@@ -1291,7 +1291,7 @@ begin
       ABlock);
 end;
 
-function TATStrings.CreateItem_UTF8(const AString: UTF8String;
+function TATStrings.CreateItem_UTF8(const AString: string;
   AEnd: TATLineEnds): TATStringItem;
 begin
   Result:= TATStringItem.Create_UTF8(AString, AEnd);
@@ -1355,7 +1355,7 @@ begin
   Result:= false;
 end;
 
-procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: UTF8String;
+procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: string;
   AEnd: TATLineEnds);
 var
   Item: TATStringItem;

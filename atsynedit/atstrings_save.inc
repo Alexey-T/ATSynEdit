@@ -4,10 +4,8 @@ procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; A
 var
   i: integer;
   Item: TATStringItem;
-  SA: AnsiString;
+  SA, SUtf8, Sign: string;
   SWide: UnicodeString;
-  SUtf8: UTF8String;
-  Sign: AnsiString;
   bEncoded: boolean;
 begin
   if AWithSignature then

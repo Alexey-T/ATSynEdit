@@ -1,6 +1,6 @@
 {$ifdef nn}begin end;{$endif}
 
-function SConvertAnsiToUtf8(const SA: string): UTF8String;
+function SConvertAnsiToUtf8(const SA: string): string;
 begin
   {$ifdef windows}
   case Windows.GetACP of
@@ -21,7 +21,7 @@ begin
   {$endif}
 end;
 
-function SConvertUtf8ToAnsi(const S: UTF8String): string;
+function SConvertUtf8ToAnsi(const S: string): string;
 begin
   {$ifdef windows}
   case Windows.GetACP of
