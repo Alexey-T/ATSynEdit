@@ -127,8 +127,6 @@ type
     FUndoGroupCounter: integer;
     FOneLine: boolean;
     FProgressValue: integer;
-    FProgressMinSize: integer;
-    FProgressMinIncrement: integer;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnProgress: TNotifyEvent;
@@ -229,8 +227,6 @@ type
     property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
     property ProgressValue: integer read FProgressValue write FProgressValue;
-    property ProgressMinSize: integer read FProgressMinSize write FProgressMinSize;
-    property ProgressMinIncrement: integer read FProgressMinIncrement write FProgressMinIncrement;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property Gaps: TATSynGaps read FGaps;
     //actions
@@ -630,8 +626,6 @@ begin
   FUndoAfterSave:= true;
   FOneLine:= false;
   FProgressValue:= 0;
-  FProgressMinSize:= 5*1024*1024;
-  FProgressMinIncrement:= 6;
   SetLength(FSavedCaretsArray, 0);
 
   ActionAddFakeLineIfNeeded;

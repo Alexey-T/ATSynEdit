@@ -225,8 +225,8 @@ var
   SWide: UnicodeString;
   LineEnd: TATLineEnds;
   bWithBom, bEncoded: boolean;
-  NPercents: integer;
   Ending1, Ending2: TATCharEnding;
+  LineIndex, LineIndexCounted: integer;
 begin
   Clear;
 
@@ -247,6 +247,9 @@ begin
   BufSize:= Stream.Size-Len;
   if BufSize<=0 then Exit;
 
+  LineIndex:= 0;
+  LineIndexCounted:= 0;
+
   GetMem(Buf, BufSize);
   try
     Stream.Position:= Len;
@@ -256,16 +259,16 @@ begin
     repeat
       NEnd:= _FindNextEol(NStart);
       Len:= NEnd-NStart;
+      Inc(LineIndex);
 
-      if Stream.Size>=FProgressMinSize then
+      //call OnProgress each 100K lines
+      //it's smooth enouth progress, on 280Mb log (line len<80), 10 seconds
+      if LineIndex-LineIndexCounted>100*1000 then
       begin
-        NPercents:= Int64(NEnd)*100 div Stream.Size;
-        if Abs(NPercents-FProgressValue)>=FProgressMinIncrement then
-        begin
-          FProgressValue:= NPercents;
-          if Assigned(FOnProgress) then
-            FOnProgress(Self);
-        end;
+        LineIndexCounted:= LineIndex;
+        FProgressValue:= Int64(NEnd)*100 div Stream.Size;
+        if Assigned(FOnProgress) then
+          FOnProgress(Self);
       end;
 
       //detect+skip Eol
