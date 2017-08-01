@@ -51,7 +51,7 @@ type
     FStrings: TATStrings;
     FVirtualMode: boolean;
     FOnCheckCollapsed: TATCheckLineCollapsedEvent;
-    function GetItemData(AIndex: integer): TATSynWrapItemData;
+    function GetData(AIndex: integer): TATSynWrapItemData;
     procedure SetVirtualMode(AValue: boolean);
   public
     constructor Create; virtual;
@@ -62,7 +62,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     function IsItemInitial(N: integer): boolean;
-    property Data[N: integer]: TATSynWrapItemData read GetItemData; default;
+    property Data[N: integer]: TATSynWrapItemData read GetData; default;
     procedure Add(AItem: TATSynWrapItem);
     procedure Delete(N: integer);
     procedure Insert(N: integer; AItem: TATSynWrapItem);
@@ -98,7 +98,7 @@ end;
 
 { TATSynWrapInfo }
 
-function TATSynWrapInfo.GetItemData(AIndex: integer): TATSynWrapItemData;
+function TATSynWrapInfo.GetData(AIndex: integer): TATSynWrapItemData;
 begin
   if FVirtualMode then
   begin

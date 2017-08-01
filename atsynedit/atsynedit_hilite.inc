@@ -6,24 +6,22 @@ function TATSynEdit.DoCalcLineHiliteEx(ALineIndex: integer;
 const
   cMaxCharsInLine = 50*1024;
 var
-  WrapItem: TATSynWrapItem;
-  Str: atString;
+  Data: TATSynWrapItemData;
 begin
+  FillChar(AParts, SizeOf(AParts), 0);
   Result:= Strings.IsIndexValid(ALineIndex);
   if not Result then exit;
-  FillChar(AParts, SizeOf(AParts), 0);
 
-  Str:= Strings.Lines[ALineIndex];
-  if Str='' then exit;
+  Data.NLineIndex:= ALineIndex;
+  Data.NCharIndex:= 1;
+  Data.NLength:= Strings.LinesLen[ALineIndex];
+  Data.NIndent:= 0;
+  Data.NFinal:= cWrapItemFinal;
+  if Data.NLength=0 then exit;
 
-  WrapItem:= TATSynWrapItem.Create(ALineIndex, 1, Length(Str), 0, cWrapItemFinal);
-  try
-    AColorAfter:= AColorBG;
-    DoCalcLineHilite(WrapItem.Data, AParts, 0, cMaxCharsInLine,
-      AColorBG, false, AColorAfter);
-  finally
-    FreeAndNil(WrapItem);
-  end;
+  AColorAfter:= AColorBG;
+  DoCalcLineHilite(Data, AParts, 0, cMaxCharsInLine,
+    AColorBG, false, AColorAfter);
 end;
 
 
