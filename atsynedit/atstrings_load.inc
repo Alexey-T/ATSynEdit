@@ -187,7 +187,7 @@ var
   Buf: PAnsiChar;
   BufSize: int64;
   CharSize: integer;
-
+  //------
   function _GetEnding(APos: integer): TATCharEnding;
   var
     code: word;
@@ -211,21 +211,45 @@ var
       else Result:= cCharNotEnding;
     end;
   end;
-
-  function _FindNextEol(APos: integer): integer;
+  //------
+  procedure _FindNextEol(AFromPos: integer;
+    out AFoundPos: integer;
+    out AEnding: TATLineEnds);
   begin
-    Result:= APos;
-    while (Result<BufSize) and (_GetEnding(Result)=cCharNotEnding) do
-      Inc(Result, CharSize);
-  end;
+    AFoundPos:= AFromPos;
+    AEnding:= cEndNone;
+    repeat
+      if AFoundPos>=BufSize then exit;
 
+      case _GetEnding(AFoundPos) of
+        cCharNotEnding:
+          begin
+            Inc(AFoundPos, CharSize);
+          end;
+        cCharEnding10:
+          begin
+            AEnding:= cEndUnix;
+            exit
+          end;
+        cCharEnding13:
+          begin
+            if AFoundPos+CharSize<BufSize then
+              if _GetEnding(AFoundPos+CharSize)=cCharEnding10 then
+                AEnding:= cEndWin
+              else
+                AEnding:= cEndMac;
+            exit
+          end;
+      end;
+    until false;
+  end;
+  //------
 var
   NStart, NEnd, Len: integer;
   SA, SUtf8: string;
   SWide: UnicodeString;
   LineEnd: TATLineEnds;
   bWithBom, bEncoded: boolean;
-  Ending1, Ending2: TATCharEnding;
   LineIndex, LineIndexCounted: integer;
 begin
   Clear;
@@ -257,7 +281,7 @@ begin
 
     NStart:= 0;
     repeat
-      NEnd:= _FindNextEol(NStart);
+      _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
       Inc(LineIndex);
 
@@ -271,37 +295,8 @@ begin
           FOnProgress(Self);
       end;
 
-      //detect+skip Eol
-      LineEnd:= cEndNone;
-
-      Ending1:= cCharNotEnding;
-      Ending2:= cCharNotEnding;
-
-      if NEnd<BufSize then
-      begin
-        Ending1:= _GetEnding(NEnd);
-        if Ending1<>cCharNotEnding then
-          if Int64(NEnd)+CharSize<BufSize then
-            Ending2:= _GetEnding(NEnd+CharSize);
-      end;
-
-      if (Ending1=cCharEnding13) and (Ending2=cCharEnding10) then
-      begin
-        LineEnd:= cEndWin;
-        Inc(NEnd, CharSize*2);
-      end
-      else
-      if (Ending1=cCharEnding10) then
-      begin
-        LineEnd:= cEndUnix;
-        Inc(NEnd, CharSize);
-      end
-      else
-      if (Ending1=cCharEnding13) then
-      begin
-        LineEnd:= cEndMac;
-        Inc(NEnd, CharSize);
-      end
+      if LineEnd=cEndWin then
+        Inc(NEnd, CharSize*2)
       else
         Inc(NEnd, CharSize);
 
