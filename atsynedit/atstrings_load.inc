@@ -282,7 +282,7 @@ begin
 
       //call OnProgress each 1M chars
       //it's smooth enough progress, on 280Mb log, 10 seconds
-      if NStart-NCounted>1000*1000 then
+      if NStart-NCounted>cStringsProgressLoadChars then
       begin
         NCounted:= NStart;
         FProgressValue:= Int64(NStart)*100 div Stream.Size;

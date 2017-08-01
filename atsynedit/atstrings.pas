@@ -33,6 +33,9 @@ const
   //smart update used only if lines changed, not deleted/inserted
   cMaxUpdatesCountEasy = 200;
 
+  cStringsProgressLoadChars = 1000*1000;
+  cStringsProgressSaveLines = 100*1000;
+
 type
   TATLineState = (
     cLineStateNone,
