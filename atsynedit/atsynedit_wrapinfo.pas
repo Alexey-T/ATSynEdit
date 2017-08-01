@@ -10,7 +10,8 @@ unit ATSynEdit_WrapInfo;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils,
+  ATStrings;
 
 type
   TATSynWrapFinal = (
@@ -43,12 +44,18 @@ type
   TATSynWrapInfo = class
   private
     FList: TList;
+    FStrings: TATStrings;
+    FVirtualMode: boolean;
+    FVirtualItem: TATSynWrapItem;
     FOnCheckCollapsed: TATCheckLineCollapsedEvent;
-    function GetItem(N: integer): TATSynWrapItem;
+    function GetItem(AIndex: integer): TATSynWrapItem;
+    procedure SetVirtualMode(AValue: boolean);
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
+    property StringsObj: TATStrings read FStrings write FStrings;
+    property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     function IsItemInitial(N: integer): boolean;
@@ -92,19 +99,40 @@ end;
 
 { TATSynWrapInfo }
 
-function TATSynWrapInfo.GetItem(N: integer): TATSynWrapItem;
+function TATSynWrapInfo.GetItem(AIndex: integer): TATSynWrapItem;
 begin
-  Result:= TATSynWrapItem(FList[N]);
+  if FVirtualMode then
+  begin
+    FVirtualItem.NLineIndex:= AIndex;
+    FVirtualItem.NCharIndex:= 1;
+    FVirtualItem.NLength:= FStrings.LinesLen[AIndex];
+    FVirtualItem.NIndent:= 0;
+    FVirtualItem.NFinal:= cWrapItemFinal;
+    Result:= FVirtualItem;
+  end
+  else
+    Result:= TATSynWrapItem(FList[AIndex]);
+end;
+
+procedure TATSynWrapInfo.SetVirtualMode(AValue: boolean);
+begin
+  if FVirtualMode=AValue then Exit;
+  FVirtualMode:= AValue;
+  if FVirtualMode then
+    FList.Clear;
 end;
 
 constructor TATSynWrapInfo.Create;
 begin
   FList:= TList.Create;
+  FVirtualItem:= TATSynWrapItem.Create(0, 0, 0, 0, cWrapItemFinal);
+  FVirtualMode:= false;
 end;
 
 destructor TATSynWrapInfo.Destroy;
 begin
   Clear;
+  FreeAndNil(FVirtualItem);
   FreeAndNil(FList);
   inherited;
 end;
@@ -120,7 +148,10 @@ end;
 
 function TATSynWrapInfo.Count: integer;
 begin
-  Result:= FList.Count;
+  if FVirtualMode then
+    Result:= FStrings.Count
+  else
+    Result:= FList.Count;
 end;
 
 function TATSynWrapInfo.IsIndexValid(N: integer): boolean; inline;
