@@ -10,9 +10,7 @@ function TATSynEdit.DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResul
 begin
   case FWrapMode of
     cWrapOff:
-      begin
-        OptWrapMode:= cWrapOn;
-      end;
+      OptWrapMode:= cWrapOn;
     cWrapOn:
       begin
         if AltOrder then
@@ -21,12 +19,9 @@ begin
           OptWrapMode:= cWrapOff;
       end;
     cWrapAtMargin:
-      begin
-        OptWrapMode:= cWrapOff;
-      end;
+      OptWrapMode:= cWrapOff;
   end;
 
-  FWrapUpdateNeeded:= true;
   Result:= [cResultState];
 end;
 
