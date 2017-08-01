@@ -242,6 +242,7 @@ procedure TATSynWrapInfo.ReplaceItems(AFrom, ATo: integer; AItems: TList);
 var
   Dif, i: integer;
 begin
+  if FVirtualMode then exit;
   Dif:= AItems.Count - (ATo-AFrom+1);
 
   //adjust count of items
