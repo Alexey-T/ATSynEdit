@@ -221,8 +221,7 @@ var
 
 var
   NStart, NEnd, Len: integer;
-  SA: AnsiString;
-  SUtf8: UTF8String;
+  SA, SUtf8: string;
   SWide: UnicodeString;
   LineEnd: TATLineEnds;
   bWithBom, bEncoded: boolean;
