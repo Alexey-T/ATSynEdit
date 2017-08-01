@@ -221,6 +221,7 @@ const
   cInitCaretShapeOvr = cCaretShapeFull;
   cInitCaretShapeRO = cCaretShapeHorzPixels1;
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
+  cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingText = 1;
   cInitTimerBlink = 600;
@@ -1167,7 +1168,7 @@ type
     property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth default cInitMicromapWidth;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX default 0;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
-    property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cWrapOn;
+    property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
     property OptWrapEnabledForMaxLines: integer read FWrapEnabledForMaxLines write FWrapEnabledForMaxLines default cInitWrapEnabledForMaxLines;
     property OptMarginRight: integer read FMarginRight write SetMarginRight default cInitMarginRight;
@@ -2626,7 +2627,7 @@ begin
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
   FWrapUpdateNeeded:= true;
-  FWrapMode:= cWrapOn;
+  FWrapMode:= cInitWrapMode;
   FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
   FWrapEnabledForMaxLines:= cInitWrapEnabledForMaxLines;
