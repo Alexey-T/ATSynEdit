@@ -43,7 +43,6 @@ begin
 end;
 
 
-
 function IsStreamWithSignature(Stream: TStream; const Sign: string): boolean;
 var
   Buf: string;
@@ -59,7 +58,7 @@ end;
 
 function IsStreamWithUt8NoBom(Stream: TStream; BufSizeKb: word): boolean;
 const
-  cMinLen = 15;
+  cMinLen = 10;
 var
   Buf: PChar;
   Size: integer;
