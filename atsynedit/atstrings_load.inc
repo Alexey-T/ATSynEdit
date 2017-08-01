@@ -245,12 +245,11 @@ var
   end;
   //------
 var
-  NStart, NEnd, Len: integer;
+  NStart, NEnd, NCounted, Len: integer;
   SA, SUtf8: string;
   SWide: UnicodeString;
   LineEnd: TATLineEnds;
   bWithBom, bEncoded: boolean;
-  LineIndex, LineIndexCounted: integer;
 begin
   Clear;
 
@@ -271,26 +270,23 @@ begin
   BufSize:= Stream.Size-Len;
   if BufSize<=0 then Exit;
 
-  LineIndex:= 0;
-  LineIndexCounted:= 0;
-
   GetMem(Buf, BufSize);
   try
     Stream.Position:= Len;
     Stream.ReadBuffer(Buf^, BufSize);
 
     NStart:= 0;
+    NCounted:= 0;
     repeat
       _FindNextEol(NStart, NEnd, LineEnd);
       Len:= NEnd-NStart;
-      Inc(LineIndex);
 
-      //call OnProgress each 100K lines
-      //it's smooth enouth progress, on 280Mb log (line len<80), 10 seconds
-      if LineIndex-LineIndexCounted>100*1000 then
+      //call OnProgress each 500K chars
+      //it's smooth enough progress, on 280Mb log, 10 seconds
+      if NStart-NCounted>500*1000 then
       begin
-        LineIndexCounted:= LineIndex;
-        FProgressValue:= Int64(NEnd)*100 div Stream.Size;
+        NCounted:= NStart;
+        FProgressValue:= Int64(NStart)*100 div Stream.Size;
         if Assigned(FOnProgress) then
           FOnProgress(Self);
       end;
