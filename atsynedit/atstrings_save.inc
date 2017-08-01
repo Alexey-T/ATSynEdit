@@ -1,6 +1,8 @@
 {$ifdef nn}begin end;{$endif}
 
 procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
+const
+  cProgressEachLines = 100*1000;
 var
   i: integer;
   Item: TATStringItem;
@@ -53,6 +55,13 @@ begin
 
       else
         DoEncError;
+    end;
+
+    if (i mod cProgressEachLines) = (cProgressEachLines div 2) then
+    begin
+      FProgressValue:= Int64(i)*100 div (Count+1);
+      if Assigned(FOnProgress) then
+        FOnProgress(Self);
     end;
   end;
 end;
