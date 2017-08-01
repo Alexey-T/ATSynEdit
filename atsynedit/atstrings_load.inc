@@ -44,9 +44,9 @@ end;
 
 
 
-function IsStreamWithSignature(Stream: TStream; const Sign: AnsiString): boolean;
+function IsStreamWithSignature(Stream: TStream; const Sign: string): boolean;
 var
-  Buf: AnsiString;
+  Buf: string;
 begin
   Result:= false;
   if Stream.Size<Length(Sign) then Exit;

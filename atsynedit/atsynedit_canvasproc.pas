@@ -618,7 +618,7 @@ var
   PartPtr: ^TATLinePart;
   PartFontStyle: TFontStyles;
   PartRect: TRect;
-  Buf: AnsiString;
+  Buf: string;
   DxPointer: PInteger;
   bAllowLigatures: boolean;
 begin

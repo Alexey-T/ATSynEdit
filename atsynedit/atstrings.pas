@@ -296,9 +296,9 @@ function ATStrings_To_StringList(L: TATStrings): TStringList;
 implementation
 
 const
-  cSignUTF8: AnsiString = #$EF#$BB#$BF;
-  cSignWideLE: AnsiString = #$FF#$FE;
-  cSignWideBE: AnsiString = #$FE#$FF;
+  cSignUTF8: string = #$EF#$BB#$BF;
+  cSignWideLE: string = #$FF#$FE;
+  cSignWideBE: string = #$FE#$FF;
 
 procedure DoEncError;
 begin
