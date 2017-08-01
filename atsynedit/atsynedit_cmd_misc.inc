@@ -11,18 +11,18 @@ begin
   case FWrapMode of
     cWrapOff:
       begin
-        FWrapMode:= cWrapOn;
+        OptWrapMode:= cWrapOn;
       end;
     cWrapOn:
       begin
         if AltOrder then
-          FWrapMode:= cWrapAtMargin
+          OptWrapMode:= cWrapAtMargin
         else
-          FWrapMode:= cWrapOff;
+          OptWrapMode:= cWrapOff;
       end;
     cWrapAtMargin:
       begin
-        FWrapMode:= cWrapOff;
+        OptWrapMode:= cWrapOff;
       end;
   end;
 

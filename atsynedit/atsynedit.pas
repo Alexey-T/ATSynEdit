@@ -221,6 +221,7 @@ const
   cInitCaretShapeOvr = cCaretShapeFull;
   cInitCaretShapeRO = cCaretShapeHorzPixels1;
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
+  cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingText = 1;
   cInitTimerBlink = 600;
   cInitTimerAutoScroll = 80;
@@ -415,6 +416,7 @@ type
     FWrapMode: TATSynWrapMode;
     FWrapUpdateNeeded: boolean;
     FWrapIndented: boolean;
+    FWrapEnabledForMaxLines: integer;
     FUnprintedVisible,
     FUnprintedSpaces,
     FUnprintedEof,
@@ -1167,6 +1169,7 @@ type
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cWrapOn;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
+    property OptWrapEnabledForMaxLines: integer read FWrapEnabledForMaxLines write FWrapEnabledForMaxLines default cInitWrapEnabledForMaxLines;
     property OptMarginRight: integer read FMarginRight write SetMarginRight default cInitMarginRight;
     property OptMarginString: string read GetMarginString write SetMarginString;
     property OptNumbersAutosize: boolean read FOptNumbersAutosize write FOptNumbersAutosize default true;
@@ -1611,6 +1614,10 @@ var
   NLine: integer;
 begin
   if FWrapMode=AValue then Exit;
+
+  //disable setting wrap=on for too big files
+  if FWrapMode=cWrapOff then
+    if Strings.Count>=FWrapEnabledForMaxLines then exit;
 
   NLine:= LineTop;
   FWrapMode:= AValue;
@@ -2622,6 +2629,7 @@ begin
   FWrapMode:= cWrapOn;
   FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
+  FWrapEnabledForMaxLines:= cInitWrapEnabledForMaxLines;
 
   FOverwrite:= false;
   FTabSize:= cInitTabSize;
