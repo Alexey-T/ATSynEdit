@@ -3,7 +3,7 @@
 procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
 var
   Item: TATStringItem;
-  SA, SUtf8, Sign: string;
+  SA, Sign: string;
   SWide: UnicodeString;
   bEncoded: boolean;
   i: integer;
@@ -23,29 +23,28 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= TATStringItem(FList[i]);
-    SUtf8:= Item.ItemString + cLineEndStrings[Item.ItemEnd];
-    if SUtf8<>'' then
+    SA:= Item.ItemString + cLineEndStrings[Item.ItemEnd];
+    if SA<>'' then
     case AEncoding of
       cEncAnsi:
         begin
           if FEncodingCodepage='' then
-            SA:= SConvertUtf8ToAnsi(SUtf8)
+            SA:= SConvertUtf8ToAnsi(SA)
           else
-            SA:= ConvertEncodingFromUTF8(SUtf8, FEncodingCodepage, bEncoded);
+            SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
 
           Stream.WriteBuffer(SA[1], Length(SA));
         end;
 
       cEncUTF8:
         begin
-          SA:= SUtf8;
           Stream.WriteBuffer(SA[1], Length(SA));
         end;
 
       cEncWideLE,
       cEncWideBE:
         begin
-          SWide:= UTF8Decode(SUtf8);
+          SWide:= UTF8Decode(SA);
           if AEncoding=cEncWideBE then
             SWide:= SSwapEndian(SWide);
           Stream.WriteBuffer(SWide[1], Length(SWide)*2);
@@ -57,7 +56,7 @@ begin
 
     if (i mod cStringsProgressSaveLines) = (cStringsProgressSaveLines div 2) then
     begin
-      FProgressValue:= Int64(i)*100 div (Count+1);
+      FProgressValue:= Int64(i)*100 div Count;
       if Assigned(FOnProgress) then
         FOnProgress(Self);
     end;
