@@ -765,7 +765,7 @@ type
     function DoFormatLineNumber(N: integer): atString;
     function UpdateScrollInfoFromMessage(const Msg: TLMScroll;
       var Info: TATSynScrollInfo): boolean;
-    procedure UpdateWrapInfo(AConsiderFolding: boolean);
+    procedure UpdateWrapInfo;
     function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
@@ -1388,7 +1388,7 @@ begin
   Update;
 end;
 
-procedure TATSynEdit.UpdateWrapInfo(AConsiderFolding: boolean);
+procedure TATSynEdit.UpdateWrapInfo;
 var
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
@@ -1397,7 +1397,9 @@ var
   i, j: integer;
   NLine, NIndexFrom, NIndexTo: integer;
   UseCachedUpdate: boolean;
+  bConsiderFolding: boolean;
 begin
+  bConsiderFolding:= Fold.Count>0;
   //FWrapProgress:= 0;
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
@@ -1443,7 +1445,7 @@ begin
       FWrapInfo.SetCapacity(Strings.Count);
       for i:= 0 to Strings.Count-1 do
       begin
-        DoCalcWrapInfos(i, NIndentMaximal, Items, AConsiderFolding);
+        DoCalcWrapInfos(i, NIndentMaximal, Items, bConsiderFolding);
         for j:= 0 to Items.Count-1 do
           FWrapInfo.Add(TATSynWrapItem(Items[j]));
       end;
@@ -1459,7 +1461,7 @@ begin
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= NativeInt{%H-}(ListNums[i]);
-        DoCalcWrapInfos(NLine, NIndentMaximal, Items, AConsiderFolding);
+        DoCalcWrapInfos(NLine, NIndentMaximal, Items, bConsiderFolding);
         if Items.Count=0 then Continue;
 
         FWrapInfo.FindIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
@@ -1823,7 +1825,7 @@ begin
   FRectMain:= GetRectMain; //after gutter/minimap
   FRectRuler:= GetRectRuler; //after main
 
-  UpdateWrapInfo(FFold.Count>0); //faster if no folding
+  UpdateWrapInfo;
 
   if not CanvasTextOutMustUseOffsets then
     DoUpdateFontNeedsOffsets(C);
