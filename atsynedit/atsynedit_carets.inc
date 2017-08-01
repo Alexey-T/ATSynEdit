@@ -163,7 +163,7 @@ function _DoCaretPosToClientPos(
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   APreferLeftSide: boolean): TPoint;
 var
-  Item: TATSynWrapItem;
+  Item: TATSynWrapItemData;
   NIndex1, NIndex2, NLineIndexTop, NFromStart: integer;
   Str: atString;
   i: integer;
@@ -227,7 +227,7 @@ function _DoClientPosToCaretPos(
   AAfterEofUsesLastLen: boolean): TPoint;
 var
   NIndex, NIndexDecrement, NPixels: integer;
-  Item: TATSynWrapItem;
+  Item: TATSynWrapItemData;
   ItemGap: TATSynGapItem;
   Str: atString;
   AllowVirtual, bGapGoesToEnd: boolean;

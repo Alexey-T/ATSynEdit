@@ -19,7 +19,7 @@ begin
   WrapItem:= TATSynWrapItem.Create(ALineIndex, 1, Length(Str), 0, cWrapItemFinal);
   try
     AColorAfter:= AColorBG;
-    DoCalcLineHilite(WrapItem, AParts, 0, cMaxCharsInLine,
+    DoCalcLineHilite(WrapItem.Data, AParts, 0, cMaxCharsInLine,
       AColorBG, false, AColorAfter);
   finally
     FreeAndNil(WrapItem);
@@ -28,17 +28,17 @@ end;
 
 
 
-procedure TATSynEdit.DoCalcLineHilite(const AItem: TATSynWrapItem;
+procedure TATSynEdit.DoCalcLineHilite(const AData: TATSynWrapItemData;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bFound: boolean;
 begin
-  nMaxOffset:= Min(ACharsMax, AItem.NLength-ACharsSkipped);
-  nLineIndex:= AItem.NLineIndex;
-  nLineLen:= AItem.NLength;
-  nCharIndex:= AItem.NCharIndex+ACharsSkipped;
+  nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
+  nLineIndex:= AData.NLineIndex;
+  nLineLen:= AData.NLength;
+  nCharIndex:= AData.NCharIndex+ACharsSkipped;
 
   FillChar(AParts, SizeOf(AParts), 0);
 

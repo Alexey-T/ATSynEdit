@@ -23,16 +23,20 @@ type
 type
   { TATSynWrapItem }
 
-  TATSynWrapItem = packed class
-  public
+  TATSynWrapItemData = packed record
     NLineIndex,
     NCharIndex,
     NLength: integer;
     NIndent: word;
     NFinal: TATSynWrapFinal;
+  end;
+
+  TATSynWrapItem = class
+  public
+    Data: TATSynWrapItemData;
     constructor Create(ALineIndex, ACharIndex, ALength: integer;
       AIndent: word; AFinal: TATSynWrapFinal);
-    procedure Assign(Item: TATSynWrapItem);
+    procedure Assign(AItem: TATSynWrapItem);
   end;
 
 type
@@ -46,9 +50,8 @@ type
     FList: TList;
     FStrings: TATStrings;
     FVirtualMode: boolean;
-    FVirtualItem: TATSynWrapItem;
     FOnCheckCollapsed: TATCheckLineCollapsedEvent;
-    function GetItem(AIndex: integer): TATSynWrapItem;
+    function GetItemData(AIndex: integer): TATSynWrapItemData;
     procedure SetVirtualMode(AValue: boolean);
   public
     constructor Create; virtual;
@@ -59,7 +62,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     function IsItemInitial(N: integer): boolean;
-    property Items[N: integer]: TATSynWrapItem read GetItem; default;
+    property Data[N: integer]: TATSynWrapItemData read GetItemData; default;
     procedure Add(AItem: TATSynWrapItem);
     procedure Delete(N: integer);
     procedure Insert(N: integer; AItem: TATSynWrapItem);
@@ -81,37 +84,32 @@ uses
 constructor TATSynWrapItem.Create(ALineIndex, ACharIndex, ALength: integer;
   AIndent: word; AFinal: TATSynWrapFinal);
 begin
-  NLineIndex:= ALineIndex;
-  NCharIndex:= ACharIndex;
-  NLength:= ALength;
-  NIndent:= AIndent;
-  NFinal:= AFinal;
+  Data.NLineIndex:= ALineIndex;
+  Data.NCharIndex:= ACharIndex;
+  Data.NLength:= ALength;
+  Data.NIndent:= AIndent;
+  Data.NFinal:= AFinal;
 end;
 
-procedure TATSynWrapItem.Assign(Item: TATSynWrapItem);
+procedure TATSynWrapItem.Assign(AItem: TATSynWrapItem);
 begin
-  NLineIndex:= Item.NLineIndex;
-  NCharIndex:= Item.NCharIndex;
-  NLength:= Item.NLength;
-  NIndent:= Item.NIndent;
-  NFinal:= Item.NFinal;
+  Data:= AItem.Data;
 end;
 
 { TATSynWrapInfo }
 
-function TATSynWrapInfo.GetItem(AIndex: integer): TATSynWrapItem;
+function TATSynWrapInfo.GetItemData(AIndex: integer): TATSynWrapItemData;
 begin
   if FVirtualMode then
   begin
-    FVirtualItem.NLineIndex:= AIndex;
-    FVirtualItem.NCharIndex:= 1;
-    FVirtualItem.NLength:= FStrings.LinesLen[AIndex];
-    FVirtualItem.NIndent:= 0;
-    FVirtualItem.NFinal:= cWrapItemFinal;
-    Result:= FVirtualItem;
+    Result.NLineIndex:= AIndex;
+    Result.NCharIndex:= 1;
+    Result.NLength:= FStrings.LinesLen[AIndex];
+    Result.NIndent:= 0;
+    Result.NFinal:= cWrapItemFinal;
   end
   else
-    Result:= TATSynWrapItem(FList[AIndex]);
+    Result:= TATSynWrapItem(FList[AIndex]).Data;
 end;
 
 procedure TATSynWrapInfo.SetVirtualMode(AValue: boolean);
@@ -125,14 +123,12 @@ end;
 constructor TATSynWrapInfo.Create;
 begin
   FList:= TList.Create;
-  FVirtualItem:= TATSynWrapItem.Create(0, 0, 0, 0, cWrapItemFinal);
   FVirtualMode:= false;
 end;
 
 destructor TATSynWrapInfo.Destroy;
 begin
   Clear;
-  FreeAndNil(FVirtualItem);
   FreeAndNil(FList);
   inherited;
 end;
@@ -156,29 +152,32 @@ end;
 
 function TATSynWrapInfo.IsIndexValid(N: integer): boolean; inline;
 begin
-  Result:= (N>=0) and (N<FList.Count);
+  Result:= (N>=0) and (N<Count);
 end;
 
 function TATSynWrapInfo.IsItemInitial(N: integer): boolean;
 begin
   Result:= true;
-  if (N>0) and (N<FList.Count) then //cant use IsIndexValid, N>0
-    Result:= Items[N].NLineIndex<>Items[N-1].NLineIndex;
+  if (N>0) and (N<Count) then //cant use IsIndexValid, N>0
+    Result:= Data[N].NLineIndex<>Data[N-1].NLineIndex;
 end;
 
 procedure TATSynWrapInfo.Add(AItem: TATSynWrapItem);
 begin
+  if FVirtualMode then exit;
   FList.Add(AItem);
 end;
 
 procedure TATSynWrapInfo.Delete(N: integer);
 begin
+  if FVirtualMode then exit;
   FList.Delete(N);
 end;
 
 procedure TATSynWrapInfo.Insert(N: integer; AItem: TATSynWrapItem);
 begin
-  if N>=Count then
+  if FVirtualMode then exit;
+  if N>=FList.Count then
     FList.Add(AItem)
   else
     FList.Insert(N, AItem);
@@ -199,13 +198,13 @@ begin
   if b<0 then Exit;
 
   repeat
-    dif:= Items[a].NLineIndex-ALineNum;
+    dif:= Data[a].NLineIndex-ALineNum;
     if dif=0 then begin m:= a; Break end;
 
     //middle, which is near b if not exact middle
     m:= (a+b+1) div 2;
 
-    dif:= Items[m].NLineIndex-ALineNum;
+    dif:= Data[m].NLineIndex-ALineNum;
     if dif=0 then Break;
 
     if Abs(a-b)<=1 then Exit;
@@ -214,13 +213,12 @@ begin
 
   AFrom:= m;
   ATo:= m;
-  while (AFrom>0) and (Items[AFrom-1].NLineIndex=ALineNum) do Dec(AFrom);
-  while (ATo<Count-1) and (Items[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
+  while (AFrom>0) and (Data[AFrom-1].NLineIndex=ALineNum) do Dec(AFrom);
+  while (ATo<Count-1) and (Data[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
 end;
 
 function TATSynWrapInfo.FindIndexOfCaretPos(APos: TPoint): integer;
 var
-  Item: TATSynWrapItem;
   NFrom, NTo, i: integer;
 begin
   Result:= -1;
@@ -229,8 +227,8 @@ begin
   for i:= NFrom to NTo do
   begin
     Result:= i;
-    Item:= Items[i];
-    if Item.NCharIndex+Item.NLength > APos.X then Break;
+    with Data[i] do
+      if NCharIndex+NLength > APos.X then Break;
   end;
 end;
 

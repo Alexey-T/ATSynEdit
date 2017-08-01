@@ -648,7 +648,7 @@ type
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
       AItems: TList; AConsiderFolding: boolean);
-    procedure DoCalcLineHilite(const AItem: TATSynWrapItem;
+    procedure DoCalcLineHilite(const AData: TATSynWrapItemData;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
     //select
@@ -1398,6 +1398,13 @@ var
   UseCachedUpdate: boolean;
   bConsiderFolding: boolean;
 begin
+  //virtual mode allows faster usage of WrapInfo
+  FWrapInfo.StringsObj:= Strings;
+  FWrapInfo.VirtualMode:=
+    (FWrapMode=cWrapOff) and
+    (Fold.Count=0);
+  if FWrapInfo.VirtualMode then exit;
+
   bConsiderFolding:= Fold.Count>0;
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
@@ -1896,7 +1903,7 @@ var
   NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: integer;
-  WrapItem: TATSynWrapItem;
+  WrapItem: TATSynWrapItemData;
   NColorEntire, NColorAfter: TColor;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
@@ -4835,7 +4842,7 @@ var
   List: TATIntArray;
   State: (cFoldbarNone, cFoldbarBegin, cFoldbarEnd, cFoldbarMiddle);
   CoordXM, CoordYM: integer;
-  WrapItem: TATSynWrapItem;
+  WrapItem: TATSynWrapItemData;
   LineIndex: integer;
   IsPlus, IsLineUp, IsLineDown: boolean;
   i: integer;
