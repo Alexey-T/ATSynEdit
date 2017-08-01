@@ -411,7 +411,6 @@ type
     FOnCalcStaple: TATSynEditCalcStapleEvent;
     FOnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent;
     FWrapInfo: TATSynWrapInfo;
-    //FWrapProgress: integer;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
     FWrapUpdateNeeded: boolean;
@@ -1400,7 +1399,6 @@ var
   bConsiderFolding: boolean;
 begin
   bConsiderFolding:= Fold.Count>0;
-  //FWrapProgress:= 0;
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
 
@@ -2617,7 +2615,6 @@ begin
   FWrapMode:= cWrapOn;
   FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
-  //FWrapProgress:= 0;
 
   FOverwrite:= false;
   FTabSize:= cInitTabSize;
