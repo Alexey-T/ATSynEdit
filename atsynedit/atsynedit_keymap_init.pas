@@ -98,8 +98,9 @@ begin
   M.Add(cCommand_ToggleWordWrap, 'toggle word-wrap mode (off/window)', [cXControl+'+U'], []);
   M.Add(cCommand_ToggleWordWrapAlt, 'toggle word-wrap mode (off/window/margin)', [], []);
 
-  M.Add(cCommand_ToggleUnprinted, 'toggle unprinted chars: enable all', [], []);
+  M.Add(cCommand_ToggleUnprinted, 'toggle unprinted chars: enable other options', [], []);
   M.Add(cCommand_ToggleUnprintedSpaces, 'toggle unprinted chars: spaces/tabs', [], []);
+  M.Add(cCommand_ToggleUnprintedSpacesTailOnly, 'toggle unprinted chars: spaces/tabs trailing only', [], []);
   M.Add(cCommand_ToggleUnprintedEnds, 'toggle unprinted chars: ends', [], []);
   M.Add(cCommand_ToggleUnprintedEndDetails, 'toggle unprinted chars: end details', [], []);
 

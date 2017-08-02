@@ -37,6 +37,12 @@ begin
   Result:= [cResultState];
 end;
 
+function TATSynEdit.DoCommand_ToggleUnprintedSpacesTailOnly: TATCommandResults;
+begin
+  OptUnprintedSpacesTailOnly:= not OptUnprintedSpacesTailOnly;
+  Result:= [cResultState];
+end;
+
 function TATSynEdit.DoCommand_ToggleUnprintedEnds: TATCommandResults;
 begin
   OptUnprintedEnds:= not OptUnprintedEnds;

@@ -127,6 +127,7 @@ const
   cCommand_ToggleMinimap = 310;
   cCommand_ToggleMicromap = 311;
   cCommand_ToggleWordWrapAlt = 312;
+  cCommand_ToggleUnprintedSpacesTailOnly = 313;
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;
