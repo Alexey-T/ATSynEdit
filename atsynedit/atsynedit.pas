@@ -819,7 +819,7 @@ type
     function DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;
     function DoCommand_ToggleUnprinted: TATCommandResults;
     function DoCommand_ToggleUnprintedSpaces: TATCommandResults;
-    function DoCommand_ToggleUnprintedSpacesTailOnly: TATCommandResults;
+    function DoCommand_ToggleUnprintedSpacesTrailing: TATCommandResults;
     function DoCommand_ToggleUnprintedEnds: TATCommandResults;
     function DoCommand_ToggleUnprintedEndDetails: TATCommandResults;
     function DoCommand_ToggleLineNums: TATCommandResults;

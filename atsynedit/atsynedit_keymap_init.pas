@@ -100,7 +100,7 @@ begin
 
   M.Add(cCommand_ToggleUnprinted, 'toggle unprinted chars: enable other options', [], []);
   M.Add(cCommand_ToggleUnprintedSpaces, 'toggle unprinted chars: spaces/tabs', [], []);
-  M.Add(cCommand_ToggleUnprintedSpacesTailOnly, 'toggle unprinted chars: spaces/tabs trailing only', [], []);
+  M.Add(cCommand_ToggleUnprintedSpacesTrailing, 'toggle unprinted chars: spaces/tabs trailing only', [], []);
   M.Add(cCommand_ToggleUnprintedEnds, 'toggle unprinted chars: ends', [], []);
   M.Add(cCommand_ToggleUnprintedEndDetails, 'toggle unprinted chars: end details', [], []);
 

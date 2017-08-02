@@ -334,7 +334,7 @@ begin
     cCommand_ToggleWordWrapAlt:        Res:= DoCommand_ToggleWordWrap(true);
     cCommand_ToggleUnprinted:          Res:= DoCommand_ToggleUnprinted;
     cCommand_ToggleUnprintedSpaces:    Res:= DoCommand_ToggleUnprintedSpaces;
-    cCommand_ToggleUnprintedSpacesTailOnly: Res:= DoCommand_ToggleUnprintedSpacesTailOnly;
+    cCommand_ToggleUnprintedSpacesTrailing: Res:= DoCommand_ToggleUnprintedSpacesTrailing;
     cCommand_ToggleUnprintedEnds:      Res:= DoCommand_ToggleUnprintedEnds;
     cCommand_ToggleUnprintedEndDetails: Res:= DoCommand_ToggleUnprintedEndDetails;
     cCommand_ToggleLineNums:           Res:= DoCommand_ToggleLineNums;
