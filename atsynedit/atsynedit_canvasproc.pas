@@ -98,6 +98,7 @@ procedure CanvasTextOut(C: TCanvas;
   ACharSize: TPoint;
   AMainText: boolean;
   AShowUnprintable: boolean;
+  AShowUnprintableTailOnly: boolean;
   AColorUnprintable: TColor;
   AColorHex: TColor;
   out AStrWidth: integer;
@@ -293,15 +294,26 @@ procedure DoPaintUnprintedChars(C: TCanvas;
   const AOffsets: TATIntArray;
   APoint: TPoint;
   ACharSize: TPoint;
-  AColorFont: TColor);
+  AColorFont: TColor;
+  ATailOnly: boolean);
 var
+  ch: WideChar;
   R: TRect;
-  i: integer;
+  NPos, i: integer;
 begin
-  if AString='' then Exit;
+  NPos:= 1;
 
-  for i:= 1 to Length(AString) do
-    if (AString[i]=' ') or (AString[i]=#9) then
+  if ATailOnly then
+  begin
+    NPos:= Length(AString)+1;
+    while (NPos>1) and IsCharSpace(AString[NPos-1]) do
+      Dec(NPos);
+  end;
+
+  for i:= NPos to Length(AString) do
+  begin
+    ch:= AString[i];
+    if IsCharSpace(ch) then
     begin
       R.Left:= APoint.X;
       R.Right:= APoint.X;
@@ -312,11 +324,12 @@ begin
       R.Top:= APoint.Y;
       R.Bottom:= R.Top+ACharSize.Y;
 
-      if AString[i]=' ' then
+      if ch=' ' then
         CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
       else
         CanvasArrowHorz(C, R, AColorFont, OptUnprintedTabCharLength*ACharSize.X, true);
     end;
+  end;
 end;
 
 procedure CanvasSimpleLine(C: TCanvas; P1, P2: TPoint);
@@ -603,10 +616,11 @@ end;
 procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
   const ANeedOffsets: TATFontNeedsOffsets; ATabSize: integer;
   ACharSize: TPoint; AMainText: boolean; AShowUnprintable: boolean;
-  AColorUnprintable: TColor; AColorHex: TColor; out AStrWidth: integer;
-  ACharsSkipped: integer; AParts: PATLineParts;
-  ADrawEvent: TATSynEditDrawLineEvent; ATextOffsetFromLine: integer;
-  AControlWidth: integer; AAllowFontLigatures: boolean);
+  AShowUnprintableTailOnly: boolean; AColorUnprintable: TColor;
+  AColorHex: TColor; out AStrWidth: integer; ACharsSkipped: integer;
+  AParts: PATLineParts; ADrawEvent: TATSynEditDrawLineEvent;
+  ATextOffsetFromLine: integer; AControlWidth: integer;
+  AAllowFontLigatures: boolean);
 var
   ListOffsets: TATLineOffsetsInfo;
   ListInt: TATIntArray;
@@ -747,7 +761,15 @@ begin
     end;
 
   if AShowUnprintable then
-    DoPaintUnprintedChars(C, Str, ListInt, Point(PosX, PosY), ACharSize, AColorUnprintable);
+    DoPaintUnprintedChars(
+      C,
+      Str,
+      ListInt,
+      Point(PosX, PosY),
+      ACharSize,
+      AColorUnprintable,
+      AShowUnprintableTailOnly
+      );
 
   AStrWidth:= ListInt[High(ListInt)];
 

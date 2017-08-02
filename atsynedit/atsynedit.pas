@@ -420,6 +420,7 @@ type
     FWrapEnabledForMaxLines: integer;
     FUnprintedVisible,
     FUnprintedSpaces,
+    FUnprintedSpacesTailOnly,
     FUnprintedEof,
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
@@ -1184,6 +1185,7 @@ type
     property OptNumbersIndentRight: integer read FOptNumbersIndentRight write FOptNumbersIndentRight default 5;
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible default true;
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces default true;
+    property OptUnprintedSpacesTailOnly: boolean read FUnprintedSpacesTailOnly write FUnprintedSpacesTailOnly default false;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds default true;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails default true;
     property OptUnprintedEof: boolean read FUnprintedEof write FUnprintedEof default true;
@@ -2087,6 +2089,7 @@ begin
           ACharSize,
           AMainText,
           AMainText and FUnprintedVisible and FUnprintedSpaces,
+          FUnprintedSpacesTailOnly,
           FColors.UnprintedFont,
           FColors.UnprintedHexFont,
           NOutputStrWidth,
@@ -2640,6 +2643,7 @@ begin
 
   FUnprintedVisible:= true;
   FUnprintedSpaces:= true;
+  FUnprintedSpacesTailOnly:= false;
   FUnprintedEnds:= true;
   FUnprintedEndsDetails:= true;
   FUnprintedEof:= true;
