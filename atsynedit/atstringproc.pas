@@ -300,10 +300,17 @@ end;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 var
   i: integer;
+  p: PWord;
 begin
   Result:= S;
+  if S='' then exit;
+  UniqueString(Result);
+  P:= PWord(@Result[1]);
   for i:= 1 to Length(Result) do
-    Result[i]:= WideChar(SwapEndian(Ord(Result[i])));
+  begin
+    P^:= SwapEndian(P^);
+    Inc(P);
+  end;
 end;
 
 function SCalcTabulationSize(const ATabSize, APos: integer): integer;
