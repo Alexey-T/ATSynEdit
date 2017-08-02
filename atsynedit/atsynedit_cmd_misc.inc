@@ -39,7 +39,7 @@ end;
 
 function TATSynEdit.DoCommand_ToggleUnprintedSpacesTailOnly: TATCommandResults;
 begin
-  OptUnprintedSpacesTailOnly:= not OptUnprintedSpacesTailOnly;
+  OptUnprintedSpacesTrailing:= not OptUnprintedSpacesTrailing;
   Result:= [cResultState];
 end;
 
