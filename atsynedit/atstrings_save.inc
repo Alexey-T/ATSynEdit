@@ -56,6 +56,7 @@ begin
 
     if (i mod cStringsProgressSaveLines) = (cStringsProgressSaveLines div 2) then
     begin
+      FProgressLoading:= false;
       FProgressValue:= Int64(i)*100 div Count;
       if Assigned(FOnProgress) then
         FOnProgress(Self);

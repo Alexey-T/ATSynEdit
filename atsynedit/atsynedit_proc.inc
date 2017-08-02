@@ -1,5 +1,6 @@
 var
   cBitmapWait: TPortableNetworkGraphic = nil;
+  cBitmapSaving: TPortableNetworkGraphic = nil;
   cBitmapNiceScroll: TBitmap = nil;
 
 const
@@ -50,12 +51,16 @@ begin
   Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
 
   cBitmapWait:= TPortableNetworkGraphic.Create;
-  cBitmapWait.LoadFromResourceName(HInstance, 'EDITOR_WAIT');
+  cBitmapWait.LoadFromResourceName(HInstance, 'ATSYN_WAIT');
+
+  cBitmapSaving:= TPortableNetworkGraphic.Create;
+  cBitmapSaving.LoadFromResourceName(HInstance, 'ATSYN_SAVE');
 end;
 
 procedure FreeResources;
 begin
   FreeAndNil(cBitmapWait);
+  FreeAndNil(cBitmapSaving);
   FreeAndNil(cBitmapNiceScroll);
 end;
 

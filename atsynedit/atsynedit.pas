@@ -3179,7 +3179,10 @@ begin
   C.Brush.Color:= Colors.TextBG;
   C.FillRect(ClientRect);
 
-  C.Draw(cOrigX, cOrigY, cBitmapWait);
+  if Strings.ProgressLoading then
+    C.Draw(cOrigX, cOrigY, cBitmapWait)
+  else
+    C.Draw(cOrigX, cOrigY, cBitmapSaving);
 
   NValue:= Strings.ProgressValue;
   if NValue>0 then
@@ -5424,7 +5427,8 @@ end;
 
 {$R res/nicescroll.res}
 {$R res/foldbar.res}
-{$R res/hourglass.res}
+{$R res/editor_hourglass.res}
+{$R res/editor_save.res}
 
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}

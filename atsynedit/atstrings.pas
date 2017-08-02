@@ -130,6 +130,7 @@ type
     FUndoGroupCounter: integer;
     FOneLine: boolean;
     FProgressValue: integer;
+    FProgressLoading: boolean;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnProgress: TNotifyEvent;
@@ -230,6 +231,7 @@ type
     property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
     property ProgressValue: integer read FProgressValue write FProgressValue;
+    property ProgressLoading: boolean read FProgressLoading write FProgressLoading;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property Gaps: TATSynGaps read FGaps;
     //actions

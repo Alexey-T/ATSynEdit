@@ -1,5 +1,4 @@
-Icon by Snip Master
-https://www.iconfinder.com/icons/173034/hourglass_icon#size=48
+Icons "hourglass", "floppy" by Snip Master
 https://www.iconfinder.com/snipicons
 
 License: Creative Commons (Attribution-Noncommercial 3.0 Unported) 
