@@ -24,15 +24,21 @@
         <FormatVersion Value="1"/>
       </local>
     </RunParams>
-    <RequiredPackages Count="2">
+    <RequiredPackages Count="4">
       <Item1>
-        <PackageName Value="econtrol_package"/>
+        <PackageName Value="atsynedit_ex_package"/>
       </Item1>
       <Item2>
-        <PackageName Value="LCL"/>
+        <PackageName Value="atsynedit_package"/>
       </Item2>
+      <Item3>
+        <PackageName Value="econtrol_package"/>
+      </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
     </RequiredPackages>
-    <Units Count="11">
+    <Units Count="2">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -45,49 +51,6 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
       </Unit1>
-      <Unit2>
-        <Filename Value="..\..\atsynedit\atsynedit_adapter_econtrol.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Adapter_EControl"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="..\..\atsynedit\atsynedit.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="..\..\atsynedit\atsynedit_canvasproc.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_CanvasProc"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="..\..\atsynedit\atsynedit_adapters.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Adapters"/>
-      </Unit5>
-      <Unit6>
-        <Filename Value="..\..\atsynedit\atstringproc.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc"/>
-      </Unit6>
-      <Unit7>
-        <Filename Value="..\..\atsynedit\atstringproc_textbuffer.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ATStringProc_TextBuffer"/>
-      </Unit7>
-      <Unit8>
-        <Filename Value="..\..\atsynedit\atsynedit_fold.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit8>
-      <Unit9>
-        <Filename Value="..\..\atsynedit\atsynedit_ranges.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Ranges"/>
-      </Unit9>
-      <Unit10>
-        <Filename Value="..\..\atsynedit\atsynedit_hilite.inc"/>
-        <IsPartOfProject Value="True"/>
-      </Unit10>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -97,8 +60,8 @@
       <Filename Value="demo"/>
     </Target>
     <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir);..\..\atsynedit"/>
-      <OtherUnitFiles Value="..\..\atsynedit;..\..\proc_lexer"/>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="..\..\proc_lexer"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
