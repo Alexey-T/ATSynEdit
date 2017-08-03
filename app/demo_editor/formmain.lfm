@@ -351,8 +351,8 @@ object fmMain: TfmMain
     end
     object PanelEvent: TPanel
       Left = 14
-      Height = 27
-      Top = 381
+      Height = 56
+      Top = 384
       Width = 250
       TabOrder = 16
     end

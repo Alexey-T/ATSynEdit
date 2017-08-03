@@ -182,9 +182,11 @@ type
     FFindConfirmAll: TModalResult;
     FFindMarkAll: boolean;
     procedure DoAddEnc(Sub, SName: string);
-    procedure EditChangeBlock(Sender: TObject; const AStartPos,
+    procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
+    procedure EditStringsChange(Sender: TObject; ALine: integer;
+      AChange: TATLineChangeKind);
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean);
@@ -274,7 +276,8 @@ begin
   ed.PopupRuler:= PopupRuler;
 
   ed.OnChange:= @EditChanged;
-  ed.Strings.OnChangeBlock:=@EditChangeBlock;
+  ed.Strings.OnChange:=@EditStringsChange;
+  ed.Strings.OnChangeBlock:=@EditStringsChangeBlock;
   ed.OnChangeCaretPos:= @EditCaretMoved;
   ed.OnChangeState:= @EditCaretMoved;
   ed.OnScroll:= @EditCaretMoved;
@@ -943,20 +946,20 @@ begin
   miSub.Add(mi);
 end;
 
-procedure TfmMain.EditChangeBlock(Sender: TObject; const AStartPos,
+procedure TfmMain.EditStringsChangeBlock(Sender: TObject; const AStartPos,
   AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
 const
   cEvent: array[TATBlockChangeKind] of string = (
-    'del-ln',
-    'ins-ln',
-    'del-col',
-    'ins-col'
+    'cBlockDeleteLines',
+    'cBlockInsertLines',
+    'cBlockDeleteColumn',
+    'cBlockInsertColumn'
     );
 begin
-  PanelEvent.Caption:= Format('OnChBlock: %d..%d, %s', [
+  PanelEvent.Caption:= Format('%s, %d..%d', [
+    cEvent[AChange],
     AStartPos.Y,
-    AEndPos.Y,
-    cEvent[AChange]
+    AEndPos.Y
     ]);
 end;
 
@@ -966,6 +969,22 @@ begin
   if Assigned(AGapItem) then
     MsgStatus(Format('OnClickGap: line %d, pos %d:%d',
       [AGapItem.LineIndex+1, APos.X, APos.Y]));
+end;
+
+procedure TfmMain.EditStringsChange(Sender: TObject; ALine: integer;
+  AChange: TATLineChangeKind);
+const
+  cEvent: array[TATLineChangeKind] of string = (
+    'cLineChangeEdited',
+    'cLineChangeAdded',
+    'cLineChangeDeleted',
+    'cLineChangeDeletedAll'
+    );
+begin
+  PanelEvent.Caption:= Format('%s, line %d', [
+    cEvent[AChange],
+    ALine
+    ]);
 end;
 
 procedure TfmMain.MenuEncClick(Sender: TObject);
