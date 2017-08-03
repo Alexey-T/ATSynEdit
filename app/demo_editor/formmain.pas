@@ -26,6 +26,7 @@ type
     bFont: TButton;
     bOpt: TButton;
     btnStop: TButton;
+    bClearLog: TButton;
     chkTabSpaces: TCheckBox;
     chkNewScroll: TCheckBox;
     chkMinimapLeft: TCheckBox;
@@ -57,6 +58,7 @@ type
     Label5: TLabel;
     Label6: TLabel;
     Label9: TLabel;
+    ListboxLog: TListBox;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
@@ -102,7 +104,6 @@ type
     mnuFileSaveAs: TMenuItem;
     mnuGoto: TMenuItem;
     OpenDialog1: TOpenDialog;
-    PanelEvent: TPanel;
     PanelMain: TPanel;
     PanelRt: TPanel;
     PopupBookmk: TPopupMenu;
@@ -116,6 +117,7 @@ type
     Status: TStatusBar;
     StatusMsg: TStatusBar;
     TimerHint: TTimer;
+    procedure bClearLogClick(Sender: TObject);
     procedure bGotoClick(Sender: TObject);
     procedure btnMarkerClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
@@ -182,6 +184,7 @@ type
     FFindConfirmAll: TModalResult;
     FFindMarkAll: boolean;
     procedure DoAddEnc(Sub, SName: string);
+    procedure DoLog(const S: string);
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
@@ -591,6 +594,11 @@ begin
     ShowMessage('Incorrect line index: '+s);
 end;
 
+procedure TfmMain.bClearLogClick(Sender: TObject);
+begin
+  ListboxLog.Items.Clear;
+end;
+
 procedure TfmMain.btnMarkerClick(Sender: TObject);
 begin
   if ed.Carets.Count=1 then
@@ -946,6 +954,13 @@ begin
   miSub.Add(mi);
 end;
 
+
+procedure TfmMain.DoLog(const S: string);
+begin
+  ListboxLog.Items.Add(S);
+  ListboxLog.ItemIndex:= ListboxLog.Items.Count-1;
+end;
+
 procedure TfmMain.EditStringsChangeBlock(Sender: TObject; const AStartPos,
   AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
 const
@@ -956,11 +971,11 @@ const
     'cBlockInsertColumn'
     );
 begin
-  PanelEvent.Caption:= Format('%s, %d..%d', [
+  DoLog(Format('%s, %d..%d', [
     cEvent[AChange],
     AStartPos.Y,
     AEndPos.Y
-    ]);
+    ]));
 end;
 
 procedure TfmMain.EditClickGap(Sender: TObject; AGapItem: TATSynGapItem;
@@ -981,10 +996,10 @@ const
     'cLineChangeDeletedAll'
     );
 begin
-  PanelEvent.Caption:= Format('%s, line %d', [
+  DoLog(Format('%s, line %d', [
     cEvent[AChange],
     ALine
-    ]);
+    ]));
 end;
 
 procedure TfmMain.MenuEncClick(Sender: TObject);

@@ -1,7 +1,7 @@
 object fmMain: TfmMain
   Left = 266
   Height = 498
-  Top = 242
+  Top = 168
   Width = 953
   Caption = 'Demo'
   ClientHeight = 498
@@ -349,12 +349,24 @@ object fmMain: TfmMain
       OnChange = chkTabSpacesChange
       TabOrder = 6
     end
-    object PanelEvent: TPanel
-      Left = 14
-      Height = 56
-      Top = 384
-      Width = 250
+    object ListboxLog: TListBox
+      Left = 10
+      Height = 117
+      Top = 379
+      Width = 262
+      ItemHeight = 0
+      ScrollWidth = 260
       TabOrder = 16
+      TopIndex = -1
+    end
+    object bClearLog: TButton
+      Left = 176
+      Height = 25
+      Top = 348
+      Width = 91
+      Caption = 'clear log'
+      OnClick = bClearLogClick
+      TabOrder = 17
     end
   end
   object OpenDialog1: TOpenDialog
