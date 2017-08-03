@@ -215,6 +215,11 @@ type TATSynWrapInfo in unit atsynedit_wrapinfo. Holds list of wrap items, each i
 
 One wrap item renders on control as one short line. It is part of wrapped line or entire line. Also used for wrap-mode off, this is simple case - one wrap item per one line. Wrap items exist only for lines not hidden by folding feature (with Strings.LinesHidden[i]=true).
 
+
+WrapInfo has weird property VirtualMode. This prop is set if a) no fold ranges created (ie no lexer is active, or lexer didn't create fold ranges), b) word wrapping is off. VirtualMode means that WrapInfo don't store any data in internal TList, it is empty and fast, it only reads props of Strings and returns them. Indeed, when no fold ranges, and word wrapping off, all items of WrapInfo must be simple "mirror" of Strings items props (and count is the same).
+
+VirtualMode makes loading of huge logs (100-500Mb) ~1.5 times faster.
+
 === Undo object ===
 
 Holds list of actions for Undo/Redo. You must not touch it. Filled auto by changing-adding-deleting of lines in Strings object (by any API). Also holds end-of-lines markers (changed ends-of-lines can undo too).
@@ -906,8 +911,9 @@ To find/insert parts to TATLineParts, funcs DoPartFind/ DoPartInsert are used.
 = Auto-completion lists =
 == General API ==
 
-Unit atsynedit_form_complete has function to show completion-listbox for editor. Unit uses [[ATListbox]].
-Listbox is not modal. It keeps editor caret blinking. While listbox shown, editor don't get keyboard input, but listbox passes typed chars/Backspace/Left/Right to editor. Listbox replaces text on Enter/Tab keys, hides on Esc or clicking outside.
+You need to install package from repo https://github.com/Alexey-T/ATSynEdit_Ex .
+
+Unit atsynedit_form_complete has function to show completion-listbox for editor. Listbox is not modal. It keeps editor caret blinking. While listbox shown, editor don't get keyboard input, but listbox passes typed chars/Backspace/Left/Right to editor. Listbox replaces text on Enter/Tab keys, hides on Esc or clicking outside.
 
 <syntaxhighlight>
 type
