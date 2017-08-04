@@ -497,6 +497,7 @@ type
     FOptBorderWidthFocused: integer;
     FOptBorderFocusedActive: boolean;
     FOptRulerVisible: boolean;
+    FOptRulerStartFrom1: boolean;
     FOptRulerSize: integer;
     FOptRulerFontSize: integer;
     FOptRulerMarkSizeSmall: integer;
@@ -1156,6 +1157,7 @@ type
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
+    property OptRulerStartFrom1: boolean read FOptRulerStartFrom1 write FOptRulerStartFrom1 default false;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize default 8;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
@@ -1271,6 +1273,8 @@ var
 begin
   NPrevSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
+  if FOptRulerStartFrom1 then
+    Inc(NRulerStart);
 
   if FOptRulerFontSize<>0 then
     C.Font.Size:= FOptRulerFontSize;
@@ -2694,6 +2698,7 @@ begin
   FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;
+  FOptRulerStartFrom1:= false;
   FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
