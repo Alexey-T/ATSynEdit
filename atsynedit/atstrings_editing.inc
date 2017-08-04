@@ -428,17 +428,7 @@ begin
     Lines[AFromY]:= Str;
 
     //del middle lines
-    FChangeBlockActive:= true;
-    DoOnChangeBlock(
-      0, AFromY+1,
-      0, AToY,
-      cBlockDeleteLines,
-      nil);
-
-    for i:= AToY downto AFromY+1 do
-      LineDelete(i);
-
-    FChangeBlockActive:= false;
+    DeleteEntireLines(AFromY+1, AToY);
 
     if bDelEmpty then
       if Str='' then
