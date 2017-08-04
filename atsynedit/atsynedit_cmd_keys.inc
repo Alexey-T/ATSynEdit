@@ -329,7 +329,7 @@ end;
 
 function TATSynEdit.DoCommand_GotoScreenEdge(ATop: boolean): TATCommandResults;
 var
-  NX: integer;
+  NX, NY: integer;
 begin
   if Carets.Count>0 then
     NX:= Carets[0].PosX
@@ -337,10 +337,11 @@ begin
     NX:= ColumnLeft;
 
   if ATop then
-    DoCaretSingle(NX, LineTop)
+    NY:= LineTop
   else
-    DoCaretSingle(NX, LineBottom-1);
+    NY:= LineBottom-1;
 
+  DoCaretSingle(NX, NY);
   Result:= [cResultCaretTop];
 end;
 
