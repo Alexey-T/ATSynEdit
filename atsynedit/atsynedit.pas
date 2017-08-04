@@ -1414,7 +1414,8 @@ begin
   FWrapInfo.StringsObj:= Strings;
   FWrapInfo.VirtualMode:=
     (FWrapMode=cWrapOff) and
-    (Fold.Count=0);
+    (Fold.Count=0) and
+    (Strings.Count>2);
   if FWrapInfo.VirtualMode then exit;
 
   bConsiderFolding:= Fold.Count>0;

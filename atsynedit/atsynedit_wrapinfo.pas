@@ -109,15 +109,26 @@ begin
     Result.NFinal:= cWrapItemFinal;
   end
   else
-    Result:= TATSynWrapItem(FList[AIndex]).Data;
+  begin
+    //Assert(IsIndexValid(AIndex), 'Invalid index in WrapInfo.GetData()');
+    if AIndex>=0 then
+      Result:= TATSynWrapItem(FList[AIndex]).Data
+    else
+      FillChar(Result, SizeOf(Result), 0);
+  end;
 end;
 
 procedure TATSynWrapInfo.SetVirtualMode(AValue: boolean);
 begin
   if FVirtualMode=AValue then Exit;
   FVirtualMode:= AValue;
-  if FVirtualMode then
-    FList.Clear;
+
+  {
+  don't clear:
+  adapter fills Fold ranges after a pause... this causes nasty empty screen of control
+  }
+  //if FVirtualMode then
+  //  Clear;
 end;
 
 constructor TATSynWrapInfo.Create;
