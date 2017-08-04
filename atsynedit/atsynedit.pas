@@ -1268,13 +1268,11 @@ uses
 
 procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
 var
-  NX, NSize, NPrevSize, NRulerStart, i: integer;
+  NX, NSize, NPrevSize, NRulerStart, NOutput, i: integer;
   Str: string;
 begin
   NPrevSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
-  if FOptRulerStartFrom1 then
-    Inc(NRulerStart);
 
   if FOptRulerFontSize<>0 then
     C.Font.Size:= FOptRulerFontSize;
@@ -1295,7 +1293,10 @@ begin
 
     if i mod 10 = 0 then
     begin
-      Str:= IntToStr(i);
+      NOutput:= i;
+      if FOptRulerStartFrom1 then
+        Inc(NOutput);
+      Str:= IntToStr(NOutput);
       C.TextOut(NX - C.TextWidth(Str) div 2, FOptRulerTextIndent, Str);
     end;
   end;
