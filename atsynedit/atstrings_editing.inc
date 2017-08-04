@@ -340,6 +340,22 @@ end;
 
 function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
   out AShift, APosAfter: TPoint): boolean;
+  //----------
+  procedure DeleteEntireLines(ALine1, ALine2: integer);
+  var
+    i: integer;
+  begin
+    FChangeBlockActive:= true;
+    DoOnChangeBlock(
+      0, ALine1,
+      0, ALine2,
+      cBlockDeleteLines,
+      nil);
+    for i:= ALine2 downto ALine1 do
+      LineDelete(i);
+    FChangeBlockActive:= false;
+  end;
+  //----------
 var
   Str: atString;
   bDelEmpty, bDeleteEol, bDeleteEol_Alt: boolean;
@@ -378,16 +394,13 @@ begin
   if (AFromX=0) and (AToX=0) then
   begin
     //selected entire lines
-    FChangeBlockActive:= true;
-    DoOnChangeBlock(
-      0, AFromY,
-      0, AToY-1,
-      cBlockDeleteLines,
-      nil);
-
-    for i:= AToY-1 downto AFromY do
-      LineDelete(i);
-    FChangeBlockActive:= false;
+    DeleteEntireLines(AFromY, AToY-1);
+  end
+  else
+  if (AFromX=0) and (AToY=Count-1) and (AToX=LinesLen[AToY]) then
+  begin
+    //selected entire lines, to the end of last line
+    DeleteEntireLines(AFromY, AToY);
   end
   else
   begin
