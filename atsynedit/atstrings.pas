@@ -142,6 +142,8 @@ type
       //to use with OnChangeBlock:
       //indicates that program can ignore separate line changes in OnChange,
       //because OnChangeBlock is called for all lines at once
+    procedure DoBlock_DeleteLines(ALine1, ALine2: integer);
+    procedure DoBlock_InsertLines(ALineFrom: integer; ANewLines: TStringList);
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;

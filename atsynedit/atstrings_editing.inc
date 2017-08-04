@@ -51,27 +51,10 @@ begin
   Result:= true;
 
   BeginUndoGroup;
-  FChangeBlockActive:= true;
   try
-    DoOnChangeBlock(
-      0, ALineFrom,
-      0, Min(ALineTo, Count-1),
-      cBlockDeleteLines,
-      nil);
-
-    for i:= Min(ALineTo, Count-1) downto ALineFrom do
-      LineDelete(i);
-
-    DoOnChangeBlock(
-      0, ALineFrom,
-      0, 0,
-      cBlockInsertLines,
-      ANewLines);
-
-    for i:= ANewLines.Count-1 downto 0 do
-      LineInsert(ALineFrom, UTF8Decode(ANewLines[i]));
+    DoBlock_DeleteLines(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
+    DoBlock_InsertLines(ALineFrom, ANewLines);
   finally
-    FChangeBlockActive:= false;
     EndUndoGroup;
   end;
 end;
@@ -338,24 +321,40 @@ begin
   end;
 end;
 
+
+procedure TATStrings.DoBlock_DeleteLines(ALine1, ALine2: integer);
+var
+  i: integer;
+begin
+  FChangeBlockActive:= true;
+  DoOnChangeBlock(
+    0, ALine1,
+    0, ALine2,
+    cBlockDeleteLines,
+    nil);
+  for i:= ALine2 downto ALine1 do
+    LineDelete(i);
+  FChangeBlockActive:= false;
+end;
+
+procedure TATStrings.DoBlock_InsertLines(ALineFrom: integer; ANewLines: TStringList);
+var
+  i: integer;
+begin
+  FChangeBlockActive:= true;
+  DoOnChangeBlock(
+    0, ALineFrom,
+    0, 0,
+    cBlockInsertLines,
+    ANewLines);
+  for i:= ANewLines.Count-1 downto 0 do
+    LineInsert(ALineFrom, UTF8Decode(ANewLines[i]));
+  FChangeBlockActive:= false;
+end;
+
+
 function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
   out AShift, APosAfter: TPoint): boolean;
-  //----------
-  procedure DeleteEntireLines(ALine1, ALine2: integer);
-  var
-    i: integer;
-  begin
-    FChangeBlockActive:= true;
-    DoOnChangeBlock(
-      0, ALine1,
-      0, ALine2,
-      cBlockDeleteLines,
-      nil);
-    for i:= ALine2 downto ALine1 do
-      LineDelete(i);
-    FChangeBlockActive:= false;
-  end;
-  //----------
 var
   Str: atString;
   bDelEmpty, bDeleteEol, bDeleteEol_Alt: boolean;
@@ -394,13 +393,13 @@ begin
   if (AFromX=0) and (AToX=0) then
   begin
     //selected entire lines
-    DeleteEntireLines(AFromY, AToY-1);
+    DoBlock_DeleteLines(AFromY, AToY-1);
   end
   else
   if (AFromX=0) and (AToY=Count-1) and (AToX=LinesLen[AToY]) then
   begin
     //selected entire lines, to the end of last line
-    DeleteEntireLines(AFromY, AToY);
+    DoBlock_DeleteLines(AFromY, AToY);
   end
   else
   begin
@@ -428,7 +427,7 @@ begin
     Lines[AFromY]:= Str;
 
     //del middle lines
-    DeleteEntireLines(AFromY+1, AToY);
+    DoBlock_DeleteLines(AFromY+1, AToY);
 
     if bDelEmpty then
       if Str='' then
