@@ -724,7 +724,7 @@ begin
 
       bAllowLigatures:=
         {$ifdef windows}
-        AAllowFontLigatures and
+        AProps.ShowFontLigatures and
         IsStringSymbolsOnly(Buf) and //disable if unicode chrs
         (Pos(#9, PartStr)=0); //incorrect for str with tabs
         {$else}
