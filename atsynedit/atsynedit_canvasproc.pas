@@ -80,6 +80,23 @@ type
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: TATIntArray) of object;
 
+type
+  TATCanvasTextOutProps = record
+    NeedOffsets: TATFontNeedsOffsets;
+    TabSize: integer;
+    CharSize: TPoint;
+    MainTextArea: boolean;
+    CharsSkipped: integer;
+    DrawEvent: TATSynEditDrawLineEvent;
+    ControlWidth: integer;
+    TextOffsetFromLine: integer;
+    ShowUnprinted: boolean;
+    ShowUnprintedSpacesTrailing: boolean;
+    ShowFontLigatures: boolean;
+    ColorUnprintedFont: TColor;
+    ColorUnprintedHexFont: TColor;
+  end;
+
 procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
   P1, P2: TPoint; AtDown: boolean);
@@ -91,23 +108,11 @@ procedure CanvasArrowHorz(C: TCanvas;
   AToRight: boolean);
 
 procedure CanvasTextOut(C: TCanvas;
-  PosX, PosY: integer;
-  Str: atString;
-  const ANeedOffsets: TATFontNeedsOffsets;
-  ATabSize: integer;
-  ACharSize: TPoint;
-  AMainText: boolean;
-  AShowUnprintable: boolean;
-  AShowUnprintableTailOnly: boolean;
-  AColorUnprintable: TColor;
-  AColorHex: TColor;
-  out AStrWidth: integer;
-  ACharsSkipped: integer;
+  APosX, APosY: integer;
+  AText: atString;
   AParts: PATLineParts;
-  ADrawEvent: TATSynEditDrawLineEvent;
-  ATextOffsetFromLine: integer;
-  AControlWidth: integer;
-  AAllowFontLigatures: boolean
+  out ATextWidth: integer;
+  const AProps: TATCanvasTextOutProps
   );
 
 procedure CanvasTextOutMinimap(C: TCanvas;
@@ -613,14 +618,9 @@ begin
   Result:= IsStringWithUnicodeChars(AStr);
 end;
 
-procedure CanvasTextOut(C: TCanvas; PosX, PosY: integer; Str: atString;
-  const ANeedOffsets: TATFontNeedsOffsets; ATabSize: integer;
-  ACharSize: TPoint; AMainText: boolean; AShowUnprintable: boolean;
-  AShowUnprintableTailOnly: boolean; AColorUnprintable: TColor;
-  AColorHex: TColor; out AStrWidth: integer; ACharsSkipped: integer;
-  AParts: PATLineParts; ADrawEvent: TATSynEditDrawLineEvent;
-  ATextOffsetFromLine: integer; AControlWidth: integer;
-  AAllowFontLigatures: boolean);
+procedure CanvasTextOut(C: TCanvas; APosX, APosY: integer; AText: atString;
+  AParts: PATLineParts; out ATextWidth: integer;
+  const AProps: TATCanvasTextOutProps);
 var
   ListOffsets: TATLineOffsetsInfo;
   ListInt: TATIntArray;
@@ -636,21 +636,21 @@ var
   DxPointer: PInteger;
   bAllowLigatures: boolean;
 begin
-  if Str='' then Exit;
+  if AText='' then Exit;
 
-  SetLength(ListInt, Length(Str));
-  SetLength(Dx, Length(Str));
+  SetLength(ListInt, Length(AText));
+  SetLength(Dx, Length(AText));
 
-  SCalcCharOffsets(Str, ListOffsets, ATabSize, ACharsSkipped);
+  SCalcCharOffsets(AText, ListOffsets, AProps.TabSize, AProps.CharsSkipped);
 
   for i:= 0 to High(ListOffsets.OffsetPercent) do
-    ListInt[i]:= ListOffsets.OffsetPercent[i] * ACharSize.X div 100;
+    ListInt[i]:= ListOffsets.OffsetPercent[i] * AProps.CharSize.X div 100;
 
-  //truncate str, to not paint over screen
+  //truncate AText, to not paint over screen
   for i:= 1 to High(ListInt) do
-    if ListInt[i]>AControlWidth then
+    if ListInt[i]>AProps.ControlWidth then
     begin
-      SetLength(Str, i);
+      SetLength(AText, i);
       break;
     end;
 
@@ -662,20 +662,20 @@ begin
 
   if AParts=nil then
   begin
-    Buf:= UTF8Encode(SRemoveHexChars(Str));
+    Buf:= UTF8Encode(SRemoveHexChars(AText));
     SReplaceAllTabsToOneSpace(Buf);
-    if CanvasTextOutNeedsOffsets(C, Str, ANeedOffsets) then
+    if CanvasTextOutNeedsOffsets(C, AText, AProps.NeedOffsets) then
       DxPointer:= @Dx[0]
     else
       DxPointer:= nil;
-    ExtTextOut(C.Handle, PosX, PosY, 0, nil, PChar(Buf), Length(Buf), DxPointer);
+    ExtTextOut(C.Handle, APosX, APosY, 0, nil, PChar(Buf), Length(Buf), DxPointer);
 
     DoPaintHexChars(C,
-      Str,
+      AText,
       @Dx[0],
-      Point(PosX, PosY),
-      ACharSize,
-      AColorHex,
+      Point(APosX, APosY),
+      AProps.CharSize,
+      AProps.ColorUnprintedHexFont,
       C.Brush.Color
       );
   end
@@ -686,7 +686,7 @@ begin
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
       PartOffset:= PartPtr^.Offset;
-      PartStr:= Copy(Str, PartOffset+1, PartLen);
+      PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
 
       PartFontStyle:= [];
@@ -699,7 +699,7 @@ begin
       else
         PixOffset1:= 0;
 
-      i:= Min(PartOffset+PartLen, Length(Str));
+      i:= Min(PartOffset+PartLen, Length(AText));
       if i>0 then
         PixOffset2:= ListInt[i-1]
       else
@@ -710,14 +710,14 @@ begin
       C.Font.Style:= PartFontStyle;
 
       PartRect:= Rect(
-        PosX+PixOffset1,
-        PosY,
-        PosX+PixOffset2,
-        PosY+ACharSize.Y);
+        APosX+PixOffset1,
+        APosY,
+        APosX+PixOffset2,
+        APosY+AProps.CharSize.Y);
 
       Buf:= UTF8Encode(SRemoveHexChars(PartStr));
       SReplaceAllTabsToOneSpace(Buf);
-      if CanvasTextOutNeedsOffsets(C, PartStr, ANeedOffsets) then
+      if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
         DxPointer:= @Dx[PartOffset]
       else
         DxPointer:= nil;
@@ -732,8 +732,8 @@ begin
         {$endif}
 
       _SelfTextOut(C.Handle,
-        PosX+PixOffset1,
-        PosY+ATextOffsetFromLine,
+        APosX+PixOffset1,
+        APosY+AProps.TextOffsetFromLine,
         @PartRect,
         Buf,
         DxPointer,
@@ -744,14 +744,14 @@ begin
         PartStr,
         @Dx[PartOffset],
         Point(
-          PosX+PixOffset1,
-          PosY+ATextOffsetFromLine),
-        ACharSize,
-        AColorHex,
+          APosX+PixOffset1,
+          APosY+AProps.TextOffsetFromLine),
+        AProps.CharSize,
+        AProps.ColorUnprintedHexFont,
         PartPtr^.ColorBG
         );
 
-      if AMainText then
+      if AProps.MainTextArea then
       begin
         DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideDown, PartPtr^.BorderDown);
         DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideUp, PartPtr^.BorderUp);
@@ -760,22 +760,22 @@ begin
       end;
     end;
 
-  if AShowUnprintable then
+  if AProps.ShowUnprinted then
     DoPaintUnprintedChars(
       C,
-      Str,
+      AText,
       ListInt,
-      Point(PosX, PosY),
-      ACharSize,
-      AColorUnprintable,
-      AShowUnprintableTailOnly
+      Point(APosX, APosY),
+      AProps.CharSize,
+      AProps.ColorUnprintedFont,
+      AProps.ShowUnprintedSpacesTrailing
       );
 
-  AStrWidth:= ListInt[High(ListInt)];
+  ATextWidth:= ListInt[High(ListInt)];
 
-  if Str<>'' then
-    if Assigned(ADrawEvent) then
-      ADrawEvent(nil, C, PosX, PosY, Str, ACharSize, ListInt);
+  if AText<>'' then
+    if Assigned(AProps.DrawEvent) then
+      AProps.DrawEvent(nil, C, APosX, APosY, AText, AProps.CharSize, ListInt);
 end;
 
 

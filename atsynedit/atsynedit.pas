@@ -1937,6 +1937,7 @@ var
   Event: TATSynEditDrawLineEvent;
   StrSize: TSize;
   ItemGap: TATSynGapItem;
+  TextOutProps: TATCanvasTextOutProps;
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
   begin
@@ -2095,28 +2096,33 @@ begin
       CanvasTextOutHorzSpacingUsed:= OptCharSpacingX<>0;
 
       if AMainText then
+      begin
+        TextOutProps.NeedOffsets:= FFontNeedsOffsets;
+        TextOutProps.TabSize:= FTabSize;
+        TextOutProps.CharSize:= ACharSize;
+        TextOutProps.MainTextArea:= AMainText;
+        TextOutProps.CharsSkipped:= NOutputSpacesSkipped;
+          //todo:
+          //needed number of chars of all chars counted as 100%,
+          //while NOutputSpacesSkipped is with cjk counted as 170%
+        TextOutProps.DrawEvent:= Event;
+        TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
+        TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
+        TextOutProps.ShowUnprinted:= AMainText and FUnprintedVisible and FUnprintedSpaces;
+        TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
+        TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not LineWithCaret);
+        TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
+        TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+
         CanvasTextOut(C,
           CurrPointText.X,
           CurrPointText.Y,
           StrOut,
-          FFontNeedsOffsets,
-          FTabSize,
-          ACharSize,
-          AMainText,
-          AMainText and FUnprintedVisible and FUnprintedSpaces,
-          FUnprintedSpacesTrailing,
-          FColors.UnprintedFont,
-          FColors.UnprintedHexFont,
-          NOutputStrWidth,
-          NOutputSpacesSkipped, //todo:
-            //needed number of chars of all chars counted as 100%,
-            //while NOutputSpacesSkipped is with cjk counted as 170%
           @FLineParts,
-          Event,
-          FOptTextOffsetFromLine,
-          ClientWidth+ACharSize.X*2,
-          FOptShowFontLigatures and (not LineWithCaret)
+          NOutputStrWidth,
+          TextOutProps
           )
+      end
       else
         CanvasTextOutMinimap(C,
           StrOut,
