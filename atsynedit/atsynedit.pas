@@ -484,6 +484,7 @@ type
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
+    FOptTextCenteringCharWidth: integer;
     FOptTextOffsetLeft: integer;
     FOptTextOffsetTop: integer;
     FOptTextOffsetFromLine: integer;
@@ -1108,6 +1109,7 @@ type
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle default [fsItalic];
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
+    property OptTextCenteringCharWidth: integer read FOptTextCenteringCharWidth write FOptTextCenteringCharWidth default 0;
     property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft default 0;
     property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop default 0;
     property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine default cInitTextOffsetFromLine;
@@ -1846,6 +1848,12 @@ begin
   FRectGutter:= GetRectGutter;
   FRectMain:= GetRectMain; //after gutter/minimap
   FRectRuler:= GetRectRuler; //after main
+
+  if FOptTextCenteringCharWidth>0 then
+    FOptTextOffsetLeft:= Max(0, (
+      ClientWidth -
+      IfThen(OptGutterVisible, Gutter.Width) -
+      FOptTextCenteringCharWidth * FCharSize.X) div 2);
 
   UpdateWrapInfo;
 
@@ -2732,6 +2740,7 @@ begin
   FOptShowStapleWidthPercent:= 100;
 
   FOptMaxLinesToCountUnindent:= 100;
+  FOptTextCenteringCharWidth:= 0;
   FOptTextOffsetLeft:= 0;
   FOptTextOffsetTop:= 0;
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
