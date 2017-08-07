@@ -1850,12 +1850,6 @@ begin
   FRectMain:= GetRectMain; //after gutter/minimap
   FRectRuler:= GetRectRuler; //after main
 
-  if FOptTextCenteringCharWidth>0 then
-    FOptTextOffsetLeft:= Max(0, (
-      ClientWidth -
-      IfThen(OptGutterVisible, Gutter.Width) -
-      FOptTextCenteringCharWidth * FCharSize.X) div 2);
-
   UpdateWrapInfo;
 
   if not CanvasTextOutMustUseOffsets then
@@ -3116,10 +3110,21 @@ begin
 end;
 
 function TATSynEdit.GetTextOffset: TPoint;
+var
+  NGutterWidth: integer;
 begin
-  Result.X:= OptTextOffsetLeft;
   if FOptGutterVisible then
-    Inc(Result.X, FGutter.Width);
+    NGutterWidth:= Gutter.Width
+  else
+    NGutterWidth:= 0;
+
+  if FOptTextCenteringCharWidth>0 then
+    Result.X:= Max(0, (ClientWidth - NGutterWidth -
+                       FOptTextCenteringCharWidth * FCharSize.X) div 2)
+  else
+    Result.X:= OptTextOffsetLeft;
+
+  Inc(Result.X, NGutterWidth);
 
   Result.Y:= OptTextOffsetTop;
   if FOptRulerVisible then
