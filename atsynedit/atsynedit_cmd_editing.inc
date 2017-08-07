@@ -605,8 +605,16 @@ begin
   begin
     Caret.EndX:= 0;
     Caret.EndY:= NBlockBeginY;
-    Caret.PosX:= 0;
-    Caret.PosY:= Min(NBlockEndY+1, Strings.Count-1);
+    if Strings.IsIndexValid(NBlockEndY+1) then
+    begin
+      Caret.PosX:= 0;
+      Caret.PosY:= NBlockEndY+1;
+    end
+    else
+    begin
+      Caret.PosY:= NBlockEndY;
+      Caret.PosX:= Strings.LinesLen[NBlockEndY];
+    end;
   end
   else
   begin
