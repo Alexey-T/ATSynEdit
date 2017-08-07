@@ -9,37 +9,37 @@ unit ATSynEdit_Commands;
 interface
 
 const
-  cCmdSelKeep   = $10000; //cmd continues selection (new caret pos makes bigger selection)
-  cCmdSelReset  = $20000; //before command reset selection
-  cCmdCaret     = $80000; //cmd moves caret and makes new undo-group
+  cCmdFlag_KeepSel   = $10000; //cmd continues selection (new caret pos makes bigger selection)
+  cCmdFlag_ResetSel  = $20000; //before command reset selection
+  cCmdFlag_Caret     = $80000; //cmd moves caret and makes new undo-group
 
 const
-  _base_KeyUp       = 100 or cCmdCaret;
-  _base_KeyDown     = 101 or cCmdCaret;
-  _base_KeyLeft     = 102 or cCmdCaret;
-  _base_KeyRight    = 103 or cCmdCaret;
-  _base_KeyHome     = 104 or cCmdCaret;
-  _base_KeyEnd      = 105 or cCmdCaret;
-  _base_KeyPageUp   = 106 or cCmdCaret;
-  _base_KeyPageDown = 107 or cCmdCaret;
+  _base_KeyUp       = 100 or cCmdFlag_Caret;
+  _base_KeyDown     = 101 or cCmdFlag_Caret;
+  _base_KeyLeft     = 102 or cCmdFlag_Caret;
+  _base_KeyRight    = 103 or cCmdFlag_Caret;
+  _base_KeyHome     = 104 or cCmdFlag_Caret;
+  _base_KeyEnd      = 105 or cCmdFlag_Caret;
+  _base_KeyPageUp   = 106 or cCmdFlag_Caret;
+  _base_KeyPageDown = 107 or cCmdFlag_Caret;
 
-  cCommand_KeyUp           = _base_KeyUp or cCmdSelReset;
-  cCommand_KeyDown         = _base_KeyDown or cCmdSelReset;
+  cCommand_KeyUp           = _base_KeyUp or cCmdFlag_ResetSel;
+  cCommand_KeyDown         = _base_KeyDown or cCmdFlag_ResetSel;
   cCommand_KeyLeft         = _base_KeyLeft; //handles sel
   cCommand_KeyRight        = _base_KeyRight; //handles sel
-  cCommand_KeyHome         = _base_KeyHome or cCmdSelReset;
-  cCommand_KeyEnd          = _base_KeyEnd or cCmdSelReset;
-  cCommand_KeyPageUp       = _base_KeyPageUp or cCmdSelReset;
-  cCommand_KeyPageDown     = _base_KeyPageDown or cCmdSelReset;
+  cCommand_KeyHome         = _base_KeyHome or cCmdFlag_ResetSel;
+  cCommand_KeyEnd          = _base_KeyEnd or cCmdFlag_ResetSel;
+  cCommand_KeyPageUp       = _base_KeyPageUp or cCmdFlag_ResetSel;
+  cCommand_KeyPageDown     = _base_KeyPageDown or cCmdFlag_ResetSel;
 
-  cCommand_KeyUp_Sel       = _base_KeyUp or cCmdSelKeep;
-  cCommand_KeyDown_Sel     = _base_KeyDown or cCmdSelKeep;
-  cCommand_KeyLeft_Sel     = _base_KeyLeft or cCmdSelKeep;
-  cCommand_KeyRight_Sel    = _base_KeyRight or cCmdSelKeep;
-  cCommand_KeyHome_Sel     = _base_KeyHome or cCmdSelKeep;
-  cCommand_KeyEnd_Sel      = _base_KeyEnd or cCmdSelKeep;
-  cCommand_KeyPageUp_Sel   = _base_KeyPageUp or cCmdSelKeep;
-  cCommand_KeyPageDown_Sel = _base_KeyPageDown or cCmdSelKeep;
+  cCommand_KeyUp_Sel       = _base_KeyUp or cCmdFlag_KeepSel;
+  cCommand_KeyDown_Sel     = _base_KeyDown or cCmdFlag_KeepSel;
+  cCommand_KeyLeft_Sel     = _base_KeyLeft or cCmdFlag_KeepSel;
+  cCommand_KeyRight_Sel    = _base_KeyRight or cCmdFlag_KeepSel;
+  cCommand_KeyHome_Sel     = _base_KeyHome or cCmdFlag_KeepSel;
+  cCommand_KeyEnd_Sel      = _base_KeyEnd or cCmdFlag_KeepSel;
+  cCommand_KeyPageUp_Sel   = _base_KeyPageUp or cCmdFlag_KeepSel;
+  cCommand_KeyPageDown_Sel = _base_KeyPageDown or cCmdFlag_KeepSel;
 
   cCommand_ColSelectUp    = 110;
   cCommand_ColSelectDown  = 111;
@@ -65,33 +65,33 @@ const
   cCommand_TextDeleteSelection = 170;
   cCommand_TextDeleteLine = 171;
   cCommand_TextDuplicateLine = 172;
-  cCommand_TextDeleteToLineBegin = 173 or cCmdSelReset;
-  cCommand_TextDeleteToLineEnd = 174 or cCmdSelReset;
-  cCommand_TextDeleteToTextEnd = 175 or cCmdSelReset;
-  cCommand_TextDeleteWordNext = 176 or cCmdSelReset;
-  cCommand_TextDeleteWordPrev = 177 or cCmdSelReset;
+  cCommand_TextDeleteToLineBegin = 173 or cCmdFlag_ResetSel;
+  cCommand_TextDeleteToLineEnd = 174 or cCmdFlag_ResetSel;
+  cCommand_TextDeleteToTextEnd = 175 or cCmdFlag_ResetSel;
+  cCommand_TextDeleteWordNext = 176 or cCmdFlag_ResetSel;
+  cCommand_TextDeleteWordPrev = 177 or cCmdFlag_ResetSel;
 
-  _base_GotoTextBegin = 200 or cCmdCaret;
-  _base_GotoTextEnd   = 201 or cCmdCaret;
-  _base_GotoWordNext  = 202 or cCmdCaret;
-  _base_GotoWordPrev  = 203 or cCmdCaret;
+  _base_GotoTextBegin = 200 or cCmdFlag_Caret;
+  _base_GotoTextEnd   = 201 or cCmdFlag_Caret;
+  _base_GotoWordNext  = 202 or cCmdFlag_Caret;
+  _base_GotoWordPrev  = 203 or cCmdFlag_Caret;
 
-  cCommand_GotoTextBegin = _base_GotoTextBegin or cCmdSelReset;
-  cCommand_GotoTextEnd = _base_GotoTextEnd or cCmdSelReset;
-  cCommand_GotoWordNext = _base_GotoWordNext or cCmdSelReset;
-  cCommand_GotoWordPrev = _base_GotoWordPrev or cCmdSelReset;
+  cCommand_GotoTextBegin = _base_GotoTextBegin or cCmdFlag_ResetSel;
+  cCommand_GotoTextEnd = _base_GotoTextEnd or cCmdFlag_ResetSel;
+  cCommand_GotoWordNext = _base_GotoWordNext or cCmdFlag_ResetSel;
+  cCommand_GotoWordPrev = _base_GotoWordPrev or cCmdFlag_ResetSel;
 
-  cCommand_GotoTextBegin_Sel = _base_GotoTextBegin or cCmdSelKeep;
-  cCommand_GotoTextEnd_Sel = _base_GotoTextEnd or cCmdSelKeep;
-  cCommand_GotoWordNext_Sel = _base_GotoWordNext or cCmdSelKeep;
-  cCommand_GotoWordPrev_Sel = _base_GotoWordPrev or cCmdSelKeep;
+  cCommand_GotoTextBegin_Sel = _base_GotoTextBegin or cCmdFlag_KeepSel;
+  cCommand_GotoTextEnd_Sel = _base_GotoTextEnd or cCmdFlag_KeepSel;
+  cCommand_GotoWordNext_Sel = _base_GotoWordNext or cCmdFlag_KeepSel;
+  cCommand_GotoWordPrev_Sel = _base_GotoWordPrev or cCmdFlag_KeepSel;
 
   cCommand_GotoScreenTop = 205;
   cCommand_GotoScreenBottom = 206;
   cCommand_GotoScreenCenter = 207;
 
-  cCommand_Undo = 235 or cCmdSelReset;
-  cCommand_Redo = 236 or cCmdSelReset;
+  cCommand_Undo = 235 or cCmdFlag_ResetSel;
+  cCommand_Redo = 236 or cCmdFlag_ResetSel;
 
   cCommand_TextIndent = 240;
   cCommand_TextUnindent = 241;
@@ -103,18 +103,18 @@ const
   cCommand_ScrollToCaretLeft = 254;
   cCommand_ScrollToCaretRight = 255;
 
-  cCommand_SelectAll = 260 or cCmdSelReset or cCmdCaret;
-  cCommand_SelectNone = 261 or cCmdSelReset or cCmdCaret;
-  cCommand_SelectWords = 262 or cCmdSelReset or cCmdCaret;
-  cCommand_SelectLines = 263 or cCmdSelReset or cCmdCaret;
-  cCommand_SelectInverted = 264 or cCmdCaret;
-  cCommand_SelectSplitToLines = 265 or cCmdCaret;
-  cCommand_SelectExtendByLine = 266 or cCmdCaret;
+  cCommand_SelectAll = 260 or cCmdFlag_ResetSel or cCmdFlag_Caret;
+  cCommand_SelectNone = 261 or cCmdFlag_ResetSel or cCmdFlag_Caret;
+  cCommand_SelectWords = 262 or cCmdFlag_ResetSel or cCmdFlag_Caret;
+  cCommand_SelectLines = 263 or cCmdFlag_ResetSel or cCmdFlag_Caret;
+  cCommand_SelectInverted = 264 or cCmdFlag_Caret;
+  cCommand_SelectSplitToLines = 265 or cCmdFlag_Caret;
+  cCommand_SelectExtendByLine = 266 or cCmdFlag_Caret;
 
-  cCommand_MoveSelectionUp = 268 or cCmdCaret;
-  cCommand_MoveSelectionDown = 269 or cCmdCaret;
-  cCommand_TextInsertEmptyAbove = 270 or cCmdSelReset or cCmdCaret;
-  cCommand_TextInsertEmptyBelow = 271 or cCmdSelReset or cCmdCaret;
+  cCommand_MoveSelectionUp = 268 or cCmdFlag_Caret;
+  cCommand_MoveSelectionDown = 269 or cCmdFlag_Caret;
+  cCommand_TextInsertEmptyAbove = 270 or cCmdFlag_ResetSel or cCmdFlag_Caret;
+  cCommand_TextInsertEmptyBelow = 271 or cCmdFlag_ResetSel or cCmdFlag_Caret;
 
   cCommand_ToggleOverwrite = 300;
   cCommand_ToggleReadOnly = 301;
@@ -137,8 +137,8 @@ const
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;
   cCommand_ClipboardPaste_KeepCaret = 1002;
-  cCommand_ClipboardPaste_Column = 1003 or cCmdSelReset;
-  cCommand_ClipboardPaste_ColumnKeepCaret = 1004 or cCmdSelReset;
+  cCommand_ClipboardPaste_Column = 1003 or cCmdFlag_ResetSel;
+  cCommand_ClipboardPaste_ColumnKeepCaret = 1004 or cCmdFlag_ResetSel;
   cCommand_ClipboardCopy = 1006;
   cCommand_ClipboardCopyAdd = 1007;
   cCommand_ClipboardCut = 1008;
@@ -147,8 +147,8 @@ const
   cCommand_ClipboardAltPaste = 1010;
   cCommand_ClipboardAltPaste_Select = 1011;
   cCommand_ClipboardAltPaste_KeepCaret = 1012;
-  cCommand_ClipboardAltPaste_Column = 1013 or cCmdSelReset;
-  cCommand_ClipboardAltPaste_ColumnKeepCaret = 1014 or cCmdSelReset;
+  cCommand_ClipboardAltPaste_Column = 1013 or cCmdFlag_ResetSel;
+  cCommand_ClipboardAltPaste_ColumnKeepCaret = 1014 or cCmdFlag_ResetSel;
   //use SecondarySelection (has meaning on gtk2)
   cCommand_ClipboardAltAltPaste = 1015;
 

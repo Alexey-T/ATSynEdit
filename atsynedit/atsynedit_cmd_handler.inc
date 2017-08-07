@@ -156,7 +156,7 @@ begin
   DoCaretForceShow;
 
   //---handle special command bits (cCmdNNNNN)
-  if ACmd and cCmdSelKeep <> 0 then
+  if ACmd and cCmdFlag_KeepSel <> 0 then
     for i:= 0 to Carets.Count-1 do
     begin
       Caret:= Carets[i];
@@ -164,10 +164,10 @@ begin
       if Caret.EndX<0 then Caret.EndX:= Caret.PosX;
     end;
 
-  if ACmd and cCmdSelReset <> 0 then
+  if ACmd and cCmdFlag_ResetSel <> 0 then
     DoSelect_None;
 
-  if ACmd and cCmdCaret <> 0 then
+  if ACmd and cCmdFlag_Caret <> 0 then
   begin
     Strings.SetGroupMark;
 
