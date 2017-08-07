@@ -84,6 +84,7 @@ begin
 
   M.Add(cCommand_GotoScreenTop,      'go to screen top', [], []);
   M.Add(cCommand_GotoScreenBottom,   'go to screen bottom', [], []);
+  M.Add(cCommand_GotoScreenCenter,   'go to screen center', [], []);
 
   M.Add(cCommand_SelectAll, 'selection: select all', [cXControl+'+A'], []);
   M.Add(cCommand_TextDeleteSelection, 'selection: delete selected text', [], []);

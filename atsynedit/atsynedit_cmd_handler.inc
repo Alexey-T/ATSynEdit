@@ -321,8 +321,9 @@ begin
     cCommand_GotoTextEnd,
     cCommand_GotoTextEnd_Sel:          Res:= DoCommand_GotoTextEnd;
 
-    cCommand_GotoScreenTop:            Res:= DoCommand_GotoScreenEdge(true);
-    cCommand_GotoScreenBottom:         Res:= DoCommand_GotoScreenEdge(false);
+    cCommand_GotoScreenTop:            Res:= DoCommand_GotoScreenTopBottomCenter(-1);
+    cCommand_GotoScreenBottom:         Res:= DoCommand_GotoScreenTopBottomCenter(+1);
+    cCommand_GotoScreenCenter:         Res:= DoCommand_GotoScreenTopBottomCenter(0);
 
     cCommand_GotoWordNext,
     cCommand_GotoWordNext_Sel:         Res:= DoCommand_GotoWord(true);

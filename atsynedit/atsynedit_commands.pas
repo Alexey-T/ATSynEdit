@@ -88,6 +88,7 @@ const
 
   cCommand_GotoScreenTop = 205;
   cCommand_GotoScreenBottom = 206;
+  cCommand_GotoScreenCenter = 207;
 
   cCommand_Undo = 235 or cCmdSelReset;
   cCommand_Redo = 236 or cCmdSelReset;

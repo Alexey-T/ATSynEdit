@@ -830,7 +830,7 @@ type
     function DoCommand_ToggleMiniMap: TATCommandResults;
     function DoCommand_ToggleMicroMap: TATCommandResults;
     function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
-    function DoCommand_GotoScreenEdge(ATop: boolean): TATCommandResults;
+    function DoCommand_GotoScreenTopBottomCenter(APos: integer): TATCommandResults;
     function DoCommand_ScrollVert(ALines: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;

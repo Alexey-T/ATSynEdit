@@ -327,7 +327,7 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_GotoScreenEdge(ATop: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_GotoScreenTopBottomCenter(APos: integer): TATCommandResults;
 var
   NX, NY: integer;
 begin
@@ -336,10 +336,13 @@ begin
   else
     NX:= ColumnLeft;
 
-  if ATop then
+  if APos<0 then
     NY:= LineTop
   else
-    NY:= LineBottom-1;
+  if APos>0 then
+    NY:= LineBottom-1
+  else
+    NY:= (LineTop+LineBottom-1) div 2;
 
   DoCaretSingle(NX, NY);
   Result:= [cResultCaretTop];
