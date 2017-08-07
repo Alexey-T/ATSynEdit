@@ -310,6 +310,8 @@ type
   TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
     ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor) of object;
+  TATSynEditPasteEvent = procedure(Sender: TObject; var AHandled: boolean;
+    AKeepCaret, ASelectThen: boolean) of object;
 
 
 type
@@ -412,6 +414,7 @@ type
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FOnCalcStaple: TATSynEditCalcStapleEvent;
     FOnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent;
+    FOnPaste: TATSynEditPasteEvent;
     FWrapInfo: TATSynWrapInfo;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
@@ -1092,6 +1095,7 @@ type
     property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
     property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
     property OnBeforeCalcHilite: TNotifyEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
+    property OnPaste: TATSynEditPasteEvent read FOnPaste write FOnPaste;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText default crIBeam;

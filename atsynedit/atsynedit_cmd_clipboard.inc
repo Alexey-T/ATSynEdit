@@ -4,10 +4,17 @@ function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
   Str: atString;
-  bNeedFixLastEol: boolean;
+  bHandled, bNeedFixLastEol: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+
+  if Assigned(FOnPaste) then
+  begin
+    bHandled:= false;
+    FOnPaste(Self, bHandled, AKeepCaret, ASelectThen);
+    if bHandled then exit;
+  end;
 
   //column block
   if AClipboardObject.HasFormat(cATClipboardFormatId) then
