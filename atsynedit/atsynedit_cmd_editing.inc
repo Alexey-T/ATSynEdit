@@ -886,13 +886,23 @@ begin
   Update(true);
 end;
 
-function TATSynEdit.DoCommand_TextTrimSpaces(AMode: TATTrimSpaces
-  ): TATCommandResults;
+function TATSynEdit.DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
   if Strings.ActionTrimSpaces(AMode) then
     Result:= [cResultCaretAny, cResultText];
+end;
+
+function TATSynEdit.DoCommand_ForceFinalEndOfLine: TATCommandResults;
+begin
+  if Strings.ActionEnsureFinalEol then
+  begin
+    Strings.ActionAddFakeLineIfNeeded;
+    Result:= [cResultText];
+  end
+  else
+    Result:= [];
 end;
 

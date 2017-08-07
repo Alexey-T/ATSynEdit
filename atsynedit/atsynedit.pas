@@ -849,6 +849,7 @@ type
     function DoCommand_TextDeleteLeft(ALen: integer; AAllowUnindent: boolean): TATCommandResults;
     function DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
     function DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
+    function DoCommand_ForceFinalEndOfLine: TATCommandResults;
     function DoCommand_TextDeleteLines: TATCommandResults;
     function DoCommand_TextDuplicateLine: TATCommandResults;
     function DoCommand_TextDeleteToLineBegin: TATCommandResults;
