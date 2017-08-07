@@ -86,9 +86,9 @@ const
   cCommand_GotoWordNext_Sel = _base_GotoWordNext or cCmdFlag_KeepSel;
   cCommand_GotoWordPrev_Sel = _base_GotoWordPrev or cCmdFlag_KeepSel;
 
-  cCommand_GotoScreenTop = 205;
-  cCommand_GotoScreenBottom = 206;
-  cCommand_GotoScreenCenter = 207;
+  cCommand_GotoScreenTop = 205 or cCmdFlag_Caret;
+  cCommand_GotoScreenBottom = 206 or cCmdFlag_Caret;
+  cCommand_GotoScreenCenter = 207 or cCmdFlag_Caret;
 
   cCommand_Undo = 235 or cCmdFlag_ResetSel;
   cCommand_Redo = 236 or cCmdFlag_ResetSel;
