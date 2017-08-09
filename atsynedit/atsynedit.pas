@@ -75,6 +75,12 @@ type
     cDirDown
     );
 
+  TATRulerNumeration = (
+    cRulerNumeration_0_10_20,
+    cRulerNumeration_1_11_21,
+    cRulerNumeration_1_10_20
+    );
+
   TATSelectColumnDirection = (
     cDirColumnLeft,
     cDirColumnRight,
@@ -501,7 +507,7 @@ type
     FOptBorderWidthFocused: integer;
     FOptBorderFocusedActive: boolean;
     FOptRulerVisible: boolean;
-    FOptRulerStartFrom1: boolean;
+    FOptRulerNumeration: TATRulerNumeration;
     FOptRulerSize: integer;
     FOptRulerFontSize: integer;
     FOptRulerMarkSizeSmall: integer;
@@ -1164,7 +1170,7 @@ type
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
-    property OptRulerStartFrom1: boolean read FOptRulerStartFrom1 write FOptRulerStartFrom1 default false;
+    property OptRulerNumeration: TATRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cRulerNumeration_0_10_20;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize default 8;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
@@ -1275,17 +1281,18 @@ uses
 
 procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
 var
-  NX, NSize, NPrevSize, NRulerStart, NOutput, i: integer;
+  NX, NSize, NPrevFontSize, NRulerStart, NOutput, i: integer;
   Str: string;
 begin
-  NPrevSize:= C.Font.Size;
+  NPrevFontSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
+  NX:= FRectMain.Left;
 
   if FOptRulerFontSize<>0 then
     C.Font.Size:= FOptRulerFontSize;
-  C.Font.Color:= FColors.RulerFont;
-  C.Pen.Color:= FColors.RulerFont;
-  C.Brush.Color:= FColors.RulerBG;
+  C.Font.Color:= Colors.RulerFont;
+  C.Pen.Color:= Colors.RulerFont;
+  C.Brush.Color:= Colors.RulerBG;
 
   C.FillRect(FRectRuler);
   C.Line(FRectRuler.Left, FRectRuler.Bottom-1,
@@ -1293,23 +1300,43 @@ begin
 
   for i:= NRulerStart to NRulerStart+GetVisibleColumns+1 do
   begin
-    NX:= FRectMain.Left + (i-NRulerStart)*FCharSize.X;
-    NSize:= IfThen(i mod 5 = 0, FOptRulerMarkSizeBig, FOptRulerMarkSizeSmall);
+    case FOptRulerNumeration of
+      cRulerNumeration_0_10_20,
+      cRulerNumeration_1_11_21:
+        begin
+          NOutput:= i;
+          if (i mod 10 = 0) then
+          begin
+            Str:= IntToStr(NOutput +
+                  IfThen(FOptRulerNumeration=cRulerNumeration_1_11_21, 1));
+            C.TextOut(NX - C.TextWidth(Str) div 2, FOptRulerTextIndent, Str);
+          end;
+        end;
+      cRulerNumeration_1_10_20:
+        begin
+          NOutput:= i+1;
+          if (NOutput=1) or (NOutput mod 10 = 0) then
+          begin
+            Str:= IntToStr(NOutput);
+            C.TextOut(NX - C.TextWidth(Str) div 2, FOptRulerTextIndent, Str);
+          end;
+        end;
+    end;
+
+    if NOutput mod 5 = 0 then
+      NSize:= FOptRulerMarkSizeBig
+    else
+      NSize:= FOptRulerMarkSizeSmall;
+
     C.Line(NX, FRectRuler.Bottom-1,
            NX, FRectRuler.Bottom-1-NSize);
 
-    if i mod 10 = 0 then
-    begin
-      NOutput:= i;
-      if FOptRulerStartFrom1 then
-        Inc(NOutput);
-      Str:= IntToStr(NOutput);
-      C.TextOut(NX - C.TextWidth(Str) div 2, FOptRulerTextIndent, Str);
-    end;
+    Inc(NX, FCharSize.X);
   end;
 
-  C.Font.Size:= NPrevSize;
+  C.Font.Size:= NPrevFontSize;
 end;
+
 
 procedure TATSynEdit.UpdateGutterAutosize(C: TCanvas);
 begin
@@ -2713,7 +2740,7 @@ begin
   FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;
-  FOptRulerStartFrom1:= false;
+  FOptRulerNumeration:= cRulerNumeration_0_10_20;
   FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
