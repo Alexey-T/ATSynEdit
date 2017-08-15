@@ -56,12 +56,15 @@ begin
 
     if (i mod cStringsProgressSaveLines) = (cStringsProgressSaveLines div 2) then
     begin
-      FProgressLoading:= false;
+      FProgressKind:= cStringsProgressSaving;
       FProgressValue:= Int64(i)*100 div Count;
       if Assigned(FOnProgress) then
         FOnProgress(Self);
     end;
   end;
+
+  FProgressValue:= 0;
+  FProgressKind:= cStringsProgressNone;
 end;
 
 procedure TATStrings.SaveToFile(const AFilename: string);

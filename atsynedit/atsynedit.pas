@@ -3243,7 +3243,7 @@ begin
   C.Brush.Color:= Colors.TextBG;
   C.FillRect(ClientRect);
 
-  if Strings.ProgressLoading then
+  if Strings.ProgressKind<>cStringsProgressSaving then
     C.Draw(cOrigX, cOrigY, cBitmapWait)
   else
     C.Draw(cOrigX, cOrigY, cBitmapSaving);

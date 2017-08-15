@@ -285,7 +285,7 @@ begin
       if NStart-NCounted>cStringsProgressLoadChars then
       begin
         NCounted:= NStart;
-        FProgressLoading:= true;
+        FProgressKind:= cStringsProgressLoading;
         FProgressValue:= Int64(NStart)*100 div Stream.Size;
         if Assigned(FOnProgress) then
           FOnProgress(Self);
@@ -345,6 +345,8 @@ begin
 
   finally
     FreeMem(Buf);
+    FProgressValue:= 0;
+    FProgressKind:= cStringsProgressNone;
   end;
 end;
 

@@ -95,6 +95,13 @@ type
   end;
 
 type
+  TATStringsProgressKind = (
+    cStringsProgressNone,
+    cStringsProgressLoading,
+    cStringsProgressSaving
+    );
+
+type
   TATStringsGetCarets = function: TATPointArray of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
   TATStringsLogEvent = procedure(Sender: TObject; ALine, ALen: integer) of object;
@@ -130,7 +137,7 @@ type
     FUndoGroupCounter: integer;
     FOneLine: boolean;
     FProgressValue: integer;
-    FProgressLoading: boolean;
+    FProgressKind: TATStringsProgressKind;
     FOnGetCaretsArray: TATStringsGetCarets;
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnProgress: TNotifyEvent;
@@ -233,7 +240,7 @@ type
     property ModifiedVersion: Int64 read FModifiedVersion;
     property OneLine: boolean read FOneLine write FOneLine;
     property ProgressValue: integer read FProgressValue write FProgressValue;
-    property ProgressLoading: boolean read FProgressLoading write FProgressLoading;
+    property ProgressKind: TATStringsProgressKind read FProgressKind write FProgressKind;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property Gaps: TATSynGaps read FGaps;
     //actions
@@ -633,6 +640,7 @@ begin
   FUndoAfterSave:= true;
   FOneLine:= false;
   FProgressValue:= 0;
+  FProgressKind:= cStringsProgressNone;
   SetLength(FSavedCaretsArray, 0);
 
   ActionAddFakeLineIfNeeded;
