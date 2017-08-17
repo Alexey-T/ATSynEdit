@@ -389,6 +389,7 @@ type
     FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
     FMouseDragMinimap: boolean;
+    FMouseDownAndColumnSelection: boolean;
     FMouseAutoScroll: TATDirection;
     FMouseActions: TATMouseActions;
     FLastTextCmd: integer;
@@ -3696,6 +3697,7 @@ begin
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
+  FMouseDownAndColumnSelection:= false;
   FMouseDragDropping:= false;
   FMouseDragMinimap:= false;
   FTimerScroll.Enabled:= false;
@@ -3933,6 +3935,7 @@ begin
             if FOptMouseEnableColumnSelection then
               if Shift=[ssAlt, ssLeft] then
               begin
+                FMouseDownAndColumnSelection:= true;
                 DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 DoSelect_None;
                 DoSelect_ColumnBlock(FMouseDownPnt, P);

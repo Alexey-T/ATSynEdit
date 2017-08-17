@@ -370,7 +370,7 @@ begin
     FRectMain,
     FScrollHorz,
     FScrollVert,
-    FCaretVirtual,
+    FCaretVirtual or FMouseDownAndColumnSelection,
     ADetails,
     AGapCoordAction,
     IsSelRectEmpty);
