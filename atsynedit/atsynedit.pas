@@ -258,8 +258,6 @@ const
   cFoldedMarkIndentInner = 2;
   cFoldedMarkIndentOuter = 0;
   cScrollKeepHorz = 1; //keep char, allow handy clicking after eol of longest line
-  cScrollIndentGotoHorz = 10; //offsets for "goto" command: if caret goes out of control
-  cScrollIndentGotoVert = 3;
   cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert = 1; //... speed y
   cSpeedScrollNiceHorz = 4; //browser-scroll (middle-click): speed x
