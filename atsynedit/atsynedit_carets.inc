@@ -565,8 +565,8 @@ begin
   Pos:= Carets.CaretAtEdge(AEdge);
   PosEnd:= Point(-1, -1);
   DoGotoPos(Pos, PosEnd,
-    cScrollIndentCaretHorz,
-    cScrollIndentCaretVert,
+    FOptScrollIndentCaretHorz,
+    FOptScrollIndentCaretVert,
     false,
     false //dont unfold
     );
