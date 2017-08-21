@@ -92,6 +92,14 @@ end;
 
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
 begin
+  //if one-line, try to make right edge of text near the edge of control, like Win inputs
+  if ModeOneLine then
+    if (cResultText in Res) then
+    begin
+      FScrollHorz.NPos:= 0;
+      Include(Res, cResultCaretTop);
+    end;
+
   if (cResultText in Res) or
      (cResultFoldChange in Res) then
   begin

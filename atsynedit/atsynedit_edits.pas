@@ -136,6 +136,7 @@ begin
   OptMaxLen:= 0;
   OptBorderWidth:= 1;
   OptBorderWidthFocused:= 1;
+  OptScrollIndentCaretHorz:= 0;
 
   Height:= 26;
 end;
