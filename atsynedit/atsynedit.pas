@@ -348,6 +348,8 @@ type
     FCursorColumnSel: TCursor;
     FCursorGutterBookmark: TCursor;
     FCursorGutterNumbers: TCursor;
+    FCursorMinimap: TCursor;
+    FCursorMicromap: TCursor;
     FTextOffset: TPoint;
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
@@ -1109,6 +1111,8 @@ type
     property CursorColumnSel: TCursor read FCursorColumnSel write FCursorColumnSel default crCross;
     property CursorGutterBookmark: TCursor read FCursorGutterBookmark write FCursorGutterBookmark default crHandPoint;
     property CursorGutterNumbers: TCursor read FCursorGutterNumbers write FCursorGutterNumbers default crDefault;
+    property CursorMinimap: TCursor read FCursorMinimap write FCursorMinimap default crDefault;
+    property CursorMicromap: TCursor read FCursorMicromap write FCursorMicromap default crDefault;
     property Colors: TATSynEditColors read FColors write FColors;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
@@ -2646,6 +2650,8 @@ begin
   FCursorColumnSel:= crCross;
   FCursorGutterBookmark:= crHandPoint;
   FCursorGutterNumbers:= crDefault;
+  FCursorMinimap:= crDefault;
+  FCursorMicromap:= crDefault;
 
   FTimerIdle:= TTimer.Create(Self);
   FTimerIdle.Enabled:= false;
@@ -3802,6 +3808,12 @@ begin
   else
   if PtInRect(RectNums, P) then
     Cursor:= FCursorGutterNumbers
+  else
+  if PtInRect(FRectMinimap, P) then
+    Cursor:= FCursorMinimap
+  else
+  if PtInRect(FRectMicromap, P) then
+    Cursor:= FCursorMicromap
   else
     Cursor:= crDefault;
 end;
