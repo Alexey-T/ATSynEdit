@@ -344,9 +344,10 @@ type
     FFoldStyle: TATFoldStyle;
     FFoldEnabled: boolean;
     FFontNeedsOffsets: TATFontNeedsOffsets;
-    FCursorText,
-    FCursorColumnSel,
+    FCursorText: TCursor;
+    FCursorColumnSel: TCursor;
     FCursorGutterBookmark: TCursor;
+    FCursorGutterNumbers: TCursor;
     FTextOffset: TPoint;
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
@@ -1107,6 +1108,7 @@ type
     property CursorText: TCursor read FCursorText write FCursorText default crIBeam;
     property CursorColumnSel: TCursor read FCursorColumnSel write FCursorColumnSel default crCross;
     property CursorGutterBookmark: TCursor read FCursorGutterBookmark write FCursorGutterBookmark default crHandPoint;
+    property CursorGutterNumbers: TCursor read FCursorGutterNumbers write FCursorGutterNumbers default crDefault;
     property Colors: TATSynEditColors read FColors write FColors;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
@@ -2643,6 +2645,7 @@ begin
   FCursorText:= crIBeam;
   FCursorColumnSel:= crCross;
   FCursorGutterBookmark:= crHandPoint;
+  FCursorGutterNumbers:= crDefault;
 
   FTimerIdle:= TTimer.Create(Self);
   FTimerIdle.Enabled:= false;
@@ -3765,7 +3768,7 @@ end;
 procedure TATSynEdit.UpdateCursor;
 var
   P: TPoint;
-  RectBm: TRect;
+  RectBm, RectNums: TRect;
 begin
   if MouseNiceScroll then Exit;
   P:= ScreenToClient(Mouse.CursorPos);
@@ -3774,6 +3777,11 @@ begin
   RectBm.Right:= FGutter[FGutterBandBm].Right;
   RectBm.Top:= FRectMain.Top;
   RectBm.Bottom:= FRectMain.Bottom;
+
+  RectNums.Left:= FGutter[FGutterBandNum].Left;
+  RectNums.Right:= FGutter[FGutterBandNum].Right;
+  RectNums.Top:= FRectMain.Top;
+  RectNums.Bottom:= FRectMain.Bottom;
 
   //if FMouseDragDropping then
   //  Cursor:= crDrag
@@ -3791,6 +3799,9 @@ begin
   else
   if PtInRect(RectBm, P) then
     Cursor:= FCursorGutterBookmark
+  else
+  if PtInRect(RectNums, P) then
+    Cursor:= FCursorGutterNumbers
   else
     Cursor:= crDefault;
 end;
