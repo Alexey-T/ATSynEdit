@@ -3864,17 +3864,20 @@ begin
 
   //start scroll timer
   FTimerScroll.Enabled:=
-    (not ModeOneLine) and
     (ssLeft in Shift) and
     (not bOnMain) and
     (not bOnMinimap) and
     (not bOnMicromap);
 
   FMouseAutoScroll:= cDirNone;
-  if P.Y<FRectMain.Top then FMouseAutoScroll:= cDirUp else
-  if P.Y>=FRectMain.Bottom then FMouseAutoScroll:= cDirDown else
-  if P.X<FRectMain.Left then FMouseAutoScroll:= cDirLeft else
-  if P.X>=FRectMain.Right then FMouseAutoScroll:= cDirRight;
+  if (P.Y<FRectMain.Top) and (not ModeOneLine) then
+    FMouseAutoScroll:= cDirUp else
+  if (P.Y>=FRectMain.Bottom) and (not ModeOneLine) then
+    FMouseAutoScroll:= cDirDown else
+  if (P.X<FRectMain.Left) then
+    FMouseAutoScroll:= cDirLeft else
+  if (P.X>=FRectMain.Right) then
+    FMouseAutoScroll:= cDirRight;
 
   //mouse dragged on numbers
   if PtInRect(RectNums, P) then
