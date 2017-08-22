@@ -345,6 +345,7 @@ type
     FFoldEnabled: boolean;
     FFontNeedsOffsets: TATFontNeedsOffsets;
     FCursorText,
+    FCursorColumnSel,
     FCursorBm: TCursor;
     FTextOffset: TPoint;
     FTextHint: string;
@@ -1104,6 +1105,7 @@ type
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText default crIBeam;
+    property CursorColumnSel: TCursor read FCursorColumnSel write FCursorColumnSel default crCross;
     property CursorBm: TCursor read FCursorBm write FCursorBm default crHandPoint;
     property Colors: TATSynEditColors read FColors write FColors;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
@@ -2639,6 +2641,7 @@ begin
   InitMouseActions(FMouseActions);
 
   FCursorText:= crIBeam;
+  FCursorColumnSel:= crCross;
   FCursorBm:= crHandPoint;
 
   FTimerIdle:= TTimer.Create(Self);
@@ -3779,7 +3782,12 @@ begin
   //  Cursor:= crSizeNS
   //else
   if PtInRect(FRectMain, P) then
-    Cursor:= FCursorText
+  begin
+    if FMouseDownAndColumnSelection then
+      Cursor:= FCursorColumnSel
+    else
+      Cursor:= FCursorText;
+  end
   else
   if PtInRect(RectBm, P) then
     Cursor:= FCursorBm
@@ -3913,6 +3921,7 @@ begin
               if FOptMouseEnableColumnSelection and FOptMouseColumnSelectionWithoutKey then
               begin
                 //column selection
+                FMouseDownAndColumnSelection:= true;
                 DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 DoSelect_None;
                 DoSelect_ColumnBlock(FMouseDownPnt, P);
