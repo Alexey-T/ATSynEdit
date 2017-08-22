@@ -346,7 +346,7 @@ type
     FFontNeedsOffsets: TATFontNeedsOffsets;
     FCursorText,
     FCursorColumnSel,
-    FCursorBm: TCursor;
+    FCursorGutterBookmark: TCursor;
     FTextOffset: TPoint;
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
@@ -1106,7 +1106,7 @@ type
     //misc
     property CursorText: TCursor read FCursorText write FCursorText default crIBeam;
     property CursorColumnSel: TCursor read FCursorColumnSel write FCursorColumnSel default crCross;
-    property CursorBm: TCursor read FCursorBm write FCursorBm default crHandPoint;
+    property CursorGutterBookmark: TCursor read FCursorGutterBookmark write FCursorGutterBookmark default crHandPoint;
     property Colors: TATSynEditColors read FColors write FColors;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
@@ -2642,7 +2642,7 @@ begin
 
   FCursorText:= crIBeam;
   FCursorColumnSel:= crCross;
-  FCursorBm:= crHandPoint;
+  FCursorGutterBookmark:= crHandPoint;
 
   FTimerIdle:= TTimer.Create(Self);
   FTimerIdle.Enabled:= false;
@@ -3790,7 +3790,7 @@ begin
   end
   else
   if PtInRect(RectBm, P) then
-    Cursor:= FCursorBm
+    Cursor:= FCursorGutterBookmark
   else
     Cursor:= crDefault;
 end;
