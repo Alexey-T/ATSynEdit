@@ -300,7 +300,7 @@ begin
     chkMsClick2.Checked:= ed.OptMouse2ClickSelectsLine;
     chkMsClick3.Checked:= ed.OptMouse3ClickSelectsLine;
     chkMsClick2Drag.Checked:= ed.OptMouse2ClickDragSelectsWords;
-    chkMsClickNumSel.Checked:= ed.OptMouseGutterClickSelectsLine;
+    chkMsClickNumSel.Checked:= ed.OptMouseClickNumberSelectsLine;
     chkMsDragDrop.Checked:= ed.OptMouseDragDrop;
     chkMsRtClickMove.Checked:= ed.OptMouseRightClickMovesCaret;
     chkMsNiceScroll.Checked:= ed.OptMouseNiceScroll;
@@ -420,7 +420,7 @@ begin
       ed.OptMouse2ClickSelectsLine:= chkMsClick2.Checked;
       ed.OptMouse3ClickSelectsLine:= chkMsClick3.Checked;
       ed.OptMouse2ClickDragSelectsWords:= chkMsClick2Drag.Checked;
-      ed.OptMouseGutterClickSelectsLine:= chkMsClickNumSel.Checked;
+      ed.OptMouseClickNumberSelectsLine:= chkMsClickNumSel.Checked;
       ed.OptMouseDragDrop:= chkMsDragDrop.Checked;
       ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
       ed.OptMouseNiceScroll:= chkMsNiceScroll.Checked;
