@@ -545,6 +545,7 @@ type
     FOptKeyUpDownKeepColumn: boolean;
     FOptCopyLinesIfNoSel: boolean;
     FOptCutLinesIfNoSel: boolean;
+    FOptCopyColumnBlockAlignedBySpaces: boolean;
     FOptShowFullSel: boolean;
     FOptShowFullHilite: boolean;
     FOptShowCurLine: boolean;
@@ -1136,6 +1137,7 @@ type
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel default true;
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel default false;
+    property OptCopyColumnBlockAlignedBySpaces: boolean read FOptCopyColumnBlockAlignedBySpaces write FOptCopyColumnBlockAlignedBySpaces default true;
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
@@ -2832,6 +2834,7 @@ begin
 
   FOptCopyLinesIfNoSel:= true;
   FOptCutLinesIfNoSel:= false;
+  FOptCopyColumnBlockAlignedBySpaces:= true;
   FOptShowFullSel:= false;
   FOptShowFullHilite:= true;
   FOptShowCurLine:= false;

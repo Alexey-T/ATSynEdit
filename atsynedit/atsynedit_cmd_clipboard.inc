@@ -154,6 +154,7 @@ begin
   Result:= '';
   EolString:= cLineEndStrings[Strings.Endings];
 
+  //make text from column selection
   if not IsSelRectEmpty then
   begin
     for i:= FSelRect.Top to FSelRect.Bottom do
@@ -162,14 +163,18 @@ begin
       X1:= SColumnPosToCharPos(Str, FSelRect.Left, OptTabSize);
       X2:= SColumnPosToCharPos(Str, FSelRect.Right, OptTabSize);
       Str:= Strings.TextSubstring(X1, i, X2, i);
-      NLen:= X2-X1-Length(Str);
-      if NLen>0 then
-        Str:= Str+StringOfChar(' ', NLen);
+      if FOptCopyColumnBlockAlignedBySpaces then
+      begin
+        NLen:= X2-X1-Length(Str);
+        if NLen>0 then
+          Str:= Str+StringOfChar(' ', NLen);
+      end;
       Result:= Result+UTF8Encode(Str)+EolString;
     end;
     Exit;
   end;
 
+  //make text from normal selection
   ListNum:= TList.Create;
   ListStr:= TStringList.Create;
 
