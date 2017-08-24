@@ -491,6 +491,7 @@ type
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
     FOptMouseColumnSelectionWithoutKey: boolean;
+    FOptMouseClickLineNumberSelectsWithEOL: boolean;
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
@@ -992,7 +993,7 @@ type
     procedure DoSelect_None;
     procedure DoSelect_Inverted;
     procedure DoSelect_SplitSelectionToLines;
-    procedure DoSelect_Line(P: TPoint);
+    procedure DoSelect_Line(APos: TPoint; AWithEOL: boolean=true);
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
@@ -1237,6 +1238,7 @@ type
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssCtrl;
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
+    property OptMouseClickLineNumberSelectsWithEOL: boolean read FOptMouseClickLineNumberSelectsWithEOL write FOptMouseClickLineNumberSelectsWithEOL default true;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
@@ -2858,6 +2860,7 @@ begin
   FOptMouseDownForPopup:= false;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
+  FOptMouseClickLineNumberSelectsWithEOL:= true;
   FOptPasteAtEndMakesFinalEmptyLine:= true;
 
   FMouseDownPnt:= Point(-1, -1);
@@ -3660,7 +3663,7 @@ begin
         begin
           FSelRect:= cRectEmpty;
           FMouseDownGutterLineNumber:= PCaret.Y;
-          DoSelect_Line(PCaret);
+          DoSelect_Line(PCaret, FOptMouseClickLineNumberSelectsWithEOL);
         end;
       end
       else
