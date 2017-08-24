@@ -491,7 +491,6 @@ type
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseDownForPopup: boolean;
     FOptMouseColumnSelectionWithoutKey: boolean;
-    FOptMouseClickLineNumberSelectsWithEOL: boolean;
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
@@ -560,7 +559,8 @@ type
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
-    FOptMouseGutterClickSelectsLine: boolean;
+    FOptMouseClickNumberSelectsLine: boolean;
+    FOptMouseClickNumberSelectsLineWithEOL: boolean;
     FOptMouseNiceScroll: boolean;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
@@ -1228,7 +1228,8 @@ type
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssCtrl;
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
-    property OptMouseGutterClickSelectsLine: boolean read FOptMouseGutterClickSelectsLine write FOptMouseGutterClickSelectsLine default true;
+    property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
+    property OptMouseClickNumberSelectsLineWithEOL: boolean read FOptMouseClickNumberSelectsLineWithEOL write FOptMouseClickNumberSelectsLineWithEOL default true;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;
     property OptMouseWheelScrollHorz: boolean read FOptMouseWheelScrollHorz write FOptMouseWheelScrollHorz default true;
@@ -1238,7 +1239,6 @@ type
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssCtrl;
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
-    property OptMouseClickLineNumberSelectsWithEOL: boolean read FOptMouseClickLineNumberSelectsWithEOL write FOptMouseClickLineNumberSelectsWithEOL default true;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
@@ -2819,7 +2819,8 @@ begin
   FOptMouse3ClickSelectsLine:= true;
   FOptMouse2ClickDragSelectsWords:= true;
   FOptMouseRightClickMovesCaret:= false;
-  FOptMouseGutterClickSelectsLine:= true;
+  FOptMouseClickNumberSelectsLine:= true;
+  FOptMouseClickNumberSelectsLineWithEOL:= true;
   FOptMouseWheelScrollVert:= true;
   FOptMouseWheelScrollVertSpeed:= 3;
   FOptMouseWheelScrollHorz:= true;
@@ -2860,7 +2861,6 @@ begin
   FOptMouseDownForPopup:= false;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
-  FOptMouseClickLineNumberSelectsWithEOL:= true;
   FOptPasteAtEndMakesFinalEmptyLine:= true;
 
   FMouseDownPnt:= Point(-1, -1);
@@ -3659,11 +3659,11 @@ begin
       Index:= FGutter.IndexAt(X);
       if Index=FGutterBandNum then
       begin
-        if FOptMouseGutterClickSelectsLine then
+        if FOptMouseClickNumberSelectsLine then
         begin
           FSelRect:= cRectEmpty;
           FMouseDownGutterLineNumber:= PCaret.Y;
-          DoSelect_Line(PCaret, FOptMouseClickLineNumberSelectsWithEOL);
+          DoSelect_Line(PCaret, FOptMouseClickNumberSelectsLineWithEOL);
         end;
       end
       else
