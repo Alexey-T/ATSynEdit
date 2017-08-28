@@ -166,9 +166,9 @@ var
   i: integer;
 begin
   Result:= -1;
+  if ACmd<=0 then exit;
   for i:= 0 to Count-1 do
-    if Items[i].Command=ACmd then
-      begin Result:= i; Exit end;
+    if Items[i].Command=ACmd then exit(i);
 end;
 
 function TATKeymap.GetShortcutFromCommand(ACode: integer): TShortcut;
