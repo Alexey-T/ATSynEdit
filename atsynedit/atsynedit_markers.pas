@@ -17,7 +17,7 @@ type
   public
     PosX, PosY: integer;
     CoordX, CoordY: integer; //screen coords
-    Tag: integer;
+    Tag: Int64;
       //used in CudaText: when "collect marker" runs, for all markers
       //with the same Tag>0 multi-carets placed
     LenX, LenY: integer;
@@ -45,11 +45,11 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATMarkerItem read GetItem; default;
     procedure Add(APosX, APosY: integer;
-      ATag: integer=0; ALenX: integer=0; ALenY: integer=0;
+      const ATag: Int64=0; ALenX: integer=0; ALenY: integer=0;
       APtr: TObject=nil;
       AInsertToBegin: boolean=false);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
-    procedure DeleteWithTag(ATag: integer);
+    procedure DeleteWithTag(const ATag: Int64);
     function FindMarkerAtPos(AX, AY: integer): TATMarkerItem;
   end;
 
@@ -112,8 +112,8 @@ begin
     Result:= nil;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer; ATag: integer; ALenX: integer;
-  ALenY: integer; APtr: TObject; AInsertToBegin: boolean);
+procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
+  ALenX: integer; ALenY: integer; APtr: TObject; AInsertToBegin: boolean);
 var
   Item: TATMarkerItem;
 begin
@@ -143,7 +143,7 @@ begin
         Delete(i);
 end;
 
-procedure TATMarkers.DeleteWithTag(ATag: integer);
+procedure TATMarkers.DeleteWithTag(const ATag: Int64);
 var
   i: integer;
 begin
