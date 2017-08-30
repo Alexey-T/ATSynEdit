@@ -13,6 +13,8 @@ uses
   ATSynEdit_Carets;
 
 type
+  { TATMarkerItem }
+
   TATMarkerItem = class
   public
     PosX, PosY: integer;
@@ -27,6 +29,7 @@ type
       //            LenX is absolute X of sel-end
     Ptr: TObject;
       //used in Attribs object of ATSynedit
+    destructor Destroy; override;
   end;
 
 type
@@ -55,6 +58,15 @@ type
 
 implementation
 
+{ TATMarkerItem }
+
+destructor TATMarkerItem.Destroy;
+begin
+  if Assigned(Ptr) then
+    FreeAndNil(Ptr);
+  inherited Destroy;
+end;
+
 { TATMarkers }
 
 constructor TATMarkers.Create;
@@ -80,16 +92,10 @@ begin
 end;
 
 procedure TATMarkers.Delete(N: integer);
-var
-  Mark: TATMarkerItem;
 begin
   if IsIndexValid(N) then
   begin
-    Mark:= TATMarkerItem(FList[N]);
-    if Assigned(Mark.Ptr) then
-      Mark.Ptr.Free;
-    Mark.Free;
-
+    TObject(FList[N]).Free;
     FList.Delete(N);
   end;
 end;
