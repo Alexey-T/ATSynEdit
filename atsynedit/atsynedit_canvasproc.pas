@@ -146,6 +146,7 @@ procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOff
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
 procedure DoPartsShow(var P: TATLineParts);
+procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer);
 
 
 implementation
@@ -1107,6 +1108,19 @@ begin
   v2:= Byte(c2 shr 16);
   b:= (v1+v2) shr 1;
   Result := (b shl 16) + (g shl 8) + r;
+end;
+
+
+procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer);
+var
+  i: integer;
+begin
+  for i:= Low(P) to High(P) do
+  begin
+    if P[i].Len=0 then break;
+    with P[i] do
+      ColorFont:= ColorBlend(ColorBG, ColorFont, ADimLevel255);
+  end;
 end;
 
 
