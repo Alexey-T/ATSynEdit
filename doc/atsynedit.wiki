@@ -347,6 +347,18 @@ To add/remove gaps:
 Event OnDrawGap is used to paint gaps, it gets canvas, and rectangle on canvas.
 Note: if you add gap to the last line, you must turn on option OptLastLineOnTop, better don't turn it off later (to not scroll, when gap added/removed).
 
+=== DimRanges object ===
+
+type TATDimRanges in unit atsynedit_dimranges. Holds list of ranges which shade/dim/fade text font color (ie blend font color with background). Each range is of type TATDimRange, it has properties:
+
+* LineFrom: range starts from this line (0-based)
+* LineTo: range ends on this line (can use MaxInt)
+* DimValue255: dim value 0..255. 0 means "no effect", 255 means "almost transparent".
+
+To dim all text except current paragraph, you must add 2 ranges: before/after paragraph, then correct line indexes in them.
+
+There is no checking for line indexes, ranges can have any indexes, but overlapping indexes not good (first found range will give dim value).
+
 == What are the basic methods/properties? ==
 
 Objects
