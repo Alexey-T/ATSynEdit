@@ -47,10 +47,10 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATMarkerItem read GetItem; default;
-    procedure Add(APosX, APosY: integer;
+    function Add(APosX, APosY: integer;
       const ATag: Int64=0; ALenX: integer=0; ALenY: integer=0;
       APtr: TObject=nil;
-      AInsertToBegin: boolean=false);
+      AInsertToBegin: boolean=false): TATMarkerItem;
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
     function FindMarkerAtPos(AX, AY: integer): TATMarkerItem;
@@ -118,25 +118,23 @@ begin
     Result:= nil;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ALenX: integer; ALenY: integer; APtr: TObject; AInsertToBegin: boolean);
-var
-  Item: TATMarkerItem;
+function TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
+  ALenX: integer; ALenY: integer; APtr: TObject; AInsertToBegin: boolean): TATMarkerItem;
 begin
-  Item:= TATMarkerItem.Create;
-  Item.PosX:= APosX;
-  Item.PosY:= APosY;
-  Item.CoordX:= -1;
-  Item.CoordY:= -1;
-  Item.Tag:= ATag;
-  Item.LenX:= ALenX;
-  Item.LenY:= ALenY;
-  Item.Ptr:= APtr;
+  Result:= TATMarkerItem.Create;
+  Result.PosX:= APosX;
+  Result.PosY:= APosY;
+  Result.CoordX:= -1;
+  Result.CoordY:= -1;
+  Result.Tag:= ATag;
+  Result.LenX:= ALenX;
+  Result.LenY:= ALenY;
+  Result.Ptr:= APtr;
 
   if AInsertToBegin then
-    FList.Insert(0, Item)
+    FList.Insert(0, Result)
   else
-    FList.Add(Item);
+    FList.Add(Result);
 end;
 
 procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
