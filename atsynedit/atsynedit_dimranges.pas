@@ -18,7 +18,7 @@ type
   public
     LineFrom: integer;
     LineTo: integer;
-    DimValue255: integer;
+    DimValue: integer;
   end;
 
 type
@@ -36,7 +36,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATDimRange read GetItem; default;
-    procedure Add(ALineFrom, ALineTo: integer; ADimValue255: integer);
+    function Add(ALineFrom, ALineTo: integer; ADimValue: integer): TATDimRange;
     function GetDimValue(ALine, ADefValue: integer): integer;
   end;
 
@@ -91,16 +91,14 @@ begin
     Result:= nil;
 end;
 
-procedure TATDimRanges.Add(ALineFrom, ALineTo: integer; ADimValue255: integer);
-var
-  Item: TATDimRange;
+function TATDimRanges.Add(ALineFrom, ALineTo: integer; ADimValue: integer): TATDimRange;
 begin
-  Item:= TATDimRange.Create;
-  Item.LineFrom:= ALineFrom;
-  Item.LineTo:= ALineTo;
-  Item.DimValue255:= ADimValue255;
+  Result:= TATDimRange.Create;
+  Result.LineFrom:= ALineFrom;
+  Result.LineTo:= ALineTo;
+  Result.DimValue:= ADimValue;
 
-  FList.Add(Item);
+  FList.Add(Result);
 end;
 
 function TATDimRanges.GetDimValue(ALine, ADefValue: integer): integer;
@@ -113,7 +111,7 @@ begin
   begin
     R:= TATDimRange(FList[i]);
     if (ALine>=R.LineFrom) and (ALine<=R.LineTo) then
-      exit(R.DimValue255);
+      exit(R.DimValue);
   end;
 end;
 
