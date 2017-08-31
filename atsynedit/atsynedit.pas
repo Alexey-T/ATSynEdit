@@ -39,6 +39,7 @@ uses
   ATSynEdit_Gutter,
   ATSynEdit_WrapInfo,
   ATSynEdit_Ranges,
+  ATSynEdit_DimRanges,
   ATSynEdit_Gaps,
   ATSynEdit_Adapters,
   ATSynEdit_Adapter_Cache;
@@ -371,6 +372,7 @@ type
     FMarkers: TATMarkers;
     FAttribs: TATMarkers;
     FMarkedRange: TATMarkers;
+    FDimRanges: TATDimRanges;
     FMenuStd,
     FMenuText,
     FMenuGutterBm,
@@ -927,6 +929,7 @@ type
     property Carets: TATCarets read FCarets;
     property Markers: TATMarkers read FMarkers;
     property Attribs: TATMarkers read FAttribs;
+    property DimRanges: TATDimRanges read FDimRanges;
     property Gaps: TATSynGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
@@ -1969,6 +1972,7 @@ var
   NOutputSpacesSkipped: integer;
   WrapItem: TATSynWrapItemData;
   NColorEntire, NColorAfter: TColor;
+  NDimValue: integer;
   Str, StrOut, StrOutUncut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineSeparator: TATLineSeparator;
@@ -2109,6 +2113,11 @@ begin
         NOutputCharsSkipped, cMaxCharsForOutput,
         NColorEntire, LineColorForced,
         NColorAfter);
+
+      //apply DimRanges
+      NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
+      if NDimValue>=0 then
+        DoPartsDim(FLineParts, NDimValue);
 
       //adapter may return ColorAfterEol, paint it
       if FOptShowFullHilite then
@@ -2633,6 +2642,7 @@ begin
   FMarkers:= TATMarkers.Create;
   FAttribs:= TATMarkers.Create;
   FMarkedRange:= TATMarkers.Create;
+  FDimRanges:= TATDimRanges.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
 
   {$ifdef test_markedrange}
@@ -2908,6 +2918,7 @@ begin
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
+  FreeAndNil(FDimRanges);
   FreeAndNil(FMarkedRange);
   FreeAndNil(FMarkers);
   FreeAndNil(FAttribs);
