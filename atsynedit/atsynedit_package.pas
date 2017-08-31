@@ -16,7 +16,7 @@ uses
   ATSynEdit_Finder, ATStringProc_HtmlColor, ATStrings_Hints, ATSynEdit_Colors, 
   ATSynEdit_Export_HTML, ATSynEdit_Markers, ATSynEdit_RegExpr, 
   ATSynEdit_Adapter_Cache, ATSynEdit_Gaps, ATSynEdit_ScrollBar, 
-  LazarusPackageIntf;
+  ATSynEdit_DimRanges, LazarusPackageIntf;
 
 implementation
 
