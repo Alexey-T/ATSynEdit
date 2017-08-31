@@ -349,15 +349,27 @@ Note: if you add gap to the last line, you must turn on option OptLastLineOnTop,
 
 === DimRanges object ===
 
-type TATDimRanges in unit atsynedit_dimranges. Holds list of ranges which shade/dim/fade text font color (ie blend font color with background). Each range is of type TATDimRange, it has properties:
+type TATDimRanges in unit atsynedit_dimranges. Holds list of ranges which shade/dim/fade text font color, ie blend font color with background color. Each range is of type TATDimRange, it has properties:
 
 * LineFrom: range starts from this line (0-based)
 * LineTo: range ends on this line (can use MaxInt)
-* DimValue255: dim value 0..255. 0 means "no effect", 255 means "almost transparent".
+* DimValue: dim value from 0 to 255. 0 means "no effect", 255 means "transparent text".
 
 To dim all text except current paragraph, you must add 2 ranges: before/after paragraph, then correct line indexes in them.
 
 There is no checking for line indexes, ranges can have any indexes, but overlapping indexes not good (first found range will give dim value).
+
+Example adds 2 ranges and changes them later:
+
+<syntaxhighlight>
+  R1:= Ed.DimRanges.Add(0, 6, 100{dim value});
+  R2:= Ed.DimRanges.Add(20, MaxInt, 100{dim value});
+  Ed.Update;
+  //change ranges
+  R1.LineTo:= 10;
+  R2.LineFrom:= 30;
+  Ed.Update;  
+</syntaxhighlight>
 
 == What are the basic methods/properties? ==
 
@@ -372,6 +384,7 @@ Objects
 *    property Attribs: Attribs object
 *    property Colors: Colors object
 *    property Gaps: Gaps object
+*    property DimRanges: DimRanges object
 
 Files
 
