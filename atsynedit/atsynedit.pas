@@ -2116,7 +2116,7 @@ begin
 
       //apply DimRanges
       NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
-      if NDimValue>=0 then
+      if NDimValue>0 then //-1: no ranges found, 0: no effect
         DoPartsDim(FLineParts, NDimValue);
 
       //adapter may return ColorAfterEol, paint it
