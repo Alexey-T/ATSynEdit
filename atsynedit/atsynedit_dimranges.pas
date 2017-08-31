@@ -37,6 +37,7 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATDimRange read GetItem; default;
     procedure Add(ALineFrom, ALineTo: integer; ADimValue255: integer);
+    function GetDimValue(ALine, ADefValue: integer): integer;
   end;
 
 implementation
@@ -100,6 +101,20 @@ begin
   Item.DimValue255:= ADimValue255;
 
   FList.Add(Item);
+end;
+
+function TATDimRanges.GetDimValue(ALine, ADefValue: integer): integer;
+var
+  R: TATDimRange;
+  i: integer;
+begin
+  Result:= ADefValue;
+  for i:= 0 to Count-1 do
+  begin
+    R:= TATDimRange(FList[i]);
+    if (ALine>=R.LineFrom) and (ALine<=R.LineTo) then
+      exit(R.DimValue255);
+  end;
 end;
 
 
