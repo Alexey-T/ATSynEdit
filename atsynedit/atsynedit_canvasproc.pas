@@ -1119,7 +1119,11 @@ begin
   begin
     if P[i].Len=0 then break;
     with P[i] do
+    begin
       ColorFont:= ColorBlend(ColorBG, ColorFont, ADimLevel255);
+      if ColorBorder<>clNone then
+        ColorBorder:= ColorBlend(ColorBG, ColorBorder, ADimLevel255);
+    end;
   end;
 end;
 
