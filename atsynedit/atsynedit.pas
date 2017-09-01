@@ -5510,16 +5510,6 @@ begin
   FGutter[FGutterBandSep].Size:= DoScale(cGutterSizeSep);
   FGutter[FGutterBandEmpty].Size:= DoScale(cGutterSizeEmpty);
   FGutter.Update;
-
-  FScrollbarVert.Width:= cEditorScrollbarWidth;
-  FScrollbarVert.IndentBorder:= cEditorScrollbarBorderSize;
-  FScrollbarVert.IndentArrow:= 3;
-  FScrollbarHorz.Height:= cEditorScrollbarWidth;
-  FScrollbarHorz.IndentBorder:= cEditorScrollbarBorderSize;
-  FScrollbarHorz.IndentArrow:= 3;
-
-  FScrollbarVert.AutoAdjustLayout(AMode, AFromPPI, AToPPI, 1, 1);
-  FScrollbarHorz.AutoAdjustLayout(AMode, AFromPPI, AToPPI, 1, 1);
 end;
 
 
