@@ -373,8 +373,7 @@ end;
 function IsCharFullWidth(ch: atChar): boolean;
 begin
   case Ord(ch) of
-    $1100..$115F,
-    $2000..$FFFF: //emoji + cjk + others
+    $1100..$FFFF: //simple big range for cjk + emojis + others
       Result:= true;
     else
       Result:= false;
