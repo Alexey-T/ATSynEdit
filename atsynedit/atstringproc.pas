@@ -374,18 +374,7 @@ function IsCharFullWidth(ch: atChar): boolean;
 begin
   case Ord(ch) of
     $1100..$115F,
-    $2329..$232A,
-    $2E80..$303E,
-    $3041..$33FF,
-    $3400..$4DB5,
-    $4E00..$9FC3,
-    $A000..$A4C6,
-    $AC00..$D7A3,
-    $F900..$FAD9,
-    $FE10..$FE19,
-    $FE30..$FE6B,
-    $FF01..$FF60,
-    $FFE0..$FFE6:
+    $2000..$FFFF: //emoji + cjk + others
       Result:= true;
     else
       Result:= false;
