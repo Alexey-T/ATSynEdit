@@ -277,28 +277,29 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; P: TPoint);
+procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint;
+  AWithEOL: boolean);
 var
-  CItem: TATCaretItem;
+  Caret: TATCaretItem;
 begin
-  DoCaretSingle(P.X, P.Y);
-  CItem:= Carets[0];
+  DoCaretSingle(APosTo.X, APosTo.Y);
+  Caret:= Carets[0];
 
-  if P.Y<ALineFrom then
+  if APosTo.Y<ALineFrom then
   begin
-    CItem.EndX:= 0;
-    CItem.EndY:= ALineFrom+1;
+    Caret.EndX:= 0;
+    Caret.EndY:= ALineFrom+1;
   end
   else
-  if P.Y>ALineFrom then
+  if APosTo.Y>ALineFrom then
   begin
-    CItem.EndX:= 0;
-    CItem.EndY:= ALineFrom;
+    Caret.EndX:= 0;
+    Caret.EndY:= ALineFrom;
   end
   else
-  if P.Y=ALineFrom then
+  if APosTo.Y=ALineFrom then
   begin
-    DoSelect_Line(P);
+    DoSelect_Line(APosTo, AWithEOL);
   end;
 end;
 

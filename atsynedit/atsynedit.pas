@@ -999,7 +999,7 @@ type
     procedure DoSelect_SplitSelectionToLines;
     procedure DoSelect_Line(APos: TPoint; AWithEOL: boolean=true);
     procedure DoSelect_Word(P: TPoint);
-    procedure DoSelect_LineRange(ALineFrom: integer; P: TPoint);
+    procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint; AWithEOL: boolean=true);
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoRangeFold(ARange: TATSynRange);
     procedure DoRangeUnfold(ARange: TATSynRange);
@@ -3936,7 +3936,7 @@ begin
       if (P.Y>=0) and (P.X>=0) then
         if FMouseDownGutterLineNumber>=0 then
         begin
-          DoSelect_LineRange(FMouseDownGutterLineNumber, P);
+          DoSelect_LineRange(FMouseDownGutterLineNumber, P, FOptMouseClickNumberSelectsLineWithEOL);
           DoCaretsSort;
           DoEventCarets;
           Update;
