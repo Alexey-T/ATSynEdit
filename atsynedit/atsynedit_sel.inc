@@ -105,7 +105,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoSelect_Line(APos: TPoint; AWithEOL: boolean=true);
+procedure TATSynEdit.DoSelect_Line(APos: TPoint);
 var
   Caret: TATCaretItem;
   PLast: TPoint;
@@ -115,7 +115,7 @@ begin
   DoCaretSingle(APos.X, APos.Y);
   Caret:= Carets[0];
 
-  if AWithEOL then
+  if FOptMouseClickNumberSelectsLineWithEOL then
   begin
     if APos.Y<Strings.Count-1 then
     begin
@@ -277,8 +277,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint;
-  AWithEOL: boolean);
+procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
 var
   Caret: TATCaretItem;
 begin
@@ -304,7 +303,7 @@ begin
   else
   if APosTo.Y=ALineFrom then
   begin
-    DoSelect_Line(APosTo, AWithEOL);
+    DoSelect_Line(APosTo);
   end;
 end;
 
