@@ -278,8 +278,6 @@ begin
 end;
 
 procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
-var
-  Caret: TATCaretItem;
 begin
   if APosTo.Y<ALineFrom then
   begin
