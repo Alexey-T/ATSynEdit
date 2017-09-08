@@ -282,19 +282,24 @@ procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint;
 var
   Caret: TATCaretItem;
 begin
-  DoCaretSingle(APosTo.X, APosTo.Y);
-  Caret:= Carets[0];
-
   if APosTo.Y<ALineFrom then
   begin
-    Caret.EndX:= 0;
-    Caret.EndY:= ALineFrom+1;
+    DoCaretSingle(
+      APosTo.X,
+      APosTo.Y,
+      0,
+      ALineFrom+1
+      );
   end
   else
   if APosTo.Y>ALineFrom then
   begin
-    Caret.EndX:= 0;
-    Caret.EndY:= ALineFrom;
+    DoCaretSingle(
+      APosTo.X,
+      APosTo.Y,
+      0,
+      ALineFrom
+      );
   end
   else
   if APosTo.Y=ALineFrom then
