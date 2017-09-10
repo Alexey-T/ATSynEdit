@@ -107,36 +107,35 @@ end;
 
 procedure TATSynEdit.DoSelect_Line(APos: TPoint);
 var
-  Caret: TATCaretItem;
   PLast: TPoint;
+  NPosX, NPosY, NEndX, NEndY: integer;
 begin
   if not Strings.IsIndexValid(APos.Y) then Exit;
-
-  DoCaretSingle(APos.X, APos.Y);
-  Caret:= Carets[0];
 
   if FOptMouseClickNumberSelectsLineWithEOL then
   begin
     if APos.Y<Strings.Count-1 then
     begin
-      Caret.PosX:= 0;
-      Caret.PosY:= APos.Y+1;
+      NPosX:= 0;
+      NPosY:= APos.Y+1;
     end
     else
     begin
       PLast:= GetEndOfFilePos;
-      Caret.PosX:= PLast.X;
-      Caret.PosY:= PLast.Y;
+      NPosX:= PLast.X;
+      NPosY:= PLast.Y;
     end;
   end
   else
   begin
-    Caret.PosX:= Strings.LinesLen[APos.Y];
-    Caret.PosY:= APos.Y;
+    NPosX:= Strings.LinesLen[APos.Y];
+    NPosY:= APos.Y;
   end;
 
-  Caret.EndX:= 0;
-  Caret.EndY:= APos.Y;
+  NEndX:= 0;
+  NEndY:= APos.Y;
+
+  DoCaretSingle(NPosX, NPosY, NEndX, NEndY);
 end;
 
 procedure TATSynEdit.DoSelect_All;
