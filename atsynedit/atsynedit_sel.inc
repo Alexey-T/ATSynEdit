@@ -64,15 +64,7 @@ begin
   if not Strings.IsIndexValid(P.Y) then Exit;
   SFindWordBounds(Strings.Lines[P.Y], P.X, N1, N2, FOptWordChars);
   if N1<>N2 then
-  begin
-    DoCaretSingle(P.X, P.Y);
-    with Carets[0] do
-    begin
-      EndY:= P.Y;
-      EndX:= N1;
-      PosX:= N2;
-    end;
-  end;
+    DoCaretSingle(N2, P.Y, N1, P.Y);
 end;
 
 procedure TATSynEdit.DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
