@@ -143,12 +143,7 @@ var
   P: TPoint;
 begin
   P:= GetEndOfFilePos;
-  DoCaretSingle(P.X, P.Y);
-  with Carets[0] do
-  begin
-    EndX:= 0;
-    EndY:= 0;
-  end;
+  DoCaretSingle(P.X, P.Y, 0, 0);
 end;
 
 procedure TATSynEdit.DoSelect_Inverted;
