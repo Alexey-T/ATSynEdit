@@ -293,7 +293,7 @@ type
     property RedoCount: integer read GetRedoCount;
     procedure DoClearUndo(ALocked: boolean = false);
     //misc
-    procedure DoSaveLastEditPos;
+    procedure DoSaveLastEditPos(AX: integer=-1; AY: integer=-1);
     procedure DoGotoLastEditPos;
     procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
       AChange: TATBlockChangeKind; ABlock: TStringList);
@@ -1245,11 +1245,19 @@ begin
   end;
 end;
 
-procedure TATStrings.DoSaveLastEditPos;
+procedure TATStrings.DoSaveLastEditPos(AX: integer; AY: integer);
 var
   Ar: TATPointArray;
 begin
-  Ar:= GetCaretsArray;
+  if AY>=0 then
+  begin
+    SetLength(Ar, 1);
+    Ar[0].X:= AX;
+    Ar[0].Y:= AY;
+  end
+  else
+    Ar:= GetCaretsArray;
+
   if Length(Ar)>0 then
     FSavedCaretsArray:= Ar;
 end;
