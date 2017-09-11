@@ -154,7 +154,7 @@ const
   RegExprModifierR : boolean = True;     // default value for ModifierR
   RegExprModifierS : boolean = True;     // default value for ModifierS
   RegExprModifierG : boolean = True;     // default value for ModifierG
-  RegExprModifierM : boolean = False;    // default value for ModifierM
+  RegExprModifierM : boolean = True;    //AT // default value for ModifierM
   RegExprModifierX : boolean = False;    // default value for ModifierX
   RegExprSpaceChars : RegExprString =    // default value for SpaceChars
   ' '#$9#$A#$D#$C;
