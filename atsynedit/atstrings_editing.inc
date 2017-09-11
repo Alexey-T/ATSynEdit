@@ -43,8 +43,6 @@ end;
 
 function TATStrings.TextReplaceLines_UTF8(ALineFrom, ALineTo: integer;
   ANewLines: TStringList): boolean;
-var
-  i: integer;
 begin
   Result:= false;
   if not IsIndexValid(ALineFrom) then exit;
