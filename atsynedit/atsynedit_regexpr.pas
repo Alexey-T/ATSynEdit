@@ -653,16 +653,6 @@ function RegExprSubExpressions (const ARegExpr : string;
 
 implementation
 
-{$IFDEF FPC}
-{$ELSE}
-uses
-{$IFDEF SYN_WIN32}
- Windows; // CharUpper/Lower
-{$ELSE}
-  Libc; //Qt.pas from Borland does not expose char handling functions
-{$ENDIF}
-{$ENDIF}
-
 const
  TRegExprVersionMajor : integer = 0;
  TRegExprVersionMinor : integer = 952;
@@ -1227,9 +1217,9 @@ class function TRegExpr.InvertCaseFunction (const Ch : REChar) : REChar;
   else
   {$ENDIF}
    begin
-    Result := {$IFDEF FPC}AnsiUpperCase (Ch) [1]{$ELSE} {$IFDEF SYN_WIN32}REChar (CharUpper (PChar (Ch))){$ELSE}REChar (toupper (integer (Ch))){$ENDIF} {$ENDIF};
+    Result := WideUpperCase (Ch) [1];
     if Result = Ch
-     then Result := {$IFDEF FPC}AnsiLowerCase (Ch) [1]{$ELSE} {$IFDEF SYN_WIN32}REChar (CharLower (PChar (Ch))){$ELSE}REChar(tolower (integer (Ch))){$ENDIF} {$ENDIF};
+     then Result := WideLowerCase (Ch) [1];
    end;
  end; { of function TRegExpr.InvertCaseFunction
 --------------------------------------------------------------}
@@ -4171,10 +4161,8 @@ procedure TRegExpr.Error (AErrorID : integer);
 // be carefull - placed here code will be always compiled with
 // compiler optimization flag
 
-{$IFDEF FPC}
 initialization
  RegExprInvertCaseFunction := TRegExpr.InvertCaseFunction;
 
-{$ENDIF}
 end.
 
