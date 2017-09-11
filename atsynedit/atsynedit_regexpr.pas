@@ -203,7 +203,7 @@ type
 
  TRegExpr = class;
 
- TRegExprReplaceFunction = function (ARegExpr : TRegExpr): string
+ TRegExprReplaceFunction = function (ARegExpr : TRegExpr): RegExprString
                                of object;
 
  TRegExpr = class
