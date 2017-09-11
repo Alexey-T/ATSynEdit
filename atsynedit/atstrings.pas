@@ -1249,11 +1249,14 @@ procedure TATStrings.DoSaveLastEditPos(AX: integer; AY: integer);
 var
   Ar: TATPointArray;
 begin
-  if AY>=0 then
+  if (AX>=0) and (AY>=0) then
   begin
-    SetLength(Ar, 1);
+    //2 items per caret
+    SetLength(Ar, 2);
     Ar[0].X:= AX;
     Ar[0].Y:= AY;
+    Ar[1].X:= -1;
+    Ar[1].Y:= -1;
   end
   else
     Ar:= GetCaretsArray;
