@@ -3867,8 +3867,7 @@ begin
           smodeOneLower, smodeAllLower:
             begin
               Ch := p0^;
-              if Ch < #128 then
-                Ch := AnsiLowerCase(Ch)[1];
+              Ch := WideLowerCase(Ch)[1];
               ResultPtr^ := Ch;
               if Mode = smodeOneLower then
                 Mode := smodeNormal;
@@ -3876,8 +3875,7 @@ begin
           smodeOneUpper, smodeAllUpper:
             begin
               Ch := p0^;
-              if Ch < #128 then
-                Ch := AnsiUpperCase(Ch)[1];
+              Ch := WideUpperCase(Ch)[1];
               ResultPtr^ := Ch;
               if Mode = smodeOneUpper then
                 Mode := smodeNormal;
