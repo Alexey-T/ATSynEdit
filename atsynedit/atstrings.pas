@@ -1249,6 +1249,8 @@ procedure TATStrings.DoSaveLastEditPos(AX: integer; AY: integer);
 var
   Ar: TATPointArray;
 begin
+  ModifiedRecent:= false;
+
   if (AX>=0) and (AY>=0) then
   begin
     //2 items per caret

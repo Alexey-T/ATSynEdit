@@ -5485,10 +5485,8 @@ procedure TATSynEdit.DoCaretsOnChanged(Sender: TObject);
 begin
   if Strings.ModifiedRecent then
     if Assigned(FCarets) and (FCarets.Count>0) then
-    begin
-      Strings.ModifiedRecent:= false;
       Strings.DoSaveLastEditPos;
-    end;
+      //it clears ModifiedRecent
 end;
 
 function TATSynEdit.DoScale(N: integer): integer;
