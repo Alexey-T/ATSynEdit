@@ -27,13 +27,13 @@ const
 
 
 type
-  TCharGr = (cgSp, cgSymb, cgWord);
+  TCharGroup = (cgSpaces, cgSymbols, cgWord);
 
-function SCharGr(ch: atChar; const AWordChars: atString): TCharGr;
+function GroupOfChar(ch: atChar; const AWordChars: atString): TCharGroup;
 begin
   if (AWordChars<>'') and (Pos(ch, AWordChars)>0) then Result:= cgWord else
-   if Pos(ch, cCharsSp)>0 then Result:= cgSp else
-    if Pos(ch, cCharsSymb)>0 then Result:= cgSymb else
+   if Pos(ch, cCharsSp)>0 then Result:= cgSpaces else
+    if Pos(ch, cCharsSymb)>0 then Result:= cgSymbols else
      Result:= cgWord;
 end;
 
@@ -43,21 +43,21 @@ var
   n: integer;
   //------------
   procedure Next;
-  var gr: TCharGr;
+  var gr: TCharGroup;
   begin
     if not ((n>=0) and (n<Length(s))) then Exit;
-    gr:= SCharGr(s[n+1], AWordChars);
+    gr:= GroupOfChar(s[n+1], AWordChars);
     repeat Inc(n)
     until
-      (n>=Length(s)) or (SCharGr(s[n+1], AWordChars)<>gr);
+      (n>=Length(s)) or (GroupOfChar(s[n+1], AWordChars)<>gr);
   end;
   //------------
   procedure Home;
-  var gr: TCharGr;
+  var gr: TCharGroup;
   begin
     if not ((n>0) and (n<Length(s))) then Exit;
-    gr:= SCharGr(s[n+1], AWordChars);
-    while (n>0) and (SCharGr(s[n], AWordChars)=gr) do
+    gr:= GroupOfChar(s[n+1], AWordChars);
+    while (n>0) and (GroupOfChar(s[n], AWordChars)=gr) do
       Dec(n);
   end;
   //------------
@@ -67,13 +67,13 @@ begin
   begin
     Next;
     if ABigJump then
-      if (n<Length(s)) and (SCharGr(s[n+1], AWordChars)= cgSp) then
+      if (n<Length(s)) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
         Next;
   end
   else
   begin
     //if we at word middle, jump to word start
-    if (n>0) and (n<Length(s)) and (SCharGr(s[n], AWordChars)=SCharGr(s[n+1], AWordChars)) then
+    if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], AWordChars)=GroupOfChar(s[n+1], AWordChars)) then
       Home
     else
     begin
@@ -81,7 +81,7 @@ begin
       if (n>0) then
         begin Dec(n); Home end;
       if ABigJump then
-        if (n>0) and (SCharGr(s[n+1], AWordChars)= cgSp) then
+        if (n>0) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
           begin Dec(n); Home end;
     end
   end;
