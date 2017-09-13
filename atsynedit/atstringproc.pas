@@ -174,7 +174,10 @@ end;
 
 function IsCharSpace(ch: atChar): boolean;
 begin
-  Result:= (ch=' ') or (ch=#9);
+  Result:=
+    (ch=' ') or //space
+    (ch=#9) or //tab
+    (ch=#$A0); //no-break space, often used on macOS
 end;
 
 function IsCharAsciiControl(ch: atChar): boolean;

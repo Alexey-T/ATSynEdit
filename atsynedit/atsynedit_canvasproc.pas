@@ -330,7 +330,7 @@ begin
       R.Top:= APoint.Y;
       R.Bottom:= R.Top+ACharSize.Y;
 
-      if ch=' ' then
+      if ch<>#9 then
         CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
       else
         CanvasArrowHorz(C, R, AColorFont, OptUnprintedTabCharLength*ACharSize.X, true);
