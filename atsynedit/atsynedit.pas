@@ -1578,13 +1578,7 @@ begin
 
   NLen:= Strings.LinesLen[ALine];
 
-  //line not wrapped?
-  if (FWrapColumn<cMinWrapColumnAbs) then
-  begin
-    AItems.Add(TATSynWrapItem.Create(ALine, 1, NLen, 0, cWrapItemFinal));
-    Exit;
-  end;
-
+  //consider fold, before wordwrap
   if AConsiderFolding then
   begin
     //line folded partially?
@@ -1594,6 +1588,13 @@ begin
       AItems.Add(TATSynWrapItem.Create(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed));
       Exit;
     end;
+  end;
+
+  //line not wrapped?
+  if (FWrapColumn<cMinWrapColumnAbs) then
+  begin
+    AItems.Add(TATSynWrapItem.Create(ALine, 1, NLen, 0, cWrapItemFinal));
+    Exit;
   end;
 
   Str:= Strings.Lines[ALine];
