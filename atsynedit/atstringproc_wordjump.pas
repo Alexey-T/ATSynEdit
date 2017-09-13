@@ -20,11 +20,8 @@ procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1, AOf
 implementation
 
 const
-  //no EOL here, we jump only inside line
-  //0xA0 is no-break space
-  cCharsSp: atString = ' '#9#$A0;
   //no chars '@' (email) and '$' (used in php)
-  cCharsSymb: atString = '!"#%&''()[]{}<>*+-/=,.:;?\^`|~‚„…‹›‘’“”–—¦«»­±';
+  cCharsSymbols: atString = '!"#%&''()[]{}<>*+-/=,.:;?\^`|~‚„…‹›‘’“”–—¦«»­±';
 
 
 type
@@ -33,8 +30,8 @@ type
 function GroupOfChar(ch: atChar; const AWordChars: atString): TCharGroup;
 begin
   if (AWordChars<>'') and (Pos(ch, AWordChars)>0) then Result:= cgWord else
-   if Pos(ch, cCharsSp)>0 then Result:= cgSpaces else
-    if Pos(ch, cCharsSymb)>0 then Result:= cgSymbols else
+   if (ch=#9) or IsCharSpace(ch) then Result:= cgSpaces else
+    if Pos(ch, cCharsSymbols)>0 then Result:= cgSymbols else
      Result:= cgWord;
 end;
 
