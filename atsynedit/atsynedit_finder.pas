@@ -101,7 +101,7 @@ type
     FOnConfirmReplace: TATFinderConfirmReplace;
     FFragments: TList;
     FFragmentIndex: integer;
-    FReplacedAtEndOfText: boolean;
+    //FReplacedAtEndOfText: boolean;
     //
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
     procedure UpdateBuffer_FromText(const AText: atString);
@@ -500,7 +500,7 @@ begin
   FSkipLen:= 0;
   FFragments:= nil;
   FFragmentIndex:= 0;
-  FReplacedAtEndOfText:= false;
+  //FReplacedAtEndOfText:= false;
 
   OptFromCaret:= false;
   OptConfirmReplace:= false;
@@ -686,9 +686,9 @@ var
 begin
   //replace in editor
   Strs:= FEditor.Strings;
-  FReplacedAtEndOfText:=
-    (APosEnd.Y>Strs.Count-1) or
-    ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
+  //FReplacedAtEndOfText:=
+  //  (APosEnd.Y>Strs.Count-1) or
+  //  ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
 
   Strs.TextReplaceRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, AReplacement, Shift, PosAfter);
 
@@ -776,7 +776,7 @@ var
 begin
   Result:= false;
   AChanged:= false;
-  FReplacedAtEndOfText:= false;
+  //FReplacedAtEndOfText:= false;
 
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
@@ -894,7 +894,7 @@ var
 begin
   Result:= false;
   if FEditor.ModeReadOnly then exit;
-  FReplacedAtEndOfText:= false;
+  //FReplacedAtEndOfText:= false;
   UpdateBuffer(true);
 
   if not IsSelectionStartsAtFoundMatch then
