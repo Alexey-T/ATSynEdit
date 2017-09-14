@@ -656,7 +656,9 @@ begin
       Inc(Result);
 
       if Application.Terminated then exit;
-      if FReplacedAtEndOfText then exit;
+
+      //if FReplacedAtEndOfText then Continue;
+        //was needed before, now no need for backward replaces
 
       {
       //gives progress rolling back
