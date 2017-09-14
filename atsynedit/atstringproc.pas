@@ -377,6 +377,8 @@ end;
 
 function IsCharFullWidth(ch: atChar): boolean;
 begin
+  if ch=#$2026 then exit(false); //unicode dots
+
   case Ord(ch) of
     $1100..$FFFF: //simple big range for cjk + emojis + others
       Result:= true;
