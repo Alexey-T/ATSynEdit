@@ -113,7 +113,7 @@ begin
   M.Add(cCommand_ToggleMinimap, 'toggle show mini-map', [], []);
   M.Add(cCommand_ToggleMicromap, 'toggle show micro-map', [], []);
 
-  M.Add(cCommand_ColSelectWithoutKey_Toggle, 'toggle column selection without key modifier', [], []);
+  M.Add(cCommand_ColSelectWithoutKey_Toggle, 'column selection without key modifier: toggle', [], []);
   M.Add(cCommand_ColSelectWithoutKey_On, 'column selection without key modifier: on', [], []);
   M.Add(cCommand_ColSelectWithoutKey_Off, 'column selection without key modifier: off', [], []);
 
