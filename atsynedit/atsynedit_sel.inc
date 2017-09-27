@@ -311,6 +311,14 @@ var
   PTarget: TPoint;
   SLine: atString;
 begin
+  //consider tab-chars
+  SLine:= Strings.Lines[P1.Y];
+  P1.X:= SCharPosToColumnPos(SLine, P1.X, FTabSize);
+
+  SLine:= Strings.Lines[P2.Y];
+  P2.X:= SCharPosToColumnPos(SLine, P2.X, FTabSize);
+
+  //fix coords
   PTarget:= P2;
   if P1.Y>P2.Y then
     SwapInt(P1.Y, P2.Y);
