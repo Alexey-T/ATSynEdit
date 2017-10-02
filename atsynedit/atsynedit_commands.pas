@@ -90,6 +90,14 @@ const
   cCommand_GotoScreenBottom = 206 or cCmdFlag_Caret;
   cCommand_GotoScreenCenter = 207 or cCmdFlag_Caret;
 
+  _base_GotoLineAbsBegin = 210 or cCmdFlag_Caret;
+  _base_GotoLineAbsEnd   = 211 or cCmdFlag_Caret;
+
+  cCommand_GotoLineAbsBegin     = _base_GotoLineAbsBegin or cCmdFlag_ResetSel;
+  cCommand_GotoLineAbsBegin_Sel = _base_GotoLineAbsBegin or cCmdFlag_KeepSel;
+  cCommand_GotoLineAbsEnd       = _base_GotoLineAbsEnd or cCmdFlag_ResetSel;
+  cCommand_GotoLineAbsEnd_Sel   = _base_GotoLineAbsEnd or cCmdFlag_KeepSel;
+
   cCommand_Undo = 235 or cCmdFlag_ResetSel;
   cCommand_Redo = 236 or cCmdFlag_ResetSel;
 

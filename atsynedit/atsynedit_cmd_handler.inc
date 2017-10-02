@@ -338,6 +338,11 @@ begin
     cCommand_GotoWordPrev,
     cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(false);
 
+    cCommand_GotoLineAbsBegin,
+    cCommand_GotoLineAbsBegin_Sel:     Res:= DoCommand_GotoLineEdge(true);
+    cCommand_GotoLineAbsEnd,
+    cCommand_GotoLineAbsEnd_Sel:       Res:= DoCommand_GotoLineEdge(false);
+
     cCommand_ToggleOverwrite:          Res:= DoCommand_ToggleOverwrite;
     cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
     cCommand_ToggleWordWrap:           Res:= DoCommand_ToggleWordWrap(false);

@@ -82,6 +82,11 @@ begin
   M.Add(cCommand_GotoWordNext,       'go to word right',          [cXControl+'+Right'], []);
   M.Add(cCommand_GotoWordNext_Sel,   'go to word right + select', [cXControl+'+Shift+Right'], []);
 
+  M.Add(cCommand_GotoLineAbsBegin,     'go to line abs. begin',          [], []);
+  M.Add(cCommand_GotoLineAbsBegin_Sel, 'go to line abs. begin + select', [], []);
+  M.Add(cCommand_GotoLineAbsEnd,       'go to line abs. end',          [], []);
+  M.Add(cCommand_GotoLineAbsEnd_Sel,   'go to line abs. end + select', [], []);
+
   M.Add(cCommand_GotoScreenTop,      'go to screen top', [], []);
   M.Add(cCommand_GotoScreenBottom,   'go to screen bottom', [], []);
   M.Add(cCommand_GotoScreenCenter,   'go to screen center', [], []);

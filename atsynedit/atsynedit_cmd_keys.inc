@@ -326,6 +326,25 @@ begin
     Result:= [cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
+var
+  Caret: TATCaretItem;
+  i: integer;
+begin
+  for i:= 0 to FCarets.Count-1 do
+  begin
+    Caret:= FCarets[i];
+    if not Strings.IsIndexValid(Caret.PosY) then Continue;
+
+    if ABegin then
+      Caret.PosX:= 0
+    else
+      Caret.PosX:= Strings.LinesLen[Caret.PosY];
+  end;
+
+  Result:= [cResultCaretTop];
+end;
+
 
 function TATSynEdit.DoCommand_GotoScreenTopBottomCenter(APos: integer): TATCommandResults;
 var
