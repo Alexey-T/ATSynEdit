@@ -82,9 +82,14 @@ begin
   if ModeReadOnly then Exit;
 
   Str:= UTF8Decode(AClipboardObject.AsText);
+
   Strings.BeginUndoGroup;
-  Result:= DoCommand_TextInsertColumnBlockOnce(Str, AKeepCaret);
-  Strings.EndUndoGroup;
+  try
+    DoCommand_TextDeleteSelection;
+    Result:= DoCommand_TextInsertColumnBlockOnce(Str, AKeepCaret);
+  finally
+    Strings.EndUndoGroup;
+  end;
 end;
 
 
