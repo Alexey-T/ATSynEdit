@@ -67,56 +67,58 @@ var
       Dec(n);
   end;
   //------------
+  procedure JumpToNext;
+  begin
+    Next;
+    if ABigJump then
+      if (n<Length(s)) and (GroupOfChar(s[n+1], AWordChars)=cgSpaces) then
+        Next;
+  end;
+  //------------
+  procedure JumpToEnd;
+  begin
+    while (n<Length(S)) and (GroupOfChar(S[n+1], AWordChars)=cgWord) do
+      Inc(n);
+  end;
+  //------------
 begin
   n:= AOffset;
 
   case AJump of
-  cWordjumpToNext:
-  begin
-    Next;
-    if ABigJump then
-      if (n<Length(s)) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
-        Next;
-  end;
+    cWordjumpToNext:
+      JumpToNext;
 
-  cWordjumpToPrev:
-  begin
-    //if we at word middle, jump to word start
-    if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], AWordChars)=GroupOfChar(s[n+1], AWordChars)) then
-      Home
-    else
-    begin
-      //jump lefter, then jump to prev word start
-      if (n>0) then
-        begin Dec(n); Home end;
-      if ABigJump then
-        if (n>0) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
-          begin Dec(n); Home end;
-    end
-  end;
-
-  cWordjumpToEndOrNext:
-    begin
-      //find word end
-      while (n<Length(S)) and (GroupOfChar(S[n+1], AWordChars)=cgWord) do
-        Inc(n);
-
-      //not moved? jump to next word
-      if n=AOffset then
+    cWordjumpToPrev:
       begin
-        Next;
-        if ABigJump then
-          if (n<Length(s)) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
-            Next;
-
-        while (n<Length(S)) and (GroupOfChar(S[n+1], AWordChars)=cgWord) do
-          Inc(n);
+        //if we at word middle, jump to word start
+        if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], AWordChars)=GroupOfChar(s[n+1], AWordChars)) then
+          Home
+        else
+        begin
+          //jump lefter, then jump to prev word start
+          if (n>0) then
+            begin Dec(n); Home end;
+          if ABigJump then
+            if (n>0) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
+              begin Dec(n); Home end;
+        end
       end;
-    end;
+
+    cWordjumpToEndOrNext:
+      begin
+        JumpToEnd;
+        //not moved? jump again
+        if n=AOffset then
+        begin
+          JumpToNext;
+          JumpToEnd;
+        end;
+      end;
   end;
 
   Result:= n;
 end;
+
 
 procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1,
   AOffset2: integer; const AWordChars: atString);
