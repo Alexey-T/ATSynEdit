@@ -77,12 +77,12 @@ begin
   M.Add(cCommand_GotoTextEnd,        'go to text end',            [cXControl+'+End'], []);
   M.Add(cCommand_GotoTextEnd_Sel,    'go to text end + select',   [cXControl+'+Shift+End'], []);
 
-  M.Add(cCommand_GotoWordPrev,       'go to word prev',           [cXControl+'+Left'], []);
-  M.Add(cCommand_GotoWordPrev_Sel,   'go to word prev + select',  [cXControl+'+Shift+Left'], []);
+  M.Add(cCommand_GotoWordPrev,       'go to word previous',           [cXControl+'+Left'], []);
+  M.Add(cCommand_GotoWordPrev_Sel,   'go to word previous + select',  [cXControl+'+Shift+Left'], []);
   M.Add(cCommand_GotoWordNext,       'go to word next',          [cXControl+'+Right'], []);
   M.Add(cCommand_GotoWordNext_Sel,   'go to word next + select', [cXControl+'+Shift+Right'], []);
-  M.Add(cCommand_GotoWordPrev_Simple,     'go to word prev, simple',          [], []);
-  M.Add(cCommand_GotoWordPrev_Simple_Sel, 'go to word prev, simple + select', [], []);
+  M.Add(cCommand_GotoWordPrev_Simple,     'go to word previous, simple',          [], []);
+  M.Add(cCommand_GotoWordPrev_Simple_Sel, 'go to word previous, simple + select', [], []);
   M.Add(cCommand_GotoWordNext_Simple,     'go to word next, simple',          [], []);
   M.Add(cCommand_GotoWordNext_Simple_Sel, 'go to word next, simple + select', [], []);
   M.Add(cCommand_GotoWordEnd,        'go to word end',            [], []);
@@ -128,8 +128,8 @@ begin
   M.Add(cCommand_ColSelectWithoutKey_On, 'column selection without key modifier: on', [], []);
   M.Add(cCommand_ColSelectWithoutKey_Off, 'column selection without key modifier: off', [], []);
 
-  M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
-  M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);
+  M.Add(cCommand_TextDeleteWordPrev, 'delete word previous', [cXControl+'+Bksp'], []);
+  M.Add(cCommand_TextDeleteWordNext, 'delete word next', [cXControl+'+Del'], []);
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line begin', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXControl+'+K'], []);
   M.Add(cCommand_TextDeleteToTextEnd, 'delete to text end', [], []);
