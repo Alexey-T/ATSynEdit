@@ -20,7 +20,7 @@ type
     );
 
 function SFindWordOffset(const S: atString; AOffset: integer; AJump: TATWordJump; ABigJump: boolean;
-  const AWordChars: atString): integer;
+  const AWordChars: atString; AJumpSimple: boolean=false): integer;
 
 procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer;
   const AWordChars: atString);
@@ -35,7 +35,10 @@ const
 type
   TCharGroup = (cgSpaces, cgSymbols, cgWord);
 
-function GroupOfChar(ch: atChar; const AWordChars: atString): TCharGroup;
+type
+  TCharGroupFunction = function(ch: atChar; const AWordChars: atString): TCharGroup;
+
+function GroupOfChar_Usual(ch: atChar; const AWordChars: atString): TCharGroup;
 begin
   if (AWordChars<>'') and (Pos(ch, AWordChars)>0) then Result:= cgWord else
    if (ch=#9) or IsCharSpace(ch) then Result:= cgSpaces else
@@ -43,9 +46,21 @@ begin
      Result:= cgWord;
 end;
 
+function GroupOfChar_Simple(ch: atChar; const AWordChars: atString): TCharGroup;
+begin
+  if (ch=#9) or IsCharSpace(ch) then
+    Result:= cgSpaces
+  else
+    Result:= cgWord;
+end;
+
+
 function SFindWordOffset(const S: atString; AOffset: integer;
-  AJump: TATWordJump; ABigJump: boolean; const AWordChars: atString): integer;
+  AJump: TATWordJump; ABigJump: boolean;
+  const AWordChars: atString;
+  AJumpSimple: boolean): integer;
 var
+  GroupOfChar: TCharGroupFunction;
   n: integer;
   //------------
   procedure Next;
@@ -83,6 +98,11 @@ var
   //------------
 begin
   n:= AOffset;
+
+  if AJumpSimple then
+    GroupOfChar:= @GroupOfChar_Simple
+  else
+    GroupOfChar:= @GroupOfChar_Usual;
 
   case AJump of
     cWordjumpToNext:
