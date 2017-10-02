@@ -298,12 +298,19 @@ begin
     end
     else
     //jump to next line?
-    if (Caret.PosX>=Length(Str)) and (AJump=cWordjumpToNext) then
+    if (Caret.PosX>=Length(Str)) and (AJump in [cWordjumpToNext, cWordjumpToEndOrNext]) then
     begin
       if Caret.PosY<Strings.Count-1 then
       begin
         Inc(Caret.PosY);
         Caret.PosX:= SGetIndentChars(Strings.Lines[Caret.PosY]);
+
+        //additional jump to word end
+        if AJump=cWordjumpToEndOrNext then
+        begin
+          Str:= Strings.Lines[Caret.PosY];
+          Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars);
+        end;
       end;
     end
     else
@@ -320,10 +327,10 @@ begin
     end;
   end;
 
-  if AJump=cWordjumpToNext then
-    Result:= [cResultCaretBottom]
+  if AJump=cWordjumpToPrev then
+    Result:= [cResultCaretTop]
   else
-    Result:= [cResultCaretTop];
+    Result:= [cResultCaretBottom];
 end;
 
 function TATSynEdit.DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
