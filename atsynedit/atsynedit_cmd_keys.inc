@@ -275,7 +275,8 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_GotoWord(AJump: TATWordJump): TATCommandResults;
+function TATSynEdit.DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean
+  ): TATCommandResults;
 var
   Caret: TATCaretItem;
   Str: atString;
@@ -309,7 +310,7 @@ begin
         if AJump=cWordjumpToEndOrNext then
         begin
           Str:= Strings.Lines[Caret.PosY];
-          Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars);
+          Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars, AJumpSimple);
         end;
       end;
     end
@@ -323,7 +324,7 @@ begin
     //jump inside line?
     if (Caret.PosX<=Length(Str)) then
     begin
-      Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars);
+      Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars, AJumpSimple);
     end;
   end;
 

@@ -846,7 +846,7 @@ type
     function DoCommand_ToggleRuler: TATCommandResults;
     function DoCommand_ToggleMiniMap: TATCommandResults;
     function DoCommand_ToggleMicroMap: TATCommandResults;
-    function DoCommand_GotoWord(AJump: TATWordJump): TATCommandResults;
+    function DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean=false): TATCommandResults;
     function DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
     function DoCommand_GotoScreenTopBottomCenter(APos: integer): TATCommandResults;
     function DoCommand_ScrollVert(ALines: integer; AKeepCaretOnScreen: boolean): TATCommandResults;

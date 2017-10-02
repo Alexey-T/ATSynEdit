@@ -337,6 +337,12 @@ begin
     cCommand_GotoWordNext_Sel:         Res:= DoCommand_GotoWord(cWordjumpToNext);
     cCommand_GotoWordPrev,
     cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(cWordjumpToPrev);
+
+    cCommand_GotoWordNext_Simple,
+    cCommand_GotoWordNext_Simple_Sel:  Res:= DoCommand_GotoWord(cWordjumpToNext, true);
+    cCommand_GotoWordPrev_Simple,
+    cCommand_GotoWordPrev_Simple_Sel:  Res:= DoCommand_GotoWord(cWordjumpToPrev, true);
+
     cCommand_GotoWordEnd,
     cCommand_GotoWordEnd_Sel:          Res:= DoCommand_GotoWord(cWordjumpToEndOrNext);
 
