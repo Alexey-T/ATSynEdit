@@ -275,7 +275,7 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_GotoWord(ANext: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_GotoWord(AJump: TATWordJump): TATCommandResults;
 var
   Caret: TATCaretItem;
   Str: atString;
@@ -288,7 +288,7 @@ begin
     Str:= Strings.Lines[Caret.PosY];
 
     //jump to prev line?
-    if (Caret.PosX=0) and (not ANext) then
+    if (Caret.PosX=0) and (AJump=cWordjumpToPrev) then
     begin
       if Caret.PosY>0 then
       begin
@@ -298,7 +298,7 @@ begin
     end
     else
     //jump to next line?
-    if (Caret.PosX>=Length(Str)) and ANext then
+    if (Caret.PosX>=Length(Str)) and (AJump=cWordjumpToNext) then
     begin
       if Caret.PosY<Strings.Count-1 then
       begin
@@ -308,7 +308,7 @@ begin
     end
     else
     //jump from beyond eol to eol?
-    if (Caret.PosX>Length(Str)) and (not ANext) then
+    if (Caret.PosX>Length(Str)) and (AJump=cWordjumpToPrev) then
     begin
       Caret.PosX:= Length(Str);
     end
@@ -316,11 +316,11 @@ begin
     //jump inside line?
     if (Caret.PosX<=Length(Str)) then
     begin
-      Caret.PosX:= SFindWordOffset(Str, Caret.PosX, ANext, true, FOptWordChars);
+      Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars);
     end;
   end;
 
-  if ANext then
+  if AJump=cWordjumpToNext then
     Result:= [cResultCaretBottom]
   else
     Result:= [cResultCaretTop];

@@ -12,8 +12,16 @@ uses
   Classes, SysUtils,
   ATStringProc;
 
-function SFindWordOffset(const S: atString; AOffset: integer; ANext, ABigJump: boolean;
+type
+  TATWordJump = (
+    cWordjumpToNext,
+    cWordjumpToEndOrNext,
+    cWordjumpToPrev
+    );
+
+function SFindWordOffset(const S: atString; AOffset: integer; AJump: TATWordJump; ABigJump: boolean;
   const AWordChars: atString): integer;
+
 procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer;
   const AWordChars: atString);
 
@@ -35,8 +43,8 @@ begin
      Result:= cgWord;
 end;
 
-function SFindWordOffset(const S: atString; AOffset: integer; ANext,
-  ABigJump: boolean; const AWordChars: atString): integer;
+function SFindWordOffset(const S: atString; AOffset: integer;
+  AJump: TATWordJump; ABigJump: boolean; const AWordChars: atString): integer;
 var
   n: integer;
   //------------
@@ -61,14 +69,17 @@ var
   //------------
 begin
   n:= AOffset;
-  if ANext then
+
+  case AJump of
+  cWordjumpToNext:
   begin
     Next;
     if ABigJump then
       if (n<Length(s)) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
         Next;
-  end
-  else
+  end;
+
+  cWordjumpToPrev:
   begin
     //if we at word middle, jump to word start
     if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], AWordChars)=GroupOfChar(s[n+1], AWordChars)) then
@@ -83,6 +94,27 @@ begin
           begin Dec(n); Home end;
     end
   end;
+
+  cWordjumpToEndOrNext:
+    begin
+      //find word end
+      while (n<Length(S)) and (GroupOfChar(S[n+1], AWordChars)=cgWord) do
+        Inc(n);
+
+      //not moved? jump to next word
+      if n=AOffset then
+      begin
+        Next;
+        if ABigJump then
+          if (n<Length(s)) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
+            Next;
+
+        while (n<Length(S)) and (GroupOfChar(S[n+1], AWordChars)=cgWord) do
+          Inc(n);
+      end;
+    end;
+  end;
+
   Result:= n;
 end;
 
@@ -108,9 +140,9 @@ begin
 
     //jump left only if at middle of word
     if (AOffset>0) and IsCharWord(S[AOffset], AWordChars) then
-      AOffset1:= SFindWordOffset(S, AOffset, false, false, AWordChars);
+      AOffset1:= SFindWordOffset(S, AOffset, cWordjumpToPrev, false, AWordChars);
     //jump right always
-    AOffset2:= SFindWordOffset(S, AOffset, true, false, AWordChars);
+    AOffset2:= SFindWordOffset(S, AOffset, cWordjumpToNext, false, AWordChars);
   end;
 end;
 

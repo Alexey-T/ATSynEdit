@@ -29,6 +29,7 @@ uses
   LMessages, LCLType,
   ATStringProc,
   ATStrings,
+  ATStringProc_WordJump,
   ATSynEdit_RegExpr,
   ATSynEdit_ScrollBar,
   ATSynEdit_Colors,
@@ -845,7 +846,7 @@ type
     function DoCommand_ToggleRuler: TATCommandResults;
     function DoCommand_ToggleMiniMap: TATCommandResults;
     function DoCommand_ToggleMicroMap: TATCommandResults;
-    function DoCommand_GotoWord(ANext: boolean): TATCommandResults;
+    function DoCommand_GotoWord(AJump: TATWordJump): TATCommandResults;
     function DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
     function DoCommand_GotoScreenTopBottomCenter(APos: integer): TATCommandResults;
     function DoCommand_ScrollVert(ALines: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
@@ -1288,8 +1289,7 @@ uses
   Types,
   Math,
   ATSynEdit_Commands,
-  ATSynEdit_Keymap_Init,
-  ATStringProc_WordJump;
+  ATSynEdit_Keymap_Init;
 
 {$I atsynedit_proc.inc}
 

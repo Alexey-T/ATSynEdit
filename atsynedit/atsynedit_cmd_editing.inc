@@ -451,6 +451,9 @@ begin
 end;
 
 function TATSynEdit.DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
+const
+  cWordJumps: array[boolean] of TATWordJump =
+    (cWordjumpToPrev, cWordjumpToNext);
 var
   Caret: TATCaretItem;
   Str: atString;
@@ -495,7 +498,7 @@ begin
     //delete inside line?
     if (Caret.PosX<=Length(Str)) then
     begin
-      PosAfter.X:= SFindWordOffset(Str, Caret.PosX, ANext, false, FOptWordChars);
+      PosAfter.X:= SFindWordOffset(Str, Caret.PosX, cWordJumps[ANext], false, FOptWordChars);
       if PosAfter.X<>Caret.PosX then
       begin
         System.Delete(Str, Min(Caret.PosX, PosAfter.X)+1, Abs(Caret.PosX-PosAfter.X));

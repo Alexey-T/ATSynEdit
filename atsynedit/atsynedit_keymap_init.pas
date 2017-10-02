@@ -81,6 +81,8 @@ begin
   M.Add(cCommand_GotoWordPrev_Sel,   'go to word left + select',  [cXControl+'+Shift+Left'], []);
   M.Add(cCommand_GotoWordNext,       'go to word right',          [cXControl+'+Right'], []);
   M.Add(cCommand_GotoWordNext_Sel,   'go to word right + select', [cXControl+'+Shift+Right'], []);
+  M.Add(cCommand_GotoWordEnd,        'go to word end',            [], []);
+  M.Add(cCommand_GotoWordEnd_Sel,    'go to word end + select',   [], []);
 
   M.Add(cCommand_GotoLineAbsBegin,     'go to line abs. begin',          [], []);
   M.Add(cCommand_GotoLineAbsBegin_Sel, 'go to line abs. begin + select', [], []);

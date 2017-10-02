@@ -334,9 +334,11 @@ begin
     cCommand_GotoScreenCenter:         Res:= DoCommand_GotoScreenTopBottomCenter(0);
 
     cCommand_GotoWordNext,
-    cCommand_GotoWordNext_Sel:         Res:= DoCommand_GotoWord(true);
+    cCommand_GotoWordNext_Sel:         Res:= DoCommand_GotoWord(cWordjumpToNext);
     cCommand_GotoWordPrev,
-    cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(false);
+    cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(cWordjumpToPrev);
+    cCommand_GotoWordEnd,
+    cCommand_GotoWordEnd_Sel:          Res:= DoCommand_GotoWord(cWordjumpToEndOrNext);
 
     cCommand_GotoLineAbsBegin,
     cCommand_GotoLineAbsBegin_Sel:     Res:= DoCommand_GotoLineEdge(true);

@@ -75,16 +75,19 @@ const
   _base_GotoTextEnd   = 201 or cCmdFlag_Caret;
   _base_GotoWordNext  = 202 or cCmdFlag_Caret;
   _base_GotoWordPrev  = 203 or cCmdFlag_Caret;
+  _base_GotoWordEnd   = 204 or cCmdFlag_Caret;
 
   cCommand_GotoTextBegin = _base_GotoTextBegin or cCmdFlag_ResetSel;
   cCommand_GotoTextEnd = _base_GotoTextEnd or cCmdFlag_ResetSel;
   cCommand_GotoWordNext = _base_GotoWordNext or cCmdFlag_ResetSel;
   cCommand_GotoWordPrev = _base_GotoWordPrev or cCmdFlag_ResetSel;
+  cCommand_GotoWordEnd = _base_GotoWordEnd or cCmdFlag_ResetSel;
 
   cCommand_GotoTextBegin_Sel = _base_GotoTextBegin or cCmdFlag_KeepSel;
   cCommand_GotoTextEnd_Sel = _base_GotoTextEnd or cCmdFlag_KeepSel;
   cCommand_GotoWordNext_Sel = _base_GotoWordNext or cCmdFlag_KeepSel;
   cCommand_GotoWordPrev_Sel = _base_GotoWordPrev or cCmdFlag_KeepSel;
+  cCommand_GotoWordEnd_Sel = _base_GotoWordEnd or cCmdFlag_KeepSel;
 
   cCommand_GotoScreenTop = 205 or cCmdFlag_Caret;
   cCommand_GotoScreenBottom = 206 or cCmdFlag_Caret;

@@ -85,8 +85,8 @@ begin
     SwapInt(P1.Y, P2.Y);
   end;
 
-  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, false, false, FOptWordChars);
-  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, true, false, FOptWordChars);
+  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptWordChars);
+  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptWordChars);
 
   with Carets[ACaretIndex] do
   begin
