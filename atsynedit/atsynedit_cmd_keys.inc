@@ -354,25 +354,31 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_GotoScreenTopBottomCenter(APos: integer): TATCommandResults;
+function TATSynEdit.DoCommand_GotoScreenSide(ASide: TATCaretScreenSide): TATCommandResults;
+const
+  dx = 2;
 var
-  NX, NY: integer;
+  P: TPoint;
+  Details: TATPosDetails;
 begin
-  if Carets.Count>0 then
-    NX:= Carets[0].PosX
-  else
-    NX:= ColumnLeft;
+  Result:= [];
 
-  if APos<0 then
-    NY:= LineTop
-  else
-  if APos>0 then
-    NY:= LineBottom-1
-  else
-    NY:= (LineTop+LineBottom-1) div 2;
+  case ASide of
+    cScreenSideTop:
+      P:= Point(FRectMain.Left+dx, FRectMain.Top+dx);
+    cScreenSideBottom:
+      P:= Point(FRectMain.Left+dx, FRectMain.Bottom-dx);
+    cScreenSideMiddle:
+      P:= Point(FRectMain.Left+dx, (FRectMain.Top+FRectMain.Bottom) div 2);
+  end;
 
-  DoCaretSingle(NX, NY);
-  Result:= [cResultCaretTop];
+  if P.Y<0 then exit;
+  P:= ClientPosToCaretPos(P, Details);
+  if P.Y>=0 then
+  begin
+    DoCaretSingle(P.X, P.Y);
+    Result:= [cResultCaretTop];
+  end;
 end;
 
 

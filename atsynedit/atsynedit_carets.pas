@@ -52,6 +52,12 @@ type
     cEdgeRight
     );
 
+  TATCaretScreenSide = (
+    cScreenSideTop,
+    cScreenSideMiddle,
+    cScreenSideBottom
+    );
+
 type
   { TATCarets }
 
