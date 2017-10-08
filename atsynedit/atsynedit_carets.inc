@@ -191,6 +191,8 @@ begin
     if NFromStart>Item.NLength then
       Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.X);
 
+    //TODO: here scrolled part is taken as small chars (*ACharSize.X),
+    //while text may have full-width chars, and it gives incorrect result
     Inc(Result.X, (Item.NIndent-AScrollHorz.NPos)*ACharSize.X);
     Result.Y:= (i-AScrollVert.NPos)*ACharSize.Y;
 
