@@ -631,6 +631,7 @@ type
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;
     function GetGaps: TATSynGaps;
+    function GetLastCommandChangedLines: integer;
     function GetMinimapActualHeight: integer;
     function GetMinimapSelTop: integer;
     function GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
@@ -748,6 +749,7 @@ type
     procedure SetCaretShapeRO(AValue: TATSynCaretShape);
     procedure SetCaretBlinkEnabled(AValue: boolean);
     procedure SetFoldEnabled(AValue: boolean);
+    procedure SetLastCommandChangedLines(AValue: integer);
     procedure SetModified(AValue: boolean);
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
@@ -995,6 +997,7 @@ type
     procedure EndUpdate;
     function TextSelected: atString;
     function TextCurrentWord: atString;
+    property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     procedure DoSelect_All;
     procedure DoSelect_None;
     procedure DoSelect_Inverted;
@@ -5227,6 +5230,11 @@ end;
 function TATSynEdit.GetGaps: TATSynGaps;
 begin
   Result:= Strings.Gaps;
+end;
+
+function TATSynEdit.GetLastCommandChangedLines: integer;
+begin
+  Result:= Strings.LastCommandChangedLines;
 end;
 
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);

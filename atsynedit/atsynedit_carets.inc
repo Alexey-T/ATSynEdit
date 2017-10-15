@@ -422,6 +422,11 @@ begin
   Update;
 end;
 
+procedure TATSynEdit.SetLastCommandChangedLines(AValue: integer);
+begin
+  Strings.LastCommandChangedLines:= AValue;
+end;
+
 
 procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
 begin

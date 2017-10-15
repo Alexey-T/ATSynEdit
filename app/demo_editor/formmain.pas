@@ -406,7 +406,7 @@ const
   cMod: array[boolean] of string = ('-', 'Mod');
   cSel: array[boolean] of string = ('-', 'Column');
 var
-  sPos: string;
+  sPos, sCount: string;
   i: integer;
 begin
   sPos:= '';
@@ -414,7 +414,11 @@ begin
     with ed.Carets[i] do
       sPos:= sPos+Format(' %d:%d', [PosY+1, PosX+1]);
 
-  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d', [
+  sCount:= '';
+  if ed.LastCommandChangedLines>0 then
+    sCount:= Format('%d lines chg', [ed.LastCommandChangedLines]);
+
+  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d | %s', [
     sPos,
     ed.Carets.Count,
     ed.LineTop+1,
@@ -424,7 +428,8 @@ begin
     cSel[not ed.IsSelRectEmpty],
     cMod[ed.Modified],
     ed.UndoCount,
-    ed.RedoCount
+    ed.RedoCount,
+    sCount
     ]);
 end;
 

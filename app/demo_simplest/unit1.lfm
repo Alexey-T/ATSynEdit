@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 257
   Height = 391
-  Top = 344
+  Top = 325
   Width = 690
   Caption = 'Demo'
   ClientHeight = 391
@@ -9,7 +9,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.7'
+  LCLVersion = '1.9.0.0'
   object Panel1: TPanel
     Left = 0
     Height = 39

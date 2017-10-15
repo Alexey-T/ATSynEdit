@@ -152,10 +152,17 @@ procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');
 var
   Caret: TATCaretItem;
   Res: TATCommandResults;
+  Str: string;
   i: integer;
 begin
   if ACmd<=0 then Exit;
-  if DoEventCommand(ACmd, AText) then Exit;
+  LastCommandChangedLines:= 0;
+
+  if AText<>'' then
+    Str:= UTF8Encode(AText)
+  else
+    Str:= '';
+  if DoEventCommand(ACmd, Str) then Exit;
 
   Res:= [];
   FCaretSpecPos:= false;

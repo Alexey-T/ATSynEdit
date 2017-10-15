@@ -149,6 +149,8 @@ type
       //to use with OnChangeBlock:
       //indicates that program can ignore separate line changes in OnChange,
       //because OnChangeBlock is called for all lines at once
+    FLastCommandChangedLines: integer;
+
     procedure DoBlock_DeleteLines(ALine1, ALine2: integer);
     procedure DoBlock_InsertLines(ALineFrom: integer; ANewLines: TStringList);
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
@@ -297,6 +299,7 @@ type
     procedure DoGotoLastEditPos;
     procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
       AChange: TATBlockChangeKind; ABlock: TStringList);
+    property LastCommandChangedLines: integer read FLastCommandChangedLines write FLastCommandChangedLines;
     //events
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
@@ -1346,6 +1349,8 @@ var
   S1, S2: atString;
 begin
   Result:= false;
+  FLastCommandChangedLines:= 0;
+
   for i:= 0 to Count-1 do
   begin
     S1:= Lines[i];
@@ -1354,8 +1359,10 @@ begin
       cTrimRight: S2:= TrimRight(S1);
       cTrimAll: S2:= Trim(S1);
     end;
+
     if S2<>S1 then
     begin
+      Inc(FLastCommandChangedLines);
       Lines[i]:= S2;
       Result:= true;
     end;
