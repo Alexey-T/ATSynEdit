@@ -27,6 +27,7 @@ type
     bOpt: TButton;
     btnStop: TButton;
     bClearLog: TButton;
+    chkMouseEn: TCheckBox;
     chkTabSpaces: TCheckBox;
     chkNewScroll: TCheckBox;
     chkMinimapLeft: TCheckBox;
@@ -122,6 +123,7 @@ type
     procedure btnMarkerClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure chkMinimapLeftChange(Sender: TObject);
+    procedure chkMouseEnChange(Sender: TObject);
     procedure chkNewScrollChange(Sender: TObject);
     procedure chkTabSpacesChange(Sender: TObject);
     procedure FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
@@ -622,6 +624,13 @@ procedure TfmMain.chkMinimapLeftChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptMinimapAtLeft:= chkMinimapLeft.Checked;
+  ed.Update;
+end;
+
+procedure TfmMain.chkMouseEnChange(Sender: TObject);
+begin
+  ed.OptMouseEnableNormalSelection:= chkMouseEn.Checked;
+  ed.OptMouseEnableColumnSelection:= chkMouseEn.Checked;
   ed.Update;
 end;
 
