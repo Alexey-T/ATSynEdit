@@ -3917,6 +3917,9 @@ begin
 
   //start scroll timer
   FTimerScroll.Enabled:=
+    FOptMouseEnableAll and
+    FOptMouseEnableNormalSelection and
+    FOptMouseEnableColumnSelection and
     (ssLeft in Shift) and
     (not bOnMain) and
     (not bOnMinimap) and
