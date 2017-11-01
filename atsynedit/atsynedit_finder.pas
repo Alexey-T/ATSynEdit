@@ -116,7 +116,7 @@ type
     function DoReplaceAll: integer;
     function DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean): boolean;
-    function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
+    function DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
       const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean);
@@ -778,7 +778,7 @@ begin
 
   UpdateBuffer(true);
   NStartPos:= GetOffsetStartPos;
-  Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
+  Result:= DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
 
   if (not Result) and (OptWrapped and not OptInSelection) then
     if (not OptBack and (NStartPos>1)) or
@@ -787,7 +787,7 @@ begin
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
       //
-      if DoFindOrReplace_Internal(ANext, false, AForMany, AChanged,
+      if DoFindOrReplace_Buffered_Internal(ANext, false, AForMany, AChanged,
         IfThen(not OptBack, 1, Length(StrText))) then
       begin
         Result:= (not OptBack and (MatchPos<NStartPos)) or
@@ -802,7 +802,7 @@ begin
 end;
 
 
-function TATEditorFinder.DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean; AStartPos: integer): boolean;
   //function usually called 1 time in outer func,
   //or 1-2 times if OptWrap=true
