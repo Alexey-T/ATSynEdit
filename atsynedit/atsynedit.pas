@@ -927,7 +927,7 @@ type
     procedure DoEventScroll; virtual;
     procedure DoEventChange; virtual;
     procedure DoEventState; virtual;
-    //lists
+    //complex props
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
     property Carets: TATCarets read FCarets;
@@ -938,6 +938,8 @@ type
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
     property WrapInfo: TATSynWrapInfo read FWrapInfo;
+    property ScrollVert: TATSynScrollInfo read FScrollVert write FScrollVert;
+    property ScrollHorz: TATSynScrollInfo read FScrollHorz write FScrollHorz;
     //common
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
