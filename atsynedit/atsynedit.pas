@@ -937,6 +937,7 @@ type
     property Gaps: TATSynGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
+    property WrapInfo: TATSynWrapInfo read FWrapInfo;
     //common
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
