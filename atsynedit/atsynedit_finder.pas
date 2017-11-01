@@ -114,7 +114,7 @@ type
     procedure DoFixCaretSelectionDirection;
     //
     function DoReplaceAll: integer;
-    function DoFindOrReplace_Inner(ANext, AReplace, AForMany: boolean;
+    function DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean): boolean;
     function DoFindOrReplace_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
@@ -763,13 +763,11 @@ begin
     raise Exception.Create('Finder.Editor.Carets is empty');
   if AReplace and FEditor.ModeReadOnly then exit;
 
-  UpdateBuffer(true);
   DoFixCaretSelectionDirection;
-
-  Result:= DoFindOrReplace_Inner(ANext, AReplace, AForMany, AChanged);
+  Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged);
 end;
 
-function TATEditorFinder.DoFindOrReplace_Inner(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
 var
   NStartPos: integer;
@@ -778,6 +776,7 @@ begin
   AChanged:= false;
   //FReplacedAtEndOfText:= false;
 
+  UpdateBuffer(true);
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
 
@@ -895,12 +894,11 @@ begin
   Result:= false;
   if FEditor.ModeReadOnly then exit;
   //FReplacedAtEndOfText:= false;
-  UpdateBuffer(true);
 
   if not IsSelectionStartsAtFoundMatch then
   begin
     //do Find-next (from caret)
-    DoFindOrReplace_Inner(false, false, false, bSel);
+    DoFindOrReplace_Buffered(false, false, false, bSel);
     exit;
   end;
 
