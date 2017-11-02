@@ -797,10 +797,9 @@ end;
 
 function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
-//todo: consider OptWrap
 var
   Caret: TATCaretItem;
-  NStartX, NStartY: integer;
+  NStartX, NStartY, NLastY: integer;
 begin
   Result:= false;
   AChanged:= false;
@@ -820,6 +819,25 @@ begin
   end;
 
   Result:= DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany, AChanged, NStartX, NStartY);
+  NLastY:= FEditor.Strings.Count-1;
+
+  if (not Result) and (OptWrapped and not OptInSelection) then
+    if (not OptBack and ((NStartX>0) or (NStartY>0))) or
+       (OptBack and (NStartY<NLastY)) then
+    begin
+      //same as _buffered version:
+      //we must have AReplace=false
+      //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
+      //
+      if DoFindOrReplace_InEditor_Internal(ANext, false, AForMany, AChanged,
+        0, IfThen(not OptBack, 0, NLastY)) then
+      begin
+        Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, NStartX, NStartY, false)) or
+                 (OptBack and IsPosSorted(NStartX, NStartY, FMatchEdPos.X, FMatchEdPos.Y, false));
+        if not Result then
+          ClearMatchPos;
+      end;
+    end;
 end;
 
 
