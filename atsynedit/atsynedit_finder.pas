@@ -1309,10 +1309,22 @@ end;
 function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer): boolean;
 //todo: consider OptBack
 var
-  SFind, SLine: UnicodeString;
-  NStartOffset, NParts, NLenPart0, NLenLine0: integer;
+  NParts: integer;
+  SLineLooped: string;
+  ListParts, ListLooped: TStringList;
+  //
+  function GetLineLooped(AIndex: integer): string;
+  begin
+    if (NParts=1) or (AIndex=0) then
+      Result:= SLineLooped
+    else
+      Result:= ListLooped[AIndex];
+  end;
+  //
+var
+  SFind, SLineTest: UnicodeString;
+  NStartOffset, NLenPart, NLenLooped: integer;
   IndexLine, IndexChar, i: integer;
-  ListParts, ListLines: TStringList;
 begin
   Result:= false;
   if StrFind='' then Exit;
@@ -1322,35 +1334,45 @@ begin
     SFind:= UpperCase(SFind);
 
   ListParts:= TStringList.Create;
-  ListLines:= TStringList.Create;
+  ListLooped:= TStringList.Create;
   try
     ListParts.TextLineBreakStyle:= tlbsLF;
-    ListLines.TextLineBreakStyle:= tlbsLF;
+    ListLooped.TextLineBreakStyle:= tlbsLF;
+
     ListParts.Text:= UTF8Encode(SFind);
     NParts:= ListParts.Count;
     if NParts=0 then exit;
     if NParts>FEditor.Strings.Count-AStartY then exit;
-    NLenPart0:= Length(UTF8Decode(ListParts[0]));
+    NLenPart:= Length(UTF8Decode(ListParts[0]));
 
     for IndexLine:= AStartY to FEditor.Strings.Count-NParts do
     begin
-      //fill ListLines
-      ListLines.Clear;
-      for i:= 0 to NParts-1 do
-        ListLines.Add(FEditor.Strings.Items[IndexLine+i].ItemString);
+      SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
+      if NParts>1 then
+      begin
+        ListLooped.Clear;
+        ListLooped.Add(SLineLooped);
+        for i:= 1 to NParts-1 do
+          ListLooped.Add(FEditor.Strings.Items[IndexLine+i].ItemString);
+      end;
 
-      //quick check ListLines by len
-      if Length(ListLines[0])<Length(ListParts[0]) then Continue;
+      //quick check by len
+      if Length(SLineLooped)<Length(ListParts[0]) then Continue;
       if NParts>1 then
       begin
         for i:= 1 to NParts-2 do
-          if Length(ListLines[i])<>Length(ListParts[i]) then Continue;
-        if Length(ListLines[NParts-1])<Length(ListParts[NParts-1]) then Continue;
+          if Length(GetLineLooped(i))<>Length(ListParts[i]) then Continue;
+        if Length(GetLineLooped(NParts-1))<Length(ListParts[NParts-1]) then Continue;
       end;
 
-      SLine:= UTF8Decode(ListLines.Text);
-      SetLength(SLine, Length(SLine)-1); //.Text gets trailing LF
-      NLenLine0:= Length(UTF8Decode(ListLines[0]));
+      if NParts=1 then
+        SLineTest:= SLineLooped
+      else
+      begin
+        SLineTest:= UTF8Decode(ListLooped.Text);
+        SetLength(SLineTest, Length(SLineTest)-1); //.Text adds trailing LF
+      end;
+      NLenLooped:= Length(UTF8Decode(SLineLooped));
 
       //exact search
       if IndexLine=AStartY then
@@ -1358,8 +1380,8 @@ begin
       else
         NStartOffset:= 0;
 
-      for IndexChar:= NStartOffset to NLenLine0-NLenPart0 do
-        if IsLineMatch(SFind, SLine, IndexChar+1) then
+      for IndexChar:= NStartOffset to NLenLooped-NLenPart do
+        if IsLineMatch(SFind, SLineTest, IndexChar+1) then
         begin
           Result:= true;
           FMatchEdPos.Y:= IndexLine;
@@ -1375,7 +1397,7 @@ begin
     end;
   finally
     FreeAndNil(ListParts);
-    FreeAndNil(ListLines);
+    FreeAndNil(ListLooped);
   end;
 end;
 
