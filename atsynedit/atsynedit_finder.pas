@@ -1299,7 +1299,7 @@ begin
     if OptCase then
       ok:= PtrFind^=PtrLine^
     else
-      ok:= PtrFind^=UpCase(PtrLine^);
+      ok:= PtrFind^=WideUpperCase(PtrLine^)[1];
     if not ok then exit(false);
     Inc(PtrFind);
     Inc(PtrLine);
@@ -1339,7 +1339,7 @@ begin
 
   SFind:= StrFind;
   if not OptCase then
-    SFind:= UpperCase(SFind);
+    SFind:= WideUpperCase(SFind);
 
   ListParts:= TStringList.Create;
   ListLooped:= TStringList.Create;
