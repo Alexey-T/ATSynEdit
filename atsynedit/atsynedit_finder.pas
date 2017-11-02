@@ -1332,7 +1332,6 @@ begin
     if NParts>FEditor.Strings.Count-AStartY then exit;
     NLenPart0:= Length(UTF8Decode(ListParts[0]));
 
-    NStartOffset:= AStartX;
     for IndexLine:= AStartY to FEditor.Strings.Count-NParts do
     begin
       //fill ListLines
@@ -1354,6 +1353,11 @@ begin
       NLenLine0:= Length(UTF8Decode(ListLines[0]));
 
       //exact search
+      if IndexLine=AStartY then
+        NStartOffset:= AStartX
+      else
+        NStartOffset:= 0;
+
       for IndexChar:= NStartOffset to NLenLine0-NLenPart0 do
         if IsLineMatch(SFind, SLine, IndexChar+1) then
         begin
@@ -1368,8 +1372,6 @@ begin
           DoOnFound;
           Exit
         end;
-
-      NStartOffset:= 0;
     end;
   finally
     FreeAndNil(ListParts);
