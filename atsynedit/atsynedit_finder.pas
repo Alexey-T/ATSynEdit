@@ -70,8 +70,6 @@ type
     constructor Create;
     destructor Destroy; override;
     function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
-    property MatchPos: integer read FMatchPos; //have meaning if FindMatch returned True
-    property MatchLen: integer read FMatchLen; //too
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
     property OnBadRegex: TNotifyEvent read FOnBadRegex write FOnBadRegex;
   end;
@@ -82,7 +80,7 @@ type
   TATEditorFragment = class
   public
     X1, Y1, X2, Y2: integer;
-    Text: atString;
+    Text: UnicodeString;
   end;
 
 type
@@ -104,7 +102,7 @@ type
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(AStartX, AStartY: integer): boolean;
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
-    procedure UpdateBuffer_FromText(const AText: atString);
+    procedure UpdateBuffer_FromText(const AText: UnicodeString);
     procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
     function ConvertBufferPosToCaretPos(APos: integer): TPoint;
     function ConvertCaretPosToBufferPos(APos: TPoint): integer;
@@ -225,41 +223,6 @@ begin
   FMatchLen:= 0;
 end;
 
-(*
-function TATTextFinder.IsMatchUsual(APos: integer): boolean;
-begin
-  Result:= false;
-  ShowMessage('Error: Finder.IsMatchUsual called in non-regex');
-end;
-*)
-
-(*
-function TATTextFinder.IsMatchUsual(APos: integer): boolean;
-var
-  LenF, LastPos: integer;
-begin
-  Result:= false;
-  if StrFind='' then exit;
-  if StrText='' then exit;
-
-  LenF:= Length(StrFind);
-  LastPos:= Length(StrText)-LenF+1;
-
-  if OptCase then
-    Result:= CompareMem(@StrFind[1], @StrText[APos], LenF*2)
-  else
-    Result:=
-      UnicodeLowerCase(StrFind) =
-      UnicodeLowerCase(Copy(StrText, APos, LenF));
-
-  if Result then
-    if OptWords then
-      Result:=
-        ((APos <= 1) or not IsWordChar(StrText[APos - 1])) and
-        ((APos >= LastPos) or not IsWordChar(StrText[APos + LenF]));
-end;
-*)
-
 procedure TATTextFinder.SetStrFind(const AValue: UnicodeString);
 begin
   if FStrFind=AValue then Exit;
@@ -277,40 +240,6 @@ procedure TATTextFinder.DoOnFound;
 begin
   //
 end;
-
-
-(*
-function TATTextFinder.DoFind_Usual(AFromPos: integer): boolean;
-var
-  NLastPos, i: integer;
-begin
-  Result:= false;
-  if StrText='' then exit;
-  if StrFind='' then exit;
-  NLastPos:= Length(StrText) - Length(StrFind) + 1;
-
-  if not OptBack then
-  begin
-    for i:= AFromPos to NLastPos do
-      if IsMatchUsual(i) then
-      begin
-        FMatchPos:= i;
-        FMatchLen:= Length(StrFind);
-        exit(true);
-      end;
-  end
-  else
-  begin
-    for i:= AFromPos downto 1 do
-      if IsMatchUsual(i) then
-      begin
-        FMatchPos:= i;
-        FMatchLen:= Length(StrFind);
-        exit(true);
-      end;
-  end;
-end;
-*)
 
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
 begin
@@ -519,7 +448,7 @@ begin
   FMatchEdEnd:= Point(-1, -1);
 end;
 
-procedure TATEditorFinder.UpdateBuffer_FromText(const AText: atString);
+procedure TATEditorFinder.UpdateBuffer_FromText(const AText: UnicodeString);
 begin
   FBuffer.SetupSlow(AText);
   StrText:= AText;
@@ -898,6 +827,7 @@ function TATEditorFinder.DoFindOrReplace_InEditor_Internal(ANext, AReplace, AFor
 var
   ConfirmThis, ConfirmContinue: boolean;
   SNew: UnicodeString;
+  P1, P2: TPoint;
 begin
   Result:= false;
   AChanged:= false;
@@ -923,7 +853,16 @@ begin
       if ConfirmThis then
       begin
         if OptRegex then
-          SNew:= GetRegexReplacement(FBuffer.SubString(MatchPos, MatchLen))
+        begin
+          P1:= FMatchEdPos;
+          P2:= FMatchEdEnd;
+          if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
+          begin
+            P1:= FMatchEdEnd;
+            P2:= FMatchEdPos;
+          end;
+          SNew:= GetRegexReplacement(FEditor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
+        end
         else
           SNew:= StrReplace;
 
@@ -971,8 +910,8 @@ begin
       if DoFindOrReplace_Buffered_Internal(ANext, false, AForMany, AChanged,
         IfThen(not OptBack, 1, Length(StrText))) then
       begin
-        Result:= (not OptBack and (MatchPos<NStartPos)) or
-                 (OptBack and (MatchPos>NStartPos));
+        Result:= (not OptBack and (FMatchPos<NStartPos)) or
+                 (OptBack and (FMatchPos>NStartPos));
         if not Result then
           ClearMatchPos;
       end;
@@ -995,8 +934,8 @@ begin
 
   if Result then
   begin
-    P1:= ConvertBufferPosToCaretPos(MatchPos);
-    P2:= ConvertBufferPosToCaretPos(MatchPos+MatchLen);
+    P1:= ConvertBufferPosToCaretPos(FMatchPos);
+    P2:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
     FEditor.DoCaretSingle(P1.X, P1.Y);
 
     if AReplace then
@@ -1014,7 +953,7 @@ begin
       if ConfirmThis then
       begin
         if OptRegex then
-          SNew:= GetRegexReplacement(FBuffer.SubString(MatchPos, MatchLen))
+          SNew:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
         else
           SNew:= StrReplace;
 
@@ -1164,7 +1103,6 @@ begin
   if StrText='' then Exit;
   if StrFind='' then Exit;
 
-  //regex code
   if OptRegex then
   begin
     if not ANext then
@@ -1174,28 +1112,9 @@ begin
     Result:= DoFind_Regex(FromPos);
     if Result then DoOnFound;
     Exit
-  end;
-
-  ShowMessage('Error: Finder.FindMatch called for non-regex');
-  (*
-  //usual code
-  if not ANext then
-  begin
-    FMatchPos:= AStartPos;
   end
   else
-  begin
-    if FMatchPos<=0 then
-      FMatchPos:= 1;
-    if not OptBack then
-      Inc(FMatchPos, ASkipLen)
-    else
-      Dec(FMatchPos, ASkipLen);
-  end;
-
-  Result:= DoFind_Usual(FMatchPos);
-  if Result then DoOnFound;
-  *)
+    ShowMessage('Error: Finder.FindMatch called for non-regex');
 end;
 
 procedure TATEditorFinder.DoOnFound;
@@ -1206,8 +1125,8 @@ begin
   begin
     if OptRegex then
     begin
-      P1:= ConvertBufferPosToCaretPos(MatchPos);
-      P2:= ConvertBufferPosToCaretPos(MatchPos+MatchLen);
+      P1:= ConvertBufferPosToCaretPos(FMatchPos);
+      P2:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
     end
     else
     begin
