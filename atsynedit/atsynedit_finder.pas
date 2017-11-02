@@ -108,7 +108,6 @@ type
     //
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(AStartX, AStartY: integer): boolean;
-    function IsStringMatch(PtrFind, PtrLine: PWideChar; ALenFind: integer): boolean;
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
     procedure UpdateBuffer_FromText(const AText: atString);
     procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
@@ -177,6 +176,39 @@ begin
   Result:= StringReplace(Result, '\t', #9, [rfReplaceAll]);
   Result:= StringReplace(Result, #1, '\\', [rfReplaceAll]);
 end;
+
+function STestStringMatch(PtrFind, PtrLine: PWideChar; LenStrFind: integer; OptCaseSensitive: boolean): boolean;
+//1- if case-insensitive, PtrLine str must be wide-upper-cased
+//2- index check must be in caller
+var
+  charFind, charLine: WideChar;
+  code: word absolute charLine;
+  i: integer;
+begin
+  for i:= 1 to LenStrFind do
+  begin
+    charFind:= PtrFind^;
+    charLine:= PtrLine^;
+
+    if not OptCaseSensitive then
+    begin
+      //like UpCase(char)
+      if (code>=Ord('a')) and (code<=Ord('z')) then
+        Dec(code, 32)
+      else
+      //call slow WideUpperCase only if not ascii
+      if code>=128 then
+        charLine:= WideUpperCase(charLine)[1];
+    end;
+
+    if charFind<>charLine then
+      exit(false);
+    Inc(PtrFind);
+    Inc(PtrLine);
+  end;
+  Result:= true;
+end;
+
 
 { TATFinderResult }
 
@@ -1282,38 +1314,6 @@ begin
 end;
 
 
-function TATEditorFinder.IsStringMatch(PtrFind, PtrLine: PWideChar; ALenFind: integer): boolean;
-//1- of not OptCase, StrFind must be wide-upper-cased
-//2- index check must be in caller
-var
-  charFind, charLine: WideChar;
-  code: word absolute charLine;
-  i: integer;
-begin
-  for i:= 1 to ALenFind do
-  begin
-    charFind:= PtrFind^;
-    charLine:= PtrLine^;
-
-    if not OptCase then
-    begin
-      //like UpCase(char)
-      if (code>=Ord('a')) and (code<=Ord('z')) then
-        Dec(code, 32)
-      else
-      //call slow WideUpperCase only if not ascii
-      if code>=128 then
-        charLine:= WideUpperCase(charLine)[1];
-    end;
-
-    if charFind<>charLine then
-      exit(false);
-    Inc(PtrFind);
-    Inc(PtrLine);
-  end;
-  Result:= true;
-end;
-
 function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer): boolean;
 //todo: consider OptBack
 var
@@ -1326,7 +1326,10 @@ var
     if (NParts=1) or (AIndex=0) then
       Result:= SLineLooped
     else
-      Result:= ListLooped[AIndex];
+    if AIndex<ListLooped.Count then
+      Result:= ListLooped[AIndex]
+    else
+      Result:= '';
   end;
   //
   function GetLinePart(AIndex: integer): string;
@@ -1334,7 +1337,10 @@ var
     if (NParts=1) or (AIndex=0) then
       Result:= SLinePart
     else
-      Result:= ListParts[AIndex];
+    if AIndex<ListParts.Count then
+      Result:= ListParts[AIndex]
+    else
+      Result:= '';
   end;
   //
 var
@@ -1351,9 +1357,6 @@ begin
     SFind:= WideUpperCase(SFind);
   NLenStrFind:= Length(SFind);
 
-  IndexLineMax:= FEditor.Strings.Count-1;
-  FPrevProgress:= 0;
-
   ListParts:= TStringList.Create;
   ListLooped:= TStringList.Create;
   try
@@ -1365,8 +1368,10 @@ begin
     if NParts=0 then exit;
 
     SLinePart:= ListParts[0];
-    if NParts>FEditor.Strings.Count-AStartY then exit;
     NLenPart:= Length(UTF8Decode(SLinePart));
+
+    FPrevProgress:= 0;
+    IndexLineMax:= FEditor.Strings.Count-NParts;
 
     for IndexLine:= AStartY to IndexLineMax do
     begin
@@ -1379,14 +1384,14 @@ begin
           if not bOk then Break;
         end;
 
-      if not FEditor.Strings.IsIndexValid(IndexLine) then exit;
       SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
       if NParts>1 then
       begin
         ListLooped.Clear;
         ListLooped.Add(SLineLooped);
         for i:= 1 to NParts-1 do
-          ListLooped.Add(FEditor.Strings.Items[IndexLine+i].ItemString);
+          if FEditor.Strings.IsIndexValid(IndexLine+i) then
+            ListLooped.Add(FEditor.Strings.Items[IndexLine+i].ItemString);
       end;
 
       //quick check by len
@@ -1414,10 +1419,11 @@ begin
         NStartOffset:= 0;
 
       for IndexChar:= NStartOffset to NLenLooped-NLenPart do
-        if IsStringMatch(
+        if STestStringMatch(
           @SFind[1],
           @SLineTest[IndexChar+1],
-          NLenStrFind) then
+          NLenStrFind,
+          OptCase) then
         begin
           Result:= true;
           FMatchEdPos.Y:= IndexLine;
