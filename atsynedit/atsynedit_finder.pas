@@ -1241,8 +1241,6 @@ end;
 
 procedure TATEditorFinder.DoConfirmReplace(APos, AEnd: TPoint;
   var AConfirmThis, AConfirmContinue: boolean);
-var
-  P1, P2: TPoint;
 begin
   AConfirmThis:= true;
   AConfirmContinue:= true;
@@ -1250,7 +1248,7 @@ begin
   if Assigned(FOnConfirmReplace) then
   begin
     FEditor.DoCaretSingle(APos.X, APos.Y);
-    FOnConfirmReplace(Self, P1, P2, true, AConfirmThis, AConfirmContinue);
+    FOnConfirmReplace(Self, APos, AEnd, true, AConfirmThis, AConfirmContinue);
   end;
 end;
 
