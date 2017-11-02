@@ -164,7 +164,7 @@ type
 
 implementation
 
-function IsWordChar(ch: Widechar): boolean;
+function IsWordChar(ch: WideChar): boolean; inline;
 begin
   Result:= ATStringProc.IsCharWord(ch, '');
 end;
@@ -248,8 +248,8 @@ begin
   if Result then
     if OptWords then
       Result:=
-        ((APos <= 1) or (not IsWordChar(StrText[APos - 1]))) and
-        ((APos >= LastPos) or (not IsWordChar(StrText[APos + LenF])));
+        ((APos <= 1) or not IsWordChar(StrText[APos - 1])) and
+        ((APos >= LastPos) or not IsWordChar(StrText[APos + LenF]));
 end;
 
 procedure TATTextFinder.SetStrFind(const AValue: UnicodeString);
@@ -1344,7 +1344,7 @@ var
   end;
   //
 var
-  SFind, SLineTest: UnicodeString;
+  SFind, SLineTest, SLineLoopedWide: UnicodeString;
   NStartOffset, NLenPart, NLenLooped, NLenStrFind: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
   bOk: boolean;
@@ -1410,7 +1410,9 @@ begin
         SLineTest:= UTF8Decode(ListLooped.Text);
         SetLength(SLineTest, Length(SLineTest)-1); //.Text adds trailing LF
       end;
-      NLenLooped:= Length(UTF8Decode(SLineLooped));
+
+      SLineLoopedWide:= UTF8Decode(SLineLooped);
+      NLenLooped:= Length(SLineLoopedWide);
 
       //exact search
       if IndexLine=AStartY then
@@ -1419,11 +1421,12 @@ begin
         NStartOffset:= 0;
 
       for IndexChar:= NStartOffset to NLenLooped-NLenPart do
-        if STestStringMatch(
-          @SFind[1],
-          @SLineTest[IndexChar+1],
-          NLenStrFind,
-          OptCase) then
+      begin
+        bOk:= STestStringMatch(@SFind[1], @SLineTest[IndexChar+1], NLenStrFind, OptCase);
+        if bOk and OptWords then
+          bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedWide[IndexChar])) and
+                ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedWide[IndexChar+NLenPart+1]));
+        if bOk then
         begin
           Result:= true;
           FMatchEdPos.Y:= IndexLine;
@@ -1436,6 +1439,7 @@ begin
           DoOnFound;
           Exit
         end;
+      end;
     end;
   finally
     FreeAndNil(ListParts);
