@@ -100,7 +100,7 @@ type
     //FReplacedAtEndOfText: boolean;
     //
     procedure ClearMatchPos; override;
-    function FindMatch_InEditor(AStartX, AStartY: integer): boolean;
+    function FindMatch_InEditor(AStartX, AStartY: integer; AWithEvent: boolean): boolean;
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
     procedure UpdateBuffer_FromText(const AText: UnicodeString);
     procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
@@ -309,7 +309,7 @@ begin
   repeat
     if Application.Terminated then Break;
     if not FEditor.Strings.IsIndexValid(NStartY) then Break;
-    if not FindMatch_InEditor(NStartX, NStartY) then Break;
+    if not FindMatch_InEditor(NStartX, NStartY, AWithEvent) then Break;
 
     if FMatchEdPos.X < Length(FEditor.Strings.Lines[FMatchEdPos.Y]) then
     begin
@@ -833,7 +833,7 @@ begin
   AChanged:= false;
   ClearMatchPos;
 
-  Result:= FindMatch_InEditor(AStartX, AStartY);
+  Result:= FindMatch_InEditor(AStartX, AStartY, true);
   if Result then
   begin
     FEditor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y);
@@ -1253,7 +1253,8 @@ begin
 end;
 
 
-function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer): boolean;
+function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer;
+  AWithEvent: boolean): boolean;
 //todo: consider OptBack
 var
   NParts: integer;
@@ -1367,7 +1368,6 @@ begin
                 ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedWide[IndexChar+NLenPart+1]));
         if bOk then
         begin
-          Result:= true;
           FMatchEdPos.Y:= IndexLine;
           FMatchEdPos.X:= IndexChar;
           FMatchEdEnd.Y:= IndexLine+NParts-1;
@@ -1375,8 +1375,9 @@ begin
             FMatchEdEnd.X:= IndexChar+NLenPart
           else
             FMatchEdEnd.X:= Length(UTF8Decode(GetLinePart(NParts-1)));
-          DoOnFound;
-          Exit
+          if AWithEvent then
+            DoOnFound;
+          Exit(true);
         end;
       end;
     end;
