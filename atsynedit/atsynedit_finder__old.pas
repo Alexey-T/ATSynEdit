@@ -48,7 +48,6 @@ type
     FPrevProgress: integer;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
-    procedure ClearMatchPos; virtual;
     function IsMatchUsual(APos: integer): boolean;
     function DoFind_Usual(AFromPos: integer): boolean;
     function DoFind_Regex(AFromPos: integer): boolean;
@@ -102,14 +101,8 @@ type
     FOnConfirmReplace: TATFinderConfirmReplace;
     FFragments: TList;
     FFragmentIndex: integer;
-    FMatchEdPos: TPoint;
-    FMatchEdEnd: TPoint;
     //FReplacedAtEndOfText: boolean;
     //
-    procedure ClearMatchPos; override;
-    function FindMatch_InEditor(AStartX, AStartY: integer): boolean;
-    function IsLineMatch(const AStrFind, AStrLine: UnicodeString;
-      AIndexInLine: integer): boolean;
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
     procedure UpdateBuffer_FromText(const AText: atString);
     procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
@@ -121,17 +114,13 @@ type
     procedure DoFixCaretSelectionDirection;
     //
     function DoReplaceAll: integer;
-    function DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
-      AStartX, AStartY: integer): boolean;
     function DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean): boolean;
     function DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; AStartPos: integer): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
       const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean);
-    function IsSelStartsAtMatch_InEditor: boolean;
-    function IsSelStartsAtMatch_Buffered: boolean;
+    function IsSelectionStartsAtFoundMatch: boolean;
     //fragments
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
@@ -190,12 +179,6 @@ end;
 
 { TATTextFinder }
 
-procedure TATTextFinder.ClearMatchPos;
-begin
-  FMatchPos:= -1;
-  FMatchLen:= 0;
-end;
-
 function TATTextFinder.IsMatchUsual(APos: integer): boolean;
 var
   LenF, LastPos: integer;
@@ -225,7 +208,8 @@ procedure TATTextFinder.SetStrFind(const AValue: UnicodeString);
 begin
   if FStrFind=AValue then Exit;
   FStrFind:= AValue;
-  ClearMatchPos;
+  FMatchPos:= -1;
+  FMatchLen:= 0;
 end;
 
 procedure TATTextFinder.SetStrReplace(const AValue: UnicodeString);
@@ -464,14 +448,6 @@ begin
   end;
 end;
 
-{ TATEditorFinder }
-
-procedure TATEditorFinder.ClearMatchPos;
-begin
-  inherited;
-  FMatchEdPos:= Point(-1, -1);
-  FMatchEdEnd:= Point(-1, -1);
-end;
 
 procedure TATEditorFinder.UpdateBuffer_FromText(const AText: atString);
 begin
@@ -788,93 +764,7 @@ begin
   if AReplace and FEditor.ModeReadOnly then exit;
 
   DoFixCaretSelectionDirection;
-  if OptRegex then
-    Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged)
-  else
-    Result:= DoFindOrReplace_InEditor(ANext, AReplace, AForMany, AChanged);
-end;
-
-
-function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean;
-  out AChanged: boolean): boolean;
-var
-  Caret: TATCaretItem;
-  NStartX, NStartY: integer;
-begin
-  Result:= false;
-  AChanged:= false;
-
-  if FEditor.Carets.Count=0 then exit;
-  Caret:= FEditor.Carets[0];
-
-  if OptFromCaret then
-  begin
-    NStartX:= Caret.PosX;
-    NStartY:= Caret.PosY;
-  end
-  else
-  begin
-    NStartX:= 0;
-    NStartY:= 0;
-  end;
-
-  Result:= DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany, AChanged, NStartX, NStartY);
-end;
-
-
-function TATEditorFinder.DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean;
-  out AChanged: boolean; AStartX, AStartY: integer): boolean;
-var
-  ConfirmThis, ConfirmContinue: boolean;
-  SNew: UnicodeString;
-begin
-  Result:= false;
-  AChanged:= false;
-  ClearMatchPos;
-
-  Result:= FindMatch_InEditor(AStartX, AStartY);
-  if Result then
-  begin
-    FEditor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y);
-
-    if AReplace then
-    begin
-      ConfirmThis:= true;
-      ConfirmContinue:= true;
-
-      if OptConfirmReplace then
-        if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, FMatchEdPos, FMatchEdEnd, AForMany, ConfirmThis, ConfirmContinue);
-
-      if not ConfirmContinue then
-        Exit(false);
-
-      if ConfirmThis then
-      begin
-        if OptRegex then
-          SNew:= GetRegexReplacement(FBuffer.SubString(MatchPos, MatchLen))
-        else
-          SNew:= StrReplace;
-
-        DoReplaceTextInEditor(FMatchEdPos, FMatchEdEnd, SNew, true, true);
-
-        FSkipLen:= Length(SNew);
-        if OptRegex then
-          Inc(FSkipLen, GetRegexSkipIncrement);
-
-        AChanged:= true;
-      end;
-    end;
-
-    if AReplace then
-      //don't select
-      FEditor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y)
-    else
-    if OptBack and OptPutBackwardSelection then
-      FEditor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y, FMatchEdEnd.X, FMatchEdEnd.Y)
-    else
-      FEditor.DoCaretSingle(FMatchEdEnd.X, FMatchEdEnd.Y, FMatchEdPos.X, FMatchEdPos.Y);
-  end;
+  Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged);
 end;
 
 function TATEditorFinder.DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
@@ -903,7 +793,10 @@ begin
         Result:= (not OptBack and (MatchPos<NStartPos)) or
                  (OptBack and (MatchPos>NStartPos));
         if not Result then
-          ClearMatchPos;
+        begin
+          FMatchPos:= -1;
+          FMatchLen:= 0;
+        end;
       end;
     end;
 end;
@@ -968,30 +861,7 @@ begin
   end;
 end;
 
-function TATEditorFinder.IsSelStartsAtMatch_InEditor: boolean;
-var
-  Caret: TATCaretItem;
-  X1, Y1, X2, Y2: integer;
-  bSel: boolean;
-begin
-  Result:= false;
-  if FEditor.Carets.Count=0 then exit;
-  Caret:= FEditor.Carets[0];
-  Caret.GetRange(X1, Y1, X2, Y2, bSel);
-  if not bSel then exit;
-
-  //allow to replace, also if selection=Strfind
-  Result:=
-    (
-     (FMatchEdPos.X=X1) and
-     (FMatchEdPos.Y=Y1) and
-     (FMatchEdEnd.X=X2) and
-     (FMatchEdEnd.Y=Y2)
-    ) or
-    ((StrFind<>'') and (FEditor.TextSelected=StrFind));
-end;
-
-function TATEditorFinder.IsSelStartsAtMatch_Buffered: boolean;
+function TATEditorFinder.IsSelectionStartsAtFoundMatch: boolean;
 var
   Caret: TATCaretItem;
   X1, Y1, X2, Y2: integer;
@@ -1025,21 +895,11 @@ begin
   if FEditor.ModeReadOnly then exit;
   //FReplacedAtEndOfText:= false;
 
-  if OptRegex then
+  if not IsSelectionStartsAtFoundMatch then
   begin
-    if not IsSelStartsAtMatch_Buffered then
-    begin
-      DoFindOrReplace_Buffered(false, false, false, bSel);
-      exit;
-    end;
-  end
-  else
-  begin
-    if not IsSelStartsAtMatch_InEditor then
-    begin
-      DoFindOrReplace_InEditor(false, false, false, bSel);
-      exit;
-    end;
+    //do Find-next (from caret)
+    DoFindOrReplace_Buffered(false, false, false, bSel);
+    exit;
   end;
 
   Caret:= FEditor.Carets[0];
@@ -1072,7 +932,8 @@ begin
   OptCase:= false;
   OptWords:= false;
   OptRegex:= false;
-  ClearMatchPos;
+  FMatchPos:= -1;
+  FMatchLen:= 0;
 
   FRegex:= TRegExpr.Create;
   FRegex.ModifierS:= false; //don't catch all text by .*
@@ -1130,16 +991,8 @@ var
 begin
   if Assigned(FOnFound) then
   begin
-    if OptRegex then
-    begin
-      P1:= ConvertBufferPosToCaretPos(MatchPos);
-      P2:= ConvertBufferPosToCaretPos(MatchPos+MatchLen);
-    end
-    else
-    begin
-      P1:= FMatchEdPos;
-      P2:= FMatchEdEnd;
-    end;
+    P1:= ConvertBufferPosToCaretPos(MatchPos);
+    P2:= ConvertBufferPosToCaretPos(MatchPos+MatchLen);
     FOnFound(Self, P1, P2);
   end;
 end;
@@ -1260,66 +1113,6 @@ begin
     P2:= ConvertBufferPosToCaretPos(APos+ALen);
     FEditor.DoCaretSingle(P1.X, P1.Y);
     FOnConfirmReplace(Self, P1, P2, true, AConfirmThis, AConfirmContinue);
-  end;
-end;
-
-
-function TATEditorFinder.IsLineMatch(const AStrFind, AStrLine: UnicodeString; AIndexInLine: integer): boolean;
-//1- of not OptCase, AStrFind must be upcased
-//2- index check must be in caller
-var
-  PtrFind, PtrLine: PWideChar;
-  k: integer;
-  ok: boolean;
-begin
-  Result:= true;
-  PtrFind:= @AStrFind[1];
-  PtrLine:= @AStrLine[AIndexInLine];
-  for k:= 1 to Length(AStrFind) do
-  begin
-    if OptCase then
-      ok:= PtrFind^=PtrLine^
-    else
-      ok:= PtrFind^=UpCase(PtrLine^);
-    if not ok then exit(false);
-    Inc(PtrFind);
-    Inc(PtrLine);
-  end;
-end;
-
-function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer): boolean;
-//todo:
-//OptBack
-//consider multiline StrFind
-//OptWrap
-var
-  SFind, SLine: UnicodeString;
-  NLenFind, NLen, NStartOffset: integer;
-  IndexLine, IndexChar: integer;
-begin
-  Result:= false;
-  if StrFind='' then Exit;
-
-  SFind:= StrFind;
-  if not OptCase then
-    SFind:= UpperCase(SFind);
-  NLenFind:= Length(SFind);
-
-  NStartOffset:= AStartX;
-  for IndexLine:= AStartY to FEditor.Strings.Count-1 do
-  begin
-    SLine:= FEditor.Strings.Lines[IndexLine];
-    NLen:= Length(SLine);
-    for IndexChar:= NStartOffset+1 to NLen-NLenFind+1 do
-      if IsLineMatch(SFind, SLine, IndexChar) then
-      begin
-        Result:= true;
-        FMatchEdPos:= Point(IndexChar-1, IndexLine);
-        FMatchEdEnd:= Point(IndexChar-1+NLenFind, IndexLine);
-        DoOnFound;
-        Exit
-      end;
-    NStartOffset:= 0;
   end;
 end;
 
