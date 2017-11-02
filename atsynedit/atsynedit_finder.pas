@@ -1310,7 +1310,7 @@ function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer): boolean;
 //todo: consider OptBack
 var
   NParts: integer;
-  SLineLooped: string;
+  SLinePart, SLineLooped: string;
   ListParts, ListLooped: TStringList;
   //
   function GetLineLooped(AIndex: integer): string;
@@ -1319,6 +1319,14 @@ var
       Result:= SLineLooped
     else
       Result:= ListLooped[AIndex];
+  end;
+  //
+  function GetLinePart(AIndex: integer): string;
+  begin
+    if (NParts=1) or (AIndex=0) then
+      Result:= SLinePart
+    else
+      Result:= ListParts[AIndex];
   end;
   //
 var
@@ -1342,11 +1350,14 @@ begin
     ListParts.Text:= UTF8Encode(SFind);
     NParts:= ListParts.Count;
     if NParts=0 then exit;
-    if NParts>FEditor.Strings.Count-AStartY then exit;
-    NLenPart:= Length(UTF8Decode(ListParts[0]));
 
-    for IndexLine:= AStartY to FEditor.Strings.Count-NParts do
+    SLinePart:= ListParts[0];
+    if NParts>FEditor.Strings.Count-AStartY then exit;
+    NLenPart:= Length(UTF8Decode(SLinePart));
+
+    for IndexLine:= AStartY to FEditor.Strings.Count-1 do
     begin
+      if not FEditor.Strings.IsIndexValid(IndexLine) then exit;
       SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
       if NParts>1 then
       begin
@@ -1357,12 +1368,12 @@ begin
       end;
 
       //quick check by len
-      if Length(SLineLooped)<Length(ListParts[0]) then Continue;
+      if Length(SLineLooped)<Length(SLinePart) then Continue;
       if NParts>1 then
       begin
         for i:= 1 to NParts-2 do
-          if Length(GetLineLooped(i))<>Length(ListParts[i]) then Continue;
-        if Length(GetLineLooped(NParts-1))<Length(ListParts[NParts-1]) then Continue;
+          if Length(GetLineLooped(i))<>Length(GetLinePart(i)) then Continue;
+        if Length(GetLineLooped(NParts-1))<Length(GetLinePart(NParts-1)) then Continue;
       end;
 
       if NParts=1 then
@@ -1388,9 +1399,9 @@ begin
           FMatchEdPos.X:= IndexChar;
           FMatchEdEnd.Y:= IndexLine+NParts-1;
           if NParts=1 then
-            FMatchEdEnd.X:= IndexChar+Length(UTF8Decode(ListParts[0]))
+            FMatchEdEnd.X:= IndexChar+NLenPart
           else
-            FMatchEdEnd.X:= Length(UTF8Decode(ListParts[NParts-1]));
+            FMatchEdEnd.X:= Length(UTF8Decode(GetLinePart(NParts-1)));
           DoOnFound;
           Exit
         end;
