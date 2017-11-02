@@ -797,6 +797,7 @@ end;
 
 function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
+//todo: consider OptWrap
 var
   Caret: TATCaretItem;
   NStartX, NStartY: integer;
@@ -1288,17 +1289,12 @@ begin
 end;
 
 function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer): boolean;
-//todo:
-//OptBack
-//consider multiline StrFind
-//OptWrap
+//todo: consider OptBack
 var
   SFind, SLine: UnicodeString;
   NStartOffset, NParts, NLenPart0, NLenLine0: integer;
-  IndexLine, IndexChar: integer;
-  ListParts: TStringList;
-  ListLines: TStringList;
-  i: integer;
+  IndexLine, IndexChar, i: integer;
+  ListParts, ListLines: TStringList;
 begin
   Result:= false;
   if StrFind='' then Exit;
@@ -1326,7 +1322,7 @@ begin
       for i:= 0 to NParts-1 do
         ListLines.Add(FEditor.Strings.Items[IndexLine+i].ItemString);
 
-      //raw check ListLines, only by len
+      //quick check ListLines by len
       if Length(ListLines[0])<Length(ListParts[0]) then Continue;
       if NParts>1 then
       begin
@@ -1336,27 +1332,27 @@ begin
       end;
 
       SLine:= UTF8Decode(ListLines.Text);
-      SetLength(SLine, Length(SLine)-1); //delete trailing Eol
+      SetLength(SLine, Length(SLine)-1); //.Text gets trailing LF
       NLenLine0:= Length(UTF8Decode(ListLines[0]));
 
       //exact search
-      for IndexChar:= NStartOffset+1 to NLenLine0-NLenPart0+1 do
-        if IsLineMatch(SFind, SLine, IndexChar) then
+      for IndexChar:= NStartOffset to NLenLine0-NLenPart0 do
+        if IsLineMatch(SFind, SLine, IndexChar+1) then
         begin
           Result:= true;
           FMatchEdPos.Y:= IndexLine;
-          FMatchEdPos.X:= IndexChar-1;
+          FMatchEdPos.X:= IndexChar;
           FMatchEdEnd.Y:= IndexLine+NParts-1;
           if NParts=1 then
-            FMatchEdEnd.X:= IndexChar-1+Length(UTF8Decode(ListParts[0]))
+            FMatchEdEnd.X:= IndexChar+Length(UTF8Decode(ListParts[0]))
           else
             FMatchEdEnd.X:= Length(UTF8Decode(ListParts[NParts-1]));
           DoOnFound;
           Exit
         end;
+
       NStartOffset:= 0;
     end;
-
   finally
     FreeAndNil(ListParts);
     FreeAndNil(ListLines);
