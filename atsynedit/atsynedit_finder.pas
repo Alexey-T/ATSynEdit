@@ -1294,8 +1294,11 @@ function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer): boolean;
 //OptWrap
 var
   SFind, SLine: UnicodeString;
-  NLenFind, NLen, NStartOffset: integer;
+  NStartOffset, NParts, NLenPart0, NLenLine0: integer;
   IndexLine, IndexChar: integer;
+  ListParts: TStringList;
+  ListLines: TStringList;
+  i: integer;
 begin
   Result:= false;
   if StrFind='' then Exit;
@@ -1303,23 +1306,60 @@ begin
   SFind:= StrFind;
   if not OptCase then
     SFind:= UpperCase(SFind);
-  NLenFind:= Length(SFind);
 
-  NStartOffset:= AStartX;
-  for IndexLine:= AStartY to FEditor.Strings.Count-1 do
-  begin
-    SLine:= FEditor.Strings.Lines[IndexLine];
-    NLen:= Length(SLine);
-    for IndexChar:= NStartOffset+1 to NLen-NLenFind+1 do
-      if IsLineMatch(SFind, SLine, IndexChar) then
+  ListParts:= TStringList.Create;
+  ListLines:= TStringList.Create;
+  try
+    ListParts.TextLineBreakStyle:= tlbsLF;
+    ListLines.TextLineBreakStyle:= tlbsLF;
+    ListParts.Text:= UTF8Encode(SFind);
+    NParts:= ListParts.Count;
+    if NParts=0 then exit;
+    if NParts>FEditor.Strings.Count-AStartY then exit;
+    NLenPart0:= Length(UTF8Decode(ListParts[0]));
+
+    NStartOffset:= AStartX;
+    for IndexLine:= AStartY to FEditor.Strings.Count-NParts do
+    begin
+      //fill ListLines
+      ListLines.Clear;
+      for i:= 0 to NParts-1 do
+        ListLines.Add(FEditor.Strings.Items[IndexLine+i].ItemString);
+
+      //raw check ListLines, only by len
+      if Length(ListLines[0])<Length(ListParts[0]) then Continue;
+      if NParts>1 then
       begin
-        Result:= true;
-        FMatchEdPos:= Point(IndexChar-1, IndexLine);
-        FMatchEdEnd:= Point(IndexChar-1+NLenFind, IndexLine);
-        DoOnFound;
-        Exit
+        for i:= 1 to NParts-2 do
+          if Length(ListLines[i])<>Length(ListParts[i]) then Continue;
+        if Length(ListLines[NParts-1])<Length(ListParts[NParts-1]) then Continue;
       end;
-    NStartOffset:= 0;
+
+      SLine:= UTF8Decode(ListLines.Text);
+      SetLength(SLine, Length(SLine)-1); //delete trailing Eol
+      NLenLine0:= Length(UTF8Decode(ListLines[0]));
+
+      //exact search
+      for IndexChar:= NStartOffset+1 to NLenLine0-NLenPart0+1 do
+        if IsLineMatch(SFind, SLine, IndexChar) then
+        begin
+          Result:= true;
+          FMatchEdPos.Y:= IndexLine;
+          FMatchEdPos.X:= IndexChar-1;
+          FMatchEdEnd.Y:= IndexLine+NParts-1;
+          if NParts=1 then
+            FMatchEdEnd.X:= IndexChar-1+Length(UTF8Decode(ListParts[0]))
+          else
+            FMatchEdEnd.X:= Length(UTF8Decode(ListParts[NParts-1]));
+          DoOnFound;
+          Exit
+        end;
+      NStartOffset:= 0;
+    end;
+
+  finally
+    FreeAndNil(ListParts);
+    FreeAndNil(ListLines);
   end;
 end;
 
