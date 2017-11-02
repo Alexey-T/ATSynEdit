@@ -1332,7 +1332,8 @@ var
 var
   SFind, SLineTest: UnicodeString;
   NStartOffset, NLenPart, NLenLooped: integer;
-  IndexLine, IndexChar, i: integer;
+  IndexLine, IndexChar, IndexLineMax, i: integer;
+  bOk: boolean;
 begin
   Result:= false;
   if StrFind='' then Exit;
@@ -1340,6 +1341,9 @@ begin
   SFind:= StrFind;
   if not OptCase then
     SFind:= WideUpperCase(SFind);
+
+  IndexLineMax:= FEditor.Strings.Count-1;
+  FPrevProgress:= 0;
 
   ListParts:= TStringList.Create;
   ListLooped:= TStringList.Create;
@@ -1355,8 +1359,17 @@ begin
     if NParts>FEditor.Strings.Count-AStartY then exit;
     NLenPart:= Length(UTF8Decode(SLinePart));
 
-    for IndexLine:= AStartY to FEditor.Strings.Count-1 do
+    for IndexLine:= AStartY to IndexLineMax do
     begin
+      if IsProgressNeeded(IndexLine) then
+        if Assigned(FOnProgress) then
+        begin
+          if Application.Terminated then exit;
+          bOk:= true;
+          FOnProgress(Self, IndexLine, IndexLineMax, bOk);
+          if not bOk then Break;
+        end;
+
       if not FEditor.Strings.IsIndexValid(IndexLine) then exit;
       SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
       if NParts>1 then
