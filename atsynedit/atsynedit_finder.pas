@@ -50,7 +50,7 @@ type
     FOnBadRegex: TNotifyEvent;
     procedure ClearMatchPos; virtual;
     function IsMatchUsual(APos: integer): boolean;
-    function DoFind_Usual(AFromPos: integer): boolean;
+    //function DoFind_Usual(AFromPos: integer): boolean;
     function DoFind_Regex(AFromPos: integer): boolean;
     procedure DoCollect_Usual(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
     procedure DoCollect_Regex(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
@@ -228,6 +228,13 @@ begin
 end;
 
 function TATTextFinder.IsMatchUsual(APos: integer): boolean;
+begin
+  Result:= false;
+  ShowMessage('Error: Finder.IsMatchUsual called in non-regex');
+end;
+
+(*
+function TATTextFinder.IsMatchUsual(APos: integer): boolean;
 var
   LenF, LastPos: integer;
 begin
@@ -251,6 +258,7 @@ begin
         ((APos <= 1) or not IsWordChar(StrText[APos - 1])) and
         ((APos >= LastPos) or not IsWordChar(StrText[APos + LenF]));
 end;
+*)
 
 procedure TATTextFinder.SetStrFind(const AValue: UnicodeString);
 begin
@@ -278,6 +286,7 @@ begin
 end;
 
 
+(*
 function TATTextFinder.DoFind_Usual(AFromPos: integer): boolean;
 var
   NLastPos, i: integer;
@@ -308,6 +317,7 @@ begin
       end;
   end;
 end;
+*)
 
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
 begin
@@ -1155,6 +1165,8 @@ begin
     Exit
   end;
 
+  ShowMessage('Error: Finder.FindMatch called for non-regex');
+  (*
   //usual code
   if not ANext then
   begin
@@ -1172,6 +1184,7 @@ begin
 
   Result:= DoFind_Usual(FMatchPos);
   if Result then DoOnFound;
+  *)
 end;
 
 procedure TATEditorFinder.DoOnFound;
