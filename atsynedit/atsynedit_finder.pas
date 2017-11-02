@@ -421,6 +421,7 @@ procedure TATEditorFinder.DoCollect_Regex(AList: TList; AFromPos: integer; AWith
 var
   bOk, bContinue: boolean;
   Res: TATFinderResult;
+  P1, P2: TPoint;
 begin
   AList.Clear;
   if StrFind='' then exit;
@@ -432,6 +433,8 @@ begin
     FRegex.Expression:= StrFind;
     FRegex.InputString:= StrText;
     if not FRegex.ExecPos(AFromPos) then exit;
+    P1:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
+    P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
   except
     if Assigned(FOnBadRegex) then
       FOnBadRegex(Self);
@@ -441,20 +444,13 @@ begin
   bOk:= true;
   if AWithConfirm then
   begin
-    DoConfirmReplace(
-      ConvertBufferPosToCaretPos(FRegex.MatchPos[0]),
-      ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]),
-      bOk,
-      bContinue);
+    DoConfirmReplace(P1, P2, bOk, bContinue);
     if not bContinue then exit;
   end;
 
   if bOk then
   begin
-    Res:= TATFinderResult.Create(
-      ConvertBufferPosToCaretPos(FRegex.MatchPos[0]),
-      ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0])
-      );
+    Res:= TATFinderResult.Create(P1, P2);
     AList.Add(Res);
 
     if AWithEvent then
@@ -467,22 +463,18 @@ begin
 
   while FRegex.ExecNext do
   begin
+    P1:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
+    P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
+
     if Application.Terminated then exit;
     if AWithConfirm then
     begin
-      DoConfirmReplace(
-        ConvertBufferPosToCaretPos(FRegex.MatchPos[0]),
-        ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]),
-        bOk,
-        bContinue);
+      DoConfirmReplace(P1, P2, bOk, bContinue);
       if not bContinue then exit;
       if not bOk then Continue;
     end;
 
-    Res:= TATFinderResult.Create(
-      ConvertBufferPosToCaretPos(FRegex.MatchPos[0]),
-      ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0])
-      );
+    Res:= TATFinderResult.Create(P1, P2);
     AList.Add(Res);
 
     if AWithEvent then
