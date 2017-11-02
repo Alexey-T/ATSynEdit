@@ -108,8 +108,7 @@ type
     //
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(AStartX, AStartY: integer): boolean;
-    function IsLineMatch(const AStrFind, AStrLine: UnicodeString;
-      AIndexInLine: integer): boolean;
+    function IsStringMatch(PtrFind, PtrLine: PWideChar; ALenFind: integer): boolean;
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
     procedure UpdateBuffer_FromText(const AText: atString);
     procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
@@ -1283,27 +1282,36 @@ begin
 end;
 
 
-function TATEditorFinder.IsLineMatch(const AStrFind, AStrLine: UnicodeString; AIndexInLine: integer): boolean;
-//1- of not OptCase, AStrFind must be upcased
+function TATEditorFinder.IsStringMatch(PtrFind, PtrLine: PWideChar; ALenFind: integer): boolean;
+//1- of not OptCase, StrFind must be wide-upper-cased
 //2- index check must be in caller
 var
-  PtrFind, PtrLine: PWideChar;
-  k: integer;
-  ok: boolean;
+  charFind, charLine: WideChar;
+  code: word absolute charLine;
+  i: integer;
 begin
-  Result:= true;
-  PtrFind:= @AStrFind[1];
-  PtrLine:= @AStrLine[AIndexInLine];
-  for k:= 1 to Length(AStrFind) do
+  for i:= 1 to ALenFind do
   begin
-    if OptCase then
-      ok:= PtrFind^=PtrLine^
-    else
-      ok:= PtrFind^=WideUpperCase(PtrLine^)[1];
-    if not ok then exit(false);
+    charFind:= PtrFind^;
+    charLine:= PtrLine^;
+
+    if not OptCase then
+    begin
+      //like UpCase(char)
+      if (code>=Ord('a')) and (code<=Ord('z')) then
+        Dec(code, 32)
+      else
+      //call slow WideUpperCase only if not ascii
+      if code>=128 then
+        charLine:= WideUpperCase(charLine)[1];
+    end;
+
+    if charFind<>charLine then
+      exit(false);
     Inc(PtrFind);
     Inc(PtrLine);
   end;
+  Result:= true;
 end;
 
 function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer): boolean;
@@ -1331,7 +1339,7 @@ var
   //
 var
   SFind, SLineTest: UnicodeString;
-  NStartOffset, NLenPart, NLenLooped: integer;
+  NStartOffset, NLenPart, NLenLooped, NLenStrFind: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
   bOk: boolean;
 begin
@@ -1341,6 +1349,7 @@ begin
   SFind:= StrFind;
   if not OptCase then
     SFind:= WideUpperCase(SFind);
+  NLenStrFind:= Length(SFind);
 
   IndexLineMax:= FEditor.Strings.Count-1;
   FPrevProgress:= 0;
@@ -1405,7 +1414,10 @@ begin
         NStartOffset:= 0;
 
       for IndexChar:= NStartOffset to NLenLooped-NLenPart do
-        if IsLineMatch(SFind, SLineTest, IndexChar+1) then
+        if IsStringMatch(
+          @SFind[1],
+          @SLineTest[IndexChar+1],
+          NLenStrFind) then
         begin
           Result:= true;
           FMatchEdPos.Y:= IndexLine;
