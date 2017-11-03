@@ -375,16 +375,17 @@ Example adds 2 ranges and changes them later:
 
 Objects
 
-*    property Strings: Strings object
-*    property Carets: Carets object
-*    property Gutter: Gutter object
-*    property Keymap: Keymap object
-*    property Fold: Fold object
-*    property Markers: Markers object
-*    property Attribs: Attribs object
-*    property Colors: Colors object
-*    property Gaps: Gaps object
-*    property DimRanges: DimRanges object
+*    property Strings
+*    property Carets
+*    property Gutter
+*    property Keymap
+*    property Fold
+*    property Markers
+*    property Attribs
+*    property Colors
+*    property WrapInfo
+*    property Gaps
+*    property DimRanges
 
 Files
 
@@ -930,6 +931,14 @@ It updates TATLineParts. How it works:
 * For parts, which are partly selected, it makes slow loop over offsets in parts. This slow loop finds chars which are selected and inserts new parts (with selection color) for them.
 
 To find/insert parts to TATLineParts, funcs DoPartFind/ DoPartInsert are used.
+
+==How to control vert/horz scrolling?==
+
+Property LineTop is index of top visible line, it is not precise vert scroll position, if long wrapped lines present.
+
+Public prop: WrapInfo, it's list of wrapinfo items. You can read it to get all info about wrapped lines, at which offsets they are wrapped. This allows to make smart jump of caret on wrapped lines.
+
+Public props: ScrollVert, ScrollHorz. They are records, NPos is scroll pos. ScrollVert.NPos is index in WrapInfo list, change it to make precise scrolling (call Update() then). ScrollHorz.NPos is horz scroll pos, now it's the same as prop ColumnLeft.
 
 ==more==
 
