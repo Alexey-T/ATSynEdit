@@ -356,7 +356,6 @@ function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
 var
   Str: atString;
   bDelEmpty, bDeleteEol, bDeleteEol_Alt: boolean;
-  i: integer;
 begin
   Result:= false;
   AShift.X:= 0;
