@@ -263,10 +263,10 @@ begin
   Result:= [cResultCaretTop];
 end;
 
-function TATSynEdit.DoCommand_ScrollVert(ALines: integer;
+function TATSynEdit.DoCommand_ScrollByDelta(ALines, AColumns: integer;
   AKeepCaretOnScreen: boolean): TATCommandResults;
 begin
-  DoScrollByDelta(0, ALines);
+  DoScrollByDelta(AColumns, ALines);
   Result:= [cResultScroll];
 
   if AKeepCaretOnScreen then

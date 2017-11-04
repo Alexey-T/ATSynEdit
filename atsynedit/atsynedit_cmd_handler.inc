@@ -376,8 +376,10 @@ begin
     cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);
 
-    cCommand_ScrollLineUp:             Res:= DoCommand_ScrollVert(-1, FOptScrollLineCommandsKeepCaretOnScreen);
-    cCommand_ScrollLineDown:           Res:= DoCommand_ScrollVert(1, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollLineUp:             Res:= DoCommand_ScrollByDelta(-1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollLineDown:           Res:= DoCommand_ScrollByDelta(1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollColumnLeft:         Res:= DoCommand_ScrollByDelta(0, -1, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollColumnRight:        Res:= DoCommand_ScrollByDelta(0, 1, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollToCaretTop:         Res:= [cResultCaretTop];
     cCommand_ScrollToCaretBottom:      Res:= [cResultCaretBottom];
     cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];

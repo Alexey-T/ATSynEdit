@@ -154,6 +154,8 @@ begin
 
   M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
+  M.Add(cCommand_ScrollColumnLeft, 'scroll column left', [], []);
+  M.Add(cCommand_ScrollColumnRight, 'scroll column right', [], []);
   M.Add(cCommand_ScrollToCaretTop, 'scroll to top caret (of multi-carets)', [], []);
   M.Add(cCommand_ScrollToCaretBottom, 'scroll to bottom caret (of multi-carets)', [], []);
   M.Add(cCommand_ScrollToCaretLeft, 'scroll to left caret (of multi-carets)', [], []);

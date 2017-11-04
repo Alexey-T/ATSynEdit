@@ -851,7 +851,7 @@ type
     function DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean=false): TATCommandResults;
     function DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
     function DoCommand_GotoScreenSide(ASide: TATCaretScreenSide): TATCommandResults;
-    function DoCommand_ScrollVert(ALines: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
+    function DoCommand_ScrollByDelta(ALines, AColumns: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;
     function DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
@@ -4604,7 +4604,7 @@ end;
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
   with FScrollHorz do
-    NPos:= Max(0, Min(NPosLast, NPos+Dx));
+    NPos:= Max(0, NPos+Dx); //NPosLast here is 0
   with FScrollVert do
     NPos:= Max(0, Min(NPosLast, NPos+Dy));
 end;
