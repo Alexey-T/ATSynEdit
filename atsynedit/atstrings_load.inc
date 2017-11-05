@@ -1,6 +1,6 @@
 {$ifdef nn}begin end;{$endif}
 
-function SConvertAnsiToUtf8(const SA: string): string;
+function SConvertEnc_AnsiToUtf8(const SA: string): string;
 begin
   {$ifdef windows}
   case Windows.GetACP of
@@ -21,7 +21,7 @@ begin
   {$endif}
 end;
 
-function SConvertUtf8ToAnsi(const S: string): string;
+function SConvertEnc_Utf8ToAnsi(const S: string): string;
 begin
   {$ifdef windows}
   case Windows.GetACP of
@@ -41,7 +41,6 @@ begin
   Result:= UTF8ToCP1250(S);
   {$endif}
 end;
-
 
 function IsStreamWithSignature(Stream: TStream; const Sign: string): boolean;
 var
@@ -308,7 +307,7 @@ begin
               Move(Buf[NStart], SA[1], Len);
 
               if FEncodingCodepage='' then
-                SUtf8:= SConvertAnsiToUTF8(SA)
+                SUtf8:= SConvertEnc_AnsiToUTF8(SA)
               else
                 SUtf8:= ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded);
 

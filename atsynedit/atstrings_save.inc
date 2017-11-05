@@ -29,7 +29,7 @@ begin
       cEncAnsi:
         begin
           if FEncodingCodepage='' then
-            SA:= SConvertUtf8ToAnsi(SA)
+            SA:= SConvertEnc_Utf8ToAnsi(SA)
           else
             SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
 
