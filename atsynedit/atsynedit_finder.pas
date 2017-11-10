@@ -173,6 +173,21 @@ begin
   Result:= StringReplace(Result, #1, '\\', [rfReplaceAll]);
 end;
 
+procedure StringList_Reverse(L: TStringList);
+var
+  LTemp: TStringList;
+  i: integer;
+begin
+  LTemp:= TStringList.Create;
+  try
+    for i:= L.Count-1 downto 0 do
+      LTemp.Add(L[i]);
+    L.Assign(LTemp);
+  finally
+    LTemp.Free;
+  end;
+end;
+
 function STestStringMatch(PtrFind, PtrLine: PWideChar; LenStrFind: integer; OptCaseSensitive: boolean): boolean;
 //1- if case-insensitive, PtrLine str must be wide-upper-cased
 //2- index check must be in caller
@@ -780,13 +795,17 @@ function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boo
   out AChanged: boolean): boolean;
 var
   Caret: TATCaretItem;
-  NStartX, NStartY, NLastY: integer;
+  NStartX, NStartY, NLastY, NLines: integer;
 begin
   Result:= false;
   AChanged:= false;
 
   if FEditor.Carets.Count=0 then exit;
   Caret:= FEditor.Carets[0];
+
+  NLines:= FEditor.Strings.Count;
+  if NLines=0 then exit;
+  NLastY:= NLines-1;
 
   if OptFromCaret then
   begin
@@ -795,12 +814,19 @@ begin
   end
   else
   begin
-    NStartX:= 0;
-    NStartY:= 0;
+    if not OptBack then
+    begin
+      NStartX:= 0;
+      NStartY:= 0;
+    end
+    else
+    begin
+      NStartX:= Length(FEditor.Strings.Lines[NLastY]);
+      NStartY:= NLastY;
+    end;
   end;
 
   Result:= DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany, AChanged, NStartX, NStartY);
-  NLastY:= FEditor.Strings.Count-1;
 
   if (not Result) and (OptWrapped and not OptInSelection) then
     if (not OptBack and ((NStartX>0) or (NStartY>0))) or
@@ -1261,7 +1287,7 @@ var
   SLinePart, SLineLooped: string;
   ListParts, ListLooped: TStringList;
   //
-  function GetLineLooped(AIndex: integer): string;
+  function _GetLineLooped(AIndex: integer): string;
   begin
     if (NParts=1) or (AIndex=0) then
       Result:= SLineLooped
@@ -1272,7 +1298,7 @@ var
       Result:= '';
   end;
   //
-  function GetLinePart(AIndex: integer): string;
+  function _GetLinePart(AIndex: integer): string;
   begin
     if (NParts=1) or (AIndex=0) then
       Result:= SLinePart
@@ -1281,6 +1307,27 @@ var
       Result:= ListParts[AIndex]
     else
       Result:= '';
+  end;
+  //
+  function _ComparePartsbyLen: boolean;
+  var
+    i: integer;
+  begin
+    Result:= true;
+    for i:= 1 to NParts-2 do
+      if Length(_GetLineLooped(i))<>Length(_GetLinePart(i)) then exit(false);
+    if Length(_GetLineLooped(NParts-1))<Length(_GetLinePart(NParts-1)) then exit(false);
+  end;
+  //
+  function _GetLineToTest: UnicodeString;
+  begin
+    if NParts=1 then
+      Result:= UTF8Decode(SLineLooped)
+    else
+    begin
+      Result:= UTF8Decode(ListLooped.Text);
+      SetLength(Result, Length(Result)-1); //.Text adds trailing LF
+    end;
   end;
   //
 var
@@ -1307,6 +1354,8 @@ begin
     NParts:= ListParts.Count;
     if NParts=0 then exit;
 
+    if OptBack then
+      StringList_Reverse(ListParts);
     SLinePart:= ListParts[0];
     NLenPart:= Length(UTF8Decode(SLinePart));
 
@@ -1338,20 +1387,9 @@ begin
         //quick check by len
         if Length(SLineLooped)<Length(SLinePart) then Continue;
         if NParts>1 then
-        begin
-          for i:= 1 to NParts-2 do
-            if Length(GetLineLooped(i))<>Length(GetLinePart(i)) then Continue;
-          if Length(GetLineLooped(NParts-1))<Length(GetLinePart(NParts-1)) then Continue;
-        end;
+          if not _ComparePartsbyLen then Continue;
 
-        if NParts=1 then
-          SLineTest:= SLineLooped
-        else
-        begin
-          SLineTest:= UTF8Decode(ListLooped.Text);
-          SetLength(SLineTest, Length(SLineTest)-1); //.Text adds trailing LF
-        end;
-
+        SLineTest:= _GetLineToTest;
         SLineLoopedWide:= UTF8Decode(SLineLooped);
         NLenLooped:= Length(SLineLoopedWide);
 
@@ -1375,7 +1413,7 @@ begin
             if NParts=1 then
               FMatchEdEnd.X:= IndexChar+NLenPart
             else
-              FMatchEdEnd.X:= Length(UTF8Decode(GetLinePart(NParts-1)));
+              FMatchEdEnd.X:= Length(UTF8Decode(_GetLinePart(NParts-1)));
             if AWithEvent then
               DoOnFound;
             Exit(true);
@@ -1386,8 +1424,68 @@ begin
     //if OptBack
       for IndexLine:= AStartY downto 0 do
       begin
-        //todo
-      end;
+        if IsProgressNeeded(IndexLine) then
+          if Assigned(FOnProgress) then
+          begin
+            if Application.Terminated then exit;
+            bOk:= true;
+            FOnProgress(Self, IndexLine, IndexLineMax, bOk); //todo: this is back progress
+            if not bOk then Break;
+          end;
+
+        SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
+        if NParts>1 then
+        begin
+          ListLooped.Clear;
+          ListLooped.Add(SLineLooped);
+          for i:= 1 to NParts-1 do //store ListLooped as reversed
+            if FEditor.Strings.IsIndexValid(IndexLine-i) then
+              ListLooped.Insert(0, FEditor.Strings.Items[IndexLine-i].ItemString);
+        end;
+
+        //quick check by len
+        if Length(SLineLooped)<Length(SLinePart) then Continue;
+        if NParts>1 then
+          if not _ComparePartsbyLen then Continue;
+
+        SLineTest:= _GetLineToTest;
+        SLineLoopedWide:= UTF8Decode(SLineLooped);
+        NLenLooped:= Length(SLineLoopedWide);
+
+        //exact search
+        if IndexLine=AStartY then
+          NStartOffset:= AStartX
+        else
+          NStartOffset:= NLenLooped;
+
+        for IndexChar:= NStartOffset-NLenPart downto 0 do
+        begin
+          bOk:= STestStringMatch(@SFind[1], @SLineTest[IndexChar+1], NLenStrFind, OptCase);
+          if bOk and OptWords then
+            bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedWide[IndexChar])) and
+                  ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedWide[IndexChar+NLenPart+1]));
+          if bOk then
+          begin
+            if NParts=1 then
+            begin
+              FMatchEdEnd.Y:= IndexLine;
+              FMatchEdEnd.X:= IndexChar;
+              FMatchEdPos.Y:= IndexLine;
+              FMatchEdPos.X:= IndexChar+NLenPart;
+            end
+            else
+            begin
+              FMatchEdEnd.Y:= IndexLine;
+              FMatchEdEnd.X:= Length(UTF8Decode(_GetLinePart(0)));
+              FMatchEdPos.Y:= IndexLine-NParts+1;
+              FMatchEdPos.X:= Length(FEditor.Strings.Lines[FMatchEdPos.Y]) - Length(UTF8Decode(_GetLinePart(NParts-1)));
+            end;
+            if AWithEvent then
+              DoOnFound;
+            Exit(true);
+          end;
+        end;
+      end
   finally
     FreeAndNil(ListParts);
     FreeAndNil(ListLooped);
