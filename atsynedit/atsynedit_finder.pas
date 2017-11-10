@@ -354,9 +354,6 @@ begin
     Res:= TATFinderResult.Create(FMatchEdPos, FMatchEdEnd);
     AList.Add(Res);
 
-    if AWithEvent then
-      DoOnFound;
-
     if IsProgressNeeded(FMatchEdPos.Y) then
       if Assigned(FOnProgress) then
       begin
