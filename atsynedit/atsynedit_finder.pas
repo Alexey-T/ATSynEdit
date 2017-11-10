@@ -1291,8 +1291,10 @@ function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer;
 //todo: consider OptBack
 var
   NParts: integer;
-  SLinePart, SLineLooped: string;
   ListParts, ListLooped: TStringList;
+  SLinePart, SLineLooped: string;
+  SLinePartW, SLineLoopedW: UnicodeString;
+  NLenPart, NLenLooped: integer;
   //---------
   function _GetLineLooped(AIndex: integer): string;
   begin
@@ -1335,30 +1337,32 @@ var
     Result:= false;
 
     //compare 1st part
-    S1:= UTF8Encode(SLinePart);
-    S2:= UTF8Encode(SLineLooped);
+    S1:= SLinePartW;
+    S2:= SLineLoopedW;
     if Length(S1)>Length(S2) then exit;
 
     if NParts=1 then
     begin
+      //test 1st part at given offset
       if not STestStringMatch(@S1[1], @S2[AEndOffset-Length(S1)], Length(S1), OptCase) then exit;
     end
     else
     begin
+      //test 1st part at begin
       if not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
 
-      //compare middle parts
+      //test middle parts
       for i:= 1 to NParts-2 do
       begin
-        S1:= UTF8Encode(ListParts[i]);
-        S2:= UTF8Encode(ListLooped[i]);
+        S1:= UTF8Decode(ListParts[i]);
+        S2:= UTF8Decode(ListLooped[i]);
         if Length(S1)<>Length(S2) then exit;
         if not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
       end;
 
-      //compare last part at end
-      S1:= UTF8Encode(ListParts[NParts-1]);
-      S2:= UTF8Encode(ListLooped[NParts-1]);
+      //test last part at end
+      S1:= UTF8Decode(ListParts[NParts-1]);
+      S2:= UTF8Decode(ListLooped[NParts-1]);
       if Length(S1)>Length(S2) then exit;
       if not STestStringMatch(@S1[1], @S2[Length(S2)-Length(S1)+1], Length(S1), OptCase) then exit;
     end;
@@ -1369,14 +1373,14 @@ var
   function _GetLineToTest: UnicodeString;
   begin
     if NParts=1 then
-      Result:= UTF8Decode(SLineLooped)
+      Result:= SLineLoopedW
     else
       Result:= UTF8Decode(StringList_GetText(ListLooped));
   end;
   //
 var
-  SFind, SLineToTest, SLineLoopedWide: UnicodeString;
-  NStartOffset, NLenPart, NLenLooped, NLenStrFind: integer;
+  SFind, SLineToTest: UnicodeString;
+  NStartOffset, NLenStrFind: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
   bOk: boolean;
 begin
@@ -1401,7 +1405,8 @@ begin
     if OptBack then
       StringList_Reverse(ListParts);
     SLinePart:= ListParts[0];
-    NLenPart:= Length(UTF8Decode(SLinePart));
+    SLinePartW:= UTF8Decode(SLinePart);
+    NLenPart:= Length(SLinePartW);
 
     FPrevProgress:= 0;
     IndexLineMax:= FEditor.Strings.Count-NParts;
@@ -1420,6 +1425,9 @@ begin
           end;
 
         SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
+        SLineLoopedW:= UTF8Decode(SLineLooped);
+        NLenLooped:= Length(SLineLoopedW);
+
         if NParts>1 then
         begin
           ListLooped.Clear;
@@ -1435,8 +1443,6 @@ begin
           if not _CompareParts_ByLen then Continue;
 
         SLineToTest:= _GetLineToTest;
-        SLineLoopedWide:= UTF8Decode(SLineLooped);
-        NLenLooped:= Length(SLineLoopedWide);
 
         //exact search
         if IndexLine=AStartY then
@@ -1448,8 +1454,8 @@ begin
         begin
           bOk:= STestStringMatch(@SFind[1], @SLineToTest[IndexChar+1], NLenStrFind, OptCase);
           if bOk and OptWords then
-            bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedWide[IndexChar])) and
-                  ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedWide[IndexChar+NLenPart+1]));
+            bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
+                  ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+NLenPart+1]));
           if bOk then
           begin
             FMatchEdPos.Y:= IndexLine;
@@ -1479,6 +1485,9 @@ begin
           end;
 
         SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
+        SLineLoopedW:= UTF8Decode(SLineLooped);
+        NLenLooped:= Length(SLineLoopedW);
+
         if NParts>1 then
         begin
           ListLooped.Clear;
@@ -1493,9 +1502,6 @@ begin
         if NParts>1 then
           if not _CompareParts_ByLen then Continue;
 
-        SLineLoopedWide:= UTF8Decode(SLineLooped);
-        NLenLooped:= Length(SLineLoopedWide);
-
         //exact search
         if IndexLine=AStartY then
           NStartOffset:= AStartX
@@ -1507,8 +1513,8 @@ begin
         begin
           bOk:= _CompareParts_Back(IndexChar);
           //if bOk and OptWords then
-          //  bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedWide[IndexChar])) and
-          //        ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedWide[IndexChar+NLenPart+1]));
+          //  bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
+          //        ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+NLenPart+1]));
           //      //todo: rework word check to consider NParts>1
           if bOk then
           begin
