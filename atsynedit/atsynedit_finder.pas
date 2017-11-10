@@ -1464,7 +1464,8 @@ begin
         for IndexChar:= NStartOffset to NLenLooped-NLenPart do
         begin
           bOk:= STestStringMatch(@SFind[1], @SLineToTest[IndexChar+1], NLenStrFind, OptCase);
-          if bOk and OptWords then
+          //consider whole words (only for single line)
+          if bOk and OptWords and (NParts=1) then
             bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+NLenPart+1]));
           if bOk then
@@ -1523,10 +1524,10 @@ begin
         for IndexChar:= IfThen(NParts=1, NStartOffset+1, NLenPart) downto NLenPart do
         begin
           bOk:= _CompareParts_Back(IndexChar);
-          //if bOk and OptWords then
-          //  bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
-          //        ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+NLenPart+1]));
-          //      //todo: rework word check to consider NParts>1
+          //consider whole words (only for single line)
+          if bOk and OptWords and (NParts=1) then
+            bOk:= ((IndexChar>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar])) and
+                  ((IndexChar-1-NLenPart<1) or not IsWordChar(SLineLoopedW[IndexChar-1-NLenPart]));
           if bOk then
           begin
             if NParts=1 then
