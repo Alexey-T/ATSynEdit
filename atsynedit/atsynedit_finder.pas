@@ -1338,10 +1338,15 @@ var
     S1:= UTF8Encode(SLinePart);
     S2:= UTF8Encode(SLineLooped);
     if Length(S1)>Length(S2) then exit;
-    if not STestStringMatch(@S1[1], @S2[AEndOffset-Length(S1)], Length(S1), OptCase) then exit;
 
-    if NParts>1 then
+    if NParts=1 then
     begin
+      if not STestStringMatch(@S1[1], @S2[AEndOffset-Length(S1)], Length(S1), OptCase) then exit;
+    end
+    else
+    begin
+      if not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
+
       //compare middle parts
       for i:= 1 to NParts-2 do
       begin
@@ -1497,7 +1502,8 @@ begin
         else
           NStartOffset:= NLenLooped;
 
-        for IndexChar:= NStartOffset+1 downto NLenPart do
+        //for NParts>1 must be single compare
+        for IndexChar:= IfThen(NParts=1, NStartOffset+1, NLenPart) downto NLenPart do
         begin
           bOk:= _CompareParts_Back(IndexChar);
           //if bOk and OptWords then
