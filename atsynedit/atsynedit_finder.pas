@@ -802,7 +802,8 @@ function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boo
   out AChanged: boolean): boolean;
 var
   Caret: TATCaretItem;
-  NStartX, NStartY, NLastY, NLines: integer;
+  NStartX, NStartY, NLastX, NLastY, NLines: integer;
+  bStartAtEdge: boolean;
 begin
   Result:= false;
   AChanged:= false;
@@ -813,6 +814,7 @@ begin
   NLines:= FEditor.Strings.Count;
   if NLines=0 then exit;
   NLastY:= NLines-1;
+  NLastX:= Length(FEditor.Strings.Lines[NLastY]);
 
   if OptFromCaret then
   begin
@@ -828,23 +830,34 @@ begin
     end
     else
     begin
-      NStartX:= Length(FEditor.Strings.Lines[NLastY]);
+      NStartX:= NLastX;
       NStartY:= NLastY;
     end;
   end;
 
   Result:= DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany, AChanged, NStartX, NStartY);
 
-  if (not Result) and (OptWrapped and not OptInSelection) then
-    if (not OptBack and ((NStartX>0) or (NStartY>0))) or
-       (OptBack and (NStartY<NLastY)) then
+  if not Result and OptWrapped and not OptInSelection then
+  begin
+    if not OptBack then
+    begin
+      bStartAtEdge:= (NStartX=0) and (NStartY=0);
+      NStartX:= 0;
+      NStartY:= 0;
+    end
+    else
+    begin
+      bStartAtEdge:= (NStartX=NLastX) and (NStartY=NLastY);
+      NStartX:= NLastX;
+      NStartY:= NLastY;
+    end;
+
+    if not bStartAtEdge then
     begin
       //same as _buffered version:
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
-      //
-      if DoFindOrReplace_InEditor_Internal(ANext, false, AForMany, AChanged,
-        0, IfThen(not OptBack, 0, NLastY)) then
+      if DoFindOrReplace_InEditor_Internal(ANext, false, AForMany, AChanged, NStartX, NStartY) then
       begin
         Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, NStartX, NStartY, false)) or
                  (OptBack and IsPosSorted(NStartX, NStartY, FMatchEdPos.X, FMatchEdPos.Y, false));
@@ -852,6 +865,7 @@ begin
           ClearMatchPos;
       end;
     end;
+  end;
 end;
 
 
