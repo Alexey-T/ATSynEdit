@@ -520,7 +520,7 @@ begin
   Editor:= nil;
   FBuffer:= TATStringBuffer.Create;
   FSkipLen:= 0;
-  FFragments:= nil;
+  FFragments:= TList.Create;
   FFragmentIndex:= 0;
   //FReplacedAtEndOfText:= false;
 
@@ -533,8 +533,9 @@ end;
 destructor TATEditorFinder.Destroy;
 begin
   Editor:= nil;
-  FreeAndNil(FBuffer);
   DoFragmentsClear;
+  FreeAndNil(FFragments);
+  FreeAndNil(FBuffer);
   inherited;
 end;
 
@@ -601,7 +602,7 @@ begin
   if OptRegex then
     UpdateBuffer(true);
 
-  if FFragments=nil then
+  if FFragments.Count=0 then
     Result:= DoCountAll(AWithEvent)
   else
   begin
@@ -624,7 +625,7 @@ begin
   if OptRegex then
     UpdateBuffer(true);
 
-  if FFragments=nil then
+  if FFragments.Count=0 then
     Result:= DoReplaceAll
   else
   begin
@@ -1205,7 +1206,6 @@ var
 begin
   DoFragmentsClear;
   if Editor=nil then exit;
-  FFragments:= TList.Create;
 
   for i:= 0 to Editor.Carets.Count-1 do
   begin
@@ -1244,22 +1244,17 @@ procedure TATEditorFinder.DoFragmentsClear;
 var
   i: integer;
 begin
-  if Assigned(FFragments) then
-  begin
-    for i:= FFragments.Count-1 downto 0 do
-      TObject(FFragments[i]).Free;
-    FFragments.Clear;
-    FreeAndNil(FFragments);
-  end;
+  for i:= FFragments.Count-1 downto 0 do
+    TObject(FFragments[i]).Free;
+  FFragments.Clear;
 end;
 
 function TATEditorFinder.CurrentFragment: TATEditorFragment;
 begin
   Result:= nil;
   if OptInSelection then
-    if Assigned(FFragments) then
-      if (FFragmentIndex>=0) and (FFragmentIndex<FFragments.Count) then
-        Result:= TATEditorFragment(FFragments[FFragmentIndex]);
+    if (FFragmentIndex>=0) and (FFragmentIndex<FFragments.Count) then
+      Result:= TATEditorFragment(FFragments[FFragmentIndex]);
 end;
 
 procedure TATEditorFinder.SetFragmentIndex(AValue: integer);
@@ -1271,8 +1266,11 @@ begin
   begin
     FFragmentIndex:= AValue;
     Fr:= TATEditorFragment(FFragments[FFragmentIndex]);
-    StrText:= Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2);
-    FBuffer.SetupSlow(StrText);
+    if OptRegex then
+    begin
+      StrText:= Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2);
+      FBuffer.SetupSlow(StrText);
+    end;
   end;
 end;
 
