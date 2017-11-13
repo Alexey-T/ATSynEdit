@@ -100,7 +100,7 @@ type
     //
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean): boolean;
-    procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
+    procedure UpdateBuffer;
     procedure UpdateBuffer_FromText(const AText: UnicodeString);
     procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
     function ConvertBufferPosToCaretPos(APos: integer): TPoint;
@@ -132,6 +132,7 @@ type
     procedure DoFragmentsShow;
     procedure SetFragmentIndex(AValue: integer);
     function GetFragmentsTouched: boolean;
+    procedure UpdateFragments;
     function CurrentFragment: TATEditorFragment;
     property CurrentFragmentIndex: integer read FFragmentIndex write SetFragmentIndex;
   protected
@@ -492,27 +493,27 @@ begin
   StrText:= FBuffer.FText;
 end;
 
-procedure TATEditorFinder.UpdateBuffer(AUpdateFragmentsFirst: boolean);
+procedure TATEditorFinder.UpdateBuffer;
 var
   Fr: TATEditorFragment;
 begin
-  if AUpdateFragmentsFirst then
-  begin
-    if OptRegex then
-      OptBack:= false;
-    if OptInSelection then
-      OptFromCaret:= false;
-
-    DoFragmentsClear;
-    if OptInSelection then
-      DoFragmentsInit;
-  end;
-
   Fr:= CurrentFragment;
   if Assigned(Fr) then
     UpdateBuffer_FromText(Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2))
   else
     UpdateBuffer_FromStrings(Editor.Strings);
+end;
+
+procedure TATEditorFinder.UpdateFragments;
+begin
+  if OptRegex then
+    OptBack:= false;
+  if OptInSelection then
+    OptFromCaret:= false;
+
+  DoFragmentsClear;
+  if OptInSelection then
+    DoFragmentsInit;
 end;
 
 
@@ -602,8 +603,9 @@ function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
 var
   i: integer;
 begin
+  UpdateFragments;
   if OptRegex then
-    UpdateBuffer(true);
+    UpdateBuffer;
 
   if FFragments.Count=0 then
     Result:= DoCountAll(AWithEvent)
@@ -625,8 +627,10 @@ var
 begin
   Result:= 0;
   if Editor.ModeReadOnly then exit;
+
+  UpdateFragments;
   if OptRegex then
-    UpdateBuffer(true);
+    UpdateBuffer;
 
   if FFragments.Count=0 then
     Result:= DoReplaceAll
@@ -789,6 +793,7 @@ begin
     raise Exception.Create('Finder.Editor.Carets is empty');
   if AReplace and Editor.ModeReadOnly then exit;
 
+  UpdateFragments;
   DoFixCaretSelectionDirection;
   if OptRegex then
     Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged)
@@ -949,7 +954,8 @@ begin
   AChanged:= false;
   //FReplacedAtEndOfText:= false;
 
-  UpdateBuffer(true);
+  UpdateBuffer;
+
   NStartPos:= GetOffsetStartPos;
   Result:= DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
 
@@ -1086,7 +1092,7 @@ var
 begin
   Result:= false;
   if Editor.ModeReadOnly then exit;
-  //FReplacedAtEndOfText:= false;
+  UpdateFragments;
 
   if OptRegex then
   begin
