@@ -89,7 +89,6 @@ type
   TATEditorFinder = class(TATTextFinder)
   private
     FBuffer: TATStringBuffer;
-    FEditor: TATSynEdit;
     FSkipLen: integer;
     FOnFound: TATFinderFound;
     FOnConfirmReplace: TATFinderConfirmReplace;
@@ -139,6 +138,7 @@ type
     procedure DoOnFound; override;
     procedure DoConfirmReplace(APos, AEnd: TPoint; var AConfirmThis, AConfirmContinue: boolean);
   public
+    Editor: TATSynEdit;
     OptFromCaret: boolean;
     OptConfirmReplace: boolean;
     OptInSelection: boolean;
@@ -146,7 +146,6 @@ type
     //
     constructor Create;
     destructor Destroy; override;
-    property Editor: TATSynEdit read FEditor write FEditor;
     //
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoAction_ReplaceSelected: boolean;
@@ -323,17 +322,17 @@ begin
   AList.Clear;
   if StrFind='' then exit;
 
-  IndexLineMax:= FEditor.Strings.Count-1;
+  IndexLineMax:= Editor.Strings.Count-1;
   NStartX:= 0;
   NStartY:= 0;
   FPrevProgress:= 0;
 
   repeat
     if Application.Terminated then Break;
-    if not FEditor.Strings.IsIndexValid(NStartY) then Break;
+    if not Editor.Strings.IsIndexValid(NStartY) then Break;
     if not FindMatch_InEditor(NStartX, NStartY, AWithEvent) then Break;
 
-    if FMatchEdPos.X < Length(FEditor.Strings.Lines[FMatchEdPos.Y]) then
+    if FMatchEdPos.X < Length(Editor.Strings.Lines[FMatchEdPos.Y]) then
     begin
       NStartX:= FMatchEdEnd.X;
       NStartY:= FMatchEdEnd.Y;
@@ -436,7 +435,7 @@ begin
       if Assigned(FOnProgress) then
       begin
         bOk:= true;
-        FOnProgress(Self, Res.FPos.Y, FEditor.Strings.Count-1, bOk);
+        FOnProgress(Self, Res.FPos.Y, Editor.Strings.Count-1, bOk);
         if not bOk then exit;
       end;
   end;
@@ -505,7 +504,7 @@ begin
   if Assigned(Fr) then
     UpdateBuffer_FromText(Fr.Text)
   else
-    UpdateBuffer_FromStrings(FEditor.Strings);
+    UpdateBuffer_FromStrings(Editor.Strings);
 end;
 
 
@@ -513,7 +512,7 @@ constructor TATEditorFinder.Create;
 begin
   inherited;
 
-  FEditor:= nil;
+  Editor:= nil;
   FBuffer:= TATStringBuffer.Create;
   FSkipLen:= 0;
   FFragments:= nil;
@@ -528,7 +527,7 @@ end;
 
 destructor TATEditorFinder.Destroy;
 begin
-  FEditor:= nil;
+  Editor:= nil;
   FreeAndNil(FBuffer);
   DoFragmentsClear;
   inherited;
@@ -574,7 +573,7 @@ function TATEditorFinder.GetOffsetOfCaret: integer;
 var
   Pnt: TPoint;
 begin
-  with FEditor.Carets[0] do
+  with Editor.Carets[0] do
   begin
     Pnt.X:= PosX;
     Pnt.Y:= PosY;
@@ -615,7 +614,7 @@ var
   i: integer;
 begin
   Result:= 0;
-  if FEditor.ModeReadOnly then exit;
+  if Editor.ModeReadOnly then exit;
   UpdateBuffer(true);
 
   if FFragments=nil then
@@ -672,7 +671,7 @@ begin
       end;
 
       if OptRegex then
-        Str:= GetRegexReplacement(FEditor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
+        Str:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y))
       else
         Str:= StrReplace;
 
@@ -695,7 +694,7 @@ begin
       }
     end;
 
-    FEditor.DoEventChange;
+    Editor.DoEventChange;
   finally
     FreeAndNil(L);
   end;
@@ -709,7 +708,7 @@ var
   Strs: TATStrings;
 begin
   //replace in editor
-  Strs:= FEditor.Strings;
+  Strs:= Editor.Strings;
   //FReplacedAtEndOfText:=
   //  (APosEnd.Y>Strs.Count-1) or
   //  ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
@@ -718,7 +717,7 @@ begin
 
   if AUpdateBuffer then
   begin
-    FEditor.DoEventChange;
+    Editor.DoEventChange;
     UpdateBuffer_FromStrings(Strs);
   end;
 
@@ -728,7 +727,7 @@ begin
       //correct caret pos
       //e.g. replace "dddddd" to "--": move lefter
       //e.g. replace "ab" to "cd cd": move righter
-      FEditor.DoCaretSingle(PosAfter.X, PosAfter.Y);
+      Editor.DoCaretSingle(PosAfter.X, PosAfter.Y);
     end;
 end;
 
@@ -752,8 +751,8 @@ var
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
 begin
-  if FEditor.Carets.Count=0 then exit;
-  Caret:= FEditor.Carets[0];
+  if Editor.Carets.Count=0 then exit;
+  Caret:= Editor.Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
 
@@ -779,13 +778,13 @@ begin
   Result:= false;
   AChanged:= false;
 
-  if not Assigned(FEditor) then
+  if not Assigned(Editor) then
     raise Exception.Create('Finder.Editor not set');
   if StrFind='' then
     raise Exception.Create('Finder.StrFind is empty');
-  if FEditor.Carets.Count=0 then
+  if Editor.Carets.Count=0 then
     raise Exception.Create('Finder.Editor.Carets is empty');
-  if AReplace and FEditor.ModeReadOnly then exit;
+  if AReplace and Editor.ModeReadOnly then exit;
 
   DoFixCaretSelectionDirection;
   if OptRegex then
@@ -805,13 +804,13 @@ begin
   Result:= false;
   AChanged:= false;
 
-  if FEditor.Carets.Count=0 then exit;
-  Caret:= FEditor.Carets[0];
+  if Editor.Carets.Count=0 then exit;
+  Caret:= Editor.Carets[0];
 
-  NLines:= FEditor.Strings.Count;
+  NLines:= Editor.Strings.Count;
   if NLines=0 then exit;
   NLastY:= NLines-1;
-  NLastX:= Length(FEditor.Strings.Lines[NLastY]);
+  NLastX:= Length(Editor.Strings.Lines[NLastY]);
 
   if OptFromCaret then
   begin
@@ -880,7 +879,7 @@ begin
   Result:= FindMatch_InEditor(AStartX, AStartY, true);
   if Result then
   begin
-    FEditor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y);
+    Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y);
 
     if AReplace then
     begin
@@ -905,7 +904,7 @@ begin
             P1:= FMatchEdEnd;
             P2:= FMatchEdPos;
           end;
-          SNew:= GetRegexReplacement(FEditor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
+          SNew:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
         end
         else
           SNew:= StrReplace;
@@ -922,12 +921,12 @@ begin
 
     if AReplace then
       //don't select
-      FEditor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y)
+      Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y)
     else
     if OptBack and OptPutBackwardSelection then
-      FEditor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y, FMatchEdEnd.X, FMatchEdEnd.Y)
+      Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y, FMatchEdEnd.X, FMatchEdEnd.Y)
     else
-      FEditor.DoCaretSingle(FMatchEdEnd.X, FMatchEdEnd.Y, FMatchEdPos.X, FMatchEdPos.Y);
+      Editor.DoCaretSingle(FMatchEdEnd.X, FMatchEdEnd.Y, FMatchEdPos.X, FMatchEdPos.Y);
   end;
 end;
 
@@ -980,7 +979,7 @@ begin
   begin
     P1:= ConvertBufferPosToCaretPos(FMatchPos);
     P2:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
-    FEditor.DoCaretSingle(P1.X, P1.Y);
+    Editor.DoCaretSingle(P1.X, P1.Y);
 
     if AReplace then
     begin
@@ -1013,12 +1012,12 @@ begin
 
     if AReplace then
       //don't select
-      FEditor.DoCaretSingle(P1.X, P1.Y)
+      Editor.DoCaretSingle(P1.X, P1.Y)
     else
     if OptBack and OptPutBackwardSelection then
-      FEditor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y)
+      Editor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y)
     else
-      FEditor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y);
+      Editor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y);
   end;
 end;
 
@@ -1029,8 +1028,8 @@ var
   bSel: boolean;
 begin
   Result:= false;
-  if FEditor.Carets.Count=0 then exit;
-  Caret:= FEditor.Carets[0];
+  if Editor.Carets.Count=0 then exit;
+  Caret:= Editor.Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
 
@@ -1042,7 +1041,7 @@ begin
      (FMatchEdEnd.X=X2) and
      (FMatchEdEnd.Y=Y2)
     ) or
-    ((StrFind<>'') and (FEditor.TextSelected=StrFind));
+    ((StrFind<>'') and (Editor.TextSelected=StrFind));
 end;
 
 function TATEditorFinder.IsSelStartsAtMatch_Buffered: boolean;
@@ -1053,8 +1052,8 @@ var
   bSel: boolean;
 begin
   Result:= false;
-  if FEditor.Carets.Count=0 then exit;
-  Caret:= FEditor.Carets[0];
+  if Editor.Carets.Count=0 then exit;
+  Caret:= Editor.Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
 
@@ -1064,7 +1063,7 @@ begin
   //allow to replace, also if selection=Strfind
   Result:=
     ((PosOfBegin=FMatchPos) and (PosOfEnd=FMatchPos+FMatchLen)) or
-    ((StrFind<>'') and (FEditor.TextSelected=StrFind));
+    ((StrFind<>'') and (Editor.TextSelected=StrFind));
 end;
 
 function TATEditorFinder.DoAction_ReplaceSelected: boolean;
@@ -1076,7 +1075,7 @@ var
   SSelText, SNew: UnicodeString;
 begin
   Result:= false;
-  if FEditor.ModeReadOnly then exit;
+  if Editor.ModeReadOnly then exit;
   //FReplacedAtEndOfText:= false;
 
   if OptRegex then
@@ -1096,13 +1095,13 @@ begin
     end;
   end;
 
-  Caret:= FEditor.Carets[0];
+  Caret:= Editor.Carets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
   P1:= Point(X1, Y1);
   P2:= Point(X2, Y2);
 
-  SSelText:= FEditor.TextSelected;
+  SSelText:= Editor.TextSelected;
 
   Caret.EndX:= -1;
   Caret.EndY:= -1;
@@ -1199,12 +1198,12 @@ var
   i: integer;
 begin
   DoFragmentsClear;
-  if FEditor=nil then exit;
+  if Editor=nil then exit;
   FFragments:= TList.Create;
 
-  for i:= 0 to FEditor.Carets.Count-1 do
+  for i:= 0 to Editor.Carets.Count-1 do
   begin
-    Caret:= FEditor.Carets[i];
+    Caret:= Editor.Carets[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
     if not bSel then Continue;
     Fr:= TATEditorFragment.Create;
@@ -1212,7 +1211,7 @@ begin
     Fr.X2:= X2;
     Fr.Y1:= Y1;
     Fr.Y2:= Y2;
-    Fr.Text:= FEditor.Strings.TextSubstring(X1, Y1, X2, Y2);
+    Fr.Text:= Editor.Strings.TextSubstring(X1, Y1, X2, Y2);
     FFragments.Add(Fr);
   end;
 
@@ -1291,7 +1290,7 @@ begin
 
   if Assigned(FOnConfirmReplace) then
   begin
-    FEditor.DoCaretSingle(APos.X, APos.Y);
+    Editor.DoCaretSingle(APos.X, APos.Y);
     FOnConfirmReplace(Self, APos, AEnd, true, AConfirmThis, AConfirmContinue);
   end;
 end;
@@ -1420,7 +1419,7 @@ begin
     NLenPart:= Length(SLinePartW);
 
     FPrevProgress:= 0;
-    IndexLineMax:= FEditor.Strings.Count-NParts;
+    IndexLineMax:= Editor.Strings.Count-NParts;
 
     if not OptBack then
     //forward search
@@ -1435,7 +1434,7 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
+        SLineLooped:= Editor.Strings.Items[IndexLine].ItemString;
         SLineLoopedW:= UTF8Decode(SLineLooped);
         NLenLooped:= Length(SLineLoopedW);
 
@@ -1444,8 +1443,8 @@ begin
           ListLooped.Clear;
           ListLooped.Add(SLineLooped);
           for i:= 1 to NParts-1 do
-            if FEditor.Strings.IsIndexValid(IndexLine+i) then
-              ListLooped.Add(FEditor.Strings.Items[IndexLine+i].ItemString);
+            if Editor.Strings.IsIndexValid(IndexLine+i) then
+              ListLooped.Add(Editor.Strings.Items[IndexLine+i].ItemString);
         end;
 
         //quick check by len
@@ -1496,7 +1495,7 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLooped:= FEditor.Strings.Items[IndexLine].ItemString;
+        SLineLooped:= Editor.Strings.Items[IndexLine].ItemString;
         SLineLoopedW:= UTF8Decode(SLineLooped);
         NLenLooped:= Length(SLineLoopedW);
 
@@ -1505,8 +1504,8 @@ begin
           ListLooped.Clear;
           ListLooped.Add(SLineLooped);
           for i:= 1 to NParts-1 do //store ListLooped as reversed
-            if FEditor.Strings.IsIndexValid(IndexLine-i) then
-              ListLooped.Add(FEditor.Strings.Items[IndexLine-i].ItemString);
+            if Editor.Strings.IsIndexValid(IndexLine-i) then
+              ListLooped.Add(Editor.Strings.Items[IndexLine-i].ItemString);
         end;
 
         //quick check by len
@@ -1542,7 +1541,7 @@ begin
               FMatchEdPos.Y:= IndexLine;
               FMatchEdPos.X:= NLenPart;
               FMatchEdEnd.Y:= IndexLine-NParts+1;
-              FMatchEdEnd.X:= Length(FEditor.Strings.Lines[FMatchEdEnd.Y]) - Length(UTF8Decode(_GetLinePart(NParts-1)));
+              FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - Length(UTF8Decode(_GetLinePart(NParts-1)));
             end;
             if AWithEvent then
               DoOnFound;
