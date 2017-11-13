@@ -488,6 +488,9 @@ procedure TATEditorFinder.UpdateBuffer(AUpdateFragmentsFirst: boolean);
 var
   Fr: TATEditorFragment;
 begin
+  if not OptRegex then
+    raise Exception.Create('Finder UpdateBuffer called for non-regex mode');
+
   if AUpdateFragmentsFirst then
   begin
     if OptRegex then
@@ -593,7 +596,8 @@ function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
 var
   i: integer;
 begin
-  UpdateBuffer(true);
+  if OptRegex then
+    UpdateBuffer(true);
 
   if FFragments=nil then
     Result:= DoCountAll(AWithEvent)
@@ -615,27 +619,20 @@ var
 begin
   Result:= 0;
   if Editor.ModeReadOnly then exit;
-  UpdateBuffer(true);
+  if OptRegex then
+    UpdateBuffer(true);
 
   if FFragments=nil then
     Result:= DoReplaceAll
   else
   begin
     Result:= 0;
-    //fragments touched- do loop-downto,
-    //else its safe to do loop-to
-    if GetFragmentsTouched then
-      for i:= FFragments.Count-1 downto 0 do
-      begin
-        CurrentFragmentIndex:= i;
-        Inc(Result, DoReplaceAll);
-      end
-    else
-      for i:= 0 to FFragments.Count-1 do
-      begin
-        CurrentFragmentIndex:= i;
-        Inc(Result, DoReplaceAll);
-      end;
+    //always loop downto, coz multiline replacement deletes/adds lines
+    for i:= FFragments.Count-1 downto 0 do
+    begin
+      CurrentFragmentIndex:= i;
+      Inc(Result, DoReplaceAll);
+    end;
     CurrentFragmentIndex:= 0;
   end;
 end;
