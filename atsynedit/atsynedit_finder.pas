@@ -470,6 +470,9 @@ end;
 
 procedure TATEditorFinder.UpdateBuffer_FromText(const AText: UnicodeString);
 begin
+  if not OptRegex then
+    raise Exception.Create('Finder UpdateBuffer called for non-regex mode');
+
   FBuffer.SetupSlow(AText);
   StrText:= AText;
 end;
@@ -479,6 +482,9 @@ var
   Lens: array of integer;
   i: integer;
 begin
+  if not OptRegex then
+    raise Exception.Create('Finder UpdateBuffer called for non-regex mode');
+
   SetLength(Lens, AStrings.Count);
   for i:= 0 to Length(Lens)-1 do
     Lens[i]:= AStrings.LinesLen[i];
@@ -490,9 +496,6 @@ procedure TATEditorFinder.UpdateBuffer(AUpdateFragmentsFirst: boolean);
 var
   Fr: TATEditorFragment;
 begin
-  if not OptRegex then
-    raise Exception.Create('Finder UpdateBuffer called for non-regex mode');
-
   if AUpdateFragmentsFirst then
   begin
     if OptRegex then
@@ -715,7 +718,7 @@ begin
 
   Strs.TextReplaceRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, AReplacement, Shift, PosAfter);
 
-  if AUpdateBuffer then
+  if AUpdateBuffer and OptRegex then
   begin
     Editor.DoEventChange;
     UpdateBuffer_FromStrings(Strs);
@@ -1267,10 +1270,7 @@ begin
     FFragmentIndex:= AValue;
     Fr:= TATEditorFragment(FFragments[FFragmentIndex]);
     if OptRegex then
-    begin
-      StrText:= Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2);
-      FBuffer.SetupSlow(StrText);
-    end;
+      UpdateBuffer_FromText(Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2));
   end;
 end;
 
