@@ -79,8 +79,8 @@ type
 
   TATEditorFragment = class
   public
-    X1, Y1, X2, Y2: integer;
-    Text: UnicodeString;
+    X1, Y1,
+    X2, Y2: integer;
   end;
 
 type
@@ -507,7 +507,7 @@ begin
 
   Fr:= CurrentFragment;
   if Assigned(Fr) then
-    UpdateBuffer_FromText(Fr.Text)
+    UpdateBuffer_FromText(Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2))
   else
     UpdateBuffer_FromStrings(Editor.Strings);
 end;
@@ -1217,7 +1217,6 @@ begin
     Fr.X2:= X2;
     Fr.Y1:= Y1;
     Fr.Y2:= Y2;
-    Fr.Text:= Editor.Strings.TextSubstring(X1, Y1, X2, Y2);
     FFragments.Add(Fr);
   end;
 
@@ -1235,7 +1234,7 @@ begin
   for i:= 0 to FFragments.Count-1 do
   begin
     Fr:= TATEditorFragment(FFragments[i]);
-    S:= S+ Utf8Encode(Fr.Text) +
+    S:= S +
       Format(#10'--[%d:%d .. %d:%d]-----'#10, [Fr.Y1, Fr.X1, Fr.Y2, Fr.X2]);
   end;
   ShowMessage(S);
@@ -1264,12 +1263,15 @@ begin
 end;
 
 procedure TATEditorFinder.SetFragmentIndex(AValue: integer);
+var
+  Fr: TATEditorFragment;
 begin
   if FFragmentIndex=AValue then Exit;
   if (AValue>=0) and (AValue<FFragments.Count) then
   begin
     FFragmentIndex:= AValue;
-    StrText:= TATEditorFragment(FFragments[FFragmentIndex]).Text;
+    Fr:= TATEditorFragment(FFragments[FFragmentIndex]);
+    StrText:= Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2);
     FBuffer.SetupSlow(StrText);
   end;
 end;
