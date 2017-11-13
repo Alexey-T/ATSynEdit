@@ -68,7 +68,7 @@ type
     FOneLine: boolean;
     FOnCaretChanged: TNotifyEvent;
     function GetItem(N: integer): TATCaretItem;
-    procedure DeleteDups;
+    procedure DeleteDups(AJoinAdjacentCarets: boolean);
     function IsJoinNeeded(N1, N2: integer;
       out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
     function GetAsArray: TATPointArray;
@@ -82,7 +82,7 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATCaretItem read GetItem; default;
     procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
-    procedure Sort;
+    procedure Sort(AJoinAdjacentCarets: boolean=true);
     procedure Assign(Obj: TATCarets);
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfPosYAvg(APosY: integer): integer;
@@ -290,13 +290,13 @@ begin
     Result:= Obj1.PosX-Obj2.PosX;
 end;
 
-procedure TATCarets.Sort;
+procedure TATCarets.Sort(AJoinAdjacentCarets: boolean=true);
 begin
   FList.Sort(@_ListCaretsCompare);
-  DeleteDups;
+  DeleteDups(AJoinAdjacentCarets);
 end;
 
-procedure TATCarets.DeleteDups;
+procedure TATCarets.DeleteDups(AJoinAdjacentCarets: boolean);
 var
   i: integer;
   Item1, Item2: TATCaretItem;
@@ -310,7 +310,8 @@ begin
     if (Item1.PosY=Item2.PosY) and (Item1.PosX=Item2.PosX) then
       Delete(i);
 
-    if IsJoinNeeded(i, i-1, OutPosX, OutPosY, OutEndX, OutEndY) then
+    if AJoinAdjacentCarets and
+      IsJoinNeeded(i, i-1, OutPosX, OutPosY, OutEndX, OutEndY) then
     begin
       Delete(i);
       Item2.PosX:= OutPosX;
