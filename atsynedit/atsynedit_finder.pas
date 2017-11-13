@@ -1396,7 +1396,7 @@ var
   //
 var
   SFind, SLineToTest: UnicodeString;
-  NStartOffset, NLenStrFind: integer;
+  NStartOffset, NEndOffset, NLenStrFind: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
   bOk: boolean;
 begin
@@ -1429,7 +1429,7 @@ begin
 
     if not OptBack then
     //forward search
-      for IndexLine:= APosStart.Y to IndexLineMax do
+      for IndexLine:= APosStart.Y to APosEnd.Y do
       begin
         if IsProgressNeeded(IndexLine) then
           if Assigned(FOnProgress) then
@@ -1466,7 +1466,12 @@ begin
         else
           NStartOffset:= 0;
 
-        for IndexChar:= NStartOffset to NLenLooped-NLenPart do
+        if IndexLine=APosEnd.Y then
+          NEndOffset:= APosEnd.X
+        else
+          NEndOffset:= NLenLooped;
+
+        for IndexChar:= NStartOffset to NEndOffset-NLenPart do
         begin
           bOk:= STestStringMatch(@SFind[1], @SLineToTest[IndexChar+1], NLenStrFind, OptCase);
           //consider whole words (only for single line)
@@ -1490,7 +1495,7 @@ begin
       end
     else
     //backward search
-      for IndexLine:= APosStart.Y downto 0 do
+      for IndexLine:= APosStart.Y downto APosEnd.Y do
       begin
         if IsProgressNeeded(IndexLine) then
           if Assigned(FOnProgress) then
@@ -1525,8 +1530,13 @@ begin
         else
           NStartOffset:= NLenLooped;
 
+        if IndexLine=APosEnd.Y then
+          NEndOffset:= APosEnd.X
+        else
+          NEndOffset:= 0;
+
         //for NParts>1 must be single compare
-        for IndexChar:= IfThen(NParts=1, NStartOffset+1, NLenPart) downto NLenPart do
+        for IndexChar:= IfThen(NParts=1, NStartOffset+1, NLenPart) downto NEndOffset+NLenPart do
         begin
           bOk:= _CompareParts_Back(IndexChar);
           //consider whole words (only for single line)
