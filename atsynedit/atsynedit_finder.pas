@@ -99,7 +99,7 @@ type
     //FReplacedAtEndOfText: boolean;
     //
     procedure ClearMatchPos; override;
-    function FindMatch_InEditor(AStartX, AStartY: integer; AWithEvent: boolean): boolean;
+    function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean): boolean;
     procedure UpdateBuffer(AUpdateFragmentsFirst: boolean);
     procedure UpdateBuffer_FromText(const AText: UnicodeString);
     procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
@@ -116,8 +116,8 @@ type
     //
     function DoReplaceAll: integer;
     function DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
-      AStartX, AStartY: integer): boolean;
+    function DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean;
+      out AChanged: boolean; APosStart, APosEnd: TPoint): boolean;
     function DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean): boolean;
     function DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean;
@@ -315,7 +315,7 @@ end;
 procedure TATEditorFinder.DoCollect_Usual(AList: TList; AWithEvent, AWithConfirm: boolean);
 var
   IndexLineMax: integer;
-  NStartX, NStartY: integer;
+  PosStart, PosEnd: TPoint;
   bOk, bContinue: boolean;
   Res: TATFinderResult;
 begin
@@ -323,24 +323,26 @@ begin
   if StrFind='' then exit;
 
   IndexLineMax:= Editor.Strings.Count-1;
-  NStartX:= 0;
-  NStartY:= 0;
+  PosStart.X:= 0;
+  PosStart.Y:= 0;
+  PosEnd.Y:= IndexLineMax;
+  PosEnd.X:= Length(Editor.Strings.Lines[IndexLineMax]);
   FPrevProgress:= 0;
 
   repeat
     if Application.Terminated then Break;
-    if not Editor.Strings.IsIndexValid(NStartY) then Break;
-    if not FindMatch_InEditor(NStartX, NStartY, AWithEvent) then Break;
+    if not Editor.Strings.IsIndexValid(PosStart.Y) then Break;
+    if not FindMatch_InEditor(PosStart, PosEnd, AWithEvent) then Break;
 
     if FMatchEdPos.X < Length(Editor.Strings.Lines[FMatchEdPos.Y]) then
     begin
-      NStartX:= FMatchEdEnd.X;
-      NStartY:= FMatchEdEnd.Y;
+      PosStart.X:= FMatchEdEnd.X;
+      PosStart.Y:= FMatchEdEnd.Y;
     end
     else
     begin
-      NStartX:= 0;
-      NStartY:= FMatchEdPos.Y+1;
+      PosStart.X:= 0;
+      PosStart.Y:= FMatchEdPos.Y+1;
     end;
 
     if AWithConfirm then
@@ -795,7 +797,8 @@ function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boo
   out AChanged: boolean): boolean;
 var
   Caret: TATCaretItem;
-  NStartX, NStartY, NLastX, NLastY, NLines: integer;
+  NLastX, NLastY, NLines: integer;
+  PosStart, PosEnd: TPoint;
   bStartAtEdge: boolean;
 begin
   Result:= false;
@@ -809,40 +812,46 @@ begin
   NLastY:= NLines-1;
   NLastX:= Length(Editor.Strings.Lines[NLastY]);
 
-  if OptFromCaret then
+  if not OptBack then
   begin
-    NStartX:= Caret.PosX;
-    NStartY:= Caret.PosY;
+    PosStart.X:= 0;
+    PosStart.Y:= 0;
+    PosEnd.X:= NLastX;
+    PosEnd.Y:= NLastY;
   end
   else
   begin
-    if not OptBack then
-    begin
-      NStartX:= 0;
-      NStartY:= 0;
-    end
-    else
-    begin
-      NStartX:= NLastX;
-      NStartY:= NLastY;
-    end;
+    PosStart.X:= NLastX;
+    PosStart.Y:= NLastY;
+    PosEnd.X:= 0;
+    PosEnd.Y:= 0;
   end;
 
-  Result:= DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany, AChanged, NStartX, NStartY);
+  if OptFromCaret then
+  begin
+    PosStart.X:= Caret.PosX;
+    PosStart.Y:= Caret.PosY;
+  end;
+
+  Result:= DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany, AChanged, PosStart, PosEnd);
 
   if not Result and OptWrapped and not OptInSelection then
   begin
     if not OptBack then
     begin
-      bStartAtEdge:= (NStartX=0) and (NStartY=0);
-      NStartX:= 0;
-      NStartY:= 0;
+      bStartAtEdge:= (PosStart.X=0) and (PosStart.Y=0);
+      PosEnd.X:= PosStart.X;
+      PosEnd.Y:= PosStart.Y;
+      PosStart.X:= 0;
+      PosStart.Y:= 0;
     end
     else
     begin
-      bStartAtEdge:= (NStartX=NLastX) and (NStartY=NLastY);
-      NStartX:= NLastX;
-      NStartY:= NLastY;
+      bStartAtEdge:= (PosStart.X=NLastX) and (PosStart.Y=NLastY);
+      PosEnd.X:= PosStart.X;
+      PosEnd.Y:= PosStart.Y;
+      PosStart.X:= NLastX;
+      PosStart.Y:= NLastY;
     end;
 
     if not bStartAtEdge then
@@ -850,10 +859,10 @@ begin
       //same as _buffered version:
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
-      if DoFindOrReplace_InEditor_Internal(ANext, false, AForMany, AChanged, NStartX, NStartY) then
+      if DoFindOrReplace_InEditor_Internal(ANext, false, AForMany, AChanged, PosStart, PosEnd) then
       begin
-        Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, NStartX, NStartY, false)) or
-                 (OptBack and IsPosSorted(NStartX, NStartY, FMatchEdPos.X, FMatchEdPos.Y, false));
+        Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, PosStart.X, PosStart.Y, false)) or
+                 (OptBack and IsPosSorted(PosStart.X, PosStart.Y, FMatchEdPos.X, FMatchEdPos.Y, false));
         if not Result then
           ClearMatchPos;
       end;
@@ -863,7 +872,7 @@ end;
 
 
 function TATEditorFinder.DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean;
-  out AChanged: boolean; AStartX, AStartY: integer): boolean;
+  out AChanged: boolean; APosStart, APosEnd: TPoint): boolean;
 var
   ConfirmThis, ConfirmContinue: boolean;
   SNew: UnicodeString;
@@ -873,7 +882,7 @@ begin
   AChanged:= false;
   ClearMatchPos;
 
-  Result:= FindMatch_InEditor(AStartX, AStartY, true);
+  Result:= FindMatch_InEditor(APosStart, APosEnd, true);
   if Result then
   begin
     Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y);
@@ -1293,7 +1302,7 @@ begin
 end;
 
 
-function TATEditorFinder.FindMatch_InEditor(AStartX, AStartY: integer;
+function TATEditorFinder.FindMatch_InEditor(APosStart, APosEnd: TPoint;
   AWithEvent: boolean): boolean;
 //todo: consider OptBack
 var
@@ -1420,7 +1429,7 @@ begin
 
     if not OptBack then
     //forward search
-      for IndexLine:= AStartY to IndexLineMax do
+      for IndexLine:= APosStart.Y to IndexLineMax do
       begin
         if IsProgressNeeded(IndexLine) then
           if Assigned(FOnProgress) then
@@ -1452,8 +1461,8 @@ begin
         SLineToTest:= _GetLineToTest;
 
         //exact search
-        if IndexLine=AStartY then
-          NStartOffset:= AStartX
+        if IndexLine=APosStart.Y then
+          NStartOffset:= APosStart.X
         else
           NStartOffset:= 0;
 
@@ -1481,7 +1490,7 @@ begin
       end
     else
     //backward search
-      for IndexLine:= AStartY downto 0 do
+      for IndexLine:= APosStart.Y downto 0 do
       begin
         if IsProgressNeeded(IndexLine) then
           if Assigned(FOnProgress) then
@@ -1511,8 +1520,8 @@ begin
           if not _CompareParts_ByLen then Continue;
 
         //exact search
-        if IndexLine=AStartY then
-          NStartOffset:= AStartX
+        if IndexLine=APosStart.Y then
+          NStartOffset:= APosStart.X
         else
           NStartOffset:= NLenLooped;
 
