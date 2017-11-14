@@ -1265,6 +1265,7 @@ begin
   for i:= FFragments.Count-1 downto 0 do
     TObject(FFragments[i]).Free;
   FFragments.Clear;
+  FFragmentIndex:= -1;
 end;
 
 function TATEditorFinder.CurrentFragment: TATEditorFragment;
