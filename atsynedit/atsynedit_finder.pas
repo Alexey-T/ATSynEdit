@@ -115,6 +115,7 @@ type
     function DoCount_InFragment(AWithEvent: boolean): integer;
     function DoReplace_InFragment: integer;
     //
+    function DoFindOrReplace_InFragment(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; APosStart, APosEnd: TPoint): boolean;
@@ -790,6 +791,8 @@ end;
 
 function TATEditorFinder.DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
+var
+  i: integer;
 begin
   Result:= false;
   AChanged:= false;
@@ -805,20 +808,43 @@ begin
   UpdateFragments;
   DoFixCaretSelectionDirection;
 
-  if OptInSelection and (FFragments.Count>0) then
-    if not OptBack then
-      CurrentFragmentIndex:= 0
-    else
-      CurrentFragmentIndex:= FFragments.Count-1;
+  if not OptInSelection or (FFragments.Count=0) then
+  begin
+    Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged);
+    exit
+  end;
 
-  if OptRegex then
-    Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged)
+  if not OptBack then
+  begin
+    for i:= 0 to FFragments.Count-1 do
+    begin
+      CurrentFragmentIndex:= i;
+      Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged);
+      if Result then Break;
+    end;
+  end
   else
-    Result:= DoFindOrReplace_InEditor(ANext, AReplace, AForMany, AChanged);
+  begin
+    for i:= FFragments.Count-1 downto 0 do
+    begin
+      CurrentFragmentIndex:= i;
+      Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged);
+      if Result then Break;
+    end;
+  end;
 
   CurrentFragmentIndex:= -1;
 end;
 
+
+function TATEditorFinder.DoFindOrReplace_InFragment(ANext, AReplace, AForMany: boolean;
+  out AChanged: boolean): boolean;
+begin
+  if OptRegex then
+    Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged)
+  else
+    Result:= DoFindOrReplace_InEditor(ANext, AReplace, AForMany, AChanged);
+end;
 
 function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
