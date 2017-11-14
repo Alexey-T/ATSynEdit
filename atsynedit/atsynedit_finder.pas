@@ -112,9 +112,9 @@ type
     //
     procedure DoCollect_Usual(AList: TList; AWithEvent, AWithConfirm: boolean);
     procedure DoCollect_Regex(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
-    function DoCountAll(AWithEvent: boolean): integer;
+    function DoCount_InFragment(AWithEvent: boolean): integer;
+    function DoReplace_InFragment: integer;
     //
-    function DoReplaceAll: integer;
     function DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean; APosStart, APosEnd: TPoint): boolean;
@@ -319,16 +319,29 @@ var
   PosStart, PosEnd: TPoint;
   bOk, bContinue: boolean;
   Res: TATFinderResult;
+  Fr: TATEditorFragment;
 begin
   AList.Clear;
   if StrFind='' then exit;
 
   IndexLineMax:= Editor.Strings.Count-1;
-  PosStart.X:= 0;
-  PosStart.Y:= 0;
-  PosEnd.Y:= IndexLineMax;
-  PosEnd.X:= Length(Editor.Strings.Lines[IndexLineMax]);
   FPrevProgress:= 0;
+
+  if FFragments.Count=0 then
+  begin
+    PosStart.X:= 0;
+    PosStart.Y:= 0;
+    PosEnd.Y:= IndexLineMax;
+    PosEnd.X:= Length(Editor.Strings.Lines[IndexLineMax]);
+  end
+  else
+  begin
+    Fr:= CurrentFragment;
+    PosStart.X:= Fr.X1;
+    PosStart.Y:= Fr.Y1;
+    PosEnd.X:= Fr.X2;
+    PosEnd.Y:= Fr.Y2;
+  end;
 
   repeat
     if Application.Terminated then Break;
@@ -444,7 +457,7 @@ begin
   end;
 end;
 
-function TATEditorFinder.DoCountAll(AWithEvent: boolean): integer;
+function TATEditorFinder.DoCount_InFragment(AWithEvent: boolean): integer;
 var
   L: TList;
 begin
@@ -608,14 +621,14 @@ begin
     UpdateBuffer;
 
   if FFragments.Count=0 then
-    Result:= DoCountAll(AWithEvent)
+    Result:= DoCount_InFragment(AWithEvent)
   else
   begin
     Result:= 0;
     for i:= 0 to FFragments.Count-1 do
     begin
       CurrentFragmentIndex:= i;
-      Inc(Result, DoCountAll(AWithEvent));
+      Inc(Result, DoCount_InFragment(AWithEvent));
     end;
     CurrentFragmentIndex:= 0;
   end;
@@ -633,7 +646,7 @@ begin
     UpdateBuffer;
 
   if FFragments.Count=0 then
-    Result:= DoReplaceAll
+    Result:= DoReplace_InFragment
   else
   begin
     Result:= 0;
@@ -641,14 +654,14 @@ begin
     for i:= FFragments.Count-1 downto 0 do
     begin
       CurrentFragmentIndex:= i;
-      Inc(Result, DoReplaceAll);
+      Inc(Result, DoReplace_InFragment);
     end;
     CurrentFragmentIndex:= 0;
   end;
 end;
 
 
-function TATEditorFinder.DoReplaceAll: integer;
+function TATEditorFinder.DoReplace_InFragment: integer;
 var
   L: TList;
   Res: TATFinderResult;
@@ -667,6 +680,7 @@ begin
 
     for i:= L.Count-1 downto 0 do
     begin
+      if Application.Terminated then exit;
       Res:= TATFinderResult(L[i]);
 
       P1:= Res.FPos;
@@ -685,17 +699,12 @@ begin
       DoReplaceTextInEditor(P1, P2, Str, false, false);
       Inc(Result);
 
-      if Application.Terminated then exit;
-
-      //if FReplacedAtEndOfText then Continue;
-        //was needed before, now no need for backward replaces
-
       {
       //gives progress rolling back
       if Assigned(FOnProgress) then
       begin
         Ok:= true;
-        FOnProgress(Self, Res.NPos, Length(StrText), Ok);
+        FOnProgress(Self, Res.FPos.Y, Editor.Strings.Count-1, Ok);
         if not Ok then exit;
       end;
       }
