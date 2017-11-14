@@ -804,10 +804,19 @@ begin
 
   UpdateFragments;
   DoFixCaretSelectionDirection;
+
+  if OptInSelection and (FFragments.Count>0) then
+    if not OptBack then
+      CurrentFragmentIndex:= 0
+    else
+      CurrentFragmentIndex:= FFragments.Count-1;
+
   if OptRegex then
     Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged)
   else
     Result:= DoFindOrReplace_InEditor(ANext, AReplace, AForMany, AChanged);
+
+  CurrentFragmentIndex:= -1;
 end;
 
 
@@ -818,6 +827,7 @@ var
   NLastX, NLastY, NLines: integer;
   PosStart, PosEnd: TPoint;
   bStartAtEdge: boolean;
+  Fr: TATEditorFragment;
 begin
   Result:= false;
   AChanged:= false;
@@ -845,6 +855,21 @@ begin
     PosEnd.Y:= 0;
   end;
 
+  Fr:= CurrentFragment;
+  if Assigned(Fr) then
+  begin
+    if not OptBack then
+    begin
+      PosStart.X:= Fr.X1;
+      PosStart.Y:= Fr.Y1;
+    end
+    else
+    begin
+      PosStart.X:= Fr.X2;
+      PosStart.Y:= Fr.Y2;
+    end;
+  end
+  else
   if OptFromCaret then
   begin
     PosStart.X:= Caret.PosX;
