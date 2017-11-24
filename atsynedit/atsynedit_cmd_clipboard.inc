@@ -122,7 +122,7 @@ begin
   if not IsSelRectEmpty then
   begin
     //copy vertical block
-    AClipboardObject.AsText:= SNewText;
+    SClipboardCopy(SNewText, AClipboardObject);
     AClipboardObject.AddFormat(
       cATClipboardFormatId,
       cATClipboardSignatureColBlock,
@@ -132,15 +132,15 @@ begin
   begin
     //copy usual block
     if Append then
-      AClipboardObject.AsText:= AClipboardObject.AsText+SNewText
+      SClipboardCopy(AClipboardObject.AsText+SNewText, AClipboardObject)
     else
-      AClipboardObject.AsText:= SNewText;
+      SClipboardCopy(SNewText, AClipboardObject);
   end;
 
   {$ifndef windows}
   //for Linux gtk2, not sure about Mac
   if AClipboardObject=Clipboard then
-    PrimarySelection.AsText:= AClipboardObject.AsText;
+    SClipboardCopy(AClipboardObject.AsText, PrimarySelection);
   {$endif}
 
   Result:= [];

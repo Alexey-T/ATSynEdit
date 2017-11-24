@@ -10,7 +10,8 @@ unit ATStringProc;
 interface
 
 uses
-  Classes, SysUtils, StrUtils;
+  Classes, SysUtils, StrUtils,
+  LCLType, LCLIntf, Clipbrd;
 
 type
   atString = UnicodeString;
@@ -133,6 +134,8 @@ procedure SDeleteFromEol(var s: atString);
 var
   OptUnprintedReplaceSpec: boolean = false;
   OptUnprintedReplaceSpecToCode: integer = 164; //char 164 is small circle
+
+procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
 
 
 implementation
@@ -967,6 +970,20 @@ begin
     List.Delete(List.Count-1);
 end;
 
+procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
+begin
+  if AText='' then exit;
+  if AClipboardObj=nil then
+    AClipboardObj:= Clipboard;
+
+  {$IFDEF LCLGTK2}
+  //Workaround for Lazarus bug #0021453. LCL adds trailing zero to clipboard in Clipboard.AsText.
+  AClipboardObj.Clear;
+  AClipboardObj.AddFormat(PredefinedClipboardFormat(pcfText), AText[1], Length(AText));
+  {$ELSE}
+  AClipboardObj.AsText:= AText;
+  {$ENDIF}
+end;
 
 initialization
   _InitCharsHex;
