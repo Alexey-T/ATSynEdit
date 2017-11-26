@@ -1009,6 +1009,7 @@ type
     procedure DoSelect_Word(P: TPoint);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
+    procedure DoSelect_ColumnBlock_FromSelRect;
     procedure DoRangeFold(ARange: TATSynRange);
     procedure DoRangeUnfold(ARange: TATSynRange);
     procedure DoScrollByDelta(Dx, Dy: integer);

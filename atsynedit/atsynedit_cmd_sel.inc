@@ -95,7 +95,7 @@ begin
       end;
   end;
 
-  DoSelect_ColumnBlock(FSelRectBegin, FSelRectEnd);
+  DoSelect_ColumnBlock_FromSelRect;
 end;
 
 function TATSynEdit.DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
@@ -122,7 +122,7 @@ begin
     FSelRectEnd.X:= NPos;
   end;
 
-  DoSelect_ColumnBlock(FSelRectBegin, FSelRectEnd);
+  DoSelect_ColumnBlock_FromSelRect;
   Result:= [cResultKeepColumnSel, cResultCaretBottom];
 end;
 

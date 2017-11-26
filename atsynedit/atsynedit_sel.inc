@@ -340,6 +340,20 @@ begin
   end;
 end;
 
+procedure TATSynEdit.DoSelect_ColumnBlock_FromSelRect;
+var
+  PntBegin, PntEnd: TPoint;
+begin
+  //convert SelRect to char-pos
+  PntBegin:= FSelRectBegin;
+  PntBegin.X:= SColumnPosToCharPos(Strings.Lines[PntBegin.Y], PntBegin.X, OptTabSize);
+  PntEnd:= FSelRectEnd;
+  PntEnd.X:= SColumnPosToCharPos(Strings.Lines[PntEnd.Y], PntEnd.X, OptTabSize);
+
+  //func needs char-pos
+  DoSelect_ColumnBlock(PntBegin, PntEnd);
+end;
+
 
 procedure TATSynEdit.DoSelectionDeleteOrReset;
 begin
