@@ -15,7 +15,7 @@ uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ButtonPanel,
   StdCtrls, ComCtrls, CheckLst,
   LCLIntf, LCLType, LCLProc,
-  ecSyntAnal,
+  ec_SyntAnal,
   formlexerprop, proc_lexer_install_zip,
   math;
 

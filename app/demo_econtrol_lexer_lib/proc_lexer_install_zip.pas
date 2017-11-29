@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, FileUtil,
-  ecSyntAnal;
+  ec_SyntAnal;
 
 function DoInstallLexerFromZip(const fn_zip: string;
   Manager: TecSyntaxManager;

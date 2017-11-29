@@ -13,8 +13,8 @@ uses
   ATSynEdit_Adapter_EControl,
   ATSynEdit_Carets,
   ATSynEdit_Export_HTML,
-  ecSyntAnal,
-  proc_lexer;
+  ec_SyntAnal,
+  ec_proc_lexer;
 
 type
   { TfmMain }

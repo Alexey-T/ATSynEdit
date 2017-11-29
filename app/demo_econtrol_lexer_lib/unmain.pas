@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   LclIntf, LclProc, LclType,
-  ecSyntAnal,
+  ec_SyntAnal,
   formlexerlib;
 
 type

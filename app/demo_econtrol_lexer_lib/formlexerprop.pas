@@ -14,7 +14,7 @@ interface
 uses
   Classes, SysUtils, Graphics, FileUtil, Forms, Controls, StdCtrls,
   Dialogs, ButtonPanel, ComCtrls, ExtCtrls, ColorBox,
-  ecSyntAnal,
+  ec_SyntAnal,
   ATSynEdit,
   ATSynEdit_Adapter_EControl;
 
