@@ -1507,7 +1507,7 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLooped:= Editor.Strings.Items[IndexLine].ItemString;
+        SLineLooped:= Editor.Strings.Items[IndexLine].Str;
         SLineLoopedW:= UTF8Decode(SLineLooped);
         NLenLooped:= Length(SLineLoopedW);
 
@@ -1517,7 +1517,7 @@ begin
           ListLooped.Add(SLineLooped);
           for i:= 1 to NParts-1 do
             if Editor.Strings.IsIndexValid(IndexLine+i) then
-              ListLooped.Add(Editor.Strings.Items[IndexLine+i].ItemString);
+              ListLooped.Add(Editor.Strings.Items[IndexLine+i].Str);
         end;
 
         //quick check by len
@@ -1573,7 +1573,7 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLooped:= Editor.Strings.Items[IndexLine].ItemString;
+        SLineLooped:= Editor.Strings.Items[IndexLine].Str;
         SLineLoopedW:= UTF8Decode(SLineLooped);
         NLenLooped:= Length(SLineLoopedW);
 
@@ -1583,7 +1583,7 @@ begin
           ListLooped.Add(SLineLooped);
           for i:= 1 to NParts-1 do //store ListLooped as reversed
             if Editor.Strings.IsIndexValid(IndexLine-i) then
-              ListLooped.Add(Editor.Strings.Items[IndexLine-i].ItemString);
+              ListLooped.Add(Editor.Strings.Items[IndexLine-i].Str);
         end;
 
         //quick check by len

@@ -23,7 +23,7 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= FList[i];
-    SA:= Item.ItemString + cLineEndStrings[Item.ItemEnd];
+    SA:= Item.Str + cLineEndStrings[TATLineEnds(Item.Ex.Ends)];
     if SA<>'' then
     case AEncoding of
       cEncAnsi:
