@@ -87,8 +87,8 @@ type
     Ends: TATBits2;
     State: TATBits2;
     Sep: TATBits2;
-    Bm: byte; //kind of bookmark, 0: none
-    Hint: byte; //max 250 hints per control, 0: no hint
+    Bm: TATBits4; //kind of bookmark, 0: none
+    Hint: TATBits6; //index of hint, 0: no hint
     Hidden: packed array[0..cMaxStringsClients-1] of boolean;
     FoldFrom: packed array[0..cMaxStringsClients-1] of word;
       //0: line not folded
