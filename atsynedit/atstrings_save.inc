@@ -22,7 +22,7 @@ begin
 
   for i:= 0 to Count-1 do
   begin
-    Item:= TATStringItem(FList[i]);
+    Item:= FList[i];
     SA:= Item.ItemString + cLineEndStrings[Item.ItemEnd];
     if SA<>'' then
     case AEncoding of
