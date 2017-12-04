@@ -5,8 +5,8 @@ License: MPL 2.0 or LGPL
 unit ATStrings;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 {$MinEnumSize 1}
-{$modeswitch advancedrecords}
 
 interface
 
@@ -93,6 +93,7 @@ type
     class operator=(A, B: TATStringItem): boolean;
   end;
 
+  TATStringItemList = specialize TFPGList<TATStringItem>;
 
 type
   TATStringsProgressKind = (
@@ -108,11 +109,6 @@ type
   TATStringsChangeEvent = procedure(Sender: TObject; ALine: integer; AChange: TATLineChangeKind) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
-type
-  { TATStringItemList }
-
-  TATStringItemList = specialize TFPGList<TATStringItem>;
-
 type
   { TATStrings }
 
