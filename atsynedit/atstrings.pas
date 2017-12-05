@@ -80,8 +80,9 @@ type
   { TATStringItem }
 
   TATBits2 = 0..3;
-  TATBits4 = 0..15;
-  TATBits6 = 0..63;
+  TATBits4 = 0..(1 shl 4)-1;
+  TATBits6 = 0..(1 shl 6)-1;
+  TATBits12 = 0..(1 shl 12)-1;
 
   TATStringItemEx = bitpacked record
     Ends: TATBits2;
@@ -89,10 +90,10 @@ type
     Sep: TATBits2;
     Bm: TATBits4; //kind of bookmark, 0: none
     Hint: TATBits6; //index of hint, 0: no hint
-    Hidden: packed array[0..cMaxStringsClients-1] of boolean;
-    FoldFrom: packed array[0..cMaxStringsClients-1] of word;
+    FoldFrom: bitpacked array[0..cMaxStringsClients-1] of TATBits12;
       //0: line not folded
       //>0: line folded from this char-pos
+    Hidden: bitpacked array[0..cMaxStringsClients-1] of boolean;
   end;
 
   TATStringItem = packed record
