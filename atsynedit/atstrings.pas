@@ -193,8 +193,8 @@ type
     procedure SetLine(AIndex: integer; const AValue: atString);
     procedure SetLineBm(AIndex: integer; AValue: integer);
     procedure SetLineEnd(AIndex: integer; AValue: TATLineEnds);
-    procedure SetLineFoldFrom(IndexLine, IndexClient: integer; AValue: integer);
-    procedure SetLineHidden(IndexLine, IndexClient: integer; AValue: boolean);
+    procedure SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
+    procedure SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
     procedure SetLineHint(AIndex: integer; const AValue: string);
     procedure SetLineSep(AIndex: integer; AValue: TATLineSeparator);
     procedure SetLineState(AIndex: integer; AValue: TATLineState);
@@ -544,31 +544,29 @@ begin
   FList[AIndex]:= Item;
 end;
 
-procedure TATStrings.SetLineFoldFrom(IndexLine, IndexClient: integer;
-  AValue: integer);
+procedure TATStrings.SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
 const
-  cMax = 5000;
+  cMax = High(TATBits12);
 var
   Item: TATStringItem;
 begin
-  //Assert(IsIndexValid(IndexLine));
+  //Assert(IsIndexValid(AIndexLine));
   if AValue<0 then AValue:= 0;
   if AValue>cMax then AValue:= cMax;
 
-  Item:= FList[IndexLine];
-  Item.Ex.FoldFrom[IndexClient]:= AValue;
-  FList[IndexLine]:= Item;
+  Item:= FList[AIndexLine];
+  Item.Ex.FoldFrom[AIndexClient]:= AValue;
+  FList[AIndexLine]:= Item;
 end;
 
-procedure TATStrings.SetLineHidden(IndexLine, IndexClient: integer;
-  AValue: boolean);
+procedure TATStrings.SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
 var
   Item: TATStringItem;
 begin
-  //Assert(IsIndexValid(IndexLine));
-  Item:= FList[IndexLine];
-  Item.Ex.Hidden[IndexClient]:= AValue;
-  FList[IndexLine]:= Item;
+  //Assert(IsIndexValid(AIndexLine));
+  Item:= FList[AIndexLine];
+  Item.Ex.Hidden[AIndexClient]:= AValue;
+  FList[AIndexLine]:= Item;
 end;
 
 procedure TATStrings.SetLineHint(AIndex: integer; const AValue: string);
