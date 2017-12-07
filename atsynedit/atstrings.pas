@@ -336,8 +336,6 @@ begin
 end;
 
 procedure StringItem_Init(var A: TATStringItem; const AString: string; AEnd: TATLineEnds);
-var
-  i: integer;
 begin
   FillChar(A, SizeOf(A), 0);
   A.Str:= AString;
