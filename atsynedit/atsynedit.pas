@@ -888,7 +888,7 @@ type
       AClipboardObject: TClipboard): TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
-    function DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
+    function DoMouseWheelAction(Shift: TShiftState; AUp, AForceHorz: boolean): boolean;
     function GetCaretsArray: TATPointArray;
     procedure SetCaretsArray(const Ar: TATPointArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
@@ -1031,6 +1031,7 @@ type
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
     procedure MouseLeave; override;
     function DoMouseWheel(Shift: TShiftState; WheelDelta: integer; MousePos{%H-}: TPoint): boolean; override;
+    function DoMouseWheelHorz(Shift: TShiftState; WheelDelta: integer; MousePos{%H-}: TPoint): boolean; override;
     procedure DblClick; override;
     procedure TripleClick; override;
     function DoGetTextString: atString; virtual;
@@ -4036,7 +4037,14 @@ function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
 begin
   if not OptMouseEnableAll then exit(false);
-  Result:= DoMouseWheelAction(Shift, WheelDelta>0);
+  Result:= DoMouseWheelAction(Shift, WheelDelta>0, false);
+end;
+
+function TATSynEdit.DoMouseWheelHorz(Shift: TShiftState; WheelDelta: integer;
+  MousePos: TPoint): boolean;
+begin
+  if not OptMouseEnableAll then exit(false);
+  Result:= DoMouseWheelAction([], WheelDelta<0, true);
 end;
 
 type
@@ -4046,7 +4054,7 @@ type
     aWheelModeZoom
     );
 
-function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp: boolean): boolean;
+function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp, AForceHorz: boolean): boolean;
 var
   Mode: TATMouseWheelMode;
   NSpeedX, NSpeedY: integer;
@@ -4054,6 +4062,9 @@ begin
   Result:= false;
   if not OptMouseEnableAll then exit;
 
+  if AForceHorz then
+    Mode:= aWheelModeHoriz
+  else
   if (Shift=[FOptMouseWheelZoomsWithState]) then
     Mode:= aWheelModeZoom
   else
