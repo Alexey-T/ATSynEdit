@@ -501,6 +501,10 @@ procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
 var
   Item: TATStringItem;
 begin
+  if (AValue<0) or (AValue>High(TATStringItemEx.Bm)) then
+    AValue:= 0;
+    //raise Exception.Create('Incorrect bookmark value: '+IntToStr(AValue));
+
   if IsIndexValid(AIndex) then
   begin
     Item:= FList[AIndex];
