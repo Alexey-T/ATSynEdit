@@ -80,7 +80,6 @@ type
   { TATStringItem }
 
   TATBits2 = 0..3;
-  TATBits4 = 0..(1 shl 4)-1;
   TATBits6 = 0..(1 shl 6)-1;
   TATBits12 = 0..(1 shl 12)-1;
 
@@ -88,7 +87,7 @@ type
     Ends: TATBits2;
     State: TATBits2;
     Sep: TATBits2;
-    Bm: TATBits4; //kind of bookmark, 0: none
+    Bm: TATBits6; //kind of bookmark, 0: none
     Hint: TATBits6; //index of hint, 0: no hint
     FoldFrom: bitpacked array[0..cMaxStringsClients-1] of TATBits12;
       //0: line not folded
