@@ -87,8 +87,8 @@ type
     Ends: TATBits2;
     State: TATBits2;
     Sep: TATBits2;
-    Bm: TATBits6; //kind of bookmark, 0: none
-    Hint: TATBits6; //index of hint, 0: no hint
+    Bookmark: TATBits6;
+    HintIndex: TATBits6;
     FoldFrom: bitpacked array[0..cMaxStringsClients-1] of TATBits12;
       //0: line not folded
       //>0: line folded from this char-pos
@@ -376,7 +376,7 @@ end;
 function TATStrings.GetLineBm(AIndex: integer): integer;
 begin
   //Assert(IsIndexValid(AIndex));
-  Result:= FList[AIndex].Ex.Bm;
+  Result:= FList[AIndex].Ex.Bookmark;
 end;
 
 function TATStrings.GetLineHint(AIndex: integer): string;
@@ -384,7 +384,7 @@ var
   N: integer;
 begin
   //Assert(IsIndexValid(AIndex));
-  N:= FList[AIndex].Ex.Hint;
+  N:= FList[AIndex].Ex.HintIndex;
   Result:= FHintList[N];
 end;
 
@@ -500,16 +500,16 @@ procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
 var
   Item: TATStringItem;
 begin
-  if (AValue<0) or (AValue>High(TATStringItemEx.Bm)) then
+  if (AValue<0) or (AValue>High(TATStringItemEx.Bookmark)) then
     AValue:= 0;
     //raise Exception.Create('Incorrect bookmark value: '+IntToStr(AValue));
 
   if IsIndexValid(AIndex) then
   begin
     Item:= FList[AIndex];
-    Item.Ex.Bm:= AValue;
+    Item.Ex.Bookmark:= AValue;
     if AValue=0 then
-      Item.Ex.Hint:= 0;
+      Item.Ex.HintIndex:= 0;
     FList[AIndex]:= Item;
   end;
 end;
@@ -582,7 +582,7 @@ begin
     N:= FHintList.Add(AValue);
 
   Item:= FList[AIndex];
-  Item.Ex.Hint:= N;
+  Item.Ex.HintIndex:= N;
   FList[AIndex]:= Item;
 end;
 
@@ -945,9 +945,9 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= FList[i];
-    if Item.Ex.Hint<>0 then
+    if Item.Ex.HintIndex<>0 then
     begin
-      Item.Ex.Hint:= 0;
+      Item.Ex.HintIndex:= 0;
       FList[i]:= Item;
     end;
   end;
