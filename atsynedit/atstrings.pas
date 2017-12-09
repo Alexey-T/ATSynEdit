@@ -858,25 +858,23 @@ procedure TATStrings.LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; 
 //  False to insert whole lines except last + concat last item to existing line
 var
   Item: TATStringItem;
-  Cnt: integer;
   Str: atString;
-  i: integer;
+  NCount, i: integer;
 begin
-  if ABlock.Count=0 then exit;
+  NCount:= ABlock.Count;
+  if NCount=0 then exit;
+  if not AWithFinalEol then Dec(NCount);
 
-  Cnt:= ABlock.Count;
-  if not AWithFinalEol then Dec(Cnt);
-
-  if Cnt>0 then
+  if NCount>0 then
   begin
-    for i:= 0 to Cnt-1 do
+    for i:= 0 to NCount-1 do
     begin
       DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone);
       DoEventLog(ALineIndex+i, ABlock.LinesLen[i]);
       DoEventChange(ALineIndex+i, cLineChangeAdded);
 
       StringItem_Init(Item,
-        ABlock.FList.GetItem(i)^.Str,
+        ABlock.GetLineUTF8(i),
         Endings);
       FList.Insert(ALineIndex+i, @Item);
       StringItem_Zero(Item);
