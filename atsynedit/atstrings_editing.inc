@@ -324,14 +324,32 @@ procedure TATStrings.DoBlock_DeleteLines(ALine1, ALine2: integer);
 var
   i: integer;
 begin
+  if ALine1>=Count then ALine1:= Count-1;
+  if ALine2>=Count then ALine2:= Count-1;
+
   FChangeBlockActive:= true;
   DoOnChangeBlock(
     0, ALine1,
     0, ALine2,
     cBlockDeleteLines,
     nil);
-  for i:= ALine2 downto ALine1 do
-    LineDelete(i);
+
+  if (ALine2-ALine1)<FUndoList.MaxCount then
+  begin
+    //delete slowly with undo
+    for i:= ALine2 downto ALine1 do
+      LineDelete(i);
+  end
+  else
+  begin
+    //delete fast
+    for i:= ALine2 downto ALine1 do
+      FList.Delete(i);
+    DoClearUndo;
+    DoEventChange(0, cLineChangeEdited);
+    DoEventLog(0, 1);
+  end;
+
   FChangeBlockActive:= false;
 end;
 

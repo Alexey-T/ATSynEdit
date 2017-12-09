@@ -107,6 +107,7 @@ type
   public
     constructor Create;
     function GetItem(AIndex: integer): PATStringItem;
+    procedure Deref(Item: Pointer); override; overload;
   end;
 
 type
@@ -373,8 +374,12 @@ end;
 
 function TATStringItemList.GetItem(AIndex: integer): PATStringItem;
 begin
-  //Assert((AIndex>=0) and (AIndex<Count), 'Wrong List.GetItem index');
   Result:= PATStringItem(Get(AIndex));
+end;
+
+procedure TATStringItemList.Deref(Item: Pointer);
+begin
+  PATStringItem(Item)^.Str:= '';
 end;
 
 { TATStrings }
@@ -920,7 +925,6 @@ begin
     DoEventLog(ALineIndex, -Length(Str));
     DoEventChange(ALineIndex, cLineChangeDeleted);
 
-    Item^.Str:= '';
     FList.Delete(ALineIndex);
   end;
   //else
