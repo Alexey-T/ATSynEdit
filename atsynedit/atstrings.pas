@@ -497,12 +497,13 @@ begin
 end;
 
 procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
+const
+  cMax = High(TATStringItemEx.Bookmark);
 var
   Item: TATStringItem;
 begin
-  if (AValue<0) or (AValue>High(TATStringItemEx.Bookmark)) then
-    AValue:= 0;
-    //raise Exception.Create('Incorrect bookmark value: '+IntToStr(AValue));
+  if AValue<0 then AValue:= 0;
+  if AValue>cMax then AValue:= cMax;
 
   if IsIndexValid(AIndex) then
   begin
@@ -547,7 +548,7 @@ end;
 
 procedure TATStrings.SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
 const
-  cMax = High(TATBits12);
+  cMax = High(TATStringItemEx.FoldFrom);
 var
   Item: TATStringItem;
 begin
