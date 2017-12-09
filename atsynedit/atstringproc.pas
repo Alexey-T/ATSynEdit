@@ -80,19 +80,6 @@ function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
 function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
 function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
 
-type
-  TATCommentAction = (
-    cCommentAdd_AtNonspace,
-    cCommentAdd_AtNonespace_IfNone,
-    cCommentAdd_AtStart,
-    cCommentAdd_AtStart_IfNone,
-    cCommentRemove,
-    cCommentToggle_AtNonspace,
-    cCommentToggle_AtStart
-    );
-
-function SCommentLineAction(L: TStringList; const AComment: atString; Act: TATCommentAction): boolean;
-
 function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
@@ -817,84 +804,6 @@ begin
     Result := Result + S[i];
     Inc(i);
   until False;
-end;
-
-
-function SCommentLineAction(L: TStringList;
-  const AComment: atString; Act: TATCommentAction): boolean;
-var
-  Str, Str0: atString;
-  IndentThis, IndentAll, i: integer;
-  IsCmtThis, IsCmtAll: boolean;
-begin
-  Result:= false;
-  if L.Count=0 then exit;
-
-  IndentAll:= MaxInt;
-  for i:= 0 to L.Count-1 do
-    IndentAll:= Min(IndentAll, SGetIndentChars(L[i])+1);
-    //no need Utf8decode
-
-  for i:= 0 to L.Count-1 do
-  begin
-    Str:= Utf8Decode(L[i]);
-    Str0:= Str;
-
-    //IndentThis, IsCmtThis: regarding indent if this line
-    //IndentAll, IsCmtAll: regarding minimal indent of block
-    IndentThis:= SGetIndentChars(Str)+1;
-    IsCmtThis:= Copy(Str, IndentThis, Length(AComment))=AComment;
-    IsCmtAll:= Copy(Str, IndentAll, Length(AComment))=AComment;
-
-    case Act of
-      cCommentAdd_AtNonspace:
-        begin
-          Insert(AComment, Str, IndentAll);
-        end;
-      cCommentAdd_AtNonespace_IfNone:
-        begin
-          if not IsCmtAll then
-            Insert(AComment, Str, IndentAll);
-        end;
-      cCommentAdd_AtStart:
-        begin
-          Insert(AComment, Str, 1);
-        end;
-      cCommentAdd_AtStart_IfNone:
-        begin
-          if not IsCmtAll then
-            Insert(AComment, Str, 1);
-        end;
-      cCommentRemove:
-        begin
-          if IsCmtAll then
-            Delete(Str, IndentAll, Length(AComment))
-          else
-          if IsCmtThis then
-            Delete(Str, IndentThis, Length(AComment))
-        end;
-      cCommentToggle_AtNonspace:
-        begin
-          if IsCmtAll then
-            Delete(Str, IndentAll, Length(AComment))
-          else
-            Insert(AComment, Str, IndentAll);
-        end;
-      cCommentToggle_AtStart:
-        begin
-          if IsCmtAll then
-            Delete(Str, IndentAll, Length(AComment))
-          else
-            Insert(AComment, Str, 1);
-        end;
-    end;
-
-    if Str<>Str0 then
-    begin
-      Result:= true; //modified
-      L[i]:= Utf8Encode(Str);
-    end;
-  end;
 end;
 
 

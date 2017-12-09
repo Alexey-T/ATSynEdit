@@ -852,43 +852,6 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCommentSelectionLines(Act: TATCommentAction; const AComment: atString);
-var
-  Caret: TATCaretItem;
-  L: TStringList;
-  NFrom, NTo, i: integer;
-  bChange: boolean;
-begin
-  if Carets.Count=0 then exit;
-  Caret:= Carets[0];
-  Caret.GetSelLines(NFrom, NTo, true);
-  if NFrom<0 then exit;
-  if NTo<0 then exit;
-
-  L:= TStringList.Create;
-  try
-    for i:= NFrom to NTo do
-      L.Add(Strings.LinesUTF8[i]);
-
-    bChange:= SCommentLineAction(L, AComment, Act);
-    if not bChange then exit;
-    Assert(L.Count=(NTo-NFrom+1), 'DoCommentSel changed line count');
-
-    Strings.BeginUndoGroup;
-    try
-      for i:= NFrom to NTo do
-        Strings.Lines[i]:= Utf8Decode(L[i-NFrom]);
-    finally
-      Strings.EndUndoGroup;
-    end;
-  finally
-    L.Free;
-  end;
-
-  DoEventChange;
-  Update(true);
-end;
-
 function TATSynEdit.DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
 begin
   Result:= [];

@@ -1014,7 +1014,6 @@ type
     procedure DoRangeUnfold(ARange: TATSynRange);
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
-    procedure DoCommentSelectionLines(Act: TATCommentAction; const AComment: atString);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor): boolean;
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
