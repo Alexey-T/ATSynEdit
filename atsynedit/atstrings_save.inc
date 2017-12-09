@@ -2,7 +2,7 @@
 
 procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
   SA, Sign: string;
   SWide: UnicodeString;
   bEncoded: boolean;
@@ -22,8 +22,8 @@ begin
 
   for i:= 0 to Count-1 do
   begin
-    Item:= FList[i];
-    SA:= Item.Str + cLineEndStrings[TATLineEnds(Item.Ex.Ends)];
+    Item:= FList.GetItem(i);
+    SA:= Item^.Str + cLineEndStrings[TATLineEnds(Item^.Ex.Ends)];
     if SA<>'' then
     case AEncoding of
       cEncAnsi:

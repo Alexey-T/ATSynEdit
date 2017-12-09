@@ -98,16 +98,15 @@ type
   TATStringItem = packed record
     Str: string;
     Ex: TATStringItemEx;
-    class operator=(A, B: TATStringItem): boolean;
   end;
   PATStringItem = ^TATStringItem;
 
   { TATStringItemList }
 
-  TATStringItemList = class(specialize TFPGList<TATStringItem>)
+  TATStringItemList = class(TFPSList)
   public
-    procedure Deref(Item: Pointer); override;
-    procedure CopyItem(Src, Dest: Pointer); override;
+    constructor Create;
+    function GetItem(AIndex: integer): PATStringItem;
   end;
 
 type
@@ -177,8 +176,8 @@ type
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
-    function GetItem(AIndex: integer): TATStringItem;
     function GetLine(AIndex: integer): atString;
+    function GetLineUTF8(AIndex: integer): string;
     function GetLineBm(AIndex: integer): integer;
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
@@ -225,7 +224,6 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
-    property Items[Index: integer]: TATStringItem read GetItem;
     procedure LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
@@ -233,6 +231,7 @@ type
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
+    property LinesUTF8[Index: integer]: string read GetLineUTF8;
     property LinesLen[Index: integer]: integer read GetLineLen;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
@@ -341,6 +340,11 @@ begin
     (TATLineEnds(A.Ex.Ends)=cEndNone);
 end;
 
+procedure StringItem_Zero(var A: TATStringItem); inline;
+begin
+  FillChar(A, SizeOf(A), 0);
+end;
+
 procedure StringItem_Init(var A: TATStringItem; const AString: string; AEnd: TATLineEnds);
 begin
   FillChar(A, SizeOf(A), 0);
@@ -349,11 +353,6 @@ begin
   A.Ex.State:= TATBits2(cLineStateAdded);
   A.Ex.Sep:= TATBits2(cLineSepNone);
   UniqueString(A.Str);
-end;
-
-operator=(A, B: TATStringItem): boolean;
-begin
-  Result:= false;
 end;
 
 function ATStrings_To_StringList(L: TATStrings): TStringList;
@@ -367,39 +366,34 @@ end;
 
 { TATStringItemList }
 
-procedure TATStringItemList.Deref(Item: Pointer);
+constructor TATStringItemList.Create;
 begin
-  PATStringItem(Item)^.Str:= '';
-  inherited;
+  inherited Create(SizeOf(TATStringItem));
 end;
 
-procedure TATStringItemList.CopyItem(Src, Dest: Pointer);
+function TATStringItemList.GetItem(AIndex: integer): PATStringItem;
 begin
-  PATStringItem(Dest)^.Str:= PATStringItem(Src)^.Str;
-  PATStringItem(Dest)^.Ex:= PATStringItem(Src)^.Ex;
-  UniqueString(PATStringItem(Dest)^.Str);
-end;
-
-{ TATStringItem }
-
-class operator TATStringItem.=(A, B: TATStringItem): boolean;
-begin
-  //we don't need to compare items
-  Result:= false;
+  //Assert((AIndex>=0) and (AIndex<Count), 'Wrong List.GetItem index');
+  Result:= PATStringItem(Get(AIndex));
 end;
 
 { TATStrings }
 
 function TATStrings.GetLine(AIndex: integer): atString;
 begin
+  Result:= UTF8Decode(GetLineUTF8(AIndex));
+end;
+
+function TATStrings.GetLineUTF8(AIndex: integer): string;
+begin
   //Assert(IsIndexValid(AIndex));
-  Result:= UTF8Decode(FList[AIndex].Str);
+  Result:= FList.GetItem(AIndex)^.Str;
 end;
 
 function TATStrings.GetLineBm(AIndex: integer): integer;
 begin
   //Assert(IsIndexValid(AIndex));
-  Result:= FList[AIndex].Ex.Bookmark;
+  Result:= FList.GetItem(AIndex)^.Ex.Bookmark;
 end;
 
 function TATStrings.GetLineHint(AIndex: integer): string;
@@ -407,32 +401,32 @@ var
   N: integer;
 begin
   //Assert(IsIndexValid(AIndex));
-  N:= FList[AIndex].Ex.HintIndex;
+  N:= FList.GetItem(AIndex)^.Ex.HintIndex;
   Result:= FHintList[N];
 end;
 
 function TATStrings.GetLineEnd(AIndex: integer): TATLineEnds;
 begin
   //Assert(IsIndexValid(AIndex));
-  Result:= TATLineEnds(FList[AIndex].Ex.Ends);
+  Result:= TATLineEnds(FList.GetItem(AIndex)^.Ex.Ends);
 end;
 
 function TATStrings.GetLineFoldFrom(ALine, AClient: integer): integer;
 begin
   //Assert(IsIndexValid(ALine));
-  Result:= FList[ALine].Ex.FoldFrom[AClient];
+  Result:= FList.GetItem(ALine)^.Ex.FoldFrom[AClient];
 end;
 
 function TATStrings.GetLineHidden(ALine, AClient: integer): boolean;
 begin
   //Assert(IsIndexValid(ALine));
-  Result:= FList[ALine].Ex.Hidden[AClient];
+  Result:= FList.GetItem(ALine)^.Ex.Hidden[AClient];
 end;
 
 function TATStrings.GetLineState(AIndex: integer): TATLineState;
 begin
   //Assert(IsIndexValid(AIndex));
-  Result:= TATLineState(FList[AIndex].Ex.State);
+  Result:= TATLineState(FList.GetItem(AIndex)^.Ex.State);
 end;
 
 function TATStrings.GetLineLen(AIndex: integer): integer;
@@ -440,15 +434,15 @@ begin
   //Assert(IsIndexValid(AIndex));
 
   //do not use UTF8LengthFast
-  //Result:= UTF8Length(...Str) is ok, but in Laz trunk 2017.12.08 it gives crash sometimes
+  //Result:= UTF8Length(...Str) is ok
   Result:=
-    Length(UTF8Decode(FList[AIndex].Str));
+    UTF8Length(FList.GetItem(AIndex)^.Str);
 end;
 
 function TATStrings.GetLineSep(AIndex: integer): TATLineSeparator;
 begin
   //Assert(IsIndexValid(AIndex));
-  Result:= TATLineSeparator(FList[AIndex].Ex.Sep);
+  Result:= TATLineSeparator(FList.GetItem(AIndex)^.Ex.Sep);
 end;
 
 function TATStrings.GetUndoCount: integer;
@@ -494,111 +488,104 @@ end;
 
 procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
   Str: atString;
   i: integer;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
 
-  Item:= FList[AIndex];
-  Str:= UTF8Decode(Item.Str);
+  Item:= FList.GetItem(AIndex);
+  Str:= UTF8Decode(Item^.Str);
 
-  DoAddUndo(cEditActionChange, AIndex, Str, TATLineEnds(Item.Ex.Ends));
+  DoAddUndo(cEditActionChange, AIndex, Str, TATLineEnds(Item^.Ex.Ends));
   DoEventLog(AIndex, -Length(Str));
   DoEventLog(AIndex, Length(AValue));
   DoEventChange(AIndex, cLineChangeEdited);
 
-  Item.Str:= UTF8Encode(AValue);
+  Item^.Str:= UTF8Encode(AValue);
+  UniqueString(Item^.Str);
 
   //fully unfold this line
-  for i:= 0 to High(Item.Ex.Hidden) do
-    Item.Ex.FoldFrom[i]:= 0;
+  for i:= 0 to High(Item^.Ex.Hidden) do
+    Item^.Ex.FoldFrom[i]:= 0;
 
-  if TATLineState(Item.Ex.State)<>cLineStateAdded then
-    Item.Ex.State:= TATBits2(cLineStateChanged);
-
-  FList[AIndex]:= Item;
+  if TATLineState(Item^.Ex.State)<>cLineStateAdded then
+    Item^.Ex.State:= TATBits2(cLineStateChanged);
 end;
 
 procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
 const
   cMax = High(TATStringItemEx.Bookmark);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
 begin
   if AValue<0 then AValue:= 0;
   if AValue>cMax then AValue:= cMax;
 
   if IsIndexValid(AIndex) then
   begin
-    Item:= FList[AIndex];
-    Item.Ex.Bookmark:= AValue;
+    Item:= FList.GetItem(AIndex);
+    Item^.Ex.Bookmark:= AValue;
     if AValue=0 then
-      Item.Ex.HintIndex:= 0;
-    FList[AIndex]:= Item;
+      Item^.Ex.HintIndex:= 0;
   end;
 end;
 
 procedure TATStrings.SetLineSep(AIndex: integer; AValue: TATLineSeparator);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
 begin
   if IsIndexValid(AIndex) then
   begin
-    Item:= FList[AIndex];
-    Item.Ex.Sep:= TATBits2(AValue);
-    FList[AIndex]:= Item;
+    Item:= FList.GetItem(AIndex);
+    Item^.Ex.Sep:= TATBits2(AValue);
   end;
 end;
 
 
 procedure TATStrings.SetLineEnd(AIndex: integer; AValue: TATLineEnds);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
 
-  Item:= FList[AIndex];
+  Item:= FList.GetItem(AIndex);
 
-  DoAddUndo(cEditActionChangeEol, AIndex, '', TATLineEnds(Item.Ex.Ends));
+  DoAddUndo(cEditActionChangeEol, AIndex, '', TATLineEnds(Item^.Ex.Ends));
 
-  Item.Ex.Ends:= TATBits2(AValue);
-  if TATLineState(Item.Ex.State)<>cLineStateAdded then
-    Item.Ex.State:= TATBits2(cLineStateChanged);
-
-  FList[AIndex]:= Item;
+  Item^.Ex.Ends:= TATBits2(AValue);
+  if TATLineState(Item^.Ex.State)<>cLineStateAdded then
+    Item^.Ex.State:= TATBits2(cLineStateChanged);
 end;
 
 procedure TATStrings.SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
 const
   cMax = High(TATBits12);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
 begin
   //Assert(IsIndexValid(AIndexLine));
   if AValue<0 then AValue:= 0;
   if AValue>cMax then AValue:= cMax;
 
-  Item:= FList[AIndexLine];
-  Item.Ex.FoldFrom[AIndexClient]:= AValue;
-  FList[AIndexLine]:= Item;
+  Item:= FList.GetItem(AIndexLine);
+  Item^.Ex.FoldFrom[AIndexClient]:= AValue;
 end;
 
 procedure TATStrings.SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
 begin
   //Assert(IsIndexValid(AIndexLine));
-  Item:= FList[AIndexLine];
-  Item.Ex.Hidden[AIndexClient]:= AValue;
-  FList[AIndexLine]:= Item;
+  Item:= FList.GetItem(AIndexLine);
+  Item^.Ex.Hidden[AIndexClient]:= AValue;
 end;
 
 procedure TATStrings.SetLineHint(AIndex: integer; const AValue: string);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
   N: integer;
 begin
   //Assert(IsIndexValid(AIndex));
@@ -607,19 +594,17 @@ begin
   else
     N:= FHintList.Add(AValue);
 
-  Item:= FList[AIndex];
-  Item.Ex.HintIndex:= N;
-  FList[AIndex]:= Item;
+  Item:= FList.GetItem(AIndex);
+  Item^.Ex.HintIndex:= N;
 end;
 
 procedure TATStrings.SetLineState(AIndex: integer; AValue: TATLineState);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
 begin
   //Assert(IsIndexValid(AIndex));
-  Item:= FList[AIndex];
-  Item.Ex.State:= TATBits2(AValue);
-  FList[AIndex]:= Item;
+  Item:= FList.GetItem(AIndex);
+  Item^.Ex.State:= TATBits2(AValue);
 end;
 
 
@@ -634,7 +619,7 @@ const
   CharEol: char = #10;
 var
   Len, LastIndex, i: integer;
-  Item: TATStringItem;
+  Item: PATStringItem;
   Ptr: pointer;
   Str: string;
   bFinalEol: boolean;
@@ -647,8 +632,8 @@ begin
   Len:= 0;
   for i:= 0 to LastIndex do
   begin
-    Item:= FList[i];
-    Str:= Item.Str;
+    Item:= FList.GetItem(i);
+    Str:= Item^.Str;
     Inc(Len, Length(Str));
     if bFinalEol or (i<LastIndex) then
       Inc(Len, LenEol);
@@ -660,8 +645,8 @@ begin
 
   for i:= 0 to LastIndex do
   begin
-    Item:= FList[i];
-    Str:= Item.Str;
+    Item:= FList.GetItem(i);
+    Str:= Item^.Str;
     Len:= Length(Str);
     //copy string
     if Len>0 then
@@ -738,14 +723,14 @@ end;
 function TATStrings.IsLastLineFake: boolean;
 begin
   Result:= (Count>0) and
-    StringItem_IsFake(FList.Last);
+    StringItem_IsFake(FList.GetItem(FList.Count-1)^);
 end;
 
 function TATStrings.IsLastFakeLineUnneeded: boolean;
 begin
   Result:= (Count>1) and
-    StringItem_IsFake(FList.Last) and
-    (TATLineEnds(FList[FList.Count-2].Ex.Ends)=cEndNone);
+    IsLastLineFake and
+    (TATLineEnds(FList.GetItem(FList.Count-2)^.Ex.Ends)=cEndNone);
 end;
 
 procedure TATStrings.ActionDeleteFakeLine;
@@ -791,7 +776,8 @@ begin
   DoEventChange(Count, cLineChangeAdded);
 
   StringItem_Init(Item, UTF8Encode(AString), AEnd);
-  FList.Add(Item);
+  FList.Add(@Item);
+  StringItem_Zero(Item);
 end;
 
 procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds);
@@ -844,7 +830,8 @@ begin
   DoEventChange(ALineIndex, cLineChangeAdded);
 
   StringItem_Init(Item, UTF8Encode(AString), AEnd);
-  FList.Insert(ALineIndex, Item);
+  FList.Insert(ALineIndex, @Item);
+  StringItem_Zero(Item);
 end;
 
 procedure TATStrings.LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
@@ -871,7 +858,7 @@ procedure TATStrings.LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; 
 //  False to insert whole lines except last + concat last item to existing line
 var
   Item: TATStringItem;
-  Cnt, CntMove: integer;
+  Cnt: integer;
   Str: atString;
   i: integer;
 begin
@@ -882,13 +869,6 @@ begin
 
   if Cnt>0 then
   begin
-    CntMove:= FList.Count-ALineIndex;
-
-    //fast! insert many
-    FList.Count:= FList.Count+Cnt;
-    System.Move(FList.List^[ALineIndex], FList.List^[ALineIndex+Cnt], CntMove*SizeOf(Pointer));
-    FillChar(FList.List^[ALineIndex], Cnt*SizeOf(Pointer), 0);
-
     for i:= 0 to Cnt-1 do
     begin
       DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone);
@@ -896,9 +876,10 @@ begin
       DoEventChange(ALineIndex+i, cLineChangeAdded);
 
       StringItem_Init(Item,
-        ABlock.FList[i].Str,
+        ABlock.FList.GetItem(i)^.Str,
         Endings);
-      FList[ALineIndex+i]:= Item;
+      FList.Insert(ALineIndex+i, @Item);
+      StringItem_Zero(Item);
     end;
   end;
 
@@ -927,20 +908,21 @@ end;
 
 procedure TATStrings.LineDelete(ALineIndex: integer; AForceLast: boolean = true);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
   Str: atString;
 begin
   if FReadOnly then Exit;
 
   if IsIndexValid(ALineIndex) then
   begin
-    Item:= FList[ALineIndex];
-    Str:= UTF8Decode(Item.Str);
+    Item:= FList.GetItem(ALineIndex);
+    Str:= UTF8Decode(Item^.Str);
 
-    DoAddUndo(cEditActionDelete, ALineIndex, Str, TATLineEnds(Item.Ex.Ends));
+    DoAddUndo(cEditActionDelete, ALineIndex, Str, TATLineEnds(Item^.Ex.Ends));
     DoEventLog(ALineIndex, -Length(Str));
     DoEventChange(ALineIndex, cLineChangeDeleted);
 
+    Item^.Str:= '';
     FList.Delete(ALineIndex);
   end;
   //else
@@ -964,37 +946,33 @@ end;
 
 procedure TATStrings.ClearHints;
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
   i: integer;
 begin
   FHintList.Clear;
   for i:= 0 to Count-1 do
   begin
-    Item:= FList[i];
-    if Item.Ex.HintIndex<>0 then
-    begin
-      Item.Ex.HintIndex:= 0;
-      FList[i]:= Item;
-    end;
+    Item:= FList.GetItem(i);
+    if Item^.Ex.HintIndex<>0 then
+      Item^.Ex.HintIndex:= 0;
   end;
 end;
 
 procedure TATStrings.DoClearLineStates(ASaved: boolean);
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
   i: integer;
 begin
   for i:= 0 to Count-1 do
   begin
-    Item:= FList[i];
+    Item:= FList.GetItem(i);
     if ASaved then
     begin
-      if TATLineState(Item.Ex.State)<>cLineStateNone then
-        Item.Ex.State:= TATBits2(cLineStateSaved);
+      if TATLineState(Item^.Ex.State)<>cLineStateNone then
+        Item^.Ex.State:= TATBits2(cLineStateSaved);
     end
     else
-      Item.Ex.State:= TATBits2(cLineStateNone);
-    FList[i]:= Item;
+      Item^.Ex.State:= TATBits2(cLineStateNone);
   end;
 end;
 
@@ -1187,18 +1165,18 @@ end;
 
 function TATStrings.DebugText: string;
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
   i: integer;
 begin
   Result:= '';
   for i:= 0 to Min(20, Count-1) do
   begin
-    Item:= FList[i];
+    Item:= FList.GetItem(i);
     Result:= Result+Format('[%d] "%s" <%s>', [
       i,
-      Item.Str,
-      cLineEndNiceNames[TATLineEnds(Item.Ex.Ends)]
-      ])+#13;
+      Item^.Str,
+      cLineEndNiceNames[TATLineEnds(Item^.Ex.Ends)]
+      ])+#10;
   end;
 end;
 
@@ -1206,11 +1184,6 @@ function TATStrings.GetCaretsArray: TATPointArray;
 begin
   if Assigned(FOnGetCaretsArray) then
     Result:= FOnGetCaretsArray();
-end;
-
-function TATStrings.GetItem(AIndex: integer): TATStringItem;
-begin
-  Result:= FList[AIndex];
 end;
 
 procedure TATStrings.SetCaretsArray(const L: TATPointArray);
@@ -1451,7 +1424,8 @@ var
 begin
   StringItem_Init(Item, AString, AEnd);
   Item.Ex.State:= TATBits2(cLineStateAdded);
-  FList.Add(Item);
+  FList.Add(@Item);
+  StringItem_Zero(Item);
 end;
 
 procedure TATStrings.DoEventLog(ALine, ALen: integer);
@@ -1470,14 +1444,13 @@ end;
 
 procedure TATStrings.ClearSeparators;
 var
-  Item: TATStringItem;
+  Item: PATStringItem;
   i: integer;
 begin
   for i:= 0 to Count-1 do
   begin
-    Item:= FList[i];
-    Item.Ex.Sep:= TATBits2(cLineSepNone);
-    FList[i]:= Item;
+    Item:= FList.GetItem(i);
+    Item^.Ex.Sep:= TATBits2(cLineSepNone);
   end;
 end;
 
