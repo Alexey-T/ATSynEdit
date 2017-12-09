@@ -417,6 +417,7 @@ begin
   //Assert(IsIndexValid(AIndex));
 
   //do not use UTF8LengthFast
+  //Result:= UTF8Length(...Str) is ok, but in Laz trunk 2017.12.08 it gives crash sometimes
   Result:=
     Length(UTF8Decode(FList[AIndex].Str));
 end;
