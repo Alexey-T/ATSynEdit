@@ -550,7 +550,7 @@ end;
 
 procedure TATStrings.SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
 const
-  cMax = High(TATStringItemEx.FoldFrom);
+  cMax = High(TATBits12);
 var
   Item: TATStringItem;
 begin
