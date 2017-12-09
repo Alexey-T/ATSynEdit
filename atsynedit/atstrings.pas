@@ -319,7 +319,7 @@ type
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
   end;
 
-function ATStrings_To_StringList(L: TATStrings): TStringList;
+function ATStrings_To_StringList(AStr: TATStrings): TStringList;
 
 
 implementation
@@ -356,13 +356,13 @@ begin
   UniqueString(A.Str);
 end;
 
-function ATStrings_To_StringList(L: TATStrings): TStringList;
+function ATStrings_To_StringList(AStr: TATStrings): TStringList;
 var
   i: integer;
 begin
   Result:= TStringList.Create;
-  for i:= 0 to L.Count-1 do
-    Result.Add(UTF8Encode(L.Lines[i]));
+  for i:= 0 to AStr.Count-1 do
+    Result.Add(AStr.LinesUTF8[i]);
 end;
 
 { TATStringItemList }
@@ -1028,8 +1028,7 @@ begin
     //middle
     for i:= AY1+1 to AY2-1 do
     begin
-      Str:= Lines[i];
-      L.Add(UTF8Encode(Str));
+      L.Add(LinesUTF8[i]);
     end;
 
     //last line

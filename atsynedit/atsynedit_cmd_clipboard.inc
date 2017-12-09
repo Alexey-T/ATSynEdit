@@ -154,7 +154,7 @@ var
   i, NLen, X1, Y1, X2, Y2: integer;
   bSel: boolean;
   Str: atString;
-  EolString: string;
+  EolString, STemp: string;
 begin
   Result:= '';
   EolString:= cLineEndStrings[Strings.Endings];
@@ -200,9 +200,9 @@ begin
       begin
         for i:= 0 to ListNum.Count-1 do
         begin
-          Str:= Strings.Lines[NativeInt{%H-}(ListNum[i])];
-          if Str<>'' then
-            ListStr.Add(UTF8Encode(Str));
+          STemp:= Strings.LinesUTF8[NativeInt{%H-}(ListNum[i])];
+          if STemp<>'' then
+            ListStr.Add(STemp);
         end;
         Result:= ListStr.Text; //always use Text, need eol
       end;

@@ -868,7 +868,7 @@ begin
   L:= TStringList.Create;
   try
     for i:= NFrom to NTo do
-      L.Add(Utf8Encode(Strings.Lines[i]));
+      L.Add(Strings.LinesUTF8[i]);
 
     bChange:= SCommentLineAction(L, AComment, Act);
     if not bChange then exit;
