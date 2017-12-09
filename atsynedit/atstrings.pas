@@ -414,10 +414,11 @@ end;
 
 function TATStrings.GetLineLen(AIndex: integer): integer;
 begin
-  //do not use Utf8LengthFast
-  Result:= UTF8Length(
-    FList[AIndex].Str
-    );
+  //Assert(IsIndexValid(AIndex));
+
+  //do not use UTF8LengthFast
+  Result:=
+    Length(UTF8Decode(FList[AIndex].Str));
 end;
 
 function TATStrings.GetLineSep(AIndex: integer): TATLineSeparator;
