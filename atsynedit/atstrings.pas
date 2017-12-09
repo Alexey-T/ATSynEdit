@@ -100,8 +100,15 @@ type
     Ex: TATStringItemEx;
     class operator=(A, B: TATStringItem): boolean;
   end;
+  PATStringItem = ^TATStringItem;
 
-  TATStringItemList = specialize TFPGList<TATStringItem>;
+  { TATStringItemList }
+
+  TATStringItemList = class(specialize TFPGList<TATStringItem>)
+  public
+    procedure Deref(Item: Pointer); override;
+    procedure CopyItem(Src, Dest: Pointer); override;
+  end;
 
 type
   TATStringsProgressKind = (
@@ -341,6 +348,7 @@ begin
   A.Ex.Ends:= TATBits2(AEnd);
   A.Ex.State:= TATBits2(cLineStateAdded);
   A.Ex.Sep:= TATBits2(cLineSepNone);
+  UniqueString(A.Str);
 end;
 
 operator=(A, B: TATStringItem): boolean;
@@ -355,6 +363,21 @@ begin
   Result:= TStringList.Create;
   for i:= 0 to L.Count-1 do
     Result.Add(UTF8Encode(L.Lines[i]));
+end;
+
+{ TATStringItemList }
+
+procedure TATStringItemList.Deref(Item: Pointer);
+begin
+  PATStringItem(Item)^.Str:= '';
+  inherited;
+end;
+
+procedure TATStringItemList.CopyItem(Src, Dest: Pointer);
+begin
+  PATStringItem(Dest)^.Str:= PATStringItem(Src)^.Str;
+  PATStringItem(Dest)^.Ex:= PATStringItem(Src)^.Ex;
+  UniqueString(PATStringItem(Dest)^.Str);
 end;
 
 { TATStringItem }
