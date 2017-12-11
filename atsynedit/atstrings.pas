@@ -85,14 +85,14 @@ type
 
   TATStringItemEx = bitpacked record
     Ends: TATBits2;
-    State: TATBits2;
-    Sep: TATBits2;
     Bookmark: TATBits6;
+    State: TATBits2;
     HintIndex: TATBits6;
-    FoldFrom: bitpacked array[0..cMaxStringsClients-1] of TATBits12;
+    FoldFrom_0, FoldFrom_1: TATBits12;
       //0: line not folded
       //>0: line folded from this char-pos
-    Hidden: bitpacked array[0..cMaxStringsClients-1] of boolean;
+    Hidden_0, Hidden_1: boolean;
+    Sep: TATBits2;
   end;
 
   TATStringItem = packed record
@@ -419,13 +419,21 @@ end;
 function TATStrings.GetLineFoldFrom(ALine, AClient: integer): integer;
 begin
   //Assert(IsIndexValid(ALine));
-  Result:= FList.GetItem(ALine)^.Ex.FoldFrom[AClient];
+  case AClient of
+    0: Result:= FList.GetItem(ALine)^.Ex.FoldFrom_0;
+    1: Result:= FList.GetItem(ALine)^.Ex.FoldFrom_1;
+    else raise Exception.Create('Incorrect index in Strings.LinesFoldFrom[]');
+  end;
 end;
 
 function TATStrings.GetLineHidden(ALine, AClient: integer): boolean;
 begin
   //Assert(IsIndexValid(ALine));
-  Result:= FList.GetItem(ALine)^.Ex.Hidden[AClient];
+  case AClient of
+    0: Result:= FList.GetItem(ALine)^.Ex.Hidden_0;
+    1: Result:= FList.GetItem(ALine)^.Ex.Hidden_1;
+    else raise Exception.Create('Incorrect index in Strings.LinesHidden[]')
+  end;
 end;
 
 function TATStrings.GetLineState(AIndex: integer): TATLineState;
@@ -495,7 +503,6 @@ procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
 var
   Item: PATStringItem;
   Str: atString;
-  i: integer;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
@@ -512,8 +519,8 @@ begin
   UniqueString(Item^.Str);
 
   //fully unfold this line
-  for i:= 0 to High(Item^.Ex.Hidden) do
-    Item^.Ex.FoldFrom[i]:= 0;
+  Item^.Ex.FoldFrom_0:= 0;
+  Item^.Ex.FoldFrom_1:= 0;
 
   if TATLineState(Item^.Ex.State)<>cLineStateAdded then
     Item^.Ex.State:= TATBits2(cLineStateChanged);
@@ -576,7 +583,10 @@ begin
   if AValue>cMax then AValue:= cMax;
 
   Item:= FList.GetItem(AIndexLine);
-  Item^.Ex.FoldFrom[AIndexClient]:= AValue;
+  case AIndexClient of
+    0: Item^.Ex.FoldFrom_0:= AValue;
+    1: Item^.Ex.FoldFrom_1:= AValue;
+  end;
 end;
 
 procedure TATStrings.SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
@@ -585,7 +595,10 @@ var
 begin
   //Assert(IsIndexValid(AIndexLine));
   Item:= FList.GetItem(AIndexLine);
-  Item^.Ex.Hidden[AIndexClient]:= AValue;
+  case AIndexClient of
+    0: Item^.Ex.Hidden_0:= AValue;
+    1: Item^.Ex.Hidden_1:= AValue;
+  end;
 end;
 
 procedure TATStrings.SetLineHint(AIndex: integer; const AValue: string);
