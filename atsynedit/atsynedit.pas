@@ -671,8 +671,8 @@ type
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
-      AItems: TList; AConsiderFolding: boolean);
-    procedure DoCalcLineHilite(const AData: TATSynWrapItemData;
+      AItems: TATSynWrapItems; AConsiderFolding: boolean);
+    procedure DoCalcLineHilite(const AData: TATSynWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
     //select
@@ -1461,7 +1461,7 @@ procedure TATSynEdit.UpdateWrapInfo;
 var
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
-  Items: TList;
+  Items: TATSynWrapItems;
   ListNums: TList;
   i, j: integer;
   NLine, NIndexFrom, NIndexTo: integer;
@@ -1511,7 +1511,7 @@ begin
     (Strings.ListUpdates.Count>0);
   //UseCachedUpdate:= false;////to disable
 
-  Items:= TList.Create;
+  Items:= TATSynWrapItems.Create;
   ListNums:= TList.Create;
 
   try
@@ -1523,7 +1523,7 @@ begin
       begin
         DoCalcWrapInfos(i, NIndentMaximal, Items, bConsiderFolding);
         for j:= 0 to Items.Count-1 do
-          FWrapInfo.Add(TATSynWrapItem(Items[j]));
+          FWrapInfo.Add(Items[j]);
       end;
     end
     else
@@ -1566,9 +1566,10 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TList;
+procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TATSynWrapItems;
   AConsiderFolding: boolean);
 var
+  Item: TATSynWrapItem;
   NOffset, NLen, NIndent, NVisColumns: integer;
   bHidden: boolean;
   NFoldFrom: integer;
@@ -1593,7 +1594,8 @@ begin
     NFoldFrom:= Strings.LinesFoldFrom[ALine, FEditorIndex];
     if NFoldFrom>0 then
     begin
-      AItems.Add(TATSynWrapItem.Create(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed));
+      WrapItem_Init(Item, ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed);
+      AItems.Add(Item);
       Exit;
     end;
   end;
@@ -1601,7 +1603,8 @@ begin
   //line not wrapped?
   if (FWrapColumn<cMinWrapColumnAbs) then
   begin
-    AItems.Add(TATSynWrapItem.Create(ALine, 1, NLen, 0, cWrapItemFinal));
+    WrapItem_Init(Item, ALine, 1, NLen, 0, cWrapItemFinal);
+    AItems.Add(Item);
     Exit;
   end;
 
@@ -1624,7 +1627,9 @@ begin
       NFinal:= cWrapItemFinal
     else
       NFinal:= cWrapItemMiddle;
-    AItems.Add(TATSynWrapItem.Create(ALine, NOffset, NLen, NIndent, NFinal));
+
+    WrapItem_Init(Item, ALine, NOffset, NLen, NIndent, NFinal);
+    AItems.Add(Item);
 
     if FWrapIndented then
       if NOffset=1 then
@@ -1979,7 +1984,7 @@ var
   NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth: integer;
   NOutputSpacesSkipped: integer;
-  WrapItem: TATSynWrapItemData;
+  WrapItem: TATSynWrapItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
   Str, StrOut, StrOutUncut: atString;
@@ -4997,7 +5002,7 @@ var
   List: TATIntArray;
   State: (cFoldbarNone, cFoldbarBegin, cFoldbarEnd, cFoldbarMiddle);
   CoordXM, CoordYM: integer;
-  WrapItem: TATSynWrapItemData;
+  WrapItem: TATSynWrapItem;
   LineIndex: integer;
   IsPlus, IsLineUp, IsLineDown: boolean;
   i: integer;
