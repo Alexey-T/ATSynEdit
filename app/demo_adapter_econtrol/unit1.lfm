@@ -1,7 +1,7 @@
 object fmMain: TfmMain
   Left = 327
   Height = 578
-  Top = 221
+  Top = 137
   Width = 889
   Caption = 'Demo'
   ClientHeight = 578
@@ -22,16 +22,16 @@ object fmMain: TfmMain
     TabOrder = 0
     object chkWrap: TCheckBox
       Left = 9
-      Height = 24
+      Height = 23
       Top = 8
-      Width = 98
+      Width = 90
       Caption = 'word wrap'
       OnChange = chkWrapChange
       TabOrder = 0
     end
     object edLexer: TComboBox
       Left = 9
-      Height = 31
+      Height = 30
       Top = 120
       Width = 176
       DropDownCount = 24
@@ -51,7 +51,7 @@ object fmMain: TfmMain
       ReadOnly = True
       ShowColumnHeaders = False
       SortType = stText
-      TabOrder = 12
+      TabOrder = 10
       ToolTips = False
       ViewStyle = vsSmallIcon
       OnClick = filesClick
@@ -59,18 +59,18 @@ object fmMain: TfmMain
     end
     object chkFullSel: TCheckBox
       Left = 9
-      Height = 24
+      Height = 23
       Top = 48
-      Width = 129
+      Width = 119
       Caption = 'show full sel-bg'
       OnChange = chkFullSelChange
       TabOrder = 2
     end
     object chkFullHilite: TCheckBox
       Left = 9
-      Height = 24
+      Height = 23
       Top = 68
-      Width = 154
+      Width = 143
       Caption = 'show full syntax-bg'
       OnChange = chkFullHiliteChange
       TabOrder = 3
@@ -86,27 +86,27 @@ object fmMain: TfmMain
     end
     object chkUnpri: TCheckBox
       Left = 9
-      Height = 24
+      Height = 23
       Top = 28
-      Width = 130
+      Width = 121
       Caption = 'show unprinted'
       OnChange = chkUnpriChange
       TabOrder = 1
     end
     object chkShowCur: TCheckBox
       Left = 9
-      Height = 24
+      Height = 23
       Top = 88
-      Width = 132
+      Width = 126
       Caption = 'show cur line bg'
       OnChange = chkShowCurChange
       TabOrder = 4
     end
     object chkLexer: TCheckBox
       Left = 9
-      Height = 24
+      Height = 23
       Top = 152
-      Width = 108
+      Width = 99
       Caption = 'enable lexer'
       Checked = True
       OnChange = chkLexerChange
@@ -115,39 +115,21 @@ object fmMain: TfmMain
     end
     object chkDyn: TCheckBox
       Left = 9
-      Height = 24
+      Height = 23
       Top = 176
-      Width = 119
+      Width = 111
       Caption = 'dynamic hilite'
       OnChange = chkDynChange
       TabOrder = 7
     end
-    object bComment: TButton
+    object bExport: TButton
       Left = 192
       Height = 25
       Top = 40
       Width = 152
-      Caption = 'comment sel'
-      OnClick = bCommentClick
-      TabOrder = 9
-    end
-    object bUncomment: TButton
-      Left = 192
-      Height = 25
-      Top = 72
-      Width = 152
-      Caption = 'uncomment sel'
-      OnClick = bUncommentClick
-      TabOrder = 10
-    end
-    object bExport: TButton
-      Left = 192
-      Height = 25
-      Top = 104
-      Width = 152
       Caption = 'export html'
       OnClick = bExportClick
-      TabOrder = 11
+      TabOrder = 9
     end
   end
   object Tree: TTreeView

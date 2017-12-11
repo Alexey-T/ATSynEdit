@@ -21,8 +21,6 @@ type
 
   TfmMain = class(TForm)
     bOpen: TButton;
-    bComment: TButton;
-    bUncomment: TButton;
     bExport: TButton;
     chkDyn: TCheckBox;
     chkFullHilite: TCheckBox;
@@ -41,10 +39,8 @@ type
     Tree: TTreeView;
     procedure AdapterParseBegin(Sender: TObject);
     procedure AdapterParseDone(Sender: TObject);
-    procedure bCommentClick(Sender: TObject);
     procedure bExportClick(Sender: TObject);
     procedure bOpenClick(Sender: TObject);
-    procedure bUncommentClick(Sender: TObject);
     procedure chkDynChange(Sender: TObject);
     procedure chkFullHiliteChange(Sender: TObject);
     procedure chkFullSelChange(Sender: TObject);
@@ -63,7 +59,6 @@ type
     ed: TATSynEdit;
     FDirApp: string;
     FFilename: string;
-    procedure DoCommentAct(Act: TATCommentAction);
     procedure DoLexer(const aname: string);
     procedure DoOpenFile(const fn: string);
     procedure EditCalcStaple(Sender: TObject; ALine, AIndent: integer; var AColor: TColor);
@@ -257,22 +252,6 @@ begin
     Result:= an.LineComment;
 end;
 
-procedure TfmMain.DoCommentAct(Act: TATCommentAction);
-var
-  Str: string;
-begin
-  Str:= GetComment;
-  if Str='' then
-    Showmessage('No line comment defined for lexer')
-  else
-    Ed.DoCommentSelectionLines(Act, Str);
-end;
-
-procedure TfmMain.bCommentClick(Sender: TObject);
-begin
-  DoCommentAct(cCommentAdd_AtNonespace_IfNone);
-end;
-
 procedure TfmMain.bExportClick(Sender: TObject);
 var
   fn: string;
@@ -294,11 +273,6 @@ end;
 procedure TfmMain.AdapterParseBegin(Sender: TObject);
 begin
   Tree.Items.Clear;
-end;
-
-procedure TfmMain.bUncommentClick(Sender: TObject);
-begin
-  DoCommentAct(cCommentRemove);
 end;
 
 procedure TfmMain.chkDynChange(Sender: TObject);
