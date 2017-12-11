@@ -36,7 +36,6 @@ type
     Data: TATSynWrapItemData;
     constructor Create(ALineIndex, ACharIndex, ALength: integer;
       AIndent: word; AFinal: TATSynWrapFinal);
-    procedure Assign(AItem: TATSynWrapItem);
   end;
 
 type
@@ -89,11 +88,6 @@ begin
   Data.NLength:= ALength;
   Data.NIndent:= AIndent;
   Data.NFinal:= AFinal;
-end;
-
-procedure TATSynWrapItem.Assign(AItem: TATSynWrapItem);
-begin
-  Data:= AItem.Data;
 end;
 
 { TATSynWrapInfo }
@@ -271,7 +265,7 @@ begin
 
   //overwrite N items
   for i:= 0 to AItems.Count-1 do
-    TATSynWrapItem(FList[AFrom+i]).Assign(TATSynWrapItem(AItems[i]));
+    TATSynWrapItem(FList[AFrom+i]).Data:= TATSynWrapItem(AItems[i]).Data;
 
   //must free list
   for i:= 0 to AItems.Count-1 do
