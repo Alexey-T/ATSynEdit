@@ -948,8 +948,6 @@ begin
 end;
 
 procedure TATStrings.Clear;
-var
-  i: integer;
 begin
   DoClearUndo(FUndoList.Locked);
   DoEventLog(-1, 0);
