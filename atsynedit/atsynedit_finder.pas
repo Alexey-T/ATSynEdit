@@ -19,7 +19,8 @@ uses
   ATStringProc_TextBuffer;
 
 type
-  TATFinderProgress = procedure(Sender: TObject; ACurPos, AMaxPos: integer;
+  TATFinderProgress = procedure(Sender: TObject;
+    const ACurPos, AMaxPos: Int64;
     var AContinue: boolean) of object;
   TATFinderFound = procedure(Sender: TObject; APos1, APos2: TPoint) of object;
   TATFinderConfirmReplace = procedure(Sender: TObject;
