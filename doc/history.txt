@@ -1,0 +1,34 @@
+
+2017.12.30
++ use local copy of FPC's fgl.pp as atsynedit_fgl.pas
+
+2017.12.14
+* change decl of TATFinderProgress
+
+2017.12.11
++ change storage of WrapInfo items to generic list TFPGList
++ optimized ATStrings item size
+
+2017.12.09
+* delete function SCommentLineAction, better do it in user app
++ optimized by adding prop Strings.LinesUTF8[]
++ optimized Strings.TextDeleteRange, do fast delete block, no undo, if block is too big
++ big rewrite of ATStrings storage using generic list TFPSList
+
+2017.12.07
++ support new Laz API (trunk) OnMouseWheelHorz
+
+2017.12.04
++ optimized ATStrings item size (bitpacked record)
++ change storage ATStrings to generic list
+
+2017.11.26
+- fix: if tab-char exists at line start, column selection was wrong
+
+2017.11.24
++ add func SClipboardCopy; fix it for LCL GTK2 bug with trailing zero
+
+2017.11.14
++ finder: usual (non regex) search engine rewritten totally, don't use StringBuffer, fast
+
+(older log: only in github)
