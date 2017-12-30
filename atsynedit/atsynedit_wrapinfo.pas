@@ -13,7 +13,7 @@ interface
 uses
   Classes, SysUtils,
   ATStrings,
-  fgl;
+  ATSynEdit_fgl;
 
 type
   TATSynWrapFinal = (
