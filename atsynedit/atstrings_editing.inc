@@ -347,6 +347,7 @@ begin
     DoClearUndo;
     DoEventChange(0, cLineChangeEdited);
     DoEventLog(0, 1);
+    Modified:= true;
   end;
 
   FChangeBlockActive:= false;
