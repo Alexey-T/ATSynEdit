@@ -343,8 +343,7 @@ begin
   else
   begin
     //delete fast
-    for i:= ALine2 downto ALine1 do
-      FList.Delete(i);
+    FList.DeleteRange(ALine1, ALine2);
     DoClearUndo;
     DoEventChange(0, cLineChangeEdited);
     DoEventLog(0, 1);

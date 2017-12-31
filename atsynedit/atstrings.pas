@@ -1021,6 +1021,8 @@ var
 begin
   Result:= '';
   if AY1>AY2 then Exit;
+  if not IsIndexValid(AY1) then Exit;
+  if not IsIndexValid(AY2) then Exit;
 
   if AY1=AY2 then
   begin
