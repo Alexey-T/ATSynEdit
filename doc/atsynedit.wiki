@@ -940,6 +940,8 @@ Public prop: WrapInfo, it's list of wrapinfo items. You can read it to get all i
 
 Public props: ScrollVert, ScrollHorz. They are records, NPos is scroll pos. ScrollVert.NPos is index in WrapInfo list, change it to make precise scrolling (call Update() then). ScrollHorz.NPos is horz scroll pos, now it's the same as prop ColumnLeft.
 
+Method DoScrollByDelta(Dx, Dy) allows to increment/decrement horz (Dx) and vert (Dy) scroll positions.
+
 ==more==
 
 = Auto-completion lists =
