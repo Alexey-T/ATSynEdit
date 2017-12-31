@@ -1029,8 +1029,11 @@ type
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
     procedure MouseLeave; override;
+
     function DoMouseWheel(Shift: TShiftState; WheelDelta: integer; MousePos{%H-}: TPoint): boolean; override;
     function DoMouseWheelHorz(Shift: TShiftState; WheelDelta: integer; MousePos{%H-}: TPoint): boolean; override;
+    // Note! ...Horz is new API in Lazarus 1.9. If you use 1.8 release, just comment word "override;" at end of line
+
     procedure DblClick; override;
     procedure TripleClick; override;
     function DoGetTextString: atString; virtual;
