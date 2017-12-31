@@ -1,5 +1,6 @@
 
 2017.12.30
++ use fast TFPSList.DeleteRange in Strings.TextDeleteRange to fast del big block w/o using undo
 + use local copy of FPC's fgl.pp as atsynedit_fgl.pas
 
 2017.12.14
