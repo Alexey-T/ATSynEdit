@@ -1380,7 +1380,7 @@ begin
   Result := false;
   Index := -1;
   if not Sorted then
-    raise EListError.Create(SErrFindNeedsSortedList);
+    raise EListError.Create('TFPSMap.Find needs sorted list');
   // Use binary search.
   L := 0;
   R := FCount-1;
