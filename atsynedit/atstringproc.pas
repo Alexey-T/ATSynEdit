@@ -119,6 +119,7 @@ procedure SDeleteFromEol(var s: string);
 procedure SDeleteFromEol(var s: atString);
 
 var
+  OptAllowSpecialWidthChars: boolean = true;
   OptUnprintedReplaceSpec: boolean = false;
   OptUnprintedReplaceSpecToCode: integer = 164; //char 164 is small circle
 
@@ -408,7 +409,7 @@ begin
         NScalePercents:= cCharScaleHex_Big;
     end
     else
-    if IsCharFullWidth(S[i]) then
+    if OptAllowSpecialWidthChars and IsCharFullWidth(S[i]) then
       NScalePercents:= cCharScaleFullwidth_Default;
 
     {$ifdef test_wide_char}
