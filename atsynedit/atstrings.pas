@@ -102,7 +102,7 @@ type
   TATStringItem = packed record
     Str: string;
     CharLen: integer;
-      //len in CodePoints (we need len in UTF16 chars, it's almost the same here)
+      //len in UTF16 chars (almost the same as UTF8Length(Str) in most cases, which is used in some place)
       //it can be >16M, so we need Longint
       // >=0: value
       // -1: len is unknown yet
@@ -356,10 +356,15 @@ begin
   FillChar(A, SizeOf(A), 0);
 end;
 
-procedure StringItem_Init(var A: TATStringItem; const AString: string; AEnd: TATLineEnds);
+procedure StringItem_Init(
+  var A: TATStringItem;
+  const AString: string;
+  AEnd: TATLineEnds;
+  ACharLen: integer);
 begin
   FillChar(A, SizeOf(A), 0);
   A.Str:= AString;
+  A.CharLen:= ACharLen;
   A.Ex.Ends:= TATBits2(AEnd);
   A.Ex.State:= TATBits2(cLineStateAdded);
   A.Ex.Sep:= TATBits2(cLineSepNone);
@@ -803,7 +808,7 @@ begin
   DoEventLog(Count, Length(AString));
   DoEventChange(Count, cLineChangeAdded);
 
-  StringItem_Init(Item, UTF8Encode(AString), AEnd);
+  StringItem_Init(Item, UTF8Encode(AString), AEnd, Length(AString));
   FList.Add(@Item);
   StringItem_Zero(Item);
 end;
@@ -857,7 +862,7 @@ begin
   DoEventLog(ALineIndex, Length(AString));
   DoEventChange(ALineIndex, cLineChangeAdded);
 
-  StringItem_Init(Item, UTF8Encode(AString), AEnd);
+  StringItem_Init(Item, UTF8Encode(AString), AEnd, Length(AString));
   FList.Insert(ALineIndex, @Item);
   StringItem_Zero(Item);
 end;
@@ -903,7 +908,8 @@ begin
 
       StringItem_Init(Item,
         ABlock.GetLineUTF8(i),
-        Endings);
+        Endings,
+        cLineLenUnknown);
       FList.Insert(ALineIndex+i, @Item);
       StringItem_Zero(Item);
     end;
@@ -1441,12 +1447,11 @@ begin
   Result:= false;
 end;
 
-procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: string;
-  AEnd: TATLineEnds);
+procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLineEnds);
 var
   Item: TATStringItem;
 begin
-  StringItem_Init(Item, AString, AEnd);
+  StringItem_Init(Item, AString, AEnd, cLineLenUnknown);
   Item.Ex.State:= TATBits2(cLineStateAdded);
   FList.Add(@Item);
   StringItem_Zero(Item);
