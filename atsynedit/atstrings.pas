@@ -517,20 +517,21 @@ end;
 procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
 var
   Item: PATStringItem;
-  Str: atString;
+  StrBefore: atString;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
 
   Item:= FList.GetItem(AIndex);
-  Str:= UTF8Decode(Item^.Str);
+  StrBefore:= UTF8Decode(Item^.Str);
 
-  DoAddUndo(cEditActionChange, AIndex, Str, TATLineEnds(Item^.Ex.Ends));
-  DoEventLog(AIndex, -Length(Str));
+  DoAddUndo(cEditActionChange, AIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
+  DoEventLog(AIndex, -Length(StrBefore));
   DoEventLog(AIndex, Length(AValue));
   DoEventChange(AIndex, cLineChangeEdited);
 
   Item^.Str:= UTF8Encode(AValue);
+  Item^.CharLen:= Length(AValue);
   UniqueString(Item^.Str);
 
   //fully unfold this line
@@ -941,17 +942,17 @@ end;
 procedure TATStrings.LineDelete(ALineIndex: integer; AForceLast: boolean = true);
 var
   Item: PATStringItem;
-  Str: atString;
+  StrBefore: atString;
 begin
   if FReadOnly then Exit;
 
   if IsIndexValid(ALineIndex) then
   begin
     Item:= FList.GetItem(ALineIndex);
-    Str:= UTF8Decode(Item^.Str);
+    StrBefore:= UTF8Decode(Item^.Str);
 
-    DoAddUndo(cEditActionDelete, ALineIndex, Str, TATLineEnds(Item^.Ex.Ends));
-    DoEventLog(ALineIndex, -Length(Str));
+    DoAddUndo(cEditActionDelete, ALineIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
+    DoEventLog(ALineIndex, -Length(StrBefore));
     DoEventChange(ALineIndex, cLineChangeDeleted);
 
     FList.Delete(ALineIndex);
