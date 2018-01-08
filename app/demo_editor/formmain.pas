@@ -126,8 +126,7 @@ type
     procedure chkMouseEnChange(Sender: TObject);
     procedure chkNewScrollChange(Sender: TObject);
     procedure chkTabSpacesChange(Sender: TObject);
-    procedure FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
-      var AContinue: boolean);
+    procedure FinderProgress(Sender: TObject; const ACurPos, AMaxPos: Int64; var AContinue: boolean);
     procedure mnuFileExitClick(Sender: TObject);
     procedure mnuFileHtmlClick(Sender: TObject);
     procedure mnuFileOpenClick(Sender: TObject);
@@ -648,8 +647,8 @@ begin
   ed.Update;
 end;
 
-procedure TfmMain.FinderProgress(Sender: TObject; ACurPos, AMaxPos: integer;
-  var AContinue: boolean);
+procedure TfmMain.FinderProgress(Sender: TObject; const ACurPos,
+  AMaxPos: Int64; var AContinue: boolean);
 begin
   progress.Position:= ACurPos * 100 div AMaxPos;
   Application.ProcessMessages;

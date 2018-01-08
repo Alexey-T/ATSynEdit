@@ -15,6 +15,8 @@ License: MPL 2.0 or LGPL
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
                          //when horz-scroll hides/shows/hides/...
                          //ok also for win32
+//{$define at_show_scroll_info}
+
 unit ATSynEdit;
 
 interface
@@ -1788,6 +1790,11 @@ begin
   if FOptScrollbarsNew then si.nPage:= si.nMax+1;
   si.nPos:= FScrollVert.NPos;
   SetScrollInfo(Handle, SB_VERT, si, True);
+
+  {$ifdef at_show_scroll_info}
+  Writeln(Format('ATSynEdit SetScrollInfo: SB_VERT, nMin=%d, nMax=%d, nPage=%d, nPos=%d',
+    [FScrollVert.NMin, FScrollVert.NMax, FScrollVert.NPage, FScrollVert.NPos]));
+  {$endif}
 end;
 
 procedure TATSynEdit.UpdateScrollbarHorz;
@@ -1817,6 +1824,11 @@ begin
   if FOptScrollbarsNew then si.nPage:= si.nMax+1;
   si.nPos:= FScrollHorz.NPos;
   SetScrollInfo(Handle, SB_HORZ, si, True);
+
+  {$ifdef at_show_scroll_info}
+  Writeln(Format('ATSynEdit SetScrollInfo: SB_HORZ, nMin=%d, nMax=%d, nPage=%d, nPos=%d',
+    [FScrollHorz.NMin, FScrollHorz.NMax, FScrollHorz.NPage, FScrollHorz.NPos]));
+  {$endif}
 end;
 
 function TATSynEdit.GetRectMain: TRect;
