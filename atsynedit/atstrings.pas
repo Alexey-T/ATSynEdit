@@ -76,6 +76,10 @@ type
     cTrimAll
     );
 
+const
+  cLineLenUnknown = -1;
+  cLineLenSameForASCII = -2;
+
 type
   { TATStringItem }
 
@@ -97,6 +101,12 @@ type
 
   TATStringItem = packed record
     Str: string;
+    CharLen: integer;
+      //len in CodePoints (we need len in UTF16 chars, it's almost the same here)
+      //it can be >16M, so we need Longint
+      // >=0: value
+      // -1: len is unknown yet
+      // -2: str is ASCII only, so len = Length(Str)
     Ex: TATStringItemEx;
   end;
   PATStringItem = ^TATStringItem;
