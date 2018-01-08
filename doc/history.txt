@@ -1,5 +1,6 @@
 
 2018.01.08
++ don't calc URLs in too long lines. property OptMaxLineLenToCalcURL=300
 + add global option OptAllowSpecialWidthChars (to disable rendering of 170% width chars)
 + add {$ifdef at_show_scroll_info} (to debug)
 
