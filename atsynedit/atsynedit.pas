@@ -248,6 +248,7 @@ const
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
   cInitFoldStyle = cFoldHereWithTruncatedText;
+  cInitMaxLineLenToCalcURL = 300;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
@@ -488,6 +489,7 @@ type
     FOptShowFontLigatures: boolean;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
+    FOptMaxLineLenToCalcURL: integer;
     FOptShowStapleStyle: TATLineStyle;
     FOptShowStapleIndent: integer;
     FOptShowStapleWidthPercent: integer;
@@ -1167,6 +1169,7 @@ type
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
+    property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
     property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle default cLineStyleSolid;
     property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent default -1;
     property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent default 100;
@@ -2824,6 +2827,7 @@ begin
   FOptShowFontLigatures:= true;
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
+  FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
 
   FOptShowStapleStyle:= cLineStyleSolid;
   FOptShowStapleIndent:= -1;
@@ -5409,7 +5413,6 @@ procedure TATSynEdit.DoCalcLinks;
 var
   ReObj: TRegExpr;
   AtrObj: TATLinePartClass;
-  SLine: atString;
   MatchPos, MatchLen, NLine, i: integer;
 begin
   Attribs.DeleteWithTag(cUrlMarkerTag);
@@ -5426,8 +5429,9 @@ begin
     for i:= NLine to NLine+GetVisibleLines do
     begin
       if not Strings.IsIndexValid(i) then Break;
-      SLine:= Strings.Lines[i];
-      ReObj.InputString:= SLine;
+      if Length(Strings.LinesUTF8[i])>FOptMaxLineLenToCalcURL then Continue;
+
+      ReObj.InputString:= Strings.Lines[i];
 
       MatchPos:= 0;
       MatchLen:= 0;
