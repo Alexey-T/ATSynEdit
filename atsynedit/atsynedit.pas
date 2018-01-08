@@ -29,6 +29,7 @@ uses
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
   LMessages, LCLType,
+  LazUTF8,
   ATStringProc,
   ATStrings,
   ATStringProc_WordJump,
@@ -2006,6 +2007,7 @@ var
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
   Str, StrOut, StrOutUncut: atString;
+  StrTemp: string;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineSeparator: TATLineSeparator;
   LineWithCaret, LineEolSelected, LineColorForced: boolean;
@@ -2090,8 +2092,19 @@ begin
     end;
 
     //prepare line
+    {
     Str:= Strings.Lines[NLinesIndex];
     Str:= Copy(Str, WrapItem.NCharIndex, WrapItem.NLength);
+    }
+    //optimization for 4M string length
+    StrTemp:= UTF8Copy(
+      Strings.LinesUTF8[NLinesIndex],
+      WrapItem.NCharIndex,
+      Min(WrapItem.NLength, GetVisibleColumns+ScrollHorz.NPos)
+      //don't read entire len
+      );
+    Str:= UTF8Decode(StrTemp);
+    //
 
     LineSeparator:= Strings.LinesSeparator[NLinesIndex];
     LineWithCaret:= IsLineWithCaret(NLinesIndex);
