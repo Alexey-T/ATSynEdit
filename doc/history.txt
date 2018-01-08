@@ -1,4 +1,8 @@
 
+2018.01.08
++ add global option OptAllowSpecialWidthChars (to disable rendering of 170% width chars)
++ add {$ifdef at_show_scroll_info} (to debug)
+
 2017.12.30
 + use fast TFPSList.DeleteRange in Strings.TextDeleteRange to fast del big block w/o using undo
 + use local copy of FPC's fgl.pp as atsynedit_fgl.pas
