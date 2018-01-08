@@ -41,12 +41,12 @@ const
   cLineEndStrings: array[TATLineEnds] of string = ('', #13#10, #10, #13);
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'win', 'un', 'mac');
 
-const
-  cMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
-  cCharScaleFullwidth_Default: word = 170; //width of CJK chars
-  cCharScaleHex_Small: word = 300; //width of hex show: "xNN"
-  cCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
-  cMinWordWrapOffset: integer = 3;
+var
+  OptMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
+  OptCharScaleFullwidth_Default: word = 170; //width of CJK chars in percents
+  OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
+  OptCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
+  OptMinWordWrapOffset: integer = 3;
 
 var
   OptHexCharsDefault: UnicodeString = ''; //show these chars as "<NNNN>"
@@ -223,7 +223,7 @@ var
 begin
   if S='' then
     begin Result:= 0; Exit end;
-  if AColumns<cMinWordWrapOffset then
+  if AColumns<OptMinWordWrapOffset then
     begin Result:= AColumns; Exit end;
 
   SCalcCharOffsets(S, Offsets, ATabSize);
@@ -238,8 +238,8 @@ begin
   N:= Length(S)-1;
   while (N>0) and (Offsets.OffsetPercent[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
-  if NAvg<cMinWordWrapOffset then
-    begin Result:= cMinWordWrapOffset; Exit end;
+  if NAvg<OptMinWordWrapOffset then
+    begin Result:= OptMinWordWrapOffset; Exit end;
 
   //find correct offset: not allowed at edge
   //a) 2 wordchars,
@@ -312,7 +312,7 @@ end;
 function SCalcTabulationSize(const ATabSize, APos: integer): integer;
 begin
   Result:= 1;
-  if APos>cMaxTabPositionToExpand then Exit;
+  if APos>OptMaxTabPositionToExpand then Exit;
   while (APos+Result-1) mod ATabSize <> 0 do
     Inc(Result);
 end;
@@ -404,13 +404,13 @@ begin
     if IsCharHex(S[i]) then
     begin
       if Ord(S[i])<$100 then
-        NScalePercents:= cCharScaleHex_Small
+        NScalePercents:= OptCharScaleHex_Small
       else
-        NScalePercents:= cCharScaleHex_Big;
+        NScalePercents:= OptCharScaleHex_Big;
     end
     else
     if OptAllowSpecialWidthChars and IsCharFullWidth(S[i]) then
-      NScalePercents:= cCharScaleFullwidth_Default;
+      NScalePercents:= OptCharScaleFullwidth_Default;
 
     {$ifdef test_wide_char}
     if IsSpaceChar(S[i]) then
