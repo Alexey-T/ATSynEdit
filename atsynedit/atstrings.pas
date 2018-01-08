@@ -458,13 +458,26 @@ begin
 end;
 
 function TATStrings.GetLineLen(AIndex: integer): integer;
+var
+  ItemPtr: PATStringItem;
+  CurrentLen: integer;
 begin
   //Assert(IsIndexValid(AIndex));
 
-  //do not use UTF8LengthFast
-  //Result:= UTF8Length(...Str) is ok
-  Result:=
-    UTF8Length(FList.GetItem(AIndex)^.Str);
+  ItemPtr:= FList.GetItem(AIndex);
+  CurrentLen:= ItemPtr^.CharLen;
+  if CurrentLen>=0 then
+    Result:= CurrentLen
+  else
+  if CurrentLen=cLineLenUnknown then
+  begin
+    //make faster calc via UTF8Length, don't use slow UTF8Decode
+    Result:= UTF8Length(ItemPtr^.Str);
+    ItemPtr^.CharLen:= Result;
+  end
+  else
+  if CurrentLen=cLineLenSameForASCII then
+    Result:= Length(ItemPtr^.Str);
 end;
 
 function TATStrings.GetLineSep(AIndex: integer): TATLineSeparator;
