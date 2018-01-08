@@ -24,7 +24,6 @@ type
 
   TATLineOffsetsInfo = record
     OffsetPercent: array of integer; //word is too small
-    Ligatures: atString;
   end;
 
 
@@ -388,7 +387,6 @@ var
   i: integer;
 begin
   SetLength(AInfo.OffsetPercent, Length(S));
-  AInfo.Ligatures:= '';
   if S='' then Exit;
 
   NCharsSkipped:= ACharsSkipped;
