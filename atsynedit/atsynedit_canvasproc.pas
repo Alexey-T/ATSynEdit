@@ -593,7 +593,7 @@ begin
   Result:= 0;
   if S='' then Exit;
   SCalcCharOffsets(S, Offsets, ATabSize);
-  Result:= Offsets.OffsetPercent[High(Offsets.OffsetPercent)] * ACharSize.X div 100;
+  Result:= Offsets[High(Offsets)] * ACharSize.X div 100;
 end;
 
 
@@ -644,8 +644,8 @@ begin
 
   SCalcCharOffsets(AText, ListOffsets, AProps.TabSize, AProps.CharsSkipped);
 
-  for i:= 0 to High(ListOffsets.OffsetPercent) do
-    ListInt[i]:= ListOffsets.OffsetPercent[i] * AProps.CharSize.X div 100;
+  for i:= 0 to High(ListOffsets) do
+    ListInt[i]:= ListOffsets[i] * AProps.CharSize.X div 100;
 
   //truncate AText, to not paint over screen
   for i:= 1 to High(ListInt) do

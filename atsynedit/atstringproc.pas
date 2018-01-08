@@ -21,11 +21,7 @@ type
 type
   TATIntArray = array of integer;
   TATPointArray = array of TPoint;
-
-  TATLineOffsetsInfo = record
-    OffsetPercent: array of integer; //word is too small
-  end;
-
+  TATLineOffsetsInfo = array of integer; //word is too small
 
 function SCharUpper(ch: atChar): atChar;
 function SCharLower(ch: atChar): atChar;
@@ -201,8 +197,8 @@ var
   s: string;
 begin
   s:= '';
-  for i:= Low(AList.OffsetPercent) to High(AList.OffsetPercent) do
-    s:= s+IntToStr(AList.OffsetPercent[i])+'% ';
+  for i:= Low(AList) to High(AList) do
+    s:= s+IntToStr(AList[i])+'% ';
   ShowMessage('Offsets'#10+s);
 end;
 
@@ -227,7 +223,7 @@ begin
 
   SCalcCharOffsets(S, Offsets, ATabSize);
 
-  if Offsets.OffsetPercent[High(Offsets.OffsetPercent)]<=AColumns*100 then
+  if Offsets[High(Offsets)]<=AColumns*100 then
   begin
     Result:= Length(S);
     Exit
@@ -235,7 +231,7 @@ begin
 
   //NAvg is average wrap offset, we use it if no correct offset found
   N:= Length(S)-1;
-  while (N>0) and (Offsets.OffsetPercent[N]>(AColumns+1)*100) do Dec(N);
+  while (N>0) and (Offsets[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
   if NAvg<OptMinWordWrapOffset then
     begin Result:= OptMinWordWrapOffset; Exit end;
@@ -386,7 +382,7 @@ var
   NScalePercents: integer;
   i: integer;
 begin
-  SetLength(AInfo.OffsetPercent, Length(S));
+  SetLength(AInfo, Length(S));
   if S='' then Exit;
 
   NCharsSkipped:= ACharsSkipped;
@@ -430,9 +426,9 @@ begin
       NSize:= 0;
 
     if i=1 then
-      AInfo.OffsetPercent[i-1]:= NSize*NScalePercents
+      AInfo[i-1]:= NSize*NScalePercents
     else
-      AInfo.OffsetPercent[i-1]:= AInfo.OffsetPercent[i-2]+NSize*NScalePercents;
+      AInfo[i-1]:= AInfo[i-2]+NSize*NScalePercents;
   end;
 end;
 
@@ -461,7 +457,7 @@ begin
 
   //positions of each char end
   for i:= 0 to High(ListEnds) do
-    ListEnds[i]:= ListOffsets.OffsetPercent[i]*ACharSize div 100;
+    ListEnds[i]:= ListOffsets[i]*ACharSize div 100;
 
   //positions of each char middle
   for i:= 0 to High(ListEnds) do
@@ -496,11 +492,11 @@ begin
   SCalcCharOffsets(S, Offsets, ATabSize);
 
   while (ACharsSkipped<Length(S)) and
-    (Offsets.OffsetPercent[ACharsSkipped] < AScrollPos*100) do
+    (Offsets[ACharsSkipped] < AScrollPos*100) do
     Inc(ACharsSkipped);
 
   if (ACharsSkipped>0) then
-    ASpacesSkipped:= Offsets.OffsetPercent[ACharsSkipped-1] div 100;
+    ASpacesSkipped:= Offsets[ACharsSkipped-1] div 100;
 end;
 
 
