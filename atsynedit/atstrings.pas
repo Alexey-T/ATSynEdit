@@ -406,8 +406,26 @@ end;
 { TATStrings }
 
 function TATStrings.GetLine(AIndex: integer): atString;
+var
+  Item: PATStringItem;
+  PrevLen, NewLen: integer;
 begin
-  Result:= UTF8Decode(GetLineUTF8(AIndex));
+  Item:= FList.GetItem(AIndex);
+  PrevLen:= Item^.CharLen;
+
+  if PrevLen=cCharLenAscii then
+    //optimization for pure ascii-strings, get them faster
+    Result:= SConvertUtf8ToWideForAscii(Item^.Str)
+  else
+  begin
+    //use use slow UTF8Decode, and update CharLen
+    Result:= UTF8Decode(Item^.Str);
+    NewLen:= Length(Result);
+    if NewLen=Length(Item^.Str) then
+      Item^.CharLen:= cCharLenAscii
+    else
+      Item^.CharLen:= NewLen;
+  end;
 end;
 
 function TATStrings.GetLineUTF8(AIndex: integer): string;
