@@ -2007,7 +2007,6 @@ var
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
   Str, StrOut, StrOutUncut: atString;
-  StrTemp: string;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineSeparator: TATLineSeparator;
   LineWithCaret, LineEolSelected, LineColorForced: boolean;
@@ -2097,14 +2096,11 @@ begin
     Str:= Copy(Str, WrapItem.NCharIndex, WrapItem.NLength);
     }
     //optimization for 4M string length
-    StrTemp:= UTF8Copy(
-      Strings.LinesUTF8[NLinesIndex],
+    Str:= Strings.LineSub(
+      NLinesIndex,
       WrapItem.NCharIndex,
       Min(WrapItem.NLength, GetVisibleColumns+ScrollHorz.NPos)
-      //don't read entire len
       );
-    Str:= UTF8Decode(StrTemp);
-    //
 
     LineSeparator:= Strings.LinesSeparator[NLinesIndex];
     LineWithCaret:= IsLineWithCaret(NLinesIndex);

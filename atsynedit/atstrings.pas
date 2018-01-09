@@ -251,6 +251,7 @@ type
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
     property LinesHint[Index: integer]: string read GetLineHint write SetLineHint;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
+    function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
@@ -1006,6 +1007,17 @@ begin
 
   if AForceLast then
     ActionAddFakeLineIfNeeded;
+end;
+
+function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
+var
+  S: string;
+begin
+  //UTF8Copy is almost what we need
+  S:= UTF8Copy(
+    LinesUTF8[ALineIndex],
+    APosFrom, ALen);
+  Result:= UTF8Decode(S);
 end;
 
 procedure TATStrings.Clear;
