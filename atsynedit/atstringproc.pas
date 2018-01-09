@@ -896,7 +896,7 @@ var
 begin
   SetLength(Result, Length(S));
   for i:= 1 to Length(S) do
-    Result[i]:= S[i];
+    Result[i]:= WideChar(Ord(S[i]));
 end;
 
 
