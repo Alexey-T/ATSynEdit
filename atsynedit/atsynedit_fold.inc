@@ -133,7 +133,7 @@ begin
     begin
       Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= ARange.X;
       if ARange.Hint='' then
-        ARange.Hint:= Copy(Strings.Lines[ARange.Y], ARange.X, cFoldedLenOfEmptyHint)+'...';
+        ARange.Hint:= Strings.LineSub(ARange.Y, ARange.X, cFoldedLenOfEmptyHint)+'...';
     end;
     cFoldFromEndOfLine:
     begin
@@ -328,7 +328,7 @@ begin
 
     mi.Caption:=
       cHintScrollPrefix+' '+Inttostr(Rng.Y+1)+': '+
-      UTF8Encode(Copy(Strings.Lines[Rng.Y], 1, cFoldedLenOfEmptyHint));
+      UTF8Encode(Strings.LineSub(Rng.Y, 1, cFoldedLenOfEmptyHint));
 
     if Rng.Folded then
       mi.ImageIndex:= 0

@@ -112,7 +112,7 @@ begin
     if OptMaxLen>0 then
       if Strings.LinesLen[0]>OptMaxLen then
       begin
-        Strings.Lines[0]:= Copy(Strings.Lines[0], 1, OptMaxLen);
+        Strings.Lines[0]:= Strings.LineSub(0, 1, OptMaxLen);
         DoCaretSingle(Strings.LinesLen[0], 0);
         Update(true);
       end;
