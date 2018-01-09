@@ -185,7 +185,7 @@ begin
         Continue;
 
     NFromStart:= P.X+1-Item.NCharIndex;
-    Str:= Copy(AStrings.Lines[P.Y], Item.NCharIndex, Min(NFromStart, Item.NLength));
+    Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
 
     Result.X:= CanvasTextWidth(Str, ATabSize, ACharSize);
     if NFromStart>Item.NLength then
@@ -327,7 +327,7 @@ begin
     Item:= AWrapInfo[NIndex];
     Result.Y:= Item.NLineIndex;
 
-    Str:= Copy(AStrings.Lines[Result.Y], Item.NCharIndex, Item.NLength);
+    Str:= AStrings.LineSub(Result.Y, Item.NCharIndex, Item.NLength);
 
     if bGapGoesToEnd then
       Result.X:= Length(Str) + Item.NCharIndex-1
