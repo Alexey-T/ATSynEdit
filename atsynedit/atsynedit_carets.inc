@@ -327,7 +327,13 @@ begin
     Item:= AWrapInfo[NIndex];
     Result.Y:= Item.NLineIndex;
 
-    Str:= AStrings.LineSub(Result.Y, Item.NCharIndex, Item.NLength);
+    Str:= AStrings.LineSub(
+      Result.Y,
+      Item.NCharIndex,
+      //optimized for huge line
+      Min(Item.NLength,
+          AScrollHorz.NPos + (ARect.Right-ARect.Left) div ACharSize.X)
+      );
 
     if bGapGoesToEnd then
       Result.X:= Length(Str) + Item.NCharIndex-1
