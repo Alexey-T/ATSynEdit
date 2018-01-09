@@ -10,7 +10,8 @@ begin
   begin
     if not ((AY>=FSelRect.Top) and (AY<=FSelRect.Bottom)) then exit(False);
 
-    SLine:= Strings.Lines[AY];
+    //optimized for huge lines
+    SLine:= Strings.LineSub(AY, 1, FSelRect.Right);
     NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
     NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
     Result:= (AX>=NPosLeft) and (AX<NPosRight);
