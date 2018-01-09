@@ -1099,7 +1099,7 @@ begin
 
   if AY1=AY2 then
   begin
-    Result:= Copy(Lines[AY1], AX1+1, AX2-AX1);
+    Result:= LineSub(AY1, AX1+1, AX2-AX1);
     Exit
   end;
 
@@ -1108,7 +1108,7 @@ begin
     L.LineBreak:= AEolString;
 
     //first line
-    Str:= Copy(Lines[AY1], AX1+1, MaxInt);
+    Str:= LineSub(AY1, AX1+1, MaxInt);
     L.Add(UTF8Encode(Str));
 
     //middle
@@ -1118,7 +1118,7 @@ begin
     end;
 
     //last line
-    Str:= Copy(Lines[AY2], 1, AX2);
+    Str:= LineSub(AY2, 1, AX2);
     L.Add(UTF8Encode(Str));
 
     TrimStringList(L);

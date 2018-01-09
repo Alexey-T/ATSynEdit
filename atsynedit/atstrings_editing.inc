@@ -437,8 +437,8 @@ begin
     //concat remaining parts of 1st+last lines
     Str:= '';
     if AFromX>0 then
-      Str:= Copy(Lines[AFromY], 1, AFromX);
-    Str:= Str + Copy(Lines[AToY], AToX+1, MaxInt);
+      Str:= LineSub(AFromY, 1, AFromX);
+    Str:= Str + LineSub(AToY, AToX+1, MaxInt);
     Lines[AFromY]:= Str;
 
     //del middle lines
