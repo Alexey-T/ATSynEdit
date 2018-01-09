@@ -44,8 +44,8 @@ var
   OptMinWordWrapOffset: integer = 3;
 
 var
-  OptHexCharsDefault: UnicodeString = ''; //show these chars as "<NNNN>"
-  OptHexCharsUser: UnicodeString = ''; //these too
+  OptHexChars: UnicodeString = ''; //show these chars as "<NNNN>"
+  OptHexCharsDefault: UnicodeString = ''; //recommended default for OptHexChars
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
 
 
@@ -176,7 +176,7 @@ end;
 
 function IsCharHex(ch: atChar): boolean;
 begin
-  Result:= Pos(ch, OptHexCharsDefault+OptHexCharsUser)>0;
+  Result:= Pos(ch, OptHexChars)>0;
 end;
 
 function IsStringWithUnicodeChars(const S: atString): boolean;
