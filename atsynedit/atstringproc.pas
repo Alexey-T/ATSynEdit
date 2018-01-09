@@ -104,6 +104,7 @@ procedure TrimStringList(L: TStringList);
 type
   TATDecodeRec = record SFrom, STo: UnicodeString; end;
 function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
+function SConvertUtf8ToWideForAscii(const S: string): UnicodeString;
 
 procedure SReplaceAll(var s: string; const SFrom, STo: string);
 procedure SReplaceAllPercentChars(var S: string);
@@ -888,6 +889,16 @@ begin
   AClipboardObj.AsText:= AText;
   {$ENDIF}
 end;
+
+function SConvertUtf8ToWideForAscii(const S: string): UnicodeString;
+var
+  i: integer;
+begin
+  SetLength(Result, Length(S));
+  for i:= 1 to Length(S) do
+    Result[i]:= S[i];
+end;
+
 
 initialization
   _InitCharsHex;
