@@ -38,7 +38,7 @@ begin
   begin
     if i=APos1.Y then
       Carets.Clear;
-    SLine:= Strings.Lines[i];
+    SLine:= Strings.LineSub(i, 1, ARect.Right);
     Carets.Add(
       SColumnPosToCharPos(SLine, ARect.Right, OptTabSize),
       i,

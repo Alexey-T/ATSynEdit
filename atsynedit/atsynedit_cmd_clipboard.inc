@@ -164,7 +164,7 @@ begin
   begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
-      Str:= Strings.Lines[i];
+      Str:= Strings.LineSub(i, 1, FSelRect.Right);
       X1:= SColumnPosToCharPos(Str, FSelRect.Left, OptTabSize);
       X2:= SColumnPosToCharPos(Str, FSelRect.Right, OptTabSize);
       Str:= Strings.TextSubstring(X1, i, X2, i);

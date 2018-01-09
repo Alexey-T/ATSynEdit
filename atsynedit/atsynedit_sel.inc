@@ -36,7 +36,7 @@ begin
       exit(cRangeAllUnselected);
 
     //check for x
-    SLine:= Strings.Lines[AY1];
+    SLine:= Strings.LineSub(AY1, 1, FSelRect.Right);
     NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
     NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
 
