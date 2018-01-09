@@ -77,8 +77,8 @@ type
     );
 
 const
-  cLineLenUnknown = -1;
-  cLineLenSameForASCII = -2;
+  cCharLenUnknown = -1;
+  cCharLenAscii = -2;
 
 type
   { TATStringItem }
@@ -354,6 +354,7 @@ end;
 procedure StringItem_Zero(var A: TATStringItem); inline;
 begin
   FillChar(A, SizeOf(A), 0);
+  A.CharLen:= cCharLenUnknown;
 end;
 
 procedure StringItem_Init(
@@ -364,7 +365,12 @@ procedure StringItem_Init(
 begin
   FillChar(A, SizeOf(A), 0);
   A.Str:= AString;
-  A.CharLen:= ACharLen;
+
+  if ACharLen=Length(A.Str) then
+    A.CharLen:= cCharLenAscii
+  else
+    A.CharLen:= ACharLen;
+
   A.Ex.Ends:= TATBits2(AEnd);
   A.Ex.State:= TATBits2(cLineStateAdded);
   A.Ex.Sep:= TATBits2(cLineSepNone);
@@ -469,14 +475,18 @@ begin
   if CurrentLen>=0 then
     Result:= CurrentLen
   else
-  if CurrentLen=cLineLenUnknown then
+  if CurrentLen=cCharLenUnknown then
   begin
     //make faster calc via UTF8Length, don't use slow UTF8Decode
     Result:= UTF8Length(ItemPtr^.Str);
-    ItemPtr^.CharLen:= Result;
+
+    if Result=Length(ItemPtr^.Str) then
+      ItemPtr^.CharLen:= cCharLenAscii
+    else
+      ItemPtr^.CharLen:= Result;
   end
   else
-  if CurrentLen=cLineLenSameForASCII then
+  if CurrentLen=cCharLenAscii then
     Result:= Length(ItemPtr^.Str);
 end;
 
@@ -544,8 +554,11 @@ begin
   DoEventChange(AIndex, cLineChangeEdited);
 
   Item^.Str:= UTF8Encode(AValue);
-  Item^.CharLen:= Length(AValue);
   UniqueString(Item^.Str);
+  if Length(Item^.Str)=Length(AValue) then
+    Item^.CharLen:= cCharLenAscii
+  else
+    Item^.CharLen:= Length(AValue);
 
   //fully unfold this line
   Item^.Ex.FoldFrom_0:= 0;
@@ -923,7 +936,7 @@ begin
       StringItem_Init(Item,
         ABlock.GetLineUTF8(i),
         Endings,
-        cLineLenUnknown);
+        cCharLenUnknown);
       FList.Insert(ALineIndex+i, @Item);
       StringItem_Zero(Item);
     end;
@@ -1465,7 +1478,7 @@ procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLine
 var
   Item: TATStringItem;
 begin
-  StringItem_Init(Item, AString, AEnd, cLineLenUnknown);
+  StringItem_Init(Item, AString, AEnd, cCharLenUnknown);
   Item.Ex.State:= TATBits2(cLineStateAdded);
   FList.Add(@Item);
   StringItem_Zero(Item);
