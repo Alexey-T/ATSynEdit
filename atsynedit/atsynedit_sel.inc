@@ -313,10 +313,10 @@ var
   SLine: atString;
 begin
   //consider tab-chars
-  SLine:= Strings.Lines[P1.Y];
+  SLine:= Strings.LineSub(P1.Y, 1, P1.X);
   P1.X:= SCharPosToColumnPos(SLine, P1.X, FTabSize);
 
-  SLine:= Strings.Lines[P2.Y];
+  SLine:= Strings.LineSub(P2.Y, 1, P2.X);
   P2.X:= SCharPosToColumnPos(SLine, P2.X, FTabSize);
 
   //fix coords
@@ -335,7 +335,7 @@ begin
   else
   begin
     //single caret at moving block edge
-    SLine:= Strings.Lines[PTarget.Y];
+    SLine:= Strings.LineSub(PTarget.Y, 1, PTarget.X);
     PTarget.X:= SColumnPosToCharPos(SLine, PTarget.X, OptTabSize);
     DoCaretSingle(PTarget.X, PTarget.Y);
   end;
@@ -371,18 +371,23 @@ end;
 procedure TATSynEdit.DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
 var
   Caret: TATCaretItem;
+  SLine: atString;
 begin
   Caret:= Carets[0];
   if (Caret.EndY>=0) and (Caret.EndX>=0) then
   begin
-    ABegin.X:= SCharPosToColumnPos(Strings.Lines[Caret.EndY], Caret.EndX, OptTabSize);
+    SLine:= Strings.LineSub(Caret.EndY, 1, Caret.EndX);
+    ABegin.X:= SCharPosToColumnPos(SLine, Caret.EndX, OptTabSize);
     ABegin.Y:= Caret.EndY;
-    AEnd.X:= SCharPosToColumnPos(Strings.Lines[Caret.PosY], Caret.PosX, OptTabSize);
+
+    SLine:= Strings.LineSub(Caret.PosY, 1, Caret.PosX);
+    AEnd.X:= SCharPosToColumnPos(SLine, Caret.PosX, OptTabSize);
     AEnd.Y:= Caret.PosY;
   end
   else
   begin
-    ABegin.X:= SCharPosToColumnPos(Strings.Lines[Caret.PosY], Caret.PosX, OptTabSize);
+    SLine:= Strings.LineSub(Caret.PosY, 1, Caret.PosX);
+    ABegin.X:= SCharPosToColumnPos(SLine, Caret.PosX, OptTabSize);
     ABegin.Y:= Caret.PosY;
     AEnd:= ABegin;
   end;
