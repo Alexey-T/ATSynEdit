@@ -28,6 +28,7 @@ function TATSynEdit.DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATC
 var
   PntBegin, PntEnd: TPoint;
   N, NPageLines, i: integer;
+  StrTemp: atString;
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
@@ -49,17 +50,23 @@ begin
   case ADir of
     cDirColumnLeft:
       begin
-        N:= SColumnPosToCharPos(Strings.Lines[FSelRectEnd.Y], FSelRectEnd.X, OptTabSize);
+        //optimized for huge lines
+        StrTemp:= Strings.LineSub(FSelRectEnd.Y, 1, FSelRectEnd.X+OptTabSize);
+
+        N:= SColumnPosToCharPos(StrTemp, FSelRectEnd.X, OptTabSize);
         if N>0 then Dec(N);
-        N:= SCharPosToColumnPos(Strings.Lines[FSelRectEnd.Y], N, OptTabSize);
+        N:= SCharPosToColumnPos(StrTemp, N, OptTabSize);
         FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretLeft];
       end;
     cDirColumnRight:
       begin
-        N:= SColumnPosToCharPos(Strings.Lines[FSelRectEnd.Y], FSelRectEnd.X, OptTabSize);
+        //optimized for huge lines
+        StrTemp:= Strings.LineSub(FSelRectEnd.Y, 1, FSelRectEnd.X+OptTabSize);
+
+        N:= SColumnPosToCharPos(StrTemp, FSelRectEnd.X, OptTabSize);
         Inc(N);
-        N:= SCharPosToColumnPos(Strings.Lines[FSelRectEnd.Y], N, OptTabSize);
+        N:= SCharPosToColumnPos(StrTemp, N, OptTabSize);
         FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretRight];
       end;
