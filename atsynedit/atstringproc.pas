@@ -890,13 +890,24 @@ begin
   {$ENDIF}
 end;
 
+
+//function donated by user "mse" at Laz forum
 function SConvertUtf8ToWideForAscii(const S: string): UnicodeString;
 var
-  i: integer;
+  ps, pe: PByte;
+  pd: PWord;
+  NLen: integer;
 begin
-  SetLength(Result, Length(S));
-  for i:= 1 to Length(S) do
-    Result[i]:= WideChar(Ord(S[i]));
+  NLen:= Length(S);
+  SetLength(Result, NLen);
+  ps:= pointer(S);
+  pe:= ps + NLen;
+  pd:= pointer(Result);
+  while ps < pe do begin
+    pd^:= ps^;
+    Inc(ps);
+    Inc(pd);
+  end;
 end;
 
 
