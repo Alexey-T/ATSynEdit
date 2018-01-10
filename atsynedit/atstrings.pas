@@ -419,7 +419,7 @@ begin
     Result:= SConvertUtf8ToWideForAscii(Item^.Str)
   else
   begin
-    //use use slow UTF8Decode, and update CharLen
+    //use UTF8Decode, and update CharLen
     Result:= UTF8Decode(Item^.Str);
     NewLen:= Length(Result);
     if NewLen=Length(Item^.Str) then
