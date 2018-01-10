@@ -1,4 +1,12 @@
 
+2018.01.10
++ many optimizations for texts with huge lines (tested on file with 4M line len)
++ ATStrings: added method LineSub (faster than Strings.Lines[i]+Copy)
+* ATStrings: increased size of TATStringItem by Longint, sorry
+* ATStringProc: renamed several props, added prefix Opt
+* ATStringProc: renamed OptHexCharsUser to OptHexChars
+* ATStringProc: changed logic of OptHexCharsDefault, don't add strings OptHexChars+OptHexCharsDefault in each call of IsCharHex (faster)
+
 2018.01.08
 + don't calc URLs in too long lines. property OptMaxLineLenToCalcURL=300
 + add global option OptAllowSpecialWidthChars (to disable rendering of 170% width chars)
@@ -9,7 +17,7 @@
 + use local copy of FPC's fgl.pp as atsynedit_fgl.pas
 
 2017.12.14
-* change decl of TATFinderProgress
+* change declaration of TATFinderProgress
 
 2017.12.11
 + change storage of WrapInfo items to generic list TFPGList
