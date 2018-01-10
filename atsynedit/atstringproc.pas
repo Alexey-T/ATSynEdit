@@ -891,22 +891,23 @@ begin
 end;
 
 
-//function donated by user "mse" at Laz forum
+//function posted by user "mse" at Laz forum
 function SConvertUtf8ToWideForAscii(const S: string): UnicodeString;
 var
-  ps, pe: PByte;
-  pd: PWord;
+  PStart, PEnd: PByte;
+  PDest: PWord;
   NLen: integer;
 begin
   NLen:= Length(S);
   SetLength(Result, NLen);
-  ps:= pointer(S);
-  pe:= ps + NLen;
-  pd:= pointer(Result);
-  while ps < pe do begin
-    pd^:= ps^;
-    Inc(ps);
-    Inc(pd);
+  PStart:= Pointer(S);
+  PEnd:= PStart+NLen;
+  PDest:= Pointer(Result);
+  while PStart<PEnd do
+  begin
+    PDest^:= PStart^;
+    Inc(PStart);
+    Inc(PDest);
   end;
 end;
 
