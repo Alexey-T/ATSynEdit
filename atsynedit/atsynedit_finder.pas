@@ -1486,6 +1486,10 @@ begin
     ListLooped.TextLineBreakStyle:= tlbsLF;
 
     ListParts.Text:= UTF8Encode(SFind);
+    //FPC ignores last LF
+    if SEndsWith(SFind, #10) then
+      ListParts.Add('');
+
     NParts:= ListParts.Count;
     if NParts=0 then exit;
 
