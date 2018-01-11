@@ -205,6 +205,9 @@ var
   code: word absolute charLine;
   i: integer;
 begin
+  if PtrFind=nil then exit(false);
+  if PtrLine=nil then exit(false);
+
   for i:= 1 to LenStrFind do
   begin
     charFind:= PtrFind^;
