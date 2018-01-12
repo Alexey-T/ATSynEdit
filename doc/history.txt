@@ -1,4 +1,9 @@
 
+2018.01.12
++ Ctrl+(double click) now _adds_ caret with word
++ finder: add DoAction_FindSimple()
+- finder: fixed search for find-str with trailing LF (if multi-line input used)
+
 2018.01.10
 + many optimizations for texts with huge lines (tested on file with 4M line len)
 + ATStrings: added method LineSub (faster than Strings.Lines[i]+Copy)
