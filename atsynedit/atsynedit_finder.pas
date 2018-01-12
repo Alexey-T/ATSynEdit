@@ -147,9 +147,13 @@ type
     OptInSelection: boolean;
     OptPutBackwardSelection: boolean; //on backward search, place backward selection, ie caret on left of selection
     //
+    property MatchEdPos: TPoint read FMatchEdPos;
+    property MatchEdEnd: TPoint read FMatchEdEnd;
+    //
     constructor Create;
     destructor Destroy; override;
     //
+    function DoAction_FindSimple(APosStart, APosEnd: TPoint; out AResultStart, AResultEnd: TPoint): boolean;
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoAction_ReplaceSelected: boolean;
     function DoAction_CountAll(AWithEvent: boolean): integer;
@@ -559,6 +563,22 @@ begin
   FreeAndNil(FFragments);
   FreeAndNil(FBuffer);
   inherited;
+end;
+
+function TATEditorFinder.DoAction_FindSimple(APosStart, APosEnd: TPoint; out
+  AResultStart, AResultEnd: TPoint): boolean;
+begin
+  Result:= FindMatch_InEditor(APosStart, APosEnd, false);
+  if Result then
+  begin
+    AResultStart:= FMatchEdPos;
+    AResultEnd:= FMatchEdEnd;
+  end
+  else
+  begin
+    AResultStart:= Point(-1, -1);
+    AResultEnd:= Point(-1, -1);
+  end;
 end;
 
 function TATEditorFinder.ConvertBufferPosToCaretPos(APos: integer): TPoint;
