@@ -58,13 +58,20 @@ begin
   Result:= EqualRect(FSelRect, cRectEmpty);
 end;
 
-procedure TATSynEdit.DoSelect_Word(P: TPoint);
+procedure TATSynEdit.DoSelect_Word(P: TPoint; AddCaret: boolean);
 var
   N1, N2: integer;
 begin
   if not Strings.IsIndexValid(P.Y) then Exit;
   SFindWordBounds(Strings.Lines[P.Y], P.X, N1, N2, FOptWordChars);
-  if N1<>N2 then
+  if N1=N2 then exit;
+
+  if AddCaret then
+  begin
+    Carets.Add(N2, P.Y, N1, P.Y);
+    DoCaretsSort;
+  end
+  else
     DoCaretSingle(N2, P.Y, N1, P.Y);
 end;
 

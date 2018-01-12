@@ -109,3 +109,13 @@ begin
       exit(M[i].MouseActionId);
 end;
 
+function IsPressedCtrl: boolean;
+begin
+  Result:= GetKeyState(VK_CONTROL)<0;
+end;
+
+function IsPressedAlt: boolean;
+begin
+  Result:= GetKeyState(VK_MENU)<0;
+end;
+

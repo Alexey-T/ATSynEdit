@@ -1011,7 +1011,7 @@ type
     procedure DoSelect_Inverted;
     procedure DoSelect_SplitSelectionToLines;
     procedure DoSelect_Line(APos: TPoint);
-    procedure DoSelect_Word(P: TPoint);
+    procedure DoSelect_Word(P: TPoint; AddCaret: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_FromSelRect;
@@ -4194,7 +4194,7 @@ begin
   begin
     P:= ClientPosToCaretPos(P, Details);
     if P.Y<0 then Exit;
-    DoSelect_Word(P);
+    DoSelect_Word(P, IsPressedCtrl);
     Update;
   end;
 end;
@@ -5511,7 +5511,7 @@ begin
       SetFocus;
 
     //Ctrl not pressed: delete block from src
-    if not (GetKeyState(VK_CONTROL)<0) then
+    if not IsPressedCtrl then
       (Source as TATSynedit).DoCommand(cCommand_TextDeleteSelection);
   end;
 end;
