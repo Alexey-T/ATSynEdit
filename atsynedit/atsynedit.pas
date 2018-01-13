@@ -576,7 +576,6 @@ type
     FOptMouseWheelScrollVertSpeed: integer;
     FOptMouseWheelScrollHorzSpeed: integer;
     FOptMouseWheelScrollHorzWithState: TShiftStateEnum;
-    FOptMouseWheelScrollHorzWithState2: TShiftStateEnum;
     FOptMouseWheelZooms: boolean;
     FOptMouseWheelZoomsWithState: TShiftStateEnum;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
@@ -1258,7 +1257,6 @@ type
     property OptMouseWheelScrollHorz: boolean read FOptMouseWheelScrollHorz write FOptMouseWheelScrollHorz default true;
     property OptMouseWheelScrollHorzSpeed: integer read FOptMouseWheelScrollHorzSpeed write FOptMouseWheelScrollHorzSpeed default 10;
     property OptMouseWheelScrollHorzWithState: TShiftStateEnum read FOptMouseWheelScrollHorzWithState write FOptMouseWheelScrollHorzWithState default ssShift;
-    property OptMouseWheelScrollHorzWithState2: TShiftStateEnum read FOptMouseWheelScrollHorzWithState2 write FOptMouseWheelScrollHorzWithState2 default ssHyper;
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssModifier;
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
@@ -2880,7 +2878,6 @@ begin
   FOptMouseWheelScrollHorz:= true;
   FOptMouseWheelScrollHorzSpeed:= 10;
   FOptMouseWheelScrollHorzWithState:= ssShift;
-  FOptMouseWheelScrollHorzWithState2:= ssHyper;
   FOptMouseWheelZooms:= true;
   FOptMouseWheelZoomsWithState:= ssModifier;
 
@@ -4100,8 +4097,8 @@ begin
   if (Shift=[FOptMouseWheelZoomsWithState]) then
     Mode:= aWheelModeZoom
   else
-  if (Shift=[FOptMouseWheelScrollHorzWithState]) or
-     (Shift=[FOptMouseWheelScrollHorzWithState2]) then
+  if (Shift=[FOptMouseWheelScrollHorzWithState])
+    {or (Shift=[FOptMouseWheelScrollHorzWithState2]) } then
     Mode:= aWheelModeHoriz
   else
   if (Shift=[]) then
