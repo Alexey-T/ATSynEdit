@@ -121,8 +121,3 @@ begin
   {$endif}
 end;
 
-function IsPressedAlt: boolean;
-begin
-  Result:= GetKeyState(VK_MENU)<0;
-end;
-

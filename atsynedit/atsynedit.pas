@@ -1248,7 +1248,7 @@ type
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
-    property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssCtrl;
+    property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
@@ -1260,7 +1260,7 @@ type
     property OptMouseWheelScrollHorzWithState: TShiftStateEnum read FOptMouseWheelScrollHorzWithState write FOptMouseWheelScrollHorzWithState default ssShift;
     property OptMouseWheelScrollHorzWithState2: TShiftStateEnum read FOptMouseWheelScrollHorzWithState2 write FOptMouseWheelScrollHorzWithState2 default ssHyper;
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
-    property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssCtrl;
+    property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssModifier;
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
@@ -2866,7 +2866,7 @@ begin
   FOptOverwriteSel:= true;
   FOptMouseDragDrop:= true;
   FOptMouseDragDropCopying:= true;
-  FOptMouseDragDropCopyingWithState:= ssCtrl;
+  FOptMouseDragDropCopyingWithState:= ssModifier;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
   FOptMouse2ClickSelectsLine:= false;
@@ -2882,7 +2882,7 @@ begin
   FOptMouseWheelScrollHorzWithState:= ssShift;
   FOptMouseWheelScrollHorzWithState2:= ssHyper;
   FOptMouseWheelZooms:= true;
-  FOptMouseWheelZoomsWithState:= ssCtrl;
+  FOptMouseWheelZoomsWithState:= ssModifier;
 
   FOptCopyLinesIfNoSel:= true;
   FOptCutLinesIfNoSel:= false;
@@ -5511,7 +5511,7 @@ begin
       SetFocus;
 
     //Ctrl not pressed: delete block from src
-    if not IsPressedCtrl then
+    if FOptMouseDragDropCopyingWithState in GetKeyShiftState then
       (Source as TATSynedit).DoCommand(cCommand_TextDeleteSelection);
   end;
 end;
