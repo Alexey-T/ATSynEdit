@@ -111,7 +111,14 @@ end;
 
 function IsPressedCtrl: boolean;
 begin
+  {$ifdef darwin}
+  //on macOS use Command-key instead of Ctrl
+  Result:=
+    (GetKeyState(VK_LWIN)<0) or
+    (GetKeyState(VK_RWIN)<0);
+  {$else}
   Result:= GetKeyState(VK_CONTROL)<0;
+  {$endif}
 end;
 
 function IsPressedAlt: boolean;
