@@ -1023,6 +1023,7 @@ type
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
     procedure DoGetMarkedLines(out ALine1, ALine2: integer);
     function DoGetLinkAtPos(AX, AY: integer): atString;
+    function GetCacheDump: string;
 
   protected
     procedure Paint; override;
@@ -5474,6 +5475,14 @@ begin
 
   Result:= Strings.Lines[AY];
   Result:= Copy(Result, Atr.PosX+1, Atr.LenX);
+end;
+
+function TATSynEdit.GetCacheDump: string;
+begin
+  if Assigned(FAdapterCache) then
+    Result:= FAdapterCache.GetDump
+  else
+    Result:= '?';
 end;
 
 
