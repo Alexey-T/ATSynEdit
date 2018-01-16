@@ -97,6 +97,10 @@ begin
   //ignore if no parts
   if (AParts[0].Len=0) then exit;
 
+  //ignore if single part
+  //(some strange bug on macOS, cache gets items with single long part)
+  if (AParts[1].Len=0) then exit;
+
   {
   //ignore if single part, and no bold/italic/underline attr
   //e.g. lexer didnt parse end of file yet
