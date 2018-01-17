@@ -162,6 +162,11 @@ begin
     Str:= UTF8Encode(AText)
   else
     Str:= '';
+
+  //fix non-blinking caret
+  if not OptCaretBlinkEnabled then
+    DoCaretForceShow;
+
   if DoEventCommand(ACmd, Str) then Exit;
 
   Res:= [];
