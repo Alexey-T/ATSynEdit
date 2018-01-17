@@ -413,3 +413,16 @@ begin
   Update;
 end;
 
+procedure TATSynEdit.SetFoldEnabled(AValue: boolean);
+begin
+  if FFoldEnabled=AValue then Exit;
+  FFoldEnabled:= AValue;
+  if not FFoldEnabled then
+  begin
+    DoCommand(cCommand_UnfoldAll);
+    FFold.Clear;
+  end;
+  Update;
+end;
+
+

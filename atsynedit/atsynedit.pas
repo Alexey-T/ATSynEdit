@@ -601,7 +601,6 @@ type
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     function DoCaretsKeepOnScreen: boolean;
     procedure DoCaretsOnChanged(Sender: TObject);
-    procedure DoCaretForceShow;
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoCaretsShift_CaretItem(Caret: TATCaretItem; APosX, APosY, AShiftX,
       AShiftY, AShiftBelowX: integer);
@@ -984,6 +983,7 @@ type
     procedure DoCaretSingleAsIs;
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
+    procedure DoCaretForceShow;
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint;
       out ADetails: TATPosDetails;
@@ -5283,6 +5283,11 @@ end;
 function TATSynEdit.GetLastCommandChangedLines: integer;
 begin
   Result:= Strings.LastCommandChangedLines;
+end;
+
+procedure TATSynEdit.SetLastCommandChangedLines(AValue: integer);
+begin
+  Strings.LastCommandChangedLines:= AValue;
 end;
 
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);

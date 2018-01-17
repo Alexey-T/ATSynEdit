@@ -416,24 +416,6 @@ begin
   DoPaintModeBlinking;
 end;
 
-procedure TATSynEdit.SetFoldEnabled(AValue: boolean);
-begin
-  if FFoldEnabled=AValue then Exit;
-  FFoldEnabled:= AValue;
-  if not FFoldEnabled then
-  begin
-    DoCommand(cCommand_UnfoldAll);
-    FFold.Clear;
-  end;
-  Update;
-end;
-
-procedure TATSynEdit.SetLastCommandChangedLines(AValue: integer);
-begin
-  Strings.LastCommandChangedLines:= AValue;
-end;
-
-
 procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
 begin
   FScrollVert.NPos:= Max(0, AWrapInfoIndex-AIndentVert);
