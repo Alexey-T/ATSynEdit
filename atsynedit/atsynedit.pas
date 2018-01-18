@@ -4646,7 +4646,7 @@ end;
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
   with FScrollHorz do
-    NPos:= Max(0, NPos+Dx); //NPosLast here is 0
+    NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
   with FScrollVert do
     NPos:= Max(0, Min(NPosLast, NPos+Dy));
 end;
