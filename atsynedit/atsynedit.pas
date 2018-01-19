@@ -321,6 +321,7 @@ type
     ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor) of object;
   TATSynEditPasteEvent = procedure(Sender: TObject; var AHandled: boolean;
     AKeepCaret, ASelectThen: boolean) of object;
+  TATSynEditHotspotEvent = procedure(Sender: TObject; AHotspotIndex: integer) of object;
 
 
 type
@@ -401,6 +402,7 @@ type
     FMouseDownAndColumnSelection: boolean;
     FMouseAutoScroll: TATDirection;
     FMouseActions: TATMouseActions;
+    FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
     FCursorOnMinimap: boolean;
@@ -431,6 +433,8 @@ type
     FOnCalcStaple: TATSynEditCalcStapleEvent;
     FOnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent;
     FOnPaste: TATSynEditPasteEvent;
+    FOnHotspotEnter: TATSynEditHotspotEvent;
+    FOnHotspotExit: TATSynEditHotspotEvent;
     FWrapInfo: TATSynWrapInfo;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
@@ -1130,6 +1134,8 @@ type
     property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
     property OnBeforeCalcHilite: TNotifyEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
     property OnPaste: TATSynEditPasteEvent read FOnPaste write FOnPaste;
+    property OnHotspotEnter: TATSynEditHotspotEvent read FOnHotspotEnter write FOnHotspotEnter;
+    property OnHotspotExit: TATSynEditHotspotEvent read FOnHotspotExit write FOnHotspotExit;
 
     //misc
     property CursorText: TCursor read FCursorText write FCursorText default crIBeam;
@@ -2932,6 +2938,7 @@ begin
   FCursorOnGutter:= false;
   FLastTextCmd:= 0;
   FLastTextCmdText:= '';
+  FLastHotspot:= -1;
 
   DoClearScrollInfo(FScrollHorz);
   DoClearScrollInfo(FScrollVert);
@@ -4004,9 +4011,17 @@ begin
           if P.Y>=0 then
           begin
             nIndex:= Hotspots.FindByPos(P.X, P.Y);
-            if nIndex>=0 then
+            if nIndex<>FLastHotspot then
             begin
-              //todo: OnHotspotEnter
+              if FLastHotspot>=0 then
+                if Assigned(FOnHotspotExit) then
+                  FOnHotspotExit(Self, FLastHotspot);
+
+              if nIndex>=0 then
+                if Assigned(FOnHotspotEnter) then
+                  FOnHotspotEnter(Self, nIndex);
+
+              FLastHotspot:= nIndex;
             end;
           end;
         end;
@@ -4086,6 +4101,7 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
   DoHintHide;
+  FLastHotspot:= -1;
 end;
 
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;

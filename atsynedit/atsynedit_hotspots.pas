@@ -8,8 +8,6 @@ unit ATSynEdit_Hotspots;
 {$ModeSwitch advancedrecords}
 {$Z1}
 
-//{$define test_hotspots}
-
 interface
 
 uses
@@ -62,27 +60,8 @@ end;
 { TATHotspots }
 
 constructor TATHotspots.Create;
-var
-  R: TATHotspotItem;
 begin
   FList:= TATHotspotItems.Create;
-
-  {$ifdef test_hotspots}
-  //debug
-  R.PosX:= 0;
-  R.PosY:= 0;
-  R.EndX:= 4;
-  R.EndY:= 4;
-  R.Tag:= 'spot0';
-  Add(R);
-
-  R.PosX:= 10;
-  R.PosY:= 20;
-  R.EndX:= 20;
-  R.EndY:= 20;
-  R.Tag:= 'spot1';
-  Add(R);
-  {$endif}
 end;
 
 destructor TATHotspots.Destroy;
