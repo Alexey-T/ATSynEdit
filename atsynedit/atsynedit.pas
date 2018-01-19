@@ -3988,10 +3988,17 @@ begin
     Exit
   end;
 
-  //mouse dragged on text
   if (not FMouseDragDropping) and (FMouseDownPnt.X>=0) then
     if PtInRect(FRectMain, P) then
     begin
+      //mouse just moved on text
+      if Shift*[ssLeft, ssRight]=[] then
+      begin
+        //todo: handle Hotspots
+        Exit
+      end;
+
+      //mouse dragged to select block
       if ssLeft in Shift then
         if Carets.Count>0 then
         begin
