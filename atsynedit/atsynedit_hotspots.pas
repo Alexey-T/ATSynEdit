@@ -19,7 +19,8 @@ type
   TATHotspotItem = record
     PosX, PosY: integer;
     EndX, EndY: integer;
-    Tag: string;
+    Tag: Int64;
+    TagString: string;
     class operator=(const A, B: TATHotspotItem): boolean;
   end;
 
@@ -44,7 +45,8 @@ type
     procedure Delete(N: integer);
     procedure Insert(N: integer; const AItem: TATHotspotItem);
     function FindByPos(AX, AY: integer): integer;
-    function FindByTag(const ATag: string): integer;
+    function FindByTagInt(const ATag: Int64): integer;
+    function FindByTagString(const ATagString: string): integer;
   end;
 
 
@@ -123,13 +125,23 @@ begin
   end;
 end;
 
-function TATHotspots.FindByTag(const ATag: string): integer;
+function TATHotspots.FindByTagInt(const ATag: Int64): integer;
 var
   i: integer;
 begin
   Result:= -1;
   for i:= 0 to Count-1 do
     if ATag=Items[i].Tag then
+      exit(i);
+end;
+
+function TATHotspots.FindByTagString(const ATagString: string): integer;
+var
+  i: integer;
+begin
+  Result:= -1;
+  for i:= 0 to Count-1 do
+    if ATagString=Items[i].TagString then
       exit(i);
 end;
 
