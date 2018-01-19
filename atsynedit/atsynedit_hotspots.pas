@@ -8,7 +8,7 @@ unit ATSynEdit_Hotspots;
 {$ModeSwitch advancedrecords}
 {$Z1}
 
-{$define test_hotspots}
+//{$define test_hotspots}
 
 interface
 
@@ -69,17 +69,17 @@ begin
 
   {$ifdef test_hotspots}
   //debug
-  R.PosX:= 2;
-  R.PosY:= 2;
+  R.PosX:= 0;
+  R.PosY:= 0;
   R.EndX:= 4;
   R.EndY:= 4;
   R.Tag:= 'spot0';
   Add(R);
 
   R.PosX:= 10;
-  R.PosY:= 10;
+  R.PosY:= 20;
   R.EndX:= 20;
-  R.EndY:= 10;
+  R.EndY:= 20;
   R.Tag:= 'spot1';
   Add(R);
   {$endif}

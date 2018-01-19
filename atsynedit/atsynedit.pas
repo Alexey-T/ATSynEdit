@@ -3993,17 +3993,30 @@ begin
     Exit
   end;
 
+  //mouse just moved on text
+  if (FMouseDownPnt.X<0) then
+    if PtInRect(FRectMain, P) then
+    begin
+      if Shift*[ssLeft, ssRight]=[] then
+        if Hotspots.Count>0 then
+        begin
+          P:= ClientPosToCaretPos(P, Details);
+          if P.Y>=0 then
+          begin
+            nIndex:= Hotspots.FindByPos(P.X, P.Y);
+            if nIndex>=0 then
+            begin
+              //todo: OnHotspotEnter
+            end;
+          end;
+        end;
+      Exit
+    end;
+
+  //mouse dragged to select block
   if (not FMouseDragDropping) and (FMouseDownPnt.X>=0) then
     if PtInRect(FRectMain, P) then
     begin
-      //mouse just moved on text
-      if Shift*[ssLeft, ssRight]=[] then
-      begin
-        //todo: handle Hotspots
-        Exit
-      end;
-
-      //mouse dragged to select block
       if ssLeft in Shift then
         if Carets.Count>0 then
         begin
