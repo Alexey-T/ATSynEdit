@@ -786,6 +786,9 @@ ATSynEdit has API which allows to make report to any format. It's function DoCal
 * OnDrawMicromap: Called on painting micromap area. 
 * OnDrawRuler: Called after painting ruler area.
 * OnScroll: Called after any command which scrolls text.
+* OnPaste: Called just before pasting text. App can disable/override default pasting.
+* OnHotspotEnter: Called when mouse moving enters one of the ranges in Hotspots object.
+* OnHotspotExit: Called when mouse moving exits hotspot.
 
 ==What is logic of grouped-undo?==
 
