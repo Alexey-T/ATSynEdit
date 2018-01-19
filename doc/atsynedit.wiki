@@ -371,6 +371,20 @@ Example adds 2 ranges and changes them later:
   Ed.Update;  
 </syntaxhighlight>
 
+=== Hotspots object ===
+
+type TATHotspots in unit atsynedit_hotspots. Holds list of ranges, which need special tooltip on mouse-over. Each range is of type TATHotspotItem, it has props:
+
+* PosX, PosY: start of range (text position)
+* EndX, EndY: end of range
+* Tag: some custom int value
+* TagString: some custom string value
+
+You can add hotspots via Add method, and find them later by Tag, by TagString, by text position - methods FindByPos, FindByTag, FindByTagString.
+To support mouse-over for these ranges, two events exist: OnHotspotEnter, OnHotspotExit.
+
+Example of usage: in HTML file, app can find all HTML color tokens #rrggbb, add hotspots for them, and store color value to Tag. Then on mouse-over app can show colored tooltip.
+
 == What are the basic methods/properties? ==
 
 Objects
@@ -386,6 +400,7 @@ Objects
 *    property WrapInfo
 *    property Gaps
 *    property DimRanges
+*    property Hotspots
 
 Files
 
