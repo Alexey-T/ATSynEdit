@@ -8,16 +8,20 @@ unit ATSynEdit_Hotspots;
 {$ModeSwitch advancedrecords}
 {$Z1}
 
+{$define test_hotspots}
+
 interface
 
 uses
   Classes, SysUtils,
-  ATSynEdit_fgl;
+  ATSynEdit_fgl,
+  ATSynEdit_Carets;
 
 type
   TATHotspotItem = record
     PosX, PosY: integer;
     EndX, EndY: integer;
+    Tag: string;
     class operator=(const A, B: TATHotspotItem): boolean;
   end;
 
@@ -41,6 +45,8 @@ type
     procedure Add(const AItem: TATHotspotItem);
     procedure Delete(N: integer);
     procedure Insert(N: integer; const AItem: TATHotspotItem);
+    function FindByPos(AX, AY: integer): integer;
+    function FindByTag(const ATag: string): integer;
   end;
 
 
@@ -55,14 +61,28 @@ end;
 
 { TATHotspots }
 
-function TATHotspots.GetItem(AIndex: integer): TATHotspotItem;
-begin
-  Result:= FList[AIndex];
-end;
-
 constructor TATHotspots.Create;
+var
+  R: TATHotspotItem;
 begin
   FList:= TATHotspotItems.Create;
+
+  {$ifdef test_hotspots}
+  //debug
+  R.PosX:= 2;
+  R.PosY:= 2;
+  R.EndX:= 4;
+  R.EndY:= 4;
+  R.Tag:= 'spot0';
+  Add(R);
+
+  R.PosX:= 10;
+  R.PosY:= 10;
+  R.EndX:= 20;
+  R.EndY:= 10;
+  R.Tag:= 'spot1';
+  Add(R);
+  {$endif}
 end;
 
 destructor TATHotspots.Destroy;
@@ -75,6 +95,11 @@ end;
 procedure TATHotspots.Clear;
 begin
   FList.Clear;
+end;
+
+function TATHotspots.GetItem(AIndex: integer): TATHotspotItem;
+begin
+  Result:= FList[AIndex];
 end;
 
 function TATHotspots.Count: integer;
@@ -103,6 +128,30 @@ begin
     FList.Add(AItem)
   else
     FList.Insert(N, AItem);
+end;
+
+function TATHotspots.FindByPos(AX, AY: integer): integer;
+var
+  Item: TATHotspotItem;
+  i: integer;
+begin
+  Result:= -1;
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    if IsPosInRange(AX, AY, Item.PosX, Item.PosY, Item.EndX, Item.EndY, false) = cRelateInside then
+      exit(i);
+  end;
+end;
+
+function TATHotspots.FindByTag(const ATag: string): integer;
+var
+  i: integer;
+begin
+  Result:= -1;
+  for i:= 0 to Count-1 do
+    if ATag=Items[i].Tag then
+      exit(i);
 end;
 
 end.

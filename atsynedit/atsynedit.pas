@@ -939,6 +939,7 @@ type
     property Markers: TATMarkers read FMarkers;
     property Attribs: TATMarkers read FAttribs;
     property DimRanges: TATDimRanges read FDimRanges;
+    property Hotspots: TATHotspots read FHotspots;
     property Gaps: TATSynGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
@@ -2685,6 +2686,7 @@ begin
   FAttribs:= TATMarkers.Create;
   FMarkedRange:= TATMarkers.Create;
   FDimRanges:= TATDimRanges.Create;
+  FHotspots:= TATHotspots.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
 
   {$ifdef test_markedrange}
@@ -2960,6 +2962,7 @@ begin
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
+  FreeAndNil(FHotspots);
   FreeAndNil(FDimRanges);
   FreeAndNil(FMarkedRange);
   FreeAndNil(FMarkers);
