@@ -1,16 +1,13 @@
-
 = About =
 
-'''ATSynEdit''' is the multi-line edit control, with fixed font.
+'''ATSynEdit''' is the multi-line editor control, with fixed font.
 
 * Homepage: https://github.com/Alexey-T/ATSynEdit
 * Support for EControl adapter: https://github.com/Alexey-T/EControl
 
-(press "Download Zip" button at right)
-
 Author: Alexey Torgashin
 
-[[File:atsynedit.png‎]]
+[[File:atsynedit.png]]
 
 = License =
 
