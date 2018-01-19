@@ -1,4 +1,9 @@
 
+2018.01.19
++ added Hotspots object, see wiki description about it
++ added events OnHotspotEnter, OnHotspotExit
+* on macOS, Command-key is used instead of Ctrl-key (in features with Ctrl press)
+
 2018.01.12
 + Ctrl+(double click) now _adds_ caret with word
 + finder: add DoAction_FindSimple()
