@@ -15,6 +15,8 @@ uses
   ATSynEdit_Gaps,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
+  ATSynEdit_Hotspots,
+  ATSynEdit_DimRanges,
   formkey,
   formopt,
   formfind;
@@ -186,6 +188,8 @@ type
     FFindMarkAll: boolean;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
+    procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
+    procedure EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
@@ -257,6 +261,8 @@ end;
 { TfmMain }
 
 procedure TfmMain.FormCreate(Sender: TObject);
+var
+  FHot: TATHotspotItem;
 begin
   UpdateEnc;
 
@@ -293,8 +299,29 @@ begin
   ed.OnDrawLine:= @EditDrawLine;
   ed.OnDrawMicromap:= @EditDrawMicromap;
   ed.OnDrawGap:= @EditDrawGap;
+  ed.OnHotspotEnter:= @EditHotspotEnter;
+  ed.OnHotspotExit:= @EditHotspotExit;
 
   ed.SetFocus;
+
+  (*
+  FHot.PosX:= 0;
+  FHot.PosY:= 0;
+  FHot.EndX:= 4;
+  FHot.EndY:= 4;
+  FHot.Tag:= 'hot0';
+  ed.Hotspots.Add(FHot);
+
+  FHot.PosX:= 10;
+  FHot.PosY:= 10;
+  FHot.EndX:= 20;
+  FHot.EndY:= 14;
+  FHot.Tag:= 'hot1';
+  ed.Hotspots.Add(FHot);
+
+  ed.DimRanges.Add(0, 4, 200);
+  ed.DimRanges.Add(10, 14, 200);
+  *)
 
   FFinder:= TATEditorFinder.Create;
   FFinder.Editor:= ed;
@@ -972,6 +999,16 @@ procedure TfmMain.DoLog(const S: string);
 begin
   ListboxLog.Items.Add(S);
   ListboxLog.ItemIndex:= ListboxLog.Items.Count-1;
+end;
+
+procedure TfmMain.EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
+begin
+  DoLog('OnHotspotEnter: '+IntToStr(AHotspotIndex));
+end;
+
+procedure TfmMain.EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
+begin
+  DoLog('OnHotspotExit: '+IntToStr(AHotspotIndex));
 end;
 
 procedure TfmMain.EditStringsChangeBlock(Sender: TObject; const AStartPos,
