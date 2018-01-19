@@ -45,6 +45,7 @@ uses
   ATSynEdit_Ranges,
   ATSynEdit_DimRanges,
   ATSynEdit_Gaps,
+  ATSynEdit_Hotspots,
   ATSynEdit_Adapters,
   ATSynEdit_Adapter_Cache;
 
@@ -378,6 +379,7 @@ type
     FAttribs: TATMarkers;
     FMarkedRange: TATMarkers;
     FDimRanges: TATDimRanges;
+    FHotspots: TATHotspots;
     FMenuStd,
     FMenuText,
     FMenuGutterBm,
