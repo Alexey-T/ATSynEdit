@@ -1,4 +1,7 @@
 
+2018.01.21
++ consider zero-width-space char U+200B
+
 2018.01.19
 + added Hotspots object, see wiki description about it
 + added events OnHotspotEnter, OnHotspotExit

@@ -166,6 +166,7 @@ begin
     (ch=#9) or //tab
     (ch=#$A0) or //no-break space, NBSP, often used on macOS
     (ch=#$2007) or //figure space
+    (ch=#$200B) or //zero width space https://en.wikipedia.org/wiki/Zero-width_space
     (ch=#$202F); //narrow no-break space
 end;
 
