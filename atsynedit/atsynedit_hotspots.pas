@@ -42,8 +42,9 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATHotspotItem read GetItem; default;
     procedure Add(const AItem: TATHotspotItem);
-    procedure Delete(N: integer);
     procedure Insert(N: integer; const AItem: TATHotspotItem);
+    procedure Delete(N: integer);
+    procedure DeleteByTag(const ATag: Int64);
     function FindByPos(AX, AY: integer): integer;
     function FindByTagInt(const ATag: Int64): integer;
     function FindByTagString(const ATagString: string): integer;
@@ -101,6 +102,17 @@ end;
 procedure TATHotspots.Delete(N: integer);
 begin
   FList.Delete(N);
+end;
+
+procedure TATHotspots.DeleteByTag(const ATag: Int64);
+var
+  N: integer;
+begin
+  repeat
+    N:= FindByTagInt(ATag);
+    if N<0 then Break;
+    Delete(N);
+  until false;
 end;
 
 procedure TATHotspots.Insert(N: integer; const AItem: TATHotspotItem);
