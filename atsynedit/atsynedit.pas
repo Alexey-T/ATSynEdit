@@ -622,6 +622,7 @@ type
       AForThisRange: TATSynRange);
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
+    procedure DoHotspotsExit;
     procedure DoHintShow;
     procedure DoHintHide;
     procedure DoHintShowForBookmark(ALine: integer);
@@ -4101,7 +4102,7 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
   DoHintHide;
-  FLastHotspot:= -1;
+  DoHotspotsExit;
 end;
 
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
@@ -4132,14 +4133,7 @@ var
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
-
-  //scrolling must call OnHotspotExit
-  if FLastHotspot>=0 then
-  begin
-    if Assigned(FOnHotspotExit) then
-      FOnHotspotExit(Self, FLastHotspot);
-    FLastHotspot:= -1;
-  end;
+  DoHotspotsExit;
 
   if AForceHorz then
     Mode:= aWheelModeHoriz
@@ -5646,6 +5640,15 @@ begin
   //auto paints "wait... N%"
 end;
 
+procedure TATSynEdit.DoHotspotsExit;
+begin
+  if FLastHotspot>=0 then
+  begin
+    if Assigned(FOnHotspotExit) then
+      FOnHotspotExit(Self, FLastHotspot);
+    FLastHotspot:= -1;
+  end;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
