@@ -4147,8 +4147,7 @@ begin
   if (Shift=[FOptMouseWheelZoomsWithState]) then
     Mode:= aWheelModeZoom
   else
-  if (Shift=[FOptMouseWheelScrollHorzWithState])
-    {or (Shift=[FOptMouseWheelScrollHorzWithState2]) } then
+  if (Shift=[FOptMouseWheelScrollHorzWithState]) then
     Mode:= aWheelModeHoriz
   else
   if (Shift=[]) then
