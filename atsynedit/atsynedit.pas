@@ -4133,6 +4133,14 @@ begin
   Result:= false;
   if not OptMouseEnableAll then exit;
 
+  //scrolling must call OnHotspotExit
+  if FLastHotspot>=0 then
+  begin
+    if Assigned(FOnHotspotExit) then
+      FOnHotspotExit(Self, FLastHotspot);
+    FLastHotspot:= -1;
+  end;
+
   if AForceHorz then
     Mode:= aWheelModeHoriz
   else
