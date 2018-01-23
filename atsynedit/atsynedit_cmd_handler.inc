@@ -157,6 +157,7 @@ var
 begin
   if ACmd<=0 then Exit;
   LastCommandChangedLines:= 0;
+  DoHotspotsExit;
 
   if AText<>'' then
     Str:= UTF8Encode(AText)
