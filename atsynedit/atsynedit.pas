@@ -1283,6 +1283,9 @@ type
     property OptKeyEndToNonSpace: boolean read FOptKeyEndToNonSpace write FOptKeyEndToNonSpace default true;
     property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents default true;
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize default 2;
+             // N>0: use N spaces
+             // N<0: use N tabs
+             // N=0: calc indent from OptTabSize/OptTabSpaces
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign default true;
     property OptIndentMakesWholeLinesSelection: boolean read FOptIndentMakesWholeLinesSelection write FOptIndentMakesWholeLinesSelection default false;
     property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;

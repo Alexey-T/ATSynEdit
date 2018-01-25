@@ -91,7 +91,8 @@ procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer
   out ACharsSkipped: integer; out ASpacesSkipped: integer);
 
 function SIndentUnindent(const Str: atString; ARight: boolean;
-  AIndentSize, ATabSize: integer): atString;
+  AIndentSize, ATabSize: integer;
+  ATabSpaces: boolean): atString;
 function SGetItem(var S: string; const sep: Char = ','): string;
 function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
@@ -578,7 +579,7 @@ begin
 end;
 
 function SIndentUnindent(const Str: atString; ARight: boolean;
-  AIndentSize, ATabSize: integer): atString;
+  AIndentSize, ATabSize: integer; ATabSpaces: boolean): atString;
 var
   StrIndent, StrText: atString;
   DecSpaces, N: integer;
@@ -586,14 +587,24 @@ var
 begin
   Result:= Str;
 
-  //indent<0 - use tabs
-  if AIndentSize>=0 then
+  if AIndentSize=0 then
   begin
+    if ATabSpaces then
+      StrIndent:= StringOfChar(' ', ATabSize)
+    else
+      StrIndent:= #9;
+    DecSpaces:= ATabSize;
+  end
+  else
+  if AIndentSize>0 then
+  begin
+    //use spaces
     StrIndent:= StringOfChar(' ', AIndentSize);
     DecSpaces:= AIndentSize;
   end
   else
   begin
+    //indent<0 - use tabs
     StrIndent:= StringOfChar(#9, Abs(AIndentSize));
     DecSpaces:= Abs(AIndentSize)*ATabSize;
   end;

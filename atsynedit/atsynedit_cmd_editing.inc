@@ -562,7 +562,10 @@ begin
   NBlockBeginX:= Caret.PosX;
   NBlockEndX:= Caret.EndX;
 
-  if FOptIndentSize>=0 then
+  if FOptIndentSize=0 then
+    NDecSpaces:= FTabSize
+  else
+  if FOptIndentSize>0 then
     NDecSpaces:= FOptIndentSize
   else
     NDecSpaces:= Abs(FOptIndentSize)*FTabSize;
@@ -584,7 +587,7 @@ begin
   //calc shifts (emulate Lazarus IDE indent)
   NIndent1:= SGetIndentChars(Strings.Lines[NBlockBeginY]);
   NIndent2:= SGetIndentChars(Strings.Lines[NBlockEndY]);
-  NShiftInit:= Abs(FOptIndentSize) * IfThen(ARight, 1, -1);
+  NShiftInit:= NDecSpaces * IfThen(ARight, 1, -1);
   NShift1:= IfThen((NBlockBeginX>=NIndent1) and (NBlockBeginX>0), NShiftInit, 0);
   NShift2:= IfThen((NBlockEndX>=NIndent2), NShiftInit, 0);
 
@@ -595,7 +598,7 @@ begin
     begin
       Str:= Strings.Lines[i];
       if Trim(Str)='' then Continue;
-      Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize);
+      Str:= SIndentUnindent(Str, ARight, FOptIndentSize, FTabSize, FOptTabSpaces);
       if Strings.Lines[i]<>Str then
         Strings.Lines[i]:= Str;
     end;
@@ -650,7 +653,9 @@ begin
       if Trim(Str)='' then Continue;
 
       Str:= Copy(Str, 1, NIndentAtCol) + SIndentUnindent(
-              Copy(Str, NIndentAtCol+1, MaxInt), ARight, FOptIndentSize, FTabSize);
+              Copy(Str, NIndentAtCol+1, MaxInt), ARight, FOptIndentSize,
+              FTabSize,
+              FOptTabSpaces);
 
       if Strings.Lines[i]<>Str then
         Strings.Lines[i]:= Str;
