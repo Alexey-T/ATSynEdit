@@ -548,7 +548,7 @@ var
   NDecSpaces, NMinSpaces, i: integer;
   Str: atString;
   Caret: TATCaretItem;
-  NShiftInit, NShift1, NShift2, NIndent1, NIndent2: integer;
+  NShiftInit, NShift1, NShift2, NShiftChars, NIndent1, NIndent2: integer;
   NBlockBeginX, NBlockBeginY, NBlockEndX, NBlockEndY: integer;
 begin
   Caret:= Carets[0];
@@ -563,12 +563,21 @@ begin
   NBlockEndX:= Caret.EndX;
 
   if FOptIndentSize=0 then
-    NDecSpaces:= FTabSize
+  begin
+    NDecSpaces:= FTabSize;
+    NShiftChars:= 1;
+  end
   else
   if FOptIndentSize>0 then
-    NDecSpaces:= FOptIndentSize
+  begin
+    NDecSpaces:= FOptIndentSize;
+    NShiftChars:= FOptIndentSize;
+  end
   else
+  begin
     NDecSpaces:= Abs(FOptIndentSize)*FTabSize;
+    NShiftChars:= Abs(FOptIndentSize);
+  end;
 
   //calc minimal indent of all
   NMinSpaces:= MaxInt;
@@ -587,7 +596,7 @@ begin
   //calc shifts (emulate Lazarus IDE indent)
   NIndent1:= SGetIndentChars(Strings.Lines[NBlockBeginY]);
   NIndent2:= SGetIndentChars(Strings.Lines[NBlockEndY]);
-  NShiftInit:= NDecSpaces * IfThen(ARight, 1, -1);
+  NShiftInit:= NShiftChars * IfThen(ARight, 1, -1);
   NShift1:= IfThen((NBlockBeginX>=NIndent1) and (NBlockBeginX>0), NShiftInit, 0);
   NShift2:= IfThen((NBlockEndX>=NIndent2), NShiftInit, 0);
 
