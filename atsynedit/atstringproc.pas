@@ -5,7 +5,6 @@ License: MPL 2.0 or LGPL
 unit ATStringProc;
 
 {$mode objfpc}{$H+}
-//{$define test_wide_char}
 
 interface
 
@@ -383,6 +382,7 @@ procedure SCalcCharOffsets(const S: atString;
 var
   NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
+  ch: char;
   i: integer;
 begin
   SetLength(AInfo, Length(S));
@@ -392,31 +392,27 @@ begin
 
   for i:= 1 to Length(S) do
   begin
+    ch:= S[i];
     Inc(NCharsSkipped);
 
     NScalePercents:= 100;
-    if OptUnprintedReplaceSpec and IsCharAsciiControl(S[i]) then
-      NScalePercents:= 100
-    else
-    if IsCharHex(S[i]) then
+    if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     begin
-      if Ord(S[i])<$100 then
+      //def value
+    end
+    else
+    if IsCharHex(ch) then
+    begin
+      if Ord(ch)<$100 then
         NScalePercents:= OptCharScaleHex_Small
       else
         NScalePercents:= OptCharScaleHex_Big;
     end
     else
-    if OptAllowSpecialWidthChars and IsCharFullWidth(S[i]) then
+    if OptAllowSpecialWidthChars and IsCharFullWidth(ch) then
       NScalePercents:= OptCharScaleFullwidth_Default;
 
-    {$ifdef test_wide_char}
-    if IsSpaceChar(S[i]) then
-      NScalePercents:= 100
-    else
-      NScalePercents:= 190;
-    {$endif}
-
-    if S[i]<>#9 then
+    if ch<>#9 then
       NSize:= 1
     else
     begin
