@@ -1,4 +1,13 @@
 
+2018.01.29
+- fix commands "extend carets up/down..."- must consider tab-chars
+
+2018.01.25
++ allow OptIndentSize value 0: it uses OptTabSize, OptTabSpaces
+
+2018.01.23
++ call OnHotspotExit on mouse leave, on scrolling, on command
+
 2018.01.21
 + consider zero-width-space char U+200B
 
