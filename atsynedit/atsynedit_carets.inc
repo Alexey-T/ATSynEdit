@@ -687,6 +687,7 @@ end;
 
 procedure TATSynEdit.DoCaretsExtend(ADown: boolean; ALines: integer);
 var
+  Caret: TATCaretItem;
   MoreCarets: TATCarets;
   X, Y: integer;
   i, j: integer;
@@ -694,16 +695,18 @@ begin
   MoreCarets:= TATCarets.Create;
   try
     for i:= 0 to Carets.Count-1 do
-      with Carets[i] do
+    begin
+      Caret:= Carets[i];
+      for j:= 1 to ALines do
       begin
-        for j:= 1 to ALines do
-        begin
-          X:= PosX;
-          Y:= PosY+BoolToPlusMinusOne(ADown)*j;
-          if (Y<0) or (Y>=Strings.Count) then Break;
-          MoreCarets.Add(X, Y);
-        end;
+        if not Strings.IsIndexValid(Caret.PosY) then Break;
+        X:= SCharPosToColumnPos(Strings.Lines[Caret.PosY], Caret.PosX, FTabSize);
+        Y:= Caret.PosY+BoolToPlusMinusOne(ADown)*j;
+        if not Strings.IsIndexValid(Y) then Break;
+        X:= SColumnPosToCharPos(Strings.Lines[Y], X, FTabSize);
+        MoreCarets.Add(X, Y);
       end;
+    end;
 
     for i:= 0 to MoreCarets.Count-1 do
       with MoreCarets[i] do
