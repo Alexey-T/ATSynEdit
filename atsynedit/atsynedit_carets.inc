@@ -709,8 +709,12 @@ begin
     end;
 
     for i:= 0 to MoreCarets.Count-1 do
-      with MoreCarets[i] do
-        Carets.Add(PosX, PosY);
+    begin
+      Caret:= MoreCarets[i];
+      Carets.Add(Caret.PosX, Caret.PosY);
+    end;
+
+    //must remove many dups
     Carets.Sort;
   finally
     FreeAndNil(MoreCarets);
