@@ -382,7 +382,7 @@ procedure SCalcCharOffsets(const S: atString;
 var
   NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
-  ch: char;
+  ch: widechar;
   i: integer;
 begin
   SetLength(AInfo, Length(S));
