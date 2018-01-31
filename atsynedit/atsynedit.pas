@@ -264,7 +264,7 @@ const
   cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2;
   cFoldedMarkIndentOuter = 0;
-  cScrollKeepHorz = 1; //keep char, allow handy clicking after eol of longest line
+  cScrollKeepHorz = 1; //for horiz scrollbar, add space for 1+ chars, to allow clicking after eol of longest line
   cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert = 1; //... speed y
   cSpeedScrollNiceHorz = 4; //browser-scroll (middle-click): speed x
@@ -2121,7 +2121,8 @@ begin
     StrOut:= Str;
     StrOutUncut:= StrOut;
     AScrollHorz.NMax:= Max(AScrollHorz.NMax,
-      CanvasTextWidth(StrOutUncut, FTabSize, Point(1, 1){cell size=1pixel}) + cScrollKeepHorz);
+      Strings.LinesLen[NLinesIndex] //this is approx len, todo: consider CHK chars (width 170%)
+      + cScrollKeepHorz);
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
