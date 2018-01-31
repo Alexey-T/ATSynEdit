@@ -2018,7 +2018,7 @@ var
   WrapItem: TATSynWrapItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
-  Str, StrOut, StrOutUncut: atString;
+  Str, StrOut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineSeparator: TATLineSeparator;
   LineWithCaret, LineEolSelected, LineColorForced: boolean;
@@ -2119,7 +2119,8 @@ begin
     LineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
     StrOut:= Str;
-    StrOutUncut:= StrOut;
+    //horz scrollbar max: calced here, to make variable horz bar
+    //vert scrollbar max: calced in UpdateScrollbars
     AScrollHorz.NMax:= Max(AScrollHorz.NMax,
       Strings.LinesLen[NLinesIndex] //this is approx len, todo: consider CHK chars (width 170%)
       + cScrollbarHorzAddChars);
