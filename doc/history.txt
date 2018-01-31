@@ -1,4 +1,8 @@
 
+2018.01.31
+- fix: stupid bug (fix: char->widechar) in detect pixel width of CJK text
++ add: prop OptMaxLineLengthForSlowWidthDetect (500)
+
 2018.01.29
 - fix commands "extend carets up/down..."- must consider tab-chars
 
