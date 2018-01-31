@@ -197,6 +197,7 @@ type
     function GetLineSep(AIndex: integer): TATLineSeparator;
     function GetLineState(AIndex: integer): TATLineState;
     function GetLineLen(AIndex: integer): integer;
+    function GetLineLenRaw(AIndex: integer): integer;
     function GetRedoCount: integer;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
@@ -244,6 +245,7 @@ type
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesUTF8[Index: integer]: string read GetLineUTF8;
     property LinesLen[Index: integer]: integer read GetLineLen;
+    property LinesLenRaw[Index: integer]: integer read GetLineLenRaw;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
@@ -507,6 +509,14 @@ begin
   else
   if CurrentLen=cCharLenAscii then
     Result:= Length(ItemPtr^.Str);
+end;
+
+function TATStrings.GetLineLenRaw(AIndex: integer): integer;
+var
+  ItemPtr: PATStringItem;
+begin
+  ItemPtr:= FList.GetItem(AIndex);
+  Result:= Length(ItemPtr^.Str);
 end;
 
 function TATStrings.GetLineSep(AIndex: integer): TATLineSeparator;

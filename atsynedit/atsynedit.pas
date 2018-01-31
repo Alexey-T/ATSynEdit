@@ -488,6 +488,7 @@ type
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
+    FOptMaxLineLengthForSlowWidthDetect: integer;
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
     FOptScrollbarsNew: boolean;
@@ -1289,6 +1290,7 @@ type
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign default true;
     property OptIndentMakesWholeLinesSelection: boolean read FOptIndentMakesWholeLinesSelection write FOptIndentMakesWholeLinesSelection default false;
     property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;
+    property OptMaxLineLengthForSlowWidthDetect: integer read FOptMaxLineLengthForSlowWidthDetect write FOptMaxLineLengthForSlowWidthDetect default 500;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines default true;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG default true;
     property OptAllowScrollbarVert: boolean read FOptAllowScrollbarVert write FOptAllowScrollbarVert default true;
@@ -2121,9 +2123,11 @@ begin
     StrOut:= Str;
     //horz scrollbar max: calced here, to make variable horz bar
     //vert scrollbar max: calced in UpdateScrollbars
-    AScrollHorz.NMax:= Max(AScrollHorz.NMax,
-      Strings.LinesLen[NLinesIndex] //this is approx len, todo: consider CHK chars (width 170%)
-      + cScrollbarHorzAddChars);
+    if Strings.LinesLenRaw[NLinesIndex] > FOptMaxLineLengthForSlowWidthDetect then
+      NOutputStrWidth:= Strings.LinesLen[NLinesIndex] //approx len, it don't consider CJK chars
+    else
+      NOutputStrWidth:= CanvasTextWidth(Strings.Lines[NLinesIndex], FTabSize, Point(1, 1)); //(1,1): need width in chars
+    AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + cScrollbarHorzAddChars);
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
@@ -2858,6 +2862,7 @@ begin
   FOptShowStapleWidthPercent:= 100;
 
   FOptMaxLinesToCountUnindent:= 100;
+  FOptMaxLineLengthForSlowWidthDetect:= 500;
   FOptTextCenteringCharWidth:= 0;
   FOptTextOffsetLeft:= 0;
   FOptTextOffsetTop:= 0;
