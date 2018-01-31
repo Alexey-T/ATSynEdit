@@ -264,7 +264,7 @@ const
   cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2;
   cFoldedMarkIndentOuter = 0;
-  cScrollKeepHorz = 1; //for horiz scrollbar, add space for 1+ chars, to allow clicking after eol of longest line
+  cScrollbarHorzAddChars = 1; //for horiz scrollbar, add space for 1+ chars, to allow clicking after eol of longest line
   cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert = 1; //... speed y
   cSpeedScrollNiceHorz = 4; //browser-scroll (middle-click): speed x
@@ -1520,7 +1520,7 @@ begin
     cWrapOff:
       FWrapColumn:= 0;
     cWrapOn:
-      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-cScrollKeepHorz);
+      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-cScrollbarHorzAddChars);
     cWrapAtMargin:
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
   end;
@@ -2122,7 +2122,7 @@ begin
     StrOutUncut:= StrOut;
     AScrollHorz.NMax:= Max(AScrollHorz.NMax,
       Strings.LinesLen[NLinesIndex] //this is approx len, todo: consider CHK chars (width 170%)
-      + cScrollKeepHorz);
+      + cScrollbarHorzAddChars);
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
