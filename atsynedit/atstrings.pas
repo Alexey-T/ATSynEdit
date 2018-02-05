@@ -21,6 +21,7 @@ uses
   ATStrings_Hints,
   ATSynEdit_fgl,
   ATSynEdit_Gaps,
+  ATSynEdit_Bookmarks,
   Math,
   LazUtf8Classes,
   LConvEncoding;
