@@ -146,14 +146,26 @@ end;
 
 function TATBookmarks.Find(ALineNum: integer): integer;
 var
-  i: integer;
+  a, b, m, dif: integer;
 begin
   Result:= -1;
-  for i:= 0 to Count-1 do
-  begin
-    if Items[i].LineNum=ALineNum then 
-      exit(i);
-  end;
+  a:= 0;
+  b:= Count-1;
+  if b<0 then Exit;
+
+  repeat
+    dif:= Items[a].LineNum-ALineNum;
+    if dif=0 then exit(a);
+
+    //middle, which is near b if not exact middle
+    m:= (a+b+1) div 2;
+
+    dif:= Items[m].LineNum-ALineNum;
+    if dif=0 then exit(m);
+
+    if Abs(a-b)<=1 then exit;
+    if dif>0 then b:= m else a:= m;
+  until false;
 end;
 
 end.
