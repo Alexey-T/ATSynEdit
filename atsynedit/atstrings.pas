@@ -18,7 +18,6 @@ uses
   ATStringProc,
   ATStringProc_Utf8Detect,
   ATStrings_Undo,
-  ATStrings_Hints,
   ATSynEdit_fgl,
   ATSynEdit_Gaps,
   ATSynEdit_Bookmarks,
@@ -90,9 +89,7 @@ type
 
   TATStringItemEx = bitpacked record
     Ends: TATBits2;
-    Bookmark: TATBits6;
     State: TATBits2;
-    HintIndex: TATBits6;
     FoldFrom_0, FoldFrom_1: TATBits12;
       //0: line not folded
       //>0: line folded from this char-pos
@@ -145,7 +142,6 @@ type
     FListUpdatesHard: boolean;
     FGaps: TATSynGaps;
     FBookmarks: TATBookmarks;
-    FHintList: TATHintList;
     FUndoList,
     FRedoList: TATUndoList;
     FEndings: TATLineEnds;
@@ -232,7 +228,6 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    procedure ClearHints;
     procedure ClearSeparators;
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
@@ -441,18 +436,23 @@ begin
 end;
 
 function TATStrings.GetLineBm(AIndex: integer): integer;
+var
+  BmIndex: integer;
 begin
-  //Assert(IsIndexValid(AIndex));
-  Result:= FList.GetItem(AIndex)^.Ex.Bookmark;
+  Result:= 0;
+  BmIndex:= FBookmarks.Find(AIndex);
+  if BmIndex>=0 then
+    Result:= FBookmarks[BmIndex].Kind;
 end;
 
 function TATStrings.GetLineHint(AIndex: integer): string;
 var
-  N: integer;
+  BmIndex: integer;
 begin
-  //Assert(IsIndexValid(AIndex));
-  N:= FList.GetItem(AIndex)^.Ex.HintIndex;
-  Result:= FHintList[N];
+  Result:= '';
+  BmIndex:= FBookmarks.Find(AIndex);
+  if BmIndex>=0 then
+    Result:= FBookmarks[BmIndex].Hint;
 end;
 
 function TATStrings.GetLineEnd(AIndex: integer): TATLineEnds;
@@ -602,20 +602,25 @@ end;
 
 procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
 const
-  cMax = High(TATStringItemEx.Bookmark);
+  cMax = $FFFF;
 var
   Item: PATStringItem;
+  NIndex: integer;
 begin
   if AValue<0 then AValue:= 0;
   if AValue>cMax then AValue:= cMax;
 
   if IsIndexValid(AIndex) then
-  begin
-    Item:= FList.GetItem(AIndex);
-    Item^.Ex.Bookmark:= AValue;
-    if AValue=0 then
-      Item^.Ex.HintIndex:= 0;
-  end;
+    if AValue>0 then
+    begin
+      FBookmarks.Add(AIndex, AValue, '');
+    end
+    else
+    begin
+      NIndex:= FBookmarks.Find(AIndex);
+      if NIndex>=0 then
+        FBookmarks.Delete(NIndex);
+    end;
 end;
 
 procedure TATStrings.SetLineSep(AIndex: integer; AValue: TATLineSeparator);
@@ -677,17 +682,11 @@ end;
 
 procedure TATStrings.SetLineHint(AIndex: integer; const AValue: string);
 var
-  Item: PATStringItem;
   N: integer;
 begin
-  //Assert(IsIndexValid(AIndex));
-  if AValue='' then
-    N:= 0
-  else
-    N:= FHintList.Add(AValue);
-
-  Item:= FList.GetItem(AIndex);
-  Item^.Ex.HintIndex:= N;
+  N:= FBookmarks.Find(AIndex);
+  if N>=0 then
+    FBookmarks[N].Hint:= AValue;
 end;
 
 procedure TATStrings.SetLineState(AIndex: integer; AValue: TATLineState);
@@ -763,7 +762,6 @@ begin
   FListUpdatesHard:= false;
   FUndoList:= TATUndoList.Create;
   FRedoList:= TATUndoList.Create;
-  FHintList:= TATHintList.Create;
   FGaps:= TATSynGaps.Create;
   FBookmarks:= TATBookmarks.Create;
 
@@ -809,7 +807,6 @@ begin
   FreeAndNil(FListUpdates);
   FreeAndNil(FUndoList);
   FreeAndNil(FRedoList);
-  FreeAndNil(FHintList);
 
   inherited;
 end;
@@ -1042,21 +1039,6 @@ begin
   DoEventChange(-1, cLineChangeDeletedAll);
 
   FList.Clear;
-  FHintList.Clear;
-end;
-
-procedure TATStrings.ClearHints;
-var
-  Item: PATStringItem;
-  i: integer;
-begin
-  FHintList.Clear;
-  for i:= 0 to Count-1 do
-  begin
-    Item:= FList.GetItem(i);
-    if Item^.Ex.HintIndex<>0 then
-      Item^.Ex.HintIndex:= 0;
-  end;
 end;
 
 procedure TATStrings.DoClearLineStates(ASaved: boolean);
