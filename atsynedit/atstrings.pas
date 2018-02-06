@@ -245,7 +245,7 @@ type
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
-    property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
+    property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm; deprecated 'Use Strings.Bookmarks instead';
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
