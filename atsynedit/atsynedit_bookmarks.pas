@@ -9,7 +9,8 @@ unit ATSynEdit_Bookmarks;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils,
+  ATSynEdit_Gaps;
 
 type
   { TATBookmarkItem }
@@ -40,6 +41,7 @@ type
     procedure Add(ALineNum: integer; AKind: word; const AHint: string);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
+    procedure Update(ALine: integer; AChange: TATLineChangeKind);
   end;
 
 implementation
@@ -167,5 +169,42 @@ begin
     if dif>0 then b:= m else a:= m;
   until false;
 end;
+
+
+procedure TATBookmarks.Update(ALine: integer;
+  AChange: TATLineChangeKind);
+var
+  Item: TATBookmarkItem;
+  i: integer;
+begin
+  case AChange of
+    cLineChangeEdited:
+      begin
+      end;
+    cLineChangeAdded:
+      begin
+        for i:= 0 to Count-1 do
+        begin
+          Item:= Items[i];
+          if Item.LineNum>=ALine then
+            Item.LineNum:= Item.LineNum+1;
+        end;
+      end;
+    cLineChangeDeletedAll:
+      begin
+        Clear;
+      end;
+    cLineChangeDeleted:
+      begin
+        for i:= Count-1 downto 0 do
+        begin
+          Item:= Items[i];
+          if Item.LineNum>ALine then
+            Item.LineNum:= Item.LineNum-1;
+        end;
+      end;
+  end;
+end;
+
 
 end.

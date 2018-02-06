@@ -144,6 +144,7 @@ type
     FListUpdates: TList;
     FListUpdatesHard: boolean;
     FGaps: TATSynGaps;
+    FBookmarks: TATBookmarks;
     FHintList: TATHintList;
     FUndoList,
     FRedoList: TATUndoList;
@@ -271,6 +272,7 @@ type
     property ProgressKind: TATStringsProgressKind read FProgressKind write FProgressKind;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property Gaps: TATSynGaps read FGaps;
+    property Bookmarks: TATBookmarks read FBookmarks;
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
@@ -763,6 +765,7 @@ begin
   FRedoList:= TATUndoList.Create;
   FHintList:= TATHintList.Create;
   FGaps:= TATSynGaps.Create;
+  FBookmarks:= TATBookmarks.Create;
 
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
@@ -801,6 +804,7 @@ begin
 
   Clear;
   FreeAndNil(FList);
+  FreeAndNil(FBookmarks);
   FreeAndNil(FGaps);
   FreeAndNil(FListUpdates);
   FreeAndNil(FUndoList);
@@ -1533,7 +1537,8 @@ end;
 
 procedure TATStrings.DoEventChange(ALine: integer; AChange: TATLineChangeKind);
 begin
-  Gaps.Update(ALine, AChange);
+  FGaps.Update(ALine, AChange);
+  FBookmarks.Update(ALine, AChange);
 
   if Assigned(FOnChange) then
     FOnChange(Self, ALine, AChange);
