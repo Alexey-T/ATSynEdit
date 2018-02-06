@@ -603,24 +603,15 @@ end;
 procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
 const
   cMax = $FFFF;
-var
-  Item: PATStringItem;
-  NIndex: integer;
 begin
   if AValue<0 then AValue:= 0;
   if AValue>cMax then AValue:= cMax;
 
   if IsIndexValid(AIndex) then
     if AValue>0 then
-    begin
-      FBookmarks.Add(AIndex, AValue, '');
-    end
+      FBookmarks.Add(AIndex, AValue, '')
     else
-    begin
-      NIndex:= FBookmarks.Find(AIndex);
-      if NIndex>=0 then
-        FBookmarks.Delete(NIndex);
-    end;
+      FBookmarks.DeleteForLine(AIndex);
 end;
 
 procedure TATStrings.SetLineSep(AIndex: integer; AValue: TATLineSeparator);
