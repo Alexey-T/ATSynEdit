@@ -1,4 +1,10 @@
 
+2018.02.06
++ rewritten bookmarks support. now bookmarks are not embedded into Strings items, they are in separate Bookmarks object. now bookmarks aren't deleted if their lines are deleted - good.
++ smaller size of Strings item
++ added unit atsynedit_bookmarks
+* deleted unit atstrings_hints 
+
 2018.01.31
 - fix: stupid bug (fix: char->widechar) in detect pixel width of CJK text
 + add: prop OptMaxLineLengthForSlowWidthDetect (500)
