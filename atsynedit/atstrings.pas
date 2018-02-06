@@ -84,17 +84,17 @@ type
   { TATStringItem }
 
   TATBits2 = 0..3;
-  TATBits6 = 0..(1 shl 6)-1;
+  //TATBits6 = 0..(1 shl 6)-1;
   TATBits12 = 0..(1 shl 12)-1;
 
   TATStringItemEx = bitpacked record
     Ends: TATBits2;
     State: TATBits2;
+    Sep: TATBits2;
+    Hidden_0, Hidden_1: boolean;
     FoldFrom_0, FoldFrom_1: TATBits12;
       //0: line not folded
       //>0: line folded from this char-pos
-    Hidden_0, Hidden_1: boolean;
-    Sep: TATBits2;
   end;
 
   TATStringItem = packed record
