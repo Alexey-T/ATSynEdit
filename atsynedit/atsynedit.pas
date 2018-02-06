@@ -2358,7 +2358,7 @@ begin
       if FGutter[FGutterBandBm].Visible then
         if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
-          if Strings.LinesBm[NLinesIndex]<>0 then
+          if Strings.Bookmarks.Find(NLinesIndex)>=0 then
             DoEventDrawBookmarkIcon(C, NLinesIndex,
               Rect(
                 FGutter[FGutterBandBm].Left,
