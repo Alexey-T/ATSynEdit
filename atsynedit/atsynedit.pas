@@ -3470,9 +3470,12 @@ var
   S: string;
   P: TPoint;
   R: TRect;
+  NIndex: integer;
 begin
-  if not Strings.IsIndexValid(ALine) then exit;
-  S:= Strings.LinesHint[ALine];
+  NIndex:= Strings.Bookmarks.Find(ALine);
+  if NIndex<0 then exit;
+
+  S:= Strings.Bookmarks[NIndex].Hint;
   if S='' then
     begin DoHintHide; exit end;
 

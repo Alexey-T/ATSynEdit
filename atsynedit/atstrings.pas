@@ -191,7 +191,6 @@ type
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
     function GetLineHidden(ALine, AClient: integer): boolean;
-    function GetLineHint(AIndex: integer): string;
     function GetLineSep(AIndex: integer): TATLineSeparator;
     function GetLineState(AIndex: integer): TATLineState;
     function GetLineLen(AIndex: integer): integer;
@@ -210,7 +209,6 @@ type
     procedure SetLineEnd(AIndex: integer; AValue: TATLineEnds);
     procedure SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
     procedure SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
-    procedure SetLineHint(AIndex: integer; const AValue: string);
     procedure SetLineSep(AIndex: integer; AValue: TATLineSeparator);
     procedure SetLineState(AIndex: integer; AValue: TATLineState);
     function GetTextString_Unicode: UnicodeString;
@@ -248,7 +246,6 @@ type
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm;
-    property LinesHint[Index: integer]: string read GetLineHint write SetLineHint;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
@@ -443,16 +440,6 @@ begin
   BmIndex:= FBookmarks.Find(AIndex);
   if BmIndex>=0 then
     Result:= FBookmarks[BmIndex].Kind;
-end;
-
-function TATStrings.GetLineHint(AIndex: integer): string;
-var
-  BmIndex: integer;
-begin
-  Result:= '';
-  BmIndex:= FBookmarks.Find(AIndex);
-  if BmIndex>=0 then
-    Result:= FBookmarks[BmIndex].Hint;
 end;
 
 function TATStrings.GetLineEnd(AIndex: integer): TATLineEnds;
@@ -669,15 +656,6 @@ begin
     0: Item^.Ex.Hidden_0:= AValue;
     1: Item^.Ex.Hidden_1:= AValue;
   end;
-end;
-
-procedure TATStrings.SetLineHint(AIndex: integer; const AValue: string);
-var
-  N: integer;
-begin
-  N:= FBookmarks.Find(AIndex);
-  if N>=0 then
-    FBookmarks[N].Hint:= AValue;
 end;
 
 procedure TATStrings.SetLineState(AIndex: integer; AValue: TATLineState);
