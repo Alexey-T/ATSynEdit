@@ -16,7 +16,7 @@
     <Description Value="Multi-line editor control, analog to SynEdit, but with much more features. Supports syntax highlighting using EControl engine."/>
     <License Value="MPL 2.0, LGPL"/>
     <Version Major="1"/>
-    <Files Count="33">
+    <Files Count="32">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -32,7 +32,7 @@
       </Item3>
       <Item4>
         <Filename Value="atstringproc_utf8detect.pas"/>
-        <UnitName Value="atstringproc_utf8detect"/>
+        <UnitName Value="ATStringProc_UTF8Detect"/>
       </Item4>
       <Item5>
         <Filename Value="atstringproc_wordjump.pas"/>
@@ -109,45 +109,41 @@
         <UnitName Value="ATStringProc_HtmlColor"/>
       </Item23>
       <Item24>
-        <Filename Value="atstrings_hints.pas"/>
-        <UnitName Value="atstrings_hints"/>
-      </Item24>
-      <Item25>
         <Filename Value="atsynedit_colors.pas"/>
         <UnitName Value="ATSynEdit_Colors"/>
-      </Item25>
-      <Item26>
+      </Item24>
+      <Item25>
         <Filename Value="atsynedit_export_html.pas"/>
         <UnitName Value="ATSynEdit_Export_HTML"/>
-      </Item26>
-      <Item27>
+      </Item25>
+      <Item26>
         <Filename Value="atsynedit_markers.pas"/>
         <UnitName Value="ATSynEdit_Markers"/>
-      </Item27>
-      <Item28>
+      </Item26>
+      <Item27>
         <Filename Value="atsynedit_regexpr.pas"/>
         <UnitName Value="ATSynEdit_RegExpr"/>
-      </Item28>
-      <Item29>
+      </Item27>
+      <Item28>
         <Filename Value="atsynedit_adapter_cache.pas"/>
         <UnitName Value="ATSynEdit_Adapter_Cache"/>
-      </Item29>
-      <Item30>
+      </Item28>
+      <Item29>
         <Filename Value="atsynedit_gaps.pas"/>
         <UnitName Value="ATSynEdit_Gaps"/>
-      </Item30>
-      <Item31>
+      </Item29>
+      <Item30>
         <Filename Value="atsynedit_scrollbar.pas"/>
         <UnitName Value="ATSynEdit_ScrollBar"/>
-      </Item31>
-      <Item32>
+      </Item30>
+      <Item31>
         <Filename Value="atsynedit_dimranges.pas"/>
         <UnitName Value="ATSynEdit_DimRanges"/>
-      </Item32>
-      <Item33>
+      </Item31>
+      <Item32>
         <Filename Value="atsynedit_bookmarks.pas"/>
         <UnitName Value="ATSynEdit_Bookmarks"/>
-      </Item33>
+      </Item32>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
