@@ -35,6 +35,7 @@ type
     destructor Destroy; override;
     procedure Clear;
     procedure Delete(N: integer);
+    procedure DeleteForLine(ALine: integer);
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATBookmarkItem read GetItem; default;
@@ -89,6 +90,15 @@ procedure TATBookmarks.Delete(N: integer);
 begin
   TObject(FList[N]).Free;
   FList.Delete(N);
+end;
+
+procedure TATBookmarks.DeleteForLine(ALine: integer);
+var
+  N: integer;
+begin
+  N:= Find(ALine);
+  if N>=0 then
+    Delete(N);
 end;
 
 function TATBookmarks.Count: integer;
