@@ -251,13 +251,14 @@ end;
 procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
   ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
 var
-  BmKind: integer;
+  NIndex, BmKind: integer;
 begin
   AColor:= clNone;
 
-  BmKind:= Strings.LinesBm[ALine];
-  if BmKind<>0 then
+  NIndex:= Strings.Bookmarks.Find(ALine);
+  if NIndex>=0 then
   begin
+    BmKind:= Strings.Bookmarks[NIndex].Kind;
     AColor:= Colors.BookmarkBG;
     if Assigned(FOnCalcBookmarkColor) then
       FOnCalcBookmarkColor(Self, BmKind, AColor);
