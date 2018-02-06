@@ -175,12 +175,14 @@ procedure TATBookmarks.Update(ALine: integer;
   AChange: TATLineChangeKind);
 var
   Item: TATBookmarkItem;
-  i: integer;
+  bMovedHere: boolean;
+  NIndexPlaced, i: integer;
 begin
   case AChange of
     cLineChangeEdited:
       begin
       end;
+
     cLineChangeAdded:
       begin
         for i:= 0 to Count-1 do
@@ -190,18 +192,32 @@ begin
             Item.LineNum:= Item.LineNum+1;
         end;
       end;
+
     cLineChangeDeletedAll:
       begin
         Clear;
       end;
+
     cLineChangeDeleted:
       begin
+        NIndexPlaced:= Find(ALine);
+        bMovedHere:= false;
+
         for i:= Count-1 downto 0 do
         begin
           Item:= Items[i];
           if Item.LineNum>ALine then
+          begin
             Item.LineNum:= Item.LineNum-1;
+            if Item.LineNum=ALine then
+              bMovedHere:= true;
+          end;
         end;
+
+        //delete new duplicate
+        if bMovedHere then
+          if NIndexPlaced>=0 then
+            Delete(NIndexPlaced);
       end;
   end;
 end;
