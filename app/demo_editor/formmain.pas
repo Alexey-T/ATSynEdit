@@ -506,19 +506,16 @@ begin
 end;
 
 procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer);
+var
+  NIndex: integer;
 begin
   if ABand=ed.GutterBandBm then
   begin
-    if ed.Strings.LinesBm[ALine]<>0 then
-    begin
-      ed.Strings.LinesBm[ALine]:= 0;
-      ed.Strings.LinesHint[ALine]:= '';
-    end
+    NIndex:= ed.Strings.Bookmarks.Find(ALine);
+    if NIndex>=0 then
+      ed.Strings.Bookmarks.Delete(NIndex)
     else
-    begin
-      ed.Strings.LinesBm[ALine]:= 1;
-      ed.Strings.LinesHint[ALine]:= Format('Bookmark for line %d', [ALine+1]);
-    end;
+      ed.Strings.Bookmarks.Add(ALine, 1, Format('Bookmark for line %d', [ALine+1]));
     ed.Update;
   end;
 end;
