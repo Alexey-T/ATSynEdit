@@ -177,8 +177,8 @@ type TATBookmarks in unit atsynedit_bookmarks. Holds list of bookmarks of type T
 Kind specifies background color and gutter icon for bookmarks of this kind. Kind value 0 must not be used (previously value 0 meaned "no bookmark"), value 1 should be used for "usual" bookmarks, value>1 should be used for custom application bookmarks. ATSynEdit has 2 events: to paint bookmark icon (from its kind), and to get color of bookmark (from its kind).
 
 Bookmarks object is always sorted by line index.
-Duplicate bookmarks (for the same line index) are automacically removed.
-To add bookmark, call method Add(). To delete bookmark, call method Delete or DeleteForLine.
+Duplicate bookmarks (for the same line index) are auto removed.
+To add bookmark, use method Add. To delete bookmark, use methods Delete and DeleteForLine.
 
 === Carets object ===
 
@@ -330,7 +330,7 @@ Contains color properties of type TColor. For ex, Colors.TextFont is text font c
 
 === Gaps object ===
 
-List of gap items. Gap items have properties: 
+type TATSynGaps in unit atsynedit_gaps. Holds list of items TATSynGapItem. Each item has properties:
 
 * LineIndex
 * Size: height in pixels
@@ -340,7 +340,7 @@ List of gap items. Gap items have properties:
 Gap item paints as rectangle (it is owner-drawn), just between lines N and N+1, not overlapping text. 
 When user adds/deletes lines, gaps auto-shift with their lines; gap is deleted if its line is deleted.
 
-Example usages:
+Use cases:
 
 * App wants to show picture preview, when picture is linked in HTML. It creates small preview picture e.g. 100x50, and adds gap: gap size=52, picture height and 2 pixels of border.
 * App runs linter on JS code, for JS errors it places bookmarks, and adds gaps with size=15 for error lines: in gaps it writes errors, maybe icons.
