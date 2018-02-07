@@ -42,7 +42,7 @@ type
     procedure Add(ALineNum: integer; AKind: word; const AHint: string);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
-    procedure Update(ALine: integer; AChange: TATLineChangeKind);
+    procedure Update(ALine: integer; AChange: TATLineChangeKind; ALineCount: integer);
   end;
 
 implementation
@@ -181,8 +181,8 @@ begin
 end;
 
 
-procedure TATBookmarks.Update(ALine: integer;
-  AChange: TATLineChangeKind);
+procedure TATBookmarks.Update(ALine: integer; AChange: TATLineChangeKind;
+  ALineCount: integer);
 var
   Item: TATBookmarkItem;
   bMovedHere: boolean;
@@ -216,7 +216,7 @@ begin
         for i:= Count-1 downto 0 do
         begin
           Item:= Items[i];
-          if Item.LineNum>ALine then
+          if (Item.LineNum>ALine) or (Item.LineNum=ALineCount-1) then
           begin
             Item.LineNum:= Item.LineNum-1;
             if Item.LineNum=ALine then

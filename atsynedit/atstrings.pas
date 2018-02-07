@@ -1489,7 +1489,7 @@ end;
 procedure TATStrings.DoEventChange(ALine: integer; AChange: TATLineChangeKind);
 begin
   FGaps.Update(ALine, AChange);
-  FBookmarks.Update(ALine, AChange);
+  FBookmarks.Update(ALine, AChange, Count);
 
   if Assigned(FOnChange) then
     FOnChange(Self, ALine, AChange);
