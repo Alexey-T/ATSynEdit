@@ -216,6 +216,7 @@ begin
         for i:= Count-1 downto 0 do
         begin
           Item:= Items[i];
+          //spec case for bookmark on last line, keep it if deleting last line
           if (Item.LineNum>ALine) or (Item.LineNum=ALineCount-1) then
           begin
             Item.LineNum:= Item.LineNum-1;
