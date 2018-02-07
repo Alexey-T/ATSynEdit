@@ -178,7 +178,7 @@ Kind specifies background color and gutter icon for bookmarks of this kind. Kind
 
 Bookmarks object is always sorted by line index.
 Duplicate bookmarks (for the same line index) are auto removed.
-To add bookmark, use method Add. To delete bookmark, use methods Delete and DeleteForLine.
+To change bookmarks, use methods Add, Delete, DeleteForLine, Clear. Also use method Find.
 
 === Carets object ===
 
