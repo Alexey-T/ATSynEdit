@@ -17,14 +17,14 @@ EControl files licensed under special license (readme.txt), usage allowed only i
 
 = Requirements =
 
-Lazarus: 1.4+
+Lazarus: 1.8+
 
-One of the last versions was tested on:
+Tested on:
 
-* Windows (x32) 
-* Linux GTK2 (x32, x64)
-* Qt (Linux, Windows) (main problem was moving all painting code into Paint event, it's done)
-* macOS (10.8 and later)
+* Windows (x32/x64) 
+* GTK2 (x32, x64)
+* Qt (Linux, Windows)
+* macOS (10.8 and later), Carbon/Cocoa
 
 = Keyboard shortcuts =
 
@@ -148,22 +148,37 @@ It may be installed or not.
 * Use not installed: see below "Basic example how to use".
 * Use installed: in Lazarus IDE, open package file "atsynedit\atsynedit_package". Install it in Package dialog. You 'll have components installed in "Misc" page of component pallette: TATSynEdit, TATEdit (single line edit), etc.
 
-==     What parts does it have?==
+==What parts does it have?==
 
 === Strings object ===
 
-type TATStrings in unit atstrings. Holds text lines. 
+type TATStrings in unit atstrings. Storage of text lines. It includes managing of Undo/Redo too. And auto-adjustments of Gaps/Bookmarks objects when lines are added/deleted. 
 
-* To add text lines, use procedures of Strings: LineAdd, LineInsert, LineDelete.
-* To get/set text lines, use properties:
-** Lines[i]: text, of type UnicodeString
-** LinesLen[i]: integer: same as getting Length of item (in WideChars), but faster
-** LinesEnds[i]: enum: kind of end-of-line chars
-** LinesHidden[i]: bool: true if line is fully hidden (inside folded block)
-** LinesFoldFrom[i]: byte: 0 if line is not folded, >0 if line is folded from this char-pos
-** LinesState[i]: enum: state normal/changed/saved, it's shown by color on gutter
-** LinesBm[i]: integer: bookmark kind (each kind has assigned color), or 0 if no bookmark
-** LinesHint[i]: string: hint which shows by moving mouse over bookmark icon (for items with bookmark only)
+To add/delete lines, use methods: LineAdd, LineInsert, LineDelete. They consider Undo data. Methods with "Raw" word ignore Undo data, usually don't use them.
+
+To get/set lines, use properties:
+
+* Lines[i]: text, of type UnicodeString
+* LinesUTF8[i]: text, of type string (faster than Lines[])
+* LinesLen[i]: integer: same as Length(Lines[i]), but faster
+* LinesEnds[i]: enum: kind of end-of-line chars
+* LinesHidden[i]: bool: true if line is fully hidden (inside folded block)
+* LinesFoldFrom[i]: byte: 0 if line is not folded, >0 if line is folded from this char-pos
+* LinesState[i]: enum: line state, normal/changed/saved, it's shown by color on gutter
+
+=== Strings.Bookmarks object ===
+
+type TATBookmarks in unit atsynedit_bookmarks. Holds list of bookmarks of type TATBookmarkItem. Each item has props:
+
+* LineNum: line index in Strings object
+* Kind: int kind value
+* Hint: hint/tooltip string, which is shown on mouse-over for bookmark gutter icon
+
+Kind specifies background color and gutter icon for bookmarks of this kind. Kind value 0 must not be used (previously value 0 meaned "no bookmark"), value 1 should be used for "usual" bookmarks, value>1 should be used for custom application bookmarks. ATSynEdit has 2 events: to paint bookmark icon (from its kind), and to get color of bookmark (from its kind).
+
+Bookmarks object is always sorted by line index.
+Duplicate bookmarks (for the same line index) are automacically removed.
+To add bookmark, call method Add(). To delete bookmark, call method Delete or DeleteForLine.
 
 === Carets object ===
 
