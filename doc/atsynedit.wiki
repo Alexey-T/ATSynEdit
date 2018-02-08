@@ -189,7 +189,9 @@ type TATCarets in unit atsynedit_carets. Holds list of items of type TATCaretIte
 * EndY, EndX: position for selection edge for this caret, or -1/-1 if no selection for this caret
 * CoordY, CoordX: screen coordinates (usually you don't need these)
 
-Note: for forward sel, pair (PosY, PosX) is after pair (EndY, EndX); for backward sel the order is reversed. So if you want to get pos of selection start (e.g. to delete this selection), get minimal pair.
+For forward sel, pair (PosY, PosX) is after pair (EndY, EndX); for backward sel the order is reversed. So if you want to get pos of selection start (e.g. to delete this selection), get minimal pair.
+
+Carets object is sorted by text position, method Sort does this. Duplicate carets (they appear during work with multi-carets) are auto removed. If you try to add overlapping caret selections, they will be auto merged to one caret. To add/delete carets, use methods Add, Clear. Also ATSynEdit has methods DoCaretNNNNN, eg DoCaretSingle makes single caret.
 
 === Keymap object ===
 
