@@ -28,7 +28,7 @@ uses
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
-  LMessages, LCLType,
+  LMessages, LCLType, LCLVersion,
   LazUTF8,
   ATStringProc,
   ATStrings,
@@ -1045,8 +1045,7 @@ type
     procedure MouseLeave; override;
 
     function DoMouseWheel(Shift: TShiftState; WheelDelta: integer; MousePos{%H-}: TPoint): boolean; override;
-    function DoMouseWheelHorz(Shift: TShiftState; WheelDelta: integer; MousePos{%H-}: TPoint): boolean; override;
-    // Note! ...Horz is new API in Lazarus 1.9. If you use 1.8 release, just comment word "override;" at end of line
+    function DoMouseWheelHorz(Shift: TShiftState; WheelDelta: integer; MousePos{%H-}: TPoint): boolean; {$IF LCL_FULLVERSION >= 1090000} override; {$ENDIF}
 
     procedure DblClick; override;
     procedure TripleClick; override;
