@@ -3556,39 +3556,38 @@ begin
 end;
 
 procedure TATSynEdit.WMIME_COMPOSITION(var Msg: TMessage);
+const
+  IME_COMPFLAG = GCS_COMPREADSTR or GCS_COMPSTR;
+  IME_RESULTFLAG = GCS_RESULTREADSTR or GCS_RESULTSTR;
 var
-  IMC:HIMC;
-  imeCode, len:Integer;
-  p:PWideChar;
-  res:TATCommandResults;
+  IMC: HIMC;
+  imeCode, imeReadCode, len: Integer;
+  p: PWideChar;
+  res: TATCommandResults;
 begin
   if not ModeReadOnly then
   begin
-    { work with GCS_COMPSTR and GCS_RESULTSTR }
-    if Msg.lParam and GCS_COMPSTR <> 0 then
-       imeCode := GCS_COMPSTR
-       else if Msg.lParam and GCS_RESULTSTR <> 0 then
-            imeCode := GCS_RESULTSTR
-            else
-                imeCode := 0;
+    { work with GCS_COMPREADSTR and GCS_COMPSTR and GCS_RESULTREADSTR and GCS_RESULTSTR }
+    imeCode := Msg.lParam and (IME_COMPFLAG or IME_RESULTFLAG);
     { check compositon state }
     if imeCode<>0 then
     begin
       IMC := ImmGetContext(Handle);
       try
          { Get Result string length }
-         len := ImmGetCompositionStringW(IMC,imeCode,nil,0);
+         imeReadCode:=imeCode and (GCS_COMPSTR or GCS_RESULTSTR);
+         len := ImmGetCompositionStringW(IMC,imeReadCode,nil,0);
          GetMem(p,len+2);
          try
             { get compositon string }
-            ImmGetCompositionStringW(IMC,imeCode,p,len);
+            ImmGetCompositionStringW(IMC,imeReadCode,p,len);
             len := len shr 1;
             p[len]:=#0;
             { Insert text and
               select text if it is not GCS_RESULTSTR }
             res:=DoCommand_TextInsertAtCarets(p, False,
-                                 (imeCode=GCS_RESULTSTR) and FOverwrite,
-                                 (imeCode<>GCS_RESULTSTR) and (Len>0));
+                                 (imeCode and IME_RESULTFLAG<>0) and FOverwrite,
+                                 (imeCode and IME_COMPFLAG<>0) and (len>0));
             DoCommandResults(res);
          finally
            FreeMem(p);
@@ -3600,6 +3599,7 @@ begin
   end;
   Msg.Result:=-1;
 end;
+
 
 procedure TATSynEdit.WMIME_ENDCOMPOSITION(var Msg: TMessage);
 begin
