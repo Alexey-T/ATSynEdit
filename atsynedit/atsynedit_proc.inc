@@ -5,11 +5,11 @@ var
 
 const
   cBitmapNiceScrollRadius = 16;
-  crNiceScrollNone  = TCursor(-30);
-  crNiceScrollUp    = TCursor(-31);
-  crNiceScrollDown  = TCursor(-32);
-  crNiceScrollLeft  = TCursor(-33);
-  crNiceScrollRight = TCursor(-34);
+  crNiceScrollNone  = TCursor(-40);
+  crNiceScrollUp    = TCursor(-41);
+  crNiceScrollDown  = TCursor(-42);
+  crNiceScrollLeft  = TCursor(-43);
+  crNiceScrollRight = TCursor(-44);
 
 const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
