@@ -984,8 +984,8 @@ type
     property GutterBandSep: integer read FGutterBandSep write FGutterBandSep;
     property GutterBandEmpty: integer read FGutterBandEmpty write FGutterBandEmpty;
     //files
-    procedure LoadFromFile(const AFilename: string);
-    procedure SaveToFile(const AFilename: string);
+    procedure LoadFromFile(const AFilename: string); virtual;
+    procedure SaveToFile(const AFilename: string); virtual;
     //carets
     procedure DoCaretSingle(APosX, APosY, AEndX, AEndY: integer);
     procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
