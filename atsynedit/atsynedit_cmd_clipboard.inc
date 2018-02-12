@@ -58,8 +58,9 @@ begin
     begin
       Strings.ActionDeleteFakeLineAndFinalEol;
       //correct caret after line deleted
-      if not AKeepCaret and
-           (Carets[0].PosY>=Strings.Count) then
+      if not AKeepCaret
+        and (Carets[0].PosY>=Strings.Count)
+        and (Strings.Count>0) then
         DoCaretSingle(
           Strings.LinesLen[Strings.Count-1],
           Strings.Count-1
