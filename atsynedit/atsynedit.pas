@@ -1011,6 +1011,7 @@ type
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
+    function IsLocked: boolean;
     function TextSelected: atString;
     function TextCurrentWord: atString;
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
@@ -3373,7 +3374,7 @@ procedure TATSynEdit.PaintEx(ALineNumber: integer);
 var
   R: TRect;
 begin
-  if FPaintLocked>0 then
+  if IsLocked then
   begin
     DoPaintLockedWarning(Canvas);
     Exit
@@ -5020,6 +5021,11 @@ begin
     FPaintLocked:= 0;
   if FPaintLocked=0 then
     Invalidate;
+end;
+
+function TATSynEdit.IsLocked: boolean;
+begin
+  Result:= FPaintLocked>0;
 end;
 
 function TATSynEdit.TextSelected: atString;
