@@ -55,10 +55,10 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    procedure Delete(N: integer);
+    procedure Delete(AIndex: integer);
     function Count: integer;
-    function IsIndexValid(N: integer): boolean; inline;
-    property Items[N: integer]: TATMarkerItem read GetItem; default;
+    function IsIndexValid(AIndex: integer): boolean;
+    property Items[AIndex: integer]: TATMarkerItem read GetItem; default;
     procedure Add(APosX, APosY: integer;
       const ATag: Int64=0;
       ALenX: integer=0;
@@ -110,10 +110,10 @@ begin
   FList.Clear;
 end;
 
-procedure TATMarkers.Delete(N: integer);
+procedure TATMarkers.Delete(AIndex: integer);
 begin
-  if IsIndexValid(N) then
-    FList.Delete(N);
+  if IsIndexValid(AIndex) then
+    FList.Delete(AIndex);
 end;
 
 function TATMarkers.Count: integer;
@@ -121,9 +121,9 @@ begin
   Result:= FList.Count;
 end;
 
-function TATMarkers.IsIndexValid(N: integer): boolean; inline;
+function TATMarkers.IsIndexValid(AIndex: integer): boolean;
 begin
-  Result:= (N>=0) and (N<FList.Count);
+  Result:= (AIndex>=0) and (AIndex<FList.Count);
 end;
 
 function TATMarkers.GetItem(N: integer): TATMarkerItem;
