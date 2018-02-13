@@ -5,18 +5,20 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Markers;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 interface
 
 uses
   Classes, SysUtils,
+  ATSynEdit_fgl,
   ATSynEdit_Carets;
 
 type
   { TATMarkerItem }
 
-  TATMarkerItem = class
-  public
+  PATMarkerItem = ^TATMarkerItem;
+  TATMarkerItem = record
     PosX, PosY: integer;
     CoordX, CoordY: integer; //screen coords
     Tag: Int64;
@@ -29,7 +31,17 @@ type
       //            LenX is absolute X of sel-end
     Ptr: TObject;
       //used in Attribs object of ATSynedit
-    destructor Destroy; override;
+    class operator=(const A, B: TATMarkerItem): boolean;
+  end;
+  
+type
+  { TATMarkerItems }
+
+  TATMarkerItemsBase = specialize TFPGList<TATMarkerItem>;
+
+  TATMarkerItems = class(TATMarkerItemsBase)
+  public
+    procedure Deref(Item: Pointer); override;
   end;
 
 type
@@ -37,7 +49,7 @@ type
 
   TATMarkers = class
   private
-    FList: TList;
+    FList: TATMarkerItems;
     function GetItem(N: integer): TATMarkerItem;
   public
     constructor Create; virtual;
@@ -47,24 +59,35 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATMarkerItem read GetItem; default;
-    function Add(APosX, APosY: integer;
-      const ATag: Int64=0; ALenX: integer=0; ALenY: integer=0;
+    procedure Add(APosX, APosY: integer;
+      const ATag: Int64=0;
+      ALenX: integer=0;
+      ALenY: integer=0;
       APtr: TObject=nil;
-      AInsertToBegin: boolean=false): TATMarkerItem;
+      AInsertToBegin: boolean=false);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
-    function FindMarkerAtPos(AX, AY: integer): TATMarkerItem;
+    function FindAtPos(AX, AY: integer): integer;
   end;
 
 implementation
 
 { TATMarkerItem }
 
-destructor TATMarkerItem.Destroy;
+class operator TATMarkerItem.=(const A, B: TATMarkerItem): boolean;
 begin
-  if Assigned(Ptr) then
-    FreeAndNil(Ptr);
-  inherited Destroy;
+  Result:= false;
+end;
+
+{ TATMarkerItems }
+
+procedure TATMarkerItems.Deref(Item: Pointer);
+var
+  ItemPtr: PATMarkerItem;
+begin
+  ItemPtr:= Item;
+  if Assigned(ItemPtr^.Ptr) then
+    FreeAndNil(ItemPtr^.Ptr);
 end;
 
 { TATMarkers }
@@ -72,7 +95,7 @@ end;
 constructor TATMarkers.Create;
 begin
   inherited;
-  FList:= TList.Create;
+  FList:= TATMarkerItems.Create;
 end;
 
 destructor TATMarkers.Destroy;
@@ -83,21 +106,14 @@ begin
 end;
 
 procedure TATMarkers.Clear;
-var
-  i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
-    TObject(FList[i]).Free;
   FList.Clear;
 end;
 
 procedure TATMarkers.Delete(N: integer);
 begin
   if IsIndexValid(N) then
-  begin
-    TObject(FList[N]).Free;
     FList.Delete(N);
-  end;
 end;
 
 function TATMarkers.Count: integer;
@@ -112,39 +128,41 @@ end;
 
 function TATMarkers.GetItem(N: integer): TATMarkerItem;
 begin
-  if IsIndexValid(N) then
-    Result:= TATMarkerItem(FList[N])
-  else
-    Result:= nil;
+  Result:= FList[N];
 end;
 
-function TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ALenX: integer; ALenY: integer; APtr: TObject; AInsertToBegin: boolean): TATMarkerItem;
+procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
+  ALenX: integer; ALenY: integer; APtr: TObject; AInsertToBegin: boolean);
+var
+  Item: TATMarkerItem;
 begin
-  Result:= TATMarkerItem.Create;
-  Result.PosX:= APosX;
-  Result.PosY:= APosY;
-  Result.CoordX:= -1;
-  Result.CoordY:= -1;
-  Result.Tag:= ATag;
-  Result.LenX:= ALenX;
-  Result.LenY:= ALenY;
-  Result.Ptr:= APtr;
+  FillChar(Item, SizeOf(Item), 0);
+  Item.PosX:= APosX;
+  Item.PosY:= APosY;
+  Item.CoordX:= -1;
+  Item.CoordY:= -1;
+  Item.Tag:= ATag;
+  Item.LenX:= ALenX;
+  Item.LenY:= ALenY;
+  Item.Ptr:= APtr;
 
   if AInsertToBegin then
-    FList.Insert(0, Result)
+    FList.Insert(0, Item)
   else
-    FList.Add(Result);
+    FList.Add(Item);
 end;
 
 procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
 var
+  Item: TATMarkerItem;
   i: integer;
 begin
   for i:= Count-1 downto 0 do
-    with Items[i] do
-      if IsPosInRange(PosX, PosY, AX1, AY1, AX2, AY2)=cRelateInside then
-        Delete(i);
+  begin
+    Item:= Items[i];
+    if IsPosInRange(Item.PosX, Item.PosY, AX1, AY1, AX2, AY2)=cRelateInside then
+      Delete(i);
+  end;
 end;
 
 procedure TATMarkers.DeleteWithTag(const ATag: Int64);
@@ -156,18 +174,18 @@ begin
       Delete(i);
 end;
 
-function TATMarkers.FindMarkerAtPos(AX, AY: integer): TATMarkerItem;
+function TATMarkers.FindAtPos(AX, AY: integer): integer;
 var
   Item: TATMarkerItem;
   i: integer;
 begin
-  Result:= nil;
+  Result:= -1;
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
     if (Item.PosY=AY) and (Item.PosX<=AX) and
       ( (Item.LenY>0) or (Item.PosX+Item.LenX>AX) )
-      then exit(Item);
+      then exit(i);
   end;
 end;
 

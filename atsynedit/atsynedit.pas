@@ -614,7 +614,6 @@ type
     procedure DoCaretsShift_MarkerItem(Mark: TATMarkerItem; APosX, APosY, AShiftX,
       AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
     procedure DoCaretsFixIfInsideCollapsedPart;
-    procedure DoDebugAddAttribs;
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     procedure DoFoldbarClick(ALine: integer);
@@ -5401,29 +5400,6 @@ begin
 end;
 
 
-procedure TATSynEdit.DoDebugAddAttribs;
-var
-  p1, p2, p3: TATLinePartClass;
-begin
-  p1:= TATLinePartClass.Create;
-  p2:= TATLinePartClass.Create;
-  p3:= TATLinePartClass.Create;
-
-  p1.Data.ColorBG:= clgreen;
-  p1.Data.ColorFont:= clwhite;
-  p1.data.BorderDown:= cLineStyleDotted;
-  Attribs.Add(1,1, 0,0, 4, p1);
-
-  p2.Data.ColorBG:= clYellow;
-  p2.Data.ColorFont:= clBlue;
-  p2.data.BorderDown:= cLineStyleSolid;
-  Attribs.Add(2,2, 0,0, 4, p2);
-
-  p3.Data.ColorBG:= clRed;
-  p3.Data.ColorFont:= clYellow;
-  Attribs.Add(3,3, 0,0, 4, p3);
-end;
-
 procedure TATSynEdit.DoSetMarkedLines(ALine1, ALine2: integer);
 begin
   FMarkedRange.Clear;
@@ -5529,12 +5505,16 @@ end;
 
 function TATSynEdit.DoGetLinkAtPos(AX, AY: integer): atString;
 var
+  NIndex: integer;
   Atr: TATMarkerItem;
 begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
-  Atr:= Attribs.FindMarkerAtPos(AX, AY);
-  if Atr=nil then exit;
+
+  NIndex:= Attribs.FindAtPos(AX, AY);
+  if NIndex<0 then exit;
+
+  Atr:= Attribs[NIndex];
   if Atr.Tag<>cUrlMarkerTag then exit;
   if Atr.LenY>0 then exit;
 
