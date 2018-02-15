@@ -74,6 +74,9 @@ function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
 function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
 function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
 
+function SStringHasTab(const S: atString): boolean;
+function SStringHasTab(const S: string): boolean;
+
 function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
@@ -572,6 +575,24 @@ begin
   end;
 
   Result:= AColumn-Length(STabsToSpaces(S, ATabSize))+Length(S);
+end;
+
+function SStringHasTab(const S: atString): boolean;
+var
+  i: integer;
+begin
+  Result:= false;
+  for i:= 1 to Length(S) do
+    if S[i]=#9 then exit(true);
+end;
+
+function SStringHasTab(const S: string): boolean;
+var
+  i: integer;
+begin
+  Result:= false;
+  for i:= 1 to Length(S) do
+    if S[i]=#9 then exit(true);
 end;
 
 function SIndentUnindent(const Str: atString; ARight: boolean;
