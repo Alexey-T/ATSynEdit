@@ -84,15 +84,14 @@ type
   { TATStringItem }
 
   TATBits2 = 0..3;
-  //TATBits6 = 0..(1 shl 6)-1;
-  TATBits12 = 0..(1 shl 12)-1;
+  TATStringItem_FoldFrom = 0..1023;
 
   TATStringItemEx = bitpacked record
     Ends: TATBits2;
     State: TATBits2;
     Sep: TATBits2;
     Hidden_0, Hidden_1: boolean;
-    FoldFrom_0, FoldFrom_1: TATBits12;
+    FoldFrom_0, FoldFrom_1: TATStringItem_FoldFrom;
       //0: line not folded
       //>0: line folded from this char-pos
   end;
@@ -633,7 +632,7 @@ end;
 
 procedure TATStrings.SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
 const
-  cMax = High(TATBits12);
+  cMax = High(TATStringItem_FoldFrom);
 var
   Item: PATStringItem;
 begin
