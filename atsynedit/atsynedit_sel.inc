@@ -4,16 +4,13 @@ function TATSynEdit.IsPosSelected(AX, AY: integer): boolean;
 var
   NPosLeft,
   NPosRight: integer;
-  SLine: atString;
 begin
   if not IsSelRectEmpty then
   begin
     if not ((AY>=FSelRect.Top) and (AY<=FSelRect.Bottom)) then exit(False);
 
-    //optimized for huge lines
-    SLine:= Strings.LineSub(AY, 1, FSelRect.Right);
-    NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
-    NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
+    NPosLeft:= Strings.ColumnPosToCharPos(AY, FSelRect.Left, OptTabSize);
+    NPosRight:= Strings.ColumnPosToCharPos(AY, FSelRect.Right, OptTabSize);
     Result:= (AX>=NPosLeft) and (AX<NPosRight);
   end
   else
@@ -25,7 +22,6 @@ function TATSynEdit.IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelect
 var
   NPosLeft,
   NPosRight: integer;
-  SLine: atString;
 begin
   if not IsSelRectEmpty then
   begin
@@ -36,9 +32,8 @@ begin
       exit(cRangeAllUnselected);
 
     //check for x
-    SLine:= Strings.LineSub(AY1, 1, FSelRect.Right);
-    NPosLeft:= SColumnPosToCharPos(SLine, FSelRect.Left, OptTabSize);
-    NPosRight:= SColumnPosToCharPos(SLine, FSelRect.Right, OptTabSize);
+    NPosLeft:= Strings.ColumnPosToCharPos(AY1, FSelRect.Left, OptTabSize);
+    NPosRight:= Strings.ColumnPosToCharPos(AY1, FSelRect.Right, OptTabSize);
 
     if (AX1>=NPosLeft) and (AX2<=NPosRight) then
       Result:= cRangeAllSelected
@@ -317,14 +312,10 @@ end;
 procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
 var
   PTarget: TPoint;
-  SLine: atString;
 begin
   //consider tab-chars
-  SLine:= Strings.LineSub(P1.Y, 1, P1.X);
-  P1.X:= SCharPosToColumnPos(SLine, P1.X, FTabSize);
-
-  SLine:= Strings.LineSub(P2.Y, 1, P2.X);
-  P2.X:= SCharPosToColumnPos(SLine, P2.X, FTabSize);
+  P1.X:= Strings.CharPosToColumnPos(P1.Y, P1.X, FTabSize);
+  P2.X:= Strings.CharPosToColumnPos(P2.Y, P2.X, FTabSize);
 
   //fix coords
   PTarget:= P2;
@@ -342,8 +333,7 @@ begin
   else
   begin
     //single caret at moving block edge
-    SLine:= Strings.LineSub(PTarget.Y, 1, PTarget.X);
-    PTarget.X:= SColumnPosToCharPos(SLine, PTarget.X, OptTabSize);
+    PTarget.X:= Strings.ColumnPosToCharPos(PTarget.Y, PTarget.X, OptTabSize);
     DoCaretSingle(PTarget.X, PTarget.Y);
   end;
 end;
@@ -351,16 +341,13 @@ end;
 procedure TATSynEdit.DoSelect_ColumnBlock_FromSelRect;
 var
   PntBegin, PntEnd: TPoint;
-  StrTemp: atString;
 begin
   //convert SelRect to char-pos
   PntBegin:= FSelRectBegin;
-  StrTemp:= Strings.LineSub(PntBegin.Y, 1, PntBegin.X);
-  PntBegin.X:= SColumnPosToCharPos(StrTemp, PntBegin.X, OptTabSize);
+  PntBegin.X:= Strings.ColumnPosToCharPos(PntBegin.Y, PntBegin.X, OptTabSize);
 
   PntEnd:= FSelRectEnd;
-  StrTemp:= Strings.LineSub(PntEnd.Y, 1, PntEnd.X);
-  PntEnd.X:= SColumnPosToCharPos(StrTemp, PntEnd.X, OptTabSize);
+  PntEnd.X:= Strings.ColumnPosToCharPos(PntEnd.Y, PntEnd.X, OptTabSize);
 
   //func needs char-pos
   DoSelect_ColumnBlock(PntBegin, PntEnd);
@@ -378,23 +365,19 @@ end;
 procedure TATSynEdit.DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
 var
   Caret: TATCaretItem;
-  SLine: atString;
 begin
   Caret:= Carets[0];
   if (Caret.EndY>=0) and (Caret.EndX>=0) then
   begin
-    SLine:= Strings.LineSub(Caret.EndY, 1, Caret.EndX);
-    ABegin.X:= SCharPosToColumnPos(SLine, Caret.EndX, OptTabSize);
+    ABegin.X:= Strings.CharPosToColumnPos(Caret.EndY, Caret.EndX, OptTabSize);
     ABegin.Y:= Caret.EndY;
 
-    SLine:= Strings.LineSub(Caret.PosY, 1, Caret.PosX);
-    AEnd.X:= SCharPosToColumnPos(SLine, Caret.PosX, OptTabSize);
+    AEnd.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, OptTabSize);
     AEnd.Y:= Caret.PosY;
   end
   else
   begin
-    SLine:= Strings.LineSub(Caret.PosY, 1, Caret.PosX);
-    ABegin.X:= SCharPosToColumnPos(SLine, Caret.PosX, OptTabSize);
+    ABegin.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, OptTabSize);
     ABegin.Y:= Caret.PosY;
     AEnd:= ABegin;
   end;
@@ -412,8 +395,8 @@ begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
       Str:= Strings.Lines[i];
-      X1:= SColumnPosToCharPos(Str, FSelRect.Left, OptTabSize);
-      X2:= SColumnPosToCharPos(Str, FSelRect.Right, OptTabSize);
+      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, OptTabSize);
+      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, OptTabSize);
 
       StrNew:= Str;
       Delete(StrNew, X1+1, X2-X1);

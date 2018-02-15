@@ -165,9 +165,8 @@ begin
   begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
-      Str:= Strings.LineSub(i, 1, FSelRect.Right);
-      X1:= SColumnPosToCharPos(Str, FSelRect.Left, OptTabSize);
-      X2:= SColumnPosToCharPos(Str, FSelRect.Right, OptTabSize);
+      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, OptTabSize);
+      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, OptTabSize);
       Str:= Strings.TextSubstring(X1, i, X2, i);
       if FOptCopyColumnBlockAlignedBySpaces then
       begin

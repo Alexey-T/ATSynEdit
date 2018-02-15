@@ -31,18 +31,16 @@ end;
 
 procedure TATSynEdit.DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
 var
-  SLine: atString;
   i: integer;
 begin
   for i:= APos1.Y to APos2.Y do
   begin
     if i=APos1.Y then
       Carets.Clear;
-    SLine:= Strings.LineSub(i, 1, ARect.Right);
     Carets.Add(
-      SColumnPosToCharPos(SLine, ARect.Right, OptTabSize),
+      Strings.ColumnPosToCharPos(i, ARect.Right, OptTabSize),
       i,
-      SColumnPosToCharPos(SLine, ARect.Left, OptTabSize),
+      Strings.ColumnPosToCharPos(i, ARect.Left, OptTabSize),
       i
       );
   end
@@ -700,10 +698,10 @@ begin
       for j:= 1 to ALines do
       begin
         if not Strings.IsIndexValid(Caret.PosY) then Break;
-        X:= SCharPosToColumnPos(Strings.Lines[Caret.PosY], Caret.PosX, FTabSize);
+        X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabSize);
         Y:= Caret.PosY+BoolToPlusMinusOne(ADown)*j;
         if not Strings.IsIndexValid(Y) then Break;
-        X:= SColumnPosToCharPos(Strings.Lines[Y], X, FTabSize);
+        X:= Strings.ColumnPosToCharPos(Y, X, FTabSize);
         MoreCarets.Add(X, Y);
       end;
     end;
