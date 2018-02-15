@@ -248,6 +248,8 @@ type
     property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm; deprecated 'Use Strings.Bookmarks instead';
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
+    function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabSize: integer): integer;
+    function CharPosToColumnPos(AIndex: integer; AX: integer; ATabSize: integer): integer;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
@@ -999,6 +1001,26 @@ begin
     LinesUTF8[ALineIndex],
     APosFrom, ALen);
   Result:= UTF8Decode(S);
+end;
+
+function TATStrings.ColumnPosToCharPos(AIndex: integer; AX: integer;
+  ATabSize: integer): integer;
+var
+  SLine: atString;
+begin
+  //optimized for huge lines
+  SLine:= LineSub(AIndex, 1, AX+ATabSize);
+  Result:= SColumnPosToCharPos(SLine, AX, ATabSize);
+end;
+
+function TATStrings.CharPosToColumnPos(AIndex: integer; AX: integer;
+  ATabSize: integer): integer;
+var
+  SLine: atString;
+begin
+  //optimized for huge lines
+  SLine:= LineSub(AIndex, 1, AX+ATabSize);
+  Result:= SCharPosToColumnPos(SLine, AX, ATabSize);
 end;
 
 procedure TATStrings.Clear;
