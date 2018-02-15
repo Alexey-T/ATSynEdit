@@ -76,6 +76,13 @@ type
     cTrimAll
     );
 
+type
+  TATLineHasTab = (
+    cLineTabUnknown,
+    cLineTabNo,
+    cLineTabYes
+    );
+
 const
   cCharLenUnknown = -1;
   cCharLenAscii = -2;
@@ -90,6 +97,7 @@ type
     Ends: TATBits2;
     State: TATBits2;
     Sep: TATBits2;
+    HasTab: TATBits2;
     Hidden_0, Hidden_1: boolean;
     FoldFrom_0, FoldFrom_1: TATStringItem_FoldFrom;
       //0: line not folded
@@ -221,6 +229,7 @@ type
     procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
+    function UpdateItemHasTab(AIndex: integer): boolean;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -561,6 +570,7 @@ procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
 var
   Item: PATStringItem;
   StrBefore: atString;
+  FHasTab: TATLineHasTab;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
@@ -586,6 +596,12 @@ begin
 
   if TATLineState(Item^.Ex.State)<>cLineStateAdded then
     Item^.Ex.State:= TATBits2(cLineStateChanged);
+
+  if SStringHasTab(AValue) then
+    FHasTab:= cLineTabYes
+  else
+    FHasTab:= cLineTabNo;
+  Item^.Ex.HasTab:= TATBits2(FHasTab);
 end;
 
 procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
@@ -1002,11 +1018,33 @@ begin
   Result:= UTF8Decode(S);
 end;
 
+function TATStrings.UpdateItemHasTab(AIndex: integer): boolean;
+var
+  Item: PATStringItem;
+  FHasTab: TATLineHasTab;
+begin
+  Item:= FList.GetItem(AIndex);
+  FHasTab:= TATLineHasTab(Item^.Ex.HasTab);
+  if FHasTab=cLineTabUnknown then
+  begin
+    Result:= SStringHasTab(Item^.Str);
+    if Result then
+      FHasTab:= cLineTabYes
+    else
+      FHasTab:= cLineTabNo;
+    Item^.Ex.HasTab:= TATBits2(FHasTab);
+  end
+  else
+    Result:= FHasTab=cLineTabYes;
+end;
+
 function TATStrings.ColumnPosToCharPos(AIndex: integer; AX: integer;
   ATabSize: integer): integer;
 var
   SLine: atString;
 begin
+  if not UpdateItemHasTab(AIndex) then exit(AX);
+
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabSize);
   Result:= SColumnPosToCharPos(SLine, AX, ATabSize);
@@ -1017,6 +1055,8 @@ function TATStrings.CharPosToColumnPos(AIndex: integer; AX: integer;
 var
   SLine: atString;
 begin
+  if not UpdateItemHasTab(AIndex) then exit(AX);
+
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabSize);
   Result:= SCharPosToColumnPos(SLine, AX, ATabSize);
