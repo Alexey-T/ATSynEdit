@@ -162,8 +162,10 @@ function _DoCaretPosToClientPos(
   APreferLeftSide: boolean): TPoint;
 var
   Item: TATSynWrapItem;
+  StringItem: PATStringItem;
   NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
   Str: atString;
+  bAsciiOnly: boolean;
   i: integer;
 begin
   Result.X:= -1;
@@ -171,6 +173,11 @@ begin
 
   AWrapInfo.FindIndexesOfLineNumber(P.Y, NIndex1, NIndex2);
   if NIndex1<0 then Exit;
+
+  //prepare optimization
+  AStrings.UpdateItemHasTab(P.Y);
+  StringItem:= AStrings.GetItemPtr(P.Y);
+  bAsciiOnly:= TATLineHasAscii(StringItem^.Ex.HasAsciiOnly) = cLineAsciiYes;
 
   for i:= NIndex1 to NIndex2 do
   begin
@@ -184,8 +191,15 @@ begin
 
     NFromStart:= P.X+1-Item.NCharIndex;
 
-    Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-    NWidth:= CanvasTextWidth(Str, ATabSize, ACharSize);
+    if bAsciiOnly then
+    begin
+      NWidth:= Min(NFromStart, Item.NLength) * ACharSize.X;
+    end
+    else
+    begin
+      Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
+      NWidth:= CanvasTextWidth(Str, ATabSize, ACharSize);
+    end;
 
     Result.X:= NWidth;
 
