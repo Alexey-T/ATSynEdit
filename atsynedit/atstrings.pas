@@ -83,6 +83,13 @@ type
     cLineTabYes
     );
 
+type
+  TATLineHasAscii = (
+    cLineAsciiUnknown,
+    cLineAsciiNo,
+    cLineAsciiYes
+    );
+
 const
   cCharLenUnknown = -1;
   cCharLenAscii = -2;
@@ -98,6 +105,7 @@ type
     State: TATBits2;
     Sep: TATBits2;
     HasTab: TATBits2;
+    HasAsciiOnly: TATBits2;
     Hidden_0, Hidden_1: boolean;
     FoldFrom_0, FoldFrom_1: TATStringItem_FoldFrom;
       //0: line not folded
@@ -573,6 +581,7 @@ var
   Item: PATStringItem;
   StrBefore: atString;
   FHasTab: TATLineHasTab;
+  FHasAscii: TATLineHasAscii;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
@@ -604,6 +613,12 @@ begin
   else
     FHasTab:= cLineTabNo;
   Item^.Ex.HasTab:= TATBits2(FHasTab);
+
+  if SStringHasAsciiAndNoTabs(AValue) then
+    FHasAscii:= cLineAsciiYes
+  else
+    FHasAscii:= cLineAsciiNo;
+  Item^.Ex.HasAsciiOnly:= TATBits2(FHasAscii);
 end;
 
 procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
@@ -1024,8 +1039,10 @@ function TATStrings.UpdateItemHasTab(AIndex: integer): boolean;
 var
   Item: PATStringItem;
   FHasTab: TATLineHasTab;
+  FHasAscii: TATLineHasAscii;
 begin
   Item:= FList.GetItem(AIndex);
+
   FHasTab:= TATLineHasTab(Item^.Ex.HasTab);
   if FHasTab=cLineTabUnknown then
   begin
@@ -1038,6 +1055,16 @@ begin
   end
   else
     Result:= FHasTab=cLineTabYes;
+
+  FHasAscii:= TATLineHasAscii(Item^.Ex.HasAsciiOnly);
+  if FHasAscii=cLineAsciiUnknown then
+  begin
+    if SStringHasAsciiAndNoTabs(Item^.Str) then
+      FHasAscii:= cLineAsciiYes
+    else
+      FHasAscii:= cLineAsciiNo;
+    Item^.Ex.HasAsciiOnly:= TATBits2(FHasAscii);
+  end;
 end;
 
 function TATStrings.ColumnPosToCharPos(AIndex: integer; AX: integer;

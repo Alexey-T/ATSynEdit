@@ -77,7 +77,8 @@ function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): int
 
 function SStringHasTab(const S: atString): boolean;
 function SStringHasTab(const S: string): boolean;
-function SStringIsAsciiAndNoTabs(const S: atString): boolean;
+function SStringHasAsciiAndNoTabs(const S: atString): boolean;
+function SStringHasAsciiAndNoTabs(const S: string): boolean;
 
 function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
@@ -604,7 +605,20 @@ begin
     if S[i]=#9 then exit(true);
 end;
 
-function SStringIsAsciiAndNoTabs(const S: atString): boolean;
+function SStringHasAsciiAndNoTabs(const S: atString): boolean;
+var
+  code, i: integer;
+begin
+  Result:= true;
+  for i:= 1 to Length(S) do
+  begin
+    code:= Ord(S[i]);
+    if (code<32) or (code>=127) then
+      exit(false);
+  end;
+end;
+
+function SStringHasAsciiAndNoTabs(const S: string): boolean;
 var
   code, i: integer;
 begin
