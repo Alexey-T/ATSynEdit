@@ -185,11 +185,7 @@ begin
     NFromStart:= P.X+1-Item.NCharIndex;
 
     Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-    NWidth:= CanvasTextWidth(Str, ATabSize, Point(1, 1)) * ACharSize.X;
-    //
-    //todo: cache CanvasTextWidth() in WrapItem
-    //currently cannot do, for big files WrapInfo.VirtualMode=true
-    //
+    NWidth:= CanvasTextWidth(Str, ATabSize, ACharSize);
 
     Result.X:= NWidth;
 
