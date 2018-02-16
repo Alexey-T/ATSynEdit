@@ -162,8 +162,9 @@ function _DoCaretPosToClientPos(
   APreferLeftSide: boolean): TPoint;
 var
   Item: TATSynWrapItem;
-  NIndex1, NIndex2, NLineIndexTop, NFromStart: integer;
+  NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
   Str: atString;
+  //StringItem: PATStringItem;
   i: integer;
 begin
   Result.X:= -1;
@@ -171,6 +172,11 @@ begin
 
   AWrapInfo.FindIndexesOfLineNumber(P.Y, NIndex1, NIndex2);
   if NIndex1<0 then Exit;
+
+  (*
+  AStrings.UpdateItemHasTab(P.Y);
+  StringItem:= AStrings.GetItemPtr(P.Y);
+  *)
 
   for i:= NIndex1 to NIndex2 do
   begin
@@ -183,9 +189,23 @@ begin
         Continue;
 
     NFromStart:= P.X+1-Item.NCharIndex;
-    Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
 
-    Result.X:= CanvasTextWidth(Str, ATabSize, ACharSize);
+    (*
+    //optimize for huge lines
+    if (StringItem^.CharLen=cCharLenAscii) and
+      (TATLineHasTab(StringItem^.Ex.HasTab)=cLineTabNo) then
+    begin
+      NWidth:= ACharSize.X*Min(NFromStart, Item.NLength);
+    end
+    else
+    *)
+    begin
+      Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
+      NWidth:= CanvasTextWidth(Str, ATabSize, ACharSize);
+    end;
+
+    Result.X:= NWidth;
+
     if NFromStart>Item.NLength then
       Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.X);
 

@@ -229,7 +229,6 @@ type
     procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
-    function UpdateItemHasTab(AIndex: integer): boolean;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -258,6 +257,9 @@ type
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
     function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabSize: integer): integer;
     function CharPosToColumnPos(AIndex: integer; AX: integer; ATabSize: integer): integer;
+    function GetItemPtr(AIndex: integer): PATStringItem;
+    function UpdateItemHasTab(AIndex: integer): boolean;
+
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
@@ -1060,6 +1062,11 @@ begin
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabSize);
   Result:= SCharPosToColumnPos(SLine, AX, ATabSize);
+end;
+
+function TATStrings.GetItemPtr(AIndex: integer): PATStringItem;
+begin
+  Result:= FList.GetItem(AIndex);
 end;
 
 procedure TATStrings.Clear;
