@@ -608,17 +608,8 @@ begin
   if TATLineState(Item^.Ex.State)<>cLineStateAdded then
     Item^.Ex.State:= TATBits2(cLineStateChanged);
 
-  if SStringHasTab(AValue) then
-    FHasTab:= cLineTabYes
-  else
-    FHasTab:= cLineTabNo;
-  Item^.Ex.HasTab:= TATBits2(FHasTab);
-
-  if SStringHasAsciiAndNoTabs(AValue) then
-    FHasAscii:= cLineAsciiYes
-  else
-    FHasAscii:= cLineAsciiNo;
-  Item^.Ex.HasAsciiOnly:= TATBits2(FHasAscii);
+  Item^.Ex.HasTab:= 0; //unknown
+  Item^.Ex.HasAsciiOnly:= 0; //unknown
 end;
 
 procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
