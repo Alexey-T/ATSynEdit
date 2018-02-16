@@ -164,7 +164,7 @@ var
   Item: TATSynWrapItem;
   NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
   Str: atString;
-  //StringItem: PATStringItem;
+  StringItem: PATStringItem;
   i: integer;
 begin
   Result.X:= -1;
@@ -173,10 +173,9 @@ begin
   AWrapInfo.FindIndexesOfLineNumber(P.Y, NIndex1, NIndex2);
   if NIndex1<0 then Exit;
 
-  (*
+  //prepare optimization
   AStrings.UpdateItemHasTab(P.Y);
   StringItem:= AStrings.GetItemPtr(P.Y);
-  *)
 
   for i:= NIndex1 to NIndex2 do
   begin
@@ -190,15 +189,13 @@ begin
 
     NFromStart:= P.X+1-Item.NCharIndex;
 
-    (*
-    //optimize for huge lines
+    //optimize for huge lines (pure ascii + no tab chars)
     if (StringItem^.CharLen=cCharLenAscii) and
       (TATLineHasTab(StringItem^.Ex.HasTab)=cLineTabNo) then
     begin
       NWidth:= ACharSize.X*Min(NFromStart, Item.NLength);
     end
     else
-    *)
     begin
       Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
       NWidth:= CanvasTextWidth(Str, ATabSize, ACharSize);
