@@ -118,7 +118,7 @@ begin
     NPos:= 0;
     for i:= FSelRectBegin.Y to FSelRectEnd.Y do
       if Strings.IsIndexValid(i) then
-        NPos:= Max(NPos, Length(STabsToSpaces(Strings.Lines[i], FTabSize)));
+        NPos:= Max(NPos, STabsToSpaces_Length(Strings.Lines[i], FTabSize));
     FSelRectEnd.X:= NPos;
   end;
 

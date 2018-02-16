@@ -70,6 +70,7 @@ function SGetIndentCharsToOpeningBracket(const S: atString): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
+function STabsToSpaces_Length(const S: atString; ATabSize: integer; AMaxLen: integer=-1): integer;
 function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
 function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
 function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
@@ -289,8 +290,7 @@ var
   SIndent: atString;
 begin
   SIndent:= Copy(S, 1, SGetIndentChars(S));
-  SIndent:= STabsToSpaces(SIndent, ATabSize);
-  Result:= Length(SIndent);
+  Result:= STabsToSpaces_Length(SIndent, ATabSize);
 end;
 
 function SSwapEndian(const S: UnicodeString): UnicodeString;
@@ -317,6 +317,7 @@ begin
     Inc(Result);
 end;
 
+
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 var
   N, NSize: integer;
@@ -335,6 +336,21 @@ begin
     end;
   until false;
 end;
+
+function STabsToSpaces_Length(const S: atString; ATabSize: integer; AMaxLen: integer=-1): integer;
+var
+  i: integer;
+begin
+  Result:= 0;
+  if AMaxLen<0 then
+    AMaxLen:= Length(S);
+  for i:= 1 to AMaxLen do
+    if S[i]<>#9 then
+      Inc(Result)
+    else
+      Inc(Result, SCalcTabulationSize(ATabSize, Result+1));
+end;
+
 
 {
 http://en.wikipedia.org/wiki/Combining_character
@@ -551,9 +567,10 @@ end;
 
 function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
 begin
-  Result:= Length(STabsToSpaces(Copy(S, 1, APos), ATabSize));
   if APos>Length(S) then
-    Inc(Result, APos-Length(S));
+    Result:= STabsToSpaces_Length(S, ATabSize) + APos-Length(S)
+  else
+    Result:= STabsToSpaces_Length(S, ATabSize, APos);
 end;
 
 function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
@@ -574,7 +591,7 @@ begin
       exit(i);
   end;
 
-  Result:= AColumn-Length(STabsToSpaces(S, ATabSize))+Length(S);
+  Result:= AColumn - STabsToSpaces_Length(S, ATabSize) + Length(S);
 end;
 
 function SStringHasTab(const S: atString): boolean;
