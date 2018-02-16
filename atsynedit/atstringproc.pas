@@ -34,6 +34,7 @@ type
 const
   cLineEndStrings: array[TATLineEnds] of string = ('', #13#10, #10, #13);
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'win', 'un', 'mac');
+  cLineEndLength: array[TATLineEnds] of Byte = (0, 2, 1, 1);
 
 var
   OptMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
