@@ -170,17 +170,24 @@ end;
 
 procedure TfmMain.TreeClick(Sender: TObject);
 var
-  R: TecTextRange;
-  P: TPoint;
+  Rng: TATRangeInCodeTree;
+  PntBegin, PntEnd: TPoint;
 begin
   if adapter.TreeBusy then exit;
   if Tree.Selected=nil then exit;
   if Tree.Selected.Data=nil then exit;
 
-  R:= TecTextRange(Tree.Selected.Data);
-  P:= adapter.TreeGetPositionOfRange(R);
+  Rng:= TObject(Tree.Selected.Data) as TATRangeInCodeTree;
+  adapter.TreeGetPositionOfRange_Codetree(Rng, PntBegin, PntEnd);
 
-  ed.DoGotoPos(P, Point(-1, -1), 5, 5, true, true);
+  ed.DoGotoPos(
+    PntBegin,
+    Point(-1, -1),
+    5,
+    5,
+    true,
+    true
+    );
   ed.SetFocus;
 end;
 
