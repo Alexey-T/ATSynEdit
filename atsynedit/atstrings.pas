@@ -591,8 +591,6 @@ procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
 var
   Item: PATStringItem;
   StrBefore: atString;
-  FHasTab: TATLineHasTab;
-  FHasAscii: TATLineHasAscii;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
