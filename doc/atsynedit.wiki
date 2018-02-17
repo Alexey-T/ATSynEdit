@@ -974,6 +974,12 @@ Public props: ScrollVert, ScrollHorz. They are records, NPos is scroll pos. Scro
 
 Method DoScrollByDelta(Dx, Dy) allows to increment/decrement horz (Dx) and vert (Dy) scroll positions.
 
+==When Update call is needed?==
+
+* Update(true): needed if you changed Strings contents, Fold ranges. Ie, if WrapInfo object needs update.
+* Update(false): needed if you only changed look, ie carets, scroll pos, bookmarks, markers, etc.
+* no Update() call needed, if you only called DoCommand(). DoCommand does it.
+
 ==more==
 
 = Auto-completion lists =
