@@ -121,7 +121,8 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   APos: TPoint;
   ACharSize: TPoint;
   ATabSize: integer;
-  AParts: PATLineParts
+  AParts: PATLineParts;
+  AColorBG: TColor
   );
 
 procedure DoPaintUnprintedEol(C: TCanvas;
@@ -1130,16 +1131,18 @@ end;
 
 procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString;
   const ARect: TRect; APos: TPoint; ACharSize: TPoint; ATabSize: integer;
-  AParts: PATLineParts);
-const
-  cLowChars = '.,:;_''-+`~=^*';
+  AParts: PATLineParts;
+  AColorBG: TColor);
+// line is painted with 2px height,
+// and 1px spacing between lines
 var
   Offsets: TATIntArray;
   Part: ^TATLinePart;
   ch: Widechar;
   nPos, nCharSize: integer;
-  i, j: integer;
-  X1, Y1, Y2: integer;
+  X1, Y1, X2, Y2: integer;
+  HasBG: boolean;
+  i: integer;
 begin
   if AStr='' then exit;
   SetLength(Offsets, Length(AStr)+1);
@@ -1151,26 +1154,30 @@ begin
   begin
     Part:= @AParts^[i];
     if Part^.Len=0 then Break;
-    for j:= 1 to Part^.Len do
+
+    HasBG:= Part^.ColorBG<>AColorBG;
+
+    nPos:= Part^.Offset+1;
+    if nPos>Length(AStr) then Continue;
+    ch:= AStr[nPos];
+    if IsCharSpace(ch) and (not HasBG) then Continue;
+
+    X1:= APos.X + ACharSize.X*Offsets[nPos-1];
+    X2:= X1 + ACharSize.X*Part^.Len;
+    Y2:= APos.Y+1;
+
+    if HasBG then
+      Y1:= Y2-2
+    else
+      Y1:= Y2-1;
+
+    if (X1>=ARect.Left) and (X1<ARect.Right) then
     begin
-      nPos:= Part^.Offset+j;
-      if nPos>Length(AStr) then Continue;
-      ch:= AStr[nPos];
-      if IsCharSpace(ch) then Continue;
-
-      nCharSize:= ACharSize.Y;
-      if Pos(ch, cLowChars)>0 then
-        nCharSize:= nCharSize div 2;
-
-      X1:= APos.X+ACharSize.X*Offsets[nPos-1];
-      Y2:= APos.Y+ACharSize.Y;
-      Y1:= Y2-nCharSize;
-
-      if (X1>=ARect.Left) and (X1<ARect.Right) then
-      begin
-        C.Pen.Color:= ColorBlendHalf(Part^.ColorBG, Part^.ColorFont);
-        C.Line(X1, Y1, X1, Y2);
-      end;
+      if HasBG then
+        C.Brush.Color:= Part^.ColorBG
+      else
+        C.Brush.Color:= ColorBlendHalf(Part^.ColorBG, Part^.ColorFont);
+      C.FillRect(X1, Y1, X2, Y2);
     end;
   end;
 end;

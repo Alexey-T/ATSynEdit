@@ -2236,7 +2236,8 @@ begin
           CurrPointText,
           FCharSizeMinimap,
           FTabSize,
-          @FLineParts
+          @FLineParts,
+          Colors.TextBG
           );
 
       //restore after textout
