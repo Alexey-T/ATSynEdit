@@ -1160,7 +1160,7 @@ begin
     nPos:= Part^.Offset+1;
     if nPos>Length(AStr) then Continue;
     ch:= AStr[nPos];
-    if IsStringSpaces(Copy(AStr, nPos, Part^.Len))
+    if IsStringSpaces(AStr, nPos, Part^.Len)
       and (not HasBG) then Continue;
 
     X1:= APos.X + ACharSize.X*Part^.Offset;
