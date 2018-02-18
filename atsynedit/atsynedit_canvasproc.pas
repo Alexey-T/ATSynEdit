@@ -1157,7 +1157,7 @@ begin
 
     X1:= APos.X + ACharSize.X*Part^.Offset;
     X2:= X1 + ACharSize.X*Part^.Len;
-    Y2:= APos.Y+1;
+    Y2:= APos.Y + ACharSize.Y;
 
     if HasBG then
       Y1:= Y2-2
