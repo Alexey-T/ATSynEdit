@@ -1136,23 +1136,16 @@ procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString;
 // line is painted with 2px height,
 // and 1px spacing between lines
 var
-  Offsets: TATIntArray;
   Part: ^TATLinePart;
   ch: Widechar;
-  nPos, nCharSize: integer;
+  nPart, nPos, nCharSize: integer;
   X1, Y1, X2, Y2: integer;
   HasBG: boolean;
-  i: integer;
 begin
   if AStr='' then exit;
-  SetLength(Offsets, Length(AStr)+1);
-  Offsets[0]:= 0;
-  for i:= 2 to Length(AStr) do
-    Offsets[i-1]:= Offsets[i-2]+IfThen(AStr[i-1]=#9, ATabSize, 1);
-
-  for i:= Low(TATLineParts) to High(TATLineParts) do
+  for nPart:= Low(TATLineParts) to High(TATLineParts) do
   begin
-    Part:= @AParts^[i];
+    Part:= @AParts^[nPart];
     if Part^.Len=0 then Break;
 
     HasBG:= Part^.ColorBG<>AColorBG;
@@ -1162,7 +1155,7 @@ begin
     ch:= AStr[nPos];
     if IsCharSpace(ch) and (not HasBG) then Continue;
 
-    X1:= APos.X + ACharSize.X*Offsets[nPos-1];
+    X1:= APos.X + ACharSize.X*Part^.Offset;
     X2:= X1 + ACharSize.X*Part^.Len;
     Y2:= APos.Y+1;
 
