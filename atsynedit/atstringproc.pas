@@ -56,6 +56,7 @@ function IsCharAsciiControl(ch: atChar): boolean;
 function IsCharAccent(ch: atChar): boolean;
 function IsCharHex(ch: atChar): boolean;
 function IsStringWithUnicodeChars(const S: atString): boolean;
+function IsStringSpaces(const S: atString): boolean;
 
 function SBeginsWith(const S, SubStr: atString): boolean;
 function SBeginsWith(const S, SubStr: string): boolean;
@@ -185,6 +186,15 @@ end;
 function IsCharHex(ch: atChar): boolean;
 begin
   Result:= Pos(ch, OptHexChars)>0;
+end;
+
+function IsStringSpaces(const S: atString): boolean;
+var
+  i: integer;
+begin
+  Result:= true;
+  for i:= 1 to Length(S) do
+    if not IsCharSpace(S[i]) then exit(false);
 end;
 
 function IsStringWithUnicodeChars(const S: atString): boolean;

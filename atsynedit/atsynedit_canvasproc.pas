@@ -906,6 +906,13 @@ begin
     Result:= AParts[N-1].Offset+AParts[N-1].Len;
 end;
 
+function DoPartsGetCount(const AParts: TATLineParts): integer;
+//func considers case when some middle part has Len=0
+begin
+  Result:= High(AParts)+1;
+  while (Result>0) and (AParts[Result-1].Len=0) do
+    Dec(Result);
+end;
 
 var
   ResultParts: TATLineParts; //size is huge, so not local var
@@ -1153,7 +1160,8 @@ begin
     nPos:= Part^.Offset+1;
     if nPos>Length(AStr) then Continue;
     ch:= AStr[nPos];
-    if IsCharSpace(ch) and (not HasBG) then Continue;
+    if IsStringSpaces(Copy(AStr, nPos, Part^.Len))
+      and (not HasBG) then Continue;
 
     X1:= APos.X + ACharSize.X*Part^.Offset;
     X2:= X1 + ACharSize.X*Part^.Len;
