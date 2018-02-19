@@ -146,6 +146,7 @@ begin
       Marker.CoordX:= P.X;
       Marker.CoordY:= P.Y;
     end;
+    Markers[i]:= Marker;
   end;
 end;
 

@@ -51,6 +51,7 @@ type
   private
     FList: TATMarkerItems;
     function GetItem(N: integer): TATMarkerItem;
+    procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -58,7 +59,7 @@ type
     procedure Delete(AIndex: integer);
     function Count: integer;
     function IsIndexValid(AIndex: integer): boolean;
-    property Items[AIndex: integer]: TATMarkerItem read GetItem; default;
+    property Items[AIndex: integer]: TATMarkerItem read GetItem write SetItem; default;
     procedure Add(APosX, APosY: integer;
       const ATag: Int64=0;
       ALenX: integer=0;
@@ -129,6 +130,11 @@ end;
 function TATMarkers.GetItem(N: integer): TATMarkerItem;
 begin
   Result:= FList[N];
+end;
+
+procedure TATMarkers.SetItem(N: integer; const AItem: TATMarkerItem);
+begin
+  FList[N]:= AItem;
 end;
 
 procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
