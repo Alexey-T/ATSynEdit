@@ -796,10 +796,15 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsShift_MarkerItem(Mark: TATMarkerItem;
+procedure TATSynEdit.DoCaretsShift_MarkerItem(
+  AMarkerObj: TATMarkers;
+  AMarkerIndex: integer;
   APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer;
   APosAfter: TPoint);
+var
+  Mark: TATMarkerItem;
 begin
+  Mark:= AMarkerObj[AMarkerIndex];
   //marker below src, apply ShiftY/ShiftBelowX
   if Mark.PosY>APosY then
   begin
@@ -832,6 +837,8 @@ begin
 
   if Mark.PosX<0 then Mark.PosX:= 0;
   if Mark.PosY<0 then Mark.PosY:= 0;
+
+  AMarkerObj[AMarkerIndex]:= Mark;
 end;
 
 
@@ -894,15 +901,15 @@ begin
   //adjust markers
   //(cannot optimize, markers not sorted)
   for i:= 0 to Markers.Count-1 do
-    DoCaretsShift_MarkerItem(Markers[i],
+    DoCaretsShift_MarkerItem(Markers, i,
       APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 
   for i:= 0 to Attribs.Count-1 do
-    DoCaretsShift_MarkerItem(Attribs[i],
+    DoCaretsShift_MarkerItem(Attribs, i,
       APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 
   for i:= 0 to FMarkedRange.Count-1 do
-    DoCaretsShift_MarkerItem(FMarkedRange[i],
+    DoCaretsShift_MarkerItem(FMarkedRange, i,
       APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 end;
 

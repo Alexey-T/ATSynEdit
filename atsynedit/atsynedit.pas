@@ -611,8 +611,9 @@ type
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoCaretsShift_CaretItem(Caret: TATCaretItem; APosX, APosY, AShiftX,
       AShiftY, AShiftBelowX: integer);
-    procedure DoCaretsShift_MarkerItem(Mark: TATMarkerItem; APosX, APosY, AShiftX,
-      AShiftY, AShiftBelowX: integer; APosAfter: TPoint);
+    procedure DoCaretsShift_MarkerItem(AMarkerObj: TATMarkers;
+      AMarkerIndex: integer; APosX, APosY, AShiftX, AShiftY,
+      AShiftBelowX: integer; APosAfter: TPoint);
     procedure DoCaretsFixIfInsideCollapsedPart;
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);

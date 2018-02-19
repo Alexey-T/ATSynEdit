@@ -37,12 +37,7 @@ type
 type
   { TATMarkerItems }
 
-  TATMarkerItemsBase = specialize TFPGList<TATMarkerItem>;
-
-  TATMarkerItems = class(TATMarkerItemsBase)
-  public
-    procedure Deref(Item: Pointer); override;
-  end;
+  TATMarkerItems = specialize TFPGList<TATMarkerItem>;
 
 type
   { TATMarkers }
@@ -80,17 +75,6 @@ begin
   Result:= false;
 end;
 
-{ TATMarkerItems }
-
-procedure TATMarkerItems.Deref(Item: Pointer);
-var
-  ItemPtr: PATMarkerItem;
-begin
-  ItemPtr:= Item;
-  if Assigned(ItemPtr^.Ptr) then
-    FreeAndNil(ItemPtr^.Ptr);
-end;
-
 { TATMarkers }
 
 constructor TATMarkers.Create;
@@ -107,14 +91,30 @@ begin
 end;
 
 procedure TATMarkers.Clear;
+var
+  Item: TATMarkerItem;
+  i: integer;
 begin
+  for i:= FList.Count-1 downto 0 do
+  begin
+    Item:= Items[i];
+    if Assigned(Item.Ptr) then
+      Item.Ptr.Free;
+  end;
   FList.Clear;
 end;
 
 procedure TATMarkers.Delete(AIndex: integer);
+var
+  Item: TATMarkerItem;
 begin
   if IsIndexValid(AIndex) then
+  begin
+    Item:= Items[AIndex];
+    if Assigned(Item.Ptr) then
+      Item.Ptr.Free;
     FList.Delete(AIndex);
+  end;
 end;
 
 function TATMarkers.Count: integer;
