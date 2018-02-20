@@ -598,6 +598,11 @@ type
     FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
 
+    {$ifdef WINDOWS}
+    FIMEPreSelText: atString;
+    FIMEDoUpdate: boolean;
+    {$endif}
+
     //
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
@@ -3550,10 +3555,14 @@ begin
   Invalidate;
 end;
 
-{ Simple Windows IME support, only tested with Korean }
+{
+Windows IME support, tested with Korean/Chinese
+by https://github.com/rasberryrabbit
+}
 {$ifdef Windows}
 procedure TATSynEdit.WMIME_STARTCOMPOSITION(var Msg: TMessage);
 begin
+  FIMEPreSelText:=TextSelected;
   Msg.Result:=-1;
 end;
 
@@ -3562,20 +3571,22 @@ const
   IME_COMPFLAG = GCS_COMPREADSTR or GCS_COMPSTR;
   IME_RESULTFLAG = GCS_RESULTREADSTR or GCS_RESULTSTR;
 var
-  IMC: HIMC;
-  imeCode, imeReadCode, len: Integer;
+  IMC:HIMC;
+  imeCode,imeReadCode,len,ImmGCode: Integer;
   p: PWideChar;
   res: TATCommandResults;
+  bOverwrite, bSelect: Boolean;
 begin
   if not ModeReadOnly then
   begin
     { work with GCS_COMPREADSTR and GCS_COMPSTR and GCS_RESULTREADSTR and GCS_RESULTSTR }
-    imeCode := Msg.lParam and (IME_COMPFLAG or IME_RESULTFLAG);
+    imeCode:=Msg.lParam and (IME_COMPFLAG or IME_RESULTFLAG);
     { check compositon state }
     if imeCode<>0 then
     begin
       IMC := ImmGetContext(Handle);
       try
+         ImmGCode:=Msg.wParam;
          { Get Result string length }
          imeReadCode:=imeCode and (GCS_COMPSTR or GCS_RESULTSTR);
          len := ImmGetCompositionStringW(IMC,imeReadCode,nil,0);
@@ -3585,12 +3596,24 @@ begin
             ImmGetCompositionStringW(IMC,imeReadCode,p,len);
             len := len shr 1;
             p[len]:=#0;
-            { Insert text and
-              select text if it is not GCS_RESULTSTR }
-            res:=DoCommand_TextInsertAtCarets(p, False,
-                                 (imeCode and IME_RESULTFLAG<>0) and FOverwrite,
-                                 (imeCode and IME_COMPFLAG<>0) and (len>0));
-            DoCommandResults(res);
+            { Insert IME Composition string }
+            if (ImmGCode<>$1b) or (imeCode and GCS_COMPSTR=0) then
+            begin
+              { Insert IME text and select if it is not GCS_RESULTSTR }
+              bOverwrite:=(imeCode and GCS_RESULTSTR<>0) and
+                          FOverwrite and
+                          (Length(FIMEPreSelText)=0);
+              bSelect:=(imeCode and GCS_RESULTSTR=0) and
+                       (len>0);
+              res:=DoCommand_TextInsertAtCarets(p, False,
+                                   bOverwrite,
+                                   bSelect);
+              DoCommandResults(res);
+              //WriteLn(Format('Set STRING %d, %s',[len,p]));
+            end;
+            { Revert not possible after IME completion }
+            if imeCode and GCS_RESULTSTR<>0 then
+              FIMEPreSelText:='';
          finally
            FreeMem(p);
          end;
@@ -3599,12 +3622,22 @@ begin
       end;
     end;
   end;
+  //WriteLn(Format('WM_IME_COMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:=-1;
 end;
 
-
 procedure TATSynEdit.WMIME_ENDCOMPOSITION(var Msg: TMessage);
+var
+  len: Integer;
+  res:TATCommandResults;
 begin
+  len:=Length(FIMEPreSelText);
+  res:=DoCommand_TextInsertAtCarets(FIMEPreSelText, False,
+                       False,
+                       len>0);
+  DoCommandResults(res);
+  //WriteLn(Format('set STRING %d, %s',[len,FIMEPreSelText]));
+  //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:=-1;
 end;
 {$endif}
