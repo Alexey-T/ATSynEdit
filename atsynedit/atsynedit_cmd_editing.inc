@@ -192,6 +192,8 @@ begin
     DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
+    Caret.EndX:= -1;
+    Caret.EndY:= -1;
   end;
 
   if bNeedGroup then Strings.EndUndoGroup;
