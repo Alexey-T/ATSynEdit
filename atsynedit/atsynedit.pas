@@ -493,6 +493,7 @@ type
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
     FOptScrollbarsNew: boolean;
     FOptScrollbarsNewArrowsKind: TATScrollArrowsKind;
+    FOptScrollbarHorizontalHidden: boolean;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
     FOptShowFontLigatures: boolean;
     FOptShowURLs: boolean;
@@ -1181,6 +1182,7 @@ type
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
     property OptScrollbarsNewArrowsKind: TATScrollArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default asaArrowsNormal;
+    property OptScrollbarHorizontalHidden: boolean read FOptScrollbarHorizontalHidden write FOptScrollbarHorizontalHidden default false;
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
 
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
@@ -1826,7 +1828,11 @@ var
 begin
   if not FOptAllowScrollbarHorz then Exit;
 
-  FScrollbarHorz.Visible:= FOptScrollbarsNew and (FScrollHorz.NMax-FScrollHorz.NMin>FScrollHorz.NPage);
+  FScrollbarHorz.Visible:=
+    FOptScrollbarsNew and
+    not FOptScrollbarHorizontalHidden and
+    (FScrollHorz.NMax-FScrollHorz.NMin > FScrollHorz.NPage);
+
   if FOptScrollbarsNew then
   begin
     FScrollbarLock:= true;
@@ -1844,7 +1850,8 @@ begin
   si.nMin:= FScrollHorz.NMin;
   si.nMax:= FScrollHorz.NMax;
   si.nPage:= FScrollHorz.NPage;
-  if FOptScrollbarsNew then si.nPage:= si.nMax+1;
+  if FOptScrollbarsNew or FOptScrollbarHorizontalHidden then
+    si.nPage:= si.nMax+1;
   si.nPos:= FScrollHorz.NPos;
   SetScrollInfo(Handle, SB_HORZ, si, True);
 
@@ -2856,6 +2863,7 @@ begin
   FOptScrollIndentCaretVert:= 0;
   FOptScrollbarsNew:= false;
   FOptScrollbarsNewArrowsKind:= asaArrowsNormal;
+  FOptScrollbarHorizontalHidden:= false;
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
 
   FOptShowFontLigatures:= true;
