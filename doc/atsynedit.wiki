@@ -976,9 +976,9 @@ Method DoScrollByDelta(Dx, Dy) allows to increment/decrement horz (Dx) and vert 
 
 ==When Update call is needed?==
 
-* Update(true): needed if you changed Strings contents, Fold ranges. Ie, if WrapInfo object needs update.
+* Update(true): needed if you changed Strings contents - directly via Strings object, Fold ranges - directly via Fold object. Ie, if WrapInfo object needs update (and component cannot detect this).
 * Update(false): needed if you only changed look, ie carets, scroll pos, bookmarks, markers, etc.
-* no Update() call needed, if you only called DoCommand(). DoCommand does it.
+* no Update() call needed, if you only called DoCommand(). DoCommand does it automatically.
 
 ==more==
 
