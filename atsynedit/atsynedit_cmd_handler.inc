@@ -444,7 +444,7 @@ begin
       FLastTextCmdText:= AText;
     end;
 
-  if FLastCommandChangedText then
+  if ACmd=cCommand_KeyTab then
   begin
     if not FLastCommandChangedText2 then
       Carets.UpdateSavedX(cUpdateX_Save);
