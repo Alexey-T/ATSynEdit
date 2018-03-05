@@ -405,6 +405,7 @@ type
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
+    FLastCommandChangedText: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
     FOnBeforeCalcHilite: TNotifyEvent;
@@ -2963,6 +2964,7 @@ begin
   FCursorOnGutter:= false;
   FLastTextCmd:= 0;
   FLastTextCmdText:= '';
+  FLastCommandChangedText:= false;
   FLastHotspot:= -1;
 
   DoClearScrollInfo(FScrollHorz);
