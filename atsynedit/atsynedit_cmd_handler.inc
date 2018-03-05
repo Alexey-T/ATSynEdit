@@ -191,20 +191,11 @@ begin
   if ACmd and cCmdFlag_Caret <> 0 then
   begin
     Strings.SetGroupMark;
-
-    //save column for Up/Down movement
-    Carets.UpdateSavedX(
-      (ACmd=cCommand_KeyUp) or
-      (ACmd=cCommand_KeyDown) or
-      (ACmd=cCommand_KeyUp_Sel) or
-      (ACmd=cCommand_KeyDown_Sel)
-      );
   end;
 
-  //debug
-  //if FCaretMoved then Beep;
-  //--------
+  Carets.UpdateSavedX(true);
 
+  //--------
   case ACmd of
     //most used commands
 
@@ -453,11 +444,9 @@ begin
       FLastTextCmdText:= AText;
     end;
 
-  //save column for Up/Down movement
-  //Carets.UpdateColumnCoord(
-  //  FLastCommandChangedText and
-  //  not FLastCommandChangedText2
-  //  );
+  if FLastCommandChangedText then
+    if not FLastCommandChangedText2 then
+      Carets.UpdateSavedX(false);
 
   DoCommandResults(Res);
   DoEventCommandAfter(ACmd, AText);
