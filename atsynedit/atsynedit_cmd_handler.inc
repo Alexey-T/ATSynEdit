@@ -194,6 +194,7 @@ begin
   end;
 
   Carets.UpdateSavedX(cUpdateX_Prepare);
+  FIsRunningCommand:= true;
 
   //--------
   case ACmd of
@@ -456,6 +457,7 @@ begin
 
   DoCommandResults(Res);
   DoEventCommandAfter(ACmd, AText);
+  FIsRunningCommand:= false;
 end;
 
 

@@ -407,6 +407,7 @@ type
     FLastTextCmdText: atString;
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
+    FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
     FOnBeforeCalcHilite: TNotifyEvent;
@@ -1023,6 +1024,7 @@ type
     function TextSelected: atString;
     function TextCurrentWord: atString;
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
+    property IsRunningCommand: boolean read FIsRunningCommand;
     procedure DoSelect_All;
     procedure DoSelect_None;
     procedure DoSelect_Inverted;
