@@ -444,6 +444,7 @@ begin
     cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
 
+  FLastCommandChangedText2:= FLastCommandChangedText;
   FLastCommandChangedText:= cResultText in Res;
   if FLastCommandChangedText then
     if ACmd<>cCommand_RepeatTextCommand then

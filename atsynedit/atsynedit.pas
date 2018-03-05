@@ -406,6 +406,7 @@ type
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
     FLastCommandChangedText: boolean;
+    FLastCommandChangedText2: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
     FOnBeforeCalcHilite: TNotifyEvent;
