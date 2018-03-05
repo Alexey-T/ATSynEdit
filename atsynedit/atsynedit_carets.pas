@@ -38,7 +38,7 @@ type
     PosX, PosY, //caret blinking pos
     EndX, EndY: integer; //end of selection or -1
     CoordX, CoordY: integer; //screen coords
-    CoordColumn: integer; //saved CoordX to use in keys Up/Down cmd
+    SavedX, SavedX_Prepared: integer; //to use with arrows Up/Down
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
@@ -97,7 +97,7 @@ type
     property OneLine: boolean read FOneLine write FOneLine;
     property AsArray: TATPointArray read GetAsArray write SetAsArray;
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
-    procedure UpdateColumnCoord(ASaveColumn: boolean);
+    procedure UpdateSavedX(ASaveColumn: boolean);
     procedure UpdateIncorrectPositions(AMaxLine: integer);
     procedure DoChanged;
   end;
@@ -599,7 +599,7 @@ begin
   DoChanged;
 end;
 
-procedure TATCarets.UpdateColumnCoord(ASaveColumn: boolean);
+procedure TATCarets.UpdateSavedX(ASaveColumn: boolean);
 var
   i: integer;
   Caret: TATCaretItem;
@@ -609,11 +609,11 @@ begin
     Caret:= Items[i];
     if ASaveColumn then
     begin
-      if Caret.CoordColumn=0 then
-        Caret.CoordColumn:= Caret.CoordX;
+      if Caret.SavedX=0 then
+        Caret.SavedX:= Caret.CoordX;
     end
     else
-      Caret.CoordColumn:= 0
+      Caret.SavedX:= 0
   end;
 end;
 

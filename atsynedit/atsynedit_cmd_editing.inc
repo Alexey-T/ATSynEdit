@@ -332,7 +332,7 @@ begin
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
     //on Enter reset prev column for up/down
-    Caret.CoordColumn:= 0;
+    Caret.SavedX:= 0;
   end;
 
   if bNeedGroup then Strings.EndUndoGroup;

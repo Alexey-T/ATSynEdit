@@ -193,7 +193,7 @@ begin
     Strings.SetGroupMark;
 
     //save column for Up/Down movement
-    Carets.UpdateColumnCoord(
+    Carets.UpdateSavedX(
       (ACmd=cCommand_KeyUp) or
       (ACmd=cCommand_KeyDown) or
       (ACmd=cCommand_KeyUp_Sel) or
@@ -452,6 +452,12 @@ begin
       FLastTextCmd:= ACmd;
       FLastTextCmdText:= AText;
     end;
+
+  //save column for Up/Down movement
+  //Carets.UpdateColumnCoord(
+  //  FLastCommandChangedText and
+  //  not FLastCommandChangedText2
+  //  );
 
   DoCommandResults(Res);
   DoEventCommandAfter(ACmd, AText);

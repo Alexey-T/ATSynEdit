@@ -203,8 +203,8 @@ begin
     end;
 
     Pnt.X:= Caret.CoordX;
-    if FOptKeyUpDownKeepColumn and (Caret.CoordColumn>0) then
-      Pnt.X:= Caret.CoordColumn;
+    if FOptKeyUpDownKeepColumn and (Caret.SavedX>0) then
+      Pnt.X:= Caret.SavedX;
 
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne(ADown);
     Pnt:= ClientPosToCaretPos(Pnt, Details, cGapActions[ADown]);
