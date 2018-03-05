@@ -193,7 +193,7 @@ begin
     Strings.SetGroupMark;
   end;
 
-  Carets.UpdateSavedX(true);
+  Carets.UpdateSavedX(cUpdateXModePrepareVal);
 
   //--------
   case ACmd of
@@ -445,8 +445,14 @@ begin
     end;
 
   if FLastCommandChangedText then
+  begin
     if not FLastCommandChangedText2 then
-      Carets.UpdateSavedX(false);
+      Carets.UpdateSavedX(cUpdateXModeSaveVal);
+  end
+  else
+  begin
+    Carets.UpdateSavedX(cUpdateXModeClearVal);
+  end;
 
   DoCommandResults(Res);
   DoEventCommandAfter(ACmd, AText);
