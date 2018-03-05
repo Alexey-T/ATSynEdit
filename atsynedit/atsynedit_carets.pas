@@ -59,9 +59,9 @@ type
     );
 
   TATCaretUpdateXMode = (
-    cUpdateXModePrepareVal,
-    cUpdateXModeSaveVal,
-    cUpdateXModeClearVal
+    cUpdateX_Prepare,
+    cUpdateX_Save,
+    cUpdateX_Clear
     );
 
 type
@@ -614,11 +614,11 @@ begin
   begin
     Caret:= Items[i];
     case AMode of
-      cUpdateXModePrepareVal:
+      cUpdateX_Prepare:
         Caret.SavedX_Pre:= Caret.CoordX;
-      cUpdateXModeSaveVal:
+      cUpdateX_Save:
         Caret.SavedX:= Caret.SavedX_Pre;
-      cUpdateXModeClearVal:
+      cUpdateX_Clear:
         Caret.SavedX:= 0;
     end;
   end;
