@@ -103,7 +103,7 @@ type
     property OneLine: boolean read FOneLine write FOneLine;
     property AsArray: TATPointArray read GetAsArray write SetAsArray;
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
-    procedure UpdateSavedX(AMode: TATCaretUpdateXMode);
+    procedure UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
     procedure UpdateIncorrectPositions(AMaxLine: integer);
     procedure DoChanged;
   end;
@@ -605,7 +605,7 @@ begin
   DoChanged;
 end;
 
-procedure TATCarets.UpdateSavedX(AMode: TATCaretUpdateXMode);
+procedure TATCarets.UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
 var
   i: integer;
   Caret: TATCaretItem;
@@ -615,11 +615,18 @@ begin
     Caret:= Items[i];
     case AMode of
       cUpdateX_Prepare:
-        Caret.SavedX_Pre:= Caret.CoordX;
+        begin
+          Caret.SavedX_Pre:= Caret.CoordX;
+        end;
       cUpdateX_Save:
-        Caret.SavedX:= Caret.SavedX_Pre;
+        begin
+          if (not AArrowUpDown) or (Caret.SavedX<Caret.SavedX_Pre) then
+            Caret.SavedX:= Caret.SavedX_Pre;
+        end;
       cUpdateX_Clear:
-        Caret.SavedX:= 0;
+        begin
+          Caret.SavedX:= 0;
+        end;
     end;
   end;
 end;

@@ -193,7 +193,7 @@ begin
     Strings.SetGroupMark;
   end;
 
-  Carets.UpdateSavedX(cUpdateX_Prepare);
+  Carets.UpdateSavedX(cUpdateX_Prepare, false);
   FIsRunningCommand:= true;
 
   //--------
@@ -445,14 +445,22 @@ begin
       FLastTextCmdText:= AText;
     end;
 
-  if ACmd=cCommand_KeyTab then
-  begin
-    if not FLastCommandChangedText2 then
-      Carets.UpdateSavedX(cUpdateX_Save);
-  end
-  else
-  begin
-    Carets.UpdateSavedX(cUpdateX_Clear);
+  //this logic: to make like in SynWrite, option "Fixed column move".
+  //arrows up/down must keep their column, even if sometimes they jump to shorter lines (caret_after_end: off).
+  //and special handling for tab-key (for first press of tab-key).
+  case ACmd of
+    cCommand_KeyTab:
+      begin
+        if not FLastCommandChangedText2 then
+          Carets.UpdateSavedX(cUpdateX_Save, false);
+      end;
+    cCommand_KeyUp,
+    cCommand_KeyUp_Sel,
+    cCommand_KeyDown,
+    cCommand_KeyDown_Sel:
+      Carets.UpdateSavedX(cUpdateX_Save, true);
+    else
+      Carets.UpdateSavedX(cUpdateX_Clear, false);
   end;
 
   DoCommandResults(Res);
