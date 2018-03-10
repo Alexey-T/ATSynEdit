@@ -35,7 +35,6 @@ type
     chkShowFoldLinesAll: TCheckBox;
     chkBackspUnindent: TCheckBox;
     chkEnterIndent: TCheckBox;
-    chkMsMenuDown: TCheckBox;
     chkTabIndent: TCheckBox;
     chkUnindentKeepAlign: TCheckBox;
     chkUnprintAsciiRep: TCheckBox;
@@ -305,7 +304,6 @@ begin
     chkMsRtClickMove.Checked:= ed.OptMouseRightClickMovesCaret;
     chkMsNiceScroll.Checked:= ed.OptMouseNiceScroll;
     chkMsHideCursor.Checked:= ed.OptMouseHideCursorOnType;
-    chkMsMenuDown.Checked:= ed.OptMouseDownForPopup;
 
     //undo
     edUndo.Value:= ed.OptUndoLimit;
@@ -425,7 +423,6 @@ begin
       ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
       ed.OptMouseNiceScroll:= chkMsNiceScroll.Checked;
       ed.OptMouseHideCursorOnType:= chkMsHideCursor.Checked;
-      ed.OptMouseDownForPopup:= chkMsMenuDown.Checked;
 
       //undo
       ed.OptUndoLimit:= edUndo.Value;
