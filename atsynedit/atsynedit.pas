@@ -3662,7 +3662,6 @@ begin
   Invalidate;
 end;
 
-
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   PCaret: TPoint;
@@ -3674,6 +3673,15 @@ begin
   inherited;
   SetFocus;
   DoCaretForceShow;
+
+  {$ifdef darwin}
+  //special handler for Ctrl+click on macOS
+  if Shift=[ssCtrl, ssLeft] then
+  begin
+    DoHandleRightClick(X, Y);
+    exit;
+  end;
+  {$endif}
 
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
