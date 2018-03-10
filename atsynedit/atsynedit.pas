@@ -3674,6 +3674,15 @@ begin
   SetFocus;
   DoCaretForceShow;
 
+  {$ifdef darwin}
+  //support Ctrl+click for context menu on macOS
+  if (Button=mbLeft) and (Shift*[ssCtrl, ssAlt, ssShift] = [ssCtrl]) then
+  begin
+    DoHandleRightClick(X, Y);
+    exit
+  end;
+  {$endif}
+
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
   FMouseDownGutterLineNumber:= -1;
