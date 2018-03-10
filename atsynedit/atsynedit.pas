@@ -395,7 +395,6 @@ type
     FMouseDownPnt: TPoint;
     FMouseDownGutterLineNumber: integer;
     FMouseDownDouble: boolean;
-    FMouseDownRight: boolean;
     FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
     FMouseDragMinimap: boolean;
@@ -508,7 +507,6 @@ type
     FOptMouseEnableAll: boolean;
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
-    FOptMouseDownForPopup: boolean;
     FOptMouseColumnSelectionWithoutKey: boolean;
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
@@ -1044,6 +1042,7 @@ type
   protected
     procedure Paint; override;
     procedure DoOnResize; override;
+    procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
     procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
@@ -1261,7 +1260,6 @@ type
     property OptMouseEnableAll: boolean read FOptMouseEnableAll write FOptMouseEnableAll default true;
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection default true;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection default true;
-    property OptMouseDownForPopup: boolean read FOptMouseDownForPopup write FOptMouseDownForPopup default false;
     property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor default false;
     property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine default false;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
@@ -2948,7 +2946,6 @@ begin
   FOptCaretsAddedToColumnSelection:= true;
   FOptMarkersSize:= 4;
   FOptMouseEnableAll:= true;
-  FOptMouseDownForPopup:= false;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
   FOptPasteAtEndMakesFinalEmptyLine:= true;
@@ -2956,7 +2953,6 @@ begin
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
-  FMouseDownRight:= false;
   FMouseDragDropping:= false;
   FMouseNiceScrollPos:= Point(0, 0);
 
@@ -3457,6 +3453,12 @@ begin
   PaintEx(LineTop);
 end;
 
+procedure TATSynEdit.DoContextPopup(MousePos: TPoint; var Handled: Boolean);
+begin
+  DoHandleRightClick(MousePos.X, MousePos.Y);
+  Handled:= true;
+end;
+
 procedure TATSynEdit.WMEraseBkgnd(var Msg: TLMEraseBkgnd);
 begin
   //needed to remove flickering on resize and mouse-over
@@ -3672,21 +3674,11 @@ begin
   SetFocus;
   DoCaretForceShow;
 
-  {$ifdef darwin}
-  //special handler for Ctrl+click on macOS
-  if Shift=[ssCtrl, ssLeft] then
-  begin
-    DoHandleRightClick(X, Y);
-    exit;
-  end;
-  {$endif}
-
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
   FMouseDownGutterLineNumber:= -1;
   FMouseDragDropping:= false;
   ActionId:= GetMouseActionId(FMouseActions, Shift);
-  FMouseDownRight:= ActionId=cMouseActionClickRight;
 
   if MouseNiceScroll then
   begin
@@ -3781,13 +3773,6 @@ begin
     end;
   end;
 
-  if ActionId=cMouseActionClickRight then
-    if FOptMouseDownForPopup then
-    begin
-      DoHandleRightClick(X, Y);
-      exit;
-    end;
-
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
   begin
     if ActionId=cMouseActionClickSimple then
@@ -3854,17 +3839,6 @@ begin
   FMouseDragDropping:= false;
   FMouseDragMinimap:= false;
   FTimerScroll.Enabled:= false;
-
-  //popup menu
-  if FMouseDownRight then
-  begin
-    FMouseDownRight:= false;
-    if not FOptMouseDownForPopup then
-    begin
-      DoHandleRightClick(X, Y);
-      exit
-    end;
-  end;
 
   if Carets.Count=1 then
     with Carets[0] do
