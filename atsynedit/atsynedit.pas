@@ -915,10 +915,6 @@ type
     procedure DoDebugInitFoldList;
 
     procedure OnCanvasFontChanged(Sender:TObject);
-  protected
-    procedure DoSendShowHideToInterface; override;
-    procedure DragOver(Source: TObject; X, Y: Integer; State: TDragState;
-      var Accept: Boolean); override;
   public
     MenuitemTextCut: TMenuItem;
     MenuitemTextCopy: TMenuItem;
@@ -1063,6 +1059,8 @@ type
     function DoGetTextString: atString; virtual;
     procedure DoEnter; override;
     procedure DoExit; override;
+    procedure DragOver(Source: TObject; X, Y: Integer; State: TDragState;
+      var Accept: Boolean); override;
     //messages
     //procedure WMGetDlgCode(var Msg: TLMNoParams); message LM_GETDLGCODE;
     procedure WMEraseBkgnd(var Msg: TLMEraseBkgnd); message LM_ERASEBKGND;
@@ -4747,17 +4745,6 @@ begin
     Canvas.TextWidth(Utf8Encode(_CharCodeM));
 end;
 {$endif}
-
-procedure TATSynEdit.DoSendShowHideToInterface;
-begin
-  inherited DoSendShowHideToInterface;
-
-  {
-  //breaks painting in non-doublebuffered mode
-  Canvas.Font.OnChange:= @OnCanvasFontChanged;
-  OnCanvasFontChanged(Canvas.Font);
-  }
-end;
 
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
