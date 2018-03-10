@@ -3785,7 +3785,10 @@ begin
 
   if ActionId=cMouseActionClickRight then
     if FOptMouseDownForPopup then
+    begin
       DoHandleRightClick(X, Y);
+      exit;
+    end;
 
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
   begin
@@ -3859,7 +3862,10 @@ begin
   begin
     FMouseDownRight:= false;
     if not FOptMouseDownForPopup then
+    begin
       DoHandleRightClick(X, Y);
+      exit
+    end;
   end;
 
   if Carets.Count=1 then
