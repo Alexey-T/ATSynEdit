@@ -1174,6 +1174,10 @@ begin
 
     if (X1>=ARect.Left) and (X1<ARect.Right) then
     begin
+      //must limit line on right edge
+      if X2>ARect.Right then
+        X2:= ARect.Right;
+
       if HasBG then
         C.Brush.Color:= Part^.ColorBG
       else
