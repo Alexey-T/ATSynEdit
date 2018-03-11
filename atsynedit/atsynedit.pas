@@ -659,7 +659,7 @@ type
     function GetLastCommandChangedLines: integer;
     function GetMinimapActualHeight: integer;
     function GetMinimapSelTop: integer;
-    function GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
+    function GetMinimap_PixelsToWrapIndex(APosY: integer): integer;
     function GetOptTextOffsetTop: integer;
     function GetRectMinimapSel: TRect;
     procedure InitResourcesFoldbar;
@@ -2460,7 +2460,7 @@ begin
       ));
 end;
 
-function TATSynEdit.GetMinimapSelTop_PixelsToWrapIndex(APixels: integer): integer;
+function TATSynEdit.GetMinimap_PixelsToWrapIndex(APosY: integer): integer;
 var
   Percent: double;
 const
@@ -2471,7 +2471,7 @@ begin
   2) must correct this! we must scroll to 0 if almost at the top;
     must scroll to end if almost at the end - do this by increment n%
   }
-  Percent:= (APixels-FRectMinimap.Top) / GetMinimapActualHeight;
+  Percent:= (APosY-FRectMinimap.Top) / GetMinimapActualHeight;
 
   if Percent<0.1 then Percent:= Max(0.0, Percent-PercentFix) else
    if Percent>0.9 then Percent:= Min(100.0, Percent+PercentFix);
@@ -5014,6 +5014,7 @@ begin
     NItem:= Max(0, NItem - GetVisibleLines div 2);
     FScrollVert.NPos:= Min(NItem, FScrollVert.NMax);
     Update;
+    UpdateMinimapTooltip;
   end;
 end;
 
@@ -5021,7 +5022,7 @@ procedure TATSynEdit.DoMinimapDrag(APosY: integer);
 var
   NIndex: integer;
 begin
-  NIndex:= GetMinimapSelTop_PixelsToWrapIndex(APosY);
+  NIndex:= GetMinimap_PixelsToWrapIndex(APosY);
   //set scroll so that drag point is in 1/2 of sel-rect height.
   //Sublime makes drag point at ~1/3 of sel-rect height, btw.
   FScrollVert.NPos:= Max(0, Min(
@@ -5729,7 +5730,7 @@ begin
   C.Brush.Color:= Colors.MinimapTooltipBG;
   C.FillRect(RectAll);
 
-  NLineCenter:= GetMinimapSelTop_PixelsToWrapIndex(Pnt.Y);
+  NLineCenter:= GetMinimap_PixelsToWrapIndex(Pnt.Y);
   if not Strings.IsIndexValid(NLineCenter) then exit;
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
   NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
