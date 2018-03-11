@@ -240,7 +240,7 @@ const
   cInitTimerAutoScroll = 80;
   cInitTimerNiceScroll = 200;
   cInitMinimapVisible = false;
-  cInitMinimapShowTooltip = false;
+  cInitMinimapShowTooltip = true;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
   cInitTabSize = 8;
@@ -5707,23 +5707,73 @@ end;
 procedure TATSynEdit.MinimapTooltipPaint(Sender: TObject);
 var
   C: TCanvas;
-  R: TRect;
+  RectAll: TRect;
   Pnt: TPoint;
-  NLineCenter: integer;
+  NLineCenter, NLineTop, NLineBottom, NLine,
+  NWrapIndex, NOutputStrWidth: integer;
+  NIndentLeft, NIndentTop: integer;
+  NColorAfter: TColor;
+  WrapItem: TATSynWrapItem;
+  TextOutProps: TATCanvasTextOutProps;
 begin
   C:= FMinimapTooltip.Canvas;
-  R:= Rect(0, 0, FMinimapTooltip.Width, FMinimapTooltip.Height);
+  RectAll:= Rect(0, 0, FMinimapTooltip.Width, FMinimapTooltip.Height);
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
-  C.Pen.Color:= clMedGray;
-  C.Brush.Color:= clMoneyGreen;
-  C.FillRect(R);
-  C.Rectangle(R);
+  C.Brush.Color:= Colors.MinimapTooltipBG;
+  C.FillRect(RectAll);
 
   NLineCenter:= GetMinimapSelTop_PixelsToWrapIndex(Pnt.Y);
   if not Strings.IsIndexValid(NLineCenter) then exit;
+  NLineTop:= Max(0, NLineCenter-3);
+  NLineBottom:= Min(NLineTop+5, Strings.Count-1);
 
-  C.TextOut(10, 10, 'line '+inttostr(NLineCenter));
+  NIndentLeft:= 5;
+  NIndentTop:= 1;
+
+  FillChar(TextOutProps, SizeOf(TextOutProps), 0);
+  TextOutProps.NeedOffsets:= FFontNeedsOffsets;
+  TextOutProps.TabSize:= FTabSize;
+  TextOutProps.CharSize:= FCharSize;
+  TextOutProps.MainTextArea:= true;
+  TextOutProps.CharsSkipped:= 0;
+    //todo:
+    //needed number of chars of all chars counted as 100%,
+    //while NOutputSpacesSkipped is with cjk counted as 170%
+  TextOutProps.DrawEvent:= nil;
+  TextOutProps.ControlWidth:= FMinimapTooltip.Width;
+  TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
+  TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
+  TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
+  TextOutProps.ShowFontLigatures:= FOptShowFontLigatures;
+  TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
+  TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+
+  for NLine:= NLineTop to NLineBottom do
+  begin
+    NColorAfter:= clNone;
+    NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, NLine));
+    if NWrapIndex<0 then Break;
+    WrapItem:= WrapInfo[NWrapIndex];
+
+    DoCalcLineHilite(WrapItem, FLineParts{%H-},
+      0, cMaxCharsForOutput,
+      Colors.MinimapTooltipBG,
+      false,
+      NColorAfter);
+
+    CanvasTextOut(C,
+      NIndentLeft,
+      NIndentTop+FCharSize.Y*(NLine-NLineTop),
+      Strings.Lines[WrapItem.NLineIndex],
+      @FLineParts,
+      NOutputStrWidth,
+      TextOutProps
+      )
+   end;
+
+  C.Brush.Color:= Colors.MinimapTooltipBorder;
+  C.FrameRect(RectAll);
 end;
 
 procedure TATSynEdit.UpdateMinimapTooltip;
