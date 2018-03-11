@@ -240,7 +240,7 @@ const
   cInitTimerAutoScroll = 80;
   cInitTimerNiceScroll = 200;
   cInitMinimapVisible = false;
-  cInitMinimapShowTooltip = true;
+  cInitMinimapTooltipVisible = true;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
   cInitTabSize = 8;
@@ -486,7 +486,7 @@ type
     FMinimapShowSelBorder: boolean;
     FMinimapShowSelAlways: boolean;
     FMinimapAtLeft: boolean;
-    FMinimapShowTooltip: boolean;
+    FMinimapTooltipVisible: boolean;
     FMinimapTooltip: TPanel;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
@@ -1238,7 +1238,7 @@ type
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder default false;
     property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways default true;
     property OptMinimapAtLeft: boolean read FMinimapAtLeft write FMinimapAtLeft default false;
-    property OptMinimapShowTooltip: boolean read FMinimapShowTooltip write FMinimapShowTooltip default cInitMinimapShowTooltip;
+    property OptMinimapTooltipVisible: boolean read FMinimapTooltipVisible write FMinimapTooltipVisible default cInitMinimapTooltipVisible;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth default cInitMicromapWidth;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX default 0;
@@ -2859,7 +2859,7 @@ begin
   FMinimapShowSelBorder:= false;
   FMinimapShowSelAlways:= true;
   FMinimapAtLeft:= false;
-  FMinimapShowTooltip:= cInitMinimapShowTooltip;
+  FMinimapTooltipVisible:= cInitMinimapTooltipVisible;
 
   FMinimapTooltip:= TPanel.Create(Self);
   FMinimapTooltip.Hide;
@@ -3986,7 +3986,7 @@ begin
     FCursorOnMinimap:= bOnMinimap;
   end;
 
-  FMinimapTooltip.Visible:= bOnMinimap and FMinimapShowTooltip;
+  FMinimapTooltip.Visible:= bOnMinimap and FMinimapTooltipVisible;
   UpdateMinimapTooltip;
 
   //detect cursor on micromap
