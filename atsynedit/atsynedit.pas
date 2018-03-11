@@ -4143,7 +4143,7 @@ begin
     end;
 
   //mouse dragged on minimap
-  if PtInRect(FRectMinimap, P) then
+  if bOnMinimap then
     if FMouseDragMinimap then
     begin
       if Shift=[ssLeft] then
