@@ -659,7 +659,8 @@ type
     function GetLastCommandChangedLines: integer;
     function GetMinimapActualHeight: integer;
     function GetMinimapSelTop: integer;
-    function GetMinimap_PixelsToWrapIndex(APosY: integer): integer;
+    function GetMinimap_PercentToWrapIndex(APosY: integer): integer;
+    function GetMinimap_PosToWrapIndex(APosY: integer): integer;
     function GetOptTextOffsetTop: integer;
     function GetRectMinimapSel: TRect;
     procedure InitResourcesFoldbar;
@@ -2460,7 +2461,7 @@ begin
       ));
 end;
 
-function TATSynEdit.GetMinimap_PixelsToWrapIndex(APosY: integer): integer;
+function TATSynEdit.GetMinimap_PercentToWrapIndex(APosY: integer): integer;
 var
   Percent: double;
 const
@@ -2477,6 +2478,13 @@ begin
    if Percent>0.9 then Percent:= Min(100.0, Percent+PercentFix);
 
   Result:= Round(Percent * FWrapInfo.Count);
+end;
+
+function TATSynEdit.GetMinimap_PosToWrapIndex(APosY: integer): integer;
+begin
+  Result:= (APosY-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
+  if not FWrapInfo.IsIndexValid(Result) then
+    Result:= -1;
 end;
 
 function TATSynEdit.GetOptTextOffsetTop: integer;
@@ -5008,8 +5016,8 @@ procedure TATSynEdit.DoMinimapClick(APosY: integer);
 var
   NItem: integer;
 begin
-  NItem:= (APosY-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
-  if FWrapInfo.IsIndexValid(NItem) then
+  NItem:= GetMinimap_PosToWrapIndex(APosY);
+  if NItem>=0 then
   begin
     NItem:= Max(0, NItem - GetVisibleLines div 2);
     FScrollVert.NPos:= Min(NItem, FScrollVert.NMax);
@@ -5022,7 +5030,7 @@ procedure TATSynEdit.DoMinimapDrag(APosY: integer);
 var
   NIndex: integer;
 begin
-  NIndex:= GetMinimap_PixelsToWrapIndex(APosY);
+  NIndex:= GetMinimap_PercentToWrapIndex(APosY);
   //set scroll so that drag point is in 1/2 of sel-rect height.
   //Sublime makes drag point at ~1/3 of sel-rect height, btw.
   FScrollVert.NPos:= Max(0, Min(
@@ -5730,8 +5738,9 @@ begin
   C.Brush.Color:= Colors.MinimapTooltipBG;
   C.FillRect(RectAll);
 
-  NLineCenter:= GetMinimap_PixelsToWrapIndex(Pnt.Y);
-  if not Strings.IsIndexValid(NLineCenter) then exit;
+  NWrapIndex:= GetMinimap_PosToWrapIndex(Pnt.Y);
+  if NWrapIndex<0 then exit;
+  NLineCenter:= FWrapInfo[NWrapIndex].NLineIndex;
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
   NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
 
