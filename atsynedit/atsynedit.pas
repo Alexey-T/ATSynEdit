@@ -240,6 +240,7 @@ const
   cInitTimerAutoScroll = 80;
   cInitTimerNiceScroll = 200;
   cInitMinimapVisible = false;
+  cInitMinimapShowTooltip = false;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
   cInitTabSize = 8;
@@ -485,6 +486,8 @@ type
     FMinimapShowSelBorder: boolean;
     FMinimapShowSelAlways: boolean;
     FMinimapAtLeft: boolean;
+    FMinimapShowTooltip: boolean;
+    FMinimapTooltip: TPanel;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
     FOptIdleInterval: integer;
@@ -661,6 +664,7 @@ type
     procedure MenuFoldLevelClick(Sender: TObject);
     procedure MenuFoldUnfoldAllClick(Sender: TObject);
     procedure MenuFoldPlusMinusClick(Sender: TObject);
+    procedure MinimapTooltipPaint(Sender: TObject);
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
     procedure OnNewScrollbarVertChanged(Sender: TObject);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
@@ -804,6 +808,7 @@ type
     procedure UpdateCursor;
     procedure UpdateGutterAutosize(C: TCanvas);
     procedure UpdateMinimapAutosize(C: TCanvas);
+    procedure UpdateMinimapTooltip;
     function DoFormatLineNumber(N: integer): atString;
     function UpdateScrollInfoFromMessage(const Msg: TLMScroll;
       var Info: TATSynScrollInfo): boolean;
@@ -1233,6 +1238,7 @@ type
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder default false;
     property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways default true;
     property OptMinimapAtLeft: boolean read FMinimapAtLeft write FMinimapAtLeft default false;
+    property OptMinimapShowTooltip: boolean read FMinimapShowTooltip write FMinimapShowTooltip default cInitMinimapShowTooltip;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth default cInitMicromapWidth;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX default 0;
@@ -2513,6 +2519,8 @@ begin
     C.Line(FRectMinimap.Left-1, FRectMinimap.Top,
            FRectMinimap.Left-1, FRectMinimap.Bottom);
   end;
+
+  UpdateMinimapTooltip;
 end;
 
 procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
@@ -2853,6 +2861,14 @@ begin
   FMinimapShowSelBorder:= false;
   FMinimapShowSelAlways:= true;
   FMinimapAtLeft:= false;
+  FMinimapShowTooltip:= cInitMinimapShowTooltip;
+
+  FMinimapTooltip:= TPanel.Create(Self);
+  FMinimapTooltip.Hide;
+  FMinimapTooltip.Parent:= Self;
+  FMinimapTooltip.BorderStyle:= bsNone;
+  FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
+
   FMicromapWidth:= cInitMicromapWidth;
   FMicromapVisible:= cInitMicromapVisible;
 
@@ -3972,6 +3988,9 @@ begin
     FCursorOnMinimap:= bOnMinimap;
   end;
 
+  FMinimapTooltip.Visible:= bOnMinimap and FMinimapShowTooltip;
+  UpdateMinimapTooltip;
+
   //detect cursor on micromap
   if FMicromapVisible then
   begin
@@ -4158,6 +4177,7 @@ begin
   inherited;
   DoHintHide;
   DoHotspotsExit;
+  FMinimapTooltip.Hide;
 end;
 
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
@@ -5683,6 +5703,37 @@ begin
     FLastHotspot:= -1;
   end;
 end;
+
+procedure TATSynEdit.MinimapTooltipPaint(Sender: TObject);
+var
+  C: TCanvas;
+  R: TRect;
+begin
+  C:= FMinimapTooltip.Canvas;
+  R:= Rect(0, 0, FMinimapTooltip.Width, FMinimapTooltip.Height);
+  C.Pen.Color:= clMedGray;
+  C.Brush.Color:= clMoneyGreen;
+  C.FillRect(R);
+  C.Rectangle(R);
+end;
+
+procedure TATSynEdit.UpdateMinimapTooltip;
+var
+  Pnt: TPoint;
+begin
+  if not FMinimapTooltip.Visible then exit;
+  Pnt:= ScreenToClient(Mouse.CursorPos);
+
+  FMinimapTooltip.Width:= ClientWidth div 2;
+  FMinimapTooltip.Left:= FRectMinimap.Left - FMinimapTooltip.Width - 10;
+  FMinimapTooltip.Height:= FCharSize.Y*6 + 2;
+  FMinimapTooltip.Top:= Max(FRectMain.Top, Min(FRectMain.Bottom-FMinimapTooltip.Height,
+    Pnt.Y - FCharSize.Y*3
+    ));
+
+  FMinimapTooltip.Invalidate;
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
