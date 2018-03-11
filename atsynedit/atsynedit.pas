@@ -242,6 +242,7 @@ const
   cInitMinimapVisible = false;
   cInitMinimapTooltipVisible = true;
   cInitMinimapTooltipLinesCount = 6;
+  cInitMinimapTooltipWidthPercents = 60;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
   cInitTabSize = 8;
@@ -489,6 +490,7 @@ type
     FMinimapAtLeft: boolean;
     FMinimapTooltipVisible: boolean;
     FMinimapTooltipLinesCount: integer;
+    FMinimapTooltipWidthPercents: integer;
     FMinimapTooltip: TPanel;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
@@ -1242,6 +1244,7 @@ type
     property OptMinimapAtLeft: boolean read FMinimapAtLeft write FMinimapAtLeft default false;
     property OptMinimapTooltipVisible: boolean read FMinimapTooltipVisible write FMinimapTooltipVisible default cInitMinimapTooltipVisible;
     property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
+    property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth default cInitMicromapWidth;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX default 0;
@@ -2864,6 +2867,7 @@ begin
   FMinimapAtLeft:= false;
   FMinimapTooltipVisible:= cInitMinimapTooltipVisible;
   FMinimapTooltipLinesCount:= cInitMinimapTooltipLinesCount;
+  FMinimapTooltipWidthPercents:= cInitMinimapTooltipWidthPercents;
 
   FMinimapTooltip:= TPanel.Create(Self);
   FMinimapTooltip.Hide;
@@ -5785,7 +5789,7 @@ begin
   if not FMinimapTooltip.Visible then exit;
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
-  FMinimapTooltip.Width:= ClientWidth div 2;
+  FMinimapTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FMinimapTooltipWidthPercents div 100;
   if FMinimapAtLeft then
     FMinimapTooltip.Left:= FRectMinimap.Right
   else
