@@ -241,6 +241,7 @@ const
   cInitTimerNiceScroll = 200;
   cInitMinimapVisible = false;
   cInitMinimapTooltipVisible = true;
+  cInitMinimapTooltipLinesCount = 6;
   cInitMicromapVisible = false;
   cInitMarginRight = 80;
   cInitTabSize = 8;
@@ -487,6 +488,7 @@ type
     FMinimapShowSelAlways: boolean;
     FMinimapAtLeft: boolean;
     FMinimapTooltipVisible: boolean;
+    FMinimapTooltipLinesCount: integer;
     FMinimapTooltip: TPanel;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
@@ -1239,6 +1241,7 @@ type
     property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways default true;
     property OptMinimapAtLeft: boolean read FMinimapAtLeft write FMinimapAtLeft default false;
     property OptMinimapTooltipVisible: boolean read FMinimapTooltipVisible write FMinimapTooltipVisible default cInitMinimapTooltipVisible;
+    property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth default cInitMicromapWidth;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX default 0;
@@ -2860,6 +2863,7 @@ begin
   FMinimapShowSelAlways:= true;
   FMinimapAtLeft:= false;
   FMinimapTooltipVisible:= cInitMinimapTooltipVisible;
+  FMinimapTooltipLinesCount:= cInitMinimapTooltipLinesCount;
 
   FMinimapTooltip:= TPanel.Create(Self);
   FMinimapTooltip.Hide;
@@ -5723,8 +5727,8 @@ begin
 
   NLineCenter:= GetMinimapSelTop_PixelsToWrapIndex(Pnt.Y);
   if not Strings.IsIndexValid(NLineCenter) then exit;
-  NLineTop:= Max(0, NLineCenter-3);
-  NLineBottom:= Min(NLineTop+5, Strings.Count-1);
+  NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
+  NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
 
   NIndentLeft:= 5;
   NIndentTop:= 1;
@@ -5786,9 +5790,9 @@ begin
     FMinimapTooltip.Left:= FRectMinimap.Right
   else
     FMinimapTooltip.Left:= FRectMinimap.Left - FMinimapTooltip.Width;
-  FMinimapTooltip.Height:= FCharSize.Y*6 + 2;
+  FMinimapTooltip.Height:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
   FMinimapTooltip.Top:= Max(0, Min(ClientHeight-FMinimapTooltip.Height,
-    Pnt.Y - FCharSize.Y*3
+    Pnt.Y - Trunc(FCharSize.Y*FMinimapTooltipLinesCount/2)
     ));
 
   FMinimapTooltip.Invalidate;
