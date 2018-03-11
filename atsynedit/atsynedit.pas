@@ -5708,13 +5708,22 @@ procedure TATSynEdit.MinimapTooltipPaint(Sender: TObject);
 var
   C: TCanvas;
   R: TRect;
+  Pnt: TPoint;
+  NLineCenter: integer;
 begin
   C:= FMinimapTooltip.Canvas;
   R:= Rect(0, 0, FMinimapTooltip.Width, FMinimapTooltip.Height);
+  Pnt:= ScreenToClient(Mouse.CursorPos);
+
   C.Pen.Color:= clMedGray;
   C.Brush.Color:= clMoneyGreen;
   C.FillRect(R);
   C.Rectangle(R);
+
+  NLineCenter:= GetMinimapSelTop_PixelsToWrapIndex(Pnt.Y);
+  if not Strings.IsIndexValid(NLineCenter) then exit;
+
+  C.TextOut(10, 10, 'line '+inttostr(NLineCenter));
 end;
 
 procedure TATSynEdit.UpdateMinimapTooltip;
@@ -5725,9 +5734,12 @@ begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
   FMinimapTooltip.Width:= ClientWidth div 2;
-  FMinimapTooltip.Left:= FRectMinimap.Left - FMinimapTooltip.Width - 10;
+  if FMinimapAtLeft then
+    FMinimapTooltip.Left:= FRectMinimap.Right
+  else
+    FMinimapTooltip.Left:= FRectMinimap.Left - FMinimapTooltip.Width;
   FMinimapTooltip.Height:= FCharSize.Y*6 + 2;
-  FMinimapTooltip.Top:= Max(FRectMain.Top, Min(FRectMain.Bottom-FMinimapTooltip.Height,
+  FMinimapTooltip.Top:= Max(0, Min(ClientHeight-FMinimapTooltip.Height,
     Pnt.Y - FCharSize.Y*3
     ));
 
