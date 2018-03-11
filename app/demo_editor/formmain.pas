@@ -29,6 +29,7 @@ type
     bOpt: TButton;
     btnStop: TButton;
     bClearLog: TButton;
+    chkMinimapTooltip: TCheckBox;
     chkMouseEn: TCheckBox;
     chkTabSpaces: TCheckBox;
     chkNewScroll: TCheckBox;
@@ -65,9 +66,10 @@ type
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
+    MenuItem11: TMenuItem;
+    mnuShowPane: TMenuItem;
     mnuTestGapAdd: TMenuItem;
     mnuTestGapClear: TMenuItem;
-    MenuItem14: TMenuItem;
     mnuTestMarker: TMenuItem;
     MenuItem5: TMenuItem;
     mnuFileExit: TMenuItem;
@@ -88,7 +90,6 @@ type
     MenuItem8: TMenuItem;
     mnuOpts: TMenuItem;
     mnuBms: TMenuItem;
-    mnuShowPane: TMenuItem;
     mnuTestHiliteWww: TMenuItem;
     mnuTestCaret1: TMenuItem;
     mnuOptDlg: TMenuItem;
@@ -125,10 +126,12 @@ type
     procedure btnMarkerClick(Sender: TObject);
     procedure btnStopClick(Sender: TObject);
     procedure chkMinimapLeftChange(Sender: TObject);
+    procedure chkMinimapTooltipChange(Sender: TObject);
     procedure chkMouseEnChange(Sender: TObject);
     procedure chkNewScrollChange(Sender: TObject);
     procedure chkTabSpacesChange(Sender: TObject);
     procedure FinderProgress(Sender: TObject; const ACurPos, AMaxPos: Int64; var AContinue: boolean);
+    procedure MenuItem14Click(Sender: TObject);
     procedure mnuFileExitClick(Sender: TObject);
     procedure mnuFileHtmlClick(Sender: TObject);
     procedure mnuFileOpenClick(Sender: TObject);
@@ -649,6 +652,12 @@ begin
   ed.Update;
 end;
 
+procedure TfmMain.chkMinimapTooltipChange(Sender: TObject);
+begin
+  if wait then Exit;
+  ed.OptMinimapTooltipVisible:= chkMinimapTooltip.Checked;
+end;
+
 procedure TfmMain.chkMouseEnChange(Sender: TObject);
 begin
   ed.OptMouseEnableNormalSelection:= chkMouseEn.Checked;
@@ -676,6 +685,11 @@ begin
   progress.Position:= ACurPos * 100 div AMaxPos;
   Application.ProcessMessages;
   if FFindStopped then AContinue:= false;
+end;
+
+procedure TfmMain.MenuItem14Click(Sender: TObject);
+begin
+
 end;
 
 procedure TfmMain.mnuFileExitClick(Sender: TObject);
