@@ -2519,8 +2519,6 @@ begin
     C.Line(FRectMinimap.Left-1, FRectMinimap.Top,
            FRectMinimap.Left-1, FRectMinimap.Bottom);
   end;
-
-  UpdateMinimapTooltip;
 end;
 
 procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
