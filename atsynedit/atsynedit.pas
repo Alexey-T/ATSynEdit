@@ -4996,7 +4996,8 @@ var
   NIndex: integer;
 begin
   NIndex:= GetMinimapSelTop_PixelsToWrapIndex(APosY);
-  FScrollVert.NPos:= Max(0, Min(NIndex, FScrollVert.NMax));
+  //set scroll pos so that drag point in in sel-rect center
+  FScrollVert.NPos:= Max(0, Min(NIndex - GetVisibleLines div 2, FScrollVert.NMax));
   Update;
 end;
 
