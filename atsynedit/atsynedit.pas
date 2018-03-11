@@ -4996,8 +4996,11 @@ var
   NIndex: integer;
 begin
   NIndex:= GetMinimapSelTop_PixelsToWrapIndex(APosY);
-  //set scroll pos so that drag point in in sel-rect center
-  FScrollVert.NPos:= Max(0, Min(NIndex - GetVisibleLines div 2, FScrollVert.NMax));
+  //set scroll so that drag point is in 1/2 of sel-rect height.
+  //Sublime makes drag point at ~1/3 of sel-rect height, btw.
+  FScrollVert.NPos:= Max(0, Min(
+    NIndex - GetVisibleLines div 2,
+    FScrollVert.NMax));
   Update;
 end;
 
