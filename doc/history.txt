@@ -1,4 +1,24 @@
 
+2018.03.11
++ add: minimap tooltip: it shows several lines for mouse cursor pos, when mouse is over minimap
++ add: prop OptMinimapTooltipVisible
++ add: prop OptMinimapTooltipLinesCount
++ add: prop OptMinimapTooltipWidthPercents
++ add: prop Colors.MinimapTooltipBG
++ add: prop Colors.MinimapTooltipBorder
+
+2018.03.10
++ add: Ctrl+click must call context menu on macOS
+* deleted prop OptMouseDownForPopup, code made simpler
+
+2018.03.06
++ improved logic of CaretItem.SavedX field (field is also renamed), to be like in SynWrite and tested on CudaText
+
+2018.02.27
++ add: prop OptScrollbarHorizontalHidden
+- fix: can write LineTop for hidden control too
+- fix: major fix for IME input
+
 2018.02.06
 + rewritten bookmarks support. now bookmarks are not embedded into Strings items, they are in separate Strings.Bookmarks object. now bookmarks aren't deleted if their lines are deleted - good.
 + smaller size of Strings item
