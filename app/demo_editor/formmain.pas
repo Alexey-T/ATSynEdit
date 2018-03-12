@@ -264,8 +264,6 @@ end;
 { TfmMain }
 
 procedure TfmMain.FormCreate(Sender: TObject);
-var
-  FHot: TATHotspotItem;
 begin
   UpdateEnc;
 
@@ -306,25 +304,6 @@ begin
   ed.OnHotspotExit:= @EditHotspotExit;
 
   ed.SetFocus;
-
-  (*
-  FHot.PosX:= 0;
-  FHot.PosY:= 0;
-  FHot.EndX:= 4;
-  FHot.EndY:= 4;
-  FHot.Tag:= 'hot0';
-  ed.Hotspots.Add(FHot);
-
-  FHot.PosX:= 10;
-  FHot.PosY:= 10;
-  FHot.EndX:= 20;
-  FHot.EndY:= 14;
-  FHot.Tag:= 'hot1';
-  ed.Hotspots.Add(FHot);
-
-  ed.DimRanges.Add(0, 4, 200);
-  ed.DimRanges.Add(10, 14, 200);
-  *)
 
   FFinder:= TATEditorFinder.Create;
   FFinder.Editor:= ed;
