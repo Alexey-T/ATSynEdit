@@ -5801,9 +5801,9 @@ begin
 
   FMinimapTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FMinimapTooltipWidthPercents div 100;
   if FMinimapAtLeft then
-    FMinimapTooltip.Left:= FRectMinimap.Right
+    FMinimapTooltip.Left:= FRectMinimap.Right + 1
   else
-    FMinimapTooltip.Left:= FRectMinimap.Left - FMinimapTooltip.Width;
+    FMinimapTooltip.Left:= FRectMinimap.Left - FMinimapTooltip.Width - 1;
   FMinimapTooltip.Height:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
   FMinimapTooltip.Top:= Max(0, Min(ClientHeight-FMinimapTooltip.Height,
     Pnt.Y - Trunc(FCharSize.Y*FMinimapTooltipLinesCount/2)
