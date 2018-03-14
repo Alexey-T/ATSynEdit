@@ -454,6 +454,14 @@ begin
         if not FLastCommandChangedText2 then
           Carets.UpdateSavedX(cUpdateX_Save, false);
       end;
+    cCommand_ClipboardPaste,
+    cCommand_ClipboardPaste_Select,
+    cCommand_ClipboardAltPaste,
+    cCommand_ClipboardAltAltPaste,
+    cCommand_ClipboardAltPaste_Select:
+      begin
+        Carets.UpdateSavedX(cUpdateX_Save, false);
+      end;
     cCommand_KeyUp,
     cCommand_KeyUp_Sel,
     cCommand_KeyDown,
