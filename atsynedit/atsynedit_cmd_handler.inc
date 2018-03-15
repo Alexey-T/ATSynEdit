@@ -454,6 +454,8 @@ begin
         if not FLastCommandChangedText2 then
           Carets.UpdateSavedX(cUpdateX_Save, false);
       end;
+    {
+    // https://github.com/Alexey-T/CudaText/issues/1326
     cCommand_ClipboardPaste,
     cCommand_ClipboardPaste_Select,
     cCommand_ClipboardAltPaste,
@@ -462,6 +464,7 @@ begin
       begin
         Carets.UpdateSavedX(cUpdateX_Save, false);
       end;
+    }
     cCommand_KeyUp,
     cCommand_KeyUp_Sel,
     cCommand_KeyDown,
