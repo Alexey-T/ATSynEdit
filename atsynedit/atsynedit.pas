@@ -5,9 +5,7 @@ License: MPL 2.0 or LGPL
 
 {$mode objfpc}{$H+}
 
-//{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
-//{$define beep_cached_update}
 //{$define test_foldlist}
 //{$define allow_proc_msg}
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
@@ -1530,10 +1528,6 @@ begin
   FWrapUpdateNeeded:= false;
   FPrevVisibleColumns:= NNewVisibleColumns;
 
-  {$ifdef beep_wrapinfo}
-  Beep;
-  {$endif}
-
   InvalidateHilitingCache;
 
   case FWrapMode of
@@ -1569,10 +1563,6 @@ begin
     end
     else
     begin
-      {$ifdef beep_cached_update}
-      Beep;
-      {$endif}
-
       ListNums.Assign(Strings.ListUpdates);
 
       for i:= 0 to ListNums.Count-1 do
