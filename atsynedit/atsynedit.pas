@@ -6,7 +6,6 @@ License: MPL 2.0 or LGPL
 {$mode objfpc}{$H+}
 
 //{$define debug_findwrapindex}
-//{$define allow_proc_msg}
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
                          //when horz-scroll hides/shows/hides/...
                          //ok also for win32
@@ -3067,13 +3066,6 @@ begin
 
   BeginUpdate;
   try
-    //show "wait" text
-    //Paint;
-    //Invalidate;
-    //{$ifdef allow_proc_msg}
-    //Application.ProcessMessages;
-    //{$endif}
-
     Strings.LoadFromFile(AFilename);
   finally
     EndUpdate;
