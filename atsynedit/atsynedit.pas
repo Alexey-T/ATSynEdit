@@ -6,7 +6,6 @@ License: MPL 2.0 or LGPL
 {$mode objfpc}{$H+}
 
 //{$define debug_findwrapindex}
-//{$define test_foldlist}
 //{$define allow_proc_msg}
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
                          //when horz-scroll hides/shows/hides/...
@@ -916,7 +915,6 @@ type
     function GetCaretsArray: TATPointArray;
     procedure SetCaretsArray(const Ar: TATPointArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
-    procedure DoDebugInitFoldList;
 
     procedure OnCanvasFontChanged(Sender:TObject);
   public
@@ -3085,10 +3083,6 @@ begin
   DoPaintModeBlinking;
   DoEventChange;
   DoEventCarets;
-
-  {$ifdef test_foldlist}
-  DoDebugInitFoldList;
-  {$endif}
 end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
