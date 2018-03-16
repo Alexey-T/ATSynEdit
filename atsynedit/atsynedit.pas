@@ -5,8 +5,6 @@ License: MPL 2.0 or LGPL
 
 {$mode objfpc}{$H+}
 
-//{$define test_markedrange}
-//{$define test_attribs}
 //{$define beep_wrapinfo}
 //{$define debug_findwrapindex}
 //{$define beep_cached_update}
@@ -2737,13 +2735,6 @@ begin
   FDimRanges:= TATDimRanges.Create;
   FHotspots:= TATHotspots.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
-
-  {$ifdef test_markedrange}
-  DoSetMarkedRange(1, 3);
-  {$endif}
-  {$ifdef test_attribs}
-  DoDebugAddAttribs;
-  {$endif}
 
   FPaintLocked:= 0;
   FPaintStatic:= false;
