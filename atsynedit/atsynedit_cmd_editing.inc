@@ -198,7 +198,7 @@ begin
 
   if bNeedGroup then Strings.EndUndoGroup;
 
-  Result:= [cResultText, cResultCaretAny];
+  Result:= [cResultText, cResultCaretTop];
 end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
