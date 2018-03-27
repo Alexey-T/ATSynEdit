@@ -4724,7 +4724,7 @@ end;
 {$else}
 procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
 begin
-  ATStringProc.OptCharScaleFullwidth_Default:=
+  ATStringProc.OptCharScaleFullWidth:=
     Canvas.TextWidth(Utf8Encode(_CharCodeFullM)) * 100 div
     Canvas.TextWidth(Utf8Encode(_CharCodeM));
 end;
