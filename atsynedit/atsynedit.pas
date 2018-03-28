@@ -2049,6 +2049,8 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
+  FontWidthCache.Init(Font.Name, Font.Size, C);
+
   C.Brush.Color:= GetColorTextBG;
   C.FillRect(ARect);
 

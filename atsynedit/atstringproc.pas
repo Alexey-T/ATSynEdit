@@ -9,7 +9,7 @@ unit ATStringProc;
 interface
 
 uses
-  Classes, SysUtils, StrUtils,
+  Classes, SysUtils, StrUtils, Graphics,
   LCLType, LCLIntf, Clipbrd;
 
 type
@@ -21,6 +21,24 @@ type
   TATIntArray = array of integer;
   TATPointArray = array of TPoint;
   TATLineOffsetsInfo = array of integer; //word is too small
+
+type
+  { TATFontWidthCache }
+
+  TATFontWidthCache = class
+  private
+    FontName: string;
+    FontSize: integer;
+    Canvas: TCanvas;
+    Sizes: packed array[word] of word;
+    SizeAvg: integer;
+  public
+    procedure Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
+    function GetCharWidth(ch: Widechar): integer;
+  end;
+
+var
+  FontWidthCache: TATFontWidthCache;
 
 function SCharUpper(ch: atChar): atChar;
 function SCharLower(ch: atChar): atChar;
@@ -38,6 +56,7 @@ const
 
 var
   OptMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
+  OptProportionalFontRendering: boolean = false;
   OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
   OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
   OptCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
@@ -439,6 +458,12 @@ begin
     Inc(NCharsSkipped);
 
     NScalePercents:= 100;
+
+    if OptProportionalFontRendering then
+    begin
+      NScalePercents:= FontWidthCache.GetCharWidth(ch);
+    end
+    else
     if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     begin
       //def value
@@ -1008,9 +1033,39 @@ begin
   end;
 end;
 
+{ TATFontWidthCache }
+
+procedure TATFontWidthCache.Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
+begin
+  if (FontName<>AFontName) or (FontSize<>AFontSize) then
+  begin
+    FontName:= AFontName;
+    FontSize:= AFontSize;
+    FillChar(Sizes, SizeOf(Sizes), 0);
+  end;
+  Canvas:= ACanvas;
+  Canvas.Font.Name:= AFontName;
+  Canvas.Font.Size:= AFontSize;
+  SizeAvg:= Canvas.TextWidth('T');
+end;
+
+function TATFontWidthCache.GetCharWidth(ch: Widechar): integer;
+begin
+  Result:= Sizes[Ord(ch)];
+  if Result=0 then
+  begin
+    Result:= Canvas.TextWidth(UTF8Encode(UnicodeString(ch))) * 100 div SizeAvg;
+    Sizes[Ord(ch)]:= Result;
+  end;
+end;
+
 
 initialization
   _InitCharsHex;
+  FontWidthCache:= TATFontWidthCache.Create;
+
+finalization
+  FreeAndNil(FontWidthCache);
 
 end.
 
