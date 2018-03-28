@@ -18,6 +18,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkProportional: TCheckBox;
     chkCrBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
     chkMsColumnSel: TCheckBox;
@@ -216,6 +217,8 @@ begin
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
+
+    chkProportional.Checked:= OptProportionalFontRendering;
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -428,6 +431,8 @@ begin
       ed.OptUndoLimit:= edUndo.Value;
       ed.OptUndoGrouped:= chkUndoGr.Checked;
       ed.OptUndoAfterSave:= chkUndoSv.Checked;
+
+      OptProportionalFontRendering:= chkProportional.Checked;
 
       //apply
       ed.Gutter.Update;

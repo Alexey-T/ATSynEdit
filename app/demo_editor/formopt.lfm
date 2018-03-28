@@ -73,7 +73,7 @@ object fmOpt: TfmOpt
         Top = 8
         Width = 136
         Caption = 'copy lines if no sel'
-        TabOrder = 6
+        TabOrder = 7
       end
       object chkShowFullSel: TCheckBox
         Left = 8
@@ -89,7 +89,7 @@ object fmOpt: TfmOpt
         Top = 68
         Width = 231
         Caption = 'consider overwrite-mode on paste'
-        TabOrder = 9
+        TabOrder = 10
       end
       object LabChars: TLabel
         Left = 408
@@ -104,7 +104,7 @@ object fmOpt: TfmOpt
         Height = 24
         Top = 272
         Width = 106
-        TabOrder = 15
+        TabOrder = 16
       end
       object chkDotLn: TCheckBox
         Left = 296
@@ -112,7 +112,7 @@ object fmOpt: TfmOpt
         Top = 48
         Width = 216
         Caption = 'show wrapped-indent vert lines'
-        TabOrder = 8
+        TabOrder = 9
       end
       object chkCutNoSel: TCheckBox
         Left = 296
@@ -120,7 +120,7 @@ object fmOpt: TfmOpt
         Top = 28
         Width = 127
         Caption = 'cut lines if no sel'
-        TabOrder = 7
+        TabOrder = 8
       end
       object chkSaveTrim: TCheckBox
         Left = 296
@@ -128,7 +128,7 @@ object fmOpt: TfmOpt
         Top = 88
         Width = 177
         Caption = 'on save: trim trail spaces'
-        TabOrder = 10
+        TabOrder = 11
       end
       object chkSaveEol: TCheckBox
         Left = 296
@@ -136,7 +136,7 @@ object fmOpt: TfmOpt
         Top = 108
         Width = 172
         Caption = 'on save: ensure final eol'
-        TabOrder = 11
+        TabOrder = 12
       end
       object chkScrollHint: TCheckBox
         Left = 296
@@ -144,7 +144,7 @@ object fmOpt: TfmOpt
         Top = 128
         Width = 226
         Caption = 'show hint on dragging vert-scroll'
-        TabOrder = 12
+        TabOrder = 13
       end
       object chkCurLineMin: TCheckBox
         Left = 24
@@ -159,7 +159,7 @@ object fmOpt: TfmOpt
         Height = 24
         Top = 244
         Width = 106
-        TabOrder = 14
+        TabOrder = 15
       end
       object LabelHint: TLabel
         Left = 408
@@ -190,7 +190,7 @@ object fmOpt: TfmOpt
           'no arrows'
         )
         Style = csDropDownList
-        TabOrder = 13
+        TabOrder = 14
       end
       object Label11: TLabel
         Left = 456
@@ -199,6 +199,14 @@ object fmOpt: TfmOpt
         Width = 134
         Caption = 'new scrollbars: arrows'
         ParentColor = False
+      end
+      object chkProportional: TCheckBox
+        Left = 8
+        Height = 24
+        Top = 152
+        Width = 277
+        Caption = 'proportional font rendering (e.g. for Arial)'
+        TabOrder = 6
       end
     end
     object TabSheet2: TTabSheet
