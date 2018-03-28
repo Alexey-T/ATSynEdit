@@ -1046,7 +1046,7 @@ begin
   Canvas:= ACanvas;
   Canvas.Font.Name:= AFontName;
   Canvas.Font.Size:= AFontSize;
-  SizeAvg:= Canvas.TextWidth('T');
+  SizeAvg:= Canvas.TextWidth('M');
 end;
 
 function TATFontWidthCache.GetCharWidth(ch: Widechar): integer;
