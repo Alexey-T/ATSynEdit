@@ -34,7 +34,6 @@ var
 type
   TATCharSizerMode = (
     cCharSizeFixed,
-    cCharSizeProportional,
     cCharSizeFixed128AndProportional
     );
 
@@ -164,9 +163,6 @@ end;
 function TATCharSizer.GetCharWidth(ch: widechar): integer;
 begin
   Result:= 100;
-
-  if OptCharSizeMode=cCharSizeProportional then
-    exit(GetCharWidth_FromCache(ch));
 
   if OptCharSizeMode=cCharSizeFixed128AndProportional then
     if Ord(ch)>=128 then

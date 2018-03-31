@@ -202,8 +202,8 @@ object fmOpt: TfmOpt
       end
       object groupCharSize: TRadioGroup
         Left = 8
-        Height = 91
-        Top = 208
+        Height = 67
+        Top = 232
         Width = 280
         AutoFill = True
         Caption = 'char size mode'
@@ -214,11 +214,10 @@ object fmOpt: TfmOpt
         ChildSizing.ShrinkVertical = crsScaleChilds
         ChildSizing.Layout = cclLeftToRightThenTopToBottom
         ChildSizing.ControlsPerLine = 1
-        ClientHeight = 72
+        ClientHeight = 48
         ClientWidth = 276
         Items.Strings = (
           'fixed (detect by char code)'
-          'proportional to font'
           'fixed 0..127, others proportional'
         )
         TabOrder = 13
