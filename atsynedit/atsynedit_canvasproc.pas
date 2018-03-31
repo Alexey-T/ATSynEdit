@@ -1145,8 +1145,7 @@ procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString;
 // and 1px spacing between lines
 var
   Part: ^TATLinePart;
-  ch: Widechar;
-  nPart, nPos, nCharSize: integer;
+  nPart, nPos: integer;
   X1, Y1, X2, Y2: integer;
   HasBG: boolean;
 begin
@@ -1160,7 +1159,6 @@ begin
 
     nPos:= Part^.Offset+1;
     if nPos>Length(AStr) then Continue;
-    ch:= AStr[nPos];
     if IsStringSpaces(AStr, nPos, Part^.Len)
       and (not HasBG) then Continue;
 
