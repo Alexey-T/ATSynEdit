@@ -147,6 +147,7 @@ begin
   Canvas:= ACanvas;
   Canvas.Font.Name:= AFontName;
   Canvas.Font.Size:= AFontSize;
+  Canvas.Font.Style:= [];
   SizeAvg:= Canvas.TextWidth('M');
 end;
 
