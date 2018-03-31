@@ -15,7 +15,8 @@ uses
   {$endif}
   Classes, SysUtils, Graphics, Types,
   Forms,
-  ATStringProc;
+  ATStringProc,
+  ATSynEdit_CharSizer;
 
 var
   OptUnprintedTabCharLength: integer = 1;

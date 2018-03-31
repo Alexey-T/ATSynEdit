@@ -9,7 +9,8 @@ uses
   ButtonPanel, Spin, ComCtrls,
   ATStringProc,
   ATSynEdit,
-  ATSynEdit_CanvasProc;
+  ATSynEdit_CanvasProc,
+  ATSynEdit_CharSizer;
 
 type
   { TfmOpt }
