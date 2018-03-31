@@ -40,10 +40,10 @@ type
 
 var
   OptCharSizeMode: TATCharSizerMode = cCharSizeFixed;
+  OptCharSizeWideAllowed: boolean = true;
   OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
   OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
   OptCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
-  OptAllowSpecialWidthChars: boolean = true;
   OptUnprintedReplaceSpec: boolean = false;
   OptUnprintedReplaceSpecToCode: integer = 164; //char 164 is small circle
   OptHexChars: UnicodeString = ''; //show these chars as "<NNNN>"
@@ -183,7 +183,7 @@ begin
       exit(OptCharScaleHex_Big);
   end;
 
-  if OptAllowSpecialWidthChars and IsCharFullWidth(ch) then
+  if OptCharSizeWideAllowed and IsCharFullWidth(ch) then
     exit(OptCharScaleFullWidth);
 end;
 
