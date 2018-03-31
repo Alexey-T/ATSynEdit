@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ButtonPanel, Spin, ComCtrls,
+  ButtonPanel, Spin, ComCtrls, ExtCtrls,
   ATStringProc,
   ATSynEdit,
   ATSynEdit_CanvasProc,
@@ -19,7 +19,6 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
-    chkProportional: TCheckBox;
     chkCrBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
     chkMsColumnSel: TCheckBox;
@@ -144,6 +143,7 @@ type
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
+    groupCharSize: TRadioGroup;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -219,7 +219,7 @@ begin
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
 
-    chkProportional.Checked:= OptProportionalFontRendering;
+    groupCharSize.ItemIndex:= Ord(OptCharSizeMode);
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -433,7 +433,7 @@ begin
       ed.OptUndoGrouped:= chkUndoGr.Checked;
       ed.OptUndoAfterSave:= chkUndoSv.Checked;
 
-      OptProportionalFontRendering:= chkProportional.Checked;
+      OptCharSizeMode:= TATCharSizerMode(groupCharSize.ItemIndex);
 
       //apply
       ed.Gutter.Update;

@@ -22,17 +22,24 @@ type
     Canvas: TCanvas;
     Sizes: packed array[word] of word;
     SizeAvg: integer;
-    function GetCharWidth_FromCache(ch: Widechar): integer;
+    function GetCharWidth_FromCache(ch: widechar): integer;
   public
     procedure Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
-    function GetCharWidth(ch: Widechar): integer;
+    function GetCharWidth(ch: widechar): integer;
   end;
 
 var
   GlobalCharSizer: TATCharSizer;
 
+type
+  TATCharSizerMode = (
+    cCharSizeFixed,
+    cCharSizeProportional,
+    cCharSizeFixed128AndProportional
+    );
+
 var
-  OptProportionalFontRendering: boolean = false;
+  OptCharSizeMode: TATCharSizerMode = cCharSizeFixed;
   OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
   OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
   OptCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
@@ -154,30 +161,30 @@ begin
   end;
 end;
 
-function TATCharSizer.GetCharWidth(ch: Widechar): integer;
+function TATCharSizer.GetCharWidth(ch: widechar): integer;
 begin
   Result:= 100;
 
-  if OptProportionalFontRendering then
-  begin
-    Result:= GetCharWidth_FromCache(ch);
-  end
-  else
+  if OptCharSizeMode=cCharSizeProportional then
+    exit(GetCharWidth_FromCache(ch));
+
+  if OptCharSizeMode=cCharSizeFixed128AndProportional then
+    if Ord(ch)>=128 then
+      exit(GetCharWidth_FromCache(ch));
+
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
-  begin
-    //def value
-  end
-  else
+    exit;
+
   if IsCharHex(ch) then
   begin
     if Ord(ch)<$100 then
-      Result:= OptCharScaleHex_Small
+      exit(OptCharScaleHex_Small)
     else
-      Result:= OptCharScaleHex_Big;
-  end
-  else
+      exit(OptCharScaleHex_Big);
+  end;
+
   if OptAllowSpecialWidthChars and IsCharFullWidth(ch) then
-    Result:= OptCharScaleFullWidth;
+    exit(OptCharScaleFullWidth);
 end;
 
 
