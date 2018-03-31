@@ -27,6 +27,7 @@ uses
   ATStringProc,
   ATStrings,
   ATStringProc_WordJump,
+  ATSynEdit_CharSizer,
   ATSynEdit_RegExpr,
   ATSynEdit_ScrollBar,
   ATSynEdit_Colors,
@@ -2049,7 +2050,7 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  FontWidthCache.Init(Font.Name, Font.Size, C);
+  GlobalCharSizer.Init(Font.Name, Font.Size, C);
 
   C.Brush.Color:= GetColorTextBG;
   C.FillRect(ARect);

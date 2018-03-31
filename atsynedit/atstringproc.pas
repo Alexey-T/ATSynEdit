@@ -9,8 +9,9 @@ unit ATStringProc;
 interface
 
 uses
-  Classes, SysUtils, StrUtils, Graphics,
-  LCLType, LCLIntf, Clipbrd;
+  Classes, SysUtils, StrUtils,
+  LCLType, LCLIntf, Clipbrd,
+  ATSynEdit_CharSizer;
 
 type
   atString = UnicodeString;
@@ -21,24 +22,6 @@ type
   TATIntArray = array of integer;
   TATPointArray = array of TPoint;
   TATLineOffsetsInfo = array of integer; //word is too small
-
-type
-  { TATFontWidthCache }
-
-  TATFontWidthCache = class
-  private
-    FontName: string;
-    FontSize: integer;
-    Canvas: TCanvas;
-    Sizes: packed array[word] of word;
-    SizeAvg: integer;
-  public
-    procedure Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
-    function GetCharWidth(ch: Widechar): integer;
-  end;
-
-var
-  FontWidthCache: TATFontWidthCache;
 
 function SCharUpper(ch: atChar): atChar;
 function SCharLower(ch: atChar): atChar;
@@ -461,7 +444,7 @@ begin
 
     if OptProportionalFontRendering then
     begin
-      NScalePercents:= FontWidthCache.GetCharWidth(ch);
+      NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
     end
     else
     if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
@@ -1033,39 +1016,9 @@ begin
   end;
 end;
 
-{ TATFontWidthCache }
-
-procedure TATFontWidthCache.Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
-begin
-  if (FontName<>AFontName) or (FontSize<>AFontSize) then
-  begin
-    FontName:= AFontName;
-    FontSize:= AFontSize;
-    FillChar(Sizes, SizeOf(Sizes), 0);
-  end;
-  Canvas:= ACanvas;
-  Canvas.Font.Name:= AFontName;
-  Canvas.Font.Size:= AFontSize;
-  SizeAvg:= Canvas.TextWidth('M');
-end;
-
-function TATFontWidthCache.GetCharWidth(ch: Widechar): integer;
-begin
-  Result:= Sizes[Ord(ch)];
-  if Result=0 then
-  begin
-    Result:= Canvas.TextWidth(UTF8Encode(UnicodeString(ch))) * 100 div SizeAvg;
-    Sizes[Ord(ch)]:= Result;
-  end;
-end;
-
 
 initialization
   _InitCharsHex;
-  FontWidthCache:= TATFontWidthCache.Create;
-
-finalization
-  FreeAndNil(FontWidthCache);
 
 end.
 
