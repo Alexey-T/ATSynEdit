@@ -191,7 +191,7 @@ type
     FFindStopped: boolean;
     FFindConfirmAll: TModalResult;
     FFindMarkAll: boolean;
-    FGapPanel: TPanel;
+    ed_gap: TATSynEdit;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
     procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
@@ -317,11 +317,17 @@ begin
   FFinder.OnBadRegex:= @FinderBadRegex;
   FFinder.OnFound:= @FinderFound;
 
-  FGapPanel:= TPanel.Create(Self);
-  FGapPanel.Caption:= '(test gap panel)';
-  FGapPanel.Color:= clYellow;
-  FGapPanel.Parent:= ed;
-  FGapPanel.Hide;
+  ed_gap:= TATSynEdit.Create(Self);
+  ed_gap.Text:= '(test inline editor)';
+  ed_gap.Colors.TextBG:= $80f0f0;
+  ed_gap.OptRulerVisible:= false;
+  ed_gap.OptUnprintedVisible:= false;
+  ed_gap.OptMarginRight:= 2000;
+  ed_gap.Gutter[ed_gap.GutterBandBm].Visible:= false;
+  ed_gap.Gutter[ed_gap.GutterBandFold].Visible:= false;
+  ed_gap.Gutter[ed_gap.GutterBandState].Visible:= false;
+  ed_gap.Parent:= ed;
+  ed_gap.Hide;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -1438,18 +1444,18 @@ var
 begin
   if not mnuTestGapPanels.Checked then
   begin
-    FGapPanel.Hide;
+    ed_gap.Hide;
     exit
   end;
 
   if not ed.DoGetGapRect(0, R) then
   begin
-    FGapPanel.Hide;
+    ed_gap.Hide;
     exit
   end;
 
-  FGapPanel.SetBounds(R.Left, R.Top, R.Right-R.Left, R.Bottom-R.Top);
-  FGapPanel.Show;
+  ed_gap.SetBounds(R.Left, R.Top, R.Right-R.Left, R.Bottom-R.Top);
+  ed_gap.Show;
 end;
 
 end.
