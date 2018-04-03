@@ -1,4 +1,11 @@
 
+2018.04.03
++ add: to support inline editors (like Adobe Brackets), added method DoGetGapRect
+
+2018.04.02
++ add: part of code separated to ATSynEdit_CharSizer unit
++ add: in CharSizer unit, added global option for proportional font rendering (proportional for char codes >127), it fixes wrong width of many Unicode characters
+
 2018.03.11
 + add: minimap tooltip: it shows several lines for mouse cursor pos, when mouse is over minimap
 + add: prop OptMinimapTooltipVisible
