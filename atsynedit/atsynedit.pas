@@ -1041,6 +1041,7 @@ type
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
     procedure DoGetMarkedLines(out ALine1, ALine2: integer);
     function DoGetLinkAtPos(AX, AY: integer): atString;
+    function DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
     function GetCacheDump: string;
 
   protected
@@ -5781,6 +5782,29 @@ begin
 
   FMinimapTooltip.Invalidate;
 end;
+
+
+function TATSynEdit.DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
+var
+  GapItem: TATSynGapItem;
+  Pnt: TPoint;
+begin
+  Result:= false;
+  ARect:= Rect(0, 0, 0, 0);
+
+  if not ((AIndex>=0) and (AIndex<Gaps.Count)) then exit;
+
+  GapItem:= Gaps.Items[AIndex];
+  Pnt:= CaretPosToClientPos(Point(0, GapItem.LineIndex+1));
+  if Pnt.Y<GapItem.Size then exit;
+
+  ARect.Left:= FRectMain.Left;
+  ARect.Right:= FRectMain.Right;
+  ARect.Top:= Pnt.Y - GapItem.Size;
+  ARect.Bottom:= Pnt.Y;
+  Result:= true;
+end;
+
 
 
 {$I atsynedit_carets.inc}
