@@ -31,14 +31,8 @@ type
 var
   GlobalCharSizer: TATCharSizer;
 
-type
-  TATCharSizerMode = (
-    cCharSizeFixed,
-    cCharSizeFixed128AndProportional
-    );
-
 var
-  OptCharSizeMode: TATCharSizerMode = cCharSizeFixed;
+  OptCharSizeProportional: boolean = true;
   OptCharSizeWideAllowed: boolean = true;
   OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
   OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
@@ -165,7 +159,7 @@ function TATCharSizer.GetCharWidth(ch: widechar): integer;
 begin
   Result:= 100;
 
-  if OptCharSizeMode=cCharSizeFixed128AndProportional then
+  if OptCharSizeProportional then
     if Ord(ch)>=128 then
       exit(GetCharWidth_FromCache(ch));
 
