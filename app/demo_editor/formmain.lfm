@@ -4,7 +4,7 @@ object fmMain: TfmMain
   Top = 168
   Width = 953
   Caption = 'Demo'
-  ClientHeight = 499
+  ClientHeight = 496
   ClientWidth = 953
   Menu = MainMenu1
   OnCreate = FormCreate
@@ -13,25 +13,25 @@ object fmMain: TfmMain
   LCLVersion = '1.9.0.0'
   object PanelMain: TPanel
     Left = 0
-    Height = 499
+    Height = 496
     Top = 0
     Width = 672
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 499
+    ClientHeight = 496
     ClientWidth = 672
     TabOrder = 0
     object Status: TStatusBar
       Left = 0
-      Height = 18
-      Top = 481
+      Height = 21
+      Top = 475
       Width = 672
       Panels = <>
     end
     object StatusMsg: TStatusBar
       Left = 0
-      Height = 18
-      Top = 463
+      Height = 21
+      Top = 454
       Width = 672
       Font.Color = clBlue
       Panels = <>
@@ -46,7 +46,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Side = asrCenter
       Left = 507
       Height = 14
-      Top = 465
+      Top = 457
       Width = 160
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
@@ -61,7 +61,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Side = asrCenter
       Left = 412
       Height = 22
-      Top = 461
+      Top = 453
       Width = 90
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
@@ -73,19 +73,19 @@ object fmMain: TfmMain
   end
   object PanelRt: TPanel
     Left = 672
-    Height = 499
+    Height = 496
     Top = 0
     Width = 281
     Align = alRight
     BevelOuter = bvNone
-    ClientHeight = 499
+    ClientHeight = 496
     ClientWidth = 281
     TabOrder = 1
     object chkGutter: TCheckBox
       Left = 8
       Height = 24
       Top = 8
-      Width = 64
+      Width = 68
       Caption = 'gutter'
       OnChange = chkGutterChange
       TabOrder = 0
@@ -94,7 +94,7 @@ object fmMain: TfmMain
       Left = 8
       Height = 24
       Top = 30
-      Width = 54
+      Width = 58
       Caption = 'ruler'
       OnChange = chkRulerChange
       TabOrder = 1
@@ -103,14 +103,14 @@ object fmMain: TfmMain
       Left = 8
       Height = 24
       Top = 52
-      Width = 79
+      Width = 85
       Caption = 'minimap'
       OnChange = chkMinimapChange
       TabOrder = 2
     end
     object edSpaceX: TSpinEdit
       Left = 8
-      Height = 24
+      Height = 27
       Top = 280
       Width = 52
       MaxValue = 10
@@ -120,23 +120,23 @@ object fmMain: TfmMain
     end
     object Label1: TLabel
       Left = 67
-      Height = 14
+      Height = 17
       Top = 284
-      Width = 58
+      Width = 63
       Caption = 'spacing-x'
       ParentColor = False
     end
     object Label2: TLabel
       Left = 67
-      Height = 14
+      Height = 17
       Top = 348
-      Width = 77
+      Width = 84
       Caption = 'fixed margin'
       ParentColor = False
     end
     object edMarginFixed: TSpinEdit
       Left = 8
-      Height = 24
+      Height = 27
       Top = 344
       Width = 52
       MaxValue = 200
@@ -151,14 +151,14 @@ object fmMain: TfmMain
       Top = 4
       Width = 128
       Caption = 'wrap'
-      ClientHeight = 96
+      ClientHeight = 93
       ClientWidth = 124
       TabOrder = 14
       object chkWrapOff: TRadioButton
         Left = 8
         Height = 24
         Top = 0
-        Width = 41
+        Width = 46
         Caption = 'off'
         Checked = True
         OnChange = chkWrapOffChange
@@ -169,7 +169,7 @@ object fmMain: TfmMain
         Left = 8
         Height = 24
         Top = 20
-        Width = 72
+        Width = 76
         Caption = 'at edge'
         OnChange = chkWrapOnChange
         TabOrder = 1
@@ -178,7 +178,7 @@ object fmMain: TfmMain
         Left = 8
         Height = 24
         Top = 40
-        Width = 85
+        Width = 90
         Caption = 'at margin'
         OnChange = chkWrapMarginChange
         TabOrder = 2
@@ -187,7 +187,7 @@ object fmMain: TfmMain
         Left = 8
         Height = 24
         Top = 64
-        Width = 95
+        Width = 101
         Caption = 'with indent'
         OnChange = chkWrapIndentChange
         TabOrder = 3
@@ -195,7 +195,7 @@ object fmMain: TfmMain
     end
     object edFontsize: TSpinEdit
       Left = 8
-      Height = 24
+      Height = 27
       Top = 216
       Width = 52
       MaxValue = 40
@@ -206,9 +206,9 @@ object fmMain: TfmMain
     end
     object Label4: TLabel
       Left = 67
-      Height = 14
+      Height = 17
       Top = 220
-      Width = 50
+      Width = 58
       Caption = 'font size'
       ParentColor = False
     end
@@ -218,14 +218,14 @@ object fmMain: TfmMain
       Top = 120
       Width = 128
       Caption = 'unprintable'
-      ClientHeight = 88
+      ClientHeight = 85
       ClientWidth = 124
       TabOrder = 15
       object chkUnprintVis: TCheckBox
         Left = 8
         Height = 24
         Top = 1
-        Width = 57
+        Width = 61
         Caption = 'show'
         OnChange = chkUnprintVisChange
         TabOrder = 0
@@ -234,7 +234,7 @@ object fmMain: TfmMain
         Left = 8
         Height = 24
         Top = 20
-        Width = 67
+        Width = 72
         Caption = 'spaces'
         OnChange = chkUnprintSpChange
         TabOrder = 1
@@ -243,7 +243,7 @@ object fmMain: TfmMain
         Left = 8
         Height = 24
         Top = 40
-        Width = 55
+        Width = 58
         Caption = 'ends'
         OnChange = chkUnprintEndChange
         TabOrder = 2
@@ -252,7 +252,7 @@ object fmMain: TfmMain
         Left = 8
         Height = 24
         Top = 60
-        Width = 92
+        Width = 101
         Caption = 'end-details'
         OnChange = chkUnprintEndDetChange
         TabOrder = 3
@@ -260,7 +260,7 @@ object fmMain: TfmMain
     end
     object edTabsize: TSpinEdit
       Left = 8
-      Height = 24
+      Height = 27
       Top = 248
       Width = 52
       MaxValue = 12
@@ -271,9 +271,9 @@ object fmMain: TfmMain
     end
     object Label5: TLabel
       Left = 67
-      Height = 14
+      Height = 17
       Top = 252
-      Width = 46
+      Width = 52
       Caption = 'tab size'
       ParentColor = False
     end
@@ -290,14 +290,14 @@ object fmMain: TfmMain
       Left = 8
       Height = 24
       Top = 118
-      Width = 87
+      Width = 95
       Caption = 'micromap'
       OnChange = chkMicromapChange
       TabOrder = 5
     end
     object edSpaceY: TSpinEdit
       Left = 8
-      Height = 24
+      Height = 27
       Top = 312
       Width = 52
       MaxValue = 10
@@ -307,9 +307,9 @@ object fmMain: TfmMain
     end
     object Label6: TLabel
       Left = 67
-      Height = 14
+      Height = 17
       Top = 316
-      Width = 58
+      Width = 62
       Caption = 'spacing-y'
       ParentColor = False
     end
@@ -326,7 +326,7 @@ object fmMain: TfmMain
       Left = 30
       Height = 24
       Top = 74
-      Width = 61
+      Width = 67
       Caption = 'at left'
       OnChange = chkMinimapLeftChange
       TabOrder = 3
@@ -335,7 +335,7 @@ object fmMain: TfmMain
       Left = 8
       Height = 24
       Top = 140
-      Width = 112
+      Width = 123
       Caption = 'new scrollbars'
       OnChange = chkNewScrollChange
       TabOrder = 6
@@ -344,7 +344,7 @@ object fmMain: TfmMain
       Left = 8
       Height = 24
       Top = 162
-      Width = 108
+      Width = 116
       Caption = 'tab as spaces'
       OnChange = chkTabSpacesChange
       TabOrder = 7
@@ -355,7 +355,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Control = PanelRt
       AnchorSideBottom.Side = asrBottom
       Left = 8
-      Height = 121
+      Height = 118
       Top = 376
       Width = 271
       Anchors = [akTop, akLeft, akRight, akBottom]
@@ -378,7 +378,7 @@ object fmMain: TfmMain
       Left = 8
       Height = 24
       Top = 184
-      Width = 105
+      Width = 114
       Caption = 'mouse select'
       Checked = True
       OnChange = chkMouseEnChange
@@ -389,7 +389,7 @@ object fmMain: TfmMain
       Left = 30
       Height = 24
       Top = 96
-      Width = 64
+      Width = 73
       Caption = 'tooltip'
       Checked = True
       OnChange = chkMinimapTooltipChange
@@ -528,6 +528,10 @@ object fmMain: TfmMain
       object mnuTestGapClear: TMenuItem
         Caption = 'clear gaps'
         OnClick = mnuTestGapClearClick
+      end
+      object mnuTestGapPanels: TMenuItem
+        Caption = 'toggle: paint colored panel on gaps'
+        OnClick = mnuTestGapPanelsClick
       end
     end
     object mnuOpts: TMenuItem

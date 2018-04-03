@@ -67,6 +67,7 @@ type
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem11: TMenuItem;
+    mnuTestGapPanels: TMenuItem;
     mnuShowPane: TMenuItem;
     mnuTestGapAdd: TMenuItem;
     mnuTestGapClear: TMenuItem;
@@ -145,6 +146,7 @@ type
     procedure mnuFindNextClick(Sender: TObject);
     procedure mnuTestGapAddClick(Sender: TObject);
     procedure mnuTestGapClearClick(Sender: TObject);
+    procedure mnuTestGapPanelsClick(Sender: TObject);
     procedure mnuTestSyntaxClick(Sender: TObject);
     procedure TimerHintTimer(Sender: TObject);
     procedure UpdateEnc;
@@ -189,6 +191,7 @@ type
     FFindStopped: boolean;
     FFindConfirmAll: TModalResult;
     FFindMarkAll: boolean;
+    FGapPanel: TPanel;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
     procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
@@ -222,6 +225,7 @@ type
     procedure FinderUpdateEditor(AUpdateText: boolean);
     procedure MenuEncClick(Sender: TObject);
     procedure MsgStatus(const S: string);
+    procedure UpdateGapPanel;
     procedure UpdateStatus;
     procedure UpdateChecks;
   public
@@ -291,7 +295,7 @@ begin
   ed.Strings.OnChangeBlock:=@EditStringsChangeBlock;
   ed.OnChangeCaretPos:= @EditCaretMoved;
   ed.OnChangeState:= @EditCaretMoved;
-  ed.OnScroll:= @EditCaretMoved;
+  ed.OnScroll:=@EditScroll;
   ed.OnCommand:= @EditCommand;
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnClickMicromap:= @EditClickMicromap;
@@ -312,6 +316,12 @@ begin
   FFinder.OnProgress:= @FinderProgress;
   FFinder.OnBadRegex:= @FinderBadRegex;
   FFinder.OnFound:= @FinderFound;
+
+  FGapPanel:= TPanel.Create(Self);
+  FGapPanel.Caption:= '(test gap panel)';
+  FGapPanel.Color:= clYellow;
+  FGapPanel.Parent:= ed;
+  FGapPanel.Hide;
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -470,7 +480,8 @@ end;
 
 procedure TfmMain.EditScroll(Sender: TObject);
 begin
-  UpdateStatus;
+  EditCaretMoved(Sender);
+  UpdateGapPanel;
 end;
 
 procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer;
@@ -887,12 +898,21 @@ begin
 
   ed.OptLastLineOnTop:= true;
   ed.Update;
+  UpdateGapPanel;
 end;
 
 procedure TfmMain.mnuTestGapClearClick(Sender: TObject);
 begin
   ed.Gaps.Clear;
   ed.Update;
+  UpdateGapPanel;
+end;
+
+procedure TfmMain.mnuTestGapPanelsClick(Sender: TObject);
+begin
+  with mnuTestGapPanels do
+    Checked:= not Checked;
+  UpdateGapPanel;
 end;
 
 procedure TfmMain.mnuTestSyntaxClick(Sender: TObject);
@@ -1412,5 +1432,24 @@ begin
   end;
 end;
 
+procedure TfmMain.UpdateGapPanel;
+var
+  R: TRect;
+begin
+  if not mnuTestGapPanels.Checked then
+  begin
+    FGapPanel.Hide;
+    exit
+  end;
+
+  if not ed.DoGetGapRect(0, R) then
+  begin
+    FGapPanel.Hide;
+    exit
+  end;
+
+  FGapPanel.SetBounds(R.Left, R.Top, R.Right-R.Left, R.Bottom-R.Top);
+  FGapPanel.Show;
+end;
 
 end.
