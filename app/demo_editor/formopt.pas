@@ -219,7 +219,7 @@ begin
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
 
-    groupCharSize.ItemIndex:= Ord(OptCharSizeMode);
+    groupCharSize.ItemIndex:= Ord(OptCharSizeProportional);
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -433,7 +433,7 @@ begin
       ed.OptUndoGrouped:= chkUndoGr.Checked;
       ed.OptUndoAfterSave:= chkUndoSv.Checked;
 
-      OptCharSizeMode:= TATCharSizerMode(groupCharSize.ItemIndex);
+      OptCharSizeProportional:= groupCharSize.ItemIndex>0;
 
       //apply
       ed.Gutter.Update;
