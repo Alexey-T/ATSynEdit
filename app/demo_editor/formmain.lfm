@@ -530,7 +530,7 @@ object fmMain: TfmMain
         OnClick = mnuTestGapClearClick
       end
       object mnuTestGapPanels: TMenuItem
-        Caption = 'toggle: paint colored panel on gaps'
+        Caption = 'toggle inline editor, over 1st gap'
         OnClick = mnuTestGapPanelsClick
       end
     end
