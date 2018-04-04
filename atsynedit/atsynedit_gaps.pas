@@ -20,7 +20,6 @@ type
     );
 
 type
-
   { TATSynGapItem }
 
   TATSynGapItem = class
@@ -34,11 +33,15 @@ type
   end;
 
 type
+  TATSynGapDelete = procedure(Sender: TObject; ALineIndex: integer) of object;
+
+type
   { TATSynGaps }
 
   TATSynGaps = class
   private
     FList: TList;
+    FOnDelete: TATSynGapDelete;
     function GetItem(N: integer): TATSynGapItem;
   public
     constructor Create; virtual;
@@ -53,6 +56,7 @@ type
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
     procedure Update(ALine: integer; AChange: TATLineChangeKind);
+    property OnDelete: TATSynGapDelete read FOnDelete write FOnDelete;
   end;
 
 var
@@ -104,7 +108,11 @@ var
   i: integer;
 begin
   for i:= FList.Count-1 downto 0 do
+  begin
+    if Assigned(FOnDelete) then
+      FOnDelete(Self, Items[i].LineIndex);
     TObject(FList[i]).Free;
+  end;
   FList.Clear;
 end;
 
@@ -125,6 +133,9 @@ end;
 
 procedure TATSynGaps.Delete(N: integer);
 begin
+  if Assigned(FOnDelete) then
+    FOnDelete(Self, Items[N].LineIndex);
+
   TObject(FList[N]).Free;
   FList.Delete(N);
 end;
