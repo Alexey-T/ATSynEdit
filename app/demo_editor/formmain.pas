@@ -192,10 +192,12 @@ type
     FFindConfirmAll: TModalResult;
     FFindMarkAll: boolean;
     ed_gap: TATSynEdit;
+    FGapInitSize: integer;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
     procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
     procedure EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
+    procedure EditorGapChange(Sender: TObject);
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
@@ -318,15 +320,18 @@ begin
   FFinder.OnFound:= @FinderFound;
 
   ed_gap:= TATSynEdit.Create(Self);
-  ed_gap.Text:= '(test inline editor)';
+  ed_gap.Text:= '(inline editor)';
   ed_gap.Colors.TextBG:= $80f0f0;
   ed_gap.OptRulerVisible:= false;
   ed_gap.OptUnprintedVisible:= false;
   ed_gap.OptMarginRight:= 2000;
-  ed_gap.Gutter[ed_gap.GutterBandBm].Visible:= false;
-  ed_gap.Gutter[ed_gap.GutterBandFold].Visible:= false;
-  ed_gap.Gutter[ed_gap.GutterBandState].Visible:= false;
+  ed_gap.OptScrollbarsNew:= ed.OptScrollbarsNew;
+  ed_gap.OptGutterVisible:= false;
+  //ed_gap.Gutter[ed_gap.GutterBandBm].Visible:= false;
+  //ed_gap.Gutter[ed_gap.GutterBandFold].Visible:= false;
+  //ed_gap.Gutter[ed_gap.GutterBandState].Visible:= false;
   ed_gap.Parent:= ed;
+  ed_gap.OnChange:= @EditorGapChange;
   ed_gap.Hide;
 end;
 
@@ -902,6 +907,9 @@ begin
     exit;
   end;
 
+  if ed.Gaps.Count=1 then
+    FGapInitSize:= NSize;
+
   ed.OptLastLineOnTop:= true;
   ed.Update;
   UpdateGapPanel;
@@ -1457,5 +1465,16 @@ begin
   ed_gap.SetBounds(R.Left, R.Top, R.Right-R.Left, R.Bottom-R.Top);
   ed_gap.Show;
 end;
+
+procedure TfmMain.EditorGapChange(Sender: TObject);
+var
+  NLines: integer;
+begin
+  NLines:= ed_gap.Strings.Count+1;
+  ed_gap.Height:= Max(FGapInitSize, NLines*ed_gap.TextCharSize.Y);
+  ed.Gaps[0].Size:= ed_gap.Height;
+  ed.Update;
+end;
+
 
 end.
