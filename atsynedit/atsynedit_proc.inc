@@ -1,7 +1,7 @@
 var
   cBitmapWait: TPortableNetworkGraphic = nil;
   cBitmapSaving: TPortableNetworkGraphic = nil;
-  cBitmapNiceScroll: TBitmap = nil;
+  cBitmapNiceScroll: TPortableNetworkGraphic = nil;
 
 const
   cBitmapNiceScrollRadius = 16;
@@ -40,15 +40,14 @@ end;
 
 procedure InitResources;
 begin
-  cBitmapNiceScroll:= TBitmap.Create;
-  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_MOVE');
-  cBitmapNiceScroll.Transparent:= true;
-
   Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
   Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
   Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
   Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'ATSYN_MOVE_L');
   Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
+
+  cBitmapNiceScroll:= TPortableNetworkGraphic.Create;
+  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK');
 
   cBitmapWait:= TPortableNetworkGraphic.Create;
   cBitmapWait.LoadFromResourceName(HInstance, 'ATSYN_WAIT');

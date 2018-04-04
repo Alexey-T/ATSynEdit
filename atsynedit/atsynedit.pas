@@ -5814,6 +5814,7 @@ end;
 {$I atsynedit_debug.inc}
 
 {$R res/nicescroll.res}
+{$R res/nicescroll2.res}
 {$R res/foldbar.res}
 {$R res/editor_hourglass.res}
 {$R res/editor_save.res}
