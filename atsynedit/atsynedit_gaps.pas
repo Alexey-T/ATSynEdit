@@ -9,7 +9,7 @@ unit ATSynEdit_Gaps;
 interface
 
 uses
-  SysUtils, Classes, Graphics, Math;
+  SysUtils, Classes, Graphics, Controls, Math;
 
 type
   TATLineChangeKind = (
@@ -28,6 +28,7 @@ type
     Size: integer;
     Bitmap: TBitmap;
     Tag: Int64;
+    Control: TControl;
     constructor Create; virtual;
     destructor Destroy; override;
   end;

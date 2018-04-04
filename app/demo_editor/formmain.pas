@@ -198,6 +198,7 @@ type
     procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
     procedure EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
     procedure EditorGapChange(Sender: TObject);
+    procedure EditorGapDelete(Sender: TObject; ALineIndex: integer);
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
@@ -332,6 +333,7 @@ begin
   //ed_gap.Gutter[ed_gap.GutterBandState].Visible:= false;
   ed_gap.Parent:= ed;
   ed_gap.OnChange:= @EditorGapChange;
+  ed.Gaps.OnDelete:=@EditorGapDelete;
   ed_gap.Hide;
 end;
 
@@ -1474,6 +1476,11 @@ begin
   ed_gap.Height:= Max(FGapInitSize, NLines*ed_gap.TextCharSize.Y);
   ed.Gaps[0].Size:= ed_gap.Height;
   ed.Update;
+end;
+
+procedure TfmMain.EditorGapDelete(Sender: TObject; ALineIndex: integer);
+begin
+  //ShowMessage('delete gap '+IntToStr(ALineIndex));
 end;
 
 
