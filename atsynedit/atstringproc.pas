@@ -11,6 +11,7 @@ interface
 uses
   Classes, SysUtils, StrUtils,
   LCLType, LCLIntf, Clipbrd,
+  UnicodeData,
   ATSynEdit_CharSizer;
 
 type
@@ -129,29 +130,26 @@ end;
 
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
 begin
-  Result:= false;
-
-  case Ord(ch) of
-    //Eng
-    Ord('0')..Ord('9'),
-    Ord('a')..Ord('z'),
-    Ord('A')..Ord('Z'),
-    Ord('_'),
-    //German
-    $E4, $C4, $E9, $F6, $D6, $FC, $DC, $DF,
-    //Rus
-    $0430..$044F, //a..z
-    $0410..$042F, //A..Z
-    $0451, $0401, //yo, Yo
-    //Greek
-    $0391..$03A9,
-    $03B1..$03C9:
+  case ch of
+    '0'..'9',
+    'a'..'z',
+    'A'..'Z',
+    '_':
       exit(true);
   end;
 
-  if AWordChars<>'' then
-    if Pos(ch, AWordChars)>0 then
-      Result:= true;
+  if Ord(ch)<128 then
+    Result:= false
+  else
+  if Ord(ch)>=LOW_SURROGATE_BEGIN then
+    exit(false)
+  else
+    Result:= GetProps(word(ch))^.Category <= UGC_OtherLetter;
+
+  if not Result then
+    if AWordChars<>'' then
+      if Pos(ch, AWordChars)>0 then
+        Result:= true;
 end;
 
 function IsCharSpace(ch: atChar): boolean;

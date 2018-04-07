@@ -1,4 +1,7 @@
 
+2018.04.07
++ add: IsCharWord() func uses UnicodeData now, works for all international letters
+
 2018.04.04
 + add: Gaps.OnDelete event
 + add: TATSynGapItem.Control field
