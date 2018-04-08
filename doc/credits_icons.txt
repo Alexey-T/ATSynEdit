@@ -1,0 +1,14 @@
+Lazarus component palette icons:
+
+Icon Pack: Chalkwork HTML
+Designer: Dave Shea 
+http://www.mezzoblue.com/icons/chalkwork/html/
+License: http://www.mezzoblue.com/icons/license/
+
+----
+Resource icons "hourglass", "floppy":
+
+Snip Master
+https://www.iconfinder.com/snipicons
+License: Creative Commons (Attribution-Noncommercial 3.0 Unported) 
+http://creativecommons.org/licenses/by-nc/3.0/
