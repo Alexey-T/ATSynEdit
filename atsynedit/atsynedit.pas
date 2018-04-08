@@ -5809,7 +5809,6 @@ begin
 end;
 
 
-
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
 {$I atsynedit_sel.inc}
@@ -5820,7 +5819,6 @@ end;
 {$R res/nicescroll2.res}
 {$R res/foldbar.res}
 {$R res/editor_hourglass.res}
-{$R res/editor_save.res}
 
 {$I atsynedit_cmd_handler.inc}
 {$I atsynedit_cmd_keys.inc}
