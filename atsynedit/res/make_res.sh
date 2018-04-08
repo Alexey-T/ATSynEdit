@@ -4,4 +4,4 @@
 ~/lazarus/tools/lazres editor_hourglass.res editor_hourglass.png=atsyn_wait
 ~/lazarus/tools/lazres editor_save.res editor_save.png=atsyn_save
 
-~/lazarus/tools/lazres foldbar.res fold_plus.png=atsyn_fold_p fold_minus.png=atsyn_fold_m 
+~/lazarus/tools/lazres foldbar.res fold_plus.png=atsyn_fold_p fold_plus_150.png=atsyn_fold_p_150 fold_plus_200.png=atsyn_fold_p_200 fold_minus.png=atsyn_fold_m fold_minus_150.png=atsyn_fold_m_150 fold_minus_200.png=atsyn_fold_m_200 
