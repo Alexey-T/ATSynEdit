@@ -1,7 +1,10 @@
 var
+  cResourceScaleSuffix: string = '';
   cBitmapWait: TPortableNetworkGraphic = nil;
   cBitmapSaving: TPortableNetworkGraphic = nil;
   cBitmapNiceScroll: TPortableNetworkGraphic = nil;
+  cBitmapFoldPlus: TPortableNetworkGraphic = nil;
+  cBitmapFoldMinus: TPortableNetworkGraphic = nil;
 
 const
   crNiceScrollNone  = TCursor(-40);
@@ -50,6 +53,8 @@ end;
 
 procedure InitResources;
 begin
+  cResourceScaleSuffix:= _GetResourceScaleSuffix;
+
   Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
   Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
   Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
@@ -57,13 +62,19 @@ begin
   Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
 
   cBitmapNiceScroll:= TPortableNetworkGraphic.Create;
-  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK'+_GetResourceScaleSuffix);
+  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK'+cResourceScaleSuffix);
 
   cBitmapWait:= TPortableNetworkGraphic.Create;
   cBitmapWait.LoadFromResourceName(HInstance, 'ATSYN_WAIT');
 
   cBitmapSaving:= TPortableNetworkGraphic.Create;
   cBitmapSaving.LoadFromResourceName(HInstance, 'ATSYN_SAVE');
+
+  cBitmapFoldPlus:= TPortableNetworkGraphic.Create;
+  cBitmapFoldPlus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_P'+cResourceScaleSuffix);
+
+  cBitmapFoldMinus:= TPortableNetworkGraphic.Create;
+  cBitmapFoldMinus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_M'+cResourceScaleSuffix);
 end;
 
 procedure FreeResources;

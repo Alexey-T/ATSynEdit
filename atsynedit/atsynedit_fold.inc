@@ -344,10 +344,10 @@ begin
   if FFoldImageList=nil then
   begin
     FFoldImageList:= TImageList.Create(Self);
-    FFoldImageList.Width:= 12;
-    FFoldImageList.Height:= 12;
-    FFoldImageList.AddResourceName(HInstance, 'ATSYN_FOLD_P');
-    FFoldImageList.AddResourceName(HInstance, 'ATSYN_FOLD_M');
+    FFoldImageList.Width:= cBitmapFoldPlus.Width;
+    FFoldImageList.Height:= cBitmapFoldPlus.Height;
+    FFoldImageList.Add(cBitmapFoldPlus, nil);
+    FFoldImageList.Add(cBitmapFoldMinus, nil);
   end;
 end;
 

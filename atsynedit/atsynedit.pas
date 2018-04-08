@@ -2669,6 +2669,9 @@ var
 begin
   inherited;
 
+  if not Assigned(cBitmapNiceScroll) then
+    InitResources;
+
   Caption:= '';
   ControlStyle:= ControlStyle+[csOpaque, csDoubleClicks, csTripleClicks];
   DoubleBuffered:= IsDoubleBufferedNeeded;
@@ -5829,7 +5832,6 @@ end;
 
 initialization
   InitClipboardFormat;
-  InitResources;
 
 finalization
   FreeResources;
