@@ -4,7 +4,6 @@ var
   cBitmapNiceScroll: TPortableNetworkGraphic = nil;
 
 const
-  cBitmapNiceScrollRadius = 16;
   crNiceScrollNone  = TCursor(-40);
   crNiceScrollUp    = TCursor(-41);
   crNiceScrollDown  = TCursor(-42);
@@ -38,6 +37,17 @@ begin
   cATClipboardFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
 end;
 
+function _GetResourceScaleSuffix: string;
+begin
+  if Screen.PixelsPerInch>=96*2 then
+    Result:= '_200'
+  else
+  if Screen.PixelsPerInch>=Round(96*1.5) then
+    Result:= '_150'
+  else
+    Result:= '';
+end;
+
 procedure InitResources;
 begin
   Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
@@ -47,7 +57,7 @@ begin
   Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
 
   cBitmapNiceScroll:= TPortableNetworkGraphic.Create;
-  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK');
+  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK'+_GetResourceScaleSuffix);
 
   cBitmapWait:= TPortableNetworkGraphic.Create;
   cBitmapWait.LoadFromResourceName(HInstance, 'ATSYN_WAIT');

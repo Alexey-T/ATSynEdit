@@ -4408,8 +4408,8 @@ begin
   Dx:= Pnt.X-FMouseNiceScrollPos.X;
   Dy:= Pnt.Y-FMouseNiceScrollPos.Y;
 
-  if (Abs(Dx)<=cBitmapNiceScrollRadius) and
-    (Abs(Dy)<=cBitmapNiceScrollRadius) then
+  if (Abs(Dx)<=cBitmapNiceScroll.Height div 2) and
+    (Abs(Dy)<=cBitmapNiceScroll.Height div 2) then
     begin
       Cursor:= crNiceScrollNone;
       Exit;
@@ -4428,8 +4428,8 @@ begin
   end;
 
   //delta in chars
-  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScrollRadius) div FCharSize.X + 1)*cSpeedScrollNiceHorz;
-  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScrollRadius) div FCharSize.Y + 1)*cSpeedScrollNiceVert;
+  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) div FCharSize.X + 1)*cSpeedScrollNiceHorz;
+  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) div FCharSize.Y + 1)*cSpeedScrollNiceVert;
 
   if Dir in [cDirLeft, cDirRight] then
     DoScrollByDelta(Dx, 0)
@@ -4604,8 +4604,8 @@ procedure TATSynEdit.DoPaintNiceScroll(C: TCanvas);
 begin
   if MouseNiceScroll then
     C.Draw(
-      FMouseNiceScrollPos.X - cBitmapNiceScrollRadius,
-      FMouseNiceScrollPos.Y - cBitmapNiceScrollRadius,
+      FMouseNiceScrollPos.X - cBitmapNiceScroll.Height div 2,
+      FMouseNiceScrollPos.Y - cBitmapNiceScroll.Height div 2,
       cBitmapNiceScroll);
 end;
 
