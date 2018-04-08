@@ -129,6 +129,8 @@ begin
 end;
 
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
+var
+  NType: byte;
 begin
   case ch of
     '0'..'9',
@@ -144,7 +146,10 @@ begin
   if Ord(ch)>=LOW_SURROGATE_BEGIN then
     exit(false)
   else
-    Result:= GetProps(word(ch))^.Category <= UGC_OtherLetter;
+  begin
+    NType:= GetProps(Ord(ch))^.Category;
+    Result:= (NType<=UGC_OtherNumber);
+  end;
 
   if not Result then
     if AWordChars<>'' then
