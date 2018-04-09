@@ -10,6 +10,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
+  UnicodeData,
   LCLType, LCLIntf;
 
 type
@@ -56,6 +57,8 @@ end;
 
 function IsCharHex(ch: widechar): boolean;
 begin
+  if Ord(ch)>=LOW_SURROGATE_BEGIN then exit(true);
+
   Result:= Pos(ch, OptHexChars)>0;
 end;
 
