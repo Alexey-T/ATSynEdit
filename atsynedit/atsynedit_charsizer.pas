@@ -77,15 +77,8 @@ cannot render them ok anyway as accents:
 }
 function IsCharAccent(ch: widechar): boolean;
 begin
-  case Ord(ch) of
-    $0300..$036F,
-    $1AB0..$1AFF,
-    $1DC0..$1DFF,
-    $20D0..$20FF,
-    {$ifdef unix}
-    $0EB1, $0EB4..$0EBC, $0EC8..$0ECD, //Lao accent chars
-    {$endif}
-    $FE20..$FE2F:
+  case GetProps(Ord(ch))^.Category of
+    UGC_NonSpacingMark .. UGC_EnclosingMark:
       Result:= true;
     else
       Result:= false;
