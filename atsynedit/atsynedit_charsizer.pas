@@ -33,9 +33,6 @@ var
   GlobalCharSizer: TATCharSizer;
 
 var
-  OptCharSizeProportional: boolean = true;
-  OptCharSizeWideAllowed: boolean = true;
-  OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
   OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
   OptCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
   OptUnprintedReplaceSpec: boolean = false;
@@ -101,19 +98,6 @@ begin
   end;
 end;
 
-function IsCharFullWidth(ch: widechar): boolean;
-begin
-  if ch=#$2026 then exit(false); //unicode dots
-
-  case Ord(ch) of
-    $180..$24F, //extended ANSI
-    $1100..$FFFF: //simple big range for cjk + emojis + others
-      Result:= true;
-    else
-      Result:= false;
-  end;
-end;
-
 
 { TATCharSizer }
 
@@ -146,9 +130,8 @@ function TATCharSizer.GetCharWidth(ch: widechar): integer;
 begin
   Result:= 100;
 
-  if OptCharSizeProportional then
-    if Ord(ch)>=128 then
-      exit(GetCharWidth_FromCache(ch));
+  if Ord(ch)>=128 then
+    exit(GetCharWidth_FromCache(ch));
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
@@ -160,9 +143,6 @@ begin
     else
       exit(OptCharScaleHex_Big);
   end;
-
-  if OptCharSizeWideAllowed and IsCharFullWidth(ch) then
-    exit(OptCharScaleFullWidth);
 end;
 
 

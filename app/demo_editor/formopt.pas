@@ -143,7 +143,6 @@ type
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
-    groupCharSize: TRadioGroup;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -218,8 +217,6 @@ begin
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
-
-    groupCharSize.ItemIndex:= Ord(OptCharSizeProportional);
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -432,8 +429,6 @@ begin
       ed.OptUndoLimit:= edUndo.Value;
       ed.OptUndoGrouped:= chkUndoGr.Checked;
       ed.OptUndoAfterSave:= chkUndoSv.Checked;
-
-      OptCharSizeProportional:= groupCharSize.ItemIndex>0;
 
       //apply
       ed.Gutter.Update;

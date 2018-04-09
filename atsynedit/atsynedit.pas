@@ -916,7 +916,6 @@ type
     procedure SetCaretsArray(const Ar: TATPointArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
 
-    procedure OnCanvasFontChanged(Sender:TObject);
   public
     MenuitemTextCut: TMenuItem;
     MenuitemTextCopy: TMenuItem;
@@ -4704,38 +4703,6 @@ begin
     FOnBeforeCalcHilite(Self);
 end;
 
-
-const
-  _CharCodeM: WideChar = #$4d; //half-width M
-  _CharCodeFullM: WideChar = #$ff2d; //full-width M
-
-{$ifdef windows}
-procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
-var
-  sizeSmall, sizeFull: single;
-  a: ABCFLOAT;
-begin
-  if not Assigned(Parent) then exit;
-  //half width
-  if GetCharABCWidthsFloatW(Canvas.Handle, Ord(_CharCodeM), Ord(_CharCodeM), a) then
-    sizeSmall:= Max(1.0, a.abcfA+a.abcfB+a.abcfC)
-  else
-    sizeSmall:= 1.0;
-  //full width
-  if GetCharABCWidthsFloatW(Canvas.Handle, Ord(_CharCodeFullM), Ord(_CharCodeFullM), a) then
-    sizeFull:= a.abcfA+a.abcfB+a.abcfC
-  else
-    sizeFull:= 1.0;
-  ATSynEdit_CharSizer.OptCharScaleFullWidth:= Trunc(sizeFull * 100 / sizeSmall);
-end;
-{$else}
-procedure TATSynEdit.OnCanvasFontChanged(Sender: TObject);
-begin
-  ATSynEdit_CharSizer.OptCharScaleFullWidth:=
-    Canvas.TextWidth(Utf8Encode(_CharCodeFullM)) * 100 div
-    Canvas.TextWidth(Utf8Encode(_CharCodeM));
-end;
-{$endif}
 
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
