@@ -55,9 +55,25 @@ begin
   Result:= (ch<>#9) and (Ord(ch)<$20);
 end;
 
+{
+http://unicode.org/reports/tr9/#Directional_Formatting_Characters
+Implicit Directional Formatting Characters 	LRM, RLM, ALM
+Explicit Directional Embedding and Override Formatting Characters 	LRE, RLE, LRO, RLO, PDF
+Explicit Directional Isolate Formatting Characters 	LRI, RLI, FSI, PDI
+}
 function IsCharHex(ch: widechar): boolean;
 begin
+  if ch=#9 then exit(false);
+  if Ord(ch)<$20 then exit(true);
+  if Ord(ch)<128 then exit(false);
+
   if Ord(ch)>=LOW_SURROGATE_BEGIN then exit(true);
+
+  if (ch>=#$202A) and (ch<=#$202E) then exit(true);
+  if (ch>=#$2066) and (ch<=#$2069) then exit(true);
+  if ch=#$200E then exit(true);
+  if ch=#$200F then exit(true);
+  if ch=#$061C then exit(true);
 
   Result:= Pos(ch, OptHexChars)>0;
 end;
@@ -96,31 +112,6 @@ begin
     else
       Result:= false;
   end;
-end;
-
-{
-http://unicode.org/reports/tr9/#Directional_Formatting_Characters
-Implicit Directional Formatting Characters 	LRM, RLM, ALM
-Explicit Directional Embedding and Override Formatting Characters 	LRE, RLE, LRO, RLO, PDF
-Explicit Directional Isolate Formatting Characters 	LRI, RLI, FSI, PDI
-}
-const
-  cDirectionalCodes: UnicodeString =
-    #$202A {LRE} + #$202B {RLE} + #$202D {LRO} + #$202E {RLO} + #$202C {PDF} +
-    #$2066 {LRI} + #$2067 {RLI} + #$2068 {FSI} + #$2069 {PDI} +
-    #$200E {LRM} + #$200F {RLM} + #$061C {ALM};
-
-procedure _InitCharsHex;
-var
-  i: integer;
-begin
-  OptHexCharsDefault:= '';
-
-  for i:= 0 to 31 do
-    if (i<>13) and (i<>10) and (i<>9) then
-      OptHexCharsDefault:= OptHexCharsDefault+Chr(i);
-
-  OptHexCharsDefault:= OptHexCharsDefault + cDirectionalCodes;
 end;
 
 
@@ -177,7 +168,6 @@ end;
 
 initialization
 
-  _InitCharsHex;
   GlobalCharSizer:= TATCharSizer.Create;
 
 finalization
