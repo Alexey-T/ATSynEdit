@@ -36,6 +36,14 @@ var
   OptCharSizeProportional: boolean = true;
   OptCharSizeWideAllowed: boolean = true;
   OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
+
+  OptCharFillWidth_Range1_begin: word = $180;
+  OptCharFillWidth_Range1_end: word = $24F;
+  OptCharFillWidth_Range2_begin: word = $1100;
+  OptCharFillWidth_Range2_end: word = $FFFF;
+  OptCharFillWidth_Range3_begin: word = 0;
+  OptCharFillWidth_Range3_end: word = 0;
+
   OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
   OptCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
   OptUnprintedReplaceSpec: boolean = false;
@@ -57,15 +65,17 @@ end;
 
 function IsCharFullWidth(ch: widechar): boolean;
 begin
-  if ch=#$2026 then exit(false); //unicode dots
+  Result:= false;
+  if ch=#$2026 then exit; //unicode dots
 
-  case Ord(ch) of
-    $180..$24F, //extended ANSI
-    $1100..$FFFF: //simple big range for cjk + emojis + others
-      Result:= true;
-    else
-      Result:= false;
-  end;
+  if (Ord(ch)>=OptCharFillWidth_Range1_begin) and
+     (Ord(ch)<=OptCharFillWidth_Range1_end) then exit(true);
+
+  if (Ord(ch)>=OptCharFillWidth_Range2_begin) and
+     (Ord(ch)<=OptCharFillWidth_Range2_end) then exit(true);
+
+  if (Ord(ch)>=OptCharFillWidth_Range3_begin) and
+     (Ord(ch)<=OptCharFillWidth_Range3_end) then exit(true);
 end;
 
 {
