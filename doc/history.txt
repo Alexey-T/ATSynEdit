@@ -1,4 +1,16 @@
 
+2018.04.13
++ add: global options for Unicode full-width chars, unit ATSynEdit_CharSizer:
+    OptCharSizeProportional
+    OptCharSizeWideAllowed
+    OptCharScaleFullWidth
+    OptCharFillWidth_Range1_begin
+    OptCharFillWidth_Range1_end
+    OptCharFillWidth_Range2_begin
+    OptCharFillWidth_Range2_end
+    OptCharFillWidth_Range3_begin
+    OptCharFillWidth_Range3_end
+
 2018.04.08
 + add: used Hi-dpi resource icons (for foldbar context menu, for mouse middle click), by FTurtle
 
