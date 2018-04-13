@@ -64,7 +64,8 @@ begin
   if Ord(ch)<$20 then exit(true);
   if Ord(ch)<128 then exit(false);
 
-  if Ord(ch)>=LOW_SURROGATE_BEGIN then exit(true);
+  //codes for surrogate utf16 chars
+  if (Ord(ch)>=$D800) and (Ord(ch)<=$DFFF) then exit(true);
 
   if (ch>=#$202A) and (ch<=#$202E) then exit(true);
   if (ch>=#$2066) and (ch<=#$2069) then exit(true);
