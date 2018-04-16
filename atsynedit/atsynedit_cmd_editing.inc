@@ -10,7 +10,7 @@ begin
   if FOptKeyTabIndents then
   begin
     if not IsSelRectEmpty then
-      bBlockSel:= true
+      bBlockSel:= FOptKeyTabIndentsVerticalBlock
     else
     if Carets.Count<>1 then
       bBlockSel:= false

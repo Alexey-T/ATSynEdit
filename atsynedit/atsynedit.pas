@@ -595,6 +595,7 @@ type
     FOptKeyHomeToNonSpace: boolean;
     FOptKeyEndToNonSpace: boolean;
     FOptKeyTabIndents: boolean;
+    FOptKeyTabIndentsVerticalBlock: boolean;
     FOptShowIndentLines: boolean;
     FOptShowGutterCaretBG: boolean;
     FOptAllowScrollbarVert: boolean;
@@ -1297,6 +1298,7 @@ type
     property OptKeyHomeToNonSpace: boolean read FOptKeyHomeToNonSpace write FOptKeyHomeToNonSpace default true;
     property OptKeyEndToNonSpace: boolean read FOptKeyEndToNonSpace write FOptKeyEndToNonSpace default true;
     property OptKeyTabIndents: boolean read FOptKeyTabIndents write FOptKeyTabIndents default true;
+    property OptKeyTabIndentsVerticalBlock: boolean read FOptKeyTabIndentsVerticalBlock write FOptKeyTabIndentsVerticalBlock default false;
     property OptIndentSize: integer read FOptIndentSize write FOptIndentSize default 2;
              // N>0: use N spaces
              // N<0: use N tabs
@@ -2946,6 +2948,7 @@ begin
   FOptKeyHomeToNonSpace:= true;
   FOptKeyEndToNonSpace:= true;
   FOptKeyTabIndents:= true;
+  FOptKeyTabIndentsVerticalBlock:= false;
   FOptShowIndentLines:= true;
   FOptShowGutterCaretBG:= true;
   FOptIndentSize:= 2;
