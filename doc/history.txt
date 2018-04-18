@@ -1,4 +1,9 @@
 
+2018.04.18
++ add: event OnClickLink
++ add: OptMouseClickOpensURL
++ add: OptKeyTabIndentsVerticalBlock (default false, was true)
+
 2018.04.13
 + add: global options for Unicode full-width chars, unit ATSynEdit_CharSizer:
     OptCharSizeProportional

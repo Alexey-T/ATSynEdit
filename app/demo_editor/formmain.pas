@@ -195,6 +195,7 @@ type
     FGapInitSize: integer;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
+    procedure EditClickLink(Sender: TObject; const ALink: string);
     procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
     procedure EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
     procedure EditorGapChange(Sender: TObject);
@@ -303,6 +304,7 @@ begin
   ed.OnClickGutter:= @EditClickGutter;
   ed.OnClickMicromap:= @EditClickMicromap;
   ed.OnClickGap:= @EditClickGap;
+  ed.OnClickLink:= @EditClickLink;
   ed.OnDrawBookmarkIcon:= @EditDrawBm;
   ed.OnDrawLine:= @EditDrawLine;
   ed.OnDrawMicromap:= @EditDrawMicromap;
@@ -1024,6 +1026,11 @@ procedure TfmMain.DoLog(const S: string);
 begin
   ListboxLog.Items.Add(S);
   ListboxLog.ItemIndex:= ListboxLog.Items.Count-1;
+end;
+
+procedure TfmMain.EditClickLink(Sender: TObject; const ALink: string);
+begin
+  OpenURL(ALink);
 end;
 
 procedure TfmMain.EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);

@@ -19,6 +19,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkClickLink: TCheckBox;
     chkCrBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
     chkMsColumnSel: TCheckBox;
@@ -217,6 +218,7 @@ begin
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
+    chkClickLink.Checked:= ed.OptMouseClickOpensURL;
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -336,6 +338,7 @@ begin
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
       ed.OptSavingTrimSpaces:= chkSaveTrim.Checked;
       ed.OptShowScrollHint:= chkScrollHint.Checked;
+      ed.OptMouseClickOpensURL:= chkClickLink.Checked;
 
       //unprint
       ed.OptUnprintedVisible:= chkUnprintEn.Checked;

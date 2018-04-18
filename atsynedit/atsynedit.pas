@@ -310,6 +310,7 @@ type
   TATSynEditCommandAfterEvent = procedure(Sender: TObject; ACommand: integer; const AText: string) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
+  TATSynEditClickLinkEvent = procedure(Sender: TObject; const ALink: string) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
   TATSynEditDrawGapEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATSynGapItem) of object;
@@ -414,6 +415,7 @@ type
     FOnClickMoveCaret: TATSynEditClickMoveCaretEvent;
     FOnClickGap: TATSynEditClickGapEvent;
     FOnClickEndSelect: TATSynEditClickMoveCaretEvent;
+    FOnClickLink: TATSynEditClickLinkEvent;
     FOnIdle: TNotifyEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChange: TNotifyEvent;
@@ -510,6 +512,7 @@ type
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseColumnSelectionWithoutKey: boolean;
+    FOptMouseClickOpensURL: boolean;
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
@@ -1130,6 +1133,7 @@ type
     property OnClickMoveCaret: TATSynEditClickMoveCaretEvent read FOnClickMoveCaret write FOnClickMoveCaret;
     property OnClickEndSelect: TATSynEditClickMoveCaretEvent read FOnClickEndSelect write FOnClickEndSelect;
     property OnClickGap: TATSynEditClickGapEvent read FOnClickGap write FOnClickGap;
+    property OnClickLink: TATSynEditClickLinkEvent read FOnClickLink write FOnClickLink;
     property OnIdle: TNotifyEvent read FOnIdle write FOnIdle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
@@ -1287,6 +1291,7 @@ type
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssModifier;
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
+    property OptMouseClickOpensURL: boolean read FOptMouseClickOpensURL write FOptMouseClickOpensURL default false;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
@@ -3828,6 +3833,8 @@ end;
 procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   bCopySelection: boolean;
+  Str: atString;
+  Caret: TATCaretItem;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -3846,6 +3853,16 @@ begin
       Update;
     end;
   end;
+
+  if not FMouseDownDouble and FOptMouseClickOpensURL then
+    if Carets.Count=1 then
+    begin
+      Caret:= Carets[0];
+      Str:= DoGetLinkAtPos(Caret.PosX, Caret.PosY);
+      if Str<>'' then
+        if Assigned(FOnClickLink) then
+          FOnClickLink(Self, Str);
+    end;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownGutterLineNumber:= -1;
