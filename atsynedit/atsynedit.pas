@@ -3854,15 +3854,16 @@ begin
     end;
   end;
 
-  if not FMouseDownDouble and FOptMouseClickOpensURL then
-    if Carets.Count=1 then
-    begin
-      Caret:= Carets[0];
-      Str:= DoGetLinkAtPos(Caret.PosX, Caret.PosY);
-      if Str<>'' then
-        if Assigned(FOnClickLink) then
-          FOnClickLink(Self, Str);
-    end;
+  if FOptMouseClickOpensURL then
+    if not FMouseDownDouble and not FMouseDragDropping and (Button=mbLeft) then
+      if Carets.Count=1 then
+      begin
+        Caret:= Carets[0];
+        Str:= DoGetLinkAtPos(Caret.PosX, Caret.PosY);
+        if Str<>'' then
+          if Assigned(FOnClickLink) then
+            FOnClickLink(Self, Str);
+      end;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownGutterLineNumber:= -1;
