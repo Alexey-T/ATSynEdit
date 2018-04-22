@@ -150,6 +150,8 @@ begin
   M.Add(cCommand_ClipboardAltPaste, 'clipboard primary (gtk): paste', [], []);
   M.Add(cCommand_ClipboardAltAltPaste, 'clipboard secondary (gtk): paste', [], []);
 
+  M.Add(cCommand_ScrollToBegin, 'scroll to begin', [], []);
+  M.Add(cCommand_ScrollToEnd, 'scroll to end', [], []);
   M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
   M.Add(cCommand_ScrollColumnLeft, 'scroll column left', [], []);

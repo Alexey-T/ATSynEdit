@@ -878,6 +878,7 @@ type
     function DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean=false): TATCommandResults;
     function DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
     function DoCommand_GotoScreenSide(ASide: TATCaretScreenSide): TATCommandResults;
+    function DoCommand_ScrollToBeginOrEnd(AToBegin: boolean): TATCommandResults;
     function DoCommand_ScrollByDelta(ALines, AColumns: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;
@@ -1037,6 +1038,7 @@ type
     procedure DoSelect_ColumnBlock_FromSelRect;
     procedure DoRangeFold(ARange: TATSynRange);
     procedure DoRangeUnfold(ARange: TATSynRange);
+    procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
@@ -4724,6 +4726,15 @@ begin
     FOnBeforeCalcHilite(Self);
 end;
 
+
+procedure TATSynEdit.DoScrollToBeginOrEnd(AToBegin: boolean);
+begin
+  FScrollHorz.NPos:= 0;
+  if AToBegin then
+    FScrollVert.NPos:= 0
+  else
+    FScrollVert.NPos:= FScrollVert.NPosLast;
+end;
 
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin

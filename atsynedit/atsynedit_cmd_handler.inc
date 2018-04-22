@@ -374,6 +374,8 @@ begin
     cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
     cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);
 
+    cCommand_ScrollToBegin:            Res:= DoCommand_ScrollToBeginOrEnd(true);
+    cCommand_ScrollToEnd:              Res:= DoCommand_ScrollToBeginOrEnd(false);
     cCommand_ScrollLineUp:             Res:= DoCommand_ScrollByDelta(-1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollLineDown:           Res:= DoCommand_ScrollByDelta(1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollColumnLeft:         Res:= DoCommand_ScrollByDelta(0, -1, FOptScrollLineCommandsKeepCaretOnScreen);

@@ -121,6 +121,8 @@ const
   cCommand_ScrollToCaretRight = 255;
   cCommand_ScrollColumnLeft = 256;
   cCommand_ScrollColumnRight = 257;
+  cCommand_ScrollToBegin = 258;
+  cCommand_ScrollToEnd = 259;
 
   cCommand_SelectAll = 260 or cCmdFlag_ResetSel or cCmdFlag_Caret;
   cCommand_SelectNone = 261 or cCmdFlag_ResetSel or cCmdFlag_Caret;

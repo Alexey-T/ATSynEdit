@@ -275,6 +275,13 @@ begin
 end;
 
 
+function TATSynEdit.DoCommand_ScrollToBeginOrEnd(AToBegin: boolean): TATCommandResults;
+begin
+  DoScrollToBeginOrEnd(AToBegin);
+  Result:= [cResultScroll];
+end;
+
+
 function TATSynEdit.DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean
   ): TATCommandResults;
 var
