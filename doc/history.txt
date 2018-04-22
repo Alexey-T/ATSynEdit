@@ -2,6 +2,8 @@
 2018.04.22
 + add: cCommand_ScrollToBegin
 + add: cCommand_ScrollToEnd
++ add: cCommand_ScrollPageUp
++ add: cCommand_ScrollPageDown
 
 2018.04.18
 + add: event OnClickLink

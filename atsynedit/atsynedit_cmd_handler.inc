@@ -378,6 +378,8 @@ begin
     cCommand_ScrollToEnd:              Res:= DoCommand_ScrollToBeginOrEnd(false);
     cCommand_ScrollLineUp:             Res:= DoCommand_ScrollByDelta(-1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollLineDown:           Res:= DoCommand_ScrollByDelta(1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollPageUp:             Res:= DoCommand_ScrollByDelta(-GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollPageDown:           Res:= DoCommand_ScrollByDelta(GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollColumnLeft:         Res:= DoCommand_ScrollByDelta(0, -1, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollColumnRight:        Res:= DoCommand_ScrollByDelta(0, 1, FOptScrollLineCommandsKeepCaretOnScreen);
     cCommand_ScrollToCaretTop:         Res:= [cResultCaretTop];

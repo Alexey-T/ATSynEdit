@@ -113,6 +113,8 @@ const
   cCommand_TextIndent = 240;
   cCommand_TextUnindent = 241;
 
+  cCommand_ScrollPageUp = 248;
+  cCommand_ScrollPageDown = 249;
   cCommand_ScrollLineUp = 250;
   cCommand_ScrollLineDown = 251;
   cCommand_ScrollToCaretTop = 252;
