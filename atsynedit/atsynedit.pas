@@ -290,7 +290,7 @@ const
   cHintBookmarkDx = 6;
   cHintBookmarkDy = 16;
   cUrlMarkerTag = -100;
-  cUrlRegexInitial = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s\(\)]+';
+  cUrlRegexInitial = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+';
   cStrMenuitemFoldAll: string = 'Fold all';
   cStrMenuitemUnfoldAll: string = 'Unfold all';
   cStrMenuitemFoldLevel: string = 'Fold level';
