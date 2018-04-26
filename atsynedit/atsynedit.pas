@@ -1574,7 +1574,7 @@ begin
 
       for i:= 0 to ListNums.Count-1 do
       begin
-        NLine:= NativeInt{%H-}(ListNums[i]);
+        NLine:= PtrInt{%H-}(ListNums[i]);
         DoCalcWrapInfos(NLine, NIndentMaximal, Items, bConsiderFolding);
         if Items.Count=0 then Continue;
 
@@ -2585,7 +2585,7 @@ begin
   if FMarginRight>1 then
     DoPaintMarginLineTo(C, PosX(FMarginRight), FColors.MarginRight);
   for i:= 0 to FMarginList.Count-1 do
-    DoPaintMarginLineTo(C, PosX(NativeInt{%H-}(FMarginList[i])), FColors.MarginUser);
+    DoPaintMarginLineTo(C, PosX(PtrInt{%H-}(FMarginList[i])), FColors.MarginUser);
 end;
 
 
