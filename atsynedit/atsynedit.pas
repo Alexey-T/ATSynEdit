@@ -2648,7 +2648,8 @@ var
 begin
   Result:= '';
   for i:= 0 to FMarginList.Count-1 do
-    Result:= Result+IntToStr(NativeInt{%H-}(FMarginList[i]))+' ';
+    Result:= Result + IntToStr(PtrInt(FMarginList[i])) + ' ';
+  Result:= Trim(Result);
 end;
 
 function TATSynEdit.GetReadOnly: boolean;
