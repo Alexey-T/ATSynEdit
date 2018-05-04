@@ -720,6 +720,7 @@ type
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
       var AScrollHorz, AScrollVert: TATSynScrollInfo; ALineFrom: integer);
+    procedure DoPaintTextFragmentTo(C: TCanvas; const ARect: TRect; ALineFrom, ALineTo: integer);
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
@@ -5695,17 +5696,15 @@ begin
   end;
 end;
 
+
 procedure TATSynEdit.MinimapTooltipPaint(Sender: TObject);
 var
   C: TCanvas;
   RectAll: TRect;
   Pnt: TPoint;
-  NLineCenter, NLineTop, NLineBottom, NLine,
-  NWrapIndex, NOutputStrWidth: integer;
-  NIndentLeft, NIndentTop: integer;
-  NColorAfter: TColor;
+  NWrapIndex,
+  NLineCenter, NLineTop, NLineBottom: integer;
   WrapItem: TATSynWrapItem;
-  TextOutProps: TATCanvasTextOutProps;
 begin
   C:= FMinimapTooltip.Canvas;
   RectAll:= Rect(0, 0, FMinimapTooltip.Width, FMinimapTooltip.Height);
@@ -5720,6 +5719,20 @@ begin
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
   NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
 
+  DoPaintTextFragmentTo(C, RectAll, NLineTop, NLineBottom);
+end;
+
+procedure TATSynEdit.DoPaintTextFragmentTo(C: TCanvas;
+  const ARect: TRect;
+  ALineFrom, ALineTo: integer);
+var
+  NOutputStrWidth: integer;
+  NLine, NWrapIndex,
+  NIndentLeft, NIndentTop: integer;
+  NColorAfter: TColor;
+  WrapItem: TATSynWrapItem;
+  TextOutProps: TATCanvasTextOutProps;
+begin
   NIndentLeft:= 5;
   NIndentTop:= 1;
 
@@ -5741,7 +5754,7 @@ begin
   TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
-  for NLine:= NLineTop to NLineBottom do
+  for NLine:= ALineFrom to ALineTo do
   begin
     NColorAfter:= clNone;
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, NLine));
@@ -5756,7 +5769,7 @@ begin
 
     CanvasTextOut(C,
       NIndentLeft,
-      NIndentTop+FCharSize.Y*(NLine-NLineTop),
+      NIndentTop+FCharSize.Y*(NLine-ALineFrom),
       Strings.Lines[WrapItem.NLineIndex],
       @FLineParts,
       NOutputStrWidth,
@@ -5765,8 +5778,9 @@ begin
    end;
 
   C.Brush.Color:= Colors.MinimapTooltipBorder;
-  C.FrameRect(RectAll);
+  C.FrameRect(ARect);
 end;
+
 
 procedure TATSynEdit.UpdateMinimapTooltip;
 var
