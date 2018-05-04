@@ -248,7 +248,7 @@ const
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
   cInitFoldStyle = cFoldHereWithTruncatedText;
-  cInitFoldTooltipVisible = false;
+  cInitFoldTooltipVisible = true;
   cInitMaxLineLenToCalcURL = 300;
 
   cGutterBands = 6;
@@ -648,7 +648,7 @@ type
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
       AForThisRange: TATSynRange);
-    function DoGetFoldedMarkAtCursor: TATFoldedMark;
+    function DoGetFoldedMarkAt(Pnt: TPoint): TATFoldedMark;
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHotspotsExit;
@@ -4089,7 +4089,7 @@ begin
   //detect cursor on folded marks
   if FFoldTooltipVisible then
   begin
-    FFoldedMarkCurrent:= DoGetFoldedMarkAtCursor;
+    FFoldedMarkCurrent:= DoGetFoldedMarkAt(Point(X, Y));
     UpdateFoldedMarkTooltip;
   end;
 
@@ -5887,15 +5887,12 @@ begin
 end;
 
 
-function TATSynEdit.DoGetFoldedMarkAtCursor: TATFoldedMark;
+function TATSynEdit.DoGetFoldedMarkAt(Pnt: TPoint): TATFoldedMark;
 var
-  Pnt: TPoint;
   Mark: TATFoldedMark;
   i: integer;
 begin
   Result:= nil;
-  Pnt:= ScreenToClient(Mouse.CursorPos);
-
   for i:= 0 to FFoldedMarkList.Count-1 do
   begin
     Mark:= TATFoldedMark(FFoldedMarkList[i]);
