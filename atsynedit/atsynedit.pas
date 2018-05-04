@@ -649,6 +649,7 @@ type
     procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
       AForThisRange: TATSynRange);
     function DoGetFoldedMarkAt(Pnt: TPoint): TATFoldedMark;
+    function DoGetFoldedMarkLinesCount(ALine: integer): integer;
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHotspotsExit;
@@ -2662,7 +2663,7 @@ begin
     FoldMark:= TATFoldedMark.Create;
     FoldMark.Coord:= RectMark;
     FoldMark.LineFrom:= APos.Y;
-    FoldMark.LineTo:= APos.Y+10; //not detected LineTo correctly, todo
+    FoldMark.LineTo:= APos.Y + DoGetFoldedMarkLinesCount(APos.Y) -1;
     FFoldedMarkList.Add(FoldMark);
   end;
 end;
@@ -5872,7 +5873,10 @@ begin
   end;
 
   FFoldedMarkTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FMinimapTooltipWidthPercents div 100;
-  FFoldedMarkTooltip.Height:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
+  FFoldedMarkTooltip.Height:= Min(
+    FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1,
+    FMinimapTooltipLinesCount
+    ) * FCharSize.Y + 2;
   FFoldedMarkTooltip.Left:= Min(
     FRectMain.Right - FFoldedMarkTooltip.Width - 1,
     FFoldedMarkCurrent.Coord.Left);
@@ -5925,6 +5929,19 @@ begin
     Mark:= TATFoldedMark(FFoldedMarkList[i]);
     if PtInRect(Mark.Coord, Pnt) then exit(Mark);
   end;
+end;
+
+
+function TATSynEdit.DoGetFoldedMarkLinesCount(ALine: integer): integer;
+const
+  cMaxLines = 50;
+var
+  i: integer;
+begin
+  Result:= 1;
+  for i:= ALine+1 to Min(ALine+cMaxLines, Strings.Count-1) do
+    if Strings.LinesHidden[i, FEditorIndex] then
+      Inc(Result);
 end;
 
 
