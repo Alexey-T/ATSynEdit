@@ -5878,6 +5878,12 @@ begin
     FFoldedMarkCurrent.Coord.Left);
   FFoldedMarkTooltip.Top:=
     FFoldedMarkCurrent.Coord.Top + FCharSize.Y;
+
+  //no space for on bottom? show on top
+  if FFoldedMarkTooltip.Top + FFoldedMarkTooltip.Height > FRectMain.Bottom then
+    if FFoldedMarkCurrent.Coord.Top - FFoldedMarkTooltip.Height >= FRectMain.Top then
+      FFoldedMarkTooltip.Top:= FFoldedMarkCurrent.Coord.Top - FFoldedMarkTooltip.Height;
+
   FFoldedMarkTooltip.Show;
   FFoldedMarkTooltip.Invalidate;
 end;
