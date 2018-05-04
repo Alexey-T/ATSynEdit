@@ -248,6 +248,7 @@ const
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
   cInitFoldStyle = cFoldHereWithTruncatedText;
+  cInitFoldTooltipVisible = false;
   cInitMaxLineLenToCalcURL = 300;
 
   cGutterBands = 6;
@@ -324,6 +325,12 @@ type
     AKeepCaret, ASelectThen: boolean) of object;
   TATSynEditHotspotEvent = procedure(Sender: TObject; AHotspotIndex: integer) of object;
 
+type
+  TATFoldedMark = class
+  public
+    Coord: TRect;
+    LineFrom, LineTo: integer;
+  end;
 
 type
   { TATSynEdit }
@@ -352,6 +359,7 @@ type
     FFoldImageList: TImageList;
     FFoldStyle: TATFoldStyle;
     FFoldEnabled: boolean;
+    FFoldTooltipVisible: boolean;
     FFontNeedsOffsets: TATFontNeedsOffsets;
     FCursorText: TCursor;
     FCursorColumnSel: TCursor;
@@ -493,9 +501,9 @@ type
     FMinimapTooltip: TPanel;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FFoldedMarkList: TList;
     FFoldedMarkTooltip: TPanel;
-    FFoldedMarkLine1: integer;
-    FFoldedMarkLine2: integer;
+    FFoldedMarkCurrent: TATFoldedMark;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
@@ -633,12 +641,14 @@ type
       AMarkerIndex: integer; APosX, APosY, AShiftX, AShiftY,
       AShiftBelowX: integer; APosAfter: TPoint);
     procedure DoCaretsFixIfInsideCollapsedPart;
+    procedure DoClearFoldedMarkList;
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     procedure DoFoldbarClick(ALine: integer);
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
       AForThisRange: TATSynRange);
+    function DoGetFoldedMarkAtCursor: TATFoldedMark;
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
     procedure DoHotspotsExit;
@@ -1183,6 +1193,7 @@ type
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
+    property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle default [fsItalic];
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
@@ -2072,6 +2083,8 @@ begin
   C.Brush.Color:= GetColorTextBG;
   C.FillRect(ARect);
 
+  DoClearFoldedMarkList;
+
   if AWithGutter then
   begin
     C.Brush.Color:= FColors.GutterBG;
@@ -2602,6 +2615,8 @@ procedure TATSynEdit.DoPaintFoldedMark(C: TCanvas;
 var
   NWidth: integer;
   Str: string;
+  RectMark: TRect;
+  FoldMark: TATFoldedMark;
 begin
   Str:= AMarkText;
 
@@ -2634,10 +2649,20 @@ begin
   NWidth:= C.TextWidth(Str) + 2*cFoldedMarkIndentInner;
 
   //paint frame
+  RectMark:= Rect(ACoord.X, ACoord.Y, ACoord.X+NWidth, ACoord.Y+FCharSize.Y);
   C.Pen.Color:= FColors.CollapseMarkBorder;
   C.Brush.Style:= bsClear;
-  C.Rectangle(ACoord.X, ACoord.Y, ACoord.X+NWidth, ACoord.Y+FCharSize.Y);
+  C.Rectangle(RectMark);
   C.Brush.Style:= bsSolid;
+
+  if FFoldTooltipVisible then
+  begin
+    FoldMark:= TATFoldedMark.Create;
+    FoldMark.Coord:= RectMark;
+    FoldMark.LineFrom:= APos.Y;
+    FoldMark.LineTo:= APos.Y+10; //not detected LineTo correctly, todo
+    FFoldedMarkList.Add(FoldMark);
+  end;
 end;
 
 function TATSynEdit.GetCharSpacingX: integer;
@@ -2795,6 +2820,7 @@ begin
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
   FFoldEnabled:= true;
+  FFoldTooltipVisible:= cInitFoldTooltipVisible;
 
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
@@ -2808,6 +2834,7 @@ begin
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
   FMarginList:= TList.Create;
+  FFoldedMarkList:= TList.Create;
   FOptIdleInterval:= cInitIdleInterval;
 
   FUnprintedVisible:= true;
@@ -3031,6 +3058,7 @@ begin
   FreeAndNil(FHintWnd);
   FreeAndNil(FMenuStd);
   DoPaintModeStatic;
+  DoClearFoldedMarkList;
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
@@ -3042,6 +3070,7 @@ begin
   FreeAndNil(FMarkers);
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
+  FreeAndNil(FFoldedMarkList);
   FreeAndNil(FMarginList);
   FreeAndNil(FWrapInfo);
   FreeAndNil(FStringsInt);
@@ -4055,6 +4084,13 @@ begin
       RectBookmk.Top:= FRectMain.Top;
       RectBookmk.Bottom:= FRectMain.Bottom;
     end;
+  end;
+
+  //detect cursor on folded marks
+  if FFoldTooltipVisible then
+  begin
+    FFoldedMarkCurrent:= DoGetFoldedMarkAtCursor;
+    UpdateFoldedMarkTooltip;
   end;
 
   //show/hide bookmark hint
@@ -5717,16 +5753,11 @@ var
   C: TCanvas;
   RectAll: TRect;
   Pnt: TPoint;
-  NWrapIndex,
-  NLineCenter, NLineTop, NLineBottom: integer;
-  WrapItem: TATSynWrapItem;
+  NWrapIndex, NLineCenter, NLineTop, NLineBottom: integer;
 begin
   C:= FMinimapTooltip.Canvas;
   RectAll:= Rect(0, 0, FMinimapTooltip.Width, FMinimapTooltip.Height);
   Pnt:= ScreenToClient(Mouse.CursorPos);
-
-  C.Brush.Color:= Colors.MinimapTooltipBG;
-  C.FillRect(RectAll);
 
   NWrapIndex:= GetMinimap_PosToWrapIndex(Pnt.Y);
   if NWrapIndex<0 then exit;
@@ -5747,6 +5778,9 @@ var
   WrapItem: TATSynWrapItem;
   TextOutProps: TATCanvasTextOutProps;
 begin
+  C.Brush.Color:= Colors.MinimapTooltipBG;
+  C.FillRect(ARect);
+
   FillChar(TextOutProps, SizeOf(TextOutProps), 0);
   TextOutProps.NeedOffsets:= FFontNeedsOffsets;
   TextOutProps.TabSize:= FTabSize;
@@ -5757,7 +5791,7 @@ begin
     //needed number of chars of all chars counted as 100%,
     //while NOutputSpacesSkipped is with cjk counted as 170%
   TextOutProps.DrawEvent:= nil;
-  TextOutProps.ControlWidth:= FMinimapTooltip.Width;
+  TextOutProps.ControlWidth:= ARect.Right-ARect.Left;
   TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
   TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
@@ -5816,21 +5850,57 @@ end;
 
 procedure TATSynEdit.UpdateFoldedMarkTooltip;
 begin
+  if (not FFoldTooltipVisible) or (FFoldedMarkCurrent=nil) then
+  begin
+    FFoldedMarkTooltip.Hide;
+    exit
+  end;
+
   FFoldedMarkTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FMinimapTooltipWidthPercents div 100;
   FFoldedMarkTooltip.Height:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
-  FFoldedMarkTooltip.Left:= 0; //todo
-  FFoldedMarkTooltip.Top:= 0; //todo
+  FFoldedMarkTooltip.Left:= Min(
+    FRectMain.Right - FFoldedMarkTooltip.Width - 1,
+    FFoldedMarkCurrent.Coord.Left);
+  FFoldedMarkTooltip.Top:=
+    FFoldedMarkCurrent.Coord.Top + FCharSize.Y;
+  FFoldedMarkTooltip.Show;
   FFoldedMarkTooltip.Invalidate;
 end;
 
 procedure TATSynEdit.FoldedMarkTooltipPaint(Sender: TObject);
-var
-  C: TCanvas;
-  R: TRect;
 begin
-  C:= FFoldedMarkTooltip.Canvas;
-  R:= Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height);
-  DoPaintTextFragmentTo(C, R, FFoldedMarkLine1, FFoldedMarkLine2);
+  if FFoldedMarkCurrent<>nil then
+    DoPaintTextFragmentTo(
+      FFoldedMarkTooltip.Canvas,
+      Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
+      FFoldedMarkCurrent.LineFrom,
+      FFoldedMarkCurrent.LineTo);
+end;
+
+procedure TATSynEdit.DoClearFoldedMarkList;
+var
+  i: integer;
+begin
+  for i:= FFoldedMarkList.Count-1 downto 0 do
+    TATFoldedMark(FFoldedMarkList[i]).Free;
+  FFoldedMarkList.Clear;
+end;
+
+
+function TATSynEdit.DoGetFoldedMarkAtCursor: TATFoldedMark;
+var
+  Pnt: TPoint;
+  Mark: TATFoldedMark;
+  i: integer;
+begin
+  Result:= nil;
+  Pnt:= ScreenToClient(Mouse.CursorPos);
+
+  for i:= 0 to FFoldedMarkList.Count-1 do
+  begin
+    Mark:= TATFoldedMark(FFoldedMarkList[i]);
+    if PtInRect(Mark.Coord, Pnt) then exit(Mark);
+  end;
 end;
 
 
