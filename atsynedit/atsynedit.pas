@@ -272,6 +272,8 @@ const
   cSizeRulerHeight = 20;
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 7;
+  cSizeIndentTooltipX = 5;
+  cSizeIndentTooltipY = 1;
   cMinFontSize = 6;
   cMinTabSize = 1;
   cMaxTabSize = 64;
@@ -5727,15 +5729,11 @@ procedure TATSynEdit.DoPaintTextFragmentTo(C: TCanvas;
   ALineFrom, ALineTo: integer);
 var
   NOutputStrWidth: integer;
-  NLine, NWrapIndex,
-  NIndentLeft, NIndentTop: integer;
+  NLine, NWrapIndex: integer;
   NColorAfter: TColor;
   WrapItem: TATSynWrapItem;
   TextOutProps: TATCanvasTextOutProps;
 begin
-  NIndentLeft:= 5;
-  NIndentTop:= 1;
-
   FillChar(TextOutProps, SizeOf(TextOutProps), 0);
   TextOutProps.NeedOffsets:= FFontNeedsOffsets;
   TextOutProps.TabSize:= FTabSize;
@@ -5768,8 +5766,8 @@ begin
       NColorAfter);
 
     CanvasTextOut(C,
-      NIndentLeft,
-      NIndentTop+FCharSize.Y*(NLine-ALineFrom),
+      cSizeIndentTooltipX,
+      cSizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
       Strings.Lines[WrapItem.NLineIndex],
       @FLineParts,
       NOutputStrWidth,
