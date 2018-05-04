@@ -493,6 +493,9 @@ type
     FMinimapTooltip: TPanel;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
+    FFoldedMarkTooltip: TPanel;
+    FFoldedMarkLine1: integer;
+    FFoldedMarkLine2: integer;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
@@ -671,6 +674,7 @@ type
     procedure MenuFoldUnfoldAllClick(Sender: TObject);
     procedure MenuFoldPlusMinusClick(Sender: TObject);
     procedure MinimapTooltipPaint(Sender: TObject);
+    procedure FoldedMarkTooltipPaint(Sender: TObject);
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
     procedure OnNewScrollbarVertChanged(Sender: TObject);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
@@ -816,6 +820,7 @@ type
     procedure UpdateGutterAutosize(C: TCanvas);
     procedure UpdateMinimapAutosize(C: TCanvas);
     procedure UpdateMinimapTooltip;
+    procedure UpdateFoldedMarkTooltip;
     function DoFormatLineNumber(N: integer): atString;
     function UpdateScrollInfoFromMessage(const Msg: TLMScroll;
       var Info: TATSynScrollInfo): boolean;
@@ -2884,6 +2889,14 @@ begin
 
   FMicromapWidth:= cInitMicromapWidth;
   FMicromapVisible:= cInitMicromapVisible;
+
+  FFoldedMarkTooltip:= TPanel.Create(Self);
+  FFoldedMarkTooltip.Hide;
+  FFoldedMarkTooltip.Width:= 15;
+  FFoldedMarkTooltip.Height:= 15;
+  FFoldedMarkTooltip.Parent:= Self;
+  FFoldedMarkTooltip.BorderStyle:= bsNone;
+  FFoldedMarkTooltip.OnPaint:= @FoldedMarkTooltipPaint;
 
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSizeMinimap:= Point(1, 2);
@@ -5798,6 +5811,26 @@ begin
     ));
 
   FMinimapTooltip.Invalidate;
+end;
+
+
+procedure TATSynEdit.UpdateFoldedMarkTooltip;
+begin
+  FFoldedMarkTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FMinimapTooltipWidthPercents div 100;
+  FFoldedMarkTooltip.Height:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
+  FFoldedMarkTooltip.Left:= 0; //todo
+  FFoldedMarkTooltip.Top:= 0; //todo
+  FFoldedMarkTooltip.Invalidate;
+end;
+
+procedure TATSynEdit.FoldedMarkTooltipPaint(Sender: TObject);
+var
+  C: TCanvas;
+  R: TRect;
+begin
+  C:= FFoldedMarkTooltip.Canvas;
+  R:= Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height);
+  DoPaintTextFragmentTo(C, R, FFoldedMarkLine1, FFoldedMarkLine2);
 end;
 
 
