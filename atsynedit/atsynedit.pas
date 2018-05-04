@@ -2873,6 +2873,8 @@ begin
 
   FMinimapTooltip:= TPanel.Create(Self);
   FMinimapTooltip.Hide;
+  FMinimapTooltip.Width:= 15;
+  FMinimapTooltip.Height:= 15;
   FMinimapTooltip.Parent:= Self;
   FMinimapTooltip.BorderStyle:= bsNone;
   FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
