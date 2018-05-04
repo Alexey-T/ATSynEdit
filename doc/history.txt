@@ -1,4 +1,8 @@
 
+2018.05.04
++ add: implemented tooltips over folded region marks, ie [...] marks
++ add: OptFoldTooltipVisible (true by default)
+
 2018.04.22
 + add: cCommand_ScrollToBegin
 + add: cCommand_ScrollToEnd
