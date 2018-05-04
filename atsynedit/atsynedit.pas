@@ -507,7 +507,9 @@ type
     FMicromapVisible: boolean;
     FFoldedMarkList: TList;
     FFoldedMarkTooltip: TPanel;
-    FFoldedMarkCurrent: TATFoldedMark;
+    FFoldedMark_LineFrom: integer;
+    FFoldedMark_LineTo: integer;
+    FFoldedMark_Rect: TRect;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
@@ -4036,6 +4038,7 @@ var
   bOnMain, bOnMinimap, bOnMicromap, bOnGutter: boolean;
   Details: TATPosDetails;
   nIndex: integer;
+  FoldMark: TATFoldedMark;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -4101,7 +4104,19 @@ begin
   //detect cursor on folded marks
   if FFoldTooltipVisible then
   begin
-    FFoldedMarkCurrent:= DoGetFoldedMarkAt(Point(X, Y));
+    FoldMark:= DoGetFoldedMarkAt(Point(X, Y));
+    if Assigned(FoldMark) then
+    begin
+      FFoldedMark_LineFrom:= FoldMark.LineFrom;
+      FFoldedMark_LineTo:= FoldMark.LineTo;
+      FFoldedMark_Rect:= FoldMark.Coord;
+    end
+    else
+    begin
+      FFoldedMark_LineFrom:= -1;
+      FFoldedMark_LineTo:= -1;
+      FFoldedMark_Rect:= Rect(0, 0, 0, 0);
+    end;
     UpdateFoldedMarkTooltip;
   end;
 
@@ -5874,24 +5889,24 @@ end;
 
 procedure TATSynEdit.UpdateFoldedMarkTooltip;
 begin
-  if (not FFoldTooltipVisible) or (FFoldedMarkCurrent=nil) then
+  if (not FFoldTooltipVisible) or (FFoldedMark_LineFrom<0) then
   begin
     FFoldedMarkTooltip.Hide;
     exit
   end;
 
   FFoldedMarkTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FFoldTooltipWidthPercents div 100;
-  FFoldedMarkTooltip.Height:= (FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1) * FCharSize.Y + 2;
+  FFoldedMarkTooltip.Height:= (FFoldedMark_LineTo-FFoldedMark_LineFrom+1) * FCharSize.Y + 2;
   FFoldedMarkTooltip.Left:= Min(
     FRectMain.Right - FFoldedMarkTooltip.Width - 1,
-    FFoldedMarkCurrent.Coord.Left);
+    FFoldedMark_Rect.Left);
   FFoldedMarkTooltip.Top:=
-    FFoldedMarkCurrent.Coord.Top + FCharSize.Y;
+    FFoldedMark_Rect.Top + FCharSize.Y;
 
   //no space for on bottom? show on top
   if FFoldedMarkTooltip.Top + FFoldedMarkTooltip.Height > FRectMain.Bottom then
-    if FFoldedMarkCurrent.Coord.Top - FFoldedMarkTooltip.Height >= FRectMain.Top then
-      FFoldedMarkTooltip.Top:= FFoldedMarkCurrent.Coord.Top - FFoldedMarkTooltip.Height;
+    if FFoldedMark_Rect.Top - FFoldedMarkTooltip.Height >= FRectMain.Top then
+      FFoldedMarkTooltip.Top:= FFoldedMark_Rect.Top - FFoldedMarkTooltip.Height;
 
   FFoldedMarkTooltip.Show;
   FFoldedMarkTooltip.Invalidate;
@@ -5899,12 +5914,12 @@ end;
 
 procedure TATSynEdit.FoldedMarkTooltipPaint(Sender: TObject);
 begin
-  if FFoldedMarkCurrent<>nil then
+  if FFoldedMark_LineFrom>=0 then
     DoPaintTextFragmentTo(
       FFoldedMarkTooltip.Canvas,
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
-      FFoldedMarkCurrent.LineFrom,
-      FFoldedMarkCurrent.LineTo,
+      FFoldedMark_LineFrom,
+      FFoldedMark_LineTo,
       false);
 end;
 
