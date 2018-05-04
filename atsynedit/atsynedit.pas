@@ -745,7 +745,7 @@ type
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
       var AScrollHorz, AScrollVert: TATSynScrollInfo; ALineFrom: integer);
     procedure DoPaintTextFragmentTo(C: TCanvas; const ARect: TRect; ALineFrom,
-      ALineTo: integer; AConsiderWrapInfo: boolean);
+      ALineTo: integer; AConsiderWrapInfo: boolean; AColorBG, AColorBorder: TColor);
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
@@ -5792,13 +5792,20 @@ begin
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
   NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
 
-  DoPaintTextFragmentTo(C, RectAll, NLineTop, NLineBottom, true);
+  DoPaintTextFragmentTo(C, RectAll,
+    NLineTop,
+    NLineBottom,
+    true,
+    Colors.MinimapTooltipBG,
+    Colors.MinimapTooltipBorder
+    );
 end;
 
 procedure TATSynEdit.DoPaintTextFragmentTo(C: TCanvas;
   const ARect: TRect;
   ALineFrom, ALineTo: integer;
-  AConsiderWrapInfo: boolean);
+  AConsiderWrapInfo: boolean;
+  AColorBG, AColorBorder: TColor);
 var
   NOutputStrWidth: integer;
   NLine, NWrapIndex: integer;
@@ -5806,7 +5813,7 @@ var
   WrapItem: TATSynWrapItem;
   TextOutProps: TATCanvasTextOutProps;
 begin
-  C.Brush.Color:= Colors.MinimapTooltipBG;
+  C.Brush.Color:= AColorBG;
   C.FillRect(ARect);
 
   FillChar(TextOutProps, SizeOf(TextOutProps), 0);
@@ -5847,7 +5854,7 @@ begin
 
     DoCalcLineHilite(WrapItem, FLineParts{%H-},
       0, cMaxCharsForOutput,
-      Colors.MinimapTooltipBG,
+      AColorBG,
       false,
       NColorAfter);
 
@@ -5861,7 +5868,7 @@ begin
       )
    end;
 
-  C.Brush.Color:= Colors.MinimapTooltipBorder;
+  C.Brush.Color:= AColorBorder;
   C.FrameRect(ARect);
 end;
 
@@ -5920,7 +5927,10 @@ begin
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
       FFoldedMark_LineFrom,
       FFoldedMark_LineTo,
-      false);
+      false, //to paint fully folded lines, must be False
+      Colors.MinimapTooltipBG,
+      Colors.MinimapTooltipBorder
+      );
 end;
 
 procedure TATSynEdit.FoldedMarkMouseEnter(Sender: TObject);
