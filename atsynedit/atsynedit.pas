@@ -736,7 +736,8 @@ type
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
       var AScrollHorz, AScrollVert: TATSynScrollInfo; ALineFrom: integer);
-    procedure DoPaintTextFragmentTo(C: TCanvas; const ARect: TRect; ALineFrom, ALineTo: integer);
+    procedure DoPaintTextFragmentTo(C: TCanvas; const ARect: TRect; ALineFrom,
+      ALineTo: integer; AConsiderWrapInfo: boolean);
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
@@ -5765,12 +5766,13 @@ begin
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
   NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
 
-  DoPaintTextFragmentTo(C, RectAll, NLineTop, NLineBottom);
+  DoPaintTextFragmentTo(C, RectAll, NLineTop, NLineBottom, true);
 end;
 
 procedure TATSynEdit.DoPaintTextFragmentTo(C: TCanvas;
   const ARect: TRect;
-  ALineFrom, ALineTo: integer);
+  ALineFrom, ALineTo: integer;
+  AConsiderWrapInfo: boolean);
 var
   NOutputStrWidth: integer;
   NLine, NWrapIndex: integer;
@@ -5801,10 +5803,21 @@ begin
 
   for NLine:= ALineFrom to ALineTo do
   begin
+    if not Strings.IsIndexValid(NLine) then Break;
     NColorAfter:= clNone;
-    NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, NLine));
-    if NWrapIndex<0 then Break;
-    WrapItem:= WrapInfo[NWrapIndex];
+    if AConsiderWrapInfo then
+    begin
+      NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, NLine));
+      if NWrapIndex<0 then Break;
+      WrapItem:= WrapInfo[NWrapIndex];
+    end
+    else
+    begin
+      FillChar(WrapItem, SizeOf(WrapItem), 0);
+      WrapItem.NLineIndex:= NLine;
+      WrapItem.NCharIndex:= 1;
+      WrapItem.NLength:= Strings.LinesLen[NLine];
+    end;
 
     DoCalcLineHilite(WrapItem, FLineParts{%H-},
       0, cMaxCharsForOutput,
@@ -5874,7 +5887,8 @@ begin
       FFoldedMarkTooltip.Canvas,
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
       FFoldedMarkCurrent.LineFrom,
-      FFoldedMarkCurrent.LineTo);
+      FFoldedMarkCurrent.LineTo,
+      false);
 end;
 
 procedure TATSynEdit.DoClearFoldedMarkList;
