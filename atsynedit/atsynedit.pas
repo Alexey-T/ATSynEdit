@@ -685,6 +685,7 @@ type
     procedure MenuFoldPlusMinusClick(Sender: TObject);
     procedure MinimapTooltipPaint(Sender: TObject);
     procedure FoldedMarkTooltipPaint(Sender: TObject);
+    procedure FoldedMarkMouseEnter(Sender: TObject);
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
     procedure OnNewScrollbarVertChanged(Sender: TObject);
     procedure DoPartCalc_CreateNew(var AParts: TATLineParts; AOffsetMax,
@@ -2925,6 +2926,7 @@ begin
   FFoldedMarkTooltip.Parent:= Self;
   FFoldedMarkTooltip.BorderStyle:= bsNone;
   FFoldedMarkTooltip.OnPaint:= @FoldedMarkTooltipPaint;
+  FFoldedMarkTooltip.OnMouseEnter:=@FoldedMarkMouseEnter;
 
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSizeMinimap:= Point(1, 2);
@@ -5889,6 +5891,11 @@ begin
       FFoldedMarkCurrent.LineFrom,
       FFoldedMarkCurrent.LineTo,
       false);
+end;
+
+procedure TATSynEdit.FoldedMarkMouseEnter(Sender: TObject);
+begin
+  FFoldedMarkTooltip.Hide;
 end;
 
 procedure TATSynEdit.DoClearFoldedMarkList;
