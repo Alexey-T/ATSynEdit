@@ -249,6 +249,7 @@ const
   cInitGutterPlusSize = 4;
   cInitFoldStyle = cFoldHereWithTruncatedText;
   cInitFoldTooltipVisible = true;
+  cInitFoldTooltipLineCount = 15;
   cInitMaxLineLenToCalcURL = 300;
 
   cGutterBands = 6;
@@ -360,6 +361,7 @@ type
     FFoldStyle: TATFoldStyle;
     FFoldEnabled: boolean;
     FFoldTooltipVisible: boolean;
+    FFoldTooltipLineCount: integer;
     FFontNeedsOffsets: TATFontNeedsOffsets;
     FCursorText: TCursor;
     FCursorColumnSel: TCursor;
@@ -1197,6 +1199,7 @@ type
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
     property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;
+    property OptFoldTooltipLineCount: integer read FFoldTooltipLineCount write FFoldTooltipLineCount default cInitFoldTooltipLineCount;
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle default [fsItalic];
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
@@ -2824,6 +2827,7 @@ begin
   FFoldStyle:= cInitFoldStyle;
   FFoldEnabled:= true;
   FFoldTooltipVisible:= cInitFoldTooltipVisible;
+  FFoldTooltipLineCount:= cInitFoldTooltipLineCount;
 
   FWrapInfo:= TATSynWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
@@ -5873,10 +5877,7 @@ begin
   end;
 
   FFoldedMarkTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FMinimapTooltipWidthPercents div 100;
-  FFoldedMarkTooltip.Height:= Min(
-    FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1,
-    FMinimapTooltipLinesCount
-    ) * FCharSize.Y + 2;
+  FFoldedMarkTooltip.Height:= (FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1) * FCharSize.Y + 2;
   FFoldedMarkTooltip.Left:= Min(
     FRectMain.Right - FFoldedMarkTooltip.Width - 1,
     FFoldedMarkCurrent.Coord.Left);
@@ -5933,13 +5934,11 @@ end;
 
 
 function TATSynEdit.DoGetFoldedMarkLinesCount(ALine: integer): integer;
-const
-  cMaxLines = 50;
 var
   i: integer;
 begin
   Result:= 1;
-  for i:= ALine+1 to Min(ALine+cMaxLines, Strings.Count-1) do
+  for i:= ALine+1 to Min(ALine+FFoldTooltipLineCount-1, Strings.Count-1) do
     if Strings.LinesHidden[i, FEditorIndex] then
       Inc(Result);
 end;
