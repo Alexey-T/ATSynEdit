@@ -1,4 +1,7 @@
 
+2018.05.07
++ add: Bookmarks have prop DeleteOnDelLine (bool)
+
 2018.05.04
 + add: implemented tooltips over folded region marks, ie [...] marks
 + add: OptFoldTooltipVisible (true by default)
