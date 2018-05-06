@@ -20,6 +20,7 @@ type
     LineNum: integer;
     Kind: word;
     Hint: string;
+    DeleteOnDelLine: boolean;
     constructor Create(ALineNum: integer; AKind: word; const AHint: string);
   end;
 
@@ -55,6 +56,7 @@ begin
   LineNum:= ALineNum;
   Kind:= AKind;
   Hint:= AHint;
+  DeleteOnDelLine:= false;
 end;
 
 { TATBookmarks }
@@ -213,9 +215,16 @@ begin
         NIndexPlaced:= Find(ALine);
         bMovedHere:= false;
 
+        if (NIndexPlaced>=0) and Items[NIndexPlaced].DeleteOnDelLine then
+        begin
+          Delete(NIndexPlaced);
+          NIndexPlaced:= -1;
+        end;
+
         for i:= Count-1 downto 0 do
         begin
           Item:= Items[i];
+
           //spec case for bookmark on last line, keep it if deleting last line
           if (Item.LineNum>ALine) or (Item.LineNum=ALineCount-1) then
           begin
