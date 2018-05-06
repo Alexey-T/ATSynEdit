@@ -322,7 +322,7 @@ begin
     if NIndex>=0 then
       ed.Strings.Bookmarks.Delete(NIndex)
     else
-      ed.Strings.Bookmarks.Add(ALine, 1, '');
+      ed.Strings.Bookmarks.Add(ALine, 1, '', false);
     ed.Update;
   end;
 end;
