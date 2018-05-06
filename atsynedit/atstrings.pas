@@ -630,7 +630,7 @@ begin
 
   if IsIndexValid(AIndex) then
     if AValue>0 then
-      FBookmarks.Add(AIndex, AValue, '')
+      FBookmarks.Add(AIndex, AValue, '', false)
     else
       FBookmarks.DeleteForLine(AIndex);
 end;

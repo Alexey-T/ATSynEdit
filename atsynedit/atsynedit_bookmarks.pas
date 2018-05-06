@@ -21,7 +21,8 @@ type
     Kind: word;
     Hint: string;
     DeleteOnDelLine: boolean;
-    constructor Create(ALineNum: integer; AKind: word; const AHint: string);
+    constructor Create(ALineNum: integer; AKind: word;
+      const AHint: string; ADeleteOnDelLine: boolean);
   end;
 
 type
@@ -40,7 +41,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATBookmarkItem read GetItem; default;
-    procedure Add(ALineNum: integer; AKind: word; const AHint: string);
+    procedure Add(ALineNum: integer; AKind: word; const AHint: string; ADeleteOnDelLine: boolean);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
     procedure Update(ALine: integer; AChange: TATLineChangeKind; ALineCount: integer);
@@ -51,12 +52,12 @@ implementation
 { TATBookmarkItem }
 
 constructor TATBookmarkItem.Create(ALineNum: integer; AKind: word;
-  const AHint: string);
+  const AHint: string; ADeleteOnDelLine: boolean);
 begin
   LineNum:= ALineNum;
   Kind:= AKind;
   Hint:= AHint;
-  DeleteOnDelLine:= false;
+  DeleteOnDelLine:= ADeleteOnDelLine;
 end;
 
 { TATBookmarks }
@@ -113,7 +114,8 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATBookmarks.Add(ALineNum: integer; AKind: word; const AHint: string);
+procedure TATBookmarks.Add(ALineNum: integer; AKind: word; const AHint: string;
+  ADeleteOnDelLine: boolean);
 var
   Item: TATBookmarkItem;
   nLine, i: integer;
@@ -129,19 +131,20 @@ begin
       Item.LineNum:= ALineNum;
       Item.Kind:= AKind;
       Item.Hint:= AHint;
+      Item.DeleteOnDelLine:= ADeleteOnDelLine;
       Exit
     end;
 
     //found bookmark for bigger line: insert before it
     if nLine>ALineNum then
     begin
-      FList.Insert(i, TATBookmarkItem.Create(ALineNum, AKind, AHint));
+      FList.Insert(i, TATBookmarkItem.Create(ALineNum, AKind, AHint, ADeleteOnDelLine));
       Exit;
     end;
   end;
 
   //not found bookmark for bigger line: append
-  FList.Add(TATBookmarkItem.Create(ALineNum, AKind, AHint));
+  FList.Add(TATBookmarkItem.Create(ALineNum, AKind, AHint, ADeleteOnDelLine));
 end;
 
 procedure TATBookmarks.DeleteDups;
