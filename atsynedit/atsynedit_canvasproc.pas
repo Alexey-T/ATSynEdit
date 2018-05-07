@@ -164,7 +164,7 @@ var
 type
   TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
 
-function IsStringSymbolsOnly(const S: string): boolean;
+function IsStringSymbolsOnly(const S: UnicodeString): boolean;
 var
   i, N: integer;
 begin
@@ -179,19 +179,19 @@ begin
 end;
 
 
-//override LCLIntf.ExtTextOut on Win32 to draw font ligatures
-function _SelfTextOut(DC: HDC; X, Y: Integer; Rect: PRect;
-  const Str: String;
+{$ifdef windows}
+//to draw font ligatures
+function _TextOut_Windows(DC: HDC;
+  X, Y: Integer;
+  Rect: PRect;
+  const Str: UnicodeString;
   Dx: PInteger;
   AllowLigatures: boolean
   ): boolean;
-{$ifdef windows}
 var
-  CharPlaceInfo: TGCPRESULTS;
+  CharPlaceInfo: GCP_RESULTSW;
   Glyphs: array of WideChar;
-{$endif}
 begin
-  {$ifdef windows}
   if AllowLigatures then
   begin
     ZeroMemory(@CharPlaceInfo, SizeOf(CharPlaceInfo));
@@ -200,15 +200,26 @@ begin
     CharPlaceInfo.lpGlyphs:= @Glyphs[0];
     CharPlaceInfo.nGlyphs:= Length(Glyphs);
 
-    if GetCharacterPlacement(DC, PChar(Str), Length(Str), 0, @CharPlaceInfo, GCP_LIGATE)<> 0 then
-      Result:= Windows.ExtTextOut(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE or ETO_GLYPH_INDEX, Rect, Pointer(Glyphs), Length(Glyphs), Dx)
+    if GetCharacterPlacementW(DC, PWChar(Str), Length(Str), 0, @CharPlaceInfo, GCP_LIGATE)<> 0 then
+      Result:= Windows.ExtTextOutW(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE or ETO_GLYPH_INDEX, Rect, Pointer(Glyphs), Length(Glyphs), Dx)
     else
-      Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+      Result:= Windows.ExtTextOutW(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PWChar(Str), Length(Str), Dx);
   end
   else
-  {$endif}
+    Result:= Windows.ExtTextOutW(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PWChar(Str), Length(Str), Dx);
+end;
+
+{$else}
+function _TextOut_Unix(DC: HDC;
+  X, Y: Integer;
+  Rect: PRect;
+  const Str: string;
+  Dx: PInteger
+  ): boolean;
+begin
   Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
 end;
+{$endif}
 
 
 procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
@@ -636,6 +647,7 @@ var
   PartFontStyle: TFontStyles;
   PartRect: TRect;
   Buf: string;
+  BufW: UnicodeString;
   DxPointer: PInteger;
   bAllowLigatures: boolean;
 begin
@@ -718,30 +730,43 @@ begin
         APosX+PixOffset2,
         APosY+AProps.CharSize.Y);
 
-      Buf:= UTF8Encode(SRemoveHexChars(PartStr));
-      SReplaceAllTabsToOneSpace(Buf);
+      {$ifdef windows}
+      BufW:= SRemoveHexChars(PartStr);
+      BufW:= STabsToSpaces(BufW, AProps.TabSize);
+      bAllowLigatures:=
+        AProps.ShowFontLigatures;
+        //and IsStringSymbolsOnly(BufW); //disable if unicode chars
+
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
         DxPointer:= @Dx[PartOffset]
       else
         DxPointer:= nil;
 
-      bAllowLigatures:=
-        {$ifdef windows}
-        AProps.ShowFontLigatures and
-        IsStringSymbolsOnly(Buf) and //disable if unicode chrs
-        (Pos(#9, PartStr)=0); //incorrect for str with tabs
-        {$else}
-        false;
-        {$endif}
+      _TextOut_Windows(C.Handle,
+        APosX+PixOffset1,
+        APosY+AProps.TextOffsetFromLine,
+        @PartRect,
+        BufW,
+        DxPointer,
+        bAllowLigatures
+        );
+      {$else}
+      Buf:= UTF8Encode(SRemoveHexChars(PartStr));
+      SReplaceAllTabsToOneSpace(Buf);
 
-      _SelfTextOut(C.Handle,
+      if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
+        DxPointer:= @Dx[PartOffset]
+      else
+        DxPointer:= nil;
+
+      _TextOut_Unix(C.Handle,
         APosX+PixOffset1,
         APosY+AProps.TextOffsetFromLine,
         @PartRect,
         Buf,
-        DxPointer,
-        bAllowLigatures
+        DxPointer
         );
+      {$endif}
 
       DoPaintHexChars(C,
         PartStr,
