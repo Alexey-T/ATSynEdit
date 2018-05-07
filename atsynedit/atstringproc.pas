@@ -110,6 +110,7 @@ function SConvertUtf8ToWideForAscii(const S: string): UnicodeString;
 procedure SReplaceAll(var s: string; const SFrom, STo: string);
 procedure SReplaceAllPercentChars(var S: string);
 procedure SReplaceAllTabsToOneSpace(var S: string);
+procedure SReplaceAllTabsToOneSpace(var S: UnicodeString);
 procedure SDeleteFrom(var s: string; const SFrom: string);
 procedure SDeleteFrom(var s: atString; const SFrom: atString);
 procedure SDeleteFromEol(var s: string);
@@ -822,6 +823,14 @@ begin
       S[i]:= ' ';
 end;
 
+procedure SReplaceAllTabsToOneSpace(var S: UnicodeString);
+var
+  i: integer;
+begin
+  for i:= 1 to Length(S) do
+    if S[i]=#9 then
+      S[i]:= ' ';
+end;
 
 procedure SDeleteFrom(var s: string; const SFrom: string);
 var
