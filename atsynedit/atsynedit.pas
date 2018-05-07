@@ -339,6 +339,9 @@ type
 
   TATSynEdit = class(TCustomControl)
   private
+    FFontItalic: TFont;
+    FFontBold: TFont;
+    FFontBoldItalic: TFont;
     FTimerIdle: TTimer;
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
@@ -801,6 +804,9 @@ type
     procedure SetCaretShapeRO(AValue: TATSynCaretShape);
     procedure SetCaretBlinkEnabled(AValue: boolean);
     procedure SetFoldEnabled(AValue: boolean);
+    procedure SetFontBold(AValue: TFont);
+    procedure SetFontBoldItalic(AValue: TFont);
+    procedure SetFontItalic(AValue: TFont);
     procedure SetLastCommandChangedLines(AValue: integer);
     procedure SetModified(AValue: boolean);
     procedure SetMouseNiceScroll(AValue: boolean);
@@ -1119,6 +1125,9 @@ type
     property DragKind;
     property Enabled;
     property Font;
+    property FontItalic: TFont read FFontItalic write SetFontItalic;
+    property FontBold: TFont read FFontBold write SetFontBold;
+    property FontBoldItalic: TFont read FFontBoldItalic write SetFontBoldItalic;
     property ParentFont;
     property ParentShowHint;
     property ShowHint;
@@ -2737,6 +2746,13 @@ begin
   Font.Name:= 'Courier New';
   Font.Size:= 9;
 
+  FFontItalic:= TFont.Create;
+  FFontItalic.Name:= '';
+  FFontBold:= TFont.Create;
+  FFontBold.Name:= '';
+  FFontBoldItalic:= TFont.Create;
+  FFontBoldItalic.Name:= '';
+
   FScrollbarVert:= TATScroll.Create(Self);
   FScrollbarVert.Hide;
   FScrollbarVert.Parent:= Self;
@@ -3091,6 +3107,9 @@ begin
   FreeAndNil(FBitmap);
   FreeAndNil(FColors);
   FreeAndNil(FAdapterCache);
+  FreeAndNil(FFontItalic);
+  FreeAndNil(FFontBold);
+  FreeAndNil(FFontBoldItalic);
   inherited;
 end;
 
@@ -5994,6 +6013,21 @@ begin
   ARect.Top:= Pnt.Y - GapItem.Size;
   ARect.Bottom:= Pnt.Y;
   Result:= true;
+end;
+
+procedure TATSynEdit.SetFontItalic(AValue: TFont);
+begin
+  FFontItalic.Assign(AValue);
+end;
+
+procedure TATSynEdit.SetFontBold(AValue: TFont);
+begin
+  FFontBold.Assign(AValue);
+end;
+
+procedure TATSynEdit.SetFontBoldItalic(AValue: TFont);
+begin
+  FFontBoldItalic.Assign(AValue);
 end;
 
 
