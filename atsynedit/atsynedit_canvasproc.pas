@@ -732,10 +732,11 @@ begin
 
       {$ifdef windows}
       BufW:= SRemoveHexChars(PartStr);
-      BufW:= STabsToSpaces(BufW, AProps.TabSize);
+      SReplaceAllTabsToOneSpace(BufW);
       bAllowLigatures:=
-        AProps.ShowFontLigatures;
-        //and IsStringSymbolsOnly(BufW); //disable if unicode chars
+        AProps.ShowFontLigatures
+        and IsStringSymbolsOnly(BufW) //disable if unicode chars
+        and (Pos(#9, BufW)=0); //disable if tab-chars
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
         DxPointer:= @Dx[PartOffset]
