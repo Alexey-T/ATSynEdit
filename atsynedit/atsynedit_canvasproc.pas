@@ -96,6 +96,10 @@ type
     ShowFontLigatures: boolean;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
+    FontNormal: TFont;
+    FontItalic: TFont;
+    FontBold: TFont;
+    FontBoldItalic: TFont;
   end;
 
 procedure CanvasLineEx(C: TCanvas;
@@ -723,6 +727,38 @@ begin
       C.Font.Color:= PartPtr^.ColorFont;
       C.Brush.Color:= PartPtr^.ColorBG;
       C.Font.Style:= PartFontStyle;
+
+      if PartPtr^.FontItalic and not PartPtr^.FontBold then
+      begin
+        if AProps.FontItalic.Name<>'' then
+        begin
+          C.Font.Name:= AProps.FontItalic.Name;
+          C.Font.Size:= AProps.FontItalic.Size;
+        end;
+      end
+      else
+      if PartPtr^.FontBold and not PartPtr^.FontItalic then
+      begin
+        if AProps.FontBold.Name<>'' then
+        begin
+          C.Font.Name:= AProps.FontBold.Name;
+          C.Font.Size:= AProps.FontBold.Size;
+        end;
+      end
+      else
+      if PartPtr^.FontBold and PartPtr^.FontItalic then
+      begin
+        if AProps.FontBoldItalic.Name<>'' then
+        begin
+          C.Font.Name:= AProps.FontBoldItalic.Name;
+          C.Font.Size:= AProps.FontBoldItalic.Size;
+        end;
+      end
+      else
+      begin
+        C.Font.Name:= AProps.FontNormal.Name;
+        C.Font.Size:= AProps.FontNormal.Size;
+      end;
 
       PartRect:= Rect(
         APosX+PixOffset1,

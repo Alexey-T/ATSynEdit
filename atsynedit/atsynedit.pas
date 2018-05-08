@@ -2284,6 +2284,11 @@ begin
         TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
         TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
+        TextOutProps.FontNormal:= Font;
+        TextOutProps.FontItalic:= FontItalic;
+        TextOutProps.FontBold:= FontBold;
+        TextOutProps.FontBoldItalic:= FontBoldItalic;
+
         CanvasTextOut(C,
           CurrPointText.X,
           CurrPointText.Y,
@@ -5852,6 +5857,11 @@ begin
   TextOutProps.ShowFontLigatures:= FOptShowFontLigatures;
   TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+
+  TextOutProps.FontNormal:= Font;
+  TextOutProps.FontItalic:= FontItalic;
+  TextOutProps.FontBold:= FontBold;
+  TextOutProps.FontBoldItalic:= FontBoldItalic;
 
   for NLine:= ALineFrom to ALineTo do
   begin
