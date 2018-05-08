@@ -2103,7 +2103,8 @@ begin
   C.Brush.Color:= GetColorTextBG;
   C.FillRect(ARect);
 
-  DoClearFoldedMarkList;
+  if AMainText then
+    DoClearFoldedMarkList;
 
   if AWithGutter then
   begin
