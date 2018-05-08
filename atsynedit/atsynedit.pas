@@ -4325,7 +4325,11 @@ var
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
+
+  //hide all temporary windows
   DoHotspotsExit;
+  FFoldedMarkTooltip.Hide;
+  FMinimapTooltip.Hide;
 
   if AForceHorz then
     Mode:= aWheelModeHoriz
