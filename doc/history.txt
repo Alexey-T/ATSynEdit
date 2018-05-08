@@ -1,4 +1,7 @@
 
+2018.05.09
++ add: can render syntax hilited text with several fonts: added props FontItalic, FontBold, FontBoldItalic
+
 2018.05.07
 + add: Bookmarks have prop DeleteOnDelLine (bool)
 
