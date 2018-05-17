@@ -63,6 +63,7 @@ type
     FontBold, FontItalic, FontStrikeOut: ByteBool;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
+  PATLinePart = ^TATLinePart;
 
 type
   TATLinePartClass = class
@@ -1123,13 +1124,15 @@ end;
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor;
   AForceColor: boolean);
 var
+  PartPtr: PATLinePart;
   i: integer;
 begin
   for i:= Low(AParts) to High(AParts) do
   begin
-    if AParts[i].Len=0 then Break;
-    if AForceColor or (AParts[i].ColorBG=clNone) then
-      AParts[i].ColorBG:= AColor;
+    PartPtr:= @AParts[i];
+    //if PartPtr^.Len=0 then Break; //better colorize all to hide possible bugs
+    if AForceColor or (PartPtr^.ColorBG=clNone) then
+      PartPtr^.ColorBG:= AColor;
   end;
 end;
 
