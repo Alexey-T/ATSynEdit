@@ -1130,7 +1130,7 @@ begin
   for i:= Low(AParts) to High(AParts) do
   begin
     PartPtr:= @AParts[i];
-    //if PartPtr^.Len=0 then Break; //better colorize all to hide possible bugs
+    if PartPtr^.Len=0 then Break; //comment to colorize all parts to hide possible bugs
     if AForceColor or (PartPtr^.ColorBG=clNone) then
       PartPtr^.ColorBG:= AColor;
   end;
