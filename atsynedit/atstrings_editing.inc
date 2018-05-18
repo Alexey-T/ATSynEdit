@@ -143,7 +143,7 @@ begin
     end;
 
     if not bAtFileEnd then
-      bUseBlockFinalEol:= bAtLineEnd
+      bUseBlockFinalEol:= bAtLineEnd and not bAtEmptyLine
     else
       bUseBlockFinalEol:= bBlockWithEol;
     LineInsertStrings(AY, Block, bUseBlockFinalEol);
