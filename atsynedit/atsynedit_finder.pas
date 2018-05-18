@@ -875,7 +875,7 @@ function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boo
 var
   Caret: TATCaretItem;
   NLastX, NLastY, NLines: integer;
-  PosStart, PosEnd, SecondStart: TPoint;
+  PosStart, PosEnd, SecondStart, SecondEnd: TPoint;
   bStartAtEdge: boolean;
   Fr: TATEditorFragment;
 begin
@@ -933,16 +933,16 @@ begin
     if not OptBack then
     begin
       bStartAtEdge:= (PosStart.X=0) and (PosStart.Y=0);
-      PosEnd.X:= PosStart.X;
-      PosEnd.Y:= PosStart.Y;
+      SecondEnd.X:= PosStart.X;
+      SecondEnd.Y:= PosStart.Y;
       SecondStart.X:= 0;
       SecondStart.Y:= 0;
     end
     else
     begin
       bStartAtEdge:= (PosStart.X=NLastX) and (PosStart.Y=NLastY);
-      PosEnd.X:= PosStart.X;
-      PosEnd.Y:= PosStart.Y;
+      SecondEnd.X:= PosStart.X;
+      SecondEnd.Y:= PosStart.Y;
       SecondStart.X:= NLastX;
       SecondStart.Y:= NLastY;
     end;
@@ -952,7 +952,7 @@ begin
       //same as _buffered version:
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
-      if DoFindOrReplace_InEditor_Internal(ANext, false, AForMany, AChanged, SecondStart, PosEnd) then
+      if DoFindOrReplace_InEditor_Internal(ANext, false, AForMany, AChanged, SecondStart, SecondEnd) then
       begin
         Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, PosStart.X, PosStart.Y, false)) or
                  (OptBack and IsPosSorted(PosStart.X, PosStart.Y, FMatchEdPos.X, FMatchEdPos.Y, false));
