@@ -373,7 +373,8 @@ function TATStrings.TextDeleteRange(AFromX, AFromY, AToX, AToY: integer;
   out AShift, APosAfter: TPoint): boolean;
 var
   Str: atString;
-  bDelEmpty, bDeleteEol, bDeleteEol_Alt: boolean;
+  //bDelEmpty,
+  bDeleteEol, bDeleteEol_Alt: boolean;
 begin
   Result:= false;
   AShift.X:= 0;
@@ -418,7 +419,7 @@ begin
   end
   else
   begin
-    bDelEmpty:= false;
+    //bDelEmpty:= false;
 
     //for empty last line
     if (AToY>0) and (LinesLen[AToY]=0) then
@@ -428,8 +429,9 @@ begin
       AToX:= LinesLen[AToY];
     end;
 
-    if AFromX=0 then
-      bDelEmpty:= true;
+    ////this caused incorrect deletion of entire lines, when selected till end of line, w/o LF
+    //if AFromX=0 then
+    //  bDelEmpty:= true;
 
     //remember no final eol
     bDeleteEol_Alt:= (AFromY=0) and (AToY=Count-1) and (LinesEnds[AToY]=cEndNone);
@@ -444,9 +446,9 @@ begin
     //del middle lines
     DoBlock_DeleteLines(AFromY+1, AToY);
 
-    if bDelEmpty then
-      if Str='' then
-        LineDelete(AFromY);
+    //if bDelEmpty then
+    //  if Str='' then
+    //    LineDelete(AFromY);
 
     if bDeleteEol then
     begin
