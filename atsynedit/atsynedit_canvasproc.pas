@@ -1211,7 +1211,7 @@ procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString;
 var
   Part: ^TATLinePart;
   nPart, nPos: integer;
-  X1, Y1, X2, Y2: integer;
+  X1, X2, Y2: integer;
   HasBG: boolean;
 begin
   if AStr='' then exit;
@@ -1231,11 +1231,6 @@ begin
     X2:= X1 + ACharSize.X*Part^.Len;
     Y2:= APos.Y + ACharSize.Y;
 
-    if HasBG then
-      Y1:= Y2-2
-    else
-      Y1:= Y2-1;
-
     if (X1>=ARect.Left) and (X1<ARect.Right) then
     begin
       //must limit line on right edge
@@ -1243,10 +1238,14 @@ begin
         X2:= ARect.Right;
 
       if HasBG then
-        C.Brush.Color:= Part^.ColorBG
-      else
-        C.Brush.Color:= ColorBlendHalf(Part^.ColorBG, Part^.ColorFont);
-      C.FillRect(X1, Y1, X2, Y2);
+      begin
+        //paint BG color 1 pixel upper
+        C.Brush.Color:= Part^.ColorBG;
+        C.FillRect(X1, Y2-2, X2, Y2-1);
+      end;
+
+      C.Brush.Color:= ColorBlendHalf(Part^.ColorBG, Part^.ColorFont);
+      C.FillRect(X1, Y2-1, X2, Y2);
     end;
   end;
 end;
