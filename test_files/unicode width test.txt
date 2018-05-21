@@ -1,0 +1,24 @@
+Fixed Width Font Test incl. CJK|||
+ABCDEFGHIJKLMNOPQRSTUVWXYZ,.<>||||
+abcdefghijklmnopqrstuvwxyz[]{}||||
+1234567890!@#$%^&*()`~-_=+\|/?||||
+Ξεσκεπάζω την ψυχοφθόρα βδελυγμία|
+В чащах юга жил бы цитрус?||||||||
+Да, но фальшивый экземпляр(ъ)!||||
+지친 그대 곁에 머물고 싶지만,|||||
+떠날 수 밖에. 그대를 사랑했지만.||
+少年易老學難成，一寸光陰不可輕。||
+未覺池塘春草夢，階前梧葉已秋聲。||
+子供のころにわかりかけてたことが||
+素直になれ Night 濡れた Memory||||
+abcdefghijklmnopqrstuvwxyz;:'"||||
+ABCDEFGHIJKLMNOPQRSTUVWXYZÆÐĦØ||||
+〈〉《》「」『』【】々　〃⿰⿱||||
+The Line will be Straight.(1:2)|||
+*Æ  may half or full width by font
+
+{ //test with CudaText options
+  "unicode_proportional": false, 
+  "unicode_wide_allowed": true, 
+  "unicode_full_width": 200,
+}
