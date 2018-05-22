@@ -142,10 +142,27 @@ begin
       end;
     end;
 
+    {
+    set bUseBlockFinalEol.
+    this is weak place - gave bug before. how to test:
+    1) copy to clipboard 3 lines without EOL
+      test paste at:
+       a) empty line
+       b) middle of line
+       c) end of non-empty line
+    2) copy to clipboard 3 lines with EOL
+       test again, a) b) c)
+    }
     if not bAtFileEnd then
-      bUseBlockFinalEol:= bAtLineEnd and not bAtEmptyLine
+    begin
+      if bBlockWithEol then
+        bUseBlockFinalEol:= bAtLineEnd
+      else
+        bUseBlockFinalEol:= bAtLineEnd and not bAtEmptyLine;
+    end
     else
       bUseBlockFinalEol:= bBlockWithEol;
+
     LineInsertStrings(AY, Block, bUseBlockFinalEol);
 
     APosAfter.X:= Block.LinesLen[Block.Count-1];
