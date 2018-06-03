@@ -1,4 +1,8 @@
 
+2018.06.03
++ add: method DoCaretsFixIfAfterLineEnds
++ add: use new method in Trim Spaces actions
+
 2018.05.09
 + add: can render syntax hilited text with several fonts: added props FontItalic, FontBold, FontBoldItalic
 
