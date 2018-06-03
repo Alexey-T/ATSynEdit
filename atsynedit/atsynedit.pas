@@ -649,7 +649,6 @@ type
     procedure DoCaretsShift_MarkerItem(AMarkerObj: TATMarkers;
       AMarkerIndex: integer; APosX, APosY, AShiftX, AShiftY,
       AShiftBelowX: integer; APosAfter: TPoint);
-    procedure DoCaretsFixIfInsideCollapsedPart;
     procedure DoClearFoldedMarkList;
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
@@ -1034,6 +1033,8 @@ type
     procedure DoCaretSingle(APosX, APosY, AEndX, AEndY: integer);
     procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
     procedure DoCaretSingleAsIs;
+    procedure DoCaretsFixIfAfterLineEnds;
+    procedure DoCaretsFixIfInsideCollapsedPart;
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoCaretForceShow;

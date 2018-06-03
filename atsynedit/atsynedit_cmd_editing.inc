@@ -874,7 +874,10 @@ begin
   if ModeReadOnly then Exit;
 
   if Strings.ActionTrimSpaces(AMode) then
+  begin
+    DoCaretsFixIfAfterLineEnds;
     Result:= [cResultCaretAny, cResultText];
+  end;
 end;
 
 function TATSynEdit.DoCommand_ForceFinalEndOfLine: TATCommandResults;

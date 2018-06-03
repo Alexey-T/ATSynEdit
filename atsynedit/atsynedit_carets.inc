@@ -870,6 +870,40 @@ begin
 end;
 
 
+procedure TATSynEdit.DoCaretsFixIfAfterLineEnds;
+var
+  Caret: TATCaretItem;
+  NLast, NLen, i: integer;
+begin
+  NLast:= Strings.Count-1;
+  if NLast<0 then
+  begin
+    DoCaretSingle(0, 0);
+    exit
+  end;
+
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Caret:= Carets[i];
+
+    if not Strings.IsIndexValid(Caret.PosY) then
+      Caret.PosY:= NLast;
+    NLen:= Strings.LinesLen[Caret.PosY];
+    if Caret.PosX>NLen then
+      Caret.PosX:= NLen;
+
+    if Caret.EndY>=0 then
+    begin
+      if not Strings.IsIndexValid(Caret.EndY) then
+        Caret.EndY:= NLast;
+      NLen:= Strings.LinesLen[Caret.EndY];
+      if Caret.EndX>NLen then
+        Caret.EndX:= NLen;
+    end;
+  end;
+end;
+
+
 procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
   AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
 var
