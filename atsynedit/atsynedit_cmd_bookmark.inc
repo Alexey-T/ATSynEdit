@@ -85,3 +85,42 @@ begin
   until false;
 end;
 
+
+procedure TATSynEdit.BookmarkCopyMarkedLines;
+var
+  List: TStringList;
+  NLine, i: integer;
+begin
+  List:= TStringList.Create;
+  try
+    for i:= 0 to Strings.Bookmarks.Count-1 do
+    begin
+      NLine:= Strings.Bookmarks[i].LineNum;
+      if Strings.IsIndexValid(NLine) then
+        List.Add(Strings.LinesUTF8[NLine]);
+    end;
+    SClipboardCopy(List.Text);
+  finally
+    FreeAndNil(List);
+  end;
+end;
+
+
+procedure TATSynEdit.BookmarkDeleteMarkedLines;
+var
+  NCount, NLine, i: integer;
+begin
+  NCount:= Strings.Bookmarks.Count;
+  if NCount=0 then exit;
+
+  for i:= NCount-1 downto 0 do
+  begin
+    NLine:= Strings.Bookmarks[i].LineNum;
+    Strings.LineDelete(NLine);
+  end;
+
+  UpdateIncorrectCaretPositions;
+  Update(true);
+  DoEventChange;
+end;
+

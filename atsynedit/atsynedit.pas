@@ -1058,6 +1058,8 @@ type
     procedure BookmarkDeleteAll;
     procedure BookmarkInvertAll;
     procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer);
+    procedure BookmarkCopyMarkedLines;
+    procedure BookmarkDeleteMarkedLines;
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
