@@ -1049,6 +1049,15 @@ type
       APlaceCaret, ADoUnfold: boolean;
       AAllowProcessMsg: boolean=true);
     procedure DoGotoCaret(AEdge: TATCaretEdge);
+    //bookmarks
+    procedure BookmarkSetForLine(ALine, ABmKind: integer;
+      const AHint: string; ADeleteOnDelLine: boolean);
+    procedure BookmarkToggleForLine(ALine, ABmKind: integer;
+      const AHint: string; ADeleteOnDelLine: boolean);
+    procedure BookmarkDeleteForLine(ALine: integer);
+    procedure BookmarkDeleteAll;
+    procedure BookmarkInvertAll;
+    procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer);
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
@@ -6064,6 +6073,7 @@ end;
 {$I atsynedit_cmd_editing.inc}
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
+{$I atsynedit_cmd_bookmark.inc}
 
 
 initialization
