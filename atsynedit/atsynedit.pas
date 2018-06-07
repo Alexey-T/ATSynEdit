@@ -1060,6 +1060,8 @@ type
     procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer);
     procedure BookmarkCopyMarkedLines;
     procedure BookmarkDeleteMarkedLines;
+    procedure BookmarkPlaceBookmarksOnCarets;
+    procedure BookmarkPlaceCaretsOnBookmarks;
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;

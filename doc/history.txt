@@ -1,6 +1,8 @@
 
 2018.06.07
 + add: public methods
+    DoConvertTabsToSpaces
+    DoConvertSpacesToTabsLeading
     BookmarkSetForLine
     BookmarkToggleForLine
     BookmarkDeleteForLine
@@ -9,8 +11,8 @@
     BookmarkGotoNext
     BookmarkCopyMarkedLines
     BookmarkDeleteMarkedLines
-    DoConvertTabsToSpaces
-    DoConvertSpacesToTabsLeading
+    BookmarkPlaceBookmarksOnCarets
+    BookmarkPlaceCaretsOnBookmarks
 
 2018.06.03
 + add: method DoCaretsFixIfAfterLineEnds

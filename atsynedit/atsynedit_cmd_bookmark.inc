@@ -124,3 +124,44 @@ begin
   DoEventChange;
 end;
 
+
+procedure TATSynEdit.BookmarkPlaceCaretsOnBookmarks;
+var
+  X1, Y1, X2, Y2: integer;
+  NLine, i: integer;
+begin
+  if Carets.Count=0 then exit;
+  with Carets[0] do
+  begin
+    X1:= PosX;
+    Y1:= PosY;
+    X2:= EndX;
+    Y2:= EndY;
+  end;
+
+  Carets.Clear;
+  for i:= 0 to Strings.Bookmarks.Count-1 do
+  begin
+    NLine:= Strings.Bookmarks[i].LineNum;
+    Carets.Add(0, NLine);
+  end;
+
+  if Carets.Count=0 then
+    DoCaretSingle(X1, Y1, X2, Y2);
+end;
+
+
+procedure TATSynEdit.BookmarkPlaceBookmarksOnCarets;
+var
+  Caret: TATCaretItem;
+  i: integer;
+begin
+  BookmarkDeleteAll;
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Caret:= Carets[i];
+    if Strings.IsIndexValid(Caret.PosY) then
+      Strings.Bookmarks.Add(Caret.PosY, 1, '', false);
+  end;
+end;
+
