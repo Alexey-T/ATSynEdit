@@ -1062,6 +1062,11 @@ type
     procedure BookmarkDeleteMarkedLines;
     procedure BookmarkPlaceBookmarksOnCarets;
     procedure BookmarkPlaceCaretsOnBookmarks;
+    //markers
+    procedure MarkerClearAll;
+    procedure MarkerDrop;
+    procedure MarkerGotoLast(AndDelete: boolean; AIndentHorz, AIndentVert: integer);
+    procedure MarkerSwap;
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
@@ -6080,6 +6085,7 @@ end;
 {$I atsynedit_cmd_clipboard.inc}
 {$I atsynedit_cmd_misc.inc}
 {$I atsynedit_cmd_bookmark.inc}
+{$I atsynedit_cmd_markers.inc}
 
 
 initialization

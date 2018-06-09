@@ -1,4 +1,11 @@
 
+2018.06.09
++ add: public methods
+    MarkerClearAll
+    MarkerDrop
+    MarkerGotoLast
+    MarkerSwap
+
 2018.06.07
 + add: public methods
     DoConvertTabsToSpaces
