@@ -4249,7 +4249,9 @@ begin
         if Carets.Count>0 then
         begin
           P:= ClientPosToCaretPos(P, Details);
-          if P.Y>=0 then
+          if (P.Y>=0) and
+            //mouse actually moved
+            not ((FMouseDownPnt.X=P.X) and (FMouseDownPnt.Y=P.Y)) then
           begin
             //drag w/out button pressed: single selection
             if [ssXControl, ssShift, ssAlt]*Shift=[] then
