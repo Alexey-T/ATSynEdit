@@ -63,7 +63,7 @@ begin
 
   //first add Attribs,
   //selection must be over attribs
-  DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, nLineLen, AColorBG);
+  DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
@@ -290,7 +290,7 @@ end;
 
 
 procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
-  AOffsetMax, ALineIndex, ACharIndex, ALineLen: integer; AColorBG: TColor);
+  AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
 var
   Attr: TATMarkerItem;
   Part: TATLinePart;
@@ -306,7 +306,7 @@ begin
       begin
         //offset must be inside 0..ALineLen-1
         nOffset:= Attr.PosX-ACharIndex;
-        if (nOffset<0) or (nOffset>=ALineLen) then Continue;
+        if (nOffset<0) or (nOffset>=AOffsetMax) then Continue;
 
         //empty parts? init part for whole line, for DoPartInsert to work
         if AParts[0].Len=0 then
