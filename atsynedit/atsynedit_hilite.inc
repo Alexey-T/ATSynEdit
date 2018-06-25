@@ -292,10 +292,10 @@ end;
 procedure TATSynEdit.DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts;
   AOffsetMax, ALineIndex, ACharIndex, ALineLen: integer; AColorBG: TColor);
 var
-  i: integer;
   Attr: TATMarkerItem;
   Part: TATLinePart;
   PartObj: TATLinePartClass;
+  nOffset, i: integer;
 begin
   for i:= 0 to Attribs.Count-1 do
   begin
@@ -304,8 +304,9 @@ begin
     if Assigned(PartObj) then
       if Attr.PosY=ALineIndex then
       begin
-        //attr must be inside ALineLen
-        if Attr.PosX-ACharIndex>=ALineLen then Continue;
+        //offset must be inside 0..ALineLen-1
+        nOffset:= Attr.PosX-ACharIndex;
+        if (nOffset<0) or (nOffset>=ALineLen) then Continue;
 
         //empty parts? init part for whole line, for DoPartInsert to work
         if AParts[0].Len=0 then
@@ -318,7 +319,7 @@ begin
 
         Part:= PartObj.Data;
         Part.Len:= Attr.LenX;
-        Part.Offset:= Attr.PosX-ACharIndex;
+        Part.Offset:= nOffset;
         //note: don't change Part.ColorBG here
         DoPartInsert(AParts, Part, false);
       end;
