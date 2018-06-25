@@ -702,7 +702,7 @@ type
     procedure DoPartCalc_ApplySelectionOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
-      ALineIndex, ACharIndex: integer; AColorBG: TColor);
+      ALineIndex, ACharIndex, ALineLen: integer; AColorBG: TColor);
     function GetAutoIndentString(APosX, APosY: integer): atString;
     function GetFirstUnfoldedLineNumber: integer;
     function GetFoldedMarkText(ALine: integer): string;
