@@ -304,7 +304,7 @@ begin
     if Assigned(PartObj) then
       if Attr.PosY=ALineIndex then
       begin
-        //offset must be inside 0..ALineLen-1
+        //must check offset, for part of wrapped line
         nOffset:= Attr.PosX-ACharIndex;
         if (nOffset<0) or (nOffset>=AOffsetMax) then Continue;
 
