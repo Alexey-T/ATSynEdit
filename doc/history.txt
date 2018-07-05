@@ -1,4 +1,7 @@
 
+2018.07.05
+- fix: OnContextPopup was not called
+
 2018.06.12
 - fix: tiny mouse moving gave empty selection (from x:y to x:y)
 

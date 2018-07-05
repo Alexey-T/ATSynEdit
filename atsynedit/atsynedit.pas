@@ -3576,8 +3576,12 @@ end;
 
 procedure TATSynEdit.DoContextPopup(MousePos: TPoint; var Handled: Boolean);
 begin
-  DoHandleRightClick(MousePos.X, MousePos.Y);
-  Handled:= true;
+  inherited;
+  if not Handled then
+  begin
+    DoHandleRightClick(MousePos.X, MousePos.Y);
+    Handled:= true;
+  end;
 end;
 
 procedure TATSynEdit.WMEraseBkgnd(var Msg: TLMEraseBkgnd);
