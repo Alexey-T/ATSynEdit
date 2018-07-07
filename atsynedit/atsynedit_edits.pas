@@ -185,6 +185,9 @@ var
   i: integer;
   mi: TMenuItem;
 begin
+  Update; //control may get focus, need repaint
+  if FItems.Count=0 then exit;
+
   p:= ClientToScreen(Point(Width-OptMicromapWidth, Height));
   with FMenu.Items do
   begin
