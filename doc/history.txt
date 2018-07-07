@@ -1,4 +1,10 @@
 
+2018.07.07
++ add: commands (from CudaText):
+  cCommand_FoldingFoldAtCurLine
+  cCommand_FoldingUnfoldAtCurLine
+  cCommand_FoldingToggleAtCurLine
+
 2018.07.05
 - fix: OnContextPopup was not called
 

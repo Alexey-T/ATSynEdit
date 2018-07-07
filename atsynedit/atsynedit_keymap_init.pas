@@ -201,6 +201,9 @@ begin
   M.Add(cCommand_FoldLevel7, 'folding: fold level 7', [], []);
   M.Add(cCommand_FoldLevel8, 'folding: fold level 8', [], []);
   M.Add(cCommand_FoldLevel9, 'folding: fold level 9', [], []);
+  M.Add(cCommand_FoldingFoldAtCurLine, 'folding: fold block at current line', [], []);
+  M.Add(cCommand_FoldingUnfoldAtCurLine, 'folding: unfold block at current line', [], []);
+  M.Add(cCommand_FoldingToggleAtCurLine, 'folding: toggle block at current line', [], []);
 end;
 
 procedure InitKeymapCombo(var M: TATKeymap);

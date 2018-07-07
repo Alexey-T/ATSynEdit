@@ -148,6 +148,12 @@ type
     cFoldFromNextLine //looks like SynWrite: don't show "...", show separator line
     );
 
+  TATFoldRangeCmd = (
+    cFoldingFold,
+    cFoldingUnfold,
+    cFoldingToggle
+    );
+
 type
   TATAutoIndentKind = (
     cIndentAsPrevLine,
@@ -656,6 +662,7 @@ type
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
       AForThisRange: TATSynRange);
+    procedure DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
     function DoGetFoldedMarkAt(Pnt: TPoint): TATFoldedMark;
     function DoGetFoldedMarkLinesCount(ALine: integer): integer;
     procedure DoHandleRightClick(X, Y: integer);
@@ -873,6 +880,8 @@ type
     function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
     function DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
     function DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
+    function DoCommand_FoldRangeAtCurLine(ACommand: TATFoldRangeCmd
+      ): TATCommandResults;
     function DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
     function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
     function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;

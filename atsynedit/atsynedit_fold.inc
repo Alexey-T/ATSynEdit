@@ -425,3 +425,44 @@ begin
   Update;
 end;
 
+
+procedure TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
+var
+  NLine: integer;
+  R: TATSynRange;
+begin
+  if Carets.Count<>1 then exit;
+  NLine:= Carets[0].PosY;
+  if not Strings.IsIndexValid(NLine) then exit;
+
+  R:= Fold.FindRangeWithPlusAtLine(NLine);
+  if R=nil then exit;
+
+  case AOp of
+    cFoldingFold:
+      begin
+        if not R.Folded then
+        begin
+          DoRangeFold(R);
+          Update;
+        end;
+      end;
+    cFoldingUnfold:
+      begin
+        if R.Folded then
+        begin
+          DoRangeUnfold(R);
+          Update;
+        end;
+      end;
+    cFoldingToggle:
+      begin
+        if R.Folded then
+          DoRangeUnfold(R)
+        else
+          DoRangeFold(R);
+        Update;
+      end;
+  end;
+end;
+

@@ -145,10 +145,16 @@ begin
   Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
 end;
 
-
 function TATSynEdit.DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
 begin
   DoFoldForLevel(ALevel);
+  Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
+end;
+
+
+function TATSynEdit.DoCommand_FoldRangeAtCurLine(ACommand: TATFoldRangeCmd): TATCommandResults;
+begin
+  DoFoldUnfoldRangeAtCurLine(ACommand);
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
 

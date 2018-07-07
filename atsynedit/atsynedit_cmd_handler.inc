@@ -427,6 +427,10 @@ begin
     cCommand_FoldLevel1..
     cCommand_FoldLevel9:               Res:= DoCommand_FoldLevel(ACmd-cCommand_FoldLevel1);
 
+    cCommand_FoldingFoldAtCurLine:     Res:= DoCommand_FoldRangeAtCurLine(cFoldingFold);
+    cCommand_FoldingUnfoldAtCurLine:   Res:= DoCommand_FoldRangeAtCurLine(cFoldingUnfold);
+    cCommand_FoldingToggleAtCurLine:   Res:= DoCommand_FoldRangeAtCurLine(cFoldingToggle);
+
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
     cCommand_CaretsExtendUpLine:       Res:= DoCommand_CaretsExtend(false, 1);
     cCommand_CaretsExtendUpPage:       Res:= DoCommand_CaretsExtend(false, GetPageLines);
