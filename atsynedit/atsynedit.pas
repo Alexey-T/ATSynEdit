@@ -659,10 +659,6 @@ type
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     procedure DoFoldbarClick(ALine: integer);
-    procedure DoFoldForLevel(ALevel: integer);
-    procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
-      AForThisRange: TATSynRange);
-    procedure DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
     function DoGetFoldedMarkAt(Pnt: TPoint): TATFoldedMark;
     function DoGetFoldedMarkLinesCount(ALine: integer): integer;
     procedure DoHandleRightClick(X, Y: integer);
@@ -1071,6 +1067,13 @@ type
     procedure BookmarkDeleteMarkedLines;
     procedure BookmarkPlaceBookmarksOnCarets;
     procedure BookmarkPlaceCaretsOnBookmarks;
+    //fold
+    procedure DoRangeFold(ARange: TATSynRange);
+    procedure DoRangeUnfold(ARange: TATSynRange);
+    procedure DoFoldForLevel(ALevel: integer);
+    procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
+      AForThisRange: TATSynRange);
+    procedure DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
     //markers
     procedure MarkerClearAll;
     procedure MarkerDrop;
@@ -1097,8 +1100,6 @@ type
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_FromSelRect;
-    procedure DoRangeFold(ARange: TATSynRange);
-    procedure DoRangeUnfold(ARange: TATSynRange);
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
