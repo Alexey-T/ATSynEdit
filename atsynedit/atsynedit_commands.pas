@@ -214,9 +214,9 @@ const
   cCommand_CaretsExtendUpPage = 2014;
   cCommand_CaretsExtendUpToTop = 2015;
 
-  // custom commands id must start here not to conflict
-  // with built-in commands in the DoCommand overridden method.
-  cCommand_FirstUser = 30000;
+  // custom commands must start later to not conflict
+  // with built-in commands in the DoCommand overridden method
+  cCommand_FirstUserCode = 4000;
 
 implementation
 
