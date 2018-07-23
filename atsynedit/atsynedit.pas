@@ -5118,7 +5118,7 @@ begin
   Result:= Strings.TextString_Unicode;
 end;
 
-function TATSynEdit.IsRepaintNeededOnEnterOrExit: boolean;
+function TATSynEdit.IsRepaintNeededOnEnterOrExit: boolean; inline;
 begin
   Result:=
     FOptShowCurLineOnlyFocused or
