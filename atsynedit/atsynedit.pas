@@ -691,6 +691,7 @@ type
     function GetRectMinimapSel: TRect;
     procedure InitResourcesFoldbar;
     function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
+    function IsRepaintNeededOnEnterOrExit: boolean;
     procedure MenuFoldFoldAllClick(Sender: TObject);
     procedure MenuFoldLevelClick(Sender: TObject);
     procedure MenuFoldUnfoldAllClick(Sender: TObject);
@@ -5117,19 +5118,25 @@ begin
   Result:= Strings.TextString_Unicode;
 end;
 
+function TATSynEdit.IsRepaintNeededOnEnterOrExit: boolean;
+begin
+  Result:=
+    FOptShowCurLineOnlyFocused or
+    FOptBorderFocusedActive or
+    FCaretStopUnfocused;
+end;
+
 procedure TATSynEdit.DoEnter;
 begin
   inherited;
-  //repaint only if some options set
-  if FOptShowCurLineOnlyFocused or FOptBorderFocusedActive then
+  if IsRepaintNeededOnEnterOrExit then
     Update;
 end;
 
 procedure TATSynEdit.DoExit;
 begin
   inherited;
-  //repaint only if some options set
-  if FOptShowCurLineOnlyFocused or FOptBorderFocusedActive then
+  if IsRepaintNeededOnEnterOrExit then
     Update;
 end;
 

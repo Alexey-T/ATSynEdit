@@ -1,4 +1,7 @@
 
+2018.07.23
+- fix: OptCaretStopUnfocused didn't have effect for non-blicking caret on focus lost
+
 2018.07.07
 + add: commands (from CudaText):
   cCommand_FoldingFoldAtCurLine
