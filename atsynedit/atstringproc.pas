@@ -46,6 +46,7 @@ var
 
 function IsCharEol(ch: atChar): boolean;
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
+function IsCharWordInIdentifier(ch: atChar): boolean;
 function IsCharDigit(ch: atChar): boolean; inline;
 function IsCharSpace(ch: atChar): boolean;
 function IsStringWithUnicodeChars(const S: atString): boolean;
@@ -157,6 +158,19 @@ begin
     if AWordChars<>'' then
       if Pos(ch, AWordChars)>0 then
         Result:= true;
+end;
+
+function IsCharWordInIdentifier(ch: atChar): boolean;
+begin
+  case ch of
+    '0'..'9',
+    'a'..'z',
+    'A'..'Z',
+    '_':
+      Result:= true;
+    else
+      Result:= false;
+  end;
 end;
 
 function IsCharDigit(ch: atChar): boolean; inline;
