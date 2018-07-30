@@ -1,6 +1,6 @@
 
 2018.07.23
-- fix: OptCaretStopUnfocused didn't have effect for non-blicking caret on focus lost
+- fix: OptCaretStopUnfocused didn't have effect for non-blinking caret on focus change
 
 2018.07.07
 + add: commands (from CudaText):
