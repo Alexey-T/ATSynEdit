@@ -80,18 +80,16 @@ end;
 
 {
 http://unicode.org/reports/tr9/#Directional_Formatting_Characters
-Implicit Directional Formatting Characters 	LRM, RLM, ALM
-Explicit Directional Embedding and Override Formatting Characters 	LRE, RLE, LRO, RLO, PDF
-Explicit Directional Isolate Formatting Characters 	LRI, RLI, FSI, PDI
+https://en.wikipedia.org/wiki/Whitespace_character#Unicode
 }
 function IsCharHex(ch: widechar): boolean;
 begin
   if ch=#9 then exit(false);
-  if Ord(ch)<$20 then exit(true);
-  if Ord(ch)<128 then exit(false);
+  if ch<#$20 then exit(true);
+  if ch<#128 then exit(false);
 
   //codes for surrogate utf16 chars
-  if (Ord(ch)>=$D800) and (Ord(ch)<=$DFFF) then exit(true);
+  if (ch>=#$D800) and (ch<=#$DFFF) then exit(true);
 
   if (ch>=#$202A) and (ch<=#$202E) then exit(true);
   if (ch>=#$2066) and (ch<=#$2069) then exit(true);
