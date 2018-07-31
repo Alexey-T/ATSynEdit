@@ -89,14 +89,16 @@ begin
   if ch<#128 then exit(false);
 
   if ch=#$85 then exit(true); //white space
-  if ch=#$1680 then exit(true); //white space
   if (ch>=#$D800) and (ch<=#$DFFF) then exit(true); //surrogate utf-16 chars
-  if (ch>=#$2000) and (ch<=#$200A) then exit(true); //white space
-  if (ch>=#$202A) and (ch<=#$202E) then exit(true);
+  if (ch>=#$2000) and (ch<=#$200F) then exit(true); //white spaces + specials
+  if (ch>=#$2028) and (ch<=#$202F) then exit(true); //white spaces + specials
   if (ch>=#$2066) and (ch<=#$2069) then exit(true);
-  if ch=#$200E then exit(true);
-  if ch=#$200F then exit(true);
+  if ch=#$1680 then exit(true); //white space
+  if ch=#$205F then exit(true); //white space
+  if ch=#$2060 then exit(true); //white space
+  if ch=#$3000 then exit(true); //white space
   if ch=#$061C then exit(true);
+  if ch=#$FEFF then exit(true);
 
   Result:= Pos(ch, OptHexChars)>0;
 end;
