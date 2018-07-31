@@ -1,4 +1,8 @@
 
+2018.07.31
+- fix: bug in detecting width of Unicode chars which are "hex"
++ add: detect more Unicode chars as "hex", from Wikipedia "White space characters"
+
 2018.07.23
 - fix: OptCaretStopUnfocused didn't have effect for non-blinking caret on focus change
 
