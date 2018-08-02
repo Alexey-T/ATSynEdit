@@ -202,7 +202,6 @@ type
     function GetCaretsArray: TATPointArray;
     function GetLine(AIndex: integer): atString;
     function GetLineUTF8(AIndex: integer): string;
-    function GetLineBm(AIndex: integer): integer;
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
     function GetLineHidden(ALine, AClient: integer): boolean;
@@ -221,7 +220,6 @@ type
     procedure SetCaretsArray(const L: TATPointArray);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(AIndex: integer; const AValue: atString);
-    procedure SetLineBm(AIndex: integer; AValue: integer);
     procedure SetLineEnd(AIndex: integer; AValue: TATLineEnds);
     procedure SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
     procedure SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
@@ -262,7 +260,6 @@ type
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
-    property LinesBm[Index: integer]: integer read GetLineBm write SetLineBm; deprecated 'Use Strings.Bookmarks instead';
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
     function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabSize: integer): integer;
@@ -454,16 +451,6 @@ begin
   Result:= FList.GetItem(AIndex)^.Str;
 end;
 
-function TATStrings.GetLineBm(AIndex: integer): integer;
-var
-  BmIndex: integer;
-begin
-  Result:= 0;
-  BmIndex:= FBookmarks.Find(AIndex);
-  if BmIndex>=0 then
-    Result:= FBookmarks[BmIndex].Kind;
-end;
-
 function TATStrings.GetLineEnd(AIndex: integer): TATLineEnds;
 begin
   //Assert(IsIndexValid(AIndex));
@@ -619,20 +606,6 @@ begin
 
   Item^.Ex.HasTab:= 0; //unknown
   Item^.Ex.HasAsciiOnly:= 0; //unknown
-end;
-
-procedure TATStrings.SetLineBm(AIndex: integer; AValue: integer);
-const
-  cMax = $FFFF;
-begin
-  if AValue<0 then AValue:= 0;
-  if AValue>cMax then AValue:= cMax;
-
-  if IsIndexValid(AIndex) then
-    if AValue>0 then
-      FBookmarks.Add(AIndex, AValue, '', false)
-    else
-      FBookmarks.DeleteForLine(AIndex);
 end;
 
 procedure TATStrings.SetLineSep(AIndex: integer; AValue: TATLineSeparator);
