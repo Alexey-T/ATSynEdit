@@ -275,7 +275,7 @@ type
     fCompModifiers : integer; // compiler's copy of modifiers
     fProgModifiers : integer; // modifiers values from last programm compilation
 
-    fSpaceChars : RegExprString; //###0.927
+    //fSpaceChars : RegExprString; //###0.927
     //fWordChars : RegExprString; //###0.929
     fInvertCase : TRegExprInvertCaseFunction; //###0.927
 
@@ -558,7 +558,7 @@ type
     // Returns pos in r.e. there compiler stopped.
     // Useful for error diagnostics
 
-    property SpaceChars : RegExprString read fSpaceChars write fSpaceChars; //###0.927
+    //property SpaceChars : RegExprString read fSpaceChars write fSpaceChars; //###0.927
     // Contains chars, treated as /s (initially filled with RegExprSpaceChars
     // global constant)
 
@@ -672,6 +672,17 @@ const
  {$ELSE}
  XIgnoredChars = [' ', #9, #$d, #$a];
  {$ENDIF}
+
+
+ function IsCharSpace(ch: WideChar): boolean; inline;
+ begin
+   case ch of
+     ' ', #$9, #$A, #$D, #$C:
+       Result:= true
+     else
+       Result:= false;
+   end;
+ end;
 
  //this function is taken from ATStringProc.pas
  function IsCharWord(ch: WideChar): boolean;
@@ -1207,7 +1218,7 @@ constructor TRegExpr.Create;
   ModifierG := RegExprModifierG;
   ModifierM := RegExprModifierM; //###0.940
 
-  SpaceChars := RegExprSpaceChars; //###0.927
+  //SpaceChars := RegExprSpaceChars; //###0.927
   //WordChars := RegExprWordChars; //###0.929
   fInvertCase := RegExprInvertCaseFunction; //###0.927
 
@@ -2439,7 +2450,7 @@ function TRegExpr.ParseAtom (var flagp : integer) : PRegExprChar;
                 case regparse^ of // r.e.extensions
                   'd': EmitRangeStr ('0123456789');
                   'w': EmitRangeStr (RegExprWordChars);
-                  's': EmitRangeStr (SpaceChars);
+                  's': EmitRangeStr (RegExprSpaceChars);
                   else EmitSimpleRangeC (UnQuoteChar (regparse));
                  end; { of case}
                end
@@ -2770,13 +2781,13 @@ function TRegExpr.regrepeat (p : PRegExprChar; AMax : PtrInt) : PtrInt;
        end;
     ANYSPACE:
       while (Result < TheMax) and
-         (Pos (scan^, fSpaceChars) > 0) do begin
+         IsCharSpace(scan^) do begin
         inc (Result);
         inc (scan);
        end;
     NOTSPACE:
       while (Result < TheMax) and
-         (Pos (scan^, fSpaceChars) <= 0) do begin
+         not IsCharSpace(scan^) do begin
         inc (Result);
         inc (scan);
        end;
@@ -2973,12 +2984,12 @@ function TRegExpr.MatchPrim (prog : PRegExprChar) : boolean;
             inc (reginput);
            end;
          ANYSPACE: begin
-            if (reginput^ = #0) or not (Pos (reginput^, fSpaceChars) > 0) //###0.943
+            if (reginput^ = #0) or not IsCharSpace(reginput^) //###0.943
              then EXIT;
             inc (reginput);
            end;
          NOTSPACE: begin
-            if (reginput^ = #0) or (Pos (reginput^, fSpaceChars) > 0) //###0.943
+            if (reginput^ = #0) or IsCharSpace(reginput^) //###0.943
              then EXIT;
             inc (reginput);
            end;
