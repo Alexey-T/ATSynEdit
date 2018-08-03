@@ -276,7 +276,7 @@ type
     fProgModifiers : integer; // modifiers values from last programm compilation
 
     fSpaceChars : RegExprString; //###0.927
-    fWordChars : RegExprString; //###0.929
+    //fWordChars : RegExprString; //###0.929
     fInvertCase : TRegExprInvertCaseFunction; //###0.927
 
     fLineSeparators : RegExprString; //###0.941
@@ -562,7 +562,7 @@ type
     // Contains chars, treated as /s (initially filled with RegExprSpaceChars
     // global constant)
 
-    property WordChars : RegExprString read fWordChars write fWordChars; //###0.929
+    //property WordChars : RegExprString read fWordChars write fWordChars; //###0.929
     // Contains chars, treated as /w (initially filled with RegExprWordChars
     // global constant)
 
@@ -653,6 +653,8 @@ function RegExprSubExpressions (const ARegExpr : string;
 
 implementation
 
+uses UnicodeData;
+
 const
  TRegExprVersionMajor : integer = 0;
  TRegExprVersionMinor : integer = 952;
@@ -670,6 +672,31 @@ const
  {$ELSE}
  XIgnoredChars = [' ', #9, #$d, #$a];
  {$ENDIF}
+
+ //this function is taken from ATStringProc.pas
+ function IsCharWord(ch: WideChar): boolean;
+ var
+   NType: byte;
+ begin
+   case ch of
+     '0'..'9',
+     'a'..'z',
+     'A'..'Z',
+     '_':
+       exit(true);
+   end;
+
+   if Ord(ch)<128 then
+     Result:= false
+   else
+   if Ord(ch)>=LOW_SURROGATE_BEGIN then
+     exit(false)
+   else
+   begin
+     NType:= GetProps(Ord(ch))^.Category;
+     Result:= (NType<=UGC_OtherNumber);
+   end;
+ end;
 
  function AlignToPtr(const p: Pointer): Pointer;
  begin
@@ -1181,7 +1208,7 @@ constructor TRegExpr.Create;
   ModifierM := RegExprModifierM; //###0.940
 
   SpaceChars := RegExprSpaceChars; //###0.927
-  WordChars := RegExprWordChars; //###0.929
+  //WordChars := RegExprWordChars; //###0.929
   fInvertCase := RegExprInvertCaseFunction; //###0.927
 
   fLineSeparators := RegExprLineSeparators; //###0.941
@@ -2411,7 +2438,7 @@ function TRegExpr.ParseAtom (var flagp : integer) : PRegExprChar;
                  end;
                 case regparse^ of // r.e.extensions
                   'd': EmitRangeStr ('0123456789');
-                  'w': EmitRangeStr (WordChars);
+                  'w': EmitRangeStr (RegExprWordChars);
                   's': EmitRangeStr (SpaceChars);
                   else EmitSimpleRangeC (UnQuoteChar (regparse));
                  end; { of case}
@@ -2724,7 +2751,8 @@ function TRegExpr.regrepeat (p : PRegExprChar; AMax : PtrInt) : PtrInt;
     {$IFNDEF UseSetOfChar} //###0.929
     ANYLETTER:
       while (Result < TheMax) and
-       (Pos (scan^, fWordChars) > 0) //###0.940
+       //(Pos (scan^, fWordChars) > 0) //###0.940
+       IsCharWord(scan^) //AT
      {  ((scan^ >= 'a') and (scan^ <= 'z') !! I've forgotten (>='0') and (<='9')
        or (scan^ >= 'A') and (scan^ <= 'Z') or (scan^ = '_'))} do begin
         inc (Result);
@@ -2732,7 +2760,8 @@ function TRegExpr.regrepeat (p : PRegExprChar; AMax : PtrInt) : PtrInt;
        end;
     NOTLETTER:
       while (Result < TheMax) and
-       (Pos (scan^, fWordChars) <= 0)  //###0.940
+       //(Pos (scan^, fWordChars) <= 0)  //###0.940
+       not IsCharWord(scan^)
      {   not ((scan^ >= 'a') and (scan^ <= 'z') !! I've forgotten (>='0') and (<='9')
          or (scan^ >= 'A') and (scan^ <= 'Z')
          or (scan^ = '_'))} do begin
@@ -2861,11 +2890,11 @@ function TRegExpr.MatchPrim (prog : PRegExprChar) : boolean;
          BOUND:
          if (scan^ = BOUND)
           xor (
-          ((reginput = fInputStart) or (Pos ((reginput - 1)^, fWordChars) <= 0))
-            and (reginput^ <> #0) and (Pos (reginput^, fWordChars) > 0)
+          ((reginput = fInputStart) or not IsCharWord((reginput - 1)^)) //(Pos ((reginput - 1)^, fWordChars) <= 0))
+            and (reginput^ <> #0) and IsCharWord(reginput^) //(Pos (reginput^, fWordChars) > 0)
            or
-            (reginput <> fInputStart) and (Pos ((reginput - 1)^, fWordChars) > 0)
-            and ((reginput^ = #0) or (Pos (reginput^, fWordChars) <= 0)))
+            (reginput <> fInputStart) and IsCharWord((reginput - 1)^) //(Pos ((reginput - 1)^, fWordChars) > 0)
+            and ((reginput^ = #0) or not IsCharWord(reginput^))) //(Pos (reginput^, fWordChars) <= 0)))
           then EXIT;
 
          BOL: if reginput <> fInputStart
@@ -2934,12 +2963,12 @@ function TRegExpr.MatchPrim (prog : PRegExprChar) : boolean;
            end;
          {$IFNDEF UseSetOfChar} //###0.929
          ANYLETTER: begin
-            if (reginput^ = #0) or (Pos (reginput^, fWordChars) <= 0) //###0.943
+            if (reginput^ = #0) or not IsCharWord(reginput^) //(Pos (reginput^, fWordChars) <= 0) //###0.943
              then EXIT;
             inc (reginput);
            end;
          NOTLETTER: begin
-            if (reginput^ = #0) or (Pos (reginput^, fWordChars) > 0) //###0.943
+            if (reginput^ = #0) or IsCharWord(reginput^) //(Pos (reginput^, fWordChars) > 0) //###0.943
              then EXIT;
             inc (reginput);
            end;
