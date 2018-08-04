@@ -1,4 +1,7 @@
 
+2018.08.03
++ add: improved RegExpr unit (similar patch is sent to FreePascal) to support all Unicode word letters in \w
+
 2018.08.02
 * deleted deprecated Strings.LinesBm[] prop
 
