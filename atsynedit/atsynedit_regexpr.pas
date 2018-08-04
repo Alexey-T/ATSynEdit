@@ -4054,19 +4054,7 @@ function TRegExpr.Dump : RegExprString;
 --------------------------------------------------------------}
 {$ENDIF}
 
-{$IFDEF reRealExceptionAddr}
-{$OPTIMIZATION ON}
-// ReturnAddr works correctly only if compiler optimization is ON
-// I placed this method at very end of unit because there are no
-// way to restore compiler optimization flag ...
-{$ENDIF}
 procedure TRegExpr.Error (AErrorID : integer);
-{$IFDEF reRealExceptionAddr}
- function ReturnAddr : pointer; //###0.938
-  asm
-   mov  eax,[ebp+4]
-  end;
-{$ENDIF}
  var
   e : ERegExpr;
  begin
@@ -4077,10 +4065,7 @@ procedure TRegExpr.Error (AErrorID : integer);
    else e := ERegExpr.Create (ErrorMsg (AErrorID));
   e.ErrorCode := AErrorID;
   e.CompilerErrorPos := CompilerErrorPos;
-  raise e
-   {$IFDEF reRealExceptionAddr}
-   At ReturnAddr; //###0.938
-   {$ENDIF}
+  raise e;
  end; { of procedure TRegExpr.Error
 --------------------------------------------------------------}
 
