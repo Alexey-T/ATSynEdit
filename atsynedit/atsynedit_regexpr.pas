@@ -680,7 +680,7 @@ const
    end;
  end;
 
- function AlignToPtr(const p: Pointer): Pointer;
+ function AlignToPtr(const p: Pointer): Pointer; inline;
  begin
  {$IFDEF FPC_REQUIRES_PROPER_ALIGNMENT}
    Result := Align(p, SizeOf(Pointer));
@@ -689,7 +689,7 @@ const
  {$ENDIF}
  end;
 
- function AlignToInt(const p: Pointer): Pointer;
+ function AlignToInt(const p: Pointer): Pointer; inline;
  begin
  {$IFDEF FPC_REQUIRES_PROPER_ALIGNMENT}
    Result := Align(p, SizeOf(integer));
@@ -697,78 +697,6 @@ const
    Result := p;
  {$ENDIF}
  end;
-
-{=============================================================}
-{=================== WideString functions ====================}
-{=============================================================}
-
-{$IFDEF UniCode}
-
-function StrPCopy (Dest: PRegExprChar; const Source: RegExprString): PRegExprChar;
- var
-  Len : integer;
- begin
-  Len := length (Source); //###0.932
-  if Len>0 then
-   move(Source[1],Dest[0],Len*sizeof(ReChar));
-  Dest [Len] := #0;
-  Result := Dest;
- end; { of function StrPCopy
---------------------------------------------------------------}
-
-function StrLCopy (Dest, Source: PRegExprChar; MaxLen: PtrUInt): PRegExprChar;
- begin
-   if MaxLen>0 then
-     move(Source[0],Dest[0],MaxLen*sizeof(ReChar));
-  Result := Dest;
- end; { of function StrLCopy
---------------------------------------------------------------}
-
-function StrLen (Str: PRegExprChar): PtrUInt;
- begin
-  Result:=0;
-  while Str [result] <> #0
-   do Inc (Result);
- end; { of function StrLen
---------------------------------------------------------------}
-
-function StrPos (Str1, Str2: PRegExprChar): PRegExprChar;
- var n: PtrInt;
- begin
-  Result := nil;
-  n := Pos (RegExprString (Str2), RegExprString (Str1));
-  if n = 0
-   then EXIT;
-  Result := Str1 + n - 1;
- end; { of function StrPos
---------------------------------------------------------------}
-
-function StrLComp (Str1, Str2: PRegExprChar; MaxLen: PtrUInt): PtrInt;
- var S1, S2: RegExprString;
- begin
-  S1 := Str1;
-  S2 := Str2;
-  if Copy (S1, 1, MaxLen) > Copy (S2, 1, MaxLen)
-   then Result := 1
-   else
-    if Copy (S1, 1, MaxLen) < Copy (S2, 1, MaxLen)
-     then Result := -1
-     else Result := 0;
- end; { function StrLComp
---------------------------------------------------------------}
-
-function StrScan (Str: PRegExprChar; Chr: WideChar): PRegExprChar;
- begin
-  Result := nil;
-  while (Str^ <> #0) and (Str^ <> Chr)
-   do Inc (Str);
-  if (Str^ <> #0)
-   then Result := Str;
- end; { of function StrScan
---------------------------------------------------------------}
-
-{$ENDIF}
-
 
 {=============================================================}
 {===================== Global functions ======================}
