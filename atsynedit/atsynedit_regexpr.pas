@@ -50,17 +50,12 @@ interface
 
 {off $DEFINE DebugSynRegExpr}
 
-{$IFDEF FPC}
- {$MODE DELPHI} // Delphi-compatible mode in FreePascal
-{$ENDIF}
+{$MODE DELPHI} // Delphi-compatible mode in FreePascal
 
 // ======== Define base compiler options
 {$BOOLEVAL OFF}
 {$EXTENDEDSYNTAX ON}
 {$LONGSTRINGS ON}
-{$IFNDEF FPC}
-{$OPTIMIZATION ON}
-{$ENDIF}
 
 // ======== Define options for TRegExpr engine
 {$DEFINE UniCode} // ATSynEdit needs Unicode support
@@ -79,8 +74,8 @@ interface
 // Define 'UseAsserts' option (do not edit this definitions).
 // Asserts used to catch 'strange bugs' in TRegExpr implementation (when something goes
 // completely wrong). You can swith asserts on/off with help of {$C+}/{$C-} compiler options.
-{$IFDEF FPC} {$DEFINE UseAsserts} {$ENDIF}
-{$IFDEF FPC} {$DEFINE OverMeth} {$ENDIF}
+{$DEFINE UseAsserts}
+{$DEFINE OverMeth}
 
 uses
  Classes,  // TStrings in Split method
@@ -411,12 +406,9 @@ type
     // Modifier /x - eXtended syntax, allow r.e. text formatting,
     // see description in the help. Initialized from RegExprModifierX
 
-    function Exec (const AInputString : RegExprString) : boolean; {$IFDEF OverMeth} overload;
-    {$IFNDEF FPC} // I do not know why FreePascal cannot overload methods with empty param list
+    function Exec (const AInputString : RegExprString) : boolean;
     function Exec : boolean; overload; //###0.949
-    {$ENDIF}
     function Exec (AOffset: PtrInt) : boolean; overload; //###0.949
-    {$ENDIF}
     // match a programm against a string AInputString
     // !!! Exec store AInputString into InputString property
     // For Delphi 5 and higher available overloaded versions - first without
@@ -462,11 +454,10 @@ type
     function Replace (const AInputStr : RegExprString;
       const AReplaceStr : RegExprString;
       AUseSubstitution : boolean{$IFDEF DefParam}= False{$ENDIF}) //###0.946
-     : RegExprString; {$IFDEF OverMeth} overload;
+     : RegExprString; overload;
     function Replace (const AInputStr : RegExprString;
       AReplaceFunc : TRegExprReplaceFunction)
      : RegExprString; overload;
-    {$ENDIF}
     function ReplaceEx (const AInputStr : RegExprString;
       AReplaceFunc : TRegExprReplaceFunction)
      : RegExprString;
@@ -569,7 +560,7 @@ type
   end;
 
 const
-  RegExprInvertCaseFunction : TRegExprInvertCaseFunction = {$IFDEF FPC} nil {$ELSE} TRegExpr.InvertCaseFunction{$ENDIF};
+  RegExprInvertCaseFunction : TRegExprInvertCaseFunction = nil;
   // defaul for InvertCase property
 
 function ExecRegExpr (const ARegExpr, AInputStr : RegExprString) : boolean;
@@ -3368,20 +3359,16 @@ function TRegExpr.Exec (const AInputString : RegExprString) : boolean;
  end; { of function TRegExpr.Exec
 --------------------------------------------------------------}
 
-{$IFDEF OverMeth}
-{$IFNDEF FPC}
-function TRegExpr.Exec : boolean;
+function TRegExpr.Exec : boolean; overload;
  begin
   Result := ExecPrim (1);
  end; { of function TRegExpr.Exec
 --------------------------------------------------------------}
-{$ENDIF}
-function TRegExpr.Exec (AOffset: PtrInt) : boolean;
+function TRegExpr.Exec (AOffset: PtrInt) : boolean; overload;
  begin
   Result := ExecPrim (AOffset);
  end; { of function TRegExpr.Exec
 --------------------------------------------------------------}
-{$ENDIF}
 
 function TRegExpr.ExecPos (AOffset: PtrInt {$IFDEF DefParam}= 1{$ENDIF}) : boolean;
  begin
@@ -3883,15 +3870,13 @@ function TRegExpr.ReplaceEx (const AInputStr : RegExprString;
 --------------------------------------------------------------}
 
 
-{$IFDEF OverMeth}
 function TRegExpr.Replace (const AInputStr : RegExprString;
       AReplaceFunc : TRegExprReplaceFunction)
      : RegExprString;
  begin
-  {$IFDEF FPC}Result:={$ENDIF}ReplaceEx (AInputStr, AReplaceFunc);
+  Result:= ReplaceEx (AInputStr, AReplaceFunc);
  end; { of function TRegExpr.Replace
 --------------------------------------------------------------}
-{$ENDIF}
 
 {=============================================================}
 {====================== Debug section ========================}
