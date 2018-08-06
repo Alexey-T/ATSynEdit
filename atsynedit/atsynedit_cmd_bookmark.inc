@@ -81,24 +81,29 @@ begin
 end;
 
 
-procedure TATSynEdit.BookmarkGotoNext(ANext: boolean;
-  AIndentHorz, AIndentVert: integer);
+procedure TATSynEdit.BookmarkGotoNext(ANext: boolean; AIndentHorz,
+  AIndentVert: integer; AOnlyShownInList: boolean);
 var
-  n, nFrom: integer;
+  nLine, nLineOrig, nItem: integer;
+  bm: TATBookmarkItem;
 begin
-  n:= Carets[0].PosY;
-  nFrom:= n;
+  nLine:= Carets[0].PosY;
+  nLineOrig:= nLine;
   repeat
-    if ANext then Inc(n) else Dec(n);
-    if n=nFrom then exit;
+    if ANext then Inc(nLine) else Dec(nLine);
+    if nLine=nLineOrig then exit;
 
-    if n>=Strings.Count then n:= 0;
-    if n<0 then n:= Strings.Count-1;
+    if nLine>=Strings.Count then
+      nLine:= 0;
+    if nLine<0 then
+      nLine:= Strings.Count-1;
 
-    if Strings.Bookmarks.Find(n)>=0 then
+    nItem:= Strings.Bookmarks.Find(nLine);
+    if (nItem>=0) and
+      (not AOnlyShownInList or Strings.Bookmarks[nItem].ShowInBookmarkList) then
     begin
       DoGotoPos(
-        Point(0, n),
+        Point(0, nLine),
         Point(-1, -1),
         AIndentHorz,
         AIndentVert,

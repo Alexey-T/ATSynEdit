@@ -37,6 +37,7 @@ uses
   ATSynEdit_Markers,
   ATSynEdit_Gutter,
   ATSynEdit_WrapInfo,
+  ATSynEdit_Bookmarks,
   ATSynEdit_Ranges,
   ATSynEdit_DimRanges,
   ATSynEdit_Gaps,
@@ -1064,7 +1065,8 @@ type
     function BookmarkDeleteByTag(const ATag: Int64): boolean;
     procedure BookmarkDeleteAll;
     procedure BookmarkInvertAll;
-    procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer);
+    procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer;
+      AOnlyShownInList: boolean);
     procedure BookmarkCopyMarkedLines;
     procedure BookmarkDeleteMarkedLines;
     procedure BookmarkPlaceBookmarksOnCarets;
