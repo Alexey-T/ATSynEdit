@@ -1,16 +1,27 @@
 {$ifdef nnnn}begin end;{$endif}
 
 procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
-  const AHint: string; ADeleteOnDelLine: boolean);
+  const AHint: string;
+  ADeleteOnDelLine, AShowInList: boolean;
+  const ATag: Int64);
 begin
   if not Strings.IsIndexValid(ALine) then exit;
-  Strings.Bookmarks.Add(ALine, ABmKind, AHint, ADeleteOnDelLine);
+  Strings.Bookmarks.Add(
+    ALine,
+    ABmKind,
+    AHint,
+    ADeleteOnDelLine,
+    AShowInList,
+    ATag
+    );
   Update;
 end;
 
 
 procedure TATSynEdit.BookmarkToggleForLine(ALine, ABmKind: integer;
-  const AHint: string; ADeleteOnDelLine: boolean);
+  const AHint: string;
+  ADeleteOnDelLine, AShowInList: boolean;
+  const ATag: Int64);
 var
   NIndex: integer;
 begin
@@ -20,7 +31,14 @@ begin
   if NIndex>=0 then
     Strings.Bookmarks.Delete(NIndex)
   else
-    Strings.Bookmarks.Add(ALine, ABmKind, AHint, ADeleteOnDelLine);
+    Strings.Bookmarks.Add(
+      ALine,
+      ABmKind,
+      AHint,
+      ADeleteOnDelLine,
+      AShowInList,
+      ATag
+      );
 
   Update;
 end;
@@ -31,6 +49,13 @@ begin
   if not Strings.IsIndexValid(ALine) then exit;
   Strings.Bookmarks.DeleteForLine(ALine);
   Update;
+end;
+
+function TATSynEdit.BookmarkDeleteByTag(const ATag: Int64): boolean;
+begin
+  Result:= Strings.Bookmarks.DeleteByTag(ATag);
+  if Result then
+    Update;
 end;
 
 

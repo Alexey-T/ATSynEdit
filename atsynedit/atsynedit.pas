@@ -1057,10 +1057,11 @@ type
     procedure DoGotoCaret(AEdge: TATCaretEdge);
     //bookmarks
     procedure BookmarkSetForLine(ALine, ABmKind: integer;
-      const AHint: string; ADeleteOnDelLine: boolean);
+      const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
     procedure BookmarkToggleForLine(ALine, ABmKind: integer;
-      const AHint: string; ADeleteOnDelLine: boolean);
+      const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
     procedure BookmarkDeleteForLine(ALine: integer);
+    function BookmarkDeleteByTag(const ATag: Int64): boolean;
     procedure BookmarkDeleteAll;
     procedure BookmarkInvertAll;
     procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer);

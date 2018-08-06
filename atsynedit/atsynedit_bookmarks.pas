@@ -44,7 +44,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteForLine(ALine: integer);
-    procedure DeleteByTag(const ATag: Int64);
+    function DeleteByTag(const ATag: Int64): boolean;
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATBookmarkItem read GetItem; default;
@@ -119,13 +119,17 @@ begin
     Delete(N);
 end;
 
-procedure TATBookmarks.DeleteByTag(const ATag: Int64);
+function TATBookmarks.DeleteByTag(const ATag: Int64): boolean;
 var
   i: integer;
 begin
+  Result:= false;
   for i:= FList.Count-1 downto 0 do
     if TATBookmarkItem(FList[i]).Tag=ATag then
+    begin
+      Result:= true;
       Delete(i);
+    end;
 end;
 
 function TATBookmarks.Count: integer;
