@@ -1,6 +1,8 @@
 
 2018.08.06
 + add: Bookmarks object items: added fields Tag (Int64), ShowInBookmarkList (bool)
++ add: methods Bookmark* improved for new fields
++ add: method BookmarkDeleteByTag
 
 2018.08.03
 + add: improved RegExpr unit (similar patch is sent to FreePascal) to support all Unicode word letters in \w
