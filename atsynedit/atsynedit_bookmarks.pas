@@ -17,12 +17,18 @@ type
 
   TATBookmarkItem = class
   public
+    Tag: Int64;
     LineNum: integer;
     Kind: word;
     Hint: string;
     DeleteOnDelLine: boolean;
-    constructor Create(ALineNum: integer; AKind: word;
-      const AHint: string; ADeleteOnDelLine: boolean);
+    ShowInBookmarkList: boolean;
+    constructor Create(ALineNum: integer;
+      AKind: word;
+      const AHint: string;
+      ADeleteOnDelLine: boolean;
+      AShowInBookmarkList: boolean=true;
+      const ATag: Int64=0);
   end;
 
 type
@@ -38,10 +44,16 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteForLine(ALine: integer);
+    procedure DeleteByTag(const ATag: Int64);
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATBookmarkItem read GetItem; default;
-    procedure Add(ALineNum: integer; AKind: word; const AHint: string; ADeleteOnDelLine: boolean);
+    procedure Add(ALineNum: integer;
+      AKind: word;
+      const AHint: string;
+      ADeleteOnDelLine: boolean;
+      AShowInBookmarkList: boolean=true;
+      const ATag: Int64=0);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
     procedure Update(ALine: integer; AChange: TATLineChangeKind; ALineCount: integer);
@@ -52,12 +64,15 @@ implementation
 { TATBookmarkItem }
 
 constructor TATBookmarkItem.Create(ALineNum: integer; AKind: word;
-  const AHint: string; ADeleteOnDelLine: boolean);
+  const AHint: string; ADeleteOnDelLine: boolean; AShowInBookmarkList: boolean;
+  const ATag: Int64);
 begin
+  Tag:= ATag;
   LineNum:= ALineNum;
   Kind:= AKind;
   Hint:= AHint;
   DeleteOnDelLine:= ADeleteOnDelLine;
+  ShowInBookmarkList:= AShowInBookmarkList;
 end;
 
 { TATBookmarks }
@@ -104,6 +119,15 @@ begin
     Delete(N);
 end;
 
+procedure TATBookmarks.DeleteByTag(const ATag: Int64);
+var
+  i: integer;
+begin
+  for i:= FList.Count-1 downto 0 do
+    if TATBookmarkItem(FList[i]).Tag=ATag then
+      Delete(i);
+end;
+
 function TATBookmarks.Count: integer;
 begin
   Result:= FList.Count;
@@ -115,7 +139,7 @@ begin
 end;
 
 procedure TATBookmarks.Add(ALineNum: integer; AKind: word; const AHint: string;
-  ADeleteOnDelLine: boolean);
+  ADeleteOnDelLine: boolean; AShowInBookmarkList: boolean; const ATag: Int64);
 var
   Item: TATBookmarkItem;
   nLine, i: integer;
@@ -128,23 +152,39 @@ begin
     //bookmark already exists: overwrite
     if nLine=ALineNum then
     begin
+      Item.Tag:= ATag;
       Item.LineNum:= ALineNum;
       Item.Kind:= AKind;
       Item.Hint:= AHint;
       Item.DeleteOnDelLine:= ADeleteOnDelLine;
+      Item.ShowInBookmarkList:= AShowInBookmarkList;
       Exit
     end;
 
     //found bookmark for bigger line: insert before it
     if nLine>ALineNum then
     begin
-      FList.Insert(i, TATBookmarkItem.Create(ALineNum, AKind, AHint, ADeleteOnDelLine));
+      FList.Insert(i, TATBookmarkItem.Create(
+        ALineNum,
+        AKind,
+        AHint,
+        ADeleteOnDelLine,
+        AShowInBookmarkList,
+        ATag
+        ));
       Exit;
     end;
   end;
 
   //not found bookmark for bigger line: append
-  FList.Add(TATBookmarkItem.Create(ALineNum, AKind, AHint, ADeleteOnDelLine));
+  FList.Add(TATBookmarkItem.Create(
+    ALineNum,
+    AKind,
+    AHint,
+    ADeleteOnDelLine,
+    AShowInBookmarkList,
+    ATag
+    ));
 end;
 
 procedure TATBookmarks.DeleteDups;
