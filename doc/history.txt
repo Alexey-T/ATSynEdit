@@ -1,4 +1,7 @@
 
+2018.08.08
+* change: now OnChange not called in LoadFromFile, makes almost no sense
+
 2018.08.06
 + add: Bookmarks object items: added fields Tag (Int64), ShowInBookmarkList (bool)
 + add: methods Bookmark* improved for new fields

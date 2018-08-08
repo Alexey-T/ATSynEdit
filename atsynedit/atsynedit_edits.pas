@@ -27,7 +27,7 @@ type
     function DoGetTextString: atString; override;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure DoEventChange; override;
+    procedure DoEventChange(AllowOnChange: boolean=true); override;
   published
     property OptMaxLen: integer read FOptMaxLen write SetOptMaxLen default 0;
   end;
@@ -88,7 +88,7 @@ begin
       SetLength(Result, Length(Result)-1);
 end;
 
-procedure TATEdit.DoEventChange;
+procedure TATEdit.DoEventChange(AllowOnChange: boolean);
 begin
   inherited;
   DoCaretSingleAsIs;

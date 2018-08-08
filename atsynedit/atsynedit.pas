@@ -986,7 +986,7 @@ type
     procedure UpdateFoldedFromLinesHidden;
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
-    procedure DoEventChange; virtual;
+    procedure DoEventChange(AllowOnChange: boolean=true); virtual;
     procedure DoEventState; virtual;
     //complex props
     property Strings: TATStrings read GetStrings write SetStrings;
@@ -3211,7 +3211,7 @@ begin
 
   Update;
   DoPaintModeBlinking;
-  DoEventChange;
+  DoEventChange(false); //calling OnChange makes almost no sense on opening file
   DoEventCarets;
 end;
 
@@ -4825,7 +4825,7 @@ begin
     FOnScroll(Self);
 end;
 
-procedure TATSynEdit.DoEventChange;
+procedure TATSynEdit.DoEventChange(AllowOnChange: boolean=true);
 begin
   if Assigned(FAdapterHilite) then
   begin
@@ -4833,8 +4833,9 @@ begin
     FAdapterHilite.OnEditorChange(Self);
   end;
 
-  if Assigned(FOnChange) then
-    FOnChange(Self);
+  if AllowOnChange then
+    if Assigned(FOnChange) then
+      FOnChange(Self);
 
   //fire OnIdle after pause after change
   if FOptIdleInterval>0 then
