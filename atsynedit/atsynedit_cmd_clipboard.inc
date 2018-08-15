@@ -158,7 +158,9 @@ var
   EolString, STemp: string;
 begin
   Result:= '';
-  EolString:= cLineEndStrings[Strings.Endings];
+
+  //EolString:= cLineEndStrings[Strings.Endings]; //gives incorrect result with MacOS lineends on Linux
+  EolString:= System.LineEnding;
 
   //make text from column selection
   if not IsSelRectEmpty then
