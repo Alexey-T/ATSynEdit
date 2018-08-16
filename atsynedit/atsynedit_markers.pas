@@ -30,6 +30,7 @@ type
       //if LenY>0 - LenY is Y-delta of sel-end,
       //            LenX is absolute X of sel-end
     Ptr: TObject;
+    ShowOnMap: boolean;
       //used in Attribs object of ATSynedit
     class operator=(const A, B: TATMarkerItem): boolean;
   end;
