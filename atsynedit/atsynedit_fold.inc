@@ -118,12 +118,11 @@ begin
 end;
 
 procedure TATSynEdit.DoRangeFold(ARange: TATSynRange);
-var
-  i: integer;
 begin
   ARange.Folded:= true;
   FWrapUpdateNeeded:= true;
 
+  //partially hide first line
   case FFoldStyle of
     cFoldHereWithDots:
     begin
@@ -153,11 +152,18 @@ begin
     end;
   end;
 
-  //fully fold next lines
-  for i:= ARange.Y+1 to ARange.Y2 do
-    Strings.LinesHidden[i, FEditorIndex]:= true;
+  //fully hide other lines
+  DoRangeHide(ARange.Y+1, ARange.Y2);
 end;
 
+
+procedure TATSynEdit.DoRangeHide(ALineFrom, ALineTo: integer);
+var
+  i: integer;
+begin
+  for i:= ALineFrom to ALineTo do
+    Strings.LinesHidden[i, FEditorIndex]:= true;
+end;
 
 procedure TATSynEdit.DoUnfoldLine(ALine: integer);
 var

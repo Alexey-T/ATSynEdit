@@ -1074,6 +1074,7 @@ type
     //fold
     procedure DoRangeFold(ARange: TATSynRange);
     procedure DoRangeUnfold(ARange: TATSynRange);
+    procedure DoRangeHide(ALineFrom, ALineTo: integer);
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
       AForThisRange: TATSynRange);
