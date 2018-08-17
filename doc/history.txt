@@ -1,5 +1,7 @@
 
 2018.08.17
++ add: detection of UTF16 without BOM (LE/BE)
++ add: property EncodingDetectUtf16BufSizeWords (2..100)
 + add: on folding range (DoRangeFold), caret(s) is fixed, it is was inside that range
 
 2018.08.08
