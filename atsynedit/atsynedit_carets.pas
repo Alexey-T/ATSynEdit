@@ -105,6 +105,7 @@ type
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
     procedure UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
     procedure UpdateIncorrectPositions(AMaxLine: integer);
+    procedure UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
     procedure DoChanged;
   end;
 
@@ -649,6 +650,28 @@ begin
 
   if chg then
     DoChanged;
+end;
+
+procedure TATCarets.UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
+var
+  Caret: TATCaretItem;
+  bChange: boolean;
+  i: integer;
+begin
+  bChange:= false;
+  for i:= 0 to Count-1 do
+  begin
+    Caret:= GetItem(i);
+    if (Caret.PosY>=ARangeY) and (Caret.PosY<=ARangeY2) and
+      ((Caret.PosY>ARangeY) or (Caret.PosX>ARangeX)) then
+    begin
+      bChange:= true;
+      Caret.PosX:= Max(0, ARangeX-1);
+      Caret.PosY:= ARangeY;
+    end;
+  end;
+  if bChange then
+    Sort;
 end;
 
 

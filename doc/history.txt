@@ -1,4 +1,7 @@
 
+2018.08.17
++ add: on folding range (DoRangeFold), caret(s) is fixed, it is was inside that range
+
 2018.08.08
 * change: now OnChange not called in LoadFromFile, makes almost no sense
 
