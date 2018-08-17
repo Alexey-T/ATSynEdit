@@ -138,6 +138,7 @@ procedure DoDetectStreamEncoding(Stream: TStream;
   out SignLen: integer;
   out EncWithBom: boolean;
   BufSizeKb: integer;
+  BufSizeWords: integer;
   DefaultIsUtf8: boolean);
 var
   IsLE: boolean;
@@ -186,7 +187,7 @@ begin
     Exit
   end;
 
-  if IsStreamWithUtf16NoBom(Stream, 8, IsLE) then
+  if IsStreamWithUtf16NoBom(Stream, BufSizeWords, IsLE) then
   begin
     if IsLE then
       Enc:= cEncWideLE
@@ -321,6 +322,7 @@ begin
   begin
     DoDetectStreamEncoding(Stream, FEncoding, Len, bWithBom,
       FEncodingDetectBufSizeKb,
+      FEncodingDetectBufSizeWords,
       FEncodingDetectDefaultUtf8);
     case FEncoding of
       cEncUTF8: SaveSignUtf8:= bWithBom;

@@ -165,6 +165,7 @@ type
     FEncodingDetectDefaultUtf8: boolean;
     FEncodingCodepage: string;
     FEncodingDetectBufSizeKb: integer;
+    FEncodingDetectBufSizeWords: integer;
     FModified: boolean;
     FModifiedRecent: boolean;
     FModifiedVersion: Int64;
@@ -272,6 +273,7 @@ type
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property EncodingDetectBufSizeKb: integer read FEncodingDetectBufSizeKb write FEncodingDetectBufSizeKb;
+    property EncodingDetectUtf16BufSizeWords: integer read FEncodingDetectBufSizeWords write FEncodingDetectBufSizeWords;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
@@ -746,6 +748,7 @@ begin
   FEncodingDetectDefaultUtf8:= true;
   FEncodingCodepage:= '';
   FEncodingDetectBufSizeKb:= 16;
+  FEncodingDetectBufSizeWords:= 10;
   FEndings:= cEndWin;
 
   FModified:= false;
