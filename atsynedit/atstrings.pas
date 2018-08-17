@@ -349,6 +349,8 @@ type
   end;
 
 function ATStrings_To_StringList(AStr: TATStrings): TStringList;
+function IsStreamWithUt8NoBom(Stream: TStream; BufSizeKb: word): boolean;
+function IsStreamWithUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
 
 
 implementation
