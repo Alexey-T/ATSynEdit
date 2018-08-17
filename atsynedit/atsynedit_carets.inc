@@ -842,7 +842,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsFixIfInsideCollapsedPart;
+procedure TATSynEdit.DoCaretsFixIfInsideFolded;
 var
   Caret: TATCaretItem;
   NFoldFrom, i: integer;

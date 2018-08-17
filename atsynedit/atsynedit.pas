@@ -1041,7 +1041,7 @@ type
     procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
     procedure DoCaretSingleAsIs;
     procedure DoCaretsFixIfAfterLineEnds;
-    procedure DoCaretsFixIfInsideCollapsedPart;
+    procedure DoCaretsFixIfInsideFolded;
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoCaretForceShow;

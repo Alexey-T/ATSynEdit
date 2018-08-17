@@ -128,7 +128,7 @@ begin
   begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
-    DoCaretsFixIfInsideCollapsedPart;
+    DoCaretsFixIfInsideFolded;
     DoEventCarets;
   end;
 
