@@ -55,6 +55,60 @@ begin
   Result:= Buf=Sign;
 end;
 
+
+function IsByteAscii(value: byte): boolean; inline;
+begin
+  case value of
+    9, 10, 13,
+    32..126:
+      Result:= true;
+    else
+      Result:= false;
+  end;
+
+end;
+
+
+function IsStreamWithUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
+var
+  Buf: array[0..100] of word;
+  NSize, i: integer;
+  NWord: Word;
+  FlagBE_0, FlagBE,
+  FlagLE_0, FlagLE: boolean;
+begin
+  Result:= false;
+  NSize:= BufSizeWords*2;
+  if Stream.Size<NSize then Exit;
+
+  if BufSizeWords<2 then BufSizeWords:= 2;
+  if BufSizeWords>High(Buf) then BufSizeWords:= High(Buf);
+
+  FillChar(Buf, SizeOf(Buf), 0);
+  Stream.Position:= 0;
+  Stream.Read(Buf, NSize);
+  Stream.Position:= 0;
+
+  NWord:= Buf[0];
+  FlagLE_0:= (Hi(NWord)=0) and IsByteAscii(Lo(NWord));
+  FlagBE_0:= (Lo(NWord)=0) and IsByteAscii(Hi(NWord));
+  if not FlagLE_0 and not FlagBE_0 then exit;
+
+  for i:= 1 to BufSizeWords-1 do
+  begin
+    NWord:= Buf[i];
+    FlagLE:= (Hi(NWord)=0) and IsByteAscii(Lo(NWord));
+    FlagBE:= (Lo(NWord)=0) and IsByteAscii(Hi(NWord));
+    if not FlagLE and not FlagBE then exit;
+    if FlagLE<>FlagLE_0 then exit;
+    if FlagBE<>FlagBE_0 then exit;
+  end;
+
+  Result:= true;
+  IsLE:= FlagLE_0;
+end;
+
+
 function IsStreamWithUt8NoBom(Stream: TStream; BufSizeKb: word): boolean;
 const
   cMinLen = 10;
@@ -85,6 +139,8 @@ procedure DoDetectStreamEncoding(Stream: TStream;
   out EncWithBom: boolean;
   BufSizeKb: integer;
   DefaultIsUtf8: boolean);
+var
+  IsLE: boolean;
 begin
   if DefaultIsUtf8 then
   begin
@@ -127,6 +183,15 @@ begin
   begin
     Enc:= cEncUTF8;
     EncWithBom:= false;
+    Exit
+  end;
+
+  if IsStreamWithUtf16NoBom(Stream, 8, IsLE) then
+  begin
+    if IsLE then
+      Enc:= cEncWideLE
+    else
+      Enc:= cEncWideBE;
     Exit
   end;
 end;
