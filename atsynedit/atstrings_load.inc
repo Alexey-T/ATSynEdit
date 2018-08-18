@@ -71,18 +71,19 @@ end;
 
 function IsStreamWithUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
 var
-  Buf: array[0..100] of word;
+  Buf: array[0..80] of word;
   NSize, i: integer;
   NWord: Word;
   FlagBE_0, FlagBE,
   FlagLE_0, FlagLE: boolean;
 begin
   Result:= false;
-  NSize:= BufSizeWords*2;
-  if Stream.Size<NSize then Exit;
 
   if BufSizeWords<2 then BufSizeWords:= 2;
   if BufSizeWords>High(Buf) then BufSizeWords:= High(Buf);
+
+  NSize:= BufSizeWords*2;
+  if Stream.Size<NSize then Exit;
 
   FillChar(Buf, SizeOf(Buf), 0);
   Stream.Position:= 0;

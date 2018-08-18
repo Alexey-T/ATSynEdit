@@ -750,7 +750,7 @@ begin
   FEncodingDetectDefaultUtf8:= true;
   FEncodingCodepage:= '';
   FEncodingDetectBufSizeKb:= 16;
-  FEncodingDetectBufSizeWords:= 10;
+  FEncodingDetectBufSizeWords:= 5;
   FEndings:= cEndWin;
 
   FModified:= false;
