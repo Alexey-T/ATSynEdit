@@ -72,41 +72,44 @@ end;
 function IsStreamWithUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
 var
   Buf: array[0..80] of word;
+  BufItem: word;
   NSize, i: integer;
-  NWord: Word;
-  FlagBE_0, FlagBE,
-  FlagLE_0, FlagLE: boolean;
+  CountLE, CountBE: integer;
+  DetectLE, DetectBE: boolean;
 begin
   Result:= false;
+  if Stream.Size<6 then exit;
 
-  if BufSizeWords<2 then BufSizeWords:= 2;
+  if BufSizeWords<3 then BufSizeWords:= 3;
   if BufSizeWords>High(Buf) then BufSizeWords:= High(Buf);
+  i:= Stream.Size div 2;
+  if BufSizeWords>i then BufSizeWords:= i;
 
   NSize:= BufSizeWords*2;
-  if Stream.Size<NSize then Exit;
 
   FillChar(Buf, SizeOf(Buf), 0);
   Stream.Position:= 0;
   Stream.Read(Buf, NSize);
   Stream.Position:= 0;
 
-  NWord:= Buf[0];
-  FlagLE_0:= (Hi(NWord)=0) and IsByteAscii(Lo(NWord));
-  FlagBE_0:= (Lo(NWord)=0) and IsByteAscii(Hi(NWord));
-  if not FlagLE_0 and not FlagBE_0 then exit;
+  CountLE:= 0;
+  CountBE:= 0;
 
-  for i:= 1 to BufSizeWords-1 do
+  for i:= 0 to BufSizeWords-1 do
   begin
-    NWord:= Buf[i];
-    FlagLE:= (Hi(NWord)=0) and IsByteAscii(Lo(NWord));
-    FlagBE:= (Lo(NWord)=0) and IsByteAscii(Hi(NWord));
-    if not FlagLE and not FlagBE then exit;
-    if FlagLE<>FlagLE_0 then exit;
-    if FlagBE<>FlagBE_0 then exit;
+    BufItem:= Buf[i];
+    if (Hi(BufItem)=0) and IsByteAscii(Lo(BufItem)) then
+      Inc(CountLE)
+    else
+    if (Lo(BufItem)=0) and IsByteAscii(Hi(BufItem)) then
+      Inc(CountBE);
   end;
 
-  Result:= true;
-  IsLE:= FlagLE_0;
+  DetectLE:= (CountBE=0) and (CountLE>=BufSizeWords div 3 * 2);
+  DetectBE:= (CountLE=0) and (CountBE>=BufSizeWords div 3 * 2);
+
+  Result:= DetectLE or DetectBE;
+  IsLE:= DetectLE;
 end;
 
 
