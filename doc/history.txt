@@ -1,10 +1,11 @@
 
 2018.08.18
++ add: detection of UTF16 without BOM (LE/BE)
 + add: global vars (instead of ATStrings props):
     GlobalDetectUtf8BufferKb
     GlobalDetectUtf16BufferWords (2..80)
-+ add: detection of UTF16 without BOM (LE/BE)
 + add: on folding range (DoRangeFold), caret(s) is fixed, it is was inside that range
++ add: prop OptCaretFixAfterRangeFolded
 
 2018.08.08
 * change: now OnChange not called in LoadFromFile, makes almost no sense

@@ -545,6 +545,7 @@ type
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
+    FOptCaretFixAfterRangeFolded: boolean;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
     FOptTextCenteringCharWidth: integer;
@@ -1297,6 +1298,7 @@ type
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide default true;
     property OptCaretPosAfterPasteColumn: TATPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn default cPasteCaretColumnRight;
     property OptCaretsAddedToColumnSelection: boolean read FOptCaretsAddedToColumnSelection write FOptCaretsAddedToColumnSelection default true;
+    property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default 4;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
@@ -3086,6 +3088,7 @@ begin
   FOptCaretPreferLeftSide:= true;
   FOptCaretPosAfterPasteColumn:= cPasteCaretColumnRight;
   FOptCaretsAddedToColumnSelection:= true;
+  FOptCaretFixAfterRangeFolded:= true;
   FOptMarkersSize:= 4;
   FOptMouseEnableAll:= true;
   FOptMouseEnableNormalSelection:= true;

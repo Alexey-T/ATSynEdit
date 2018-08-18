@@ -155,8 +155,8 @@ begin
   //fully hide other lines
   DoRangeHide(ARange.Y+1, ARange.Y2);
 
-  //if caret inside folded range, move it to beginning of range
-  Carets.UpdateAfterRangeFolded(ARange.X, ARange.Y, ARange.Y2);
+  if FOptCaretFixAfterRangeFolded then
+    Carets.UpdateAfterRangeFolded(ARange.X, ARange.Y, ARange.Y2);
 end;
 
 
