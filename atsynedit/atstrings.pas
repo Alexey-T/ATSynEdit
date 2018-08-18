@@ -164,8 +164,6 @@ type
     FEncodingDetect: boolean;
     FEncodingDetectDefaultUtf8: boolean;
     FEncodingCodepage: string;
-    FEncodingDetectBufSizeKb: integer;
-    FEncodingDetectBufSizeWords: integer;
     FModified: boolean;
     FModifiedRecent: boolean;
     FModifiedVersion: Int64;
@@ -272,8 +270,6 @@ type
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
-    property EncodingDetectBufSizeKb: integer read FEncodingDetectBufSizeKb write FEncodingDetectBufSizeKb;
-    property EncodingDetectUtf16BufSizeWords: integer read FEncodingDetectBufSizeWords write FEncodingDetectBufSizeWords;
     property Endings: TATLineEnds read FEndings write SetEndings;
     property ListUpdates: TList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
@@ -352,6 +348,9 @@ function ATStrings_To_StringList(AStr: TATStrings): TStringList;
 function IsStreamWithUt8NoBom(Stream: TStream; BufSizeKb: word): boolean;
 function IsStreamWithUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
 
+var
+  GlobalDetectUtf8BufferKb: integer = 8;
+  GlobalDetectUf16BufferWords: integer = 5;
 
 implementation
 
@@ -749,8 +748,6 @@ begin
   FEncodingDetect:= true;
   FEncodingDetectDefaultUtf8:= true;
   FEncodingCodepage:= '';
-  FEncodingDetectBufSizeKb:= 16;
-  FEncodingDetectBufSizeWords:= 5;
   FEndings:= cEndWin;
 
   FModified:= false;

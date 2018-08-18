@@ -322,8 +322,8 @@ begin
   if FEncodingDetect then
   begin
     DoDetectStreamEncoding(Stream, FEncoding, Len, bWithBom,
-      FEncodingDetectBufSizeKb,
-      FEncodingDetectBufSizeWords,
+      GlobalDetectUtf8BufferKb,
+      GlobalDetectUf16BufferWords,
       FEncodingDetectDefaultUtf8);
     case FEncoding of
       cEncUTF8: SaveSignUtf8:= bWithBom;
