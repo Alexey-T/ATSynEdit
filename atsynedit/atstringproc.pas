@@ -180,13 +180,21 @@ end;
 
 function IsCharSpace(ch: atChar): boolean;
 begin
-  Result:=
-    (ch=' ') or //space
-    (ch=#9) or //tab
-    (ch=#$A0) or //no-break space, NBSP, often used on macOS
-    (ch=#$2007) or //figure space
-    (ch=#$200B) or //zero width space https://en.wikipedia.org/wiki/Zero-width_space
-    (ch=#$202F); //narrow no-break space
+  case ch of
+    #9, //tab
+    ' ', //space
+    #$A0, //no-break space, NBSP, often used on macOS
+    #$1680, //white space
+    #$2007, //figure space
+    #$200B, //zero width space https://en.wikipedia.org/wiki/Zero-width_space
+    #$202F, //narrow no-break space
+    #$205F, //white space
+    #$2060, //white space
+    #$3000: //CJK white space
+      Result:= true;
+    else
+      Result:= false;
+  end;
 end;
 
 function IsStringSpaces(const S: atString): boolean;
