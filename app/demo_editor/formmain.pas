@@ -198,6 +198,7 @@ type
     procedure EditClickLink(Sender: TObject; const ALink: string);
     procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
     procedure EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
+    procedure EditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure EditorGapChange(Sender: TObject);
     procedure EditorGapDelete(Sender: TObject; ALineIndex: integer);
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
@@ -311,6 +312,7 @@ begin
   ed.OnDrawGap:= @EditDrawGap;
   ed.OnHotspotEnter:= @EditHotspotEnter;
   ed.OnHotspotExit:= @EditHotspotExit;
+  ed.OnKeyDown:= @EditKeyDown;
 
   ed.SetFocus;
 
@@ -1041,6 +1043,11 @@ end;
 procedure TfmMain.EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
 begin
   DoLog('OnHotspotExit: '+IntToStr(AHotspotIndex));
+end;
+
+procedure TfmMain.EditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  DoLog('OnKeyDown, key='+IntToStr(Key));
 end;
 
 procedure TfmMain.EditStringsChangeBlock(Sender: TObject; const AStartPos,

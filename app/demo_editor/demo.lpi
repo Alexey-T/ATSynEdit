@@ -127,11 +127,6 @@
         <IncludeAssertionCode Value="True"/>
       </SyntaxOptions>
     </Parsing>
-    <CodeGeneration>
-      <Checks>
-        <RangeChecks Value="True"/>
-      </Checks>
-    </CodeGeneration>
     <Linking>
       <Debugging>
         <UseExternalDbgSyms Value="True"/>
