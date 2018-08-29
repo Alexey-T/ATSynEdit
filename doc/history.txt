@@ -1,4 +1,7 @@
 
+2018.08.29
++ add: set Shift+Alt+click to make vertical selection (from 1st caret to click pos) (like in VS Code)
+
 2018.08.18
 + add: detection of UTF16 without BOM (LE/BE)
 + add: global vars (instead of ATStrings props):
