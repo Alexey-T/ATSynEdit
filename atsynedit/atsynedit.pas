@@ -56,7 +56,7 @@ type
     cMouseActionNone,
     cMouseActionClickSimple,
     cMouseActionClickRight,
-    cMouseActionClickAndSelBlock,
+    cMouseActionClickAndSelNormalBlock,
     cMouseActionMakeCaret,
     cMouseActionMakeCaretsColumn,
     cMouseActionNiceScrolling
@@ -3894,7 +3894,7 @@ begin
       end;
     end;
 
-    if ActionId=cMouseActionClickAndSelBlock then
+    if ActionId=cMouseActionClickAndSelNormalBlock then
     begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;

@@ -104,7 +104,7 @@ begin
 
   Add(cMouseActionClickSimple, [ssLeft]);
   Add(cMouseActionClickRight, [ssRight]);
-  Add(cMouseActionClickAndSelBlock, [ssLeft, ssShift]);
+  Add(cMouseActionClickAndSelNormalBlock, [ssLeft, ssShift]);
   Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
   Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
   Add(cMouseActionNiceScrolling, [ssMiddle]);
