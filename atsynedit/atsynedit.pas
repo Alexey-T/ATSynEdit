@@ -57,6 +57,7 @@ type
     cMouseActionClickSimple,
     cMouseActionClickRight,
     cMouseActionClickAndSelNormalBlock,
+    cMouseActionClickAndSelVerticalBlock,
     cMouseActionMakeCaret,
     cMouseActionMakeCaretsColumn,
     cMouseActionNiceScrolling
@@ -3899,6 +3900,17 @@ begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
       Carets[0].SelectToPoint(FMouseDownPnt.X, FMouseDownPnt.Y);
+    end;
+
+    if ActionId=cMouseActionClickAndSelVerticalBlock then
+    begin
+      FSelRect:= cRectEmpty;
+      DoCaretSingleAsIs;
+      with Carets[0] do
+        DoSelect_ColumnBlock(
+          Point(PosX, PosY),
+          FMouseDownPnt
+          );
     end;
 
     if ActionId=cMouseActionMakeCaret then

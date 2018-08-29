@@ -105,6 +105,7 @@ begin
   Add(cMouseActionClickSimple, [ssLeft]);
   Add(cMouseActionClickRight, [ssRight]);
   Add(cMouseActionClickAndSelNormalBlock, [ssLeft, ssShift]);
+  Add(cMouseActionClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
   Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
   Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
   Add(cMouseActionNiceScrolling, [ssMiddle]);
@@ -112,7 +113,6 @@ begin
   Add(cMouseActionClickSimple, [ssLeft, ssAlt]);
   Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
   Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssXControl]);
-  Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift]);
   Add(cMouseActionClickSimple, [ssLeft, ssAlt, ssShift, ssXControl]);
 end;
 
