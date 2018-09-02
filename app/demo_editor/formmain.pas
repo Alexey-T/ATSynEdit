@@ -275,6 +275,8 @@ end;
 { TfmMain }
 
 procedure TfmMain.FormCreate(Sender: TObject);
+var
+  decor: TATGutterDecorData;
 begin
   UpdateEnc;
 
@@ -341,6 +343,14 @@ begin
   ed_gap.OnChange:= @EditorGapChange;
   ed.Gaps.OnDelete:=@EditorGapDelete;
   ed_gap.Hide;
+
+  FillChar(decor, SizeOf(decor), 0);
+  decor.Kind:= agdkText;
+  decor.LineNum:= 2;
+  decor.Text:= 'tst';
+  decor.TextItalic:= true;
+  decor.TextColor:= clRed;
+  ed.GutterDecor.Add(decor);
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);

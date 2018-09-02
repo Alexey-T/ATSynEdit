@@ -778,6 +778,7 @@ type
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
+    procedure DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
     procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
       ABottom: integer);
     procedure DoPaintLockedWarning(C: TCanvas);
@@ -1031,6 +1032,7 @@ type
     procedure DoUnfoldLine(ALine: integer);
     //gutter
     property Gutter: TATGutter read FGutter;
+    property GutterDecor: TATGutterDecor read FGutterDecor;
     property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
     property GutterBandNum: integer read FGutterBandNum write FGutterBandNum;
     property GutterBandState: integer read FGutterBandState write FGutterBandState;
@@ -2119,7 +2121,7 @@ var
   NOutputSpacesSkipped: integer;
   WrapItem: TATSynWrapItem;
   NColorEntire, NColorAfter: TColor;
-  NDimValue: integer;
+  NDimValue, NBandDecor: integer;
   Str, StrOut: atString;
   CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
   LineSeparator: TATLineSeparator;
@@ -2478,6 +2480,19 @@ begin
                 NCoordTop+ACharSize.Y
                 ));
         end;
+
+      //gutter decor
+      NBandDecor:= FGutterDecor.GutterBand;
+      if NBandDecor<0 then
+        NBandDecor:= FGutterBandBm;
+      if FGutter[NBandDecor].Visible then
+        DoPaintGutterDecor(C, NLinesIndex,
+          Rect(
+            FGutter[NBandDecor].Left,
+            NCoordTop,
+            FGutter[NBandDecor].Right,
+            NCoordTop+ACharSize.Y
+            ));
 
       //gutter band: fold
       if FGutter[FGutterBandFold].Visible then
@@ -5431,6 +5446,43 @@ begin
       begin
         DrawUp;
         DrawDown;
+      end;
+  end;
+end;
+
+procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
+var
+  Decor: TATGutterDecorItem;
+  Style: TFontStyles;
+  N: integer;
+  Ext: TSize;
+begin
+  N:= FGutterDecor.Find(ALine);
+  if N<0 then exit;
+  Decor:= FGutterDecor[N];
+
+  case Decor.Data.Kind of
+    agdkIcon:
+      begin
+        //todo
+      end;
+
+    agdkText:
+      begin
+        C.Font.Color:= Decor.Data.TextColor;
+        Style:= [];
+        if Decor.Data.TextBold then
+          Include(Style, fsBold);
+        if Decor.Data.TextItalic then
+          Include(Style, fsItalic);
+        C.Font.Style:= Style;
+
+        Ext:= C.TextExtent(Decor.Data.Text);
+        C.TextOut(
+          (ARect.Left+ARect.Right-Ext.cx) div 2,
+          (ARect.Top+ARect.Bottom-Ext.cy) div 2,
+          Decor.Data.Text
+          );
       end;
   end;
 end;
