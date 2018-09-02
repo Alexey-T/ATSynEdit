@@ -36,6 +36,7 @@ uses
   ATSynEdit_Carets,
   ATSynEdit_Markers,
   ATSynEdit_Gutter,
+  ATSynEdit_Gutter_Decor,
   ATSynEdit_WrapInfo,
   ATSynEdit_Bookmarks,
   ATSynEdit_Ranges,
@@ -480,6 +481,7 @@ type
     FCharSpacingText: TPoint;
     FTabSize: integer;
     FGutter: TATGutter;
+    FGutterDecor: TATGutterDecor;
     FGutterBandBm,
     FGutterBandNum,
     FGutterBandState,
@@ -2923,6 +2925,8 @@ begin
   FTextHintCenter:= false;
 
   FGutter:= TATGutter.Create;
+  FGutterDecor:= TATGutterDecor.Create;
+
   FOptGutterVisible:= true;
   FOptGutterPlusSize:= cInitGutterPlusSize;
   FOptGutterShowFoldAlways:= true;
@@ -3145,6 +3149,7 @@ begin
   FreeAndNil(FMarkedRange);
   FreeAndNil(FMarkers);
   FreeAndNil(FAttribs);
+  FreeAndNil(FGutterDecor);
   FreeAndNil(FGutter);
   FreeAndNil(FFoldedMarkList);
   FreeAndNil(FMarginList);
