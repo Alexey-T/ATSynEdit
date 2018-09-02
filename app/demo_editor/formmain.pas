@@ -12,6 +12,7 @@ uses
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATSynEdit_Carets,
+  ATSynEdit_Bookmarks,
   ATSynEdit_Gaps,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
@@ -390,14 +391,22 @@ end;
 procedure TfmMain.mnuTestBookmkClick(Sender: TObject);
 var
   NIndex, i: integer;
+  Data: TATBookmarkData;
 begin
+  FillChar(Data, SizeOf(Data), 0);
+  Data.Kind:= 1;
+  Data.ShowInBookmarkList:= true;
+
   for i:= 0 to ed.Strings.Count-1 do
   begin
     NIndex:= ed.Strings.Bookmarks.Find(i);
     if NIndex>=0 then
       ed.Strings.Bookmarks.Delete(NIndex)
     else
-      ed.Strings.Bookmarks.Add(i, 1, '', false);
+    begin
+      Data.LineNum:= i;
+      ed.Strings.Bookmarks.Add(Data);
+    end;
   end;
   ed.Update;
 end;
@@ -518,6 +527,7 @@ end;
 procedure TfmMain.EditClickGutter(Sender: TObject; ABand, ALine: integer);
 var
   NIndex: integer;
+  Data: TATBookmarkData;
 begin
   if ABand=ed.GutterBandBm then
   begin
@@ -525,7 +535,14 @@ begin
     if NIndex>=0 then
       ed.Strings.Bookmarks.Delete(NIndex)
     else
-      ed.Strings.Bookmarks.Add(ALine, 1, Format('Bookmark for line %d', [ALine+1]), false);
+    begin
+      FillChar(Data, SizeOf(Data), 0);
+      Data.Kind:= 1;
+      Data.LineNum:= ALine;
+      Data.ShowInBookmarkList:= true;
+      Data.Hint:= Format('Bookmark for line %d', [ALine+1]);
+      ed.Strings.Bookmarks.Add(Data);
+    end;
     ed.Update;
   end;
 end;

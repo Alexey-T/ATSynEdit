@@ -3643,7 +3643,7 @@ begin
   NIndex:= Strings.Bookmarks.Find(ALine);
   if NIndex<0 then exit;
 
-  S:= Strings.Bookmarks[NIndex].Hint;
+  S:= Strings.Bookmarks[NIndex].Data.Hint;
   if S='' then
     begin DoHintHide; exit end;
 

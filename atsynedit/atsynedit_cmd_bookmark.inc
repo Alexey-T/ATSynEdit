@@ -4,16 +4,17 @@ procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
   const AHint: string;
   ADeleteOnDelLine, AShowInList: boolean;
   const ATag: Int64);
+var
+  Data: TATBookmarkData;
 begin
   if not Strings.IsIndexValid(ALine) then exit;
-  Strings.Bookmarks.Add(
-    ALine,
-    ABmKind,
-    AHint,
-    ADeleteOnDelLine,
-    AShowInList,
-    ATag
-    );
+  Data.LineNum:= ALine;
+  Data.Kind:= ABmKind;
+  Data.Hint:= AHint;
+  Data.DeleteOnDelLine:= ADeleteOnDelLine;
+  Data.ShowInBookmarkList:= AShowInList;
+  Data.Tag:= ATag;
+  Strings.Bookmarks.Add(Data);
   Update;
 end;
 
@@ -24,6 +25,7 @@ procedure TATSynEdit.BookmarkToggleForLine(ALine, ABmKind: integer;
   const ATag: Int64);
 var
   NIndex: integer;
+  Data: TATBookmarkData;
 begin
   if not Strings.IsIndexValid(ALine) then exit;
 
@@ -31,14 +33,15 @@ begin
   if NIndex>=0 then
     Strings.Bookmarks.Delete(NIndex)
   else
-    Strings.Bookmarks.Add(
-      ALine,
-      ABmKind,
-      AHint,
-      ADeleteOnDelLine,
-      AShowInList,
-      ATag
-      );
+  begin
+    Data.LineNum:= ALine;
+    Data.Kind:= ABmKind;
+    Data.Hint:= AHint;
+    Data.DeleteOnDelLine:= ADeleteOnDelLine;
+    Data.ShowInBookmarkList:= AShowInList;
+    Data.Tag:= ATag;
+    Strings.Bookmarks.Add(Data);
+  end;
 
   Update;
 end;
@@ -62,14 +65,22 @@ end;
 procedure TATSynEdit.BookmarkInvertAll;
 var
   NIndex, i: integer;
+  Data: TATBookmarkData;
 begin
+  FillChar(Data, SizeOf(Data), 0);
+  Data.Kind:= 1;
+  Data.ShowInBookmarkList:= true;
+
   for i:= 0 to Strings.Count-1 do
   begin
     NIndex:= Strings.Bookmarks.Find(i);
     if NIndex>=0 then
       Strings.Bookmarks.Delete(NIndex)
     else
-      Strings.Bookmarks.Add(i, 1, '', false);
+    begin
+      Data.LineNum:= i;
+      Strings.Bookmarks.Add(Data);
+    end;
   end;
   Update;
 end;
@@ -100,7 +111,7 @@ begin
 
     nItem:= Strings.Bookmarks.Find(nLine);
     if (nItem>=0) and
-      (not AOnlyShownInList or Strings.Bookmarks[nItem].ShowInBookmarkList) then
+      (not AOnlyShownInList or Strings.Bookmarks[nItem].Data.ShowInBookmarkList) then
     begin
       DoGotoPos(
         Point(0, nLine),
@@ -125,7 +136,7 @@ begin
   try
     for i:= 0 to Strings.Bookmarks.Count-1 do
     begin
-      NLine:= Strings.Bookmarks[i].LineNum;
+      NLine:= Strings.Bookmarks[i].Data.LineNum;
       if Strings.IsIndexValid(NLine) then
         List.Add(Strings.LinesUTF8[NLine]);
     end;
@@ -145,7 +156,7 @@ begin
 
   for i:= NCount-1 downto 0 do
   begin
-    NLine:= Strings.Bookmarks[i].LineNum;
+    NLine:= Strings.Bookmarks[i].Data.LineNum;
     Strings.LineDelete(NLine);
   end;
 
@@ -172,7 +183,7 @@ begin
   Carets.Clear;
   for i:= 0 to Strings.Bookmarks.Count-1 do
   begin
-    NLine:= Strings.Bookmarks[i].LineNum;
+    NLine:= Strings.Bookmarks[i].Data.LineNum;
     Carets.Add(0, NLine);
   end;
 
@@ -184,14 +195,22 @@ end;
 procedure TATSynEdit.BookmarkPlaceBookmarksOnCarets;
 var
   Caret: TATCaretItem;
+  Data: TATBookmarkData;
   i: integer;
 begin
+  FillChar(Data, SizeOf(Data), 0);
+  Data.Kind:= 1;
+  Data.ShowInBookmarkList:= true;
+
   BookmarkDeleteAll;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
     if Strings.IsIndexValid(Caret.PosY) then
-      Strings.Bookmarks.Add(Caret.PosY, 1, '', false);
+    begin
+      Data.LineNum:= Caret.PosY;
+      Strings.Bookmarks.Add(Data);
+    end;
   end;
 end;
 

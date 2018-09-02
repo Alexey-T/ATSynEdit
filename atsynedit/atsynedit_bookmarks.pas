@@ -13,22 +13,21 @@ uses
   ATSynEdit_Gaps;
 
 type
+  TATBookmarkData = packed record
+    Tag: Int64;
+    LineNum: integer;
+    Hint: string;
+    Kind: word;
+    DeleteOnDelLine: boolean;
+    ShowInBookmarkList: boolean;
+  end;
+
   { TATBookmarkItem }
 
   TATBookmarkItem = class
   public
-    Tag: Int64;
-    LineNum: integer;
-    Kind: word;
-    Hint: string;
-    DeleteOnDelLine: boolean;
-    ShowInBookmarkList: boolean;
-    constructor Create(ALineNum: integer;
-      AKind: word;
-      const AHint: string;
-      ADeleteOnDelLine: boolean;
-      AShowInBookmarkList: boolean=true;
-      const ATag: Int64=0);
+    Data: TATBookmarkData;
+    constructor Create(const AData: TATBookmarkData);
   end;
 
 type
@@ -48,12 +47,7 @@ type
     function Count: integer;
     function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATBookmarkItem read GetItem; default;
-    procedure Add(ALineNum: integer;
-      AKind: word;
-      const AHint: string;
-      ADeleteOnDelLine: boolean;
-      AShowInBookmarkList: boolean=true;
-      const ATag: Int64=0);
+    procedure Add(const AData: TATBookmarkData);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
     procedure Update(ALine: integer; AChange: TATLineChangeKind; ALineCount: integer);
@@ -61,18 +55,21 @@ type
 
 implementation
 
+procedure CopyBookmarkData(const Src: TATBookmarkData; var Dest: TATBookmarkData);
+begin
+  Dest.Tag:= Src.Tag;
+  Dest.LineNum:= Src.LineNum;
+  Dest.Hint:= Src.Hint;
+  Dest.Kind:= Src.Kind;
+  Dest.DeleteOnDelLine:= Src.DeleteOnDelLine;
+  Dest.ShowInBookmarkList:= Src.ShowInBookmarkList;
+end;
+
 { TATBookmarkItem }
 
-constructor TATBookmarkItem.Create(ALineNum: integer; AKind: word;
-  const AHint: string; ADeleteOnDelLine: boolean; AShowInBookmarkList: boolean;
-  const ATag: Int64);
+constructor TATBookmarkItem.Create(const AData: TATBookmarkData);
 begin
-  Tag:= ATag;
-  LineNum:= ALineNum;
-  Kind:= AKind;
-  Hint:= AHint;
-  DeleteOnDelLine:= ADeleteOnDelLine;
-  ShowInBookmarkList:= AShowInBookmarkList;
+  CopyBookmarkData(AData, Data);
 end;
 
 { TATBookmarks }
@@ -125,7 +122,7 @@ var
 begin
   Result:= false;
   for i:= FList.Count-1 downto 0 do
-    if TATBookmarkItem(FList[i]).Tag=ATag then
+    if TATBookmarkItem(FList[i]).Data.Tag=ATag then
     begin
       Result:= true;
       Delete(i);
@@ -142,8 +139,7 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-procedure TATBookmarks.Add(ALineNum: integer; AKind: word; const AHint: string;
-  ADeleteOnDelLine: boolean; AShowInBookmarkList: boolean; const ATag: Int64);
+procedure TATBookmarks.Add(const AData: TATBookmarkData);
 var
   Item: TATBookmarkItem;
   nLine, i: integer;
@@ -151,44 +147,25 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
-    nLine:= Item.LineNum;
+    nLine:= Item.Data.LineNum;
 
     //bookmark already exists: overwrite
-    if nLine=ALineNum then
+    if nLine=AData.LineNum then
     begin
-      Item.Tag:= ATag;
-      Item.LineNum:= ALineNum;
-      Item.Kind:= AKind;
-      Item.Hint:= AHint;
-      Item.DeleteOnDelLine:= ADeleteOnDelLine;
-      Item.ShowInBookmarkList:= AShowInBookmarkList;
+      CopyBookmarkData(AData, Item.Data);
       Exit
     end;
 
     //found bookmark for bigger line: insert before it
-    if nLine>ALineNum then
+    if nLine>AData.LineNum then
     begin
-      FList.Insert(i, TATBookmarkItem.Create(
-        ALineNum,
-        AKind,
-        AHint,
-        ADeleteOnDelLine,
-        AShowInBookmarkList,
-        ATag
-        ));
+      FList.Insert(i, TATBookmarkItem.Create(AData));
       Exit;
     end;
   end;
 
   //not found bookmark for bigger line: append
-  FList.Add(TATBookmarkItem.Create(
-    ALineNum,
-    AKind,
-    AHint,
-    ADeleteOnDelLine,
-    AShowInBookmarkList,
-    ATag
-    ));
+  FList.Add(TATBookmarkItem.Create(AData));
 end;
 
 procedure TATBookmarks.DeleteDups;
@@ -200,7 +177,7 @@ begin
   begin
     Item1:= GetItem(i);
     Item2:= GetItem(i-1);
-    if Item1.LineNum=Item2.LineNum then
+    if Item1.Data.LineNum=Item2.Data.LineNum then
       Delete(i);
   end;
 end;
@@ -215,13 +192,13 @@ begin
   if b<0 then Exit;
 
   repeat
-    dif:= Items[a].LineNum-ALineNum;
+    dif:= Items[a].Data.LineNum-ALineNum;
     if dif=0 then exit(a);
 
     //middle, which is near b if not exact middle
     m:= (a+b+1) div 2;
 
-    dif:= Items[m].LineNum-ALineNum;
+    dif:= Items[m].Data.LineNum-ALineNum;
     if dif=0 then exit(m);
 
     if Abs(a-b)<=1 then exit;
@@ -247,8 +224,8 @@ begin
         for i:= 0 to Count-1 do
         begin
           Item:= Items[i];
-          if Item.LineNum>=ALine then
-            Item.LineNum:= Item.LineNum+1;
+          if Item.Data.LineNum>=ALine then
+            Item.Data.LineNum:= Item.Data.LineNum+1;
         end;
       end;
 
@@ -262,7 +239,7 @@ begin
         NIndexPlaced:= Find(ALine);
         bMovedHere:= false;
 
-        if (NIndexPlaced>=0) and Items[NIndexPlaced].DeleteOnDelLine then
+        if (NIndexPlaced>=0) and Items[NIndexPlaced].Data.DeleteOnDelLine then
         begin
           Delete(NIndexPlaced);
           NIndexPlaced:= -1;
@@ -273,10 +250,10 @@ begin
           Item:= Items[i];
 
           //spec case for bookmark on last line, keep it if deleting last line
-          if (Item.LineNum>ALine) or (Item.LineNum=ALineCount-1) then
+          if (Item.Data.LineNum>ALine) or (Item.Data.LineNum=ALineCount-1) then
           begin
-            Item.LineNum:= Item.LineNum-1;
-            if Item.LineNum=ALine then
+            Item.Data.LineNum:= Item.Data.LineNum-1;
+            if Item.Data.LineNum=ALine then
               bMovedHere:= true;
           end;
         end;
