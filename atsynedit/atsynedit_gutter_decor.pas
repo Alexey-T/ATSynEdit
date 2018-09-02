@@ -13,17 +13,19 @@ uses
   ATSynEdit_Gaps;
 
 type
+  //at last 2-3 UTF8 chars
+  TATGutterDecorText = string[12];
+
   TATGutterDecorKind = (
     agdkText,
     agdkIcon
     );
 
-type
   TATGutterDecorData = packed record
     Tag: Int64;
     LineNum: integer;
     ImageIndex: integer;
-    Text: string;
+    Text: TATGutterDecorText;
     TextColor: TColor;
     TextBold: boolean;
     TextItalic: boolean;
@@ -67,17 +69,10 @@ implementation
 
 procedure CopyGutterDecorData(
   const Src: TATGutterDecorData;
-  var Dest: TATGutterDecorData);
+  var Dest: TATGutterDecorData); inline;
 begin
-  Dest.Tag:= Src.Tag;
-  Dest.LineNum:= Src.LineNum;
-  Dest.Kind:= Src.Kind;
-  Dest.Text:= Src.Text;
-  Dest.TextBold:= Src.TextBold;
-  Dest.TextItalic:= Src.TextItalic;
-  Dest.TextColor:= Src.TextColor;
-  Dest.ImageIndex:= Src.ImageIndex;
-  Dest.DeleteOnDelLine:= Src.DeleteOnDelLine;
+  //Data has no long string (only string[n]), so can use Move
+  Move(Src, Dest, SizeOf(Src));
 end;
 
 { TATGutterDecorItem }
