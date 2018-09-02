@@ -17,6 +17,7 @@ uses
   ATSynEdit_Export_HTML,
   ATSynEdit_Hotspots,
   ATSynEdit_DimRanges,
+  ATSynEdit_Gutter_Decor,
   formkey,
   formopt,
   formfind;
