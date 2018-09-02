@@ -12,6 +12,7 @@ uses
   ATStringProc,
   ATSynEdit_Adapter_EControl,
   ATSynEdit_Carets,
+  ATSynEdit_Bookmarks,
   ATSynEdit_Export_HTML,
   ec_SyntAnal,
   ec_proc_lexer;
@@ -315,6 +316,7 @@ end;
 procedure TfmMain.EditClickGutter(Sender: TObject; ABand: integer; ALine: integer);
 var
   NIndex: integer;
+  Data: TATBookmarkData;
 begin
   if ABand=ed.GutterBandBm then
   begin
@@ -322,7 +324,13 @@ begin
     if NIndex>=0 then
       ed.Strings.Bookmarks.Delete(NIndex)
     else
-      ed.Strings.Bookmarks.Add(ALine, 1, '', false);
+    begin
+      FillChar(Data, SizeOf(Data), 0);
+      Data.Kind:= 1;
+      Data.ShowInBookmarkList:= true;
+      Data.LineNum:= ALine;
+      ed.Strings.Bookmarks.Add(Data);
+    end;
     ed.Update;
   end;
 end;
