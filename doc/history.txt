@@ -1,4 +1,7 @@
 
+2018.09.03
+* change: changes in Bookmark object API, now it has Data field (where all items placed), sorry, it's to simplify code
+
 2018.08.29
 + add: set Shift+Alt+click to make vertical selection (from 1st caret to click pos) (like in VS Code)
 
