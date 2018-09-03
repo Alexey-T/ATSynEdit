@@ -199,7 +199,6 @@ type
     FFindMarkAll: boolean;
     ed_gap: TATSynEdit;
     FGapInitSize: integer;
-    FDecorIsText: boolean;
     FDecorImage: integer;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
@@ -963,8 +962,6 @@ begin
 end;
 
 procedure TfmMain.mnuTestGutterDecorClick(Sender: TObject);
-const
-  cDecor: array[boolean] of TATGutterDecorKind = (agdkIcon, agdkText);
 var
   decor: TATGutterDecorData;
   S: string;
@@ -975,12 +972,9 @@ begin
   N:= StrToIntDef(S, -1);
   if not ed.Strings.IsIndexValid(N) then exit;
 
-  FDecorIsText:= not FDecorIsText;
-  if not FDecorIsText then
-    FDecorImage:= (FDecorImage+1) mod ImagesDecor.Count;
+  FDecorImage:= (FDecorImage+1) mod ImagesDecor.Count;
 
   FillChar(decor, SizeOf(decor), 0);
-  decor.Kind:= cDecor[FDecorIsText];
   decor.DeleteOnDelLine:= true;
   decor.Text:= '*'+Chr(Ord('A')+Random(26));
   decor.TextItalic:= true;

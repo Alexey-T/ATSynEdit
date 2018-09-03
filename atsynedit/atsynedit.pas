@@ -5473,34 +5473,32 @@ begin
   if N<0 then exit;
   Decor:= FGutterDecor[N];
 
-  case Decor.Data.Kind of
-    agdkIcon:
-      begin
-        if Assigned(FGutterDecorImages) then
-          FGutterDecorImages.Draw(C,
-            (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
-            (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
-            Decor.Data.ImageIndex
-            );
-      end;
+  if Decor.Data.Text<>'' then
+  begin
+    C.Font.Color:= Decor.Data.TextColor;
+    Style:= [];
+    if Decor.Data.TextBold then
+      Include(Style, fsBold);
+    if Decor.Data.TextItalic then
+      Include(Style, fsItalic);
+    C.Font.Style:= Style;
 
-    agdkText:
-      begin
-        C.Font.Color:= Decor.Data.TextColor;
-        Style:= [];
-        if Decor.Data.TextBold then
-          Include(Style, fsBold);
-        if Decor.Data.TextItalic then
-          Include(Style, fsItalic);
-        C.Font.Style:= Style;
-
-        Ext:= C.TextExtent(Decor.Data.Text);
-        C.TextOut(
-          (ARect.Left+ARect.Right-Ext.cx) div 2,
-          (ARect.Top+ARect.Bottom-Ext.cy) div 2,
-          Decor.Data.Text
-          );
-      end;
+    Ext:= C.TextExtent(Decor.Data.Text);
+    C.TextOut(
+      (ARect.Left+ARect.Right-Ext.cx) div 2,
+      (ARect.Top+ARect.Bottom-Ext.cy) div 2,
+      Decor.Data.Text
+      );
+  end
+  else
+  if Decor.Data.ImageIndex>=0 then
+  begin
+    if Assigned(FGutterDecorImages) then
+      FGutterDecorImages.Draw(C,
+        (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
+        (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
+        Decor.Data.ImageIndex
+        );
   end;
 end;
 

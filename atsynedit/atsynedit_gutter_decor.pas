@@ -16,11 +16,6 @@ type
   //at last 2-3 UTF8 chars
   TATGutterDecorText = string[12];
 
-  TATGutterDecorKind = (
-    agdkText,
-    agdkIcon
-    );
-
   TATGutterDecorData = packed record
     Tag: Int64;
     LineNum: integer;
@@ -30,7 +25,6 @@ type
     TextBold: boolean;
     TextItalic: boolean;
     DeleteOnDelLine: boolean;
-    Kind: TATGutterDecorKind;
   end;
 
 type
