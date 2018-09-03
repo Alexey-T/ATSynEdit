@@ -482,12 +482,13 @@ type
     FTabSize: integer;
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
-    FGutterBandBm,
-    FGutterBandNum,
-    FGutterBandState,
-    FGutterBandFold,
-    FGutterBandSep,
+    FGutterBandBm: integer;
+    FGutterBandNum: integer;
+    FGutterBandState: integer;
+    FGutterBandFold: integer;
+    FGutterBandSep: integer;
     FGutterBandEmpty: integer;
+    FGutterBandDecor: integer;
     FColors: TATSynEditColors;
     FRectMain,
     FRectMinimap,
@@ -1039,6 +1040,7 @@ type
     property GutterBandFold: integer read FGutterBandFold write FGutterBandFold;
     property GutterBandSep: integer read FGutterBandSep write FGutterBandSep;
     property GutterBandEmpty: integer read FGutterBandEmpty write FGutterBandEmpty;
+    property GutterBandDecor: integer read FGutterBandDecor write FGutterBandDecor;
     //files
     procedure LoadFromFile(const AFilename: string); virtual;
     procedure SaveToFile(const AFilename: string); virtual;
@@ -2485,9 +2487,10 @@ begin
         end;
 
       //gutter decor
-      NBandDecor:= FGutterDecor.GutterBand;
+      NBandDecor:= FGutterBandDecor;
       if NBandDecor<0 then
         NBandDecor:= FGutterBandBm;
+
       Band:= FGutter[NBandDecor];
       if Band.Visible then
         DoPaintGutterDecor(C, NLinesIndex,
@@ -2961,6 +2964,7 @@ begin
   FGutterBandFold:= 3;
   FGutterBandSep:= 4;
   FGutterBandEmpty:= 5;
+  FGutterBandDecor:= -1;
 
   for i:= 1 to cGutterBands do
     FGutter.Add(10);

@@ -970,11 +970,12 @@ begin
 
   FillChar(decor, SizeOf(decor), 0);
   decor.Kind:= agdkText;
+  decor.DeleteOnDelLine:= true;
   decor.Text:= IntToStr(N);
   decor.TextItalic:= true;
-  decor.TextColor:= clRed;
+  decor.TextBold:= true;
+  decor.TextColor:= Random($ffffff);
   decor.LineNum:= N;
-  decor.DeleteOnDelLine:= true;
 
   ed.GutterDecor.Add(decor);
   ed.Update;

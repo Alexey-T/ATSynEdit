@@ -48,7 +48,6 @@ type
   TATGutterDecor = class
   private
     FList: TList;
-    FGutterBand: integer;
     function GetItem(N: integer): TATGutterDecorItem;
   public
     constructor Create; virtual;
@@ -64,7 +63,6 @@ type
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
     procedure Update(ALine: integer; AChange: TATLineChangeKind; ALineCount: integer);
-    property GutterBand: integer read FGutterBand write FGutterBand;
   end;
 
 implementation
@@ -95,7 +93,6 @@ constructor TATGutterDecor.Create;
 begin
   inherited;
   FList:= TList.Create;
-  FGutterBand:= -1;
 end;
 
 destructor TATGutterDecor.Destroy;
