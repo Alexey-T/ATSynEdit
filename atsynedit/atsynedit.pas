@@ -2473,21 +2473,6 @@ begin
         end;
       end;
 
-      //gutter band: bookmark
-      Band:= FGutter[FGutterBandBm];
-      if Band.Visible then
-        if FWrapInfo.IsItemInitial(NWrapIndex) then
-        begin
-          if Strings.Bookmarks.Find(NLinesIndex)>=0 then
-            DoEventDrawBookmarkIcon(C, NLinesIndex,
-              Rect(
-                Band.Left,
-                NCoordTop,
-                Band.Right,
-                NCoordTop+ACharSize.Y
-                ));
-        end;
-
       //gutter decor
       NBandDecor:= FGutterBandDecor;
       if NBandDecor<0 then
@@ -2502,6 +2487,21 @@ begin
             Band.Right,
             NCoordTop+ACharSize.Y
             ));
+
+      //gutter band: bookmark
+      Band:= FGutter[FGutterBandBm];
+      if Band.Visible then
+        if FWrapInfo.IsItemInitial(NWrapIndex) then
+        begin
+          if Strings.Bookmarks.Find(NLinesIndex)>=0 then
+            DoEventDrawBookmarkIcon(C, NLinesIndex,
+              Rect(
+                Band.Left,
+                NCoordTop,
+                Band.Right,
+                NCoordTop+ACharSize.Y
+                ));
+        end;
 
       //gutter band: fold
       Band:= FGutter[FGutterBandFold];

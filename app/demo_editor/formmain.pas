@@ -981,7 +981,7 @@ begin
   FillChar(decor, SizeOf(decor), 0);
   decor.Kind:= cDecor[FDecorText];
   decor.DeleteOnDelLine:= true;
-  decor.Text:= IntToStr(N);
+  decor.Text:= '*'+Chr(Ord('A')+Random(26));
   decor.TextItalic:= true;
   decor.TextBold:= true;
   decor.TextColor:= Random($ffffff);
