@@ -2130,6 +2130,7 @@ var
   StrSize: TSize;
   ItemGap: TATSynGapItem;
   TextOutProps: TATCanvasTextOutProps;
+  Band: TATGutterItem;
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
   begin
@@ -2433,7 +2434,8 @@ begin
       C.FillRect(FRectGutter.Left, NCoordTop, FRectGutter.Right, NCoordTop+ACharSize.Y);
 
       //gutter band: number
-      if FGutter[FGutterBandNum].Visible then
+      Band:= FGutter[FGutterBandNum];
+      if Band.Visible then
       begin
         if LineWithCaret and FOptShowGutterCaretBG then
         begin
@@ -2452,9 +2454,9 @@ begin
           StrSize:= C.TextExtent(Str);
 
           case FOptNumbersAlignment of
-            taLeftJustify: CoordNums.X:= FGutter[FGutterBandNum].Left + FOptNumbersIndentLeft;
-            taRightJustify: CoordNums.X:= FGutter[FGutterBandNum].Right - StrSize.cx - FOptNumbersIndentRight;
-            taCenter: CoordNums.X:= (FGutter[FGutterBandNum].Left + FGutter[FGutterBandNum].Right - StrSize.cx) div 2;
+            taLeftJustify: CoordNums.X:= Band.Left + FOptNumbersIndentLeft;
+            taRightJustify: CoordNums.X:= Band.Right - StrSize.cx - FOptNumbersIndentRight;
+            taCenter: CoordNums.X:= (Band.Left + Band.Right - StrSize.cx) div 2;
           end;
 
           if FOptNumbersFontSize=0 then
@@ -2468,15 +2470,16 @@ begin
       end;
 
       //gutter band: bookmark
-      if FGutter[FGutterBandBm].Visible then
+      Band:= FGutter[FGutterBandBm];
+      if Band.Visible then
         if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
           if Strings.Bookmarks.Find(NLinesIndex)>=0 then
             DoEventDrawBookmarkIcon(C, NLinesIndex,
               Rect(
-                FGutter[FGutterBandBm].Left,
+                Band.Left,
                 NCoordTop,
-                FGutter[FGutterBandBm].Right,
+                Band.Right,
                 NCoordTop+ACharSize.Y
                 ));
         end;
@@ -2485,30 +2488,33 @@ begin
       NBandDecor:= FGutterDecor.GutterBand;
       if NBandDecor<0 then
         NBandDecor:= FGutterBandBm;
-      if FGutter[NBandDecor].Visible then
+      Band:= FGutter[NBandDecor];
+      if Band.Visible then
         DoPaintGutterDecor(C, NLinesIndex,
           Rect(
-            FGutter[NBandDecor].Left,
+            Band.Left,
             NCoordTop,
-            FGutter[NBandDecor].Right,
+            Band.Right,
             NCoordTop+ACharSize.Y
             ));
 
       //gutter band: fold
-      if FGutter[FGutterBandFold].Visible then
+      Band:= FGutter[FGutterBandFold];
+      if Band.Visible then
       begin
         DoPaintGutterBandBG(C, FGutterBandFold, FColors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y);
         DoPaintGutterFolding(C,
           NWrapIndex,
-          FGutter[FGutterBandFold].Left,
-          FGutter[FGutterBandFold].Right,
+          Band.Left,
+          Band.Right,
           NCoordTop,
           NCoordTop+ACharSize.Y
           );
       end;
 
       //gutter band: state
-      if FGutter[FGutterBandState].Visible then
+      Band:= FGutter[FGutterBandState];
+      if Band.Visible then
       begin
         case Strings.LinesState[NLinesIndex] of
           cLineStateChanged: DoPaintGutterBandState(NCoordTop, FColors.StateChanged);
