@@ -482,6 +482,7 @@ type
     FTabSize: integer;
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
+    FGutterDecorImages: TImageList;
     FGutterBandBm: integer;
     FGutterBandNum: integer;
     FGutterBandState: integer;
@@ -1245,6 +1246,7 @@ type
     property CursorMinimap: TCursor read FCursorMinimap write FCursorMinimap default crDefault;
     property CursorMicromap: TCursor read FCursorMicromap write FCursorMicromap default crDefault;
     property Colors: TATSynEditColors read FColors write FColors;
+    property ImagesGutterDecor: TImageList read FGutterDecorImages write FGutterDecorImages;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
@@ -5474,7 +5476,12 @@ begin
   case Decor.Data.Kind of
     agdkIcon:
       begin
-        //todo
+        if Assigned(FGutterDecorImages) then
+          FGutterDecorImages.Draw(C,
+            (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
+            (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
+            Decor.Data.ImageIndex
+            );
       end;
 
     agdkText:

@@ -56,6 +56,7 @@ type
     FontDialog1: TFontDialog;
     gUnpri: TGroupBox;
     gWrap: TGroupBox;
+    ImagesDecor: TImageList;
     Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
@@ -198,6 +199,8 @@ type
     FFindMarkAll: boolean;
     ed_gap: TATSynEdit;
     FGapInitSize: integer;
+    FDecorText: boolean;
+    FDecorImage: integer;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
     procedure EditClickLink(Sender: TObject; const ALink: string);
@@ -287,6 +290,7 @@ begin
   ed:= TATSynEdit.Create(Self);
   ed.Parent:= PanelMain;
   ed.Align:= alClient;
+
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
   {$else}
@@ -299,6 +303,7 @@ begin
   ed.PopupMinimap:= PopupMinimap;
   ed.PopupMicromap:= PopupMicromap;
   ed.PopupRuler:= PopupRuler;
+  ed.ImagesGutterDecor:= ImagesDecor;
 
   ed.OnChange:= @EditChanged;
   ed.Strings.OnChange:=@EditStringsChange;
@@ -958,6 +963,8 @@ begin
 end;
 
 procedure TfmMain.mnuTestGutterDecorClick(Sender: TObject);
+const
+  cDecor: array[boolean] of TATGutterDecorKind = (agdkIcon, agdkText);
 var
   decor: TATGutterDecorData;
   S: string;
@@ -968,14 +975,18 @@ begin
   N:= StrToIntDef(S, -1);
   if not ed.Strings.IsIndexValid(N) then exit;
 
+  FDecorText:= not FDecorText;
+  FDecorImage:= (FDecorImage+1) mod ImagesDecor.Count;
+
   FillChar(decor, SizeOf(decor), 0);
-  decor.Kind:= agdkText;
+  decor.Kind:= cDecor[FDecorText];
   decor.DeleteOnDelLine:= true;
   decor.Text:= IntToStr(N);
   decor.TextItalic:= true;
   decor.TextBold:= true;
   decor.TextColor:= Random($ffffff);
   decor.LineNum:= N;
+  decor.ImageIndex:= FDecorImage;
 
   ed.GutterDecor.Add(decor);
   ed.Update;
