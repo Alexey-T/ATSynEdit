@@ -199,7 +199,7 @@ type
     FFindMarkAll: boolean;
     ed_gap: TATSynEdit;
     FGapInitSize: integer;
-    FDecorText: boolean;
+    FDecorIsText: boolean;
     FDecorImage: integer;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
@@ -975,11 +975,12 @@ begin
   N:= StrToIntDef(S, -1);
   if not ed.Strings.IsIndexValid(N) then exit;
 
-  FDecorText:= not FDecorText;
-  FDecorImage:= (FDecorImage+1) mod ImagesDecor.Count;
+  FDecorIsText:= not FDecorIsText;
+  if not FDecorIsText then
+    FDecorImage:= (FDecorImage+1) mod ImagesDecor.Count;
 
   FillChar(decor, SizeOf(decor), 0);
-  decor.Kind:= cDecor[FDecorText];
+  decor.Kind:= cDecor[FDecorIsText];
   decor.DeleteOnDelLine:= true;
   decor.Text:= '*'+Chr(Ord('A')+Random(26));
   decor.TextItalic:= true;
