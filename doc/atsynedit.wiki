@@ -259,6 +259,25 @@ To know which band of gutter does what, use properties of ATSynEdit: GutterBandN
   ed.Update;
 </syntaxhighlight>
 
+=== GutterDecor object ===
+
+type TATGutterDecor in unit atsynedit_gutter_decor. Holds list of items, which are painted over gutter, for decoration purpose. Items can hold short text strings (e.g. normal/square/curly brackets to show pair brackets in text), or icon from TImageList. If item has not empty Text, then text is shown, otherwise icon is shown. Each item has props:
+
+* Data.LineNum: line index (in Strings object)
+* Data.Tag: int value, for custom app needs
+* Data.ImageIndex: icon index in TATSynEdit.ImagesGutterDecor image list
+* Data.Text: short string
+* Data.TextBold: bool, text font is bold
+* Data.TextItalic: bool, text font is italic
+* Data.TextColor: color of text
+* Data.DeleteOnDelLine: enables to auto delete item, when its line is deleted
+
+Items in this object are auto adjusted when text is edited.
+But note: for this to work, you must assign GutterDecor object to Strings object prop GutterDecor1 or GutterDecor2.
+
+Duplicate items (for the same line index) are auto removed.
+TATSynEdit.GutterBandDecor sets index of gutter band for decorations. If -1, then gutter band for bookmarks is used.
+
 === Fold object ===
 
 type TATSynRanges in unit atsynedit_ranges. Holds list of ranges which can be folded and show plus/minus on gutter. Each range is of type TATSynRange, it has properties:
