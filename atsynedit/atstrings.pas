@@ -21,6 +21,7 @@ uses
   ATSynEdit_fgl,
   ATSynEdit_Gaps,
   ATSynEdit_Bookmarks,
+  ATSynEdit_Gutter_Decor,
   Math,
   LazUtf8Classes,
   LConvEncoding;
@@ -157,6 +158,8 @@ type
     FListUpdatesHard: boolean;
     FGaps: TATSynGaps;
     FBookmarks: TATBookmarks;
+    FGutterDecor1: TATGutterDecor;
+    FGutterDecor2: TATGutterDecor;
     FUndoList,
     FRedoList: TATUndoList;
     FEndings: TATLineEnds;
@@ -282,6 +285,8 @@ type
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property Gaps: TATSynGaps read FGaps;
     property Bookmarks: TATBookmarks read FBookmarks;
+    property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
+    property GutterDecor2: TATGutterDecor read FGutterDecor2 write FGutterDecor2;
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
@@ -1560,6 +1565,11 @@ procedure TATStrings.DoEventChange(ALine: integer; AChange: TATLineChangeKind);
 begin
   FGaps.Update(ALine, AChange);
   FBookmarks.Update(ALine, AChange, Count);
+
+  if Assigned(FGutterDecor1) then
+    FGutterDecor1.Update(ALine, AChange, Count);
+  if Assigned(FGutterDecor2) then
+    FGutterDecor2.Update(ALine, AChange, Count);
 
   if Assigned(FOnChange) then
     FOnChange(Self, ALine, AChange);

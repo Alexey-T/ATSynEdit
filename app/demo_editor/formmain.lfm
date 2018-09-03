@@ -533,6 +533,13 @@ object fmMain: TfmMain
         Caption = 'toggle inline editor, over 1st gap'
         OnClick = mnuTestGapPanelsClick
       end
+      object MenuItem13: TMenuItem
+        Caption = '-'
+      end
+      object mnuTestGutterDecor: TMenuItem
+        Caption = 'add gutter decor..'
+        OnClick = mnuTestGutterDecorClick
+      end
     end
     object mnuOpts: TMenuItem
       Caption = 'Options'

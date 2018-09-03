@@ -69,6 +69,8 @@ type
     MenuItem1: TMenuItem;
     MenuItem10: TMenuItem;
     MenuItem11: TMenuItem;
+    MenuItem13: TMenuItem;
+    mnuTestGutterDecor: TMenuItem;
     mnuTestGapPanels: TMenuItem;
     mnuShowPane: TMenuItem;
     mnuTestGapAdd: TMenuItem;
@@ -149,6 +151,7 @@ type
     procedure mnuTestGapAddClick(Sender: TObject);
     procedure mnuTestGapClearClick(Sender: TObject);
     procedure mnuTestGapPanelsClick(Sender: TObject);
+    procedure mnuTestGutterDecorClick(Sender: TObject);
     procedure mnuTestSyntaxClick(Sender: TObject);
     procedure TimerHintTimer(Sender: TObject);
     procedure UpdateEnc;
@@ -275,8 +278,6 @@ end;
 { TfmMain }
 
 procedure TfmMain.FormCreate(Sender: TObject);
-var
-  decor: TATGutterDecorData;
 begin
   UpdateEnc;
 
@@ -302,6 +303,7 @@ begin
   ed.OnChange:= @EditChanged;
   ed.Strings.OnChange:=@EditStringsChange;
   ed.Strings.OnChangeBlock:=@EditStringsChangeBlock;
+  ed.Strings.GutterDecor1:= ed.GutterDecor;
   ed.OnChangeCaretPos:= @EditCaretMoved;
   ed.OnChangeState:= @EditCaretMoved;
   ed.OnScroll:=@EditScroll;
@@ -343,14 +345,6 @@ begin
   ed_gap.OnChange:= @EditorGapChange;
   ed.Gaps.OnDelete:=@EditorGapDelete;
   ed_gap.Hide;
-
-  FillChar(decor, SizeOf(decor), 0);
-  decor.Kind:= agdkText;
-  decor.LineNum:= 2;
-  decor.Text:= 'tst';
-  decor.TextItalic:= true;
-  decor.TextColor:= clRed;
-  ed.GutterDecor.Add(decor);
 end;
 
 procedure TfmMain.FormShow(Sender: TObject);
@@ -961,6 +955,29 @@ begin
   with mnuTestGapPanels do
     Checked:= not Checked;
   UpdateGapPanel;
+end;
+
+procedure TfmMain.mnuTestGutterDecorClick(Sender: TObject);
+var
+  decor: TATGutterDecorData;
+  S: string;
+  N: integer;
+begin
+  S:= '2';
+  if not InputQuery('Place gutter decor', 'Line index:', S) then exit;
+  N:= StrToIntDef(S, -1);
+  if not ed.Strings.IsIndexValid(N) then exit;
+
+  FillChar(decor, SizeOf(decor), 0);
+  decor.Kind:= agdkText;
+  decor.Text:= IntToStr(N);
+  decor.TextItalic:= true;
+  decor.TextColor:= clRed;
+  decor.LineNum:= N;
+  decor.DeleteOnDelLine:= true;
+
+  ed.GutterDecor.Add(decor);
+  ed.Update;
 end;
 
 procedure TfmMain.mnuTestSyntaxClick(Sender: TObject);

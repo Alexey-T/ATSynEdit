@@ -96,7 +96,6 @@ procedure TATSynEdit.BookmarkGotoNext(ANext: boolean; AIndentHorz,
   AIndentVert: integer; AOnlyShownInList: boolean);
 var
   nLine, nLineOrig, nItem: integer;
-  bm: TATBookmarkItem;
 begin
   nLine:= Carets[0].PosY;
   nLineOrig:= nLine;

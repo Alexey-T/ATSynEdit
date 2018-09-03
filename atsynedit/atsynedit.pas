@@ -3164,12 +3164,12 @@ begin
   FreeAndNil(FMarkedRange);
   FreeAndNil(FMarkers);
   FreeAndNil(FAttribs);
-  FreeAndNil(FGutterDecor);
   FreeAndNil(FGutter);
   FreeAndNil(FFoldedMarkList);
   FreeAndNil(FMarginList);
   FreeAndNil(FWrapInfo);
   FreeAndNil(FStringsInt);
+  FreeAndNil(FGutterDecor);
   FreeAndNil(FBitmap);
   FreeAndNil(FColors);
   FreeAndNil(FAdapterCache);
