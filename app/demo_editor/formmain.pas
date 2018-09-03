@@ -964,19 +964,22 @@ end;
 procedure TfmMain.mnuTestGutterDecorClick(Sender: TObject);
 var
   decor: TATGutterDecorData;
-  S: string;
+  V: array[0..1] of string;
   N: integer;
 begin
-  S:= '2';
-  if not InputQuery('Place gutter decor', 'Line index:', S) then exit;
-  N:= StrToIntDef(S, -1);
+  V[0]:= '2';
+  V[1]:= '*'+Chr(Ord('A')+Random(26));
+  if not InputQuery('Place gutter decor',
+    ['Line index:', 'Text (icon if empty):'], V) then exit;
+
+  N:= StrToIntDef(V[0], -1);
   if not ed.Strings.IsIndexValid(N) then exit;
 
   FDecorImage:= (FDecorImage+1) mod ImagesDecor.Count;
 
   FillChar(decor, SizeOf(decor), 0);
   decor.DeleteOnDelLine:= true;
-  decor.Text:= '*'+Chr(Ord('A')+Random(26));
+  decor.Text:= V[1];
   decor.TextItalic:= true;
   decor.TextBold:= true;
   decor.TextColor:= Random($ffffff);
