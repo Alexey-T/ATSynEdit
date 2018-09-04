@@ -5491,13 +5491,14 @@ begin
       );
   end
   else
-  if Decor.Data.ImageIndex>=0 then
+  if Assigned(FGutterDecorImages) then
   begin
-    if Assigned(FGutterDecorImages) then
+    N:= Decor.Data.ImageIndex;
+    if (N>=0) and (N<FGutterDecorImages.Count) then
       FGutterDecorImages.Draw(C,
         (ARect.Left+ARect.Right-FGutterDecorImages.Width) div 2,
         (ARect.Top+ARect.Bottom-FGutterDecorImages.Height) div 2,
-        Decor.Data.ImageIndex
+        N
         );
   end;
 end;
