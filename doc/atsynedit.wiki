@@ -426,8 +426,10 @@ Example of usage: in HTML file, app can find all HTML color tokens #rrggbb, add 
 Objects
 
 *    property Strings
+*    property Strings.Bookmarks
 *    property Carets
 *    property Gutter
+*    property GutterDecor
 *    property Keymap
 *    property Fold
 *    property Markers
