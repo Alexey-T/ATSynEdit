@@ -5484,6 +5484,7 @@ begin
     C.Font.Style:= Style;
 
     Ext:= C.TextExtent(Decor.Data.Text);
+    C.Brush.Color:= Colors.GutterBG;
     C.TextOut(
       (ARect.Left+ARect.Right-Ext.cx) div 2,
       (ARect.Top+ARect.Bottom-Ext.cy) div 2,
