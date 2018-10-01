@@ -219,13 +219,23 @@ begin
     Result:= DoCommand_TextDeleteRight(1);
 end;
 
+type
+  TPoints3 = class
+  public
+    X, Y: integer;
+    Shift: TPoint;
+    PosAfter: TPoint;
+  end;
+
 function TATSynEdit.DoCommand_TextDeleteSelection: TATCommandResults;
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  i: integer;
-  X1, Y1, X2, Y2, XLast, YLast: integer;
+  X1, Y1, X2, Y2: integer;
   bSel: boolean;
+  Points: TPoints3;
+  PointList: TList;
+  i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -239,20 +249,13 @@ begin
 
   if not Carets.IsSelection then Exit;
 
+  PointList:= TList.Create;
   Strings.BeginUndoGroup;
   try
-    //this cannot work Ok: for i:= FCarets.Count-1 downto 0 do...
-    //bacause carets overlap/lost during loop.
-    //so do more complex loop.
-    XLast:= MaxInt;
-    YLast:= MaxInt;
-    repeat
-      Caret:= Carets.FindCaretBeforePos(XLast, YLast, true);
-      if Caret=nil then Break;
-
+    for i:= Carets.Count-1 downto 0 do
+    begin
+      Caret:= Carets[i];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
-      XLast:= X1;
-      YLast:= Y1;
 
       Markers.DeleteInRange(X1, Y1, X2, Y2);
       Attribs.DeleteInRange(X1, Y1, X2, Y2);
@@ -263,12 +266,31 @@ begin
       Caret.PosY:= Y1;
       Caret.EndX:= -1;
       Caret.EndY:= -1;
-      DoCaretsShift(X1, Y1, Shift.X, Shift.Y, PosAfter);
+
+      Points:= TPoints3.Create;
+      Points.X:= X1;
+      Points.Y:= Y1;
+      Points.Shift:= Shift;
+      Points.PosAfter:= PosAfter;
+      PointList.Add(Points);
+    end;
+
+    //make shift of carets after main loop, to keep correct text
+    //even if carets are broken. carets are broken if Del pressed in very complex
+    //multi-selections - https://github.com/Alexey-T/CudaText/issues/1615
+    for i:= PointList.Count-1 downto 0 do
+    begin
+      Points:= TPoints3(PointList[i]);
+      DoCaretsShift(Points.X, Points.Y, Points.Shift.X, Points.Shift.Y, Points.PosAfter);
       DoCaretsSort;
-    until false;
+    end;
   finally
     Strings.EndUndoGroup;
   end;
+
+  for i:= PointList.Count-1 downto 0 do
+    TObject(PointList[i]).Free;
+  FreeAndNil(PointList);
 
   Result:= [cResultText, cResultCaretTop];
 end;
