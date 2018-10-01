@@ -224,7 +224,7 @@ var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   i: integer;
-  AX1, AY1, AX2, AY2: integer;
+  X1, Y1, X2, Y2, XLast, YLast: integer;
   bSel: boolean;
 begin
   Result:= [];
@@ -241,22 +241,31 @@ begin
 
   Strings.BeginUndoGroup;
   try
-    for i:= FCarets.Count-1 downto 0 do
-    begin
-      Caret:= Carets[i];
-      Caret.GetRange(AX1, AY1, AX2, AY2, bSel);
-      if not bSel then Continue;
+    //this cannot work Ok: for i:= FCarets.Count-1 downto 0 do...
+    //bacause carets overlap/lost during loop.
+    //so do more complex loop.
+    XLast:= MaxInt;
+    YLast:= MaxInt;
+    repeat
+      Caret:= Carets.FindCaretBeforePos(XLast, YLast, true);
+      if Caret=nil then Break;
 
-      Markers.DeleteInRange(AX1, AY1, AX2, AY2);
-      Attribs.DeleteInRange(AX1, AY1, AX2, AY2);
+      Caret.GetRange(X1, Y1, X2, Y2, bSel);
+      XLast:= X1;
+      YLast:= Y1;
 
-      Strings.TextDeleteRange(AX1, AY1, AX2, AY2, Shift, PosAfter);
-      DoCaretsShift(AX1, AY1, Shift.X, Shift.Y, PosAfter);
-      Caret.PosX:= PosAfter.X;
-      Caret.PosY:= PosAfter.Y;
+      Markers.DeleteInRange(X1, Y1, X2, Y2);
+      Attribs.DeleteInRange(X1, Y1, X2, Y2);
+
+      Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+
+      Caret.PosX:= X1;
+      Caret.PosY:= Y1;
       Caret.EndX:= -1;
       Caret.EndY:= -1;
-    end;
+      DoCaretsShift(X1, Y1, Shift.X, Shift.Y, PosAfter);
+      DoCaretsSort;
+    until false;
   finally
     Strings.EndUndoGroup;
   end;
