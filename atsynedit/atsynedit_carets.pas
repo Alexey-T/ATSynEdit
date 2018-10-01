@@ -90,6 +90,7 @@ type
     procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     procedure Sort(AJoinAdjacentCarets: boolean=true);
     procedure Assign(Obj: TATCarets);
+    function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): TATCaretItem;
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
@@ -344,6 +345,26 @@ begin
       Obj[i].EndX,
       Obj[i].EndY);
   DoChanged;
+end;
+
+function TATCarets.FindCaretBeforePos(APosX, APosY: integer;
+  ARequireSel: boolean): TATCaretItem;
+var
+  Item: TATCaretItem;
+  bSel: boolean;
+  X1, Y1, X2, Y2: integer;
+  i: integer;
+begin
+  Result:= nil;
+  for i:= Count-1 downto 0 do
+  begin
+    Item:= Items[i];
+    Item.GetRange(X1, Y1, X2, Y2, bSel);
+    if ARequireSel and not bSel then
+      Continue;
+    if (Y1<APosY) or ((Y1=APosY) and (X1<APosX)) then
+      exit(Item);
+  end;
 end;
 
 function TATCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
