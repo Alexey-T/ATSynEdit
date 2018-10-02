@@ -2480,13 +2480,14 @@ begin
 
       Band:= FGutter[NBandDecor];
       if Band.Visible then
-        DoPaintGutterDecor(C, NLinesIndex,
-          Rect(
-            Band.Left,
-            NCoordTop,
-            Band.Right,
-            NCoordTop+ACharSize.Y
-            ));
+        if FWrapInfo.IsItemInitial(NWrapIndex) then
+          DoPaintGutterDecor(C, NLinesIndex,
+            Rect(
+              Band.Left,
+              NCoordTop,
+              Band.Right,
+              NCoordTop+ACharSize.Y
+              ));
 
       //gutter band: bookmark
       Band:= FGutter[FGutterBandBm];
