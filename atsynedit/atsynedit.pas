@@ -589,6 +589,7 @@ type
     FOptNumbersIndentLeft,
     FOptNumbersIndentRight: integer;
     FOptWordChars: atString;
+    FOptIgnoreWordChars: boolean;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
     FOptTabSpaces: boolean;
@@ -1255,6 +1256,7 @@ type
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
+    property OptIgnoreWordChars: boolean read FOptIgnoreWordChars write FOptIgnoreWordChars default false;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
     property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;

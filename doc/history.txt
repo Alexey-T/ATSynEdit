@@ -1,4 +1,7 @@
 
+2018.10.09
++ add: OptIgnoreWordChars (for input to enter numbers)
+
 2018.09.03
 + add: GutterDecor object; see documentation in wiki
 * change: changes in Bookmark object API, now it has Data field (where all items placed), sorry, it's to simplify code
