@@ -1,16 +1,16 @@
 object fmCombo: TfmCombo
   Left = 418
-  Height = 279
+  Height = 289
   Top = 398
   Width = 397
   ActiveControl = PanelEdit
   Caption = 'Demo - ATEdit, ATComboEdit'
-  ClientHeight = 279
+  ClientHeight = 289
   ClientWidth = 397
   Constraints.MinHeight = 200
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.9.0.0'
+  LCLVersion = '2.1.0.0'
   object PanelCombo: TPanel
     Left = 6
     Height = 58
@@ -26,7 +26,7 @@ object fmCombo: TfmCombo
       Left = 0
       Height = 17
       Top = 8
-      Width = 94
+      Width = 93
       Caption = 'ATComboEdit'
       ParentColor = False
     end
@@ -34,7 +34,7 @@ object fmCombo: TfmCombo
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 29
-    Top = 244
+    Top = 254
     Width = 385
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
@@ -44,7 +44,7 @@ object fmCombo: TfmCombo
     CloseButton.DefaultCaption = True
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
-    TabOrder = 5
+    TabOrder = 6
     ShowButtons = [pbClose]
     ShowBevel = False
   end
@@ -52,7 +52,7 @@ object fmCombo: TfmCombo
     Left = 8
     Height = 24
     Top = 136
-    Width = 82
+    Width = 80
     Caption = 'Enabled'
     Checked = True
     OnChange = chkEnabledChange
@@ -74,7 +74,7 @@ object fmCombo: TfmCombo
       Left = 0
       Height = 17
       Top = 8
-      Width = 45
+      Width = 44
       Caption = 'ATEdit'
       ParentColor = False
     end
@@ -82,11 +82,11 @@ object fmCombo: TfmCombo
   object edMaxLen: TSpinEdit
     Left = 8
     Height = 27
-    Top = 208
+    Top = 216
     Width = 80
     MaxValue = 1000
     OnChange = edMaxLenChange
-    TabOrder = 4
+    TabOrder = 5
   end
   object LabelMaxLen: TLabel
     AnchorSideLeft.Control = edMaxLen
@@ -95,8 +95,8 @@ object fmCombo: TfmCombo
     AnchorSideTop.Side = asrCenter
     Left = 94
     Height = 17
-    Top = 213
-    Width = 119
+    Top = 221
+    Width = 116
     BorderSpacing.Left = 6
     Caption = 'Max length (if >0)'
     ParentColor = False
@@ -105,11 +105,20 @@ object fmCombo: TfmCombo
     Left = 8
     Height = 24
     Top = 160
-    Width = 131
+    Width = 128
     Caption = 'Enabled mouse'
     Checked = True
     OnChange = chkEnMouseChange
     State = cbChecked
     TabOrder = 3
+  end
+  object chkNoWordChars: TCheckBox
+    Left = 8
+    Height = 24
+    Top = 184
+    Width = 204
+    Caption = 'Ignore word chars (letters)'
+    OnChange = chkNoWordCharsChange
+    TabOrder = 4
   end
 end
