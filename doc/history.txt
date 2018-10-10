@@ -1,6 +1,7 @@
 
-2018.10.09
-+ add: OptIgnoreWordChars (for input to enter numbers)
+2018.10.10
++ add: instead of OptIgnoreWordChars, added event OnCheckInput
+* removed: OptIgnoreWordChars
 
 2018.09.03
 + add: GutterDecor object; see documentation in wiki

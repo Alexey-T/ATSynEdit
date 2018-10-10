@@ -335,6 +335,7 @@ type
   TATSynEditPasteEvent = procedure(Sender: TObject; var AHandled: boolean;
     AKeepCaret, ASelectThen: boolean) of object;
   TATSynEditHotspotEvent = procedure(Sender: TObject; AHotspotIndex: integer) of object;
+  TATSynEditCheckInputEvent = procedure(Sender: TObject; AChar: WideChar; var AllowInput: boolean) of object;
 
 type
   TATFoldedMark = class
@@ -434,6 +435,7 @@ type
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
+    FOnCheckInput: TATSynEditCheckInputEvent;
     FOnBeforeCalcHilite: TNotifyEvent;
     FOnClickDbl,
     FOnClickTriple,
@@ -589,7 +591,6 @@ type
     FOptNumbersIndentLeft,
     FOptNumbersIndentRight: integer;
     FOptWordChars: atString;
-    FOptIgnoreWordChars: boolean;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
     FOptTabSpaces: boolean;
@@ -1218,6 +1219,7 @@ type
     property OnClickEndSelect: TATSynEditClickMoveCaretEvent read FOnClickEndSelect write FOnClickEndSelect;
     property OnClickGap: TATSynEditClickGapEvent read FOnClickGap write FOnClickGap;
     property OnClickLink: TATSynEditClickLinkEvent read FOnClickLink write FOnClickLink;
+    property OnCheckInput: TATSynEditCheckInputEvent read FOnCheckInput write FOnCheckInput;
     property OnIdle: TNotifyEvent read FOnIdle write FOnIdle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
@@ -1256,7 +1258,6 @@ type
     property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
-    property OptIgnoreWordChars: boolean read FOptIgnoreWordChars write FOptIgnoreWordChars default false;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
     property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;

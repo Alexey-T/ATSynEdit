@@ -51,7 +51,7 @@ end;
 procedure TATSynEdit.UTF8KeyPress(var UTF8Key: TUTF8Char);
 var
   Str: atString;
-  ch: WideChar;
+  Allow: boolean;
 begin
   inherited;
 
@@ -61,10 +61,11 @@ begin
   Str:= Utf8Decode(Utf8Key);
   if Str='' then Exit;
 
-  if OptIgnoreWordChars then
+  if Assigned(FOnCheckInput) then
   begin
-    ch:= Str[1];
-    if (ch>'9') and IsCharWord(ch) then Exit;
+    Allow:= true;
+    FOnCheckInput(Self, Str[1], Allow);
+    if not Allow then Exit;
   end;
 
   DoCommand(cCommand_TextInsert, Str);
