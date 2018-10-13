@@ -985,9 +985,6 @@ end;
 
 procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; AShape: TATSynCaretShape);
 begin
-  R.Right:= R.Left+FCharSize.X;
-  R.Bottom:= R.Top+FCharSize.Y;
-
   case AShape of
     cCaretShapeVertPixels1: begin R.Right:= R.Left+1; end;
     cCaretShapeVertPixels2: begin R.Right:= R.Left+2; end;

@@ -4701,13 +4701,16 @@ begin
     Item:= FCarets[i];
     R.Left:= Item.CoordX;
     R.Top:= Item.CoordY;
-    DoCaretsApplyShape(R, Shape);
+    R.Right:= R.Left+FCharSize.X;
+    R.Bottom:= R.Top+FCharSize.Y;
 
     //check caret is visible (IntersectRect is slower)
     if R.Right<=FRectMain.Left then Continue;
     if R.Bottom<=FRectMain.Top then Continue;
     if R.Left>=FRectMain.Right then Continue;
     if R.Top>=FRectMain.Bottom then Continue;
+
+    DoCaretsApplyShape(R, Shape);
 
     if FCaretBlinkEnabled then
     begin
