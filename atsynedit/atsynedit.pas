@@ -3591,7 +3591,7 @@ begin
     //we already painted bitmap above,
     //and now we invert carets or dont invert (use FCaretAllowNextBlink)
     begin
-      if FCaretAllowNextBlink then
+      if not FCaretBlinkEnabled or FCaretAllowNextBlink then
         DoPaintCarets(Canvas, true);
     end;
   end;
@@ -4675,10 +4675,14 @@ var
   Item: TATCaretItem;
   Shape: TATSynCaretShape;
 begin
-  if IsCaretBlocked then
-    if not FCaretShown then Exit;
+  //only for blinking caret
+  if FCaretBlinkEnabled then
+  begin
+    if IsCaretBlocked then
+      if not FCaretShown then Exit;
 
-  FCaretShown:= not FCaretShown;
+    FCaretShown:= not FCaretShown;
+  end;
 
   if ModeReadOnly then
     Shape:= FCaretShapeRO
@@ -4697,7 +4701,7 @@ begin
     R.Bottom:= R.Top+FCharSize.Y;
 
     //caret not visible
-    if R.Left<0 then Continue;
+    if R.Right<0 then Continue;
     if R.Top<0 then Continue;
 
     case Shape of
@@ -4730,11 +4734,20 @@ begin
 
     if IntersectRect(R, R, FRectMain) then
     begin
-      CanvasInvertRect(C, R, FColors.Caret);
+      if FCaretBlinkEnabled then
+      begin
+        CanvasInvertRect(C, R, FColors.Caret);
 
-      //frame-shape: invert second time inner area
-      if Shape=cCaretShapeFrameFull then
-        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), FColors.Caret);
+        //frame shape: invert second time inner area
+        if Shape=cCaretShapeFrameFull then
+          CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), FColors.Caret);
+      end
+      else
+      begin
+        //paint non-blinking caret simpler
+        C.Brush.Color:= FColors.Caret;
+        C.FillRect(R);
+      end;
 
       if AWithInvalidate then
         if not (csCustomPaint in ControlState) then //disable during Paint
