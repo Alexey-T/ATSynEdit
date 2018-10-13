@@ -655,7 +655,7 @@ type
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
       ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
-    procedure DoCaretsApplyShape(var R: TRect; AShape: TATSynCaretShape);
+    procedure DoCaretsApplyShape(var R: TRect; Shape: TATSynCaretShape; W, H: integer);
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     function DoCaretsKeepOnScreen: boolean;
     procedure DoCaretsOnChanged(Sender: TObject);
@@ -4710,7 +4710,7 @@ begin
     if R.Left>=FRectMain.Right then Continue;
     if R.Top>=FRectMain.Bottom then Continue;
 
-    DoCaretsApplyShape(R, Shape);
+    DoCaretsApplyShape(R, Shape, FCharSize.X, FCharSize.Y);
 
     if FCaretBlinkEnabled then
     begin
