@@ -4703,31 +4703,29 @@ begin
     R.Top:= Item.CoordY;
     DoCaretsApplyShape(R, Shape);
 
-    //caret not visible
-    if R.Right<0 then Continue;
-    if R.Top<0 then Continue;
+    //check caret is visible (IntersectRect is slower)
+    if R.Right<FRectMain.Left then Continue;
+    if R.Bottom<FRectMain.Top then Continue;
+    if R.Left>=FRectMain.Right then Continue;
+    if R.Top>=FRectMain.Bottom then Continue;
 
-    if IntersectRect(R, R, FRectMain) then
+    if FCaretBlinkEnabled then
     begin
-      if FCaretBlinkEnabled then
-      begin
-        CanvasInvertRect(C, R, FColors.Caret);
-
-        //frame shape: invert second time inner area
-        if Shape=cCaretShapeFrameFull then
-          CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), FColors.Caret);
-      end
-      else
-      begin
-        //paint non-blinking caret simpler
-        C.Brush.Color:= FColors.Caret;
-        C.FillRect(R);
-      end;
-
-      if AWithInvalidate then
-        if not (csCustomPaint in ControlState) then //disable during Paint
-          InvalidateRect(Handle, @R, false);
+      CanvasInvertRect(C, R, FColors.Caret);
+      //if shape FrameFull, invert inner area
+      if Shape=cCaretShapeFrameFull then
+        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), FColors.Caret);
+    end
+    else
+    begin
+      //paint non-blinking caret simpler
+      C.Brush.Color:= FColors.Caret;
+      C.FillRect(R);
     end;
+
+    if AWithInvalidate then
+      if not (csCustomPaint in ControlState) then //disable during Paint
+        InvalidateRect(Handle, @R, false);
   end;
 end;
 
