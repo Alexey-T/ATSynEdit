@@ -982,3 +982,38 @@ begin
   end;
 end;
 
+
+procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; AShape: TATSynCaretShape);
+begin
+  R.Right:= R.Left+FCharSize.X;
+  R.Bottom:= R.Top+FCharSize.Y;
+
+  case AShape of
+    cCaretShapeVertPixels1: begin R.Right:= R.Left+1; end;
+    cCaretShapeVertPixels2: begin R.Right:= R.Left+2; end;
+    cCaretShapeVertPixels3: begin R.Right:= R.Left+3; end;
+    cCaretShapeVertPixels4: begin R.Right:= R.Left+4; end;
+    cCaretShapeVertPercents10: begin R.Right:= R.Left+Trunc(FCharSize.X*0.10); end;
+    cCaretShapeVertPercents15: begin R.Right:= R.Left+Trunc(FCharSize.X*0.15); end;
+    cCaretShapeVertPercents20: begin R.Right:= R.Left+Trunc(FCharSize.X*0.20); end;
+    cCaretShapeVertPercents25: begin R.Right:= R.Left+Trunc(FCharSize.X*0.25); end;
+    cCaretShapeVertPercents30: begin R.Right:= R.Left+Trunc(FCharSize.X*0.30); end;
+    cCaretShapeVertPercents35: begin R.Right:= R.Left+Trunc(FCharSize.X*0.35); end;
+    cCaretShapeVertPercents40: begin R.Right:= R.Left+Trunc(FCharSize.X*0.40); end;
+    cCaretShapeVertPercents50: begin R.Right:= R.Left+FCharSize.X div 2; end;
+    cCaretShapeHorzPixels1: begin R.Top:= R.Bottom-1; end;
+    cCaretShapeHorzPixels2: begin R.Top:= R.Bottom-2; end;
+    cCaretShapeHorzPixels3: begin R.Top:= R.Bottom-3; end;
+    cCaretShapeHorzPixels4: begin R.Top:= R.Bottom-4; end;
+    cCaretShapeHorzPixels5: begin R.Top:= R.Bottom-5; end;
+    cCaretShapeHorzPercents10: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.10); end;
+    cCaretShapeHorzPercents15: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.15); end;
+    cCaretShapeHorzPercents20: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.20); end;
+    cCaretShapeHorzPercents25: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.25); end;
+    cCaretShapeHorzPercents30: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.30); end;
+    cCaretShapeHorzPercents35: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.35); end;
+    cCaretShapeHorzPercents40: begin R.Top:= R.Bottom-Trunc(FCharSize.Y*0.40); end;
+    cCaretShapeHorzPercents50: begin R.Top:= R.Bottom-FCharSize.Y div 2; end;
+  end;
+end;
+
