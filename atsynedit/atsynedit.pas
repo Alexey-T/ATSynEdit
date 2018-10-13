@@ -4704,8 +4704,8 @@ begin
     DoCaretsApplyShape(R, Shape);
 
     //check caret is visible (IntersectRect is slower)
-    if R.Right<FRectMain.Left then Continue;
-    if R.Bottom<FRectMain.Top then Continue;
+    if R.Right<=FRectMain.Left then Continue;
+    if R.Bottom<=FRectMain.Top then Continue;
     if R.Left>=FRectMain.Right then Continue;
     if R.Top>=FRectMain.Bottom then Continue;
 
