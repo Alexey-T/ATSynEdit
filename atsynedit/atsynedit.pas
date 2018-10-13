@@ -3577,9 +3577,12 @@ begin
     DoPaint(FPaintFlags, ALineNumber);
   Exclude(FPaintFlags, cPaintUpdateBitmap);
 
-  if cPaintUpdateCarets in FPaintFlags then
+  //consider cPaintUpdateCarets only for blinking caret
+  if not FCaretBlinkEnabled or
+    (cPaintUpdateCarets in FPaintFlags) then
   begin
     Exclude(FPaintFlags, cPaintUpdateCarets);
+
     if DoubleBuffered then
     //buf mode: timer tick don't give painting of whole bitmap
     //(cPaintUpdateBitmap off)
