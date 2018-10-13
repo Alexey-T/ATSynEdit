@@ -5804,8 +5804,7 @@ begin
   if Atr.Tag<>cUrlMarkerTag then exit;
   if Atr.LenY>0 then exit;
 
-  Result:= Strings.Lines[AY];
-  Result:= Copy(Result, Atr.PosX+1, Atr.LenX);
+  Result:= Strings.LineSub(AY, Atr.PosX+1, Atr.LenX);
 end;
 
 function TATSynEdit.GetCacheDump: string;
