@@ -586,7 +586,7 @@ end;
 procedure TATStrings.SetLineUTF8(AIndex: integer; const AValue: string);
 var
   Item: PATStringItem;
-  StrW: atString;
+  NLen: integer;
 begin
   if FReadOnly then Exit;
 
@@ -595,11 +595,11 @@ begin
   Item^.Str:= AValue;
   UniqueString(Item^.Str);
 
-  StrW:= UTF8Decode(AValue);
-  if Length(Item^.Str)=Length(StrW) then
+  NLen:= UTF8Length(AValue);
+  if Length(AValue)=NLen then
     Item^.CharLen:= cCharLenAscii
   else
-    Item^.CharLen:= Length(StrW);
+    Item^.CharLen:= NLen;
 
   //fully unfold this line
   Item^.Ex.FoldFrom_0:= 0;
