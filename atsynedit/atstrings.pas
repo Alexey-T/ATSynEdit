@@ -221,6 +221,7 @@ type
     procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
     procedure SetCaretsArray(const L: TATPointArray);
     procedure SetEndings(AValue: TATLineEnds);
+    procedure SetLineUTF8(AIndex: integer; const AValue: string);
     procedure SetLine(AIndex: integer; const AValue: atString);
     procedure SetLineEnd(AIndex: integer; AValue: TATLineEnds);
     procedure SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
@@ -254,7 +255,7 @@ type
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean = true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
-    property LinesUTF8[Index: integer]: string read GetLineUTF8;
+    property LinesUTF8[Index: integer]: string read GetLineUTF8 write SetLineUTF8;
     property LinesLen[Index: integer]: integer read GetLineLen;
     property LinesLenRaw[Index: integer]: integer read GetLineLenRaw;
     property LinesLenPhysical[Index: integer]: integer read GetLineLenPhysical;
@@ -580,6 +581,35 @@ begin
     if (typ<>AValue) and (typ<>cEndNone) then
       LinesEnds[i]:= AValue;
   end;
+end;
+
+procedure TATStrings.SetLineUTF8(AIndex: integer; const AValue: string);
+var
+  Item: PATStringItem;
+  StrW: atString;
+begin
+  if FReadOnly then Exit;
+
+  Item:= FList.GetItem(AIndex);
+
+  Item^.Str:= AValue;
+  UniqueString(Item^.Str);
+
+  StrW:= UTF8Decode(AValue);
+  if Length(Item^.Str)=Length(StrW) then
+    Item^.CharLen:= cCharLenAscii
+  else
+    Item^.CharLen:= Length(StrW);
+
+  //fully unfold this line
+  Item^.Ex.FoldFrom_0:= 0;
+  Item^.Ex.FoldFrom_1:= 0;
+
+  if TATLineState(Item^.Ex.State)<>cLineStateAdded then
+    Item^.Ex.State:= TATBits2(cLineStateChanged);
+
+  Item^.Ex.HasTab:= 0; //unknown
+  Item^.Ex.HasAsciiOnly:= 0; //unknown
 end;
 
 procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
