@@ -129,7 +129,7 @@ begin
   Item.LineLen:= ALineLen;
   Item.ColorAfterEol:= AColorAfterEol;
   Move(AParts, Item.Parts, SizeOf(AParts));
-  FList.Add(Item);
+  FList.Insert(0, Item);
 end;
 
 function TATAdapterHiliteCache.GetDump: string;
