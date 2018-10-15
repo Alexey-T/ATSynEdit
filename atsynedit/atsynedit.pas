@@ -2234,17 +2234,21 @@ begin
       );
 
     LineSeparator:= Strings.LinesSeparator[NLinesIndex];
-    LineWithCaret:= IsLineWithCaret(NLinesIndex);
-    LineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
+    LineWithCaret:= AMainText and IsLineWithCaret(NLinesIndex);
+    LineEolSelected:= AMainText and IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
     StrOut:= Str;
-    //horz scrollbar max: calced here, to make variable horz bar
-    //vert scrollbar max: calced in UpdateScrollbars
-    if Strings.LinesLenRaw[NLinesIndex] > FOptMaxLineLengthForSlowWidthDetect then
-      NOutputStrWidth:= Strings.LinesLen[NLinesIndex] //approx len, it don't consider CJK chars
-    else
-      NOutputStrWidth:= CanvasTextWidth(Strings.Lines[NLinesIndex], FTabSize, Point(1, 1)); //(1,1): need width in chars
-    AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + cScrollbarHorzAddChars);
+
+    if AMainText then
+    begin
+      //horz scrollbar max: calced here, to make variable horz bar
+      //vert scrollbar max: calced in UpdateScrollbars
+      if Strings.LinesLenRaw[NLinesIndex] > FOptMaxLineLengthForSlowWidthDetect then
+        NOutputStrWidth:= Strings.LinesLen[NLinesIndex] //approx len, it don't consider CJK chars
+      else
+        NOutputStrWidth:= CanvasTextWidth(Strings.Lines[NLinesIndex], FTabSize, Point(1, 1)); //(1,1): need width in chars
+      AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + cScrollbarHorzAddChars);
+    end;
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
