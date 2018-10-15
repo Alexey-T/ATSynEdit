@@ -456,9 +456,12 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
-    if (Item.EndX<0) or (Item.EndY<0) then Continue;
-    if (Item.PosX<>Item.EndX) or (Item.PosY<>Item.EndY) then
-      begin Result:= true; Exit end;
+    if (Item.EndY>=0) then exit(true);
+    {
+    if (Item.EndY<0) then Continue;
+    if (Item.PosX<>Item.EndX) or
+    (Item.PosY<>Item.EndY) then exit(true);
+    }
   end;
 end;
 
