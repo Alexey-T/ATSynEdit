@@ -2213,6 +2213,36 @@ begin
     NLinesIndex:= WrapItem.NLineIndex;
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
+    //speedup painting minimap:
+    //if line parts cached, paint them now (without Strings.Lines reading)
+    if not AMainText then
+      if Assigned(FAdapterHilite) then
+        if FAdapterCache.Get(
+          WrapItem.NLineIndex,
+          WrapItem.NCharIndex,
+          WrapItem.NLength,
+          FLineParts,
+          NColorAfter) then
+        begin
+          CurrPointText:= Point(
+            Int64(ARect.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
+            NCoordTop);
+
+          CanvasTextOutMinimap(C,
+            ARect,
+            CurrPointText,
+            FCharSizeMinimap,
+            FTabSize,
+            @FLineParts,
+            Colors.TextBG
+            );
+
+          //end of painting line
+          Inc(NCoordTop, ACharSize.Y);
+          Inc(NWrapIndex);
+          Continue;
+        end;
+
     //don't update FLineBottom if minimap paints
     if AMainText then
       FLineBottom:= NLinesIndex;
