@@ -13,7 +13,7 @@ interface
 uses
   Classes, SysUtils, Graphics,
   ATSynEdit_CanvasProc,
-  ATSynEdit_fgl;
+  gdeque;
 
 type
   TATAdapterCacheItem = packed record
@@ -22,9 +22,10 @@ type
     Parts: TATLineParts;
     class operator=(const A, B: TATAdapterCacheItem): boolean;
   end;
+  PATAdapterCacheItem = ^TATAdapterCacheItem;
 
 type
-  TATAdapterCacheItems = specialize TFPGList<TATAdapterCacheItem>;
+  TATAdapterCacheItems = specialize TDeque<TATAdapterCacheItem>;
 
 type
   { TATAdapterHiliteCache }
@@ -90,7 +91,8 @@ end;
 
 procedure TATAdapterHiliteCache.Clear;
 begin
-  FList.Clear;
+  while not FList.IsEmpty() do
+    FList.PopBack();
 end;
 
 procedure TATAdapterHiliteCache.Add(
@@ -98,7 +100,6 @@ procedure TATAdapterHiliteCache.Add(
   const AParts: TATLineParts;
   const AColorAfterEol: TColor);
 var
-  N: integer;
   Item: TATAdapterCacheItem;
 begin
   if not Enabled then exit;
@@ -120,8 +121,8 @@ begin
     then exit;
     }
 
-  if FList.Count>=FMaxCount then
-    FList.Delete(FList.Count-1);
+  if FList.Size()>=FMaxCount then
+    FList.PopBack;
 
   FillChar(Item, SizeOf(Item), 0);
   Item.LineIndex:= ALineIndex;
@@ -129,7 +130,7 @@ begin
   Item.LineLen:= ALineLen;
   Item.ColorAfterEol:= AColorAfterEol;
   Move(AParts, Item.Parts, SizeOf(AParts));
-  FList.Insert(0, Item);
+  FList.PushFront(Item);
 end;
 
 function TATAdapterHiliteCache.GetDump: string;
@@ -140,7 +141,7 @@ var
 begin
   L:= TStringList.Create;
   try
-    for i:= 0 to FList.Count-1 do
+    for i:= 0 to FList.Size-1 do
       with FList.Items[i] do
       begin
         S:= '';
@@ -168,21 +169,21 @@ function TATAdapterHiliteCache.Get(
   var AParts: TATLineParts;
   var AColorAfterEol: TColor): boolean;
 var
-  Item: TATAdapterCacheItem;
+  ItemPtr: PATAdapterCacheItem;
   i: integer;
 begin
   Result:= false;
   if not Enabled then exit;
 
-  for i:= 0 to FList.Count-1 do
+  for i:= 0 to FList.Size-1 do
   begin
-    Item:= FList[i];
-    if (Item.LineIndex=ALineIndex) and
-      (Item.CharIndex=ACharIndex) and
-      (Item.LineLen=ALineLen) then
+    ItemPtr:= FList.Mutable[i];
+    if (ItemPtr^.LineIndex=ALineIndex) and
+      (ItemPtr^.CharIndex=ACharIndex) and
+      (ItemPtr^.LineLen=ALineLen) then
       begin
-        Move(Item.Parts, AParts, SizeOf(AParts));
-        AColorAfterEol:= Item.ColorAfterEol;
+        Move(ItemPtr^.Parts, AParts, SizeOf(AParts));
+        AColorAfterEol:= ItemPtr^.ColorAfterEol;
         exit(true);
       end;
   end;
