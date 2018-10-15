@@ -2150,14 +2150,14 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  if AMainText then
-    GlobalCharSizer.Init(Font.Name, Font.Size, C);
-
   C.Brush.Color:= GetColorTextBG;
   C.FillRect(ARect);
 
   if AMainText then
+  begin
+    GlobalCharSizer.Init(Font.Name, Font.Size, C);
     DoClearFoldedMarkList;
+  end;
 
   if AWithGutter then
   begin
