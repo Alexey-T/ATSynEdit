@@ -50,7 +50,6 @@ type
       const ALineIndex, ACharIndex, ALineLen: integer;
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
-    function GetDump: string;
   end;
 
 
@@ -133,36 +132,6 @@ begin
   FList.PushFront(Item);
 end;
 
-function TATAdapterHiliteCache.GetDump: string;
-var
-  L: TStringList;
-  S: string;
-  i, j: integer;
-begin
-  L:= TStringList.Create;
-  try
-    for i:= 0 to FList.Size-1 do
-      with FList.Items[i] do
-      begin
-        S:= '';
-        for j:= 0 to 10 do
-        begin
-          if (Parts[j].Offset=0) and
-             (Parts[j].Len=0) then Break;
-          S:= S+Format('[%d %d]',
-            [ Parts[j].Offset, Parts[j].Len ]
-            );
-        end;
-
-        S:= Format('  line %d, char %d, len %d, parts %s',
-          [LineIndex, CharIndex, LineLen, S]);
-        L.Add(S);
-      end;
-    Result:= L.Text;
-  finally
-    L.Free;
-  end;
-end;
 
 function TATAdapterHiliteCache.Get(
   const ALineIndex, ACharIndex, ALineLen: integer;

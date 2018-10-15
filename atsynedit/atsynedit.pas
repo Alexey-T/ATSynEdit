@@ -5809,10 +5809,7 @@ end;
 
 function TATSynEdit.GetCacheDump: string;
 begin
-  if Assigned(FAdapterCache) then
-    Result:= FAdapterCache.GetDump
-  else
-    Result:= '?';
+  Result:= '?';
 end;
 
 
