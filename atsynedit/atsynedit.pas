@@ -642,6 +642,7 @@ type
     FOptAllowScrollbarHorz: boolean;
     FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
+    FOptMinimapCachedPainting: boolean;
 
     {$ifdef WINDOWS}
     FIMEPreSelText: atString;
@@ -1416,6 +1417,7 @@ type
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine default true;
+    property OptMinimapCachedPainting: boolean read FOptMinimapCachedPainting write FOptMinimapCachedPainting default false;
   end;
 
 var
@@ -2215,7 +2217,7 @@ begin
 
     //speedup painting minimap:
     //if line parts cached, paint them now (without Strings.Lines reading)
-    if not AMainText then
+    if not AMainText and FOptMinimapCachedPainting then
       if Assigned(FAdapterHilite) then
         if FAdapterCache.Get(
           WrapItem.NLineIndex,
