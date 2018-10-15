@@ -2357,6 +2357,7 @@ begin
           )
       end
       else
+      if StrOut<>'' then
         CanvasTextOutMinimap(C,
           StrOut,
           ARect,

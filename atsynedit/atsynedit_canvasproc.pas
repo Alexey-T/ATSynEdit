@@ -1215,7 +1215,6 @@ var
   X1, X2, Y2: integer;
   HasBG: boolean;
 begin
-  if AStr='' then exit;
   for nPart:= Low(TATLineParts) to High(TATLineParts) do
   begin
     Part:= @AParts^[nPart];
