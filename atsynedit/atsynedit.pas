@@ -520,6 +520,7 @@ type
     FMinimapTooltipLinesCount: integer;
     FMinimapTooltipWidthPercents: integer;
     FMinimapTooltip: TPanel;
+    FMinimapCachedPainting: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
     FFoldedMarkList: TList;
@@ -642,7 +643,6 @@ type
     FOptAllowScrollbarHorz: boolean;
     FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
-    FOptMinimapCachedPainting: boolean;
 
     {$ifdef WINDOWS}
     FIMEPreSelText: atString;
@@ -1338,6 +1338,7 @@ type
     property OptMinimapTooltipVisible: boolean read FMinimapTooltipVisible write FMinimapTooltipVisible default cInitMinimapTooltipVisible;
     property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
     property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
+    property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth default cInitMicromapWidth;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX default 0;
@@ -1417,7 +1418,6 @@ type
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine default true;
-    property OptMinimapCachedPainting: boolean read FOptMinimapCachedPainting write FOptMinimapCachedPainting default false;
   end;
 
 var
@@ -2217,7 +2217,8 @@ begin
 
     //speedup painting minimap:
     //if line parts cached, paint them now (without Strings.Lines reading)
-    if not AMainText and FOptMinimapCachedPainting then
+    if not AMainText then
+     if FMinimapCachedPainting and not Carets.IsSelection then
       if Assigned(FAdapterHilite) then
         if FAdapterCache.Get(
           WrapItem.NLineIndex,
@@ -3055,6 +3056,7 @@ begin
   FMinimapTooltipVisible:= cInitMinimapTooltipVisible;
   FMinimapTooltipLinesCount:= cInitMinimapTooltipLinesCount;
   FMinimapTooltipWidthPercents:= cInitMinimapTooltipWidthPercents;
+  FMinimapCachedPainting:= true;
 
   FMinimapTooltip:= TPanel.Create(Self);
   FMinimapTooltip.Hide;
