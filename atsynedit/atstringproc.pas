@@ -62,7 +62,7 @@ function SEndsWithEol(const S: atString): boolean;
 
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
-function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
+function SGetIndentExpanded(const S: atString; ATabSize: integer): integer; inline;
 function SGetIndentCharsToOpeningBracket(const S: atString): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 
@@ -316,12 +316,9 @@ begin
     Result:= Length(S);
 end;
 
-function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
-var
-  SIndent: atString;
+function SGetIndentExpanded(const S: atString; ATabSize: integer): integer; inline;
 begin
-  SIndent:= Copy(S, 1, SGetIndentChars(S));
-  Result:= STabsToSpaces_Length(SIndent, ATabSize);
+  Result:= STabsToSpaces_Length(S, ATabSize, SGetIndentChars(S));
 end;
 
 function SSwapEndian(const S: UnicodeString): UnicodeString;
