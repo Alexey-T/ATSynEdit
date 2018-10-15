@@ -5,27 +5,33 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Adapter_Cache;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
+{$Z1}
 
 interface
 
 uses
   Classes, SysUtils, Graphics,
-  ATSynEdit_CanvasProc;
+  ATSynEdit_CanvasProc,
+  ATSynEdit_fgl;
 
 type
-  TATAdapterHiliteCacheItem = class
-  public
+  TATAdapterCacheItem = packed record
     LineIndex, CharIndex, LineLen: integer;
     ColorAfterEol: TColor;
     Parts: TATLineParts;
+    class operator=(const A, B: TATAdapterCacheItem): boolean;
   end;
+
+type
+  TATAdapterCacheItems = specialize TFPGList<TATAdapterCacheItem>;
 
 type
   { TATAdapterHiliteCache }
 
   TATAdapterHiliteCache = class
   private
-    FList: TList;
+    FList: TATAdapterCacheItems;
     FMaxCount: integer;
     FEnabled: boolean;
     procedure SetEnabled(AValue: boolean);
@@ -50,8 +56,15 @@ type
 implementation
 
 const
-  cAdapterCacheMaxSize = 1000;
   //500 lines in minimap on my monitor+ 100 lines in editor
+  cAdapterCacheMaxSize = 1000;
+
+{ TATAdapterCacheItem }
+
+class operator TATAdapterCacheItem.=(const A, B: TATAdapterCacheItem): boolean;
+begin
+  Result:= false;
+end;
 
 { TATAdapterHiliteCache }
 
@@ -64,7 +77,7 @@ end;
 
 constructor TATAdapterHiliteCache.Create;
 begin
-  FList:= TList.Create;
+  FList:= TATAdapterCacheItems.Create;
   FMaxCount:= cAdapterCacheMaxSize;
 end;
 
@@ -76,11 +89,7 @@ begin
 end;
 
 procedure TATAdapterHiliteCache.Clear;
-var
-  i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
-    TObject(FList[i]).Free;
   FList.Clear;
 end;
 
@@ -90,7 +99,7 @@ procedure TATAdapterHiliteCache.Add(
   const AColorAfterEol: TColor);
 var
   N: integer;
-  Item: TATAdapterHiliteCacheItem;
+  Item: TATAdapterCacheItem;
 begin
   if not Enabled then exit;
 
@@ -111,21 +120,16 @@ begin
     then exit;
     }
 
-  //new item adds to begin, last item deleted
   if FList.Count>=FMaxCount then
-  begin
-    N:= FList.Count-1;
-    TObject(FList[N]).Free;
-    FList.Delete(N);
-  end;
+    FList.Delete(FList.Count-1);
 
-  Item:= TATAdapterHiliteCacheItem.Create;
+  FillChar(Item, SizeOf(Item), 0);
   Item.LineIndex:= ALineIndex;
   Item.CharIndex:= ACharIndex;
   Item.LineLen:= ALineLen;
   Item.ColorAfterEol:= AColorAfterEol;
   Move(AParts, Item.Parts, SizeOf(AParts));
-  FList.Insert(0, Item);
+  FList.Add(Item);
 end;
 
 function TATAdapterHiliteCache.GetDump: string;
@@ -137,7 +141,7 @@ begin
   L:= TStringList.Create;
   try
     for i:= 0 to FList.Count-1 do
-      with TATAdapterHiliteCacheItem(FList.Items[i]) do
+      with FList.Items[i] do
       begin
         S:= '';
         for j:= 0 to 10 do
@@ -164,7 +168,7 @@ function TATAdapterHiliteCache.Get(
   var AParts: TATLineParts;
   var AColorAfterEol: TColor): boolean;
 var
-  Item: TATAdapterHiliteCacheItem;
+  Item: TATAdapterCacheItem;
   i: integer;
 begin
   Result:= false;
@@ -172,7 +176,7 @@ begin
 
   for i:= 0 to FList.Count-1 do
   begin
-    Item:= TATAdapterHiliteCacheItem(FList[i]);
+    Item:= FList[i];
     if (Item.LineIndex=ALineIndex) and
       (Item.CharIndex=ACharIndex) and
       (Item.LineLen=ALineLen) then
