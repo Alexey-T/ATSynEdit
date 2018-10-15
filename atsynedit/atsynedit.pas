@@ -2150,7 +2150,8 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  GlobalCharSizer.Init(Font.Name, Font.Size, C);
+  if AMainText then
+    GlobalCharSizer.Init(Font.Name, Font.Size, C);
 
   C.Brush.Color:= GetColorTextBG;
   C.FillRect(ARect);
