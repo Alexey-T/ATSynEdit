@@ -740,7 +740,7 @@ type
       AItems: TATSynWrapItems; AConsiderFolding: boolean);
     procedure DoCalcLineHilite(const AData: TATSynWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
-  AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
+      AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
     //select
     procedure DoSelectionDeleteOrReset;
     procedure DoSelect_ExtendSelectionByLine;
@@ -2359,7 +2359,6 @@ begin
       else
       if StrOut<>'' then
         CanvasTextOutMinimap(C,
-          StrOut,
           ARect,
           CurrPointText,
           FCharSizeMinimap,

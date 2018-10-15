@@ -123,7 +123,6 @@ procedure CanvasTextOut(C: TCanvas;
   );
 
 procedure CanvasTextOutMinimap(C: TCanvas;
-  const AStr: atString;
   const ARect: TRect;
   APos: TPoint;
   ACharSize: TPoint;
@@ -1203,7 +1202,7 @@ begin
 end;
 
 
-procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString;
+procedure CanvasTextOutMinimap(C: TCanvas;
   const ARect: TRect; APos: TPoint; ACharSize: TPoint; ATabSize: integer;
   AParts: PATLineParts;
   AColorBG: TColor);
@@ -1211,9 +1210,10 @@ procedure CanvasTextOutMinimap(C: TCanvas; const AStr: atString;
 // and 1px spacing between lines
 var
   Part: ^TATLinePart;
-  nPart, nPos: integer;
+  nPart: integer;
   X1, X2, Y2: integer;
   HasBG: boolean;
+  NColorFont: TColor;
 begin
   for nPart:= Low(TATLineParts) to High(TATLineParts) do
   begin
@@ -1221,11 +1221,15 @@ begin
     if Part^.Len=0 then Break;
 
     HasBG:= Part^.ColorBG<>AColorBG;
+    //nPos:= Part^.Offset+1;
 
-    nPos:= Part^.Offset+1;
-    if nPos>Length(AStr) then Continue;
-    if IsStringSpaces(AStr, nPos, Part^.Len)
-      and (not HasBG) then Continue;
+    //clNone means that it's empty/space part (adapter must set so)
+    NColorFont:= Part^.ColorFont;
+    if NColorFont=clNone then
+      if HasBG then
+        NColorFont:= Part^.ColorBG
+      else
+        Continue;
 
     X1:= APos.X + ACharSize.X*Part^.Offset;
     X2:= X1 + ACharSize.X*Part^.Len;
@@ -1244,7 +1248,7 @@ begin
         C.FillRect(X1, Y2-2, X2, Y2-1);
       end;
 
-      C.Brush.Color:= ColorBlendHalf(Part^.ColorBG, Part^.ColorFont);
+      C.Brush.Color:= ColorBlendHalf(Part^.ColorBG, NColorFont);
       C.FillRect(X1, Y2-1, X2, Y2);
     end;
   end;
