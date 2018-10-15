@@ -2197,9 +2197,12 @@ begin
 
   repeat
     if NCoordTop>ARect.Bottom then Break;
+
     if not FWrapInfo.IsIndexValid(NWrapIndex) then
     begin
-      if NWrapIndex>=0 then
+      //paint end-of-file arrow
+      if AMainText then
+       if NWrapIndex>=0 then
         if OptUnprintedVisible and OptUnprintedEof then
           CanvasArrowHorz(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
             Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X, false);
