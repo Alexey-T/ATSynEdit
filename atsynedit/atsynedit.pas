@@ -2125,10 +2125,9 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   var AScrollHorz, AScrollVert: TATSynScrollInfo;
   ALineFrom: integer);
 var
-  NCoordTop, NCoordTopGapped, NCoordSep: integer;
+  NCoordTop, NCoordSep: integer;
   NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
-  NOutputCharsSkipped, NOutputStrWidth: integer;
-  NOutputSpacesSkipped: integer;
+  NOutputCharsSkipped, NOutputStrWidth, NOutputSpacesSkipped: integer;
   WrapItem: TATSynWrapItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue, NBandDecor: integer;
@@ -2597,9 +2596,8 @@ begin
       ItemGap:= Gaps.Find(NLinesIndex);
       if Assigned(ItemGap) then
       begin
-        NCoordTopGapped:= NCoordTop + ItemGap.Size;
-        DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTopGapped), ItemGap);
-        NCoordTop:= NCoordTopGapped;
+        DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ItemGap.Size), ItemGap);
+        NCoordTop+= ItemGap.Size;
       end;
     end;
   until false;
