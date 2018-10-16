@@ -15,16 +15,19 @@ uses
   ATStringProc;
 
 type
+  TATSynRangeHint = string[47];
+
+type
   { TATSynRange }
 
   TATSynRange = class
   private
-    FX, //start column
-    FY, //start line
+    FX: integer; //start column
+    FY: integer; //start line
     FY2: integer; //end line which is fully folded (can't partially fold)
     FFolded: boolean;
     FStaple: boolean;
-    FHint: string;
+    FHint: TATSynRangeHint;
     FTag: Int64;
   public
     property X: integer read FX write FX;
@@ -32,7 +35,7 @@ type
     property Y2: integer read FY2 write FY2;
     property Folded: boolean read FFolded write FFolded;
     property Staple: boolean read FStaple write FStaple;
-    property Hint: string read FHint write FHint;
+    property Hint: TATSynRangeHint read FHint write FHint;
     property Tag: Int64 read FTag write FTag;
     constructor Create(AX, AY, AY2: integer; AStaple: boolean; const AHint: string;
       const ATag: Int64); virtual;
@@ -151,7 +154,7 @@ end;
 constructor TATSynRanges.Create;
 begin
   FList:= TList.Create;
-  FList.Capacity:= 4000;
+  FList.Capacity:= 2*1024;
 end;
 
 destructor TATSynRanges.Destroy;
