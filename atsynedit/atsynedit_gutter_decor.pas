@@ -50,8 +50,8 @@ type
     procedure Delete(N: integer);
     procedure DeleteForLine(ALine: integer);
     function DeleteByTag(const ATag: Int64): boolean;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATGutterDecorItem read GetItem; default;
     procedure Add(const AData: TATGutterDecorData);
     function Find(ALineNum: integer): integer;
@@ -133,12 +133,12 @@ begin
     end;
 end;
 
-function TATGutterDecor.Count: integer;
+function TATGutterDecor.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
 
-function TATGutterDecor.IsIndexValid(N: integer): boolean;
+function TATGutterDecor.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;

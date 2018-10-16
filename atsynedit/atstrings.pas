@@ -244,8 +244,8 @@ type
     destructor Destroy; override;
     procedure Clear;
     procedure ClearSeparators;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
     procedure LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLineEnds);

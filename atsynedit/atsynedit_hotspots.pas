@@ -38,8 +38,8 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATHotspotItem read GetItem; default;
     procedure Add(const AItem: TATHotspotItem);
     procedure Insert(N: integer; const AItem: TATHotspotItem);

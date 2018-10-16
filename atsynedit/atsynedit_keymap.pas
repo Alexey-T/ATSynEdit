@@ -52,8 +52,8 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATKeymapItem read GetItem; default;
     procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string);
     procedure Delete(N: integer);
@@ -117,17 +117,17 @@ begin
   FList.Clear;
 end;
 
-function TATKeymap.Count: integer;
+function TATKeymap.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
 
-function TATKeymap.IsIndexValid(N: integer): boolean;
+function TATKeymap.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-function _TextToShortcut(const S: string): TShortcut;
+function _TextToShortcut(const S: string): TShortcut; inline;
 begin
   Result:= TextToShortCut(S);
   {$ifdef test_correct_keynames}

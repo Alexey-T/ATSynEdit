@@ -44,8 +44,8 @@ type
     procedure Delete(N: integer);
     procedure DeleteForLine(ALine: integer);
     function DeleteByTag(const ATag: Int64): boolean;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATBookmarkItem read GetItem; default;
     procedure Add(const AData: TATBookmarkData);
     function Find(ALineNum: integer): integer;
@@ -101,13 +101,13 @@ begin
   FList.Clear;
 end;
 
-procedure TATBookmarks.Delete(N: integer);
+procedure TATBookmarks.Delete(N: integer); inline;
 begin
   TObject(FList[N]).Free;
   FList.Delete(N);
 end;
 
-procedure TATBookmarks.DeleteForLine(ALine: integer);
+procedure TATBookmarks.DeleteForLine(ALine: integer); inline;
 var
   N: integer;
 begin
@@ -129,12 +129,12 @@ begin
     end;
 end;
 
-function TATBookmarks.Count: integer;
+function TATBookmarks.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
 
-function TATBookmarks.IsIndexValid(N: integer): boolean;
+function TATBookmarks.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;

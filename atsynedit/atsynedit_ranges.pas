@@ -60,8 +60,8 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     procedure Clear;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;

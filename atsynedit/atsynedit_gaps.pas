@@ -48,8 +48,8 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATSynGapItem read GetItem; default;
     procedure Delete(N: integer);
     function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; ATag: Int64): boolean;

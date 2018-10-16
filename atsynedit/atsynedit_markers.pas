@@ -52,8 +52,8 @@ type
     destructor Destroy; override;
     procedure Clear;
     procedure Delete(AIndex: integer);
-    function Count: integer;
-    function IsIndexValid(AIndex: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(AIndex: integer): boolean; inline;
     property Items[AIndex: integer]: TATMarkerItem read GetItem write SetItem; default;
     procedure Add(APosX, APosY: integer;
       const ATag: Int64=0;
@@ -117,12 +117,12 @@ begin
   end;
 end;
 
-function TATMarkers.Count: integer;
+function TATMarkers.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
 
-function TATMarkers.IsIndexValid(AIndex: integer): boolean;
+function TATMarkers.IsIndexValid(AIndex: integer): boolean; inline;
 begin
   Result:= (AIndex>=0) and (AIndex<FList.Count);
 end;

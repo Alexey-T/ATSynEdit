@@ -60,9 +60,9 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    function IsIndexValid(N: integer): boolean;
+    function IsIndexValid(N: integer): boolean; inline;
     function IsItemsEqual(N1, N2: integer): boolean;
-    function Count: integer;
+    function Count: integer; inline;
     function Last: TATUndoItem;
     property Items[N: integer]: TATUndoItem read GetItem; default;
     property MaxCount: integer read FMaxCount write FMaxCount;
@@ -133,12 +133,12 @@ begin
   inherited;
 end;
 
-function TATUndoList.Count: integer;
+function TATUndoList.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
 
-function TATUndoList.IsIndexValid(N: integer): boolean;
+function TATUndoList.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<Count);
 end;

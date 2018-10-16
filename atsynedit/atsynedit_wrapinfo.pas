@@ -58,8 +58,8 @@ type
     procedure Clear;
     property StringsObj: TATStrings read FStrings write FStrings;
     property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
-    function Count: integer;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     function IsItemInitial(N: integer): boolean;
     property Data[N: integer]: TATSynWrapItem read GetData; default;
     procedure Add(const AData: TATSynWrapItem);

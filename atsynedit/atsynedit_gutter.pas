@@ -30,11 +30,11 @@ type
     GutterLeft: integer;
     constructor Create; virtual;
     destructor Destroy; override;
-    function IsIndexValid(N: integer): boolean;
+    function IsIndexValid(N: integer): boolean; inline;
     procedure Add(ASize: integer);
     procedure Delete(N: integer);
     procedure Clear;
-    function Count: integer;
+    function Count: integer; inline;
     property Items[N: integer]: TATGutterItem read GetItem; default;
     function Width: integer;
     procedure Update;
@@ -46,7 +46,7 @@ implementation
 
 { TATGutter }
 
-function TATGutter.IsIndexValid(N: integer): boolean;
+function TATGutter.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
@@ -101,7 +101,7 @@ begin
     Delete(i);
 end;
 
-function TATGutter.Count: integer;
+function TATGutter.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
