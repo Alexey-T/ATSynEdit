@@ -55,19 +55,19 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure Clear; inline;
+    procedure Clear;
     property StringsObj: TATStrings read FStrings write FStrings;
     property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
-    function Count: integer; inline;
-    function IsIndexValid(N: integer): boolean; inline;
+    function Count: integer;
+    function IsIndexValid(N: integer): boolean;
     function IsItemInitial(N: integer): boolean;
     property Data[N: integer]: TATSynWrapItem read GetData; default;
-    procedure Add(const AData: TATSynWrapItem); inline;
-    procedure Delete(N: integer); inline;
-    procedure Insert(N: integer; const AItem: TATSynWrapItem); inline;
+    procedure Add(const AData: TATSynWrapItem);
+    procedure Delete(N: integer);
+    procedure Insert(N: integer; const AItem: TATSynWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
     function FindIndexOfCaretPos(APos: TPoint): integer;
-    procedure SetCapacity(N: integer); inline;
+    procedure SetCapacity(N: integer);
     procedure ReplaceItems(AFrom, ATo: integer; AItems: TATSynWrapItems);
     property OnCheckLineCollapsed: TATCheckLineCollapsedEvent read FOnCheckCollapsed write FOnCheckCollapsed;
   end;
