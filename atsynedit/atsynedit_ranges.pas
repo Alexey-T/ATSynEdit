@@ -6,12 +6,10 @@ unit ATSynEdit_Ranges;
 
 {$mode objfpc}{$H+}
 
-//{$define show_unfold_rng}
-
 interface
 
 uses
-  Classes, SysUtils, Dialogs,
+  Classes, SysUtils,
   ATStringProc;
 
 type
@@ -255,10 +253,6 @@ begin
 
     if ATopLevelOnly then
     begin
-      {$ifdef show_unfold_rng}
-      s1:= 'toplevel: ranges shortlist'#13+MessageTextForIndexList(L);
-      {$endif}
-
       for i:= L.Count-1 downto 1 do
         for j:= 0 to i-1 do
           if IsRangeInsideOther(Items[PtrInt(L[i])], Items[PtrInt(L[j])]) then
@@ -266,12 +260,6 @@ begin
             L.Delete(i);
             Break
           end;
-
-      {$ifdef show_unfold_rng}
-      s2:= 'toplevel: ranges done'#13+MessageTextForIndexList(L);
-      if l.count>0 then
-        showmessage(s1+#13+s2);
-      {$endif}
     end;
 
     SetLength(Result, L.Count);
