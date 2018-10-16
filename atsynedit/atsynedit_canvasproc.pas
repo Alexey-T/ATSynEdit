@@ -1213,6 +1213,7 @@ var
   nPart: integer;
   X1, X2, Y2: integer;
   HasBG: boolean;
+  NColorBack,
   NColorFont: TColor;
 begin
   for nPart:= Low(TATLineParts) to High(TATLineParts) do
@@ -1220,14 +1221,16 @@ begin
     Part:= @AParts^[nPart];
     if Part^.Len=0 then Break;
 
-    HasBG:= Part^.ColorBG<>AColorBG;
-    //nPos:= Part^.Offset+1;
+    NColorFont:= Part^.ColorFont;
+    NColorBack:= Part^.ColorBG;
+    if NColorBack=clNone then
+      NColorBack:= AColorBG;
+    HasBG:= NColorBack<>AColorBG;
 
     //clNone means that it's empty/space part (adapter must set so)
-    NColorFont:= Part^.ColorFont;
     if NColorFont=clNone then
       if HasBG then
-        NColorFont:= Part^.ColorBG
+        NColorFont:= NColorBack
       else
         Continue;
 
@@ -1244,11 +1247,11 @@ begin
       if HasBG then
       begin
         //paint BG color 1 pixel upper
-        C.Brush.Color:= Part^.ColorBG;
+        C.Brush.Color:= NColorBack;
         C.FillRect(X1, Y2-2, X2, Y2-1);
       end;
 
-      C.Brush.Color:= ColorBlendHalf(Part^.ColorBG, NColorFont);
+      C.Brush.Color:= ColorBlendHalf(NColorBack, NColorFont);
       C.FillRect(X1, Y2-1, X2, Y2);
     end;
   end;
