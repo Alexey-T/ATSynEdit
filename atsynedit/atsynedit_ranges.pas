@@ -55,14 +55,13 @@ type
   TATSynRanges = class
   private
     FList: TList;
-    function GetCount: integer;
     function GetItems(Index: integer): TATSynRange;
     function MessageTextForIndexList(L: TList): string;
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    property Count: integer read GetCount;
-    function IsIndexValid(N: integer): boolean;
+    function Count: integer; inline;
+    function IsIndexValid(N: integer): boolean; inline;
     procedure Clear;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
@@ -111,12 +110,12 @@ begin
   FTag:= ATag;
 end;
 
-function TATSynRange.IsSimple: boolean;
+function TATSynRange.IsSimple: boolean; inline;
 begin
   Result:= Y=Y2;
 end;
 
-function TATSynRange.IsLineInside(ALine: integer): boolean;
+function TATSynRange.IsLineInside(ALine: integer): boolean; inline;
 begin
   Result:= (ALine>=Y) and (ALine<=Y2);
 end;
@@ -128,12 +127,12 @@ end;
 
 { TATSynRanges }
 
-function TATSynRanges.IsIndexValid(N: integer): boolean;
+function TATSynRanges.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-function TATSynRanges.GetCount: integer;
+function TATSynRanges.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
