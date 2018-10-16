@@ -117,7 +117,7 @@ implementation
 uses
   Math{%H-};
 
-function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
+function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean; inline;
 begin
   if Y1<>Y2 then
     Result:= Y1<Y2
@@ -391,8 +391,7 @@ begin
       begin XUse:= Item.PosX; YUse:= Item.PosY; end;
 
     if (YUse>APosY) then Break;
-    if (XUse=APosX) and (YUse=APosY) then
-      begin Result:= i; Break end;
+    if (XUse=APosX) and (YUse=APosY) then exit(i);
   end;
 end;
 
@@ -404,7 +403,7 @@ begin
   Result:= -1;
   for i:= 0 to FList.Count-1 do
     if TATCaretItem(FList[i]).PosY>=APosY then
-      begin Result:= i; Exit end;
+      exit(i);
 end;
 
 function TATCarets.IndexOfLeftRight(ALeft: boolean): integer;
@@ -441,10 +440,7 @@ begin
   begin
     Item:= TATCaretItem(FList[i]);
     if Item.PosY=APosY then
-    begin
-      Result:= true;
-      Exit
-    end;
+      exit(true);
   end;
 end;
 

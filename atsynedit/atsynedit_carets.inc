@@ -1,6 +1,6 @@
 {$ifdef nnnn}begin end;{$endif}
 
-function TATSynEdit.IsLineWithCaret(ALine: integer): boolean;
+function TATSynEdit.IsLineWithCaret(ALine: integer): boolean; inline;
 begin
   Result:= FCarets.IsLineListed(ALine);
 end;
@@ -20,10 +20,7 @@ begin
     begin
       Coord:= CaretPosToClientPos(Point(Caret.PosX, Caret.PosY));
       if Coord.Y=ACoordY then
-      begin
-        Result:= true;
-        Exit
-      end;
+        exit(true);
     end;
   end;
 end;
