@@ -2141,6 +2141,7 @@ var
   ItemGap: TATSynGapItem;
   TextOutProps: TATCanvasTextOutProps;
   Band: TATGutterItem;
+  bCachedMinimap: boolean;
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
   begin
@@ -2197,6 +2198,12 @@ begin
 
   DoEventBeforeCalcHilite;
 
+  bCachedMinimap:=
+    not AMainText and
+    FMinimapCachedPainting and
+    Assigned(FAdapterHilite) and
+    not Carets.IsSelectionMultiline;
+
   repeat
     if NCoordTop>ARect.Bottom then Break;
 
@@ -2217,15 +2224,13 @@ begin
 
     //speedup painting minimap:
     //if line parts cached, paint them now (without Strings.Lines reading)
-    if not AMainText then
-     if FMinimapCachedPainting and not Carets.IsSelection then
-      if Assigned(FAdapterHilite) then
-        if FAdapterCache.Get(
-          WrapItem.NLineIndex,
-          WrapItem.NCharIndex,
-          WrapItem.NLength,
-          FLineParts,
-          NColorAfter) then
+    if bCachedMinimap then
+      if FAdapterCache.Get(
+        WrapItem.NLineIndex,
+        WrapItem.NCharIndex,
+        WrapItem.NLength,
+        FLineParts,
+        NColorAfter) then
         begin
           CurrPointText:= Point(
             Int64(ARect.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,

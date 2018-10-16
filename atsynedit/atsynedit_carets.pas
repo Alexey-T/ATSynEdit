@@ -96,6 +96,7 @@ type
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
     function IsSelection: boolean;
+    function IsSelectionMultiline: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
@@ -456,12 +457,22 @@ begin
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
-    if (Item.EndY>=0) then exit(true);
-    {
-    if (Item.EndY<0) then Continue;
-    if (Item.PosX<>Item.EndX) or
-    (Item.PosY<>Item.EndY) then exit(true);
-    }
+    if (Item.EndY>=0) then
+      exit(true);
+  end;
+end;
+
+function TATCarets.IsSelectionMultiline: boolean;
+var
+  Item: TATCaretItem;
+  i: integer;
+begin
+  Result:= false;
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    if (Item.EndY>=0) and (Item.EndY<>Item.PosY) then
+      exit(true);
   end;
 end;
 
