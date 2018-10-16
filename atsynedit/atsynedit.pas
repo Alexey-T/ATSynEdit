@@ -2129,6 +2129,8 @@ var
   NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth, NOutputSpacesSkipped: integer;
   WrapItem: TATSynWrapItem;
+  GapItem: TATSynGapItem;
+  Band: TATGutterItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue, NBandDecor: integer;
   Str, StrOut: atString;
@@ -2137,9 +2139,7 @@ var
   LineWithCaret, LineEolSelected, LineColorForced: boolean;
   Event: TATSynEditDrawLineEvent;
   StrSize: TSize;
-  ItemGap: TATSynGapItem;
   TextOutProps: TATCanvasTextOutProps;
-  Band: TATGutterItem;
   bCachedMinimap: boolean;
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
@@ -2593,11 +2593,11 @@ begin
     //consider gap (not for minimap)
     if AMainText and (WrapItem.NFinal=cWrapItemFinal) then
     begin
-      ItemGap:= Gaps.Find(NLinesIndex);
-      if Assigned(ItemGap) then
+      GapItem:= Gaps.Find(NLinesIndex);
+      if Assigned(GapItem) then
       begin
-        DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ItemGap.Size), ItemGap);
-        NCoordTop+= ItemGap.Size;
+        DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+GapItem.Size), GapItem);
+        NCoordTop+= GapItem.Size;
       end;
     end;
   until false;
