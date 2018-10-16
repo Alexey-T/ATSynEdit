@@ -39,7 +39,7 @@ type
     destructor Destroy; override;
     procedure Clear;
     function Count: integer;
-    function IsIndexValid(N: integer): boolean; inline;
+    function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATHotspotItem read GetItem; default;
     procedure Add(const AItem: TATHotspotItem);
     procedure Insert(N: integer; const AItem: TATHotspotItem);
@@ -74,7 +74,7 @@ begin
   inherited;
 end;
 
-procedure TATHotspots.Clear;
+procedure TATHotspots.Clear; inline;
 begin
   FList.Clear;
 end;
@@ -84,7 +84,7 @@ begin
   Result:= FList[AIndex];
 end;
 
-function TATHotspots.Count: integer;
+function TATHotspots.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
@@ -94,12 +94,12 @@ begin
   Result:= (N>=0) and (N<Count);
 end;
 
-procedure TATHotspots.Add(const AItem: TATHotspotItem);
+procedure TATHotspots.Add(const AItem: TATHotspotItem); inline;
 begin
   FList.Add(AItem);
 end;
 
-procedure TATHotspots.Delete(N: integer);
+procedure TATHotspots.Delete(N: integer); inline;
 begin
   FList.Delete(N);
 end;
@@ -115,7 +115,7 @@ begin
   until false;
 end;
 
-procedure TATHotspots.Insert(N: integer; const AItem: TATHotspotItem);
+procedure TATHotspots.Insert(N: integer; const AItem: TATHotspotItem); inline;
 begin
   if N>=FList.Count then
     FList.Add(AItem)

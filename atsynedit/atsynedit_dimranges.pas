@@ -34,7 +34,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     function Count: integer;
-    function IsIndexValid(N: integer): boolean; inline;
+    function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATDimRange read GetItem; default;
     function Add(ALineFrom, ALineTo: integer; ADimValue: integer): TATDimRange;
     function GetDimValue(ALine, ADefValue: integer): integer;
@@ -73,7 +73,7 @@ begin
   end;
 end;
 
-function TATDimRanges.Count: integer;
+function TATDimRanges.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;

@@ -36,8 +36,8 @@ type
     property Tag: Int64 read FTag write FTag;
     constructor Create(AX, AY, AY2: integer; AStaple: boolean; const AHint: string;
       const ATag: Int64); virtual;
-    function IsSimple: boolean; inline;
-    function IsLineInside(ALine: integer): boolean; inline;
+    function IsSimple: boolean;
+    function IsLineInside(ALine: integer): boolean;
     function MessageText: string;
   end;
 
@@ -60,8 +60,8 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    function Count: integer; inline;
-    function IsIndexValid(N: integer): boolean; inline;
+    function Count: integer;
+    function IsIndexValid(N: integer): boolean;
     procedure Clear;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
@@ -187,7 +187,7 @@ begin
   FList.Insert(Index, Result);
 end;
 
-procedure TATSynRanges.Delete(Index: integer);
+procedure TATSynRanges.Delete(Index: integer); inline;
 begin
   if IsIndexValid(Index) then
   begin
@@ -196,19 +196,19 @@ begin
   end;
 end;
 
-function TATSynRanges.IsRangeInsideOther(R1, R2: TATSynRange): boolean;
+function TATSynRanges.IsRangeInsideOther(R1, R2: TATSynRange): boolean; inline;
 begin
   Result:=
     IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true)
     and (R1.Y2-cAllowHangoutLines<=R2.Y2);
 end;
 
-function TATSynRanges.IsRangesSame(R1, R2: TATSynRange): boolean;
+function TATSynRanges.IsRangesSame(R1, R2: TATSynRange): boolean; inline;
 begin
   if R1=R2 then
-    begin Result:= true; Exit end;
+    exit(true);
   if (R1.X=R2.X) and (R1.Y=R2.Y) and (Abs(R1.Y2-R2.Y2)<=cAllowHangoutLines) then
-    begin Result:= true; Exit end;
+    exit(true);
 
   Result:= false;
 end;

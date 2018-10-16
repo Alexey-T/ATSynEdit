@@ -24,8 +24,8 @@ type
   TATPointArray = array of TPoint;
   TATLineOffsetsInfo = array of integer; //word is too small
 
-function SCharUpper(ch: atChar): atChar;
-function SCharLower(ch: atChar): atChar;
+function SCharUpper(ch: atChar): atChar; inline;
+function SCharLower(ch: atChar): atChar; inline;
 function SCaseTitle(const S, SWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SWordChars: atString): atString;
@@ -44,21 +44,21 @@ var
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
 
 
-function IsCharEol(ch: atChar): boolean;
+function IsCharEol(ch: atChar): boolean; inline;
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
 function IsCharWordInIdentifier(ch: atChar): boolean;
 function IsCharDigit(ch: atChar): boolean; inline;
 function IsCharSpace(ch: atChar): boolean;
 function IsStringWithUnicodeChars(const S: atString): boolean;
-function IsStringSpaces(const S: atString): boolean;
+function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
 
-function SBeginsWith(const S, SubStr: atString): boolean;
-function SBeginsWith(const S, SubStr: string): boolean;
-function SEndsWith(const S, SubStr: atString): boolean;
-function SEndsWith(const S, SubStr: string): boolean;
-function SEndsWithEol(const S: string): boolean;
-function SEndsWithEol(const S: atString): boolean;
+function SBeginsWith(const S, SubStr: atString): boolean; inline;
+function SBeginsWith(const S, SubStr: string): boolean; inline;
+function SEndsWith(const S, SubStr: atString): boolean; inline;
+function SEndsWith(const S, SubStr: string): boolean; inline;
+function SEndsWithEol(const S: string): boolean; inline;
+function SEndsWithEol(const S: atString): boolean; inline;
 
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
@@ -68,7 +68,7 @@ function SGetNonSpaceLength(const S: atString): integer;
 
 function STabsToSpaces(const S: atString; ATabSize: integer): atString;
 function STabsToSpaces_Length(const S: atString; ATabSize: integer; AMaxLen: integer=-1): integer;
-function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+function SSpacesToTabs(const S: atString; ATabSize: integer): atString; inline;
 function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
 function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
 
@@ -197,7 +197,7 @@ begin
   end;
 end;
 
-function IsStringSpaces(const S: atString): boolean;
+function IsStringSpaces(const S: atString): boolean; inline;
 begin
   Result:= IsStringSpaces(S, 1, Length(S));
 end;
@@ -532,7 +532,7 @@ begin
     (Pos(#10, S)>0);
 end;
 
-function SSpacesToTabs(const S: atString; ATabSize: integer): atString;
+function SSpacesToTabs(const S: atString; ATabSize: integer): atString; inline;
 begin
   Result:= StringReplace(S, StringOfChar(' ', ATabSize), #9, [rfReplaceAll]);
 end;
@@ -705,45 +705,45 @@ begin
   Result:= Copy(S, 1, N);
 end;
 
-function SBeginsWith(const S, SubStr: atString): boolean;
+function SBeginsWith(const S, SubStr: atString): boolean; inline;
 begin
   Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
 end;
 
-function SBeginsWith(const S, SubStr: string): boolean;
+function SBeginsWith(const S, SubStr: string): boolean; inline;
 begin
   Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
 end;
 
-function SEndsWith(const S, SubStr: atString): boolean;
+function SEndsWith(const S, SubStr: atString): boolean; inline;
 begin
   Result:= (SubStr<>'') and (Length(SubStr)<=Length(S)) and
     (Copy(S, Length(S)-Length(SubStr)+1, MaxInt)=SubStr);
 end;
 
-function SEndsWith(const S, SubStr: string): boolean;
+function SEndsWith(const S, SubStr: string): boolean; inline;
 begin
   Result:= (SubStr<>'') and (Length(SubStr)<=Length(S)) and
     (Copy(S, Length(S)-Length(SubStr)+1, MaxInt)=SubStr);
 end;
 
-function SEndsWithEol(const S: string): boolean;
+function SEndsWithEol(const S: string): boolean; inline;
 begin
   Result:= (S<>'') and IsCharEol(S[Length(S)]);
 end;
 
-function SEndsWithEol(const S: atString): boolean;
+function SEndsWithEol(const S: atString): boolean; inline;
 begin
   Result:= (S<>'') and IsCharEol(S[Length(S)]);
 end;
 
 
-function SCharUpper(ch: atChar): atChar;
+function SCharUpper(ch: atChar): atChar; inline;
 begin
   Result:= UnicodeUpperCase(ch)[1];
 end;
 
-function SCharLower(ch: atChar): atChar;
+function SCharLower(ch: atChar): atChar; inline;
 begin
   Result:= UnicodeLowerCase(ch)[1];
 end;

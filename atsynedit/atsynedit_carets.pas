@@ -26,7 +26,7 @@ type
     );
 
 procedure SwapInt(var n1, n2: integer); inline;
-function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean;
+function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean; inline;
 function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer; AllowOnRightEdge: boolean=false): TATPosRelation;
 
 
@@ -85,7 +85,7 @@ type
     procedure Clear;
     procedure Delete(N: integer);
     function Count: integer;
-    function IsIndexValid(N: integer): boolean; inline;
+    function IsIndexValid(N: integer): boolean;
     property Items[N: integer]: TATCaretItem read GetItem; default;
     procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     procedure Sort(AJoinAdjacentCarets: boolean=true);
@@ -257,7 +257,7 @@ begin
   end;
 end;
 
-function TATCarets.Count: integer;
+function TATCarets.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
