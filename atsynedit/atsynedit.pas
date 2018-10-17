@@ -2231,25 +2231,20 @@ begin
         FLineParts,
         NColorAfter) then
         begin
+          if NColorAfter<>clNone then
+          begin
+            C.Brush.Color:= NColorAfter;
+            C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+          end;
+
           CurrPointText:= Point(
             Int64(ARect.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
             NCoordTop);
 
-          {
-          ////not finished block
-
-          //hilite sub-lexer ranges with custom BG color
-          DoCalcLineEntireColor(NLinesIndex, false, NColorEntire, LineColorForced);
-          DoPartSetColorBG(FLineParts, NColorEntire, LineColorForced);
-
-          C.Brush.Color:= NColorEntire;
-          C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-          }
-
           CanvasTextOutMinimap(C,
             ARect,
             CurrPointText,
-            FCharSizeMinimap,
+            ACharSize,
             FTabSize,
             @FLineParts,
             Colors.TextBG
