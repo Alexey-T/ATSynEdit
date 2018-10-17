@@ -2421,7 +2421,7 @@ begin
         CanvasTextOutMinimap(C,
           ARect,
           CurrPointText,
-          FCharSizeMinimap,
+          ACharSize,
           FTabSize,
           @FLineParts,
           Colors.TextBG
