@@ -654,8 +654,8 @@ type
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
     procedure DoCalcLinks;
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
-    procedure DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
-      ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
+    procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean;
+      out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsApplyShape(var R: TRect; Shape: TATSynCaretShape; W, H: integer);
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     function DoCaretsKeepOnScreen: boolean;
@@ -2140,7 +2140,7 @@ var
   Event: TATSynEditDrawLineEvent;
   StrSize: TSize;
   TextOutProps: TATCanvasTextOutProps;
-  bCachedMinimap: boolean;
+  bCachedMinimap, bUseColorOfCurrentLine: boolean;
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
   begin
@@ -2235,6 +2235,17 @@ begin
             Int64(ARect.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
             NCoordTop);
 
+          {
+          ////not finished block
+
+          //hilite sub-lexer ranges with custom BG color
+          DoCalcLineEntireColor(NLinesIndex, false, NColorEntire, LineColorForced);
+          DoPartSetColorBG(FLineParts, NColorEntire, LineColorForced);
+
+          C.Brush.Color:= NColorEntire;
+          C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+          }
+
           CanvasTextOutMinimap(C,
             ARect,
             CurrPointText,
@@ -2296,7 +2307,21 @@ begin
     C.Brush.Color:= GetColorTextBG;
     C.Font.Color:= GetColorTextFont;
 
-    DoCalcLineEntireColor(NLinesIndex, NCoordTop, LineWithCaret, NColorEntire, LineColorForced);
+    bUseColorOfCurrentLine:= false;
+    if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or Self.Focused) then
+    begin
+      if FOptShowCurLineMinimal then
+        bUseColorOfCurrentLine:= LineWithCaret and IsLinePartWithCaret(NLinesIndex, NCoordTop)
+      else
+        bUseColorOfCurrentLine:= LineWithCaret;
+    end;
+
+    DoCalcLineEntireColor(
+      NLinesIndex,
+      bUseColorOfCurrentLine,
+      NColorEntire,
+      LineColorForced);
+
     C.Brush.Color:= NColorEntire;
     C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
 

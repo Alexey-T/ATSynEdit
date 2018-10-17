@@ -248,33 +248,25 @@ begin
     FAdapterHilite.OnEditorCalcPosColor(Self, AX, AY, AColor);
 end;
 
-procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer; ACoordTop: integer;
-  ALineWithCaret: boolean; out AColor: TColor; out AColorForced: boolean);
+procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer;
+  AUseColorOfCurrentLine: boolean;
+  out AColor: TColor; out AColorForced: boolean);
 var
   NIndex, BmKind: integer;
 begin
   AColor:= clNone;
 
-  NIndex:= Strings.Bookmarks.Find(ALine);
-  if NIndex>=0 then
+  if AUseColorOfCurrentLine then
+    AColor:= Colors.CurrentLineBG
+  else
   begin
-    BmKind:= Strings.Bookmarks[NIndex].Data.Kind;
-    AColor:= Colors.BookmarkBG;
-    if Assigned(FOnCalcBookmarkColor) then
-      FOnCalcBookmarkColor(Self, BmKind, AColor);
-  end;
-
-  if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or Self.Focused) then
-  begin
-    if FOptShowCurLineMinimal then
+    NIndex:= Strings.Bookmarks.Find(ALine);
+    if NIndex>=0 then
     begin
-      if ALineWithCaret and IsLinePartWithCaret(ALine, ACoordTop) then
-        AColor:= Colors.CurrentLineBG;
-    end
-    else
-    begin
-      if ALineWithCaret then
-        AColor:= Colors.CurrentLineBG;
+      BmKind:= Strings.Bookmarks[NIndex].Data.Kind;
+      AColor:= Colors.BookmarkBG;
+      if Assigned(FOnCalcBookmarkColor) then
+        FOnCalcBookmarkColor(Self, BmKind, AColor);
     end;
   end;
 
