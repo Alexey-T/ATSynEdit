@@ -2303,13 +2303,14 @@ begin
     C.Font.Color:= GetColorTextFont;
 
     bUseColorOfCurrentLine:= false;
-    if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or Self.Focused) then
-    begin
-      if FOptShowCurLineMinimal then
-        bUseColorOfCurrentLine:= LineWithCaret and IsLinePartWithCaret(NLinesIndex, NCoordTop)
-      else
-        bUseColorOfCurrentLine:= LineWithCaret;
-    end;
+    if AMainText then
+      if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or Self.Focused) then
+      begin
+        if FOptShowCurLineMinimal then
+          bUseColorOfCurrentLine:= LineWithCaret and IsLinePartWithCaret(NLinesIndex, NCoordTop)
+        else
+          bUseColorOfCurrentLine:= LineWithCaret;
+      end;
 
     DoCalcLineEntireColor(
       NLinesIndex,
