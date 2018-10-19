@@ -72,8 +72,8 @@ function SSpacesToTabs(const S: atString; ATabSize: integer): atString; inline;
 function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
 function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
 
-function SStringHasTab(const S: atString): boolean;
-function SStringHasTab(const S: string): boolean;
+function SStringHasTab(const S: atString): boolean; inline;
+function SStringHasTab(const S: string): boolean; inline;
 function SStringHasAsciiAndNoTabs(const S: atString): boolean;
 function SStringHasAsciiAndNoTabs(const S: string): boolean;
 
@@ -97,25 +97,25 @@ function SIndentUnindent(const Str: atString; ARight: boolean;
   ATabSpaces: boolean): atString;
 function SGetItem(var S: string; const ch: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
-function SWithBreaks(const S: atString): boolean;
+function SWithBreaks(const S: atString): boolean; inline;
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
 
-function BoolToPlusMinusOne(b: boolean): integer;
-procedure TrimStringList(L: TStringList);
+function BoolToPlusMinusOne(b: boolean): integer; inline;
+procedure TrimStringList(L: TStringList); inline;
 
 type
   TATDecodeRec = record SFrom, STo: UnicodeString; end;
 function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
 function SConvertUtf8ToWideForAscii(const S: string): UnicodeString;
 
-procedure SReplaceAll(var s: string; const SFrom, STo: string);
+procedure SReplaceAll(var S: string; const SFrom, STo: string); inline;
 procedure SReplaceAllPercentChars(var S: string);
-procedure SReplaceAllTabsToOneSpace(var S: string);
-procedure SReplaceAllTabsToOneSpace(var S: UnicodeString);
-procedure SDeleteFrom(var s: string; const SFrom: string);
-procedure SDeleteFrom(var s: atString; const SFrom: atString);
-procedure SDeleteFromEol(var s: string);
-procedure SDeleteFromEol(var s: atString);
+procedure SReplaceAllTabsToOneSpace(var S: string); inline;
+procedure SReplaceAllTabsToOneSpace(var S: UnicodeString); inline;
+procedure SDeleteFrom(var s: string; const SFrom: string); inline;
+procedure SDeleteFrom(var s: atString; const SFrom: atString); inline;
+procedure SDeleteFromEol(var S: string); inline;
+procedure SDeleteFromEol(var S: atString); inline;
 
 procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
 
@@ -488,7 +488,7 @@ begin
 end;
 
 
-function BoolToPlusMinusOne(b: boolean): integer;
+function BoolToPlusMinusOne(b: boolean): integer; inline;
 begin
   if b then Result:= 1 else Result:= -1;
 end;
@@ -511,14 +511,14 @@ begin
 end;
 
 
-procedure TrimStringList(L: TStringList);
+procedure TrimStringList(L: TStringList); inline;
 begin
   //dont do "while", we need correct last empty lines
   if (L.Count>0) and (L[L.Count-1]='') then
     L.Delete(L.Count-1);
 end;
 
-function SWithBreaks(const S: atString): boolean;
+function SWithBreaks(const S: atString): boolean; inline;
 begin
   Result:=
     (Pos(#13, S)>0) or
@@ -559,7 +559,7 @@ begin
   Result:= AColumn - STabsToSpaces_Length(S, ATabSize) + Length(S);
 end;
 
-function SStringHasTab(const S: atString): boolean;
+function SStringHasTab(const S: atString): boolean; inline;
 var
   i: integer;
 begin
@@ -595,7 +595,7 @@ begin
 end;
 
 
-function SStringHasTab(const S: string): boolean;
+function SStringHasTab(const S: string): boolean; inline;
 var
   i: integer;
 begin
@@ -686,7 +686,6 @@ begin
     if IsCharEol(Result[i]) then
       Result[i]:= ' ';
 end;
-
 
 
 function STrimRight(const S: atString): atString;
@@ -816,7 +815,7 @@ begin
 end;
 
 
-procedure SReplaceAll(var s: string; const SFrom, STo: string);
+procedure SReplaceAll(var S: string; const SFrom, STo: string); inline;
 begin
   S:= StringReplace(S, SFrom, STo, [rfReplaceAll]);
 end;
@@ -832,7 +831,7 @@ begin
   SReplaceAll(S, '%'+IntToHex(i, 2), Chr(i));
 end;
 
-procedure SReplaceAllTabsToOneSpace(var S: string);
+procedure SReplaceAllTabsToOneSpace(var S: string); inline;
 var
   i: integer;
 begin
@@ -841,7 +840,7 @@ begin
       S[i]:= ' ';
 end;
 
-procedure SReplaceAllTabsToOneSpace(var S: UnicodeString);
+procedure SReplaceAllTabsToOneSpace(var S: UnicodeString); inline;
 var
   i: integer;
 begin
@@ -850,31 +849,31 @@ begin
       S[i]:= ' ';
 end;
 
-procedure SDeleteFrom(var s: string; const SFrom: string);
+procedure SDeleteFrom(var s: string; const SFrom: string); inline;
 var
   n: integer;
 begin
   n:= Pos(SFrom, S);
   if n>0 then
-    Delete(S, n, MaxInt);
+    SetLength(S, n-1);
 end;
 
-procedure SDeleteFrom(var s: atString; const SFrom: atString);
+procedure SDeleteFrom(var s: atString; const SFrom: atString); inline;
 var
   n: integer;
 begin
   n:= Pos(SFrom, S);
   if n>0 then
-    Delete(S, n, MaxInt);
+    SetLength(S, n-1);
 end;
 
-procedure SDeleteFromEol(var s: string);
+procedure SDeleteFromEol(var s: string); inline;
 begin
   SDeleteFrom(s, #10);
   SDeleteFrom(s, #13);
 end;
 
-procedure SDeleteFromEol(var s: atString);
+procedure SDeleteFromEol(var s: atString); inline;
 begin
   SDeleteFrom(s, #10);
   SDeleteFrom(s, #13);
