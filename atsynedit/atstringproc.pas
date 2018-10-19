@@ -337,12 +337,12 @@ begin
   end;
 end;
 
-function SCalcTabulationSize(const ATabSize, APos: integer): integer;
+function SCalcTabulationSize(ATabSize, APos: integer): integer; inline;
 begin
-  Result:= 1;
-  if APos>OptMaxTabPositionToExpand then Exit;
-  while (APos+Result-1) mod ATabSize <> 0 do
-    Inc(Result);
+  if APos<=OptMaxTabPositionToExpand then
+    Result:= ATabSize - (APos-1) mod ATabSize
+  else
+    Result:= 1;
 end;
 
 
