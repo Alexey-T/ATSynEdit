@@ -96,7 +96,6 @@ function SIndentUnindent(const Str: atString; ARight: boolean;
   AIndentSize, ATabSize: integer;
   ATabSpaces: boolean): atString;
 function SGetItem(var S: string; const ch: Char = ','): string;
-function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SWithBreaks(const S: atString): boolean;
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
@@ -511,18 +510,6 @@ begin
   end;
 end;
 
-function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
-var
-  i: integer;
-begin
-  Result:= '';
-  i:= Pos(sep, S);
-  if i>0 then
-  begin
-    Result:= Copy(S, i+1, MaxInt);
-    Delete(S, i, MaxInt);
-  end;
-end;
 
 procedure TrimStringList(L: TStringList);
 begin
