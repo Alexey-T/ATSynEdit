@@ -356,13 +356,13 @@ begin
     N:= PosEx(#9, Result, N+1);
     if N=0 then Break;
     NSize:= SCalcTabulationSize(ATabSize, N);
-    if NSize<=1 then
+    if NSize<2 then
       Result[N]:= ' '
     else
-      Result:=
-        Copy(Result, 1, N-1) +
-        StringOfChar(' ', NSize) +
-        Copy(Result, N+1, MaxInt);
+    begin
+      Result[N]:= ' ';
+      Insert(StringOfChar(' ', NSize-1), Result, N);
+    end;
   until false;
 end;
 
