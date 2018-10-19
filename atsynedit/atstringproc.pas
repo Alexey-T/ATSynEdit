@@ -48,7 +48,7 @@ function IsCharEol(ch: atChar): boolean; inline;
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
 function IsCharWordInIdentifier(ch: atChar): boolean;
 function IsCharDigit(ch: atChar): boolean; inline;
-function IsCharSpace(ch: atChar): boolean;
+function IsCharSpace(ch: atChar): boolean; inline;
 function IsStringWithUnicodeChars(const S: atString): boolean;
 function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
@@ -177,7 +177,7 @@ begin
   Result:= (ch>='0') and (ch<='9');
 end;
 
-function IsCharSpace(ch: atChar): boolean;
+function IsCharSpace(ch: atChar): boolean; inline;
 begin
   case ch of
     #9, //tab
@@ -315,10 +315,6 @@ begin
     Result:= Length(S);
 end;
 
-function SGetIndentExpanded(const S: atString; ATabSize: integer): integer; inline;
-begin
-  Result:= STabsToSpaces_Length(S, ATabSize, SGetIndentChars(S));
-end;
 
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 var
@@ -342,6 +338,24 @@ begin
     Result:= ATabSize - (APos-1) mod ATabSize
   else
     Result:= 1;
+end;
+
+
+function SGetIndentExpanded(const S: atString; ATabSize: integer): integer; inline;
+var
+  ch: atChar;
+  i: integer;
+begin
+  Result:= 0;
+  for i:= 1 to Length(S) do
+  begin
+    ch:= S[i];
+    if not IsCharSpace(ch) then exit;
+    if ch<>#9 then
+      Inc(Result)
+    else
+      Inc(Result, SCalcTabulationSize(ATabSize, Result+1));
+  end;
 end;
 
 
