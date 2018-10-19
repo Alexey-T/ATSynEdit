@@ -351,17 +351,18 @@ var
   N, NSize: integer;
 begin
   Result:= S;
+  N:= 0;
   repeat
-    N:= Pos(#9, Result);
+    N:= PosEx(#9, Result, N+1);
     if N=0 then Break;
     NSize:= SCalcTabulationSize(ATabSize, N);
     if NSize<=1 then
       Result[N]:= ' '
     else
-    begin
-      Delete(Result, N, 1);
-      Insert(StringOfChar(' ', NSize), Result, N);
-    end;
+      Result:=
+        Copy(Result, 1, N-1) +
+        StringOfChar(' ', NSize) +
+        Copy(Result, N+1, MaxInt);
   until false;
 end;
 
@@ -378,8 +379,6 @@ begin
     else
       Inc(Result, SCalcTabulationSize(ATabSize, Result+1));
 end;
-
-
 
 
 procedure SCalcCharOffsets(const S: atString;
