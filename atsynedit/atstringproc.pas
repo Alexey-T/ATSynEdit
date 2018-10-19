@@ -95,7 +95,7 @@ procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer
 function SIndentUnindent(const Str: atString; ARight: boolean;
   AIndentSize, ATabSize: integer;
   ATabSpaces: boolean): atString;
-function SGetItem(var S: string; const sep: Char = ','): string;
+function SGetItem(var S: string; const ch: Char = ','): string;
 function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SWithBreaks(const S: atString): boolean;
@@ -494,14 +494,21 @@ begin
   if b then Result:= 1 else Result:= -1;
 end;
 
-function SGetItem(var S: string; const sep: Char = ','): string;
+function SGetItem(var S: string; const ch: Char = ','): string;
 var
   i: integer;
 begin
-  i:= Pos(sep, s);
-  if i=0 then i:= MaxInt;
-  Result:= Copy(s, 1, i-1);
-  Delete(s, 1, i);
+  i:= Pos(ch, S);
+  if i=0 then
+  begin
+    Result:= S;
+    S:= '';
+  end
+  else
+  begin
+    Result:= Copy(S, 1, i-1);
+    Delete(S, 1, i);
+  end;
 end;
 
 function SGetItemAtEnd(var S: string; const sep: Char = ','): string;
