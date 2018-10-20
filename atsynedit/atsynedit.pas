@@ -671,7 +671,7 @@ type
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean;
       out AColor: TColor; out AColorForced: boolean);
-    procedure DoCaretsApplyShape(var R: TRect; Shape: TATSynCaretShape; W, H: integer);
+    procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretProps; W, H: integer);
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     function DoCaretsKeepOnScreen: boolean;
     procedure DoCaretsOnChanged(Sender: TObject);
@@ -4768,7 +4768,7 @@ var
   R: TRect;
   i: integer;
   Item: TATCaretItem;
-  Shape: TATSynCaretShape;
+  CaretProps: TATCaretProps;
 begin
   //only for blinking caret
   if FCaretBlinkEnabled then
@@ -4780,12 +4780,12 @@ begin
   end;
 
   if ModeReadOnly then
-    Shape:= FCaretShapeRO
+    CaretProps:= FCaretPropsReadonly
   else
   if ModeOverwrite then
-    Shape:= FCaretShapeOvr
+    CaretProps:= FCaretPropsOverwrite
   else
-    Shape:= FCaretShapeIns;
+    CaretProps:= FCaretPropsNormal;
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -4801,13 +4801,13 @@ begin
     if R.Left>=FRectMain.Right then Continue;
     if R.Top>=FRectMain.Bottom then Continue;
 
-    DoCaretsApplyShape(R, Shape, FCharSize.X, FCharSize.Y);
+    DoCaretsApplyShape(R, CaretProps, FCharSize.X, FCharSize.Y);
 
     if FCaretBlinkEnabled then
     begin
       CanvasInvertRect(C, R, FColors.Caret);
       //if shape FrameFull, invert inner area
-      if Shape=cCaretShapeFrameFull then
+      if CaretProps.EmptyInside then
         CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), FColors.Caret);
     end
     else

@@ -983,35 +983,21 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Shape: TATSynCaretShape; W, H: integer);
+procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Props: TATCaretProps; W, H: integer);
 begin
-  case Shape of
-    cCaretShapeFull: exit;
-    cCaretShapeVertPixels1: R.Right:= R.Left+1;
-    cCaretShapeVertPixels2: R.Right:= R.Left+2;
-    cCaretShapeVertPixels3: R.Right:= R.Left+3;
-    cCaretShapeVertPixels4: R.Right:= R.Left+4;
-    cCaretShapeVertPercents10: R.Right:= R.Left + W div 10;
-    cCaretShapeVertPercents15: R.Right:= R.Left + W * 3 div 20;
-    cCaretShapeVertPercents20: R.Right:= R.Left + W div 5;
-    cCaretShapeVertPercents25: R.Right:= R.Left + W div 4;
-    cCaretShapeVertPercents30: R.Right:= R.Left + W * 3 div 10;
-    cCaretShapeVertPercents35: R.Right:= R.Left + W * 35 div 100;
-    cCaretShapeVertPercents40: R.Right:= R.Left + W * 2 div 5;
-    cCaretShapeVertPercents50: R.Right:= R.Left + W div 2;
-    cCaretShapeHorzPixels1: R.Top:= R.Bottom-1;
-    cCaretShapeHorzPixels2: R.Top:= R.Bottom-2;
-    cCaretShapeHorzPixels3: R.Top:= R.Bottom-3;
-    cCaretShapeHorzPixels4: R.Top:= R.Bottom-4;
-    cCaretShapeHorzPixels5: R.Top:= R.Bottom-5;
-    cCaretShapeHorzPercents10: R.Top:= R.Bottom - H div 10;
-    cCaretShapeHorzPercents15: R.Top:= R.Bottom - H * 3 div 20;
-    cCaretShapeHorzPercents20: R.Top:= R.Bottom - H div 5;
-    cCaretShapeHorzPercents25: R.Top:= R.Bottom - H div 4;
-    cCaretShapeHorzPercents30: R.Top:= R.Bottom - H * 3 div 10;
-    cCaretShapeHorzPercents35: R.Top:= R.Bottom - H * 35 div 100;
-    cCaretShapeHorzPercents40: R.Top:= R.Bottom - H * 2 div 5;
-    cCaretShapeHorzPercents50: R.Top:= R.Bottom - H div 2;
+  if Props.InPercents then
+  begin
+    if Props.Width>0 then
+      R.Right:= R.Left + W * Props.Width div 100
+    else
+      R.Top:= R.Bottom - H * Props.Height div 100;
+  end
+  else
+  begin
+    if Props.Width>0 then
+      R.Right:= R.Left + Props.Width
+    else
+      R.Top:= R.Bottom - Props.Height;
   end;
 end;
 
