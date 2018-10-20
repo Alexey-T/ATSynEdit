@@ -1,4 +1,14 @@
 
+2018.10.20
++ add: new props for caret shape, which allow more tuning:
+   CaretPropsNormal
+   CaretPropsOverwrite
+   CaretPropsReadonly
+* deprecated: props OptCaretShapeNNNN (3 props); now they just set 3 new props
+
+2018.10.18
++ improved painting speed of minimap
+
 2018.10.10
 + add: instead of OptIgnoreWordChars, added event OnCheckInput
 * removed: OptIgnoreWordChars
