@@ -2939,6 +2939,12 @@ begin
   FCaretPropsOverwrite:= TATCaretProps.Create;
   FCaretPropsReadonly:= TATCaretProps.Create;
 
+  //initialize it w/o using Shape consts (faster)
+  FCaretPropsNormal.Width:= 2;
+  FCaretPropsReadonly.Height:= 2;
+  FCaretPropsOverwrite.Height:= 50;
+  FCaretPropsOverwrite.InPercents:= true;
+
   FWantTabs:= true;
   FWantReturns:= true;
   FCharSize:= Point(4, 4); //not nul
