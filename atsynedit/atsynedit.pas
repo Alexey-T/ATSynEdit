@@ -201,36 +201,6 @@ type
     NPosLast: integer;
   end;
 
-  TATSynCaretShape = (
-    cCaretShapeFull,
-    cCaretShapeVertPixels1,
-    cCaretShapeVertPixels2,
-    cCaretShapeVertPixels3,
-    cCaretShapeVertPixels4,
-    cCaretShapeVertPercents10,
-    cCaretShapeVertPercents15,
-    cCaretShapeVertPercents20,
-    cCaretShapeVertPercents25,
-    cCaretShapeVertPercents30,
-    cCaretShapeVertPercents35,
-    cCaretShapeVertPercents40,
-    cCaretShapeVertPercents50,
-    cCaretShapeHorzPixels1,
-    cCaretShapeHorzPixels2,
-    cCaretShapeHorzPixels3,
-    cCaretShapeHorzPixels4,
-    cCaretShapeHorzPixels5,
-    cCaretShapeHorzPercents10,
-    cCaretShapeHorzPercents15,
-    cCaretShapeHorzPercents20,
-    cCaretShapeHorzPercents25,
-    cCaretShapeHorzPercents30,
-    cCaretShapeHorzPercents35,
-    cCaretShapeHorzPercents40,
-    cCaretShapeHorzPercents50,
-    cCaretShapeFrameFull
-    );
-
 type
   { TATCaretProps }
 
@@ -240,14 +210,11 @@ type
     Height: integer;
     InPercents: boolean;
     EmptyInside: boolean;
-    procedure InitFromShape(AShape: TATSynCaretShape);
+    procedure Assign(Obj: TATCaretProps);
   end;
 
 const
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
-  cInitCaretShapeIns = cCaretShapeVertPixels1;
-  cInitCaretShapeOvr = cCaretShapeFull;
-  cInitCaretShapeRO = cCaretShapeHorzPixels1;
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
@@ -406,9 +373,6 @@ type
     FScalePercents: integer;
     FCarets: TATCarets;
     FCaretBlinkEnabled: boolean;
-    FCaretShapeIns: TATSynCaretShape;
-    FCaretShapeOvr: TATSynCaretShape;
-    FCaretShapeRO: TATSynCaretShape;
     FCaretShown: boolean;
     FCaretPropsNormal: TATCaretProps;
     FCaretPropsOverwrite: TATCaretProps;
@@ -831,7 +795,6 @@ type
     function GetTextForClipboard: string;
     function GetStrings: TATStrings;
     function GetMouseNiceScroll: boolean;
-    procedure SetCaretShapeRO(AValue: TATSynCaretShape);
     procedure SetCaretBlinkEnabled(AValue: boolean);
     procedure SetFoldEnabled(AValue: boolean);
     procedure SetFontBold(AValue: TFont);
@@ -842,8 +805,6 @@ type
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretBlinkTime(AValue: integer);
-    procedure SetCaretShapeIns(AValue: TATSynCaretShape);
-    procedure SetCaretShapeOvr(AValue: TATSynCaretShape);
     procedure SetCharSpacingX(AValue: integer);
     procedure SetCharSpacingY(AValue: integer);
     procedure SetMarginString(AValue: string);
@@ -1321,12 +1282,6 @@ type
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed default true;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual default true;
-    property OptCaretShape: TATSynCaretShape read FCaretShapeIns write SetCaretShapeIns default cInitCaretShapeIns;
-             deprecated 'Now use CaretPropsNormal';
-    property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr default cInitCaretShapeOvr;
-             deprecated 'Now use CaretPropsOverwrite';
-    property OptCaretShapeRO: TATSynCaretShape read FCaretShapeRO write SetCaretShapeRO default cInitCaretShapeRO;
-             deprecated 'Now use CaretPropsReadonly';
     property OptCaretBlinkTime: integer read GetCaretBlinkTime write SetCaretBlinkTime default cInitTimerBlink;
     property OptCaretBlinkEnabled: boolean read FCaretBlinkEnabled write SetCaretBlinkEnabled default true;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused default true;
@@ -2959,9 +2914,6 @@ begin
 
   FCaretBlinkEnabled:= true;
   FCaretShown:= false;
-  FCaretShapeIns:= cInitCaretShapeIns;
-  FCaretShapeOvr:= cInitCaretShapeOvr;
-  FCaretShapeRO:= cInitCaretShapeRO;
   FCaretVirtual:= true;
   FCaretSpecPos:= false;
   FCaretStopUnfocused:= true;
