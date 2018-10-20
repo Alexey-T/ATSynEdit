@@ -402,6 +402,7 @@ begin
   if FCaretShapeIns=AValue then Exit;
   DoPaintModeStatic;
   FCaretShapeIns:= AValue;
+  FCaretPropsNormal.InitFromShape(AValue);
   DoPaintModeBlinking;
 end;
 
@@ -410,6 +411,7 @@ begin
   if FCaretShapeOvr=AValue then Exit;
   DoPaintModeStatic;
   FCaretShapeOvr:= AValue;
+  FCaretPropsOverwrite.InitFromShape(AValue);
   DoPaintModeBlinking;
 end;
 
@@ -418,6 +420,7 @@ begin
   if FCaretShapeRO=AValue then Exit;
   DoPaintModeStatic;
   FCaretShapeRO:= AValue;
+  FCaretPropsReadonly.InitFromShape(AValue);
   DoPaintModeBlinking;
 end;
 
@@ -1009,6 +1012,204 @@ begin
     cCaretShapeHorzPercents35: R.Top:= R.Bottom - H * 35 div 100;
     cCaretShapeHorzPercents40: R.Top:= R.Bottom - H * 2 div 5;
     cCaretShapeHorzPercents50: R.Top:= R.Bottom - H div 2;
+  end;
+end;
+
+
+{ TATCaretProps }
+
+procedure TATCaretProps.InitFromShape(AShape: TATSynCaretShape);
+begin
+  case AShape of
+    cCaretShapeFull:
+      begin
+        Width:= 100;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPixels1:
+      begin
+        Width:= 1;
+        Height:= 0;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPixels2:
+      begin
+        Width:= 2;
+        Height:= 0;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPixels3:
+      begin
+        Width:= 3;
+        Height:= 0;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPixels4:
+      begin
+        Width:= 4;
+        Height:= 0;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPercents10:
+      begin
+        Width:= 10;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPercents15:
+      begin
+        Width:= 15;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPercents20:
+      begin
+        Width:= 20;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPercents25:
+      begin
+        Width:= 25;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPercents30:
+      begin
+        Width:= 30;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPercents35:
+      begin
+        Width:= 35;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPercents40:
+      begin
+        Width:= 40;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeVertPercents50:
+      begin
+        Width:= 50;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPixels1:
+      begin
+        Width:= 0;
+        Height:= 1;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPixels2:
+      begin
+        Width:= 0;
+        Height:= 2;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPixels3:
+      begin
+        Width:= 0;
+        Height:= 3;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPixels4:
+      begin
+        Width:= 0;
+        Height:= 4;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPixels5:
+      begin
+        Width:= 0;
+        Height:= 5;
+        InPercents:= false;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPercents10:
+      begin
+        Width:= 0;
+        Height:= 10;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPercents15:
+      begin
+        Width:= 0;
+        Height:= 15;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPercents20:
+      begin
+        Width:= 0;
+        Height:= 20;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPercents25:
+      begin
+        Width:= 0;
+        Height:= 25;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPercents30:
+      begin
+        Width:= 0;
+        Height:= 30;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPercents35:
+      begin
+        Width:= 0;
+        Height:= 35;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPercents40:
+      begin
+        Width:= 0;
+        Height:= 40;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeHorzPercents50:
+      begin
+        Width:= 0;
+        Height:= 50;
+        InPercents:= true;
+        EmptyInside:= false;
+      end;
+    cCaretShapeFrameFull:
+      begin
+        Width:= 100;
+        Height:= 0;
+        InPercents:= true;
+        EmptyInside:= true;
+      end;
   end;
 end;
 

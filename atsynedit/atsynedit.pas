@@ -231,6 +231,18 @@ type
     cCaretShapeFrameFull
     );
 
+type
+  { TATCaretProps }
+
+  TATCaretProps = class
+  public
+    Width: integer;
+    Height: integer;
+    InPercents: boolean;
+    EmptyInside: boolean;
+    procedure InitFromShape(AShape: TATSynCaretShape);
+  end;
+
 const
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitCaretShapeIns = cCaretShapeVertPixels1;
@@ -394,10 +406,13 @@ type
     FScalePercents: integer;
     FCarets: TATCarets;
     FCaretBlinkEnabled: boolean;
-    FCaretShapeIns,
-    FCaretShapeOvr,
+    FCaretShapeIns: TATSynCaretShape;
+    FCaretShapeOvr: TATSynCaretShape;
     FCaretShapeRO: TATSynCaretShape;
     FCaretShown: boolean;
+    FCaretPropsNormal: TATCaretProps;
+    FCaretPropsOverwrite: TATCaretProps;
+    FCaretPropsReadonly: TATCaretProps;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
@@ -1013,6 +1028,9 @@ type
     property WrapInfo: TATSynWrapInfo read FWrapInfo;
     property ScrollVert: TATSynScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATSynScrollInfo read FScrollHorz write FScrollHorz;
+    property CaretPropsNormal: TATCaretProps read FCaretPropsNormal;
+    property CaretPropsOverwrite: TATCaretProps read FCaretPropsOverwrite;
+    property CaretPropsReadonly: TATCaretProps read FCaretPropsReadonly;
     //common
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
@@ -2917,6 +2935,10 @@ begin
   FScrollbarHorz.IndentBorder:= cEditorScrollbarBorderSize;
   FScrollbarHorz.OnChange:= @OnNewScrollbarHorzChanged;
 
+  FCaretPropsNormal:= TATCaretProps.Create;
+  FCaretPropsOverwrite:= TATCaretProps.Create;
+  FCaretPropsReadonly:= TATCaretProps.Create;
+
   FWantTabs:= true;
   FWantReturns:= true;
   FCharSize:= Point(4, 4); //not nul
@@ -3259,6 +3281,9 @@ begin
   FreeAndNil(FFontItalic);
   FreeAndNil(FFontBold);
   FreeAndNil(FFontBoldItalic);
+  FreeAndNil(FCaretPropsNormal);
+  FreeAndNil(FCaretPropsOverwrite);
+  FreeAndNil(FCaretPropsReadonly);
   inherited;
 end;
 
