@@ -1322,8 +1322,11 @@ type
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed default true;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual default true;
     property OptCaretShape: TATSynCaretShape read FCaretShapeIns write SetCaretShapeIns default cInitCaretShapeIns;
+             deprecated 'Now use CaretPropsNormal';
     property OptCaretShapeOvr: TATSynCaretShape read FCaretShapeOvr write SetCaretShapeOvr default cInitCaretShapeOvr;
+             deprecated 'Now use CaretPropsOverwrite';
     property OptCaretShapeRO: TATSynCaretShape read FCaretShapeRO write SetCaretShapeRO default cInitCaretShapeRO;
+             deprecated 'Now use CaretPropsReadonly';
     property OptCaretBlinkTime: integer read GetCaretBlinkTime write SetCaretBlinkTime default cInitTimerBlink;
     property OptCaretBlinkEnabled: boolean read FCaretBlinkEnabled write SetCaretBlinkEnabled default true;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused default true;
