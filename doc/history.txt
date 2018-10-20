@@ -4,7 +4,7 @@
    CaretPropsNormal
    CaretPropsOverwrite
    CaretPropsReadonly
-* deprecated: props OptCaretShapeNNNN (3 props); now they just set 3 new props
+* deleted: props OptCaretShapeNNNN and type TATSynCaretShape
 
 2018.10.18
 + improved painting speed of minimap
