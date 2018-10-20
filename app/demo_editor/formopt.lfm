@@ -10,7 +10,7 @@ object fmOpt: TfmOpt
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.9.0.0'
+  LCLVersion = '2.1.0.0'
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 29
@@ -940,39 +940,11 @@ object fmOpt: TfmOpt
         TabOrder = 2
       end
       object Label7: TLabel
-        Left = 448
+        Left = 344
         Height = 17
-        Top = 16
+        Top = 12
         Width = 95
         Caption = 'shape, normal'
-        ParentColor = False
-      end
-      object edCrShape: TComboBox
-        Left = 312
-        Height = 31
-        Top = 8
-        Width = 128
-        DropDownCount = 40
-        ItemHeight = 0
-        Style = csDropDownList
-        TabOrder = 6
-      end
-      object edCrShape2: TComboBox
-        Left = 312
-        Height = 31
-        Top = 40
-        Width = 128
-        DropDownCount = 40
-        ItemHeight = 0
-        Style = csDropDownList
-        TabOrder = 7
-      end
-      object Label9: TLabel
-        Left = 448
-        Height = 17
-        Top = 48
-        Width = 112
-        Caption = 'shape, overwrite'
         ParentColor = False
       end
       object chkCrPreferLeft: TCheckBox
@@ -983,46 +955,6 @@ object fmOpt: TfmOpt
         Caption = 'end of wrapped part: prefer next line pos'
         TabOrder = 5
       end
-      object ListShapes: TListBox
-        Left = 312
-        Height = 196
-        Top = 296
-        Width = 117
-        Items.Strings = (
-          'Full'
-          'VertPixels1'
-          'VertPixels2'
-          'VertPixels3'
-          'VertPixels4'
-          'VertPercents10'
-          'VertPercents15'
-          'VertPercents20'
-          'VertPercents25'
-          'VertPercents30'
-          'VertPercents35'
-          'VertPercents40'
-          'VertPercents50'
-          'HorzPixels1'
-          'HorzPixels2'
-          'HorzPixels3'
-          'HorzPixels4'
-          'HorzPixels5'
-          'HorzPercents10'
-          'HorzPercents15'
-          'HorzPercents20'
-          'HorzPercents25'
-          'HorzPercents30'
-          'HorzPercents35'
-          'HorzPercents40'
-          'HorzPercents50'
-          'Frame'
-        )
-        ItemHeight = 0
-        ScrollWidth = 115
-        TabOrder = 8
-        TopIndex = -1
-        Visible = False
-      end
       object chkCrBlinkEn: TCheckBox
         Left = 8
         Height = 24
@@ -1030,6 +962,39 @@ object fmOpt: TfmOpt
         Width = 116
         Caption = 'blink enabled'
         TabOrder = 1
+      end
+      object edCrSizeNormal: TSpinEdit
+        Left = 344
+        Height = 27
+        Top = 32
+        Width = 66
+        MinValue = 1
+        TabOrder = 6
+        Value = 1
+      end
+      object chkCrVertNormal: TCheckBox
+        Left = 344
+        Height = 24
+        Top = 64
+        Width = 76
+        Caption = 'vertical'
+        TabOrder = 7
+      end
+      object chkCrPercentNormal: TCheckBox
+        Left = 344
+        Height = 24
+        Top = 88
+        Width = 85
+        Caption = 'percents'
+        TabOrder = 8
+      end
+      object chkCrEmptyNormal: TCheckBox
+        Left = 344
+        Height = 24
+        Top = 112
+        Width = 112
+        Caption = 'empty inside'
+        TabOrder = 9
       end
     end
     object TabSheet6: TTabSheet

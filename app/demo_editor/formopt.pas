@@ -19,6 +19,9 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkCrEmptyNormal: TCheckBox;
+    chkCrVertNormal: TCheckBox;
+    chkCrPercentNormal: TCheckBox;
     chkClickLink: TCheckBox;
     chkCrBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
@@ -89,8 +92,6 @@ type
     edMapCharWidth: TSpinEdit;
     edNumAlign: TComboBox;
     edIndentKind: TComboBox;
-    edCrShape: TComboBox;
-    edCrShape2: TComboBox;
     edCrTime: TSpinEdit;
     edSizeSep: TSpinEdit;
     edWordChars: TEdit;
@@ -135,15 +136,14 @@ type
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
-    Label9: TLabel;
     LabelArr: TLabel;
     LabelArr1: TLabel;
     LabelHint: TLabel;
     ListCol: TListBox;
-    ListShapes: TListBox;
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
+    edCrSizeNormal: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -161,7 +161,6 @@ type
     { private declarations }
   public
     { public declarations }
-    procedure InitShape(ed: TCombobox);
   end;
 
 var
@@ -237,8 +236,14 @@ begin
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
     chkCrStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
     chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
-    edCrShape.ItemIndex:= Ord(ed.OptCaretShape);
-    edCrShape2.ItemIndex:= Ord(ed.OptCaretShapeOvr);
+
+    if ed.CaretPropsNormal.Width>0 then
+      edCrSizeNormal.Value:= ed.CaretPropsNormal.Width
+    else
+      edCrSizeNormal.Value:= ed.CaretPropsNormal.Height;
+    chkCrVertNormal.Checked:= ed.CaretPropsNormal.Width>0;
+    chkCrPercentNormal.Checked:= ed.CaretPropsNormal.InPercents;
+    chkCrEmptyNormal.Checked:= ed.CaretPropsNormal.EmptyInside;
 
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
@@ -353,12 +358,23 @@ begin
       //caret
       ed.OptCaretBlinkEnabled:= chkCrBlinkEn.Checked;
       ed.OptCaretBlinkTime:= edCrTime.Value;
-      ed.OptCaretShape:= TATSynCaretShape(edCrShape.ItemIndex);
-      ed.OptCaretShapeOvr:= TATSynCaretShape(edCrShape2.ItemIndex);
       ed.OptCaretVirtual:= chkCrVirt.Checked;
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
       ed.OptCaretStopUnfocused:= chkCrStopUnfocus.Checked;
       ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
+
+      if chkCrVertNormal.Checked then
+      begin
+        ed.CaretPropsNormal.Width:= edCrSizeNormal.Value;
+        ed.CaretPropsNormal.Height:= 0;
+      end
+      else
+      begin
+        ed.CaretPropsNormal.Height:= edCrSizeNormal.Value;
+        ed.CaretPropsNormal.Width:= 0;
+      end;
+      ed.CaretPropsNormal.InPercents:= chkCrPercentNormal.Checked;
+      ed.CaretPropsNormal.EmptyInside:= chkCrEmptyNormal.Checked;
 
       //gutter
       ed.OptNumbersFontSize:= edNumSize.Value;
@@ -445,8 +461,6 @@ end;
 
 procedure TfmOpt.FormCreate(Sender: TObject);
 begin
-  InitShape(edCrShape);
-  InitShape(edCrShape2);
 end;
 
 procedure TfmOpt.FormShow(Sender: TObject);
@@ -478,11 +492,6 @@ begin
       SwapItems(ListCol, ItemIndex, ItemIndex+1);
 end;
 
-procedure TfmOpt.InitShape(ed: TCombobox);
-begin
-  ed.Items.Clear;
-  ed.Items.AddStrings(ListShapes.Items);
-end;
 
 end.
 
