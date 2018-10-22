@@ -958,20 +958,15 @@ end;
 
 procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Props: TATCaretProps; W, H: integer);
 begin
-  if Props.InPercents then
-  begin
-    if Props.Width>0 then
-      R.Right:= R.Left + W * Props.Width div 100
-    else
-      R.Top:= R.Bottom - H * Props.Height div 100;
-  end
+  if Props.Width<0 then
+    R.Right:= R.Left - W * Props.Width div 100 // <0 is counted
   else
-  begin
-    if Props.Width>0 then
-      R.Right:= R.Left + Props.Width
-    else
-      R.Top:= R.Bottom - Props.Height;
-  end;
+    R.Right:= R.Left + Props.Width;
+
+  if Props.Height<0 then
+    R.Top:= R.Bottom + H * Props.Height div 100 // <0 is counted
+  else
+    R.Top:= R.Bottom - Props.Height;
 end;
 
 
@@ -981,7 +976,6 @@ procedure TATCaretProps.Assign(Obj: TATCaretProps);
 begin
   Width:= Obj.Width;
   Height:= Obj.Height;
-  InPercents:= Obj.InPercents;
   EmptyInside:= Obj.EmptyInside;
 end;
 

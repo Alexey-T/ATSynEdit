@@ -208,7 +208,6 @@ type
   public
     Width: integer;
     Height: integer;
-    InPercents: boolean;
     EmptyInside: boolean;
     procedure Assign(Obj: TATCaretProps);
   end;
@@ -2897,11 +2896,12 @@ begin
   FCaretPropsOverwrite:= TATCaretProps.Create;
   FCaretPropsReadonly:= TATCaretProps.Create;
 
-  //initialize it w/o using Shape consts (faster)
   FCaretPropsNormal.Width:= 2;
+  FCaretPropsNormal.Height:= -100;
+  FCaretPropsOverwrite.Width:= -100;
+  FCaretPropsOverwrite.Height:= -100;
+  FCaretPropsReadonly.Width:= -100;
   FCaretPropsReadonly.Height:= 2;
-  FCaretPropsOverwrite.Height:= 50;
-  FCaretPropsOverwrite.InPercents:= true;
 
   FWantTabs:= true;
   FWantReturns:= true;

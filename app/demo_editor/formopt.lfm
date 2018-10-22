@@ -968,6 +968,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 32
         Width = 66
+        MinValue = -100
         TabOrder = 6
       end
       object chkCrPercentNormal: TCheckBox
@@ -991,7 +992,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 61
         Width = 66
-        MaxValue = 300
+        MinValue = -300
         TabOrder = 7
       end
       object Label9: TLabel

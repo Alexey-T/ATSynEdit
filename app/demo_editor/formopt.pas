@@ -241,7 +241,6 @@ begin
 
     edCrWidthNormal.Value:= ed.CaretPropsNormal.Width;
     edCrHeightNormal.Value:= ed.CaretPropsNormal.Height;
-    chkCrPercentNormal.Checked:= ed.CaretPropsNormal.InPercents;
     chkCrEmptyNormal.Checked:= ed.CaretPropsNormal.EmptyInside;
 
     //gutter
@@ -364,7 +363,6 @@ begin
 
       ed.CaretPropsNormal.Width:= edCrWidthNormal.Value;
       ed.CaretPropsNormal.Height:= edCrHeightNormal.Value;
-      ed.CaretPropsNormal.InPercents:= chkCrPercentNormal.Checked;
       ed.CaretPropsNormal.EmptyInside:= chkCrEmptyNormal.Checked;
 
       //gutter
