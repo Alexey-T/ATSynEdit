@@ -206,6 +206,9 @@ type
 
   TATCaretProps = class
   public
+    //Value>=0: in pixels
+    //Value<0: in percents
+    //Value<-100 means that caret is bigger than cell and overlaps nearest cells
     Width: integer;
     Height: integer;
     EmptyInside: boolean;

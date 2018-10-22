@@ -957,14 +957,27 @@ end;
 
 
 procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Props: TATCaretProps; W, H: integer);
+var
+  Y0, DY: integer;
 begin
   if Props.Width<0 then
-    R.Right:= R.Left - W * Props.Width div 100 // <0 is counted
+    R.Right:= R.Left - W * Props.Width div 100
   else
     R.Right:= R.Left + Props.Width;
 
   if Props.Height<0 then
-    R.Top:= R.Bottom + H * Props.Height div 100 // <0 is counted
+  begin
+    //allow height >100% to paint over upper/lower lines
+    if Props.Height<-100 then
+    begin
+      Y0:= (R.Top+R.Bottom) div 2;
+      DY:= -H * Props.Height div 200;
+      R.Top:= Y0-DY;
+      R.Bottom:= Y0+DY;
+    end
+    else
+      R.Top:= R.Bottom + H * Props.Height div 100;
+  end
   else
     R.Top:= R.Bottom - Props.Height;
 end;
