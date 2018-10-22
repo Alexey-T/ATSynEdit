@@ -942,7 +942,7 @@ object fmOpt: TfmOpt
       object Label7: TLabel
         Left = 344
         Height = 17
-        Top = 12
+        Top = 8
         Width = 95
         Caption = 'shape, normal'
         ParentColor = False
@@ -971,42 +971,38 @@ object fmOpt: TfmOpt
         MinValue = -100
         TabOrder = 6
       end
-      object chkCrPercentNormal: TCheckBox
-        Left = 344
-        Height = 24
-        Top = 96
-        Width = 85
-        Caption = 'percents'
-        TabOrder = 8
-      end
       object chkCrEmptyNormal: TCheckBox
         Left = 344
         Height = 24
-        Top = 120
+        Top = 96
         Width = 112
         Caption = 'empty inside'
-        TabOrder = 9
+        TabOrder = 8
       end
       object edCrHeightNormal: TSpinEdit
         Left = 344
         Height = 27
-        Top = 61
+        Top = 64
         Width = 66
         MinValue = -300
         TabOrder = 7
       end
       object Label9: TLabel
-        Left = 419
+        AnchorSideTop.Control = edCrWidthNormal
+        AnchorSideTop.Side = asrCenter
+        Left = 416
         Height = 17
-        Top = 40
+        Top = 37
         Width = 38
         Caption = 'width'
         ParentColor = False
       end
       object Label21: TLabel
-        Left = 419
+        AnchorSideTop.Control = edCrHeightNormal
+        AnchorSideTop.Side = asrCenter
+        Left = 416
         Height = 17
-        Top = 68
+        Top = 69
         Width = 42
         Caption = 'height'
         ParentColor = False

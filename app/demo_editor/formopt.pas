@@ -20,7 +20,6 @@ type
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
     chkCrEmptyNormal: TCheckBox;
-    chkCrPercentNormal: TCheckBox;
     chkClickLink: TCheckBox;
     chkCrBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
