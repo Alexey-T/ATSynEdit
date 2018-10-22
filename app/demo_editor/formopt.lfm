@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 628
-    ActivePage = TabSheet1
+    ActivePage = TabSheet4
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 0
+    TabIndex = 5
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -963,27 +963,17 @@ object fmOpt: TfmOpt
         Caption = 'blink enabled'
         TabOrder = 1
       end
-      object edCrSizeNormal: TSpinEdit
+      object edCrWidthNormal: TSpinEdit
         Left = 344
         Height = 27
         Top = 32
         Width = 66
-        MinValue = 1
         TabOrder = 6
-        Value = 1
-      end
-      object chkCrVertNormal: TCheckBox
-        Left = 344
-        Height = 24
-        Top = 64
-        Width = 76
-        Caption = 'vertical'
-        TabOrder = 7
       end
       object chkCrPercentNormal: TCheckBox
         Left = 344
         Height = 24
-        Top = 88
+        Top = 96
         Width = 85
         Caption = 'percents'
         TabOrder = 8
@@ -991,10 +981,34 @@ object fmOpt: TfmOpt
       object chkCrEmptyNormal: TCheckBox
         Left = 344
         Height = 24
-        Top = 112
+        Top = 120
         Width = 112
         Caption = 'empty inside'
         TabOrder = 9
+      end
+      object edCrHeightNormal: TSpinEdit
+        Left = 344
+        Height = 27
+        Top = 61
+        Width = 66
+        MaxValue = 300
+        TabOrder = 7
+      end
+      object Label9: TLabel
+        Left = 419
+        Height = 17
+        Top = 40
+        Width = 38
+        Caption = 'width'
+        ParentColor = False
+      end
+      object Label21: TLabel
+        Left = 419
+        Height = 17
+        Top = 68
+        Width = 42
+        Caption = 'height'
+        ParentColor = False
       end
     end
     object TabSheet6: TTabSheet

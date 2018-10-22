@@ -20,7 +20,6 @@ type
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
     chkCrEmptyNormal: TCheckBox;
-    chkCrVertNormal: TCheckBox;
     chkCrPercentNormal: TCheckBox;
     chkClickLink: TCheckBox;
     chkCrBlinkEn: TCheckBox;
@@ -88,6 +87,7 @@ type
     chkUnprintEndDet: TCheckBox;
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
+    edCrHeightNormal: TSpinEdit;
     edScrollArrowKind: TComboBox;
     edMapCharWidth: TSpinEdit;
     edNumAlign: TComboBox;
@@ -130,12 +130,14 @@ type
     Label19: TLabel;
     Label2: TLabel;
     Label20: TLabel;
+    Label21: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
     Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
+    Label9: TLabel;
     LabelArr: TLabel;
     LabelArr1: TLabel;
     LabelHint: TLabel;
@@ -143,7 +145,7 @@ type
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
     edNumSize: TSpinEdit;
-    edCrSizeNormal: TSpinEdit;
+    edCrWidthNormal: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -237,11 +239,8 @@ begin
     chkCrStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
     chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
 
-    if ed.CaretPropsNormal.Width>0 then
-      edCrSizeNormal.Value:= ed.CaretPropsNormal.Width
-    else
-      edCrSizeNormal.Value:= ed.CaretPropsNormal.Height;
-    chkCrVertNormal.Checked:= ed.CaretPropsNormal.Width>0;
+    edCrWidthNormal.Value:= ed.CaretPropsNormal.Width;
+    edCrHeightNormal.Value:= ed.CaretPropsNormal.Height;
     chkCrPercentNormal.Checked:= ed.CaretPropsNormal.InPercents;
     chkCrEmptyNormal.Checked:= ed.CaretPropsNormal.EmptyInside;
 
@@ -363,16 +362,8 @@ begin
       ed.OptCaretStopUnfocused:= chkCrStopUnfocus.Checked;
       ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
 
-      if chkCrVertNormal.Checked then
-      begin
-        ed.CaretPropsNormal.Width:= edCrSizeNormal.Value;
-        ed.CaretPropsNormal.Height:= 0;
-      end
-      else
-      begin
-        ed.CaretPropsNormal.Height:= edCrSizeNormal.Value;
-        ed.CaretPropsNormal.Width:= 0;
-      end;
+      ed.CaretPropsNormal.Width:= edCrWidthNormal.Value;
+      ed.CaretPropsNormal.Height:= edCrHeightNormal.Value;
       ed.CaretPropsNormal.InPercents:= chkCrPercentNormal.Checked;
       ed.CaretPropsNormal.EmptyInside:= chkCrEmptyNormal.Checked;
 
