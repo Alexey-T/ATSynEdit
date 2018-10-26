@@ -693,6 +693,7 @@ var
   Str: UnicodeString;
   P1, P2: TPoint;
   i: integer;
+  Ok: boolean;
 begin
   Result:= 0;
 
@@ -724,15 +725,13 @@ begin
       DoReplaceTextInEditor(P1, P2, Str, false, false);
       Inc(Result);
 
-      {
-      //gives progress rolling back
-      if Assigned(FOnProgress) then
-      begin
-        Ok:= true;
-        FOnProgress(Self, Res.FPos.Y, Editor.Strings.Count-1, Ok);
-        if not Ok then exit;
-      end;
-      }
+      if i mod 100 = 0 then
+        if Assigned(FOnProgress) then
+        begin
+          Ok:= true;
+          FOnProgress(Self, L.Count-1-i, L.Count-1, Ok);
+          if not Ok then Break;
+        end;
     end;
 
     Editor.DoEventChange;
