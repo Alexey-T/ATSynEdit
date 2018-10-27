@@ -1,7 +1,7 @@
 {$ifdef none}begin end;{$endif}
 
 
-procedure TATStrings.TextReplaceInOneLine(AY, AX1, AX2: integer; const AText: atString);
+procedure TATStrings.TextReplace_OneLine(AY, AX1, AX2: integer; const AText: atString);
 //simple, made to speedup mass-replace in CudaText
 //(usually match replaced inside one line)
 //IsIndexValid must be in outer func
@@ -16,12 +16,23 @@ begin
   Lines[AY]:= Str;
 end;
 
+procedure TATStrings.TextReplace_OneLine_ReplaceOneEol(AY, AX1, AX2: integer; const ATextPart1,
+  ATextPart2: atString);
+var
+  Str: atString;
+begin
+  Str:= Lines[AY];
+  Lines[AY]:= Copy(Str, 1, AX1) + ATextPart1;
+  LineInsert(AY+1, ATextPart2 + Copy(Str, AX2+1, MaxInt));
+end;
+
 
 procedure TATStrings.TextReplaceRange(AFromX, AFromY, AToX, AToY: integer;
   const AText: atString; out AShift, APosAfter: TPoint; AWithUndoGroup: boolean);
 var
   bOneLine, bOneEol: boolean;
-  NCountEol: integer;
+  NCountEol, N: integer;
+  SPart1, SPart2: atString;
 begin
   NCountEol:= SFindCharCount(AText, #10);
   bOneLine:= (AFromY=AToY) and (NCountEol=0);
@@ -29,22 +40,24 @@ begin
 
   if bOneLine then
   begin
-    TextReplaceInOneLine(AFromY, AFromX, AToX, AText);
+    TextReplace_OneLine(AFromY, AFromX, AToX, AText);
     AShift.X:= 0;
     AShift.Y:= 0;
     APosAfter.X:= AFromX+Length(AText);
     APosAfter.Y:= AFromY;
   end
-  {
+  else
   if bOneEol then
   begin
-    TextReplaceInOneLineWithOneEol(AFromY, AFromX, AToX, AText);
+    N:= Pos(#10, AText);
+    SPart1:= Copy(AText, 1, N-1);
+    SPart2:= Copy(AText, N+1, MaxInt);
+    TextReplace_OneLine_ReplaceOneEol(AFromY, AFromX, AToX, SPart1, SPart2);
     AShift.X:= 0;
     AShift.Y:= 1;
-    APosAfter.X:= AFromX+Length(AText);
+    APosAfter.X:= Length(SPart2);
     APosAfter.Y:= AFromY+1;
   end
-  }
   else
   begin
     if AWithUndoGroup then

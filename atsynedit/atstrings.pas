@@ -319,7 +319,8 @@ type
     procedure TextInsertEol(AX, AY: integer; AKeepCaret: boolean;
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
-    procedure TextReplaceInOneLine(AY, AX1, AX2: integer; const AText: atString);
+    procedure TextReplace_OneLine(AY, AX1, AX2: integer; const AText: atString);
+    procedure TextReplace_OneLine_ReplaceOneEol(AY, AX1, AX2: integer; const ATextPart1, ATextPart2: atString);
     procedure TextReplaceRange(AFromX, AFromY, AToX, AToY: integer; const AText: atString; out AShift,
       APosAfter: TPoint; AWithUndoGroup: boolean);
     function TextReplaceLines_UTF8(ALineFrom, ALineTo: integer; ANewLines: TStringList): boolean;
