@@ -122,6 +122,9 @@ type
       // -1: len is unknown yet
       // -2: str is ASCII only, so len = Length(Str)
     Ex: TATStringItemEx;
+    //
+    procedure Init(const AStr: string; AEnd: TATLineEnds; ACharLen: integer);
+    function IsFake: boolean; inline;
   end;
   PATStringItem = ^TATStringItem;
 
@@ -371,37 +374,29 @@ begin
   raise Exception.Create('Unknown enc value');
 end;
 
-function StringItem_IsFake(const A: TATStringItem): boolean;
+{ TATStringItem }
+
+function TATStringItem.IsFake: boolean; inline;
 begin
   Result:=
-    (A.Str='') and
-    (TATLineEnds(A.Ex.Ends)=cEndNone);
+    (Str='') and
+    (TATLineEnds(Ex.Ends)=cEndNone);
 end;
 
-procedure StringItem_Zero(var A: TATStringItem); inline;
+procedure TATStringItem.Init(const AStr: string; AEnd: TATLineEnds; ACharLen: integer);
 begin
-  FillChar(A, SizeOf(A), 0);
-  A.CharLen:= cCharLenUnknown;
-end;
+  Str:= AStr;
+  UniqueString(Str);
 
-procedure StringItem_Init(
-  var A: TATStringItem;
-  const AString: string;
-  AEnd: TATLineEnds;
-  ACharLen: integer);
-begin
-  FillChar(A, SizeOf(A), 0);
-  A.Str:= AString;
-
-  if ACharLen=Length(A.Str) then
-    A.CharLen:= cCharLenAscii
+  if ACharLen=Length(Str) then
+    CharLen:= cCharLenAscii
   else
-    A.CharLen:= ACharLen;
+    CharLen:= ACharLen;
 
-  A.Ex.Ends:= TATBits2(AEnd);
-  A.Ex.State:= TATBits2(cLineStateAdded);
-  A.Ex.Sep:= TATBits2(cLineSepNone);
-  UniqueString(A.Str);
+  FillChar(Ex, SizeOf(Ex), 0);
+  Ex.Ends:= TATBits2(AEnd);
+  Ex.State:= TATBits2(cLineStateAdded);
+  Ex.Sep:= TATBits2(cLineSepNone);
 end;
 
 function ATStrings_To_StringList(AStr: TATStrings): TStringList;
@@ -828,7 +823,7 @@ end;
 function TATStrings.IsLastLineFake: boolean;
 begin
   Result:= (Count>0) and
-    StringItem_IsFake(FList.GetItem(FList.Count-1)^);
+    FList.GetItem(FList.Count-1)^.IsFake;
 end;
 
 function TATStrings.IsLastFakeLineUnneeded: boolean;
@@ -880,9 +875,9 @@ begin
   DoEventLog(Count, Length(AString));
   DoEventChange(Count, cLineChangeAdded);
 
-  StringItem_Init(Item, UTF8Encode(AString), AEnd, Length(AString));
+  Item.Init(UTF8Encode(AString), AEnd, Length(AString));
   FList.Add(@Item);
-  StringItem_Zero(Item);
+  FillChar(Item, SizeOf(Item), 0);
 end;
 
 procedure TATStrings.LineAddEx(const AString: atString; AEnd: TATLineEnds);
@@ -934,9 +929,9 @@ begin
   DoEventLog(ALineIndex, Length(AString));
   DoEventChange(ALineIndex, cLineChangeAdded);
 
-  StringItem_Init(Item, UTF8Encode(AString), AEnd, Length(AString));
+  Item.Init(UTF8Encode(AString), AEnd, Length(AString));
   FList.Insert(ALineIndex, @Item);
-  StringItem_Zero(Item);
+  FillChar(Item, SizeOf(Item), 0);
 end;
 
 procedure TATStrings.LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
@@ -978,12 +973,12 @@ begin
       DoEventLog(ALineIndex+i, ABlock.LinesLen[i]);
       DoEventChange(ALineIndex+i, cLineChangeAdded);
 
-      StringItem_Init(Item,
+      Item.Init(
         ABlock.GetLineUTF8(i),
         Endings,
         cCharLenUnknown);
       FList.Insert(ALineIndex+i, @Item);
-      StringItem_Zero(Item);
+      FillChar(Item, SizeOf(Item), 0);
     end;
   end;
 
@@ -1580,10 +1575,10 @@ procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLine
 var
   Item: TATStringItem;
 begin
-  StringItem_Init(Item, AString, AEnd, cCharLenUnknown);
+  Item.Init(AString, AEnd, cCharLenUnknown);
   Item.Ex.State:= TATBits2(cLineStateAdded);
   FList.Add(@Item);
-  StringItem_Zero(Item);
+  FillChar(Item, SizeOf(Item), 0);
 end;
 
 procedure TATStrings.DoEventLog(ALine, ALen: integer);
