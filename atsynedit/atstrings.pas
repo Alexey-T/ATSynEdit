@@ -320,8 +320,8 @@ type
       const AStrIndent: atString; out AShift, APosAfter: TPoint);
     procedure TextDeleteLine(AX, AY: integer; out AShift, APosAfter: TPoint);
     procedure TextReplaceInOneLine(AY, AX1, AX2: integer; const AText: atString);
-    procedure TextReplaceRange(AFromX, AFromY, AToX, AToY: integer;
-      const AText: atString; out AShift, APosAfter: TPoint);
+    procedure TextReplaceRange(AFromX, AFromY, AToX, AToY: integer; const AText: atString; out AShift,
+      APosAfter: TPoint; AWithUndoGroup: boolean);
     function TextReplaceLines_UTF8(ALineFrom, ALineTo: integer; ANewLines: TStringList): boolean;
     function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: string = #10): atString;
     //undo

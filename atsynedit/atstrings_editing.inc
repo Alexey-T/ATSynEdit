@@ -18,13 +18,15 @@ end;
 
 
 procedure TATStrings.TextReplaceRange(AFromX, AFromY, AToX, AToY: integer;
-  const AText: atString; out AShift, APosAfter: TPoint);
+  const AText: atString; out AShift, APosAfter: TPoint; AWithUndoGroup: boolean);
 var
-  bOneLine: boolean;
-  NCountEols: integer;
+  bOneLine, bOneEol: boolean;
+  NCountEol: integer;
 begin
-  NCountEols:= SFindCharCount(AText, #10);
-  bOneLine:= (AFromY=AToY) and (NCountEols=0);
+  NCountEol:= SFindCharCount(AText, #10);
+  bOneLine:= (AFromY=AToY) and (NCountEol=0);
+  bOneEol:= (AFromY=AToY) and (NCountEol=1);
+
   if bOneLine then
   begin
     TextReplaceInOneLine(AFromY, AFromX, AToX, AText);
@@ -33,12 +35,24 @@ begin
     APosAfter.X:= AFromX+Length(AText);
     APosAfter.Y:= AFromY;
   end
+  {
+  if bOneEol then
+  begin
+    TextReplaceInOneLineWithOneEol(AFromY, AFromX, AToX, AText);
+    AShift.X:= 0;
+    AShift.Y:= 1;
+    APosAfter.X:= AFromX+Length(AText);
+    APosAfter.Y:= AFromY+1;
+  end
+  }
   else
   begin
-    BeginUndoGroup;
+    if AWithUndoGroup then
+      BeginUndoGroup;
     TextDeleteRange(AFromX, AFromY, AToX, AToY, AShift, APosAfter);
     TextInsert(AFromX, AFromY, AText, false, AShift, APosAfter);
-    EndUndoGroup;
+    if AWithUndoGroup then
+      EndUndoGroup;
   end;
 end;
 
