@@ -118,6 +118,7 @@ procedure SDeleteFromEol(var S: string); inline;
 procedure SDeleteFromEol(var S: atString); inline;
 
 procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
+function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
 
 
 implementation
@@ -945,6 +946,15 @@ begin
   end;
 end;
 
+function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
+var
+  i: integer;
+begin
+  Result:= 0;
+  for i:= 1 to Length(S) do
+    if S[i]=ch then
+      Inc(Result);
+end;
 
 end.
 

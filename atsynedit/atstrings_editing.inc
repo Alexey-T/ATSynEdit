@@ -21,8 +21,10 @@ procedure TATStrings.TextReplaceRange(AFromX, AFromY, AToX, AToY: integer;
   const AText: atString; out AShift, APosAfter: TPoint);
 var
   bOneLine: boolean;
+  NCountEols: integer;
 begin
-  bOneLine:= (AFromY=AToY) and (Pos(#10, AText)=0);
+  NCountEols:= SFindCharCount(AText, #10);
+  bOneLine:= (AFromY=AToY) and (NCountEols=0);
   if bOneLine then
   begin
     TextReplaceInOneLine(AFromY, AFromX, AToX, AText);
