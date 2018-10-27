@@ -1702,7 +1702,7 @@ begin
     NFoldFrom:= Strings.LinesFoldFrom[ALine, FEditorIndex];
     if NFoldFrom>0 then
     begin
-      WrapItem_Init(Item, ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed);
+      Item.Init(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed);
       AItems.Add(Item);
       Exit;
     end;
@@ -1711,7 +1711,7 @@ begin
   //line not wrapped?
   if (FWrapColumn<cMinWrapColumnAbs) then
   begin
-    WrapItem_Init(Item, ALine, 1, NLen, 0, cWrapItemFinal);
+    Item.Init(ALine, 1, NLen, 0, cWrapItemFinal);
     AItems.Add(Item);
     Exit;
   end;
@@ -1736,7 +1736,7 @@ begin
     else
       NFinal:= cWrapItemMiddle;
 
-    WrapItem_Init(Item, ALine, NOffset, NLen, NIndent, NFinal);
+    Item.Init(ALine, NOffset, NLen, NIndent, NFinal);
     AItems.Add(Item);
 
     if FWrapIndented then

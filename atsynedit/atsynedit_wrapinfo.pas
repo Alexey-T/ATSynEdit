@@ -29,14 +29,13 @@ type
     NLength: integer;
     NIndent: word;
     NFinal: TATSynWrapFinal;
+    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
     class operator=(const A, B: TATSynWrapItem): boolean;
   end;
 
 type
   TATSynWrapItems = specialize TFPGList<TATSynWrapItem>;
 
-procedure WrapItem_Init(var AItem: TATSynWrapItem;
-  const ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
 
 type
   TATCheckLineCollapsedEvent = function(ALineNum: integer): boolean of object;
@@ -78,17 +77,16 @@ implementation
 uses
   Math, Dialogs, Forms;
 
-procedure WrapItem_Init(var AItem: TATSynWrapItem; const ALineIndex,
-  ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
-begin
-  AItem.NLineIndex:= ALineIndex;
-  AItem.NCharIndex:= ACharIndex;
-  AItem.NLength:= ALength;
-  AItem.NIndent:= AIndent;
-  AItem.NFinal:= AFinal;
-end;
-
 { TATSynWrapItem }
+
+procedure TATSynWrapItem.Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
+begin
+  NLineIndex:= ALineIndex;
+  NCharIndex:= ACharIndex;
+  NLength:= ALength;
+  NIndent:= AIndent;
+  NFinal:= AFinal;
+end;
 
 class operator TATSynWrapItem.=(const A, B: TATSynWrapItem): boolean;
 begin
@@ -100,16 +98,9 @@ end;
 function TATSynWrapInfo.GetData(AIndex: integer): TATSynWrapItem;
 begin
   if FVirtualMode then
-  begin
-    Result.NLineIndex:= AIndex;
-    Result.NCharIndex:= 1;
-    Result.NLength:= FStrings.LinesLen[AIndex];
-    Result.NIndent:= 0;
-    Result.NFinal:= cWrapItemFinal;
-  end
+    Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal)
   else
   begin
-    //Assert(IsIndexValid(AIndex), 'Invalid index in WrapInfo.GetData()');
     if AIndex>=0 then
       Result:= FList[AIndex]
     else
@@ -264,7 +255,7 @@ begin
   begin
     for i:= 1 to Dif do
     begin
-      WrapItem_Init(Item, 0, 0, 0, 0, Low(TATSynWrapFinal));
+      Item.Init(0, 0, 0, 0, Low(TATSynWrapFinal));
       Insert(AFrom, Item);
     end;
   end;
