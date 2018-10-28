@@ -906,7 +906,7 @@ begin
 
   if Strings.ActionTrimSpaces(AMode) then
   begin
-    DoCaretsFixIfAfterLineEnds;
+    DoCaretsFixIncorrectPos(true);
     Result:= [cResultCaretAny, cResultText];
   end;
 end;

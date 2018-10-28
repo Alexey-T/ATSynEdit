@@ -1035,7 +1035,7 @@ type
     procedure DoCaretSingle(APosX, APosY, AEndX, AEndY: integer);
     procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
     procedure DoCaretSingleAsIs;
-    procedure DoCaretsFixIfAfterLineEnds;
+    procedure DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean);
     procedure DoCaretsFixIfInsideFolded;
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
@@ -3328,6 +3328,9 @@ begin
     Change2:= Strings.ActionTrimSpaces(cTrimRight);
   if FOptSavingTrimFinalEmptyLines then
     Change3:= Strings.ActionTrimFinalEmptyLines;
+
+  if Change3 then
+    DoCaretsFixIncorrectPos(false);
 
   if Change1 or Change2 or Change3 then
   begin
