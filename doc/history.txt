@@ -1,4 +1,7 @@
 
+2018.10.28
++ add: property OptSavingTrimFinalEmptyLines
+
 2018.10.20
 + add: new props for caret shape, which allow more tuning:
    CaretPropsNormal
