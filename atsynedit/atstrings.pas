@@ -298,6 +298,7 @@ type
     procedure ActionAddFakeLineIfNeeded;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
+    function ActionTrimFinalEmptyLines: boolean;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const AFilename: string);
@@ -1527,6 +1528,16 @@ begin
       LinesEnds[Count-1]:= Endings;
       Result:= true;
     end;
+  end;
+end;
+
+function TATStrings.ActionTrimFinalEmptyLines: boolean;
+begin
+  Result:= false;
+  while (Count>1) and (Lines[Count-1]='') and (Lines[Count-2]='') do
+  begin
+    LineDelete(Count-2);
+    Result:= true;
   end;
 end;
 

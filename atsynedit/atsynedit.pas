@@ -543,6 +543,7 @@ type
     FOptTextOffsetFromLine: integer;
     FOptSavingForceFinalEol: boolean;
     FOptSavingTrimSpaces: boolean;
+    FOptSavingTrimFinalEmptyLines: boolean;
     FOptUndoGrouped: boolean;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
@@ -1395,6 +1396,7 @@ type
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave default true;
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
+    property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
     property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine default true;
   end;
 
@@ -3314,17 +3316,20 @@ end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
 var
-  Change1, Change2: boolean;
+  Change1, Change2, Change3: boolean;
 begin
   Change1:= false;
   Change2:= false;
+  Change3:= false;
 
   if FOptSavingForceFinalEol then
     Change1:= Strings.ActionEnsureFinalEol;
   if FOptSavingTrimSpaces then
     Change2:= Strings.ActionTrimSpaces(cTrimRight);
+  if FOptSavingTrimFinalEmptyLines then
+    Change3:= Strings.ActionTrimFinalEmptyLines;
 
-  if Change1 or Change2 then
+  if Change1 or Change2 or Change3 then
   begin
     Update(true);
     DoEventChange;
