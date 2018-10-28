@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 628
-    ActivePage = TabSheet4
+    ActivePage = TabSheet1
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 5
+    TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -73,7 +73,7 @@ object fmOpt: TfmOpt
         Top = 8
         Width = 147
         Caption = 'copy lines if no sel'
-        TabOrder = 6
+        TabOrder = 8
       end
       object chkShowFullSel: TCheckBox
         Left = 8
@@ -89,7 +89,7 @@ object fmOpt: TfmOpt
         Top = 68
         Width = 256
         Caption = 'consider overwrite-mode on paste'
-        TabOrder = 9
+        TabOrder = 11
       end
       object LabChars: TLabel
         Left = 408
@@ -104,7 +104,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 272
         Width = 106
-        TabOrder = 16
+        TabOrder = 17
       end
       object chkDotLn: TCheckBox
         Left = 296
@@ -112,7 +112,7 @@ object fmOpt: TfmOpt
         Top = 48
         Width = 235
         Caption = 'show wrapped-indent vert lines'
-        TabOrder = 8
+        TabOrder = 10
       end
       object chkCutNoSel: TCheckBox
         Left = 296
@@ -120,7 +120,7 @@ object fmOpt: TfmOpt
         Top = 28
         Width = 136
         Caption = 'cut lines if no sel'
-        TabOrder = 7
+        TabOrder = 9
       end
       object chkSaveTrim: TCheckBox
         Left = 296
@@ -128,7 +128,7 @@ object fmOpt: TfmOpt
         Top = 88
         Width = 192
         Caption = 'on save: trim trail spaces'
-        TabOrder = 10
+        TabOrder = 12
       end
       object chkSaveEol: TCheckBox
         Left = 296
@@ -136,15 +136,15 @@ object fmOpt: TfmOpt
         Top = 108
         Width = 184
         Caption = 'on save: ensure final eol'
-        TabOrder = 11
+        TabOrder = 13
       end
       object chkScrollHint: TCheckBox
-        Left = 296
+        Left = 8
         Height = 24
-        Top = 128
+        Top = 176
         Width = 242
         Caption = 'show hint on dragging vert-scroll'
-        TabOrder = 12
+        TabOrder = 7
       end
       object chkCurLineMin: TCheckBox
         Left = 24
@@ -159,7 +159,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 244
         Width = 106
-        TabOrder = 15
+        TabOrder = 16
       end
       object LabelHint: TLabel
         Left = 408
@@ -190,7 +190,7 @@ object fmOpt: TfmOpt
           'no arrows'
         )
         Style = csDropDownList
-        TabOrder = 14
+        TabOrder = 15
       end
       object Label11: TLabel
         Left = 456
@@ -201,12 +201,20 @@ object fmOpt: TfmOpt
         ParentColor = False
       end
       object chkClickLink: TCheckBox
-        Left = 296
+        Left = 8
         Height = 24
         Top = 152
         Width = 190
         Caption = 'open URL by simple click'
-        TabOrder = 13
+        TabOrder = 6
+      end
+      object chkSaveTrimEmptyLines: TCheckBox
+        Left = 296
+        Height = 24
+        Top = 128
+        Width = 224
+        Caption = 'on save: trim final empty lines'
+        TabOrder = 14
       end
     end
     object TabSheet2: TTabSheet

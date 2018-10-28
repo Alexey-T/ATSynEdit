@@ -19,6 +19,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkSaveTrimEmptyLines: TCheckBox;
     chkCrEmptyNormal: TCheckBox;
     chkClickLink: TCheckBox;
     chkCrBlinkEn: TCheckBox;
@@ -217,6 +218,7 @@ begin
     edScrollArrowKind.ItemIndex:= Ord(ed.OptScrollbarsNewArrowsKind);
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
+    chkSaveTrimEmptyLines.Checked:= ed.OptSavingTrimFinalEmptyLines;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
     chkClickLink.Checked:= ed.OptMouseClickOpensURL;
 
@@ -339,6 +341,7 @@ begin
       ed.OptShowIndentLines:= chkDotLn.Checked;
       ed.OptSavingForceFinalEol:= chkSaveEol.Checked;
       ed.OptSavingTrimSpaces:= chkSaveTrim.Checked;
+      ed.OptSavingTrimFinalEmptyLines:= chkSaveTrimEmptyLines.Checked;
       ed.OptShowScrollHint:= chkScrollHint.Checked;
       ed.OptMouseClickOpensURL:= chkClickLink.Checked;
 
