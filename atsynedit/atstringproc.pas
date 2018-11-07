@@ -60,7 +60,7 @@ type
     OnCalcTabSize: TATStringTabCalcEvent;
     function CalcTabulationSize(ALineIndex, APos: integer): integer;
     function TabsToSpaces(ALineIndex: integer; const S: atString): atString;
-    function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: integer=-1): integer;
+    function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: integer): integer;
     function SpacesToTabs(ALineIndex: integer; const S: atString): atString;
     function GetIndentExpanded(ALineIndex: integer; const S: atString): integer;
     function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
@@ -562,7 +562,7 @@ function TATStringTabHelper.CharPosToColumnPos(ALineIndex: integer; const S: atS
   APos: integer): integer;
 begin
   if APos>Length(S) then
-    Result:= TabsToSpaces_Length(ALineIndex, S) + APos-Length(S)
+    Result:= TabsToSpaces_Length(ALineIndex, S, -1) + APos-Length(S)
   else
     Result:= TabsToSpaces_Length(ALineIndex, S, APos);
 end;
