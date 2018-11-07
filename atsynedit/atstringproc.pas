@@ -558,7 +558,7 @@ var
   size, i: integer;
 begin
   if AColumn=0 then exit(AColumn);
-  if Pos(#9, S)=0 then exit(AColumn);
+  if not SStringHasTab(S) then exit(AColumn);
 
   size:= 0;
   for i:= 1 to Length(S) do
@@ -575,13 +575,15 @@ begin
 end;
 
 function SStringHasTab(const S: atString): boolean; inline;
-var
-  i: integer;
 begin
-  Result:= false;
-  for i:= 1 to Length(S) do
-    if S[i]=#9 then exit(true);
+  Result:= Pos(#9, S)>0;
 end;
+
+function SStringHasTab(const S: string): boolean; inline;
+begin
+  Result:= Pos(#9, S)>0;
+end;
+
 
 function SStringHasAsciiAndNoTabs(const S: atString): boolean;
 var
@@ -609,15 +611,6 @@ begin
   end;
 end;
 
-
-function SStringHasTab(const S: string): boolean; inline;
-var
-  i: integer;
-begin
-  Result:= false;
-  for i:= 1 to Length(S) do
-    if S[i]=#9 then exit(true);
-end;
 
 function SIndentUnindent(const Str: atString; ARight: boolean;
   AIndentSize, ATabSize: integer; ATabSpaces: boolean): atString;
@@ -657,7 +650,7 @@ begin
     N:= SGetIndentChars(Str);
     StrIndent:= Copy(Str, 1, N);
     StrText:= Copy(Str, N+1, MaxInt);
-    DoTabs:= Pos(#9, StrIndent)>0;
+    DoTabs:= SStringHasTab(StrIndent);
 
     StrIndent:= STabsToSpaces(StrIndent, ATabSize);
     if DecSpaces>Length(StrIndent) then
