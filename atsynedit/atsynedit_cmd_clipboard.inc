@@ -167,8 +167,8 @@ begin
   begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
-      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, OptTabSize);
-      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, OptTabSize);
+      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, FTabHelper);
+      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, FTabHelper);
       Str:= Strings.TextSubstring(X1, i, X2, i);
       if FOptCopyColumnBlockAlignedBySpaces then
       begin

@@ -9,8 +9,8 @@ begin
   begin
     if not ((AY>=FSelRect.Top) and (AY<=FSelRect.Bottom)) then exit(False);
 
-    NPosLeft:= Strings.ColumnPosToCharPos(AY, FSelRect.Left, OptTabSize);
-    NPosRight:= Strings.ColumnPosToCharPos(AY, FSelRect.Right, OptTabSize);
+    NPosLeft:= Strings.ColumnPosToCharPos(AY, FSelRect.Left, FTabHelper);
+    NPosRight:= Strings.ColumnPosToCharPos(AY, FSelRect.Right, FTabHelper);
     Result:= (AX>=NPosLeft) and (AX<NPosRight);
   end
   else
@@ -32,8 +32,8 @@ begin
       exit(cRangeAllUnselected);
 
     //check for x
-    NPosLeft:= Strings.ColumnPosToCharPos(AY1, FSelRect.Left, OptTabSize);
-    NPosRight:= Strings.ColumnPosToCharPos(AY1, FSelRect.Right, OptTabSize);
+    NPosLeft:= Strings.ColumnPosToCharPos(AY1, FSelRect.Left, FTabHelper);
+    NPosRight:= Strings.ColumnPosToCharPos(AY1, FSelRect.Right, FTabHelper);
 
     if (AX1>=NPosLeft) and (AX2<=NPosRight) then
       Result:= cRangeAllSelected
@@ -314,8 +314,8 @@ var
   PTarget: TPoint;
 begin
   //consider tab-chars
-  P1.X:= Strings.CharPosToColumnPos(P1.Y, P1.X, FTabSize);
-  P2.X:= Strings.CharPosToColumnPos(P2.Y, P2.X, FTabSize);
+  P1.X:= Strings.CharPosToColumnPos(P1.Y, P1.X, FTabHelper);
+  P2.X:= Strings.CharPosToColumnPos(P2.Y, P2.X, FTabHelper);
 
   //fix coords
   PTarget:= P2;
@@ -333,7 +333,7 @@ begin
   else
   begin
     //single caret at moving block edge
-    PTarget.X:= Strings.ColumnPosToCharPos(PTarget.Y, PTarget.X, OptTabSize);
+    PTarget.X:= Strings.ColumnPosToCharPos(PTarget.Y, PTarget.X, FTabHelper);
     DoCaretSingle(PTarget.X, PTarget.Y);
   end;
 end;
@@ -344,10 +344,10 @@ var
 begin
   //convert SelRect to char-pos
   PntBegin:= FSelRectBegin;
-  PntBegin.X:= Strings.ColumnPosToCharPos(PntBegin.Y, PntBegin.X, OptTabSize);
+  PntBegin.X:= Strings.ColumnPosToCharPos(PntBegin.Y, PntBegin.X, FTabHelper);
 
   PntEnd:= FSelRectEnd;
-  PntEnd.X:= Strings.ColumnPosToCharPos(PntEnd.Y, PntEnd.X, OptTabSize);
+  PntEnd.X:= Strings.ColumnPosToCharPos(PntEnd.Y, PntEnd.X, FTabHelper);
 
   //func needs char-pos
   DoSelect_ColumnBlock(PntBegin, PntEnd);
@@ -369,15 +369,15 @@ begin
   Caret:= Carets[0];
   if (Caret.EndY>=0) and (Caret.EndX>=0) then
   begin
-    ABegin.X:= Strings.CharPosToColumnPos(Caret.EndY, Caret.EndX, OptTabSize);
+    ABegin.X:= Strings.CharPosToColumnPos(Caret.EndY, Caret.EndX, FTabHelper);
     ABegin.Y:= Caret.EndY;
 
-    AEnd.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, OptTabSize);
+    AEnd.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
     AEnd.Y:= Caret.PosY;
   end
   else
   begin
-    ABegin.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, OptTabSize);
+    ABegin.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
     ABegin.Y:= Caret.PosY;
     AEnd:= ABegin;
   end;
@@ -395,8 +395,8 @@ begin
     for i:= FSelRect.Top to FSelRect.Bottom do
     begin
       Str:= Strings.Lines[i];
-      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, OptTabSize);
-      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, OptTabSize);
+      X1:= Strings.ColumnPosToCharPos(i, FSelRect.Left, FTabHelper);
+      X2:= Strings.ColumnPosToCharPos(i, FSelRect.Right, FTabHelper);
 
       StrNew:= Str;
       Delete(StrNew, X1+1, X2-X1);

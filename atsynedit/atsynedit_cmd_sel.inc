@@ -49,17 +49,17 @@ begin
   case ADir of
     cDirColumnLeft:
       begin
-        N:= Strings.ColumnPosToCharPos(FSelRectEnd.Y, FSelRectEnd.X, OptTabSize);
+        N:= Strings.ColumnPosToCharPos(FSelRectEnd.Y, FSelRectEnd.X, FTabHelper);
         if N>0 then Dec(N);
-        N:= Strings.CharPosToColumnPos(FSelRectEnd.Y, N, OptTabSize);
+        N:= Strings.CharPosToColumnPos(FSelRectEnd.Y, N, FTabHelper);
         FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretLeft];
       end;
     cDirColumnRight:
       begin
-        N:= Strings.ColumnPosToCharPos(FSelRectEnd.Y, FSelRectEnd.X, OptTabSize);
+        N:= Strings.ColumnPosToCharPos(FSelRectEnd.Y, FSelRectEnd.X, FTabHelper);
         Inc(N);
-        N:= Strings.CharPosToColumnPos(FSelRectEnd.Y, N, OptTabSize);
+        N:= Strings.CharPosToColumnPos(FSelRectEnd.Y, N, FTabHelper);
         FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretRight];
       end;

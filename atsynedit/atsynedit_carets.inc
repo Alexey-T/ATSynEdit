@@ -35,9 +35,9 @@ begin
     if i=APos1.Y then
       Carets.Clear;
     Carets.Add(
-      Strings.ColumnPosToCharPos(i, ARect.Right, OptTabSize),
+      Strings.ColumnPosToCharPos(i, ARect.Right, FTabHelper),
       i,
-      Strings.ColumnPosToCharPos(i, ARect.Left, OptTabSize),
+      Strings.ColumnPosToCharPos(i, ARect.Left, FTabHelper),
       i
       );
   end
@@ -689,10 +689,10 @@ begin
       for j:= 1 to ALines do
       begin
         if not Strings.IsIndexValid(Caret.PosY) then Break;
-        X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabSize);
+        X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
         Y:= Caret.PosY+BoolToPlusMinusOne(ADown)*j;
         if not Strings.IsIndexValid(Y) then Break;
-        X:= Strings.ColumnPosToCharPos(Y, X, FTabSize);
+        X:= Strings.ColumnPosToCharPos(Y, X, FTabHelper);
         MoreCarets.Add(X, Y);
       end;
     end;

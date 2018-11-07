@@ -161,7 +161,6 @@ type
     FListUpdatesHard: boolean;
     FGaps: TATSynGaps;
     FBookmarks: TATBookmarks;
-    FTabHelper: TATStringTabHelper;
     FGutterDecor1: TATGutterDecor;
     FGutterDecor2: TATGutterDecor;
     FUndoList,
@@ -269,8 +268,8 @@ type
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
-    function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabSize: integer): integer;
-    function CharPosToColumnPos(AIndex: integer; AX: integer; ATabSize: integer): integer;
+    function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
+    function CharPosToColumnPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
     function GetItemPtr(AIndex: integer): PATStringItem;
     function UpdateItemHasTab(AIndex: integer): boolean;
 
@@ -776,7 +775,6 @@ begin
   FRedoList:= TATUndoList.Create;
   FGaps:= TATSynGaps.Create;
   FBookmarks:= TATBookmarks.Create;
-  FTabHelper:= TATStringTabHelper.Create;
 
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
@@ -814,7 +812,6 @@ begin
 
   Clear;
   FreeAndNil(FList);
-  FreeAndNil(FTabHelper);
   FreeAndNil(FBookmarks);
   FreeAndNil(FGaps);
   FreeAndNil(FListUpdates);
@@ -1077,30 +1074,26 @@ begin
   end;
 end;
 
-function TATStrings.ColumnPosToCharPos(AIndex: integer; AX: integer;
-  ATabSize: integer): integer;
+function TATStrings.ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
 var
   SLine: atString;
 begin
   if not UpdateItemHasTab(AIndex) then exit(AX);
 
   //optimized for huge lines
-  SLine:= LineSub(AIndex, 1, AX+ATabSize);
-  FTabHelper.TabSize:= ATabSize;
-  Result:= FTabHelper.ColumnPosToCharPos(SLine, AX);
+  SLine:= LineSub(AIndex, 1, AX+ATabHelper.TabSize);
+  Result:= ATabHelper.ColumnPosToCharPos(SLine, AX);
 end;
 
-function TATStrings.CharPosToColumnPos(AIndex: integer; AX: integer;
-  ATabSize: integer): integer;
+function TATStrings.CharPosToColumnPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
 var
   SLine: atString;
 begin
   if not UpdateItemHasTab(AIndex) then exit(AX);
 
   //optimized for huge lines
-  SLine:= LineSub(AIndex, 1, AX+ATabSize);
-  FTabHelper.TabSize:= ATabSize;
-  Result:= FTabHelper.CharPosToColumnPos(SLine, AX);
+  SLine:= LineSub(AIndex, 1, AX+ATabHelper.TabSize);
+  Result:= ATabHelper.CharPosToColumnPos(SLine, AX);
 end;
 
 function TATStrings.GetItemPtr(AIndex: integer): PATStringItem;
