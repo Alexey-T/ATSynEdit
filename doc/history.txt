@@ -1,4 +1,7 @@
 
+2018.11.07
++ add: event OnCalcTabSize to support Elastic Tabstops
+
 2018.10.28
 + add: property OptSavingTrimFinalEmptyLines
 
