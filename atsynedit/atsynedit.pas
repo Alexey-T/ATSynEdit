@@ -1044,11 +1044,11 @@ type
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoCaretForceShow;
-    function CaretPosToClientPos(P: TPoint): TPoint;
+    function CaretPosToClientPos(P: TPoint): TPoint; inline;
     function ClientPosToCaretPos(P: TPoint;
       out ADetails: TATPosDetails;
-      AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
-    function IsLineWithCaret(ALine: integer): boolean;
+      AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint; inline;
+    function IsLineWithCaret(ALine: integer): boolean; inline;
     //goto
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;

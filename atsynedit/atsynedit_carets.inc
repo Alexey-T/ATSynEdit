@@ -363,7 +363,7 @@ begin
   end;
 end;
 
-function TATSynEdit.CaretPosToClientPos(P: TPoint): TPoint;
+function TATSynEdit.CaretPosToClientPos(P: TPoint): TPoint; inline;
 begin
   Result:= _DoCaretPosToClientPos(P,
     FWrapInfo,
@@ -380,7 +380,7 @@ end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TPoint;
   out ADetails: TATPosDetails;
-  AGapCoordAction: TATGapCoordAction = cGapCoordToLineEnd): TPoint;
+  AGapCoordAction: TATGapCoordAction = cGapCoordToLineEnd): TPoint; inline;
 begin
   Result:= _DoClientPosToCaretPos(P,
     FWrapInfo,
