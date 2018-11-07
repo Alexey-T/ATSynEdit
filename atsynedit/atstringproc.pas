@@ -44,6 +44,9 @@ var
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
 
 type
+  TATStringTabCalcEvent = function(Sender: TObject; ALineIndex, ACharIndex: integer): integer of object;
+
+type
 
   { TATStringTabHelper }
 
@@ -53,22 +56,24 @@ type
     TabSpaces: boolean;
     TabSize: integer;
     IndentSize: integer;
-    function CalcTabulationSize(APos: integer): integer;
-    function TabsToSpaces(const S: atString): atString;
-    function TabsToSpaces_Length(const S: atString; AMaxLen: integer=-1): integer;
-    function SpacesToTabs(const S: atString): atString;
-    function GetIndentExpanded(const S: atString): integer;
-    function CharPosToColumnPos(const S: atString; APos: integer): integer;
-    function ColumnPosToCharPos(const S: atString; AColumn: integer): integer;
-    function IndentUnindent(const Str: atString; ARight: boolean): atString;
-    procedure CalcCharOffsets(const S: atString; var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
-    function FindWordWrapOffset(const S: atString; AColumns: integer;
+    SenderObj: TObject;
+    OnCalcTabSize: TATStringTabCalcEvent;
+    function CalcTabulationSize(ALineIndex, APos: integer): integer;
+    function TabsToSpaces(ALineIndex: integer; const S: atString): atString;
+    function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: integer=-1): integer;
+    function SpacesToTabs(ALineIndex: integer; const S: atString): atString;
+    function GetIndentExpanded(ALineIndex: integer; const S: atString): integer;
+    function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
+    function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
+    function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
+    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
+    function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
       const AWordChars: atString; AWrapIndented: boolean): integer;
-    function FindClickedPosition(const Str: atString;
+    function FindClickedPosition(ALineIndex: integer; const Str: atString;
       APixelsFromLeft, ACharSize: integer;
       AAllowVirtualPos: boolean;
       out AEndOfLinePos: boolean): integer;
-    procedure FindOutputSkipOffset(const S: atString; AScrollPos: integer;
+    procedure FindOutputSkipOffset(ALineIndex: integer; const S: atString; AScrollPos: integer;
       out ACharsSkipped: integer; out ASpacesSkipped: integer);
   end;
 
@@ -246,7 +251,7 @@ begin
   ShowMessage('Offsets'#10+s);
 end;
 
-function TATStringTabHelper.FindWordWrapOffset(const S: atString; AColumns: integer;
+function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
   //
   //override IsCharWord to check also commas,dots,quotes
@@ -265,7 +270,7 @@ begin
   if AColumns<OptMinWordWrapOffset then
     begin Result:= AColumns; Exit end;
 
-  CalcCharOffsets(S, Offsets);
+  CalcCharOffsets(ALineIndex, S, Offsets);
 
   if Offsets[High(Offsets)]<=AColumns*100 then
   begin
@@ -340,8 +345,11 @@ begin
   end;
 end;
 
-function TATStringTabHelper.CalcTabulationSize(APos: integer): integer;
+function TATStringTabHelper.CalcTabulationSize(ALineIndex, APos: integer): integer;
 begin
+  if Assigned(OnCalcTabSize) then
+    Result:= OnCalcTabSize(SenderObj, ALineIndex, APos)
+  else
   if APos<=OptMaxTabPositionToExpand then
     Result:= TabSize - (APos-1) mod TabSize
   else
@@ -349,7 +357,7 @@ begin
 end;
 
 
-function TATStringTabHelper.GetIndentExpanded(const S: atString): integer;
+function TATStringTabHelper.GetIndentExpanded(ALineIndex: integer; const S: atString): integer;
 var
   ch: atChar;
   i: integer;
@@ -362,12 +370,12 @@ begin
     if ch<>#9 then
       Inc(Result)
     else
-      Inc(Result, CalcTabulationSize(Result+1));
+      Inc(Result, CalcTabulationSize(ALineIndex, Result+1));
   end;
 end;
 
 
-function TATStringTabHelper.TabsToSpaces(const S: atString): atString;
+function TATStringTabHelper.TabsToSpaces(ALineIndex: integer; const S: atString): atString;
 var
   N, NSize: integer;
 begin
@@ -376,7 +384,7 @@ begin
   repeat
     N:= PosEx(#9, Result, N+1);
     if N=0 then Break;
-    NSize:= CalcTabulationSize(N);
+    NSize:= CalcTabulationSize(ALineIndex, N);
     if NSize<2 then
       Result[N]:= ' '
     else
@@ -387,7 +395,8 @@ begin
   until false;
 end;
 
-function TATStringTabHelper.TabsToSpaces_Length(const S: atString; AMaxLen: integer=-1): integer;
+function TATStringTabHelper.TabsToSpaces_Length(ALineIndex: integer; const S: atString;
+  AMaxLen: integer): integer;
 var
   i: integer;
 begin
@@ -398,13 +407,12 @@ begin
     if S[i]<>#9 then
       Inc(Result)
     else
-      Inc(Result, CalcTabulationSize(Result+1));
+      Inc(Result, CalcTabulationSize(ALineIndex, Result+1));
 end;
 
 
-procedure TATStringTabHelper.CalcCharOffsets(const S: atString;
-  var AInfo: TATLineOffsetsInfo;
-  ACharsSkipped: integer);
+procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
+  var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer);
 var
   NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
@@ -427,7 +435,7 @@ begin
       NSize:= 1
     else
     begin
-      NTabSize:= CalcTabulationSize(NCharsSkipped);
+      NTabSize:= CalcTabulationSize(ALineIndex, NCharsSkipped);
       NSize:= NTabSize;
       Inc(NCharsSkipped, NTabSize-1);
     end;
@@ -442,10 +450,8 @@ begin
   end;
 end;
 
-function TATStringTabHelper.FindClickedPosition(const Str: atString;
-  APixelsFromLeft, ACharSize: integer;
-  AAllowVirtualPos: boolean;
-  out AEndOfLinePos: boolean): integer;
+function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString; APixelsFromLeft,
+  ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
 var
   ListOffsets: TATLineOffsetsInfo;
   ListEnds, ListMid: TATIntArray;
@@ -463,7 +469,7 @@ begin
 
   SetLength(ListEnds, Length(Str));
   SetLength(ListMid, Length(Str));
-  CalcCharOffsets(Str, ListOffsets);
+  CalcCharOffsets(ALineIndex, Str, ListOffsets);
 
   //positions of each char end
   for i:= 0 to High(ListEnds) do
@@ -490,8 +496,8 @@ begin
     Result:= Length(Str)+1;
 end;
 
-procedure TATStringTabHelper.FindOutputSkipOffset(const S: atString; AScrollPos: integer;
-  out ACharsSkipped: integer; out ASpacesSkipped: integer);
+procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
+  AScrollPos: integer; out ACharsSkipped: integer; out ASpacesSkipped: integer);
 var
   Offsets: TATLineOffsetsInfo;
 begin
@@ -499,7 +505,7 @@ begin
   ASpacesSkipped:= 0;
   if (S='') or (AScrollPos=0) then Exit;
 
-  CalcCharOffsets(S, Offsets);
+  CalcCharOffsets(ALineIndex, S, Offsets);
 
   while (ACharsSkipped<Length(S)) and
     (Offsets[ACharsSkipped] < AScrollPos*100) do
@@ -547,20 +553,22 @@ begin
     (Pos(#10, S)>0);
 end;
 
-function TATStringTabHelper.SpacesToTabs(const S: atString): atString; inline;
+function TATStringTabHelper.SpacesToTabs(ALineIndex: integer; const S: atString): atString;
 begin
   Result:= StringReplace(S, StringOfChar(' ', TabSize), #9, [rfReplaceAll]);
 end;
 
-function TATStringTabHelper.CharPosToColumnPos(const S: atString; APos: integer): integer;
+function TATStringTabHelper.CharPosToColumnPos(ALineIndex: integer; const S: atString;
+  APos: integer): integer;
 begin
   if APos>Length(S) then
-    Result:= TabsToSpaces_Length(S) + APos-Length(S)
+    Result:= TabsToSpaces_Length(ALineIndex, S) + APos-Length(S)
   else
-    Result:= TabsToSpaces_Length(S, APos);
+    Result:= TabsToSpaces_Length(ALineIndex, S, APos);
 end;
 
-function TATStringTabHelper.ColumnPosToCharPos(const S: atString; AColumn: integer): integer;
+function TATStringTabHelper.ColumnPosToCharPos(ALineIndex: integer; const S: atString;
+  AColumn: integer): integer;
 var
   size, i: integer;
 begin
@@ -573,12 +581,12 @@ begin
     if S[i]<>#9 then
       Inc(size)
     else
-      Inc(size, CalcTabulationSize(size+1));
+      Inc(size, CalcTabulationSize(ALineIndex, size+1));
     if size>=AColumn then
       exit(i);
   end;
 
-  Result:= AColumn - TabsToSpaces_Length(S, TabSize) + Length(S);
+  Result:= AColumn - TabsToSpaces_Length(ALineIndex, S, TabSize) + Length(S);
 end;
 
 function SStringHasTab(const S: atString): boolean; inline;
@@ -619,7 +627,8 @@ begin
 end;
 
 
-function TATStringTabHelper.IndentUnindent(const Str: atString; ARight: boolean): atString;
+function TATStringTabHelper.IndentUnindent(ALineIndex: integer; const Str: atString;
+  ARight: boolean): atString;
 var
   StrIndent, StrText: atString;
   DecSpaces, N: integer;
@@ -658,13 +667,13 @@ begin
     StrText:= Copy(Str, N+1, MaxInt);
     DoTabs:= SStringHasTab(StrIndent);
 
-    StrIndent:= TabsToSpaces(StrIndent);
+    StrIndent:= TabsToSpaces(ALineIndex, StrIndent);
     if DecSpaces>Length(StrIndent) then
       DecSpaces:= Length(StrIndent);
     Delete(StrIndent, 1, DecSpaces);
 
     if DoTabs then
-      StrIndent:= SpacesToTabs(StrIndent);
+      StrIndent:= SpacesToTabs(ALineIndex, StrIndent);
     Result:= StrIndent+StrText;
   end;
 end;

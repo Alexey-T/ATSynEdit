@@ -87,6 +87,7 @@ type
   TATCanvasTextOutProps = record
     NeedOffsets: TATFontNeedsOffsets;
     TabHelper: TATStringTabHelper;
+    LineIndex: integer;
     CharSize: TPoint;
     MainTextArea: boolean;
     CharsSkipped: integer;
@@ -138,7 +139,7 @@ procedure DoPaintUnprintedEol(C: TCanvas;
   AColorFont, AColorBG: TColor;
   ADetails: boolean);
 
-function CanvasTextWidth(const S: atString; ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer;
+function CanvasTextWidth(const S: atString; ALineIndex: integer; ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer;
 function CanvasFontSizes(C: TCanvas): TPoint;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer);
@@ -604,13 +605,14 @@ begin
   Result.Y:= Size.cy;
 end;
 
-function CanvasTextWidth(const S: atString; ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer;
+function CanvasTextWidth(const S: atString; ALineIndex: integer; ATabHelper: TATStringTabHelper;
+  ACharSize: TPoint): integer;
 var
   Offsets: TATLineOffsetsInfo;
 begin
   Result:= 0;
   if S='' then Exit;
-  ATabHelper.CalcCharOffsets(S, Offsets);
+  ATabHelper.CalcCharOffsets(ALineIndex, S, Offsets);
   Result:= Offsets[High(Offsets)] * ACharSize.X div 100;
 end;
 
@@ -661,7 +663,7 @@ begin
   SetLength(ListInt, Length(AText));
   SetLength(Dx, Length(AText));
 
-  AProps.TabHelper.CalcCharOffsets(AText, ListOffsets, AProps.CharsSkipped);
+  AProps.TabHelper.CalcCharOffsets(AProps.LineIndex, AText, ListOffsets, AProps.CharsSkipped);
 
   for i:= 0 to High(ListOffsets) do
     ListInt[i]:= ListOffsets[i] * AProps.CharSize.X div 100;

@@ -196,7 +196,7 @@ begin
     else
     begin
       Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-      NWidth:= CanvasTextWidth(Str, ATabHelper, ACharSize);
+      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize);
     end;
 
     Result.X:= NWidth;
@@ -354,8 +354,14 @@ begin
     begin
       AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
       NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
-      Result.X:= ATabHelper.FindClickedPosition(Str, NPixels, ACharSize.X,
-        AllowVirtual, ADetails.EndOfWrappedLine) + Item.NCharIndex - 2;
+      Result.X:= ATabHelper.FindClickedPosition(
+        Result.Y,
+        Str,
+        NPixels,
+        ACharSize.X,
+        AllowVirtual,
+        ADetails.EndOfWrappedLine)
+        + Item.NCharIndex - 2;
     end;
 
     if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol

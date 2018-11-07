@@ -1082,7 +1082,7 @@ begin
 
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabHelper.TabSize);
-  Result:= ATabHelper.ColumnPosToCharPos(SLine, AX);
+  Result:= ATabHelper.ColumnPosToCharPos(AIndex, SLine, AX);
 end;
 
 function TATStrings.CharPosToColumnPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
@@ -1093,7 +1093,7 @@ begin
 
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabHelper.TabSize);
-  Result:= ATabHelper.CharPosToColumnPos(SLine, AX);
+  Result:= ATabHelper.CharPosToColumnPos(AIndex, SLine, AX);
 end;
 
 function TATStrings.GetItemPtr(AIndex: integer): PATStringItem;

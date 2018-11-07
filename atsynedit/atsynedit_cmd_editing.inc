@@ -618,7 +618,7 @@ begin
   begin
     Str:= Strings.Lines[i];
     if Trim(Str)='' then Continue;
-    NMinSpaces:= Min(NMinSpaces, FTabHelper.GetIndentExpanded(Str));
+    NMinSpaces:= Min(NMinSpaces, FTabHelper.GetIndentExpanded(i, Str));
   end;
   if NMinSpaces=MaxInt then Exit;
 
@@ -640,7 +640,7 @@ begin
     begin
       Str:= Strings.Lines[i];
       if Trim(Str)='' then Continue;
-      Str:= FTabHelper.IndentUnindent(Str, ARight);
+      Str:= FTabHelper.IndentUnindent(i, Str, ARight);
       if Strings.Lines[i]<>Str then
         Strings.Lines[i]:= Str;
     end;
@@ -696,6 +696,7 @@ begin
 
       Str:= Copy(Str, 1, NIndentAtCol) +
             FTabHelper.IndentUnindent(
+              i,
               Copy(Str, NIndentAtCol+1, MaxInt),
               ARight);
 

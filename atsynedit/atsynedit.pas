@@ -681,6 +681,7 @@ type
     function GetMinimapSelTop: integer;
     function GetMinimap_PercentToWrapIndex(APosY: integer): integer;
     function GetMinimap_PosToWrapIndex(APosY: integer): integer;
+    function GetOnTabCalcSize: TATStringTabCalcEvent;
     function GetOptTextOffsetTop: integer;
     function GetRectMinimapSel: TRect;
     procedure InitResourcesFoldbar;
@@ -815,6 +816,7 @@ type
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
     procedure SetOneLine(AValue: boolean);
+    procedure SetOnTabCalcSize(AValue: TATStringTabCalcEvent);
     procedure SetOptScrollbarsNewArrowsKind(AValue: TATScrollArrowsKind);
     procedure SetReadOnly(AValue: boolean);
     procedure SetLineTop(AValue: integer);
@@ -1223,6 +1225,7 @@ type
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
     property OnCalcHilite: TATSynEditCalcHiliteEvent read FOnCalcHilite write FOnCalcHilite;
     property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
+    property OnCalcTabSize: TATStringTabCalcEvent read GetOnTabCalcSize write SetOnTabCalcSize;
     property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
     property OnBeforeCalcHilite: TNotifyEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
     property OnPaste: TATSynEditPasteEvent read FOnPaste write FOnPaste;
@@ -1729,6 +1732,7 @@ begin
 
   repeat
     NLen:= FTabHelper.FindWordWrapOffset(
+      ALine,
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
       Copy(Str, 1, NVisColumns),
@@ -1747,7 +1751,7 @@ begin
     if FWrapIndented then
       if NOffset=1 then
       begin
-        NIndent:= FTabHelper.GetIndentExpanded(Str);
+        NIndent:= FTabHelper.GetIndentExpanded(ALine, Str);
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
@@ -2283,7 +2287,12 @@ begin
       if Strings.LinesLenRaw[NLinesIndex] > FOptMaxLineLengthForSlowWidthDetect then
         NOutputStrWidth:= Strings.LinesLen[NLinesIndex] //approx len, it don't consider CJK chars
       else
-        NOutputStrWidth:= CanvasTextWidth(Strings.Lines[NLinesIndex], FTabHelper, Point(1, 1)); //(1,1): need width in chars
+        NOutputStrWidth:= CanvasTextWidth(
+            Strings.Lines[NLinesIndex],
+            NLinesIndex,
+            FTabHelper,
+            Point(1, 1) //(1,1): need width in chars
+            );
       AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + cScrollbarHorzAddChars);
     end;
 
@@ -2324,7 +2333,12 @@ begin
       NOutputSpacesSkipped:= 0;
       if FWrapInfo.IsItemInitial(NWrapIndex) then
       begin
-        FTabHelper.FindOutputSkipOffset(StrOut, AScrollHorz.NPos, NOutputCharsSkipped, NOutputSpacesSkipped);
+        FTabHelper.FindOutputSkipOffset(
+          NLinesIndex,
+          StrOut,
+          AScrollHorz.NPos,
+          NOutputCharsSkipped,
+          NOutputSpacesSkipped);
         Delete(StrOut, 1, NOutputCharsSkipped);
         Delete(StrOut, cMaxCharsForOutput, MaxInt);
         Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
@@ -2379,6 +2393,7 @@ begin
       begin
         TextOutProps.NeedOffsets:= FFontNeedsOffsets;
         TextOutProps.TabHelper:= FTabHelper;
+        TextOutProps.LineIndex:= NLinesIndex;
         TextOutProps.CharSize:= ACharSize;
         TextOutProps.MainTextArea:= AMainText;
         TextOutProps.CharsSkipped:= NOutputSpacesSkipped;
@@ -2659,6 +2674,11 @@ begin
     Result:= -1;
 end;
 
+function TATSynEdit.GetOnTabCalcSize: TATStringTabCalcEvent;
+begin
+  Result:= FTabHelper.OnCalcTabSize;
+end;
+
 function TATSynEdit.GetOptTextOffsetTop: integer;
 begin
   if ModeOneLine then
@@ -2777,7 +2797,7 @@ begin
   SReplaceAll(Str, #10, '');
     //todo: for some reason, for Python, for "if/for" blocks, text has #10 at AMarkText begin
     //this is workaround
-  Str:= FTabHelper.TabsToSpaces(Str);
+  Str:= FTabHelper.TabsToSpaces(-1, Str);
     //expand tabs too
 
   Inc(ACoord.X, cFoldedMarkIndentOuter);
@@ -3438,6 +3458,11 @@ begin
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
   end;
+end;
+
+procedure TATSynEdit.SetOnTabCalcSize(AValue: TATStringTabCalcEvent);
+begin
+  FTabHelper.OnCalcTabSize:= AValue;
 end;
 
 procedure TATSynEdit.SetOptScrollbarsNewArrowsKind(AValue: TATScrollArrowsKind);
@@ -5173,7 +5198,7 @@ begin
   NChars:= Min(APosX, NChars); //limit indent by x-pos
 
   StrIndent:= Copy(StrPrev, 1, NChars);
-  NSpaces:= Length(FTabHelper.TabsToSpaces(StrIndent));
+  NSpaces:= Length(FTabHelper.TabsToSpaces(APosY, StrIndent));
 
   case FOptAutoIndentKind of
     cIndentAsPrevLine:
@@ -5655,7 +5680,7 @@ begin
     if (P1.Y<0) and (Range.Y>=nLineFrom) then Continue;
     if (P2.Y<0) and (Range.Y2>=nLineFrom) then Continue;
 
-    NIndent:= FTabHelper.GetIndentExpanded(Strings.Lines[Range.Y]);
+    NIndent:= FTabHelper.GetIndentExpanded(Range.Y, Strings.Lines[Range.Y]);
     Inc(P1.X, NIndent*ACharSize.X);
     Inc(P2.X, NIndent*ACharSize.X);
 
@@ -6096,6 +6121,7 @@ begin
       false,
       NColorAfter);
 
+    TextOutProps.LineIndex:= WrapItem.NLineIndex;
     CanvasTextOut(C,
       cSizeIndentTooltipX,
       cSizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
@@ -6254,6 +6280,7 @@ begin
   FTabHelper.TabSpaces:= OptTabSpaces;
   FTabHelper.TabSize:= OptTabSize;
   FTabHelper.IndentSize:= OptIndentSize;
+  FTabHelper.SenderObj:= Self;
 end;
 
 {$I atsynedit_carets.inc}
