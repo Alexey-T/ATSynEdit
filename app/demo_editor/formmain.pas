@@ -213,6 +213,7 @@ type
     procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
     procedure EditStringsChange(Sender: TObject; ALine: integer;
       AChange: TATLineChangeKind);
+    function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean);
@@ -323,6 +324,7 @@ begin
   ed.OnHotspotEnter:= @EditHotspotEnter;
   ed.OnHotspotExit:= @EditHotspotExit;
   ed.OnKeyDown:= @EditKeyDown;
+  ////ed.OnCalcTabSize:= @EditCalcTabSize;
 
   ed.SetFocus;
 
@@ -1144,6 +1146,15 @@ begin
     cEvent[AChange],
     ALine
     ]));
+end;
+
+function TfmMain.EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
+begin
+  if ALineIndex<10 then Result:= 8
+  else
+  if ALineIndex<20 then Result:= 2
+  else
+    Result:= 4;
 end;
 
 procedure TfmMain.MenuEncClick(Sender: TObject);
