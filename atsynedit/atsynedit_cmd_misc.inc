@@ -169,7 +169,7 @@ begin
     for i:= 0 to Strings.Count-1 do
     begin
       S1:= Strings.Lines[i];
-      if Pos(#9, S1)=0 then Continue;
+      if not SStringHasTab(S1) then Continue;
 
       S2:= STabsToSpaces(S1, OptTabSize);
       if S1<>S2 then

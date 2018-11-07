@@ -773,7 +773,7 @@ begin
       bAllowLigatures:=
         AProps.ShowFontLigatures
         and IsStringSymbolsOnly(BufW) //disable if unicode chars
-        and (Pos(#9, BufW)=0); //disable if tab-chars
+        and not SStringHasTab(BufW); //disable if tab-chars
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
         DxPointer:= @Dx[PartOffset]
