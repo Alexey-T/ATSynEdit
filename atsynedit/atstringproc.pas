@@ -586,7 +586,8 @@ begin
       exit(i);
   end;
 
-  Result:= AColumn - TabsToSpaces_Length(ALineIndex, S, TabSize) + Length(S);
+  //column is too big, after line end
+  Result:= AColumn - size + Length(S);
 end;
 
 function SStringHasTab(const S: atString): boolean; inline;
