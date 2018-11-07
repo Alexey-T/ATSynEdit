@@ -161,6 +161,7 @@ type
     FListUpdatesHard: boolean;
     FGaps: TATSynGaps;
     FBookmarks: TATBookmarks;
+    FTabHelper: TATStringTabHelper;
     FGutterDecor1: TATGutterDecor;
     FGutterDecor2: TATGutterDecor;
     FUndoList,
@@ -775,6 +776,7 @@ begin
   FRedoList:= TATUndoList.Create;
   FGaps:= TATSynGaps.Create;
   FBookmarks:= TATBookmarks.Create;
+  FTabHelper:= TATStringTabHelper.Create;
 
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
@@ -812,6 +814,7 @@ begin
 
   Clear;
   FreeAndNil(FList);
+  FreeAndNil(FTabHelper);
   FreeAndNil(FBookmarks);
   FreeAndNil(FGaps);
   FreeAndNil(FListUpdates);
@@ -1083,7 +1086,8 @@ begin
 
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabSize);
-  Result:= SColumnPosToCharPos(SLine, AX, ATabSize);
+  FTabHelper.TabSize:= ATabSize;
+  Result:= FTabHelper.ColumnPosToCharPos(SLine, AX);
 end;
 
 function TATStrings.CharPosToColumnPos(AIndex: integer; AX: integer;
@@ -1095,7 +1099,8 @@ begin
 
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabSize);
-  Result:= SCharPosToColumnPos(SLine, AX, ATabSize);
+  FTabHelper.TabSize:= ATabSize;
+  Result:= FTabHelper.CharPosToColumnPos(SLine, AX);
 end;
 
 function TATStrings.GetItemPtr(AIndex: integer): PATStringItem;

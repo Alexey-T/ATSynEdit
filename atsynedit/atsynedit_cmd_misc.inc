@@ -171,7 +171,7 @@ begin
       S1:= Strings.Lines[i];
       if not SStringHasTab(S1) then Continue;
 
-      S2:= STabsToSpaces(S1, OptTabSize);
+      S2:= FTabHelper.TabsToSpaces(S1);
       if S1<>S2 then
         Strings.Lines[i]:= S2;
     end;
@@ -199,7 +199,7 @@ begin
       SBegin:= Copy(S1, 1, N);
       SEnd:= Copy(S1, N+1, MaxInt);
 
-      SBegin2:= SSpacesToTabs(SBegin, OptTabSize);
+      SBegin2:= FTabHelper.SpacesToTabs(SBegin);
       if SBegin2<>SBegin then
         Strings.Lines[i]:= SBegin2+SEnd;
     end;

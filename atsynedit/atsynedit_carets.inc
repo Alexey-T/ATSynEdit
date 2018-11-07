@@ -154,7 +154,7 @@ function _DoCaretPosToClientPos(
   AStrings: TATStrings;
   AGaps: TATSynGaps;
   ACharSize: TPoint;
-  ATabSize: integer;
+  ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   APreferLeftSide: boolean): TPoint;
@@ -196,7 +196,7 @@ begin
     else
     begin
       Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-      NWidth:= CanvasTextWidth(Str, ATabSize, ACharSize);
+      NWidth:= CanvasTextWidth(Str, ATabHelper, ACharSize);
     end;
 
     Result.X:= NWidth;
@@ -233,7 +233,7 @@ function _DoClientPosToCaretPos(
   AStrings: TATStrings;
   AGaps: TATSynGaps;
   ACharSize: TPoint;
-  ATabSize: integer;
+  ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   AVirtualPos: boolean;
@@ -354,7 +354,7 @@ begin
     begin
       AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
       NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
-      Result.X:= SFindClickedPosition(Str, NPixels, ACharSize.X, ATabSize,
+      Result.X:= ATabHelper.FindClickedPosition(Str, NPixels, ACharSize.X,
         AllowVirtual, ADetails.EndOfWrappedLine) + Item.NCharIndex - 2;
     end;
 
@@ -370,7 +370,7 @@ begin
     Strings,
     Gaps,
     FCharSize,
-    FTabSize,
+    FTabHelper,
     FRectMain,
     FScrollHorz,
     FScrollVert,
@@ -387,7 +387,7 @@ begin
     Strings,
     Gaps,
     FCharSize,
-    FTabSize,
+    FTabHelper,
     FRectMain,
     FScrollHorz,
     FScrollVert,

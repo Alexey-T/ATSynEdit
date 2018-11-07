@@ -43,6 +43,34 @@ var
   OptMinWordWrapOffset: integer = 3;
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
 
+type
+
+  { TATStringTabHelper }
+
+  TATStringTabHelper = class
+  private
+  public
+    TabSpaces: boolean;
+    TabSize: integer;
+    IndentSize: integer;
+    function CalcTabulationSize(APos: integer): integer;
+    function TabsToSpaces(const S: atString): atString;
+    function TabsToSpaces_Length(const S: atString; AMaxLen: integer=-1): integer;
+    function SpacesToTabs(const S: atString): atString;
+    function GetIndentExpanded(const S: atString): integer;
+    function CharPosToColumnPos(const S: atString; APos: integer): integer;
+    function ColumnPosToCharPos(const S: atString; AColumn: integer): integer;
+    function IndentUnindent(const Str: atString; ARight: boolean): atString;
+    procedure CalcCharOffsets(const S: atString; var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
+    function FindWordWrapOffset(const S: atString; AColumns: integer;
+      const AWordChars: atString; AWrapIndented: boolean): integer;
+    function FindClickedPosition(const Str: atString;
+      APixelsFromLeft, ACharSize: integer;
+      AAllowVirtualPos: boolean;
+      out AEndOfLinePos: boolean): integer;
+    procedure FindOutputSkipOffset(const S: atString; AScrollPos: integer;
+      out ACharsSkipped: integer; out ASpacesSkipped: integer);
+  end;
 
 function IsCharEol(ch: atChar): boolean; inline;
 function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
@@ -62,15 +90,8 @@ function SEndsWithEol(const S: atString): boolean; inline;
 
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
-function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
 function SGetIndentCharsToOpeningBracket(const S: atString): integer;
 function SGetNonSpaceLength(const S: atString): integer;
-
-function STabsToSpaces(const S: atString; ATabSize: integer): atString;
-function STabsToSpaces_Length(const S: atString; ATabSize: integer; AMaxLen: integer=-1): integer;
-function SSpacesToTabs(const S: atString; ATabSize: integer): atString; inline;
-function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
-function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
 
 function SStringHasTab(const S: atString): boolean; inline;
 function SStringHasTab(const S: string): boolean; inline;
@@ -81,20 +102,6 @@ function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
 
-procedure SCalcCharOffsets(const S: atString; var AInfo: TATLineOffsetsInfo;
-  ATabSize: integer; ACharsSkipped: integer = 0);
-function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
-  const AWordChars: atString; AWrapIndented: boolean): integer;
-function SFindClickedPosition(const Str: atString;
-  APixelsFromLeft, ACharSize, ATabSize: integer;
-  AAllowVirtualPos: boolean;
-  out AEndOfLinePos: boolean): integer;
-procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
-  out ACharsSkipped: integer; out ASpacesSkipped: integer);
-
-function SIndentUnindent(const Str: atString; ARight: boolean;
-  AIndentSize, ATabSize: integer;
-  ATabSpaces: boolean): atString;
 function SGetItem(var S: string; const ch: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
 function SWithBreaks(const S: atString): boolean; inline;
@@ -239,7 +246,7 @@ begin
   ShowMessage('Offsets'#10+s);
 end;
 
-function SFindWordWrapOffset(const S: atString; AColumns, ATabSize: integer;
+function TATStringTabHelper.FindWordWrapOffset(const S: atString; AColumns: integer;
   const AWordChars: atString; AWrapIndented: boolean): integer;
   //
   //override IsCharWord to check also commas,dots,quotes
@@ -258,7 +265,7 @@ begin
   if AColumns<OptMinWordWrapOffset then
     begin Result:= AColumns; Exit end;
 
-  SCalcCharOffsets(S, Offsets, ATabSize);
+  CalcCharOffsets(S, Offsets);
 
   if Offsets[High(Offsets)]<=AColumns*100 then
   begin
@@ -333,16 +340,16 @@ begin
   end;
 end;
 
-function SCalcTabulationSize(ATabSize, APos: integer): integer; inline;
+function TATStringTabHelper.CalcTabulationSize(APos: integer): integer;
 begin
   if APos<=OptMaxTabPositionToExpand then
-    Result:= ATabSize - (APos-1) mod ATabSize
+    Result:= TabSize - (APos-1) mod TabSize
   else
     Result:= 1;
 end;
 
 
-function SGetIndentExpanded(const S: atString; ATabSize: integer): integer;
+function TATStringTabHelper.GetIndentExpanded(const S: atString): integer;
 var
   ch: atChar;
   i: integer;
@@ -355,12 +362,12 @@ begin
     if ch<>#9 then
       Inc(Result)
     else
-      Inc(Result, SCalcTabulationSize(ATabSize, Result+1));
+      Inc(Result, CalcTabulationSize(Result+1));
   end;
 end;
 
 
-function STabsToSpaces(const S: atString; ATabSize: integer): atString;
+function TATStringTabHelper.TabsToSpaces(const S: atString): atString;
 var
   N, NSize: integer;
 begin
@@ -369,7 +376,7 @@ begin
   repeat
     N:= PosEx(#9, Result, N+1);
     if N=0 then Break;
-    NSize:= SCalcTabulationSize(ATabSize, N);
+    NSize:= CalcTabulationSize(N);
     if NSize<2 then
       Result[N]:= ' '
     else
@@ -380,7 +387,7 @@ begin
   until false;
 end;
 
-function STabsToSpaces_Length(const S: atString; ATabSize: integer; AMaxLen: integer=-1): integer;
+function TATStringTabHelper.TabsToSpaces_Length(const S: atString; AMaxLen: integer=-1): integer;
 var
   i: integer;
 begin
@@ -391,13 +398,13 @@ begin
     if S[i]<>#9 then
       Inc(Result)
     else
-      Inc(Result, SCalcTabulationSize(ATabSize, Result+1));
+      Inc(Result, CalcTabulationSize(Result+1));
 end;
 
 
-procedure SCalcCharOffsets(const S: atString;
+procedure TATStringTabHelper.CalcCharOffsets(const S: atString;
   var AInfo: TATLineOffsetsInfo;
-  ATabSize: integer; ACharsSkipped: integer);
+  ACharsSkipped: integer);
 var
   NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
@@ -420,7 +427,7 @@ begin
       NSize:= 1
     else
     begin
-      NTabSize:= SCalcTabulationSize(ATabSize, NCharsSkipped);
+      NTabSize:= CalcTabulationSize(NCharsSkipped);
       NSize:= NTabSize;
       Inc(NCharsSkipped, NTabSize-1);
     end;
@@ -435,8 +442,8 @@ begin
   end;
 end;
 
-function SFindClickedPosition(const Str: atString;
-  APixelsFromLeft, ACharSize, ATabSize: integer;
+function TATStringTabHelper.FindClickedPosition(const Str: atString;
+  APixelsFromLeft, ACharSize: integer;
   AAllowVirtualPos: boolean;
   out AEndOfLinePos: boolean): integer;
 var
@@ -456,7 +463,7 @@ begin
 
   SetLength(ListEnds, Length(Str));
   SetLength(ListMid, Length(Str));
-  SCalcCharOffsets(Str, ListOffsets, ATabSize);
+  CalcCharOffsets(Str, ListOffsets);
 
   //positions of each char end
   for i:= 0 to High(ListEnds) do
@@ -483,7 +490,7 @@ begin
     Result:= Length(Str)+1;
 end;
 
-procedure SFindOutputSkipOffset(const S: atString; ATabSize, AScrollPos: integer;
+procedure TATStringTabHelper.FindOutputSkipOffset(const S: atString; AScrollPos: integer;
   out ACharsSkipped: integer; out ASpacesSkipped: integer);
 var
   Offsets: TATLineOffsetsInfo;
@@ -492,7 +499,7 @@ begin
   ASpacesSkipped:= 0;
   if (S='') or (AScrollPos=0) then Exit;
 
-  SCalcCharOffsets(S, Offsets, ATabSize);
+  CalcCharOffsets(S, Offsets);
 
   while (ACharsSkipped<Length(S)) and
     (Offsets[ACharsSkipped] < AScrollPos*100) do
@@ -540,20 +547,20 @@ begin
     (Pos(#10, S)>0);
 end;
 
-function SSpacesToTabs(const S: atString; ATabSize: integer): atString; inline;
+function TATStringTabHelper.SpacesToTabs(const S: atString): atString; inline;
 begin
-  Result:= StringReplace(S, StringOfChar(' ', ATabSize), #9, [rfReplaceAll]);
+  Result:= StringReplace(S, StringOfChar(' ', TabSize), #9, [rfReplaceAll]);
 end;
 
-function SCharPosToColumnPos(const S: atString; APos, ATabSize: integer): integer;
+function TATStringTabHelper.CharPosToColumnPos(const S: atString; APos: integer): integer;
 begin
   if APos>Length(S) then
-    Result:= STabsToSpaces_Length(S, ATabSize) + APos-Length(S)
+    Result:= TabsToSpaces_Length(S) + APos-Length(S)
   else
-    Result:= STabsToSpaces_Length(S, ATabSize, APos);
+    Result:= TabsToSpaces_Length(S, APos);
 end;
 
-function SColumnPosToCharPos(const S: atString; AColumn, ATabSize: integer): integer;
+function TATStringTabHelper.ColumnPosToCharPos(const S: atString; AColumn: integer): integer;
 var
   size, i: integer;
 begin
@@ -566,12 +573,12 @@ begin
     if S[i]<>#9 then
       Inc(size)
     else
-      Inc(size, SCalcTabulationSize(ATabSize, size+1));
+      Inc(size, CalcTabulationSize(size+1));
     if size>=AColumn then
       exit(i);
   end;
 
-  Result:= AColumn - STabsToSpaces_Length(S, ATabSize) + Length(S);
+  Result:= AColumn - TabsToSpaces_Length(S, TabSize) + Length(S);
 end;
 
 function SStringHasTab(const S: atString): boolean; inline;
@@ -612,8 +619,7 @@ begin
 end;
 
 
-function SIndentUnindent(const Str: atString; ARight: boolean;
-  AIndentSize, ATabSize: integer; ATabSpaces: boolean): atString;
+function TATStringTabHelper.IndentUnindent(const Str: atString; ARight: boolean): atString;
 var
   StrIndent, StrText: atString;
   DecSpaces, N: integer;
@@ -621,26 +627,26 @@ var
 begin
   Result:= Str;
 
-  if AIndentSize=0 then
+  if IndentSize=0 then
   begin
-    if ATabSpaces then
-      StrIndent:= StringOfChar(' ', ATabSize)
+    if TabSpaces then
+      StrIndent:= StringOfChar(' ', TabSize)
     else
       StrIndent:= #9;
-    DecSpaces:= ATabSize;
+    DecSpaces:= TabSize;
   end
   else
-  if AIndentSize>0 then
+  if IndentSize>0 then
   begin
     //use spaces
-    StrIndent:= StringOfChar(' ', AIndentSize);
-    DecSpaces:= AIndentSize;
+    StrIndent:= StringOfChar(' ', IndentSize);
+    DecSpaces:= IndentSize;
   end
   else
   begin
     //indent<0 - use tabs
-    StrIndent:= StringOfChar(#9, Abs(AIndentSize));
-    DecSpaces:= Abs(AIndentSize)*ATabSize;
+    StrIndent:= StringOfChar(#9, Abs(IndentSize));
+    DecSpaces:= Abs(IndentSize)*TabSize;
   end;
 
   if ARight then
@@ -652,13 +658,13 @@ begin
     StrText:= Copy(Str, N+1, MaxInt);
     DoTabs:= SStringHasTab(StrIndent);
 
-    StrIndent:= STabsToSpaces(StrIndent, ATabSize);
+    StrIndent:= TabsToSpaces(StrIndent);
     if DecSpaces>Length(StrIndent) then
       DecSpaces:= Length(StrIndent);
     Delete(StrIndent, 1, DecSpaces);
 
     if DoTabs then
-      StrIndent:= SSpacesToTabs(StrIndent, ATabSize);
+      StrIndent:= SpacesToTabs(StrIndent);
     Result:= StrIndent+StrText;
   end;
 end;

@@ -349,6 +349,7 @@ type
     FMarginList: TList;
     FStringsInt,
     FStringsExternal: TATStrings;
+    FTabHelper: TATStringTabHelper;
     FAdapterHilite: TATAdapterHilite;
     FAdapterCache: TATAdapterHiliteCache;
     FFold: TATSynRanges;
@@ -830,11 +831,13 @@ type
     function GetPageLines: integer;
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
+    procedure SetTabSpaces(AValue: boolean);
     procedure SetText(const AValue: atString);
     procedure SetUndoAfterSave(AValue: boolean);
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
+    procedure UpdateTabHelper;
     procedure UpdateCursor;
     procedure UpdateGutterAutosize(C: TCanvas);
     procedure UpdateMinimapAutosize(C: TCanvas);
@@ -989,6 +992,7 @@ type
     property Gaps: TATSynGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
+    property TabHelper: TATStringTabHelper read FTabHelper;
     property WrapInfo: TATSynWrapInfo read FWrapInfo;
     property ScrollVert: TATSynScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATSynScrollInfo read FScrollHorz write FScrollHorz;
@@ -1239,7 +1243,7 @@ type
 
     //options
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
-    property OptTabSpaces: boolean read FOptTabSpaces write FOptTabSpaces default false;
+    property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
@@ -1724,12 +1728,11 @@ begin
   NIndent:= 0;
 
   repeat
-    NLen:= SFindWordWrapOffset(
+    NLen:= FTabHelper.FindWordWrapOffset(
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
       Copy(Str, 1, NVisColumns),
       Max(FWrapColumn-NIndent, cMinWrapColumnAbs),
-      FTabSize,
       FOptWordChars,
       FWrapIndented);
 
@@ -1744,7 +1747,7 @@ begin
     if FWrapIndented then
       if NOffset=1 then
       begin
-        NIndent:= SGetIndentExpanded(Str, FTabSize);
+        NIndent:= FTabHelper.GetIndentExpanded(Str);
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
@@ -1784,6 +1787,14 @@ begin
   if FTabSize=AValue then Exit;
   FTabSize:= Min(cMaxTabSize, Max(cMinTabSize, AValue));
   FWrapUpdateNeeded:= true;
+  UpdateTabHelper;
+end;
+
+procedure TATSynEdit.SetTabSpaces(AValue: boolean);
+begin
+  if FOptTabSpaces=AValue then Exit;
+  FOptTabSpaces:= AValue;
+  UpdateTabHelper;
 end;
 
 procedure TATSynEdit.SetText(const AValue: atString);
@@ -2272,7 +2283,7 @@ begin
       if Strings.LinesLenRaw[NLinesIndex] > FOptMaxLineLengthForSlowWidthDetect then
         NOutputStrWidth:= Strings.LinesLen[NLinesIndex] //approx len, it don't consider CJK chars
       else
-        NOutputStrWidth:= CanvasTextWidth(Strings.Lines[NLinesIndex], FTabSize, Point(1, 1)); //(1,1): need width in chars
+        NOutputStrWidth:= CanvasTextWidth(Strings.Lines[NLinesIndex], FTabHelper, Point(1, 1)); //(1,1): need width in chars
       AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + cScrollbarHorzAddChars);
     end;
 
@@ -2313,7 +2324,7 @@ begin
       NOutputSpacesSkipped:= 0;
       if FWrapInfo.IsItemInitial(NWrapIndex) then
       begin
-        SFindOutputSkipOffset(StrOut, FTabSize, AScrollHorz.NPos, NOutputCharsSkipped, NOutputSpacesSkipped);
+        FTabHelper.FindOutputSkipOffset(StrOut, AScrollHorz.NPos, NOutputCharsSkipped, NOutputSpacesSkipped);
         Delete(StrOut, 1, NOutputCharsSkipped);
         Delete(StrOut, cMaxCharsForOutput, MaxInt);
         Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
@@ -2367,7 +2378,7 @@ begin
       if AMainText then
       begin
         TextOutProps.NeedOffsets:= FFontNeedsOffsets;
-        TextOutProps.TabSize:= FTabSize;
+        TextOutProps.TabHelper:= FTabHelper;
         TextOutProps.CharSize:= ACharSize;
         TextOutProps.MainTextArea:= AMainText;
         TextOutProps.CharsSkipped:= NOutputSpacesSkipped;
@@ -2766,7 +2777,7 @@ begin
   SReplaceAll(Str, #10, '');
     //todo: for some reason, for Python, for "if/for" blocks, text has #10 at AMarkText begin
     //this is workaround
-  Str:= STabsToSpaces(Str, OptTabSize);
+  Str:= FTabHelper.TabsToSpaces(Str);
     //expand tabs too
 
   Inc(ACoord.X, cFoldedMarkIndentOuter);
@@ -2923,6 +2934,7 @@ begin
   FCaretSpecPos:= false;
   FCaretStopUnfocused:= true;
 
+  FTabHelper:= TATStringTabHelper.Create;
   FMarkers:= TATMarkers.Create;
   FAttribs:= TATMarkers.Create;
   FMarkedRange:= TATMarkers.Create;
@@ -3234,6 +3246,7 @@ begin
   FreeAndNil(FDimRanges);
   FreeAndNil(FMarkedRange);
   FreeAndNil(FMarkers);
+  FreeAndNil(FTabHelper);
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
   FreeAndNil(FFoldedMarkList);
@@ -3561,6 +3574,7 @@ end;
 function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
 begin
   Result:= false;
+  UpdateTabHelper;
 
   if DoubleBuffered then
   begin
@@ -5159,7 +5173,7 @@ begin
   NChars:= Min(APosX, NChars); //limit indent by x-pos
 
   StrIndent:= Copy(StrPrev, 1, NChars);
-  NSpaces:= Length(STabsToSpaces(StrIndent, FTabSize));
+  NSpaces:= Length(FTabHelper.TabsToSpaces(StrIndent));
 
   case FOptAutoIndentKind of
     cIndentAsPrevLine:
@@ -5641,7 +5655,7 @@ begin
     if (P1.Y<0) and (Range.Y>=nLineFrom) then Continue;
     if (P2.Y<0) and (Range.Y2>=nLineFrom) then Continue;
 
-    NIndent:= SGetIndentExpanded(Strings.Lines[Range.Y], FTabSize);
+    NIndent:= FTabHelper.GetIndentExpanded(Strings.Lines[Range.Y]);
     Inc(P1.X, NIndent*ACharSize.X);
     Inc(P2.X, NIndent*ACharSize.X);
 
@@ -6037,7 +6051,7 @@ begin
 
   FillChar(TextOutProps, SizeOf(TextOutProps), 0);
   TextOutProps.NeedOffsets:= FFontNeedsOffsets;
-  TextOutProps.TabSize:= FTabSize;
+  TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;
   TextOutProps.MainTextArea:= true;
   TextOutProps.CharsSkipped:= 0;
@@ -6235,6 +6249,12 @@ begin
   FFontBoldItalic.Assign(AValue);
 end;
 
+procedure TATSynEdit.UpdateTabHelper;
+begin
+  FTabHelper.TabSpaces:= OptTabSpaces;
+  FTabHelper.TabSize:= OptTabSize;
+  FTabHelper.IndentSize:= OptIndentSize;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
