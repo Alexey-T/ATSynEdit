@@ -296,7 +296,12 @@ begin
 
   if FEncoding=cEncAnsi then
     if FEncodingCodepage='' then
-      FEncodingCodepage:= GetDefaultTextEncoding;
+      FEncodingCodepage:=
+        {$ifdef windows}
+        GetDefaultTextEncoding;
+        {$else}
+        'cp1252'; //GetDefaultTextEncoding gives 'utf8' which is not ok
+        {$endif}
 
   BufSize:= Stream.Size-Len;
   if BufSize<=0 then Exit;
