@@ -444,6 +444,7 @@ type
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
     FOnCalcStaple: TATSynEditCalcStapleEvent;
     FOnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent;
+    FOnCalcTabSize: TATStringTabCalcEvent;
     FOnPaste: TATSynEditPasteEvent;
     FOnHotspotEnter: TATSynEditHotspotEvent;
     FOnHotspotExit: TATSynEditHotspotEvent;
@@ -681,7 +682,6 @@ type
     function GetMinimapSelTop: integer;
     function GetMinimap_PercentToWrapIndex(APosY: integer): integer;
     function GetMinimap_PosToWrapIndex(APosY: integer): integer;
-    function GetOnTabCalcSize: TATStringTabCalcEvent;
     function GetOptTextOffsetTop: integer;
     function GetRectMinimapSel: TRect;
     procedure InitResourcesFoldbar;
@@ -816,7 +816,6 @@ type
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
     procedure SetOneLine(AValue: boolean);
-    procedure SetOnTabCalcSize(AValue: TATStringTabCalcEvent);
     procedure SetOptScrollbarsNewArrowsKind(AValue: TATScrollArrowsKind);
     procedure SetReadOnly(AValue: boolean);
     procedure SetLineTop(AValue: integer);
@@ -1225,7 +1224,7 @@ type
     property OnDrawRuler: TATSynEditDrawRectEvent read FOnDrawRuler write FOnDrawRuler;
     property OnCalcHilite: TATSynEditCalcHiliteEvent read FOnCalcHilite write FOnCalcHilite;
     property OnCalcStaple: TATSynEditCalcStapleEvent read FOnCalcStaple write FOnCalcStaple;
-    property OnCalcTabSize: TATStringTabCalcEvent read GetOnTabCalcSize write SetOnTabCalcSize;
+    property OnCalcTabSize: TATStringTabCalcEvent read FOnCalcTabSize write FOnCalcTabSize;
     property OnCalcBookmarkColor: TATSynEditCalcBookmarkColorEvent read FOnCalcBookmarkColor write FOnCalcBookmarkColor;
     property OnBeforeCalcHilite: TNotifyEvent read FOnBeforeCalcHilite write FOnBeforeCalcHilite;
     property OnPaste: TATSynEditPasteEvent read FOnPaste write FOnPaste;
@@ -1791,14 +1790,14 @@ begin
   if FTabSize=AValue then Exit;
   FTabSize:= Min(cMaxTabSize, Max(cMinTabSize, AValue));
   FWrapUpdateNeeded:= true;
-  UpdateTabHelper;
+  FTabHelper.TabSize:= FTabSize;
 end;
 
 procedure TATSynEdit.SetTabSpaces(AValue: boolean);
 begin
   if FOptTabSpaces=AValue then Exit;
   FOptTabSpaces:= AValue;
-  UpdateTabHelper;
+  FTabHelper.TabSpaces:= AValue;
 end;
 
 procedure TATSynEdit.SetText(const AValue: atString);
@@ -2674,11 +2673,6 @@ begin
     Result:= -1;
 end;
 
-function TATSynEdit.GetOnTabCalcSize: TATStringTabCalcEvent;
-begin
-  Result:= FTabHelper.OnCalcTabSize;
-end;
-
 function TATSynEdit.GetOptTextOffsetTop: integer;
 begin
   if ModeOneLine then
@@ -3458,11 +3452,6 @@ begin
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
   end;
-end;
-
-procedure TATSynEdit.SetOnTabCalcSize(AValue: TATStringTabCalcEvent);
-begin
-  FTabHelper.OnCalcTabSize:= AValue;
 end;
 
 procedure TATSynEdit.SetOptScrollbarsNewArrowsKind(AValue: TATScrollArrowsKind);
@@ -6281,6 +6270,7 @@ begin
   FTabHelper.TabSize:= OptTabSize;
   FTabHelper.IndentSize:= OptIndentSize;
   FTabHelper.SenderObj:= Self;
+  FTabHelper.OnCalcTabSize:= FOnCalcTabSize;
 end;
 
 {$I atsynedit_carets.inc}
