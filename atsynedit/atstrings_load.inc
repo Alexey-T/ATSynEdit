@@ -1,47 +1,5 @@
 {$ifdef nn}begin end;{$endif}
 
-function SConvertEnc_AnsiToUtf8(const SA: string): string;
-begin
-  {$ifdef windows}
-  case Windows.GetACP of
-    1250: Result:= CP1250ToUTF8(SA);
-    1251: Result:= CP1251ToUTF8(SA);
-    1252: Result:= CP1252ToUTF8(SA);
-    1253: Result:= CP1253ToUTF8(SA);
-    1254: Result:= CP1254ToUTF8(SA);
-    1255: Result:= CP1255ToUTF8(SA);
-    1256: Result:= CP1256ToUTF8(SA);
-    1257: Result:= CP1257ToUTF8(SA);
-    1258: Result:= CP1258ToUTF8(SA);
-    437: Result:= CP437ToUTF8(SA);
-    else Result:= CP1250ToUTF8(SA);
-  end;
-  {$else}
-  Result:= CP1250ToUTF8(SA);
-  {$endif}
-end;
-
-function SConvertEnc_Utf8ToAnsi(const S: string): string;
-begin
-  {$ifdef windows}
-  case Windows.GetACP of
-    1250: Result:= UTF8ToCP1250(S);
-    1251: Result:= UTF8ToCP1251(S);
-    1252: Result:= UTF8ToCP1252(S);
-    1253: Result:= UTF8ToCP1253(S);
-    1254: Result:= UTF8ToCP1254(S);
-    1255: Result:= UTF8ToCP1255(S);
-    1256: Result:= UTF8ToCP1256(S);
-    1257: Result:= UTF8ToCP1257(S);
-    1258: Result:= UTF8ToCP1258(S);
-    437: Result:= UTF8ToCP437(S);
-    else Result:= UTF8ToCP1250(S);
-  end;
-  {$else}
-  Result:= UTF8ToCP1250(S);
-  {$endif}
-end;
-
 function IsStreamWithSignature(Stream: TStream; const Sign: string): boolean;
 var
   Buf: string;
@@ -336,6 +294,10 @@ begin
   end;
   CharSize:= cEncodingSize[FEncoding];
 
+  if FEncoding=cEncAnsi then
+    if FEncodingCodepage='' then
+      FEncodingCodepage:= GetDefaultTextEncoding;
+
   BufSize:= Stream.Size-Len;
   if BufSize<=0 then Exit;
 
@@ -377,10 +339,7 @@ begin
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
 
-              if FEncodingCodepage='' then
-                SUtf8:= SConvertEnc_AnsiToUTF8(SA)
-              else
-                SUtf8:= ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded);
+              SUtf8:= ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded);
 
               LineAddRaw_UTF8_NoUndo(SUtf8, LineEnd);
             end;

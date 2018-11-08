@@ -28,11 +28,7 @@ begin
     case AEncoding of
       cEncAnsi:
         begin
-          if FEncodingCodepage='' then
-            SA:= SConvertEnc_Utf8ToAnsi(SA)
-          else
-            SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
-
+          SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
           Stream.WriteBuffer(SA[1], Length(SA));
         end;
 
