@@ -1,4 +1,8 @@
 
+2018.11.09
+- fix: command "Invert Selection" gave redundant carets at begin/end
++ add: don't use empty CodePage name, always fill it with LConvEncoding.GetDefaultTextEncoding
+
 2018.11.07
 + add: event OnCalcTabSize to support Elastic Tabstops
 
