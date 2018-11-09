@@ -160,14 +160,16 @@ begin
       if not Sel then Continue;
 
       //add range
-      NewCarets.Add(X1, Y1, XPrev, YPrev);
+      if (X1<>XPrev) or (Y1<>YPrev) then
+        NewCarets.Add(X1, Y1, XPrev, YPrev);
       XPrev:= X2;
       YPrev:= Y2;
     end;
 
     //add range after last caret
     PosLast:= GetEndOfFilePos;
-    NewCarets.Add(PosLast.X, PosLast.Y, XPrev, YPrev);
+    if (PosLast.X<>XPrev) or (PosLast.Y<>YPrev) then
+      NewCarets.Add(PosLast.X, PosLast.Y, XPrev, YPrev);
 
     DoCaretsAssign(NewCarets);
   finally
