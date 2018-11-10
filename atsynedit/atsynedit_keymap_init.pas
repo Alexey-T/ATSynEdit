@@ -59,9 +59,9 @@ begin
   M.Add(cCommand_ColSelectToLineBegin, 'column select: to line begin', ['Shift+Alt+Home'], []);
   M.Add(cCommand_ColSelectToLineEnd,   'column select: to line end',   ['Shift+Alt+End'], []);
 
-  M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], []);
+  M.Add(cCommand_KeyBackspace, 'delete char left (backspace)', ['Bksp'], ['Shift+Bksp']);
   M.Add(cCommand_KeyDelete, 'delete char right (delete)', ['Del'], []);
-  M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Enter'], []);
+  M.Add(cCommand_KeyEnter, 'insert line-break (enter)', ['Enter'], ['Shift+Enter']);
   M.Add(cCommand_KeyTab, 'tabulation key', [], []);
   M.Add(cCommand_TextInsertTabChar, 'insert tab char', [], []);
 
