@@ -1106,6 +1106,7 @@ end;
 
 procedure TfmMain.EditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
+  exit;////
   DoLog('OnKeyDown, key='+IntToStr(Key));
 end;
 
@@ -1144,6 +1145,7 @@ const
     'cLineChangeDeletedAll'
     );
 begin
+  exit;////
   DoLog(Format('%s, line %d', [
     cEvent[AChange],
     ALine
