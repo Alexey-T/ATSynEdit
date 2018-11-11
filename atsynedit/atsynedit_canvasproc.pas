@@ -328,19 +328,22 @@ procedure DoPaintUnprintedChar(
 var
   R: TRect;
 begin
-  R.Left:= APoint.X;
-  R.Right:= APoint.X;
-  if AIndex>1 then
-    Inc(R.Left, AOffsets[AIndex-2]);
-  Inc(R.Right, AOffsets[AIndex-1]);
+  if IsCharSpace(ch) then
+  begin
+    R.Left:= APoint.X;
+    R.Right:= APoint.X;
+    if AIndex>1 then
+      Inc(R.Left, AOffsets[AIndex-2]);
+    Inc(R.Right, AOffsets[AIndex-1]);
 
-  R.Top:= APoint.Y;
-  R.Bottom:= R.Top+ACharSize.Y;
+    R.Top:= APoint.Y;
+    R.Bottom:= R.Top+ACharSize.Y;
 
-  if ch<>#9 then
-    CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
-  else
-    CanvasArrowHorz(C, R, AColorFont, OptUnprintedTabCharLength*ACharSize.X, true);
+    if ch<>#9 then
+      CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
+    else
+      CanvasArrowHorz(C, R, AColorFont, OptUnprintedTabCharLength*ACharSize.X, true);
+  end;
 end;
 
 
@@ -352,46 +355,29 @@ procedure DoPaintUnprintedChars(C: TCanvas;
   AColorFont: TColor;
   ASpacesTrailing, ASpacesBothEnds: boolean);
 var
-  ch: WideChar;
   i: integer;
 begin
   if ASpacesBothEnds then
   begin
     //paint leading
     for i:= 1 to SGetIndentChars(AString) do
-    begin
-      ch:= AString[i];
-      if IsCharSpace(ch) then
-        DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
-    end;
+      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
     //paint trailing
     for i:= SGetNonSpaceLength(AString)+1 to Length(AString) do
-    begin
-      ch:= AString[i];
-      if IsCharSpace(ch) then
-        DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
-    end;
+      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
   end
   else
   if ASpacesTrailing then
   begin
     //paint trailing
     for i:= SGetNonSpaceLength(AString)+1 to Length(AString) do
-    begin
-      ch:= AString[i];
-      if IsCharSpace(ch) then
-        DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
-    end;
+      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
   end
   else
   begin
     //paint all
     for i:= 1 to Length(AString) do
-    begin
-      ch:= AString[i];
-      if IsCharSpace(ch) then
-        DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
-    end;
+      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
   end;
 end;
 
