@@ -123,6 +123,7 @@ type
     PopupRuler: TPopupMenu;
     PopupNums: TPopupMenu;
     progress: TProgressBar;
+    chkWrapWndMargin: TRadioButton;
     SaveDialog1: TSaveDialog;
     Status: TStatusBar;
     StatusMsg: TStatusBar;
@@ -136,6 +137,7 @@ type
     procedure chkMouseEnChange(Sender: TObject);
     procedure chkNewScrollChange(Sender: TObject);
     procedure chkTabSpacesChange(Sender: TObject);
+    procedure chkWrapWndMarginChange(Sender: TObject);
     procedure FinderProgress(Sender: TObject; const ACurPos, AMaxPos: Int64; var AContinue: boolean);
     procedure MenuItem14Click(Sender: TObject);
     procedure mnuFileExitClick(Sender: TObject);
@@ -1301,6 +1303,12 @@ procedure TfmMain.chkWrapOnChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptWrapMode:= cWrapOn;
+end;
+
+procedure TfmMain.chkWrapWndMarginChange(Sender: TObject);
+begin
+  if wait then Exit;
+  ed.OptWrapMode:= cWrapAtWindowOrMargin;
 end;
 
 procedure TfmMain.chkWrapIndentChange(Sender: TObject);

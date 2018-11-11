@@ -176,7 +176,8 @@ type
   TATSynWrapMode = (
     cWrapOff,
     cWrapOn,
-    cWrapAtMargin
+    cWrapAtMargin,
+    cWrapAtWindowOrMargin
     );
 
   TATSynNumbersStyle = (
@@ -1585,7 +1586,7 @@ procedure TATSynEdit.SetMarginRight(AValue: integer);
 begin
   if AValue=FMarginRight then Exit;
   FMarginRight:= Max(AValue, cMinMarginRt);
-  if FWrapMode=cWrapAtMargin then
+  if FWrapMode in [cWrapAtMargin, cWrapAtWindowOrMargin] then
     FWrapUpdateNeeded:= true;
   Update;
 end;
@@ -1631,6 +1632,8 @@ begin
       FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
     cWrapAtMargin:
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
+    cWrapAtWindowOrMargin:
+      FWrapColumn:= Max(cMinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
   end;
 
   UseCachedUpdate:=

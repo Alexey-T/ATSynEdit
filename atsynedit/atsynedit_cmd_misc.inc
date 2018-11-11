@@ -18,7 +18,8 @@ begin
         else
           OptWrapMode:= cWrapOff;
       end;
-    cWrapAtMargin:
+    cWrapAtMargin,
+    cWrapAtWindowOrMargin:
       OptWrapMode:= cWrapOff;
   end;
 

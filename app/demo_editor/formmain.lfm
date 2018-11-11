@@ -10,7 +10,7 @@ object fmMain: TfmMain
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
-  LCLVersion = '1.9.0.0'
+  LCLVersion = '2.1.0.0'
   object PanelMain: TPanel
     Left = 0
     Height = 496
@@ -147,11 +147,11 @@ object fmMain: TfmMain
     end
     object gWrap: TGroupBox
       Left = 144
-      Height = 112
+      Height = 138
       Top = 4
       Width = 128
       Caption = 'wrap'
-      ClientHeight = 93
+      ClientHeight = 119
       ClientWidth = 124
       TabOrder = 14
       object chkWrapOff: TRadioButton
@@ -169,8 +169,8 @@ object fmMain: TfmMain
         Left = 8
         Height = 24
         Top = 20
-        Width = 76
-        Caption = 'at edge'
+        Width = 78
+        Caption = 'window'
         OnChange = chkWrapOnChange
         TabOrder = 1
       end
@@ -178,18 +178,27 @@ object fmMain: TfmMain
         Left = 8
         Height = 24
         Top = 40
-        Width = 90
-        Caption = 'at margin'
+        Width = 73
+        Caption = 'margin'
         OnChange = chkWrapMarginChange
         TabOrder = 2
       end
       object chkWrapIndent: TCheckBox
         Left = 8
         Height = 24
-        Top = 64
+        Top = 88
         Width = 101
         Caption = 'with indent'
         OnChange = chkWrapIndentChange
+        TabOrder = 4
+      end
+      object chkWrapWndMargin: TRadioButton
+        Left = 8
+        Height = 24
+        Top = 62
+        Width = 115
+        Caption = 'min wnd/mrg'
+        OnChange = chkWrapWndMarginChange
         TabOrder = 3
       end
     end
@@ -215,7 +224,7 @@ object fmMain: TfmMain
     object gUnpri: TGroupBox
       Left = 144
       Height = 104
-      Top = 120
+      Top = 144
       Width = 128
       Caption = 'unprintable'
       ClientHeight = 85
@@ -280,7 +289,7 @@ object fmMain: TfmMain
     object bFont: TButton
       Left = 144
       Height = 25
-      Top = 232
+      Top = 256
       Width = 96
       Caption = 'font...'
       OnClick = bFontClick
@@ -316,7 +325,7 @@ object fmMain: TfmMain
     object bOpt: TButton
       Left = 144
       Height = 25
-      Top = 264
+      Top = 288
       Width = 96
       Caption = 'opts...'
       OnClick = bOptClick
