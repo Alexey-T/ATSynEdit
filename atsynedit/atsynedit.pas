@@ -221,6 +221,7 @@ type
   end;
 
 const
+  cInitScrollbarHorzAddSpace = 4;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
   cInitWrapMode = cWrapOff;
@@ -260,7 +261,6 @@ const
   cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2;
   cFoldedMarkIndentOuter = 0;
-  cScrollbarHorzAddChars = 1; //for horiz scrollbar, add space for 1+ chars, to allow clicking after eol of longest line
   cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert = 1; //... speed y
   cSpeedScrollNiceHorz = 4; //browser-scroll (middle-click): speed x
@@ -458,6 +458,7 @@ type
     FWrapMode: TATSynWrapMode;
     FWrapUpdateNeeded: boolean;
     FWrapIndented: boolean;
+    FWrapAddSpace: integer;
     FWrapEnabledForMaxLines: integer;
     FUnprintedVisible,
     FUnprintedSpaces,
@@ -524,6 +525,7 @@ type
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
     FOptScrollbarsNew: boolean;
     FOptScrollbarsNewArrowsKind: TATScrollArrowsKind;
+    FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollbarHorizontalHidden: boolean;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
     FOptShowFontLigatures: boolean;
@@ -1278,6 +1280,7 @@ type
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
     property OptScrollbarsNewArrowsKind: TATScrollArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default asaArrowsNormal;
     property OptScrollbarHorizontalHidden: boolean read FOptScrollbarHorizontalHidden write FOptScrollbarHorizontalHidden default false;
+    property OptScrollbarHorizontalAddSpace: integer read FOptScrollbarHorizontalAddSpace write FOptScrollbarHorizontalAddSpace default cInitScrollbarHorzAddSpace;
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
 
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
@@ -1335,6 +1338,7 @@ type
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
+    property OptWrapAddSpace: integer read FWrapAddSpace write FWrapAddSpace default 1;
     property OptWrapEnabledForMaxLines: integer read FWrapEnabledForMaxLines write FWrapEnabledForMaxLines default cInitWrapEnabledForMaxLines;
     property OptMarginRight: integer read FMarginRight write SetMarginRight default cInitMarginRight;
     property OptMarginString: string read GetMarginString write SetMarginString;
@@ -1624,7 +1628,7 @@ begin
     cWrapOff:
       FWrapColumn:= 0;
     cWrapOn:
-      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-cScrollbarHorzAddChars);
+      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
     cWrapAtMargin:
       FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
   end;
@@ -2297,7 +2301,7 @@ begin
             FTabHelper,
             Point(1, 1) //(1,1): need width in chars
             );
-      AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + cScrollbarHorzAddChars);
+      AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + FOptScrollbarHorizontalAddSpace);
     end;
 
     CurrPoint.X:= ARect.Left;
@@ -3019,6 +3023,7 @@ begin
   FWrapMode:= cInitWrapMode;
   FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
+  FWrapAddSpace:= 1;
   FWrapEnabledForMaxLines:= cInitWrapEnabledForMaxLines;
 
   FOverwrite:= false;
@@ -3128,6 +3133,7 @@ begin
   FOptScrollIndentCaretVert:= 0;
   FOptScrollbarsNew:= false;
   FOptScrollbarsNewArrowsKind:= asaArrowsNormal;
+  FOptScrollbarHorizontalAddSpace:= cInitScrollbarHorzAddSpace;
   FOptScrollbarHorizontalHidden:= false;
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
 
