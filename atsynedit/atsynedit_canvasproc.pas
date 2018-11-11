@@ -96,6 +96,7 @@ type
     TextOffsetFromLine: integer;
     ShowUnprinted: boolean;
     ShowUnprintedSpacesTrailing: boolean;
+    ShowUnprintedSpacesBothEnds: boolean;
     ShowFontLigatures: boolean;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
@@ -349,21 +350,48 @@ procedure DoPaintUnprintedChars(C: TCanvas;
   APoint: TPoint;
   ACharSize: TPoint;
   AColorFont: TColor;
-  ATailOnly: boolean);
+  ASpacesTrailing, ASpacesBothEnds: boolean);
 var
   ch: WideChar;
-  NPos, i: integer;
+  i: integer;
 begin
-  NPos:= 1;
-
-  if ATailOnly then
-    NPos:= Length(AString)+1-SGetTrailingSpaceChars(AString);
-
-  for i:= NPos to Length(AString) do
+  if ASpacesBothEnds then
   begin
-    ch:= AString[i];
-    if IsCharSpace(ch) then
-      DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
+    //paint leading
+    for i:= 1 to SGetIndentChars(AString) do
+    begin
+      ch:= AString[i];
+      if IsCharSpace(ch) then
+        DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
+    end;
+    //paint trailing
+    for i:= SGetNonSpaceLength(AString)+1 to Length(AString) do
+    begin
+      ch:= AString[i];
+      if IsCharSpace(ch) then
+        DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
+    end;
+  end
+  else
+  if ASpacesTrailing then
+  begin
+    //paint trailing
+    for i:= SGetNonSpaceLength(AString)+1 to Length(AString) do
+    begin
+      ch:= AString[i];
+      if IsCharSpace(ch) then
+        DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
+    end;
+  end
+  else
+  begin
+    //paint all
+    for i:= 1 to Length(AString) do
+    begin
+      ch:= AString[i];
+      if IsCharSpace(ch) then
+        DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
+    end;
   end;
 end;
 
@@ -847,7 +875,8 @@ begin
       Point(APosX, APosY),
       AProps.CharSize,
       AProps.ColorUnprintedFont,
-      AProps.ShowUnprintedSpacesTrailing
+      AProps.ShowUnprintedSpacesTrailing,
+      AProps.ShowUnprintedSpacesBothEnds
       );
 
   ATextWidth:= ListInt[High(ListInt)];

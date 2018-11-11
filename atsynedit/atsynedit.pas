@@ -464,6 +464,7 @@ type
     FUnprintedVisible,
     FUnprintedSpaces,
     FUnprintedSpacesTrailing,
+    FUnprintedSpacesBothEnds,
     FUnprintedEof,
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
@@ -1355,6 +1356,7 @@ type
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible default true;
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces default true;
     property OptUnprintedSpacesTrailing: boolean read FUnprintedSpacesTrailing write FUnprintedSpacesTrailing default false;
+    property OptUnprintedSpacesBothEnds: boolean read FUnprintedSpacesBothEnds write FUnprintedSpacesBothEnds default false;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds default true;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails default true;
     property OptUnprintedEof: boolean read FUnprintedEof write FUnprintedEof default true;
@@ -2416,6 +2418,7 @@ begin
         TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
         TextOutProps.ShowUnprinted:= AMainText and FUnprintedVisible and FUnprintedSpaces;
         TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
+        TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
         TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not LineWithCaret);
         TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
         TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
@@ -3039,6 +3042,7 @@ begin
   FUnprintedVisible:= true;
   FUnprintedSpaces:= true;
   FUnprintedSpacesTrailing:= false;
+  FUnprintedSpacesBothEnds:= false;
   FUnprintedEnds:= true;
   FUnprintedEndsDetails:= true;
   FUnprintedEof:= true;
@@ -6091,6 +6095,7 @@ begin
   TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
   TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
+  TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
   TextOutProps.ShowFontLigatures:= FOptShowFontLigatures;
   TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
