@@ -1,5 +1,6 @@
 
 2018.11.11
++ add: property OptUnprintedSpacesBothEnds
 + add: property OptWrapAddSpace (additional number of spaces for wrapped lines)
 + add: property OptScrollbarHorizontalAddSpace (additional number of spaces to show at end of longest line)
 + add: OptWrapMode has new enum value: cWrapAtWindowOrMargin (auto minimal from 2 values)
