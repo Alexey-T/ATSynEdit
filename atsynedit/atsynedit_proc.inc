@@ -17,22 +17,23 @@ const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
 
+{ TATSynScrollInfo }
 
-procedure DoClearScrollInfo(var Info: TATSynScrollInfo);
+procedure TATSynScrollInfo.Clear;
 begin
-  Info.NPos:= 0;
-  Info.NMin:= 0;
-  Info.NMax:= 1;
-  Info.NPage:= 1;
+  NPos:= 0;
+  NMin:= 0;
+  NMax:= 1;
+  NPage:= 1;
 end;
 
-function IsEqualScrollInfo(const Info1, Info2: TATSynScrollInfo): boolean;
+class operator TATSynScrollInfo.= (const A, B: TATSynScrollInfo): boolean;
 begin
   Result:=
-    (Info1.NPos=Info2.NPos) and
-    (Info1.NMin=Info2.NMin) and
-    (Info1.NMax=Info2.NMax) and
-    (Info1.NPage=Info2.NPage);
+    (A.NPos=B.NPos) and
+    (A.NMin=B.NMin) and
+    (A.NMax=B.NMax) and
+    (A.NPage=B.NPage);
 end;
 
 procedure InitClipboardFormat;

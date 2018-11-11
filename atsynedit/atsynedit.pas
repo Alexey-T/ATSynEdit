@@ -4,6 +4,7 @@ License: MPL 2.0 or LGPL
 }
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 //{$define debug_findwrapindex}
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
@@ -193,12 +194,16 @@ type
     );
   TATSynPaintFlags = set of TATSynPaintFlag;
 
+  { TATSynScrollInfo }
+
   TATSynScrollInfo = record
     NMin,
     NMax,
     NPage,
     NPos,
     NPosLast: integer;
+    procedure Clear;
+    class operator =(const A, B: TATSynScrollInfo): boolean;
   end;
 
 type
@@ -1873,8 +1878,8 @@ begin
   bHorz2:= GetScrollbarVisible(false);
   Result:= (bVert1<>bVert2) or (bHorz1<>bHorz2);
 
-  if not IsEqualScrollInfo(FPrevHorz, FScrollHorz) or
-    not IsEqualScrollInfo(FPrevVert, FScrollVert) then
+  if (FPrevHorz<>FScrollHorz) or
+    (FPrevVert<>FScrollVert) then
   begin
     FPrevHorz:= FScrollHorz;
     FPrevVert:= FScrollVert;
@@ -2704,8 +2709,8 @@ end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
 begin
-  DoClearScrollInfo(FScrollHorzMinimap);
-  DoClearScrollInfo(FScrollVertMinimap);
+  FScrollHorzMinimap.Clear;
+  FScrollVertMinimap.Clear;
 
   FScrollVertMinimap.NPos:= GetMinimapScrollPos;
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
@@ -3226,8 +3231,8 @@ begin
   FLastCommandChangedText:= false;
   FLastHotspot:= -1;
 
-  DoClearScrollInfo(FScrollHorz);
-  DoClearScrollInfo(FScrollVert);
+  FScrollHorz.Clear;
+  FScrollVert.Clear;
 
   FKeymap:= KeymapFull;
   FHintWnd:= THintWindow.Create(Self);
@@ -3325,8 +3330,8 @@ begin
   FWrapInfo.Clear;
   FWrapUpdateNeeded:= true;
 
-  DoClearScrollInfo(FScrollHorz);
-  DoClearScrollInfo(FScrollVert);
+  FScrollHorz.Clear;
+  FScrollVert.Clear;
 
   BeginUpdate;
   try
@@ -3797,7 +3802,7 @@ begin
 
   if (Info.NMax-Info.NMin)<Info.NPage then
   begin
-    DoClearScrollInfo(Info);
+    Info.Clear;
     Exit(true);
   end;
 
