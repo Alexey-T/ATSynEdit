@@ -139,16 +139,17 @@ procedure DoPaintUnprintedEol(C: TCanvas;
   AColorFont, AColorBG: TColor;
   ADetails: boolean);
 
-function CanvasTextWidth(const S: atString; ALineIndex: integer; ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer;
-function CanvasFontSizes(C: TCanvas): TPoint;
+function CanvasTextWidth(const S: atString; ALineIndex: integer;
+  ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer; inline;
+function CanvasFontSizes(C: TCanvas): TPoint; inline;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
-procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer);
+procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer); inline;
 procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
 procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
 
-procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
-procedure CanvasPaintTriangleRight(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
-procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean);
+procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
+procedure CanvasPaintTriangleRight(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
+procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean); inline;
 
 procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
@@ -221,7 +222,7 @@ function _TextOut_Unix(DC: HDC;
   Rect: PRect;
   const Str: string;
   Dx: PInteger
-  ): boolean;
+  ): boolean; inline;
 begin
   Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
 end;
@@ -229,7 +230,7 @@ end;
 
 
 procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
-  AScale: integer; AFontColor: TColor);
+  AScale: integer; AFontColor: TColor); inline;
 const
   cMinDotSize = 2;
 var
@@ -314,6 +315,34 @@ begin
   C.LineTo(X+Dx, Y2-Dx);
 end;
 
+
+procedure DoPaintUnprintedChar(
+  C: TCanvas;
+  ch: WideChar;
+  AIndex: integer;
+  const AOffsets: TATIntArray;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont: TColor); inline; //many params, many calls, so inline
+var
+  R: TRect;
+begin
+  R.Left:= APoint.X;
+  R.Right:= APoint.X;
+  if AIndex>1 then
+    Inc(R.Left, AOffsets[AIndex-2]);
+  Inc(R.Right, AOffsets[AIndex-1]);
+
+  R.Top:= APoint.Y;
+  R.Bottom:= R.Top+ACharSize.Y;
+
+  if ch<>#9 then
+    CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
+  else
+    CanvasArrowHorz(C, R, AColorFont, OptUnprintedTabCharLength*ACharSize.X, true);
+end;
+
+
 procedure DoPaintUnprintedChars(C: TCanvas;
   const AString: atString;
   const AOffsets: TATIntArray;
@@ -323,7 +352,6 @@ procedure DoPaintUnprintedChars(C: TCanvas;
   ATailOnly: boolean);
 var
   ch: WideChar;
-  R: TRect;
   NPos, i: integer;
 begin
   NPos:= 1;
@@ -339,25 +367,12 @@ begin
   begin
     ch:= AString[i];
     if IsCharSpace(ch) then
-    begin
-      R.Left:= APoint.X;
-      R.Right:= APoint.X;
-      if i>1 then
-        Inc(R.Left, AOffsets[i-2]);
-      Inc(R.Right, AOffsets[i-1]);
-
-      R.Top:= APoint.Y;
-      R.Bottom:= R.Top+ACharSize.Y;
-
-      if ch<>#9 then
-        CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
-      else
-        CanvasArrowHorz(C, R, AColorFont, OptUnprintedTabCharLength*ACharSize.X, true);
-    end;
+      DoPaintUnprintedChar(C, ch, i, AOffsets, APoint, ACharSize, AColorFont);
   end;
 end;
 
-procedure CanvasSimpleLine(C: TCanvas; P1, P2: TPoint);
+
+procedure CanvasSimpleLine(C: TCanvas; P1, P2: TPoint); inline;
 begin
   if P1.Y=P2.Y then
     C.Line(P1.X, P1.Y, P2.X+1, P2.Y)
@@ -596,7 +611,7 @@ begin
 end;
 
 
-function CanvasFontSizes(C: TCanvas): TPoint;
+function CanvasFontSizes(C: TCanvas): TPoint; inline;
 var
   Size: TSize;
 begin
@@ -606,7 +621,7 @@ begin
 end;
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer; ATabHelper: TATStringTabHelper;
-  ACharSize: TPoint): integer;
+  ACharSize: TPoint): integer; inline;
 var
   Offsets: TATLineOffsetsInfo;
 begin
@@ -882,7 +897,7 @@ begin
 end;
 {$endif}
 
-procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer);
+procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer); inline;
 var
   j: integer;
 begin
@@ -892,7 +907,7 @@ begin
 end;
 
 
-procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
+procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
 begin
   C.Brush.Color:= AColor;
   C.Pen.Color:= AColor;
@@ -903,7 +918,7 @@ begin
     ]);
 end;
 
-procedure CanvasPaintTriangleRight(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer);
+procedure CanvasPaintTriangleRight(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
 begin
   C.Brush.Color:= AColor;
   C.Pen.Color:= AColor;
@@ -916,7 +931,7 @@ end;
 
 
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor;
-  ACenter: TPoint; ASize: integer; APlus: boolean);
+  ACenter: TPoint; ASize: integer; APlus: boolean); inline;
 begin
   C.Brush.Color:= AColorBG;
   C.Pen.Color:= AColorBorder;
