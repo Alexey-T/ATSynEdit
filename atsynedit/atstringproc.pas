@@ -96,6 +96,7 @@ function SEndsWithEol(const S: atString): boolean; inline;
 function STrimRight(const S: atString): atString;
 function SGetIndentChars(const S: atString): integer;
 function SGetIndentCharsToOpeningBracket(const S: atString): integer;
+function SGetTrailingSpaceChars(const S: atString): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 
 function SStringHasTab(const S: atString): boolean; inline;
@@ -307,6 +308,20 @@ begin
   while (Result<Length(S)) and IsCharSpace(S[Result+1]) do
     Inc(Result);
 end;
+
+function SGetTrailingSpaceChars(const S: atString): integer;
+var
+  N: integer;
+begin
+  Result:= 0;
+  N:= Length(S);
+  while (N>0) and IsCharSpace(S[N]) do
+  begin
+    Inc(Result);
+    Dec(N);
+  end;
+end;
+
 
 function SGetIndentCharsToOpeningBracket(const S: atString): integer;
 var

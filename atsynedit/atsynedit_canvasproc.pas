@@ -357,11 +357,7 @@ begin
   NPos:= 1;
 
   if ATailOnly then
-  begin
-    NPos:= Length(AString)+1;
-    while (NPos>1) and IsCharSpace(AString[NPos-1]) do
-      Dec(NPos);
-  end;
+    NPos:= Length(AString)+1-SGetTrailingSpaceChars(AString);
 
   for i:= NPos to Length(AString) do
   begin
