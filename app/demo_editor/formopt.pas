@@ -19,6 +19,8 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkUnprintOnlyBothEnds: TCheckBox;
+    chkUnprintOnlyEnd: TCheckBox;
     chkSaveTrimEmptyLines: TCheckBox;
     chkCrEmptyNormal: TCheckBox;
     chkClickLink: TCheckBox;
@@ -227,6 +229,8 @@ begin
     chkUnprintSpace.Checked:= ed.OptUnprintedSpaces;
     chkUnprintEnd.Checked:= ed.OptUnprintedEnds;
     chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
+    chkUnprintOnlyBothEnds.Checked:= ed.OptUnprintedSpacesBothEnds;
+    chkUnprintOnlyEnd.Checked:= ed.OptUnprintedSpacesTrailing;
     chkUnprintArrowDown.Checked:= OptUnprintedEndArrowOrDot;
     chkUnprintAsciiRep.Checked:= OptUnprintedReplaceSpec;
     edTabArrowSize.Value:= OptUnprintedTabCharLength;
@@ -350,6 +354,8 @@ begin
       ed.OptUnprintedSpaces:= chkUnprintSpace.Checked;
       ed.OptUnprintedEnds:= chkUnprintEnd.Checked;
       ed.OptUnprintedEndsDetails:= chkUnprintEndDet.Checked;
+      ed.OptUnprintedSpacesBothEnds:= chkUnprintOnlyBothEnds.Checked;
+      ed.OptUnprintedSpacesTrailing:= chkUnprintOnlyEnd.Checked;
       OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
       OptUnprintedTabCharLength:= edTabArrowSize.Value;
       OptUnprintedTabPointerScale:= edTabArrowPnt.Value;

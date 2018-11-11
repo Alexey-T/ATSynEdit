@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 628
-    ActivePage = TabSheet1
+    ActivePage = TabSheet8
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 0
+    TabIndex = 8
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -1100,10 +1100,10 @@ object fmOpt: TfmOpt
       object chkUnprintAsciiRep: TCheckBox
         Left = 8
         Height = 24
-        Top = 136
+        Top = 208
         Width = 162
         Caption = 'show ascii 0-31 as "."'
-        TabOrder = 5
+        TabOrder = 7
       end
       object edTabArrowSize: TSpinEdit
         Left = 304
@@ -1111,7 +1111,7 @@ object fmOpt: TfmOpt
         Top = 8
         Width = 50
         MaxValue = 16
-        TabOrder = 6
+        TabOrder = 8
       end
       object LabelArr: TLabel
         Left = 360
@@ -1127,7 +1127,7 @@ object fmOpt: TfmOpt
         Top = 36
         Width = 50
         MaxValue = 50
-        TabOrder = 7
+        TabOrder = 9
       end
       object LabelArr1: TLabel
         Left = 360
@@ -1141,8 +1141,8 @@ object fmOpt: TfmOpt
         Left = 8
         Height = 24
         Top = 8
-        Width = 130
-        Caption = 'show unprinted'
+        Width = 233
+        Caption = 'show unprinted (global enable)'
         TabOrder = 0
       end
       object chkUnprintSpace: TCheckBox
@@ -1172,10 +1172,26 @@ object fmOpt: TfmOpt
       object chkUnprintArrowDown: TCheckBox
         Left = 8
         Height = 24
-        Top = 104
+        Top = 184
         Width = 319
         Caption = 'show arrow-down instead of dot, at line end'
+        TabOrder = 6
+      end
+      object chkUnprintOnlyBothEnds: TCheckBox
+        Left = 8
+        Height = 24
+        Top = 112
+        Width = 207
+        Caption = '.. only at begin+end of lines'
         TabOrder = 4
+      end
+      object chkUnprintOnlyEnd: TCheckBox
+        Left = 8
+        Height = 24
+        Top = 136
+        Width = 162
+        Caption = '.. only at end of lines'
+        TabOrder = 5
       end
     end
   end
