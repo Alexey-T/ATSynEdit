@@ -5663,9 +5663,9 @@ var
   Indexes: TATIntArray;
   Range, RangeActive: TATSynRange;
   P1, P2: TPoint;
-  i: integer;
   RSt: TRect;
-  NColor: TColor;
+  NColor, NColorNormal, NColorActive: TColor;
+  i: integer;
 begin
   if FOptShowStapleStyle=cLineStyleNone then Exit;
   nLineFrom:= LineTop;
@@ -5681,6 +5681,9 @@ begin
       i:= Carets[0].PosY;
       RangeActive:= FFold.FindDeepestRangeContainingLine(i, Indexes);
     end;
+
+  NColorNormal:= Colors.BlockStaple;
+  NColorActive:= ColorBlend(NColorNormal, Colors.TextFont, 200);
 
   //c.font.color:= clblue;
   //c.textout(arect.right-150, arect.top, format('staples vis %d', [length(indexes)]));
@@ -5711,9 +5714,10 @@ begin
     if (RSt.Left>=ARect.Left) and
       (RSt.Left<ARect.Right) then
     begin
-      NColor:= Colors.BlockStaple;
       if Range=RangeActive then
-        NColor:= ColorBlendHalf(NColor, Colors.TextFont);
+        NColor:= NColorActive
+      else
+        NColor:= NColorNormal;
 
       if Assigned(FOnCalcStaple) then
         FOnCalcStaple(Self, Range.Y, NIndent, NColor);
