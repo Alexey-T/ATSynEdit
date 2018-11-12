@@ -537,6 +537,7 @@ type
     FOptShowStapleStyle: TATLineStyle;
     FOptShowStapleIndent: integer;
     FOptShowStapleWidthPercent: integer;
+    FOptShowStapleHiliteActive: boolean;
     FOptMouseEnableAll: boolean;
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
@@ -1292,6 +1293,7 @@ type
     property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle default cLineStyleSolid;
     property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent default -1;
     property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent default 100;
+    property OptShowStapleHiliteActive: boolean read FOptShowStapleHiliteActive write FOptShowStapleHiliteActive default true;
     property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
     property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
@@ -3152,6 +3154,7 @@ begin
   FOptShowStapleStyle:= cLineStyleSolid;
   FOptShowStapleIndent:= -1;
   FOptShowStapleWidthPercent:= 100;
+  FOptShowStapleHiliteActive:= true;
 
   FOptMaxLinesToCountUnindent:= 100;
   FOptMaxLineLengthForSlowWidthDetect:= 500;
@@ -5658,7 +5661,7 @@ procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
 var
   nLineFrom, nLineTo, nIndent: integer;
   Indexes: TATIntArray;
-  Range: TATSynRange;
+  Range, RangeActive: TATSynRange;
   P1, P2: TPoint;
   i: integer;
   RSt: TRect;
@@ -5669,6 +5672,15 @@ begin
   nLineTo:= LineBottom;
   Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, nil,
     false{OnlyFolded}, false{TopLevelOnly}, cRngHasAnyOfLines);
+
+  RangeActive:= nil;
+  //currently find active range for first caret only
+  if FOptShowStapleHiliteActive then
+    if Carets.Count>0 then
+    begin
+      i:= Carets[0].PosY;
+      RangeActive:= FFold.FindDeepestRangeContainingLine(i, Indexes);
+    end;
 
   //c.font.color:= clblue;
   //c.textout(arect.right-150, arect.top, format('staples vis %d', [length(indexes)]));
@@ -5700,6 +5712,9 @@ begin
       (RSt.Left<ARect.Right) then
     begin
       NColor:= Colors.BlockStaple;
+      if Range=RangeActive then
+        NColor:= ColorBlendHalf(NColor, Colors.TextFont);
+
       if Assigned(FOnCalcStaple) then
         FOnCalcStaple(Self, Range.Y, NIndent, NColor);
       DoPaintStaple(C, RSt, NColor);

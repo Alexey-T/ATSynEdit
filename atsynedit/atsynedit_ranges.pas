@@ -75,6 +75,7 @@ type
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
       AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
+    function FindDeepestRangeContainingLine(ALine: integer; AIndexes: TATIntArray): TATSynRange;
     function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
     function FindIndexOfRange(R: TATSynRange): integer;
     function MessageText(Cnt: integer): string;
@@ -269,6 +270,24 @@ begin
     FreeAndNil(L);
   end;
 end;
+
+function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AIndexes: TATIntArray): TATSynRange;
+var
+  R: TATSynRange;
+  i: integer;
+begin
+  Result:= nil;
+  for i:= 0 to High(AIndexes) do
+  begin
+    R:= Items[AIndexes[i]];
+    if R.IsSimple then Continue;
+    if (R.Y>ALine) then Break;
+    if (R.Y2<ALine) then Continue;
+    if (Result=nil) or (R.Y>Result.Y) then
+      Result:= R;
+  end;
+end;
+
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
 var

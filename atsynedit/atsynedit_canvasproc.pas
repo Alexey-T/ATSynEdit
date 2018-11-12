@@ -158,6 +158,8 @@ procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor
 procedure DoPartsShow(var P: TATLineParts);
 procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer);
 
+function ColorBlend(c1, c2: Longint; A: Longint): Longint;
+function ColorBlendHalf(c1, c2: Longint): Longint;
 
 implementation
 
