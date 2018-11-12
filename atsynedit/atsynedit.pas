@@ -249,6 +249,7 @@ const
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
   cInitMaxLineLenToCalcURL = 300;
+  cInitStapleHiliteAlpha = 200;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
@@ -538,6 +539,7 @@ type
     FOptShowStapleIndent: integer;
     FOptShowStapleWidthPercent: integer;
     FOptShowStapleHiliteActive: boolean;
+    FOptShowStapleHiliteActiveAlpha: integer;
     FOptMouseEnableAll: boolean;
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
@@ -1294,6 +1296,7 @@ type
     property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent default -1;
     property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent default 100;
     property OptShowStapleHiliteActive: boolean read FOptShowStapleHiliteActive write FOptShowStapleHiliteActive default true;
+    property OptShowStapleHiliteActiveAlpha: integer read FOptShowStapleHiliteActiveAlpha write FOptShowStapleHiliteActiveAlpha default cInitStapleHiliteAlpha;
     property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
     property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
@@ -3155,6 +3158,7 @@ begin
   FOptShowStapleIndent:= -1;
   FOptShowStapleWidthPercent:= 100;
   FOptShowStapleHiliteActive:= true;
+  FOptShowStapleHiliteActiveAlpha:= cInitStapleHiliteAlpha;
 
   FOptMaxLinesToCountUnindent:= 100;
   FOptMaxLineLengthForSlowWidthDetect:= 500;
@@ -5683,7 +5687,7 @@ begin
     end;
 
   NColorNormal:= Colors.BlockStaple;
-  NColorActive:= ColorBlend(NColorNormal, Colors.TextFont, 200);
+  NColorActive:= ColorBlend(NColorNormal, Colors.TextFont, FOptShowStapleHiliteActiveAlpha);
 
   //c.font.color:= clblue;
   //c.textout(arect.right-150, arect.top, format('staples vis %d', [length(indexes)]));
