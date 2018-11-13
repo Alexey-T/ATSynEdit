@@ -35,7 +35,7 @@ type
   TATLineEnds = (cEndNone, cEndWin, cEndUnix, cEndMac);
 const
   cLineEndStrings: array[TATLineEnds] of string = ('', #13#10, #10, #13);
-  cLineEndNiceNames: array[TATLineEnds] of string = ('', 'win', 'un', 'mac');
+  cLineEndNiceNames: array[TATLineEnds] of string = ('', 'CRLF', 'LF', 'CR');
   cLineEndLength: array[TATLineEnds] of Byte = (0, 2, 1, 1);
 
 var
