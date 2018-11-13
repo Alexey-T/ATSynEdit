@@ -249,7 +249,7 @@ const
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
   cInitMaxLineLenToCalcURL = 300;
-  cInitStapleHiliteAlpha = 200;
+  cInitStapleHiliteAlpha = 180;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
