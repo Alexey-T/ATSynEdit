@@ -1516,8 +1516,6 @@ begin
 end;
 
 function TATStrings.OffsetToPosition(AOffset: integer): TPoint;
-const
-  cEndSize: array[TATLineEnds] of integer = (0, 2, 1, 1);
 var
   NOffset, NLen, i: integer;
 begin
@@ -1530,7 +1528,7 @@ begin
     NLen:= LinesLen[i];
     if (AOffset>=NOffset) and (AOffset<=NOffset+NLen) then
       exit(Point(AOffset-NOffset, i));
-    Inc(NOffset, NLen+cEndSize[LinesEnds[i]]);
+    Inc(NOffset, NLen+cLineEndLength[LinesEnds[i]]);
   end;
 end;
 
