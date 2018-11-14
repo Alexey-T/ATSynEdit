@@ -347,6 +347,7 @@ type
     procedure DoGotoLastEditPos;
     procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
       AChange: TATBlockChangeKind; ABlock: TStringList);
+    function OffsetToPosition(AOffset: integer): TPoint;
     property LastCommandChangedLines: integer read FLastCommandChangedLines write FLastCommandChangedLines;
     //events
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
@@ -1512,6 +1513,25 @@ begin
       Point(AX2, AY2),
       AChange,
       ABlock);
+end;
+
+function TATStrings.OffsetToPosition(AOffset: integer): TPoint;
+const
+  cEndSize: array[TATLineEnds] of integer = (0, 2, 1, 1);
+var
+  NOffset, NLen, i: integer;
+begin
+  Result:= Point(-1, -1);
+  if AOffset<0 then exit;
+
+  NOffset:= 0;
+  for i:= 0 to Count-1 do
+  begin
+    NLen:= LinesLen[i];
+    if (AOffset>=NOffset) and (AOffset<=NOffset+NLen) then
+      exit(Point(AOffset-NOffset, i));
+    Inc(NOffset, NLen+cEndSize[LinesEnds[i]]);
+  end;
 end;
 
 
