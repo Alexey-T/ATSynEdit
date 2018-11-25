@@ -240,6 +240,8 @@ type
     procedure DoFinalizeLoading;
     procedure DoClearLineStates(ASaved: boolean);
     procedure SetModified(AValue: boolean);
+    procedure SetRedoAsString(const AValue: string);
+    procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
     procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
@@ -343,8 +345,8 @@ type
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
-    property UndoAsString: string read GetUndoAsString;
-    property RedoAsString: string read GetRedoAsString;
+    property UndoAsString: string read GetUndoAsString write SetUndoAsString;
+    property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     procedure DoClearUndo(ALocked: boolean = false);
     //misc
     procedure DoSaveLastEditPos(AX: integer=-1; AY: integer=-1);
@@ -1150,6 +1152,16 @@ begin
     Inc(FModifiedVersion)
   else
     FUndoList.AddUnmodifiedMark;
+end;
+
+procedure TATStrings.SetRedoAsString(const AValue: string);
+begin
+  FRedoList.AsString:= AValue;
+end;
+
+procedure TATStrings.SetUndoAsString(const AValue: string);
+begin
+  FUndoList.AsString:= AValue;
 end;
 
 procedure TATStrings.SetUndoLimit(AValue: integer);

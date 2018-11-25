@@ -37,6 +37,7 @@ type
   private
     const PartSep = #9;
     function GetAsString: string;
+    procedure SetAsString(AValue: string);
   public
     ItemAction: TATEditAction;
     ItemIndex: integer;
@@ -45,10 +46,12 @@ type
     ItemCarets: TATPointArray;
     ItemSoftMark: boolean;
     ItemHardMark: boolean;
-    property AsString: string read GetAsString;
+    procedure Assign(const D: TATUndoItem);
+    property AsString: string read GetAsString write SetAsString;
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray); virtual;
+    constructor CreateEmpty;
   end;
 
 type
@@ -63,6 +66,7 @@ type
     FHardMark: boolean;
     function GetAsString: string;
     function GetItem(N: integer): TATUndoItem;
+    procedure SetAsString(const AValue: string);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -83,7 +87,7 @@ type
       AEnd: TATLineEnds; const ACarets: TATPointArray);
     procedure AddUnmodifiedMark;
     function DebugText: string;
-    property AsString: string read GetAsString;
+    property AsString: string read GetAsString write SetAsString;
   end;
 
 
@@ -105,6 +109,22 @@ begin
   end;
 end;
 
+procedure StringToPointsArray(var A: TATPointArray; Str: string);
+var
+  SItem: string;
+  i, NLen: integer;
+begin
+  NLen:= 0;
+  for i:= 1 to Length(Str) do
+    if Str[i]=';' then Inc(NLen);
+  SetLength(A, NLen);
+  for i:= 0 to NLen-1 do
+  begin
+    SItem:= SGetItem(Str, ';');
+    A[i].X:= StrToIntDef(SGetItem(SItem, ','), 0);
+    A[i].Y:= StrToIntDef(SGetItem(SItem, ','), 0);
+  end;
+end;
 
 { TATUndoItem }
 
@@ -119,6 +139,43 @@ begin
     IntToStr(Ord(ItemHardMark))+PartSep+
     UTF8Encode(ItemText);
 end;
+
+procedure TATUndoItem.SetAsString(AValue: string);
+var
+  SItem: string;
+begin
+  SItem:= SGetItem(AValue, PartSep);
+  ItemAction:= TATEditAction(StrToIntDef(SItem, 0));
+
+  SItem:= SGetItem(AValue, PartSep);
+  ItemIndex:= StrToIntDef(SItem, 0);
+
+  SItem:= SGetItem(AValue, PartSep);
+  ItemEnd:= TATLineEnds(StrToIntDef(SItem, 0));
+
+  SItem:= SGetItem(AValue, PartSep);
+  StringToPointsArray(ItemCarets, SItem);
+
+  SItem:= SGetItem(AValue, PartSep);
+  ItemSoftMark:= SItem='1';
+
+  SItem:= SGetItem(AValue, PartSep);
+  ItemHardMark:= SItem='1';
+
+  ItemText:= UTF8Decode(AValue);
+end;
+
+procedure TATUndoItem.Assign(const D: TATUndoItem);
+begin
+  ItemAction:= D.ItemAction;
+  ItemIndex:= D.ItemIndex;
+  ItemEnd:= D.ItemEnd;
+  ItemText:= D.ItemText;
+  ItemCarets:= D.ItemCarets;
+  ItemSoftMark:= D.ItemSoftMark;
+  ItemHardMark:= D.ItemHardMark;
+end;
+
 
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
@@ -138,6 +195,11 @@ begin
   begin
     ItemCarets[i]:= ACarets[i];
   end;
+end;
+
+constructor TATUndoItem.CreateEmpty;
+begin
+  inherited Create;
 end;
 
 { TATUndoList }
@@ -321,6 +383,28 @@ begin
     for i:= 0 to Count-1 do
       L.Add(Items[i].AsString);
     Result:= L.Text;
+  finally
+    FreeAndNil(L);
+  end;
+end;
+
+procedure TATUndoList.SetAsString(const AValue: string);
+var
+  L: TStringList;
+  Item: TATUndoItem;
+  i: integer;
+begin
+  Clear;
+  L:= TStringList.Create;
+  try
+    L.LineBreak:= #10;
+    L.Text:= AValue;
+    for i:= 0 to L.Count-1 do
+    begin
+      Item:= TATUndoItem.CreateEmpty;
+      Item.AsString:= L[i];
+      FList.Add(Item);
+    end;
   finally
     FreeAndNil(L);
   end;

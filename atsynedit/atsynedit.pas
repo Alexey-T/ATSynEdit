@@ -835,6 +835,7 @@ type
     procedure SetLineTop(AValue: integer);
     procedure SetColumnLeft(AValue: integer);
     procedure SetLinesFromTop(AValue: integer);
+    procedure SetRedoAsString(const AValue: string);
     procedure SetStrings(Obj: TATStrings);
     function GetRectMain: TRect;
     function GetRectMinimap: TRect;
@@ -849,6 +850,7 @@ type
     procedure SetTabSpaces(AValue: boolean);
     procedure SetText(const AValue: atString);
     procedure SetUndoAfterSave(AValue: boolean);
+    procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
@@ -1027,8 +1029,8 @@ type
     property ModeOneLine: boolean read GetOneLine write SetOneLine;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
-    property UndoAsString: string read GetUndoAsString;
-    property RedoAsString: string read GetRedoAsString;
+    property UndoAsString: string read GetUndoAsString write SetUndoAsString;
+    property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     property Text: atString read GetText write SetText;
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
@@ -3539,6 +3541,11 @@ begin
     NPos:= Max(0, NPos + (GetLinesFromTop - AValue));
 end;
 
+procedure TATSynEdit.SetRedoAsString(const AValue: string);
+begin
+  Strings.RedoAsString:= AValue;
+end;
+
 procedure TATSynEdit.SetStrings(Obj: TATStrings);
 begin
   FStringsExternal:= Obj;
@@ -5365,6 +5372,11 @@ end;
 procedure TATSynEdit.SetUndoAfterSave(AValue: boolean);
 begin
   Strings.UndoAfterSave:= AValue;
+end;
+
+procedure TATSynEdit.SetUndoAsString(const AValue: string);
+begin
+  Strings.UndoAsString:= AValue;
 end;
 
 procedure TATSynEdit.DoSizeChange(AInc: boolean);
