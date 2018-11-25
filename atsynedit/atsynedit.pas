@@ -696,6 +696,7 @@ type
     function GetMinimap_PosToWrapIndex(APosY: integer): integer;
     function GetOptTextOffsetTop: integer;
     function GetRectMinimapSel: TRect;
+    function GetUndoAsString: string;
     procedure InitResourcesFoldbar;
     function IsFoldLineNeededBeforeWrapitem(N: integer): boolean;
     function IsRepaintNeededOnEnterOrExit: boolean;
@@ -1025,6 +1026,7 @@ type
     property ModeOneLine: boolean read GetOneLine write SetOneLine;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
+    property UndoAsString: string read GetUndoAsString;
     property Text: atString read GetText write SetText;
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
@@ -5326,6 +5328,11 @@ begin
     NIndex - GetVisibleLines div 2,
     FScrollVert.NMax));
   Update;
+end;
+
+function TATSynEdit.GetUndoAsString: string;
+begin
+  Result:= Strings.UndoAsString;
 end;
 
 function TATSynEdit.GetUndoLimit: integer;

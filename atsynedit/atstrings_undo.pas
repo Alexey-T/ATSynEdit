@@ -34,6 +34,10 @@ type
   { TATUndoItem }
 
   TATUndoItem = class
+  private
+    const PartSep = #9;
+    function GetAsString: string;
+  public
     ItemAction: TATEditAction;
     ItemIndex: integer;
     ItemText: atString;
@@ -41,6 +45,7 @@ type
     ItemCarets: TATPointArray;
     ItemSoftMark: boolean;
     ItemHardMark: boolean;
+    property AsString: string read GetAsString;
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray); virtual;
@@ -56,6 +61,7 @@ type
     FLocked: boolean;
     FSoftMark: boolean;
     FHardMark: boolean;
+    function GetAsString: string;
     function GetItem(N: integer): TATUndoItem;
   public
     constructor Create; virtual;
@@ -77,6 +83,7 @@ type
       AEnd: TATLineEnds; const ACarets: TATPointArray);
     procedure AddUnmodifiedMark;
     function DebugText: string;
+    property AsString: string read GetAsString;
   end;
 
 
@@ -85,7 +92,33 @@ implementation
 uses
   Math, Dialogs;
 
+function PointsArrayToString(const A: TATPointArray): string;
+var
+  j: integer;
+  Pnt: TPoint;
+begin
+  Result:= '';
+  for j:= 0 to Length(A)-1 do
+  begin
+    Pnt:= A[j];
+    Result+= IntToStr(Pnt.X)+','+IntToStr(Pnt.Y)+';';
+  end;
+end;
+
+
 { TATUndoItem }
+
+function TATUndoItem.GetAsString: string;
+begin
+  Result:=
+    IntToStr(Ord(ItemAction))+PartSep+
+    IntToStr(ItemIndex)+PartSep+
+    IntToStr(Ord(ItemEnd))+PartSep+
+    PointsArrayToString(ItemCarets)+PartSep+
+    IntToStr(Ord(ItemSoftMark))+PartSep+
+    IntToStr(Ord(ItemHardMark))+PartSep+
+    UTF8Encode(ItemText);
+end;
 
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
@@ -275,6 +308,24 @@ begin
   else
     Result:= nil;
 end;
+
+
+function TATUndoList.GetAsString: string;
+var
+  L: TStringList;
+  i: integer;
+begin
+  L:= TStringList.Create;
+  try
+    L.LineBreak:= #10;
+    for i:= 0 to Count-1 do
+      L.Add(Items[i].AsString);
+    Result:= L.Text;
+  finally
+    FreeAndNil(L);
+  end;
+end;
+
 
 end.
 

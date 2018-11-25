@@ -216,6 +216,7 @@ type
     function GetLineLenRaw(AIndex: integer): integer;
     function GetLineLenPhysical(AIndex: integer): integer;
     function GetRedoCount: integer;
+    function GetUndoAsString: string;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
@@ -341,6 +342,7 @@ type
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
+    property UndoAsString: string read GetUndoAsString;
     procedure DoClearUndo(ALocked: boolean = false);
     //misc
     procedure DoSaveLastEditPos(AX: integer=-1; AY: integer=-1);
@@ -554,6 +556,11 @@ begin
     Result:= FRedoList.Count
   else
     Result:= 0;
+end;
+
+function TATStrings.GetUndoAsString: string;
+begin
+  Result:= FUndoList.AsString;
 end;
 
 
