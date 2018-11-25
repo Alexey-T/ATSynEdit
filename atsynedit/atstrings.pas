@@ -215,6 +215,7 @@ type
     function GetLineLen(AIndex: integer): integer;
     function GetLineLenRaw(AIndex: integer): integer;
     function GetLineLenPhysical(AIndex: integer): integer;
+    function GetRedoAsString: string;
     function GetRedoCount: integer;
     function GetUndoAsString: string;
     function GetUndoCount: integer;
@@ -343,6 +344,7 @@ type
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
     property UndoAsString: string read GetUndoAsString;
+    property RedoAsString: string read GetRedoAsString;
     procedure DoClearUndo(ALocked: boolean = false);
     //misc
     procedure DoSaveLastEditPos(AX: integer=-1; AY: integer=-1);
@@ -534,6 +536,11 @@ begin
   //Assert(IsIndexValid(AIndex));
   ItemPtr:= FList.GetItem(AIndex);
   Result:= Length(ItemPtr^.Str) + cLineEndLength[TATLineEnds(ItemPtr^.Ex.Ends)];
+end;
+
+function TATStrings.GetRedoAsString: string;
+begin
+  Result:= FRedoList.AsString;
 end;
 
 function TATStrings.GetLineSep(AIndex: integer): TATLineSeparator;
