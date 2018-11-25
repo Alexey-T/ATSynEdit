@@ -1,4 +1,7 @@
 
+2018.11.25
++ add: prop UndoAsString
+
 2018.11.12
 + add: OptShowStapleHiliteActive (highlight deepest block staple containing caret pos)
 + add: OptShowStapleHiliteActiveAlpha (alpha blend value for active staple)
