@@ -260,7 +260,7 @@ type
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: integer; const AString: atString);
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
-    procedure LineDelete(ALineIndex: integer; AForceLast: boolean = true);
+    procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true; AWithEvent: boolean= true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesUTF8[Index: integer]: string read GetLineUTF8 write SetLineUTF8;
     property LinesLen[Index: integer]: integer read GetLineLen;
@@ -1023,7 +1023,8 @@ begin
   Result:= FList.Count;
 end;
 
-procedure TATStrings.LineDelete(ALineIndex: integer; AForceLast: boolean = true);
+procedure TATStrings.LineDelete(ALineIndex: integer; AForceLast: boolean = true;
+  AWithEvent: boolean = true);
 var
   Item: PATStringItem;
   StrBefore: atString;
@@ -1036,8 +1037,12 @@ begin
     StrBefore:= UTF8Decode(Item^.Str);
 
     DoAddUndo(cEditActionDelete, ALineIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
-    DoEventLog(ALineIndex, -Length(StrBefore));
-    DoEventChange(ALineIndex, cLineChangeDeleted);
+
+    if AWithEvent then
+    begin
+      DoEventLog(ALineIndex, -Length(StrBefore));
+      DoEventChange(ALineIndex, cLineChangeDeleted);
+    end;
 
     FList.Delete(ALineIndex);
   end;

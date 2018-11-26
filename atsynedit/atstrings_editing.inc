@@ -383,16 +383,20 @@ begin
   if (ALine2-ALine1)<FUndoList.MaxCount then
   begin
     //delete slowly with undo
+    //AWithEvent must be false, to fix freeze by NN sec during lexer parsing
     for i:= ALine2 downto ALine1 do
-      LineDelete(i);
+      LineDelete(i, true, false{WithEvent});
+    //call event
+    DoEventChange(ALine1, cLineChangeEdited);
+    DoEventLog(ALine1, 1);
   end
   else
   begin
     //delete fast
     FList.DeleteRange(ALine1, ALine2);
     DoClearUndo;
-    DoEventChange(0, cLineChangeEdited);
-    DoEventLog(0, 1);
+    DoEventChange(ALine1, cLineChangeEdited);
+    DoEventLog(ALine1, 1);
     Modified:= true;
   end;
 
