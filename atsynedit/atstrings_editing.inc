@@ -386,19 +386,17 @@ begin
     //AWithEvent must be false, to fix freeze by NN sec during lexer parsing
     for i:= ALine2 downto ALine1 do
       LineDelete(i, true, false{WithEvent});
-    //call event
-    DoEventChange(ALine1, cLineChangeEdited);
-    DoEventLog(ALine1, 1);
   end
   else
   begin
     //delete fast
     FList.DeleteRange(ALine1, ALine2);
     DoClearUndo;
-    DoEventChange(ALine1, cLineChangeEdited);
-    DoEventLog(ALine1, 1);
-    Modified:= true;
   end;
+
+  DoEventChange(ALine1, cLineChangeEdited);
+  DoEventLog(ALine1, 1);
+  Modified:= true;
 
   FChangeBlockActive:= false;
 end;
