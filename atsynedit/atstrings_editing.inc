@@ -383,7 +383,7 @@ begin
   if (ALine2-ALine1)<FUndoList.MaxCount then
   begin
     //delete slowly with undo
-    //AWithEvent must be false, to fix freeze by NN sec during lexer parsing
+    //AWithEvent=false to fix freeze by NN sec, by Ctrl+A,Del during lexer parsing
     for i:= ALine2 downto ALine1 do
       LineDelete(i, true, false{WithEvent});
   end
@@ -394,6 +394,7 @@ begin
     DoClearUndo;
   end;
 
+  //no sense to fire event for each line, do it for first line
   DoEventChange(ALine1, cLineChangeEdited);
   DoEventLog(ALine1, 1);
   Modified:= true;
