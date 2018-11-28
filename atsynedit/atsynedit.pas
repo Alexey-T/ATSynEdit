@@ -5681,9 +5681,18 @@ end;
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin
   if FOptShowStapleStyle=cLineStyleNone then Exit;
-  CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
-  CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Left, R.Bottom), false);
-  CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
+  if FOptShowStapleIndent<0 then
+  begin
+    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
+    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Left, R.Bottom), false);
+    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
+  end
+  else
+  begin
+    //don't paint top staple edge
+    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top+FCharSize.Y), Point(R.Left, R.Bottom), false);
+    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
+  end;
 end;
 
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
