@@ -535,11 +535,11 @@ type
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
     FOptMaxLineLenToCalcURL: integer;
-    FOptShowStapleStyle: TATLineStyle;
-    FOptShowStapleIndent: integer;
-    FOptShowStapleWidthPercent: integer;
-    FOptShowStapleHiliteActive: boolean;
-    FOptShowStapleHiliteActiveAlpha: integer;
+    FOptStapleStyle: TATLineStyle;
+    FOptStapleIndent: integer;
+    FOptStapleWidthPercent: integer;
+    FOptStapleHiliteActive: boolean;
+    FOptStapleHiliteActiveAlpha: integer;
     FOptMouseEnableAll: boolean;
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
@@ -1298,11 +1298,11 @@ type
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
-    property OptShowStapleStyle: TATLineStyle read FOptShowStapleStyle write FOptShowStapleStyle default cLineStyleSolid;
-    property OptShowStapleIndent: integer read FOptShowStapleIndent write FOptShowStapleIndent default -1;
-    property OptShowStapleWidthPercent: integer read FOptShowStapleWidthPercent write FOptShowStapleWidthPercent default 100;
-    property OptShowStapleHiliteActive: boolean read FOptShowStapleHiliteActive write FOptShowStapleHiliteActive default true;
-    property OptShowStapleHiliteActiveAlpha: integer read FOptShowStapleHiliteActiveAlpha write FOptShowStapleHiliteActiveAlpha default cInitStapleHiliteAlpha;
+    property OptStapleStyle: TATLineStyle read FOptStapleStyle write FOptStapleStyle default cLineStyleSolid;
+    property OptStapleIndent: integer read FOptStapleIndent write FOptStapleIndent default -1;
+    property OptStapleWidthPercent: integer read FOptStapleWidthPercent write FOptStapleWidthPercent default 100;
+    property OptStapleHiliteActive: boolean read FOptStapleHiliteActive write FOptStapleHiliteActive default true;
+    property OptStapleHiliteActiveAlpha: integer read FOptStapleHiliteActiveAlpha write FOptStapleHiliteActiveAlpha default cInitStapleHiliteAlpha;
     property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
     property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
@@ -3160,11 +3160,11 @@ begin
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
 
-  FOptShowStapleStyle:= cLineStyleSolid;
-  FOptShowStapleIndent:= -1;
-  FOptShowStapleWidthPercent:= 100;
-  FOptShowStapleHiliteActive:= true;
-  FOptShowStapleHiliteActiveAlpha:= cInitStapleHiliteAlpha;
+  FOptStapleStyle:= cLineStyleSolid;
+  FOptStapleIndent:= -1;
+  FOptStapleWidthPercent:= 100;
+  FOptStapleHiliteActive:= true;
+  FOptStapleHiliteActiveAlpha:= cInitStapleHiliteAlpha;
 
   FOptMaxLinesToCountUnindent:= 100;
   FOptMaxLineLengthForSlowWidthDetect:= 500;
@@ -5680,18 +5680,18 @@ end;
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 begin
-  if FOptShowStapleStyle=cLineStyleNone then Exit;
-  if FOptShowStapleIndent<0 then
+  if FOptStapleStyle=cLineStyleNone then Exit;
+  if FOptStapleIndent<0 then
   begin
-    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
-    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top), Point(R.Left, R.Bottom), false);
-    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
+    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
+    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Top), Point(R.Left, R.Bottom), false);
+    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
   end
   else
   begin
     //don't paint top staple edge
-    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Top+FCharSize.Y), Point(R.Left, R.Bottom), false);
-    CanvasLineEx(C, AColor, FOptShowStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
+    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Top+FCharSize.Y), Point(R.Left, R.Bottom), false);
+    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
   end;
 end;
 
@@ -5706,7 +5706,7 @@ var
   NColor, NColorNormal, NColorActive: TColor;
   i: integer;
 begin
-  if FOptShowStapleStyle=cLineStyleNone then Exit;
+  if FOptStapleStyle=cLineStyleNone then Exit;
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
   Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, nil,
@@ -5714,7 +5714,7 @@ begin
 
   RangeActive:= nil;
   //currently find active range for first caret only
-  if FOptShowStapleHiliteActive then
+  if FOptStapleHiliteActive then
     if Carets.Count>0 then
     begin
       i:= Carets[0].PosY;
@@ -5722,7 +5722,7 @@ begin
     end;
 
   NColorNormal:= Colors.BlockStaple;
-  NColorActive:= ColorBlend(NColorNormal, Colors.TextFont, FOptShowStapleHiliteActiveAlpha);
+  NColorActive:= ColorBlend(NColorNormal, Colors.TextFont, FOptStapleHiliteActiveAlpha);
 
   //c.font.color:= clblue;
   //c.textout(arect.right-150, arect.top, format('staples vis %d', [length(indexes)]));
@@ -5745,9 +5745,9 @@ begin
     Inc(P1.X, NIndent*ACharSize.X);
     Inc(P2.X, NIndent*ACharSize.X);
 
-    RSt.Left:= P1.X + FOptShowStapleIndent;
+    RSt.Left:= P1.X + FOptStapleIndent;
     RSt.Top:= P1.Y;
-    RSt.Right:= RSt.Left+ (ACharSize.X * FOptShowStapleWidthPercent div 100);
+    RSt.Right:= RSt.Left+ (ACharSize.X * FOptStapleWidthPercent div 100);
     RSt.Bottom:= P2.Y + ACharSize.Y-1;
 
     if (RSt.Left>=ARect.Left) and
