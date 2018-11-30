@@ -1,6 +1,7 @@
 
 2018.11.30
 * change: renamed props OptShowStapleNNN to OptStapleNNN
++ add: prop OptStapleEdge1, OptStapleEdge2
 
 2018.11.28
 + add: paint nicer block staple, like in PyCharm, if OptShowStaplesIndent>=0

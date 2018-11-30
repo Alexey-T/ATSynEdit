@@ -158,6 +158,12 @@ type
     cFoldingToggle
     );
 
+  TATStapleEdge = (
+    cStapleEdgeNone,
+    cStapleEdgeAngle,
+    cStapleEdgeLine
+    );
+
 type
   TATAutoIndentKind = (
     cIndentAsPrevLine,
@@ -540,6 +546,8 @@ type
     FOptStapleWidthPercent: integer;
     FOptStapleHiliteActive: boolean;
     FOptStapleHiliteActiveAlpha: integer;
+    FOptStapleEdge1: TATStapleEdge;
+    FOptStapleEdge2: TATStapleEdge;
     FOptMouseEnableAll: boolean;
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
@@ -1303,6 +1311,8 @@ type
     property OptStapleWidthPercent: integer read FOptStapleWidthPercent write FOptStapleWidthPercent default 100;
     property OptStapleHiliteActive: boolean read FOptStapleHiliteActive write FOptStapleHiliteActive default true;
     property OptStapleHiliteActiveAlpha: integer read FOptStapleHiliteActiveAlpha write FOptStapleHiliteActiveAlpha default cInitStapleHiliteAlpha;
+    property OptStapleEdge1: TATStapleEdge read FOptStapleEdge1 write FOptStapleEdge1 default cStapleEdgeAngle;
+    property OptStapleEdge2: TATStapleEdge read FOptStapleEdge2 write FOptStapleEdge2 default cStapleEdgeAngle;
     property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
     property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
@@ -3165,6 +3175,8 @@ begin
   FOptStapleWidthPercent:= 100;
   FOptStapleHiliteActive:= true;
   FOptStapleHiliteActiveAlpha:= cInitStapleHiliteAlpha;
+  FOptStapleEdge1:= cStapleEdgeAngle;
+  FOptStapleEdge2:= cStapleEdgeAngle;
 
   FOptMaxLinesToCountUnindent:= 100;
   FOptMaxLineLengthForSlowWidthDetect:= 500;
@@ -5679,20 +5691,25 @@ end;
 
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
+var
+  P1, P2: TPoint;
 begin
   if FOptStapleStyle=cLineStyleNone then Exit;
-  if FOptStapleIndent<0 then
-  begin
+
+  if FOptStapleEdge1=cStapleEdgeAngle then
     CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
-    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Top), Point(R.Left, R.Bottom), false);
+
+  P1:= Point(R.Left, R.Top);
+  P2:= Point(R.Left, R.Bottom);
+  if FOptStapleEdge1=cStapleEdgeNone then
+    Inc(P1.Y, FCharSize.Y);
+  if FOptStapleEdge2=cStapleEdgeNone then
+    Dec(P2.Y, FCharSize.Y);
+
+  CanvasLineEx(C, AColor, FOptStapleStyle, P1, P2, false);
+
+  if FOptStapleEdge2=cStapleEdgeAngle then
     CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
-  end
-  else
-  begin
-    //don't paint top staple edge
-    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Top+FCharSize.Y), Point(R.Left, R.Bottom), false);
-    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
-  end;
 end;
 
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
