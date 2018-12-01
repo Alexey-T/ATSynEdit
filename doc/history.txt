@@ -1,4 +1,7 @@
 
+2018.12.01
++ add: Colors.BlockStapleForCaret (if clNone, then color is calculated from Colors.BlockStaple/TextFont)
+
 2018.11.30
 * change: renamed props OptShowStapleNNN to OptStapleNNN
 + add: prop OptStapleEdge1, OptStapleEdge2

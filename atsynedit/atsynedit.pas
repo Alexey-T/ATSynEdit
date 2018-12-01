@@ -5739,10 +5739,9 @@ begin
     end;
 
   NColorNormal:= Colors.BlockStaple;
-  NColorActive:= ColorBlend(NColorNormal, Colors.TextFont, FOptStapleHiliteActiveAlpha);
-
-  //c.font.color:= clblue;
-  //c.textout(arect.right-150, arect.top, format('staples vis %d', [length(indexes)]));
+  NColorActive:= Colors.BlockStapleForCaret;
+  if NColorActive=clNone then
+    NColorActive:= ColorBlend(NColorNormal, Colors.TextFont, FOptStapleHiliteActiveAlpha);
 
   for i:= 0 to High(Indexes) do
   begin
