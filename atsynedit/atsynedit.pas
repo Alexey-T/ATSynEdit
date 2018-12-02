@@ -2275,7 +2275,7 @@ begin
             CurrPointText,
             ACharSize,
             FTabSize,
-            @FLineParts,
+            FLineParts,
             Colors.TextBG
             );
 
@@ -2465,7 +2465,7 @@ begin
           CurrPointText,
           ACharSize,
           FTabSize,
-          @FLineParts,
+          FLineParts,
           Colors.TextBG
           );
 

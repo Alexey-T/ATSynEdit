@@ -129,7 +129,7 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   APos: TPoint;
   ACharSize: TPoint;
   ATabSize: integer;
-  AParts: PATLineParts;
+  const AParts: TATLineParts;
   AColorBG: TColor
   );
 
@@ -1232,14 +1232,13 @@ begin
 end;
 
 
-procedure CanvasTextOutMinimap(C: TCanvas;
-  const ARect: TRect; APos: TPoint; ACharSize: TPoint; ATabSize: integer;
-  AParts: PATLineParts;
+procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
+  ACharSize: TPoint; ATabSize: integer; const AParts: TATLineParts;
   AColorBG: TColor);
 // line is painted with 2px height,
 // and 1px spacing between lines
 var
-  Part: ^TATLinePart;
+  Part: PATLinePart;
   nPart: integer;
   X1, X2, Y2: integer;
   HasBG: boolean;
@@ -1248,7 +1247,7 @@ var
 begin
   for nPart:= Low(TATLineParts) to High(TATLineParts) do
   begin
-    Part:= @AParts^[nPart];
+    Part:= @AParts[nPart];
     if Part^.Len=0 then Break;
 
     NColorFont:= Part^.ColorFont;
