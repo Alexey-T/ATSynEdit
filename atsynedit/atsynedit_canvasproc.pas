@@ -1241,7 +1241,7 @@ procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
 // and 1px spacing between lines
 var
   Part: PATLinePart;
-  nPart, NCharIndex, NSpaces: integer;
+  NPartIndex, NCharIndex, NSpaces: integer;
   X1, X2, Y2: integer;
   HasBG: boolean;
   NColorBack,
@@ -1249,9 +1249,9 @@ var
   ch: WideChar;
 begin
   NSpaces:= 0;
-  for nPart:= Low(TATLineParts) to High(TATLineParts) do
+  for NPartIndex:= Low(TATLineParts) to High(TATLineParts) do
   begin
-    Part:= @AParts[nPart];
+    Part:= @AParts[NPartIndex];
     if Part^.Len=0 then Break; //last part
     if Part^.Offset>Length(ALine) then Break; //part out of ALine
 
@@ -1267,6 +1267,9 @@ begin
         NColorFont:= NColorBack
       else
         Continue;
+
+    C.Brush.Color:= NColorBack;
+    C.Pen.Color:= ColorBlendHalf(NColorBack, NColorFont);
 
     //iterate over all chars, to check for spaces (ignore them) and Tabs (add indent for them).
     //because need to paint multiline comments/strings nicely.
@@ -1292,14 +1295,10 @@ begin
           X2:= ARect.Right;
 
         if HasBG then
-        begin
           //paint BG color 1 pixel upper
-          C.Brush.Color:= NColorBack;
           C.FillRect(X1, Y2-2, X2, Y2-1);
-        end;
 
-        C.Brush.Color:= ColorBlendHalf(NColorBack, NColorFont);
-        C.FillRect(X1, Y2-1, X2, Y2);
+        C.Line(X1, Y2-1, X2, Y2-1);
       end;
     end;
   end;
