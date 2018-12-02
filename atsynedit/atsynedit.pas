@@ -2277,7 +2277,10 @@ begin
             FTabSize,
             FLineParts,
             Colors.TextBG,
-            Strings.LineSub(NLinesIndex, 1, GetVisibleColumns) //optimize for huge lines
+            Strings.LineSub(
+              WrapItem.NLineIndex,
+              WrapItem.NCharIndex,
+              GetVisibleColumns) //optimize for huge lines
             );
 
           //end of painting line
@@ -2468,7 +2471,10 @@ begin
           FTabSize,
           FLineParts,
           Colors.TextBG,
-          Strings.LineSub(NLinesIndex, 1, GetVisibleColumns) //optimize for huge lines
+          Strings.LineSub(
+            WrapItem.NLineIndex,
+            WrapItem.NCharIndex,
+            GetVisibleColumns) //optimize for huge lines
           );
 
       //restore after textout
