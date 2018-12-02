@@ -6191,18 +6191,21 @@ begin
   TextOutProps.FontBold:= FontBold;
   TextOutProps.FontBoldItalic:= FontBoldItalic;
 
+  if AConsiderWrapInfo then
+    NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, ALineFrom));
+
   for NLine:= ALineFrom to ALineTo do
   begin
-    if not Strings.IsIndexValid(NLine) then Break;
     NColorAfter:= clNone;
     if AConsiderWrapInfo then
     begin
-      NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, NLine));
       if NWrapIndex<0 then Break;
       WrapItem:= WrapInfo[NWrapIndex];
+      Inc(NWrapIndex);
     end
     else
     begin
+      if not Strings.IsIndexValid(NLine) then Break;
       FillChar(WrapItem, SizeOf(WrapItem), 0);
       WrapItem.NLineIndex:= NLine;
       WrapItem.NCharIndex:= 1;
@@ -6219,7 +6222,10 @@ begin
     CanvasTextOut(C,
       cSizeIndentTooltipX,
       cSizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
-      Strings.Lines[WrapItem.NLineIndex],
+      Strings.LineSub(
+        WrapItem.NLineIndex,
+        WrapItem.NCharIndex,
+        GetVisibleColumns),
       @FLineParts,
       NOutputStrWidth,
       TextOutProps
