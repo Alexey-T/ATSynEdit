@@ -1252,7 +1252,8 @@ begin
   for nPart:= Low(TATLineParts) to High(TATLineParts) do
   begin
     Part:= @AParts[nPart];
-    if Part^.Len=0 then Break;
+    if Part^.Len=0 then Break; //last part
+    if Part^.Offset>Length(ALine) then Break; //part out of ALine
 
     NColorFont:= Part^.ColorFont;
     NColorBack:= Part^.ColorBG;
@@ -1272,13 +1273,13 @@ begin
     for NCharIndex:= Part^.Offset+1 to Part^.Offset+Part^.Len do
     begin
       if NCharIndex>Length(ALine) then Break;
-
       ch:= ALine[NCharIndex];
       if ch=#9 then
-        Inc(NSpaces, 4) //fixed tab size is ok
+        Inc(NSpaces, ATabSize)
       else
         Inc(NSpaces);
-      if IsCharSpace(ch) then Continue; //skip spaces
+      //skip spaces
+      if IsCharSpace(ch) then Continue;
 
       X1:= APos.X + ACharSize.X*NSpaces;
       X2:= X1 + ACharSize.X;
