@@ -132,8 +132,7 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   ATabSize: integer;
   const AParts: TATLineParts;
   AColorBG: TColor;
-  AStrings: TATStrings;
-  ALineIndex: integer
+  const ALine: atString
   );
 
 procedure DoPaintUnprintedEol(C: TCanvas;
@@ -1237,7 +1236,7 @@ end;
 
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
   ACharSize: TPoint; ATabSize: integer; const AParts: TATLineParts;
-  AColorBG: TColor; AStrings: TATStrings; ALineIndex: integer);
+  AColorBG: TColor; const ALine: atString);
 // line is painted with 2px height,
 // and 1px spacing between lines
 var
@@ -1247,12 +1246,9 @@ var
   HasBG: boolean;
   NColorBack,
   NColorFont: TColor;
-  SLine: atString;
   ch: WideChar;
 begin
-  SLine:= AStrings.Lines[ALineIndex];
   NSpaces:= 0;
-
   for nPart:= Low(TATLineParts) to High(TATLineParts) do
   begin
     Part:= @AParts[nPart];
@@ -1275,9 +1271,9 @@ begin
     //because need to paint multiline comments/strings nicely.
     for NCharIndex:= Part^.Offset+1 to Part^.Offset+Part^.Len do
     begin
-      if NCharIndex>Length(SLine) then Break;
+      if NCharIndex>Length(ALine) then Break;
 
-      ch:= SLine[NCharIndex];
+      ch:= ALine[NCharIndex];
       if ch=#9 then
         Inc(NSpaces, 4) //fixed tab size is ok
       else

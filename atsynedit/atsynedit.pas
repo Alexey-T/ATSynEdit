@@ -2251,7 +2251,7 @@ begin
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
     //speedup painting minimap:
-    //if line parts cached, paint them now (without Strings.Lines reading)
+    //if line parts cached, paint them now
     if bCachedMinimap then
       if FAdapterCache.Get(
         WrapItem.NLineIndex,
@@ -2277,8 +2277,7 @@ begin
             FTabSize,
             FLineParts,
             Colors.TextBG,
-            Strings,
-            WrapItem.NLineIndex
+            Strings.LineSub(NLinesIndex, 1, GetVisibleColumns) //optimize for huge lines
             );
 
           //end of painting line
@@ -2469,8 +2468,7 @@ begin
           FTabSize,
           FLineParts,
           Colors.TextBG,
-          Strings,
-          WrapItem.NLineIndex
+          Strings.LineSub(NLinesIndex, 1, GetVisibleColumns) //optimize for huge lines
           );
 
       //restore after textout
