@@ -2276,7 +2276,9 @@ begin
             ACharSize,
             FTabSize,
             FLineParts,
-            Colors.TextBG
+            Colors.TextBG,
+            Strings,
+            WrapItem.NLineIndex
             );
 
           //end of painting line
@@ -2466,7 +2468,9 @@ begin
           ACharSize,
           FTabSize,
           FLineParts,
-          Colors.TextBG
+          Colors.TextBG,
+          Strings,
+          WrapItem.NLineIndex
           );
 
       //restore after textout

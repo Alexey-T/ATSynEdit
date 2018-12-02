@@ -16,6 +16,7 @@ uses
   Classes, SysUtils, Graphics, Types,
   Forms,
   ATStringProc,
+  ATStrings,
   ATSynEdit_CharSizer;
 
 var
@@ -130,7 +131,9 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   ACharSize: TPoint;
   ATabSize: integer;
   const AParts: TATLineParts;
-  AColorBG: TColor
+  AColorBG: TColor;
+  AStrings: TATStrings;
+  ALineIndex: integer
   );
 
 procedure DoPaintUnprintedEol(C: TCanvas;
@@ -1234,17 +1237,22 @@ end;
 
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
   ACharSize: TPoint; ATabSize: integer; const AParts: TATLineParts;
-  AColorBG: TColor);
+  AColorBG: TColor; AStrings: TATStrings; ALineIndex: integer);
 // line is painted with 2px height,
 // and 1px spacing between lines
 var
   Part: PATLinePart;
-  nPart: integer;
+  nPart, NCharIndex, NSpaces: integer;
   X1, X2, Y2: integer;
   HasBG: boolean;
   NColorBack,
   NColorFont: TColor;
+  SLine: atString;
+  ch: WideChar;
 begin
+  SLine:= AStrings.Lines[ALineIndex];
+  NSpaces:= 0;
+
   for nPart:= Low(TATLineParts) to High(TATLineParts) do
   begin
     Part:= @AParts[nPart];
@@ -1263,25 +1271,39 @@ begin
       else
         Continue;
 
-    X1:= APos.X + ACharSize.X*Part^.Offset;
-    X2:= X1 + ACharSize.X*Part^.Len;
-    Y2:= APos.Y + ACharSize.Y;
-
-    if (X1>=ARect.Left) and (X1<ARect.Right) then
+    //iterate over all chars, to check for spaces (ignore them) and Tabs (add indent for them).
+    //because need to paint multiline comments/strings nicely.
+    for NCharIndex:= Part^.Offset+1 to Part^.Offset+Part^.Len do
     begin
-      //must limit line on right edge
-      if X2>ARect.Right then
-        X2:= ARect.Right;
+      if NCharIndex>Length(SLine) then Break;
 
-      if HasBG then
+      ch:= SLine[NCharIndex];
+      if ch=#9 then
+        Inc(NSpaces, 4) //fixed tab size is ok
+      else
+        Inc(NSpaces);
+      if IsCharSpace(ch) then Continue; //skip spaces
+
+      X1:= APos.X + ACharSize.X*NSpaces;
+      X2:= X1 + ACharSize.X;
+      Y2:= APos.Y + ACharSize.Y;
+
+      if (X1>=ARect.Left) and (X1<ARect.Right) then
       begin
-        //paint BG color 1 pixel upper
-        C.Brush.Color:= NColorBack;
-        C.FillRect(X1, Y2-2, X2, Y2-1);
-      end;
+        //must limit line on right edge
+        if X2>ARect.Right then
+          X2:= ARect.Right;
 
-      C.Brush.Color:= ColorBlendHalf(NColorBack, NColorFont);
-      C.FillRect(X1, Y2-1, X2, Y2);
+        if HasBG then
+        begin
+          //paint BG color 1 pixel upper
+          C.Brush.Color:= NColorBack;
+          C.FillRect(X1, Y2-2, X2, Y2-1);
+        end;
+
+        C.Brush.Color:= ColorBlendHalf(NColorBack, NColorFont);
+        C.FillRect(X1, Y2-1, X2, Y2);
+      end;
     end;
   end;
 end;
