@@ -1281,8 +1281,6 @@ begin
         Inc(NSpaces, ATabSize)
       else
         Inc(NSpaces);
-      //skip spaces
-      if IsCharSpace(ch) then Continue;
 
       X1:= APos.X + ACharSize.X*NSpaces;
       X2:= X1 + ACharSize.X;
@@ -1295,10 +1293,11 @@ begin
           X2:= ARect.Right;
 
         if HasBG then
-          //paint BG color 1 pixel upper
-          C.FillRect(X1, Y2-2, X2, Y2-1);
+          //paint BG as 2 pixel line
+          C.FillRect(X1, Y2-2, X2, Y2);
 
-        C.Line(X1, Y2-1, X2, Y2-1);
+        if not IsCharSpace(ch) then
+          C.Line(X1, Y2-1, X2, Y2-1);
       end;
     end;
   end;
