@@ -6133,6 +6133,10 @@ begin
   RectAll:= Rect(0, 0, FMinimapTooltip.Width, FMinimapTooltip.Height);
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
+  C.Pen.Color:= Colors.MinimapTooltipBorder;
+  C.Brush.Color:= Colors.MinimapTooltipBG;
+  C.Rectangle(RectAll);
+
   NWrapIndex:= GetMinimap_PosToWrapIndex(Pnt.Y);
   if NWrapIndex<0 then exit;
   NLineCenter:= FWrapInfo[NWrapIndex].NLineIndex;
