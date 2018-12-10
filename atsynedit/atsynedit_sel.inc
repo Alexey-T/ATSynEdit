@@ -416,7 +416,7 @@ begin
 end;
 
 
-function TATSynEdit.DoSelect_TestMultiCaretsAlignedLikeColumn: boolean;
+function TATSynEdit.DoSelect_MultiCaretsToColumnSel: boolean;
 var
   Caret0, Caret: TATCaretItem;
   Pnt: TPoint;

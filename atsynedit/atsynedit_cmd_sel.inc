@@ -33,7 +33,7 @@ begin
   if Carets.Count=0 then Exit;
 
   if IsSelRectEmpty or (FSelRectBegin.X<0) then
-    if not DoSelect_TestMultiCaretsAlignedLikeColumn then
+    if not DoSelect_MultiCaretsToColumnSel then
     begin
       DoSelect_NormalSelToColumnSel(PntBegin, PntEnd);
       DoCaretSingleAsIs;

@@ -231,7 +231,7 @@ const
   cInitScrollbarHorzAddSpace = 4;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
-  cInitColumnSelFromMultiCarets = false; //todo: enable later
+  cInitColumnSelFromMultiCarets = true; //todo: enable later
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingText = 1;
@@ -694,7 +694,7 @@ type
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
     procedure DoSelectionDeleteColumnBlock;
-    function DoSelect_TestMultiCaretsAlignedLikeColumn: boolean;
+    function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
     function GetColorTextBG: TColor;
