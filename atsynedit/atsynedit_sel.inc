@@ -429,7 +429,7 @@ begin
   Caret0:= Carets[0];
   if Caret0.EndY<0 then exit;
   if Caret0.EndY<>Caret0.PosY then exit;
-  Pnt.X:= Caret0.PosX;
+  Pnt.X:= Strings.CharPosToColumnPos(Caret0.PosY, Caret0.PosX, FTabHelper);
   Pnt.Y:= Caret0.PosY;
 
   for i:= 1{>0} to Carets.Count-1 do
@@ -437,7 +437,7 @@ begin
     Caret:= Carets[i];
     if Caret.PosY<>Pnt.Y+i then exit;
     if Caret.PosY<>Caret.EndY then exit;
-    if Caret.PosX<>Pnt.X then exit;
+    if Pnt.X<>Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper) then exit;
   end;
 
   Result:= true;
