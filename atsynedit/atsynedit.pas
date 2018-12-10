@@ -231,7 +231,7 @@ const
   cInitScrollbarHorzAddSpace = 4;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
-  cInitColumnSelFromMultiCarets = true; //todo: enable later
+  cInitCaretsMultiToColumnSel = false; //todo: enable later
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingText = 1;
@@ -558,6 +558,7 @@ type
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
     FOptCaretFixAfterRangeFolded: boolean;
+    FOptCaretsMultiToColumnSel: boolean;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
     FOptTextCenteringCharWidth: integer;
@@ -603,7 +604,6 @@ type
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptOverwriteAllowedOnPaste: boolean;
-    FOptColumnSelectionFromMultiCarets: boolean;
     FOptKeyBackspaceUnindent: boolean;
     FOptKeyPageKeepsRelativePos: boolean;
     FOptKeyUpDownNavigateWrapped: boolean;
@@ -1297,7 +1297,6 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
-    property OptColumnSelectionFromMultiCarets: boolean read FOptColumnSelectionFromMultiCarets write FOptColumnSelectionFromMultiCarets default cInitColumnSelFromMultiCarets;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
@@ -1333,6 +1332,7 @@ type
     property OptCaretPosAfterPasteColumn: TATPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn default cPasteCaretColumnRight;
     property OptCaretsAddedToColumnSelection: boolean read FOptCaretsAddedToColumnSelection write FOptCaretsAddedToColumnSelection default true;
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
+    property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default 4;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
@@ -3206,7 +3206,6 @@ begin
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptKeyUpDownKeepColumn:= true;
   FOptOverwriteAllowedOnPaste:= false;
-  FOptColumnSelectionFromMultiCarets:= cInitColumnSelFromMultiCarets;
   FOptWordChars:= '';
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsPrevLine;
@@ -3262,6 +3261,7 @@ begin
   FOptCaretPosAfterPasteColumn:= cPasteCaretColumnRight;
   FOptCaretsAddedToColumnSelection:= true;
   FOptCaretFixAfterRangeFolded:= true;
+  FOptCaretsMultiToColumnSel:= cInitCaretsMultiToColumnSel;
   FOptMarkersSize:= 4;
   FOptMouseEnableAll:= true;
   FOptMouseEnableNormalSelection:= true;

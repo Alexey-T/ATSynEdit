@@ -423,7 +423,7 @@ var
   i: integer;
 begin
   Result:= false;
-  if not FOptColumnSelectionFromMultiCarets then exit;
+  if not FOptCaretsMultiToColumnSel then exit;
   if Carets.Count<2 then exit;
 
   Caret0:= Carets[0];
@@ -441,12 +441,28 @@ begin
   end;
 
   Result:= true;
+  //set FSelRect, FSelRectBegin, FSelRectEnd
 
-  //make column sel: set FSelRect, FSelRectBegin, FSelRectEnd
-  FSelRectBegin:= Pnt;
-  Caret:= Carets[Carets.Count-1];
-  FSelRectEnd.X:= Caret.EndX;
-  FSelRectEnd.Y:= Caret.PosY;
+  //if Caret0.PosX>Caret0.EndX then
+  begin
+    FSelRectBegin.X:= Caret0.PosX;
+    FSelRectBegin.Y:= Caret0.PosY;
+    Caret:= Carets[Carets.Count-1];
+    FSelRectEnd.X:= Caret.EndX;
+    FSelRectEnd.Y:= Caret.PosY;
+  end;
+  {
+  //this block was trying to fix continue of multi-carets,
+  //when each multi-caret is reverse selection. but it don't help.
+  else
+  begin
+    FSelRectBegin.X:= Caret0.EndX;
+    FSelRectBegin.Y:= Caret0.PosY;
+    Caret:= Carets[Carets.Count-1];
+    FSelRectEnd.X:= Caret.PosX;
+    FSelRectEnd.Y:= Caret.PosY;
+  end;
+  }
 
   FSelRect:= Rect(
     Min(FSelRectBegin.X, FSelRectEnd.X),
