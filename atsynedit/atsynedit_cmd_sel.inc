@@ -33,13 +33,14 @@ begin
   if Carets.Count=0 then Exit;
 
   if IsSelRectEmpty or (FSelRectBegin.X<0) then
-  begin
-    DoSelect_NormalSelToColumnSel(PntBegin, PntEnd);
-    DoCaretSingleAsIs;
-    DoSelect_None;
-    FSelRectBegin:= PntBegin;
-    FSelRectEnd:= PntEnd;
-  end;
+    if not DoSelect_TestMultiCaretsAlignedLikeColumn then
+    begin
+      DoSelect_NormalSelToColumnSel(PntBegin, PntEnd);
+      DoCaretSingleAsIs;
+      DoSelect_None;
+      FSelRectBegin:= PntBegin;
+      FSelRectEnd:= PntEnd;
+    end;
 
   if ADir in [cDirColumnPageUp, cDirColumnPageDown] then
     NPageLines:= GetPageLines

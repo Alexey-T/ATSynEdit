@@ -231,6 +231,7 @@ const
   cInitScrollbarHorzAddSpace = 4;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
+  cInitColumnSelFromMultiCarets = false; //todo: enable later
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingText = 1;
@@ -602,6 +603,7 @@ type
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptOverwriteAllowedOnPaste: boolean;
+    FOptColumnSelectionFromMultiCarets: boolean;
     FOptKeyBackspaceUnindent: boolean;
     FOptKeyPageKeepsRelativePos: boolean;
     FOptKeyUpDownNavigateWrapped: boolean;
@@ -692,6 +694,7 @@ type
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
     procedure DoSelectionDeleteColumnBlock;
+    function DoSelect_TestMultiCaretsAlignedLikeColumn: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
     function GetColorTextBG: TColor;
@@ -1294,6 +1297,7 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
+    property OptColumnSelectionFromMultiCarets: boolean read FOptColumnSelectionFromMultiCarets write FOptColumnSelectionFromMultiCarets default cInitColumnSelFromMultiCarets;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
@@ -3202,6 +3206,7 @@ begin
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptKeyUpDownKeepColumn:= true;
   FOptOverwriteAllowedOnPaste:= false;
+  FOptColumnSelectionFromMultiCarets:= cInitColumnSelFromMultiCarets;
   FOptWordChars:= '';
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsPrevLine;

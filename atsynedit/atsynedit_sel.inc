@@ -415,3 +415,44 @@ begin
     Carets[0].PosX:= X1;
 end;
 
+
+function TATSynEdit.DoSelect_TestMultiCaretsAlignedLikeColumn: boolean;
+var
+  Caret0, Caret: TATCaretItem;
+  Pnt: TPoint;
+  i: integer;
+begin
+  Result:= false;
+  if not FOptColumnSelectionFromMultiCarets then exit;
+  if Carets.Count<2 then exit;
+
+  Caret0:= Carets[0];
+  if Caret0.EndY<0 then exit;
+  if Caret0.EndY<>Caret0.PosY then exit;
+  Pnt.X:= Caret0.PosX;
+  Pnt.Y:= Caret0.PosY;
+
+  for i:= 1{>0} to Carets.Count-1 do
+  begin
+    Caret:= Carets[i];
+    if Caret.PosY<>Pnt.Y+i then exit;
+    if Caret.PosY<>Caret.EndY then exit;
+    if Caret.PosX<>Pnt.X then exit;
+  end;
+
+  Result:= true;
+
+  //make column sel: set FSelRect, FSelRectBegin, FSelRectEnd
+  FSelRectBegin:= Pnt;
+  Caret:= Carets[Carets.Count-1];
+  FSelRectEnd.X:= Caret.EndX;
+  FSelRectEnd.Y:= Caret.PosY;
+
+  FSelRect:= Rect(
+    Min(FSelRectBegin.X, FSelRectEnd.X),
+    FSelRectBegin.Y,
+    Max(FSelRectBegin.X, FSelRectEnd.X),
+    FSelRectEnd.Y
+    );
+end;
+
