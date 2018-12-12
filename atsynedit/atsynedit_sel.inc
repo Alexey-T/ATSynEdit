@@ -443,18 +443,17 @@ begin
   Result:= true;
   //must set FSelRect, FSelRectBegin, FSelRectEnd
 
-  FSelRectEnd.X:= Caret0.PosX;
-  FSelRectEnd.Y:= Caret0.PosY;
-
   Caret:= Carets[Carets.Count-1];
+  FSelRectEnd.X:= Caret0.PosX;
+  FSelRectEnd.Y:= Caret.PosY;
   FSelRectBegin.X:= Caret.EndX;
-  FSelRectBegin.Y:= Caret.PosY;
+  FSelRectBegin.Y:= Caret0.PosY;
 
   FSelRect:= Rect(
     Min(FSelRectBegin.X, FSelRectEnd.X),
-    FSelRectEnd.Y,
+    Caret0.PosY,
     Max(FSelRectBegin.X, FSelRectEnd.X),
-    FSelRectBegin.Y
+    Caret.PosY
     );
 
   {//debug
