@@ -231,7 +231,7 @@ const
   cInitScrollbarHorzAddSpace = 4;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
-  cInitCaretsMultiToColumnSel = false; //todo: enable later
+  cInitCaretsMultiToColumnSel = true;
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingText = 1;
