@@ -441,34 +441,25 @@ begin
   end;
 
   Result:= true;
-  //set FSelRect, FSelRectBegin, FSelRectEnd
+  //must set FSelRect, FSelRectBegin, FSelRectEnd
 
-  //if Caret0.PosX>Caret0.EndX then
-  begin
-    FSelRectBegin.X:= Caret0.PosX;
-    FSelRectBegin.Y:= Caret0.PosY;
-    Caret:= Carets[Carets.Count-1];
-    FSelRectEnd.X:= Caret.EndX;
-    FSelRectEnd.Y:= Caret.PosY;
-  end;
-  {
-  //this block was trying to fix continue of multi-carets,
-  //when each multi-caret is reverse selection. but it don't help.
-  else
-  begin
-    FSelRectBegin.X:= Caret0.EndX;
-    FSelRectBegin.Y:= Caret0.PosY;
-    Caret:= Carets[Carets.Count-1];
-    FSelRectEnd.X:= Caret.PosX;
-    FSelRectEnd.Y:= Caret.PosY;
-  end;
-  }
+  FSelRectEnd.X:= Caret0.PosX;
+  FSelRectEnd.Y:= Caret0.PosY;
+
+  Caret:= Carets[Carets.Count-1];
+  FSelRectBegin.X:= Caret.EndX;
+  FSelRectBegin.Y:= Caret.PosY;
 
   FSelRect:= Rect(
     Min(FSelRectBegin.X, FSelRectEnd.X),
-    FSelRectBegin.Y,
+    FSelRectEnd.Y,
     Max(FSelRectBegin.X, FSelRectEnd.X),
-    FSelRectEnd.Y
+    FSelRectBegin.Y
     );
+
+  {//debug
+  Application.MainForm.Caption:= Format('selrect %d:%d-%d:%d, begin %d:%d',
+    [FSelRect.Left, FSelRect.Top, FSelRect.Right, FSelRect.Bottom, FSelRectBegin.X, FSelRectBegin.Y]);
+    }
 end;
 
