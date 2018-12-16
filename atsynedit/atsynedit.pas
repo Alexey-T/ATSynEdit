@@ -235,7 +235,7 @@ const
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingText = 1;
-  cInitTimerBlink = 600;
+  cInitCaretBlinkTime = 600;
   cInitTimerAutoScroll = 80;
   cInitTimerNiceScroll = 200;
   cInitMinimapVisible = false;
@@ -390,6 +390,7 @@ type
     FScalePercents: integer;
     FCarets: TATCarets;
     FCaretBlinkEnabled: boolean;
+    FCaretBlinkTime: integer;
     FCaretShown: boolean;
     FCaretPropsNormal: TATCaretProps;
     FCaretPropsOverwrite: TATCaretProps;
@@ -805,7 +806,6 @@ type
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
-    function GetCaretBlinkTime: integer;
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
     procedure DoCaretsSort;
     //events
@@ -1325,7 +1325,7 @@ type
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed default true;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual default true;
-    property OptCaretBlinkTime: integer read GetCaretBlinkTime write SetCaretBlinkTime default cInitTimerBlink;
+    property OptCaretBlinkTime: integer read FCaretBlinkTime write SetCaretBlinkTime default cInitCaretBlinkTime;
     property OptCaretBlinkEnabled: boolean read FCaretBlinkEnabled write SetCaretBlinkEnabled default true;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused default true;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide default true;
@@ -3024,7 +3024,7 @@ begin
   FTimerIdle.OnTimer:=@TimerIdleTick;
 
   FTimerBlink:= TTimer.Create(Self);
-  FTimerBlink.Interval:= cInitTimerBlink;
+  SetCaretBlinkTime(cInitCaretBlinkTime);
   FTimerBlink.OnTimer:= @TimerBlinkTick;
   FTimerBlink.Enabled:= true;
 
@@ -3439,6 +3439,7 @@ procedure TATSynEdit.SetCaretBlinkTime(AValue: integer);
 begin
   AValue:= Max(AValue, cMinCaretTime);
   AValue:= Min(AValue, cMaxCaretTime);
+  FCaretBlinkTime:= AValue;
   FTimerBlink.Interval:= AValue;
 end;
 
@@ -4982,12 +4983,6 @@ procedure TATSynEdit.DoEventCommandAfter(ACommand: integer; const AText: string)
 begin
   if Assigned(FOnCommandAfter) then
     FOnCommandAfter(Self, ACommand, AText);
-end;
-
-
-function TATSynEdit.GetCaretBlinkTime: integer;
-begin
-  Result:= FTimerBlink.Interval;
 end;
 
 
