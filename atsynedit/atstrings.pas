@@ -1649,7 +1649,8 @@ end;
 procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
 begin
   FGaps.Update(AChange, ALineIndex, AItemCount);
-  FBookmarks.Update(ALineIndex, AChange, Count);
+
+  FBookmarks.Update(AChange, ALineIndex, AItemCount, Count);
 
   if Assigned(FGutterDecor1) then
     FGutterDecor1.Update(ALineIndex, AChange, Count);

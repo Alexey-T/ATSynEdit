@@ -50,7 +50,7 @@ type
     procedure Add(const AData: TATBookmarkData);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
-    procedure Update(ALine: integer; AChange: TATLineChangeKind; ALineCount: integer);
+    procedure Update(AChange: TATLineChangeKind; ALine, AItemCount, ALineCount: integer);
   end;
 
 implementation
@@ -207,11 +207,11 @@ begin
 end;
 
 
-procedure TATBookmarks.Update(ALine: integer; AChange: TATLineChangeKind;
-  ALineCount: integer);
+procedure TATBookmarks.Update(AChange: TATLineChangeKind;
+  ALine, AItemCount, ALineCount: integer);
 var
   Item: TATBookmarkItem;
-  bMovedHere: boolean;
+  //bMovedHere: boolean;
   NIndexPlaced, i: integer;
 begin
   case AChange of
@@ -225,7 +225,7 @@ begin
         begin
           Item:= Items[i];
           if Item.Data.LineNum>=ALine then
-            Item.Data.LineNum:= Item.Data.LineNum+1;
+            Item.Data.LineNum:= Item.Data.LineNum+AItemCount;
         end;
       end;
 
@@ -236,13 +236,16 @@ begin
 
     cLineChangeDeleted:
       begin
-        NIndexPlaced:= Find(ALine);
-        bMovedHere:= false;
-
-        if (NIndexPlaced>=0) and Items[NIndexPlaced].Data.DeleteOnDelLine then
+        for i:= 0 to AItemCount-1 do
         begin
-          Delete(NIndexPlaced);
-          NIndexPlaced:= -1;
+          NIndexPlaced:= Find(ALine+i);
+          //bMovedHere:= false;
+
+          if (NIndexPlaced>=0) and Items[NIndexPlaced].Data.DeleteOnDelLine then
+          begin
+            Delete(NIndexPlaced);
+            NIndexPlaced:= -1;
+          end;
         end;
 
         for i:= Count-1 downto 0 do
@@ -252,16 +255,20 @@ begin
           //spec case for bookmark on last line, keep it if deleting last line
           if (Item.Data.LineNum>ALine) or (Item.Data.LineNum=ALineCount-1) then
           begin
-            Item.Data.LineNum:= Item.Data.LineNum-1;
+            Item.Data.LineNum:= Item.Data.LineNum-AItemCount;
+            {
             if Item.Data.LineNum=ALine then
               bMovedHere:= true;
+            }
           end;
         end;
 
+        {
         //delete new duplicate
         if bMovedHere then
           if NIndexPlaced>=0 then
             Delete(NIndexPlaced);
+        }
       end;
   end;
 end;
