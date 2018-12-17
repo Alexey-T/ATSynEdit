@@ -1653,9 +1653,9 @@ begin
   FBookmarks.Update(AChange, ALineIndex, AItemCount, Count);
 
   if Assigned(FGutterDecor1) then
-    FGutterDecor1.Update(ALineIndex, AChange, Count);
+    FGutterDecor1.Update(AChange, ALineIndex, AItemCount, Count);
   if Assigned(FGutterDecor2) then
-    FGutterDecor2.Update(ALineIndex, AChange, Count);
+    FGutterDecor2.Update(AChange, ALineIndex, AItemCount, Count);
 
   if Assigned(FOnChange) then
     FOnChange(Self, AChange, ALineIndex, AItemCount);
