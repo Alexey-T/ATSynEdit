@@ -223,8 +223,10 @@ type
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
-    procedure LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
-    procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
+    procedure LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
+      AWithEvent: boolean=true);
+    procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
+      AWithEvent: boolean=true);
     procedure SetCaretsArray(const L: TATPointArray);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLineUTF8(AIndex: integer; const AValue: string);
@@ -259,7 +261,7 @@ type
     procedure LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
-    procedure LineInsert(ALineIndex: integer; const AString: atString);
+    procedure LineInsert(ALineIndex: integer; const AString: atString; AWithEvent: boolean=true);
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true; AWithEvent: boolean= true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
@@ -937,7 +939,8 @@ begin
   end;
 end;
 
-procedure TATStrings.LineInsertRaw(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
+procedure TATStrings.LineInsertRaw(ALineIndex: integer; const AString: atString;
+  AEnd: TATLineEnds; AWithEvent: boolean=true);
 var
   Item: TATStringItem;
 begin
@@ -945,30 +948,36 @@ begin
   if DoCheckFilled then Exit;
 
   DoAddUndo(cEditActionInsert, ALineIndex, '', cEndNone);
-  DoEventLog(ALineIndex, Length(AString));
-  DoEventChange(cLineChangeAdded, ALineIndex, 1);
+
+  if AWithEvent then
+  begin
+    DoEventLog(ALineIndex, Length(AString));
+    DoEventChange(cLineChangeAdded, ALineIndex, 1);
+  end;
 
   Item.Init(UTF8Encode(AString), AEnd, Length(AString));
   FList.Insert(ALineIndex, @Item);
   FillChar(Item, SizeOf(Item), 0);
 end;
 
-procedure TATStrings.LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds);
+procedure TATStrings.LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
+  AWithEvent: boolean=true);
 begin
   if FReadOnly then Exit;
 
   if IsIndexValid(ALineIndex) then
-    LineInsertRaw(ALineIndex, AString, AEnd)
+    LineInsertRaw(ALineIndex, AString, AEnd, AWithEvent)
   else
   if ALineIndex=Count then
-    LineAddEx(AString, AEnd)
-  else
-    raise Exception.Create('Incorrect Insert index: '+IntToStr(ALineIndex));
+    LineAddEx(AString, AEnd);
+  //else
+  //  raise Exception.Create('Incorrect Insert index: '+IntToStr(ALineIndex));
 end;
 
-procedure TATStrings.LineInsert(ALineIndex: integer; const AString: atString);
+procedure TATStrings.LineInsert(ALineIndex: integer; const AString: atString;
+  AWithEvent: boolean=true);
 begin
-  LineInsertEx(ALineIndex, AString, FEndings);
+  LineInsertEx(ALineIndex, AString, FEndings, AWithEvent);
 end;
 
 procedure TATStrings.LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);

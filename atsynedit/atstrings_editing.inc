@@ -411,9 +411,13 @@ begin
     0, 0,
     cBlockInsertLines,
     ANewLines);
+
   for i:= ANewLines.Count-1 downto 0 do
-    LineInsert(ALineFrom, UTF8Decode(ANewLines[i]));
+    LineInsert(ALineFrom, UTF8Decode(ANewLines[i]), false{AWithEvent});
   FChangeBlockActive:= false;
+
+  DoEventLog(ALineFrom, 1);
+  DoEventChange(cLineChangeAdded, ALineFrom, ANewLines.Count);
 end;
 
 
