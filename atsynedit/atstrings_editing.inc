@@ -394,8 +394,7 @@ begin
     DoClearUndo;
   end;
 
-  //no sense to fire event for each line, do it for first line
-  DoEventChange(ALine1, cLineChangeEdited);
+  DoEventChange(cLineChangeDeleted, ALine1, ALine2-ALine1+1);
   DoEventLog(ALine1, 1);
   Modified:= true;
 

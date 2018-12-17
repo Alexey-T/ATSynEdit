@@ -201,7 +201,8 @@ type
     function DebugText: string;
     function DoCheckFilled: boolean;
     procedure DoEventLog(ALine, ALen: integer);
-    procedure DoEventChange(ALine: integer; AChange: TATLineChangeKind);
+    procedure DoEventChange(AChange: TATLineChangeKind; ALineIndex,
+      AItemCount: integer);
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
@@ -640,7 +641,7 @@ begin
   DoAddUndo(cEditActionChange, AIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
   DoEventLog(AIndex, -Length(StrBefore));
   DoEventLog(AIndex, Length(AValue));
-  DoEventChange(AIndex, cLineChangeEdited);
+  DoEventChange(cLineChangeEdited, AIndex, 1);
 
   Item^.Str:= UTF8Encode(AValue);
   UniqueString(Item^.Str);
@@ -891,7 +892,7 @@ begin
 
   DoAddUndo(cEditActionInsert, Count, '', cEndNone);
   DoEventLog(Count, Length(AString));
-  DoEventChange(Count, cLineChangeAdded);
+  DoEventChange(cLineChangeAdded, Count, 1);
 
   Item.Init(UTF8Encode(AString), AEnd, Length(AString));
   FList.Add(@Item);
@@ -945,7 +946,7 @@ begin
 
   DoAddUndo(cEditActionInsert, ALineIndex, '', cEndNone);
   DoEventLog(ALineIndex, Length(AString));
-  DoEventChange(ALineIndex, cLineChangeAdded);
+  DoEventChange(cLineChangeAdded, ALineIndex, 1);
 
   Item.Init(UTF8Encode(AString), AEnd, Length(AString));
   FList.Insert(ALineIndex, @Item);
@@ -989,7 +990,6 @@ begin
     begin
       DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone);
       DoEventLog(ALineIndex+i, ABlock.LinesLen[i]);
-      DoEventChange(ALineIndex+i, cLineChangeAdded);
 
       Item.Init(
         ABlock.GetLineUTF8(i),
@@ -998,6 +998,7 @@ begin
       FList.Insert(ALineIndex+i, @Item);
       FillChar(Item, SizeOf(Item), 0);
     end;
+    DoEventChange(cLineChangeAdded, ALineIndex, NCount);
   end;
 
   //insert last item specially, if no eol
@@ -1041,7 +1042,7 @@ begin
     if AWithEvent then
     begin
       DoEventLog(ALineIndex, -Length(StrBefore));
-      DoEventChange(ALineIndex, cLineChangeDeleted);
+      DoEventChange(cLineChangeDeleted, ALineIndex, 1);
     end;
 
     FList.Delete(ALineIndex);
@@ -1127,7 +1128,7 @@ procedure TATStrings.Clear;
 begin
   DoClearUndo(FUndoList.Locked);
   DoEventLog(-1, 0);
-  DoEventChange(-1, cLineChangeDeletedAll);
+  DoEventChange(cLineChangeDeletedAll, -1, 1);
 
   FList.Clear;
 end;
@@ -1645,18 +1646,18 @@ begin
     FOnLog(Self, ALine, ALen);
 end;
 
-procedure TATStrings.DoEventChange(ALine: integer; AChange: TATLineChangeKind);
+procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
 begin
-  FGaps.Update(ALine, AChange);
-  FBookmarks.Update(ALine, AChange, Count);
+  FGaps.Update(ALineIndex, AChange);
+  FBookmarks.Update(ALineIndex, AChange, Count);
 
   if Assigned(FGutterDecor1) then
-    FGutterDecor1.Update(ALine, AChange, Count);
+    FGutterDecor1.Update(ALineIndex, AChange, Count);
   if Assigned(FGutterDecor2) then
-    FGutterDecor2.Update(ALine, AChange, Count);
+    FGutterDecor2.Update(ALineIndex, AChange, Count);
 
   if Assigned(FOnChange) then
-    FOnChange(Self, ALine, AChange);
+    FOnChange(Self, ALineIndex, AChange);
 end;
 
 procedure TATStrings.ClearSeparators;
