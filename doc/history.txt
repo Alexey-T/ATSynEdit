@@ -1,4 +1,8 @@
 
+2018.12.18
+* change: declaration of Strings.OnChange (added param)
++ add: improved String.OnChange code for deletion/insertion of many lines
+
 2018.12.02
 + add: reworked Minimap painting, so now it correctly paints spaces/tabs, even if they are inside multiline comments or strings
 - fix: fixes for Minimap Tooltip - it must show wrapped lines like editor does
