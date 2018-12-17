@@ -56,7 +56,7 @@ type
     function Find(ALineIndex: integer; ATag: Int64=-1): TATSynGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
-    procedure Update(ALine: integer; AChange: TATLineChangeKind);
+    procedure Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     property OnDelete: TATSynGapDelete read FOnDelete write FOnDelete;
   end;
 
@@ -205,8 +205,7 @@ begin
   end;
 end;
 
-procedure TATSynGaps.Update(ALine: integer;
-  AChange: TATLineChangeKind);
+procedure TATSynGaps.Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);
 var
   Item: TATSynGapItem;
   i: integer;
@@ -221,7 +220,7 @@ begin
         begin
           Item:= Items[i];
           if Item.LineIndex>=ALine then
-            Item.LineIndex:= Item.LineIndex+1;
+            Item.LineIndex:= Item.LineIndex+AItemCount;
         end;
       end;
     cLineChangeDeletedAll:
@@ -233,11 +232,11 @@ begin
         for i:= Count-1 downto 0 do
         begin
           Item:= Items[i];
-          if Item.LineIndex=ALine then
+          if (Item.LineIndex>=ALine) and (Item.LineIndex<ALine+AItemCount) then
             Delete(i)
           else
           if Item.LineIndex>ALine then
-            Item.LineIndex:= Item.LineIndex-1;
+            Item.LineIndex:= Item.LineIndex-AItemCount;
         end;
       end;
   end;
