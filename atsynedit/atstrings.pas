@@ -148,7 +148,7 @@ type
   TATStringsGetCarets = function: TATPointArray of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
   TATStringsLogEvent = procedure(Sender: TObject; ALine, ALen: integer) of object;
-  TATStringsChangeEvent = procedure(Sender: TObject; ALine: integer; AChange: TATLineChangeKind) of object;
+  TATStringsChangeEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
 type
@@ -1657,7 +1657,7 @@ begin
     FGutterDecor2.Update(ALineIndex, AChange, Count);
 
   if Assigned(FOnChange) then
-    FOnChange(Self, ALineIndex, AChange);
+    FOnChange(Self, AChange, ALineIndex, AItemCount);
 end;
 
 procedure TATStrings.ClearSeparators;

@@ -213,8 +213,7 @@ type
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
     procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
-    procedure EditStringsChange(Sender: TObject; ALine: integer;
-      AChange: TATLineChangeKind);
+    procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
     procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
@@ -1135,8 +1134,8 @@ begin
       [AGapItem.LineIndex+1, APos.X, APos.Y]));
 end;
 
-procedure TfmMain.EditStringsChange(Sender: TObject; ALine: integer;
-  AChange: TATLineChangeKind);
+procedure TfmMain.EditStringsChange(Sender: TObject;
+  AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
 const
   cEvent: array[TATLineChangeKind] of string = (
     'cLineChangeEdited',
@@ -1148,7 +1147,7 @@ begin
   exit;////
   DoLog(Format('%s, line %d', [
     cEvent[AChange],
-    ALine
+    ALineIndex
     ]));
 end;
 
