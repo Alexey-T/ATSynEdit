@@ -379,7 +379,7 @@ var
 begin
   L:= TStringList.Create;
   try
-    L.LineBreak:= #10;
+    L.TextLineBreakStyle:= tlbsLF;
     for i:= 0 to Count-1 do
       L.Add(Items[i].AsString);
     Result:= L.Text;
@@ -397,10 +397,11 @@ begin
   Clear;
   L:= TStringList.Create;
   try
-    L.LineBreak:= #10;
+    L.TextLineBreakStyle:= tlbsLF;
     L.Text:= AValue;
     for i:= 0 to L.Count-1 do
     begin
+      if L[i]='' then Continue;
       Item:= TATUndoItem.CreateEmpty;
       Item.AsString:= L[i];
       FList.Add(Item);
