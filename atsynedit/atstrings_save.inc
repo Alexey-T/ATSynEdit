@@ -8,6 +8,10 @@ var
   bEncoded: boolean;
   i: integer;
 begin
+  {$if (lcl_major>=2)}
+  LConvEncoding.ConvertEncodingFromUtf8RaisesException:= true;
+  {$endif}
+
   if AWithSignature then
   begin
     Sign:= '';

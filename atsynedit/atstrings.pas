@@ -15,6 +15,7 @@ uses
   SysUtils, Classes, Graphics,
   LazUTF8,
   FileUtil,
+  LCLVersion,
   ATStringProc,
   ATStringProc_Utf8Detect,
   ATStrings_Undo,
