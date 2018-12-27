@@ -145,7 +145,9 @@ begin
   Result:= Sizes[Ord(ch)];
   if Result=0 then
   begin
-    Result:= Canvas.TextWidth(UTF8Encode(UnicodeString(ch))) * 100 div SizeAvg;
+    if SizeAvg<=0 then
+       raise Exception.Create('CharSize.Init was not called');
+    Result:= Canvas.TextWidth(UTF8Encode(WideString(ch))) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Result;
   end;
 end;

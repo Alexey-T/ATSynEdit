@@ -2076,6 +2076,7 @@ begin
 
   C.Font.Assign(Font);
   FCharSize:= GetCharSize(C, FCharSpacingText);
+  GlobalCharSizer.Init(Font.Name, Font.Size, C);
 
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize(C);
@@ -2190,7 +2191,6 @@ begin
 
   if AMainText then
   begin
-    GlobalCharSizer.Init(Font.Name, Font.Size, C);
     DoClearFoldedMarkList;
   end;
 
