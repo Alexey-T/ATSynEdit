@@ -44,7 +44,7 @@ object fmCombo: TfmCombo
     CloseButton.DefaultCaption = True
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
-    TabOrder = 6
+    TabOrder = 5
     ShowButtons = [pbClose]
     ShowBevel = False
   end
@@ -86,7 +86,7 @@ object fmCombo: TfmCombo
     Width = 80
     MaxValue = 1000
     OnChange = edMaxLenChange
-    TabOrder = 5
+    TabOrder = 4
   end
   object LabelMaxLen: TLabel
     AnchorSideLeft.Control = edMaxLen
@@ -111,14 +111,5 @@ object fmCombo: TfmCombo
     OnChange = chkEnMouseChange
     State = cbChecked
     TabOrder = 3
-  end
-  object chkNoWordChars: TCheckBox
-    Left = 8
-    Height = 24
-    Top = 184
-    Width = 204
-    Caption = 'Ignore word chars (letters)'
-    OnChange = chkNoWordCharsChange
-    TabOrder = 4
   end
 end

@@ -13,7 +13,6 @@ type
 
   TfmCombo = class(TForm)
     ButtonPanel1: TButtonPanel;
-    chkNoWordChars: TCheckBox;
     chkEnMouse: TCheckBox;
     chkEnabled: TCheckBox;
     Label1: TLabel;
@@ -24,7 +23,6 @@ type
     edMaxLen: TSpinEdit;
     procedure chkEnabledChange(Sender: TObject);
     procedure chkEnMouseChange(Sender: TObject);
-    procedure chkNoWordCharsChange(Sender: TObject);
     procedure edMaxLenChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -79,12 +77,6 @@ procedure TfmCombo.chkEnMouseChange(Sender: TObject);
 begin
   ed.OptMouseEnableAll:= chkEnMouse.Checked;
   ed0.OptMouseEnableAll:= chkEnMouse.Checked;
-end;
-
-procedure TfmCombo.chkNoWordCharsChange(Sender: TObject);
-begin
-  ed.OptIgnoreWordChars:= chkNoWordChars.Checked;
-  ed0.OptIgnoreWordChars:= chkNoWordChars.Checked;
 end;
 
 procedure TfmCombo.edMaxLenChange(Sender: TObject);
