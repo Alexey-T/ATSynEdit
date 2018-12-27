@@ -653,7 +653,6 @@ type
 
     {$ifdef WINDOWS}
     FIMEPreSelText: atString;
-    FIMEDoUpdate: boolean;
     {$endif}
 
     //
@@ -868,7 +867,7 @@ type
     procedure UpdateTabHelper;
     procedure UpdateCursor;
     procedure UpdateGutterAutosize(C: TCanvas);
-    procedure UpdateMinimapAutosize(C: TCanvas);
+    procedure UpdateMinimapAutosize;
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
     function DoFormatLineNumber(N: integer): atString;
@@ -1529,7 +1528,7 @@ begin
   FGutter.Update;
 end;
 
-procedure TATSynEdit.UpdateMinimapAutosize(C: TCanvas);
+procedure TATSynEdit.UpdateMinimapAutosize;
 {
   Minimap must give same cnt of small chars, as rest width gives for normal chars.
   This gives:
@@ -2086,7 +2085,7 @@ begin
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize(C);
   if FMinimapVisible then
-    UpdateMinimapAutosize(C);
+    UpdateMinimapAutosize;
 
   FTextOffset:= GetTextOffset; //after gutter autosize
   FRectMinimap:= GetRectMinimap;
@@ -2261,6 +2260,7 @@ begin
 
     //speedup painting minimap:
     //if line parts cached, paint them now
+    NColorAfter:= clNone;
     if bCachedMinimap then
       if FAdapterCache.Get(
         WrapItem.NLineIndex,
@@ -2902,7 +2902,7 @@ var
 begin
   Result:= '';
   for i:= 0 to FMarginList.Count-1 do
-    Result:= Result + IntToStr(PtrInt(FMarginList[i])) + ' ';
+    Result+= IntToStr(PtrInt(FMarginList[i])) + ' ';
   Result:= Trim(Result);
 end;
 
@@ -6043,7 +6043,7 @@ var
   Msg: TLMVScroll;
 begin
   if FScrollbarLock then exit;
-  FillChar(Msg, SizeOf(Msg), 0);
+  FillChar(Msg{%H-}, SizeOf(Msg), 0);
   Msg.ScrollCode:= SB_THUMBPOSITION;
   Msg.Pos:= FScrollbarVert.Position;
   WMVScroll(Msg);
@@ -6057,7 +6057,7 @@ var
   Msg: TLMHScroll;
 begin
   if FScrollbarLock then exit;
-  FillChar(Msg, SizeOf(Msg), 0);
+  FillChar({%H-}Msg, SizeOf(Msg), 0);
   Msg.ScrollCode:= SB_THUMBPOSITION;
   Msg.Pos:= FScrollbarHorz.Position;
   WMHScroll(Msg);
@@ -6165,7 +6165,7 @@ begin
   C.Brush.Color:= AColorBG;
   C.FillRect(ARect);
 
-  FillChar(TextOutProps, SizeOf(TextOutProps), 0);
+  FillChar(TextOutProps{%H-}, SizeOf(TextOutProps), 0);
   TextOutProps.NeedOffsets:= FFontNeedsOffsets;
   TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;

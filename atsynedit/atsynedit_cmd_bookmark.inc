@@ -67,7 +67,7 @@ var
   NIndex, i: integer;
   Data: TATBookmarkData;
 begin
-  FillChar(Data, SizeOf(Data), 0);
+  FillChar(Data{%H-}, SizeOf(Data), 0);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
 
@@ -197,7 +197,7 @@ var
   Data: TATBookmarkData;
   i: integer;
 begin
-  FillChar(Data, SizeOf(Data), 0);
+  FillChar(Data{%H-}, SizeOf(Data), 0);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
 
