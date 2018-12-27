@@ -54,14 +54,14 @@ var
   OptHexChars: UnicodeString = ''; //show these chars as "<NNNN>"
   OptHexCharsDefault: UnicodeString = ''; //recommended default for OptHexChars
 
-function IsCharAsciiControl(ch: widechar): boolean;
+function IsCharAsciiControl(ch: widechar): boolean; inline;
 function IsCharAccent(ch: widechar): boolean;
 function IsCharHex(ch: widechar): boolean;
 
 
 implementation
 
-function IsCharAsciiControl(ch: widechar): boolean;
+function IsCharAsciiControl(ch: widechar): boolean; inline;
 begin
   Result:= (ch<>#9) and (Ord(ch)<$20);
 end;
