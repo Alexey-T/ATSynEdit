@@ -1244,8 +1244,7 @@ var
   NPartIndex, NCharIndex, NSpaces: integer;
   X1, X2, Y2: integer;
   HasBG: boolean;
-  NColorBack,
-  NColorFont: TColor;
+  NColorBack, NColorFont, NColorFontHalf: TColor;
   ch: WideChar;
 begin
   NSpaces:= 0;
@@ -1268,8 +1267,7 @@ begin
       else
         Continue;
 
-    C.Brush.Color:= NColorBack;
-    C.Pen.Color:= ColorBlendHalf(NColorBack, NColorFont);
+    NColorFontHalf:= ColorBlendHalf(NColorBack, NColorFont);
 
     //iterate over all chars, to check for spaces (ignore them) and Tabs (add indent for them).
     //because need to paint multiline comments/strings nicely.
@@ -1293,11 +1291,17 @@ begin
           X2:= ARect.Right;
 
         if HasBG then
+        begin
           //paint BG as 2 pixel line
+          C.Brush.Color:= NColorBack;
           C.FillRect(X1, Y2-2, X2, Y2);
+        end;
 
         if not IsCharSpace(ch) then
-          C.Line(X1, Y2-1, X2, Y2-1);
+        begin
+          C.Brush.Color:= NColorFontHalf;
+          C.FillRect(X1, Y2-1, X2, Y2);
+        end;
       end;
     end;
   end;
