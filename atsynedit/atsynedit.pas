@@ -1629,6 +1629,12 @@ var
   UseCachedUpdate: boolean;
   bConsiderFolding: boolean;
 begin
+  if not HandleAllocated then exit;
+    //must have, coz method can be called before 1st paint,
+    //so TCanvas.TextWidth will give exception (control has no parent window)
+
+  GlobalCharSizer.Init(Font.Name, Font.Size, Canvas);
+
   //virtual mode allows faster usage of WrapInfo
   FWrapInfo.StringsObj:= Strings;
   FWrapInfo.VirtualMode:=
@@ -2076,7 +2082,6 @@ begin
 
   C.Font.Assign(Font);
   FCharSize:= GetCharSize(C, FCharSpacingText);
-  GlobalCharSizer.Init(Font.Name, Font.Size, C);
 
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize(C);
@@ -3521,6 +3526,8 @@ end;
 
 procedure TATSynEdit.SetReadOnly(AValue: boolean);
 begin
+
+
   if not FOptAllowReadOnly then Exit;
   Strings.ReadOnly:= AValue;
 end;
