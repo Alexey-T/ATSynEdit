@@ -9,7 +9,10 @@ unit ATSynEdit_CharSizer;
 interface
 
 uses
-  Classes, SysUtils, Graphics,
+  {$ifdef windows}
+  Windows,
+  {$endif}
+  Classes, SysUtils, Graphics, Dialogs,
   UnicodeData,
   LCLType, LCLIntf;
 
@@ -140,14 +143,32 @@ begin
   SizeAvg:= Canvas.TextWidth('M');
 end;
 
+{$ifdef windows}
+function _CharWidth(C: TCanvas; ch: Widechar): integer; inline;
+var
+  Size: TSize;
+begin
+  Windows.GetTextExtentPointW(C.Handle, @ch, 1, Size);
+  Result:= Size.cx;
+end;
+{$else}
+function _CharWidth(C: TCanvas; ch: Widechar): integer; inline;
+begin
+  Result:= C.TextWidth(UTF8Encode(WideString(ch)));
+end;
+{$endif}
+
 function TATCharSizer.GetCharWidth_FromCache(ch: Widechar): integer;
 begin
   Result:= Sizes[Ord(ch)];
   if Result=0 then
   begin
-    if SizeAvg<=0 then
-       raise Exception.Create('CharSize.Init was not called');
-    Result:= Canvas.TextWidth(UTF8Encode(WideString(ch))) * 100 div SizeAvg;
+    if Canvas=nil then
+    begin
+      ShowMessage('Program error: CharSize.Init was not called');
+      exit(8); //some char width
+    end;
+    Result:= _CharWidth(Canvas, ch) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Result;
   end;
 end;
