@@ -125,6 +125,20 @@ begin
   end;
 end;
 
+{$ifdef windows}
+function _WidecharWidth(C: TCanvas; ch: Widechar): integer; inline;
+var
+  Size: TSize;
+begin
+  Windows.GetTextExtentPointW(C.Handle, @ch, 1, Size);
+  Result:= Size.cx;
+end;
+{$else}
+function _WidecharWidth(C: TCanvas; ch: Widechar): integer; inline;
+begin
+  Result:= C.TextWidth(UTF8Encode(UnicodeString(ch)));
+end;
+{$endif}
 
 { TATCharSizer }
 
@@ -143,21 +157,6 @@ begin
   SizeAvg:= Canvas.TextWidth('M');
 end;
 
-{$ifdef windows}
-function _CharWidth(C: TCanvas; ch: Widechar): integer; inline;
-var
-  Size: TSize;
-begin
-  Windows.GetTextExtentPointW(C.Handle, @ch, 1, Size);
-  Result:= Size.cx;
-end;
-{$else}
-function _CharWidth(C: TCanvas; ch: Widechar): integer; inline;
-begin
-  Result:= C.TextWidth(UTF8Encode(WideString(ch)));
-end;
-{$endif}
-
 function TATCharSizer.GetCharWidth_FromCache(ch: Widechar): integer;
 begin
   Result:= Sizes[Ord(ch)];
@@ -168,7 +167,7 @@ begin
       ShowMessage('Program error: CharSize.Init was not called');
       exit(8); //some char width
     end;
-    Result:= _CharWidth(Canvas, ch) * 100 div SizeAvg;
+    Result:= _WidecharWidth(Canvas, ch) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Result;
   end;
 end;
