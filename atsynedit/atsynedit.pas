@@ -252,6 +252,7 @@ const
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
   cInitFoldStyle = cFoldHereWithTruncatedText;
+  cInitFoldUnderlineOffset = 3;
   cInitFoldTooltipVisible = true;
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
@@ -369,6 +370,7 @@ type
     FFold: TATSynRanges;
     FFoldImageList: TImageList;
     FFoldStyle: TATFoldStyle;
+    FFoldUnderlineOffset: integer;
     FFoldEnabled: boolean;
     FFoldTooltipVisible: boolean;
     FFoldTooltipWidthPercents: integer;
@@ -1278,6 +1280,7 @@ type
     property OptWordChars: atString read FOptWordChars write FOptWordChars;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
+    property OptFoldUnderlineOffset: integer read FFoldUnderlineOffset write FFoldUnderlineOffset default cInitFoldUnderlineOffset;
     property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;
     property OldFoldTooltipWidthPercents: integer read FFoldTooltipWidthPercents write FFoldTooltipWidthPercents default cInitFoldTooltipWidthPercents;
     property OptFoldTooltipLineCount: integer read FFoldTooltipLineCount write FFoldTooltipLineCount default cInitFoldTooltipLineCount;
@@ -2306,7 +2309,11 @@ begin
     begin
       NCoordSep:= NCoordTop-1;
       C.Pen.Color:= Colors.CollapseLine;
-      C.Line(ARect.Left, NCoordSep, ARect.Right, NCoordSep);
+      C.Line(
+        ARect.Left+FFoldUnderlineOffset,
+        NCoordSep,
+        ARect.Right-FFoldUnderlineOffset,
+        NCoordSep);
     end;
 
     //prepare line
@@ -3057,6 +3064,7 @@ begin
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
   FFoldEnabled:= true;
+  FFoldUnderlineOffset:= cInitFoldUnderlineOffset;
   FFoldTooltipVisible:= cInitFoldTooltipVisible;
   FFoldTooltipWidthPercents:= cInitFoldTooltipWidthPercents;
   FFoldTooltipLineCount:= cInitFoldTooltipLineCount;
