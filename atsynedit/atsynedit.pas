@@ -1932,17 +1932,19 @@ end;
 procedure TATSynEdit.UpdateScrollbarVert;
 var
   si: TScrollInfo;
+  h: integer;
 begin
   if not FOptAllowScrollbarVert then Exit;
+  h:= FCharSize.y;
 
   FScrollbarVert.Visible:= FOptScrollbarsNew;
   if FOptScrollbarsNew then
   begin
     FScrollbarLock:= true;
-    FScrollbarVert.Min:= FScrollVert.NMin;
-    FScrollbarVert.Max:= FScrollVert.NMax;
-    FScrollbarVert.PageSize:= FScrollVert.NPage;
-    FScrollbarVert.Position:= FScrollVert.NPos;
+    FScrollbarVert.Min:= FScrollVert.NMin*h;
+    FScrollbarVert.Max:= FScrollVert.NMax*h;
+    FScrollbarVert.PageSize:= FScrollVert.NPage*h;
+    FScrollbarVert.Position:= FScrollVert.NPos*h {+ FScrollbarVert.Position mod h}; //todo
     FScrollbarVert.Update;
     FScrollbarLock:= false;
   end;
@@ -1950,11 +1952,11 @@ begin
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
-  si.nMin:= FScrollVert.NMin;
-  si.nMax:= FScrollVert.NMax;
-  si.nPage:= FScrollVert.NPage;
+  si.nMin:= FScrollVert.NMin*h;
+  si.nMax:= FScrollVert.NMax*h;
+  si.nPage:= FScrollVert.NPage*h;
   if FOptScrollbarsNew then si.nPage:= si.nMax+1;
-  si.nPos:= FScrollVert.NPos;
+  si.nPos:= FScrollVert.NPos*h;
   SetScrollInfo(Handle, SB_VERT, si, True);
 
   {$ifdef at_show_scroll_info}
@@ -3867,10 +3869,13 @@ begin
 end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
+var
+  h: integer;
 begin
   //debug
   //application.MainForm.Caption:= format('min %d, max %d, pagesize %d, pos %d, pos-last %d',
   //                               [info.nmin, info.nmax, info.npage, info.npos, info.NPosLast]);
+  h:= FCharSize.y;
 
   if (Info.NMax-Info.NMin)<Info.NPage then
   begin
@@ -3893,12 +3898,12 @@ begin
         //must ignore message with Msg.Msg set: LM_VSCROLL, LM_HSCROLL;
         //we get it on macOS during window resize, not expected! moves v-scroll pos to 0.
         if Msg.Msg=0 then
-          Info.NPos:= Msg.Pos;
+          Info.NPos:= Msg.Pos div h;
       end;
 
     SB_THUMBTRACK:
       begin
-        Info.NPos:= Msg.Pos;
+        Info.NPos:= Msg.Pos div h;
         if @Info=@FScrollVert then DoHintShow;
       end;
 
@@ -6053,7 +6058,7 @@ begin
   if FScrollbarLock then exit;
   FillChar(Msg{%H-}, SizeOf(Msg), 0);
   Msg.ScrollCode:= SB_THUMBPOSITION;
-  Msg.Pos:= FScrollbarVert.Position;
+  Msg.Pos:= FScrollbarVert.Position div FCharSize.y;
   WMVScroll(Msg);
 
   //show scroll hint
