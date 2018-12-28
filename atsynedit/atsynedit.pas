@@ -6058,7 +6058,7 @@ begin
   if FScrollbarLock then exit;
   FillChar(Msg{%H-}, SizeOf(Msg), 0);
   Msg.ScrollCode:= SB_THUMBPOSITION;
-  Msg.Pos:= FScrollbarVert.Position div FCharSize.y;
+  Msg.Pos:= FScrollbarVert.Position;
   WMVScroll(Msg);
 
   //show scroll hint
