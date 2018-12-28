@@ -1,4 +1,7 @@
 
+2018.12.28
++ add: prop OptFoldUnderlineOffset
+
 2018.12.18
 * change: declaration of Strings.OnChange (added param)
 + add: improved Strings internal code for deletion/insertion of many lines
