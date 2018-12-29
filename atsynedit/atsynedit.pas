@@ -497,6 +497,7 @@ type
     FGutterBandDecor: integer;
     FColors: TATSynEditColors;
     FRectMain,
+    FRectMainVisible,
     FRectMinimap,
     FRectMicromap,
     FRectGutter,
@@ -1814,14 +1815,11 @@ function TATSynEdit.GetVisibleLines: integer;
 var
   N: integer;
 begin
-  N:= FRectMain.Bottom-FRectMain.Top;
+  N:= FRectMainVisible.Height;
 
   //Delta:= Gaps.SizeForLineRange(LineTop, LineBottom-1);
   //Dec(N, Delta);
   ////gives jumps of v-scroll at end
-
-  if FOptScrollSmooth then
-    Dec(N, FScrollVert.NPixelOffset);
 
   Result:= N div FCharSize.Y;
 end;
@@ -1830,10 +1828,7 @@ function TATSynEdit.GetVisibleColumns: integer;
 var
   N: integer;
 begin
-  N:= FRectMain.Right-FRectMain.Left;
-
-  if FOptScrollSmooth then
-    Dec(N, FScrollHorz.NPixelOffset);
+  N:= FRectMainVisible.Width;
 
   Result:= N div FCharSize.X;
 end;
@@ -2033,6 +2028,8 @@ begin
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
     - IfThen(FMicromapVisible, FMicromapWidth);
   Result.Bottom:= ClientHeight;
+
+  FRectMainVisible:= Result;
 
   if FOptScrollSmooth then
   begin
