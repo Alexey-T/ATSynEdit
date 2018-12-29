@@ -1811,16 +1811,31 @@ begin
 end;
 
 function TATSynEdit.GetVisibleLines: integer;
+var
+  N: integer;
 begin
-  //Delta:= Gaps.SizeForLineRange(LineTop, LineBottom-1);
-  //gives jumps of v-scroll at end
+  N:= FRectMain.Bottom-FRectMain.Top;
 
-  Result:= (FRectMain.Bottom-FRectMain.Top{-Delta}) div FCharSize.Y;
+  //Delta:= Gaps.SizeForLineRange(LineTop, LineBottom-1);
+  //Dec(N, Delta);
+  ////gives jumps of v-scroll at end
+
+  if FOptScrollSmooth then
+    Dec(N, FScrollVert.NPixelOffset);
+
+  Result:= N div FCharSize.Y;
 end;
 
 function TATSynEdit.GetVisibleColumns: integer;
+var
+  N: integer;
 begin
-  Result:= (FRectMain.Right-FRectMain.Left) div FCharSize.X;
+  N:= FRectMain.Right-FRectMain.Left;
+
+  if FOptScrollSmooth then
+    Dec(N, FScrollHorz.NPixelOffset);
+
+  Result:= N div FCharSize.X;
 end;
 
 function TATSynEdit.GetVisibleLinesMinimap: integer;
