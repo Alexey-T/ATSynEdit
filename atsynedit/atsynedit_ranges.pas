@@ -13,7 +13,7 @@ uses
   ATStringProc;
 
 type
-  TATSynRangeHint = string[47];
+  TATSynRangeHint = string[110];
 
 type
   { TATSynRange }
