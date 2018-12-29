@@ -3941,12 +3941,12 @@ begin
   end;
 
   //correct value (if -1)
-  if Info.NPos>=Info.NPosLast then
+  if Info.NPos>Info.NPosLast then
   begin
     Info.NPos:= Info.NPosLast;
     Info.NPixelOffset:= 0;
   end;
-  if Info.NPos<=Info.NMin then
+  if Info.NPos<Info.NMin then
   begin
     Info.NPos:= Info.NMin;
     Info.NPixelOffset:= 0;
