@@ -3874,12 +3874,13 @@ end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
 var
+  bVertical: boolean;
   h: integer;
 begin
-  //debug
-  //application.MainForm.Caption:= format('min %d, max %d, pagesize %d, pos %d, pos-last %d',
+  //Application.MainForm.Caption:= Format('min %d, max %d, pagesize %d, pos %d, pos-last %d',
   //                               [info.nmin, info.nmax, info.npage, info.npos, info.NPosLast]);
-  if @Info=@FScrollVert then
+  bVertical:= @Info=@FScrollVert;
+  if bVertical then
     h:= FCharSize.y
   else
     h:= FCharSize.x;
@@ -3939,7 +3940,8 @@ begin
       begin
         Info.NPos:= Msg.Pos div h;
         Info.NPixelOffset:= Msg.Pos mod h;
-        if @Info=@FScrollVert then DoHintShow;
+        if bVertical then
+          DoHintShow;
       end;
 
     SB_ENDSCROLL:
