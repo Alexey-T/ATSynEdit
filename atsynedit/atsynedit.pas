@@ -238,7 +238,7 @@ const
   cInitSpacingText = 1;
   cInitCaretBlinkTime = 600;
   cInitTimerAutoScroll = 80;
-  cInitTimerNiceScroll = 120;
+  cInitTimerNiceScroll = 100;
   cInitMinimapVisible = false;
   cInitMinimapTooltipVisible = true;
   cInitMinimapTooltipLinesCount = 6;
@@ -274,7 +274,7 @@ const
   cFoldedMarkIndentOuter = 0;
   cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert = 1; //... speed y
-  cSpeedScrollNiceHorz = 4; //browser-scroll (middle-click): speed x
+  cSpeedScrollNiceHorz = 1; //browser-scroll (middle-click): speed x
   cSpeedScrollNiceVert = 1; //... speed y
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldLineDx = 3;
@@ -1970,8 +1970,10 @@ end;
 procedure TATSynEdit.UpdateScrollbarHorz;
 var
   si: TScrollInfo;
+  w: integer;
 begin
   if not FOptAllowScrollbarHorz then Exit;
+  w:= FCharSize.x;
 
   FScrollbarHorz.Visible:=
     FOptScrollbarsNew and
@@ -1981,10 +1983,10 @@ begin
   if FOptScrollbarsNew then
   begin
     FScrollbarLock:= true;
-    FScrollbarHorz.Min:= FScrollHorz.NMin;
-    FScrollbarHorz.Max:= FScrollHorz.NMax;
-    FScrollbarHorz.PageSize:= FScrollHorz.NPage;
-    FScrollbarHorz.Position:= FScrollHorz.NPos;
+    FScrollbarHorz.Min:= FScrollHorz.NMin*w;
+    FScrollbarHorz.Max:= FScrollHorz.NMax*w;
+    FScrollbarHorz.PageSize:= FScrollHorz.NPage*w;
+    FScrollbarHorz.Position:= FScrollHorz.NPos*w + FScrollHorz.NPixelOffset;
     FScrollbarHorz.Update;
     FScrollbarLock:= false;
   end;
@@ -1992,12 +1994,12 @@ begin
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; don't work
-  si.nMin:= FScrollHorz.NMin;
-  si.nMax:= FScrollHorz.NMax;
-  si.nPage:= FScrollHorz.NPage;
+  si.nMin:= FScrollHorz.NMin*w;
+  si.nMax:= FScrollHorz.NMax*w;
+  si.nPage:= FScrollHorz.NPage*w;
   if FOptScrollbarsNew or FOptScrollbarHorizontalHidden then
     si.nPage:= si.nMax+1;
-  si.nPos:= FScrollHorz.NPos;
+  si.nPos:= FScrollHorz.NPos*w + FScrollHorz.NPixelOffset;
   SetScrollInfo(Handle, SB_HORZ, si, True);
 
   {$ifdef at_show_scroll_info}
@@ -2008,7 +2010,7 @@ end;
 
 function TATSynEdit.GetRectMain: TRect;
 begin
-  Result.Left:= FRectGutter.Left + FTextOffset.X;
+  Result.Left:= FRectGutter.Left + FTextOffset.X - FScrollHorz.NPixelOffset;
   Result.Top:= FTextOffset.Y - FScrollVert.NPixelOffset;
   Result.Right:= ClientWidth
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
@@ -3877,7 +3879,10 @@ begin
   //debug
   //application.MainForm.Caption:= format('min %d, max %d, pagesize %d, pos %d, pos-last %d',
   //                               [info.nmin, info.nmax, info.npage, info.npos, info.NPosLast]);
-  h:= FCharSize.y;
+  if @Info=@FScrollVert then
+    h:= FCharSize.y
+  else
+    h:= FCharSize.x;
 
   if (Info.NMax-Info.NMin)<Info.NPage then
   begin
@@ -5145,6 +5150,7 @@ begin
   begin
     N:= NPos*W+NPixelOffset;
     Inc(N, Dx);
+    if N<0 then N:= 0;
     NPos:= N div W;
     NPixelOffset:= N mod W;
     NPos:= Max(NMin, Min(NMax-NPage, NPos));
@@ -5154,6 +5160,7 @@ begin
   begin
     N:= NPos*H+NPixelOffset;
     Inc(N, Dy);
+    if N<0 then N:= 0;
     NPos:= N div H;
     NPixelOffset:= N mod H;
     NPos:= Max(NMin, Min(NPosLast, NPos));
