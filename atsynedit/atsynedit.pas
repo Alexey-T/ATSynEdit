@@ -535,6 +535,7 @@ type
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
     FOptMaxLineLengthForSlowWidthDetect: integer;
+    FOptScrollSmooth: boolean;
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
     FOptScrollbarsNew: boolean;
@@ -1301,6 +1302,7 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
+    property OptScrollSmooth: boolean read FOptScrollSmooth write FOptScrollSmooth default true;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
@@ -2010,12 +2012,18 @@ end;
 
 function TATSynEdit.GetRectMain: TRect;
 begin
-  Result.Left:= FRectGutter.Left + FTextOffset.X - FScrollHorz.NPixelOffset;
-  Result.Top:= FTextOffset.Y - FScrollVert.NPixelOffset;
+  Result.Left:= FRectGutter.Left + FTextOffset.X;
+  Result.Top:= FTextOffset.Y;
   Result.Right:= ClientWidth
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
     - IfThen(FMicromapVisible, FMicromapWidth);
   Result.Bottom:= ClientHeight;
+
+  if FOptScrollSmooth then
+  begin
+    Dec(Result.Left, FScrollHorz.NPixelOffset);
+    Dec(Result.Top, FScrollVert.NPixelOffset);
+  end;
 end;
 
 function TATSynEdit.GetRectMinimap: TRect;
@@ -3188,6 +3196,7 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSizeMinimap:= Point(1, 2);
 
+  FOptScrollSmooth:= true;
   FOptScrollIndentCaretHorz:= 10;
   FOptScrollIndentCaretVert:= 0;
   FOptScrollbarsNew:= false;

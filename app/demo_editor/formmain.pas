@@ -31,6 +31,7 @@ type
     bOpt: TButton;
     btnStop: TButton;
     bClearLog: TButton;
+    chkSmoothScroll: TCheckBox;
     chkMinimapTooltip: TCheckBox;
     chkMouseEn: TCheckBox;
     chkTabSpaces: TCheckBox;
@@ -50,14 +51,12 @@ type
     chkWrapOn: TRadioButton;
     edFontsize: TSpinEdit;
     edMarginFixed: TSpinEdit;
-    edSpaceX: TSpinEdit;
     edSpaceY: TSpinEdit;
     edTabsize: TSpinEdit;
     FontDialog1: TFontDialog;
     gUnpri: TGroupBox;
     gWrap: TGroupBox;
     ImagesDecor: TImageList;
-    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label2: TLabel;
@@ -136,6 +135,7 @@ type
     procedure chkMinimapTooltipChange(Sender: TObject);
     procedure chkMouseEnChange(Sender: TObject);
     procedure chkNewScrollChange(Sender: TObject);
+    procedure chkSmoothScrollChange(Sender: TObject);
     procedure chkTabSpacesChange(Sender: TObject);
     procedure chkWrapWndMarginChange(Sender: TObject);
     procedure FinderProgress(Sender: TObject; const ACurPos, AMaxPos: Int64; var AContinue: boolean);
@@ -175,7 +175,6 @@ type
     procedure chkWrapIndentChange(Sender: TObject);
     procedure edFontsizeChange(Sender: TObject);
     procedure edMarginFixedChange(Sender: TObject);
-    procedure edSpaceXChange(Sender: TObject);
     procedure edSpaceYChange(Sender: TObject);
     procedure edTabsizeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -501,7 +500,6 @@ begin
   chkNewScroll.Checked:= ed.OptScrollbarsNew;
   edFontsize.Value:= ed.Font.Size;
   edTabsize.Value:= ed.OptTabSize;
-  edSpaceX.Value:= ed.OptCharSpacingX;
   edSpaceY.Value:= ed.OptCharSpacingY;
   edMarginFixed.Value:= ed.OptMarginRight;
   case ed.OptWrapMode of
@@ -705,6 +703,13 @@ procedure TfmMain.chkNewScrollChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptScrollbarsNew:= chkNewScroll.Checked;
+  ed.Update;
+end;
+
+procedure TfmMain.chkSmoothScrollChange(Sender: TObject);
+begin
+  if wait then exit;
+  ed.OptScrollSmooth:= chkSmoothScroll.Checked;
   ed.Update;
 end;
 
@@ -1330,13 +1335,6 @@ procedure TfmMain.edMarginFixedChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptMarginRight:= edMarginFixed.Value;
-  ed.Update;
-end;
-
-procedure TfmMain.edSpaceXChange(Sender: TObject);
-begin
-  if wait then Exit;
-  ed.OptCharSpacingX:= edSpaceX.Value;
   ed.Update;
 end;
 

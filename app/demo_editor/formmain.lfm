@@ -108,24 +108,6 @@ object fmMain: TfmMain
       OnChange = chkMinimapChange
       TabOrder = 2
     end
-    object edSpaceX: TSpinEdit
-      Left = 8
-      Height = 27
-      Top = 280
-      Width = 52
-      MaxValue = 10
-      MinValue = -5
-      OnChange = edSpaceXChange
-      TabOrder = 11
-    end
-    object Label1: TLabel
-      Left = 67
-      Height = 17
-      Top = 284
-      Width = 63
-      Caption = 'spacing-x'
-      ParentColor = False
-    end
     object Label2: TLabel
       Left = 67
       Height = 17
@@ -205,18 +187,18 @@ object fmMain: TfmMain
     object edFontsize: TSpinEdit
       Left = 8
       Height = 27
-      Top = 216
+      Top = 248
       Width = 52
       MaxValue = 40
       MinValue = 4
       OnChange = edFontsizeChange
-      TabOrder = 9
+      TabOrder = 10
       Value = 10
     end
     object Label4: TLabel
       Left = 67
       Height = 17
-      Top = 220
+      Top = 248
       Width = 58
       Caption = 'font size'
       ParentColor = False
@@ -270,18 +252,18 @@ object fmMain: TfmMain
     object edTabsize: TSpinEdit
       Left = 8
       Height = 27
-      Top = 248
+      Top = 280
       Width = 52
       MaxValue = 12
       MinValue = 1
       OnChange = edTabsizeChange
-      TabOrder = 10
+      TabOrder = 11
       Value = 8
     end
     object Label5: TLabel
       Left = 67
       Height = 17
-      Top = 252
+      Top = 280
       Width = 52
       Caption = 'tab size'
       ParentColor = False
@@ -404,6 +386,17 @@ object fmMain: TfmMain
       OnChange = chkMinimapTooltipChange
       State = cbChecked
       TabOrder = 4
+    end
+    object chkSmoothScroll: TCheckBox
+      Left = 8
+      Height = 24
+      Top = 208
+      Width = 118
+      Caption = 'smooth scroll'
+      Checked = True
+      OnChange = chkSmoothScrollChange
+      State = cbChecked
+      TabOrder = 9
     end
   end
   object OpenDialog1: TOpenDialog
