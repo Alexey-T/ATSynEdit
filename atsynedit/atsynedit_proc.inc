@@ -25,6 +25,7 @@ begin
   NMin:= 0;
   NMax:= 1;
   NPage:= 1;
+  NPixelOffset:= 0;
 end;
 
 class operator TATSynScrollInfo.= (const A, B: TATSynScrollInfo): boolean;
@@ -33,7 +34,8 @@ begin
     (A.NPos=B.NPos) and
     (A.NMin=B.NMin) and
     (A.NMax=B.NMax) and
-    (A.NPage=B.NPage);
+    (A.NPage=B.NPage) and
+    (A.NPixelOffset=B.NPixelOffset);
 end;
 
 procedure InitClipboardFormat;

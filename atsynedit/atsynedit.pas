@@ -204,12 +204,12 @@ type
   { TATSynScrollInfo }
 
   TATSynScrollInfo = record
-    NMin,
-    NMax,
-    NPage,
-    NPixelOffset,
-    NPos,
+    NMin: integer;
+    NMax: integer;
+    NPage: integer;
+    NPos: integer;
     NPosLast: integer;
+    NPixelOffset: integer;
     procedure Clear;
     class operator =(const A, B: TATSynScrollInfo): boolean;
   end;
@@ -2008,7 +2008,7 @@ end;
 function TATSynEdit.GetRectMain: TRect;
 begin
   Result.Left:= FRectGutter.Left + FTextOffset.X;
-  Result.Top:= FTextOffset.Y;
+  Result.Top:= FTextOffset.Y - FScrollVert.NPixelOffset;
   Result.Right:= ClientWidth
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
     - IfThen(FMicromapVisible, FMicromapWidth);
@@ -3885,14 +3885,38 @@ begin
   end;
 
   case Msg.ScrollCode of
-    SB_TOP:        Info.NPos:= Info.NMin;
-    SB_BOTTOM:     Info.NPos:= Info.NPosLast;
+    SB_TOP:
+      begin
+        Info.NPos:= Info.NMin;
+        Info.NPixelOffset:= 0;
+      end;
+    SB_BOTTOM:
+      begin
+        Info.NPos:= Info.NPosLast;
+        Info.NPixelOffset:= 0;
+      end;
 
-    SB_LINEUP:     Info.NPos:= Info.NPos-1;
-    SB_LINEDOWN:   Info.NPos:= Info.NPos+1;
+    SB_LINEUP:
+      begin
+        Dec(Info.NPos);
+        Info.NPixelOffset:= 0;
+      end;
+    SB_LINEDOWN:
+      begin
+        Inc(Info.NPos);
+        Info.NPixelOffset:= 0;
+      end;
 
-    SB_PAGEUP:     Info.NPos:= Info.NPos-Info.NPage;
-    SB_PAGEDOWN:   Info.NPos:= Info.NPos+Info.NPage;
+    SB_PAGEUP:
+      begin
+        Dec(Info.NPos, Info.NPage);
+        Info.NPixelOffset:= 0;
+      end;
+    SB_PAGEDOWN:
+      begin
+        Inc(Info.NPos, Info.NPage);
+        Info.NPixelOffset:= 0;
+      end;
 
     SB_THUMBPOSITION:
       begin
