@@ -207,6 +207,7 @@ type
     NMin,
     NMax,
     NPage,
+    NPixelOffset,
     NPos,
     NPosLast: integer;
     procedure Clear;
@@ -1944,7 +1945,7 @@ begin
     FScrollbarVert.Min:= FScrollVert.NMin*h;
     FScrollbarVert.Max:= FScrollVert.NMax*h;
     FScrollbarVert.PageSize:= FScrollVert.NPage*h;
-    FScrollbarVert.Position:= FScrollVert.NPos*h {+ FScrollbarVert.Position mod h}; //todo
+    FScrollbarVert.Position:= FScrollVert.NPos*h + FScrollVert.NPixelOffset;
     FScrollbarVert.Update;
     FScrollbarLock:= false;
   end;
@@ -1956,7 +1957,7 @@ begin
   si.nMax:= FScrollVert.NMax*h;
   si.nPage:= FScrollVert.NPage*h;
   if FOptScrollbarsNew then si.nPage:= si.nMax+1;
-  si.nPos:= FScrollVert.NPos*h;
+  si.nPos:= FScrollVert.NPos*h + FScrollVert.NPixelOffset;
   SetScrollInfo(Handle, SB_VERT, si, True);
 
   {$ifdef at_show_scroll_info}
@@ -3898,12 +3899,16 @@ begin
         //must ignore message with Msg.Msg set: LM_VSCROLL, LM_HSCROLL;
         //we get it on macOS during window resize, not expected! moves v-scroll pos to 0.
         if Msg.Msg=0 then
+        begin
           Info.NPos:= Msg.Pos div h;
+          Info.NPixelOffset:= Msg.Pos mod h;
+        end;
       end;
 
     SB_THUMBTRACK:
       begin
         Info.NPos:= Msg.Pos div h;
+        Info.NPixelOffset:= Msg.Pos mod h;
         if @Info=@FScrollVert then DoHintShow;
       end;
 
@@ -3912,8 +3917,16 @@ begin
   end;
 
   //correct value (if -1)
-  Info.NPos:= Min(Info.NPos, Info.NPosLast);
-  Info.NPos:= Max(Info.NPos, Info.NMin);
+  if Info.NPos>=Info.NPosLast then
+  begin
+    Info.NPos:= Info.NPosLast;
+    Info.NPixelOffset:= 0;
+  end;
+  if Info.NPos<=Info.NMin then
+  begin
+    Info.NPos:= Info.NMin;
+    Info.NPixelOffset:= 0;
+  end;
 
   Result:= Msg.ScrollCode<>SB_THUMBTRACK;
 end;
