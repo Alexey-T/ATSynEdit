@@ -238,7 +238,7 @@ const
   cInitSpacingText = 1;
   cInitCaretBlinkTime = 600;
   cInitTimerAutoScroll = 80;
-  cInitTimerNiceScroll = 200;
+  cInitTimerNiceScroll = 120;
   cInitMinimapVisible = false;
   cInitMinimapTooltipVisible = true;
   cInitMinimapTooltipLinesCount = 6;
@@ -1138,6 +1138,7 @@ type
     procedure DoSelect_ColumnBlock_FromSelRect;
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(Dx, Dy: integer);
+    procedure DoScrollByDeltaInPixels(Dx, Dy: integer);
     procedure DoSizeChange(AInc: boolean);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor): boolean;
@@ -4861,14 +4862,14 @@ begin
     cDirDown:  Cursor:= crNiceScrollDown;
   end;
 
-  //delta in chars
-  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) div FCharSize.X + 1)*cSpeedScrollNiceHorz;
-  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) div FCharSize.Y + 1)*cSpeedScrollNiceVert;
+  //delta in pixels
+  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) + 1)*cSpeedScrollNiceHorz;
+  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) + 1)*cSpeedScrollNiceVert;
 
   if Dir in [cDirLeft, cDirRight] then
-    DoScrollByDelta(Dx, 0)
+    DoScrollByDeltaInPixels(Dx, 0)
   else
-    DoScrollByDelta(0, Dy);
+    DoScrollByDeltaInPixels(0, Dy);
 
   Invalidate;
 end;
@@ -5131,6 +5132,32 @@ begin
     NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
   with FScrollVert do
     NPos:= Max(0, Min(NPosLast, NPos+Dy));
+end;
+
+procedure TATSynEdit.DoScrollByDeltaInPixels(Dx, Dy: integer);
+var
+  W, H, N: integer;
+begin
+  W:= FCharSize.x;
+  H:= FCharSize.y;
+
+  with FScrollHorz do
+  begin
+    N:= NPos*W+NPixelOffset;
+    Inc(N, Dx);
+    NPos:= N div W;
+    NPixelOffset:= N mod W;
+    NPos:= Max(NMin, Min(NMax-NPage, NPos));
+  end;
+
+  with FScrollVert do
+  begin
+    N:= NPos*H+NPixelOffset;
+    Inc(N, Dy);
+    NPos:= N div H;
+    NPixelOffset:= N mod H;
+    NPos:= Max(NMin, Min(NPosLast, NPos));
+  end;
 end;
 
 procedure TATSynEdit.MenuClick(Sender: TObject);
