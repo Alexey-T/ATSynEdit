@@ -2177,7 +2177,7 @@ begin
   with FGutter[ABand] do
     begin X1:= Left; X2:= Right; end;
 
-  if ATop + FScrollVert.NPixelOffset >= 0 then
+  if ATop>=FRectMain.Top then //not ">=0", for smooth scroll
   begin
     C.Brush.Color:= AColor;
     C.FillRect(X1, ATop, X2, ABottom);
