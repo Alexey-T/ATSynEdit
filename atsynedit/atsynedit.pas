@@ -5155,9 +5155,18 @@ end;
 procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
   with FScrollHorz do
+  begin
     NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
+    if NPos=0 then
+      NPixelOffset:= 0;
+  end;
+
   with FScrollVert do
+  begin
     NPos:= Max(0, Min(NPosLast, NPos+Dy));
+    if NPos=0 then
+      NPixelOffset:= 0;
+  end;
 end;
 
 procedure TATSynEdit.DoScrollByDeltaInPixels(Dx, Dy: integer);
