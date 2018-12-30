@@ -2176,11 +2176,17 @@ var
 begin
   with FGutter[ABand] do
     begin X1:= Left; X2:= Right; end;
-  C.Brush.Color:= AColor;
-  if ATop>=0 then
-    C.FillRect(X1, ATop, X2, ABottom)
+
+  if ATop + FScrollVert.NPixelOffset >= 0 then
+  begin
+    C.Brush.Color:= AColor;
+    C.FillRect(X1, ATop, X2, ABottom);
+  end
   else
-    C.FillRect(X1, FRectGutter.Top, X2, FRectGutter.Bottom)
+  begin
+    C.Brush.Color:= Colors.GutterBG;
+    C.FillRect(X1, FRectGutter.Top, X2, FRectGutter.Bottom);
+  end;
 end;
 
 procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
