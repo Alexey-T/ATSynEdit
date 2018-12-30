@@ -238,7 +238,7 @@ const
   cInitSpacingText = 1;
   cInitCaretBlinkTime = 600;
   cInitTimerAutoScroll = 80;
-  cInitTimerNiceScroll = 150;
+  cInitTimerNiceScroll = 100;
   cInitMinimapVisible = false;
   cInitMinimapTooltipVisible = true;
   cInitMinimapTooltipLinesCount = 6;
