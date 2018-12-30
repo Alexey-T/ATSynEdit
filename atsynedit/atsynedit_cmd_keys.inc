@@ -33,6 +33,9 @@ begin
       Caret.PosX:= 0;
   end;
 
+  if Caret.PosX=0 then
+    FScrollHorz.NPixelOffset:= 0;
+
   Result:= [cResultCaretLeft];
 end;
 
