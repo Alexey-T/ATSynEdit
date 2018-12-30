@@ -158,7 +158,7 @@ begin
     DoEventState;
 
   //when caret goes to left/top edge, must reset the NPixelOffset
-  if Carets.Count=1 then
+  if FOptScrollSmooth and (Carets.Count=1) then
   begin
     Caret:= Carets[0];
     if FScrollVert.NPixelOffset>0 then
