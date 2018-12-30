@@ -238,7 +238,7 @@ const
   cInitSpacingText = 1;
   cInitCaretBlinkTime = 600;
   cInitTimerAutoScroll = 80;
-  cInitTimerNiceScroll = 100;
+  cInitTimerNiceScroll = 150;
   cInitMinimapVisible = false;
   cInitMinimapTooltipVisible = true;
   cInitMinimapTooltipLinesCount = 6;
@@ -274,8 +274,7 @@ const
   cFoldedMarkIndentOuter = 0;
   cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert = 1; //... speed y
-  cSpeedScrollNiceHorz = 1; //browser-scroll (middle-click): speed x
-  cSpeedScrollNiceVert = 1; //... speed y
+  cSpeedScrollNice_SmoothSlower = 3;
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldLineDx = 3;
   cSizeRulerHeight = 20;
@@ -4891,8 +4890,14 @@ begin
   end;
 
   //delta in pixels
-  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) + 1)*cSpeedScrollNiceHorz;
-  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) + 1)*cSpeedScrollNiceVert;
+  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) + 1);
+  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) + 1);
+
+  if FOptScrollSmooth then
+  begin
+    Dx:= Dx div cSpeedScrollNice_SmoothSlower;
+    Dy:= Dy div cSpeedScrollNice_SmoothSlower;
+  end;
 
   if Dir in [cDirLeft, cDirRight] then
     DoScrollByDeltaInPixels(Dx, 0)
