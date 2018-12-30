@@ -101,6 +101,8 @@ begin
 end;
 
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
+var
+  Caret: TATCaretItem;
 begin
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
@@ -154,6 +156,18 @@ begin
 
   if cResultState in Res then
     DoEventState;
+
+  //when caret goes to left/top edge, must reset the NPixelOffset
+  if Carets.Count=1 then
+  begin
+    Caret:= Carets[0];
+    if FScrollVert.NPixelOffset>0 then
+      if Caret.CoordY=FRectMain.Top then
+        FScrollVert.NPixelOffset:= 0;
+    if FScrollHorz.NPixelOffset>0 then
+      if Caret.CoordX=FRectMain.Left then
+        FScrollHorz.NPixelOffset:= 0;
+  end;
 
   Update;
 end;
