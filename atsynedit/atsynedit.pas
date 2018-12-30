@@ -5184,6 +5184,8 @@ begin
     NPos:= N div W;
     NPixelOffset:= N mod W;
     NPos:= Max(NMin, Min(NMax-NPage, NPos));
+    if NPos>=NMax-NPage then
+      NPixelOffset:= 0;
   end;
 
   with FScrollVert do
@@ -5194,6 +5196,8 @@ begin
     NPos:= N div H;
     NPixelOffset:= N mod H;
     NPos:= Max(NMin, Min(NPosLast, NPos));
+    if NPos>=NPosLast then
+      NPixelOffset:= 0;
   end;
 end;
 
