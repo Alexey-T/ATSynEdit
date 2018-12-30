@@ -2227,14 +2227,14 @@ begin
 
   if AWithGutter then
   begin
-    C.Brush.Color:= FColors.GutterBG;
+    C.Brush.Color:= Colors.GutterBG;
     C.FillRect(FRectGutter);
 
     //paint some bands, for full height coloring
     if FGutter[FGutterBandFold].Visible then
-      DoPaintGutterBandBG(C, FGutterBandFold, FColors.GutterFoldBG, -1, -1);
+      DoPaintGutterBandBG(C, FGutterBandFold, Colors.GutterFoldBG, -1, -1);
     if FGutter[FGutterBandSep].Visible then
-      DoPaintGutterBandBG(C, FGutterBandSep, FColors.GutterSeparatorBG, -1, -1);
+      DoPaintGutterBandBG(C, FGutterBandSep, Colors.GutterSeparatorBG, -1, -1);
     if FGutter[FGutterBandEmpty].Visible then
       DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, -1, -1);
   end;
@@ -2551,7 +2551,7 @@ begin
       //for OptShowFullWidthForSelection=false paint eol bg
       if LineEolSelected then
       begin
-        C.Brush.Color:= FColors.TextSelBG;
+        C.Brush.Color:= Colors.TextSelBG;
         C.FillRect(
           CoordAfterText.X,
           CoordAfterText.Y,
@@ -2565,8 +2565,8 @@ begin
           cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
           CoordAfterText,
           ACharSize,
-          FColors.UnprintedFont,
-          FColors.UnprintedBG,
+          Colors.UnprintedFont,
+          Colors.UnprintedBG,
           FUnprintedEndsDetails);
     end;
 
@@ -2593,7 +2593,7 @@ begin
     if AWithGutter then
     begin
       //paint area over scrolled text
-      C.Brush.Color:= FColors.GutterBG;
+      C.Brush.Color:= Colors.GutterBG;
       C.FillRect(FRectGutter.Left, NCoordTop, FRectGutter.Right, NCoordTop+ACharSize.Y);
 
       //gutter band: number
@@ -2602,11 +2602,11 @@ begin
       begin
         if LineWithCaret and FOptShowGutterCaretBG then
         begin
-          DoPaintGutterBandBG(C, FGutterBandNum, FColors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y);
-          C.Font.Color:= FColors.GutterCaretFont;
+          DoPaintGutterBandBG(C, FGutterBandNum, Colors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y);
+          C.Font.Color:= Colors.GutterCaretFont;
         end
         else
-          C.Font.Color:= FColors.GutterFont;
+          C.Font.Color:= Colors.GutterFont;
 
         if FWrapInfo.IsItemInitial(NWrapIndex) then
         begin
@@ -2667,7 +2667,7 @@ begin
       Band:= FGutter[FGutterBandFold];
       if Band.Visible then
       begin
-        DoPaintGutterBandBG(C, FGutterBandFold, FColors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y);
+        DoPaintGutterBandBG(C, FGutterBandFold, Colors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y);
         DoPaintGutterFolding(C,
           NWrapIndex,
           Band.Left,
@@ -2682,15 +2682,15 @@ begin
       if Band.Visible then
       begin
         case Strings.LinesState[NLinesIndex] of
-          cLineStateChanged: DoPaintGutterBandState(NCoordTop, FColors.StateChanged);
-          cLineStateAdded: DoPaintGutterBandState(NCoordTop, FColors.StateAdded);
-          cLineStateSaved: DoPaintGutterBandState(NCoordTop, FColors.StateSaved);
+          cLineStateChanged: DoPaintGutterBandState(NCoordTop, Colors.StateChanged);
+          cLineStateAdded: DoPaintGutterBandState(NCoordTop, Colors.StateAdded);
+          cLineStateSaved: DoPaintGutterBandState(NCoordTop, Colors.StateSaved);
         end;
       end;
 
       //gutter band: separator
       if FGutter[FGutterBandSep].Visible then
-        DoPaintGutterBandBG(C, FGutterBandSep, FColors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y);
+        DoPaintGutterBandBG(C, FGutterBandSep, Colors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y);
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
         DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, NCoordTop, NCoordTop+ACharSize.Y);
@@ -2775,10 +2775,10 @@ begin
   R:= GetRectMinimapSel;
   if IntersectRect(R, R, FRectMinimap) then
   begin
-    CanvasInvertRect(C, R, FColors.MinimapSelBG);
+    CanvasInvertRect(C, R, Colors.MinimapSelBG);
     if FMinimapShowSelBorder then
     begin
-      C.Pen.Color:= FColors.MinimapBorder;
+      C.Pen.Color:= Colors.MinimapBorder;
       C.Brush.Style:= bsClear;
       C.Rectangle(R);
       C.Brush.Style:= bsSolid;
@@ -2797,9 +2797,9 @@ begin
 
   DoPaintMinimapSelTo(C);
 
-  if FColors.MinimapBorder<>clNone then
+  if Colors.MinimapBorder<>clNone then
   begin
-    C.Pen.Color:= FColors.MinimapBorder;
+    C.Pen.Color:= Colors.MinimapBorder;
     C.Line(FRectMinimap.Left-1, FRectMinimap.Top,
            FRectMinimap.Left-1, FRectMinimap.Bottom);
   end;
@@ -2856,9 +2856,9 @@ var
   i: integer;
 begin
   if FMarginRight>1 then
-    DoPaintMarginLineTo(C, PosX(FMarginRight), FColors.MarginRight);
+    DoPaintMarginLineTo(C, PosX(FMarginRight), Colors.MarginRight);
   for i:= 0 to FMarginList.Count-1 do
-    DoPaintMarginLineTo(C, PosX(PtrInt{%H-}(FMarginList[i])), FColors.MarginUser);
+    DoPaintMarginLineTo(C, PosX(PtrInt{%H-}(FMarginList[i])), Colors.MarginUser);
 end;
 
 
@@ -2902,7 +2902,7 @@ begin
 
   //paint frame
   RectMark:= Rect(ACoord.X, ACoord.Y, ACoord.X+NWidth, ACoord.Y+FCharSize.Y);
-  C.Pen.Color:= FColors.CollapseMarkBorder;
+  C.Pen.Color:= Colors.CollapseMarkBorder;
   C.Brush.Style:= bsClear;
   C.Rectangle(RectMark);
   C.Brush.Style:= bsSolid;
@@ -3678,7 +3678,7 @@ begin
     UpdateCaretsCoords;
     //paint margin
     if FOptShowCurColumn and (Carets.Count>0) then
-      DoPaintMarginLineTo(C, Carets[0].CoordX, FColors.MarginCaret);
+      DoPaintMarginLineTo(C, Carets[0].CoordX, Colors.MarginCaret);
   end;
 
   //paint markers after calc carets
@@ -4942,15 +4942,15 @@ begin
 
     if FCaretBlinkEnabled then
     begin
-      CanvasInvertRect(C, R, FColors.Caret);
+      CanvasInvertRect(C, R, Colors.Caret);
       //if shape FrameFull, invert inner area
       if CaretProps.EmptyInside then
-        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), FColors.Caret);
+        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), Colors.Caret);
     end
     else
     begin
       //paint non-blinking caret simpler
-      C.Brush.Color:= FColors.Caret;
+      C.Brush.Color:= Colors.Caret;
       C.FillRect(R);
     end;
 
@@ -5002,7 +5002,7 @@ begin
     for i:= 0 to AIndentSize-1 do
       if i mod FTabSize = 0 then
         CanvasDottedVertLine_Alt(C,
-          FColors.IndentVertLines,
+          Colors.IndentVertLines,
           ARect.Left + (i-AScrollPos)*ACharSize.X,
           ACoordY,
           ACoordY+ACharSize.Y);
@@ -5025,7 +5025,7 @@ begin
     begin
       NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
       NRight:= NLeft+ACharSize.X*(FSelRect.Right-FSelRect.Left);
-      C.Brush.Color:= FColors.TextSelBG;
+      C.Brush.Color:= Colors.TextSelBG;
       C.FillRect(
         NLeft,
         APointLeft.Y,
@@ -5037,7 +5037,7 @@ begin
   if FOptShowFullSel then
     if AEolSelected then
     begin
-      C.Brush.Color:= FColors.TextSelBG;
+      C.Brush.Color:= Colors.TextSelBG;
       C.FillRect(
         APointText.X,
         APointText.Y,
@@ -5679,8 +5679,8 @@ begin
       State:= cFoldbarMiddle;
 
   C.Pen.Color:= IfThen(FOptGutterShowFoldLines,
-    FColors.GutterFoldLine,
-    FColors.GutterFoldBG);
+    Colors.GutterFoldLine,
+    Colors.GutterFoldBG);
 
   CoordXM:= (ACoordX1+ACoordX2) div 2;
   CoordYM:= (ACoordY1+ACoordY2) div 2;
@@ -5781,7 +5781,7 @@ var
   Pos: TPoint;
 begin
   C.Brush.Color:= GetColorTextBG;
-  C.Font.Color:= FColors.TextHintFont;
+  C.Font.Color:= Colors.TextHintFont;
   C.Font.Style:= FTextHintFontStyle;
 
   Size:= C.TextExtent(FTextHint);
