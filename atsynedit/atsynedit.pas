@@ -274,7 +274,7 @@ const
   cFoldedMarkIndentOuter = 0;
   cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert = 1; //... speed y
-  cSpeedScrollNice_SmoothSlower = 3;
+  cSpeedScrollNice = 3;
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldLineDx = 3;
   cSizeRulerHeight = 20;
@@ -4890,14 +4890,8 @@ begin
   end;
 
   //delta in pixels
-  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) + 1);
-  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) + 1);
-
-  if FOptScrollSmooth then
-  begin
-    Dx:= Dx div cSpeedScrollNice_SmoothSlower;
-    Dy:= Dy div cSpeedScrollNice_SmoothSlower;
-  end;
+  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) + 1) div cSpeedScrollNice;
+  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) + 1) div cSpeedScrollNice;
 
   if Dir in [cDirLeft, cDirRight] then
     DoScrollByDeltaInPixels(Dx, 0)
