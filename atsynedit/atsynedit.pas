@@ -2207,7 +2207,7 @@ var
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap, bUseColorOfCurrentLine: boolean;
   //
-  procedure DoPaintGutterBandState(ATop: integer; AColor: TColor);
+  procedure DoPaintGutterBandState(ATop: integer; AColor: TColor); inline;
   begin
     DoPaintGutterBandBG(C, FGutterBandState, AColor, ATop, ATop+ACharSize.Y);
   end;
