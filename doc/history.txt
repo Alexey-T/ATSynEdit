@@ -1,4 +1,8 @@
 
+2018.12.31
++ add: smooth (per-pixel) scrolling in editor. Property OptScrollSmooth.
+  Seems it don't increase CPU load on scrolling. Also used in middle-mouse-click scrolling, it's smooth too.
+
 2018.12.28
 + add: prop OptFoldUnderlineOffset
 
