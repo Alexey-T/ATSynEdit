@@ -2,9 +2,10 @@
 2018.12.31
 + add: smooth (per-pixel) scrolling in editor. Property OptScrollSmooth.
   Seems it don't increase CPU load on scrolling. Also used in middle-mouse-click scrolling, it's smooth too.
++ add: small limit for folded-mark text length made bigger (47->110)
 
 2018.12.28
-+ add: prop OptFoldUnderlineOffset
++ add: prop OptFoldUnderlineOffset (before it was 0, now 3)
 
 2018.12.18
 * change: declaration of Strings.OnChange (added param)
