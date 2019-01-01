@@ -5884,8 +5884,8 @@ begin
 
     P1:= CaretPosToClientPos(Point(0, Range.Y));
     P2:= CaretPosToClientPos(Point(0, Range.Y2));
-    if (P1.Y<0) and (Range.Y>=nLineFrom) then Continue;
-    if (P2.Y<0) and (Range.Y2>=nLineFrom) then Continue;
+    if (P1.Y<FRectMain.Top) and (Range.Y>=nLineFrom) then Continue;
+    if (P2.Y<FRectMain.Top) and (Range.Y2>=nLineFrom) then Continue;
 
     NIndent:= FTabHelper.GetIndentExpanded(Range.Y, Strings.Lines[Range.Y]);
     Inc(P1.X, NIndent*ACharSize.X);
