@@ -133,13 +133,13 @@ Some details about this:
 * Can highlight URLs
 * Can set color attributes for ranges (to hilite brackets, words)
 
-== Difference from other components? ==
+== Difference from other components ==
 
-* Adapters to support syntax hilight; possible to support syntax files from any app: Sublime Text, Atom, EmEditor etc.
+* Adapters to support syntax highlighting. In theory, using adapters it's possible to support syntax files from any app: Sublime Text, Atom, EmEditor etc.
 * Muti-carets, multi-selections
-* Gaps (I didn't see this in others)
-* Minimap, Micromap (rare in others)
-* Diff from SynEdit: simpler set of objects, no "markup objects"
+* Inter-line gaps, can insert pictures in it
+* Minimap, Micromap (rare in others editors)
+* Smooth per-pixel scrolling (option)
 
 ==     Does it need to be installed? ==
 
@@ -154,7 +154,12 @@ It may be installed or not.
 
 type TATStrings in unit atstrings. Storage of text lines. It includes managing of Undo/Redo too. And auto-adjustments of Gaps/Bookmarks objects when lines are added/deleted. 
 
-To add/delete lines, use methods: LineAdd, LineInsert, LineDelete. They consider Undo data. Methods with "Raw" word ignore Undo data, usually don't use them.
+Methods:
+
+* To add/delete lines: LineAdd, LineInsert, LineDelete. They automatically create/update Undo/Redo data. Methods with "Raw" word in name: ignore Undo/Redo data, usually don't use them.
+* To insert/delete blocks of lines: DoBlock_DeleteLines, DoBlock_InsertLines.
+* Methods starting with "Text" support basic text operations: TextReplace, TextAppend, TextInsert etc. They operate on one caret position and get parameters AShift (shift of caret after text operation, by x/y) and APosAfter (position of caret after the operation).
+* To load blocks into Strings object: LoadFromFile, LoadFromStream, LoadFromString (multi-line string).
 
 To get/set lines, use properties:
 
@@ -165,6 +170,7 @@ To get/set lines, use properties:
 * LinesHidden[i]: bool: true if line is fully hidden (inside folded block)
 * LinesFoldFrom[i]: byte: 0 if line is not folded, >0 if line is folded from this char-pos
 * LinesState[i]: enum: line state, normal/changed/saved, it's shown by color on gutter
+* LinesSeparator[i]: enum: kind of horizontal separator line to paint near text (rarely needed for apps).
 
 === Strings.Bookmarks object ===
 
@@ -1116,4 +1122,5 @@ See [[ATSynEdit EControl adapter]]
 
 = more =
 
+[[Category: ATSynEdit]]
 [[Category:Components]]
