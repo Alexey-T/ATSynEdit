@@ -152,7 +152,7 @@ It may be installed or not.
 
 === Strings object ===
 
-type TATStrings in unit atstrings. Storage of text lines. It includes managing of Undo/Redo too. And auto-adjustments of Gaps/Bookmarks objects when lines are added/deleted. 
+type TATStrings in unit atstrings. Storage of text lines. It includes managing of Undo/Redo too.
 
 Methods:
 
@@ -171,6 +171,12 @@ To get/set lines, use properties:
 * LinesFoldFrom[i]: byte: 0 if line is not folded, >0 if line is folded from this char-pos
 * LinesState[i]: enum: line state, normal/changed/saved, it's shown by color on gutter
 * LinesSeparator[i]: enum: kind of horizontal separator line to paint near text (rarely needed for apps).
+
+Auto-adjustments of other objects when lines are added/deleted:
+
+* If Strings.Gaps property is set, Strings object updates Gaps object. Property is auto-set in ATSynEdit.
+* If Strings.Bookmarks property is set, Strings object updates Bookmarks object. Property is auto-set in ATSynEdit.
+* If Strings.GutterDecor1 / .GutterDecor2 properties are set, Strings object updates GutterDecor object(s). Properties are not set in ATSynEdit, application must set them.
 
 === Strings.Bookmarks object ===
 
