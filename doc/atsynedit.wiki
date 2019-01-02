@@ -174,8 +174,8 @@ To get/set lines, use properties:
 
 Auto-adjustments of other objects when lines are added/deleted:
 
-* If Strings.Gaps property is set, Strings object updates Gaps object. Property is auto-set in ATSynEdit.
-* If Strings.Bookmarks property is set, Strings object updates Bookmarks object. Property is auto-set in ATSynEdit.
+* Strings object updates Strings.Bookmarks object.
+* Strings object updates Gaps (actually Strings.Gaps) object.
 * If Strings.GutterDecor1 / .GutterDecor2 properties are set, Strings object updates GutterDecor object(s). Properties are not set in ATSynEdit, application must set them.
 * Objects Attribs / Markers / HotSpots are updated not inside Strings object, but in main ATSynEdit code.
 
