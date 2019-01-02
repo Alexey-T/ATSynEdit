@@ -195,8 +195,6 @@ type
       //because OnChangeBlock is called for all lines at once
     FLastCommandChangedLines: integer;
 
-    procedure DoBlock_DeleteLines(ALine1, ALine2: integer);
-    procedure DoBlock_InsertLines(ALineFrom: integer; ANewLines: TStringList);
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
@@ -276,6 +274,8 @@ type
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
+    procedure LineBlockDelete(ALine1, ALine2: integer);
+    procedure LineBlockInsert(ALineFrom: integer; ANewLines: TStringList);
     function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
     function CharPosToColumnPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
     function GetItemPtr(AIndex: integer): PATStringItem;

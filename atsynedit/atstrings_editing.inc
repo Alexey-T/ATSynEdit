@@ -79,8 +79,8 @@ begin
 
   BeginUndoGroup;
   try
-    DoBlock_DeleteLines(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
-    DoBlock_InsertLines(ALineFrom, ANewLines);
+    LineBlockDelete(ALineFrom, Min(ALineTo, Count-1)); //too big ALineTo allowed
+    LineBlockInsert(ALineFrom, ANewLines);
   finally
     EndUndoGroup;
   end;
@@ -366,7 +366,7 @@ begin
 end;
 
 
-procedure TATStrings.DoBlock_DeleteLines(ALine1, ALine2: integer);
+procedure TATStrings.LineBlockDelete(ALine1, ALine2: integer);
 var
   i: integer;
 begin
@@ -401,7 +401,7 @@ begin
   FChangeBlockActive:= false;
 end;
 
-procedure TATStrings.DoBlock_InsertLines(ALineFrom: integer; ANewLines: TStringList);
+procedure TATStrings.LineBlockInsert(ALineFrom: integer; ANewLines: TStringList);
 var
   i: integer;
 begin
@@ -461,13 +461,13 @@ begin
   if (AFromX=0) and (AToX=0) then
   begin
     //selected entire lines
-    DoBlock_DeleteLines(AFromY, AToY-1);
+    LineBlockDelete(AFromY, AToY-1);
   end
   else
   if (AFromX=0) and (AToY=Count-1) and (AToX=LinesLen[AToY]) then
   begin
     //selected entire lines, to the end of last line
-    DoBlock_DeleteLines(AFromY, AToY);
+    LineBlockDelete(AFromY, AToY);
   end
   else
   begin
@@ -496,7 +496,7 @@ begin
     Lines[AFromY]:= Str;
 
     //del middle lines
-    DoBlock_DeleteLines(AFromY+1, AToY);
+    LineBlockDelete(AFromY+1, AToY);
 
     //if bDelEmpty then
     //  if Str='' then
