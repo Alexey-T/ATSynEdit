@@ -157,9 +157,9 @@ type TATStrings in unit atstrings. Storage of text lines. It includes managing o
 Methods:
 
 * To add/delete lines: LineAdd, LineInsert, LineDelete. They automatically create/update Undo/Redo data. Methods with "Raw" word in name: ignore Undo/Redo data, usually don't use them.
-* To insert/delete blocks of lines: DoBlock_DeleteLines, DoBlock_InsertLines.
+* To insert/delete blocks of lines: LineBlockInsert, LineBlockDelete.
 * Methods starting with "Text" support basic text operations: TextReplace, TextAppend, TextInsert etc. They operate on one caret position and get parameters AShift (shift of caret after text operation, by x/y) and APosAfter (position of caret after the operation).
-* To load blocks into Strings object: LoadFromFile, LoadFromStream, LoadFromString (multi-line string).
+* To load entire content into Strings object: LoadFromFile, LoadFromStream, LoadFromString (multi-line string).
 
 To get/set lines, use properties:
 
