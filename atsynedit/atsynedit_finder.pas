@@ -157,7 +157,7 @@ type
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoAction_ReplaceSelected: boolean;
     function DoAction_CountAll(AWithEvent: boolean): integer;
-    function DoAction_ExtractAll(AWithEvent: boolean): string;
+    procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList);
     function DoAction_ReplaceAll: integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
@@ -660,10 +660,9 @@ begin
   end;
 end;
 
-function TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean): string;
+procedure TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList);
 var
   ListRes: TList;
-  ListText: TStringList;
   Res: TATFinderResult;
   Str: UnicodeString;
   i: integer;
@@ -672,11 +671,12 @@ begin
     raise Exception.Create('Finder Extract action called for non-regex mode');
   UpdateBuffer;
 
+  AMatches.Clear;
   ListRes:= TList.Create;
-  ListText:= TStringList.Create;
   try
-    ListText.TextLineBreakStyle:= tlbsLF;
-    ListText.Sorted:= true;
+    AMatches.TextLineBreakStyle:= tlbsLF;
+    AMatches.Sorted:= true;
+    AMatches.Duplicates:= dupIgnore;
 
     DoCollect_Regex(ListRes, 1, AWithEvent, false);
     for i:= 0 to ListRes.Count-1 do
@@ -688,12 +688,9 @@ begin
         Res.FEnd.X,
         Res.FEnd.Y);
       if Str<>'' then
-        ListText.Add(UTF8Encode(Str));
+        AMatches.Add(UTF8Encode(Str));
     end;
-
-    Result:= ListText.Text;
   finally
-    FreeAndNil(ListText);
     FreeAndNil(ListRes);
   end;
 end;
