@@ -157,6 +157,7 @@ type
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoAction_ReplaceSelected: boolean;
     function DoAction_CountAll(AWithEvent: boolean): integer;
+    function DoAction_ExtractAll(AWithEvent: boolean): string;
     function DoAction_ReplaceAll: integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
@@ -656,6 +657,44 @@ begin
       Inc(Result, DoCount_InFragment(AWithEvent));
     end;
     CurrentFragmentIndex:= 0;
+  end;
+end;
+
+function TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean): string;
+var
+  ListRes: TList;
+  ListText: TStringList;
+  Res: TATFinderResult;
+  Str: UnicodeString;
+  i: integer;
+begin
+  if not OptRegex then
+    raise Exception.Create('Finder Extract action called for non-regex mode');
+  UpdateBuffer;
+
+  ListRes:= TList.Create;
+  ListText:= TStringList.Create;
+  try
+    ListText.TextLineBreakStyle:= tlbsLF;
+    ListText.Sorted:= true;
+
+    DoCollect_Regex(ListRes, 1, AWithEvent, false);
+    for i:= 0 to ListRes.Count-1 do
+    begin
+      Res:= TATFinderResult(ListRes[i]);
+      Str:= Editor.Strings.TextSubstring(
+        Res.FPos.X,
+        Res.FPos.Y,
+        Res.FEnd.X,
+        Res.FEnd.Y);
+      if Str<>'' then
+        ListText.Add(UTF8Encode(Str));
+    end;
+
+    Result:= ListText.Text;
+  finally
+    FreeAndNil(ListText);
+    FreeAndNil(ListRes);
   end;
 end;
 
