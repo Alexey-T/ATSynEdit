@@ -311,6 +311,7 @@ type
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const AFilename: string);
     procedure LoadFromString(const AText: atString);
+    procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
     procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);
     property SaveSignUtf8: boolean read FSaveSignUtf8 write FSaveSignUtf8;

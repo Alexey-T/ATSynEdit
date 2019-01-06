@@ -160,6 +160,27 @@ begin
 end;
 
 
+procedure TATStrings.LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
+var
+  i: integer;
+begin
+  if ReadOnly then exit;
+  Clear;
+  if AList.Count=0 then
+  begin
+    ActionAddFakeLineIfNeeded;
+    Exit;
+  end;
+
+  for i:= 0 to AList.Count-1 do
+    LineAddRaw_UTF8_NoUndo(AList[i], AEnds);
+
+  ActionAddFakeLineIfNeeded;
+  Modified:= true;
+  for i:= 0 to Count-1 do
+    SetLineState(i, cLineStateAdded);
+end;
+
 procedure TATStrings.LoadFromString(const AText: atString);
 var
   MS: TMemoryStream;
