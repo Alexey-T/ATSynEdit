@@ -85,6 +85,8 @@ begin
   FreeAndNil(cBitmapWait);
   FreeAndNil(cBitmapSaving);
   FreeAndNil(cBitmapNiceScroll);
+  FreeAndNil(cBitmapFoldPlus);
+  FreeAndNil(cBitmapFoldMinus);
 end;
 
 function IsDoubleBufferedNeeded: boolean;
