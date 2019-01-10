@@ -2742,6 +2742,8 @@ var
   Percent: double;
 const
   PercentFix: double = 0.02;
+  PercentEdgeMin = 0.03;
+  PercentEdgeMax = 0.97;
 begin
   {
   1) calculate percent position of mouse
@@ -2750,8 +2752,11 @@ begin
   }
   Percent:= (APosY-FRectMinimap.Top) / GetMinimapActualHeight;
 
-  if Percent<0.1 then Percent:= Max(0.0, Percent-PercentFix) else
-   if Percent>0.9 then Percent:= Min(100.0, Percent+PercentFix);
+  if Percent<PercentEdgeMin then
+    Percent:= Max(0.0, Percent-PercentFix)
+  else
+  if Percent>PercentEdgeMax then
+    Percent:= Min(100.0, Percent+PercentFix);
 
   Result:= Round(Percent * FWrapInfo.Count);
 end;
