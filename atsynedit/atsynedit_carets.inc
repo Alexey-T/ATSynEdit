@@ -967,7 +967,7 @@ begin
       Result:= true;
     end
     else
-    if (Caret.CoordY>=FRectMain.Bottom-FCharSize.Y-2) then
+    if (Caret.CoordY>=FRectMain.Bottom-2*FCharSize.Y-2) then
     begin
       Pnt:= Point(Caret.CoordX, FRectMain.Bottom-FCharSize.Y);
       Pnt:= ClientPosToCaretPos(Pnt, Details);
