@@ -1,4 +1,11 @@
 
+2019.01.12
+- fix: when caret on file end, command "scroll line up" caused caret jump
+
+2019.01.06
++ add: Strings object new method LoadFromStrings()
++ add: Finder has new method DoAction_ExtractAll (for CudaText)
+
 2018.12.31
 + add: smooth (per-pixel) scrolling in editor. Property OptScrollSmooth.
   Seems it don't increase CPU load on scrolling. Also used in middle-mouse-click scrolling, it's smooth too.
