@@ -92,7 +92,7 @@ begin
     Carets.Add(AX, AY);
 end;
 
-procedure TATSynEdit.DoCaretsSort;
+procedure TATSynEdit.DoCaretsSort; inline;
 begin
   Carets.Sort;
 end;
@@ -411,7 +411,7 @@ begin
   DoPaintModeBlinking;
 end;
 
-procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
+procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
 begin
   FScrollVert.NPos:= Max(0, AWrapInfoIndex-AIndentVert);
   FScrollVert.NPixelOffset:= 0;
@@ -550,12 +550,10 @@ begin
 end;
 
 procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge);
-var
-  Pos, PosEnd: TPoint;
 begin
-  Pos:= Carets.CaretAtEdge(AEdge);
-  PosEnd:= Point(-1, -1);
-  DoGotoPos(Pos, PosEnd,
+  DoGotoPos(
+    Carets.CaretAtEdge(AEdge),
+    Point(-1, -1),
     FOptScrollIndentCaretHorz,
     FOptScrollIndentCaretVert,
     false,
@@ -726,12 +724,12 @@ begin
     DoCaretSingle(0, 0);
 end;
 
-function TATSynEdit.IsCaretBlocked: boolean;
+function TATSynEdit.IsCaretBlocked: boolean; inline;
 begin
   Result:= FCaretStopUnfocused and not Focused;
 end;
 
-procedure TATSynEdit.UpdateIncorrectCaretPositions;
+procedure TATSynEdit.UpdateIncorrectCaretPositions; inline;
 begin
   Carets.UpdateIncorrectPositions(Strings.Count-1);
 end;
@@ -938,7 +936,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretForceShow;
+procedure TATSynEdit.DoCaretForceShow; inline;
 begin
   Include(FPaintFlags, cPaintUpdateCarets);
   FCaretAllowNextBlink:= true;

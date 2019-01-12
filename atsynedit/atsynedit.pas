@@ -696,7 +696,7 @@ type
     procedure DoOnStringProgress(Sender: TObject);
     function DoScale(N: integer): integer;
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
-    procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer);
+    procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
     procedure DoSelectionDeleteColumnBlock;
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
@@ -745,7 +745,7 @@ type
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
     procedure DoInitPopupMenu;
-    function IsCaretBlocked: boolean;
+    function IsCaretBlocked: boolean; inline;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
@@ -810,7 +810,7 @@ type
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
-    procedure DoCaretsSort;
+    procedure DoCaretsSort; inline;
     //events
     procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
