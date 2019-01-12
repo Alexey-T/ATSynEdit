@@ -946,27 +946,33 @@ end;
 
 
 function TATSynEdit.DoCaretsKeepOnScreen: boolean;
+//Forces carets to visible screen area. Gets true if some caret modified.
 var
   Caret: TATCaretItem;
-  NMinIndex, NMaxIndex, i: integer;
+  Pnt: TPoint;
+  Details: TATPosDetails;
+  i: integer;
 begin
   Result:= false;
-
-  NMinIndex:= LineTop;
-  NMaxIndex:= LineBottom-2; //-1 gives not ok result
 
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    if Caret.PosY<NMinIndex then
+    if (Caret.CoordY<=FRectMain.Top+2) then
     begin
-      Caret.PosY:= NMinIndex;
+      Pnt:= Point(Caret.CoordX, FRectMain.Top);
+      Pnt:= ClientPosToCaretPos(Pnt, Details);
+      Caret.PosX:= Pnt.X;
+      Caret.PosY:= Pnt.Y;
       Result:= true;
     end
     else
-    if Caret.PosY>NMaxIndex then
+    if (Caret.CoordY>=FRectMain.Bottom-FCharSize.Y-2) then
     begin
-      Caret.PosY:= NMaxIndex;
+      Pnt:= Point(Caret.CoordX, FRectMain.Bottom-FCharSize.Y);
+      Pnt:= ClientPosToCaretPos(Pnt, Details);
+      Caret.PosX:= Pnt.X;
+      Caret.PosY:= Pnt.Y;
       Result:= true;
     end;
   end;
