@@ -342,8 +342,8 @@ var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   Str: atString;
-  bNeedGroup: boolean;
-  i: integer;
+  bNeedGroup, bBetterBrackets: boolean;
+  NShiftX, NShiftY, i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -357,10 +357,25 @@ begin
   for i:= FCarets.Count-1 downto 0 do
   begin
     Caret:= FCarets[i];
+
+    Str:= Strings.Lines[Caret.PosY];
+    bBetterBrackets:= (Caret.PosX>0) and (Caret.PosX<Length(Str)) and (Copy(Str, Caret.PosX, 2)='{}');
+    NShiftX:= 0;
+    NShiftY:= 0;
+
     Str:= GetAutoIndentString(Caret.PosX, Caret.PosY);
     Strings.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
-    Caret.PosX:= PosAfter.X;
+
+    //work to move } to next line, leave caret at current line
+    if bBetterBrackets then
+    begin
+      Strings.LineInsert(Caret.PosY+1, Str+StringOfChar(' ', FOptIndentSize));
+      NShiftX:= FOptIndentSize;
+      NShiftY:= 1;
+    end;
+
+    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X+NShiftX, Shift.Y+NShiftY, PosAfter);
+    Caret.PosX:= PosAfter.X+NShiftX;
     Caret.PosY:= PosAfter.Y;
     //on Enter reset prev column for up/down
     Caret.SavedX:= 0;
