@@ -362,7 +362,7 @@ begin
     NShiftX:= 0;
     NShiftY:= 0;
     bBetterBrackets:=
-      FOptAutoIndentBetterBrackets and
+      FOptAutoIndentDoBracketsCurly and
       (Caret.PosX>0) and (Caret.PosX<Length(Str)) and (Copy(Str, Caret.PosX, 2)='{}');
 
     Str:= GetAutoIndentString(Caret.PosX, Caret.PosY);

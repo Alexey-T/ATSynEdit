@@ -605,7 +605,7 @@ type
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
-    FOptAutoIndentBetterBrackets: boolean;
+    FOptAutoIndentDoBracketsCurly: boolean;
     FOptTabSpaces: boolean;
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
@@ -1296,7 +1296,7 @@ type
     property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine default cInitTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
-    property OptAutoIndentBetterCurlyBrackets: boolean read FOptAutoIndentBetterBrackets write FOptAutoIndentBetterBrackets default true;
+    property OptAutoIndentDoBracketsCurly: boolean read FOptAutoIndentDoBracketsCurly write FOptAutoIndentDoBracketsCurly default true;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel default true;
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel default false;
     property OptCopyColumnBlockAlignedBySpaces: boolean read FOptCopyColumnBlockAlignedBySpaces write FOptCopyColumnBlockAlignedBySpaces default true;
@@ -3260,7 +3260,7 @@ begin
   FOptWordChars:= '';
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsPrevLine;
-  FOptAutoIndentBetterBrackets:= true;
+  FOptAutoIndentDoBracketsCurly:= true;
   FOptTabSpaces:= false;
 
   FOptLastLineOnTop:= false;
