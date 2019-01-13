@@ -341,7 +341,7 @@ function TATSynEdit.DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResu
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  Str, StrTest: atString;
+  Str: atString;
   bNeedGroup, bBetterBrackets: boolean;
   NShiftX, NShiftY, i: integer;
 begin
@@ -357,18 +357,19 @@ begin
   for i:= FCarets.Count-1 downto 0 do
   begin
     Caret:= FCarets[i];
+    if not Strings.IsIndexValid(Caret.PosY) then Continue;
 
-    Str:= Strings.Lines[Caret.PosY];
     NShiftX:= 0;
     NShiftY:= 0;
     bBetterBrackets:= false;
 
+    Str:= Strings.Lines[Caret.PosY];
     if (Caret.PosX>0) and (Caret.PosX<Length(Str)) then
     begin
-      StrTest:= Copy(Str, Caret.PosX, 2);
-      if (FOptAutoIndentBetterBracketsCurly and (StrTest='{}')) or
-         (FOptAutoIndentBetterBracketsRound and (StrTest='()')) or
-         (FOptAutoIndentBetterBracketsSquare and (StrTest='[]')) then
+      Str:= Copy(Str, Caret.PosX, 2);
+      if (FOptAutoIndentBetterBracketsCurly and (Str='{}')) or
+         (FOptAutoIndentBetterBracketsRound and (Str='()')) or
+         (FOptAutoIndentBetterBracketsSquare and (Str='[]')) then
         bBetterBrackets:= true;
     end;
 
