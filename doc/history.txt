@@ -1,6 +1,8 @@
 
 2019.01.13
-+ add: OptAutoIndentBetterCurlyBrackets (make additional indented line if caret was inside {} )
++ add: OptAutoIndentBetterBracketsCurly (make additional indented line if caret was inside {} )
++ add: OptAutoIndentBetterBracketsRound
++ add: OptAutoIndentBetterBracketsSquare
 
 2019.01.12
 - fix: when caret on file end, command "scroll line up" caused caret jump

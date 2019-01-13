@@ -605,7 +605,9 @@ type
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
-    FOptAutoIndentDoBracketsCurly: boolean;
+    FOptAutoIndentBetterBracketsCurly: boolean;
+    FOptAutoIndentBetterBracketsRound: boolean;
+    FOptAutoIndentBetterBracketsSquare: boolean;
     FOptTabSpaces: boolean;
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
@@ -1296,7 +1298,9 @@ type
     property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine default cInitTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
     property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
-    property OptAutoIndentDoBracketsCurly: boolean read FOptAutoIndentDoBracketsCurly write FOptAutoIndentDoBracketsCurly default true;
+    property OptAutoIndentBetterBracketsCurly: boolean read FOptAutoIndentBetterBracketsCurly write FOptAutoIndentBetterBracketsCurly default true;
+    property OptAutoIndentBetterBracketsRound: boolean read FOptAutoIndentBetterBracketsRound write FOptAutoIndentBetterBracketsRound default false;
+    property OptAutoIndentBetterBracketsSquare: boolean read FOptAutoIndentBetterBracketsSquare write FOptAutoIndentBetterBracketsSquare default false;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel default true;
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel default false;
     property OptCopyColumnBlockAlignedBySpaces: boolean read FOptCopyColumnBlockAlignedBySpaces write FOptCopyColumnBlockAlignedBySpaces default true;
@@ -3260,7 +3264,9 @@ begin
   FOptWordChars:= '';
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsPrevLine;
-  FOptAutoIndentDoBracketsCurly:= true;
+  FOptAutoIndentBetterBracketsCurly:= true;
+  FOptAutoIndentBetterBracketsRound:= false;
+  FOptAutoIndentBetterBracketsSquare:= false;
   FOptTabSpaces:= false;
 
   FOptLastLineOnTop:= false;
