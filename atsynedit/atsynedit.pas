@@ -6,6 +6,7 @@ License: MPL 2.0 or LGPL
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
 
+//{$define debug_minimap_time}
 //{$define debug_findwrapindex}
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
                          //when horz-scroll hides/shows/hides/...
@@ -2804,7 +2805,13 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
+var
+  t: QWord;
 begin
+  {$ifdef debug_minimap_time}
+  t:= GetTickCount64;
+  {$endif}
+
   FScrollHorzMinimap.Clear;
   FScrollVertMinimap.Clear;
 
@@ -2813,6 +2820,11 @@ begin
   DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
 
   DoPaintMinimapSelTo(C);
+
+  {$ifdef debug_minimap_time}
+  t:= GetTickCount64-t;
+  Application.MainForm.Caption:= Format('minimap: %d ms', [t]);
+  {$endif}
 
   if Colors.MinimapBorder<>clNone then
   begin
