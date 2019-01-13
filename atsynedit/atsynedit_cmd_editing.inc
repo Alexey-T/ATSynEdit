@@ -359,9 +359,11 @@ begin
     Caret:= FCarets[i];
 
     Str:= Strings.Lines[Caret.PosY];
-    bBetterBrackets:= (Caret.PosX>0) and (Caret.PosX<Length(Str)) and (Copy(Str, Caret.PosX, 2)='{}');
     NShiftX:= 0;
     NShiftY:= 0;
+    bBetterBrackets:=
+      FOptAutoIndentBetterBrackets and
+      (Caret.PosX>0) and (Caret.PosX<Length(Str)) and (Copy(Str, Caret.PosX, 2)='{}');
 
     Str:= GetAutoIndentString(Caret.PosX, Caret.PosY);
     Strings.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
