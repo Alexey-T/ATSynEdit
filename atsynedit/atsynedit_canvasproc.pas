@@ -132,7 +132,8 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   ATabSize: integer;
   const AParts: TATLineParts;
   AColorBG: TColor;
-  const ALine: atString
+  const ALine: atString;
+  AUsePixels: boolean
   );
 
 procedure DoPaintUnprintedEol(C: TCanvas;
@@ -1236,7 +1237,7 @@ end;
 
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
   ACharSize: TPoint; ATabSize: integer; const AParts: TATLineParts;
-  AColorBG: TColor; const ALine: atString);
+  AColorBG: TColor; const ALine: atString; AUsePixels: boolean);
 // line is painted with 2px height,
 // and 1px spacing between lines
 var
@@ -1287,20 +1288,35 @@ begin
       if (X1>=ARect.Left) and (X1<ARect.Right) then
       begin
         //must limit line on right edge
-        if X2>ARect.Right then
-          X2:= ARect.Right;
+        //if X2>ARect.Right then
+        //  X2:= ARect.Right;
 
         if HasBG then
         begin
           //paint BG as 2 pixel line
-          C.Brush.Color:= NColorBack;
-          C.FillRect(X1, Y2-2, X2, Y2);
+          if AUsePixels then
+          begin
+            C.Pixels[X1, Y2-2]:= NColorBack;
+            C.Pixels[X1, Y2-1]:= NColorBack;
+          end
+          else
+          begin
+            C.Brush.Color:= NColorBack;
+            C.FillRect(X1, Y2-2, X2, Y2);
+          end;
         end;
 
         if not IsCharSpace(ch) then
         begin
-          C.Brush.Color:= NColorFontHalf;
-          C.FillRect(X1, Y2-1, X2, Y2);
+          if AUsePixels then
+          begin
+            C.Pixels[X1, Y2-1]:= NColorFontHalf;
+          end
+          else
+          begin
+            C.Brush.Color:= NColorFontHalf;
+            C.FillRect(X1, Y2-1, X2, Y2);
+          end;
         end;
       end;
     end;

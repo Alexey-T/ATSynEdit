@@ -2329,7 +2329,8 @@ begin
             Strings.LineSub(
               WrapItem.NLineIndex,
               WrapItem.NCharIndex,
-              GetVisibleColumns) //optimize for huge lines
+              GetVisibleColumns), //optimize for huge lines
+            DoubleBuffered
             );
 
           //end of painting line
@@ -2527,7 +2528,8 @@ begin
           Strings.LineSub(
             WrapItem.NLineIndex,
             WrapItem.NCharIndex,
-            GetVisibleColumns) //optimize for huge lines
+            GetVisibleColumns), //optimize for huge lines
+          DoubleBuffered
           );
 
       //restore after textout
