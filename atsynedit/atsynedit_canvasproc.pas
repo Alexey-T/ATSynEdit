@@ -74,7 +74,7 @@ type
   end;
 
 const
-  cMaxLineParts = 1000; //big two monitors have total about 1000 chars (small font)
+  cMaxLineParts = 210;
 type
   TATLineParts = array[0..cMaxLineParts-1] of TATLinePart;
   PATLineParts = ^TATLineParts;
