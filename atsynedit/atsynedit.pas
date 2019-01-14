@@ -424,6 +424,8 @@ type
     FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
     FMouseDragMinimap: boolean;
+    FMouseDragMinimapDelta: integer;
+    FMouseDragMinimapSelHeight: integer;
     FMouseDownAndColumnSelection: boolean;
     FMouseAutoScroll: TATDirection;
     FMouseActions: TATMouseActions;
@@ -711,7 +713,7 @@ type
     function GetLastCommandChangedLines: integer;
     function GetMinimapActualHeight: integer;
     function GetMinimapSelTop: integer;
-    function GetMinimap_PercentToWrapIndex(APosY: integer): integer;
+    function GetMinimap_DraggedPosToWrapIndex(APosY: integer): integer;
     function GetMinimap_PosToWrapIndex(APosY: integer): integer;
     function GetOptTextOffsetTop: integer;
     function GetRectMinimapSel: TRect;
@@ -2746,28 +2748,16 @@ begin
       ));
 end;
 
-function TATSynEdit.GetMinimap_PercentToWrapIndex(APosY: integer): integer;
+function TATSynEdit.GetMinimap_DraggedPosToWrapIndex(APosY: integer): integer;
 var
-  Percent: double;
-const
-  PercentFix: double = 0.02;
-  PercentEdgeMin = 0.03;
-  PercentEdgeMax = 0.97;
+  NCount, NScrollPos, NScrollHeight: integer;
 begin
-  {
-  1) calculate percent position of mouse
-  2) must correct this! we must scroll to 0 if almost at the top;
-    must scroll to end if almost at the end - do this by increment n%
-  }
-  Percent:= (APosY-FRectMinimap.Top) / GetMinimapActualHeight;
+  NCount:= FWrapInfo.Count;
+  NScrollPos:= Max(0, APosY-FMouseDragMinimapDelta);
+  NScrollHeight:= Max(0, FRectMinimap.Height-FMouseDragMinimapSelHeight);
 
-  if Percent<PercentEdgeMin then
-    Percent:= Max(0.0, Percent-PercentFix)
-  else
-  if Percent>PercentEdgeMax then
-    Percent:= Min(100.0, Percent+PercentFix);
-
-  Result:= Round(Percent * FWrapInfo.Count);
+  Result:= Int64(NCount) * NScrollPos div NScrollHeight;
+  Result:= Min(NCount-1, Result);
 end;
 
 function TATSynEdit.GetMinimap_PosToWrapIndex(APosY: integer): integer;
@@ -4123,6 +4113,7 @@ var
   PosDetails: TATPosDetails;
   Index: integer;
   ActionId: TATMouseActionId;
+  R: TRect;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -4143,8 +4134,13 @@ begin
 
   if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
   begin
-    if PtInRect(GetRectMinimapSel, Point(X, Y)) then
+    R:= GetRectMinimapSel;
+    FMouseDragMinimapSelHeight:= R.Height;
+    if PtInRect(R, Point(X, Y)) then
+    begin
       FMouseDragMinimap:= true;
+      FMouseDragMinimapDelta:= Y-R.Top;
+    end;
     if ActionId=cMouseActionClickSimple then
     begin
       DoMinimapClick(Y);
@@ -5497,15 +5493,8 @@ begin
 end;
 
 procedure TATSynEdit.DoMinimapDrag(APosY: integer);
-var
-  NIndex: integer;
 begin
-  NIndex:= GetMinimap_PercentToWrapIndex(APosY);
-  //set scroll so that drag point is in 1/2 of sel-rect height.
-  //Sublime makes drag point at ~1/3 of sel-rect height, btw.
-  FScrollVert.NPos:= Max(0, Min(
-    NIndex - GetVisibleLines div 2,
-    FScrollVert.NMax));
+  FScrollVert.NPos:= GetMinimap_DraggedPosToWrapIndex(APosY);
   Update;
 end;
 
