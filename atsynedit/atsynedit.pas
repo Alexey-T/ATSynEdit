@@ -2750,13 +2750,23 @@ end;
 
 function TATSynEdit.GetMinimap_DraggedPosToWrapIndex(APosY: integer): integer;
 var
-  NCount, NScrollPos, NScrollHeight: integer;
+  NCount, NScrollPos, NScrollMax, NScrollMax2: integer;
 begin
   NCount:= FWrapInfo.Count;
   NScrollPos:= Max(0, APosY-FMouseDragMinimapDelta);
-  NScrollHeight:= Max(0, FRectMinimap.Height-FMouseDragMinimapSelHeight);
 
-  Result:= Int64(NCount) * NScrollPos div NScrollHeight;
+  //for big files
+  NScrollMax:= Max(0, FRectMinimap.Height-FMouseDragMinimapSelHeight);
+
+  //for small files: minimap drag must not be until bottom
+  NScrollMax2:= NCount*FCharSizeMinimap.Y;
+  if not FOptLastLineOnTop then
+    NScrollMax2:= Max(0, NScrollMax2-FMouseDragMinimapSelHeight);
+
+  if NScrollMax>NScrollMax2 then
+    NScrollMax:= NScrollMax2;
+
+  Result:= Int64(FScrollVert.NPosLast) * NScrollPos div NScrollMax;
   Result:= Min(NCount-1, Result);
 end;
 
