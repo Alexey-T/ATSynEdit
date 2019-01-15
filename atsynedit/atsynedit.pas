@@ -420,6 +420,7 @@ type
     FHintWnd: THintWindow;
     FMouseDownPnt: TPoint;
     FMouseDownGutterLineNumber: integer;
+    FMouseDownOnMinimap: boolean;
     FMouseDownDouble: boolean;
     FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
@@ -714,7 +715,7 @@ type
     function GetMinimapActualHeight: integer;
     function GetMinimapSelTop: integer;
     function GetMinimap_DraggedPosToWrapIndex(APosY: integer): integer;
-    function GetMinimap_PosToWrapIndex(APosY: integer): integer;
+    function GetMinimap_ClickedPosToWrapIndex(APosY: integer): integer;
     function GetOptTextOffsetTop: integer;
     function GetRectMinimapSel: TRect;
     function GetRedoAsString: string;
@@ -2770,7 +2771,7 @@ begin
   Result:= Min(NCount-1, Result);
 end;
 
-function TATSynEdit.GetMinimap_PosToWrapIndex(APosY: integer): integer;
+function TATSynEdit.GetMinimap_ClickedPosToWrapIndex(APosY: integer): integer;
 begin
   Result:= (APosY-FRectMinimap.Top) div FCharSizeMinimap.Y + FScrollVertMinimap.NPos;
   if not FWrapInfo.IsIndexValid(Result) then
@@ -2807,8 +2808,10 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
+{$ifdef debug_minimap_time}
 var
   t: QWord;
+  {$endif}
 begin
   {$ifdef debug_minimap_time}
   t:= GetTickCount64;
@@ -4132,8 +4135,10 @@ begin
 
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
+  FMouseDownOnMinimap:= false;
   FMouseDownGutterLineNumber:= -1;
   FMouseDragDropping:= false;
+  FMouseDragMinimap:= false;
   ActionId:= GetMouseActionId(FMouseActions, Shift);
 
   if MouseNiceScroll then
@@ -4145,16 +4150,12 @@ begin
   if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
   begin
     R:= GetRectMinimapSel;
+    FMouseDownOnMinimap:= true;
     FMouseDragMinimapSelHeight:= R.Height;
     if PtInRect(R, Point(X, Y)) then
     begin
       FMouseDragMinimap:= true;
       FMouseDragMinimapDelta:= Y-R.Top;
-    end;
-    if ActionId=cMouseActionClickSimple then
-    begin
-      DoMinimapClick(Y);
-      Exit
     end;
   end;
 
@@ -4291,6 +4292,17 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
 
+  if PtInRect(FRectMinimap, Point(X, Y)) then
+  begin
+    if FMouseDownOnMinimap then
+    begin
+      FMouseDownOnMinimap:= false;
+      if not FMouseDragMinimap then
+        DoMinimapClick(Y);
+    end;
+    Exit
+  end;
+
   if PtInRect(ClientRect, Point(X, Y)) then
   if FMouseDragDropping then
   begin
@@ -4321,6 +4333,7 @@ begin
   FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDownAndColumnSelection:= false;
+  FMouseDownOnMinimap:= false;
   FMouseDragDropping:= false;
   FMouseDragMinimap:= false;
   FTimerScroll.Enabled:= false;
@@ -5492,7 +5505,7 @@ procedure TATSynEdit.DoMinimapClick(APosY: integer);
 var
   NItem: integer;
 begin
-  NItem:= GetMinimap_PosToWrapIndex(APosY);
+  NItem:= GetMinimap_ClickedPosToWrapIndex(APosY);
   if NItem>=0 then
   begin
     NItem:= Max(0, NItem - GetVisibleLines div 2);
@@ -6286,7 +6299,7 @@ begin
   C.Brush.Color:= Colors.MinimapTooltipBG;
   C.Rectangle(RectAll);
 
-  NWrapIndex:= GetMinimap_PosToWrapIndex(Pnt.Y);
+  NWrapIndex:= GetMinimap_ClickedPosToWrapIndex(Pnt.Y);
   if NWrapIndex<0 then exit;
   NLineCenter:= FWrapInfo[NWrapIndex].NLineIndex;
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
