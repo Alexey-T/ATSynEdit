@@ -675,7 +675,7 @@ type
       out AColor: TColor; out AColorForced: boolean);
     procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretProps; W, H: integer);
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
-    function DoCaretsKeepOnScreen: boolean;
+    function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
     procedure DoCaretsOnChanged(Sender: TObject);
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoCaretsShift_CaretItem(Caret: TATCaretItem; APosX, APosY, AShiftX,

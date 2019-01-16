@@ -1,4 +1,7 @@
 
+2019.01.16
+- fix: OptScrollLineCommandsKeepCaretOnScreen worked wrong
+
 2019.01.14
 + add: rework dragging of Minimap's highlighted rect; now it must feel like Sublime
 

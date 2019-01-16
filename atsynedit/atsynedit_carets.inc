@@ -943,7 +943,7 @@ begin
 end;
 
 
-function TATSynEdit.DoCaretsKeepOnScreen: boolean;
+function TATSynEdit.DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
 //Forces carets to visible screen area. Gets true if some caret modified.
 var
   Caret: TATCaretItem;
@@ -956,7 +956,7 @@ begin
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    if (Caret.CoordY<=FRectMain.Top+2) then
+    if AMoveDown and (Caret.CoordY<=FRectMain.Top+2) then
     begin
       Pnt:= Point(Caret.CoordX, FRectMain.Top);
       Pnt:= ClientPosToCaretPos(Pnt, Details);
@@ -965,7 +965,7 @@ begin
       Result:= true;
     end
     else
-    if (Caret.CoordY>=FRectMain.Bottom-2*FCharSize.Y-2) then
+    if not AMoveDown and (Caret.CoordY>=FRectMain.Bottom-2*FCharSize.Y-2) then
     begin
       Pnt:= Point(Caret.CoordX, FRectMain.Bottom-FCharSize.Y);
       Pnt:= ClientPosToCaretPos(Pnt, Details);

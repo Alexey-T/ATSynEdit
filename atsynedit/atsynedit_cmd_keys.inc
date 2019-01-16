@@ -273,7 +273,7 @@ begin
   Result:= [cResultScroll];
 
   if AKeepCaretOnScreen then
-    if DoCaretsKeepOnScreen then
+    if DoCaretsKeepOnScreen(ALines>0) then
       Include(Result, cResultCaretAny);
 end;
 
