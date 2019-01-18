@@ -3707,6 +3707,10 @@ end;
 
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
 begin
+  {$ifdef debug_show_fps}
+  FTickAll:= GetTickCount64;
+  {$endif}
+
   DoPaintMainTo(C, ALineFrom);
 
   if cPaintUpdateCaretsCoords in AFlags then
@@ -3720,6 +3724,11 @@ begin
   //paint markers after calc carets
   DoPaintMarkersTo(C);
 
+  {$ifdef debug_show_fps}
+  FTickAll:= GetTickCount64-FTickAll;
+  DoPaintFPS(C, FTickAll, FTickMinimap);
+  {$endif}
+
   FCaretShown:= false;
 end;
 
@@ -3728,28 +3737,14 @@ begin
   Result:= false;
   UpdateTabHelper;
 
-  {$ifdef debug_show_fps}
-  FTickAll:= GetTickCount64;
-  {$endif}
-
   if DoubleBuffered then
   begin
     if Assigned(FBitmap) then
       if cPaintUpdateBitmap in AFlags then
-      begin
         DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
-        {$ifdef debug_show_fps}
-        DoPaintFPS(FBitmap.Canvas, GetTickCount64-FTickAll, FTickMinimap);
-        {$endif}
-      end;
   end
   else
-  begin
     DoPaintAllTo(Canvas, AFlags, ALineFrom);
-    {$ifdef debug_show_fps}
-    DoPaintFPS(Canvas, GetTickCount64-FTickAll, FTickMinimap);
-    {$endif}
-  end;
 
   if cPaintUpdateScrollbars in AFlags then
     Result:= UpdateScrollbars;
@@ -6558,19 +6553,20 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintFPS(C: TCanvas; ATimeAll, ATimeMinimap: integer);
+var
+  S: string;
 begin
-  if ATimeAll<=0 then
-    ATimeAll:= 1;
-  if ATimeMinimap<=0 then
-    ATimeMinimap:= 1;
+  if ATimeAll<3 then exit;
+  S:= IntToStr(1000 div ATimeAll div 5 * 5);
+
+  if ATimeMinimap>1 then
+    S+= ':'+IntToStr(1000 div ATimeMinimap);
 
   C.Font.Name:= 'Arial';
   C.Font.Color:= clRed;
   C.Font.Size:= 8;
   C.Brush.Color:= clCream;
-  C.TextOut(ClientWidth-60, 5,
-    IntToStr(1000 div ATimeAll div 5 * 5)+':'+
-    IntToStr(1000 div ATimeMinimap)+' fps');
+  C.TextOut(ClientWidth-60, 5, S+' fps');
 end;
 
 
