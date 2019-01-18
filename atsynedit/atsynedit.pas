@@ -3741,7 +3741,11 @@ begin
   begin
     if Assigned(FBitmap) then
       if cPaintUpdateBitmap in AFlags then
+      begin
+        FBitmap.BeginUpdate(true);
         DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
+        FBitmap.EndUpdate();
+      end;
   end
   else
     DoPaintAllTo(Canvas, AFlags, ALineFrom);
