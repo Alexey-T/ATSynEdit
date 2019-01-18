@@ -6,7 +6,7 @@ License: MPL 2.0 or LGPL
 {$mode objfpc}{$H+}
 {$ModeSwitch advancedrecords}
 
-//{$define debug_minimap_time}
+//{$define debug_show_fps}
 //{$define debug_findwrapindex}
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
                          //when horz-scroll hides/shows/hides/...
@@ -535,6 +535,10 @@ type
     FFoldedMark_LineFrom: integer;
     FFoldedMark_LineTo: integer;
     FFoldedMark_Rect: TRect;
+    {$ifdef debug_show_fps}
+    FTickMinimap: DWord;
+    FTickAll: DWord;
+    {$endif}
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
@@ -778,6 +782,7 @@ type
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintRulerTo(C: TCanvas);
+    procedure DoPaintFPS(C: TCanvas; ATimeAll, ATimeMinimap: integer);
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
       var AScrollHorz, AScrollVert: TATSynScrollInfo; ALineFrom: integer);
@@ -1536,7 +1541,6 @@ begin
 
   C.Font.Size:= NPrevFontSize;
 end;
-
 
 procedure TATSynEdit.UpdateGutterAutosize(C: TCanvas);
 begin
@@ -2808,13 +2812,9 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
-{$ifdef debug_minimap_time}
-var
-  t: QWord;
-  {$endif}
 begin
-  {$ifdef debug_minimap_time}
-  t:= GetTickCount64;
+  {$ifdef debug_show_fps}
+  FTickMinimap:= GetTickCount64;
   {$endif}
 
   FScrollHorzMinimap.Clear;
@@ -2826,17 +2826,16 @@ begin
 
   DoPaintMinimapSelTo(C);
 
-  {$ifdef debug_minimap_time}
-  t:= GetTickCount64-t;
-  Application.MainForm.Caption:= Format('minimap: %d ms', [t]);
-  {$endif}
-
   if Colors.MinimapBorder<>clNone then
   begin
     C.Pen.Color:= Colors.MinimapBorder;
     C.Line(FRectMinimap.Left-1, FRectMinimap.Top,
            FRectMinimap.Left-1, FRectMinimap.Bottom);
   end;
+
+  {$ifdef debug_show_fps}
+  FTickMinimap:= GetTickCount64-FTickMinimap;
+  {$endif}
 end;
 
 procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
@@ -3729,16 +3728,28 @@ begin
   Result:= false;
   UpdateTabHelper;
 
+  {$ifdef debug_show_fps}
+  FTickAll:= GetTickCount64;
+  {$endif}
+
   if DoubleBuffered then
   begin
     if Assigned(FBitmap) then
       if cPaintUpdateBitmap in AFlags then
       begin
         DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
+        {$ifdef debug_show_fps}
+        DoPaintFPS(FBitmap.Canvas, GetTickCount64-FTickAll, FTickMinimap);
+        {$endif}
       end;
   end
   else
+  begin
     DoPaintAllTo(Canvas, AFlags, ALineFrom);
+    {$ifdef debug_show_fps}
+    DoPaintFPS(Canvas, GetTickCount64-FTickAll, FTickMinimap);
+    {$endif}
+  end;
 
   if cPaintUpdateScrollbars in AFlags then
     Result:= UpdateScrollbars;
@@ -6545,6 +6556,23 @@ begin
   FTabHelper.SenderObj:= Self;
   FTabHelper.OnCalcTabSize:= FOnCalcTabSize;
 end;
+
+procedure TATSynEdit.DoPaintFPS(C: TCanvas; ATimeAll, ATimeMinimap: integer);
+begin
+  if ATimeAll<=0 then
+    ATimeAll:= 1;
+  if ATimeMinimap<=0 then
+    ATimeMinimap:= 1;
+
+  C.Font.Name:= 'Arial';
+  C.Font.Color:= clRed;
+  C.Font.Size:= 8;
+  C.Brush.Color:= clCream;
+  C.TextOut(ClientWidth-60, 5,
+    IntToStr(1000 div ATimeAll div 5 * 5)+':'+
+    IntToStr(1000 div ATimeMinimap)+' fps');
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
