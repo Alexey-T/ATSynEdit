@@ -298,7 +298,15 @@ begin
       begin
         //must check offset, for part of wrapped line
         nOffset:= Attr.PosX-ACharIndex;
-        if (nOffset<0) or (nOffset>=AOffsetMax) then Continue;
+        if (nOffset>=AOffsetMax) then Continue;
+        if (nOffset+Attr.LenX<=0) then Continue;
+
+        //fix part visible partly, because of horz scroll
+        if (nOffset<0) then
+        begin
+          Inc(Attr.LenX, nOffset);
+          nOffset:= 0;
+        end;
 
         //empty parts? init part for whole line, for DoPartInsert to work
         if AParts[0].Len=0 then
