@@ -36,7 +36,7 @@ implementation
 constructor TATSafeTimer.Create(AOwner: TComponent);
 begin
   inherited;
-  UseTimerThread:= true;
+  //UseTimerThread:= true; //makes crash on Linux in demo_adapter_econtrol
 end;
 {$endif}
 
