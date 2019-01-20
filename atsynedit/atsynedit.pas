@@ -1182,7 +1182,6 @@ type
 
     procedure DblClick; override;
     procedure TripleClick; override;
-    procedure VisibleChanged; override;
     function DoGetTextString: atString; virtual;
     procedure DoEnter; override;
     procedure DoExit; override;
@@ -3100,7 +3099,7 @@ begin
   FTimerBlink:= TATSafeTimer.Create(Self);
   SetCaretBlinkTime(cInitCaretBlinkTime);
   FTimerBlink.OnTimer:= @TimerBlinkTick;
-  FTimerBlink.Enabled:= true;
+  FTimerBlink.Enabled:= false; //true;
 
   FTimerScroll:= TATSafeTimer.Create(Self);
   FTimerScroll.Interval:= cInitTimerAutoScroll;
@@ -4813,15 +4812,6 @@ begin
     DoSelect_Line_ByClick;
 end;
 
-procedure TATSynEdit.VisibleChanged;
-begin
-  inherited;
-  if Visible then
-    TimersStart
-  else
-    TimersStop;
-end;
-
 
 procedure TATSynEdit.DoSelect_Word_ByClick;
 var
@@ -5517,6 +5507,7 @@ begin
   inherited;
   if IsRepaintNeededOnEnterOrExit then
     Update;
+  TimersStart;
 end;
 
 procedure TATSynEdit.DoExit;
@@ -5524,9 +5515,10 @@ begin
   inherited;
   if IsRepaintNeededOnEnterOrExit then
     Update;
+  TimersStop;
 end;
 
-procedure TATSynEdit.TimersStart; inline;
+procedure TATSynEdit.TimersStart;
 //TimersStart/Stop are added to minimize count of running timers,
 //which are threads on Unix (TATSafeTimer).
 begin
@@ -5535,17 +5527,13 @@ begin
     FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;
 end;
 
-procedure TATSynEdit.TimersStop; inline;
+procedure TATSynEdit.TimersStop;
 begin
   FTimersEnabled:= false;
-  if Assigned(FTimerBlink) then
-    FTimerBlink.Enabled:= false;
-  if Assigned(FTimerIdle) then
-    FTimerIdle.Enabled:= false;
-  if Assigned(FTimerScroll) then
-    FTimerScroll.Enabled:= false;
-  if Assigned(FTimerNiceScroll) then
-    FTimerNiceScroll.Enabled:= false;
+  if Assigned(FTimerBlink) then FTimerBlink.Enabled:= false;
+  if Assigned(FTimerIdle) then FTimerIdle.Enabled:= false;
+  if Assigned(FTimerScroll) then FTimerScroll.Enabled:= false;
+  if Assigned(FTimerNiceScroll) then FTimerNiceScroll.Enabled:= false;
 end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);
