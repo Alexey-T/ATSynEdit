@@ -350,6 +350,7 @@ type
     FFontItalic: TFont;
     FFontBold: TFont;
     FFontBoldItalic: TFont;
+    FTimersEnabled: boolean;
     FTimerIdle: TATSafeTimer;
     FTimerBlink: TATSafeTimer;
     FTimerScroll: TATSafeTimer;
@@ -1181,6 +1182,7 @@ type
 
     procedure DblClick; override;
     procedure TripleClick; override;
+    procedure VisibleChanged; override;
     function DoGetTextString: atString; virtual;
     procedure DoEnter; override;
     procedure DoExit; override;
@@ -4811,6 +4813,15 @@ begin
     DoSelect_Line_ByClick;
 end;
 
+procedure TATSynEdit.VisibleChanged;
+begin
+  inherited;
+  if Visible then
+    TimersStart
+  else
+    TimersStop;
+end;
+
 
 procedure TATSynEdit.DoSelect_Word_ByClick;
 var
@@ -5040,7 +5051,7 @@ begin
   if Assigned(FTimerBlink) then
   begin
     FTimerBlink.Enabled:= false;
-    FTimerBlink.Enabled:= IsVisible and FCaretBlinkEnabled;
+    FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;
   end;
 end;
 
@@ -5516,13 +5527,17 @@ begin
 end;
 
 procedure TATSynEdit.TimersStart; inline;
+//TimersStart/Stop are added to minimize count of running timers,
+//which are threads on Unix (TATSafeTimer).
 begin
+  FTimersEnabled:= true;
   if Assigned(FTimerBlink) then
-    FTimerBlink.Enabled:= IsVisible and FCaretBlinkEnabled;
+    FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;
 end;
 
 procedure TATSynEdit.TimersStop; inline;
 begin
+  FTimersEnabled:= false;
   if Assigned(FTimerBlink) then
     FTimerBlink.Enabled:= false;
   if Assigned(FTimerIdle) then
