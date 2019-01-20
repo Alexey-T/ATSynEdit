@@ -1,4 +1,7 @@
 
+2019.01.20
+* change: to fix hanging of timers (by LCL), now on Unix component uses TfpTimer, ie threads. App must enable define UseCThreads (see how it's used in the begin of .lpr file), otherwise you'll get runtime error on start.
+
 2019.01.16
 - fix: OptScrollLineCommandsKeepCaretOnScreen worked wrong
 
