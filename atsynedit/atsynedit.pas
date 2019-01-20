@@ -29,6 +29,7 @@ uses
   ATStringProc,
   ATStrings,
   ATStringProc_WordJump,
+  ATSynEdit_Timer,
   ATSynEdit_CharSizer,
   ATSynEdit_RegExpr,
   ATSynEdit_ScrollBar,
@@ -349,10 +350,10 @@ type
     FFontItalic: TFont;
     FFontBold: TFont;
     FFontBoldItalic: TFont;
-    FTimerIdle: TTimer;
-    FTimerBlink: TTimer;
-    FTimerScroll: TTimer;
-    FTimerNiceScroll: TTimer;
+    FTimerIdle: TATSafeTimer;
+    FTimerBlink: TATSafeTimer;
+    FTimerScroll: TATSafeTimer;
+    FTimerNiceScroll: TATSafeTimer;
     FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
     FPaintLocked: integer;
@@ -1023,6 +1024,8 @@ type
     procedure DoEventScroll; virtual;
     procedure DoEventChange(AllowOnChange: boolean=true); virtual;
     procedure DoEventState; virtual;
+    procedure TimersStart;
+    procedure TimersStop;
     //complex props
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
@@ -3088,21 +3091,21 @@ begin
   FCursorMinimap:= crDefault;
   FCursorMicromap:= crDefault;
 
-  FTimerIdle:= TTimer.Create(Self);
+  FTimerIdle:= TATSafeTimer.Create(Self);
   FTimerIdle.Enabled:= false;
   FTimerIdle.OnTimer:=@TimerIdleTick;
 
-  FTimerBlink:= TTimer.Create(Self);
+  FTimerBlink:= TATSafeTimer.Create(Self);
   SetCaretBlinkTime(cInitCaretBlinkTime);
   FTimerBlink.OnTimer:= @TimerBlinkTick;
   FTimerBlink.Enabled:= true;
 
-  FTimerScroll:= TTimer.Create(Self);
+  FTimerScroll:= TATSafeTimer.Create(Self);
   FTimerScroll.Interval:= cInitTimerAutoScroll;
   FTimerScroll.OnTimer:= @TimerScrollTick;
   FTimerScroll.Enabled:= false;
 
-  FTimerNiceScroll:= TTimer.Create(Self);
+  FTimerNiceScroll:= TATSafeTimer.Create(Self);
   FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
   FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
   FTimerNiceScroll.Enabled:= false;
@@ -3377,6 +3380,7 @@ end;
 
 destructor TATSynEdit.Destroy;
 begin
+  TimersStop;
   FreeAndNil(FHintWnd);
   FreeAndNil(FMenuStd);
   DoPaintModeStatic;
@@ -5036,7 +5040,7 @@ begin
   if Assigned(FTimerBlink) then
   begin
     FTimerBlink.Enabled:= false;
-    FTimerBlink.Enabled:= FCaretBlinkEnabled;
+    FTimerBlink.Enabled:= IsVisible and FCaretBlinkEnabled;
   end;
 end;
 
@@ -5509,6 +5513,24 @@ begin
   inherited;
   if IsRepaintNeededOnEnterOrExit then
     Update;
+end;
+
+procedure TATSynEdit.TimersStart; inline;
+begin
+  if Assigned(FTimerBlink) then
+    FTimerBlink.Enabled:= IsVisible and FCaretBlinkEnabled;
+end;
+
+procedure TATSynEdit.TimersStop; inline;
+begin
+  if Assigned(FTimerBlink) then
+    FTimerBlink.Enabled:= false;
+  if Assigned(FTimerIdle) then
+    FTimerIdle.Enabled:= false;
+  if Assigned(FTimerScroll) then
+    FTimerScroll.Enabled:= false;
+  if Assigned(FTimerNiceScroll) then
+    FTimerNiceScroll.Enabled:= false;
 end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);
