@@ -187,8 +187,8 @@ type TATBookmarks in unit atsynedit_bookmarks. Holds list of bookmarks of type T
 * Data.Kind: int kind value
 * Data.Hint: tooltip string, which is shown on mouse-over for bookmark gutter icon
 * Data.Tag: int value, for custom application needs
-* Data.DeleteOnDelLine: bool flag, if True then bookmark is deleted when its line is deleted
-* Data.ShowInBookmarkList: bool flag, for custom application needs
+* Data.DeleteOnDelLine: bool, enables to auto delete item, when its line is deleted
+* Data.ShowInBookmarkList: bool, for custom application needs
 
 Kind specifies background color and gutter icon for bookmarks of this kind. Kind value 0 must not be used (previously value 0 meaned "no bookmark"), value 1 should be used for "usual" bookmarks, value>1 should be used for custom application bookmarks. ATSynEdit has 2 events: to paint bookmark icon (from its kind), and to get color of bookmark (from its kind).
 
@@ -283,7 +283,7 @@ type TATGutterDecor in unit atsynedit_gutter_decor. Holds list of items, which a
 * Data.TextBold: bool, text font is bold
 * Data.TextItalic: bool, text font is italic
 * Data.TextColor: color of text
-* Data.DeleteOnDelLine: enables to auto delete item, when its line is deleted
+* Data.DeleteOnDelLine: bool, enables to auto delete item, when its line is deleted
 
 Items in this object are auto adjusted when text is edited.
 But note: for this to work, you must assign GutterDecor object to Strings object prop GutterDecor1 or GutterDecor2.
@@ -373,6 +373,7 @@ type TATSynGaps in unit atsynedit_gaps. Holds list of items TATSynGapItem. Each 
 * Size: height in pixels
 * Tag: int value, to difference gaps from several plugins
 * Bitmap: TBitmap which is painted on gap, when it's visible
+* DeleteOnDelLine: bool, enables to auto delete item, when its line is deleted
 
 Gap item paints as rectangle (it is owner-drawn), just between lines N and N+1, not overlapping text. 
 When user adds/deletes lines, gaps auto-shift with their lines; gap is deleted if its line is deleted.

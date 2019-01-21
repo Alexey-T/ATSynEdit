@@ -28,6 +28,7 @@ type
     Size: integer;
     Bitmap: TBitmap;
     Tag: Int64;
+    DeleteOnDelLine: boolean;
     Control: TControl;
     constructor Create; virtual;
     destructor Destroy; override;
@@ -80,6 +81,7 @@ end;
 constructor TATSynGapItem.Create;
 begin
   Bitmap:= nil;
+  DeleteOnDelLine:= true;
 end;
 
 destructor TATSynGapItem.Destroy;
@@ -238,7 +240,10 @@ begin
         begin
           Item:= Items[i];
           if (Item.LineIndex>=ALine) and (Item.LineIndex<ALine+AItemCount) then
-            Delete(i)
+          begin
+            if Item.DeleteOnDelLine then
+              Delete(i);
+          end
           else
           if Item.LineIndex>ALine then
             Item.LineIndex:= Item.LineIndex-AItemCount;
