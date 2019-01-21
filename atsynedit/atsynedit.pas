@@ -2309,6 +2309,17 @@ begin
     NLinesIndex:= WrapItem.NLineIndex;
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
+    //support Gap before the 1st line
+    if AMainText and (NWrapIndex=0) then
+    begin
+      GapItem:= Gaps.Find(-1);
+      if Assigned(GapItem) then
+      begin
+        DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+GapItem.Size), GapItem);
+        NCoordTop+= GapItem.Size;
+      end;
+    end;
+
     //speedup painting minimap:
     //if line parts cached, paint them now
     NColorAfter:= clNone;

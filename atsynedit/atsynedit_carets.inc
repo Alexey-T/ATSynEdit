@@ -270,6 +270,14 @@ begin
       Dec(NPixels, NIndexDecrement*ACharSize.Y);
     end;
 
+  //support gap before 1st line
+  if (NIndex=0) then
+  begin
+    ItemGap:= AGaps.Find(-1);
+    if Assigned(ItemGap) then
+      Inc(NPixels, ItemGap.Size);
+  end;
+
   repeat
     if not AWrapInfo.IsIndexValid(NIndex) then
       Break;

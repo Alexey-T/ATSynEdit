@@ -164,7 +164,7 @@ var
   Item: TATSynGapItem;
 begin
   Result:= false;
-  if (ALineIndex<0) then exit;
+  if (ALineIndex<-1) then exit;
   if (ASize<cMinGapSize) or (ASize>cMaxGapSize) then exit;
   if Find(ALineIndex)<>nil then exit;
 
@@ -197,6 +197,11 @@ var
   i: integer;
 begin
   Result:= 0;
+
+  //support gap before 1st line
+  if ALineFrom=0 then
+    ALineFrom:= -1;
+
   for i:= 0 to FList.Count-1 do
   begin
     Item:= Items[i];
