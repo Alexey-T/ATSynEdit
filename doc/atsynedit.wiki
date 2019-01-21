@@ -369,7 +369,7 @@ Contains color properties of type TColor. For ex, Colors.TextFont is text font c
 
 type TATSynGaps in unit atsynedit_gaps. Holds list of items TATSynGapItem. Each item has properties:
 
-* LineIndex
+* LineIndex: index in Strings object; and special value -1 is allowed: gap before the first line
 * Size: height in pixels
 * Tag: int value, to difference gaps from several plugins
 * Bitmap: TBitmap which is painted on gap, when it's visible
