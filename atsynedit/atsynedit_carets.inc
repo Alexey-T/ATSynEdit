@@ -463,6 +463,14 @@ begin
         Dec(NPixels, ItemGap.Size);
     end;
 
+    //support gap before 1st line
+    if (NIndex=0) then
+    begin
+      ItemGap:= Gaps.Find(-1);
+      if Assigned(ItemGap) then
+        Dec(NPixels, ItemGap.Size);
+    end;
+
     if NPixels<0 then
     begin
       FScrollVert.NPos:= NIndex+1;
