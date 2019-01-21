@@ -1,4 +1,7 @@
 
+2019.01.21
++ add: Gaps object allows item before the 1st line, with LineIndex=-1
+
 2019.01.20
 * change: to fix hanging of timers (by LCL), now on Unix component uses TfpTimer, ie threads. App must enable define UseCThreads (see how it's used in the begin of .lpr file), otherwise you'll get runtime error on start.
 
