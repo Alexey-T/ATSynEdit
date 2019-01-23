@@ -2,43 +2,28 @@ unit ATSynEdit_Timer;
 
 {$mode objfpc}{$H+}
 
+{$ifdef linux}
+  {$define use_fptimer}
+{$endif}
+
 interface
 
 uses
-  {$ifdef windows}
-  ExtCtrls,
-  {$else}
-  //on Linux/Mac use fpTimer, since TTimer doesn't work safe:
-  //  - caret stops blinking (rarely)
-  //  - syntax parsing cannot finish (rarely)
+  {$ifdef use_fptimer}
   fpTimer,
+  {$else}
+  ExtCtrls,
   {$endif}
   Classes;
 
-{$ifdef windows}
 type
-  TATSafeTimer = TTimer;
-
-implementation
+{$ifdef USE_FPTIMER}
+  TATSafeTimer = TfpTimer;
 {$else}
-type
-  { TATSafeTimer }
-
-  TATSafeTimer = class(TfpTimer)
-  public
-    constructor Create(AOwner: TComponent); override;
-  end;
+  TATSafeTimer = TTimer;
+{$endif}
 
 implementation
-
-{ TATSafeTimer }
-
-constructor TATSafeTimer.Create(AOwner: TComponent);
-begin
-  inherited;
-  //UseTimerThread:= true; //makes crash on Linux in demo_adapter_econtrol
-end;
-{$endif}
 
 end.
 
