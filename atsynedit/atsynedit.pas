@@ -7,6 +7,7 @@ License: MPL 2.0 or LGPL
 {$ModeSwitch advancedrecords}
 
 //{$define debug_show_fps}
+//{$define atsynedit_cache}
 //{$define debug_findwrapindex}
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app
                          //when horz-scroll hides/shows/hides/...
@@ -2320,6 +2321,7 @@ begin
       end;
     end;
 
+    {$ifdef atsynedit_cache}
     //speedup painting minimap:
     //if line parts cached, paint them now
     NColorAfter:= clNone;
@@ -2360,6 +2362,7 @@ begin
           Inc(NWrapIndex);
           Continue;
         end;
+    {$endif}
 
     //don't update FLineBottom if minimap paints
     if AMainText then
@@ -3813,7 +3816,9 @@ end;
 procedure TATSynEdit.Paint;
 begin
   if not HandleAllocated then exit;
+  // start-profiler
   PaintEx(-1);
+  // stop-profiler
 end;
 
 procedure TATSynEdit.PaintEx(ALineNumber: integer);

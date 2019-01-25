@@ -43,6 +43,7 @@ begin
   //1) get hilites from adapter
   if Assigned(FAdapterHilite) then
   begin
+    {$ifdef atsynedit_cache}
     //DynamicHilite must disable cache
     FAdapterCache.Enabled:= not FAdapterHilite.DynamicHiliteActiveNow(Strings.Count);
     bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
@@ -51,6 +52,9 @@ begin
       FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
       FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
     end;
+    {$else}
+    FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
+    {$endif}
   end;
 
   //2) get hilites from OnCalcHilite
