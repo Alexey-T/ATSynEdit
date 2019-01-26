@@ -1,4 +1,7 @@
 
+2019.01.26
+* reverted usage of fpTimer, now not used
+
 2019.01.21
 + add: Gaps object allows item before the 1st line, with LineIndex=-1
 + add: Gaps items have prop DeleteOnDelLine

@@ -2,9 +2,10 @@ unit ATSynEdit_Timer;
 
 {$mode objfpc}{$H+}
 
-{$ifdef linux}
-  {$define use_fptimer}
-{$endif}
+// trying to not use fpTimer at all
+//{$ifdef linux}
+//  {$define use_fptimer}
+//{$endif}
 
 interface
 
