@@ -291,13 +291,15 @@ var
   Attr: TATMarkerItem;
   Part: TATLinePart;
   PartObj: TATLinePartClass;
-  nAttribIndex, nOffset, i: integer;
+  nAttrIndex, nOffset, i: integer;
   bExact, bContains: boolean;
 begin
-  Attribs.FindPrior(ACharIndex-1, ALineIndex, nAttribIndex, bExact, bContains);
-  for i:= nAttribIndex to Attribs.Count-1 do
+  Attribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact, bContains);
+  if not Attribs.IsIndexValid(nAttrIndex) then exit;
+  for i:= nAttrIndex to Attribs.Count-1 do
   begin
     Attr:= Attribs[i];
+    if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;
 
     PartObj:= TATLinePartClass(Attr.Ptr);

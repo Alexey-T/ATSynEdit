@@ -63,8 +63,7 @@ type
       APtr: TObject=nil);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
-    procedure FindPrior(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
-    procedure FindNext(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+    procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
   end;
 
 implementation
@@ -164,7 +163,7 @@ begin
   Item.Ptr:= APtr;
 
   //keep list sorted
-  FindPrior(APosX, APosY, NIndex, bExact, bContains);
+  Find(APosX, APosY, NIndex, bExact, bContains);
   if bExact then
     FList.Delete(NIndex);
   FList.Insert(NIndex, Item);
@@ -200,50 +199,47 @@ begin
     Result:= X1-X2;
 end;
 
-procedure TATMarkers.FindPrior(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
-//Copied from fgl unit, function TFPSMap.Find(AKey: Pointer; out Index: Integer): Boolean;
-//Searches for the first item <= (AX,AY)
+procedure TATMarkers.Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+//gives AIndex in range [0..Count] (without -1)
 var
-  I, L, R, Dir: Integer;
+  L, H, I, C: Integer;
   Item: TATMarkerItem;
 begin
-  AIndex:= -1;
-  AExactMatch:= false;
-  AContains:= false;
-  L:= 0;
-  R:= Count-1;
-  while L<=R do
+  AIndex := 0;
+  AExactMatch := False;
+  AContains := False;
+
+  if Count = 0 then
+    Exit;
+
+  L := 0;
+  H := Count - 1;
+  while L <= H do
   begin
-    I:= L + (R - L) div 2;
-    Item:= Items[I];
-    Dir:= _ComparePoints(Item.PosX, Item.PosY, AX, AY);
-    if Dir < 0 then
-      L:= I+1
-    else begin
-      R:= I-1;
-      if Dir=0 then
+    I := (L + H) shr 1;
+    Item := Items[I];
+    C := _ComparePoints(Item.PosX, Item.PosY, AX, AY);
+    if C < 0 then
+      L := I + 1
+    else
+    begin
+      if C = 0 then
       begin
-        AExactMatch:= true;
-        //if Duplicates <> dupAccept then
-          L := I;
+        AIndex := I;
+        AExactMatch := True;
+        AContains := True;
+        Exit;
       end;
+      H := I - 1;
     end;
   end;
-  AIndex:= L;
+  AIndex := L;
 
   if IsIndexValid(AIndex) then
-    AContains:= Items[AIndex].Contains(AX, AY);
-end;
-
-procedure TATMarkers.FindNext(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
-begin
-  FindPrior(AX, AY, AIndex, AExactMatch, AContains);
-  if AExactMatch then exit;
-  Inc(AIndex);
-  if IsIndexValid(AIndex) then
-    AContains:= Items[AIndex].Contains(AX, AY)
-  else
-    AContains:= false;
+  begin
+    Item := Items[AIndex];
+    AContains := Item.Contains(AX, AY);
+  end;
 end;
 
 
