@@ -59,10 +59,10 @@ type
       const ATag: Int64=0;
       ALenX: integer=0;
       ALenY: integer=0;
-      APtr: TObject=nil;
-      AInsertToBegin: boolean=false);
+      APtr: TObject=nil);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
+    procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindAtPos(AX, AY: integer): integer;
   end;
 
@@ -138,9 +138,11 @@ begin
 end;
 
 procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ALenX: integer; ALenY: integer; APtr: TObject; AInsertToBegin: boolean);
+  ALenX: integer; ALenY: integer; APtr: TObject);
 var
   Item: TATMarkerItem;
+  NIndex: integer;
+  bExact: boolean;
 begin
   FillChar(Item, SizeOf(Item), 0);
   Item.PosX:= APosX;
@@ -152,10 +154,11 @@ begin
   Item.LenY:= ALenY;
   Item.Ptr:= APtr;
 
-  if AInsertToBegin then
-    FList.Insert(0, Item)
-  else
-    FList.Add(Item);
+  //keep list sorted
+  Find(APosX, APosY, NIndex, bExact);
+  if bExact then
+    FList.Delete(NIndex);
+  FList.Insert(NIndex, Item);
 end;
 
 procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
@@ -178,6 +181,45 @@ begin
   for i:= Count-1 downto 0 do
     if Items[i].Tag=ATag then
       Delete(i);
+end;
+
+function _ComparePoints(X1, Y1, X2, Y2: integer): integer; inline;
+begin
+  if Y2<>Y1 then
+    Result:= Y2-Y1
+  else
+    Result:= X2-X1;
+end;
+
+procedure TATMarkers.Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
+//Copied from fgl unit, function TFPSMap.Find(AKey: Pointer; out Index: Integer): Boolean;
+//Searches for the first item <= (AX,AY)
+var
+  I, L, R, Dir: Integer;
+  Item: TATMarkerItem;
+begin
+  AExactMatch:= false;
+  AIndex:= -1;
+  L:= 0;
+  R:= Count-1;
+  while L<=R do
+  begin
+    I:= L + (R - L) div 2;
+    Item:= Items[I];
+    Dir:= _ComparePoints(AX, AY, Item.PosX, Item.PosY);
+    if Dir < 0 then
+      L:= I+1
+    else begin
+      R:= I-1;
+      if Dir=0 then
+      begin
+        AExactMatch:= true;
+        //if Duplicates <> dupAccept then
+          L := I;
+      end;
+    end;
+  end;
+  AIndex:= L;
 end;
 
 function TATMarkers.FindAtPos(AX, AY: integer): integer;
