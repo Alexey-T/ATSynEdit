@@ -32,6 +32,7 @@ type
     Ptr: TObject;
       //used in Attribs object of ATSynedit
     class operator=(const A, B: TATMarkerItem): boolean;
+    function Contains(AX, AY: integer): boolean;
   end;
   
 type
@@ -62,7 +63,8 @@ type
       APtr: TObject=nil);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
-    procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+    procedure FindPrior(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+    procedure FindNext(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
   end;
 
 implementation
@@ -72,6 +74,11 @@ implementation
 class operator TATMarkerItem.=(const A, B: TATMarkerItem): boolean;
 begin
   Result:= false;
+end;
+
+function TATMarkerItem.Contains(AX, AY: integer): boolean;
+begin
+  Result:= IsPosInRange(AX, AY, PosX, PosY, PosX+LenX, PosY)=cRelateInside;
 end;
 
 { TATMarkers }
@@ -154,7 +161,7 @@ begin
   Item.Ptr:= APtr;
 
   //keep list sorted
-  Find(APosX, APosY, NIndex, bExact, bContains);
+  FindPrior(APosX, APosY, NIndex, bExact, bContains);
   if bExact then
     FList.Delete(NIndex);
   FList.Insert(NIndex, Item);
@@ -184,13 +191,13 @@ end;
 
 function _ComparePoints(X1, Y1, X2, Y2: integer): integer; inline;
 begin
-  if Y2<>Y1 then
-    Result:= Y2-Y1
+  if Y1<>Y2 then
+    Result:= Y1-Y2
   else
-    Result:= X2-X1;
+    Result:= X1-X2;
 end;
 
-procedure TATMarkers.Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+procedure TATMarkers.FindPrior(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
 //Copied from fgl unit, function TFPSMap.Find(AKey: Pointer; out Index: Integer): Boolean;
 //Searches for the first item <= (AX,AY)
 var
@@ -206,7 +213,7 @@ begin
   begin
     I:= L + (R - L) div 2;
     Item:= Items[I];
-    Dir:= _ComparePoints(AX, AY, Item.PosX, Item.PosY);
+    Dir:= _ComparePoints(Item.PosX, Item.PosY, AX, AY);
     if Dir < 0 then
       L:= I+1
     else begin
@@ -222,10 +229,16 @@ begin
   AIndex:= L;
 
   if IsIndexValid(AIndex) then
-  begin
-    Item:= Items[AIndex];
-    AContains:= IsPosInRange(AX, AY, Item.PosX, Item.PosY, Item.PosX+Item.LenX, Item.PosY)=cRelateInside;
-  end
+    AContains:= Items[AIndex].Contains(AX, AY);
+end;
+
+procedure TATMarkers.FindNext(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+begin
+  FindPrior(AX, AY, AIndex, AExactMatch, AContains);
+  if AExactMatch then exit;
+  Inc(AIndex);
+  if IsIndexValid(AIndex) then
+    AContains:= Items[AIndex].Contains(AX, AY);
 end;
 
 

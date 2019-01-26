@@ -6202,7 +6202,7 @@ begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
-  Attribs.Find(AX, AY, NIndex, bExact, bContains);
+  Attribs.FindPrior(AX, AY, NIndex, bExact, bContains);
   if not Attribs.IsIndexValid(NIndex) then exit;
   if not bContains then exit;
 
