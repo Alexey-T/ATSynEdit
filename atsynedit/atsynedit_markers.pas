@@ -62,8 +62,7 @@ type
       APtr: TObject=nil);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
-    procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
-    function FindAtPos(AX, AY: integer): integer;
+    procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
   end;
 
 implementation
@@ -142,7 +141,7 @@ procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
 var
   Item: TATMarkerItem;
   NIndex: integer;
-  bExact: boolean;
+  bExact, bContains: boolean;
 begin
   FillChar(Item, SizeOf(Item), 0);
   Item.PosX:= APosX;
@@ -155,7 +154,7 @@ begin
   Item.Ptr:= APtr;
 
   //keep list sorted
-  Find(APosX, APosY, NIndex, bExact);
+  Find(APosX, APosY, NIndex, bExact, bContains);
   if bExact then
     FList.Delete(NIndex);
   FList.Insert(NIndex, Item);
@@ -191,15 +190,16 @@ begin
     Result:= X2-X1;
 end;
 
-procedure TATMarkers.Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
+procedure TATMarkers.Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
 //Copied from fgl unit, function TFPSMap.Find(AKey: Pointer; out Index: Integer): Boolean;
 //Searches for the first item <= (AX,AY)
 var
   I, L, R, Dir: Integer;
   Item: TATMarkerItem;
 begin
-  AExactMatch:= false;
   AIndex:= -1;
+  AExactMatch:= false;
+  AContains:= false;
   L:= 0;
   R:= Count-1;
   while L<=R do
@@ -220,22 +220,14 @@ begin
     end;
   end;
   AIndex:= L;
+
+  if IsIndexValid(AIndex) then
+  begin
+    Item:= Items[AIndex];
+    AContains:= IsPosInRange(AX, AY, Item.PosX, Item.PosY, Item.PosX+Item.LenX, Item.PosY)=cRelateInside;
+  end
 end;
 
-function TATMarkers.FindAtPos(AX, AY: integer): integer;
-var
-  Item: TATMarkerItem;
-  i: integer;
-begin
-  Result:= -1;
-  for i:= 0 to Count-1 do
-  begin
-    Item:= Items[i];
-    if (Item.PosY=AY) and (Item.PosX<=AX) and
-      ( (Item.LenY>0) or (Item.PosX+Item.LenX>AX) )
-      then exit(i);
-  end;
-end;
 
 end.
 

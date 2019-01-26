@@ -6196,13 +6196,15 @@ end;
 function TATSynEdit.DoGetLinkAtPos(AX, AY: integer): atString;
 var
   NIndex: integer;
+  bExact, bContains: boolean;
   Atr: TATMarkerItem;
 begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
-  NIndex:= Attribs.FindAtPos(AX, AY);
-  if NIndex<0 then exit;
+  Attribs.Find(AX, AY, NIndex, bExact, bContains);
+  if not Attribs.IsIndexValid(NIndex) then exit;
+  if not bContains then exit;
 
   Atr:= Attribs[NIndex];
   if Atr.Tag<>cUrlMarkerTag then exit;
