@@ -78,7 +78,10 @@ end;
 
 function TATMarkerItem.Contains(AX, AY: integer): boolean;
 begin
-  Result:= IsPosInRange(AX, AY, PosX, PosY, PosX+LenX, PosY)=cRelateInside;
+  if LenX=0 then
+    Result:= false
+  else
+    Result:= IsPosInRange(AX, AY, PosX, PosY, PosX+LenX, PosY)=cRelateInside;
 end;
 
 { TATMarkers }
