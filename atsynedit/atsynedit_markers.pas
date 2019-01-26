@@ -238,7 +238,9 @@ begin
   if AExactMatch then exit;
   Inc(AIndex);
   if IsIndexValid(AIndex) then
-    AContains:= Items[AIndex].Contains(AX, AY);
+    AContains:= Items[AIndex].Contains(AX, AY)
+  else
+    AContains:= false;
 end;
 
 

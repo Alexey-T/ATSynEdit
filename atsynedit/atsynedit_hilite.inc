@@ -291,14 +291,17 @@ var
   Attr: TATMarkerItem;
   Part: TATLinePart;
   PartObj: TATLinePartClass;
-  nOffset, i: integer;
+  nAttribIndex, nOffset, i: integer;
+  bExact, bContains: boolean;
 begin
-  for i:= 0 to Attribs.Count-1 do
+  Attribs.FindPrior(ACharIndex-1, ALineIndex, nAttribIndex, bExact, bContains);
+  for i:= nAttribIndex to Attribs.Count-1 do
   begin
     Attr:= Attribs[i];
+    if Attr.PosY>ALineIndex then Break;
+
     PartObj:= TATLinePartClass(Attr.Ptr);
     if Assigned(PartObj) then
-      if Attr.PosY=ALineIndex then
       begin
         //must check offset, for part of wrapped line
         nOffset:= Attr.PosX-ACharIndex;
