@@ -150,7 +150,7 @@ end;
 
 function _DoCaretPosToClientPos(
   P: TPoint;
-  AWrapInfo: TATSynWrapInfo;
+  AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
   AGaps: TATSynGaps;
   ACharSize: TPoint;
@@ -159,7 +159,7 @@ function _DoCaretPosToClientPos(
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   APreferLeftSide: boolean): TPoint;
 var
-  Item: TATSynWrapItem;
+  Item: TATWrapItem;
   StringItem: PATStringItem;
   NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
   Str: atString;
@@ -229,7 +229,7 @@ end;
 
 function _DoClientPosToCaretPos(
   P: TPoint;
-  AWrapInfo: TATSynWrapInfo;
+  AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
   AGaps: TATSynGaps;
   ACharSize: TPoint;
@@ -242,7 +242,7 @@ function _DoClientPosToCaretPos(
   AAfterEofUsesLastLen: boolean): TPoint;
 var
   NIndex, NIndexDecrement, NPixels: integer;
-  Item: TATSynWrapItem;
+  Item: TATWrapItem;
   ItemGap: TATSynGapItem;
   Str: atString;
   AllowVirtual, bGapGoesToEnd: boolean;

@@ -23,33 +23,33 @@ type
     );
 
 type
-  TATSynWrapItem = packed record
+  TATWrapItem = packed record
     NLineIndex,
     NCharIndex,
     NLength: integer;
     NIndent: word;
     NFinal: TATSynWrapFinal;
     procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
-    class operator=(const A, B: TATSynWrapItem): boolean;
+    class operator=(const A, B: TATWrapItem): boolean;
   end;
 
 type
-  TATSynWrapItems = specialize TFPGList<TATSynWrapItem>;
+  TATWrapItems = specialize TFPGList<TATWrapItem>;
 
 
 type
   TATCheckLineCollapsedEvent = function(ALineNum: integer): boolean of object;
 
 type
-  { TATSynWrapInfo }
+  { TATWrapInfo }
 
-  TATSynWrapInfo = class
+  TATWrapInfo = class
   private
-    FList: TATSynWrapItems;
+    FList: TATWrapItems;
     FStrings: TATStrings;
     FVirtualMode: boolean;
     FOnCheckCollapsed: TATCheckLineCollapsedEvent;
-    function GetData(AIndex: integer): TATSynWrapItem;
+    function GetData(AIndex: integer): TATWrapItem;
     procedure SetVirtualMode(AValue: boolean);
   public
     constructor Create; virtual;
@@ -60,14 +60,14 @@ type
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     function IsItemInitial(N: integer): boolean;
-    property Data[N: integer]: TATSynWrapItem read GetData; default;
-    procedure Add(const AData: TATSynWrapItem);
+    property Data[N: integer]: TATWrapItem read GetData; default;
+    procedure Add(const AData: TATWrapItem);
     procedure Delete(N: integer);
-    procedure Insert(N: integer; const AItem: TATSynWrapItem);
+    procedure Insert(N: integer; const AItem: TATWrapItem);
     procedure FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
     function FindIndexOfCaretPos(APos: TPoint): integer;
     procedure SetCapacity(N: integer);
-    procedure ReplaceItems(AFrom, ATo: integer; AItems: TATSynWrapItems);
+    procedure ReplaceItems(AFrom, ATo: integer; AItems: TATWrapItems);
     property OnCheckLineCollapsed: TATCheckLineCollapsedEvent read FOnCheckCollapsed write FOnCheckCollapsed;
   end;
 
@@ -77,9 +77,9 @@ implementation
 uses
   Math, Dialogs, Forms;
 
-{ TATSynWrapItem }
+{ TATWrapItem }
 
-procedure TATSynWrapItem.Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
+procedure TATWrapItem.Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
 begin
   NLineIndex:= ALineIndex;
   NCharIndex:= ACharIndex;
@@ -88,14 +88,14 @@ begin
   NFinal:= AFinal;
 end;
 
-class operator TATSynWrapItem.=(const A, B: TATSynWrapItem): boolean;
+class operator TATWrapItem.=(const A, B: TATWrapItem): boolean;
 begin
   Result:= false;
 end;
 
-{ TATSynWrapInfo }
+{ TATWrapInfo }
 
-function TATSynWrapInfo.GetData(AIndex: integer): TATSynWrapItem;
+function TATWrapInfo.GetData(AIndex: integer): TATWrapItem;
 begin
   if FVirtualMode then
     Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal)
@@ -108,7 +108,7 @@ begin
   end;
 end;
 
-procedure TATSynWrapInfo.SetVirtualMode(AValue: boolean);
+procedure TATWrapInfo.SetVirtualMode(AValue: boolean);
 begin
   if FVirtualMode=AValue then Exit;
   FVirtualMode:= AValue;
@@ -121,25 +121,25 @@ begin
   //  Clear;
 end;
 
-constructor TATSynWrapInfo.Create;
+constructor TATWrapInfo.Create;
 begin
-  FList:= TATSynWrapItems.Create;
+  FList:= TATWrapItems.Create;
   FVirtualMode:= false;
 end;
 
-destructor TATSynWrapInfo.Destroy;
+destructor TATWrapInfo.Destroy;
 begin
   Clear;
   FreeAndNil(FList);
   inherited;
 end;
 
-procedure TATSynWrapInfo.Clear; inline;
+procedure TATWrapInfo.Clear; inline;
 begin
   FList.Clear;
 end;
 
-function TATSynWrapInfo.Count: integer; inline;
+function TATWrapInfo.Count: integer; inline;
 begin
   if FVirtualMode then
     Result:= FStrings.Count
@@ -147,12 +147,12 @@ begin
     Result:= FList.Count;
 end;
 
-function TATSynWrapInfo.IsIndexValid(N: integer): boolean; inline;
+function TATWrapInfo.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<Count);
 end;
 
-function TATSynWrapInfo.IsItemInitial(N: integer): boolean;
+function TATWrapInfo.IsItemInitial(N: integer): boolean;
 begin
   if (N>0) and (N<Count) then //cant use IsIndexValid, N>0
     Result:= Data[N].NLineIndex<>Data[N-1].NLineIndex
@@ -160,19 +160,19 @@ begin
     Result:= true;
 end;
 
-procedure TATSynWrapInfo.Add(const AData: TATSynWrapItem); inline;
+procedure TATWrapInfo.Add(const AData: TATWrapItem); inline;
 begin
   if FVirtualMode then exit;
   FList.Add(AData);
 end;
 
-procedure TATSynWrapInfo.Delete(N: integer); inline;
+procedure TATWrapInfo.Delete(N: integer); inline;
 begin
   if FVirtualMode then exit;
   FList.Delete(N);
 end;
 
-procedure TATSynWrapInfo.Insert(N: integer; const AItem: TATSynWrapItem); inline;
+procedure TATWrapInfo.Insert(N: integer; const AItem: TATWrapItem); inline;
 begin
   if FVirtualMode then exit;
   if N>=FList.Count then
@@ -181,7 +181,7 @@ begin
     FList.Insert(N, AItem);
 end;
 
-procedure TATSynWrapInfo.FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
+procedure TATWrapInfo.FindIndexesOfLineNumber(ALineNum: integer; out AFrom, ATo: integer);
 var
   a, b, m, dif: integer;
 begin
@@ -215,7 +215,7 @@ begin
   while (ATo<Count-1) and (Data[ATo+1].NLineIndex=ALineNum) do Inc(ATo);
 end;
 
-function TATSynWrapInfo.FindIndexOfCaretPos(APos: TPoint): integer;
+function TATWrapInfo.FindIndexOfCaretPos(APos: TPoint): integer;
 var
   NFrom, NTo, i: integer;
 begin
@@ -230,15 +230,15 @@ begin
   end;
 end;
 
-procedure TATSynWrapInfo.SetCapacity(N: integer); inline;
+procedure TATWrapInfo.SetCapacity(N: integer); inline;
 begin
   FList.Capacity:= Max(1024, N);
 end;
 
 //optimized; don't just del/ins
-procedure TATSynWrapInfo.ReplaceItems(AFrom, ATo: integer; AItems: TATSynWrapItems);
+procedure TATWrapInfo.ReplaceItems(AFrom, ATo: integer; AItems: TATWrapItems);
 var
-  Item: TATSynWrapItem;
+  Item: TATWrapItem;
   Dif, i: integer;
 begin
   if FVirtualMode then exit;

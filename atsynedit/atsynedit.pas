@@ -472,7 +472,7 @@ type
     FOnPaste: TATSynEditPasteEvent;
     FOnHotspotEnter: TATSynEditHotspotEvent;
     FOnHotspotExit: TATSynEditHotspotEvent;
-    FWrapInfo: TATSynWrapInfo;
+    FWrapInfo: TATWrapInfo;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
     FWrapUpdateNeeded: boolean;
@@ -765,8 +765,8 @@ type
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
-      AItems: TATSynWrapItems; AConsiderFolding: boolean);
-    procedure DoCalcLineHilite(const AData: TATSynWrapItem;
+      AItems: TATWrapItems; AConsiderFolding: boolean);
+    procedure DoCalcLineHilite(const AData: TATWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
     //select
@@ -1040,7 +1040,7 @@ type
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
-    property WrapInfo: TATSynWrapInfo read FWrapInfo;
+    property WrapInfo: TATWrapInfo read FWrapInfo;
     property ScrollVert: TATSynScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATSynScrollInfo read FScrollHorz write FScrollHorz;
     property CaretPropsNormal: TATCaretProps read FCaretPropsNormal;
@@ -1646,7 +1646,7 @@ procedure TATSynEdit.UpdateWrapInfo;
 var
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
-  Items: TATSynWrapItems;
+  Items: TATWrapItems;
   ListNums: TList;
   i, j: integer;
   NLine, NIndexFrom, NIndexTo: integer;
@@ -1700,7 +1700,7 @@ begin
     (Strings.ListUpdates.Count>0);
   //UseCachedUpdate:= false;////to disable
 
-  Items:= TATSynWrapItems.Create;
+  Items:= TATWrapItems.Create;
   ListNums:= TList.Create;
 
   try
@@ -1751,10 +1751,10 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TATSynWrapItems;
+procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TATWrapItems;
   AConsiderFolding: boolean);
 var
-  Item: TATSynWrapItem;
+  Item: TATWrapItem;
   NOffset, NLen, NIndent, NVisColumns: integer;
   bHidden: boolean;
   NFoldFrom: integer;
@@ -2218,7 +2218,7 @@ var
   NCoordTop, NCoordSep: integer;
   NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth, NOutputSpacesSkipped: integer;
-  WrapItem: TATSynWrapItem;
+  WrapItem: TATWrapItem;
   GapItem: TATSynGapItem;
   Band: TATGutterItem;
   NColorEntire, NColorAfter: TColor;
@@ -3147,7 +3147,7 @@ begin
   FFoldTooltipWidthPercents:= cInitFoldTooltipWidthPercents;
   FFoldTooltipLineCount:= cInitFoldTooltipLineCount;
 
-  FWrapInfo:= TATSynWrapInfo.Create;
+  FWrapInfo:= TATWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
   FWrapUpdateNeeded:= true;
   FWrapMode:= cInitWrapMode;
@@ -5709,7 +5709,7 @@ var
   List: TATIntArray;
   State: (cFoldbarNone, cFoldbarBegin, cFoldbarEnd, cFoldbarMiddle);
   CoordXM, CoordYM: integer;
-  WrapItem: TATSynWrapItem;
+  WrapItem: TATWrapItem;
   LineIndex: integer;
   IsPlus, IsLineUp, IsLineDown: boolean;
   i: integer;
@@ -6377,7 +6377,7 @@ var
   NOutputStrWidth: integer;
   NLine, NWrapIndex: integer;
   NColorAfter: TColor;
-  WrapItem: TATSynWrapItem;
+  WrapItem: TATWrapItem;
   TextOutProps: TATCanvasTextOutProps;
 begin
   C.Brush.Color:= AColorBG;

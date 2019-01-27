@@ -6,7 +6,7 @@ function TATSynEdit.DoCalcLineHiliteEx(ALineIndex: integer;
 const
   cMaxCharsInLine = 50*1024;
 var
-  Data: TATSynWrapItem;
+  Data: TATWrapItem;
 begin
   FillChar(AParts, SizeOf(AParts), 0);
   Result:= Strings.IsIndexValid(ALineIndex);
@@ -26,7 +26,7 @@ end;
 
 
 
-procedure TATSynEdit.DoCalcLineHilite(const AData: TATSynWrapItem;
+procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
 var
