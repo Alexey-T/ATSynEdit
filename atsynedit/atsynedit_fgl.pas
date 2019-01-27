@@ -21,7 +21,7 @@
 {$inline on}
 {$endif FGLINLINE}
 
-unit atsynedit_fgl;
+unit ATSynEdit_fgl;
 
 interface
 
@@ -96,9 +96,9 @@ type
 
 const
 {$ifdef cpu16}
-  MaxGListSize = {MaxInt div} 1024;
+  MaxGListSize = {MaxInt div} 1024 deprecated;
 {$else cpu16}
-  MaxGListSize = MaxInt div 1024;
+  MaxGListSize = MaxInt div 1024 deprecated;
 {$endif cpu16}
 
 type
@@ -117,9 +117,9 @@ type
   private
     type
       TCompareFunc = function(const Item1, Item2: T): Integer;
-      TTypeList = array[0..MaxGListSize] of T;
-      PTypeList = ^TTypeList;
       PT = ^T;
+      TTypeList = PT;
+      PTypeList = ^TTypeList;
   {$ifndef OldSyntax}protected var{$else}var protected{$endif}
       FOnCompare: TCompareFunc;
     procedure CopyItem(Src, Dest: Pointer); override;
@@ -153,13 +153,13 @@ type
     property List: PTypeList read GetList;
   end;
 
-  generic TFPGObjectList<T> = class(TFPSList)
+  generic TFPGObjectList<T: TObject> = class(TFPSList)
   private
     type
       TCompareFunc = function(const Item1, Item2: T): Integer;
-      TTypeList = array[0..MaxGListSize] of T;
-      PTypeList = ^TTypeList;
       PT = ^T;
+      TTypeList = PT;
+      PTypeList = ^TTypeList;
       TFPGListEnumeratorSpec = specialize TFPGListEnumerator<T>;
   {$ifndef OldSyntax}protected var{$else}var protected{$endif}
       FOnCompare: TCompareFunc;
@@ -198,9 +198,9 @@ type
   private
     type
       TCompareFunc = function(const Item1, Item2: T): Integer;
-      TTypeList = array[0..MaxGListSize] of T;
-      PTypeList = ^TTypeList;
       PT = ^T;
+      TTypeList = PT;
+      PTypeList = ^TTypeList;
       TFPGListEnumeratorSpec = specialize TFPGListEnumerator<T>;
   {$ifndef OldSyntax}protected var{$else}var protected{$endif}
       FOnCompare: TCompareFunc;
@@ -330,7 +330,7 @@ type
     property OnDataCompare: TDataCompareFunc read FOnDataCompare write SetOnDataCompare;
   end;
 
-  generic TFPGMapObject<TKey, TData> = class(TFPSMap)
+  generic TFPGMapObject<TKey; TData: TObject> = class(TFPSMap)
   private
     type
       TKeyCompareFunc = function(const Key1, Key2: TKey): Integer;
@@ -1380,7 +1380,7 @@ begin
   Result := false;
   Index := -1;
   if not Sorted then
-    raise EListError.Create('TFPSMap.Find needs sorted list');
+    raise EListError.Create(SErrFindNeedsSortedList);
   // Use binary search.
   L := 0;
   R := FCount-1;
@@ -1619,11 +1619,7 @@ begin
   if Result then
     AData := TData(inherited GetData(I)^)
   else
-{$IFDEF VER2_6}  
-    FillChar(AData,SizeOf(TData),0);
-{$ELSE}
     AData := Default(TData);
-{$ENDIF}    
 end;
 
 procedure TFPGMap.AddOrSetData(const AKey: TKey; const AData: TData);
@@ -1805,11 +1801,7 @@ begin
   if Result then
     AData := TData(inherited GetData(I)^)
   else
-{$IFDEF VER2_6}
-    FillChar(AData,SizeOf(TData),0);
-{$ELSE}
     AData := Default(TData);
-{$ENDIF}
 end;
 
 procedure TFPGMapObject.AddOrSetData(const AKey: TKey; const AData: TData);
@@ -1987,11 +1979,7 @@ begin
   if Result then
     AData := TData(inherited GetData(I)^)
   else
-{$IFDEF VER2_6}
-    FillChar(AData,SizeOf(TData),0);
-{$ELSE}
     AData := Default(TData);
-{$ENDIF}
 end;
 
 procedure TFPGMapInterfacedObjectData.AddOrSetData(const AKey: TKey;
