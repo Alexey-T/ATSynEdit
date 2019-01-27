@@ -69,6 +69,7 @@ type
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+    function FindContaining(AX, AY: integer): integer;
   end;
 
 implementation
@@ -275,6 +276,37 @@ begin
   begin
     Item := Items[AIndex];
     AContains := Item.Contains(AX, AY);
+  end;
+end;
+
+function TATMarkers.FindContaining(AX, AY: integer): integer;
+var
+  Item: TATMarkerItem;
+  NIndex: integer;
+  bExact, bContains: boolean;
+begin
+  Result:= -1;
+  if Count=0 then exit;
+
+  Find(AX, AY, NIndex, bExact, bContains);
+
+  if bContains then
+    exit(NIndex);
+
+  //because Find is limited, check also nearest 2 items
+  if NIndex>=Count then
+    NIndex:= Count-1;
+
+  Item:= Items[NIndex];
+  if Item.Contains(AX, AY) then
+    exit(NIndex);
+
+  if NIndex>0 then
+  begin
+    Dec(NIndex);
+    Item:= Items[NIndex];
+    if Item.Contains(AX, AY) then
+      exit(NIndex);
   end;
 end;
 

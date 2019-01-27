@@ -45,29 +45,12 @@ end;
 
 function TATDimRanges.GetDimValue(ALine, ADefValue: integer): integer;
 var
-  Item: TATMarkerItem;
   NIndex: integer;
-  bExact, bContains: boolean;
 begin
   Result:= ADefValue;
-  if Count=0 then exit;
-
-  Find(0, ALine, NIndex, bExact, bContains);
-
-  //because Find is limited, check also nearest 2 items
-  if NIndex>=Count then
-    NIndex:= Count-1;
-
-  Item:= Items[NIndex];
-  if Item.Contains(0, ALine) then
-    exit(Item.Value);
-
-  if NIndex>0 then
-  begin
-    Item:= Items[NIndex-1];
-    if Item.Contains(0, ALine) then
-      exit(Item.Value);
-  end;
+  NIndex:= FindContaining(0, ALine);
+  if IsIndexValid(NIndex) then
+    Result:= Items[NIndex].Value;
 end;
 
 
