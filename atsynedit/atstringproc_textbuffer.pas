@@ -142,9 +142,12 @@ begin
   if (APnt.Y>=FCount) then Exit;
 
   //handle caret pos after eol
-  Len:= LineLength(APnt.Y);
-  if APnt.X>Len then
-    APnt.X:= Len;
+  if APnt.X>0 then
+  begin
+    Len:= LineLength(APnt.Y);
+    if APnt.X>Len then
+      APnt.X:= Len;
+  end;
 
   Result:= FList[APnt.Y]+APnt.X;
 end;
