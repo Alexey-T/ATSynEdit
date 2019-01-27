@@ -15,6 +15,7 @@ procedure TATSynEdit.MarkerGotoLast(AndDelete: boolean;
 var
   Mark: TATMarkerItem;
   X1, Y1, X2, Y2: integer;
+  Pnt: TPoint;
   NTag, i: integer;
 begin
   if Markers.Count=0 then exit;
@@ -22,25 +23,10 @@ begin
 
   X1:= Mark.PosX;
   Y1:= Mark.PosY;
-  X2:= -1;
-  Y2:= -1;
 
-  if Mark.LenY<=0 then
-  begin
-    //LenX is selection len (1-line)
-    if Mark.LenX>0 then
-    begin
-      X2:= X1+Mark.LenX;
-      Y2:= Y1;
-    end;
-  end
-  else
-  begin
-    //LenX is selection end X-pos;
-    //LenY is count of sel lines
-    X2:= Mark.LenX;
-    Y2:= Y1+Mark.LenY;
-  end;
+  Pnt:= Mark.PosEnd;
+  X2:= Pnt.X;
+  Y2:= Pnt.Y;
 
   DoGotoPos(
     Point(X1, Y1),
@@ -64,13 +50,11 @@ begin
         Mark:= Markers[i];
         if Mark.Tag=NTag then
         begin
-          if Mark.LenY>0 then
-            Carets.Add(Mark.LenX, Mark.PosY+Mark.LenY, Mark.PosX, Mark.PosY)
-          else
-          if Mark.LenX<=0 then
+          Pnt:= Mark.PosEnd;
+          if (Mark.LenX<=0) and (Mark.LenY<=0) then
             Carets.Add(Mark.PosX, Mark.PosY)
           else
-            Carets.Add(Mark.PosX+Mark.LenX, Mark.PosY, Mark.PosX, Mark.PosY);
+            Carets.Add(Pnt.X, Pnt.Y, Mark.PosX, Mark.PosY);
           Markers.Delete(i);
         end;
       end;

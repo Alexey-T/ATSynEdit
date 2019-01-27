@@ -33,6 +33,7 @@ type
       //used in Attribs object of ATSynedit
     class operator=(const A, B: TATMarkerItem): boolean;
     function Contains(AX, AY: integer): boolean;
+    function PosEnd: TPoint;
   end;
   
 type
@@ -81,6 +82,23 @@ begin
     Result:= false
   else
     Result:= IsPosInRange(AX, AY, PosX, PosY, PosX+LenX, PosY)=cRelateInside;
+end;
+
+function TATMarkerItem.PosEnd: TPoint;
+begin
+  if LenY<=0 then
+  begin
+    //LenX is selection len (selection is single line)
+    Result.X:= PosX+LenX;
+    Result.Y:= PosY;
+  end
+  else
+  begin
+    //LenX is selection end X-pos;
+    //LenY is count of sel lines
+    Result.X:= LenX;
+    Result.Y:= PosY+LenY;
+  end;
 end;
 
 { TATMarkers }
