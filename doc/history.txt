@@ -1,6 +1,6 @@
 
 2019.01.27
-+ add: objects Markers/Attribs/DimRanges now use binary search to find items. Big speedup if lot of items in Attribs.
++ add: objects Attribs/DimRanges now use binary search to find items. Big speedup if lot of items in Attribs.
 
 2019.01.26
 * reverted usage of fpTimer, now not used
