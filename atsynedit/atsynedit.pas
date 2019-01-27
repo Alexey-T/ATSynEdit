@@ -3085,8 +3085,11 @@ begin
 
   FTabHelper:= TATStringTabHelper.Create;
   FMarkers:= TATMarkers.Create;
+  FMarkers.Sorted:= false;
   FAttribs:= TATMarkers.Create;
+  FAttribs.Sorted:= true;
   FMarkedRange:= TATMarkers.Create;
+  FMarkedRange.Sorted:= true;
   FDimRanges:= TATDimRanges.Create;
   FHotspots:= TATHotspots.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;

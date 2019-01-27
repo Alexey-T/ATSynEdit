@@ -29,6 +29,7 @@ type
       //if LenY=0 - LenX is length of sel (single line)
       //if LenY>0 - LenY is Y-delta of sel-end,
       //            LenX is absolute X of sel-end
+    Value: Int64;
     Ptr: TObject;
       //used in Attribs object of ATSynedit
     class operator=(const A, B: TATMarkerItem): boolean;
@@ -47,6 +48,7 @@ type
   TATMarkers = class
   private
     FList: TATMarkerItems;
+    FSorted: boolean;
     function GetItem(N: integer): TATMarkerItem;
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
@@ -57,6 +59,7 @@ type
     function Count: integer; inline;
     function IsIndexValid(AIndex: integer): boolean; inline;
     property Items[AIndex: integer]: TATMarkerItem read GetItem write SetItem; default;
+    property Sorted: boolean read FSorted write FSorted;
     procedure Add(APosX, APosY: integer;
       const ATag: Int64=0;
       ALenX: integer=0;
@@ -107,6 +110,7 @@ constructor TATMarkers.Create;
 begin
   inherited;
   FList:= TATMarkerItems.Create;
+  FSorted:= false;
 end;
 
 destructor TATMarkers.Destroy;
@@ -180,11 +184,15 @@ begin
   Item.LenY:= ALenY;
   Item.Ptr:= APtr;
 
-  //keep list sorted
-  Find(APosX, APosY, NIndex, bExact, bContains);
-  if bExact then
-    FList.Delete(NIndex);
-  FList.Insert(NIndex, Item);
+  if FSorted then
+  begin
+    Find(APosX, APosY, NIndex, bExact, bContains);
+    if bExact then
+      FList.Delete(NIndex);
+    FList.Insert(NIndex, Item);
+  end
+  else
+    FList.Add(Item);
 end;
 
 procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
