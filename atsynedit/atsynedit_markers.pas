@@ -231,6 +231,9 @@ var
   L, H, I, C: Integer;
   Item: TATMarkerItem;
 begin
+  if not FSorted then
+    raise Exception.Create('Method Find can be used only with Sorted=true');
+
   AIndex := 0;
   AExactMatch := False;
   AContains := False;
