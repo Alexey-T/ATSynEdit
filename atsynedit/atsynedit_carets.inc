@@ -152,7 +152,7 @@ function _DoCaretPosToClientPos(
   P: TPoint;
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
-  AGaps: TATSynGaps;
+  AGaps: TATGaps;
   ACharSize: TPoint;
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
@@ -231,7 +231,7 @@ function _DoClientPosToCaretPos(
   P: TPoint;
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
-  AGaps: TATSynGaps;
+  AGaps: TATGaps;
   ACharSize: TPoint;
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
@@ -243,7 +243,7 @@ function _DoClientPosToCaretPos(
 var
   NIndex, NIndexDecrement, NPixels: integer;
   Item: TATWrapItem;
-  ItemGap: TATSynGapItem;
+  ItemGap: TATGapItem;
   Str: atString;
   AllowVirtual, bGapGoesToEnd: boolean;
 begin
@@ -430,7 +430,7 @@ procedure TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: inte
 //do dec(index), until offset (pixels) from caret to bottom is small enough
 var
   NPixels, NPixelsNeeded, NIndex, NCell: integer;
-  ItemGap: TATSynGapItem;
+  ItemGap: TATGapItem;
   i: integer;
 begin
   NIndex:= AWrapInfoIndex;

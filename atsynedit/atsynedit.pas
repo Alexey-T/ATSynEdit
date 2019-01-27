@@ -53,7 +53,7 @@ uses
 type
   TATPosDetails = record
     EndOfWrappedLine: boolean;
-    OnGapItem: TATSynGapItem;
+    OnGapItem: TATGapItem;
     OnGapPos: TPoint;
   end;
 
@@ -318,7 +318,7 @@ var
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
-  TATSynEditClickGapEvent = procedure(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint) of object;
+  TATSynEditClickGapEvent = procedure(Sender: TObject; AGapItem: TATGapItem; APos: TPoint) of object;
   TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; const AText: string; var AHandled: boolean) of object;
   TATSynEditCommandAfterEvent = procedure(Sender: TObject; ACommand: integer; const AText: string) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
@@ -326,7 +326,7 @@ type
   TATSynEditClickLinkEvent = procedure(Sender: TObject; const ALink: string) of object;
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
-  TATSynEditDrawGapEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATSynGapItem) of object;
+  TATSynEditDrawGapEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATGapItem) of object;
   TATSynEditCalcBookmarkColorEvent = procedure(Sender: TObject; ABookmarkKind: integer; out AColor: TColor) of object;
   TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
@@ -717,7 +717,7 @@ type
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;
-    function GetGaps: TATSynGaps;
+    function GetGaps: TATGaps;
     function GetLastCommandChangedLines: integer;
     function GetMinimapActualHeight: integer;
     function GetMinimapSelTop: integer;
@@ -798,7 +798,7 @@ type
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
     procedure DoPaintMarginsTo(C: TCanvas);
-    procedure DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATSynGapItem);
+    procedure DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
     procedure DoPaintFoldedMark(C: TCanvas; APos: TPoint; ACoord: TPoint;
       const AMarkText: string);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
@@ -1036,7 +1036,7 @@ type
     property Attribs: TATMarkers read FAttribs;
     property DimRanges: TATDimRanges read FDimRanges;
     property Hotspots: TATHotspots read FHotspots;
-    property Gaps: TATSynGaps read GetGaps;
+    property Gaps: TATGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
@@ -2219,7 +2219,7 @@ var
   NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
   NOutputCharsSkipped, NOutputStrWidth, NOutputSpacesSkipped: integer;
   WrapItem: TATWrapItem;
-  GapItem: TATSynGapItem;
+  GapItem: TATGapItem;
   Band: TATGutterItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue, NBandDecor: integer;
@@ -2868,7 +2868,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATSynGapItem);
+procedure TATSynEdit.DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
 var
   RHere, RBmp: TRect;
 begin
@@ -6027,7 +6027,7 @@ begin
     Result:= Colors.TextDisabledFont;
 end;
 
-function TATSynEdit.GetGaps: TATSynGaps;
+function TATSynEdit.GetGaps: TATGaps;
 begin
   Result:= Strings.Gaps;
 end;
@@ -6557,7 +6557,7 @@ end;
 
 function TATSynEdit.DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
 var
-  GapItem: TATSynGapItem;
+  GapItem: TATGapItem;
   Pnt: TPoint;
 begin
   Result:= false;

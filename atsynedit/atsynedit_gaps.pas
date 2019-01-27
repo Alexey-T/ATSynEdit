@@ -20,9 +20,9 @@ type
     );
 
 type
-  { TATSynGapItem }
+  { TATGapItem }
 
-  TATSynGapItem = class
+  TATGapItem = class
   public
     LineIndex: integer;
     Size: integer;
@@ -35,31 +35,31 @@ type
   end;
 
 type
-  TATSynGapDelete = procedure(Sender: TObject; ALineIndex: integer) of object;
+  TATGapDeleteEvent = procedure(Sender: TObject; ALineIndex: integer) of object;
 
 type
-  { TATSynGaps }
+  { TATGaps }
 
-  TATSynGaps = class
+  TATGaps = class
   private
     FList: TList;
-    FOnDelete: TATSynGapDelete;
-    function GetItem(N: integer): TATSynGapItem;
+    FOnDelete: TATGapDeleteEvent;
+    function GetItem(N: integer): TATGapItem;
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
-    property Items[N: integer]: TATSynGapItem read GetItem; default;
+    property Items[N: integer]: TATGapItem read GetItem; default;
     procedure Delete(N: integer);
     function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; const ATag: Int64;
       ADeleteOnDelLine: boolean=true): boolean;
-    function Find(ALineIndex: integer; ATag: Int64=-1): TATSynGapItem;
+    function Find(ALineIndex: integer; ATag: Int64=-1): TATGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);
-    property OnDelete: TATSynGapDelete read FOnDelete write FOnDelete;
+    property OnDelete: TATGapDeleteEvent read FOnDelete write FOnDelete;
   end;
 
 var
@@ -77,37 +77,37 @@ begin
 end;
 
 
-{ TATSynGapItem }
+{ TATGapItem }
 
-constructor TATSynGapItem.Create;
+constructor TATGapItem.Create;
 begin
   Bitmap:= nil;
   DeleteOnDelLine:= true;
 end;
 
-destructor TATSynGapItem.Destroy;
+destructor TATGapItem.Destroy;
 begin
   if Bitmap<>nil then
     FreeAndNil(Bitmap);
   inherited;
 end;
 
-{ TATSynGaps }
+{ TATGaps }
 
-constructor TATSynGaps.Create;
+constructor TATGaps.Create;
 begin
   inherited;
   FList:= TList.Create;
 end;
 
-destructor TATSynGaps.Destroy;
+destructor TATGaps.Destroy;
 begin
   Clear;
   FreeAndNil(FList);
   inherited;
 end;
 
-procedure TATSynGaps.Clear;
+procedure TATGaps.Clear;
 var
   i: integer;
 begin
@@ -120,22 +120,22 @@ begin
   FList.Clear;
 end;
 
-function TATSynGaps.Count: integer; inline;
+function TATGaps.Count: integer; inline;
 begin
   Result:= FList.Count;
 end;
 
-function TATSynGaps.IsIndexValid(N: integer): boolean; inline;
+function TATGaps.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-function TATSynGaps.GetItem(N: integer): TATSynGapItem;
+function TATGaps.GetItem(N: integer): TATGapItem;
 begin
-  Result:= TATSynGapItem(FList[N]);
+  Result:= TATGapItem(FList[N]);
 end;
 
-procedure TATSynGaps.Delete(N: integer);
+procedure TATGaps.Delete(N: integer);
 begin
   if Assigned(FOnDelete) then
     FOnDelete(Self, Items[N].LineIndex);
@@ -144,9 +144,9 @@ begin
   FList.Delete(N);
 end;
 
-function TATSynGaps.DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
+function TATGaps.DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
 var
-  Item: TATSynGapItem;
+  Item: TATGapItem;
   i: integer;
 begin
   Result:= false;
@@ -161,17 +161,17 @@ begin
   end;
 end;
 
-function TATSynGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap; const ATag: Int64;
+function TATGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap; const ATag: Int64;
   ADeleteOnDelLine: boolean): boolean;
 var
-  Item: TATSynGapItem;
+  Item: TATGapItem;
 begin
   Result:= false;
   if (ALineIndex<-1) then exit;
   if (ASize<cMinGapSize) or (ASize>cMaxGapSize) then exit;
   if Find(ALineIndex)<>nil then exit;
 
-  Item:= TATSynGapItem.Create;
+  Item:= TATGapItem.Create;
   Item.LineIndex:= ALineIndex;
   Item.Size:= ASize;
   Item.Bitmap:= ABitmap;
@@ -182,9 +182,9 @@ begin
   Result:= true;
 end;
 
-function TATSynGaps.Find(ALineIndex: integer; ATag: Int64=-1): TATSynGapItem;
+function TATGaps.Find(ALineIndex: integer; ATag: Int64=-1): TATGapItem;
 var
-  Item: TATSynGapItem;
+  Item: TATGapItem;
   i: integer;
 begin
   Result:= nil;
@@ -195,9 +195,9 @@ begin
   end;
 end;
 
-function TATSynGaps.SizeForLineRange(ALineFrom, ALineTo: integer): integer;
+function TATGaps.SizeForLineRange(ALineFrom, ALineTo: integer): integer;
 var
-  Item: TATSynGapItem;
+  Item: TATGapItem;
   i: integer;
 begin
   Result:= 0;
@@ -214,9 +214,9 @@ begin
   end;
 end;
 
-procedure TATSynGaps.Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);
+procedure TATGaps.Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);
 var
-  Item: TATSynGapItem;
+  Item: TATGapItem;
   i: integer;
 begin
   case AChange of

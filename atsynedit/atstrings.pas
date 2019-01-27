@@ -160,7 +160,7 @@ type
     FList: TATStringItemList;
     FListUpdates: TList;
     FListUpdatesHard: boolean;
-    FGaps: TATSynGaps;
+    FGaps: TATGaps;
     FBookmarks: TATBookmarks;
     FGutterDecor1: TATGutterDecor;
     FGutterDecor2: TATGutterDecor;
@@ -295,7 +295,7 @@ type
     property ProgressValue: integer read FProgressValue write FProgressValue;
     property ProgressKind: TATStringsProgressKind read FProgressKind write FProgressKind;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
-    property Gaps: TATSynGaps read FGaps;
+    property Gaps: TATGaps read FGaps;
     property Bookmarks: TATBookmarks read FBookmarks;
     property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
     property GutterDecor2: TATGutterDecor read FGutterDecor2 write FGutterDecor2;
@@ -795,7 +795,7 @@ begin
   FListUpdatesHard:= false;
   FUndoList:= TATUndoList.Create;
   FRedoList:= TATUndoList.Create;
-  FGaps:= TATSynGaps.Create;
+  FGaps:= TATGaps.Create;
   FBookmarks:= TATBookmarks.Create;
 
   FEncoding:= cEncUTF8;

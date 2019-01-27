@@ -235,7 +235,7 @@ After you added new keymap items, add reaction for them: use OnCommand event as 
 
 === WrapInfo object ===
 
-type TATSynWrapInfo in unit atsynedit_wrapinfo. Holds list of wrap items, each is info about wrapped part of line or about entire line:
+type TATWrapInfo in unit atsynedit_wrapinfo. Holds list of wrap items, each is info about wrapped part of line or about entire line:
 
 * its original line index in Strings object (0-base)
 * its char offset in original line (0-base)
