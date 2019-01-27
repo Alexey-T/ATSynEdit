@@ -68,7 +68,7 @@ type
       AValue: Int64=0);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
-    procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+    procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
   end;
 
@@ -179,7 +179,7 @@ procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64; ALenX: intege
 var
   Item: TATMarkerItem;
   NIndex: integer;
-  bExact, bContains: boolean;
+  bExact: boolean;
 begin
   FillChar(Item, SizeOf(Item), 0);
   Item.PosX:= APosX;
@@ -194,7 +194,7 @@ begin
 
   if FSorted then
   begin
-    Find(APosX, APosY, NIndex, bExact, bContains);
+    Find(APosX, APosY, NIndex, bExact);
     if bExact then
       FList.Delete(NIndex);
     FList.Insert(NIndex, Item);
@@ -233,7 +233,7 @@ begin
     Result:= X1-X2;
 end;
 
-procedure TATMarkers.Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
+procedure TATMarkers.Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
 //gives AIndex in range [0..Count] (without -1)
 var
   L, H, I, C: Integer;
@@ -244,7 +244,6 @@ begin
 
   AIndex := 0;
   AExactMatch := False;
-  AContains := False;
 
   if Count = 0 then
     Exit;
@@ -264,34 +263,24 @@ begin
       begin
         AIndex := I;
         AExactMatch := True;
-        AContains := True;
         Exit;
       end;
       H := I - 1;
     end;
   end;
   AIndex := L;
-
-  if IsIndexValid(AIndex) then
-  begin
-    Item := Items[AIndex];
-    AContains := Item.Contains(AX, AY);
-  end;
 end;
 
 function TATMarkers.FindContaining(AX, AY: integer): integer;
 var
   Item: TATMarkerItem;
   NIndex: integer;
-  bExact, bContains: boolean;
+  bExact: boolean;
 begin
   Result:= -1;
   if Count=0 then exit;
 
-  Find(AX, AY, NIndex, bExact, bContains);
-
-  if bContains then
-    exit(NIndex);
+  Find(AX, AY, NIndex, bExact);
 
   //because Find is limited, check also nearest 2 items
   if NIndex>=Count then

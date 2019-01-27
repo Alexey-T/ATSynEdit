@@ -292,9 +292,9 @@ var
   Part: TATLinePart;
   PartObj: TATLinePartClass;
   nAttrIndex, nOffset, i: integer;
-  bExact, bContains: boolean;
+  bExact: boolean;
 begin
-  Attribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact, bContains);
+  Attribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact);
   if not Attribs.IsIndexValid(nAttrIndex) then exit;
   for i:= nAttrIndex to Attribs.Count-1 do
   begin
