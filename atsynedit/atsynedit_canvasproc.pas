@@ -159,7 +159,7 @@ procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOff
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
 procedure DoPartsShow(var P: TATLineParts);
-procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer);
+procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColor);
 
 function ColorBlend(c1, c2: Longint; A: Longint): Longint;
 function ColorBlendHalf(c1, c2: Longint): Longint;
@@ -1218,7 +1218,7 @@ begin
 end;
 
 
-procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer);
+procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColor);
 var
   i: integer;
 begin
@@ -1228,6 +1228,8 @@ begin
     with P[i] do
     begin
       ColorFont:= ColorBlend(ColorBG, ColorFont, ADimLevel255);
+      if ColorBG<>clNone then
+        ColorBG:= ColorBlend(AColorBG, ColorBG, ADimLevel255);
       if ColorBorder<>clNone then
         ColorBorder:= ColorBlend(ColorBG, ColorBorder, ADimLevel255);
     end;

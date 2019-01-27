@@ -2480,7 +2480,7 @@ begin
       //apply DimRanges
       NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
       if NDimValue>0 then //-1: no ranges found, 0: no effect
-        DoPartsDim(FLineParts, NDimValue);
+        DoPartsDim(FLineParts, NDimValue, Colors.TextBG);
 
       //adapter may return ColorAfterEol, paint it
       if FOptShowFullHilite then
