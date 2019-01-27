@@ -9,34 +9,16 @@ unit ATSynEdit_DimRanges;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils,
+  ATSynEdit_Markers;
   
-type
-  { TATDimRange }
-
-  TATDimRange = class
-  public
-    LineFrom: integer;
-    LineTo: integer;
-    DimValue: integer;
-  end;
-
 type
   { TATDimRanges }
 
-  TATDimRanges = class
-  private
-    FList: TList;
-    function GetItem(N: integer): TATDimRange;
+  TATDimRanges = class(TATMarkers)
   public
-    constructor Create; virtual;
-    destructor Destroy; override;
-    procedure Clear;
-    procedure Delete(N: integer);
-    function Count: integer; inline;
-    function IsIndexValid(N: integer): boolean; inline;
-    property Items[N: integer]: TATDimRange read GetItem; default;
-    function Add(ALineFrom, ALineTo: integer; ADimValue: integer): TATDimRange;
+    constructor Create; override;
+    procedure Add(ALineFrom, ALineTo: integer; ADimValue: integer);
     function GetDimValue(ALine, ADefValue: integer): integer;
   end;
 
@@ -44,74 +26,47 @@ implementation
 
 constructor TATDimRanges.Create;
 begin
-  inherited;
-  FList:= TList.Create;
+  inherited Create;
+  Sorted:= true;
 end;
 
-destructor TATDimRanges.Destroy;
+procedure TATDimRanges.Add(ALineFrom, ALineTo: integer; ADimValue: integer);
 begin
-  Clear;
-  FreeAndNil(FList);
-  inherited;
-end;
-
-procedure TATDimRanges.Clear;
-var
-  i: integer;
-begin
-  for i:= FList.Count-1 downto 0 do
-    TObject(FList[i]).Free;
-  FList.Clear;
-end;
-
-procedure TATDimRanges.Delete(N: integer);
-begin
-  if IsIndexValid(N) then
-  begin
-    TObject(FList[N]).Free;
-    FList.Delete(N);
-  end;
-end;
-
-function TATDimRanges.Count: integer; inline;
-begin
-  Result:= FList.Count;
-end;
-
-function TATDimRanges.IsIndexValid(N: integer): boolean; inline;
-begin
-  Result:= (N>=0) and (N<FList.Count);
-end;
-
-function TATDimRanges.GetItem(N: integer): TATDimRange;
-begin
-  if IsIndexValid(N) then
-    Result:= TATDimRange(FList[N])
-  else
-    Result:= nil;
-end;
-
-function TATDimRanges.Add(ALineFrom, ALineTo: integer; ADimValue: integer): TATDimRange;
-begin
-  Result:= TATDimRange.Create;
-  Result.LineFrom:= ALineFrom;
-  Result.LineTo:= ALineTo;
-  Result.DimValue:= ADimValue;
-
-  FList.Add(Result);
+  inherited Add(
+    0,
+    ALineFrom,
+    0,
+    0,
+    ALineTo-ALineFrom+1,
+    nil,
+    ADimValue
+    );
 end;
 
 function TATDimRanges.GetDimValue(ALine, ADefValue: integer): integer;
 var
-  R: TATDimRange;
-  i: integer;
+  Item: TATMarkerItem;
+  NIndex: integer;
+  bExact, bContains: boolean;
 begin
   Result:= ADefValue;
-  for i:= 0 to Count-1 do
+  if Count=0 then exit;
+
+  Find(0, ALine, NIndex, bExact, bContains);
+
+  //because Find is limited, check also nearest 2 items
+  if NIndex>=Count then
+    NIndex:= Count-1;
+
+  Item:= Items[NIndex];
+  if Item.Contains(0, ALine) then
+    exit(Item.Value);
+
+  if NIndex>0 then
   begin
-    R:= TATDimRange(FList[i]);
-    if (ALine>=R.LineFrom) and (ALine<=R.LineTo) then
-      exit(R.DimValue);
+    Item:= Items[NIndex-1];
+    if Item.Contains(0, ALine) then
+      exit(Item.Value);
   end;
 end;
 

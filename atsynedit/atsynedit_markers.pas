@@ -64,7 +64,8 @@ type
       const ATag: Int64=0;
       ALenX: integer=0;
       ALenY: integer=0;
-      APtr: TObject=nil);
+      APtr: TObject=nil;
+      AValue: Int64=0);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch, AContains: boolean);
@@ -80,11 +81,16 @@ begin
 end;
 
 function TATMarkerItem.Contains(AX, AY: integer): boolean;
+var
+  P: TPoint;
 begin
-  if LenX=0 then
+  if (LenX<=0) and (LenY<=0) then
     Result:= false
   else
-    Result:= IsPosInRange(AX, AY, PosX, PosY, PosX+LenX, PosY)=cRelateInside;
+  begin
+    P:= PosEnd;
+    Result:= IsPosInRange(AX, AY, PosX, PosY, P.X, P.Y)=cRelateInside;
+  end;
 end;
 
 function TATMarkerItem.PosEnd: TPoint;
@@ -167,8 +173,8 @@ begin
   FList[N]:= AItem;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ALenX: integer; ALenY: integer; APtr: TObject);
+procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64; ALenX: integer; ALenY: integer;
+  APtr: TObject; AValue: Int64);
 var
   Item: TATMarkerItem;
   NIndex: integer;
@@ -183,6 +189,7 @@ begin
   Item.LenX:= ALenX;
   Item.LenY:= ALenY;
   Item.Ptr:= APtr;
+  Item.Value:= AValue;
 
   if FSorted then
   begin
