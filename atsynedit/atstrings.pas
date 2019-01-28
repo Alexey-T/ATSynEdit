@@ -194,6 +194,7 @@ type
       //indicates that program can ignore separate line changes in OnChange,
       //because OnChangeBlock is called for all lines at once
     FLastCommandChangedLines: integer;
+    FEnabledBookmarksUpdate: boolean;
 
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
@@ -295,6 +296,7 @@ type
     property ProgressValue: integer read FProgressValue write FProgressValue;
     property ProgressKind: TATStringsProgressKind read FProgressKind write FProgressKind;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
+    property EnabledBookmarksUpdate: boolean read FEnabledBookmarksUpdate write FEnabledBookmarksUpdate;
     property Gaps: TATGaps read FGaps;
     property Bookmarks: TATBookmarks read FBookmarks;
     property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
@@ -797,6 +799,7 @@ begin
   FRedoList:= TATUndoList.Create;
   FGaps:= TATGaps.Create;
   FBookmarks:= TATBookmarks.Create;
+  FEnabledBookmarksUpdate:= true;
 
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
@@ -1661,7 +1664,8 @@ procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItem
 begin
   FGaps.Update(AChange, ALineIndex, AItemCount);
 
-  FBookmarks.Update(AChange, ALineIndex, AItemCount, Count);
+  if FEnabledBookmarksUpdate then
+    FBookmarks.Update(AChange, ALineIndex, AItemCount, Count);
 
   if Assigned(FGutterDecor1) then
     FGutterDecor1.Update(AChange, ALineIndex, AItemCount, Count);

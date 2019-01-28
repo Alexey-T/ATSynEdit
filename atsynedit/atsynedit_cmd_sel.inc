@@ -146,6 +146,9 @@ begin
     NTo:= NFrom;
   end;
 
+ try
+  Strings.EnabledBookmarksUpdate:= false;
+
   if ADown then
   begin
     NLastLine:= Strings.Count-1;
@@ -180,6 +183,10 @@ begin
     if Caret.EndY>=0 then
       Dec(Caret.EndY);
   end;
+
+ finally
+   Strings.EnabledBookmarksUpdate:= true;
+ end;
 
   Result:= [cResultText, cResultCaretTop];
 end;
