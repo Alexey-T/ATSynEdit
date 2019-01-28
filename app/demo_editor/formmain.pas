@@ -211,7 +211,7 @@ type
     procedure EditorGapDelete(Sender: TObject; ALineIndex: integer);
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
       AEndPos: TPoint; AChange: TATBlockChangeKind; ABlock: TStringList);
-    procedure EditClickGap(Sender: TObject; AGapItem: TATSynGapItem; APos: TPoint);
+    procedure EditClickGap(Sender: TObject; AGapItem: TATGapItem; APos: TPoint);
     procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
     procedure FinderBadRegex(Sender: TObject);
@@ -233,7 +233,7 @@ type
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
     procedure EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);
-    procedure EditDrawGap(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATSynGapItem);
+    procedure EditDrawGap(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATGapItem);
     procedure FinderFound(Sender: TObject; APos1, APos2: TPoint);
     procedure FinderUpdateEditor(AUpdateText: boolean);
     procedure MenuEncClick(Sender: TObject);
@@ -594,7 +594,7 @@ begin
 end;
 
 procedure TfmMain.EditDrawGap(Sender: TObject; C: TCanvas; const ARect: TRect;
-  AGap: TATSynGapItem);
+  AGap: TATGapItem);
 begin
   ////DoPaintGap(C, ARect, AGap.LineIndex);
 end;
@@ -1131,7 +1131,7 @@ begin
     ]));
 end;
 
-procedure TfmMain.EditClickGap(Sender: TObject; AGapItem: TATSynGapItem;
+procedure TfmMain.EditClickGap(Sender: TObject; AGapItem: TATGapItem;
   APos: TPoint);
 begin
   if Assigned(AGapItem) then
