@@ -295,7 +295,10 @@ var
   bExact: boolean;
 begin
   Attribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact);
-  if not Attribs.IsIndexValid(nAttrIndex) then exit;
+  if nAttrIndex<0 then exit; //not IsIndexValid, because index=Attribs.Count is ok
+  if nAttrIndex>0 then //fixes disappeared attrib on horz scrolling
+    Dec(nAttrIndex);
+
   for i:= nAttrIndex to Attribs.Count-1 do
   begin
     Attr:= Attribs[i];
