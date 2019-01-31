@@ -271,6 +271,17 @@ begin
       AColor:= Colors.BookmarkBG;
       if Assigned(FOnCalcBookmarkColor) then
         FOnCalcBookmarkColor(Self, BmKind, AColor);
+    end
+    else
+    begin
+      NIndex:= Strings.Bookmarks2.Find(ALine);
+      if NIndex>=0 then
+      begin
+        BmKind:= Strings.Bookmarks2[NIndex].Data.Kind;
+        AColor:= Colors.BookmarkBG;
+        if Assigned(FOnCalcBookmarkColor) then
+          FOnCalcBookmarkColor(Self, BmKind, AColor);
+      end;
     end;
   end;
 

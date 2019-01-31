@@ -203,6 +203,7 @@ type
     FDecorImage: integer;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
+    procedure EditCalcBookmarkColor(Sender: TObject; ABookmarkKind: integer; var AColor: TColor);
     procedure EditClickLink(Sender: TObject; const ALink: string);
     procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
     procedure EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
@@ -266,6 +267,8 @@ const
 
 const
   cColorBmIco = clMedGray;
+  cBookmarkBgKind = 10;
+
 
 procedure DoPaintGap(C: TCanvas; R: TRect; ALine: integer);
 begin
@@ -324,6 +327,7 @@ begin
   ed.OnHotspotEnter:= @EditHotspotEnter;
   ed.OnHotspotExit:= @EditHotspotExit;
   ed.OnKeyDown:= @EditKeyDown;
+  ed.OnCalcBookmarkColor:= @EditCalcBookmarkColor;
   ////ed.OnCalcTabSize:= @EditCalcTabSize;
 
   ed.SetFocus;
@@ -626,6 +630,11 @@ begin
   finally
     ed.EndUpdate;
   end;
+
+  //test Bookmarks2
+  ed.BookmarkSetForLine_2(4, cBookmarkBgKind, '', false, false, 0);
+  ed.BookmarkSetForLine_2(5, cBookmarkBgKind, '', false, false, 0);
+  ed.BookmarkSetForLine_2(6, cBookmarkBgKind, '', false, false, 0);
 
   Progress.Hide;
   Caption:= 'Demo - '+ExtractFileName(fn);
@@ -1091,6 +1100,12 @@ procedure TfmMain.DoLog(const S: string);
 begin
   ListboxLog.Items.Add(S);
   ListboxLog.ItemIndex:= ListboxLog.Items.Count-1;
+end;
+
+procedure TfmMain.EditCalcBookmarkColor(Sender: TObject; ABookmarkKind: integer; var AColor: TColor);
+begin
+  if ABookmarkKind=cBookmarkBgKind then
+    AColor:= clYellow;
 end;
 
 procedure TfmMain.EditClickLink(Sender: TObject; const ALink: string);

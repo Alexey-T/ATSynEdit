@@ -162,6 +162,7 @@ type
     FListUpdatesHard: boolean;
     FGaps: TATGaps;
     FBookmarks: TATBookmarks;
+    FBookmarks2: TATBookmarks;
     FGutterDecor1: TATGutterDecor;
     FGutterDecor2: TATGutterDecor;
     FUndoList,
@@ -299,6 +300,7 @@ type
     property EnabledBookmarksUpdate: boolean read FEnabledBookmarksUpdate write FEnabledBookmarksUpdate;
     property Gaps: TATGaps read FGaps;
     property Bookmarks: TATBookmarks read FBookmarks;
+    property Bookmarks2: TATBookmarks read FBookmarks2;
     property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
     property GutterDecor2: TATGutterDecor read FGutterDecor2 write FGutterDecor2;
     //actions
@@ -799,6 +801,7 @@ begin
   FRedoList:= TATUndoList.Create;
   FGaps:= TATGaps.Create;
   FBookmarks:= TATBookmarks.Create;
+  FBookmarks2:= TATBookmarks.Create;
   FEnabledBookmarksUpdate:= true;
 
   FEncoding:= cEncUTF8;
@@ -837,6 +840,7 @@ begin
 
   Clear;
   FreeAndNil(FList);
+  FreeAndNil(FBookmarks2);
   FreeAndNil(FBookmarks);
   FreeAndNil(FGaps);
   FreeAndNil(FListUpdates);
@@ -1665,7 +1669,10 @@ begin
   FGaps.Update(AChange, ALineIndex, AItemCount);
 
   if FEnabledBookmarksUpdate then
+  begin
     FBookmarks.Update(AChange, ALineIndex, AItemCount, Count);
+    FBookmarks2.Update(AChange, ALineIndex, AItemCount, Count);
+  end;
 
   if Assigned(FGutterDecor1) then
     FGutterDecor1.Update(AChange, ALineIndex, AItemCount, Count);

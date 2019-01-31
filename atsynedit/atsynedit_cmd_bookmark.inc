@@ -1,9 +1,7 @@
 {$ifdef nnnn}begin end;{$endif}
 
 procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
-  const AHint: string;
-  ADeleteOnDelLine, AShowInList: boolean;
-  const ATag: Int64);
+  const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
 var
   Data: TATBookmarkData;
 begin
@@ -15,6 +13,22 @@ begin
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
   Strings.Bookmarks.Add(Data);
+  Update;
+end;
+
+procedure TATSynEdit.BookmarkSetForLine_2(ALine, ABmKind: integer;
+  const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
+var
+  Data: TATBookmarkData;
+begin
+  if not Strings.IsIndexValid(ALine) then exit;
+  Data.LineNum:= ALine;
+  Data.Kind:= ABmKind;
+  Data.Hint:= AHint;
+  Data.DeleteOnDelLine:= ADeleteOnDelLine;
+  Data.ShowInBookmarkList:= AShowInList;
+  Data.Tag:= ATag;
+  Strings.Bookmarks2.Add(Data);
   Update;
 end;
 
@@ -54,9 +68,23 @@ begin
   Update;
 end;
 
+procedure TATSynEdit.BookmarkDeleteForLine_2(ALine: integer);
+begin
+  if not Strings.IsIndexValid(ALine) then exit;
+  Strings.Bookmarks2.DeleteForLine(ALine);
+  Update;
+end;
+
 function TATSynEdit.BookmarkDeleteByTag(const ATag: Int64): boolean;
 begin
   Result:= Strings.Bookmarks.DeleteByTag(ATag);
+  if Result then
+    Update;
+end;
+
+function TATSynEdit.BookmarkDeleteByTag_2(const ATag: Int64): boolean;
+begin
+  Result:= Strings.Bookmarks2.DeleteByTag(ATag);
   if Result then
     Update;
 end;
@@ -88,6 +116,12 @@ end;
 procedure TATSynEdit.BookmarkDeleteAll;
 begin
   Strings.Bookmarks.Clear;
+  Update;
+end;
+
+procedure TATSynEdit.BookmarkDeleteAll_2;
+begin
+  Strings.Bookmarks2.Clear;
   Update;
 end;
 

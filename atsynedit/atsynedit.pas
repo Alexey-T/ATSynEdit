@@ -327,7 +327,7 @@ type
   TATSynEditDrawBookmarkEvent = procedure(Sender: TObject; C: TCanvas; ALineNum: integer; const ARect: TRect) of object;
   TATSynEditDrawRectEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect) of object;
   TATSynEditDrawGapEvent = procedure(Sender: TObject; C: TCanvas; const ARect: TRect; AGap: TATGapItem) of object;
-  TATSynEditCalcBookmarkColorEvent = procedure(Sender: TObject; ABookmarkKind: integer; out AColor: TColor) of object;
+  TATSynEditCalcBookmarkColorEvent = procedure(Sender: TObject; ABookmarkKind: integer; var AColor: TColor) of object;
   TATSynEditCalcStapleEvent = procedure(Sender: TObject; ALine, AIndent: integer; var AStapleColor: TColor) of object;
   TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
     ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor) of object;
@@ -1107,14 +1107,18 @@ type
     //bookmarks
     procedure BookmarkSetForLine(ALine, ABmKind: integer;
       const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
+    procedure BookmarkSetForLine_2(ALine, ABmKind: integer;
+      const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
     procedure BookmarkToggleForLine(ALine, ABmKind: integer;
       const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
     procedure BookmarkDeleteForLine(ALine: integer);
+    procedure BookmarkDeleteForLine_2(ALine: integer);
     function BookmarkDeleteByTag(const ATag: Int64): boolean;
+    function BookmarkDeleteByTag_2(const ATag: Int64): boolean;
     procedure BookmarkDeleteAll;
+    procedure BookmarkDeleteAll_2;
     procedure BookmarkInvertAll;
-    procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer;
-      AOnlyShownInList: boolean);
+    procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer; AOnlyShownInList: boolean);
     procedure BookmarkCopyMarkedLines;
     procedure BookmarkDeleteMarkedLines;
     procedure BookmarkPlaceBookmarksOnCarets;
