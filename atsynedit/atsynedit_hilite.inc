@@ -31,12 +31,13 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
-  bFound: boolean;
+  bFound, bAddToCache: boolean;
 begin
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
+  bAddToCache:= false;
 
   FillChar(AParts, SizeOf(AParts), 0);
 
@@ -50,7 +51,7 @@ begin
     if not bFound then
     begin
       FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
-      FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
+      bAddToCache:= true;
     end;
     {$else}
     FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
@@ -68,6 +69,11 @@ begin
   //first add Attribs,
   //selection must be over attribs
   DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+
+  //add to cache - after DoPartSetColorBG and ApplyAttribsOver
+  //so bookmark color and attribs will be cached
+  if bAddToCache and Assigned(FAdapterCache) then
+    FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
