@@ -174,7 +174,7 @@ To get/set lines, use properties:
 
 Auto-adjustments of other objects when lines are added/deleted:
 
-* Strings object updates Strings.Bookmarks object.
+* Strings object updates Strings.Bookmarks, Strings.Bookmarks2 objects.
 * Strings object updates Gaps (actually Strings.Gaps) object.
 * If Strings.GutterDecor1 / .GutterDecor2 properties are set, Strings object updates GutterDecor object(s). Properties are not set in ATSynEdit, application must set them.
 * Objects Attribs / Markers / HotSpots are updated not inside Strings object, but in main ATSynEdit code.
@@ -195,6 +195,10 @@ Kind specifies background color and gutter icon for bookmarks of this kind. Kind
 Bookmarks object is always sorted by line index.
 Duplicate bookmarks (for the same line index) are auto removed.
 To change bookmarks, use methods Add, Delete, DeleteForLine, Clear. Also use method Find.
+
+=== Strings.Bookmarks2 object ===
+
+Same type as Strings.Bookmarks object. This list holds "background bookmarks", which have lower paint priority than usual bookmarks. So if a line has usual bookmark - it is painted, and if not - background bookmark is searched for this line and painted. Bookmarks2 allows to colorize entire lines, but not to interfere with usual bookmarks - it is "passive coloring". Additionally, marks in Bookmarks2 don't have gutter icon, and mouse-over tooltip. Marks in Bookmarks/Bookmarks2 use the same Kind values space.
 
 === Carets object ===
 
@@ -441,6 +445,7 @@ Objects
 
 *    property Strings
 *    property Strings.Bookmarks
+*    property Strings.Bookmarks2
 *    property Carets
 *    property Gutter
 *    property GutterDecor
