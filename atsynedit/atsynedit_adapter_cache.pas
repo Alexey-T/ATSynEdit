@@ -43,6 +43,7 @@ type
       const ALineIndex, ACharIndex, ALineLen: integer;
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
+    procedure DeleteForLine(ALineIndex: integer);
   end;
 
 
@@ -140,6 +141,19 @@ begin
         AColorAfterEol:= Item.ColorAfterEol;
         exit(true);
       end;
+  end;
+end;
+
+procedure TATAdapterHiliteCache.DeleteForLine(ALineIndex: integer);
+var
+  Item: TATAdapterCacheItem;
+  i: integer;
+begin
+  for i:= FList.Count-1 downto 0 do
+  begin
+    Item:= TATAdapterCacheItem(FList.Items[i]);
+    if (Item.LineIndex=ALineIndex) then
+      FList.Delete(i);
   end;
 end;
 
