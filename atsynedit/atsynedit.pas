@@ -1022,6 +1022,7 @@ type
     //updates
     procedure Invalidate; override;
     procedure InvalidateHilitingCache;
+    procedure InvalidateHilitingCache(ALineIndex: integer);
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     procedure UpdateIncorrectCaretPositions;
     procedure UpdateFoldedFromLinesHidden;
@@ -4899,6 +4900,12 @@ end;
 procedure TATSynEdit.InvalidateHilitingCache;
 begin
   FAdapterCache.Clear;
+end;
+
+procedure TATSynEdit.InvalidateHilitingCache(ALineIndex: integer);
+begin
+  if Assigned(FAdapterCache) then
+    FAdapterCache.DeleteForLine(ALineIndex);
 end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
