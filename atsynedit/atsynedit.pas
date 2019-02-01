@@ -21,6 +21,7 @@ interface
 uses
   {$ifdef Windows}
   Windows, Imm, Messages,
+  LConvEncoding,
   {$endif}
   InterfaceBase,
   Classes, SysUtils, Graphics,
@@ -6688,7 +6689,7 @@ begin
            Str.EncodingCodepage:= AName;
            //support old value 'ANSI' in user history
            if AName='ANSI' then
-             Str.EncodingCodepage:= {$ifdef windows} GetDefaultTextEncoding {$else} 'cp1252' {$endif};
+             Str.EncodingCodepage:= {$ifdef windows} LConvEncoding.GetDefaultTextEncoding {$else} 'cp1252' {$endif};
          end;
 end;
 
