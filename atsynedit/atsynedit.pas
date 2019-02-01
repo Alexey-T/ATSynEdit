@@ -771,7 +771,8 @@ type
       AItems: TATWrapItems; AConsiderFolding: boolean);
     procedure DoCalcLineHilite(const AData: TATWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
-      AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
+      AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
+      AMainText: boolean);
     //select
     procedure DoSelectionDeleteOrReset;
     procedure DoSelect_ExtendSelectionByLine;
@@ -2490,7 +2491,7 @@ begin
       DoCalcLineHilite(WrapItem, FLineParts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
         NColorEntire, LineColorForced,
-        NColorAfter);
+        NColorAfter, AMainText);
 
       //apply DimRanges
       NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
@@ -6454,7 +6455,8 @@ begin
       0, cMaxCharsForOutput,
       AColorBG,
       false,
-      NColorAfter);
+      NColorAfter,
+      true);
 
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     CanvasTextOut(C,

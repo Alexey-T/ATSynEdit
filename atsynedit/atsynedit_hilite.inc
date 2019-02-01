@@ -21,14 +21,17 @@ begin
 
   AColorAfter:= AColorBG;
   DoCalcLineHilite(Data, AParts, 0, cMaxCharsInLine,
-    AColorBG, false, AColorAfter);
+    AColorBG, false, AColorAfter, true);
 end;
 
 
 
 procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
-  var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
-  AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor);
+  var AParts: TATLineParts;
+  ACharsSkipped, ACharsMax: integer;
+  AColorBG: TColor; AColorForced: boolean;
+  var AColorAfter: TColor;
+  AMainText: boolean);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bFound, bAddToCache: boolean;
@@ -73,7 +76,8 @@ begin
 
   //first add Attribs,
   //selection must be over attribs
-  DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+  if AMainText then
+    DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
