@@ -715,6 +715,8 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
+    function GetEncodingName: string;
+    procedure SetEncodingName(const AName: string);
     function GetColorTextBG: TColor;
     function GetColorTextFont: TColor;
     function GetGaps: TATGaps;
@@ -1047,6 +1049,7 @@ type
     property CaretPropsOverwrite: TATCaretProps read FCaretPropsOverwrite;
     property CaretPropsReadonly: TATCaretProps read FCaretPropsReadonly;
     //common
+    property EncodingName: string read GetEncodingName write SetEncodingName;
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property EditorIndex: integer read FEditorIndex write FEditorIndex;
@@ -1476,6 +1479,13 @@ var
   //better to have as global bar (for many editors)
   OptMouseDragDropFocusesTargetEditor: boolean = true;
 
+const
+  cEncNameUtf8_WithBom = 'UTF-8 with BOM';
+  cEncNameUtf8_NoBom = 'UTF-8';
+  cEncNameUtf16LE_WithBom = 'UTF-16 LE with BOM';
+  cEncNameUtf16LE_NoBom = 'UTF-16 LE';
+  cEncNameUtf16BE_WithBom = 'UTF-16 BE with BOM';
+  cEncNameUtf16BE_NoBom = 'UTF-16 BE';
 
 implementation
 
@@ -1489,7 +1499,6 @@ uses
   ATSynEdit_Keymap_Init;
 
 {$I atsynedit_proc.inc}
-
 
 { TATSynEdit }
 
@@ -6154,6 +6163,7 @@ begin
     }
 end;
 
+
 procedure TATSynEdit.DoCalcLinks;
 var
   ReObj: TRegExpr;
@@ -6619,6 +6629,67 @@ begin
   C.Font.Size:= 8;
   C.Brush.Color:= clCream;
   C.TextOut(ClientWidth-60, 5, S+' fps');
+end;
+
+
+function TATSynEdit.GetEncodingName: string;
+var
+  Str: TATStrings;
+begin
+  Str:= Strings;
+  case Str.Encoding of
+    cEncAnsi:
+      begin
+        Result:= Str.EncodingCodepage;
+        if Result='' then Result:= '?';
+      end;
+    cEncUTF8:
+      begin
+        if Str.SaveSignUtf8 then
+          Result:= cEncNameUtf8_WithBom
+        else
+          Result:= cEncNameUtf8_NoBom;
+      end;
+    cEncWideLE:
+      begin
+        if Str.SaveSignWide then
+          Result:= cEncNameUtf16LE_WithBom
+        else
+          Result:= cEncNameUtf16LE_NoBom;
+      end;
+    cEncWideBE:
+      begin
+        if Str.SaveSignWide then
+          Result:= cEncNameUtf16BE_WithBom
+        else
+          Result:= cEncNameUtf16BE_NoBom;
+      end;
+    else
+      Result:= '?';
+  end;
+end;
+
+procedure TATSynEdit.SetEncodingName(const AName: string);
+var
+  Str: TATStrings;
+begin
+  if AName='' then exit;
+  if SameText(AName, GetEncodingName) then exit;
+  Str:= Strings;
+
+  if SameText(AName, cEncNameUtf8_WithBom) then begin Str.Encoding:= cEncUTF8; Str.SaveSignUtf8:= true; end else
+   if SameText(AName, cEncNameUtf8_NoBom) then begin Str.Encoding:= cEncUTF8; Str.SaveSignUtf8:= false; end else
+    if SameText(AName, cEncNameUtf16LE_WithBom) then begin Str.Encoding:= cEncWideLE; Str.SaveSignWide:= true; end else
+     if SameText(AName, cEncNameUtf16LE_NoBom) then begin Str.Encoding:= cEncWideLE; Str.SaveSignWide:= false; end else
+      if SameText(AName, cEncNameUtf16BE_WithBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= true; end else
+       if SameText(AName, cEncNameUtf16BE_NoBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= false; end else
+         begin
+           Str.Encoding:= cEncAnsi;
+           Str.EncodingCodepage:= AName;
+           //support old value 'ANSI' in user history
+           if AName='ANSI' then
+             Str.EncodingCodepage:= {$ifdef windows} GetDefaultTextEncoding {$else} 'cp1252' {$endif};
+         end;
 end;
 
 
