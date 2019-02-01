@@ -13,6 +13,8 @@ begin
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
   Strings.Bookmarks.Add(Data);
+
+  InvalidateHilitingCache(ALine);
   Update;
 end;
 
@@ -29,6 +31,8 @@ begin
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
   Strings.Bookmarks2.Add(Data);
+
+  InvalidateHilitingCache(ALine);
   Update;
 end;
 
@@ -57,6 +61,7 @@ begin
     Strings.Bookmarks.Add(Data);
   end;
 
+  InvalidateHilitingCache(ALine);
   Update;
 end;
 
@@ -65,6 +70,8 @@ procedure TATSynEdit.BookmarkDeleteForLine(ALine: integer);
 begin
   if not Strings.IsIndexValid(ALine) then exit;
   Strings.Bookmarks.DeleteForLine(ALine);
+
+  InvalidateHilitingCache(ALine);
   Update;
 end;
 
@@ -72,6 +79,8 @@ procedure TATSynEdit.BookmarkDeleteForLine_2(ALine: integer);
 begin
   if not Strings.IsIndexValid(ALine) then exit;
   Strings.Bookmarks2.DeleteForLine(ALine);
+
+  InvalidateHilitingCache(ALine);
   Update;
 end;
 
@@ -79,14 +88,20 @@ function TATSynEdit.BookmarkDeleteByTag(const ATag: Int64): boolean;
 begin
   Result:= Strings.Bookmarks.DeleteByTag(ATag);
   if Result then
+  begin
+    InvalidateHilitingCache;
     Update;
+  end;
 end;
 
 function TATSynEdit.BookmarkDeleteByTag_2(const ATag: Int64): boolean;
 begin
   Result:= Strings.Bookmarks2.DeleteByTag(ATag);
   if Result then
+  begin
+    InvalidateHilitingCache;
     Update;
+  end;
 end;
 
 
@@ -110,18 +125,24 @@ begin
       Strings.Bookmarks.Add(Data);
     end;
   end;
+
+  InvalidateHilitingCache;
   Update;
 end;
 
 procedure TATSynEdit.BookmarkDeleteAll;
 begin
   Strings.Bookmarks.Clear;
+
+  InvalidateHilitingCache;
   Update;
 end;
 
 procedure TATSynEdit.BookmarkDeleteAll_2;
 begin
   Strings.Bookmarks2.Clear;
+
+  InvalidateHilitingCache;
   Update;
 end;
 

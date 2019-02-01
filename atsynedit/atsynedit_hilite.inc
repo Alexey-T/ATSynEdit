@@ -66,14 +66,14 @@ begin
   if AColorForced then
     AColorAfter:= AColorBG;
 
+  //add to cache - after DoPartSetColorBG, before ApplyAttribsOver
+  //bookmarks - cached; attribs - not
+  if bAddToCache then
+    FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
+
   //first add Attribs,
   //selection must be over attribs
   DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
-
-  //add to cache - after DoPartSetColorBG and ApplyAttribsOver
-  //so bookmark color and attribs will be cached
-  if bAddToCache and Assigned(FAdapterCache) then
-    FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
