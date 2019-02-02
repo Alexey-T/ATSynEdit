@@ -1077,6 +1077,8 @@ type
     function IsCharWord(ch: Widechar): boolean;
     property TextCharSize: TPoint read FCharSize;
     procedure DoUnfoldLine(ALine: integer);
+    property RectMain: TRect read FRectMain;
+    property RectGutter: TRect read FRectGutter;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read FGutterDecor;
