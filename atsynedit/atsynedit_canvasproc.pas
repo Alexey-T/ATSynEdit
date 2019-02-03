@@ -243,7 +243,7 @@ var
   R: TRect;
   NSize: integer;
 begin
-  NSize:= Max(cMinDotSize, (ARect.Bottom-ARect.Top) * AScale div 100);
+  NSize:= Max(cMinDotSize, ARect.Height * AScale div 100);
   R.Left:= (ARect.Left+ARect.Right) div 2 - NSize div 2;
   R.Top:= (ARect.Top+ARect.Bottom) div 2 - NSize div 2;
   R.Right:= R.Left + NSize;
@@ -278,7 +278,7 @@ begin
   end;
 
   Y:= (ARect.Top+ARect.Bottom) div 2;
-  Dx:= (ARect.Bottom-ARect.Top) * OptUnprintedTabPointerScale div 100;
+  Dx:= ARect.Height * OptUnprintedTabPointerScale div 100;
   C.Pen.Color:= AColorFont;
 
   C.Line(X1, Y, X2, Y);
@@ -306,8 +306,8 @@ var
   Len, X, Y1, Y2, Dx: integer;
 begin
   X:= (ARect.Left+ARect.Right) div 2;
-  Len:= (ARect.Bottom-ARect.Top) * OptUnprintedEndArrowLength div 100;
-  Dx:= (ARect.Bottom-ARect.Top) * OptUnprintedTabPointerScale div 100;
+  Len:= ARect.Height * OptUnprintedEndArrowLength div 100;
+  Dx:= ARect.Height * OptUnprintedTabPointerScale div 100;
   C.Pen.Color:= AColorFont;
 
   Y1:= (ARect.Bottom+ARect.Top-Len) div 2;
@@ -902,7 +902,7 @@ begin
   C.Pen.Color:= AColor;
   C.AntialiasingMode:= amOff;
   C.Pen.EndCap:= pecFlat;
-  C.Pen.Width:= R.Right-R.Left;
+  C.Pen.Width:= R.Width;
 
   C.MoveTo(X, R.Top);
   C.LineTo(X, R.Bottom);

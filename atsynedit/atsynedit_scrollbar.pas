@@ -310,7 +310,7 @@ begin
   if IsHorz then
   begin
     //horz kind
-    FSize:= Math.Min(FRectMain.Bottom-FRectMain.Top, (FRectMain.Right-FRectMain.Left) div 2);
+    FSize:= Math.Min(FRectMain.Height, FRectMain.Width div 2);
     Inc(FSize, FIndentArrLonger);
     case FKindArrows of
       asaArrowsNormal:
@@ -339,7 +339,7 @@ begin
   else
   begin
     //vertical kind
-    FSize:= Math.Min(FRectMain.Right-FRectMain.Left, (FRectMain.Bottom-FRectMain.Top) div 2);
+    FSize:= Math.Min(FRectMain.Width, FRectMain.Height div 2);
     Inc(FSize, FIndentArrLonger);
     case FKindArrows of
       asaArrowsNormal:
@@ -557,12 +557,12 @@ begin
   if IsHorz then
   begin
     N0:= FRectMain.Left;
-    NLen:= FRectMain.Right-FRectMain.Left
+    NLen:= FRectMain.Width
   end
   else
   begin
     N0:= FRectMain.Top;
-    NLen:= FRectMain.Bottom-FRectMain.Top;
+    NLen:= FRectMain.Height;
   end;
   Result:= N0 + (APos-FMin) * NLen div Math.Max(1, FMax-FMin);
 end;
@@ -579,7 +579,7 @@ begin
 
   if IsHorz then
   begin
-    if FRectMain.Right-FRectMain.Left<cMinView then Exit;
+    if FRectMain.Width<cMinView then Exit;
     R.Top:= FRectMain.Top;
     R.Bottom:= FRectMain.Bottom;
     R.Left:= GetPxAtScroll(FPos);
@@ -590,7 +590,7 @@ begin
   end
   else
   begin
-    if FRectMain.Bottom-FRectMain.Top<cMinView then Exit;
+    if FRectMain.Height<cMinView then Exit;
     R.Left:= FRectMain.Left;
     R.Right:= FRectMain.Right;
     R.Top:= GetPxAtScroll(FPos);
@@ -641,7 +641,7 @@ begin
   P:= CenterPoint(R);
   if IsHorz then
   begin
-    if (R.Right-R.Left)>cMinMark then
+    if R.Width>cMinMark then
     begin
       C.MoveTo(P.X  , R.Top+cMarkOf);
       C.LineTo(P.X  , R.Bottom-cMarkOf);
@@ -653,7 +653,7 @@ begin
   end
   else
   begin
-    if (R.Bottom-R.Top)>cMinMark then
+    if R.Height>cMinMark then
     begin
       C.MoveTo(R.Left+cMarkOf, P.Y);
       C.LineTo(R.Right-cMarkOf, P.Y);
@@ -722,9 +722,9 @@ end;
 function TATScroll.MouseToPos(X, Y: Integer): Integer;
 begin
   if IsHorz then
-    Result:= FMin + (X-FRectMain.Left) * (FMax-FMin) div Math.Max(FRectMain.Right-FRectMain.Left, 1)
+    Result:= FMin + (X-FRectMain.Left) * (FMax-FMin) div Math.Max(FRectMain.Width, 1)
   else
-    Result:= FMin + (Y-FRectMain.Top) * (FMax-FMin) div Math.Max(FRectMain.Bottom-FRectMain.Top, 1);
+    Result:= FMin + (Y-FRectMain.Top) * (FMax-FMin) div Math.Max(FRectMain.Height, 1);
 end;
 
 procedure TATScroll.DoUpdatePosOnDrag(X, Y: Integer);

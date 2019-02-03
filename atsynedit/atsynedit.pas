@@ -2772,7 +2772,7 @@ function TATSynEdit.GetMinimapActualHeight: integer;
 begin
   Result:=
     Max(2, Min(
-      FRectMinimap.Bottom-FRectMinimap.Top,
+      FRectMinimap.Height,
       FWrapInfo.Count*FCharSizeMinimap.Y
       ));
 end;
@@ -3930,7 +3930,7 @@ begin
   S:= cHintScrollPrefix+' '+IntToStr(LineTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
-  P:= ClientToScreen(Point(ClientWidth-(R.Right-R.Left), 0));
+  P:= ClientToScreen(Point(ClientWidth-R.Width, 0));
   OffsetRect(R, P.X, P.Y);
   OffsetRect(R, -cHintScrollDx, cHintScrollDx);
 
@@ -5123,7 +5123,7 @@ begin
     if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
     begin
       NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
-      NRight:= NLeft+ACharSize.X*(FSelRect.Right-FSelRect.Left);
+      NRight:= NLeft+ACharSize.X*FSelRect.Width;
       C.Brush.Color:= Colors.TextSelBG;
       C.FillRect(
         NLeft,
@@ -6406,7 +6406,7 @@ begin
     //needed number of chars of all chars counted as 100%,
     //while NOutputSpacesSkipped is with cjk counted as 170%
   TextOutProps.DrawEvent:= nil;
-  TextOutProps.ControlWidth:= ARect.Right-ARect.Left;
+  TextOutProps.ControlWidth:= ARect.Width;
   TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
   TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
@@ -6474,7 +6474,7 @@ begin
   if not FMinimapTooltip.Visible then exit;
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
-  FMinimapTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FMinimapTooltipWidthPercents div 100;
+  FMinimapTooltip.Width:= FRectMain.Width * FMinimapTooltipWidthPercents div 100;
   if FMinimapAtLeft then
     FMinimapTooltip.Left:= FRectMinimap.Right + 1
   else
@@ -6496,7 +6496,7 @@ begin
     exit
   end;
 
-  FFoldedMarkTooltip.Width:= (FRectMain.Right-FRectMain.Left) * FFoldTooltipWidthPercents div 100;
+  FFoldedMarkTooltip.Width:= FRectMain.Width * FFoldTooltipWidthPercents div 100;
   FFoldedMarkTooltip.Height:= (FFoldedMark_LineTo-FFoldedMark_LineFrom+1) * FCharSize.Y + 2;
   FFoldedMarkTooltip.Left:= Min(
     FRectMain.Right - FFoldedMarkTooltip.Width - 1,

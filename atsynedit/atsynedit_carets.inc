@@ -353,7 +353,7 @@ begin
       Item.NCharIndex,
       //optimized for huge line
       Min(Item.NLength,
-          AScrollHorz.NPos + (ARect.Right-ARect.Left) div ACharSize.X)
+          AScrollHorz.NPos + ARect.Width div ACharSize.X)
       );
 
     if bGapGoesToEnd then
@@ -437,7 +437,7 @@ begin
   if NIndex<=0 then exit;
 
   NCell:= FCharSize.Y;
-  NPixels:= (FRectMain.Bottom-FRectMain.Top)-NCell;
+  NPixels:= FRectMain.Height-NCell;
   if NPixels<=0 then exit;
     //this is distance of first visible line, to bottom of control
   NPixelsNeeded:= (AIndentVert+1)*NCell-1;
