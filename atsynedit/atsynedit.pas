@@ -1847,30 +1847,18 @@ begin
 end;
 
 function TATSynEdit.GetVisibleLines: integer;
-var
-  N: integer;
 begin
-  N:= FRectMainVisible.Height;
-
-  //Delta:= Gaps.SizeForLineRange(LineTop, LineBottom-1);
-  //Dec(N, Delta);
-  ////gives jumps of v-scroll at end
-
-  Result:= N div FCharSize.Y;
+  Result:= FRectMainVisible.Height div FCharSize.Y;
 end;
 
 function TATSynEdit.GetVisibleColumns: integer;
-var
-  N: integer;
 begin
-  N:= FRectMainVisible.Width;
-
-  Result:= N div FCharSize.X;
+  Result:= FRectMainVisible.Width div FCharSize.X;
 end;
 
 function TATSynEdit.GetVisibleLinesMinimap: integer;
 begin
-  Result:= (FRectMinimap.Bottom-FRectMinimap.Top) div FCharSizeMinimap.Y - 1;
+  Result:= FRectMinimap.Height div FCharSizeMinimap.Y - 1;
 end;
 
 function TATSynEdit.GetMinimapScrollPos: integer;
