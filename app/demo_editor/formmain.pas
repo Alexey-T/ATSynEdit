@@ -577,7 +577,7 @@ begin
   c.pen.color:= cColorBmIco;
   inc(r.top, 1);
   inc(r.left, 4);
-  dx:= (r.bottom-r.top) div 2-1;
+  dx:= r.Height div 2-1;
   c.Polygon([Point(r.left, r.top), Point(r.left+dx, r.top+dx), Point(r.left, r.top+2*dx)]);
 end;
 
@@ -1566,7 +1566,7 @@ begin
     exit
   end;
 
-  ed_gap.SetBounds(R.Left, R.Top, R.Right-R.Left, R.Bottom-R.Top);
+  ed_gap.SetBounds(R.Left, R.Top, R.Width, R.Height);
   ed_gap.Show;
 end;
 
