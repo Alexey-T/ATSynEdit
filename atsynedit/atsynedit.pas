@@ -2394,7 +2394,7 @@ begin
     Str:= Strings.LineSub(
       NLinesIndex,
       WrapItem.NCharIndex,
-      Min(WrapItem.NLength, GetVisibleColumns+ScrollHorz.NPos)
+      Min(WrapItem.NLength, GetVisibleColumns+ScrollHorz.NPos+1) //+1 because of NPixelOffset
       );
 
     LineSeparator:= Strings.LinesSeparator[NLinesIndex];
