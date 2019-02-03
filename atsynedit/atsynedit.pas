@@ -1145,13 +1145,13 @@ type
     procedure MarkerGotoLast(AndDelete: boolean; AIndentHorz, AIndentVert: integer);
     procedure MarkerSwap;
     //misc
-    function GetVisibleLines: integer;
-    function GetVisibleColumns: integer;
-    function GetVisibleLinesMinimap: integer;
+    function GetVisibleLines: integer; inline;
+    function GetVisibleColumns: integer; inline;
+    function GetVisibleLinesMinimap: integer; inline;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
-    procedure BeginUpdate;
-    procedure EndUpdate;
-    function IsLocked: boolean;
+    procedure BeginUpdate; inline;
+    procedure EndUpdate; inline;
+    function IsLocked: boolean; inline;
     function TextSelected: atString;
     function TextCurrentWord: atString;
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
