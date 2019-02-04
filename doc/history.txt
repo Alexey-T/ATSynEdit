@@ -1,4 +1,7 @@
 
+2019.02.04
++ add: event OnChangeModified
+
 2019.02.01
 + add: property EncodingName
 

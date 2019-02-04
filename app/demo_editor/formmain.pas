@@ -208,6 +208,7 @@ type
     procedure EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
     procedure EditHotspotExit(Sender: TObject; AHotspotIndex: integer);
     procedure EditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure EditChangeModified(Sender: TObject);
     procedure EditorGapChange(Sender: TObject);
     procedure EditorGapDelete(Sender: TObject; ALineIndex: integer);
     procedure EditStringsChangeBlock(Sender: TObject; const AStartPos,
@@ -239,6 +240,7 @@ type
     procedure FinderUpdateEditor(AUpdateText: boolean);
     procedure MenuEncClick(Sender: TObject);
     procedure MsgStatus(const S: string);
+    procedure UpdateCaption;
     procedure UpdateGapPanel;
     procedure UpdateStatus;
     procedure UpdateChecks;
@@ -309,6 +311,7 @@ begin
   ed.ImagesGutterDecor:= ImagesDecor;
 
   ed.OnChange:= @EditChanged;
+  ed.OnChangeModified:=@EditChangeModified;
   ed.Strings.OnChange:=@EditStringsChange;
   ed.Strings.OnChangeBlock:=@EditStringsChangeBlock;
   ed.Strings.GutterDecor1:= ed.GutterDecor;
@@ -637,7 +640,14 @@ begin
   ed.BookmarkSetForLine_2(6, cBookmarkBgKind, '', false, false, 0);
 
   Progress.Hide;
-  Caption:= 'Demo - '+ExtractFileName(fn);
+  UpdateCaption;
+end;
+
+procedure TfmMain.UpdateCaption;
+const
+  cModified: array[boolean] of string = ('', '*');
+begin
+  Caption:= cModified[ed.Modified]+ExtractFileName(FFileName)+' - Editor';
 end;
 
 procedure TfmMain.EditChanged(Sender: TObject);
@@ -1127,6 +1137,11 @@ procedure TfmMain.EditKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
 begin
   exit;////
   DoLog('OnKeyDown, key='+IntToStr(Key));
+end;
+
+procedure TfmMain.EditChangeModified(Sender: TObject);
+begin
+  UpdateCaption;
 end;
 
 procedure TfmMain.EditStringsChangeBlock(Sender: TObject; const AStartPos,

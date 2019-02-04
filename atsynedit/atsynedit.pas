@@ -452,8 +452,10 @@ type
     FOnClickEndSelect: TATSynEditClickMoveCaretEvent;
     FOnClickLink: TATSynEditClickLinkEvent;
     FOnIdle: TNotifyEvent;
-    FOnChangeCaretPos: TNotifyEvent;
     FOnChange: TNotifyEvent;
+    FOnChangeState: TNotifyEvent;
+    FOnChangeCaretPos: TNotifyEvent;
+    FOnChangeModified: TNotifyEvent;
     FOnScroll: TNotifyEvent;
     FOnClickGutter: TATSynEditClickGutterEvent;
     FOnClickMicromap: TATSynEditClickMicromapEvent;
@@ -463,7 +465,6 @@ type
     FOnDrawMicromap: TATSynEditDrawRectEvent;
     FOnDrawEditor: TATSynEditDrawRectEvent;
     FOnDrawRuler: TATSynEditDrawRectEvent;
-    FOnChangeState: TNotifyEvent;
     FOnCommand: TATSynEditCommandEvent;
     FOnCommandAfter: TATSynEditCommandAfterEvent;
     FOnCalcHilite: TATSynEditCalcHiliteEvent;
@@ -488,6 +489,7 @@ type
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
     FPrevVisibleColumns: integer;
+    FPrevModified: boolean;
     FCharSize: TPoint;
     FCharSizeMinimap: TPoint;
     FCharSpacingText: TPoint;
@@ -1272,6 +1274,7 @@ type
     property OnCheckInput: TATSynEditCheckInputEvent read FOnCheckInput write FOnCheckInput;
     property OnIdle: TNotifyEvent read FOnIdle write FOnIdle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChangeModified: TNotifyEvent read FOnChangeModified write FOnChangeModified;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
     property OnScroll: TNotifyEvent read FOnScroll write FOnScroll;
@@ -5196,8 +5199,17 @@ begin
   end;
 
   if AllowOnChange then
+  begin
     if Assigned(FOnChange) then
       FOnChange(Self);
+
+    if FPrevModified<>Modified then
+    begin
+      FPrevModified:= Modified;
+      if Assigned(FOnChangeModified) then
+        FOnChangeModified(Self);
+    end;
+  end;
 
   //fire OnIdle after pause after change
   if FOptIdleInterval>0 then
