@@ -16,4 +16,11 @@ begin
   end;
 end;
 
+procedure aa2;
+begin
+  begin 
+    aa
+  end;
+end;
+
 end.
