@@ -31,7 +31,6 @@ uses
   ATStringProc,
   ATStrings,
   ATStringProc_WordJump,
-  ATSynEdit_Timer,
   ATSynEdit_CharSizer,
   ATSynEdit_RegExpr,
   ATSynEdit_ScrollBar,
@@ -353,10 +352,10 @@ type
     FFontBold: TFont;
     FFontBoldItalic: TFont;
     FTimersEnabled: boolean;
-    FTimerIdle: TATSafeTimer;
-    FTimerBlink: TATSafeTimer;
-    FTimerScroll: TATSafeTimer;
-    FTimerNiceScroll: TATSafeTimer;
+    FTimerIdle: TTimer;
+    FTimerBlink: TTimer;
+    FTimerScroll: TTimer;
+    FTimerNiceScroll: TTimer;
     FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
     FPaintLocked: integer;
@@ -3120,21 +3119,21 @@ begin
   FCursorMinimap:= crDefault;
   FCursorMicromap:= crDefault;
 
-  FTimerIdle:= TATSafeTimer.Create(Self);
+  FTimerIdle:= TTimer.Create(Self);
   FTimerIdle.Enabled:= false;
   FTimerIdle.OnTimer:=@TimerIdleTick;
 
-  FTimerBlink:= TATSafeTimer.Create(Self);
+  FTimerBlink:= TTimer.Create(Self);
   SetCaretBlinkTime(cInitCaretBlinkTime);
   FTimerBlink.OnTimer:= @TimerBlinkTick;
   FTimerBlink.Enabled:= false; //true;
 
-  FTimerScroll:= TATSafeTimer.Create(Self);
+  FTimerScroll:= TTimer.Create(Self);
   FTimerScroll.Interval:= cInitTimerAutoScroll;
   FTimerScroll.OnTimer:= @TimerScrollTick;
   FTimerScroll.Enabled:= false;
 
-  FTimerNiceScroll:= TATSafeTimer.Create(Self);
+  FTimerNiceScroll:= TTimer.Create(Self);
   FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
   FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
   FTimerNiceScroll.Enabled:= false;
@@ -5565,7 +5564,7 @@ end;
 
 procedure TATSynEdit.TimersStart;
 //TimersStart/Stop are added to minimize count of running timers,
-//which are threads on Unix (TATSafeTimer).
+//which are threads on Unix (TTimer).
 begin
   FTimersEnabled:= true;
   if Assigned(FTimerBlink) then
