@@ -13,9 +13,9 @@
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
-    <Description Value="Multi-line editor control, analog to SynEdit, but with much more features. Supports syntax highlighting using EControl engine."/>
+    <Description Value="Multi-line editor control, with much more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
-    <Version Major="1"/>
+    <Version Major="1" Minor="2"/>
     <Files Count="34">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>

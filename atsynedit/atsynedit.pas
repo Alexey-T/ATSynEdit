@@ -5563,8 +5563,7 @@ begin
 end;
 
 procedure TATSynEdit.TimersStart;
-//TimersStart/Stop are added to minimize count of running timers,
-//which are threads on Unix (TTimer).
+//TimersStart/Stop are added to minimize count of running timers
 begin
   FTimersEnabled:= true;
   if Assigned(FTimerBlink) then
