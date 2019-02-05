@@ -2397,7 +2397,9 @@ begin
     Str:= Strings.LineSub(
       NLinesIndex,
       WrapItem.NCharIndex,
-      Min(WrapItem.NLength, GetVisibleColumns+ScrollHorz.NPos+1) //+1 because of NPixelOffset
+      Min(WrapItem.NLength, GetVisibleColumns+ScrollHorz.NPos+1+6)
+        //+1 because of NPixelOffset
+        //+6 because of HTML color underlines
       );
 
     LineSeparator:= Strings.LinesSeparator[NLinesIndex];
