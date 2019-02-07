@@ -59,7 +59,6 @@ type
     FBlockSepLine,
     FLinks,
     FLockedBG,
-    FGapsBG,
     FMarkedLinesBG,
     FBorderLine,
     FBorderLineFocused,
@@ -110,7 +109,6 @@ type
     property BlockSepLine: TColor read FBlockSepLine write FBlockSepLine;
     property Links: TColor read FLinks write FLinks;
     property LockedBG: TColor read FLockedBG write FLockedBG;
-    property GapsBG: TColor read FGapsBG write FGapsBG;
     property TextHintFont: TColor read FTextHintFont write FTextHintFont;
     property MarkedLinesBG: TColor read FMarkedLinesBG write FMarkedLinesBG;
     property BorderLine: TColor read FBorderLine write FBorderLine;
@@ -171,7 +169,6 @@ begin
   C.BlockSepLine:= clMedGray;
   C.Links:= clBlue;
   C.LockedBG:= $e0e0e0;
-  C.GapsBG:= clNone;
   C.MarkedLinesBG:= $f0e0b0;
   C.BorderLine:= clMedGray;
   C.BorderLineFocused:= clNavy;

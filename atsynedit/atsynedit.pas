@@ -2883,7 +2883,7 @@ var
   RHere, RBmp: TRect;
   NColor: TColor;
 begin
-  NColor:= Colors.GapsBG;
+  NColor:= AGap.Color;
   if NColor<>clNone then
   begin
     C.Brush.Color:= NColor;

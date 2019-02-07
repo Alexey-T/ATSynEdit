@@ -30,6 +30,7 @@ type
     Tag: Int64;
     DeleteOnDelLine: boolean;
     Control: TControl;
+    Color: TColor;
     constructor Create; virtual;
     destructor Destroy; override;
   end;
@@ -83,6 +84,7 @@ constructor TATGapItem.Create;
 begin
   Bitmap:= nil;
   DeleteOnDelLine:= true;
+  Color:= clNone;
 end;
 
 destructor TATGapItem.Destroy;

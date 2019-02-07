@@ -1,6 +1,6 @@
 
 2019.02.06
-+ add: Colors.GapsBG (has effect if not clNone)
++ add: Gaps items have new Color property
 
 2019.02.04
 + add: event OnChangeModified
