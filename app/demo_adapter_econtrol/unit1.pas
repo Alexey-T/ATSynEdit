@@ -203,7 +203,10 @@ end;
 
 procedure TfmMain.EditorChangeCaretPos(Sender: TObject);
 begin
-  adapter.TreeShowItemForCaret(Tree, Point(ed.Carets[0].PosX, ed.Carets[0].PosY));
+  CodetreeSelectItemForPosition(Tree, Point(
+    ed.Carets[0].PosX,
+    ed.Carets[0].PosY
+    ));
 end;
 
 procedure TfmMain.chkFullSelChange(Sender: TObject);
