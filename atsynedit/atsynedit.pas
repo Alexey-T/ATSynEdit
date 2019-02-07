@@ -2881,7 +2881,15 @@ end;
 procedure TATSynEdit.DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
 var
   RHere, RBmp: TRect;
+  NColor: TColor;
 begin
+  NColor:= Colors.GapsBG;
+  if NColor<>clNone then
+  begin
+    C.Brush.Color:= NColor;
+    C.FillRect(ARect);
+  end;
+
   if AGap.Bitmap<>nil then
   begin
     RBmp:= Rect(0, 0, AGap.Bitmap.Width, AGap.Bitmap.Height);

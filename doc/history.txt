@@ -1,4 +1,7 @@
 
+2019.02.06
++ add: Colors.GapsBG (has effect if not clNone)
+
 2019.02.04
 + add: event OnChangeModified
 
