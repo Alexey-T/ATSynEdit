@@ -30,6 +30,7 @@ type
     Tag: Int64;
     DeleteOnDelLine: boolean;
     Control: TControl;
+    Color: TColor;
     constructor Create; virtual;
     destructor Destroy; override;
   end;
@@ -54,7 +55,7 @@ type
     property Items[N: integer]: TATGapItem read GetItem; default;
     procedure Delete(N: integer);
     function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; const ATag: Int64;
-      ADeleteOnDelLine: boolean=true): boolean;
+      AColor: TColor=clNone; ADeleteOnDelLine: boolean=true): boolean;
     function Find(ALineIndex: integer; ATag: Int64=-1): TATGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
@@ -83,6 +84,7 @@ constructor TATGapItem.Create;
 begin
   Bitmap:= nil;
   DeleteOnDelLine:= true;
+  Color:= clNone;
 end;
 
 destructor TATGapItem.Destroy;
@@ -161,8 +163,8 @@ begin
   end;
 end;
 
-function TATGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap; const ATag: Int64;
-  ADeleteOnDelLine: boolean): boolean;
+function TATGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap;
+  const ATag: Int64; AColor: TColor; ADeleteOnDelLine: boolean): boolean;
 var
   Item: TATGapItem;
 begin
@@ -176,6 +178,7 @@ begin
   Item.Size:= ASize;
   Item.Bitmap:= ABitmap;
   Item.Tag:= ATag;
+  Item.Color:= AColor;
   Item.DeleteOnDelLine:= ADeleteOnDelLine;
 
   FList.Add(Item);

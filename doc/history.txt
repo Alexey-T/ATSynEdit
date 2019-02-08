@@ -1,4 +1,7 @@
 
+2019.02.06
++ add: Gaps items have new Color property
+
 2019.02.04
 + add: event OnChangeModified
 
