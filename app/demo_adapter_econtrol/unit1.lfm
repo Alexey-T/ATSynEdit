@@ -145,7 +145,7 @@ object fmMain: TfmMain
       TabOrder = 9
     end
     object Label1: TLabel
-      Left = 227
+      Left = 216
       Height = 21
       Top = 76
       Width = 45
@@ -457,7 +457,7 @@ object fmMain: TfmMain
   end
   object Timer1: TTimer
     OnTimer = Timer1Timer
-    left = 297
-    top = 480
+    left = 248
+    top = 512
   end
 end
