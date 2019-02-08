@@ -1,53 +1,58 @@
 object fmMain: TfmMain
   Left = 327
-  Height = 578
+  Height = 626
   Top = 137
-  Width = 889
+  Width = 963
   Caption = 'Demo'
-  ClientHeight = 578
-  ClientWidth = 889
+  ClientHeight = 626
+  ClientWidth = 963
+  DesignTimePPI = 104
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '1.9.0.0'
   object Panel1: TPanel
     Left = 0
-    Height = 218
-    Top = 360
-    Width = 889
+    Height = 236
+    Top = 390
+    Width = 963
     Align = alBottom
     BevelOuter = bvNone
-    ClientHeight = 218
-    ClientWidth = 889
+    ClientHeight = 236
+    ClientWidth = 963
+    ParentFont = False
     TabOrder = 0
     object chkWrap: TCheckBox
-      Left = 9
+      Left = 10
       Height = 23
-      Top = 8
-      Width = 90
+      Top = 9
+      Width = 97
       Caption = 'word wrap'
       OnChange = chkWrapChange
+      ParentFont = False
       TabOrder = 0
     end
     object edLexer: TComboBox
-      Left = 9
-      Height = 30
-      Top = 120
-      Width = 176
+      Left = 10
+      Height = 37
+      Top = 130
+      Width = 191
       DropDownCount = 24
       ItemHeight = 0
       OnChange = edLexerChange
+      ParentFont = False
       Style = csDropDownList
       TabOrder = 5
     end
     object files: TShellListView
-      Left = 352
-      Height = 208
+      Left = 381
+      Height = 225
       Top = 3
-      Width = 528
+      Width = 572
       Anchors = [akTop, akLeft, akBottom]
       Color = clDefault
       HideSelection = False
+      ParentFont = False
       ReadOnly = True
       ShowColumnHeaders = False
       SortType = stText
@@ -58,89 +63,106 @@ object fmMain: TfmMain
       ObjectTypes = [otNonFolders]
     end
     object chkFullSel: TCheckBox
-      Left = 9
+      Left = 10
       Height = 23
-      Top = 48
-      Width = 119
+      Top = 52
+      Width = 132
       Caption = 'show full sel-bg'
       OnChange = chkFullSelChange
+      ParentFont = False
       TabOrder = 2
     end
     object chkFullHilite: TCheckBox
-      Left = 9
+      Left = 10
       Height = 23
-      Top = 68
-      Width = 143
+      Top = 74
+      Width = 157
       Caption = 'show full syntax-bg'
       OnChange = chkFullHiliteChange
+      ParentFont = False
       TabOrder = 3
     end
     object bOpen: TButton
-      Left = 192
-      Height = 25
-      Top = 8
-      Width = 152
+      Left = 208
+      Height = 27
+      Top = 9
+      Width = 165
       Caption = 'open...'
       OnClick = bOpenClick
+      ParentFont = False
       TabOrder = 8
     end
     object chkUnpri: TCheckBox
-      Left = 9
+      Left = 10
       Height = 23
-      Top = 28
-      Width = 121
+      Top = 30
+      Width = 132
       Caption = 'show unprinted'
       OnChange = chkUnpriChange
+      ParentFont = False
       TabOrder = 1
     end
     object chkShowCur: TCheckBox
-      Left = 9
+      Left = 10
       Height = 23
-      Top = 88
-      Width = 126
+      Top = 95
+      Width = 137
       Caption = 'show cur line bg'
       OnChange = chkShowCurChange
+      ParentFont = False
       TabOrder = 4
     end
     object chkLexer: TCheckBox
-      Left = 9
+      Left = 10
       Height = 23
-      Top = 152
-      Width = 99
+      Top = 165
+      Width = 108
       Caption = 'enable lexer'
       Checked = True
       OnChange = chkLexerChange
+      ParentFont = False
       State = cbChecked
       TabOrder = 6
     end
     object chkDyn: TCheckBox
-      Left = 9
+      Left = 10
       Height = 23
-      Top = 176
-      Width = 111
+      Top = 191
+      Width = 120
       Caption = 'dynamic hilite'
       OnChange = chkDynChange
+      ParentFont = False
       TabOrder = 7
     end
     object bExport: TButton
-      Left = 192
-      Height = 25
-      Top = 40
-      Width = 152
+      Left = 208
+      Height = 27
+      Top = 43
+      Width = 165
       Caption = 'export html'
       OnClick = bExportClick
+      ParentFont = False
       TabOrder = 9
+    end
+    object Label1: TLabel
+      Left = 216
+      Height = 21
+      Top = 76
+      Width = 45
+      Caption = 'Label1'
+      ParentColor = False
     end
   end
   object Tree: TTreeView
     Left = 0
-    Height = 360
+    Height = 390
     Top = 0
-    Width = 240
+    Width = 260
     Align = alLeft
-    ExpandSignSize = 7
+    ExpandSignSize = 8
     HideSelection = False
     Images = ImageListTree
+    ParentFont = False
     ReadOnly = True
     RightClickSelect = True
     RowSelect = True
@@ -149,29 +171,30 @@ object fmMain: TfmMain
     Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoRightClickSelect, tvoRowSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips]
   end
   object PanelText: TPanel
-    Left = 245
-    Height = 360
+    Left = 265
+    Height = 390
     Top = 0
-    Width = 644
+    Width = 698
     Align = alClient
     BevelOuter = bvNone
     Caption = 'PanelText'
+    ParentFont = False
     TabOrder = 2
   end
   object Splitter1: TSplitter
-    Left = 240
-    Height = 360
+    Left = 260
+    Height = 390
     Top = 0
     Width = 5
   end
   object OpenDialog1: TOpenDialog
-    left = 264
-    top = 176
+    left = 286
+    top = 191
   end
   object ImageListTree: TImageList
     AllocBy = 10
-    left = 368
-    top = 176
+    left = 399
+    top = 191
     Bitmap = {
       4C69080000001000000010000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -431,5 +454,10 @@ object fmMain: TfmMain
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000
     }
+  end
+  object Timer1: TTimer
+    OnTimer = Timer1Timer
+    left = 248
+    top = 512
   end
 end
