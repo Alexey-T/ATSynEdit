@@ -33,10 +33,12 @@ type
     edLexer: TComboBox;
     files: TShellListView;
     ImageListTree: TImageList;
+    Label1: TLabel;
     OpenDialog1: TOpenDialog;
     Panel1: TPanel;
     PanelText: TPanel;
     Splitter1: TSplitter;
+    Timer1: TTimer;
     Tree: TTreeView;
     procedure AdapterParseBegin(Sender: TObject);
     procedure AdapterParseDone(Sender: TObject);
@@ -54,6 +56,7 @@ type
     procedure filesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
     procedure TreeClick(Sender: TObject);
   private
     { private declarations }
@@ -167,6 +170,14 @@ procedure TfmMain.FormShow(Sender: TObject);
 begin
   if DirectoryExists(FDirApp) then
     files.Root:= ExtractFileDir(ExtractFileDir(FDirApp))+DirectorySeparator+'test_syntax_files';
+end;
+
+procedure TfmMain.Timer1Timer(Sender: TObject);
+var
+  MM:TMemoryManager;
+begin
+  GetMemoryManager(MM);
+  Label1.Caption:=inttostr(MM.GetFPCHeapStatus().CurrHeapUsed);
 end;
 
 procedure TfmMain.TreeClick(Sender: TObject);
