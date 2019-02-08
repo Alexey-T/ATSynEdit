@@ -38,7 +38,7 @@ type
     Panel1: TPanel;
     PanelText: TPanel;
     Splitter1: TSplitter;
-    Timer1: TTimer;
+    TimerMemory: TTimer;
     Tree: TTreeView;
     procedure AdapterParseBegin(Sender: TObject);
     procedure AdapterParseDone(Sender: TObject);
@@ -56,7 +56,7 @@ type
     procedure filesClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure Timer1Timer(Sender: TObject);
+    procedure TimerMemoryTimer(Sender: TObject);
     procedure TreeClick(Sender: TObject);
   private
     { private declarations }
@@ -172,12 +172,12 @@ begin
     files.Root:= ExtractFileDir(ExtractFileDir(FDirApp))+DirectorySeparator+'test_syntax_files';
 end;
 
-procedure TfmMain.Timer1Timer(Sender: TObject);
+procedure TfmMain.TimerMemoryTimer(Sender: TObject);
 var
-  MM:TMemoryManager;
+  MM: TMemoryManager;
 begin
   GetMemoryManager(MM);
-  Label1.Caption:='Used Mem:'+inttostr(MM.GetFPCHeapStatus().CurrHeapUsed);
+  Label1.Caption:= 'Used mem: '+IntToStr(MM.GetFPCHeapStatus().CurrHeapUsed);
 end;
 
 procedure TfmMain.TreeClick(Sender: TObject);
