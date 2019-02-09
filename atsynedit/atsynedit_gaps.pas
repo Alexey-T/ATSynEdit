@@ -26,11 +26,10 @@ type
   public
     LineIndex: integer;
     Size: integer;
+    Color: TColor;
     Bitmap: TBitmap;
     Tag: Int64;
     DeleteOnDelLine: boolean;
-    Control: TControl;
-    Color: TColor;
     constructor Create; virtual;
     destructor Destroy; override;
   end;
