@@ -62,10 +62,6 @@ type
     property OnDelete: TATGapDeleteEvent read FOnDelete write FOnDelete;
   end;
 
-var
-  cMinGapSize: integer = 8;
-  cMaxGapSize: integer = 500;
-
 function GetGapBitmapPosLeft(const ARect: TRect; ABitmap: TBitmap): integer;
 
 
@@ -169,7 +165,6 @@ var
 begin
   Result:= false;
   if (ALineIndex<-1) then exit;
-  if (ASize<cMinGapSize) or (ASize>cMaxGapSize) then exit;
   if Find(ALineIndex)<>nil then exit;
 
   Item:= TATGapItem.Create;
