@@ -5868,7 +5868,7 @@ end;
 procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
 var
   Decor: TATGutterDecorItem;
-  Style: TFontStyles;
+  Style, StylePrev: TFontStyles;
   N: integer;
   Ext: TSize;
 begin
@@ -5884,6 +5884,7 @@ begin
       Include(Style, fsBold);
     if Decor.Data.TextItalic then
       Include(Style, fsItalic);
+    StylePrev:= C.Font.Style;
     C.Font.Style:= Style;
 
     Ext:= C.TextExtent(Decor.Data.Text);
@@ -5893,6 +5894,7 @@ begin
       (ARect.Top+ARect.Bottom-Ext.cy) div 2,
       Decor.Data.Text
       );
+    C.Font.Style:= StylePrev;
   end
   else
   if Assigned(FGutterDecorImages) then
