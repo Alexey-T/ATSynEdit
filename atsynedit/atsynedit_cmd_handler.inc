@@ -169,10 +169,12 @@ begin
         FScrollHorz.NPixelOffset:= 0;
   end;
 
-  Update;
-
-  //Paint call needed, to repaint after "Fold all" (Linux gtk2)
+  //- don't call Update, because it does unneeded Invalidate (we call Paint below so Invalidate not needed)
+  //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
   //and it helps to not skip repaints in big files with EControl lexer
+  UpdateCursor;
+  Include(FPaintFlags, cPaintUpdateScrollbars);
+  Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Paint;
 end;
 
