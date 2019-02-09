@@ -170,6 +170,10 @@ begin
   end;
 
   Update;
+
+  //Paint call needed, to repaint after "Fold all" (Linux gtk2)
+  //and it helps to not skip repaints in big files with EControl lexer
+  Paint;
 end;
 
 procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');
