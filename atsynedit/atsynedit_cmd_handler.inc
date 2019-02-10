@@ -103,7 +103,10 @@ end;
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
 var
   Caret: TATCaretItem;
+  bNeedRepaint: boolean;
 begin
+  bNeedRepaint:= false;
+
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
     if (cResultText in Res) then
@@ -115,6 +118,7 @@ begin
   if (cResultText in Res) or
      (cResultFoldChange in Res) then
   begin
+    bNeedRepaint:= true;
     FWrapUpdateNeeded:= true;
     UpdateWrapInfo;
   end;
@@ -169,7 +173,7 @@ begin
         FScrollHorz.NPixelOffset:= 0;
   end;
 
-  if FOptPaintOften then
+  if bNeedRepaint or FOptPaintOften then
   begin
     //- don't call Update, because it does unneeded Invalidate (we call Paint below so Invalidate not needed)
     //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
@@ -178,6 +182,7 @@ begin
     Include(FPaintFlags, cPaintUpdateScrollbars);
     Include(FPaintFlags, cPaintUpdateCaretsCoords);
     Paint;
+    Invalidate;
   end
   else
     Invalidate;
