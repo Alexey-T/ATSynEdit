@@ -232,7 +232,6 @@ type
   end;
 
 const
-  cInitPaintOften = false;
   cInitScrollbarHorzAddSpace = 4;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
@@ -545,7 +544,6 @@ type
     FTickMinimap: DWord;
     FTickAll: DWord;
     {$endif}
-    FOptPaintOften: boolean;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptMaxLinesToCountUnindent: integer;
@@ -1309,7 +1307,6 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
-    property OptPaintOften: boolean read FOptPaintOften write FOptPaintOften default cInitPaintOften;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
@@ -3183,7 +3180,6 @@ begin
   FMarginList:= TList.Create;
   FFoldedMarkList:= TList.Create;
   FOptIdleInterval:= cInitIdleInterval;
-  FOptPaintOften:= cInitPaintOften;
 
   FUnprintedVisible:= true;
   FUnprintedSpaces:= true;

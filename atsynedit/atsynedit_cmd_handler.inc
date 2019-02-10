@@ -173,7 +173,7 @@ begin
         FScrollHorz.NPixelOffset:= 0;
   end;
 
-  if bNeedRepaint or FOptPaintOften then
+  if bNeedRepaint then
   begin
     //- don't call Update, because it does unneeded Invalidate (we call Paint below so Invalidate not needed)
     //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
