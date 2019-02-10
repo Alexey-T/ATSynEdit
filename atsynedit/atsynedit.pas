@@ -6135,6 +6135,7 @@ begin
     FMarkedRange.Add(0, ALine1);
     FMarkedRange.Add(0, ALine2);
   end;
+  InvalidateHilitingCache;
 end;
 
 procedure TATSynEdit.DoGetMarkedLines(out ALine1, ALine2: integer);
