@@ -5018,15 +5018,6 @@ var
   Item: TATCaretItem;
   CaretProps: TATCaretProps;
 begin
-  {
-  //not needed - TimersStop is called
-  if FCaretBlinkEnabled then
-  begin
-    if IsCaretBlocked then
-      if not FCaretShown then Exit;
-  end;
-  }
-
   if ModeReadOnly then
     CaretProps:= FCaretPropsReadonly
   else
