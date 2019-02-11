@@ -3749,6 +3749,7 @@ begin
   FTickAll:= GetTickCount64;
   {$endif}
 
+  FCaretShown:= false;
   DoPaintMainTo(C, ALineFrom);
 
   if cPaintUpdateCaretsCoords in AFlags then
@@ -3766,8 +3767,6 @@ begin
   FTickAll:= GetTickCount64-FTickAll;
   DoPaintFPS(C, FTickAll, FTickMinimap);
   {$endif}
-
-  FCaretShown:= false;
 end;
 
 function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
@@ -5016,14 +5015,14 @@ var
   Item: TATCaretItem;
   CaretProps: TATCaretProps;
 begin
-  //only for blinking caret
+  {
+  //not needed - TimersStop is called
   if FCaretBlinkEnabled then
   begin
     if IsCaretBlocked then
       if not FCaretShown then Exit;
-
-    FCaretShown:= not FCaretShown;
   end;
+  }
 
   if ModeReadOnly then
     CaretProps:= FCaretPropsReadonly
@@ -5051,6 +5050,7 @@ begin
 
     if FCaretBlinkEnabled then
     begin
+      FCaretShown:= not FCaretShown;
       CanvasInvertRect(C, R, Colors.Caret);
       //if shape FrameFull, invert inner area
       if CaretProps.EmptyInside then
@@ -5058,6 +5058,7 @@ begin
     end
     else
     begin
+      FCaretShown:= true;
       //paint non-blinking caret simpler
       C.Brush.Color:= Colors.Caret;
       C.FillRect(R);
