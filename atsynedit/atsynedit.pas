@@ -788,7 +788,7 @@ type
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintRulerTo(C: TCanvas);
-    procedure DoPaintFPS(C: TCanvas; ATimeAll, ATimeMinimap: integer);
+    procedure DoPaintFPS(C: TCanvas);
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
       var AScrollHorz, AScrollVert: TATSynScrollInfo; ALineFrom: integer);
@@ -3773,7 +3773,7 @@ begin
 
   {$ifdef debug_show_fps}
   FTickAll:= GetTickCount64-FTickAll;
-  DoPaintFPS(C, FTickAll, FTickMinimap);
+  DoPaintFPS(C);
   {$endif}
 end;
 
@@ -6630,21 +6630,25 @@ begin
   FTabHelper.OnCalcTabSize:= FOnCalcTabSize;
 end;
 
-procedure TATSynEdit.DoPaintFPS(C: TCanvas; ATimeAll, ATimeMinimap: integer);
+procedure TATSynEdit.DoPaintFPS(C: TCanvas);
 var
   S: string;
 begin
-  if ATimeAll<3 then exit;
-  S:= IntToStr(1000 div ATimeAll div 5 * 5);
+  {$ifdef DEBUG_SHOW_FPS}
+  if FTickAll<3 then exit;
+  S:= IntToStr(1000 div FTickAll div 5 * 5);
 
-  if ATimeMinimap>1 then
-    S+= ':'+IntToStr(1000 div ATimeMinimap)+' fps, #'+IntToStr(FPaintCounter);
+  if FTickMinimap>1 then
+    S+= ':'+IntToStr(1000 div FTickMinimap);
+
+  S+=' fps, #'+IntToStr(FPaintCounter);
 
   C.Font.Name:= 'Arial';
   C.Font.Color:= clRed;
   C.Font.Size:= 8;
   C.Brush.Color:= clCream;
   C.TextOut(ClientWidth-90, 5, S);
+  {$endif}
 end;
 
 
