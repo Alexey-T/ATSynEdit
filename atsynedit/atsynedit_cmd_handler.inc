@@ -42,10 +42,13 @@ begin
       end;
   end;
 
-  DoPaintModeStatic;
   NCmd:= GetCommandFromKey(Key, Shift);
-  DoCommand(NCmd);
-  DoPaintModeBlinking;
+  if NCmd>0 then
+  begin
+    DoPaintModeStatic;
+    DoCommand(NCmd);
+    DoPaintModeBlinking;
+  end;
 end;
 
 procedure TATSynEdit.UTF8KeyPress(var UTF8Key: TUTF8Char);
@@ -68,7 +71,10 @@ begin
     if not Allow then Exit;
   end;
 
+  DoPaintModeStatic;
   DoCommand(cCommand_TextInsert, Str);
+  DoPaintModeBlinking;
+
   Utf8Key:= '';
 end;
 
