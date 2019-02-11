@@ -356,7 +356,6 @@ type
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
     FTimerNiceScroll: TTimer;
-    FPaintStatic: boolean;
     FPaintFlags: TATSynPaintFlags;
     FPaintLocked: integer;
     FBitmap: TBitmap;
@@ -3113,7 +3112,6 @@ begin
   FAdapterCache:= TATAdapterHiliteCache.Create;
 
   FPaintLocked:= 0;
-  FPaintStatic:= false;
   FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
 
   FColors:= TATSynEditColors.Create;
@@ -5073,19 +5071,13 @@ end;
 
 procedure TATSynEdit.DoPaintModeStatic;
 begin
-  FPaintStatic:= true;
   FTimerBlink.Enabled:= false;
-  Invalidate;
 end;
 
 procedure TATSynEdit.DoPaintModeBlinking;
 begin
-  FPaintStatic:= false;
-  if Assigned(FTimerBlink) then
-  begin
-    FTimerBlink.Enabled:= false;
-    FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;
-  end;
+  FTimerBlink.Enabled:= false;
+  FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;
 end;
 
 

@@ -41,11 +41,8 @@ begin
   end;
 
   DoPaintModeStatic;
-  try
-    DoCommand(GetCommandFromKey(Key, Shift));
-  finally
-    DoPaintModeBlinking;
-  end;
+  DoCommand(GetCommandFromKey(Key, Shift));
+  DoPaintModeBlinking;
 end;
 
 procedure TATSynEdit.UTF8KeyPress(var UTF8Key: TUTF8Char);

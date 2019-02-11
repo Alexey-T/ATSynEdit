@@ -415,7 +415,6 @@ procedure TATSynEdit.SetCaretBlinkEnabled(AValue: boolean);
 begin
   if FCaretBlinkEnabled=AValue then Exit;
   FCaretBlinkEnabled:= AValue;
-  DoPaintModeStatic;
   DoPaintModeBlinking;
 end;
 
