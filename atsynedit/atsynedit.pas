@@ -828,7 +828,7 @@ type
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
     function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
-    procedure DoCaretsSort; inline;
+    procedure DoCaretsSort;
     //events
     procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
@@ -1100,11 +1100,11 @@ type
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoCaretForceShow;
-    function CaretPosToClientPos(P: TPoint): TPoint; inline;
+    function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint;
       out ADetails: TATPosDetails;
-      AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint; inline;
-    function IsLineWithCaret(ALine: integer): boolean; inline;
+      AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
+    function IsLineWithCaret(ALine: integer): boolean;
     //goto
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
@@ -1144,13 +1144,13 @@ type
     procedure MarkerGotoLast(AndDelete: boolean; AIndentHorz, AIndentVert: integer);
     procedure MarkerSwap;
     //misc
-    function GetVisibleLines: integer; inline;
-    function GetVisibleColumns: integer; inline;
+    function GetVisibleLines: integer;
+    function GetVisibleColumns: integer;
     function GetVisibleLinesMinimap: integer; inline;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
-    procedure BeginUpdate; inline;
-    procedure EndUpdate; inline;
-    function IsLocked: boolean; inline;
+    procedure BeginUpdate;
+    procedure EndUpdate;
+    function IsLocked: boolean;
     function TextSelected: atString;
     function TextCurrentWord: atString;
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
@@ -1846,12 +1846,12 @@ begin
   until Str='';
 end;
 
-function TATSynEdit.GetVisibleLines: integer;
+function TATSynEdit.GetVisibleLines: integer; inline;
 begin
   Result:= FRectMainVisible.Height div FCharSize.Y;
 end;
 
-function TATSynEdit.GetVisibleColumns: integer;
+function TATSynEdit.GetVisibleColumns: integer; inline;
 begin
   Result:= FRectMainVisible.Width div FCharSize.X;
 end;
@@ -5645,13 +5645,13 @@ begin
   Update;
 end;
 
-procedure TATSynEdit.BeginUpdate;
+procedure TATSynEdit.BeginUpdate; inline;
 begin
   Inc(FPaintLocked);
   Invalidate;
 end;
 
-procedure TATSynEdit.EndUpdate;
+procedure TATSynEdit.EndUpdate; inline;
 begin
   Dec(FPaintLocked);
   if FPaintLocked<0 then
@@ -5660,7 +5660,7 @@ begin
     Invalidate;
 end;
 
-function TATSynEdit.IsLocked: boolean;
+function TATSynEdit.IsLocked: boolean; inline;
 begin
   Result:= FPaintLocked>0;
 end;
