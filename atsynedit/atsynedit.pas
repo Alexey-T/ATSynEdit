@@ -5416,17 +5416,14 @@ begin
   //calc insert-pos
   P:= ScreenToClient(Mouse.CursorPos);
   P:= ClientPosToCaretPos(P, Details);
-  if P.Y<0 then
-    begin Beep; Exit end;
+  if P.Y<0 then exit;
 
   //can't drop into selection
   Relation:= IsPosInRange(P.X, P.Y, X1, Y1, X2, Y2);
-  if Relation=cRelateInside then
-    begin Beep; Exit end;
+  if Relation=cRelateInside then exit;
 
   Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
-  if Str='' then
-    begin Beep; Exit end;
+  if Str='' then exit;
 
   //insert before selection?
   if Relation=cRelateBefore then
