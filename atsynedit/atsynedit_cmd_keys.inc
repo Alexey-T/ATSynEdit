@@ -97,6 +97,7 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
+    if not Strings.IsIndexValid(Caret.PosY) then Continue;
     if (Caret.PosX>0) then
       Dec(Caret.PosX)
     else
@@ -125,6 +126,7 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
+    if not Strings.IsIndexValid(Caret.PosY) then Continue;
     if (Caret.PosX<Strings.LinesLen[Caret.PosY]) or FCaretVirtual then
       Inc(Caret.PosX)
     else
