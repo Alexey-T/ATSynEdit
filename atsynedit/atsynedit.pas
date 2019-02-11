@@ -3778,8 +3778,8 @@ begin
 end;
 
 function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
+//gets True if one of scrollbars changed Visible state
 begin
-  Result:= false;
   UpdateTabHelper;
 
   if DoubleBuffered then
