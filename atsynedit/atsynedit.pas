@@ -3895,8 +3895,12 @@ begin
     end;
   end;
 
-  FWrapUpdateNeeded:= true;
-  Include(FPaintFlags, cPaintUpdateCaretsCoords);
+  if FWrapMode in [cWrapOn, cWrapAtWindowOrMargin] then
+  begin
+    FWrapUpdateNeeded:= true;
+    Include(FPaintFlags, cPaintUpdateCaretsCoords);
+  end;
+
   Include(FPaintFlags, cPaintUpdateBitmap);
   PaintEx(LineTop);
 end;
