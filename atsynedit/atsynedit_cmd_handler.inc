@@ -130,6 +130,7 @@ begin
         SetCursor(crNone);
   end;
 
+  DoCaretsFixIfInsideFolded;
   DoCaretsSort;
   UpdateCaretsCoords;
 
@@ -144,7 +145,6 @@ begin
   begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
-    DoCaretsFixIfInsideFolded;
     DoEventCarets;
   end;
 
