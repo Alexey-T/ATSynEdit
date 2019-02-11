@@ -138,17 +138,17 @@ begin
     cResultCaretLeft, cResultCaretRight,
     cResultCaretTop, cResultCaretBottom]<>[] then
   begin
-    if cResultCaretLeft in Res then
-      DoGotoCaret(cEdgeLeft)
-    else
-    if cResultCaretRight in Res then
-      DoGotoCaret(cEdgeRight)
-    else
     if cResultCaretTop in Res then
-      DoGotoCaret(cEdgeTop)
+      DoGotoCaret(cEdgeTop, false, false)
     else
     if cResultCaretBottom in Res then
-      DoGotoCaret(cEdgeBottom);
+      DoGotoCaret(cEdgeBottom, false, false)
+    else
+    if cResultCaretLeft in Res then
+      DoGotoCaret(cEdgeLeft, false, false)
+    else
+    if cResultCaretRight in Res then
+      DoGotoCaret(cEdgeRight, false, false);
 
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;

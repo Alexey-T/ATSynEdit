@@ -538,6 +538,7 @@ type
     FFoldedMark_LineFrom: integer;
     FFoldedMark_LineTo: integer;
     FFoldedMark_Rect: TRect;
+    FPaintCounter: integer;
     {$ifdef debug_show_fps}
     FTickMinimap: DWord;
     FTickAll: DWord;
@@ -1110,7 +1111,8 @@ type
       APlaceCaret, ADoUnfold: boolean;
       AAllowProcessMsg: boolean=true;
       AAllowUpdate: boolean=true);
-    procedure DoGotoCaret(AEdge: TATCaretEdge; AAllowUpdate: boolean=true);
+    procedure DoGotoCaret(AEdge: TATCaretEdge;
+      AAllowProcessMsg: boolean= true; AAllowUpdate: boolean= true);
     //bookmarks
     procedure BookmarkSetForLine(ALine, ABmKind: integer;
       const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
@@ -3754,6 +3756,7 @@ end;
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
 begin
   {$ifdef debug_show_fps}
+  Inc(FPaintCounter);
   FTickAll:= GetTickCount64;
   {$endif}
 
@@ -6635,13 +6638,13 @@ begin
   S:= IntToStr(1000 div ATimeAll div 5 * 5);
 
   if ATimeMinimap>1 then
-    S+= ':'+IntToStr(1000 div ATimeMinimap);
+    S+= ':'+IntToStr(1000 div ATimeMinimap)+' fps, #'+IntToStr(FPaintCounter);
 
   C.Font.Name:= 'Arial';
   C.Font.Color:= clRed;
   C.Font.Size:= 8;
   C.Brush.Color:= clCream;
-  C.TextOut(ClientWidth-60, 5, S+' fps');
+  C.TextOut(ClientWidth-90, 5, S);
 end;
 
 

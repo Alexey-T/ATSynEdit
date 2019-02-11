@@ -565,7 +565,8 @@ begin
     Update;
 end;
 
-procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge; AAllowUpdate: boolean=true);
+procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge;
+  AAllowProcessMsg: boolean=true; AAllowUpdate: boolean=true);
 begin
   DoGotoPos(
     Carets.CaretAtEdge(AEdge),
@@ -574,7 +575,7 @@ begin
     FOptScrollIndentCaretVert,
     false,
     false, //dont unfold
-    true,
+    AAllowProcessMsg,
     AAllowUpdate
     );
 end;
