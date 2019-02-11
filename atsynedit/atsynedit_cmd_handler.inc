@@ -162,8 +162,8 @@ begin
     DoEventChange;
   end;
 
-  if cResultScroll in Res then
-    DoEventScroll;
+  //if cResultScroll in Res then
+  //  DoEventScroll;
 
   if cResultState in Res then
     DoEventState;

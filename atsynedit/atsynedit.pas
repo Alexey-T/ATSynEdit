@@ -4967,7 +4967,7 @@ begin
 
   DoCaretsSort;
   DoEventCarets;
-  DoEventScroll;
+  //DoEventScroll;
   Update;
 end;
 
