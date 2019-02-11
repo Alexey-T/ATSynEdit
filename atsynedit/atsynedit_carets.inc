@@ -742,11 +742,6 @@ begin
     DoCaretSingle(0, 0);
 end;
 
-function TATSynEdit.IsCaretBlocked: boolean; inline;
-begin
-  Result:= FCaretStopUnfocused and not Focused;
-end;
-
 procedure TATSynEdit.UpdateIncorrectCaretPositions; inline;
 begin
   Carets.UpdateIncorrectPositions(Strings.Count-1);

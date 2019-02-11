@@ -760,7 +760,6 @@ type
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
     procedure DoInitPopupMenu;
-    function IsCaretBlocked: boolean; inline;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
@@ -4910,6 +4909,11 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
+  //don't check Focused here, it's slow
+  if FCaretStopUnfocused and not Application.Active then
+    if FCaretShown then
+      exit;
+
   if not DoubleBuffered then
     FCaretAllowNextBlink:= not FCaretAllowNextBlink;
 
