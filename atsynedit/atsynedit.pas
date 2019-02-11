@@ -3751,14 +3751,11 @@ begin
   DoPaintMainTo(C, ALineFrom);
 
   if cPaintUpdateCaretsCoords in AFlags then
-  begin
     UpdateCaretsCoords;
-    //paint margin
-    if FOptShowCurColumn and (Carets.Count>0) then
-      DoPaintMarginLineTo(C, Carets[0].CoordX, Colors.MarginCaret);
-  end;
 
-  //paint markers after calc carets
+  if FOptShowCurColumn and (Carets.Count>0) then
+    DoPaintMarginLineTo(C, Carets[0].CoordX, Colors.MarginCaret);
+
   DoPaintMarkersTo(C);
 
   {$ifdef debug_show_fps}
