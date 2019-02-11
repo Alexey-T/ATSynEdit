@@ -2339,6 +2339,16 @@ begin
         FLineParts,
         NColorAfter) then
         begin
+          DoCalcLineEntireColor(
+            WrapItem.NLineIndex,
+            false,
+            NColorEntire,
+            LineColorForced);
+
+          DoPartSetColorBG(FLineParts, NColorEntire, LineColorForced);
+          if LineColorForced then
+            NColorAfter:= NColorEntire;
+
           if NColorAfter<>clNone then
           begin
             C.Brush.Color:= NColorAfter;

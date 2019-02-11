@@ -34,13 +34,12 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   AMainText: boolean);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
-  bFound, bAddToCache: boolean;
+  bFound: boolean;
 begin
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
-  bAddToCache:= false;
 
   FillChar(AParts, SizeOf(AParts), 0);
 
@@ -54,7 +53,7 @@ begin
     if not bFound then
     begin
       FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
-      bAddToCache:= true;
+      FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
     end;
     {$else}
     FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
@@ -68,11 +67,6 @@ begin
   DoPartSetColorBG(AParts, AColorBG, AColorForced);
   if AColorForced then
     AColorAfter:= AColorBG;
-
-  //add to cache - after DoPartSetColorBG, before ApplyAttribsOver
-  //bookmarks - cached; attribs - not
-  if bAddToCache then
-    FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
 
   //first add Attribs,
   //selection must be over attribs
