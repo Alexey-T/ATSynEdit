@@ -402,6 +402,7 @@ type
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
     FCaretAllowNextBlink: boolean;
+    FIsFocused: boolean;
     FMarkers: TATMarkers;
     FAttribs: TATMarkers;
     FMarkedRange: TATMarkers;
@@ -2170,7 +2171,7 @@ begin
   if FMicromapVisible then
     DoPaintMicromapTo(C);
 
-  if FOptBorderFocusedActive and Focused then
+  if FOptBorderFocusedActive and FIsFocused then
     DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
   else
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
@@ -2438,7 +2439,7 @@ begin
 
     bUseColorOfCurrentLine:= false;
     if LineWithCaret then
-      if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or Self.Focused) then
+      if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsFocused) then
       begin
         if FOptShowCurLineMinimal then
           bUseColorOfCurrentLine:= IsLinePartWithCaret(NLinesIndex, NCoordTop)
@@ -5544,6 +5545,7 @@ end;
 procedure TATSynEdit.DoEnter;
 begin
   inherited;
+  FIsFocused:= true;
   if IsRepaintNeededOnEnterOrExit then
     Update;
   TimersStart;
@@ -5552,6 +5554,7 @@ end;
 procedure TATSynEdit.DoExit;
 begin
   inherited;
+  FIsFocused:= false;
   if IsRepaintNeededOnEnterOrExit then
     Update;
   TimersStop;
