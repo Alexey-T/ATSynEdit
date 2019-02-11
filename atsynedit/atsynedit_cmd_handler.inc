@@ -134,15 +134,22 @@ begin
   DoCaretsSort;
   UpdateCaretsCoords;
 
-  if cResultCaretLeft in Res then DoGotoCaret(cEdgeLeft);
-  if cResultCaretRight in Res then DoGotoCaret(cEdgeRight);
-  if cResultCaretTop in Res then DoGotoCaret(cEdgeTop);
-  if cResultCaretBottom in Res then DoGotoCaret(cEdgeBottom);
-
   if Res*[cResultCaretAny,
     cResultCaretLeft, cResultCaretRight,
     cResultCaretTop, cResultCaretBottom]<>[] then
   begin
+    if cResultCaretLeft in Res then
+      DoGotoCaret(cEdgeLeft)
+    else
+    if cResultCaretRight in Res then
+      DoGotoCaret(cEdgeRight)
+    else
+    if cResultCaretTop in Res then
+      DoGotoCaret(cEdgeTop)
+    else
+    if cResultCaretBottom in Res then
+      DoGotoCaret(cEdgeBottom);
+
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
     DoEventCarets;
@@ -180,7 +187,7 @@ begin
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
     Include(FPaintFlags, cPaintUpdateScrollbars);
-    Include(FPaintFlags, cPaintUpdateCaretsCoords);
+    Exclude(FPaintFlags, cPaintUpdateCaretsCoords);
     Paint;
     Invalidate;
   end

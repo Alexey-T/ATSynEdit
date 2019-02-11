@@ -487,7 +487,8 @@ end;
 procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
   AIndentHorz, AIndentVert: integer;
   APlaceCaret, ADoUnfold: boolean;
-  AAllowProcessMsg: boolean=true);
+  AAllowProcessMsg: boolean=true;
+  AAllowUpdate: boolean=true);
 var
   NIndex, NChars: integer;
   Coord: TPoint;
@@ -501,7 +502,8 @@ begin
     if ADoUnfold then
     begin
       DoUnfoldLine(APos.Y);
-      Update;
+      if AAllowUpdate then
+        Update;
       if AAllowProcessMsg then
         Application.ProcessMessages;
     end
@@ -559,12 +561,11 @@ begin
     bScrolled:= true;
   end;
 
-  //if bScrolled then
-  //  UpdateCaretsCoords;
-  Update;
+  if AAllowUpdate then
+    Update;
 end;
 
-procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge);
+procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge; AAllowUpdate: boolean=true);
 begin
   DoGotoPos(
     Carets.CaretAtEdge(AEdge),
@@ -572,7 +573,9 @@ begin
     FOptScrollIndentCaretHorz,
     FOptScrollIndentCaretVert,
     false,
-    false //dont unfold
+    false, //dont unfold
+    true,
+    AAllowUpdate
     );
 end;
 

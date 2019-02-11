@@ -1109,8 +1109,9 @@ type
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
       APlaceCaret, ADoUnfold: boolean;
-      AAllowProcessMsg: boolean=true);
-    procedure DoGotoCaret(AEdge: TATCaretEdge);
+      AAllowProcessMsg: boolean=true;
+      AAllowUpdate: boolean=true);
+    procedure DoGotoCaret(AEdge: TATCaretEdge; AAllowUpdate: boolean=true);
     //bookmarks
     procedure BookmarkSetForLine(ALine, ABmKind: integer;
       const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
