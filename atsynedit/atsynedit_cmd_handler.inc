@@ -42,15 +42,14 @@ begin
       end;
   end;
 
+  DoPaintModeStatic;
+  Include(FPaintFlags, cPaintUpdateCarets);
+    //force painting caret after any command (for fast text typing)
+
   NCmd:= GetCommandFromKey(Key, Shift);
-  if NCmd>0 then
-  begin
-    DoPaintModeStatic;
-    Include(FPaintFlags, cPaintUpdateCarets);
-      //force painting caret after any command (for fast text typing)
-    DoCommand(NCmd);
-    DoPaintModeBlinking;
-  end;
+  DoCommand(NCmd);
+
+  DoPaintModeBlinking;
 end;
 
 procedure TATSynEdit.UTF8KeyPress(var UTF8Key: TUTF8Char);
