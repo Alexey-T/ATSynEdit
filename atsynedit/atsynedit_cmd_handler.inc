@@ -93,12 +93,6 @@ begin
   if IsEditableTextKey(Key) and ((Shift=[]) or (Shift=[ssShift])) then
     Exit;
 
-  if not Assigned(FKeymap) then
-  begin
-    ShowMessage('Keymap not assigned: cannot input keys');
-    Exit
-  end;
-
   Shortcut:= KeyToShortCut(Key, Shift);
   Result:= FKeymap.GetCommandFromShortcut(Shortcut);
   if Result>0 then
