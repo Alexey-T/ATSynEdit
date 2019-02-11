@@ -12,6 +12,8 @@ begin
 end;
 
 procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
+var
+  NCmd: integer;
 begin
   inherited;
 
@@ -40,9 +42,15 @@ begin
       end;
   end;
 
-  DoPaintModeStatic;
-  DoCommand(GetCommandFromKey(Key, Shift));
-  DoPaintModeBlinking;
+  NCmd:= GetCommandFromKey(Key, Shift);
+  if NCmd>0 then
+  begin
+    DoPaintModeStatic;
+    Include(FPaintFlags, cPaintUpdateCarets);
+      //force painting caret after any command (for fast text typing)
+    DoCommand(NCmd);
+    DoPaintModeBlinking;
+  end;
 end;
 
 procedure TATSynEdit.UTF8KeyPress(var UTF8Key: TUTF8Char);
