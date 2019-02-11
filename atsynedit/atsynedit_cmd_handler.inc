@@ -43,12 +43,8 @@ begin
   end;
 
   DoPaintModeStatic;
-  Include(FPaintFlags, cPaintUpdateCarets);
-    //force painting caret after any command (for fast text typing)
-
   NCmd:= GetCommandFromKey(Key, Shift);
   DoCommand(NCmd);
-
   DoPaintModeBlinking;
 end;
 

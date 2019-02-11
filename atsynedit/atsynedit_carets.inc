@@ -953,7 +953,6 @@ end;
 
 procedure TATSynEdit.DoCaretForceShow; inline;
 begin
-  Include(FPaintFlags, cPaintUpdateCarets);
   FCaretAllowNextBlink:= true;
 end;
 

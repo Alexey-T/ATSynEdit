@@ -199,8 +199,7 @@ type
   TATSynPaintFlag = (
     cPaintUpdateBitmap,
     cPaintUpdateScrollbars,
-    cPaintUpdateCaretsCoords,
-    cPaintUpdateCarets
+    cPaintUpdateCaretsCoords
     );
   TATSynPaintFlags = set of TATSynPaintFlag;
 
@@ -3857,12 +3856,6 @@ begin
     DoPaint(FPaintFlags, ALineNumber);
   Exclude(FPaintFlags, cPaintUpdateBitmap);
 
-  //consider cPaintUpdateCarets only for blinking caret
-  if not FCaretBlinkEnabled or
-    (cPaintUpdateCarets in FPaintFlags) then
-  begin
-    Exclude(FPaintFlags, cPaintUpdateCarets);
-
     if DoubleBuffered then
     //buf mode: timer tick don't give painting of whole bitmap
     //(cPaintUpdateBitmap off)
@@ -3877,7 +3870,6 @@ begin
       if not FCaretBlinkEnabled or FCaretAllowNextBlink then
         DoPaintCarets(Canvas, true);
     end;
-  end;
 
   if DoubleBuffered then
   begin
@@ -4910,7 +4902,6 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  Include(FPaintFlags, cPaintUpdateCarets);
   if not DoubleBuffered then
     FCaretAllowNextBlink:= not FCaretAllowNextBlink;
 
