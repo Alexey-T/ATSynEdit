@@ -186,7 +186,6 @@ begin
     //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
-    Include(FPaintFlags, cPaintUpdateScrollbars);
     Exclude(FPaintFlags, cPaintUpdateCaretsCoords);
     Paint;
     Invalidate;

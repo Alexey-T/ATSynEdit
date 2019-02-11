@@ -198,7 +198,6 @@ type
 
   TATSynPaintFlag = (
     cPaintUpdateBitmap,
-    cPaintUpdateScrollbars,
     cPaintUpdateCaretsCoords
     );
   TATSynPaintFlags = set of TATSynPaintFlag;
@@ -3112,7 +3111,7 @@ begin
   FAdapterCache:= TATAdapterHiliteCache.Create;
 
   FPaintLocked:= 0;
-  FPaintFlags:= [cPaintUpdateBitmap, cPaintUpdateScrollbars];
+  FPaintFlags:= [cPaintUpdateBitmap];
 
   FColors:= TATSynEditColors.Create;
   InitDefaultColors(FColors);
@@ -3455,7 +3454,6 @@ begin
   UpdateCursor;
   if AUpdateWrapInfo then
     FWrapUpdateNeeded:= true;
-  Include(FPaintFlags, cPaintUpdateScrollbars);
   if AUpdateCaretsCoords then
     Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Invalidate;
@@ -3787,8 +3785,7 @@ begin
   else
     DoPaintAllTo(Canvas, AFlags, ALineFrom);
 
-  if cPaintUpdateScrollbars in AFlags then
-    Result:= UpdateScrollbars;
+  Result:= UpdateScrollbars;
 end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
@@ -3899,7 +3896,6 @@ begin
   end;
 
   FWrapUpdateNeeded:= true;
-  Include(FPaintFlags, cPaintUpdateScrollbars);
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Include(FPaintFlags, cPaintUpdateBitmap);
   PaintEx(LineTop);
