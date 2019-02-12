@@ -4913,8 +4913,8 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  //don't check Focused here, it's slow
-  if FCaretStopUnfocused and not Application.Active then
+  //don't use Focused here, it's slower
+  if FCaretStopUnfocused and not (FIsFocused and Application.Active) then
     if FCaretShown then
       exit;
 
