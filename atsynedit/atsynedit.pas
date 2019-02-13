@@ -402,7 +402,7 @@ type
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
     FCaretAllowNextBlink: boolean;
-    FIsFocused: boolean;
+    FIsEntered: boolean;
     FMarkers: TATMarkers;
     FAttribs: TATMarkers;
     FMarkedRange: TATMarkers;
@@ -716,6 +716,7 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
+    function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
     function GetColorTextBG: TColor;
@@ -2173,7 +2174,7 @@ begin
   if FMicromapVisible then
     DoPaintMicromapTo(C);
 
-  if FOptBorderFocusedActive and FIsFocused then
+  if FOptBorderFocusedActive and FIsEntered then
     DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
   else
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
@@ -2441,7 +2442,7 @@ begin
 
     bUseColorOfCurrentLine:= false;
     if LineWithCaret then
-      if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsFocused) then
+      if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsEntered) then
       begin
         if FOptShowCurLineMinimal then
           bUseColorOfCurrentLine:= IsLinePartWithCaret(NLinesIndex, NCoordTop)
@@ -4911,10 +4912,27 @@ begin
     FAdapterCache.DeleteForLine(ALineIndex);
 end;
 
+function TATSynEdit._IsFocused: boolean;
+//this method is to speedup focused check (TControl.Focused prop is slower)
+var
+  C: TControl;
+begin
+  Result:= false;
+  if not FIsEntered then exit;
+  if not Application.Active then exit;
+
+  C:= Self;
+  while Assigned(C.Parent) do
+    C:= C.Parent;
+  if C is TForm then
+    if not (C as TForm).Active then exit;
+
+  Result:= true;
+end;
+
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
-  //don't use Focused here, it's slower
-  if FCaretStopUnfocused and not (FIsFocused and Application.Active) then
+  if FCaretStopUnfocused and not _IsFocused then
     if FCaretShown then
       exit;
 
@@ -5545,7 +5563,7 @@ end;
 procedure TATSynEdit.DoEnter;
 begin
   inherited;
-  FIsFocused:= true;
+  FIsEntered:= true;
   if IsRepaintNeededOnEnterOrExit then
     Update;
   TimersStart;
@@ -5554,7 +5572,7 @@ end;
 procedure TATSynEdit.DoExit;
 begin
   inherited;
-  FIsFocused:= false;
+  FIsEntered:= false;
   if IsRepaintNeededOnEnterOrExit then
     Update;
   TimersStop;
