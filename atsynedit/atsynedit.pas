@@ -5499,7 +5499,7 @@ begin
     cIndentToOpeningBracket:
       begin
         //indent like in prev line + spaces up to opening bracket
-        NSpaces:= SGetIndentCharsToOpeningBracket(StrPrev);
+        NSpaces:= SGetIndentCharsToOpeningBracket(Copy(StrPrev, 1, APosX));
         Result:= StrIndent + StringOfChar(' ', NSpaces-Length(StrIndent));
       end
     else

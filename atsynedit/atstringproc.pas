@@ -328,7 +328,9 @@ var
   n: integer;
 begin
   Result:= 0;
-  n:= RPos('(', S);
+  n:= Length(S);
+  //note RPos() don't work with UnicodeString
+  while (n>0) and (S[n]<>'(') do Dec(n);
   if n>0 then
     //test that found bracket is not closed
     if PosEx(')', S, n)=0 then
