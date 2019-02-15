@@ -5477,8 +5477,8 @@ var
   NChars, NSpaces: integer;
 begin
   Result:= '';
-  if not Strings.IsIndexValid(APosY) then Exit;
   if not FOptAutoIndent then Exit;
+  if not Strings.IsIndexValid(APosY) then Exit;
 
   StrPrev:= Copy(Strings.Lines[APosY], 1, APosX);
   if StrPrev='' then exit;
@@ -5501,9 +5501,7 @@ begin
         //indent like in prev line + spaces up to opening bracket
         NSpaces:= SGetIndentCharsToOpeningBracket(StrPrev);
         Result:= StrIndent + StringOfChar(' ', NSpaces-Length(StrIndent));
-      end
-    else
-      raise Exception.Create('Unknown auto-indent-kind value');
+      end;
   end;
 end;
 
