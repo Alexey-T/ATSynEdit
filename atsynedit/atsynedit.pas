@@ -5480,9 +5480,9 @@ begin
   if not Strings.IsIndexValid(APosY) then Exit;
   if not FOptAutoIndent then Exit;
 
-  StrPrev:= Strings.Lines[APosY];
+  StrPrev:= Copy(Strings.Lines[APosY], 1, APosX);
+  if StrPrev='' then exit;
   NChars:= SGetIndentChars(StrPrev); //count of chars in indent
-  NChars:= Min(APosX, NChars); //limit indent by x-pos
 
   StrIndent:= Copy(StrPrev, 1, NChars);
   NSpaces:= Length(FTabHelper.TabsToSpaces(APosY, StrIndent));
@@ -5499,7 +5499,7 @@ begin
     cIndentToOpeningBracket:
       begin
         //indent like in prev line + spaces up to opening bracket
-        NSpaces:= SGetIndentCharsToOpeningBracket(Copy(StrPrev, 1, APosX));
+        NSpaces:= SGetIndentCharsToOpeningBracket(StrPrev);
         Result:= StrIndent + StringOfChar(' ', NSpaces-Length(StrIndent));
       end
     else
