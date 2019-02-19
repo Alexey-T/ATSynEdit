@@ -21,6 +21,8 @@ type
     FDynamicHiliteMaxLines: integer;
     FDynamicHiliteSupportedInCurrentSyntax: boolean;
   public
+    const MaxLineLengthToParse: integer = 4000;
+
     constructor Create(AOwner: TComponent); override;
     procedure AddEditor(AEditor: TComponent); virtual;
     //
