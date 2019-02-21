@@ -30,13 +30,14 @@ type
     var AConfirm, AContinue: boolean) of object;
 
 type
-  { TATFinderResult }
-
-  TATFinderResult = class
+  TATFinderResult = record
   public
     FPos, FEnd: TPoint;
-    constructor Create(APos, AEnd: TPoint);
+    procedure Init(APos, AEnd: TPoint);
+    class operator =(const a, b: TATFinderResult): boolean;
   end;
+
+  TATFinderResults = specialize TFPGList<TATFinderResult>;
 
 type
   { TATTextFinder }
@@ -114,8 +115,10 @@ type
     function GetRegexSkipIncrement: integer;
     procedure DoFixCaretSelectionDirection;
     //
-    procedure DoCollect_Usual(AList: TList; AWithEvent, AWithConfirm: boolean);
-    procedure DoCollect_Regex(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent,
+      AWithConfirm: boolean);
+    procedure DoCollect_Regex(AList: TATFinderResults; AFromPos: integer;
+      AWithEvent, AWithConfirm: boolean);
     function DoCount_InFragment(AWithEvent: boolean): integer;
     function DoReplace_InFragment: integer;
     //
@@ -263,10 +266,15 @@ end;
 
 { TATFinderResult }
 
-constructor TATFinderResult.Create(APos, AEnd: TPoint);
+procedure TATFinderResult.Init(APos, AEnd: TPoint);
 begin
   FPos:= APos;
   FEnd:= AEnd;
+end;
+
+class operator TATFinderResult.=(const a, b: TATFinderResult): boolean;
+begin
+  Result:= false;
 end;
 
 
@@ -346,7 +354,7 @@ begin
 end;
 
 
-procedure TATEditorFinder.DoCollect_Usual(AList: TList; AWithEvent, AWithConfirm: boolean);
+procedure TATEditorFinder.DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
 var
   IndexLineMax: integer;
   PosStart, PosEnd: TPoint;
@@ -399,7 +407,7 @@ begin
       if not bOk then Continue;
     end;
 
-    Res:= TATFinderResult.Create(FMatchEdPos, FMatchEdEnd);
+    Res.Init(FMatchEdPos, FMatchEdEnd);
     AList.Add(Res);
 
     if IsProgressNeeded(FMatchEdPos.Y) then
@@ -413,7 +421,7 @@ begin
 end;
 
 
-procedure TATEditorFinder.DoCollect_Regex(AList: TList; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
+procedure TATEditorFinder.DoCollect_Regex(AList: TATFinderResults; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
 var
   bOk, bContinue: boolean;
   Res: TATFinderResult;
@@ -446,7 +454,7 @@ begin
 
   if bOk then
   begin
-    Res:= TATFinderResult.Create(P1, P2);
+    Res.Init(P1, P2);
     AList.Add(Res);
 
     if AWithEvent then
@@ -470,7 +478,7 @@ begin
       if not bOk then Continue;
     end;
 
-    Res:= TATFinderResult.Create(P1, P2);
+    Res.Init(P1, P2);
     AList.Add(Res);
 
     if AWithEvent then
@@ -492,9 +500,9 @@ end;
 
 function TATEditorFinder.DoCount_InFragment(AWithEvent: boolean): integer;
 var
-  L: TList;
+  L: TATFinderResults;
 begin
-  L:= TList.Create;
+  L:= TATFinderResults.Create;
   try
     if OptRegex then
       DoCollect_Regex(L, 1, AWithEvent, false)
@@ -685,7 +693,7 @@ end;
 
 procedure TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList);
 var
-  ListRes: TList;
+  ListRes: TATFinderResults;
   Res: TATFinderResult;
   Str: UnicodeString;
   i: integer;
@@ -695,7 +703,7 @@ begin
   UpdateBuffer;
 
   AMatches.Clear;
-  ListRes:= TList.Create;
+  ListRes:= TATFinderResults.Create;
   try
     AMatches.TextLineBreakStyle:= tlbsLF;
     AMatches.Sorted:= true;
@@ -704,7 +712,7 @@ begin
     DoCollect_Regex(ListRes, 1, AWithEvent, false);
     for i:= 0 to ListRes.Count-1 do
     begin
-      Res:= TATFinderResult(ListRes[i]);
+      Res:= ListRes[i];
       Str:= Editor.Strings.TextSubstring(
         Res.FPos.X,
         Res.FPos.Y,
@@ -747,7 +755,7 @@ end;
 
 function TATEditorFinder.DoReplace_InFragment: integer;
 var
-  L: TList;
+  L: TATFinderResults;
   Res: TATFinderResult;
   Str: UnicodeString;
   P1, P2: TPoint;
@@ -756,7 +764,7 @@ var
 begin
   Result:= 0;
 
-  L:= TList.Create;
+  L:= TATFinderResults.Create;
   try
     if OptRegex then
       DoCollect_Regex(L, 1, false, OptConfirmReplace)
@@ -766,7 +774,7 @@ begin
     for i:= L.Count-1 downto 0 do
     begin
       if Application.Terminated then exit;
-      Res:= TATFinderResult(L[i]);
+      Res:= L[i];
 
       P1:= Res.FPos;
       P2:= Res.FEnd;
