@@ -147,9 +147,13 @@ begin
   Result:= [];
 end;
 
+
+type
+  TATTempIntList = specialize TFPGList<integer>;
+
 function TATSynEdit.GetTextForClipboard: string;
 var
-  ListNum: TList;
+  ListNum: TATTempIntList;
   ListStr: TStringList;
   Caret: TATCaretItem;
   i, NLen, X1, Y1, X2, Y2: integer;
@@ -182,7 +186,7 @@ begin
   end;
 
   //make text from normal selection
-  ListNum:= TList.Create;
+  ListNum:= TATTempIntList.Create;
   ListStr:= TStringList.Create;
 
   try
@@ -191,8 +195,8 @@ begin
     for i:= 0 to Carets.Count-1 do
     begin
       Caret:= Carets[i];
-      if ListNum.IndexOf(pointer{%H-}(Caret.PosY))<0 then
-        ListNum.Add(pointer{%H-}(Caret.PosY));
+      if ListNum.IndexOf(Caret.PosY)<0 then
+        ListNum.Add(Caret.PosY);
     end;
 
     //no selections-- copy entire lines
@@ -202,7 +206,7 @@ begin
       begin
         for i:= 0 to ListNum.Count-1 do
         begin
-          STemp:= Strings.LinesUTF8[NativeInt{%H-}(ListNum[i])];
+          STemp:= Strings.LinesUTF8[ListNum[i]];
           if STemp<>'' then
             ListStr.Add(STemp);
         end;
