@@ -13,7 +13,7 @@ uses
   Dialogs,
   LazUTF8,
   ATStringProc,
-  FGL;
+  ATSynEdit_FGL;
 
 type
   TTextChangedEvent = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;

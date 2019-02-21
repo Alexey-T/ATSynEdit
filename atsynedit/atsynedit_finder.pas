@@ -12,9 +12,9 @@ interface
 uses
   SysUtils, Classes, Dialogs, Forms,
   Math,
-  FGL,
-  ATSynEdit_RegExpr, //must be with {$define Unicode}
   ATSynEdit,
+  ATSynEdit_FGL,
+  ATSynEdit_RegExpr, //must be with {$define Unicode}
   ATSynEdit_Carets,
   ATStrings,
   ATStringProc,
