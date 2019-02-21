@@ -362,7 +362,7 @@ type
     FWantReturns: boolean;
     FEditorIndex: integer;
     FMarginRight: integer;
-    FMarginList: TList;
+    FMarginList: array of integer;
     FStringsInt,
     FStringsExternal: TATStrings;
     FTabHelper: TATStringTabHelper;
@@ -2937,8 +2937,8 @@ var
 begin
   if FMarginRight>1 then
     DoPaintMarginLineTo(C, PosX(FMarginRight), Colors.MarginRight);
-  for i:= 0 to FMarginList.Count-1 do
-    DoPaintMarginLineTo(C, PosX(PtrInt{%H-}(FMarginList[i])), Colors.MarginUser);
+  for i:= 0 to Length(FMarginList)-1 do
+    DoPaintMarginLineTo(C, PosX(FMarginList[i]), Colors.MarginUser);
 end;
 
 
@@ -3012,8 +3012,8 @@ var
   i: integer;
 begin
   Result:= '';
-  for i:= 0 to FMarginList.Count-1 do
-    Result+= IntToStr(PtrInt(FMarginList[i])) + ' ';
+  for i:= 0 to Length(FMarginList)-1 do
+    Result+= IntToStr(FMarginList[i]) + ' ';
   Result:= Trim(Result);
 end;
 
@@ -3187,7 +3187,7 @@ begin
   FOverwrite:= false;
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
-  FMarginList:= TList.Create;
+  SetLength(FMarginList, 0);
   FFoldedMarkList:= TList.Create;
   FOptIdleInterval:= cInitIdleInterval;
 
@@ -3444,7 +3444,6 @@ begin
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
   FreeAndNil(FFoldedMarkList);
-  FreeAndNil(FMarginList);
   FreeAndNil(FWrapInfo);
   FreeAndNil(FStringsInt);
   FreeAndNil(FGutterDecor);
@@ -3585,13 +3584,14 @@ var
   S: string;
   N: integer;
 begin
-  FMarginList.Clear;
+  SetLength(FMarginList, 0);
   repeat
     S:= SGetItem(AValue, ' ');
     if S='' then Break;
     N:= StrToIntDef(S, 0);
     if N<2 then Continue;
-    FMarginList.Add(pointer{%H-}(N));
+    SetLength(FMarginList, Length(FMarginList)+1);
+    FMarginList[Length(FMarginList)-1]:= N;
   until false;
 end;
 
