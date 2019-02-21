@@ -5,12 +5,14 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Finder;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 interface
 
 uses
   SysUtils, Classes, Dialogs, Forms,
   Math,
+  FGL,
   ATSynEdit_RegExpr, //must be with {$define Unicode}
   ATSynEdit,
   ATSynEdit_Carets,
@@ -76,13 +78,14 @@ type
   end;
 
 type
-  { TATEditorFragment }
-
-  TATEditorFragment = class
-  public
-    X1, Y1,
-    X2, Y2: integer;
+  TATEditorFragment = record
+    X1, Y1, X2, Y2: integer;
+    procedure Init(AX1, AY1, AX2, AY2: integer);
+    function Inited: boolean;
+    class operator =(const a, b: TATEditorFragment): boolean;
   end;
+
+  TATEditorFragments = specialize TFPGList<TATEditorFragment>;
 
 type
   { TATEditorFinder }
@@ -93,7 +96,7 @@ type
     FSkipLen: integer;
     FOnFound: TATFinderFound;
     FOnConfirmReplace: TATFinderConfirmReplace;
-    FFragments: TList;
+    FFragments: TATEditorFragments;
     FFragmentIndex: integer;
     FMatchEdPos: TPoint;
     FMatchEdEnd: TPoint;
@@ -235,6 +238,26 @@ begin
     Inc(PtrLine);
   end;
   Result:= true;
+end;
+
+{ TATEditorFragment }
+
+procedure TATEditorFragment.Init(AX1, AY1, AX2, AY2: integer);
+begin
+  X1:= AX1;
+  Y1:= AY1;
+  X2:= AX2;
+  Y2:= AY2;
+end;
+
+function TATEditorFragment.Inited: boolean;
+begin
+  Result:= Y1>=0;
+end;
+
+class operator TATEditorFragment.=(const a, b: TATEditorFragment): boolean;
+begin
+  Result:= false;
 end;
 
 
@@ -521,7 +544,7 @@ var
   Fr: TATEditorFragment;
 begin
   Fr:= CurrentFragment;
-  if Assigned(Fr) then
+  if Fr.Inited then
     UpdateBuffer_FromText(Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2))
   else
     UpdateBuffer_FromStrings(Editor.Strings);
@@ -547,7 +570,7 @@ begin
   Editor:= nil;
   FBuffer:= TATStringBuffer.Create;
   FSkipLen:= 0;
-  FFragments:= TList.Create;
+  FFragments:= TATEditorFragments.Create;
   FFragmentIndex:= 0;
   //FReplacedAtEndOfText:= false;
 
@@ -590,7 +613,7 @@ begin
   Result:= FBuffer.StrToCaret(APos);
 
   Fr:= CurrentFragment;
-  if Assigned(Fr) then
+  if Fr.Inited then
   begin
     if Result.Y=0 then
       Inc(Result.X, Fr.X1);
@@ -603,7 +626,7 @@ var
   Fr: TATEditorFragment;
 begin
   Fr:= CurrentFragment;
-  if Assigned(Fr) then
+  if Fr.Inited then
   begin
     if (APos.Y<Fr.Y1) or ((APos.Y=Fr.Y1) and (APos.X<Fr.X1)) then
       Exit(1);
@@ -941,7 +964,7 @@ begin
   end;
 
   Fr:= CurrentFragment;
-  if Assigned(Fr) then
+  if Fr.Inited then
   begin
     if not OptBack then
     begin
@@ -1340,11 +1363,8 @@ begin
     Caret:= Editor.Carets[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
     if not bSel then Continue;
-    Fr:= TATEditorFragment.Create;
-    Fr.X1:= X1;
-    Fr.X2:= X2;
-    Fr.Y1:= Y1;
-    Fr.Y2:= Y2;
+
+    Fr.Init(X1, Y1, X2, Y2);
     FFragments.Add(Fr);
   end;
 
@@ -1361,7 +1381,7 @@ begin
   S:= '';
   for i:= 0 to FFragments.Count-1 do
   begin
-    Fr:= TATEditorFragment(FFragments[i]);
+    Fr:= FFragments[i];
     S:= S +
       Format(#10'--[%d:%d .. %d:%d]-----'#10, [Fr.Y1, Fr.X1, Fr.Y2, Fr.X2]);
   end;
@@ -1369,21 +1389,17 @@ begin
 end;
 
 procedure TATEditorFinder.DoFragmentsClear;
-var
-  i: integer;
 begin
-  for i:= FFragments.Count-1 downto 0 do
-    TObject(FFragments[i]).Free;
   FFragments.Clear;
   FFragmentIndex:= -1;
 end;
 
 function TATEditorFinder.CurrentFragment: TATEditorFragment;
 begin
-  Result:= nil;
+  Result.Init(-1, -1, -1, -1);
   if OptInSelection then
     if (FFragmentIndex>=0) and (FFragmentIndex<FFragments.Count) then
-      Result:= TATEditorFragment(FFragments[FFragmentIndex]);
+      Result:= FFragments[FFragmentIndex];
 end;
 
 procedure TATEditorFinder.SetFragmentIndex(AValue: integer);
@@ -1394,7 +1410,7 @@ begin
   if (AValue>=0) and (AValue<FFragments.Count) then
   begin
     FFragmentIndex:= AValue;
-    Fr:= TATEditorFragment(FFragments[FFragmentIndex]);
+    Fr:= FFragments[FFragmentIndex];
     if OptRegex then
       UpdateBuffer_FromText(Editor.Strings.TextSubstring(Fr.X1, Fr.Y1, Fr.X2, Fr.Y2));
   end;
@@ -1408,8 +1424,8 @@ begin
   Result:= false;
   for i:= 0 to FFragments.Count-2 do
   begin
-    Fr1:= TATEditorFragment(FFragments[i]);
-    Fr2:= TATEditorFragment(FFragments[i+1]);
+    Fr1:= FFragments[i];
+    Fr2:= FFragments[i+1];
     if Fr1.Y2=Fr2.Y1 then Exit(true);
   end;
 end;
