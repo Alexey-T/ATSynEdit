@@ -115,10 +115,8 @@ type
     function GetRegexSkipIncrement: integer;
     procedure DoFixCaretSelectionDirection;
     //
-    procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent,
-      AWithConfirm: boolean);
-    procedure DoCollect_Regex(AList: TATFinderResults; AFromPos: integer;
-      AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
+    procedure DoCollect_Regex(AList: TATFinderResults; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
     function DoCount_InFragment(AWithEvent: boolean): integer;
     function DoReplace_InFragment: integer;
     //
