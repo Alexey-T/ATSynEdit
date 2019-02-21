@@ -17,6 +17,30 @@ const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
 
+{ TATFoldedMark }
+
+procedure TATFoldedMark.Init(const ACoord: TRect; ALineFrom, ALineTo: integer);
+begin
+  Coord:= ACoord;
+  LineFrom:= ALineFrom;
+  LineTo:= ALineTo;
+end;
+
+procedure TATFoldedMark.SetNone;
+begin
+  Init(Rect(0, 0, 0, 0), -1, -1);
+end;
+
+function TATFoldedMark.Inited: boolean;
+begin
+  Result:= LineFrom>=0;
+end;
+
+class operator TATFoldedMark.=(const a, b: TATFoldedMark): boolean;
+begin
+  Result:= false;
+end;
+
 { TATSynScrollInfo }
 
 procedure TATSynScrollInfo.Clear;

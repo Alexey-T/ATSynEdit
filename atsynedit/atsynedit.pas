@@ -48,7 +48,8 @@ uses
   ATSynEdit_Gaps,
   ATSynEdit_Hotspots,
   ATSynEdit_Adapters,
-  ATSynEdit_Adapter_Cache;
+  ATSynEdit_Adapter_Cache,
+  ATSynEdit_FGL;
 
 type
   TATPosDetails = record
@@ -335,11 +336,19 @@ type
   TATSynEditCheckInputEvent = procedure(Sender: TObject; AChar: WideChar; var AllowInput: boolean) of object;
 
 type
-  TATFoldedMark = class
+  { TATFoldedMark }
+
+  TATFoldedMark = record
   public
     Coord: TRect;
     LineFrom, LineTo: integer;
+    procedure Init(const ACoord: TRect; ALineFrom, ALineTo: integer);
+    procedure SetNone;
+    function Inited: boolean;
+    class operator =(const a, b: TATFoldedMark): boolean;
   end;
+
+  TATFoldedMarks = specialize TFPGList<TATFoldedMark>;
 
 type
   { TATSynEdit }
@@ -533,11 +542,9 @@ type
     FMinimapCachedPainting: boolean;
     FMicromapWidth: integer;
     FMicromapVisible: boolean;
-    FFoldedMarkList: TList;
+    FFoldedMarkList: TATFoldedMarks;
+    FFoldedMarkCurrent: TATFoldedMark;
     FFoldedMarkTooltip: TPanel;
-    FFoldedMark_LineFrom: integer;
-    FFoldedMark_LineTo: integer;
-    FFoldedMark_Rect: TRect;
     FPaintCounter: integer;
     {$ifdef debug_show_fps}
     FTickMinimap: DWord;
@@ -2989,10 +2996,11 @@ begin
 
   if FFoldTooltipVisible then
   begin
-    FoldMark:= TATFoldedMark.Create;
-    FoldMark.Coord:= RectMark;
-    FoldMark.LineFrom:= APos.Y;
-    FoldMark.LineTo:= APos.Y + DoGetFoldedMarkLinesCount(APos.Y) -1;
+    FoldMark.Init(
+      RectMark,
+      APos.Y,
+      APos.Y + DoGetFoldedMarkLinesCount(APos.Y) -1
+      );
     FFoldedMarkList.Add(FoldMark);
   end;
 end;
@@ -3188,7 +3196,7 @@ begin
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
   SetLength(FMarginList, 0);
-  FFoldedMarkList:= TList.Create;
+  FFoldedMarkList:= TATFoldedMarks.Create;
   FOptIdleInterval:= cInitIdleInterval;
 
   FUnprintedVisible:= true;
@@ -4558,19 +4566,7 @@ begin
   //detect cursor on folded marks
   if FFoldTooltipVisible then
   begin
-    FoldMark:= DoGetFoldedMarkAt(Point(X, Y));
-    if Assigned(FoldMark) then
-    begin
-      FFoldedMark_LineFrom:= FoldMark.LineFrom;
-      FFoldedMark_LineTo:= FoldMark.LineTo;
-      FFoldedMark_Rect:= FoldMark.Coord;
-    end
-    else
-    begin
-      FFoldedMark_LineFrom:= -1;
-      FFoldedMark_LineTo:= -1;
-      FFoldedMark_Rect:= Rect(0, 0, 0, 0);
-    end;
+    FFoldedMarkCurrent:= DoGetFoldedMarkAt(Point(X, Y));
     UpdateFoldedMarkTooltip;
   end;
 
@@ -6519,24 +6515,24 @@ end;
 
 procedure TATSynEdit.UpdateFoldedMarkTooltip;
 begin
-  if (not FFoldTooltipVisible) or (FFoldedMark_LineFrom<0) then
+  if (not FFoldTooltipVisible) or not FFoldedMarkCurrent.Inited then
   begin
     FFoldedMarkTooltip.Hide;
     exit
   end;
 
   FFoldedMarkTooltip.Width:= FRectMain.Width * FFoldTooltipWidthPercents div 100;
-  FFoldedMarkTooltip.Height:= (FFoldedMark_LineTo-FFoldedMark_LineFrom+1) * FCharSize.Y + 2;
+  FFoldedMarkTooltip.Height:= (FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1) * FCharSize.Y + 2;
   FFoldedMarkTooltip.Left:= Min(
     FRectMain.Right - FFoldedMarkTooltip.Width - 1,
-    FFoldedMark_Rect.Left);
+    FFoldedMarkCurrent.Coord.Left);
   FFoldedMarkTooltip.Top:=
-    FFoldedMark_Rect.Top + FCharSize.Y;
+    FFoldedMarkCurrent.Coord.Top + FCharSize.Y;
 
   //no space for on bottom? show on top
   if FFoldedMarkTooltip.Top + FFoldedMarkTooltip.Height > FRectMain.Bottom then
-    if FFoldedMark_Rect.Top - FFoldedMarkTooltip.Height >= FRectMain.Top then
-      FFoldedMarkTooltip.Top:= FFoldedMark_Rect.Top - FFoldedMarkTooltip.Height;
+    if FFoldedMarkCurrent.Coord.Top - FFoldedMarkTooltip.Height >= FRectMain.Top then
+      FFoldedMarkTooltip.Top:= FFoldedMarkCurrent.Coord.Top - FFoldedMarkTooltip.Height;
 
   FFoldedMarkTooltip.Show;
   FFoldedMarkTooltip.Invalidate;
@@ -6544,12 +6540,12 @@ end;
 
 procedure TATSynEdit.FoldedMarkTooltipPaint(Sender: TObject);
 begin
-  if FFoldedMark_LineFrom>=0 then
+  if FFoldedMarkCurrent.Inited then
     DoPaintTextFragmentTo(
       FFoldedMarkTooltip.Canvas,
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
-      FFoldedMark_LineFrom,
-      FFoldedMark_LineTo,
+      FFoldedMarkCurrent.LineFrom,
+      FFoldedMarkCurrent.LineTo,
       false, //to paint fully folded lines, must be False
       Colors.MinimapTooltipBG,
       Colors.MinimapTooltipBorder
@@ -6562,11 +6558,7 @@ begin
 end;
 
 procedure TATSynEdit.DoClearFoldedMarkList;
-var
-  i: integer;
 begin
-  for i:= FFoldedMarkList.Count-1 downto 0 do
-    TATFoldedMark(FFoldedMarkList[i]).Free;
   FFoldedMarkList.Clear;
 end;
 
@@ -6576,12 +6568,12 @@ var
   Mark: TATFoldedMark;
   i: integer;
 begin
-  Result:= nil;
   for i:= 0 to FFoldedMarkList.Count-1 do
   begin
-    Mark:= TATFoldedMark(FFoldedMarkList[i]);
+    Mark:= FFoldedMarkList[i];
     if PtInRect(Mark.Coord, Pnt) then exit(Mark);
   end;
+  Result.SetNone;
 end;
 
 
