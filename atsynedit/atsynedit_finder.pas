@@ -509,7 +509,7 @@ begin
   if not OptRegex then
     raise Exception.Create('Finder UpdateBuffer called for non-regex mode');
 
-  SetLength(Lens, AStrings.Count);
+  SetLength(Lens{%H-}, AStrings.Count);
   for i:= 0 to Length(Lens)-1 do
     Lens[i]:= AStrings.LinesLen[i];
   FBuffer.Setup(AStrings.TextString_Unicode, Lens);

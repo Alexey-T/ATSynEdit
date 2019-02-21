@@ -12,10 +12,14 @@ uses
   Classes, SysUtils,
   Dialogs,
   LazUTF8,
-  ATStringProc;
+  ATStringProc,
+  FGL;
 
 type
   TTextChangedEvent = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
+
+type
+  TATGenericIntList = specialize TFPGList<integer>;
 
 type
   { TATStringBuffer }
@@ -27,6 +31,7 @@ type
     FLenEol: integer;
     FOnChange: TTextChangedEvent;
     procedure SetCount(AValue: integer);
+    procedure SetupFromGenericList(L: TATGenericIntList);
   public
     FText: UnicodeString;
     constructor Create; virtual;
@@ -96,35 +101,72 @@ begin
   end;
 end;
 
+procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
+var
+  Pos, NLen, i: integer;
+begin
+  SetCount(L.Count+1);
+  Pos:= 0;
+  FList[0]:= 0;
+  for i:= 0 to L.Count-1 do
+  begin
+    NLen:= L[i];
+    Inc(Pos, NLen+FLenEol);
+    FList[i+1]:= Pos;
+  end;
+end;
+
+
 procedure TATStringBuffer.SetupSlow(const AText: UnicodeString);
 var
-  STextFinal: UnicodeString;
-  L: TStringList;
-  Lens: array of integer;
-  i: integer;
+  Lens: TATGenericIntList;
+  i, N: integer;
 begin
-  if AText='' then
+  FText:= AText;
+  if FText='' then
   begin
-    FText:= '';
     SetCount(0);
     Exit
   end;
 
-  L:= TStringList.Create;
+  N:= 0;
+  i:= 1;
+
+  Lens:= TATGenericIntList.Create;
   try
-    L.TextLineBreakStyle:= tlbsLF;
-    L.Text:= UTF8Encode(AText);
-    STextFinal:= UTF8Decode(L.Text); //this converts all ends to LF
+    while i<=Length(FText) do
+    begin
+      //Replace CR LF and CR to LF
+      if FText[i]=#13 then
+      begin
+        if (i<Length(FText)) and (FText[i+1]=#10) then
+        begin
+          Delete(FText, i, 1);
+          Continue;
+        end
+        else
+          FText[i]:= #10;
+      end;
 
-    SetLength(Lens, L.Count);
-    for i:= 0 to L.Count-1 do
-      Lens[i]:= UTF8Length(L[i]);
+      if FText[i]=#10 then
+      begin
+        Lens.Add(N);
+        N:= 0;
+      end
+      else
+        Inc(N);
+      Inc(i);
+    end;
 
-    Setup(STextFinal, Lens);
+    if N>0 then
+      Lens.Add(N);
+
+    SetupFromGenericList(Lens);
   finally
-    FreeAndNil(L);
+    FreeAndNil(Lens);
   end;
 end;
+
 
 procedure TATStringBuffer.Clear;
 begin
