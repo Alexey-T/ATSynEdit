@@ -28,15 +28,15 @@ type
     FOnChange: TTextChangedEvent;
     procedure SetCount(AValue: integer);
   public
-    FText: atString;
+    FText: UnicodeString;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
-    procedure Setup(const AText: atString; const ALineLens: array of integer);
-    procedure SetupSlow(const AText: atString);
+    procedure Setup(const AText: UnicodeString; const ALineLens: array of integer);
+    procedure SetupSlow(const AText: UnicodeString);
     function CaretToStr(APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
-    function SubString(APos, ALen: integer): atString; inline;
+    function SubString(APos, ALen: integer): UnicodeString; inline;
     function TextLength: integer; inline;
     function LineIndex(N: integer): integer;
     function LineLength(N: integer): integer;
@@ -77,7 +77,7 @@ begin
   inherited;
 end;
 
-procedure TATStringBuffer.Setup(const AText: atString;
+procedure TATStringBuffer.Setup(const AText: UnicodeString;
   const ALineLens: array of integer);
 var
   Pos, NLen, i: integer;
@@ -96,14 +96,14 @@ begin
   end;
 end;
 
-procedure TATStringBuffer.SetupSlow(const AText: atString);
+procedure TATStringBuffer.SetupSlow(const AText: UnicodeString);
 var
-  STextFinal: atString;
+  STextFinal: UnicodeString;
   L: TStringList;
   Lens: array of integer;
   i: integer;
 begin
-  if Trim(AText)='' then
+  if AText='' then
   begin
     FText:= '';
     SetCount(0);
@@ -183,7 +183,7 @@ begin
   Result.X:= APos-FList[Result.Y];
 end;
 
-function TATStringBuffer.SubString(APos, ALen: integer): atString; inline;
+function TATStringBuffer.SubString(APos, ALen: integer): UnicodeString; inline;
 begin
   Result:= Copy(FText, APos, ALen);
 end;
