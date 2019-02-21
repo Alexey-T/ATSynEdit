@@ -220,12 +220,23 @@ begin
 end;
 
 type
-  TPoints3 = class
-  public
+  { TATPosShift }
+
+  TATPosShift = record
     X, Y: integer;
     Shift: TPoint;
     PosAfter: TPoint;
+    class operator =(const a, b: TATPosShift): boolean;
   end;
+
+  TATPosShifts = specialize TFPGList<TATPosShift>;
+
+{ TATPointsShift }
+
+class operator TATPosShift.= (const a, b: TATPosShift): boolean;
+begin
+  Result:= false;
+end;
 
 function TATSynEdit.DoCommand_TextDeleteSelection: TATCommandResults;
 var
@@ -233,8 +244,8 @@ var
   Shift, PosAfter: TPoint;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
-  Points: TPoints3;
-  PointList: TList;
+  Point: TATPosShift;
+  PointList: TATPosShifts;
   i: integer;
 begin
   Result:= [];
@@ -249,7 +260,7 @@ begin
 
   if not Carets.IsSelection then Exit;
 
-  PointList:= TList.Create;
+  PointList:= TATPosShifts.Create;
   Strings.BeginUndoGroup;
   try
     for i:= Carets.Count-1 downto 0 do
@@ -267,12 +278,11 @@ begin
       Caret.EndX:= -1;
       Caret.EndY:= -1;
 
-      Points:= TPoints3.Create;
-      Points.X:= X1;
-      Points.Y:= Y1;
-      Points.Shift:= Shift;
-      Points.PosAfter:= PosAfter;
-      PointList.Add(Points);
+      Point.X:= X1;
+      Point.Y:= Y1;
+      Point.Shift:= Shift;
+      Point.PosAfter:= PosAfter;
+      PointList.Add(Point);
     end;
 
     //make shift of carets after main loop, to keep correct text
@@ -280,17 +290,14 @@ begin
     //multi-selections - https://github.com/Alexey-T/CudaText/issues/1615
     for i:= PointList.Count-1 downto 0 do
     begin
-      Points:= TPoints3(PointList[i]);
-      DoCaretsShift(Points.X, Points.Y, Points.Shift.X, Points.Shift.Y, Points.PosAfter);
+      Point:= PointList[i];
+      DoCaretsShift(Point.X, Point.Y, Point.Shift.X, Point.Shift.Y, Point.PosAfter);
       DoCaretsSort;
     end;
   finally
+    FreeAndNil(PointList);
     Strings.EndUndoGroup;
   end;
-
-  for i:= PointList.Count-1 downto 0 do
-    TObject(PointList[i]).Free;
-  FreeAndNil(PointList);
 
   Result:= [cResultText, cResultCaretTop];
 end;
