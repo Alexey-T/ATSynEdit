@@ -4767,7 +4767,7 @@ begin
   if (Shift=[FOptMouseWheelScrollHorzWithState]) then
     Mode:= aWheelModeHoriz
   else
-  if (Shift=[]) then
+  if (Shift-[ssLeft]=[]) then
     Mode:= aWheelModeNormal
   else
     exit;
@@ -4808,6 +4808,10 @@ begin
         end;
       end;
   end;
+
+  if ssLeft in Shift then
+    with Mouse.CursorPos do
+      MouseMove(Shift, X, Y);
 end;
 
 function TATSynEdit.DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
