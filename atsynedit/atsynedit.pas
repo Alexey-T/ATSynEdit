@@ -4500,7 +4500,6 @@ var
   bOnMain, bOnMinimap, bOnMicromap, bOnGutter: boolean;
   Details: TATPosDetails;
   nIndex: integer;
-  FoldMark: TATFoldedMark;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -4749,6 +4748,7 @@ function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp, AForceHorz: bool
 var
   Mode: TATMouseWheelMode;
   NSpeedX, NSpeedY: integer;
+  Pnt: TPoint;
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
@@ -4810,8 +4810,10 @@ begin
   end;
 
   if ssLeft in Shift then
-    with Mouse.CursorPos do
-      MouseMove(Shift, X, Y);
+  begin
+    Pnt:= ScreenToClient(Mouse.CursorPos);
+    MouseMove(Shift, Pnt.X, Pnt.Y);
+  end;
 end;
 
 function TATSynEdit.DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
