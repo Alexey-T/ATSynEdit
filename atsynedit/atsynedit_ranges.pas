@@ -68,9 +68,8 @@ type
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
       AInRangeIndex: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
-    function FindDeepestRangeContainingLine(ALine: integer; AIndexes: TATIntArray): integer;
+    function FindDeepestRangeContainingLine(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
-    function FindIndexOfRange(const R: TATSynRange): integer;
     function MessageText(Cnt: integer): string;
   end;
 
@@ -260,7 +259,9 @@ begin
   end;
 end;
 
-function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AIndexes: TATIntArray): integer;
+
+function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer;
+  const AIndexes: TATIntArray): integer;
 var
   R: TATSynRange;
   i: integer;
@@ -280,8 +281,8 @@ end;
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
 var
-  i: integer;
   R: TATSynRange;
+  i: integer;
 begin
   Result:= -1;
   for i:= 0 to Count-1 do
@@ -290,11 +291,6 @@ begin
     if (not R.IsSimple) and (R.Y=ALine) then
       exit(i);
   end;
-end;
-
-function TATSynRanges.FindIndexOfRange(const R: TATSynRange): integer;
-begin
-  Result:= FList.IndexOf(R);
 end;
 
 function TATSynRanges.MessageText(Cnt: integer): string;
