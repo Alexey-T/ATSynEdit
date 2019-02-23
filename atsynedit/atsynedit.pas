@@ -1675,7 +1675,7 @@ var
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
   Items: TATWrapItems;
-  ListNums: TList;
+  ListNums: TATIntegerList;
   i, j: integer;
   NLine, NIndexFrom, NIndexTo: integer;
   UseCachedUpdate: boolean;
@@ -1729,7 +1729,7 @@ begin
   //UseCachedUpdate:= false;////to disable
 
   Items:= TATWrapItems.Create;
-  ListNums:= TList.Create;
+  ListNums:= TATIntegerList.Create;
 
   try
     if not UseCachedUpdate then
@@ -1749,7 +1749,7 @@ begin
 
       for i:= 0 to ListNums.Count-1 do
       begin
-        NLine:= PtrInt{%H-}(ListNums[i]);
+        NLine:= ListNums[i];
         DoCalcWrapInfos(NLine, NIndentMaximal, Items, bConsiderFolding);
         if Items.Count=0 then Continue;
 

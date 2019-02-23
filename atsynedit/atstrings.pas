@@ -41,6 +41,9 @@ const
   cStringsProgressSaveLines = 100*1000;
 
 type
+  TATIntegerList = specialize TFPGList<integer>;
+
+type
   TATLineState = (
     cLineStateNone,
     cLineStateChanged,
@@ -158,7 +161,7 @@ type
   TATStrings = class
   private
     FList: TATStringItemList;
-    FListUpdates: TList;
+    FListUpdates: TATIntegerList;
     FListUpdatesHard: boolean;
     FGaps: TATGaps;
     FBookmarks: TATBookmarks;
@@ -288,7 +291,7 @@ type
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property Endings: TATLineEnds read FEndings write SetEndings;
-    property ListUpdates: TList read FListUpdates;
+    property ListUpdates: TATIntegerList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
     property Modified: boolean read FModified write SetModified;
     property ModifiedRecent: boolean read FModifiedRecent write FModifiedRecent;
@@ -795,7 +798,7 @@ end;
 constructor TATStrings.Create;
 begin
   FList:= TATStringItemList.Create;
-  FListUpdates:= TList.Create;
+  FListUpdates:= TATIntegerList.Create;
   FListUpdatesHard:= false;
   FUndoList:= TATUndoList.Create;
   FRedoList:= TATUndoList.Create;
@@ -1549,9 +1552,9 @@ begin
     Exit
   end;
 
-  Ptr:= pointer{%H-}(N);
   with FListUpdates do
-    if IndexOf(Ptr)<0 then Add(Ptr);
+    if IndexOf(N)<0 then
+      Add(N);
 end;
 
 procedure TATStrings.DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
