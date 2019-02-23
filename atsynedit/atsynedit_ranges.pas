@@ -50,7 +50,7 @@ type
     FList: TATSynRangeList;
     function GetItems(Index: integer): TATSynRange;
     procedure SetItems(Index: integer; const AValue: TATSynRange);
-    function MessageTextForIndexList(L: TList): string;
+    //function MessageTextForIndexList(const L: TATIntArray): string;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -302,18 +302,19 @@ var
 begin
   Result:= '';
   for i:= 0 to Min(Count-1, Cnt) do
-    Result:= Result+Items[i].MessageText+#13;
+    Result:= Result+Items[i].MessageText+#10;
 end;
 
-function TATSynRanges.MessageTextForIndexList(L: TList): string;
+(*
+function TATSynRanges.MessageTextForIndexList(const L: TATIntArray): string;
 var
   i: integer;
 begin
   Result:= '';
-  if L.Count=0 then exit;
-  for i:= 0 to L.Count-1 do
-    Result:= Result+Items[PtrInt(L[i])].MessageText+#13;
+  for i:= 0 to Length(L)-1 do
+    Result:= Result+Items[L[i]].MessageText+#10;
 end;
+*)
 
 procedure TATSynRanges.SetItems(Index: integer; const AValue: TATSynRange);
 begin
