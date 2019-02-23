@@ -121,36 +121,36 @@ end;
 
 procedure TATSynEdit.DoRangeFold(ARangeIndex: integer);
 var
-  ARange: TATSynRange;
+  Range: TATSynRange;
 begin
-  ARange:= Fold.Items[ARangeIndex];
-  ARange.Folded:= true;
-  Fold.Items[ARangeIndex]:= ARange;
+  Range:= Fold.Items[ARangeIndex];
+  Range.Folded:= true;
+  Fold.Items[ARangeIndex]:= Range;
   FWrapUpdateNeeded:= true;
 
   //partially hide first line
   case FFoldStyle of
     cFoldHereWithDots:
     begin
-      Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= ARange.X;
+      Strings.LinesFoldFrom[Range.Y, FEditorIndex]:= Range.X;
     end;
     cFoldHereWithTruncatedText:
     begin
-      Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= ARange.X;
-      if ARange.Hint='' then
-        ARange.Hint:= Strings.LineSub(ARange.Y, ARange.X, cFoldedLenOfEmptyHint)+'...';
+      Strings.LinesFoldFrom[Range.Y, FEditorIndex]:= Range.X;
+      if Range.Hint='' then
+        Range.Hint:= Strings.LineSub(Range.Y, Range.X, cFoldedLenOfEmptyHint)+'...';
     end;
     cFoldFromEndOfLine:
     begin
-      if ARange.Hint<>'' then
-        Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= ARange.X
+      if Range.Hint<>'' then
+        Strings.LinesFoldFrom[Range.Y, FEditorIndex]:= Range.X
       else
-        Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= Strings.LinesLen[ARange.Y]+1;
+        Strings.LinesFoldFrom[Range.Y, FEditorIndex]:= Strings.LinesLen[Range.Y]+1;
     end;
     cFoldFromEndOfLineAlways:
     begin
-      Strings.LinesFoldFrom[ARange.Y, FEditorIndex]:= Strings.LinesLen[ARange.Y]+1;
-      ARange.Hint:= '...';
+      Strings.LinesFoldFrom[Range.Y, FEditorIndex]:= Strings.LinesLen[Range.Y]+1;
+      Range.Hint:= '...';
     end;
     cFoldFromNextLine:
     begin
@@ -159,10 +159,10 @@ begin
   end;
 
   //fully hide other lines
-  DoRangeHide(ARange.Y+1, ARange.Y2);
+  DoRangeHide(Range.Y+1, Range.Y2);
 
   if FOptCaretFixAfterRangeFolded then
-    Carets.UpdateAfterRangeFolded(ARange.X, ARange.Y, ARange.Y2);
+    Carets.UpdateAfterRangeFolded(Range.X, Range.Y, Range.Y2);
 end;
 
 
