@@ -5,18 +5,22 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Bookmarks;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 interface
 
 uses
   Classes, SysUtils,
-  ATSynEdit_Gaps;
+  ATSynEdit_Gaps,
+  ATSynEdit_FGL;
 
 type
+  { TATBookmarkData }
+
   TATBookmarkData = packed record
     Tag: Int64;
+    Hint: string[55];
     LineNum: integer;
-    Hint: string;
     Kind: word;
     DeleteOnDelLine: boolean;
     ShowInBookmarkList: boolean;
@@ -24,19 +28,22 @@ type
 
   { TATBookmarkItem }
 
-  TATBookmarkItem = class
-  public
+  TATBookmarkItem = record
     Data: TATBookmarkData;
-    constructor Create(const AData: TATBookmarkData);
+    class operator =(const a, b: TATBookmarkItem): boolean;
+    constructor Assign(const AData: TATBookmarkData);
   end;
+
+  TATBookmarkItems = specialize TFPGList<TATBookmarkItem>;
 
 type
   { TATBookmarks }
 
   TATBookmarks = class
   private
-    FList: TList;
+    FList: TATBookmarkItems;
     function GetItem(N: integer): TATBookmarkItem;
+    procedure SetItem(N: integer; const AValue: TATBookmarkItem);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -44,9 +51,9 @@ type
     procedure Delete(N: integer);
     procedure DeleteForLine(ALine: integer);
     function DeleteByTag(const ATag: Int64): boolean;
-    function Count: integer; inline;
-    function IsIndexValid(N: integer): boolean; inline;
-    property Items[N: integer]: TATBookmarkItem read GetItem; default;
+    function Count: integer;
+    function IsIndexValid(N: integer): boolean;
+    property Items[N: integer]: TATBookmarkItem read GetItem write SetItem; default;
     procedure Add(const AData: TATBookmarkData);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
@@ -55,34 +62,34 @@ type
 
 implementation
 
-procedure CopyBookmarkData(const Src: TATBookmarkData; var Dest: TATBookmarkData);
-begin
-  Dest.Tag:= Src.Tag;
-  Dest.LineNum:= Src.LineNum;
-  Dest.Hint:= Src.Hint;
-  Dest.Kind:= Src.Kind;
-  Dest.DeleteOnDelLine:= Src.DeleteOnDelLine;
-  Dest.ShowInBookmarkList:= Src.ShowInBookmarkList;
-end;
-
 { TATBookmarkItem }
 
-constructor TATBookmarkItem.Create(const AData: TATBookmarkData);
+class operator TATBookmarkItem.=(const a, b: TATBookmarkItem): boolean;
 begin
-  CopyBookmarkData(AData, Data);
+  Result:= false;
+end;
+
+constructor TATBookmarkItem.Assign(const AData: TATBookmarkData);
+begin
+  Data:= AData;
 end;
 
 { TATBookmarks }
 
 function TATBookmarks.GetItem(N: integer): TATBookmarkItem;
 begin
-  Result:= TATBookmarkItem(FList[N]);
+  Result:= FList[N];
+end;
+
+procedure TATBookmarks.SetItem(N: integer; const AValue: TATBookmarkItem);
+begin
+  FList[N]:= AValue;
 end;
 
 constructor TATBookmarks.Create;
 begin
   inherited;
-  FList:= TList.Create;
+  FList:= TATBookmarkItems.Create;
 end;
 
 destructor TATBookmarks.Destroy;
@@ -93,17 +100,12 @@ begin
 end;
 
 procedure TATBookmarks.Clear;
-var
-  i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
-    TObject(FList[i]).Free;
   FList.Clear;
 end;
 
 procedure TATBookmarks.Delete(N: integer); inline;
 begin
-  TObject(FList[N]).Free;
   FList.Delete(N);
 end;
 
@@ -122,7 +124,7 @@ var
 begin
   Result:= false;
   for i:= FList.Count-1 downto 0 do
-    if TATBookmarkItem(FList[i]).Data.Tag=ATag then
+    if FList[i].Data.Tag=ATag then
     begin
       Result:= true;
       Delete(i);
@@ -146,26 +148,28 @@ var
 begin
   for i:= 0 to Count-1 do
   begin
-    Item:= Items[i];
-    nLine:= Item.Data.LineNum;
+    nLine:= Items[i].Data.LineNum;
 
     //bookmark already exists: overwrite
     if nLine=AData.LineNum then
     begin
-      CopyBookmarkData(AData, Item.Data);
+      Item.Assign(AData);
+      Items[i]:= Item;
       Exit
     end;
 
     //found bookmark for bigger line: insert before it
     if nLine>AData.LineNum then
     begin
-      FList.Insert(i, TATBookmarkItem.Create(AData));
+      Item.Assign(AData);
+      FList.Insert(i, Item);
       Exit;
     end;
   end;
 
   //not found bookmark for bigger line: append
-  FList.Add(TATBookmarkItem.Create(AData));
+  Item.Assign(AData);
+  FList.Add(Item);
 end;
 
 procedure TATBookmarks.DeleteDups;
@@ -225,7 +229,10 @@ begin
         begin
           Item:= Items[i];
           if Item.Data.LineNum>=ALine then
+          begin
             Item.Data.LineNum:= Item.Data.LineNum+AItemCount;
+            Items[i]:= Item;
+          end;
         end;
       end;
 
@@ -256,6 +263,7 @@ begin
           if (Item.Data.LineNum>ALine) or (Item.Data.LineNum=ALineCount-1) then
           begin
             Item.Data.LineNum:= Item.Data.LineNum-AItemCount;
+            Items[i]:= Item;
             {
             if Item.Data.LineNum=ALine then
               bMovedHere:= true;
