@@ -5,44 +5,45 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Gutter_Decor;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 interface
 
 uses
   Classes, SysUtils, Graphics,
-  ATSynEdit_Gaps;
+  ATSynEdit_Gaps,
+  ATSynEdit_FGL;
 
 type
-  //at last 2-3 UTF8 chars
-  TATGutterDecorText = string[12];
-
   TATGutterDecorData = packed record
     Tag: Int64;
     LineNum: integer;
     ImageIndex: integer;
-    Text: TATGutterDecorText;
+    Text: string[15]; //at last 2-3 UTF8 chars
     TextColor: TColor;
     TextBold: boolean;
     TextItalic: boolean;
     DeleteOnDelLine: boolean;
   end;
 
-type
   { TATGutterDecorItem }
 
-  TATGutterDecorItem = class
-  public
+  TATGutterDecorItem = record
     Data: TATGutterDecorData;
-    constructor Create(const AData: TATGutterDecorData);
+    procedure Init(const AData: TATGutterDecorData);
+    class operator =(const a, b: TATGutterDecorItem): boolean;
   end;
+
+  TATGutterDecorItems = specialize TFPGList<TATGutterDecorItem>;
 
 type
   { TATGutterDecor }
 
   TATGutterDecor = class
   private
-    FList: TList;
+    FList: TATGutterDecorItems;
     function GetItem(N: integer): TATGutterDecorItem;
+    procedure SetItem(N: integer; const AValue: TATGutterDecorItem);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -52,7 +53,7 @@ type
     function DeleteByTag(const ATag: Int64): boolean;
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
-    property Items[N: integer]: TATGutterDecorItem read GetItem; default;
+    property Items[N: integer]: TATGutterDecorItem read GetItem write SetItem; default;
     procedure Add(const AData: TATGutterDecorData);
     function Find(ALineNum: integer): integer;
     procedure DeleteDups;
@@ -61,32 +62,34 @@ type
 
 implementation
 
-procedure CopyGutterDecorData(
-  const Src: TATGutterDecorData;
-  var Dest: TATGutterDecorData); inline;
-begin
-  //Data has no long string (only string[n]), so can use Move
-  Move(Src, Dest, SizeOf(Src));
-end;
-
 { TATGutterDecorItem }
 
-constructor TATGutterDecorItem.Create(const AData: TATGutterDecorData);
+procedure TATGutterDecorItem.Init(const AData: TATGutterDecorData);
 begin
-  CopyGutterDecorData(AData, Data);
+  Data:= AData;
+end;
+
+class operator TATGutterDecorItem.=(const a, b: TATGutterDecorItem): boolean;
+begin
+  Result:= false;
 end;
 
 { TATGutterDecor }
 
 function TATGutterDecor.GetItem(N: integer): TATGutterDecorItem;
 begin
-  Result:= TATGutterDecorItem(FList[N]);
+  Result:= FList[N];
+end;
+
+procedure TATGutterDecor.SetItem(N: integer; const AValue: TATGutterDecorItem);
+begin
+  FList[N]:= AValue;
 end;
 
 constructor TATGutterDecor.Create;
 begin
   inherited;
-  FList:= TList.Create;
+  FList:= TATGutterDecorItems.Create;
 end;
 
 destructor TATGutterDecor.Destroy;
@@ -97,17 +100,12 @@ begin
 end;
 
 procedure TATGutterDecor.Clear;
-var
-  i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
-    TObject(FList[i]).Free;
   FList.Clear;
 end;
 
 procedure TATGutterDecor.Delete(N: integer);
 begin
-  TObject(FList[N]).Free;
   FList.Delete(N);
 end;
 
@@ -125,8 +123,8 @@ var
   i: integer;
 begin
   Result:= false;
-  for i:= FList.Count-1 downto 0 do
-    if TATGutterDecorItem(FList[i]).Data.Tag=ATag then
+  for i:= Count-1 downto 0 do
+    if Items[i].Data.Tag=ATag then
     begin
       Result:= true;
       Delete(i);
@@ -148,28 +146,29 @@ var
   Item: TATGutterDecorItem;
   nLine, i: integer;
 begin
+  Item.Init(AData);
+
   for i:= 0 to Count-1 do
   begin
-    Item:= Items[i];
-    nLine:= Item.Data.LineNum;
+    nLine:= Items[i].Data.LineNum;
 
     //item already exists: overwrite
     if nLine=AData.LineNum then
     begin
-      CopyGutterDecorData(AData, Item.Data);
+      Items[i]:= Item;
       Exit
     end;
 
     //found item for bigger line: insert before it
     if nLine>AData.LineNum then
     begin
-      FList.Insert(i, TATGutterDecorItem.Create(AData));
+      FList.Insert(i, Item);
       Exit;
     end;
   end;
 
   //not found item for bigger line: append
-  FList.Add(TATGutterDecorItem.Create(AData));
+  FList.Add(Item);
 end;
 
 procedure TATGutterDecor.DeleteDups;
@@ -229,7 +228,10 @@ begin
         begin
           Item:= Items[i];
           if Item.Data.LineNum>=ALine then
+          begin
             Item.Data.LineNum:= Item.Data.LineNum+AItemCount;
+            Items[i]:= Item;
+          end;
         end;
       end;
 
@@ -260,6 +262,7 @@ begin
           if (Item.Data.LineNum>ALine) or (Item.Data.LineNum=ALineCount-1) then
           begin
             Item.Data.LineNum:= Item.Data.LineNum-AItemCount;
+            Items[i]:= Item;
             {
             if Item.Data.LineNum=ALine then
               bMovedHere:= true;
