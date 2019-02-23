@@ -148,12 +148,9 @@ begin
 end;
 
 
-type
-  TATTempIntList = specialize TFPGList<integer>;
-
 function TATSynEdit.GetTextForClipboard: string;
 var
-  ListNum: TATTempIntList;
+  ListNum: TATIntegerList;
   ListStr: TStringList;
   Caret: TATCaretItem;
   i, NLen, X1, Y1, X2, Y2: integer;
@@ -186,7 +183,7 @@ begin
   end;
 
   //make text from normal selection
-  ListNum:= TATTempIntList.Create;
+  ListNum:= TATIntegerList.Create;
   ListStr:= TStringList.Create;
 
   try
