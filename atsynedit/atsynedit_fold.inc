@@ -75,21 +75,23 @@ b) for all subranges at top level:
   b1) if subrange marked folded, unfold 1st line "[...]"
   b2) if subrange marked unfolded, recursion
 *)
-procedure TATSynEdit.DoRangeUnfold(ARange: TATSynRange);
+procedure TATSynEdit.DoRangeUnfold(ARangeIndex: integer);
 var
   List: TATIntArray;
-  R: TATSynRange;
+  RangeThis, R: TATSynRange;
   i, j: integer;
   InSubrange: boolean;
 begin
-  ARange.Folded:= false;
+  RangeThis:= Fold.Items[ARangeIndex];
+  RangeThis.Folded:= false;
+  Fold.Items[ARangeIndex]:= RangeThis;
   FWrapUpdateNeeded:= true;
 
-  List:= FFold.FindRangesContainingLines(-1, -1, ARange,
+  List:= FFold.FindRangesContainingLines(-1, -1, ARangeIndex,
     false{OnlyFolded}, true{TopLevel}, cRngIgnore);
 
   //show all lines not in subranges
-  for i:= ARange.Y to ARange.Y2 do
+  for i:= RangeThis.Y to RangeThis.Y2 do
   begin
     InSubrange:= false;
     for j:= Low(List) to High(List) do
@@ -113,13 +115,17 @@ begin
     if R.Folded then
       Strings.LinesHidden[R.Y, FEditorIndex]:= false
     else
-      DoRangeUnfold(R);
+      DoRangeUnfold(List[i]);
   end;
 end;
 
-procedure TATSynEdit.DoRangeFold(ARange: TATSynRange);
+procedure TATSynEdit.DoRangeFold(ARangeIndex: integer);
+var
+  ARange: TATSynRange;
 begin
+  ARange:= Fold.Items[ARangeIndex];
   ARange.Folded:= true;
+  Fold.Items[ARangeIndex]:= ARange;
   FWrapUpdateNeeded:= true;
 
   //partially hide first line
@@ -173,23 +179,23 @@ var
   List: TATIntArray;
   i: integer;
 begin
-  List:= FFold.FindRangesContainingLines(ALine, ALine, nil,
+  List:= FFold.FindRangesContainingLines(ALine, ALine, -1,
     true{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
   for i:= Low(List) to High(List) do
-    DoRangeUnfold(FFold[List[i]]);
+    DoRangeUnfold(List[i]);
 end;
 
 procedure TATSynEdit.DoFoldbarClick(ALine: integer);
 var
-  R: TATSynRange;
+  N: integer;
 begin
-  R:= FFold.FindRangeWithPlusAtLine(ALine);
-  if Assigned(R) then
+  N:= FFold.FindRangeWithPlusAtLine(ALine);
+  if N>=0 then
   begin
-    if R.Folded then
-      DoRangeUnfold(R)
+    if Fold.Items[N].Folded then
+      DoRangeUnfold(N)
     else
-      DoRangeFold(R);
+      DoRangeFold(N);
     Update;
   end;
 end;
@@ -197,12 +203,12 @@ end;
 
 function TATSynEdit.GetFoldedMarkText(ALine: integer): string;
 var
-  R: TATSynRange;
+  N: integer;
 begin
   Result:= '';
-  R:= FFold.FindRangeWithPlusAtLine(ALine);
-  if Assigned(R) then
-    Result:= R.Hint;
+  N:= FFold.FindRangeWithPlusAtLine(ALine);
+  if N>=0 then
+    Result:= FFold.Items[N].Hint;
   if Result='' then
     Result:= '...';
 end;
@@ -231,7 +237,7 @@ begin
       bOk:= R.X=NFoldFrom;
 
     if bOk then
-      DoRangeFold(R); //do not just R.Folded:= true;
+      DoRangeFold(iRange); //do not just R.Folded:= true;
   end;
 end;
 
@@ -318,7 +324,7 @@ begin
   NLine:= Pnt.Y;
   if NLine<0 then Exit;
 
-  IntList:= Fold.FindRangesContainingLines(NLine, NLine, nil,
+  IntList:= Fold.FindRangesContainingLines(NLine, NLine, -1,
     false{OnlyFolded}, false{TopLevel}, cRngHasAllLines);
   if Length(IntList)=0 then Exit;
 
@@ -332,7 +338,7 @@ begin
   begin
     Rng:= Fold[IntList[i]];
     mi:= TMenuItem.Create(Self);
-    mi.Tag:= ptrint(Rng);
+    mi.Tag:= IntList[i];
     mi.OnClick:= @MenuFoldPlusMinusClick;
 
     mi.Caption:=
@@ -363,13 +369,15 @@ end;
 
 procedure TATSynEdit.MenuFoldPlusMinusClick(Sender: TObject);
 var
-  Rng: TATSynRange;
+  N: integer;
 begin
-  Rng:= TATSynRange((Sender as TComponent).Tag);
-  if Rng.Folded then
-    DoRangeUnfold(Rng)
+  N:= (Sender as TComponent).Tag;
+  if not Fold.IsIndexValid(N) then exit;
+
+  if Fold.Items[N].Folded then
+    DoRangeUnfold(N)
   else
-    DoRangeFold(Rng);
+    DoRangeFold(N);
   Update;
 end;
 
@@ -390,7 +398,7 @@ end;
 
 
 procedure TATSynEdit.DoFoldForLevelAndLines(ALineFrom, ALineTo: integer;
-  ALevel: integer; AForThisRange: TATSynRange);
+  ALevel: integer; AForThisRange: integer);
 var
   List: TATIntArray;
   R: TATSynRange;
@@ -409,16 +417,16 @@ begin
     if R.IsSimple then Continue;
     if R.Folded then Continue;
     if ALevel=0 then
-      DoRangeFold(R)
+      DoRangeFold(List[i])
     else
-      DoFoldForLevelAndLines(R.Y, R.Y2, ALevel-1, R);
+      DoFoldForLevelAndLines(R.Y, R.Y2, ALevel-1, List[i]);
   end;
 end;
 
 procedure TATSynEdit.DoFoldForLevel(ALevel: integer);
 begin
   DoCommand(cCommand_UnfoldAll);
-  DoFoldForLevelAndLines(0, Strings.Count-1, ALevel, nil);
+  DoFoldForLevelAndLines(0, Strings.Count-1, ALevel, -1);
   Update;
 end;
 
@@ -437,42 +445,43 @@ end;
 
 procedure TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
 var
-  NLine: integer;
-  R: TATSynRange;
+  NLine, NRange: integer;
   Indexes: TATIntArray;
+  bFolded: boolean;
 begin
   if Carets.Count<>1 then exit;
   NLine:= Carets[0].PosY;
   if not Strings.IsIndexValid(NLine) then exit;
 
-  Indexes:= Fold.FindRangesContainingLines(NLine, NLine, nil, false, false, cRngHasAllLines);
+  Indexes:= Fold.FindRangesContainingLines(NLine, NLine, -1, false, false, cRngHasAllLines);
   if Length(Indexes)=0 then exit;
-  R:= Fold.FindDeepestRangeContainingLine(NLine, Indexes);
-  if R=nil then exit;
+  NRange:= Fold.FindDeepestRangeContainingLine(NLine, Indexes);
+  if NRange<0 then exit;
+  bFolded:= Fold.Items[NRange].Folded;
 
   case AOp of
     cFoldingFold:
       begin
-        if not R.Folded then
+        if not bFolded then
         begin
-          DoRangeFold(R);
+          DoRangeFold(NRange);
           Update;
         end;
       end;
     cFoldingUnfold:
       begin
-        if R.Folded then
+        if bFolded then
         begin
-          DoRangeUnfold(R);
+          DoRangeUnfold(NRange);
           Update;
         end;
       end;
     cFoldingToggle:
       begin
-        if R.Folded then
-          DoRangeUnfold(R)
+        if bFolded then
+          DoRangeUnfold(NRange)
         else
-          DoRangeFold(R);
+          DoRangeFold(NRange);
         Update;
       end;
   end;

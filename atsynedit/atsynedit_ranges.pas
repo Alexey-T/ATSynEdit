@@ -5,42 +5,34 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Ranges;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 interface
 
 uses
   Classes, SysUtils,
-  ATStringProc;
-
-type
-  TATSynRangeHint = string[110];
+  ATStringProc,
+  ATSynEdit_FGL;
 
 type
   { TATSynRange }
 
-  TATSynRange = class
-  private
-    FX: integer; //start column
-    FY: integer; //start line
-    FY2: integer; //end line which is fully folded (can't partially fold)
-    FFolded: boolean;
-    FStaple: boolean;
-    FHint: TATSynRangeHint;
-    FTag: Int64;
-  public
-    property X: integer read FX write FX;
-    property Y: integer read FY write FY;
-    property Y2: integer read FY2 write FY2;
-    property Folded: boolean read FFolded write FFolded;
-    property Staple: boolean read FStaple write FStaple;
-    property Hint: TATSynRangeHint read FHint write FHint;
-    property Tag: Int64 read FTag write FTag;
-    constructor Create(AX, AY, AY2: integer; AStaple: boolean; const AHint: string;
-      const ATag: Int64); virtual;
+  TATSynRange = packed record
+    Tag: Int64;
+    Hint: string[95];
+    X: integer; //start column
+    Y: integer; //start line
+    Y2: integer; //end line which is fully folded (can't partially fold)
+    Folded: boolean;
+    Staple: boolean;
+    procedure Init(AX, AY, AY2: integer; AStaple: boolean; const AHint: string; const ATag: Int64);
     function IsSimple: boolean;
     function IsLineInside(ALine: integer): boolean;
     function MessageText: string;
+    class operator =(const a, b: TATSynRange): boolean;
   end;
+
+  TATSynRangeList = specialize TFPGList<TATSynRange>;
 
 type
   TATRangeHasLines = (
@@ -55,8 +47,9 @@ type
 
   TATSynRanges = class
   private
-    FList: TList;
+    FList: TATSynRangeList;
     function GetItems(Index: integer): TATSynRange;
+    procedure SetItems(Index: integer; const AValue: TATSynRange);
     function MessageTextForIndexList(L: TList): string;
   public
     constructor Create; virtual;
@@ -69,15 +62,15 @@ type
     function Insert(Index: integer; AX, AY, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
     procedure Delete(Index: integer);
-    property Items[Index: integer]: TATSynRange read GetItems; default;
-    function IsRangeInsideOther(R1, R2: TATSynRange): boolean;
-    function IsRangesSame(R1, R2: TATSynRange): boolean;
+    property Items[Index: integer]: TATSynRange read GetItems write SetItems; default;
+    function IsRangeInsideOther(const R1, R2: TATSynRange): boolean;
+    function IsRangesSame(const R1, R2: TATSynRange): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
-      AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean;
+      AInRangeIndex: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
-    function FindDeepestRangeContainingLine(ALine: integer; AIndexes: TATIntArray): TATSynRange;
-    function FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
-    function FindIndexOfRange(R: TATSynRange): integer;
+    function FindDeepestRangeContainingLine(ALine: integer; AIndexes: TATIntArray): integer;
+    function FindRangeWithPlusAtLine(ALine: integer): integer;
+    function FindIndexOfRange(const R: TATSynRange): integer;
     function MessageText(Cnt: integer): string;
   end;
 
@@ -96,7 +89,7 @@ const
 
 { TATSynRange }
 
-constructor TATSynRange.Create(AX, AY, AY2: integer; AStaple: boolean;
+procedure TATSynRange.Init(AX, AY, AY2: integer; AStaple: boolean;
   const AHint: string; const ATag: Int64);
 begin
   if (AX<=0) then raise Exception.Create('Incorrect range with x<=0: '+MessageText);
@@ -104,12 +97,13 @@ begin
   //if (AY>AY2) then raise Exception.Create('Incorrect range with y>y2: '+MessageText);
   if (AY>AY2) then AY2:= AY; //hide this error, it happens in Rexx lexer
 
-  FX:= AX;
-  FY:= AY;
-  FY2:= AY2;
-  FStaple:= AStaple;
-  FHint:= AHint;
-  FTag:= ATag;
+  X:= AX;
+  Y:= AY;
+  Y2:= AY2;
+  Staple:= AStaple;
+  Hint:= AHint;
+  Folded:= false;
+  Tag:= ATag;
 end;
 
 function TATSynRange.IsSimple: boolean; inline;
@@ -127,6 +121,11 @@ begin
   Result:= Format('%d..%d', [Y+1, Y2+1]);
 end;
 
+class operator TATSynRange.=(const a, b: TATSynRange): boolean;
+begin
+  Result:= false;
+end;
+
 { TATSynRanges }
 
 function TATSynRanges.IsIndexValid(N: integer): boolean; inline;
@@ -141,18 +140,12 @@ end;
 
 function TATSynRanges.GetItems(Index: integer): TATSynRange;
 begin
-  Result:= TATSynRange(FList[Index]);
-  {
-  if IsIndexValid(Index) then
-    Result:= TATSynRange(FList[Index])
-  else
-    Result:= nil;
-    }
+  Result:= FList[Index];
 end;
 
 constructor TATSynRanges.Create;
 begin
-  FList:= TList.Create;
+  FList:= TATSynRangeList.Create;
   FList.Capacity:= 2*1024;
 end;
 
@@ -164,11 +157,7 @@ begin
 end;
 
 procedure TATSynRanges.Clear;
-var
-  i: integer;
 begin
-  for i:= Count-1 downto 0 do
-    TObject(FList[i]).Free;
   FList.Clear;
 end;
 
@@ -176,7 +165,7 @@ function TATSynRanges.Add(AX, AY, AY2: integer; AWithStaple: boolean;
   const AHint: string;
   const ATag: Int64=0): TATSynRange;
 begin
-  Result:= TATSynRange.Create(AX, AY, AY2, AWithStaple, AHint, ATag);
+  Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
   FList.Add(Result);
 end;
 
@@ -185,27 +174,23 @@ function TATSynRanges.Insert(Index: integer; AX, AY, AY2: integer;
   const AHint: string;
   const ATag: Int64=0): TATSynRange;
 begin
-  Result:= TATSynRange.Create(AX, AY, AY2, AWithStaple, AHint, ATag);
+  Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
   FList.Insert(Index, Result);
 end;
 
 procedure TATSynRanges.Delete(Index: integer); inline;
 begin
-  if IsIndexValid(Index) then
-  begin
-    TObject(FList[Index]).Free;
-    FList.Delete(Index);
-  end;
+  FList.Delete(Index);
 end;
 
-function TATSynRanges.IsRangeInsideOther(R1, R2: TATSynRange): boolean; inline;
+function TATSynRanges.IsRangeInsideOther(const R1, R2: TATSynRange): boolean;
 begin
   Result:=
     IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true)
     and (R1.Y2-cAllowHangoutLines<=R2.Y2);
 end;
 
-function TATSynRanges.IsRangesSame(R1, R2: TATSynRange): boolean; inline;
+function TATSynRanges.IsRangesSame(const R1, R2: TATSynRange): boolean;
 begin
   if R1=R2 then
     exit(true);
@@ -216,10 +201,11 @@ begin
 end;
 
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
-  AInRange: TATSynRange; AOnlyFolded, ATopLevelOnly: boolean; ALineMode: TATRangeHasLines): TATIntArray;
+  AInRangeIndex: integer; AOnlyFolded, ATopLevelOnly: boolean;
+  ALineMode: TATRangeHasLines): TATIntArray;
 var
   L: TList;
-  R: TATSynRange;
+  R, RTest: TATSynRange;
   i, j: integer;
   Ok: boolean;
 begin
@@ -237,15 +223,18 @@ begin
             cRngIgnore: Ok:= true;
             cRngHasAllLines: Ok:= (R.Y<=ALineFrom) and (R.Y2>=ALineTo);
             cRngHasAnyOfLines: Ok:= (R.Y<=ALineTo) and (R.Y2>=ALineFrom);
-            cRngExceptThisRange: Ok:= R<>AInRange;
+            cRngExceptThisRange: Ok:= i<>AInRangeIndex;
             else raise Exception.Create('unknown LineMode');
           end;
           if not Ok then Continue;
 
-          if AInRange=nil then
+          if AInRangeIndex<0 then
             Ok:= true
           else
-            Ok:= not IsRangesSame(AInRange, R) and IsRangeInsideOther(R, AInRange);
+          begin
+            RTest:= Items[AInRangeIndex];
+            Ok:= not IsRangesSame(RTest, R) and IsRangeInsideOther(R, RTest);
+          end;
 
           if Ok then
             L.Add(Pointer(PtrInt(i)));
@@ -271,44 +260,41 @@ begin
   end;
 end;
 
-function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AIndexes: TATIntArray): TATSynRange;
+function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AIndexes: TATIntArray): integer;
 var
   R: TATSynRange;
   i: integer;
 begin
-  Result:= nil;
+  Result:= -1;
   for i:= 0 to High(AIndexes) do
   begin
     R:= Items[AIndexes[i]];
     if R.IsSimple then Continue;
     if (R.Y>ALine) then Break;
     if (R.Y2<ALine) then Continue;
-    if (Result=nil) or (R.Y>Result.Y) then
-      Result:= R;
+    if (Result<0) or (R.Y>Items[Result].Y) then
+      Result:= AIndexes[i];
   end;
 end;
 
 
-function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): TATSynRange;
+function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
 var
   i: integer;
   R: TATSynRange;
 begin
-  Result:= nil;
+  Result:= -1;
   for i:= 0 to Count-1 do
   begin
     R:= Items[i];
     if (not R.IsSimple) and (R.Y=ALine) then
-    begin
-      Result:= R;
-      Break
-    end;
+      exit(i);
   end;
 end;
 
-function TATSynRanges.FindIndexOfRange(R: TATSynRange): integer;
+function TATSynRanges.FindIndexOfRange(const R: TATSynRange): integer;
 begin
-  Result:= FList.IndexOf(Pointer(R));
+  Result:= FList.IndexOf(R);
 end;
 
 function TATSynRanges.MessageText(Cnt: integer): string;
@@ -328,6 +314,11 @@ begin
   if L.Count=0 then exit;
   for i:= 0 to L.Count-1 do
     Result:= Result+Items[PtrInt(L[i])].MessageText+#13;
+end;
+
+procedure TATSynRanges.SetItems(Index: integer; const AValue: TATSynRange);
+begin
+  FList[Index]:= AValue
 end;
 
 end.

@@ -1141,12 +1141,12 @@ type
     procedure BookmarkPlaceBookmarksOnCarets;
     procedure BookmarkPlaceCaretsOnBookmarks;
     //fold
-    procedure DoRangeFold(ARange: TATSynRange);
-    procedure DoRangeUnfold(ARange: TATSynRange);
+    procedure DoRangeFold(ARangeIndex: integer);
+    procedure DoRangeUnfold(ARangeIndex: integer);
     procedure DoRangeHide(ALineFrom, ALineTo: integer);
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
-      AForThisRange: TATSynRange);
+      AForThisRange: integer);
     procedure DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
     //markers
     procedure MarkerClearAll;
@@ -5782,7 +5782,7 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
-  List:= FFold.FindRangesContainingLines(LineIndex, LineIndex, nil,
+  List:= FFold.FindRangesContainingLines(LineIndex, LineIndex, -1,
     false{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
   if Length(List)=0 then Exit;
 
@@ -5981,9 +5981,9 @@ end;
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
   ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
 var
-  nLineFrom, nLineTo, nIndent: integer;
+  nLineFrom, nLineTo, nIndent, nRange: integer;
   Indexes: TATIntArray;
-  Range, RangeActive: TATSynRange;
+  Range: TATSynRange;
   P1, P2: TPoint;
   RSt: TRect;
   NColor, NColorNormal, NColorActive: TColor;
@@ -5992,16 +5992,16 @@ begin
   if FOptStapleStyle=cLineStyleNone then Exit;
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
-  Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, nil,
+
+  Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, -1,
     false{OnlyFolded}, false{TopLevelOnly}, cRngHasAnyOfLines);
 
-  RangeActive:= nil;
   //currently find active range for first caret only
   if FOptStapleHiliteActive then
     if Carets.Count>0 then
     begin
       i:= Carets[0].PosY;
-      RangeActive:= FFold.FindDeepestRangeContainingLine(i, Indexes);
+      nRange:= FFold.FindDeepestRangeContainingLine(i, Indexes);
     end;
 
   NColorNormal:= Colors.BlockStaple;
@@ -6035,7 +6035,7 @@ begin
     if (RSt.Left>=ARect.Left) and
       (RSt.Left<ARect.Right) then
     begin
-      if Range=RangeActive then
+      if Indexes[i]=nRange then
         NColor:= NColorActive
       else
         NColor:= NColorNormal;

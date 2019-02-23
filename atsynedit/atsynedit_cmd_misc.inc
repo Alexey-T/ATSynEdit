@@ -119,8 +119,7 @@ begin
     begin
       R:= Fold[i];
       if R.IsSimple then Continue;
-      R.Folded:= false;
-      DoRangeFold(R);
+      DoRangeFold(i);
     end;
 
     NeedFixCaret:= false;
@@ -139,7 +138,7 @@ begin
     begin
       R:= Fold[i];
       if R.Folded then
-        DoRangeUnfold(R);
+        DoRangeUnfold(i);
     end;
   end;
 
