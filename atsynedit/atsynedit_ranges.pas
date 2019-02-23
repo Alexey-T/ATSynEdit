@@ -199,18 +199,21 @@ begin
   Result:= false;
 end;
 
+type
+  TATIntegerList = specialize TFPGList<integer>;
+
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
   AInRangeIndex: integer; AOnlyFolded, ATopLevelOnly: boolean;
   ALineMode: TATRangeHasLines): TATIntArray;
 var
-  L: TList;
+  L: TATIntegerList;
   R, RTest: TATSynRange;
   i, j: integer;
   Ok: boolean;
 begin
   SetLength(Result, 0);
-  L:= TList.Create;
-  L.Capacity:= 512;
+  L:= TATIntegerList.Create;
+  L.Capacity:= 128;
   try
     for i:= 0 to Count-1 do
     begin
@@ -236,7 +239,7 @@ begin
           end;
 
           if Ok then
-            L.Add(Pointer(PtrInt(i)));
+            L.Add(i);
         end;
     end;
 
@@ -244,7 +247,7 @@ begin
     begin
       for i:= L.Count-1 downto 1 do
         for j:= 0 to i-1 do
-          if IsRangeInsideOther(Items[PtrInt(L[i])], Items[PtrInt(L[j])]) then
+          if IsRangeInsideOther(Items[L[i]], Items[L[j]]) then
           begin
             L.Delete(i);
             Break
@@ -253,7 +256,7 @@ begin
 
     SetLength(Result, L.Count);
     for i:= 0 to L.Count-1 do
-      Result[i]:= PtrInt(L[i]);
+      Result[i]:= L[i];
   finally
     FreeAndNil(L);
   end;
