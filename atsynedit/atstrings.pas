@@ -844,8 +844,8 @@ begin
   GutterDecor2:= nil;
 
   DoClearUndo(true);
+  FList.Clear; //Clear calls event, no need
 
-  Clear;
   FreeAndNil(FList);
   FreeAndNil(FBookmarks2);
   FreeAndNil(FBookmarks);
