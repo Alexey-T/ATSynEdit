@@ -832,12 +832,16 @@ end;
 
 destructor TATStrings.Destroy;
 begin
-  //disable events: so Clear wont call
+  //disable events: so Clear won't call them
+  FOnChange:= nil;
+  FOnChangeBlock:= nil;
   FOnGetCaretsArray:= nil;
   FOnSetCaretsArray:= nil;
   FOnProgress:= nil;
   FOnLog:= nil;
-  //
+
+  GutterDecor1:= nil;
+  GutterDecor2:= nil;
 
   DoClearUndo(true);
 
