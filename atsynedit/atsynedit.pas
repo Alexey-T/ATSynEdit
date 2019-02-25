@@ -6214,7 +6214,7 @@ begin
     for i:= NLine to NLine+GetVisibleLines do
     begin
       if not Strings.IsIndexValid(i) then Break;
-      if Length(Strings.LinesUTF8[i])>FOptMaxLineLenToCalcURL then Continue;
+      if Strings.LinesLenRaw[i]>FOptMaxLineLenToCalcURL then Continue;
 
       ReObj.InputString:= Strings.Lines[i];
 
