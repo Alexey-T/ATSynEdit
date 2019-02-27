@@ -32,18 +32,22 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   AColorBG: TColor; AColorForced: boolean;
   var AColorAfter: TColor;
   AMainText: boolean);
+const
+  cMaxLenToTokenize = 4000;
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
-  bFound: boolean;
+  bEnableHilite, bFound: boolean;
 begin
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
+  bEnableHilite:= Strings.LinesLenRaw[nLineIndex]<=cMaxLenToTokenize;
 
   FillChar(AParts, SizeOf(AParts), 0);
 
   //1) get hilites from adapter
+  if bEnableHilite then
   if Assigned(FAdapterHilite) then
   begin
     {$ifdef atsynedit_cache}
@@ -61,6 +65,7 @@ begin
   end;
 
   //2) get hilites from OnCalcHilite
+  if bEnableHilite then
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
 
