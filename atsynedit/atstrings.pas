@@ -1014,7 +1014,6 @@ begin
     for i:= 0 to NCount-1 do
     begin
       DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone);
-      DoEventLog(ALineIndex+i, ABlock.LinesLen[i]);
 
       Item.Init(
         ABlock.GetLineUTF8(i),
@@ -1023,6 +1022,8 @@ begin
       FList.Insert(ALineIndex+i, @Item);
       FillChar(Item, SizeOf(Item), 0);
     end;
+
+    DoEventLog(ALineIndex, 1); //don't call it inside loop above (freeze)
     DoEventChange(cLineChangeAdded, ALineIndex, NCount);
   end;
 
