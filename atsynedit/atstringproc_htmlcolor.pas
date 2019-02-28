@@ -21,12 +21,27 @@ implementation
 
 function IsCharWord(ch: char): boolean;
 begin
-  Result:= ch in ['a'..'z', 'A'..'Z', '_', '0'..'9'];
+  case ch of
+    'a'..'z',
+    'A'..'Z',
+    '_',
+    '0'..'9':
+      Result:= true;
+    else
+      Result:= false
+  end;
 end;
 
 function IsCharHex(ch: char): boolean;
 begin
-  Result:= ch in ['0'..'9', 'a'..'f', 'A'..'F'];
+  case ch of
+    '0'..'9',
+    'a'..'f',
+    'A'..'F':
+      Result:= true
+    else
+      Result:= false;
+  end;
 end;
 
 function SColorToHtmlColor(Color: TColor): string;
