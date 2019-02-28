@@ -151,7 +151,7 @@ type
 type
   TATStringsGetCarets = function: TATPointArray of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
-  TATStringsLogEvent = procedure(Sender: TObject; ALine, ALen: integer) of object;
+  TATStringsLogEvent = procedure(Sender: TObject; ALine: integer) of object;
   TATStringsChangeEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
@@ -204,7 +204,7 @@ type
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
     function DoCheckFilled: boolean;
-    procedure DoEventLog(ALine, ALen: integer);
+    procedure DoEventLog(ALine: integer);
     procedure DoEventChange(AChange: TATLineChangeKind; ALineIndex,
       AItemCount: integer);
     procedure DoFinalizeSaving;
@@ -650,8 +650,7 @@ begin
   StrBefore:= UTF8Decode(Item^.Str);
 
   DoAddUndo(cEditActionChange, AIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
-  DoEventLog(AIndex, -Length(StrBefore));
-  DoEventLog(AIndex, Length(AValue));
+  DoEventLog(AIndex);
   DoEventChange(cLineChangeEdited, AIndex, 1);
 
   Item^.Str:= UTF8Encode(AValue);
@@ -909,7 +908,7 @@ begin
   if DoCheckFilled then Exit;
 
   DoAddUndo(cEditActionInsert, Count, '', cEndNone);
-  DoEventLog(Count, Length(AString));
+  DoEventLog(Count);
   DoEventChange(cLineChangeAdded, Count, 1);
 
   Item.Init(UTF8Encode(AString), AEnd, Length(AString));
@@ -967,7 +966,7 @@ begin
 
   if AWithEvent then
   begin
-    DoEventLog(ALineIndex, Length(AString));
+    DoEventLog(ALineIndex);
     DoEventChange(cLineChangeAdded, ALineIndex, 1);
   end;
 
@@ -1023,7 +1022,7 @@ begin
       FillChar(Item, SizeOf(Item), 0);
     end;
 
-    DoEventLog(ALineIndex, 1); //don't call it inside loop above (freeze)
+    DoEventLog(ALineIndex);
     DoEventChange(cLineChangeAdded, ALineIndex, NCount);
   end;
 
@@ -1067,7 +1066,7 @@ begin
 
     if AWithEvent then
     begin
-      DoEventLog(ALineIndex, -Length(StrBefore));
+      DoEventLog(ALineIndex);
       DoEventChange(cLineChangeDeleted, ALineIndex, 1);
     end;
 
@@ -1153,7 +1152,7 @@ end;
 procedure TATStrings.Clear;
 begin
   DoClearUndo(FUndoList.Locked);
-  DoEventLog(-1, 0);
+  DoEventLog(-1);
   DoEventChange(cLineChangeDeletedAll, -1, 1);
 
   FList.Clear;
@@ -1666,10 +1665,10 @@ begin
   FillChar(Item, SizeOf(Item), 0);
 end;
 
-procedure TATStrings.DoEventLog(ALine, ALen: integer);
+procedure TATStrings.DoEventLog(ALine: integer); inline;
 begin
   if Assigned(FOnLog) then
-    FOnLog(Self, ALine, ALen);
+    FOnLog(Self, ALine);
 end;
 
 procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);

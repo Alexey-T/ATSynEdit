@@ -395,7 +395,7 @@ begin
   end;
 
   DoEventChange(cLineChangeDeleted, ALine1, ALine2-ALine1+1);
-  DoEventLog(ALine1, 1);
+  DoEventLog(ALine1);
   Modified:= true;
 
   FChangeBlockActive:= false;
@@ -416,7 +416,7 @@ begin
     LineInsert(ALineFrom, UTF8Decode(ANewLines[i]), false{AWithEvent});
   FChangeBlockActive:= false;
 
-  DoEventLog(ALineFrom, 1);
+  DoEventLog(ALineFrom);
   DoEventChange(cLineChangeAdded, ALineFrom, ANewLines.Count);
 end;
 
