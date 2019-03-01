@@ -1185,7 +1185,7 @@ type
     function DoGetLinkAtPos(AX, AY: integer): atString;
     function DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
     function GetCacheDump: string;
-    procedure DoConvertSpacesToTabsLeading;
+    procedure DoConvertIndentation(ASpacesToTabs: boolean);
     procedure DoConvertTabsToSpaces;
 
   protected

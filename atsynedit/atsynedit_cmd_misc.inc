@@ -182,7 +182,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoConvertSpacesToTabsLeading;
+procedure TATSynEdit.DoConvertIndentation(ASpacesToTabs: boolean);
 var
   S1, SBegin, SBegin2, SEnd: atString;
   N, i: integer;
@@ -192,14 +192,17 @@ begin
     for i:= 0 to Strings.Count-1 do
     begin
       S1:= Strings.Lines[i];
-      if Pos(' ', S1)=0 then Continue;
 
       N:= SGetIndentChars(S1);
       if N=0 then Continue;
       SBegin:= Copy(S1, 1, N);
       SEnd:= Copy(S1, N+1, MaxInt);
 
-      SBegin2:= FTabHelper.SpacesToTabs(i, SBegin);
+      if ASpacesToTabs then
+        SBegin2:= FTabHelper.SpacesToTabs(i, SBegin)
+      else
+        SBegin2:= FTabHelper.TabsToSpaces(i, SBegin);
+
       if SBegin2<>SBegin then
         Strings.Lines[i]:= SBegin2+SEnd;
     end;
