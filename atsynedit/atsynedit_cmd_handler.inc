@@ -132,7 +132,6 @@ begin
 
   DoCaretsFixIfInsideFolded;
   DoCaretsSort;
-  UpdateCaretsCoords;
 
   if Res*[cResultCaretAny,
     cResultCaretLeft, cResultCaretRight,
@@ -153,6 +152,7 @@ begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
     DoEventCarets;
+    //UpdateCaretsCoords;
   end;
 
   if cResultText in Res then
@@ -186,7 +186,7 @@ begin
     //- Paint call needed, to repaint after "Fold all" (Linux gtk2)
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
-    Exclude(FPaintFlags, cPaintUpdateCaretsCoords);
+    //Exclude(FPaintFlags, cPaintUpdateCaretsCoords);
     Paint;
     Invalidate;
   end
