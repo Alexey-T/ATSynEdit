@@ -433,7 +433,7 @@ begin
   inherited Create(SizeOf(TATStringItem));
 end;
 
-function TATStringItemList.GetItem(AIndex: integer): PATStringItem;
+function TATStringItemList.GetItem(AIndex: integer): PATStringItem; inline;
 begin
   Result:= PATStringItem(Get(AIndex));
 end;
@@ -754,16 +754,21 @@ begin
   Result:= '';
   if Count=0 then Exit;
   LastIndex:= Count-1;
-  bFinalEol:= LinesEnds[LastIndex]<>cEndNone;
 
   Len:= 0;
-  for i:= 0 to LastIndex do
+  for i:= 0 to LastIndex-1 do
   begin
     Item:= FList.GetItem(i);
-    Inc(Len, Length(Item^.Str));
-    if bFinalEol or (i<LastIndex) then
-      Inc(Len, LenEol);
+    Inc(Len, Length(Item^.Str)+LenEol);
   end;
+
+  Item:= FList.GetItem(LastIndex);
+  Inc(Len, Length(Item^.Str));
+
+  bFinalEol:= LinesEnds[LastIndex]<>cEndNone;
+  if bFinalEol then
+    Inc(Len, LenEol);
+
   if Len=0 then Exit;
 
   SetLength(Result, Len);
