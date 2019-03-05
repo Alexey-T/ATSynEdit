@@ -323,8 +323,8 @@ type
     property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
-    function TextString_Unicode: UnicodeString;
-    function TextString_UTF8: string;
+    function TextString_Unicode(AMaxLen: integer=0): UnicodeString;
+    function TextString_UTF8(AMaxLen: integer=0): string;
     procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
     procedure TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
@@ -736,12 +736,12 @@ begin
 end;
 
 
-function TATStrings.TextString_Unicode: UnicodeString;
+function TATStrings.TextString_Unicode(AMaxLen: integer=0): UnicodeString;
 begin
-  Result:= UTF8Decode(TextString_UTF8);
+  Result:= UTF8Decode(TextString_UTF8(AMaxLen));
 end;
 
-function TATStrings.TextString_UTF8: string;
+function TATStrings.TextString_UTF8(AMaxLen: integer=0): string;
 const
   LenEol = 1;
   CharEol: char = #10;
@@ -749,7 +749,6 @@ var
   Len, LastIndex, i: integer;
   Item: PATStringItem;
   Ptr: pointer;
-  Str: string;
   bFinalEol: boolean;
 begin
   Result:= '';
@@ -761,8 +760,7 @@ begin
   for i:= 0 to LastIndex do
   begin
     Item:= FList.GetItem(i);
-    Str:= Item^.Str;
-    Inc(Len, Length(Str));
+    Inc(Len, Length(Item^.Str));
     if bFinalEol or (i<LastIndex) then
       Inc(Len, LenEol);
   end;
@@ -774,12 +772,14 @@ begin
   for i:= 0 to LastIndex do
   begin
     Item:= FList.GetItem(i);
-    Str:= Item^.Str;
-    Len:= Length(Str);
+    Len:= Length(Item^.Str);
     //copy string
     if Len>0 then
     begin
-      Move(Str[1], Ptr^, Len);
+      if (AMaxLen>0) and (Len>AMaxLen) then
+        FillChar(Ptr^, Len, $20) //fill item with spaces
+      else
+        Move(Item^.Str[1], Ptr^, Len);
       Inc(Ptr, Len);
     end;
     //copy eol
