@@ -271,6 +271,7 @@ const
   cGutterSizeEmpty = 2;
 
 const
+  cMaxLenToTokenize = 4000;
   cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2;
   cFoldedMarkIndentOuter = 0;

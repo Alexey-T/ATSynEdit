@@ -25,15 +25,12 @@ begin
 end;
 
 
-
 procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   var AParts: TATLineParts;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
   var AColorAfter: TColor;
   AMainText: boolean);
-const
-  cMaxLenToTokenize = 4000;
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite, bFound: boolean;
