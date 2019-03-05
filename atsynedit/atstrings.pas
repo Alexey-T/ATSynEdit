@@ -240,8 +240,6 @@ type
     procedure SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
     procedure SetLineSep(AIndex: integer; AValue: TATLineSeparator);
     procedure SetLineState(AIndex: integer; AValue: TATLineState);
-    function GetTextString_Unicode: UnicodeString;
-    function GetTextString_UTF8: string;
     procedure DoLoadFromStream(Stream: TStream);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
@@ -325,8 +323,8 @@ type
     property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
-    property TextString_Unicode: UnicodeString read GetTextString_Unicode;
-    property TextString_UTF8: string read GetTextString_UTF8;
+    function TextString_Unicode: UnicodeString;
+    function TextString_UTF8: string;
     procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
     procedure TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
@@ -738,12 +736,12 @@ begin
 end;
 
 
-function TATStrings.GetTextString_Unicode: UnicodeString;
+function TATStrings.TextString_Unicode: UnicodeString;
 begin
-  Result:= UTF8Decode(GetTextString_UTF8);
+  Result:= UTF8Decode(TextString_UTF8);
 end;
 
-function TATStrings.GetTextString_UTF8: string;
+function TATStrings.TextString_UTF8: string;
 const
   LenEol = 1;
   CharEol: char = #10;
