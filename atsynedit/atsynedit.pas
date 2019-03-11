@@ -816,9 +816,10 @@ type
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
-    procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint; const AVisRect: TRect; APointLeft: TPoint;
-      APointText: TPoint; ALineIndex: integer; ALineWidth: integer; AEolSelected: boolean;
-  const AScrollHorz: TATSynScrollInfo);
+    procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
+      const AVisRect: TRect; APointLeft,
+      APointText: TPoint; ALineIndex, ALineWidth: integer; AEolSelected: boolean;
+      const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
@@ -5135,10 +5136,8 @@ end;
 procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   ACharSize: TPoint;
   const AVisRect: TRect;
-  APointLeft: TPoint;
-  APointText: TPoint;
-  ALineIndex: integer;
-  ALineWidth: integer;
+  APointLeft, APointText: TPoint;
+  ALineIndex, ALineWidth: integer;
   AEolSelected: boolean;
   const AScrollHorz: TATSynScrollInfo);
 var
@@ -5146,24 +5145,25 @@ var
   Ranges: TATSimpleRangeArray;
   Range: TATSimpleRange;
 begin
+  C.Brush.Color:= Colors.TextSelBG;
+
   if not IsSelRectEmpty then
   begin
     if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
     begin
       NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
       NRight:= NLeft+ACharSize.X*FSelRect.Width;
-      C.Brush.Color:= Colors.TextSelBG;
-      C.FillRect(
-        NLeft,
-        APointLeft.Y,
-        NRight,
-        APointLeft.Y+ACharSize.Y);
+      NLeft:= Max(NLeft, APointText.X+ALineWidth);
+      if (NLeft<NRight) then
+        C.FillRect(
+          NLeft,
+          APointLeft.Y,
+          NRight,
+          APointLeft.Y+ACharSize.Y);
     end;
   end
   else
   begin
-    C.Brush.Color:= Colors.TextSelBG;
-
     //here we calculate ranges (XFrom, XTo) where selection(s) overlap current line,
     //and then paint fillrect for them
     NLen:= Strings.LinesLen[ALineIndex];
