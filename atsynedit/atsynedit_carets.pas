@@ -99,6 +99,7 @@ type
     function IsSelectionMultiline: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
+    procedure GetRangesSelectedInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
@@ -520,6 +521,36 @@ begin
     exit(cRangePartlySelected);
   end;
 end;
+
+procedure TATCarets.GetRangesSelectedInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
+var
+  X1, Y1, X2, Y2, XFrom, XTo: integer;
+  i: integer;
+  bSel: boolean;
+begin
+  SetLength(ARanges, 0);
+  for i:= 0 to Count-1 do
+  begin
+    Items[i].GetRange(X1, Y1, X2, Y2, bSel);
+    if not bSel then Continue;
+
+    if (Y1>AY) or (Y2<AY) then Continue;
+
+    if (Y1<AY) then XFrom:= 0 else XFrom:= X1;
+    if (Y2>AY) then XTo:= MaxInt else XTo:= X2;
+
+    if XTo<=AX then Continue;
+    if XFrom<AX then XFrom:= AX;
+
+    SetLength(ARanges, Length(ARanges)+1);
+    with ARanges[Length(ARanges)-1] do
+    begin
+      NFrom:= XFrom;
+      NTo:= XTo;
+    end;
+  end;
+end;
+
 
 function TATCarets.CaretAtEdge(AEdge: TATCaretEdge): TPoint;
 var

@@ -23,6 +23,8 @@ type
   TATIntArray = array of integer;
   TATPointArray = array of TPoint;
   TATLineOffsetsInfo = array of integer; //word is too small
+  TATSimpleRange = record NFrom, NTo: integer; end;
+  TATSimpleRangeArray = array of TATSimpleRange;
 
 function SCharUpper(ch: atChar): atChar; inline;
 function SCharLower(ch: atChar): atChar; inline;

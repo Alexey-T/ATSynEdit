@@ -5140,7 +5140,9 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   AEolSelected: boolean;
   const AScrollHorz: TATSynScrollInfo);
 var
-  NLeft, NRight: integer;
+  NLeft, NRight, NLen, i: integer;
+  Ranges: TATSimpleRangeArray;
+  Range: TATSimpleRange;
 begin
   if not IsSelRectEmpty then
   begin
@@ -5157,6 +5159,31 @@ begin
     end;
   end
   else
+  begin
+    C.Brush.Color:= Colors.TextSelBG;
+
+    //here we calculate ranges (XFrom, XTo) where selection(s) overlap current line,
+    //and then paint fillrect for them
+    NLen:= Strings.LinesLen[ALineIndex];
+    Carets.GetRangesSelectedInLineAfterPoint(NLen, ALineIndex, Ranges);
+
+    for i:= 0 to Length(Ranges)-1 do
+    begin
+      Range:= Ranges[i];
+      NLeft:= APointText.X + Range.NFrom*ACharSize.X;
+      if Range.NTo=MaxInt then
+        NRight:= AVisRect.Right
+      else
+        NRight:= NLeft+(Range.NTo-Range.NFrom)*ACharSize.X;
+
+      C.FillRect(
+        NLeft,
+        APointText.Y,
+        NRight,
+        APointText.Y+ACharSize.Y
+        );
+    end;
+  {
   if FOptShowFullSel then
     if AEolSelected then
     begin
@@ -5167,6 +5194,8 @@ begin
         AVisRect.Right,
         APointText.Y+ACharSize.Y);
     end;
+    }
+  end;
 end;
 
 procedure TATSynEdit.DoPaintNiceScroll(C: TCanvas);
