@@ -5166,13 +5166,10 @@ begin
     NLen:= Strings.LinesLen[ALineIndex];
     Carets.GetRangesSelectedInLineAfterPoint(NLen, ALineIndex, Ranges);
 
-    if Length(Ranges)=1 then
-    begin
-      Range:= Ranges[0];
-      if (Range.NFrom=NLen) and (Range.NTo=MaxInt) then
-        if not FOptShowFullSel then
+    if not FOptShowFullSel then
+      if Length(Ranges)=1 then
+        if (Ranges[0].NFrom=NLen) and (Ranges[0].NTo=MaxInt) then
           exit;
-    end;
 
     for i:= 0 to Length(Ranges)-1 do
     begin
