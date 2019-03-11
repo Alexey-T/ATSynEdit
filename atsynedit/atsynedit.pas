@@ -5184,9 +5184,9 @@ begin
         NRight:= NLeft+(Range.NTo-Range.NFrom)*ACharSize.X;
 
       C.FillRect(
-        NLeft,
+        Max(AVisRect.Left, NLeft),
         APointText.Y,
-        NRight,
+        Min(AVisRect.Right, NRight),
         APointText.Y+ACharSize.Y
         );
     end;
