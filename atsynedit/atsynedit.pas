@@ -816,10 +816,9 @@ type
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
-    procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
-      const AVisRect: TRect; APointLeft: TPoint; APointText: TPoint;
-      ALineIndex: integer; AEolSelected: boolean;
-      const AScrollHorz: TATSynScrollInfo);
+    procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint; const AVisRect: TRect; APointLeft: TPoint;
+      APointText: TPoint; ALineIndex: integer; ALineWidth: integer; AEolSelected: boolean;
+  const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
@@ -2567,6 +2566,7 @@ begin
           CurrPoint,
           CurrPointText,
           NLinesIndex,
+          NOutputStrWidth,
           LineEolSelected,
           AScrollHorz);
       end
@@ -2607,6 +2607,7 @@ begin
         CurrPoint,
         CurrPointText,
         NLinesIndex,
+        0,
         LineEolSelected,
         AScrollHorz);
     end;
@@ -5137,6 +5138,7 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   APointLeft: TPoint;
   APointText: TPoint;
   ALineIndex: integer;
+  ALineWidth: integer;
   AEolSelected: boolean;
   const AScrollHorz: TATSynScrollInfo);
 var
@@ -5170,7 +5172,7 @@ begin
     for i:= 0 to Length(Ranges)-1 do
     begin
       Range:= Ranges[i];
-      NLeft:= APointText.X + Range.NFrom*ACharSize.X;
+      NLeft:= APointText.X + ALineWidth + (Range.NFrom-NLen)*ACharSize.X;
       if Range.NTo=MaxInt then
         NRight:= AVisRect.Right
       else
