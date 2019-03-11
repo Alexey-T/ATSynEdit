@@ -2519,14 +2519,6 @@ begin
           C.FillRect(CurrPointText.X, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
         end;
 
-      //paint selection bg, after applying ColorAfterEol
-      DoPaintSelectedLineBG(C, ACharSize, ARect,
-        CurrPoint,
-        CurrPointText,
-        NLinesIndex,
-        LineEolSelected,
-        AScrollHorz);
-
       if AWithGutter then
         Event:= FOnDrawLine
       else
@@ -2568,7 +2560,15 @@ begin
           @FLineParts,
           NOutputStrWidth,
           TextOutProps
-          )
+          );
+
+        //paint selection bg, after applying ColorAfterEol
+        DoPaintSelectedLineBG(C, ACharSize, ARect,
+          CurrPoint,
+          CurrPointText,
+          NLinesIndex,
+          LineEolSelected,
+          AScrollHorz);
       end
       else
       if StrOut<>'' then
