@@ -817,9 +817,9 @@ type
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
-      const AVisRect: TRect; APointLeft,
-      APointText: TPoint; ALineIndex, ALineWidth: integer; AEolSelected: boolean;
-      const AScrollHorz: TATSynScrollInfo);
+      const AVisRect: TRect;
+      APointLeft, APointText: TPoint;
+      ALineIndex, ALineWidth: integer; const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
@@ -2568,7 +2568,6 @@ begin
           CurrPointText,
           NLinesIndex,
           NOutputStrWidth,
-          LineEolSelected,
           AScrollHorz);
       end
       else
@@ -2609,7 +2608,6 @@ begin
         CurrPointText,
         NLinesIndex,
         0,
-        LineEolSelected,
         AScrollHorz);
     end;
 
@@ -5138,7 +5136,6 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   const AVisRect: TRect;
   APointLeft, APointText: TPoint;
   ALineIndex, ALineWidth: integer;
-  AEolSelected: boolean;
   const AScrollHorz: TATSynScrollInfo);
 var
   NLeft, NRight, NLen, i: integer;
@@ -5168,6 +5165,14 @@ begin
     //and then paint fillrect for them
     NLen:= Strings.LinesLen[ALineIndex];
     Carets.GetRangesSelectedInLineAfterPoint(NLen, ALineIndex, Ranges);
+
+    if Length(Ranges)=1 then
+    begin
+      Range:= Ranges[0];
+      if (Range.NFrom=NLen) and (Range.NTo=MaxInt) then
+        if not FOptShowFullSel then
+          exit;
+    end;
 
     for i:= 0 to Length(Ranges)-1 do
     begin
