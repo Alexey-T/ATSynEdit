@@ -819,7 +819,7 @@ type
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
       const AVisRect: TRect;
       APointLeft, APointText: TPoint;
-      ALineIndex, ALineWidth: integer; const AScrollHorz: TATSynScrollInfo);
+      ALineIndex, ALineLen, ALineWidth: integer; const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
@@ -2233,7 +2233,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   ALineFrom: integer);
 var
   NCoordTop, NCoordSep: integer;
-  NWrapIndex, NWrapIndexDummy, NLinesIndex: integer;
+  NWrapIndex, NWrapIndexDummy, NLinesIndex, NLineLen: integer;
   NOutputCharsSkipped, NOutputStrWidth, NOutputSpacesSkipped: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
@@ -2428,10 +2428,12 @@ begin
 
     if AMainText then
     begin
+      NLineLen:= Strings.LinesLen[NLinesIndex];
+
       //horz scrollbar max: calced here, to make variable horz bar
       //vert scrollbar max: calced in UpdateScrollbars
       if Strings.LinesLenRaw[NLinesIndex] > FOptMaxLineLengthForSlowWidthDetect then
-        NOutputStrWidth:= Strings.LinesLen[NLinesIndex] //approx len, it don't consider CJK chars
+        NOutputStrWidth:= NLineLen //approx len, it don't consider CJK chars
       else
         NOutputStrWidth:= CanvasTextWidth(
             Strings.Lines[NLinesIndex],
@@ -2567,6 +2569,7 @@ begin
           CurrPoint,
           CurrPointText,
           NLinesIndex,
+          NLineLen,
           NOutputStrWidth,
           AScrollHorz);
       end
@@ -2607,6 +2610,7 @@ begin
         CurrPoint,
         CurrPointText,
         NLinesIndex,
+        0,
         0,
         AScrollHorz);
     end;
@@ -5135,10 +5139,10 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   ACharSize: TPoint;
   const AVisRect: TRect;
   APointLeft, APointText: TPoint;
-  ALineIndex, ALineWidth: integer;
+  ALineIndex, ALineLen, ALineWidth: integer;
   const AScrollHorz: TATSynScrollInfo);
 var
-  NLeft, NRight, NLen, i: integer;
+  NLeft, NRight, i: integer;
   Ranges: TATSimpleRangeArray;
   Range: TATSimpleRange;
 begin
@@ -5163,18 +5167,17 @@ begin
   begin
     //here we calculate ranges (XFrom, XTo) where selection(s) overlap current line,
     //and then paint fillrect for them
-    NLen:= Strings.LinesLen[ALineIndex];
-    Carets.GetRangesSelectedInLineAfterPoint(NLen, ALineIndex, Ranges);
+    Carets.GetRangesSelectedInLineAfterPoint(ALineLen, ALineIndex, Ranges);
 
     if not FOptShowFullSel then
       if Length(Ranges)=1 then
-        if (Ranges[0].NFrom=NLen) and (Ranges[0].NTo=MaxInt) then
+        if (Ranges[0].NFrom=ALineLen) and (Ranges[0].NTo=MaxInt) then
           exit;
 
     for i:= 0 to Length(Ranges)-1 do
     begin
       Range:= Ranges[i];
-      NLeft:= APointText.X + ALineWidth + (Range.NFrom-NLen)*ACharSize.X;
+      NLeft:= APointText.X + ALineWidth + (Range.NFrom-ALineLen)*ACharSize.X;
       if Range.NTo=MaxInt then
         NRight:= AVisRect.Right
       else
