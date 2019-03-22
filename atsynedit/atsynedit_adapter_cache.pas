@@ -43,6 +43,7 @@ type
       const ALineIndex, ACharIndex, ALineLen: integer;
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
+    procedure Delete(N: integer);
     procedure DeleteForLine(ALineIndex: integer);
   end;
 
@@ -76,7 +77,11 @@ begin
 end;
 
 procedure TATAdapterHiliteCache.Clear;
+var
+  i: integer;
 begin
+  for i:= FList.Count-1 downto 0 do
+    TObject(FList[i]).Free;
   FList.Clear;
 end;
 
@@ -107,7 +112,7 @@ begin
     }
 
   while FList.Count>FMaxCount do
-    FList.Delete(FList.Count-1);
+    Delete(FList.Count-1);
 
   Item:= TATAdapterCacheItem.Create;
   Item.LineIndex:= ALineIndex;
@@ -144,6 +149,12 @@ begin
   end;
 end;
 
+procedure TATAdapterHiliteCache.Delete(N: integer);
+begin
+  TObject(FList[N]).Free;
+  FList.Delete(N);
+end;
+
 procedure TATAdapterHiliteCache.DeleteForLine(ALineIndex: integer);
 var
   Item: TATAdapterCacheItem;
@@ -153,7 +164,7 @@ begin
   begin
     Item:= TATAdapterCacheItem(FList.Items[i]);
     if (Item.LineIndex=ALineIndex) then
-      FList.Delete(i);
+      Delete(i);
   end;
 end;
 
