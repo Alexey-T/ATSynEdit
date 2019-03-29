@@ -60,6 +60,7 @@ type
     function IndexOf(ACmd: integer): integer;
     function GetShortcutFromCommand(ACode: integer): TShortcut;
     function GetCommandFromShortcut(AKey: TShortcut): integer;
+    function GetCommandFromHotkeyString(AHotkey: string; const AComboSepar: string): integer;
   end;
 
 implementation
@@ -207,6 +208,25 @@ begin
 
   if AKey>0 then
     AddToHistory(AKey);
+end;
+
+function TATKeymap.GetCommandFromHotkeyString(AHotkey: string; const AComboSepar: string): integer;
+var
+  Ar: TATKeyArray;
+  Item: TATKeymapItem;
+  i: integer;
+begin
+  Result:= -1;
+  if AHotkey='' then exit;
+  AHotkey:= StringReplace(AHotkey, AComboSepar, '*', [rfReplaceAll]);
+  KeyArraySetFromString(Ar, AHotkey);
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    if KeyArraysEqualNotEmpty(Item.Keys1, Ar) or
+       KeyArraysEqualNotEmpty(Item.Keys2, Ar) then
+        exit(i);
+  end;
 end;
 
 function TATKeymap.IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut;
