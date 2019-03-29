@@ -152,8 +152,8 @@ begin
   Item.Command:= ACmd;
   Item.Name:= AName;
 
-  FillChar(Item.Keys1, Sizeof(Item.Keys1), 0);
-  FillChar(Item.Keys2, Sizeof(Item.Keys2), 0);
+  Item.Keys1.Clear;
+  Item.Keys2.Clear;
 
   for i:= 0 to Min(High(AKeys1), High(Item.Keys1.Data)) do Item.Keys1.Data[i]:= _TextToShortcut(AKeys1[i]);
   for i:= 0 to Min(High(AKeys2), High(Item.Keys2.Data)) do Item.Keys2.Data[i]:= _TextToShortcut(AKeys2[i]);
@@ -296,6 +296,7 @@ begin
   FHistory.Data[len]:= sh;
 end;
 
+{ TATKeyArray }
 
 function TATKeyArray.ToString: string;
 var
@@ -322,7 +323,6 @@ begin
     Data[i]:= TextToShortCut(S);
   end;
 end;
-
 
 class operator TATKeyArray.=(const a1, a2: TATKeyArray): boolean;
 var
