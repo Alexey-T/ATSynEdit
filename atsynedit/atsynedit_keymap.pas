@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Keymap;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 //{$define test_correct_keynames}
 
@@ -17,13 +18,15 @@ const
   cMaxKeyCombo = 3; //3 must be enougth for everybody..
 
 type
-  TATKeyArray = array[0..Pred(cMaxKeyCombo)] of TShortcut;
-
-function KeyArrayToString(const K: TATKeyArray): string;
-procedure KeyArraySetFromString(var K: TATKeyArray; StrKeys: string);
-function KeyArraysEqualNotEmpty(const a1, a2: TATKeyArray): boolean;
-function KeyArrayLength(const K: TATKeyArray): integer;
-procedure KeyArrayClear(var K: TATKeyArray);
+  TATKeyArray = record
+  public
+    Data: array[0..Pred(cMaxKeyCombo)] of TShortcut;
+    function ToString: string;
+    procedure SetFromString(StrKeys: string);
+    class operator =(const a1, a2: TATKeyArray): boolean;
+    function Length: integer;
+    procedure Clear;
+  end;
 
 type
   { TATKeymapItem }
@@ -70,19 +73,21 @@ uses
   LCLProc,
   Dialogs;
 
-function KeyArrayLength(const K: TATKeyArray): integer;
+{ TATKeyArray }
+
+function TATKeyArray.Length: integer;
 var
   i: integer;
 begin
   Result:= 0;
-  for i:= Low(K) to High(K) do
-    if K[i]<>0 then
+  for i:= Low(Data) to High(Data) do
+    if Data[i]<>0 then
       Inc(Result);
 end;
 
-procedure KeyArrayClear(var K: TATKeyArray);
+procedure TATKeyArray.Clear;
 begin
-  FillChar(K, SizeOf(K), 0);
+  FillChar(Data, SizeOf(Data), 0);
 end;
 
 { TATKeymap }
@@ -150,8 +155,8 @@ begin
   FillChar(Item.Keys1, Sizeof(Item.Keys1), 0);
   FillChar(Item.Keys2, Sizeof(Item.Keys2), 0);
 
-  for i:= 0 to Min(High(AKeys1), High(Item.Keys1)) do Item.Keys1[i]:= _TextToShortcut(AKeys1[i]);
-  for i:= 0 to Min(High(AKeys2), High(Item.Keys2)) do Item.Keys2[i]:= _TextToShortcut(AKeys2[i]);
+  for i:= 0 to Min(High(AKeys1), High(Item.Keys1.Data)) do Item.Keys1.Data[i]:= _TextToShortcut(AKeys1[i]);
+  for i:= 0 to Min(High(AKeys2), High(Item.Keys2.Data)) do Item.Keys2.Data[i]:= _TextToShortcut(AKeys2[i]);
 
   FList.Add(Item);
 end;
@@ -182,8 +187,8 @@ begin
     if Items[i].Command=ACode then
     begin
       //don't get result if combo is set
-      if Items[i].Keys1[1]=0 then
-        Result:= Items[i].Keys1[0];
+      if Items[i].Keys1.Data[1]=0 then
+        Result:= Items[i].Keys1.Data[0];
       Exit;
     end;
 end;
@@ -219,12 +224,12 @@ begin
   Result:= -1;
   if AHotkey='' then exit;
   AHotkey:= StringReplace(AHotkey, AComboSepar, '*', [rfReplaceAll]);
-  KeyArraySetFromString(Ar, AHotkey);
+  Ar.SetFromString(AHotkey);
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
-    if KeyArraysEqualNotEmpty(Item.Keys1, Ar) or
-       KeyArraysEqualNotEmpty(Item.Keys2, Ar) then
+    if (Item.Keys1=Ar) or
+       (Item.Keys2=Ar) then
         exit(i);
   end;
 end;
@@ -238,20 +243,20 @@ var
 begin
   Result:= false;
 
-  LenThis:= KeyArrayLength(AKeys);
+  LenThis:= AKeys.Length;
   if LenThis=0 then Exit;
 
   if LenThis=1 then
   begin
-    Result:= AAllowOneKey and (AKeys[0]=AKey);
+    Result:= AAllowOneKey and (AKeys.Data[0]=AKey);
     Exit
   end;
 
   //AKey is last in combo AKeys?
-  if AKeys[LenThis-1]<>AKey then Exit;
+  if AKeys.Data[LenThis-1]<>AKey then Exit;
 
   //stack filled?
-  LenStack:= KeyArrayLength(FHistory);
+  LenStack:= FHistory.Length;
   if LenStack<LenThis-1 then
   begin
     //showmessage('no match: if lenstack');
@@ -262,8 +267,8 @@ begin
   for i:= LenThis-2 downto 0 do
   begin
     IndexStack:= LenStack-1-(LenThis-2-i);
-    if (IndexStack>=Low(FHistory)) and (IndexStack<=High(FHistory)) then
-      if AKeys[i]<>FHistory[IndexStack] then
+    if (IndexStack>=Low(FHistory.Data)) and (IndexStack<=High(FHistory.Data)) then
+      if AKeys.Data[i]<>FHistory.Data[IndexStack] then
       begin
         //showmessage('no match: check items');
         Exit;
@@ -275,61 +280,61 @@ end;
 
 procedure TATKeymap.ClearHistory;
 begin
-  FillChar(FHistory, Sizeof(FHistory), 0);
+  FHistory.Clear;
 end;
 
 procedure TATKeymap.AddToHistory(sh: TShortcut);
 var
   len: integer;
 begin
-  len:= KeyArrayLength(FHistory);
-  if len>=Length(FHistory) then
+  len:= FHistory.Length;
+  if len>=Length(FHistory.Data) then
   begin
     ClearHistory;
-    len:= KeyArrayLength(FHistory);
+    len:= 0;
   end;
-  FHistory[len]:= sh;
+  FHistory.Data[len]:= sh;
 end;
 
 
-function KeyArrayToString(const K: TATKeyArray): string;
+function TATKeyArray.ToString: string;
 var
   i: integer;
 begin
   result:= '';
-  for i:= Low(K) to High(K) do
-    if K[i]<>0 then
+  for i:= Low(Data) to High(Data) do
+    if Data[i]<>0 then
     begin
       if result<>'' then
         result:= result+' * ';
-      result:= result+ShortcutToText(K[i]);
+      result:= result+ShortcutToText(Data[i]);
     end;
 end;
 
-procedure KeyArraySetFromString(var K: TATKeyArray; StrKeys: string);
+procedure TATKeyArray.SetFromString(StrKeys: string);
 var
   S: string;
   i: integer;
 begin
-  for i:= Low(K) to High(K) do
+  for i:= Low(Data) to High(Data) do
   begin
     S:= Trim(SGetItem(StrKeys, '*')); //allow '*' with near spaces
-    K[i]:= TextToShortCut(S);
+    Data[i]:= TextToShortCut(S);
   end;
 end;
 
 
-function KeyArraysEqualNotEmpty(const a1, a2: TATKeyArray): boolean;
+class operator TATKeyArray.=(const a1, a2: TATKeyArray): boolean;
 var
   i: integer;
 begin
   Result:= true;
 
-  if a1[0]=0 then Exit(false);
-  if a2[0]=0 then Exit(false);
+  if a1.Data[0]=0 then Exit(false);
+  if a2.Data[0]=0 then Exit(false);
 
-  for i:= Low(a1) to High(a1) do
-    if a1[i]<>a2[i] then Exit(false);
+  for i:= Low(a1.Data) to High(a1.Data) do
+    if a1.Data[i]<>a2.Data[i] then Exit(false);
 end;
 
 
