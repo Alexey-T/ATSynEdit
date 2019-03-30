@@ -18,12 +18,14 @@ type
   { TATKeyArray }
 
   TATKeyArray = record
+  private
+    const ComboSeparator = '*';
   public
     Data: array[0..2] of TShortcut; //hotkey combo max len, 3 must be enough for everybody
     procedure Clear;
     function Length: integer;
     function ToString: string;
-    procedure SetFromString(AHotkey: string; AComboSepar: char= '*');
+    procedure SetFromString(AHotkey: string; AComboSepar: char= ComboSeparator);
     class operator =(const a1, a2: TATKeyArray): boolean;
   end;
 
@@ -298,7 +300,7 @@ end;
 
 function TATKeyArray.ToString: string;
 const
-  cNiceSeparator = ' * ';
+  cNiceSeparator = ' '+ComboSeparator+' ';
 var
   i: integer;
 begin
