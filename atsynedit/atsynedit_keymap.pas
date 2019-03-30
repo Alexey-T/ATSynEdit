@@ -14,16 +14,12 @@ interface
 uses
   Classes, SysUtils, Forms, ATStringProc;
 
-const
-  cMaxKeyCombo = 3; //3 must be enougth for everybody..
-
 type
-
   { TATKeyArray }
 
   TATKeyArray = record
   public
-    Data: array[0..Pred(cMaxKeyCombo)] of TShortcut;
+    Data: array[0..2] of TShortcut; //hotkey combo max len, 3 must be enough for everybody
     function ToString: string;
     procedure SetFromString(AHotkey: string; AComboSepar: char= '*');
     class operator =(const a1, a2: TATKeyArray): boolean;
