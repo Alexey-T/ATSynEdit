@@ -297,6 +297,8 @@ end;
 { TATKeyArray }
 
 function TATKeyArray.ToString: string;
+const
+  cNiceSeparator = ' * ';
 var
   i: integer;
 begin
@@ -304,9 +306,9 @@ begin
   for i:= Low(Data) to High(Data) do
     if Data[i]<>0 then
     begin
-      if result<>'' then
-        result:= result+' * ';
-      result:= result+ShortcutToText(Data[i]);
+      if Result<>'' then
+        Result+= cNiceSeparator;
+      Result+= ShortcutToText(Data[i]);
     end;
 end;
 
