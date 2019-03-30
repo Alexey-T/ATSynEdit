@@ -18,11 +18,14 @@ const
   cMaxKeyCombo = 3; //3 must be enougth for everybody..
 
 type
+
+  { TATKeyArray }
+
   TATKeyArray = record
   public
     Data: array[0..Pred(cMaxKeyCombo)] of TShortcut;
     function ToString: string;
-    procedure SetFromString(StrKeys: string);
+    procedure SetFromString(AHotkey: string; AComboSepar: char= '*');
     class operator =(const a1, a2: TATKeyArray): boolean;
     function Length: integer;
     procedure Clear;
@@ -63,7 +66,7 @@ type
     function IndexOf(ACmd: integer): integer;
     function GetShortcutFromCommand(ACode: integer): TShortcut;
     function GetCommandFromShortcut(AKey: TShortcut): integer;
-    function GetCommandFromHotkeyString(AHotkey: string; const AComboSepar: string): integer;
+    function GetCommandFromHotkeyString(AHotkey: string; AComboSepar: char): integer;
   end;
 
 implementation
@@ -215,7 +218,7 @@ begin
     AddToHistory(AKey);
 end;
 
-function TATKeymap.GetCommandFromHotkeyString(AHotkey: string; const AComboSepar: string): integer;
+function TATKeymap.GetCommandFromHotkeyString(AHotkey: string; AComboSepar: char): integer;
 var
   Ar: TATKeyArray;
   Item: TATKeymapItem;
@@ -223,8 +226,7 @@ var
 begin
   Result:= -1;
   if AHotkey='' then exit;
-  AHotkey:= StringReplace(AHotkey, AComboSepar, '*', [rfReplaceAll]);
-  Ar.SetFromString(AHotkey);
+  Ar.SetFromString(AHotkey, AComboSepar);
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
@@ -312,14 +314,16 @@ begin
     end;
 end;
 
-procedure TATKeyArray.SetFromString(StrKeys: string);
+procedure TATKeyArray.SetFromString(AHotkey: string; AComboSepar: char);
 var
   S: string;
   i: integer;
 begin
+  Clear;
   for i:= Low(Data) to High(Data) do
   begin
-    S:= Trim(SGetItem(StrKeys, '*')); //allow '*' with near spaces
+    S:= Trim(SGetItem(AHotkey, AComboSepar)); //Trim to allow near spaces
+    if S='' then Break;
     Data[i]:= TextToShortCut(S);
   end;
 end;
