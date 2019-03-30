@@ -20,11 +20,11 @@ type
   TATKeyArray = record
   public
     Data: array[0..2] of TShortcut; //hotkey combo max len, 3 must be enough for everybody
+    procedure Clear;
+    function Length: integer;
     function ToString: string;
     procedure SetFromString(AHotkey: string; AComboSepar: char= '*');
     class operator =(const a1, a2: TATKeyArray): boolean;
-    function Length: integer;
-    procedure Clear;
   end;
 
 type
