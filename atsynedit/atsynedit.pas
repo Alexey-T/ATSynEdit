@@ -3478,7 +3478,10 @@ procedure TATSynEdit.Update(
 begin
   UpdateCursor;
   if AUpdateWrapInfo then
+  begin
     FWrapUpdateNeeded:= true;
+    ////UpdateWrapInfo; //performed later
+  end;
   if AUpdateCaretsCoords then
     Include(FPaintFlags, cPaintUpdateCaretsCoords);
   Invalidate;

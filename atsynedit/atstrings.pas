@@ -1602,6 +1602,7 @@ begin
     if LinesEnds[Count-1]=cEndNone then
     begin
       LinesEnds[Count-1]:= Endings;
+      ActionAddFakeLineIfNeeded;
       Result:= true;
     end;
   end;
