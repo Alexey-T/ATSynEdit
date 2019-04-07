@@ -1789,7 +1789,17 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TATWrapItems;
+procedure _CalcWrapInfos(
+  AStrings: TATStrings;
+  ATabHelper: TATStringTabHelper;
+  AEditorIndex: integer;
+  AWrapColumn: integer;
+  AWrapIndented: boolean;
+  AVisibleColumns: integer;
+  const AWordChars: atString;
+  ALine: integer;
+  AIndentMaximal: integer;
+  AItems: TATWrapItems;
   AConsiderFolding: boolean);
 var
   Item: TATWrapItem;
@@ -1804,17 +1814,17 @@ begin
   if AConsiderFolding then
   begin
     //line folded entirely?
-    bHidden:= Strings.LinesHidden[ALine, FEditorIndex];
+    bHidden:= AStrings.LinesHidden[ALine, AEditorIndex];
     if bHidden then Exit;
   end;
 
-  NLen:= Strings.LinesLen[ALine];
+  NLen:= AStrings.LinesLen[ALine];
 
   //consider fold, before wordwrap
   if AConsiderFolding then
   begin
     //line folded partially?
-    NFoldFrom:= Strings.LinesFoldFrom[ALine, FEditorIndex];
+    NFoldFrom:= AStrings.LinesFoldFrom[ALine, AEditorIndex];
     if NFoldFrom>0 then
     begin
       Item.Init(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed);
@@ -1824,27 +1834,27 @@ begin
   end;
 
   //line not wrapped?
-  if (FWrapColumn<cMinWrapColumnAbs) then
+  if (AWrapColumn<cMinWrapColumnAbs) then
   begin
     Item.Init(ALine, 1, NLen, 0, cWrapItemFinal);
     AItems.Add(Item);
     Exit;
   end;
 
-  Str:= Strings.Lines[ALine];
-  NVisColumns:= Max(GetVisibleColumns, cMinWrapColumnAbs);
+  Str:= AStrings.Lines[ALine];
+  NVisColumns:= Max(AVisibleColumns, cMinWrapColumnAbs);
   NOffset:= 1;
   NIndent:= 0;
 
   repeat
-    NLen:= FTabHelper.FindWordWrapOffset(
+    NLen:= ATabHelper.FindWordWrapOffset(
       ALine,
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
       Copy(Str, 1, NVisColumns),
-      Max(FWrapColumn-NIndent, cMinWrapColumnAbs),
-      FOptWordChars,
-      FWrapIndented);
+      Max(AWrapColumn-NIndent, cMinWrapColumnAbs),
+      AWordChars,
+      AWrapIndented);
 
     if NLen>=Length(Str) then
       NFinal:= cWrapItemFinal
@@ -1854,10 +1864,10 @@ begin
     Item.Init(ALine, NOffset, NLen, NIndent, NFinal);
     AItems.Add(Item);
 
-    if FWrapIndented then
+    if AWrapIndented then
       if NOffset=1 then
       begin
-        NIndent:= FTabHelper.GetIndentExpanded(ALine, Str);
+        NIndent:= ATabHelper.GetIndentExpanded(ALine, Str);
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
@@ -1865,6 +1875,25 @@ begin
     Delete(Str, 1, NLen);
   until Str='';
 end;
+
+
+procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TATWrapItems;
+  AConsiderFolding: boolean);
+begin
+  _CalcWrapInfos(
+    Strings,
+    FTabHelper,
+    FEditorIndex,
+    FWrapColumn,
+    FWrapIndented,
+    GetVisibleColumns,
+    FOptWordChars,
+    ALine,
+    AIndentMaximal,
+    AItems,
+    AConsiderFolding);
+end;
+
 
 function TATSynEdit.GetVisibleLines: integer; inline;
 begin
