@@ -4564,7 +4564,7 @@ end;
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   P: TPoint;
-  RectNums, RectBookmk: TRect;
+  R, RectNums, RectBookmk: TRect;
   bOnMain, bOnMinimap, bOnMicromap, bOnGutter: boolean;
   Details: TATPosDetails;
   nIndex: integer;
@@ -4572,9 +4572,24 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
 
-  FMouseDragCoord:= Point(-1, -1);
   P:= Point(X, Y);
   UpdateCursor;
+
+  if (not FMouseDragDropping) and (FMouseDownPnt.X>=0) then
+  begin
+    FMouseDragCoord:= P;
+    R:= FRectMainVisible;
+    if FMouseDragCoord.X<R.Left+1 then
+      FMouseDragCoord.X:= R.Left+1;
+    if FMouseDragCoord.X>R.Right then
+      FMouseDragCoord.X:= R.Right;
+    if FMouseDragCoord.Y<R.Top+1 then
+      FMouseDragCoord.Y:= R.Top+1;
+    if FMouseDragCoord.Y>R.Bottom then
+      FMouseDragCoord.Y:= R.Bottom;
+  end
+  else
+    FMouseDragCoord:= Point(-1, -1);
 
   bOnMain:= PtInRect(FRectMain, P);
   bOnMinimap:= false;
@@ -4720,7 +4735,6 @@ begin
       if ssLeft in Shift then
         if Carets.Count>0 then
         begin
-          FMouseDragCoord:= P;
           P:= ClientPosToCaretPos(P, Details);
           if (P.Y>=0) and
             //mouse actually moved
