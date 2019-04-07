@@ -1,4 +1,7 @@
 
+2019.04.07
++ add: property OptMouseDragFrameVisible (show dotted frame during mouse selection)
+
 2019.02.06
 + add: Gaps items have new Color property
 
