@@ -246,6 +246,7 @@ const
   cInitMinimapTooltipLinesCount = 6;
   cInitMinimapTooltipWidthPercents = 60;
   cInitMicromapVisible = false;
+  cInitMouseDragFrameVisible = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
   cInitMicromapWidth = 30;
@@ -429,6 +430,8 @@ type
     FMenuRuler: TPopupMenu;
     FOverwrite: boolean;
     FHintWnd: THintWindow;
+    FMouseDownCoord: TPoint;
+    FMouseDragCoord: TPoint;
     FMouseDownPnt: TPoint;
     FMouseDownGutterLineNumber: integer;
     FMouseDownOnMinimap: boolean;
@@ -653,6 +656,7 @@ type
     FOptMouseDragDrop: boolean;
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
+    FOptMouseDragFrameVisible: boolean;
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseClickNumberSelectsLine: boolean;
     FOptMouseClickNumberSelectsLineWithEOL: boolean;
@@ -1443,6 +1447,7 @@ type
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
+    property OptMouseDragFrameVisible: boolean read FOptMouseDragFrameVisible write FOptMouseDragFrameVisible default cInitMouseDragFrameVisible;
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
@@ -2186,6 +2191,15 @@ begin
     DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
   else
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
+
+  if FOptMouseDragFrameVisible then
+    if FMouseDragCoord.X>=0 then
+      C.DrawFocusRect(Rect(
+        FMouseDownCoord.X - FScrollHorz.NPos*FCharSize.X - FScrollHorz.NPixelOffset,
+        FMouseDownCoord.Y - FScrollVert.NPos*FCharSize.Y - FScrollVert.NPixelOffset,
+        FMouseDragCoord.X,
+        FMouseDragCoord.Y
+        ));
 end;
 
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
@@ -3352,6 +3366,7 @@ begin
   FOptMouseDragDrop:= true;
   FOptMouseDragDropCopying:= true;
   FOptMouseDragDropCopyingWithState:= ssModifier;
+  FOptMouseDragFrameVisible:= cInitMouseDragFrameVisible;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
   FOptMouse2ClickSelectsLine:= false;
@@ -4202,6 +4217,9 @@ begin
   SetFocus;
   DoCaretForceShow;
 
+  FMouseDownCoord.X:= X + FScrollHorz.NPos*FCharSize.X + FScrollHorz.NPixelOffset;
+  FMouseDownCoord.Y:= Y + FScrollVert.NPos*FCharSize.Y + FScrollVert.NPixelOffset;
+
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
   FMouseDownOnMinimap:= false;
@@ -4361,6 +4379,13 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
 
+  if FOptMouseDragFrameVisible then
+    if FMouseDragCoord.X>=0 then
+    begin
+      FMouseDragCoord:= Point(-1, -1);
+      Invalidate;
+    end;
+
   if PtInRect(FRectMinimap, Point(X, Y)) then
   begin
     if FMouseDownOnMinimap then
@@ -4512,6 +4537,7 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
 
+  FMouseDragCoord:= Point(-1, -1);
   P:= Point(X, Y);
   UpdateCursor;
 
@@ -4659,6 +4685,7 @@ begin
       if ssLeft in Shift then
         if Carets.Count>0 then
         begin
+          FMouseDragCoord:= P;
           P:= ClientPosToCaretPos(P, Details);
           if (P.Y>=0) and
             //mouse actually moved
