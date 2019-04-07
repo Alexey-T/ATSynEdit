@@ -781,7 +781,7 @@ type
     procedure MenuClick(Sender: TObject);
     procedure MenuPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
-      AItems: TATWrapItems; AConsiderFolding: boolean);
+      AItems: TATWrapItems; AConsiderFolding: boolean); inline;
     procedure DoCalcLineHilite(const AData: TATWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
@@ -1878,7 +1878,7 @@ end;
 
 
 procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TATWrapItems;
-  AConsiderFolding: boolean);
+  AConsiderFolding: boolean); inline;
 begin
   _CalcWrapInfos(
     Strings,
