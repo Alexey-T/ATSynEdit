@@ -485,6 +485,7 @@ type
     FOnHotspotEnter: TATSynEditHotspotEvent;
     FOnHotspotExit: TATSynEditHotspotEvent;
     FWrapInfo: TATWrapInfo;
+    FWrapTemps: TATWrapItems;
     FWrapColumn: integer;
     FWrapMode: TATSynWrapMode;
     FWrapUpdateNeeded: boolean;
@@ -1681,7 +1682,6 @@ procedure TATSynEdit.UpdateWrapInfo;
 var
   NNewVisibleColumns: integer;
   NIndentMaximal: integer;
-  Items: TATWrapItems;
   ListNums: TATIntegerList;
   i, j: integer;
   NLine, NIndexFrom, NIndexTo: integer;
@@ -1735,30 +1735,33 @@ begin
     (Strings.ListUpdates.Count>0);
   //UseCachedUpdate:= false;////to disable
 
-  Items:= TATWrapItems.Create;
-  ListNums:= TATIntegerList.Create;
+  FWrapTemps.Clear;
 
-  try
-    if not UseCachedUpdate then
+  if not UseCachedUpdate then
+  begin
+    FWrapInfo.Clear;
+    FWrapInfo.SetCapacity(Strings.Count);
+    for i:= 0 to Strings.Count-1 do
     begin
-      FWrapInfo.Clear;
-      FWrapInfo.SetCapacity(Strings.Count);
-      for i:= 0 to Strings.Count-1 do
-      begin
-        DoCalcWrapInfos(i, NIndentMaximal, Items, bConsiderFolding);
-        for j:= 0 to Items.Count-1 do
-          FWrapInfo.Add(Items[j]);
-      end;
-    end
-    else
-    begin
+      DoCalcWrapInfos(i, NIndentMaximal, FWrapTemps, bConsiderFolding);
+      for j:= 0 to FWrapTemps.Count-1 do
+        FWrapInfo.Add(FWrapTemps[j]);
+    end;
+    FWrapTemps.Clear;
+  end
+  else
+  begin
+    //cached WrapInfo update - calculate info only for changed lines (Strings.ListUpdates)
+    //and insert results into WrapInfo
+    ListNums:= TATIntegerList.Create;
+    try
       ListNums.Assign(Strings.ListUpdates);
 
       for i:= 0 to ListNums.Count-1 do
       begin
         NLine:= ListNums[i];
-        DoCalcWrapInfos(NLine, NIndentMaximal, Items, bConsiderFolding);
-        if Items.Count=0 then Continue;
+        DoCalcWrapInfos(NLine, NIndentMaximal, FWrapTemps, bConsiderFolding);
+        if FWrapTemps.Count=0 then Continue;
 
         FWrapInfo.FindIndexesOfLineNumber(NLine, NIndexFrom, NIndexTo);
         if NIndexFrom<0 then
@@ -1769,12 +1772,12 @@ begin
 
         //slow for 100carets, 1M lines, so made method in which
         //we can optimize it (instead of del/ins do assign)
-        FWrapInfo.ReplaceItems(NIndexFrom, NIndexTo, Items);
+        FWrapInfo.ReplaceItems(NIndexFrom, NIndexTo, FWrapTemps);
       end;
+      FWrapTemps.Clear;
+    finally
+      FreeAndNil(ListNums);
     end;
-  finally
-    FreeAndNil(ListNums);
-    FreeAndNil(Items);
   end;
 
   Strings.ListUpdates.Clear;
@@ -3205,6 +3208,7 @@ begin
 
   FWrapInfo:= TATWrapInfo.Create;
   FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
+  FWrapTemps:= TATWrapItems.Create;
   FWrapUpdateNeeded:= true;
   FWrapMode:= cInitWrapMode;
   FWrapColumn:= cInitMarginRight;
@@ -3473,6 +3477,7 @@ begin
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
   FreeAndNil(FFoldedMarkList);
+  FreeAndNil(FWrapTemps);
   FreeAndNil(FWrapInfo);
   FreeAndNil(FStringsInt);
   FreeAndNil(FGutterDecor);
