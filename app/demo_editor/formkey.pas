@@ -60,8 +60,8 @@ begin
       with List.Items.Add do
       begin
         Caption:= Name;
-        SubItems.Add(ShortCutToText(Keys1[0]));
-        SubItems.Add(ShortCutToText(Keys2[0]));
+        SubItems.Add(ShortCutToText(Keys1.Data[0]));
+        SubItems.Add(ShortCutToText(Keys2.Data[0]));
         SubItems.Add(Inttostr(Command));
       end;
 
