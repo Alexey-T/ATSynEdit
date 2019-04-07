@@ -4561,10 +4561,19 @@ begin
     Cursor:= crDefault;
 end;
 
+
+procedure _LimitPointByRect(var P: TPoint; const R: TRect); inline;
+begin
+  if P.X<R.Left+1 then P.X:= R.Left+1;
+  if P.X>R.Right then P.X:= R.Right;
+  if P.Y<R.Top+1 then P.Y:= R.Top+1;
+  if P.Y>R.Bottom then P.Y:= R.Bottom;
+end;
+
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   P: TPoint;
-  R, RectNums, RectBookmk: TRect;
+  RectNums, RectBookmk: TRect;
   bOnMain, bOnMinimap, bOnMicromap, bOnGutter: boolean;
   Details: TATPosDetails;
   nIndex: integer;
@@ -4578,15 +4587,7 @@ begin
   if (not FMouseDragDropping) and (FMouseDownPnt.X>=0) then
   begin
     FMouseDragCoord:= P;
-    R:= FRectMainVisible;
-    if FMouseDragCoord.X<R.Left+1 then
-      FMouseDragCoord.X:= R.Left+1;
-    if FMouseDragCoord.X>R.Right then
-      FMouseDragCoord.X:= R.Right;
-    if FMouseDragCoord.Y<R.Top+1 then
-      FMouseDragCoord.Y:= R.Top+1;
-    if FMouseDragCoord.Y>R.Bottom then
-      FMouseDragCoord.Y:= R.Bottom;
+    _LimitPointByRect(FMouseDragCoord, FRectMainVisible);
   end
   else
     FMouseDragCoord:= Point(-1, -1);
