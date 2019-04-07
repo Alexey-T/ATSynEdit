@@ -127,6 +127,20 @@ begin
   Result:= [cResultKeepColumnSel, cResultCaretBottom];
 end;
 
+function TATSynEdit.DoCommand_DeselectOneCaret(AFirstCaret: boolean): TATCommandResults;
+begin
+  if Carets.Count>1 then
+  begin
+    if AFirstCaret then
+      Carets.Delete(0)
+    else
+      Carets.Delete(Carets.Count-1);
+    Result:= [cResultCaretAny];
+  end
+  else
+    Result:= [];
+end;
+
 function TATSynEdit.DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
 var
   NFrom, NTo, NLastLine: integer;

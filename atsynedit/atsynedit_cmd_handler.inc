@@ -338,6 +338,9 @@ begin
         Res:= [cResultState];
       end;
 
+    cCommand_DeselectFirstSel:    Res:= DoCommand_DeselectOneCaret(true);
+    cCommand_DeselectLastSel:     Res:= DoCommand_DeselectOneCaret(false);
+
     cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
     cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
     cCommand_KeyBackspace:        Res:= DoCommand_TextBackspace;

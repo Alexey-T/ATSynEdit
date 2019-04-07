@@ -104,6 +104,8 @@ begin
   M.Add(cCommand_SelectLines, 'selection: select lines at carets', [], []);
   M.Add(cCommand_SelectNone, 'selection: cancel selection', [], []);
   M.Add(cCommand_Cancel, 'selection: cancel carets, selection, drag-drop', ['Esc'], []);
+  M.Add(cCommand_DeselectFirstSel, 'selection: deselect first selection', [], []);
+  M.Add(cCommand_DeselectLastSel, 'selection: deselect last selection', [], []);
 
   M.Add(cCommand_ToggleOverwrite, 'toggle insert/overwrite mode', ['Ins'], []);
   M.Add(cCommand_ToggleReadOnly, 'toggle read-only mode', ['Ctrl+Shift+R'], []);

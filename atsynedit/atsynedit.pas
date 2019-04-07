@@ -941,6 +941,7 @@ type
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
     function DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATCommandResults;
     function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
+    function DoCommand_DeselectOneCaret(AFirstCaret: boolean): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_Undo: TATCommandResults;
