@@ -54,8 +54,8 @@ const
   cCommand_ColSelectWithoutKey_Off = 131;
   cCommand_ColSelectWithoutKey_Toggle = 132;
 
-  cCommand_DeselectFirstSel = 135;
-  cCommand_DeselectLastSel = 136;
+  cCommand_RemoveFirstCaret = 135;
+  cCommand_RemoveLastCaret = 136;
 
   cCommand_TextInsert = 150;
   cCommand_TextInsertTabChar = 151;

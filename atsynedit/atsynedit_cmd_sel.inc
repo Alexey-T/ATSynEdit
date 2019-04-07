@@ -127,7 +127,7 @@ begin
   Result:= [cResultKeepColumnSel, cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_DeselectOneCaret(AFirstCaret: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
 begin
   if Carets.Count>1 then
   begin
