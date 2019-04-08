@@ -1164,7 +1164,7 @@ type
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
-    function GetVisibleLinesMinimap: integer; inline;
+    function GetVisibleLinesMinimap: integer;
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
@@ -1902,7 +1902,7 @@ begin
   Result:= FRectMainVisible.Width div FCharSize.X;
 end;
 
-function TATSynEdit.GetVisibleLinesMinimap: integer;
+function TATSynEdit.GetVisibleLinesMinimap: integer; inline;
 begin
   Result:= FRectMinimap.Height div FCharSizeMinimap.Y - 1;
 end;
