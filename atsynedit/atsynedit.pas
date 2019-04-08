@@ -838,6 +838,7 @@ type
     procedure DoPaintStaples(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintTextHintTo(C: TCanvas);
+    procedure DoPaintMouseSelFrame(C: TCanvas);
     //carets
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
@@ -2224,12 +2225,24 @@ begin
 
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
-      C.DrawFocusRect(Rect(
-        FMouseDownCoord.X - FScrollHorz.TotalOffset(FCharSize.X),
-        FMouseDownCoord.Y - FScrollVert.TotalOffset(FCharSize.Y),
-        FMouseDragCoord.X,
-        FMouseDragCoord.Y
-        ));
+      DoPaintMouseSelFrame(C);
+end;
+
+procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);
+var
+  X1, X2, Y1, Y2: integer;
+begin
+  X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset(FCharSize.X);
+  X2:= FMouseDragCoord.X;
+  Y1:= FMouseDownCoord.Y - FScrollVert.TotalOffset(FCharSize.Y);
+  Y2:= FMouseDragCoord.Y;
+
+  C.DrawFocusRect(Rect(
+    Max(-1, Min(X1, X2)),
+    Max(-1, Min(Y1, Y2)),
+    Min(Width+1, Max(X1, X2)),
+    Min(Height+1, Max(Y1, Y2))
+    ));
 end;
 
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
