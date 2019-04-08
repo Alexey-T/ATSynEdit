@@ -52,6 +52,11 @@ begin
   NPixelOffset:= 0;
 end;
 
+function TATSynScrollInfo.TotalOffset(CharSize: integer): integer; inline;
+begin
+  Result:= NPos*CharSize + NPixelOffset;
+end;
+
 class operator TATSynScrollInfo.= (const A, B: TATSynScrollInfo): boolean;
 begin
   Result:=

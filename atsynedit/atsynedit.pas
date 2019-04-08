@@ -213,6 +213,7 @@ type
     NPosLast: integer;
     NPixelOffset: integer;
     procedure Clear;
+    function TotalOffset(CharSize: integer): integer; inline;
     class operator =(const A, B: TATSynScrollInfo): boolean;
   end;
 
@@ -2026,7 +2027,7 @@ begin
     FScrollbarVert.Min:= FScrollVert.NMin*h;
     FScrollbarVert.Max:= FScrollVert.NMax*h;
     FScrollbarVert.PageSize:= FScrollVert.NPage*h;
-    FScrollbarVert.Position:= FScrollVert.NPos*h + FScrollVert.NPixelOffset;
+    FScrollbarVert.Position:= FScrollVert.TotalOffset(h);
     FScrollbarVert.Update;
     FScrollbarLock:= false;
   end;
@@ -2038,7 +2039,7 @@ begin
   si.nMax:= FScrollVert.NMax*h;
   si.nPage:= FScrollVert.NPage*h;
   if FOptScrollbarsNew then si.nPage:= si.nMax+1;
-  si.nPos:= FScrollVert.NPos*h + FScrollVert.NPixelOffset;
+  si.nPos:= FScrollVert.TotalOffset(h);
   SetScrollInfo(Handle, SB_VERT, si, True);
 
   {$ifdef at_show_scroll_info}
@@ -2066,7 +2067,7 @@ begin
     FScrollbarHorz.Min:= FScrollHorz.NMin*w;
     FScrollbarHorz.Max:= FScrollHorz.NMax*w;
     FScrollbarHorz.PageSize:= FScrollHorz.NPage*w;
-    FScrollbarHorz.Position:= FScrollHorz.NPos*w + FScrollHorz.NPixelOffset;
+    FScrollbarHorz.Position:= FScrollHorz.TotalOffset(w);
     FScrollbarHorz.Update;
     FScrollbarLock:= false;
   end;
@@ -2079,7 +2080,7 @@ begin
   si.nPage:= FScrollHorz.NPage*w;
   if FOptScrollbarsNew or FOptScrollbarHorizontalHidden then
     si.nPage:= si.nMax+1;
-  si.nPos:= FScrollHorz.NPos*w + FScrollHorz.NPixelOffset;
+  si.nPos:= FScrollHorz.TotalOffset(w);
   SetScrollInfo(Handle, SB_HORZ, si, True);
 
   {$ifdef at_show_scroll_info}
@@ -2224,8 +2225,8 @@ begin
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
       C.DrawFocusRect(Rect(
-        FMouseDownCoord.X - FScrollHorz.NPos*FCharSize.X - FScrollHorz.NPixelOffset,
-        FMouseDownCoord.Y - FScrollVert.NPos*FCharSize.Y - FScrollVert.NPixelOffset,
+        FMouseDownCoord.X - FScrollHorz.TotalOffset(FCharSize.X),
+        FMouseDownCoord.Y - FScrollVert.TotalOffset(FCharSize.Y),
         FMouseDragCoord.X,
         FMouseDragCoord.Y
         ));
@@ -4248,8 +4249,8 @@ begin
   SetFocus;
   DoCaretForceShow;
 
-  FMouseDownCoord.X:= X + FScrollHorz.NPos*FCharSize.X + FScrollHorz.NPixelOffset;
-  FMouseDownCoord.Y:= Y + FScrollVert.NPos*FCharSize.Y + FScrollVert.NPixelOffset;
+  FMouseDownCoord.X:= X + FScrollHorz.TotalOffset(FCharSize.X);
+  FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset(FCharSize.Y);
 
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
@@ -5422,7 +5423,7 @@ begin
 
   with FScrollHorz do
   begin
-    N:= NPos*W+NPixelOffset;
+    N:= TotalOffset(W);
     Inc(N, Dx);
     if N<0 then N:= 0;
     NPos:= N div W;
@@ -5434,7 +5435,7 @@ begin
 
   with FScrollVert do
   begin
-    N:= NPos*H+NPixelOffset;
+    N:= TotalOffset(H);
     Inc(N, Dy);
     if N<0 then N:= 0;
     NPos:= N div H;
