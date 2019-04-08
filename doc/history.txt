@@ -1,6 +1,6 @@
 
 2019.04.07
-+ add: property OptMouseDragFrameVisible (show dotted frame during mouse selection)
++ add: property OptShowMouseSelFrame (show dotted frame during mouse selection)
 + add: commands "selection: remove first caret", "selection: remove last caret"
 
 2019.02.06

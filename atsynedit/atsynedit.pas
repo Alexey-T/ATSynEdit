@@ -246,7 +246,7 @@ const
   cInitMinimapTooltipLinesCount = 6;
   cInitMinimapTooltipWidthPercents = 60;
   cInitMicromapVisible = false;
-  cInitMouseDragFrameVisible = true;
+  cInitShowMouseSelFrame = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
   cInitMicromapWidth = 30;
@@ -650,6 +650,7 @@ type
     FOptShowCurLineMinimal: boolean;
     FOptShowCurLineOnlyFocused: boolean;
     FOptShowCurColumn: boolean;
+    FOptShowMouseSelFrame: boolean;
     FOptMouseHideCursor: boolean;
     FOptMouse2ClickSelectsLine: boolean;
     FOptMouse3ClickSelectsLine: boolean;
@@ -657,7 +658,6 @@ type
     FOptMouseDragDrop: boolean;
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
-    FOptMouseDragFrameVisible: boolean;
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseClickNumberSelectsLine: boolean;
     FOptMouseClickNumberSelectsLineWithEOL: boolean;
@@ -1377,6 +1377,7 @@ type
     property OptShowCurLineOnlyFocused: boolean read FOptShowCurLineOnlyFocused write FOptShowCurLineOnlyFocused default false;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn default false;
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
+    property OptShowMouseSelFrame: boolean read FOptShowMouseSelFrame write FOptShowMouseSelFrame default cInitShowMouseSelFrame;
     property OptCaretManyAllowed: boolean read GetCaretManyAllowed write SetCaretManyAllowed default true;
     property OptCaretVirtual: boolean read FCaretVirtual write FCaretVirtual default true;
     property OptCaretBlinkTime: integer read FCaretBlinkTime write SetCaretBlinkTime default cInitCaretBlinkTime;
@@ -1449,7 +1450,6 @@ type
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
-    property OptMouseDragFrameVisible: boolean read FOptMouseDragFrameVisible write FOptMouseDragFrameVisible default cInitMouseDragFrameVisible;
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
@@ -2221,7 +2221,7 @@ begin
   else
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
 
-  if FOptMouseDragFrameVisible then
+  if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
       C.DrawFocusRect(Rect(
         FMouseDownCoord.X - FScrollHorz.NPos*FCharSize.X - FScrollHorz.NPixelOffset,
@@ -3396,7 +3396,6 @@ begin
   FOptMouseDragDrop:= true;
   FOptMouseDragDropCopying:= true;
   FOptMouseDragDropCopyingWithState:= ssModifier;
-  FOptMouseDragFrameVisible:= cInitMouseDragFrameVisible;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
   FOptMouse2ClickSelectsLine:= false;
@@ -3422,6 +3421,7 @@ begin
   FOptShowCurLineMinimal:= true;
   FOptShowCurLineOnlyFocused:= false;
   FOptShowCurColumn:= false;
+  FOptShowMouseSelFrame:= cInitShowMouseSelFrame;
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
   FOptKeyLeftRightSwapSel:= true;
   FOptKeyLeftRightSwapSelAndSelect:= false;
@@ -4410,7 +4410,7 @@ begin
   if not OptMouseEnableAll then exit;
   inherited;
 
-  if FOptMouseDragFrameVisible then
+  if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
     begin
       FMouseDragCoord:= Point(-1, -1);
