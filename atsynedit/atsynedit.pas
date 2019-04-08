@@ -1804,19 +1804,15 @@ procedure _CalcWrapInfos(
 var
   Item: TATWrapItem;
   NOffset, NLen, NIndent, NVisColumns: integer;
-  bHidden: boolean;
   NFoldFrom: integer;
   NFinal: TATSynWrapFinal;
   Str: atString;
 begin
   AItems.Clear;
 
+  //line folded entirely?
   if AConsiderFolding then
-  begin
-    //line folded entirely?
-    bHidden:= AStrings.LinesHidden[ALine, AEditorIndex];
-    if bHidden then Exit;
-  end;
+    if AStrings.LinesHidden[ALine, AEditorIndex] then Exit;
 
   NLen:= AStrings.LinesLen[ALine];
 
