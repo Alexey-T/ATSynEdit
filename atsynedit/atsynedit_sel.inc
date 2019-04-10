@@ -296,6 +296,11 @@ begin
   end;
 end;
 
+procedure TATSynEdit.DoSelect_ClearColumnBlock;
+begin
+  FSelRect:= cRectEmpty;
+end;
+
 procedure TATSynEdit.DoSelect_None;
 var
   i: integer;

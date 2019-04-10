@@ -1181,6 +1181,7 @@ type
     procedure DoSelect_Line(APos: TPoint);
     procedure DoSelect_Word(P: TPoint; AddCaret: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
+    procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_FromSelRect;
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
