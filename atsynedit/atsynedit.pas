@@ -1983,12 +1983,20 @@ begin
   Result:= false;
 
   //consider Gaps for vertical scrollbar
-  NLineIndex:= 0;
-  if FWrapInfo.IsIndexValid(FScrollVert.NPos) then
-    NLineIndex:= FWrapInfo.Data[FScrollVert.NPos].NLineIndex;
+  if Gaps.Count>0 then
+  begin
+    NLineIndex:= 0;
+    if FWrapInfo.IsIndexValid(FScrollVert.NPos) then
+      NLineIndex:= FWrapInfo.Data[FScrollVert.NPos].NLineIndex;
 
-  NGapAll:= Gaps.SizeForAll;
-  NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
+    NGapAll:= Gaps.SizeForAll;
+    NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
+  end
+  else
+  begin
+    NGapAll:= 0;
+    NGapPos:= 0;
+  end;
 
   with FScrollVert do
   begin
