@@ -909,8 +909,9 @@ type
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
     function DoFormatLineNumber(N: integer): atString;
-    function UpdateScrollInfoFromMessage(const Msg: TLMScroll;
-      var Info: TATSynScrollInfo): boolean;
+    function UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
+    procedure UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize,
+      ACharSize: integer; AVert: boolean);
     procedure UpdateWrapInfo;
     function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
@@ -4068,18 +4069,24 @@ begin
     FHintWnd.Hide;
 end;
 
+procedure TATSynEdit.UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize, ACharSize: integer; AVert: boolean);
+begin
+  AInfo.NPos:= AScrollSize div ACharSize;
+  AInfo.NPixelOffset:= AScrollSize mod ACharSize;
+end;
+
 function TATSynEdit.UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
 var
   bVertical: boolean;
-  h: integer;
+  NCharSize: integer;
 begin
   //Application.MainForm.Caption:= Format('min %d, max %d, pagesize %d, pos %d, pos-last %d',
   //                               [info.nmin, info.nmax, info.npage, info.npos, info.NPosLast]);
   bVertical:= @Info=@FScrollVert;
   if bVertical then
-    h:= FCharSize.y
+    NCharSize:= FCharSize.y
   else
-    h:= FCharSize.x;
+    NCharSize:= FCharSize.x;
 
   if (Info.NMax-Info.NMin)<Info.NPage then
   begin
@@ -4126,16 +4133,12 @@ begin
         //must ignore message with Msg.Msg set: LM_VSCROLL, LM_HSCROLL;
         //we get it on macOS during window resize, not expected! moves v-scroll pos to 0.
         if Msg.Msg=0 then
-        begin
-          Info.NPos:= Msg.Pos div h;
-          Info.NPixelOffset:= Msg.Pos mod h;
-        end;
+          UpdateScrollInfoFromSize(Info, Msg.Pos, NCharSize, bVertical);
       end;
 
     SB_THUMBTRACK:
       begin
-        Info.NPos:= Msg.Pos div h;
-        Info.NPixelOffset:= Msg.Pos mod h;
+        UpdateScrollInfoFromSize(Info, Msg.Pos, NCharSize, bVertical);
         if bVertical then
           DoHintShow;
       end;
