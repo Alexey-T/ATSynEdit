@@ -125,7 +125,6 @@ var
 begin
   Range:= Fold.Items[ARangeIndex];
   Range.Folded:= true;
-  Fold.Items[ARangeIndex]:= Range;
   FWrapUpdateNeeded:= true;
 
   //partially hide first line
@@ -157,6 +156,8 @@ begin
       //don't fold line
     end;
   end;
+
+  Fold.Items[ARangeIndex]:= Range;
 
   //fully hide other lines
   DoRangeHide(Range.Y+1, Range.Y2);
