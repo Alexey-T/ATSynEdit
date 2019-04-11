@@ -58,6 +58,7 @@ type
     function Find(ALineIndex: integer; ATag: Int64=-1): TATGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
+    function SizeForAll: integer;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     property OnDelete: TATGapDeleteEvent read FOnDelete write FOnDelete;
   end;
@@ -208,6 +209,19 @@ begin
     Item:= Items[i];
     if (Item.LineIndex>=ALineFrom) and (Item.LineIndex<=ALineTo) then
       Inc(Result, Item.Size);
+  end;
+end;
+
+function TATGaps.SizeForAll: integer;
+var
+  Item: TATGapItem;
+  i: integer;
+begin
+  Result:= 0;
+  for i:= 0 to FList.Count-1 do
+  begin
+    Item:= Items[i];
+    Inc(Result, Item.Size);
   end;
 end;
 
