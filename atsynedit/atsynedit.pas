@@ -212,6 +212,11 @@ type
     NPos: integer;
     NPosLast: integer;
     NPixelOffset: integer;
+    SmoothCharSize: integer;
+    SmoothMin: integer;
+    SmoothMax: integer;
+    SmoothPage: integer;
+    SmoothPos: integer;
     procedure Clear;
     function TotalOffset(CharSize: integer): integer; inline;
     class operator =(const A, B: TATSynScrollInfo): boolean;
@@ -1973,8 +1978,17 @@ function TATSynEdit.UpdateScrollbars: boolean;
 var
   bVert1, bVert2,
   bHorz1, bHorz2: boolean;
+  NLineIndex, NGapAll, NGapPos: integer;
 begin
   Result:= false;
+
+  //consider Gaps for vertical scrollbar
+  NLineIndex:= 0;
+  if FWrapInfo.IsIndexValid(FScrollVert.NPos) then
+    NLineIndex:= FWrapInfo.Data[FScrollVert.NPos].NLineIndex;
+
+  NGapAll:= Gaps.SizeForAll;
+  NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
 
   with FScrollVert do
   begin
@@ -1984,6 +1998,12 @@ begin
     if FOptLastLineOnTop then
       Inc(NMax, NPage);
     NPosLast:= Max(NMin, NMax-NPage);
+
+    SmoothCharSize:= FCharSize.Y;
+    SmoothMin:= NMin*SmoothCharSize;
+    SmoothMax:= NMax*SmoothCharSize + NGapAll;
+    SmoothPage:= NPage*SmoothCharSize;
+    SmoothPos:= TotalOffset(SmoothCharSize) + NGapPos;
   end;
 
   with FScrollHorz do
@@ -1995,7 +2015,13 @@ begin
     if FWrapMode=cWrapOn then
       NMax:= NPage;
     NPosLast:= Max(NMin, NMax-NPage);
-  end;
+
+    SmoothCharSize:= FCharSize.X;
+    SmoothMin:= NMin*SmoothCharSize;
+    SmoothMax:= NMax*SmoothCharSize;
+    SmoothPage:= NPage*SmoothCharSize;
+    SmoothPos:= TotalOffset(SmoothCharSize);
+end;
 
   bVert1:= GetScrollbarVisible(true);
   bHorz1:= GetScrollbarVisible(false);
@@ -2019,39 +2045,30 @@ end;
 procedure TATSynEdit.UpdateScrollbarVert;
 var
   si: TScrollInfo;
-  NLineIndex, NGapAll, NGapPos, h: integer;
 begin
   if not FOptAllowScrollbarVert then Exit;
-  h:= FCharSize.y;
-
-  //consider Gaps for vertical scrollbar
-  NLineIndex:= 0;
-  if FWrapInfo.IsIndexValid(FScrollVert.NPos) then
-    NLineIndex:= FWrapInfo.Data[FScrollVert.NPos].NLineIndex;
-
-  NGapAll:= Gaps.SizeForAll;
-  NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
 
   FScrollbarVert.Visible:= FOptScrollbarsNew;
   if FOptScrollbarsNew then
   begin
     FScrollbarLock:= true;
-    FScrollbarVert.Min:= FScrollVert.NMin*h;
-    FScrollbarVert.Max:= FScrollVert.NMax*h + NGapAll;
-    FScrollbarVert.PageSize:= FScrollVert.NPage*h;
-    FScrollbarVert.Position:= FScrollVert.TotalOffset(h) + NGapPos;
+    FScrollbarVert.Min:= FScrollVert.SmoothMin;
+    FScrollbarVert.Max:= FScrollVert.SmoothMax;
+    FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
+    FScrollbarVert.Position:= FScrollVert.SmoothPos;
     FScrollbarVert.Update;
     FScrollbarLock:= false;
   end;
 
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
-  si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
-  si.nMin:= FScrollVert.NMin*h;
-  si.nMax:= FScrollVert.NMax*h + NGapAll;
-  si.nPage:= FScrollVert.NPage*h;
-  if FOptScrollbarsNew then si.nPage:= si.nMax+1;
-  si.nPos:= FScrollVert.TotalOffset(h) + NGapPos;
+  si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
+  si.nMin:= FScrollVert.SmoothMin;
+  si.nMax:= FScrollVert.SmoothMax;
+  si.nPage:= FScrollVert.SmoothPage;
+  if FOptScrollbarsNew then
+    si.nPage:= si.nMax+1;
+  si.nPos:= FScrollVert.SmoothPos;
   SetScrollInfo(Handle, SB_VERT, si, True);
 
   {$ifdef at_show_scroll_info}
@@ -2063,10 +2080,8 @@ end;
 procedure TATSynEdit.UpdateScrollbarHorz;
 var
   si: TScrollInfo;
-  w: integer;
 begin
   if not FOptAllowScrollbarHorz then Exit;
-  w:= FCharSize.x;
 
   FScrollbarHorz.Visible:=
     FOptScrollbarsNew and
@@ -2076,10 +2091,10 @@ begin
   if FOptScrollbarsNew then
   begin
     FScrollbarLock:= true;
-    FScrollbarHorz.Min:= FScrollHorz.NMin*w;
-    FScrollbarHorz.Max:= FScrollHorz.NMax*w;
-    FScrollbarHorz.PageSize:= FScrollHorz.NPage*w;
-    FScrollbarHorz.Position:= FScrollHorz.TotalOffset(w);
+    FScrollbarHorz.Min:= FScrollHorz.SmoothMin;
+    FScrollbarHorz.Max:= FScrollHorz.SmoothMax;
+    FScrollbarHorz.PageSize:= FScrollHorz.SmoothPage;
+    FScrollbarHorz.Position:= FScrollHorz.SmoothPos;
     FScrollbarHorz.Update;
     FScrollbarLock:= false;
   end;
@@ -2087,12 +2102,12 @@ begin
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; don't work
-  si.nMin:= FScrollHorz.NMin*w;
-  si.nMax:= FScrollHorz.NMax*w;
-  si.nPage:= FScrollHorz.NPage*w;
+  si.nMin:= FScrollHorz.SmoothMin;
+  si.nMax:= FScrollHorz.SmoothMax;
+  si.nPage:= FScrollHorz.SmoothPage;
   if FOptScrollbarsNew or FOptScrollbarHorizontalHidden then
     si.nPage:= si.nMax+1;
-  si.nPos:= FScrollHorz.TotalOffset(w);
+  si.nPos:= FScrollHorz.SmoothPos;
   SetScrollInfo(Handle, SB_HORZ, si, True);
 
   {$ifdef at_show_scroll_info}
