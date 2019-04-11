@@ -157,9 +157,10 @@ begin
     end;
   end;
 
+  //write to Fold list (after changed Range.Folded, Range.Hint)
   Fold.Items[ARangeIndex]:= Range;
 
-  //fully hide other lines
+  //fully hide other lines of range
   DoRangeHide(Range.Y+1, Range.Y2);
 
   if FOptCaretFixAfterRangeFolded then
