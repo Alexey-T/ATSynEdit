@@ -2008,7 +2008,7 @@ begin
     NPosLast:= Max(NMin, NMax-NPage);
 
     SmoothCharSize:= FCharSize.Y;
-    SmoothMin:= NMin*SmoothCharSize;
+    SmoothMin:= 0;
     SmoothMax:= NMax*SmoothCharSize + NGapAll;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPos:= TotalOffset(SmoothCharSize) + NGapPos;
@@ -2025,7 +2025,7 @@ begin
     NPosLast:= Max(NMin, NMax-NPage);
 
     SmoothCharSize:= FCharSize.X;
-    SmoothMin:= NMin*SmoothCharSize;
+    SmoothMin:= 0;
     SmoothMax:= NMax*SmoothCharSize;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPos:= TotalOffset(SmoothCharSize);
