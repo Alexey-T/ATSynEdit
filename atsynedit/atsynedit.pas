@@ -1979,10 +1979,9 @@ begin
   begin
     NPage:= Max(1, GetVisibleLines)-1;
     NMin:= 0;
+    NMax:= Max(1, FWrapInfo.Count-1);
     if FOptLastLineOnTop then
-      NMax:= Max(1, FWrapInfo.Count+NPage-1)
-    else
-      NMax:= Max(1, FWrapInfo.Count-1);
+      Inc(NMax, NPage);
     NPosLast:= Max(NMin, NMax-NPage);
   end;
 
@@ -1999,8 +1998,10 @@ begin
 
   bVert1:= GetScrollbarVisible(true);
   bHorz1:= GetScrollbarVisible(false);
+
   UpdateScrollbarVert;
   UpdateScrollbarHorz;
+
   bVert2:= GetScrollbarVisible(true);
   bHorz2:= GetScrollbarVisible(false);
   Result:= (bVert1<>bVert2) or (bHorz1<>bHorz2);
