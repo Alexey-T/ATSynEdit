@@ -957,12 +957,12 @@ begin
 
   b:= TBitmap.Create;
   b.PixelFormat:= pf24bit;
-  b.SetSize(500, NSize-4);
+  b.SetSize(500, NSize);
   DoPaintGap(b.Canvas, Rect(0, 0, b.Width, b.Height), NLine);
 
   if not ed.Gaps.Add(NLine-1, NSize, b, 0) then
   begin
-    ShowMessage(Format('Not correct line index (%d) or size (%d)', [NLine, NSize]));
+    ShowMessage(Format('Not correct line index (%d)', [NLine]));
     exit;
   end;
 
