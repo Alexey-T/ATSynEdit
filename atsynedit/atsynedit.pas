@@ -3022,10 +3022,10 @@ var
 begin
   Str:= AMarkText;
 
-  SReplaceAll(Str, #10, '');
-    //todo: for some reason, for Python, for "if/for" blocks, text has #10 at AMarkText begin
-    //this is workaround
-  Str:= FTabHelper.TabsToSpaces(-1, Str);
+  SDeleteFrom(Str, #10);
+    //e.g. Diff lexer gives collapsed-string with EOL (several lines)
+
+  Str:= FTabHelper.TabsToSpaces(-1, UTF8Decode(Str));
     //expand tabs too
 
   Inc(ACoord.X, cFoldedMarkIndentOuter);
