@@ -1,4 +1,7 @@
 
+2019.04.11
++ add: Gaps now don't break smooth vertical scrolling (mostly done)
+
 2019.04.07
 + add: property OptShowMouseSelFrame (show dotted frame during mouse selection)
 + add: commands "selection: remove first caret", "selection: remove last caret"
