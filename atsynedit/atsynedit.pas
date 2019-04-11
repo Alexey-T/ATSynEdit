@@ -911,7 +911,7 @@ type
     function DoFormatLineNumber(N: integer): atString;
     function UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
     procedure UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize,
-      ACharSize: integer; AVert: boolean);
+      ACharSize: integer; AVertical: boolean);
     procedure UpdateWrapInfo;
     function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
@@ -2030,7 +2030,7 @@ begin
     NLineIndex:= FWrapInfo.Data[FScrollVert.NPos].NLineIndex;
 
   NGapAll:= Gaps.SizeForAll;
-  NGapPos:= Gaps.SizeForLineRange(0, NLineIndex);
+  NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
 
   FScrollbarVert.Visible:= FOptScrollbarsNew;
   if FOptScrollbarsNew then
@@ -4069,10 +4069,32 @@ begin
     FHintWnd.Hide;
 end;
 
-procedure TATSynEdit.UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize, ACharSize: integer; AVert: boolean);
+procedure TATSynEdit.UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize, ACharSize: integer; AVertical: boolean);
+var
+  NPos, NPixels, NLineIndex: integer;
 begin
   AInfo.NPos:= AScrollSize div ACharSize;
   AInfo.NPixelOffset:= AScrollSize mod ACharSize;
+
+  //consider Gaps for vert scrolling
+  if AVertical and (Gaps.Count>0) then
+  begin
+    NPos:= AInfo.NPos;
+    NPixels:= AInfo.NPixelOffset;
+    if not FWrapInfo.IsIndexValid(NPos) then exit;
+
+    repeat
+      NLineIndex:= FWrapInfo.Data[NPos].NLineIndex - 1;
+      NPixels:= AScrollSize - NPos*ACharSize - Gaps.SizeForLineRange(0, NLineIndex);
+      if NPos=0 then Break;
+      if NLineIndex=0 then Break;
+      if NPixels>=0 then Break;
+      Dec(NPos);
+    until false;
+
+    AInfo.NPos:= NPos;
+    AInfo.NPixelOffset:= NPixels
+  end;
 end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
