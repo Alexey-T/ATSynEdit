@@ -2018,19 +2018,27 @@ end;
 procedure TATSynEdit.UpdateScrollbarVert;
 var
   si: TScrollInfo;
-  h: integer;
+  NLineIndex, NGapAll, NGapPos, h: integer;
 begin
   if not FOptAllowScrollbarVert then Exit;
   h:= FCharSize.y;
+
+  //consider Gaps for vertical scrollbar
+  NLineIndex:= 0;
+  if FWrapInfo.IsIndexValid(FScrollVert.NPos) then
+    NLineIndex:= FWrapInfo.Data[FScrollVert.NPos].NLineIndex;
+
+  NGapAll:= Gaps.SizeForAll;
+  NGapPos:= Gaps.SizeForLineRange(0, NLineIndex);
 
   FScrollbarVert.Visible:= FOptScrollbarsNew;
   if FOptScrollbarsNew then
   begin
     FScrollbarLock:= true;
     FScrollbarVert.Min:= FScrollVert.NMin*h;
-    FScrollbarVert.Max:= FScrollVert.NMax*h;
+    FScrollbarVert.Max:= FScrollVert.NMax*h + NGapAll;
     FScrollbarVert.PageSize:= FScrollVert.NPage*h;
-    FScrollbarVert.Position:= FScrollVert.TotalOffset(h);
+    FScrollbarVert.Position:= FScrollVert.TotalOffset(h) + NGapPos;
     FScrollbarVert.Update;
     FScrollbarLock:= false;
   end;
@@ -2039,10 +2047,10 @@ begin
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL;// or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
   si.nMin:= FScrollVert.NMin*h;
-  si.nMax:= FScrollVert.NMax*h;
+  si.nMax:= FScrollVert.NMax*h + NGapAll;
   si.nPage:= FScrollVert.NPage*h;
   if FOptScrollbarsNew then si.nPage:= si.nMax+1;
-  si.nPos:= FScrollVert.TotalOffset(h);
+  si.nPos:= FScrollVert.TotalOffset(h) + NGapPos;
   SetScrollInfo(Handle, SB_VERT, si, True);
 
   {$ifdef at_show_scroll_info}
