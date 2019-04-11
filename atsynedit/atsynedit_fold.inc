@@ -202,15 +202,21 @@ end;
 
 
 function TATSynEdit.GetFoldedMarkText(ALine: integer): string;
+const
+  cDefaultHint = '...';
 var
   N: integer;
 begin
   Result:= '';
+
+  if FFoldStyle=cFoldFromEndOfLineAlways then
+    exit(cDefaultHint);
+
   N:= FFold.FindRangeWithPlusAtLine(ALine);
   if N>=0 then
     Result:= FFold.Items[N].Hint;
   if Result='' then
-    Result:= '...';
+    Result:= cDefaultHint;
 end;
 
 procedure TATSynEdit.UpdateFoldedFromLinesHidden;
