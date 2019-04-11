@@ -275,8 +275,8 @@ const
 const
   cMaxLenToTokenize = 4000;
   cFoldedLenOfEmptyHint = 50;
-  cFoldedMarkIndentInner = 2;
-  cFoldedMarkIndentOuter = 0;
+  cFoldedMarkIndentInner = 2; //indent inside [...] folded-mark
+  cFoldedMarkIndentOuter = 2; //indent before [...] folded-mark
   cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert = 1; //... speed y
   cSpeedScrollNice = 3;
@@ -3028,7 +3028,8 @@ begin
   Str:= FTabHelper.TabsToSpaces(-1, UTF8Decode(Str));
     //expand tabs too
 
-  Inc(ACoord.X, cFoldedMarkIndentOuter);
+  if APos.X>0 then
+    Inc(ACoord.X, cFoldedMarkIndentOuter);
 
   //set colors:
   //if 1st chars selected, then use selection-color
