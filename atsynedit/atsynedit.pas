@@ -1189,7 +1189,7 @@ type
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_FromSelRect;
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
-    procedure DoScrollByDelta(Dx, Dy: integer);
+    procedure DoScrollByDelta(ADeltaX, ADeltaY: integer);
     procedure DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
     procedure DoSizeChange(AInc: boolean);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
@@ -5462,21 +5462,21 @@ begin
     FScrollVert.NPos:= FScrollVert.NPosLast;
 end;
 
-procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
+procedure TATSynEdit.DoScrollByDelta(ADeltaX, ADeltaY: integer);
+//
+  procedure _Delta(var AInfo: TATSynScrollInfo; ADelta: integer); inline;
+  begin
+    with AInfo do
+    begin
+      NPos:= Max(0, Min(NPosLast, NPos+ADelta));
+      if (NPos=0) or (NPos>=NPosLast) then
+        NPixelOffset:= 0;
+    end;
+  end;
+//
 begin
-  with FScrollHorz do
-  begin
-    NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
-    if (NPos=0) or (NPos=NMax-NPage) then
-      NPixelOffset:= 0;
-  end;
-
-  with FScrollVert do
-  begin
-    NPos:= Max(0, Min(NPosLast, NPos+Dy));
-    if (NPos=0) or (NPos=NPosLast) then
-      NPixelOffset:= 0;
-  end;
+  _Delta(FScrollHorz, ADeltaX);
+  _Delta(FScrollVert, ADeltaY);
 end;
 
 procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
