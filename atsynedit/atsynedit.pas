@@ -4103,11 +4103,7 @@ procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; 
 var
   NPos, NPixels, NLineIndex, NCharSize: integer;
 begin
-  if AInfo.Vertical then
-    NCharSize:= FCharSize.Y
-  else
-    NCharSize:= FCharSize.X;
-
+  NCharSize:= AInfo.SmoothCharSize;
   AInfo.NPos:= APos div NCharSize;
   AInfo.NPixelOffset:= APos mod NCharSize;
 
@@ -5489,18 +5485,14 @@ end;
 
 procedure TATSynEdit.DoScrollByDeltaInPixels(Dx, Dy: integer);
 var
-  W, H, N: integer;
+  N: integer;
 begin
-  W:= FCharSize.x;
-  H:= FCharSize.y;
-
   with FScrollHorz do
   begin
     N:= TotalOffset;
     Inc(N, Dx);
     if N<0 then N:= 0;
-    NPos:= N div W;
-    NPixelOffset:= N mod W;
+    UpdateScrollInfoFromSmoothPos(FScrollHorz, N);
     NPos:= Max(NMin, Min(NMax-NPage, NPos));
     if NPos>=NMax-NPage then
       NPixelOffset:= 0;
@@ -5511,8 +5503,7 @@ begin
     N:= TotalOffset;
     Inc(N, Dy);
     if N<0 then N:= 0;
-    NPos:= N div H;
-    NPixelOffset:= N mod H;
+    UpdateScrollInfoFromSmoothPos(FScrollVert, N);
     NPos:= Max(NMin, Min(NPosLast, NPos));
     if NPos>=NPosLast then
       NPixelOffset:= 0;
