@@ -26,12 +26,12 @@ begin
   LineTo:= ALineTo;
 end;
 
-procedure TATFoldedMark.SetNone;
+procedure TATFoldedMark.InitNone;
 begin
   Init(Rect(0, 0, 0, 0), -1, -1);
 end;
 
-function TATFoldedMark.Inited: boolean;
+function TATFoldedMark.IsInited: boolean;
 begin
   Result:= LineFrom>=0;
 end;

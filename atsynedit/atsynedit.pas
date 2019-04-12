@@ -350,8 +350,8 @@ type
     Coord: TRect;
     LineFrom, LineTo: integer;
     procedure Init(const ACoord: TRect; ALineFrom, ALineTo: integer);
-    procedure SetNone;
-    function Inited: boolean;
+    procedure InitNone;
+    function IsInited: boolean;
     class operator =(const a, b: TATFoldedMark): boolean;
   end;
 
@@ -6703,7 +6703,7 @@ end;
 
 procedure TATSynEdit.UpdateFoldedMarkTooltip;
 begin
-  if (not FFoldTooltipVisible) or not FFoldedMarkCurrent.Inited then
+  if (not FFoldTooltipVisible) or not FFoldedMarkCurrent.IsInited then
   begin
     FFoldedMarkTooltip.Hide;
     exit
@@ -6728,7 +6728,7 @@ end;
 
 procedure TATSynEdit.FoldedMarkTooltipPaint(Sender: TObject);
 begin
-  if FFoldedMarkCurrent.Inited then
+  if FFoldedMarkCurrent.IsInited then
     DoPaintTextFragmentTo(
       FFoldedMarkTooltip.Canvas,
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
@@ -6761,7 +6761,7 @@ begin
     Mark:= FFoldedMarkList[i];
     if PtInRect(Mark.Coord, Pnt) then exit(Mark);
   end;
-  Result.SetNone;
+  Result.InitNone;
 end;
 
 
