@@ -916,7 +916,6 @@ type
     procedure UpdateFoldedMarkTooltip;
     function DoFormatLineNumber(N: integer): atString;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
-    procedure UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize: integer);
     procedure UpdateWrapInfo;
     function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
@@ -1049,6 +1048,7 @@ type
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     procedure UpdateIncorrectCaretPositions;
     procedure UpdateFoldedFromLinesHidden;
+    procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
     procedure DoEventChange(AllowOnChange: boolean=true); virtual;
@@ -4096,7 +4096,7 @@ begin
     FHintWnd.Hide;
 end;
 
-procedure TATSynEdit.UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize: integer);
+procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
 var
   NPos, NPixels, NLineIndex, NCharSize: integer;
 begin
@@ -4105,8 +4105,8 @@ begin
   else
     NCharSize:= FCharSize.X;
 
-  AInfo.NPos:= AScrollSize div NCharSize;
-  AInfo.NPixelOffset:= AScrollSize mod NCharSize;
+  AInfo.NPos:= APos div NCharSize;
+  AInfo.NPixelOffset:= APos mod NCharSize;
 
   //consider Gaps for vert scrolling
   if AInfo.Vertical and (Gaps.Count>0) then
@@ -4117,7 +4117,7 @@ begin
 
     repeat
       NLineIndex:= FWrapInfo.Data[NPos].NLineIndex - 1;
-      NPixels:= AScrollSize - NPos*NCharSize - Gaps.SizeForLineRange(0, NLineIndex);
+      NPixels:= APos - NPos*NCharSize - Gaps.SizeForLineRange(0, NLineIndex);
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;
@@ -4176,12 +4176,12 @@ begin
         //must ignore message with Msg.Msg set: LM_VSCROLL, LM_HSCROLL;
         //we get it on macOS during window resize, not expected! moves v-scroll pos to 0.
         if Msg.Msg=0 then
-          UpdateScrollInfoFromSize(Info, Msg.Pos);
+          UpdateScrollInfoFromSmoothPos(Info, Msg.Pos);
       end;
 
     SB_THUMBTRACK:
       begin
-        UpdateScrollInfoFromSize(Info, Msg.Pos);
+        UpdateScrollInfoFromSmoothPos(Info, Msg.Pos);
         if Info.Vertical then
           DoHintShow;
       end;
