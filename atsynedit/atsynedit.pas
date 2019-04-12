@@ -915,10 +915,8 @@ type
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
     function DoFormatLineNumber(N: integer): atString;
-    function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo;
-      const Msg: TLMScroll): boolean;
-    procedure UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo;
-      AScrollSize: integer);
+    function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
+    procedure UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize: integer);
     procedure UpdateWrapInfo;
     function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
@@ -4098,8 +4096,7 @@ begin
     FHintWnd.Hide;
 end;
 
-procedure TATSynEdit.UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo;
-  AScrollSize: integer);
+procedure TATSynEdit.UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize: integer);
 var
   NPos, NPixels, NLineIndex, NCharSize: integer;
 begin
@@ -4132,8 +4129,7 @@ begin
   end;
 end;
 
-function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo;
-  const Msg: TLMScroll): boolean;
+function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
 begin
   if (Info.NMax-Info.NMin)<Info.NPage then
   begin
