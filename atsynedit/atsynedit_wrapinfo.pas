@@ -16,14 +16,13 @@ uses
   ATSynEdit_fgl;
 
 type
-  TATSynWrapFinal = (
+  TATWrapItemFinal = (
     cWrapItemFinal,
     cWrapItemCollapsed,
     cWrapItemMiddle
     );
 
 type
-
   { TATWrapItem }
 
   TATWrapItem = packed record
@@ -31,15 +30,14 @@ type
     NCharIndex: integer;
     NLength: integer;
     NIndent: word;
-    NFinal: TATSynWrapFinal;
+    NFinal: TATWrapItemFinal;
     bInitial: boolean;
-    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal; AInitial: boolean); inline;
+    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATWrapItemFinal; AInitial: boolean); inline;
     class operator=(const A, B: TATWrapItem): boolean;
   end;
 
 type
   TATWrapItems = specialize TFPGList<TATWrapItem>;
-
 
 type
   TATCheckLineCollapsedEvent = function(ALineNum: integer): boolean of object;
@@ -83,7 +81,7 @@ uses
 { TATWrapItem }
 
 procedure TATWrapItem.Init(ALineIndex, ACharIndex, ALength, AIndent: integer;
-  AFinal: TATSynWrapFinal; AInitial: boolean);
+  AFinal: TATWrapItemFinal; AInitial: boolean);
 begin
   NLineIndex:= ALineIndex;
   NCharIndex:= ACharIndex;
@@ -252,7 +250,7 @@ begin
   begin
     for i:= 1 to Dif do
     begin
-      Item.Init(0, 0, 0, 0, Low(TATSynWrapFinal), true);
+      Item.Init(0, 0, 0, 0, Low(TATWrapItemFinal), true);
       Insert(AFrom, Item);
     end;
   end;

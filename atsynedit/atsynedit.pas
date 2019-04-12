@@ -1814,7 +1814,7 @@ var
   Item: TATWrapItem;
   NOffset, NLen, NIndent, NVisColumns: integer;
   NFoldFrom: integer;
-  NFinal: TATSynWrapFinal;
+  NFinal: TATWrapItemFinal;
   bInitial: boolean;
   Str: atString;
 begin
