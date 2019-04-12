@@ -5460,6 +5460,9 @@ begin
     FScrollVert.NPos:= 0
   else
     FScrollVert.NPos:= FScrollVert.NPosLast;
+
+  FScrollHorz.NPixelOffset:= 0;
+  FScrollVert.NPixelOffset:= 0;
 end;
 
 procedure TATSynEdit.DoScrollByDelta(ADeltaX, ADeltaY: integer);
