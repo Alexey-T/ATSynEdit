@@ -1815,6 +1815,7 @@ var
   NOffset, NLen, NIndent, NVisColumns: integer;
   NFoldFrom: integer;
   NFinal: TATSynWrapFinal;
+  bInitial: boolean;
   Str: atString;
 begin
   AItems.Clear;
@@ -1832,7 +1833,7 @@ begin
     NFoldFrom:= AStrings.LinesFoldFrom[ALine, AEditorIndex];
     if NFoldFrom>0 then
     begin
-      Item.Init(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed);
+      Item.Init(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed, true);
       AItems.Add(Item);
       Exit;
     end;
@@ -1841,7 +1842,7 @@ begin
   //line not wrapped?
   if (AWrapColumn<cMinWrapColumnAbs) then
   begin
-    Item.Init(ALine, 1, NLen, 0, cWrapItemFinal);
+    Item.Init(ALine, 1, NLen, 0, cWrapItemFinal, true);
     AItems.Add(Item);
     Exit;
   end;
@@ -1850,6 +1851,7 @@ begin
   NVisColumns:= Max(AVisibleColumns, cMinWrapColumnAbs);
   NOffset:= 1;
   NIndent:= 0;
+  bInitial:= true;
 
   repeat
     NLen:= ATabHelper.FindWordWrapOffset(
@@ -1866,8 +1868,9 @@ begin
     else
       NFinal:= cWrapItemMiddle;
 
-    Item.Init(ALine, NOffset, NLen, NIndent, NFinal);
+    Item.Init(ALine, NOffset, NLen, NIndent, NFinal, bInitial);
     AItems.Add(Item);
+    bInitial:= false;
 
     if AWrapIndented then
       if NOffset=1 then
@@ -2570,7 +2573,7 @@ begin
     begin
       NOutputCharsSkipped:= 0;
       NOutputSpacesSkipped:= 0;
-      if FWrapInfo.IsItemInitial(NWrapIndex) then
+      if WrapItem.bInitial then
       begin
         FTabHelper.FindOutputSkipOffset(
           NLinesIndex,
@@ -2772,7 +2775,7 @@ begin
         else
           C.Font.Color:= Colors.GutterFont;
 
-        if FWrapInfo.IsItemInitial(NWrapIndex) then
+        if WrapItem.bInitial then
         begin
           if FOptNumbersFontSize<>0 then
             C.Font.Size:= FOptNumbersFontSize;
@@ -2803,7 +2806,7 @@ begin
 
       Band:= FGutter[NBandDecor];
       if Band.Visible then
-        if FWrapInfo.IsItemInitial(NWrapIndex) then
+        if WrapItem.bInitial then
           DoPaintGutterDecor(C, NLinesIndex,
             Rect(
               Band.Left,
@@ -2815,7 +2818,7 @@ begin
       //gutter band: bookmark
       Band:= FGutter[FGutterBandBm];
       if Band.Visible then
-        if FWrapInfo.IsItemInitial(NWrapIndex) then
+        if WrapItem.bInitial then
         begin
           if Strings.Bookmarks.Find(NLinesIndex)>=0 then
             DoEventDrawBookmarkIcon(C, NLinesIndex,
@@ -5996,7 +5999,7 @@ begin
 
   //correct state for wrapped line
   if State=cFoldbarBegin then
-    if not FWrapInfo.IsItemInitial(AWrapItemIndex) then
+    if not WrapItem.bInitial then
       State:= cFoldbarMiddle;
 
   //correct state for wrapped line

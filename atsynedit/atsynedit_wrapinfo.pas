@@ -23,13 +23,17 @@ type
     );
 
 type
+
+  { TATWrapItem }
+
   TATWrapItem = packed record
-    NLineIndex,
-    NCharIndex,
+    NLineIndex: integer;
+    NCharIndex: integer;
     NLength: integer;
     NIndent: word;
     NFinal: TATSynWrapFinal;
-    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
+    bInitial: boolean;
+    procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal; AInitial: boolean); inline;
     class operator=(const A, B: TATWrapItem): boolean;
   end;
 
@@ -59,7 +63,6 @@ type
     property VirtualMode: boolean read FVirtualMode write SetVirtualMode;
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
-    function IsItemInitial(N: integer): boolean;
     property Data[N: integer]: TATWrapItem read GetData; default;
     procedure Add(const AData: TATWrapItem);
     procedure Delete(N: integer);
@@ -79,13 +82,15 @@ uses
 
 { TATWrapItem }
 
-procedure TATWrapItem.Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATSynWrapFinal); inline;
+procedure TATWrapItem.Init(ALineIndex, ACharIndex, ALength, AIndent: integer;
+  AFinal: TATSynWrapFinal; AInitial: boolean);
 begin
   NLineIndex:= ALineIndex;
   NCharIndex:= ACharIndex;
   NLength:= ALength;
   NIndent:= AIndent;
   NFinal:= AFinal;
+  bInitial:= AInitial;
 end;
 
 class operator TATWrapItem.=(const A, B: TATWrapItem): boolean;
@@ -98,7 +103,7 @@ end;
 function TATWrapInfo.GetData(AIndex: integer): TATWrapItem;
 begin
   if FVirtualMode then
-    Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal)
+    Result.Init(AIndex, 1, FStrings.LinesLen[AIndex], 0, cWrapItemFinal, true)
   else
   begin
     if AIndex>=0 then
@@ -150,14 +155,6 @@ end;
 function TATWrapInfo.IsIndexValid(N: integer): boolean; inline;
 begin
   Result:= (N>=0) and (N<Count);
-end;
-
-function TATWrapInfo.IsItemInitial(N: integer): boolean;
-begin
-  if (N>0) and (N<Count) then //cant use IsIndexValid, N>0
-    Result:= Data[N].NLineIndex<>Data[N-1].NLineIndex
-  else
-    Result:= true;
 end;
 
 procedure TATWrapInfo.Add(const AData: TATWrapItem); inline;
@@ -255,7 +252,7 @@ begin
   begin
     for i:= 1 to Dif do
     begin
-      Item.Init(0, 0, 0, 0, Low(TATSynWrapFinal));
+      Item.Init(0, 0, 0, 0, Low(TATSynWrapFinal), true);
       Insert(AFrom, Item);
     end;
   end;
