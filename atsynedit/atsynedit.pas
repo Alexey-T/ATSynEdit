@@ -219,7 +219,7 @@ type
     SmoothPage: integer;
     SmoothPos: integer;
     procedure Clear;
-    function TotalOffset(CharSize: integer): integer; inline;
+    function TotalOffset: integer; inline;
     class operator =(const A, B: TATSynScrollInfo): boolean;
   end;
 
@@ -2014,7 +2014,7 @@ begin
     SmoothMin:= 0;
     SmoothMax:= NMax*SmoothCharSize + NGapAll;
     SmoothPage:= NPage*SmoothCharSize;
-    SmoothPos:= TotalOffset(SmoothCharSize) + NGapPos;
+    SmoothPos:= TotalOffset + NGapPos;
   end;
 
   with FScrollHorz do
@@ -2031,7 +2031,7 @@ begin
     SmoothMin:= 0;
     SmoothMax:= NMax*SmoothCharSize;
     SmoothPage:= NPage*SmoothCharSize;
-    SmoothPos:= TotalOffset(SmoothCharSize);
+    SmoothPos:= TotalOffset;
 end;
 
   bVert1:= GetScrollbarVisible(true);
@@ -2269,9 +2269,9 @@ procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);
 var
   X1, X2, Y1, Y2: integer;
 begin
-  X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset(FCharSize.X);
+  X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset;
   X2:= FMouseDragCoord.X;
-  Y1:= FMouseDownCoord.Y - FScrollVert.TotalOffset(FCharSize.Y);
+  Y1:= FMouseDownCoord.Y - FScrollVert.TotalOffset;
   Y2:= FMouseDragCoord.Y;
 
   C.DrawFocusRect(Rect(
@@ -4322,8 +4322,8 @@ begin
   SetFocus;
   DoCaretForceShow;
 
-  FMouseDownCoord.X:= X + FScrollHorz.TotalOffset(FCharSize.X);
-  FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset(FCharSize.Y);
+  FMouseDownCoord.X:= X + FScrollHorz.TotalOffset;
+  FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset;
 
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
@@ -5496,7 +5496,7 @@ begin
 
   with FScrollHorz do
   begin
-    N:= TotalOffset(W);
+    N:= TotalOffset;
     Inc(N, Dx);
     if N<0 then N:= 0;
     NPos:= N div W;
@@ -5508,7 +5508,7 @@ begin
 
   with FScrollVert do
   begin
-    N:= TotalOffset(H);
+    N:= TotalOffset;
     Inc(N, Dy);
     if N<0 then N:= 0;
     NPos:= N div H;

@@ -57,14 +57,15 @@ begin
   SmoothPage:= 1;
 end;
 
-function TATSynScrollInfo.TotalOffset(CharSize: integer): integer; inline;
+function TATSynScrollInfo.TotalOffset: integer;
 begin
-  Result:= NPos*CharSize + NPixelOffset;
+  Result:= NPos*SmoothCharSize + NPixelOffset;
 end;
 
 class operator TATSynScrollInfo.= (const A, B: TATSynScrollInfo): boolean;
 begin
   Result:=
+    (A.Vertical=B.Vertical) and
     (A.NPos=B.NPos) and
     (A.NMin=B.NMin) and
     (A.NMax=B.NMax) and
