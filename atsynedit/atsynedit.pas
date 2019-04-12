@@ -213,7 +213,6 @@ type
     NPosLast: integer;
     NPixelOffset: integer;
     SmoothCharSize: integer;
-    SmoothMin: integer;
     SmoothMax: integer;
     SmoothPage: integer;
     SmoothPos: integer;
@@ -2009,7 +2008,6 @@ begin
     NPosLast:= Max(0, NMax-NPage);
 
     SmoothCharSize:= FCharSize.Y;
-    SmoothMin:= 0;
     SmoothMax:= NMax*SmoothCharSize + NGapAll;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPos:= TotalOffset + NGapPos;
@@ -2025,7 +2023,6 @@ begin
     NPosLast:= Max(0, NMax-NPage);
 
     SmoothCharSize:= FCharSize.X;
-    SmoothMin:= 0;
     SmoothMax:= NMax*SmoothCharSize;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPos:= TotalOffset;
@@ -2060,7 +2057,7 @@ begin
   if FOptScrollbarsNew then
   begin
     FScrollbarLock:= true;
-    FScrollbarVert.Min:= FScrollVert.SmoothMin;
+    FScrollbarVert.Min:= 0;
     FScrollbarVert.Max:= FScrollVert.SmoothMax;
     FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
     FScrollbarVert.Position:= FScrollVert.SmoothPos;
@@ -2071,7 +2068,7 @@ begin
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
-  si.nMin:= FScrollVert.SmoothMin;
+  si.nMin:= 0;
   si.nMax:= FScrollVert.SmoothMax;
   si.nPage:= FScrollVert.SmoothPage;
   if FOptScrollbarsNew then
@@ -2099,7 +2096,7 @@ begin
   if FOptScrollbarsNew then
   begin
     FScrollbarLock:= true;
-    FScrollbarHorz.Min:= FScrollHorz.SmoothMin;
+    FScrollbarHorz.Min:= 0;
     FScrollbarHorz.Max:= FScrollHorz.SmoothMax;
     FScrollbarHorz.PageSize:= FScrollHorz.SmoothPage;
     FScrollbarHorz.Position:= FScrollHorz.SmoothPos;
@@ -2110,7 +2107,7 @@ begin
   FillChar(si{%H-}, SizeOf(si), 0);
   si.cbSize:= SizeOf(si);
   si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; don't work
-  si.nMin:= FScrollHorz.SmoothMin;
+  si.nMin:= 0;
   si.nMax:= FScrollHorz.SmoothMax;
   si.nPage:= FScrollHorz.SmoothPage;
   if FOptScrollbarsNew or FOptScrollbarHorizontalHidden then
