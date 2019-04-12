@@ -1960,7 +1960,10 @@ begin
   FWrapMode:= AValue;
   FWrapUpdateNeeded:= true;
   if FWrapMode<>cWrapOff then
+  begin
     FScrollHorz.NPos:= 0;
+    FScrollHorz.NPixelOffset:= 0;
+  end;
 
   Update;
   LineTop:= NLine;
