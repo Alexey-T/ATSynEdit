@@ -249,8 +249,7 @@ end;
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;
 begin
   DoCaretSingle(0, 0, false);
-  FScrollHorz.NPos:= 0;
-  FScrollVert.NPos:= 0;
+  DoScrollToBeginOrEnd(true);
 
   Result:= [cResultCaretTop];
 end;
