@@ -1192,7 +1192,7 @@ type
     procedure DoSelect_ColumnBlock_FromSelRect;
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(Dx, Dy: integer);
-    procedure DoScrollByDeltaInPixels(Dx, Dy: integer);
+    procedure DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
     procedure DoSizeChange(AInc: boolean);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor): boolean;
@@ -4104,6 +4104,8 @@ var
   NPos, NPixels, NLineIndex, NCharSize: integer;
 begin
   NCharSize:= AInfo.SmoothCharSize;
+
+  AInfo.SmoothPos:= APos;
   AInfo.NPos:= APos div NCharSize;
   AInfo.NPixelOffset:= APos mod NCharSize;
 
@@ -5483,29 +5485,27 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoScrollByDeltaInPixels(Dx, Dy: integer);
-var
-  N: integer;
+procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
 begin
   with FScrollHorz do
   begin
-    N:= TotalOffset;
-    Inc(N, Dx);
-    if N<0 then N:= 0;
-    UpdateScrollInfoFromSmoothPos(FScrollHorz, N);
+    UpdateScrollInfoFromSmoothPos(FScrollHorz, SmoothPos + ADeltaX);
     NPos:= Max(NMin, Min(NMax-NPage, NPos));
     if NPos>=NMax-NPage then
+      NPixelOffset:= 0
+    else
+    if (NPos=0) and (NPixelOffset<0) then
       NPixelOffset:= 0;
   end;
 
   with FScrollVert do
   begin
-    N:= TotalOffset;
-    Inc(N, Dy);
-    if N<0 then N:= 0;
-    UpdateScrollInfoFromSmoothPos(FScrollVert, N);
+    UpdateScrollInfoFromSmoothPos(FScrollVert, SmoothPos + ADeltaY);
     NPos:= Max(NMin, Min(NPosLast, NPos));
     if NPos>=NPosLast then
+      NPixelOffset:= 0
+    else
+    if (NPos=0) and (NPixelOffset<0) then
       NPixelOffset:= 0;
   end;
 end;
