@@ -45,12 +45,10 @@ end;
 
 procedure TATSynScrollInfo.Clear;
 begin
-  NPos:= 0;
+  FillChar(Self, SizeOf(Self), 0);
   NMax:= 1;
   NPage:= 1;
-  NPixelOffset:= 0;
   SmoothCharSize:= 1;
-  SmoothPos:= 0;
   SmoothMax:= 1;
   SmoothPage:= 1;
 end;
