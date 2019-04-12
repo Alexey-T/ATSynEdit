@@ -50,6 +50,11 @@ begin
   NMax:= 1;
   NPage:= 1;
   NPixelOffset:= 0;
+  SmoothCharSize:= 1;
+  SmoothPos:= 0;
+  SmoothMin:= 0;
+  SmoothMax:= 1;
+  SmoothPage:= 1;
 end;
 
 function TATSynScrollInfo.TotalOffset(CharSize: integer): integer; inline;
