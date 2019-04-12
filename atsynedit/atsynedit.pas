@@ -5357,7 +5357,7 @@ begin
 end;
 
 
-function TATSynEdit.DoEventCommand(ACommand: integer; const AText: string): boolean;
+function TATSynEdit.DoEventCommand(ACommand: integer; const AText: string): boolean; inline;
 begin
   Result:= false;
   if Assigned(FOnCommand) then
@@ -5425,25 +5425,25 @@ begin
     FOnChangeState(Self);
 end;
 
-procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer);
+procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer); inline;
 begin
   if Assigned(FOnClickGutter) then
     FOnClickGutter(Self, ABandIndex, ALineNumber);
 end;
 
-procedure TATSynEdit.DoEventClickMicromap(AX, AY: integer);
+procedure TATSynEdit.DoEventClickMicromap(AX, AY: integer); inline;
 begin
   if Assigned(FOnClickMicromap) then
     FOnClickMicromap(Self, AX, AY);
 end;
 
-procedure TATSynEdit.DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
+procedure TATSynEdit.DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect); inline;
 begin
   if Assigned(FOnDrawBookmarkIcon) then
     FOnDrawBookmarkIcon(Self, C, ALineNumber, ARect);
 end;
 
-procedure TATSynEdit.DoEventBeforeCalcHilite;
+procedure TATSynEdit.DoEventBeforeCalcHilite; inline;
 begin
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorBeforeCalcHilite(Self);
