@@ -46,7 +46,6 @@ end;
 procedure TATSynScrollInfo.Clear;
 begin
   NPos:= 0;
-  NMin:= 0;
   NMax:= 1;
   NPage:= 1;
   NPixelOffset:= 0;
@@ -67,7 +66,6 @@ begin
   Result:=
     (A.Vertical=B.Vertical) and
     (A.NPos=B.NPos) and
-    (A.NMin=B.NMin) and
     (A.NMax=B.NMax) and
     (A.NPage=B.NPage) and
     (A.NPixelOffset=B.NPixelOffset);

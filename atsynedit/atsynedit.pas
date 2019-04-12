@@ -207,7 +207,6 @@ type
 
   TATSynScrollInfo = record
     Vertical: boolean;
-    NMin: integer;
     NMax: integer;
     NPage: integer;
     NPos: integer;
@@ -2004,11 +2003,10 @@ begin
   with FScrollVert do
   begin
     NPage:= Max(1, GetVisibleLines)-1;
-    NMin:= 0;
     NMax:= Max(1, FWrapInfo.Count-1);
     if FOptLastLineOnTop then
       Inc(NMax, NPage);
-    NPosLast:= Max(NMin, NMax-NPage);
+    NPosLast:= Max(0, NMax-NPage);
 
     SmoothCharSize:= FCharSize.Y;
     SmoothMin:= 0;
@@ -2020,12 +2018,11 @@ begin
   with FScrollHorz do
   begin
     NPage:= Max(1, GetVisibleColumns);
-    NMin:= 0;
     //NMax calculated in DoPaintTextTo
     //hide horz bar for word-wrap:
     if FWrapMode=cWrapOn then
       NMax:= NPage;
-    NPosLast:= Max(NMin, NMax-NPage);
+    NPosLast:= Max(0, NMax-NPage);
 
     SmoothCharSize:= FCharSize.X;
     SmoothMin:= 0;
@@ -2097,7 +2094,7 @@ begin
   FScrollbarHorz.Visible:=
     FOptScrollbarsNew and
     not FOptScrollbarHorizontalHidden and
-    (FScrollHorz.NMax-FScrollHorz.NMin > FScrollHorz.NPage);
+    (FScrollHorz.NMax{-FScrollHorz.NMin} > FScrollHorz.NPage);
 
   if FOptScrollbarsNew then
   begin
@@ -4132,7 +4129,7 @@ end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
 begin
-  if (Info.NMax-Info.NMin)<Info.NPage then
+  if (Info.NMax{-Info.NMin})<Info.NPage then
   begin
     Info.Clear;
     Exit(true);
@@ -4141,7 +4138,7 @@ begin
   case Msg.ScrollCode of
     SB_TOP:
       begin
-        Info.NPos:= Info.NMin;
+        Info.NPos:= 0;
         Info.NPixelOffset:= 0;
       end;
     SB_BOTTOM:
@@ -4197,9 +4194,9 @@ begin
     Info.NPos:= Info.NPosLast;
     Info.NPixelOffset:= 0;
   end;
-  if Info.NPos<Info.NMin then
+  if Info.NPos<0 then
   begin
-    Info.NPos:= Info.NMin;
+    Info.NPos:= 0;
     Info.NPixelOffset:= 0;
   end;
 
@@ -5472,15 +5469,15 @@ procedure TATSynEdit.DoScrollByDelta(Dx, Dy: integer);
 begin
   with FScrollHorz do
   begin
-    NPos:= Max(NMin, Min(NMax-NPage, NPos+Dx));
-    if (NPos=NMin) or (NPos=NMax-NPage) then
+    NPos:= Max(0, Min(NMax-NPage, NPos+Dx));
+    if (NPos=0) or (NPos=NMax-NPage) then
       NPixelOffset:= 0;
   end;
 
   with FScrollVert do
   begin
-    NPos:= Max(NMin, Min(NPosLast, NPos+Dy));
-    if (NPos=NMin) or (NPos=NPosLast) then
+    NPos:= Max(0, Min(NPosLast, NPos+Dy));
+    if (NPos=0) or (NPos=NPosLast) then
       NPixelOffset:= 0;
   end;
 end;
@@ -5490,7 +5487,7 @@ begin
   with FScrollHorz do
   begin
     UpdateScrollInfoFromSmoothPos(FScrollHorz, SmoothPos + ADeltaX);
-    NPos:= Max(NMin, Min(NMax-NPage, NPos));
+    NPos:= Max(0, Min(NMax-NPage, NPos));
     if NPos>=NMax-NPage then
       NPixelOffset:= 0
     else
@@ -5501,7 +5498,7 @@ begin
   with FScrollVert do
   begin
     UpdateScrollInfoFromSmoothPos(FScrollVert, SmoothPos + ADeltaY);
-    NPos:= Max(NMin, Min(NPosLast, NPos));
+    NPos:= Max(0, Min(NPosLast, NPos));
     if NPos>=NPosLast then
       NPixelOffset:= 0
     else
