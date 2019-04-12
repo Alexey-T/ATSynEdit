@@ -914,9 +914,10 @@ type
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
     function DoFormatLineNumber(N: integer): atString;
-    function UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
-    procedure UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize,
-      ACharSize: integer; AVertical: boolean);
+    function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo;
+      const Msg: TLMScroll; AVertical: boolean): boolean;
+    procedure UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo;
+      AScrollSize: integer; AVertical: boolean);
     procedure UpdateWrapInfo;
     function UpdateScrollbars: boolean;
     procedure UpdateScrollbarVert;
@@ -4092,12 +4093,17 @@ begin
     FHintWnd.Hide;
 end;
 
-procedure TATSynEdit.UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize, ACharSize: integer; AVertical: boolean);
+procedure TATSynEdit.UpdateScrollInfoFromSize(var AInfo: TATSynScrollInfo; AScrollSize: integer; AVertical: boolean);
 var
-  NPos, NPixels, NLineIndex: integer;
+  NPos, NPixels, NLineIndex, NCharSize: integer;
 begin
-  AInfo.NPos:= AScrollSize div ACharSize;
-  AInfo.NPixelOffset:= AScrollSize mod ACharSize;
+  if AVertical then
+    NCharSize:= FCharSize.Y
+  else
+    NCharSize:= FCharSize.X;
+
+  AInfo.NPos:= AScrollSize div NCharSize;
+  AInfo.NPixelOffset:= AScrollSize mod NCharSize;
 
   //consider Gaps for vert scrolling
   if AVertical and (Gaps.Count>0) then
@@ -4108,7 +4114,7 @@ begin
 
     repeat
       NLineIndex:= FWrapInfo.Data[NPos].NLineIndex - 1;
-      NPixels:= AScrollSize - NPos*ACharSize - Gaps.SizeForLineRange(0, NLineIndex);
+      NPixels:= AScrollSize - NPos*NCharSize - Gaps.SizeForLineRange(0, NLineIndex);
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;
@@ -4120,19 +4126,9 @@ begin
   end;
 end;
 
-function TATSynEdit.UpdateScrollInfoFromMessage(const Msg: TLMScroll; var Info: TATSynScrollInfo): boolean;
-var
-  bVertical: boolean;
-  NCharSize: integer;
+function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo;
+  const Msg: TLMScroll; AVertical: boolean): boolean;
 begin
-  //Application.MainForm.Caption:= Format('min %d, max %d, pagesize %d, pos %d, pos-last %d',
-  //                               [info.nmin, info.nmax, info.npage, info.npos, info.NPosLast]);
-  bVertical:= @Info=@FScrollVert;
-  if bVertical then
-    NCharSize:= FCharSize.y
-  else
-    NCharSize:= FCharSize.x;
-
   if (Info.NMax-Info.NMin)<Info.NPage then
   begin
     Info.Clear;
@@ -4178,13 +4174,13 @@ begin
         //must ignore message with Msg.Msg set: LM_VSCROLL, LM_HSCROLL;
         //we get it on macOS during window resize, not expected! moves v-scroll pos to 0.
         if Msg.Msg=0 then
-          UpdateScrollInfoFromSize(Info, Msg.Pos, NCharSize, bVertical);
+          UpdateScrollInfoFromSize(Info, Msg.Pos, AVertical);
       end;
 
     SB_THUMBTRACK:
       begin
-        UpdateScrollInfoFromSize(Info, Msg.Pos, NCharSize, bVertical);
-        if bVertical then
+        UpdateScrollInfoFromSize(Info, Msg.Pos, AVertical);
+        if AVertical then
           DoHintShow;
       end;
 
@@ -4210,7 +4206,7 @@ end;
 procedure TATSynEdit.WMVScroll(var Msg: TLMVScroll);
 begin
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
-  UpdateScrollInfoFromMessage(Msg, FScrollVert);
+  UpdateScrollInfoFromMessage(FScrollVert, Msg, true);
   Invalidate;
 end;
 
@@ -4304,7 +4300,7 @@ end;
 procedure TATSynEdit.WMHScroll(var Msg: TLMHScroll);
 begin
   Include(FPaintFlags, cPaintUpdateCaretsCoords);
-  UpdateScrollInfoFromMessage(Msg, FScrollHorz);
+  UpdateScrollInfoFromMessage(FScrollHorz, Msg, false);
   Invalidate;
 end;
 
