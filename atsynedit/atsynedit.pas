@@ -711,7 +711,6 @@ type
       AShiftBelowX: integer; APosAfter: TPoint);
     procedure DoClearFoldedMarkList;
     procedure DoDropText(AndDeleteSelection: boolean);
-    procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     procedure DoFoldbarClick(ALine: integer);
     function DoGetFoldedMarkAt(Pnt: TPoint): TATFoldedMark;
     function DoGetFoldedMarkLinesCount(ALine: integer): integer;
@@ -855,6 +854,7 @@ type
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
     function DoEventCommand(ACommand: integer; const AText: string): boolean;
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
+    procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     //
     function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
@@ -5364,7 +5364,7 @@ begin
     FOnCommand(Self, ACommand, AText, Result);
 end;
 
-procedure TATSynEdit.DoEventCommandAfter(ACommand: integer; const AText: string);
+procedure TATSynEdit.DoEventCommandAfter(ACommand: integer; const AText: string); inline;
 begin
   if Assigned(FOnCommandAfter) then
     FOnCommandAfter(Self, ACommand, AText);
