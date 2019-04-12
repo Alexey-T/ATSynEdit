@@ -5480,28 +5480,30 @@ begin
 end;
 
 procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
+//
+  procedure _Delta(var AInfo: TATSynScrollInfo; ADelta: integer); inline;
+  begin
+    UpdateScrollInfoFromSmoothPos(AInfo, AInfo.SmoothPos + ADelta);
+    with AInfo do
+    begin
+      if (NPos>=NPosLast) then
+      begin
+        NPos:= NPosLast;
+        NPixelOffset:= 0;
+      end
+      else
+      if (NPos<=0) then
+      begin
+        NPos:= 0;
+        if (NPixelOffset<0) then
+          NPixelOffset:= 0;
+      end;
+    end;
+  end;
+//
 begin
-  with FScrollHorz do
-  begin
-    UpdateScrollInfoFromSmoothPos(FScrollHorz, SmoothPos + ADeltaX);
-    NPos:= Max(0, Min(NMax-NPage, NPos));
-    if NPos>=NMax-NPage then
-      NPixelOffset:= 0
-    else
-    if (NPos=0) and (NPixelOffset<0) then
-      NPixelOffset:= 0;
-  end;
-
-  with FScrollVert do
-  begin
-    UpdateScrollInfoFromSmoothPos(FScrollVert, SmoothPos + ADeltaY);
-    NPos:= Max(0, Min(NPosLast, NPos));
-    if NPos>=NPosLast then
-      NPixelOffset:= 0
-    else
-    if (NPos=0) and (NPixelOffset<0) then
-      NPixelOffset:= 0;
-  end;
+  _Delta(FScrollHorz, ADeltaX);
+  _Delta(FScrollVert, ADeltaY);
 end;
 
 procedure TATSynEdit.MenuClick(Sender: TObject);
