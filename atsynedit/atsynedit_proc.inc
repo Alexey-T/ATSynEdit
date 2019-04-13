@@ -1,5 +1,4 @@
 var
-  cResourceScaleSuffix: string = '';
   cBitmapWait: TPortableNetworkGraphic = nil;
   cBitmapSaving: TPortableNetworkGraphic = nil;
   cBitmapNiceScroll: TPortableNetworkGraphic = nil;
@@ -92,7 +91,7 @@ begin
   cATClipboardFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
 end;
 
-function _GetResourceScaleSuffix: string;
+function GetResourceScaleSuffix: string;
 var
   N: integer;
 begin
@@ -107,8 +106,10 @@ begin
 end;
 
 procedure InitResources;
+var
+  Suffix: string;
 begin
-  cResourceScaleSuffix:= _GetResourceScaleSuffix;
+  Suffix:= GetResourceScaleSuffix;
 
   Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
   Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
@@ -117,7 +118,7 @@ begin
   Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
 
   cBitmapNiceScroll:= TPortableNetworkGraphic.Create;
-  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK'+cResourceScaleSuffix);
+  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK'+Suffix);
 
   cBitmapWait:= TPortableNetworkGraphic.Create;
   cBitmapWait.LoadFromResourceName(HInstance, 'ATSYN_WAIT');
@@ -126,10 +127,10 @@ begin
   cBitmapSaving.LoadFromResourceName(HInstance, 'ATSYN_SAVE');
 
   cBitmapFoldPlus:= TPortableNetworkGraphic.Create;
-  cBitmapFoldPlus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_P'+cResourceScaleSuffix);
+  cBitmapFoldPlus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_P'+Suffix);
 
   cBitmapFoldMinus:= TPortableNetworkGraphic.Create;
-  cBitmapFoldMinus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_M'+cResourceScaleSuffix);
+  cBitmapFoldMinus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_M'+Suffix);
 end;
 
 procedure FreeResources;
