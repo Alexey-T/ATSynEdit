@@ -216,6 +216,7 @@ type
     SmoothMax: integer;
     SmoothPage: integer;
     SmoothPos: integer;
+    SmoothPosLast: integer;
     procedure Clear;
     function TotalOffset: integer; inline;
     class operator =(const A, B: TATSynScrollInfo): boolean;
@@ -2017,6 +2018,7 @@ begin
     SmoothMax:= NMax*SmoothCharSize + NGapAll;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPos:= TotalOffset + NGapPos;
+    SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
   end;
 
   with FScrollHorz do
@@ -2032,7 +2034,8 @@ begin
     SmoothMax:= NMax*SmoothCharSize;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPos:= TotalOffset;
-end;
+    SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
+  end;
 
   bVert1:= GetScrollbarVisible(true);
   bHorz1:= GetScrollbarVisible(false);
