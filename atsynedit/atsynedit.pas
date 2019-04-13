@@ -4195,12 +4195,12 @@ begin
   end;
 
   //correct value (if -1)
-  if Info.NPos>Info.NPosLast then
+  if Info.SmoothPos>Info.SmoothPosLast then
   begin
-    Info.NPos:= Info.NPosLast;
-    Info.NPixelOffset:= 0;
-  end;
-  if Info.NPos<0 then
+    UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPosLast);
+  end
+  else
+  if Info.SmoothPos<0 then
   begin
     Info.NPos:= 0;
     Info.NPixelOffset:= 0;
