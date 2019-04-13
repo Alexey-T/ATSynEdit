@@ -67,6 +67,7 @@ begin
   NPixelOffset:= 0;
   SmoothCharSize:= 1;
   SmoothPos:= 0;
+  SmoothPosLast:= 1;
   SmoothMax:= 1;
   SmoothPage:= 1;
 end;
