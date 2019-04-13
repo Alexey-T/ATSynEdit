@@ -18,7 +18,7 @@ const
 
 { TATFoldedMarks }
 
-function TATFoldedMarks.Find(ACoord: TPoint): TATFoldedMark;
+function TATFoldedMarks.FindByCoord(ACoord: TPoint): TATFoldedMark;
 var
   Mark: TATFoldedMark;
   i: integer;

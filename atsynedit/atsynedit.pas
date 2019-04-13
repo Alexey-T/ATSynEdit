@@ -359,7 +359,7 @@ type
 
   TATFoldedMarks = class(specialize TFPGList<TATFoldedMark>)
   public
-    function Find(ACoord: TPoint): TATFoldedMark;
+    function FindByCoord(ACoord: TPoint): TATFoldedMark;
   end;
 
 type
@@ -4718,7 +4718,7 @@ begin
   //detect cursor on folded marks
   if FFoldTooltipVisible then
   begin
-    FFoldedMarkCurrent:= FFoldedMarkList.Find(Point(X, Y));
+    FFoldedMarkCurrent:= FFoldedMarkList.FindByCoord(Point(X, Y));
     UpdateFoldedMarkTooltip;
   end;
 
