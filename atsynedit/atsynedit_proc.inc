@@ -87,17 +87,20 @@ begin
     (A.NPixelOffset=B.NPixelOffset);
 end;
 
-procedure InitClipboardFormat;
+procedure InitClipboardFormat; inline;
 begin
   cATClipboardFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
 end;
 
 function _GetResourceScaleSuffix: string;
+var
+  N: integer;
 begin
-  if Screen.PixelsPerInch>=96*2 then
+  N:= Screen.PixelsPerInch;
+  if N>=96*2 then
     Result:= '_200'
   else
-  if Screen.PixelsPerInch>=Round(96*1.5) then
+  if N>=(96 * 3 div 2) then
     Result:= '_150'
   else
     Result:= '';
