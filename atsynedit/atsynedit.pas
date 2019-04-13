@@ -5495,15 +5495,19 @@ procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
 //
   procedure _Delta(var AInfo: TATSynScrollInfo; ADelta: integer); inline;
   begin
-    UpdateScrollInfoFromSmoothPos(AInfo, AInfo.SmoothPos + ADelta);
+    UpdateScrollInfoFromSmoothPos(AInfo,
+      Min(AInfo.SmoothPosLast, AInfo.SmoothPos + ADelta));
+
     with AInfo do
     begin
+      {
       if (NPos>=NPosLast) then
       begin
         NPos:= NPosLast;
         NPixelOffset:= 0;
       end
       else
+      }
       if (NPos<=0) then
       begin
         NPos:= 0;
