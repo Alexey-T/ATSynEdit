@@ -17,6 +17,22 @@ const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
 
+{ TATFoldedMarks }
+
+function TATFoldedMarks.Find(ACoord: TPoint): TATFoldedMark;
+var
+  Mark: TATFoldedMark;
+  i: integer;
+begin
+  for i:= 0 to Count-1 do
+  begin
+    Mark:= Items[i];
+    if PtInRect(Mark.Coord, ACoord) then
+      exit(Mark);
+  end;
+  Result.InitNone;
+end;
+
 { TATFoldedMark }
 
 procedure TATFoldedMark.Init(const ACoord: TRect; ALineFrom, ALineTo: integer);

@@ -355,7 +355,12 @@ type
     class operator =(const a, b: TATFoldedMark): boolean;
   end;
 
-  TATFoldedMarks = specialize TFPGList<TATFoldedMark>;
+  { TATFoldedMarks }
+
+  TATFoldedMarks = class(specialize TFPGList<TATFoldedMark>)
+  public
+    function Find(ACoord: TPoint): TATFoldedMark;
+  end;
 
 type
   { TATSynEdit }
@@ -709,10 +714,8 @@ type
     procedure DoCaretsShift_MarkerItem(AMarkerObj: TATMarkers;
       AMarkerIndex: integer; APosX, APosY, AShiftX, AShiftY,
       AShiftBelowX: integer; APosAfter: TPoint);
-    procedure DoClearFoldedMarkList;
     procedure DoDropText(AndDeleteSelection: boolean);
     procedure DoFoldbarClick(ALine: integer);
-    function DoGetFoldedMarkAt(Pnt: TPoint): TATFoldedMark;
     function DoGetFoldedMarkLinesCount(ALine: integer): integer;
     procedure DoHandleRightClick(X, Y: integer);
     function DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
@@ -2355,7 +2358,7 @@ begin
 
   if AMainText then
   begin
-    DoClearFoldedMarkList;
+    FFoldedMarkList.Clear;
   end;
 
   if AWithGutter then
@@ -3541,7 +3544,7 @@ begin
   FreeAndNil(FHintWnd);
   FreeAndNil(FMenuStd);
   DoPaintModeStatic;
-  DoClearFoldedMarkList;
+  FFoldedMarkList.Clear;
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
@@ -4715,7 +4718,7 @@ begin
   //detect cursor on folded marks
   if FFoldTooltipVisible then
   begin
-    FFoldedMarkCurrent:= DoGetFoldedMarkAt(Point(X, Y));
+    FFoldedMarkCurrent:= FFoldedMarkList.Find(Point(X, Y));
     UpdateFoldedMarkTooltip;
   end;
 
@@ -6744,26 +6747,6 @@ procedure TATSynEdit.FoldedMarkMouseEnter(Sender: TObject);
 begin
   FFoldedMarkTooltip.Hide;
 end;
-
-procedure TATSynEdit.DoClearFoldedMarkList;
-begin
-  FFoldedMarkList.Clear;
-end;
-
-
-function TATSynEdit.DoGetFoldedMarkAt(Pnt: TPoint): TATFoldedMark;
-var
-  Mark: TATFoldedMark;
-  i: integer;
-begin
-  for i:= 0 to FFoldedMarkList.Count-1 do
-  begin
-    Mark:= FFoldedMarkList[i];
-    if PtInRect(Mark.Coord, Pnt) then exit(Mark);
-  end;
-  Result.InitNone;
-end;
-
 
 function TATSynEdit.DoGetFoldedMarkLinesCount(ALine: integer): integer;
 var
