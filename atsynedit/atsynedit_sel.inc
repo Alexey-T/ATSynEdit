@@ -422,6 +422,8 @@ end;
 
 
 function TATSynEdit.DoSelect_MultiCaretsToColumnSel: boolean;
+//Convert multi-carets to column block,
+//but only if carets are placed vertically, if all multi-selections are single line
 var
   Caret0, Caret: TATCaretItem;
   Pnt: TPoint;
@@ -440,8 +442,11 @@ begin
   for i:= 1{>0} to Carets.Count-1 do
   begin
     Caret:= Carets[i];
+    //check that carets placed vertically (y)
     if Caret.PosY<>Pnt.Y+i then exit;
+    //check for single line selections
     if Caret.PosY<>Caret.EndY then exit;
+    //check for vertically (x)
     if Pnt.X<>Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper) then exit;
   end;
 
