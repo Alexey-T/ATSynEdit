@@ -1,6 +1,9 @@
 
+2019.04.14
+- fix: multi-carets in a row can be continued up/down, by commands "column select: up (down)", even without selections
+
 2019.04.11
-+ add: Gaps now don't break smooth vertical scrolling (mostly done)
++ add: improved Gaps, they must not break smooth vertical scrolling (80% done)
 
 2019.04.07
 + add: property OptShowMouseSelFrame (show dotted frame during mouse selection)
