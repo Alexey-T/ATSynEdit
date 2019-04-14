@@ -427,6 +427,7 @@ function TATSynEdit.DoSelect_MultiCaretsToColumnSel: boolean;
 var
   Caret0, Caret: TATCaretItem;
   Pnt: TPoint;
+  bSel: boolean;
   i: integer;
 begin
   Result:= false;
@@ -434,8 +435,10 @@ begin
   if Carets.Count<2 then exit;
 
   Caret0:= Carets[0];
-  if Caret0.EndY<0 then exit;
-  if Caret0.EndY<>Caret0.PosY then exit;
+  bSel:= Caret0.EndY>=0;
+  //check for single line selection
+  if bSel and (Caret0.PosY<>Caret0.EndY) then exit;
+  //remember column x
   Pnt.X:= Strings.CharPosToColumnPos(Caret0.PosY, Caret0.PosX, FTabHelper);
   Pnt.Y:= Caret0.PosY;
 
@@ -445,7 +448,7 @@ begin
     //check that carets placed vertically (y)
     if Caret.PosY<>Pnt.Y+i then exit;
     //check for single line selections
-    if Caret.PosY<>Caret.EndY then exit;
+    if bSel and (Caret.PosY<>Caret.EndY) then exit;
     //check for vertically (x)
     if Pnt.X<>Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper) then exit;
   end;
@@ -456,7 +459,7 @@ begin
   Caret:= Carets[Carets.Count-1];
   FSelRectEnd.X:= Caret0.PosX;
   FSelRectEnd.Y:= Caret.PosY;
-  FSelRectBegin.X:= Caret.EndX;
+  FSelRectBegin.X:= IfThen(bSel, Caret.EndX, Caret.PosX);
   FSelRectBegin.Y:= Caret0.PosY;
 
   FSelRect:= Rect(
