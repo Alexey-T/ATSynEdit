@@ -103,7 +103,7 @@ type
   { TATStringItem }
 
   TATBits2 = 0..3;
-  TATStringItem_FoldFrom = 0..1023;
+  TATStringItem_FoldFrom = 0..255; //8 bits should be enougth
 
   TATStringItemEx = bitpacked record
     Ends: TATBits2;
@@ -115,6 +115,7 @@ type
     FoldFrom_0, FoldFrom_1: TATStringItem_FoldFrom;
       //0: line not folded
       //>0: line folded from this char-pos
+    Updated: boolean;
   end;
 
   TATStringItem = packed record
@@ -217,6 +218,7 @@ type
     function GetLineHidden(ALine, AClient: integer): boolean;
     function GetLineSep(AIndex: integer): TATLineSeparator;
     function GetLineState(AIndex: integer): TATLineState;
+    function GetLineUpdated(AIndex: integer): boolean;
     function GetLineLen(AIndex: integer): integer;
     function GetLineLenRaw(AIndex: integer): integer;
     function GetLineLenPhysical(AIndex: integer): integer;
@@ -240,6 +242,7 @@ type
     procedure SetLineHidden(AIndexLine, AIndexClient: integer; AValue: boolean);
     procedure SetLineSep(AIndex: integer; AValue: TATLineSeparator);
     procedure SetLineState(AIndex: integer; AValue: TATLineState);
+    procedure SetLineUpdated(AIndex: integer; AValue: boolean);
     procedure DoLoadFromStream(Stream: TStream);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
@@ -275,6 +278,7 @@ type
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
+    property LinesUpdated[Index: integer]: boolean read GetLineUpdated write SetLineUpdated;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
     procedure LineBlockDelete(ALine1, ALine2: integer);
@@ -358,6 +362,7 @@ type
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     procedure DoClearUndo(ALocked: boolean = false);
+    procedure DoClearLineStatesUpdated;
     //misc
     procedure DoSaveLastEditPos(AX: integer=-1; AY: integer=-1);
     procedure DoGotoLastEditPos;
@@ -415,6 +420,7 @@ begin
   Ex.Ends:= TATBits2(AEnd);
   Ex.State:= TATBits2(cLineStateAdded);
   Ex.Sep:= TATBits2(cLineSepNone);
+  Ex.Updated:= true;
 end;
 
 function ATStrings_To_StringList(AStr: TATStrings): TStringList;
@@ -504,6 +510,11 @@ function TATStrings.GetLineState(AIndex: integer): TATLineState;
 begin
   //Assert(IsIndexValid(AIndex));
   Result:= TATLineState(FList.GetItem(AIndex)^.Ex.State);
+end;
+
+function TATStrings.GetLineUpdated(AIndex: integer): boolean;
+begin
+  Result:= FList.GetItem(AIndex)^.Ex.Updated;
 end;
 
 function TATStrings.GetLineLen(AIndex: integer): integer;
@@ -733,6 +744,15 @@ begin
   //Assert(IsIndexValid(AIndex));
   Item:= FList.GetItem(AIndex);
   Item^.Ex.State:= TATBits2(AValue);
+end;
+
+procedure TATStrings.SetLineUpdated(AIndex: integer; AValue: boolean);
+var
+  Item: PATStringItem;
+begin
+  //Assert(IsIndexValid(AIndex));
+  Item:= FList.GetItem(AIndex);
+  Item^.Ex.Updated:= AValue;
 end;
 
 
@@ -1507,6 +1527,14 @@ begin
   end;
 end;
 
+procedure TATStrings.DoClearLineStatesUpdated;
+var
+  i: integer;
+begin
+  for i:= 0 to FList.Count-1 do
+    FList.GetItem(i)^.Ex.Updated:= false;
+end;
+
 procedure TATStrings.DoSaveLastEditPos(AX: integer; AY: integer);
 var
   Ar: TATPointArray;
@@ -1542,8 +1570,6 @@ begin
 end;
 
 procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
-var
-  Ptr: pointer;
 begin
   if not Assigned(FListUpdates) then Exit;
 
