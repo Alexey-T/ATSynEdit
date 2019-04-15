@@ -1033,6 +1033,7 @@ type
     MenuitemTextSelAll: TMenuItem;
     MenuitemTextUndo: TMenuItem;
     MenuitemTextRedo: TMenuItem;
+    TagString: string; //to store plugin specific data in CudaText
 
     //overrides
     constructor Create(AOwner: TComponent); override;
