@@ -676,6 +676,7 @@ begin
   if TATLineState(Item^.Ex.State)<>cLineStateAdded then
     Item^.Ex.State:= TATBits2(cLineStateChanged);
 
+  Item^.Ex.Updated:= true;
   Item^.Ex.HasTab:= 0; //unknown
   Item^.Ex.HasAsciiOnly:= 0; //unknown
 end;
@@ -706,6 +707,7 @@ begin
   Item^.Ex.Ends:= TATBits2(AValue);
   if TATLineState(Item^.Ex.State)<>cLineStateAdded then
     Item^.Ex.State:= TATBits2(cLineStateChanged);
+  Item^.Ex.Updated:= true;
 end;
 
 procedure TATStrings.SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
