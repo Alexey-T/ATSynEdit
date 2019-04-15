@@ -4108,6 +4108,20 @@ var
 begin
   NCharSize:= AInfo.SmoothCharSize;
 
+  if APos<=0 then
+  begin
+    AInfo.SmoothPos:= 0;
+    AInfo.NPos:= 0;
+    exit
+  end;
+
+  if APos>=AInfo.SmoothPosLast then
+  begin
+    AInfo.SmoothPos:= AInfo.SmoothPosLast;
+    AInfo.NPos:= AInfo.NPosLast;
+    exit
+  end;
+
   AInfo.SmoothPos:= APos;
   AInfo.NPos:= APos div NCharSize;
   AInfo.NPixelOffset:= APos mod NCharSize;
