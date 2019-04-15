@@ -4106,8 +4106,6 @@ procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; 
 var
   NPos, NPixels, NLineIndex, NCharSize: integer;
 begin
-  NCharSize:= AInfo.SmoothCharSize;
-
   if APos<=0 then
   begin
     AInfo.SmoothPos:= 0;
@@ -4124,6 +4122,7 @@ begin
     exit
   end;
 
+  NCharSize:= AInfo.SmoothCharSize;
   AInfo.SmoothPos:= APos;
   AInfo.NPos:= APos div NCharSize;
   AInfo.NPixelOffset:= APos mod NCharSize;
