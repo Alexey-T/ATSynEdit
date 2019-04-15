@@ -4112,6 +4112,7 @@ begin
   begin
     AInfo.SmoothPos:= 0;
     AInfo.NPos:= 0;
+    AInfo.NPixelOffset:= 0;
     exit
   end;
 
@@ -4119,6 +4120,7 @@ begin
   begin
     AInfo.SmoothPos:= AInfo.SmoothPosLast;
     AInfo.NPos:= AInfo.NPosLast;
+    AInfo.NPixelOffset:= 0;
     exit
   end;
 
