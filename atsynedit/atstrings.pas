@@ -110,11 +110,12 @@ type
     State: TATBits2;
     Sep: TATBits2;
     HasTab: TATBits2;
-    HasAsciiOnly: TATBits2;
-    Hidden_0, Hidden_1: boolean;
-    FoldFrom_0, FoldFrom_1: TATStringItem_FoldFrom;
+    FoldFrom_0,
+    FoldFrom_1: TATStringItem_FoldFrom;
       //0: line not folded
       //>0: line folded from this char-pos
+    HasAsciiOnly: TATBits2;
+    Hidden_0, Hidden_1: boolean;
     Updated: boolean;
   end;
 
