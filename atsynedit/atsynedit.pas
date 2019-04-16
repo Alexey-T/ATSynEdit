@@ -3510,6 +3510,8 @@ begin
   FMouseDownDouble:= false;
   FMouseDragDropping:= false;
   FMouseNiceScrollPos:= Point(0, 0);
+  FMouseDownCoord:= Point(-1, -1);
+  FMouseDragCoord:= Point(-1, -1);
 
   FSelRect:= cRectEmpty;
   FCursorOnMinimap:= false;
