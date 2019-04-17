@@ -89,6 +89,7 @@ type
     chkUnprintEndDet: TCheckBox;
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
+    chkZebra: TCheckBox;
     edCrHeightNormal: TSpinEdit;
     edScrollArrowKind: TComboBox;
     edMapCharWidth: TSpinEdit;
@@ -223,6 +224,7 @@ begin
     chkSaveTrimEmptyLines.Checked:= ed.OptSavingTrimFinalEmptyLines;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
     chkClickLink.Checked:= ed.OptMouseClickOpensURL;
+    chkZebra.Checked:= ed.OptZebraActive;
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -348,6 +350,7 @@ begin
       ed.OptSavingTrimFinalEmptyLines:= chkSaveTrimEmptyLines.Checked;
       ed.OptShowScrollHint:= chkScrollHint.Checked;
       ed.OptMouseClickOpensURL:= chkClickLink.Checked;
+      ed.OptZebraActive:= chkZebra.Checked;
 
       //unprint
       ed.OptUnprintedVisible:= chkUnprintEn.Checked;
