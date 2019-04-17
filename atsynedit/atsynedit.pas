@@ -4127,15 +4127,14 @@ begin
 
   NCharSize:= AInfo.SmoothCharSize;
   AInfo.SmoothPos:= APos;
-  AInfo.NPos:= APos div NCharSize;
+  AInfo.NPos:= Min(APos div NCharSize, AInfo.NMax); //Min() needed, for Gaps
   AInfo.NPixelOffset:= APos mod NCharSize;
 
   //consider Gaps for vert scrolling
   if AInfo.Vertical and (Gaps.Count>0) then
   begin
-    NPos:= AInfo.NPos;
+    NPos:= Min(AInfo.NPos, WrapInfo.Count-1);
     NPixels:= AInfo.NPixelOffset;
-    if not FWrapInfo.IsIndexValid(NPos) then exit;
 
     repeat
       NLineIndex:= FWrapInfo.Data[NPos].NLineIndex - 1;
