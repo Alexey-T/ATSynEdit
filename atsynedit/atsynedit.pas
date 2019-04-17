@@ -4127,7 +4127,7 @@ begin
 
   NCharSize:= AInfo.SmoothCharSize;
   AInfo.SmoothPos:= APos;
-  AInfo.NPos:= Min(APos div NCharSize, AInfo.NMax); //Min() needed, for Gaps
+  AInfo.NPos:= Min(APos div NCharSize, AInfo.NMax);
   AInfo.NPixelOffset:= APos mod NCharSize;
 
   //consider Gaps for vert scrolling
