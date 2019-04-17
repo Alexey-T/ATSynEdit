@@ -1512,7 +1512,7 @@ type
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
     property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine default true;
     property OptZebraActive: boolean read FOptZebraActive write FOptZebraActive default false;
-    property OptZebtaAlphaBlend: byte read FOptZebraAlphaBlend write FOptZebraAlphaBlend default cInitZebraAlphaBlend;
+    property OptZebraAlphaBlend: byte read FOptZebraAlphaBlend write FOptZebraAlphaBlend default cInitZebraAlphaBlend;
   end;
 
 var
@@ -2569,7 +2569,7 @@ begin
       NColorEntire,
       LineColorForced);
 
-    if FOptZebraActive then
+    if AMainText and FOptZebraActive then
       if Odd(NLinesIndex) then
         NColorEntire:= ColorBlend(NColorEntire, Colors.TextFont, FOptZebraAlphaBlend);
 
