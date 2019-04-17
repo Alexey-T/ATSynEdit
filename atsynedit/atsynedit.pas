@@ -268,6 +268,7 @@ const
   cInitFoldTooltipWidthPercents = 80;
   cInitMaxLineLenToCalcURL = 300;
   cInitStapleHiliteAlpha = 180;
+  cInitZebraAlphaBlend = 235;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
@@ -693,6 +694,8 @@ type
     FOptAllowScrollbarHorz: boolean;
     FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
+    FOptZebraActive: boolean;
+    FOptZebraAlphaBlend: byte;
 
     {$ifdef WINDOWS}
     FIMEPreSelText: atString;
@@ -1508,6 +1511,8 @@ type
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
     property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine default true;
+    property OptZebraActive: boolean read FOptZebraActive write FOptZebraActive default false;
+    property OptZebtaAlphaBlend: byte read FOptZebraAlphaBlend write FOptZebraAlphaBlend default cInitZebraAlphaBlend;
   end;
 
 var
@@ -2564,6 +2569,10 @@ begin
       NColorEntire,
       LineColorForced);
 
+    if FOptZebraActive then
+      if Odd(NLinesIndex) then
+        NColorEntire:= ColorBlend(NColorEntire, Colors.TextFont, FOptZebraAlphaBlend);
+
     C.Brush.Color:= NColorEntire;
     C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
 
@@ -3504,6 +3513,8 @@ begin
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
   FOptPasteAtEndMakesFinalEmptyLine:= true;
+  FOptZebraActive:= false;
+  FOptZebraAlphaBlend:= cInitZebraAlphaBlend;
 
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownGutterLineNumber:= -1;

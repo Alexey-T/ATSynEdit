@@ -1,4 +1,8 @@
 
+2019.04.17
++ add: property OptZebraActive
++ add: property OptZebraAlphaBlend
+
 2019.04.14
 - fix: multi-carets in a row can be continued up/down, by commands "column select: up (down)", even without selections
 
