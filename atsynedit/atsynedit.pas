@@ -4219,35 +4219,32 @@ begin
   case Msg.ScrollCode of
     SB_TOP:
       begin
-        Info.NPos:= 0;
-        Info.NPixelOffset:= 0;
+        UpdateScrollInfoFromSmoothPos(Info, 0);
       end;
+
     SB_BOTTOM:
       begin
-        Info.NPos:= Info.NPosLast;
-        Info.NPixelOffset:= 0;
+        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPosLast);
       end;
 
     SB_LINEUP:
       begin
-        Info.NPos:= Max(0, Info.NPos-1);
-        Info.NPixelOffset:= 0;
+        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos-Info.SmoothCharSize);
       end;
+
     SB_LINEDOWN:
       begin
-        Info.NPos:= Min(Info.NPosLast, Info.NPos+1);
-        Info.NPixelOffset:= 0;
+        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos+Info.SmoothCharSize);
       end;
 
     SB_PAGEUP:
       begin
-        Info.NPos:= Max(0, Info.NPos-Info.NPage);
-        Info.NPixelOffset:= 0;
+        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos-Info.SmoothPage);
       end;
+
     SB_PAGEDOWN:
       begin
-        Info.NPos:= Min(Info.NPosLast, Info.NPos+Info.NPage);
-        Info.NPixelOffset:= 0;
+        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos+Info.SmoothPage);
       end;
 
     SB_THUMBPOSITION:
