@@ -4183,23 +4183,23 @@ begin
 
     SB_LINEUP:
       begin
-        Dec(Info.NPos);
+        Info.NPos:= Max(0, Info.NPos-1);
         Info.NPixelOffset:= 0;
       end;
     SB_LINEDOWN:
       begin
-        Inc(Info.NPos);
+        Info.NPos:= Min(Info.NPosLast, Info.NPos+1);
         Info.NPixelOffset:= 0;
       end;
 
     SB_PAGEUP:
       begin
-        Dec(Info.NPos, Info.NPage);
+        Info.NPos:= Max(0, Info.NPos-Info.NPage);
         Info.NPixelOffset:= 0;
       end;
     SB_PAGEDOWN:
       begin
-        Inc(Info.NPos, Info.NPage);
+        Info.NPos:= Min(Info.NPosLast, Info.NPos+Info.NPage);
         Info.NPixelOffset:= 0;
       end;
 
