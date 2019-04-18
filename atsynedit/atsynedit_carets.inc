@@ -162,6 +162,7 @@ var
   Item: TATWrapItem;
   StringItem: PATStringItem;
   NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
+  NHorzPos, NVertPos: integer;
   Str: atString;
   bAsciiOnly: boolean;
   i: integer;
@@ -204,15 +205,18 @@ begin
     if NFromStart>Item.NLength then
       Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.X);
 
+    NHorzPos:= AScrollHorz.NPos;
+    NVertPos:= Max(0, AScrollVert.NPos);
+
     //TODO: here scrolled part is taken as small chars (*ACharSize.X),
     //while text may have full-width chars, and it gives incorrect result
-    Inc(Result.X, (Item.NIndent-AScrollHorz.NPos)*ACharSize.X);
-    Result.Y:= (i-AScrollVert.NPos)*ACharSize.Y;
+    Inc(Result.X, (Item.NIndent-NHorzPos)*ACharSize.X);
+    Result.Y:= (i-NVertPos)*ACharSize.Y;
 
     //consider gaps
-    if AWrapInfo.IsIndexValid(AScrollVert.NPos) then
+    if AWrapInfo.IsIndexValid(NVertPos) then
     begin
-      NLineIndexTop:= AWrapInfo[AScrollVert.NPos].NLineIndex;
+      NLineIndexTop:= AWrapInfo[NVertPos].NLineIndex;
       Inc(Result.Y, AGaps.SizeForLineRange(
         NLineIndexTop, //index of top line
         P.Y-1 //index of line before caret
@@ -256,7 +260,7 @@ begin
 
   //find index in WrapInfo for P.Y
   NPixels:= ARect.Top;
-  NIndex:= AScrollVert.NPos;
+  NIndex:= Max(0, AScrollVert.NPos);
   bGapGoesToEnd:= false;
 
   //allow to work for arrow-up/ page-up, if caret at top

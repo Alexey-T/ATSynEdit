@@ -1929,7 +1929,7 @@ end;
 function TATSynEdit.GetMinimapScrollPos: integer;
 begin
   Result:=
-    Int64(FScrollVert.NPos) *
+    Int64(Max(0, FScrollVert.NPos)) *
     Max(0, FScrollVert.NMax-GetVisibleLinesMinimap) div
     Max(1, FScrollVert.NMax-FScrollVert.NPage);
 end;
@@ -1992,7 +1992,7 @@ function TATSynEdit.UpdateScrollbars: boolean;
 var
   bVert1, bVert2,
   bHorz1, bHorz2: boolean;
-  NLineIndex, NGapAll, NGapPos: integer;
+  NPos, NLineIndex, NGapAll, NGapPos: integer;
 begin
   Result:= false;
 
@@ -2000,8 +2000,9 @@ begin
   if Gaps.Count>0 then
   begin
     NLineIndex:= 0;
-    if FWrapInfo.IsIndexValid(FScrollVert.NPos) then
-      NLineIndex:= FWrapInfo.Data[FScrollVert.NPos].NLineIndex;
+    NPos:= Max(0, FScrollVert.NPos);
+    if FWrapInfo.IsIndexValid(NPos) then
+      NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
 
     NGapAll:= Gaps.SizeForAll;
     NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
@@ -2404,7 +2405,7 @@ begin
     AScrollVert.NPos:= NWrapIndex;
   end
   else
-    NWrapIndex:= AScrollVert.NPos;
+    NWrapIndex:= Max(0, AScrollVert.NPos);
 
   DoEventBeforeCalcHilite;
 
@@ -2901,7 +2902,7 @@ end;
 
 function TATSynEdit.GetMinimapSelTop: integer;
 begin
-  Result:= FRectMinimap.Top + (FScrollVert.NPos-FScrollVertMinimap.NPos)*FCharSizeMinimap.Y;
+  Result:= FRectMinimap.Top + (Max(0, FScrollVert.NPos)-FScrollVertMinimap.NPos)*FCharSizeMinimap.Y;
 end;
 
 function TATSynEdit.GetMinimapActualHeight: integer;
@@ -3150,7 +3151,7 @@ var
   N: integer;
 begin
   Result:= 0;
-  N:= FScrollVert.NPos;
+  N:= Max(0, FScrollVert.NPos);
   if FWrapInfo.IsIndexValid(N) then
     Result:= FWrapInfo[N].NLineIndex;
 end;
