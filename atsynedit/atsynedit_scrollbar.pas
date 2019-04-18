@@ -96,7 +96,8 @@ type
     FPos,
     FMin,
     FMax,
-    FPage: Integer;
+    FLineSize,
+    FPageSize: Integer;
 
     //internal
     FRectMain: TRect; //area for scrolling
@@ -147,7 +148,7 @@ type
     procedure SetPos(Value: Integer);
     procedure SetMin(Value: Integer);
     procedure SetMax(Value: Integer);
-    procedure SetPage(Value: Integer);
+    procedure SetPageSize(Value: Integer);
     function DoDrawEvent(AType: TATScrollElemType;
       ACanvas: TCanvas; const ARect: TRect): boolean;
   public
@@ -158,7 +159,8 @@ type
     property Position: Integer read FPos write SetPos;
     property Min: Integer read FMin write SetMin;
     property Max: Integer read FMax write SetMax;
-    property PageSize: Integer read FPage write SetPage;
+    property LineSize: integer read FLineSize write FLineSize;
+    property PageSize: Integer read FPageSize write SetPageSize;
     procedure AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy; const AFromPPI, AToPPI,
       AOldFormWidth, ANewFormWidth: Integer); override;
   protected
@@ -231,7 +233,8 @@ begin
 
   FMin:= 0;
   FMax:= 100;
-  FPage:= 20;
+  FLineSize:= 1;
+  FPageSize:= 20;
 
   Color:= ATScrollbarTheme.ColorBG;
 
@@ -584,7 +587,7 @@ begin
     R.Bottom:= FRectMain.Bottom;
     R.Left:= GetPxAtScroll(FPos);
     R.Left:= Math.Min(R.Left, FRectMain.Right-cMinView);
-    R.Right:= GetPxAtScroll(FPos+FPage);
+    R.Right:= GetPxAtScroll(FPos+FPageSize);
     R.Right:= Math.Max(R.Right, R.Left+cMinView);
     R.Right:= Math.Min(R.Right, FRectMain.Right);
   end
@@ -595,7 +598,7 @@ begin
     R.Right:= FRectMain.Right;
     R.Top:= GetPxAtScroll(FPos);
     R.Top:= Math.Min(R.Top, FRectMain.Bottom-cMinView);
-    R.Bottom:= GetPxAtScroll(FPos+FPage);
+    R.Bottom:= GetPxAtScroll(FPos+FPageSize);
     R.Bottom:= Math.Max(R.Bottom, R.Top+cMinView);
     R.Bottom:= Math.Min(R.Bottom, FRectMain.Bottom);
   end;
@@ -686,11 +689,11 @@ begin
   end;
 end;
 
-procedure TATScroll.SetPage(Value: Integer);
+procedure TATScroll.SetPageSize(Value: Integer);
 begin
-  if FPage<>Value then
+  if FPageSize<>Value then
   begin
-    FPage:= Value;
+    FPageSize:= Value;
     Invalidate;
   end;
 end;
@@ -735,7 +738,7 @@ begin
     X-FMouseDragOffset,
     Y-FMouseDragOffset);
   N:= Math.Max(N, FMin);
-  N:= Math.Min(N, FMax-FPage);
+  N:= Math.Min(N, FMax-FPageSize);
   SetPos(N);
 end;
 
@@ -746,7 +749,7 @@ begin
   N:= FPos;
   Inc(N, NDelta);
   if (NDelta>0) then
-    N:= Math.Min(N, FMax-FPage);
+    N:= Math.Min(N, FMax-FPageSize);
   SetPos(N);
 end;
 
@@ -758,16 +761,16 @@ begin
   P:= ScreenToClient(P);
 
   if FMouseDownOnDown and PtInRect(FRectArrDown, P) then
-    DoScrollBy(1)
+    DoScrollBy(FLineSize)
   else
   if FMouseDownOnUp and PtInRect(FRectArrUp, P) then
-    DoScrollBy(-1)
+    DoScrollBy(-FLineSize)
   else
   if FMouseDownOnPageDown and PtInRect(FRectPageDown, P) then
-    DoScrollBy(FPage)
+    DoScrollBy(FPageSize)
   else
   if FMouseDownOnPageUp and PtInRect(FRectPageUp, P) then
-    DoScrollBy(-FPage);
+    DoScrollBy(-FPageSize);
 end;
 
 procedure TATScroll.DoPaintStd_Corner(C: TCanvas; const R: TRect);
