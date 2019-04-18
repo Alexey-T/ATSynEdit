@@ -2,6 +2,7 @@
 2019.04.17
 + add: property OptZebraActive
 + add: property OptZebraAlphaBlend
+- fix: if modern scrollbars used, they scroll by 1 pixel by clicking on arrows; must scroll faster, by char size
 
 2019.04.14
 - fix: multi-carets in a row can be continued up/down, by commands "column select: up (down)", even without selections
