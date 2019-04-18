@@ -1989,28 +1989,34 @@ begin
 end;
 
 function TATSynEdit.UpdateScrollbars: boolean;
+//todo: cleanup all commented code
 var
   bVert1, bVert2,
   bHorz1, bHorz2: boolean;
-  NPos, NLineIndex, NGapAll, NGapPos: integer;
+  //NPos: integer;
+  //NLineIndex: integer;
+  NGapAll: integer;
+  //NGapPos: integer;
 begin
   Result:= false;
 
   //consider Gaps for vertical scrollbar
   if Gaps.Count>0 then
   begin
+    {
     NLineIndex:= 0;
     NPos:= Max(0, FScrollVert.NPos);
     if FWrapInfo.IsIndexValid(NPos) then
       NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
+      }
 
     NGapAll:= Gaps.SizeForAll;
-    NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
+    //NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
   end
   else
   begin
     NGapAll:= 0;
-    NGapPos:= 0;
+    //NGapPos:= 0;
   end;
 
   with FScrollVert do
@@ -2024,7 +2030,7 @@ begin
     SmoothCharSize:= FCharSize.Y;
     SmoothMax:= NMax*SmoothCharSize + NGapAll;
     SmoothPage:= NPage*SmoothCharSize;
-    SmoothPos:= TotalOffset + NGapPos;
+    //SmoothPos:= TotalOffset + NGapPos; //why it was needed?
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
   end;
 
@@ -2040,7 +2046,7 @@ begin
     SmoothCharSize:= FCharSize.X;
     SmoothMax:= NMax*SmoothCharSize;
     SmoothPage:= NPage*SmoothCharSize;
-    SmoothPos:= TotalOffset;
+    //SmoothPos:= TotalOffset; //why it was needed?
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
   end;
 
@@ -2405,7 +2411,9 @@ begin
     AScrollVert.NPos:= NWrapIndex;
   end
   else
+  begin
     NWrapIndex:= Max(0, AScrollVert.NPos);
+  end;
 
   DoEventBeforeCalcHilite;
 
@@ -2434,7 +2442,7 @@ begin
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
     //support Gap before the 1st line
-    if AMainText and (NWrapIndex=0) and (Gaps.SizeOfTopGap>0) then
+    if AMainText and (NWrapIndex=0) and (AScrollVert.NPos=-1) and (Gaps.SizeOfTopGap>0) then
     begin
       GapItem:= Gaps.Find(-1);
       if Assigned(GapItem) then
@@ -4120,14 +4128,24 @@ begin
 end;
 
 procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
+//Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
   NPos, NPixels, NLineIndex, NCharSize: integer;
+  NSizeTopGap, NSizeFirstGap: integer;
+  GapItem: TATGapItem;
+  bConsiderGaps: boolean;
 begin
+  AInfo.SmoothPos:= APos;
+  bConsiderGaps:= AInfo.Vertical and (Gaps.Count>0);
+
   if APos<=0 then
   begin
     AInfo.SmoothPos:= 0;
     AInfo.NPos:= 0;
     AInfo.NPixelOffset:= 0;
+    if bConsiderGaps then
+      if Gaps.SizeOfTopGap>0 then
+        AInfo.NPos:= -1;
     exit
   end;
 
@@ -4139,13 +4157,39 @@ begin
     exit
   end;
 
+  if bConsiderGaps then
+  begin
+    //for position before line=0
+    NSizeTopGap:= Gaps.SizeOfTopGap;
+    if NSizeTopGap>0 then
+      if APos<NSizeTopGap then
+      begin
+        AInfo.NPos:= -1;
+        AInfo.NPixelOffset:= APos;
+        exit;
+      end;
+
+    //for position before line=1
+    //(other positions are calculated ok later)
+    GapItem:= Gaps.Find(0);
+    if Assigned(GapItem) then
+    begin
+      NSizeFirstGap:= GapItem.Size;
+      if APos<NSizeTopGap+AInfo.SmoothCharSize+NSizeFirstGap then
+      begin
+        AInfo.NPos:= 0;
+        AInfo.NPixelOffset:= APos-NSizeTopGap;
+        exit;
+      end;
+    end;
+  end;
+
   NCharSize:= AInfo.SmoothCharSize;
-  AInfo.SmoothPos:= APos;
   AInfo.NPos:= Min(APos div NCharSize, AInfo.NMax);
   AInfo.NPixelOffset:= APos mod NCharSize;
 
   //consider Gaps for vert scrolling
-  if AInfo.Vertical and (Gaps.Count>0) then
+  if bConsiderGaps then
   begin
     NPos:= Min(AInfo.NPos, WrapInfo.Count-1);
     NPixels:= AInfo.NPixelOffset;
