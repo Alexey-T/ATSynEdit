@@ -2434,7 +2434,7 @@ begin
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
     //support Gap before the 1st line
-    if AMainText and (NWrapIndex=0) then
+    if AMainText and (NWrapIndex=0) and (Gaps.SizeOfTopGap>0) then
     begin
       GapItem:= Gaps.Find(-1);
       if Assigned(GapItem) then
