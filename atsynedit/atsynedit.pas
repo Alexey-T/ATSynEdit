@@ -4210,7 +4210,7 @@ end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
 begin
-  if (Info.NMax{-Info.NMin})<Info.NPage then
+  if Info.NMax<Info.NPage then
   begin
     Info.Clear;
     Exit(true);
@@ -4268,15 +4268,10 @@ begin
 
   //correct value (if -1)
   if Info.SmoothPos>Info.SmoothPosLast then
-  begin
-    UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPosLast);
-  end
+    UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPosLast)
   else
   if Info.SmoothPos<0 then
-  begin
-    Info.NPos:= 0;
-    Info.NPixelOffset:= 0;
-  end;
+    UpdateScrollInfoFromSmoothPos(Info, 0);
 
   Result:= Msg.ScrollCode<>SB_THUMBTRACK;
 end;
