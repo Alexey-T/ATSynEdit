@@ -2442,7 +2442,7 @@ begin
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
     //support Gap before the 1st line
-    if AMainText and (NWrapIndex=0) and (AScrollVert.NPos=-1) and (Gaps.SizeOfTopGap>0) then
+    if AMainText and (NWrapIndex=0) and (AScrollVert.NPos=-1) and (Gaps.SizeOfGapTop>0) then
     begin
       GapItem:= Gaps.Find(-1);
       if Assigned(GapItem) then
@@ -4144,7 +4144,7 @@ begin
     AInfo.NPos:= 0;
     AInfo.NPixelOffset:= 0;
     if bConsiderGaps then
-      if Gaps.SizeOfTopGap>0 then
+      if Gaps.SizeOfGapTop>0 then
         AInfo.NPos:= -1;
     exit
   end;
@@ -4160,7 +4160,7 @@ begin
   if bConsiderGaps then
   begin
     //for position before line=0
-    NSizeTopGap:= Gaps.SizeOfTopGap;
+    NSizeTopGap:= Gaps.SizeOfGapTop;
     if NSizeTopGap>0 then
       if APos<NSizeTopGap then
       begin
