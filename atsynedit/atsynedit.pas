@@ -4131,8 +4131,7 @@ procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; 
 //Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
   NPos, NPixels, NLineIndex, NCharSize: integer;
-  NSizeTopGap, NSizeFirstGap: integer;
-  GapItem: TATGapItem;
+  NSizeGapTop, NSizeGap0: integer;
   bConsiderGaps: boolean;
 begin
   AInfo.SmoothPos:= APos;
@@ -4160,9 +4159,11 @@ begin
   if bConsiderGaps then
   begin
     //for position before line=0
-    NSizeTopGap:= Gaps.SizeOfGapTop;
-    if NSizeTopGap>0 then
-      if APos<NSizeTopGap then
+    NSizeGapTop:= Gaps.SizeOfGapTop;
+    NSizeGap0:= Gaps.SizeOfGap0;
+
+    if NSizeGapTop>0 then
+      if APos<NSizeGapTop then
       begin
         AInfo.NPos:= -1;
         AInfo.NPixelOffset:= APos;
@@ -4171,17 +4172,13 @@ begin
 
     //for position before line=1
     //(other positions are calculated ok later)
-    GapItem:= Gaps.Find(0);
-    if Assigned(GapItem) then
-    begin
-      NSizeFirstGap:= GapItem.Size;
-      if APos<NSizeTopGap+AInfo.SmoothCharSize+NSizeFirstGap then
+    if NSizeGap0>0 then
+      if APos<NSizeGapTop+AInfo.SmoothCharSize+NSizeGap0 then
       begin
         AInfo.NPos:= 0;
-        AInfo.NPixelOffset:= APos-NSizeTopGap;
+        AInfo.NPixelOffset:= APos-NSizeGapTop;
         exit;
       end;
-    end;
   end;
 
   NCharSize:= AInfo.SmoothCharSize;

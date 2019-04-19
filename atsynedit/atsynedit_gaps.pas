@@ -45,6 +45,7 @@ type
     FList: TList;
     FOnDelete: TATGapDeleteEvent;
     FSizeOfGapTop: integer;
+    FSizeOfGap0: integer;
     function GetItem(N: integer): TATGapItem;
   public
     constructor Create; virtual;
@@ -61,6 +62,7 @@ type
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
     function SizeForAll: integer;
     property SizeOfGapTop: integer read FSizeOfGapTop;
+    property SizeOfGap0: integer read FSizeOfGap0;
     procedure Update(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     property OnDelete: TATGapDeleteEvent read FOnDelete write FOnDelete;
   end;
@@ -99,6 +101,7 @@ begin
   inherited;
   FList:= TList.Create;
   FSizeOfGapTop:= 0;
+  FSizeOfGap0:= 0;
 end;
 
 destructor TATGaps.Destroy;
@@ -120,6 +123,7 @@ begin
   end;
   FList.Clear;
   FSizeOfGapTop:= 0;
+  FSizeOfGap0:= 0;
 end;
 
 function TATGaps.Count: integer; inline;
@@ -146,7 +150,10 @@ begin
     FOnDelete(Self, Item.LineIndex);
 
   if Item.LineIndex=-1 then
-    FSizeOfGapTop:= 0;
+    FSizeOfGapTop:= 0
+  else
+  if Item.LineIndex=0 then
+    FSizeOfGap0:= 0;
 
   Item.Free;
   FList.Delete(N);
@@ -187,7 +194,10 @@ begin
   Item.DeleteOnDelLine:= ADeleteOnDelLine;
 
   if ALineIndex=-1 then
-    FSizeOfGapTop:= ASize;
+    FSizeOfGapTop:= ASize
+  else
+  if ALineIndex=0 then
+    FSizeOfGap0:= ASize;
 
   FList.Add(Item);
   Result:= true;
