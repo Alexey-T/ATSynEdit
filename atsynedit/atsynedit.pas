@@ -1989,34 +1989,21 @@ begin
 end;
 
 function TATSynEdit.UpdateScrollbars: boolean;
-//todo: cleanup all commented code
 var
   bVert1, bVert2,
   bHorz1, bHorz2: boolean;
-  //NPos: integer;
-  //NLineIndex: integer;
   NGapAll: integer;
-  //NGapPos: integer;
 begin
   Result:= false;
 
   //consider Gaps for vertical scrollbar
   if Gaps.Count>0 then
   begin
-    {
-    NLineIndex:= 0;
-    NPos:= Max(0, FScrollVert.NPos);
-    if FWrapInfo.IsIndexValid(NPos) then
-      NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
-      }
-
     NGapAll:= Gaps.SizeForAll;
-    //NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
   end
   else
   begin
     NGapAll:= 0;
-    //NGapPos:= 0;
   end;
 
   with FScrollVert do
@@ -2030,14 +2017,13 @@ begin
     SmoothCharSize:= FCharSize.Y;
     SmoothMax:= NMax*SmoothCharSize + NGapAll;
     SmoothPage:= NPage*SmoothCharSize;
-    //SmoothPos:= TotalOffset + NGapPos; //why it was needed?
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
   end;
 
   with FScrollHorz do
   begin
     NPage:= Max(1, GetVisibleColumns);
-    //NMax calculated in DoPaintTextTo
+    //NMax is calculated in DoPaintTextTo
     //hide horz bar for word-wrap:
     if FWrapMode=cWrapOn then
       NMax:= NPage;
@@ -2046,7 +2032,6 @@ begin
     SmoothCharSize:= FCharSize.X;
     SmoothMax:= NMax*SmoothCharSize;
     SmoothPage:= NPage*SmoothCharSize;
-    //SmoothPos:= TotalOffset; //why it was needed?
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
   end;
 
