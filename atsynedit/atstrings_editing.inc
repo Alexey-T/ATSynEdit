@@ -94,6 +94,7 @@ var
   BlockUTF8: TStringList;
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
+  BlockOriginalLineCount: integer;
 begin
   AShift.X:= 0;
   AShift.Y:= 0;
@@ -145,7 +146,9 @@ begin
     FChangeBlockActive:= true;
     BeginUndoGroup;
     Block.LoadFromString(StrLead+AText);
+    BlockOriginalLineCount:= Block.Count;
 
+    //note: tricky condition to remove last empty line from Block
     if not bBlockWithEol or bAtEmptyLine then
       Block.ActionDeleteFakeLine;
     if Block.Count=0 then Exit;
@@ -194,8 +197,17 @@ begin
 
     LineInsertStrings(AY, Block, bUseBlockFinalEol);
 
-    APosAfter.X:= Block.LinesLen[Block.Count-1];
-    APosAfter.Y:= AY+Block.Count-1;
+    if bBlockWithEol then
+    begin
+      APosAfter.X:= 0;
+      APosAfter.Y:= AY+BlockOriginalLineCount-1;
+    end
+    else
+    begin
+      APosAfter.X:= Block.LinesLen[Block.Count-1];
+      APosAfter.Y:= AY+Block.Count-1;
+    end;
+
     AShift.Y:= APosAfter.Y-AY;
 
   finally
