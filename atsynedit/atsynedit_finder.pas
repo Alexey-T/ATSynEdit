@@ -74,6 +74,8 @@ type
     constructor Create;
     destructor Destroy; override;
     function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
+    property MatchLen: integer read FMatchLen;
+    property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
     property OnBadRegex: TNotifyEvent read FOnBadRegex write FOnBadRegex;
   end;

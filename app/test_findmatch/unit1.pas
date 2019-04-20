@@ -78,10 +78,10 @@ begin
   else
     NFromPos:= 1;
 
-  if not FInder.FindMatch(ANext, NSkipLen, NFromPos) then
+  if not Finder.FindMatch(ANext, NSkipLen, NFromPos) then
     memo3.text:= '(not found)'
   else
-    memo3.text:= 'context:'#13+Copy(Finder.StrText, Finder.MatchPos-2, FInder.MatchLen+4);
+    memo3.text:= Copy(Finder.StrText, Finder.MatchPos-2, FInder.MatchLen+4);
 end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
