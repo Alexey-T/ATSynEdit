@@ -2008,7 +2008,7 @@ begin
       NPos:= Max(0, FScrollVert.NPos);
       if FWrapInfo.IsIndexValid(NPos) then
         NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
-      NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
+      NGapPos:= Gaps.SizeForLineRange(-1, NLineIndex-1);
     end;
 
     NGapAll:= Gaps.SizeForAll;
@@ -4190,7 +4190,7 @@ begin
 
     repeat
       NLineIndex:= FWrapInfo.Data[NPos].NLineIndex - 1;
-      NPixels:= APos - NPos*NCharSize - Gaps.SizeForLineRange(0, NLineIndex);
+      NPixels:= APos - NPos*NCharSize - Gaps.SizeForLineRange(-1, NLineIndex);
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;

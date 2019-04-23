@@ -222,11 +222,6 @@ var
   i: integer;
 begin
   Result:= 0;
-
-  //support gap before 1st line
-  if ALineFrom=0 then
-    ALineFrom:= -1;
-
   for i:= 0 to FList.Count-1 do
   begin
     Item:= Items[i];

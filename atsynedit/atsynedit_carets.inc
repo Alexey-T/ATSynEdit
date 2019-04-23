@@ -221,6 +221,9 @@ begin
         NLineIndexTop, //index of top line
         P.Y-1 //index of line before caret
         ));
+      //consider top gap
+      if AScrollVert.NPos=-1 then
+        Inc(Result.Y, AGaps.SizeOfGapTop);
     end;
 
     //coords of corner
