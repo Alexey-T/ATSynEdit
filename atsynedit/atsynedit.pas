@@ -922,7 +922,7 @@ type
     function DoFormatLineNumber(N: integer): atString;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
     procedure UpdateWrapInfo;
-    function UpdateScrollbars: boolean;
+    function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
     procedure UpdateCaretsCoords(AOnlyLast: boolean = false);
@@ -1988,22 +1988,30 @@ begin
     FWrapUpdateNeeded:= true;
 end;
 
-function TATSynEdit.UpdateScrollbars: boolean;
+function TATSynEdit.UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
 var
   bVert1, bVert2,
   bHorz1, bHorz2: boolean;
-  NGapAll: integer;
+  NPos, NLineIndex, NGapPos, NGapAll: integer;
 begin
   Result:= false;
+
+  NGapAll:= 0;
+  NGapPos:= 0;
 
   //consider Gaps for vertical scrollbar
   if Gaps.Count>0 then
   begin
+    if AdjustSmoothPos then
+    begin
+      NLineIndex:= 0;
+      NPos:= Max(0, FScrollVert.NPos);
+      if FWrapInfo.IsIndexValid(NPos) then
+        NLineIndex:= FWrapInfo.Data[NPos].NLineIndex;
+      NGapPos:= Gaps.SizeForLineRange(0, NLineIndex-1);
+    end;
+
     NGapAll:= Gaps.SizeForAll;
-  end
-  else
-  begin
-    NGapAll:= 0;
   end;
 
   with FScrollVert do
@@ -2018,6 +2026,8 @@ begin
     SmoothMax:= NMax*SmoothCharSize + NGapAll;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
+    if AdjustSmoothPos then
+      SmoothPos:= TotalOffset + NGapPos;
   end;
 
   with FScrollHorz do
@@ -2033,6 +2043,8 @@ begin
     SmoothMax:= NMax*SmoothCharSize;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
+    if AdjustSmoothPos then
+      SmoothPos:= TotalOffset;
   end;
 
   bVert1:= GetScrollbarVisible(true);
@@ -3927,7 +3939,7 @@ begin
   else
     DoPaintAllTo(Canvas, AFlags, ALineFrom);
 
-  Result:= UpdateScrollbars;
+  Result:= UpdateScrollbars(false);
 end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);

@@ -533,7 +533,6 @@ begin
     NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
     if NIndex<0 then Exit;
     DoScroll_IndentFromTop(NIndex, Abs(AIndentVert));
-    UpdateScrollbars;
     bScrolled:= true;
   end
   else
@@ -545,7 +544,6 @@ begin
       DoScroll_IndentFromTop(NIndex, Abs(AIndentVert))
     else
       DoScroll_IndentFromBottom(NIndex, Abs(AIndentVert));
-    UpdateScrollbars;
     bScrolled:= true;
   end;
 
@@ -554,7 +552,6 @@ begin
   begin
     NChars:= (FRectMain.Left-Coord.X) div FCharSize.X + 1 + AIndentHorz;
     FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
-    UpdateScrollbars;
     bScrolled:= true;
   end
   else
@@ -562,9 +559,11 @@ begin
   begin
     NChars:= (Coord.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
     Inc(FScrollHorz.NPos, NChars);
-    UpdateScrollbars;
     bScrolled:= true;
   end;
+
+  if bScrolled then
+    UpdateScrollbars(true);
 
   if AAllowUpdate then
     Update;
