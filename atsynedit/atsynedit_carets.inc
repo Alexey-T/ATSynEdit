@@ -214,7 +214,7 @@ begin
     Result.Y:= (i-NVertPos)*ACharSize.Y;
 
     //consider gaps
-    if AWrapInfo.IsIndexValid(NVertPos) then
+    if (AGaps.Count>0) and AWrapInfo.IsIndexValid(NVertPos) then
     begin
       NLineIndexTop:= AWrapInfo[NVertPos].NLineIndex;
       Inc(Result.Y, AGaps.SizeForLineRange(
@@ -275,12 +275,8 @@ begin
     end;
 
   //support gap before 1st line
-  if (NIndex=0) then
-  begin
-    ItemGap:= AGaps.Find(-1);
-    if Assigned(ItemGap) then
-      Inc(NPixels, ItemGap.Size);
-  end;
+  if (NIndex=0) and (AGaps.Count>0) then
+    Inc(NPixels, AGaps.SizeOfGapTop);
 
   repeat
     if not AWrapInfo.IsIndexValid(NIndex) then
@@ -291,7 +287,7 @@ begin
 
     //consider gap
     Item:= AWrapInfo[NIndex];
-    if Item.NFinal=cWrapItemFinal then
+    if (Item.NFinal=cWrapItemFinal) and (AGaps.Count>0) then
     begin
       ItemGap:= AGaps.Find(Item.NLineIndex);
       if Assigned(ItemGap) then
