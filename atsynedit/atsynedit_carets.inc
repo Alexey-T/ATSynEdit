@@ -558,7 +558,8 @@ begin
     bScrolled:= true;
   end;
 
-  if bScrolled then
+  ////don't check bScrolled, to update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
+  //if bScrolled then
     UpdateScrollbars(true);
 
   if AAllowUpdate then
