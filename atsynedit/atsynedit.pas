@@ -218,6 +218,7 @@ type
     SmoothPos: integer;
     SmoothPosLast: integer;
     procedure Clear;
+    function TopGapVisible: boolean; inline;
     function TotalOffset: integer; inline;
     class operator =(const A, B: TATSynScrollInfo): boolean;
   end;
@@ -2439,7 +2440,7 @@ begin
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
     //support Gap before the 1st line
-    if AMainText and (NWrapIndex=0) and (AScrollVert.NPos=-1) and (Gaps.SizeOfGapTop>0) then
+    if AMainText and (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
       GapItem:= Gaps.Find(-1);
       if Assigned(GapItem) then

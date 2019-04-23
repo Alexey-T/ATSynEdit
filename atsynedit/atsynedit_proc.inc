@@ -72,6 +72,11 @@ begin
   SmoothPage:= 1;
 end;
 
+function TATSynScrollInfo.TopGapVisible: boolean;
+begin
+  Result:= NPos=-1;
+end;
+
 function TATSynScrollInfo.TotalOffset: integer;
 begin
   Result:= NPos*SmoothCharSize + NPixelOffset;

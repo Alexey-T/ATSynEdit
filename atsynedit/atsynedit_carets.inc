@@ -222,7 +222,7 @@ begin
         P.Y-1 //index of line before caret
         ));
       //consider top gap
-      if AScrollVert.NPos=-1 then
+      if AScrollVert.TopGapVisible then
         Inc(Result.Y, AGaps.SizeOfGapTop);
     end;
 
@@ -278,7 +278,7 @@ begin
     end;
 
   //support gap before 1st line
-  if (NIndex=0) and (AScrollVert.NPos=-1) and (AGaps.Count>0) then
+  if (NIndex=0) and AScrollVert.TopGapVisible and (AGaps.Count>0) then
     Inc(NPixels, AGaps.SizeOfGapTop);
 
   repeat
