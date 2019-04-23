@@ -842,8 +842,8 @@ type
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
-    procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop,
-      ABottom: integer);
+    procedure DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; AY1,
+      AY2: integer; AEntireHeight: boolean);
     procedure DoPaintLockedWarning(C: TCanvas);
     procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
     procedure DoPaintStaples(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
@@ -2316,21 +2316,25 @@ begin
   Result.Y:= Max(1, Size.Y + ACharSpacing.Y);
 end;
 
-procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor; ATop, ABottom: integer);
+procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor;
+  AY1, AY2: integer; AEntireHeight: boolean);
 var
   X1, X2: integer;
 begin
   with FGutter[ABand] do
-    begin X1:= Left; X2:= Right; end;
+  begin
+    X1:= Left;
+    X2:= Right;
+  end;
 
-  if ATop>=FRectMain.Top then //not ">=0", for smooth scroll
+  if not AEntireHeight then
   begin
     C.Brush.Color:= AColor;
-    C.FillRect(X1, ATop, X2, ABottom);
+    C.FillRect(X1, AY1, X2, AY2);
   end
   else
   begin
-    C.Brush.Color:= Colors.GutterBG;
+    C.Brush.Color:= AColor;
     C.FillRect(X1, FRectGutter.Top, X2, FRectGutter.Bottom);
   end;
 end;
@@ -2361,7 +2365,7 @@ var
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor); inline;
   begin
-    DoPaintGutterBandBG(C, FGutterBandState, AColor, ATop, ATop+ACharSize.Y);
+    DoPaintGutterBandBG(C, FGutterBandState, AColor, ATop, ATop+ACharSize.Y, false);
   end;
   //
 begin
@@ -2384,11 +2388,11 @@ begin
 
     //paint some bands, for full height coloring
     if FGutter[FGutterBandFold].Visible then
-      DoPaintGutterBandBG(C, FGutterBandFold, Colors.GutterFoldBG, -1, -1);
+      DoPaintGutterBandBG(C, FGutterBandFold, Colors.GutterFoldBG, -1, -1, true);
     if FGutter[FGutterBandSep].Visible then
-      DoPaintGutterBandBG(C, FGutterBandSep, Colors.GutterSeparatorBG, -1, -1);
+      DoPaintGutterBandBG(C, FGutterBandSep, Colors.GutterSeparatorBG, -1, -1, true);
     if FGutter[FGutterBandEmpty].Visible then
-      DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, -1, -1);
+      DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, -1, -1, true);
   end;
 
   if AMainText and (FTextHint<>'') then
@@ -2791,7 +2795,7 @@ begin
       begin
         if LineWithCaret and FOptShowGutterCaretBG then
         begin
-          DoPaintGutterBandBG(C, FGutterBandNum, Colors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y);
+          DoPaintGutterBandBG(C, FGutterBandNum, Colors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y, false);
           C.Font.Color:= Colors.GutterCaretFont;
         end
         else
@@ -2856,7 +2860,7 @@ begin
       Band:= FGutter[FGutterBandFold];
       if Band.Visible then
       begin
-        DoPaintGutterBandBG(C, FGutterBandFold, Colors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y);
+        DoPaintGutterBandBG(C, FGutterBandFold, Colors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y, false);
         DoPaintGutterFolding(C,
           NWrapIndex,
           Band.Left,
@@ -2879,10 +2883,10 @@ begin
 
       //gutter band: separator
       if FGutter[FGutterBandSep].Visible then
-        DoPaintGutterBandBG(C, FGutterBandSep, Colors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y);
+        DoPaintGutterBandBG(C, FGutterBandSep, Colors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
-        DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, NCoordTop, NCoordTop+ACharSize.Y);
+        DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, NCoordTop, NCoordTop+ACharSize.Y, false);
     end;
 
     //end of painting line
