@@ -278,7 +278,7 @@ begin
     end;
 
   //support gap before 1st line
-  if (NIndex=0) and (AGaps.Count>0) then
+  if (NIndex=0) and (AScrollVert.NPos=-1) and (AGaps.Count>0) then
     Inc(NPixels, AGaps.SizeOfGapTop);
 
   repeat
