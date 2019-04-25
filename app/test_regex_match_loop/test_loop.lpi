@@ -13,7 +13,7 @@
       </XPManifest>
     </General>
     <BuildModes>
-      <Item1 Name="Default" Default="True"/>
+      <Item1 Name="default" Default="True"/>
       <Item2 Name="solaris">
         <CompilerOptions>
           <Version Value="11"/>
