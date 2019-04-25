@@ -5538,6 +5538,8 @@ begin
 
   FScrollHorz.NPixelOffset:= 0;
   FScrollVert.NPixelOffset:= 0;
+
+  UpdateScrollbars(true);
 end;
 
 procedure TATSynEdit.DoScrollByDelta(ADeltaX, ADeltaY: integer);
