@@ -5544,6 +5544,7 @@ procedure TATSynEdit.DoScrollByDelta(ADeltaX, ADeltaY: integer);
 //
   procedure _Delta(var AInfo: TATSynScrollInfo; ADelta: integer); inline;
   begin
+    if ADelta=0 then exit;
     with AInfo do
     begin
       NPos:= Max(0, Min(NPosLast, NPos+ADelta));
@@ -5555,32 +5556,16 @@ procedure TATSynEdit.DoScrollByDelta(ADeltaX, ADeltaY: integer);
 begin
   _Delta(FScrollHorz, ADeltaX);
   _Delta(FScrollVert, ADeltaY);
+  UpdateScrollbars(true);
 end;
 
 procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
 //
   procedure _Delta(var AInfo: TATSynScrollInfo; ADelta: integer); inline;
   begin
+    if ADelta=0 then exit;
     UpdateScrollInfoFromSmoothPos(AInfo,
       Min(AInfo.SmoothPosLast, AInfo.SmoothPos + ADelta));
-
-    with AInfo do
-    begin
-      {
-      if (NPos>=NPosLast) then
-      begin
-        NPos:= NPosLast;
-        NPixelOffset:= 0;
-      end
-      else
-      }
-      if (NPos<=0) then
-      begin
-        NPos:= 0;
-        if (NPixelOffset<0) then
-          NPixelOffset:= 0;
-      end;
-    end;
   end;
 //
 begin
