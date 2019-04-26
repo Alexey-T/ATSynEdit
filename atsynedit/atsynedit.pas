@@ -618,6 +618,7 @@ type
     FOptBorderWidthFocused: integer;
     FOptBorderFocusedActive: boolean;
     FOptRulerVisible: boolean;
+    FOptRulerCaretMark: boolean;
     FOptRulerNumeration: TATRulerNumeration;
     FOptRulerSize: integer;
     FOptRulerFontSize: integer;
@@ -814,6 +815,7 @@ type
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintRulerTo(C: TCanvas);
+    procedure DoPaintRulerCaretMark(C: TCanvas);
     procedure DoPaintFPS(C: TCanvas);
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
@@ -1415,6 +1417,7 @@ type
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
+    property OptRulerCaretMark: boolean read FOptRulerCaretMark write FOptRulerCaretMark default true;
     property OptRulerNumeration: TATRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cRulerNumeration_0_10_20;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize default 8;
@@ -1599,6 +1602,21 @@ begin
   end;
 
   C.Font.Size:= NPrevFontSize;
+end;
+
+
+procedure TATSynEdit.DoPaintRulerCaretMark(C: TCanvas);
+const
+  cMarkSize = 1; //2 is ok too, 3 is too big
+var
+  X: integer;
+begin
+  if Carets.Count>0 then
+  begin
+    X:= Carets[0].CoordX;
+    if (X>=FRectRuler.Left) and (X<FRectRuler.Right) then
+      CanvasPaintTriangleDown(C, Colors.RulerFont, Point(X, FRectRuler.Top+cMarkSize), cMarkSize);
+  end;
 end;
 
 procedure TATSynEdit.UpdateGutterAutosize(C: TCanvas);
@@ -3382,6 +3400,7 @@ begin
   FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;
+  FOptRulerCaretMark:= true;
   FOptRulerNumeration:= cRulerNumeration_0_10_20;
   FOptRulerSize:= cSizeRulerHeight;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
@@ -3917,6 +3936,9 @@ begin
 
   if FOptShowCurColumn and (Carets.Count>0) then
     DoPaintMarginLineTo(C, Carets[0].CoordX, Colors.MarginCaret);
+
+  if FOptRulerVisible and FOptRulerCaretMark then
+    DoPaintRulerCaretMark(C);
 
   DoPaintMarkersTo(C);
 
