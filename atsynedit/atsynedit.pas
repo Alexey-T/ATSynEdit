@@ -816,7 +816,7 @@ type
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintRulerTo(C: TCanvas);
-    procedure DoPaintRulerCaretMark(C: TCanvas);
+    procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
     procedure DoPaintFPS(C: TCanvas);
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
@@ -1606,20 +1606,14 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintRulerCaretMark(C: TCanvas);
-var
-  X: integer;
+procedure TATSynEdit.DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
 begin
-  if Carets.Count>0 then
-  begin
-    X:= Carets[0].CoordX;
-    if (X>=FRectRuler.Left) and (X<FRectRuler.Right) then
-      CanvasPaintTriangleDown(C,
-        Colors.RulerFont,
-        Point(X, FRectRuler.Top+FOptRulerMarkSizeCaret),
-        FOptRulerMarkSizeCaret
-        );
-  end;
+  if (ACaretX>=FRectRuler.Left) and (ACaretX<FRectRuler.Right) then
+    CanvasPaintTriangleDown(C,
+      Colors.RulerFont,
+      Point(ACaretX, FRectRuler.Top+FOptRulerMarkSizeCaret),
+      FOptRulerMarkSizeCaret
+      );
 end;
 
 procedure TATSynEdit.UpdateGutterAutosize(C: TCanvas);
@@ -3925,6 +3919,8 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
+var
+  NCaretX: integer;
 begin
   {$ifdef debug_show_fps}
   Inc(FPaintCounter);
@@ -3937,11 +3933,14 @@ begin
   if cPaintUpdateCaretsCoords in AFlags then
     UpdateCaretsCoords;
 
-  if FOptShowCurColumn and (Carets.Count>0) then
-    DoPaintMarginLineTo(C, Carets[0].CoordX, Colors.MarginCaret);
-
-  if FOptRulerVisible and (FOptRulerMarkSizeCaret>0) then
-    DoPaintRulerCaretMark(C);
+  if Carets.Count>0 then
+  begin
+    NCaretX:= Carets[0].CoordX;
+    if FOptShowCurColumn then
+      DoPaintMarginLineTo(C, NCaretX, Colors.MarginCaret);
+    if FOptRulerVisible and (FOptRulerMarkSizeCaret>0) then
+      DoPaintRulerCaretMark(C, NCaretX);
+  end;
 
   DoPaintMarkersTo(C);
 
