@@ -292,6 +292,7 @@ const
   cSizeRulerHeight = 20;
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 7;
+  cSizeRulerMarkCaret = 1;
   cSizeIndentTooltipX = 5;
   cSizeIndentTooltipY = 1;
   cMinFontSize = 6;
@@ -618,10 +619,10 @@ type
     FOptBorderWidthFocused: integer;
     FOptBorderFocusedActive: boolean;
     FOptRulerVisible: boolean;
-    FOptRulerCaretMark: boolean;
     FOptRulerNumeration: TATRulerNumeration;
     FOptRulerSize: integer;
     FOptRulerFontSize: integer;
+    FOptRulerMarkSizeCaret: integer;
     FOptRulerMarkSizeSmall: integer;
     FOptRulerMarkSizeBig: integer;
     FOptRulerTextIndent: integer;
@@ -1417,10 +1418,10 @@ type
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
-    property OptRulerCaretMark: boolean read FOptRulerCaretMark write FOptRulerCaretMark default true;
     property OptRulerNumeration: TATRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cRulerNumeration_0_10_20;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
     property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize default 8;
+    property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cSizeRulerMarkCaret;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cSizeRulerMarkBig;
     property OptRulerTextIndent: integer read FOptRulerTextIndent write FOptRulerTextIndent default 0;
@@ -1606,8 +1607,6 @@ end;
 
 
 procedure TATSynEdit.DoPaintRulerCaretMark(C: TCanvas);
-const
-  cMarkSize = 1; //2 is ok too, 3 is too big
 var
   X: integer;
 begin
@@ -1615,7 +1614,11 @@ begin
   begin
     X:= Carets[0].CoordX;
     if (X>=FRectRuler.Left) and (X<FRectRuler.Right) then
-      CanvasPaintTriangleDown(C, Colors.RulerFont, Point(X, FRectRuler.Top+cMarkSize), cMarkSize);
+      CanvasPaintTriangleDown(C,
+        Colors.RulerFont,
+        Point(X, FRectRuler.Top+FOptRulerMarkSizeCaret),
+        FOptRulerMarkSizeCaret
+        );
   end;
 end;
 
@@ -3400,9 +3403,9 @@ begin
   FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;
-  FOptRulerCaretMark:= true;
   FOptRulerNumeration:= cRulerNumeration_0_10_20;
   FOptRulerSize:= cSizeRulerHeight;
+  FOptRulerMarkSizeCaret:= cSizeRulerMarkCaret;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
   FOptRulerFontSize:= 8;
@@ -3937,7 +3940,7 @@ begin
   if FOptShowCurColumn and (Carets.Count>0) then
     DoPaintMarginLineTo(C, Carets[0].CoordX, Colors.MarginCaret);
 
-  if FOptRulerVisible and FOptRulerCaretMark then
+  if FOptRulerVisible and (FOptRulerMarkSizeCaret>0) then
     DoPaintRulerCaretMark(C);
 
   DoPaintMarkersTo(C);
