@@ -3075,7 +3075,7 @@ end;
 
 procedure TATSynEdit.DoPaintMarginsTo(C: TCanvas);
   //
-  function PosX(NMargin: integer): integer;
+  function PosX(NMargin: integer): integer; inline;
   begin
     Result:= FRectMain.Left + FCharSize.X*(NMargin-FScrollHorz.NPos);
   end;
