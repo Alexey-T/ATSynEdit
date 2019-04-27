@@ -548,18 +548,25 @@ Strings object holds UnicodeString's, where each WideChar gives offset=1, and ev
 
 === Text position to/from screen coordinates ===
 
-Use these funcs to convert text position to screen coordinates in pixels:
+Methods allow to convert text position to/from control-relative coordinates (in pixels). Layout of gutter, ruler and other UI elements are already considered by methods.
 
-*    function CaretPosToClientPos(P: TPoint): TPoint.
-*    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint. Last param: returned True if text pos is after real end-of-line, False if text pos is inside line.
+<syntaxhighlight>
+    function CaretPosToClientPos(P: TPoint): TPoint;
+    function ClientPosToCaretPos(P: TPoint;
+      out ADetails: TATPosDetails;
+      AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
+</syntaxhighlight>
+
+* Param ADetails: returned True if text pos is after real end-of-line, False if text pos is inside line.
+* Param AGapCoordAction: you must specify here what to do if coordinates are over inter-line gap (see Gaps object).
 
 Functions give Result.Y<0 if cannot calculate pos. For example, if line index is too big or line with this index is fully folded.
 
-Property OptCaretVirtual exists. If it's True, caret is allowed after end-of-line. Functions (above) consider it.
+Property OptCaretVirtual exists. If it's True, caret is allowed after end-of-line. Methods consider it.
 
 === Text posistion to/from column index ===
 
-To convert text coordinate X to/from column index, considering Tab chars, ATSynEdit gives TabHelper object. TabHelper has needed methods to convert. Here is example, code which converts X of first caret to its column index:
+To convert text coordinate X to/from column index (considering Tab chars), ATSynEdit has TabHelper object and methods of Strings object. Here is example, code which converts X of first caret to its column index:
 
 <syntaxhighlight>
     var
@@ -577,15 +584,13 @@ To convert text coordinate X to/from column index, considering Tab chars, ATSynE
 
 == How to manage the caret, the selection? ==
 
-See topic above about "Carets object". To change position of carets, get Carets property of editor, and change caret items' properties PosX/PosY, then call editor's Update (repaint). To change selection for any caret (each caret has own selection), do the same: get any caret item, and change its propeties EndX/EndY (-1 to delete selection), then call editor's Update.
+See topic "Carets object". To change position of carets, get Carets property of editor, get each item Carets[N], and change caret items' properties PosX/PosY and/or EndX/EndY, then call editor's method Update. To change selection for any caret (each caret has own selection): get caret item, and change its propeties EndX/EndY (set both to -1 to remove selection), then call editor's method Update.
 
-Better don't do overlapping selections (e.g. selection of caret-2 overlaps selection of caret-3), but even here you can call "Carets.Sort" which should sort carets by PosX/PosY and fix them.
+Better don't do overlapping selections (when e.g. selection of caret-2 overlaps selection of caret-3), but even here you can call Carets.Sort, which should sort carets by PosX/PosY and fix them.
 
-You can delete caret items. Or add caret items.
+You can delete and add caret items.
 
-Example:
-
-
+<syntaxhighlight>
   var
     Caret: TATCaretItem;
     i: integer;
@@ -599,6 +604,7 @@ Example:
     end;
     edit.Update;    
   end;
+</syntaxhighlight>
 
 == How to modify text? ==
 
