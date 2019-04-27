@@ -79,7 +79,7 @@
         <PackageName Value="LCL"/>
       </Item2>
     </RequiredPackages>
-    <Units Count="6">
+    <Units Count="5">
       <Unit0>
         <Filename Value="demo.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -112,11 +112,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit4>
-      <Unit5>
-        <Filename Value="..\..\atsynedit\atsynedit_timer.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ATSynEdit_Timer"/>
-      </Unit5>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

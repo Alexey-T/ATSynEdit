@@ -28,7 +28,7 @@ var
 implementation
 
 uses
-  ATSynEdit_RegExpr;
+  RegExpr;
 
 {$R *.lfm}
 
