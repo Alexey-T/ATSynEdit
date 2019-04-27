@@ -4110,6 +4110,7 @@ var
   P: TPoint;
   R: TRect;
 begin
+  if csDesigning in ComponentState then Exit;
   if not FOptShowScrollHint then Exit;
 
   S:= cHintScrollPrefix+' '+IntToStr(LineTop+1);
@@ -4130,6 +4131,8 @@ var
   R: TRect;
   NIndex: integer;
 begin
+  if csDesigning in ComponentState then Exit;
+
   NIndex:= Strings.Bookmarks.Find(ALine);
   if NIndex<0 then exit;
 
