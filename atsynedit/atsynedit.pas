@@ -3587,7 +3587,8 @@ end;
 destructor TATSynEdit.Destroy;
 begin
   TimersStop;
-  FreeAndNil(FHintWnd);
+  if Assigned(FHintWnd) then
+    FreeAndNil(FHintWnd);
   FreeAndNil(FMenuStd);
   DoPaintModeStatic;
   FFoldedMarkList.Clear;
