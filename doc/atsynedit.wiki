@@ -538,25 +538,42 @@ Encodings
 
 == How does it manage the coordinates? ==
 
-Carets object contains list of caret items. Each caret item has props PosY (line index in Strings object), PosX (char offset from line start). Strings object holds UnicodeString's, where each WideChar gives offset=1, and even Tab char gives offset=1. Before painting, PosX/PosY converted to properties CoordX/CoordY, screen coordinates. CoordY is pixels from top control edge (you don't need to change by ruler height), CoordX is pixels from left edge (you don't need to change by gutter width). Don't touch CoordX/CoordY. Change PosX/PosY (caret item position) and EndX/EndY (selection end for caret item, both -1 if no selection present for this item).
+Carets object contains list of caret items. Each caret item, e.g. Carets[0], has properties:
+* PosY: line index in Strings object
+* PosX: char offset from line start
+* EndY, EndX: selection end for caret, both -1 if no selection
+* CoordX, CoordY: control-relative coordinates of caret
 
-=== Caret pos to/from screen coords ===
+Strings object holds UnicodeString's, where each WideChar gives offset=1, and even Tab char gives offset=1. Component auto-calculates properties CoordX/CoordY for all carets, screen coordinates. Don't touch CoordX/CoordY, change only PosX/PosY and EndX/EndY.
 
-Use these funcs if needed to convert caret pos to screen coordinates in pixels:
+=== Text position to/from screen coordinates ===
+
+Use these funcs to convert text position to screen coordinates in pixels:
 
 *    function CaretPosToClientPos(P: TPoint): TPoint.
-*    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint. Last param: returned true if caret pos is after real end-of-line, false if caret pos is inside line.
+*    function ClientPosToCaretPos(P: TPoint; out AEndOfLinePos: boolean): TPoint. Last param: returned True if text pos is after real end-of-line, False if text pos is inside line.
 
-Functions give result.Y<0 if cannot calculate pos. For example, if line index is too big or line with this index is fully folded.
+Functions give Result.Y<0 if cannot calculate pos. For example, if line index is too big or line with this index is fully folded.
 
-Property OptCaretVirtual exists. If true, caret is allowed after end-of-line. Functions (above) consider it.
+Property OptCaretVirtual exists. If it's True, caret is allowed after end-of-line. Functions (above) consider it.
 
-=== Caret pos to/from column index ===
+=== Text posistion to/from column index ===
 
-Use these funcs (unit ATStringProc) to convert tab-char-indenendent caret pos x, to/from tab-char-dependant column index:
+To convert text coordinate X to/from column index, considering Tab chars, ATSynEdit gives TabHelper object. TabHelper has needed methods to convert. Here is example, code which converts X of first caret to its column index:
 
-* function SCharPosToColumnPos
-* function SColumnPosToCharPos
+<syntaxhighlight>
+    var
+      ed: TATSynEdit;
+      caret: TATCaretItem;
+    //...
+
+    caret:= ed.Carets[0];
+    if ed.Strings.IsIndexValid(caret.PosY) then
+    begin
+      //optimized for huge lines
+      ColumnIndex:= ed.Strings.CharPosToColumnPos(caret.PosY, caret.PosX, ed.TabHelper)+1;
+    end;
+</syntaxhighlight>
 
 == How to manage the caret, the selection? ==
 
