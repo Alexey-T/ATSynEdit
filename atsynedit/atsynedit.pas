@@ -3569,7 +3569,7 @@ begin
   FScrollHorzMinimap.Vertical:= false;
 
   FKeymap:= KeymapFull;
-  FHintWnd:= THintWindow.Create(Self);
+  FHintWnd:= nil;
 
   FMenuStd:= TPopupMenu.Create(Self);
   FMenuText:= nil;
@@ -4113,6 +4113,9 @@ begin
   if csDesigning in ComponentState then Exit;
   if not FOptShowScrollHint then Exit;
 
+  if FHintWnd=nil then
+    FHintWnd:= THintWindow.Create(Self);
+
   S:= cHintScrollPrefix+' '+IntToStr(LineTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
@@ -4132,6 +4135,9 @@ var
   NIndex: integer;
 begin
   if csDesigning in ComponentState then Exit;
+
+  if FHintWnd=nil then
+    FHintWnd:= THintWindow.Create(Self);
 
   NIndex:= Strings.Bookmarks.Find(ALine);
   if NIndex<0 then exit;
