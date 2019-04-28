@@ -4908,9 +4908,17 @@ begin
         if Carets.Count>0 then
         begin
           P:= ClientPosToCaretPos(P, Details);
-          if (P.Y>=0) and
-            //mouse actually moved
-            not ((FMouseDownPnt.X=P.X) and (FMouseDownPnt.Y=P.Y)) then
+          //Application.MainForm.Caption:= Format('MouseDownPnt %d:%d, CurPnt %d:%d',
+          //  [FMouseDownPnt.Y, FMouseDownPnt.X, P.Y, P.X]);
+          if (P.Y<0) then Exit;
+
+          //mouse moved at last by char?
+          if (FMouseDownPnt.X=P.X) and (FMouseDownPnt.Y=P.Y) then
+          begin
+            DoCaretSingle(P.X, P.Y);
+            Update;
+          end
+          else
           begin
             //drag w/out button pressed: single selection
             if [ssXControl, ssShift, ssAlt]*Shift=[] then
