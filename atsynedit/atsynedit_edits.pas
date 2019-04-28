@@ -137,6 +137,7 @@ begin
   OptBorderWidth:= 1;
   OptBorderWidthFocused:= 1;
   OptScrollIndentCaretHorz:= 0;
+  OptShowMouseSelFrame:= false;
 
   Height:= 26;
 end;
