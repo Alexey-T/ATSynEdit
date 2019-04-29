@@ -30,6 +30,7 @@ type
     FCount: integer;
     FLenEol: integer;
     FOnChange: TTextChangedEvent;
+    FLocked: boolean;
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
@@ -39,6 +40,8 @@ type
     procedure Clear;
     procedure Setup(const AText: UnicodeString; const ALineLens: array of integer);
     procedure SetupSlow(const AText: UnicodeString);
+    procedure Lock;
+    procedure Unlock;
     function CaretToStr(APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
     function SubString(APos, ALen: integer): UnicodeString; inline;
@@ -60,6 +63,7 @@ implementation
 
 procedure TATStringBuffer.SetCount(AValue: integer);
 begin
+  Assert(not FLocked);
   if AValue<0 then
     raise Exception.Create('StringBuffer Count<0');
 
@@ -70,6 +74,7 @@ end;
 
 constructor TATStringBuffer.Create;
 begin
+  FLocked:=false;
   FText:= '';
   FLenEol:= 1; //no apps should use other
   FCount:= 0;
@@ -78,6 +83,7 @@ end;
 
 destructor TATStringBuffer.Destroy;
 begin
+
   SetCount(0);
   inherited;
 end;
@@ -87,6 +93,7 @@ procedure TATStringBuffer.Setup(const AText: UnicodeString;
 var
   Pos, NLen, i: integer;
 begin
+  Assert(Not FLocked);
   FText:= AText;
   //FLenEol:= ALenEol;
 
@@ -122,6 +129,7 @@ var
   Lens: TATGenericIntList;
   i, N: integer;
 begin
+  Assert(not FLocked);
   FText:= AText;
   if FText='' then
   begin
@@ -167,9 +175,20 @@ begin
   end;
 end;
 
+procedure TATStringBuffer.Lock;
+begin
+  FLocked:=true;
+end;
+
+procedure TATStringBuffer.Unlock;
+begin
+  FLocked:=false;
+end;
+
 
 procedure TATStringBuffer.Clear;
 begin
+  Assert(not FLocked);
   FText:= '';
   SetCount(0);
 end;
