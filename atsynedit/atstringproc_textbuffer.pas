@@ -111,9 +111,12 @@ var
 begin
   {$IFDEF DEBUGLOG}
   Inc(FBufferVersion);
-  {$ENDIF}
   if FLocked then
      Assert(false, Format('Buffer %d v=%d', [FBufferId, FBufferVersion]));
+  {$ELSE}
+   Assert(not FLocked, 'Attempt to reSet locked/used buffer!');
+  {$ENDIF}
+
 
   FText:= AText;
   //FLenEol:= ALenEol;
