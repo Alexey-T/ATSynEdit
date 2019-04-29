@@ -74,7 +74,7 @@ end;
 
 constructor TATStringBuffer.Create;
 begin
-  FLocked:=false;
+  FLocked:= false;
   FText:= '';
   FLenEol:= 1; //no apps should use other
   FCount:= 0;
@@ -93,7 +93,7 @@ procedure TATStringBuffer.Setup(const AText: UnicodeString;
 var
   Pos, NLen, i: integer;
 begin
-  Assert(Not FLocked);
+  Assert(not FLocked);
   FText:= AText;
   //FLenEol:= ALenEol;
 
@@ -177,12 +177,12 @@ end;
 
 procedure TATStringBuffer.Lock;
 begin
-  FLocked:=true;
+  FLocked:= true;
 end;
 
 procedure TATStringBuffer.Unlock;
 begin
-  FLocked:=false;
+  FLocked:= false;
 end;
 
 
