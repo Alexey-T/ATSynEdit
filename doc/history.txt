@@ -1,4 +1,8 @@
 
+2019.04.30
++ add: property Strings.UndoEmpty
++ add: property Strings.RedoEmpty
+
 2019.04.26
 + add: property OptRulerMarkSizeCaret
 
