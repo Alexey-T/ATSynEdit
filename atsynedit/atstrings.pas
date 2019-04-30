@@ -225,8 +225,10 @@ type
     function GetLineLenPhysical(AIndex: integer): integer;
     function GetRedoAsString: string;
     function GetRedoCount: integer;
+    function GetRedoEmpty: boolean;
     function GetUndoAsString: string;
     function GetUndoCount: integer;
+    function GetUndoEmpty: boolean;
     function GetUndoLimit: integer;
     function IsLastFakeLineUnneeded: boolean;
     procedure LineAddEx(const AString: atString; AEnd: TATLineEnds);
@@ -360,6 +362,8 @@ type
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
+    property UndoEmpty: boolean read GetUndoEmpty;
+    property RedoEmpty: boolean read GetRedoEmpty;
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     procedure DoClearUndo(ALocked: boolean = false);
@@ -581,12 +585,22 @@ begin
     Result:= 0;
 end;
 
+function TATStrings.GetUndoEmpty: boolean;
+begin
+  Result:= FUndoList.IsEmpty;
+end;
+
 function TATStrings.GetRedoCount: integer;
 begin
   if Assigned(FRedoList) then
     Result:= FRedoList.Count
   else
     Result:= 0;
+end;
+
+function TATStrings.GetRedoEmpty: boolean;
+begin
+  Result:= FRedoList.IsEmpty;
 end;
 
 function TATStrings.GetUndoAsString: string;
