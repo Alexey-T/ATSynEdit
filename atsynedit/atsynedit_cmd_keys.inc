@@ -369,27 +369,37 @@ function TATSynEdit.DoCommand_GotoScreenSide(ASide: TATCaretScreenSide): TATComm
 const
   dx = 2;
 var
+  R: TRect;
   P: TPoint;
   Details: TATPosDetails;
 begin
   Result:= [];
 
+  R:= FRectMainVisible;
+  OffsetRect(R, -dx, -dx);
+
   case ASide of
     cScreenSideTop:
-      P:= Point(FRectMain.Left+dx, FRectMain.Top+dx);
+      P:= Point(R.Left, R.Top);
     cScreenSideBottom:
-      P:= Point(FRectMain.Left+dx, FRectMain.Bottom-dx);
+      P:= Point(R.Left, R.Bottom);
     cScreenSideMiddle:
-      P:= Point(FRectMain.Left+dx, (FRectMain.Top+FRectMain.Bottom) div 2);
+      P:= Point(R.Left, (R.Top+R.Bottom) div 2);
   end;
 
   if P.Y<0 then exit;
   P:= ClientPosToCaretPos(P, Details);
-  if P.Y>=0 then
-  begin
-    DoCaretSingle(P.X, P.Y);
-    Result:= [cResultCaretTop];
+  if P.Y<0 then exit;
+
+  case ASide of
+    cScreenSideTop:
+      Inc(P.Y); //smooth scrolling gives partially visible 1st line
+    cScreenSideBottom:
+      Dec(P.Y);
   end;
+
+  DoCaretSingle(P.X, P.Y);
+  Result:= [cResultCaretTop];
 end;
 
 
