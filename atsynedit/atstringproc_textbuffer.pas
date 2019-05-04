@@ -60,7 +60,6 @@ type
     function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
     property Count: integer read FCount;
-    property Version: integer read FVersion write FVersion;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
     property Version :integer read FBufferVersion;
   end;
@@ -97,7 +96,6 @@ begin
   FLenEol:= 1; //no apps should use other
   FCount:= 0;
   SetCount(0);
-  FVersion:= 0;
 end;
 
 destructor TATStringBuffer.Destroy;
