@@ -9,9 +9,13 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value=".;..\proc_lexer"/>
+        <OtherUnitFiles Value=".;..\proc_lexer;..\..\..\..\cmp\mORMot"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
+      <Other>
+        <CustomOptions Value="-Sa
+-dDEBUGLOG"/>
+      </Other>
       <Parsing>
         <SyntaxOptions>
           <IncludeAssertionCode Value="True"/>
@@ -21,7 +25,7 @@
     <Description Value="Multi-line editor control, with much more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
     <Version Major="1" Minor="2"/>
-    <Files Count="34">
+    <Files Count="33">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -100,63 +104,61 @@
         <UnitName Value="ATSynEdit_WrapInfo"/>
       </Item19>
       <Item20>
-        <AddToUsesPkgSection Value="False"/>
-      </Item20>
-      <Item21>
         <Filename Value="atsynedit_finder.pas"/>
         <UnitName Value="ATSynEdit_Finder"/>
-      </Item21>
-      <Item22>
-        <AddToUsesPkgSection Value="False"/>
-      </Item22>
-      <Item23>
+      </Item20>
+      <Item21>
         <Filename Value="atstringproc_htmlcolor.pas"/>
         <UnitName Value="ATStringProc_HtmlColor"/>
-      </Item23>
-      <Item24>
+      </Item21>
+      <Item22>
         <Filename Value="atsynedit_colors.pas"/>
         <UnitName Value="ATSynEdit_Colors"/>
-      </Item24>
-      <Item25>
+      </Item22>
+      <Item23>
         <Filename Value="atsynedit_export_html.pas"/>
         <UnitName Value="ATSynEdit_Export_HTML"/>
-      </Item25>
-      <Item26>
+      </Item23>
+      <Item24>
         <Filename Value="atsynedit_markers.pas"/>
         <UnitName Value="ATSynEdit_Markers"/>
-      </Item26>
-      <Item27>
+      </Item24>
+      <Item25>
         <Filename Value="atsynedit_regexpr.pas"/>
         <UnitName Value="ATSynEdit_RegExpr"/>
-      </Item27>
-      <Item28>
+      </Item25>
+      <Item26>
         <Filename Value="atsynedit_adapter_cache.pas"/>
         <UnitName Value="ATSynEdit_Adapter_Cache"/>
-      </Item28>
-      <Item29>
+      </Item26>
+      <Item27>
         <Filename Value="atsynedit_gaps.pas"/>
         <UnitName Value="ATSynEdit_Gaps"/>
-      </Item29>
-      <Item30>
+      </Item27>
+      <Item28>
         <Filename Value="atsynedit_scrollbar.pas"/>
         <UnitName Value="ATSynEdit_ScrollBar"/>
-      </Item30>
-      <Item31>
+      </Item28>
+      <Item29>
         <Filename Value="atsynedit_dimranges.pas"/>
         <UnitName Value="ATSynEdit_DimRanges"/>
-      </Item31>
-      <Item32>
+      </Item29>
+      <Item30>
         <Filename Value="atsynedit_bookmarks.pas"/>
         <UnitName Value="ATSynEdit_Bookmarks"/>
-      </Item32>
-      <Item33>
+      </Item30>
+      <Item31>
         <Filename Value="atsynedit_charsizer.pas"/>
         <Type Value="Include"/>
-      </Item33>
-      <Item34>
+      </Item31>
+      <Item32>
         <Filename Value="atsynedit_gutter_decor.pas"/>
         <UnitName Value="ATSynEdit_Gutter_Decor"/>
-      </Item34>
+      </Item32>
+      <Item33>
+        <Filename Value="atsynedit_fgl.pas"/>
+        <UnitName Value="ATSynEdit_fgl"/>
+      </Item33>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
