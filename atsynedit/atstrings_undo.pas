@@ -87,6 +87,7 @@ type
       AEnd: TATLineEnds; const ACarets: TATPointArray);
     procedure AddUnmodifiedMark;
     function DebugText: string;
+    function IsEmpty: boolean;
     property AsString: string read GetAsString write SetAsString;
   end;
 
@@ -360,6 +361,13 @@ begin
     n_carets:= Length(Item.ItemCarets) div 2;
     Result:= Result+Format('actn "%s", text "%s", crts %d'#10, [s_action, s_text, n_carets]);
   end;
+end;
+
+function TATUndoList.IsEmpty: boolean;
+begin
+  Result:=
+    (Count=0) or
+    ((Count=1) and (Items[0].ItemAction=cEditActionClearModified));
 end;
 
 

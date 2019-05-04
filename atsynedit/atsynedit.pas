@@ -3830,6 +3830,7 @@ begin
   if NFrom>=0 then
   begin
     FScrollVert.NPos:= NFrom;
+    UpdateScrollbars(true);
     Update;
     Exit
   end;
@@ -3840,6 +3841,7 @@ begin
       if NLineIndex>=AValue then
       begin
         FScrollVert.NPos:= i;
+        UpdateScrollbars(true);
         Update;
         Exit
       end;
@@ -3848,6 +3850,7 @@ end;
 procedure TATSynEdit.SetColumnLeft(AValue: integer);
 begin
   FScrollHorz.NPos:= AValue;
+  UpdateScrollbars(true);
   Update;
 end;
 
@@ -5891,6 +5894,7 @@ begin
   begin
     NItem:= Max(0, NItem - GetVisibleLines div 2);
     FScrollVert.NPos:= Min(NItem, FScrollVert.NMax);
+    UpdateScrollbars(true);
     Update;
     UpdateMinimapTooltip;
   end;
@@ -5899,6 +5903,7 @@ end;
 procedure TATSynEdit.DoMinimapDrag(APosY: integer);
 begin
   FScrollVert.NPos:= GetMinimap_DraggedPosToWrapIndex(APosY);
+  UpdateScrollbars(true);
   Update;
 end;
 
