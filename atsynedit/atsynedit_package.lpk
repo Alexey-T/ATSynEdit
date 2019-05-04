@@ -9,17 +9,18 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value=".;..\proc_lexer"/>
+        <OtherUnitFiles Value=".;..\proc_lexer;..\..\..\..\cmp\mORMot"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
       <Other>
-        <CustomOptions Value="-Sa"/>
+        <CustomOptions Value="-Sa
+-dDEBUGLOG"/>
       </Other>
     </CompilerOptions>
     <Description Value="Multi-line editor control, with much more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
     <Version Major="1" Minor="2"/>
-    <Files Count="32">
+    <Files Count="33">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -149,6 +150,10 @@
         <Filename Value="atsynedit_gutter_decor.pas"/>
         <UnitName Value="ATSynEdit_Gutter_Decor"/>
       </Item32>
+      <Item33>
+        <Filename Value="atsynedit_fgl.pas"/>
+        <UnitName Value="ATSynEdit_fgl"/>
+      </Item33>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>

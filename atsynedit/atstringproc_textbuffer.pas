@@ -7,7 +7,7 @@ unit ATStringProc_TextBuffer;
 {$mode objfpc}{$H+}
 
 interface
-
+{$UNDEF debuglog}
 uses
   Classes, SysUtils,
   Dialogs,
@@ -35,8 +35,9 @@ type
     FOnChange: TTextChangedEvent;
 
     {$IFDEF DEBUGLOG}
-    FBufferId, FBufferVersion:integer;
+    FBufferId:integer;
     {$ENDIF}
+    FBufferVersion:integer;
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
@@ -61,6 +62,7 @@ type
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
     property Count: integer read FCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
+    property Version :integer read FBufferVersion;
   end;
 
 implementation
@@ -85,7 +87,7 @@ begin
   {$IFDEF DEBUGLOG}
   Inc(__BufferCounter);
   FBufferId:=__BufferCounter;
-  FBufferVersion:=0;
+  FBufferVersion:= 0;
 
   TSynLog.Add.Log(sllCustom1, 'Create Buffer %', [FBufferId]);
 
