@@ -114,6 +114,8 @@ type
     property Current: T read GetCurrent;
   end;
 
+  { TFPGList }
+
   generic TFPGList<T> = class(TFPSList)
   private
     type
@@ -143,6 +145,8 @@ type
     function GetEnumerator: TFPGListEnumeratorSpec; {$ifdef FGLINLINE} inline; {$endif}
     function IndexOf(constref Item: T): Integer;
     procedure Insert(Index: Integer; constref Item: T); {$ifdef FGLINLINE} inline; {$endif}
+    function _GetItemPtr(index:integer):PT; {$ifdef FGLINLINE} inline; {$endif}
+
     property Last: T read GetLast write SetLast;
 {$ifndef VER2_4}
     procedure Assign(Source: TFPGList);
@@ -954,6 +958,11 @@ end;
 procedure TFPGList.Insert(Index: Integer; constref Item: T);
 begin
   T(inherited Insert(Index)^) := Item;
+end;
+
+function TFPGList._GetItemPtr(index: integer):PT;
+begin
+  Result := PT(inherited Get(Index));
 end;
 
 function TFPGList.GetLast: T;

@@ -49,7 +49,7 @@ type
     procedure SetupSlow(const AText: UnicodeString);
     procedure Lock;
     procedure Unlock;
-    function CaretToStr(APnt: TPoint): integer;
+    function CaretToStr(constref APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
     function SubString(APos, ALen: integer): UnicodeString; inline;
     function TextLength: integer; inline;
@@ -232,24 +232,24 @@ begin
   SetCount(0);
 end;
 
-function TATStringBuffer.CaretToStr(APnt: TPoint): integer;
+function TATStringBuffer.CaretToStr(constref APnt: TPoint): integer;
 var
-  Len: integer;
+  Len,x: integer;
 begin
   Result:= -1;
+  x:=APnt.X;
   if (APnt.Y<0) then Exit;
   if (APnt.X<0) then Exit;
   if (APnt.Y>=FCount) then Exit;
 
   //handle caret pos after eol
-  if APnt.X>0 then
+  if x>0 then
   begin
     Len:= LineLength(APnt.Y);
-    if APnt.X>Len then
-      APnt.X:= Len;
+    if x>Len then
+      x:= Len;
   end;
-
-  Result:= FList[APnt.Y]+APnt.X;
+  Result:= FList[APnt.Y]+x;
 end;
 
 function TATStringBuffer.StrToCaret(APos: integer): TPoint;
