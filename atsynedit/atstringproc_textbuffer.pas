@@ -86,11 +86,12 @@ begin
   {$IFDEF DEBUGLOG}
   Inc(__BufferCounter);
   FBufferId:=__BufferCounter;
-  FBufferVersion:= 0;
+
 
   TSynLog.Add.Log(sllCustom1, 'Create Buffer %', [FBufferId]);
 
   {$ENDIF}
+  FBufferVersion:= 0;
   FLocked:=false;
   FText:= '';
   FLenEol:= 1; //no apps should use other
@@ -111,14 +112,11 @@ var
   Pos, NLen, i: integer;
 begin
   {$IFDEF DEBUGLOG}
-  Inc(FBufferVersion);
   if FLocked then
      Assert(false, Format('Buffer %d v=%d', [FBufferId, FBufferVersion]));
-  {$ELSE}
-   Assert(not FLocked, 'Attempt to reSet locked/used buffer!');
   {$ENDIF}
-
-
+  Assert(not FLocked, 'Attempt to reSet locked/used buffer!');
+  Inc(FBufferVersion);
   FText:= AText;
   //FLenEol:= ALenEol;
 
@@ -137,10 +135,8 @@ procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
 var
   Pos, NLen, i: integer;
 begin
-  {$IFDEF DEBUGLOG}
-  Inc(FBufferVersion);
-  {$ENDIF}
   Assert(not FLocked);
+  Inc(FBufferVersion);
   SetCount(L.Count+1);
   Pos:= 0;
   FList[0]:= 0;
@@ -158,10 +154,10 @@ var
   Lens: TATGenericIntList;
   i, N: integer;
 begin
-  {$IFDEF DEBUGLOG}
-  Inc(FBufferVersion);
-  {$ENDIF}
+
   Assert(not FLocked);
+  Inc(FBufferVersion);
+
   FText:= AText;
   if FText='' then
   begin
