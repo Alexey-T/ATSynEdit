@@ -861,14 +861,17 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean);
+function TATSynEdit.DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean): boolean;
 var
   Caret: TATCaretItem;
   NLast, NLen, i: integer;
 begin
+  Result:= false;
+
   NLast:= Strings.Count-1;
   if NLast<0 then
   begin
+    Result:= true;
     DoCaretSingle(0, 0);
     exit
   end;
@@ -880,6 +883,7 @@ begin
     //fix position
     if not Strings.IsIndexValid(Caret.PosY) then
     begin
+      Result:= true;
       Caret.PosY:= NLast;
       Caret.EndX:= -1;
       Caret.EndY:= -1;
@@ -889,17 +893,26 @@ begin
     begin
       NLen:= Strings.LinesLen[Caret.PosY];
       if Caret.PosX>NLen then
+      begin
+        Result:= true;
         Caret.PosX:= NLen;
+      end;
     end;
 
     //fix selection end
     if Caret.EndY>=0 then
     begin
       if not Strings.IsIndexValid(Caret.EndY) then
+      begin
+        Result:= true;
         Caret.EndY:= NLast;
+      end;
       NLen:= Strings.LinesLen[Caret.EndY];
       if Caret.EndX>NLen then
+      begin
+        Result:= true;
         Caret.EndX:= NLen;
+      end;
     end;
   end;
 end;
