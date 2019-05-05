@@ -1056,7 +1056,6 @@ type
     procedure InvalidateHilitingCache;
     procedure InvalidateHilitingCache(ALineIndex: integer);
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
-    procedure UpdateIncorrectCaretPositions;
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
     procedure DoEventCarets; virtual;
@@ -1128,7 +1127,7 @@ type
     procedure DoCaretSingle(APosX, APosY, AEndX, AEndY: integer);
     procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
     procedure DoCaretSingleAsIs;
-    procedure DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean);
+    function DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean): boolean;
     procedure DoCaretsFixIfInsideFolded;
     procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);

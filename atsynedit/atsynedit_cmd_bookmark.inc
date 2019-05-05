@@ -214,7 +214,7 @@ begin
     Strings.LineDelete(NLine);
   end;
 
-  UpdateIncorrectCaretPositions;
+  DoCaretsFixIncorrectPos(false);
   Update(true);
   DoEventChange;
 end;

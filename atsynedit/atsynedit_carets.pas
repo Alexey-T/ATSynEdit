@@ -107,7 +107,6 @@ type
     property AsArray: TATPointArray read GetAsArray write SetAsArray;
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
     procedure UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
-    procedure UpdateIncorrectPositions(AMaxLine: integer);
     procedure UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
     procedure DoChanged;
   end;
@@ -692,26 +691,6 @@ begin
         end;
     end;
   end;
-end;
-
-procedure TATCarets.UpdateIncorrectPositions(AMaxLine: integer);
-var
-  Caret: TATCaretItem;
-  chg: boolean;
-  i: integer;
-begin
-  chg:= false;
-  for i:= 0 to Count-1 do
-  begin
-    Caret:= Items[i];
-    if Caret.PosY>AMaxLine then
-      begin Caret.PosY:= AMaxLine; chg:= true; end;
-    if Caret.EndY>AMaxLine then
-      begin Caret.EndY:= AMaxLine; chg:= true; end;
-  end;
-
-  if chg then
-    DoChanged;
 end;
 
 procedure TATCarets.UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
