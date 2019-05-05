@@ -117,7 +117,7 @@ type
   generic TFPGList<T> = class(TFPSList)
   private
     type
-      TCompareFunc = function(const Item1, Item2: T): Integer;
+      TCompareFunc = function(constref Item1, Item2: T): Integer;
       PT = ^T;
       TTypeList = PT;
       PTypeList = ^TTypeList;
@@ -137,18 +137,18 @@ type
     Type
       TFPGListEnumeratorSpec = specialize TFPGListEnumerator<T>;
     constructor Create;
-    function Add(const Item: T): Integer; {$ifdef FGLINLINE} inline; {$endif}
-    function Extract(const Item: T): T; {$ifdef FGLINLINE} inline; {$endif}
+    function Add(constref Item: T): Integer; {$ifdef FGLINLINE} inline; {$endif}
+    function Extract(constref Item: T): T; {$ifdef FGLINLINE} inline; {$endif}
     property First: T read GetFirst write SetFirst;
     function GetEnumerator: TFPGListEnumeratorSpec; {$ifdef FGLINLINE} inline; {$endif}
-    function IndexOf(const Item: T): Integer;
-    procedure Insert(Index: Integer; const Item: T); {$ifdef FGLINLINE} inline; {$endif}
+    function IndexOf(constref Item: T): Integer;
+    procedure Insert(Index: Integer; constref Item: T); {$ifdef FGLINLINE} inline; {$endif}
     property Last: T read GetLast write SetLast;
 {$ifndef VER2_4}
     procedure Assign(Source: TFPGList);
     procedure AddList(Source: TFPGList);
 {$endif VER2_4}
-    function Remove(const Item: T): Integer; {$ifdef FGLINLINE} inline; {$endif}
+    function Remove(constref Item: T): Integer; {$ifdef FGLINLINE} inline; {$endif}
     procedure Sort(Compare: TCompareFunc);
     procedure Sort(Compare: TCompareFunc; SortingAlgorithm: PSortingAlgorithm);
     property Items[Index: Integer]: T read Get write Put; default;
@@ -913,12 +913,12 @@ begin
   inherited Put(Index, @Item);
 end;
 
-function TFPGList.Add(const Item: T): Integer;
+function TFPGList.Add(constref Item: T): Integer;
 begin
   Result := inherited Add(@Item);
 end;
 
-function TFPGList.Extract(const Item: T): T;
+function TFPGList.Extract(constref Item: T): T;
 begin
   inherited Extract(@Item, @Result);
 end;
@@ -941,7 +941,7 @@ begin
   Result := TFPGListEnumeratorSpec.Create(Self);
 end;
 
-function TFPGList.IndexOf(const Item: T): Integer;
+function TFPGList.IndexOf(constref Item: T): Integer;
 begin
   Result := 0;
   {$info TODO: fix inlining to work! InternalItems[Result]^}
@@ -951,7 +951,7 @@ begin
     Result := -1;
 end;
 
-procedure TFPGList.Insert(Index: Integer; const Item: T);
+procedure TFPGList.Insert(Index: Integer; constref Item: T);
 begin
   T(inherited Insert(Index)^) := Item;
 end;
@@ -987,7 +987,7 @@ begin
 end;
 {$endif VER2_4}
 
-function TFPGList.Remove(const Item: T): Integer;
+function TFPGList.Remove(constref Item: T): Integer;
 begin
   Result := IndexOf(Item);
   if Result >= 0 then

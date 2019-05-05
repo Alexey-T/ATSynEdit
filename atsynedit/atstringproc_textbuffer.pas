@@ -7,13 +7,15 @@ unit ATStringProc_TextBuffer;
 {$mode objfpc}{$H+}
 
 interface
-
+{$UNDEF debuglog}
 uses
   Classes, SysUtils,
   Dialogs,
   LazUTF8,
   ATStringProc,
-  ATSynEdit_FGL;
+  ATSynEdit_FGL
+   {$IFDEF DEBUGLOG}, SynCommons,SynLog {$ENDIF}
+  ;
 
 type
   TTextChangedEvent = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
@@ -25,12 +27,16 @@ type
   { TATStringBuffer }
 
   TATStringBuffer = class
-  private
+  strict private
+    FLocked: boolean;
     FList: array of integer;
     FCount: integer;
     FLenEol: integer;
     FOnChange: TTextChangedEvent;
-    FLocked: boolean;
+    {$IFDEF DEBUGLOG}
+    FBufferId:integer;
+    {$ENDIF}
+    FBufferVersion:integer;
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
@@ -55,12 +61,15 @@ type
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
     property Count: integer read FCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
+    property Version :integer read FBufferVersion;
   end;
 
 implementation
 
 { TATStringBuffer }
-
+{$IFDEF DEBUGLOG}
+var __BufferCounter:integer=0;
+{$ENDIF}
 procedure TATStringBuffer.SetCount(AValue: integer);
 begin
   Assert(not FLocked);
@@ -74,7 +83,15 @@ end;
 
 constructor TATStringBuffer.Create;
 begin
-  FLocked:= false;
+  {$IFDEF DEBUGLOG}
+  Inc(__BufferCounter);
+  FBufferId:=__BufferCounter;
+  FBufferVersion:= 0;
+
+  TSynLog.Add.Log(sllCustom1, 'Create Buffer %', [FBufferId]);
+
+  {$ENDIF}
+  FLocked:=false;
   FText:= '';
   FLenEol:= 1; //no apps should use other
   FCount:= 0;
@@ -83,17 +100,25 @@ end;
 
 destructor TATStringBuffer.Destroy;
 begin
-
   SetCount(0);
   inherited;
 end;
+
 
 procedure TATStringBuffer.Setup(const AText: UnicodeString;
   const ALineLens: array of integer);
 var
   Pos, NLen, i: integer;
 begin
-  Assert(not FLocked);
+  {$IFDEF DEBUGLOG}
+  Inc(FBufferVersion);
+  if FLocked then
+     Assert(false, Format('Buffer %d v=%d', [FBufferId, FBufferVersion]));
+  {$ELSE}
+   Assert(not FLocked, 'Attempt to reSet locked/used buffer!');
+  {$ENDIF}
+
+
   FText:= AText;
   //FLenEol:= ALenEol;
 
@@ -112,6 +137,10 @@ procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
 var
   Pos, NLen, i: integer;
 begin
+  {$IFDEF DEBUGLOG}
+  Inc(FBufferVersion);
+  {$ENDIF}
+  Assert(not FLocked);
   SetCount(L.Count+1);
   Pos:= 0;
   FList[0]:= 0;
@@ -129,6 +158,9 @@ var
   Lens: TATGenericIntList;
   i, N: integer;
 begin
+  {$IFDEF DEBUGLOG}
+  Inc(FBufferVersion);
+  {$ENDIF}
   Assert(not FLocked);
   FText:= AText;
   if FText='' then
@@ -177,12 +209,18 @@ end;
 
 procedure TATStringBuffer.Lock;
 begin
-  FLocked:= true;
+  {$IFDEF DEBUGLOG}
+  TSynLog.Add.Log(sllCustom1, 'LOCK Buffer % v=%', [FBufferId, FBufferVersion]);
+  {$ENDIF}
+  FLocked:=true;
 end;
 
 procedure TATStringBuffer.Unlock;
 begin
-  FLocked:= false;
+    {$IFDEF DEBUGLOG}
+  TSynLog.Add.Log(sllCustom1, 'UnLOCK Buffer % v=%', [FBufferId, FBufferVersion]);
+  {$ENDIF}
+  FLocked:=false;
 end;
 
 
