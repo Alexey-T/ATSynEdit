@@ -1056,7 +1056,6 @@ type
     procedure InvalidateHilitingCache;
     procedure InvalidateHilitingCache(ALineIndex: integer);
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
-    procedure UpdateIncorrectCaretPositions;
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
     procedure DoEventCarets; virtual;

@@ -747,11 +747,6 @@ begin
     DoCaretSingle(0, 0);
 end;
 
-procedure TATSynEdit.UpdateIncorrectCaretPositions; inline;
-begin
-  Carets.UpdateIncorrectPositions(Strings.Count-1);
-end;
-
 
 procedure TATSynEdit.DoCaretsShift_CaretItem(Caret: TATCaretItem;
   APosX, APosY, AShiftX, AShiftY, AShiftBelowX: integer);
