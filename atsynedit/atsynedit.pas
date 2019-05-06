@@ -3375,9 +3375,12 @@ begin
   for i:= 1 to cGutterBands do
     FGutter.Add(10);
   FGutter[FGutterBandBm].Size:= cGutterSizeBm;
+  FGutter[FGutterBandBm].Scaled:= true;
   FGutter[FGutterBandNum].Size:= cGutterSizeNum;
   FGutter[FGutterBandState].Size:= cGutterSizeState;
+  FGutter[FGutterBandState].Scaled:= true;
   FGutter[FGutterBandFold].Size:= cGutterSizeFold;
+  FGutter[FGutterBandFold].Scaled:= true;
   FGutter[FGutterBandSep].Size:= cGutterSizeSep;
   FGutter[FGutterBandEmpty].Size:= cGutterSizeEmpty;
   FGutter[FGutterBandSep].Visible:= false;
@@ -6984,6 +6987,7 @@ procedure TATSynEdit.SetScalePercents(AValue: integer);
 begin
   if FScalePercents=AValue then Exit;
   FScalePercents:= AValue;
+  FGutter.ScalePercents:= AValue;
   FScrollbarHorz.ScalePercents:= AValue;
   FScrollbarVert.ScalePercents:= AValue;
 end;

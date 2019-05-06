@@ -16,6 +16,7 @@ type
     Visible: boolean;
     Size: integer;
     Left, Right: integer;
+    Scaled: boolean;
   end;
 
 type
@@ -25,9 +26,11 @@ type
   TATGutter = class
   private
     FList: TList;
-    function GetItem(N: Integer): TATGutterItem;
+    function GetItem(N: integer): TATGutterItem;
+    function DoScale(Value: integer): integer;
   public
     GutterLeft: integer;
+    ScalePercents: integer;
     constructor Create; virtual;
     destructor Destroy; override;
     function IsIndexValid(N: integer): boolean; inline;
@@ -51,7 +54,7 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-function TATGutter.GetItem(N: Integer): TATGutterItem;
+function TATGutter.GetItem(N: integer): TATGutterItem;
 begin
   if IsIndexValid(N) then
     Result:= TATGutterItem(FList[N])
@@ -59,10 +62,16 @@ begin
     Result:= nil;
 end;
 
+function TATGutter.DoScale(Value: integer): integer; inline;
+begin
+  Result:= Value*ScalePercents div 100;
+end;
+
 constructor TATGutter.Create;
 begin
   inherited;
   FList:= TList.Create;
+  ScalePercents:= 100;
 end;
 
 destructor TATGutter.Destroy;
@@ -127,7 +136,12 @@ begin
         Left:= GutterLeft;
       Right:= Left;
       if Visible then
-        Inc(Right, Size);
+      begin
+        if Scaled then
+          Inc(Right, DoScale(Size))
+        else
+          Inc(Right, Size);
+      end;
     end;
 end;
 
