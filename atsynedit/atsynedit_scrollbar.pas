@@ -95,11 +95,13 @@ type
     FScalePercents: Integer;
     FWidthInitial: Integer;
 
-    FPos,
-    FMin,
-    FMax,
-    FLineSize,
+    FPos: Integer;
+    FMin: Integer;
+    FMax: Integer;
+    FLineSize: Integer;
     FPageSize: Integer;
+    FMinSizeToShowThumb: Integer;
+    FMinSizeOfThumb: Integer;
 
     //internal
     FRectMain: TRect; //area for scrolling
@@ -135,7 +137,6 @@ type
     procedure DoPaintStd_BackScrolled(C: TCanvas; const R: TRect);
     procedure DoPaintStd_Arrow(C: TCanvas; R: TRect; Typ: TATScrollElemType);
     procedure DoPaintStd_Thumb(C: TCanvas; const R: TRect);
-    function DoScale(AValue: integer): integer;
 
     function IsHorz: boolean;
     function MouseToPos(X, Y: Integer): Integer;
@@ -144,6 +145,7 @@ type
     procedure DoUpdatePosOnDrag(X, Y: Integer);
     procedure DoScrollBy(NDelta: Integer);
     function GetPxAtScroll(APos: Integer): Integer;
+    function DoScale(AValue: integer): integer;
     procedure SetScalePercents(AValue: Integer);
 
     procedure TimerTimer(Sender: TObject);
@@ -159,15 +161,9 @@ type
     constructor Create(AOnwer: TComponent); override;
     destructor Destroy; override;
     function CanFocus: boolean; override;
-
-    property Position: Integer read FPos write SetPos;
-    property Min: Integer read FMin write SetMin;
-    property Max: Integer read FMax write SetMax;
-    property LineSize: Integer read FLineSize write FLineSize;
-    property PageSize: Integer read FPageSize write SetPageSize;
-
     property WidthInitial: Integer read FWidthInitial write FWidthInitial;
     property ScalePercents: Integer read FScalePercents write SetScalePercents;
+
   protected
     procedure Paint; override;
     procedure Resize; override;
@@ -189,6 +185,14 @@ type
     property PopupMenu;
     property ShowHint;
     property Visible;
+
+    property Position: Integer read FPos write SetPos default 0;
+    property Min: Integer read FMin write SetMin default 0;
+    property Max: Integer read FMax write SetMax default 100;
+    property LineSize: Integer read FLineSize write FLineSize default 1;
+    property PageSize: Integer read FPageSize write SetPageSize default 20;
+    property MinSizeToShowThumb: Integer read FMinSizeToShowThumb write FMinSizeToShowThumb default 10;
+    property MinSizeOfThumb: Integer read FMinSizeOfThumb write FMinSizeOfThumb default 4;
     property Kind: TScrollBarKind read FKind write SetKind default sbHorizontal;
     property KindArrows: TATScrollArrowsKind read FKindArrows write SetKindArrows default asaArrowsNormal;
     property IndentBorder: Integer read FIndentBorder write FIndentBorder default 1;
@@ -196,6 +200,7 @@ type
     property IndentArrow: Integer read FIndentArrow write FIndentArrow default 3;
     property IndentArrLonger: Integer read FIndentArrLonger write FIndentArrLonger default 0;
     property TimerDelay: Integer read FTimerDelay write FTimerDelay default 80;
+
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnOwnerDraw: TATScrollDrawEvent read FOnOwnerDraw write FOnOwnerDraw;
     property OnContextPopup;
@@ -228,6 +233,7 @@ begin
   DoubleBuffered:= IsDoubleBufferedNeeded;
   Width:= 200;
   Height:= 20;
+  FWidthInitial:= Height;
 
   FScalePercents:= 100;
   FKind:= sbHorizontal;
@@ -241,6 +247,8 @@ begin
   FMax:= 100;
   FLineSize:= 1;
   FPageSize:= 20;
+  FMinSizeToShowThumb:= 10;
+  FMinSizeOfThumb:= 4;
 
   Color:= ATScrollbarTheme.ColorBG;
 
@@ -265,7 +273,6 @@ begin
   FreeAndNil(FBitmap);
   inherited;
 end;
-
 function TATScroll.CanFocus: boolean;
 begin
   Result:= false;
@@ -303,7 +310,7 @@ begin
     if DoDrawEvent(aseCorner, C, FRectCorner) then
       DoPaintStd_Corner(C, FRectCorner);
 
-  C.Brush.Color:= ATScrollbarTheme.ColorBorder;
+  C.Brush.Color:= ColorToRGB(ATScrollbarTheme.ColorBorder);
   C.FillRect(FRectMain);
 
   InflateRect(FRectMain, -DoScale(FIndentBorder), -DoScale(FIndentBorder));
@@ -493,7 +500,7 @@ begin
   if IsRectEmpty(R) then exit;
   if DoDrawEvent(Typ, C, R) then
     DoPaintStd_Arrow(C, R, Typ);
-end;
+end;    
 
 procedure TATScroll.DoPaintStd_Arrow(C: TCanvas; R: TRect;
   Typ: TATScrollElemType);
@@ -502,11 +509,11 @@ var
   cc: Integer;
 begin
   if IsRectEmpty(R) then exit;
-  C.Brush.Color:= ATScrollbarTheme.ColorArrowBorder;
+  C.Brush.Color:= ColorToRGB(ATScrollbarTheme.ColorArrowBorder);
   C.FillRect(R);
 
   InflateRect(R, -1, -1);
-  C.Brush.Color:= ATScrollbarTheme.ColorArrowFill;
+  C.Brush.Color:= ColorToRGB(ATScrollbarTheme.ColorArrowFill);
   C.FillRect(R);
 
   P:= CenterPoint(R);
@@ -539,10 +546,10 @@ begin
       end;
     else
       Exit;
- end;
+ end;     
 
-  C.Brush.Color:= ATScrollbarTheme.ColorArrowSign;
-  C.Pen.Color:= ATScrollbarTheme.ColorArrowSign;
+  C.Brush.Color:= ColorToRGB(ATScrollbarTheme.ColorArrowSign);
+  C.Pen.Color:= ColorToRGB(ATScrollbarTheme.ColorArrowSign);
   C.Polygon([P1, P2, P3]);
 end;
 
@@ -581,8 +588,6 @@ begin
 end;
 
 procedure TATScroll.DoUpdateThumbRect;
-const
-  cMinView = 10;
 var
   R: TRect;
 begin
@@ -592,24 +597,24 @@ begin
 
   if IsHorz then
   begin
-    if FRectMain.Width<cMinView then Exit;
+    if FRectMain.Width<FMinSizeToShowThumb then Exit;
     R.Top:= FRectMain.Top;
     R.Bottom:= FRectMain.Bottom;
     R.Left:= GetPxAtScroll(FPos);
-    R.Left:= Math.Min(R.Left, FRectMain.Right-cMinView);
+    R.Left:= Math.Min(R.Left, FRectMain.Right-FMinSizeOfThumb);
     R.Right:= GetPxAtScroll(FPos+FPageSize);
-    R.Right:= Math.Max(R.Right, R.Left+cMinView);
+    R.Right:= Math.Max(R.Right, R.Left+FMinSizeOfThumb);
     R.Right:= Math.Min(R.Right, FRectMain.Right);
   end
   else
   begin
-    if FRectMain.Height<cMinView then Exit;
+    if FRectMain.Height<FMinSizeToShowThumb then Exit;
     R.Left:= FRectMain.Left;
     R.Right:= FRectMain.Right;
     R.Top:= GetPxAtScroll(FPos);
-    R.Top:= Math.Min(R.Top, FRectMain.Bottom-cMinView);
+    R.Top:= Math.Min(R.Top, FRectMain.Bottom-FMinSizeOfThumb);
     R.Bottom:= GetPxAtScroll(FPos+FPageSize);
-    R.Bottom:= Math.Max(R.Bottom, R.Top+cMinView);
+    R.Bottom:= Math.Max(R.Bottom, R.Top+FMinSizeOfThumb);
     R.Bottom:= Math.Min(R.Bottom, FRectMain.Bottom);
   end;
   FRectThumb:= R;
@@ -647,8 +652,8 @@ const
 var
   P: TPoint;
 begin
-  C.Brush.Color:= ATScrollbarTheme.ColorThumbFill;
-  C.Pen.Color:= ATScrollbarTheme.ColorThumbBorder;
+  C.Brush.Color:= ColorToRGB(ATScrollbarTheme.ColorThumbFill);
+  C.Pen.Color:= ColorToRGB(ATScrollbarTheme.ColorThumbBorder);
   C.Rectangle(R);
 
   P:= CenterPoint(R);
@@ -786,21 +791,21 @@ end;
 procedure TATScroll.DoPaintStd_Corner(C: TCanvas; const R: TRect);
 begin
   if IsRectEmpty(R) then exit;
-  C.Brush.Color:= ATScrollbarTheme.ColorBG;
+  C.Brush.Color:= ColorToRGB(ATScrollbarTheme.ColorBG);
   C.FillRect(R);
 end;
 
 procedure TATScroll.DoPaintStd_Back(C: TCanvas; const R: TRect);
 begin
   if IsRectEmpty(R) then exit;
-  C.Brush.Color:= ATScrollbarTheme.ColorBG;
+  C.Brush.Color:= ColorToRGB(ATScrollbarTheme.ColorBG);
   C.FillRect(R);
 end;
 
 procedure TATScroll.DoPaintStd_BackScrolled(C: TCanvas; const R: TRect);
 begin
   if IsRectEmpty(R) then exit;
-  C.Brush.Color:= ATScrollbarTheme.ColorScrolled;
+  C.Brush.Color:= ColorToRGB(ATScrollbarTheme.ColorScrolled);
   C.FillRect(R);
 end;
 
