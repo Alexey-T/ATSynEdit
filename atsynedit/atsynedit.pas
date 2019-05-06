@@ -1556,7 +1556,7 @@ begin
   NX:= FRectMain.Left;
 
   if FOptRulerFontSize<>0 then
-    C.Font.Size:= FOptRulerFontSize;
+    C.Font.Size:= DoScale(FOptRulerFontSize);
   C.Font.Color:= Colors.RulerFont;
   C.Pen.Color:= Colors.RulerFont;
   C.Brush.Color:= Colors.RulerBG;
@@ -1591,9 +1591,9 @@ begin
     end;
 
     if NOutput mod 5 = 0 then
-      NSize:= FOptRulerMarkSizeBig
+      NSize:= DoScale(FOptRulerMarkSizeBig)
     else
-      NSize:= FOptRulerMarkSizeSmall;
+      NSize:= DoScale(FOptRulerMarkSizeSmall);
 
     C.Line(NX, FRectRuler.Bottom-1,
            NX, FRectRuler.Bottom-1-NSize);
@@ -2235,7 +2235,7 @@ begin
   Result.Left:= FRectGutter.Left;
   Result.Right:= FRectMain.Right;
   Result.Top:= 0;
-  Result.Bottom:= Result.Top+FOptRulerSize;
+  Result.Bottom:= Result.Top+DoScale(FOptRulerSize);
 end;
 
 procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
