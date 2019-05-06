@@ -2204,7 +2204,7 @@ function TATSynEdit.GetRectMicromap: TRect;
 begin
   if not FMicromapVisible then exit(cRectEmpty);
 
-  Result.Left:= ClientWidth-FMicromapWidth;
+  Result.Left:= ClientWidth-DoScale(FMicromapWidth);
   Result.Top:= 0;
   Result.Right:= ClientWidth;
   Result.Bottom:= ClientHeight;
