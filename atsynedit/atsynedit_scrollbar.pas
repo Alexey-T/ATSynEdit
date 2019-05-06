@@ -92,6 +92,7 @@ type
     FIndentArrow: Integer;
     FIndentArrLonger: Integer;
     FTimerDelay: Integer;
+    FScalePercents: integer;
 
     FPos,
     FMin,
@@ -133,6 +134,7 @@ type
     procedure DoPaintStd_BackScrolled(C: TCanvas; const R: TRect);
     procedure DoPaintStd_Arrow(C: TCanvas; R: TRect; Typ: TATScrollElemType);
     procedure DoPaintStd_Thumb(C: TCanvas; const R: TRect);
+    function DoScale(AValue: integer): integer;
 
     function IsHorz: boolean;
     function MouseToPos(X, Y: Integer): Integer;
@@ -159,10 +161,9 @@ type
     property Position: Integer read FPos write SetPos;
     property Min: Integer read FMin write SetMin;
     property Max: Integer read FMax write SetMax;
-    property LineSize: integer read FLineSize write FLineSize;
+    property LineSize: Integer read FLineSize write FLineSize;
     property PageSize: Integer read FPageSize write SetPageSize;
-    procedure AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy; const AFromPPI, AToPPI,
-      AOldFormWidth, ANewFormWidth: Integer); override;
+    property ScalePercents: Integer read FScalePercents write FScalePercents;
   protected
     procedure Paint; override;
     procedure Resize; override;
@@ -224,6 +225,7 @@ begin
   Width:= 200;
   Height:= 20;
 
+  FScalePercents:= 100;
   FKind:= sbHorizontal;
   FKindArrows:= asaArrowsNormal;
   FIndentBorder:= 1;
@@ -265,17 +267,9 @@ begin
   Result:= false;
 end;
 
-procedure TATScroll.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
-  const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer);
+function TATScroll.DoScale(AValue: integer): integer; inline;
 begin
-  //inherited; //dont call it to aviod scale twice
-
-  Width:= MulDiv(Width, AToPPI, AFromPPI);
-  Height:= MulDiv(Height, AToPPI, AFromPPI);
-
-  IndentArrow:= MulDiv(IndentArrow, AToPPI, AFromPPI);
-  IndentArrLonger:= MulDiv(IndentArrLonger, AToPPI, AFromPPI);
-  IndentCorner:= MulDiv(IndentCorner, AToPPI, AFromPPI);
+  Result:= AValue*FScalePercents div 100;
 end;
 
 procedure TATScroll.Paint;
@@ -308,13 +302,13 @@ begin
   C.Brush.Color:= ATScrollbarTheme.ColorBorder;
   C.FillRect(FRectMain);
 
-  InflateRect(FRectMain, -FIndentBorder, -FIndentBorder);
+  InflateRect(FRectMain, -DoScale(FIndentBorder), -DoScale(FIndentBorder));
 
   if IsHorz then
   begin
     //horz kind
     FSize:= Math.Min(FRectMain.Height, FRectMain.Width div 2);
-    Inc(FSize, FIndentArrLonger);
+    Inc(FSize, DoScale(FIndentArrLonger));
     case FKindArrows of
       asaArrowsNormal:
         begin
@@ -343,7 +337,7 @@ begin
   begin
     //vertical kind
     FSize:= Math.Min(FRectMain.Width, FRectMain.Height div 2);
-    Inc(FSize, FIndentArrLonger);
+    Inc(FSize, DoScale(FIndentArrLonger));
     case FKindArrows of
       asaArrowsNormal:
         begin
@@ -512,7 +506,7 @@ begin
   C.FillRect(R);
 
   P:= CenterPoint(R);
-  cc:= FIndentArrow;
+  cc:= DoScale(FIndentArrow);
 
   case Typ of
     aseArrowUp:
@@ -795,34 +789,37 @@ begin
 end;
 
 procedure TATScroll.DoUpdateCornerRect;
+var
+  Delta: integer;
 begin
   FRectCorner:= Rect(0, 0, 0, 0);
+  Delta:= DoScale(FIndentCorner);
   if IsHorz then
   begin
-    if FIndentCorner>0 then
+    if Delta>0 then
     begin
-      FRectCorner:= Rect(ClientWidth-FIndentCorner, 0, ClientWidth, ClientHeight);
-      Dec(FRectMain.Right, FIndentCorner);
+      FRectCorner:= Rect(ClientWidth-Delta, 0, ClientWidth, ClientHeight);
+      Dec(FRectMain.Right, Delta);
     end
     else
-    if FIndentCorner<0 then
+    if Delta<0 then
     begin
-      FRectCorner:= Rect(0, 0, Abs(FIndentCorner), ClientHeight);
-      Inc(FRectMain.Left, Abs(FIndentCorner));
+      FRectCorner:= Rect(0, 0, Abs(Delta), ClientHeight);
+      Inc(FRectMain.Left, Abs(Delta));
     end;
   end
   else
   begin
-    if FIndentCorner>0 then
+    if Delta>0 then
     begin
-      FRectCorner:= Rect(0, ClientHeight-FIndentCorner, ClientWidth, ClientHeight);
-      Dec(FRectMain.Bottom, FIndentCorner);
+      FRectCorner:= Rect(0, ClientHeight-Delta, ClientWidth, ClientHeight);
+      Dec(FRectMain.Bottom, Delta);
     end
     else
-    if FIndentCorner<0 then
+    if Delta<0 then
     begin
-      FRectCorner:= Rect(0, 0, ClientWidth, Abs(FIndentCorner));
-      Inc(FRectMain.Top, Abs(FIndentCorner));
+      FRectCorner:= Rect(0, 0, ClientWidth, Abs(Delta));
+      Inc(FRectMain.Top, Abs(Delta));
     end;
   end;
 end;

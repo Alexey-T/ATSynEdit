@@ -736,13 +736,14 @@ type
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
     procedure DoOnStringProgress(Sender: TObject);
-    function DoScale(N: integer): integer;
+    function DoScale(AValue: integer): integer;
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
     procedure DoSelectionDeleteColumnBlock;
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
+    procedure SetScalePercents(AValue: integer);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1049,8 +1050,6 @@ type
     function ClientWidth: integer;
     function ClientHeight: integer;
     procedure DragDrop(Source: TObject; X, Y: Integer); override;
-    procedure AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy; const AFromPPI, AToPPI,
-      AOldFormWidth, ANewFormWidth: Integer); override;
     //updates
     procedure Invalidate; override;
     procedure InvalidateHilitingCache;
@@ -1368,6 +1367,7 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
+    property OptScalePercents: integer read FScalePercents write SetScalePercents default 100;
     property OptScrollSmooth: boolean read FOptScrollSmooth write FOptScrollSmooth default true;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
@@ -6624,27 +6624,10 @@ begin
       //it clears ModifiedRecent
 end;
 
-function TATSynEdit.DoScale(N: integer): integer;
+function TATSynEdit.DoScale(AValue: integer): integer; inline;
 begin
-  Result:= MulDiv(N, FScalePercents, 100);
+  Result:= AValue * FScalePercents div 100;
 end;
-
-procedure TATSynEdit.AutoAdjustLayout(AMode: TLayoutAdjustmentPolicy;
-  const AFromPPI, AToPPI, AOldFormWidth, ANewFormWidth: Integer);
-begin
-  inherited;
-
-  FScalePercents:= MulDiv(100, AToPPI, AFromPPI);
-
-  FGutter[FGutterBandBm].Size:= DoScale(cGutterSizeBm);
-  FGutter[FGutterBandNum].Size:= DoScale(cGutterSizeNum);
-  FGutter[FGutterBandState].Size:= DoScale(cGutterSizeState);
-  FGutter[FGutterBandFold].Size:= DoScale(cGutterSizeFold);
-  FGutter[FGutterBandSep].Size:= DoScale(cGutterSizeSep);
-  FGutter[FGutterBandEmpty].Size:= DoScale(cGutterSizeEmpty);
-  FGutter.Update;
-end;
-
 
 procedure TATSynEdit.TimerIdleTick(Sender: TObject);
 begin
@@ -6992,6 +6975,22 @@ begin
            if AName='ANSI' then
              Str.EncodingCodepage:= {$ifdef windows} LConvEncoding.GetDefaultTextEncoding {$else} 'cp1252' {$endif};
          end;
+end;
+
+
+procedure TATSynEdit.SetScalePercents(AValue: integer);
+begin
+  if FScalePercents=AValue then Exit;
+  FScalePercents:= AValue;
+
+  FScrollbarHorz.ScalePercents:= AValue;
+  FScrollbarVert.ScalePercents:= AValue;
+
+  FScrollbarVert.Width:= DoScale(cEditorScrollbarWidth);
+  FScrollbarVert.Invalidate;
+
+  FScrollbarHorz.Height:= DoScale(cEditorScrollbarWidth);
+  FScrollbarHorz.Invalidate;
 end;
 
 
