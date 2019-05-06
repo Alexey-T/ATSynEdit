@@ -3220,6 +3220,7 @@ begin
   FScrollbarVert.Kind:= sbVertical;
   FScrollbarVert.Cursor:= crArrow;
   FScrollbarVert.Width:= cEditorScrollbarWidth;
+  FScrollbarVert.WidthInitial:= cEditorScrollbarWidth;
   FScrollbarVert.IndentBorder:= cEditorScrollbarBorderSize;
   FScrollbarVert.OnChange:= @OnNewScrollbarVertChanged;
 
@@ -3230,6 +3231,7 @@ begin
   FScrollbarHorz.Kind:= sbHorizontal;
   FScrollbarHorz.Cursor:= crArrow;
   FScrollbarHorz.Height:= cEditorScrollbarWidth;
+  FScrollbarHorz.WidthInitial:= cEditorScrollbarWidth;
   FScrollbarHorz.IndentCorner:= cEditorScrollbarWidth;
   FScrollbarHorz.IndentBorder:= cEditorScrollbarBorderSize;
   FScrollbarHorz.OnChange:= @OnNewScrollbarHorzChanged;
@@ -6982,15 +6984,8 @@ procedure TATSynEdit.SetScalePercents(AValue: integer);
 begin
   if FScalePercents=AValue then Exit;
   FScalePercents:= AValue;
-
   FScrollbarHorz.ScalePercents:= AValue;
   FScrollbarVert.ScalePercents:= AValue;
-
-  FScrollbarVert.Width:= DoScale(cEditorScrollbarWidth);
-  FScrollbarVert.Invalidate;
-
-  FScrollbarHorz.Height:= DoScale(cEditorScrollbarWidth);
-  FScrollbarHorz.Invalidate;
 end;
 
 

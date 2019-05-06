@@ -92,7 +92,8 @@ type
     FIndentArrow: Integer;
     FIndentArrLonger: Integer;
     FTimerDelay: Integer;
-    FScalePercents: integer;
+    FScalePercents: Integer;
+    FWidthInitial: Integer;
 
     FPos,
     FMin,
@@ -143,6 +144,7 @@ type
     procedure DoUpdatePosOnDrag(X, Y: Integer);
     procedure DoScrollBy(NDelta: Integer);
     function GetPxAtScroll(APos: Integer): Integer;
+    procedure SetScalePercents(AValue: Integer);
 
     procedure TimerTimer(Sender: TObject);
     procedure SetKind(AValue: TScrollBarKind);
@@ -163,7 +165,9 @@ type
     property Max: Integer read FMax write SetMax;
     property LineSize: Integer read FLineSize write FLineSize;
     property PageSize: Integer read FPageSize write SetPageSize;
-    property ScalePercents: Integer read FScalePercents write FScalePercents;
+
+    property WidthInitial: Integer read FWidthInitial write FWidthInitial;
+    property ScalePercents: Integer read FScalePercents write SetScalePercents;
   protected
     procedure Paint; override;
     procedure Resize; override;
@@ -562,6 +566,18 @@ begin
     NLen:= FRectMain.Height;
   end;
   Result:= N0 + (APos-FMin) * NLen div Math.Max(1, FMax-FMin);
+end;
+
+procedure TATScroll.SetScalePercents(AValue: Integer);
+begin
+  if FScalePercents=AValue then Exit;
+  FScalePercents:= AValue;
+
+  //usually controls don't scale Width/Height, but it's handy for scrollbars
+  if IsHorz then
+    Height:= DoScale(FWidthInitial)
+  else
+    Width:= DoScale(FWidthInitial);
 end;
 
 procedure TATScroll.DoUpdateThumbRect;
