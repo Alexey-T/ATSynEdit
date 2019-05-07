@@ -1635,8 +1635,10 @@ begin
 
   if FMinimapCharWidth=0 then
   begin
-    FMinimapWidth:= (ClientWidth - IfThen(FMicromapVisible, FRectMicromap.Width) - FTextOffset.X)
-      * CharSmall div (CharSmall+CharBig);
+    FMinimapWidth:= ClientWidth-FTextOffset.X;
+    if FMicromapVisible then
+      Dec(FMinimapWidth, EditorScale(FMicromapWidth));
+    FMinimapWidth:= FMinimapWidth * CharSmall div (CharSmall+CharBig);
   end
   else
     FMinimapWidth:= CharSmall*FMinimapCharWidth;
