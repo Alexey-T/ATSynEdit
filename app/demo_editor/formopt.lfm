@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 628
-    ActivePage = TabSheet1
+    ActivePage = TabSheet2
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -226,47 +226,48 @@ object fmOpt: TfmOpt
       end
     end
     object TabSheet2: TTabSheet
-      Caption = 'gutter'
+      Caption = 'gutter/ruler'
       ClientHeight = 312
       ClientWidth = 624
       object edRulerSize: TSpinEdit
-        Left = 296
-        Height = 23
+        Left = 288
+        Height = 27
         Top = 8
-        Width = 50
-        MaxValue = 80
-        MinValue = 4
+        Width = 58
+        MaxValue = 900
+        MinValue = 10
         TabOrder = 8
-        Value = 4
+        Value = 10
       end
       object edRulerFSize: TSpinEdit
-        Left = 296
-        Height = 23
+        Left = 288
+        Height = 27
         Top = 36
-        Width = 50
-        MaxValue = 40
+        Width = 58
+        MaxValue = 900
+        MinValue = 10
         TabOrder = 9
-        Value = 4
+        Value = 10
       end
       object Label2: TLabel
         Left = 352
-        Height = 15
+        Height = 17
         Top = 12
-        Width = 46
-        Caption = 'ruler size'
+        Width = 108
+        Caption = 'ruler height in %'
         ParentColor = False
       end
       object Label10: TLabel
         Left = 136
-        Height = 15
+        Height = 17
         Top = 12
-        Width = 52
+        Width = 64
         Caption = 'num style'
         ParentColor = False
       end
       object edNumStyle: TComboBox
         Left = 8
-        Height = 23
+        Height = 27
         Top = 8
         Width = 122
         ItemHeight = 0
@@ -281,114 +282,114 @@ object fmOpt: TfmOpt
       end
       object chkShowNumBg: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 108
-        Width = 177
+        Width = 221
         Caption = 'show num bg-color for carets'
         TabOrder = 4
       end
       object chkShowNum1st: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 68
-        Width = 151
+        Width = 191
         Caption = 'show number for 1st line'
         TabOrder = 2
       end
       object chkShowNumCr: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 88
-        Width = 150
+        Width = 192
         Caption = 'show numbers for carets'
         TabOrder = 3
       end
       object edNumSize: TSpinEdit
-        Left = 296
-        Height = 23
+        Left = 288
+        Height = 27
         Top = 92
-        Width = 50
+        Width = 58
         MaxValue = 40
         TabOrder = 11
         Value = 5
       end
       object Label1: TLabel
         Left = 352
-        Height = 15
+        Height = 17
         Top = 96
-        Width = 142
-        Caption = 'numbers font size (if not 0)'
+        Width = 156
+        Caption = 'numbers font size, if >0'
         ParentColor = False
         WordWrap = True
       end
       object Label12: TLabel
         Left = 352
-        Height = 15
+        Height = 17
         Top = 40
-        Width = 119
-        Caption = 'ruler font size (if not 0)'
+        Width = 124
+        Caption = 'ruler font size in %'
         ParentColor = False
         WordWrap = True
       end
       object edNumChar: TEdit
-        Left = 296
-        Height = 23
+        Left = 288
+        Height = 27
         Top = 148
-        Width = 50
+        Width = 58
         TabOrder = 13
       end
       object Label13: TLabel
         Left = 352
-        Height = 15
+        Height = 17
         Top = 152
-        Width = 105
+        Width = 131
         Caption = 'char if num skipped'
         ParentColor = False
       end
       object edPlusSize: TSpinEdit
-        Left = 296
-        Height = 23
+        Left = 288
+        Height = 27
         Top = 120
-        Width = 50
+        Width = 58
         MaxValue = 40
         TabOrder = 12
         Value = 5
       end
       object Label14: TLabel
         Left = 352
-        Height = 15
+        Height = 17
         Top = 124
-        Width = 100
+        Width = 127
         Caption = 'fold plus-mark size'
         ParentColor = False
       end
       object chkShowFoldAlways: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 128
-        Width = 132
+        Width = 167
         Caption = 'show fold-bar always'
         TabOrder = 5
       end
       object chkShowFoldLines: TCheckBox
         Left = 8
-        Height = 19
+        Height = 24
         Top = 148
-        Width = 101
+        Width = 127
         Caption = 'show fold-lines'
         TabOrder = 6
       end
       object chkShowFoldLinesAll: TCheckBox
         Left = 24
-        Height = 19
+        Height = 24
         Top = 168
-        Width = 83
+        Width = 108
         Caption = 'all line parts'
         TabOrder = 7
       end
       object edNumAlign: TComboBox
         Left = 8
-        Height = 23
+        Height = 27
         Top = 36
         Width = 122
         ItemHeight = 0
@@ -402,17 +403,17 @@ object fmOpt: TfmOpt
       end
       object Label15: TLabel
         Left = 136
-        Height = 15
+        Height = 17
         Top = 40
-        Width = 82
+        Width = 99
         Caption = 'num alignment'
         ParentColor = False
       end
       object edRulerIndent: TSpinEdit
-        Left = 296
-        Height = 23
+        Left = 288
+        Height = 27
         Top = 64
-        Width = 50
+        Width = 58
         MaxValue = 20
         MinValue = -10
         TabOrder = 10
@@ -420,9 +421,9 @@ object fmOpt: TfmOpt
       end
       object Label19: TLabel
         Left = 352
-        Height = 15
+        Height = 17
         Top = 68
-        Width = 106
+        Width = 139
         Caption = 'ruler text vert indent'
         ParentColor = False
         WordWrap = True

@@ -262,8 +262,8 @@ begin
     chkShowFoldAlways.Checked:= ed.OptGutterShowFoldAlways;
     chkShowFoldLines.Checked:= ed.OptGutterShowFoldLines;
     chkShowFoldLinesAll.Checked:= ed.OptGutterShowFoldLinesAll;
-    edRulerSize.Value:= ed.OptRulerSize;
-    edRulerFSize.Value:= ed.OptRulerFontSize;
+    edRulerSize.Value:= ed.OptRulerHeightPercents;
+    edRulerFSize.Value:= ed.OptRulerFontSizePercents;
     edRulerIndent.Value:= ed.OptRulerTextIndent;
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
@@ -388,8 +388,8 @@ begin
       ed.OptGutterShowFoldLinesAll:= chkShowFoldLinesAll.Checked;
       ed.OptGutterPlusSize:= edPlusSize.Value;
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
-      ed.OptRulerSize:= edRulerSize.Value;
-      ed.OptRulerFontSize:= edRulerFSize.Value;
+      ed.OptRulerHeightPercents:= edRulerSize.Value;
+      ed.OptRulerFontSizePercents:= edRulerFSize.Value;
       ed.OptRulerTextIndent:= edRulerIndent.Value;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
