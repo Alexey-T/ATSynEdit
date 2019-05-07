@@ -10,7 +10,7 @@ uses
   ATStringProc,
   ATSynEdit,
   ATSynEdit_CanvasProc,
-  ATSynEdit_CharSizer;
+  ATSynEdit_CharSizer, Types;
 
 type
   { TfmOpt }
@@ -19,6 +19,8 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkUndoGr: TCheckBox;
+    chkUndoSv: TCheckBox;
     chkUnprintOnlyBothEnds: TCheckBox;
     chkUnprintOnlyEnd: TCheckBox;
     chkSaveTrimEmptyLines: TCheckBox;
@@ -61,8 +63,6 @@ type
     chkMapSelAlways: TCheckBox;
     chkShowNumBg: TCheckBox;
     chkTabSpaces: TCheckBox;
-    chkUndoSv: TCheckBox;
-    chkUndoGr: TCheckBox;
     chkCutNoSel: TCheckBox;
     chkDotLn: TCheckBox;
     chkMsClickNumSel: TCheckBox;
@@ -101,6 +101,7 @@ type
     edIndentKind: TComboBox;
     edCrTime: TSpinEdit;
     edSizeSep: TSpinEdit;
+    edUndo: TSpinEdit;
     edWordChars: TEdit;
     edIndentSize: TSpinEdit;
     edPlusSize: TSpinEdit;
@@ -118,6 +119,7 @@ type
     edTextHint: TEdit;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
+    GroupBox3: TGroupBox;
     groupIndent: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
@@ -145,7 +147,6 @@ type
     LabelHint: TLabel;
     ListCol: TListBox;
     PageControl1: TPageControl;
-    edUndo: TSpinEdit;
     edCrWidthNormal: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet10: TTabSheet;
@@ -153,7 +154,6 @@ type
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
-    TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TabSheet8: TTabSheet;
     TabSheet9: TTabSheet;
@@ -161,6 +161,8 @@ type
     procedure bColUpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
   private
     { private declarations }
   public
@@ -465,6 +467,12 @@ end;
 procedure TfmOpt.FormShow(Sender: TObject);
 begin
   PageControl1.ActivePageIndex:= 0;
+end;
+
+procedure TfmOpt.TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+
 end;
 
 procedure SwapItems(L: TListbox; n1, n2: integer);
