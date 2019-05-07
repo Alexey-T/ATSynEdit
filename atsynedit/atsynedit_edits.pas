@@ -155,8 +155,8 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapWidth:= MulDiv(22, Screen.PixelsPerInch, 96);
-  OptComboboxArrowSize:= MulDiv(2, Screen.PixelsPerInch, 96);
+  OptMicromapWidth:= 22;
+  OptComboboxArrowSize:= 2;
 
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
