@@ -1,4 +1,9 @@
 
+2019.05.07
++ add: global variables EditorScale, EditorScaleFont (in percents)
++ add: property OptRulerFontSizePercents
+* deleted: property OptRulerFontSize
+
 2019.04.30
 + add: property Strings.UndoEmpty
 + add: property Strings.RedoEmpty
