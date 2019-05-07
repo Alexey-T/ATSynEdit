@@ -531,6 +531,7 @@ type
     FGutterBandDecor: integer;
     FColors: TATSynEditColors;
     FRulerHeight: integer;
+    FNumbersIndent: integer;
     FRectMain,
     FRectMainVisible,
     FRectMinimap,
@@ -1618,8 +1619,7 @@ var
 begin
   Str:= IntToStr(Max(10, Strings.Count));
   FGutter[FGutterBandNum].Size:=
-    Length(Str)*FCharSize.X+
-    2*FOptNumbersIndentPercents*FCharSize.X div 100;
+    Length(Str)*FCharSize.X + 2*FNumbersIndent;
   FGutter.Update;
 end;
 
@@ -2255,15 +2255,17 @@ begin
 
   C.Font.Name:= Font.Name;
   C.Font.Size:= EditorScaleFont(Font.Size);
+
   FCharSize:= GetCharSize(C, FCharSpacingText);
+  FNumbersIndent:= FCharSize.X * FOptNumbersIndentPercents div 100;
+  FMicromapWidth:= FCharSize.X * FMicromapWidthPercents div 100;
+  FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
 
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize(C);
   if FMinimapVisible then
     UpdateMinimapAutosize;
 
-  FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
-  FMicromapWidth:= FCharSize.X * FMicromapWidthPercents div 100;
   FTextOffset:= GetTextOffset; //after gutter autosize
   GetRectMicromap(FRectMicromap);
   GetRectMinimap(FRectMinimap); //after micromap
@@ -5474,9 +5476,9 @@ begin
 
   case FOptNumbersAlignment of
     taLeftJustify:
-      CoordX:= ABand.Left + FOptNumbersIndentPercents*FCharSize.X div 100;
+      CoordX:= ABand.Left + FNumbersIndent;
     taRightJustify:
-      CoordX:= ABand.Right - Size - FOptNumbersIndentPercents*FCharSize.X div 100;
+      CoordX:= ABand.Right - Size - FNumbersIndent;
     taCenter:
       CoordX:= (ABand.Left + ABand.Right - Size) div 2;
   end;
