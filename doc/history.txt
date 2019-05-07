@@ -4,9 +4,11 @@
 + add: property OptRulerHeightPercents
 + add: property OptRulerFontSizePercents
 + add: property OptMicromapWidthPercents
++ add: property OptNumbersIndentPercents
 * deleted: OptRulerSize
 * deleted: OptRulerFontSize
 * deleted: OptMicromapWidth
+* deleted: OptNumbersIndentLeft, OptNumbersIndentRight
 * deleted: OptNumbersFontSize
 
 2019.04.30

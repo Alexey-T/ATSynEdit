@@ -259,6 +259,7 @@ const
   cInitMicromapWidthPercents = 150;
   cInitMinimapWidth = 160;
   cInitNumbersStyle = cNumbersEach5th;
+  cInitNumbersIndentPercents = 60;
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
@@ -639,8 +640,7 @@ type
     FOptNumbersShowFirst: boolean;
     FOptNumbersShowCarets: boolean;
     FOptNumbersSkippedChar: string;
-    FOptNumbersIndentLeft: integer;
-    FOptNumbersIndentRight: integer;
+    FOptNumbersIndentPercents: integer;
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
@@ -906,7 +906,6 @@ type
     procedure GetRectGutter(var R: TRect);
     procedure GetRectRuler(var R: TRect);
     function GetTextOffset: TPoint;
-    function GetGutterNumbersWidth(C: TCanvas): integer;
     function GetPageLines: integer;
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
@@ -1449,8 +1448,7 @@ type
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst default true;
     property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets default false;
     property OptNumbersSkippedChar: string read FOptNumbersSkippedChar write FOptNumbersSkippedChar;
-    property OptNumbersIndentLeft: integer read FOptNumbersIndentLeft write FOptNumbersIndentLeft default 5;
-    property OptNumbersIndentRight: integer read FOptNumbersIndentRight write FOptNumbersIndentRight default 5;
+    property OptNumbersIndentPercents: integer read FOptNumbersIndentPercents write FOptNumbersIndentPercents default cInitNumbersIndentPercents;
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible default true;
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces default true;
     property OptUnprintedSpacesTrailing: boolean read FUnprintedSpacesTrailing write FUnprintedSpacesTrailing default false;
@@ -1615,8 +1613,13 @@ begin
 end;
 
 procedure TATSynEdit.UpdateGutterAutosize(C: TCanvas);
+var
+  Str: string;
 begin
-  FGutter[FGutterBandNum].Size:= GetGutterNumbersWidth(C);
+  Str:= IntToStr(Max(10, Strings.Count));
+  FGutter[FGutterBandNum].Size:=
+    Length(Str)*FCharSize.X+
+    2*FOptNumbersIndentPercents*FCharSize.X div 100;
   FGutter.Update;
 end;
 
@@ -3385,8 +3388,7 @@ begin
   FOptNumbersShowFirst:= true;
   FOptNumbersShowCarets:= false;
   FOptNumbersSkippedChar:= '.';
-  FOptNumbersIndentLeft:= 5;
-  FOptNumbersIndentRight:= 5;
+  FOptNumbersIndentPercents:= cInitNumbersIndentPercents;
 
   FOptBorderWidth:= 0;
   FOptBorderWidthFocused:= 0;
@@ -3890,21 +3892,6 @@ begin
   Result.Y:= OptTextOffsetTop;
   if FOptRulerVisible then
     Inc(Result.Y, FRulerHeight);
-end;
-
-function TATSynEdit.GetGutterNumbersWidth(C: TCanvas): integer;
-var
-  Str: string;
-  CharSize: integer;
-begin
-  C.Font.Size:= EditorScaleFont(Font.Size);
-  CharSize:= C.TextWidth('0');
-
-  Str:= IntToStr(Max(10, Strings.Count));
-  Result:=
-    Length(Str)*CharSize+
-    FOptNumbersIndentLeft+
-    FOptNumbersIndentRight;
 end;
 
 function TATSynEdit.GetPageLines: integer;
@@ -5487,9 +5474,9 @@ begin
 
   case FOptNumbersAlignment of
     taLeftJustify:
-      CoordX:= ABand.Left + FOptNumbersIndentLeft;
+      CoordX:= ABand.Left + FOptNumbersIndentPercents*FCharSize.X div 100;
     taRightJustify:
-      CoordX:= ABand.Right - Size - FOptNumbersIndentRight;
+      CoordX:= ABand.Right - Size - FOptNumbersIndentPercents*FCharSize.X div 100;
     taCenter:
       CoordX:= (ABand.Left + ABand.Right - Size) div 2;
   end;
