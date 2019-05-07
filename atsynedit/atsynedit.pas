@@ -628,7 +628,7 @@ type
     FOptRulerMarkSizeCaret: integer;
     FOptRulerMarkSizeSmall: integer;
     FOptRulerMarkSizeBig: integer;
-    FOptRulerTextIndent: integer;
+    FOptRulerTopIndentPercents: integer;
     FOptGutterVisible: boolean;
     FOptGutterPlusSize: integer;
     FOptGutterShowFoldAlways: boolean;
@@ -1423,7 +1423,7 @@ type
     property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cSizeRulerMarkCaret;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cSizeRulerMarkBig;
-    property OptRulerTextIndent: integer read FOptRulerTextIndent write FOptRulerTextIndent default 0;
+    property OptRulerTopIndentPercents: integer read FOptRulerTopIndentPercents write FOptRulerTopIndentPercents default 0;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible default cInitMinimapVisible;
     property OptMinimapCharWidth: integer read FMinimapCharWidth write FMinimapCharWidth default 0;
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder default false;
@@ -1546,12 +1546,14 @@ uses
 
 procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
 var
-  NX, NSize, NPrevFontSize, NRulerStart, NOutput, i: integer;
+  NX, NSize, NPrevFontSize, NRulerStart, NOutput,
+  NTopIndent, i: integer;
   Str: string;
 begin
   NPrevFontSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
   NX:= FRectMain.Left;
+  NTopIndent:= FOptRulerTopIndentPercents*FCharSize.Y div 100;
 
   C.Font.Name:= Font.Name;
   C.Font.Size:= EditorScaleFont(Font.Size) * FOptRulerFontSizePercents div 100;
@@ -1574,7 +1576,7 @@ begin
           begin
             Str:= IntToStr(NOutput +
                   IfThen(FOptRulerNumeration=cRulerNumeration_1_11_21, 1));
-            C.TextOut(NX - C.TextWidth(Str) div 2, FOptRulerTextIndent, Str);
+            C.TextOut(NX - C.TextWidth(Str) div 2, NTopIndent, Str);
           end;
         end;
       cRulerNumeration_1_10_20:
@@ -1583,7 +1585,7 @@ begin
           if (NOutput=1) or (NOutput mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput);
-            C.TextOut(NX - C.TextWidth(Str) div 2, FOptRulerTextIndent, Str);
+            C.TextOut(NX - C.TextWidth(Str) div 2, NTopIndent, Str);
           end;
         end;
     end;
@@ -3403,7 +3405,7 @@ begin
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
   FOptRulerFontSizePercents:= 80;
-  FOptRulerTextIndent:= 0;
+  FOptRulerTopIndentPercents:= 0;
 
   FMinimapWidth:= cInitMinimapWidth;
   FMinimapCharWidth:= 0;

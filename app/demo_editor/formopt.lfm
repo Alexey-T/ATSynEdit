@@ -304,27 +304,6 @@ object fmOpt: TfmOpt
         Caption = 'show numbers for carets'
         TabOrder = 3
       end
-      object edNumSize: TSpinEdit
-        Left = 288
-        Height = 27
-        Top = 92
-        Width = 58
-        Enabled = False
-        MaxValue = 900
-        MinValue = 10
-        TabOrder = 11
-        Value = 10
-      end
-      object Label1: TLabel
-        Left = 352
-        Height = 17
-        Top = 96
-        Width = 151
-        Caption = 'numbers font size in %'
-        Enabled = False
-        ParentColor = False
-        WordWrap = True
-      end
       object Label12: TLabel
         Left = 352
         Height = 17
@@ -337,14 +316,14 @@ object fmOpt: TfmOpt
       object edNumChar: TEdit
         Left = 288
         Height = 27
-        Top = 148
+        Top = 128
         Width = 58
-        TabOrder = 13
+        TabOrder = 12
       end
       object Label13: TLabel
         Left = 352
         Height = 17
-        Top = 152
+        Top = 135
         Width = 262
         Caption = 'char to show when line number skipped'
         ParentColor = False
@@ -352,16 +331,16 @@ object fmOpt: TfmOpt
       object edPlusSize: TSpinEdit
         Left = 288
         Height = 27
-        Top = 120
+        Top = 96
         Width = 58
         MaxValue = 40
-        TabOrder = 12
+        TabOrder = 11
         Value = 5
       end
       object Label14: TLabel
         Left = 352
         Height = 17
-        Top = 124
+        Top = 104
         Width = 147
         Caption = 'folding plus-mark size'
         ParentColor = False
@@ -417,8 +396,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 64
         Width = 58
-        MaxValue = 20
-        MinValue = -10
+        MaxValue = 500
         TabOrder = 10
         Value = 4
       end
@@ -426,8 +404,8 @@ object fmOpt: TfmOpt
         Left = 352
         Height = 17
         Top = 68
-        Width = 139
-        Caption = 'ruler text vert indent'
+        Width = 136
+        Caption = 'ruler top indent in %'
         ParentColor = False
         WordWrap = True
       end
@@ -447,39 +425,39 @@ object fmOpt: TfmOpt
         TabOrder = 0
         object chkGutterBm: TCheckBox
           Left = 8
-          Height = 19
+          Height = 24
           Top = 0
-          Width = 64
+          Width = 82
           Caption = 'bookmk'
           TabOrder = 0
         end
         object chkGutterNum: TCheckBox
           Left = 8
-          Height = 19
+          Height = 24
           Top = 28
-          Width = 50
+          Width = 62
           Caption = 'nums'
           TabOrder = 1
         end
         object chkGutterStat: TCheckBox
           Left = 8
-          Height = 19
+          Height = 24
           Top = 112
-          Width = 50
+          Width = 68
           Caption = 'states'
           TabOrder = 3
         end
         object chkGutterEmpty: TCheckBox
           Left = 8
-          Height = 19
+          Height = 24
           Top = 196
-          Width = 54
+          Width = 69
           Caption = 'empty'
           TabOrder = 6
         end
         object edSizeBm: TSpinEdit
           Left = 112
-          Height = 23
+          Height = 27
           Top = 0
           Width = 50
           MinValue = 1
@@ -488,60 +466,50 @@ object fmOpt: TfmOpt
         end
         object edSizeState: TSpinEdit
           Left = 112
-          Height = 23
+          Height = 27
           Top = 112
-          Width = 50
-          MinValue = 1
-          TabOrder = 11
-          Value = 1
-        end
-        object edSizeEmpty: TSpinEdit
-          Left = 112
-          Height = 23
-          Top = 196
-          Width = 50
-          MinValue = 1
-          TabOrder = 14
-          Value = 1
-        end
-        object chkGutterFold: TCheckBox
-          Left = 8
-          Height = 19
-          Top = 140
-          Width = 41
-          Caption = 'fold'
-          TabOrder = 4
-        end
-        object edSizeFold: TSpinEdit
-          Left = 112
-          Height = 23
-          Top = 140
-          Width = 50
-          MinValue = 1
-          TabOrder = 12
-          Value = 1
-        end
-        object edSizeNum1: TSpinEdit
-          Left = 112
-          Height = 23
-          Top = 28
-          Width = 50
-          MinValue = 1
-          TabOrder = 8
-          Value = 1
-        end
-        object edSizeNum2: TSpinEdit
-          Left = 112
-          Height = 23
-          Top = 84
           Width = 50
           MinValue = 1
           TabOrder = 10
           Value = 1
         end
+        object edSizeEmpty: TSpinEdit
+          Left = 112
+          Height = 27
+          Top = 196
+          Width = 50
+          MinValue = 1
+          TabOrder = 13
+          Value = 1
+        end
+        object chkGutterFold: TCheckBox
+          Left = 8
+          Height = 24
+          Top = 140
+          Width = 54
+          Caption = 'fold'
+          TabOrder = 4
+        end
+        object edSizeFold: TSpinEdit
+          Left = 112
+          Height = 27
+          Top = 140
+          Width = 50
+          MinValue = 1
+          TabOrder = 11
+          Value = 1
+        end
+        object edSizeNumIndent: TSpinEdit
+          Left = 112
+          Height = 27
+          Top = 28
+          Width = 50
+          MaxValue = 500
+          TabOrder = 8
+        end
         object edSizeNum: TSpinEdit
           Left = 112
-          Height = 23
+          Height = 27
           Top = 56
           Width = 50
           MinValue = 1
@@ -550,51 +518,43 @@ object fmOpt: TfmOpt
         end
         object Label16: TLabel
           Left = 168
-          Height = 15
+          Height = 17
           Top = 32
-          Width = 54
-          Caption = 'indent left'
+          Width = 74
+          Caption = 'indent in %'
           ParentColor = False
         end
         object Label17: TLabel
           Left = 167
-          Height = 15
+          Height = 17
           Top = 59
-          Width = 58
+          Width = 70
           Caption = 'num width'
-          ParentColor = False
-        end
-        object Label18: TLabel
-          Left = 167
-          Height = 15
-          Top = 88
-          Width = 62
-          Caption = 'indent right'
           ParentColor = False
         end
         object chkGutterNumAuto: TCheckBox
           Left = 24
-          Height = 19
+          Height = 24
           Top = 58
-          Width = 63
+          Width = 83
           Caption = 'autosize'
           TabOrder = 2
         end
         object chkGutterSep: TCheckBox
           Left = 8
-          Height = 19
+          Height = 24
           Top = 168
-          Width = 69
+          Width = 93
           Caption = 'separator'
           TabOrder = 5
         end
         object edSizeSep: TSpinEdit
           Left = 112
-          Height = 23
+          Height = 27
           Top = 168
           Width = 50
           MinValue = 1
-          TabOrder = 13
+          TabOrder = 12
           Value = 1
         end
       end
@@ -613,7 +573,7 @@ object fmOpt: TfmOpt
           Top = 0
           Width = 98
           ItemHeight = 0
-          ScrollWidth = 94
+          ScrollWidth = 96
           TabOrder = 0
           TopIndex = -1
         end

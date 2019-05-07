@@ -109,8 +109,7 @@ type
     edSizeBm: TSpinEdit;
     edSizeEmpty: TSpinEdit;
     edSizeFold: TSpinEdit;
-    edSizeNum1: TSpinEdit;
-    edSizeNum2: TSpinEdit;
+    edSizeNumIndent: TSpinEdit;
     edSizeNum: TSpinEdit;
     edSizeState: TSpinEdit;
     edTabArrowSize: TSpinEdit;
@@ -120,7 +119,6 @@ type
     GroupBox2: TGroupBox;
     groupIndent: TGroupBox;
     LabChars: TLabel;
-    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
@@ -129,7 +127,6 @@ type
     Label15: TLabel;
     Label16: TLabel;
     Label17: TLabel;
-    Label18: TLabel;
     Label19: TLabel;
     Label2: TLabel;
     Label20: TLabel;
@@ -147,7 +144,6 @@ type
     ListCol: TListBox;
     PageControl1: TPageControl;
     edUndo: TSpinEdit;
-    edNumSize: TSpinEdit;
     edCrWidthNormal: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
@@ -264,7 +260,7 @@ begin
     chkShowFoldLinesAll.Checked:= ed.OptGutterShowFoldLinesAll;
     edRulerSize.Value:= ed.OptRulerHeightPercents;
     edRulerFSize.Value:= ed.OptRulerFontSizePercents;
-    edRulerIndent.Value:= ed.OptRulerTextIndent;
+    edRulerIndent.Value:= ed.OptRulerTopIndentPercents;
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
@@ -278,8 +274,7 @@ begin
     edSizeSep.Value:= ed.Gutter[ed.GutterBandSep].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
     edSizeNum.Value:= ed.Gutter[ed.GutterBandNum].Size;
-    edSizeNum1.Value:= ed.OptNumbersIndentLeft;
-    edSizeNum2.Value:= ed.OptNumbersIndentRight;
+    edSizeNumIndent.Value:= ed.OptNumbersIndentPercents;
     chkGutterNumAuto.Checked:= ed.OptNumbersAutosize;
 
     //minimap
@@ -390,7 +385,7 @@ begin
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
       ed.OptRulerHeightPercents:= edRulerSize.Value;
       ed.OptRulerFontSizePercents:= edRulerFSize.Value;
-      ed.OptRulerTextIndent:= edRulerIndent.Value;
+      ed.OptRulerTopIndentPercents:= edRulerIndent.Value;
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
@@ -405,8 +400,7 @@ begin
       ed.Gutter[ed.GutterBandSep].Size:= edSizeSep.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
       ed.OptNumbersAutosize:= chkGutterNumAuto.Checked;
-      ed.OptNumbersIndentLeft:= edSizeNum1.Value;
-      ed.OptNumbersIndentRight:= edSizeNum2.Value;
+      ed.OptNumbersIndentPercents:= edSizeNumIndent.Value;
 
       //minimap
       ed.OptMinimapCharWidth:= edMapCharWidth.Value;
