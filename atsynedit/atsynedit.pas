@@ -620,7 +620,7 @@ type
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATRulerNumeration;
     FOptRulerSize: integer;
-    FOptRulerFontSize: integer;
+    FOptRulerFontSizePercents: integer;
     FOptRulerMarkSizeCaret: integer;
     FOptRulerMarkSizeSmall: integer;
     FOptRulerMarkSizeBig: integer;
@@ -1417,7 +1417,7 @@ type
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cRulerNumeration_0_10_20;
     property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
-    property OptRulerFontSize: integer read FOptRulerFontSize write FOptRulerFontSize default 8;
+    property OptRulerFontSizePercents: integer read FOptRulerFontSizePercents write FOptRulerFontSizePercents default 80;
     property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cSizeRulerMarkCaret;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cSizeRulerMarkBig;
@@ -1553,8 +1553,8 @@ begin
   NRulerStart:= FScrollHorz.NPos;
   NX:= FRectMain.Left;
 
-  if FOptRulerFontSize<>0 then
-    C.Font.Size:= EditorScaleFont(FOptRulerFontSize);
+  C.Font.Name:= Font.Name;
+  C.Font.Size:= EditorScaleFont(Font.Size) * FOptRulerFontSizePercents div 100;
   C.Font.Color:= Colors.RulerFont;
   C.Pen.Color:= Colors.RulerFont;
   C.Brush.Color:= Colors.RulerBG;
@@ -3423,7 +3423,7 @@ begin
   FOptRulerMarkSizeCaret:= cSizeRulerMarkCaret;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
-  FOptRulerFontSize:= 8;
+  FOptRulerFontSizePercents:= 80;
   FOptRulerTextIndent:= 0;
 
   FMinimapWidth:= cInitMinimapWidth;
