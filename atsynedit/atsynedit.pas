@@ -256,7 +256,7 @@ const
   cInitShowMouseSelFrame = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
-  cInitMicromapWidth = 30;
+  cInitMicromapWidthPercents = 150;
   cInitMinimapWidth = 160;
   cInitNumbersStyle = cNumbersEach5th;
   cInitBitmapWidth = 1000;
@@ -560,6 +560,7 @@ type
     FMinimapTooltip: TPanel;
     FMinimapCachedPainting: boolean;
     FMicromapWidth: integer;
+    FMicromapWidthPercents: integer;
     FMicromapVisible: boolean;
     FFoldedMarkList: TATFoldedMarks;
     FFoldedMarkCurrent: TATFoldedMark;
@@ -1433,7 +1434,7 @@ type
     property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
     property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
-    property OptMicromapWidth: integer read FMicromapWidth write FMicromapWidth default cInitMicromapWidth;
+    property OptMicromapWidthPercents: integer read FMicromapWidthPercents write FMicromapWidthPercents default cInitMicromapWidthPercents;
     property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX default 0;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
@@ -1637,7 +1638,7 @@ begin
   begin
     FMinimapWidth:= ClientWidth-FTextOffset.X;
     if FMicromapVisible then
-      Dec(FMinimapWidth, EditorScale(FMicromapWidth));
+      Dec(FMinimapWidth, FMicromapWidth);
     FMinimapWidth:= FMinimapWidth * CharSmall div (CharSmall+CharBig);
   end
   else
@@ -2213,7 +2214,7 @@ begin
     exit
   end;
 
-  R.Left:= ClientWidth-EditorScale(FMicromapWidth);
+  R.Left:= ClientWidth-FMicromapWidth;
   R.Top:= 0;
   R.Right:= ClientWidth;
   R.Bottom:= ClientHeight;
@@ -2268,6 +2269,7 @@ begin
     UpdateMinimapAutosize;
 
   FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
+  FMicromapWidth:= FCharSize.X * FMicromapWidthPercents div 100;
   FTextOffset:= GetTextOffset; //after gutter autosize
   GetRectMicromap(FRectMicromap);
   GetRectMinimap(FRectMinimap); //after micromap
@@ -3449,7 +3451,7 @@ begin
   FMinimapTooltip.BorderStyle:= bsNone;
   FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
 
-  FMicromapWidth:= cInitMicromapWidth;
+  FMicromapWidthPercents:= cInitMicromapWidthPercents;
   FMicromapVisible:= cInitMicromapVisible;
 
   FFoldedMarkTooltip:= TPanel.Create(Self);

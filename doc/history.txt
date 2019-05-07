@@ -3,8 +3,10 @@
 + add: global variables EditorScale, EditorScaleFont (in percents)
 + add: property OptRulerHeightPercents
 + add: property OptRulerFontSizePercents
++ add: property OptMicromapWidthPercents
 * deleted: OptRulerSize
 * deleted: OptRulerFontSize
+* deleted: OptMicromapWidth
 
 2019.04.30
 + add: property Strings.UndoEmpty

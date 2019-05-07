@@ -155,7 +155,7 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapWidth:= 20;
+  OptMicromapWidthPercents:= 300;
   OptComboboxArrowSize:= 2;
 
   OnClickMicromap:= @MicromapClick;
@@ -189,7 +189,7 @@ begin
   Update; //control may get focus, need repaint
   if FItems.Count=0 then exit;
 
-  p:= ClientToScreen(Point(Width-OptMicromapWidth, Height));
+  p:= ClientToScreen(Point(Width, Height));
   with FMenu.Items do
   begin
     Clear;
