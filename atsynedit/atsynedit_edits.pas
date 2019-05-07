@@ -177,7 +177,7 @@ begin
     Point(
       (ARect.Left+ARect.Right) div 2,
       (ARect.Top+ARect.Bottom) div 2),
-    DoScale(FOptComboboxArrowSize));
+    EditorScale(FOptComboboxArrowSize));
 end;
 
 procedure TATComboEdit.DoMenu;
