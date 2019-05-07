@@ -5475,29 +5475,24 @@ end;
 procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem); inline;
 var
   Str: string;
-  Size: TSize;
+  Size: integer;
   CoordX: integer;
 begin
-  C.Font.Size:= EditorScaleFont(Font.Size);
-
   Str:= DoFormatLineNumber(ALineIndex+1);
-  Size:= C.TextExtent(Str);
+
+  //C.Font.Name:= Font.Name;
+  //C.Font.Size:= EditorScaleFont(Font.Size);
+  //Size:= C.TextWidth(Str);
+  Size:= FCharSize.X*Length(Str);
 
   case FOptNumbersAlignment of
     taLeftJustify:
       CoordX:= ABand.Left + FOptNumbersIndentLeft;
     taRightJustify:
-      CoordX:= ABand.Right - Size.cx - FOptNumbersIndentRight;
+      CoordX:= ABand.Right - Size - FOptNumbersIndentRight;
     taCenter:
-      CoordX:= (ABand.Left + ABand.Right - Size.cx) div 2;
+      CoordX:= (ABand.Left + ABand.Right - Size) div 2;
   end;
-
-  {
-  if FOptNumbersFontSizePercents=100 then
-    CoordX.Y:= NCoordTop
-  else
-    CoordX.Y:= NCoordTop + ACharSize.y div 2 - Size.cy div 2;
-    }
 
   C.TextOut(CoordX, ACoordTop, Str);
 end;
