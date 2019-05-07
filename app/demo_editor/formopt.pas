@@ -253,7 +253,7 @@ begin
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
     edNumAlign.ItemIndex:= Ord(ed.OptNumbersAlignment);
-    edNumSize.Value:= ed.OptNumbersFontSize;
+    //edNumSize.Value:= ed.OptNumbersFontSizePercents;
     edNumChar.Text:= ed.OptNumbersSkippedChar;
     edPlusSize.Value:= ed.OptGutterPlusSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
@@ -377,7 +377,7 @@ begin
       ed.CaretPropsNormal.EmptyInside:= chkCrEmptyNormal.Checked;
 
       //gutter
-      ed.OptNumbersFontSize:= edNumSize.Value;
+      //ed.OptNumbersFontSizePercents:= edNumSize.Value;
       ed.OptNumbersStyle:= TATSynNumbersStyle(edNumStyle.ItemIndex);
       ed.OptNumbersAlignment:= TAlignment(edNumAlign.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;

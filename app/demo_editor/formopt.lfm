@@ -309,16 +309,19 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 92
         Width = 58
-        MaxValue = 40
+        Enabled = False
+        MaxValue = 900
+        MinValue = 10
         TabOrder = 11
-        Value = 5
+        Value = 10
       end
       object Label1: TLabel
         Left = 352
         Height = 17
         Top = 96
-        Width = 156
-        Caption = 'numbers font size, if >0'
+        Width = 151
+        Caption = 'numbers font size in %'
+        Enabled = False
         ParentColor = False
         WordWrap = True
       end

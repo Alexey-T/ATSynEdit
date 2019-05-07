@@ -635,7 +635,6 @@ type
     FOptGutterIcons: TATGutterIconsKind;
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
-    FOptNumbersFontSize: integer;
     FOptNumbersStyle: TATSynNumbersStyle;
     FOptNumbersShowFirst,
     FOptNumbersShowCarets: boolean;
@@ -1445,7 +1444,6 @@ type
     property OptMarginString: string read GetMarginString write SetMarginString;
     property OptNumbersAutosize: boolean read FOptNumbersAutosize write FOptNumbersAutosize default true;
     property OptNumbersAlignment: TAlignment read FOptNumbersAlignment write FOptNumbersAlignment default taRightJustify;
-    property OptNumbersFontSize: integer read FOptNumbersFontSize write FOptNumbersFontSize default 0;
     property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle default cInitNumbersStyle;
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst default true;
     property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets default false;
@@ -2841,25 +2839,29 @@ begin
 
         if WrapItem.bInitial then
         begin
-          if FOptNumbersFontSize<>0 then
-            C.Font.Size:= EditorScaleFont(FOptNumbersFontSize);
+          C.Font.Size:= EditorScaleFont(Font.Size);
 
           Str:= DoFormatLineNumber(NLinesIndex+1);
           StrSize:= C.TextExtent(Str);
 
           case FOptNumbersAlignment of
-            taLeftJustify: CoordNums.X:= Band.Left + FOptNumbersIndentLeft;
-            taRightJustify: CoordNums.X:= Band.Right - StrSize.cx - FOptNumbersIndentRight;
-            taCenter: CoordNums.X:= (Band.Left + Band.Right - StrSize.cx) div 2;
+            taLeftJustify:
+              CoordNums.X:= Band.Left + FOptNumbersIndentLeft;
+            taRightJustify:
+              CoordNums.X:= Band.Right - StrSize.cx - FOptNumbersIndentRight;
+            taCenter:
+              CoordNums.X:= (Band.Left + Band.Right - StrSize.cx) div 2;
           end;
 
-          if FOptNumbersFontSize=0 then
+          CoordNums.Y:= NCoordTop;
+          {
+          if FOptNumbersFontSizePercents=100 then
             CoordNums.Y:= NCoordTop
           else
             CoordNums.Y:= NCoordTop + ACharSize.y div 2 - StrSize.cy div 2;
+            }
 
           C.TextOut(CoordNums.X, CoordNums.Y, Str);
-          C.Font.Size:= EditorScaleFont(Font.Size);
         end;
       end;
 
@@ -3411,7 +3413,6 @@ begin
 
   FOptNumbersAutosize:= true;
   FOptNumbersAlignment:= taRightJustify;
-  FOptNumbersFontSize:= 0;
   FOptNumbersStyle:= cInitNumbersStyle;
   FOptNumbersShowFirst:= true;
   FOptNumbersShowCarets:= false;
@@ -3925,11 +3926,10 @@ end;
 
 function TATSynEdit.GetGutterNumbersWidth(C: TCanvas): integer;
 var
-  Str: atString;
+  Str: string;
   CharSize: integer;
 begin
-  if FOptNumbersFontSize<>0 then
-    C.Font.Size:= EditorScaleFont(FOptNumbersFontSize);
+  C.Font.Size:= EditorScaleFont(Font.Size);
   CharSize:= C.TextWidth('0');
 
   Str:= IntToStr(Max(10, Strings.Count));
@@ -3937,9 +3937,6 @@ begin
     Length(Str)*CharSize+
     FOptNumbersIndentLeft+
     FOptNumbersIndentRight;
-
-  if FOptNumbersFontSize<>0 then
-    C.Font.Size:= EditorScaleFont(Font.Size);
 end;
 
 function TATSynEdit.GetPageLines: integer;
