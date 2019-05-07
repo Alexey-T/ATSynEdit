@@ -205,17 +205,3 @@ begin
   {$endif}
 end;
 
-
-function EditorScale(AValue: integer): integer; inline;
-begin
-  Result:= AValue * EditorScalePercents div 100;
-end;
-
-function EditorScaleFont(AValue: integer): integer;
-begin
-  if EditorScaleFontPercents=0 then
-    Result:= EditorScale(AValue)
-  else
-    Result:= AValue * EditorScaleFontPercents div 100;
-end;
-

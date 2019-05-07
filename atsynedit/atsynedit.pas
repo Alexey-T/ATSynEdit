@@ -321,13 +321,6 @@ const
   cEditorScrollbarBorderSize: integer = 0;
 
 var
-  EditorScalePercents: integer = 100;
-  EditorScaleFontPercents: integer = 0; //if 0, it follows previous variable
-
-function EditorScale(AValue: integer): integer; inline;
-function EditorScaleFont(AValue: integer): integer;
-
-var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
   cATClipboardFormatId: integer = 0; //must be inited
   cATClipboardSignatureColBlock: integer = $1000;
@@ -3643,7 +3636,6 @@ procedure TATSynEdit.Update(
 begin
   UpdateCursor;
 
-  FGutter.ScalePercents:= EditorScalePercents;
   FScrollbarHorz.ScalePercents:= EditorScalePercents;
   FScrollbarVert.ScalePercents:= EditorScalePercents;
 

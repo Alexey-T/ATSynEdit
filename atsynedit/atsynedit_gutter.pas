@@ -9,7 +9,8 @@ unit ATSynEdit_Gutter;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils,
+  ATStringProc;
 
 type
   TATGutterItem = class
@@ -27,10 +28,8 @@ type
   private
     FList: TList;
     function GetItem(N: integer): TATGutterItem;
-    function DoScale(Value: integer): integer;
   public
     GutterLeft: integer;
-    ScalePercents: integer;
     constructor Create; virtual;
     destructor Destroy; override;
     function IsIndexValid(N: integer): boolean; inline;
@@ -62,16 +61,10 @@ begin
     Result:= nil;
 end;
 
-function TATGutter.DoScale(Value: integer): integer; inline;
-begin
-  Result:= Value*ScalePercents div 100;
-end;
-
 constructor TATGutter.Create;
 begin
   inherited;
   FList:= TList.Create;
-  ScalePercents:= 100;
 end;
 
 destructor TATGutter.Destroy;
@@ -138,7 +131,7 @@ begin
       if Visible then
       begin
         if Scaled then
-          Inc(Right, DoScale(Size))
+          Inc(Right, EditorScale(Size))
         else
           Inc(Right, Size);
       end;
