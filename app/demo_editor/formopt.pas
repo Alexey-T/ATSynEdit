@@ -92,6 +92,9 @@ type
     chkZebra: TCheckBox;
     comboRulerStyle: TComboBox;
     edCrHeightNormal: TSpinEdit;
+    edRulerFSize: TSpinEdit;
+    edRulerIndent: TSpinEdit;
+    edRulerSize: TSpinEdit;
     edScrollArrowKind: TComboBox;
     edMapCharWidth: TSpinEdit;
     edNumAlign: TComboBox;
@@ -104,9 +107,6 @@ type
     edNumChar: TEdit;
     edNumStyle: TComboBox;
     edPageSize: TComboBox;
-    edRulerFSize: TSpinEdit;
-    edRulerIndent: TSpinEdit;
-    edRulerSize: TSpinEdit;
     edSizeBm: TSpinEdit;
     edSizeEmpty: TSpinEdit;
     edSizeFold: TSpinEdit;
@@ -148,6 +148,7 @@ type
     edUndo: TSpinEdit;
     edCrWidthNormal: TSpinEdit;
     TabSheet1: TTabSheet;
+    TabSheet10: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
