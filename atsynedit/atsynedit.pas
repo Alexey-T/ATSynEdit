@@ -1649,17 +1649,11 @@ function TATSynEdit.DoFormatLineNumber(N: integer): atString;
 begin
   if FOptNumbersShowCarets then
     if IsLineWithCaret(N-1) then
-    begin
-      Result:= IntToStr(N);
-      Exit
-    end;
+      Exit(IntToStr(N));
 
   if FOptNumbersShowFirst then
     if N=1 then
-    begin
-      Result:= IntToStr(N);
-      Exit
-    end;
+      Exit(IntToStr(N));
 
   case FOptNumbersStyle of
     cNumbersAll:
@@ -1683,8 +1677,6 @@ begin
         else
           Result:= FOptNumbersSkippedChar;
       end;
-    else
-      raise Exception.Create('Unknown num-style');
   end;
 end;
 
