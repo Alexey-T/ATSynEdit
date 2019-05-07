@@ -636,10 +636,10 @@ type
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
     FOptNumbersStyle: TATSynNumbersStyle;
-    FOptNumbersShowFirst,
+    FOptNumbersShowFirst: boolean;
     FOptNumbersShowCarets: boolean;
-    FOptNumbersSkippedChar: atString;
-    FOptNumbersIndentLeft,
+    FOptNumbersSkippedChar: string;
+    FOptNumbersIndentLeft: integer;
     FOptNumbersIndentRight: integer;
     FOptWordChars: atString;
     FOptAutoIndent: boolean;
@@ -813,6 +813,7 @@ type
     procedure DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
+    procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem); inline;
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintRulerTo(C: TCanvas);
     procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
@@ -922,7 +923,7 @@ type
     procedure UpdateMinimapAutosize;
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
-    function DoFormatLineNumber(N: integer): atString;
+    function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
     procedure UpdateWrapInfo;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
@@ -1447,7 +1448,7 @@ type
     property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle default cInitNumbersStyle;
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst default true;
     property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets default false;
-    property OptNumbersSkippedChar: atString read FOptNumbersSkippedChar write FOptNumbersSkippedChar;
+    property OptNumbersSkippedChar: string read FOptNumbersSkippedChar write FOptNumbersSkippedChar;
     property OptNumbersIndentLeft: integer read FOptNumbersIndentLeft write FOptNumbersIndentLeft default 5;
     property OptNumbersIndentRight: integer read FOptNumbersIndentRight write FOptNumbersIndentRight default 5;
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible default true;
@@ -1645,7 +1646,7 @@ begin
   FMinimapWidth:= Max(cMinMinimapWidth, FMinimapWidth);
 end;
 
-function TATSynEdit.DoFormatLineNumber(N: integer): atString;
+function TATSynEdit.DoFormatLineNumber(N: integer): string;
 begin
   if FOptNumbersShowCarets then
     if IsLineWithCaret(N-1) then
@@ -2376,11 +2377,10 @@ var
   NColorEntire, NColorAfter: TColor;
   NDimValue, NBandDecor: integer;
   Str, StrOut: atString;
-  CurrPoint, CurrPointText, CoordAfterText, CoordNums: TPoint;
+  CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineSeparator: TATLineSeparator;
   LineWithCaret, LineEolSelected, LineColorForced: boolean;
   Event: TATSynEditDrawLineEvent;
-  StrSize: TSize;
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap, bUseColorOfCurrentLine: boolean;
   //
@@ -2830,31 +2830,7 @@ begin
           C.Font.Color:= Colors.GutterFont;
 
         if WrapItem.bInitial then
-        begin
-          C.Font.Size:= EditorScaleFont(Font.Size);
-
-          Str:= DoFormatLineNumber(NLinesIndex+1);
-          StrSize:= C.TextExtent(Str);
-
-          case FOptNumbersAlignment of
-            taLeftJustify:
-              CoordNums.X:= Band.Left + FOptNumbersIndentLeft;
-            taRightJustify:
-              CoordNums.X:= Band.Right - StrSize.cx - FOptNumbersIndentRight;
-            taCenter:
-              CoordNums.X:= (Band.Left + Band.Right - StrSize.cx) div 2;
-          end;
-
-          CoordNums.Y:= NCoordTop;
-          {
-          if FOptNumbersFontSizePercents=100 then
-            CoordNums.Y:= NCoordTop
-          else
-            CoordNums.Y:= NCoordTop + ACharSize.y div 2 - StrSize.cy div 2;
-            }
-
-          C.TextOut(CoordNums.X, CoordNums.Y, Str);
-        end;
+          DoPaintLineNumber(C, NLinesIndex, NCoordTop, Band);
       end;
 
       //gutter decor
@@ -5494,6 +5470,36 @@ begin
       FMouseNiceScrollPos.X - cBitmapNiceScroll.Height div 2,
       FMouseNiceScrollPos.Y - cBitmapNiceScroll.Height div 2,
       cBitmapNiceScroll);
+end;
+
+procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem); inline;
+var
+  Str: string;
+  Size: TSize;
+  CoordX: integer;
+begin
+  C.Font.Size:= EditorScaleFont(Font.Size);
+
+  Str:= DoFormatLineNumber(ALineIndex+1);
+  Size:= C.TextExtent(Str);
+
+  case FOptNumbersAlignment of
+    taLeftJustify:
+      CoordX:= ABand.Left + FOptNumbersIndentLeft;
+    taRightJustify:
+      CoordX:= ABand.Right - Size.cx - FOptNumbersIndentRight;
+    taCenter:
+      CoordX:= (ABand.Left + ABand.Right - Size.cx) div 2;
+  end;
+
+  {
+  if FOptNumbersFontSizePercents=100 then
+    CoordX.Y:= NCoordTop
+  else
+    CoordX.Y:= NCoordTop + ACharSize.y div 2 - Size.cy div 2;
+    }
+
+  C.TextOut(CoordX, ACoordTop, Str);
 end;
 
 
