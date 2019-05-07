@@ -155,7 +155,7 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapWidth:= 22;
+  OptMicromapWidth:= 20;
   OptComboboxArrowSize:= 2;
 
   OnClickMicromap:= @MicromapClick;
@@ -177,7 +177,7 @@ begin
     Point(
       (ARect.Left+ARect.Right) div 2,
       (ARect.Top+ARect.Bottom) div 2),
-    FOptComboboxArrowSize);
+    DoScale(FOptComboboxArrowSize));
 end;
 
 procedure TATComboEdit.DoMenu;

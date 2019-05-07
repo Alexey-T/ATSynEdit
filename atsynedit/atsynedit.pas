@@ -736,7 +736,6 @@ type
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
     procedure DoOnStringProgress(Sender: TObject);
-    function DoScale(AValue: integer): integer;
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
     procedure DoSelectionDeleteColumnBlock;
@@ -1239,12 +1238,15 @@ type
     procedure WMHScroll(var Msg: TLMHScroll); message LM_HSCROLL;
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
     procedure CMWantSpecialKey(var Message: TCMWantSpecialKey); message CM_WANTSPECIALKEY;
+
     // Windows IME Support
     {$ifdef Windows}
     procedure WMIME_STARTCOMPOSITION(var Msg:TMessage); message WM_IME_STARTCOMPOSITION;
     procedure WMIME_COMPOSITION(var Msg:TMessage); message WM_IME_COMPOSITION;
     procedure WMIME_ENDCOMPOSITION(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
     {$endif}
+
+    function DoScale(AValue: integer): integer;
   published
     property Align;
     property Anchors;
