@@ -289,7 +289,7 @@ const
   cSpeedScrollNice = 3;
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldLineDx = 3;
-  cSizeRulerHeight = 20;
+  cSizeRulerHeightPercents = 120;
   cSizeRulerMarkSmall = 3;
   cSizeRulerMarkBig = 7;
   cSizeRulerMarkCaret = 1;
@@ -529,6 +529,7 @@ type
     FGutterBandEmpty: integer;
     FGutterBandDecor: integer;
     FColors: TATSynEditColors;
+    FRulerHeight: integer;
     FRectMain,
     FRectMainVisible,
     FRectMinimap,
@@ -619,7 +620,7 @@ type
     FOptBorderFocusedActive: boolean;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATRulerNumeration;
-    FOptRulerSize: integer;
+    FOptRulerHeightPercents: integer;
     FOptRulerFontSizePercents: integer;
     FOptRulerMarkSizeCaret: integer;
     FOptRulerMarkSizeSmall: integer;
@@ -1416,7 +1417,7 @@ type
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cRulerNumeration_0_10_20;
-    property OptRulerSize: integer read FOptRulerSize write FOptRulerSize default cSizeRulerHeight;
+    property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cSizeRulerHeightPercents;
     property OptRulerFontSizePercents: integer read FOptRulerFontSizePercents write FOptRulerFontSizePercents default 80;
     property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cSizeRulerMarkCaret;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
@@ -2219,7 +2220,7 @@ end;
 procedure TATSynEdit.GetRectGutter(var R: TRect);
 begin
   R.Left:= IfThen(FMinimapVisible and FMinimapAtLeft, FMinimapWidth);
-  R.Top:= IfThen(FOptRulerVisible, FOptRulerSize);
+  R.Top:= IfThen(FOptRulerVisible, FRulerHeight);
   R.Right:= R.Left + FGutter.Width;
   R.Bottom:= ClientHeight;
 
@@ -2245,7 +2246,7 @@ begin
   R.Left:= FRectGutter.Left;
   R.Right:= FRectMain.Right;
   R.Top:= 0;
-  R.Bottom:= R.Top+EditorScale(FOptRulerSize);
+  R.Bottom:= R.Top + FRulerHeight;
 end;
 
 procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
@@ -2264,6 +2265,7 @@ begin
   if FMinimapVisible then
     UpdateMinimapAutosize;
 
+  FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
   FTextOffset:= GetTextOffset; //after gutter autosize
   GetRectMicromap(FRectMicromap);
   GetRectMinimap(FRectMinimap); //after micromap
@@ -3419,7 +3421,7 @@ begin
 
   FOptRulerVisible:= true;
   FOptRulerNumeration:= cRulerNumeration_0_10_20;
-  FOptRulerSize:= cSizeRulerHeight;
+  FOptRulerHeightPercents:= cSizeRulerHeightPercents;
   FOptRulerMarkSizeCaret:= cSizeRulerMarkCaret;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
@@ -3914,7 +3916,7 @@ begin
 
   Result.Y:= OptTextOffsetTop;
   if FOptRulerVisible then
-    Inc(Result.Y, FOptRulerSize);
+    Inc(Result.Y, FRulerHeight);
 end;
 
 function TATSynEdit.GetGutterNumbersWidth(C: TCanvas): integer;
