@@ -206,3 +206,16 @@ begin
 end;
 
 
+function DoScale(AValue: integer): integer; inline;
+begin
+  Result:= AValue * EditorScalePercents div 100;
+end;
+
+function DoScaleFont(AValue: integer): integer; inline;
+begin
+  if EditorScaleFontPercents=0 then
+    Result:= DoScale(AValue)
+  else
+    Result:= AValue * EditorScaleFontPercents div 100;
+end;
+

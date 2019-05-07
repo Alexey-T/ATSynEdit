@@ -324,6 +324,9 @@ var
   EditorScalePercents: integer = 100;
   EditorScaleFontPercents: integer = 0; //if 0, it follows previous variable
 
+function DoScale(AValue: integer): integer; inline;
+function DoScaleFont(AValue: integer): integer; inline;
+
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
   cATClipboardFormatId: integer = 0; //must be inited
@@ -1248,8 +1251,6 @@ type
     procedure WMIME_ENDCOMPOSITION(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
     {$endif}
 
-    function DoScale(AValue: integer): integer;
-    function DoScaleFont(AValue: integer): integer;
   published
     property Align;
     property Anchors;
@@ -1728,7 +1729,7 @@ begin
     //must have, coz method can be called before 1st paint,
     //so TCanvas.TextWidth will give exception (control has no parent window)
 
-  GlobalCharSizer.Init(Font.Name, Font.Size, Canvas);
+  GlobalCharSizer.Init(Font.Name, DoScaleFont(Font.Size), Canvas);
 
   //virtual mode allows faster usage of WrapInfo
   FWrapInfo.StringsObj:= Strings;
@@ -2249,7 +2250,8 @@ begin
   C.Brush.Color:= GetColorTextBG;
   C.FillRect(ClientRect);
 
-  C.Font.Assign(Font);
+  C.Font.Name:= Font.Name;
+  C.Font.Size:= DoScaleFont(Font.Size);
   FCharSize:= GetCharSize(C, FCharSpacingText);
 
   if FOptGutterVisible and FOptNumbersAutosize then
@@ -2688,10 +2690,17 @@ begin
         TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
         TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
-        TextOutProps.FontNormal:= Font;
-        TextOutProps.FontItalic:= FontItalic;
-        TextOutProps.FontBold:= FontBold;
-        TextOutProps.FontBoldItalic:= FontBoldItalic;
+        TextOutProps.FontNormal_Name:= Font.Name;
+        TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
+
+        TextOutProps.FontItalic_Name:= FontItalic.Name;
+        TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
+
+        TextOutProps.FontBold_Name:= FontBold.Name;
+        TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
+
+        TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
+        TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
 
         CanvasTextOut(C,
           CurrPointText.X,
@@ -2822,7 +2831,7 @@ begin
         if WrapItem.bInitial then
         begin
           if FOptNumbersFontSize<>0 then
-            C.Font.Size:= FOptNumbersFontSize;
+            C.Font.Size:= DoScaleFont(FOptNumbersFontSize);
 
           Str:= DoFormatLineNumber(NLinesIndex+1);
           StrSize:= C.TextExtent(Str);
@@ -2839,7 +2848,7 @@ begin
             CoordNums.Y:= NCoordTop + ACharSize.y div 2 - StrSize.cy div 2;
 
           C.TextOut(CoordNums.X, CoordNums.Y, Str);
-          C.Font.Size:= Font.Size;
+          C.Font.Size:= DoScaleFont(Font.Size);
         end;
       end;
 
@@ -3910,7 +3919,7 @@ var
   CharSize: integer;
 begin
   if FOptNumbersFontSize<>0 then
-    C.Font.Size:= FOptNumbersFontSize;
+    C.Font.Size:= DoScaleFont(FOptNumbersFontSize);
   CharSize:= C.TextWidth('0');
 
   Str:= IntToStr(Max(10, Strings.Count));
@@ -3920,7 +3929,7 @@ begin
     FOptNumbersIndentRight;
 
   if FOptNumbersFontSize<>0 then
-    C.Font.Size:= Font.Size;
+    C.Font.Size:= DoScaleFont(Font.Size);
 end;
 
 function TATSynEdit.GetPageLines: integer;
@@ -6640,19 +6649,6 @@ begin
       //it clears ModifiedRecent
 end;
 
-function TATSynEdit.DoScale(AValue: integer): integer; inline;
-begin
-  Result:= AValue * EditorScalePercents div 100;
-end;
-
-function TATSynEdit.DoScaleFont(AValue: integer): integer; inline;
-begin
-  if EditorScaleFontPercents=0 then
-    Result:= DoScale(AValue)
-  else
-    Result:= AValue * EditorScaleFontPercents div 100;
-end;
-
 procedure TATSynEdit.TimerIdleTick(Sender: TObject);
 begin
   FTimerIdle.Enabled:= false;
@@ -6744,10 +6740,17 @@ begin
   TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
-  TextOutProps.FontNormal:= Font;
-  TextOutProps.FontItalic:= FontItalic;
-  TextOutProps.FontBold:= FontBold;
-  TextOutProps.FontBoldItalic:= FontBoldItalic;
+  TextOutProps.FontNormal_Name:= Font.Name;
+  TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
+
+  TextOutProps.FontItalic_Name:= FontItalic.Name;
+  TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
+
+  TextOutProps.FontBold_Name:= FontBold.Name;
+  TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
+
+  TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
+  TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
 
   if AConsiderWrapInfo then
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, ALineFrom));
