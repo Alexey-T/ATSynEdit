@@ -7,6 +7,7 @@
 * deleted: OptRulerSize
 * deleted: OptRulerFontSize
 * deleted: OptMicromapWidth
+* deleted: OptNumbersFontSize
 
 2019.04.30
 + add: property Strings.UndoEmpty
