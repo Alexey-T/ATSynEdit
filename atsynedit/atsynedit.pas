@@ -6384,22 +6384,25 @@ end;
 
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
-  M: TATMarkerItem;
+  Mark: TATMarkerItem;
+  Pnt: TPoint;
   i: integer;
 begin
   for i:= 0 to Markers.Count-1 do
   begin
-    M:= Markers[i];
-    if M.CoordX<0 then Continue;
-    if M.CoordY<0 then Continue;
-    if not PtInRect(FRectMain, Point(M.CoordX, M.CoordY)) then Continue;
+    Mark:= Markers[i];
+    if Mark.CoordX<0 then Continue;
+    if Mark.CoordY<0 then Continue;
 
-    C.Brush.Color:= Colors.Markers;
-    C.Pen.Color:= Colors.Markers;
-    C.Polygon([
-      Point(M.CoordX, M.CoordY+FCharSize.Y-FOptMarkersSize-1),
-      Point(M.CoordX-FOptMarkersSize, M.CoordY+FCharSize.Y-1),
-      Point(M.CoordX+FOptMarkersSize, M.CoordY+FCharSize.Y-1) ]);
+    Pnt.X:= Mark.CoordX;
+    Pnt.Y:= Mark.CoordY+FCharSize.Y;
+    if not PtInRect(FRectMain, Pnt) then Continue;
+
+    CanvasPaintTriangleUp(C,
+      Colors.Markers,
+      Pnt,
+      FCharSize.X div 4
+      );
   end;
 end;
 
