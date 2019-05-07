@@ -345,8 +345,8 @@ object fmOpt: TfmOpt
         Left = 352
         Height = 17
         Top = 152
-        Width = 131
-        Caption = 'char if num skipped'
+        Width = 262
+        Caption = 'char to show when line number skipped'
         ParentColor = False
       end
       object edPlusSize: TSpinEdit
@@ -362,8 +362,8 @@ object fmOpt: TfmOpt
         Left = 352
         Height = 17
         Top = 124
-        Width = 127
-        Caption = 'fold plus-mark size'
+        Width = 147
+        Caption = 'folding plus-mark size'
         ParentColor = False
       end
       object chkShowFoldAlways: TCheckBox
