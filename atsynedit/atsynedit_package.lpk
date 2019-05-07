@@ -12,19 +12,18 @@
         <OtherUnitFiles Value=".;..\proc_lexer;..\..\..\..\cmp\mORMot"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
-      <CodeGeneration>
-        <SmartLinkUnit Value="True"/>
-      </CodeGeneration>
-      <Other>
-        <CustomOptions Value="-Sa
--dFGLINLINE
--dDEBUGLOG"/>
-      </Other>
       <Parsing>
         <SyntaxOptions>
           <IncludeAssertionCode Value="True"/>
         </SyntaxOptions>
       </Parsing>
+      <CodeGeneration>
+        <SmartLinkUnit Value="True"/>
+      </CodeGeneration>
+      <Other>
+        <CustomOptions Value="-Sa
+-dFGLINLINE"/>
+      </Other>
     </CompilerOptions>
     <Description Value="Multi-line editor control, with much more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>

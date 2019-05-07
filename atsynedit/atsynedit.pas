@@ -1634,7 +1634,7 @@ begin
 
   if FMinimapCharWidth=0 then
   begin
-    FMinimapWidth:= (ClientWidth - IfThen(FMicromapVisible, FMicromapWidth) - FTextOffset.X)
+    FMinimapWidth:= (ClientWidth - IfThen(FMicromapVisible, FRectMicromap.Width) - FTextOffset.X)
       * CharSmall div (CharSmall+CharBig);
   end
   else
@@ -2161,7 +2161,7 @@ begin
   Result.Top:= FTextOffset.Y;
   Result.Right:= ClientWidth
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
-    - IfThen(FMicromapVisible, FMicromapWidth);
+    - IfThen(FMicromapVisible, FRectMicromap.Width);
   Result.Bottom:= ClientHeight;
 
   FRectMainVisible:= Result;
@@ -2180,7 +2180,7 @@ begin
   if FMinimapAtLeft then
     Result.Left:= 0
   else
-    Result.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible, FMicromapWidth);
+    Result.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible, FRectMicromap.Width);
 
   Result.Right:= Result.Left+FMinimapWidth;
   Result.Top:= 0;
@@ -2253,8 +2253,8 @@ begin
     UpdateMinimapAutosize;
 
   FTextOffset:= GetTextOffset; //after gutter autosize
-  FRectMinimap:= GetRectMinimap;
   FRectMicromap:= GetRectMicromap;
+  FRectMinimap:= GetRectMinimap;
   FRectGutter:= GetRectGutter;
   FRectMain:= GetRectMain; //after gutter/minimap
   FRectRuler:= GetRectRuler; //after main
