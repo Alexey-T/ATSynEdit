@@ -12,6 +12,7 @@
 * deleted: OptMicromapWidth
 * deleted: OptNumbersIndentLeft, OptNumbersIndentRight
 * deleted: OptNumbersFontSize
+* deleted: OptCharSpacingX
 
 2019.04.30
 + add: property Strings.UndoEmpty

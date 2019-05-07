@@ -868,7 +868,6 @@ type
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     //
-    function GetCharSpacingX: integer;
     function GetCharSpacingY: integer;
     function GetEndOfFilePos: TPoint;
     function GetMarginString: string;
@@ -888,7 +887,6 @@ type
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretBlinkTime(AValue: integer);
-    procedure SetCharSpacingX(AValue: integer);
     procedure SetCharSpacingY(AValue: integer);
     procedure SetMarginString(AValue: string);
     procedure SetMicromapVisible(AValue: boolean);
@@ -1435,7 +1433,6 @@ type
     property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapWidthPercents: integer read FMicromapWidthPercents write FMicromapWidthPercents default cInitMicromapWidthPercents;
-    property OptCharSpacingX: integer read GetCharSpacingX write SetCharSpacingX default 0;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
@@ -2675,7 +2672,7 @@ begin
         Event:= nil;
 
       StrOut:= SRemoveAsciiControlChars(StrOut, WideChar(OptUnprintedReplaceSpecToCode));
-      CanvasTextOutHorzSpacingUsed:= OptCharSpacingX<>0;
+      CanvasTextOutHorzSpacingUsed:= false; //OptCharSpacingX<>0;
 
       if AMainText then
       begin
@@ -3144,11 +3141,6 @@ begin
       );
     FFoldedMarkList.Add(FoldMark);
   end;
-end;
-
-function TATSynEdit.GetCharSpacingX: integer;
-begin
-  Result:= FCharSpacingText.X;
 end;
 
 function TATSynEdit.GetCharSpacingY: integer;
@@ -3734,13 +3726,6 @@ begin
   AValue:= Min(AValue, cMaxCaretTime);
   FCaretBlinkTime:= AValue;
   FTimerBlink.Interval:= AValue;
-end;
-
-procedure TATSynEdit.SetCharSpacingX(AValue: integer);
-begin
-  if FCharSpacingText.X=AValue then Exit;
-  FCharSpacingText.X:= AValue;
-  FWrapUpdateNeeded:= true;
 end;
 
 procedure TATSynEdit.SetCharSpacingY(AValue: integer);
