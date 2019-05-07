@@ -753,7 +753,7 @@ type
     function GetMinimap_DraggedPosToWrapIndex(APosY: integer): integer;
     function GetMinimap_ClickedPosToWrapIndex(APosY: integer): integer;
     function GetOptTextOffsetTop: integer;
-    function GetRectMinimapSel: TRect;
+    procedure GetRectMinimapSel(var R: TRect);
     function GetRedoAsString: string;
     function GetUndoAsString: string;
     procedure InitResourcesFoldbar;
@@ -898,11 +898,11 @@ type
     procedure SetLinesFromTop(AValue: integer);
     procedure SetRedoAsString(const AValue: string);
     procedure SetStrings(Obj: TATStrings);
-    function GetRectMain: TRect;
-    function GetRectMinimap: TRect;
-    function GetRectMicromap: TRect;
-    function GetRectGutter: TRect;
-    function GetRectRuler: TRect;
+    procedure GetRectMain(var R: TRect);
+    procedure GetRectMinimap(var R: TRect);
+    procedure GetRectMicromap(var R: TRect);
+    procedure GetRectGutter(var R: TRect);
+    procedure GetRectRuler(var R: TRect);
     function GetTextOffset: TPoint;
     function GetGutterNumbersWidth(C: TCanvas): integer;
     function GetPageLines: integer;
@@ -2155,85 +2155,97 @@ begin
   {$endif}
 end;
 
-function TATSynEdit.GetRectMain: TRect;
+procedure TATSynEdit.GetRectMain(var R: TRect);
 begin
-  Result.Left:= FRectGutter.Left + FTextOffset.X;
-  Result.Top:= FTextOffset.Y;
-  Result.Right:= ClientWidth
+  R.Left:= FRectGutter.Left + FTextOffset.X;
+  R.Top:= FTextOffset.Y;
+  R.Right:= ClientWidth
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
     - IfThen(FMicromapVisible, FRectMicromap.Width);
-  Result.Bottom:= ClientHeight;
+  R.Bottom:= ClientHeight;
 
-  FRectMainVisible:= Result;
+  FRectMainVisible:= R;
 
   if FOptScrollSmooth then
   begin
-    Dec(Result.Left, FScrollHorz.NPixelOffset);
-    Dec(Result.Top, FScrollVert.NPixelOffset);
+    Dec(R.Left, FScrollHorz.NPixelOffset);
+    Dec(R.Top, FScrollVert.NPixelOffset);
   end;
 end;
 
-function TATSynEdit.GetRectMinimap: TRect;
+procedure TATSynEdit.GetRectMinimap(var R: TRect);
 begin
-  if not FMinimapVisible then exit(cRectEmpty);
+  if not FMinimapVisible then
+  begin
+    R:= cRectEmpty;
+    exit
+  end;
 
   if FMinimapAtLeft then
-    Result.Left:= 0
+    R.Left:= 0
   else
-    Result.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible, FRectMicromap.Width);
+    R.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible, FRectMicromap.Width);
 
-  Result.Right:= Result.Left+FMinimapWidth;
-  Result.Top:= 0;
-  Result.Bottom:= ClientHeight;
+  R.Right:= R.Left+FMinimapWidth;
+  R.Top:= 0;
+  R.Bottom:= ClientHeight;
 end;
 
-function TATSynEdit.GetRectMinimapSel: TRect;
+procedure TATSynEdit.GetRectMinimapSel(var R: TRect);
 begin
-  Result.Left:= FRectMinimap.Left;
-  Result.Right:= FRectMinimap.Right;
-  Result.Top:= GetMinimapSelTop;
-  Result.Bottom:= Min(
-    Result.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y,
+  R.Left:= FRectMinimap.Left;
+  R.Right:= FRectMinimap.Right;
+  R.Top:= GetMinimapSelTop;
+  R.Bottom:= Min(
+    R.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y,
     FRectMinimap.Bottom
     );
 end;
 
-function TATSynEdit.GetRectMicromap: TRect;
+procedure TATSynEdit.GetRectMicromap(var R: TRect);
 begin
-  if not FMicromapVisible then exit(cRectEmpty);
-
-  Result.Left:= ClientWidth-EditorScale(FMicromapWidth);
-  Result.Top:= 0;
-  Result.Right:= ClientWidth;
-  Result.Bottom:= ClientHeight;
-end;
-
-function TATSynEdit.GetRectGutter: TRect;
-begin
-  Result.Left:= IfThen(FMinimapVisible and FMinimapAtLeft, FMinimapWidth);
-  Result.Top:= IfThen(FOptRulerVisible, FOptRulerSize);
-  Result.Right:= Result.Left + FGutter.Width;
-  Result.Bottom:= ClientHeight;
-
-  if not FOptGutterVisible then
+  if not FMicromapVisible then
   begin
-    Result.Right:= Result.Left;
-    Result.Bottom:= Result.Top;
+    R:= cRectEmpty;
     exit
   end;
 
-  Gutter.GutterLeft:= Result.Left;
+  R.Left:= ClientWidth-EditorScale(FMicromapWidth);
+  R.Top:= 0;
+  R.Right:= ClientWidth;
+  R.Bottom:= ClientHeight;
+end;
+
+procedure TATSynEdit.GetRectGutter(var R: TRect);
+begin
+  R.Left:= IfThen(FMinimapVisible and FMinimapAtLeft, FMinimapWidth);
+  R.Top:= IfThen(FOptRulerVisible, FOptRulerSize);
+  R.Right:= R.Left + FGutter.Width;
+  R.Bottom:= ClientHeight;
+
+  if not FOptGutterVisible then
+  begin
+    R.Right:= R.Left;
+    R.Bottom:= R.Top;
+    exit
+  end;
+
+  Gutter.GutterLeft:= R.Left;
   Gutter.Update;
 end;
 
-function TATSynEdit.GetRectRuler: TRect;
+procedure TATSynEdit.GetRectRuler(var R: TRect);
 begin
-  if not FOptRulerVisible then exit(cRectEmpty);
+  if not FOptRulerVisible then
+  begin
+    R:= cRectEmpty;
+    exit
+  end;
 
-  Result.Left:= FRectGutter.Left;
-  Result.Right:= FRectMain.Right;
-  Result.Top:= 0;
-  Result.Bottom:= Result.Top+EditorScale(FOptRulerSize);
+  R.Left:= FRectGutter.Left;
+  R.Right:= FRectMain.Right;
+  R.Top:= 0;
+  R.Bottom:= R.Top+EditorScale(FOptRulerSize);
 end;
 
 procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
@@ -2253,11 +2265,11 @@ begin
     UpdateMinimapAutosize;
 
   FTextOffset:= GetTextOffset; //after gutter autosize
-  FRectMicromap:= GetRectMicromap;
-  FRectMinimap:= GetRectMinimap;
-  FRectGutter:= GetRectGutter;
-  FRectMain:= GetRectMain; //after gutter/minimap
-  FRectRuler:= GetRectRuler; //after main
+  GetRectMicromap(FRectMicromap);
+  GetRectMinimap(FRectMinimap); //after micromap
+  GetRectGutter(FRectGutter);
+  GetRectMain(FRectMain); //after gutter/minimap/micromap
+  GetRectRuler(FRectRuler); //after main
 
   UpdateWrapInfo;
 
@@ -2988,7 +3000,7 @@ begin
   if not FMinimapShowSelAlways then
     if not FCursorOnMinimap then Exit;
 
-  R:= GetRectMinimapSel;
+  GetRectMinimapSel(R);
   if IntersectRect(R, R, FRectMinimap) then
   begin
     CanvasInvertRect(C, R, Colors.MinimapSelBG);
@@ -4458,7 +4470,7 @@ begin
 
   if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
   begin
-    R:= GetRectMinimapSel;
+    GetRectMinimapSel(R);
     FMouseDownOnMinimap:= true;
     FMouseDragMinimapSelHeight:= R.Height;
     if PtInRect(R, Point(X, Y)) then
