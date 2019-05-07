@@ -90,6 +90,7 @@ type
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
     chkZebra: TCheckBox;
+    comboRulerStyle: TComboBox;
     edCrHeightNormal: TSpinEdit;
     edScrollArrowKind: TComboBox;
     edMapCharWidth: TSpinEdit;
@@ -119,6 +120,7 @@ type
     GroupBox2: TGroupBox;
     groupIndent: TGroupBox;
     LabChars: TLabel;
+    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label12: TLabel;
@@ -261,6 +263,7 @@ begin
     edRulerSize.Value:= ed.OptRulerHeightPercents;
     edRulerFSize.Value:= ed.OptRulerFontSizePercents;
     edRulerIndent.Value:= ed.OptRulerTopIndentPercents;
+    comboRulerStyle.ItemIndex:= Ord(ed.OptRulerNumeration);
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
@@ -386,6 +389,7 @@ begin
       ed.OptRulerHeightPercents:= edRulerSize.Value;
       ed.OptRulerFontSizePercents:= edRulerFSize.Value;
       ed.OptRulerTopIndentPercents:= edRulerIndent.Value;
+      ed.OptRulerNumeration:= TATRulerNumeration(comboRulerStyle.ItemIndex);
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;

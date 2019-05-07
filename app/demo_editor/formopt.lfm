@@ -323,7 +323,7 @@ object fmOpt: TfmOpt
       object Label13: TLabel
         Left = 352
         Height = 17
-        Top = 135
+        Top = 132
         Width = 262
         Caption = 'char to show when line number skipped'
         ParentColor = False
@@ -340,7 +340,7 @@ object fmOpt: TfmOpt
       object Label14: TLabel
         Left = 352
         Height = 17
-        Top = 104
+        Top = 102
         Width = 147
         Caption = 'folding plus-mark size'
         ParentColor = False
@@ -408,6 +408,28 @@ object fmOpt: TfmOpt
         Caption = 'ruler top indent in %'
         ParentColor = False
         WordWrap = True
+      end
+      object comboRulerStyle: TComboBox
+        Left = 288
+        Height = 27
+        Top = 160
+        Width = 120
+        ItemHeight = 0
+        Items.Strings = (
+          '0_10_20'
+          '1_11_21'
+          '1_10_20'
+        )
+        Style = csDropDownList
+        TabOrder = 13
+      end
+      object Label1: TLabel
+        Left = 416
+        Height = 17
+        Top = 162
+        Width = 148
+        Caption = 'ruler numeration style'
+        ParentColor = False
       end
     end
     object TabSheet9: TTabSheet
@@ -573,7 +595,7 @@ object fmOpt: TfmOpt
           Top = 0
           Width = 98
           ItemHeight = 0
-          ScrollWidth = 96
+          ScrollWidth = 94
           TabOrder = 0
           TopIndex = -1
         end

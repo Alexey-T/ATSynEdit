@@ -1543,8 +1543,8 @@ uses
 
 procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
 var
-  NX, NSize, NPrevFontSize, NRulerStart, NOutput,
-  NTopIndent, i: integer;
+  NX, NPrevFontSize, NRulerStart, NOutput,
+  NTopIndent, NMarkHeight, i: integer;
   Str: string;
 begin
   NPrevFontSize:= C.Font.Size;
@@ -1565,14 +1565,21 @@ begin
   for i:= NRulerStart to NRulerStart+GetVisibleColumns+1 do
   begin
     case FOptRulerNumeration of
-      cRulerNumeration_0_10_20,
+      cRulerNumeration_0_10_20:
+        begin
+          NOutput:= i;
+          if (i mod 10 = 0) then
+          begin
+            Str:= IntToStr(NOutput);
+            C.TextOut(NX - C.TextWidth(Str) div 2, NTopIndent, Str);
+          end;
+        end;
       cRulerNumeration_1_11_21:
         begin
           NOutput:= i;
           if (i mod 10 = 0) then
           begin
-            Str:= IntToStr(NOutput +
-                  IfThen(FOptRulerNumeration=cRulerNumeration_1_11_21, 1));
+            Str:= IntToStr(NOutput+1{!});
             C.TextOut(NX - C.TextWidth(Str) div 2, NTopIndent, Str);
           end;
         end;
@@ -1588,12 +1595,12 @@ begin
     end;
 
     if NOutput mod 5 = 0 then
-      NSize:= EditorScale(FOptRulerMarkSizeBig)
+      NMarkHeight:= EditorScale(FOptRulerMarkSizeBig)
     else
-      NSize:= EditorScale(FOptRulerMarkSizeSmall);
+      NMarkHeight:= EditorScale(FOptRulerMarkSizeSmall);
 
     C.Line(NX, FRectRuler.Bottom-1,
-           NX, FRectRuler.Bottom-1-NSize);
+           NX, FRectRuler.Bottom-1-NMarkHeight);
 
     Inc(NX, FCharSize.X);
   end;
