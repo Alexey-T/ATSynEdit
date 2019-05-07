@@ -321,6 +321,10 @@ const
   cEditorScrollbarBorderSize: integer = 0;
 
 var
+  EditorScalePercents: integer = 100;
+  EditorScaleFontPercents: integer = 0; //if 0, it follows previous variable
+
+var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
   cATClipboardFormatId: integer = 0; //must be inited
   cATClipboardSignatureColBlock: integer = $1000;
@@ -415,7 +419,6 @@ type
     FSelRect: TRect;
     FSelRectBegin,
     FSelRectEnd: TPoint;
-    FScalePercents: integer;
     FCarets: TATCarets;
     FCaretBlinkEnabled: boolean;
     FCaretBlinkTime: integer;
@@ -742,7 +745,6 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
-    procedure SetScalePercents(AValue: integer);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1247,6 +1249,7 @@ type
     {$endif}
 
     function DoScale(AValue: integer): integer;
+    function DoScaleFont(AValue: integer): integer;
   published
     property Align;
     property Anchors;
@@ -1369,7 +1372,6 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
-    property OptScalePercents: integer read FScalePercents write SetScalePercents default 100;
     property OptScrollSmooth: boolean read FOptScrollSmooth write FOptScrollSmooth default true;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
@@ -1558,7 +1560,7 @@ begin
   NX:= FRectMain.Left;
 
   if FOptRulerFontSize<>0 then
-    C.Font.Size:= DoScale(FOptRulerFontSize);
+    C.Font.Size:= DoScaleFont(FOptRulerFontSize);
   C.Font.Color:= Colors.RulerFont;
   C.Pen.Color:= Colors.RulerFont;
   C.Brush.Color:= Colors.RulerBG;
@@ -3204,7 +3206,6 @@ begin
 
   Width:= 300;
   Height:= 250;
-  FScalePercents:= 100;
   Font.Name:= 'Courier New';
   Font.Size:= 9;
 
@@ -3632,6 +3633,11 @@ procedure TATSynEdit.Update(
   AUpdateCaretsCoords: boolean = true);
 begin
   UpdateCursor;
+
+  FGutter.ScalePercents:= EditorScalePercents;
+  FScrollbarHorz.ScalePercents:= EditorScalePercents;
+  FScrollbarVert.ScalePercents:= EditorScalePercents;
+
   if AUpdateWrapInfo then
   begin
     FWrapUpdateNeeded:= true;
@@ -6636,7 +6642,15 @@ end;
 
 function TATSynEdit.DoScale(AValue: integer): integer; inline;
 begin
-  Result:= AValue * FScalePercents div 100;
+  Result:= AValue * EditorScalePercents div 100;
+end;
+
+function TATSynEdit.DoScaleFont(AValue: integer): integer; inline;
+begin
+  if EditorScaleFontPercents=0 then
+    Result:= DoScale(AValue)
+  else
+    Result:= AValue * EditorScaleFontPercents div 100;
 end;
 
 procedure TATSynEdit.TimerIdleTick(Sender: TObject);
@@ -6985,16 +6999,6 @@ begin
            if AName='ANSI' then
              Str.EncodingCodepage:= {$ifdef windows} LConvEncoding.GetDefaultTextEncoding {$else} 'cp1252' {$endif};
          end;
-end;
-
-
-procedure TATSynEdit.SetScalePercents(AValue: integer);
-begin
-  if FScalePercents=AValue then Exit;
-  FScalePercents:= AValue;
-  FGutter.ScalePercents:= AValue;
-  FScrollbarHorz.ScalePercents:= AValue;
-  FScrollbarVert.ScalePercents:= AValue;
 end;
 
 
