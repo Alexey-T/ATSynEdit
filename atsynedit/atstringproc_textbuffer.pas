@@ -365,8 +365,7 @@ begin
   Result:= 0;
   NPos:= APos+1;
   NLen:= TextLength;
-  while (NPos<NLen) and (FText[NPos+1]<>CharEol) do
-  begin
+  while (NPos<NLen) and (FText[NPos+1]<>CharEol) do  begin
     Inc(Result);
     Inc(NPos);
   end;
