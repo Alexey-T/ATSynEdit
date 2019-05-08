@@ -101,10 +101,14 @@ type
     ShowFontLigatures: boolean;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
-    FontNormal: TFont;
-    FontItalic: TFont;
-    FontBold: TFont;
-    FontBoldItalic: TFont;
+    FontNormal_Name: string;
+    FontNormal_Size: integer;
+    FontItalic_Name: string;
+    FontItalic_Size: integer;
+    FontBold_Name: string;
+    FontBold_Size: integer;
+    FontBoldItalic_Name: string;
+    FontBoldItalic_Size: integer;
   end;
 
 procedure CanvasLineEx(C: TCanvas;
@@ -151,6 +155,7 @@ procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: intege
 procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
 procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
 
+procedure CanvasPaintTriangleUp(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
 procedure CanvasPaintTriangleRight(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
 procedure CanvasPaintPlusMinus(C: TCanvas; AColorBorder, AColorBG: TColor; ACenter: TPoint; ASize: integer; APlus: boolean); inline;
@@ -763,34 +768,34 @@ begin
 
       if PartPtr^.FontItalic and not PartPtr^.FontBold then
       begin
-        if AProps.FontItalic.Name<>'' then
+        if AProps.FontItalic_Name<>'' then
         begin
-          C.Font.Name:= AProps.FontItalic.Name;
-          C.Font.Size:= AProps.FontItalic.Size;
+          C.Font.Name:= AProps.FontItalic_Name;
+          C.Font.Size:= AProps.FontItalic_Size;
         end;
       end
       else
       if PartPtr^.FontBold and not PartPtr^.FontItalic then
       begin
-        if AProps.FontBold.Name<>'' then
+        if AProps.FontBold_Name<>'' then
         begin
-          C.Font.Name:= AProps.FontBold.Name;
-          C.Font.Size:= AProps.FontBold.Size;
+          C.Font.Name:= AProps.FontBold_Name;
+          C.Font.Size:= AProps.FontBold_Size;
         end;
       end
       else
       if PartPtr^.FontBold and PartPtr^.FontItalic then
       begin
-        if AProps.FontBoldItalic.Name<>'' then
+        if AProps.FontBoldItalic_Name<>'' then
         begin
-          C.Font.Name:= AProps.FontBoldItalic.Name;
-          C.Font.Size:= AProps.FontBoldItalic.Size;
+          C.Font.Name:= AProps.FontBoldItalic_Name;
+          C.Font.Size:= AProps.FontBoldItalic_Size;
         end;
       end
       else
       begin
-        C.Font.Name:= AProps.FontNormal.Name;
-        C.Font.Size:= AProps.FontNormal.Size;
+        C.Font.Name:= AProps.FontNormal_Name;
+        C.Font.Size:= AProps.FontNormal_Size;
       end;
 
       PartRect:= Rect(
@@ -922,6 +927,16 @@ begin
       C.Pixels[X1, j]:= Color;
 end;
 
+procedure CanvasPaintTriangleUp(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
+begin
+  C.Brush.Color:= AColor;
+  C.Pen.Color:= AColor;
+  C.Polygon([
+    Point(ACoord.X - ASize*2, ACoord.Y + ASize),
+    Point(ACoord.X + ASize*2, ACoord.Y + ASize),
+    Point(ACoord.X, ACoord.Y - ASize)
+    ]);
+end;
 
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
 begin

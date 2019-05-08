@@ -10,7 +10,7 @@ uses
   ATStringProc,
   ATSynEdit,
   ATSynEdit_CanvasProc,
-  ATSynEdit_CharSizer;
+  ATSynEdit_CharSizer, Types;
 
 type
   { TfmOpt }
@@ -19,6 +19,8 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkUndoGr: TCheckBox;
+    chkUndoSv: TCheckBox;
     chkUnprintOnlyBothEnds: TCheckBox;
     chkUnprintOnlyEnd: TCheckBox;
     chkSaveTrimEmptyLines: TCheckBox;
@@ -61,8 +63,6 @@ type
     chkMapSelAlways: TCheckBox;
     chkShowNumBg: TCheckBox;
     chkTabSpaces: TCheckBox;
-    chkUndoSv: TCheckBox;
-    chkUndoGr: TCheckBox;
     chkCutNoSel: TCheckBox;
     chkDotLn: TCheckBox;
     chkMsClickNumSel: TCheckBox;
@@ -90,27 +90,28 @@ type
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
     chkZebra: TCheckBox;
+    comboRulerStyle: TComboBox;
     edCrHeightNormal: TSpinEdit;
+    edRulerFSize: TSpinEdit;
+    edRulerIndent: TSpinEdit;
+    edRulerSize: TSpinEdit;
     edScrollArrowKind: TComboBox;
     edMapCharWidth: TSpinEdit;
     edNumAlign: TComboBox;
     edIndentKind: TComboBox;
     edCrTime: TSpinEdit;
     edSizeSep: TSpinEdit;
+    edUndo: TSpinEdit;
     edWordChars: TEdit;
     edIndentSize: TSpinEdit;
     edPlusSize: TSpinEdit;
     edNumChar: TEdit;
     edNumStyle: TComboBox;
     edPageSize: TComboBox;
-    edRulerFSize: TSpinEdit;
-    edRulerIndent: TSpinEdit;
-    edRulerSize: TSpinEdit;
     edSizeBm: TSpinEdit;
     edSizeEmpty: TSpinEdit;
     edSizeFold: TSpinEdit;
-    edSizeNum1: TSpinEdit;
-    edSizeNum2: TSpinEdit;
+    edSizeNumIndent: TSpinEdit;
     edSizeNum: TSpinEdit;
     edSizeState: TSpinEdit;
     edTabArrowSize: TSpinEdit;
@@ -118,6 +119,7 @@ type
     edTextHint: TEdit;
     GroupBox1: TGroupBox;
     GroupBox2: TGroupBox;
+    GroupBox3: TGroupBox;
     groupIndent: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
@@ -129,7 +131,6 @@ type
     Label15: TLabel;
     Label16: TLabel;
     Label17: TLabel;
-    Label18: TLabel;
     Label19: TLabel;
     Label2: TLabel;
     Label20: TLabel;
@@ -146,15 +147,13 @@ type
     LabelHint: TLabel;
     ListCol: TListBox;
     PageControl1: TPageControl;
-    edUndo: TSpinEdit;
-    edNumSize: TSpinEdit;
     edCrWidthNormal: TSpinEdit;
     TabSheet1: TTabSheet;
+    TabSheet10: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
-    TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TabSheet8: TTabSheet;
     TabSheet9: TTabSheet;
@@ -162,6 +161,8 @@ type
     procedure bColUpClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+      var Handled: Boolean);
   private
     { private declarations }
   public
@@ -253,7 +254,7 @@ begin
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
     edNumAlign.ItemIndex:= Ord(ed.OptNumbersAlignment);
-    edNumSize.Value:= ed.OptNumbersFontSize;
+    //edNumSize.Value:= ed.OptNumbersFontSizePercents;
     edNumChar.Text:= ed.OptNumbersSkippedChar;
     edPlusSize.Value:= ed.OptGutterPlusSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
@@ -262,9 +263,10 @@ begin
     chkShowFoldAlways.Checked:= ed.OptGutterShowFoldAlways;
     chkShowFoldLines.Checked:= ed.OptGutterShowFoldLines;
     chkShowFoldLinesAll.Checked:= ed.OptGutterShowFoldLinesAll;
-    edRulerSize.Value:= ed.OptRulerSize;
-    edRulerFSize.Value:= ed.OptRulerFontSize;
-    edRulerIndent.Value:= ed.OptRulerTextIndent;
+    edRulerSize.Value:= ed.OptRulerHeightPercents;
+    edRulerFSize.Value:= ed.OptRulerFontSizePercents;
+    edRulerIndent.Value:= ed.OptRulerTopIndentPercents;
+    comboRulerStyle.ItemIndex:= Ord(ed.OptRulerNumeration);
 
     chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
     chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
@@ -278,8 +280,7 @@ begin
     edSizeSep.Value:= ed.Gutter[ed.GutterBandSep].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
     edSizeNum.Value:= ed.Gutter[ed.GutterBandNum].Size;
-    edSizeNum1.Value:= ed.OptNumbersIndentLeft;
-    edSizeNum2.Value:= ed.OptNumbersIndentRight;
+    edSizeNumIndent.Value:= ed.OptNumbersIndentPercents;
     chkGutterNumAuto.Checked:= ed.OptNumbersAutosize;
 
     //minimap
@@ -377,7 +378,7 @@ begin
       ed.CaretPropsNormal.EmptyInside:= chkCrEmptyNormal.Checked;
 
       //gutter
-      ed.OptNumbersFontSize:= edNumSize.Value;
+      //ed.OptNumbersFontSizePercents:= edNumSize.Value;
       ed.OptNumbersStyle:= TATSynNumbersStyle(edNumStyle.ItemIndex);
       ed.OptNumbersAlignment:= TAlignment(edNumAlign.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
@@ -388,9 +389,10 @@ begin
       ed.OptGutterShowFoldLinesAll:= chkShowFoldLinesAll.Checked;
       ed.OptGutterPlusSize:= edPlusSize.Value;
       ed.OptShowGutterCaretBG:= chkShowNumBg.Checked;
-      ed.OptRulerSize:= edRulerSize.Value;
-      ed.OptRulerFontSize:= edRulerFSize.Value;
-      ed.OptRulerTextIndent:= edRulerIndent.Value;
+      ed.OptRulerHeightPercents:= edRulerSize.Value;
+      ed.OptRulerFontSizePercents:= edRulerFSize.Value;
+      ed.OptRulerTopIndentPercents:= edRulerIndent.Value;
+      ed.OptRulerNumeration:= TATRulerNumeration(comboRulerStyle.ItemIndex);
 
       ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
@@ -405,8 +407,7 @@ begin
       ed.Gutter[ed.GutterBandSep].Size:= edSizeSep.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
       ed.OptNumbersAutosize:= chkGutterNumAuto.Checked;
-      ed.OptNumbersIndentLeft:= edSizeNum1.Value;
-      ed.OptNumbersIndentRight:= edSizeNum2.Value;
+      ed.OptNumbersIndentPercents:= edSizeNumIndent.Value;
 
       //minimap
       ed.OptMinimapCharWidth:= edMapCharWidth.Value;
@@ -466,6 +467,12 @@ end;
 procedure TfmOpt.FormShow(Sender: TObject);
 begin
   PageControl1.ActivePageIndex:= 0;
+end;
+
+procedure TfmOpt.TabSheet1ContextPopup(Sender: TObject; MousePos: TPoint;
+  var Handled: Boolean);
+begin
+
 end;
 
 procedure SwapItems(L: TListbox; n1, n2: integer);
