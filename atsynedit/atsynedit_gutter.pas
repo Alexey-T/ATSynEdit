@@ -9,13 +9,15 @@ unit ATSynEdit_Gutter;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils,
+  ATStringProc;
 
 type
   TATGutterItem = class
     Visible: boolean;
     Size: integer;
     Left, Right: integer;
+    Scaled: boolean;
   end;
 
 type
@@ -25,7 +27,7 @@ type
   TATGutter = class
   private
     FList: TList;
-    function GetItem(N: Integer): TATGutterItem;
+    function GetItem(N: integer): TATGutterItem;
   public
     GutterLeft: integer;
     constructor Create; virtual;
@@ -51,7 +53,7 @@ begin
   Result:= (N>=0) and (N<FList.Count);
 end;
 
-function TATGutter.GetItem(N: Integer): TATGutterItem;
+function TATGutter.GetItem(N: integer): TATGutterItem;
 begin
   if IsIndexValid(N) then
     Result:= TATGutterItem(FList[N])
@@ -127,7 +129,12 @@ begin
         Left:= GutterLeft;
       Right:= Left;
       if Visible then
-        Inc(Right, Size);
+      begin
+        if Scaled then
+          Inc(Right, EditorScale(Size))
+        else
+          Inc(Right, Size);
+      end;
     end;
 end;
 

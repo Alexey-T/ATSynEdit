@@ -309,7 +309,7 @@ object fmMain: TfmMain
       Height = 25
       Top = 288
       Width = 96
-      Caption = 'opts...'
+      Caption = 'options...'
       OnClick = bOptClick
       TabOrder = 17
     end
@@ -401,24 +401,24 @@ object fmMain: TfmMain
   end
   object OpenDialog1: TOpenDialog
     Options = [ofFileMustExist, ofEnableSizing]
-    left = 472
-    top = 20
+    Left = 472
+    Top = 20
   end
   object FontDialog1: TFontDialog
     Title = 'Font'
     MinFontSize = 0
     MaxFontSize = 0
-    left = 536
-    top = 20
+    Left = 536
+    Top = 20
   end
   object SaveDialog1: TSaveDialog
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    left = 504
-    top = 20
+    Left = 504
+    Top = 20
   end
   object MainMenu1: TMainMenu
-    left = 432
-    top = 80
+    Left = 432
+    Top = 80
     object mnuFile: TMenuItem
       Caption = 'File'
       object mnuFileOpen: TMenuItem
@@ -576,48 +576,48 @@ object fmMain: TfmMain
     end
   end
   object PopupBookmk: TPopupMenu
-    left = 480
-    top = 104
+    Left = 480
+    Top = 104
     object mnuBms: TMenuItem
       Caption = 'toggle all bm''s'
       OnClick = mnuBmsClick
     end
   end
   object PopupNums: TPopupMenu
-    left = 523
-    top = 128
+    Left = 523
+    Top = 128
     object MenuItem3: TMenuItem
       Caption = 'test nums'
       Enabled = False
     end
   end
   object PopupFold: TPopupMenu
-    left = 568
-    top = 152
+    Left = 568
+    Top = 152
     object MenuItem4: TMenuItem
       Caption = 'test fold'
       Enabled = False
     end
   end
   object PopupMinimap: TPopupMenu
-    left = 448
-    top = 192
+    Left = 448
+    Top = 192
     object MenuItem6: TMenuItem
       Caption = 'minimap'
       Enabled = False
     end
   end
   object PopupMicromap: TPopupMenu
-    left = 496
-    top = 216
+    Left = 496
+    Top = 216
     object MenuItem7: TMenuItem
       Caption = 'micromap'
       Enabled = False
     end
   end
   object PopupRuler: TPopupMenu
-    left = 552
-    top = 240
+    Left = 552
+    Top = 240
     object MenuItem8: TMenuItem
       Caption = 'ruler'
       Enabled = False
@@ -627,18 +627,18 @@ object fmMain: TfmMain
     Enabled = False
     Interval = 5500
     OnTimer = TimerHintTimer
-    left = 560
-    top = 303
+    Left = 560
+    Top = 303
   end
   object ApplicationProperties1: TApplicationProperties
     ShowButtonGlyphs = sbgNever
     ShowMenuGlyphs = sbgNever
-    left = 548
-    top = 366
+    Left = 548
+    Top = 366
   end
   object ImagesDecor: TImageList
-    left = 609
-    top = 24
+    Left = 609
+    Top = 24
     Bitmap = {
       4C69030000001000000010000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

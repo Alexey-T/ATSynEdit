@@ -155,8 +155,8 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapWidth:= MulDiv(22, Screen.PixelsPerInch, 96);
-  OptComboboxArrowSize:= MulDiv(2, Screen.PixelsPerInch, 96);
+  OptMicromapWidthPercents:= 300;
+  OptComboboxArrowSize:= 2;
 
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
@@ -177,7 +177,7 @@ begin
     Point(
       (ARect.Left+ARect.Right) div 2,
       (ARect.Top+ARect.Bottom) div 2),
-    FOptComboboxArrowSize);
+    EditorScale(FOptComboboxArrowSize));
 end;
 
 procedure TATComboEdit.DoMenu;
@@ -189,7 +189,7 @@ begin
   Update; //control may get focus, need repaint
   if FItems.Count=0 then exit;
 
-  p:= ClientToScreen(Point(Width-OptMicromapWidth, Height));
+  p:= ClientToScreen(Point(Width, Height));
   with FMenu.Items do
   begin
     Clear;

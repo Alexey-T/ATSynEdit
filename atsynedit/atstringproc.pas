@@ -41,6 +41,13 @@ const
   cLineEndLength: array[TATLineEnds] of integer = (0, 2, 1, 1);
 
 var
+  EditorScalePercents: integer = 100;
+  EditorScaleFontPercents: integer = 0; //if 0, it follows previous variable
+
+function EditorScale(AValue: integer): integer; inline;
+function EditorScaleFont(AValue: integer): integer;
+
+var
   OptMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
   OptMinWordWrapOffset: integer = 3;
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
@@ -982,6 +989,20 @@ begin
   for i:= 1 to Length(S) do
     if S[i]=ch then
       Inc(Result);
+end;
+
+
+function EditorScale(AValue: integer): integer; inline;
+begin
+  Result:= AValue * EditorScalePercents div 100;
+end;
+
+function EditorScaleFont(AValue: integer): integer;
+begin
+  if EditorScaleFontPercents=0 then
+    Result:= EditorScale(AValue)
+  else
+    Result:= AValue * EditorScaleFontPercents div 100;
 end;
 
 end.

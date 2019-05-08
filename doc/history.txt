@@ -1,4 +1,19 @@
 
+2019.05.07
++ add: global variables EditorScale, EditorScaleFont (in percents)
++ add: property OptRulerHeightPercents
++ add: property OptRulerFontSizePercents
++ add: property OptRulerTopIndentPercents
++ add: property OptMicromapWidthPercents
++ add: property OptNumbersIndentPercents
+* deleted: OptRulerSize
+* deleted: OptRulerFontSize
+* deleted: OptRulerTextIndent
+* deleted: OptMicromapWidth
+* deleted: OptNumbersIndentLeft, OptNumbersIndentRight
+* deleted: OptNumbersFontSize
+* deleted: OptCharSpacingX
+
 2019.04.30
 + add: property Strings.UndoEmpty
 + add: property Strings.RedoEmpty

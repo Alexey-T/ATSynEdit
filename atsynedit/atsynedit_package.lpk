@@ -25,8 +25,7 @@
       </CodeGeneration>
       <Other>
         <CustomOptions Value="-Sa
--dFGLINLINE
--dDEBUGLOG"/>
+-dFGLINLINE"/>
       </Other>
     </CompilerOptions>
     <Description Value="Multi-line editor control, with much more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
