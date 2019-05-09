@@ -694,6 +694,7 @@ type
     FOptKeyTabIndentsVerticalBlock: boolean;
     FOptShowIndentLines: boolean;
     FOptShowGutterCaretBG: boolean;
+    FOptAllowRepaintOnTextChange: boolean;
     FOptAllowScrollbarVert: boolean;
     FOptAllowScrollbarHorz: boolean;
     FOptAllowZooming: boolean;
@@ -1499,6 +1500,7 @@ type
     property OptMaxLineLengthForSlowWidthDetect: integer read FOptMaxLineLengthForSlowWidthDetect write FOptMaxLineLengthForSlowWidthDetect default 500;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines default true;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG default true;
+    property OptAllowRepaintOnTextChange: boolean read FOptAllowRepaintOnTextChange write FOptAllowRepaintOnTextChange default true;
     property OptAllowScrollbarVert: boolean read FOptAllowScrollbarVert write FOptAllowScrollbarVert default true;
     property OptAllowScrollbarHorz: boolean read FOptAllowScrollbarHorz write FOptAllowScrollbarHorz default true;
     property OptAllowZooming: boolean read FOptAllowZooming write FOptAllowZooming default true;
@@ -3468,6 +3470,7 @@ begin
   FOptTextOffsetLeft:= 0;
   FOptTextOffsetTop:= 0;
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
+  FOptAllowRepaintOnTextChange:= true;
   FOptAllowScrollbarVert:= true;
   FOptAllowScrollbarHorz:= true;
   FOptAllowZooming:= true;

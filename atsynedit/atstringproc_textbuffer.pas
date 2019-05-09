@@ -62,6 +62,7 @@ type
     property Count: integer read FCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
     property Version :integer read FBufferVersion;
+    property IsLocked :boolean read FLocked;
   end;
 
 implementation
@@ -365,8 +366,7 @@ begin
   Result:= 0;
   NPos:= APos+1;
   NLen:= TextLength;
-  while (NPos<NLen) and (FText[NPos+1]<>CharEol) do
-  begin
+  while (NPos<NLen) and (FText[NPos+1]<>CharEol) do  begin
     Inc(Result);
     Inc(NPos);
   end;
