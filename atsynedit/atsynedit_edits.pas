@@ -182,14 +182,12 @@ end;
 
 procedure TATComboEdit.DoMenu;
 var
-  p: TPoint;
   i: integer;
   mi: TMenuItem;
 begin
   Update; //control may get focus, need repaint
   if FItems.Count=0 then exit;
 
-  p:= ClientToScreen(Point(Width, Height));
   with FMenu.Items do
   begin
     Clear;
@@ -202,7 +200,8 @@ begin
       Add(mi);
     end;
   end;
-  FMenu.PopUp(p.x, p.y);
+
+  FMenu.PopUp;
 end;
 
 procedure TATComboEdit.MenuItemClick(Sender: TObject);
