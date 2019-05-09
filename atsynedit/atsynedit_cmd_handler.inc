@@ -103,9 +103,10 @@ end;
 procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
 var
   Caret: TATCaretItem;
-  bNeedRepaint: boolean;
+  bNeedRepaint, bAllowRepaint: boolean;
 begin
   bNeedRepaint:= false;
+  bAllowRepaint:= true;
 
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
@@ -125,6 +126,7 @@ begin
 
   if cResultText in Res then
   begin
+    bAllowRepaint:= FOptAllowRepaintOnTextChange;
     if FOptMouseHideCursor then
       if PtInRect(FRectMain, ScreenToClient(Mouse.CursorPos)) then
         SetCursor(crNone);
@@ -184,10 +186,14 @@ begin
     //and it helps to not skip repaints in big files with EControl lexer
     UpdateCursor;
     Paint;
-    Invalidate;
+    if bAllowRepaint then
+      Invalidate;
   end
   else
-    Invalidate;
+  begin
+    if bAllowRepaint then
+      Invalidate;
+  end;
 end;
 
 procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');

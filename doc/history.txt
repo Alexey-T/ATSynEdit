@@ -1,4 +1,7 @@
 
+2019.05.09
++ add: property OptAllowRepaintOnTextChange
+
 2019.05.07
 + add: global variables EditorScale, EditorScaleFont (in percents)
 + add: property OptRulerHeightPercents
