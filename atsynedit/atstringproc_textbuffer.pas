@@ -62,6 +62,7 @@ type
     property Count: integer read FCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
     property Version :integer read FBufferVersion;
+    property IsLocked :boolean read FLocked;
   end;
 
 implementation
