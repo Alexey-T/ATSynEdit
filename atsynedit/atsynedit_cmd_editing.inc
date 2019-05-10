@@ -416,9 +416,9 @@ begin
   try
     DoCaretsDeleteOnSameLines;
 
-    for i:= FCarets.Count-1 downto 0 do
+    for i:= Carets.Count-1 downto 0 do
     begin
-      Caret:= FCarets[i];
+      Caret:= Carets[i];
       Caret.GetSelLines(YFrom, YTo, true);
 
       //Caret.PosX:= 0;
@@ -431,6 +431,15 @@ begin
         Strings.TextDeleteLine(0, j, Shift, PosAfter);
         DoCaretsShift(0, j, Shift.X, Shift.Y, PosAfter);
       end;
+    end;
+
+    //fix possible incorrect caret pos
+    for i:= Carets.Count-1 downto 0 do
+    begin
+      Caret:= Carets[i];
+      Caret.PosY:= Min(Caret.PosY, Strings.Count-1);
+      if not FCaretVirtual then
+        Caret.PosX:= Min(Caret.PosX, Strings.LinesLen[Caret.PosY]);
     end;
   finally
     Strings.EndUndoGroup;
