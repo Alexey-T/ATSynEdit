@@ -433,14 +433,7 @@ begin
       end;
     end;
 
-    //fix possible incorrect caret pos
-    for i:= Carets.Count-1 downto 0 do
-    begin
-      Caret:= Carets[i];
-      Caret.PosY:= Min(Caret.PosY, Strings.Count-1);
-      if not FCaretVirtual then
-        Caret.PosX:= Min(Caret.PosX, Strings.LinesLen[Caret.PosY]);
-    end;
+    DoCaretsFixIncorrectPos(false);
   finally
     Strings.EndUndoGroup;
   end;

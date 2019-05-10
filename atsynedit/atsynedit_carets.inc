@@ -889,7 +889,7 @@ begin
       Caret.EndY:= -1;
     end;
 
-    if AndLimitByLineEnds then
+    if AndLimitByLineEnds or not FCaretVirtual then
     begin
       NLen:= Strings.LinesLen[Caret.PosY];
       if Caret.PosX>NLen then
