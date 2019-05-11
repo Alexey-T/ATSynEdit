@@ -1255,12 +1255,25 @@ end;
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
   ACharSize: TPoint; ATabSize: integer; const AParts: TATLineParts;
   AColorBG: TColor; const ALine: atString; AUsePixels: boolean);
-// line is painted with 2px height,
-// and 1px spacing between lines
+{
+Line is painted with ACharSize.Y=2px height, with 1px spacing between lines
+}
+  //
+  procedure PaintPixel(AX, AY: integer; AColor: TColor); inline;
+  begin
+    if ACharSize.X=1 then
+      C.Pixels[AX, AY]:= AColor
+    else
+    begin
+      C.Brush.Color:= AColor;
+      C.FillRect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y);
+    end;
+  end;
+  //
 var
   Part: PATLinePart;
   NPartIndex, NCharIndex, NSpaces: integer;
-  X1, X2, Y2: integer;
+  X1, X2, Y1, Y2: integer;
   HasBG: boolean;
   NColorBack, NColorFont, NColorFontHalf: TColor;
   ch: WideChar;
@@ -1300,7 +1313,8 @@ begin
 
       X1:= APos.X + ACharSize.X*NSpaces;
       X2:= X1 + ACharSize.X;
-      Y2:= APos.Y + ACharSize.Y;
+      Y1:= APos.Y;
+      Y2:= Y1 + ACharSize.Y;
 
       if (X1>=ARect.Left) and (X1<ARect.Right) then
       begin
@@ -1311,28 +1325,32 @@ begin
         if HasBG then
         begin
           //paint BG as 2 pixel line
+          (*
           if AUsePixels then
           begin
-            C.Pixels[X1, Y2-2]:= NColorBack;
-            C.Pixels[X1, Y2-1]:= NColorBack;
+            PaintPixel(X1, Y1, NColorBack);
+            PaintPixel(X1, Y2-1, NColorBack);
           end
           else
+          *)
           begin
             C.Brush.Color:= NColorBack;
-            C.FillRect(X1, Y2-2, X2, Y2);
+            C.FillRect(X1, Y1, X2, Y2);
           end;
         end;
 
         if not IsCharSpace(ch) then
         begin
+          (*
           if AUsePixels then
           begin
-            C.Pixels[X1, Y2-1]:= NColorFontHalf;
+            PaintPixel(X1, Y2-1, NColorFontHalf);
           end
           else
+          *)
           begin
             C.Brush.Color:= NColorFontHalf;
-            C.FillRect(X1, Y2-1, X2, Y2);
+            C.FillRect(X1, Y1+ACharSize.Y div 2, X2, Y2);
           end;
         end;
       end;

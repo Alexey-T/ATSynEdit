@@ -2265,6 +2265,9 @@ begin
   C.Font.Size:= EditorScaleFont(Font.Size);
 
   FCharSize:= GetCharSize(C, FCharSpacingText);
+  FCharSizeMinimap.X:= EditorScale(1);
+  FCharSizeMinimap.Y:= EditorScale(2);
+
   FNumbersIndent:= FCharSize.X * FOptNumbersIndentPercents div 100;
   FMicromapWidth:= FCharSize.X * FMicromapWidthPercents div 100;
   FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
