@@ -57,6 +57,7 @@ type
     gUnpri: TGroupBox;
     gWrap: TGroupBox;
     ImagesDecor: TImageList;
+    Label1: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label2: TLabel;
@@ -127,6 +128,7 @@ type
     Status: TStatusBar;
     StatusMsg: TStatusBar;
     TimerHint: TTimer;
+    TrackbarScale: TTrackBar;
     procedure bClearLogClick(Sender: TObject);
     procedure bGotoClick(Sender: TObject);
     procedure btnMarkerClick(Sender: TObject);
@@ -157,6 +159,7 @@ type
     procedure mnuTestGutterDecorClick(Sender: TObject);
     procedure mnuTestSyntaxClick(Sender: TObject);
     procedure TimerHintTimer(Sender: TObject);
+    procedure TrackbarScaleChange(Sender: TObject);
     procedure UpdateEnc;
     procedure mnuHelpMousClick(Sender: TObject);
     procedure chkGutterChange(Sender: TObject);
@@ -1031,6 +1034,12 @@ procedure TfmMain.TimerHintTimer(Sender: TObject);
 begin
   TimerHint.Enabled:= false;
   StatusMsg.SimpleText:= '';
+end;
+
+procedure TfmMain.TrackbarScaleChange(Sender: TObject);
+begin
+  EditorScalePercents:= TrackbarScale.Position;
+  Ed.Update(true);
 end;
 
 procedure TfmMain.DoSetEnc(const Str: string);

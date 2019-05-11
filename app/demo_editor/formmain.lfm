@@ -1,10 +1,10 @@
 object fmMain: TfmMain
   Left = 266
-  Height = 519
+  Height = 542
   Top = 168
   Width = 953
   Caption = 'Demo'
-  ClientHeight = 496
+  ClientHeight = 519
   ClientWidth = 953
   Menu = MainMenu1
   OnCreate = FormCreate
@@ -13,25 +13,25 @@ object fmMain: TfmMain
   LCLVersion = '2.1.0.0'
   object PanelMain: TPanel
     Left = 0
-    Height = 496
+    Height = 519
     Top = 0
     Width = 672
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 496
+    ClientHeight = 519
     ClientWidth = 672
     TabOrder = 0
     object Status: TStatusBar
       Left = 0
       Height = 21
-      Top = 475
+      Top = 498
       Width = 672
       Panels = <>
     end
     object StatusMsg: TStatusBar
       Left = 0
       Height = 21
-      Top = 454
+      Top = 477
       Width = 672
       Font.Color = clBlue
       Panels = <>
@@ -46,7 +46,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Side = asrCenter
       Left = 507
       Height = 14
-      Top = 457
+      Top = 480
       Width = 160
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
@@ -61,7 +61,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Side = asrCenter
       Left = 412
       Height = 22
-      Top = 453
+      Top = 476
       Width = 90
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
@@ -73,12 +73,12 @@ object fmMain: TfmMain
   end
   object PanelRt: TPanel
     Left = 672
-    Height = 496
+    Height = 519
     Top = 0
     Width = 281
     Align = alRight
     BevelOuter = bvNone
-    ClientHeight = 496
+    ClientHeight = 519
     ClientWidth = 281
     TabOrder = 1
     object chkGutter: TCheckBox
@@ -346,8 +346,8 @@ object fmMain: TfmMain
       AnchorSideBottom.Control = PanelRt
       AnchorSideBottom.Side = asrBottom
       Left = 8
-      Height = 118
-      Top = 376
+      Height = 109
+      Top = 408
       Width = 271
       Anchors = [akTop, akLeft, akRight, akBottom]
       BorderSpacing.Around = 2
@@ -357,9 +357,9 @@ object fmMain: TfmMain
       TopIndex = -1
     end
     object bClearLog: TButton
-      Left = 176
+      Left = 184
       Height = 25
-      Top = 348
+      Top = 494
       Width = 91
       Caption = 'clear log'
       OnClick = bClearLogClick
@@ -397,6 +397,29 @@ object fmMain: TfmMain
       OnChange = chkSmoothScrollChange
       State = cbChecked
       TabOrder = 9
+    end
+    object TrackbarScale: TTrackBar
+      Left = 184
+      Height = 46
+      Top = 312
+      Width = 88
+      Max = 300
+      Min = 100
+      OnChange = TrackbarScaleChange
+      Position = 100
+      ShowSelRange = False
+      TickStyle = tsNone
+      TabOrder = 20
+    end
+    object Label1: TLabel
+      AnchorSideTop.Control = TrackbarScale
+      AnchorSideTop.Side = asrCenter
+      Left = 144
+      Height = 17
+      Top = 327
+      Width = 35
+      Caption = 'Scale'
+      ParentColor = False
     end
   end
   object OpenDialog1: TOpenDialog
