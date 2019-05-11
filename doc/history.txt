@@ -1,12 +1,13 @@
 
 2019.05.11
-+ add: now all elements are auto-scaled (by EditorSpacePercents), and minimap too
++ add: now all elements are auto-scaled (by EditorScalePercents), and minimap too
 
 2019.05.09
-+ add: property OptAllowRepaintOnTextChange
++ add: property OptAllowRepaintOnTextChange (to reduce repaint count with adapters)
 
 2019.05.07
-+ add: global variables EditorScalePercents, EditorScaleFontPercents (in percents)
++ add: global variables EditorScalePercents, EditorScaleFontPercents
++ add: global procedures EditorScale, EditorScaleFont
 + add: property OptRulerHeightPercents
 + add: property OptRulerFontSizePercents
 + add: property OptRulerTopIndentPercents
