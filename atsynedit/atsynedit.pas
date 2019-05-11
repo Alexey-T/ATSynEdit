@@ -1617,7 +1617,7 @@ begin
     CanvasPaintTriangleDown(C,
       Colors.RulerFont,
       Point(ACaretX, FRectRuler.Top+FOptRulerMarkSizeCaret),
-      FOptRulerMarkSizeCaret
+      EditorScale(FOptRulerMarkSizeCaret)
       );
 end;
 
