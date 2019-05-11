@@ -16,8 +16,8 @@ uses
   ATSynEdit_Gaps,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
-  ATSynEdit_Hotspots,
-  ATSynEdit_DimRanges,
+  //ATSynEdit_Hotspots,
+  //ATSynEdit_DimRanges,
   ATSynEdit_Gutter_Decor,
   formkey,
   formopt,
@@ -57,7 +57,7 @@ type
     gUnpri: TGroupBox;
     gWrap: TGroupBox;
     ImagesDecor: TImageList;
-    Label1: TLabel;
+    LabelScale: TLabel;
     Label10: TLabel;
     Label11: TLabel;
     Label2: TLabel;

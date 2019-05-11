@@ -399,6 +399,10 @@ object fmMain: TfmMain
       TabOrder = 9
     end
     object TrackbarScale: TTrackBar
+      AnchorSideLeft.Control = LabelScale
+      AnchorSideLeft.Side = asrBottom
+      AnchorSideTop.Control = LabelScale
+      AnchorSideTop.Side = asrCenter
       Left = 184
       Height = 46
       Top = 312
@@ -409,11 +413,10 @@ object fmMain: TfmMain
       Position = 100
       ShowSelRange = False
       TickStyle = tsNone
+      BorderSpacing.Left = 5
       TabOrder = 20
     end
-    object Label1: TLabel
-      AnchorSideTop.Control = TrackbarScale
-      AnchorSideTop.Side = asrCenter
+    object LabelScale: TLabel
       Left = 144
       Height = 17
       Top = 327
