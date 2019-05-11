@@ -3653,7 +3653,7 @@ function TATSynEdit.ClientWidth: integer;
 begin
   Result:= inherited ClientWidth;
   if FScrollbarVert.Visible then
-    Dec(Result, cEditorScrollbarWidth);
+    Dec(Result, FScrollbarVert.Width);
   if Result<1 then Result:= 1;
 end;
 
@@ -3661,7 +3661,7 @@ function TATSynEdit.ClientHeight: integer;
 begin
   Result:= inherited ClientHeight;
   if FScrollbarHorz.Visible then
-    Dec(Result, FScrollbarVert.Width);
+    Dec(Result, FScrollbarHorz.Height);
   if Result<1 then Result:= 1;
 end;
 
