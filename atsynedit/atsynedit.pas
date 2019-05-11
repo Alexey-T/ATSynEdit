@@ -2534,7 +2534,7 @@ begin
               WrapItem.NLineIndex,
               WrapItem.NCharIndex,
               GetVisibleColumns), //optimize for huge lines
-            DoubleBuffered
+            DoubleBuffered and (ACharSize.X=1)
             );
 
           //end of painting line
@@ -2750,7 +2750,7 @@ begin
             WrapItem.NLineIndex,
             WrapItem.NCharIndex,
             GetVisibleColumns), //optimize for huge lines
-          DoubleBuffered
+          DoubleBuffered and (ACharSize.X=1)
           );
 
       //restore after textout

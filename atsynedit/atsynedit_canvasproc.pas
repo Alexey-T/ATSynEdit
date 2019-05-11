@@ -1258,18 +1258,6 @@ procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
 {
 Line is painted with ACharSize.Y=2px height, with 1px spacing between lines
 }
-  //
-  procedure PaintPixel(AX, AY: integer; AColor: TColor); inline;
-  begin
-    if ACharSize.X=1 then
-      C.Pixels[AX, AY]:= AColor
-    else
-    begin
-      C.Brush.Color:= AColor;
-      C.FillRect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y);
-    end;
-  end;
-  //
 var
   Part: PATLinePart;
   NPartIndex, NCharIndex, NSpaces: integer;
@@ -1325,14 +1313,12 @@ begin
         if HasBG then
         begin
           //paint BG as 2 pixel line
-          (*
           if AUsePixels then
           begin
-            PaintPixel(X1, Y1, NColorBack);
-            PaintPixel(X1, Y2-1, NColorBack);
+            C.Pixels[X1, Y1]:= NColorBack;
+            C.Pixels[X1, Y2-1]:= NColorBack;
           end
           else
-          *)
           begin
             C.Brush.Color:= NColorBack;
             C.FillRect(X1, Y1, X2, Y2);
@@ -1341,13 +1327,11 @@ begin
 
         if not IsCharSpace(ch) then
         begin
-          (*
           if AUsePixels then
           begin
-            PaintPixel(X1, Y2-1, NColorFontHalf);
+            C.Pixels[X1, Y2-1]:= NColorFontHalf;
           end
           else
-          *)
           begin
             C.Brush.Color:= NColorFontHalf;
             C.FillRect(X1, Y1+ACharSize.Y div 2, X2, Y2);
