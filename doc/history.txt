@@ -1,4 +1,7 @@
 
+2019.05.12
++ add: feature like in EmEditor: double-click selects not only whole word, but also spaces and symbol-chars
+
 2019.05.11
 + add: now all elements are auto-scaled (by EditorScalePercents), and minimap too
 
