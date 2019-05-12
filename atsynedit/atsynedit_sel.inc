@@ -53,7 +53,7 @@ begin
   Result:= EqualRect(FSelRect, cRectEmpty);
 end;
 
-procedure TATSynEdit.DoSelect_CharGroupAtPos(P: TPoint; AddCaret: boolean);
+procedure TATSynEdit.DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
 var
   XFrom, XTo: integer;
   ch: atChar;
@@ -68,13 +68,17 @@ begin
   if IsCharWord(ch) then
     SFindWordBounds(Str, P.X, XFrom, XTo, FOptWordChars)
   else
-  if IsCharSymbol(ch) then
-    SFindSymbolsBounds(Str, P.X, XFrom, XTo)
-  else
-  if IsCharSpace(ch) then
-    SFindSpacesBounds(Str, P.X, XFrom, XTo)
-  else
-    exit;
+  begin
+    if AllowOnlyWordChars then
+      Exit;
+    if IsCharSymbol(ch) then
+      SFindSymbolsBounds(Str, P.X, XFrom, XTo)
+    else
+    if IsCharSpace(ch) then
+      SFindSpacesBounds(Str, P.X, XFrom, XTo)
+    else
+      exit;
+  end;
 
   if XFrom=XTo then exit;
 

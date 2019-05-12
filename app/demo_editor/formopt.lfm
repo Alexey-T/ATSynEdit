@@ -944,7 +944,8 @@ object fmOpt: TfmOpt
         ItemHeight = 0
         Items.Strings = (
           'none'
-          'select words/etc'
+          'select word chars'
+          'select any chars'
           'select entire line'
         )
         Style = csDropDownList

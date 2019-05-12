@@ -60,7 +60,8 @@ type
 
   TATMouseDoubleClickAction = (
     cMouseDblClickNone,
-    cMouseDblClickSelectCharGroup,
+    cMouseDblClickSelectWordChars,
+    cMouseDblClickSelectAnyChars,
     cMouseDblClickSelectEntireLine
     );
 
@@ -812,7 +813,7 @@ type
     procedure DoSelect_ExtendSelectionByLine;
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
-    procedure DoSelect_ByDoubleClick;
+    procedure DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
     procedure DoSelect_Line_ByClick;
     //paint
     procedure PaintEx(ALineNumber: integer);
@@ -1197,7 +1198,8 @@ type
     procedure DoSelect_Inverted;
     procedure DoSelect_SplitSelectionToLines;
     procedure DoSelect_Line(APos: TPoint);
-    procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret: boolean);
+    procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret,
+      AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
@@ -1465,7 +1467,7 @@ type
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection default true;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection default true;
     property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor default false;
-    property OptMouse2ClickAction: TATMouseDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectCharGroup;
+    property OptMouse2ClickAction: TATMouseDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectAnyChars;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
@@ -3505,7 +3507,7 @@ begin
   FOptMouseDragDropCopyingWithState:= ssModifier;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
-  FOptMouse2ClickAction:= cMouseDblClickSelectCharGroup;
+  FOptMouse2ClickAction:= cMouseDblClickSelectAnyChars;
   FOptMouse3ClickSelectsLine:= true;
   FOptMouse2ClickDragSelectsWords:= true;
   FOptMouseRightClickMovesCaret:= false;
@@ -5093,10 +5095,15 @@ begin
       begin
         DoSelect_Line_ByClick;
       end;
-    cMouseDblClickSelectCharGroup:
+    cMouseDblClickSelectWordChars:
       begin
         FMouseDownDouble:= true;
-        DoSelect_ByDoubleClick;
+        DoSelect_ByDoubleClick(true);
+      end;
+    cMouseDblClickSelectAnyChars:
+      begin
+        FMouseDownDouble:= true;
+        DoSelect_ByDoubleClick(false);
       end;
   end;
 
@@ -5115,10 +5122,10 @@ begin
 end;
 
 
-procedure TATSynEdit.DoSelect_ByDoubleClick;
+procedure TATSynEdit.DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
 begin
   if FMouseDownPnt.Y<0 then Exit;
-  DoSelect_CharGroupAtPos(FMouseDownPnt, IsPressedCtrl);
+  DoSelect_CharGroupAtPos(FMouseDownPnt, IsPressedCtrl, AllowOnlyWordChars);
   Update;
 end;
 
