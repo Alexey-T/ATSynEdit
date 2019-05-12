@@ -1,7 +1,8 @@
 
 2019.05.12
 + add: feature like in EmEditor: double-click selects not only whole word, but also spaces and symbol-chars
-* replaced OptMouse2ClickSelectsLine to OptMouse2ClickAction enum
+* change: replaced OptMouse2ClickSelectsLine to OptMouse2ClickAction enum
+* change: OptScrollbarsNewArrowsKind has renamed its type and has new values
 
 2019.05.11
 + add: now all elements are auto-scaled (by EditorScalePercents), and minimap too

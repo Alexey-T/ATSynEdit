@@ -106,11 +106,12 @@ type
     cDirColumnPageDown
     );
 
-  TATScrollArrowsKind = (
-    asaArrowsNormal,
-    asaArrowsBelow,
-    asaArrowsAbove,
-    asaArrowsHidden
+  TATScrollbarsArrowsKind = (
+    cScrollArrowsNormal,
+    cScrollArrowsHidden,
+    cScrollArrowsAbove,
+    cScrollArrowsBelow,
+    cScrollArrowsCorner
     );
 
   TATCaseConvert = (
@@ -587,7 +588,7 @@ type
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
     FOptScrollbarsNew: boolean;
-    FOptScrollbarsNewArrowsKind: TATScrollArrowsKind;
+    FOptScrollbarsNewArrowsKind: TATScrollbarsArrowsKind;
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollbarHorizontalHidden: boolean;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
@@ -900,7 +901,7 @@ type
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
     procedure SetOneLine(AValue: boolean);
-    procedure SetOptScrollbarsNewArrowsKind(AValue: TATScrollArrowsKind);
+    procedure SetOptScrollbarsNewArrowsKind(AValue: TATScrollbarsArrowsKind);
     procedure SetReadOnly(AValue: boolean);
     procedure SetLineTop(AValue: integer);
     procedure SetColumnLeft(AValue: integer);
@@ -1379,7 +1380,7 @@ type
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
-    property OptScrollbarsNewArrowsKind: TATScrollArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default asaArrowsNormal;
+    property OptScrollbarsNewArrowsKind: TATScrollbarsArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default cScrollArrowsNormal;
     property OptScrollbarHorizontalHidden: boolean read FOptScrollbarHorizontalHidden write FOptScrollbarHorizontalHidden default false;
     property OptScrollbarHorizontalAddSpace: integer read FOptScrollbarHorizontalAddSpace write FOptScrollbarHorizontalAddSpace default cInitScrollbarHorzAddSpace;
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
@@ -3457,7 +3458,7 @@ begin
   FOptScrollIndentCaretHorz:= 10;
   FOptScrollIndentCaretVert:= 0;
   FOptScrollbarsNew:= false;
-  FOptScrollbarsNewArrowsKind:= asaArrowsNormal;
+  FOptScrollbarsNewArrowsKind:= cScrollArrowsNormal;
   FOptScrollbarHorizontalAddSpace:= cInitScrollbarHorzAddSpace;
   FOptScrollbarHorizontalHidden:= false;
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
@@ -3811,18 +3812,41 @@ begin
   end;
 end;
 
-procedure TATSynEdit.SetOptScrollbarsNewArrowsKind(AValue: TATScrollArrowsKind);
+procedure TATSynEdit.SetOptScrollbarsNewArrowsKind(AValue: TATScrollbarsArrowsKind);
 begin
   if FOptScrollbarsNewArrowsKind=AValue then Exit;
   FOptScrollbarsNewArrowsKind:= AValue;
-  FScrollbarVert.KindArrows:= ATSynEdit_ScrollBar.TATScrollArrowsKind(AValue);
-  FScrollbarHorz.KindArrows:= FScrollbarVert.KindArrows;
+  case AValue of
+    cScrollArrowsNormal:
+      begin
+        FScrollbarVert.KindArrows:= asaArrowsNormal;
+        FScrollbarHorz.KindArrows:= asaArrowsNormal;
+      end;
+    cScrollArrowsHidden:
+      begin
+        FScrollbarVert.KindArrows:= asaArrowsHidden;
+        FScrollbarHorz.KindArrows:= asaArrowsHidden;
+      end;
+    cScrollArrowsAbove:
+      begin
+        FScrollbarVert.KindArrows:= asaArrowsAbove;
+        FScrollbarHorz.KindArrows:= asaArrowsAbove;
+      end;
+    cScrollArrowsBelow:
+      begin
+        FScrollbarVert.KindArrows:= asaArrowsBelow;
+        FScrollbarHorz.KindArrows:= asaArrowsBelow;
+      end;
+    cScrollArrowsCorner:
+      begin
+        FScrollbarVert.KindArrows:= asaArrowsBelow;
+        FScrollbarHorz.KindArrows:= asaArrowsAbove;
+      end;
+  end;
 end;
 
 procedure TATSynEdit.SetReadOnly(AValue: boolean);
 begin
-
-
   if not FOptAllowReadOnly then Exit;
   Strings.ReadOnly:= AValue;
 end;

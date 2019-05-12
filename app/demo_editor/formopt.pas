@@ -339,7 +339,7 @@ begin
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptTextHint:= edTextHint.Text;
       ed.OptWordChars:= edWordChars.Text;
-      ed.OptScrollbarsNewArrowsKind:= TATScrollArrowsKind(edScrollArrowKind.ItemIndex);
+      ed.OptScrollbarsNewArrowsKind:= TATScrollbarsArrowsKind(edScrollArrowKind.ItemIndex);
       ed.OptOverwriteAllowedOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
