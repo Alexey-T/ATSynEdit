@@ -25,6 +25,13 @@ function SFindWordOffset(const S: atString; AOffset: integer; AJump: TATWordJump
 procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer;
   const AWordChars: atString);
 
+procedure SFindSymbolsBounds(const S: atString; AOffset: integer; out AOffset1,
+  AOffset2: integer);
+
+procedure SFindSpacesBounds(const S: atString; AOffset: integer; out AOffset1,
+  AOffset2: integer);
+
+
 implementation
 
 const
@@ -167,6 +174,46 @@ begin
     AOffset2:= SFindWordOffset(S, AOffset, cWordjumpToNext, false, AWordChars);
   end;
 end;
+
+
+procedure SFindSymbolsBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer);
+begin
+  AOffset1:= AOffset;
+  AOffset2:= AOffset;
+  if S='' then exit;
+
+  //pos at end
+  if (AOffset=Length(S)) then Dec(AOffset);
+
+  if (AOffset>=0) and (AOffset<Length(S)) then
+  begin
+    while (AOffset1>0) and IsCharSymbol(S[AOffset1]) do
+      Dec(AOffset1);
+
+    while (AOffset2<Length(S)) and IsCharSymbol(S[AOffset2+1]) do
+      Inc(AOffset2);
+  end;
+end;
+
+procedure SFindSpacesBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer);
+begin
+  AOffset1:= AOffset;
+  AOffset2:= AOffset;
+  if S='' then exit;
+
+  //pos at end
+  if (AOffset=Length(S)) then Dec(AOffset);
+
+  if (AOffset>=0) and (AOffset<Length(S)) then
+  begin
+    while (AOffset1>0) and IsCharSpace(S[AOffset1]) do
+      Dec(AOffset1);
+
+    while (AOffset2<Length(S)) and IsCharSpace(S[AOffset2+1]) do
+      Inc(AOffset2);
+  end;
+end;
+
 
 end.
 

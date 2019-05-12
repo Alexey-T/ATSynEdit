@@ -91,6 +91,7 @@ function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
 function IsCharWordInIdentifier(ch: atChar): boolean;
 function IsCharDigit(ch: atChar): boolean; inline;
 function IsCharSpace(ch: atChar): boolean; inline;
+function IsCharSymbol(ch: atChar): boolean;
 function IsStringWithUnicodeChars(const S: atString): boolean;
 function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
@@ -218,6 +219,12 @@ begin
       Result:= false;
   end;
 end;
+
+function IsCharSymbol(ch: atChar): boolean;
+begin
+  Result:= Pos(ch, '.,;:''"/\-+*=()[]{}<>?!@#$%^&|~`')>0;
+end;
+
 
 function IsStringSpaces(const S: atString): boolean; inline;
 begin

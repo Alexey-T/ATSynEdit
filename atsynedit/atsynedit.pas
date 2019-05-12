@@ -1191,7 +1191,7 @@ type
     procedure DoSelect_Inverted;
     procedure DoSelect_SplitSelectionToLines;
     procedure DoSelect_Line(APos: TPoint);
-    procedure DoSelect_Word(P: TPoint; AddCaret: boolean);
+    procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
@@ -5106,12 +5106,9 @@ end;
 
 
 procedure TATSynEdit.DoSelect_ByDoubleClick;
-var
-  P: TPoint;
 begin
-  P:= FMouseDownPnt;
-  if P.Y<0 then Exit;
-  DoSelect_Word(P, IsPressedCtrl);
+  if FMouseDownPnt.Y<0 then Exit;
+  DoSelect_CharGroupAtPos(FMouseDownPnt, IsPressedCtrl);
   Update;
 end;
 

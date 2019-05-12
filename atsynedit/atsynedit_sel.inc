@@ -53,21 +53,38 @@ begin
   Result:= EqualRect(FSelRect, cRectEmpty);
 end;
 
-procedure TATSynEdit.DoSelect_Word(P: TPoint; AddCaret: boolean);
+procedure TATSynEdit.DoSelect_CharGroupAtPos(P: TPoint; AddCaret: boolean);
 var
-  N1, N2: integer;
+  XFrom, XTo: integer;
+  ch: atChar;
+  Str: atString;
 begin
   if not Strings.IsIndexValid(P.Y) then Exit;
-  SFindWordBounds(Strings.Lines[P.Y], P.X, N1, N2, FOptWordChars);
-  if N1=N2 then exit;
+
+  Str:= Strings.Lines[P.Y];
+  if not ((P.X>=0) and (P.X<Length(Str))) then Exit;
+  ch:= Str[P.X+1];
+
+  if IsCharWord(ch) then
+    SFindWordBounds(Str, P.X, XFrom, XTo, FOptWordChars)
+  else
+  if IsCharSymbol(ch) then
+    SFindSymbolsBounds(Str, P.X, XFrom, XTo)
+  else
+  if IsCharSpace(ch) then
+    SFindSpacesBounds(Str, P.X, XFrom, XTo)
+  else
+    exit;
+
+  if XFrom=XTo then exit;
 
   if AddCaret then
   begin
-    Carets.Add(N2, P.Y, N1, P.Y);
+    Carets.Add(XTo, P.Y, XFrom, P.Y);
     DoCaretsSort;
   end
   else
-    DoCaretSingle(N2, P.Y, N1, P.Y);
+    DoCaretSingle(XTo, P.Y, XFrom, P.Y);
 end;
 
 procedure TATSynEdit.DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
