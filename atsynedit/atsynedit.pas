@@ -806,7 +806,7 @@ type
     procedure DoSelect_ExtendSelectionByLine;
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
-    procedure DoSelect_Word_ByClick;
+    procedure DoSelect_ByDoubleClick;
     procedure DoSelect_Line_ByClick;
     //paint
     procedure PaintEx(ALineNumber: integer);
@@ -5087,7 +5087,7 @@ begin
   else
   begin
     FMouseDownDouble:= true;
-    DoSelect_Word_ByClick;
+    DoSelect_ByDoubleClick;
   end;
 
   DoEventCarets;
@@ -5105,19 +5105,14 @@ begin
 end;
 
 
-procedure TATSynEdit.DoSelect_Word_ByClick;
+procedure TATSynEdit.DoSelect_ByDoubleClick;
 var
   P: TPoint;
-  Details: TATPosDetails;
 begin
-  P:= ScreenToClient(Mouse.CursorPos);
-  if PtInRect(FRectMain, P) then
-  begin
-    P:= ClientPosToCaretPos(P, Details);
-    if P.Y<0 then Exit;
-    DoSelect_Word(P, IsPressedCtrl);
-    Update;
-  end;
+  P:= FMouseDownPnt;
+  if P.Y<0 then Exit;
+  DoSelect_Word(P, IsPressedCtrl);
+  Update;
 end;
 
 function TATSynEdit.GetCaretManyAllowed: boolean;
