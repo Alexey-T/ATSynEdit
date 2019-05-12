@@ -58,6 +58,12 @@ type
     OnGapPos: TPoint;
   end;
 
+  TATMouseDoubleClickAction = (
+    cMouseDblClickNone,
+    cMouseDblClickSelectCharGroup,
+    cMouseDblClickSelectEntireLine
+    );
+
   TATMouseActionId = (
     cMouseActionNone,
     cMouseActionClickSimple,
@@ -668,7 +674,7 @@ type
     FOptShowCurColumn: boolean;
     FOptShowMouseSelFrame: boolean;
     FOptMouseHideCursor: boolean;
-    FOptMouse2ClickSelectsLine: boolean;
+    FOptMouse2ClickAction: TATMouseDoubleClickAction;
     FOptMouse3ClickSelectsLine: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
     FOptMouseDragDrop: boolean;
@@ -1459,7 +1465,7 @@ type
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection default true;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection default true;
     property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor default false;
-    property OptMouse2ClickSelectsLine: boolean read FOptMouse2ClickSelectsLine write FOptMouse2ClickSelectsLine default false;
+    property OptMouse2ClickAction: TATMouseDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectCharGroup;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
@@ -3499,7 +3505,7 @@ begin
   FOptMouseDragDropCopyingWithState:= ssModifier;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
-  FOptMouse2ClickSelectsLine:= false;
+  FOptMouse2ClickAction:= cMouseDblClickSelectCharGroup;
   FOptMouse3ClickSelectsLine:= true;
   FOptMouse2ClickDragSelectsWords:= true;
   FOptMouseRightClickMovesCaret:= false;
@@ -5082,12 +5088,16 @@ begin
 
   if DoHandleClickEvent(FOnClickDbl) then Exit;
 
-  if FOptMouse2ClickSelectsLine then
-    DoSelect_Line_ByClick
-  else
-  begin
-    FMouseDownDouble:= true;
-    DoSelect_ByDoubleClick;
+  case FOptMouse2ClickAction of
+    cMouseDblClickSelectEntireLine:
+      begin
+        DoSelect_Line_ByClick;
+      end;
+    cMouseDblClickSelectCharGroup:
+      begin
+        FMouseDownDouble:= true;
+        DoSelect_ByDoubleClick;
+      end;
   end;
 
   DoEventCarets;

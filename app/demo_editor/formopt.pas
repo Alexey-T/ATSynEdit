@@ -76,7 +76,6 @@ type
     chkMsDragDrop: TCheckBox;
     chkCrMul: TCheckBox;
     chkCrVirt: TCheckBox;
-    chkMsClick2: TCheckBox;
     chkMsClick2Drag: TCheckBox;
     chkMsClick3: TCheckBox;
     chkShowFullSel: TCheckBox;
@@ -90,6 +89,7 @@ type
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
     chkZebra: TCheckBox;
+    ComboMsClick2: TComboBox;
     comboRulerStyle: TComboBox;
     edCrHeightNormal: TSpinEdit;
     edRulerFSize: TSpinEdit;
@@ -131,6 +131,7 @@ type
     Label15: TLabel;
     Label16: TLabel;
     Label17: TLabel;
+    Label18: TLabel;
     Label19: TLabel;
     Label2: TLabel;
     Label20: TLabel;
@@ -310,7 +311,7 @@ begin
     //mouse
     chkMsNormalSel.Checked:= ed.OptMouseEnableNormalSelection;
     chkMsColumnSel.Checked:= ed.OptMouseEnableColumnSelection;
-    chkMsClick2.Checked:= ed.OptMouse2ClickSelectsLine;
+    ComboMsClick2.ItemIndex:= Ord(ed.OptMouse2ClickAction);
     chkMsClick3.Checked:= ed.OptMouse3ClickSelectsLine;
     chkMsClick2Drag.Checked:= ed.OptMouse2ClickDragSelectsWords;
     chkMsClickNumSel.Checked:= ed.OptMouseClickNumberSelectsLine;
@@ -436,7 +437,7 @@ begin
       //mouse
       ed.OptMouseEnableNormalSelection:= chkMsNormalSel.Checked;
       ed.OptMouseEnableColumnSelection:= chkMsColumnSel.Checked;
-      ed.OptMouse2ClickSelectsLine:= chkMsClick2.Checked;
+      ed.OptMouse2ClickAction:= TATMouseDoubleClickAction(ComboMsClick2.ItemIndex);
       ed.OptMouse3ClickSelectsLine:= chkMsClick3.Checked;
       ed.OptMouse2ClickDragSelectsWords:= chkMsClick2Drag.Checked;
       ed.OptMouseClickNumberSelectsLine:= chkMsClickNumSel.Checked;
