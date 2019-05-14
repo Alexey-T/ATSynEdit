@@ -146,7 +146,7 @@ begin
   ed.Colors.TextBG:= $e0f0f0;
   ed.Colors.CurrentLineBG:= clTeal;
 
-  ed.Gutter[ed.GutterBandNum].Visible:= false;
+  ed.Gutter[ed.GutterBandNumbers].Visible:= false;
   ed.Gutter.Update;
 
   ed.OnClickGutter:= @EditClickGutter;
@@ -332,7 +332,7 @@ var
   NIndex: integer;
   Data: TATBookmarkData;
 begin
-  if ABand=ed.GutterBandBm then
+  if ABand=ed.GutterBandBookmarks then
   begin
     NIndex:= ed.Strings.Bookmarks.Find(ALine);
     if NIndex>=0 then
