@@ -2356,11 +2356,11 @@ end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
 var
-  Size: TPoint;
+  Size: TSize;
 begin
-  Size:= CanvasFontSizes(C);
-  Result.X:= Max(1, Size.X + ACharSpacing.X);
-  Result.Y:= Max(1, Size.Y + ACharSpacing.Y);
+  Size:= C.TextExtent('M');
+  Result.X:= Max(1, Size.cx + ACharSpacing.X);
+  Result.Y:= Max(1, Size.cy + ACharSpacing.Y);
 end;
 
 procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; ABand: integer; AColor: TColor;

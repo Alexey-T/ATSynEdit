@@ -149,7 +149,6 @@ procedure DoPaintUnprintedEol(C: TCanvas;
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
   ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer; inline;
-function CanvasFontSizes(C: TCanvas): TPoint; inline;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer); inline;
 procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
@@ -630,15 +629,6 @@ begin
   end;
 end;
 
-
-function CanvasFontSizes(C: TCanvas): TPoint; inline;
-var
-  Size: TSize;
-begin
-  Size:= C.TextExtent('M');
-  Result.X:= Size.cx;
-  Result.Y:= Size.cy;
-end;
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer; ATabHelper: TATStringTabHelper;
   ACharSize: TPoint): integer; inline;
