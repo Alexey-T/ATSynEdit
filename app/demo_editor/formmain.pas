@@ -354,9 +354,9 @@ begin
   ed_gap.OptMarginRight:= 2000;
   ed_gap.OptScrollbarsNew:= ed.OptScrollbarsNew;
   ed_gap.OptGutterVisible:= false;
-  //ed_gap.Gutter[ed_gap.GutterBandBm].Visible:= false;
-  //ed_gap.Gutter[ed_gap.GutterBandFold].Visible:= false;
-  //ed_gap.Gutter[ed_gap.GutterBandState].Visible:= false;
+  //ed_gap.Gutter[ed_gap.GutterBandBookmarks].Visible:= false;
+  //ed_gap.Gutter[ed_gap.GutterBandFolding].Visible:= false;
+  //ed_gap.Gutter[ed_gap.GutterBandStates].Visible:= false;
   ed_gap.Parent:= ed;
   ed_gap.OnChange:= @EditorGapChange;
   ed.Gaps.OnDelete:=@EditorGapDelete;
@@ -548,7 +548,7 @@ var
   NIndex: integer;
   Data: TATBookmarkData;
 begin
-  if ABand=ed.GutterBandBm then
+  if ABand=ed.GutterBandBookmarks then
   begin
     NIndex:= ed.Strings.Bookmarks.Find(ALine);
     if NIndex>=0 then

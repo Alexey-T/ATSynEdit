@@ -58,14 +58,14 @@ end;
 
 function TATSynEdit.DoCommand_ToggleLineNums: TATCommandResults;
 begin
-  with Gutter.Items[GutterBandNum] do
+  with Gutter.Items[GutterBandNumbers] do
     Visible:= not Visible;
   Result:= [cResultState];
 end;
 
 function TATSynEdit.DoCommand_ToggleFolding: TATCommandResults;
 begin
-  with Gutter.Items[GutterBandFold] do
+  with Gutter.Items[GutterBandFolding] do
     Visible:= not Visible;
   Result:= [cResultState];
 end;

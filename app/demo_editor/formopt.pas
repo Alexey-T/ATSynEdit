@@ -198,11 +198,11 @@ begin
       Items.Clear;
       for i:= 0 to 4 do
       begin
-        if i=ed.GutterBandBm then Items.Add(nameBm);
-        if i=ed.GutterBandNum then Items.Add(nameNums);
-        if i=ed.GutterBandState then Items.Add(nameState);
-        if i=ed.GutterBandFold then Items.Add(nameFold);
-        if i=ed.GutterBandSep then Items.Add(nameSep);
+        if i=ed.GutterBandBookmarks then Items.Add(nameBm);
+        if i=ed.GutterBandNumbers then Items.Add(nameNums);
+        if i=ed.GutterBandStates then Items.Add(nameState);
+        if i=ed.GutterBandFolding then Items.Add(nameFold);
+        if i=ed.GutterBandSeparator then Items.Add(nameSep);
       end;
       ItemIndex:= 0;
     end;
@@ -269,18 +269,18 @@ begin
     edRulerIndent.Value:= ed.OptRulerTopIndentPercents;
     comboRulerStyle.ItemIndex:= Ord(ed.OptRulerNumeration);
 
-    chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBm].Visible;
-    chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNum].Visible;
-    chkGutterFold.Checked:= ed.Gutter[ed.GutterBandFold].Visible;
-    chkGutterStat.Checked:= ed.Gutter[ed.GutterBandState].Visible;
-    chkGutterSep.Checked:= ed.Gutter[ed.GutterBandSep].Visible;
+    chkGutterBm.Checked:= ed.Gutter[ed.GutterBandBookmarks].Visible;
+    chkGutterNum.Checked:= ed.Gutter[ed.GutterBandNumbers].Visible;
+    chkGutterFold.Checked:= ed.Gutter[ed.GutterBandFolding].Visible;
+    chkGutterStat.Checked:= ed.Gutter[ed.GutterBandStates].Visible;
+    chkGutterSep.Checked:= ed.Gutter[ed.GutterBandSeparator].Visible;
     chkGutterEmpty.Checked:= ed.Gutter[ed.GutterBandEmpty].Visible;
-    edSizeBm.Value:= ed.Gutter[ed.GutterBandBm].Size;
-    edSizeFold.Value:= ed.Gutter[ed.GutterBandFold].Size;
-    edSizeState.Value:= ed.Gutter[ed.GutterBandState].Size;
-    edSizeSep.Value:= ed.Gutter[ed.GutterBandSep].Size;
+    edSizeBm.Value:= ed.Gutter[ed.GutterBandBookmarks].Size;
+    edSizeFold.Value:= ed.Gutter[ed.GutterBandFolding].Size;
+    edSizeState.Value:= ed.Gutter[ed.GutterBandStates].Size;
+    edSizeSep.Value:= ed.Gutter[ed.GutterBandSeparator].Size;
     edSizeEmpty.Value:= ed.Gutter[ed.GutterBandEmpty].Size;
-    edSizeNum.Value:= ed.Gutter[ed.GutterBandNum].Size;
+    edSizeNum.Value:= ed.Gutter[ed.GutterBandNumbers].Size;
     edSizeNumIndent.Value:= ed.OptNumbersIndentPercents;
     chkGutterNumAuto.Checked:= ed.OptNumbersAutosize;
 
@@ -327,11 +327,11 @@ begin
 
     if ShowModal=mrOk then
     begin
-      ed.GutterBandBm:= ListCol.Items.IndexOf(nameBm);
-      ed.GutterBandNum:= ListCol.Items.IndexOf(nameNums);
-      ed.GutterBandState:= ListCol.Items.IndexOf(nameState);
-      ed.GutterBandFold:= ListCol.Items.IndexOf(nameFold);
-      ed.GutterBandSep:= ListCol.Items.IndexOf(nameSep);
+      ed.GutterBandBookmarks:= ListCol.Items.IndexOf(nameBm);
+      ed.GutterBandNumbers:= ListCol.Items.IndexOf(nameNums);
+      ed.GutterBandStates:= ListCol.Items.IndexOf(nameState);
+      ed.GutterBandFolding:= ListCol.Items.IndexOf(nameFold);
+      ed.GutterBandSeparator:= ListCol.Items.IndexOf(nameSep);
 
       //general
       ed.OptShowCurLine:= chkCurLine.Checked;
@@ -395,17 +395,17 @@ begin
       ed.OptRulerTopIndentPercents:= edRulerIndent.Value;
       ed.OptRulerNumeration:= TATRulerNumeration(comboRulerStyle.ItemIndex);
 
-      ed.Gutter[ed.GutterBandBm].Visible:= chkGutterBm.Checked;
-      ed.Gutter[ed.GutterBandNum].Visible:= chkGutterNum.Checked;
-      ed.Gutter[ed.GutterBandFold].Visible:= chkGutterFold.Checked;
-      ed.Gutter[ed.GutterBandState].Visible:= chkGutterStat.Checked;
-      ed.Gutter[ed.GutterBandSep].Visible:= chkGutterSep.Checked;
+      ed.Gutter[ed.GutterBandBookmarks].Visible:= chkGutterBm.Checked;
+      ed.Gutter[ed.GutterBandNumbers].Visible:= chkGutterNum.Checked;
+      ed.Gutter[ed.GutterBandFolding].Visible:= chkGutterFold.Checked;
+      ed.Gutter[ed.GutterBandStates].Visible:= chkGutterStat.Checked;
+      ed.Gutter[ed.GutterBandSeparator].Visible:= chkGutterSep.Checked;
       ed.Gutter[ed.GutterBandEmpty].Visible:= chkGutterEmpty.Checked;
-      ed.Gutter[ed.GutterBandBm].Size:= edSizeBm.Value;
-      ed.Gutter[ed.GutterBandNum].Size:= edSizeNum.Value;
-      ed.Gutter[ed.GutterBandFold].Size:= edSizeFold.Value;
-      ed.Gutter[ed.GutterBandState].Size:= edSizeState.Value;
-      ed.Gutter[ed.GutterBandSep].Size:= edSizeSep.Value;
+      ed.Gutter[ed.GutterBandBookmarks].Size:= edSizeBm.Value;
+      ed.Gutter[ed.GutterBandNumbers].Size:= edSizeNum.Value;
+      ed.Gutter[ed.GutterBandFolding].Size:= edSizeFold.Value;
+      ed.Gutter[ed.GutterBandStates].Size:= edSizeState.Value;
+      ed.Gutter[ed.GutterBandSeparator].Size:= edSizeSep.Value;
       ed.Gutter[ed.GutterBandEmpty].Size:= edSizeEmpty.Value;
       ed.OptNumbersAutosize:= chkGutterNumAuto.Checked;
       ed.OptNumbersIndentPercents:= edSizeNumIndent.Value;

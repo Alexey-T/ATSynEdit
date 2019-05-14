@@ -530,11 +530,11 @@ type
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
     FGutterDecorImages: TImageList;
-    FGutterBandBm: integer;
-    FGutterBandNum: integer;
-    FGutterBandState: integer;
-    FGutterBandFold: integer;
-    FGutterBandSep: integer;
+    FGutterBandBookmarks: integer;
+    FGutterBandNumbers: integer;
+    FGutterBandStates: integer;
+    FGutterBandFolding: integer;
+    FGutterBandSeparator: integer;
     FGutterBandEmpty: integer;
     FGutterBandDecor: integer;
     FColors: TATSynEditColors;
@@ -1118,11 +1118,11 @@ type
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read FGutterDecor;
-    property GutterBandBm: integer read FGutterBandBm write FGutterBandBm;
-    property GutterBandNum: integer read FGutterBandNum write FGutterBandNum;
-    property GutterBandState: integer read FGutterBandState write FGutterBandState;
-    property GutterBandFold: integer read FGutterBandFold write FGutterBandFold;
-    property GutterBandSep: integer read FGutterBandSep write FGutterBandSep;
+    property GutterBandBookmarks: integer read FGutterBandBookmarks write FGutterBandBookmarks;
+    property GutterBandNumbers: integer read FGutterBandNumbers write FGutterBandNumbers;
+    property GutterBandStates: integer read FGutterBandStates write FGutterBandStates;
+    property GutterBandFolding: integer read FGutterBandFolding write FGutterBandFolding;
+    property GutterBandSeparator: integer read FGutterBandSeparator write FGutterBandSeparator;
     property GutterBandEmpty: integer read FGutterBandEmpty write FGutterBandEmpty;
     property GutterBandDecor: integer read FGutterBandDecor write FGutterBandDecor;
     //files
@@ -1635,7 +1635,7 @@ var
   Str: string;
 begin
   Str:= IntToStr(Max(10, Strings.Count));
-  FGutter[FGutterBandNum].Size:=
+  FGutter[FGutterBandNumbers].Size:=
     Length(Str)*FCharSize.X + 2*FNumbersIndent;
   FGutter.Update;
 end;
@@ -2411,7 +2411,7 @@ var
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor); inline;
   begin
-    DoPaintGutterBandBG(C, FGutterBandState, AColor, ATop, ATop+ACharSize.Y, false);
+    DoPaintGutterBandBG(C, FGutterBandStates, AColor, ATop, ATop+ACharSize.Y, false);
   end;
   //
 begin
@@ -2433,10 +2433,10 @@ begin
     C.FillRect(FRectGutter);
 
     //paint some bands, for full height coloring
-    if FGutter[FGutterBandFold].Visible then
-      DoPaintGutterBandBG(C, FGutterBandFold, Colors.GutterFoldBG, -1, -1, true);
-    if FGutter[FGutterBandSep].Visible then
-      DoPaintGutterBandBG(C, FGutterBandSep, Colors.GutterSeparatorBG, -1, -1, true);
+    if FGutter[FGutterBandFolding].Visible then
+      DoPaintGutterBandBG(C, FGutterBandFolding, Colors.GutterFoldBG, -1, -1, true);
+    if FGutter[FGutterBandSeparator].Visible then
+      DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, -1, -1, true);
     if FGutter[FGutterBandEmpty].Visible then
       DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, -1, -1, true);
   end;
@@ -2843,12 +2843,12 @@ begin
       C.FillRect(FRectGutter.Left, NCoordTop, FRectGutter.Right, NCoordTop+ACharSize.Y);
 
       //gutter band: number
-      Band:= FGutter[FGutterBandNum];
+      Band:= FGutter[FGutterBandNumbers];
       if Band.Visible then
       begin
         if LineWithCaret and FOptShowGutterCaretBG then
         begin
-          DoPaintGutterBandBG(C, FGutterBandNum, Colors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+          DoPaintGutterBandBG(C, FGutterBandNumbers, Colors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y, false);
           C.Font.Color:= Colors.GutterCaretFont;
         end
         else
@@ -2861,7 +2861,7 @@ begin
       //gutter decor
       NBandDecor:= FGutterBandDecor;
       if NBandDecor<0 then
-        NBandDecor:= FGutterBandBm;
+        NBandDecor:= FGutterBandBookmarks;
 
       Band:= FGutter[NBandDecor];
       if Band.Visible then
@@ -2875,7 +2875,7 @@ begin
               ));
 
       //gutter band: bookmark
-      Band:= FGutter[FGutterBandBm];
+      Band:= FGutter[FGutterBandBookmarks];
       if Band.Visible then
         if WrapItem.bInitial then
         begin
@@ -2890,10 +2890,10 @@ begin
         end;
 
       //gutter band: fold
-      Band:= FGutter[FGutterBandFold];
+      Band:= FGutter[FGutterBandFolding];
       if Band.Visible then
       begin
-        DoPaintGutterBandBG(C, FGutterBandFold, Colors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+        DoPaintGutterBandBG(C, FGutterBandFolding, Colors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y, false);
         DoPaintGutterFolding(C,
           NWrapIndex,
           Band.Left,
@@ -2904,7 +2904,7 @@ begin
       end;
 
       //gutter band: state
-      Band:= FGutter[FGutterBandState];
+      Band:= FGutter[FGutterBandStates];
       if Band.Visible then
       begin
         case Strings.LinesState[NLinesIndex] of
@@ -2915,8 +2915,8 @@ begin
       end;
 
       //gutter band: separator
-      if FGutter[FGutterBandSep].Visible then
-        DoPaintGutterBandBG(C, FGutterBandSep, Colors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+      if FGutter[FGutterBandSeparator].Visible then
+        DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
         DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, NCoordTop, NCoordTop+ACharSize.Y, false);
@@ -3377,26 +3377,26 @@ begin
   FOptGutterShowFoldLinesAll:= false;
   FOptGutterIcons:= cGutterIconsPlusMinus;
 
-  FGutterBandBm:= 0;
-  FGutterBandNum:= 1;
-  FGutterBandState:= 2;
-  FGutterBandFold:= 3;
-  FGutterBandSep:= 4;
+  FGutterBandBookmarks:= 0;
+  FGutterBandNumbers:= 1;
+  FGutterBandStates:= 2;
+  FGutterBandFolding:= 3;
+  FGutterBandSeparator:= 4;
   FGutterBandEmpty:= 5;
   FGutterBandDecor:= -1;
 
   for i:= 1 to cGutterBands do
     FGutter.Add(10);
-  FGutter[FGutterBandBm].Size:= cGutterSizeBm;
-  FGutter[FGutterBandBm].Scaled:= true;
-  FGutter[FGutterBandNum].Size:= cGutterSizeNum;
-  FGutter[FGutterBandState].Size:= cGutterSizeState;
-  FGutter[FGutterBandState].Scaled:= true;
-  FGutter[FGutterBandFold].Size:= cGutterSizeFold;
-  FGutter[FGutterBandFold].Scaled:= true;
-  FGutter[FGutterBandSep].Size:= cGutterSizeSep;
+  FGutter[FGutterBandBookmarks].Size:= cGutterSizeBm;
+  FGutter[FGutterBandBookmarks].Scaled:= true;
+  FGutter[FGutterBandNumbers].Size:= cGutterSizeNum;
+  FGutter[FGutterBandStates].Size:= cGutterSizeState;
+  FGutter[FGutterBandStates].Scaled:= true;
+  FGutter[FGutterBandFolding].Size:= cGutterSizeFold;
+  FGutter[FGutterBandFolding].Scaled:= true;
+  FGutter[FGutterBandSeparator].Size:= cGutterSizeSep;
   FGutter[FGutterBandEmpty].Size:= cGutterSizeEmpty;
-  FGutter[FGutterBandSep].Visible:= false;
+  FGutter[FGutterBandSeparator].Visible:= false;
   FGutter.Update;
 
   FOptNumbersAutosize:= true;
@@ -4564,7 +4564,7 @@ begin
     if ActionId=cMouseActionClickSimple then
     begin
       Index:= FGutter.IndexAt(X);
-      if Index=FGutterBandNum then
+      if Index=FGutterBandNumbers then
       begin
         if FOptMouseClickNumberSelectsLine then
         begin
@@ -4574,7 +4574,7 @@ begin
         end;
       end
       else
-      if Index=FGutterBandFold then
+      if Index=FGutterBandFolding then
       begin
         DoFoldbarClick(PCaret.Y);
       end
@@ -4681,11 +4681,11 @@ begin
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
   begin
     Index:= FGutter.IndexAt(X);
-    if Index=FGutterBandBm then
+    if Index=FGutterBandBookmarks then
       if Assigned(FMenuGutterBm) then FMenuGutterBm.PopUp;
-    if Index=FGutterBandNum then
+    if Index=FGutterBandNumbers then
       if Assigned(FMenuGutterNum) then FMenuGutterNum.PopUp;
-    if Index=FGutterBandFold then
+    if Index=FGutterBandFolding then
       if Assigned(FMenuGutterFold) then FMenuGutterFold.PopUp else DoMenuGutterFold;
   end
   else
@@ -4713,13 +4713,13 @@ begin
   if MouseNiceScroll then Exit;
   P:= ScreenToClient(Mouse.CursorPos);
 
-  RectBm.Left:= FGutter[FGutterBandBm].Left;
-  RectBm.Right:= FGutter[FGutterBandBm].Right;
+  RectBm.Left:= FGutter[FGutterBandBookmarks].Left;
+  RectBm.Right:= FGutter[FGutterBandBookmarks].Right;
   RectBm.Top:= FRectMain.Top;
   RectBm.Bottom:= FRectMain.Bottom;
 
-  RectNums.Left:= FGutter[FGutterBandNum].Left;
-  RectNums.Right:= FGutter[FGutterBandNum].Right;
+  RectNums.Left:= FGutter[FGutterBandNumbers].Left;
+  RectNums.Right:= FGutter[FGutterBandNumbers].Right;
   RectNums.Top:= FRectMain.Top;
   RectNums.Bottom:= FRectMain.Bottom;
 
@@ -4821,18 +4821,18 @@ begin
   RectBookmk:= Rect(0, 0, 0, 0);
   if FOptGutterVisible then
   begin
-    if FGutter[FGutterBandNum].Visible then
+    if FGutter[FGutterBandNumbers].Visible then
     begin
-      RectNums.Left:= FGutter[FGutterBandNum].Left;
-      RectNums.Right:= FGutter[FGutterBandNum].Right;
+      RectNums.Left:= FGutter[FGutterBandNumbers].Left;
+      RectNums.Right:= FGutter[FGutterBandNumbers].Right;
       RectNums.Top:= FRectMain.Top;
       RectNums.Bottom:= FRectMain.Bottom;
     end;
 
-    if FGutter[FGutterBandBm].Visible then
+    if FGutter[FGutterBandBookmarks].Visible then
     begin
-      RectBookmk.Left:= FGutter[FGutterBandBm].Left;
-      RectBookmk.Right:= FGutter[FGutterBandBm].Right;
+      RectBookmk.Left:= FGutter[FGutterBandBookmarks].Left;
+      RectBookmk.Right:= FGutter[FGutterBandBookmarks].Right;
       RectBookmk.Top:= FRectMain.Top;
       RectBookmk.Bottom:= FRectMain.Bottom;
     end;
