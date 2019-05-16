@@ -19,6 +19,7 @@ uses
   //ATSynEdit_Hotspots,
   //ATSynEdit_DimRanges,
   ATSynEdit_Gutter_Decor,
+  ATScrollBar,
   formkey,
   formopt,
   formfind;
@@ -1039,6 +1040,7 @@ end;
 procedure TfmMain.TrackbarScaleChange(Sender: TObject);
 begin
   EditorScalePercents:= TrackbarScale.Position;
+  ATScrollbarTheme.ScalePercents:= EditorScalePercents;
   Ed.Update(true);
 end;
 

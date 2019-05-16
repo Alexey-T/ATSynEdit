@@ -51,8 +51,8 @@ end;
     </CompilerOptions>
     <Description Value="Multi-line editor control, with much more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
-    <Version Major="1" Minor="2"/>
-    <Files Count="33">
+    <Version Major="1" Minor="4"/>
+    <Files Count="32">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -163,37 +163,36 @@ end;
         <UnitName Value="ATSynEdit_Gaps"/>
       </Item27>
       <Item28>
-        <Filename Value="atsynedit_scrollbar.pas"/>
-        <UnitName Value="ATSynEdit_ScrollBar"/>
-      </Item28>
-      <Item29>
         <Filename Value="atsynedit_dimranges.pas"/>
         <UnitName Value="ATSynEdit_DimRanges"/>
-      </Item29>
-      <Item30>
+      </Item28>
+      <Item29>
         <Filename Value="atsynedit_bookmarks.pas"/>
         <UnitName Value="ATSynEdit_Bookmarks"/>
-      </Item30>
-      <Item31>
+      </Item29>
+      <Item30>
         <Filename Value="atsynedit_charsizer.pas"/>
         <Type Value="Include"/>
-      </Item31>
-      <Item32>
+      </Item30>
+      <Item31>
         <Filename Value="atsynedit_gutter_decor.pas"/>
         <UnitName Value="ATSynEdit_Gutter_Decor"/>
-      </Item32>
-      <Item33>
+      </Item31>
+      <Item32>
         <Filename Value="atsynedit_fgl.pas"/>
         <UnitName Value="ATSynEdit_fgl"/>
-      </Item33>
+      </Item32>
     </Files>
-    <RequiredPkgs Count="2">
+    <RequiredPkgs Count="3">
       <Item1>
-        <PackageName Value="LCL"/>
+        <PackageName Value="atflatcontrols_package"/>
       </Item1>
       <Item2>
-        <PackageName Value="FCL"/>
+        <PackageName Value="LCL"/>
       </Item2>
+      <Item3>
+        <PackageName Value="FCL"/>
+      </Item3>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

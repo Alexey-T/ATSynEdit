@@ -33,7 +33,6 @@ uses
   ATStringProc_WordJump,
   ATSynEdit_CharSizer,
   ATSynEdit_RegExpr,
-  ATSynEdit_ScrollBar,
   ATSynEdit_Colors,
   ATSynEdit_Keymap,
   ATSynEdit_CanvasProc,
@@ -49,7 +48,8 @@ uses
   ATSynEdit_Hotspots,
   ATSynEdit_Adapters,
   ATSynEdit_Adapter_Cache,
-  ATSynEdit_FGL;
+  ATSynEdit_FGL,
+  ATScrollBar;
 
 type
   TATPosDetails = record
@@ -326,8 +326,6 @@ const
   cStrMenuitemFoldAll: string = 'Fold all';
   cStrMenuitemUnfoldAll: string = 'Unfold all';
   cStrMenuitemFoldLevel: string = 'Fold level';
-  cEditorScrollbarWidth: integer = 14;
-  cEditorScrollbarBorderSize: integer = 0;
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -554,7 +552,7 @@ type
     FScrollVertMinimap,
     FScrollHorzMinimap: TATSynScrollInfo;
     FScrollbarVert,
-    FScrollbarHorz: TATScroll;
+    FScrollbarHorz: TATScrollbar;
     FScrollbarLock: boolean;
     FPrevHorz,
     FPrevVert: TATSynScrollInfo;
@@ -3226,27 +3224,25 @@ begin
   FFontBoldItalic:= TFont.Create;
   FFontBoldItalic.Name:= '';
 
-  FScrollbarVert:= TATScroll.Create(Self);
+  FScrollbarVert:= TATScrollbar.Create(Self);
   FScrollbarVert.Hide;
   FScrollbarVert.Parent:= Self;
   FScrollbarVert.Align:= alRight;
   FScrollbarVert.Kind:= sbVertical;
   FScrollbarVert.Cursor:= crArrow;
-  FScrollbarVert.Width:= cEditorScrollbarWidth;
-  FScrollbarVert.WidthInitial:= cEditorScrollbarWidth;
-  FScrollbarVert.IndentBorder:= cEditorScrollbarBorderSize;
+  FScrollbarVert.Width:= ATScrollbarTheme.InitialSize;
+  FScrollbarVert.Update;
   FScrollbarVert.OnChange:= @OnNewScrollbarVertChanged;
 
-  FScrollbarHorz:= TATScroll.Create(Self);
+  FScrollbarHorz:= TATScrollbar.Create(Self);
   FScrollbarHorz.Hide;
   FScrollbarHorz.Parent:= Self;
   FScrollbarHorz.Align:= alBottom;
   FScrollbarHorz.Kind:= sbHorizontal;
   FScrollbarHorz.Cursor:= crArrow;
-  FScrollbarHorz.Height:= cEditorScrollbarWidth;
-  FScrollbarHorz.WidthInitial:= cEditorScrollbarWidth;
-  FScrollbarHorz.IndentCorner:= cEditorScrollbarWidth;
-  FScrollbarHorz.IndentBorder:= cEditorScrollbarBorderSize;
+  FScrollbarHorz.Height:= ATScrollbarTheme.InitialSize;
+  FScrollbarHorz.IndentCorner:= 100;
+  FScrollbarHorz.Update;
   FScrollbarHorz.OnChange:= @OnNewScrollbarHorzChanged;
 
   FCaretPropsNormal:= TATCaretProps.Create;
@@ -3643,9 +3639,6 @@ procedure TATSynEdit.Update(
 begin
   UpdateCursor;
 
-  FScrollbarHorz.ScalePercents:= EditorScalePercents;
-  FScrollbarVert.ScalePercents:= EditorScalePercents;
-
   if AUpdateWrapInfo then
   begin
     FWrapUpdateNeeded:= true;
@@ -3819,28 +3812,28 @@ begin
   case AValue of
     cScrollArrowsNormal:
       begin
-        FScrollbarVert.KindArrows:= asaArrowsNormal;
-        FScrollbarHorz.KindArrows:= asaArrowsNormal;
+        FScrollbarVert.ArrowStyle:= asaArrowsNormal;
+        FScrollbarHorz.ArrowStyle:= asaArrowsNormal;
       end;
     cScrollArrowsHidden:
       begin
-        FScrollbarVert.KindArrows:= asaArrowsHidden;
-        FScrollbarHorz.KindArrows:= asaArrowsHidden;
+        FScrollbarVert.ArrowStyle:= asaArrowsHidden;
+        FScrollbarHorz.ArrowStyle:= asaArrowsHidden;
       end;
     cScrollArrowsAbove:
       begin
-        FScrollbarVert.KindArrows:= asaArrowsAbove;
-        FScrollbarHorz.KindArrows:= asaArrowsAbove;
+        FScrollbarVert.ArrowStyle:= asaArrowsAbove;
+        FScrollbarHorz.ArrowStyle:= asaArrowsAbove;
       end;
     cScrollArrowsBelow:
       begin
-        FScrollbarVert.KindArrows:= asaArrowsBelow;
-        FScrollbarHorz.KindArrows:= asaArrowsBelow;
+        FScrollbarVert.ArrowStyle:= asaArrowsBelow;
+        FScrollbarHorz.ArrowStyle:= asaArrowsBelow;
       end;
     cScrollArrowsCorner:
       begin
-        FScrollbarVert.KindArrows:= asaArrowsBelow;
-        FScrollbarHorz.KindArrows:= asaArrowsAbove;
+        FScrollbarVert.ArrowStyle:= asaArrowsBelow;
+        FScrollbarHorz.ArrowStyle:= asaArrowsAbove;
       end;
   end;
 end;
