@@ -586,7 +586,6 @@ type
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
     FOptScrollbarsNew: boolean;
-    FOptScrollbarsNewArrowsKind: TATScrollbarsArrowsKind;
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollbarHorizontalHidden: boolean;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
@@ -899,7 +898,6 @@ type
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
     procedure SetOneLine(AValue: boolean);
-    procedure SetOptScrollbarsNewArrowsKind(AValue: TATScrollbarsArrowsKind);
     procedure SetReadOnly(AValue: boolean);
     procedure SetLineTop(AValue: integer);
     procedure SetColumnLeft(AValue: integer);
@@ -1378,7 +1376,6 @@ type
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
-    property OptScrollbarsNewArrowsKind: TATScrollbarsArrowsKind read FOptScrollbarsNewArrowsKind write SetOptScrollbarsNewArrowsKind default cScrollArrowsNormal;
     property OptScrollbarHorizontalHidden: boolean read FOptScrollbarHorizontalHidden write FOptScrollbarHorizontalHidden default false;
     property OptScrollbarHorizontalAddSpace: integer read FOptScrollbarHorizontalAddSpace write FOptScrollbarHorizontalAddSpace default cInitScrollbarHorzAddSpace;
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
@@ -3454,7 +3451,6 @@ begin
   FOptScrollIndentCaretHorz:= 10;
   FOptScrollIndentCaretVert:= 0;
   FOptScrollbarsNew:= false;
-  FOptScrollbarsNewArrowsKind:= cScrollArrowsNormal;
   FOptScrollbarHorizontalAddSpace:= cInitScrollbarHorzAddSpace;
   FOptScrollbarHorizontalHidden:= false;
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
@@ -3802,39 +3798,6 @@ begin
     OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
-  end;
-end;
-
-procedure TATSynEdit.SetOptScrollbarsNewArrowsKind(AValue: TATScrollbarsArrowsKind);
-begin
-  if FOptScrollbarsNewArrowsKind=AValue then Exit;
-  FOptScrollbarsNewArrowsKind:= AValue;
-  case AValue of
-    cScrollArrowsNormal:
-      begin
-        FScrollbarVert.ArrowStyle:= asaArrowsNormal;
-        FScrollbarHorz.ArrowStyle:= asaArrowsNormal;
-      end;
-    cScrollArrowsHidden:
-      begin
-        FScrollbarVert.ArrowStyle:= asaArrowsHidden;
-        FScrollbarHorz.ArrowStyle:= asaArrowsHidden;
-      end;
-    cScrollArrowsAbove:
-      begin
-        FScrollbarVert.ArrowStyle:= asaArrowsAbove;
-        FScrollbarHorz.ArrowStyle:= asaArrowsAbove;
-      end;
-    cScrollArrowsBelow:
-      begin
-        FScrollbarVert.ArrowStyle:= asaArrowsBelow;
-        FScrollbarHorz.ArrowStyle:= asaArrowsBelow;
-      end;
-    cScrollArrowsCorner:
-      begin
-        FScrollbarVert.ArrowStyle:= asaArrowsBelow;
-        FScrollbarHorz.ArrowStyle:= asaArrowsAbove;
-      end;
   end;
 end;
 

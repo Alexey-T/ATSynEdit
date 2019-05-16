@@ -105,7 +105,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 272
         Width = 106
-        TabOrder = 18
+        TabOrder = 17
       end
       object chkDotLn: TCheckBox
         Left = 296
@@ -160,7 +160,7 @@ object fmOpt: TfmOpt
         Height = 27
         Top = 244
         Width = 106
-        TabOrder = 17
+        TabOrder = 16
       end
       object LabelHint: TLabel
         Left = 408
@@ -177,32 +177,6 @@ object fmOpt: TfmOpt
         Width = 238
         Caption = 'show syntax-regions BG full size'
         TabOrder = 5
-      end
-      object edScrollArrowKind: TComboBox
-        Left = 296
-        Height = 27
-        Top = 208
-        Width = 152
-        ItemHeight = 0
-        Items.Strings = (
-          'normal'
-          'hidden'
-          'both above'
-          'both below'
-          'corner'
-        )
-        Style = csDropDownList
-        TabOrder = 16
-      end
-      object Label11: TLabel
-        AnchorSideTop.Control = edScrollArrowKind
-        AnchorSideTop.Side = asrCenter
-        Left = 456
-        Height = 17
-        Top = 213
-        Width = 151
-        Caption = 'new scrollbars: arrows'
-        ParentColor = False
       end
       object chkClickLink: TCheckBox
         Left = 296
@@ -236,7 +210,7 @@ object fmOpt: TfmOpt
         Caption = 'undo'
         ClientHeight = 86
         ClientWidth = 182
-        TabOrder = 19
+        TabOrder = 18
         object edUndo: TSpinEdit
           Left = 8
           Height = 27
