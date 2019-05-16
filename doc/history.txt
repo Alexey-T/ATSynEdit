@@ -1,4 +1,7 @@
 
+2019.05.16
+* change: required package ATFlatControls. This was needed to not have copy of ATScrollbar unit (renamed to ATSynEdit_Scrollbar), that unit is complex and had recent updates. It's hard to keep copy sync'ed. DRY principle.
+
 2019.05.14
 * renamed props GutterBand* to longer names
 
