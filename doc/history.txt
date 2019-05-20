@@ -1,4 +1,7 @@
 
+2019.05.20
++ add: OptAutoIndentRegexRule (if line matches this regex, then Enter will add additional indent to new line)
+
 2019.05.16
 * change: required package ATFlatControls. This was needed to not have copy of ATScrollbar unit (renamed to ATSynEdit_Scrollbar), that unit is complex and had recent updates. It's hard to keep copy sync'ed. DRY principle.
 

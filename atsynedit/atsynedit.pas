@@ -653,6 +653,7 @@ type
     FOptAutoIndentBetterBracketsCurly: boolean;
     FOptAutoIndentBetterBracketsRound: boolean;
     FOptAutoIndentBetterBracketsSquare: boolean;
+    FOptAutoIndentRegexRule: string;
     FOptTabSpaces: boolean;
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
@@ -1366,6 +1367,7 @@ type
     property OptAutoIndentBetterBracketsCurly: boolean read FOptAutoIndentBetterBracketsCurly write FOptAutoIndentBetterBracketsCurly default true;
     property OptAutoIndentBetterBracketsRound: boolean read FOptAutoIndentBetterBracketsRound write FOptAutoIndentBetterBracketsRound default false;
     property OptAutoIndentBetterBracketsSquare: boolean read FOptAutoIndentBetterBracketsSquare write FOptAutoIndentBetterBracketsSquare default false;
+    property OptAutoIndentRegexRule: string read FOptAutoIndentRegexRule write FOptAutoIndentRegexRule;
     property OptCopyLinesIfNoSel: boolean read FOptCopyLinesIfNoSel write FOptCopyLinesIfNoSel default true;
     property OptCutLinesIfNoSel: boolean read FOptCutLinesIfNoSel write FOptCutLinesIfNoSel default false;
     property OptCopyColumnBlockAlignedBySpaces: boolean read FOptCopyColumnBlockAlignedBySpaces write FOptCopyColumnBlockAlignedBySpaces default true;
@@ -3491,6 +3493,7 @@ begin
   FOptAutoIndentBetterBracketsCurly:= true;
   FOptAutoIndentBetterBracketsRound:= false;
   FOptAutoIndentBetterBracketsSquare:= false;
+  FOptAutoIndentRegexRule:= '';
   FOptTabSpaces:= false;
 
   FOptLastLineOnTop:= false;
@@ -5764,6 +5767,8 @@ function TATSynEdit.GetAutoIndentString(APosX, APosY: integer): atString;
 var
   StrPrev, StrIndent: atString;
   NChars, NSpaces: integer;
+  MatchPos, MatchLen: integer;
+  bAddIndent: boolean;
 begin
   Result:= '';
   if not FOptAutoIndent then Exit;
@@ -5772,6 +5777,9 @@ begin
   StrPrev:= Copy(Strings.Lines[APosY], 1, APosX);
   if StrPrev='' then exit;
   NChars:= SGetIndentChars(StrPrev); //count of chars in indent
+
+  bAddIndent:= (FOptAutoIndentRegexRule<>'') and
+    SFindRegexMatch(StrPrev, FOptAutoIndentRegexRule, MatchPos, MatchLen);
 
   StrIndent:= Copy(StrPrev, 1, NChars);
   NSpaces:= Length(FTabHelper.TabsToSpaces(APosY, StrIndent));
@@ -5792,6 +5800,12 @@ begin
         Result:= StrIndent + StringOfChar(' ', NSpaces-Length(StrIndent));
       end;
   end;
+
+  if bAddIndent then
+    if FOptTabSpaces then
+      Result:= Result+StringOfChar(' ', FTabSize)
+    else
+      Result:= Result+#9;
 end;
 
 function TATSynEdit.GetModified: boolean;
@@ -6981,6 +6995,7 @@ begin
              Str.EncodingCodepage:= {$ifdef windows} LConvEncoding.GetDefaultTextEncoding {$else} 'cp1252' {$endif};
          end;
 end;
+
 
 
 {$I atsynedit_carets.inc}

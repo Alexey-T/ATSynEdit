@@ -12,6 +12,7 @@ uses
   Classes, SysUtils, StrUtils,
   LCLType, LCLIntf, Clipbrd,
   UnicodeData,
+  ATSynEdit_RegExpr,
   ATSynEdit_CharSizer;
 
 type
@@ -31,6 +32,7 @@ function SCharLower(ch: atChar): atChar; inline;
 function SCaseTitle(const S, SWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SWordChars: atString): atString;
+function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
 
 {$Z1}
 type
@@ -1011,6 +1013,34 @@ begin
   else
     Result:= AValue * EditorScaleFontPercents div 100;
 end;
+
+
+function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
+var
+  Obj: TRegExpr;
+begin
+  Result:= false;
+  MatchPos:= 0;
+  MatchLen:= 0;
+
+  Obj:= TRegExpr.Create;
+  try
+    Obj.ModifierS:= false;
+    Obj.ModifierM:= true;
+    Obj.ModifierI:= false;
+    Obj.Expression:= Regex;
+
+    if Obj.Exec(Subject) then
+    begin
+      Result:= true;
+      MatchPos:= Obj.MatchPos[0];
+      MatchLen:= Obj.MatchLen[0];
+    end;
+  finally
+    FreeAndNil(Obj);
+  end;
+end;
+
 
 end.
 
