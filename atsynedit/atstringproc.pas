@@ -32,7 +32,6 @@ function SCharLower(ch: atChar): atChar; inline;
 function SCaseTitle(const S, SWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SWordChars: atString): atString;
-function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
 
 {$Z1}
 type
@@ -144,6 +143,7 @@ procedure SDeleteFromEol(var S: atString); inline;
 
 procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
 function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
+function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
 
 
 implementation
