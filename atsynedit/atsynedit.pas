@@ -6286,7 +6286,7 @@ end;
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
   ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
 var
-  nLineFrom, nLineTo, nIndent, nRange: integer;
+  nLineFrom, nLineTo, nIndent, nRange, nMaxHeight: integer;
   Indexes: TATIntArray;
   Range: TATSynRange;
   P1, P2: TPoint;
@@ -6297,6 +6297,7 @@ begin
   if FOptStapleStyle=cLineStyleNone then Exit;
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
+  nMaxHeight:= ClientHeight+2;
 
   Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, -1,
     false{OnlyFolded}, false{TopLevelOnly}, cRngHasAnyOfLines);
@@ -6340,6 +6341,10 @@ begin
     if (RSt.Left>=ARect.Left) and
       (RSt.Left<ARect.Right) then
     begin
+      //don't use too big coords, some OS truncate them
+      RSt.Top:= Max(RSt.Top, -2);
+      RSt.Bottom:= Min(RSt.Bottom, nMaxHeight);
+
       if Indexes[i]=nRange then
         NColor:= NColorActive
       else
