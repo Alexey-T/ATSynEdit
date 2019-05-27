@@ -69,17 +69,16 @@ example of CPP file which is hard to unfold (if nested ranges folded).
    }
  }
 
-what we do. for each line in range:
-a) if line not in any subrange, show it
-b) for all subranges at top level:
-  b1) if subrange marked folded, unfold 1st line "[...]"
-  b2) if subrange marked unfolded, recursion
+what we do.
+find all _folded_ sub-ranges in given range.
+a) for all lines in given range: if line not in sub-range, show it
+b) show first lines of found folded sub-ranges
 *)
 procedure TATSynEdit.DoRangeUnfold(ARangeIndex: integer);
 var
-  List: TATIntArray;
+  Indexes: TATIntArray;
   RangeThis, R: TATSynRange;
-  i, j: integer;
+  IndexLine, IndexRange: integer;
   InSubrange: boolean;
 begin
   RangeThis:= Fold.Items[ARangeIndex];
@@ -87,35 +86,36 @@ begin
   Fold.Items[ARangeIndex]:= RangeThis;
   FWrapUpdateNeeded:= true;
 
-  List:= FFold.FindRangesContainingLines(-1, -1, ARangeIndex,
-    false{OnlyFolded}, true{TopLevel}, cRngIgnore);
+  Indexes:= FFold.FindRangesContainingLines(-1, -1, ARangeIndex,
+    true{OnlyFolded}, true{TopLevel}, cRngIgnore);
 
   //show all lines not in subranges
-  for i:= RangeThis.Y to RangeThis.Y2 do
+  for IndexLine:= RangeThis.Y to RangeThis.Y2 do
   begin
     InSubrange:= false;
-    for j:= Low(List) to High(List) do
-      if FFold[List[j]].IsLineInside(i) then
+
+    for IndexRange:= Low(Indexes) to High(Indexes) do
+    begin
+      R:= Fold[Indexes[IndexRange]];
+      if R.IsLineInside(IndexLine) then
       begin
         InSubrange:= true;
         Break
       end;
+    end;
 
     if not InSubrange then
     begin
-      Strings.LinesHidden[i, FEditorIndex]:= false;
-      Strings.LinesFoldFrom[i, FEditorIndex]:= 0;
+      Strings.LinesHidden[IndexLine, FEditorIndex]:= false;
+      Strings.LinesFoldFrom[IndexLine, FEditorIndex]:= 0;
     end;
   end;
 
-  //unfold subranges, resursion
-  for i:= Low(List) to High(List) do
+  //show first lines of found subranges
+  for IndexRange:= Low(Indexes) to High(Indexes) do
   begin
-    R:= FFold[List[i]];
-    if R.Folded then
-      Strings.LinesHidden[R.Y, FEditorIndex]:= false
-    else
-      DoRangeUnfold(List[i]);
+    R:= Fold[Indexes[IndexRange]];
+    Strings.LinesHidden[R.Y, FEditorIndex]:= false;
   end;
 end;
 
