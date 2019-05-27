@@ -111,6 +111,7 @@ function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults
 var
   R: TATSynRange;
   NeedFixCaret: boolean;
+  Str: TATStrings;
   i: integer;
 begin
   if ADoFold then
@@ -133,12 +134,24 @@ begin
       DoCaretSingle(0, 0);
   end
   else
+  //unfold all
   begin
     for i:= 0 to Fold.Count-1 do
     begin
       R:= Fold[i];
       if R.Folded then
-        DoRangeUnfold(i);
+      begin
+        R.Folded:= false;
+        Fold[i]:= R;
+        FWrapUpdateNeeded:= true;
+      end;
+    end;
+
+    Str:= Strings;
+    for i:= 0 to Str.Count-1 do
+    begin
+      Str.LinesHidden[i, EditorIndex]:= false;
+      Str.LinesFoldFrom[i, EditorIndex]:= 0;
     end;
   end;
 
