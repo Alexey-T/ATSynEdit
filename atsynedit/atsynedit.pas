@@ -4888,13 +4888,16 @@ begin
         begin
           P:= ClientPosToCaretPos(P, Details);
           //Application.MainForm.Caption:= Format('MouseDownPnt %d:%d, CurPnt %d:%d',
-          //  [FMouseDownPnt.Y, FMouseDownPnt.X, P.Y, P.X]);
+            //[FMouseDownPnt.Y, FMouseDownPnt.X, P.Y, P.X]);
           if (P.Y<0) then Exit;
 
-          //mouse moved at last by char?
+          //mouse not moved at last by char?
           if (FMouseDownPnt.X=P.X) and (FMouseDownPnt.Y=P.Y) then
           begin
-            DoCaretSingle(P.X, P.Y);
+            //remove selection from current caret
+            nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
+            if Carets.IsIndexValid(nIndex) then
+              Carets[nIndex].SelectNone;
             Update;
           end
           else

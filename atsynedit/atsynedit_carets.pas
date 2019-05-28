@@ -39,6 +39,7 @@ type
     EndX, EndY: integer; //end of selection or -1
     CoordX, CoordY: integer; //screen coords
     SavedX, SavedX_Pre: integer; //to use with arrows Up/Down
+    procedure SelectNone;
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
@@ -203,6 +204,12 @@ begin
   ATo:= Y2;
   //sel ended at line-start?
   if (X2=0) and (Y2>0) then Dec(ATo);
+end;
+
+procedure TATCaretItem.SelectNone;
+begin
+  EndX:= -1;
+  EndY:= -1;
 end;
 
 procedure TATCaretItem.SelectToPoint(AX, AY: integer);
