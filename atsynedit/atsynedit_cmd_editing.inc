@@ -380,7 +380,7 @@ begin
         bBetterBrackets:= true;
     end;
 
-    Str:= GetAutoIndentString(Caret.PosX, Caret.PosY);
+    Str:= GetAutoIndentString(Caret.PosX, Caret.PosY, not bBetterBrackets);
     Strings.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
 
     //work to move } to next line, leave caret at current line

@@ -784,7 +784,8 @@ type
       ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
-    function GetAutoIndentString(APosX, APosY: integer): atString;
+    function GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule: boolean
+      ): atString;
     function GetFirstUnfoldedLineNumber: integer;
     function GetFoldedMarkText(ALine: integer): string;
     function GetLastUnfoldedLineNumber: integer;
@@ -5775,7 +5776,7 @@ begin
     Result:= #9;
 end;
 
-function TATSynEdit.GetAutoIndentString(APosX, APosY: integer): atString;
+function TATSynEdit.GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule: boolean): atString;
 var
   StrPrev, StrIndent: atString;
   NChars, NSpaces: integer;
@@ -5790,7 +5791,9 @@ begin
   if StrPrev='' then exit;
   NChars:= SGetIndentChars(StrPrev); //count of chars in indent
 
-  bAddIndent:= (FOptAutoIndentRegexRule<>'') and
+  bAddIndent:=
+    AUseIndentRegexRule and
+    (FOptAutoIndentRegexRule<>'') and
     SFindRegexMatch(StrPrev, FOptAutoIndentRegexRule, MatchPos, MatchLen);
 
   StrIndent:= Copy(StrPrev, 1, NChars);
