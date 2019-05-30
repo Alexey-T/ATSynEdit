@@ -386,8 +386,8 @@ begin
     //work to move } to next line, leave caret at current line
     if bBetterBrackets then
     begin
-      Strings.LineInsert(Caret.PosY+1, Str+StringOfChar(' ', FTabSize));
-      NShiftX:= FTabSize;
+      Strings.LineInsert(Caret.PosY+1, Str+GetSimpleIndent);
+      NShiftX:= Length(GetSimpleIndent);
       NShiftY:= 1;
     end;
 

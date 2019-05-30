@@ -750,6 +750,7 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
+    function GetSimpleIndent: string;
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -5766,6 +5767,14 @@ begin
   DoEventChange;
 end;
 
+function TATSynEdit.GetSimpleIndent: string;
+begin
+  if FOptTabSpaces then
+    Result:= StringOfChar(' ', FTabSize)
+  else
+    Result:= #9;
+end;
+
 function TATSynEdit.GetAutoIndentString(APosX, APosY: integer): atString;
 var
   StrPrev, StrIndent: atString;
@@ -5805,10 +5814,7 @@ begin
   end;
 
   if bAddIndent then
-    if FOptTabSpaces then
-      Result:= Result+StringOfChar(' ', FTabSize)
-    else
-      Result:= Result+#9;
+    Result:= Result+GetSimpleIndent;
 end;
 
 function TATSynEdit.GetModified: boolean;
