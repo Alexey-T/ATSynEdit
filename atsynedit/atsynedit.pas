@@ -750,7 +750,6 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
-    function GetSimpleIndent: string;
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1114,6 +1113,7 @@ type
     procedure DoUnfoldLine(ALine: integer);
     property RectMain: TRect read FRectMain;
     property RectGutter: TRect read FRectGutter;
+    function IndentString: string;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read FGutterDecor;
@@ -5768,7 +5768,7 @@ begin
   DoEventChange;
 end;
 
-function TATSynEdit.GetSimpleIndent: string;
+function TATSynEdit.IndentString: string;
 begin
   if FOptTabSpaces then
     Result:= StringOfChar(' ', FTabSize)
@@ -5817,7 +5817,7 @@ begin
   end;
 
   if bAddIndent then
-    Result:= Result+GetSimpleIndent;
+    Result:= Result+IndentString;
 end;
 
 function TATSynEdit.GetModified: boolean;
