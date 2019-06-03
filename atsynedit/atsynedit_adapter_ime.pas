@@ -124,7 +124,6 @@ var
   IMC: HIMC;
   imeCode, imeReadCode, len, ImmGCode: Integer;
   p: PWideChar;
-  res: TATCommandResults;
   bOverwrite, bSelect: Boolean;
 begin
   Ed:= TATSynEdit(Sender);
@@ -157,10 +156,9 @@ begin
                           (Length(FSelText)=0);
               bSelect:=(imeCode and GCS_RESULTSTR=0) and
                        (len>0);
-              res:= Ed.DoCommand_TextInsertAtCarets(p, False,
+              Ed.TextInsertAtCarets(p, False,
                                    bOverwrite,
                                    bSelect);
-              Ed.DoCommandResults(res);
               //WriteLn(Format('Set STRING %d, %s',[len,p]));
             end;
             { Revert not possible after IME completion }
@@ -183,14 +181,10 @@ procedure TATAdapterIMEStandard.EndComposition(Sender: TObject;
 var
   Ed: TATSynEdit;
   Len: Integer;
-  Res: TATCommandResults;
 begin
   Ed:= TATSynEdit(Sender);
   Len:= Length(FSelText);
-  Res:= Ed.DoCommand_TextInsertAtCarets(FSelText, False,
-                       False,
-                       Len>0);
-  Ed.DoCommandResults(Res);
+  Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
   //WriteLn(Format('set STRING %d, %s',[Len,FSelText]));
   //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:= -1;

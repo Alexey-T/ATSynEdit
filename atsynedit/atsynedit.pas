@@ -949,6 +949,9 @@ type
     procedure DoCaretsDeleteOnSameLines;
 
     //editing
+    procedure DoCommandResults(Res: TATCommandResults);
+    function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
+      AOvrMode, ASelectThen: boolean): TATCommandResults;
     function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
     function DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
     function DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
@@ -1124,9 +1127,8 @@ type
     procedure LoadFromFile(const AFilename: string); virtual;
     procedure SaveToFile(const AFilename: string); virtual;
     //cmd
-    function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
-      AOvrMode, ASelectThen: boolean): TATCommandResults;
-    procedure DoCommandResults(Res: TATCommandResults);
+    procedure TextInsertAtCarets(const AText: atString; AKeepCaret,
+      AOvrMode, ASelectThen: boolean);
     //carets
     procedure DoCaretSingle(APosX, APosY, AEndX, AEndY: integer);
     procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
@@ -6965,6 +6967,14 @@ begin
          end;
 end;
 
+procedure TATSynEdit.TextInsertAtCarets(const AText: atString; AKeepCaret,
+  AOvrMode, ASelectThen: boolean);
+var
+  Res: TATCommandResults;
+begin
+  Res:= DoCommand_TextInsertAtCarets(AText, AKeepCaret, AOvrMode, ASelectThen);
+  DoCommandResults(Res);
+end;
 
 
 {$I atsynedit_carets.inc}
