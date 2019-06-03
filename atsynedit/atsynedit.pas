@@ -20,8 +20,9 @@ interface
 
 uses
   {$ifdef Windows}
-  Windows, Imm, Messages,
+  Windows, Messages,
   LConvEncoding,
+  ATSynEdit_Adapter_IME,
   {$endif}
   InterfaceBase,
   Classes, SysUtils, Graphics,
@@ -400,6 +401,7 @@ type
     FTabHelper: TATStringTabHelper;
     FAdapterHilite: TATAdapterHilite;
     FAdapterCache: TATAdapterHiliteCache;
+    FAdapterIME: TATAdapterIME;
     FFold: TATSynRanges;
     FFoldImageList: TImageList;
     FFoldStyle: TATFoldStyle;
@@ -708,10 +710,6 @@ type
     FOptZebraActive: boolean;
     FOptZebraAlphaBlend: byte;
 
-    {$ifdef WINDOWS}
-    FIMEPreSelText: atString;
-    {$endif}
-
     //
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
@@ -951,7 +949,6 @@ type
     procedure DoCaretsDeleteOnSameLines;
 
     //editing
-    procedure DoCommandResults(Res: TATCommandResults);
     function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
     function DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
     function DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
@@ -996,8 +993,6 @@ type
     function DoCommand_GotoScreenSide(ASide: TATCaretScreenSide): TATCommandResults;
     function DoCommand_ScrollToBeginOrEnd(AToBegin: boolean): TATCommandResults;
     function DoCommand_ScrollByDelta(ALines, AColumns: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
-    function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
-      AOvrMode, ASelectThen: boolean): TATCommandResults;
     function DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
     function DoCommand_TextTabulation: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
@@ -1089,6 +1084,7 @@ type
     property EncodingName: string read GetEncodingName write SetEncodingName;
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
+    property AdapterIME: TATAdapterIME read FAdapterIME write FAdapterIME;
     property EditorIndex: integer read FEditorIndex write FEditorIndex;
     property LineTop: integer read GetLineTop write SetLineTop;
     property LineBottom: integer read FLineBottom;
@@ -1127,6 +1123,10 @@ type
     //files
     procedure LoadFromFile(const AFilename: string); virtual;
     procedure SaveToFile(const AFilename: string); virtual;
+    //cmd
+    function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
+      AOvrMode, ASelectThen: boolean): TATCommandResults;
+    procedure DoCommandResults(Res: TATCommandResults);
     //carets
     procedure DoCaretSingle(APosX, APosY, AEndX, AEndY: integer);
     procedure DoCaretSingle(AX, AY: integer; AClearSelection: boolean = true);
@@ -1246,13 +1246,11 @@ type
     procedure WMVScroll(var Msg: TLMVScroll); message LM_VSCROLL;
     procedure CMWantSpecialKey(var Message: TCMWantSpecialKey); message CM_WANTSPECIALKEY;
 
-    // Windows IME Support
-    {$ifdef Windows}
-    procedure UpdateImeWindowPos;
+    {$ifdef windows}
     procedure WMIME_Notify(var Msg: TMessage); message WM_IME_NOTIFY;
-    procedure WMIME_STARTCOMPOSITION(var Msg:TMessage); message WM_IME_STARTCOMPOSITION;
-    procedure WMIME_COMPOSITION(var Msg:TMessage); message WM_IME_COMPOSITION;
-    procedure WMIME_ENDCOMPOSITION(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
+    procedure WMIME_StartComposition(var Msg:TMessage); message WM_IME_STARTCOMPOSITION;
+    procedure WMIME_Composition(var Msg:TMessage); message WM_IME_COMPOSITION;
+    procedure WMIME_EndComposition(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
     {$endif}
 
   published
@@ -3284,6 +3282,7 @@ begin
   FDimRanges:= TATDimRanges.Create;
   FHotspots:= TATHotspots.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
+  FAdapterIME:= TATAdapterIMEStandard.Create;
 
   FPaintLocked:= 0;
   FPaintFlags:= [cPaintUpdateBitmap];
@@ -3601,6 +3600,8 @@ end;
 
 destructor TATSynEdit.Destroy;
 begin
+  FAdapterHilite:= nil;
+  FAdapterIME:= nil;
   TimersStop;
   if Assigned(FHintWnd) then
     FreeAndNil(FHintWnd);
@@ -4299,129 +4300,29 @@ begin
   Invalidate;
 end;
 
-{
-Windows IME support, tested with Korean/Chinese
-by https://github.com/rasberryrabbit
-}
-{$ifdef Windows}
-procedure TATSynEdit.UpdateImeWindowPos;
-var
-  imc: HIMC;
-  cf: CompositionForm;
-  Pnt: TPoint;
-  Caret: TATCaretItem;
-begin
-  {
-  if Carets.Count=0 then exit;
-  Caret:= Carets[0];
-  Pnt.X := Caret.CoordX;
-  Pnt.Y := Caret.CoordY;
-  Pnt := ClientToScreen(Pnt);
-  }
-  Pnt:= Point(20, 20);
-
-  imc := ImmGetContext(Handle);
-  if imc<>0 then
-  begin
-    FillChar(cf, SizeOf(cf), 0);
-    cf.dwStyle := CFS_POINT;
-    cf.ptCurrentPos := Pnt;
-
-    ImmSetCompositionWindow(imc, @cf);
-    ImmReleaseContext(Handle, imc);
-  end;
-end;
-
-
+{$ifdef windows}
 procedure TATSynEdit.WMIME_Notify(var Msg: TMessage);
 begin
-  case Msg.WParam of
-    IMN_SETOPENSTATUS:
-      UpdateImeWindowPos;
-  end;
+  if Assigned(FAdapterIME) then
+    FAdapterIME.Notify(Self, Msg);
 end;
 
-procedure TATSynEdit.WMIME_STARTCOMPOSITION(var Msg: TMessage);
+procedure TATSynEdit.WMIME_StartComposition(var Msg: TMessage);
 begin
-  UpdateImeWindowPos;
-  FIMEPreSelText:=TextSelected;
-  Msg.Result:=-1;
+  if Assigned(FAdapterIME) then
+    FAdapterIME.StartComposition(Self, Msg);
 end;
 
-procedure TATSynEdit.WMIME_COMPOSITION(var Msg: TMessage);
-const
-  IME_COMPFLAG = GCS_COMPREADSTR or GCS_COMPSTR;
-  IME_RESULTFLAG = GCS_RESULTREADSTR or GCS_RESULTSTR;
-var
-  IMC:HIMC;
-  imeCode,imeReadCode,len,ImmGCode: Integer;
-  p: PWideChar;
-  res: TATCommandResults;
-  bOverwrite, bSelect: Boolean;
+procedure TATSynEdit.WMIME_Composition(var Msg: TMessage);
 begin
-  if not ModeReadOnly then
-  begin
-    { work with GCS_COMPREADSTR and GCS_COMPSTR and GCS_RESULTREADSTR and GCS_RESULTSTR }
-    imeCode:=Msg.lParam and (IME_COMPFLAG or IME_RESULTFLAG);
-    { check compositon state }
-    if imeCode<>0 then
-    begin
-      IMC := ImmGetContext(Handle);
-      try
-         ImmGCode:=Msg.wParam;
-         { Get Result string length }
-         imeReadCode:=imeCode and (GCS_COMPSTR or GCS_RESULTSTR);
-         len := ImmGetCompositionStringW(IMC,imeReadCode,nil,0);
-         GetMem(p,len+2);
-         try
-            { get compositon string }
-            ImmGetCompositionStringW(IMC,imeReadCode,p,len);
-            if len>0 then
-              len := len shr 1;
-            p[len]:=#0;
-            { Insert IME Composition string }
-            if (ImmGCode<>$1b) or (imeCode and GCS_COMPSTR=0) then
-            begin
-              { Insert IME text and select if it is not GCS_RESULTSTR }
-              bOverwrite:=(imeCode and GCS_RESULTSTR<>0) and
-                          FOverwrite and
-                          (Length(FIMEPreSelText)=0);
-              bSelect:=(imeCode and GCS_RESULTSTR=0) and
-                       (len>0);
-              res:=DoCommand_TextInsertAtCarets(p, False,
-                                   bOverwrite,
-                                   bSelect);
-              DoCommandResults(res);
-              //WriteLn(Format('Set STRING %d, %s',[len,p]));
-            end;
-            { Revert not possible after IME completion }
-            if imeCode and GCS_RESULTSTR<>0 then
-              FIMEPreSelText:='';
-         finally
-           FreeMem(p);
-         end;
-      finally
-        ImmReleaseContext(Handle,IMC);
-      end;
-    end;
-  end;
-  //WriteLn(Format('WM_IME_COMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
-  Msg.Result:=-1;
+  if Assigned(FAdapterIME) then
+    FAdapterIME.Composition(Self, Msg);
 end;
 
-procedure TATSynEdit.WMIME_ENDCOMPOSITION(var Msg: TMessage);
-var
-  len: Integer;
-  res:TATCommandResults;
+procedure TATSynEdit.WMIME_EndComposition(var Msg: TMessage);
 begin
-  len:=Length(FIMEPreSelText);
-  res:=DoCommand_TextInsertAtCarets(FIMEPreSelText, False,
-                       False,
-                       len>0);
-  DoCommandResults(res);
-  //WriteLn(Format('set STRING %d, %s',[len,FIMEPreSelText]));
-  //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
-  Msg.Result:=-1;
+  if Assigned(FAdapterIME) then
+    FAdapterIME.EndComposition(Self, Msg);
 end;
 {$endif}
 

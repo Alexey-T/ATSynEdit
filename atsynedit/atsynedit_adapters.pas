@@ -9,7 +9,7 @@ unit ATSynEdit_Adapters;
 interface
 
 uses
-  Classes, SysUtils, Graphics,
+  Classes, SysUtils, Graphics, Messages,
   ATSynEdit_CanvasProc;
 
 type
@@ -79,7 +79,42 @@ type
     //ATSynEdit reads it.
   end;
 
+type
+
+  { TATAdapterIME }
+
+  TATAdapterIME = class
+  public
+    procedure Notify(Sender: TObject; var Msg: TMessage); virtual;
+    procedure StartComposition(Sender: TObject; var Msg: TMessage); virtual;
+    procedure Composition(Sender: TObject; var Msg: TMessage); virtual;
+    procedure EndComposition(Sender: TObject; var Msg: TMessage); virtual;
+  end;
+
+
 implementation
+
+{ TATAdapterIME }
+
+procedure TATAdapterIME.Notify(Sender: TObject; var Msg: TMessage);
+begin
+  //
+end;
+
+procedure TATAdapterIME.StartComposition(Sender: TObject; var Msg: TMessage);
+begin
+  //
+end;
+
+procedure TATAdapterIME.Composition(Sender: TObject; var Msg: TMessage);
+begin
+  //
+end;
+
+procedure TATAdapterIME.EndComposition(Sender: TObject; var Msg: TMessage);
+begin
+  //
+end;
 
 { TATAdapterHilite }
 
