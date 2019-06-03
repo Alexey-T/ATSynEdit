@@ -1248,6 +1248,8 @@ type
 
     // Windows IME Support
     {$ifdef Windows}
+    procedure UpdateImeWindowPos;
+    procedure WMIME_Notify(var Msg: TMessage); message WM_IME_NOTIFY;
     procedure WMIME_STARTCOMPOSITION(var Msg:TMessage); message WM_IME_STARTCOMPOSITION;
     procedure WMIME_COMPOSITION(var Msg:TMessage); message WM_IME_COMPOSITION;
     procedure WMIME_ENDCOMPOSITION(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
@@ -4302,8 +4304,46 @@ Windows IME support, tested with Korean/Chinese
 by https://github.com/rasberryrabbit
 }
 {$ifdef Windows}
+procedure TATSynEdit.UpdateImeWindowPos;
+var
+  imc: HIMC;
+  cf: CompositionForm;
+  Pnt: TPoint;
+  Caret: TATCaretItem;
+begin
+  {
+  if Carets.Count=0 then exit;
+  Caret:= Carets[0];
+  Pnt.X := Caret.CoordX;
+  Pnt.Y := Caret.CoordY;
+  Pnt := ClientToScreen(Pnt);
+  }
+  Pnt:= Point(20, 20);
+
+  imc := ImmGetContext(Handle);
+  if imc<>0 then
+  begin
+    FillChar(cf, SizeOf(cf), 0);
+    cf.dwStyle := CFS_POINT;
+    cf.ptCurrentPos := Pnt;
+
+    ImmSetCompositionWindow(imc, @cf);
+    ImmReleaseContext(Handle, imc);
+  end;
+end;
+
+
+procedure TATSynEdit.WMIME_Notify(var Msg: TMessage);
+begin
+  case Msg.WParam of
+    IMN_SETOPENSTATUS:
+      UpdateImeWindowPos;
+  end;
+end;
+
 procedure TATSynEdit.WMIME_STARTCOMPOSITION(var Msg: TMessage);
 begin
+  UpdateImeWindowPos;
   FIMEPreSelText:=TextSelected;
   Msg.Result:=-1;
 end;
@@ -4336,7 +4376,8 @@ begin
          try
             { get compositon string }
             ImmGetCompositionStringW(IMC,imeReadCode,p,len);
-            len := len shr 1;
+            if len>0 then
+              len := len shr 1;
             p[len]:=#0;
             { Insert IME Composition string }
             if (ImmGCode<>$1b) or (imeCode and GCS_COMPSTR=0) then
