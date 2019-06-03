@@ -1247,6 +1247,7 @@ type
     procedure CMWantSpecialKey(var Message: TCMWantSpecialKey); message CM_WANTSPECIALKEY;
 
     {$ifdef windows}
+    procedure WMIME_Request(var Msg: TMessage); message WM_IME_REQUEST;
     procedure WMIME_Notify(var Msg: TMessage); message WM_IME_NOTIFY;
     procedure WMIME_StartComposition(var Msg:TMessage); message WM_IME_STARTCOMPOSITION;
     procedure WMIME_Composition(var Msg:TMessage); message WM_IME_COMPOSITION;
@@ -4301,6 +4302,12 @@ begin
 end;
 
 {$ifdef windows}
+procedure TATSynEdit.WMIME_Request(var Msg: TMessage);
+begin
+  if Assigned(FAdapterIME) then
+    FAdapterIME.Request(Self, Msg);
+end;
+
 procedure TATSynEdit.WMIME_Notify(var Msg: TMessage);
 begin
   if Assigned(FAdapterIME) then

@@ -19,6 +19,7 @@ type
     FSelText: UnicodeString;
     procedure UpdateImeWindow(Sender: TObject);
   public
+    procedure Request(Sender: TObject; var Msg: TMessage); override;
     procedure Notify(Sender: TObject; var Msg: TMessage); override;
     procedure StartComposition(Sender: TObject; var Msg: TMessage); override;
     procedure Composition(Sender: TObject; var Msg: TMessage); override;
@@ -29,6 +30,7 @@ implementation
 
 uses
   Windows, Imm,
+  Classes,
   ATSynEdit;
 
 procedure TATAdapterIMEStandard.UpdateImeWindow(Sender: TObject);
@@ -46,7 +48,7 @@ begin
   Pnt.Y := Caret.CoordY;
   Pnt := ClientToScreen(Pnt);
   }
-  Pnt:= Point(20, 20);
+  Pnt:= Point(100, 100);
 
   imc := ImmGetContext(TATSynEdit(Sender).Handle);
   if imc<>0 then
@@ -60,8 +62,45 @@ begin
   end;
 end;
 
+procedure TATAdapterIMEStandard.Request(Sender: TObject; var Msg: TMessage);
+var
+  Ed: TATSynEdit;
+  cp: PIMECHARPOSITION;
+  Pnt: TPoint;
+begin
+  //not implemented
+  Msg.Result:= 0;
+  exit;
+
+  Ed:= TATSynEdit(Sender);
+  case Msg.wParam of
+    IMR_QUERYCHARPOSITION:
+      begin
+        cp := PIMECHARPOSITION(Msg.lParam);
+
+        //TODO: fill here
+        Pnt.X:= 50;
+        Pnt.Y:= 50;
+
+        cp^.cLineHeight := Ed.TextCharSize.Y;
+
+        cp^.pt.x := Pnt.x;
+        cp^.pt.y := Pnt.y;
+
+        cp^.rcDocument.TopLeft := Ed.ClientToScreen(Ed.ClientRect.TopLeft);
+        cp^.rcDocument.BottomRight := Ed.ClientToScreen(Ed.ClientRect.BottomRight);
+
+        Msg.Result:= 1;
+      end;
+  end;
+end;
+
 procedure TATAdapterIMEStandard.Notify(Sender: TObject; var Msg: TMessage);
 begin
+  //not implemented
+  Msg.Result:= 0;
+  exit;
+
   case Msg.WParam of
     IMN_SETOPENSTATUS:
       UpdateImeWindow(Sender);

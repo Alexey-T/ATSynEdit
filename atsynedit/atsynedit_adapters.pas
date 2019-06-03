@@ -80,11 +80,11 @@ type
   end;
 
 type
-
   { TATAdapterIME }
 
   TATAdapterIME = class
   public
+    procedure Request(Sender: TObject; var Msg: TMessage); virtual;
     procedure Notify(Sender: TObject; var Msg: TMessage); virtual;
     procedure StartComposition(Sender: TObject; var Msg: TMessage); virtual;
     procedure Composition(Sender: TObject; var Msg: TMessage); virtual;
@@ -95,6 +95,11 @@ type
 implementation
 
 { TATAdapterIME }
+
+procedure TATAdapterIME.Request(Sender: TObject; var Msg: TMessage);
+begin
+  //
+end;
 
 procedure TATAdapterIME.Notify(Sender: TObject; var Msg: TMessage);
 begin
