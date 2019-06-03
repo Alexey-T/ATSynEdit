@@ -16,8 +16,8 @@ type
 
   TATAdapterIMEStandard = class(TATAdapterIME)
   private
-    FIMEPreSelText: UnicodeString;
-    procedure UpdateImeWindowPos(Ed: TObject);
+    FSelText: UnicodeString;
+    procedure UpdateImeWindow(Sender: TObject);
   public
     procedure Notify(Sender: TObject; var Msg: TMessage); override;
     procedure StartComposition(Sender: TObject; var Msg: TMessage); override;
@@ -29,10 +29,9 @@ implementation
 
 uses
   Windows, Imm,
-  SysUtils, Classes,
   ATSynEdit;
 
-procedure TATAdapterIMEStandard.UpdateImeWindowPos(Ed: TObject);
+procedure TATAdapterIMEStandard.UpdateImeWindow(Sender: TObject);
 var
   imc: HIMC;
   cf: CompositionForm;
@@ -49,7 +48,7 @@ begin
   }
   Pnt:= Point(20, 20);
 
-  imc := ImmGetContext(TATSynEdit(Ed).Handle);
+  imc := ImmGetContext(TATSynEdit(Sender).Handle);
   if imc<>0 then
   begin
     FillChar(cf, SizeOf(cf), 0);
@@ -57,25 +56,24 @@ begin
     cf.ptCurrentPos := Pnt;
 
     ImmSetCompositionWindow(imc, @cf);
-    ImmReleaseContext(TATSynEdit(Ed).Handle, imc);
+    ImmReleaseContext(TATSynEdit(Sender).Handle, imc);
   end;
 end;
-
 
 procedure TATAdapterIMEStandard.Notify(Sender: TObject; var Msg: TMessage);
 begin
   case Msg.WParam of
     IMN_SETOPENSTATUS:
-      UpdateImeWindowPos(Sender);
+      UpdateImeWindow(Sender);
   end;
 end;
 
 procedure TATAdapterIMEStandard.StartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
-  UpdateImeWindowPos(Sender);
-  FIMEPreSelText:= TATSynEdit(Sender).TextSelected;
-  Msg.Result:=-1;
+  UpdateImeWindow(Sender);
+  FSelText:= TATSynEdit(Sender).TextSelected;
+  Msg.Result:= -1;
 end;
 
 procedure TATAdapterIMEStandard.Composition(Sender: TObject; var Msg: TMessage);
@@ -84,8 +82,8 @@ const
   IME_RESULTFLAG = GCS_RESULTREADSTR or GCS_RESULTSTR;
 var
   Ed: TATSynEdit;
-  IMC:HIMC;
-  imeCode,imeReadCode,len,ImmGCode: Integer;
+  IMC: HIMC;
+  imeCode, imeReadCode, len, ImmGCode: Integer;
   p: PWideChar;
   res: TATCommandResults;
   bOverwrite, bSelect: Boolean;
@@ -117,7 +115,7 @@ begin
               { Insert IME text and select if it is not GCS_RESULTSTR }
               bOverwrite:=(imeCode and GCS_RESULTSTR<>0) and
                           Ed.ModeOverwrite and
-                          (Length(FIMEPreSelText)=0);
+                          (Length(FSelText)=0);
               bSelect:=(imeCode and GCS_RESULTSTR=0) and
                        (len>0);
               res:= Ed.DoCommand_TextInsertAtCarets(p, False,
@@ -128,7 +126,7 @@ begin
             end;
             { Revert not possible after IME completion }
             if imeCode and GCS_RESULTSTR<>0 then
-              FIMEPreSelText:='';
+              FSelText:='';
          finally
            FreeMem(p);
          end;
@@ -138,25 +136,25 @@ begin
     end;
   end;
   //WriteLn(Format('WM_IME_COMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
-  Msg.Result:=-1;
+  Msg.Result:= -1;
 end;
 
 procedure TATAdapterIMEStandard.EndComposition(Sender: TObject;
   var Msg: TMessage);
 var
   Ed: TATSynEdit;
-  len: Integer;
-  res: TATCommandResults;
+  Len: Integer;
+  Res: TATCommandResults;
 begin
   Ed:= TATSynEdit(Sender);
-  len:= Length(FIMEPreSelText);
-  res:= Ed.DoCommand_TextInsertAtCarets(FIMEPreSelText, False,
+  Len:= Length(FSelText);
+  Res:= Ed.DoCommand_TextInsertAtCarets(FSelText, False,
                        False,
-                       len>0);
-  Ed.DoCommandResults(res);
-  //WriteLn(Format('set STRING %d, %s',[len,FIMEPreSelText]));
+                       Len>0);
+  Ed.DoCommandResults(Res);
+  //WriteLn(Format('set STRING %d, %s',[Len,FSelText]));
   //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
-  Msg.Result:=-1;
+  Msg.Result:= -1;
 end;
 
 
