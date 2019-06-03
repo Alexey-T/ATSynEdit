@@ -3283,7 +3283,10 @@ begin
   FDimRanges:= TATDimRanges.Create;
   FHotspots:= TATHotspots.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
+
+  {$ifdef windows}
   FAdapterIME:= TATAdapterIMEStandard.Create;
+  {$endif}
 
   FPaintLocked:= 0;
   FPaintFlags:= [cPaintUpdateBitmap];
