@@ -33,8 +33,13 @@ implementation
 uses
   Windows, Imm,
   Classes,
+  Forms,
   ATSynEdit,
   ATSynEdit_Carets;
+
+// declated here, because FPC 3.3 trunk has typo in declaration
+function ImmGetCandidateWindow(imc: HIMC; par1: DWORD; lpCandidate: LPCANDIDATEFORM): LongBool; stdcall ; external 'imm32' name 'ImmGetCandidateWindow';
+
 
 procedure TATAdapterIMEStandard.StopIME(Sender: TObject; Success: boolean);
 var
@@ -59,21 +64,39 @@ var
   Caret: TATCaretItem;
   imc: HIMC;
   CandiForm: CANDIDATEFORM;
+  VisRect: TRect;
+  Y: integer;
 begin
   Ed:= TATSynEdit(Sender);
   if Ed.Carets.Count=0 then exit;
   Caret:= Ed.Carets[0];
+
+  VisRect:= Screen.WorkAreaRect;
 
   imc:= ImmGetContext(Ed.Handle);
   if imc<>0 then
   begin
     CandiForm.dwIndex:= 0;
     CandiForm.dwStyle:= CFS_FORCE_POSITION;
-
     CandiForm.ptCurrentPos.X:= Caret.CoordX;
     CandiForm.ptCurrentPos.Y:= Caret.CoordY+Ed.TextCharSize.Y+1;
-
     ImmSetCandidateWindow(imc, @CandiForm);
+
+    (*
+    if ImmGetCandidateWindow(imc, 0, @CandiForm) then
+    begin
+      Y:= CandiForm.rcArea.Bottom;
+      if Y>=VisRect.Bottom then
+      begin
+        CandiForm.dwIndex:= 0;
+        CandiForm.dwStyle:= CFS_FORCE_POSITION;
+        CandiForm.ptCurrentPos.X:= Caret.CoordX;
+        CandiForm.ptCurrentPos.Y:= 0;
+        ImmSetCandidateWindow(imc, @CandiForm);
+      end;
+    end;
+    *)
+
     ImmReleaseContext(Ed.Handle, imc);
   end;
 end;
