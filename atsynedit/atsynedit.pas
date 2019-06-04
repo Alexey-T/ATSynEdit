@@ -4369,6 +4369,9 @@ begin
   FMouseDragMinimap:= false;
   ActionId:= GetMouseActionId(FMouseActions, Shift);
 
+  if Assigned(FAdapterIME) then
+    FAdapterIME.MouseClicked(Self);
+
   if MouseNiceScroll then
   begin
     MouseNiceScroll:= false;

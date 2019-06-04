@@ -19,7 +19,7 @@ type
     FSelText: UnicodeString;
     procedure UpdateWindowPos(Sender: TObject);
   public
-    procedure MovedCaret(Sender: TObject); override;
+    procedure MouseClicked(Sender: TObject); override;
     procedure Request(Sender: TObject; var Msg: TMessage); override;
     procedure Notify(Sender: TObject; var Msg: TMessage); override;
     procedure StartComposition(Sender: TObject; var Msg: TMessage); override;
@@ -60,19 +60,19 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.MovedCaret(Sender: TObject);
+procedure TATAdapterIMEStandard.MouseClicked(Sender: TObject);
 begin
-  //TODO
+  UpdateWindowPos(Sender);
 end;
 
 procedure TATAdapterIMEStandard.Request(Sender: TObject; var Msg: TMessage);
+{
 var
   Ed: TATSynEdit;
   cp: PIMECHARPOSITION;
   Pnt: TPoint;
+  }
 begin
-  //not implemented
-  Msg.Result:= 0;
   exit;
 
   (*

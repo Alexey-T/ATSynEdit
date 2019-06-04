@@ -84,7 +84,7 @@ type
 
   TATAdapterIME = class
   public
-    procedure MovedCaret(Sender: TObject); virtual;
+    procedure MouseClicked(Sender: TObject); virtual;
     procedure Request(Sender: TObject; var Msg: TMessage); virtual;
     procedure Notify(Sender: TObject; var Msg: TMessage); virtual;
     procedure StartComposition(Sender: TObject; var Msg: TMessage); virtual;
@@ -97,7 +97,7 @@ implementation
 
 { TATAdapterIME }
 
-procedure TATAdapterIME.MovedCaret(Sender: TObject);
+procedure TATAdapterIME.MouseClicked(Sender: TObject);
 begin
   //
 end;
