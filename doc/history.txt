@@ -1,4 +1,9 @@
 
+2019.06.04
++ refactor: split all IME code to "adapter" atsynedit_adapter_ime
++ IME window position must be near caret
++ IME window must hide on mouse click
+
 2019.05.20
 + add: OptAutoIndentRegexRule (if line matches this regex, then Enter will add additional indent to new line)
 
