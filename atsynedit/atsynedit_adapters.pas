@@ -85,11 +85,11 @@ type
   TATAdapterIME = class
   public
     procedure Stop(Sender: TObject; Success: boolean); virtual;
-    procedure Request(Sender: TObject; var Msg: TMessage); virtual;
-    procedure Notify(Sender: TObject; var Msg: TMessage); virtual;
-    procedure StartComposition(Sender: TObject; var Msg: TMessage); virtual;
-    procedure Composition(Sender: TObject; var Msg: TMessage); virtual;
-    procedure EndComposition(Sender: TObject; var Msg: TMessage); virtual;
+    procedure ImeRequest(Sender: TObject; var Msg: TMessage); virtual;
+    procedure ImeNotify(Sender: TObject; var Msg: TMessage); virtual;
+    procedure ImeStartComposition(Sender: TObject; var Msg: TMessage); virtual;
+    procedure ImeComposition(Sender: TObject; var Msg: TMessage); virtual;
+    procedure ImeEndComposition(Sender: TObject; var Msg: TMessage); virtual;
   end;
 
 
@@ -102,27 +102,27 @@ begin
   //
 end;
 
-procedure TATAdapterIME.Request(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterIME.ImeRequest(Sender: TObject; var Msg: TMessage);
 begin
   //
 end;
 
-procedure TATAdapterIME.Notify(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterIME.ImeNotify(Sender: TObject; var Msg: TMessage);
 begin
   //
 end;
 
-procedure TATAdapterIME.StartComposition(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterIME.ImeStartComposition(Sender: TObject; var Msg: TMessage);
 begin
   //
 end;
 
-procedure TATAdapterIME.Composition(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterIME.ImeComposition(Sender: TObject; var Msg: TMessage);
 begin
   //
 end;
 
-procedure TATAdapterIME.EndComposition(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterIME.ImeEndComposition(Sender: TObject; var Msg: TMessage);
 begin
   //
 end;

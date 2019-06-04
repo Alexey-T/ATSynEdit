@@ -17,15 +17,14 @@ type
   TATAdapterIMEStandard = class(TATAdapterIME)
   private
     FSelText: UnicodeString;
-    procedure StopIME(Sender: TObject; Success: boolean);
     procedure UpdateWindowPos(Sender: TObject);
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
-    procedure Request(Sender: TObject; var Msg: TMessage); override;
-    procedure Notify(Sender: TObject; var Msg: TMessage); override;
-    procedure StartComposition(Sender: TObject; var Msg: TMessage); override;
-    procedure Composition(Sender: TObject; var Msg: TMessage); override;
-    procedure EndComposition(Sender: TObject; var Msg: TMessage); override;
+    procedure ImeRequest(Sender: TObject; var Msg: TMessage); override;
+    procedure ImeNotify(Sender: TObject; var Msg: TMessage); override;
+    procedure ImeStartComposition(Sender: TObject; var Msg: TMessage); override;
+    procedure ImeComposition(Sender: TObject; var Msg: TMessage); override;
+    procedure ImeEndComposition(Sender: TObject; var Msg: TMessage); override;
   end;
 
 implementation
@@ -41,7 +40,7 @@ uses
 function ImmGetCandidateWindow(imc: HIMC; par1: DWORD; lpCandidate: LPCANDIDATEFORM): LongBool; stdcall ; external 'imm32' name 'ImmGetCandidateWindow';
 
 
-procedure TATAdapterIMEStandard.StopIME(Sender: TObject; Success: boolean);
+procedure TATAdapterIMEStandard.Stop(Sender: TObject; Success: boolean);
 var
   Ed: TATSynEdit;
   imc: HIMC;
@@ -101,12 +100,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.Stop(Sender: TObject; Success: boolean);
-begin
-  StopIME(Sender, false);
-end;
-
-procedure TATAdapterIMEStandard.Request(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterIMEStandard.ImeRequest(Sender: TObject; var Msg: TMessage);
 {
 var
   Ed: TATSynEdit;
@@ -141,7 +135,7 @@ begin
   *)
 end;
 
-procedure TATAdapterIMEStandard.Notify(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterIMEStandard.ImeNotify(Sender: TObject; var Msg: TMessage);
 begin
   case Msg.WParam of
     IMN_OPENCANDIDATE:
@@ -149,7 +143,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.StartComposition(Sender: TObject;
+procedure TATAdapterIMEStandard.ImeStartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
   UpdateWindowPos(Sender);
@@ -157,7 +151,7 @@ begin
   Msg.Result:= -1;
 end;
 
-procedure TATAdapterIMEStandard.Composition(Sender: TObject; var Msg: TMessage);
+procedure TATAdapterIMEStandard.ImeComposition(Sender: TObject; var Msg: TMessage);
 const
   IME_COMPFLAG = GCS_COMPREADSTR or GCS_COMPSTR;
   IME_RESULTFLAG = GCS_RESULTREADSTR or GCS_RESULTSTR;
@@ -189,7 +183,7 @@ begin
             if len>0 then
               len := len shr 1;
             p[len]:=#0;
-            { Insert IME Composition string }
+            { Insert IME ImeComposition string }
             if (ImmGCode<>$1b) or (imeCode and GCS_COMPSTR=0) then
             begin
               { Insert IME text and select if it is not GCS_RESULTSTR }
@@ -218,7 +212,7 @@ begin
   Msg.Result:= -1;
 end;
 
-procedure TATAdapterIMEStandard.EndComposition(Sender: TObject;
+procedure TATAdapterIMEStandard.ImeEndComposition(Sender: TObject;
   var Msg: TMessage);
 var
   Ed: TATSynEdit;

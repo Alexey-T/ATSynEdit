@@ -4310,31 +4310,31 @@ end;
 procedure TATSynEdit.WMIME_Request(var Msg: TMessage);
 begin
   if Assigned(FAdapterIME) then
-    FAdapterIME.Request(Self, Msg);
+    FAdapterIME.ImeRequest(Self, Msg);
 end;
 
 procedure TATSynEdit.WMIME_Notify(var Msg: TMessage);
 begin
   if Assigned(FAdapterIME) then
-    FAdapterIME.Notify(Self, Msg);
+    FAdapterIME.ImeNotify(Self, Msg);
 end;
 
 procedure TATSynEdit.WMIME_StartComposition(var Msg: TMessage);
 begin
   if Assigned(FAdapterIME) then
-    FAdapterIME.StartComposition(Self, Msg);
+    FAdapterIME.ImeStartComposition(Self, Msg);
 end;
 
 procedure TATSynEdit.WMIME_Composition(var Msg: TMessage);
 begin
   if Assigned(FAdapterIME) then
-    FAdapterIME.Composition(Self, Msg);
+    FAdapterIME.ImeComposition(Self, Msg);
 end;
 
 procedure TATSynEdit.WMIME_EndComposition(var Msg: TMessage);
 begin
   if Assigned(FAdapterIME) then
-    FAdapterIME.EndComposition(Self, Msg);
+    FAdapterIME.ImeEndComposition(Self, Msg);
 end;
 {$endif}
 
