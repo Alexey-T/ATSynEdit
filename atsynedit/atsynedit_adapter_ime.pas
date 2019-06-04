@@ -17,6 +17,7 @@ type
   TATAdapterIMEStandard = class(TATAdapterIME)
   private
     FSelText: UnicodeString;
+    procedure StopIME(Sender: TObject; Success: boolean);
     procedure UpdateWindowPos(Sender: TObject);
   public
     procedure MouseClicked(Sender: TObject); override;
@@ -34,6 +35,23 @@ uses
   Classes,
   ATSynEdit,
   ATSynEdit_Carets;
+
+procedure TATAdapterIMEStandard.StopIME(Sender: TObject; Success: boolean);
+var
+  Ed: TATSynEdit;
+  imc: HIMC;
+begin
+  Ed:= TATSynEdit(Sender);
+  imc:= ImmGetContext(Ed.Handle);
+  if imc<>0 then
+  begin
+    if Success then
+      ImmNotifyIME(imc, NI_COMPOSITIONSTR, CPS_COMPLETE, 0)
+    else
+      ImmNotifyIME(imc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
+    ImmReleaseContext(Ed.Handle, imc);
+  end;
+end;
 
 procedure TATAdapterIMEStandard.UpdateWindowPos(Sender: TObject);
 var
@@ -62,7 +80,7 @@ end;
 
 procedure TATAdapterIMEStandard.MouseClicked(Sender: TObject);
 begin
-  UpdateWindowPos(Sender);
+  StopIME(Sender, false);
 end;
 
 procedure TATAdapterIMEStandard.Request(Sender: TObject; var Msg: TMessage);
