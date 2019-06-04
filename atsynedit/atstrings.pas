@@ -1120,14 +1120,36 @@ begin
 end;
 
 function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
+const
+  cBigLen = 6000;
 var
+  Item: PATStringItem;
+  bHasAscii: TATLineHasAscii;
   S: string;
+  i: integer;
 begin
-  //UTF8Copy is almost what we need
-  S:= UTF8Copy(
-    LinesUTF8[ALineIndex],
-    APosFrom, ALen);
-  Result:= UTF8Decode(S);
+  if ALen=0 then exit('');
+  Item:= GetItemPtr(ALineIndex);
+
+  bHasAscii:= TATLineHasAscii(Item^.Ex.HasAsciiOnly);
+  if bHasAscii=cLineAsciiYes then
+  begin
+    S:= Copy(Item^.Str, APosFrom, ALen);
+    SetLength(Result, Length(S));
+    for i:= 1 to Length(S) do
+      Result[i]:= S[i];
+  end
+  else
+  if Length(Item^.Str)<cBigLen then
+  begin
+    Result:= Copy(UTF8Decode(Item^.Str), APosFrom, ALen);
+  end
+  else
+  begin
+    //This is incorrect on surrogate Unicode chars, so use it only for huge lines
+    S:= UTF8Copy(Item^.Str, APosFrom, ALen);
+    Result:= UTF8Decode(S);
+  end
 end;
 
 function TATStrings.UpdateItemHasTab(AIndex: integer): boolean;
