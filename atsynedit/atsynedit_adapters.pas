@@ -84,7 +84,7 @@ type
 
   TATAdapterIME = class
   public
-    procedure MouseClicked(Sender: TObject); virtual;
+    procedure Stop(Sender: TObject; Success: boolean); virtual;
     procedure Request(Sender: TObject; var Msg: TMessage); virtual;
     procedure Notify(Sender: TObject; var Msg: TMessage); virtual;
     procedure StartComposition(Sender: TObject; var Msg: TMessage); virtual;
@@ -97,7 +97,7 @@ implementation
 
 { TATAdapterIME }
 
-procedure TATAdapterIME.MouseClicked(Sender: TObject);
+procedure TATAdapterIME.Stop(Sender: TObject; Success: boolean);
 begin
   //
 end;

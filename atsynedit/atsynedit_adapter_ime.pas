@@ -20,7 +20,7 @@ type
     procedure StopIME(Sender: TObject; Success: boolean);
     procedure UpdateWindowPos(Sender: TObject);
   public
-    procedure MouseClicked(Sender: TObject); override;
+    procedure Stop(Sender: TObject; Success: boolean); override;
     procedure Request(Sender: TObject; var Msg: TMessage); override;
     procedure Notify(Sender: TObject; var Msg: TMessage); override;
     procedure StartComposition(Sender: TObject; var Msg: TMessage); override;
@@ -78,7 +78,7 @@ begin
   end;
 end;
 
-procedure TATAdapterIMEStandard.MouseClicked(Sender: TObject);
+procedure TATAdapterIMEStandard.Stop(Sender: TObject; Success: boolean);
 begin
   StopIME(Sender, false);
 end;

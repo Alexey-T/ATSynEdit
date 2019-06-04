@@ -4370,7 +4370,7 @@ begin
   ActionId:= GetMouseActionId(FMouseActions, Shift);
 
   if Assigned(FAdapterIME) then
-    FAdapterIME.MouseClicked(Self);
+    FAdapterIME.Stop(Self, false);
 
   if MouseNiceScroll then
   begin
