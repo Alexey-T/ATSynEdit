@@ -92,7 +92,10 @@ begin
   if ch<#128 then exit(false);
 
   if ch=#$85 then exit(true); //white space
-  if (ch>=#$D800) and (ch<=#$DFFF) then exit(true); //surrogate utf-16 chars
+
+  //these are Emojis
+  //if (ch>=#$D800) and (ch<=#$DFFF) then exit(true); //surrogate utf-16 chars
+
   if (ch>=#$2000) and (ch<=#$200F) then exit(true); //white spaces + specials
   if (ch>=#$2028) and (ch<=#$202F) then exit(true); //white spaces + specials
   if (ch>=#$2066) and (ch<=#$2069) then exit(true);
