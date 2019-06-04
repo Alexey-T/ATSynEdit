@@ -30,6 +30,7 @@ type
   public
     procedure Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
     function GetCharWidth(ch: widechar): integer;
+    function GetStrWidth(const S: UnicodeString): integer;
   end;
 
 var
@@ -56,6 +57,7 @@ var
 
 function IsCharAsciiControl(ch: widechar): boolean; inline;
 function IsCharAccent(ch: widechar): boolean;
+function IsCharSurrogate(ch: widechar): boolean;
 function IsCharHex(ch: widechar): boolean;
 
 
@@ -165,7 +167,7 @@ begin
   SizeAvg:= Canvas.TextWidth('M');
 end;
 
-function TATCharSizer.GetCharWidth_FromCache(ch: Widechar): integer;
+function TATCharSizer.GetCharWidth_FromCache(ch: widechar): integer;
 begin
   Result:= Sizes[Ord(ch)];
   if Result=0 then
@@ -201,6 +203,11 @@ begin
 
   if OptCharSizeWideAllowed and IsCharFullWidth(ch) then
     exit(OptCharScaleFullWidth);
+end;
+
+function TATCharSizer.GetStrWidth(const S: UnicodeString): integer;
+begin
+  Result:= Canvas.TextWidth(UTF8Encode(S)) * 100 div SizeAvg;
 end;
 
 

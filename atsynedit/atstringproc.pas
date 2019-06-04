@@ -451,20 +451,40 @@ procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atStr
 var
   NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
+  NPairSize: integer;
+  StrPair: UnicodeString;
   ch: widechar;
+  bPair: boolean;
   i: integer;
 begin
   SetLength(AInfo, Length(S));
   if S='' then Exit;
 
   NCharsSkipped:= ACharsSkipped;
+  NPairSize:= 0;
+  StrPair:= 'ab';
 
   for i:= 1 to Length(S) do
   begin
     ch:= S[i];
     Inc(NCharsSkipped);
+    bPair:= IsCharSurrogate(ch);
 
-    NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
+    if (NPairSize>0) then
+    begin
+      NScalePercents:= NPairSize div 2;
+      NPairSize:= 0;
+    end
+    else
+    if bPair and (i<Length(S)) then
+    begin
+      StrPair[1]:= ch;
+      StrPair[2]:= S[i+1];
+      NPairSize:= GlobalCharSizer.GetStrWidth(StrPair);
+      NScalePercents:= NPairSize - NPairSize div 2;
+    end
+    else
+      NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
 
     if ch<>#9 then
       NSize:= 1
