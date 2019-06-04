@@ -81,6 +81,11 @@ begin
      (Ord(ch)<=OptCharFillWidth_Range3_end) then exit(true);
 end;
 
+function IsCharSurrogate(ch: widechar): boolean;
+begin
+  Result:= (ch>=#$D800) and (ch<=#$DFFF);
+end;
+
 {
 http://unicode.org/reports/tr9/#Directional_Formatting_Characters
 https://en.wikipedia.org/wiki/Whitespace_character#Unicode
@@ -94,7 +99,7 @@ begin
   if ch=#$85 then exit(true); //white space
 
   //these are Emojis
-  //if (ch>=#$D800) and (ch<=#$DFFF) then exit(true); //surrogate utf-16 chars
+  //if IsCharSurrogate(ch) then exit(true);
 
   if (ch>=#$2000) and (ch<=#$200F) then exit(true); //white spaces + specials
   if (ch>=#$2028) and (ch<=#$202F) then exit(true); //white spaces + specials
