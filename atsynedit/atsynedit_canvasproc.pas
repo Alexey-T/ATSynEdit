@@ -664,6 +664,35 @@ begin
   Result:= IsStringWithUnicodeChars(AStr);
 end;
 
+
+procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
+  const DxIn: TATIntArray;
+  var DxOut: TATIntArray);
+var
+  NSize, i: integer;
+begin
+  SetLength(DxOut, 0);
+
+  i:= 0;
+  repeat
+    Inc(i);
+    if i>Length(S) then Break;
+    if i>=Length(DxIn) then Break;
+
+    if IsCharSurrogate(S[i]) then
+    begin
+      NSize:= DxIn[i-1]+DxIn[i];
+      Inc(i);
+    end
+    else
+      NSize:= DxIn[i-1];
+
+    SetLength(DxOut, Length(DxOut)+1);
+    DxOut[Length(DxOut)-1]:= NSize;
+  until false;
+end;
+
+
 procedure CanvasTextOut(C: TCanvas; APosX, APosY: integer; AText: atString;
   AParts: PATLineParts; out ATextWidth: integer;
   const AProps: TATCanvasTextOutProps);
@@ -671,6 +700,7 @@ var
   ListOffsets: TATLineOffsetsInfo;
   ListInt: TATIntArray;
   Dx: TATIntArray;
+  DxUTF8: TATIntArray;
   i, j: integer;
   PartStr: atString;
   PartOffset, PartLen,
@@ -816,11 +846,15 @@ begin
         bAllowLigatures
         );
       {$else}
-      Buf:= UTF8Encode(SRemoveHexChars(PartStr));
+      BufW:= PartStr;
+      Buf:= UTF8Encode(SRemoveHexChars(BufW));
       SReplaceAllTabsToOneSpace(Buf);
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
-        DxPointer:= @Dx[PartOffset]
+      begin
+        _CalcCharSizesUtf8FromWidestring(BufW, @Dx[PartOffset], DxUTF8);
+        DxPointer:= @DxUTF8[0];
+      end
       else
         DxPointer:= nil;
 
