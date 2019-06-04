@@ -17,8 +17,9 @@ type
   TATAdapterIMEStandard = class(TATAdapterIME)
   private
     FSelText: UnicodeString;
-    procedure UpdateImeWindow(Sender: TObject);
+    procedure UpdateWindowPos(Sender: TObject);
   public
+    procedure MovedCaret(Sender: TObject); override;
     procedure Request(Sender: TObject; var Msg: TMessage); override;
     procedure Notify(Sender: TObject; var Msg: TMessage); override;
     procedure StartComposition(Sender: TObject; var Msg: TMessage); override;
@@ -31,35 +32,37 @@ implementation
 uses
   Windows, Imm,
   Classes,
-  ATSynEdit;
+  ATSynEdit,
+  ATSynEdit_Carets;
 
-procedure TATAdapterIMEStandard.UpdateImeWindow(Sender: TObject);
+procedure TATAdapterIMEStandard.UpdateWindowPos(Sender: TObject);
 var
+  Ed: TATSynEdit;
+  Caret: TATCaretItem;
   imc: HIMC;
-  cf: CompositionForm;
-  Pnt: TPoint;
-  //Caret: TATCaretItem;
+  CandiForm: CANDIDATEFORM;
 begin
-  //TODO: place IME window position near the caret
-  {
-  if Carets.Count=0 then exit;
-  Caret:= Carets[0];
-  Pnt.X := Caret.CoordX;
-  Pnt.Y := Caret.CoordY;
-  Pnt := ClientToScreen(Pnt);
-  }
-  Pnt:= Point(100, 100);
+  Ed:= TATSynEdit(Sender);
+  if Ed.Carets.Count=0 then exit;
+  Caret:= Ed.Carets[0];
 
-  imc := ImmGetContext(TATSynEdit(Sender).Handle);
+  imc:= ImmGetContext(Ed.Handle);
   if imc<>0 then
   begin
-    FillChar(cf, SizeOf(cf), 0);
-    cf.dwStyle := CFS_POINT;
-    cf.ptCurrentPos := Pnt;
+    CandiForm.dwIndex:= 0;
+    CandiForm.dwStyle:= CFS_FORCE_POSITION;
 
-    ImmSetCompositionWindow(imc, @cf);
-    ImmReleaseContext(TATSynEdit(Sender).Handle, imc);
+    CandiForm.ptCurrentPos.X:= Caret.CoordX;
+    CandiForm.ptCurrentPos.Y:= Caret.CoordY+Ed.TextCharSize.Y+1;
+
+    ImmSetCandidateWindow(imc, @CandiForm);
+    ImmReleaseContext(Ed.Handle, imc);
   end;
+end;
+
+procedure TATAdapterIMEStandard.MovedCaret(Sender: TObject);
+begin
+  //TODO
 end;
 
 procedure TATAdapterIMEStandard.Request(Sender: TObject; var Msg: TMessage);
@@ -72,6 +75,7 @@ begin
   Msg.Result:= 0;
   exit;
 
+  (*
   Ed:= TATSynEdit(Sender);
   case Msg.wParam of
     IMR_QUERYCHARPOSITION:
@@ -93,24 +97,21 @@ begin
         Msg.Result:= 1;
       end;
   end;
+  *)
 end;
 
 procedure TATAdapterIMEStandard.Notify(Sender: TObject; var Msg: TMessage);
 begin
-  //not implemented
-  Msg.Result:= 0;
-  exit;
-
   case Msg.WParam of
-    IMN_SETOPENSTATUS:
-      UpdateImeWindow(Sender);
+    IMN_OPENCANDIDATE:
+      UpdateWindowPos(Sender);
   end;
 end;
 
 procedure TATAdapterIMEStandard.StartComposition(Sender: TObject;
   var Msg: TMessage);
 begin
-  UpdateImeWindow(Sender);
+  UpdateWindowPos(Sender);
   FSelText:= TATSynEdit(Sender).TextSelected;
   Msg.Result:= -1;
 end;
