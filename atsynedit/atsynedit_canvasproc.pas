@@ -677,9 +677,9 @@ begin
   repeat
     Inc(i);
     if i>Length(S) then Break;
-    if i>=Length(DxIn) then Break;
+    if i>Length(DxIn) then Break;
 
-    if IsCharSurrogate(S[i]) then
+    if IsCharSurrogate(S[i]) and (i<Length(DxIn)) then
     begin
       NSize:= DxIn[i-1]+DxIn[i];
       Inc(i);
