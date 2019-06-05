@@ -563,6 +563,11 @@ begin
     if APixelsFromLeft<ListMid[i] then
     begin
       Result:= i+1;
+
+      //don't get position inside utf16 surrogate pair
+      if (Result<=Length(Str)) and IsCharSurrogateLow(Str[Result]) then
+        Inc(Result);
+
       Exit
     end;
 
