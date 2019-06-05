@@ -57,7 +57,6 @@ var
 
 function IsCharAsciiControl(ch: widechar): boolean; inline;
 function IsCharAccent(ch: widechar): boolean;
-function IsCharSurrogate(ch: widechar): boolean;
 function IsCharHex(ch: widechar): boolean;
 
 
@@ -81,11 +80,6 @@ begin
 
   if (Ord(ch)>=OptCharFillWidth_Range3_begin) and
      (Ord(ch)<=OptCharFillWidth_Range3_end) then exit(true);
-end;
-
-function IsCharSurrogate(ch: widechar): boolean;
-begin
-  Result:= (ch>=#$D800) and (ch<=#$DFFF);
 end;
 
 {

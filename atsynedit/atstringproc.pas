@@ -93,6 +93,7 @@ function IsCharWordInIdentifier(ch: atChar): boolean;
 function IsCharDigit(ch: atChar): boolean; inline;
 function IsCharSpace(ch: atChar): boolean; inline;
 function IsCharSymbol(ch: atChar): boolean;
+function IsCharSurrogate(ch: widechar): boolean; inline;
 function IsStringWithUnicodeChars(const S: atString): boolean;
 function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
@@ -227,6 +228,11 @@ begin
   Result:= Pos(ch, '.,;:''"/\-+*=()[]{}<>?!@#$%^&|~`')>0;
 end;
 
+function IsCharSurrogate(ch: widechar): boolean; inline;
+begin
+  Result:= (ch>=#$D800) and (ch<=#$DFFF);
+end;
+
 
 function IsStringSpaces(const S: atString): boolean; inline;
 begin
@@ -309,7 +315,8 @@ begin
   //b) space as 2nd char (not nice look for Python src)
   NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and
-    ((_IsWord(S[N]) and _IsWord(S[N+1])) or
+    (IsCharSurrogate(S[N]) or
+     (_IsWord(S[N]) and _IsWord(S[N+1])) or
      (AWrapIndented and IsCharSpace(S[N+1])))
     do Dec(N);
 
