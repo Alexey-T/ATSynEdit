@@ -27,8 +27,8 @@ type
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;
 
-function SCharUpper(ch: atChar): atChar; inline;
-function SCharLower(ch: atChar): atChar; inline;
+function SCharUpper(ch: widechar): widechar; inline;
+function SCharLower(ch: widechar): widechar; inline;
 function SCaseTitle(const S, SWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SWordChars: atString): atString;
@@ -87,12 +87,12 @@ type
       out ACharsSkipped: integer; out ASpacesSkipped: integer);
   end;
 
-function IsCharEol(ch: atChar): boolean; inline;
-function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
-function IsCharWordInIdentifier(ch: atChar): boolean;
-function IsCharDigit(ch: atChar): boolean; inline;
-function IsCharSpace(ch: atChar): boolean; inline;
-function IsCharSymbol(ch: atChar): boolean;
+function IsCharEol(ch: widechar): boolean; inline;
+function IsCharWord(ch: widechar; const AWordChars: atString): boolean;
+function IsCharWordInIdentifier(ch: widechar): boolean;
+function IsCharDigit(ch: widechar): boolean; inline;
+function IsCharSpace(ch: widechar): boolean; inline;
+function IsCharSymbol(ch: widechar): boolean;
 function IsCharSurrogate(ch: widechar): boolean; inline;
 function IsStringWithUnicodeChars(const S: atString): boolean;
 function IsStringSpaces(const S: atString): boolean; inline;
@@ -152,12 +152,12 @@ implementation
 uses
   Dialogs, Math;
 
-function IsCharEol(ch: atChar): boolean; inline;
+function IsCharEol(ch: widechar): boolean; inline;
 begin
   Result:= (ch=#10) or (ch=#13);
 end;
 
-function IsCharWord(ch: atChar; const AWordChars: atString): boolean;
+function IsCharWord(ch: widechar; const AWordChars: atString): boolean;
 var
   NType: byte;
 begin
@@ -186,7 +186,7 @@ begin
         Result:= true;
 end;
 
-function IsCharWordInIdentifier(ch: atChar): boolean;
+function IsCharWordInIdentifier(ch: widechar): boolean;
 begin
   case ch of
     '0'..'9',
@@ -199,12 +199,12 @@ begin
   end;
 end;
 
-function IsCharDigit(ch: atChar): boolean; inline;
+function IsCharDigit(ch: widechar): boolean; inline;
 begin
   Result:= (ch>='0') and (ch<='9');
 end;
 
-function IsCharSpace(ch: atChar): boolean; inline;
+function IsCharSpace(ch: widechar): boolean; inline;
 begin
   case ch of
     #9, //tab
@@ -223,7 +223,7 @@ begin
   end;
 end;
 
-function IsCharSymbol(ch: atChar): boolean;
+function IsCharSymbol(ch: widechar): boolean;
 begin
   Result:= Pos(ch, '.,;:''"/\-+*=()[]{}<>?!@#$%^&|~`')>0;
 end;
@@ -281,7 +281,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
   //
   //override IsCharWord to check also commas,dots,quotes
   //to wrap them with wordchars
-  function _IsWord(ch: atChar): boolean;
+  function _IsWord(ch: widechar): boolean;
   begin
     Result:= IsCharWord(ch, AWordChars+OptCommaCharsWrapWithWords);
   end;
@@ -401,7 +401,7 @@ end;
 
 function TATStringTabHelper.GetIndentExpanded(ALineIndex: integer; const S: atString): integer;
 var
-  ch: atChar;
+  ch: widechar;
   i: integer;
 begin
   Result:= 0;
@@ -816,12 +816,12 @@ begin
 end;
 
 
-function SCharUpper(ch: atChar): atChar; inline;
+function SCharUpper(ch: widechar): widechar; inline;
 begin
   Result:= UnicodeUpperCase(ch)[1];
 end;
 
-function SCharLower(ch: atChar): atChar; inline;
+function SCharLower(ch: widechar): widechar; inline;
 begin
   Result:= UnicodeLowerCase(ch)[1];
 end;
