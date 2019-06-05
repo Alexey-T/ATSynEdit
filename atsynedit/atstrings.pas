@@ -459,12 +459,10 @@ end;
 function TATStrings.GetLine(AIndex: integer): atString;
 var
   Item: PATStringItem;
-  PrevLen, NewLen: integer;
+  NewLen: integer;
 begin
   Item:= FList.GetItem(AIndex);
-  PrevLen:= Item^.CharLen;
-
-  if PrevLen=cCharLenAscii then
+  if Item^.CharLen=cCharLenAscii then
     //optimization for pure ascii-strings, get them faster
     Result:= SConvertUtf8ToWideForAscii(Item^.Str)
   else
@@ -1124,15 +1122,13 @@ const
   cBigLen = 10000;
 var
   Item: PATStringItem;
-  bHasAscii: TATLineHasAscii;
   S: string;
   i: integer;
 begin
   if ALen=0 then exit('');
   Item:= GetItemPtr(ALineIndex);
 
-  bHasAscii:= TATLineHasAscii(Item^.Ex.HasAsciiOnly);
-  if bHasAscii=cLineAsciiYes then
+  if Item^.CharLen=cCharLenAscii then
   begin
     S:= Copy(Item^.Str, APosFrom, ALen);
     Result:= SConvertUtf8ToWideForAscii(S);
