@@ -475,7 +475,6 @@ var
   NPairSize: integer;
   StrPair: UnicodeString;
   ch: widechar;
-  bPair: boolean;
   i: integer;
 begin
   SetLength(AInfo, Length(S));
@@ -489,15 +488,14 @@ begin
   begin
     ch:= S[i];
     Inc(NCharsSkipped);
-    bPair:= IsCharSurrogateHigh(ch);
 
-    if (NPairSize>0) then
+    if (NPairSize>0) and IsCharSurrogateLow(ch) then
     begin
       NScalePercents:= NPairSize div 2;
       NPairSize:= 0;
     end
     else
-    if bPair and (i<Length(S)) then
+    if IsCharSurrogateHigh(ch) and (i<Length(S)) then
     begin
       StrPair[1]:= ch;
       StrPair[2]:= S[i+1];
@@ -505,7 +503,10 @@ begin
       NScalePercents:= NPairSize - NPairSize div 2;
     end
     else
+    begin
       NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
+      NPairSize:= 0;
+    end;
 
     if ch<>#9 then
       NSize:= 1

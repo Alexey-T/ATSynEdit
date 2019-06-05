@@ -669,17 +669,20 @@ procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
   const DxIn: TATIntArray;
   var DxOut: TATIntArray);
 var
-  NSize, i: integer;
+  NLen, NSize, i: integer;
 begin
   SetLength(DxOut, 0);
 
   i:= 0;
+  NLen:= Length(S);
   repeat
     Inc(i);
-    if i>Length(S) then Break;
+    if i>NLen then Break;
     if i>Length(DxIn) then Break;
 
-    if IsCharSurrogateHigh(S[i]) and (i<Length(DxIn)) then
+    if (i<NLen) and (i<Length(DxIn)) and
+      IsCharSurrogateHigh(S[i]) and
+      IsCharSurrogateLow(S[i+1]) then
     begin
       NSize:= DxIn[i-1]+DxIn[i];
       Inc(i);
