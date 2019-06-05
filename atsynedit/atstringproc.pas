@@ -295,7 +295,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
   //
   //override IsCharWord to check also commas,dots,quotes
   //to wrap them with wordchars
-  function _IsWord(ch: widechar): boolean;
+  function _IsWord(ch: widechar): boolean; inline;
   begin
     Result:= IsCharWord(ch, AWordChars+OptCommaCharsWrapWithWords);
   end;
@@ -305,31 +305,28 @@ var
   Offsets: TATLineOffsetsInfo;
 begin
   if S='' then
-    begin Result:= 0; Exit end;
+    Exit(0);
   if AColumns<OptMinWordWrapOffset then
-    begin Result:= AColumns; Exit end;
+    Exit(AColumns);
 
   CalcCharOffsets(ALineIndex, S, Offsets);
 
   if Offsets[High(Offsets)]<=AColumns*100 then
-  begin
-    Result:= Length(S);
-    Exit
-  end;
+    Exit(Length(S));
 
   //NAvg is average wrap offset, we use it if no correct offset found
   N:= Length(S)-1;
   while (N>0) and (Offsets[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
   if NAvg<OptMinWordWrapOffset then
-    begin Result:= OptMinWordWrapOffset; Exit end;
+    Exit(OptMinWordWrapOffset);
 
   //find correct offset: not allowed at edge
   //a) 2 wordchars,
   //b) space as 2nd char (not nice look for Python src)
   NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and
-    (IsCharSurrogateHigh(S[N]) or
+    (IsCharSurrogateLow(S[N]) or
      (_IsWord(S[N]) and _IsWord(S[N+1])) or
      (AWrapIndented and IsCharSpace(S[N+1])))
     do Dec(N);
