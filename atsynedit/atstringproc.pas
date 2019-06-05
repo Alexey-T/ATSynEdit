@@ -93,7 +93,11 @@ function IsCharWordInIdentifier(ch: widechar): boolean;
 function IsCharDigit(ch: widechar): boolean; inline;
 function IsCharSpace(ch: widechar): boolean; inline;
 function IsCharSymbol(ch: widechar): boolean;
-function IsCharSurrogate(ch: widechar): boolean; inline;
+
+function IsCharSurrogateAny(ch: widechar): boolean; inline;
+function IsCharSurrogateHigh(ch: widechar): boolean; inline;
+function IsCharSurrogateLow(ch: widechar): boolean; inline;
+
 function IsStringWithUnicodeChars(const S: atString): boolean;
 function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
@@ -228,9 +232,19 @@ begin
   Result:= Pos(ch, '.,;:''"/\-+*=()[]{}<>?!@#$%^&|~`')>0;
 end;
 
-function IsCharSurrogate(ch: widechar): boolean; inline;
+function IsCharSurrogateAny(ch: widechar): boolean; inline;
 begin
   Result:= (ch>=#$D800) and (ch<=#$DFFF);
+end;
+
+function IsCharSurrogateHigh(ch: widechar): boolean; inline;
+begin
+  Result:= (ch>=#$D800) and (ch<=#$DBFF);
+end;
+
+function IsCharSurrogateLow(ch: widechar): boolean; inline;
+begin
+  Result:= (ch>=#$DC00) and (ch<=#$DFFF);
 end;
 
 
@@ -315,7 +329,7 @@ begin
   //b) space as 2nd char (not nice look for Python src)
   NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and
-    (IsCharSurrogate(S[N]) or
+    (IsCharSurrogateHigh(S[N]) or
      (_IsWord(S[N]) and _IsWord(S[N+1])) or
      (AWrapIndented and IsCharSpace(S[N+1])))
     do Dec(N);
@@ -475,7 +489,7 @@ begin
   begin
     ch:= S[i];
     Inc(NCharsSkipped);
-    bPair:= IsCharSurrogate(ch);
+    bPair:= IsCharSurrogateHigh(ch);
 
     if (NPairSize>0) then
     begin
