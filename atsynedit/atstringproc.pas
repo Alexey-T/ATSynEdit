@@ -326,7 +326,7 @@ begin
   //b) space as 2nd char (not nice look for Python src)
   NMin:= SGetIndentChars(S)+1;
   while (N>NMin) and
-    (IsCharSurrogateLow(S[N]) or
+    (IsCharSurrogateLow(S[N+1]) or
      (_IsWord(S[N]) and _IsWord(S[N+1])) or
      (AWrapIndented and IsCharSpace(S[N+1])))
     do Dec(N);
