@@ -1121,7 +1121,7 @@ end;
 
 function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
 const
-  cBigLen = 6000;
+  cBigLen = 10000;
 var
   Item: PATStringItem;
   bHasAscii: TATLineHasAscii;
@@ -1135,9 +1135,7 @@ begin
   if bHasAscii=cLineAsciiYes then
   begin
     S:= Copy(Item^.Str, APosFrom, ALen);
-    SetLength(Result, Length(S));
-    for i:= 1 to Length(S) do
-      Result[i]:= S[i];
+    Result:= SConvertUtf8ToWideForAscii(S);
   end
   else
   if Length(Item^.Str)<cBigLen then
