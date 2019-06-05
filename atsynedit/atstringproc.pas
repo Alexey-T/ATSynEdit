@@ -49,6 +49,7 @@ function EditorScale(AValue: integer): integer; inline;
 function EditorScaleFont(AValue: integer): integer;
 
 var
+  OptEmojiWidthPercents: integer = 210;
   OptMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
   OptMinWordWrapOffset: integer = 3;
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
@@ -487,7 +488,7 @@ begin
     Inc(NCharsSkipped);
 
     {
-    ////if used GetStrWidth, then some strange bug, Emoji wrap pos is not ok
+    ////if used GetStrWidth, then strange bug on Win32, Emoji wrap pos is not ok
     if (NPairSize>0) and IsCharSurrogateLow(ch) then
     begin
       NScalePercents:= NPairSize div 2;
@@ -504,8 +505,7 @@ begin
     }
     if IsCharSurrogateAny(ch) then
     begin
-      //let's used Emoji width 210%
-      NScalePercents:= 210 div 2;
+      NScalePercents:= OptEmojiWidthPercents div 2;
     end
     else
     begin
