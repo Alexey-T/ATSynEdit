@@ -30,7 +30,7 @@ type
   public
     procedure Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
     function GetCharWidth(ch: widechar): integer;
-    function GetStrWidth(const S: UnicodeString): integer;
+    function GetStrWidth(const S: WideString): integer;
   end;
 
 var
@@ -130,17 +130,17 @@ begin
 end;
 
 {$ifdef windows}
-function _WidecharWidth(C: TCanvas; ch: Widechar): integer; inline;
+function _WidestrWidth(C: TCanvas; const S: WideString): integer; inline;
 var
   Size: TSize;
 begin
-  Windows.GetTextExtentPointW(C.Handle, @ch, 1, Size);
+  Windows.GetTextExtentPointW(C.Handle, PWChar(S), Length(S), Size);
   Result:= Size.cx;
 end;
 {$else}
-function _WidecharWidth(C: TCanvas; ch: Widechar): integer; inline;
+function _WidestrWidth(C: TCanvas; const S: WideString): integer; inline;
 begin
-  Result:= C.TextWidth(UTF8Encode(UnicodeString(ch)));
+  Result:= C.TextWidth(UTF8Encode(S));
 end;
 {$endif}
 
@@ -171,7 +171,7 @@ begin
       ShowMessage('Program error: CharSize.Init was not called');
       exit(8); //some char width
     end;
-    Result:= _WidecharWidth(Canvas, ch) * 100 div SizeAvg;
+    Result:= _WidestrWidth(Canvas, WideString(ch)) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Result;
   end;
 end;
@@ -199,9 +199,9 @@ begin
     exit(OptCharScaleFullWidth);
 end;
 
-function TATCharSizer.GetStrWidth(const S: UnicodeString): integer;
+function TATCharSizer.GetStrWidth(const S: WideString): integer;
 begin
-  Result:= Canvas.TextWidth(UTF8Encode(S)) * 100 div SizeAvg;
+  Result:= _WidestrWidth(Canvas, S) * 100 div SizeAvg;
 end;
 
 

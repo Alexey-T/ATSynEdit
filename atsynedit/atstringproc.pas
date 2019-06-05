@@ -469,8 +469,8 @@ procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atStr
 var
   NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
-  NPairSize: integer;
-  StrPair: UnicodeString;
+  //NPairSize: integer;
+  //StrPair: WideString;
   ch: widechar;
   i: integer;
 begin
@@ -478,14 +478,16 @@ begin
   if S='' then Exit;
 
   NCharsSkipped:= ACharsSkipped;
-  NPairSize:= 0;
-  StrPair:= 'ab';
+  //NPairSize:= 0;
+  //StrPair:= 'ab';
 
   for i:= 1 to Length(S) do
   begin
     ch:= S[i];
     Inc(NCharsSkipped);
 
+    {
+    ////if used GetStrWidth, then some strange bug, Emoji wrap pos is not ok
     if (NPairSize>0) and IsCharSurrogateLow(ch) then
     begin
       NScalePercents:= NPairSize div 2;
@@ -499,10 +501,16 @@ begin
       NPairSize:= GlobalCharSizer.GetStrWidth(StrPair);
       NScalePercents:= NPairSize - NPairSize div 2;
     end
+    }
+    if IsCharSurrogateAny(ch) then
+    begin
+      //let's used Emoji width 210%
+      NScalePercents:= 210 div 2;
+    end
     else
     begin
       NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
-      NPairSize:= 0;
+      //NPairSize:= 0;
     end;
 
     if ch<>#9 then
