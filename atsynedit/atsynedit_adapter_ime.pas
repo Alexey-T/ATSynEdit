@@ -5,6 +5,8 @@ refactored to separate unit by Alexey T.
 }
 unit ATSynEdit_Adapter_IME;
 
+{.$define IME_ATTR_FUNC}  //It has no functional code.
+
 interface
 
 uses
@@ -17,6 +19,10 @@ type
   TATAdapterIMEStandard = class(TATAdapterIME)
   private
     FSelText: UnicodeString;
+    {$ifdef IME_ATTR_FUNC}
+    position: Integer;
+    {$endif}
+    buffer: array[0..256] of WideChar;        { use static buffer. to avoid unexpected exception on FPC }
     procedure UpdateWindowPos(Sender: TObject);
   public
     procedure Stop(Sender: TObject; Success: boolean); override;
@@ -35,6 +41,9 @@ uses
   Forms,
   ATSynEdit,
   ATSynEdit_Carets;
+
+const
+  MaxImeBufSize = 256;
 
 // declated here, because FPC 3.3 trunk has typo in declaration
 function ImmGetCandidateWindow(imc: HIMC; par1: DWORD; lpCandidate: LPCANDIDATEFORM): LongBool; stdcall ; external 'imm32' name 'ImmGetCandidateWindow';
@@ -136,8 +145,11 @@ begin
 end;
 
 procedure TATAdapterIMEStandard.ImeNotify(Sender: TObject; var Msg: TMessage);
+const
+  IMN_OPENCANDIDATE_CH = 269;
 begin
   case Msg.WParam of
+    IMN_OPENCANDIDATE_CH,
     IMN_OPENCANDIDATE:
       UpdateWindowPos(Sender);
   end;
@@ -148,18 +160,52 @@ procedure TATAdapterIMEStandard.ImeStartComposition(Sender: TObject;
 begin
   UpdateWindowPos(Sender);
   FSelText:= TATSynEdit(Sender).TextSelected;
+  {$ifdef IME_ATTR_FUNC}
+  position:=0;
+  {$endif}
   Msg.Result:= -1;
 end;
 
+{$ifdef IME_ATTR_FUNC}
+procedure getCompositionStrCovertedRange(imc: HIMC; var selstart, sellength: Integer);
+const
+  attrbufsize = MaxImeBufSize;
+var
+  attrbuf: array[0..attrbufsize-1] of byte;
+  len, astart, aend: Integer;
+begin
+  selstart:=0;
+  sellength:=0;
+
+  len:=ImmGetCompositionString(imc, GCS_COMPATTR, @attrbuf[0], attrbufsize);
+  if len<>0 then
+  begin
+    astart:=0;
+    while (astart < len) and (attrbuf[astart] and ATTR_TARGET_CONVERTED=0) do
+      Inc(astart);
+    if astart< len then
+    begin
+      aend:=astart+1;
+      while (aend < len) and (attrbuf[aend] and ATTR_TARGET_CONVERTED<>0) do
+        Inc(aend);
+      selstart:=astart;
+      sellength:=aend-astart;
+    end;
+  end;
+end;
+{$endif}
+
 procedure TATAdapterIMEStandard.ImeComposition(Sender: TObject; var Msg: TMessage);
 const
-  IME_COMPFLAG = GCS_COMPREADSTR or GCS_COMPSTR;
-  IME_RESULTFLAG = GCS_RESULTREADSTR or GCS_RESULTSTR;
+  IME_COMPFLAG = GCS_COMPSTR or GCS_COMPATTR or GCS_CURSORPOS;
+  IME_RESULTFLAG = GCS_RESULTCLAUSE or GCS_RESULTSTR;
 var
   Ed: TATSynEdit;
   IMC: HIMC;
-  imeCode, imeReadCode, len, ImmGCode: Integer;
-  p: PWideChar;
+  imeCode, len, ImmGCode: Integer;
+  {$ifdef IME_ATTR_FUNC}
+  astart, alen: Integer;
+  {$endif}
   bOverwrite, bSelect: Boolean;
 begin
   Ed:= TATSynEdit(Sender);
@@ -173,36 +219,65 @@ begin
       IMC := ImmGetContext(Ed.Handle);
       try
          ImmGCode:=Msg.wParam;
-         { Get Result string length }
-         imeReadCode:=imeCode and (GCS_COMPSTR or GCS_RESULTSTR);
-         len := ImmGetCompositionStringW(IMC,imeReadCode,nil,0);
-         GetMem(p,len+2);
-         try
-            { get compositon string }
-            ImmGetCompositionStringW(IMC,imeReadCode,p,len);
-            if len>0 then
-              len := len shr 1;
-            p[len]:=#0;
-            { Insert IME ImeComposition string }
-            if (ImmGCode<>$1b) or (imeCode and GCS_COMPSTR=0) then
+          { Insert IME Composition string }
+          if ImmGCode<>$1b then
+          begin
+            { for janpanese IME, process result and composition separately.
+              It comes togetther }
+            { insert result string }
+            if imecode and IME_RESULTFLAG<>0 then
             begin
-              { Insert IME text and select if it is not GCS_RESULTSTR }
-              bOverwrite:=(imeCode and GCS_RESULTSTR<>0) and
-                          Ed.ModeOverwrite and
+              len:=ImmGetCompositionStringW(IMC,GCS_RESULTSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
+              if len>0 then
+                len := len shr 1;
+              buffer[len]:=#0;
+              {$ifdef IME_ATTR_FUNC}
+              // NOT USED
+              if imeCode and GCS_CURSORPOS<>0 then
+                position:=ImmGetCompositionStringW(IMC,GCS_CURSORPOS,nil,0);
+              getCompositionStrCovertedRange(IMC, astart, alen);
+              if (Msg.lParam and CS_INSERTCHAR<>0) and (Msg.lParam and CS_NOMOVECARET<>0) then
+              begin
+                astart:=0;
+                alen:=len;
+              end;
+              if alen=0 then
+                astart:=0;
+              {$endif}
+              // insert
+              bOverwrite:=Ed.ModeOverwrite and
                           (Length(FSelText)=0);
-              bSelect:=(imeCode and GCS_RESULTSTR=0) and
-                       (len>0);
-              Ed.TextInsertAtCarets(p, False,
+              Ed.TextInsertAtCarets(buffer, False,
                                    bOverwrite,
-                                   bSelect);
-              //WriteLn(Format('Set STRING %d, %s',[len,p]));
-            end;
-            { Revert not possible after IME completion }
-            if imeCode and GCS_RESULTSTR<>0 then
+                                   False);
               FSelText:='';
-         finally
-           FreeMem(p);
-         end;
+            end;
+            { insert composition string }
+            if imeCode and IME_COMPFLAG<>0 then begin
+              len:=ImmGetCompositionStringW(IMC,GCS_COMPSTR,@buffer[0],sizeof(buffer)-sizeof(WideChar));
+              if len>0 then
+                len := len shr 1;
+              buffer[len]:=#0;
+              bSelect:=len>0;
+              {$ifdef IME_ATTR_FUNC}
+              // NOT USED
+              if imeCode and GCS_CURSORPOS<>0 then
+                position:=ImmGetCompositionStringW(IMC,GCS_CURSORPOS,nil,0);
+              getCompositionStrCovertedRange(IMC, astart, alen);
+              if (Msg.lParam and CS_INSERTCHAR<>0) and (Msg.lParam and CS_NOMOVECARET<>0) then
+              begin
+                astart:=0;
+                alen:=len;
+              end;
+              if alen=0 then
+                astart:=0;
+              {$endif}
+              // insert
+              Ed.TextInsertAtCarets(buffer, False,
+                                   False,
+                                   bSelect);
+            end;
+          end;
       finally
         ImmReleaseContext(Ed.Handle,IMC);
       end;
@@ -221,6 +296,9 @@ begin
   Ed:= TATSynEdit(Sender);
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
+  {$ifdef IME_ATTR_FUNC}
+  position:=0;
+  {$endif}
   //WriteLn(Format('set STRING %d, %s',[Len,FSelText]));
   //WriteLn(Format('WM_IME_ENDCOMPOSITION %x, %x',[Msg.wParam,Msg.lParam]));
   Msg.Result:= -1;
