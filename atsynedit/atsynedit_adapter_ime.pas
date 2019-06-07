@@ -6,6 +6,7 @@ refactored to separate unit by Alexey T.
 unit ATSynEdit_Adapter_IME;
 
 {.$define IME_ATTR_FUNC}  //It has no functional code.
+{.$define IME_RECONV}
 
 interface
 
@@ -37,6 +38,7 @@ implementation
 
 uses
   Windows, Imm,
+  SysUtils,
   Classes,
   Forms,
   ATSynEdit,
@@ -109,19 +111,103 @@ begin
   end;
 end;
 
+{$ifdef IME_RECONV}
+function ImeReconvertString(Ed:TATSynEdit; lprcv:PRECONVERTSTRING):DWORD;
+var
+  dwSelStart, dwSelEnd:DWORD;
+  dwStart, dwEnd:DWORD;
+  dwLength, dwCSPos:DWORD;
+  imc:HIMC;
+begin
+  // request buffer
+  if lprcv=nil then
+  begin
+    dwSelStart:=Ed.SelRect.Left;
+    dwStart:=dwSelStart;
+    dwSelEnd:=Ed.SelRect.Right;
+    dwEnd:=dwSelEnd;
+  end;
+  // set buffer(+#0)
+  dwLength:=sizeof(RECONVERTSTRING)+(dwSelEnd-dwSelStart+1)*sizeof(WideChar);
+  // return required size
+  if lprcv=nil then
+  begin
+    Result:=dwLength;
+    exit;
+  end;
+  dwSelStart:=Ed.SelRect.Left;
+  dwStart:=dwSelStart;
+  dwSelEnd:=Ed.SelRect.Right;
+  dwEnd:=dwSelEnd;
+
+  // lprcv^.dwSize := sizeof (RECONVERTSTRING);
+  // lprcv^.dwVersion = 0;
+
+  // string offset
+  lprcv^.dwStrOffset := sizeof (RECONVERTSTRING);
+
+  lprcv^.dwStrLen := dwEnd - dwStart;
+
+  lprcv^.dwCompStrOffset := (dwSelStart - dwStart) * sizeof (WideChar);
+
+  lprcv^.dwCompStrLen := dwSelEnd - dwSelStart;
+
+  lprcv^.dwTargetStrOffset := lprcv^.dwCompStrOffset;
+  lprcv^.dwTargetStrLen := lprcv^.dwCompStrLen;
+
+  system.Move(Ed.TextSelected[1],(pchar(lprcv)+sizeof(RECONVERTSTRING))^,(Length(Ed.TextSelected)+1)*sizeof(WideChar));
+
+  imc:=ImmGetContext(Ed.Handle);
+  try
+    if ImmSetCompositionStringW(imc, SCS_QUERYRECONVERTSTRING, lprcv, lprcv^.dwSize, nil, 0) then
+    begin
+          dwCSPos := lprcv^.dwCompStrOffset div sizeof(WideChar);
+          if (dwCSPos<>dwSelStart-dwStart) or
+             (lprcv^.dwCompStrLen<>dwSelEnd-dwSelStart) then
+          begin
+              dwSelStart := dwCSPos;
+              dwSelEnd := dwSelStart + lprcv^.dwCompStrLen;
+          end;
+
+          //Set Caret Position
+
+          if not ImmSetCompositionStringW (imc, SCS_SETRECONVERTSTRING, lprcv, lprcv^.dwSize, nil, 0) then
+              dwLength := 0;
+          Result:=dwLength;
+    end;
+  finally
+    ImmReleaseContext(Ed.Handle, imc);
+  end;
+end;
+{$endif}
+
 procedure TATAdapterIMEStandard.ImeRequest(Sender: TObject; var Msg: TMessage);
-{
 var
   Ed: TATSynEdit;
+  {$ifdef IME_RECONV}
+  size: Longint;
+  {$endif}
+  {
   cp: PIMECHARPOSITION;
   Pnt: TPoint;
   }
 begin
+  {$ifndef IME_RECONV}
   exit;
-
-  (*
+  {$else}
   Ed:= TATSynEdit(Sender);
   case Msg.wParam of
+    IMR_RECONVERTSTRING :
+      begin
+        size:=ImeReconvertString(Ed,PRECONVERTSTRING(Msg.lParam));
+        if size<0 then
+          Msg.Result:=0
+          else
+            Msg.Result:=-1;
+      end;
+    IMR_CONFIRMRECONVERTSTRING:
+      Msg.Result:=-1;
+    {
     IMR_QUERYCHARPOSITION:
       begin
         cp := PIMECHARPOSITION(Msg.lParam);
@@ -140,8 +226,10 @@ begin
 
         Msg.Result:= 1;
       end;
+    }
   end;
-  *)
+  {$endif}
+  //WriteLn(Format('WM_IME_REQUEST %x, %x',[Msg.wParam,Msg.lParam]));
 end;
 
 procedure TATAdapterIMEStandard.ImeNotify(Sender: TObject; var Msg: TMessage);
