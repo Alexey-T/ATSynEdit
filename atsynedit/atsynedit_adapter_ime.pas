@@ -110,30 +110,29 @@ begin
 end;
 
 procedure TATAdapterIMEStandard.ImeRequest(Sender: TObject; var Msg: TMessage);
-{
 var
   Ed: TATSynEdit;
+  Caret: TATCaretItem;
   cp: PIMECHARPOSITION;
   Pnt: TPoint;
-  }
 begin
-  exit;
-
-  (*
   Ed:= TATSynEdit(Sender);
+  if Ed.Carets.Count=0 then exit;
+  Caret:= Ed.Carets[0];
+
+  Pnt.X:= Caret.CoordX;
+  Pnt.Y:= Caret.CoordY;
+  Pnt:= Ed.ClientToScreen(Pnt);
+
   case Msg.wParam of
     IMR_QUERYCHARPOSITION:
       begin
         cp := PIMECHARPOSITION(Msg.lParam);
 
-        //TODO: fill here
-        Pnt.X:= 50;
-        Pnt.Y:= 50;
-
         cp^.cLineHeight := Ed.TextCharSize.Y;
 
-        cp^.pt.x := Pnt.x;
-        cp^.pt.y := Pnt.y;
+        cp^.pt.x := Pnt.X;
+        cp^.pt.y := Pnt.Y;
 
         cp^.rcDocument.TopLeft := Ed.ClientToScreen(Ed.ClientRect.TopLeft);
         cp^.rcDocument.BottomRight := Ed.ClientToScreen(Ed.ClientRect.BottomRight);
@@ -141,7 +140,6 @@ begin
         Msg.Result:= 1;
       end;
   end;
-  *)
 end;
 
 procedure TATAdapterIMEStandard.ImeNotify(Sender: TObject; var Msg: TMessage);
