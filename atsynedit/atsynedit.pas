@@ -4686,6 +4686,7 @@ var
   bOnMain, bOnMinimap, bOnMicromap, bOnGutter: boolean;
   Details: TATPosDetails;
   nIndex: integer;
+  Caret: TATCaretItem;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -4856,7 +4857,13 @@ begin
             //remove selection from current caret
             nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
             if Carets.IsIndexValid(nIndex) then
-              Carets[nIndex].SelectNone;
+            begin
+              Caret:= Carets[nIndex];
+              Caret.PosX:= P.X;
+              Caret.PosY:= P.Y;
+              Caret.EndX:= -1;
+              Caret.EndY:= -1;
+            end;
             Update;
           end
           else
