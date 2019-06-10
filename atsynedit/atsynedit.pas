@@ -1112,6 +1112,9 @@ type
     procedure DoUnfoldLine(ALine: integer);
     property RectMain: TRect read FRectMain;
     property RectGutter: TRect read FRectGutter;
+    property RectMinimap: TRect read FRectMinimap;
+    property RectMicromap: TRect read FRectMicromap;
+    property RectRuler: TRect read FRectRuler;
     function IndentString: string;
     //gutter
     property Gutter: TATGutter read FGutter;
