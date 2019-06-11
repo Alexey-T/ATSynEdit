@@ -927,13 +927,13 @@ begin
     cTokensStrings:
       Result:= Kind=cTokenKindString;
     cTokensCommentsAndStrings:
-      Result:= Kind in [cTokenKindComment, cTokenKindString];
+      Result:= Kind<>cTokenKindOther; //Kind in [cTokenKindComment, cTokenKindString];
     cTokensNoComments:
       Result:= Kind<>cTokenKindComment;
     cTokensNoStrings:
       Result:= Kind<>cTokenKindString;
     cTokensNoCommentsAndStrings:
-      Result:= not (Kind in [cTokenKindComment, cTokenKindString]);
+      Result:= Kind=cTokenKindOther; //not (Kind in [cTokenKindComment, cTokenKindString]);
   end;
 end;
 
