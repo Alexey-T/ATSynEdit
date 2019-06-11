@@ -40,7 +40,7 @@ type
   TATFinderResults = specialize TFPGList<TATFinderResult>;
 
   TATFinderTokenKind = (
-    cTokenKindAny,
+    cTokenKindOther,
     cTokenKindComment,
     cTokenKindString
     );
@@ -473,7 +473,7 @@ begin
   bOk:= true;
 
   if bOk then
-    if (OptTokens<>cTokensAll) and not CheckTokens(P1.X, P1.Y) then
+    if not CheckTokens(P1.X, P1.Y) then
       bOk:= false;
 
   if bOk and AWithConfirm then
@@ -502,7 +502,7 @@ begin
 
     if Application.Terminated then exit;
 
-    if (OptTokens<>cTokensAll) and not CheckTokens(P1.X, P1.Y) then Continue;
+    if not CheckTokens(P1.X, P1.Y) then Continue;
 
     if AWithConfirm then
     begin
@@ -916,6 +916,8 @@ function TATEditorFinder.CheckTokens(AX, AY: integer): boolean;
 var
   Kind: TATFinderTokenKind;
 begin
+  if OptTokens=cTokensAll then
+    exit(true);
   if not Assigned(FOnGetToken) then
     exit(true);
   FOnGetToken(Editor, AX, AY, Kind);
@@ -1690,7 +1692,7 @@ begin
             bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+NLenPart+1]));
           if bOk and
-            ((OptTokens=cTokensAll) or CheckTokens(IndexChar, IndexLine)) then
+            CheckTokens(IndexChar, IndexLine) then
           begin
             FMatchEdPos.Y:= IndexLine;
             FMatchEdPos.X:= IndexChar;
@@ -1756,7 +1758,7 @@ begin
             bOk:= ((IndexChar>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar-1-NLenPart<1) or not IsWordChar(SLineLoopedW[IndexChar-1-NLenPart]));
           if bOk and
-            ((OptTokens=cTokensAll) or CheckTokens(IndexChar-1-NLenPart, IndexLine)) then
+            CheckTokens(IndexChar-1-NLenPart, IndexLine) then
           begin
             if NParts=1 then
             begin
