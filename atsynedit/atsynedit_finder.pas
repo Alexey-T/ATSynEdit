@@ -45,11 +45,11 @@ type
     cTokenKindString
     );
 
-  TATFinderTokens = (
+  TATFinderTokensAllowed = (
     cTokensAll,
-    cTokensComments,
-    cTokensStrings,
-    cTokensCommentsAndStrings,
+    cTokensOnlyComments,
+    cTokensOnlyStrings,
+    cTokensOnlyCommentsAndStrings,
     cTokensNoComments,
     cTokensNoStrings,
     cTokensNoCommentsAndStrings
@@ -90,7 +90,7 @@ type
     OptCase: boolean; //for regex and usual
     OptRegex: boolean;
     OptWrapped: boolean;
-    OptTokens: TATFinderTokens;
+    OptTokens: TATFinderTokensAllowed;
     StrText: UnicodeString;
     property StrFind: UnicodeString read FStrFind write SetStrFind;
     property StrReplace: UnicodeString read FStrReplace write SetStrReplace;
@@ -922,11 +922,11 @@ begin
     exit(true);
   FOnGetToken(Editor, AX, AY, Kind);
   case OptTokens of
-    cTokensComments:
+    cTokensOnlyComments:
       Result:= Kind=cTokenKindComment;
-    cTokensStrings:
+    cTokensOnlyStrings:
       Result:= Kind=cTokenKindString;
-    cTokensCommentsAndStrings:
+    cTokensOnlyCommentsAndStrings:
       Result:= Kind<>cTokenKindOther; //Kind in [cTokenKindComment, cTokenKindString];
     cTokensNoComments:
       Result:= Kind<>cTokenKindComment;
