@@ -39,6 +39,12 @@ type
 
   TATFinderResults = specialize TFPGList<TATFinderResult>;
 
+  TATFinderTokenKind = (
+    cTokenKindAny,
+    cTokenKindComment,
+    cTokenKindString
+    );
+
   TATFinderTokens = (
     cTokensAll,
     cTokensComments,
@@ -48,6 +54,11 @@ type
     cTokensNoStrings,
     cTokensNoCommentsAndStrings
     );
+
+type
+  TATFinderGetToken = procedure(Sender: TObject;
+    AX, AY: integer;
+    out AKind: TATFinderTokenKind) of object;
 
 type
   { TATTextFinder }
@@ -62,6 +73,7 @@ type
     FPrevProgress: integer;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
+    FOnGetToken: TATFinderGetToken;
     procedure ClearMatchPos; virtual;
     //function IsMatchUsual(APos: integer): boolean;
     //function DoFind_Usual(AFromPos: integer): boolean;
@@ -78,6 +90,7 @@ type
     OptCase: boolean; //for regex and usual
     OptRegex: boolean;
     OptWrapped: boolean;
+    OptTokens: TATFinderTokens;
     StrText: UnicodeString;
     property StrFind: UnicodeString read FStrFind write SetStrFind;
     property StrReplace: UnicodeString read FStrReplace write SetStrReplace;
@@ -88,6 +101,7 @@ type
     property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
     property OnBadRegex: TNotifyEvent read FOnBadRegex write FOnBadRegex;
+    property OnGetToken: TATFinderGetToken read FOnGetToken write FOnGetToken;
   end;
 
 type
@@ -126,6 +140,7 @@ type
     function GetOffsetStartPos: integer;
     function GetRegexSkipIncrement: integer;
     procedure DoFixCaretSelectionDirection;
+    function CheckTokens(AX, AY: integer): boolean;
     //
     procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
     procedure DoCollect_Regex(AList: TATFinderResults; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
@@ -456,7 +471,12 @@ begin
   end;
 
   bOk:= true;
-  if AWithConfirm then
+
+  if bOk then
+    if (OptTokens<>cTokensAll) and not CheckTokens(P1.X, P1.Y) then
+      bOk:= false;
+
+  if bOk and AWithConfirm then
   begin
     DoConfirmReplace(P1, P2, bOk, bContinue);
     if not bContinue then exit;
@@ -481,6 +501,9 @@ begin
     P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
 
     if Application.Terminated then exit;
+
+    if (OptTokens<>cTokensAll) and not CheckTokens(P1.X, P1.Y) then Continue;
+
     if AWithConfirm then
     begin
       DoConfirmReplace(P1, P2, bOk, bContinue);
@@ -886,6 +909,29 @@ begin
     Caret.PosY:= Y2;
     Caret.EndX:= X1;
     Caret.EndY:= Y1;
+  end;
+end;
+
+function TATEditorFinder.CheckTokens(AX, AY: integer): boolean;
+var
+  Kind: TATFinderTokenKind;
+begin
+  if not Assigned(FOnGetToken) then
+    exit(true);
+  FOnGetToken(Editor, AX, AY, Kind);
+  case OptTokens of
+    cTokensComments:
+      Result:= Kind=cTokenKindComment;
+    cTokensStrings:
+      Result:= Kind=cTokenKindString;
+    cTokensCommentsAndStrings:
+      Result:= Kind in [cTokenKindComment, cTokenKindString];
+    cTokensNoComments:
+      Result:= Kind<>cTokenKindComment;
+    cTokensNoStrings:
+      Result:= Kind<>cTokenKindString;
+    cTokensNoCommentsAndStrings:
+      Result:= not (Kind in [cTokenKindComment, cTokenKindString]);
   end;
 end;
 
@@ -1301,6 +1347,7 @@ begin
   OptCase:= false;
   OptWords:= false;
   OptRegex:= false;
+  OptTokens:= cTokensAll;
   ClearMatchPos;
 
   FRegex:= TRegExpr.Create;
@@ -1642,7 +1689,8 @@ begin
           if bOk and OptWords and (NParts=1) then
             bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+NLenPart+1]));
-          if bOk then
+          if bOk and
+            ((OptTokens=cTokensAll) or CheckTokens(IndexChar, IndexLine)) then
           begin
             FMatchEdPos.Y:= IndexLine;
             FMatchEdPos.X:= IndexChar;
@@ -1707,7 +1755,8 @@ begin
           if bOk and OptWords and (NParts=1) then
             bOk:= ((IndexChar>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar-1-NLenPart<1) or not IsWordChar(SLineLoopedW[IndexChar-1-NLenPart]));
-          if bOk then
+          if bOk and
+            ((OptTokens=cTokensAll) or CheckTokens(IndexChar-1-NLenPart, IndexLine)) then
           begin
             if NParts=1 then
             begin
