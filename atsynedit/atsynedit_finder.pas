@@ -39,6 +39,16 @@ type
 
   TATFinderResults = specialize TFPGList<TATFinderResult>;
 
+  TATFinderTokens = (
+    cTokensAll,
+    cTokensComments,
+    cTokensStrings,
+    cTokensCommentsAndStrings,
+    cTokensNoComments,
+    cTokensNoStrings,
+    cTokensNoCommentsAndStrings
+    );
+
 type
   { TATTextFinder }
 
