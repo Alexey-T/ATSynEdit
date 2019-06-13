@@ -84,6 +84,7 @@ type
     function IsProgressNeeded(ANewPos: integer): boolean;
   protected
     procedure DoOnFound; virtual;
+    function CheckTokens(APos: integer): boolean; virtual;
   public
     OptBack: boolean; //for non-regex
     OptWords: boolean; //for non-regex
@@ -140,7 +141,6 @@ type
     function GetOffsetStartPos: integer;
     function GetRegexSkipIncrement: integer;
     procedure DoFixCaretSelectionDirection;
-    function CheckTokens(AX, AY: integer): boolean;
     //
     procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
     procedure DoCollect_Regex(AList: TATFinderResults; AFromPos: integer; AWithEvent, AWithConfirm: boolean);
@@ -171,6 +171,8 @@ type
   protected
     procedure DoOnFound; override;
     procedure DoConfirmReplace(APos, AEnd: TPoint; var AConfirmThis, AConfirmContinue: boolean);
+    function CheckTokens(AX, AY: integer): boolean;
+    function CheckTokens(APos: integer): boolean; override;
   public
     Editor: TATSynEdit;
     OptFromCaret: boolean;
@@ -329,6 +331,11 @@ begin
   //
 end;
 
+function TATTextFinder.CheckTokens(APos: integer): boolean;
+begin
+  //
+end;
+
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
 begin
   Result:= false;
@@ -340,11 +347,27 @@ begin
   try
     FRegex.Expression:= StrFind;
     FRegex.InputString:= StrText;
-    Result:= FRegex.ExecPos(AFromPos);
-    if Result then
+
+    if FRegex.ExecPos(AFromPos) then
     begin
-      FMatchPos:= FRegex.MatchPos[0];
-      FMatchLen:= FRegex.MatchLen[0];
+      if CheckTokens(FRegex.MatchPos[0]) then
+      begin
+        Result:= true;
+        FMatchPos:= FRegex.MatchPos[0];
+        FMatchLen:= FRegex.MatchLen[0];
+        exit
+      end;
+
+      repeat
+        if not FRegex.ExecNext then exit;
+        if CheckTokens(FRegex.MatchPos[0]) then
+        begin
+          Result:= true;
+          FMatchPos:= FRegex.MatchPos[0];
+          FMatchLen:= FRegex.MatchLen[0];
+          exit
+        end;
+      until false;
     end;
   except
     if Assigned(FOnBadRegex) then
@@ -937,6 +960,14 @@ begin
   end;
 end;
 
+function TATEditorFinder.CheckTokens(APos: integer): boolean;
+var
+  P: TPoint;
+begin
+  P:= ConvertBufferPosToCaretPos(APos);
+  Result:= CheckTokens(P.X, P.Y);
+end;
+
 function TATEditorFinder.DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
 var
@@ -1379,7 +1410,6 @@ begin
       FromPos:= FMatchPos+ASkipLen;
     Result:= DoFind_Regex(FromPos);
     if Result then DoOnFound;
-    Exit
   end
   else
     ShowMessage('Error: Finder.FindMatch called for non-regex');
