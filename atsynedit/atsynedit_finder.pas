@@ -39,6 +39,27 @@ type
 
   TATFinderResults = specialize TFPGList<TATFinderResult>;
 
+  TATFinderTokenKind = (
+    cTokenKindOther,
+    cTokenKindComment,
+    cTokenKindString
+    );
+
+  TATFinderTokensAllowed = (
+    cTokensAll,
+    cTokensOnlyComments,
+    cTokensOnlyStrings,
+    cTokensOnlyCommentsAndStrings,
+    cTokensNoComments,
+    cTokensNoStrings,
+    cTokensNoCommentsAndStrings
+    );
+
+type
+  TATFinderGetToken = procedure(Sender: TObject;
+    AX, AY: integer;
+    out AKind: TATFinderTokenKind) of object;
+
 type
   { TATTextFinder }
 
@@ -52,6 +73,7 @@ type
     FPrevProgress: integer;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
+    FOnGetToken: TATFinderGetToken;
     procedure ClearMatchPos; virtual;
     //function IsMatchUsual(APos: integer): boolean;
     //function DoFind_Usual(AFromPos: integer): boolean;
@@ -62,12 +84,14 @@ type
     function IsProgressNeeded(ANewPos: integer): boolean;
   protected
     procedure DoOnFound; virtual;
+    function CheckTokens(APos: integer): boolean; virtual;
   public
     OptBack: boolean; //for non-regex
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
     OptRegex: boolean;
     OptWrapped: boolean;
+    OptTokens: TATFinderTokensAllowed;
     StrText: UnicodeString;
     property StrFind: UnicodeString read FStrFind write SetStrFind;
     property StrReplace: UnicodeString read FStrReplace write SetStrReplace;
@@ -78,6 +102,7 @@ type
     property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
     property OnBadRegex: TNotifyEvent read FOnBadRegex write FOnBadRegex;
+    property OnGetToken: TATFinderGetToken read FOnGetToken write FOnGetToken;
   end;
 
 type
@@ -146,6 +171,8 @@ type
   protected
     procedure DoOnFound; override;
     procedure DoConfirmReplace(APos, AEnd: TPoint; var AConfirmThis, AConfirmContinue: boolean);
+    function CheckTokens(AX, AY: integer): boolean;
+    function CheckTokens(APos: integer): boolean; override;
   public
     Editor: TATSynEdit;
     OptFromCaret: boolean;
@@ -304,6 +331,11 @@ begin
   //
 end;
 
+function TATTextFinder.CheckTokens(APos: integer): boolean;
+begin
+  //
+end;
+
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
 begin
   Result:= false;
@@ -315,11 +347,27 @@ begin
   try
     FRegex.Expression:= StrFind;
     FRegex.InputString:= StrText;
-    Result:= FRegex.ExecPos(AFromPos);
-    if Result then
+
+    if FRegex.ExecPos(AFromPos) then
     begin
-      FMatchPos:= FRegex.MatchPos[0];
-      FMatchLen:= FRegex.MatchLen[0];
+      if CheckTokens(FRegex.MatchPos[0]) then
+      begin
+        Result:= true;
+        FMatchPos:= FRegex.MatchPos[0];
+        FMatchLen:= FRegex.MatchLen[0];
+        exit
+      end;
+
+      repeat
+        if not FRegex.ExecNext then exit;
+        if CheckTokens(FRegex.MatchPos[0]) then
+        begin
+          Result:= true;
+          FMatchPos:= FRegex.MatchPos[0];
+          FMatchLen:= FRegex.MatchLen[0];
+          exit
+        end;
+      until false;
     end;
   except
     if Assigned(FOnBadRegex) then
@@ -446,7 +494,12 @@ begin
   end;
 
   bOk:= true;
-  if AWithConfirm then
+
+  if bOk then
+    if not CheckTokens(P1.X, P1.Y) then
+      bOk:= false;
+
+  if bOk and AWithConfirm then
   begin
     DoConfirmReplace(P1, P2, bOk, bContinue);
     if not bContinue then exit;
@@ -471,6 +524,9 @@ begin
     P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
 
     if Application.Terminated then exit;
+
+    if not CheckTokens(P1.X, P1.Y) then Continue;
+
     if AWithConfirm then
     begin
       DoConfirmReplace(P1, P2, bOk, bContinue);
@@ -877,6 +933,39 @@ begin
     Caret.EndX:= X1;
     Caret.EndY:= Y1;
   end;
+end;
+
+function TATEditorFinder.CheckTokens(AX, AY: integer): boolean;
+var
+  Kind: TATFinderTokenKind;
+begin
+  if OptTokens=cTokensAll then
+    exit(true);
+  if not Assigned(FOnGetToken) then
+    exit(true);
+  FOnGetToken(Editor, AX, AY, Kind);
+  case OptTokens of
+    cTokensOnlyComments:
+      Result:= Kind=cTokenKindComment;
+    cTokensOnlyStrings:
+      Result:= Kind=cTokenKindString;
+    cTokensOnlyCommentsAndStrings:
+      Result:= Kind<>cTokenKindOther; //Kind in [cTokenKindComment, cTokenKindString];
+    cTokensNoComments:
+      Result:= Kind<>cTokenKindComment;
+    cTokensNoStrings:
+      Result:= Kind<>cTokenKindString;
+    cTokensNoCommentsAndStrings:
+      Result:= Kind=cTokenKindOther; //not (Kind in [cTokenKindComment, cTokenKindString]);
+  end;
+end;
+
+function TATEditorFinder.CheckTokens(APos: integer): boolean;
+var
+  P: TPoint;
+begin
+  P:= ConvertBufferPosToCaretPos(APos);
+  Result:= CheckTokens(P.X, P.Y);
 end;
 
 function TATEditorFinder.DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean;
@@ -1291,6 +1380,7 @@ begin
   OptCase:= false;
   OptWords:= false;
   OptRegex:= false;
+  OptTokens:= cTokensAll;
   ClearMatchPos;
 
   FRegex:= TRegExpr.Create;
@@ -1320,7 +1410,6 @@ begin
       FromPos:= FMatchPos+ASkipLen;
     Result:= DoFind_Regex(FromPos);
     if Result then DoOnFound;
-    Exit
   end
   else
     ShowMessage('Error: Finder.FindMatch called for non-regex');
@@ -1632,7 +1721,8 @@ begin
           if bOk and OptWords and (NParts=1) then
             bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+NLenPart+1]));
-          if bOk then
+          if bOk and
+            CheckTokens(IndexChar, IndexLine) then
           begin
             FMatchEdPos.Y:= IndexLine;
             FMatchEdPos.X:= IndexChar;
@@ -1697,7 +1787,8 @@ begin
           if bOk and OptWords and (NParts=1) then
             bOk:= ((IndexChar>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar-1-NLenPart<1) or not IsWordChar(SLineLoopedW[IndexChar-1-NLenPart]));
-          if bOk then
+          if bOk and
+            CheckTokens(IndexChar-1-NLenPart, IndexLine) then
           begin
             if NParts=1 then
             begin
