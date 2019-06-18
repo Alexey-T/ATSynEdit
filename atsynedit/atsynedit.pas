@@ -2980,8 +2980,13 @@ begin
   if NScrollMax>NScrollMax2 then
     NScrollMax:= NScrollMax2;
 
-  Result:= Int64(FScrollVert.NPosLast) * NScrollPos div NScrollMax;
-  Result:= Min(NCount-1, Result);
+  if NScrollMax>0 then
+  begin
+    Result:= Int64(FScrollVert.NPosLast) * NScrollPos div NScrollMax;
+    Result:= Min(NCount-1, Result);
+  end
+  else
+    Result:= 0;
 end;
 
 function TATSynEdit.GetMinimap_ClickedPosToWrapIndex(APosY: integer): integer;
