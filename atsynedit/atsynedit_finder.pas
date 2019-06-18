@@ -190,7 +190,8 @@ type
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoAction_ReplaceSelected: boolean;
     function DoAction_CountAll(AWithEvent: boolean): integer;
-    procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList);
+    procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
+      ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
@@ -747,7 +748,8 @@ begin
   end;
 end;
 
-procedure TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList);
+procedure TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList;
+  ASorted: boolean; ADuplicates: TDuplicates);
 var
   ListRes: TATFinderResults;
   Res: TATFinderResult;
@@ -762,8 +764,8 @@ begin
   ListRes:= TATFinderResults.Create;
   try
     AMatches.TextLineBreakStyle:= tlbsLF;
-    AMatches.Sorted:= true;
-    AMatches.Duplicates:= dupIgnore;
+    AMatches.Sorted:= ASorted;
+    AMatches.Duplicates:= ADuplicates;
 
     DoCollect_Regex(ListRes, 1, AWithEvent, false);
     for i:= 0 to ListRes.Count-1 do
