@@ -6673,6 +6673,7 @@ begin
   C.Rectangle(RectAll);
 
   NWrapIndex:= GetMinimap_ClickedPosToWrapIndex(Pnt.Y);
+  FMinimapTooltip.Visible:= FMinimapTooltipVisible and (NWrapIndex>=0);
   if NWrapIndex<0 then exit;
   NLineCenter:= FWrapInfo[NWrapIndex].NLineIndex;
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
