@@ -563,12 +563,13 @@ begin
     DoEventCarets;
   end;
 
-  //bScrolled:=
+  if APosEnd.Y>=0 then
+    DoShowPos(APosEnd, AIndentHorz, AIndentVert);
   DoShowPos(APos, AIndentHorz, AIndentVert);
 
-  ////don't check bScrolled, to update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
+  ////don't check bScrolled (result of DoShowPos), to update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
   //if bScrolled then
-    UpdateScrollbars(true);
+  UpdateScrollbars(true);
 
   if AAllowUpdate then
     Update;
