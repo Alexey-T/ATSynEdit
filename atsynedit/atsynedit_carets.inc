@@ -488,15 +488,57 @@ begin
   end;
 end;
 
+function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer): boolean;
+var
+  Coord: TPoint;
+  NIndex, NChars: integer;
+begin
+  Result:= false;
+  Coord:= CaretPosToClientPos(APos);
+
+  //for y
+  //  vert indent <0: always indent from top;
+  //             >=0: indent from top (goto up) or bottom (goto down)
+  if Coord.Y<FRectMain.Top then
+  begin
+    NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
+    if NIndex<0 then Exit;
+    DoScroll_IndentFromTop(NIndex, Abs(AIndentVert));
+    Result:= true;
+  end
+  else
+  if Coord.Y+FCharSize.Y >= FRectMain.Bottom then
+  begin
+    NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
+    if NIndex<0 then Exit;
+    if AIndentVert<0 then
+      DoScroll_IndentFromTop(NIndex, Abs(AIndentVert))
+    else
+      DoScroll_IndentFromBottom(NIndex, Abs(AIndentVert));
+    Result:= true;
+  end;
+
+  //for x
+  if Coord.X<FRectMain.Left then
+  begin
+    NChars:= (FRectMain.Left-Coord.X) div FCharSize.X + 1 + AIndentHorz;
+    FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
+    Result:= true;
+  end
+  else
+  if Coord.X>FRectMain.Right-FCharSize.X then
+  begin
+    NChars:= (Coord.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
+    Inc(FScrollHorz.NPos, NChars);
+    Result:= true;
+  end;
+end;
+
 procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
   AIndentHorz, AIndentVert: integer;
   APlaceCaret, ADoUnfold: boolean;
   AAllowProcessMsg: boolean=true;
   AAllowUpdate: boolean=true);
-var
-  NIndex, NChars: integer;
-  Coord: TPoint;
-  bScrolled: boolean;
 begin
   if not Strings.IsIndexValid(APos.Y) then exit;
 
@@ -521,45 +563,8 @@ begin
     DoEventCarets;
   end;
 
-  bScrolled:= false;
-  Coord:= CaretPosToClientPos(APos);
-
-  //for y
-  //  vert indent <0: always indent from top;
-  //             >=0: indent from top (goto up) or bottom (goto down)
-  if Coord.Y<FRectMain.Top then
-  begin
-    NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
-    if NIndex<0 then Exit;
-    DoScroll_IndentFromTop(NIndex, Abs(AIndentVert));
-    bScrolled:= true;
-  end
-  else
-  if Coord.Y+FCharSize.Y >= FRectMain.Bottom then
-  begin
-    NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
-    if NIndex<0 then Exit;
-    if AIndentVert<0 then
-      DoScroll_IndentFromTop(NIndex, Abs(AIndentVert))
-    else
-      DoScroll_IndentFromBottom(NIndex, Abs(AIndentVert));
-    bScrolled:= true;
-  end;
-
-  //for x
-  if Coord.X<FRectMain.Left then
-  begin
-    NChars:= (FRectMain.Left-Coord.X) div FCharSize.X + 1 + AIndentHorz;
-    FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
-    bScrolled:= true;
-  end
-  else
-  if Coord.X>FRectMain.Right-FCharSize.X then
-  begin
-    NChars:= (Coord.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
-    Inc(FScrollHorz.NPos, NChars);
-    bScrolled:= true;
-  end;
+  //bScrolled:=
+  DoShowPos(APos, AIndentHorz, AIndentVert);
 
   ////don't check bScrolled, to update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
   //if bScrolled then
