@@ -488,7 +488,7 @@ begin
   end;
 end;
 
-function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer): boolean;
+function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AllowUpdate: boolean): boolean;
 var
   Coord: TPoint;
   NIndex, NChars: integer;
@@ -532,6 +532,13 @@ begin
     Inc(FScrollHorz.NPos, NChars);
     Result:= true;
   end;
+
+  if Result then
+  begin
+    UpdateScrollbars(true);
+    if AllowUpdate then
+      Update;
+  end;
 end;
 
 procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
@@ -539,6 +546,8 @@ procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
   APlaceCaret, ADoUnfold: boolean;
   AAllowProcessMsg: boolean=true;
   AAllowUpdate: boolean=true);
+var
+  changed1, changed2: boolean;
 begin
   if not Strings.IsIndexValid(APos.Y) then exit;
 
@@ -564,12 +573,14 @@ begin
   end;
 
   if APosEnd.Y>=0 then
-    DoShowPos(APosEnd, AIndentHorz, AIndentVert);
-  DoShowPos(APos, AIndentHorz, AIndentVert);
+    changed1:= DoShowPos(APosEnd, AIndentHorz, AIndentVert, false)
+  else
+    changed1:= false;
+  changed2:= DoShowPos(APos, AIndentHorz, AIndentVert, false);
 
-  ////don't check bScrolled (result of DoShowPos), to update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
-  //if bScrolled then
-  UpdateScrollbars(true);
+  ////always update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
+  if not changed1 and not changed2 then
+    UpdateScrollbars(true);
 
   if AAllowUpdate then
     Update;

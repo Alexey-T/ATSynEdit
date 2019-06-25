@@ -1147,8 +1147,7 @@ type
       AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
-    function DoShowPos(const APos: TPoint;
-      AIndentHorz, AIndentVert: integer): boolean;
+    function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AllowUpdate: boolean): boolean;
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
       APlaceCaret, ADoUnfold: boolean;
