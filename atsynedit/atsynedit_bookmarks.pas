@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils,
-  ATSynEdit_Gaps,
+  ATSynEdit_UpdClient,
   ATSynEdit_FGL;
 
 type

@@ -34,6 +34,7 @@ uses
   ATStringProc_WordJump,
   ATSynEdit_CharSizer,
   ATSynEdit_RegExpr,
+  ATSynEdit_UpdClient,
   ATSynEdit_Colors,
   ATSynEdit_Keymap,
   ATSynEdit_CanvasProc,

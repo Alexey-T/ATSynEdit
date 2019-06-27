@@ -12,7 +12,7 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
-  ATSynEdit_Gaps,
+  ATSynEdit_UpdClient,
   ATSynEdit_FGL;
 
 type

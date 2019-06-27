@@ -9,15 +9,8 @@ unit ATSynEdit_Gaps;
 interface
 
 uses
-  SysUtils, Classes, Graphics, Controls, Math;
-
-type
-  TATLineChangeKind = (
-    cLineChangeEdited,
-    cLineChangeAdded,
-    cLineChangeDeleted,
-    cLineChangeDeletedAll
-    );
+  SysUtils, Classes, Graphics, Controls, Math,
+  ATSynEdit_UpdClient;
 
 type
   { TATGapItem }
