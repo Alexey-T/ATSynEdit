@@ -56,12 +56,14 @@ type
     destructor Destroy; override;
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
-    procedure Clear;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
     function Insert(Index: integer; AX, AY, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
+    procedure Clear;
     procedure Delete(Index: integer);
+    procedure DeleteAllByTag(const ATag: Int64);
+    procedure DeleteAllExceptTag(const ATag: Int64);
     property Items[Index: integer]: TATSynRange read GetItems write SetItems; default;
     function IsRangeInsideOther(const R1, R2: TATSynRange): boolean;
     function IsRangesSame(const R1, R2: TATSynRange): boolean;
@@ -180,6 +182,24 @@ end;
 procedure TATSynRanges.Delete(Index: integer); inline;
 begin
   FList.Delete(Index);
+end;
+
+procedure TATSynRanges.DeleteAllByTag(const ATag: Int64);
+var
+  i: integer;
+begin
+  for i:= FList.Count-1 downto 0 do
+    if FList[i].Tag=ATag then
+      FList.Delete(i);
+end;
+
+procedure TATSynRanges.DeleteAllExceptTag(const ATag: Int64);
+var
+  i: integer;
+begin
+  for i:= FList.Count-1 downto 0 do
+    if FList[i].Tag<>ATag then
+      FList.Delete(i);
 end;
 
 function TATSynRanges.IsRangeInsideOther(const R1, R2: TATSynRange): boolean;
