@@ -12,6 +12,7 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
+  ATSynEdit_Gaps,
   ATSynEdit_FGL;
 
 type
@@ -73,6 +74,7 @@ type
     function FindDeepestRangeContainingLine(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function MessageText(Cnt: integer): string;
+    procedure Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
   end;
 
 implementation
@@ -142,6 +144,11 @@ end;
 function TATSynRanges.GetItems(Index: integer): TATSynRange;
 begin
   Result:= FList[Index];
+end;
+
+procedure TATSynRanges.SetItems(Index: integer; const AValue: TATSynRange);
+begin
+  FList[Index]:= AValue
 end;
 
 constructor TATSynRanges.Create;
@@ -325,6 +332,50 @@ begin
     Result:= Result+Items[i].MessageText+#10;
 end;
 
+procedure TATSynRanges.Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+var
+  Rng: TATSynRange;
+  i: integer;
+begin
+  if AChange=cLineChangeDeletedAll then
+  begin
+    Clear;
+    exit
+  end;
+
+  for i:= FList.Count-1 downto 0 do
+  begin
+    Rng:= FList[i];
+    //Tag=-1 means persistent range, from command "Fold selection"
+    if Rng.Tag<>-1 then Continue;
+
+    case AChange of
+      cLineChangeDeleted:
+        begin
+          if Rng.Y>=ALineIndex+AItemCount then
+          begin
+            Rng.Y:= Rng.Y-AItemCount;
+            Rng.Y2:= Rng.Y2-AItemCount;
+            FList[i]:= Rng;
+          end
+          else
+          if Rng.Y>=ALineIndex then
+            FList.Delete(i);
+        end;
+
+      cLineChangeAdded:
+        begin
+          if Rng.Y>=ALineIndex then
+          begin
+            Rng.Y:= Rng.Y+AItemCount;
+            Rng.Y2:= Rng.Y2+AItemCount;
+            FList[i]:= Rng;
+          end;
+        end;
+    end;
+  end;
+end;
+
 (*
 function TATSynRanges.MessageTextForIndexList(const L: TATIntArray): string;
 var
@@ -335,11 +386,6 @@ begin
     Result:= Result+Items[L[i]].MessageText+#10;
 end;
 *)
-
-procedure TATSynRanges.SetItems(Index: integer; const AValue: TATSynRange);
-begin
-  FList[Index]:= AValue
-end;
 
 end.
 

@@ -741,6 +741,7 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
+    procedure DoOnStringChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure DoOnStringProgress(Sender: TObject);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
@@ -3343,6 +3344,7 @@ begin
   FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
   FStringsInt.OnProgress:= @DoOnStringProgress;
+  FStringsInt.OnChange:= @DoOnStringChange;
 
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
@@ -5904,6 +5906,12 @@ begin
   FScrollVert.NPos:= GetMinimap_DraggedPosToWrapIndex(APosY);
   UpdateScrollbars(true);
   Update;
+end;
+
+procedure TATSynEdit.DoOnStringChange(Sender: TObject; AChange: TATLineChangeKind; ALine,
+  AItemCount: integer);
+begin
+  Fold.Update(AChange, ALine, AItemCount);
 end;
 
 function TATSynEdit.GetUndoAsString: string;
