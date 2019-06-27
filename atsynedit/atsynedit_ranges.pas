@@ -333,25 +333,21 @@ begin
 end;
 
 procedure TATSynRanges.Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+//Tag=-1 means persistent range, from command "Fold selection"
 var
   Rng: TATSynRange;
   i: integer;
 begin
-  if AChange=cLineChangeDeletedAll then
-  begin
-    Clear;
-    exit
-  end;
+  case AChange of
+    cLineChangeDeletedAll:
+      Clear;
 
-  for i:= FList.Count-1 downto 0 do
-  begin
-    Rng:= FList[i];
-    //Tag=-1 means persistent range, from command "Fold selection"
-    if Rng.Tag<>-1 then Continue;
-
-    case AChange of
-      cLineChangeDeleted:
+    cLineChangeDeleted:
+      for i:= FList.Count-1 downto 0 do
         begin
+          Rng:= FList[i];
+          if Rng.Tag<>-1 then Continue;
+
           if Rng.Y>=ALineIndex+AItemCount then
           begin
             Rng.Y:= Rng.Y-AItemCount;
@@ -363,8 +359,12 @@ begin
             FList.Delete(i);
         end;
 
-      cLineChangeAdded:
+    cLineChangeAdded:
+      for i:= FList.Count-1 downto 0 do
         begin
+          Rng:= FList[i];
+          if Rng.Tag<>-1 then Continue;
+
           if Rng.Y>=ALineIndex then
           begin
             Rng.Y:= Rng.Y+AItemCount;
@@ -372,7 +372,6 @@ begin
             FList[i]:= Rng;
           end;
         end;
-    end;
   end;
 end;
 
