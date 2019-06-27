@@ -741,8 +741,8 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
-    procedure DoOnStringChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
-    procedure DoOnStringProgress(Sender: TObject);
+    procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
+    procedure DoStringsOnProgress(Sender: TObject);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
     procedure DoSelectionDeleteColumnBlock;
@@ -3343,8 +3343,8 @@ begin
   FStringsInt:= TATStrings.Create;
   FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
-  FStringsInt.OnProgress:= @DoOnStringProgress;
-  FStringsInt.OnChange:= @DoOnStringChange;
+  FStringsInt.OnProgress:= @DoStringsOnProgress;
+  FStringsInt.OnChange:= @DoStringsOnChange;
 
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
@@ -5908,12 +5908,6 @@ begin
   Update;
 end;
 
-procedure TATSynEdit.DoOnStringChange(Sender: TObject; AChange: TATLineChangeKind; ALine,
-  AItemCount: integer);
-begin
-  Fold.Update(AChange, ALine, AItemCount);
-end;
-
 function TATSynEdit.GetUndoAsString: string;
 begin
   Result:= Strings.UndoAsString;
@@ -6649,7 +6643,13 @@ begin
     FAdapterHilite.OnEditorIdle(Self);
 end;
 
-procedure TATSynEdit.DoOnStringProgress(Sender: TObject);
+procedure TATSynEdit.DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine,
+  AItemCount: integer);
+begin
+  Fold.Update(AChange, ALine, AItemCount);
+end;
+
+procedure TATSynEdit.DoStringsOnProgress(Sender: TObject);
 begin
   Invalidate;
   Application.ProcessMessages;
