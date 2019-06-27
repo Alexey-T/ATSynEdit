@@ -166,7 +166,6 @@ type
     FList: TATStringItemList;
     FListUpdates: TATIntegerList;
     FListUpdatesHard: boolean;
-    FClients: TList;
     FGaps: TATGaps;
     FBookmarks: TATBookmarks;
     FBookmarks2: TATBookmarks;
@@ -293,7 +292,6 @@ type
     function GetItemPtr(AIndex: integer): PATStringItem;
     function UpdateItemHasTab(AIndex: integer): boolean;
 
-    property Clients: TList read FClients;
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
@@ -842,7 +840,6 @@ begin
   FListUpdatesHard:= false;
   FUndoList:= TATUndoList.Create;
   FRedoList:= TATUndoList.Create;
-  FClients:= TList.Create;
   FGaps:= TATGaps.Create;
   FBookmarks:= TATBookmarks.Create;
   FBookmarks2:= TATBookmarks.Create;
@@ -894,7 +891,6 @@ begin
   FreeAndNil(FListUpdates);
   FreeAndNil(FUndoList);
   FreeAndNil(FRedoList);
-  FreeAndNil(FClients);
 
   inherited;
 end;
@@ -1740,8 +1736,6 @@ begin
 end;
 
 procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
-var
-  i: integer;
 begin
   FGaps.Update(AChange, ALineIndex, AItemCount);
 
@@ -1750,9 +1744,6 @@ begin
     FBookmarks.Update(AChange, ALineIndex, AItemCount, Count);
     FBookmarks2.Update(AChange, ALineIndex, AItemCount, Count);
   end;
-
-  for i:= 0 to FClients.Count-1 do
-    IATUpdatableClient(FClients[i]).Update(AChange, ALineIndex, AItemCount, Count);
 
   if Assigned(FGutterDecor1) then
     FGutterDecor1.Update(AChange, ALineIndex, AItemCount, Count);

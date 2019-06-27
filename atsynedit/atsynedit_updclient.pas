@@ -14,11 +14,14 @@ type
     cLineChangeDeletedAll
     );
 
+{
+//Did a try to use this interface in TATStrings.DoEventChange, no success
 type
   IATUpdatableClient = interface
     ['{045EAD6D-5584-4A60-849E-6B8994AA5B8F}']
     procedure Update(AChange: TATLineChangeKind; ALineIndex, ALineCount, ATotalLineCount: integer);
   end;
+}
 
 implementation
 
