@@ -205,6 +205,7 @@ begin
   M.Add(cCommand_FoldingFoldAtCurLine, 'folding: fold block at current line', [], []);
   M.Add(cCommand_FoldingUnfoldAtCurLine, 'folding: unfold block at current line', [], []);
   M.Add(cCommand_FoldingToggleAtCurLine, 'folding: toggle block at current line', [], []);
+  M.Add(cCommand_FoldingFoldSelection, 'folding: fold selected lines', [], []);
 end;
 
 procedure InitKeymapCombo(var M: TATKeymap);

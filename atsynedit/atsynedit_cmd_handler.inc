@@ -477,6 +477,7 @@ begin
     cCommand_FoldingFoldAtCurLine:     Res:= DoCommand_FoldRangeAtCurLine(cFoldingFold);
     cCommand_FoldingUnfoldAtCurLine:   Res:= DoCommand_FoldRangeAtCurLine(cFoldingUnfold);
     cCommand_FoldingToggleAtCurLine:   Res:= DoCommand_FoldRangeAtCurLine(cFoldingToggle);
+    cCommand_FoldingFoldSelection:     Res:= DoCommand_FoldSelection;
 
     cCommand_Cancel:                   Res:= DoCommand_Cancel;
     cCommand_CaretsExtendUpLine:       Res:= DoCommand_CaretsExtend(false, 1);

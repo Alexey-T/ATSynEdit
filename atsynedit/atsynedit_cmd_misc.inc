@@ -171,6 +171,25 @@ begin
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
 
+function TATSynEdit.DoCommand_FoldSelection: TATCommandResults;
+var
+  Caret: TATCaretItem;
+  Y1, Y2: integer;
+begin
+  Result:= [];
+  if Carets.Count<>1 then exit;
+  Caret:= Carets[0];
+  if Caret.EndY<0 then exit;
+  Caret.GetSelLines(Y1, Y2);
+
+  if Fold.FindRangeWithPlusAtLine(Y1)>=0 then exit;
+
+  Fold.Add(1, Y1, Y2, false, '', -1);
+  DoRangeFold(Fold.Count-1);
+
+  Result:= [cResultCaretAny, cResultFoldChange];
+end;
+
 
 procedure TATSynEdit.DoConvertTabsToSpaces;
 var

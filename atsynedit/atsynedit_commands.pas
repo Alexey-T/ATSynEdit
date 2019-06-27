@@ -203,6 +203,7 @@ const
   cCommand_FoldingFoldAtCurLine = 1040;
   cCommand_FoldingUnfoldAtCurLine = 1041;
   cCommand_FoldingToggleAtCurLine = 1042;
+  cCommand_FoldingFoldSelection = 1043;
 
   cCommand_Cancel = 2001;
   cCommand_RepeatTextCommand = 2002;
