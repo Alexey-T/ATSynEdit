@@ -20,7 +20,6 @@ uses
   ATStringProc_Utf8Detect,
   ATStrings_Undo,
   ATSynEdit_fgl,
-  ATSynEdit_UpdClient,
   ATSynEdit_Gaps,
   ATSynEdit_Bookmarks,
   ATSynEdit_Gutter_Decor,

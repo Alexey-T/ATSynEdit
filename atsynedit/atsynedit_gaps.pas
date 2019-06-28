@@ -10,7 +10,7 @@ interface
 
 uses
   SysUtils, Classes, Graphics, Controls, Math,
-  ATSynEdit_UpdClient;
+  ATStringProc;
 
 type
   { TATGapItem }

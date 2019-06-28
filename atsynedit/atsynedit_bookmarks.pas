@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils,
-  ATSynEdit_UpdClient,
+  ATStringProc,
   ATSynEdit_FGL;
 
 type
