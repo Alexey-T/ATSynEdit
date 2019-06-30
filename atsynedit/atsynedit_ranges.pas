@@ -373,7 +373,20 @@ begin
           end
           else
           if Rng^.Y>=ALineIndex then
-            FList.Delete(i);
+          begin
+            if Rng^.Y2<=ALineIndex+AItemCount then
+              FList.Delete(i)
+            else
+            begin
+              Rng^.Y:= Max(Rng^.Y-AItemCount, ALineIndex);
+              Rng^.Y2-= AItemCount;
+            end;
+          end
+          else
+          if Rng^.Y2>=ALineIndex then
+          begin
+            Rng^.Y2:= ALineIndex;
+          end;
         end;
 
     cLineChangeAdded:
@@ -385,6 +398,11 @@ begin
           if Rng^.Y>=ALineIndex then
           begin
             Rng^.Y+= AItemCount;
+            Rng^.Y2+= AItemCount;
+          end
+          else
+          if Rng^.Y2>=ALineIndex then
+          begin
             Rng^.Y2+= AItemCount;
           end;
         end;
