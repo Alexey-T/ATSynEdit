@@ -17,6 +17,7 @@ uses
 type
   { TATSynRange }
 
+  PATSynRange = ^TATSynRange;
   TATSynRange = packed record
     Tag: Int64;
     Hint: string[95];
@@ -32,7 +33,12 @@ type
     class operator =(const a, b: TATSynRange): boolean;
   end;
 
-  TATSynRangeList = specialize TFPGList<TATSynRange>;
+  { TATSynRangeList }
+
+  TATSynRangeList = class(specialize TFPGList<TATSynRange>)
+  public
+    function ItemPtr(AIndex: integer): PATSynRange; inline;
+  end;
 
 type
   TATRangeHasLines = (
@@ -65,8 +71,9 @@ type
     procedure DeleteAllByTag(const ATag: Int64);
     procedure DeleteAllExceptTag(const ATag: Int64);
     property Items[Index: integer]: TATSynRange read GetItems write SetItems; default;
-    function IsRangeInsideOther(const R1, R2: TATSynRange): boolean;
-    function IsRangesSame(const R1, R2: TATSynRange): boolean;
+    function ItemPtr(AIndex: integer): PATSynRange;
+    function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
+    function IsRangesSame(R1, R2: PATSynRange): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
       AInRangeIndex: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
@@ -87,6 +94,13 @@ uses
 //(don't know why it gives such blocks)
 const
   cAllowHangoutLines = 1; //0 or 1, do not bigger
+
+{ TATSynRangeList }
+
+function TATSynRangeList.ItemPtr(AIndex: integer): PATSynRange;
+begin
+  Result:= PATSynRange(InternalGet(AIndex));
+end;
 
 
 { TATSynRange }
@@ -208,18 +222,23 @@ begin
       FList.Delete(i);
 end;
 
-function TATSynRanges.IsRangeInsideOther(const R1, R2: TATSynRange): boolean;
+function TATSynRanges.ItemPtr(AIndex: integer): PATSynRange;
 begin
-  Result:=
-    IsPosSorted(R2.X, R2.Y, R1.X, R1.Y, true)
-    and (R1.Y2-cAllowHangoutLines<=R2.Y2);
+  Result:= FList.ItemPtr(AIndex);
 end;
 
-function TATSynRanges.IsRangesSame(const R1, R2: TATSynRange): boolean;
+function TATSynRanges.IsRangeInsideOther(R1, R2: PATSynRange): boolean;
+begin
+  Result:=
+    IsPosSorted(R2^.X, R2^.Y, R1^.X, R1^.Y, true)
+    and (R1^.Y2-cAllowHangoutLines<=R2^.Y2);
+end;
+
+function TATSynRanges.IsRangesSame(R1, R2: PATSynRange): boolean;
 begin
   if R1=R2 then
     exit(true);
-  if (R1.X=R2.X) and (R1.Y=R2.Y) and (Abs(R1.Y2-R2.Y2)<=cAllowHangoutLines) then
+  if (R1^.X=R2^.X) and (R1^.Y=R2^.Y) and (Abs(R1^.Y2-R2^.Y2)<=cAllowHangoutLines) then
     exit(true);
 
   Result:= false;
@@ -233,7 +252,7 @@ function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
   ALineMode: TATRangeHasLines): TATIntArray;
 var
   L: TATIntegerList;
-  R, RTest: TATSynRange;
+  R, RTest: PATSynRange;
   i, j: integer;
   Ok: boolean;
 begin
@@ -243,14 +262,14 @@ begin
   try
     for i:= 0 to Count-1 do
     begin
-      R:= Items[i];
-      if (not R.IsSimple) then
-        if (not AOnlyFolded or R.Folded) then
+      R:= FList.ItemPtr(i);
+      if (not R^.IsSimple) then
+        if (not AOnlyFolded or R^.Folded) then
         begin
           case ALineMode of
             cRngIgnore: Ok:= true;
-            cRngHasAllLines: Ok:= (R.Y<=ALineFrom) and (R.Y2>=ALineTo);
-            cRngHasAnyOfLines: Ok:= (R.Y<=ALineTo) and (R.Y2>=ALineFrom);
+            cRngHasAllLines: Ok:= (R^.Y<=ALineFrom) and (R^.Y2>=ALineTo);
+            cRngHasAnyOfLines: Ok:= (R^.Y<=ALineTo) and (R^.Y2>=ALineFrom);
             cRngExceptThisRange: Ok:= i<>AInRangeIndex;
             else raise Exception.Create('unknown LineMode');
           end;
@@ -260,7 +279,7 @@ begin
             Ok:= true
           else
           begin
-            RTest:= Items[AInRangeIndex];
+            RTest:= FList.ItemPtr(AInRangeIndex);
             Ok:= not IsRangesSame(RTest, R) and IsRangeInsideOther(R, RTest);
           end;
 
@@ -273,7 +292,7 @@ begin
     begin
       for i:= L.Count-1 downto 1 do
         for j:= 0 to i-1 do
-          if IsRangeInsideOther(Items[L[i]], Items[L[j]]) then
+          if IsRangeInsideOther(FList.ItemPtr(L[i]), FList.ItemPtr(L[j])) then
           begin
             L.Delete(i);
             Break
@@ -292,17 +311,17 @@ end;
 function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer;
   const AIndexes: TATIntArray): integer;
 var
-  R: TATSynRange;
+  R: PATSynRange;
   i: integer;
 begin
   Result:= -1;
   for i:= 0 to High(AIndexes) do
   begin
-    R:= Items[AIndexes[i]];
-    if R.IsSimple then Continue;
-    if (R.Y>ALine) then Break;
-    if (R.Y2<ALine) then Continue;
-    if (Result<0) or (R.Y>Items[Result].Y) then
+    R:= FList.ItemPtr(AIndexes[i]);
+    if R^.IsSimple then Continue;
+    if (R^.Y>ALine) then Break;
+    if (R^.Y2<ALine) then Continue;
+    if (Result<0) or (R^.Y>FList.ItemPtr(Result)^.Y) then
       Result:= AIndexes[i];
   end;
 end;
@@ -310,14 +329,14 @@ end;
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
 var
-  R: TATSynRange;
+  R: PATSynRange;
   i: integer;
 begin
   Result:= -1;
   for i:= 0 to Count-1 do
   begin
-    R:= Items[i];
-    if (not R.IsSimple) and (R.Y=ALine) then
+    R:= FList.ItemPtr(i);
+    if (not R^.IsSimple) and (R^.Y=ALine) then
       exit(i);
   end;
 end;
@@ -328,13 +347,13 @@ var
 begin
   Result:= '';
   for i:= 0 to Min(Count-1, Cnt) do
-    Result:= Result+Items[i].MessageText+#10;
+    Result:= Result+FList.ItemPtr(i)^.MessageText+#10;
 end;
 
 procedure TATSynRanges.Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
 //Tag=-1 means persistent range, from command "Fold selection"
 var
-  Rng: TATSynRange;
+  Rng: PATSynRange;
   i: integer;
 begin
   case AChange of
@@ -344,31 +363,29 @@ begin
     cLineChangeDeleted:
       for i:= FList.Count-1 downto 0 do
         begin
-          Rng:= FList[i];
-          if Rng.Tag<>-1 then Continue;
+          Rng:= FList.ItemPtr(i);
+          if Rng^.Tag<>-1 then Continue;
 
-          if Rng.Y>=ALineIndex+AItemCount then
+          if Rng^.Y>=ALineIndex+AItemCount then
           begin
-            Rng.Y:= Rng.Y-AItemCount;
-            Rng.Y2:= Rng.Y2-AItemCount;
-            FList[i]:= Rng;
+            Rng^.Y-= AItemCount;
+            Rng^.Y2-= AItemCount;
           end
           else
-          if Rng.Y>=ALineIndex then
+          if Rng^.Y>=ALineIndex then
             FList.Delete(i);
         end;
 
     cLineChangeAdded:
       for i:= FList.Count-1 downto 0 do
         begin
-          Rng:= FList[i];
-          if Rng.Tag<>-1 then Continue;
+          Rng:= FList.ItemPtr(i);
+          if Rng^.Tag<>-1 then Continue;
 
-          if Rng.Y>=ALineIndex then
+          if Rng^.Y>=ALineIndex then
           begin
-            Rng.Y:= Rng.Y+AItemCount;
-            Rng.Y2:= Rng.Y2+AItemCount;
-            FList[i]:= Rng;
+            Rng^.Y+= AItemCount;
+            Rng^.Y2+= AItemCount;
           end;
         end;
   end;
