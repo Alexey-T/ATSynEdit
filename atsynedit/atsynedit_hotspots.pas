@@ -16,6 +16,7 @@ uses
   ATSynEdit_Carets;
 
 type
+  PATHotspotItem = ^TATHotspotItem;
   TATHotspotItem = record
     PosX, PosY: integer;
     EndX, EndY: integer;
@@ -25,7 +26,13 @@ type
   end;
 
 type
-  TATHotspotItems = specialize TFPGList<TATHotspotItem>;
+
+  { TATHotspotItems }
+
+  TATHotspotItems = class(specialize TFPGList<TATHotspotItem>)
+  public
+    function ItemPtr(AIndex: integer): PATHotspotItem;
+  end;
 
 type
   { TATHotspots }
@@ -52,6 +59,13 @@ type
 
 
 implementation
+
+{ TATHotspotItems }
+
+function TATHotspotItems.ItemPtr(AIndex: integer): PATHotspotItem;
+begin
+  Result:= PATHotspotItem(InternalGet(AIndex));
+end;
 
 { TATHotspotItem }
 
@@ -125,14 +139,14 @@ end;
 
 function TATHotspots.FindByPos(AX, AY: integer): integer;
 var
-  Item: TATHotspotItem;
+  Item: PATHotspotItem;
   i: integer;
 begin
   Result:= -1;
   for i:= 0 to Count-1 do
   begin
-    Item:= Items[i];
-    if IsPosInRange(AX, AY, Item.PosX, Item.PosY, Item.EndX, Item.EndY, false) = cRelateInside then
+    Item:= FList.ItemPtr(i);
+    if IsPosInRange(AX, AY, Item^.PosX, Item^.PosY, Item^.EndX, Item^.EndY, false) = cRelateInside then
       exit(i);
   end;
 end;
@@ -143,7 +157,7 @@ var
 begin
   Result:= -1;
   for i:= 0 to Count-1 do
-    if ATag=Items[i].Tag then
+    if ATag=FList.ItemPtr(i)^.Tag then
       exit(i);
 end;
 
@@ -153,7 +167,7 @@ var
 begin
   Result:= -1;
   for i:= 0 to Count-1 do
-    if ATagString=Items[i].TagString then
+    if ATagString=FList.ItemPtr(i)^.TagString then
       exit(i);
 end;
 
