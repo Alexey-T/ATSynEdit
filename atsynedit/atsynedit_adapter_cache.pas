@@ -26,9 +26,11 @@ type
     class operator =(const a, b: TATAdapterCacheItem): boolean;
   end;
 
+  { TATAdapterCacheItems }
+
   TATAdapterCacheItems = class(specialize TFPGList<TATAdapterCacheItem>)
   public
-    property InternalItems;
+    function ItemPtr(AIndex: integer): PATAdapterCacheItem;
   end;
 
 type
@@ -64,6 +66,13 @@ implementation
 const
   //500 lines in minimap on my monitor+ 100 lines in editor
   cAdapterCacheMaxSize = 1000;
+
+{ TATAdapterCacheItems }
+
+function TATAdapterCacheItems.ItemPtr(AIndex: integer): PATAdapterCacheItem;
+begin
+  Result:= PATAdapterCacheItem(InternalGet(AIndex));
+end;
 
 { TATAdapterCacheItem }
 
@@ -151,7 +160,7 @@ begin
 
   for i:= 0 to FList.Count-1 do
   begin
-    Item:= FList.InternalItems[i];
+    Item:= FList.ItemPtr(i);
     if (Item^.LineIndex=ALineIndex) and
       (Item^.CharIndex=ACharIndex) and
       (Item^.LineLen=ALineLen) then
@@ -175,7 +184,7 @@ var
 begin
   for i:= FList.Count-1 downto 0 do
   begin
-    Item:= FList.InternalItems[i];
+    Item:= FList.ItemPtr(i);
     if (Item^.LineIndex=ALineIndex) then
       Delete(i);
   end;
