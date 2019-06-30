@@ -184,7 +184,7 @@ begin
 
   if Fold.FindRangeWithPlusAtLine(Y1)>=0 then exit;
 
-  Fold.Add(1, Y1, Y2, false, '', -1);
+  Fold.Add(1, Y1, Y2, false, '', cTagPersistentFoldRange);
   DoRangeFold(Fold.Count-1);
 
   Result:= [cResultCaretAny, cResultFoldChange];

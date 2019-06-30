@@ -83,6 +83,9 @@ type
     procedure Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
   end;
 
+const
+  cTagPersistentFoldRange = -1;
+
 implementation
 
 uses
@@ -351,7 +354,6 @@ begin
 end;
 
 procedure TATSynRanges.Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
-//Tag=-1 means persistent range, from command "Fold selection"
 var
   Rng: PATSynRange;
   i: integer;
@@ -364,7 +366,7 @@ begin
       for i:= FList.Count-1 downto 0 do
         begin
           Rng:= FList.ItemPtr(i);
-          if Rng^.Tag<>-1 then Continue;
+          if Rng^.Tag<>cTagPersistentFoldRange then Continue;
 
           if Rng^.Y>=ALineIndex+AItemCount then
           begin
@@ -393,7 +395,7 @@ begin
       for i:= FList.Count-1 downto 0 do
         begin
           Rng:= FList.ItemPtr(i);
-          if Rng^.Tag<>-1 then Continue;
+          if Rng^.Tag<>cTagPersistentFoldRange then Continue;
 
           if Rng^.Y>=ALineIndex then
           begin
