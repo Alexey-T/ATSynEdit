@@ -6276,7 +6276,7 @@ procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
 var
   nLineFrom, nLineTo, nIndent, nRange, nMaxHeight: integer;
   Indexes: TATIntArray;
-  Range: TATSynRange;
+  Range: PATSynRange;
   P1, P2: TPoint;
   RSt: TRect;
   NColor, NColorNormal, NColorActive: TColor;
@@ -6305,19 +6305,19 @@ begin
 
   for i:= 0 to High(Indexes) do
   begin
-    Range:= FFold[Indexes[i]];
-    if not Range.Staple then Continue;
-    if Range.Folded then Continue;
+    Range:= Fold.ItemPtr(Indexes[i]);
+    if not Range^.Staple then Continue;
+    if Range^.Folded then Continue;
 
-    if IsLineFolded(Range.Y, true) then Continue;
-    if IsLineFolded(Range.Y2, true) then Continue;
+    if IsLineFolded(Range^.Y, true) then Continue;
+    if IsLineFolded(Range^.Y2, true) then Continue;
 
-    P1:= CaretPosToClientPos(Point(0, Range.Y));
-    P2:= CaretPosToClientPos(Point(0, Range.Y2));
-    if (P1.Y<FRectMain.Top) and (Range.Y>=nLineFrom) then Continue;
-    if (P2.Y<FRectMain.Top) and (Range.Y2>=nLineFrom) then Continue;
+    P1:= CaretPosToClientPos(Point(0, Range^.Y));
+    P2:= CaretPosToClientPos(Point(0, Range^.Y2));
+    if (P1.Y<FRectMain.Top) and (Range^.Y>=nLineFrom) then Continue;
+    if (P2.Y<FRectMain.Top) and (Range^.Y2>=nLineFrom) then Continue;
 
-    NIndent:= FTabHelper.GetIndentExpanded(Range.Y, Strings.Lines[Range.Y]);
+    NIndent:= FTabHelper.GetIndentExpanded(Range^.Y, Strings.Lines[Range^.Y]);
     Inc(P1.X, NIndent*ACharSize.X);
     Inc(P2.X, NIndent*ACharSize.X);
 
@@ -6339,7 +6339,7 @@ begin
         NColor:= NColorNormal;
 
       if Assigned(FOnCalcStaple) then
-        FOnCalcStaple(Self, Range.Y, NIndent, NColor);
+        FOnCalcStaple(Self, Range^.Y, NIndent, NColor);
       DoPaintStaple(C, RSt, NColor);
     end;
   end;
