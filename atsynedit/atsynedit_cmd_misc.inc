@@ -109,7 +109,7 @@ end;
 
 function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
 var
-  R: TATSynRange;
+  R: PATSynRange;
   NeedFixCaret: boolean;
   Str: TATStrings;
   i: integer;
@@ -118,8 +118,8 @@ begin
   begin
     for i:= 0 to Fold.Count-1 do
     begin
-      R:= Fold[i];
-      if R.IsSimple then Continue;
+      R:= Fold.ItemPtr(i);
+      if R^.IsSimple then Continue;
       DoRangeFold(i);
     end;
 
@@ -138,11 +138,11 @@ begin
   begin
     for i:= 0 to Fold.Count-1 do
     begin
-      R:= Fold[i];
-      if R.Folded then
+      R:= Fold.ItemPtr(i);
+      if R^.Folded then
       begin
-        R.Folded:= false;
-        Fold[i]:= R;
+        R^.Folded:= false;
+        //Fold[i]:= R;
         FWrapUpdateNeeded:= true;
       end;
     end;

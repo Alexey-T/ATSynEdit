@@ -6068,6 +6068,8 @@ var
         );
   end;
   //
+var
+  Rng: PATSynRange;
 begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then Exit;
@@ -6086,17 +6088,17 @@ begin
   IsLineDown:= false;
 
   for i:= Low(List) to High(List) do
-    with FFold[List[i]] do
     begin
-      if Y<LineIndex then IsLineUp:= true;
-      if Y2>LineIndex then IsLineDown:= true;
-      if Y=LineIndex then
+      Rng:= Fold.ItemPtr(List[i]);
+      if Rng^.Y<LineIndex then IsLineUp:= true;
+      if Rng^.Y2>LineIndex then IsLineDown:= true;
+      if Rng^.Y=LineIndex then
       begin
         State:= cFoldbarBegin;
         //don't override found [+], 2 blocks can start at same pos
-        if not IsPlus then IsPlus:= Folded;
+        if not IsPlus then IsPlus:= Rng^.Folded;
       end;
-      if Y2=LineIndex then
+      if Rng^.Y2=LineIndex then
         if State<>cFoldbarBegin then
           State:= cFoldbarEnd;
     end;
