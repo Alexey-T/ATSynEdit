@@ -6647,6 +6647,9 @@ procedure TATSynEdit.DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKi
   AItemCount: integer);
 begin
   Fold.Update(AChange, ALine, AItemCount);
+
+  if Assigned(FAdapterHilite) then
+    FAdapterHilite.OnEditorChangeEx(Self, AChange, ALine, AItemCount);
 end;
 
 procedure TATSynEdit.DoStringsOnProgress(Sender: TObject);

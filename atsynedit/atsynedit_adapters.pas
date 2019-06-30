@@ -10,6 +10,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Messages,
+  ATStringProc,
   ATSynEdit_CanvasProc;
 
 type
@@ -26,6 +27,9 @@ type
     //
     procedure OnEditorChange(Sender: TObject); virtual;
     //called when editor's text changes.
+
+    procedure OnEditorChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer); virtual;
+    //detailed version of OnEditorChange
 
     procedure OnEditorIdle(Sender: TObject); virtual;
     //called after text is changed, and pause passed (OptIdleInterval)
@@ -145,6 +149,12 @@ begin
 end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine,
+  AItemCount: integer);
 begin
   //
 end;
