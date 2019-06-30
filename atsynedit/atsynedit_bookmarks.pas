@@ -39,7 +39,7 @@ type
 
   TATBookmarkItems = class(specialize TFPGList<TATBookmarkItem>)
   public
-    function ItemPtr(AIndex: integer): PATBookmarkItem;
+    function ItemPtr(AIndex: integer): PATBookmarkItem; inline;
   end;
 
 type

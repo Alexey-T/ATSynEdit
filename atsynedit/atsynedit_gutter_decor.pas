@@ -39,7 +39,7 @@ type
 
   TATGutterDecorItems = class(specialize TFPGList<TATGutterDecorItem>)
   public
-    function ItemPtr(AIndex: integer): PATGutterDecorItem;
+    function ItemPtr(AIndex: integer): PATGutterDecorItem; inline;
   end;
 
 type

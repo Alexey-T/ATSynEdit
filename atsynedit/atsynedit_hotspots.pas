@@ -31,7 +31,7 @@ type
 
   TATHotspotItems = class(specialize TFPGList<TATHotspotItem>)
   public
-    function ItemPtr(AIndex: integer): PATHotspotItem;
+    function ItemPtr(AIndex: integer): PATHotspotItem; inline;
   end;
 
 type

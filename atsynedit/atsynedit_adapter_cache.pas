@@ -30,7 +30,7 @@ type
 
   TATAdapterCacheItems = class(specialize TFPGList<TATAdapterCacheItem>)
   public
-    function ItemPtr(AIndex: integer): PATAdapterCacheItem;
+    function ItemPtr(AIndex: integer): PATAdapterCacheItem; inline;
   end;
 
 type
