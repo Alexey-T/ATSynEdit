@@ -2114,7 +2114,7 @@ begin
     FScrollbarLock:= true;
     FScrollbarVert.Min:= 0;
     FScrollbarVert.Max:= FScrollVert.SmoothMax;
-    FScrollbarVert.LineSize:= FScrollVert.SmoothCharSize;
+    FScrollbarVert.SmallChange:= FScrollVert.SmoothCharSize;
     FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
     FScrollbarVert.Position:= FScrollVert.SmoothPos;
     FScrollbarVert.Update;
@@ -2154,7 +2154,7 @@ begin
     FScrollbarLock:= true;
     FScrollbarHorz.Min:= 0;
     FScrollbarHorz.Max:= FScrollHorz.SmoothMax;
-    FScrollbarHorz.LineSize:= FScrollHorz.SmoothCharSize;
+    FScrollbarHorz.SmallChange:= FScrollHorz.SmoothCharSize;
     FScrollbarHorz.PageSize:= FScrollHorz.SmoothPage;
     FScrollbarHorz.Position:= FScrollHorz.SmoothPos;
     FScrollbarHorz.Update;
