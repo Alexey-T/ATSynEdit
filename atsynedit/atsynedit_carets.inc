@@ -423,6 +423,7 @@ end;
 
 procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
 begin
+  AIndentVert:= Min(AIndentVert, GetVisibleLines-1);
   FScrollVert.NPos:= Max(0, AWrapInfoIndex-AIndentVert);
   FScrollVert.NPixelOffset:= 0;
 end;
