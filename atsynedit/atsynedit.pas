@@ -2355,11 +2355,14 @@ end;
 
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
 var
-  i: integer;
+  W, H, i: integer;
 begin
+  if AWidth<1 then exit;
   C.Pen.Color:= AColor;
+  W:= ClientWidth;
+  H:= ClientHeight;
   for i:= 0 to AWidth-1 do
-    C.Frame(i, i, ClientWidth-i, ClientHeight-i);
+    C.Frame(i, i, W-i, H-i);
 end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
