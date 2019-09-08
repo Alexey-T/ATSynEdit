@@ -222,7 +222,7 @@ var
   i: integer;
 begin
   for i:= FList.Count-1 downto 0 do
-    if FList[i].Tag=ATag then
+    if ItemPtr(i)^.Tag=ATag then
       FList.Delete(i);
   if ATag=cTagPersistentFoldRange then
     FHasTagPersist:= false;
