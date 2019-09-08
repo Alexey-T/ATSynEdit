@@ -238,7 +238,7 @@ begin
     for i:= 0 to FList.Count-1 do
       if ItemPtr(i)^.Tag=ATag then
         TempList.Add(ItemPtr(i)^);
-    Clear;
+    FList.Clear;
     for i:= 0 to TempList.Count-1 do
       FList.Add(TempList.ItemPtr(i)^);
   finally
