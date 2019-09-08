@@ -54,6 +54,7 @@ type
   TATSynRanges = class
   private
     FList: TATSynRangeList;
+    FHasTagPersist: boolean;
     function GetItems(Index: integer): TATSynRange;
     procedure SetItems(Index: integer; const AValue: TATSynRange);
     //function MessageTextForIndexList(const L: TATIntArray): string;
@@ -81,6 +82,7 @@ type
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function MessageText(Cnt: integer): string;
     procedure Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
+    property HasTagPersist: boolean read FHasTagPersist;
   end;
 
 const
@@ -164,13 +166,16 @@ end;
 
 procedure TATSynRanges.SetItems(Index: integer; const AValue: TATSynRange);
 begin
-  FList[Index]:= AValue
+  FList[Index]:= AValue;
+  if AValue.Tag=cTagPersistentFoldRange then
+    FHasTagPersist:= true;
 end;
 
 constructor TATSynRanges.Create;
 begin
   FList:= TATSynRangeList.Create;
   FList.Capacity:= 2*1024;
+  FHasTagPersist:= false;
 end;
 
 destructor TATSynRanges.Destroy;
@@ -183,6 +188,7 @@ end;
 procedure TATSynRanges.Clear;
 begin
   FList.Clear;
+  FHasTagPersist:= false;
 end;
 
 function TATSynRanges.Add(AX, AY, AY2: integer; AWithStaple: boolean;
@@ -191,6 +197,8 @@ function TATSynRanges.Add(AX, AY, AY2: integer; AWithStaple: boolean;
 begin
   Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
   FList.Add(Result);
+  if ATag=cTagPersistentFoldRange then
+    FHasTagPersist:= true;
 end;
 
 function TATSynRanges.Insert(Index: integer; AX, AY, AY2: integer;
@@ -200,6 +208,8 @@ function TATSynRanges.Insert(Index: integer; AX, AY, AY2: integer;
 begin
   Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
   FList.Insert(Index, Result);
+  if ATag=cTagPersistentFoldRange then
+    FHasTagPersist:= true;
 end;
 
 procedure TATSynRanges.Delete(Index: integer); inline;
@@ -214,6 +224,8 @@ begin
   for i:= FList.Count-1 downto 0 do
     if FList[i].Tag=ATag then
       FList.Delete(i);
+  if ATag=cTagPersistentFoldRange then
+    FHasTagPersist:= false;
 end;
 
 procedure TATSynRanges.DeleteAllExceptTag(const ATag: Int64);
@@ -223,6 +235,8 @@ begin
   for i:= FList.Count-1 downto 0 do
     if FList[i].Tag<>ATag then
       FList.Delete(i);
+  if ATag<>cTagPersistentFoldRange then
+    FHasTagPersist:= false;
 end;
 
 function TATSynRanges.ItemPtr(AIndex: integer): PATSynRange;
