@@ -230,11 +230,21 @@ end;
 
 procedure TATSynRanges.DeleteAllExceptTag(const ATag: Int64);
 var
+  TempList: TATSynRangeList;
   i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
-    if FList[i].Tag<>ATag then
-      FList.Delete(i);
+  TempList:= TATSynRangeList.Create;
+  try
+    for i:= 0 to FList.Count-1 do
+      if ItemPtr(i)^.Tag=ATag then
+        TempList.Add(ItemPtr(i)^);
+    Clear;
+    for i:= 0 to TempList.Count-1 do
+      FList.Add(TempList.ItemPtr(i)^);
+  finally
+    FreeAndNil(TempList);
+  end;
+
   if ATag<>cTagPersistentFoldRange then
     FHasTagPersist:= false;
 end;
