@@ -715,8 +715,8 @@ type
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
     procedure DoCalcLinks;
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
-    procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean;
-      out AColor: TColor; out AColorForced: boolean);
+    procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean; out AColor: TColor; out
+      AColorForced: boolean; AHiliteLineWithSelection: boolean);
     procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretProps; W, H: integer);
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
@@ -2419,6 +2419,7 @@ var
   Event: TATSynEditDrawLineEvent;
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap, bUseColorOfCurrentLine: boolean;
+  bHiliteLinesWithSelection: boolean;
   //
   procedure DoPaintGutterBandState(ATop: integer; AColor: TColor); inline;
   begin
@@ -2426,6 +2427,8 @@ var
   end;
   //
 begin
+  bHiliteLinesWithSelection:= not AMainText;
+
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
@@ -2527,7 +2530,8 @@ begin
             WrapItem.NLineIndex,
             false,
             NColorEntire,
-            LineColorForced);
+            LineColorForced,
+            bHiliteLinesWithSelection);
 
           DoPartSetColorBG(FLineParts, NColorEntire, LineColorForced);
           if LineColorForced then
@@ -2637,7 +2641,8 @@ begin
       NLinesIndex,
       bUseColorOfCurrentLine,
       NColorEntire,
-      LineColorForced);
+      LineColorForced,
+      bHiliteLinesWithSelection);
 
     if AMainText and FOptZebraActive then
       if Odd(NLinesIndex) then

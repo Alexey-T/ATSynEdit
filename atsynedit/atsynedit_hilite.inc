@@ -260,13 +260,17 @@ end;
 
 procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer;
   AUseColorOfCurrentLine: boolean;
-  out AColor: TColor; out AColorForced: boolean);
+  out AColor: TColor; out AColorForced: boolean;
+  AHiliteLineWithSelection: boolean);
 var
   NIndex, BmKind: integer;
 begin
   AColor:= clNone;
 
   if AUseColorOfCurrentLine then
+    AColor:= Colors.CurrentLineBG
+  else
+  if AHiliteLineWithSelection and Carets.IsLineWithSelection(ALine) then
     AColor:= Colors.CurrentLineBG
   else
   begin
