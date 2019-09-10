@@ -96,6 +96,7 @@ type
     function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
+    function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
     function IsSelectionMultiline: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
@@ -450,6 +451,36 @@ begin
       exit(true);
   end;
 end;
+
+function TATCarets.IsLineWithSelection(APosY: integer): boolean;
+var
+  i: integer;
+  Item: TATCaretItem;
+  Y1, Y2, X1, X2: integer;
+begin
+  Result:= false;
+  for i:= 0 to FList.Count-1 do
+  begin
+    Item:= TATCaretItem(FList[i]);
+    if Item.EndY>=0 then
+    begin
+      X1:= Item.PosX;
+      Y1:= Item.PosY;
+      X2:= Item.EndX;
+      Y2:= Item.EndY;
+      if (Y1>Y2) or ((Y1=Y2) and (X1>X2)) then
+      begin
+        SwapInt(Y1, Y2);
+        SwapInt(X1, X2);
+      end;
+      if (X2=0) then
+        Dec(Y2);
+      if (Y1<=APosY) and (APosY<=Y2) then
+        exit(true);
+    end;
+  end;
+end;
+
 
 function TATCarets.IsSelection: boolean;
 var
