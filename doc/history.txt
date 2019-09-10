@@ -1,4 +1,7 @@
 
+2019.09.10
++ add: OptMinimapHiliteLinesWithSelection (it uses Colors.CurrentLineBG)
+
 2019.06.12
 + add: Finder has property OptTokens (enum: all, comments, strings, comments+strings, except comments, ...)
 + add: Finder has event OnGetToken (to implement checks for OptTokens)
