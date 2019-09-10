@@ -569,6 +569,7 @@ type
     FMinimapTooltipWidthPercents: integer;
     FMinimapTooltip: TPanel;
     FMinimapCachedPainting: boolean;
+    FMinimapHiliteLinesWithSelection: boolean;
     FMicromapWidth: integer;
     FMicromapWidthPercents: integer;
     FMicromapVisible: boolean;
@@ -1449,6 +1450,7 @@ type
     property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
     property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
     property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
+    property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapWidthPercents: integer read FMicromapWidthPercents write FMicromapWidthPercents default cInitMicromapWidthPercents;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
@@ -2427,7 +2429,7 @@ var
   end;
   //
 begin
-  bHiliteLinesWithSelection:= not AMainText;
+  bHiliteLinesWithSelection:= not AMainText and FMinimapHiliteLinesWithSelection;
 
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -3454,6 +3456,7 @@ begin
   FMinimapTooltipLinesCount:= cInitMinimapTooltipLinesCount;
   FMinimapTooltipWidthPercents:= cInitMinimapTooltipWidthPercents;
   FMinimapCachedPainting:= true;
+  FMinimapHiliteLinesWithSelection:= true;
 
   FMinimapTooltip:= TPanel.Create(Self);
   FMinimapTooltip.Hide;
