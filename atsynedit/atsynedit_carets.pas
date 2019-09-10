@@ -473,7 +473,7 @@ begin
         SwapInt(Y1, Y2);
         SwapInt(X1, X2);
       end;
-      if (X2=0) then
+      if (X2=0) and (Y2>0) then
         Dec(Y2);
       if (Y1<=APosY) and (APosY<=Y2) then
         exit(true);
