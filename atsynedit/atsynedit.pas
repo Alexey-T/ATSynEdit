@@ -3814,9 +3814,13 @@ begin
 end;
 
 procedure TATSynEdit.SetOneLine(AValue: boolean);
+var
+  Str: TATStrings;
 begin
-  Strings.OneLine:= AValue;
   Carets.OneLine:= AValue;
+  Str:= Strings;
+  Str.OneLine:= AValue;
+
   if AValue then
   begin
     OptGutterVisible:= false;
@@ -3835,6 +3839,11 @@ begin
     OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
+
+    DoCaretSingle(0, 0);
+
+    while Str.Count>1 do
+      Str.LineDelete(Str.Count-1, false, false);
   end;
 end;
 
