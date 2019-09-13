@@ -518,6 +518,7 @@ type
     FUnprintedSpaces,
     FUnprintedSpacesTrailing,
     FUnprintedSpacesBothEnds,
+    FUnprintedSpacesOnlyInSelection,
     FUnprintedEof,
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
@@ -1471,6 +1472,7 @@ type
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces default true;
     property OptUnprintedSpacesTrailing: boolean read FUnprintedSpacesTrailing write FUnprintedSpacesTrailing default false;
     property OptUnprintedSpacesBothEnds: boolean read FUnprintedSpacesBothEnds write FUnprintedSpacesBothEnds default false;
+    property OptUnprintedSpacesOnlyInSelection: boolean read FUnprintedSpacesOnlyInSelection write FUnprintedSpacesOnlyInSelection default false;
     property OptUnprintedEnds: boolean read FUnprintedEnds write FUnprintedEnds default true;
     property OptUnprintedEndsDetails: boolean read FUnprintedEndsDetails write FUnprintedEndsDetails default true;
     property OptUnprintedEof: boolean read FUnprintedEof write FUnprintedEof default true;
@@ -2727,9 +2729,13 @@ begin
         TextOutProps.DrawEvent:= Event;
         TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
         TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
+
         TextOutProps.ShowUnprinted:= AMainText and FUnprintedVisible and FUnprintedSpaces;
         TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
         TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
+        TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection;
+        TextOutProps.DetectIsPosSelected:= @IsPosSelected;
+
         TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not LineWithCaret);
         TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
         TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
@@ -3385,6 +3391,7 @@ begin
   FUnprintedSpaces:= true;
   FUnprintedSpacesTrailing:= false;
   FUnprintedSpacesBothEnds:= false;
+  FUnprintedSpacesOnlyInSelection:= false;
   FUnprintedEnds:= true;
   FUnprintedEndsDetails:= true;
   FUnprintedEof:= true;
@@ -5141,7 +5148,6 @@ begin
   end;
 end;
 
-
 procedure TATSynEdit.Invalidate;
 begin
   Include(FPaintFlags, cPaintUpdateBitmap);
@@ -6750,9 +6756,13 @@ begin
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
   TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
+
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
   TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
   TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
+  TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection;
+  TextOutProps.DetectIsPosSelected:= @IsPosSelected;
+
   TextOutProps.ShowFontLigatures:= FOptShowFontLigatures;
   TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;

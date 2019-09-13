@@ -1,4 +1,7 @@
 
+2019.09.13
++ add: OptUnprintedSpacesOnlyInSelection
+
 2019.09.10
 + add: OptMinimapHiliteLinesWithSelection (it uses Colors.CurrentLineBG)
 

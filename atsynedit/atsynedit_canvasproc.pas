@@ -40,6 +40,9 @@ var
   CanvasTextOutHorzSpacingUsed: boolean = false;
 
 type
+  TATSynEditCallbackIsCharSelected = function(AX, AY: integer): boolean of object;
+
+type
   TATLineStyle = (
     cLineStyleNone,
     cLineStyleSolid,
@@ -98,6 +101,7 @@ type
     ShowUnprinted: boolean;
     ShowUnprintedSpacesTrailing: boolean;
     ShowUnprintedSpacesBothEnds: boolean;
+    ShowUnprintedSpacesOnlyInSelection: boolean;
     ShowFontLigatures: boolean;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
@@ -109,6 +113,7 @@ type
     FontBold_Size: integer;
     FontBoldItalic_Name: string;
     FontBoldItalic_Size: integer;
+    DetectIsPosSelected: TATSynEditCallbackIsCharSelected;
   end;
 
 procedure CanvasLineEx(C: TCanvas;
@@ -388,6 +393,23 @@ begin
     for i:= 1 to Length(AString) do
       DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
   end;
+end;
+
+procedure DoPaintUnprintedChars_OnlyInSelection(C: TCanvas;
+  const AString: atString;
+  const AOffsets: TATIntArray;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont: TColor;
+  ALineIndex: integer;
+  AIsCharSelected: TATSynEditCallbackIsCharSelected);
+var
+  i: integer;
+begin
+  if AIsCharSelected=nil then exit;
+  for i:= 1 to Length(AString) do
+    if AIsCharSelected(i-1, ALineIndex) then
+      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
 end;
 
 
@@ -891,6 +913,18 @@ begin
     end;
 
   if AProps.ShowUnprinted then
+   if AProps.ShowUnprintedSpacesOnlyInSelection then
+    DoPaintUnprintedChars_OnlyInSelection(
+      C,
+      AText,
+      ListInt,
+      Point(APosX, APosY),
+      AProps.CharSize,
+      AProps.ColorUnprintedFont,
+      AProps.LineIndex,
+      AProps.DetectIsPosSelected
+      )
+   else
     DoPaintUnprintedChars(
       C,
       AText,
