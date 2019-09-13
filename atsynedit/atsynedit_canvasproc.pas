@@ -913,28 +913,28 @@ begin
     end;
 
   if AProps.ShowUnprinted then
-   if AProps.ShowUnprintedSpacesOnlyInSelection then
-    DoPaintUnprintedChars_OnlyInSelection(
-      C,
-      AText,
-      ListInt,
-      Point(APosX, APosY),
-      AProps.CharSize,
-      AProps.ColorUnprintedFont,
-      AProps.LineIndex,
-      AProps.DetectIsPosSelected
-      )
-   else
-    DoPaintUnprintedChars(
-      C,
-      AText,
-      ListInt,
-      Point(APosX, APosY),
-      AProps.CharSize,
-      AProps.ColorUnprintedFont,
-      AProps.ShowUnprintedSpacesTrailing,
-      AProps.ShowUnprintedSpacesBothEnds
-      );
+    if AProps.ShowUnprintedSpacesOnlyInSelection then
+      DoPaintUnprintedChars_OnlyInSelection(
+        C,
+        AText,
+        ListInt,
+        Point(APosX, APosY),
+        AProps.CharSize,
+        AProps.ColorUnprintedFont,
+        AProps.LineIndex,
+        AProps.DetectIsPosSelected
+        )
+    else
+      DoPaintUnprintedChars(
+        C,
+        AText,
+        ListInt,
+        Point(APosX, APosY),
+        AProps.CharSize,
+        AProps.ColorUnprintedFont,
+        AProps.ShowUnprintedSpacesTrailing,
+        AProps.ShowUnprintedSpacesBothEnds
+        );
 
   ATextWidth:= ListInt[High(ListInt)];
 
