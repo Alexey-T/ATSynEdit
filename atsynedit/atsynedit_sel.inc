@@ -62,7 +62,13 @@ begin
   if not Strings.IsIndexValid(P.Y) then Exit;
 
   Str:= Strings.Lines[P.Y];
-  if not ((P.X>=0) and (P.X<Length(Str))) then Exit;
+  if Str='' then exit;
+
+  if P.X<0 then Exit;
+  //allow clicking after line end
+  if P.X>=Length(Str) then
+    P.X:= Length(Str)-1;
+
   ch:= Str[P.X+1];
 
   if IsCharWord(ch) then
