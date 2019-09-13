@@ -5108,7 +5108,7 @@ end;
 
 procedure TATSynEdit.DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
 begin
-  if FMouseDownPnt.Y<0 then Exit;
+  if not Strings.IsIndexValid(FMouseDownPnt.Y) then Exit;
   DoSelect_CharGroupAtPos(FMouseDownPnt, IsPressedCtrl, AllowOnlyWordChars);
   Update;
 end;
