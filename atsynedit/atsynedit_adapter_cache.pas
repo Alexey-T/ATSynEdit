@@ -41,6 +41,7 @@ type
     FList: TATAdapterCacheItems;
     FMaxCount: integer;
     FEnabled: boolean;
+    FTempItem: TATAdapterCacheItem;
     procedure SetEnabled(AValue: boolean);
   public
     constructor Create; virtual;
@@ -112,8 +113,6 @@ procedure TATAdapterHiliteCache.Add(
   const ALineIndex, ACharIndex, ALineLen: integer;
   const AParts: TATLineParts;
   const AColorAfterEol: TColor);
-var
-  Item: TATAdapterCacheItem;
 begin
   if not Enabled then exit;
 
@@ -137,13 +136,13 @@ begin
   while FList.Count>FMaxCount do
     Delete(FList.Count-1);
 
-  FillChar(Item, SizeOf(Item), 0);
-  Item.LineIndex:= ALineIndex;
-  Item.CharIndex:= ACharIndex;
-  Item.LineLen:= ALineLen;
-  Item.ColorAfterEol:= AColorAfterEol;
-  Move(AParts, Item.Parts, SizeOf(AParts));
-  FList.Insert(0, Item);
+  FillChar(FTempItem, SizeOf(FTempItem), 0);
+  FTempItem.LineIndex:= ALineIndex;
+  FTempItem.CharIndex:= ACharIndex;
+  FTempItem.LineLen:= ALineLen;
+  FTempItem.ColorAfterEol:= AColorAfterEol;
+  Move(AParts, FTempItem.Parts, SizeOf(AParts));
+  FList.Insert(0, FTempItem);
 end;
 
 
