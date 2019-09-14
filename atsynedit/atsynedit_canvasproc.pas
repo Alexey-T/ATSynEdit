@@ -424,18 +424,26 @@ end;
 procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
 var
   i: integer;
+  vis: boolean;
 begin
+  vis:= false;
   if P1.Y=P2.Y then
   begin
     for i:= P1.X to P2.X do
-      if Odd(i-P1.X+1) then
+    begin
+      vis:= not vis;
+      if vis then
         C.Pixels[i, P2.Y]:= Color;
+    end;
   end
   else
   begin
     for i:= P1.Y to P2.Y do
-      if Odd(i-P1.Y+1) then
+    begin
+      vis:= not vis;
+      if vis then
         C.Pixels[P1.X, i]:= Color;
+    end;
   end;
 end;
 
