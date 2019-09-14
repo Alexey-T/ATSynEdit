@@ -442,6 +442,9 @@ end;
 procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle; P1, P2: TPoint; AtDown: boolean);
 begin
   case Style of
+    cLineStyleNone:
+      exit;
+
     cLineStyleSolid:
       begin
         C.Pen.Color:= Color;
@@ -485,36 +488,6 @@ begin
 
     cLineStyleWave:
       CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
-  end;
-end;
-
-procedure DoPaintBorder(C: TCanvas; Color: TColor; R: TRect; Side: TATBorderSide; Style: TATLineStyle);
-begin
-  if Style=cLineStyleNone then Exit;
-  Dec(R.Right);
-  Dec(R.Bottom);
-
-  case Side of
-    cSideDown:
-      CanvasLineEx(C, Color, Style,
-        Point(R.Left, R.Bottom),
-        Point(R.Right, R.Bottom),
-        true);
-    cSideLeft:
-      CanvasLineEx(C, Color, Style,
-        Point(R.Left, R.Top),
-        Point(R.Left, R.Bottom),
-        false);
-    cSideRight:
-      CanvasLineEx(C, Color, Style,
-        Point(R.Right, R.Top),
-        Point(R.Right, R.Bottom),
-        true);
-    cSideUp:
-      CanvasLineEx(C, Color, Style,
-        Point(R.Left, R.Top),
-        Point(R.Right, R.Top),
-        false);
   end;
 end;
 
@@ -851,12 +824,40 @@ begin
         PartPtr^.ColorBG
         );
 
+      //paint 4 borders of part
       if AProps.MainTextArea then
       begin
-        DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideDown, PartPtr^.BorderDown);
-        DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideUp, PartPtr^.BorderUp);
-        DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideLeft, PartPtr^.BorderLeft);
-        DoPaintBorder(C, PartPtr^.ColorBorder, PartRect, cSideRight, PartPtr^.BorderRight);
+        //note: PartRect is changed here
+        Dec(PartRect.Right);
+        Dec(PartRect.Bottom);
+
+        CanvasLineEx(C,
+          PartPtr^.ColorBorder,
+          PartPtr^.BorderDown,
+          Point(PartRect.Left, PartRect.Bottom),
+          Point(PartRect.Right, PartRect.Bottom),
+          true);
+
+        CanvasLineEx(C,
+          PartPtr^.ColorBorder,
+          PartPtr^.BorderUp,
+          Point(PartRect.Left, PartRect.Top),
+          Point(PartRect.Right, PartRect.Top),
+          false);
+
+        CanvasLineEx(C,
+          PartPtr^.ColorBorder,
+          PartPtr^.BorderLeft,
+          Point(PartRect.Left, PartRect.Top),
+          Point(PartRect.Left, PartRect.Bottom),
+          false);
+
+        CanvasLineEx(C,
+          PartPtr^.ColorBorder,
+          PartPtr^.BorderRight,
+          Point(PartRect.Right, PartRect.Top),
+          Point(PartRect.Right, PartRect.Bottom),
+          true);
       end;
     end;
 
