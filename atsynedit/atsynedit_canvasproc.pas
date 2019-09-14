@@ -361,58 +361,6 @@ begin
 end;
 
 
-procedure DoPaintUnprintedChars(C: TCanvas;
-  const AString: atString;
-  const AOffsets: TATIntArray;
-  APoint: TPoint;
-  ACharSize: TPoint;
-  AColorFont: TColor;
-  ASpacesTrailing, ASpacesBothEnds: boolean); inline;
-var
-  i: integer;
-begin
-  if ASpacesBothEnds then
-  begin
-    //paint leading
-    for i:= 1 to SGetIndentChars(AString) do
-      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
-    //paint trailing
-    for i:= SGetNonSpaceLength(AString)+1 to Length(AString) do
-      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
-  end
-  else
-  if ASpacesTrailing then
-  begin
-    //paint trailing
-    for i:= SGetNonSpaceLength(AString)+1 to Length(AString) do
-      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
-  end
-  else
-  begin
-    //paint all
-    for i:= 1 to Length(AString) do
-      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
-  end;
-end;
-
-procedure DoPaintUnprintedChars_OnlyInSelection(C: TCanvas;
-  const AString: atString;
-  const AOffsets: TATIntArray;
-  APoint: TPoint;
-  ACharSize: TPoint;
-  AColorFont: TColor;
-  ALineIndex: integer;
-  AIsCharSelected: TATSynEditCallbackIsCharSelected); inline;
-var
-  i: integer;
-begin
-  if AIsCharSelected=nil then exit;
-  for i:= 1 to Length(AString) do
-    if AIsCharSelected(i-1, ALineIndex) then
-      DoPaintUnprintedChar(C, AString[i], i, AOffsets, APoint, ACharSize, AColorFont);
-end;
-
-
 procedure CanvasSimpleLine(C: TCanvas; P1, P2: TPoint); inline;
 begin
   if P1.Y=P2.Y then
@@ -913,28 +861,37 @@ begin
     end;
 
   if AProps.ShowUnprinted then
+  begin
     if AProps.ShowUnprintedSpacesOnlyInSelection then
-      DoPaintUnprintedChars_OnlyInSelection(
-        C,
-        AText,
-        ListInt,
-        Point(APosX, APosY),
-        AProps.CharSize,
-        AProps.ColorUnprintedFont,
-        AProps.LineIndex,
-        AProps.DetectIsPosSelected
-        )
+    begin
+      for i:= 1 to Length(AText) do
+        if AProps.DetectIsPosSelected(i-1, AProps.LineIndex) then
+          DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
+    end
     else
-      DoPaintUnprintedChars(
-        C,
-        AText,
-        ListInt,
-        Point(APosX, APosY),
-        AProps.CharSize,
-        AProps.ColorUnprintedFont,
-        AProps.ShowUnprintedSpacesTrailing,
-        AProps.ShowUnprintedSpacesBothEnds
-        );
+    if AProps.ShowUnprintedSpacesBothEnds then
+    begin
+      //paint leading
+      for i:= 1 to SGetIndentChars(AText) do
+        DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
+      //paint trailing
+      for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+        DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
+    end
+    else
+    if AProps.ShowUnprintedSpacesTrailing then
+    begin
+      //paint trailing
+      for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+        DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
+    end
+    else
+    begin
+      //paint all
+      for i:= 1 to Length(AText) do
+        DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
+    end;
+  end;
 
   ATextWidth:= ListInt[High(ListInt)];
 
