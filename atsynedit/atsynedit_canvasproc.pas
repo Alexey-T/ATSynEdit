@@ -367,7 +367,7 @@ procedure DoPaintUnprintedChars(C: TCanvas;
   APoint: TPoint;
   ACharSize: TPoint;
   AColorFont: TColor;
-  ASpacesTrailing, ASpacesBothEnds: boolean);
+  ASpacesTrailing, ASpacesBothEnds: boolean); inline;
 var
   i: integer;
 begin
@@ -402,7 +402,7 @@ procedure DoPaintUnprintedChars_OnlyInSelection(C: TCanvas;
   ACharSize: TPoint;
   AColorFont: TColor;
   ALineIndex: integer;
-  AIsCharSelected: TATSynEditCallbackIsCharSelected);
+  AIsCharSelected: TATSynEditCallbackIsCharSelected); inline;
 var
   i: integer;
 begin
