@@ -118,7 +118,7 @@ type
 
 procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
-  P1, P2: TPoint; AtDown: boolean);
+  X1, Y1, X2, Y2: integer; AtDown: boolean);
 
 procedure CanvasArrowHorz(C: TCanvas;
   const ARect: TRect;
@@ -156,8 +156,8 @@ function CanvasTextWidth(const S: atString; ALineIndex: integer;
   ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer; inline;
 procedure CanvasInvertRect(C: TCanvas; const R: TRect; AColor: TColor);
 procedure CanvasDottedVertLine_Alt(C: TCanvas; Color: TColor; X1, Y1, Y2: integer); inline;
-procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
-procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
+procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; X1, Y1, X2, Y2: integer);
+procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; X1, Y1, X2, Y2: integer; AtDown: boolean);
 
 procedure CanvasPaintTriangleUp(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
 procedure CanvasPaintTriangleDown(C: TCanvas; AColor: TColor; ACoord: TPoint; ASize: integer); inline;
@@ -361,44 +361,44 @@ begin
 end;
 
 
-procedure CanvasSimpleLine(C: TCanvas; P1, P2: TPoint); inline;
+procedure CanvasSimpleLine(C: TCanvas; X1, Y1, X2, Y2: integer); inline;
 begin
-  if P1.Y=P2.Y then
-    C.Line(P1.X, P1.Y, P2.X+1, P2.Y)
+  if Y1=Y2 then
+    C.Line(X1, Y1, X2+1, Y2)
   else
-    C.Line(P1.X, P1.Y, P2.X, P2.Y+1);
+    C.Line(X1, Y1, X2, Y2+1);
 end;
 
-procedure CanvasRoundedLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
+procedure CanvasRoundedLine(C: TCanvas; Color: TColor; X1, Y1, X2, Y2: integer; AtDown: boolean);
 var
   Points: array[0..3] of TPoint;
 begin
   C.Pen.Color:= Color;
-  if P1.Y=P2.Y then
+  if Y1=Y2 then
   begin
     //paint polyline, 4 points, horz line and 2 edges
-    Points[1]:= Point(P1.X+2, P1.Y);
-    Points[2]:= Point(P2.X-2, P2.Y);
+    Points[1]:= Point(X1+2, Y1);
+    Points[2]:= Point(X2-2, Y2);
     if AtDown then
     begin
-      Points[0]:= Point(P1.X, P1.Y-2);
-      Points[3]:= Point(P2.X+1, P2.Y-3);
+      Points[0]:= Point(X1, Y1-2);
+      Points[3]:= Point(X2+1, Y2-3);
     end
     else
     begin
-      Points[0]:= Point(P1.X, P1.Y+2);
-      Points[3]:= Point(P2.X+1, P2.Y+3);
+      Points[0]:= Point(X1, Y1+2);
+      Points[3]:= Point(X2+1, Y2+3);
     end;
     C.Polyline(Points);
   end
   else
   begin
-    C.Line(P1.X, P1.Y+2, P2.X, P2.Y-1);
+    C.Line(X1, Y1+2, X2, Y2-1);
     //don't draw pixels, other lines did it
   end;
 end;
 
-procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; P1, P2: TPoint; AtDown: boolean);
+procedure CanvasWavyHorzLine(C: TCanvas; Color: TColor; X1, Y1, X2, Y2: integer; AtDown: boolean);
 const
   cWavePeriod = 2;
   cWaveInc: array[0..cWavePeriod-1] of integer = (0, 2);
@@ -408,10 +408,10 @@ var
 begin
   SetLength(Points, 0);
   if AtDown then sign:= -1 else sign:= 1;
-  for x:= P1.X to P2.X do
+  for x:= X1 to X2 do
     if not Odd(x) then
     begin
-      y:= P2.Y + sign * cWaveInc[(x-P1.X) div 2 mod cWavePeriod];
+      y:= Y2 + sign * cWaveInc[(x-X1) div 2 mod cWavePeriod];
       SetLength(Points, Length(Points)+1);
       Points[Length(Points)-1]:= Point(x, y);
     end;
@@ -421,33 +421,33 @@ begin
     C.Polyline(Points);
 end;
 
-procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; P1, P2: TPoint);
+procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; X1, Y1, X2, Y2: integer);
 var
   i: integer;
   vis: boolean;
 begin
   vis:= false;
-  if P1.Y=P2.Y then
+  if Y1=Y2 then
   begin
-    for i:= P1.X to P2.X do
+    for i:= X1 to X2 do
     begin
       vis:= not vis;
       if vis then
-        C.Pixels[i, P2.Y]:= Color;
+        C.Pixels[i, Y2]:= Color;
     end;
   end
   else
   begin
-    for i:= P1.Y to P2.Y do
+    for i:= Y1 to Y2 do
     begin
       vis:= not vis;
       if vis then
-        C.Pixels[P1.X, i]:= Color;
+        C.Pixels[X1, i]:= Color;
     end;
   end;
 end;
 
-procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle; P1, P2: TPoint; AtDown: boolean);
+procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle; X1, Y1, X2, Y2: integer; AtDown: boolean);
 begin
   case Style of
     cLineStyleNone:
@@ -456,46 +456,46 @@ begin
     cLineStyleSolid:
       begin
         C.Pen.Color:= Color;
-        CanvasSimpleLine(C, P1, P2);
+        CanvasSimpleLine(C, X1, Y1, X2, Y2);
       end;
 
     cLineStyleSolid2px:
       begin
         C.Pen.Color:= Color;
-        CanvasSimpleLine(C, P1, P2);
-        if P1.Y=P2.Y then
+        CanvasSimpleLine(C, X1, Y1, X2, Y2);
+        if Y1=Y2 then
         begin
           if AtDown then
-            begin Dec(P1.Y); Dec(P2.Y) end
+            begin Dec(Y1); Dec(Y2) end
           else
-            begin Inc(P1.Y); Inc(P2.Y) end;
+            begin Inc(Y1); Inc(Y2) end;
         end
         else
         begin
           if AtDown then
-            begin Dec(P1.X); Dec(P2.X) end
+            begin Dec(X1); Dec(X2) end
           else
-            begin Inc(P1.X); Inc(P2.X) end;
+            begin Inc(X1); Inc(X2) end;
         end;
-        CanvasSimpleLine(C, P1, P2);
+        CanvasSimpleLine(C, X1, Y1, X2, Y2);
       end;
 
     cLineStyleDash:
       begin
         C.Pen.Color:= Color;
         C.Pen.Style:= psDot;
-        CanvasSimpleLine(C, P1, P2);
+        CanvasSimpleLine(C, X1, Y1, X2, Y2);
         C.Pen.Style:= psSolid;
       end;
 
     cLineStyleDotted:
-      CanvasDottedHorzVertLine(C, Color, P1, P2);
+      CanvasDottedHorzVertLine(C, Color, X1, Y1, X2, Y2);
 
     cLineStyleRounded:
-      CanvasRoundedLine(C, Color, P1, P2, AtDown);
+      CanvasRoundedLine(C, Color, X1, Y1, X2, Y2, AtDown);
 
     cLineStyleWave:
-      CanvasWavyHorzLine(C, Color, P1, P2, AtDown);
+      CanvasWavyHorzLine(C, Color, X1, Y1, X2, Y2, AtDown);
   end;
 end;
 
@@ -842,29 +842,29 @@ begin
         CanvasLineEx(C,
           PartPtr^.ColorBorder,
           PartPtr^.BorderDown,
-          Point(PartRect.Left, PartRect.Bottom),
-          Point(PartRect.Right, PartRect.Bottom),
+          PartRect.Left, PartRect.Bottom,
+          PartRect.Right, PartRect.Bottom,
           true);
 
         CanvasLineEx(C,
           PartPtr^.ColorBorder,
           PartPtr^.BorderUp,
-          Point(PartRect.Left, PartRect.Top),
-          Point(PartRect.Right, PartRect.Top),
+          PartRect.Left, PartRect.Top,
+          PartRect.Right, PartRect.Top,
           false);
 
         CanvasLineEx(C,
           PartPtr^.ColorBorder,
           PartPtr^.BorderLeft,
-          Point(PartRect.Left, PartRect.Top),
-          Point(PartRect.Left, PartRect.Bottom),
+          PartRect.Left, PartRect.Top,
+          PartRect.Left, PartRect.Bottom,
           false);
 
         CanvasLineEx(C,
           PartPtr^.ColorBorder,
           PartPtr^.BorderRight,
-          Point(PartRect.Right, PartRect.Top),
-          Point(PartRect.Right, PartRect.Bottom),
+          PartRect.Right, PartRect.Top,
+          PartRect.Right, PartRect.Bottom,
           true);
       end;
     end;

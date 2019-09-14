@@ -6279,24 +6279,26 @@ end;
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 var
-  P1, P2: TPoint;
+  X1, Y1, X2, Y2: integer;
 begin
   if FOptStapleStyle=cLineStyleNone then Exit;
 
   if FOptStapleEdge1=cStapleEdgeAngle then
-    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Top), Point(R.Right, R.Top), false);
+    CanvasLineEx(C, AColor, FOptStapleStyle, R.Left, R.Top, R.Right, R.Top, false);
 
-  P1:= Point(R.Left, R.Top);
-  P2:= Point(R.Left, R.Bottom);
+  X1:= R.Left;
+  Y1:= R.Top;
+  X2:= R.Left;
+  Y2:= R.Bottom;
   if FOptStapleEdge1=cStapleEdgeNone then
-    Inc(P1.Y, FCharSize.Y);
+    Inc(Y1, FCharSize.Y);
   if FOptStapleEdge2=cStapleEdgeNone then
-    Dec(P2.Y, FCharSize.Y);
+    Dec(Y2, FCharSize.Y);
 
-  CanvasLineEx(C, AColor, FOptStapleStyle, P1, P2, false);
+  CanvasLineEx(C, AColor, FOptStapleStyle, X1, Y1, X2, Y2, false);
 
   if FOptStapleEdge2=cStapleEdgeAngle then
-    CanvasLineEx(C, AColor, FOptStapleStyle, Point(R.Left, R.Bottom), Point(R.Right, R.Bottom), true);
+    CanvasLineEx(C, AColor, FOptStapleStyle, R.Left, R.Bottom, R.Right, R.Bottom, true);
 end;
 
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
