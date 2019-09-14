@@ -423,6 +423,9 @@ begin
       Inc(PointIndex);
     end;
 
+  if PointIndex+1<PointCount then
+    SetLength(Points, PointIndex+1);
+
   C.Pen.Color:= Color;
   C.Polyline(Points);
 end;
