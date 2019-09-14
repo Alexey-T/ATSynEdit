@@ -404,21 +404,27 @@ const
   cWaveInc: array[0..cWavePeriod-1] of integer = (0, 2);
 var
   Points: array of TPoint;
-  x, y, sign: integer;
+  PointCount, PointIndex: integer;
+  X, Y, NSign: integer;
 begin
-  SetLength(Points, 0);
-  if AtDown then sign:= -1 else sign:= 1;
-  for x:= X1 to X2 do
-    if not Odd(x) then
+  PointCount:= (X2-X1+1) div 2;
+  if PointCount<3 then exit;
+  SetLength(Points, PointCount);
+
+  if AtDown then NSign:= -1 else NSign:= 1;
+  PointIndex:= 0;
+
+  for X:= X1 to X2 do
+    if not Odd(X) then
     begin
-      y:= Y2 + sign * cWaveInc[(x-X1) div 2 mod cWavePeriod];
-      SetLength(Points, Length(Points)+1);
-      Points[Length(Points)-1]:= Point(x, y);
+      if PointIndex>=PointCount then Break;
+      Y:= Y2 + NSign * cWaveInc[(X-X1) div 2 mod cWavePeriod];
+      Points[PointIndex]:= Point(X, Y);
+      Inc(PointIndex);
     end;
 
   C.Pen.Color:= Color;
-  if Length(Points)>0 then
-    C.Polyline(Points);
+  C.Polyline(Points);
 end;
 
 procedure CanvasDottedHorzVertLine(C: TCanvas; Color: TColor; X1, Y1, X2, Y2: integer);
