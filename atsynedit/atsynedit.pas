@@ -7027,9 +7027,6 @@ begin
          begin
            Str.Encoding:= cEncAnsi;
            Str.EncodingCodepage:= AName;
-           //support old value 'ANSI' in user history
-           if AName='ANSI' then
-             Str.EncodingCodepage:= {$ifdef windows} LConvEncoding.GetDefaultTextEncoding {$else} 'cp1252' {$endif};
          end;
 end;
 
