@@ -265,7 +265,6 @@ uses
 {$R *.lfm}
 
 const
-  sEncAnsi = 'ANSI';
   sEncUtf8 = 'UTF-8';
   sEncUtf8NoBom = 'UTF-8 no bom';
   sEncUtf16LE = 'UTF-16 LE';
@@ -1046,12 +1045,6 @@ end;
 
 procedure TfmMain.DoSetEnc(const Str: string);
 begin
-  if Str=sEncAnsi then
-  begin
-    Ed.Strings.Encoding:= cEncAnsi;
-    Ed.Strings.EncodingCodepage:= '';
-  end
-  else
   if Str=sEncUtf8 then
   begin
     Ed.Strings.Encoding:= cEncUTF8;
@@ -1216,7 +1209,6 @@ procedure TfmMain.UpdateEnc;
 begin
   mnuEnc.Clear;
 
-  DoAddEnc('', sEncAnsi);
   DoAddEnc('', sEncUtf8);
   DoAddEnc('', sEncUtf8NoBom);
   DoAddEnc('', sEncUtf16LE);
