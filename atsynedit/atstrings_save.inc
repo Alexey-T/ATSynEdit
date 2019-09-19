@@ -5,12 +5,9 @@ var
   Item: PATStringItem;
   SA, Sign: string;
   SWide: UnicodeString;
-  bEncoded: boolean;
   i: integer;
 begin
-  {$if (lcl_major>=2)}
-  LConvEncoding.ConvertEncodingFromUtf8RaisesException:= true;
-  {$endif}
+  EncConvErrorMode:= eemException;
 
   if AWithSignature then
   begin
@@ -32,7 +29,7 @@ begin
     case AEncoding of
       cEncAnsi:
         begin
-          SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
+          SA:= EncConvertFromUTF8(SA, FEncodingCodepage);
           Stream.WriteBuffer(SA[1], Length(SA));
         end;
 

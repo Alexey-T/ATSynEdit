@@ -21,7 +21,6 @@ interface
 uses
   {$ifdef Windows}
   Windows, Messages,
-  LConvEncoding,
   ATSynEdit_Adapter_IME,
   {$endif}
   InterfaceBase,
@@ -29,6 +28,7 @@ uses
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
   LMessages, LCLType, LCLVersion,
   LazUTF8,
+  EncConv,
   ATStringProc,
   ATStrings,
   ATStringProc_WordJump,
@@ -6981,8 +6981,7 @@ begin
   case Str.Encoding of
     cEncAnsi:
       begin
-        Result:= Str.EncodingCodepage;
-        if Result='' then Result:= '?';
+        Result:= cEncConvNames[Str.EncodingCodepage];
       end;
     cEncUTF8:
       begin
@@ -7026,7 +7025,7 @@ begin
        if SameText(AName, cEncNameUtf16BE_NoBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= false; end else
          begin
            Str.Encoding:= cEncAnsi;
-           Str.EncodingCodepage:= AName;
+           Str.EncodingCodepage:= EncConvFindEncodingByName(LowerCase(AName));
          end;
 end;
 

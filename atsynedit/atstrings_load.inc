@@ -296,7 +296,7 @@ var
   SA, SUtf8: string;
   SWide: UnicodeString;
   LineEnd: TATLineEnds;
-  bWithBom, bEncoded: boolean;
+  bWithBom: boolean;
 begin
   Clear;
 
@@ -314,10 +314,6 @@ begin
     end;
   end;
   CharSize:= cEncodingSize[FEncoding];
-
-  if FEncoding=cEncAnsi then
-    if FEncodingCodepage='' then
-      FEncodingCodepage:= 'cp1252';
 
   BufSize:= Stream.Size-Len;
   if BufSize<=0 then Exit;
@@ -360,7 +356,7 @@ begin
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
 
-              SUtf8:= ConvertEncodingToUTF8(SA, FEncodingCodepage, bEncoded);
+              SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
 
               LineAddRaw_UTF8_NoUndo(SUtf8, LineEnd);
             end;

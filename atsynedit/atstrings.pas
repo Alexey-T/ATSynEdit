@@ -25,7 +25,7 @@ uses
   ATSynEdit_Gutter_Decor,
   Math,
   LazUtf8Classes,
-  LConvEncoding;
+  EncConv;
 
 const
   //set it to number of editors, which share same Strings obj
@@ -176,7 +176,7 @@ type
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
     FEncodingDetectDefaultUtf8: boolean;
-    FEncodingCodepage: string;
+    FEncodingCodepage: TEncConvId;
     FModified: boolean;
     FModifiedRecent: boolean;
     FModifiedVersion: Int64;
@@ -292,7 +292,7 @@ type
     function UpdateItemHasTab(AIndex: integer): boolean;
 
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
-    property EncodingCodepage: string read FEncodingCodepage write FEncodingCodepage;
+    property EncodingCodepage: TEncConvId read FEncodingCodepage write FEncodingCodepage;
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property Endings: TATLineEnds read FEndings write SetEndings;
@@ -847,7 +847,7 @@ begin
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
   FEncodingDetectDefaultUtf8:= true;
-  FEncodingCodepage:= '';
+  FEncodingCodepage:= eidCP1252;
   FEndings:= cEndWin;
 
   FModified:= false;
