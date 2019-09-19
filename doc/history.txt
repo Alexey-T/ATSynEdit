@@ -1,4 +1,7 @@
 
+2019.09.19
+* change: require package EncConv (from github.com/alexey-t) instead if LConvEncoding
+
 2019.09.13
 + add: OptUnprintedSpacesOnlyInSelection
 
