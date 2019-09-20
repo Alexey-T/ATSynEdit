@@ -7025,7 +7025,7 @@ begin
        if SameText(AName, cEncNameUtf16BE_NoBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= false; end else
          begin
            Str.Encoding:= cEncAnsi;
-           Str.EncodingCodepage:= EncConvFindEncodingByName(LowerCase(AName));
+           Str.EncodingCodepage:= EncConvFindEncoding(LowerCase(AName));
          end;
 end;
 
