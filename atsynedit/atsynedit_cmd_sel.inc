@@ -3,7 +3,9 @@
 function TATSynEdit.DoCommand_SelectAll: TATCommandResults;
 begin
   DoSelect_All;
-  Result:= [cResultCaretBottom];
+  Result:= [cResultCaretAny];
+  //don't return [cResultCaretBottom] - this scrolls to file end,
+  //while Sublime & EmEditor & GEdit keep scroll position after "select all"
 end;
 
 function TATSynEdit.DoCommand_SelectInverted: TATCommandResults;
