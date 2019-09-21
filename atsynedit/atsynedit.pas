@@ -255,7 +255,7 @@ const
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingText = 1;
   cInitCaretBlinkTime = 600;
-  cInitTimerAutoScroll = 80;
+  cInitTimerAutoScroll = 100;
   cInitTimerNiceScroll = 100;
   cInitMinimapVisible = false;
   cInitMinimapTooltipVisible = true;
@@ -294,9 +294,9 @@ const
   cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2; //indent inside [...] folded-mark
   cFoldedMarkIndentOuter = 2; //indent before [...] folded-mark
-  cSpeedScrollAutoHorz = 10; //auto-scroll (drag out of control): speed x
-  cSpeedScrollAutoVert = 1; //... speed y
-  cSpeedScrollNice = 3;
+  cSpeedScrollAutoHorz: integer = 10; //auto-scroll (drag out of control): speed x
+  cSpeedScrollAutoVert: integer = 1; //... speed y
+  cSpeedScrollNice: integer = 3;
   cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldLineDx = 3;
   cSizeRulerHeightPercents = 120;
