@@ -2720,6 +2720,7 @@ begin
         TextOutProps.NeedOffsets:= FFontNeedsOffsets;
         TextOutProps.TabHelper:= FTabHelper;
         TextOutProps.LineIndex:= NLinesIndex;
+        TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
         TextOutProps.CharSize:= ACharSize;
         TextOutProps.MainTextArea:= AMainText;
         TextOutProps.CharsSkipped:= NOutputSpacesSkipped;
@@ -6810,6 +6811,7 @@ begin
       true);
 
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
+    TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
     CanvasTextOut(C,
       cSizeIndentTooltipX,
       cSizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),

@@ -92,6 +92,7 @@ type
     NeedOffsets: TATFontNeedsOffsets;
     TabHelper: TATStringTabHelper;
     LineIndex: integer;
+    CharIndexInLine: integer;
     CharSize: TPoint;
     MainTextArea: boolean;
     CharsSkipped: integer;
@@ -883,7 +884,7 @@ begin
     if AProps.ShowUnprintedSpacesOnlyInSelection then
     begin
       for i:= 1 to Length(AText) do
-        if AProps.DetectIsPosSelected(i-1, AProps.LineIndex) then
+        if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
           DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
     end
     else
