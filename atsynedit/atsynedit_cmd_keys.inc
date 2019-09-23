@@ -321,7 +321,7 @@ begin
         if AJump=cWordjumpToEndOrNext then
         begin
           Str:= Strings.Lines[Caret.PosY];
-          Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars, AJumpSimple);
+          Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptNonWordChars, AJumpSimple);
         end;
       end;
     end
@@ -335,7 +335,7 @@ begin
     //jump inside line?
     if (Caret.PosX<=Length(Str)) then
     begin
-      Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars, AJumpSimple);
+      Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptNonWordChars, AJumpSimple);
     end;
   end;
 

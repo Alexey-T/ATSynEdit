@@ -203,7 +203,7 @@ implementation
 
 function IsWordChar(ch: WideChar): boolean; inline;
 begin
-  Result:= ATStringProc.IsCharWord(ch, '');
+  Result:= ATStringProc.IsCharWord(ch, cDefaultNonWordChars);
 end;
 
 function SRegexReplaceEscapedTabs(const AStr: string): string;

@@ -20,10 +20,10 @@ type
     );
 
 function SFindWordOffset(const S: atString; AOffset: integer; AJump: TATWordJump; ABigJump: boolean;
-  const AWordChars: atString; AJumpSimple: boolean=false): integer;
+  const ANonWordChars: atString; AJumpSimple: boolean=false): integer;
 
 procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1, AOffset2: integer;
-  const AWordChars: atString);
+  const ANonWordChars: atString);
 
 procedure SFindSymbolsBounds(const S: atString; AOffset: integer; out AOffset1,
   AOffset2: integer);
@@ -43,17 +43,23 @@ type
   TCharGroup = (cgSpaces, cgSymbols, cgWord);
 
 type
-  TCharGroupFunction = function(ch: atChar; const AWordChars: atString): TCharGroup;
+  TCharGroupFunction = function(ch: atChar; const ANonWordChars: atString): TCharGroup;
 
-function GroupOfChar_Usual(ch: atChar; const AWordChars: atString): TCharGroup;
+function GroupOfChar_Usual(ch: atChar; const ANonWordChars: atString): TCharGroup;
 begin
-  if (AWordChars<>'') and (Pos(ch, AWordChars)>0) then Result:= cgWord else
-   if (ch=#9) or IsCharSpace(ch) then Result:= cgSpaces else
-    if Pos(ch, cCharsSymbols)>0 then Result:= cgSymbols else
-     Result:= cgWord;
+  if (ch=#9) or IsCharSpace(ch) then
+    Result:= cgSpaces
+  else
+  if IsCharWord(ch, ANonWordChars) then
+    Result:= cgWord
+  else
+  if Pos(ch, cCharsSymbols)>0 then
+    Result:= cgSymbols
+  else
+    Result:= cgWord;
 end;
 
-function GroupOfChar_Simple(ch: atChar; const AWordChars: atString): TCharGroup;
+function GroupOfChar_Simple(ch: atChar; const ANonWordChars: atString): TCharGroup;
 begin
   if (ch=#9) or IsCharSpace(ch) then
     Result:= cgSpaces
@@ -64,7 +70,7 @@ end;
 
 function SFindWordOffset(const S: atString; AOffset: integer;
   AJump: TATWordJump; ABigJump: boolean;
-  const AWordChars: atString;
+  const ANonWordChars: atString;
   AJumpSimple: boolean): integer;
 var
   GroupOfChar: TCharGroupFunction;
@@ -74,18 +80,18 @@ var
   var gr: TCharGroup;
   begin
     if not ((n>=0) and (n<Length(s))) then Exit;
-    gr:= GroupOfChar(s[n+1], AWordChars);
+    gr:= GroupOfChar(s[n+1], ANonWordChars);
     repeat Inc(n)
     until
-      (n>=Length(s)) or (GroupOfChar(s[n+1], AWordChars)<>gr);
+      (n>=Length(s)) or (GroupOfChar(s[n+1], ANonWordChars)<>gr);
   end;
   //------------
   procedure Home;
   var gr: TCharGroup;
   begin
     if not ((n>0) and (n<Length(s))) then Exit;
-    gr:= GroupOfChar(s[n+1], AWordChars);
-    while (n>0) and (GroupOfChar(s[n], AWordChars)=gr) do
+    gr:= GroupOfChar(s[n+1], ANonWordChars);
+    while (n>0) and (GroupOfChar(s[n], ANonWordChars)=gr) do
       Dec(n);
   end;
   //------------
@@ -93,13 +99,13 @@ var
   begin
     Next;
     if ABigJump then
-      if (n<Length(s)) and (GroupOfChar(s[n+1], AWordChars)=cgSpaces) then
+      if (n<Length(s)) and (GroupOfChar(s[n+1], ANonWordChars)=cgSpaces) then
         Next;
   end;
   //------------
   procedure JumpToEnd;
   begin
-    while (n<Length(S)) and (GroupOfChar(S[n+1], AWordChars)=cgWord) do
+    while (n<Length(S)) and (GroupOfChar(S[n+1], ANonWordChars)=cgWord) do
       Inc(n);
   end;
   //------------
@@ -118,7 +124,7 @@ begin
     cWordjumpToPrev:
       begin
         //if we at word middle, jump to word start
-        if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], AWordChars)=GroupOfChar(s[n+1], AWordChars)) then
+        if (n>0) and (n<Length(s)) and (GroupOfChar(s[n], ANonWordChars)=GroupOfChar(s[n+1], ANonWordChars)) then
           Home
         else
         begin
@@ -126,7 +132,7 @@ begin
           if (n>0) then
             begin Dec(n); Home end;
           if ABigJump then
-            if (n>0) and (GroupOfChar(s[n+1], AWordChars)= cgSpaces) then
+            if (n>0) and (GroupOfChar(s[n+1], ANonWordChars)= cgSpaces) then
               begin Dec(n); Home end;
         end
       end;
@@ -148,7 +154,7 @@ end;
 
 
 procedure SFindWordBounds(const S: atString; AOffset: integer; out AOffset1,
-  AOffset2: integer; const AWordChars: atString);
+  AOffset2: integer; const ANonWordChars: atString);
 begin
   AOffset1:= AOffset;
   AOffset2:= AOffset;
@@ -161,17 +167,17 @@ begin
   begin
     //not on wrdchar?
     //move left
-    if (AOffset>0) and not IsCharWord(S[AOffset+1], AWordChars) then
+    if (AOffset>0) and not IsCharWord(S[AOffset+1], ANonWordChars) then
       Dec(AOffset);
 
     //not on wrdchar? exit
-    if not IsCharWord(S[AOffset+1], AWordChars) then exit;
+    if not IsCharWord(S[AOffset+1], ANonWordChars) then exit;
 
     //jump left only if at middle of word
-    if (AOffset>0) and IsCharWord(S[AOffset], AWordChars) then
-      AOffset1:= SFindWordOffset(S, AOffset, cWordjumpToPrev, false, AWordChars);
+    if (AOffset>0) and IsCharWord(S[AOffset], ANonWordChars) then
+      AOffset1:= SFindWordOffset(S, AOffset, cWordjumpToPrev, false, ANonWordChars);
     //jump right always
-    AOffset2:= SFindWordOffset(S, AOffset, cWordjumpToNext, false, AWordChars);
+    AOffset2:= SFindWordOffset(S, AOffset, cWordjumpToNext, false, ANonWordChars);
   end;
 end;
 

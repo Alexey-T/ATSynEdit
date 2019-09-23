@@ -37,9 +37,9 @@ type
 
 function SCharUpper(ch: widechar): widechar; inline;
 function SCharLower(ch: widechar): widechar; inline;
-function SCaseTitle(const S, SWordChars: atString): atString;
+function SCaseTitle(const S, SNonWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
-function SCaseSentence(const S, SWordChars: atString): atString;
+function SCaseSentence(const S, SNonWordChars: atString): atString;
 
 {$Z1}
 type
@@ -87,7 +87,7 @@ type
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
     procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
-      const AWordChars: atString; AWrapIndented: boolean): integer;
+      const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer; const Str: atString;
       APixelsFromLeft, ACharSize: integer;
       AAllowVirtualPos: boolean;
@@ -97,7 +97,7 @@ type
   end;
 
 function IsCharEol(ch: widechar): boolean; inline;
-function IsCharWord(ch: widechar; const AWordChars: atString): boolean;
+function IsCharWord(ch: widechar; const ANonWordChars: atString): boolean;
 function IsCharWordInIdentifier(ch: widechar): boolean;
 function IsCharDigit(ch: widechar): boolean; inline;
 function IsCharSpace(ch: widechar): boolean; inline;
@@ -141,6 +141,9 @@ procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer
 function BoolToPlusMinusOne(b: boolean): integer; inline;
 procedure TrimStringList(L: TStringList); inline;
 
+const
+  cDefaultNonWordChars = '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…';
+
 type
   TATDecodeRec = record SFrom, STo: UnicodeString; end;
 function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
@@ -170,7 +173,7 @@ begin
   Result:= (ch=#10) or (ch=#13);
 end;
 
-function IsCharWord(ch: widechar; const AWordChars: atString): boolean;
+function IsCharWord(ch: widechar; const ANonWordChars: atString): boolean;
 var
   NType: byte;
 begin
@@ -180,10 +183,15 @@ begin
     'A'..'Z',
     '_':
       exit(true);
+    #0..' ':
+      exit(false);
   end;
 
+  if Pos(ch, ANonWordChars)>0 then
+    exit(false);
+
   if Ord(ch)<128 then
-    Result:= false
+    Result:= true
   else
   if Ord(ch)>=LOW_SURROGATE_BEGIN then
     exit(false)
@@ -192,11 +200,6 @@ begin
     NType:= GetProps(Ord(ch))^.Category;
     Result:= (NType<=UGC_OtherNumber);
   end;
-
-  if not Result then
-    if AWordChars<>'' then
-      if Pos(ch, AWordChars)>0 then
-        Result:= true;
 end;
 
 function IsCharWordInIdentifier(ch: widechar): boolean;
@@ -300,13 +303,16 @@ begin
 end;
 
 function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
-  const AWordChars: atString; AWrapIndented: boolean): integer;
+  const ANonWordChars: atString; AWrapIndented: boolean): integer;
   //
   //override IsCharWord to check also commas,dots,quotes
   //to wrap them with wordchars
   function _IsWord(ch: widechar): boolean; inline;
   begin
-    Result:= IsCharWord(ch, AWordChars+OptCommaCharsWrapWithWords);
+    if Pos(ch, OptCommaCharsWrapWithWords)>0 then
+      Result:= true
+    else
+      Result:= IsCharWord(ch, ANonWordChars);
   end;
   //
 var
@@ -860,13 +866,13 @@ begin
 end;
 
 
-function SCaseTitle(const S, SWordChars: atString): atString;
+function SCaseTitle(const S, SNonWordChars: atString): atString;
 var
   i: integer;
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
-    if (i=1) or not IsCharWord(S[i-1], SWordChars) then
+    if (i=1) or not IsCharWord(S[i-1], SNonWordChars) then
       Result[i]:= SCharUpper(Result[i])
     else
       Result[i]:= SCharLower(Result[i]);
@@ -884,7 +890,7 @@ begin
       Result[i]:= SCharLower(Result[i]);
 end;
 
-function SCaseSentence(const S, SWordChars: atString): atString;
+function SCaseSentence(const S, SNonWordChars: atString): atString;
 var
   dot: boolean;
   i: Integer;
@@ -893,7 +899,7 @@ begin
   dot:= True;
   for i:= 1 to Length(Result) do
   begin
-    if IsCharWord(Result[i], SWordChars) then
+    if IsCharWord(Result[i], SNonWordChars) then
     begin
       if dot then
         Result[i]:= SCharUpper(Result[i])

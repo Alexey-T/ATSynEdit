@@ -72,7 +72,7 @@ begin
   ch:= Str[P.X+1];
 
   if IsCharWord(ch) then
-    SFindWordBounds(Str, P.X, XFrom, XTo, FOptWordChars)
+    SFindWordBounds(Str, P.X, XFrom, XTo, FOptNonWordChars)
   else
   begin
     if AllowOnlyWordChars then
@@ -115,8 +115,8 @@ begin
     SwapInt(P1.Y, P2.Y);
   end;
 
-  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptWordChars);
-  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptWordChars);
+  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptNonWordChars);
+  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptNonWordChars);
 
   with Carets[ACaretIndex] do
   begin

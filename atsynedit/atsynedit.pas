@@ -651,7 +651,7 @@ type
     FOptNumbersShowCarets: boolean;
     FOptNumbersSkippedChar: string;
     FOptNumbersIndentPercents: integer;
-    FOptWordChars: atString;
+    FOptNonWordChars: atString;
     FOptAutoIndent: boolean;
     FOptAutoIndentKind: TATAutoIndentKind;
     FOptAutoIndentBetterBracketsCurly: boolean;
@@ -1361,7 +1361,7 @@ type
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
-    property OptWordChars: atString read FOptWordChars write FOptWordChars;
+    property OptNonWordChars: atString read FOptNonWordChars write FOptNonWordChars;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
     property OptFoldUnderlineOffset: integer read FFoldUnderlineOffset write FFoldUnderlineOffset default cInitFoldUnderlineOffset;
@@ -1853,7 +1853,7 @@ procedure _CalcWrapInfos(
   AWrapColumn: integer;
   AWrapIndented: boolean;
   AVisibleColumns: integer;
-  const AWordChars: atString;
+  const ANonWordChars: atString;
   ALine: integer;
   AIndentMaximal: integer;
   AItems: TATWrapItems;
@@ -1908,7 +1908,7 @@ begin
       //calc for first NVisColumns chars
       Copy(Str, 1, NVisColumns),
       Max(AWrapColumn-NIndent, cMinWrapColumnAbs),
-      AWordChars,
+      ANonWordChars,
       AWrapIndented);
 
     if NLen>=Length(Str) then
@@ -1943,7 +1943,7 @@ begin
     FWrapColumn,
     FWrapIndented,
     GetVisibleColumns,
-    FOptWordChars,
+    FOptNonWordChars,
     ALine,
     AIndentMaximal,
     AItems,
@@ -3527,7 +3527,7 @@ begin
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptKeyUpDownKeepColumn:= true;
   FOptOverwriteAllowedOnPaste:= false;
-  FOptWordChars:= '';
+  FOptNonWordChars:= cDefaultNonWordChars;
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsPrevLine;
   FOptAutoIndentBetterBracketsCurly:= true;
@@ -6031,7 +6031,7 @@ begin
   if Carets.Count=0 then Exit;
   Caret:= Carets[0];
   Str:= Strings.Lines[Caret.PosY];
-  SFindWordBounds(Str, Caret.PosX, N1, N2, OptWordChars);
+  SFindWordBounds(Str, Caret.PosX, N1, N2, OptNonWordChars);
   if N2>N1 then
     Result:= Copy(Str, N1+1, N2-N1);
 end;
@@ -6379,7 +6379,7 @@ end;
 
 function TATSynEdit.IsCharWord(ch: Widechar): boolean;
 begin
-  Result:= ATStringProc.IsCharWord(ch, OptWordChars);
+  Result:= ATStringProc.IsCharWord(ch, OptNonWordChars);
 end;
 
 function TATSynEdit.GetColorTextBG: TColor;

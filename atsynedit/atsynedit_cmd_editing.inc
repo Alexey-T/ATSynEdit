@@ -565,7 +565,7 @@ begin
     //delete inside line?
     if (Caret.PosX<=Length(Str)) then
     begin
-      PosAfter.X:= SFindWordOffset(Str, Caret.PosX, cWordJumps[ANext], false, FOptWordChars);
+      PosAfter.X:= SFindWordOffset(Str, Caret.PosX, cWordJumps[ANext], false, FOptNonWordChars);
       if PosAfter.X<>Caret.PosX then
       begin
         System.Delete(Str, Min(Caret.PosX, PosAfter.X)+1, Abs(Caret.PosX-PosAfter.X));
@@ -909,7 +909,7 @@ begin
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
     if not bSel then
     begin
-      SFindWordBounds(Strings.Lines[Caret.PosY], Caret.PosX, X1, X2, FOptWordChars);
+      SFindWordBounds(Strings.Lines[Caret.PosY], Caret.PosX, X1, X2, FOptNonWordChars);
       if X1<0 then Continue;
       Y1:= Caret.PosY;
       Y2:= Caret.PosY;
@@ -919,9 +919,9 @@ begin
     case AMode of
       cCaseLower: Str2:= UnicodeLowerCase(Str1);
       cCaseUpper: Str2:= UnicodeUpperCase(Str1);
-      cCaseTitle: Str2:= SCaseTitle(Str1, FOptWordChars);
+      cCaseTitle: Str2:= SCaseTitle(Str1, FOptNonWordChars);
       cCaseInvert: Str2:= SCaseInvert(Str1);
-      cCaseSentence: Str2:= SCaseSentence(Str1, FOptWordChars);
+      cCaseSentence: Str2:= SCaseSentence(Str1, FOptNonWordChars);
     end;
     if Str1=Str2 then Continue;
 
