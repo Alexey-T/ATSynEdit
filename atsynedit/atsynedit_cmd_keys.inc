@@ -191,7 +191,7 @@ var
   Caret: TATCaretItem;
   Pnt: TPoint;
   Details: TATPosDetails;
-  i: integer;
+  NWrapIndex, i: integer;
 const
   cGapActions: array[boolean] of TATGapCoordAction =
     (cGapCoordIgnore, cGapCoordMoveDown);
@@ -211,6 +211,13 @@ begin
     if FOptKeyUpDownKeepColumn and (Caret.SavedX>0) then
       Pnt.X:= Caret.SavedX;
 
+    //prevent any action if caret on first line (arrow up) / last line (arrow down)
+    //this allows to avoid jump to end of last line (arrow down)
+    NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
+    if not ADown and (NWrapIndex=0) then exit;
+    if ADown and (NWrapIndex=WrapInfo.Count-1) then exit;
+
+    //increase/decrease Caret.CoordY and calculate pos from it
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne(ADown);
     Pnt:= ClientPosToCaretPos(Pnt, Details, cGapActions[ADown]);
     if Pnt.Y<0 then Continue;
