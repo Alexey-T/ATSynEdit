@@ -50,13 +50,13 @@ begin
   if (ch=#9) or IsCharSpace(ch) then
     Result:= cgSpaces
   else
-  if IsCharWord(ch, ANonWordChars) then
-    Result:= cgWord
-  else
   if Pos(ch, cCharsSymbols)>0 then
     Result:= cgSymbols
   else
-    Result:= cgWord;
+  if IsCharWord(ch, ANonWordChars) then
+    Result:= cgWord
+  else
+    Result:= cgSymbols;
 end;
 
 function GroupOfChar_Simple(ch: atChar; const ANonWordChars: atString): TCharGroup;
