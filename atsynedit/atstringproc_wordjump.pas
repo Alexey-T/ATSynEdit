@@ -34,10 +34,11 @@ procedure SFindSpacesBounds(const S: atString; AOffset: integer; out AOffset1,
 
 implementation
 
+{
 const
   //no chars '@' (email) and '$' (used in php)
   cCharsSymbols: atString = '!"#%&''()[]{}<>*+-/=,.:;?\^`|~‚„…‹›‘’“”–—¦«»­±';
-
+}
 
 type
   TCharGroup = (cgSpaces, cgSymbols, cgWord);
@@ -49,9 +50,6 @@ function GroupOfChar_Usual(ch: atChar; const ANonWordChars: atString): TCharGrou
 begin
   if (ch=#9) or IsCharSpace(ch) then
     Result:= cgSpaces
-  else
-  if Pos(ch, cCharsSymbols)>0 then
-    Result:= cgSymbols
   else
   if IsCharWord(ch, ANonWordChars) then
     Result:= cgWord
