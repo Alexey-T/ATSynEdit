@@ -96,11 +96,11 @@ object fmOpt: TfmOpt
         Left = 408
         Height = 17
         Top = 276
-        Width = 75
-        Caption = 'word-chars'
+        Width = 103
+        Caption = 'non-word chars'
         ParentColor = False
       end
-      object edWordChars: TEdit
+      object edNonWordChars: TEdit
         Left = 296
         Height = 27
         Top = 272

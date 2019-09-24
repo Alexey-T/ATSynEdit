@@ -7,6 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
   ExtCtrls, Spin, ComCtrls, Menus, LclIntf,
+  EncConv,
   ATStrings,
   ATStringProc,
   ATSynEdit,
@@ -629,7 +630,7 @@ begin
   ed.BeginUpdate;
   try
     if ADetectEnc then
-      ed.Strings.EncodingCodepage:= '';
+      ed.Strings.EncodingCodepage:= eidUTF8;
     ed.Strings.EncodingDetect:= ADetectEnc;
     ed.LoadFromFile(fn);
     ed.Strings.EncodingDetect:= true;
@@ -1049,31 +1050,31 @@ begin
   begin
     Ed.Strings.Encoding:= cEncUTF8;
     Ed.Strings.SaveSignUtf8:= true;
-    Ed.Strings.EncodingCodepage:= '';
+    Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
   if Str=sEncUtf8NoBom then
   begin
     Ed.Strings.Encoding:= cEncUTF8;
     Ed.Strings.SaveSignUtf8:= false;
-    Ed.Strings.EncodingCodepage:= '';
+    Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
   if Str=sEncUtf16LE then
   begin
     Ed.Strings.Encoding:= cEncWideLE;
-    Ed.Strings.EncodingCodepage:= '';
+    Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
   if Str=sEncUtf16BE then
   begin
     Ed.Strings.Encoding:= cEncWideBE;
-    Ed.Strings.EncodingCodepage:= '';
+    Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
   begin
     Ed.Strings.Encoding:= cEncAnsi;
-    Ed.Strings.EncodingCodepage:= Str;
+    Ed.Strings.EncodingCodepage:= EncConvFindEncoding(LowerCase(Str));
   end;
 
   if FFileName<>'' then
@@ -1226,9 +1227,9 @@ begin
   DoAddEnc('Europe', 'CP852');
   DoAddEnc('Europe', 'CP866');
   DoAddEnc('Europe', '-');
-  DoAddEnc('Europe', 'ISO-8859-1');
-  DoAddEnc('Europe', 'ISO-8859-2');
-  DoAddEnc('Europe', 'Macintosh');
+  DoAddEnc('Europe', 'ISO88591');
+  DoAddEnc('Europe', 'ISO88592');
+  DoAddEnc('Europe', 'Mac');
 
   DoAddEnc('Other', 'CP1254');
   DoAddEnc('Other', 'CP1255');
