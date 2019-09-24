@@ -217,7 +217,7 @@ begin
     chkOvrPaste.Checked:= ed.OptOverwriteAllowedOnPaste;
     chkDotLn.Checked:= ed.OptShowIndentLines;
     edTextHint.Text:= ed.OptTextHint;
-    edNonWordChars.Text:= ed.OptNonWordChars;
+    edNonWordChars.Text:= UTF8Encode(ed.OptNonWordChars);
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     chkSaveTrimEmptyLines.Checked:= ed.OptSavingTrimFinalEmptyLines;
@@ -335,7 +335,7 @@ begin
       ed.OptShowCurLineMinimal:= chkCurLineMin.Checked;
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptTextHint:= edTextHint.Text;
-      ed.OptNonWordChars:= edNonWordChars.Text;
+      ed.OptNonWordChars:= UTF8Decode(edNonWordChars.Text);
       ed.OptOverwriteAllowedOnPaste:= chkOvrPaste.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
