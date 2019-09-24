@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 unit ATStringProc;
 
 {$mode objfpc}{$H+}
+{$codepage utf8}
 
 interface
 
