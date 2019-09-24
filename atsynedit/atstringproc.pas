@@ -142,7 +142,7 @@ function BoolToPlusMinusOne(b: boolean): integer; inline;
 procedure TrimStringList(L: TStringList); inline;
 
 const
-  cDefaultNonWordChars = '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…';
+  cDefaultNonWordChars: UnicodeString = '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…';
 
 type
   TATDecodeRec = record SFrom, STo: UnicodeString; end;
