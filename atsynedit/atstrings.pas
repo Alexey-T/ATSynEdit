@@ -847,7 +847,7 @@ begin
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
   FEncodingDetectDefaultUtf8:= true;
-  FEncodingCodepage:= eidCP1252;
+  FEncodingCodepage:= EncConvGetANSI;
   FEndings:= cEndWin;
 
   FModified:= false;
