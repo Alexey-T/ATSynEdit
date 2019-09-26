@@ -5379,7 +5379,7 @@ begin
   if AIndentLines then
     for i:= 0 to AIndentSize-1 do
       if i mod FTabSize = 0 then
-        CanvasDottedVertLine_Alt(C,
+        CanvasLine_DottedVertAlt(C,
           Colors.IndentVertLines,
           ARect.Left + (i-AScrollPos)*ACharSize.X,
           ACoordY,

@@ -330,13 +330,13 @@ begin
       end;
 
     cLineStyleDotted:
-      CanvasDottedHorzVertLine(C, Color, X1, Y1, X2, Y2);
+      CanvasLine_Dotted(C, Color, X1, Y1, X2, Y2);
 
     cLineStyleRounded:
-      CanvasRoundedLine(C, Color, X1, Y1, X2, Y2, AtDown);
+      CanvasLine_RoundedEdge(C, Color, X1, Y1, X2, Y2, AtDown);
 
     cLineStyleWave:
-      CanvasWavyHorzLine(C, Color, X1, Y1, X2, Y2, AtDown);
+      CanvasLine_WavyHorz(C, Color, X1, Y1, X2, Y2, AtDown);
   end;
 end;
 
