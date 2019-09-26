@@ -32,6 +32,7 @@ uses
   ATStringProc,
   ATStrings,
   ATStringProc_WordJump,
+  ATCanvasPrimitives,
   ATSynEdit_CharSizer,
   ATSynEdit_RegExpr,
   ATSynEdit_Colors,
@@ -2498,8 +2499,11 @@ begin
       if AMainText then
        if NWrapIndex>=0 then
         if OptUnprintedVisible and OptUnprintedEof then
-          CanvasArrowHorz(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
-            Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X, false);
+          CanvasArrowHorz(C,
+            Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
+            Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
+            false,
+            OptUnprintedTabPointerScale);
       Break;
     end;
 

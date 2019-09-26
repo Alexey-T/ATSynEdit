@@ -12,6 +12,7 @@ uses
   Classes, SysUtils, Graphics, Controls,
   Menus, Math, Forms,
   LCLType,
+  ATCanvasPrimitives,
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATStringProc;
