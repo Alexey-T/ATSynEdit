@@ -280,7 +280,7 @@ begin
 end;
 
 
-procedure CanvasSimpleLine(C: TCanvas; X1, Y1, X2, Y2: integer); inline;
+procedure CanvasLine_WithEnd(C: TCanvas; X1, Y1, X2, Y2: integer); inline;
 begin
   if Y1=Y2 then
     C.Line(X1, Y1, X2+1, Y2)
@@ -297,13 +297,13 @@ begin
     cLineStyleSolid:
       begin
         C.Pen.Color:= Color;
-        CanvasSimpleLine(C, X1, Y1, X2, Y2);
+        CanvasLine_WithEnd(C, X1, Y1, X2, Y2);
       end;
 
     cLineStyleSolid2px:
       begin
         C.Pen.Color:= Color;
-        CanvasSimpleLine(C, X1, Y1, X2, Y2);
+        CanvasLine_WithEnd(C, X1, Y1, X2, Y2);
         if Y1=Y2 then
         begin
           if AtDown then
@@ -318,14 +318,14 @@ begin
           else
             begin Inc(X1); Inc(X2) end;
         end;
-        CanvasSimpleLine(C, X1, Y1, X2, Y2);
+        CanvasLine_WithEnd(C, X1, Y1, X2, Y2);
       end;
 
     cLineStyleDash:
       begin
         C.Pen.Color:= Color;
         C.Pen.Style:= psDot;
-        CanvasSimpleLine(C, X1, Y1, X2, Y2);
+        CanvasLine_WithEnd(C, X1, Y1, X2, Y2);
         C.Pen.Style:= psSolid;
       end;
 
