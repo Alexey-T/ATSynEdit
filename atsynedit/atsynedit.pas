@@ -597,6 +597,7 @@ type
     FOptShowFontLigatures: boolean;
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
+    FOptShowDragDropMarker: boolean;
     FOptMaxLineLenToCalcURL: integer;
     FOptStapleStyle: TATLineStyle;
     FOptStapleIndent: integer;
@@ -852,6 +853,7 @@ type
       APointLeft, APointText: TPoint;
       ALineIndex, ALineLen, ALineWidth: integer; const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
+    procedure DoPaintMarkerOfDragDrop(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
@@ -1399,6 +1401,7 @@ type
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
+    property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
     property OptStapleStyle: TATLineStyle read FOptStapleStyle write FOptStapleStyle default cLineStyleSolid;
     property OptStapleIndent: integer read FOptStapleIndent write FOptStapleIndent default -1;
@@ -3504,6 +3507,7 @@ begin
   FOptShowFontLigatures:= true;
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
+  FOptShowDragDropMarker:= true;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
 
   FOptStapleStyle:= cLineStyleSolid;
@@ -4093,6 +4097,8 @@ begin
     R:= Canvas.ClipRect;
     Canvas.CopyRect(R, FBitmap.Canvas, R);
   end;
+
+  DoPaintMarkerOfDragDrop(Canvas);
 end;
 
 procedure TATSynEdit.DoOnResize;
@@ -5342,6 +5348,32 @@ begin
       if not (csCustomPaint in ControlState) then //disable during Paint
         InvalidateRect(Handle, @R, false);
   end;
+end;
+
+procedure TATSynEdit.DoPaintMarkerOfDragDrop(C: TCanvas);
+var
+  Details: TATPosDetails;
+  P: TPoint;
+  R: TRect;
+begin
+  if not FOptShowDragDropMarker then exit;
+  if not FMouseDragDropping then exit;
+
+  P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos), Details);
+  if P.Y<0 then exit;
+  P:= CaretPosToClientPos(P);
+  if P.Y<0 then exit;
+  if not PtInRect(FRectMain, P) then exit;
+
+  R.Left:= P.X-1;
+  R.Right:= P.X+1; //2 pixels width
+  R.Top:= P.Y;
+  R.Bottom:= P.Y+FCharSize.Y; //100% height
+
+  C.Brush.Color:= Colors.Markers;
+  C.FillRect(R);
+
+  //InvalidateRect(Handle, @R, false);
 end;
 
 procedure TATSynEdit.DoPaintModeStatic;
