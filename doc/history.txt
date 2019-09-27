@@ -1,4 +1,7 @@
 
+2019.09.27
++ add: OptShowDragDropMarker (works during drag-drop of text block)
+
 2019.09.23
 * change: replaced option OptWordChars to OptNonWordChars; replaced also AWordChars to ANonWordChars in all code
 
