@@ -198,8 +198,15 @@ begin
   if FSorted then
   begin
     Find(APosX, APosY, NIndex, bExact);
-    if bExact and not FDuplicates then
-      FList.Delete(NIndex);
+    if bExact then
+    begin
+      if not FDuplicates then
+        FList.Delete(NIndex)
+      else
+      repeat
+        Inc(NIndex)
+      until not IsIndexValid(NIndex) or (Items[NIndex]<>Item);
+    end;
     FList.Insert(NIndex, Item);
   end
   else
