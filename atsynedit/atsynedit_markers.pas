@@ -120,7 +120,7 @@ begin
   inherited;
   FList:= TATMarkerItems.Create;
   FSorted:= false;
-  FDuplicates:= true;
+  FDuplicates:= false;
 end;
 
 destructor TATMarkers.Destroy;

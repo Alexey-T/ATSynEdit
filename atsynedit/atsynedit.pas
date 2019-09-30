@@ -3315,6 +3315,7 @@ begin
   FMarkers.Sorted:= false;
   FAttribs:= TATMarkers.Create;
   FAttribs.Sorted:= true;
+  FAttribs.Duplicates:= true; //CudaText plugins need it
   FMarkedRange:= TATMarkers.Create;
   FMarkedRange.Sorted:= true;
   FDimRanges:= TATDimRanges.Create;
