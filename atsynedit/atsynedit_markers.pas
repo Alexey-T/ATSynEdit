@@ -49,6 +49,7 @@ type
   private
     FList: TATMarkerItems;
     FSorted: boolean;
+    FDuplicates: boolean;
     function GetItem(N: integer): TATMarkerItem;
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
@@ -60,6 +61,7 @@ type
     function IsIndexValid(AIndex: integer): boolean; inline;
     property Items[AIndex: integer]: TATMarkerItem read GetItem write SetItem; default;
     property Sorted: boolean read FSorted write FSorted;
+    property Duplicates: boolean read FDuplicates write FDuplicates;
     procedure Add(APosX, APosY: integer;
       const ATag: Int64=0;
       ALenX: integer=0;
@@ -78,7 +80,7 @@ implementation
 
 class operator TATMarkerItem.=(const A, B: TATMarkerItem): boolean;
 begin
-  Result:= false;
+  Result:= (A.PosX=B.PosX) and (A.PosY=B.PosY);
 end;
 
 function TATMarkerItem.Contains(AX, AY: integer): boolean;
@@ -118,6 +120,7 @@ begin
   inherited;
   FList:= TATMarkerItems.Create;
   FSorted:= false;
+  FDuplicates:= true;
 end;
 
 destructor TATMarkers.Destroy;
@@ -195,7 +198,7 @@ begin
   if FSorted then
   begin
     Find(APosX, APosY, NIndex, bExact);
-    if bExact then
+    if bExact and not FDuplicates then
       FList.Delete(NIndex);
     FList.Insert(NIndex, Item);
   end
@@ -262,6 +265,9 @@ begin
       if C = 0 then
       begin
         AIndex := I;
+        if FDuplicates then
+          while (AIndex>0) and (Item=Items[AIndex-1]) do
+            Dec(AIndex);
         AExactMatch := True;
         Exit;
       end;
