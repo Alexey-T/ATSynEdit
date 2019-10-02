@@ -13,6 +13,7 @@ uses
   Menus, Math, Forms,
   LCLType,
   ATCanvasPrimitives,
+  ATScrollbar,
   ATSynEdit,
   ATSynEdit_CanvasProc,
   ATStringProc;
@@ -41,7 +42,6 @@ type
     FItems: TStringList;
     FItemIndex: integer;
     FMenu: TPopupMenu;
-    FOptComboboxArrowSize: integer;
     procedure DoComboUpDown(ADown: boolean);
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
@@ -54,7 +54,6 @@ type
     procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
-    property OptComboboxArrowSize: integer read FOptComboboxArrowSize write FOptComboboxArrowSize default 2;
   end;
 
 
@@ -157,7 +156,6 @@ begin
 
   OptMicromapVisible:= true;
   OptMicromapWidthPercents:= 300;
-  OptComboboxArrowSize:= 2;
 
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
@@ -178,7 +176,7 @@ begin
     Point(
       (ARect.Left+ARect.Right) div 2,
       (ARect.Top+ARect.Bottom) div 2),
-    EditorScale(FOptComboboxArrowSize));
+    EditorScale(ATScrollbarTheme.ArrowSize));
 end;
 
 procedure TATComboEdit.DoMenu;
