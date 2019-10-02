@@ -1134,7 +1134,7 @@ type
     property GutterBandEmpty: integer read FGutterBandEmpty write FGutterBandEmpty;
     property GutterBandDecor: integer read FGutterBandDecor write FGutterBandDecor;
     //files
-    procedure LoadFromFile(const AFilename: string); virtual;
+    procedure LoadFromFile(const AFilename: string; AKeepScroll: boolean=false); virtual;
     procedure SaveToFile(const AFilename: string); virtual;
     //cmd
     procedure TextInsertAtCarets(const AText: atString; AKeepCaret,
@@ -3720,7 +3720,7 @@ begin
   if Result<1 then Result:= 1;
 end;
 
-procedure TATSynEdit.LoadFromFile(const AFilename: string);
+procedure TATSynEdit.LoadFromFile(const AFilename: string; AKeepScroll: boolean=false);
 begin
   DoPaintModeStatic;
 
@@ -3731,8 +3731,11 @@ begin
   FWrapInfo.Clear;
   FWrapUpdateNeeded:= true;
 
-  FScrollHorz.Clear;
-  FScrollVert.Clear;
+  if not AKeepScroll then
+  begin
+    FScrollHorz.Clear;
+    FScrollVert.Clear;
+  end;
 
   BeginUpdate;
   try
