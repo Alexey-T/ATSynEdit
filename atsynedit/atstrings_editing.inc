@@ -543,6 +543,7 @@ var
   BlockUTF8: TStringList;
   i: integer;
 begin
+  if not IsIndexValid(AY) then exit;
   FChangeBlockActive:= true;
 
   if Assigned(FOnChangeBlock) then
