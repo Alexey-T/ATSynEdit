@@ -185,6 +185,7 @@ procedure TATStrings.LoadFromString(const AText: atString);
 var
   MS: TMemoryStream;
   Str: atString;
+  PrevEnc: TATFileEncoding;
   i: integer;
 begin
   if ReadOnly then exit;
@@ -208,9 +209,11 @@ begin
       MS.Write(AText[1], Length(AText)*SizeOf(atChar));
       MS.Position:= 0;
 
+      PrevEnc:= Encoding;
       Encoding:= cEncWideLE;
       EncodingDetect:= false;
       LoadFromStream(MS);
+      Encoding:= PrevEnc;
       ActionAddFakeLineIfNeeded;
     finally
       FreeAndNil(MS);
