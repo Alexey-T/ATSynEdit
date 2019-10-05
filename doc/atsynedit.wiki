@@ -1027,6 +1027,18 @@ Handler must fill:
 
 Handler must handle the situation of line-wrapping inside whole words (or long comments, or long string constants, etc), when one fragment gives "part" in AParts for ALineIndex=N, and next fragment will give "part" for ALineIndex=N+1.
 
+Example.
+Handler gets string with Pascal syntax like "procedure AB(name: word)". It must create such "parts" for this string:
+
+* part[0]: for "procedure": TATLinePart properties: offset=0, len=9, etc
+* part[1]: for "AB": offset=10, len=2 
+* part[2]: for "(": offset=12, len=1
+* part[3]: for "name": offset=13, len=1
+* part[4]: for ":": offset=17, len=1
+* part[5]: for "word": offset=19, len=4
+* part[6]: for ")": offset=23, len=1
+* other parts must have offset=0, len=0
+
 ==Details about highlighting rendering==
 
 Central procedure is DoCalcLineHilite. For items of WrapInfo object, it calculates "line parts" (array TATLineParts of record TATLinePart). Each "part" here is one colored/styled fragment of string.
