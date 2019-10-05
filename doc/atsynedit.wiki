@@ -1011,7 +1011,8 @@ end;
 
 This event has type:
 <syntaxhighlight lang="pascal">
- TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
+type
+  TATSynEditCalcHiliteEvent = procedure(Sender: TObject; var AParts: TATLineParts;
     ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor) of object;
 </syntaxhighlight>
 
@@ -1025,7 +1026,7 @@ Handler must fill:
 * AParts: array of highlighted parts, one part per one "syntax token" (e.g. one symbol, one keyword, one string const, one comment, etc). Fill all other parts with zeros.
 * AColorAfterEol: color of background after line end (for empty area).
 
-Handler must handle the situation of line-wrapping inside whole words (or long comments, or long string constants, etc), when one fragment gives "part" in AParts for ALineIndex=N, and next fragment will give "part" for ALineIndex=N+1.
+Handler must handle the situation of line-wrapping inside long comments (or long string constants, etc), when one fragment gives part for ALineIndex=N, and next fragment gives part for ALineIndex=N+1.
 
 Example.
 Handler gets string with Pascal syntax like "procedure AB(name: word)". It must create such "parts" for this string:
