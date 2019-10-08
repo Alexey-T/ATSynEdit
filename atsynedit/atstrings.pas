@@ -402,6 +402,33 @@ begin
   raise Exception.Create('Unknown enc value');
 end;
 
+function _ReadFileToMemoryStream(ms: TMemoryStream; const Filename: string): string;
+const
+  sEol: string = #10;
+var
+  f: TextFile;
+  s: string;
+begin
+  ms.Clear;
+  {$Push}
+  {$IOChecks off}
+  AssignFile(f, Filename);
+  Reset(f);
+  if IOResult<>0 then exit;
+  {$Pop}
+  try
+    while not EOF(f) do
+    begin
+      ReadLn(f, s);
+      if s<>'' then
+        ms.Write(s[1], Length(s));
+      ms.Write(sEol[1], 1);
+    end;
+  finally
+    CloseFile(f);
+  end;
+end;
+
 { TATStringItem }
 
 function TATStringItem.IsFake: boolean; inline;
