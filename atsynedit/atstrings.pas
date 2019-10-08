@@ -402,14 +402,11 @@ begin
   raise Exception.Create('Unknown enc value');
 end;
 
-function _ReadFileToMemoryStream(ms: TMemoryStream; const Filename: string): string;
-const
-  sEol: string = #10;
+procedure _ReadFileToStream(st: TStream; const Filename: string);
 var
   f: TextFile;
-  s: string;
+  ch: char;
 begin
-  ms.Clear;
   {$Push}
   {$IOChecks off}
   AssignFile(f, Filename);
@@ -417,12 +414,11 @@ begin
   if IOResult<>0 then exit;
   {$Pop}
   try
+    st.Position:= 0;
     while not EOF(f) do
     begin
-      ReadLn(f, s);
-      if s<>'' then
-        ms.Write(s[1], Length(s));
-      ms.Write(sEol[1], 1);
+      Read(f, ch);
+      st.Write(ch, 1);
     end;
   finally
     CloseFile(f);

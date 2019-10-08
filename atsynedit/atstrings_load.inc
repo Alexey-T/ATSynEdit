@@ -422,7 +422,7 @@ begin
     begin
       ms:= TMemoryStream.Create;
       try
-        _ReadFileToMemoryStream(ms, AFilename);
+        _ReadFileToStream(ms, AFilename);
         LoadFromStream(ms);
       finally
         FreeAndNil(ms);
