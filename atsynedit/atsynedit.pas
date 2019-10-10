@@ -723,6 +723,7 @@ type
       AColorForced: boolean; AHiliteLineWithSelection: boolean);
     procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretProps; W, H: integer);
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
+    procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
     function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
     procedure DoCaretsOnChanged(Sender: TObject);
     procedure DoCaretsAssign(NewCarets: TATCarets);
@@ -955,7 +956,7 @@ type
     procedure DoCaretsDeleteOnSameLines;
 
     //editing
-    procedure DoCommandResults(Res: TATCommandResults);
+    procedure DoCommandResults(ACmd: integer; Res: TATCommandResults);
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;
     function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
@@ -7077,9 +7078,26 @@ var
   Res: TATCommandResults;
 begin
   Res:= DoCommand_TextInsertAtCarets(AText, AKeepCaret, AOvrMode, ASelectThen);
-  DoCommandResults(Res);
+  DoCommandResults(0, Res);
 end;
 
+procedure TATSynEdit.DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
+var
+  Caret: TATCaretItem;
+  i: integer;
+  S: atString;
+begin
+  for i:= 0 to Carets.Count-1 do
+  begin
+    Caret:= Carets[i];
+    if Caret.PosX<=0 then Continue;
+    if not Strings.IsIndexValid(Caret.PosY) then Continue;
+    S:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
+    if S='' then Continue;
+    if IsCharSurrogateLow(S[1]) then
+      Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
+  end;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

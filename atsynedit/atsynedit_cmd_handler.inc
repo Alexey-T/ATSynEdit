@@ -100,7 +100,8 @@ begin
     Key:= 0;
 end;
 
-procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
+
+procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
 var
   Caret: TATCaretItem;
   bNeedRepaint, bAllowRepaint: boolean;
@@ -130,6 +131,23 @@ begin
     if FOptMouseHideCursor then
       if PtInRect(FRectMain, ScreenToClient(Mouse.CursorPos)) then
         SetCursor(crNone);
+  end;
+
+  case ACmd of
+    cCommand_KeyLeft,
+    cCommand_KeyLeft_Sel:
+      DoCaretsFixForSurrogatePairs(false);
+    cCommand_KeyRight,
+    cCommand_KeyRight_Sel,
+    cCommand_KeyDown,
+    cCommand_KeyDown_Sel,
+    cCommand_KeyUp,
+    cCommand_KeyUp_Sel,
+    cCommand_KeyPageUp,
+    cCommand_KeyPageUp_Sel,
+    cCommand_KeyPageDown,
+    cCommand_KeyPageDown_Sel:
+      DoCaretsFixForSurrogatePairs(true);
   end;
 
   DoCaretsFixIfInsideFolded;
@@ -530,7 +548,7 @@ begin
       Carets.UpdateSavedX(cUpdateX_Clear, false);
   end;
 
-  DoCommandResults(Res);
+  DoCommandResults(ACmd, Res);
   DoEventCommandAfter(ACmd, AText);
   FIsRunningCommand:= false;
 end;
