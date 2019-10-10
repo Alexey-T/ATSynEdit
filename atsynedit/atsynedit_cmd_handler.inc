@@ -136,14 +136,6 @@ begin
   case ACmd of
     cCommand_KeyLeft,
     cCommand_KeyLeft_Sel,
-    cCommand_KeyDown,
-    cCommand_KeyDown_Sel,
-    cCommand_KeyUp,
-    cCommand_KeyUp_Sel,
-    cCommand_KeyPageUp,
-    cCommand_KeyPageUp_Sel,
-    cCommand_KeyPageDown,
-    cCommand_KeyPageDown_Sel,
     cCommand_CaretsExtendDownLine..cCommand_CaretsExtendUpToTop:
       DoCaretsFixForSurrogatePairs(false);
     cCommand_KeyRight,
