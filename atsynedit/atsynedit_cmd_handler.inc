@@ -135,10 +135,7 @@ begin
 
   case ACmd of
     cCommand_KeyLeft,
-    cCommand_KeyLeft_Sel:
-      DoCaretsFixForSurrogatePairs(false);
-    cCommand_KeyRight,
-    cCommand_KeyRight_Sel,
+    cCommand_KeyLeft_Sel,
     cCommand_KeyDown,
     cCommand_KeyDown_Sel,
     cCommand_KeyUp,
@@ -146,7 +143,11 @@ begin
     cCommand_KeyPageUp,
     cCommand_KeyPageUp_Sel,
     cCommand_KeyPageDown,
-    cCommand_KeyPageDown_Sel:
+    cCommand_KeyPageDown_Sel,
+    cCommand_CaretsExtendDownLine..cCommand_CaretsExtendUpToTop:
+      DoCaretsFixForSurrogatePairs(false);
+    cCommand_KeyRight,
+    cCommand_KeyRight_Sel:
       DoCaretsFixForSurrogatePairs(true);
   end;
 

@@ -7093,8 +7093,7 @@ begin
     if Caret.PosX<=0 then Continue;
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
     S:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
-    if S='' then Continue;
-    if IsCharSurrogateLow(S[1]) then
+    if (S<>'') and IsCharSurrogateLow(S[1]) then
       Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
   end;
 end;
