@@ -402,26 +402,32 @@ begin
   raise Exception.Create('Unknown enc value');
 end;
 
-procedure _ReadFileToStream(st: TStream; const Filename: string);
+procedure _ReadFileToStream(AStream: TStream;
+  const AFileName: string;
+  AMaxSize: integer=20*1024*1024);
+const
+  BufSize = 4096;
 var
-  f: TextFile;
-  ch: char;
+  Buf: array[0..BufSize-1] of char;
+  fs: TFileStream;
+  NSize, NTotalSize: integer;
 begin
-  {$Push}
-  {$IOChecks off}
-  AssignFile(f, Filename);
-  Reset(f);
-  if IOResult<>0 then exit;
-  {$Pop}
+  fs:= TFileStream.Create(AFileName, fmOpenRead or fmShareDenyNone);
   try
-    st.Position:= 0;
-    while not EOF(f) do
-    begin
-      Read(f, ch);
-      st.Write(ch, 1);
-    end;
+    AStream.Position:= 0;
+    NTotalSize:= 0;
+    repeat
+      NSize:= fs.Read(Buf, BufSize);
+      if NSize>0 then
+      begin
+        AStream.Write(Buf, NSize);
+        Inc(NTotalSize, NSize);
+        if NTotalSize>=AMaxSize then
+          Break;
+      end;
+    until NSize<BufSize;
   finally
-    CloseFile(f);
+    FreeAndNil(fs);
   end;
 end;
 
