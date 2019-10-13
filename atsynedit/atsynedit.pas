@@ -1195,6 +1195,8 @@ type
     procedure MarkerDrop;
     procedure MarkerGotoLast(AndDelete: boolean; AIndentHorz, AIndentVert: integer);
     procedure MarkerSwap;
+    procedure MarkerSelectToCaret;
+    procedure MarkerDeleteToCaret;
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;

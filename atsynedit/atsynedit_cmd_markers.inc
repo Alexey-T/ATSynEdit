@@ -92,3 +92,50 @@ begin
   Update;
 end;
 
+procedure TATSynEdit.MarkerSelectToCaret;
+var
+  Caret: TATCaretItem;
+  Mark: TATMarkerItem;
+begin
+  if Carets.Count<>1 then exit;
+  if Markers.Count=0 then exit;
+  Caret:= Carets[0];
+  Mark:= Markers[Markers.Count-1];
+
+  Caret.EndX:= Mark.PosX;
+  Caret.EndY:= Mark.PosY;
+  Update;
+end;
+
+procedure TATSynEdit.MarkerDeleteToCaret;
+var
+  Caret: TATCaretItem;
+  Mark: TATMarkerItem;
+  X1, Y1, X2, Y2: integer;
+  Shift, PosAfter: TPoint;
+begin
+  if Carets.Count<>1 then exit;
+  if Markers.Count=0 then exit;
+  Caret:= Carets[0];
+  Mark:= Markers[Markers.Count-1];
+
+  X1:= Caret.PosX;
+  Y1:= Caret.PosY;
+  X2:= Mark.PosX;
+  Y2:= Mark.PosY;
+
+  if not IsPosSorted(X1, Y1, X2, Y2, true) then
+  begin
+    SwapInt(X1, X2);
+    SwapInt(Y1, Y2);
+  end;
+
+  Caret.PosX:= X1;
+  Caret.PosY:= Y1;
+  Markers.Clear;
+
+  Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+  Update;
+  DoEventChange;
+end;
+
