@@ -132,7 +132,7 @@ begin
 
   Caret.PosX:= X1;
   Caret.PosY:= Y1;
-  Markers.Clear;
+  Markers.Delete(Markers.Count-1);
 
   Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
   Update;
