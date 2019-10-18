@@ -34,16 +34,16 @@ end;
 function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
   AKeepCaret, AOvrMode, ASelectThen: boolean): TATCommandResults;
 var
-  List: TStringList;
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
+  TextItems: TStringList;
   TextItem: atString;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
-  List:= nil;
+  TextItems:= nil;
 
   try
     bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
@@ -52,20 +52,20 @@ begin
 
     DoSelectionDeleteOrReset;
 
-    //List allows to insert each clipboard text line into one caret
+    //TextItems allows to insert each clipboard text line into one caret
     if FOptPasteMultilineTextSpreadsToCarets then
     if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
     begin
-      List:= TStringList.Create;
-      List.Text:= UTF8Encode(AText);
+      TextItems:= TStringList.Create;
+      TextItems.Text:= UTF8Encode(AText);
     end;
 
     for i:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[i];
 
-      if Assigned(List) and (Carets.Count=List.Count) and (i>=0) and (i<List.Count) then
-        TextItem:= UTF8Decode(List[i])
+      if Assigned(TextItems) and (Carets.Count=TextItems.Count) and (i<TextItems.Count) then
+        TextItem:= UTF8Decode(TextItems[i])
       else
         TextItem:= AText;
 
@@ -81,8 +81,8 @@ begin
       end;
     end;
   finally
-    if Assigned(List) then
-      FreeAndNil(List);
+    if Assigned(TextItems) then
+      FreeAndNil(TextItems);
     if bNeedGroup then
       Strings.EndUndoGroup;
   end;
