@@ -585,6 +585,7 @@ type
     {$endif}
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
+    FOptPasteMultilineTextSpreadsToCarets: boolean;
     FOptMaxLinesToCountUnindent: integer;
     FOptMaxLineLengthForSlowWidthDetect: integer;
     FOptScrollSmooth: boolean;
@@ -1540,6 +1541,7 @@ type
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
     property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine default true;
+    property OptPasteMultilineTextSpreadsToCarets: boolean read FOptPasteMultilineTextSpreadsToCarets write FOptPasteMultilineTextSpreadsToCarets default true;
     property OptZebraActive: boolean read FOptZebraActive write FOptZebraActive default false;
     property OptZebraAlphaBlend: byte read FOptZebraAlphaBlend write FOptZebraAlphaBlend default cInitZebraAlphaBlend;
   end;
@@ -3605,6 +3607,7 @@ begin
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
   FOptPasteAtEndMakesFinalEmptyLine:= true;
+  FOptPasteMultilineTextSpreadsToCarets:= true;
   FOptZebraActive:= false;
   FOptZebraAlphaBlend:= cInitZebraAlphaBlend;
 

@@ -19,6 +19,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkPasteSpread: TCheckBox;
     chkUndoGr: TCheckBox;
     chkUndoSv: TCheckBox;
     chkUnprintOnlyBothEnds: TCheckBox;
@@ -224,6 +225,7 @@ begin
     chkScrollHint.Checked:= ed.OptShowScrollHint;
     chkClickLink.Checked:= ed.OptMouseClickOpensURL;
     chkZebra.Checked:= ed.OptZebraActive;
+    chkPasteSpread.Checked:= ed.OptPasteMultilineTextSpreadsToCarets;
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -349,6 +351,7 @@ begin
       ed.OptShowScrollHint:= chkScrollHint.Checked;
       ed.OptMouseClickOpensURL:= chkClickLink.Checked;
       ed.OptZebraActive:= chkZebra.Checked;
+      ed.OptPasteMultilineTextSpreadsToCarets:= chkPasteSpread.Checked;
 
       //unprint
       ed.OptUnprintedVisible:= chkUnprintEn.Checked;

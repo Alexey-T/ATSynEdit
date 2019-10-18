@@ -1,4 +1,7 @@
 
+2019.10.18
++ add: OptPasteMultilineTextSpreadsToCarets
+
 2019.10.13
 + add: methods MarkerSelectToCaret, MarkerDeleteToCaret
 

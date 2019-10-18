@@ -247,6 +247,14 @@ object fmOpt: TfmOpt
           TabOrder = 2
         end
       end
+      object chkPasteSpread: TCheckBox
+        Left = 296
+        Height = 24
+        Top = 207
+        Width = 312
+        Caption = 'paste multi-line text spreads text to carets'
+        TabOrder = 19
+      end
     end
     object TabSheet2: TTabSheet
       Caption = 'gutter'

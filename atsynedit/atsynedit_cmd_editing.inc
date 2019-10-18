@@ -59,7 +59,8 @@ begin
 
   DoSelectionDeleteOrReset;
 
-  //list allows to insert each clip-line into one caret
+  //List allows to insert each clipboard text line into one caret
+  if FOptPasteMultilineTextSpreadsToCarets then
   if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
   begin
     List:= TStringList.Create;
