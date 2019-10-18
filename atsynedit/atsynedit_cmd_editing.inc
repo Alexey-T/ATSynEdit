@@ -54,20 +54,21 @@ begin
   if ModeReadOnly then Exit;
   List:= nil;
 
-  bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
-  if bNeedGroup then Strings.BeginUndoGroup;
-
-  DoSelectionDeleteOrReset;
-
-  //List allows to insert each clipboard text line into one caret
-  if FOptPasteMultilineTextSpreadsToCarets then
-  if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
-  begin
-    List:= TStringList.Create;
-    List.Text:= UTF8Encode(AText);
-  end;
-
   try
+    bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
+    if bNeedGroup then
+      Strings.BeginUndoGroup;
+
+    DoSelectionDeleteOrReset;
+
+    //List allows to insert each clipboard text line into one caret
+    if FOptPasteMultilineTextSpreadsToCarets then
+    if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
+    begin
+      List:= TStringList.Create;
+      List.Text:= UTF8Encode(AText);
+    end;
+
     for i:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[i];
@@ -85,9 +86,9 @@ begin
   finally
     if Assigned(List) then
       FreeAndNil(List);
+    if bNeedGroup then
+      Strings.EndUndoGroup;
   end;
-
-  if bNeedGroup then Strings.EndUndoGroup;
 
   Result:= [cResultText, cResultCaretBottom];
 end;
