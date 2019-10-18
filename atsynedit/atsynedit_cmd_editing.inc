@@ -35,19 +35,10 @@ function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
   AKeepCaret, AOvrMode, ASelectThen: boolean): TATCommandResults;
 var
   List: TStringList;
-  //
-  function TextItem(i: integer): atString;
-  begin
-    if Assigned(List) and (Carets.Count=List.Count) and (i>=0) and (i<List.Count) then
-      Result:= UTF8Decode(List[i])
-    else
-      Result:= AText;
-  end;
-  //
-var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
+  TextItem: atString;
   i: integer;
 begin
   Result:= [];
@@ -72,7 +63,13 @@ begin
     for i:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[i];
-      Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem(i), AOvrMode, Shift, PosAfter);
+
+      if Assigned(List) and (Carets.Count=List.Count) and (i>=0) and (i<List.Count) then
+        TextItem:= UTF8Decode(List[i])
+      else
+        TextItem:= AText;
+
+      Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem, AOvrMode, Shift, PosAfter);
       DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
       if not AKeepCaret then
