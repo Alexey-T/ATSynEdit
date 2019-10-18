@@ -54,11 +54,15 @@ begin
 
     //TextItems allows to insert each clipboard text line into one caret
     if FOptPasteMultilineTextSpreadsToCarets then
-    if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
-    begin
-      TextItems:= TStringList.Create;
-      TextItems.Text:= UTF8Encode(AText);
-    end;
+      if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
+        if SCountTextLines(AText, sLineBreak) = Carets.Count then
+        begin
+          TextItems:= TStringList.Create;
+          TextItems.Text:= UTF8Encode(AText);
+          //if Carets.Count<>TextItems.Count then
+          //  raise Exception.CreateFmt('Unexpected lines count in clipboard text (found %d, expected %d)',
+          //    [TextItems.Count, Carets.Count]);
+        end;
 
     for i:= Carets.Count-1 downto 0 do
     begin

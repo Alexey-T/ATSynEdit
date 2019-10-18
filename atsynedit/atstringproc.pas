@@ -162,6 +162,8 @@ procedure SDeleteFromEol(var S: atString); inline;
 procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
 function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
 function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
+function SCountTextOccurrences(const SubStr, Str: UnicodeString): integer;
+function SCountTextLines(const Str, StrBreak: UnicodeString): integer;
 
 
 implementation
@@ -1108,6 +1110,29 @@ begin
   end;
 end;
 
+
+function SCountTextOccurrences(const SubStr, Str: UnicodeString): integer;
+var
+  Offset: integer;
+begin
+  Result:= 0;
+  if (Str='') or (SubStr='') then exit;
+  Offset:= PosEx(SubStr, Str, 1);
+  while Offset<>0 do
+  begin
+    Inc(Result);
+    Offset:= PosEx(SubStr, Str, Offset + Length(SubStr));
+  end;
+end;
+
+function SCountTextLines(const Str, StrBreak: UnicodeString): integer;
+begin
+  Result:= SCountTextOccurrences(StrBreak, Str)+1;
+  // ignore trailing EOL
+  if Length(Str)>=Length(StrBreak) then
+    if Copy(Str, Length(Str)-Length(StrBreak)+1, Length(StrBreak))=StrBreak then
+      Dec(Result);
+end;
 
 end.
 
