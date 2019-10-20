@@ -331,8 +331,8 @@ const
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
-  cATClipboardFormatId: integer = 0; //must be inited
-  cATClipboardSignatureColBlock: integer = $1000;
+  cATClipboardFormatId: PtrInt = 0; //must be inited
+  cATClipboardSignatureColBlock: PtrInt = $1000;
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
