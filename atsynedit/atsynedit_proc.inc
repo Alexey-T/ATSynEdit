@@ -92,11 +92,6 @@ begin
     (A.NPixelOffset=B.NPixelOffset);
 end;
 
-procedure InitClipboardFormat; inline;
-begin
-  cATClipboardFormatId:= RegisterClipboardFormat('Application/X-Laz-ATSynEdit-Block');
-end;
-
 function GetResourceScaleSuffix: string;
 var
   N: integer;

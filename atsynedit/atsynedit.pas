@@ -331,8 +331,8 @@ const
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
-  cATClipboardFormatId: TClipboardFormat = 0; //must be inited
-  cATClipboardSignatureColBlock: integer = $1000;
+  ATClipboardColumnFormat: TClipboardFormat = 0; //must be inited
+  ATClipboardColumnSignature: integer = $1000;
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
@@ -7125,7 +7125,7 @@ end;
 
 
 initialization
-  InitClipboardFormat;
+  ATClipboardColumnFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Block');
 
 finalization
   FreeResources;
