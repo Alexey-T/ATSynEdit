@@ -2246,10 +2246,10 @@ begin
     exit
   end;
 
-  R.Left:= ClientWidth-FMicromapWidth;
   R.Top:= 0;
-  R.Right:= ClientWidth;
   R.Bottom:= ClientHeight;
+  R.Right:= ClientWidth;
+  R.Left:= R.Right-EditorScale(FMicromapWidth);
 end;
 
 procedure TATSynEdit.GetRectGutter(var R: TRect);
