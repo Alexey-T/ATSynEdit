@@ -573,9 +573,11 @@ type
     FMinimapCachedPainting: boolean;
     FMinimapHiliteLinesWithSelection: boolean;
     FMicromapWidth: integer;
-    FMicromapColumns: array of integer;
+    FMicromapColumns: array of record NWidthPercents, NWidthPixels, NLeft, NRight: integer; end;
     FMicromapWidthPercents: integer;
     FMicromapVisible: boolean;
+    FMicromapScaleMul: integer;
+    FMicromapScaleDiv: integer;
     FFoldedMarkList: TATFoldedMarks;
     FFoldedMarkCurrent: TATFoldedMark;
     FFoldedMarkTooltip: TPanel;
@@ -1128,6 +1130,7 @@ type
     property RectMicromap: TRect read FRectMicromap;
     property RectRuler: TRect read FRectRuler;
     function IndentString: string;
+    function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read FGutterDecor;
@@ -2305,10 +2308,20 @@ begin
   FCharSizeMinimap.Y:= EditorScale(2);
 
   FNumbersIndent:= FCharSize.X * FOptNumbersIndentPercents div 100;
-  FMicromapWidth:= FCharSize.X * FMicromapWidthPercents div 100;
-  for i:= 0 to Length(FMicromapColumns)-1 do
-    Inc(FMicromapWidth, FCharSize.X * FMicromapColumns[i] div 100);
   FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
+  FMicromapWidth:= FCharSize.X * FMicromapWidthPercents div 100;
+
+  for i:= 0 to Length(FMicromapColumns)-1 do
+    with FMicromapColumns[i] do
+    begin
+      if i=0 then
+        NLeft:= FMicromapWidth
+      else
+        NLeft:= FMicromapColumns[i-1].NRight;
+      NWidthPixels:= FCharSize.X * FMicromapColumns[i].NWidthPercents div 100;
+      NRight:= NLeft+NWidthPixels;
+      Inc(FMicromapWidth, NWidthPixels);
+    end;
 
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize(C);
@@ -2321,6 +2334,9 @@ begin
   GetRectGutter(FRectGutter);
   GetRectMain(FRectMain); //after gutter/minimap/micromap
   GetRectRuler(FRectRuler); //after main
+
+  FMicromapScaleMul:= FRectMicromap.Height;
+  FMicromapScaleDiv:= Max(1, Strings.Count);
 
   UpdateWrapInfo;
 
@@ -7117,7 +7133,7 @@ var
 begin
   Result:= '';
   for i:= 0 to Length(FMicromapColumns)-1 do
-    Result:= Result + IntToStr(FMicromapColumns[i]) + ',';
+    Result:= Result + IntToStr(FMicromapColumns[i].NWidthPercents) + ',';
   SetLength(Result, Length(Result)-1);
 end;
 
@@ -7141,8 +7157,32 @@ begin
       AValue:= '';
     end;
     SetLength(FMicromapColumns, Length(FMicromapColumns)+1);
-    FMicromapColumns[Length(FMicromapColumns)-1]:= NVal;
+    FMicromapColumns[Length(FMicromapColumns)-1].NWidthPercents:= NVal;
   until AValue='';
+end;
+
+function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
+begin
+  Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * FMicromapScaleMul div FMicromapScaleDiv;
+  Result.Bottom:= Max(Result.Top+2,
+               FRectMicromap.Top + Int64(ALineTo+1) * FMicromapScaleMul div FMicromapScaleDiv);
+
+  if Length(FMicromapColumns)=0 then
+  begin
+    Result.Left:= FRectMicromap.Left;
+    Result.Right:= FRectMicromap.Right;
+  end
+  else
+  if AColumn<=0 then
+  begin
+    Result.Left:= FRectMicromap.Left;
+    Result.Right:= FMicromapColumns[1].NLeft;
+  end
+  else
+  begin
+    Result.Left:= FMicromapColumns[AColumn-1].NLeft;
+    Result.Right:= FMicromapColumns[AColumn-1].NRight;
+  end;
 end;
 
 
