@@ -74,7 +74,7 @@ type
   TATLinePartClass = class
   public
     Data: TATLinePart;
-    ShowOnMap: boolean;
+    Column: integer;
   end;
 
 const
