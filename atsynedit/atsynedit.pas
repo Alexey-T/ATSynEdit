@@ -2249,7 +2249,7 @@ begin
   R.Top:= 0;
   R.Bottom:= ClientHeight;
   R.Right:= ClientWidth;
-  R.Left:= R.Right-EditorScale(FMicromapWidth);
+  R.Left:= R.Right-FMicromapWidth; //FMicromapWidth is already scaled to font size
 end;
 
 procedure TATSynEdit.GetRectGutter(var R: TRect);
