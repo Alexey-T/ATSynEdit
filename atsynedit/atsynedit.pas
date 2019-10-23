@@ -7122,16 +7122,24 @@ begin
 end;
 
 procedure TATSynEdit.SetMicromapCustomColumns(AValue: string);
+const
+  cDefaultSize = 50;
 var
   NPos, NVal: integer;
 begin
   SetLength(FMicromapColumns, 0);
   repeat
     NPos:= Pos(',', AValue);
-    if NPos=0 then
-      NPos:= Length(AValue)+1;
-    NVal:= StrToIntDef(Copy(AValue, 1, NPos-1), 50);
-    Delete(AValue, 1, NPos);
+    if NPos>0 then
+    begin
+      NVal:= StrToIntDef(Copy(AValue, 1, NPos-1), cDefaultSize);
+      Delete(AValue, 1, NPos);
+    end
+    else
+    begin
+      NVal:= StrToIntDef(AValue, cDefaultSize);
+      AValue:= '';
+    end;
     SetLength(FMicromapColumns, Length(FMicromapColumns)+1);
     FMicromapColumns[Length(FMicromapColumns)-1]:= NVal;
   until AValue='';
