@@ -574,7 +574,6 @@ type
     FMinimapHiliteLinesWithSelection: boolean;
     FMicromapColumns: array of record NWidthPercents, NWidthPixels, NLeft, NRight: integer; end;
     FMicromapVisible: boolean;
-    FMicromapScaleMul: integer;
     FMicromapScaleDiv: integer;
     FFoldedMarkList: TATFoldedMarks;
     FFoldedMarkCurrent: TATFoldedMark;
@@ -2253,7 +2252,7 @@ begin
   for i:= 0 to Length(FMicromapColumns)-1 do
     with FMicromapColumns[i] do
     begin
-      NWidthPixels:= FCharSize.X * FMicromapColumns[i].NWidthPercents div 100;
+      NWidthPixels:= FCharSize.X * NWidthPercents div 100;
       Inc(NSize, NWidthPixels);
     end;
 
@@ -2278,7 +2277,6 @@ begin
       NRight:= NLeft+NWidthPixels;
     end;
 
-  FMicromapScaleMul:= R.Height;
   FMicromapScaleDiv:= Max(1, Strings.Count);
 end;
 
@@ -7184,10 +7182,13 @@ begin
 end;
 
 function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
+var
+  H: integer;
 begin
-  Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * FMicromapScaleMul div FMicromapScaleDiv;
+  H:= FRectMicromap.Height;
+  Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * H div FMicromapScaleDiv;
   Result.Bottom:= Max(Result.Top+2,
-               FRectMicromap.Top + Int64(ALineTo+1) * FMicromapScaleMul div FMicromapScaleDiv);
+               FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv);
 
   Result.Left:= FMicromapColumns[AColumn].NLeft;
   Result.Right:= FMicromapColumns[AColumn].NRight;
