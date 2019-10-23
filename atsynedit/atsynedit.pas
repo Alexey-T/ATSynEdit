@@ -572,9 +572,7 @@ type
     FMinimapTooltip: TPanel;
     FMinimapCachedPainting: boolean;
     FMinimapHiliteLinesWithSelection: boolean;
-    FMicromapWidth: integer;
     FMicromapColumns: array of record NWidthPercents, NWidthPixels, NLeft, NRight: integer; end;
-    FMicromapWidthPercents: integer;
     FMicromapVisible: boolean;
     FMicromapScaleMul: integer;
     FMicromapScaleDiv: integer;
@@ -759,7 +757,9 @@ type
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
     function GetMicromapCustomColumns: string;
+    function GetMicromapWidthPercents: integer;
     procedure SetMicromapCustomColumns(AValue: string);
+    procedure SetMicromapWidthPercents(AValue: integer);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1467,7 +1467,7 @@ type
     property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
-    property OptMicromapWidthPercents: integer read FMicromapWidthPercents write FMicromapWidthPercents default cInitMicromapWidthPercents;
+    property OptMicromapWidthPercents: integer read GetMicromapWidthPercents write SetMicromapWidthPercents default cInitMicromapWidthPercents;
     property OptMicromapCustomColumns: string read GetMicromapCustomColumns write SetMicromapCustomColumns;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
@@ -1685,7 +1685,7 @@ begin
   begin
     FMinimapWidth:= ClientWidth-FTextOffset.X;
     if FMicromapVisible then
-      Dec(FMinimapWidth, FMicromapWidth);
+      Dec(FMinimapWidth, FRectMicromap.Width);
     FMinimapWidth:= FMinimapWidth * CharSmall div (CharSmall+CharBig);
   end
   else
@@ -2246,7 +2246,17 @@ begin
 end;
 
 procedure TATSynEdit.GetRectMicromap(var R: TRect);
+var
+  NSize, i: integer;
 begin
+  NSize:= 0;
+  for i:= 0 to Length(FMicromapColumns)-1 do
+    with FMicromapColumns[i] do
+    begin
+      NWidthPixels:= FCharSize.X * FMicromapColumns[i].NWidthPercents div 100;
+      Inc(NSize, NWidthPixels);
+    end;
+
   if not FMicromapVisible then
   begin
     R:= cRectEmpty;
@@ -2256,7 +2266,20 @@ begin
   R.Top:= 0;
   R.Bottom:= ClientHeight;
   R.Right:= ClientWidth;
-  R.Left:= R.Right-FMicromapWidth; //FMicromapWidth is already scaled to font size
+  R.Left:= R.Right-NSize;
+
+  for i:= 0 to Length(FMicromapColumns)-1 do
+    with FMicromapColumns[i] do
+    begin
+      if i=0 then
+        NLeft:= R.Left
+      else
+        NLeft:= FMicromapColumns[i-1].NRight;
+      NRight:= NLeft+NWidthPixels;
+    end;
+
+  FMicromapScaleMul:= R.Height;
+  FMicromapScaleDiv:= Max(1, Strings.Count);
 end;
 
 procedure TATSynEdit.GetRectGutter(var R: TRect);
@@ -2292,8 +2315,6 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
-var
-  i: integer;
 begin
   if csLoading in ComponentState then Exit;
 
@@ -2309,19 +2330,6 @@ begin
 
   FNumbersIndent:= FCharSize.X * FOptNumbersIndentPercents div 100;
   FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
-  FMicromapWidth:= FCharSize.X * FMicromapWidthPercents div 100;
-
-  for i:= 0 to Length(FMicromapColumns)-1 do
-    with FMicromapColumns[i] do
-    begin
-      if i=0 then
-        NLeft:= FMicromapWidth
-      else
-        NLeft:= FMicromapColumns[i-1].NRight;
-      NWidthPixels:= FCharSize.X * FMicromapColumns[i].NWidthPercents div 100;
-      NRight:= NLeft+NWidthPixels;
-      Inc(FMicromapWidth, NWidthPixels);
-    end;
 
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize(C);
@@ -2334,9 +2342,6 @@ begin
   GetRectGutter(FRectGutter);
   GetRectMain(FRectMain); //after gutter/minimap/micromap
   GetRectRuler(FRectRuler); //after main
-
-  FMicromapScaleMul:= FRectMicromap.Height;
-  FMicromapScaleDiv:= Max(1, Strings.Count);
 
   UpdateWrapInfo;
 
@@ -3511,8 +3516,15 @@ begin
   FMinimapTooltip.BorderStyle:= bsNone;
   FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
 
-  FMicromapWidthPercents:= cInitMicromapWidthPercents;
   FMicromapVisible:= cInitMicromapVisible;
+  SetLength(FMicromapColumns, 1);
+  with FMicromapColumns[0] do
+  begin
+    NWidthPercents:= cInitMicromapWidthPercents;;
+    NWidthPixels:= 0;
+    NLeft:= 0;
+    NRight:= 0;
+  end;
 
   FFoldedMarkTooltip:= TPanel.Create(Self);
   FFoldedMarkTooltip.Hide;
@@ -7132,9 +7144,14 @@ var
   i: integer;
 begin
   Result:= '';
-  for i:= 0 to Length(FMicromapColumns)-1 do
+  for i:= 1 to Length(FMicromapColumns)-1 do
     Result:= Result + IntToStr(FMicromapColumns[i].NWidthPercents) + ',';
   SetLength(Result, Length(Result)-1);
+end;
+
+function TATSynEdit.GetMicromapWidthPercents: integer;
+begin
+  Result:= FMicromapColumns[0].NWidthPercents;
 end;
 
 procedure TATSynEdit.SetMicromapCustomColumns(AValue: string);
@@ -7143,7 +7160,7 @@ const
 var
   NPos, NVal: integer;
 begin
-  SetLength(FMicromapColumns, 0);
+  SetLength(FMicromapColumns, 1);
   repeat
     NPos:= Pos(',', AValue);
     if NPos>0 then
@@ -7161,28 +7178,19 @@ begin
   until AValue='';
 end;
 
+procedure TATSynEdit.SetMicromapWidthPercents(AValue: integer);
+begin
+  FMicromapColumns[0].NWidthPercents:= AValue;
+end;
+
 function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
 begin
   Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * FMicromapScaleMul div FMicromapScaleDiv;
   Result.Bottom:= Max(Result.Top+2,
                FRectMicromap.Top + Int64(ALineTo+1) * FMicromapScaleMul div FMicromapScaleDiv);
 
-  if Length(FMicromapColumns)=0 then
-  begin
-    Result.Left:= FRectMicromap.Left;
-    Result.Right:= FRectMicromap.Right;
-  end
-  else
-  if AColumn<=0 then
-  begin
-    Result.Left:= FRectMicromap.Left;
-    Result.Right:= FMicromapColumns[1].NLeft;
-  end
-  else
-  begin
-    Result.Left:= FMicromapColumns[AColumn-1].NLeft;
-    Result.Right:= FMicromapColumns[AColumn-1].NRight;
-  end;
+  Result.Left:= FMicromapColumns[AColumn].NLeft;
+  Result.Right:= FMicromapColumns[AColumn].NRight;
 end;
 
 
