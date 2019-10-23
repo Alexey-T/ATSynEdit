@@ -573,6 +573,7 @@ type
     FMinimapCachedPainting: boolean;
     FMinimapHiliteLinesWithSelection: boolean;
     FMicromapWidth: integer;
+    FMicromapColumns: array of integer;
     FMicromapWidthPercents: integer;
     FMicromapVisible: boolean;
     FFoldedMarkList: TATFoldedMarks;
@@ -755,6 +756,8 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
+    function GetMicromapCustomColumns: string;
+    procedure SetMicromapCustomColumns(AValue: string);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1462,6 +1465,7 @@ type
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapWidthPercents: integer read FMicromapWidthPercents write FMicromapWidthPercents default cInitMicromapWidthPercents;
+    property OptMicromapCustomColumns: string read GetMicromapCustomColumns write SetMicromapCustomColumns;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
@@ -2285,6 +2289,8 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
+var
+  i: integer;
 begin
   if csLoading in ComponentState then Exit;
 
@@ -2300,6 +2306,8 @@ begin
 
   FNumbersIndent:= FCharSize.X * FOptNumbersIndentPercents div 100;
   FMicromapWidth:= FCharSize.X * FMicromapWidthPercents div 100;
+  for i:= 0 to Length(FMicromapColumns)-1 do
+    Inc(FMicromapWidth, FCharSize.X * FMicromapColumns[i] div 100);
   FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
 
   if FOptGutterVisible and FOptNumbersAutosize then
@@ -7102,6 +7110,33 @@ begin
       Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
   end;
 end;
+
+function TATSynEdit.GetMicromapCustomColumns: string;
+var
+  i: integer;
+begin
+  Result:= '';
+  for i:= 0 to Length(FMicromapColumns)-1 do
+    Result:= Result + IntToStr(FMicromapColumns[i]) + ',';
+  SetLength(Result, Length(Result)-1);
+end;
+
+procedure TATSynEdit.SetMicromapCustomColumns(AValue: string);
+var
+  NPos, NVal: integer;
+begin
+  SetLength(FMicromapColumns, 0);
+  repeat
+    NPos:= Pos(',', AValue);
+    if NPos=0 then
+      NPos:= Length(AValue)+1;
+    NVal:= StrToIntDef(Copy(AValue, 1, NPos-1), 50);
+    Delete(AValue, 1, NPos);
+    SetLength(FMicromapColumns, Length(FMicromapColumns)+1);
+    FMicromapColumns[Length(FMicromapColumns)-1]:= NVal;
+  until AValue='';
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
