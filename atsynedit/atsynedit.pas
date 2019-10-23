@@ -755,8 +755,8 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
-    function GetMicromapColumns: string;
-    procedure SetMicromapColumns(AValue: string);
+    function GetMicromapColumnWidths: TATIntArray;
+    procedure SetMicromapColumnWidths(const AValue: TATIntArray);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1237,6 +1237,7 @@ type
     function GetCacheDump: string;
     procedure DoConvertIndentation(ASpacesToTabs: boolean);
     procedure DoConvertTabsToSpaces;
+    property OptMicromapColumnWidths: TATIntArray read GetMicromapColumnWidths write SetMicromapColumnWidths;
 
   protected
     procedure Paint; override;
@@ -1464,7 +1465,6 @@ type
     property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
-    property OptMicromapColumns: string read GetMicromapColumns write SetMicromapColumns;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
@@ -7134,38 +7134,22 @@ begin
   end;
 end;
 
-function TATSynEdit.GetMicromapColumns: string;
+function TATSynEdit.GetMicromapColumnWidths: TATIntArray;
 var
   i: integer;
 begin
-  Result:= '';
-  for i:= 0 to Length(FMicromapColumns)-1 do
-    Result:= Result + IntToStr(FMicromapColumns[i].NWidthPercents) + ',';
-  SetLength(Result, Length(Result)-1);
+  SetLength(Result, Length(FMicromapColumns));
+  for i:= 0 to Length(Result)-1 do
+    Result[i]:= FMicromapColumns[i].NWidthPercents;
 end;
 
-procedure TATSynEdit.SetMicromapColumns(AValue: string);
-const
-  cDefaultSize = 50;
+procedure TATSynEdit.SetMicromapColumnWidths(const AValue: TATIntArray);
 var
-  NPos, NVal: integer;
+  i: integer;
 begin
-  SetLength(FMicromapColumns, 0);
-  repeat
-    NPos:= Pos(',', AValue);
-    if NPos>0 then
-    begin
-      NVal:= StrToIntDef(Copy(AValue, 1, NPos-1), cDefaultSize);
-      Delete(AValue, 1, NPos);
-    end
-    else
-    begin
-      NVal:= StrToIntDef(AValue, cDefaultSize);
-      AValue:= '';
-    end;
-    SetLength(FMicromapColumns, Length(FMicromapColumns)+1);
-    FMicromapColumns[Length(FMicromapColumns)-1].NWidthPercents:= NVal;
-  until AValue='';
+  SetLength(FMicromapColumns, Length(AValue));
+  for i:= 0 to Length(AValue)-1 do
+    FMicromapColumns[i].NWidthPercents:= AValue[i];
 end;
 
 function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
