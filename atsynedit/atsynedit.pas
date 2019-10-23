@@ -755,10 +755,8 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
-    function GetMicromapCustomColumns: string;
-    function GetMicromapWidthPercents: integer;
-    procedure SetMicromapCustomColumns(AValue: string);
-    procedure SetMicromapWidthPercents(AValue: integer);
+    function GetMicromapColumns: string;
+    procedure SetMicromapColumns(AValue: string);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1466,8 +1464,7 @@ type
     property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
-    property OptMicromapWidthPercents: integer read GetMicromapWidthPercents write SetMicromapWidthPercents default cInitMicromapWidthPercents;
-    property OptMicromapCustomColumns: string read GetMicromapCustomColumns write SetMicromapCustomColumns;
+    property OptMicromapColumns: string read GetMicromapColumns write SetMicromapColumns;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
@@ -7137,28 +7134,23 @@ begin
   end;
 end;
 
-function TATSynEdit.GetMicromapCustomColumns: string;
+function TATSynEdit.GetMicromapColumns: string;
 var
   i: integer;
 begin
   Result:= '';
-  for i:= 1 to Length(FMicromapColumns)-1 do
+  for i:= 0 to Length(FMicromapColumns)-1 do
     Result:= Result + IntToStr(FMicromapColumns[i].NWidthPercents) + ',';
   SetLength(Result, Length(Result)-1);
 end;
 
-function TATSynEdit.GetMicromapWidthPercents: integer;
-begin
-  Result:= FMicromapColumns[0].NWidthPercents;
-end;
-
-procedure TATSynEdit.SetMicromapCustomColumns(AValue: string);
+procedure TATSynEdit.SetMicromapColumns(AValue: string);
 const
   cDefaultSize = 50;
 var
   NPos, NVal: integer;
 begin
-  SetLength(FMicromapColumns, 1);
+  SetLength(FMicromapColumns, 0);
   repeat
     NPos:= Pos(',', AValue);
     if NPos>0 then
@@ -7174,11 +7166,6 @@ begin
     SetLength(FMicromapColumns, Length(FMicromapColumns)+1);
     FMicromapColumns[Length(FMicromapColumns)-1].NWidthPercents:= NVal;
   until AValue='';
-end;
-
-procedure TATSynEdit.SetMicromapWidthPercents(AValue: integer);
-begin
-  FMicromapColumns[0].NWidthPercents:= AValue;
 end;
 
 function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
