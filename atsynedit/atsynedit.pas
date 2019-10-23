@@ -266,7 +266,7 @@ const
   cInitShowMouseSelFrame = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
-  cInitMicromapWidthPercents = 150;
+  cInitMicromapWidthPercents = 100;
   cInitMinimapWidth = 160;
   cInitNumbersStyle = cNumbersEach5th;
   cInitNumbersIndentPercents = 60;
