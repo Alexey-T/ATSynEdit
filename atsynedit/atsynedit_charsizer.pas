@@ -34,7 +34,7 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Init(const AFontName: string; AFontSize: integer);
-    function GetCharWidth(ch: widechar): integer;
+    function GetCharWidth(ch: WideChar): integer;
     function GetStrWidth(const S: WideString): integer;
   end;
 
@@ -189,9 +189,11 @@ begin
   inherited;
 end;
 
-function TATCharSizer.GetCharWidth(ch: widechar): integer;
+function TATCharSizer.GetCharWidth(ch: WideChar): integer;
 begin
   Result:= 100;
+
+  if (Ord(ch)>=32) and (Ord(ch)<128) then exit;
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
