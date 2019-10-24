@@ -1058,7 +1058,7 @@ type
     MenuitemTextUndo: TMenuItem;
     MenuitemTextRedo: TMenuItem;
     TagString: string; //to store plugin specific data in CudaText
-    OptMicromapColumns: array of TATMicromapColumn;
+    MicromapColumns: array of TATMicromapColumn;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -2251,8 +2251,8 @@ var
   NSize, i: integer;
 begin
   NSize:= 0;
-  for i:= 0 to Length(OptMicromapColumns)-1 do
-    with OptMicromapColumns[i] do
+  for i:= 0 to Length(MicromapColumns)-1 do
+    with MicromapColumns[i] do
     begin
       NWidthPixels:= FCharSize.X * NWidthPercents div 100;
       Inc(NSize, NWidthPixels);
@@ -2269,13 +2269,13 @@ begin
   R.Right:= ClientWidth;
   R.Left:= R.Right-NSize;
 
-  for i:= 0 to Length(OptMicromapColumns)-1 do
-    with OptMicromapColumns[i] do
+  for i:= 0 to Length(MicromapColumns)-1 do
+    with MicromapColumns[i] do
     begin
       if i=0 then
         NLeft:= R.Left
       else
-        NLeft:= OptMicromapColumns[i-1].NRight;
+        NLeft:= MicromapColumns[i-1].NRight;
       NRight:= NLeft+NWidthPixels;
     end;
 
@@ -3517,8 +3517,8 @@ begin
   FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
 
   FMicromapVisible:= cInitMicromapVisible;
-  SetLength(OptMicromapColumns, 1);
-  with OptMicromapColumns[0] do
+  SetLength(MicromapColumns, 1);
+  with MicromapColumns[0] do
   begin
     NWidthPercents:= cInitMicromapWidthPercents;
     NTag:= 0;
@@ -7141,7 +7141,7 @@ function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRec
 var
   H: integer;
 begin
-  if (AColumn<0) or (AColumn>=Length(OptMicromapColumns)) then
+  if (AColumn<0) or (AColumn>=Length(MicromapColumns)) then
     exit(cRectEmpty);
 
   H:= FRectMicromap.Height;
@@ -7149,7 +7149,7 @@ begin
   Result.Bottom:= Max(Result.Top+2,
                FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv);
 
-  with OptMicromapColumns[AColumn] do
+  with MicromapColumns[AColumn] do
   begin
     Result.Left:= NLeft;
     Result.Right:= NRight;
@@ -7160,8 +7160,8 @@ function TATSynEdit.MicromapGetColumnFromTag(const ATag: Int64): integer;
 var
   i: integer;
 begin
-  for i:= 0 to Length(OptMicromapColumns)-1 do
-    with OptMicromapColumns[i] do
+  for i:= 0 to Length(MicromapColumns)-1 do
+    with MicromapColumns[i] do
       if NTag=ATag then
         exit(i);
   Result:= -1;
@@ -7172,12 +7172,12 @@ var
   NCol, NLen, i: integer;
 begin
   NCol:= MicromapGetColumnFromTag(ATag);
-  NLen:= Length(OptMicromapColumns);
+  NLen:= Length(MicromapColumns);
   if (NCol>0) and (NCol<NLen) then //don't allow to delete column-0
   begin
     for i:= NCol to NLen-2 do
-      OptMicromapColumns[i]:= OptMicromapColumns[i+1];
-    SetLength(OptMicromapColumns, NLen-1);
+      MicromapColumns[i]:= MicromapColumns[i+1];
+    SetLength(MicromapColumns, NLen-1);
     Update;
     Result:= true;
   end
