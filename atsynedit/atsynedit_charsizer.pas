@@ -12,7 +12,7 @@ uses
   {$ifdef windows}
   Windows,
   {$endif}
-  Classes, SysUtils, Graphics, Dialogs,
+  Classes, SysUtils, Graphics,
   Math,
   UnicodeData,
   LCLType, LCLIntf;
@@ -29,7 +29,7 @@ type
     Bitmap: TBitmap;
     SizeAvg: integer;
     Sizes: packed array[word] of byte; //width of WideChars, divided by SizeAvg, divided by SaveScale
-    function GetCharWidth_FromCache(ch: widechar): integer;
+    function GetCharWidth_FromCache(ch: WideChar): integer;
   public
     constructor Create;
     destructor Destroy; override;
@@ -61,19 +61,19 @@ var
   OptHexChars: UnicodeString = ''; //show these chars as "<NNNN>"
   OptHexCharsDefault: UnicodeString = ''; //recommended default for OptHexChars
 
-function IsCharAsciiControl(ch: widechar): boolean; inline;
-function IsCharAccent(ch: widechar): boolean;
-function IsCharHex(ch: widechar): boolean;
+function IsCharAsciiControl(ch: WideChar): boolean; inline;
+function IsCharAccent(ch: WideChar): boolean;
+function IsCharHex(ch: WideChar): boolean;
 
 
 implementation
 
-function IsCharAsciiControl(ch: widechar): boolean; inline;
+function IsCharAsciiControl(ch: WideChar): boolean; inline;
 begin
   Result:= (ch<>#9) and (Ord(ch)<$20);
 end;
 
-function IsCharFullWidth(ch: widechar): boolean;
+function IsCharFullWidth(ch: WideChar): boolean;
 begin
   Result:= false;
   if ch=#$2026 then exit; //unicode dots
@@ -92,7 +92,7 @@ end;
 http://unicode.org/reports/tr9/#Directional_Formatting_Characters
 https://en.wikipedia.org/wiki/Whitespace_character#Unicode
 }
-function IsCharHex(ch: widechar): boolean;
+function IsCharHex(ch: WideChar): boolean;
 begin
   if ch=#9 then exit(false);
   if ch<#$20 then exit(true);
@@ -125,7 +125,7 @@ http://www.unicode.org/charts/PDF/U0E80.pdf
 cannot render them ok anyway as accents:
 0EB1, 0EB4..0EBC, 0EC8..0ECD
 }
-function IsCharAccent(ch: widechar): boolean;
+function IsCharAccent(ch: WideChar): boolean;
 begin
   case GetProps(Ord(ch))^.Category of
     UGC_NonSpacingMark .. UGC_EnclosingMark:
@@ -166,7 +166,7 @@ begin
   SizeAvg:= Bitmap.Canvas.TextWidth('M');
 end;
 
-function TATCharSizer.GetCharWidth_FromCache(ch: widechar): integer;
+function TATCharSizer.GetCharWidth_FromCache(ch: WideChar): integer;
 begin
   Result:= Sizes[Ord(ch)] * SaveScale;
   if Result=0 then
