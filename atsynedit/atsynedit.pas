@@ -1133,6 +1133,7 @@ type
     function IndentString: string;
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
     function MicromapGetColumnFromTag(const ATag: Int64): integer;
+    function MicromapAddColumn(const ATag: Int64; AWidthPercents: integer): boolean;
     function MicromapDeleteColumn(const ATag: Int64): boolean;
     //gutter
     property Gutter: TATGutter read FGutter;
@@ -7165,6 +7166,20 @@ begin
       if NTag=ATag then
         exit(i);
   Result:= -1;
+end;
+
+function TATSynEdit.MicromapAddColumn(const ATag: Int64; AWidthPercents: integer): boolean;
+begin
+  Result:= MicromapGetColumnFromTag(ATag)<0;
+  if Result then
+  begin
+    SetLength(MicromapColumns, Length(MicromapColumns)+1);
+    with MicromapColumns[Length(MicromapColumns)-1] do
+    begin
+      NTag:= ATag;
+      NWidthPercents:= AWidthPercents;
+    end;
+  end;
 end;
 
 function TATSynEdit.MicromapDeleteColumn(const ATag: Int64): boolean;
