@@ -441,7 +441,7 @@ Example of usage: in HTML file, app can find all HTML color tokens #rrggbb, add 
 
 ===Micromap object===
 
-type TATMicromap in unit atsynedit_micromap. Holds list of micromap's columns. The micromap is shown by ATSynEdit property OptMicromapVisible and must be painted by the app via OnDrawMicromap event. Micromap object has Columns property, "array of TATMicromapColumn".
+type TATMicromap in unit atsynedit_micromap. Holds list of micromap's columns (by default only one column is added, and CudaText adds 2nd column to paint marks from plugins). The micromap is shown by ATSynEdit property OptMicromapVisible and must be painted by the app via OnDrawMicromap event. Micromap object has Columns property, "array of TATMicromapColumn".
 
 Type TATMicromapColumn is record with the fields:
 
@@ -449,7 +449,7 @@ Type TATMicromapColumn is record with the fields:
 * NWidthPercents: Width of column in percents of average char width - app can change this
 * NWidthPixels: Width of column in pixels - auto calculated, app must not change this
 * NLeft, NRight: Control-related coordinates of column left and right edge - auto calculated, app must not change this
-       
+
 Micromap object holds Columns prop, and several methods to add/delete columns: ColumnAdd, ColumnDelete, and method ColumnFromTag to find columns by int tag. Application can paint anything on micromap, but it's recommented to paint small marks per editor lines. To get coordinates of such marks, use ATSynEdit method RectMicromapMark, it does calculations to get coords for all editor lines, to fill the entire micromap.
 
 == What are the basic methods/properties? ==
