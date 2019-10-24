@@ -22,14 +22,13 @@ type
 
   TATCharSizer = class
   private
-    const SaveScale=10;
+    const SaveScale=3; //max stored char width (in %) is 255*SaveScale
   private
     FontName: string;
     FontSize: integer;
     Panel: TPanel;
     SizeAvg: integer;
-    Sizes: packed array[word] of byte;
-      //width of WideChars, divided by SizeAvg, divided by SaveScale
+    Sizes: packed array[word] of byte; //width of WideChars, divided by SizeAvg, divided by SaveScale
     function GetCharWidth_FromCache(ch: widechar): integer;
   public
     constructor Create;
