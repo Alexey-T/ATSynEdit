@@ -21,10 +21,13 @@ type
 
   TATCharSizer = class
   private
+    const SaveScale=10;
+  private
     FontName: string;
     FontSize: integer;
     Canvas: TCanvas;
-    Sizes: packed array[word] of word;
+    Sizes: packed array[word] of byte;
+      //width of WideChars, divided by SizeAvg, divided by SaveScale
     SizeAvg: integer;
     function GetCharWidth_FromCache(ch: widechar): integer;
   public
@@ -163,7 +166,7 @@ end;
 
 function TATCharSizer.GetCharWidth_FromCache(ch: widechar): integer;
 begin
-  Result:= Sizes[Ord(ch)];
+  Result:= Sizes[Ord(ch)] * SaveScale;
   if Result=0 then
   begin
     if Canvas=nil then
@@ -172,7 +175,7 @@ begin
       exit(8); //some char width
     end;
     Result:= _WidestrWidth(Canvas, WideString(ch)) * 100 div SizeAvg;
-    Sizes[Ord(ch)]:= Result;
+    Sizes[Ord(ch)]:= Result div SaveScale;
   end;
 end;
 
