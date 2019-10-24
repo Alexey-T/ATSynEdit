@@ -5,7 +5,6 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Micromap;
 
 {$mode objfpc}{$H+}
-{$ModeSwitch advancedrecords}
 
 interface
 
