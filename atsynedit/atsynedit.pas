@@ -1759,7 +1759,7 @@ begin
     //must have, coz method can be called before 1st paint,
     //so TCanvas.TextWidth will give exception (control has no parent window)
 
-  GlobalCharSizer.Init(Font.Name, EditorScaleFont(Font.Size), Canvas);
+  GlobalCharSizer.Init(Font.Name, EditorScaleFont(Font.Size));
 
   //virtual mode allows faster usage of WrapInfo
   FWrapInfo.StringsObj:= Strings;
@@ -3253,6 +3253,10 @@ var
   i: integer;
 begin
   inherited;
+
+  //GlobalCharSizer should be created after MainForm is inited
+  if not Assigned(GlobalCharSizer) then
+    GlobalCharSizer:= TATCharSizer.Create;
 
   if not Assigned(cBitmapNiceScroll) then
     InitResources;

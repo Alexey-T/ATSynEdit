@@ -13,6 +13,7 @@ uses
   Windows,
   {$endif}
   Classes, SysUtils, Graphics, Dialogs,
+  Forms, ExtCtrls,
   UnicodeData,
   LCLType, LCLIntf;
 
@@ -25,19 +26,22 @@ type
   private
     FontName: string;
     FontSize: integer;
-    Canvas: TCanvas;
+    Panel: TPanel;
+    SizeAvg: integer;
     Sizes: packed array[word] of byte;
       //width of WideChars, divided by SizeAvg, divided by SaveScale
-    SizeAvg: integer;
     function GetCharWidth_FromCache(ch: widechar): integer;
   public
-    procedure Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
+    constructor Create;
+    destructor Destroy; override;
+    procedure Init(const AFontName: string; AFontSize: integer);
     function GetCharWidth(ch: widechar): integer;
     function GetStrWidth(const S: WideString): integer;
   end;
 
 var
-  GlobalCharSizer: TATCharSizer;
+  GlobalCharSizer: TATCharSizer = nil;
+  //should be created after MainForm is initialized, e.g. in TATSynEdit.Create
 
 var
   OptCharSizeProportional: boolean = true;
@@ -149,7 +153,7 @@ end;
 
 { TATCharSizer }
 
-procedure TATCharSizer.Init(const AFontName: string; AFontSize: integer; ACanvas: TCanvas);
+procedure TATCharSizer.Init(const AFontName: string; AFontSize: integer);
 begin
   if (FontName<>AFontName) or (FontSize<>AFontSize) then
   begin
@@ -157,11 +161,10 @@ begin
     FontSize:= AFontSize;
     FillChar(Sizes, SizeOf(Sizes), 0);
   end;
-  Canvas:= ACanvas;
-  Canvas.Font.Name:= AFontName;
-  Canvas.Font.Size:= AFontSize;
-  Canvas.Font.Style:= [];
-  SizeAvg:= Canvas.TextWidth('M');
+  Panel.Canvas.Font.Name:= AFontName;
+  Panel.Canvas.Font.Size:= AFontSize;
+  Panel.Canvas.Font.Style:= [];
+  SizeAvg:= Panel.Canvas.TextWidth('M');
 end;
 
 function TATCharSizer.GetCharWidth_FromCache(ch: widechar): integer;
@@ -169,14 +172,22 @@ begin
   Result:= Sizes[Ord(ch)] * SaveScale;
   if Result=0 then
   begin
-    if Canvas=nil then
-    begin
-      ShowMessage('Program error: CharSize.Init was not called');
-      exit(8); //some char width
-    end;
-    Result:= _WidestrWidth(Canvas, WideString(ch)) * 100 div SizeAvg;
+    Result:= _WidestrWidth(Panel.Canvas, WideString(ch)) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Result div SaveScale;
   end;
+end;
+
+constructor TATCharSizer.Create;
+begin
+  Panel:= TPanel.Create(nil);
+  Panel.Hide;
+  Panel.Parent:= Application.MainForm;
+end;
+
+destructor TATCharSizer.Destroy;
+begin
+  FreeAndNil(Panel);
+  inherited;
 end;
 
 function TATCharSizer.GetCharWidth(ch: widechar): integer;
@@ -204,17 +215,14 @@ end;
 
 function TATCharSizer.GetStrWidth(const S: WideString): integer;
 begin
-  Result:= _WidestrWidth(Canvas, S) * 100 div SizeAvg;
+  Result:= _WidestrWidth(Panel.Canvas, S) * 100 div SizeAvg;
 end;
 
 
-initialization
-
-  GlobalCharSizer:= TATCharSizer.Create;
-
 finalization
 
-  FreeAndNil(GlobalCharSizer);
+  if Assigned(GlobalCharSizer) then
+    FreeAndNil(GlobalCharSizer);
 
 end.
 
