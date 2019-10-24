@@ -7170,7 +7170,7 @@ end;
 
 function TATSynEdit.MicromapAddColumn(const ATag: Int64; AWidthPercents: integer): boolean;
 begin
-  Result:= MicromapGetColumnFromTag(ATag)<0;
+  Result:= (MicromapGetColumnFromTag(ATag)<0) and (AWidthPercents>0);
   if Result then
   begin
     SetLength(MicromapColumns, Length(MicromapColumns)+1);
