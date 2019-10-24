@@ -13,7 +13,7 @@ uses
   Windows,
   {$endif}
   Classes, SysUtils, Graphics, Dialogs,
-  Forms, ExtCtrls, Math,
+  Math,
   UnicodeData,
   LCLType, LCLIntf;
 
@@ -26,7 +26,7 @@ type
   private
     FontName: string;
     FontSize: integer;
-    Panel: TPanel;
+    Bitmap: TBitmap;
     SizeAvg: integer;
     Sizes: packed array[word] of byte; //width of WideChars, divided by SizeAvg, divided by SaveScale
     function GetCharWidth_FromCache(ch: widechar): integer;
@@ -160,10 +160,10 @@ begin
     FontSize:= AFontSize;
     FillChar(Sizes, SizeOf(Sizes), 0);
   end;
-  Panel.Canvas.Font.Name:= AFontName;
-  Panel.Canvas.Font.Size:= AFontSize;
-  Panel.Canvas.Font.Style:= [];
-  SizeAvg:= Panel.Canvas.TextWidth('M');
+  Bitmap.Canvas.Font.Name:= AFontName;
+  Bitmap.Canvas.Font.Size:= AFontSize;
+  Bitmap.Canvas.Font.Style:= [];
+  SizeAvg:= Bitmap.Canvas.TextWidth('M');
 end;
 
 function TATCharSizer.GetCharWidth_FromCache(ch: widechar): integer;
@@ -171,21 +171,21 @@ begin
   Result:= Sizes[Ord(ch)] * SaveScale;
   if Result=0 then
   begin
-    Result:= _WidestrWidth(Panel.Canvas, WideString(ch)) * 100 div SizeAvg;
+    Result:= _WidestrWidth(Bitmap.Canvas, WideString(ch)) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Math.Min(255, Result div SaveScale);
   end;
 end;
 
 constructor TATCharSizer.Create;
 begin
-  Panel:= TPanel.Create(nil);
-  Panel.Hide;
-  Panel.Parent:= Application.MainForm;
+  Bitmap:= TBitmap.Create;
+  Bitmap.Width:= 50;
+  Bitmap.Height:= 20;
 end;
 
 destructor TATCharSizer.Destroy;
 begin
-  FreeAndNil(Panel);
+  FreeAndNil(Bitmap);
   inherited;
 end;
 
@@ -214,7 +214,7 @@ end;
 
 function TATCharSizer.GetStrWidth(const S: WideString): integer;
 begin
-  Result:= _WidestrWidth(Panel.Canvas, S) * 100 div SizeAvg;
+  Result:= _WidestrWidth(Bitmap.Canvas, S) * 100 div SizeAvg;
 end;
 
 
