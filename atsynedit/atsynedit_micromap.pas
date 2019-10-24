@@ -26,6 +26,7 @@ type
   public
     Columns: array of TATMicromapColumn;
     constructor Create;
+    function IsIndexValid(AIndex: integer): boolean;
     function ColumnFromTag(const ATag: Int64): integer;
     function ColumnAdd(const ATag: Int64; AWidthPercents: integer): boolean;
     function ColumnDelete(const ATag: Int64): boolean;
@@ -47,6 +48,11 @@ begin
     NWidthPercents:= 100;
     NTag:= 0;
   end;
+end;
+
+function TATMicromap.IsIndexValid(AIndex: integer): boolean;
+begin
+  Result:= (AIndex>=0) and (AIndex<Length(Columns));
 end;
 
 function TATMicromap.ColumnFromTag(const ATag: Int64): integer;
