@@ -22,7 +22,7 @@ type
 
   TATCharSizer = class
   private
-    const SaveScale=3; //max stored char width (in %) is 255*SaveScale
+    const SaveScale=2; //max stored char width (in %) is 255*SaveScale
   private
     FontName: string;
     FontSize: integer;
@@ -172,7 +172,7 @@ begin
   if Result=0 then
   begin
     Result:= _WidestrWidth(Panel.Canvas, WideString(ch)) * 100 div SizeAvg;
-    Sizes[Ord(ch)]:= Result div SaveScale;
+    Sizes[Ord(ch)]:= Min(255, Result div SaveScale);
   end;
 end;
 
