@@ -7179,6 +7179,7 @@ begin
       NTag:= ATag;
       NWidthPercents:= AWidthPercents;
     end;
+    Update;
   end;
 end;
 
@@ -7188,16 +7189,14 @@ var
 begin
   NCol:= MicromapGetColumnFromTag(ATag);
   NLen:= Length(MicromapColumns);
-  if (NCol>0) and (NCol<NLen) then //don't allow to delete column-0
+  Result:= (NCol>0) and (NCol<NLen); //don't allow to delete column-0
+  if Result then
   begin
     for i:= NCol to NLen-2 do
       MicromapColumns[i]:= MicromapColumns[i+1];
     SetLength(MicromapColumns, NLen-1);
     Update;
-    Result:= true;
-  end
-  else
-    Result:= false;
+  end;
 end;
 
 
