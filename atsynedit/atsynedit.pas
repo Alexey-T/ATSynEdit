@@ -7113,22 +7113,26 @@ begin
 end;
 
 function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
+const
+  cMinHeight = 2;
 var
   H: integer;
 begin
-  if (AColumn<0) or (AColumn>=Length(FMicromap.Columns)) then
-    exit(cRectEmpty);
-
-  H:= FRectMicromap.Height;
-  Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * H div FMicromapScaleDiv;
-  Result.Bottom:= Max(Result.Top+2,
-               FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv);
-
-  with FMicromap.Columns[AColumn] do
+  if FMicromap.IsIndexValid(AColumn) then
   begin
-    Result.Left:= NLeft;
-    Result.Right:= NRight;
-  end;
+    H:= FRectMicromap.Height;
+    Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * H div FMicromapScaleDiv;
+    Result.Bottom:= Max(Result.Top+cMinHeight,
+                 FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv);
+
+    with FMicromap.Columns[AColumn] do
+    begin
+      Result.Left:= NLeft;
+      Result.Right:= NRight;
+    end;
+  end
+  else
+    Result:= cRectEmpty;
 end;
 
 
