@@ -17,7 +17,7 @@ uses
   ATSynEdit_Export_HTML, ATSynEdit_Markers, ATSynEdit_RegExpr, 
   ATSynEdit_Adapter_Cache, ATSynEdit_Gaps, ATSynEdit_DimRanges, 
   ATSynEdit_Bookmarks, ATSynEdit_Gutter_Decor, ATSynEdit_fgl, 
-  LazarusPackageIntf;
+  ATSynEdit_Micromap, LazarusPackageIntf;
 
 implementation
 

@@ -52,7 +52,7 @@ end;
     <Description Value="Multi-line editor control, with much more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
     <Version Major="1" Minor="4"/>
-    <Files Count="32">
+    <Files Count="33">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -182,6 +182,10 @@ end;
         <Filename Value="atsynedit_fgl.pas"/>
         <UnitName Value="ATSynEdit_fgl"/>
       </Item32>
+      <Item33>
+        <Filename Value="atsynedit_micromap.pas"/>
+        <UnitName Value="ATSynEdit_Micromap"/>
+      </Item33>
     </Files>
     <RequiredPkgs Count="4">
       <Item1>

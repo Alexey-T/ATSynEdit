@@ -48,18 +48,13 @@ uses
   ATSynEdit_DimRanges,
   ATSynEdit_Gaps,
   ATSynEdit_Hotspots,
+  ATSynEdit_Micromap,
   ATSynEdit_Adapters,
   ATSynEdit_Adapter_Cache,
   ATSynEdit_FGL,
   ATScrollBar;
 
 type
-  TATMicromapColumn = record
-    NWidthPercents, NWidthPixels: integer;
-    NLeft, NRight: integer;
-    NTag: Int64;
-  end;
-
   TATPosDetails = record
     EndOfWrappedLine: boolean;
     OnGapItem: TATGapItem;
@@ -272,7 +267,6 @@ const
   cInitShowMouseSelFrame = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
-  cInitMicromapWidthPercents = 100;
   cInitMinimapWidth = 160;
   cInitNumbersStyle = cNumbersEach5th;
   cInitNumbersIndentPercents = 60;
@@ -578,6 +572,7 @@ type
     FMinimapTooltip: TPanel;
     FMinimapCachedPainting: boolean;
     FMinimapHiliteLinesWithSelection: boolean;
+    FMicromap: TATMicromap;
     FMicromapVisible: boolean;
     FMicromapScaleDiv: integer;
     FFoldedMarkList: TATFoldedMarks;
@@ -1058,7 +1053,6 @@ type
     MenuitemTextUndo: TMenuItem;
     MenuitemTextRedo: TMenuItem;
     TagString: string; //to store plugin specific data in CudaText
-    MicromapColumns: array of TATMicromapColumn;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -1086,6 +1080,7 @@ type
     property Carets: TATCarets read FCarets;
     property Markers: TATMarkers read FMarkers;
     property Attribs: TATMarkers read FAttribs;
+    property Micromap: TATMicromap read FMicromap;
     property DimRanges: TATDimRanges read FDimRanges;
     property Hotspots: TATHotspots read FHotspots;
     property Gaps: TATGaps read GetGaps;
@@ -1132,9 +1127,6 @@ type
     property RectRuler: TRect read FRectRuler;
     function IndentString: string;
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
-    function MicromapGetColumnFromTag(const ATag: Int64): integer;
-    function MicromapAddColumn(const ATag: Int64; AWidthPercents: integer): boolean;
-    function MicromapDeleteColumn(const ATag: Int64): boolean;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read FGutterDecor;
@@ -2252,8 +2244,8 @@ var
   NSize, i: integer;
 begin
   NSize:= 0;
-  for i:= 0 to Length(MicromapColumns)-1 do
-    with MicromapColumns[i] do
+  for i:= 0 to Length(FMicromap.Columns)-1 do
+    with FMicromap.Columns[i] do
     begin
       NWidthPixels:= FCharSize.X * NWidthPercents div 100;
       Inc(NSize, NWidthPixels);
@@ -2270,13 +2262,13 @@ begin
   R.Right:= ClientWidth;
   R.Left:= R.Right-NSize;
 
-  for i:= 0 to Length(MicromapColumns)-1 do
-    with MicromapColumns[i] do
+  for i:= 0 to Length(FMicromap.Columns)-1 do
+    with FMicromap.Columns[i] do
     begin
       if i=0 then
         NLeft:= R.Left
       else
-        NLeft:= MicromapColumns[i-1].NRight;
+        NLeft:= FMicromap.Columns[i-1].NRight;
       NRight:= NLeft+NWidthPixels;
     end;
 
@@ -2339,9 +2331,9 @@ begin
 
   FTextOffset:= GetTextOffset; //after gutter autosize
   GetRectMicromap(FRectMicromap);
-  GetRectMinimap(FRectMinimap); //after micromap
+  GetRectMinimap(FRectMinimap); //after FMicromap
   GetRectGutter(FRectGutter);
-  GetRectMain(FRectMain); //after gutter/minimap/micromap
+  GetRectMain(FRectMain); //after gutter/minimap/FMicromap
   GetRectRuler(FRectRuler); //after main
 
   UpdateWrapInfo;
@@ -3424,6 +3416,8 @@ begin
   FWrapAddSpace:= 1;
   FWrapEnabledForMaxLines:= cInitWrapEnabledForMaxLines;
 
+  FMicromap:= TATMicromap.Create;
+
   FOverwrite:= false;
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
@@ -3518,12 +3512,6 @@ begin
   FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
 
   FMicromapVisible:= cInitMicromapVisible;
-  SetLength(MicromapColumns, 1);
-  with MicromapColumns[0] do
-  begin
-    NWidthPercents:= cInitMicromapWidthPercents;
-    NTag:= 0;
-  end;
 
   FFoldedMarkTooltip:= TPanel.Create(Self);
   FFoldedMarkTooltip.Hide;
@@ -3695,6 +3683,7 @@ begin
   FreeAndNil(FMenuStd);
   DoPaintModeStatic;
   FFoldedMarkList.Clear;
+  FreeAndNil(FMicromap);
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
@@ -4815,7 +4804,7 @@ begin
   FMinimapTooltip.Visible:= bOnMinimap and FMinimapTooltipVisible;
   UpdateMinimapTooltip;
 
-  //detect cursor on micromap
+  //detect cursor on FMicromap
   if FMicromapVisible then
   begin
     bOnMicromap:= PtInRect(FRectMicromap, P);
@@ -7142,7 +7131,7 @@ function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRec
 var
   H: integer;
 begin
-  if (AColumn<0) or (AColumn>=Length(MicromapColumns)) then
+  if (AColumn<0) or (AColumn>=Length(FMicromap.Columns)) then
     exit(cRectEmpty);
 
   H:= FRectMicromap.Height;
@@ -7150,52 +7139,10 @@ begin
   Result.Bottom:= Max(Result.Top+2,
                FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv);
 
-  with MicromapColumns[AColumn] do
+  with FMicromap.Columns[AColumn] do
   begin
     Result.Left:= NLeft;
     Result.Right:= NRight;
-  end;
-end;
-
-function TATSynEdit.MicromapGetColumnFromTag(const ATag: Int64): integer;
-var
-  i: integer;
-begin
-  for i:= 0 to Length(MicromapColumns)-1 do
-    with MicromapColumns[i] do
-      if NTag=ATag then
-        exit(i);
-  Result:= -1;
-end;
-
-function TATSynEdit.MicromapAddColumn(const ATag: Int64; AWidthPercents: integer): boolean;
-begin
-  Result:= (MicromapGetColumnFromTag(ATag)<0) and (AWidthPercents>0);
-  if Result then
-  begin
-    SetLength(MicromapColumns, Length(MicromapColumns)+1);
-    with MicromapColumns[Length(MicromapColumns)-1] do
-    begin
-      NTag:= ATag;
-      NWidthPercents:= AWidthPercents;
-    end;
-    Update;
-  end;
-end;
-
-function TATSynEdit.MicromapDeleteColumn(const ATag: Int64): boolean;
-var
-  NCol, NLen, i: integer;
-begin
-  NCol:= MicromapGetColumnFromTag(ATag);
-  NLen:= Length(MicromapColumns);
-  Result:= (NCol>0) and (NCol<NLen); //don't allow to delete column-0
-  if Result then
-  begin
-    for i:= NCol to NLen-2 do
-      MicromapColumns[i]:= MicromapColumns[i+1];
-    SetLength(MicromapColumns, NLen-1);
-    Update;
   end;
 end;
 
