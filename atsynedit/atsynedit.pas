@@ -2241,15 +2241,9 @@ end;
 
 procedure TATSynEdit.GetRectMicromap(var R: TRect);
 var
-  NSize, i: integer;
+  NSize: integer;
 begin
-  NSize:= 0;
-  for i:= 0 to Length(FMicromap.Columns)-1 do
-    with FMicromap.Columns[i] do
-    begin
-      NWidthPixels:= FCharSize.X * NWidthPercents div 100;
-      Inc(NSize, NWidthPixels);
-    end;
+  NSize:= FMicromap.UpdateSizes(FCharSize.X);
 
   if not FMicromapVisible then
   begin
@@ -2262,16 +2256,7 @@ begin
   R.Right:= ClientWidth;
   R.Left:= R.Right-NSize;
 
-  for i:= 0 to Length(FMicromap.Columns)-1 do
-    with FMicromap.Columns[i] do
-    begin
-      if i=0 then
-        NLeft:= R.Left
-      else
-        NLeft:= FMicromap.Columns[i-1].NRight;
-      NRight:= NLeft+NWidthPixels;
-    end;
-
+  FMicromap.UpdateCoords(R.Left);
   FMicromapScaleDiv:= Max(1, Strings.Count);
 end;
 

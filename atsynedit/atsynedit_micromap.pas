@@ -30,6 +30,8 @@ type
     function ColumnFromTag(const ATag: Int64): integer;
     function ColumnAdd(const ATag: Int64; AWidthPercents: integer): boolean;
     function ColumnDelete(const ATag: Int64): boolean;
+    function UpdateSizes(ACharSize: integer): integer;
+    procedure UpdateCoords(ALeft: integer);
   end;
 
 implementation
@@ -88,6 +90,32 @@ begin
   end;
 end;
 
+function TATMicromap.UpdateSizes(ACharSize: integer): integer;
+var
+  i: integer;
+begin
+  Result:= 0;
+  for i:= 0 to Length(Columns)-1 do
+    with Columns[i] do
+    begin
+      NWidthPixels:= ACharSize * NWidthPercents div 100;
+      Inc(Result, NWidthPixels);
+    end;
+end;
 
+procedure TATMicromap.UpdateCoords(ALeft: integer);
+var
+  i: integer;
+begin
+  for i:= 0 to Length(Columns)-1 do
+    with Columns[i] do
+    begin
+      if i=0 then
+        NLeft:= ALeft
+      else
+        NLeft:= Columns[i-1].NRight;
+      NRight:= NLeft+NWidthPixels;
+    end;
+end;
 
 end.
