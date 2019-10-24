@@ -767,7 +767,6 @@ type
     function GetMinimap_DraggedPosToWrapIndex(APosY: integer): integer;
     function GetMinimap_ClickedPosToWrapIndex(APosY: integer): integer;
     function GetOptTextOffsetTop: integer;
-    procedure GetRectMinimapSel(var R: TRect);
     function GetRedoAsString: string;
     function GetUndoAsString: string;
     procedure InitResourcesFoldbar;
@@ -914,6 +913,7 @@ type
     procedure SetStrings(Obj: TATStrings);
     procedure GetRectMain(var R: TRect);
     procedure GetRectMinimap(var R: TRect);
+    procedure GetRectMinimapSel(var R: TRect);
     procedure GetRectMicromap(var R: TRect);
     procedure GetRectGutter(var R: TRect);
     procedure GetRectRuler(var R: TRect);
