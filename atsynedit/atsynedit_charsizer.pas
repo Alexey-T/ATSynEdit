@@ -13,7 +13,7 @@ uses
   Windows,
   {$endif}
   Classes, SysUtils, Graphics, Dialogs,
-  Forms, ExtCtrls,
+  Forms, ExtCtrls, Math,
   UnicodeData,
   LCLType, LCLIntf;
 
@@ -40,7 +40,7 @@ type
 
 var
   GlobalCharSizer: TATCharSizer = nil;
-  //should be created after MainForm is initialized, e.g. in TATSynEdit.Create
+  //must be created after MainForm is inited, e.g. in TATSynEdit.Create
 
 var
   OptCharSizeProportional: boolean = true;
@@ -172,7 +172,7 @@ begin
   if Result=0 then
   begin
     Result:= _WidestrWidth(Panel.Canvas, WideString(ch)) * 100 div SizeAvg;
-    Sizes[Ord(ch)]:= Min(255, Result div SaveScale);
+    Sizes[Ord(ch)]:= Math.Min(255, Result div SaveScale);
   end;
 end;
 
