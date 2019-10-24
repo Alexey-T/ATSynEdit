@@ -1132,6 +1132,8 @@ type
     property RectRuler: TRect read FRectRuler;
     function IndentString: string;
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
+    function MicromapGetColumnFromTag(const ATag: Int64): integer;
+    function MicromapDeleteColumn(const ATag: Int64): boolean;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read FGutterDecor;
@@ -7152,6 +7154,35 @@ begin
     Result.Left:= NLeft;
     Result.Right:= NRight;
   end;
+end;
+
+function TATSynEdit.MicromapGetColumnFromTag(const ATag: Int64): integer;
+var
+  i: integer;
+begin
+  for i:= 0 to Length(OptMicromapColumns)-1 do
+    with OptMicromapColumns[i] do
+      if NTag=ATag then
+        exit(i);
+  Result:= -1;
+end;
+
+function TATSynEdit.MicromapDeleteColumn(const ATag: Int64): boolean;
+var
+  NCol, NLen, i: integer;
+begin
+  NCol:= MicromapGetColumnFromTag(ATag);
+  NLen:= Length(OptMicromapColumns);
+  if (NCol>0) and (NCol<NLen) then //don't allow to delete column-0
+  begin
+    for i:= NCol to NLen-2 do
+      OptMicromapColumns[i]:= OptMicromapColumns[i+1];
+    SetLength(OptMicromapColumns, NLen-1);
+    Update;
+    Result:= true;
+  end
+  else
+    Result:= false;
 end;
 
 
