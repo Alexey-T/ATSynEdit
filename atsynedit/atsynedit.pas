@@ -54,6 +54,12 @@ uses
   ATScrollBar;
 
 type
+  TATMicromapColumn = record
+    NWidthPercents, NWidthPixels: integer;
+    NLeft, NRight: integer;
+    NTag: Int64;
+  end;
+
   TATPosDetails = record
     EndOfWrappedLine: boolean;
     OnGapItem: TATGapItem;
@@ -572,7 +578,6 @@ type
     FMinimapTooltip: TPanel;
     FMinimapCachedPainting: boolean;
     FMinimapHiliteLinesWithSelection: boolean;
-    FMicromapColumns: array of record NWidthPercents, NWidthPixels, NLeft, NRight: integer; end;
     FMicromapVisible: boolean;
     FMicromapScaleDiv: integer;
     FFoldedMarkList: TATFoldedMarks;
@@ -755,8 +760,6 @@ type
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     procedure DoUpdateFontNeedsOffsets(C: TCanvas);
-    function GetMicromapColumnWidths: TATIntArray;
-    procedure SetMicromapColumnWidths(const AValue: TATIntArray);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1055,6 +1058,7 @@ type
     MenuitemTextUndo: TMenuItem;
     MenuitemTextRedo: TMenuItem;
     TagString: string; //to store plugin specific data in CudaText
+    OptMicromapColumns: array of TATMicromapColumn;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
@@ -1237,7 +1241,6 @@ type
     function GetCacheDump: string;
     procedure DoConvertIndentation(ASpacesToTabs: boolean);
     procedure DoConvertTabsToSpaces;
-    property OptMicromapColumnWidths: TATIntArray read GetMicromapColumnWidths write SetMicromapColumnWidths;
 
   protected
     procedure Paint; override;
@@ -2246,8 +2249,8 @@ var
   NSize, i: integer;
 begin
   NSize:= 0;
-  for i:= 0 to Length(FMicromapColumns)-1 do
-    with FMicromapColumns[i] do
+  for i:= 0 to Length(OptMicromapColumns)-1 do
+    with OptMicromapColumns[i] do
     begin
       NWidthPixels:= FCharSize.X * NWidthPercents div 100;
       Inc(NSize, NWidthPixels);
@@ -2264,13 +2267,13 @@ begin
   R.Right:= ClientWidth;
   R.Left:= R.Right-NSize;
 
-  for i:= 0 to Length(FMicromapColumns)-1 do
-    with FMicromapColumns[i] do
+  for i:= 0 to Length(OptMicromapColumns)-1 do
+    with OptMicromapColumns[i] do
     begin
       if i=0 then
         NLeft:= R.Left
       else
-        NLeft:= FMicromapColumns[i-1].NRight;
+        NLeft:= OptMicromapColumns[i-1].NRight;
       NRight:= NLeft+NWidthPixels;
     end;
 
@@ -3512,13 +3515,11 @@ begin
   FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
 
   FMicromapVisible:= cInitMicromapVisible;
-  SetLength(FMicromapColumns, 1);
-  with FMicromapColumns[0] do
+  SetLength(OptMicromapColumns, 1);
+  with OptMicromapColumns[0] do
   begin
-    NWidthPercents:= cInitMicromapWidthPercents;;
-    NWidthPixels:= 0;
-    NLeft:= 0;
-    NRight:= 0;
+    NWidthPercents:= cInitMicromapWidthPercents;
+    NTag:= 0;
   end;
 
   FFoldedMarkTooltip:= TPanel.Create(Self);
@@ -7134,29 +7135,11 @@ begin
   end;
 end;
 
-function TATSynEdit.GetMicromapColumnWidths: TATIntArray;
-var
-  i: integer;
-begin
-  SetLength(Result, Length(FMicromapColumns));
-  for i:= 0 to Length(Result)-1 do
-    Result[i]:= FMicromapColumns[i].NWidthPercents;
-end;
-
-procedure TATSynEdit.SetMicromapColumnWidths(const AValue: TATIntArray);
-var
-  i: integer;
-begin
-  SetLength(FMicromapColumns, Length(AValue));
-  for i:= 0 to Length(AValue)-1 do
-    FMicromapColumns[i].NWidthPercents:= AValue[i];
-end;
-
 function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
 var
   H: integer;
 begin
-  if (AColumn<0) or (AColumn>=Length(FMicromapColumns)) then
+  if (AColumn<0) or (AColumn>=Length(OptMicromapColumns)) then
     exit(cRectEmpty);
 
   H:= FRectMicromap.Height;
@@ -7164,7 +7147,7 @@ begin
   Result.Bottom:= Max(Result.Top+2,
                FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv);
 
-  with FMicromapColumns[AColumn] do
+  with OptMicromapColumns[AColumn] do
   begin
     Result.Left:= NLeft;
     Result.Right:= NRight;

@@ -155,7 +155,7 @@ begin
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapColumnWidths:= [300];
+  OptMicromapColumns[0].NWidthPercents:= 300;
 
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
