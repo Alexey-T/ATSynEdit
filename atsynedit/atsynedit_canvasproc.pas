@@ -853,10 +853,13 @@ begin
   if nIndex1<0 then Exit;
   if nIndex2<0 then Exit;
 
-  //if ColorBG=clNone, insert ColorBG of found part
+  //if ColorBG=clNone, use ColorBG of previous part at that position
   //tested on URLs in JS inside HTML
   if APart.ColorBG=clNone then
     APart.ColorBG:= AParts[nIndex1].ColorBG; //clYellow;
+
+  if APart.ColorFont=clNone then
+    APart.ColorFont:= AParts[nIndex1].ColorFont; //clYellow;
 
   //these 2 parts are for edges of selection
   FillChar(PartSelBegin{%H-}, SizeOf(TATLinePart), 0);
