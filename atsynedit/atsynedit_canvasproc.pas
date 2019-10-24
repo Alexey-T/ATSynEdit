@@ -74,7 +74,7 @@ type
   TATLinePartClass = class
   public
     Data: TATLinePart;
-    Column: integer;
+    ColumnTag: Int64;
   end;
 
 const
