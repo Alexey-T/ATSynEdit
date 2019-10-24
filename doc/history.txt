@@ -1,7 +1,9 @@
 
-2019.10.23
-* change: replace OptMicromapWidthPercents with OptMicromapColumnWidths: comma-separated list of micromap column sizes in % of char width
-+ add: method RectMicromapMark to get rect of one micromap mark
+2019.10.24
+* change: replace OptMicromapWidthPercents with MicromapColumns array to allow more columns
++ add: method RectMicromapMark
++ add: method MicromapGetColumnFromTag
++ add: method MicromapDeleteColumn
 
 2019.10.18
 + add: OptPasteMultilineTextSpreadsToCarets
