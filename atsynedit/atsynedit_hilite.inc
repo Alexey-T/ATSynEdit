@@ -323,6 +323,7 @@ begin
   for i:= nAttrIndex to Attribs.Count-1 do
   begin
     Attr:= Attribs[i];
+    if Attr.MicromapOnly then Continue;
     if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;
 

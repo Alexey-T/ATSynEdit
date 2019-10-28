@@ -32,6 +32,7 @@ type
     Value: Int64;
     Ptr: TObject;
       //used in Attribs object of ATSynedit
+    MicromapOnly: boolean;
     class operator=(const A, B: TATMarkerItem): boolean;
     function Contains(AX, AY: integer): boolean;
     function PosEnd: TPoint;
@@ -67,7 +68,8 @@ type
       ALenX: integer=0;
       ALenY: integer=0;
       APtr: TObject=nil;
-      AValue: Int64=0);
+      AValue: Int64=0;
+      AMicromapOnly: boolean=False);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
@@ -178,7 +180,7 @@ begin
 end;
 
 procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64; ALenX: integer; ALenY: integer;
-  APtr: TObject; AValue: Int64);
+  APtr: TObject; AValue: Int64; AMicromapOnly: boolean);
 var
   Item: TATMarkerItem;
   NIndex: integer;
@@ -194,6 +196,7 @@ begin
   Item.LenY:= ALenY;
   Item.Ptr:= APtr;
   Item.Value:= AValue;
+  Item.MicromapOnly:= AMicromapOnly;
 
   if FSorted then
   begin
