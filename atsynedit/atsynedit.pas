@@ -7125,9 +7125,17 @@ begin
   if FMicromap.IsIndexValid(AColumn) then
   begin
     H:= FRectMicromap.Height;
-    Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * H div FMicromapScaleDiv;
-    Result.Bottom:= Max(Result.Top+cMinHeight,
-                 FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv);
+
+    if ALineFrom>=0 then
+      Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * H div FMicromapScaleDiv
+    else
+      Result.Top:= FRectMicromap.Top;
+
+    if ALineTo>=0 then
+      Result.Bottom:= Max(Result.Top+cMinHeight,
+                 FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv)
+    else
+      Result.Bottom:= FRectMicromap.Bottom;
 
     with FMicromap.Columns[AColumn] do
     begin

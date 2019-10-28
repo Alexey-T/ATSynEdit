@@ -9,13 +9,14 @@ unit ATSynEdit_Micromap;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, Graphics;
 
 type
   TATMicromapColumn = record
     NWidthPercents, NWidthPixels: integer;
     NLeft, NRight: integer;
     NTag: Int64;
+    NColor: TColor;
   end;
 
 type
@@ -28,7 +29,7 @@ type
     constructor Create;
     function IsIndexValid(AIndex: integer): boolean;
     function ColumnFromTag(const ATag: Int64): integer;
-    function ColumnAdd(const ATag: Int64; AWidthPercents: integer): boolean;
+    function ColumnAdd(const ATag: Int64; AWidthPercents: integer; AColor: TColor): boolean;
     function ColumnDelete(const ATag: Int64): boolean;
     function UpdateSizes(ACharSize: integer): integer;
     procedure UpdateCoords(ALeft: integer);
@@ -66,7 +67,7 @@ begin
   Result:= -1;
 end;
 
-function TATMicromap.ColumnAdd(const ATag: Int64; AWidthPercents: integer): boolean;
+function TATMicromap.ColumnAdd(const ATag: Int64; AWidthPercents: integer; AColor: TColor): boolean;
 begin
   Result:= (ColumnFromTag(ATag)<0) and (AWidthPercents>0);
   if Result then
@@ -76,6 +77,7 @@ begin
     begin
       NTag:= ATag;
       NWidthPercents:= AWidthPercents;
+      NColor:= AColor;
     end;
   end;
 end;
