@@ -25,7 +25,7 @@ type
     procedure Clear;
     function Length: integer;
     function ToString: string;
-    procedure SetFromString(AHotkey: string; AComboSepar: char= ComboSeparator);
+    procedure SetFromString(const AHotkey: string; AComboSepar: char= ComboSeparator);
     class operator =(const a1, a2: TATKeyArray): boolean;
   end;
 
@@ -314,15 +314,18 @@ begin
     end;
 end;
 
-procedure TATKeyArray.SetFromString(AHotkey: string; AComboSepar: char);
+procedure TATKeyArray.SetFromString(const AHotkey: string; AComboSepar: char);
 var
+  Sep: TATStringSeparator;
   S: string;
   i: integer;
 begin
   Clear;
+  Sep.Init(AHotkey, AComboSepar);
   for i:= Low(Data) to High(Data) do
   begin
-    S:= Trim(SGetItem(AHotkey, AComboSepar)); //Trim to allow near spaces
+    if not Sep.GetItemStr(S) then Break;
+    S:= Trim(S); //Trim to allow near spaces
     if S='' then Break;
     Data[i]:= TextToShortCut(S);
   end;
