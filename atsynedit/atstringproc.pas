@@ -53,6 +53,7 @@ type
     FPos: integer;
   public
     procedure Init(const AStr: string; ASep: char=',');
+    function GetRest(out AValue: string): boolean;
     function GetItemStr(out AValue: string): boolean;
     function GetItemStr(out AValue: UnicodeString): boolean;
     function GetItemInt(out AValue: integer; const ADefault: integer): boolean;
@@ -1177,6 +1178,12 @@ begin
   FStr:= AStr;
   FSep:= ASep;
   FPos:= 1;
+end;
+
+function TATStringSeparator.GetRest(out AValue: string): boolean;
+begin
+  AValue:= Copy(FStr, FPos, MaxInt);
+  Result:= true;
 end;
 
 function TATStringSeparator.GetItemStr(out AValue: string): boolean;
