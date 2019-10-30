@@ -1158,7 +1158,7 @@ begin
   N:= Pos(Sep, S);
   if N=0 then
   begin
-    S1:= '';
+    S1:= S;
     S2:= '';
   end
   else
