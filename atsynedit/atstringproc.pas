@@ -54,6 +54,7 @@ type
   public
     procedure Init(const AStr: string; ASep: char=',');
     function GetItemStr(out AValue: string): boolean;
+    function GetItemStr(out AValue: UnicodeString): boolean;
     function GetItemInt(out AValue: integer; const ADefault: integer): boolean;
   end;
 
@@ -1191,6 +1192,14 @@ begin
   AValue:= Copy(FStr, FPos, N-FPos);
   FPos:= N+1;
   Result:= true;
+end;
+
+function TATStringSeparator.GetItemStr(out AValue: UnicodeString): boolean;
+var
+  SVal: string;
+begin
+  Result:= GetItemStr(SVal);
+  AValue:= SVal;
 end;
 
 function TATStringSeparator.GetItemInt(out AValue: integer; const ADefault: integer): boolean;
