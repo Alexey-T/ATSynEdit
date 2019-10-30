@@ -6,6 +6,7 @@ unit ATStringProc;
 
 {$mode objfpc}{$H+}
 {$codepage utf8}
+{$ModeSwitch advancedrecords}
 
 interface
 
@@ -41,6 +42,20 @@ function SCharLower(ch: widechar): widechar; inline;
 function SCaseTitle(const S, SNonWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SNonWordChars: atString): atString;
+
+type
+  { TATStringSeparator }
+
+  TATStringSeparator = record
+  private
+    FSep: char;
+    FStr: string;
+    FPos: integer;
+  public
+    procedure Init(const AStr: string; ASep: char=',');
+    function GetItemStr(out AValue: string): boolean;
+    function GetItemInt(out AValue: integer; const ADefault: integer): boolean;
+  end;
 
 {$Z1}
 type
@@ -164,6 +179,7 @@ function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
 function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
 function SCountTextOccurrences(const SubStr, Str: UnicodeString): integer;
 function SCountTextLines(const Str, StrBreak: UnicodeString): integer;
+procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
 
 
 implementation
@@ -1133,6 +1149,73 @@ begin
     if Copy(Str, Length(Str)-Length(StrBreak)+1, Length(StrBreak))=StrBreak then
       Dec(Result);
 end;
+
+procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
+var
+  N: integer;
+begin
+  N:= Pos(Sep, S);
+  if N=0 then
+  begin
+    S1:= '';
+    S2:= '';
+  end
+  else
+  begin
+    S1:= Copy(S, 1, N-1);
+    S2:= Copy(S, N+1, Length(S));
+  end;
+end;
+
+{ TATStringSeparator }
+
+procedure TATStringSeparator.Init(const AStr: string; ASep: char);
+begin
+  FStr:= AStr;
+  FSep:= ASep;
+  FPos:= 1;
+end;
+
+function TATStringSeparator.GetItemStr(out AValue: string): boolean;
+var
+  N: integer;
+begin
+  if FPos>Length(FStr) then
+  begin
+    AValue:= '';
+    exit(false);
+  end;
+  N:= PosEx(FSep, FStr, FPos);
+  if N=0 then
+    N:= Length(FStr)+1;
+  AValue:= Copy(FStr, FPos, N-FPos);
+  FPos:= N+1;
+  Result:= true;
+end;
+
+function TATStringSeparator.GetItemInt(out AValue: integer; const ADefault: integer): boolean;
+var
+  SVal: string;
+begin
+  Result:= GetItemStr(SVal);
+  if Result then
+    AValue:= StrToIntDef(SVal, ADefault)
+  else
+    AValue:= ADefault;
+end;
+
+procedure TestStringSeparator;
+var
+  sep: TATStringSeparator;
+  res, item: string;
+begin
+  sep.init(',,1,,,4', ',');
+  res:= '';
+  while sep.GetItemStr(item) do
+    res+= item+','#10;
+  ShowMessage(res);
+end;
+
 
 end.
 
