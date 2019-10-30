@@ -901,7 +901,7 @@ type
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretBlinkTime(AValue: integer);
     procedure SetCharSpacingY(AValue: integer);
-    procedure SetMarginString(AValue: string);
+    procedure SetMarginString(const AValue: string);
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
     procedure SetOneLine(AValue: boolean);
@@ -3822,16 +3822,15 @@ begin
   FWrapUpdateNeeded:= true;
 end;
 
-procedure TATSynEdit.SetMarginString(AValue: string);
+procedure TATSynEdit.SetMarginString(const AValue: string);
 var
-  S: string;
+  Sep: TATStringSeparator;
   N: integer;
 begin
   SetLength(FMarginList, 0);
+  Sep.Init(AValue, ' ');
   repeat
-    S:= SGetItem(AValue, ' ');
-    if S='' then Break;
-    N:= StrToIntDef(S, 0);
+    if not Sep.GetItemInt(N, 0) then Break;
     if N<2 then Continue;
     SetLength(FMarginList, Length(FMarginList)+1);
     FMarginList[Length(FMarginList)-1]:= N;
