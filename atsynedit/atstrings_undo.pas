@@ -110,20 +110,21 @@ begin
   end;
 end;
 
-procedure StringToPointsArray(var A: TATPointArray; Str: string);
+procedure StringToPointsArray(var A: TATPointArray; const AStr: string);
 var
-  SItem: string;
+  Sep: TATStringSeparator;
+  SItem, S1, S2: string;
   i, NLen: integer;
 begin
-  NLen:= 0;
-  for i:= 1 to Length(Str) do
-    if Str[i]=';' then Inc(NLen);
+  NLen:= SFindCharCount(AStr, ';');
   SetLength(A, NLen);
+  Sep.Init(AStr, ';');
   for i:= 0 to NLen-1 do
   begin
-    SItem:= SGetItem(Str, ';');
-    A[i].X:= StrToIntDef(SGetItem(SItem, ','), 0);
-    A[i].Y:= StrToIntDef(SGetItem(SItem, ','), 0);
+    Sep.GetItemStr(SItem);
+    SSplitByChar(SItem, ',', S1, S2);
+    A[i].X:= StrToIntDef(S1, 0);
+    A[i].Y:= StrToIntDef(S2, 0);
   end;
 end;
 
