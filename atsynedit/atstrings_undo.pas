@@ -37,7 +37,7 @@ type
   private
     const PartSep = #9;
     function GetAsString: string;
-    procedure SetAsString(AValue: string);
+    procedure SetAsString(const AValue: string);
   public
     ItemAction: TATEditAction;
     ItemIndex: integer;
@@ -142,29 +142,34 @@ begin
     UTF8Encode(ItemText);
 end;
 
-procedure TATUndoItem.SetAsString(AValue: string);
+procedure TATUndoItem.SetAsString(const AValue: string);
 var
-  SItem: string;
+  Sep: TATStringSeparator;
+  S: string;
+  N: integer;
 begin
-  SItem:= SGetItem(AValue, PartSep);
-  ItemAction:= TATEditAction(StrToIntDef(SItem, 0));
+  Sep.Init(AValue, PartSep);
 
-  SItem:= SGetItem(AValue, PartSep);
-  ItemIndex:= StrToIntDef(SItem, 0);
+  Sep.GetItemInt(N, 0);
+  ItemAction:= TATEditAction(N);
 
-  SItem:= SGetItem(AValue, PartSep);
-  ItemEnd:= TATLineEnds(StrToIntDef(SItem, 0));
+  Sep.GetItemInt(N, 0);
+  ItemIndex:= N;
 
-  SItem:= SGetItem(AValue, PartSep);
-  StringToPointsArray(ItemCarets, SItem);
+  Sep.GetItemInt(N, 0);
+  ItemEnd:= TATLineEnds(N);
 
-  SItem:= SGetItem(AValue, PartSep);
-  ItemSoftMark:= SItem='1';
+  Sep.GetItemStr(S);
+  StringToPointsArray(ItemCarets, S);
 
-  SItem:= SGetItem(AValue, PartSep);
-  ItemHardMark:= SItem='1';
+  Sep.GetItemStr(S);
+  ItemSoftMark:= S='1';
 
-  ItemText:= UTF8Decode(AValue);
+  Sep.GetItemStr(S);
+  ItemHardMark:= S='1';
+
+  Sep.GetItemStr(S);
+  ItemText:= S;
 end;
 
 procedure TATUndoItem.Assign(const D: TATUndoItem);
