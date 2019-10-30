@@ -15,7 +15,7 @@ implementation
 { Registration }
 procedure Register;
 begin
-  RegisterComponents('Misc', [TATSynEdit, TATEdit, TATComboEdit]);
+  RegisterComponents('AT Controls', [TATSynEdit, TATEdit, TATComboEdit]);
 end;
 
 initialization
