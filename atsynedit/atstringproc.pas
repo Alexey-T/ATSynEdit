@@ -56,6 +56,8 @@ type
     function GetItemStr(out AValue: string): boolean;
     function GetItemStr(out AValue: UnicodeString): boolean;
     function GetItemInt(out AValue: integer; const ADefault: integer): boolean;
+    function GetItemInt64(out AValue: Int64; const ADefault: Int64): boolean;
+    function GetItemDWord(out AValue: DWord; const ADefault: DWord): boolean;
   end;
 
 {$Z1}
@@ -1209,6 +1211,28 @@ begin
   Result:= GetItemStr(SVal);
   if Result then
     AValue:= StrToIntDef(SVal, ADefault)
+  else
+    AValue:= ADefault;
+end;
+
+function TATStringSeparator.GetItemInt64(out AValue: Int64; const ADefault: Int64): boolean;
+var
+  SVal: string;
+begin
+  Result:= GetItemStr(SVal);
+  if Result then
+    AValue:= StrToInt64Def(SVal, ADefault)
+  else
+    AValue:= ADefault;
+end;
+
+function TATStringSeparator.GetItemDWord(out AValue: DWord; const ADefault: DWord): boolean;
+var
+  SVal: string;
+begin
+  Result:= GetItemStr(SVal);
+  if Result then
+    AValue:= StrToDWordDef(SVal, ADefault)
   else
     AValue:= ADefault;
 end;
