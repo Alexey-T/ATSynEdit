@@ -938,9 +938,11 @@ begin
 end;
 
 
-//for text change at unknown caret, pass AFromCaret=0
 procedure TATSynEdit.DoCaretsShift(AFromCaret: integer; APosX, APosY: integer;
   AShiftX, AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
+//for text change at unknown caret, pass AFromCaret=0
+//AShiftBelowX: used in Del key command, it's set to the length of line,
+//to shift (to right) carets in the line below
 var
   i: integer;
   {$ifdef debug_markers_shift}
