@@ -1149,7 +1149,7 @@ type
     procedure DoCaretSingleAsIs;
     function DoCaretsFixIncorrectPos(AndLimitByLineEnds: boolean): boolean;
     procedure DoCaretsFixIfInsideFolded;
-    procedure DoCaretsShift(APosX, APosY: integer; AShiftX, AShiftY: integer;
+    procedure DoCaretsShift(AFromCaret: integer; APosX, APosY: integer; AShiftX, AShiftY: integer;
       APosAfter: TPoint; AShiftBelowX: integer = 0);
     procedure DoCaretForceShow;
     function CaretPosToClientPos(P: TPoint): TPoint;
@@ -5821,7 +5821,7 @@ begin
     if AndDeleteSelection then
     begin
       Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
-      DoCaretsShift(X1, Y1, Shift.X, Shift.Y, PosAfter);
+      DoCaretsShift(-1, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   end;
 

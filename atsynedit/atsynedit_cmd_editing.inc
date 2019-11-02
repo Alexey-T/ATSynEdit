@@ -74,7 +74,7 @@ begin
         TextItem:= AText;
 
       Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem, AOvrMode, Shift, PosAfter);
-      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+      DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
       if not AKeepCaret then
       begin
@@ -113,7 +113,7 @@ begin
       Caret:= Carets[i];
       StrSpaces:= StringOfChar(' ', FTabSize - Caret.PosX mod FTabSize);
       Strings.TextInsert(Caret.PosX, Caret.PosY, StrSpaces, AOvrMode, Shift, PosAfter);
-      DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+      DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
       Caret.PosX:= PosAfter.X;
       Caret.PosY:= PosAfter.Y;
@@ -192,7 +192,7 @@ begin
     end;
 
     Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+    DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
     Caret.EndX:= -1;
@@ -226,6 +226,7 @@ type
   { TATPosShift }
 
   TATPosShift = record
+    CaretIndex: integer;
     X, Y: integer;
     Shift: TPoint;
     PosAfter: TPoint;
@@ -281,6 +282,7 @@ begin
       Caret.EndX:= -1;
       Caret.EndY:= -1;
 
+      Point.CaretIndex:= i;
       Point.X:= X1;
       Point.Y:= Y1;
       Point.Shift:= Shift;
@@ -294,7 +296,7 @@ begin
     for i:= PointList.Count-1 downto 0 do
     begin
       Point:= PointList[i];
-      DoCaretsShift(Point.X, Point.Y, Point.Shift.X, Point.Shift.Y, Point.PosAfter);
+      DoCaretsShift(Point.CaretIndex, Point.X, Point.Y, Point.Shift.X, Point.Shift.Y, Point.PosAfter);
       DoCaretsSort;
     end;
   finally
@@ -337,7 +339,7 @@ begin
       ShiftBelowX:= Len;
 
     Strings.TextDeleteRight(Caret.PosX, Caret.PosY, ALen, Shift, PosAfter);
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter, ShiftBelowX);
+    DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter, ShiftBelowX);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
@@ -394,7 +396,7 @@ begin
       NShiftY:= 1;
     end;
 
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X+NShiftX, Shift.Y+NShiftY, PosAfter);
+    DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X+NShiftX, Shift.Y+NShiftY, PosAfter);
     Caret.PosX:= PosAfter.X+NShiftX;
     Caret.PosY:= PosAfter.Y;
     //on Enter reset prev column for up/down
@@ -432,7 +434,7 @@ begin
       for j:= YTo downto YFrom do
       begin
         Strings.TextDeleteLine(0, j, Shift, PosAfter);
-        DoCaretsShift(0, j, Shift.X, Shift.Y, PosAfter);
+        DoCaretsShift(i, 0, j, Shift.X, Shift.Y, PosAfter);
       end;
     end;
 
@@ -578,7 +580,7 @@ begin
       end;
     end;
 
-    DoCaretsShift(Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+    DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 
     if ((Caret.PosX<>PosAfter.X) or (Caret.PosY<>PosAfter.Y)) and
       (FCarets.IndexOfPosXY(PosAfter.X, PosAfter.Y)>=0) then
@@ -884,7 +886,7 @@ begin
     PosAfter.X:= 0;
     PosAfter.Y:= Caret.PosY+IfThen(ADown, 1);
 
-    DoCaretsShift(0, Caret.PosY, 0, 1, PosAfter);
+    DoCaretsShift(i, 0, Caret.PosY, 0, 1, PosAfter);
 
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;

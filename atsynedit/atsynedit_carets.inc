@@ -938,10 +938,10 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsShift(APosX, APosY: integer; AShiftX,
-  AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
+procedure TATSynEdit.DoCaretsShift(AFromCaret: integer; APosX, APosY: integer;
+  AShiftX, AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
 var
-  NStart, i: integer;
+  i: integer;
   {$ifdef debug_markers_shift}
   S: string;
   {$endif}
@@ -949,11 +949,11 @@ begin
   if APosX<0 then Exit;
   if APosY<0 then Exit;
 
-  //adjust carets
-  //(optimized, from index NStart, to fast do on 200 carets)
-  NStart:= Carets.IndexOfPosYAvg(APosY);
-  if NStart>=0 then
-    for i:= NStart to Carets.Count-1 do
+  //optimized, to work fast on 200 carets
+  if AFromCaret<0 then
+    AFromCaret:= Carets.IndexOfPosYAvg(APosY);
+  if AFromCaret>=0 then
+    for i:= AFromCaret to Carets.Count-1 do
       DoCaretsShift_CaretItem(Carets[i],
         APosX, APosY, AShiftX, AShiftY, AShiftBelowX);
 
