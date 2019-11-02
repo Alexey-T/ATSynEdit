@@ -222,6 +222,7 @@ begin
     Result:= DoCommand_TextDeleteRight(1);
 end;
 
+(*
 type
   { TATPosShift }
 
@@ -241,6 +242,7 @@ class operator TATPosShift.= (const a, b: TATPosShift): boolean;
 begin
   Result:= false;
 end;
+*)
 
 function TATSynEdit.DoCommand_TextDeleteSelection: TATCommandResults;
 var
@@ -248,8 +250,6 @@ var
   Shift, PosAfter: TPoint;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
-  Point: TATPosShift;
-  PointList: TATPosShifts;
   i: integer;
 begin
   Result:= [];
@@ -264,7 +264,6 @@ begin
 
   if not Carets.IsSelection then Exit;
 
-  PointList:= TATPosShifts.Create;
   Strings.BeginUndoGroup;
   try
     for i:= Carets.Count-1 downto 0 do
@@ -282,25 +281,12 @@ begin
       Caret.EndX:= -1;
       Caret.EndY:= -1;
 
-      Point.CaretIndex:= i;
-      Point.X:= X1;
-      Point.Y:= Y1;
-      Point.Shift:= Shift;
-      Point.PosAfter:= PosAfter;
-      PointList.Add(Point);
-    end;
-
-    //make shift of carets after main loop, to keep correct text
-    //even if carets are broken. carets are broken if Del pressed in very complex
-    //multi-selections - https://github.com/Alexey-T/CudaText/issues/1615
-    for i:= PointList.Count-1 downto 0 do
-    begin
-      Point:= PointList[i];
-      DoCaretsShift(Point.CaretIndex, Point.X, Point.Y, Point.Shift.X, Point.Shift.Y, Point.PosAfter);
-      DoCaretsSort;
+      //tested on these cases:
+      // https://github.com/Alexey-T/CudaText/issues/1615
+      // https://github.com/Alexey-T/CudaText/issues/2261
+      DoCaretsShift(i, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   finally
-    FreeAndNil(PointList);
     Strings.EndUndoGroup;
   end;
 
