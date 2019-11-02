@@ -5821,7 +5821,7 @@ begin
     if AndDeleteSelection then
     begin
       Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
-      DoCaretsShift(-1, X1, Y1, Shift.X, Shift.Y, PosAfter);
+      DoCaretsShift(0, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   end;
 

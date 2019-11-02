@@ -938,6 +938,7 @@ begin
 end;
 
 
+//for text change at unknown caret, pass AFromCaret=0
 procedure TATSynEdit.DoCaretsShift(AFromCaret: integer; APosX, APosY: integer;
   AShiftX, AShiftY: integer; APosAfter: TPoint; AShiftBelowX: integer);
 var
@@ -949,9 +950,9 @@ begin
   if APosX<0 then Exit;
   if APosY<0 then Exit;
 
-  //optimized, to work fast on 200 carets
-  if AFromCaret<0 then
-    AFromCaret:= Carets.IndexOfPosYAvg(APosY);
+  //if AFromCaret<0 then
+  //  AFromCaret:= Carets.IndexOfPosYAvg(APosY);
+
   if AFromCaret>=0 then
     for i:= AFromCaret to Carets.Count-1 do
       DoCaretsShift_CaretItem(Carets[i],
