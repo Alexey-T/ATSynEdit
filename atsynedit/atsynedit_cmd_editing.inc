@@ -290,6 +290,9 @@ begin
     Strings.EndUndoGroup;
   end;
 
+  //to fix https://github.com/Alexey-T/CudaText/issues/1615
+  DoCaretsSort;
+
   Result:= [cResultText, cResultCaretTop];
 end;
 
