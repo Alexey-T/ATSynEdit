@@ -781,6 +781,7 @@ begin
   end
   else
   //carets on same line as src, apply ShiftX
+  if Caret.PosY=APosY then
   begin
     if Caret.PosX>APosX then
       Inc(Caret.PosX, AShiftX);
@@ -795,6 +796,7 @@ begin
     Inc(Caret.EndY, AShiftY);
   end
   else
+  if Caret.EndY=APosY then
   begin
     if Caret.EndX>APosX then
       Inc(Caret.EndX, AShiftX);
