@@ -583,6 +583,9 @@ type
     FTickMinimap: DWord;
     FTickAll: DWord;
     {$endif}
+    FShowOsBarVert: boolean;
+    FShowOsBarHorz: boolean;
+
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
@@ -716,6 +719,8 @@ type
     FOptZebraAlphaBlend: byte;
 
     //
+    procedure SetShowOsBarVert(AValue: boolean);
+    procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
     procedure DoCalcLinks;
@@ -1043,6 +1048,8 @@ type
     function GetCaretsArray: TATPointArray;
     procedure SetCaretsArray(const Ar: TATPointArray);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
+    property ShowOsBarVert: boolean read FShowOsBarVert write SetShowOsBarVert;
+    property ShowOsBarHorz: boolean read FShowOsBarHorz write SetShowOsBarHorz;
 
   public
     MenuitemTextCut: TMenuItem;
@@ -2123,7 +2130,9 @@ begin
   if not FOptAllowScrollbarVert then Exit;
 
   FScrollbarVert.Visible:= FOptScrollbarsNew;
-  if FOptScrollbarsNew then
+  ShowOsBarVert:= not FOptScrollbarsNew;
+
+  if FScrollbarVert.Visible then
   begin
     FScrollbarLock:= true;
     FScrollbarVert.Min:= 0;
@@ -2135,16 +2144,19 @@ begin
     FScrollbarLock:= false;
   end;
 
-  FillChar(si{%H-}, SizeOf(si), 0);
-  si.cbSize:= SizeOf(si);
-  si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
-  si.nMin:= 0;
-  si.nMax:= FScrollVert.SmoothMax;
-  si.nPage:= FScrollVert.SmoothPage;
-  if FOptScrollbarsNew then
-    si.nPage:= si.nMax+1;
-  si.nPos:= FScrollVert.SmoothPos;
-  SetScrollInfo(Handle, SB_VERT, si, True);
+  if ShowOsBarVert then
+  begin
+    FillChar(si{%H-}, SizeOf(si), 0);
+    si.cbSize:= SizeOf(si);
+    si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; //todo -- DisableNoScroll doesnt work(Win)
+    si.nMin:= 0;
+    si.nMax:= FScrollVert.SmoothMax;
+    si.nPage:= FScrollVert.SmoothPage;
+    //if FOptScrollbarsNew then
+    //  si.nPage:= si.nMax+1;
+    si.nPos:= FScrollVert.SmoothPos;
+    SetScrollInfo(Handle, SB_VERT, si, True);
+  end;
 
   {$ifdef at_show_scroll_info}
   Writeln(Format('ATSynEdit SetScrollInfo: SB_VERT, nMin=%d, nMax=%d, nPage=%d, nPos=%d',
@@ -2154,16 +2166,17 @@ end;
 
 procedure TATSynEdit.UpdateScrollbarHorz;
 var
+  NeedBar: boolean;
   si: TScrollInfo;
 begin
   if not FOptAllowScrollbarHorz then Exit;
 
-  FScrollbarHorz.Visible:=
-    FOptScrollbarsNew and
-    not FOptScrollbarHorizontalHidden and
+  NeedBar:= not FOptScrollbarHorizontalHidden and
     (FScrollHorz.NMax{-FScrollHorz.NMin} > FScrollHorz.NPage);
+  FScrollbarHorz.Visible:= FOptScrollbarsNew and NeedBar;
+  ShowOsBarHorz:= not FOptScrollbarsNew and NeedBar;
 
-  if FOptScrollbarsNew then
+  if FScrollbarHorz.Visible then
   begin
     FScrollbarLock:= true;
     FScrollbarHorz.Min:= 0;
@@ -2175,16 +2188,19 @@ begin
     FScrollbarLock:= false;
   end;
 
-  FillChar(si{%H-}, SizeOf(si), 0);
-  si.cbSize:= SizeOf(si);
-  si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; don't work
-  si.nMin:= 0;
-  si.nMax:= FScrollHorz.SmoothMax;
-  si.nPage:= FScrollHorz.SmoothPage;
-  if FOptScrollbarsNew or FOptScrollbarHorizontalHidden then
-    si.nPage:= si.nMax+1;
-  si.nPos:= FScrollHorz.SmoothPos;
-  SetScrollInfo(Handle, SB_HORZ, si, True);
+  if ShowOsBarHorz then
+  begin
+    FillChar(si{%H-}, SizeOf(si), 0);
+    si.cbSize:= SizeOf(si);
+    si.fMask:= SIF_ALL; //or SIF_DISABLENOSCROLL; don't work
+    si.nMin:= 0;
+    si.nMax:= FScrollHorz.SmoothMax;
+    si.nPage:= FScrollHorz.SmoothPage;
+    //if FOptScrollbarsNew or FOptScrollbarHorizontalHidden then
+    //  si.nPage:= si.nMax+1;
+    si.nPos:= FScrollHorz.SmoothPos;
+    SetScrollInfo(Handle, SB_HORZ, si, True);
+  end;
 
   {$ifdef at_show_scroll_info}
   Writeln(Format('ATSynEdit SetScrollInfo: SB_HORZ, nMin=%d, nMax=%d, nPage=%d, nPos=%d',
@@ -7146,6 +7162,19 @@ begin
     Result:= cRectEmpty;
 end;
 
+procedure TATSynEdit.SetShowOsBarVert(AValue: boolean);
+begin
+  if FShowOsBarVert=AValue then Exit;
+  FShowOsBarVert:= AValue;
+  ShowScrollBar(Handle, SB_Vert, AValue);
+end;
+
+procedure TATSynEdit.SetShowOsBarHorz(AValue: boolean);
+begin
+  if FShowOsBarHorz=AValue then Exit;
+  FShowOsBarHorz:= AValue;
+  ShowScrollBar(Handle, SB_Horz, AValue);
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
