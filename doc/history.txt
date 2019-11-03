@@ -3,6 +3,8 @@
 + add: OptScrollStyleHorz
 + add: OptScrollStyleVert
 * deleted OptScrollbarHorizontalHidden
+* deleted OptAllowScrollbarVert
+* deleted OptAllowScrollbarHorz
 
 2019.10.24
 * add: Micromap object to allow more columns

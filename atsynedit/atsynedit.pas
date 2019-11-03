@@ -718,8 +718,6 @@ type
     FOptShowIndentLines: boolean;
     FOptShowGutterCaretBG: boolean;
     FOptAllowRepaintOnTextChange: boolean;
-    FOptAllowScrollbarVert: boolean;
-    FOptAllowScrollbarHorz: boolean;
     FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
     FOptZebraActive: boolean;
@@ -1546,8 +1544,6 @@ type
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines default true;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG default true;
     property OptAllowRepaintOnTextChange: boolean read FOptAllowRepaintOnTextChange write FOptAllowRepaintOnTextChange default true;
-    property OptAllowScrollbarVert: boolean read FOptAllowScrollbarVert write FOptAllowScrollbarVert default true;
-    property OptAllowScrollbarHorz: boolean read FOptAllowScrollbarHorz write FOptAllowScrollbarHorz default true;
     property OptAllowZooming: boolean read FOptAllowZooming write FOptAllowZooming default true;
     property OptAllowReadOnly: boolean read FOptAllowReadOnly write FOptAllowReadOnly default true;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit default 5000;
@@ -2136,8 +2132,6 @@ var
   NeedBar: boolean;
   si: TScrollInfo;
 begin
-  if not FOptAllowScrollbarVert then Exit;
-
   case FOptScrollStyleVert of
     aessHide:
       NeedBar:= false;
@@ -2187,8 +2181,6 @@ var
   NeedBar: boolean;
   si: TScrollInfo;
 begin
-  if not FOptAllowScrollbarHorz then Exit;
-
   case FOptScrollStyleHorz of
     aessHide:
       NeedBar:= false;
@@ -3588,8 +3580,6 @@ begin
   FOptTextOffsetTop:= 0;
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
   FOptAllowRepaintOnTextChange:= true;
-  FOptAllowScrollbarVert:= true;
-  FOptAllowScrollbarHorz:= true;
   FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;
   FOptKeyBackspaceUnindent:= true;
@@ -3914,8 +3904,8 @@ begin
     OptCaretManyAllowed:= false;
     OptUnprintedVisible:= false;
     OptWrapMode:= cWrapOff;
-    OptAllowScrollbarVert:= false;
-    OptAllowScrollbarHorz:= false;
+    OptScrollStyleHorz:= aessHide;
+    OptScrollStyleVert:= aessHide;
     OptAllowZooming:= false;
     OptAllowReadOnly:= false;
     OptMouseNiceScroll:= false;
