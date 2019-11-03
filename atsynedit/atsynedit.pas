@@ -55,6 +55,12 @@ uses
   ATScrollBar;
 
 type
+  TATSynEditScrollStyle = (
+    aessHide,
+    aessShow,
+    aessAuto
+    );
+
   TATPosDetails = record
     EndOfWrappedLine: boolean;
     OnGapItem: TATGapItem;
@@ -591,12 +597,13 @@ type
     FOptPasteMultilineTextSpreadsToCarets: boolean;
     FOptMaxLinesToCountUnindent: integer;
     FOptMaxLineLengthForSlowWidthDetect: integer;
+    FOptScrollStyleVert: TATSynEditScrollStyle;
+    FOptScrollStyleHorz: TATSynEditScrollStyle;
     FOptScrollSmooth: boolean;
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
     FOptScrollbarsNew: boolean;
     FOptScrollbarHorizontalAddSpace: integer;
-    FOptScrollbarHorizontalHidden: boolean;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
     FOptShowFontLigatures: boolean;
     FOptShowURLs: boolean;
@@ -1403,11 +1410,12 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
+    property OptScrollStyleHorz: TATSynEditScrollStyle read FOptScrollStyleHorz write FOptScrollStyleHorz default aessAuto;
+    property OptScrollStyleVert: TATSynEditScrollStyle read FOptScrollStyleVert write FOptScrollStyleVert default aessShow;
     property OptScrollSmooth: boolean read FOptScrollSmooth write FOptScrollSmooth default true;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
-    property OptScrollbarHorizontalHidden: boolean read FOptScrollbarHorizontalHidden write FOptScrollbarHorizontalHidden default false;
     property OptScrollbarHorizontalAddSpace: integer read FOptScrollbarHorizontalAddSpace write FOptScrollbarHorizontalAddSpace default cInitScrollbarHorzAddSpace;
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
 
@@ -2104,14 +2112,14 @@ begin
       SmoothPos:= TotalOffset;
   end;
 
-  bVert1:= GetScrollbarVisible(true);
-  bHorz1:= GetScrollbarVisible(false);
+  bVert1:= ShowOsBarVert;
+  bHorz1:= ShowOsBarHorz;
 
   UpdateScrollbarVert;
   UpdateScrollbarHorz;
 
-  bVert2:= GetScrollbarVisible(true);
-  bHorz2:= GetScrollbarVisible(false);
+  bVert2:= ShowOsBarVert;
+  bHorz2:= ShowOsBarHorz;
   Result:= (bVert1<>bVert2) or (bHorz1<>bHorz2);
 
   if (FPrevHorz<>FScrollHorz) or
@@ -2125,12 +2133,22 @@ end;
 
 procedure TATSynEdit.UpdateScrollbarVert;
 var
+  NeedBar: boolean;
   si: TScrollInfo;
 begin
   if not FOptAllowScrollbarVert then Exit;
 
-  FScrollbarVert.Visible:= FOptScrollbarsNew;
-  ShowOsBarVert:= not FOptScrollbarsNew;
+  case FOptScrollStyleVert of
+    aessHide:
+      NeedBar:= false;
+    aessShow:
+      NeedBar:= true;
+    aessAuto:
+      NeedBar:= FScrollVert.NMax>FScrollVert.NPage;
+  end;
+
+  FScrollbarVert.Visible:= NeedBar and FOptScrollbarsNew;
+  ShowOsBarVert:= NeedBar and not FOptScrollbarsNew;
 
   if FScrollbarVert.Visible then
   begin
@@ -2171,10 +2189,17 @@ var
 begin
   if not FOptAllowScrollbarHorz then Exit;
 
-  NeedBar:= not FOptScrollbarHorizontalHidden and
-    (FScrollHorz.NMax{-FScrollHorz.NMin} > FScrollHorz.NPage);
-  FScrollbarHorz.Visible:= FOptScrollbarsNew and NeedBar;
-  ShowOsBarHorz:= not FOptScrollbarsNew and NeedBar;
+  case FOptScrollStyleHorz of
+    aessHide:
+      NeedBar:= false;
+    aessShow:
+      NeedBar:= true;
+    aessAuto:
+      NeedBar:= FScrollHorz.NMax>FScrollHorz.NPage;
+  end;
+
+  FScrollbarHorz.Visible:= NeedBar and FOptScrollbarsNew;
+  ShowOsBarHorz:= NeedBar and not FOptScrollbarsNew;
 
   if FScrollbarHorz.Visible then
   begin
@@ -3430,6 +3455,9 @@ begin
   FFoldedMarkList:= TATFoldedMarks.Create;
   FOptIdleInterval:= cInitIdleInterval;
 
+  FShowOsBarVert:= false;
+  FShowOsBarHorz:= false;
+
   FUnprintedVisible:= true;
   FUnprintedSpaces:= true;
   FUnprintedSpacesTrailing:= false;
@@ -3530,12 +3558,13 @@ begin
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSizeMinimap:= Point(1, 2);
 
+  FOptScrollStyleHorz:= aessAuto;
+  FOptScrollStyleVert:= aessShow;
   FOptScrollSmooth:= true;
   FOptScrollIndentCaretHorz:= 10;
   FOptScrollIndentCaretVert:= 0;
   FOptScrollbarsNew:= false;
   FOptScrollbarHorizontalAddSpace:= cInitScrollbarHorzAddSpace;
-  FOptScrollbarHorizontalHidden:= false;
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
 
   FOptShowFontLigatures:= true;
