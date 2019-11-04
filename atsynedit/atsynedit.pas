@@ -2202,6 +2202,10 @@ begin
     FScrollbarHorz.PageSize:= FScrollHorz.SmoothPage;
     FScrollbarHorz.Position:= FScrollHorz.SmoothPos;
     FScrollbarHorz.Update;
+    if FScrollbarVert.Visible then
+      FScrollbarHorz.IndentCorner:= 100
+    else
+      FScrollbarHorz.IndentCorner:= 0;
     FScrollbarLock:= false;
   end;
 
