@@ -568,6 +568,7 @@ type
     FPrevVert: TATSynScrollInfo;
     FMinimapWidth: integer;
     FMinimapCharWidth: integer;
+    FMinimapCustomScale: integer;
     FMinimapVisible: boolean;
     FMinimapShowSelBorder: boolean;
     FMinimapShowSelAlways: boolean;
@@ -1465,6 +1466,7 @@ type
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cSizeRulerMarkBig;
     property OptRulerTopIndentPercents: integer read FOptRulerTopIndentPercents write FOptRulerTopIndentPercents default 0;
+    property OptMinimapCustomScale: integer read FMinimapCustomScale write FMinimapCustomScale default 0;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible default cInitMinimapVisible;
     property OptMinimapCharWidth: integer read FMinimapCharWidth write FMinimapCharWidth default 0;
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder default false;
@@ -2340,8 +2342,17 @@ begin
   C.Font.Size:= EditorScaleFont(Font.Size);
 
   FCharSize:= GetCharSize(C, FCharSpacingText);
-  FCharSizeMinimap.X:= EditorScale(1);
-  FCharSizeMinimap.Y:= EditorScale(2);
+
+  if FMinimapCustomScale<100 then
+  begin
+    FCharSizeMinimap.X:= EditorScale(1);
+    FCharSizeMinimap.Y:= EditorScale(2);
+  end
+  else
+  begin
+    FCharSizeMinimap.X:= 1 * FMinimapCustomScale div 100;
+    FCharSizeMinimap.Y:= 2 * FMinimapCustomScale div 100;
+  end;
 
   FNumbersIndent:= FCharSize.X * FOptNumbersIndentPercents div 100;
   FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
@@ -3522,6 +3533,7 @@ begin
 
   FMinimapWidth:= cInitMinimapWidth;
   FMinimapCharWidth:= 0;
+  FMinimapCustomScale:= 0;
   FMinimapVisible:= cInitMinimapVisible;
   FMinimapShowSelBorder:= false;
   FMinimapShowSelAlways:= true;
