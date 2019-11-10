@@ -657,6 +657,8 @@ end;
 function TATEditorFinder.DoAction_FindSimple(APosStart, APosEnd: TPoint; out
   AResultStart, AResultEnd: TPoint): boolean;
 begin
+  if OptRegex then
+    raise Exception.Create('Finder FindSimple called in regex mode');
   Result:= FindMatch_InEditor(APosStart, APosEnd, false);
   if Result then
   begin
