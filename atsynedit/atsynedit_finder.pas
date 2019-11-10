@@ -186,7 +186,7 @@ type
     constructor Create;
     destructor Destroy; override;
     //
-    function DoAction_FindSimple(APosStart, APosEnd: TPoint; out AResultStart, AResultEnd: TPoint): boolean;
+    function DoAction_FindSimple(const APosStart: TPoint): boolean;
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoAction_ReplaceSelected: boolean;
     function DoAction_CountAll(AWithEvent: boolean): integer;
@@ -654,22 +654,19 @@ begin
   inherited;
 end;
 
-function TATEditorFinder.DoAction_FindSimple(APosStart, APosEnd: TPoint; out
-  AResultStart, AResultEnd: TPoint): boolean;
+function TATEditorFinder.DoAction_FindSimple(const APosStart: TPoint): boolean;
+var
+  Cnt: integer;
+  PosEnd: TPoint;
 begin
   if OptRegex then
     raise Exception.Create('Finder FindSimple called in regex mode');
-  Result:= FindMatch_InEditor(APosStart, APosEnd, false);
-  if Result then
-  begin
-    AResultStart:= FMatchEdPos;
-    AResultEnd:= FMatchEdEnd;
-  end
-  else
-  begin
-    AResultStart:= Point(-1, -1);
-    AResultEnd:= Point(-1, -1);
-  end;
+
+  Cnt:= Editor.Strings.Count;
+  PosEnd.X:= Editor.Strings.LinesLen[Cnt-1];
+  PosEnd.Y:= Cnt-1;
+
+  Result:= FindMatch_InEditor(APosStart, PosEnd, false);
 end;
 
 function TATEditorFinder.ConvertBufferPosToCaretPos(APos: integer): TPoint;
