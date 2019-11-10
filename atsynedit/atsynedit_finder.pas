@@ -97,7 +97,7 @@ type
     property StrReplace: UnicodeString read FStrReplace write SetStrReplace;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
+    function FindMatch_Regex(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
     property MatchLen: integer read FMatchLen;
     property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
@@ -1229,7 +1229,7 @@ var
   SNew: UnicodeString;
 begin
   AChanged:= false;
-  Result:= FindMatch(ANext, FSkipLen, AStartPos);
+  Result:= FindMatch_Regex(ANext, FSkipLen, AStartPos);
   FSkipLen:= FMatchLen;
 
   if Result then
@@ -1396,7 +1396,7 @@ begin
   inherited Destroy;
 end;
 
-function TATTextFinder.FindMatch(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
+function TATTextFinder.FindMatch_Regex(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
 var
   FromPos: integer;
 begin
