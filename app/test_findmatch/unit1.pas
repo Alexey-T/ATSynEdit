@@ -6,7 +6,11 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  atsynedit_finder, atsynedit_regexpr;
+  ATSynEdit_Finder,
+  ATSynEdit_RegExpr,
+  ATSynEdit_Carets,
+  ATSynEdit,
+  Math;
 
 type
 
@@ -22,14 +26,15 @@ type
     Label1: TLabel;
     Label2: TLabel;
     Label3: TLabel;
-    Memo1: TMemo;
-    Memo2: TMemo;
-    Memo3: TMemo;
+    Ed: TATSynEdit;
+    MemoRes: TMemo;
+    MemoWhat: TEdit;
     procedure bFindNextClick(Sender: TObject);
     procedure bFindClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure MemoWhatChange(Sender: TObject);
   private
-    Finder: TATTextFinder;
+    Finder: TATEditorFinder;
     procedure DoFind(ANext: boolean);
     { private declarations }
   public
@@ -57,36 +62,45 @@ end;
 
 procedure TfmMain.DoFind(ANext: boolean);
 var
-  NFromPos, NSkipLen: integer;
+  bChanged: boolean;
 begin
-  Finder.StrFind:= trim(Memo1.Text);
-  Finder.StrText:= trim(Memo2.Text);
   Finder.OptCase:= chkCase.Checked;
   Finder.OptWords:= chkWords.Checked;
-  Finder.OptBack:= chkBack.Checked;
   Finder.OptRegex:= chkRegex.Checked;
+  Finder.OptBack:= chkBack.Checked and not chkRegex.Checked;
+  Finder.OptFromCaret:= ANext;
 
-  NSkipLen:= Finder.MatchLen;
-  if ANext then
-    NFromPos:= Finder.MatchPos
+  if Finder.DoAction_FindOrReplace(ANext, false, false, bChanged) then
+  begin
+    MemoRes.Text:= Format('(line %d)'#10, [Finder.MatchEdPos.Y+1]) +
+      Ed.Strings.TextSubstring(Finder.MatchEdPos.X, Finder.MatchEdPos.Y, Finder.MatchEdEnd.X, Finder.MatchEdEnd.Y);
+    Ed.DoGotoPos(
+      Point(Finder.MatchEdPos.X, Finder.MatchEdPos.Y),
+      Point(Finder.MatchEdEnd.X, Finder.MatchEdEnd.Y),
+      5, 2,
+      true,
+      true);
+  end
   else
-  if Finder.OptRegex then
-    NFromPos:= 1
-  else
-  if Finder.OptBack then
-    NFromPos:= Length(Finder.StrText)
-  else
-    NFromPos:= 1;
-
-  if not Finder.FindMatch(ANext, NSkipLen, NFromPos) then
-    memo3.text:= '(not found)'
-  else
-    memo3.text:= Copy(Finder.StrText, Finder.MatchPos-2, FInder.MatchLen+4);
+    MemoRes.Text:= '(not found)';
 end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
+var
+  fn: string;
 begin
-  FInder:= TATTextFinder.Create;
+  Finder:= TATEditorFinder.Create;
+  Finder.Editor:= Ed;
+  Finder.StrFind:= MemoWhat.Text;
+
+  fn:= ExtractFilePath(Application.ExeName)+'unit1.pas';
+  if FileExists(fn) then
+    Ed.Strings.LoadFromFile(fn);
+end;
+
+procedure TfmMain.MemoWhatChange(Sender: TObject);
+begin
+  Finder.StrFind:= MemoWhat.Text;
 end;
 
 end.
