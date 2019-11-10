@@ -68,7 +68,7 @@ begin
   Finder.OptWords:= chkWords.Checked;
   Finder.OptRegex:= chkRegex.Checked;
   Finder.OptBack:= chkBack.Checked and not chkRegex.Checked;
-  Finder.OptFromCaret:= ANext;
+  Finder.OptFromCaret:= ANext and not chkRegex.Checked;
 
   if Finder.DoAction_FindOrReplace(ANext, false, false, bChanged) then
   begin

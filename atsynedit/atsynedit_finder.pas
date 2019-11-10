@@ -1418,23 +1418,15 @@ begin
 end;
 
 procedure TATEditorFinder.DoOnFound;
-var
-  P1, P2: TPoint;
 begin
-  if Assigned(FOnFound) then
+  if OptRegex then
   begin
-    if OptRegex then
-    begin
-      P1:= ConvertBufferPosToCaretPos(FMatchPos);
-      P2:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
-    end
-    else
-    begin
-      P1:= FMatchEdPos;
-      P2:= FMatchEdEnd;
-    end;
-    FOnFound(Self, P1, P2);
+    FMatchEdPos:= ConvertBufferPosToCaretPos(FMatchPos);
+    FMatchEdEnd:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
   end;
+
+  if Assigned(FOnFound) then
+    FOnFound(Self, FMatchEdPos, FMatchEdEnd);
 end;
 
 function TATEditorFinder.GetRegexSkipIncrement: integer;
