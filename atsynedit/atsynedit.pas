@@ -2140,7 +2140,7 @@ begin
     aessShow:
       NeedBar:= true;
     aessAuto:
-      NeedBar:= FScrollVert.NMax>FScrollVert.NPage;
+      NeedBar:= (FScrollVert.SmoothPos>0) or (FScrollVert.NMax>FScrollVert.NPage);
   end;
 
   FScrollbarVert.Visible:= NeedBar and FOptScrollbarsNew;
