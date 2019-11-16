@@ -105,18 +105,13 @@ procedure DoDetectStreamEncoding(Stream: TStream;
 var
   IsLE: boolean;
 begin
-  if DefaultIsUtf8 then
-  begin
-    Enc:= cEncUTF8;
-    EncWithBom:= false;
-  end
-  else
-  begin
-    Enc:= cEncAnsi;
-    EncWithBom:= false;
-  end;
-
   SignLen:= 0;
+  EncWithBom:= false;
+
+  if DefaultIsUtf8 then
+    Enc:= cEncUTF8
+  else
+    Enc:= cEncAnsi;
 
   if IsStreamWithSignature(Stream, cSignUTF8) then
   begin
@@ -142,21 +137,23 @@ begin
     Exit
   end;
 
-  if IsStreamWithUt8NoBom(Stream, BufSizeKb) then
-  begin
-    Enc:= cEncUTF8;
-    EncWithBom:= false;
-    Exit
-  end;
+  if BufSizeKb>0 then
+    if IsStreamWithUt8NoBom(Stream, BufSizeKb) then
+    begin
+      Enc:= cEncUTF8;
+      EncWithBom:= false;
+      Exit
+    end;
 
-  if IsStreamWithUtf16NoBom(Stream, BufSizeWords, IsLE) then
-  begin
-    if IsLE then
-      Enc:= cEncWideLE
-    else
-      Enc:= cEncWideBE;
-    Exit
-  end;
+  if BufSizeWords>0 then
+    if IsStreamWithUtf16NoBom(Stream, BufSizeWords, IsLE) then
+    begin
+      if IsLE then
+        Enc:= cEncWideLE
+      else
+        Enc:= cEncWideBE;
+      Exit
+    end;
 end;
 
 
@@ -302,22 +299,38 @@ var
   SWide: UnicodeString;
   LineEnd: TATLineEnds;
   bWithBom: boolean;
+  TempEnc: TATFileEncoding;
 begin
   Clear;
 
+  bWithBom:= false;
   NSignatureLen:= 0;
+
   if FEncodingDetect then
   begin
+    //detect encoding by signature and by buffer content
     DoDetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
       GlobalDetectUtf8BufferKb,
       GlobalDetectUf16BufferWords,
       FEncodingDetectDefaultUtf8);
-    case FEncoding of
-      cEncUTF8: SaveSignUtf8:= bWithBom;
-      cEncWideBE,
-      cEncWideLE: SaveSignWide:= bWithBom;
-    end;
+  end
+  else
+  begin
+    //detect encoding only by signature
+    DoDetectStreamEncoding(Stream, TempEnc, NSignatureLen, bWithBom,
+      0, //don't use buffer
+      0, //don't use buffer
+      FEncodingDetectDefaultUtf8);
+    if bWithBom then
+      FEncoding:= TempEnc;
   end;
+
+  case FEncoding of
+    cEncUTF8: SaveSignUtf8:= bWithBom;
+    cEncWideBE,
+    cEncWideLE: SaveSignWide:= bWithBom;
+  end;
+
   CharSize:= cEncodingSize[FEncoding];
 
   BufSize:= Stream.Size-NSignatureLen;
