@@ -297,7 +297,7 @@ var
   end;
   //------
 var
-  NStart, NEnd, NCounted, Len: integer;
+  NStart, NEnd, NCounted, Len, NSignatureLen: integer;
   SA, SUtf8: string;
   SWide: UnicodeString;
   LineEnd: TATLineEnds;
@@ -305,10 +305,10 @@ var
 begin
   Clear;
 
-  Len:= 0;
+  NSignatureLen:= 0;
   if FEncodingDetect then
   begin
-    DoDetectStreamEncoding(Stream, FEncoding, Len, bWithBom,
+    DoDetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
       GlobalDetectUtf8BufferKb,
       GlobalDetectUf16BufferWords,
       FEncodingDetectDefaultUtf8);
@@ -320,12 +320,12 @@ begin
   end;
   CharSize:= cEncodingSize[FEncoding];
 
-  BufSize:= Stream.Size-Len;
+  BufSize:= Stream.Size-NSignatureLen;
   if BufSize<=0 then Exit;
 
   GetMem(Buf, BufSize);
   try
-    Stream.Position:= Len;
+    Stream.Position:= NSignatureLen;
     Stream.ReadBuffer(Buf^, BufSize);
 
     NStart:= 0;
