@@ -661,7 +661,7 @@ begin
   GetPositionMinOrMax(XMax1, YMax1, XMax2, YMax2, true, OutEndX, OutEndY);
 
   //swap points?
-  if not IsPosSorted(Item1.PosX, Item1.PosY, Item1.EndX, Item1.EndY, false) then
+  if Item1.IsForwardSelection then
   begin
     SwapInt(OutPosX, OutEndX);
     SwapInt(OutPosY, OutEndY);

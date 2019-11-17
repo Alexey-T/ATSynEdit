@@ -685,7 +685,7 @@ begin
   if not bSel then Exit;
   Result:= true;
 
-  bAtLeft:= IsPosSorted(Item.PosX, Item.PosY, Item.EndX, Item.EndY, true);
+  bAtLeft:= not Item.IsForwardSelection;
 
   //Left/Rt pressed at left/rt side of selection?
   //yes: cancel selection, don't move caret
