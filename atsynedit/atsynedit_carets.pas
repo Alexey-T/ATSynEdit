@@ -209,17 +209,11 @@ begin
 end;
 
 procedure TATCaretItem.SwapSelection;
-var
-  NX, NY: integer;
 begin
   if EndY>=0 then
   begin
-    NX:= PosX;
-    NY:= PosY;
-    PosX:= EndX;
-    PosY:= EndY;
-    EndX:= NX;
-    EndY:= NY;
+    SwapInt(PosX, EndX);
+    SwapInt(PosY, EndY);
   end;
 end;
 

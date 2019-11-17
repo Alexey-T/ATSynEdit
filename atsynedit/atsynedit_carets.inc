@@ -697,8 +697,7 @@ begin
   end;
 
   //else swap edge
-  SwapInt(Item.PosX, Item.EndX);
-  SwapInt(Item.PosY, Item.EndY);
+  Item.SwapSelection;
 
   if not FOptKeyLeftRightSwapSelAndSelect then
   begin
