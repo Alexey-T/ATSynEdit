@@ -96,22 +96,16 @@ begin
 end;
 
 procedure DoDetectStreamEncoding(Stream: TStream;
-  out Enc: TATFileEncoding;
+  var Enc: TATFileEncoding;
   out SignLen: integer;
   out EncWithBom: boolean;
   BufSizeKb: integer;
-  BufSizeWords: integer;
-  DefaultIsUtf8: boolean);
+  BufSizeWords: integer);
 var
   IsLE: boolean;
 begin
   SignLen:= 0;
   EncWithBom:= false;
-
-  if DefaultIsUtf8 then
-    Enc:= cEncUTF8
-  else
-    Enc:= cEncAnsi;
 
   if IsStreamWithSignature(Stream, cSignUTF8) then
   begin
@@ -299,7 +293,6 @@ var
   SWide: UnicodeString;
   LineEnd: TATLineEnds;
   bWithBom: boolean;
-  TempEnc: TATFileEncoding;
 begin
   Clear;
 
@@ -309,20 +302,20 @@ begin
   if FEncodingDetect then
   begin
     //detect encoding by signature and by buffer content
+    if FEncodingDetectDefaultUtf8 then
+      FEncoding:= cEncUTF8
+    else
+      FEncoding:= cEncAnsi;
     DoDetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
       GlobalDetectUtf8BufferKb,
-      GlobalDetectUf16BufferWords,
-      FEncodingDetectDefaultUtf8);
+      GlobalDetectUf16BufferWords);
   end
   else
   begin
     //detect encoding only by signature
-    DoDetectStreamEncoding(Stream, TempEnc, NSignatureLen, bWithBom,
-      0, //don't use buffer
-      0, //don't use buffer
-      FEncodingDetectDefaultUtf8);
-    if bWithBom then
-      FEncoding:= TempEnc;
+    DoDetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
+      0, //buffer sizes=0
+      0);
   end;
 
   case FEncoding of
