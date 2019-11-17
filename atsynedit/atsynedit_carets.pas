@@ -44,6 +44,7 @@ type
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
     procedure SwapSelection;
+    function IsForwardSelection: boolean;
   end;
 
 type
@@ -215,6 +216,11 @@ begin
     SwapInt(PosX, EndX);
     SwapInt(PosY, EndY);
   end;
+end;
+
+function TATCaretItem.IsForwardSelection: boolean;
+begin
+  Result:= (PosY>=0) and IsPosSorted(EndX, EndY, PosX, PosY, false);
 end;
 
 procedure TATCaretItem.SelectNone;
