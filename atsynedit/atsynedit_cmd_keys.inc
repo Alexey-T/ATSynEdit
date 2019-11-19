@@ -394,7 +394,6 @@ begin
       P:= Point(R.Left, (R.Top+R.Bottom) div 2);
   end;
 
-  if P.Y<0 then exit;
   P:= ClientPosToCaretPos(P, Details);
   if P.Y<0 then exit;
 
