@@ -355,9 +355,6 @@ type
     constructor Create;
     destructor Destroy; override;
 
-    class function VersionMajor : integer; //###0.944
-    class function VersionMinor : integer; //###0.944
-
     property Expression : RegExprString read GetExpression write SetExpression;
     // Regular expression.
     // For optimization, TRegExpr will automatically compiles it into 'P-code'
@@ -618,10 +615,6 @@ implementation
 uses UnicodeData;
 
 const
- TRegExprVersionMajor : integer = 0;
- TRegExprVersionMinor : integer = 952;
- // TRegExpr.VersionMajor/Minor return values of this constants
-
  MaskModI = 1;  // modifier /i bit in fModifiers
  MaskModR = 2;  // -"- /r
  MaskModS = 4;  // -"- /s
@@ -1109,22 +1102,9 @@ function TRegExpr.LastError : integer;
  end; { of function TRegExpr.LastError
 --------------------------------------------------------------}
 
-
 {=============================================================}
 {===================== Common section ========================}
 {=============================================================}
-
-class function TRegExpr.VersionMajor : integer; //###0.944
- begin
-  Result := TRegExprVersionMajor;
- end; { of class function TRegExpr.VersionMajor
---------------------------------------------------------------}
-
-class function TRegExpr.VersionMinor : integer; //###0.944
- begin
-  Result := TRegExprVersionMinor;
- end; { of class function TRegExpr.VersionMinor
---------------------------------------------------------------}
 
 constructor TRegExpr.Create;
  begin
