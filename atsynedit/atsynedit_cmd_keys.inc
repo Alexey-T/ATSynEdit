@@ -30,6 +30,9 @@ begin
     if (NIndent>0) and (Caret.PosX>NIndent) then
       Caret.PosX:= NIndent
     else
+    if FOptKeyHomeToNonSpace and (Caret.PosX=0) and (NIndent>0) then
+      Caret.PosX:= NIndent
+    else
       Caret.PosX:= 0;
   end;
 
@@ -72,6 +75,9 @@ begin
       Caret.PosX:= NWrapped
     else
     if (NLen>0) and (Caret.PosX<NLen) then
+      Caret.PosX:= NLen
+    else
+    if FOptKeyEndToNonSpace and (Caret.PosX=Length(Str)) and (NLen<>Length(Str)) then
       Caret.PosX:= NLen
     else
       Caret.PosX:= Length(Str);
