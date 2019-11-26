@@ -1,4 +1,7 @@
 
+2019.11.26
++ add: OptKeyBackspaceGoesToPrevLine
+
 2019.11.09
 + add: OptMinimapCustomScale (if >100, sets scale only for minimap)
 
