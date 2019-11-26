@@ -17,7 +17,7 @@ uses
 {$R *.res}
 
 begin
-  Application.Title:='Demo';
+  Application.Title:= 'Demo';
   RequireDerivedFormResource:= True;
   Application.Initialize;
   Application.CreateForm(TfmMain, fmMain);
