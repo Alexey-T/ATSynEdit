@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 628
-    ActivePage = TabSheet1
+    ActivePage = TabSheet5
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 0
+    TabIndex = 4
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
@@ -843,6 +843,14 @@ object fmOpt: TfmOpt
         Width = 109
         Caption = 'and keep sel'
         TabOrder = 3
+      end
+      object chkBkspGoPrev: TCheckBox
+        Left = 8
+        Height = 24
+        Top = 208
+        Width = 218
+        Caption = 'bksp: allow to go to prev line'
+        TabOrder = 12
       end
     end
     object TabSheet3: TTabSheet

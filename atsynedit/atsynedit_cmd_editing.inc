@@ -191,7 +191,7 @@ begin
           NDeleteLen:= Caret.PosX;
     end;
 
-    Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter);
+    Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
     DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
@@ -541,7 +541,7 @@ begin
     //delete to prev line?
     if (Caret.PosX=0) and (not ANext) then
     begin
-      Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter);
+      Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
     end
     else
     //delete to next line?

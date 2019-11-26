@@ -231,7 +231,7 @@ begin
   end;
 end;
 
-procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
+procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint; AllowGoToPrevLine: boolean);
 var
   Str, StrPrev: atString;
 begin
@@ -275,7 +275,7 @@ begin
       APosAfter.X:= Max(0, AX-ALen);
     end
     else
-    if AY>0 then
+    if (AY>0) and AllowGoToPrevLine then
     begin
       //DoOnChangeBlock(
       //  0, AY,

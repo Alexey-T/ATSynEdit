@@ -19,6 +19,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkBkspGoPrev: TCheckBox;
     chkPasteSpread: TCheckBox;
     chkUndoGr: TCheckBox;
     chkUndoSv: TCheckBox;
@@ -301,6 +302,7 @@ begin
     chkTabIndent.Checked:= ed.OptKeyTabIndents;
     chkEnterIndent.Checked:= ed.OptAutoIndent;
     chkBackspUnindent.Checked:= ed.OptKeyBackspaceUnindent;
+    chkBkspGoPrev.Checked:= ed.OptKeyBackspaceGoesToPrevLine;
     edIndentKind.ItemIndex:= Ord(ed.OptAutoIndentKind);
     edIndentSize.Value:= ed.OptIndentSize;
     chkUnindentKeepAlign.Checked:= ed.OptIndentKeepsAlign;
@@ -429,6 +431,7 @@ begin
       ed.OptKeyTabIndents:= chkTabIndent.Checked;
       ed.OptAutoIndent:= chkEnterIndent.Checked;
       ed.OptKeyBackspaceUnindent := chkBackspUnindent.Checked;
+      ed.OptKeyBackspaceGoesToPrevLine:= chkBkspGoPrev.Checked;
       ed.OptAutoIndentKind:= TATAutoIndentKind(edIndentKind.ItemIndex);
       ed.OptIndentSize:= edIndentSize.Value;
       ed.OptIndentKeepsAlign:= chkUnindentKeepAlign.Checked;

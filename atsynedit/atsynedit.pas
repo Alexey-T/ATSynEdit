@@ -677,6 +677,7 @@ type
     FOptOverwriteSel: boolean;
     FOptOverwriteAllowedOnPaste: boolean;
     FOptKeyBackspaceUnindent: boolean;
+    FOptKeyBackspaceGoesToPrevLine: boolean;
     FOptKeyPageKeepsRelativePos: boolean;
     FOptKeyUpDownNavigateWrapped: boolean;
     FOptKeyHomeEndNavigateWrapped: boolean;
@@ -1524,6 +1525,7 @@ type
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
     property OptMouseClickOpensURL: boolean read FOptMouseClickOpensURL write FOptMouseClickOpensURL default false;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
+    property OptKeyBackspaceGoesToPrevLine: boolean read FOptKeyBackspaceGoesToPrevLine write FOptKeyBackspaceGoesToPrevLine default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
     property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn default true;
@@ -3599,6 +3601,7 @@ begin
   FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;
   FOptKeyBackspaceUnindent:= true;
+  FOptKeyBackspaceGoesToPrevLine:= true;
   FOptKeyPageKeepsRelativePos:= true;
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyHomeEndNavigateWrapped:= true;
