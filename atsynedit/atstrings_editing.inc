@@ -248,7 +248,7 @@ begin
     //handle spec case: caret on last fake line, BkSp pressed:
     //delete fake line,
     //delete EOL at prev line
-    if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake then
+    if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake and AllowGoToPrevLine then
     begin
       //DoOnChangeBlock(
       //  0, AY,
