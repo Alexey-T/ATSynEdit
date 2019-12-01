@@ -851,7 +851,7 @@ procedure TfmMain.mnuFindClick(Sender: TObject);
 var
   res: TModalResult;
   cnt: integer;
-  ok, fchanged: boolean;
+  ok, bChanged: boolean;
 begin
   with TfmFind.Create(nil) do
   try
@@ -889,13 +889,13 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.DoAction_FindOrReplace(false, false, false, fchanged);
+          ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged);
           FinderUpdateEditor(false);
           if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.DoAction_FindOrReplace(false, true, false, fchanged);
+          ok:= FFinder.DoAction_FindOrReplace(false, true, false, bChanged);
           FinderUpdateEditor(true);
           if not ok then DoFindError;
         end;
@@ -930,7 +930,7 @@ end;
 
 procedure TfmMain.mnuFindNextClick(Sender: TObject);
 var
-  ok, fchanged: boolean;
+  ok, bChanged: boolean;
 begin
   if FFinder.StrFind='' then
   begin
@@ -939,7 +939,7 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
-  ok:= FFinder.DoAction_FindOrReplace(false, false, false, fchanged);
+  ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged);
   FinderUpdateEditor(false);
   if not ok then DoFindError;
 end;
