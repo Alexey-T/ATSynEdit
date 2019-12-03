@@ -1703,11 +1703,11 @@ begin
           NStartOffset:= 0;
 
         if IndexLine=APosEnd.Y then
-          NEndOffset:= APosEnd.X
+          NEndOffset:= Max(0, APosEnd.X-1)
         else
-          NEndOffset:= NLenLooped;
+          NEndOffset:= Max(0, NLenLooped-NLenPart);
 
-        for IndexChar:= NStartOffset to NEndOffset-NLenPart do
+        for IndexChar:= NStartOffset to NEndOffset do
         begin
           bOk:= STestStringMatch(@SFind[1], @SLineToTest[IndexChar+1], NLenStrFind, OptCase);
           //consider whole words (only for single line)
