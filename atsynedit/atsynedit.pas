@@ -4523,6 +4523,11 @@ begin
     if Shift=[ssMiddle] then
       if DoHandleClickEvent(FOnClickMiddle) then Exit;
 
+    //Ctrl+click on selection must not be ignored, but must start drag-drop with copying
+    if ActionId=cMouseActionMakeCaret then
+      if IsPosSelected(PCaret.X, PCaret.Y) then
+        ActionId:= cMouseActionClickSimple;
+
     if ActionId=cMouseActionNiceScrolling then
     begin
       if FOptMouseNiceScroll then
