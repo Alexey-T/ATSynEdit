@@ -5,6 +5,7 @@ var
   Item: PATStringItem;
   SA, Sign: string;
   SWide: UnicodeString;
+  SQuad: UCS4String;
   i: integer;
 begin
   EncConvErrorMode:= eemException;
@@ -46,6 +47,13 @@ begin
             SWide:= SSwapEndian(SWide);
           Stream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
+
+      cEnc32LE:
+        begin
+          SWide:= UTF8Decode(SA);
+          SQuad:= UnicodeStringToUCS4String(SWide);
+          Stream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
+        end
 
       else
         DoEncError;

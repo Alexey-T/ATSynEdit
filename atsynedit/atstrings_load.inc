@@ -233,25 +233,38 @@ var
   //------
   function _GetEnding(APos: integer): TATCharEnding;
   var
-    code: word;
     p: PByte absolute Buf;
+    Check: byte;
   begin
+    Result:= cCharNotEnding;
     case FEncoding of
       cEncAnsi,
       cEncUTF8:
-        code:= p[APos];
+        begin
+          Check:= p[APos];
+        end;
       cEncWideLE:
-        code:= p[APos] + p[APos+1] shl 8;
+        begin
+          if p[APos+1]<>0 then exit;
+          Check:= p[APos];
+        end;
       cEncWideBE:
-        code:= p[APos+1] + p[APos] shl 8;
-      else
-        code:= 0;
+        begin
+          if p[APos]<>0 then exit;
+          Check:= p[APos+1];
+        end;
+      cEnc32LE:
+        begin
+          if p[APos+3]<>0 then exit;
+          if p[APos+2]<>0 then exit;
+          if p[APos+1]<>0 then exit;
+          Check:= p[APos];
+        end;
     end;
 
-    case code of
+    case Check of
       10: Result:= cCharEnding10;
       13: Result:= cCharEnding13;
-      else Result:= cCharNotEnding;
     end;
   end;
   //------
@@ -291,6 +304,7 @@ var
   NStart, NEnd, NCounted, Len, NSignatureLen: integer;
   SA, SUtf8: string;
   SWide: UnicodeString;
+  SQuad: UCS4String;
   LineEnd: TATLineEnds;
   bWithBom: boolean;
 begin
@@ -388,6 +402,14 @@ begin
               Move(Buf[NStart], SWide[1], Len);
               if FEncoding=cEncWideBE then
                 SWide:= SSwapEndian(SWide);
+              LineAddRaw_UTF8_NoUndo(UTF8Encode(SWide), LineEnd);
+            end;
+
+          cEnc32LE:
+            begin
+              SetLength(SQuad, Len div 4+1);
+              Move(Buf[NStart], SQuad[0], Len);
+              SWide:= UCS4StringToUnicodeString(SQuad);
               LineAddRaw_UTF8_NoUndo(UTF8Encode(SWide), LineEnd);
             end;
 

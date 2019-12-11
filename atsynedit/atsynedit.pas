@@ -1573,6 +1573,8 @@ const
   cEncNameUtf16LE_NoBom = 'UTF-16 LE';
   cEncNameUtf16BE_WithBom = 'UTF-16 BE with BOM';
   cEncNameUtf16BE_NoBom = 'UTF-16 BE';
+  cEncNameUtf32LE_WithBom = 'UTF-32 LE with BOM';
+  cEncNameUtf32LE_NoBom = 'UTF-32 LE';
 
 implementation
 
@@ -7123,6 +7125,13 @@ begin
         else
           Result:= cEncNameUtf16BE_NoBom;
       end;
+    cEnc32LE:
+      begin
+        if Str.SaveSignWide then
+          Result:= cEncNameUtf32LE_WithBom
+        else
+          Result:= cEncNameUtf32LE_NoBom;
+      end;
     else
       Result:= '?';
   end;
@@ -7142,6 +7151,8 @@ begin
      if SameText(AName, cEncNameUtf16LE_NoBom) then begin Str.Encoding:= cEncWideLE; Str.SaveSignWide:= false; end else
       if SameText(AName, cEncNameUtf16BE_WithBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= true; end else
        if SameText(AName, cEncNameUtf16BE_NoBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= false; end else
+       if SameText(AName, cEncNameUtf32LE_WithBom) then begin Str.Encoding:= cEnc32LE; Str.SaveSignWide:= true; end else
+       if SameText(AName, cEncNameUtf32LE_NoBom) then begin Str.Encoding:= cEnc32LE; Str.SaveSignWide:= false; end else
          begin
            Str.Encoding:= cEncAnsi;
            Str.EncodingCodepage:= EncConvFindEncoding(LowerCase(AName));

@@ -270,6 +270,7 @@ const
   sEncUtf8NoBom = 'UTF-8 no bom';
   sEncUtf16LE = 'UTF-16 LE';
   sEncUtf16BE = 'UTF-16 BE';
+  sEncUtf32LE = 'UTF-32 LE';
 
 const
   cColorBmIco = clMedGray;
@@ -1072,6 +1073,12 @@ begin
     Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
+  if Str=sEncUtf32LE then
+  begin
+    Ed.Strings.Encoding:= cEnc32LE;
+    Ed.Strings.EncodingCodepage:= eidUTF8;
+  end
+  else
   begin
     Ed.Strings.Encoding:= cEncAnsi;
     Ed.Strings.EncodingCodepage:= EncConvFindEncoding(LowerCase(Str));
@@ -1214,6 +1221,7 @@ begin
   DoAddEnc('', sEncUtf8NoBom);
   DoAddEnc('', sEncUtf16LE);
   DoAddEnc('', sEncUtf16BE);
+  DoAddEnc('', sEncUtf32LE);
   DoAddEnc('', '-');
 
   DoAddEnc('Europe', 'CP1250');
