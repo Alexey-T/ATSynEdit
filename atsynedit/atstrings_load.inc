@@ -225,55 +225,55 @@ type
     cCharEnding13
     );
 
+function _GetEnding(ABuffer: pointer; APos: integer; AEnc: TATFileEncoding): TATCharEnding; inline;
+var
+  p: PByte absolute ABuffer;
+  Check: byte;
+begin
+  Result:= cCharNotEnding;
+  case AEnc of
+    cEncAnsi,
+    cEncUTF8:
+      begin
+        Check:= p[APos];
+      end;
+    cEncWideLE:
+      begin
+        if p[APos+1]<>0 then exit;
+        Check:= p[APos];
+      end;
+    cEncWideBE:
+      begin
+        if p[APos]<>0 then exit;
+        Check:= p[APos+1];
+      end;
+    cEnc32LE:
+      begin
+        if p[APos+3]<>0 then exit;
+        if p[APos+2]<>0 then exit;
+        if p[APos+1]<>0 then exit;
+        Check:= p[APos];
+      end;
+    cEnc32BE:
+      begin
+        if p[APos]<>0 then exit;
+        if p[APos+1]<>0 then exit;
+        if p[APos+2]<>0 then exit;
+        Check:= p[APos+3];
+      end;
+  end;
+
+  case Check of
+    10: Result:= cCharEnding10;
+    13: Result:= cCharEnding13;
+  end;
+end;
+
 procedure TATStrings.DoLoadFromStream(Stream: TStream);
 var
   Buf: PAnsiChar;
   BufSize: int64;
   CharSize: integer;
-  //------
-  function _GetEnding(APos: integer): TATCharEnding;
-  var
-    p: PByte absolute Buf;
-    Check: byte;
-  begin
-    Result:= cCharNotEnding;
-    case FEncoding of
-      cEncAnsi,
-      cEncUTF8:
-        begin
-          Check:= p[APos];
-        end;
-      cEncWideLE:
-        begin
-          if p[APos+1]<>0 then exit;
-          Check:= p[APos];
-        end;
-      cEncWideBE:
-        begin
-          if p[APos]<>0 then exit;
-          Check:= p[APos+1];
-        end;
-      cEnc32LE:
-        begin
-          if p[APos+3]<>0 then exit;
-          if p[APos+2]<>0 then exit;
-          if p[APos+1]<>0 then exit;
-          Check:= p[APos];
-        end;
-      cEnc32BE:
-        begin
-          if p[APos]<>0 then exit;
-          if p[APos+1]<>0 then exit;
-          if p[APos+2]<>0 then exit;
-          Check:= p[APos+3];
-        end;
-    end;
-
-    case Check of
-      10: Result:= cCharEnding10;
-      13: Result:= cCharEnding13;
-    end;
-  end;
   //------
   procedure _FindNextEol(AFromPos: integer;
     out AFoundPos: integer;
@@ -284,7 +284,7 @@ var
     repeat
       if AFoundPos>=BufSize then exit;
 
-      case _GetEnding(AFoundPos) of
+      case _GetEnding(Buf, AFoundPos, FEncoding) of
         cCharNotEnding:
           begin
             Inc(AFoundPos, CharSize);
@@ -297,7 +297,7 @@ var
         cCharEnding13:
           begin
             if AFoundPos+CharSize<BufSize then
-              if _GetEnding(AFoundPos+CharSize)=cCharEnding10 then
+              if _GetEnding(Buf, AFoundPos+CharSize, FEncoding)=cCharEnding10 then
                 AEnding:= cEndWin
               else
                 AEnding:= cEndMac;
