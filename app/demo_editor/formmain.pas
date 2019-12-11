@@ -479,8 +479,9 @@ begin
   if ed.LastCommandChangedLines>0 then
     sCount:= Format('%d lines chg', [ed.LastCommandChangedLines]);
 
-  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d | %s', [
+  Status.SimpleText:= Format('Line:Col%s | %s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d | %s', [
     sPos,
+    ed.EncodingName,
     ed.Carets.Count,
     ed.LineTop+1,
     cEnd[ed.Strings.Endings],
@@ -1040,51 +1041,9 @@ end;
 
 procedure TfmMain.DoSetEnc(const Str: string);
 begin
-  if Str=cEncNameUtf8_WithBom then
-  begin
-    Ed.Strings.Encoding:= cEncUTF8;
-    Ed.Strings.SaveSignUtf8:= true;
-    Ed.Strings.EncodingCodepage:= eidUTF8;
-  end
-  else
-  if Str=cEncNameUtf8_NoBom then
-  begin
-    Ed.Strings.Encoding:= cEncUTF8;
-    Ed.Strings.SaveSignUtf8:= false;
-    Ed.Strings.EncodingCodepage:= eidUTF8;
-  end
-  else
-  if Str=cEncNameUtf16LE_NoBom then
-  begin
-    Ed.Strings.Encoding:= cEncWideLE;
-    Ed.Strings.EncodingCodepage:= eidUTF8;
-  end
-  else
-  if Str=cEncNameUtf16BE_WithBom then
-  begin
-    Ed.Strings.Encoding:= cEncWideBE;
-    Ed.Strings.EncodingCodepage:= eidUTF8;
-  end
-  else
-  if Str=cEncNameUtf32LE_NoBom then
-  begin
-    Ed.Strings.Encoding:= cEnc32LE;
-    Ed.Strings.EncodingCodepage:= eidUTF8;
-  end
-  else
-  if Str=cEncNameUtf32BE_NoBom then
-  begin
-    Ed.Strings.Encoding:= cEnc32BE;
-    Ed.Strings.EncodingCodepage:= eidUTF8;
-  end
-  else
-  begin
-    Ed.Strings.Encoding:= cEncAnsi;
-    Ed.Strings.EncodingCodepage:= EncConvFindEncoding(LowerCase(Str));
-  end;
-
+  ed.EncodingName:= Str;
   if FFileName<>'' then
-    if Application.Messagebox('Encoding changed in mem. Also reload file in this encoding?',
+    if Application.Messagebox('Encoding changed in mem. Reload file in this encoding?',
       'Editor', MB_OKCANCEL or MB_ICONQUESTION) = id_ok then
       DoOpen(FFileName, false);
 end;
@@ -1209,6 +1168,7 @@ end;
 procedure TfmMain.MenuEncClick(Sender: TObject);
 begin
   DoSetEnc((Sender as TMenuItem).Caption);
+  UpdateStatus;
 end;
 
 
@@ -1216,12 +1176,16 @@ procedure TfmMain.UpdateEnc;
 begin
   mnuEnc.Clear;
 
-  DoAddEnc('', cEncNameUtf8_WithBom);
   DoAddEnc('', cEncNameUtf8_NoBom);
+  DoAddEnc('', cEncNameUtf8_WithBom);
   DoAddEnc('', cEncNameUtf16LE_NoBom);
+  DoAddEnc('', cEncNameUtf16LE_WithBom);
   DoAddEnc('', cEncNameUtf16BE_NoBom);
+  DoAddEnc('', cEncNameUtf16BE_WithBom);
   DoAddEnc('', cEncNameUtf32LE_NoBom);
+  DoAddEnc('', cEncNameUtf32LE_WithBom);
   DoAddEnc('', cEncNameUtf32BE_NoBom);
+  DoAddEnc('', cEncNameUtf32BE_WithBom);
   DoAddEnc('', '-');
 
   DoAddEnc('Europe', 'CP1250');

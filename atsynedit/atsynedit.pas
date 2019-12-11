@@ -7153,19 +7153,19 @@ begin
   Str:= Strings;
 
   if SameText(AName, cEncNameUtf8_WithBom) then begin Str.Encoding:= cEncUTF8; Str.SaveSignUtf8:= true; end else
-   if SameText(AName, cEncNameUtf8_NoBom) then begin Str.Encoding:= cEncUTF8; Str.SaveSignUtf8:= false; end else
-    if SameText(AName, cEncNameUtf16LE_WithBom) then begin Str.Encoding:= cEncWideLE; Str.SaveSignWide:= true; end else
-     if SameText(AName, cEncNameUtf16LE_NoBom) then begin Str.Encoding:= cEncWideLE; Str.SaveSignWide:= false; end else
-      if SameText(AName, cEncNameUtf16BE_WithBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= true; end else
-       if SameText(AName, cEncNameUtf16BE_NoBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= false; end else
-       if SameText(AName, cEncNameUtf32LE_WithBom) then begin Str.Encoding:= cEnc32LE; Str.SaveSignWide:= true; end else
-       if SameText(AName, cEncNameUtf32LE_NoBom) then begin Str.Encoding:= cEnc32LE; Str.SaveSignWide:= false; end else
-       if SameText(AName, cEncNameUtf32BE_WithBom) then begin Str.Encoding:= cEnc32BE; Str.SaveSignWide:= true; end else
-       if SameText(AName, cEncNameUtf32BE_NoBom) then begin Str.Encoding:= cEnc32BE; Str.SaveSignWide:= false; end else
-         begin
-           Str.Encoding:= cEncAnsi;
-           Str.EncodingCodepage:= EncConvFindEncoding(LowerCase(AName));
-         end;
+  if SameText(AName, cEncNameUtf8_NoBom) then begin Str.Encoding:= cEncUTF8; Str.SaveSignUtf8:= false; end else
+  if SameText(AName, cEncNameUtf16LE_WithBom) then begin Str.Encoding:= cEncWideLE; Str.SaveSignWide:= true; end else
+  if SameText(AName, cEncNameUtf16LE_NoBom) then begin Str.Encoding:= cEncWideLE; Str.SaveSignWide:= false; end else
+  if SameText(AName, cEncNameUtf16BE_WithBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= true; end else
+  if SameText(AName, cEncNameUtf16BE_NoBom) then begin Str.Encoding:= cEncWideBE; Str.SaveSignWide:= false; end else
+  if SameText(AName, cEncNameUtf32LE_WithBom) then begin Str.Encoding:= cEnc32LE; Str.SaveSignWide:= true; end else
+  if SameText(AName, cEncNameUtf32LE_NoBom) then begin Str.Encoding:= cEnc32LE; Str.SaveSignWide:= false; end else
+  if SameText(AName, cEncNameUtf32BE_WithBom) then begin Str.Encoding:= cEnc32BE; Str.SaveSignWide:= true; end else
+  if SameText(AName, cEncNameUtf32BE_NoBom) then begin Str.Encoding:= cEnc32BE; Str.SaveSignWide:= false; end else
+  begin
+    Str.Encoding:= cEncAnsi;
+    Str.EncodingCodepage:= EncConvFindEncoding(LowerCase(AName));
+  end;
 end;
 
 procedure TATSynEdit.TextInsertAtCarets(const AText: atString; AKeepCaret,

@@ -1,11 +1,13 @@
 {$ifdef nn}begin end;{$endif}
 
 function IsStreamWithSignature(Stream: TStream; const Sign: string): boolean;
+const
+  cMinimalCountOfChars = 3;
 var
   Buf: string;
 begin
   Result:= false;
-  if Stream.Size<Length(Sign) then Exit;
+  if Stream.Size<Length(Sign)*cMinimalCountOfChars then Exit;
   SetLength(Buf, Length(Sign));
   Stream.Position:= 0;
   Stream.ReadBuffer(Buf[1], Length(Sign));
@@ -128,6 +130,22 @@ begin
     Enc:= cEncWideBE;
     EncWithBom:= true;
     SignLen:= Length(cSignWideBE);
+    Exit
+  end;
+
+  if IsStreamWithSignature(Stream, cSign32LE) then
+  begin
+    Enc:= cEnc32LE;
+    EncWithBom:= true;
+    SignLen:= Length(cSign32LE);
+    Exit
+  end;
+
+  if IsStreamWithSignature(Stream, cSign32BE) then
+  begin
+    Enc:= cEnc32BE;
+    EncWithBom:= true;
+    SignLen:= Length(cSign32BE);
     Exit
   end;
 

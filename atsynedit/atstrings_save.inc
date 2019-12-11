@@ -12,11 +12,19 @@ begin
 
   if AWithSignature then
   begin
-    Sign:= '';
     case FEncoding of
-      cEncUTF8: Sign:= cSignUTF8;
-      cEncWideLE: Sign:= cSignWideLE;
-      cEncWideBE: Sign:= cSignWideBE;
+      cEncUTF8:
+        Sign:= cSignUTF8;
+      cEncWideLE:
+        Sign:= cSignWideLE;
+      cEncWideBE:
+        Sign:= cSignWideBE;
+      cEnc32LE:
+        Sign:= cSign32LE;
+      cEnc32BE:
+        Sign:= cSign32BE;
+      else
+        Sign:= '';
     end;
     if Sign<>'' then
       Stream.WriteBuffer(Sign[1], Length(Sign));

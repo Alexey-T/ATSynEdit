@@ -399,6 +399,8 @@ const
   cSignUTF8: string = #$EF#$BB#$BF;
   cSignWideLE: string = #$FF#$FE;
   cSignWideBE: string = #$FE#$FF;
+  cSign32LE: string = #$FF#$FE#0#0;
+  cSign32BE: string = #0#0#$FE#$FF;
 
 procedure DoEncError;
 begin
