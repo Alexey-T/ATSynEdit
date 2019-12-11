@@ -44,7 +44,7 @@ begin
         begin
           SWide:= UTF8Decode(SA);
           if AEncoding=cEncWideBE then
-            SWide:= SSwapEndianUTF16(SWide);
+            SSwapEndianWide(SWide);
           Stream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
 

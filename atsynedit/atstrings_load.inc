@@ -408,7 +408,7 @@ begin
               SetLength(SWide, Len div 2);
               Move(Buf[NStart], SWide[1], Len);
               if FEncoding=cEncWideBE then
-                SWide:= SSwapEndianUTF16(SWide);
+                SSwapEndianWide(SWide);
               LineAddRaw_UTF8_NoUndo(UTF8Encode(SWide), LineEnd);
             end;
 

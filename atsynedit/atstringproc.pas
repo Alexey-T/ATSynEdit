@@ -154,7 +154,7 @@ function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
-function SSwapEndianUTF16(const S: UnicodeString): UnicodeString;
+procedure SSwapEndianWide(var S: UnicodeString);
 procedure SSwapEndianUCS4(var S: UCS4String); inline;
 function SWithBreaks(const S: atString): boolean; inline;
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
@@ -420,21 +420,26 @@ begin
     Result:= Length(S);
 end;
 
-
-function SSwapEndianUTF16(const S: UnicodeString): UnicodeString;
+procedure SSwapEndianWide(var S: UnicodeString);
 var
   i: integer;
-  p: PWord;
+  P: PWord;
 begin
-  Result:= S;
   if S='' then exit;
-  UniqueString(Result);
-  P:= PWord(@Result[1]);
-  for i:= 1 to Length(Result) do
+  UniqueString(S);
+  for i:= 1 to Length(S) do
   begin
+    P:= @S[i];
     P^:= SwapEndian(P^);
-    Inc(P);
   end;
+end;
+
+procedure SSwapEndianUCS4(var S: UCS4String);
+var
+  i: integer;
+begin
+  for i:= 0 to Length(S)-1 do
+    S[i]:= SwapEndian(S[i]);
 end;
 
 function TATStringTabHelper.CalcTabulationSize(ALineIndex, APos: integer): integer;
@@ -669,14 +674,6 @@ begin
   //dont do "while", we need correct last empty lines
   if (L.Count>0) and (L[L.Count-1]='') then
     L.Delete(L.Count-1);
-end;
-
-procedure SSwapEndianUCS4(var S: UCS4String);
-var
-  i: integer;
-begin
-  for i:= 0 to Length(S)-1 do
-    S[i]:= SwapEndian(S[i]);
 end;
 
 function SWithBreaks(const S: atString): boolean; inline;
@@ -1024,13 +1021,13 @@ begin
     SetLength(S, n-1);
 end;
 
-procedure SDeleteFromEol(var s: string); inline;
+procedure SDeleteFromEol(var S: string);
 begin
   SDeleteFrom(s, #10);
   SDeleteFrom(s, #13);
 end;
 
-procedure SDeleteFromEol(var s: atString); inline;
+procedure SDeleteFromEol(var S: atString);
 begin
   SDeleteFrom(s, #10);
   SDeleteFrom(s, #13);
