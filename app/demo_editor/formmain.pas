@@ -266,13 +266,6 @@ uses
 {$R *.lfm}
 
 const
-  sEncUtf8 = 'UTF-8';
-  sEncUtf8NoBom = 'UTF-8 no bom';
-  sEncUtf16LE = 'UTF-16 LE';
-  sEncUtf16BE = 'UTF-16 BE';
-  sEncUtf32LE = 'UTF-32 LE';
-
-const
   cColorBmIco = clMedGray;
   cBookmarkBgKind = 10;
 
@@ -1047,33 +1040,33 @@ end;
 
 procedure TfmMain.DoSetEnc(const Str: string);
 begin
-  if Str=sEncUtf8 then
+  if Str=cEncNameUtf8_WithBom then
   begin
     Ed.Strings.Encoding:= cEncUTF8;
     Ed.Strings.SaveSignUtf8:= true;
     Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
-  if Str=sEncUtf8NoBom then
+  if Str=cEncNameUtf8_NoBom then
   begin
     Ed.Strings.Encoding:= cEncUTF8;
     Ed.Strings.SaveSignUtf8:= false;
     Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
-  if Str=sEncUtf16LE then
+  if Str=cEncNameUtf16LE_NoBom then
   begin
     Ed.Strings.Encoding:= cEncWideLE;
     Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
-  if Str=sEncUtf16BE then
+  if Str=cEncNameUtf16BE_WithBom then
   begin
     Ed.Strings.Encoding:= cEncWideBE;
     Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
-  if Str=sEncUtf32LE then
+  if Str=cEncNameUtf32LE_NoBom then
   begin
     Ed.Strings.Encoding:= cEnc32LE;
     Ed.Strings.EncodingCodepage:= eidUTF8;
@@ -1217,11 +1210,11 @@ procedure TfmMain.UpdateEnc;
 begin
   mnuEnc.Clear;
 
-  DoAddEnc('', sEncUtf8);
-  DoAddEnc('', sEncUtf8NoBom);
-  DoAddEnc('', sEncUtf16LE);
-  DoAddEnc('', sEncUtf16BE);
-  DoAddEnc('', sEncUtf32LE);
+  DoAddEnc('', cEncNameUtf8_WithBom);
+  DoAddEnc('', cEncNameUtf8_NoBom);
+  DoAddEnc('', cEncNameUtf16LE_NoBom);
+  DoAddEnc('', cEncNameUtf16BE_NoBom);
+  DoAddEnc('', cEncNameUtf32LE_NoBom);
   DoAddEnc('', '-');
 
   DoAddEnc('Europe', 'CP1250');
