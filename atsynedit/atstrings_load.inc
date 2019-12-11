@@ -117,22 +117,6 @@ begin
     Exit
   end;
 
-  if IsStreamWithSignature(Stream, cSignWideLE) then
-  begin
-    Enc:= cEncWideLE;
-    EncWithBom:= true;
-    SignLen:= Length(cSignWideLE);
-    Exit
-  end;
-
-  if IsStreamWithSignature(Stream, cSignWideBE) then
-  begin
-    Enc:= cEncWideBE;
-    EncWithBom:= true;
-    SignLen:= Length(cSignWideBE);
-    Exit
-  end;
-
   if IsStreamWithSignature(Stream, cSign32LE) then
   begin
     Enc:= cEnc32LE;
@@ -146,6 +130,22 @@ begin
     Enc:= cEnc32BE;
     EncWithBom:= true;
     SignLen:= Length(cSign32BE);
+    Exit
+  end;
+
+  if IsStreamWithSignature(Stream, cSignWideLE) then
+  begin
+    Enc:= cEncWideLE;
+    EncWithBom:= true;
+    SignLen:= Length(cSignWideLE);
+    Exit
+  end;
+
+  if IsStreamWithSignature(Stream, cSignWideBE) then
+  begin
+    Enc:= cEncWideBE;
+    EncWithBom:= true;
+    SignLen:= Length(cSignWideBE);
     Exit
   end;
 
