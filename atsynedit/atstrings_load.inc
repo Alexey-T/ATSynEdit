@@ -225,7 +225,7 @@ type
     cCharEnding13
     );
 
-function _GetEnding(ABuffer: pointer; APos: integer; AEnc: TATFileEncoding): TATCharEnding; inline;
+function _GetBufferEnding(ABuffer: pointer; APos: integer; AEnc: TATFileEncoding): TATCharEnding; inline;
 var
   p: PByte absolute ABuffer;
   Check: byte;
@@ -284,7 +284,7 @@ var
     repeat
       if AFoundPos>=BufSize then exit;
 
-      case _GetEnding(Buf, AFoundPos, FEncoding) of
+      case _GetBufferEnding(Buf, AFoundPos, FEncoding) of
         cCharNotEnding:
           begin
             Inc(AFoundPos, CharSize);
@@ -297,7 +297,7 @@ var
         cCharEnding13:
           begin
             if AFoundPos+CharSize<BufSize then
-              if _GetEnding(Buf, AFoundPos+CharSize, FEncoding)=cCharEnding10 then
+              if _GetBufferEnding(Buf, AFoundPos+CharSize, FEncoding)=cCharEnding10 then
                 AEnding:= cEndWin
               else
                 AEnding:= cEndMac;
