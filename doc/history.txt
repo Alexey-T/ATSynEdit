@@ -1,4 +1,7 @@
 
+2019.12.11
++ add: supported encodings UTF-32LE, UTF-32BE
+
 2019.11.26
 + add: OptKeyBackspaceGoesToPrevLine
 
