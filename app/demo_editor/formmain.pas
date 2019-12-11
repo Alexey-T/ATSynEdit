@@ -1072,6 +1072,12 @@ begin
     Ed.Strings.EncodingCodepage:= eidUTF8;
   end
   else
+  if Str=cEncNameUtf32BE_NoBom then
+  begin
+    Ed.Strings.Encoding:= cEnc32BE;
+    Ed.Strings.EncodingCodepage:= eidUTF8;
+  end
+  else
   begin
     Ed.Strings.Encoding:= cEncAnsi;
     Ed.Strings.EncodingCodepage:= EncConvFindEncoding(LowerCase(Str));
@@ -1215,6 +1221,7 @@ begin
   DoAddEnc('', cEncNameUtf16LE_NoBom);
   DoAddEnc('', cEncNameUtf16BE_NoBom);
   DoAddEnc('', cEncNameUtf32LE_NoBom);
+  DoAddEnc('', cEncNameUtf32BE_NoBom);
   DoAddEnc('', '-');
 
   DoAddEnc('Europe', 'CP1250');

@@ -62,7 +62,8 @@ type
     cEncUTF8,
     cEncWideLE,
     cEncWideBE,
-    cEnc32LE
+    cEnc32LE,
+    cEnc32BE
     );
 
   TATBlockChangeKind = (
@@ -73,7 +74,7 @@ type
   );
 
 const
-  cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2, 4);
+  cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2, 4, 4);
 
 type
   TATTrimSpaces = (

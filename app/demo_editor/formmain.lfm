@@ -538,7 +538,6 @@ object fmMain: TfmMain
       end
       object mnuTestSyntax: TMenuItem
         Caption = 'hilite "fake" syntax'
-        ShortCut = 16467
         OnClick = mnuTestSyntaxClick
       end
       object mnuTestHiliteWww: TMenuItem

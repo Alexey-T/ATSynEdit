@@ -48,12 +48,15 @@ begin
           Stream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
 
-      cEnc32LE:
+      cEnc32LE,
+      cEnc32BE:
         begin
           SWide:= UTF8Decode(SA);
           SQuad:= UnicodeStringToUCS4String(SWide);
+          if AEncoding=cEnc32BE then
+            SSwapEndianUCS4(SQuad);
           Stream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
-        end
+        end;
 
       else
         DoEncError;

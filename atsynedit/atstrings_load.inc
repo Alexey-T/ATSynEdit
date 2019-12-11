@@ -260,6 +260,13 @@ var
           if p[APos+1]<>0 then exit;
           Check:= p[APos];
         end;
+      cEnc32BE:
+        begin
+          if p[APos]<>0 then exit;
+          if p[APos+1]<>0 then exit;
+          if p[APos+2]<>0 then exit;
+          Check:= p[APos+3];
+        end;
     end;
 
     case Check of
@@ -405,10 +412,13 @@ begin
               LineAddRaw_UTF8_NoUndo(UTF8Encode(SWide), LineEnd);
             end;
 
-          cEnc32LE:
+          cEnc32LE,
+          cEnc32BE:
             begin
               SetLength(SQuad, Len div 4+1);
               Move(Buf[NStart], SQuad[0], Len);
+              if FEncoding=cEnc32BE then
+                SSwapEndianUCS4(SQuad);
               SWide:= UCS4StringToUnicodeString(SQuad);
               LineAddRaw_UTF8_NoUndo(UTF8Encode(SWide), LineEnd);
             end;

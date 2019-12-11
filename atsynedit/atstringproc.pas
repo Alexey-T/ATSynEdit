@@ -155,6 +155,7 @@ function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): at
 
 function SGetItem(var S: string; const ch: Char = ','): string;
 function SSwapEndian(const S: UnicodeString): UnicodeString;
+procedure SSwapEndianUCS4(var S: UCS4String); inline;
 function SWithBreaks(const S: atString): boolean; inline;
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
 
@@ -668,6 +669,14 @@ begin
   //dont do "while", we need correct last empty lines
   if (L.Count>0) and (L[L.Count-1]='') then
     L.Delete(L.Count-1);
+end;
+
+procedure SSwapEndianUCS4(var S: UCS4String);
+var
+  i: integer;
+begin
+  for i:= 0 to Length(S)-1 do
+    S[i]:= SwapEndian(S[i]);
 end;
 
 function SWithBreaks(const S: atString): boolean; inline;
