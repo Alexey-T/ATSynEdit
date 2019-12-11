@@ -154,7 +154,7 @@ function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
-function SSwapEndian(const S: UnicodeString): UnicodeString;
+function SSwapEndianUTF16(const S: UnicodeString): UnicodeString;
 procedure SSwapEndianUCS4(var S: UCS4String); inline;
 function SWithBreaks(const S: atString): boolean; inline;
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
@@ -421,7 +421,7 @@ begin
 end;
 
 
-function SSwapEndian(const S: UnicodeString): UnicodeString;
+function SSwapEndianUTF16(const S: UnicodeString): UnicodeString;
 var
   i: integer;
   p: PWord;
