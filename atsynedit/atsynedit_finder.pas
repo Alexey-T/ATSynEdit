@@ -237,16 +237,13 @@ end;
 
 
 function STestStringMatch(const StrFind: UnicodeString; PtrLine: PWideChar; OptCaseSensitive: boolean): boolean;
-//1- if case-insensitive, PtrLine str must be wide-upper-cased
-//2- index check must be in caller
+//- if case-insensitive, StrFind must be already in uppercase
+//- index check must be in caller
 var
   charFind, charLine: WideChar;
   code: word absolute charLine;
   i: integer;
 begin
-  if StrFind='' then exit(true);
-  if PtrLine=nil then exit(false);
-
   for i:= 1 to Length(StrFind) do
   begin
     charFind:= StrFind[i];
