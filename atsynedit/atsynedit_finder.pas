@@ -236,7 +236,7 @@ begin
 end;
 
 
-function STestStringMatch(PtrFind, PtrLine: PWideChar; LenStrFind: integer; OptCaseSensitive: boolean): boolean;
+function STestStringMatch(const StrFind: UnicodeString; PtrLine: PWideChar; OptCaseSensitive: boolean): boolean;
 //1- if case-insensitive, PtrLine str must be wide-upper-cased
 //2- index check must be in caller
 var
@@ -244,12 +244,12 @@ var
   code: word absolute charLine;
   i: integer;
 begin
-  if PtrFind=nil then exit(false);
+  if StrFind='' then exit(true);
   if PtrLine=nil then exit(false);
 
-  for i:= 1 to LenStrFind do
+  for i:= 1 to Length(StrFind) do
   begin
-    charFind:= PtrFind^;
+    charFind:= StrFind[i];
     charLine:= PtrLine^;
 
     if not OptCaseSensitive then
@@ -265,9 +265,9 @@ begin
 
     if charFind<>charLine then
       exit(false);
-    Inc(PtrFind);
     Inc(PtrLine);
   end;
+
   Result:= true;
 end;
 
@@ -1593,13 +1593,13 @@ var
     begin
       //test 1st part at given offset
       //S1='' - search-string ends with EOL and search is backward
-      if (S1<>'') and not STestStringMatch(@S1[1], @S2[AEndOffset-Length(S1)], Length(S1), OptCase) then exit;
+      if not STestStringMatch(S1, @S2[AEndOffset-Length(S1)], OptCase) then exit;
     end
     else
     begin
       //test 1st part at begin
       //S1='' - search-string ends with EOL and search is backward
-      if (S1<>'') and not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
+      if not STestStringMatch(S1, @S2[1], OptCase) then exit;
 
       //test middle parts
       for i:= 1 to NParts-2 do
@@ -1607,14 +1607,14 @@ var
         S1:= UTF8Decode(ListParts[i]);
         S2:= UTF8Decode(ListLooped[i]);
         if Length(S1)<>Length(S2) then exit;
-        if (S1<>'') and not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
+        if not STestStringMatch(S1, @S2[1], OptCase) then exit;
       end;
 
       //test last part at end
       S1:= UTF8Decode(ListParts[NParts-1]);
       S2:= UTF8Decode(ListLooped[NParts-1]);
       if Length(S1)>Length(S2) then exit;
-      if (S1<>'') and not STestStringMatch(@S1[1], @S2[Length(S2)-Length(S1)+1], Length(S1), OptCase) then exit;
+      if not STestStringMatch(S1, @S2[Length(S2)-Length(S1)+1], OptCase) then exit;
     end;
 
     Result:= true;
@@ -1711,7 +1711,7 @@ begin
 
         for IndexChar:= NStartOffset to NEndOffset do
         begin
-          bOk:= STestStringMatch(@SFind[1], @SLineToTest[IndexChar+1], NLenStrFind, OptCase);
+          bOk:= STestStringMatch(SFind, @SLineToTest[IndexChar+1], OptCase);
           //consider whole words (only for single line)
           if bOk and OptWords and (NParts=1) then
             bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
