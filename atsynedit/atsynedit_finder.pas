@@ -1544,7 +1544,7 @@ var
   SLinePartW, SLineLoopedW: UnicodeString;
   NLenPart, NLenLooped: integer;
   //---------
-  function _GetLineLooped(AIndex: integer): string;
+  function _GetLineLooped(AIndex: integer): string; inline;
   begin
     if (NParts=1) or (AIndex=0) then
       Result:= SLineLooped
@@ -1555,7 +1555,7 @@ var
       Result:= '';
   end;
   //---------
-  function _GetLinePart(AIndex: integer): string;
+  function _GetLinePart(AIndex: integer): string; inline;
   begin
     if (NParts=1) or (AIndex=0) then
       Result:= SLinePart
@@ -1620,7 +1620,7 @@ var
     Result:= true;
   end;
   //---------
-  function _GetLineToTest: UnicodeString;
+  function _GetLineToTest: UnicodeString; inline;
   begin
     if NParts=1 then
       Result:= SLineLoopedW
