@@ -1592,12 +1592,14 @@ var
     if NParts=1 then
     begin
       //test 1st part at given offset
-      if not STestStringMatch(@S1[1], @S2[AEndOffset-Length(S1)], Length(S1), OptCase) then exit;
+      //S1='' - search-string ends with EOL and search is backward
+      if (S1<>'') and not STestStringMatch(@S1[1], @S2[AEndOffset-Length(S1)], Length(S1), OptCase) then exit;
     end
     else
     begin
       //test 1st part at begin
-      if not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
+      //S1='' - search-string ends with EOL and search is backward
+      if (S1<>'') and not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
 
       //test middle parts
       for i:= 1 to NParts-2 do
