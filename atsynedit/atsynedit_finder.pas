@@ -1607,14 +1607,14 @@ var
         S1:= UTF8Decode(ListParts[i]);
         S2:= UTF8Decode(ListLooped[i]);
         if Length(S1)<>Length(S2) then exit;
-        if not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
+        if (S1<>'') and not STestStringMatch(@S1[1], @S2[1], Length(S1), OptCase) then exit;
       end;
 
       //test last part at end
       S1:= UTF8Decode(ListParts[NParts-1]);
       S2:= UTF8Decode(ListLooped[NParts-1]);
       if Length(S1)>Length(S2) then exit;
-      if not STestStringMatch(@S1[1], @S2[Length(S2)-Length(S1)+1], Length(S1), OptCase) then exit;
+      if (S1<>'') and not STestStringMatch(@S1[1], @S2[Length(S2)-Length(S1)+1], Length(S1), OptCase) then exit;
     end;
 
     Result:= true;
