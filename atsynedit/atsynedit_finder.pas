@@ -237,9 +237,9 @@ end;
 
 
 function STestStringMatch(
-  const StrFind, StrLine: UnicodeString;
-  StrLineIndex: integer;
-  OptCaseSensitive: boolean): boolean;
+  const SFind, SLine: UnicodeString;
+  CharIndex: integer;
+  CaseSens: boolean): boolean;
 //- if case-insensitive, StrFind must be already in uppercase
 //- index check must be in caller
 var
@@ -247,13 +247,14 @@ var
   code: word absolute charLine;
   i: integer;
 begin
-  for i:= 1 to Length(StrFind) do
+  for i:= 1 to Length(SFind) do
   begin
-    charFind:= StrFind[i];
-    charLine:= StrLine[StrLineIndex];
-    Inc(StrLineIndex);
+    if CharIndex>Length(SLine) then Break;
+    charFind:= SFind[i];
+    charLine:= SLine[CharIndex];
+    Inc(CharIndex);
 
-    if not OptCaseSensitive then
+    if not CaseSens then
     begin
       //like UpCase(char)
       if (code>=Ord('a')) and (code<=Ord('z')) then
