@@ -189,6 +189,7 @@ type
     function DoAction_FindSimple(const APosStart: TPoint): boolean;
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoAction_ReplaceSelected: boolean;
+    procedure DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
     function DoAction_CountAll(AWithEvent: boolean): integer;
     procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
       ADuplicates: TDuplicates);
@@ -747,6 +748,19 @@ begin
     CurrentFragmentIndex:= 0;
   end;
 end;
+
+procedure TATEditorFinder.DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
+begin
+  AResults.Clear;
+  if OptRegex then
+  begin
+    UpdateBuffer;
+    DoCollect_Regex(AResults, 1, AWithEvent, false)
+  end
+  else
+    DoCollect_Usual(AResults, AWithEvent, false);
+end;
+
 
 procedure TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList;
   ASorted: boolean; ADuplicates: TDuplicates);
