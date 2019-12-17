@@ -751,7 +751,9 @@ end;
 
 procedure TATEditorFinder.DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
 begin
-  AResults.Clear;
+  UpdateFragments;
+  CurrentFragmentIndex:= 0;
+
   if OptRegex then
   begin
     UpdateBuffer;
