@@ -147,14 +147,16 @@ type
     function DoCount_InFragment(AWithEvent: boolean): integer;
     function DoReplace_InFragment: integer;
     //
-    function DoFindOrReplace_InFragment(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoFindOrReplace_InEditor(AReplace, AForMany: boolean; out AChanged: boolean): boolean;
+    function DoFindOrReplace_InFragment(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
+      AUpdateCaret: boolean): boolean;
+    function DoFindOrReplace_InEditor(AReplace, AForMany: boolean; out AChanged: boolean;
+      AUpdateCaret: boolean): boolean;
     function DoFindOrReplace_InEditor_Internal(AReplace, AForMany: boolean; out AChanged: boolean; APosStart,
-      APosEnd: TPoint): boolean;
-    function DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
-      out AChanged: boolean): boolean;
-    function DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean;
-      out AChanged: boolean; AStartPos: integer): boolean;
+      APosEnd: TPoint; AUpdateCaret: boolean): boolean;
+    function DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
+      AUpdateCaret: boolean): boolean;
+    function DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
+      AStartPos: integer; AUpdateCaret: boolean): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
       const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean);
     function IsSelStartsAtMatch_InEditor: boolean;
@@ -187,8 +189,9 @@ type
     destructor Destroy; override;
     //
     function DoAction_FindSimple(const APosStart: TPoint): boolean;
-    function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoAction_ReplaceSelected: boolean;
+    function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
+      AUpdateCaret: boolean): boolean;
+    function DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
     procedure DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
     function DoAction_CountAll(AWithEvent: boolean): integer;
     procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
@@ -987,7 +990,7 @@ begin
 end;
 
 function TATEditorFinder.DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean;
-  out AChanged: boolean): boolean;
+  out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   i: integer;
 begin
@@ -1007,7 +1010,7 @@ begin
 
   if not OptInSelection or (FFragments.Count=0) then
   begin
-    Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged);
+    Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged, AUpdateCaret);
     exit
   end;
 
@@ -1016,7 +1019,7 @@ begin
     for i:= 0 to FFragments.Count-1 do
     begin
       CurrentFragmentIndex:= i;
-      Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged);
+      Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged, AUpdateCaret);
       if Result then Break;
     end;
   end
@@ -1025,7 +1028,7 @@ begin
     for i:= FFragments.Count-1 downto 0 do
     begin
       CurrentFragmentIndex:= i;
-      Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged);
+      Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged, AUpdateCaret);
       if Result then Break;
     end;
   end;
@@ -1035,16 +1038,16 @@ end;
 
 
 function TATEditorFinder.DoFindOrReplace_InFragment(ANext, AReplace, AForMany: boolean;
-  out AChanged: boolean): boolean;
+  out AChanged: boolean; AUpdateCaret: boolean): boolean;
 begin
   if OptRegex then
-    Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged)
+    Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged, AUpdateCaret)
   else
-    Result:= DoFindOrReplace_InEditor(AReplace, AForMany, AChanged);
+    Result:= DoFindOrReplace_InEditor(AReplace, AForMany, AChanged, AUpdateCaret);
 end;
 
 function TATEditorFinder.DoFindOrReplace_InEditor(AReplace, AForMany: boolean;
-  out AChanged: boolean): boolean;
+  out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   Caret: TATCaretItem;
   NLastX, NLastY, NLines: integer;
@@ -1099,7 +1102,7 @@ begin
     PosStart.Y:= Caret.PosY;
   end;
 
-  Result:= DoFindOrReplace_InEditor_Internal(AReplace, AForMany, AChanged, PosStart, PosEnd);
+  Result:= DoFindOrReplace_InEditor_Internal(AReplace, AForMany, AChanged, PosStart, PosEnd, AUpdateCaret);
 
   if not Result and OptWrapped and not OptInSelection then
   begin
@@ -1125,7 +1128,7 @@ begin
       //same as _buffered version:
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
-      if DoFindOrReplace_InEditor_Internal(false, AForMany, AChanged, SecondStart, SecondEnd) then
+      if DoFindOrReplace_InEditor_Internal(false, AForMany, AChanged, SecondStart, SecondEnd, AUpdateCaret) then
       begin
         Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, PosStart.X, PosStart.Y, false)) or
                  (OptBack and IsPosSorted(PosStart.X, PosStart.Y, FMatchEdPos.X, FMatchEdPos.Y, false));
@@ -1138,7 +1141,7 @@ end;
 
 
 function TATEditorFinder.DoFindOrReplace_InEditor_Internal(AReplace, AForMany: boolean;
-  out AChanged: boolean; APosStart, APosEnd: TPoint): boolean;
+  out AChanged: boolean; APosStart, APosEnd: TPoint; AUpdateCaret: boolean): boolean;
 var
   ConfirmThis, ConfirmContinue: boolean;
   SNew: UnicodeString;
@@ -1151,7 +1154,8 @@ begin
   Result:= FindMatch_InEditor(APosStart, APosEnd, true);
   if Result then
   begin
-    Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y);
+    if AUpdateCaret then
+      Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y);
 
     if AReplace then
     begin
@@ -1191,19 +1195,22 @@ begin
       end;
     end;
 
-    if AReplace then
-      //don't select
-      Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y)
-    else
-    if OptBack and OptPutBackwardSelection then
-      Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y, FMatchEdEnd.X, FMatchEdEnd.Y)
-    else
-      Editor.DoCaretSingle(FMatchEdEnd.X, FMatchEdEnd.Y, FMatchEdPos.X, FMatchEdPos.Y);
+    if AUpdateCaret then
+    begin
+      if AReplace then
+        //don't select
+        Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y)
+      else
+      if OptBack and OptPutBackwardSelection then
+        Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y, FMatchEdEnd.X, FMatchEdEnd.Y)
+      else
+        Editor.DoCaretSingle(FMatchEdEnd.X, FMatchEdEnd.Y, FMatchEdPos.X, FMatchEdPos.Y);
+    end;
   end;
 end;
 
 function TATEditorFinder.DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
-  out AChanged: boolean): boolean;
+  out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   NStartPos: integer;
 begin
@@ -1214,7 +1221,7 @@ begin
   UpdateBuffer;
 
   NStartPos:= GetOffsetStartPos;
-  Result:= DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany, AChanged, NStartPos);
+  Result:= DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
 
   if (not Result) and (OptWrapped and not OptInSelection) then
     if (not OptBack and (NStartPos>1)) or
@@ -1224,7 +1231,8 @@ begin
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
       //
       if DoFindOrReplace_Buffered_Internal(ANext, false, AForMany, AChanged,
-        IfThen(not OptBack, 1, Length(StrText))) then
+        IfThen(not OptBack, 1, Length(StrText)),
+        AUpdateCaret) then
       begin
         Result:= (not OptBack and (FMatchPos<NStartPos)) or
                  (OptBack and (FMatchPos>NStartPos));
@@ -1236,7 +1244,7 @@ end;
 
 
 function TATEditorFinder.DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean;
-  out AChanged: boolean; AStartPos: integer): boolean;
+  out AChanged: boolean; AStartPos: integer; AUpdateCaret: boolean): boolean;
   //function usually called 1 time in outer func,
   //or 1-2 times if OptWrap=true
 var
@@ -1252,7 +1260,8 @@ begin
   begin
     P1:= ConvertBufferPosToCaretPos(FMatchPos);
     P2:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
-    Editor.DoCaretSingle(P1.X, P1.Y);
+    if AUpdateCaret then
+      Editor.DoCaretSingle(P1.X, P1.Y);
 
     if AReplace then
     begin
@@ -1283,14 +1292,17 @@ begin
       end;
     end;
 
-    if AReplace then
-      //don't select
-      Editor.DoCaretSingle(P1.X, P1.Y)
-    else
-    if OptBack and OptPutBackwardSelection then
-      Editor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y)
-    else
-      Editor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y);
+    if AUpdateCaret then
+    begin
+      if AReplace then
+        //don't select
+        Editor.DoCaretSingle(P1.X, P1.Y)
+      else
+      if OptBack and OptPutBackwardSelection then
+        Editor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y)
+      else
+        Editor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y);
+    end;
   end;
 end;
 
@@ -1339,7 +1351,7 @@ begin
     ((StrFind<>'') and (Editor.TextSelected=StrFind));
 end;
 
-function TATEditorFinder.DoAction_ReplaceSelected: boolean;
+function TATEditorFinder.DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
 var
   Caret: TATCaretItem;
   P1, P2: TPoint;
@@ -1355,7 +1367,7 @@ begin
   begin
     if not IsSelStartsAtMatch_Buffered then
     begin
-      DoFindOrReplace_Buffered(false, false, false, bSel);
+      DoFindOrReplace_Buffered(false, false, false, bSel, AUpdateCaret);
       exit;
     end;
   end
@@ -1363,7 +1375,7 @@ begin
   begin
     if not IsSelStartsAtMatch_InEditor then
     begin
-      DoFindOrReplace_InEditor(false, false, bSel);
+      DoFindOrReplace_InEditor(false, false, bSel, AUpdateCaret);
       exit;
     end;
   end;
