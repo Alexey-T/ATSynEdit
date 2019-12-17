@@ -148,9 +148,9 @@ type
     function DoReplace_InFragment: integer;
     //
     function DoFindOrReplace_InFragment(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean;
-      out AChanged: boolean; APosStart, APosEnd: TPoint): boolean;
+    function DoFindOrReplace_InEditor(AReplace, AForMany: boolean; out AChanged: boolean): boolean;
+    function DoFindOrReplace_InEditor_Internal(AReplace, AForMany: boolean; out AChanged: boolean; APosStart,
+      APosEnd: TPoint): boolean;
     function DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
       out AChanged: boolean): boolean;
     function DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean;
@@ -1040,10 +1040,10 @@ begin
   if OptRegex then
     Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged)
   else
-    Result:= DoFindOrReplace_InEditor(ANext, AReplace, AForMany, AChanged);
+    Result:= DoFindOrReplace_InEditor(AReplace, AForMany, AChanged);
 end;
 
-function TATEditorFinder.DoFindOrReplace_InEditor(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoFindOrReplace_InEditor(AReplace, AForMany: boolean;
   out AChanged: boolean): boolean;
 var
   Caret: TATCaretItem;
@@ -1099,7 +1099,7 @@ begin
     PosStart.Y:= Caret.PosY;
   end;
 
-  Result:= DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany, AChanged, PosStart, PosEnd);
+  Result:= DoFindOrReplace_InEditor_Internal(AReplace, AForMany, AChanged, PosStart, PosEnd);
 
   if not Result and OptWrapped and not OptInSelection then
   begin
@@ -1125,7 +1125,7 @@ begin
       //same as _buffered version:
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
-      if DoFindOrReplace_InEditor_Internal(ANext, false, AForMany, AChanged, SecondStart, SecondEnd) then
+      if DoFindOrReplace_InEditor_Internal(false, AForMany, AChanged, SecondStart, SecondEnd) then
       begin
         Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, PosStart.X, PosStart.Y, false)) or
                  (OptBack and IsPosSorted(PosStart.X, PosStart.Y, FMatchEdPos.X, FMatchEdPos.Y, false));
@@ -1137,7 +1137,7 @@ begin
 end;
 
 
-function TATEditorFinder.DoFindOrReplace_InEditor_Internal(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoFindOrReplace_InEditor_Internal(AReplace, AForMany: boolean;
   out AChanged: boolean; APosStart, APosEnd: TPoint): boolean;
 var
   ConfirmThis, ConfirmContinue: boolean;
@@ -1363,7 +1363,7 @@ begin
   begin
     if not IsSelStartsAtMatch_InEditor then
     begin
-      DoFindOrReplace_InEditor(false, false, false, bSel);
+      DoFindOrReplace_InEditor(false, false, bSel);
       exit;
     end;
   end;
