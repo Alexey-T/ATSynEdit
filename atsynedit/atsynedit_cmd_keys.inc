@@ -271,11 +271,17 @@ function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
 var
   NLine: integer;
 begin
+  {
+  //worked not reliable, e.g. in CudaText fmConsole.memo
   if FWrapInfo.Count>0 then
   begin
     NLine:= FWrapInfo[FWrapInfo.Count-1].NLineIndex;
     DoCaretSingle(Strings.LinesLen[NLine], NLine, false);
   end;
+  }
+
+  NLine:= Strings.Count-1;
+  DoCaretSingle(Strings.LinesLen[NLine], NLine, false);
 
   Result:= [cResultCaretTop];
 end;
