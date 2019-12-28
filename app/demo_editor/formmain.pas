@@ -884,13 +884,13 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged);
+          ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged, true);
           FinderUpdateEditor(false);
           if not ok then DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.DoAction_FindOrReplace(false, true, false, bChanged);
+          ok:= FFinder.DoAction_FindOrReplace(false, true, false, bChanged, true);
           FinderUpdateEditor(true);
           if not ok then DoFindError;
         end;
@@ -934,7 +934,7 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
-  ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged);
+  ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged, true);
   FinderUpdateEditor(false);
   if not ok then DoFindError;
 end;
