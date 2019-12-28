@@ -26,7 +26,7 @@ type
 
   TATGutter = class
   private
-    FList: TList;
+    FList: TfpList;
     function GetItem(N: integer): TATGutterItem;
   public
     GutterLeft: integer;
@@ -64,7 +64,7 @@ end;
 constructor TATGutter.Create;
 begin
   inherited;
-  FList:= TList.Create;
+  FList:= TfpList.Create;
 end;
 
 destructor TATGutter.Destroy;

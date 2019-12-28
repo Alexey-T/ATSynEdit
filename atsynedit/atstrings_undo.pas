@@ -59,7 +59,7 @@ type
 
   TATUndoList = class
   private
-    FList: TList;
+    FList: TfpList;
     FMaxCount: integer;
     FLocked: boolean;
     FSoftMark: boolean;
@@ -221,7 +221,7 @@ end;
 
 constructor TATUndoList.Create;
 begin
-  FList:= TList.Create;
+  FList:= TfpList.Create;
   FMaxCount:= 5000;
   FSoftMark:= false;
   FHardMark:= false;

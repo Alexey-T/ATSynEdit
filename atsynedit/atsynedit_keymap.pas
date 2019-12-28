@@ -45,7 +45,7 @@ type
 
   TATKeymap = class
   private
-    FList: TList;
+    FList: TfpList;
     FHistory: TATKeyArray;
     function GetItem(N: integer): TATKeymapItem;
     procedure ClearHistory;
@@ -95,7 +95,7 @@ end;
 
 constructor TATKeymap.Create;
 begin
-  FList:= TList.Create;
+  FList:= TfpList.Create;
   ClearHistory;
 end;
 

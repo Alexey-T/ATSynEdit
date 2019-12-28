@@ -25,7 +25,7 @@ type
 
   TATAdapterHiliteCache = class
   private
-    FList: TList;
+    FList: TfpList;
     FMaxCount: integer;
     FEnabled: boolean;
     procedure SetEnabled(AValue: boolean);
@@ -65,7 +65,7 @@ end;
 
 constructor TATAdapterHiliteCache.Create;
 begin
-  FList:= TList.Create;
+  FList:= TfpList.Create;
   FMaxCount:= cAdapterCacheMaxSize;
 end;
 

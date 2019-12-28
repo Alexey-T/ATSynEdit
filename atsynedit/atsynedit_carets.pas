@@ -72,7 +72,7 @@ type
 
   TATCarets = class
   private
-    FList: TList;
+    FList: TfpList;
     FManyAllowed: boolean;
     FOneLine: boolean;
     FOnCaretChanged: TNotifyEvent;
@@ -250,7 +250,7 @@ end;
 constructor TATCarets.Create;
 begin
   inherited;
-  FList:= TList.Create;
+  FList:= TfpList.Create;
   FManyAllowed:= true;
   FOneLine:= false;
 end;
