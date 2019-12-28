@@ -35,7 +35,7 @@ type
 
   TATGaps = class
   private
-    FList: TfpList;
+    FList: TFPList;
     FOnDelete: TATGapDeleteEvent;
     FSizeOfGapTop: integer;
     FSizeOfGap0: integer;
@@ -92,7 +92,7 @@ end;
 constructor TATGaps.Create;
 begin
   inherited;
-  FList:= TfpList.Create;
+  FList:= TFPList.Create;
   FSizeOfGapTop:= 0;
   FSizeOfGap0:= 0;
 end;
