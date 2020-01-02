@@ -176,8 +176,8 @@ begin
   M.Add(cCommand_CaretsExtendDownPage, 'carets extend: down a page', [], []);
   M.Add(cCommand_CaretsExtendDownToEnd, 'carets extend: down to end', [], []);
 
-  M.Add(cCommand_ZoomIn, 'zoom in', [], []);
-  M.Add(cCommand_ZoomOut, 'zoom out', [], []);
+  M.Add(cCommand_ZoomIn, 'current document font size: bigger', [], []);
+  M.Add(cCommand_ZoomOut, 'current document font size: smaller', [], []);
 
   M.Add(cCommand_TextCaseLower, 'convert case: lower case', [], []);
   M.Add(cCommand_TextCaseUpper, 'convert case: upper case', [], []);
