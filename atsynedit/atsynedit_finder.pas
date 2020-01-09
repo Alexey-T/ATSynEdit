@@ -356,12 +356,23 @@ begin
   except
     if Assigned(FOnBadRegex) then
       FOnBadRegex(Self);
+    exit;
   end;
 
-    FRegex.InputString:= StrText;
+  FRegex.InputString:= StrText;
 
-    if FRegex.ExecPos(AFromPos) then
+  if FRegex.ExecPos(AFromPos) then
+  begin
+    if CheckTokens(FRegex.MatchPos[0]) then
     begin
+      Result:= true;
+      FMatchPos:= FRegex.MatchPos[0];
+      FMatchLen:= FRegex.MatchLen[0];
+      exit
+    end;
+
+    repeat
+      if not FRegex.ExecNext then exit;
       if CheckTokens(FRegex.MatchPos[0]) then
       begin
         Result:= true;
@@ -369,18 +380,8 @@ begin
         FMatchLen:= FRegex.MatchLen[0];
         exit
       end;
-
-      repeat
-        if not FRegex.ExecNext then exit;
-        if CheckTokens(FRegex.MatchPos[0]) then
-        begin
-          Result:= true;
-          FMatchPos:= FRegex.MatchPos[0];
-          FMatchLen:= FRegex.MatchLen[0];
-          exit
-        end;
-      until false;
-    end;
+    until false;
+  end;
 end;
 
 function TATTextFinder.GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
