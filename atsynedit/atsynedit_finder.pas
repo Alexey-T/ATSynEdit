@@ -211,6 +211,7 @@ begin
   Result:= ATStringProc.IsCharWord(ch, cDefaultNonWordChars);
 end;
 
+{
 function SRegexReplaceEscapedTabs(const AStr: string): string;
 begin
   Result:= AStr;
@@ -218,6 +219,7 @@ begin
   Result:= StringReplace(Result, '\t', #9, [rfReplaceAll]);
   Result:= StringReplace(Result, #1, '\\', [rfReplaceAll]);
 end;
+}
 
 procedure StringList_Reverse(L: TStringList);
 var
