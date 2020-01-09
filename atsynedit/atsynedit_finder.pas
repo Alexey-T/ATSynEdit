@@ -910,7 +910,13 @@ begin
   //  (APosEnd.Y>Strs.Count-1) or
   //  ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
 
-  Strs.TextReplaceRange(APosBegin.X, APosBegin.Y, APosEnd.X, APosEnd.Y, AReplacement, Shift, PosAfter, false);
+  Strs.TextReplaceRange(
+    APosBegin.X, APosBegin.Y,
+    APosEnd.X, APosEnd.Y,
+    AReplacement,
+    Shift, PosAfter,
+    true //use grouped undo
+    );
 
   if AUpdateBuffer and OptRegex then
   begin
