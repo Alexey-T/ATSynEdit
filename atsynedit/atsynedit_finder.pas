@@ -139,7 +139,7 @@ type
     function ConvertCaretPosToBufferPos(APos: TPoint): integer;
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
-    function GetRegexSkipIncrement: integer;
+    function GetRegexSkipIncrement: integer; inline;
     procedure DoFixCaretSelectionDirection;
     //
     procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
@@ -1187,9 +1187,7 @@ begin
 
         DoReplaceTextInEditor(FMatchEdPos, FMatchEdEnd, SNew, true, true);
 
-        FSkipLen:= Length(SNew);
-        if OptRegex then
-          Inc(FSkipLen, GetRegexSkipIncrement);
+        FSkipLen:= Length(SNew)+GetRegexSkipIncrement;
 
         AChanged:= true;
       end;
@@ -1254,7 +1252,8 @@ var
 begin
   AChanged:= false;
   Result:= FindMatch_Regex(ANext, FSkipLen, AStartPos);
-  FSkipLen:= FMatchLen;
+
+  FSkipLen:= FMatchLen+GetRegexSkipIncrement;
 
   if Result then
   begin
@@ -1284,9 +1283,7 @@ begin
 
         DoReplaceTextInEditor(P1, P2, SNew, true, true);
 
-        FSkipLen:= Length(SNew);
-        if OptRegex then
-          Inc(FSkipLen, GetRegexSkipIncrement);
+        FSkipLen:= Length(SNew)+GetRegexSkipIncrement;
 
         AChanged:= true;
       end;
@@ -1458,11 +1455,13 @@ begin
 end;
 
 function TATEditorFinder.GetRegexSkipIncrement: integer;
-//this is to solve loop-forever if regex "$" replaced-all to eg "==="
+//this is to solve loop-forever if regex "$" or "\b" replaced-all to eg "==="
 //(need to skip one more char)
 begin
-  Result:= 0;
-  if StrFind='$' then Result:= 1;
+  if OptRegex and (FMatchLen=0) then
+    Result:= 1
+  else
+    Result:= 0;
 end;
 
 
