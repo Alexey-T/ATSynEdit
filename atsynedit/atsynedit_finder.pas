@@ -391,16 +391,23 @@ begin
   if StrReplace='' then
     exit('');
 
+  if FRegexReplacer=nil then
+  begin
+    FRegexReplacer:= TRegExpr.Create;
+    FRegexReplacer.ModifierS:= false;
+    FRegexReplacer.ModifierM:= true;
+  end;
+
   try
     FRegexReplacer.ModifierI:= not OptCase;
     FRegexReplacer.Expression:= StrFind;
-    FRegexReplacer.Compile;
+    FRegexReplacer.InputString:= AFromText;
+    //don't call Compile, it will be compiled in Exec when Expression changes
+    FRegexReplacer.Exec;
   except
     exit(StrReplace);
   end;
 
-  FRegexReplacer.InputString:= AFromText;
-  FRegexReplacer.Exec;
   Result:= FRegexReplacer.Substitute(StrReplace);
 end;
 
@@ -1420,14 +1427,13 @@ begin
   FRegex.ModifierS:= false;
   FRegex.ModifierM:= true;
 
-  FRegexReplacer:= TRegExpr.Create;
-  FRegex.ModifierS:= false;
-  FRegex.ModifierM:= true;
+  FRegexReplacer:= nil;
 end;
 
 destructor TATTextFinder.Destroy;
 begin
-  FreeAndNil(FRegexReplacer);
+  if Assigned(FRegexReplacer) then
+    FreeAndNil(FRegexReplacer);
   FreeAndNil(FRegex);
   inherited Destroy;
 end;
