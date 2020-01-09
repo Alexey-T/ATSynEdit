@@ -70,6 +70,7 @@ type
     FStrFind: UnicodeString;
     FStrReplace: UnicodeString;
     FRegex: TRegExpr;
+    FRegexReplacer: TRegExpr;
     FPrevProgress: integer;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
@@ -348,10 +349,15 @@ begin
   if StrText='' then exit;
   if StrFind='' then exit;
 
-  FRegex.ModifierI:= not OptCase;
-
   try
+    FRegex.ModifierI:= not OptCase;
     FRegex.Expression:= StrFind;
+    FRegex.Compile;
+  except
+    if Assigned(FOnBadRegex) then
+      FOnBadRegex(Self);
+  end;
+
     FRegex.InputString:= StrText;
 
     if FRegex.ExecPos(AFromPos) then
@@ -375,28 +381,24 @@ begin
         end;
       until false;
     end;
-  except
-    if Assigned(FOnBadRegex) then
-      FOnBadRegex(Self);
-  end;
 end;
 
 function TATTextFinder.GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
 begin
-  FRegex.ModifierI:= not OptCase;
+  if StrReplace='' then
+    exit('');
 
   try
-    FRegex.Expression:= StrFind;
+    FRegexReplacer.ModifierI:= not OptCase;
+    FRegexReplacer.Expression:= StrFind;
+    FRegexReplacer.Compile;
   except
-    if Assigned(FOnBadRegex) then
-      FOnBadRegex(Self);
-    exit;
+    exit(StrReplace);
   end;
 
-  if StrReplace='' then
-    Result:= ''
-  else
-    Result:= FRegex.Replace(AFromText, SRegexReplaceEscapedTabs(StrReplace), true);
+  FRegexReplacer.InputString:= AFromText;
+  FRegexReplacer.Exec;
+  Result:= FRegexReplacer.Substitute(StrReplace);
 end;
 
 
@@ -485,19 +487,20 @@ begin
   if StrFind='' then exit;
   if StrText='' then exit;
 
-  FRegex.ModifierI:= not OptCase;
-
   try
+    FRegex.ModifierI:= not OptCase;
     FRegex.Expression:= StrFind;
-    FRegex.InputString:= StrText;
-    if not FRegex.ExecPos(AFromPos) then exit;
-    P1:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
-    P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
+    FRegex.Compile;
   except
     if Assigned(FOnBadRegex) then
       FOnBadRegex(Self);
     exit;
   end;
+
+  FRegex.InputString:= StrText;
+  if not FRegex.ExecPos(AFromPos) then exit;
+  P1:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]);
+  P2:= ConvertBufferPosToCaretPos(FRegex.MatchPos[0]+FRegex.MatchLen[0]);
 
   bOk:= true;
 
@@ -1411,12 +1414,17 @@ begin
   ClearMatchPos;
 
   FRegex:= TRegExpr.Create;
-  FRegex.ModifierS:= false; //don't catch all text by .*
-  FRegex.ModifierM:= true; //allow to work with ^$
+  FRegex.ModifierS:= false;
+  FRegex.ModifierM:= true;
+
+  FRegexReplacer:= TRegExpr.Create;
+  FRegex.ModifierS:= false;
+  FRegex.ModifierM:= true;
 end;
 
 destructor TATTextFinder.Destroy;
 begin
+  FreeAndNil(FRegexReplacer);
   FreeAndNil(FRegex);
   inherited Destroy;
 end;
@@ -1435,6 +1443,9 @@ begin
       FromPos:= AStartPos
     else
       FromPos:= FMatchPos+ASkipLen;
+    if FromPos<1 then
+      FromPos:= 1;
+
     Result:= DoFind_Regex(FromPos);
     if Result then DoOnFound;
   end
