@@ -79,6 +79,7 @@ type
     //function IsMatchUsual(APos: integer): boolean;
     //function DoFind_Usual(AFromPos: integer): boolean;
     function DoFind_Regex(AFromPos: integer): boolean;
+    procedure InitRegex;
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
     function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
@@ -350,6 +351,7 @@ begin
   Result:= false;
   if StrText='' then exit;
   if StrFind='' then exit;
+  InitRegex;
 
   try
     FRegex.ModifierI:= not OptCase;
@@ -496,6 +498,7 @@ begin
   AList.Clear;
   if StrFind='' then exit;
   if StrText='' then exit;
+  InitRegex;
 
   try
     FRegex.ModifierI:= not OptCase;
@@ -1429,10 +1432,7 @@ begin
   OptTokens:= cTokensAll;
   ClearMatchPos;
 
-  FRegex:= TRegExpr.Create;
-  FRegex.ModifierS:= false;
-  FRegex.ModifierM:= true;
-
+  FRegex:= nil;
   FRegexReplacer:= nil;
 end;
 
@@ -1440,8 +1440,21 @@ destructor TATTextFinder.Destroy;
 begin
   if Assigned(FRegexReplacer) then
     FreeAndNil(FRegexReplacer);
-  FreeAndNil(FRegex);
+
+  if Assigned(FRegex) then
+    FreeAndNil(FRegex);
+
   inherited Destroy;
+end;
+
+procedure TATTextFinder.InitRegex;
+begin
+  if FRegex=nil then
+  begin
+    FRegex:= TRegExpr.Create;
+    FRegex.ModifierS:= false;
+    FRegex.ModifierM:= true;
+  end;
 end;
 
 function TATTextFinder.FindMatch_Regex(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
