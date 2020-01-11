@@ -8,7 +8,10 @@ begin
   if Assigned(FMenuText) then
     FMenuText.PopUp(P.X, P.Y)
   else
+  begin
+    InitMenuStd;
     FMenuStd.PopUp(P.X, P.Y);
+  end;
 end;
 
 procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);

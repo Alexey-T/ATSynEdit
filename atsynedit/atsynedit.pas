@@ -813,11 +813,11 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
-    procedure DoInitPopupMenu;
+    procedure InitMenuStd;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
-    procedure MenuPopup(Sender: TObject);
+    procedure MenuStdPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
       AItems: TATWrapItems; AConsiderFolding: boolean); inline;
     procedure DoCalcLineHilite(const AData: TATWrapItem;
@@ -3707,7 +3707,7 @@ begin
   FKeymap:= KeymapFull;
   FHintWnd:= nil;
 
-  FMenuStd:= TPopupMenu.Create(Self);
+  FMenuStd:= nil;
   FMenuText:= nil;
   FMenuGutterBm:= nil;
   FMenuGutterNum:= nil;
@@ -3716,8 +3716,6 @@ begin
   FMenuMinimap:= nil;
   FMenuMicromap:= nil;
   FMenuRuler:= nil;
-
-  DoInitPopupMenu;
 end;
 
 destructor TATSynEdit.Destroy;
@@ -3727,7 +3725,8 @@ begin
   TimersStop;
   if Assigned(FHintWnd) then
     FreeAndNil(FHintWnd);
-  FreeAndNil(FMenuStd);
+  if Assigned(FMenuStd) then
+    FreeAndNil(FMenuStd);
   DoPaintModeStatic;
   FFoldedMarkList.Clear;
   FreeAndNil(FMicromap);
@@ -4728,7 +4727,10 @@ begin
     if Assigned(FMenuText) then
       FMenuText.PopUp
     else
+    begin
+      InitMenuStd;
       FMenuStd.PopUp;
+    end;
   end
   else
   if FOptGutterVisible and PtInRect(FRectGutter, Point(X, Y)) then
@@ -5763,7 +5765,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.MenuPopup(Sender: TObject);
+procedure TATSynEdit.MenuStdPopup(Sender: TObject);
 var
   i: integer;
 begin
@@ -5807,9 +5809,9 @@ begin
     end;
 end;
 
-procedure TATSynEdit.DoInitPopupMenu;
+procedure TATSynEdit.InitMenuStd;
   //
-  function Add(const SName: string; Cmd: integer): TMenuItem;
+  function Add(const SName: string; Cmd: integer): TMenuItem; inline;
   var
     MI: TMenuItem;
   begin
@@ -5822,17 +5824,21 @@ procedure TATSynEdit.DoInitPopupMenu;
   end;
   //
 begin
-  FMenuStd.OnPopup:= @MenuPopup;
+  if FMenuStd=nil then
+  begin
+    FMenuStd:= TPopupMenu.Create(Self);
+    FMenuStd.OnPopup:= @MenuStdPopup;
 
-  MenuitemTextUndo:= Add('Undo', cCommand_Undo);
-  MenuitemTextRedo:= Add('Redo', cCommand_Redo);
-  Add('-', 0);
-  MenuitemTextCut:= Add('Cut', cCommand_ClipboardCut);
-  MenuitemTextCopy:= Add('Copy', cCommand_ClipboardCopy);
-  MenuitemTextPaste:= Add('Paste', cCommand_ClipboardPaste);
-  MenuitemTextDelete:= Add('Delete', cCommand_TextDeleteSelection);
-  Add('-', 0);
-  MenuitemTextSelAll:= Add('Select all', cCommand_SelectAll);
+    MenuitemTextUndo:= Add('Undo', cCommand_Undo);
+    MenuitemTextRedo:= Add('Redo', cCommand_Redo);
+    Add('-', 0);
+    MenuitemTextCut:= Add('Cut', cCommand_ClipboardCut);
+    MenuitemTextCopy:= Add('Copy', cCommand_ClipboardCopy);
+    MenuitemTextPaste:= Add('Paste', cCommand_ClipboardPaste);
+    MenuitemTextDelete:= Add('Delete', cCommand_TextDeleteSelection);
+    Add('-', 0);
+    MenuitemTextSelAll:= Add('Select all', cCommand_SelectAll);
+  end;
 end;
 
 //drop selection of 1st caret into mouse-pos
