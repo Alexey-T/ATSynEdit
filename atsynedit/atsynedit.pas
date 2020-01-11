@@ -324,16 +324,23 @@ const
   cMaxCaretTime = 2000;
   cMinCharsAfterAnyIndent = 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
   cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
-  cTextEditorLocked: string = 'Wait...';
-  cHintScrollPrefix: string = 'Line';
   cHintScrollDx = 5;
   cHintBookmarkDx = 6;
   cHintBookmarkDy = 16;
   cUrlMarkerTag = -100;
   cUrlRegexInitial = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+';
+  cTextEditorLocked: string = 'Wait...';
+  cHintScrollPrefix: string = 'Line';
   cStrMenuitemFoldAll: string = 'Fold all';
   cStrMenuitemUnfoldAll: string = 'Unfold all';
   cStrMenuitemFoldLevel: string = 'Fold level';
+  cStrMenuitemCut: string = 'Cut';
+  cStrMenuitemCopy: string = 'Copy';
+  cStrMenuitemPaste: string = 'Paste';
+  cStrMenuitemDelete: string = 'Delete';
+  cStrMenuitemSelectAll: string = 'Select all';
+  cStrMenuitemUndo: string = 'Undo';
+  cStrMenuitemRedo: string = 'Redo';
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
@@ -448,15 +455,22 @@ type
     FMarkedRange: TATMarkers;
     FDimRanges: TATDimRanges;
     FHotspots: TATHotspots;
-    FMenuStd,
-    FMenuText,
-    FMenuGutterBm,
-    FMenuGutterNum,
-    FMenuGutterFold,
-    FMenuGutterFoldStd,
-    FMenuMinimap,
-    FMenuMicromap,
+    FMenuStd: TPopupMenu;
+    FMenuText: TPopupMenu;
+    FMenuGutterBm: TPopupMenu;
+    FMenuGutterNum: TPopupMenu;
+    FMenuGutterFold: TPopupMenu;
+    FMenuGutterFoldStd: TPopupMenu;
+    FMenuMinimap: TPopupMenu;
+    FMenuMicromap: TPopupMenu;
     FMenuRuler: TPopupMenu;
+    MenuitemTextCut: TMenuItem;
+    MenuitemTextCopy: TMenuItem;
+    MenuitemTextPaste: TMenuItem;
+    MenuitemTextDelete: TMenuItem;
+    MenuitemTextSelAll: TMenuItem;
+    MenuitemTextUndo: TMenuItem;
+    MenuitemTextRedo: TMenuItem;
     FOverwrite: boolean;
     FHintWnd: THintWindow;
     FMouseDownCoord: TPoint;
@@ -1059,13 +1073,6 @@ type
     property ShowOsBarHorz: boolean read FShowOsBarHorz write SetShowOsBarHorz;
 
   public
-    MenuitemTextCut: TMenuItem;
-    MenuitemTextCopy: TMenuItem;
-    MenuitemTextPaste: TMenuItem;
-    MenuitemTextDelete: TMenuItem;
-    MenuitemTextSelAll: TMenuItem;
-    MenuitemTextUndo: TMenuItem;
-    MenuitemTextRedo: TMenuItem;
     TagString: string; //to store plugin specific data in CudaText
 
     //overrides
@@ -4210,6 +4217,7 @@ end;
 
 procedure TATSynEdit.DoContextPopup(MousePos: TPoint; var Handled: Boolean);
 begin
+  InitMenuStd;
   inherited;
   if not Handled then
   begin
@@ -5769,6 +5777,14 @@ procedure TATSynEdit.MenuStdPopup(Sender: TObject);
 var
   i: integer;
 begin
+  MenuitemTextCut.Caption:= cStrMenuitemCut;
+  MenuitemTextCopy.Caption:= cStrMenuitemCopy;
+  MenuitemTextPaste.Caption:= cStrMenuitemPaste;
+  MenuitemTextDelete.Caption:= cStrMenuitemDelete;
+  MenuitemTextSelAll.Caption:= cStrMenuitemSelectAll;
+  MenuitemTextUndo.Caption:= cStrMenuitemUndo;
+  MenuitemTextRedo.Caption:= cStrMenuitemRedo;
+
   for i:= 0 to FMenuStd.Items.Count-1 do
     with FMenuStd.Items[i] do
     begin
