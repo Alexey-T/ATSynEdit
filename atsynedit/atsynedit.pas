@@ -600,6 +600,7 @@ type
     FFoldedMarkCurrent: TATFoldedMark;
     FFoldedMarkTooltip: TPanel;
     FPaintCounter: integer;
+    FPaintStarted: boolean;
     {$ifdef debug_show_fps}
     FTickMinimap: QWord;
     FTickAll: QWord;
@@ -4130,9 +4131,8 @@ end;
 procedure TATSynEdit.Paint;
 begin
   if not HandleAllocated then exit;
-  // start-profiler
+  FPaintStarted:= true;
   PaintEx(-1);
-  // stop-profiler
 end;
 
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
@@ -4211,6 +4211,7 @@ begin
     Include(FPaintFlags, cPaintUpdateCaretsCoords);
   end;
 
+  if not FPaintStarted then exit;
   Include(FPaintFlags, cPaintUpdateBitmap);
   PaintEx(LineTop);
 end;
