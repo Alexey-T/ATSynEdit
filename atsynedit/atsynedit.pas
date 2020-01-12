@@ -601,8 +601,8 @@ type
     FFoldedMarkTooltip: TPanel;
     FPaintCounter: integer;
     {$ifdef debug_show_fps}
-    FTickMinimap: DWord;
-    FTickAll: DWord;
+    FTickMinimap: QWord;
+    FTickAll: QWord;
     {$endif}
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
@@ -4047,11 +4047,7 @@ procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFro
 var
   NCaretX: integer;
 begin
-  {$ifdef debug_show_fps}
   Inc(FPaintCounter);
-  FTickAll:= GetTickCount64;
-  {$endif}
-
   FCaretShown:= false;
   DoPaintMainTo(C, ALineFrom);
 
@@ -4068,11 +4064,6 @@ begin
   end;
 
   DoPaintMarkersTo(C);
-
-  {$ifdef debug_show_fps}
-  FTickAll:= GetTickCount64-FTickAll;
-  DoPaintFPS(C);
-  {$endif}
 end;
 
 function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
@@ -4157,6 +4148,10 @@ begin
   if DoubleBuffered then
     if not Assigned(FBitmap) then exit;
 
+  {$ifdef debug_show_fps}
+  FTickAll:= GetTickCount64;
+  {$endif}
+
   //if scrollbars shown, paint again
   if DoPaint(FPaintFlags, ALineNumber) then
     DoPaint(FPaintFlags, ALineNumber);
@@ -4185,6 +4180,11 @@ begin
   end;
 
   DoPaintMarkerOfDragDrop(Canvas);
+
+  {$ifdef debug_show_fps}
+  FTickAll:= GetTickCount64-FTickAll;
+  DoPaintFPS(Canvas);
+  {$endif}
 end;
 
 procedure TATSynEdit.DoOnResize;
@@ -7098,22 +7098,25 @@ end;
 
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);
 var
+  NFps, NFpsMap: integer;
   S: string;
 begin
   {$ifdef DEBUG_SHOW_FPS}
-  if FTickAll<3 then exit;
-  S:= IntToStr(1000 div FTickAll div 5 * 5);
+  if FTickAll<1 then
+    FTickAll:= 1;
+  if FTickMinimap<1 then
+    FTickMinimap:= 1;
+  NFps:= 1000 div FTickAll div 5 * 5;
+  NFpsMap:= 1000 div FTickMinimap;
 
-  if FTickMinimap>1 then
-    S+= ':'+IntToStr(1000 div FTickMinimap);
-
-  S+=' fps, #'+IntToStr(FPaintCounter);
+  //S:= Format('#%d, fps %d/%d', [FPaintCounter, NFps, NFpsMap]);
+  S:= Format('#%d, fps %d', [FPaintCounter, NFps]);
 
   C.Font.Name:= 'Arial';
   C.Font.Color:= clRed;
   C.Font.Size:= 8;
   C.Brush.Color:= clCream;
-  C.TextOut(ClientWidth-90, 5, S);
+  C.TextOut(ClientWidth-100, 5, S);
   {$endif}
 end;
 
