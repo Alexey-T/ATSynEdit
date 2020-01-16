@@ -626,7 +626,10 @@ begin
   if FOptIndentSize=0 then
   begin
     NDecSpaces:= FTabSize;
-    NShiftChars:= 1;
+    if FOptTabSpaces then
+      NShiftChars:= FTabSize
+    else
+      NShiftChars:= 1;
   end
   else
   if FOptIndentSize>0 then
