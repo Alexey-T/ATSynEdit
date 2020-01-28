@@ -832,6 +832,7 @@ type
     procedure InitDimRanges;
     procedure InitMarkedRange;
     procedure InitMinimapTooltip;
+    procedure InitFoldedMarkList;
     procedure InitFoldedMarkTooltip;
     procedure InitMenuStd;
     function IsLineFoldedFull(ALine: integer): boolean;
@@ -2524,7 +2525,8 @@ begin
 
   if AMainText then
   begin
-    FFoldedMarkList.Clear;
+    if Assigned(FFoldedMarkList) then
+      FFoldedMarkList.Clear;
   end;
 
   if AWithGutter then
@@ -3278,6 +3280,8 @@ begin
       APos.Y,
       APos.Y + DoGetFoldedMarkLinesCount(APos.Y) -1
       );
+
+    InitFoldedMarkList;
     FFoldedMarkList.Add(FoldMark);
   end;
 end;
@@ -3479,7 +3483,7 @@ begin
   FTabSize:= cInitTabSize;
   FMarginRight:= cInitMarginRight;
   SetLength(FMarginList, 0);
-  FFoldedMarkList:= TATFoldedMarks.Create;
+  FFoldedMarkList:= nil;
   FOptIdleInterval:= cInitIdleInterval;
 
   FShowOsBarVert:= false;
@@ -3725,7 +3729,11 @@ begin
   if Assigned(FMenuStd) then
     FreeAndNil(FMenuStd);
   DoPaintModeStatic;
-  FFoldedMarkList.Clear;
+  if Assigned(FFoldedMarkList) then
+  begin
+    FFoldedMarkList.Clear;
+    FreeAndNil(FFoldedMarkList);
+  end;
   FreeAndNil(FMicromap);
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
@@ -3741,7 +3749,6 @@ begin
   FreeAndNil(FTabHelper);
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
-  FreeAndNil(FFoldedMarkList);
   FreeAndNil(FWrapTemps);
   FreeAndNil(FWrapInfo);
   FreeAndNil(FStringsInt);
@@ -4904,7 +4911,7 @@ begin
   end;
 
   //detect cursor on folded marks
-  if FFoldTooltipVisible then
+  if FFoldTooltipVisible and Assigned(FFoldedMarkList) then
   begin
     FFoldedMarkCurrent:= FFoldedMarkList.FindByCoord(Point(X, Y));
     UpdateFoldedMarkTooltip;
@@ -7283,6 +7290,12 @@ begin
     FMinimapTooltip.BorderStyle:= bsNone;
     FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
   end;
+end;
+
+procedure TATSynEdit.InitFoldedMarkList;
+begin
+  if FFoldedMarkList=nil then
+    FFoldedMarkList:= TATFoldedMarks.Create;
 end;
 
 procedure TATSynEdit.InitFoldedMarkTooltip;
