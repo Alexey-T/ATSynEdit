@@ -316,6 +316,7 @@ var
   nAttrIndex, nOffset, i: integer;
   bExact: boolean;
 begin
+  if FAttribs=nil then exit;
   FAttribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact);
   if nAttrIndex<0 then exit; //not IsIndexValid, because index=FAttribs.Count is ok
   if nAttrIndex>0 then //fixes disappeared attrib on horz scrolling

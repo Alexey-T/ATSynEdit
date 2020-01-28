@@ -273,7 +273,9 @@ begin
 
       if Assigned(FMarkers) then
         FMarkers.DeleteInRange(X1, Y1, X2, Y2);
-      FAttribs.DeleteInRange(X1, Y1, X2, Y2);
+
+      if Assigned(FAttribs) then
+        FAttribs.DeleteInRange(X1, Y1, X2, Y2);
 
       Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
 

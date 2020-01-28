@@ -741,9 +741,10 @@ type
     FOptZebraAlphaBlend: byte;
 
     //
+    function GetAttribs: TATMarkers;
+    function GetMarkers: TATMarkers;
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
-    function GetMarkers: TATMarkers;
     procedure SetShowOsBarVert(AValue: boolean);
     procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
@@ -831,6 +832,7 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
+    procedure InitAttribs;
     procedure InitMarkers;
     procedure InitHotspots;
     procedure InitDimRanges;
@@ -1111,7 +1113,7 @@ type
     property Fold: TATSynRanges read FFold;
     property Carets: TATCarets read FCarets;
     property Markers: TATMarkers read GetMarkers;
-    property Attribs: TATMarkers read FAttribs;
+    property Attribs: TATMarkers read GetAttribs;
     property Micromap: TATMicromap read FMicromap;
     property DimRanges: TATDimRanges read GetDimRanges;
     property Hotspots: TATHotspots read GetHotspots;
@@ -3405,9 +3407,7 @@ begin
 
   FTabHelper:= TATStringTabHelper.Create;
   FMarkers:= nil;
-  FAttribs:= TATMarkers.Create;
-  FAttribs.Sorted:= true;
-  FAttribs.Duplicates:= true; //CudaText plugins need it
+  FAttribs:= nil;
   FMarkedRange:= nil;
   FDimRanges:= nil;
   FHotspots:= nil;
@@ -3752,7 +3752,8 @@ begin
   if Assigned(FMarkers) then
     FreeAndNil(FMarkers);
   FreeAndNil(FTabHelper);
-  FreeAndNil(FAttribs);
+  if Assigned(FAttribs) then
+    FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
   FreeAndNil(FWrapTemps);
   FreeAndNil(FWrapInfo);
@@ -6695,8 +6696,15 @@ var
   AtrObj: TATLinePartClass;
   MatchPos, MatchLen, NLine, i: integer;
 begin
+  if not OptShowURLs then
+  begin
+    if Assigned(FAttribs) then
+      FAttribs.DeleteWithTag(cUrlMarkerTag);
+    exit;
+  end;
+
+  InitAttribs;
   FAttribs.DeleteWithTag(cUrlMarkerTag);
-  if not OptShowURLs then exit;
 
   ReObj:= TRegExpr.Create;
   try
@@ -6743,6 +6751,7 @@ begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
+  if FAttribs=nil then exit;
   NIndex:= FAttribs.FindContaining(AX, AY);
   if NIndex<0 then exit;
 
@@ -7319,6 +7328,16 @@ begin
   end;
 end;
 
+procedure TATSynEdit.InitAttribs;
+begin
+  if FAttribs=nil then
+  begin
+    FAttribs:= TATMarkers.Create;
+    FAttribs.Sorted:= true;
+    FAttribs.Duplicates:= true; //CudaText plugins need it
+  end;
+end;
+
 procedure TATSynEdit.InitMarkers;
 begin
   if FMarkers=nil then
@@ -7338,6 +7357,12 @@ procedure TATSynEdit.InitDimRanges;
 begin
   if FDimRanges=nil then
     FDimRanges:= TATDimRanges.Create;
+end;
+
+function TATSynEdit.GetAttribs: TATMarkers;
+begin
+  InitAttribs;
+  Result:= FAttribs;
 end;
 
 function TATSynEdit.GetDimRanges: TATDimRanges;
