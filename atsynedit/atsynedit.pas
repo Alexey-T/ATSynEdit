@@ -4926,7 +4926,8 @@ begin
     (ssLeft in Shift) and
     (not bOnMain) and
     (not bOnMinimap) and
-    (not bOnMicromap);
+    (not bOnMicromap) and
+    (not bOnGutter);
 
   FMouseAutoScroll:= cDirNone;
   if (P.Y<FRectMain.Top) and (not ModeOneLine) then
