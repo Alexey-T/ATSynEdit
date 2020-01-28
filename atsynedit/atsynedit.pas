@@ -6695,7 +6695,7 @@ var
   AtrObj: TATLinePartClass;
   MatchPos, MatchLen, NLine, i: integer;
 begin
-  Attribs.DeleteWithTag(cUrlMarkerTag);
+  FAttribs.DeleteWithTag(cUrlMarkerTag);
   if not OptShowURLs then exit;
 
   ReObj:= TRegExpr.Create;
@@ -6726,7 +6726,7 @@ begin
         AtrObj.Data.ColorBG:= clNone;
         AtrObj.Data.ColorBorder:= Colors.Links;
         AtrObj.Data.BorderDown:= cLineStyleSolid;
-        Attribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, 0, AtrObj);
+        FAttribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, 0, AtrObj);
       end;
     end;
   finally
@@ -6743,10 +6743,10 @@ begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
-  NIndex:= Attribs.FindContaining(AX, AY);
+  NIndex:= FAttribs.FindContaining(AX, AY);
   if NIndex<0 then exit;
 
-  Atr:= Attribs[NIndex];
+  Atr:= FAttribs[NIndex];
   if Atr.Tag<>cUrlMarkerTag then exit;
   if Atr.LenY>0 then exit;
 

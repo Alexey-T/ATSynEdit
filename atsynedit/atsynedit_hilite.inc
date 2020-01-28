@@ -316,14 +316,14 @@ var
   nAttrIndex, nOffset, i: integer;
   bExact: boolean;
 begin
-  Attribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact);
-  if nAttrIndex<0 then exit; //not IsIndexValid, because index=Attribs.Count is ok
+  FAttribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact);
+  if nAttrIndex<0 then exit; //not IsIndexValid, because index=FAttribs.Count is ok
   if nAttrIndex>0 then //fixes disappeared attrib on horz scrolling
     Dec(nAttrIndex);
 
-  for i:= nAttrIndex to Attribs.Count-1 do
+  for i:= nAttrIndex to FAttribs.Count-1 do
   begin
-    Attr:= Attribs[i];
+    Attr:= FAttribs[i];
     if Attr.MicromapOnly then Continue;
     if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;

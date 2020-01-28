@@ -976,8 +976,8 @@ begin
       DoCaretsShift_MarkerItem(FMarkers, i,
         APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 
-  for i:= 0 to Attribs.Count-1 do
-    DoCaretsShift_MarkerItem(Attribs, i,
+  for i:= 0 to FAttribs.Count-1 do
+    DoCaretsShift_MarkerItem(FAttribs, i,
       APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 
   if Assigned(FMarkedRange) then
