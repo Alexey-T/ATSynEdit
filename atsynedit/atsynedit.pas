@@ -745,6 +745,7 @@ type
     function GetMarkers: TATMarkers;
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
+    function GetGutterDecor: TATGutterDecor;
     procedure SetShowOsBarVert(AValue: boolean);
     procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
@@ -836,6 +837,7 @@ type
     procedure InitMarkers;
     procedure InitHotspots;
     procedure InitDimRanges;
+    procedure InitGutterDecor;
     procedure InitMarkedRange;
     procedure InitMinimapTooltip;
     procedure InitFoldedMarkList;
@@ -1163,7 +1165,7 @@ type
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
     //gutter
     property Gutter: TATGutter read FGutter;
-    property GutterDecor: TATGutterDecor read FGutterDecor;
+    property GutterDecor: TATGutterDecor read GetGutterDecor;
     property GutterBandBookmarks: integer read FGutterBandBookmarks write FGutterBandBookmarks;
     property GutterBandNumbers: integer read FGutterBandNumbers write FGutterBandNumbers;
     property GutterBandStates: integer read FGutterBandStates write FGutterBandStates;
@@ -3506,7 +3508,7 @@ begin
   FTextHintCenter:= false;
 
   FGutter:= TATGutter.Create;
-  FGutterDecor:= TATGutterDecor.Create;
+  FGutterDecor:= nil;
 
   FOptGutterVisible:= true;
   FOptGutterPlusSize:= cInitGutterPlusSize;
@@ -3758,7 +3760,8 @@ begin
   FreeAndNil(FWrapTemps);
   FreeAndNil(FWrapInfo);
   FreeAndNil(FStringsInt);
-  FreeAndNil(FGutterDecor);
+  if Assigned(FGutterDecor) then
+    FreeAndNil(FGutterDecor);
   FreeAndNil(FBitmap);
   FreeAndNil(FColors);
   FreeAndNil(FAdapterCache);
@@ -6363,6 +6366,7 @@ var
   N: integer;
   Ext: TSize;
 begin
+  if FGutterDecor=nil then exit;
   N:= FGutterDecor.Find(ALine);
   if N<0 then exit;
   Decor:= FGutterDecor[N];
@@ -7359,6 +7363,12 @@ begin
     FDimRanges:= TATDimRanges.Create;
 end;
 
+procedure TATSynEdit.InitGutterDecor;
+begin
+  if FGutterDecor=nil then
+    FGutterDecor:= TATGutterDecor.Create;
+end;
+
 function TATSynEdit.GetAttribs: TATMarkers;
 begin
   InitAttribs;
@@ -7381,6 +7391,12 @@ function TATSynEdit.GetMarkers: TATMarkers;
 begin
   InitMarkers;
   Result:= FMarkers;
+end;
+
+function TATSynEdit.GetGutterDecor: TATGutterDecor;
+begin
+  InitGutterDecor;
+  Result:= FGutterDecor;
 end;
 
 procedure TATSynEdit.InitMarkedRange;
