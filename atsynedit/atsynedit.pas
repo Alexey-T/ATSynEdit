@@ -4951,7 +4951,7 @@ begin
           DoSelect_LineRange(FMouseDownGutterLineNumber, P);
           DoCaretsSort;
           DoEventCarets;
-          Update;
+          Invalidate;
         end;
     end;
     Exit
@@ -5010,7 +5010,7 @@ begin
               Caret.EndX:= -1;
               Caret.EndY:= -1;
             end;
-            Update;
+            Invalidate;
           end
           else
           begin
@@ -5056,7 +5056,7 @@ begin
 
             DoCaretsSort;
             DoEventCarets;
-            Update;
+            Invalidate;
           end;
         end;
       Exit;
@@ -5142,7 +5142,7 @@ begin
         begin
           //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
           DoScrollByDelta(0, NSpeedY);
-          Update;
+          Invalidate;
           Result:= true;
         end;
       end;
@@ -5152,7 +5152,7 @@ begin
         if (not ModeOneLine) and FOptMouseWheelScrollHorz then
         begin
           DoScrollByDelta(NSpeedX, 0);
-          Update;
+          Invalidate;
           Result:= true;
         end;
       end;
@@ -5224,7 +5224,7 @@ procedure TATSynEdit.DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
 begin
   if not Strings.IsIndexValid(FMouseDownPnt.Y) then Exit;
   DoSelect_CharGroupAtPos(FMouseDownPnt, IsPressedCtrl, AllowOnlyWordChars);
-  Update;
+  Invalidate;
 end;
 
 function TATSynEdit.GetCaretManyAllowed: boolean;
@@ -5251,7 +5251,7 @@ begin
     P:= ClientPosToCaretPos(P, Details);
     if P.Y<0 then Exit;
     DoSelect_Line(P);
-    Update;
+    Invalidate;
   end;
 end;
 
@@ -5346,7 +5346,7 @@ begin
   DoCaretsSort;
   DoEventCarets;
   //DoEventScroll;
-  Update;
+  Invalidate;
 end;
 
 procedure TATSynEdit.TimerNiceScrollTick(Sender: TObject);
@@ -5770,7 +5770,7 @@ begin
   if Cmd>0 then
   begin
     DoCommand(Cmd);
-    Update;
+    Invalidate;
   end;
 end;
 
@@ -6027,7 +6027,7 @@ begin
   inherited;
   FIsEntered:= true;
   if IsRepaintNeededOnEnterOrExit then
-    Update;
+    Invalidate;
   TimersStart;
 end;
 
@@ -6036,7 +6036,7 @@ begin
   inherited;
   FIsEntered:= false;
   if IsRepaintNeededOnEnterOrExit then
-    Update;
+    Invalidate;
   TimersStop;
 end;
 
