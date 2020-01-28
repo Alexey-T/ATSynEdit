@@ -1255,7 +1255,6 @@ type
     procedure DoGetMarkedLines(out ALine1, ALine2: integer);
     function DoGetLinkAtPos(AX, AY: integer): atString;
     function DoGetGapRect(AIndex: integer; out ARect: TRect): boolean;
-    function GetCacheDump: string;
     procedure DoConvertIndentation(ASpacesToTabs: boolean);
     procedure DoConvertTabsToSpaces;
 
@@ -6732,11 +6731,6 @@ begin
   if Atr.LenY>0 then exit;
 
   Result:= Strings.LineSub(AY, Atr.PosX+1, Atr.LenX);
-end;
-
-function TATSynEdit.GetCacheDump: string;
-begin
-  Result:= '?';
 end;
 
 
