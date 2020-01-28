@@ -742,6 +742,7 @@ type
 
     //
     function GetDimRanges: TATDimRanges;
+    function GetHotspots: TATHotspots;
     procedure SetShowOsBarVert(AValue: boolean);
     procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
@@ -829,6 +830,7 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
+    procedure InitHotspots;
     procedure InitDimRanges;
     procedure InitMarkedRange;
     procedure InitMinimapTooltip;
@@ -1110,7 +1112,7 @@ type
     property Attribs: TATMarkers read FAttribs;
     property Micromap: TATMicromap read FMicromap;
     property DimRanges: TATDimRanges read GetDimRanges;
-    property Hotspots: TATHotspots read FHotspots;
+    property Hotspots: TATHotspots read GetHotspots;
     property Gaps: TATGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
     property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
@@ -3407,7 +3409,7 @@ begin
   FAttribs.Duplicates:= true; //CudaText plugins need it
   FMarkedRange:= nil;
   FDimRanges:= nil;
-  FHotspots:= TATHotspots.Create;
+  FHotspots:= nil;
   FAdapterCache:= TATAdapterHiliteCache.Create;
 
   {$ifdef windows}
@@ -3740,7 +3742,8 @@ begin
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
-  FreeAndNil(FHotspots);
+  if Assigned(FHotspots) then
+    FreeAndNil(FHotspots);
   if Assigned(FDimRanges) then
     FreeAndNil(FDimRanges);
   if Assigned(FMarkedRange) then
@@ -7313,6 +7316,12 @@ begin
   end;
 end;
 
+procedure TATSynEdit.InitHotspots;
+begin
+  if FHotspots=nil then
+    FHotspots:= TATHotspots.Create;
+end;
+
 procedure TATSynEdit.InitDimRanges;
 begin
   if FDimRanges=nil then
@@ -7323,6 +7332,12 @@ function TATSynEdit.GetDimRanges: TATDimRanges;
 begin
   InitDimRanges;
   Result:= FDimRanges;
+end;
+
+function TATSynEdit.GetHotspots: TATHotspots;
+begin
+  InitHotspots;
+  Result:= FHotspots;
 end;
 
 procedure TATSynEdit.InitMarkedRange;
