@@ -127,9 +127,10 @@ begin
     end;
   end;
 
-  for i:= 0 to Markers.Count-1 do
+  if Assigned(FMarkers) then
+  for i:= 0 to FMarkers.Count-1 do
   begin
-    Marker:= Markers[i];
+    Marker:= FMarkers[i];
     P.X:= Marker.PosX;
     P.Y:= Marker.PosY;
     if IsPosFolded(P.X, P.Y) then
@@ -143,7 +144,7 @@ begin
       Marker.CoordX:= P.X;
       Marker.CoordY:= P.Y;
     end;
-    Markers[i]:= Marker;
+    FMarkers[i]:= Marker;
   end;
 end;
 
@@ -970,9 +971,10 @@ begin
 
   //adjust markers
   //(cannot optimize, markers not sorted)
-  for i:= 0 to Markers.Count-1 do
-    DoCaretsShift_MarkerItem(Markers, i,
-      APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
+  if Assigned(FMarkers) then
+    for i:= 0 to FMarkers.Count-1 do
+      DoCaretsShift_MarkerItem(FMarkers, i,
+        APosX, APosY, AShiftX, AShiftY, AShiftBelowX, APosAfter);
 
   for i:= 0 to Attribs.Count-1 do
     DoCaretsShift_MarkerItem(Attribs, i,

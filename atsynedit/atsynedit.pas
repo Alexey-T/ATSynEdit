@@ -743,6 +743,7 @@ type
     //
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
+    function GetMarkers: TATMarkers;
     procedure SetShowOsBarVert(AValue: boolean);
     procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
@@ -830,6 +831,7 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
+    procedure InitMarkers;
     procedure InitHotspots;
     procedure InitDimRanges;
     procedure InitMarkedRange;
@@ -1108,7 +1110,7 @@ type
     property Strings: TATStrings read GetStrings write SetStrings;
     property Fold: TATSynRanges read FFold;
     property Carets: TATCarets read FCarets;
-    property Markers: TATMarkers read FMarkers;
+    property Markers: TATMarkers read GetMarkers;
     property Attribs: TATMarkers read FAttribs;
     property Micromap: TATMicromap read FMicromap;
     property DimRanges: TATDimRanges read GetDimRanges;
@@ -3402,8 +3404,7 @@ begin
   FCaretStopUnfocused:= true;
 
   FTabHelper:= TATStringTabHelper.Create;
-  FMarkers:= TATMarkers.Create;
-  FMarkers.Sorted:= false;
+  FMarkers:= nil;
   FAttribs:= TATMarkers.Create;
   FAttribs.Sorted:= true;
   FAttribs.Duplicates:= true; //CudaText plugins need it
@@ -3748,7 +3749,8 @@ begin
     FreeAndNil(FDimRanges);
   if Assigned(FMarkedRange) then
     FreeAndNil(FMarkedRange);
-  FreeAndNil(FMarkers);
+  if Assigned(FMarkers) then
+    FreeAndNil(FMarkers);
   FreeAndNil(FTabHelper);
   FreeAndNil(FAttribs);
   FreeAndNil(FGutter);
@@ -4973,12 +4975,12 @@ begin
     if PtInRect(FRectMain, P) then
     begin
       if Shift*[ssLeft, ssRight]=[] then
-        if Hotspots.Count>0 then
+        if Assigned(FHotspots) and (FHotspots.Count>0) then
         begin
           P:= ClientPosToCaretPos(P, Details);
           if P.Y>=0 then
           begin
-            nIndex:= Hotspots.FindByPos(P.X, P.Y);
+            nIndex:= FHotspots.FindByPos(P.X, P.Y);
             if nIndex<>FLastHotspot then
             begin
               if FLastHotspot>=0 then
@@ -6577,9 +6579,10 @@ var
   Pnt: TPoint;
   i: integer;
 begin
-  for i:= 0 to Markers.Count-1 do
+  if FMarkers=nil then exit;
+  for i:= 0 to FMarkers.Count-1 do
   begin
-    Mark:= Markers[i];
+    Mark:= FMarkers[i];
     if Mark.CoordX<0 then Continue;
     if Mark.CoordY<0 then Continue;
 
@@ -7316,6 +7319,15 @@ begin
   end;
 end;
 
+procedure TATSynEdit.InitMarkers;
+begin
+  if FMarkers=nil then
+  begin
+    FMarkers:= TATMarkers.Create;
+    FMarkers.Sorted:= false;
+  end;
+end;
+
 procedure TATSynEdit.InitHotspots;
 begin
   if FHotspots=nil then
@@ -7338,6 +7350,12 @@ function TATSynEdit.GetHotspots: TATHotspots;
 begin
   InitHotspots;
   Result:= FHotspots;
+end;
+
+function TATSynEdit.GetMarkers: TATMarkers;
+begin
+  InitMarkers;
+  Result:= FMarkers;
 end;
 
 procedure TATSynEdit.InitMarkedRange;

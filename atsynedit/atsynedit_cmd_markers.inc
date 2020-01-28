@@ -6,7 +6,8 @@ var
 begin
   if Carets.Count<>1 then exit;
   Caret:= Carets[0];
-  Markers.Add(Caret.PosX, Caret.PosY);
+  InitMarkers;
+  FMarkers.Add(Caret.PosX, Caret.PosY);
   Update;
 end;
 
@@ -18,8 +19,9 @@ var
   Pnt: TPoint;
   NTag, i: integer;
 begin
-  if Markers.Count=0 then exit;
-  Mark:= Markers[Markers.Count-1];
+  if FMarkers=nil then exit;
+  if FMarkers.Count=0 then exit;
+  Mark:= FMarkers[FMarkers.Count-1];
 
   X1:= Mark.PosX;
   Y1:= Mark.PosY;
@@ -39,15 +41,15 @@ begin
 
   if AndDelete then
   begin
-    NTag:= Markers[Markers.Count-1].Tag;
-    Markers.Delete(Markers.Count-1);
+    NTag:= FMarkers[FMarkers.Count-1].Tag;
+    FMarkers.Delete(FMarkers.Count-1);
 
     //Tag>0: delete also same tag marks
     //and place mul-carets
     if NTag>0 then
-      for i:= Markers.Count-1 downto 0 do
+      for i:= FMarkers.Count-1 downto 0 do
       begin
-        Mark:= Markers[i];
+        Mark:= FMarkers[i];
         if Mark.Tag=NTag then
         begin
           Pnt:= Mark.PosEnd;
@@ -55,7 +57,7 @@ begin
             Carets.Add(Mark.PosX, Mark.PosY)
           else
             Carets.Add(Pnt.X, Pnt.Y, Mark.PosX, Mark.PosY);
-          Markers.Delete(i);
+          FMarkers.Delete(i);
         end;
       end;
   end;
@@ -65,8 +67,11 @@ end;
 
 procedure TATSynEdit.MarkerClearAll;
 begin
-  Markers.Clear;
-  Update;
+  if Assigned(FMarkers) then
+  begin
+    FMarkers.Clear;
+    Update;
+  end;
 end;
 
 procedure TATSynEdit.MarkerSwap;
@@ -76,9 +81,10 @@ var
   PX, PY: integer;
 begin
   if Carets.Count<>1 then exit;
-  if Markers.Count=0 then exit;
+  if FMarkers=nil then exit;
+  if FMarkers.Count=0 then exit;
   Caret:= Carets[0];
-  Mark:= Markers[Markers.Count-1];
+  Mark:= FMarkers[FMarkers.Count-1];
 
   PX:= Caret.PosX;
   PY:= Caret.PosY;
@@ -86,7 +92,7 @@ begin
   Caret.PosY:= Mark.PosY;
   Mark.PosX:= PX;
   Mark.PosY:= PY;
-  Markers[Markers.Count-1] := Mark;
+  FMarkers[FMarkers.Count-1] := Mark;
 
   DoGotoCaret(cEdgeTop);
   Update;
@@ -98,9 +104,10 @@ var
   Mark: TATMarkerItem;
 begin
   if Carets.Count<>1 then exit;
-  if Markers.Count=0 then exit;
+  if FMarkers=nil then exit;
+  if FMarkers.Count=0 then exit;
   Caret:= Carets[0];
-  Mark:= Markers[Markers.Count-1];
+  Mark:= FMarkers[FMarkers.Count-1];
 
   Caret.EndX:= Mark.PosX;
   Caret.EndY:= Mark.PosY;
@@ -115,9 +122,10 @@ var
   Shift, PosAfter: TPoint;
 begin
   if Carets.Count<>1 then exit;
-  if Markers.Count=0 then exit;
+  if FMarkers=nil then exit;
+  if FMarkers.Count=0 then exit;
   Caret:= Carets[0];
-  Mark:= Markers[Markers.Count-1];
+  Mark:= FMarkers[FMarkers.Count-1];
 
   X1:= Caret.PosX;
   Y1:= Caret.PosY;
@@ -132,7 +140,7 @@ begin
 
   Caret.PosX:= X1;
   Caret.PosY:= Y1;
-  Markers.Delete(Markers.Count-1);
+  FMarkers.Delete(FMarkers.Count-1);
 
   Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
   Update;
