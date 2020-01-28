@@ -741,6 +741,7 @@ type
     FOptZebraAlphaBlend: byte;
 
     //
+    function GetDimRanges: TATDimRanges;
     procedure SetShowOsBarVert(AValue: boolean);
     procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
@@ -828,6 +829,7 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
+    procedure InitDimRanges;
     procedure InitMinimapTooltip;
     procedure InitFoldedMarkTooltip;
     procedure InitMenuStd;
@@ -1105,7 +1107,7 @@ type
     property Markers: TATMarkers read FMarkers;
     property Attribs: TATMarkers read FAttribs;
     property Micromap: TATMicromap read FMicromap;
-    property DimRanges: TATDimRanges read FDimRanges;
+    property DimRanges: TATDimRanges read GetDimRanges;
     property Hotspots: TATHotspots read FHotspots;
     property Gaps: TATGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
@@ -2777,9 +2779,12 @@ begin
         NColorAfter, AMainText);
 
       //apply DimRanges
-      NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
-      if NDimValue>0 then //-1: no ranges found, 0: no effect
-        DoPartsDim(FLineParts, NDimValue, Colors.TextBG);
+      if Assigned(FDimRanges) then
+      begin
+        NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
+        if NDimValue>0 then //-1: no ranges found, 0: no effect
+          DoPartsDim(FLineParts, NDimValue, Colors.TextBG);
+      end;
 
       //adapter may return ColorAfterEol, paint it
       if FOptShowFullHilite then
@@ -3397,7 +3402,7 @@ begin
   FAttribs.Duplicates:= true; //CudaText plugins need it
   FMarkedRange:= TATMarkers.Create;
   FMarkedRange.Sorted:= true;
-  FDimRanges:= TATDimRanges.Create;
+  FDimRanges:= nil;
   FHotspots:= TATHotspots.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
 
@@ -3728,7 +3733,8 @@ begin
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
   FreeAndNil(FHotspots);
-  FreeAndNil(FDimRanges);
+  if Assigned(FDimRanges) then
+    FreeAndNil(FDimRanges);
   FreeAndNil(FMarkedRange);
   FreeAndNil(FMarkers);
   FreeAndNil(FTabHelper);
@@ -7290,6 +7296,19 @@ begin
     FFoldedMarkTooltip.OnMouseEnter:=@FoldedMarkMouseEnter;
   end;
 end;
+
+procedure TATSynEdit.InitDimRanges;
+begin
+  if FDimRanges=nil then
+    FDimRanges:= TATDimRanges.Create;
+end;
+
+function TATSynEdit.GetDimRanges: TATDimRanges;
+begin
+  InitDimRanges;
+  Result:= FDimRanges;
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
