@@ -828,6 +828,7 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
+    procedure InitMinimapTooltip;
     procedure InitMenuStd;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
@@ -3557,14 +3558,6 @@ begin
   FMinimapCachedPainting:= true;
   FMinimapHiliteLinesWithSelection:= true;
 
-  FMinimapTooltip:= TPanel.Create(Self);
-  FMinimapTooltip.Hide;
-  FMinimapTooltip.Width:= 15;
-  FMinimapTooltip.Height:= 15;
-  FMinimapTooltip.Parent:= Self;
-  FMinimapTooltip.BorderStyle:= bsNone;
-  FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
-
   FMicromapVisible:= cInitMicromapVisible;
 
   FFoldedMarkTooltip:= TPanel.Create(Self);
@@ -4862,8 +4855,17 @@ begin
     FCursorOnMinimap:= bOnMinimap;
   end;
 
-  FMinimapTooltip.Visible:= bOnMinimap and FMinimapTooltipVisible;
-  UpdateMinimapTooltip;
+  if bOnMinimap and FMinimapTooltipVisible then
+  begin
+    InitMinimapTooltip;
+    FMinimapTooltip.Show;
+    UpdateMinimapTooltip;
+  end
+  else
+  begin
+    if Assigned(FMinimapTooltip) then
+      FMinimapTooltip.Hide;
+  end;
 
   //detect cursor on FMicromap
   if FMicromapVisible then
@@ -5078,7 +5080,8 @@ begin
   inherited;
   DoHintHide;
   DoHotspotsExit;
-  FMinimapTooltip.Hide;
+  if Assigned(FMinimapTooltip) then
+    FMinimapTooltip.Hide;
 end;
 
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
@@ -5114,7 +5117,8 @@ begin
   //hide all temporary windows
   DoHotspotsExit;
   FFoldedMarkTooltip.Hide;
-  FMinimapTooltip.Hide;
+  if Assigned(FMinimapTooltip) then
+    FMinimapTooltip.Hide;
 
   if AForceHorz then
     Mode:= aWheelModeHoriz
@@ -6973,6 +6977,7 @@ procedure TATSynEdit.UpdateMinimapTooltip;
 var
   Pnt: TPoint;
 begin
+  if FMinimapTooltip=nil then exit;
   if not FMinimapTooltip.Visible then exit;
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
@@ -7258,6 +7263,20 @@ begin
   if FShowOsBarHorz=AValue then Exit;
   FShowOsBarHorz:= AValue;
   ShowScrollBar(Handle, SB_Horz, AValue);
+end;
+
+procedure TATSynEdit.InitMinimapTooltip;
+begin
+  if FMinimapTooltip=nil then
+  begin
+    FMinimapTooltip:= TPanel.Create(Self);
+    FMinimapTooltip.Hide;
+    FMinimapTooltip.Width:= 15;
+    FMinimapTooltip.Height:= 15;
+    FMinimapTooltip.Parent:= Self;
+    FMinimapTooltip.BorderStyle:= bsNone;
+    FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
+  end;
 end;
 
 {$I atsynedit_carets.inc}
