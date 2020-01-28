@@ -829,6 +829,7 @@ type
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
     procedure InitMinimapTooltip;
+    procedure InitFoldedMarkTooltip;
     procedure InitMenuStd;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
@@ -3560,15 +3561,6 @@ begin
 
   FMicromapVisible:= cInitMicromapVisible;
 
-  FFoldedMarkTooltip:= TPanel.Create(Self);
-  FFoldedMarkTooltip.Hide;
-  FFoldedMarkTooltip.Width:= 15;
-  FFoldedMarkTooltip.Height:= 15;
-  FFoldedMarkTooltip.Parent:= Self;
-  FFoldedMarkTooltip.BorderStyle:= bsNone;
-  FFoldedMarkTooltip.OnPaint:= @FoldedMarkTooltipPaint;
-  FFoldedMarkTooltip.OnMouseEnter:=@FoldedMarkMouseEnter;
-
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSizeMinimap:= Point(1, 2);
 
@@ -5116,7 +5108,8 @@ begin
 
   //hide all temporary windows
   DoHotspotsExit;
-  FFoldedMarkTooltip.Hide;
+  if Assigned(FFoldedMarkTooltip) then
+    FFoldedMarkTooltip.Hide;
   if Assigned(FMinimapTooltip) then
     FMinimapTooltip.Hide;
 
@@ -6999,9 +6992,12 @@ procedure TATSynEdit.UpdateFoldedMarkTooltip;
 begin
   if (not FFoldTooltipVisible) or not FFoldedMarkCurrent.IsInited then
   begin
-    FFoldedMarkTooltip.Hide;
+    if Assigned(FFoldedMarkTooltip) then
+      FFoldedMarkTooltip.Hide;
     exit
   end;
+
+  InitFoldedMarkTooltip;
 
   FFoldedMarkTooltip.Width:= FRectMain.Width * FFoldTooltipWidthPercents div 100;
   FFoldedMarkTooltip.Height:= (FFoldedMarkCurrent.LineTo-FFoldedMarkCurrent.LineFrom+1) * FCharSize.Y + 2;
@@ -7036,7 +7032,8 @@ end;
 
 procedure TATSynEdit.FoldedMarkMouseEnter(Sender: TObject);
 begin
-  FFoldedMarkTooltip.Hide;
+  if Assigned(FFoldedMarkTooltip) then
+    FFoldedMarkTooltip.Hide;
 end;
 
 function TATSynEdit.DoGetFoldedMarkLinesCount(ALine: integer): integer;
@@ -7276,6 +7273,21 @@ begin
     FMinimapTooltip.Parent:= Self;
     FMinimapTooltip.BorderStyle:= bsNone;
     FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
+  end;
+end;
+
+procedure TATSynEdit.InitFoldedMarkTooltip;
+begin
+  if FFoldedMarkTooltip=nil then
+  begin
+    FFoldedMarkTooltip:= TPanel.Create(Self);
+    FFoldedMarkTooltip.Hide;
+    FFoldedMarkTooltip.Width:= 15;
+    FFoldedMarkTooltip.Height:= 15;
+    FFoldedMarkTooltip.Parent:= Self;
+    FFoldedMarkTooltip.BorderStyle:= bsNone;
+    FFoldedMarkTooltip.OnPaint:= @FoldedMarkTooltipPaint;
+    FFoldedMarkTooltip.OnMouseEnter:=@FoldedMarkMouseEnter;
   end;
 end;
 
