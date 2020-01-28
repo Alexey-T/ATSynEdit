@@ -272,7 +272,7 @@ var
   mi, miSub: TMenuItem;
   i: integer;
 begin
-  InitResourcesFoldbar;
+  InitFoldImageList;
   if FMenuGutterFoldStd=nil then
     FMenuGutterFoldStd:= TPopupMenu.Create(Self);
 
@@ -361,7 +361,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.InitResourcesFoldbar;
+procedure TATSynEdit.InitFoldImageList;
 begin
   if FFoldImageList=nil then
   begin

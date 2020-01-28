@@ -841,8 +841,8 @@ type
     procedure InitMinimapTooltip;
     procedure InitFoldedMarkList; inline;
     procedure InitFoldedMarkTooltip;
+    procedure InitFoldImageList;
     procedure InitMenuStd;
-    procedure InitResourcesFoldbar;
     function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
