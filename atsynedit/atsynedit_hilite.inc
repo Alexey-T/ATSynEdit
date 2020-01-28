@@ -295,7 +295,8 @@ begin
     end;
   end;
 
-  if FMarkedRange.Count=2 then
+  if Assigned(FMarkedRange) then
+   if FMarkedRange.Count=2 then
     if (ALine>=FMarkedRange.Items[0].PosY) and
        (ALine<=FMarkedRange.Items[1].PosY) then
       AColor:= Colors.MarkedLinesBG;

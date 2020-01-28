@@ -830,6 +830,7 @@ type
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
     procedure InitDimRanges;
+    procedure InitMarkedRange;
     procedure InitMinimapTooltip;
     procedure InitFoldedMarkTooltip;
     procedure InitMenuStd;
@@ -3400,8 +3401,7 @@ begin
   FAttribs:= TATMarkers.Create;
   FAttribs.Sorted:= true;
   FAttribs.Duplicates:= true; //CudaText plugins need it
-  FMarkedRange:= TATMarkers.Create;
-  FMarkedRange.Sorted:= true;
+  FMarkedRange:= nil;
   FDimRanges:= nil;
   FHotspots:= TATHotspots.Create;
   FAdapterCache:= TATAdapterHiliteCache.Create;
@@ -3735,7 +3735,8 @@ begin
   FreeAndNil(FHotspots);
   if Assigned(FDimRanges) then
     FreeAndNil(FDimRanges);
-  FreeAndNil(FMarkedRange);
+  if Assigned(FMarkedRange) then
+    FreeAndNil(FMarkedRange);
   FreeAndNil(FMarkers);
   FreeAndNil(FTabHelper);
   FreeAndNil(FAttribs);
@@ -6616,6 +6617,7 @@ end;
 
 procedure TATSynEdit.DoSetMarkedLines(ALine1, ALine2: integer);
 begin
+  InitMarkedRange;
   FMarkedRange.Clear;
   if (ALine1>=0) and (ALine2>=ALine1) then
   begin
@@ -6629,11 +6631,12 @@ procedure TATSynEdit.DoGetMarkedLines(out ALine1, ALine2: integer);
 begin
   ALine1:= -1;
   ALine2:= -1;
-  if FMarkedRange.Count=2 then
-  begin
-    ALine1:= FMarkedRange.Items[0].PosY;
-    ALine2:= FMarkedRange.Items[1].PosY;
-  end;
+  if Assigned(FMarkedRange) then
+    if FMarkedRange.Count=2 then
+    begin
+      ALine1:= FMarkedRange.Items[0].PosY;
+      ALine2:= FMarkedRange.Items[1].PosY;
+    end;
 end;
 
 procedure TATSynEdit.DoUpdateFontNeedsOffsets(C: TCanvas);
@@ -7309,6 +7312,14 @@ begin
   Result:= FDimRanges;
 end;
 
+procedure TATSynEdit.InitMarkedRange;
+begin
+  if FMarkedRange=nil then
+  begin
+    FMarkedRange:= TATMarkers.Create;
+    FMarkedRange.Sorted:= true;
+  end;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
