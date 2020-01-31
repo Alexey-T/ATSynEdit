@@ -1772,7 +1772,7 @@ begin
           NStartOffset:= 0;
 
         if IndexLine=APosEnd.Y then
-          NEndOffset:= Max(0, APosEnd.X-1)
+          NEndOffset:= Min(Max(0, APosEnd.X-1), Max(0, NLenLooped-NLenPart))
         else
           NEndOffset:= Max(0, NLenLooped-NLenPart);
 
