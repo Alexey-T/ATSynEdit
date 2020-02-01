@@ -275,25 +275,6 @@ begin
   end;
 end;
 
-procedure StringArray_Copy(var A, B: TATFinderStringArray; Reversed: boolean);
-var
-  Len, i: integer;
-begin
-  Len:= Length(A);
-  SetLength(B, Len);
-  if not Reversed then
-  begin
-    for i:= 0 to Len-1 do
-      B[i]:= A[i];
-  end
-  else
-  begin
-    for i:= 0 to Len-1 do
-      B[Len-1-i]:= A[i];
-  end;
-end;
-
-
 function STestStringMatch(
   const SFind, SLine: UnicodeString;
   CharIndex: integer;
