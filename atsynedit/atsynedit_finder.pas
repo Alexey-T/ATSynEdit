@@ -213,6 +213,20 @@ begin
   Result:= ATStringProc.IsCharWord(ch, cDefaultNonWordChars);
 end;
 
+procedure _ToUpperCase(var ch: WideChar); inline;
+var
+  code: word absolute ch;
+begin
+  //like UpCase(char)
+  if (code>=Ord('a')) and (code<=Ord('z')) then
+    Dec(code, 32)
+  else
+  //call slow WideUpperCase only if not ascii
+  if code>=128 then
+    ch:= WideUpperCase(ch)[1];
+end;
+
+
 {
 function SRegexReplaceEscapedTabs(const AStr: string): string;
 begin
@@ -283,7 +297,6 @@ function STestStringMatch(
 //- index check must be in caller
 var
   charFind, charLine: WideChar;
-  code: word absolute charLine;
   i: integer;
 begin
   for i:= 1 to Length(SFind) do
@@ -294,15 +307,7 @@ begin
     Inc(CharIndex);
 
     if not CaseSens then
-    begin
-      //like UpCase(char)
-      if (code>=Ord('a')) and (code<=Ord('z')) then
-        Dec(code, 32)
-      else
-      //call slow WideUpperCase only if not ascii
-      if code>=128 then
-        charLine:= WideUpperCase(charLine)[1];
-    end;
+      _ToUpperCase(charLine);
 
     if charFind<>charLine then
       exit(false);
