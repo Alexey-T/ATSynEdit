@@ -909,14 +909,19 @@ end;
 
 function SCaseInvert(const S: atString): atString;
 var
+  ch, ch_up: WideChar;
   i: integer;
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
-    if S[i]<>SCharUpper(S[i]) then
-      Result[i]:= SCharUpper(Result[i])
+  begin
+    ch:= Result[i];
+    ch_up:= SCharUpper(ch);
+    if ch<>ch_up then
+      Result[i]:= ch_up
     else
-      Result[i]:= SCharLower(Result[i]);
+      Result[i]:= SCharLower(ch);
+  end;
 end;
 
 function SCaseSentence(const S, SNonWordChars: atString): atString;
