@@ -813,7 +813,7 @@ end;
 function TATStrings.TextString_UTF8(AMaxLen: integer=0): string;
 const
   LenEol = 1;
-  CharEol: char = #10;
+  CharEol = #10;
 var
   Len, LastIndex, i: integer;
   Item: PATStringItem;
