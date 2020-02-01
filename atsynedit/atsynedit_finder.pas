@@ -1652,7 +1652,6 @@ end;
 
 function TATEditorFinder.FindMatch_InEditor(APosStart, APosEnd: TPoint;
   AWithEvent: boolean): boolean;
-//todo: consider OptBack
 var
   PartCount: integer;
   ListParts, ListLooped: TATFinderStringArray;
