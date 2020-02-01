@@ -37,8 +37,9 @@ type
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;
 
-function SCharUpper(ch: widechar): widechar; inline;
-function SCharLower(ch: widechar): widechar; inline;
+function SCharUpper(ch: WideChar): WideChar; inline;
+function SCharLower(ch: WideChar): WideChar; inline;
+
 function SCaseTitle(const S, SNonWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SNonWordChars: atString): atString;
@@ -884,14 +885,26 @@ begin
 end;
 
 
-function SCharUpper(ch: widechar): widechar; inline;
+function SCharUpper(ch: WideChar): WideChar; inline;
 begin
-  Result:= UnicodeUpperCase(ch)[1];
+  if (Ord(ch) >= Ord('a')) and (Ord(ch) <= Ord('z')) then
+    Result:= WideChar(Ord(ch)-32)
+  else
+  if Ord(ch) >= 128 then
+    Result:= UnicodeUpperCase(ch)[1]
+  else
+    Result:= ch;
 end;
 
-function SCharLower(ch: widechar): widechar; inline;
+function SCharLower(ch: WideChar): WideChar; inline;
 begin
-  Result:= UnicodeLowerCase(ch)[1];
+  if (Ord(ch) >= Ord('A')) and (Ord(ch) <= Ord('Z')) then
+    Result:= WideChar(Ord(ch)+32)
+  else
+  if Ord(ch) >= 128 then
+    Result:= UnicodeLowerCase(ch)[1]
+  else
+    Result:= ch;
 end;
 
 
