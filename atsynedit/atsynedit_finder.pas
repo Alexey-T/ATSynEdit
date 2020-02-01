@@ -1656,7 +1656,6 @@ function TATEditorFinder.FindMatch_InEditor(APosStart, APosEnd: TPoint;
 var
   NParts: integer;
   ListParts, ListLooped: TATFinderStringArray;
-  SLinePart, SLineLooped: string;
   SLinePartW, SLineLoopedW: UnicodeString;
   NLenPart, NLenLooped: integer;
   //---------
@@ -1763,8 +1762,7 @@ begin
   if NParts=0 then exit;
   SetLength(ListLooped, 0);
 
-  SLinePart:= ListParts[0];
-  SLinePartW:= UTF8Decode(SLinePart);
+  SLinePartW:= ListParts[0];
   NLenPart:= Length(SLinePartW);
 
   FPrevProgress:= 0;
@@ -1783,14 +1781,13 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLooped:= Editor.Strings.LinesUTF8[IndexLine];
-        SLineLoopedW:= UTF8Decode(SLineLooped);
+        SLineLoopedW:= Editor.Strings.Lines[IndexLine];
         NLenLooped:= Length(SLineLoopedW);
 
         if NParts>1 then
         begin
           SetLength(ListLooped, 1);
-          ListLooped[0]:= SLineLooped;
+          ListLooped[0]:= SLineLoopedW;
           for i:= 1 to NParts-1 do
             if Editor.Strings.IsIndexValid(IndexLine+i) then
             begin
@@ -1800,7 +1797,7 @@ begin
         end;
 
         //quick check by len
-        if Length(SLineLooped)<Length(SLinePart) then Continue;
+        if Length(SLineLoopedW)<Length(SLinePartW) then Continue;
         if NParts>1 then
           if not _CompareParts_ByLen then Continue;
 
@@ -1853,14 +1850,13 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLooped:= Editor.Strings.LinesUTF8[IndexLine];
-        SLineLoopedW:= UTF8Decode(SLineLooped);
+        SLineLoopedW:= Editor.Strings.Lines[IndexLine];
         NLenLooped:= Length(SLineLoopedW);
 
         if NParts>1 then
         begin
           SetLength(ListLooped, 1);
-          ListLooped[0]:= SLineLooped;
+          ListLooped[0]:= SLineLoopedW;
           for i:= 1 to NParts-1 do //store ListLooped as reversed
             if Editor.Strings.IsIndexValid(IndexLine-i) then
             begin
@@ -1870,7 +1866,7 @@ begin
         end;
 
         //quick check by len
-        if Length(SLineLooped)<Length(SLinePart) then Continue;
+        if Length(SLineLoopedW)<Length(SLinePartW) then Continue;
         if NParts>1 then
           if not _CompareParts_ByLen then Continue;
 
