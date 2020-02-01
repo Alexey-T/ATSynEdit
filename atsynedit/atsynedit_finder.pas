@@ -1654,14 +1654,14 @@ function TATEditorFinder.FindMatch_InEditor(APosStart, APosEnd: TPoint;
   AWithEvent: boolean): boolean;
 //todo: consider OptBack
 var
-  NParts: integer;
+  PartCount: integer;
   ListParts, ListLooped: TATFinderStringArray;
   SLinePartW, SLineLoopedW: UnicodeString;
   SLinePart_Len, NLenLooped: integer;
   //---------
   function _GetLenLooped(AIndex: integer): integer; inline;
   begin
-    if (NParts=1) or (AIndex=0) then
+    if (PartCount=1) or (AIndex=0) then
       Result:= Length(SLineLoopedW)
     else
     if AIndex<Length(ListLooped) then
@@ -1672,7 +1672,7 @@ var
   //---------
   function _GetLenPart(AIndex: integer): integer; inline;
   begin
-    if (NParts=1) or (AIndex=0) then
+    if (PartCount=1) or (AIndex=0) then
       Result:= SLinePart_Len
     else
     if AIndex<Length(ListParts) then
@@ -1686,9 +1686,9 @@ var
     i: integer;
   begin
     Result:= false;
-    for i:= 1 to NParts-2 do
+    for i:= 1 to PartCount-2 do
       if _GetLenLooped(i)<>_GetLenPart(i) then exit;
-    if _GetLenLooped(NParts-1)<_GetLenPart(NParts-1) then exit;
+    if _GetLenLooped(PartCount-1)<_GetLenPart(PartCount-1) then exit;
     Result:= true;
   end;
   //---------
@@ -1704,7 +1704,7 @@ var
     S2:= SLineLoopedW;
     if Length(S1)>Length(S2) then exit;
 
-    if NParts=1 then
+    if PartCount=1 then
     begin
       //test 1st part at given offset
       //S1='' - search-string ends with EOL and search is backward
@@ -1717,7 +1717,7 @@ var
       if not STestStringMatch(S1, S2, 1, OptCase) then exit;
 
       //test middle parts
-      for i:= 1 to NParts-2 do
+      for i:= 1 to PartCount-2 do
       begin
         S1:= ListParts[i];
         S2:= ListLooped[i];
@@ -1726,8 +1726,8 @@ var
       end;
 
       //test last part at end
-      S1:= ListParts[NParts-1];
-      S2:= ListLooped[NParts-1];
+      S1:= ListParts[PartCount-1];
+      S2:= ListLooped[PartCount-1];
       if Length(S1)>Length(S2) then exit;
       if not STestStringMatch(S1, S2, Length(S2)-Length(S1)+1, OptCase) then exit;
     end;
@@ -1737,7 +1737,7 @@ var
   //---------
   function _GetLineToTest: UnicodeString; inline;
   begin
-    if NParts=1 then
+    if PartCount=1 then
       Result:= SLineLoopedW
     else
       Result:= StringArray_GetText(ListLooped);
@@ -1758,15 +1758,15 @@ begin
   NLenStrFind:= Length(SFind);
 
   StringArray_SetFromString(ListParts, SFind, OptBack);
-  NParts:= Length(ListParts);
-  if NParts=0 then exit;
+  PartCount:= Length(ListParts);
+  if PartCount=0 then exit;
   SetLength(ListLooped, 0);
 
   SLinePartW:= ListParts[0];
   SLinePart_Len:= Length(SLinePartW);
 
   FPrevProgress:= 0;
-  IndexLineMax:= Editor.Strings.Count-NParts;
+  IndexLineMax:= Editor.Strings.Count-PartCount;
 
     if not OptBack then
     //forward search
@@ -1784,11 +1784,11 @@ begin
         SLineLoopedW:= Editor.Strings.Lines[IndexLine];
         NLenLooped:= Length(SLineLoopedW);
 
-        if NParts>1 then
+        if PartCount>1 then
         begin
           SetLength(ListLooped, 1);
           ListLooped[0]:= SLineLoopedW;
-          for i:= 1 to NParts-1 do
+          for i:= 1 to PartCount-1 do
             if Editor.Strings.IsIndexValid(IndexLine+i) then
             begin
               SetLength(ListLooped, Length(ListLooped)+1);
@@ -1798,7 +1798,7 @@ begin
 
         //quick check by len
         if Length(SLineLoopedW)<SLinePart_Len then Continue;
-        if NParts>1 then
+        if PartCount>1 then
           if not _CompareParts_ByLen then Continue;
 
         SLineToTest:= _GetLineToTest;
@@ -1818,7 +1818,7 @@ begin
         begin
           bOk:= STestStringMatch(SFind, SLineToTest, IndexChar+1, OptCase);
           //consider whole words (only for single line)
-          if bOk and OptWords and (NParts=1) then
+          if bOk and OptWords and (PartCount=1) then
             bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar+SLinePart_Len+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+SLinePart_Len+1]));
           if bOk and
@@ -1826,11 +1826,11 @@ begin
           begin
             FMatchEdPos.Y:= IndexLine;
             FMatchEdPos.X:= IndexChar;
-            FMatchEdEnd.Y:= IndexLine+NParts-1;
-            if NParts=1 then
+            FMatchEdEnd.Y:= IndexLine+PartCount-1;
+            if PartCount=1 then
               FMatchEdEnd.X:= IndexChar+SLinePart_Len
             else
-              FMatchEdEnd.X:= _GetLenPart(NParts-1);
+              FMatchEdEnd.X:= _GetLenPart(PartCount-1);
             if AWithEvent then
               DoOnFound;
             Exit(true);
@@ -1853,11 +1853,11 @@ begin
         SLineLoopedW:= Editor.Strings.Lines[IndexLine];
         NLenLooped:= Length(SLineLoopedW);
 
-        if NParts>1 then
+        if PartCount>1 then
         begin
           SetLength(ListLooped, 1);
           ListLooped[0]:= SLineLoopedW;
-          for i:= 1 to NParts-1 do //store ListLooped as reversed
+          for i:= 1 to PartCount-1 do //store ListLooped as reversed
             if Editor.Strings.IsIndexValid(IndexLine-i) then
             begin
               SetLength(ListLooped, Length(ListLooped)+1);
@@ -1867,7 +1867,7 @@ begin
 
         //quick check by len
         if Length(SLineLoopedW)<SLinePart_Len then Continue;
-        if NParts>1 then
+        if PartCount>1 then
           if not _CompareParts_ByLen then Continue;
 
         //exact search
@@ -1881,18 +1881,18 @@ begin
         else
           NEndOffset:= 0;
 
-        //for NParts>1 must be single compare
-        for IndexChar:= IfThen(NParts=1, NStartOffset+1, SLinePart_Len) downto NEndOffset+SLinePart_Len do
+        //for PartCount>1 must be single compare
+        for IndexChar:= IfThen(PartCount=1, NStartOffset+1, SLinePart_Len) downto NEndOffset+SLinePart_Len do
         begin
           bOk:= _CompareParts_Back(IndexChar);
           //consider whole words (only for single line)
-          if bOk and OptWords and (NParts=1) then
+          if bOk and OptWords and (PartCount=1) then
             bOk:= ((IndexChar>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar-1-SLinePart_Len<1) or not IsWordChar(SLineLoopedW[IndexChar-1-SLinePart_Len]));
           if bOk and
             CheckTokens(IndexChar-1-SLinePart_Len, IndexLine) then
           begin
-            if NParts=1 then
+            if PartCount=1 then
             begin
               FMatchEdEnd.Y:= IndexLine;
               FMatchEdEnd.X:= IndexChar-1;
@@ -1903,8 +1903,8 @@ begin
             begin
               FMatchEdPos.Y:= IndexLine;
               FMatchEdPos.X:= SLinePart_Len;
-              FMatchEdEnd.Y:= IndexLine-NParts+1;
-              FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - _GetLenPart(NParts-1);
+              FMatchEdEnd.Y:= IndexLine-PartCount+1;
+              FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - _GetLenPart(PartCount-1);
             end;
             if AWithEvent then
               DoOnFound;
