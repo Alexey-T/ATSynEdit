@@ -21,6 +21,7 @@ uses
   ATStringProc_TextBuffer;
 
 type
+  TATFinderStringArray = array of string;
   TATFinderProgress = procedure(Sender: TObject;
     const ACurPos, AMaxPos: Int64;
     var AContinue: boolean) of object;
@@ -237,10 +238,53 @@ begin
   end;
 end;
 
-function StringList_GetText(L: TStringList): string;
+procedure StringArray_SetFromString(out L: TATFinderStringArray; const SW: UnicodeString; Reversed: boolean);
+var
+  NCount, i: integer;
+  Sep: TATStringSeparator;
 begin
-  Result:= L.Text;
-  SetLength(Result, Length(Result)-1); //.Text adds trailing LF
+  NCount:= SFindCharCount(SW, #10)+1;
+  SetLength(L, NCount);
+  if NCount=1 then
+    L[0]:= UTF8Encode(SW)
+  else
+  begin
+    Sep.Init(UTF8Encode(SW), #10);
+    if not Reversed then
+      for i:= 0 to NCount-1 do
+        Sep.GetItemStr(L[i])
+    else
+      for i:= 0 to NCount-1 do
+        Sep.GetItemStr(L[NCount-1-i]);
+  end;
+end;
+
+function StringArray_GetText(const L: TATFinderStringArray): string;
+var
+  i: integer;
+begin
+  Result:= '';
+  for i:= 0 to Length(L)-1 do
+    Result+= L[i]+#10;
+  SetLength(Result, Length(Result)-1);
+end;
+
+procedure StringArray_Copy(var A, B: TATFinderStringArray; Reversed: boolean);
+var
+  Len, i: integer;
+begin
+  Len:= Length(A);
+  SetLength(B, Len);
+  if not Reversed then
+  begin
+    for i:= 0 to Len-1 do
+      B[i]:= A[i];
+  end
+  else
+  begin
+    for i:= 0 to Len-1 do
+      B[Len-1-i]:= A[i];
+  end;
 end;
 
 
@@ -1600,13 +1644,12 @@ begin
   end;
 end;
 
-
 function TATEditorFinder.FindMatch_InEditor(APosStart, APosEnd: TPoint;
   AWithEvent: boolean): boolean;
 //todo: consider OptBack
 var
   NParts: integer;
-  ListParts, ListLooped: TStringList;
+  ListParts, ListLooped: TATFinderStringArray;
   SLinePart, SLineLooped: string;
   SLinePartW, SLineLoopedW: UnicodeString;
   NLenPart, NLenLooped: integer;
@@ -1616,7 +1659,7 @@ var
     if (NParts=1) or (AIndex=0) then
       Result:= SLineLooped
     else
-    if AIndex<ListLooped.Count then
+    if AIndex<Length(ListLooped) then
       Result:= ListLooped[AIndex]
     else
       Result:= '';
@@ -1627,7 +1670,7 @@ var
     if (NParts=1) or (AIndex=0) then
       Result:= SLinePart
     else
-    if AIndex<ListParts.Count then
+    if AIndex<NParts then
       Result:= ListParts[AIndex]
     else
       Result:= '';
@@ -1692,7 +1735,7 @@ var
     if NParts=1 then
       Result:= SLineLoopedW
     else
-      Result:= UTF8Decode(StringList_GetText(ListLooped));
+      Result:= UTF8Decode(StringArray_GetText(ListLooped));
   end;
   //
 var
@@ -1709,28 +1752,17 @@ begin
     SFind:= WideUpperCase(SFind);
   NLenStrFind:= Length(SFind);
 
-  ListParts:= TStringList.Create;
-  ListLooped:= TStringList.Create;
-  try
-    ListParts.TextLineBreakStyle:= tlbsLF;
-    ListLooped.TextLineBreakStyle:= tlbsLF;
+  StringArray_SetFromString(ListParts, SFind, OptBack);
+  NParts:= Length(ListParts);
+  if NParts=0 then exit;
+  SetLength(ListLooped, 0);
 
-    ListParts.Text:= UTF8Encode(SFind);
-    //FPC ignores last LF
-    if SEndsWith(SFind, #10) then
-      ListParts.Add('');
+  SLinePart:= ListParts[0];
+  SLinePartW:= UTF8Decode(SLinePart);
+  NLenPart:= Length(SLinePartW);
 
-    NParts:= ListParts.Count;
-    if NParts=0 then exit;
-
-    if OptBack then
-      StringList_Reverse(ListParts);
-    SLinePart:= ListParts[0];
-    SLinePartW:= UTF8Decode(SLinePart);
-    NLenPart:= Length(SLinePartW);
-
-    FPrevProgress:= 0;
-    IndexLineMax:= Editor.Strings.Count-NParts;
+  FPrevProgress:= 0;
+  IndexLineMax:= Editor.Strings.Count-NParts;
 
     if not OptBack then
     //forward search
@@ -1751,11 +1783,14 @@ begin
 
         if NParts>1 then
         begin
-          ListLooped.Clear;
-          ListLooped.Add(SLineLooped);
+          SetLength(ListLooped, 1);
+          ListLooped[0]:= SLineLooped;
           for i:= 1 to NParts-1 do
             if Editor.Strings.IsIndexValid(IndexLine+i) then
-              ListLooped.Add(Editor.Strings.LinesUTF8[IndexLine+i]);
+            begin
+              SetLength(ListLooped, Length(ListLooped)+1);
+              ListLooped[i]:= Editor.Strings.LinesUTF8[IndexLine+i];
+            end;
         end;
 
         //quick check by len
@@ -1818,11 +1853,14 @@ begin
 
         if NParts>1 then
         begin
-          ListLooped.Clear;
-          ListLooped.Add(SLineLooped);
+          SetLength(ListLooped, 1);
+          ListLooped[0]:= SLineLooped;
           for i:= 1 to NParts-1 do //store ListLooped as reversed
             if Editor.Strings.IsIndexValid(IndexLine-i) then
-              ListLooped.Add(Editor.Strings.LinesUTF8[IndexLine-i]);
+            begin
+              SetLength(ListLooped, Length(ListLooped)+1);
+              ListLooped[i]:= Editor.Strings.LinesUTF8[IndexLine-i];
+            end;
         end;
 
         //quick check by len
@@ -1872,10 +1910,6 @@ begin
           end;
         end;
       end
-  finally
-    FreeAndNil(ListParts);
-    FreeAndNil(ListLooped);
-  end;
 end;
 
 end.
