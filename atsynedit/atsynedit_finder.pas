@@ -1766,13 +1766,15 @@ begin
 
         if PartCount>1 then
         begin
-          SetLength(ListLooped, 1);
+          SetLength(ListLooped, PartCount);
           ListLooped[0]:= SLineLoopedW;
           for i:= 1 to PartCount-1 do
             if Editor.Strings.IsIndexValid(IndexLine+i) then
+              ListLooped[i]:= Editor.Strings.Lines[IndexLine+i]
+            else
             begin
-              SetLength(ListLooped, Length(ListLooped)+1);
-              ListLooped[i]:= Editor.Strings.Lines[IndexLine+i];
+              SetLength(ListLooped, i);
+              Break
             end;
         end;
 
@@ -1835,13 +1837,15 @@ begin
 
         if PartCount>1 then
         begin
-          SetLength(ListLooped, 1);
+          SetLength(ListLooped, PartCount);
           ListLooped[0]:= SLineLoopedW;
           for i:= 1 to PartCount-1 do //store ListLooped as reversed
             if Editor.Strings.IsIndexValid(IndexLine-i) then
+              ListLooped[i]:= Editor.Strings.Lines[IndexLine-i]
+            else
             begin
-              SetLength(ListLooped, Length(ListLooped)+1);
-              ListLooped[i]:= Editor.Strings.Lines[IndexLine-i];
+              SetLength(ListLooped, i);
+              Break
             end;
         end;
 
