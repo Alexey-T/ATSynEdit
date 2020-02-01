@@ -1660,26 +1660,26 @@ var
   SLinePartW, SLineLoopedW: UnicodeString;
   NLenPart, NLenLooped: integer;
   //---------
-  function _GetLineLooped(AIndex: integer): UnicodeString; inline;
+  function _GetLenLooped(AIndex: integer): integer; inline;
   begin
     if (NParts=1) or (AIndex=0) then
-      Result:= SLineLoopedW
+      Result:= Length(SLineLoopedW)
     else
     if AIndex<Length(ListLooped) then
-      Result:= ListLooped[AIndex]
+      Result:= Length(ListLooped[AIndex])
     else
-      Result:= '';
+      Result:= 0;
   end;
   //---------
-  function _GetLinePart(AIndex: integer): UnicodeString; inline;
+  function _GetLenPart(AIndex: integer): integer; inline;
   begin
     if (NParts=1) or (AIndex=0) then
-      Result:= SLinePartW
+      Result:= Length(SLinePartW)
     else
     if AIndex<Length(ListParts) then
-      Result:= ListParts[AIndex]
+      Result:= Length(ListParts[AIndex])
     else
-      Result:= '';
+      Result:= 0;
   end;
   //---------
   function _CompareParts_ByLen: boolean;
@@ -1688,8 +1688,8 @@ var
   begin
     Result:= false;
     for i:= 1 to NParts-2 do
-      if Length(_GetLineLooped(i))<>Length(_GetLinePart(i)) then exit;
-    if Length(_GetLineLooped(NParts-1))<Length(_GetLinePart(NParts-1)) then exit;
+      if _GetLenLooped(i)<>_GetLenPart(i) then exit;
+    if _GetLenLooped(NParts-1)<_GetLenPart(NParts-1) then exit;
     Result:= true;
   end;
   //---------
@@ -1833,7 +1833,7 @@ begin
             if NParts=1 then
               FMatchEdEnd.X:= IndexChar+NLenPart
             else
-              FMatchEdEnd.X:= Length(_GetLinePart(NParts-1));
+              FMatchEdEnd.X:= _GetLenPart(NParts-1);
             if AWithEvent then
               DoOnFound;
             Exit(true);
@@ -1908,7 +1908,7 @@ begin
               FMatchEdPos.Y:= IndexLine;
               FMatchEdPos.X:= NLenPart;
               FMatchEdEnd.Y:= IndexLine-NParts+1;
-              FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - Length(_GetLinePart(NParts-1));
+              FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - _GetLenPart(NParts-1);
             end;
             if AWithEvent then
               DoOnFound;
