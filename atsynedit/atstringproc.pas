@@ -132,8 +132,10 @@ function IsStringWithUnicodeChars(const S: atString): boolean;
 function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
 
-function SBeginsWith(const S, SubStr: atString): boolean; inline;
-function SBeginsWith(const S, SubStr: string): boolean; inline;
+function SBeginsWith(const S, SubStr: UnicodeString): boolean;
+function SBeginsWith(const S, SubStr: string): boolean;
+function SBeginsWith(const S: UnicodeString; ch: WideChar): boolean; inline;
+function SBeginsWith(const S: string; ch: char): boolean; inline;
 function SEndsWith(const S, SubStr: atString): boolean; inline;
 function SEndsWith(const S, SubStr: string): boolean; inline;
 function SEndsWithEol(const S: string): boolean; inline;
@@ -854,20 +856,46 @@ begin
   Result:= Copy(S, 1, N);
 end;
 
-function SBeginsWith(const S, SubStr: atString): boolean; inline;
+function SBeginsWith(const S, SubStr: UnicodeString): boolean;
+var
+  i: integer;
 begin
-  Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
+  Result:= false;
+  if S='' then exit;
+  if SubStr='' then exit;
+  if Length(SubStr)>Length(S) then exit;
+  for i:= 1 to Length(SubStr) do
+    if S[i]<>SubStr[i] then exit;
+  Result:= true;
 end;
 
 function SBeginsWith(const S, SubStr: string): boolean; inline;
+var
+  i: integer;
 begin
-  Result:= (SubStr<>'') and (Copy(S, 1, Length(SubStr))=SubStr);
+  Result:= false;
+  if S='' then exit;
+  if SubStr='' then exit;
+  if Length(SubStr)>Length(S) then exit;
+  for i:= 1 to Length(SubStr) do
+    if S[i]<>SubStr[i] then exit;
+  Result:= true;
 end;
 
 function SEndsWith(const S, SubStr: atString): boolean; inline;
 begin
   Result:= (SubStr<>'') and (Length(SubStr)<=Length(S)) and
     (Copy(S, Length(S)-Length(SubStr)+1, MaxInt)=SubStr);
+end;
+
+function SBeginsWith(const S: UnicodeString; ch: WideChar): boolean; inline;
+begin
+  Result:= (S<>'') and (S[1]=ch);
+end;
+
+function SBeginsWith(const S: string; ch: char): boolean; inline;
+begin
+  Result:= (S<>'') and (S[1]=ch);
 end;
 
 function SEndsWith(const S, SubStr: string): boolean; inline;
