@@ -21,7 +21,7 @@ uses
   ATStringProc_TextBuffer;
 
 type
-  TATFinderStringArray = array of string;
+  TATFinderStringArray = array of UnicodeString;
   TATFinderProgress = procedure(Sender: TObject;
     const ACurPos, AMaxPos: Int64;
     var AContinue: boolean) of object;
@@ -238,18 +238,18 @@ begin
   end;
 end;
 
-procedure StringArray_SetFromString(out L: TATFinderStringArray; const SW: UnicodeString; Reversed: boolean);
+procedure StringArray_SetFromString(out L: TATFinderStringArray; const Str: UnicodeString; Reversed: boolean);
 var
   NCount, i: integer;
   Sep: TATStringSeparator;
 begin
-  NCount:= SFindCharCount(SW, #10)+1;
+  NCount:= SFindCharCount(Str, #10)+1;
   SetLength(L, NCount);
   if NCount=1 then
-    L[0]:= UTF8Encode(SW)
+    L[0]:= Str
   else
   begin
-    Sep.Init(UTF8Encode(SW), #10);
+    Sep.Init(Str, #10);
     if not Reversed then
       for i:= 0 to NCount-1 do
         Sep.GetItemStr(L[i])
@@ -259,14 +259,20 @@ begin
   end;
 end;
 
-function StringArray_GetText(const L: TATFinderStringArray): string;
+function StringArray_GetText(const L: TATFinderStringArray): UnicodeString;
 var
-  i: integer;
+  S: UnicodeString;
+  Last, i: integer;
 begin
   Result:= '';
-  for i:= 0 to Length(L)-1 do
-    Result+= L[i]+#10;
-  SetLength(Result, Length(Result)-1);
+  Last:= Length(L)-1;
+  for i:= 0 to Last do
+  begin
+    S:= L[i];
+    if i<Last then
+      S+= #10;
+    Result+= S;
+  end;
 end;
 
 procedure StringArray_Copy(var A, B: TATFinderStringArray; Reversed: boolean);
@@ -1654,10 +1660,10 @@ var
   SLinePartW, SLineLoopedW: UnicodeString;
   NLenPart, NLenLooped: integer;
   //---------
-  function _GetLineLooped(AIndex: integer): string; inline;
+  function _GetLineLooped(AIndex: integer): UnicodeString; inline;
   begin
     if (NParts=1) or (AIndex=0) then
-      Result:= SLineLooped
+      Result:= SLineLoopedW
     else
     if AIndex<Length(ListLooped) then
       Result:= ListLooped[AIndex]
@@ -1665,12 +1671,12 @@ var
       Result:= '';
   end;
   //---------
-  function _GetLinePart(AIndex: integer): string; inline;
+  function _GetLinePart(AIndex: integer): UnicodeString; inline;
   begin
     if (NParts=1) or (AIndex=0) then
-      Result:= SLinePart
+      Result:= SLinePartW
     else
-    if AIndex<NParts then
+    if AIndex<Length(ListParts) then
       Result:= ListParts[AIndex]
     else
       Result:= '';
@@ -1714,15 +1720,15 @@ var
       //test middle parts
       for i:= 1 to NParts-2 do
       begin
-        S1:= UTF8Decode(ListParts[i]);
-        S2:= UTF8Decode(ListLooped[i]);
+        S1:= ListParts[i];
+        S2:= ListLooped[i];
         if Length(S1)<>Length(S2) then exit;
         if not STestStringMatch(S1, S2, 1, OptCase) then exit;
       end;
 
       //test last part at end
-      S1:= UTF8Decode(ListParts[NParts-1]);
-      S2:= UTF8Decode(ListLooped[NParts-1]);
+      S1:= ListParts[NParts-1];
+      S2:= ListLooped[NParts-1];
       if Length(S1)>Length(S2) then exit;
       if not STestStringMatch(S1, S2, Length(S2)-Length(S1)+1, OptCase) then exit;
     end;
@@ -1735,7 +1741,7 @@ var
     if NParts=1 then
       Result:= SLineLoopedW
     else
-      Result:= UTF8Decode(StringArray_GetText(ListLooped));
+      Result:= StringArray_GetText(ListLooped);
   end;
   //
 var
@@ -1789,7 +1795,7 @@ begin
             if Editor.Strings.IsIndexValid(IndexLine+i) then
             begin
               SetLength(ListLooped, Length(ListLooped)+1);
-              ListLooped[i]:= Editor.Strings.LinesUTF8[IndexLine+i];
+              ListLooped[i]:= Editor.Strings.Lines[IndexLine+i];
             end;
         end;
 
@@ -1827,7 +1833,7 @@ begin
             if NParts=1 then
               FMatchEdEnd.X:= IndexChar+NLenPart
             else
-              FMatchEdEnd.X:= Length(UTF8Decode(_GetLinePart(NParts-1)));
+              FMatchEdEnd.X:= Length(_GetLinePart(NParts-1));
             if AWithEvent then
               DoOnFound;
             Exit(true);
@@ -1859,7 +1865,7 @@ begin
             if Editor.Strings.IsIndexValid(IndexLine-i) then
             begin
               SetLength(ListLooped, Length(ListLooped)+1);
-              ListLooped[i]:= Editor.Strings.LinesUTF8[IndexLine-i];
+              ListLooped[i]:= Editor.Strings.Lines[IndexLine-i];
             end;
         end;
 
@@ -1902,7 +1908,7 @@ begin
               FMatchEdPos.Y:= IndexLine;
               FMatchEdPos.X:= NLenPart;
               FMatchEdEnd.Y:= IndexLine-NParts+1;
-              FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - Length(UTF8Decode(_GetLinePart(NParts-1)));
+              FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - Length(_GetLinePart(NParts-1));
             end;
             if AWithEvent then
               DoOnFound;
