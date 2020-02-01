@@ -891,7 +891,7 @@ begin
     Result:= WideChar(Ord(ch)-32)
   else
   if Ord(ch) >= 128 then
-    Result:= UnicodeUpperCase(ch)[1]
+    Result:= WideUpperCase(ch)[1]
   else
     Result:= ch;
 end;
@@ -902,7 +902,7 @@ begin
     Result:= WideChar(Ord(ch)+32)
   else
   if Ord(ch) >= 128 then
-    Result:= UnicodeLowerCase(ch)[1]
+    Result:= WideLowerCase(ch)[1]
   else
     Result:= ch;
 end;
