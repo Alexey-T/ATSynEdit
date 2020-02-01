@@ -285,22 +285,24 @@ begin
 end;
 
 
-function IsStringSpaces(const S: atString): boolean; inline;
+function IsStringSpaces(const S: atString): boolean;
+var
+  i: integer;
 begin
-  Result:= IsStringSpaces(S, 1, Length(S));
+  for i:= 1 to Length(S) do
+    if not IsCharSpace(S[i]) then
+      exit(false);
+  Result:= true;
 end;
 
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
 var
-  NLen, i: integer;
+  i: integer;
 begin
+  for i:= AFrom to Min(AFrom+ALen-1, Length(S)) do
+    if not IsCharSpace(S[i]) then
+      exit(false);
   Result:= true;
-  NLen:= Length(S);
-  for i:= AFrom to AFrom+ALen-1 do
-  begin
-    if i>NLen then exit;
-    if not IsCharSpace(S[i]) then exit(false);
-  end;
 end;
 
 function IsStringWithUnicodeChars(const S: atString): boolean;
