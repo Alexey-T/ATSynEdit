@@ -175,9 +175,9 @@ procedure SReplaceAllPercentChars(var S: string);
 procedure SReplaceAllTabsToOneSpace(var S: string); inline;
 procedure SReplaceAllTabsToOneSpace(var S: UnicodeString); inline;
 procedure SDeleteFrom(var s: string; const SFrom: string); inline;
-procedure SDeleteFrom(var s: atString; const SFrom: atString); inline;
-procedure SDeleteFromEol(var S: string); inline;
-procedure SDeleteFromEol(var S: atString); inline;
+procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString); inline;
+procedure SDeleteFromEol(var S: string);
+procedure SDeleteFromEol(var S: UnicodeString);
 
 procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
 function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
@@ -1012,7 +1012,7 @@ begin
     SetLength(S, n-1);
 end;
 
-procedure SDeleteFrom(var s: atString; const SFrom: atString); inline;
+procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString); inline;
 var
   n: integer;
 begin
@@ -1022,15 +1022,35 @@ begin
 end;
 
 procedure SDeleteFromEol(var S: string);
+var
+  i: integer;
+  ch: char;
 begin
-  SDeleteFrom(s, #10);
-  SDeleteFrom(s, #13);
+  for i:= 1 to Length(S) do
+  begin
+    ch:= S[i];
+    if (ch=#10) or (ch=#13) then
+    begin
+      SetLength(S, i-1);
+      Exit;
+    end;
+  end;
 end;
 
-procedure SDeleteFromEol(var S: atString);
+procedure SDeleteFromEol(var S: UnicodeString);
+var
+  i: integer;
+  ch: WideChar;
 begin
-  SDeleteFrom(s, #10);
-  SDeleteFrom(s, #13);
+  for i:= 1 to Length(S) do
+  begin
+    ch:= S[i];
+    if (ch=#10) or (ch=#13) then
+    begin
+      SetLength(S, i-1);
+      Exit;
+    end;
+  end;
 end;
 
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
