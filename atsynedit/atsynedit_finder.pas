@@ -1657,7 +1657,7 @@ var
   PartCount: integer;
   ListParts, ListLooped: TATFinderStringArray;
   SLinePartW, SLineLoopedW: UnicodeString;
-  SLinePart_Len, NLenLooped: integer;
+  SLinePart_Len, SLineLooped_Len: integer;
   //---------
   function _GetLenLooped(AIndex: integer): integer; inline;
   begin
@@ -1782,7 +1782,7 @@ begin
           end;
 
         SLineLoopedW:= Editor.Strings.Lines[IndexLine];
-        NLenLooped:= Length(SLineLoopedW);
+        SLineLooped_Len:= Length(SLineLoopedW);
 
         if PartCount>1 then
         begin
@@ -1797,7 +1797,7 @@ begin
         end;
 
         //quick check by len
-        if Length(SLineLoopedW)<SLinePart_Len then Continue;
+        if SLineLooped_Len<SLinePart_Len then Continue;
         if PartCount>1 then
           if not _CompareParts_ByLen then Continue;
 
@@ -1810,9 +1810,9 @@ begin
           NStartOffset:= 0;
 
         if IndexLine=APosEnd.Y then
-          NEndOffset:= Min(Max(0, APosEnd.X-1), Max(0, NLenLooped-SLinePart_Len))
+          NEndOffset:= Min(Max(0, APosEnd.X-1), Max(0, SLineLooped_Len-SLinePart_Len))
         else
-          NEndOffset:= Max(0, NLenLooped-SLinePart_Len);
+          NEndOffset:= Max(0, SLineLooped_Len-SLinePart_Len);
 
         for IndexChar:= NStartOffset to NEndOffset do
         begin
@@ -1820,7 +1820,7 @@ begin
           //consider whole words (only for single line)
           if bOk and OptWords and (PartCount=1) then
             bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
-                  ((IndexChar+SLinePart_Len+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+SLinePart_Len+1]));
+                  ((IndexChar+SLinePart_Len+1>SLineLooped_Len) or not IsWordChar(SLineLoopedW[IndexChar+SLinePart_Len+1]));
           if bOk and
             CheckTokens(IndexChar, IndexLine) then
           begin
@@ -1851,7 +1851,7 @@ begin
           end;
 
         SLineLoopedW:= Editor.Strings.Lines[IndexLine];
-        NLenLooped:= Length(SLineLoopedW);
+        SLineLooped_Len:= Length(SLineLoopedW);
 
         if PartCount>1 then
         begin
@@ -1866,7 +1866,7 @@ begin
         end;
 
         //quick check by len
-        if Length(SLineLoopedW)<SLinePart_Len then Continue;
+        if SLineLooped_Len<SLinePart_Len then Continue;
         if PartCount>1 then
           if not _CompareParts_ByLen then Continue;
 
@@ -1874,7 +1874,7 @@ begin
         if IndexLine=APosStart.Y then
           NStartOffset:= APosStart.X
         else
-          NStartOffset:= NLenLooped;
+          NStartOffset:= SLineLooped_Len;
 
         if IndexLine=APosEnd.Y then
           NEndOffset:= APosEnd.X
@@ -1887,7 +1887,7 @@ begin
           bOk:= _CompareParts_Back(IndexChar);
           //consider whole words (only for single line)
           if bOk and OptWords and (PartCount=1) then
-            bOk:= ((IndexChar>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar])) and
+            bOk:= ((IndexChar>SLineLooped_Len) or not IsWordChar(SLineLoopedW[IndexChar])) and
                   ((IndexChar-1-SLinePart_Len<1) or not IsWordChar(SLineLoopedW[IndexChar-1-SLinePart_Len]));
           if bOk and
             CheckTokens(IndexChar-1-SLinePart_Len, IndexLine) then
