@@ -1657,7 +1657,7 @@ var
   NParts: integer;
   ListParts, ListLooped: TATFinderStringArray;
   SLinePartW, SLineLoopedW: UnicodeString;
-  NLenPart, NLenLooped: integer;
+  SLinePart_Len, NLenLooped: integer;
   //---------
   function _GetLenLooped(AIndex: integer): integer; inline;
   begin
@@ -1673,7 +1673,7 @@ var
   function _GetLenPart(AIndex: integer): integer; inline;
   begin
     if (NParts=1) or (AIndex=0) then
-      Result:= Length(SLinePartW)
+      Result:= SLinePart_Len
     else
     if AIndex<Length(ListParts) then
       Result:= Length(ListParts[AIndex])
@@ -1763,7 +1763,7 @@ begin
   SetLength(ListLooped, 0);
 
   SLinePartW:= ListParts[0];
-  NLenPart:= Length(SLinePartW);
+  SLinePart_Len:= Length(SLinePartW);
 
   FPrevProgress:= 0;
   IndexLineMax:= Editor.Strings.Count-NParts;
@@ -1797,7 +1797,7 @@ begin
         end;
 
         //quick check by len
-        if Length(SLineLoopedW)<Length(SLinePartW) then Continue;
+        if Length(SLineLoopedW)<SLinePart_Len then Continue;
         if NParts>1 then
           if not _CompareParts_ByLen then Continue;
 
@@ -1810,9 +1810,9 @@ begin
           NStartOffset:= 0;
 
         if IndexLine=APosEnd.Y then
-          NEndOffset:= Min(Max(0, APosEnd.X-1), Max(0, NLenLooped-NLenPart))
+          NEndOffset:= Min(Max(0, APosEnd.X-1), Max(0, NLenLooped-SLinePart_Len))
         else
-          NEndOffset:= Max(0, NLenLooped-NLenPart);
+          NEndOffset:= Max(0, NLenLooped-SLinePart_Len);
 
         for IndexChar:= NStartOffset to NEndOffset do
         begin
@@ -1820,7 +1820,7 @@ begin
           //consider whole words (only for single line)
           if bOk and OptWords and (NParts=1) then
             bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
-                  ((IndexChar+NLenPart+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+NLenPart+1]));
+                  ((IndexChar+SLinePart_Len+1>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar+SLinePart_Len+1]));
           if bOk and
             CheckTokens(IndexChar, IndexLine) then
           begin
@@ -1828,7 +1828,7 @@ begin
             FMatchEdPos.X:= IndexChar;
             FMatchEdEnd.Y:= IndexLine+NParts-1;
             if NParts=1 then
-              FMatchEdEnd.X:= IndexChar+NLenPart
+              FMatchEdEnd.X:= IndexChar+SLinePart_Len
             else
               FMatchEdEnd.X:= _GetLenPart(NParts-1);
             if AWithEvent then
@@ -1866,7 +1866,7 @@ begin
         end;
 
         //quick check by len
-        if Length(SLineLoopedW)<Length(SLinePartW) then Continue;
+        if Length(SLineLoopedW)<SLinePart_Len then Continue;
         if NParts>1 then
           if not _CompareParts_ByLen then Continue;
 
@@ -1882,27 +1882,27 @@ begin
           NEndOffset:= 0;
 
         //for NParts>1 must be single compare
-        for IndexChar:= IfThen(NParts=1, NStartOffset+1, NLenPart) downto NEndOffset+NLenPart do
+        for IndexChar:= IfThen(NParts=1, NStartOffset+1, SLinePart_Len) downto NEndOffset+SLinePart_Len do
         begin
           bOk:= _CompareParts_Back(IndexChar);
           //consider whole words (only for single line)
           if bOk and OptWords and (NParts=1) then
             bOk:= ((IndexChar>NLenLooped) or not IsWordChar(SLineLoopedW[IndexChar])) and
-                  ((IndexChar-1-NLenPart<1) or not IsWordChar(SLineLoopedW[IndexChar-1-NLenPart]));
+                  ((IndexChar-1-SLinePart_Len<1) or not IsWordChar(SLineLoopedW[IndexChar-1-SLinePart_Len]));
           if bOk and
-            CheckTokens(IndexChar-1-NLenPart, IndexLine) then
+            CheckTokens(IndexChar-1-SLinePart_Len, IndexLine) then
           begin
             if NParts=1 then
             begin
               FMatchEdEnd.Y:= IndexLine;
               FMatchEdEnd.X:= IndexChar-1;
               FMatchEdPos.Y:= IndexLine;
-              FMatchEdPos.X:= IndexChar-1-NLenPart;
+              FMatchEdPos.X:= IndexChar-1-SLinePart_Len;
             end
             else
             begin
               FMatchEdPos.Y:= IndexLine;
-              FMatchEdPos.X:= NLenPart;
+              FMatchEdPos.X:= SLinePart_Len;
               FMatchEdEnd.Y:= IndexLine-NParts+1;
               FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - _GetLenPart(NParts-1);
             end;
