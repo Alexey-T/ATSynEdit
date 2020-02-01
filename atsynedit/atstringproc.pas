@@ -927,22 +927,24 @@ end;
 function SCaseSentence(const S, SNonWordChars: atString): atString;
 var
   dot: boolean;
+  ch: WideChar;
   i: Integer;
 begin
   Result:= S;
   dot:= True;
   for i:= 1 to Length(Result) do
   begin
-    if IsCharWord(Result[i], SNonWordChars) then
+    ch:= Result[i];
+    if IsCharWord(ch, SNonWordChars) then
     begin
       if dot then
-        Result[i]:= SCharUpper(Result[i])
+        Result[i]:= SCharUpper(ch)
       else
-        Result[i]:= SCharLower(Result[i]);
+        Result[i]:= SCharLower(ch);
       dot:= False;
     end
     else
-      if (Result[i] = '.') or (Result[i] = '!') or (Result[i] = '?') then
+      if (ch = '.') or (ch = '!') or (ch = '?') then
         dot:= True;
   end;
 end;
