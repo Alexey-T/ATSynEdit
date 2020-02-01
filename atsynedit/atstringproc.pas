@@ -136,8 +136,10 @@ function SBeginsWith(const S, SubStr: UnicodeString): boolean;
 function SBeginsWith(const S, SubStr: string): boolean;
 function SBeginsWith(const S: UnicodeString; ch: WideChar): boolean; inline;
 function SBeginsWith(const S: string; ch: char): boolean; inline;
-function SEndsWith(const S, SubStr: atString): boolean; inline;
-function SEndsWith(const S, SubStr: string): boolean; inline;
+function SEndsWith(const S, SubStr: UnicodeString): boolean;
+function SEndsWith(const S, SubStr: string): boolean;
+function SEndsWith(const S: UnicodeString; ch: WideChar): boolean; inline;
+function SEndsWith(const S: string; ch: char): boolean; inline;
 function SEndsWithEol(const S: string): boolean; inline;
 function SEndsWithEol(const S: atString): boolean; inline;
 
@@ -882,40 +884,64 @@ begin
   Result:= true;
 end;
 
-function SEndsWith(const S, SubStr: atString): boolean; inline;
+function SEndsWith(const S, SubStr: UnicodeString): boolean;
+var
+  i: integer;
 begin
-  Result:= (SubStr<>'') and (Length(SubStr)<=Length(S)) and
-    (Copy(S, Length(S)-Length(SubStr)+1, MaxInt)=SubStr);
+  Result:= false;
+  if S='' then exit;
+  if SubStr='' then exit;
+  if Length(SubStr)>Length(S) then exit;
+  for i:= Length(S)-Length(SubStr)+1 to Length(S) do
+    if S[i]<>SubStr[i] then exit;
+  Result:= true;
 end;
 
-function SBeginsWith(const S: UnicodeString; ch: WideChar): boolean; inline;
+function SEndsWith(const S, SubStr: string): boolean;
+var
+  i: integer;
+begin
+  Result:= false;
+  if S='' then exit;
+  if SubStr='' then exit;
+  if Length(SubStr)>Length(S) then exit;
+  for i:= Length(S)-Length(SubStr)+1 to Length(S) do
+    if S[i]<>SubStr[i] then exit;
+  Result:= true;
+end;
+
+function SBeginsWith(const S: UnicodeString; ch: WideChar): boolean;
 begin
   Result:= (S<>'') and (S[1]=ch);
 end;
 
-function SBeginsWith(const S: string; ch: char): boolean; inline;
+function SBeginsWith(const S: string; ch: char): boolean;
 begin
   Result:= (S<>'') and (S[1]=ch);
 end;
 
-function SEndsWith(const S, SubStr: string): boolean; inline;
+function SEndsWith(const S: UnicodeString; ch: WideChar): boolean;
 begin
-  Result:= (SubStr<>'') and (Length(SubStr)<=Length(S)) and
-    (Copy(S, Length(S)-Length(SubStr)+1, MaxInt)=SubStr);
+  Result:= (S<>'') and (S[Length(S)]=ch);
 end;
 
-function SEndsWithEol(const S: string): boolean; inline;
+function SEndsWith(const S: string; ch: char): boolean;
+begin
+  Result:= (S<>'') and (S[Length(S)]=ch);
+end;
+
+function SEndsWithEol(const S: string): boolean;
 begin
   Result:= (S<>'') and IsCharEol(S[Length(S)]);
 end;
 
-function SEndsWithEol(const S: atString): boolean; inline;
+function SEndsWithEol(const S: atString): boolean;
 begin
   Result:= (S<>'') and IsCharEol(S[Length(S)]);
 end;
 
 
-function SCharUpper(ch: WideChar): WideChar; inline;
+function SCharUpper(ch: WideChar): WideChar;
 begin
   if (Ord(ch) >= Ord('a')) and (Ord(ch) <= Ord('z')) then
     Result:= WideChar(Ord(ch)-32)
@@ -926,7 +952,7 @@ begin
     Result:= ch;
 end;
 
-function SCharLower(ch: WideChar): WideChar; inline;
+function SCharLower(ch: WideChar): WideChar;
 begin
   if (Ord(ch) >= Ord('A')) and (Ord(ch) <= Ord('Z')) then
     Result:= WideChar(Ord(ch)+32)
