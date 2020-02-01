@@ -84,7 +84,7 @@ type
     procedure SetStrFind(const AValue: UnicodeString);
     procedure SetStrReplace(const AValue: UnicodeString);
     function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
-    function IsProgressNeeded(ANewPos: integer): boolean;
+    function IsProgressNeeded(ANewPos: integer): boolean; inline;
   protected
     procedure DoOnFound; virtual;
     function CheckTokens(APos: integer): boolean; virtual;
