@@ -4837,6 +4837,7 @@ var
   P: TPoint;
   RectNums, RectBookmk: TRect;
   bOnMain, bOnMinimap, bOnMicromap, bOnGutter: boolean;
+  bSelecting: boolean;
   Details: TATPosDetails;
   nIndex: integer;
   Caret: TATCaretItem;
@@ -4847,7 +4848,9 @@ begin
   P:= Point(X, Y);
   UpdateCursor;
 
-  if (not FMouseDragDropping) and (FMouseDownPnt.X>=0) then
+  bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
+
+  if bSelecting then
   begin
     FMouseDragCoord:= P;
     _LimitPointByRect(FMouseDragCoord, FRectMainVisible);
@@ -4927,7 +4930,7 @@ begin
   end;
 
   //show/hide bookmark hint
-  if PtInRect(RectBookmk, P) then
+  if PtInRect(RectBookmk, P) and not bSelecting then
   begin
     P:= ClientPosToCaretPos(Point(X, Y), Details);
     DoHintShowForBookmark(P.Y);
@@ -4956,21 +4959,21 @@ begin
   if (P.X>=FRectMain.Right) then
     FMouseAutoScroll:= cDirRight;
 
-  //mouse dragged on numbers
-  if PtInRect(RectNums, P) then
-  begin
-    if Shift=[ssLeft] then
+  //mouse dragged on gutter numbers (only if drag started on gutter numbers)
+  if FMouseDownGutterLineNumber>=0 then
+    if PtInRect(RectNums, P) then
     begin
-      P:= ClientPosToCaretPos(P, Details);
-      if (P.Y>=0) and (P.X>=0) then
-        if FMouseDownGutterLineNumber>=0 then
+      if Shift=[ssLeft] then
+      begin
+        P:= ClientPosToCaretPos(P, Details);
+        if (P.Y>=0) and (P.X>=0) then
         begin
           DoSelect_LineRange(FMouseDownGutterLineNumber, P);
           DoCaretsSort;
           DoEventCarets;
           Invalidate;
         end;
-    end;
+      end;
     Exit
   end;
 
@@ -5003,8 +5006,8 @@ begin
     end;
 
   //mouse dragged to select block
-  if (not FMouseDragDropping) and (FMouseDownPnt.X>=0) then
-    if PtInRect(FRectMain, P) then
+  if bSelecting then
+    if PtInRect(FRectMain, P) or bOnGutter then
     begin
       if ssLeft in Shift then
         if Carets.Count>0 then
