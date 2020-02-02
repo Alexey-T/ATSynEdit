@@ -4838,7 +4838,7 @@ var
   RectNums, RectBookmk: TRect;
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
-  bSelecting: boolean;
+  bSelecting, bSelectingGutterNumbers: boolean;
   Details: TATPosDetails;
   nIndex: integer;
   Caret: TATCaretItem;
@@ -4850,6 +4850,7 @@ begin
   UpdateCursor;
 
   bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
+  bSelectingGutterNumbers:= FMouseDownGutterLineNumber>=0;
 
   if bSelecting then
   begin
@@ -4959,7 +4960,7 @@ begin
     FMouseAutoScroll:= cDirRight;
 
   //mouse dragged on gutter numbers (only if drag started on gutter numbers)
-  if FMouseDownGutterLineNumber>=0 then
+  if bSelectingGutterNumbers then
     if bOnGutterNumbers then
     begin
       if Shift=[ssLeft] then
