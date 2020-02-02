@@ -4836,7 +4836,8 @@ procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
 var
   P: TPoint;
   RectNums, RectBookmk: TRect;
-  bOnMain, bOnMinimap, bOnMicromap, bOnGutter: boolean;
+  bOnMain, bOnMinimap, bOnMicromap,
+  bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting: boolean;
   Details: TATPosDetails;
   nIndex: integer;
@@ -4859,14 +4860,15 @@ begin
     FMouseDragCoord:= Point(-1, -1);
 
   bOnMain:= PtInRect(FRectMain, P);
-  bOnMinimap:= false;
-  bOnMicromap:= false;
-  bOnGutter:= false;
+  bOnMinimap:= FMinimapVisible and PtInRect(FRectMinimap, P);
+  bOnMicromap:= FMicromapVisible and PtInRect(FRectMicromap, P);
+  bOnGutter:= FOptGutterVisible and PtInRect(FRectGutter, P);
+  bOnGutterNumbers:= false;
+  bOnGutterBookmk:= false;
 
   //detect cursor on minimap
   if FMinimapVisible then
   begin
-    bOnMinimap:= PtInRect(FRectMinimap, P);
     if not FMinimapShowSelAlways then
       if bOnMinimap<>FCursorOnMinimap then
         Invalidate;
@@ -4885,16 +4887,9 @@ begin
       FMinimapTooltip.Hide;
   end;
 
-  //detect cursor on FMicromap
-  if FMicromapVisible then
-  begin
-    bOnMicromap:= PtInRect(FRectMicromap, P);
-  end;
-
   //detect cursor on gutter
   if FOptGutterVisible then
   begin
-    bOnGutter:= PtInRect(FRectGutter, P);
     if not FOptGutterShowFoldAlways then
       if bOnGutter<>FCursorOnGutter then
         Invalidate;
@@ -4911,6 +4906,8 @@ begin
       RectNums.Right:= FGutter[FGutterBandNumbers].Right;
       RectNums.Top:= FRectMain.Top;
       RectNums.Bottom:= FRectMain.Bottom;
+
+      bOnGutterNumbers:= bOnGutter and PtInRect(RectNums, P);
     end;
 
     if FGutter[FGutterBandBookmarks].Visible then
@@ -4919,6 +4916,8 @@ begin
       RectBookmk.Right:= FGutter[FGutterBandBookmarks].Right;
       RectBookmk.Top:= FRectMain.Top;
       RectBookmk.Bottom:= FRectMain.Bottom;
+
+      bOnGutterBookmk:= bOnGutter and PtInRect(RectBookmk, P);
     end;
   end;
 
@@ -4930,7 +4929,7 @@ begin
   end;
 
   //show/hide bookmark hint
-  if PtInRect(RectBookmk, P) and not bSelecting then
+  if bOnGutterBookmk and not bSelecting then
   begin
     P:= ClientPosToCaretPos(Point(X, Y), Details);
     DoHintShowForBookmark(P.Y);
@@ -4961,7 +4960,7 @@ begin
 
   //mouse dragged on gutter numbers (only if drag started on gutter numbers)
   if FMouseDownGutterLineNumber>=0 then
-    if PtInRect(RectNums, P) then
+    if bOnGutterNumbers then
     begin
       if Shift=[ssLeft] then
       begin
@@ -4978,8 +4977,7 @@ begin
   end;
 
   //mouse just moved on text
-  if (FMouseDownPnt.X<0) then
-    if PtInRect(FRectMain, P) then
+  if bOnMain and (FMouseDownPnt.X<0) then
     begin
       if Shift*[ssLeft, ssRight]=[] then
         if Assigned(FHotspots) and (FHotspots.Count>0) then
@@ -5007,7 +5005,7 @@ begin
 
   //mouse dragged to select block
   if bSelecting then
-    if PtInRect(FRectMain, P) or bOnGutter then
+    if bOnMain or bOnGutter then
     begin
       if ssLeft in Shift then
         if Carets.Count>0 then
