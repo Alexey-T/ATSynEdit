@@ -2,7 +2,7 @@
 
 function IsStreamWithSignature(Stream: TStream; const Sign: string): boolean;
 const
-  cMinimalCountOfChars = 3;
+  cMinimalCountOfChars = 1; //even empty text with only BOM must detect this BOM
 var
   Buf: string;
 begin
