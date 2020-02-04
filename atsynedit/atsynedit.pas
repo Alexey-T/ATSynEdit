@@ -3838,7 +3838,7 @@ begin
   Update;
   DoPaintModeBlinking;
   DoEventChange(false); //calling OnChange makes almost no sense on opening file
-  DoEventCarets;
+  //DoEventCarets; //calling OnChangeCaretPos makes little sense on opening file
 end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
