@@ -886,27 +886,29 @@ end;
 
 function SEndsWith(const S, SubStr: UnicodeString): boolean;
 var
-  i: integer;
+  i, Offset: integer;
 begin
   Result:= false;
   if S='' then exit;
   if SubStr='' then exit;
-  if Length(SubStr)>Length(S) then exit;
-  for i:= Length(S)-Length(SubStr)+1 to Length(S) do
-    if S[i]<>SubStr[i] then exit;
+  Offset:= Length(S)-Length(SubStr);
+  if Offset<0 then exit;
+  for i:= 1 to Length(SubStr) do
+    if S[i+Offset]<>SubStr[i] then exit;
   Result:= true;
 end;
 
 function SEndsWith(const S, SubStr: string): boolean;
 var
-  i: integer;
+  i, Offset: integer;
 begin
   Result:= false;
   if S='' then exit;
   if SubStr='' then exit;
-  if Length(SubStr)>Length(S) then exit;
-  for i:= Length(S)-Length(SubStr)+1 to Length(S) do
-    if S[i]<>SubStr[i] then exit;
+  Offset:= Length(S)-Length(SubStr);
+  if Offset<0 then exit;
+  for i:= 1 to Length(SubStr) do
+    if S[i+Offset]<>SubStr[i] then exit;
   Result:= true;
 end;
 
