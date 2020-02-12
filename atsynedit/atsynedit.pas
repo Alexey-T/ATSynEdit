@@ -971,7 +971,7 @@ type
     procedure SetWrapIndented(AValue: boolean);
     procedure UpdateTabHelper;
     procedure UpdateCursor;
-    procedure UpdateGutterAutosize(C: TCanvas);
+    procedure UpdateGutterAutosize;
     procedure UpdateMinimapAutosize;
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
@@ -1692,7 +1692,7 @@ begin
       );
 end;
 
-procedure TATSynEdit.UpdateGutterAutosize(C: TCanvas);
+procedure TATSynEdit.UpdateGutterAutosize;
 var
   Str: string;
 begin
@@ -2387,7 +2387,7 @@ begin
   FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
 
   if FOptGutterVisible and FOptNumbersAutosize then
-    UpdateGutterAutosize(C);
+    UpdateGutterAutosize;
   if FMinimapVisible then
     UpdateMinimapAutosize;
 
@@ -3980,7 +3980,6 @@ begin
   //first make sure WrapInfo is filled with data;
   //then we can read WrapInfo and calc scroll pos;
   //this is required for restoring LineTop for n tabs, on opening CudaText.
-  //don't do "if HandleAllocated then exit", it stops for hidden control.
   UpdateWrapInfo;
 
   //find exact match
