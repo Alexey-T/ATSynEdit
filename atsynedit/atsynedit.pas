@@ -3985,6 +3985,7 @@ begin
   //first make sure WrapInfo is filled with data;
   //then we can read WrapInfo and calc scroll pos;
   //this is required for restoring LineTop for n tabs, on opening CudaText.
+  UpdateInitialVars(Canvas);
   UpdateWrapInfo;
 
   //find exact match
