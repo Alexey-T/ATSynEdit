@@ -969,6 +969,7 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
+    procedure UpdateInitialVars(C: TCanvas);
     procedure UpdateTabHelper;
     procedure UpdateCursor;
     procedure UpdateGutterAutosize;
@@ -2360,13 +2361,8 @@ begin
   R.Bottom:= R.Top + FRulerHeight;
 end;
 
-procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
+procedure TATSynEdit.UpdateInitialVars(C: TCanvas);
 begin
-  if csLoading in ComponentState then Exit;
-
-  C.Brush.Color:= GetColorTextBG;
-  C.FillRect(ClientRect);
-
   C.Font.Name:= Font.Name;
   C.Font.Size:= EditorScaleFont(Font.Size);
 
@@ -2397,7 +2393,16 @@ begin
   GetRectGutter(FRectGutter);
   GetRectMain(FRectMain); //after gutter/minimap/FMicromap
   GetRectRuler(FRectRuler); //after main
+end;
 
+procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
+begin
+  if csLoading in ComponentState then Exit;
+
+  C.Brush.Color:= GetColorTextBG;
+  C.FillRect(ClientRect);
+
+  UpdateInitialVars(C);
   UpdateWrapInfo;
 
   if not CanvasTextOutMustUseOffsets then
