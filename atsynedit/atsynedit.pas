@@ -1787,13 +1787,14 @@ end;
 
 procedure TATSynEdit.UpdateWrapInfo;
 var
-  NNewVisibleColumns: integer;
-  NIndentMaximal: integer;
+  CurStrings: TATStrings;
   ListNums: TATIntegerList;
-  i, j: integer;
-  NLine, NIndexFrom, NIndexTo: integer;
   UseCachedUpdate: boolean;
   bConsiderFolding: boolean;
+  NNewVisibleColumns: integer;
+  NIndentMaximal: integer;
+  NLine, NIndexFrom, NIndexTo: integer;
+  i, j: integer;
 begin
   if not HandleAllocated then exit;
     //must have, coz method can be called before 1st paint,
@@ -1802,11 +1803,12 @@ begin
   GlobalCharSizer.Init(Font.Name, EditorScaleFont(Font.Size));
 
   //virtual mode allows faster usage of WrapInfo
-  FWrapInfo.StringsObj:= Strings;
+  CurStrings:= Strings;
+  FWrapInfo.StringsObj:= CurStrings;
   FWrapInfo.VirtualMode:=
     (FWrapMode=cWrapOff) and
     (Fold.Count=0) and
-    (Strings.Count>2);
+    (CurStrings.Count>2);
   if FWrapInfo.VirtualMode then exit;
 
   bConsiderFolding:= Fold.Count>0;
@@ -1837,9 +1839,9 @@ begin
 
   UseCachedUpdate:=
     (FWrapInfo.Count>0) and
-    (Strings.Count>cMaxLinesForOldWrapUpdate) and
-    (not Strings.ListUpdatesHard) and
-    (Strings.ListUpdates.Count>0);
+    (CurStrings.Count>cMaxLinesForOldWrapUpdate) and
+    (not CurStrings.ListUpdatesHard) and
+    (CurStrings.ListUpdates.Count>0);
   //UseCachedUpdate:= false;////to disable
 
   FWrapTemps.Clear;
@@ -1847,8 +1849,8 @@ begin
   if not UseCachedUpdate then
   begin
     FWrapInfo.Clear;
-    FWrapInfo.SetCapacity(Strings.Count);
-    for i:= 0 to Strings.Count-1 do
+    FWrapInfo.SetCapacity(CurStrings.Count);
+    for i:= 0 to CurStrings.Count-1 do
     begin
       DoCalcWrapInfos(i, NIndentMaximal, FWrapTemps, bConsiderFolding);
       for j:= 0 to FWrapTemps.Count-1 do
@@ -1862,7 +1864,7 @@ begin
     //and insert results into WrapInfo
     ListNums:= TATIntegerList.Create;
     try
-      ListNums.Assign(Strings.ListUpdates);
+      ListNums.Assign(CurStrings.ListUpdates);
 
       for i:= 0 to ListNums.Count-1 do
       begin
@@ -1887,8 +1889,8 @@ begin
     end;
   end;
 
-  Strings.ListUpdates.Clear;
-  Strings.ListUpdatesHard:= false;
+  CurStrings.ListUpdates.Clear;
+  CurStrings.ListUpdatesHard:= false;
 
   {$ifdef debug_findwrapindex}
   DebugFindWrapIndex;
