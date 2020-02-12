@@ -3967,6 +3967,14 @@ procedure TATSynEdit.SetLineTop(AValue: integer);
 var
   NFrom, NTo, i: integer;
 begin
+  if AValue<=0 then
+  begin
+    FScrollVert.NPos:= 0;
+    FScrollVert.SmoothPos:= 0;
+    Update;
+    Exit
+  end;
+
   //first make sure WrapInfo is filled with data;
   //then we can read WrapInfo and calc scroll pos;
   //this is required for restoring LineTop for n tabs, on opening CudaText.
