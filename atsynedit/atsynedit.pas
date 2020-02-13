@@ -284,6 +284,7 @@ const
   cInitFoldTooltipVisible = true;
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
+  cInitMaxLineLenToTokenize = 4000;
   cInitMaxLineLenToCalcURL = 300;
   cInitStapleHiliteAlpha = 180;
   cInitZebraAlphaBlend = 235;
@@ -297,7 +298,6 @@ const
   cGutterSizeEmpty = 2;
 
 const
-  cMaxLenToTokenize = 4000;
   cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2; //indent inside [...] folded-mark
   cFoldedMarkIndentOuter = 2; //indent before [...] folded-mark
@@ -611,6 +611,7 @@ type
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
+    FOptMaxLineLenToTokenize: integer;
     FOptMaxLinesToCountUnindent: integer;
     FOptMaxLineLengthForSlowWidthDetect: integer;
     FOptScrollStyleVert: TATSynEditScrollStyle;
@@ -1445,6 +1446,7 @@ type
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
+    property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
     property OptStapleStyle: TATLineStyle read FOptStapleStyle write FOptStapleStyle default cLineStyleSolid;
     property OptStapleIndent: integer read FOptStapleIndent write FOptStapleIndent default -1;
@@ -3602,6 +3604,7 @@ begin
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
+  FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
 
   FOptStapleStyle:= cLineStyleSolid;

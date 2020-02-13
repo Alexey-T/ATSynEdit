@@ -1,4 +1,7 @@
 
+2020.02.13
++ add: OptMaxLineLenToTokenize=4000
+
 2019.12.17
 + add: finder: added method Action_FindAll (collect all matches in a list)
 
