@@ -612,6 +612,7 @@ type
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
     FOptMaxLineLenToTokenize: integer;
+    FOptMaxLineLenToCalcURL: integer;
     FOptMaxLinesToCountUnindent: integer;
     FOptMaxLineLengthForSlowWidthDetect: integer;
     FOptScrollStyleVert: TATSynEditScrollStyle;
@@ -626,7 +627,6 @@ type
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
     FOptShowDragDropMarker: boolean;
-    FOptMaxLineLenToCalcURL: integer;
     FOptStapleStyle: TATLineStyle;
     FOptStapleIndent: integer;
     FOptStapleWidthPercent: integer;
@@ -1448,6 +1448,8 @@ type
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
+    property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;
+    property OptMaxLineLengthForSlowWidthDetect: integer read FOptMaxLineLengthForSlowWidthDetect write FOptMaxLineLengthForSlowWidthDetect default 500;
     property OptStapleStyle: TATLineStyle read FOptStapleStyle write FOptStapleStyle default cLineStyleSolid;
     property OptStapleIndent: integer read FOptStapleIndent write FOptStapleIndent default -1;
     property OptStapleWidthPercent: integer read FOptStapleWidthPercent write FOptStapleWidthPercent default 100;
@@ -1567,8 +1569,6 @@ type
              // N=0: calc indent from OptTabSize/OptTabSpaces
     property OptIndentKeepsAlign: boolean read FOptIndentKeepsAlign write FOptIndentKeepsAlign default true;
     property OptIndentMakesWholeLinesSelection: boolean read FOptIndentMakesWholeLinesSelection write FOptIndentMakesWholeLinesSelection default false;
-    property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;
-    property OptMaxLineLengthForSlowWidthDetect: integer read FOptMaxLineLengthForSlowWidthDetect write FOptMaxLineLengthForSlowWidthDetect default 500;
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines default true;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG default true;
     property OptAllowRepaintOnTextChange: boolean read FOptAllowRepaintOnTextChange write FOptAllowRepaintOnTextChange default true;
@@ -3604,8 +3604,11 @@ begin
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
+
   FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
+  FOptMaxLinesToCountUnindent:= 100;
+  FOptMaxLineLengthForSlowWidthDetect:= 500;
 
   FOptStapleStyle:= cLineStyleSolid;
   FOptStapleIndent:= -1;
@@ -3615,8 +3618,6 @@ begin
   FOptStapleEdge1:= cStapleEdgeAngle;
   FOptStapleEdge2:= cStapleEdgeAngle;
 
-  FOptMaxLinesToCountUnindent:= 100;
-  FOptMaxLineLengthForSlowWidthDetect:= 500;
   FOptTextCenteringCharWidth:= 0;
   FOptTextOffsetLeft:= 0;
   FOptTextOffsetTop:= 0;
