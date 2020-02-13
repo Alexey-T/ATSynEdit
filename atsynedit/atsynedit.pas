@@ -1797,9 +1797,13 @@ var
   NLine, NIndexFrom, NIndexTo: integer;
   i, j: integer;
 begin
+  //must have, coz method can be called before 1st paint,
+  //so TCanvas.TextWidth will give exception (control has no parent window)
   if not HandleAllocated then exit;
-    //must have, coz method can be called before 1st paint,
-    //so TCanvas.TextWidth will give exception (control has no parent window)
+
+  //must init FRect* if called before first paint (wrapped items need it)
+  if FRectMain.Width=0 then
+    UpdateInitialVars(Canvas);
 
   GlobalCharSizer.Init(Font.Name, EditorScaleFont(Font.Size));
 
@@ -3985,7 +3989,6 @@ begin
   //first make sure WrapInfo is filled with data;
   //then we can read WrapInfo and calc scroll pos;
   //this is required for restoring LineTop for n tabs, on opening CudaText.
-  UpdateInitialVars(Canvas);
   UpdateWrapInfo;
 
   //find exact match
