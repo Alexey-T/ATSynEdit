@@ -1,4 +1,7 @@
 
+2020.02.15
++ add: used Alexey Torgashin's patches to Sorokin's TRegExpr
+
 2020.02.13
 + add: OptMaxLineLenToTokenize=4000
 
