@@ -23,6 +23,9 @@ var
 begin
   Str:= Lines[AY];
   Lines[AY]:= Copy(Str, 1, AX1) + ATextPart1;
+  //line becomes not last so set ending for it
+  if LinesEnds[AY]=cEndNone then
+    LinesEnds[AY]:= FEndings;
   LineInsert(AY+1, ATextPart2 + Copy(Str, AX2+1, MaxInt));
 end;
 
