@@ -1523,7 +1523,7 @@ begin
   LinePairedSeparator := RegExprLinePairedSeparator; // ###0.941
 
   FUseOsLineEndOnReplace := False;
-  FReplaceLineEnd := sLineBreak;
+  FReplaceLineEnd := #10; //not sLineBreak, it is CR LF on Windows
 
   {$IFDEF UnicodeWordDetection}
   FUseUnicodeWordDetection := True;
