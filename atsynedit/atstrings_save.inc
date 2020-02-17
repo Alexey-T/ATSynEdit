@@ -3,10 +3,11 @@
 procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
 var
   Item: PATStringItem;
+  ItemEnd: TATLineEnds;
   SA, Sign: string;
   SWide: UnicodeString;
   SQuad: UCS4String;
-  i: integer;
+  NLast, i: integer;
 begin
   EncConvErrorMode:= eemException;
 
@@ -30,10 +31,19 @@ begin
       Stream.WriteBuffer(Sign[1], Length(Sign));
   end;
 
-  for i:= 0 to Count-1 do
+  NLast:= Count-1;
+  for i:= 0 to NLast do
   begin
     Item:= FList.GetItem(i);
-    SA:= Item^.Str + cLineEndStrings[TATLineEnds(Item^.Ex.Ends)];
+
+    ItemEnd:= TATLineEnds(Item^.Ex.Ends);
+    //don't break file if ending of some non-last line is unset
+    if i<NLast then
+      if ItemEnd=cEndNone then
+        ItemEnd:= FEndings;
+
+    SA:= Item^.Str + cLineEndStrings[ItemEnd];
+
     if SA<>'' then
     case AEncoding of
       cEncAnsi:
