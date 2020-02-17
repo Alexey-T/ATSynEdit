@@ -1023,17 +1023,17 @@ end;
 
 function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
 var
-  i, j: Integer;
   DoDecode: Boolean;
+  i, iPart: integer;
 begin
   Result := '';
   i := 1;
   repeat
     if i > Length(S) then Break;
     DoDecode := False;
-    for j := Low(Decode) to High(Decode) do
-      with Decode[j] do
-        if SFrom = Copy(S, i, Length(SFrom)) then
+    for iPart := Low(Decode) to High(Decode) do
+      with Decode[iPart] do
+        if strlcomp(PChar(SFrom), @S[i], Length(SFrom)) = 0 then
         begin
           DoDecode := True;
           Result := Result + STo;
