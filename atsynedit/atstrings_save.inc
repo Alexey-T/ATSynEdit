@@ -85,14 +85,14 @@ end;
 
 procedure TATStrings.SaveToFile(const AFilename: string);
 var
-  fs: TFileStreamUtf8;
+  fs: TFileStream;
   WithSign: boolean;
 begin
   WithSign:=
     ((FEncoding in [cEncUTF8]) and FSaveSignUtf8) or
     ((FEncoding in [cEncWideLE, cEncWideBE, cEnc32LE, cEnc32BE]) and FSaveSignWide);
 
-  fs:= TFileStreamUtf8.Create(AFilename, fmCreate or fmOpenWrite or fmShareDenyWrite);
+  fs:= TFileStream.Create(AFilename, fmCreate or fmOpenWrite or fmShareDenyWrite);
   try
     SaveToStream(fs, FEncoding, WithSign);
   finally

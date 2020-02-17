@@ -24,7 +24,6 @@ uses
   ATSynEdit_Bookmarks,
   ATSynEdit_Gutter_Decor,
   Math,
-  LazUtf8Classes,
   EncConv;
 
 const

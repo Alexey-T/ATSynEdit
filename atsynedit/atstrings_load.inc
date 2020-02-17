@@ -467,10 +467,10 @@ end;
 
 procedure TATStrings.LoadFromFile(const AFilename: string);
 var
-  fs: TFileStreamUtf8;
+  fs: TFileStream;
   ms: TMemoryStream;
 begin
-  fs:= TFileStreamUtf8.Create(AFilename, fmOpenRead or fmShareDenyNone);
+  fs:= TFileStream.Create(AFilename, fmOpenRead or fmShareDenyNone);
   try
     if fs.Size>=0 then
       LoadFromStream(fs)
