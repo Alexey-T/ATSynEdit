@@ -560,6 +560,8 @@ type
     FGutterBandEmpty: integer;
     FGutterBandDecor: integer;
     FColors: TATSynEditColors;
+    FCurrentColorFont: TColor;
+    FCurrentColorBG: TColor;
     FRulerHeight: integer;
     FNumbersIndent: integer;
     FRectMain,
@@ -791,8 +793,6 @@ type
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
-    function GetColorTextBG: TColor;
-    function GetColorTextFont: TColor;
     function GetGaps: TATGaps;
     function GetLastCommandChangedLines: integer;
     function GetMinimapActualHeight: integer;
@@ -2405,7 +2405,7 @@ procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
 begin
   if csLoading in ComponentState then Exit;
 
-  C.Brush.Color:= GetColorTextBG;
+  C.Brush.Color:= FCurrentColorBG;
   C.FillRect(ClientRect);
 
   UpdateInitialVars(C);
@@ -2541,7 +2541,7 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  C.Brush.Color:= GetColorTextBG;
+  C.Brush.Color:= FCurrentColorBG;
   C.FillRect(ARect);
 
   if AMainText then
@@ -2561,7 +2561,7 @@ begin
     if FGutter[FGutterBandSeparator].Visible then
       DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, -1, -1, true);
     if FGutter[FGutterBandEmpty].Visible then
-      DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, -1, -1, true);
+      DoPaintGutterBandBG(C, FGutterBandEmpty, FCurrentColorBG, -1, -1, true);
   end;
 
   if AMainText and (FTextHint<>'') then
@@ -2736,8 +2736,8 @@ begin
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
 
-    C.Brush.Color:= GetColorTextBG;
-    C.Font.Color:= GetColorTextFont;
+    C.Brush.Color:= FCurrentColorBG;
+    C.Font.Color:= FCurrentColorFont;
 
     bUseColorOfCurrentLine:= false;
     if LineWithCaret then
@@ -2788,7 +2788,7 @@ begin
 
       if WrapItem.NIndent>0 then
       begin
-        NColorAfter:= GetColorTextBG;
+        NColorAfter:= FCurrentColorBG;
         DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter);
         DoPaintLineIndent(C, ARect, ACharSize,
           NCoordTop, WrapItem.NIndent,
@@ -3055,7 +3055,7 @@ begin
         DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
-        DoPaintGutterBandBG(C, FGutterBandEmpty, GetColorTextBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+        DoPaintGutterBandBG(C, FGutterBandEmpty, FCurrentColorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
     end;
 
     //end of painting line
@@ -4077,6 +4077,17 @@ procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFro
 var
   NCaretX: integer;
 begin
+  if Enabled then
+  begin
+    FCurrentColorFont:= Colors.TextFont;
+    FCurrentColorBG:= Colors.TextBG;
+  end
+  else
+  begin
+    FCurrentColorFont:= Colors.TextDisabledFont;
+    FCurrentColorBG:= Colors.TextDisabledBG;
+  end;
+
   Inc(FPaintCounter);
   FCaretShown:= false;
   DoPaintMainTo(C, ALineFrom);
@@ -6433,7 +6444,7 @@ var
   Size: TSize;
   Pos: TPoint;
 begin
-  C.Brush.Color:= GetColorTextBG;
+  C.Brush.Color:= FCurrentColorBG;
   C.Font.Color:= Colors.TextHintFont;
   C.Font.Style:= FTextHintFontStyle;
 
@@ -6569,22 +6580,6 @@ end;
 function TATSynEdit.IsCharWord(ch: Widechar): boolean;
 begin
   Result:= ATStringProc.IsCharWord(ch, OptNonWordChars);
-end;
-
-function TATSynEdit.GetColorTextBG: TColor;
-begin
-  if Enabled then
-    Result:= Colors.TextBG
-  else
-    Result:= Colors.TextDisabledBG;
-end;
-
-function TATSynEdit.GetColorTextFont: TColor;
-begin
-  if Enabled then
-    Result:= Colors.TextFont
-  else
-    Result:= Colors.TextDisabledFont;
 end;
 
 function TATSynEdit.GetGaps: TATGaps;
