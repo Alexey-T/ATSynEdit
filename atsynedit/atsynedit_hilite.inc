@@ -73,20 +73,24 @@ begin
   //first add Attribs,
   //selection must be over attribs
   if AMainText then
-    DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+    if Assigned(FAttribs) and (FAttribs.Count>0) then
+      DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 
   //Createnew makes parts for selection and fills empty AParts with these parts.
   //Applyover makes parts for selection and inserts these one-by-one over ready AParts
   //calculated before (in adapter or OnCalc event).
   //Maybe possible to always use Applyover but it's slower so i made Createnew for
   //faster render w/out adapter
-  if AParts[0].Len>0 then
+  if Carets.IsSelection then
   begin
-    DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
-  end
-  else
-  begin
-    DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+    if AParts[0].Len>0 then
+    begin
+      DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
+    end
+    else
+    begin
+      DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+    end;
   end;
 end;
 
