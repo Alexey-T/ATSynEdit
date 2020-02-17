@@ -2665,7 +2665,7 @@ begin
             ACharSize,
             FTabSize,
             FLineParts,
-            Colors.TextBG,
+            FCurrentColorBG,
             Strings.LineSub(
               WrapItem.NLineIndex,
               WrapItem.NCharIndex,
@@ -2758,7 +2758,7 @@ begin
 
     if AMainText and FOptZebraActive then
       if Odd(NLinesIndex) then
-        NColorEntire:= ColorBlend(NColorEntire, Colors.TextFont, FOptZebraAlphaBlend);
+        NColorEntire:= ColorBlend(NColorEntire, FCurrentColorFont, FOptZebraAlphaBlend);
 
     C.Brush.Color:= NColorEntire;
     C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
@@ -2807,7 +2807,7 @@ begin
       begin
         NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
         if NDimValue>0 then //-1: no ranges found, 0: no effect
-          DoPartsDim(FLineParts, NDimValue, Colors.TextBG);
+          DoPartsDim(FLineParts, NDimValue, FCurrentColorBG);
       end;
 
       //adapter may return ColorAfterEol, paint it
@@ -2890,7 +2890,7 @@ begin
           ACharSize,
           FTabSize,
           FLineParts,
-          Colors.TextBG,
+          FCurrentColorBG,
           Strings.LineSub(
             WrapItem.NLineIndex,
             WrapItem.NCharIndex,
@@ -4139,7 +4139,7 @@ const
 var
   NValue: integer;
 begin
-  C.Brush.Color:= Colors.TextBG;
+  C.Brush.Color:= FCurrentColorBG;
   C.FillRect(ClientRect);
 
   if Strings.ProgressKind<>cStringsProgressSaving then
@@ -6532,7 +6532,7 @@ begin
   NColorNormal:= Colors.BlockStaple;
   NColorActive:= Colors.BlockStapleForCaret;
   if NColorActive=clNone then
-    NColorActive:= ColorBlend(NColorNormal, Colors.TextFont, FOptStapleHiliteActiveAlpha);
+    NColorActive:= ColorBlend(NColorNormal, FCurrentColorFont, FOptStapleHiliteActiveAlpha);
 
   for i:= 0 to High(Indexes) do
   begin
