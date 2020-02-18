@@ -560,8 +560,8 @@ type
     FGutterBandEmpty: integer;
     FGutterBandDecor: integer;
     FColors: TATSynEditColors;
-    FCurrentColorFont: TColor;
-    FCurrentColorBG: TColor;
+    FColorFont: TColor;
+    FColorBG: TColor;
     FRulerHeight: integer;
     FNumbersIndent: integer;
     FRectMain,
@@ -2405,7 +2405,7 @@ procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
 begin
   if csLoading in ComponentState then Exit;
 
-  C.Brush.Color:= FCurrentColorBG;
+  C.Brush.Color:= FColorBG;
   C.FillRect(ClientRect);
 
   UpdateInitialVars(C);
@@ -2541,7 +2541,7 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  C.Brush.Color:= FCurrentColorBG;
+  C.Brush.Color:= FColorBG;
   C.FillRect(ARect);
 
   if AMainText then
@@ -2561,7 +2561,7 @@ begin
     if FGutter[FGutterBandSeparator].Visible then
       DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, -1, -1, true);
     if FGutter[FGutterBandEmpty].Visible then
-      DoPaintGutterBandBG(C, FGutterBandEmpty, FCurrentColorBG, -1, -1, true);
+      DoPaintGutterBandBG(C, FGutterBandEmpty, FColorBG, -1, -1, true);
   end;
 
   if AMainText and (FTextHint<>'') then
@@ -2665,7 +2665,7 @@ begin
             ACharSize,
             FTabSize,
             FLineParts,
-            FCurrentColorBG,
+            FColorBG,
             Strings.LineSub(
               WrapItem.NLineIndex,
               WrapItem.NCharIndex,
@@ -2736,8 +2736,8 @@ begin
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
 
-    C.Brush.Color:= FCurrentColorBG;
-    C.Font.Color:= FCurrentColorFont;
+    C.Brush.Color:= FColorBG;
+    C.Font.Color:= FColorFont;
 
     bUseColorOfCurrentLine:= false;
     if LineWithCaret then
@@ -2758,7 +2758,7 @@ begin
 
     if AMainText and FOptZebraActive then
       if Odd(NLinesIndex) then
-        NColorEntire:= ColorBlend(NColorEntire, FCurrentColorFont, FOptZebraAlphaBlend);
+        NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
 
     C.Brush.Color:= NColorEntire;
     C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
@@ -2788,7 +2788,7 @@ begin
 
       if WrapItem.NIndent>0 then
       begin
-        NColorAfter:= FCurrentColorBG;
+        NColorAfter:= FColorBG;
         DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter);
         DoPaintLineIndent(C, ARect, ACharSize,
           NCoordTop, WrapItem.NIndent,
@@ -2807,7 +2807,7 @@ begin
       begin
         NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
         if NDimValue>0 then //-1: no ranges found, 0: no effect
-          DoPartsDim(FLineParts, NDimValue, FCurrentColorBG);
+          DoPartsDim(FLineParts, NDimValue, FColorBG);
       end;
 
       //adapter may return ColorAfterEol, paint it
@@ -2890,7 +2890,7 @@ begin
           ACharSize,
           FTabSize,
           FLineParts,
-          FCurrentColorBG,
+          FColorBG,
           Strings.LineSub(
             WrapItem.NLineIndex,
             WrapItem.NCharIndex,
@@ -3055,7 +3055,7 @@ begin
         DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
-        DoPaintGutterBandBG(C, FGutterBandEmpty, FCurrentColorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+        DoPaintGutterBandBG(C, FGutterBandEmpty, FColorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
     end;
 
     //end of painting line
@@ -4079,13 +4079,13 @@ var
 begin
   if Enabled then
   begin
-    FCurrentColorFont:= Colors.TextFont;
-    FCurrentColorBG:= Colors.TextBG;
+    FColorFont:= Colors.TextFont;
+    FColorBG:= Colors.TextBG;
   end
   else
   begin
-    FCurrentColorFont:= Colors.TextDisabledFont;
-    FCurrentColorBG:= Colors.TextDisabledBG;
+    FColorFont:= Colors.TextDisabledFont;
+    FColorBG:= Colors.TextDisabledBG;
   end;
 
   Inc(FPaintCounter);
@@ -4139,7 +4139,7 @@ const
 var
   NValue: integer;
 begin
-  C.Brush.Color:= FCurrentColorBG;
+  C.Brush.Color:= FColorBG;
   C.FillRect(ClientRect);
 
   if Strings.ProgressKind<>cStringsProgressSaving then
@@ -6444,7 +6444,7 @@ var
   Size: TSize;
   Pos: TPoint;
 begin
-  C.Brush.Color:= FCurrentColorBG;
+  C.Brush.Color:= FColorBG;
   C.Font.Color:= Colors.TextHintFont;
   C.Font.Style:= FTextHintFontStyle;
 
@@ -6532,7 +6532,7 @@ begin
   NColorNormal:= Colors.BlockStaple;
   NColorActive:= Colors.BlockStapleForCaret;
   if NColorActive=clNone then
-    NColorActive:= ColorBlend(NColorNormal, FCurrentColorFont, FOptStapleHiliteActiveAlpha);
+    NColorActive:= ColorBlend(NColorNormal, FColorFont, FOptStapleHiliteActiveAlpha);
 
   for i:= 0 to High(Indexes) do
   begin

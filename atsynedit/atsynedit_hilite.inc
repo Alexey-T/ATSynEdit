@@ -132,7 +132,7 @@ begin
         end
         else
         begin
-          ColorFont:= FCurrentColorFont;//random($ffff);
+          ColorFont:= FColorFont;//random($ffff);
           ColorBG:= AColorBG;
         end;
       end;
@@ -307,7 +307,7 @@ begin
 
   AColorForced:= AColor<>clNone;
   if not AColorForced then
-    AColor:= FCurrentColorBG;
+    AColor:= FColorBG;
 end;
 
 
@@ -354,7 +354,7 @@ begin
           AParts[0].Offset:= 0;
           AParts[0].Len:= AOffsetMax;
           AParts[0].ColorBG:= AColorBG;
-          AParts[0].ColorFont:= FCurrentColorFont;
+          AParts[0].ColorFont:= FColorFont;
         end;
 
         Part:= PartObj.Data;
