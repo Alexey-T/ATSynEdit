@@ -148,7 +148,7 @@ var
   PartOther: ^TATLinePart;
   nRangeX1, nRangeX2, iPart, i: integer;
 begin
-  if not Carets.IsSelection then exit;
+  if not Carets.IsLineWithSelection(ALineIndex) then exit;
 
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
