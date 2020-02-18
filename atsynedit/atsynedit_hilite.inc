@@ -73,8 +73,7 @@ begin
   //first add Attribs,
   //selection must be over attribs
   if AMainText then
-    if Assigned(FAttribs) and (FAttribs.Count>0) then
-      DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
+    DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 
   //CreateNew makes parts for selection and fills empty AParts with these parts.
   //ApplyOver makes parts for selection and inserts these one-by-one over ready AParts
@@ -321,6 +320,8 @@ var
   bExact: boolean;
 begin
   if FAttribs=nil then exit;
+  if FAttribs.Count=0 then exit;
+
   FAttribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact);
   if nAttrIndex<0 then exit; //not IsIndexValid, because index=FAttribs.Count is ok
   if nAttrIndex>0 then //fixes disappeared attrib on horz scrolling
