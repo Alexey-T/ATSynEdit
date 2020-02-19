@@ -214,7 +214,6 @@ type
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
     function GetLine(AIndex: integer): atString;
-    function GetLineUTF8(AIndex: integer): string;
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
     function GetLineHidden(ALine, AClient: integer): boolean;
@@ -239,7 +238,6 @@ type
       AWithEvent: boolean=true);
     procedure SetCaretsArray(const L: TATPointArray);
     procedure SetEndings(AValue: TATLineEnds);
-    procedure SetLineUTF8(AIndex: integer; const AValue: string);
     procedure SetLine(AIndex: integer; const AValue: atString);
     procedure SetLineEnd(AIndex: integer; AValue: TATLineEnds);
     procedure SetLineFoldFrom(AIndexLine, AIndexClient: integer; AValue: integer);
@@ -274,7 +272,6 @@ type
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true; AWithEvent: boolean= true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
-    property LinesUTF8[Index: integer]: string read GetLineUTF8 write SetLineUTF8;
     property LinesLen[Index: integer]: integer read GetLineLen;
     property LinesLenRaw[Index: integer]: integer read GetLineLenRaw;
     property LinesLenPhysical[Index: integer]: integer read GetLineLenPhysical;
@@ -467,7 +464,7 @@ var
 begin
   Result:= TStringList.Create;
   for i:= 0 to AStr.Count-1 do
-    Result.Add(AStr.LinesUTF8[i]);
+    Result.Add(AStr.Lines[i]);
 end;
 
 { TATStringItemList }
@@ -508,12 +505,6 @@ begin
     else
       Item^.CharLen:= NewLen;
   end;
-end;
-
-function TATStrings.GetLineUTF8(AIndex: integer): string;
-begin
-  //Assert(IsIndexValid(AIndex));
-  Result:= FList.GetItem(AIndex)^.Str;
 end;
 
 function TATStrings.GetLineEnd(AIndex: integer): TATLineEnds;
@@ -662,35 +653,6 @@ begin
     if (typ<>AValue) and (typ<>cEndNone) then
       LinesEnds[i]:= AValue;
   end;
-end;
-
-procedure TATStrings.SetLineUTF8(AIndex: integer; const AValue: string);
-var
-  Item: PATStringItem;
-  NLen: integer;
-begin
-  if FReadOnly then Exit;
-
-  Item:= FList.GetItem(AIndex);
-
-  Item^.Str:= AValue;
-  UniqueString(Item^.Str);
-
-  NLen:= UTF8Length(AValue);
-  if Length(AValue)=NLen then
-    Item^.CharLen:= cCharLenAscii
-  else
-    Item^.CharLen:= NLen;
-
-  //fully unfold this line
-  Item^.Ex.FoldFrom_0:= 0;
-  Item^.Ex.FoldFrom_1:= 0;
-
-  if TATLineState(Item^.Ex.State)<>cLineStateAdded then
-    Item^.Ex.State:= TATBits2(cLineStateChanged);
-
-  Item^.Ex.HasTab:= 0; //unknown
-  Item^.Ex.HasAsciiOnly:= 0; //unknown
 end;
 
 procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
@@ -982,7 +944,7 @@ begin
   DoEventLog(Count);
   DoEventChange(cLineChangeAdded, Count, 1);
 
-  Item.Init(UTF8Encode(AString), AEnd, Length(AString));
+  Item.Init(AString, AEnd, Length(AString));
   FList.Add(@Item);
   FillChar(Item, SizeOf(Item), 0);
 end;
@@ -1041,7 +1003,7 @@ begin
     DoEventChange(cLineChangeAdded, ALineIndex, 1);
   end;
 
-  Item.Init(UTF8Encode(AString), AEnd, Length(AString));
+  Item.Init(AString, AEnd, Length(AString));
   FList.Insert(ALineIndex, @Item);
   FillChar(Item, SizeOf(Item), 0);
 end;
@@ -1086,7 +1048,7 @@ begin
       DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone);
 
       Item.Init(
-        ABlock.GetLineUTF8(i),
+        ABlock.GetLine(i),
         Endings,
         cCharLenUnknown);
       FList.Insert(ALineIndex+i, @Item);
@@ -1301,9 +1263,7 @@ end;
 function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: integer;
   const AEolString: string = #10): atString;
 var
-  L: TStringList;
   i: integer;
-  Str: atString;
 begin
   Result:= '';
   if AY1>AY2 then Exit;
@@ -1316,36 +1276,24 @@ begin
     Exit
   end;
 
-  L:= TStringList.Create;
-  try
-    L.LineBreak:= AEolString;
+  //first line
+  Result:= LineSub(AY1, AX1+1, MaxInt);
 
-    //first line
-    Str:= LineSub(AY1, AX1+1, MaxInt);
-    L.Add(UTF8Encode(Str));
+  //middle
+  for i:= AY1+1 to AY2-1 do
+    Result+= AEolString+Lines[i];
 
-    //middle
-    for i:= AY1+1 to AY2-1 do
-    begin
-      L.Add(LinesUTF8[i]);
-    end;
+  //last line
+  Result+= AEolString+LineSub(AY2, 1, AX2);
 
-    //last line
-    Str:= LineSub(AY2, 1, AX2);
-    L.Add(UTF8Encode(Str));
-
-    TrimStringList(L);
-    Result:= UTF8Decode(L.Text);
-
-    //L.Text gives final eol
-    //let's keep it if AX2=0 (substr till column=0)
-    if Result<>'' then
-      if AX2<>0 then
-        if SEndsWith(Result, AEolString) then
-          SetLength(Result, Length(Result)-Length(AEolString));
-  finally
-    FreeAndNil(L);
-  end;
+  {
+  //Result gives final eol
+  //let's keep it if AX2=0 (substr till column=0)
+  if Result<>'' then
+    if AX2<>0 then
+      if SEndsWith(Result, AEolString) then
+        SetLength(Result, Length(Result)-Length(AEolString));
+  }
 end;
 
 procedure TATStrings.SetGroupMark;

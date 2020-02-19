@@ -192,7 +192,7 @@ begin
     begin
       NLine:= Strings.Bookmarks[i].Data.LineNum;
       if Strings.IsIndexValid(NLine) then
-        List.Add(Strings.LinesUTF8[NLine]);
+        List.Add(UTF8Encode(Strings.Lines[NLine]));
     end;
     SClipboardCopy(List.Text);
   finally

@@ -155,8 +155,8 @@ var
   Caret: TATCaretItem;
   i, NLen, X1, Y1, X2, Y2: integer;
   bSel: boolean;
-  Str: atString;
-  EolString, STemp: string;
+  Str, STemp: atString;
+  EolString: string;
 begin
   Result:= '';
 
@@ -203,9 +203,9 @@ begin
       begin
         for i:= 0 to ListNum.Count-1 do
         begin
-          STemp:= Strings.LinesUTF8[ListNum[i]];
+          STemp:= Strings.Lines[ListNum[i]];
           if STemp<>'' then
-            ListStr.Add(STemp);
+            ListStr.Add(UTF8Encode(STemp));
         end;
         Result:= ListStr.Text; //always use Text, need eol
       end;
