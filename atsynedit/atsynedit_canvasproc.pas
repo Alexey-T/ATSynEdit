@@ -459,9 +459,10 @@ procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
   const DxIn: TATIntArray;
   var DxOut: TATIntArray);
 var
-  NLen, NSize, ResLen, i: integer;
+  NLen, NLenDx, NSize, ResLen, i: integer;
 begin
   NLen:= Length(S);
+  NLenDx:= Length(DxIn);
   SetLength(DxOut, NLen);
 
   ResLen:= 0;
@@ -469,9 +470,9 @@ begin
   repeat
     Inc(i);
     if i>NLen then Break;
-    if i>Length(DxIn) then Break;
+    if i>NLenDx then Break;
 
-    if (i<NLen) and (i<Length(DxIn)) and
+    if (i<NLen) and (i<NLenDx) and
       IsCharSurrogateHigh(S[i]) and
       IsCharSurrogateLow(S[i+1]) then
     begin
