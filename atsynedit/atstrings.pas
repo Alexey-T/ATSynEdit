@@ -90,17 +90,6 @@ type
     );
 
 type
-  TATLineHasAscii = (
-    cLineAsciiUnknown,
-    cLineAsciiNo,
-    cLineAsciiYes
-    );
-
-const
-  cCharLenUnknown = -1;
-  cCharLenAscii = -2;
-
-type
   { TATStringItem }
 
   TATBits2 = 0..3;
@@ -111,26 +100,29 @@ type
     State: TATBits2;
     Sep: TATBits2;
     HasTab: TATBits2;
+    Wide: boolean;
+    Updated: boolean;
     FoldFrom_0,
     FoldFrom_1: TATStringItem_FoldFrom;
       //0: line not folded
       //>0: line folded from this char-pos
-    HasAsciiOnly: TATBits2;
     Hidden_0, Hidden_1: boolean;
-    Updated: boolean;
   end;
 
   TATStringItem = packed record
-    Str: string;
-    CharLen: integer;
-      //len in UTF16 chars (almost the same as UTF8Length(Str) in most cases, which is used in some place)
-      //it can be >16M, so we need Longint
-      // >=0: value
-      // -1: len is unknown yet
-      // -2: str is ASCII only, so len = Length(Str)
+  private
+    Buf: string;
+    function GetLine: UnicodeString;
+    procedure SetLineW(const S: UnicodeString);
+    procedure SetLineA(const S: string);
+  public
     Ex: TATStringItemEx;
-    //
-    procedure Init(const AStr: string; AEnd: TATLineEnds; ACharLen: integer);
+    function CharLen: integer;
+    property Line: UnicodeString read GetLine write SetLineW;
+    function LineSub(AFrom, ALen: integer): UnicodeString;
+    function HasTab: boolean;
+    procedure Init(const S: string; AEnd: TATLineEnds);
+    procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
     function IsFake: boolean; inline;
   end;
   PATStringItem = ^TATStringItem;
@@ -221,7 +213,6 @@ type
     function GetLineState(AIndex: integer): TATLineState;
     function GetLineUpdated(AIndex: integer): boolean;
     function GetLineLen(AIndex: integer): integer;
-    function GetLineLenRaw(AIndex: integer): integer;
     function GetLineLenPhysical(AIndex: integer): integer;
     function GetRedoAsString: string;
     function GetRedoCount: integer;
@@ -265,7 +256,8 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
-    procedure LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLineEnds);
+    procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
+    procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: integer; const AString: atString; AWithEvent: boolean=true);
@@ -273,7 +265,6 @@ type
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true; AWithEvent: boolean= true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesLen[Index: integer]: integer read GetLineLen;
-    property LinesLenRaw[Index: integer]: integer read GetLineLenRaw;
     property LinesLenPhysical[Index: integer]: integer read GetLineLenPhysical;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
@@ -329,7 +320,6 @@ type
     //text
     property ReadOnly: boolean read FReadOnly write FReadOnly;
     function TextString_Unicode(AMaxLen: integer=0): UnicodeString;
-    function TextString_UTF8(AMaxLen: integer=0): string;
     procedure TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean;
       out AShift, APosAfter: TPoint);
     procedure TextAppend(const AText: atString; out AShift, APosAfter: TPoint);
@@ -437,26 +427,151 @@ end;
 function TATStringItem.IsFake: boolean; inline;
 begin
   Result:=
-    (Str='') and
+    (Buf='') and
     (TATLineEnds(Ex.Ends)=cEndNone);
 end;
 
-procedure TATStringItem.Init(const AStr: string; AEnd: TATLineEnds; ACharLen: integer);
+function TATStringItem.CharLen: integer;
 begin
-  Str:= AStr;
-  UniqueString(Str);
-
-  if ACharLen=Length(Str) then
-    CharLen:= cCharLenAscii
+  if Ex.Wide then
+    Result:= Length(Buf) div 2
   else
-    CharLen:= ACharLen;
+    Result:= Length(Buf);
+end;
 
+function TATStringItem.GetLine: UnicodeString;
+var
+  NLen, i: integer;
+begin
+  NLen:= Length(Buf);
+  if NLen=0 then exit('');
+  if Ex.Wide then
+  begin
+    SetLength(Result, NLen div 2);
+    Move(Buf[1], Result[1], NLen);
+  end
+  else
+  begin
+    SetLength(Result, NLen);
+    for i:= 1 to NLen do
+      Result[i]:= WideChar(Ord(Buf[i]));
+  end;
+end;
+
+procedure TATStringItem.SetLineW(const S: UnicodeString);
+var
+  NLen, i: integer;
+begin
+  NLen:= Length(S);
+  if not IsStringWithUnicode(S) then
+  begin
+    Ex.Wide:= false;
+    SetLength(Buf, NLen);
+    for i:= 1 to NLen do
+      Buf[i]:= chr(Ord(S[i]));
+  end
+  else
+  begin
+    Ex.Wide:= true;
+    SetLength(Buf, NLen*2);
+    Move(S[1], Buf[1], NLen*2);
+  end;
+
+  Ex.State:= TATBits2(cLineStateChanged);
+  Ex.Updated:= true;
+end;
+
+procedure TATStringItem.SetLineA(const S: string);
+var
+  SW: WideString;
+begin
+  if not IsStringWithUnicode(S) then
+  begin
+    Ex.Wide:= false;
+    Buf:= S;
+    UniqueString(Buf);
+  end
+  else
+  begin
+    Ex.Wide:= true;
+    SW:= UTF8Decode(S);
+    SetLength(Buf, Length(SW)*2);
+    Move(SW[1], Buf[1], Length(Buf));
+  end;
+
+  Ex.State:= TATBits2(cLineStateChanged);
+  Ex.Updated:= true;
+end;
+
+procedure TATStringItem.Init(const S: string; AEnd: TATLineEnds);
+begin
   FillChar(Ex, SizeOf(Ex), 0);
+  SetLineA(S);
+
   Ex.Ends:= TATBits2(AEnd);
   Ex.State:= TATBits2(cLineStateAdded);
   Ex.Sep:= TATBits2(cLineSepNone);
   Ex.Updated:= true;
 end;
+
+procedure TATStringItem.Init(const S: UnicodeString; AEnd: TATLineEnds);
+begin
+  FillChar(Ex, SizeOf(Ex), 0);
+  SetLineW(S);
+
+  Ex.Ends:= TATBits2(AEnd);
+  Ex.State:= TATBits2(cLineStateAdded);
+  Ex.Sep:= TATBits2(cLineSepNone);
+  Ex.Updated:= true;
+end;
+
+function TATStringItem.LineSub(AFrom, ALen: integer): UnicodeString;
+var
+  NLen, ResLen, i: integer;
+begin
+  Result:= '';
+  NLen:= Length(Buf);
+  if NLen=0 then exit;
+  if Ex.Wide then
+  begin
+    ResLen:= Max(0, Min(ALen, NLen div 2 - AFrom + 1));
+    SetLength(Result, ResLen);
+    if ResLen>0 then
+      Move(Buf[AFrom*2-1], Result[1], ResLen*2);
+  end
+  else
+  begin
+    ResLen:= Max(0, Min(ALen, NLen-AFrom+1));
+    SetLength(Result, NLen);
+    for i:= 1 to ResLen do
+      Result[i]:= WideChar(Ord(Buf[i]));
+  end;
+end;
+
+function TATStringItem.HasTab: boolean;
+var
+  NLen, i: integer;
+  Ptr: PWideChar;
+begin
+  Result:= false;
+  NLen:= Length(Buf);
+  if NLen=0 then exit;
+  if Ex.Wide then
+  begin
+    Ptr:= @Buf[1];
+    for i:= 1 to NLen div 2 do
+    begin
+      if Ptr^=#9 then exit(true);
+      Inc(Ptr);
+    end;
+  end
+  else
+  begin
+    for i:= 1 to NLen do
+      if Buf[i]=#9 then exit(true);
+  end;
+end;
+
 
 function ATStrings_To_StringList(AStr: TATStrings): TStringList;
 var
@@ -481,41 +596,28 @@ end;
 
 procedure TATStringItemList.Deref(Item: Pointer);
 begin
-  PATStringItem(Item)^.Str:= '';
+  PATStringItem(Item)^.Buf:= '';
 end;
 
 { TATStrings }
 
 function TATStrings.GetLine(AIndex: integer): atString;
-var
-  Item: PATStringItem;
-  NewLen: integer;
 begin
-  Item:= FList.GetItem(AIndex);
-  if Item^.CharLen=cCharLenAscii then
-    //optimization for pure ascii-strings, get them faster
-    Result:= SConvertUtf8ToWideForAscii(Item^.Str)
-  else
-  begin
-    //use UTF8Decode, and update CharLen
-    Result:= UTF8Decode(Item^.Str);
-    NewLen:= Length(Result);
-    if NewLen=Length(Item^.Str) then
-      Item^.CharLen:= cCharLenAscii
-    else
-      Item^.CharLen:= NewLen;
-  end;
+  Result:= FList.GetItem(AIndex)^.Line;
+end;
+
+function TATStrings.GetLineLen(AIndex: integer): integer;
+begin
+  Result:= FList.GetItem(AIndex)^.CharLen;
 end;
 
 function TATStrings.GetLineEnd(AIndex: integer): TATLineEnds;
 begin
-  //Assert(IsIndexValid(AIndex));
   Result:= TATLineEnds(FList.GetItem(AIndex)^.Ex.Ends);
 end;
 
 function TATStrings.GetLineFoldFrom(ALine, AClient: integer): integer;
 begin
-  //Assert(IsIndexValid(ALine));
   case AClient of
     0: Result:= FList.GetItem(ALine)^.Ex.FoldFrom_0;
     1: Result:= FList.GetItem(ALine)^.Ex.FoldFrom_1;
@@ -525,7 +627,6 @@ end;
 
 function TATStrings.GetLineHidden(ALine, AClient: integer): boolean;
 begin
-  //Assert(IsIndexValid(ALine));
   case AClient of
     0: Result:= FList.GetItem(ALine)^.Ex.Hidden_0;
     1: Result:= FList.GetItem(ALine)^.Ex.Hidden_1;
@@ -535,7 +636,6 @@ end;
 
 function TATStrings.GetLineState(AIndex: integer): TATLineState;
 begin
-  //Assert(IsIndexValid(AIndex));
   Result:= TATLineState(FList.GetItem(AIndex)^.Ex.State);
 end;
 
@@ -544,48 +644,12 @@ begin
   Result:= FList.GetItem(AIndex)^.Ex.Updated;
 end;
 
-function TATStrings.GetLineLen(AIndex: integer): integer;
-var
-  ItemPtr: PATStringItem;
-  CurrentLen: integer;
-begin
-  //Assert(IsIndexValid(AIndex));
-
-  ItemPtr:= FList.GetItem(AIndex);
-  CurrentLen:= ItemPtr^.CharLen;
-  if CurrentLen>=0 then
-    Result:= CurrentLen
-  else
-  if CurrentLen=cCharLenUnknown then
-  begin
-    //make faster calc via UTF8Length, don't use slow UTF8Decode
-    Result:= UTF8Length(ItemPtr^.Str);
-
-    if Result=Length(ItemPtr^.Str) then
-      ItemPtr^.CharLen:= cCharLenAscii
-    else
-      ItemPtr^.CharLen:= Result;
-  end
-  else
-  if CurrentLen=cCharLenAscii then
-    Result:= Length(ItemPtr^.Str);
-end;
-
-function TATStrings.GetLineLenRaw(AIndex: integer): integer;
-var
-  ItemPtr: PATStringItem;
-begin
-  ItemPtr:= FList.GetItem(AIndex);
-  Result:= Length(ItemPtr^.Str);
-end;
-
 function TATStrings.GetLineLenPhysical(AIndex: integer): integer;
 var
   ItemPtr: PATStringItem;
 begin
-  //Assert(IsIndexValid(AIndex));
   ItemPtr:= FList.GetItem(AIndex);
-  Result:= Length(ItemPtr^.Str) + cLineEndLength[TATLineEnds(ItemPtr^.Ex.Ends)];
+  Result:= ItemPtr^.CharLen + cLineEndLength[TATLineEnds(ItemPtr^.Ex.Ends)];
 end;
 
 function TATStrings.GetRedoAsString: string;
@@ -664,18 +728,13 @@ begin
   if FReadOnly then Exit;
 
   Item:= FList.GetItem(AIndex);
-  StrBefore:= UTF8Decode(Item^.Str);
+  StrBefore:= Item^.Line;
 
   DoAddUndo(cEditActionChange, AIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
   DoEventLog(AIndex);
   DoEventChange(cLineChangeEdited, AIndex, 1);
 
-  Item^.Str:= UTF8Encode(AValue);
-  UniqueString(Item^.Str);
-  if Length(Item^.Str)=Length(AValue) then
-    Item^.CharLen:= cCharLenAscii
-  else
-    Item^.CharLen:= Length(AValue);
+  Item^.Line:= AValue;
 
   //fully unfold this line
   Item^.Ex.FoldFrom_0:= 0;
@@ -686,7 +745,6 @@ begin
 
   Item^.Ex.Updated:= true;
   Item^.Ex.HasTab:= 0; //unknown
-  Item^.Ex.HasAsciiOnly:= 0; //unknown
 end;
 
 procedure TATStrings.SetLineSep(AIndex: integer; AValue: TATLineSeparator);
@@ -767,11 +825,6 @@ end;
 
 
 function TATStrings.TextString_Unicode(AMaxLen: integer=0): UnicodeString;
-begin
-  Result:= UTF8Decode(TextString_UTF8(AMaxLen));
-end;
-
-function TATStrings.TextString_UTF8(AMaxLen: integer=0): string;
 const
   LenEol = 1;
   CharEol = #10;
@@ -780,6 +833,7 @@ var
   Item: PATStringItem;
   Ptr: pointer;
   bFinalEol: boolean;
+  SW: WideString;
 begin
   Result:= '';
   if Count=0 then Exit;
@@ -789,11 +843,11 @@ begin
   for i:= 0 to LastIndex-1 do
   begin
     Item:= FList.GetItem(i);
-    Inc(Len, Length(Item^.Str)+LenEol);
+    Inc(Len, Item^.CharLen+LenEol);
   end;
 
   Item:= FList.GetItem(LastIndex);
-  Inc(Len, Length(Item^.Str));
+  Inc(Len, Item^.CharLen);
 
   bFinalEol:= LinesEnds[LastIndex]<>cEndNone;
   if bFinalEol then
@@ -807,21 +861,24 @@ begin
   for i:= 0 to LastIndex do
   begin
     Item:= FList.GetItem(i);
-    Len:= Length(Item^.Str);
+    Len:= Item^.CharLen;
     //copy string
     if Len>0 then
     begin
       if (AMaxLen>0) and (Len>AMaxLen) then
-        FillChar(Ptr^, Len, $20) //fill item with spaces
+        FillChar(Ptr^, Len*2, $20) //fill item with spaces
       else
-        Move(Item^.Str[1], Ptr^, Len);
-      Inc(Ptr, Len);
+      begin
+        SW:= Item^.Line;
+        Move(SW[1], Ptr^, Len*2);
+      end;
+      Inc(Ptr, Len*2);
     end;
     //copy eol
     if bFinalEol or (i<LastIndex) then
     begin
-      PChar(Ptr)^:= CharEol;
-      Inc(Ptr, LenEol);
+      PWideChar(Ptr)^:= CharEol;
+      Inc(Ptr, LenEol*2);
     end;
   end;
 end;
@@ -944,7 +1001,7 @@ begin
   DoEventLog(Count);
   DoEventChange(cLineChangeAdded, Count, 1);
 
-  Item.Init(AString, AEnd, Length(AString));
+  Item.Init(AString, AEnd);
   FList.Add(@Item);
   FillChar(Item, SizeOf(Item), 0);
 end;
@@ -1003,7 +1060,7 @@ begin
     DoEventChange(cLineChangeAdded, ALineIndex, 1);
   end;
 
-  Item.Init(AString, AEnd, Length(AString));
+  Item.Init(AString, AEnd);
   FList.Insert(ALineIndex, @Item);
   FillChar(Item, SizeOf(Item), 0);
 end;
@@ -1049,8 +1106,8 @@ begin
 
       Item.Init(
         ABlock.GetLine(i),
-        Endings,
-        cCharLenUnknown);
+        Endings
+        );
       FList.Insert(ALineIndex+i, @Item);
       FillChar(Item, SizeOf(Item), 0);
     end;
@@ -1093,7 +1150,7 @@ begin
   if IsIndexValid(ALineIndex) then
   begin
     Item:= FList.GetItem(ALineIndex);
-    StrBefore:= UTF8Decode(Item^.Str);
+    StrBefore:= Item^.Line;
 
     DoAddUndo(cEditActionDelete, ALineIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
 
@@ -1113,46 +1170,25 @@ begin
 end;
 
 function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
-const
-  cBigLen = 10000;
 var
   Item: PATStringItem;
-  S: string;
-  i: integer;
 begin
   if ALen=0 then exit('');
   Item:= GetItemPtr(ALineIndex);
-
-  if Item^.CharLen=cCharLenAscii then
-  begin
-    S:= Copy(Item^.Str, APosFrom, ALen);
-    Result:= SConvertUtf8ToWideForAscii(S);
-  end
-  else
-  if Length(Item^.Str)<cBigLen then
-  begin
-    Result:= Copy(UTF8Decode(Item^.Str), APosFrom, ALen);
-  end
-  else
-  begin
-    //This is incorrect on surrogate Unicode chars, so use it only for huge lines
-    S:= UTF8Copy(Item^.Str, APosFrom, ALen);
-    Result:= UTF8Decode(S);
-  end
+  Result:= Item^.LineSub(APosFrom, ALen);
 end;
 
 function TATStrings.UpdateItemHasTab(AIndex: integer): boolean;
 var
   Item: PATStringItem;
   FHasTab: TATLineHasTab;
-  FHasAscii: TATLineHasAscii;
 begin
   Item:= FList.GetItem(AIndex);
 
   FHasTab:= TATLineHasTab(Item^.Ex.HasTab);
   if FHasTab=cLineTabUnknown then
   begin
-    Result:= SStringHasTab(Item^.Str);
+    Result:= Item^.HasTab;
     if Result then
       FHasTab:= cLineTabYes
     else
@@ -1161,16 +1197,6 @@ begin
   end
   else
     Result:= FHasTab=cLineTabYes;
-
-  FHasAscii:= TATLineHasAscii(Item^.Ex.HasAsciiOnly);
-  if FHasAscii=cLineAsciiUnknown then
-  begin
-    if SStringHasAsciiAndNoTabs(Item^.Str) then
-      FHasAscii:= cLineAsciiYes
-    else
-      FHasAscii:= cLineAsciiNo;
-    Item^.Ex.HasAsciiOnly:= TATBits2(FHasAscii);
-  end;
 end;
 
 function TATStrings.ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
@@ -1422,7 +1448,7 @@ begin
     Item:= FList.GetItem(i);
     Result:= Result+Format('[%d] "%s" <%s>', [
       i,
-      Item^.Str,
+      Item^.Line,
       cLineEndNiceNames[TATLineEnds(Item^.Ex.Ends)]
       ])+#10;
   end;
@@ -1699,11 +1725,21 @@ begin
   Result:= false;
 end;
 
-procedure TATStrings.LineAddRaw_UTF8_NoUndo(const AString: string; AEnd: TATLineEnds);
+procedure TATStrings.LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
 var
   Item: TATStringItem;
 begin
-  Item.Init(AString, AEnd, cCharLenUnknown);
+  Item.Init(S, AEnd);
+  Item.Ex.State:= TATBits2(cLineStateAdded);
+  FList.Add(@Item);
+  FillChar(Item, SizeOf(Item), 0);
+end;
+
+procedure TATStrings.LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
+var
+  Item: TATStringItem;
+begin
+  Item.Init(S, AEnd);
   Item.Ex.State:= TATBits2(cLineStateAdded);
   FList.Add(@Item);
   FillChar(Item, SizeOf(Item), 0);

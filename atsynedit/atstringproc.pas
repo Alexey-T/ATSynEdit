@@ -37,6 +37,9 @@ type
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;
 
+function IsStringWithUnicode(const S: string): boolean; inline;
+function IsStringWithUnicode(const S: UnicodeString): boolean; inline;
+
 function SCharUpper(ch: WideChar): WideChar; inline;
 function SCharLower(ch: WideChar): WideChar; inline;
 
@@ -942,7 +945,6 @@ begin
   Result:= (S<>'') and IsCharEol(S[Length(S)]);
 end;
 
-
 function SCharUpper(ch: WideChar): WideChar;
 begin
   if (Ord(ch) >= Ord('a')) and (Ord(ch) <= Ord('z')) then
@@ -1360,6 +1362,25 @@ begin
   ShowMessage(res);
 end;
 
+function IsStringWithUnicode(const S: string): boolean;
+var
+  i: integer;
+begin
+  for i:= 1 to Length(S) do
+    if Ord(S[i])>=128 then
+      exit(true);
+  Result:= false;
+end;
+
+function IsStringWithUnicode(const S: UnicodeString): boolean;
+var
+  i: integer;
+begin
+  for i:= 1 to Length(S) do
+    if Ord(S[i])>=128 then
+      exit(true);
+  Result:= false;
+end;
 
 end.
 

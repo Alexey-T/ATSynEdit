@@ -177,7 +177,7 @@ begin
   //prepare optimization
   AStrings.UpdateItemHasTab(P.Y);
   StringItem:= AStrings.GetItemPtr(P.Y);
-  bAsciiOnly:= TATLineHasAscii(StringItem^.Ex.HasAsciiOnly) = cLineAsciiYes;
+  bAsciiOnly:= not StringItem^.Ex.Wide;
 
   for i:= NIndex1 to NIndex2 do
   begin

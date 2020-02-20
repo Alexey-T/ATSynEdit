@@ -39,7 +39,7 @@ begin
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
-  bEnableHilite:= Strings.LinesLenRaw[nLineIndex]<=FOptMaxLineLenToTokenize;
+  bEnableHilite:= Strings.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
 
   FillChar(AParts, SizeOf(AParts), 0);
 

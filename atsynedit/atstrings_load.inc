@@ -182,7 +182,7 @@ begin
   end;
 
   for i:= 0 to AList.Count-1 do
-    LineAddRaw_UTF8_NoUndo(AList[i], AEnds);
+    LineAddRaw_NoUndo(AList[i], AEnds);
 
   ActionAddFakeLineIfNeeded;
   Modified:= true;
@@ -396,7 +396,7 @@ begin
         Inc(NEnd, CharSize);
 
       if Len=0 then
-        LineAddRaw_UTF8_NoUndo('', LineEnd)
+        LineAddRaw_NoUndo('', LineEnd)
       else
       begin
         case FEncoding of
@@ -408,7 +408,7 @@ begin
 
               SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
 
-              LineAddRaw_UTF8_NoUndo(SUtf8, LineEnd);
+              LineAddRaw_NoUndo(SUtf8, LineEnd);
             end;
 
           cEncUTF8:
@@ -416,7 +416,7 @@ begin
               SA:= '';
               SetLength(SA, Len);
               Move(Buf[NStart], SA[1], Len);
-              LineAddRaw_UTF8_NoUndo(SA, LineEnd);
+              LineAddRaw_NoUndo(SA, LineEnd);
             end;
 
           cEncWideLE,
@@ -427,7 +427,7 @@ begin
               Move(Buf[NStart], SWide[1], Len);
               if FEncoding=cEncWideBE then
                 SSwapEndianWide(SWide);
-              LineAddRaw_UTF8_NoUndo(UTF8Encode(SWide), LineEnd);
+              LineAddRaw_NoUndo(SWide, LineEnd);
             end;
 
           cEnc32LE,
@@ -438,7 +438,7 @@ begin
               if FEncoding=cEnc32BE then
                 SSwapEndianUCS4(SQuad);
               SWide:= UCS4StringToUnicodeString(SQuad);
-              LineAddRaw_UTF8_NoUndo(UTF8Encode(SWide), LineEnd);
+              LineAddRaw_NoUndo(SWide, LineEnd);
             end;
 
           else

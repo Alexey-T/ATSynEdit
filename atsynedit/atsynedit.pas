@@ -2721,7 +2721,7 @@ begin
 
       //horz scrollbar max: calced here, to make variable horz bar
       //vert scrollbar max: calced in UpdateScrollbars
-      if Strings.LinesLenRaw[NLinesIndex] > FOptMaxLineLengthForSlowWidthDetect then
+      if Strings.LinesLen[NLinesIndex] > FOptMaxLineLengthForSlowWidthDetect then
         NOutputStrWidth:= NLineLen //approx len, it don't consider CJK chars
       else
         NOutputStrWidth:= CanvasTextWidth(
@@ -6740,7 +6740,7 @@ begin
     for i:= NLine to NLine+GetVisibleLines do
     begin
       if not Strings.IsIndexValid(i) then Break;
-      if Strings.LinesLenRaw[i]>FOptMaxLineLenToCalcURL then Continue;
+      if Strings.LinesLen[i]>FOptMaxLineLenToCalcURL then Continue;
 
       ReObj.InputString:= Strings.Lines[i];
 

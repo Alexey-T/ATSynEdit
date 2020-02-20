@@ -4,7 +4,7 @@ procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; A
 var
   Item: PATStringItem;
   ItemEnd: TATLineEnds;
-  SA, Sign: string;
+  SAnsi, Sign: string;
   SWide: UnicodeString;
   SQuad: UCS4String;
   NLast, i: integer;
@@ -42,25 +42,26 @@ begin
       if ItemEnd=cEndNone then
         ItemEnd:= FEndings;
 
-    SA:= Item^.Str + cLineEndStrings[ItemEnd];
+    SWide:= Item^.Line + cLineEndStrings[ItemEnd];
 
-    if SA<>'' then
+    if SWide<>'' then
     case AEncoding of
       cEncAnsi:
         begin
-          SA:= EncConvertFromUTF8(SA, FEncodingCodepage);
-          Stream.WriteBuffer(SA[1], Length(SA));
+          SAnsi:= UTF8Encode(SWide);
+          SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
+          Stream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
       cEncUTF8:
         begin
-          Stream.WriteBuffer(SA[1], Length(SA));
+          SAnsi:= UTF8Encode(SWide);
+          Stream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
       cEncWideLE,
       cEncWideBE:
         begin
-          SWide:= UTF8Decode(SA);
           if AEncoding=cEncWideBE then
             SSwapEndianWide(SWide);
           Stream.WriteBuffer(SWide[1], Length(SWide)*2);
@@ -69,7 +70,6 @@ begin
       cEnc32LE,
       cEnc32BE:
         begin
-          SWide:= UTF8Decode(SA);
           SQuad:= UnicodeStringToUCS4String(SWide);
           if AEncoding=cEnc32BE then
             SSwapEndianUCS4(SQuad);
