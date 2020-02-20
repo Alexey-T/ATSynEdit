@@ -2766,9 +2766,8 @@ begin
     C.Brush.Color:= NColorEntire;
     C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
 
-    CurrPointText:= Point(
-      Int64(CurrPoint.X) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
-      CurrPoint.Y);
+    CurrPointText.X:= CurrPoint.X + (WrapItem.NIndent-AScrollHorz.NPos)*ACharSize.X;
+    CurrPointText.Y:= CurrPoint.Y;
     NOutputStrWidth:= 0;
 
     //paint line
