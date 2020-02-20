@@ -2777,7 +2777,8 @@ begin
           NOutputCharsSkipped,
           NOutputSpacesSkipped);
         Delete(StrOut, 1, NOutputCharsSkipped);
-        Delete(StrOut, cMaxCharsForOutput, MaxInt);
+        if Length(StrOut)>cMaxCharsForOutput then
+          SetLength(StrOut, cMaxCharsForOutput);
         Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
       end;
 
