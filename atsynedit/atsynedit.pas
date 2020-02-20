@@ -616,7 +616,6 @@ type
     FOptMaxLineLenToTokenize: integer;
     FOptMaxLineLenToCalcURL: integer;
     FOptMaxLinesToCountUnindent: integer;
-    FOptMaxLineLengthForSlowWidthDetect: integer;
     FOptScrollStyleVert: TATSynEditScrollStyle;
     FOptScrollStyleHorz: TATSynEditScrollStyle;
     FOptScrollSmooth: boolean;
@@ -1449,7 +1448,6 @@ type
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
     property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;
-    property OptMaxLineLengthForSlowWidthDetect: integer read FOptMaxLineLengthForSlowWidthDetect write FOptMaxLineLengthForSlowWidthDetect default 500;
     property OptStapleStyle: TATLineStyle read FOptStapleStyle write FOptStapleStyle default cLineStyleSolid;
     property OptStapleIndent: integer read FOptStapleIndent write FOptStapleIndent default -1;
     property OptStapleWidthPercent: integer read FOptStapleWidthPercent write FOptStapleWidthPercent default 100;
@@ -2713,7 +2711,7 @@ begin
     if AMainText then
     begin
       NLineLen:= Strings.LinesLen[NLinesIndex];
-      bLineHuge:= NLineLen>FOptMaxLineLengthForSlowWidthDetect;
+      bLineHuge:= NLineLen>OptMaxLineLenForAccurateCharWidths;
       if not bLineHuge then
       begin
         //little slow for huge lines
@@ -3640,7 +3638,6 @@ begin
   FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
   FOptMaxLinesToCountUnindent:= 100;
-  FOptMaxLineLengthForSlowWidthDetect:= 500;
 
   FOptStapleStyle:= cLineStyleSolid;
   FOptStapleIndent:= -1;

@@ -85,6 +85,7 @@ var
   OptMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
   OptMinWordWrapOffset: integer = 3;
   OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
+  OptMaxLineLenForAccurateCharWidths: integer = 500;
 
 type
   TATStringTabCalcEvent = function(Sender: TObject; ALineIndex, ACharIndex: integer): integer of object;
