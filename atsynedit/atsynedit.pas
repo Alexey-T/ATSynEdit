@@ -2709,36 +2709,45 @@ begin
     if AMainText then
     begin
       NLineLen:= Strings.LinesLen[NLinesIndex];
-
-      StrOutput:= Strings.LineSub(
-        NLinesIndex,
-        WrapItem.NCharIndex,
-        Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6)
-          //+1 because of NPixelOffset
-          //+6 because of HTML color underlines
-        );
-
-      if WrapItem.bInitial then
+      if NLineLen<=FOptMaxLineLengthForSlowWidthDetect then
       begin
-        if NLineLen<=FOptMaxLineLengthForSlowWidthDetect then
+        //little slow for huge lines
+        StrOutput:= Strings.LineSub(
+          NLinesIndex,
+          WrapItem.NCharIndex,
+          Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6)
+            //+1 because of NPixelOffset
+            //+6 because of HTML color underlines
+          );
+
+        if WrapItem.bInitial then
         begin
-          //note: this is very slow for huge lines, so it works only for linelen<=500
+          //very slow for huge lines
           FTabHelper.FindOutputSkipOffset(
             NLinesIndex,
             StrOutput,
             AScrollHorz.NPos,
             NOutputCharsSkipped,
             NOutputSpacesSkipped);
-        end
-        else
-        begin
-          NOutputCharsSkipped:= AScrollHorz.NPos;
-          NOutputSpacesSkipped:= NOutputCharsSkipped;
+          Delete(StrOutput, 1, NOutputCharsSkipped);
         end;
+      end
+      else
+      begin
+        //work faster for huge lines (but not accurate horiz scrollbar)
+        NOutputCharsSkipped:= AScrollHorz.NPos;
+        NOutputSpacesSkipped:= NOutputCharsSkipped;
 
-        Delete(StrOutput, 1, NOutputCharsSkipped);
-        Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
+        StrOutput:= Strings.LineSub(
+          NLinesIndex,
+          WrapItem.NCharIndex + NOutputCharsSkipped,
+          GetVisibleColumns+AScrollHorz.NPos+1+6
+            //+1 because of NPixelOffset
+            //+6 because of HTML color underlines
+          );
       end;
+
+      Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
 
       if Length(StrOutput)>cMaxCharsForOutput then
         SetLength(StrOutput, cMaxCharsForOutput);
