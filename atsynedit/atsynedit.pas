@@ -1911,35 +1911,35 @@ procedure _CalcWrapInfos(
   AWrapIndented: boolean;
   AVisibleColumns: integer;
   const ANonWordChars: atString;
-  ALine: integer;
+  ALineIndex: integer;
   AIndentMaximal: integer;
   AItems: TATWrapItems;
   AConsiderFolding: boolean);
 var
-  Item: TATWrapItem;
+  WrapItem: TATWrapItem;
   NOffset, NLen, NIndent, NVisColumns: integer;
   NFoldFrom: integer;
-  NFinal: TATWrapItemFinal;
-  bInitial: boolean;
+  FinalState: TATWrapItemFinal;
+  bInitialItem: boolean;
   StrPart: UnicodeString;
 begin
   AItems.Clear;
 
   //line folded entirely?
   if AConsiderFolding then
-    if AStrings.LinesHidden[ALine, AEditorIndex] then Exit;
+    if AStrings.LinesHidden[ALineIndex, AEditorIndex] then Exit;
 
-  NLen:= AStrings.LinesLen[ALine];
+  NLen:= AStrings.LinesLen[ALineIndex];
 
   //consider fold, before wordwrap
   if AConsiderFolding then
   begin
     //line folded partially?
-    NFoldFrom:= AStrings.LinesFoldFrom[ALine, AEditorIndex];
+    NFoldFrom:= AStrings.LinesFoldFrom[ALineIndex, AEditorIndex];
     if NFoldFrom>0 then
     begin
-      Item.Init(ALine, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed, true);
-      AItems.Add(Item);
+      WrapItem.Init(ALineIndex, 1, Min(NLen, NFoldFrom-1), 0, cWrapItemCollapsed, true);
+      AItems.Add(WrapItem);
       Exit;
     end;
   end;
@@ -1947,22 +1947,22 @@ begin
   //line not wrapped?
   if (AWrapColumn<cMinWrapColumnAbs) then
   begin
-    Item.Init(ALine, 1, NLen, 0, cWrapItemFinal, true);
-    AItems.Add(Item);
+    WrapItem.Init(ALineIndex, 1, NLen, 0, cWrapItemFinal, true);
+    AItems.Add(WrapItem);
     Exit;
   end;
 
   NVisColumns:= Max(AVisibleColumns, cMinWrapColumnAbs);
   NOffset:= 1;
   NIndent:= 0;
-  bInitial:= true;
+  bInitialItem:= true;
 
   repeat
-    StrPart:= AStrings.LineSub(ALine, NOffset, NVisColumns);
+    StrPart:= AStrings.LineSub(ALineIndex, NOffset, NVisColumns);
     if StrPart='' then Break;
 
     NLen:= ATabHelper.FindWordWrapOffset(
-      ALine,
+      ALineIndex,
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
       StrPart,
@@ -1971,18 +1971,18 @@ begin
       AWrapIndented);
 
     if NLen>=Length(StrPart) then
-      NFinal:= cWrapItemFinal
+      FinalState:= cWrapItemFinal
     else
-      NFinal:= cWrapItemMiddle;
+      FinalState:= cWrapItemMiddle;
 
-    Item.Init(ALine, NOffset, NLen, NIndent, NFinal, bInitial);
-    AItems.Add(Item);
-    bInitial:= false;
+    WrapItem.Init(ALineIndex, NOffset, NLen, NIndent, FinalState, bInitialItem);
+    AItems.Add(WrapItem);
+    bInitialItem:= false;
 
     if AWrapIndented then
       if NOffset=1 then
       begin
-        NIndent:= ATabHelper.GetIndentExpanded(ALine, StrPart);
+        NIndent:= ATabHelper.GetIndentExpanded(ALineIndex, StrPart);
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
