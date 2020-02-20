@@ -2601,13 +2601,13 @@ begin
     begin
       //paint end-of-file arrow
       if AMainText then
-       if NWrapIndex>=0 then
-        if OptUnprintedVisible and OptUnprintedEof then
-          CanvasArrowHorz(C,
-            Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
-            Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
-            false,
-            OptUnprintedTabPointerScale);
+        if NWrapIndex>=0 then
+          if OptUnprintedVisible and OptUnprintedEof then
+            CanvasArrowHorz(C,
+              Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
+              Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
+              false,
+              OptUnprintedTabPointerScale);
       Break;
     end;
 
@@ -2616,15 +2616,16 @@ begin
     if not Strings.IsIndexValid(NLinesIndex) then Break;
 
     //support Gap before the 1st line
-    if AMainText and (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
-    begin
-      GapItem:= Gaps.Find(-1);
-      if Assigned(GapItem) then
+    if AMainText then
+      if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
       begin
-        DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+GapItem.Size), GapItem);
-        NCoordTop+= GapItem.Size;
+        GapItem:= Gaps.Find(-1);
+        if Assigned(GapItem) then
+        begin
+          DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+GapItem.Size), GapItem);
+          NCoordTop+= GapItem.Size;
+        end;
       end;
-    end;
 
     {$ifdef atsynedit_cache}
     //speedup painting minimap:
