@@ -523,21 +523,31 @@ end;
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
   var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer);
 var
-  NSize, NTabSize, NCharsSkipped: integer;
+  NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
   //NPairSize: integer;
   //StrPair: WideString;
   ch: widechar;
   i: integer;
 begin
-  SetLength(AInfo, Length(S));
-  if S='' then Exit;
+  NLen:= Length(S);
+  SetLength(AInfo, NLen);
+  if NLen=0 then Exit;
 
   NCharsSkipped:= ACharsSkipped;
   //NPairSize:= 0;
   //StrPair:= 'ab';
 
-  for i:= 1 to Length(S) do
+  {
+  if NLen>OptMaxLineLenForAccurateCharWidths then
+  begin
+    for i:= 0 to NLen-1 do
+      AInfo[i]:= 100;
+    exit;
+  end;
+  }
+
+  for i:= 1 to NLen do
   begin
     ch:= S[i];
     Inc(NCharsSkipped);
@@ -590,17 +600,23 @@ end;
 function TATStringTabHelper.CalcCharOffsetLast(ALineIndex: integer; const S: atString;
   ACharsSkipped: integer): integer;
 var
-  NSize, NTabSize, NCharsSkipped: integer;
+  NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
   ch: widechar;
   i: integer;
 begin
   Result:= 0;
-  if S='' then Exit;
+  NLen:= Length(S);
+  if NLen=0 then Exit;
+
+  {
+  if NLen>OptMaxLineLenForAccurateCharWidths then
+    exit(NLen*100);
+    }
 
   NCharsSkipped:= ACharsSkipped;
 
-  for i:= 1 to Length(S) do
+  for i:= 1 to NLen do
   begin
     ch:= S[i];
     Inc(NCharsSkipped);
