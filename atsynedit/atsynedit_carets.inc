@@ -163,7 +163,7 @@ var
   Item: TATWrapItem;
   StringItem: PATStringItem;
   NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
-  NHorzPos, NVertPos: integer;
+  NScrolledHorz, NScrolledVert: integer;
   Str: atString;
   bAsciiOnly: boolean;
   i: integer;
@@ -178,6 +178,9 @@ begin
   AStrings.UpdateItemHasTab(P.Y);
   StringItem:= AStrings.GetItemPtr(P.Y);
   bAsciiOnly:= not StringItem^.Ex.Wide;
+
+  NScrolledHorz:= AScrollHorz.NPos;
+  NScrolledVert:= Max(0, AScrollVert.NPos);
 
   for i:= NIndex1 to NIndex2 do
   begin
@@ -206,18 +209,15 @@ begin
     if NFromStart>Item.NLength then
       Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.X);
 
-    NHorzPos:= AScrollHorz.NPos;
-    NVertPos:= Max(0, AScrollVert.NPos);
-
     //TODO: here scrolled part is taken as small chars (*ACharSize.X),
     //while text may have full-width chars, and it gives incorrect result
-    Inc(Result.X, (Item.NIndent-NHorzPos)*ACharSize.X);
-    Result.Y:= (i-NVertPos)*ACharSize.Y;
+    Inc(Result.X, (Item.NIndent-NScrolledHorz)*ACharSize.X);
+    Result.Y:= (i-NScrolledVert)*ACharSize.Y;
 
     //consider gaps
-    if (AGaps.Count>0) and AWrapInfo.IsIndexValid(NVertPos) then
+    if (AGaps.Count>0) and AWrapInfo.IsIndexValid(NScrolledVert) then
     begin
-      NLineIndexTop:= AWrapInfo[NVertPos].NLineIndex;
+      NLineIndexTop:= AWrapInfo[NScrolledVert].NLineIndex;
       Inc(Result.Y, AGaps.SizeForLineRange(
         NLineIndexTop, //index of top line
         P.Y-1 //index of line before caret
