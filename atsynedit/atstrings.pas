@@ -496,12 +496,18 @@ var
   NLen, i: integer;
 begin
   NLen:= Length(S);
+  if NLen=0 then
+  begin
+    Ex.Wide:= false;
+    Buf:= '';
+  end
+  else
   if not IsStringWithUnicode(S) then
   begin
     Ex.Wide:= false;
     SetLength(Buf, NLen);
     for i:= 1 to NLen do
-      Buf[i]:= chr(Ord(S[i]));
+      Buf[i]:= Chr(Ord(S[i]));
   end
   else
   begin
@@ -516,8 +522,15 @@ end;
 
 procedure TATStringItem.SetLineA(const S: string);
 var
-  SW: WideString;
+  NLen, N: integer;
 begin
+  NLen:= Length(S);
+  if NLen=0 then
+  begin
+    Ex.Wide:= false;
+    Buf:= '';
+  end
+  else
   if not IsStringWithUnicode(S) then
   begin
     Ex.Wide:= false;
@@ -527,9 +540,17 @@ begin
   else
   begin
     Ex.Wide:= true;
+    {
+    //this is slower
+    var SW: WideString;
     SW:= S;
     SetLength(Buf, Length(SW)*2);
     Move(SW[1], Buf[1], Length(Buf));
+    }
+    SetLength(Buf, NLen*2);
+    N:= Utf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen);
+    if N>0 then
+      SetLength(Buf, 2*(N-1));
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
