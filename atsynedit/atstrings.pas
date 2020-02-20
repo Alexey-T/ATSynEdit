@@ -123,6 +123,8 @@ type
     procedure Init(const S: string; AEnd: TATLineEnds);
     procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
     function IsFake: boolean; inline;
+    function IndentSize: integer;
+    function CharLenWithoutSpace: integer;
   end;
   PATStringItem = ^TATStringItem;
 
@@ -272,6 +274,8 @@ type
     property LinesUpdated[Index: integer]: boolean read GetLineUpdated write SetLineUpdated;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
+    function LineIndent(ALineIndex: integer): integer;
+    function LineLenWithoutSpace(ALineIndex: integer): integer;
     procedure LineBlockDelete(ALine1, ALine2: integer);
     procedure LineBlockInsert(ALineFrom: integer; ANewLines: TStringList);
     function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
@@ -430,6 +434,36 @@ begin
     (TATLineEnds(Ex.Ends)=cEndNone);
 end;
 
+function TATStringItem.IndentSize: integer;
+var
+  NLen: integer;
+  Str: UnicodeString;
+begin
+  Result:= 0;
+  NLen:= CharLen;
+  repeat
+    if Result>=NLen then Break;
+    Str:= LineSub(Result+1, 1);
+    if Length(Str)<>1 then Break;
+    if not IsCharSpace(Str[1]) then Break;
+    Inc(Result);
+  until false;
+end;
+
+function TATStringItem.CharLenWithoutSpace: integer;
+var
+  Str: UnicodeString;
+begin
+  Result:= CharLen;
+  repeat
+    if Result<=0 then Break;
+    Str:= LineSub(Result, 1);
+    if Length(Str)<>1 then Break;
+    if not IsCharSpace(Str[1]) then Break;
+    Dec(Result);
+  until false;
+end;
+
 function TATStringItem.CharLen: integer;
 begin
   if Ex.Wide then
@@ -541,9 +575,9 @@ begin
   else
   begin
     ResLen:= Max(0, Min(ALen, NLen-AFrom+1));
-    SetLength(Result, NLen);
+    SetLength(Result, ResLen);
     for i:= 1 to ResLen do
-      Result[i]:= WideChar(Ord(Buf[i]));
+      Result[i]:= WideChar(Ord(Buf[i+AFrom-1]));
   end;
 end;
 
@@ -1175,6 +1209,16 @@ begin
   if ALen=0 then exit('');
   Item:= GetItemPtr(ALineIndex);
   Result:= Item^.LineSub(APosFrom, ALen);
+end;
+
+function TATStrings.LineIndent(ALineIndex: integer): integer;
+begin
+  Result:= GetItemPtr(ALineIndex)^.IndentSize;
+end;
+
+function TATStrings.LineLenWithoutSpace(ALineIndex: integer): integer;
+begin
+  Result:= GetItemPtr(ALineIndex)^.CharLenWithoutSpace;
 end;
 
 function TATStrings.UpdateItemHasTab(AIndex: integer): boolean;
