@@ -477,7 +477,7 @@ begin
     PosStart.X:= 0;
     PosStart.Y:= 0;
     PosEnd.Y:= IndexLineMax;
-    PosEnd.X:= Length(Editor.Strings.Lines[IndexLineMax]);
+    PosEnd.X:= Editor.Strings.LinesLen[IndexLineMax];
   end
   else
   begin
@@ -493,7 +493,7 @@ begin
     if not Editor.Strings.IsIndexValid(PosStart.Y) then Break;
     if not FindMatch_InEditor(PosStart, PosEnd, AWithEvent) then Break;
 
-    if FMatchEdPos.X < Length(Editor.Strings.Lines[FMatchEdPos.Y]) then
+    if FMatchEdPos.X < Editor.Strings.LinesLen[FMatchEdPos.Y] then
     begin
       PosStart.X:= FMatchEdEnd.X;
       PosStart.Y:= FMatchEdEnd.Y;
@@ -1122,7 +1122,7 @@ begin
   NLines:= Editor.Strings.Count;
   if NLines=0 then exit;
   NLastY:= NLines-1;
-  NLastX:= Length(Editor.Strings.Lines[NLastY]);
+  NLastX:= Editor.Strings.LinesLen[NLastY];
 
   if not OptBack then
   begin
@@ -1893,7 +1893,7 @@ begin
               FMatchEdPos.Y:= IndexLine;
               FMatchEdPos.X:= SLinePart_Len;
               FMatchEdEnd.Y:= IndexLine-PartCount+1;
-              FMatchEdEnd.X:= Length(Editor.Strings.Lines[FMatchEdEnd.Y]) - _GetLenPart(PartCount-1);
+              FMatchEdEnd.X:= Editor.Strings.LinesLen[FMatchEdEnd.Y] - _GetLenPart(PartCount-1);
             end;
             if AWithEvent then
               DoOnFound;
