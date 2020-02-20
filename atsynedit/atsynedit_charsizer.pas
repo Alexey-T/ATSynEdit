@@ -62,7 +62,7 @@ var
   OptHexCharsDefault: UnicodeString = ''; //recommended default for OptHexChars
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
-function IsCharAccent(ch: WideChar): boolean;
+function IsCharAccent(ch: WideChar): boolean; inline;
 function IsCharHex(ch: WideChar): boolean;
 
 
