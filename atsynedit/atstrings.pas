@@ -13,7 +13,6 @@ interface
 uses
   {$ifdef windows} Windows, {$endif}
   SysUtils, Classes, Graphics,
-  LazUTF8,
   FileUtil,
   LCLVersion,
   ATStringProc,
@@ -494,7 +493,7 @@ begin
   else
   begin
     Ex.Wide:= true;
-    SW:= UTF8Decode(S);
+    SW:= S;
     SetLength(Buf, Length(SW)*2);
     Move(SW[1], Buf[1], Length(Buf));
   end;
