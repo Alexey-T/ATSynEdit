@@ -2696,13 +2696,20 @@ begin
     end;
 
     //prepare line
-    Str:= Strings.LineSub(
-      NLinesIndex,
-      WrapItem.NCharIndex,
-      Min(WrapItem.NLength, GetVisibleColumns+ScrollHorz.NPos+1+6)
-        //+1 because of NPixelOffset
-        //+6 because of HTML color underlines
-      );
+    if AMainText then
+      Str:= Strings.LineSub(
+        NLinesIndex,
+        WrapItem.NCharIndex,
+        Min(WrapItem.NLength, GetVisibleColumns+ScrollHorz.NPos+1+6)
+          //+1 because of NPixelOffset
+          //+6 because of HTML color underlines
+        )
+    else
+      Str:= Strings.LineSub(
+        NLinesIndex,
+        1,
+        Min(WrapItem.NLength, GetVisibleColumns)
+        );
 
     LineSeparator:= Strings.LinesSeparator[NLinesIndex];
     LineWithCaret:= AMainText and IsLineWithCaret(NLinesIndex);
