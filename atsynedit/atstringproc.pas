@@ -655,10 +655,12 @@ begin
     ASpacesSkipped:= Offsets[ACharsSkipped-1] div 100;
 end;
 
+const
+  cSignValue: array[boolean] of integer = (-1, 1);
 
-function BoolToPlusMinusOne(b: boolean): integer; inline;
+function BoolToPlusMinusOne(b: boolean): integer;
 begin
-  if b then Result:= 1 else Result:= -1;
+  Result:= cSignValue[b];
 end;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
