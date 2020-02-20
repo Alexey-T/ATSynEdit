@@ -1,4 +1,9 @@
 
+2020.02.20
++ add: reworked strings storage system TATStrings:
+  a) it takes less memory for ASCII text lines
+  b) for lines with non-ASCII chars, it takes more memory, but it works much faster, so scrolling in smoother
+
 2020.02.15
 + add: used Alexey Torgashin's patches to Sorokin's TRegExpr
 
