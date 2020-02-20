@@ -459,12 +459,13 @@ procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
   const DxIn: TATIntArray;
   var DxOut: TATIntArray);
 var
-  NLen, NSize, i: integer;
+  NLen, NSize, ResLen, i: integer;
 begin
-  SetLength(DxOut, 0);
-
-  i:= 0;
   NLen:= Length(S);
+  SetLength(DxOut, NLen);
+
+  ResLen:= 0;
+  i:= 0;
   repeat
     Inc(i);
     if i>NLen then Break;
@@ -480,9 +481,12 @@ begin
     else
       NSize:= DxIn[i-1];
 
-    SetLength(DxOut, Length(DxOut)+1);
-    DxOut[Length(DxOut)-1]:= NSize;
+    Inc(ResLen);
+    DxOut[ResLen-1]:= NSize;
   until false;
+
+  //don't realloc in a loop
+  SetLength(DxOut, ResLen);
 end;
 
 
