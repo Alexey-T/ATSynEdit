@@ -2857,6 +2857,7 @@ begin
 
       if AMainText then
       begin
+        TextOutProps.SuperFast:= bLineHuge;
         TextOutProps.NeedOffsets:= FFontNeedsOffsets;
         TextOutProps.TabHelper:= FTabHelper;
         TextOutProps.LineIndex:= NLinesIndex;
@@ -6967,6 +6968,8 @@ begin
   C.FillRect(ARect);
 
   FillChar(TextOutProps{%H-}, SizeOf(TextOutProps), 0);
+
+  TextOutProps.SuperFast:= false;
   TextOutProps.NeedOffsets:= FFontNeedsOffsets;
   TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;

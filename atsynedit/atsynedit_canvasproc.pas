@@ -90,6 +90,7 @@ type
 
 type
   TATCanvasTextOutProps = record
+    SuperFast: boolean;
     NeedOffsets: TATFontNeedsOffsets;
     TabHelper: TATStringTabHelper;
     LineIndex: integer;
@@ -498,7 +499,7 @@ var
   ListInt: TATIntArray;
   Dx: TATIntArray;
   DxUTF8: TATIntArray;
-  i, j: integer;
+  NLen, NCharWidth, i, j: integer;
   PartStr: atString;
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
@@ -510,29 +511,42 @@ var
   DxPointer: PInteger;
   bAllowLigatures: boolean;
 begin
-  if AText='' then Exit;
+  NLen:= Length(AText);
+  if NLen=0 then Exit;
+  NCharWidth:= AProps.CharSize.X;
 
-  SetLength(ListInt, Length(AText));
-  SetLength(Dx, Length(AText));
+  SetLength(ListInt, NLen);
+  SetLength(Dx, NLen);
 
-  AProps.TabHelper.CalcCharOffsets(AProps.LineIndex, AText, ListOffsets, AProps.CharsSkipped);
-
-  for i:= 0 to High(ListOffsets) do
-    ListInt[i]:= ListOffsets[i] * AProps.CharSize.X div 100;
-
-  //truncate AText, to not paint over screen
-  for i:= 1 to High(ListInt) do
-    if ListInt[i]>AProps.ControlWidth then
+  if AProps.SuperFast then
+  begin
+    for i:= 0 to NLen-1 do
     begin
-      SetLength(AText, i);
-      break;
+      ListInt[i]:= NCharWidth*(i+1);
+      Dx[i]:= NCharWidth;
     end;
+  end
+  else
+  begin
+    AProps.TabHelper.CalcCharOffsets(AProps.LineIndex, AText, ListOffsets, AProps.CharsSkipped);
 
-  for i:= 0 to High(ListInt) do
-    if i=0 then
-      Dx[i]:= ListInt[i]
-    else
-      Dx[i]:= ListInt[i]-ListInt[i-1];
+    for i:= 0 to High(ListOffsets) do
+      ListInt[i]:= ListOffsets[i] * NCharWidth div 100;
+
+    //truncate AText, to not paint over screen
+    for i:= 1 to High(ListInt) do
+      if ListInt[i]>AProps.ControlWidth then
+      begin
+        SetLength(AText, i);
+        break;
+      end;
+
+    for i:= 0 to High(ListInt) do
+      if i=0 then
+        Dx[i]:= ListInt[i]
+      else
+        Dx[i]:= ListInt[i]-ListInt[i-1];
+  end;
 
   if AParts=nil then
   begin

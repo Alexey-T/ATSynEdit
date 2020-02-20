@@ -538,14 +538,12 @@ begin
   //NPairSize:= 0;
   //StrPair:= 'ab';
 
-  {
   if NLen>OptMaxLineLenForAccurateCharWidths then
   begin
     for i:= 0 to NLen-1 do
-      AInfo[i]:= 100;
+      AInfo[i]:= 100*(i+1);
     exit;
   end;
-  }
 
   for i:= 1 to NLen do
   begin
@@ -609,10 +607,8 @@ begin
   NLen:= Length(S);
   if NLen=0 then Exit;
 
-  {
   if NLen>OptMaxLineLenForAccurateCharWidths then
     exit(NLen*100);
-    }
 
   NCharsSkipped:= ACharsSkipped;
 
