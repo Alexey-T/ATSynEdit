@@ -2708,6 +2708,8 @@ begin
 
     if AMainText then
     begin
+      NLineLen:= Strings.LinesLen[NLinesIndex];
+
       StrOutput:= Strings.LineSub(
         NLinesIndex,
         WrapItem.NCharIndex,
@@ -2718,12 +2720,22 @@ begin
 
       if WrapItem.bInitial then
       begin
-        FTabHelper.FindOutputSkipOffset(
-          NLinesIndex,
-          StrOutput,
-          AScrollHorz.NPos,
-          NOutputCharsSkipped,
-          NOutputSpacesSkipped);
+        if NLineLen<=FOptMaxLineLengthForSlowWidthDetect then
+        begin
+          //note: this is very slow for huge lines, so it works only for linelen<=500
+          FTabHelper.FindOutputSkipOffset(
+            NLinesIndex,
+            StrOutput,
+            AScrollHorz.NPos,
+            NOutputCharsSkipped,
+            NOutputSpacesSkipped);
+        end
+        else
+        begin
+          NOutputCharsSkipped:= AScrollHorz.NPos;
+          NOutputSpacesSkipped:= NOutputCharsSkipped;
+        end;
+
         Delete(StrOutput, 1, NOutputCharsSkipped);
         Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
       end;
@@ -2746,8 +2758,6 @@ begin
 
     if AMainText then
     begin
-      NLineLen:= Strings.LinesLen[NLinesIndex];
-
       //horz scrollbar max: calced here, to make variable horz bar
       //vert scrollbar max: calced in UpdateScrollbars
       if NLineLen > FOptMaxLineLengthForSlowWidthDetect then
