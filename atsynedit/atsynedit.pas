@@ -2955,41 +2955,42 @@ begin
         AScrollHorz);
     end;
 
-    CoordAfterText:= Point(
-      CurrPointText.X+NOutputStrWidth,
-      CurrPointText.Y);
-
-    if WrapItem.NFinal=cWrapItemFinal then
+    if AMainText then
     begin
-      //for OptShowFullWidthForSelection=false paint eol bg
-      if bLineEolSelected then
+      CoordAfterText.X:= CurrPointText.X+NOutputStrWidth;
+      CoordAfterText.Y:= CurrPointText.Y;
+
+      if WrapItem.NFinal=cWrapItemFinal then
       begin
-        C.Brush.Color:= Colors.TextSelBG;
-        C.FillRect(
-          CoordAfterText.X,
-          CoordAfterText.Y,
-          CoordAfterText.X+ACharSize.X,
-          CoordAfterText.Y+ACharSize.Y);
+        //for OptShowFullWidthForSelection=false paint eol bg
+        if bLineEolSelected then
+        begin
+          C.Brush.Color:= Colors.TextSelBG;
+          C.FillRect(
+            CoordAfterText.X,
+            CoordAfterText.Y,
+            CoordAfterText.X+ACharSize.X,
+            CoordAfterText.Y+ACharSize.Y);
+        end;
+
+        //paint eol mark
+        if FUnprintedVisible and FUnprintedEnds then
+          DoPaintUnprintedEol(C,
+            cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
+            CoordAfterText,
+            ACharSize,
+            Colors.UnprintedFont,
+            Colors.UnprintedBG,
+            FUnprintedEndsDetails);
       end;
 
-      //paint eol mark
-      if AMainText and FUnprintedVisible and FUnprintedEnds then
-        DoPaintUnprintedEol(C,
-          cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
-          CoordAfterText,
-          ACharSize,
-          Colors.UnprintedFont,
-          Colors.UnprintedBG,
-          FUnprintedEndsDetails);
-    end;
-
-    //draw collapsed-mark
-    if AMainText then
+      //draw collapsed-mark
       if WrapItem.NFinal=cWrapItemCollapsed then
         DoPaintFoldedMark(C,
           Point(Strings.LinesFoldFrom[NLinesIndex, FEditorIndex]-1, NLinesIndex),
           CoordAfterText,
           GetFoldedMarkText(NLinesIndex));
+    end;
 
     //draw separators
     if LineSeparator<>cLineSepNone then
