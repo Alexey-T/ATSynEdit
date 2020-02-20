@@ -2768,6 +2768,8 @@ begin
     begin
       NOutputCharsSkipped:= 0;
       NOutputSpacesSkipped:= 0;
+
+      if AMainText then
       if WrapItem.bInitial then
       begin
         FTabHelper.FindOutputSkipOffset(
@@ -2777,10 +2779,11 @@ begin
           NOutputCharsSkipped,
           NOutputSpacesSkipped);
         Delete(StrOut, 1, NOutputCharsSkipped);
-        if Length(StrOut)>cMaxCharsForOutput then
-          SetLength(StrOut, cMaxCharsForOutput);
         Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
       end;
+
+      if Length(StrOut)>cMaxCharsForOutput then
+        SetLength(StrOut, cMaxCharsForOutput);
 
       if WrapItem.NIndent>0 then
       begin
