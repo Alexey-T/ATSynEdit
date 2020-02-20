@@ -2754,6 +2754,7 @@ begin
     end
     else
     begin
+      //work very fast for minimap, take LineSub from start
       StrOutput:= Strings.LineSub(
         NLinesIndex,
         1,
