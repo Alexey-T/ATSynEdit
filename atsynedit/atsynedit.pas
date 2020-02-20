@@ -2513,7 +2513,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   ALineFrom: integer);
 var
   NCoordTop, NCoordSep: integer;
-  NWrapIndex, NWrapIndexDummy, NLinesIndex, NLineLen: integer;
+  NWrapIndex, NWrapIndexDummy, NLinesIndex, NLineLen, NCount: integer;
   NOutputCharsSkipped, NOutputStrWidth, NOutputSpacesSkipped: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
@@ -2565,15 +2565,19 @@ begin
   end;
 
   if AMainText and (FTextHint<>'') then
-    if (Strings.Count=0) or ((Strings.Count=1) and (Strings.Lines[0]='')) then
+  begin
+    NCount:= Strings.Count;
+    if (NCount=0) or ((NCount=1) and (Strings.LinesLen[0]=0)) then
     begin
       DoPaintTextHintTo(C);
       Exit
     end;
+  end;
 
   {$ifndef fix_horzscroll}
   AScrollHorz.NMax:= 1;
   {$endif}
+
   NCoordTop:= ARect.Top;
 
   if ALineFrom>=0 then
