@@ -654,7 +654,7 @@ begin
   case AClient of
     0: Result:= FList.GetItem(ALine)^.Ex.FoldFrom_0;
     1: Result:= FList.GetItem(ALine)^.Ex.FoldFrom_1;
-    else raise Exception.Create('Incorrect index in Strings.LinesFoldFrom[]');
+    else Result:= 0;
   end;
 end;
 
@@ -663,7 +663,7 @@ begin
   case AClient of
     0: Result:= FList.GetItem(ALine)^.Ex.Hidden_0;
     1: Result:= FList.GetItem(ALine)^.Ex.Hidden_1;
-    else raise Exception.Create('Incorrect index in Strings.LinesHidden[]')
+    else Result:= false;
   end;
 end;
 
@@ -692,7 +692,6 @@ end;
 
 function TATStrings.GetLineSep(AIndex: integer): TATLineSeparator;
 begin
-  //Assert(IsIndexValid(AIndex));
   Result:= TATLineSeparator(FList.GetItem(AIndex)^.Ex.Sep);
 end;
 
@@ -755,15 +754,12 @@ end;
 procedure TATStrings.SetLine(AIndex: integer; const AValue: atString);
 var
   Item: PATStringItem;
-  StrBefore: atString;
 begin
   //Assert(IsIndexValid(AIndex));
   if FReadOnly then Exit;
-
   Item:= FList.GetItem(AIndex);
-  StrBefore:= Item^.Line;
 
-  DoAddUndo(cEditActionChange, AIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
+  DoAddUndo(cEditActionChange, AIndex, Item^.Line, TATLineEnds(Item^.Ex.Ends));
   DoEventLog(AIndex);
   DoEventChange(cLineChangeEdited, AIndex, 1);
 
@@ -1176,16 +1172,13 @@ procedure TATStrings.LineDelete(ALineIndex: integer; AForceLast: boolean = true;
   AWithEvent: boolean = true);
 var
   Item: PATStringItem;
-  StrBefore: atString;
 begin
   if FReadOnly then Exit;
 
   if IsIndexValid(ALineIndex) then
   begin
     Item:= FList.GetItem(ALineIndex);
-    StrBefore:= Item^.Line;
-
-    DoAddUndo(cEditActionDelete, ALineIndex, StrBefore, TATLineEnds(Item^.Ex.Ends));
+    DoAddUndo(cEditActionDelete, ALineIndex, Item^.Line, TATLineEnds(Item^.Ex.Ends));
 
     if AWithEvent then
     begin
