@@ -1333,10 +1333,7 @@ begin
   if not IsIndexValid(AY2) then Exit;
 
   if AY1=AY2 then
-  begin
-    Result:= LineSub(AY1, AX1+1, AX2-AX1);
-    Exit
-  end;
+    Exit(LineSub(AY1, AX1+1, AX2-AX1));
 
   //first line
   Result:= LineSub(AY1, AX1+1, MaxInt);
@@ -1347,15 +1344,6 @@ begin
 
   //last line
   Result+= AEolString+LineSub(AY2, 1, AX2);
-
-  {
-  //Result gives final eol
-  //let's keep it if AX2=0 (substr till column=0)
-  if Result<>'' then
-    if AX2<>0 then
-      if SEndsWith(Result, AEolString) then
-        SetLength(Result, Length(Result)-Length(AEolString));
-  }
 end;
 
 procedure TATStrings.SetGroupMark;
