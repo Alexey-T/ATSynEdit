@@ -1,8 +1,11 @@
 
-2020.02.20
+2020.02.21
 + add: reworked strings storage system TATStrings:
   a) it takes less memory for ASCII text lines
   b) for lines with non-ASCII chars, it takes more memory, but it works much faster, so scrolling in smoother
++ add: must faster rendering on long lines (>2M)
++ add: on long lines (>500), editor ignores CJK char sizes
++ add: much faster toggling Wrap mode on huge lines
 
 2020.02.15
 + add: used Alexey Torgashin's patches to Sorokin's TRegExpr
@@ -386,7 +389,7 @@
 + rewritten bookmarks support. now bookmarks are not embedded into Strings items, they are in separate Strings.Bookmarks object. now bookmarks aren't deleted if their lines are deleted - good.
 + smaller size of Strings item
 + added unit atsynedit_bookmarks
-* deleted unit atstrings_hints 
+* deleted unit atstrings_hints
 * deprecated Strings.LinesBm[]
 * deleted Strings.LinesHint[]
 
