@@ -2523,7 +2523,7 @@ var
   Str, StrOut: atString;
   CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineSeparator: TATLineSeparator;
-  LineWithCaret, LineEolSelected, LineColorForced: boolean;
+  bLineWithCaret, bLineEolSelected, bLineColorForced: boolean;
   Event: TATSynEditDrawLineEvent;
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap, bUseColorOfCurrentLine: boolean;
@@ -2643,11 +2643,11 @@ begin
             WrapItem.NLineIndex,
             false,
             NColorEntire,
-            LineColorForced,
+            bLineColorForced,
             bHiliteLinesWithSelection);
 
-          DoPartSetColorBG(FLineParts, NColorEntire, LineColorForced);
-          if LineColorForced then
+          DoPartSetColorBG(FLineParts, NColorEntire, bLineColorForced);
+          if bLineColorForced then
             NColorAfter:= NColorEntire;
 
           if NColorAfter<>clNone then
@@ -2713,8 +2713,8 @@ begin
         );
 
     LineSeparator:= Strings.LinesSeparator[NLinesIndex];
-    LineWithCaret:= AMainText and IsLineWithCaret(NLinesIndex);
-    LineEolSelected:= AMainText and IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
+    bLineWithCaret:= AMainText and IsLineWithCaret(NLinesIndex);
+    bLineEolSelected:= AMainText and IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
     StrOut:= Str;
 
@@ -2743,7 +2743,7 @@ begin
     C.Font.Color:= FColorFont;
 
     bUseColorOfCurrentLine:= false;
-    if LineWithCaret then
+    if bLineWithCaret then
       if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsEntered) then
       begin
         if FOptShowCurLineMinimal then
@@ -2756,7 +2756,7 @@ begin
       NLinesIndex,
       bUseColorOfCurrentLine,
       NColorEntire,
-      LineColorForced,
+      bLineColorForced,
       bHiliteLinesWithSelection);
 
     if AMainText and FOptZebraActive then
@@ -2806,7 +2806,7 @@ begin
       NColorAfter:= clNone;
       DoCalcLineHilite(WrapItem, FLineParts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
-        NColorEntire, LineColorForced,
+        NColorEntire, bLineColorForced,
         NColorAfter, AMainText);
 
       //apply DimRanges
@@ -2855,7 +2855,7 @@ begin
         TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection;
         TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
-        TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not LineWithCaret);
+        TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not bLineWithCaret);
         TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
         TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
@@ -2938,7 +2938,7 @@ begin
     if WrapItem.NFinal=cWrapItemFinal then
     begin
       //for OptShowFullWidthForSelection=false paint eol bg
-      if LineEolSelected then
+      if bLineEolSelected then
       begin
         C.Brush.Color:= Colors.TextSelBG;
         C.FillRect(
@@ -2989,7 +2989,7 @@ begin
       Band:= FGutter[FGutterBandNumbers];
       if Band.Visible then
       begin
-        if LineWithCaret and FOptShowGutterCaretBG then
+        if bLineWithCaret and FOptShowGutterCaretBG then
         begin
           DoPaintGutterBandBG(C, FGutterBandNumbers, Colors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y, false);
           C.Font.Color:= Colors.GutterCaretFont;
