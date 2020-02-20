@@ -2520,7 +2520,7 @@ var
   Band: TATGutterItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue, NBandDecor: integer;
-  Str, StrOut: atString;
+  StrOutput: atString;
   CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineSeparator: TATLineSeparator;
   bLineWithCaret, bLineEolSelected, bLineColorForced: boolean;
@@ -2697,26 +2697,52 @@ begin
     end;
 
     //prepare line
+    NOutputCharsSkipped:= 0;
+    NOutputSpacesSkipped:= 0;
+    NOutputStrWidth:= 0;
+
+    CurrPoint.X:= ARect.Left;
+    CurrPoint.Y:= NCoordTop;
+    CurrPointText.X:= CurrPoint.X + (WrapItem.NIndent-AScrollHorz.NPos)*ACharSize.X;
+    CurrPointText.Y:= CurrPoint.Y;
+
     if AMainText then
-      Str:= Strings.LineSub(
+    begin
+      StrOutput:= Strings.LineSub(
         NLinesIndex,
         WrapItem.NCharIndex,
         Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6)
           //+1 because of NPixelOffset
           //+6 because of HTML color underlines
-        )
+        );
+
+      if WrapItem.bInitial then
+      begin
+        FTabHelper.FindOutputSkipOffset(
+          NLinesIndex,
+          StrOutput,
+          AScrollHorz.NPos,
+          NOutputCharsSkipped,
+          NOutputSpacesSkipped);
+        Delete(StrOutput, 1, NOutputCharsSkipped);
+        Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
+      end;
+
+      if Length(StrOutput)>cMaxCharsForOutput then
+        SetLength(StrOutput, cMaxCharsForOutput);
+    end
     else
-      Str:= Strings.LineSub(
+    begin
+      StrOutput:= Strings.LineSub(
         NLinesIndex,
         1,
         Min(WrapItem.NLength, GetVisibleColumns)
         );
+    end;
 
     LineSeparator:= Strings.LinesSeparator[NLinesIndex];
     bLineWithCaret:= AMainText and IsLineWithCaret(NLinesIndex);
     bLineEolSelected:= AMainText and IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
-
-    StrOut:= Str;
 
     if AMainText then
     begin
@@ -2735,9 +2761,6 @@ begin
             );
       AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + FOptScrollbarHorizontalAddSpace);
     end;
-
-    CurrPoint.X:= ARect.Left;
-    CurrPoint.Y:= NCoordTop;
 
     C.Brush.Color:= FColorBG;
     C.Font.Color:= FColorFont;
@@ -2766,32 +2789,9 @@ begin
     C.Brush.Color:= NColorEntire;
     C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
 
-    CurrPointText.X:= CurrPoint.X + (WrapItem.NIndent-AScrollHorz.NPos)*ACharSize.X;
-    CurrPointText.Y:= CurrPoint.Y;
-    NOutputStrWidth:= 0;
-
     //paint line
-    if StrOut<>'' then
+    if StrOutput<>'' then
     begin
-      NOutputCharsSkipped:= 0;
-      NOutputSpacesSkipped:= 0;
-
-      if AMainText then
-      if WrapItem.bInitial then
-      begin
-        FTabHelper.FindOutputSkipOffset(
-          NLinesIndex,
-          StrOut,
-          AScrollHorz.NPos,
-          NOutputCharsSkipped,
-          NOutputSpacesSkipped);
-        Delete(StrOut, 1, NOutputCharsSkipped);
-        Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
-      end;
-
-      if Length(StrOut)>cMaxCharsForOutput then
-        SetLength(StrOut, cMaxCharsForOutput);
-
       if WrapItem.NIndent>0 then
       begin
         NColorAfter:= FColorBG;
@@ -2829,7 +2829,7 @@ begin
       else
         Event:= nil;
 
-      StrOut:= SRemoveAsciiControlChars(StrOut, WideChar(OptUnprintedReplaceSpecToCode));
+      StrOutput:= SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
       CanvasTextOutHorzSpacingUsed:= false; //OptCharSpacingX<>0;
 
       if AMainText then
@@ -2873,7 +2873,7 @@ begin
         CanvasTextOut(C,
           CurrPointText.X,
           CurrPointText.Y,
-          StrOut,
+          StrOutput,
           @FLineParts,
           NOutputStrWidth,
           TextOutProps
@@ -2889,7 +2889,7 @@ begin
           AScrollHorz);
       end
       else
-      if StrOut<>'' then
+      if StrOutput<>'' then
         CanvasTextOutMinimap(C,
           ARect,
           CurrPointText,
