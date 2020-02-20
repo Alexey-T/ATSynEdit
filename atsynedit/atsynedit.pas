@@ -1921,7 +1921,7 @@ var
   NFoldFrom: integer;
   NFinal: TATWrapItemFinal;
   bInitial: boolean;
-  Str: atString;
+  StrPart: UnicodeString;
 begin
   AItems.Clear;
 
@@ -1952,23 +1952,25 @@ begin
     Exit;
   end;
 
-  Str:= AStrings.Lines[ALine];
   NVisColumns:= Max(AVisibleColumns, cMinWrapColumnAbs);
   NOffset:= 1;
   NIndent:= 0;
   bInitial:= true;
 
   repeat
+    StrPart:= AStrings.LineSub(ALine, NOffset, NVisColumns);
+    if StrPart='' then Break;
+
     NLen:= ATabHelper.FindWordWrapOffset(
       ALine,
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
-      Copy(Str, 1, NVisColumns),
+      StrPart,
       Max(AWrapColumn-NIndent, cMinWrapColumnAbs),
       ANonWordChars,
       AWrapIndented);
 
-    if NLen>=Length(Str) then
+    if NLen>=Length(StrPart) then
       NFinal:= cWrapItemFinal
     else
       NFinal:= cWrapItemMiddle;
@@ -1980,13 +1982,12 @@ begin
     if AWrapIndented then
       if NOffset=1 then
       begin
-        NIndent:= ATabHelper.GetIndentExpanded(ALine, Str);
+        NIndent:= ATabHelper.GetIndentExpanded(ALine, StrPart);
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
     Inc(NOffset, NLen);
-    Delete(Str, 1, NLen);
-  until Str='';
+  until false;
 end;
 
 
