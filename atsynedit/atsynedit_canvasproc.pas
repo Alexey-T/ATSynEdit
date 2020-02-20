@@ -426,14 +426,9 @@ end;
 
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer; ATabHelper: TATStringTabHelper;
-  ACharSize: TPoint): integer; inline;
-var
-  Offsets: TATLineOffsetsInfo;
+  ACharSize: TPoint): integer;
 begin
-  Result:= 0;
-  if S='' then Exit;
-  ATabHelper.CalcCharOffsets(ALineIndex, S, Offsets);
-  Result:= Offsets[High(Offsets)] * ACharSize.X div 100;
+  Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S) * ACharSize.X div 100;
 end;
 
 

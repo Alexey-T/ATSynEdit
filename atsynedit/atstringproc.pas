@@ -110,6 +110,7 @@ type
     function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
     procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
+    function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): integer;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer; const Str: atString;
@@ -584,6 +585,50 @@ begin
       AInfo[i-1]:= AInfo[i-2]+NSize*NScalePercents;
   end;
 end;
+
+function TATStringTabHelper.CalcCharOffsetLast(ALineIndex: integer; const S: atString;
+  ACharsSkipped: integer): integer;
+var
+  NSize, NTabSize, NCharsSkipped: integer;
+  NScalePercents: integer;
+  ch: widechar;
+  i: integer;
+begin
+  Result:= 0;
+  if S='' then Exit;
+
+  NCharsSkipped:= ACharsSkipped;
+
+  for i:= 1 to Length(S) do
+  begin
+    ch:= S[i];
+    Inc(NCharsSkipped);
+
+    if IsCharSurrogateAny(ch) then
+    begin
+      NScalePercents:= OptEmojiWidthPercents div 2;
+    end
+    else
+    begin
+      NScalePercents:= GlobalCharSizer.GetCharWidth(ch);
+    end;
+
+    if ch<>#9 then
+      NSize:= 1
+    else
+    begin
+      NTabSize:= CalcTabulationSize(ALineIndex, NCharsSkipped);
+      NSize:= NTabSize;
+      Inc(NCharsSkipped, NTabSize-1);
+    end;
+
+    if (i<Length(S)) and IsCharAccent(S[i+1]) then
+      NSize:= 0;
+
+    Inc(Result, NSize*NScalePercents);
+  end;
+end;
+
 
 function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString; APixelsFromLeft,
   ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
