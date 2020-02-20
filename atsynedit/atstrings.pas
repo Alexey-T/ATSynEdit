@@ -207,6 +207,7 @@ type
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
     function GetLine(AIndex: integer): atString;
+    function GetLineAscii(AIndex: integer): boolean;
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
     function GetLineHidden(ALine, AClient: integer): boolean;
@@ -265,6 +266,7 @@ type
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true; AWithEvent: boolean= true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
+    property LinesAscii[Index: integer]: boolean read GetLineAscii;
     property LinesLen[Index: integer]: integer read GetLineLen;
     property LinesLenPhysical[Index: integer]: integer read GetLineLenPhysical;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
@@ -658,6 +660,11 @@ end;
 function TATStrings.GetLine(AIndex: integer): atString;
 begin
   Result:= FList.GetItem(AIndex)^.Line;
+end;
+
+function TATStrings.GetLineAscii(AIndex: integer): boolean;
+begin
+  Result:= not FList.GetItem(AIndex)^.Ex.Wide;
 end;
 
 function TATStrings.GetLineLen(AIndex: integer): integer;
