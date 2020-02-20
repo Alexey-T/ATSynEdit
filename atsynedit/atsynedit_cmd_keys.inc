@@ -2,16 +2,18 @@
 
 function TATSynEdit.DoCommand_KeyHome: TATCommandResults;
 var
-  i, NIndent, NWrapped: integer;
   Caret: TATCaretItem;
   Pnt: TPoint;
   Details: TATPosDetails;
+  NLine, NIndent, NWrapped, i: integer;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     NWrapped:= 0;
     NIndent:= 0;
+    NLine:= Caret.PosY;
+    if not Strings.IsIndexValid(NLine) then Continue;
 
     if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>cWrapOff) then
     begin
@@ -22,7 +24,7 @@ begin
     end;
 
     if FOptKeyHomeToNonSpace then
-      NIndent:= SGetIndentChars(Strings.Lines[Caret.PosY]);
+      NIndent:= Strings.LineIndent(NLine);
 
     if (NWrapped>0) and (Caret.PosX>NWrapped) then
       Caret.PosX:= NWrapped
@@ -45,15 +47,17 @@ end;
 function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
 var
   Caret: TATCaretItem;
-  Str: atString;
   Pnt: TPoint;
-  i, NLen, NWrapped: integer;
+  NLine, NLenTotal, NLen, NWrapped, i: integer;
   Details: TATPosDetails;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
-    Str:= Strings.Lines[Caret.PosY];
+    NLine:= Caret.PosY;
+    if not Strings.IsIndexValid(NLine) then Continue;
+
+    NLenTotal:= Strings.LinesLen[NLine];
     NLen:= 0;
     NWrapped:= 0;
 
@@ -62,14 +66,14 @@ begin
       Pnt.X:= ClientWidth;
       Pnt.Y:= Caret.CoordY;
       Pnt:= ClientPosToCaretPos(Pnt, Details);
-      if Pnt.X<Length(Str) then
+      if Pnt.X<NLenTotal then
         NWrapped:= Pnt.X-1;
         //-1 here: need to jump not to last chr but to last-1 chr
         //(like Synwrite; to not blink caret at next part of wrapped line)
     end;
 
     if FOptKeyEndToNonSpace then
-      NLen:= SGetNonSpaceLength(Str);
+      NLen:= Strings.LineLenWithoutSpace(NLine);
 
     if (NWrapped>0) and (Caret.PosX<NWrapped) then
       Caret.PosX:= NWrapped
@@ -77,10 +81,10 @@ begin
     if (NLen>0) and (Caret.PosX<NLen) then
       Caret.PosX:= NLen
     else
-    if FOptKeyEndToNonSpace and (Caret.PosX=Length(Str)) and (NLen<>Length(Str)) then
+    if FOptKeyEndToNonSpace and (Caret.PosX=NLenTotal) and (NLen<>NLenTotal) then
       Caret.PosX:= NLen
     else
-      Caret.PosX:= Length(Str);
+      Caret.PosX:= NLenTotal;
   end;
 
   Result:= [cResultCaretRight];
