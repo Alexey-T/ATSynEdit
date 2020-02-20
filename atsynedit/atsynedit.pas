@@ -2514,7 +2514,8 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
 var
   NCoordTop, NCoordSep: integer;
   NWrapIndex, NWrapIndexDummy, NLinesIndex, NLineLen, NCount: integer;
-  NOutputCharsSkipped, NOutputStrWidth, NOutputSpacesSkipped: integer;
+  NOutputCharsSkipped, NOutputSpacesSkipped: integer;
+  NOutputStrWidth, NOutputMaximalChars: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
   Band: TATGutterItem;
@@ -2703,7 +2704,6 @@ begin
     //prepare line
     NOutputCharsSkipped:= 0;
     NOutputSpacesSkipped:= 0;
-    NOutputStrWidth:= 0;
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
@@ -2776,15 +2776,15 @@ begin
       //horz scrollbar max: calced here, to make variable horz bar
       //vert scrollbar max: calced in UpdateScrollbars
       if bLineHuge then
-        NOutputStrWidth:= NLineLen //approx len, it don't consider CJK chars
+        NOutputMaximalChars:= NLineLen //approx len, it don't consider CJK chars
       else
-        NOutputStrWidth:= CanvasTextWidth(
+        NOutputMaximalChars:= CanvasTextWidth(
             Strings.Lines[NLinesIndex],
             NLinesIndex,
             FTabHelper,
             Point(1, 1) //(1,1): need width in chars
             );
-      AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputStrWidth + FOptScrollbarHorizontalAddSpace);
+      AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputMaximalChars + FOptScrollbarHorizontalAddSpace);
     end;
 
     C.Brush.Color:= FColorBG;
