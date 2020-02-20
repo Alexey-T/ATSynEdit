@@ -1917,11 +1917,11 @@ procedure _CalcWrapInfos(
   AConsiderFolding: boolean);
 var
   WrapItem: TATWrapItem;
-  NOffset, NLen, NIndent, NVisColumns: integer;
+  NPartOffset, NLen, NIndent, NVisColumns: integer;
   NFoldFrom: integer;
   FinalState: TATWrapItemFinal;
   bInitialItem: boolean;
-  StrPart: UnicodeString;
+  StrPart: atString;
 begin
   AItems.Clear;
 
@@ -1953,12 +1953,12 @@ begin
   end;
 
   NVisColumns:= Max(AVisibleColumns, cMinWrapColumnAbs);
-  NOffset:= 1;
+  NPartOffset:= 1;
   NIndent:= 0;
   bInitialItem:= true;
 
   repeat
-    StrPart:= AStrings.LineSub(ALineIndex, NOffset, NVisColumns);
+    StrPart:= AStrings.LineSub(ALineIndex, NPartOffset, NVisColumns);
     if StrPart='' then Break;
 
     NLen:= ATabHelper.FindWordWrapOffset(
@@ -1975,18 +1975,18 @@ begin
     else
       FinalState:= cWrapItemMiddle;
 
-    WrapItem.Init(ALineIndex, NOffset, NLen, NIndent, FinalState, bInitialItem);
+    WrapItem.Init(ALineIndex, NPartOffset, NLen, NIndent, FinalState, bInitialItem);
     AItems.Add(WrapItem);
     bInitialItem:= false;
 
     if AWrapIndented then
-      if NOffset=1 then
+      if NPartOffset=1 then
       begin
         NIndent:= ATabHelper.GetIndentExpanded(ALineIndex, StrPart);
         NIndent:= Min(NIndent, AIndentMaximal);
       end;
 
-    Inc(NOffset, NLen);
+    Inc(NPartOffset, NLen);
   until false;
 end;
 
