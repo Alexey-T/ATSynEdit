@@ -2696,11 +2696,6 @@ begin
     end;
 
     //prepare line
-    {
-    Str:= Strings.Lines[NLinesIndex];
-    Str:= Copy(Str, WrapItem.NCharIndex, WrapItem.NLength);
-    }
-    //optimization for 4M string length
     Str:= Strings.LineSub(
       NLinesIndex,
       WrapItem.NCharIndex,
