@@ -2523,7 +2523,7 @@ var
   StrOutput: atString;
   CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineSeparator: TATLineSeparator;
-  bLineWithCaret, bLineEolSelected, bLineColorForced: boolean;
+  bLineWithCaret, bLineEolSelected, bLineColorForced, bLineHuge: boolean;
   Event: TATSynEditDrawLineEvent;
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap, bUseColorOfCurrentLine: boolean;
@@ -2713,7 +2713,8 @@ begin
     if AMainText then
     begin
       NLineLen:= Strings.LinesLen[NLinesIndex];
-      if NLineLen<=FOptMaxLineLengthForSlowWidthDetect then
+      bLineHuge:= NLineLen>FOptMaxLineLengthForSlowWidthDetect;
+      if not bLineHuge then
       begin
         //little slow for huge lines
         StrOutput:= Strings.LineSub(
@@ -2774,7 +2775,7 @@ begin
     begin
       //horz scrollbar max: calced here, to make variable horz bar
       //vert scrollbar max: calced in UpdateScrollbars
-      if NLineLen > FOptMaxLineLengthForSlowWidthDetect then
+      if bLineHuge then
         NOutputStrWidth:= NLineLen //approx len, it don't consider CJK chars
       else
         NOutputStrWidth:= CanvasTextWidth(
