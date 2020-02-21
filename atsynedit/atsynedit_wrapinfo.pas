@@ -40,9 +40,6 @@ type
   TATWrapItems = specialize TFPGList<TATWrapItem>;
 
 type
-  TATCheckLineCollapsedEvent = function(ALineNum: integer): boolean of object;
-
-type
   { TATWrapInfo }
 
   TATWrapInfo = class
@@ -50,9 +47,9 @@ type
     FList: TATWrapItems;
     FStrings: TATStrings;
     FVirtualMode: boolean;
-    FOnCheckCollapsed: TATCheckLineCollapsedEvent;
     function GetData(AIndex: integer): TATWrapItem;
     procedure SetVirtualMode(AValue: boolean);
+    function IsLineFolded(ALine: integer): boolean;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -69,7 +66,6 @@ type
     function FindIndexOfCaretPos(APos: TPoint): integer;
     procedure SetCapacity(N: integer);
     procedure ReplaceItems(AFrom, ATo: integer; AItems: TATWrapItems);
-    property OnCheckLineCollapsed: TATCheckLineCollapsedEvent read FOnCheckCollapsed write FOnCheckCollapsed;
   end;
 
 
@@ -122,6 +118,15 @@ begin
   }
   //if FVirtualMode then
   //  Clear;
+end;
+
+function TATWrapInfo.IsLineFolded(ALine: integer): boolean;
+const
+  FEditorIndex = 0;
+begin
+  Result:= false;
+  if not StringsObj.IsIndexValid(ALine) then exit;
+  Result:= StringsObj.LinesHidden[ALine, FEditorIndex];
 end;
 
 constructor TATWrapInfo.Create;
@@ -183,8 +188,7 @@ begin
   AFrom:= -1;
   ATo:= -1;
 
-  if Assigned(FOnCheckCollapsed) then
-    if FOnCheckCollapsed(ALineNum) then Exit;
+  if IsLineFolded(ALineNum) then Exit;
 
   a:= 0;
   b:= Count-1;

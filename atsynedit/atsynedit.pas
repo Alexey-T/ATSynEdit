@@ -842,7 +842,6 @@ type
     procedure InitFoldedMarkTooltip;
     procedure InitFoldImageList;
     procedure InitMenuStd;
-    function IsLineFoldedFull(ALine: integer): boolean;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuStdPopup(Sender: TObject);
@@ -3517,7 +3516,8 @@ begin
   FFoldTooltipLineCount:= cInitFoldTooltipLineCount;
 
   FWrapInfo:= TATWrapInfo.Create;
-  FWrapInfo.OnCheckLineCollapsed:= @IsLineFoldedFull;
+  FWrapInfo.StringsObj:= FStringsInt;
+
   FWrapTemps:= TATWrapItems.Create;
   FWrapUpdateNeeded:= true;
   FWrapMode:= cInitWrapMode;

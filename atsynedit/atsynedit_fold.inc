@@ -14,11 +14,6 @@ begin
   Result:= ADetectPartialFold and (NFoldFrom>0);
 end;
 
-function TATSynEdit.IsLineFoldedFull(ALine: integer): boolean;
-begin
-  Result:= IsLineFolded(ALine, false);
-end;
-
 function TATSynEdit.Unfolded_FirstLineNumber: integer;
 begin
   Result:= Unfolded_NextLineNumber(0, true);
