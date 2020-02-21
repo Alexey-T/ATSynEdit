@@ -2,16 +2,16 @@
 
 function TATSynEdit.IsLineFolded(ALine: integer; ADetectPartialFold: boolean): boolean;
 var
-  bHidden: boolean;
-  NFoldFrom: integer;
+  Strs: TATStrings;
 begin
-  if not Strings.IsIndexValid(ALine) then Exit(false);
+  Result:= false;
+  Strs:= Strings;
+  if not Strs.IsIndexValid(ALine) then Exit;
 
-  bHidden:= Strings.LinesHidden[ALine, FEditorIndex];
-  if bHidden then Exit(true);
+  if Strs.LinesHidden[ALine, FEditorIndex] then Exit(true);
 
-  NFoldFrom:= Strings.LinesFoldFrom[ALine, FEditorIndex];
-  Result:= ADetectPartialFold and (NFoldFrom>0);
+  if ADetectPartialFold then
+    Result:= Strs.LinesFoldFrom[ALine, FEditorIndex]>0;
 end;
 
 function TATSynEdit.Unfolded_FirstLineNumber: integer;
