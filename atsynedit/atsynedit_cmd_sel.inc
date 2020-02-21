@@ -73,7 +73,7 @@ begin
           if FSelRectEnd.Y>0 then
           begin
             Dec(FSelRectEnd.Y);
-            FSelRectEnd.Y:= GetNextUnfoldedLineNumber(FSelRectEnd.Y, false);
+            FSelRectEnd.Y:= Unfolded_NextLineNumber(FSelRectEnd.Y, false);
           end;
 
         if FSelRectEnd.Y>=FSelRectBegin.Y then
@@ -88,7 +88,7 @@ begin
           if FSelRectEnd.Y<Strings.Count-1 then
           begin
             Inc(FSelRectEnd.Y);
-            FSelRectEnd.Y:= GetNextUnfoldedLineNumber(FSelRectEnd.Y, true);
+            FSelRectEnd.Y:= Unfolded_NextLineNumber(FSelRectEnd.Y, true);
           end;
 
         if FSelRectEnd.Y>=FSelRectBegin.Y then

@@ -184,8 +184,8 @@ begin
 
     if not IsLineFolded(Y) then
     begin
-      if Y<0 then Y:= GetFirstUnfoldedLineNumber;
-      if Y>=Strings.Count then Y:= GetLastUnfoldedLineNumber;
+      if Y<0 then Y:= Unfolded_FirstLineNumber;
+      if Y>=Strings.Count then Y:= Unfolded_LastLineNumber;
       Caret.PosY:= Y;
     end;
   end;
@@ -213,7 +213,7 @@ begin
     if IsPosFolded(Caret.PosX, Caret.PosY) then
     begin
       Caret.PosX:= 0;
-      Caret.PosY:= GetNextUnfoldedLineNumber(Caret.PosY, ADown);
+      Caret.PosY:= Unfolded_NextLineNumber(Caret.PosY, ADown);
       Continue;
     end;
 

@@ -19,17 +19,17 @@ begin
   Result:= IsLineFolded(ALine, false);
 end;
 
-function TATSynEdit.GetFirstUnfoldedLineNumber: integer;
+function TATSynEdit.Unfolded_FirstLineNumber: integer;
 begin
-  Result:= GetNextUnfoldedLineNumber(0, true);
+  Result:= Unfolded_NextLineNumber(0, true);
 end;
 
-function TATSynEdit.GetLastUnfoldedLineNumber: integer;
+function TATSynEdit.Unfolded_LastLineNumber: integer;
 begin
-  Result:= GetNextUnfoldedLineNumber(Strings.Count-1, false);
+  Result:= Unfolded_NextLineNumber(Strings.Count-1, false);
 end;
 
-function TATSynEdit.GetNextUnfoldedLineNumber(ALine: integer; ADown: boolean): integer;
+function TATSynEdit.Unfolded_NextLineNumber(ALine: integer; ADown: boolean): integer;
 var
   N: integer;
 begin

@@ -818,13 +818,12 @@ type
       ALineIndex, ACharIndex: integer);
     procedure DoPartCalc_ApplyAttribsOver(var AParts: TATLineParts; AOffsetMax,
       ALineIndex, ACharIndex: integer; AColorBG: TColor);
-    function GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule: boolean
-      ): atString;
-    function GetFirstUnfoldedLineNumber: integer;
+    function GetAutoIndentString(APosX, APosY: integer; AUseIndentRegexRule: boolean): atString;
     function GetFoldedMarkText(ALine: integer): string;
-    function GetLastUnfoldedLineNumber: integer;
     function GetModified: boolean;
-    function GetNextUnfoldedLineNumber(ALine: integer; ADown: boolean): integer;
+    function Unfolded_NextLineNumber(ALine: integer; ADown: boolean): integer;
+    function Unfolded_FirstLineNumber: integer;
+    function Unfolded_LastLineNumber: integer;
     function GetOneLine: boolean;
     function GetRedoCount: integer;
     function GetLinesFromTop: integer;
