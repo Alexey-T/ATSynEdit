@@ -160,14 +160,14 @@ begin
   //Fold.Items[ARangeIndex]:= Range;
 
   //fully hide other lines of range
-  DoRangeHide(Range^.Y+1, Range^.Y2);
+  DoRangeHideLines(Range^.Y+1, Range^.Y2);
 
   if FOptCaretFixAfterRangeFolded then
     Carets.UpdateAfterRangeFolded(Range^.X, Range^.Y, Range^.Y2);
 end;
 
 
-procedure TATSynEdit.DoRangeHide(ALineFrom, ALineTo: integer);
+procedure TATSynEdit.DoRangeHideLines(ALineFrom, ALineTo: integer);
 var
   i: integer;
 begin

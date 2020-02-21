@@ -1224,7 +1224,7 @@ type
     //fold
     procedure DoRangeFold(ARangeIndex: integer);
     procedure DoRangeUnfold(ARangeIndex: integer);
-    procedure DoRangeHide(ALineFrom, ALineTo: integer);
+    procedure DoRangeHideLines(ALineFrom, ALineTo: integer); inline;
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
       AForThisRange: integer);
