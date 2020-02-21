@@ -1731,6 +1731,7 @@ var
   end;
   //
 var
+  Strs: TATStrings;
   SFind, SLineToTest: UnicodeString;
   NStartOffset, NEndOffset, NLenStrFind: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
@@ -1738,6 +1739,8 @@ var
 begin
   Result:= false;
   if StrFind='' then Exit;
+
+  Strs:= Editor.Strings;
 
   SFind:= StrFind;
   if not OptCase then
@@ -1753,16 +1756,16 @@ begin
   SLinePart_Len:= Length(SLinePartW);
 
   FPrevProgress:= 0;
-  IndexLineMax:= Editor.Strings.Count-PartCount;
+  IndexLineMax:= Strs.Count-PartCount;
 
     if not OptBack then
     //forward search
       for IndexLine:= APosStart.Y to APosEnd.Y do
       begin
-        if Editor.Strings.LinesLen[IndexLine]=0 then Continue;
+        if Strs.LinesLen[IndexLine]=0 then Continue;
 
         if FStrFindUnicode then
-          if Editor.Strings.LinesAscii[IndexLine] then Continue;
+          if Strs.LinesAscii[IndexLine] then Continue;
 
         if IsProgressNeeded(IndexLine) then
           if Assigned(FOnProgress) then
@@ -1773,7 +1776,7 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLoopedW:= Editor.Strings.Lines[IndexLine];
+        SLineLoopedW:= Strs.Lines[IndexLine];
         SLineLooped_Len:= Length(SLineLoopedW);
 
         if PartCount>1 then
@@ -1781,8 +1784,8 @@ begin
           SetLength(ListLooped, PartCount);
           ListLooped[0]:= SLineLoopedW;
           for i:= 1 to PartCount-1 do
-            if Editor.Strings.IsIndexValid(IndexLine+i) then
-              ListLooped[i]:= Editor.Strings.Lines[IndexLine+i]
+            if Strs.IsIndexValid(IndexLine+i) then
+              ListLooped[i]:= Strs.Lines[IndexLine+i]
             else
             begin
               SetLength(ListLooped, i);
@@ -1835,10 +1838,10 @@ begin
     //backward search
       for IndexLine:= APosStart.Y downto APosEnd.Y do
       begin
-        if Editor.Strings.LinesLen[IndexLine]=0 then Continue;
+        if Strs.LinesLen[IndexLine]=0 then Continue;
 
         if FStrFindUnicode then
-          if Editor.Strings.LinesAscii[IndexLine] then Continue;
+          if Strs.LinesAscii[IndexLine] then Continue;
 
         if IsProgressNeeded(IndexLine) then
           if Assigned(FOnProgress) then
@@ -1849,7 +1852,7 @@ begin
             if not bOk then Break;
           end;
 
-        SLineLoopedW:= Editor.Strings.Lines[IndexLine];
+        SLineLoopedW:= Strs.Lines[IndexLine];
         SLineLooped_Len:= Length(SLineLoopedW);
 
         if PartCount>1 then
@@ -1857,8 +1860,8 @@ begin
           SetLength(ListLooped, PartCount);
           ListLooped[0]:= SLineLoopedW;
           for i:= 1 to PartCount-1 do //store ListLooped as reversed
-            if Editor.Strings.IsIndexValid(IndexLine-i) then
-              ListLooped[i]:= Editor.Strings.Lines[IndexLine-i]
+            if Strs.IsIndexValid(IndexLine-i) then
+              ListLooped[i]:= Strs.Lines[IndexLine-i]
             else
             begin
               SetLength(ListLooped, i);
@@ -1905,7 +1908,7 @@ begin
               FMatchEdPos.Y:= IndexLine;
               FMatchEdPos.X:= SLinePart_Len;
               FMatchEdEnd.Y:= IndexLine-PartCount+1;
-              FMatchEdEnd.X:= Editor.Strings.LinesLen[FMatchEdEnd.Y] - _GetLenPart(PartCount-1);
+              FMatchEdEnd.X:= Strs.LinesLen[FMatchEdEnd.Y] - _GetLenPart(PartCount-1);
             end;
             if AWithEvent then
               DoOnFound;
