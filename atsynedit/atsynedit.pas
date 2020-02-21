@@ -4171,7 +4171,7 @@ var
   NValue: integer;
   Bmp: TGraphic;
 begin
-  C.Brush.Color:= Colors.TextDisabledBG;
+  C.Brush.Color:= Colors.TextBG;
   C.FillRect(ClientRect);
 
   if Strings.ProgressKind<>cStringsProgressSaving then
