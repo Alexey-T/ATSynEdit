@@ -175,7 +175,6 @@ begin
   if NIndex1<0 then Exit;
 
   //prepare optimization
-  AStrings.UpdateItemHasTab(P.Y);
   StringItem:= AStrings.GetItemPtr(P.Y);
   bAsciiOnly:= not StringItem^.Ex.Wide;
 

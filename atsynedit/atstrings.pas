@@ -210,6 +210,7 @@ type
     function GetLineAscii(AIndex: integer): boolean;
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
+    function GetLineHasTab(AIndex: integer): boolean;
     function GetLineHidden(ALine, AClient: integer): boolean;
     function GetLineSep(AIndex: integer): TATLineSeparator;
     function GetLineState(AIndex: integer): TATLineState;
@@ -271,6 +272,7 @@ type
     property LinesLenPhysical[Index: integer]: integer read GetLineLenPhysical;
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
+    property LinesHasTab[Index: integer]: boolean read GetLineHasTab;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesUpdated[Index: integer]: boolean read GetLineUpdated write SetLineUpdated;
@@ -283,7 +285,6 @@ type
     function ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
     function CharPosToColumnPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
     function GetItemPtr(AIndex: integer): PATStringItem;
-    function UpdateItemHasTab(AIndex: integer): boolean;
 
     property Encoding: TATFileEncoding read FEncoding write FEncoding;
     property EncodingCodepage: TEncConvId read FEncodingCodepage write FEncodingCodepage;
@@ -606,26 +607,48 @@ end;
 
 function TATStringItem.HasTab: boolean;
 var
+  Value: TATLineHasTab;
   NLen, i: integer;
   Ptr: PWideChar;
 begin
+  case TATLineHasTab(Ex.HasTab) of
+    cLineTabNo:
+      exit(false);
+    cLineTabYes:
+      exit(true);
+  end;
+
   Result:= false;
   NLen:= Length(Buf);
-  if NLen=0 then exit;
-  if Ex.Wide then
-  begin
-    Ptr:= @Buf[1];
-    for i:= 1 to NLen div 2 do
+  if NLen>0 then
+    if Ex.Wide then
     begin
-      if Ptr^=#9 then exit(true);
-      Inc(Ptr);
+      Ptr:= @Buf[1];
+      for i:= 1 to NLen div 2 do
+      begin
+        if Ptr^=#9 then
+        begin
+          Result:= true;
+          Break
+        end;
+        Inc(Ptr);
+      end;
+    end
+    else
+    begin
+      for i:= 1 to NLen do
+        if Buf[i]=#9 then
+        begin
+          Result:= true;
+          Break
+        end;
     end;
-  end
+
+  if Result then
+    Value:= cLineTabYes
   else
-  begin
-    for i:= 1 to NLen do
-      if Buf[i]=#9 then exit(true);
-  end;
+    Value:= cLineTabNo;
+  Ex.HasTab:= TATBits2(Value);
 end;
 
 
@@ -722,6 +745,12 @@ function TATStrings.GetLineSep(AIndex: integer): TATLineSeparator;
 begin
   Result:= TATLineSeparator(FList.GetItem(AIndex)^.Ex.Sep);
 end;
+
+function TATStrings.GetLineHasTab(AIndex: integer): boolean;
+begin
+  Result:= FList.GetItem(AIndex)^.HasTab;
+end;
+
 
 function TATStrings.GetUndoCount: integer;
 begin
@@ -1242,32 +1271,11 @@ begin
   Result:= GetItemPtr(ALineIndex)^.CharLenWithoutSpace;
 end;
 
-function TATStrings.UpdateItemHasTab(AIndex: integer): boolean;
-var
-  Item: PATStringItem;
-  FHasTab: TATLineHasTab;
-begin
-  Item:= FList.GetItem(AIndex);
-
-  FHasTab:= TATLineHasTab(Item^.Ex.HasTab);
-  if FHasTab=cLineTabUnknown then
-  begin
-    Result:= Item^.HasTab;
-    if Result then
-      FHasTab:= cLineTabYes
-    else
-      FHasTab:= cLineTabNo;
-    Item^.Ex.HasTab:= TATBits2(FHasTab);
-  end
-  else
-    Result:= FHasTab=cLineTabYes;
-end;
-
 function TATStrings.ColumnPosToCharPos(AIndex: integer; AX: integer; ATabHelper: TATStringTabHelper): integer;
 var
   SLine: atString;
 begin
-  if not UpdateItemHasTab(AIndex) then exit(AX);
+  if not LinesHasTab[AIndex] then exit(AX);
 
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabHelper.TabSize);
@@ -1278,7 +1286,7 @@ function TATStrings.CharPosToColumnPos(AIndex: integer; AX: integer; ATabHelper:
 var
   SLine: atString;
 begin
-  if not UpdateItemHasTab(AIndex) then exit(AX);
+  if not LinesHasTab[AIndex] then exit(AX);
 
   //optimized for huge lines
   SLine:= LineSub(AIndex, 1, AX+ATabHelper.TabSize);
