@@ -6022,7 +6022,7 @@ begin
   if not FOptAutoIndent then Exit;
   if not Strings.IsIndexValid(APosY) then Exit;
 
-  StrPrev:= Copy(Strings.Lines[APosY], 1, APosX);
+  StrPrev:= Strings.LineSub(APosY, 1, APosX);
   if StrPrev='' then exit;
   NChars:= SGetIndentChars(StrPrev); //count of chars in indent
 
