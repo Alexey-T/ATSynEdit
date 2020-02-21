@@ -313,14 +313,16 @@ function TATSynEdit.DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean
   ): TATCommandResults;
 var
   Caret: TATCaretItem;
+  Strs: TATStrings;
   Str: atString;
   i: integer;
 begin
+  Strs:= Strings;
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
-    if not Strings.IsIndexValid(Caret.PosY) then Continue;
-    Str:= Strings.Lines[Caret.PosY];
+    if not Strs.IsIndexValid(Caret.PosY) then Continue;
+    Str:= Strs.Lines[Caret.PosY];
 
     //jump to prev line?
     if (Caret.PosX=0) and (AJump=cWordjumpToPrev) then
@@ -328,22 +330,22 @@ begin
       if Caret.PosY>0 then
       begin
         Dec(Caret.PosY);
-        Caret.PosX:= Strings.LinesLen[Caret.PosY];
+        Caret.PosX:= Strs.LinesLen[Caret.PosY];
       end;
     end
     else
     //jump to next line?
     if (Caret.PosX>=Length(Str)) and (AJump in [cWordjumpToNext, cWordjumpToEndOrNext]) then
     begin
-      if Caret.PosY<Strings.Count-1 then
+      if Caret.PosY<Strs.Count-1 then
       begin
         Inc(Caret.PosY);
-        Caret.PosX:= SGetIndentChars(Strings.Lines[Caret.PosY]);
+        Str:= Strs.Lines[Caret.PosY];
+        Caret.PosX:= SGetIndentChars(Str);
 
         //additional jump to word end
         if AJump=cWordjumpToEndOrNext then
         begin
-          Str:= Strings.Lines[Caret.PosY];
           Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptNonWordChars, AJumpSimple);
         end;
       end;
