@@ -73,7 +73,8 @@ type
     FStrFindUnicode: boolean;
     FRegex: TRegExpr;
     FRegexReplacer: TRegExpr;
-    FPrevProgress: integer;
+    FProgressPrev: integer;
+    FProgressDelta: integer;
     FOnProgress: TATFinderProgress;
     FOnBadRegex: TNotifyEvent;
     FOnGetToken: TATFinderGetToken;
@@ -136,6 +137,7 @@ type
     //
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean): boolean;
+    procedure InitProgress;
     procedure UpdateBuffer;
     procedure UpdateBuffer_FromText(const AText: UnicodeString);
     procedure UpdateBuffer_FromStrings(AStrings: TATStrings);
@@ -451,12 +453,11 @@ begin
   Result:= FRegexReplacer.Substitute(StrReplace);
 end;
 
-
 function TATTextFinder.IsProgressNeeded(ANewPos: integer): boolean;
 begin
-  Result:= Abs(FPrevProgress-ANewPos) >= 2000;
+  Result:= Abs(FProgressPrev-ANewPos) >= FProgressDelta;
   if Result then
-    FPrevProgress:= ANewPos;
+    FProgressPrev:= ANewPos;
 end;
 
 
@@ -472,7 +473,7 @@ begin
   if StrFind='' then exit;
 
   IndexLineMax:= Editor.Strings.Count-1;
-  FPrevProgress:= 0;
+  InitProgress;
 
   if FFragments.Count=0 then
   begin
@@ -1755,7 +1756,7 @@ begin
   SLinePartW:= ListParts[0];
   SLinePart_Len:= Length(SLinePartW);
 
-  FPrevProgress:= 0;
+  InitProgress;
   IndexLineMax:= Strs.Count-PartCount;
 
     if not OptBack then
@@ -1917,5 +1918,14 @@ begin
         end;
       end
 end;
+
+procedure TATEditorFinder.InitProgress;
+begin
+  if Assigned(Editor) and not OptRegex then
+    FProgressDelta:= Max(Editor.Strings.Count div 20, 2)
+  else
+    FProgressDelta:= 100;
+end;
+
 
 end.
