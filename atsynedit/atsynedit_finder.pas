@@ -1762,7 +1762,7 @@ begin
     //forward search
       for IndexLine:= APosStart.Y to APosEnd.Y do
       begin
-        if Strs.LinesLen[IndexLine]=0 then Continue;
+        if Strs.LinesLen[IndexLine]<Length(SFind) then Continue;
 
         if FStrFindUnicode then
           if Strs.LinesAscii[IndexLine] then Continue;
@@ -1838,7 +1838,7 @@ begin
     //backward search
       for IndexLine:= APosStart.Y downto APosEnd.Y do
       begin
-        if Strs.LinesLen[IndexLine]=0 then Continue;
+        if Strs.LinesLen[IndexLine]<Length(SFind) then Continue;
 
         if FStrFindUnicode then
           if Strs.LinesAscii[IndexLine] then Continue;
