@@ -4161,22 +4161,24 @@ end;
 
 procedure TATSynEdit.DoPaintLockedWarning(C: TCanvas);
 const
-  cRectWidth = 300;
-  cRectHeight = 10;
-  cOrigX = 20;
-  cOrigY = 20;
+  cBitmapX = 20;
+  cBitmapY = 20;
   cRectX = 85;
   cRectY = 40;
+  cRectWidth = 300;
+  cRectHeight = 10;
 var
   NValue: integer;
+  Bmp: TGraphic;
 begin
-  C.Brush.Color:= FColorBG;
+  C.Brush.Color:= Colors.TextDisabledBG;
   C.FillRect(ClientRect);
 
   if Strings.ProgressKind<>cStringsProgressSaving then
-    C.Draw(cOrigX, cOrigY, cBitmapWait)
+    Bmp:= cBitmapWait
   else
-    C.Draw(cOrigX, cOrigY, cBitmapSaving);
+    Bmp:= cBitmapSaving;
+  C.Draw(cBitmapX, cBitmapY, Bmp);
 
   NValue:= Strings.ProgressValue;
   if NValue>0 then
