@@ -143,11 +143,11 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   );
 
 procedure DoPaintUnprintedEol(C: TCanvas;
-  const AStrEol: atString;
+  const AText: atString;
   APoint: TPoint;
   ACharSize: TPoint;
   AColorFont, AColorBG: TColor;
-  ADetails: boolean);
+  ADetailedEnds: boolean);
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
   ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer; inline;
@@ -386,17 +386,17 @@ begin
 end;
 
 procedure DoPaintUnprintedEol(C: TCanvas;
-  const AStrEol: atString;
+  const AText: atString;
   APoint: TPoint;
   ACharSize: TPoint;
   AColorFont, AColorBG: TColor;
-  ADetails: boolean);
+  ADetailedEnds: boolean);
 var
   NPrevSize: integer;
 begin
-  if AStrEol='' then Exit;
+  if AText='' then Exit;
 
-  if ADetails then
+  if ADetailedEnds then
   begin
     NPrevSize:= C.Font.Size;
     C.Font.Size:= C.Font.Size * OptUnprintedEndFontScale div 100;
@@ -405,7 +405,7 @@ begin
     C.TextOut(
       APoint.X+OptUnprintedEndFontDx,
       APoint.Y+OptUnprintedEndFontDy,
-      AStrEol);
+      AText);
     C.Font.Size:= NPrevSize;
   end
   else
