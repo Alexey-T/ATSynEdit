@@ -2685,17 +2685,19 @@ begin
 
     //don't update FLineBottom if minimap paints
     if AMainText then
+    begin
       FLineBottom:= NLinesIndex;
 
-    if IsFoldLineNeededBeforeWrapitem(NWrapIndex) then
-    begin
-      NCoordSep:= NCoordTop-1;
-      C.Pen.Color:= Colors.CollapseLine;
-      C.Line(
-        ARect.Left+FFoldUnderlineOffset,
-        NCoordSep,
-        ARect.Right-FFoldUnderlineOffset,
-        NCoordSep);
+      if IsFoldLineNeededBeforeWrapitem(NWrapIndex) then
+      begin
+        NCoordSep:= NCoordTop-1;
+        C.Pen.Color:= Colors.CollapseLine;
+        C.Line(
+          ARect.Left+FFoldUnderlineOffset,
+          NCoordSep,
+          ARect.Right-FFoldUnderlineOffset,
+          NCoordSep);
+      end;
     end;
 
     //prepare line
