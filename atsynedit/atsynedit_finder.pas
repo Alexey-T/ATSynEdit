@@ -1759,6 +1759,11 @@ begin
     //forward search
       for IndexLine:= APosStart.Y to APosEnd.Y do
       begin
+        if Editor.Strings.LinesLen[IndexLine]=0 then Continue;
+
+        if FStrFindUnicode then
+          if Editor.Strings.LinesAscii[IndexLine] then Continue;
+
         if IsProgressNeeded(IndexLine) then
           if Assigned(FOnProgress) then
           begin
@@ -1767,9 +1772,6 @@ begin
             FOnProgress(Self, IndexLine, IndexLineMax, bOk);
             if not bOk then Break;
           end;
-
-        if FStrFindUnicode then
-          if Editor.Strings.LinesAscii[IndexLine] then Continue;
 
         SLineLoopedW:= Editor.Strings.Lines[IndexLine];
         SLineLooped_Len:= Length(SLineLoopedW);
@@ -1833,6 +1835,11 @@ begin
     //backward search
       for IndexLine:= APosStart.Y downto APosEnd.Y do
       begin
+        if Editor.Strings.LinesLen[IndexLine]=0 then Continue;
+
+        if FStrFindUnicode then
+          if Editor.Strings.LinesAscii[IndexLine] then Continue;
+
         if IsProgressNeeded(IndexLine) then
           if Assigned(FOnProgress) then
           begin
@@ -1841,9 +1848,6 @@ begin
             FOnProgress(Self, IndexLineMax-IndexLine, IndexLineMax, bOk);
             if not bOk then Break;
           end;
-
-        if FStrFindUnicode then
-          if Editor.Strings.LinesAscii[IndexLine] then Continue;
 
         SLineLoopedW:= Editor.Strings.Lines[IndexLine];
         SLineLooped_Len:= Length(SLineLoopedW);
