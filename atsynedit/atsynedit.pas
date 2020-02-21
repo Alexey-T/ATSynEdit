@@ -2710,6 +2710,7 @@ begin
     //prepare line
     NOutputCharsSkipped:= 0;
     NOutputSpacesSkipped:= 0;
+    NOutputStrWidth:= 0;
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
