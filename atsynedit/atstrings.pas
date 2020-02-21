@@ -1772,17 +1772,17 @@ end;
 
 function TATStrings.IsPosFolded(AX, AY, AIndexClient: integer): boolean;
 var
-  ValueHidden: boolean;
   ValueFoldFrom: integer;
 begin
-  Result:= true;
+  Result:= false;
   if not IsIndexValid(AY) then Exit;
 
-  ValueHidden:= LinesHidden[AY, AIndexClient];
+  if LinesHidden[AY, AIndexClient] then
+    Exit(true);
+
   ValueFoldFrom:= LinesFoldFrom[AY, AIndexClient];
-  if ValueHidden then Exit;
-  if (ValueFoldFrom>0) and (AX>=ValueFoldFrom) then Exit;
-  Result:= false;
+  if (ValueFoldFrom>0) and (AX>=ValueFoldFrom) then
+    Exit(true);
 end;
 
 procedure TATStrings.LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
