@@ -1929,6 +1929,13 @@ begin
 
   NLen:= AStrings.LinesLen[ALineIndex];
 
+  if NLen=0 then
+  begin
+    WrapItem.Init(ALineIndex, 1, 0, 0, cWrapItemFinal, true);
+    AItems.Add(WrapItem);
+    Exit;
+  end;
+
   //consider fold, before wordwrap
   if AConsiderFolding then
   begin
