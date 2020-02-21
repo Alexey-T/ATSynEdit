@@ -70,6 +70,7 @@ type
     FMatchLen: integer;
     FStrFind: UnicodeString;
     FStrReplace: UnicodeString;
+    FStrFindUnicode: boolean;
     FRegex: TRegExpr;
     FRegexReplacer: TRegExpr;
     FPrevProgress: integer;
@@ -363,6 +364,7 @@ procedure TATTextFinder.SetStrFind(const AValue: UnicodeString);
 begin
   if FStrFind=AValue then Exit;
   FStrFind:= AValue;
+  FStrFindUnicode:= IsStringWithUnicode(AValue);
   ClearMatchPos;
 end;
 
@@ -1766,6 +1768,9 @@ begin
             if not bOk then Break;
           end;
 
+        if FStrFindUnicode then
+          if Editor.Strings.LinesAscii[IndexLine] then Continue;
+
         SLineLoopedW:= Editor.Strings.Lines[IndexLine];
         SLineLooped_Len:= Length(SLineLoopedW);
 
@@ -1836,6 +1841,9 @@ begin
             FOnProgress(Self, IndexLineMax-IndexLine, IndexLineMax, bOk);
             if not bOk then Break;
           end;
+
+        if FStrFindUnicode then
+          if Editor.Strings.LinesAscii[IndexLine] then Continue;
 
         SLineLoopedW:= Editor.Strings.Lines[IndexLine];
         SLineLooped_Len:= Length(SLineLoopedW);
