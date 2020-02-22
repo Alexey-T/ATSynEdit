@@ -49,12 +49,24 @@ var
   N: Longint;
 begin
   if Color=clNone then
-    begin Result:= ''; exit end;
+    exit('');
   N:= ColorToRGB(Color);
   Result:= '#'+
     IntToHex(Red(N), 2)+
     IntToHex(Green(N), 2)+
     IntToHex(Blue(N), 2);
+end;
+
+function HexDigitToInt(ch: char): integer;
+begin
+  case ch of
+    '0'..'9':
+      Result:= Ord(ch)-Ord('0');
+    'a'..'f':
+      Result:= Ord(ch)-Ord('a')+10;
+    'A'..'F':
+      Result:= Ord(ch)-Ord('A')+10;
+  end;
 end;
 
 function SHtmlColorToColor(s: string; out Len: integer; Default: TColor): TColor;
@@ -81,15 +93,15 @@ begin
 
   if Len=6 then
   begin
-    N1:= StrToInt('$'+Copy(s, 1, 2));
-    N2:= StrToInt('$'+Copy(s, 3, 2));
-    N3:= StrToInt('$'+Copy(s, 5, 2));
+    N1:= HexDigitToInt(s[1])*16 + HexDigitToInt(s[2]);
+    N2:= HexDigitToInt(s[3])*16 + HexDigitToInt(s[4]);
+    N3:= HexDigitToInt(s[5])*16 + HexDigitToInt(s[6]);
   end
   else
   begin
-    N1:= StrToInt('$'+s[1]+s[1]);
-    N2:= StrToInt('$'+s[2]+s[2]);
-    N3:= StrToInt('$'+s[3]+s[3]);
+    N1:= HexDigitToInt(s[1])*17;
+    N2:= HexDigitToInt(s[2])*17;
+    N3:= HexDigitToInt(s[3])*17;
   end;
 
   Result:= RGBToColor(N1, N2, N3);
