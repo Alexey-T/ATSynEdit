@@ -2753,7 +2753,7 @@ begin
         StrOutput:= Strings.LineSub(
           NLinesIndex,
           WrapItem.NCharIndex + NOutputCharsSkipped,
-          GetVisibleColumns+AScrollHorz.NPos+1+6
+          Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6)
             //+1 because of NPixelOffset
             //+6 because of HTML color underlines
           );
