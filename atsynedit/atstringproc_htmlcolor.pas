@@ -13,8 +13,9 @@ uses
 
 //convert TColor -> HTML color string #rrggbb
 function SColorToHtmlColor(Color: TColor): string;
+
 //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
-function SHtmlColorToColor(s: string; out Len: integer; Default: TColor): TColor;
+function SHtmlColorToColor(const s: string; out Len: integer; Default: TColor): TColor;
 
 
 implementation
@@ -71,42 +72,42 @@ begin
   end;
 end;
 
-function SHtmlColorToColor(s: string; out Len: integer; Default: TColor): TColor;
+function SHtmlColorToColor(const s: string; out Len: integer; Default: TColor): TColor;
 var
   N1, N2, N3: integer;
-  i: integer;
+  Offset: integer;
 begin
   Result:= Default;
-  Len:= 0;
-  if (s<>'') and (s[1]='#') then Delete(s, 1, 1);
-  if (s='') then exit;
+  if s='' then Exit;
 
-  //delete after first nonword char
-  i:= 1;
-  while (i<=Length(s)) and IsCharWord(s[i]) do Inc(i);
-  Delete(s, i, Maxint);
+  Len:= 0;
+  Offset:= 0;
+  if s[1]='#' then
+    Inc(Offset);
+
+  repeat
+    if Offset+Len>=Length(s) then Break;
+    Inc(Len);
+    if Len>6 then Exit;
+    if not IsCharHex(s[Offset+Len]) then Exit;
+  until false;
 
   //allow only #rgb, #rrggbb
-  Len:= Length(s);
-  if (Len<>3) and (Len<>6) then exit;
-
-  for i:= 1 to Len do
-    if not IsCharHex(s[i]) then exit;
-
   if Len=6 then
   begin
-    N1:= HexDigitToInt(s[1])*16 + HexDigitToInt(s[2]);
-    N2:= HexDigitToInt(s[3])*16 + HexDigitToInt(s[4]);
-    N3:= HexDigitToInt(s[5])*16 + HexDigitToInt(s[6]);
+    N1:= HexDigitToInt(s[Offset+1])*16 + HexDigitToInt(s[Offset+2]);
+    N2:= HexDigitToInt(s[Offset+3])*16 + HexDigitToInt(s[Offset+4]);
+    N3:= HexDigitToInt(s[Offset+5])*16 + HexDigitToInt(s[Offset+6]);
+    Result:= RGBToColor(N1, N2, N3);
   end
   else
+  if Len=3 then
   begin
-    N1:= HexDigitToInt(s[1])*17;
-    N2:= HexDigitToInt(s[2])*17;
-    N3:= HexDigitToInt(s[3])*17;
+    N1:= HexDigitToInt(s[Offset+1])*17;
+    N2:= HexDigitToInt(s[Offset+2])*17;
+    N3:= HexDigitToInt(s[Offset+3])*17;
+    Result:= RGBToColor(N1, N2, N3);
   end;
-
-  Result:= RGBToColor(N1, N2, N3);
 end;
 
 
