@@ -66,6 +66,8 @@ begin
       Result:= Ord(ch)-Ord('a')+10;
     'A'..'F':
       Result:= Ord(ch)-Ord('A')+10;
+    else
+      Result:= 0;
   end;
 end;
 
