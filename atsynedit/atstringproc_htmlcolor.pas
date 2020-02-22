@@ -20,20 +20,7 @@ function SHtmlColorToColor(const s: string; out Len: integer; Default: TColor): 
 
 implementation
 
-function IsCharWord(ch: char): boolean;
-begin
-  case ch of
-    'a'..'z',
-    'A'..'Z',
-    '_',
-    '0'..'9':
-      Result:= true;
-    else
-      Result:= false
-  end;
-end;
-
-function IsCharHex(ch: char): boolean;
+function IsCharHex(ch: char): boolean; inline;
 begin
   case ch of
     '0'..'9',
