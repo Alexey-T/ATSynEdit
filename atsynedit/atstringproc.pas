@@ -123,10 +123,14 @@ type
   end;
 
 function IsCharEol(ch: widechar): boolean; inline;
+function IsCharEol(ch: char): boolean; inline;
 function IsCharWord(ch: widechar; const ANonWordChars: atString): boolean;
+function IsCharWord(ch: char): boolean;
 function IsCharWordInIdentifier(ch: widechar): boolean;
 function IsCharDigit(ch: widechar): boolean; inline;
+function IsCharDigit(ch: char): boolean; inline;
 function IsCharSpace(ch: widechar): boolean; inline;
+function IsCharSpace(ch: char): boolean; inline;
 function IsCharSymbol(ch: widechar): boolean;
 function IsCharHex(ch: widechar): boolean; inline;
 function IsCharHex(ch: char): boolean; inline;
@@ -210,6 +214,11 @@ begin
   Result:= (ch=#10) or (ch=#13);
 end;
 
+function IsCharEol(ch: char): boolean; inline;
+begin
+  Result:= (ch=#10) or (ch=#13);
+end;
+
 function IsCharWord(ch: widechar; const ANonWordChars: atString): boolean;
 var
   NType: byte;
@@ -239,6 +248,20 @@ begin
   end;
 end;
 
+function IsCharWord(ch: char): boolean;
+begin
+  case ch of
+    '0'..'9',
+    'a'..'z',
+    'A'..'Z',
+    '_':
+      exit(true);
+    else
+      exit(false);
+  end;
+end;
+
+
 function IsCharWordInIdentifier(ch: widechar): boolean;
 begin
   case ch of
@@ -253,6 +276,11 @@ begin
 end;
 
 function IsCharDigit(ch: widechar): boolean; inline;
+begin
+  Result:= (ch>='0') and (ch<='9');
+end;
+
+function IsCharDigit(ch: char): boolean; inline;
 begin
   Result:= (ch>='0') and (ch<='9');
 end;
@@ -281,7 +309,7 @@ begin
   end;
 end;
 
-function IsCharSpace(ch: widechar): boolean; inline;
+function IsCharSpace(ch: widechar): boolean;
 begin
   case ch of
     #9, //tab
@@ -294,6 +322,18 @@ begin
     #$205F, //white space
     #$2060, //white space
     #$3000: //CJK white space
+      Result:= true;
+    else
+      Result:= false;
+  end;
+end;
+
+function IsCharSpace(ch: char): boolean;
+begin
+  case ch of
+    #9, //tab
+    ' ', //space
+    #$A0: //no-break space, NBSP, often used on macOS
       Result:= true;
     else
       Result:= false;
