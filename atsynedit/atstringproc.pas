@@ -209,12 +209,12 @@ implementation
 uses
   Dialogs, Math;
 
-function IsCharEol(ch: widechar): boolean; inline;
+function IsCharEol(ch: widechar): boolean;
 begin
   Result:= (ch=#10) or (ch=#13);
 end;
 
-function IsCharEol(ch: char): boolean; inline;
+function IsCharEol(ch: char): boolean;
 begin
   Result:= (ch=#10) or (ch=#13);
 end;
@@ -275,12 +275,12 @@ begin
   end;
 end;
 
-function IsCharDigit(ch: widechar): boolean; inline;
+function IsCharDigit(ch: widechar): boolean;
 begin
   Result:= (ch>='0') and (ch<='9');
 end;
 
-function IsCharDigit(ch: char): boolean; inline;
+function IsCharDigit(ch: char): boolean;
 begin
   Result:= (ch>='0') and (ch<='9');
 end;
@@ -345,17 +345,17 @@ begin
   Result:= Pos(ch, '.,;:''"/\-+*=()[]{}<>?!@#$%^&|~`')>0;
 end;
 
-function IsCharSurrogateAny(ch: widechar): boolean; inline;
+function IsCharSurrogateAny(ch: widechar): boolean;
 begin
   Result:= (ch>=#$D800) and (ch<=#$DFFF);
 end;
 
-function IsCharSurrogateHigh(ch: widechar): boolean; inline;
+function IsCharSurrogateHigh(ch: widechar): boolean;
 begin
   Result:= (ch>=#$D800) and (ch<=#$DBFF);
 end;
 
-function IsCharSurrogateLow(ch: widechar): boolean; inline;
+function IsCharSurrogateLow(ch: widechar): boolean;
 begin
   Result:= (ch>=#$DC00) and (ch<=#$DFFF);
 end;
@@ -806,14 +806,14 @@ begin
 end;
 
 
-procedure TrimStringList(L: TStringList); inline;
+procedure TrimStringList(L: TStringList);
 begin
   //dont do "while", we need correct last empty lines
   if (L.Count>0) and (L[L.Count-1]='') then
     L.Delete(L.Count-1);
 end;
 
-function SWithBreaks(const S: atString): boolean; inline;
+function SWithBreaks(const S: atString): boolean;
 begin
   Result:=
     (Pos(#13, S)>0) or
@@ -857,12 +857,12 @@ begin
   Result:= AColumn - size + Length(S);
 end;
 
-function SStringHasTab(const S: atString): boolean; inline;
+function SStringHasTab(const S: atString): boolean;
 begin
   Result:= Pos(#9, S)>0;
 end;
 
-function SStringHasTab(const S: string): boolean; inline;
+function SStringHasTab(const S: string): boolean;
 begin
   Result:= Pos(#9, S)>0;
 end;
@@ -1001,7 +1001,7 @@ begin
   Result:= true;
 end;
 
-function SBeginsWith(const S, SubStr: string): boolean; inline;
+function SBeginsWith(const S, SubStr: string): boolean;
 var
   i: integer;
 begin
@@ -1176,7 +1176,7 @@ begin
 end;
 
 
-procedure SReplaceAll(var S: string; const SFrom, STo: string); inline;
+procedure SReplaceAll(var S: string; const SFrom, STo: string);
 begin
   S:= StringReplace(S, SFrom, STo, [rfReplaceAll]);
 end;
@@ -1192,7 +1192,7 @@ begin
   SReplaceAll(S, '%'+IntToHex(i, 2), Chr(i));
 end;
 
-procedure SReplaceAllTabsToOneSpace(var S: string); inline;
+procedure SReplaceAllTabsToOneSpace(var S: string);
 var
   i: integer;
 begin
@@ -1201,7 +1201,7 @@ begin
       S[i]:= ' ';
 end;
 
-procedure SReplaceAllTabsToOneSpace(var S: UnicodeString); inline;
+procedure SReplaceAllTabsToOneSpace(var S: UnicodeString);
 var
   i: integer;
 begin
@@ -1210,7 +1210,7 @@ begin
       S[i]:= ' ';
 end;
 
-procedure SDeleteFrom(var s: string; const SFrom: string); inline;
+procedure SDeleteFrom(var s: string; const SFrom: string);
 var
   n: integer;
 begin
@@ -1219,7 +1219,7 @@ begin
     SetLength(S, n-1);
 end;
 
-procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString); inline;
+procedure SDeleteFrom(var s: UnicodeString; const SFrom: UnicodeString);
 var
   n: integer;
 begin
@@ -1323,7 +1323,7 @@ begin
 end;
 
 
-function EditorScale(AValue: integer): integer; inline;
+function EditorScale(AValue: integer): integer;
 begin
   Result:= AValue * EditorScalePercents div 100;
 end;
