@@ -49,7 +49,11 @@ begin
   repeat
     ch:= s[Len];
     if ch=#0 then Break;
-    if not IsCharHex(ch) then Break;
+    if not IsCharHex(ch) then
+      if IsCharWord(ch) then
+        Exit
+      else
+        Break;
     Inc(Len);
     if Len>6 then Exit;
   until false;
