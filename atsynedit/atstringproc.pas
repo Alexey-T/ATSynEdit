@@ -186,7 +186,6 @@ const
 type
   TATDecodeRec = record SFrom, STo: UnicodeString; end;
 function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;
-function SConvertUtf8ToWideForAscii(const S: string): UnicodeString;
 
 procedure SReplaceAll(var S: string; const SFrom, STo: string); inline;
 procedure SReplaceAllPercentChars(var S: string);
@@ -1299,26 +1298,6 @@ begin
   {$ENDIF}
 end;
 
-
-//function posted by user "mse" at Laz forum
-function SConvertUtf8ToWideForAscii(const S: string): UnicodeString;
-var
-  PStart, PEnd: PByte;
-  PDest: PWord;
-  NLen: integer;
-begin
-  NLen:= Length(S);
-  SetLength(Result, NLen);
-  PStart:= Pointer(S);
-  PEnd:= PStart+NLen;
-  PDest:= Pointer(Result);
-  while PStart<PEnd do
-  begin
-    PDest^:= PStart^;
-    Inc(PStart);
-    Inc(PDest);
-  end;
-end;
 
 function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
 var
