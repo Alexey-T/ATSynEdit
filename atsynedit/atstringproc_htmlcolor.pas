@@ -65,18 +65,19 @@ var
   ch: char;
 begin
   Result:= Default;
-  if s^=#0 then Exit;
+  if s=nil then Exit;
 
-  Len:= 0;
   if s^='#' then
     Inc(s);
 
+  //must handle string longer than needed, with additional chars
+  Len:= 0;
   repeat
     ch:= s[Len];
     if ch=#0 then Break;
-    if not IsCharHex(ch) then Exit;
+    if not IsCharHex(ch) then Break;
     Inc(Len);
-    if Len>6 then Exit;
+    if Len>=6 then Break;
   until false;
 
   //allow only #rgb, #rrggbb
