@@ -125,7 +125,7 @@ type
 function IsCharEol(ch: widechar): boolean; inline;
 function IsCharEol(ch: char): boolean; inline;
 function IsCharWord(ch: widechar; const ANonWordChars: atString): boolean;
-function IsCharWord(ch: char): boolean;
+function IsCharWordA(ch: char): boolean;
 function IsCharWordInIdentifier(ch: widechar): boolean;
 function IsCharDigit(ch: widechar): boolean; inline;
 function IsCharDigit(ch: char): boolean; inline;
@@ -248,7 +248,7 @@ begin
   end;
 end;
 
-function IsCharWord(ch: char): boolean;
+function IsCharWordA(ch: char): boolean;
 begin
   case ch of
     '0'..'9',
