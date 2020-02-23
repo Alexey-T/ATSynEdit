@@ -128,6 +128,9 @@ function IsCharWordInIdentifier(ch: widechar): boolean;
 function IsCharDigit(ch: widechar): boolean; inline;
 function IsCharSpace(ch: widechar): boolean; inline;
 function IsCharSymbol(ch: widechar): boolean;
+function IsCharHex(ch: widechar): boolean; inline;
+function IsCharHex(ch: char): boolean; inline;
+function HexDigitToInt(ch: char): integer;
 
 function IsCharSurrogateAny(ch: widechar): boolean; inline;
 function IsCharSurrogateHigh(ch: widechar): boolean; inline;
@@ -252,6 +255,30 @@ end;
 function IsCharDigit(ch: widechar): boolean; inline;
 begin
   Result:= (ch>='0') and (ch<='9');
+end;
+
+function IsCharHex(ch: widechar): boolean;
+begin
+  case ch of
+    '0'..'9',
+    'a'..'f',
+    'A'..'F':
+      Result:= true
+    else
+      Result:= false;
+  end;
+end;
+
+function IsCharHex(ch: char): boolean;
+begin
+  case ch of
+    '0'..'9',
+    'a'..'f',
+    'A'..'F':
+      Result:= true
+    else
+      Result:= false;
+  end;
 end;
 
 function IsCharSpace(ch: widechar): boolean; inline;
@@ -1441,6 +1468,21 @@ begin
       exit(true);
   Result:= false;
 end;
+
+function HexDigitToInt(ch: char): integer;
+begin
+  case ch of
+    '0'..'9':
+      Result:= Ord(ch)-Ord('0');
+    'a'..'f':
+      Result:= Ord(ch)-Ord('a')+10;
+    'A'..'F':
+      Result:= Ord(ch)-Ord('A')+10;
+    else
+      Result:= 0;
+  end;
+end;
+
 
 end.
 

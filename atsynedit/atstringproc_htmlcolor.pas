@@ -9,7 +9,8 @@ unit ATStringProc_HtmlColor;
 interface
 
 uses
-  Classes, SysUtils, Graphics;
+  Classes, SysUtils, Graphics,
+  ATStringProc;
 
 //convert TColor -> HTML color string #rrggbb
 function SColorToHtmlColor(Color: TColor): string;
@@ -17,21 +18,7 @@ function SColorToHtmlColor(Color: TColor): string;
 //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
 function SHtmlColorToColor(s: PChar; out Len: integer; Default: TColor): TColor;
 
-function IsCharHex(ch: char): boolean; inline;
-
 implementation
-
-function IsCharHex(ch: char): boolean;
-begin
-  case ch of
-    '0'..'9',
-    'a'..'f',
-    'A'..'F':
-      Result:= true
-    else
-      Result:= false;
-  end;
-end;
 
 function SColorToHtmlColor(Color: TColor): string;
 var
@@ -44,20 +31,6 @@ begin
     IntToHex(Red(N), 2)+
     IntToHex(Green(N), 2)+
     IntToHex(Blue(N), 2);
-end;
-
-function HexDigitToInt(ch: char): integer;
-begin
-  case ch of
-    '0'..'9':
-      Result:= Ord(ch)-Ord('0');
-    'a'..'f':
-      Result:= Ord(ch)-Ord('a')+10;
-    'A'..'F':
-      Result:= Ord(ch)-Ord('A')+10;
-    else
-      Result:= 0;
-  end;
 end;
 
 function SHtmlColorToColor(s: PChar; out Len: integer; Default: TColor): TColor;
@@ -78,7 +51,7 @@ begin
     if ch=#0 then Break;
     if not IsCharHex(ch) then Break;
     Inc(Len);
-    if Len>=6 then Break;
+    if Len>6 then Exit;
   until false;
 
   //allow only #rgb, #rrggbb
