@@ -132,7 +132,7 @@ begin
   //------------------
   //Insert single line
 
-  if not SWithBreaks(AText) then
+  if not SStringHasEol(AText) then
   begin
     Lines[AY]:= StrLead+AText+StrTail;
     if not AOverwrite then

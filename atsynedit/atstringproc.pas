@@ -161,6 +161,8 @@ function SGetIndentCharsToOpeningBracket(const S: atString): integer;
 function SGetTrailingSpaceChars(const S: atString): integer;
 function SGetNonSpaceLength(const S: atString): integer;
 
+function SStringHasEol(const S: atString): boolean; inline;
+function SStringHasEol(const S: string): boolean; inline;
 function SStringHasTab(const S: atString): boolean; inline;
 function SStringHasTab(const S: string): boolean; inline;
 function SStringHasAsciiAndNoTabs(const S: atString): boolean;
@@ -173,7 +175,6 @@ function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): at
 function SGetItem(var S: string; const ch: Char = ','): string;
 procedure SSwapEndianWide(var S: UnicodeString);
 procedure SSwapEndianUCS4(var S: UCS4String); inline;
-function SWithBreaks(const S: atString): boolean; inline;
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
 
 function BoolToPlusMinusOne(b: boolean): integer; inline;
@@ -813,11 +814,18 @@ begin
     L.Delete(L.Count-1);
 end;
 
-function SWithBreaks(const S: atString): boolean;
+function SStringHasEol(const S: atString): boolean;
 begin
   Result:=
-    (Pos(#13, S)>0) or
-    (Pos(#10, S)>0);
+    (Pos(#10, S)>0) or
+    (Pos(#13, S)>0);
+end;
+
+function SStringHasEol(const S: string): boolean;
+begin
+  Result:=
+    (Pos(#10, S)>0) or
+    (Pos(#13, S)>0);
 end;
 
 function TATStringTabHelper.SpacesToTabs(ALineIndex: integer; const S: atString): atString;
