@@ -168,9 +168,6 @@ uses
   LCLType,
   LCLIntf;
 
-type
-  TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
-
 function SRemoveHexDisplayedChars(const S: UnicodeString): UnicodeString;
 var
   i: integer;
