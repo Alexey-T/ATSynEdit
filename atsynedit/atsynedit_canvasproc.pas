@@ -357,7 +357,7 @@ begin
   if AString='' then Exit;
 
   for i:= 1 to Length(AString) do
-    if IsCharHex(AString[i]) then
+    if IsCharHexDisplayed(AString[i]) then
     begin
       R.Left:= APoint.X;
       R.Right:= APoint.X;

@@ -132,8 +132,8 @@ function IsCharDigit(ch: char): boolean; inline;
 function IsCharSpace(ch: widechar): boolean; inline;
 function IsCharSpace(ch: char): boolean; inline;
 function IsCharSymbol(ch: widechar): boolean;
-function IsCharHex(ch: widechar): boolean; inline;
-function IsCharHex(ch: char): boolean; inline;
+function IsCharHexDigit(ch: widechar): boolean; inline;
+function IsCharHexDigit(ch: char): boolean; inline;
 function HexDigitToInt(ch: char): integer;
 
 function IsCharSurrogateAny(ch: widechar): boolean; inline;
@@ -285,7 +285,7 @@ begin
   Result:= (ch>='0') and (ch<='9');
 end;
 
-function IsCharHex(ch: widechar): boolean;
+function IsCharHexDigit(ch: widechar): boolean;
 begin
   case ch of
     '0'..'9',
@@ -297,7 +297,7 @@ begin
   end;
 end;
 
-function IsCharHex(ch: char): boolean;
+function IsCharHexDigit(ch: char): boolean;
 begin
   case ch of
     '0'..'9',
@@ -964,7 +964,7 @@ var
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
-    if IsCharHex(Result[i]) then
+    if IsCharHexDisplayed(Result[i]) then
       Result[i]:= '?';
 end;
 

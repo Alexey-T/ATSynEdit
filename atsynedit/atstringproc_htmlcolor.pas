@@ -49,7 +49,7 @@ begin
   repeat
     ch:= s[Len];
     if ch=#0 then Break;
-    if not IsCharHex(ch) then
+    if not IsCharHexDigit(ch) then
       if IsCharWordA(ch) then
         Exit
       else

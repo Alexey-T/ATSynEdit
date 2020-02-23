@@ -63,7 +63,7 @@ var
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
 function IsCharAccent(ch: WideChar): boolean; inline;
-function IsCharHex(ch: WideChar): boolean;
+function IsCharHexDisplayed(ch: WideChar): boolean;
 
 
 implementation
@@ -92,7 +92,7 @@ end;
 http://unicode.org/reports/tr9/#Directional_Formatting_Characters
 https://en.wikipedia.org/wiki/Whitespace_character#Unicode
 }
-function IsCharHex(ch: WideChar): boolean;
+function IsCharHexDisplayed(ch: WideChar): boolean;
 begin
   if ch=#9 then exit(false);
   if ch<#$20 then exit(true);
@@ -198,7 +198,7 @@ begin
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
 
-  if IsCharHex(ch) then
+  if IsCharHexDisplayed(ch) then
   begin
     if Ord(ch)<$100 then
       exit(OptCharScaleHex_Small)
