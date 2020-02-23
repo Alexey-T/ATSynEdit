@@ -9,7 +9,7 @@ unit ATStrings_Undo;
 interface
 
 uses
-  Classes, SysUtils, StrUtils,
+  Classes, SysUtils,
   ATStringProc;
 
 type

@@ -255,7 +255,7 @@ type
     destructor Destroy; override;
     procedure Clear;
     procedure ClearSeparators;
-    function Count: integer; inline;
+    function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
     function IsLastLineFake: boolean;
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;

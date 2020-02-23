@@ -136,7 +136,7 @@ var
   i: integer;
 begin
   Result:= false;
-  for i:= Count-1 downto 0 do
+  for i:= FList.Count-1 downto 0 do
     if FList.ItemPtr(i)^.Data.Tag=ATag then
     begin
       Result:= true;
@@ -144,12 +144,12 @@ begin
     end;
 end;
 
-function TATGutterDecor.Count: integer; inline;
+function TATGutterDecor.Count: integer;
 begin
   Result:= FList.Count;
 end;
 
-function TATGutterDecor.IsIndexValid(N: integer): boolean; inline;
+function TATGutterDecor.IsIndexValid(N: integer): boolean;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
