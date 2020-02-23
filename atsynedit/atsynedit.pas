@@ -831,14 +831,14 @@ type
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     function GetUndoLimit: integer;
-    procedure InitAttribs; inline;
-    procedure InitMarkers; inline;
-    procedure InitHotspots; inline;
-    procedure InitDimRanges; inline;
-    procedure InitGutterDecor; inline;
-    procedure InitMarkedRange; inline;
+    procedure InitAttribs;
+    procedure InitMarkers;
+    procedure InitHotspots;
+    procedure InitDimRanges;
+    procedure InitGutterDecor;
+    procedure InitMarkedRange;
     procedure InitMinimapTooltip;
-    procedure InitFoldedMarkList; inline;
+    procedure InitFoldedMarkList;
     procedure InitFoldedMarkTooltip;
     procedure InitFoldImageList;
     procedure InitMenuStd;
@@ -846,7 +846,7 @@ type
     procedure MenuClick(Sender: TObject);
     procedure MenuStdPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
-      AItems: TATWrapItems; AConsiderFolding: boolean); inline;
+      AItems: TATWrapItems; AConsiderFolding: boolean);
     procedure DoCalcLineHilite(const AData: TATWrapItem;
       var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
@@ -865,7 +865,7 @@ type
     procedure DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
-    procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem); inline;
+    procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
     procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
     procedure DoPaintRulerTo(C: TCanvas);
     procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
@@ -950,12 +950,12 @@ type
     procedure SetLinesFromTop(AValue: integer);
     procedure SetRedoAsString(const AValue: string);
     procedure SetStrings(Obj: TATStrings);
-    procedure GetRectMain(var R: TRect);
-    procedure GetRectMinimap(var R: TRect);
-    procedure GetRectMinimapSel(var R: TRect);
-    procedure GetRectMicromap(var R: TRect);
-    procedure GetRectGutter(var R: TRect);
-    procedure GetRectRuler(var R: TRect);
+    procedure GetRectMain(out R: TRect);
+    procedure GetRectMinimap(out R: TRect);
+    procedure GetRectMinimapSel(out R: TRect);
+    procedure GetRectMicromap(out R: TRect);
+    procedure GetRectGutter(out R: TRect);
+    procedure GetRectRuler(out R: TRect);
     function GetTextOffset: TPoint;
     function GetPageLines: integer;
     function GetMinimapScrollPos: integer;
@@ -1997,7 +1997,7 @@ end;
 
 
 procedure TATSynEdit.DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer; AItems: TATWrapItems;
-  AConsiderFolding: boolean); inline;
+  AConsiderFolding: boolean);
 begin
   _CalcWrapInfos(
     Strings,
@@ -2271,7 +2271,7 @@ begin
   {$endif}
 end;
 
-procedure TATSynEdit.GetRectMain(var R: TRect);
+procedure TATSynEdit.GetRectMain(out R: TRect);
 begin
   R.Left:= FRectGutter.Left + FTextOffset.X;
   R.Top:= FTextOffset.Y;
@@ -2289,7 +2289,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.GetRectMinimap(var R: TRect);
+procedure TATSynEdit.GetRectMinimap(out R: TRect);
 begin
   if not FMinimapVisible then
   begin
@@ -2307,7 +2307,7 @@ begin
   R.Bottom:= ClientHeight;
 end;
 
-procedure TATSynEdit.GetRectMinimapSel(var R: TRect);
+procedure TATSynEdit.GetRectMinimapSel(out R: TRect);
 begin
   R.Left:= FRectMinimap.Left;
   R.Right:= FRectMinimap.Right;
@@ -2318,7 +2318,7 @@ begin
     );
 end;
 
-procedure TATSynEdit.GetRectMicromap(var R: TRect);
+procedure TATSynEdit.GetRectMicromap(out R: TRect);
 var
   NSize: integer;
 begin
@@ -2339,7 +2339,7 @@ begin
   FMicromapScaleDiv:= Max(1, Strings.Count);
 end;
 
-procedure TATSynEdit.GetRectGutter(var R: TRect);
+procedure TATSynEdit.GetRectGutter(out R: TRect);
 begin
   R.Left:= IfThen(FMinimapVisible and FMinimapAtLeft, FMinimapWidth);
   R.Top:= IfThen(FOptRulerVisible, FRulerHeight);
@@ -2357,7 +2357,7 @@ begin
   Gutter.Update;
 end;
 
-procedure TATSynEdit.GetRectRuler(var R: TRect);
+procedure TATSynEdit.GetRectRuler(out R: TRect);
 begin
   if not FOptRulerVisible then
   begin
@@ -5690,7 +5690,7 @@ begin
       cBitmapNiceScroll);
 end;
 
-procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem); inline;
+procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
 var
   Str: string;
   Size: integer;
