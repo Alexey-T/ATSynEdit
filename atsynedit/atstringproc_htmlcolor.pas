@@ -17,10 +17,11 @@ function SColorToHtmlColor(Color: TColor): string;
 //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
 function SHtmlColorToColor(s: PChar; out Len: integer; Default: TColor): TColor;
 
+function IsCharHex(ch: char): boolean; inline;
 
 implementation
 
-function IsCharHex(ch: char): boolean; inline;
+function IsCharHex(ch: char): boolean;
 begin
   case ch of
     '0'..'9',
