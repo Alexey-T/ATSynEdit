@@ -171,6 +171,16 @@ uses
 type
   TATBorderSide = (cSideLeft, cSideRight, cSideUp, cSideDown);
 
+function SRemoveHexDisplayedChars(const S: UnicodeString): UnicodeString;
+var
+  i: integer;
+begin
+  Result:= S;
+  for i:= 1 to Length(Result) do
+    if IsCharHexDisplayed(Result[i]) then
+      Result[i]:= '?';
+end;
+
 function IsStringSymbolsOnly(const S: UnicodeString): boolean;
 var
   i, N: integer;
@@ -550,7 +560,7 @@ begin
 
   if AParts=nil then
   begin
-    Buf:= UTF8Encode(SRemoveHexChars(AText));
+    Buf:= UTF8Encode(SRemoveHexDisplayedChars(AText));
     SReplaceAllTabsToOneSpace(Buf);
     if CanvasTextOutNeedsOffsets(C, AText, AProps.NeedOffsets) then
       DxPointer:= @Dx[0]
@@ -658,7 +668,7 @@ begin
         );
       {$else}
       BufW:= PartStr;
-      Buf:= UTF8Encode(SRemoveHexChars(BufW));
+      Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
       SReplaceAllTabsToOneSpace(Buf);
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then

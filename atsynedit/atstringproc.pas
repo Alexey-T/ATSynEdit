@@ -169,7 +169,6 @@ function SStringHasAsciiAndNoTabs(const S: atString): boolean;
 function SStringHasAsciiAndNoTabs(const S: string): boolean;
 
 function SRemoveNewlineChars(const S: atString): atString;
-function SRemoveHexChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
@@ -963,16 +962,6 @@ begin
     for i:= 1 to Length(Result) do
       if IsCharAsciiControl(Result[i]) then
         Result[i]:= AReplaceChar;
-end;
-
-function SRemoveHexChars(const S: atString): atString;
-var
-  i: integer;
-begin
-  Result:= S;
-  for i:= 1 to Length(Result) do
-    if IsCharHexDisplayed(Result[i]) then
-      Result[i]:= '?';
 end;
 
 function SRemoveNewlineChars(const S: atString): atString;
