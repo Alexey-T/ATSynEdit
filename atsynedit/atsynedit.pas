@@ -304,7 +304,6 @@ const
   cSpeedScrollAutoHorz: integer = 10; //auto-scroll (drag out of control): speed x
   cSpeedScrollAutoVert: integer = 1; //... speed y
   cSpeedScrollNice: integer = 3;
-  cResizeBitmapStep = 200; //resize bitmap by N pixels step
   cSizeGutterFoldLineDx = 3;
   cSizeRulerHeightPercents = 120;
   cSizeRulerMarkSmall = 3;
@@ -1282,7 +1281,7 @@ type
 
   protected
     procedure Paint; override;
-    procedure DoOnResize; override;
+    procedure Resize; override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
     procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
@@ -4269,23 +4268,25 @@ begin
   {$endif}
 end;
 
-procedure TATSynEdit.DoOnResize;
+procedure TATSynEdit.Resize;
+const
+  cStep = 200; //resize bitmap by N pixels step
 var
   SizeX, SizeY: integer;
 begin
   inherited;
 
   if DoubleBuffered then
-  if Assigned(FBitmap) then
-  begin
-    SizeX:= (Width div cResizeBitmapStep + 1)*cResizeBitmapStep;
-    SizeY:= (Height div cResizeBitmapStep + 1)*cResizeBitmapStep;
-    if (SizeX>FBitmap.Width) or (SizeY>FBitmap.Height) then
+    if Assigned(FBitmap) then
     begin
-      FBitmap.SetSize(SizeX, SizeY);
-      FBitmap.FreeImage; //recommended, else seen black bitmap on bigsize
+      SizeX:= (Width div cStep + 1)*cStep;
+      SizeY:= (Height div cStep + 1)*cStep;
+      if (SizeX>FBitmap.Width) or (SizeY>FBitmap.Height) then
+      begin
+        FBitmap.SetSize(SizeX, SizeY);
+        FBitmap.FreeImage; //recommended, else seen black bitmap on bigsize
+      end;
     end;
-  end;
 
   if FWrapMode in [cWrapOn, cWrapAtWindowOrMargin] then
   begin
