@@ -1235,6 +1235,15 @@ type
     procedure MarkerSwap;
     procedure MarkerSelectToCaret;
     procedure MarkerDeleteToCaret;
+    //menu
+    property PopupTextDefault: TPopupMenu read FMenuStd;
+    property PopupText: TPopupMenu read FMenuText write FMenuText;
+    property PopupGutterBm: TPopupMenu read FMenuGutterBm write FMenuGutterBm;
+    property PopupGutterNum: TPopupMenu read FMenuGutterNum write FMenuGutterNum;
+    property PopupGutterFold: TPopupMenu read FMenuGutterFold write FMenuGutterFold;
+    property PopupMinimap: TPopupMenu read FMenuMinimap write FMenuMinimap;
+    property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
+    property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
     //misc
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
@@ -1326,15 +1335,6 @@ type
     property TabOrder;
     property TabStop;
     property Visible;
-    //menu
-    property PopupTextDefault: TPopupMenu read FMenuStd;
-    property PopupText: TPopupMenu read FMenuText write FMenuText;
-    property PopupGutterBm: TPopupMenu read FMenuGutterBm write FMenuGutterBm;
-    property PopupGutterNum: TPopupMenu read FMenuGutterNum write FMenuGutterNum;
-    property PopupGutterFold: TPopupMenu read FMenuGutterFold write FMenuGutterFold;
-    property PopupMinimap: TPopupMenu read FMenuMinimap write FMenuMinimap;
-    property PopupMicromap: TPopupMenu read FMenuMicromap write FMenuMicromap;
-    property PopupRuler: TPopupMenu read FMenuRuler write FMenuRuler;
     //events std
     property OnContextPopup;
     property OnDragOver;

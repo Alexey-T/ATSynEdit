@@ -1,4 +1,7 @@
 
+2020.02.24
+* change: hidden all Popup* properties (TPopupMenu) to "public" section to avoid Lazarus crash
+
 2020.02.23
 + add: much faster SHtmlColorToColor
 
