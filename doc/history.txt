@@ -1,4 +1,7 @@
 
+2020.02.23
++ add: much faster SHtmlColorToColor
+
 2020.02.21
 + add: reworked strings storage system TATStrings:
   a) it takes less memory for ASCII text lines
