@@ -176,7 +176,7 @@ begin
 
   //prepare optimization
   StringItem:= AStrings.GetItemPtr(P.Y);
-  bAsciiOnly:= not StringItem^.Ex.Wide and not StringItem^.HasTab;
+  bAsciiOnly:= StringItem^.Ex.HasAsciiNoTabs;
 
   NScrolledHorz:= AScrollHorz.NPos;
   NScrolledVert:= Max(0, AScrollVert.NPos);

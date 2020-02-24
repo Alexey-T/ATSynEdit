@@ -99,12 +99,13 @@ type
     State: TATBits2;
     Sep: TATBits2;
     HasTab: TATBits2;
-    Wide: boolean;
-    Updated: boolean;
     FoldFrom_0,
     FoldFrom_1: TATStringItem_FoldFrom;
       //0: line not folded
       //>0: line folded from this char-pos
+    Wide: boolean;
+    Updated: boolean;
+    HasAsciiNoTabs: boolean;
     Hidden_0, Hidden_1: boolean;
   end;
 
@@ -211,6 +212,7 @@ type
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
     function GetLineHasTab(AIndex: integer): boolean;
+    function GetLineHasAsciiNoTabs(AIndex: integer): boolean;
     function GetLineHidden(ALine, AClient: integer): boolean;
     function GetLineSep(AIndex: integer): TATLineSeparator;
     function GetLineState(AIndex: integer): TATLineState;
@@ -273,6 +275,7 @@ type
     property LinesEnds[Index: integer]: TATLineEnds read GetLineEnd write SetLineEnd;
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
     property LinesHasTab[Index: integer]: boolean read GetLineHasTab;
+    property LinesHasAsciiNoTabs[Index: integer]: boolean read GetLineHasAsciiNoTabs;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesUpdated[Index: integer]: boolean read GetLineUpdated write SetLineUpdated;
@@ -520,6 +523,7 @@ begin
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
+  Ex.HasAsciiNoTabs:= SStringHasAsciiAndNoTabs(S);
   Ex.Updated:= true;
 end;
 
@@ -557,6 +561,7 @@ begin
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
+  Ex.HasAsciiNoTabs:= SStringHasAsciiAndNoTabs(S);
   Ex.Updated:= true;
 end;
 
@@ -567,7 +572,6 @@ begin
 
   Ex.Ends:= TATBits2(AEnd);
   Ex.State:= TATBits2(cLineStateAdded);
-  Ex.Sep:= TATBits2(cLineSepNone);
   Ex.Updated:= true;
 end;
 
@@ -578,7 +582,6 @@ begin
 
   Ex.Ends:= TATBits2(AEnd);
   Ex.State:= TATBits2(cLineStateAdded);
-  Ex.Sep:= TATBits2(cLineSepNone);
   Ex.Updated:= true;
 end;
 
@@ -749,6 +752,11 @@ end;
 function TATStrings.GetLineHasTab(AIndex: integer): boolean;
 begin
   Result:= FList.GetItem(AIndex)^.HasTab;
+end;
+
+function TATStrings.GetLineHasAsciiNoTabs(AIndex: integer): boolean;
+begin
+  Result:= FList.GetItem(AIndex)^.Ex.HasAsciiNoTabs;
 end;
 
 
