@@ -3,9 +3,9 @@
 + add: reworked strings storage system TATStrings:
   a) it takes less memory for ASCII text lines
   b) for lines with non-ASCII chars, it takes more memory, but it works much faster, so scrolling in smoother
-+ add: must faster rendering on long lines (>2M)
-+ add: on long lines (>500), editor ignores CJK char sizes
++ add: much faster rendering at the end of huge lines (>1M)
 + add: much faster toggling Wrap mode on huge lines
++ add: on long lines (>500), editor ignores CJK char sizes
 
 2020.02.15
 + add: used Alexey Torgashin's patches to Sorokin's TRegExpr
