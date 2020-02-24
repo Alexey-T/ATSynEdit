@@ -643,7 +643,7 @@ begin
         APosY+AProps.CharSize.Y);
 
       {$ifdef windows}
-      BufW:= SRemoveHexChars(PartStr);
+      BufW:= SRemoveHexDisplayedChars(PartStr);
       SReplaceAllTabsToOneSpace(BufW);
       bAllowLigatures:=
         AProps.ShowFontLigatures
