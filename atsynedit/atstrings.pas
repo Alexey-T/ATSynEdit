@@ -97,15 +97,15 @@ type
   TATStringItemEx = bitpacked record
     Ends: TATBits2;
     State: TATBits2;
-    Sep: TATBits2;
     HasTab: TATBits2;
+    HasAsciiNoTabs: TATBits2;
     FoldFrom_0,
     FoldFrom_1: TATStringItem_FoldFrom;
       //0: line not folded
       //>0: line folded from this char-pos
     Wide: boolean;
     Updated: boolean;
-    HasAsciiNoTabs: boolean;
+    Sep: TATBits2;
     Hidden_0, Hidden_1: boolean;
   end;
 
@@ -121,6 +121,7 @@ type
     property Line: UnicodeString read GetLine write SetLineW;
     function LineSub(AFrom, ALen: integer): UnicodeString;
     function HasTab: boolean;
+    function HasAsciiNoTabs: boolean;
     procedure Init(const S: string; AEnd: TATLineEnds);
     procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
     function IsFake: boolean; inline;
@@ -523,8 +524,8 @@ begin
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
-  Ex.HasTab:= 0;
-  Ex.HasAsciiNoTabs:= SStringHasAsciiAndNoTabs(S);
+  Ex.HasTab:= 0; //cFlagNone
+  Ex.HasAsciiNoTabs:= 0; //cFlagNone
   Ex.Updated:= true;
 end;
 
@@ -555,8 +556,8 @@ begin
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
-  Ex.HasTab:= 0;
-  Ex.HasAsciiNoTabs:= SStringHasAsciiAndNoTabs(S);
+  Ex.HasTab:= 0; //cFlagNone
+  Ex.HasAsciiNoTabs:= 0; //cFlagNone
   Ex.Updated:= true;
 end;
 
@@ -647,6 +648,56 @@ begin
   else
     Value:= cFlagNo;
   Ex.HasTab:= TATBits2(Value);
+end;
+
+function TATStringItem.HasAsciiNoTabs: boolean;
+var
+  Value: TATLineFlag;
+  NLen, NCode, i: integer;
+  Ptr: PWideChar;
+begin
+  case TATLineFlag(Ex.HasAsciiNoTabs) of
+    cFlagNo:
+      exit(false);
+    cFlagYes:
+      exit(true);
+  end;
+
+  Result:= true;
+  NLen:= Length(Buf);
+  if NLen>0 then
+    if Ex.Wide then
+    begin
+      Ptr:= @Buf[1];
+      for i:= 1 to NLen div 2 do
+      begin
+        NCode:= Ord(Ptr^);
+        if (NCode<32) or (NCode>=127) then
+        begin
+          Result:= false;
+          Break
+        end;
+        Inc(Ptr);
+      end;
+    end
+    else
+    begin
+      for i:= 1 to NLen do
+      begin
+        NCode:= Ord(Buf[i]);
+        if (NCode<32) or (NCode>=127) then
+        begin
+          Result:= false;
+          Break
+        end;
+      end;
+    end;
+
+  if Result then
+    Value:= cFlagYes
+  else
+    Value:= cFlagNo;
+  Ex.HasAsciiNoTabs:= TATBits2(Value);
 end;
 
 
@@ -751,7 +802,7 @@ end;
 
 function TATStrings.GetLineHasAsciiNoTabs(AIndex: integer): boolean;
 begin
-  Result:= FList.GetItem(AIndex)^.Ex.HasAsciiNoTabs;
+  Result:= FList.GetItem(AIndex)^.HasAsciiNoTabs;
 end;
 
 

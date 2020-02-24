@@ -165,8 +165,8 @@ function SStringHasEol(const S: atString): boolean; inline;
 function SStringHasEol(const S: string): boolean; inline;
 function SStringHasTab(const S: atString): boolean; inline;
 function SStringHasTab(const S: string): boolean; inline;
-function SStringHasAsciiAndNoTabs(const S: atString): boolean;
-function SStringHasAsciiAndNoTabs(const S: string): boolean;
+//function SStringHasAsciiAndNoTabs(const S: atString): boolean;
+//function SStringHasAsciiAndNoTabs(const S: string): boolean;
 
 function SRemoveNewlineChars(const S: atString): atString;
 function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
@@ -874,6 +874,7 @@ begin
 end;
 
 
+(*
 function SStringHasAsciiAndNoTabs(const S: atString): boolean;
 var
   code, i: integer;
@@ -899,7 +900,7 @@ begin
   end;
   Result:= true;
 end;
-
+*)
 
 function TATStringTabHelper.IndentUnindent(ALineIndex: integer; const Str: atString;
   ARight: boolean): atString;
