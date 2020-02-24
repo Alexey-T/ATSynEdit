@@ -19,6 +19,7 @@ var
   NCmd: integer;
 begin
   inherited;
+  if Key=0 then Exit;
 
   //special handle for spec keys
   case Key of
