@@ -82,10 +82,10 @@ type
     );
 
 type
-  TATLineHasTab = (
-    cLineTabUnknown,
-    cLineTabNo,
-    cLineTabYes
+  TATLineFlag = (
+    cFlagNone,
+    cFlagNo,
+    cFlagYes
     );
 
 type
@@ -605,14 +605,14 @@ end;
 
 function TATStringItem.HasTab: boolean;
 var
-  Value: TATLineHasTab;
+  Value: TATLineFlag;
   NLen, i: integer;
   Ptr: PWideChar;
 begin
-  case TATLineHasTab(Ex.HasTab) of
-    cLineTabNo:
+  case TATLineFlag(Ex.HasTab) of
+    cFlagNo:
       exit(false);
-    cLineTabYes:
+    cFlagYes:
       exit(true);
   end;
 
@@ -643,9 +643,9 @@ begin
     end;
 
   if Result then
-    Value:= cLineTabYes
+    Value:= cFlagYes
   else
-    Value:= cLineTabNo;
+    Value:= cFlagNo;
   Ex.HasTab:= TATBits2(Value);
 end;
 
