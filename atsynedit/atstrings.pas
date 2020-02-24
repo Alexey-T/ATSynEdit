@@ -83,7 +83,7 @@ type
 
 type
   TATLineFlag = (
-    cFlagNone,
+    cFlagUnknown,
     cFlagNo,
     cFlagYes
     );
@@ -524,8 +524,8 @@ begin
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
-  Ex.HasTab:= 0; //cFlagNone
-  Ex.HasAsciiNoTabs:= 0; //cFlagNone
+  Ex.HasTab:= 0; //cFlagUnknown
+  Ex.HasAsciiNoTabs:= 0; //cFlagUnknown
   Ex.Updated:= true;
 end;
 
@@ -556,8 +556,8 @@ begin
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
-  Ex.HasTab:= 0; //cFlagNone
-  Ex.HasAsciiNoTabs:= 0; //cFlagNone
+  Ex.HasTab:= 0; //cFlagUnknown
+  Ex.HasAsciiNoTabs:= 0; //cFlagUnknown
   Ex.Updated:= true;
 end;
 
