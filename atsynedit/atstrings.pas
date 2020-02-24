@@ -523,6 +523,7 @@ begin
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
+  Ex.HasTab:= 0;
   Ex.HasAsciiNoTabs:= SStringHasAsciiAndNoTabs(S);
   Ex.Updated:= true;
 end;
@@ -547,13 +548,6 @@ begin
   else
   begin
     Ex.Wide:= true;
-    {
-    //this is slower
-    var SW: WideString;
-    SW:= S;
-    SetLength(Buf, Length(SW)*2);
-    Move(SW[1], Buf[1], Length(Buf));
-    }
     SetLength(Buf, NLen*2);
     N:= Utf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen);
     if N>0 then
@@ -561,6 +555,7 @@ begin
   end;
 
   Ex.State:= TATBits2(cLineStateChanged);
+  Ex.HasTab:= 0;
   Ex.HasAsciiNoTabs:= SStringHasAsciiAndNoTabs(S);
   Ex.Updated:= true;
 end;
