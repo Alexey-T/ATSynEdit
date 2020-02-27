@@ -203,7 +203,7 @@ begin
   for i:= 1 to Length(S) do
   begin
     N:= Ord(S[i]);
-    if (N<32) or (N>Ord('~')) then
+    if (N<32) or (N>126) then
       exit(false);
   end;
   Result:= true;
