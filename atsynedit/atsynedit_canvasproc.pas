@@ -47,9 +47,6 @@ const
       {$endif}
     {$endif} ;
 
-var
-  CanvasTextOutHorzSpacingUsed: boolean = false;
-
 type
   TATSynEditCallbackIsCharSelected = function(AX, AY: integer): boolean of object;
 
@@ -449,7 +446,6 @@ var
   St: TFontStyles;
 begin
   if CanvasTextOutMustUseOffsets then exit(true);
-  if CanvasTextOutHorzSpacingUsed then exit(true);
 
   //detect result but presence of bold/italic tokens, for them offsets needed
   //ignore underline, strikeout

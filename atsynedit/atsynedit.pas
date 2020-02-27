@@ -2861,7 +2861,6 @@ begin
         Event:= nil;
 
       StrOutput:= SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
-      CanvasTextOutHorzSpacingUsed:= false; //OptCharSpacingX<>0;
 
       if AMainText then
       begin
