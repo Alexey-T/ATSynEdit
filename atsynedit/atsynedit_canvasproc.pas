@@ -34,9 +34,19 @@ var
 
 const
   //Win: seems no slowdown from offsets
-  //OSX: better use offsets, fonts have float-width, e.g. 10.2 pixels
+  //macOS: better use offsets, fonts have floating width value, e.g. 10.2 pixels
   //Linux gtk2: big slowdown from offsets
-  CanvasTextOutMustUseOffsets = {$ifdef linux} false {$else} true {$endif};
+  CanvasTextOutMustUseOffsets =
+    {$ifdef windows}
+    true
+    {$else}
+      {$ifdef darwin}
+      true
+      {$else}
+      false
+      {$endif}
+    {$endif} ;
+
 var
   CanvasTextOutHorzSpacingUsed: boolean = false;
 
