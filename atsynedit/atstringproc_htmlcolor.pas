@@ -55,24 +55,25 @@ begin
       else
         Break;
     Inc(Len);
-    if Len>6 then Exit;
+    if Len>8 then Exit;
   until false;
 
-  //allow only #rgb, #rrggbb
-  if Len=6 then
-  begin
-    N1:= HexDigitToInt(s[0])*16 + HexDigitToInt(s[1]);
-    N2:= HexDigitToInt(s[2])*16 + HexDigitToInt(s[3]);
-    N3:= HexDigitToInt(s[4])*16 + HexDigitToInt(s[5]);
-    Result:= RGBToColor(N1, N2, N3);
-  end
-  else
-  if Len=3 then
-  begin
-    N1:= HexDigitToInt(s[0])*17;
-    N2:= HexDigitToInt(s[1])*17;
-    N3:= HexDigitToInt(s[2])*17;
-    Result:= RGBToColor(N1, N2, N3);
+  //allow #rgb, #rgba, #rrggbb, #rrggbbaa (ignore alpha value)
+  case Len of
+    6, 8:
+      begin
+        N1:= HexDigitToInt(s[0])*16 + HexDigitToInt(s[1]);
+        N2:= HexDigitToInt(s[2])*16 + HexDigitToInt(s[3]);
+        N3:= HexDigitToInt(s[4])*16 + HexDigitToInt(s[5]);
+        Result:= RGBToColor(N1, N2, N3);
+      end;
+    3, 4:
+      begin
+        N1:= HexDigitToInt(s[0])*17;
+        N2:= HexDigitToInt(s[1])*17;
+        N3:= HexDigitToInt(s[2])*17;
+        Result:= RGBToColor(N1, N2, N3);
+      end;
   end;
 end;
 
