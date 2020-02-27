@@ -544,14 +544,12 @@ begin
       if ListInt[i]>AProps.ControlWidth then
       begin
         SetLength(AText, i);
-        break;
+        Break;
       end;
 
-    for i:= 0 to High(ListInt) do
-      if i=0 then
-        Dx[i]:= ListInt[i]
-      else
-        Dx[i]:= ListInt[i]-ListInt[i-1];
+    Dx[0]:= ListInt[0];
+    for i:= 1 to High(ListInt) do
+      Dx[i]:= ListInt[i]-ListInt[i-1];
   end;
 
   if AParts=nil then
