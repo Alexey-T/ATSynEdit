@@ -515,7 +515,9 @@ var
   Buf: string;
   BufW: UnicodeString;
   DxPointer: PInteger;
+  {$ifdef windows}
   bAllowLigatures: boolean;
+  {$endif}
 begin
   NLen:= Length(AText);
   if NLen=0 then Exit;

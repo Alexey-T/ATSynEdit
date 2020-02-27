@@ -34,11 +34,11 @@ procedure SFindSpacesBounds(const S: atString; AOffset: integer; out AOffset1,
 
 implementation
 
-{
+(*
 const
   //no chars '@' (email) and '$' (used in php)
   cCharsSymbols: atString = '!"#%&''()[]{}<>*+-/=,.:;?\^`|~‚„…‹›‘’“”–—¦«»­±';
-}
+*)
 
 type
   TCharGroup = (cgSpaces, cgSymbols, cgWord);

@@ -383,7 +383,7 @@ end;
 
 function TATTextFinder.CheckTokens(APos: integer): boolean;
 begin
-  //
+  Result:= true;
 end;
 
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
@@ -1734,7 +1734,7 @@ var
 var
   Strs: TATStrings;
   SFind, SLineToTest: UnicodeString;
-  NStartOffset, NEndOffset, NLenStrFind: integer;
+  NStartOffset, NEndOffset: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
   bOk: boolean;
 begin
@@ -1746,7 +1746,6 @@ begin
   SFind:= StrFind;
   if not OptCase then
     SFind:= WideUpperCase(SFind);
-  NLenStrFind:= Length(SFind);
 
   StringArray_SetFromString(ListParts, SFind, OptBack);
   PartCount:= Length(ListParts);
