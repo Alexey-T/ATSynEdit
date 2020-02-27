@@ -140,7 +140,7 @@ function IsCharSurrogateAny(ch: widechar): boolean; inline;
 function IsCharSurrogateHigh(ch: widechar): boolean; inline;
 function IsCharSurrogateLow(ch: widechar): boolean; inline;
 
-function IsStringWithUnicodeChars(const S: atString): boolean;
+function SStringHasUnicodeChars(const S: atString): boolean;
 function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
 
@@ -378,16 +378,16 @@ begin
   Result:= true;
 end;
 
-function IsStringWithUnicodeChars(const S: atString): boolean;
+function SStringHasUnicodeChars(const S: atString): boolean;
 var
   i, N: integer;
 begin
-  Result:= false;
   for i:= 1 to Length(S) do
   begin
     N:= Ord(S[i]);
     if (N<32) or (N>126) then exit(true);
   end;
+  Result:= false;
 end;
 
 

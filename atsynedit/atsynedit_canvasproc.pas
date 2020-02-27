@@ -195,20 +195,6 @@ begin
   end;
 end;
 
-function IsStringSymbolsOnly(const S: UnicodeString): boolean;
-var
-  i, N: integer;
-begin
-  if S='' then exit(false);
-  for i:= 1 to Length(S) do
-  begin
-    N:= Ord(S[i]);
-    if (N<32) or (N>126) then
-      exit(false);
-  end;
-  Result:= true;
-end;
-
 
 {$ifdef windows}
 //to draw font ligatures
@@ -476,7 +462,7 @@ begin
       Result:= false;
 
   if Result then exit;
-  Result:= IsStringWithUnicodeChars(AStr);
+  Result:= SStringHasUnicodeChars(AStr);
 end;
 
 
@@ -662,7 +648,7 @@ begin
       BufW:= SRemoveHexDisplayedChars(PartStr);
       bAllowLigatures:=
         AProps.ShowFontLigatures
-        and IsStringSymbolsOnly(BufW); //disable if unicode chars (also finds tab-chars)
+        and not SStringHasUnicodeChars(BufW); //disable ligatures if unicode chars
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
         DxPointer:= @Dx[PartOffset]
