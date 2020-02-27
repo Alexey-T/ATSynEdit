@@ -540,12 +540,9 @@ begin
       ListInt[i]:= ListOffsets[i] * NCharWidth div 100;
 
     //truncate AText, to not paint over screen
-    for i:= 1 to High(ListInt) do
-      if ListInt[i]>AProps.ControlWidth then
-      begin
-        SetLength(AText, i);
-        Break;
-      end;
+    i:= AProps.ControlWidth div AProps.CharSize.X + 2;
+    if Length(AText)>i then
+      SetLength(AText, i);
 
     Dx[0]:= ListInt[0];
     for i:= 1 to High(ListInt) do
