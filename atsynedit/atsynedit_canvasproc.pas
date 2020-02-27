@@ -515,7 +515,10 @@ procedure CanvasTextOut(C: TCanvas; APosX, APosY: integer; AText: atString;
 var
   ListOffsets: TATLineOffsetsInfo;
   ListInt: TATIntArray;
-  Dx, DxOfPart, DxUTF8: TATIntArray;
+  Dx: TATIntArray;
+  {$ifndef windows}
+  DxOfPart, DxUTF8: TATIntArray;
+  {$endif}
   NLen, NCharWidth, i, j: integer;
   PartStr: atString;
   PartOffset, PartLen,
@@ -654,8 +657,7 @@ begin
       SReplaceAllTabsToOneSpace(BufW);
       bAllowLigatures:=
         AProps.ShowFontLigatures
-        and IsStringSymbolsOnly(BufW) //disable if unicode chars
-        and not SStringHasTab(BufW); //disable if tab-chars
+        and IsStringSymbolsOnly(BufW); //disable if unicode chars (also finds tab-chars)
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
         DxPointer:= @Dx[PartOffset]
