@@ -180,12 +180,19 @@ uses
 
 function SRemoveHexDisplayedChars(const S: UnicodeString): UnicodeString;
 var
+  ch: WideChar;
   i: integer;
 begin
   Result:= S;
   for i:= 1 to Length(Result) do
-    if IsCharHexDisplayed(Result[i]) then
+  begin
+    ch:= Result[i];
+    if ch=#9 then
+      Result[i]:= ' '
+    else
+    if IsCharHexDisplayed(ch) then
       Result[i]:= '?';
+  end;
 end;
 
 function IsStringSymbolsOnly(const S: UnicodeString): boolean;
@@ -568,7 +575,6 @@ begin
   if AParts=nil then
   begin
     Buf:= UTF8Encode(SRemoveHexDisplayedChars(AText));
-    SReplaceAllTabsToOneSpace(Buf);
     if CanvasTextOutNeedsOffsets(C, AText, AProps.NeedOffsets) then
       DxPointer:= @Dx[0]
     else
@@ -654,7 +660,6 @@ begin
 
       {$ifdef windows}
       BufW:= SRemoveHexDisplayedChars(PartStr);
-      SReplaceAllTabsToOneSpace(BufW);
       bAllowLigatures:=
         AProps.ShowFontLigatures
         and IsStringSymbolsOnly(BufW); //disable if unicode chars (also finds tab-chars)
@@ -675,7 +680,6 @@ begin
       {$else}
       BufW:= PartStr;
       Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
-      SReplaceAllTabsToOneSpace(Buf);
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
       begin
