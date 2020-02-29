@@ -327,7 +327,7 @@ const
   cHintBookmarkDx = 6;
   cHintBookmarkDy = 16;
   cUrlMarkerTag = -100;
-  cUrlRegexInitial = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+';
+  cUrlRegexInitial = '\b\w[\w\-\.]*@\w[\w\.]*\.\w{2,}\b|\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+';
   cTextEditorLocked: string = 'Wait...';
   cHintScrollPrefix: string = 'Line';
   cStrMenuitemFoldAll: string = 'Fold all';
