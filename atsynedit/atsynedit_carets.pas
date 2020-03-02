@@ -797,22 +797,34 @@ procedure TATCarets.GetSelections(out D: TATCaretSelections);
 var
   Item: TATCaretItem;
   NLen, i: integer;
+  X1, Y1, X2, Y2: integer;
 begin
   SetLength(D, Count);
   NLen:= 0;
+
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
-    if Item.EndY>=0 then
+    X1:= Item.PosX;
+    Y1:= Item.PosY;
+    X2:= Item.EndX;
+    Y2:= Item.EndY;
+    if Y2>=0 then
     begin
-      D[NLen].PosX:= Item.PosX;
-      D[NLen].PosY:= Item.PosY;
-      D[NLen].EndX:= Item.EndX;
-      D[NLen].EndY:= Item.EndY;
+      if (Y1>Y2) or ((Y1=Y2) and (X1>X2)) then
+      begin
+        SwapInt(Y1, Y2);
+        SwapInt(X1, X2);
+      end;
+      D[NLen].PosX:= X1;
+      D[NLen].PosY:= Y1;
+      D[NLen].EndX:= X2;
+      D[NLen].EndY:= Y2;
       Inc(NLen);
     end;
   end;
-  //dont realloc in a loop
+
+  //don't realloc in a loop
   SetLength(D, NLen);
 end;
 
