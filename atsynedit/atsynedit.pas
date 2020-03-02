@@ -4024,7 +4024,7 @@ begin
     DoCaretSingle(0, 0);
 
     while Str.Count>1 do
-      Str.LineDelete(Str.Count-1, false, false);
+      Str.LineDelete(Str.Count-1, false, false, false);
   end;
 end;
 

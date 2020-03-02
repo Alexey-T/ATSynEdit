@@ -1103,7 +1103,7 @@ end;
 procedure TATStrings.ActionDeleteFakeLine;
 begin
   if IsLastLineFake then
-    LineDelete(Count-1, false{dont force});
+    LineDelete(Count-1, false{AForceLast}, false, false);
 end;
 
 procedure TATStrings.ActionDeleteFakeLineAndFinalEol;
@@ -1723,7 +1723,7 @@ end;
 procedure TATStrings.ActionDeleteDupFakeLines;
 begin
   while IsLastFakeLineUnneeded do
-    LineDelete(Count-1, false);
+    LineDelete(Count-1, false, false, false);
 end;
 
 procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
