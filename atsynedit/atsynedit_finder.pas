@@ -191,6 +191,7 @@ type
     //
     property MatchEdPos: TPoint read FMatchEdPos;
     property MatchEdEnd: TPoint read FMatchEdEnd;
+    property MaxLineLen: integer read FMaxLineLen write FMaxLineLen;
     //
     constructor Create;
     destructor Destroy; override;
