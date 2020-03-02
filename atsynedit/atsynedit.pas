@@ -6602,7 +6602,10 @@ begin
     if (P1.Y<FRectMain.Top) and (Range^.Y>=nLineFrom) then Continue;
     if (P2.Y<FRectMain.Top) and (Range^.Y2>=nLineFrom) then Continue;
 
-    NIndent:= FTabHelper.GetIndentExpanded(Range^.Y, Strings.Lines[Range^.Y]);
+    NIndent:= Min(
+      FTabHelper.GetIndentExpanded(Range^.Y, Strings.Lines[Range^.Y]),
+      FTabHelper.GetIndentExpanded(Range^.Y2, Strings.Lines[Range^.Y2])
+      );
     Inc(P1.X, NIndent*ACharSize.X);
     Inc(P2.X, NIndent*ACharSize.X);
 
