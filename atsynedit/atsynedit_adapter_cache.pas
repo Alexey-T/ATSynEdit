@@ -58,6 +58,7 @@ type
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
     procedure Delete(N: integer);
+    procedure DeleteRange(AFrom, ATo: integer);
     procedure DeleteForLine(ALineIndex: integer);
   end;
 
@@ -113,6 +114,8 @@ procedure TATAdapterHiliteCache.Add(
   const ALineIndex, ACharIndex, ALineLen: integer;
   constref AParts: TATLineParts;
   const AColorAfterEol: TColor);
+var
+  NCnt: integer;
 begin
   if not Enabled then exit;
 
@@ -133,8 +136,9 @@ begin
     then exit;
     }
 
-  while FList.Count>FMaxCount do
-    Delete(FList.Count-1);
+  NCnt:= FList.Count;
+  if NCnt>FMaxCount then
+    DeleteRange(FMaxCount, NCnt-1);
 
   FillChar(FTempItem, SizeOf(FTempItem), 0);
   FTempItem.LineIndex:= ALineIndex;
@@ -174,6 +178,11 @@ end;
 procedure TATAdapterHiliteCache.Delete(N: integer);
 begin
   FList.Delete(N);
+end;
+
+procedure TATAdapterHiliteCache.DeleteRange(AFrom, ATo: integer);
+begin
+  FList.DeleteRange(AFrom, ATo);
 end;
 
 procedure TATAdapterHiliteCache.DeleteForLine(ALineIndex: integer);
