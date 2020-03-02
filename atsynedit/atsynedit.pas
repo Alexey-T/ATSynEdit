@@ -2522,6 +2522,7 @@ var
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
   Band: TATGutterItem;
+  StringItem: PATStringItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue, NBandDecor: integer;
   StrOutput: atString;
@@ -2784,12 +2785,18 @@ begin
       if bLineHuge then
         NOutputMaximalChars:= NLineLen //approximate, it don't consider CJK chars, but OK for huge lines
       else
-        NOutputMaximalChars:= CanvasTextWidth(
-            Strings.Lines[NLinesIndex],
+      begin
+        StringItem:= Strings.GetItemPtr(NLinesIndex);
+        if StringItem^.HasAsciiNoTabs then
+          NOutputMaximalChars:= StringItem^.CharLen
+        else
+          NOutputMaximalChars:= CanvasTextWidth(
+            StringItem^.Line,
             NLinesIndex,
             FTabHelper,
             1 //pass CharWidth=1px
             );
+      end;
       AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputMaximalChars + FOptScrollbarHorizontalAddSpace);
     end;
 
