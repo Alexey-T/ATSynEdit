@@ -858,6 +858,7 @@ type
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
     procedure DoSelect_Line_ByClick;
+    function TempSel_IsMultiline: boolean;
     //paint
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
@@ -2607,7 +2608,7 @@ begin
     not AMainText and
     FMinimapCachedPainting and
     Assigned(FAdapterHilite) and
-    not Carets.IsSelectionMultiline;
+    not TempSel_IsMultiline;
 
   repeat
     if NCoordTop>ARect.Bottom then Break;

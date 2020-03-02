@@ -502,3 +502,14 @@ begin
     }
 end;
 
+
+function TATSynEdit.TempSel_IsMultiline: boolean;
+var
+  i: integer;
+begin
+  for i:= 0 to High(FSel) do
+    if FSel[i].EndY<>FSel[i].PosY then
+      exit(true);
+  Result:= false;
+end;
+
