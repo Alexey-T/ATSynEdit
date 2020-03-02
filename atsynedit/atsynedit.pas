@@ -862,6 +862,7 @@ type
     function TempSel_IsLineWithSelection(ALine: integer): boolean;
     function TempSel_IsPosSelected(AX, AY: integer): boolean;
     function TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
+    procedure TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
     //paint
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
@@ -5682,7 +5683,7 @@ begin
   begin
     //here we calculate ranges (XFrom, XTo) where selection(s) overlap current line,
     //and then paint fillrect for them
-    Carets.GetRangesSelectedInLineAfterPoint(ALineLen, ALineIndex, Ranges);
+    TempSel_GetRangesInLineAfterPoint(ALineLen, ALineIndex, Ranges);
 
     if not FOptShowFullSel then
       if Length(Ranges)=1 then

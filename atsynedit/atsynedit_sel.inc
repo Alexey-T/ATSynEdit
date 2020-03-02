@@ -582,3 +582,34 @@ begin
   end;
 end;
 
+procedure TATSynEdit.TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out
+  ARanges: TATSimpleRangeArray);
+var
+  X1, Y1, X2, Y2, XFrom, XTo: integer;
+  i: integer;
+begin
+  SetLength(ARanges, 0);
+  for i:= 0 to High(FSel) do
+  begin
+    X1:= FSel[i].PosX;
+    Y1:= FSel[i].PosY;
+    X2:= FSel[i].EndX;
+    Y2:= FSel[i].EndY;
+
+    if (Y1>AY) or (Y2<AY) then Continue;
+
+    if (Y1<AY) then XFrom:= 0 else XFrom:= X1;
+    if (Y2>AY) then XTo:= MaxInt else XTo:= X2;
+
+    if XTo<=AX then Continue;
+    if XFrom<AX then XFrom:= AX;
+
+    SetLength(ARanges, Length(ARanges)+1);
+    with ARanges[High(ARanges)] do
+    begin
+      NFrom:= XFrom;
+      NTo:= XTo;
+    end;
+  end;
+end;
+

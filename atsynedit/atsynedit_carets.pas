@@ -107,7 +107,6 @@ type
     function IsLineListed(APosY: integer): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
-    procedure GetRangesSelectedInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
     procedure GetSelections(out D: TATCaretSelections);
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
@@ -602,6 +601,7 @@ begin
 end;
 *)
 
+(*
 procedure TATCarets.GetRangesSelectedInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
 var
   X1, Y1, X2, Y2, XFrom, XTo: integer;
@@ -630,7 +630,7 @@ begin
     end;
   end;
 end;
-
+*)
 
 function TATCarets.CaretAtEdge(AEdge: TATCaretEdge): TPoint;
 var
