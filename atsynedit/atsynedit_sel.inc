@@ -523,9 +523,14 @@ begin
     Y1:= FSel[i].PosY;
     X2:= FSel[i].EndX;
     Y2:= FSel[i].EndY;
+
+    //carets are sorted: can stop
+    if Y1>ALine then exit(false);
+
     if (X2=0) and (Y2>0) then
       Dec(Y2);
-    if (Y1<=ALine) and (ALine<=Y2) then
+
+    if ALine<=Y2 then
       exit(true);
   end;
   Result:= false;
