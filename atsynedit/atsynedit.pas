@@ -2779,16 +2779,16 @@ begin
 
     if AMainText then
     begin
-      //horz scrollbar max: calced here, to make variable horz bar
-      //vert scrollbar max: calced in UpdateScrollbars
-      if bLineHuge {and Strings.LinesAscii[NLinesIndex]} then
-        NOutputMaximalChars:= NLineLen //approx len, it don't consider CJK chars
+      //horz scrollbar max: is calculated here, to make variable horz bar
+      //vert scrollbar max: is calculated in UpdateScrollbars
+      if bLineHuge then
+        NOutputMaximalChars:= NLineLen //approximate, it don't consider CJK chars, but OK for huge lines
       else
         NOutputMaximalChars:= CanvasTextWidth(
             Strings.Lines[NLinesIndex],
             NLinesIndex,
             FTabHelper,
-            1 //pass CharWidth=1px to calc amount of chars
+            1 //pass CharWidth=1px
             );
       AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputMaximalChars + FOptScrollbarHorizontalAddSpace);
     end;
