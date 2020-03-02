@@ -2623,6 +2623,7 @@ begin
     WrapItem:= FWrapInfo[NWrapIndex];
     NLinesIndex:= WrapItem.NLineIndex;
     if not Strings.IsIndexValid(NLinesIndex) then Break;
+    FillChar(FLineParts, SizeOf(FLineParts), 0);
 
     //support Gap before the 1st line
     if AMainText then

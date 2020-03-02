@@ -143,7 +143,7 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   APos: TPoint;
   ACharSize: TPoint;
   ATabSize: integer;
-  const AParts: TATLineParts;
+  constref AParts: TATLineParts;
   AColorBG: TColor;
   const ALine: atString;
   AUsePixels: boolean
@@ -159,7 +159,7 @@ procedure DoPaintUnprintedEol(C: TCanvas;
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
   ATabHelper: TATStringTabHelper; ACharWidth: integer): integer; inline;
 
-procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
+procedure DoPartFind(constref AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
 procedure DoPartsShow(var P: TATLineParts);
@@ -769,7 +769,7 @@ begin
 end;
 
 
-procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex,
+procedure DoPartFind(constref AParts: TATLineParts; APos: integer; out AIndex,
   AOffsetLeft: integer);
 var
   iStart, iEnd, i: integer;
@@ -802,7 +802,7 @@ begin
 end;
 
 
-function DoPartsGetTotalLen(const AParts: TATLineParts): integer;
+function DoPartsGetTotalLen(constref AParts: TATLineParts): integer;
 var
   N: integer;
 begin
@@ -814,7 +814,7 @@ begin
     Result:= AParts[N-1].Offset+AParts[N-1].Len;
 end;
 
-function DoPartsGetCount(const AParts: TATLineParts): integer;
+function DoPartsGetCount(constref AParts: TATLineParts): integer;
 //func considers case when some middle part has Len=0
 begin
   Result:= High(AParts)+1;
@@ -1052,7 +1052,7 @@ end;
 
 
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
-  ACharSize: TPoint; ATabSize: integer; const AParts: TATLineParts;
+  ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
   AColorBG: TColor; const ALine: atString; AUsePixels: boolean);
 {
 Line is painted with ACharSize.Y=2px height, with 1px spacing between lines

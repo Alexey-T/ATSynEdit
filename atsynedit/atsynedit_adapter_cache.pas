@@ -51,7 +51,7 @@ type
     procedure Clear;
     procedure Add(
       const ALineIndex, ACharIndex, ALineLen: integer;
-      const AParts: TATLineParts;
+      constref AParts: TATLineParts;
       const AColorAfterEol: TColor);
     function Get(
       const ALineIndex, ACharIndex, ALineLen: integer;
@@ -111,7 +111,7 @@ end;
 
 procedure TATAdapterHiliteCache.Add(
   const ALineIndex, ACharIndex, ALineLen: integer;
-  const AParts: TATLineParts;
+  constref AParts: TATLineParts;
   const AColorAfterEol: TColor);
 begin
   if not Enabled then exit;
