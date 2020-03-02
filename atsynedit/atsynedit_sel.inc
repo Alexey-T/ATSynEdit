@@ -520,7 +520,8 @@ var
 begin
   Result:= false;
   a:= 0;
-  b:= Length(FSel)-1;
+  b:= High(FSel);
+
   repeat
     if a>b then exit;
     m:= (a+b+1) div 2;
@@ -545,22 +546,30 @@ end;
 function TATSynEdit.TempSel_IsPosSelected(AX, AY: integer): boolean;
 var
   X1, Y1, X2, Y2: integer;
-  i: integer;
+  a, b, m: integer;
 begin
-  for i:= 0 to High(FSel) do
-  begin
-    X1:= FSel[i].PosX;
-    Y1:= FSel[i].PosY;
-    X2:= FSel[i].EndX;
-    Y2:= FSel[i].EndY;
-
-    //carets are sorted: can stop
-    if Y1>AY then exit(false);
-
-    if IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside then
-      exit(true);
-  end;
   Result:= false;
+  a:= 0;
+  b:= High(FSel);
+
+  repeat
+    if a>b then exit;
+    m:= (a+b+1) div 2;
+
+    X1:= FSel[m].PosX;
+    Y1:= FSel[m].PosY;
+    X2:= FSel[m].EndX;
+    Y2:= FSel[m].EndY;
+
+    case IsPosInRange(AX, AY, X1, Y1, X2, Y2) of
+      cRelateInside:
+        exit(true);
+      cRelateBefore:
+        b:= m-1;
+      cRelateAfter:
+        a:= m+1;
+    end;
+  until false;
 end;
 
 function TATSynEdit.TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
