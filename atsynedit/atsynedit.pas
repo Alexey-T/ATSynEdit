@@ -2846,8 +2846,10 @@ begin
         NColorEntire, bLineColorForced,
         NColorAfter, AMainText);
 
-      //if FLineParts[0].Offset<0 then
-      //  ShowMessage('Wrong LineParts');
+      if FLineParts[0].Offset<0 then
+      begin
+        //some bug in making parts! to fix!
+      end;
 
       //apply DimRanges
       if Assigned(FDimRanges) then

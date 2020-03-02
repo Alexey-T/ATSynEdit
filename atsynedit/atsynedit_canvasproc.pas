@@ -1065,6 +1065,9 @@ var
   NColorBack, NColorFont, NColorFontHalf: TColor;
   ch: WideChar;
 begin
+  //offset<0 means some bug on making parts!
+  if AParts[0].Offset<0 then exit;
+
   NSpaces:= 0;
   for NPartIndex:= Low(TATLineParts) to High(TATLineParts) do
   begin
