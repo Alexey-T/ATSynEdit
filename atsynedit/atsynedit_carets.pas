@@ -520,117 +520,14 @@ end;
 
 function TATCarets.IsSelection: boolean;
 var
-  Item: TATCaretItem;
   i: integer;
 begin
   for i:= 0 to Count-1 do
-  begin
-    Item:= Items[i];
-    if (Item.EndY>=0) then
+    if Items[i].EndY>=0 then
       exit(true);
-  end;
   Result:= false;
 end;
 
-(*
-function TATCarets.IsSelectionMultiline: boolean;
-var
-  Item: TATCaretItem;
-  i: integer;
-begin
-  Result:= false;
-  for i:= 0 to Count-1 do
-  begin
-    Item:= Items[i];
-    if (Item.EndY>=0) and (Item.EndY<>Item.PosY) then
-      exit(true);
-  end;
-end;
-*)
-
-(*
-function TATCarets.IsPosSelected(AX, AY: integer): boolean;
-var
-  X1, Y1, X2, Y2: integer;
-  bSel: boolean;
-  i: integer;
-begin
-  Result:= false;
-  for i:= 0 to Count-1 do
-  begin
-    Items[i].GetRange(X1, Y1, X2, Y2, bSel);
-    if not bSel then Continue;
-
-    //carets sorted: can stop
-    if Y1>AY then Exit;
-
-    if IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside then
-      exit(true);
-  end;
-end;
-*)
-
-(*
-function TATCarets.IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
-var
-  X1, Y1, X2, Y2: integer;
-  bSel: boolean;
-  bLeft, bRight: TATPosRelation;
-  i: integer;
-begin
-  Result:= cRangeAllUnselected;
-  for i:= 0 to Count-1 do
-  begin
-    Items[i].GetRange(X1, Y1, X2, Y2, bSel);
-    if not bSel then Continue;
-
-    //carets sorted: can stop
-    if Y1>AY1 then Exit;
-
-    bLeft:= IsPosInRange(AX1, AY1, X1, Y1, X2, Y2);
-    bRight:= IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true);
-
-    if (bLeft=cRelateInside) and (bRight=cRelateInside) then
-      exit(cRangeAllSelected);
-
-    if (bLeft=cRelateAfter) or (bRight=cRelateBefore) then
-      Continue;
-
-    exit(cRangePartlySelected);
-  end;
-end;
-*)
-
-(*
-procedure TATCarets.GetRangesSelectedInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
-var
-  X1, Y1, X2, Y2, XFrom, XTo: integer;
-  i: integer;
-  bSel: boolean;
-begin
-  SetLength(ARanges, 0);
-  for i:= 0 to Count-1 do
-  begin
-    Items[i].GetRange(X1, Y1, X2, Y2, bSel);
-    if not bSel then Continue;
-
-    if (Y1>AY) or (Y2<AY) then Continue;
-
-    if (Y1<AY) then XFrom:= 0 else XFrom:= X1;
-    if (Y2>AY) then XTo:= MaxInt else XTo:= X2;
-
-    if XTo<=AX then Continue;
-    if XFrom<AX then XFrom:= AX;
-
-    SetLength(ARanges, Length(ARanges)+1);
-    with ARanges[Length(ARanges)-1] do
-    begin
-      NFrom:= XFrom;
-      NTo:= XTo;
-    end;
-  end;
-end;
-*)
 
 function TATCarets.CaretAtEdge(AEdge: TATCaretEdge): TPoint;
 var
