@@ -107,8 +107,6 @@ type
     function IsLineListed(APosY: integer): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
-    function IsSelectionMultiline: boolean;
-    function IsPosSelected(AX, AY: integer): boolean;
     function IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     procedure GetRangesSelectedInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
     procedure GetSelections(out D: TATCaretSelections);
@@ -527,15 +525,16 @@ var
   Item: TATCaretItem;
   i: integer;
 begin
-  Result:= false;
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
     if (Item.EndY>=0) then
       exit(true);
   end;
+  Result:= false;
 end;
 
+(*
 function TATCarets.IsSelectionMultiline: boolean;
 var
   Item: TATCaretItem;
@@ -549,7 +548,9 @@ begin
       exit(true);
   end;
 end;
+*)
 
+(*
 function TATCarets.IsPosSelected(AX, AY: integer): boolean;
 var
   X1, Y1, X2, Y2: integer;
@@ -569,6 +570,7 @@ begin
       exit(true);
   end;
 end;
+*)
 
 function TATCarets.IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
 var
