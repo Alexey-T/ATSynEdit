@@ -976,7 +976,6 @@ type
     procedure UpdateFoldedMarkTooltip;
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
-    procedure UpdateWrapInfo;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
@@ -1101,6 +1100,7 @@ type
     procedure InvalidateHilitingCache;
     procedure InvalidateHilitingCache(ALineIndex: integer);
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
+    procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
     procedure DoEventCarets; virtual;
@@ -1784,7 +1784,7 @@ begin
   Update;
 end;
 
-procedure TATSynEdit.UpdateWrapInfo;
+procedure TATSynEdit.UpdateWrapInfo(AForceUpdate: boolean);
 var
   CurStrings: TATStrings;
   ListNums: TATIntegerList;
@@ -1818,6 +1818,9 @@ begin
   NNewVisibleColumns:= GetVisibleColumns;
   NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
 
+  if AForceUpdate then
+    FWrapUpdateNeeded:= true
+  else
   if (not FWrapUpdateNeeded) and
     (FWrapMode=cWrapOn) and
     (FPrevVisibleColumns<>NNewVisibleColumns) then
