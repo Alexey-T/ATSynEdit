@@ -548,6 +548,7 @@ type
     FCharSizeMinimap: TPoint;
     FCharSpacingText: TPoint;
     FTabSize: integer;
+    FSel: TATCaretSelections;
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
     FGutterDecorImages: TImageList;
@@ -4156,6 +4157,7 @@ begin
 
   Inc(FPaintCounter);
   FCaretShown:= false;
+  Carets.GetSelections(FSel);
 
   DoPaintMainTo(C, ALineFrom);
 

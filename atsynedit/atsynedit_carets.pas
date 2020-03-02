@@ -69,6 +69,12 @@ type
     );
 
 type
+  TATCaretSelection = record
+    PosX, PosY, EndX, EndY: integer;
+  end;
+  TATCaretSelections = array of TATCaretSelection;
+
+type
   { TATCarets }
 
   TATCarets = class
@@ -105,6 +111,7 @@ type
     function IsPosSelected(AX, AY: integer): boolean;
     function IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     procedure GetRangesSelectedInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
+    procedure GetSelections(out D: TATCaretSelections);
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
@@ -784,6 +791,29 @@ begin
   end;
   if bChange then
     Sort;
+end;
+
+procedure TATCarets.GetSelections(out D: TATCaretSelections);
+var
+  Item: TATCaretItem;
+  NLen, i: integer;
+begin
+  SetLength(D, Count);
+  NLen:= 0;
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    if Item.EndY>=0 then
+    begin
+      D[NLen].PosX:= Item.PosX;
+      D[NLen].PosY:= Item.PosY;
+      D[NLen].EndX:= Item.EndX;
+      D[NLen].EndY:= Item.EndY;
+      Inc(NLen);
+    end;
+  end;
+  //dont realloc in a loop
+  SetLength(D, NLen);
 end;
 
 
