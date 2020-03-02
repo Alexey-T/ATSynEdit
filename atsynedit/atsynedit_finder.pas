@@ -133,6 +133,7 @@ type
     FFragmentIndex: integer;
     FMatchEdPos: TPoint;
     FMatchEdEnd: TPoint;
+    FMaxLineLen: integer;
     //FReplacedAtEndOfText: boolean;
     //
     procedure ClearMatchPos; override;
@@ -698,6 +699,7 @@ begin
   FFragments:= TATEditorFragments.Create;
   FFragmentIndex:= 0;
   //FReplacedAtEndOfText:= false;
+  FMaxLineLen:= MaxInt;
 
   OptFromCaret:= false;
   OptConfirmReplace:= false;
@@ -1734,7 +1736,7 @@ var
 var
   Strs: TATStrings;
   SFind, SLineToTest: UnicodeString;
-  NStartOffset, NEndOffset: integer;
+  NLen, NStartOffset, NEndOffset: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
   bOk: boolean;
 begin
@@ -1762,7 +1764,9 @@ begin
     //forward search
       for IndexLine:= APosStart.Y to APosEnd.Y do
       begin
-        if Strs.LinesLen[IndexLine]<Length(SFind) then Continue;
+        NLen:= Strs.LinesLen[IndexLine];
+        if NLen<Length(SFind) then Continue;
+        if NLen>FMaxLineLen then Continue;
 
         if FStrFindUnicode then
           if Strs.LinesAscii[IndexLine] then Continue;
@@ -1838,7 +1842,9 @@ begin
     //backward search
       for IndexLine:= APosStart.Y downto APosEnd.Y do
       begin
-        if Strs.LinesLen[IndexLine]<Length(SFind) then Continue;
+        NLen:= Strs.LinesLen[IndexLine];
+        if NLen<Length(SFind) then Continue;
+        if NLen>FMaxLineLen then Continue;
 
         if FStrFindUnicode then
           if Strs.LinesAscii[IndexLine] then Continue;
