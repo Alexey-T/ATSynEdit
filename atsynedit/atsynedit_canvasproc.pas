@@ -442,13 +442,13 @@ end;
 
 function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: atString;
   const AOffsets: TATFontNeedsOffsets): boolean;
+//detect result by presence of bold/italic tokens, offsets are needed for them,
+//ignore underline, strikeout
 var
   St: TFontStyles;
 begin
   if CanvasTextOutMustUseOffsets then exit(true);
 
-  //detect result but presence of bold/italic tokens, for them offsets needed
-  //ignore underline, strikeout
   St:= C.Font.Style * [fsBold, fsItalic];
 
   if St=[] then Result:= AOffsets.ForNormal else
