@@ -516,24 +516,30 @@ end;
 function TATSynEdit.TempSel_IsLineWithSelection(ALine: integer): boolean;
 var
   Y1, Y2, X2: integer;
-  i: integer;
+  a, b, m: integer;
 begin
-  for i:= 0 to High(FSel) do
-  begin
-    Y1:= FSel[i].PosY;
-    X2:= FSel[i].EndX;
-    Y2:= FSel[i].EndY;
+  Result:= false;
+  a:= 0;
+  b:= Length(FSel)-1;
+  repeat
+    if a>b then exit;
+    m:= (a+b+1) div 2;
 
-    //carets are sorted: can stop
-    if Y1>ALine then exit(false);
+    Y1:= FSel[m].PosY;
+    X2:= FSel[m].EndX;
+    Y2:= FSel[m].EndY;
 
     if (X2=0) and (Y2>0) then
       Dec(Y2);
 
-    if ALine<=Y2 then
+    if (Y1<=ALine) and (ALine<=Y2) then
       exit(true);
-  end;
-  Result:= false;
+
+    if ALine<Y1 then
+      b:= m-1
+    else
+      a:= m+1;
+  until false;
 end;
 
 function TATSynEdit.TempSel_IsPosSelected(AX, AY: integer): boolean;
