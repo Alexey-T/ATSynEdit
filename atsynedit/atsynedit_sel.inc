@@ -14,7 +14,7 @@ begin
     Result:= (AX>=NPosLeft) and (AX<NPosRight);
   end
   else
-    Result:= Carets.IsPosSelected(AX, AY);
+    Result:= TempSel_IsPosSelected(AX, AY);
 end;
 
 
@@ -526,6 +526,27 @@ begin
     if (X2=0) and (Y2>0) then
       Dec(Y2);
     if (Y1<=ALine) and (ALine<=Y2) then
+      exit(true);
+  end;
+  Result:= false;
+end;
+
+function TATSynEdit.TempSel_IsPosSelected(AX, AY: integer): boolean;
+var
+  X1, Y1, X2, Y2: integer;
+  i: integer;
+begin
+  for i:= 0 to High(FSel) do
+  begin
+    X1:= FSel[i].PosX;
+    Y1:= FSel[i].PosY;
+    X2:= FSel[i].EndX;
+    Y2:= FSel[i].EndY;
+
+    //carets sorted: can stop
+    if Y1>AY then Exit;
+
+    if IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside then
       exit(true);
   end;
   Result:= false;
