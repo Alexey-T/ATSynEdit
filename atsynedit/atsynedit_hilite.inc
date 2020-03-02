@@ -98,6 +98,15 @@ var
   bSel, bSelPrev, bAdd: boolean;
   nIndex, i: integer;
 begin
+  if not Carets.IsLineWithSelection(ALineIndex) then
+  begin
+    AParts[0].Offset:= ACharIndex;
+    AParts[0].Len:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
+    AParts[0].ColorFont:= FColorFont;
+    AParts[0].ColorBG:= AColorBG;
+    exit;
+  end;
+
   bSel:= false;
   bSelPrev:= false;
   nIndex:= -1;
