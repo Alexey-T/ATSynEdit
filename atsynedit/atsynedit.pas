@@ -966,6 +966,7 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
+    procedure UpdateAdapterCacheSize;
     procedure UpdateInitialVars(C: TCanvas);
     procedure UpdateTabHelper;
     procedure UpdateCursor;
@@ -2412,6 +2413,7 @@ begin
   C.FillRect(ClientRect);
 
   UpdateInitialVars(C);
+  UpdateAdapterCacheSize;
   UpdateWrapInfo;
 
   if not CanvasTextOutMustUseOffsets then
@@ -4123,6 +4125,16 @@ begin
   end;
 end;
 
+procedure TATSynEdit.UpdateAdapterCacheSize;
+var
+  N: integer;
+begin
+  N:= GetVisibleLines+1;
+  if FMinimapVisible then
+    Inc(N, GetVisibleLinesMinimap+1);
+  FAdapterCache.MaxCount:= N;
+end;
+
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
 var
   NCaretX: integer;
@@ -4140,6 +4152,7 @@ begin
 
   Inc(FPaintCounter);
   FCaretShown:= false;
+
   DoPaintMainTo(C, ALineFrom);
 
   if cPaintUpdateCaretsCoords in AFlags then
