@@ -100,7 +100,7 @@ var
 begin
   if not Carets.IsLineWithSelection(ALineIndex) then
   begin
-    AParts[0].Offset:= ACharIndex;
+    AParts[0].Offset:= 0;
     AParts[0].Len:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
     AParts[0].ColorFont:= FColorFont;
     AParts[0].ColorBG:= AColorBG;
