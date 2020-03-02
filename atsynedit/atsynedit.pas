@@ -2788,7 +2788,7 @@ begin
             Strings.Lines[NLinesIndex],
             NLinesIndex,
             FTabHelper,
-            Point(1, 1) //(1,1): need width in chars
+            1 //pass CharWidth=1px to calc amount of chars
             );
       AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputMaximalChars + FOptScrollbarHorizontalAddSpace);
     end;

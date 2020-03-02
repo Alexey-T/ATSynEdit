@@ -200,7 +200,7 @@ begin
     else
     begin
       Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize);
+      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize.X);
     end;
 
     Result.X:= NWidth;

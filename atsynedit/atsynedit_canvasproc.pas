@@ -157,7 +157,7 @@ procedure DoPaintUnprintedEol(C: TCanvas;
   ADetailedEnds: boolean);
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharSize: TPoint): integer; inline;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer): integer; inline;
 
 procedure DoPartFind(const AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
@@ -433,10 +433,10 @@ begin
 end;
 
 
-function CanvasTextWidth(const S: atString; ALineIndex: integer; ATabHelper: TATStringTabHelper;
-  ACharSize: TPoint): integer;
+function CanvasTextWidth(const S: atString; ALineIndex: integer;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer): integer;
 begin
-  Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S) * ACharSize.X div 100;
+  Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S) * ACharWidth div 100;
 end;
 
 
