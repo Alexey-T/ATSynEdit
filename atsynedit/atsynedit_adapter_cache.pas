@@ -57,7 +57,7 @@ type
       const ALineIndex, ACharIndex, ALineLen: integer;
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
-    procedure Delete(N: integer);
+    procedure Delete(AIndex: integer);
     procedure DeleteRange(AFrom, ATo: integer);
     procedure DeleteForLine(ALineIndex: integer);
   end;
@@ -175,9 +175,9 @@ begin
   end;
 end;
 
-procedure TATAdapterHiliteCache.Delete(N: integer);
+procedure TATAdapterHiliteCache.Delete(AIndex: integer);
 begin
-  FList.Delete(N);
+  FList.Delete(AIndex);
 end;
 
 procedure TATAdapterHiliteCache.DeleteRange(AFrom, ATo: integer);
