@@ -4320,10 +4320,12 @@ begin
   end;
 
   if not FPaintStarted then exit;
-  Include(FPaintFlags, cPaintUpdateBitmap);
 
-  //PaintEx(LineTop);
-  inherited Invalidate;
+  {
+  Include(FPaintFlags, cPaintUpdateBitmap);
+  PaintEx(LineTop);
+  }
+  Invalidate;
 end;
 
 procedure TATSynEdit.DoContextPopup(MousePos: TPoint; var Handled: Boolean);
