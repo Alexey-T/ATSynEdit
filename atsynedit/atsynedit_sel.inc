@@ -513,3 +513,21 @@ begin
   Result:= false;
 end;
 
+function TATSynEdit.TempSel_IsLineWithSelection(ALine: integer): boolean;
+var
+  Y1, Y2, X2: integer;
+  i: integer;
+begin
+  for i:= 0 to High(FSel) do
+  begin
+    Y1:= FSel[i].PosY;
+    X2:= FSel[i].EndX;
+    Y2:= FSel[i].EndY;
+    if (X2=0) and (Y2>0) then
+      Dec(Y2);
+    if (Y1<=ALine) and (ALine<=Y2) then
+      exit(true);
+  end;
+  Result:= false;
+end;
+

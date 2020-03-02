@@ -98,7 +98,7 @@ var
   bSel, bSelPrev, bAdd: boolean;
   nIndex, i: integer;
 begin
-  if not Carets.IsLineWithSelection(ALineIndex) then
+  if not TempSel_IsLineWithSelection(ALineIndex) then
   begin
     AParts[0].Offset:= 0;
     AParts[0].Len:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
@@ -157,7 +157,7 @@ var
   PartOther: ^TATLinePart;
   nRangeX1, nRangeX2, iPart, i: integer;
 begin
-  if not Carets.IsLineWithSelection(ALineIndex) then exit;
+  if not TempSel_IsLineWithSelection(ALineIndex) then exit;
 
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
@@ -282,7 +282,7 @@ begin
   if AUseColorOfCurrentLine then
     AColor:= Colors.CurrentLineBG
   else
-  if AHiliteLineWithSelection and Carets.IsLineWithSelection(ALine) then
+  if AHiliteLineWithSelection and TempSel_IsLineWithSelection(ALine) then
     AColor:= Colors.CurrentLineBG
   else
   begin

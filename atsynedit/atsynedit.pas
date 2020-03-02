@@ -859,6 +859,7 @@ type
     procedure DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
     procedure DoSelect_Line_ByClick;
     function TempSel_IsMultiline: boolean;
+    function TempSel_IsLineWithSelection(ALine: integer): boolean;
     //paint
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
