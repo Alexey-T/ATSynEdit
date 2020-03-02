@@ -463,13 +463,13 @@ end;
 
 
 procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
-  constref DxIn: TATIntArray;
+  DxIn: PInteger;
+  DxInLen: integer;
   out DxOut: TATIntArray);
 var
-  NLen, NLenDx, NSize, ResLen, i: integer;
+  NLen, NSize, ResLen, i: integer;
 begin
   NLen:= Length(S);
-  NLenDx:= Length(DxIn);
   SetLength(DxOut, NLen);
 
   ResLen:= 0;
@@ -477,7 +477,7 @@ begin
   repeat
     Inc(i);
     if i>NLen then Break;
-    if i>NLenDx then Break;
+    if i>DxInLen then Break;
 
     if (i<NLen) and
       IsCharSurrogateHigh(S[i]) and
@@ -506,7 +506,7 @@ var
   ListInt: TATIntArray;
   Dx: TATIntArray;
   {$ifndef windows}
-  DxOfPart, DxUTF8: TATIntArray;
+  DxUTF8: TATIntArray;
   {$endif}
   NLen, NCharWidth, i, j: integer;
   PartStr: atString;
@@ -665,8 +665,7 @@ begin
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
       begin
-        DxOfPart:= Copy(Dx, PartOffset, Length(Dx));
-        _CalcCharSizesUtf8FromWidestring(BufW, DxOfPart, DxUTF8);
+        _CalcCharSizesUtf8FromWidestring(BufW, @Dx[PartOffset], Length(Dx)-PartOffset, DxUTF8);
         DxPointer:= @DxUTF8[0];
       end
       else
