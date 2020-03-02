@@ -44,7 +44,7 @@ begin
       Result:= cRangePartlySelected;
   end
   else
-    Result:= Carets.IsRangeSelected(AX1, AY1, AX2, AY2);
+    Result:= TempSel_IsRangeSelected(AX1, AY1, AX2, AY2);
 end;
 
 
@@ -550,5 +550,35 @@ begin
       exit(true);
   end;
   Result:= false;
+end;
+
+function TATSynEdit.TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
+var
+  X1, Y1, X2, Y2: integer;
+  bLeft, bRight: TATPosRelation;
+  i: integer;
+begin
+  Result:= cRangeAllUnselected;
+  for i:= 0 to High(FSel) do
+  begin
+    X1:= FSel[i].PosX;
+    Y1:= FSel[i].PosY;
+    X2:= FSel[i].EndX;
+    Y2:= FSel[i].EndY;
+
+    //carets sorted: can stop
+    if Y1>AY1 then Exit;
+
+    bLeft:= IsPosInRange(AX1, AY1, X1, Y1, X2, Y2);
+    bRight:= IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true);
+
+    if (bLeft=cRelateInside) and (bRight=cRelateInside) then
+      exit(cRangeAllSelected);
+
+    if (bLeft=cRelateAfter) or (bRight=cRelateBefore) then
+      Continue;
+
+    exit(cRangePartlySelected);
+  end;
 end;
 

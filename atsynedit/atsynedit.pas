@@ -861,6 +861,7 @@ type
     function TempSel_IsMultiline: boolean;
     function TempSel_IsLineWithSelection(ALine: integer): boolean;
     function TempSel_IsPosSelected(AX, AY: integer): boolean;
+    function TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     //paint
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
