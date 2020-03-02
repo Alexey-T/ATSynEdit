@@ -847,7 +847,7 @@ type
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
       AItems: TATWrapItems; AConsiderFolding: boolean);
     procedure DoCalcLineHilite(const AData: TATWrapItem;
-      var AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
+      out AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
       AMainText: boolean);
     //select
@@ -2623,7 +2623,6 @@ begin
     WrapItem:= FWrapInfo[NWrapIndex];
     NLinesIndex:= WrapItem.NLineIndex;
     if not Strings.IsIndexValid(NLinesIndex) then Break;
-    FillChar(FLineParts, SizeOf(FLineParts), 0);
 
     //support Gap before the 1st line
     if AMainText then
@@ -2846,6 +2845,9 @@ begin
         NOutputCharsSkipped, cMaxCharsForOutput,
         NColorEntire, bLineColorForced,
         NColorAfter, AMainText);
+
+      //if FLineParts[0].Offset<0 then
+      //  ShowMessage('Wrong LineParts');
 
       //apply DimRanges
       if Assigned(FDimRanges) then
