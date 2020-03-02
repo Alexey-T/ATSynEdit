@@ -409,7 +409,7 @@ type
     FEditorIndex: integer;
     FMarginRight: integer;
     FMarginList: array of integer;
-    FStringsInt,
+    FStringsInt: TATStrings;
     FStringsExternal: TATStrings;
     FTabHelper: TATStringTabHelper;
     FAdapterHilite: TATAdapterHilite;
@@ -434,8 +434,9 @@ type
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
     FTextHintCenter: boolean;
+    FSel: TATCaretSelections;
     FSelRect: TRect;
-    FSelRectBegin,
+    FSelRectBegin: TPoint;
     FSelRectEnd: TPoint;
     FCarets: TATCarets;
     FCaretBlinkEnabled: boolean;
@@ -548,7 +549,6 @@ type
     FCharSizeMinimap: TPoint;
     FCharSpacingText: TPoint;
     FTabSize: integer;
-    FSel: TATCaretSelections;
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
     FGutterDecorImages: TImageList;
