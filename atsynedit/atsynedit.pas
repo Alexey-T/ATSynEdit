@@ -2851,6 +2851,7 @@ begin
       if FLineParts[0].Offset<0 then
       begin
         //some bug in making parts! to fix!
+        if NColorAfter>0 then ;
       end;
 
       //apply DimRanges
@@ -4320,7 +4321,9 @@ begin
 
   if not FPaintStarted then exit;
   Include(FPaintFlags, cPaintUpdateBitmap);
-  PaintEx(LineTop);
+
+  //PaintEx(LineTop);
+  inherited Invalidate;
 end;
 
 procedure TATSynEdit.DoContextPopup(MousePos: TPoint; var Handled: Boolean);
