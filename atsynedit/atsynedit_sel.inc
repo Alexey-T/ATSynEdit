@@ -543,8 +543,8 @@ begin
     X2:= FSel[i].EndX;
     Y2:= FSel[i].EndY;
 
-    //carets sorted: can stop
-    if Y1>AY then Exit;
+    //carets are sorted: can stop
+    if Y1>AY then exit(false);
 
     if IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside then
       exit(true);
