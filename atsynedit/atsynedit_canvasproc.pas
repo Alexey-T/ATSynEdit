@@ -665,9 +665,7 @@ begin
 
       if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
       begin
-        SetLength(DxOfPart, Length(BufW));
-        for i:= 0 to High(DxOfPart) do
-          DxOfPart[i]:= Dx[PartOffset+i];
+        DxOfPart:= Copy(Dx, PartOffset, Length(Dx));
         _CalcCharSizesUtf8FromWidestring(BufW, DxOfPart, DxUTF8);
         DxPointer:= @DxUTF8[0];
       end
