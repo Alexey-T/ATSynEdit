@@ -206,20 +206,18 @@ begin
   Result:= -1;
   a:= 0;
   b:= Count-1;
-  if b<0 then Exit;
 
   repeat
-    dif:= FList.ItemPtr(a)^.Data.LineNum-ALineNum;
-    if dif=0 then exit(a);
-
-    //middle, which is near b if not exact middle
+    if a>b then exit;
     m:= (a+b+1) div 2;
 
     dif:= FList.ItemPtr(m)^.Data.LineNum-ALineNum;
-    if dif=0 then exit(m);
-
-    if Abs(a-b)<=1 then exit;
-    if dif>0 then b:= m else a:= m;
+    if dif=0 then
+      exit(m);
+    if dif>0 then
+      b:= m-1
+    else
+      a:= m+1;
   until false;
 end;
 
