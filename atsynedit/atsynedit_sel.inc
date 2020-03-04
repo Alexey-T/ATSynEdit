@@ -590,13 +590,15 @@ begin
     if Y1>AY1 then Exit;
 
     bLeft:= IsPosInRange(AX1, AY1, X1, Y1, X2, Y2);
+    if (bLeft=cRelateAfter) then
+      Continue;
+
     bRight:= IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true);
+    if (bRight=cRelateBefore) then
+      Continue;
 
     if (bLeft=cRelateInside) and (bRight=cRelateInside) then
       exit(cRangeAllSelected);
-
-    if (bLeft=cRelateAfter) or (bRight=cRelateBefore) then
-      Continue;
 
     exit(cRangePartlySelected);
   end;
