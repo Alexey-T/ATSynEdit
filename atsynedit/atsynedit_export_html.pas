@@ -153,9 +153,9 @@ begin
           Continue;
         end;
 
-        if PPart^.FontBold then Str0:= Str0+'<b>';
-        if PPart^.FontItalic then Str0:= Str0+'<i>';
-        if PPart^.FontStrikeOut then Str0:= Str0+'<s>';
+        if PPart^.FontBold then Str0+= '<b>';
+        if PPart^.FontItalic then Str0+= '<i>';
+        if PPart^.FontStrikeOut then Str0+= '<s>';
 
         NeedStyle:=
           (PPart^.ColorFont<>NColorFont) or
@@ -170,16 +170,16 @@ begin
             );
           if LStyles.IndexOf(StyleText)<0 then
             LStyles.Add(StyleText);
-          Str0:= Str0 + Format('<span class="%s">', [StyleName]);
+          Str0+= Format('<span class="%s">', [StyleName]);
         end;
 
         Str0:= Str0+StrText;
         if NeedStyle then
-          Str0:= Str0+'</span>';
+          Str0+= '</span>';
 
-        if PPart^.FontStrikeOut then Str0:= Str0+'</s>';
-        if PPart^.FontItalic then Str0:= Str0+'</i>';
-        if PPart^.FontBold then Str0:= Str0+'</b>';
+        if PPart^.FontStrikeOut then Str0+= '</s>';
+        if PPart^.FontItalic then Str0+= '</i>';
+        if PPart^.FontBold then Str0+= '</b>';
       end;
 
       if i=0 then
