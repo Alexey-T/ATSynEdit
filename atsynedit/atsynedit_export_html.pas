@@ -78,7 +78,7 @@ var
   PPart: ^TATLinePart;
   NColorFont: TColor;
   NColorAfter: TColor;
-  NeedStyle: boolean;
+  NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
   Str0, StrText: string;
   StyleName, StyleText: string;
   i, j: integer;
@@ -145,11 +145,15 @@ begin
         PPart:= @Parts[j];
         if PPart^.Len=0 then Break;
 
+        NeedStyleFont:= PPart^.ColorFont<>NColorFont;
+        NeedStyleBg:= PPart^.ColorBG<>AColorBG;
+        NeedStyle:= NeedStyleFont or NeedStyleBg;
+
         StrText:= Ed.Strings.LineSub(i, PPart^.Offset+1, PPart^.Len);
         StrText:= StringReplace(StrText, '<', '&lt;', [rfReplaceAll]);
         StrText:= StringReplace(StrText, '>', '&gt;', [rfReplaceAll]);
 
-        if _IsSpaces(StrText) then
+        if _IsSpaces(StrText) and not NeedStyleBg then
         begin
           Str0+= StrText;
           Continue;
@@ -158,10 +162,6 @@ begin
         if PPart^.FontBold then Str0+= '<b>';
         if PPart^.FontItalic then Str0+= '<i>';
         if PPart^.FontStrikeOut then Str0+= '<s>';
-
-        NeedStyle:=
-          (PPart^.ColorFont<>NColorFont) or
-          (PPart^.ColorBG<>AColorBG);
 
         if NeedStyle then
         begin
