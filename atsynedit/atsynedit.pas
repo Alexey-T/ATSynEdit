@@ -861,6 +861,7 @@ type
     function TempSel_IsSelection: boolean;
     function TempSel_IsMultiline: boolean;
     function TempSel_IsLineWithSelection(ALine: integer): boolean;
+    function TempSel_IsLineAllSelected(ALine: integer): boolean;
     function TempSel_IsPosSelected(AX, AY: integer): boolean;
     function TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     procedure TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);

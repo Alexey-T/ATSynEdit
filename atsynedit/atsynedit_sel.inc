@@ -548,6 +548,42 @@ begin
   until false;
 end;
 
+function TATSynEdit.TempSel_IsLineAllSelected(ALine: integer): boolean;
+var
+  X1, Y1, Y2, X2: integer;
+  NLen: integer;
+  a, b, m: integer;
+  bLeft, bRight: boolean;
+begin
+  Result:= false;
+  a:= 0;
+  b:= High(FSel);
+
+  NLen:= Strings.LinesLen[ALine];
+
+  repeat
+    if a>b then exit;
+    m:= (a+b+1) div 2;
+
+    X1:= FSel[m].PosX;
+    Y1:= FSel[m].PosY;
+    X2:= FSel[m].EndX;
+    Y2:= FSel[m].EndY;
+
+    bLeft:= IsPosSorted(X1, Y1, 0, ALine, true);
+    bRight:= IsPosSorted(NLen, ALine, X2, Y2, true);
+
+    if bLeft and bRight then
+      exit(true);
+
+    if bLeft then
+      b:= m-1
+    else
+      a:= m+1;
+  until false;
+end;
+
+
 function TATSynEdit.TempSel_IsPosSelected(AX, AY: integer): boolean;
 var
   X1, Y1, X2, Y2: integer;

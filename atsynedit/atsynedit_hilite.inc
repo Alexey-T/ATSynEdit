@@ -156,40 +156,27 @@ var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
   PartOther: ^TATLinePart;
-  nRangeX1, nRangeX2, iPart, i: integer;
+  nRangeX1, nRangeX2: integer;
+  iPart, i: integer;
 begin
+  //optimiziation for select-all case.
+  //if entire line is selected, colorize all parts.
+  if TempSel_IsLineAllSelected(ALineIndex) then
+  begin
+    for i:= Low(AParts) to High(AParts) do
+      if AParts[i].Len=0 then
+        Break
+      else
+      begin
+        AParts[i].ColorFont:= Colors.TextSelFont;
+        AParts[i].ColorBG:= Colors.TextSelBG;
+      end;
+    exit;
+  end;
+
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;
-
-  //optimiziation for select-all case.
-  //if entire line is selected, colorize all parts.
-
-  nRangeX1:= ACharIndex;
-  for i:= Low(AParts) to High(AParts) do
-    if AParts[i].Len=0 then
-    begin
-      if i=0 then exit;
-      nRangeX2:= ACharIndex + AParts[i-1].Offset + AParts[i-1].Len;
-      Break;
-    end;
-
-  case IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) of
-    cRangeAllUnselected:
-      exit;
-    cRangeAllSelected:
-      begin
-        for i:= Low(AParts) to High(AParts) do
-          if AParts[i].Len=0 then
-            Break
-          else
-          begin
-            AParts[i].ColorFont:= Part.ColorFont;
-            AParts[i].ColorBG:= Part.ColorBG; //clGreen
-          end;
-        exit;
-      end;
-  end;
 
   //we loop over parts
   //- fully selected parts, colorize them.
