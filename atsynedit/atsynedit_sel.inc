@@ -503,6 +503,11 @@ begin
 end;
 
 
+function TATSynEdit.TempSel_IsSelection: boolean;
+begin
+  Result:= Length(FSel)>0;
+end;
+
 function TATSynEdit.TempSel_IsMultiline: boolean;
 var
   i: integer;

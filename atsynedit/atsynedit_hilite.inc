@@ -82,7 +82,8 @@ begin
   //faster render w/out adapter
   if (AParts[0].Len>0) then
   begin
-    DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
+    if TempSel_IsLineWithSelection(nLineIndex) then
+      DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
   end
   else
   begin
@@ -157,8 +158,6 @@ var
   PartOther: ^TATLinePart;
   nRangeX1, nRangeX2, iPart, i: integer;
 begin
-  if not TempSel_IsLineWithSelection(ALineIndex) then exit;
-
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;

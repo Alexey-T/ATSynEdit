@@ -858,6 +858,7 @@ type
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
     procedure DoSelect_Line_ByClick;
+    function TempSel_IsSelection: boolean;
     function TempSel_IsMultiline: boolean;
     function TempSel_IsLineWithSelection(ALine: integer): boolean;
     function TempSel_IsPosSelected(AX, AY: integer): boolean;
