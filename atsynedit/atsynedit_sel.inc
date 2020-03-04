@@ -533,11 +533,11 @@ begin
     if (X2=0) and (Y2>0) then
       Dec(Y2);
 
-    if (Y1<=ALine) and (ALine<=Y2) then
-      exit(true);
-
     if ALine<Y1 then
       b:= m-1
+    else
+    if ALine<=Y2 then
+      exit(true)
     else
       a:= m+1;
   until false;
