@@ -114,14 +114,16 @@ begin
     if AWithNumbers then
     begin
       L.Add('<table>'+sLineBreak+'<tr>'+sLineBreak+'<td class="num">');
-      L.Add('<pre><code>'); //??? eol
       for i:= 0 to Ed.Strings.Count-1 do
-        L.Add(IntToStr(i+1)+'&nbsp;&nbsp;');
+      begin
+        Str0:= IntToStr(i+1)+'&nbsp;&nbsp;';
+        if i=0 then
+          Str0:= '<pre><code>'+Str0;
+        L.Add(Str0);
+      end;
       L.Add('</code></pre>');
       L.Add('</td>'+sLineBreak+'<td>');
     end;
-
-    L.Add('<pre><code>');
 
     for i:= 0 to Ed.Strings.Count-1 do
     begin
@@ -163,6 +165,9 @@ begin
         if PPart^.FontItalic then Str0:= Str0+'</i>';
         if PPart^.FontBold then Str0:= Str0+'</b>';
       end;
+
+      if i=0 then
+        Str0:= '<pre><code>'+Str0;
       L.Add(Str0);
     end;
 
