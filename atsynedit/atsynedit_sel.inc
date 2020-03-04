@@ -553,7 +553,6 @@ var
   X1, Y1, Y2, X2: integer;
   NLen: integer;
   a, b, m: integer;
-  bLeft, bRight: boolean;
 begin
   Result:= false;
   a:= 0;
@@ -570,14 +569,11 @@ begin
     X2:= FSel[m].EndX;
     Y2:= FSel[m].EndY;
 
-    bLeft:= IsPosSorted(X1, Y1, 0, ALine, true);
-    bRight:= IsPosSorted(NLen, ALine, X2, Y2, true);
-
-    if bLeft and bRight then
-      exit(true);
-
-    if bLeft then
+    if not IsPosSorted(X1, Y1, 0, ALine, true) then
       b:= m-1
+    else
+    if IsPosSorted(NLen, ALine, X2, Y2, true) then
+      exit(true)
     else
       a:= m+1;
   until false;
