@@ -56,6 +56,15 @@ begin
 end;
 
 
+function _IsSpaces(const S: string): boolean;
+var
+  i: integer;
+begin
+  for i:= 1 to Length(S) do
+    if S[i]<>' ' then exit(false);
+  Result:= true;
+end;
+
 procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename, APageTitle,
   AFontName: string; AFontSize: integer; AWithNumbers: boolean; AColorBg,
   AColorNumbers: TColor);
@@ -68,7 +77,7 @@ var
   NColorFont: TColor;
   NColorAfter: TColor;
   NeedStyle: boolean;
-  Str0, Str1: string;
+  Str0, StrText: string;
   StyleName, StyleText: string;
   i, j: integer;
 begin
@@ -133,6 +142,17 @@ begin
       begin
         PPart:= @Parts[j];
         if PPart^.Len=0 then Break;
+
+        StrText:= Ed.Strings.LineSub(i, PPart^.Offset+1, PPart^.Len);
+        StrText:= StringReplace(StrText, '<', '&lt;', [rfReplaceAll]);
+        StrText:= StringReplace(StrText, '>', '&gt;', [rfReplaceAll]);
+
+        if _IsSpaces(StrText) then
+        begin
+          Str0+= StrText;
+          Continue;
+        end;
+
         if PPart^.FontBold then Str0:= Str0+'<b>';
         if PPart^.FontItalic then Str0:= Str0+'<i>';
         if PPart^.FontStrikeOut then Str0:= Str0+'<s>';
@@ -153,11 +173,7 @@ begin
           Str0:= Str0 + Format('<span class="%s">', [StyleName]);
         end;
 
-        Str1:= Utf8Encode(Copy(Ed.Strings.Lines[i], PPart^.Offset+1, PPart^.Len));
-        Str1:= StringReplace(Str1, '<', '&lt;', [rfReplaceAll]);
-        Str1:= StringReplace(Str1, '>', '&gt;', [rfReplaceAll]);
-
-        Str0:= Str0+Str1;
+        Str0:= Str0+StrText;
         if NeedStyle then
           Str0:= Str0+'</span>';
 
