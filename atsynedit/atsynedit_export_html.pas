@@ -51,7 +51,9 @@ begin
     TextBg:= '';
   end;
 
-  StyleName:= '_'+NameF+'_'+NameBg;
+  StyleName:= '_'+NameF;
+  if NameBg<>'' then
+    StyleName+= '_'+NameBg;
   StyleText:= '    .'+StyleName+' {'+TextF+TextBg+'}';
 end;
 
