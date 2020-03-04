@@ -4141,9 +4141,10 @@ procedure TATSynEdit.UpdateAdapterCacheSize;
 var
   N: integer;
 begin
-  N:= GetVisibleLines+1;
   if FMinimapVisible then
-    Inc(N, GetVisibleLinesMinimap+1);
+    N:= GetVisibleLinesMinimap+1
+  else
+    N:= GetVisibleLines+2;
   FAdapterCache.MaxCount:= N;
 end;
 
