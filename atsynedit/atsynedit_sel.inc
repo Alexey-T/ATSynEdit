@@ -612,33 +612,41 @@ end;
 function TATSynEdit.TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
 var
   X1, Y1, X2, Y2: integer;
+  a, b, m: integer;
   bLeft, bRight: TATPosRelation;
-  i: integer;
 begin
   Result:= cRangeAllUnselected;
-  for i:= 0 to High(FSel) do
-  begin
-    X1:= FSel[i].PosX;
-    Y1:= FSel[i].PosY;
-    X2:= FSel[i].EndX;
-    Y2:= FSel[i].EndY;
+  a:= 0;
+  b:= High(FSel);
 
-    //carets sorted: can stop
-    if Y1>AY1 then Exit;
+  repeat
+    if a>b then exit;
+    m:= (a+b+1) div 2;
+
+    X1:= FSel[m].PosX;
+    Y1:= FSel[m].PosY;
+    X2:= FSel[m].EndX;
+    Y2:= FSel[m].EndY;
 
     bLeft:= IsPosInRange(AX1, AY1, X1, Y1, X2, Y2);
     if (bLeft=cRelateAfter) then
+    begin
+      a:= m+1;
       Continue;
+    end;
 
     bRight:= IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true);
     if (bRight=cRelateBefore) then
+    begin
+      b:= m-1;
       Continue;
+    end;
 
     if (bLeft=cRelateInside) and (bRight=cRelateInside) then
-      exit(cRangeAllSelected);
-
-    exit(cRangePartlySelected);
-  end;
+      exit(cRangeAllSelected)
+    else
+      exit(cRangePartlySelected);
+  until false;
 end;
 
 procedure TATSynEdit.TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out
