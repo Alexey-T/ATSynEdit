@@ -77,7 +77,7 @@ var
   NColorFont: TColor;
   NColorAfter: TColor;
   NeedStyleFont, NeedStyleBg, NeedStyle: boolean;
-  Str0, StrText: string;
+  S, StrText: string;
   StyleName, StyleText: string;
   i, j: integer;
 begin
@@ -102,7 +102,7 @@ begin
 
     for i:= 0 to Ed.Strings.Count-1 do
     begin
-      Str0:= '';
+      S:= '';
       if not Ed.DoCalcLineHiliteEx(i, Parts, AColorBG, NColorAfter) then break;
       for j:= 0 to High(Parts) do
       begin
@@ -119,13 +119,13 @@ begin
 
         if _IsSpaces(StrText) and not NeedStyleBg then
         begin
-          Str0+= StrText;
+          S+= StrText;
           Continue;
         end;
 
-        if PPart^.FontBold then Str0+= '<b>';
-        if PPart^.FontItalic then Str0+= '<i>';
-        if PPart^.FontStrikeOut then Str0+= '<s>';
+        if PPart^.FontBold then S+= '<b>';
+        if PPart^.FontItalic then S+= '<i>';
+        if PPart^.FontStrikeOut then S+= '<s>';
 
         if NeedStyle then
         begin
@@ -136,18 +136,18 @@ begin
             );
           if LStyles.IndexOf(StyleText)<0 then
             LStyles.Add(StyleText);
-          Str0+= Format('<span class="%s">', [StyleName]);
+          S+= Format('<span class="%s">', [StyleName]);
         end;
 
-        Str0:= Str0+StrText;
+        S:= S+StrText;
         if NeedStyle then
-          Str0+= '</span>';
+          S+= '</span>';
 
-        if PPart^.FontStrikeOut then Str0+= '</s>';
-        if PPart^.FontItalic then Str0+= '</i>';
-        if PPart^.FontBold then Str0+= '</b>';
+        if PPart^.FontStrikeOut then S+= '</s>';
+        if PPart^.FontItalic then S+= '</i>';
+        if PPart^.FontBold then S+= '</b>';
       end;
-      LCode.Add(Str0);
+      LCode.Add(S);
     end;
 
     LCode[0]:= '<pre><code>'+LCode[0];
