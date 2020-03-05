@@ -357,6 +357,7 @@ end;
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
 var
   a, b, m, dif: integer;
+  R: PATSynRange;
 begin
   Result:= -1;
   a:= 0;
@@ -366,7 +367,8 @@ begin
     if a>b then exit;
     m:= (a+b+1) div 2;
 
-    dif:= FList.ItemPtr(m)^.Y-ALine;
+    R:= FList.ItemPtr(m);
+    dif:= R^.Y-ALine;
 
     if dif<0 then
       a:= m+1
@@ -375,11 +377,20 @@ begin
       b:= m-1
     else
     begin
+      //range at line start?
+      if R^.X=1 then
+      begin
+        if not R^.IsSimple then
+          Result:= m;
+        exit;
+      end;
+
       //find _first_ range which begins at ALine
       while (m>0) and (FList.ItemPtr(m-1)^.Y=ALine) do
         Dec(m);
       if not FList.ItemPtr(m)^.IsSimple then
         Result:= m;
+
       exit;
     end;
   until false;
