@@ -663,7 +663,8 @@ begin
     X2:= FSel[i].EndX;
     Y2:= FSel[i].EndY;
 
-    if (Y1>AY) or (Y2<AY) then Continue;
+    if (Y1>AY) then Break; //caret is fully after line AY: stop
+    if (Y2<AY) then Continue; //caret is fully before line AY
 
     if (Y1<AY) then XFrom:= 0 else XFrom:= X1;
     if (Y2>AY) then XTo:= MaxInt else XTo:= X2;
