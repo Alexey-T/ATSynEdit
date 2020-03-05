@@ -96,7 +96,7 @@ begin
 
   try
     for i:= 0 to Ed.Strings.Count-1 do
-      LNums.Add(IntToStr(i+1)+'&nbsp;&nbsp;');
+      LNums.Add(IntToStr(i+1)+'&nbsp;');
     LNums[0]:= '<pre><code>'+LNums[0];
     LNums[LNums.Count-1]:= LNums[LNums.Count-1]+'</code></pre>';
 
