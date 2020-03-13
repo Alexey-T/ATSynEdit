@@ -2862,7 +2862,10 @@ begin
       if FLineParts[0].Offset<0 then
       begin
         //some bug in making parts! to fix!
-        raise Exception.Create('Bug in LineParts content');
+        //raise Exception.Create('Program bug in text renderer, report to author!');
+        C.Font.Color:= clRed;
+        C.TextOut(CurrPointText.X, CurrPointText.Y, 'Program bug in text renderer, report to author!');
+        Break;
       end;
 
       //apply DimRanges
