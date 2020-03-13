@@ -2862,7 +2862,7 @@ begin
       if FLineParts[0].Offset<0 then
       begin
         //some bug in making parts! to fix!
-        if NColorAfter>0 then ;
+        raise Exception.Create('Bug in LineParts content');
       end;
 
       //apply DimRanges
