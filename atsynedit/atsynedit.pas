@@ -3806,7 +3806,8 @@ end;
 destructor TATSynEdit.Destroy;
 begin
   FAdapterHilite:= nil;
-  FAdapterIME:= nil;
+  if Assigned(FAdapterIME) then
+    FreeAndNil(FAdapterIME);
   TimersStop;
   if Assigned(FHintWnd) then
     FreeAndNil(FHintWnd);
