@@ -246,7 +246,8 @@ function _DoClientPosToCaretPos(
   AVirtualPos: boolean;
   out ADetails: TATPosDetails;
   AGapCoordAction: TATGapCoordAction;
-  AAfterEofUsesLastLen: boolean): TPoint;
+  AAfterEofUsesLastLen: boolean;
+  AEditorIndex: integer): TPoint;
 var
   NIndex, NIndexDecrement, NPixels: integer;
   Item: TATWrapItem;
@@ -347,7 +348,6 @@ begin
   end;
 
   //click in text
-  begin
     Item:= AWrapInfo[NIndex];
     Result.Y:= Item.NLineIndex;
 
@@ -373,11 +373,15 @@ begin
         AllowVirtual,
         ADetails.EndOfWrappedLine)
         + Item.NCharIndex - 2;
+
+      //position after end of partially folded line? return line length
+      if ADetails.EndOfWrappedLine then
+        if AStrings.LinesFoldFrom[Result.Y, AEditorIndex]>0 then
+          Result.X:= AStrings.LinesLen[Result.Y];
     end;
 
     if Item.NFinal=cWrapItemFinal then //don't set AWrappedEnd for real eol
       ADetails.EndOfWrappedLine:= false;
-  end;
 end;
 
 function TATSynEdit.CaretPosToClientPos(P: TPoint): TPoint; inline;
@@ -411,7 +415,8 @@ begin
     FCaretVirtual or FMouseDownAndColumnSelection,
     ADetails,
     AGapCoordAction,
-    IsSelRectEmpty);
+    IsSelRectEmpty,
+    FEditorIndex);
 end;
 
 procedure TATSynEdit.SetCaretBlinkEnabled(AValue: boolean);
