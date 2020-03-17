@@ -449,10 +449,10 @@ begin
     cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];
     cCommand_ScrollToCaretRight:       Res:= [cResultCaretRight];
 
-    cCommand_FastSort_Asc:             Res:= DoCommand_FastSort(cSortActionAsc);
-    cCommand_FastSort_AscNoCase:       Res:= DoCommand_FastSort(cSortActionAscNoCase);
-    cCommand_FastSort_Desc:            Res:= DoCommand_FastSort(cSortActionDesc);
-    cCommand_FastSort_DescNoCase:      Res:= DoCommand_FastSort(cSortActionDescNoCase);
+    cCommand_FastSort_Asc:             Res:= DoCommand_Sort(cSortActionAsc);
+    cCommand_FastSort_AscNoCase:       Res:= DoCommand_Sort(cSortActionAscNoCase);
+    cCommand_FastSort_Desc:            Res:= DoCommand_Sort(cSortActionDesc);
+    cCommand_FastSort_DescNoCase:      Res:= DoCommand_Sort(cSortActionDescNoCase);
 
     cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy(false, Clipboard);
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true, Clipboard);

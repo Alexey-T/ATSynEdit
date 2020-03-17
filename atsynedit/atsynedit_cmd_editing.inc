@@ -957,7 +957,7 @@ begin
     Result:= [];
 end;
 
-function TATSynEdit.DoCommand_FastSort(AAction: TATStringsSortAction): TATCommandResults;
+function TATSynEdit.DoCommand_Sort(AAction: TATStringsSortAction): TATCommandResults;
 begin
   DoCaretSingle(0, 0);
   Strings.ActionSort(AAction);
