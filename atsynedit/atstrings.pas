@@ -88,6 +88,13 @@ type
     cFlagYes
     );
 
+  TATStringsSortAction = (
+    cSortActionAsc,
+    cSortActionDesc,
+    cSortActionAscNoCase,
+    cSortActionDescNoCase
+    );
+
 type
   { TATStringItem }
 
@@ -198,6 +205,10 @@ type
     FLastCommandChangedLines: integer;
     FEnabledBookmarksUpdate: boolean;
 
+    function Compare_Asc(Key1, Key2: Pointer): Integer;
+    function Compare_AscNoCase(Key1, Key2: Pointer): Integer;
+    function Compare_Desc(Key1, Key2: Pointer): Integer;
+    function Compare_DescNoCase(Key1, Key2: Pointer): Integer;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds);
     function DebugText: string;
@@ -315,10 +326,12 @@ type
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
     procedure ActionDeleteDupFakeLines;
+    procedure ActionDeleteAllBlankLines;
     procedure ActionAddFakeLineIfNeeded;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
     function ActionTrimFinalEmptyLines: boolean;
+    procedure ActionSort(AAction: TATStringsSortAction);
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const AFilename: string);
@@ -1726,6 +1739,15 @@ begin
     LineDelete(Count-1, false, false, false);
 end;
 
+procedure TATStrings.ActionDeleteAllBlankLines;
+var
+  i: integer;
+begin
+  for i:= Count-1 downto 0 do
+    if LinesLen[i]=0 then
+      FList.Delete(i);
+end;
+
 procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
 begin
   if not Assigned(FListUpdates) then Exit;
@@ -1897,6 +1919,67 @@ begin
     Item:= FList.GetItem(i);
     Item^.Ex.Sep:= TATBits2(cLineSepNone);
   end;
+end;
+
+function TATStrings.Compare_Asc(Key1, Key2: Pointer): Integer;
+begin
+  Result:= UnicodeCompareStr(
+    PATStringItem(Key1)^.Line,
+    PATStringItem(Key2)^.Line
+    );
+end;
+
+function TATStrings.Compare_AscNoCase(Key1, Key2: Pointer): Integer;
+begin
+  Result:= UnicodeCompareText(
+    PATStringItem(Key1)^.Line,
+    PATStringItem(Key2)^.Line
+    );
+end;
+
+function TATStrings.Compare_Desc(Key1, Key2: Pointer): Integer;
+begin
+  Result:= - UnicodeCompareStr(
+    PATStringItem(Key1)^.Line,
+    PATStringItem(Key2)^.Line
+    );
+end;
+
+function TATStrings.Compare_DescNoCase(Key1, Key2: Pointer): Integer;
+begin
+  Result:= - UnicodeCompareText(
+    PATStringItem(Key1)^.Line,
+    PATStringItem(Key2)^.Line
+    );
+end;
+
+
+procedure TATStrings.ActionSort(AAction: TATStringsSortAction);
+var
+  Func: TFPSListCompareFunc;
+begin
+  case AAction of
+    cSortActionAsc:
+      Func:= @Compare_Asc;
+    cSortActionAscNoCase:
+      Func:= @Compare_AscNoCase;
+    cSortActionDesc:
+      Func:= @Compare_Desc;
+    cSortActionDescNoCase:
+      Func:= @Compare_DescNoCase;
+  end;
+
+  DoClearUndo;
+  DoClearLineStates(false);
+
+  ActionDeleteAllBlankLines;
+  FList.Sort(Func);
+  ActionAddFakeLineIfNeeded;
+  DoClearLineStates(false);
+
+  //this clears all bookmarks, ranges, decors - it's ok
+  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventLog(0);
 end;
 
 {$I atstrings_editing.inc}

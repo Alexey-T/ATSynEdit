@@ -140,6 +140,11 @@ begin
   M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
   M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Shift+Z'], []);
 
+  M.Add(cCommand_FastSort_Asc,        'fast sort without undo: asc.', [], []);
+  M.Add(cCommand_FastSort_AscNoCase,  'fast sort without undo: asc., ignore case', [], []);
+  M.Add(cCommand_FastSort_Desc,       'fast sort without undo: desc.', [], []);
+  M.Add(cCommand_FastSort_DescNoCase, 'fast sort without undo: desc., ignore case', [], []);
+
   M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXControl+'+C'], [cXControl+'+Ins']);
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/append', [], []);
   M.Add(cCommand_ClipboardCut, 'clipboard: cut', [cXControl+'+X'], ['Shift+Del']);

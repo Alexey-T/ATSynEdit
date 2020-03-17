@@ -1084,6 +1084,7 @@ type
       AClipboardObject: TClipboard): TATCommandResults;
     function DoCommand_ClipboardCut(
       AClipboardObject: TClipboard): TATCommandResults;
+    function DoCommand_FastSort(AAction: TATStringsSortAction): TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
     function DoMouseWheelAction(Shift: TShiftState; AUp, AForceHorz: boolean): boolean;
