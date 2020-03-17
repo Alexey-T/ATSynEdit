@@ -1,6 +1,6 @@
 
 2020.03.17
-+ add: commands for sorting without keeping Undo "fast sort without undo: ..."
++ add: commands for sorting without keeping Undo "sort without undo: ..."
 
 2020.03.02
 + add: Strings.Delete has param AWithUndo
