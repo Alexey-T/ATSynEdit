@@ -1922,35 +1922,37 @@ begin
 end;
 
 function TATStrings.Compare_Asc(Key1, Key2: Pointer): Integer;
+var
+  P1, P2: PATStringItem;
 begin
-  Result:= UnicodeCompareStr(
-    PATStringItem(Key1)^.Line,
-    PATStringItem(Key2)^.Line
-    );
+  P1:= PATStringItem(Key1);
+  P2:= PATStringItem(Key2);
+  if P1^.Ex.Wide or P2^.Ex.Wide then
+    Result:= UnicodeCompareStr(P1^.Line, P2^.Line)
+  else
+    Result:= CompareStr(P1^.Buf, P2^.Buf);
 end;
 
 function TATStrings.Compare_AscNoCase(Key1, Key2: Pointer): Integer;
+var
+  P1, P2: PATStringItem;
 begin
-  Result:= UnicodeCompareText(
-    PATStringItem(Key1)^.Line,
-    PATStringItem(Key2)^.Line
-    );
+  P1:= PATStringItem(Key1);
+  P2:= PATStringItem(Key2);
+  if P1^.Ex.Wide or P2^.Ex.Wide then
+    Result:= UnicodeCompareText(P1^.Line, P2^.Line)
+  else
+    Result:= CompareText(P1^.Buf, P2^.Buf);
 end;
 
 function TATStrings.Compare_Desc(Key1, Key2: Pointer): Integer;
 begin
-  Result:= - UnicodeCompareStr(
-    PATStringItem(Key1)^.Line,
-    PATStringItem(Key2)^.Line
-    );
+  Result:= -Compare_Asc(Key1, Key2);
 end;
 
 function TATStrings.Compare_DescNoCase(Key1, Key2: Pointer): Integer;
 begin
-  Result:= - UnicodeCompareText(
-    PATStringItem(Key1)^.Line,
-    PATStringItem(Key2)^.Line
-    );
+  Result:= -Compare_AscNoCase(Key1, Key2);
 end;
 
 
