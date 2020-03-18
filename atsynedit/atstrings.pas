@@ -221,6 +221,7 @@ type
     function GetCaretsArray: TATPointArray;
     function GetLine(AIndex: integer): atString;
     function GetLineAscii(AIndex: integer): boolean;
+    function GetLineBlank(AIndex: integer): boolean;
     function GetLineEnd(AIndex: integer): TATLineEnds;
     function GetLineFoldFrom(ALine, AClient: integer): integer;
     function GetLineHasTab(AIndex: integer): boolean;
@@ -289,6 +290,7 @@ type
     property LinesHidden[IndexLine, IndexClient: integer]: boolean read GetLineHidden write SetLineHidden;
     property LinesHasTab[Index: integer]: boolean read GetLineHasTab;
     property LinesHasAsciiNoTabs[Index: integer]: boolean read GetLineHasAsciiNoTabs;
+    property LinesBlank[Index: integer]: boolean read GetLineBlank;
     property LinesFoldFrom[IndexLine, IndexClient: integer]: integer read GetLineFoldFrom write SetLineFoldFrom;
     property LinesState[Index: integer]: TATLineState read GetLineState write SetLineState;
     property LinesUpdated[Index: integer]: boolean read GetLineUpdated write SetLineUpdated;
@@ -756,6 +758,28 @@ end;
 function TATStrings.GetLineAscii(AIndex: integer): boolean;
 begin
   Result:= not FList.GetItem(AIndex)^.Ex.Wide;
+end;
+
+function TATStrings.GetLineBlank(AIndex: integer): boolean;
+var
+  Ptr: PATStringItem;
+  Len, i: integer;
+  code: byte;
+begin
+  Ptr:= FList.GetItem(AIndex);
+  Len:= Length(Ptr^.Buf);
+  if Len=0 then
+    exit(true);
+  if Ptr^.Ex.Wide then
+    exit(false);
+  for i:= 1 to Len do
+  begin
+    code:= Byte(Ptr^.Buf[i]);
+    if code=9 then Continue;
+    if code=32 then Continue;
+    exit(false);
+  end;
+  Result:= true;
 end;
 
 function TATStrings.GetLineLen(AIndex: integer): integer;
@@ -1752,7 +1776,7 @@ begin
   DoClearLineStates(false);
 
   for i:= Count-1 downto 0 do
-    if LinesLen[i]=0 then
+    if LinesBlank[i] then
       FList.Delete(i);
 
   ActionAddFakeLineIfNeeded;
@@ -1770,7 +1794,7 @@ begin
   DoClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
-    if (LinesLen[i]=0) and (LinesLen[i-1]=0) then
+    if (LinesBlank[i]) and (LinesBlank[i-1]) then
       FList.Delete(i);
 
   ActionAddFakeLineIfNeeded;
