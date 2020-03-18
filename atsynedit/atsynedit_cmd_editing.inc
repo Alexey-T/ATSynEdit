@@ -985,6 +985,13 @@ begin
   Result:= [cResultText, cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_DeleteAllDups: TATCommandResults;
+begin
+  DoCaretSingle(0, 0);
+  Strings.ActionDeleteAllDups;
+  Result:= [cResultText, cResultCaretTop];
+end;
+
 function TATSynEdit.DoCommand_ReverseLines: TATCommandResults;
 begin
   DoCaretSingle(0, 0);

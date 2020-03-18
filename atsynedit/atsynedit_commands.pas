@@ -168,6 +168,7 @@ const
   cCommand_DeleteAllBlanks      = 340;
   cCommand_DeleteAdjacentBlanks = 341;
   cCommand_DeleteAdjacentDups   = 342;
+  cCommand_DeleteAllDups        = 343;
   cCommand_ReverseLines = 345;
 
   cCommand_ClipboardPaste = 1000;

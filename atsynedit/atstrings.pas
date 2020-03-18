@@ -329,6 +329,7 @@ type
     procedure ActionDeleteAllBlanks;
     procedure ActionDeleteAdjacentBlanks;
     procedure ActionDeleteAdjacentDups;
+    procedure ActionDeleteAllDups;
     procedure ActionAddFakeLineIfNeeded;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
@@ -1795,6 +1796,34 @@ begin
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
 end;
+
+procedure TATStrings.ActionDeleteAllDups;
+var
+  i, j, NLen: integer;
+  S: UnicodeString;
+begin
+  DoClearUndo;
+  DoClearLineStates(false);
+
+  for i:= Count-1 downto 1{!} do
+  begin
+    S:= Lines[i];
+    NLen:= Length(S);
+    for j:= 0 to i-1 do
+      if (NLen=LinesLen[j]) and (S=Lines[j]) then
+      begin
+        FList.Delete(i);
+        Break
+      end;
+  end;
+
+  ActionAddFakeLineIfNeeded;
+  DoClearLineStates(false);
+
+  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventLog(0);
+end;
+
 
 procedure TATStrings.ActionReverseLines;
 var

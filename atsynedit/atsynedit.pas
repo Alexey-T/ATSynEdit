@@ -1088,6 +1088,7 @@ type
     function DoCommand_DeleteAllBlanks: TATCommandResults;
     function DoCommand_DeleteAdjacentBlanks: TATCommandResults;
     function DoCommand_DeleteAdjacentDups: TATCommandResults;
+    function DoCommand_DeleteAllDups: TATCommandResults;
     function DoCommand_ReverseLines: TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
