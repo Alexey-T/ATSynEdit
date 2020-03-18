@@ -148,6 +148,7 @@ begin
   M.Add(cCommand_DeleteAllBlanks,      '(without undo) delete all blank lines', [], []);
   M.Add(cCommand_DeleteAdjacentBlanks, '(without undo) delete adjacent blank lines', [], []);
   M.Add(cCommand_DeleteAllDups,        '(without undo) delete all duplicate lines', [], []);
+  M.Add(cCommand_DeleteAllDupsKeepBlanks, '(without undo) delete all duplicate lines, keep blanks', [], []);
   M.Add(cCommand_DeleteAdjacentDups,   '(without undo) delete adjacent duplicate lines', [], []);
   M.Add(cCommand_ReverseLines,         '(without undo) reverse lines', [], []);
   M.Add(cCommand_ShuffleLines,         '(without undo) shuffle lines', [], []);

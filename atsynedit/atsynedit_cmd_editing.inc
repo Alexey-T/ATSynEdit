@@ -985,10 +985,10 @@ begin
   Result:= [cResultText, cResultCaretTop];
 end;
 
-function TATSynEdit.DoCommand_DeleteAllDups: TATCommandResults;
+function TATSynEdit.DoCommand_DeleteAllDups(AKeepBlanks: boolean): TATCommandResults;
 begin
   DoCaretSingle(0, 0);
-  Strings.ActionDeleteAllDups;
+  Strings.ActionDeleteAllDups(AKeepBlanks);
   Result:= [cResultText, cResultCaretTop];
 end;
 

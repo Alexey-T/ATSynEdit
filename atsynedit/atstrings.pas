@@ -334,7 +334,7 @@ type
     procedure ActionDeleteAllBlanks;
     procedure ActionDeleteAdjacentBlanks;
     procedure ActionDeleteAdjacentDups;
-    procedure ActionDeleteAllDups;
+    procedure ActionDeleteAllDups(AKeepBlanks: boolean);
     procedure ActionAddFakeLineIfNeeded;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
@@ -1849,7 +1849,7 @@ begin
   DoEventLog(0);
 end;
 
-procedure TATStrings.ActionDeleteAllDups;
+procedure TATStrings.ActionDeleteAllDups(AKeepBlanks: boolean);
 var
   i, j, NLen: integer;
   S: UnicodeString;
@@ -1859,6 +1859,8 @@ begin
 
   for i:= Count-1 downto 1{!} do
   begin
+    if AKeepBlanks then
+      if LinesBlank[i] then Continue;
     S:= Lines[i];
     NLen:= Length(S);
     for j:= 0 to i-1 do

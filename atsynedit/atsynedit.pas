@@ -1088,7 +1088,7 @@ type
     function DoCommand_DeleteAllBlanks: TATCommandResults;
     function DoCommand_DeleteAdjacentBlanks: TATCommandResults;
     function DoCommand_DeleteAdjacentDups: TATCommandResults;
-    function DoCommand_DeleteAllDups: TATCommandResults;
+    function DoCommand_DeleteAllDups(AKeepBlanks: boolean): TATCommandResults;
     function DoCommand_ReverseLines: TATCommandResults;
     function DoCommand_ShuffleLines: TATCommandResults;
     //

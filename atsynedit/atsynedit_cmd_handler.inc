@@ -457,7 +457,8 @@ begin
     cCommand_DeleteAllBlanks:          Res:= DoCommand_DeleteAllBlanks;
     cCommand_DeleteAdjacentBlanks:     Res:= DoCommand_DeleteAdjacentBlanks;
     cCommand_DeleteAdjacentDups:       Res:= DoCommand_DeleteAdjacentDups;
-    cCommand_DeleteAllDups:            Res:= DoCommand_DeleteAllDups;
+    cCommand_DeleteAllDups:            Res:= DoCommand_DeleteAllDups(false);
+    cCommand_DeleteAllDupsKeepBlanks:  Res:= DoCommand_DeleteAllDups(true);
     cCommand_ReverseLines:             Res:= DoCommand_ReverseLines;
     cCommand_ShuffleLines:             Res:= DoCommand_ShuffleLines;
 
