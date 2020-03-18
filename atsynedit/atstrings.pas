@@ -762,19 +762,22 @@ end;
 
 function TATStrings.GetLineBlank(AIndex: integer): boolean;
 var
-  Ptr: PATStringItem;
+  Item: PATStringItem;
+  PtrChar: PChar;
   Len, i: integer;
   code: byte;
 begin
-  Ptr:= FList.GetItem(AIndex);
-  Len:= Length(Ptr^.Buf);
+  Item:= FList.GetItem(AIndex);
+  Len:= Length(Item^.Buf);
   if Len=0 then
     exit(true);
-  if Ptr^.Ex.Wide then
+  if Item^.Ex.Wide then
     exit(false);
-  for i:= 1 to Len do
+  PtrChar:= PChar(Item^.Buf);
+  for i:= 0 to Len-1 do
   begin
-    code:= Byte(Ptr^.Buf[i]);
+    code:= byte(PtrChar^);
+    Inc(PtrChar);
     if code=9 then Continue;
     if code=32 then Continue;
     exit(false);
