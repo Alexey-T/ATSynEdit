@@ -326,7 +326,9 @@ type
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
     procedure ActionDeleteDupFakeLines;
-    procedure ActionDeleteAllBlankLines;
+    procedure ActionDeleteAllBlanks;
+    procedure ActionDeleteAdjacentBlanks;
+    procedure ActionDeleteAdjacentDups;
     procedure ActionAddFakeLineIfNeeded;
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
@@ -1739,13 +1741,49 @@ begin
     LineDelete(Count-1, false, false, false);
 end;
 
-procedure TATStrings.ActionDeleteAllBlankLines;
+procedure TATStrings.ActionDeleteAllBlanks;
 var
   i: integer;
 begin
   for i:= Count-1 downto 0 do
     if LinesLen[i]=0 then
       FList.Delete(i);
+end;
+
+procedure TATStrings.ActionDeleteAdjacentBlanks;
+var
+  i: integer;
+begin
+  DoClearUndo;
+  DoClearLineStates(false);
+
+  for i:= Count-1 downto 1{!} do
+    if (LinesLen[i]=0) and (LinesLen[i-1]=0) then
+      FList.Delete(i);
+
+  ActionAddFakeLineIfNeeded;
+  DoClearLineStates(false);
+
+  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventLog(0);
+end;
+
+procedure TATStrings.ActionDeleteAdjacentDups;
+var
+  i: integer;
+begin
+  DoClearUndo;
+  DoClearLineStates(false);
+
+  for i:= Count-1 downto 1{!} do
+    if (LinesLen[i]=LinesLen[i-1]) and (Lines[i]=Lines[i-1]) then
+      FList.Delete(i);
+
+  ActionAddFakeLineIfNeeded;
+  DoClearLineStates(false);
+
+  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventLog(0);
 end;
 
 procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
@@ -1974,7 +2012,7 @@ begin
   DoClearUndo;
   DoClearLineStates(false);
 
-  ActionDeleteAllBlankLines;
+  ActionDeleteAllBlanks;
   FList.Sort(Func);
   ActionAddFakeLineIfNeeded;
   DoClearLineStates(false);

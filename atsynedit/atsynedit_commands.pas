@@ -165,6 +165,9 @@ const
   cCommand_Sort_Desc       = 332;
   cCommand_Sort_DescNoCase = 333;
 
+  cCommand_DeleteAdjacentBlanks = 340;
+  cCommand_DeleteAdjacentDups   = 341;
+
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;
   cCommand_ClipboardPaste_KeepCaret = 1002;

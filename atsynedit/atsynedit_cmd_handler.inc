@@ -454,6 +454,9 @@ begin
     cCommand_Sort_Desc:                Res:= DoCommand_Sort(cSortActionDesc);
     cCommand_Sort_DescNoCase:          Res:= DoCommand_Sort(cSortActionDescNoCase);
 
+    cCommand_DeleteAdjacentBlanks:     Res:= DoCommand_DeleteAdjacentBlanks;
+    cCommand_DeleteAdjacentDups:       Res:= DoCommand_DeleteAdjacentDups;
+
     cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy(false, Clipboard);
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true, Clipboard);
     cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut(Clipboard);

@@ -140,10 +140,13 @@ begin
   M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
   M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Shift+Z'], []);
 
-  M.Add(cCommand_Sort_Asc,        'sort without undo: asc.', [], []);
-  M.Add(cCommand_Sort_AscNoCase,  'sort without undo: asc., ignore case', [], []);
-  M.Add(cCommand_Sort_Desc,       'sort without undo: desc.', [], []);
-  M.Add(cCommand_Sort_DescNoCase, 'sort without undo: desc., ignore case', [], []);
+  M.Add(cCommand_Sort_Asc,        '(without undo) sort asc.', [], []);
+  M.Add(cCommand_Sort_AscNoCase,  '(without undo) sort asc., ignore case', [], []);
+  M.Add(cCommand_Sort_Desc,       '(without undo) sort desc.', [], []);
+  M.Add(cCommand_Sort_DescNoCase, '(without undo) sort desc., ignore case', [], []);
+
+  M.Add(cCommand_DeleteAdjacentBlanks, '(without undo) delete adjacent blank lines', [], []);
+  M.Add(cCommand_DeleteAdjacentDups,   '(without undo) delete adjacent duplicate lines', [], []);
 
   M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXControl+'+C'], [cXControl+'+Ins']);
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/append', [], []);
