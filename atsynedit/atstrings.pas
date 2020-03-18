@@ -127,6 +127,7 @@ type
     function CharLen: integer;
     property Line: UnicodeString read GetLine write SetLineW;
     function LineSub(AFrom, ALen: integer): UnicodeString;
+    function CharAt(AIndex: integer): WideChar;
     function HasTab: boolean;
     function HasAsciiNoTabs: boolean;
     procedure Init(const S: string; AEnd: TATLineEnds);
@@ -648,6 +649,15 @@ begin
     for i:= 1 to ResLen do
       Result[i]:= WideChar(Ord(Buf[i+AFrom-1]));
   end;
+end;
+
+function TATStringItem.CharAt(AIndex: integer): WideChar;
+begin
+  if Length(Buf)=0 then exit(#0);
+  if Ex.Wide then
+    Move(Buf[AIndex*2-1], Result, 2)
+  else
+    Result:= WideChar(Ord(Buf[AIndex]));
 end;
 
 function TATStringItem.HasTab: boolean;
