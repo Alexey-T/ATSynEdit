@@ -1794,7 +1794,7 @@ begin
   DoClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
-    if (LinesBlank[i]) and (LinesBlank[i-1]) then
+    if LinesBlank[i] and LinesBlank[i-1] then
       FList.Delete(i);
 
   ActionAddFakeLineIfNeeded;
