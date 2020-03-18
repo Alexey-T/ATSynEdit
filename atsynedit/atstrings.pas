@@ -467,29 +467,27 @@ end;
 function TATStringItem.IndentSize: integer;
 var
   NLen: integer;
-  Str: UnicodeString;
+  ch: WideChar;
 begin
   Result:= 0;
   NLen:= CharLen;
   repeat
     if Result>=NLen then Break;
-    Str:= LineSub(Result+1, 1);
-    if Length(Str)<>1 then Break;
-    if not IsCharSpace(Str[1]) then Break;
+    ch:= CharAt(Result+1);
+    if not IsCharSpace(ch) then Break;
     Inc(Result);
   until false;
 end;
 
 function TATStringItem.CharLenWithoutSpace: integer;
 var
-  Str: UnicodeString;
+  ch: WideChar;
 begin
   Result:= CharLen;
   repeat
     if Result<=0 then Break;
-    Str:= LineSub(Result, 1);
-    if Length(Str)<>1 then Break;
-    if not IsCharSpace(Str[1]) then Break;
+    ch:= CharAt(Result);
+    if not IsCharSpace(ch) then Break;
     Dec(Result);
   until false;
 end;
