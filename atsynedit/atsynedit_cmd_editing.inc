@@ -970,13 +970,8 @@ begin
     Caret.GetSelLines(NFrom, NTo);
   end;
 
-  DoCaretSingle(0, 0);
   Strings.ActionSort(AAction, NFrom, NTo);
-
-  if NFrom>=0 then
-    DoCaretSingle(0, NTo+1, 0, NFrom);
-
-  Result:= [cResultText, cResultCaretTop];
+  Result:= [cResultText];
 end;
 
 function TATSynEdit.DoCommand_DeleteAllBlanks: TATCommandResults;
