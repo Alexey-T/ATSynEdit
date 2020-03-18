@@ -1833,7 +1833,7 @@ begin
   ActionEnsureFinalEol;
   ActionDeleteFakeLine;
 
-  Cnt:= FList.Count;
+  Cnt:= Count;
   if Cnt<2 then
   begin
     ActionAddFakeLineIfNeeded;
@@ -1864,7 +1864,7 @@ begin
   ActionEnsureFinalEol;
   ActionDeleteFakeLine;
 
-  Cnt:= FList.Count;
+  Cnt:= Count;
   if Cnt<2 then
   begin
     ActionAddFakeLineIfNeeded;
@@ -2099,6 +2099,15 @@ var
   Func: TFPSListCompareFunc;
   i: integer;
 begin
+  ActionEnsureFinalEol;
+  ActionDeleteFakeLine;
+
+  if Count<2 then
+  begin
+    ActionAddFakeLineIfNeeded;
+    exit;
+  end;
+
   case AAction of
     cSortActionAsc:
       Func:= @Compare_Asc;
