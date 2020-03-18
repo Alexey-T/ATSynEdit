@@ -999,3 +999,10 @@ begin
   Result:= [cResultText, cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_ShuffleLines: TATCommandResults;
+begin
+  DoCaretSingle(0, 0);
+  Strings.ActionShuffleLines;
+  Result:= [cResultText, cResultCaretTop];
+end;
+

@@ -459,6 +459,7 @@ begin
     cCommand_DeleteAdjacentDups:       Res:= DoCommand_DeleteAdjacentDups;
     cCommand_DeleteAllDups:            Res:= DoCommand_DeleteAllDups;
     cCommand_ReverseLines:             Res:= DoCommand_ReverseLines;
+    cCommand_ShuffleLines:             Res:= DoCommand_ShuffleLines;
 
     cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy(false, Clipboard);
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true, Clipboard);

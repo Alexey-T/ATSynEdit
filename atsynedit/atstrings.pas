@@ -336,6 +336,7 @@ type
     function ActionTrimFinalEmptyLines: boolean;
     procedure ActionSort(AAction: TATStringsSortAction);
     procedure ActionReverseLines;
+    procedure ActionShuffleLines;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const AFilename: string);
@@ -1848,6 +1849,34 @@ begin
 
   for i:= Cnt-1 downto mid do
     FList.Exchange(i, Cnt-1-i);
+
+  ActionAddFakeLineIfNeeded;
+  DoClearLineStates(false);
+
+  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventLog(0);
+end;
+
+procedure TATStrings.ActionShuffleLines;
+var
+  Cnt, i: integer;
+begin
+  ActionEnsureFinalEol;
+  ActionDeleteFakeLine;
+
+  Cnt:= FList.Count;
+  if Cnt<2 then
+  begin
+    ActionAddFakeLineIfNeeded;
+    exit;
+  end;
+
+  DoClearUndo;
+  DoClearLineStates(false);
+
+  // https://stackoverflow.com/a/14006825/6792690
+  for i:= Cnt-1 downto 1 do
+    FList.Exchange(i, Random(i+1));
 
   ActionAddFakeLineIfNeeded;
   DoClearLineStates(false);

@@ -1090,6 +1090,7 @@ type
     function DoCommand_DeleteAdjacentDups: TATCommandResults;
     function DoCommand_DeleteAllDups: TATCommandResults;
     function DoCommand_ReverseLines: TATCommandResults;
+    function DoCommand_ShuffleLines: TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
     function DoMouseWheelAction(Shift: TShiftState; AUp, AForceHorz: boolean): boolean;

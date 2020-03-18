@@ -150,6 +150,7 @@ begin
   M.Add(cCommand_DeleteAllDups,        '(without undo) delete all duplicate lines', [], []);
   M.Add(cCommand_DeleteAdjacentDups,   '(without undo) delete adjacent duplicate lines', [], []);
   M.Add(cCommand_ReverseLines,         '(without undo) reverse lines', [], []);
+  M.Add(cCommand_ShuffleLines,         '(without undo) shuffle lines', [], []);
 
   M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXControl+'+C'], [cXControl+'+Ins']);
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/append', [], []);
