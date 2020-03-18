@@ -654,6 +654,7 @@ function TATStringItem.CharAt(AIndex: integer): WideChar;
 var
   NLen: integer;
 begin
+  if AIndex<=0 then exit(#0);
   NLen:= CharLen;
   if NLen=0 then exit(#0);
   if AIndex>NLen then exit(#0);
