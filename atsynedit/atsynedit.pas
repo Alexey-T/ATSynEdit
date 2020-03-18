@@ -7358,16 +7358,16 @@ end;
 procedure TATSynEdit.DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
 var
   Caret: TATCaretItem;
+  ch: WideChar;
   i: integer;
-  S: atString;
 begin
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
     if Caret.PosX<=0 then Continue;
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
-    S:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
-    if (S<>'') and IsCharSurrogateLow(S[1]) then
+    ch:= Strings.LineCharAt(Caret.PosY, Caret.PosX+1);
+    if (ch<>#0) and IsCharSurrogateLow(ch) then
       Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
   end;
 end;

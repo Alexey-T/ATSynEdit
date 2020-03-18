@@ -298,6 +298,7 @@ type
     property LinesUpdated[Index: integer]: boolean read GetLineUpdated write SetLineUpdated;
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
+    function LineCharAt(ALineIndex, ACharIndex: integer): WideChar;
     function LineIndent(ALineIndex: integer): integer;
     function LineLenWithoutSpace(ALineIndex: integer): integer;
     procedure LineBlockDelete(ALine1, ALine2: integer);
@@ -650,8 +651,12 @@ begin
 end;
 
 function TATStringItem.CharAt(AIndex: integer): WideChar;
+var
+  NLen: integer;
 begin
-  if Length(Buf)=0 then exit(#0);
+  NLen:= CharLen;
+  if NLen=0 then exit(#0);
+  if AIndex>NLen then exit(#0);
   if Ex.Wide then
     Move(Buf[AIndex*2-1], Result, 2)
   else
@@ -1374,6 +1379,11 @@ begin
   if ALen=0 then exit('');
   Item:= GetItemPtr(ALineIndex);
   Result:= Item^.LineSub(APosFrom, ALen);
+end;
+
+function TATStrings.LineCharAt(ALineIndex, ACharIndex: integer): WideChar;
+begin
+  Result:= GetItemPtr(ALineIndex)^.CharAt(ACharIndex);
 end;
 
 function TATStrings.LineIndent(ALineIndex: integer): integer;
