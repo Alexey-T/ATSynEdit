@@ -1085,6 +1085,7 @@ type
     function DoCommand_ClipboardCut(
       AClipboardObject: TClipboard): TATCommandResults;
     function DoCommand_Sort(AAction: TATStringsSortAction): TATCommandResults;
+    function DoCommand_DeleteAllBlanks: TATCommandResults;
     function DoCommand_DeleteAdjacentBlanks: TATCommandResults;
     function DoCommand_DeleteAdjacentDups: TATCommandResults;
     //

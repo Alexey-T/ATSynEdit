@@ -1745,9 +1745,18 @@ procedure TATStrings.ActionDeleteAllBlanks;
 var
   i: integer;
 begin
+  DoClearUndo;
+  DoClearLineStates(false);
+
   for i:= Count-1 downto 0 do
     if LinesLen[i]=0 then
       FList.Delete(i);
+
+  ActionAddFakeLineIfNeeded;
+  DoClearLineStates(false);
+
+  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventLog(0);
 end;
 
 procedure TATStrings.ActionDeleteAdjacentBlanks;
@@ -1997,6 +2006,7 @@ end;
 procedure TATStrings.ActionSort(AAction: TATStringsSortAction);
 var
   Func: TFPSListCompareFunc;
+  i: integer;
 begin
   case AAction of
     cSortActionAsc:
@@ -2012,8 +2022,12 @@ begin
   DoClearUndo;
   DoClearLineStates(false);
 
-  ActionDeleteAllBlanks;
+  for i:= Count-1 downto 0 do
+    if LinesLen[i]=0 then
+      FList.Delete(i);
+
   FList.Sort(Func);
+
   ActionAddFakeLineIfNeeded;
   DoClearLineStates(false);
 

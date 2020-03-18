@@ -964,6 +964,13 @@ begin
   Result:= [cResultText, cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_DeleteAllBlanks: TATCommandResults;
+begin
+  DoCaretSingle(0, 0);
+  Strings.ActionDeleteAllBlanks;
+  Result:= [cResultText, cResultCaretTop];
+end;
+
 function TATSynEdit.DoCommand_DeleteAdjacentBlanks: TATCommandResults;
 begin
   DoCaretSingle(0, 0);

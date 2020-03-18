@@ -145,6 +145,7 @@ begin
   M.Add(cCommand_Sort_Desc,       '(without undo) sort desc.', [], []);
   M.Add(cCommand_Sort_DescNoCase, '(without undo) sort desc., ignore case', [], []);
 
+  M.Add(cCommand_DeleteAllBlanks,      '(without undo) delete all blank lines', [], []);
   M.Add(cCommand_DeleteAdjacentBlanks, '(without undo) delete adjacent blank lines', [], []);
   M.Add(cCommand_DeleteAdjacentDups,   '(without undo) delete adjacent duplicate lines', [], []);
 

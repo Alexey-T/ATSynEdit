@@ -454,6 +454,7 @@ begin
     cCommand_Sort_Desc:                Res:= DoCommand_Sort(cSortActionDesc);
     cCommand_Sort_DescNoCase:          Res:= DoCommand_Sort(cSortActionDescNoCase);
 
+    cCommand_DeleteAllBlanks:          Res:= DoCommand_DeleteAllBlanks;
     cCommand_DeleteAdjacentBlanks:     Res:= DoCommand_DeleteAdjacentBlanks;
     cCommand_DeleteAdjacentDups:       Res:= DoCommand_DeleteAdjacentDups;
 
