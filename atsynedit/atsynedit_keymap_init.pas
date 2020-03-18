@@ -148,6 +148,7 @@ begin
   M.Add(cCommand_DeleteAllBlanks,      '(without undo) delete all blank lines', [], []);
   M.Add(cCommand_DeleteAdjacentBlanks, '(without undo) delete adjacent blank lines', [], []);
   M.Add(cCommand_DeleteAdjacentDups,   '(without undo) delete adjacent duplicate lines', [], []);
+  M.Add(cCommand_ReverseLines,         '(without undo) reverse lines', [], []);
 
   M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXControl+'+C'], [cXControl+'+Ins']);
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/append', [], []);

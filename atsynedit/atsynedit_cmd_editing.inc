@@ -985,3 +985,10 @@ begin
   Result:= [cResultText, cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_ReverseLines: TATCommandResults;
+begin
+  DoCaretSingle(0, 0);
+  Strings.ActionReverseLines;
+  Result:= [cResultText, cResultCaretTop];
+end;
+

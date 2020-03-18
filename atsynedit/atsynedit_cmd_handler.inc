@@ -457,6 +457,7 @@ begin
     cCommand_DeleteAllBlanks:          Res:= DoCommand_DeleteAllBlanks;
     cCommand_DeleteAdjacentBlanks:     Res:= DoCommand_DeleteAdjacentBlanks;
     cCommand_DeleteAdjacentDups:       Res:= DoCommand_DeleteAdjacentDups;
+    cCommand_ReverseLines:             Res:= DoCommand_ReverseLines;
 
     cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy(false, Clipboard);
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true, Clipboard);

@@ -334,6 +334,7 @@ type
     function ActionEnsureFinalEol: boolean;
     function ActionTrimFinalEmptyLines: boolean;
     procedure ActionSort(AAction: TATStringsSortAction);
+    procedure ActionReverseLines;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const AFilename: string);
@@ -1794,6 +1795,38 @@ begin
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
 end;
+
+procedure TATStrings.ActionReverseLines;
+var
+  Cnt, i, mid: integer;
+begin
+  ActionEnsureFinalEol;
+  ActionDeleteFakeLine;
+
+  Cnt:= FList.Count;
+  if Cnt<2 then
+  begin
+    ActionAddFakeLineIfNeeded;
+    exit;
+  end;
+
+  DoClearUndo;
+  DoClearLineStates(false);
+
+  mid:= Cnt div 2;
+  if Odd(Cnt) then
+    Inc(mid);
+
+  for i:= Cnt-1 downto mid do
+    FList.Exchange(i, Cnt-1-i);
+
+  ActionAddFakeLineIfNeeded;
+  DoClearLineStates(false);
+
+  DoEventChange(cLineChangeDeletedAll, -1, 1);
+  DoEventLog(0);
+end;
+
 
 procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
 begin
