@@ -134,6 +134,7 @@ type
     function IsFake: boolean; inline;
     function IndentSize: integer;
     function CharLenWithoutSpace: integer;
+    function IsBlank: boolean;
   end;
   PATStringItem = ^TATStringItem;
 
@@ -492,6 +493,30 @@ begin
   until false;
 end;
 
+function TATStringItem.IsBlank: boolean;
+var
+  PtrChar: PChar;
+  Len, i: integer;
+  code: byte;
+begin
+  Len:= Length(Buf);
+  if Len=0 then
+    exit(true);
+  if Ex.Wide then
+    exit(false);
+  PtrChar:= PChar(Buf);
+  for i:= 1 to Len do
+  begin
+    code:= byte(PtrChar^);
+    Inc(PtrChar);
+    if code=9 then Continue;
+    if code=32 then Continue;
+    exit(false);
+  end;
+  Result:= true;
+end;
+
+
 function TATStringItem.CharLen: integer;
 begin
   if Ex.Wide then
@@ -761,28 +786,8 @@ begin
 end;
 
 function TATStrings.GetLineBlank(AIndex: integer): boolean;
-var
-  Item: PATStringItem;
-  PtrChar: PChar;
-  Len, i: integer;
-  code: byte;
 begin
-  Item:= FList.GetItem(AIndex);
-  Len:= Length(Item^.Buf);
-  if Len=0 then
-    exit(true);
-  if Item^.Ex.Wide then
-    exit(false);
-  PtrChar:= PChar(Item^.Buf);
-  for i:= 0 to Len-1 do
-  begin
-    code:= byte(PtrChar^);
-    Inc(PtrChar);
-    if code=9 then Continue;
-    if code=32 then Continue;
-    exit(false);
-  end;
-  Result:= true;
+  Result:= FList.GetItem(AIndex)^.IsBlank;
 end;
 
 function TATStrings.GetLineLen(AIndex: integer): integer;
