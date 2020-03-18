@@ -958,9 +958,24 @@ begin
 end;
 
 function TATSynEdit.DoCommand_Sort(AAction: TATStringsSortAction): TATCommandResults;
+var
+  Caret: TATCaretItem;
+  NFrom, NTo: integer;
 begin
+  NFrom:= -1;
+  NTo:= -1;
+  if Carets.Count>0 then
+  begin
+    Caret:= Carets[0];
+    Caret.GetSelLines(NFrom, NTo);
+  end;
+
   DoCaretSingle(0, 0);
-  Strings.ActionSort(AAction);
+  Strings.ActionSort(AAction, NFrom, NTo);
+
+  if NFrom>=0 then
+    DoCaretSingle(0, NTo+1, 0, NFrom);
+
   Result:= [cResultText, cResultCaretTop];
 end;
 

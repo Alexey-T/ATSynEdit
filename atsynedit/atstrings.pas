@@ -146,6 +146,7 @@ type
     constructor Create;
     function GetItem(AIndex: integer): PATStringItem;
     procedure Deref(Item: Pointer); override; overload;
+    procedure SortRange(L, R: integer; Compare: TFPSListCompareFunc);
   end;
 
 type
@@ -339,7 +340,7 @@ type
     function ActionTrimSpaces(AMode: TATTrimSpaces): boolean;
     function ActionEnsureFinalEol: boolean;
     function ActionTrimFinalEmptyLines: boolean;
-    procedure ActionSort(AAction: TATStringsSortAction);
+    procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: integer);
     procedure ActionReverseLines;
     procedure ActionShuffleLines;
     //file
@@ -785,6 +786,11 @@ end;
 procedure TATStringItemList.Deref(Item: Pointer);
 begin
   PATStringItem(Item)^.Buf:= '';
+end;
+
+procedure TATStringItemList.SortRange(L, R: integer; Compare: TFPSListCompareFunc);
+begin
+  QuickSort(L, R, Compare);
 end;
 
 { TATStrings }
@@ -2147,7 +2153,7 @@ begin
 end;
 
 
-procedure TATStrings.ActionSort(AAction: TATStringsSortAction);
+procedure TATStrings.ActionSort(AAction: TATStringsSortAction; AFrom, ATo: integer);
 var
   Func: TFPSListCompareFunc;
   i: integer;
@@ -2179,7 +2185,10 @@ begin
     if LinesLen[i]=0 then
       FList.Delete(i);
 
-  FList.Sort(Func);
+  if AFrom<0 then
+    FList.Sort(Func)
+  else
+    FList.SortRange(AFrom, ATo, Func);
 
   ActionAddFakeLineIfNeeded;
   DoClearLineStates(false);
