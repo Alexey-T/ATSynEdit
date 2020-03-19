@@ -6281,8 +6281,8 @@ procedure TATSynEdit.DoScaleFontDelta(AInc: boolean);
 const
   cMinScale = 60;
   cStep = 10;
-var
-  NTop: integer;
+//var
+//  NTop: integer;
 begin
   if not FOptAllowZooming then Exit;
 
@@ -6296,9 +6296,9 @@ begin
   if not AInc then
     if FOptScaleFont<=cMinScale then Exit;
 
-  NTop:= LineTop;
+  //NTop:= LineTop;
   FOptScaleFont:= FOptScaleFont+cStep*BoolToPlusMinusOne(AInc);
-  LineTop:= NTop;
+  //LineTop:= NTop;
   Update;
 end;
 
