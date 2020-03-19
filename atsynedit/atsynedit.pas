@@ -5163,7 +5163,8 @@ begin
           else
           begin
             //drag w/out button pressed: single selection
-            if [ssXControl, {ssShift,} ssAlt]*Shift=[] then
+            //ssShift is allowed to select by Shift+MouseWheel
+            if [ssXControl, ssAlt]*Shift=[] then
             begin
               if FOptMouseEnableColumnSelection and FOptMouseColumnSelectionWithoutKey then
               begin
