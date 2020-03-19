@@ -1287,7 +1287,7 @@ type
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(ADeltaX, ADeltaY: integer);
     procedure DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
-    procedure DoSizeChange(AInc: boolean);
+    procedure DoScaleFontDelta(AInc: boolean);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor): boolean;
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
@@ -5318,7 +5318,7 @@ begin
       begin
         if FOptMouseWheelZooms then
         begin
-          DoSizeChange(AUp);
+          DoScaleFontDelta(AUp);
           Result:= true;
         end;
       end;
@@ -6276,16 +6276,27 @@ begin
   Strings.UndoAsString:= AValue;
 end;
 
-procedure TATSynEdit.DoSizeChange(AInc: boolean);
+procedure TATSynEdit.DoScaleFontDelta(AInc: boolean);
+const
+  cMinScale = 60;
+  cStep = 10;
 var
   NTop: integer;
 begin
   if not FOptAllowZooming then Exit;
+
+  if FOptScaleFont=0 then
+  begin
+    FOptScaleFont:= EditorScaleFontPercents;
+    if FOptScaleFont=0 then
+      FOptScaleFont:= EditorScalePercents;
+  end;
+
   if not AInc then
-    if Font.Size<=cMinFontSize then Exit;
+    if FOptScaleFont<=cMinScale then Exit;
 
   NTop:= LineTop;
-  Font.Size:= Font.Size+BoolToPlusMinusOne(AInc);
+  FOptScaleFont:= FOptScaleFont+cStep*BoolToPlusMinusOne(AInc);
   LineTop:= NTop;
   Update;
 end;
