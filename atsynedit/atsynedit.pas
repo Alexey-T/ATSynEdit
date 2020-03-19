@@ -738,7 +738,6 @@ type
     FOptShowIndentLines: boolean;
     FOptShowGutterCaretBG: boolean;
     FOptAllowRepaintOnTextChange: boolean;
-    FOptAllowZooming: boolean;
     FOptAllowReadOnly: boolean;
     FOptZebraActive: boolean;
     FOptZebraAlphaBlend: byte;
@@ -1587,7 +1586,6 @@ type
     property OptShowIndentLines: boolean read FOptShowIndentLines write FOptShowIndentLines default true;
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG default true;
     property OptAllowRepaintOnTextChange: boolean read FOptAllowRepaintOnTextChange write FOptAllowRepaintOnTextChange default true;
-    property OptAllowZooming: boolean read FOptAllowZooming write FOptAllowZooming default true;
     property OptAllowReadOnly: boolean read FOptAllowReadOnly write FOptAllowReadOnly default true;
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit default 5000;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped default true;
@@ -3701,7 +3699,6 @@ begin
   FOptTextOffsetTop:= 0;
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
   FOptAllowRepaintOnTextChange:= true;
-  FOptAllowZooming:= true;
   FOptAllowReadOnly:= true;
   FOptKeyBackspaceUnindent:= true;
   FOptKeyBackspaceGoesToPrevLine:= true;
@@ -4037,7 +4034,6 @@ begin
     OptWrapMode:= cWrapOff;
     OptScrollStyleHorz:= aessHide;
     OptScrollStyleVert:= aessHide;
-    OptAllowZooming:= false;
     OptAllowReadOnly:= false;
     OptMouseNiceScroll:= false;
     OptMouseDragDrop:= false;
@@ -6284,8 +6280,6 @@ const
 //var
 //  NTop: integer;
 begin
-  if not FOptAllowZooming then Exit;
-
   if FOptScaleFont=0 then
   begin
     FOptScaleFont:= EditorScaleFontPercents;
