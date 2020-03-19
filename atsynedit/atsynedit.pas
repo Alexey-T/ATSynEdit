@@ -610,6 +610,7 @@ type
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
 
+    FOptScaleFont: integer;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
@@ -851,6 +852,7 @@ type
       out AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
       AMainText: boolean);
+    function DoScaleFont(AValue: integer): integer;
     //select
     procedure DoSelectionDeleteOrReset;
     procedure DoSelect_ExtendSelectionByLine;
@@ -1416,6 +1418,7 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
+    property OptScaleFont: integer read FOptScaleFont write FOptScaleFont default 0;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
@@ -1640,7 +1643,7 @@ begin
   NTopIndent:= FOptRulerTopIndentPercents*FCharSize.Y div 100;
 
   C.Font.Name:= Font.Name;
-  C.Font.Size:= EditorScaleFont(Font.Size) * FOptRulerFontSizePercents div 100;
+  C.Font.Size:= DoScaleFont(Font.Size) * FOptRulerFontSizePercents div 100;
   C.Font.Color:= Colors.RulerFont;
   C.Pen.Color:= Colors.RulerFont;
   C.Brush.Color:= Colors.RulerBG;
@@ -1818,7 +1821,7 @@ begin
   if FRectMain.Width=0 then
     UpdateInitialVars(Canvas);
 
-  GlobalCharSizer.Init(Font.Name, EditorScaleFont(Font.Size));
+  GlobalCharSizer.Init(Font.Name, DoScaleFont(Font.Size));
 
   //virtual mode allows faster usage of WrapInfo
   CurStrings:= Strings;
@@ -2392,7 +2395,7 @@ end;
 procedure TATSynEdit.UpdateInitialVars(C: TCanvas);
 begin
   C.Font.Name:= Font.Name;
-  C.Font.Size:= EditorScaleFont(Font.Size);
+  C.Font.Size:= DoScaleFont(Font.Size);
 
   FCharSize:= GetCharSize(C, FCharSpacingText);
 
@@ -2926,16 +2929,16 @@ begin
         TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
         TextOutProps.FontNormal_Name:= Font.Name;
-        TextOutProps.FontNormal_Size:= EditorScaleFont(Font.Size);
+        TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
 
         TextOutProps.FontItalic_Name:= FontItalic.Name;
-        TextOutProps.FontItalic_Size:= EditorScaleFont(FontItalic.Size);
+        TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
 
         TextOutProps.FontBold_Name:= FontBold.Name;
-        TextOutProps.FontBold_Size:= EditorScaleFont(FontBold.Size);
+        TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
 
         TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
-        TextOutProps.FontBoldItalic_Size:= EditorScaleFont(FontBoldItalic.Size);
+        TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
 
         CanvasTextOut(C,
           CurrPointText.X,
@@ -5756,7 +5759,7 @@ begin
   Str:= DoFormatLineNumber(ALineIndex+1);
 
   //C.Font.Name:= Font.Name;
-  //C.Font.Size:= EditorScaleFont(Font.Size);
+  //C.Font.Size:= DoScaleFont(Font.Size);
   //Size:= C.TextWidth(Str);
   Size:= FCharSize.X*Length(Str);
 
@@ -7065,16 +7068,16 @@ begin
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
   TextOutProps.FontNormal_Name:= Font.Name;
-  TextOutProps.FontNormal_Size:= EditorScaleFont(Font.Size);
+  TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
 
   TextOutProps.FontItalic_Name:= FontItalic.Name;
-  TextOutProps.FontItalic_Size:= EditorScaleFont(FontItalic.Size);
+  TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
 
   TextOutProps.FontBold_Name:= FontBold.Name;
-  TextOutProps.FontBold_Size:= EditorScaleFont(FontBold.Size);
+  TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
 
   TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
-  TextOutProps.FontBoldItalic_Size:= EditorScaleFont(FontBoldItalic.Size);
+  TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
 
   if AConsiderWrapInfo then
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(0, ALineFrom));
@@ -7530,6 +7533,15 @@ begin
     FMarkedRange.Sorted:= true;
   end;
 end;
+
+function TATSynEdit.DoScaleFont(AValue: integer): integer;
+begin
+  if FOptScaleFont>0 then
+    Result:= AValue * FOptScaleFont div 100
+  else
+    Result:= EditorScaleFont(AValue);
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}

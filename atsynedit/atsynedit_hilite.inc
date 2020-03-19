@@ -92,7 +92,6 @@ begin
   end;
 end;
 
-
 procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
   AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
 var
