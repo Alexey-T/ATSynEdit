@@ -5163,7 +5163,7 @@ begin
           else
           begin
             //drag w/out button pressed: single selection
-            if [ssXControl, ssShift, ssAlt]*Shift=[] then
+            if [ssXControl, {ssShift,} ssAlt]*Shift=[] then
             begin
               if FOptMouseEnableColumnSelection and FOptMouseColumnSelectionWithoutKey then
               begin
@@ -5273,9 +5273,11 @@ begin
   if (Shift=[FOptMouseWheelZoomsWithState]) then
     Mode:= aWheelModeZoom
   else
-  if (Shift=[FOptMouseWheelScrollHorzWithState]) then
+  // -[ssLeft] to ignore pressed mouse button
+  if (Shift-[ssLeft]=[FOptMouseWheelScrollHorzWithState]) then
     Mode:= aWheelModeHoriz
   else
+  // -[ssLeft] to ignore pressed mouse button
   if (Shift-[ssLeft]=[]) then
     Mode:= aWheelModeNormal
   else
