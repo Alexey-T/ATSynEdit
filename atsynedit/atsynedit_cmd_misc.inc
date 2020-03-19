@@ -100,12 +100,17 @@ begin
   Result:= [cResultCaretAny];
 end;
 
-function TATSynEdit.DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ScaleDelta(AIncrease: boolean): TATCommandResults;
 begin
   DoScaleFontDelta(AIncrease);
   Result:= [cResultState];
 end;
 
+function TATSynEdit.DoCommand_ScaleReset: TATCommandResults;
+begin
+  FOptScaleFont:= 0;
+  Result:= [cResultState];
+end;
 
 function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
 var

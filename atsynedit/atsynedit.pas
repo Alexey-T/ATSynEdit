@@ -1016,7 +1016,8 @@ type
     function DoCommand_FoldSelection: TATCommandResults;
     function DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
     function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
-    function DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
+    function DoCommand_ScaleDelta(AIncrease: boolean): TATCommandResults;
+    function DoCommand_ScaleReset: TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
     function DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATCommandResults;

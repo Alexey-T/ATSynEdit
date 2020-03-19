@@ -515,8 +515,9 @@ begin
     cCommand_CaretsExtendDownPage:     Res:= DoCommand_CaretsExtend(true, GetPageLines);
     cCommand_CaretsExtendDownToEnd:    Res:= DoCommand_CaretsExtend(true, Strings.Count);
 
-    cCommand_ZoomIn:                   Res:= DoCommand_SizeChange(true);
-    cCommand_ZoomOut:                  Res:= DoCommand_SizeChange(false);
+    cCommand_ZoomIn:                   Res:= DoCommand_ScaleDelta(true);
+    cCommand_ZoomOut:                  Res:= DoCommand_ScaleDelta(false);
+    cCommand_ZoomReset:                Res:= DoCommand_ScaleReset;
     cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
 

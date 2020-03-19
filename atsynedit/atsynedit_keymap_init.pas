@@ -191,6 +191,7 @@ begin
 
   M.Add(cCommand_ZoomIn, 'current document font size: bigger', [], []);
   M.Add(cCommand_ZoomOut, 'current document font size: smaller', [], []);
+  M.Add(cCommand_ZoomReset, 'current document font size: reset', [], []);
 
   M.Add(cCommand_TextCaseLower, 'convert case: lower case', [], []);
   M.Add(cCommand_TextCaseUpper, 'convert case: upper case', [], []);
