@@ -694,6 +694,7 @@ type
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptOverwriteAllowedOnPaste: boolean;
+    FOptKeyLeftRightGoToNextLineWithCarets: boolean;
     FOptKeyBackspaceUnindent: boolean;
     FOptKeyBackspaceGoesToPrevLine: boolean;
     FOptKeyPageKeepsRelativePos: boolean;
@@ -1564,6 +1565,7 @@ type
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssModifier;
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
     property OptMouseClickOpensURL: boolean read FOptMouseClickOpensURL write FOptMouseClickOpensURL default false;
+    property OptKeyLeftRightGoToNextLineWithCarets: boolean read FOptKeyLeftRightGoToNextLineWithCarets write FOptKeyLeftRightGoToNextLineWithCarets default false;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyBackspaceGoesToPrevLine: boolean read FOptKeyBackspaceGoesToPrevLine write FOptKeyBackspaceGoesToPrevLine default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
@@ -3700,12 +3702,15 @@ begin
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
   FOptAllowRepaintOnTextChange:= true;
   FOptAllowReadOnly:= true;
+
+  FOptKeyLeftRightGoToNextLineWithCarets:= false;
   FOptKeyBackspaceUnindent:= true;
   FOptKeyBackspaceGoesToPrevLine:= true;
   FOptKeyPageKeepsRelativePos:= true;
   FOptKeyUpDownNavigateWrapped:= true;
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptKeyUpDownKeepColumn:= true;
+
   FOptOverwriteAllowedOnPaste:= false;
   FOptNonWordChars:= cDefaultNonWordChars;
   FOptAutoIndent:= true;

@@ -1,4 +1,7 @@
 
+2020.03.21
++ add: OptKeyLeftRightGoToNextLineWithCaret (to be like EmEditor)
+
 2020.03.20
 + add: OptScaleFont (if >0, it is scale of editor's font in percents)
 * change: make Ctrl+MouseWheel change editor font scale by 10%, instead of changing font.size by 1

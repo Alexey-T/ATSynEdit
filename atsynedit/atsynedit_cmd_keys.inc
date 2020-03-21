@@ -93,6 +93,7 @@ end;
 function TATSynEdit.DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  bMultiCarets: boolean;
   i: integer;
 begin
   Result:= [cResultCaretLeft];
@@ -104,12 +105,19 @@ begin
     DoSelect_None;
   end;
 
+  bMultiCarets:= FCarets.Count>1;
+
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
     if (Caret.PosX>0) then
       Dec(Caret.PosX)
+    else
+    if bMultiCarets and not FOptKeyLeftRightGoToNextLineWithCarets then
+    begin
+      //none
+    end
     else
     if (Caret.PosY>0) and not FCaretVirtual then
     begin
@@ -122,6 +130,7 @@ end;
 function TATSynEdit.DoCommand_KeyRight(ASelCommand: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  bMultiCarets: boolean;
   i: integer;
 begin
   Result:= [cResultCaretRight];
@@ -133,12 +142,19 @@ begin
     DoSelect_None;
   end;
 
+  bMultiCarets:= FCarets.Count>1;
+
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
     if (Caret.PosX<Strings.LinesLen[Caret.PosY]) or FCaretVirtual then
       Inc(Caret.PosX)
+    else
+    if bMultiCarets and not FOptKeyLeftRightGoToNextLineWithCarets then
+    begin
+      //none
+    end
     else
     if (Caret.PosY<Strings.Count-1) then
     begin
