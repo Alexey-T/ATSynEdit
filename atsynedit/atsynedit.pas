@@ -1572,7 +1572,7 @@ type
     property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn default true;
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped default true;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize default cPageSizeFullMinus1;
-    property OptKeyLeftRightGoToNextLineWithCarets: boolean read FOptKeyLeftRightGoToNextLineWithCarets write FOptKeyLeftRightGoToNextLineWithCarets default false;
+    property OptKeyLeftRightGoToNextLineWithCarets: boolean read FOptKeyLeftRightGoToNextLineWithCarets write FOptKeyLeftRightGoToNextLineWithCarets default true;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel default true;
     property OptKeyLeftRightSwapSelAndSelect: boolean read FOptKeyLeftRightSwapSelAndSelect write FOptKeyLeftRightSwapSelAndSelect default false;
     property OptKeyHomeToNonSpace: boolean read FOptKeyHomeToNonSpace write FOptKeyHomeToNonSpace default true;
@@ -3753,7 +3753,7 @@ begin
   FOptShowMouseSelFrame:= cInitShowMouseSelFrame;
 
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
-  FOptKeyLeftRightGoToNextLineWithCarets:= false;
+  FOptKeyLeftRightGoToNextLineWithCarets:= true;
   FOptKeyLeftRightSwapSel:= true;
   FOptKeyLeftRightSwapSelAndSelect:= false;
   FOptKeyHomeToNonSpace:= true;
