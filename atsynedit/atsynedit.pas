@@ -694,7 +694,6 @@ type
     FOptLastLineOnTop: boolean;
     FOptOverwriteSel: boolean;
     FOptOverwriteAllowedOnPaste: boolean;
-    FOptKeyLeftRightGoToNextLineWithCarets: boolean;
     FOptKeyBackspaceUnindent: boolean;
     FOptKeyBackspaceGoesToPrevLine: boolean;
     FOptKeyPageKeepsRelativePos: boolean;
@@ -730,6 +729,7 @@ type
     FOptMouseWheelZooms: boolean;
     FOptMouseWheelZoomsWithState: TShiftStateEnum;
     FOptKeyPageUpDownSize: TATPageUpDownSize;
+    FOptKeyLeftRightGoToNextLineWithCarets: boolean;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyLeftRightSwapSelAndSelect: boolean;
     FOptKeyHomeToNonSpace: boolean;
@@ -1565,7 +1565,6 @@ type
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssModifier;
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
     property OptMouseClickOpensURL: boolean read FOptMouseClickOpensURL write FOptMouseClickOpensURL default false;
-    property OptKeyLeftRightGoToNextLineWithCarets: boolean read FOptKeyLeftRightGoToNextLineWithCarets write FOptKeyLeftRightGoToNextLineWithCarets default false;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyBackspaceGoesToPrevLine: boolean read FOptKeyBackspaceGoesToPrevLine write FOptKeyBackspaceGoesToPrevLine default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
@@ -1573,6 +1572,7 @@ type
     property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn default true;
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped default true;
     property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize default cPageSizeFullMinus1;
+    property OptKeyLeftRightGoToNextLineWithCarets: boolean read FOptKeyLeftRightGoToNextLineWithCarets write FOptKeyLeftRightGoToNextLineWithCarets default false;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel default true;
     property OptKeyLeftRightSwapSelAndSelect: boolean read FOptKeyLeftRightSwapSelAndSelect write FOptKeyLeftRightSwapSelAndSelect default false;
     property OptKeyHomeToNonSpace: boolean read FOptKeyHomeToNonSpace write FOptKeyHomeToNonSpace default true;
@@ -3703,7 +3703,6 @@ begin
   FOptAllowRepaintOnTextChange:= true;
   FOptAllowReadOnly:= true;
 
-  FOptKeyLeftRightGoToNextLineWithCarets:= false;
   FOptKeyBackspaceUnindent:= true;
   FOptKeyBackspaceGoesToPrevLine:= true;
   FOptKeyPageKeepsRelativePos:= true;
@@ -3752,13 +3751,16 @@ begin
   FOptShowCurLineOnlyFocused:= false;
   FOptShowCurColumn:= false;
   FOptShowMouseSelFrame:= cInitShowMouseSelFrame;
+
   FOptKeyPageUpDownSize:= cPageSizeFullMinus1;
+  FOptKeyLeftRightGoToNextLineWithCarets:= false;
   FOptKeyLeftRightSwapSel:= true;
   FOptKeyLeftRightSwapSelAndSelect:= false;
   FOptKeyHomeToNonSpace:= true;
   FOptKeyEndToNonSpace:= true;
   FOptKeyTabIndents:= true;
   FOptKeyTabIndentsVerticalBlock:= false;
+
   FOptShowIndentLines:= true;
   FOptShowGutterCaretBG:= true;
   FOptIndentSize:= 2;
