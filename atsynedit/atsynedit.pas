@@ -1814,9 +1814,12 @@ var
   NLine, NIndexFrom, NIndexTo: integer;
   i, j: integer;
 begin
-  //must have, coz method can be called before 1st paint,
+  {
+  //2020.03: works ok w/o this block
+  //old comment: method can be called before 1st paint,
   //so TCanvas.TextWidth will give exception (control has no parent window)
   if not HandleAllocated then exit;
+  }
 
   //must init FRect* if called before first paint (wrapped items need it)
   if FRectMain.Width=0 then
