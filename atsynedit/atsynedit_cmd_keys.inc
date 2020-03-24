@@ -331,9 +331,12 @@ var
   Caret: TATCaretItem;
   Strs: TATStrings;
   Str: atString;
+  bMultiCaret: boolean;
   i: integer;
 begin
   Strs:= Strings;
+  bMultiCaret:= FCarets.Count>1;
+
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
@@ -343,6 +346,7 @@ begin
     //jump to prev line?
     if (Caret.PosX=0) and (AJump=cWordjumpToPrev) then
     begin
+      if not bMultiCaret or FOptKeyLeftRightGoToNextLineWithCarets then
       if Caret.PosY>0 then
       begin
         Dec(Caret.PosY);
@@ -353,6 +357,7 @@ begin
     //jump to next line?
     if (Caret.PosX>=Length(Str)) and (AJump in [cWordjumpToNext, cWordjumpToEndOrNext]) then
     begin
+      if not bMultiCaret or FOptKeyLeftRightGoToNextLineWithCarets then
       if Caret.PosY<Strs.Count-1 then
       begin
         Inc(Caret.PosY);
