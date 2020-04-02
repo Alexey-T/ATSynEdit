@@ -899,8 +899,8 @@ type
     procedure DoPaintModeBlinking;
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
       const AVisRect: TRect; APointLeft, APointText: TPoint;
-  const AWrapItem: TATWrapItem; ALineWidth: integer;
-  const AScrollHorz: TATSynScrollInfo);
+      const AWrapItem: TATWrapItem; ALineWidth: integer;
+      const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintMarkerOfDragDrop(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
@@ -5684,17 +5684,15 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   ALineWidth: integer;
   const AScrollHorz: TATSynScrollInfo);
 var
+  NLineIndex, NPartXAfter: integer;
   NLeft, NRight, i: integer;
-  NLineIndex, NPartOffset, NPartLen, NPartXAfter: integer;
   Ranges: TATSimpleRangeArray;
   Range: TATSimpleRange;
 begin
   C.Brush.Color:= Colors.TextSelBG;
 
   NLineIndex:= AWrapItem.NLineIndex;
-  NPartOffset:= AWrapItem.NCharIndex;
-  NPartLen:= AWrapItem.NLength;
-  NPartXAfter:= NPartOffset-1+NPartLen;
+  NPartXAfter:= AWrapItem.NCharIndex-1+AWrapItem.NLength;
 
   if not IsSelRectEmpty then
   begin
