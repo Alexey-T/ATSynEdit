@@ -898,9 +898,9 @@ type
     procedure DoPaintModeStatic;
     procedure DoPaintModeBlinking;
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
-      const AVisRect: TRect;
-      APointLeft, APointText: TPoint;
-      ALineIndex, ALineLen, ALineWidth: integer; const AScrollHorz: TATSynScrollInfo);
+      const AVisRect: TRect; APointLeft, APointText: TPoint;
+  const AWrapItem: TATWrapItem; ALineWidth: integer;
+  const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintMarkerOfDragDrop(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
@@ -2957,8 +2957,7 @@ begin
         DoPaintSelectedLineBG(C, ACharSize, ARect,
           CurrPoint,
           CurrPointText,
-          NLinesIndex,
-          NLineLen,
+          WrapItem,
           NOutputStrWidth,
           AScrollHorz);
       end
@@ -2998,8 +2997,7 @@ begin
       DoPaintSelectedLineBG(C, ACharSize, ARect,
         CurrPoint,
         CurrPointText,
-        NLinesIndex,
-        0,
+        WrapItem,
         0,
         AScrollHorz);
     end;
@@ -5682,18 +5680,25 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   ACharSize: TPoint;
   const AVisRect: TRect;
   APointLeft, APointText: TPoint;
-  ALineIndex, ALineLen, ALineWidth: integer;
+  const AWrapItem: TATWrapItem;
+  ALineWidth: integer;
   const AScrollHorz: TATSynScrollInfo);
 var
   NLeft, NRight, i: integer;
+  NLineIndex, NPartOffset, NPartLen, NPartXAfter: integer;
   Ranges: TATSimpleRangeArray;
   Range: TATSimpleRange;
 begin
   C.Brush.Color:= Colors.TextSelBG;
 
+  NLineIndex:= AWrapItem.NLineIndex;
+  NPartOffset:= AWrapItem.NCharIndex;
+  NPartLen:= AWrapItem.NLength;
+  NPartXAfter:= NPartOffset-1+NPartLen;
+
   if not IsSelRectEmpty then
   begin
-    if (ALineIndex>=FSelRect.Top) and (ALineIndex<=FSelRect.Bottom) then
+    if (NLineIndex>=FSelRect.Top) and (NLineIndex<=FSelRect.Bottom) then
     begin
       NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
       NRight:= NLeft+ACharSize.X*FSelRect.Width;
@@ -5710,17 +5715,17 @@ begin
   begin
     //here we calculate ranges (XFrom, XTo) where selection(s) overlap current line,
     //and then paint fillrect for them
-    TempSel_GetRangesInLineAfterPoint(ALineLen, ALineIndex, Ranges);
+    TempSel_GetRangesInLineAfterPoint(NPartXAfter, NLineIndex, Ranges);
 
     if not FOptShowFullSel then
       if Length(Ranges)=1 then
-        if (Ranges[0].NFrom=ALineLen) and (Ranges[0].NTo=MaxInt) then
+        if (Ranges[0].NFrom=NPartXAfter) and (Ranges[0].NTo=MaxInt) then
           exit;
 
     for i:= 0 to Length(Ranges)-1 do
     begin
       Range:= Ranges[i];
-      NLeft:= APointText.X + ALineWidth + (Range.NFrom-ALineLen)*ACharSize.X;
+      NLeft:= APointText.X + ALineWidth + (Range.NFrom-NPartXAfter)*ACharSize.X;
       if Range.NTo=MaxInt then
         NRight:= AVisRect.Right
       else
