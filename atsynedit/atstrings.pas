@@ -1566,6 +1566,7 @@ begin
   if Item=nil then Exit;
   AAction:= Item.ItemAction;
   AIndex:= Item.ItemIndex;
+  if not IsIndexValid(AIndex) then exit;
   AText:= Item.ItemText;
   AEnd:= Item.ItemEnd;
   ACarets:= Item.ItemCarets;

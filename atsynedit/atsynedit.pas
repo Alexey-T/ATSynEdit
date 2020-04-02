@@ -5711,6 +5711,7 @@ begin
   end
   else
   begin
+    if not FOptShowFullSel then exit;
     NPartXAfter:= AWrapItem.NCharIndex-1+AWrapItem.NLength;
 
     //here we calculate ranges (XFrom, XTo) where selection(s) overlap current line,
@@ -5724,10 +5725,6 @@ begin
 
       //don't paint tail for cases
       //1) OptShowFullSel=false
-      if RangeFrom>=NPartXAfter then
-        if (not FOptShowFullSel) then
-          Continue;
-
       //2) middle WrapItem
       if RangeFrom>NPartXAfter then
         if (AWrapItem.NFinal=cWrapItemMiddle) then
