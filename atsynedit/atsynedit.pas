@@ -5689,10 +5689,7 @@ var
   Ranges: TATSimpleRangeArray;
   Range: TATSimpleRange;
 begin
-  C.Brush.Color:= Colors.TextSelBG;
-
   NLineIndex:= AWrapItem.NLineIndex;
-  NPartXAfter:= AWrapItem.NCharIndex-1+AWrapItem.NLength;
 
   if not IsSelRectEmpty then
   begin
@@ -5702,15 +5699,20 @@ begin
       NRight:= NLeft+ACharSize.X*FSelRect.Width;
       NLeft:= Max(NLeft, APointText.X+ALineWidth);
       if (NLeft<NRight) then
+      begin
+        C.Brush.Color:= Colors.TextSelBG;
         C.FillRect(
           NLeft,
           APointLeft.Y,
           NRight,
           APointLeft.Y+ACharSize.Y);
+      end;
     end;
   end
   else
   begin
+    NPartXAfter:= AWrapItem.NCharIndex-1+AWrapItem.NLength;
+
     //here we calculate ranges (XFrom, XTo) where selection(s) overlap current line,
     //and then paint fillrect for them
     TempSel_GetRangesInLineAfterPoint(NPartXAfter, NLineIndex, Ranges);
@@ -5729,6 +5731,7 @@ begin
       else
         NRight:= NLeft+(Range.NTo-Range.NFrom)*ACharSize.X;
 
+      C.Brush.Color:= Colors.TextSelBG;
       C.FillRect(
         Max(AVisRect.Left, NLeft),
         APointText.Y,
