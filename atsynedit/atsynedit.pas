@@ -5717,14 +5717,12 @@ begin
     //and then paint fillrect for them
     TempSel_GetRangesInLineAfterPoint(NPartXAfter, NLineIndex, Ranges);
 
-    if not FOptShowFullSel then
-      if Length(Ranges)=1 then
-        if (Ranges[0].NFrom=NPartXAfter) and (Ranges[0].NTo=MaxInt) then
-          exit;
-
     for i:= 0 to Length(Ranges)-1 do
     begin
       Range:= Ranges[i];
+      if not FOptShowFullSel then
+        if Range.NFrom>=NPartXAfter then Continue;
+
       NLeft:= APointText.X + ALineWidth + (Range.NFrom-NPartXAfter)*ACharSize.X;
       if Range.NTo=MaxInt then
         NRight:= AVisRect.Right
