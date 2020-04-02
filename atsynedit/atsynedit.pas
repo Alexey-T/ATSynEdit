@@ -5722,8 +5722,16 @@ begin
       RangeFrom:= Ranges[i].NFrom;
       RangeTo:= Ranges[i].NTo;
 
-      if not FOptShowFullSel then
-        if RangeFrom>=NPartXAfter then Continue;
+      //don't paint tail for cases
+      //1) OptShowFullSel=false
+      if RangeFrom>=NPartXAfter then
+        if (not FOptShowFullSel) then
+          Continue;
+
+      //2) middle WrapItem
+      if RangeFrom>NPartXAfter then
+        if (AWrapItem.NFinal=cWrapItemMiddle) then
+          Continue;
 
       NLeft:= APointText.X + ALineWidth + (RangeFrom-NPartXAfter)*ACharSize.X;
       if RangeTo=MaxInt then
