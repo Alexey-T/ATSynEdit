@@ -240,6 +240,7 @@ begin
     //prevent any action if caret on first line (arrow up) / last line (arrow down)
     //this allows to avoid jump to end of last line (arrow down)
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
+
     if not ADown and (NWrapIndex=0) then exit;
     if ADown and (NWrapIndex=WrapInfo.Count-1) then exit;
 

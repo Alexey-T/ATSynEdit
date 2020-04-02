@@ -215,6 +215,7 @@ end;
 function TATWrapInfo.FindIndexOfCaretPos(APos: TPoint): integer;
 var
   NFrom, NTo, i: integer;
+  Item: TATWrapItem;
 begin
   Result:= -1;
   FindIndexesOfLineNumber(APos.Y, NFrom, NTo);
@@ -222,8 +223,9 @@ begin
   for i:= NFrom to NTo do
   begin
     Result:= i;
-    with Data[i] do
-      if NCharIndex+NLength > APos.X then Break;
+    Item:= Data[i];
+    if Item.NCharIndex+Item.NLength > APos.X+1 then // APos.X+1: see CudaText issue 2466
+      Break;
   end;
 end;
 
