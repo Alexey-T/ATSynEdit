@@ -5687,7 +5687,7 @@ var
   NLineIndex, NPartXAfter: integer;
   NLeft, NRight, i: integer;
   Ranges: TATSimpleRangeArray;
-  Range: TATSimpleRange;
+  RangeFrom, RangeTo: integer;
 begin
   NLineIndex:= AWrapItem.NLineIndex;
 
@@ -5719,15 +5719,17 @@ begin
 
     for i:= 0 to Length(Ranges)-1 do
     begin
-      Range:= Ranges[i];
-      if not FOptShowFullSel then
-        if Range.NFrom>=NPartXAfter then Continue;
+      RangeFrom:= Ranges[i].NFrom;
+      RangeTo:= Ranges[i].NTo;
 
-      NLeft:= APointText.X + ALineWidth + (Range.NFrom-NPartXAfter)*ACharSize.X;
-      if Range.NTo=MaxInt then
+      if not FOptShowFullSel then
+        if RangeFrom>=NPartXAfter then Continue;
+
+      NLeft:= APointText.X + ALineWidth + (RangeFrom-NPartXAfter)*ACharSize.X;
+      if RangeTo=MaxInt then
         NRight:= AVisRect.Right
       else
-        NRight:= NLeft+(Range.NTo-Range.NFrom)*ACharSize.X;
+        NRight:= NLeft+(RangeTo-RangeFrom)*ACharSize.X;
 
       C.Brush.Color:= Colors.TextSelBG;
       C.FillRect(
