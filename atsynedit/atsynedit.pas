@@ -744,6 +744,7 @@ type
     FOptZebraAlphaBlend: byte;
 
     //
+    function DoCalcLineLen(ALineIndex: integer): integer;
     function GetAttribs: TATMarkers;
     function GetMarkers: TATMarkers;
     function GetDimRanges: TATDimRanges;
@@ -7280,6 +7281,7 @@ begin
   FTabHelper.IndentSize:= OptIndentSize;
   FTabHelper.SenderObj:= Self;
   FTabHelper.OnCalcTabSize:= FOnCalcTabSize;
+  FTabHelper.OnCalcLineLen:= @DoCalcLineLen;
 end;
 
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);
@@ -7526,6 +7528,11 @@ function TATSynEdit.GetAttribs: TATMarkers;
 begin
   InitAttribs;
   Result:= FAttribs;
+end;
+
+function TATSynEdit.DoCalcLineLen(ALineIndex: integer): integer;
+begin
+  Result:= Strings.LinesLen[ALineIndex];
 end;
 
 function TATSynEdit.GetDimRanges: TATDimRanges;

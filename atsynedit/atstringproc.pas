@@ -89,6 +89,7 @@ var
 
 type
   TATStringTabCalcEvent = function(Sender: TObject; ALineIndex, ACharIndex: integer): integer of object;
+  TATStringGetLenEvent = function(ALineIndex: integer): integer of object;
 
 type
 
@@ -102,6 +103,7 @@ type
     IndentSize: integer;
     SenderObj: TObject;
     OnCalcTabSize: TATStringTabCalcEvent;
+    OnCalcLineLen: TATStringGetLenEvent;
     function CalcTabulationSize(ALineIndex, APos: integer): integer;
     function TabsToSpaces(ALineIndex: integer; const S: atString): atString;
     function TabsToSpaces_Length(ALineIndex: integer; const S: atString; AMaxLen: integer): integer;
@@ -523,10 +525,13 @@ begin
   if Assigned(OnCalcTabSize) then
     Result:= OnCalcTabSize(SenderObj, ALineIndex, APos)
   else
-  if APos<=OptMaxTabPositionToExpand then
-    Result:= TabSize - (APos-1) mod TabSize
+  if OnCalcLineLen(ALineIndex)>OptMaxLineLenForAccurateCharWidths then
+    Result:= 1
   else
-    Result:= 1;
+  if APos>OptMaxTabPositionToExpand then
+    Result:= 1
+  else
+    Result:= TabSize - (APos-1) mod TabSize;
 end;
 
 
