@@ -101,7 +101,7 @@ begin
   if not ASelCommand then
   begin
     if FOptKeyLeftRightSwapSel then
-      if DoCaretSwapEdge(true) then Exit;
+      if DoCaretSwapEdge(FCarets[0], true) then Exit;
     DoSelect_None;
   end;
 
@@ -138,7 +138,7 @@ begin
   if not ASelCommand then
   begin
     if FOptKeyLeftRightSwapSel then
-      if DoCaretSwapEdge(false) then Exit;
+      if DoCaretSwapEdge(FCarets[0], false) then Exit;
     DoSelect_None;
   end;
 

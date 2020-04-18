@@ -920,7 +920,7 @@ type
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
-    function DoCaretSwapEdge(AMoveLeft: boolean): boolean;
+    function DoCaretSwapEdge(Item: TATCaretItem; AMoveLeft: boolean): boolean;
     procedure DoCaretsSort;
     //events
     procedure DoEventBeforeCalcHilite;
