@@ -682,8 +682,6 @@ var
   bSel, bAtLeft: boolean;
 begin
   Result:= false;
-  if Carets.Count<>1 then Exit;
-
   Item.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then Exit;
   Result:= true;

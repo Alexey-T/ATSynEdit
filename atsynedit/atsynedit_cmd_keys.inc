@@ -97,20 +97,18 @@ var
   i: integer;
 begin
   Result:= [cResultCaretLeft];
-
-  if not ASelCommand then
-  begin
-    if FOptKeyLeftRightSwapSel then
-      if DoCaretSwapEdge(FCarets[0], true) then Exit;
-    DoSelect_None;
-  end;
-
   bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
+
+    if not ASelCommand and FOptKeyLeftRightSwapSel and DoCaretSwapEdge(Caret, true) then
+    begin
+      //none
+    end
+    else
     if (Caret.PosX>0) then
       Dec(Caret.PosX)
     else
@@ -134,20 +132,18 @@ var
   i: integer;
 begin
   Result:= [cResultCaretRight];
-
-  if not ASelCommand then
-  begin
-    if FOptKeyLeftRightSwapSel then
-      if DoCaretSwapEdge(FCarets[0], false) then Exit;
-    DoSelect_None;
-  end;
-
   bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
+
+    if not ASelCommand and FOptKeyLeftRightSwapSel and DoCaretSwapEdge(Caret, false) then
+    begin
+      //none
+    end
+    else
     if (Caret.PosX<Strings.LinesLen[Caret.PosY]) or FCaretVirtual then
       Inc(Caret.PosX)
     else
