@@ -641,6 +641,14 @@ begin
         APosX+PixOffset2,
         APosY+AProps.CharSize.Y);
 
+      //increase rect to avoid clipping of italic font at line end,
+      //eg comment //WWW, if theme has italic comments style,
+      //with font eg "Fira Code Retina"
+      if PartPtr^.FontItalic then
+        Inc(PartRect.Right,
+          C.Font.Size * OptItalicFontLongerInPercents div 100
+          );
+
       {$ifdef windows}
       BufW:= SRemoveHexDisplayedChars(PartStr);
       bAllowLigatures:=
@@ -651,14 +659,6 @@ begin
         DxPointer:= @Dx[PartOffset]
       else
         DxPointer:= nil;
-
-      //increase rect to avoid clipping of italic font at line end,
-      //eg comment //WWW, if theme has italic comments style,
-      //with font eg "Fira Code Retina"
-      if PartPtr^.FontItalic then
-        Inc(PartRect.Right,
-          C.Font.Size * OptItalicFontLongerInPercents div 100
-          );
 
       _TextOut_Windows(C.Handle,
         APosX+PixOffset1,
