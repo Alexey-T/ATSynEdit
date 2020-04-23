@@ -31,6 +31,7 @@ var
   OptUnprintedEndFontDy: integer = 2;
   OptUnprintedEndArrowOrDot: boolean = true;
   OptUnprintedEndArrowLength: integer = 70;
+  OptItalicFontLongerInPercents: integer = 40;
 
 const
   //Win: seems no slowdown from offsets
@@ -650,6 +651,14 @@ begin
         DxPointer:= @Dx[PartOffset]
       else
         DxPointer:= nil;
+
+      //increase rect to avoid clipping of italic font at line end,
+      //eg comment //WWW, if theme has italic comments style,
+      //with font eg "Fira Code Retina"
+      if PartPtr^.FontItalic then
+        Inc(PartRect.Right,
+          C.Font.Size * OptItalicFontLongerInPercents div 100
+          );
 
       _TextOut_Windows(C.Handle,
         APosX+PixOffset1,
