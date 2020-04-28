@@ -366,7 +366,7 @@ begin
   wait:= false;
   ActiveControl:= ed;
 
-  fn:= FFilesDir+'/fn.txt';
+  fn:= FFilesDir+'/all.txt';
   if FileExists(fn) then
     DoOpen(fn, true);
 end;
