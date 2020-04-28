@@ -654,8 +654,10 @@ begin
       Inc(NCharsSkipped, NTabSize-1);
     end;
 
+    {
     if (i<Length(S)) and IsCharAccent(S[i+1]) then
       NSize:= 0;
+      }
 
     if i=1 then
       AInfo[i-1]:= NSize*NScalePercents
@@ -704,8 +706,10 @@ begin
       Inc(NCharsSkipped, NTabSize-1);
     end;
 
+    {
     if (i<Length(S)) and IsCharAccent(S[i+1]) then
       NSize:= 0;
+      }
 
     Inc(Result, NSize*NScalePercents);
   end;
