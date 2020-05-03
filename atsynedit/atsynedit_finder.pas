@@ -25,6 +25,7 @@ type
   TATFinderProgress = procedure(Sender: TObject;
     const ACurPos, AMaxPos: Int64;
     var AContinue: boolean) of object;
+  TATFinderBadRegexEvent = procedure(Sender: TObject; const Msg: string) of object;
   TATFinderFound = procedure(Sender: TObject; APos1, APos2: TPoint) of object;
   TATFinderConfirmReplace = procedure(Sender: TObject;
     APos1, APos2: TPoint; AForMany: boolean;
@@ -76,7 +77,7 @@ type
     FProgressPrev: integer;
     FProgressDelta: integer;
     FOnProgress: TATFinderProgress;
-    FOnBadRegex: TNotifyEvent;
+    FOnBadRegex: TATFinderBadRegexEvent;
     FOnGetToken: TATFinderGetToken;
     procedure ClearMatchPos; virtual;
     //function IsMatchUsual(APos: integer): boolean;
@@ -106,7 +107,7 @@ type
     property MatchLen: integer read FMatchLen;
     property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
-    property OnBadRegex: TNotifyEvent read FOnBadRegex write FOnBadRegex;
+    property OnBadRegex: TATFinderBadRegexEvent read FOnBadRegex write FOnBadRegex;
     property OnGetToken: TATFinderGetToken read FOnGetToken write FOnGetToken;
   end;
 
@@ -400,9 +401,12 @@ begin
     FRegex.Expression:= StrFind;
     FRegex.Compile;
   except
-    if Assigned(FOnBadRegex) then
-      FOnBadRegex(Self);
-    exit;
+    on e: Exception do
+    begin
+      if Assigned(FOnBadRegex) then
+        FOnBadRegex(Self, e.Message);
+      exit;
+    end;
   end;
 
   FRegex.InputString:= StrText;
@@ -546,9 +550,12 @@ begin
     FRegex.Expression:= StrFind;
     FRegex.Compile;
   except
-    if Assigned(FOnBadRegex) then
-      FOnBadRegex(Self);
-    exit;
+    on e: Exception do
+    begin
+      if Assigned(FOnBadRegex) then
+        FOnBadRegex(Self, e.Message);
+      exit;
+    end;
   end;
 
   FRegex.InputString:= StrText;
