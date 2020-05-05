@@ -591,7 +591,7 @@ begin
   begin
     Ex.Wide:= false;
     Buf:= S;
-    UniqueString(Buf);
+    //UniqueString(Buf); //makes slower loading file by 5-7%
   end
   else
   begin
