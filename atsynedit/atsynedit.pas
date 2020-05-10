@@ -3821,6 +3821,9 @@ begin
   FMenuMinimap:= nil;
   FMenuMicromap:= nil;
   FMenuRuler:= nil;
+
+  //must call UpdateTabHelper also before first Paint
+  UpdateTabHelper;
 end;
 
 destructor TATSynEdit.Destroy;
