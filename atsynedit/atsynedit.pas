@@ -1491,7 +1491,7 @@ type
     property OptCaretsAddedToColumnSelection: boolean read FOptCaretsAddedToColumnSelection write FOptCaretsAddedToColumnSelection default true;
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
-    property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default 4;
+    property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default 25;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways default true;
@@ -3777,7 +3777,7 @@ begin
   FOptCaretsAddedToColumnSelection:= true;
   FOptCaretFixAfterRangeFolded:= true;
   FOptCaretsMultiToColumnSel:= cInitCaretsMultiToColumnSel;
-  FOptMarkersSize:= 4;
+  FOptMarkersSize:= 25;
   FOptMouseEnableAll:= true;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
@@ -6753,7 +6753,7 @@ begin
     CanvasPaintTriangleUp(C,
       Colors.Markers,
       Pnt,
-      FCharSize.X div 4
+      FCharSize.X * FOptMarkersSize div 100
       );
   end;
 end;
