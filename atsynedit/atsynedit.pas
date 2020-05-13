@@ -712,6 +712,7 @@ type
     FOptShowMouseSelFrame: boolean;
     FOptMouseHideCursor: boolean;
     FOptMouse2ClickAction: TATMouseDoubleClickAction;
+    FOptMouse2ClickOpensLink: boolean;
     FOptMouse3ClickSelectsLine: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
     FOptMouseDragDrop: boolean;
@@ -1548,6 +1549,7 @@ type
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection default true;
     property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor default false;
     property OptMouse2ClickAction: TATMouseDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectAnyChars;
+    property OptMouse2ClickOpensLink: boolean read FOptMouse2ClickOpensLink write FOptMouse2ClickOpensLink default true;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
@@ -3730,6 +3732,7 @@ begin
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
   FOptMouse2ClickAction:= cMouseDblClickSelectAnyChars;
+  FOptMouse2ClickOpensLink:= true;
   FOptMouse3ClickSelectsLine:= true;
   FOptMouse2ClickDragSelectsWords:= true;
   FOptMouseRightClickMovesCaret:= false;
@@ -5348,11 +5351,26 @@ begin
 end;
 
 procedure TATSynEdit.DblClick;
+var
+  Caret: TATCaretItem;
+  SLink: atString;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
 
   if DoHandleClickEvent(FOnClickDbl) then Exit;
+
+  if FOptMouse2ClickOpensLink then
+    if Carets.Count>0 then
+    begin
+      Caret:= Carets[0];
+      SLink:= DoGetLinkAtPos(Caret.PosX, Caret.PosY);
+      if SLink<>'' then
+      begin
+        OpenURL(SLink);
+        exit
+      end;
+    end;
 
   case FOptMouse2ClickAction of
     cMouseDblClickSelectEntireLine:
