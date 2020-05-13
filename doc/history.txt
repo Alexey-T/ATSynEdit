@@ -1,6 +1,6 @@
 
 2020.05.13
-+ add: prop OptMouse2ClickOpensLink (default True)
++ add: prop OptMouse2ClickOpensURL (default True)
 
 2020.05.12
 - fix: OptMarkersSize was not used
