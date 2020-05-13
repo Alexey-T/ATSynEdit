@@ -3442,11 +3442,11 @@ begin
     GlobalCharSizer:= TATCharSizer.Create;
 
   if not Assigned(cBitmapNiceScroll) then
-    InitResources;
+    InitEditorResources;
 
   Caption:= '';
   ControlStyle:= ControlStyle+[csOpaque, csDoubleClicks, csTripleClicks];
-  DoubleBuffered:= IsDoubleBufferedNeeded;
+  DoubleBuffered:= EditorDoubleBufferedNeeded;
   BorderStyle:= bsNone;
   TabStop:= true;
 
@@ -3526,7 +3526,7 @@ begin
 
   FColors:= TATSynEditColors.Create;
   InitDefaultColors(FColors);
-  InitMouseActions(FMouseActions);
+  InitEditorMouseActions(FMouseActions);
 
   FCursorText:= crIBeam;
   FCursorColumnSel:= crCross;
@@ -4666,7 +4666,7 @@ begin
   FMouseDownGutterLineNumber:= -1;
   FMouseDragDropping:= false;
   FMouseDragMinimap:= false;
-  ActionId:= GetMouseActionId(FMouseActions, Shift);
+  ActionId:= EditorMouseActionId(FMouseActions, Shift);
 
   if Assigned(FAdapterIME) then
     FAdapterIME.Stop(Self, false);
@@ -5418,7 +5418,7 @@ end;
 procedure TATSynEdit.DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
 begin
   if not Strings.IsIndexValid(FMouseDownPnt.Y) then Exit;
-  DoSelect_CharGroupAtPos(FMouseDownPnt, IsPressedCtrl, AllowOnlyWordChars);
+  DoSelect_CharGroupAtPos(FMouseDownPnt, EditorIsPressedCtrl, AllowOnlyWordChars);
   Invalidate;
 end;
 
@@ -7634,7 +7634,7 @@ initialization
   ATClipboardColumnFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Block');
 
 finalization
-  FreeResources;
+  FreeEditorResources;
 
 end.
 

@@ -92,7 +92,7 @@ begin
     (A.NPixelOffset=B.NPixelOffset);
 end;
 
-function GetResourceScaleSuffix: string;
+function EditorResourceScaleSuffix: string;
 var
   N: integer;
 begin
@@ -106,11 +106,11 @@ begin
     Result:= '';
 end;
 
-procedure InitResources;
+procedure InitEditorResources;
 var
   Suffix: string;
 begin
-  Suffix:= GetResourceScaleSuffix;
+  Suffix:= EditorResourceScaleSuffix;
 
   Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
   Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
@@ -134,7 +134,7 @@ begin
   cBitmapFoldMinus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_M'+Suffix);
 end;
 
-procedure FreeResources;
+procedure FreeEditorResources;
 begin
   FreeAndNil(cBitmapWait);
   FreeAndNil(cBitmapSaving);
@@ -143,13 +143,13 @@ begin
   FreeAndNil(cBitmapFoldMinus);
 end;
 
-function IsDoubleBufferedNeeded: boolean;
+function EditorDoubleBufferedNeeded: boolean;
 begin
   Result:= WidgetSet.GetLCLCapability(lcCanDrawOutsideOnPaint) = LCL_CAPABILITY_YES;
 end;
 
 
-procedure InitMouseActions(var M: TATMouseActions);
+procedure InitEditorMouseActions(var M: TATMouseActions);
   //
   procedure Add(AId: TATMouseActionId; AState: TShiftState);
   begin
@@ -176,7 +176,7 @@ begin
 end;
 
 
-function GetMouseActionId(const M: TATMouseActions; State: TShiftState): TATMouseActionId;
+function EditorMouseActionId(const M: TATMouseActions; State: TShiftState): TATMouseActionId;
 var
   i: integer;
 begin
@@ -188,7 +188,7 @@ begin
       exit(M[i].MouseActionId);
 end;
 
-function IsPressedCtrl: boolean;
+function EditorIsPressedCtrl: boolean;
 begin
   {$ifdef darwin}
   //on macOS use Command-key instead of Ctrl
