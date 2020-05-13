@@ -1635,25 +1635,6 @@ uses
 
 {$I atsynedit_proc.inc}
 
-procedure EditorOpenLink(const S: string);
-const
-  MailPrefix = 'mailto:';
-begin
-  if SBeginsWith(S, MailPrefix) then
-    OpenURL(S)
-  else
-  if (Pos('://', S)=0) and (Pos('@', S)>0) and (Pos('.', S)>0) then
-    OpenURL(MailPrefix+S)
-  else
-  if SBeginsWith(S, 'www.') then
-    OpenURL('http://'+S)
-  else
-  if SBeginsWith(S, 'ftp.') then
-    OpenURL('ftp://'+S)
-  else
-    OpenURL(S);
-end;
-
 { TATSynEdit }
 
 procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
