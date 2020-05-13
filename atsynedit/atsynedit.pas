@@ -640,7 +640,6 @@ type
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseColumnSelectionWithoutKey: boolean;
-    FOptMouseClickOpensURL: boolean;
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
@@ -711,16 +710,17 @@ type
     FOptShowCurColumn: boolean;
     FOptShowMouseSelFrame: boolean;
     FOptMouseHideCursor: boolean;
+    FOptMouseClickOpensURL: boolean;
+    FOptMouseClickNumberSelectsLine: boolean;
+    FOptMouseClickNumberSelectsLineWithEOL: boolean;
     FOptMouse2ClickAction: TATMouseDoubleClickAction;
-    FOptMouse2ClickOpensLink: boolean;
-    FOptMouse3ClickSelectsLine: boolean;
+    FOptMouse2ClickOpensURL: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
+    FOptMouse3ClickSelectsLine: boolean;
     FOptMouseDragDrop: boolean;
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
-    FOptMouseClickNumberSelectsLine: boolean;
-    FOptMouseClickNumberSelectsLineWithEOL: boolean;
     FOptMouseNiceScroll: boolean;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
@@ -1548,17 +1548,18 @@ type
     property OptMouseEnableNormalSelection: boolean read FOptMouseEnableNormalSelection write FOptMouseEnableNormalSelection default true;
     property OptMouseEnableColumnSelection: boolean read FOptMouseEnableColumnSelection write FOptMouseEnableColumnSelection default true;
     property OptMouseHideCursorOnType: boolean read FOptMouseHideCursor write FOptMouseHideCursor default false;
+    property OptMouseClickOpensURL: boolean read FOptMouseClickOpensURL write FOptMouseClickOpensURL default false;
+    property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
+    property OptMouseClickNumberSelectsLineWithEOL: boolean read FOptMouseClickNumberSelectsLineWithEOL write FOptMouseClickNumberSelectsLineWithEOL default true;
     property OptMouse2ClickAction: TATMouseDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectAnyChars;
-    property OptMouse2ClickOpensLink: boolean read FOptMouse2ClickOpensLink write FOptMouse2ClickOpensLink default true;
-    property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
+    property OptMouse2ClickOpensURL: boolean read FOptMouse2ClickOpensURL write FOptMouse2ClickOpensURL default true;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
+    property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
     property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
-    property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
-    property OptMouseClickNumberSelectsLineWithEOL: boolean read FOptMouseClickNumberSelectsLineWithEOL write FOptMouseClickNumberSelectsLineWithEOL default true;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;
     property OptMouseWheelScrollHorz: boolean read FOptMouseWheelScrollHorz write FOptMouseWheelScrollHorz default true;
@@ -1567,7 +1568,6 @@ type
     property OptMouseWheelZooms: boolean read FOptMouseWheelZooms write FOptMouseWheelZooms default true;
     property OptMouseWheelZoomsWithState: TShiftStateEnum read FOptMouseWheelZoomsWithState write FOptMouseWheelZoomsWithState default ssModifier;
     property OptMouseColumnSelectionWithoutKey: boolean read FOptMouseColumnSelectionWithoutKey write FOptMouseColumnSelectionWithoutKey default false;
-    property OptMouseClickOpensURL: boolean read FOptMouseClickOpensURL write FOptMouseClickOpensURL default false;
     property OptKeyBackspaceUnindent: boolean read FOptKeyBackspaceUnindent write FOptKeyBackspaceUnindent default true;
     property OptKeyBackspaceGoesToPrevLine: boolean read FOptKeyBackspaceGoesToPrevLine write FOptKeyBackspaceGoesToPrevLine default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
@@ -3731,13 +3731,16 @@ begin
   FOptMouseDragDropCopyingWithState:= ssModifier;
   FOptMouseNiceScroll:= true;
   FOptMouseHideCursor:= false;
-  FOptMouse2ClickAction:= cMouseDblClickSelectAnyChars;
-  FOptMouse2ClickOpensLink:= true;
-  FOptMouse3ClickSelectsLine:= true;
-  FOptMouse2ClickDragSelectsWords:= true;
-  FOptMouseRightClickMovesCaret:= false;
+
+  FOptMouseClickOpensURL:= false;
   FOptMouseClickNumberSelectsLine:= true;
   FOptMouseClickNumberSelectsLineWithEOL:= true;
+  FOptMouse2ClickAction:= cMouseDblClickSelectAnyChars;
+  FOptMouse2ClickOpensURL:= true;
+  FOptMouse2ClickDragSelectsWords:= true;
+  FOptMouse3ClickSelectsLine:= true;
+
+  FOptMouseRightClickMovesCaret:= false;
   FOptMouseWheelScrollVert:= true;
   FOptMouseWheelScrollVertSpeed:= 3;
   FOptMouseWheelScrollHorz:= true;
@@ -5360,7 +5363,7 @@ begin
 
   if DoHandleClickEvent(FOnClickDbl) then Exit;
 
-  if FOptMouse2ClickOpensLink then
+  if FOptMouse2ClickOpensURL then
     if Carets.Count>0 then
     begin
       Caret:= Carets[0];
