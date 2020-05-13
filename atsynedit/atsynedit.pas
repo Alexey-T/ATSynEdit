@@ -5370,7 +5370,8 @@ begin
       SLink:= DoGetLinkAtPos(Caret.PosX, Caret.PosY);
       if SLink<>'' then
       begin
-        OpenURL(SLink);
+        if Assigned(FOnClickLink) then
+          FOnClickLink(Self, SLink);
         exit
       end;
     end;

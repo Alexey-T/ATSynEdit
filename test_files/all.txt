@@ -1,6 +1,7 @@
 ﻿Unicode sample:
 ΓΔΕΘΛΞ √∞∟∩∫
-Ударе́ние http://yahoo.com site
+Ударе́ние 
+Links: http://yahoo.com www.yahoo.com dd@dd.dd
 
 Jp full-width: ああえ, end
 wwwwwwwwwwwwwwwwwwwwwwwww. wwwwwwww, wwwwwww; wwwww: ..test... www "www...", www,
