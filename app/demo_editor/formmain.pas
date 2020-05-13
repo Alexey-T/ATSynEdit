@@ -1090,13 +1090,7 @@ end;
 
 procedure TfmMain.EditClickLink(Sender: TObject; const ALink: string);
 begin
-  if (Pos('://', ALink)=0) and (Pos('@', ALink)>0) then
-    OpenURL('mailto:'+ALink)
-  else
-  if SBeginsWith(ALink, 'www.') then
-    OpenURL('http://'+ALink)
-  else
-    OpenURL(ALink);
+  EditorOpenLink(ALink);
 end;
 
 procedure TfmMain.EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
