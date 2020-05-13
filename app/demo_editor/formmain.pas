@@ -221,7 +221,7 @@ type
     procedure EditClickGap(Sender: TObject; AGapItem: TATGapItem; APos: TPoint);
     procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
-    procedure FinderBadRegex(Sender: TObject);
+    procedure FinderBadRegex(Sender: TObject; const AMsg: string);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean);
     procedure DoFindError;
@@ -1518,12 +1518,14 @@ begin
 end;
 
 
-procedure TfmMain.FinderBadRegex(Sender: TObject);
+procedure TfmMain.FinderBadRegex(Sender: TObject; const AMsg: string);
 begin
-  Application.MessageBox(
-    PChar('Incorrect regex passed:'#13+Utf8Encode(FFinder.StrFind)),
-    PChar(Application.Title),
-    mb_ok or mb_iconerror);
+  MessageDlg(
+    'Incorrect regex',
+    Utf8Encode(FFinder.StrFind)+#10+AMsg,
+    mtError,
+    [mbOk], ''
+    );
 end;
 
 procedure TfmMain.FinderUpdateEditor(AUpdateText: boolean);
