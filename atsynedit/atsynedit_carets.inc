@@ -178,7 +178,7 @@ begin
   //prepare optimization
   StringItem:= AStrings.GetItemPtr(P.Y);
   bAsciiOnly:= StringItem^.HasAsciiNoTabs;
-  bLineHuge:= AStrings.LinesLen[P.Y]>OptMaxLineLenForAccurateCharWidths;
+  bLineHuge:= StringItem^.CharLen>OptMaxLineLenForAccurateCharWidths;
 
   NScrolledHorz:= AScrollHorz.NPos;
   NScrolledVert:= Max(0, AScrollVert.NPos);
