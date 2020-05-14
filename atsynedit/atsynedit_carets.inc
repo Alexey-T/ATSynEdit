@@ -165,6 +165,7 @@ var
   NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
   NScrolledHorz, NScrolledVert: integer;
   Str: atString;
+  bLineHuge: boolean;
   bAsciiOnly: boolean;
   i: integer;
 begin
@@ -177,6 +178,7 @@ begin
   //prepare optimization
   StringItem:= AStrings.GetItemPtr(P.Y);
   bAsciiOnly:= StringItem^.HasAsciiNoTabs;
+  bLineHuge:= AStrings.LinesLen[P.Y]>OptMaxLineLenForAccurateCharWidths;
 
   NScrolledHorz:= AScrollHorz.NPos;
   NScrolledVert:= Max(0, AScrollVert.NPos);
@@ -193,7 +195,7 @@ begin
 
     NFromStart:= P.X+1-Item.NCharIndex;
 
-    if bAsciiOnly then
+    if bAsciiOnly or bLineHuge then
     begin
       NWidth:= Min(NFromStart, Item.NLength) * ACharSize.X;
     end
