@@ -327,13 +327,14 @@ const
   cHintBookmarkDx = 6;
   cHintBookmarkDy = 16;
   cUrlMarkerTag = -100;
-  cTextEditorLocked: string = 'Wait...';
-  cHintScrollPrefix: string = 'Line';
 
   cUrlRegex_Email = '\b\w[\w\-\.]*@\w[\w\-\.]*\.\w{2,}\b';
   cUrlRegex_WebBegin = 'https?://|ftp://|mailto:|magnet:\?|www\.|ftp\.';
   cUrlRegex_Web = '\b(' + cUrlRegex_WebBegin + ')\w[^<>''"\s]+';
   cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
+
+  cTextEditorLocked: string = 'Wait...';
+  cTextHintScrollPrefix: string = 'Line';
 
   cStrMenuitemFoldAll: string = 'Fold all';
   cStrMenuitemUnfoldAll: string = 'Unfold all';
@@ -4406,7 +4407,7 @@ begin
   if FHintWnd=nil then
     FHintWnd:= THintWindow.Create(Self);
 
-  S:= cHintScrollPrefix+' '+IntToStr(LineTop+1);
+  S:= cTextHintScrollPrefix+' '+IntToStr(LineTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
   P:= ClientToScreen(Point(ClientWidth-R.Width, 0));

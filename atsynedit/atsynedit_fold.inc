@@ -344,7 +344,7 @@ begin
     mi.OnClick:= @MenuFoldPlusMinusClick;
 
     mi.Caption:=
-      cHintScrollPrefix+' '+Inttostr(Rng^.Y+1)+': '+
+      cTextHintScrollPrefix+' '+Inttostr(Rng^.Y+1)+': '+
       UTF8Encode(Strings.LineSub(Rng^.Y, 1, cFoldedLenOfEmptyHint));
 
     if Rng^.Folded then
