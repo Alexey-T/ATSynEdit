@@ -5379,6 +5379,7 @@ begin
       begin
         if Assigned(FOnClickLink) then
           FOnClickLink(Self, SLink);
+        DoEventCarets;
         exit
       end;
     end;
