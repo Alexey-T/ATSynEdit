@@ -3128,7 +3128,7 @@ begin
 
           // last '-' inside [] treated as simple dash
           if (regparse^ = '-') and ((regparse + 1) < fRegexEnd) and
-            ((regparse + 1)^ <> ']') and CanBeRange then
+            ((regparse + 1)^ = ']') then
           begin
             EmitRangeChar('-', False);
             Inc(regparse);
