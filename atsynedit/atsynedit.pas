@@ -6935,21 +6935,40 @@ end;
 
 function TATSynEdit.DoGetLinkAtPos(AX, AY: integer): atString;
 var
-  NIndex: integer;
-  Atr: TATMarkerItem;
+  ReObj: TRegExpr;
+  MatchPos, MatchLen: integer;
 begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
-  if FAttribs=nil then exit;
-  NIndex:= FAttribs.FindContaining(AX, AY);
-  if NIndex<0 then exit;
+  ReObj:= TRegExpr.Create;
+  try
+    ReObj.ModifierS:= false;
+    ReObj.ModifierM:= true;
+    ReObj.ModifierI:= true;
+    ReObj.Expression:= FOptShowURLsRegex;
+    try
+      ReObj.Compile;
+    except
+      exit;
+    end;
 
-  Atr:= FAttribs[NIndex];
-  if Atr.Tag<>cUrlMarkerTag then exit;
-  if Atr.LenY>0 then exit;
+    ReObj.InputString:= Strings.Lines[AY];
+    MatchPos:= 0;
+    MatchLen:= 0;
 
-  Result:= Strings.LineSub(AY, Atr.PosX+1, Atr.LenX);
+    while ReObj.ExecPos(MatchPos+MatchLen+1) do
+    begin
+      MatchPos:= ReObj.MatchPos[0]-1;
+      MatchLen:= ReObj.MatchLen[0];
+      if MatchPos>AX then
+        Break;
+      if (MatchPos<=AX) and (MatchPos+MatchLen>AX) then
+        exit(ReObj.Match[0]);
+    end;
+  finally
+    FreeAndNil(ReObj);
+  end;
 end;
 
 
