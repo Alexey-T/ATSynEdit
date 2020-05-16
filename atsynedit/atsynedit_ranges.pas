@@ -380,14 +380,9 @@ begin
       b:= m-1
     else
     begin
-      //range at line start?
-      if R^.X=1 then
-        Break;
-
       //find _first_ range which begins at ALine
       while (m>0) and (FList.ItemPtr(m-1)^.Y=ALine) do
         Dec(m);
-
       Break;
     end;
   until false;
