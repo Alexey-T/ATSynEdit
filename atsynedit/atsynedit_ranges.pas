@@ -355,16 +355,19 @@ end;
 
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
+// issue https://github.com/Alexey-T/CudaText/issues/2566
+// because of this, we must skip all one-line ranges
 var
-  a, b, m, dif: integer;
+  a, b, m, dif, NCount: integer;
   R: PATSynRange;
 begin
   Result:= -1;
+  NCount:= Count;
   a:= 0;
-  b:= Count-1;
+  b:= NCount-1;
 
   repeat
-    if a>b then exit;
+    if a>b then exit; //not Break
     m:= (a+b+1) div 2;
 
     R:= FList.ItemPtr(m);
@@ -379,21 +382,22 @@ begin
     begin
       //range at line start?
       if R^.X=1 then
-      begin
-        if not R^.IsSimple then
-          Result:= m;
-        exit;
-      end;
+        Break;
 
       //find _first_ range which begins at ALine
       while (m>0) and (FList.ItemPtr(m-1)^.Y=ALine) do
         Dec(m);
-      if not FList.ItemPtr(m)^.IsSimple then
-        Result:= m;
 
-      exit;
+      Break;
     end;
   until false;
+
+  //some range is found, now skip all one-line ranges
+  while (m<NCount) and FList.ItemPtr(m)^.IsSimple do
+    Inc(m);
+  //if skipped not too far, it is the result
+  if (m<NCount) and (FList.ItemPtr(m)^.Y=ALine) then
+    Result:= m;
 end;
 
 function TATSynRanges.MessageText(Cnt: integer): string;
