@@ -374,6 +374,7 @@ type
       APosAfter: TPoint; AWithUndoGroup: boolean);
     function TextReplaceLines_UTF8(ALineFrom, ALineTo: integer; ANewLines: TStringList): boolean;
     function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: string = #10): atString;
+    function TextSubstringLength(AX1, AY1, AX2, AY2: integer; const AEolString: string=#10): integer;
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
@@ -1512,6 +1513,40 @@ begin
 
   //last line
   Result+= AEolString+LineSub(AY2, 1, AX2);
+end;
+
+function TATStrings.TextSubstringLength(AX1, AY1, AX2, AY2: integer;
+  const AEolString: string = #10): integer;
+var
+  NLen, NLenEol, i: integer;
+begin
+  Result:= 0;
+  if AY1>AY2 then Exit;
+  if not IsIndexValid(AY1) then Exit;
+  if not IsIndexValid(AY2) then Exit;
+
+  NLenEol:= Length(AEolString);
+
+  if AY1=AY2 then
+  begin
+    NLen:= LinesLen[AY1];
+    Exit(Max(0, Min(NLen, AX2)-AX1));
+  end;
+
+  //first line
+  NLen:= LinesLen[AY1];
+  Result:= Max(0, NLen-AX1);
+
+  //middle
+  for i:= AY1+1 to AY2-1 do
+  begin
+    NLen:= LinesLen[i];
+    Result+= NLen+NLenEol;
+  end;
+
+  //last line
+  NLen:= LinesLen[AY2];
+  Result+= Min(NLen, AX2)+NLenEol;
 end;
 
 procedure TATStrings.SetGroupMark;
