@@ -2650,11 +2650,18 @@ begin
       if AMainText then
         if NWrapIndex>=0 then
           if OptUnprintedVisible and OptUnprintedEof then
-            CanvasArrowHorz(C,
-              Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
-              Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
-              false,
-              OptUnprintedTabPointerScale);
+            if OptUnprintedEndsDetails then
+              DoPaintUnprintedEolText(C,
+                'EOF',
+                Point(ARect.Left, NCoordTop),
+                Colors.UnprintedFont,
+                Colors.UnprintedBG)
+            else
+              CanvasArrowHorz(C,
+                Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
+                Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
+                false,
+                OptUnprintedTabPointerScale);
       Break;
     end;
 
