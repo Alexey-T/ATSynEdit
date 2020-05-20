@@ -32,6 +32,7 @@ var
   OptUnprintedEndArrowOrDot: boolean = true;
   OptUnprintedEndArrowLength: integer = 70;
   OptUnprintedWrapArrowLength: integer = 40;
+  OptUnprintedWrapArrowWidth: integer = 80;
   OptItalicFontLongerInPercents: integer = 40;
 
 const
@@ -449,6 +450,7 @@ begin
     Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
     AColorFont,
     OptUnprintedWrapArrowLength,
+    OptUnprintedWrapArrowWidth,
     OptUnprintedTabPointerScale
     )
 end;
