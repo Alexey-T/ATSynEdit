@@ -3040,6 +3040,15 @@ begin
             Colors.UnprintedFont,
             Colors.UnprintedBG,
             FUnprintedEndsDetails);
+      end
+      else
+      begin
+        //paint wrapped-line-part mark
+        if FUnprintedVisible and FUnprintedEnds then
+          DoPaintUnprintedWrapMark(C,
+            CoordAfterText,
+            ACharSize,
+            Colors.UnprintedFont);
       end;
 
       //draw collapsed-mark

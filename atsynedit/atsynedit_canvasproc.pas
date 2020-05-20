@@ -157,6 +157,11 @@ procedure DoPaintUnprintedEol(C: TCanvas;
   AColorFont, AColorBG: TColor;
   ADetailedEnds: boolean);
 
+procedure DoPaintUnprintedWrapMark(C: TCanvas;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont: TColor);
+
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
   ATabHelper: TATStringTabHelper; ACharWidth: integer): integer; inline;
 
@@ -431,6 +436,19 @@ begin
         OptUnprintedEndDotScale,
         AColorFont);
   end;
+end;
+
+procedure DoPaintUnprintedWrapMark(C: TCanvas;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont: TColor);
+begin
+  CanvasArrowWrapped(C,
+    Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+    AColorFont,
+    OptUnprintedEndArrowLength,
+    OptUnprintedTabPointerScale
+    )
 end;
 
 
