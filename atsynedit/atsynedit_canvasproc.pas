@@ -150,12 +150,15 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   AUsePixels: boolean
   );
 
-procedure DoPaintUnprintedEol(C: TCanvas;
-  const AText: atString;
+procedure DoPaintUnprintedEolText(C: TCanvas;
+  const AText: string;
+  APoint: TPoint;
+  AColorFont, AColorBG: TColor);
+
+procedure DoPaintUnprintedEolArrow(C: TCanvas;
   APoint: TPoint;
   ACharSize: TPoint;
-  AColorFont, AColorBG: TColor;
-  ADetailedEnds: boolean);
+  AColorFont: TColor);
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
   APoint: TPoint;
@@ -398,44 +401,42 @@ begin
     end;
 end;
 
-procedure DoPaintUnprintedEol(C: TCanvas;
-  const AText: atString;
+procedure DoPaintUnprintedEolText(C: TCanvas;
+  const AText: string;
   APoint: TPoint;
-  ACharSize: TPoint;
-  AColorFont, AColorBG: TColor;
-  ADetailedEnds: boolean);
+  AColorFont, AColorBG: TColor);
 var
   NPrevSize: integer;
 begin
   if AText='' then Exit;
+  NPrevSize:= C.Font.Size;
+  C.Font.Size:= NPrevSize * OptUnprintedEndFontScale div 100;
+  C.Font.Color:= AColorFont;
+  C.Brush.Color:= AColorBG;
+  C.TextOut(
+    APoint.X+OptUnprintedEndFontDx,
+    APoint.Y+OptUnprintedEndFontDy,
+    AText);
+  C.Font.Size:= NPrevSize;
+end;
 
-  if ADetailedEnds then
-  begin
-    NPrevSize:= C.Font.Size;
-    C.Font.Size:= C.Font.Size * OptUnprintedEndFontScale div 100;
-    C.Font.Color:= AColorFont;
-    C.Brush.Color:= AColorBG;
-    C.TextOut(
-      APoint.X+OptUnprintedEndFontDx,
-      APoint.Y+OptUnprintedEndFontDy,
-      AText);
-    C.Font.Size:= NPrevSize;
-  end
+procedure DoPaintUnprintedEolArrow(C: TCanvas;
+  APoint: TPoint;
+  ACharSize: TPoint;
+  AColorFont: TColor);
+begin
+  if OptUnprintedEndArrowOrDot then
+    CanvasArrowDown(C,
+      Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+      AColorFont,
+      OptUnprintedEndArrowLength,
+      OptUnprintedTabPointerScale
+      )
   else
-  begin
-    if OptUnprintedEndArrowOrDot then
-      CanvasArrowDown(C,
-        Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
-        AColorFont,
-        OptUnprintedEndArrowLength,
-        OptUnprintedTabPointerScale
-        )
-    else
-      CanvasUnprintedSpace(C,
-        Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
-        OptUnprintedEndDotScale,
-        AColorFont);
-  end;
+    CanvasUnprintedSpace(C,
+      Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+      OptUnprintedEndDotScale,
+      AColorFont);
 end;
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;

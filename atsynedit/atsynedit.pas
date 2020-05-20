@@ -3033,13 +3033,19 @@ begin
 
         //paint eol mark
         if FUnprintedVisible and FUnprintedEnds then
-          DoPaintUnprintedEol(C,
-            cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
-            CoordAfterText,
-            ACharSize,
-            Colors.UnprintedFont,
-            Colors.UnprintedBG,
-            FUnprintedEndsDetails);
+        begin
+          if OptUnprintedEndsDetails then
+            DoPaintUnprintedEolText(C,
+              cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
+              CoordAfterText,
+              Colors.UnprintedFont,
+              Colors.UnprintedBG)
+          else
+            DoPaintUnprintedEolArrow(C,
+              CoordAfterText,
+              ACharSize,
+              Colors.UnprintedFont);
+        end;
       end
       else
       begin
