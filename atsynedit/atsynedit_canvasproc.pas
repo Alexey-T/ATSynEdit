@@ -31,6 +31,7 @@ var
   OptUnprintedEndFontDy: integer = 2;
   OptUnprintedEndArrowOrDot: boolean = true;
   OptUnprintedEndArrowLength: integer = 70;
+  OptUnprintedWrapArrowLength: integer = 40;
   OptItalicFontLongerInPercents: integer = 40;
 
 const
@@ -447,7 +448,7 @@ begin
   CanvasArrowWrapped(C,
     Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
     AColorFont,
-    OptUnprintedEndArrowLength,
+    OptUnprintedWrapArrowLength,
     OptUnprintedTabPointerScale
     )
 end;
