@@ -42,13 +42,6 @@ type
   TATIntegerList = specialize TFPGList<integer>;
 
 type
-  TATLineState = (
-    cLineStateNone,
-    cLineStateChanged,
-    cLineStateAdded,
-    cLineStateSaved
-    );
-
   TATLineSeparator = (
     cLineSepNone,
     cLineSepTop,
@@ -120,12 +113,16 @@ type
   private
     Buf: string;
     function GetLine: UnicodeString;
+    function GetLineEnds: TATLineEnds;
+    function GetLineState: TATLineState;
     procedure SetLineW(const S: UnicodeString);
     procedure SetLineA(const S: string);
   public
     Ex: TATStringItemEx;
     function CharLen: integer;
     property Line: UnicodeString read GetLine write SetLineW;
+    property LineState: TATLineState read GetLineState;
+    property LineEnds: TATLineEnds read GetLineEnds;
     function LineSub(AFrom, ALen: integer): UnicodeString;
     function CharAt(AIndex: integer): WideChar;
     function HasTab: boolean;
@@ -213,7 +210,7 @@ type
     function Compare_Desc(Key1, Key2: Pointer): Integer;
     function Compare_DescNoCase(Key1, Key2: Pointer): Integer;
     procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
-      const AText: atString; AEnd: TATLineEnds);
+      const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
     function DebugText: string;
     function DoCheckFilled: boolean;
     procedure DoEventLog(ALine: integer);
@@ -544,6 +541,16 @@ begin
     for i:= 1 to NLen do
       Result[i]:= WideChar(Ord(Buf[i]));
   end;
+end;
+
+function TATStringItem.GetLineEnds: TATLineEnds;
+begin
+  Result:= TATLineEnds(Ex.Ends);
+end;
+
+function TATStringItem.GetLineState: TATLineState;
+begin
+  Result:= TATLineState(Ex.State);
 end;
 
 procedure TATStringItem.SetLineW(const S: UnicodeString);
@@ -942,7 +949,7 @@ begin
   if FReadOnly then Exit;
   Item:= FList.GetItem(AIndex);
 
-  DoAddUndo(cEditActionChange, AIndex, Item^.Line, TATLineEnds(Item^.Ex.Ends));
+  DoAddUndo(cEditActionChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
   DoEventLog(AIndex);
   DoEventChange(cLineChangeEdited, AIndex, 1);
 
@@ -980,7 +987,7 @@ begin
 
   Item:= FList.GetItem(AIndex);
 
-  DoAddUndo(cEditActionChangeEol, AIndex, '', TATLineEnds(Item^.Ex.Ends));
+  DoAddUndo(cEditActionChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState);
 
   Item^.Ex.Ends:= TATBits2(AValue);
   if TATLineState(Item^.Ex.State)<>cLineStateAdded then
@@ -1209,7 +1216,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
-  DoAddUndo(cEditActionInsert, Count, '', cEndNone);
+  DoAddUndo(cEditActionInsert, Count, '', cEndNone, cLineStateNone);
   DoEventLog(Count);
   DoEventChange(cLineChangeAdded, Count, 1);
 
@@ -1264,7 +1271,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
-  DoAddUndo(cEditActionInsert, ALineIndex, '', cEndNone);
+  DoAddUndo(cEditActionInsert, ALineIndex, '', cEndNone, cLineStateNone);
 
   if AWithEvent then
   begin
@@ -1314,7 +1321,7 @@ begin
   begin
     for i:= 0 to NCount-1 do
     begin
-      DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone);
+      DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone, cLineStateNone);
 
       Item.Init(
         ABlock.GetLine(i),
@@ -1363,7 +1370,7 @@ begin
     Item:= FList.GetItem(ALineIndex);
 
     if AWithUndo then
-      DoAddUndo(cEditActionDelete, ALineIndex, Item^.Line, TATLineEnds(Item^.Ex.Ends));
+      DoAddUndo(cEditActionDelete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
 
     if AWithEvent then
     begin
@@ -1587,6 +1594,7 @@ var
   AText: atString;
   AIndex: integer;
   AEnd: TATLineEnds;
+  ALineState: TATLineState;
   ACarets: TATPointArray;
   NCount: integer;
 begin
@@ -1604,6 +1612,7 @@ begin
   if not IsIndexValid(AIndex) then exit;
   AText:= Item.ItemText;
   AEnd:= Item.ItemEnd;
+  ALineState:= Item.ItemLineState;
   ACarets:= Item.ItemCarets;
   ASoftMarked:= Item.ItemSoftMark;
   AHardMarked:= Item.ItemHardMark;
@@ -1623,11 +1632,13 @@ begin
       cEditActionChange:
         begin
           Lines[AIndex]:= AText;
+          LinesState[AIndex]:= ALineState;
         end;
 
       cEditActionChangeEol:
         begin
           LinesEnds[AIndex]:= AEnd;
+          LinesState[AIndex]:= ALineState;
         end;
 
       cEditActionInsert:
@@ -1642,6 +1653,7 @@ begin
             LineAddRaw(AText, AEnd)
           else
             LineInsertRaw(AIndex, AText, AEnd);
+          LinesState[AIndex]:= ALineState;
         end;
 
       cEditActionClearModified:
@@ -1654,8 +1666,8 @@ begin
           exit;
         end
 
-      else
-        raise Exception.Create('Unknown undo action');
+      //else
+      //  raise Exception.Create('Unknown undo action');
     end;
 
     SetCaretsArray(ACarets);
@@ -1694,7 +1706,8 @@ begin
     FOnSetCaretsArray(L);
 end;
 
-procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer; const AText: atString; AEnd: TATLineEnds);
+procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer;
+  const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
 begin
   FModified:= true;
   FModifiedRecent:= true;
@@ -1709,13 +1722,13 @@ begin
   if not FUndoList.Locked then
   begin
     DoAddUpdate(AIndex, AAction);
-    FUndoList.Add(AAction, AIndex, AText, AEnd, GetCaretsArray);
+    FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray);
   end
   else
   if not FRedoList.Locked then
   begin
     DoAddUpdate(AIndex, AAction);
-    FRedoList.Add(AAction, AIndex, AText, AEnd, GetCaretsArray);
+    FRedoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray);
   end;
 end;
 

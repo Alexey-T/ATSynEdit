@@ -43,13 +43,15 @@ type
     ItemIndex: integer;
     ItemText: atString;
     ItemEnd: TATLineEnds;
+    ItemLineState: TATLineState;
     ItemCarets: TATPointArray;
     ItemSoftMark: boolean;
     ItemHardMark: boolean;
     procedure Assign(const D: TATUndoItem);
     property AsString: string read GetAsString write SetAsString;
     constructor Create(AAction: TATEditAction; AIndex: integer;
-      const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
+      const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
+      ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray); virtual;
     constructor CreateEmpty;
   end;
@@ -84,7 +86,7 @@ type
     procedure DeleteLast;
     procedure DeleteUnmodifiedMarks;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
-      AEnd: TATLineEnds; const ACarets: TATPointArray);
+      AEnd: TATLineEnds; ALineState: TATLineState; const ACarets: TATPointArray);
     procedure AddUnmodifiedMark;
     function DebugText: string;
     function IsEmpty: boolean;
@@ -136,6 +138,7 @@ begin
     IntToStr(Ord(ItemAction))+PartSep+
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
+    IntToStr(Ord(ItemLineState))+PartSep+
     PointsArrayToString(ItemCarets)+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
@@ -159,6 +162,9 @@ begin
   Sep.GetItemInt(N, 0);
   ItemEnd:= TATLineEnds(N);
 
+  Sep.GetItemInt(N, 0);
+  ItemLineState:= TATLineState(N);
+
   Sep.GetItemStr(S);
   StringToPointsArray(ItemCarets, S);
 
@@ -177,6 +183,7 @@ begin
   ItemAction:= D.ItemAction;
   ItemIndex:= D.ItemIndex;
   ItemEnd:= D.ItemEnd;
+  ItemLineState:= D.ItemLineState;
   ItemText:= D.ItemText;
   ItemCarets:= D.ItemCarets;
   ItemSoftMark:= D.ItemSoftMark;
@@ -185,7 +192,8 @@ end;
 
 
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
-  const AText: atString; AEnd: TATLineEnds; ASoftMark, AHardMark: boolean;
+  const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
+  ASoftMark, AHardMark: boolean;
   const ACarets: TATPointArray);
 var
   i: integer;
@@ -194,6 +202,7 @@ begin
   ItemIndex:= AIndex;
   ItemText:= AText;
   ItemEnd:= AEnd;
+  ItemLineState:= ALineState;
   ItemSoftMark:= ASoftMark;
   ItemHardMark:= AHardMark;
 
@@ -283,7 +292,7 @@ begin
 end;
 
 procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
-  const AText: atString; AEnd: TATLineEnds;
+  const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   const ACarets: TATPointArray);
 var
   Item: TATUndoItem;
@@ -312,7 +321,7 @@ begin
       end;
   end;
 
-  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, FSoftMark, FHardMark, ACarets);
+  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState, FSoftMark, FHardMark, ACarets);
   FList.Add(Item);
   FSoftMark:= false;
 
@@ -334,7 +343,10 @@ begin
     if Item.ItemAction=cEditActionClearModified then exit;
 
   SetLength(Carets, 0);
-  Item:= TATUndoItem.Create(cEditActionClearModified, 0, '', cEndNone, false, false, Carets);
+  Item:= TATUndoItem.Create(
+    cEditActionClearModified, 0, '',
+    cEndNone, cLineStateNone,
+    false, false, Carets);
   FList.Add(Item);
 end;
 

@@ -69,6 +69,14 @@ type
 {$Z1}
 type
   TATLineEnds = (cEndNone, cEndWin, cEndUnix, cEndMac);
+
+  TATLineState = (
+    cLineStateNone,
+    cLineStateChanged,
+    cLineStateAdded,
+    cLineStateSaved
+    );
+
 const
   cLineEndStrings: array[TATLineEnds] of string = ('', #13#10, #10, #13);
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'CRLF', 'LF', 'CR');
