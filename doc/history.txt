@@ -1,4 +1,8 @@
 
+2020.05.21
++ add: "line states" are saved to Undo-list and Undo/Redo commands handles them
+* changed format of UndoAsString/RedoAsString data
+
 2020.05.17
 + add: method Strings.TextSubstringLength
 
