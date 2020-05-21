@@ -393,6 +393,17 @@ type
     function FindByCoord(ACoord: TPoint): TATFoldedMark;
   end;
 
+  TATEditorTempOptions = record
+    FontSize: integer;
+    WrapMode: TATSynWrapMode;
+    ShowMinimap: boolean;
+    ShowMicromap: boolean;
+    ShowRuler: boolean;
+    ShowNumbers: boolean;
+    ShowUnprinted: boolean;
+    ShowFolding: boolean;
+  end;
+
 type
   { TATSynEdit }
 
@@ -1113,6 +1124,7 @@ type
 
   public
     TagString: string; //to store plugin specific data in CudaText
+    InitialOptions: TATEditorTempOptions;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
