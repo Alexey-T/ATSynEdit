@@ -461,7 +461,7 @@ function TATStringItem.IsFake: boolean; inline;
 begin
   Result:=
     (Buf='') and
-    (TATLineEnds(Ex.Ends)=cEndNone);
+    (LineEnds=cEndNone);
 end;
 
 function TATStringItem.IndentSize: integer;
@@ -825,7 +825,7 @@ end;
 
 function TATStrings.GetLineEnd(AIndex: integer): TATLineEnds;
 begin
-  Result:= TATLineEnds(FList.GetItem(AIndex)^.Ex.Ends);
+  Result:= FList.GetItem(AIndex)^.LineEnds;
 end;
 
 function TATStrings.GetLineFoldFrom(ALine, AClient: integer): integer;
@@ -848,7 +848,7 @@ end;
 
 function TATStrings.GetLineState(AIndex: integer): TATLineState;
 begin
-  Result:= TATLineState(FList.GetItem(AIndex)^.Ex.State);
+  Result:= FList.GetItem(AIndex)^.LineState;
 end;
 
 function TATStrings.GetLineUpdated(AIndex: integer): boolean;
@@ -861,7 +861,7 @@ var
   ItemPtr: PATStringItem;
 begin
   ItemPtr:= FList.GetItem(AIndex);
-  Result:= ItemPtr^.CharLen + cLineEndLength[TATLineEnds(ItemPtr^.Ex.Ends)];
+  Result:= ItemPtr^.CharLen + cLineEndLength[ItemPtr^.LineEnds];
 end;
 
 function TATStrings.GetRedoAsString: string;
@@ -1175,7 +1175,7 @@ function TATStrings.IsLastFakeLineUnneeded: boolean;
 begin
   Result:= (Count>1) and
     IsLastLineFake and
-    (TATLineEnds(FList.GetItem(FList.Count-2)^.Ex.Ends)=cEndNone);
+    (FList.GetItem(FList.Count-2)^.LineEnds=cEndNone);
 end;
 
 procedure TATStrings.ActionDeleteFakeLine;
@@ -1689,7 +1689,7 @@ begin
     Result:= Result+Format('[%d] "%s" <%s>', [
       i,
       Item^.Line,
-      cLineEndNiceNames[TATLineEnds(Item^.Ex.Ends)]
+      cLineEndNiceNames[Item^.LineEnds]
       ])+#10;
   end;
 end;

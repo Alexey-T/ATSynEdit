@@ -36,7 +36,7 @@ begin
   begin
     Item:= FList.GetItem(i);
 
-    ItemEnd:= TATLineEnds(Item^.Ex.Ends);
+    ItemEnd:= Item^.LineEnds;
     //don't break file if ending of some non-last line is unset
     if i<NLast then
       if ItemEnd=cEndNone then
