@@ -2916,6 +2916,7 @@ begin
       Result := #$1b; // \e => escape (ESC)
     'c':
       begin // \cK => code for Ctrl+K
+        Result := #0;
         Inc(APtr);
         if APtr >= fRegexEnd then
           Error(reeNoLetterAfterBSlashC);
@@ -3058,6 +3059,7 @@ var
   Len: integer;
   SavedPtr: PRegExprChar;
   EnderChar, TempChar: REChar;
+  DashForRange: Boolean;
 begin
   Result := nil;
   flags := 0;
@@ -3115,19 +3117,9 @@ begin
 
         while (regparse < fRegexEnd) and (regparse^ <> ']') do
         begin
-          // char before '-]' treated as simple char, not start of range
-          if ((regparse + 2) < fRegexEnd) and
-            ((regparse + 1)^ = '-') and
-            ((regparse + 2)^ = ']') then
-          begin
-            EmitRangeChar(regparse^, False);
-            EmitRangeChar('-', False);
-            Inc(regparse, 2);
-            Break;
-          end;
-
           // last '-' inside [] treated as simple dash
-          if (regparse^ = '-') and ((regparse + 1) < fRegexEnd) and
+          if (regparse^ = '-') and
+            ((regparse + 1) < fRegexEnd) and
             ((regparse + 1)^ = ']') then
           begin
             EmitRangeChar('-', False);
@@ -3135,7 +3127,7 @@ begin
             Break;
           end;
 
-          // char '-' which makes a range
+          // char '-' which (maybe) makes a range
           if (regparse^ = '-') and ((regparse + 1) < fRegexEnd) and CanBeRange then
           begin
             Inc(regparse);
@@ -3212,12 +3204,22 @@ begin
               else
               begin
                 TempChar := UnQuoteChar(regparse);
-                EmitRangeChar(TempChar, (regparse + 1)^ = '-');
+                // False if '-' is last char in []
+                DashForRange :=
+                  (regparse + 2 < fRegexEnd) and
+                  ((regparse + 1)^ = '-') and
+                  ((regparse + 2)^ <> ']');
+                EmitRangeChar(TempChar, DashForRange);
               end;
             end
             else
             begin
-              EmitRangeChar(regparse^, (regparse + 1)^ = '-');
+              // False if '-' is last char in []
+              DashForRange :=
+                (regparse + 2 < fRegexEnd) and
+                ((regparse + 1)^ = '-') and
+                ((regparse + 2)^ <> ']');
+              EmitRangeChar(regparse^, DashForRange);
             end;
             Inc(regparse);
           end;
@@ -4311,7 +4313,7 @@ begin
   // Check InputString presence
   if fInputString = '' then
   begin
-    //Error(reeNoInputStringSpecified);
+    //Error(reeNoInputStringSpecified); // better don't raise error, breaks some apps
     Exit;
   end;
 
@@ -4523,9 +4525,10 @@ begin
   if not IsProgrammOk then
     Exit;
   {
+  // don't check for empty, user needs to replace regex "\b", zero length
   if fInputString = '' then
   begin
-    //Error(reeNoInputStringSpecified);
+    Error(reeNoInputStringSpecified);
     Exit;
   end;
   }
@@ -4591,7 +4594,7 @@ begin
   end;
   SetLength(Result, ResultLen);
   // Fill Result
-  ResultPtr := Pointer(Result);
+  ResultPtr := PRegExprChar(Result);
   p := TemplateBeg;
   Mode := smodeNormal;
   while p < TemplateEnd do
@@ -5210,6 +5213,14 @@ begin
 end; { of function TRegExpr.DumpOp
   -------------------------------------------------------------- }
 
+function PrintableChar(AChar: REChar): RegExprString; {$IFDEF InlineFuncs}inline;{$ENDIF}
+begin
+  if AChar < ' ' then
+    Result := '#' + IntToStr(Ord(AChar))
+  else
+    Result := AChar;
+end;
+
 function TRegExpr.Dump: RegExprString;
 // dump a regexp in vaguely comprehensible form
 var
@@ -5218,17 +5229,8 @@ var
   next: PRegExprChar;
   i, NLen: integer;
   Diff: PtrInt;
-  Ch: AnsiChar;
-
-  function PrintableChar(AChar: REChar): string; {$IFDEF InlineFuncs}inline;{$ENDIF}
-  begin
-    if AChar < ' ' then
-      Result := '#' + IntToStr(Ord(AChar))
-    else
-      Result := AChar;
-  end;
-
-begin
+  iByte: byte;
+ begin
   if not IsProgrammOk then
     Exit;
 
@@ -5349,14 +5351,9 @@ begin
   if FirstCharSet = RegExprAllSet then
     Result := Result + '<all chars>'
   else
-  for Ch := #0 to #255 do
-    if byte(Ch) in FirstCharSet then
-    begin
-      if Ch < ' ' then
-        Result := Result + PrintableChar(Ch) // ###0.948
-      else
-        Result := Result + Ch;
-    end;
+  for iByte := 0 to 255 do
+    if iByte in FirstCharSet then
+      Result := Result + PrintableChar(REChar(iByte));
   {$ENDIF}
   Result := Result + #$d#$a;
 end; { of function TRegExpr.Dump
