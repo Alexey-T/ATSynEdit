@@ -2530,7 +2530,7 @@ function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
 var
   Size: TSize;
 begin
-  Size:= C.TextExtent('M');
+  Size:= C.TextExtent('N'); // 'M' is not ok, it's too wide for var-width fonts
   Result.X:= Max(1, Size.cx + ACharSpacing.X);
   Result.Y:= Max(1, Size.cy + ACharSpacing.Y);
 end;
