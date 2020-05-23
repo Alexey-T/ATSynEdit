@@ -1,5 +1,6 @@
 
 2020.05.21
++ add: when unprinted symbols visible, paint additional curved-arrow for wrapped line parts
 + add: "line states" are saved to Undo-list and Undo/Redo commands handles them
 * changed format of UndoAsString/RedoAsString data
 
