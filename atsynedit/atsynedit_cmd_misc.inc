@@ -177,12 +177,13 @@ begin
 end;
 
 procedure TATSynEdit.UpdateFoldLineIndexer;
+var
+  NCount: integer;
 begin
-  if Fold.CountOfLineIndexer=0 then
-  begin
-    Fold.ClearLineIndexer(Strings.Count);
-    Fold.UpdateLineIndexer;
-  end;
+  NCount:= Strings.Count;
+  if Fold.CountOfLineIndexer<NCount then
+    Fold.ClearLineIndexer(NCount);
+  Fold.UpdateLineIndexer;
 end;
 
 function TATSynEdit.DoCommand_FoldSelection: TATCommandResults;
