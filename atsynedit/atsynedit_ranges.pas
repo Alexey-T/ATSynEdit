@@ -79,7 +79,7 @@ type
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
     function IsRangesSame(R1, R2: PATSynRange): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
-      ASpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
+      AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
@@ -319,17 +319,23 @@ type
   TATIntegerList = specialize TFPGList<integer>;
 
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
-  ASpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
+  AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
   ALineMode: TATRangeHasLines): TATIntArray;
 var
   L: TATIntegerList;
-  R, RTest: PATSynRange;
+  R, RngSpecial: PATSynRange;
   i, j: integer;
   Ok: boolean;
 begin
   SetLength(Result, 0);
   L:= TATIntegerList.Create;
   L.Capacity:= 128;
+
+  if AInsideSpecialRange>=0 then
+    RngSpecial:= FList.ItemPtr(AInsideSpecialRange)
+  else
+    RngSpecial:= nil;
+
   try
     for i:= 0 to Count-1 do
     begin
@@ -341,18 +347,13 @@ begin
             cRngIgnoreLineParams: Ok:= true;
             cRngHasAllLines: Ok:= (R^.Y<=ALineFrom) and (R^.Y2>=ALineTo);
             cRngHasAnyOfLines: Ok:= (R^.Y<=ALineTo) and (R^.Y2>=ALineFrom);
-            cRngExceptSpecialRange: Ok:= i<>ASpecialRange;
+            cRngExceptSpecialRange: Ok:= i<>AInsideSpecialRange;
             else raise Exception.Create('unknown LineMode');
           end;
           if not Ok then Continue;
 
-          if ASpecialRange<0 then
-            Ok:= true
-          else
-          begin
-            RTest:= FList.ItemPtr(ASpecialRange);
-            Ok:= not IsRangesSame(RTest, R) and IsRangeInsideOther(R, RTest);
-          end;
+          if Assigned(RngSpecial) then
+            Ok:= not IsRangesSame(RngSpecial, R) and IsRangeInsideOther(R, RngSpecial);
 
           if Ok then
             L.Add(i);
@@ -410,10 +411,11 @@ begin
   begin
     NRange:= FLineIndexer[ALine][iItem];
     Ptr:= ItemPtr(NRange);
+    if Ptr^.IsSimple then
+      Continue;
     if AWithStaple and not Ptr^.Staple then
       Continue;
-    if not Ptr^.IsSimple then
-      exit(NRange);
+    exit(NRange);
   end;
 end;
 
