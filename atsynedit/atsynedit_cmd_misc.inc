@@ -204,6 +204,8 @@ begin
   Fold.Add(1, Y1, Y2, false, '', cTagPersistentFoldRange);
   DoRangeFold(Fold.Count-1);
 
+  Caret.SelectNone;
+
   Result:= [cResultCaretAny, cResultFoldChange];
 end;
 
