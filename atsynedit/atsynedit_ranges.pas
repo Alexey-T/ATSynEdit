@@ -64,6 +64,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     function Count: integer; inline;
+    function CountOfLineIndexer: integer;
     function IsIndexValid(N: integer): boolean; inline;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
@@ -164,6 +165,11 @@ end;
 function TATSynRanges.Count: integer; inline;
 begin
   Result:= FList.Count;
+end;
+
+function TATSynRanges.CountOfLineIndexer: integer;
+begin
+  Result:= Length(FLineIndexer);
 end;
 
 function TATSynRanges.GetItems(Index: integer): TATSynRange;
