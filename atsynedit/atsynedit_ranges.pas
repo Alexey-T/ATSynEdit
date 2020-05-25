@@ -357,7 +357,8 @@ var
   L: TATIntegerList;
   R, RngSpecial: PATSynRange;
   RngStep, RngStepNext: PATSynRange;
-  NCount, i, j: integer;
+  NCount, NDeletedCount: integer;
+  i, j: integer;
   Ok: boolean;
 begin
   SetLength(Result, 0);
@@ -393,6 +394,7 @@ begin
         end;
     end;
 
+    NDeletedCount:= 0;
     if ATopLevelOnly then
     begin
       //keep from collected list L only top-level ranges
@@ -410,17 +412,20 @@ begin
               if RngStepNext^.Y>=RngStep^.Y2 then
                 Break;
               L[j]:= cDeleted;
+              Inc(NDeletedCount);
             end;
         end;
-
-      for i:= NCount-1 downto 0 do
-        if L[i]=cDeleted then
-          L.Delete(i);
     end;
 
-    SetLength(Result, L.Count);
+    //this is complex, to avoid deleting items from L, which is slow
+    SetLength(Result, L.Count-NDeletedCount);
+    j:= 0;
     for i:= 0 to L.Count-1 do
-      Result[i]:= L[i];
+      if L[i]<>cDeleted then
+      begin
+        Result[j]:= L[i];
+        Inc(j);
+      end;
   finally
     FreeAndNil(L);
   end;
