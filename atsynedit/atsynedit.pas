@@ -6724,7 +6724,7 @@ begin
     if Carets.Count>0 then
     begin
       i:= Carets[0].PosY;
-      nRange:= FFold.FindDeepestRangeContainingLine(i, Indexes);
+      nRange:= FFold.FindDeepestRangeContainingLine2(i);
     end;
 
   NColorNormal:= Colors.BlockStaple;
