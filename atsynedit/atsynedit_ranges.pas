@@ -82,7 +82,7 @@ type
       ASpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
-    function FindDeepestRangeContainingLine(ALine: integer): integer;
+    function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function MessageText(AMaxCount: integer): string;
     function MessageLineIndexer(AMaxCount: integer): string;
@@ -397,7 +397,7 @@ begin
   end;
 end;
 
-function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer): integer;
+function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
 var
   NItemLen, NRange, iItem: integer;
   Ptr: PATSynRange;
@@ -410,6 +410,8 @@ begin
   begin
     NRange:= FLineIndexer[ALine][iItem];
     Ptr:= ItemPtr(NRange);
+    if AWithStaple and not Ptr^.Staple then
+      Continue;
     if not Ptr^.IsSimple then
       exit(NRange);
   end;
