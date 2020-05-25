@@ -1,4 +1,7 @@
 
+2020.05.25
++ add: optimizations in Fold.Find* helpers, so unfolding of big count of ranges is faster
+
 2020.05.21
 + add: when unprinted symbols visible, paint additional curved-arrow for wrapped line parts
 + add: "line states" are saved to Undo-list and Undo/Redo commands handles them
