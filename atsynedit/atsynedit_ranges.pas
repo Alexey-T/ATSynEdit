@@ -78,6 +78,7 @@ type
     function ItemPtr(AIndex: integer): PATSynRange;
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
     function IsRangesSame(R1, R2: PATSynRange): boolean;
+    function IsRangeTopLevel(AIndex: integer): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
       AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
@@ -313,6 +314,35 @@ begin
     exit(true);
 
   Result:= false;
+end;
+
+function TATSynRanges.IsRangeTopLevel(AIndex: integer): boolean;
+var
+  NLine, NItemOfRng, iItem: integer;
+  Prev: PATSynRange;
+begin
+  Result:= false;
+  NLine:= ItemPtr(AIndex)^.Y;
+
+  NItemOfRng:= 0;
+  for iItem:= 0 to High(FLineIndexer[NLine]) do
+    if FLineIndexer[NLine][iItem] = AIndex then
+    begin
+      NItemOfRng:= iItem;
+      Break;
+    end;
+
+  //first in LineIndexer item? then top level
+  if NItemOfRng=0 then
+    exit(true);
+
+  //previous range in the same LineIndexer line only touches our range, or includes our range?
+  iItem:= FLineIndexer[NLine][NItemOfRng-1];
+  Prev:= ItemPtr(iItem);
+  if Prev^.Y2=NLine then //touches
+    Result:= NItemOfRng<2
+  else //includes
+    Result:= false;
 end;
 
 type
