@@ -86,6 +86,7 @@ type
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
+    function FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
     function MessageText(AMaxCount: integer): string;
     function MessageLineIndexer(AMaxCount: integer): string;
     procedure UpdateLineIndexer;
@@ -480,7 +481,7 @@ begin
 end;
 
 
-function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
+function TATSynRanges.FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
 var
   NItemLen, NRange, iItem: integer;
   Ptr: PATSynRange;
@@ -499,7 +500,6 @@ begin
   end;
 end;
 
-(*
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
 // issue https://github.com/Alexey-T/CudaText/issues/2566
 // because of this, we must skip all one-line ranges
@@ -540,7 +540,6 @@ begin
   if (m<NCount) and (FList.ItemPtr(m)^.Y=ALine) then
     Result:= m;
 end;
-*)
 
 function TATSynRanges.MessageText(AMaxCount: integer): string;
 var
