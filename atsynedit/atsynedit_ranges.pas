@@ -56,7 +56,7 @@ type
     FList: TATSynRangeList;
     FLineIndexer: array of array of integer;
     FHasTagPersist: boolean;
-    procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer);
+    procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer); inline;
     function GetItems(Index: integer): TATSynRange;
     procedure SetItems(Index: integer; const AValue: TATSynRange);
     //function MessageTextForIndexList(const L: TATIntArray): string;
