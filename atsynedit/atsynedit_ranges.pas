@@ -398,6 +398,26 @@ end;
 
 
 function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
+var
+  NItemLen, NRange, iItem: integer;
+  Ptr: PATSynRange;
+begin
+  Result:= -1;
+  if ALine>High(FLineIndexer) then exit;
+
+  NItemLen:= Length(FLineIndexer[ALine]);
+  for iItem:= 0 to NItemLen-1 do
+  begin
+    NRange:= FLineIndexer[ALine][iItem];
+    Ptr:= ItemPtr(NRange);
+    if Ptr^.Y=ALine then
+      if not Ptr^.IsSimple then
+        exit(NRange);
+  end;
+end;
+
+(*
+function TATSynRanges.FindRangeWithPlusAtLine(ALine: integer): integer;
 // issue https://github.com/Alexey-T/CudaText/issues/2566
 // because of this, we must skip all one-line ranges
 var
@@ -437,6 +457,7 @@ begin
   if (m<NCount) and (FList.ItemPtr(m)^.Y=ALine) then
     Result:= m;
 end;
+*)
 
 function TATSynRanges.MessageText(AMaxCount: integer): string;
 var
