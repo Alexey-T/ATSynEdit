@@ -79,7 +79,6 @@ type
     function ItemPtr(AIndex: integer): PATSynRange;
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
     function IsRangesSame(R1, R2: PATSynRange): boolean;
-    function IsRangeTopLevel(AIndex: integer): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
       AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
@@ -87,6 +86,7 @@ type
     function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
+    function FindRangeLevel(AIndex: integer): integer;
     function MessageText(AMaxCount: integer): string;
     function MessageLineIndexer(AMaxCount: integer): string;
     procedure UpdateLineIndexer;
@@ -325,12 +325,12 @@ begin
   Result:= false;
 end;
 
-function TATSynRanges.IsRangeTopLevel(AIndex: integer): boolean;
+function TATSynRanges.FindRangeLevel(AIndex: integer): integer;
 var
   NLine, NItemOfRng, iItem: integer;
   Prev: PATSynRange;
 begin
-  Result:= false;
+  Result:= -1;
   NLine:= ItemPtr(AIndex)^.Y;
   if NLine>High(FLineIndexer) then exit;
 
@@ -342,17 +342,18 @@ begin
       Break;
     end;
 
-  //first in LineIndexer item? then top level
+  //first in LineIndexer item? then level 0
   if NItemOfRng=0 then
-    exit(true);
+    exit(0);
 
-  //previous range in the same LineIndexer line only touches our range, or includes our range?
+  //skip previous range in the same LineIndexer line,
+  //if it only touches our range (not includes our range)
   iItem:= FLineIndexer[NLine][NItemOfRng-1];
   Prev:= ItemPtr(iItem);
-  if Prev^.Y2=NLine then //touches
-    Result:= NItemOfRng<2
-  else //includes
-    Result:= false;
+  if Prev^.Y2=NLine then
+    Dec(NItemOfRng);
+
+  Result:= NItemOfRng;
 end;
 
 type
