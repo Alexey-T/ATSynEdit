@@ -332,6 +332,7 @@ var
 begin
   Result:= false;
   NLine:= ItemPtr(AIndex)^.Y;
+  if NLine>High(FLineIndexer) then exit;
 
   NItemOfRng:= 0;
   for iItem:= 0 to High(FLineIndexer[NLine]) do
