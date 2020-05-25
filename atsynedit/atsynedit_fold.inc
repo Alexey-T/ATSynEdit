@@ -454,7 +454,7 @@ begin
   NLine:= Carets[0].PosY;
   if not Strings.IsIndexValid(NLine) then exit;
 
-  NRange:= Fold.FindDeepestRangeContainingLine2(NLine);
+  NRange:= Fold.FindDeepestRangeContainingLine(NLine);
   if NRange<0 then exit;
   bFolded:= Fold.Items[NRange].Folded;
 
