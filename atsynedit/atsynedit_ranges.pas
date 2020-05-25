@@ -351,6 +351,8 @@ type
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
   AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
   ALineMode: TATRangeHasLines): TATIntArray;
+//ATopLevel: keep from collected list only top-level ranges
+//(not globally top-level, but top-level inside found list)
 const
   cDeleted = -1;
 var
@@ -397,8 +399,6 @@ begin
     NDeletedCount:= 0;
     if ATopLevelOnly then
     begin
-      //keep from collected list L only top-level ranges
-      //(not globally top-level, but top-level inside L)
       //mark "deleted" items with value cDeleted<0
       NCount:= L.Count;
       for i:= 0 to NCount-1 do
