@@ -186,7 +186,7 @@ begin
   if Fold.CountOfLineIndexer<NCount then
   begin
     Fold.ClearLineIndexer(NCount, true);
-    Fold.UpdateLineIndexer;
+    //Fold.UpdateLineIndexer; //Fold methods auto update all
   end;
 end;
 
