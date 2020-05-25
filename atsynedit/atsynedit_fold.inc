@@ -448,16 +448,13 @@ end;
 procedure TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
 var
   NLine, NRange: integer;
-  Indexes: TATIntArray;
   bFolded: boolean;
 begin
   if Carets.Count<>1 then exit;
   NLine:= Carets[0].PosY;
   if not Strings.IsIndexValid(NLine) then exit;
 
-  Indexes:= Fold.FindRangesContainingLines(NLine, NLine, -1, false, false, cRngHasAllLines);
-  if Length(Indexes)=0 then exit;
-  NRange:= Fold.FindDeepestRangeContainingLine(NLine, Indexes);
+  NRange:= Fold.FindDeepestRangeContainingLine2(NLine);
   if NRange<0 then exit;
   bFolded:= Fold.Items[NRange].Folded;
 
