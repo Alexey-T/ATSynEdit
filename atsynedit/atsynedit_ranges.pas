@@ -81,7 +81,7 @@ type
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
       AInRangeIndex: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
-    function FindDeepestRangeContainingLine(ALine: integer; const AIndexes: TATIntArray): integer;
+    function FindDeepestRangeContainingLine1(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindDeepestRangeContainingLine2(ALine: integer): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function MessageText(AMaxCount: integer): string;
@@ -379,7 +379,7 @@ begin
 end;
 
 
-function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer;
+function TATSynRanges.FindDeepestRangeContainingLine1(ALine: integer;
   const AIndexes: TATIntArray): integer;
 var
   R: PATSynRange;
