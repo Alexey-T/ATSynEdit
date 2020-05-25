@@ -71,7 +71,7 @@ type
     function Insert(AIndex: integer; AX, AY, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
     procedure Clear;
-    procedure ClearLineIndexer(ALineCount: integer);
+    procedure ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
     procedure Delete(AIndex: integer);
     procedure DeleteAllByTag(const ATag: Int64);
     procedure DeleteAllExceptTag(const ATag: Int64);
@@ -184,12 +184,14 @@ begin
     FHasTagPersist:= true;
 end;
 
-procedure TATSynRanges.ClearLineIndexer(ALineCount: integer);
+procedure TATSynRanges.ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
 var
   i: integer;
 begin
-  for i:= High(FLineIndexer) downto 0 do
-    SetLength(FLineIndexer[i], 0);
+  if not ASetLenOnly then
+    for i:= High(FLineIndexer) downto 0 do
+      SetLength(FLineIndexer[i], 0);
+
   SetLength(FLineIndexer, ALineCount);
 end;
 

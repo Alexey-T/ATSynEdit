@@ -176,15 +176,18 @@ begin
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
 
-procedure TATSynEdit.UpdateFoldLineIndexer(AForce: boolean);
+procedure TATSynEdit.UpdateFoldLineIndexer;
+//if called w/o lexer active (EControl adapter inits LineIndexer),
+//init LineIndexer
 var
   NCount: integer;
 begin
   NCount:= Strings.Count;
   if Fold.CountOfLineIndexer<NCount then
-    Fold.ClearLineIndexer(NCount);
-  if AForce then
+  begin
+    Fold.ClearLineIndexer(NCount, true);
     Fold.UpdateLineIndexer;
+  end;
 end;
 
 function TATSynEdit.DoCommand_FoldSelection: TATCommandResults;
@@ -198,13 +201,14 @@ begin
   if Caret.EndY<0 then exit;
   Caret.GetSelLines(Y1, Y2);
 
-  UpdateFoldLineIndexer(false);
+  //better clear the selection
+  Caret.SelectNone;
+
+  UpdateFoldLineIndexer;
   if Fold.FindRangeWithPlusAtLine(Y1)>=0 then exit;
 
   Fold.Add(1, Y1, Y2, false, '', cTagPersistentFoldRange);
   DoRangeFold(Fold.Count-1);
-
-  Caret.SelectNone;
 
   Result:= [cResultCaretAny, cResultFoldChange];
 end;
