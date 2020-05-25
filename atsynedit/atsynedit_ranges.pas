@@ -54,6 +54,7 @@ type
   TATSynRanges = class
   private
     FList: TATSynRangeList;
+    FLineIndexer: array of array of integer;
     FHasTagPersist: boolean;
     function GetItems(Index: integer): TATSynRange;
     procedure SetItems(Index: integer; const AValue: TATSynRange);
@@ -68,6 +69,7 @@ type
     function Insert(Index: integer; AX, AY, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
     procedure Clear;
+    procedure ClearLineIndexer(ALineCount: integer);
     procedure Delete(Index: integer);
     procedure DeleteAllByTag(const ATag: Int64);
     procedure DeleteAllExceptTag(const ATag: Int64);
@@ -171,6 +173,15 @@ begin
     FHasTagPersist:= true;
 end;
 
+procedure TATSynRanges.ClearLineIndexer(ALineCount: integer);
+var
+  i: integer;
+begin
+  for i:= High(FLineIndexer) downto 0 do
+    SetLength(FLineIndexer[i], 0);
+  SetLength(FLineIndexer, ALineCount);
+end;
+
 constructor TATSynRanges.Create;
 begin
   FList:= TATSynRangeList.Create;
@@ -187,6 +198,7 @@ end;
 
 procedure TATSynRanges.Clear;
 begin
+  ClearLineIndexer(0);
   FList.Clear;
   FHasTagPersist:= false;
 end;
