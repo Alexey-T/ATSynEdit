@@ -87,6 +87,7 @@ type
     procedure UpdateLineIndexer;
     procedure Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     property HasTagPersist: boolean read FHasTagPersist;
+    function DebugLineIndexer: string;
   end;
 
 const
@@ -528,6 +529,22 @@ begin
     Result:= Result+Items[L[i]].MessageText+#10;
 end;
 *)
+
+function TATSynRanges.DebugLineIndexer: string;
+var
+  S: string;
+  i, iLine: integer;
+begin
+  Result:= '';
+  for iLine:= 0 to Min(High(FLineIndexer), 30) do
+  begin
+    S:= IntToStr(iLine)+': ';
+    for i:= 0 to High(FLineIndexer[iLine]) do
+      S+= IntToStr(FLineIndexer[iLine][i])+' ';
+    Result+= S+#10;
+  end;
+end;
+
 
 end.
 
