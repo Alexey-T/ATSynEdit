@@ -225,13 +225,14 @@ procedure TATSynRanges.AddToLineIndexer(ALine1, ALine2, AIndex: integer);
 var
   NItemLen, i: integer;
 begin
-  if ALine2<=High(FLineIndexer) then
-    for i:= ALine1 to ALine2 do
-    begin
-      NItemLen:= Length(FLineIndexer[i]);
-      SetLength(FLineIndexer[i], NItemLen+1);
-      FLineIndexer[i][NItemLen]:= AIndex;
-    end;
+  if ALine1<>ALine2 then //skip one-line ranges
+    if ALine2<=High(FLineIndexer) then
+      for i:= ALine1 to ALine2 do
+      begin
+        NItemLen:= Length(FLineIndexer[i]);
+        SetLength(FLineIndexer[i], NItemLen+1);
+        FLineIndexer[i][NItemLen]:= AIndex;
+      end;
 end;
 
 function TATSynRanges.Insert(AIndex: integer; AX, AY, AY2: integer;
