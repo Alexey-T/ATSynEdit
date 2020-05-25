@@ -6703,7 +6703,7 @@ end;
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
   ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
 var
-  nLineFrom, nLineTo, nIndent, nRange, nMaxHeight: integer;
+  nLineFrom, nLineTo, nIndent, nRangeDeepest, nMaxHeight: integer;
   Indexes: TATIntArray;
   Range: PATSynRange;
   P1, P2: TPoint;
@@ -6724,7 +6724,7 @@ begin
     if Carets.Count>0 then
     begin
       i:= Carets[0].PosY;
-      nRange:= FFold.FindDeepestRangeContainingLine2(i);
+      nRangeDeepest:= FFold.FindDeepestRangeContainingLine2(i);
     end;
 
   NColorNormal:= Colors.BlockStaple;
@@ -6765,7 +6765,7 @@ begin
       RSt.Top:= Max(RSt.Top, -2);
       RSt.Bottom:= Min(RSt.Bottom, nMaxHeight);
 
-      if Indexes[i]=nRange then
+      if Indexes[i]=nRangeDeepest then
         NColor:= NColorActive
       else
         NColor:= NColorNormal;
