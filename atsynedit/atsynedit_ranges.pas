@@ -56,6 +56,7 @@ type
     FList: TATSynRangeList;
     FLineIndexer: array of array of integer;
     FHasTagPersist: boolean;
+    procedure AddToLineIndexer(ALine1, ALine2, AIndex: integer);
     function GetItems(Index: integer): TATSynRange;
     procedure SetItems(Index: integer; const AValue: TATSynRange);
     //function MessageTextForIndexList(const L: TATIntArray): string;
@@ -66,11 +67,11 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
-    function Insert(Index: integer; AX, AY, AY2: integer; AWithStaple: boolean;
+    function Insert(AIndex: integer; AX, AY, AY2: integer; AWithStaple: boolean;
       const AHint: string; const ATag: Int64=0): TATSynRange;
     procedure Clear;
     procedure ClearLineIndexer(ALineCount: integer);
-    procedure Delete(Index: integer);
+    procedure Delete(AIndex: integer);
     procedure DeleteAllByTag(const ATag: Int64);
     procedure DeleteAllExceptTag(const ATag: Int64);
     property Items[Index: integer]: TATSynRange read GetItems write SetItems; default;
@@ -83,6 +84,7 @@ type
     function FindDeepestRangeContainingLine(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function MessageText(Cnt: integer): string;
+    procedure UpdateLineIndexer;
     procedure Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     property HasTagPersist: boolean read FHasTagPersist;
   end;
@@ -206,27 +208,49 @@ end;
 function TATSynRanges.Add(AX, AY, AY2: integer; AWithStaple: boolean;
   const AHint: string;
   const ATag: Int64=0): TATSynRange;
+var
+  NIndex: integer;
 begin
   Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
-  FList.Add(Result);
+  NIndex:= FList.Add(Result);
+
   if ATag=cTagPersistentFoldRange then
     FHasTagPersist:= true;
+
+  AddToLineIndexer(AY, AY2, NIndex);
 end;
 
-function TATSynRanges.Insert(Index: integer; AX, AY, AY2: integer;
+procedure TATSynRanges.AddToLineIndexer(ALine1, ALine2, AIndex: integer);
+var
+  NItemLen, i: integer;
+begin
+  if ALine2<=High(FLineIndexer) then
+    for i:= ALine1 to ALine2 do
+    begin
+      NItemLen:= Length(FLineIndexer[i]);
+      SetLength(FLineIndexer[i], NItemLen+1);
+      FLineIndexer[i][NItemLen]:= AIndex;
+    end;
+end;
+
+function TATSynRanges.Insert(AIndex: integer; AX, AY, AY2: integer;
   AWithStaple: boolean;
   const AHint: string;
   const ATag: Int64=0): TATSynRange;
 begin
   Result.Init(AX, AY, AY2, AWithStaple, AHint, ATag);
-  FList.Insert(Index, Result);
+  FList.Insert(AIndex, Result);
+
   if ATag=cTagPersistentFoldRange then
     FHasTagPersist:= true;
+
+  UpdateLineIndexer;
 end;
 
-procedure TATSynRanges.Delete(Index: integer); inline;
+procedure TATSynRanges.Delete(AIndex: integer); inline;
 begin
-  FList.Delete(Index);
+  FList.Delete(AIndex);
+  UpdateLineIndexer;
 end;
 
 procedure TATSynRanges.DeleteAllByTag(const ATag: Int64);
@@ -236,8 +260,11 @@ begin
   for i:= FList.Count-1 downto 0 do
     if ItemPtr(i)^.Tag=ATag then
       FList.Delete(i);
+
   if ATag=cTagPersistentFoldRange then
     FHasTagPersist:= false;
+
+  UpdateLineIndexer;
 end;
 
 procedure TATSynRanges.DeleteAllExceptTag(const ATag: Int64);
@@ -259,6 +286,8 @@ begin
 
   if ATag<>cTagPersistentFoldRange then
     FHasTagPersist:= false;
+
+  UpdateLineIndexer;
 end;
 
 function TATSynRanges.ItemPtr(AIndex: integer): PATSynRange;
@@ -471,6 +500,21 @@ begin
             Rng^.Y2+= AItemCount;
           end;
         end;
+  end;
+
+  UpdateLineIndexer;
+end;
+
+procedure TATSynRanges.UpdateLineIndexer;
+var
+  Ptr: PATSynRange;
+  i: integer;
+begin
+  ClearLineIndexer(Length(FLineIndexer));
+  for i:= 0 to FList.Count-1 do
+  begin
+    Ptr:= ItemPtr(i);
+    AddToLineIndexer(Ptr^.Y, Ptr^.Y2, i);
   end;
 end;
 
