@@ -176,6 +176,15 @@ begin
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
 
+procedure TATSynEdit.UpdateFoldLineIndexer;
+begin
+  if Fold.CountOfLineIndexer=0 then
+  begin
+    Fold.ClearLineIndexer(Strings.Count);
+    Fold.UpdateLineIndexer;
+  end;
+end;
+
 function TATSynEdit.DoCommand_FoldSelection: TATCommandResults;
 var
   Caret: TATCaretItem;
@@ -187,12 +196,7 @@ begin
   if Caret.EndY<0 then exit;
   Caret.GetSelLines(Y1, Y2);
 
-  if Fold.CountOfLineIndexer=0 then
-  begin
-    Fold.ClearLineIndexer(Strings.Count);
-    Fold.UpdateLineIndexer;
-  end;
-
+  UpdateFoldLineIndexer;
   if Fold.FindRangeWithPlusAtLine(Y1)>=0 then exit;
 
   Fold.Add(1, Y1, Y2, false, '', cTagPersistentFoldRange);

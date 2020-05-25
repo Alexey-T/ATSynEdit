@@ -1141,6 +1141,7 @@ type
     procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
+    procedure UpdateFoldLineIndexer;
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
     procedure DoEventChange(AllowOnChange: boolean=true); virtual;
