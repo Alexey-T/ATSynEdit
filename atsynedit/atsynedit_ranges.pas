@@ -42,10 +42,10 @@ type
 
 type
   TATRangeHasLines = (
-    cRngIgnore,
+    cRngIgnoreLineParams,
     cRngHasAllLines,
     cRngHasAnyOfLines,
-    cRngExceptThisRange
+    cRngExceptSpecialRange
     );
 
 type
@@ -79,7 +79,7 @@ type
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
     function IsRangesSame(R1, R2: PATSynRange): boolean;
     function FindRangesContainingLines(ALineFrom, ALineTo: integer;
-      AInRangeIndex: integer; AOnlyFolded, ATopLevelOnly: boolean;
+      ASpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindDeepestRangeContainingLine(ALine: integer): integer;
@@ -319,7 +319,7 @@ type
   TATIntegerList = specialize TFPGList<integer>;
 
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
-  AInRangeIndex: integer; AOnlyFolded, ATopLevelOnly: boolean;
+  ASpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
   ALineMode: TATRangeHasLines): TATIntArray;
 var
   L: TATIntegerList;
@@ -338,19 +338,19 @@ begin
         if (not AOnlyFolded or R^.Folded) then
         begin
           case ALineMode of
-            cRngIgnore: Ok:= true;
+            cRngIgnoreLineParams: Ok:= true;
             cRngHasAllLines: Ok:= (R^.Y<=ALineFrom) and (R^.Y2>=ALineTo);
             cRngHasAnyOfLines: Ok:= (R^.Y<=ALineTo) and (R^.Y2>=ALineFrom);
-            cRngExceptThisRange: Ok:= i<>AInRangeIndex;
+            cRngExceptSpecialRange: Ok:= i<>ASpecialRange;
             else raise Exception.Create('unknown LineMode');
           end;
           if not Ok then Continue;
 
-          if AInRangeIndex<0 then
+          if ASpecialRange<0 then
             Ok:= true
           else
           begin
-            RTest:= FList.ItemPtr(AInRangeIndex);
+            RTest:= FList.ItemPtr(ASpecialRange);
             Ok:= not IsRangesSame(RTest, R) and IsRangeInsideOther(R, RTest);
           end;
 

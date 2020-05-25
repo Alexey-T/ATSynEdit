@@ -81,7 +81,7 @@ begin
   FWrapUpdateNeeded:= true;
 
   Indexes:= FFold.FindRangesContainingLines(-1, -1, ARangeIndex,
-    true{OnlyFolded}, true{TopLevel}, cRngIgnore);
+    true{OnlyFolded}, true{TopLevel}, cRngIgnoreLineParams);
 
   //show all lines not in subranges
   for IndexLine:= RangeThis^.Y to RangeThis^.Y2 do
@@ -411,7 +411,7 @@ begin
   if ALevel<0 then exit;
 
   List:= Fold.FindRangesContainingLines(ALineFrom, ALineTo, AForThisRange,
-    false{OnlyFolded}, true{TopLevel}, cRngExceptThisRange);
+    false{OnlyFolded}, true{TopLevel}, cRngExceptSpecialRange);
 
   for i:= Low(List) to High(List) do
   begin
