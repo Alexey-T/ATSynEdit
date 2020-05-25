@@ -351,10 +351,13 @@ type
 function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
   AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
   ALineMode: TATRangeHasLines): TATIntArray;
+const
+  cDeleted = -1;
 var
   L: TATIntegerList;
   R, RngSpecial: PATSynRange;
-  i, j: integer;
+  RngStep, RngStepNext: PATSynRange;
+  NCount, i, j: integer;
   Ok: boolean;
 begin
   SetLength(Result, 0);
@@ -392,13 +395,27 @@ begin
 
     if ATopLevelOnly then
     begin
-      for i:= L.Count-1 downto 1 do
-        for j:= 0 to i-1 do
-          if IsRangeInsideOther(FList.ItemPtr(L[i]), FList.ItemPtr(L[j])) then
-          begin
-            L.Delete(i);
-            Break
-          end;
+      //keep from collected list L only top-level ranges
+      //(not globally top-level, but top-level inside L)
+      //mark "deleted" items with value cDeleted<0
+      NCount:= L.Count;
+      for i:= 0 to NCount-1 do
+        if L[i]<>cDeleted then
+        begin
+          RngStep:= ItemPtr(L[i]);
+          for j:= i+1 to NCount-1 do
+            if L[j]<>cDeleted then
+            begin
+              RngStepNext:= ItemPtr(L[j]);
+              if RngStepNext^.Y>=RngStep^.Y2 then
+                Break;
+              L[j]:= cDeleted;
+            end;
+        end;
+
+      for i:= NCount-1 downto 0 do
+        if L[i]=cDeleted then
+          L.Delete(i);
     end;
 
     SetLength(Result, L.Count);
