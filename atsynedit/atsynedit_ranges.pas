@@ -84,10 +84,10 @@ type
     function FindDeepestRangeContainingLine(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function MessageText(AMaxCount: integer): string;
+    function MessageLineIndexer: string;
     procedure UpdateLineIndexer;
     procedure Update(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     property HasTagPersist: boolean read FHasTagPersist;
-    function DebugLineIndexer: string;
   end;
 
 const
@@ -535,7 +535,7 @@ begin
 end;
 *)
 
-function TATSynRanges.DebugLineIndexer: string;
+function TATSynRanges.MessageLineIndexer: string;
 var
   S: string;
   i, iLine: integer;
