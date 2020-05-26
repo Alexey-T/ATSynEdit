@@ -371,19 +371,26 @@ function TATSynRanges.FindRanges(AInsideSpecialRange: integer; AOnlyFolded,
 var
   L: TATIntegerList;
   R, RngSpecial, RngLastAdded: PATSynRange;
-  i: integer;
+  nStartIndex, nEndLine, i: integer;
 begin
   RngSpecial:= nil;
   RngLastAdded:= nil;
+  nStartIndex:= 0;
+  nEndLine:= -1;
+
   if AInsideSpecialRange>=0 then
+  begin
     RngSpecial:= FList.ItemPtr(AInsideSpecialRange);
+    nStartIndex:= AInsideSpecialRange+1;
+    nEndLine:= RngSpecial^.Y2;
+  end;
 
   SetLength(Result, 0);
   L:= TATIntegerList.Create;
   L.Capacity:= 128;
 
   try
-    for i:= 0 to FList.Count-1 do
+    for i:= nStartIndex to FList.Count-1 do
     begin
       R:= FList.ItemPtr(i);
       if R^.IsSimple then
@@ -395,9 +402,11 @@ begin
         if i=AInsideSpecialRange then
           Continue;
 
-      if Assigned(RngSpecial) then
-        if IsRangesSame(RngSpecial, R) or not IsRangeInsideOther(R, RngSpecial) then
-          Continue;
+      //if we find ranges included into RangeSpecial,
+      //then break loop after RangeSpecial ending line
+      if nEndLine>=0 then
+        if R^.Y>=nEndLine then
+          Break;
 
       if ATopLevelOnly then
         if Assigned(RngLastAdded) then
