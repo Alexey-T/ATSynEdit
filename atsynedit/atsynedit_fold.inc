@@ -83,7 +83,9 @@ begin
   FWrapUpdateNeeded:= true;
 
   Strs:= Strings;
-  RangeIndexes:= FFold.FindRanges(-1, -1, ARangeIndex,
+  RangeIndexes:= FFold.FindRanges(
+    //-1{ALineFrom}, -1{ALineTo},
+    ARangeIndex,
     true{OnlyFolded}, true{TopLevel}, cRngIgnoreLineParams);
 
   //show all lines not in found _folded_ subranges
@@ -401,7 +403,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoFoldForLevelAndLines(ALineFrom, ALineTo: integer;
+procedure TATSynEdit.DoFoldForLevelAndLines(
   ALevel: integer; AForThisRange: integer);
 //this func is recursive. it calls itself with ALevel-1.
 //it folds ranges if ALevel=0, otherwise it goes to subranges until it finds ALevel=0.
@@ -412,7 +414,9 @@ var
 begin
   if ALevel<0 then exit;
 
-  List:= Fold.FindRanges(ALineFrom, ALineTo, AForThisRange,
+  List:= Fold.FindRanges(
+    //ALineFrom, ALineTo,
+    AForThisRange,
     false{OnlyFolded}, true{TopLevel}, cRngExceptSpecialRange);
 
   for i:= Low(List) to High(List) do
@@ -423,14 +427,14 @@ begin
     if ALevel=0 then
       DoRangeFold(List[i])
     else
-      DoFoldForLevelAndLines(R^.Y, R^.Y2, ALevel-1, List[i]);
+      DoFoldForLevelAndLines({R^.Y, R^.Y2,} ALevel-1, List[i]);
   end;
 end;
 
 procedure TATSynEdit.DoFoldForLevel(ALevel: integer);
 begin
   DoCommand(cCommand_UnfoldAll);
-  DoFoldForLevelAndLines(0, Strings.Count-1, ALevel, -1);
+  DoFoldForLevelAndLines({0, Strings.Count-1,} ALevel, -1);
   Update;
 end;
 

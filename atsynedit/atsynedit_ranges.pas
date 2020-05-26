@@ -80,7 +80,7 @@ type
     function ItemPtr(AIndex: integer): PATSynRange;
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
     function IsRangesSame(R1, R2: PATSynRange): boolean;
-    function FindRanges(ALineFrom, ALineTo: integer;
+    function FindRanges(
       AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
     function FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
@@ -372,7 +372,7 @@ end;
 type
   TATIntegerList = specialize TFPGList<integer>;
 
-function TATSynRanges.FindRanges(ALineFrom, ALineTo: integer;
+function TATSynRanges.FindRanges(
   AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
   ALineMode: TATRangeHasLines): TATIntArray;
 //ATopLevel: keep from collected list only top-level ranges

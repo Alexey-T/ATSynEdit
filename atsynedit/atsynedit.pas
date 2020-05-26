@@ -1267,8 +1267,7 @@ type
     procedure DoRangeUnfold(ARangeIndex: integer);
     procedure DoRangeHideLines(ALineFrom, ALineTo: integer); inline;
     procedure DoFoldForLevel(ALevel: integer);
-    procedure DoFoldForLevelAndLines(ALineFrom, ALineTo: integer; ALevel: integer;
-      AForThisRange: integer);
+    procedure DoFoldForLevelAndLines(ALevel: integer; AForThisRange: integer);
     procedure DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
     //markers
     procedure MarkerClearAll;
