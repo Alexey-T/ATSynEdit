@@ -399,13 +399,13 @@ end;
 
 procedure TATSynEdit.DoFoldForLevelAndLines(ALineFrom, ALineTo: integer;
   ALevel: integer; AForThisRange: integer);
+//this func is recursive. it calls itself with ALevel-1.
+//it folds ranges if ALevel=0, otherwise it goes to subranges until it finds ALevel=0.
 var
   List: TATIntArray;
   R: PATSynRange;
   i: integer;
 begin
-  //this func recursive. it calls itself with ALevel-1.
-  //folds ranges if ALevel=0, else goes to subranges until found ALevel=0.
   if ALevel<0 then exit;
 
   List:= Fold.FindRanges(ALineFrom, ALineTo, AForThisRange,
