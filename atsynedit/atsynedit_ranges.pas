@@ -389,11 +389,6 @@ begin
         Continue;
 
       case ALineMode of
-        cRngHasAllLines:
-          begin
-            if (R^.Y>ALineFrom) or (R^.Y2<ALineTo) then
-              Continue;
-          end;
         cRngHasAnyOfLines:
           begin
             if (R^.Y>ALineTo) or (R^.Y2<ALineFrom) then
@@ -402,6 +397,11 @@ begin
         cRngExceptSpecialRange:
           begin
             if i=AInsideSpecialRange then
+              Continue;
+          end;
+        cRngHasAllLines:
+          begin
+            if (R^.Y>ALineFrom) or (R^.Y2<ALineTo) then
               Continue;
           end;
       end;
