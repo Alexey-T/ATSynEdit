@@ -364,79 +364,62 @@ function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
   ALineMode: TATRangeHasLines): TATIntArray;
 //ATopLevel: keep from collected list only top-level ranges
 //(not globally top-level, but top-level inside found list)
-const
-  cDeleted = -1;
 var
   L: TATIntegerList;
-  R, RngSpecial: PATSynRange;
-  RngStep, RngStepNext: PATSynRange;
-  NCount, NDeletedCount: integer;
-  i, j: integer;
+  R, RngSpecial, RngLastAdded: PATSynRange;
+  i: integer;
   Ok: boolean;
 begin
+  RngSpecial:= nil;
+  RngLastAdded:= nil;
+  if AInsideSpecialRange>=0 then
+    RngSpecial:= FList.ItemPtr(AInsideSpecialRange);
+
   SetLength(Result, 0);
   L:= TATIntegerList.Create;
   L.Capacity:= 128;
 
-  if AInsideSpecialRange>=0 then
-    RngSpecial:= FList.ItemPtr(AInsideSpecialRange)
-  else
-    RngSpecial:= nil;
-
   try
-    for i:= 0 to Count-1 do
+    for i:= 0 to FList.Count-1 do
     begin
       R:= FList.ItemPtr(i);
-      if (not R^.IsSimple) then
-        if (not AOnlyFolded or R^.Folded) then
-        begin
-          case ALineMode of
-            cRngIgnoreLineParams: Ok:= true;
-            cRngHasAllLines: Ok:= (R^.Y<=ALineFrom) and (R^.Y2>=ALineTo);
-            cRngHasAnyOfLines: Ok:= (R^.Y<=ALineTo) and (R^.Y2>=ALineFrom);
-            cRngExceptSpecialRange: Ok:= i<>AInsideSpecialRange;
-            else raise Exception.Create('unknown LineMode');
-          end;
-          if not Ok then Continue;
+      if R^.IsSimple then
+        Continue;
+      if AOnlyFolded and not R^.Folded then
+        Continue;
 
-          if Assigned(RngSpecial) then
-            Ok:= not IsRangesSame(RngSpecial, R) and IsRangeInsideOther(R, RngSpecial);
-
-          if Ok then
-            L.Add(i);
-        end;
-    end;
-
-    NDeletedCount:= 0;
-    if ATopLevelOnly then
-    begin
-      //mark "deleted" items with value cDeleted<0
-      NCount:= L.Count;
-      for i:= 0 to NCount-1 do
-        if L[i]<>cDeleted then
-        begin
-          RngStep:= ItemPtr(L[i]);
-          for j:= i+1 to NCount-1 do
-            if L[j]<>cDeleted then
-            begin
-              RngStepNext:= ItemPtr(L[j]);
-              if RngStepNext^.Y>=RngStep^.Y2 then
-                Break;
-              L[j]:= cDeleted;
-              Inc(NDeletedCount);
-            end;
-        end;
-    end;
-
-    //this is complex, to avoid deleting items from L, which is slow
-    SetLength(Result, L.Count-NDeletedCount);
-    j:= 0;
-    for i:= 0 to L.Count-1 do
-      if L[i]<>cDeleted then
-      begin
-        Result[j]:= L[i];
-        Inc(j);
+      case ALineMode of
+        cRngIgnoreLineParams:
+          Ok:= true;
+        cRngHasAllLines:
+          Ok:= (R^.Y<=ALineFrom) and (R^.Y2>=ALineTo);
+        cRngHasAnyOfLines:
+          Ok:= (R^.Y<=ALineTo) and (R^.Y2>=ALineFrom);
+        cRngExceptSpecialRange:
+          Ok:= i<>AInsideSpecialRange;
       end;
+      if not Ok then Continue;
+
+      if Assigned(RngSpecial) then
+      begin
+        Ok:= not IsRangesSame(RngSpecial, R) and IsRangeInsideOther(R, RngSpecial);
+        if not Ok then Continue;
+      end;
+
+      if ATopLevelOnly then
+        if Assigned(RngLastAdded) then
+        begin
+          Ok:= not IsRangeInsideOther(R, RngLastAdded);
+          if not Ok then Continue;
+        end;
+
+      L.Add(i);
+      RngLastAdded:= R;
+    end;
+
+    SetLength(Result, L.Count);
+    for i:= 0 to L.Count-1 do
+      Result[i]:= L[i];
   finally
     FreeAndNil(L);
   end;
