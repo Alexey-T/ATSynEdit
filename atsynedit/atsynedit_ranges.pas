@@ -72,7 +72,7 @@ type
     function ItemPtr(AIndex: integer): PATSynRange;
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
     function IsRangesSame(R1, R2: PATSynRange): boolean;
-    function FindRanges(AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean): TATIntArray;
+    function FindRanges(AOuterRange: integer; AOnlyFolded, ATopLevelOnly: boolean): TATIntArray;
     function FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
     function FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
     function FindRangesWithStaples(ALineFrom, ALineTo: integer): TATIntArray;
@@ -362,25 +362,25 @@ end;
 type
   TATIntegerList = specialize TFPGList<integer>;
 
-function TATSynRanges.FindRanges(AInsideSpecialRange: integer; AOnlyFolded,
+function TATSynRanges.FindRanges(AOuterRange: integer; AOnlyFolded,
   ATopLevelOnly: boolean): TATIntArray;
 //ATopLevel: keep from collected list only top-level ranges
 //(not globally top-level, but top-level inside found list)
 var
   L: TATIntegerList;
-  R, RngSpecial, RngLastAdded: PATSynRange;
+  R, RngOuter, RngLastAdded: PATSynRange;
   nStartIndex, nEndLine, i: integer;
 begin
-  RngSpecial:= nil;
+  RngOuter:= nil;
   RngLastAdded:= nil;
   nStartIndex:= 0;
   nEndLine:= -1;
 
-  if AInsideSpecialRange>=0 then
+  if AOuterRange>=0 then
   begin
-    RngSpecial:= FList.ItemPtr(AInsideSpecialRange);
-    nStartIndex:= AInsideSpecialRange+1;
-    nEndLine:= RngSpecial^.Y2;
+    RngOuter:= FList.ItemPtr(AOuterRange);
+    nStartIndex:= AOuterRange+1;
+    nEndLine:= RngOuter^.Y2;
   end;
 
   SetLength(Result, 0);
@@ -396,8 +396,7 @@ begin
       if AOnlyFolded and not R^.Folded then
         Continue;
 
-      //if we find ranges included into RangeSpecial,
-      //then break loop after RangeSpecial ending line
+      //break loop after outer-range ending line
       if nEndLine>=0 then
         if R^.Y>=nEndLine then
           Break;
