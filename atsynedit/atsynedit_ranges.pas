@@ -41,14 +41,6 @@ type
   end;
 
 type
-  TATRangeHasLines = (
-    cRngIgnoreLineParams,
-    //cRngHasAllLines,
-    //cRngHasAnyOfLines,
-    cRngExceptSpecialRange
-    );
-
-type
   { TATSynRanges }
 
   TATSynRanges = class
@@ -82,7 +74,7 @@ type
     function IsRangesSame(R1, R2: PATSynRange): boolean;
     function FindRanges(
       AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
-      ALineMode: TATRangeHasLines): TATIntArray;
+      AExcludeSpecialRange: boolean): TATIntArray;
     function FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
     function FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
     function FindRangesWithStaples(ALineFrom, ALineTo: integer): TATIntArray;
@@ -372,9 +364,8 @@ end;
 type
   TATIntegerList = specialize TFPGList<integer>;
 
-function TATSynRanges.FindRanges(
-  AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
-  ALineMode: TATRangeHasLines): TATIntArray;
+function TATSynRanges.FindRanges(AInsideSpecialRange: integer; AOnlyFolded,
+  ATopLevelOnly: boolean; AExcludeSpecialRange: boolean): TATIntArray;
 //ATopLevel: keep from collected list only top-level ranges
 //(not globally top-level, but top-level inside found list)
 var
@@ -400,27 +391,9 @@ begin
       if AOnlyFolded and not R^.Folded then
         Continue;
 
-      case ALineMode of
-        {
-        cRngHasAnyOfLines:
-          begin
-            if (R^.Y>ALineTo) or (R^.Y2<ALineFrom) then
-              Continue;
-          end;
-         }
-        cRngExceptSpecialRange:
-          begin
-            if i=AInsideSpecialRange then
-              Continue;
-          end;
-        {
-        cRngHasAllLines:
-          begin
-            if (R^.Y>ALineFrom) or (R^.Y2<ALineTo) then
-              Continue;
-          end;
-          }
-      end;
+      if AExcludeSpecialRange then
+        if i=AInsideSpecialRange then
+          Continue;
 
       if Assigned(RngSpecial) then
         if IsRangesSame(RngSpecial, R) or not IsRangeInsideOther(R, RngSpecial) then

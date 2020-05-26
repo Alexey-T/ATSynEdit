@@ -84,9 +84,8 @@ begin
 
   Strs:= Strings;
   RangeIndexes:= FFold.FindRanges(
-    //-1{ALineFrom}, -1{ALineTo},
     ARangeIndex,
-    true{OnlyFolded}, true{TopLevel}, cRngIgnoreLineParams);
+    true{OnlyFolded}, true{TopLevel}, false);
 
   //show all lines not in found _folded_ subranges
   Line1:= RngOuter^.Y;
@@ -415,9 +414,8 @@ begin
   if ALevel<0 then exit;
 
   List:= Fold.FindRanges(
-    //ALineFrom, ALineTo,
     AForThisRange,
-    false{OnlyFolded}, true{TopLevel}, cRngExceptSpecialRange);
+    false{OnlyFolded}, true{TopLevel}, true{ExcludeSpecialRange});
 
   for i:= Low(List) to High(List) do
   begin
@@ -427,7 +425,7 @@ begin
     if ALevel=0 then
       DoRangeFold(List[i])
     else
-      DoFoldForLevelAndLines({R^.Y, R^.Y2,} ALevel-1, List[i]);
+      DoFoldForLevelAndLines(ALevel-1, List[i]);
   end;
 end;
 
