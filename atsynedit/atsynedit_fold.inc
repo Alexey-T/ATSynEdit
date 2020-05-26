@@ -80,7 +80,7 @@ begin
   RangeThis^.Folded:= false;
   FWrapUpdateNeeded:= true;
 
-  Indexes:= FFold.FindRangesContainingLines(-1, -1, ARangeIndex,
+  Indexes:= FFold.FindRanges(-1, -1, ARangeIndex,
     true{OnlyFolded}, true{TopLevel}, cRngIgnoreLineParams);
 
   //show all lines not in subranges
@@ -175,7 +175,7 @@ var
   List: TATIntArray;
   i: integer;
 begin
-  List:= FFold.FindRangesContainingLines(ALine, ALine, -1,
+  List:= FFold.FindRanges(ALine, ALine, -1,
     true{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
   for i:= Low(List) to High(List) do
     DoRangeUnfold(List[i]);
@@ -326,7 +326,7 @@ begin
   NLine:= Pnt.Y;
   if NLine<0 then Exit;
 
-  IntList:= Fold.FindRangesContainingLines(NLine, NLine, -1,
+  IntList:= Fold.FindRanges(NLine, NLine, -1,
     false{OnlyFolded}, false{TopLevel}, cRngHasAllLines);
   if Length(IntList)=0 then Exit;
 
@@ -410,7 +410,7 @@ begin
   //folds ranges if ALevel=0, else goes to subranges until found ALevel=0.
   if ALevel<0 then exit;
 
-  List:= Fold.FindRangesContainingLines(ALineFrom, ALineTo, AForThisRange,
+  List:= Fold.FindRanges(ALineFrom, ALineTo, AForThisRange,
     false{OnlyFolded}, true{TopLevel}, cRngExceptSpecialRange);
 
   for i:= Low(List) to High(List) do

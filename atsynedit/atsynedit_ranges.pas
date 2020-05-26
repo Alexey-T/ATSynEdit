@@ -79,7 +79,7 @@ type
     function ItemPtr(AIndex: integer): PATSynRange;
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
     function IsRangesSame(R1, R2: PATSynRange): boolean;
-    function FindRangesContainingLines(ALineFrom, ALineTo: integer;
+    function FindRanges(ALineFrom, ALineTo: integer;
       AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
@@ -359,7 +359,7 @@ end;
 type
   TATIntegerList = specialize TFPGList<integer>;
 
-function TATSynRanges.FindRangesContainingLines(ALineFrom, ALineTo: integer;
+function TATSynRanges.FindRanges(ALineFrom, ALineTo: integer;
   AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
   ALineMode: TATRangeHasLines): TATIntArray;
 //ATopLevel: keep from collected list only top-level ranges

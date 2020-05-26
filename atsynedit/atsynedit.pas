@@ -6502,7 +6502,7 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
-  List:= FFold.FindRangesContainingLines(LineIndex, LineIndex, -1,
+  List:= FFold.FindRanges(LineIndex, LineIndex, -1,
     false{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
   if Length(List)=0 then Exit;
 
@@ -6717,7 +6717,7 @@ begin
   nLineTo:= LineBottom;
   nMaxHeight:= ClientHeight+2;
 
-  Indexes:= FFold.FindRangesContainingLines(nLineFrom, nLineTo, -1,
+  Indexes:= FFold.FindRanges(nLineFrom, nLineTo, -1,
     false{OnlyFolded}, false{TopLevelOnly}, cRngHasAnyOfLines);
 
   //currently find active range for first caret only
