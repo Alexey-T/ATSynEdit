@@ -6770,7 +6770,7 @@ begin
     if (RSt.Left>=ARect.Left) and
       (RSt.Left<ARect.Right) then
     begin
-      //don't use too big coords, some OS truncate them
+      //don't use too big coords, some OS'es truncate lines painted with big coords
       RSt.Top:= Max(RSt.Top, -2);
       RSt.Bottom:= Min(RSt.Bottom, nMaxHeight);
 
@@ -6781,6 +6781,7 @@ begin
 
       if Assigned(FOnCalcStaple) then
         FOnCalcStaple(Self, Range^.Y, NIndent, NColor);
+
       DoPaintStaple(C, RSt, NColor);
     end;
   end;
