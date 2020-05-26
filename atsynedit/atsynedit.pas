@@ -6716,7 +6716,7 @@ begin
 
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
-  nMaxHeight:= ClientHeight+2;
+  nMaxHeight:= FRectMain.Height+2;
   nRangeDeepest:= -1;
 
   Indexes:= FFold.FindRangesWithStaples(nLineFrom, nLineTo);
