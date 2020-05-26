@@ -6716,8 +6716,7 @@ begin
   nLineTo:= LineBottom;
   nMaxHeight:= ClientHeight+2;
 
-  Indexes:= FFold.FindRanges(nLineFrom, nLineTo, -1,
-    false{OnlyFolded}, false{TopLevelOnly}, cRngHasAnyOfLines);
+  Indexes:= FFold.FindRangesWithAnyOfLines(nLineFrom, nLineTo);
 
   //currently find active range for first caret only
   if FOptStapleHiliteActive then

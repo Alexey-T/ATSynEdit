@@ -83,6 +83,7 @@ type
       AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
     function FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
+    function FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
@@ -452,6 +453,37 @@ begin
       end;
     end;
   end;
+end;
+
+function _IsArrayItemPresent(var Ar: TATIntArray; Value: integer): boolean; inline;
+var
+  i: integer;
+begin
+  for i:= 0 to High(Ar) do
+    if Ar[i]=Value then
+      exit(true);
+  Result:= false;
+end;
+
+function TATSynRanges.FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
+var
+  NMax, NRange, iLine, iItem: integer;
+begin
+  SetLength(Result, 0);
+  NMax:= High(FLineIndexer);
+  if ALineFrom>NMax then exit;
+  if ALineTo>NMax then ALineTo:= NMax;
+
+  for iLine:= ALineFrom to ALineTo do
+    for iItem:= 0 to High(FLineIndexer[iLine]) do
+    begin
+      NRange:= FLineIndexer[iLine][iItem];
+      if not _IsArrayItemPresent(Result, NRange) then
+      begin
+        SetLength(Result, Length(Result)+1);
+        Result[High(Result)]:= NRange;
+      end;
+    end;
 end;
 
 
