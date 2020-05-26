@@ -711,17 +711,6 @@ begin
   end;
 end;
 
-(*
-function TATSynRanges.MessageTextForIndexList(const L: TATIntArray): string;
-var
-  i: integer;
-begin
-  Result:= '';
-  for i:= 0 to Length(L)-1 do
-    Result:= Result+Items[L[i]].MessageText+#10;
-end;
-*)
-
 function TATSynRanges.MessageLineIndexer(AMaxCount: integer): string;
 var
   S: string;
