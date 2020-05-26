@@ -400,8 +400,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoFoldForLevelAndLines(
-  ALevel: integer; AForThisRange: integer);
+procedure TATSynEdit.DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
 //this func is recursive. it calls itself with ALevel-1.
 //it folds ranges if ALevel=0, otherwise it goes to subranges until it finds ALevel=0.
 var
@@ -411,7 +410,7 @@ var
 begin
   if ALevel<0 then exit;
 
-  List:= Fold.FindRanges(AForThisRange, false{OnlyFolded}, true{TopLevel});
+  List:= Fold.FindRanges(AOuterRange, false{OnlyFolded}, true{TopLevel});
 
   for i:= Low(List) to High(List) do
   begin
@@ -421,14 +420,14 @@ begin
     if ALevel=0 then
       DoRangeFold(List[i])
     else
-      DoFoldForLevelAndLines(ALevel-1, List[i]);
+      DoFoldForLevelEx(ALevel-1, List[i]);
   end;
 end;
 
 procedure TATSynEdit.DoFoldForLevel(ALevel: integer);
 begin
   DoCommand(cCommand_UnfoldAll);
-  DoFoldForLevelAndLines(ALevel, -1{no RangeSpecial});
+  DoFoldForLevelEx(ALevel, -1);
   Update;
 end;
 
