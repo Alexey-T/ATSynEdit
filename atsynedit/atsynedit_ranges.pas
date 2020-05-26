@@ -43,8 +43,8 @@ type
 type
   TATRangeHasLines = (
     cRngIgnoreLineParams,
-    cRngHasAllLines,
-    cRngHasAnyOfLines,
+    //cRngHasAllLines,
+    //cRngHasAnyOfLines,
     cRngExceptSpecialRange
     );
 
@@ -390,21 +390,25 @@ begin
         Continue;
 
       case ALineMode of
+        {
         cRngHasAnyOfLines:
           begin
             if (R^.Y>ALineTo) or (R^.Y2<ALineFrom) then
               Continue;
           end;
+         }
         cRngExceptSpecialRange:
           begin
             if i=AInsideSpecialRange then
               Continue;
           end;
+        {
         cRngHasAllLines:
           begin
             if (R^.Y>ALineFrom) or (R^.Y2<ALineTo) then
               Continue;
           end;
+          }
       end;
 
       if Assigned(RngSpecial) then
