@@ -6712,6 +6712,8 @@ var
   i: integer;
 begin
   if FOptStapleStyle=cLineStyleNone then Exit;
+  if not FFold.HasStaples then Exit;
+
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
   nMaxHeight:= ClientHeight+2;
