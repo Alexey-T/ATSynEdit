@@ -2463,10 +2463,11 @@ procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
 begin
   if csLoading in ComponentState then Exit;
 
-  C.Brush.Color:= FColorBG;
-  C.FillRect(ClientRect);
-
   UpdateInitialVars(C);
+
+  C.Brush.Color:= FColorBG;
+  C.FillRect(0, 0, FClientW, FClientH);
+
   UpdateAdapterCacheSize;
   UpdateWrapInfo;
 
