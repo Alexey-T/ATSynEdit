@@ -72,9 +72,7 @@ type
     function ItemPtr(AIndex: integer): PATSynRange;
     function IsRangeInsideOther(R1, R2: PATSynRange): boolean;
     function IsRangesSame(R1, R2: PATSynRange): boolean;
-    function FindRanges(
-      AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
-      AExcludeSpecialRange: boolean): TATIntArray;
+    function FindRanges(AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean): TATIntArray;
     function FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
     function FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
     function FindRangesWithStaples(ALineFrom, ALineTo: integer): TATIntArray;
@@ -365,7 +363,7 @@ type
   TATIntegerList = specialize TFPGList<integer>;
 
 function TATSynRanges.FindRanges(AInsideSpecialRange: integer; AOnlyFolded,
-  ATopLevelOnly: boolean; AExcludeSpecialRange: boolean): TATIntArray;
+  ATopLevelOnly: boolean): TATIntArray;
 //ATopLevel: keep from collected list only top-level ranges
 //(not globally top-level, but top-level inside found list)
 var
@@ -397,10 +395,6 @@ begin
         Continue;
       if AOnlyFolded and not R^.Folded then
         Continue;
-
-      if AExcludeSpecialRange then
-        if i=AInsideSpecialRange then
-          Continue;
 
       //if we find ranges included into RangeSpecial,
       //then break loop after RangeSpecial ending line

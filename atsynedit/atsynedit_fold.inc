@@ -83,7 +83,7 @@ begin
   FWrapUpdateNeeded:= true;
 
   Strs:= Strings;
-  RangeIndexes:= FFold.FindRanges(ARangeIndex, true{OnlyFolded}, true{TopLevel}, false);
+  RangeIndexes:= FFold.FindRanges(ARangeIndex, true{OnlyFolded}, true{TopLevel});
 
   //show all lines not in found _folded_ subranges
   Line1:= RngOuter^.Y;
@@ -411,7 +411,7 @@ var
 begin
   if ALevel<0 then exit;
 
-  List:= Fold.FindRanges(AForThisRange, false{OnlyFolded}, true{TopLevel}, true{ExcludeSpecialRange});
+  List:= Fold.FindRanges(AForThisRange, false{OnlyFolded}, true{TopLevel});
 
   for i:= Low(List) to High(List) do
   begin
