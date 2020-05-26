@@ -587,6 +587,8 @@ type
     FRectMicromap,
     FRectGutter,
     FRectRuler: TRect;
+    FClientW: integer; //saved on Paint, to avoid calling Controls.ClientWidth/ClientHeight
+    FClientH: integer;
     FLineBottom: integer;
     FLineParts: TATLineParts; //size is huge, so not local var
     FLineOtherParts: TATLineParts; //size is huge, so not local var
@@ -764,6 +766,7 @@ type
     //
     function DoCalcLineLen(ALineIndex: integer): integer;
     function GetAttribs: TATMarkers;
+    procedure GetClientSizes(out W, H: integer);
     function GetMarkers: TATMarkers;
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
@@ -1130,9 +1133,9 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetFocus; override;
-    function ClientWidth: integer;
-    function ClientHeight: integer;
     procedure DragDrop(Source: TObject; X, Y: Integer); override;
+    property ClientWidth: integer read FClientW;
+    property ClientHeight: integer read FClientH;
     //updates
     procedure Invalidate; override;
     procedure InvalidateHilitingCache;
@@ -2422,6 +2425,8 @@ end;
 
 procedure TATSynEdit.UpdateInitialVars(C: TCanvas);
 begin
+  GetClientSizes(FClientW, FClientH);
+
   C.Font.Name:= Font.Name;
   C.Font.Size:= DoScaleFont(Font.Size);
 
@@ -3947,20 +3952,21 @@ begin
   LCLIntf.SetFocus(Handle);
 end;
 
-function TATSynEdit.ClientWidth: integer;
+procedure TATSynEdit.GetClientSizes(out W, H: integer);
+var
+  R: TRect;
 begin
-  Result:= inherited ClientWidth;
-  if FScrollbarVert.Visible then
-    Dec(Result, FScrollbarVert.Width);
-  if Result<1 then Result:= 1;
-end;
+  R:= inherited ClientRect;
 
-function TATSynEdit.ClientHeight: integer;
-begin
-  Result:= inherited ClientHeight;
+  W:= R.Width;
+  if FScrollbarVert.Visible then
+    Dec(W, FScrollbarVert.Width);
+  if W<1 then W:= 1;
+
+  H:= R.Height;
   if FScrollbarHorz.Visible then
-    Dec(Result, FScrollbarHorz.Height);
-  if Result<1 then Result:= 1;
+    Dec(H, FScrollbarHorz.Height);
+  if H<1 then H:= 1;
 end;
 
 procedure TATSynEdit.LoadFromFile(const AFilename: string; AKeepScroll: boolean=false);
