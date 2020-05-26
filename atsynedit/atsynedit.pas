@@ -6715,16 +6715,14 @@ begin
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
   nMaxHeight:= ClientHeight+2;
+  nRangeDeepest:= -1;
 
   Indexes:= FFold.FindRangesWithAnyOfLines(nLineFrom, nLineTo);
 
   //currently find active range for first caret only
   if FOptStapleHiliteActive then
     if Carets.Count>0 then
-    begin
-      i:= Carets[0].PosY;
-      nRangeDeepest:= FFold.FindDeepestRangeContainingLine(i, true);
-    end;
+      nRangeDeepest:= FFold.FindDeepestRangeContainingLine(Carets[0].PosY, true);
 
   NColorNormal:= Colors.BlockStaple;
   NColorActive:= Colors.BlockStapleForCaret;
