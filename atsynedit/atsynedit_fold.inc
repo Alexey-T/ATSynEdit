@@ -75,6 +75,7 @@ var
   RangeThis, R: PATSynRange;
   IndexLine, IndexRange: integer;
   InSubrange: boolean;
+  Strs: TATStrings;
 begin
   RangeThis:= Fold.ItemPtr(ARangeIndex);
   RangeThis^.Folded:= false;
@@ -82,6 +83,8 @@ begin
 
   Indexes:= FFold.FindRanges(-1, -1, ARangeIndex,
     true{OnlyFolded}, true{TopLevel}, cRngIgnoreLineParams);
+
+  Strs:= Strs;
 
   //show all lines not in subranges
   for IndexLine:= RangeThis^.Y to RangeThis^.Y2 do
@@ -100,8 +103,8 @@ begin
 
     if not InSubrange then
     begin
-      Strings.LinesHidden[IndexLine, FEditorIndex]:= false;
-      Strings.LinesFoldFrom[IndexLine, FEditorIndex]:= 0;
+      Strs.LinesHidden[IndexLine, FEditorIndex]:= false;
+      Strs.LinesFoldFrom[IndexLine, FEditorIndex]:= 0;
     end;
   end;
 
@@ -109,7 +112,7 @@ begin
   for IndexRange:= Low(Indexes) to High(Indexes) do
   begin
     R:= Fold.ItemPtr(Indexes[IndexRange]);
-    Strings.LinesHidden[R^.Y, FEditorIndex]:= false;
+    Strs.LinesHidden[R^.Y, FEditorIndex]:= false;
   end;
 end;
 
