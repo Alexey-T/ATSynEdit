@@ -432,7 +432,7 @@ end;
 procedure TATSynEdit.DoFoldForLevel(ALevel: integer);
 begin
   DoCommand(cCommand_UnfoldAll);
-  DoFoldForLevelAndLines({0, Strings.Count-1,} ALevel, -1);
+  DoFoldForLevelAndLines(ALevel, -1{no RangeSpecial});
   Update;
 end;
 
