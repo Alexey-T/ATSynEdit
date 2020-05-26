@@ -368,7 +368,6 @@ var
   L: TATIntegerList;
   R, RngSpecial, RngLastAdded: PATSynRange;
   i: integer;
-  Ok: boolean;
 begin
   RngSpecial:= nil;
   RngLastAdded:= nil;
@@ -389,29 +388,31 @@ begin
         Continue;
 
       case ALineMode of
-        cRngIgnoreLineParams:
-          Ok:= true;
         cRngHasAllLines:
-          Ok:= (R^.Y<=ALineFrom) and (R^.Y2>=ALineTo);
+          begin
+            if (R^.Y>ALineFrom) or (R^.Y2<ALineTo) then
+              Continue;
+          end;
         cRngHasAnyOfLines:
-          Ok:= (R^.Y<=ALineTo) and (R^.Y2>=ALineFrom);
+          begin
+            if (R^.Y>ALineTo) or (R^.Y2<ALineFrom) then
+              Continue;
+          end;
         cRngExceptSpecialRange:
-          Ok:= i<>AInsideSpecialRange;
+          begin
+            if i=AInsideSpecialRange then
+              Continue;
+          end;
       end;
-      if not Ok then Continue;
 
       if Assigned(RngSpecial) then
-      begin
-        Ok:= not IsRangesSame(RngSpecial, R) and IsRangeInsideOther(R, RngSpecial);
-        if not Ok then Continue;
-      end;
+        if IsRangesSame(RngSpecial, R) or not IsRangeInsideOther(R, RngSpecial) then
+          Continue;
 
       if ATopLevelOnly then
         if Assigned(RngLastAdded) then
-        begin
-          Ok:= not IsRangeInsideOther(R, RngLastAdded);
-          if not Ok then Continue;
-        end;
+          if IsRangeInsideOther(R, RngLastAdded) then
+            Continue;
 
       L.Add(i);
       RngLastAdded:= R;
