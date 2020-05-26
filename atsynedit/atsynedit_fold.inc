@@ -74,7 +74,7 @@ var
   RangeIndexes: TATIntArray;
   RngOuter, Rng: PATSynRange;
   Strs: TATStrings;
-  Checks: TATIntArray;
+  Checks: array of boolean; //take less memory
   Line1, Line2: integer;
   iLine, i, j: integer;
 begin
@@ -86,23 +86,23 @@ begin
   RangeIndexes:= FFold.FindRanges(-1, -1, ARangeIndex,
     true{OnlyFolded}, true{TopLevel}, cRngIgnoreLineParams);
 
-  //show all lines not in subranges
+  //show all lines not in found _folded_ subranges
   Line1:= RngOuter^.Y;
   Line2:= RngOuter^.Y2;
   SetLength(Checks, Line2-Line1+1);
 
   for i:= 0 to High(Checks) do
-    Checks[i]:= 0;
+    Checks[i]:= false;
 
   for i:= 0 to High(RangeIndexes) do
   begin
     Rng:= Fold.ItemPtr(RangeIndexes[i]);
     for j:= Rng^.Y to Rng^.Y2 do
-      Checks[j-Line1]:= 1;
+      Checks[j-Line1]:= true;
   end;
 
   for i:= 0 to High(Checks) do
-    if Checks[i]=0 then
+    if not Checks[i] then
     begin
       iLine:= i+Line1;
       Strs.LinesHidden[iLine, FEditorIndex]:= false;
