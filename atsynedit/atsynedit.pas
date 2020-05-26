@@ -6717,7 +6717,7 @@ begin
   nMaxHeight:= ClientHeight+2;
   nRangeDeepest:= -1;
 
-  Indexes:= FFold.FindRangesWithAnyOfLines(nLineFrom, nLineTo);
+  Indexes:= FFold.FindRangesWithStaples(nLineFrom, nLineTo);
 
   //currently find active range for first caret only
   if FOptStapleHiliteActive then
@@ -6732,8 +6732,11 @@ begin
   for i:= 0 to High(Indexes) do
   begin
     Range:= Fold.ItemPtr(Indexes[i]);
+    {
+    //FindRangesWithStaples does it:
     if not Range^.Staple then Continue;
     if Range^.Folded then Continue;
+    }
 
     if IsLineFolded(Range^.Y, true) then Continue;
     if IsLineFolded(Range^.Y2, true) then Continue;
