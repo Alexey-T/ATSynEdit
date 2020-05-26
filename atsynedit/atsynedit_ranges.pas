@@ -82,6 +82,7 @@ type
     function FindRanges(ALineFrom, ALineTo: integer;
       AInsideSpecialRange: integer; AOnlyFolded, ATopLevelOnly: boolean;
       ALineMode: TATRangeHasLines): TATIntArray;
+    function FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
     function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
@@ -423,6 +424,33 @@ begin
       Result[i]:= L[i];
   finally
     FreeAndNil(L);
+  end;
+end;
+
+function TATSynRanges.FindRangesWithLine(ALine: integer; AOnlyFolded: boolean): TATIntArray;
+var
+  R: PATSynRange;
+  NLen, NRange, i: integer;
+begin
+  SetLength(Result, 0);
+  if ALine>High(FLineIndexer) then exit;
+
+  if not AOnlyFolded then
+    Result:= FLineIndexer[ALine]
+  else
+  begin
+    NLen:= 0;
+    for i:= 0 to High(FLineIndexer[ALine]) do
+    begin
+      NRange:= FLineIndexer[ALine][i];
+      R:= ItemPtr(NRange);
+      if R^.Folded then
+      begin
+        Inc(NLen);
+        SetLength(Result, NLen);
+        Result[NLen-1]:= NRange;
+      end;
+    end;
   end;
 end;
 

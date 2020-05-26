@@ -175,8 +175,7 @@ var
   List: TATIntArray;
   i: integer;
 begin
-  List:= FFold.FindRanges(ALine, ALine, -1,
-    true{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
+  List:= FFold.FindRangesWithLine(ALine, true{OnlyFolded});
   for i:= Low(List) to High(List) do
     DoRangeUnfold(List[i]);
 end;
@@ -326,8 +325,7 @@ begin
   NLine:= Pnt.Y;
   if NLine<0 then Exit;
 
-  IntList:= Fold.FindRanges(NLine, NLine, -1,
-    false{OnlyFolded}, false{TopLevel}, cRngHasAllLines);
+  IntList:= Fold.FindRangesWithLine(NLine, false{OnlyFolded});
   if Length(IntList)=0 then Exit;
 
   //separator

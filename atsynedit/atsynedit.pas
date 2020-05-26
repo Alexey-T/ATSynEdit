@@ -6502,8 +6502,7 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
-  List:= FFold.FindRanges(LineIndex, LineIndex, -1,
-    false{OnlyFolded}, false{TopLevelOnly}, cRngHasAllLines);
+  List:= FFold.FindRangesWithLine(LineIndex, false{OnlyFolded});
   if Length(List)=0 then Exit;
 
   //calc state
