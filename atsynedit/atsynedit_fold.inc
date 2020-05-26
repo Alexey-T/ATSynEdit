@@ -72,15 +72,14 @@ b) show first lines of found folded sub-ranges
 procedure TATSynEdit.DoRangeUnfold(ARangeIndex: integer);
 var
   RangeIndexes: TATIntArray;
-  RangeThis, R: PATSynRange;
-  InSubrange: boolean;
+  RngOuter, Rng: PATSynRange;
   Strs: TATStrings;
   Checks: TATIntArray;
   Line1, Line2: integer;
   iLine, i, j: integer;
 begin
-  RangeThis:= Fold.ItemPtr(ARangeIndex);
-  RangeThis^.Folded:= false;
+  RngOuter:= Fold.ItemPtr(ARangeIndex);
+  RngOuter^.Folded:= false;
   FWrapUpdateNeeded:= true;
 
   Strs:= Strings;
@@ -88,8 +87,8 @@ begin
     true{OnlyFolded}, true{TopLevel}, cRngIgnoreLineParams);
 
   //show all lines not in subranges
-  Line1:= RangeThis^.Y;
-  Line2:= RangeThis^.Y2;
+  Line1:= RngOuter^.Y;
+  Line2:= RngOuter^.Y2;
   SetLength(Checks, Line2-Line1+1);
 
   for i:= 0 to High(Checks) do
@@ -97,8 +96,8 @@ begin
 
   for i:= 0 to High(RangeIndexes) do
   begin
-    R:= Fold.ItemPtr(RangeIndexes[i]);
-    for j:= R^.Y to R^.Y2 do
+    Rng:= Fold.ItemPtr(RangeIndexes[i]);
+    for j:= Rng^.Y to Rng^.Y2 do
       Checks[j-Line1]:= 1;
   end;
 
@@ -113,8 +112,8 @@ begin
   //show first lines of found subranges
   for i:= 0 to High(RangeIndexes) do
   begin
-    R:= Fold.ItemPtr(RangeIndexes[i]);
-    Strs.LinesHidden[R^.Y, FEditorIndex]:= false;
+    Rng:= Fold.ItemPtr(RangeIndexes[i]);
+    Strs.LinesHidden[Rng^.Y, FEditorIndex]:= false;
   end;
 end;
 
