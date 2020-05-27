@@ -1,6 +1,7 @@
 
 2020.05.26
-+ add: optimization in unfolding code, so unfolding of ranges, which have lot of folded subranges, is ~20x faster
++ add: optimizations in unfolding code: change algo O(n**2) to O(n)
++ add: optimizations in "fold level / 2..3..4.." code: change O(n**2) to O(n)
 
 2020.05.21
 + add: when unprinted symbols visible, paint additional curved-arrow for wrapped line parts
