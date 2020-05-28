@@ -92,7 +92,7 @@ type
     procedure DoOnFound; virtual;
     function CheckTokens(APos: integer): boolean; virtual;
   public
-    OptBack: boolean; //for non-regex
+    OptBack: boolean;
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
     OptRegex: boolean;
@@ -411,7 +411,7 @@ begin
 
   FRegex.InputString:= StrText;
 
-  if FRegex.ExecPos(AFromPos) then
+  if FRegex.ExecPos(AFromPos, false, OptBack) then
   begin
     if CheckTokens(FRegex.MatchPos[0]) then
     begin
@@ -422,7 +422,7 @@ begin
     end;
 
     repeat
-      if not FRegex.ExecNext then exit;
+      if not FRegex.ExecNext(OptBack) then exit;
       if CheckTokens(FRegex.MatchPos[0]) then
       begin
         Result:= true;
@@ -686,8 +686,6 @@ end;
 
 procedure TATEditorFinder.UpdateFragments;
 begin
-  if OptRegex then
-    OptBack:= false;
   if OptInSelection then
     OptFromCaret:= false;
 
@@ -990,9 +988,6 @@ function TATEditorFinder.GetOffsetStartPos: integer;
 begin
   if OptFromCaret then
     Result:= GetOffsetOfCaret
-  else
-  if OptRegex then
-    Result:= 1
   else
   if OptBack then
     Result:= Length(StrText)
