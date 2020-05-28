@@ -16,7 +16,6 @@ uses
   Forms,
   ExtCtrls,
   Math,
-  UnicodeData,
   LCLType, LCLIntf;
 
 type
