@@ -210,6 +210,16 @@ begin
   if (Ord(ch)>=$410) and (Ord(ch)<=$451) then exit; //a..ya A..YA yo
   if Ord(ch)=$401 then exit; //YO
 
+  //German letters
+  // https://resources.german.lsa.umich.edu/schreiben/unicode/
+  if Ord(ch)=$00DF then exit;
+  if Ord(ch)=$00E4 then exit;
+  if Ord(ch)=$00F6 then exit;
+  if Ord(ch)=$00FC then exit;
+  if Ord(ch)=$00C4 then exit;
+  if Ord(ch)=$00D6 then exit;
+  if Ord(ch)=$00DC then exit;
+
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
 
