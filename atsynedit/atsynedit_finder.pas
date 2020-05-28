@@ -1508,7 +1508,7 @@ end;
 
 function TATTextFinder.FindMatch_Regex(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
 var
-  FromPos: integer;
+  NPos: integer;
 begin
   Result:= false;
   if StrText='' then Exit;
@@ -1516,14 +1516,8 @@ begin
 
   if OptRegex then
   begin
-    if not ANext then
-      FromPos:= AStartPos
-    else
-      FromPos:= FMatchPos+ASkipLen;
-    if FromPos<1 then
-      FromPos:= 1;
-
-    Result:= DoFind_Regex(FromPos);
+    NPos:= Max(1, AStartPos);
+    Result:= DoFind_Regex(NPos);
     if Result then DoOnFound;
   end
   else
