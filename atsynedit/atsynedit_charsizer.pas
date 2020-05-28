@@ -47,8 +47,11 @@ var
   OptCharSizeProportional: boolean = true;
   OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
 
-  OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
-  OptCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
+const
+  OptCharScaleHex_Small = 300; //width of hex show: "xNN"
+  OptCharScaleHex_Big = 500; //width of hex show: "xNNNN"
+
+var
   OptUnprintedReplaceSpec: boolean = false;
   OptUnprintedReplaceSpecToCode: integer = 164; //char 164 is small circle
   OptHexChars: UnicodeString = ''; //show these chars as "<NNNN>"
