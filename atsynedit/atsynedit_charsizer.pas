@@ -44,7 +44,7 @@ var
   //must be created after MainForm is inited, e.g. in TATSynEdit.Create
 
 var
-  OptCharSizeProportional: boolean = false;
+  OptCharSizeProportional: boolean = true;
   OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
 
   OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
