@@ -227,6 +227,17 @@ begin
   if (n>=$3400) and (n<=$9FFF) then exit(OptCharScaleFullWidth);
   if (n>=$F900) and (n<=$FAFF) then exit(OptCharScaleFullWidth);
 
+  // http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml
+  //Japanese punctuation, Hiragana, Katakana
+  if (n>=$3000) and (n<=$30ff) then exit(OptCharScaleFullWidth);
+  //full-width Roman
+  if (n>=$ff00) and (n<=$ff5f) then exit(OptCharScaleFullWidth);
+  //half-width Katakana
+  if (n>=$ff60) and (n<=$ff9f) then exit(OptCharScaleFullWidth div 2);
+  if (n>=$ffa0) and (n<=$ffef) then exit(OptCharScaleFullWidth);
+
+  //------------
+
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
 
