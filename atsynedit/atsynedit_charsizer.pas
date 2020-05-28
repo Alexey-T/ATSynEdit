@@ -171,6 +171,10 @@ begin
   for i:= $0590 to $05FF do
     FixedSizes[i]:= _full;
 
+  //Syriac...Khmer..general puctuation
+  for i:= $700 to $206F do
+    FixedSizes[i]:= _full;
+
   //combining chars
   // https://en.wikipedia.org/wiki/Combining_character
   for i:=$0300 to $036F do
