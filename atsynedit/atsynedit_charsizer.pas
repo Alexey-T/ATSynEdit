@@ -221,8 +221,7 @@ end;
 {$else}
 function _WidestrWidth(C: TCanvas; S: WideChar): integer; inline;
 begin
-  Result:= C.TextWidth(UTF8Encode(WideString(S)));
-
+  Result:= C.TextWidth(WideString(S));
   //debug
   //Write('#'+IntToHex(Ord(S),2)+'"'+S+'" ');
 end;
