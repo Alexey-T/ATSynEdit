@@ -83,6 +83,10 @@ begin
   for i:= $20 to $24F do
     FixedSizes[i]:= _norm;
 
+  //IPA Extensions
+  for i:= $250 to $2AF do
+    FixedSizes[i]:= _norm;
+
   //some Latin are full-width
   for i:= $1C4 to $1CC do
     FixedSizes[i]:= _full;
