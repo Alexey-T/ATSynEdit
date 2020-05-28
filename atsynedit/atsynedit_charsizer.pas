@@ -78,7 +78,8 @@ begin
   FillChar(FixedSizes, SizeOf(FixedSizes), 0);
 
   //Basic Latin
-  for i:= 32 to 127 do
+  //Latin-1 Supplement
+  for i:= $20 to $FF do
     FixedSizes[i]:= _norm;
 
   //Cyrillic: full-width
