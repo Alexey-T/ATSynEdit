@@ -46,15 +46,7 @@ var
 
 var
   OptCharSizeProportional: boolean = true;
-  OptCharSizeWideAllowed: boolean = true;
   OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
-
-  OptCharFillWidth_Range1_begin: word = $180;
-  OptCharFillWidth_Range1_end: word = $24F;
-  OptCharFillWidth_Range2_begin: word = $1100;
-  OptCharFillWidth_Range2_end: word = $FFFF;
-  OptCharFillWidth_Range3_begin: word = 0;
-  OptCharFillWidth_Range3_end: word = 0;
 
   OptCharScaleHex_Small: word = 300; //width of hex show: "xNN"
   OptCharScaleHex_Big: word = 500; //width of hex show: "xNNNN"
@@ -73,21 +65,6 @@ implementation
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
 begin
   Result:= (ch<>#9) and (Ord(ch)<$20);
-end;
-
-function IsCharFullWidth(ch: WideChar): boolean;
-begin
-  Result:= false;
-  if ch=#$2026 then exit; //unicode dots
-
-  if (Ord(ch)>=OptCharFillWidth_Range1_begin) and
-     (Ord(ch)<=OptCharFillWidth_Range1_end) then exit(true);
-
-  if (Ord(ch)>=OptCharFillWidth_Range2_begin) and
-     (Ord(ch)<=OptCharFillWidth_Range2_end) then exit(true);
-
-  if (Ord(ch)>=OptCharFillWidth_Range3_begin) and
-     (Ord(ch)<=OptCharFillWidth_Range3_end) then exit(true);
 end;
 
 {
@@ -204,7 +181,7 @@ var
 begin
   Result:= 100;
 
-  //Basic Latin letters
+  //Basic Latin
   if (n>=32) and (n<128) then exit;
 
   //Basic Russian
@@ -222,6 +199,8 @@ begin
   if n=$00D6 then exit;
   if n=$00DC then exit;
 
+  if n=$2026 then exit(OptCharScaleFullWidth); //unicode dots
+
   //Chinese
   // http://www.unicode.org/versions/Unicode5.0.0/ch12.pdf#G12159
   if (n>=$3400) and (n<=$9FFF) then exit(OptCharScaleFullWidth);
@@ -233,7 +212,7 @@ begin
   //full-width Roman
   if (n>=$ff00) and (n<=$ff5f) then exit(OptCharScaleFullWidth);
   //half-width Katakana
-  if (n>=$ff60) and (n<=$ff9f) then exit(OptCharScaleFullWidth div 2);
+  if (n>=$ff60) and (n<=$ff9f) then exit(100);
   if (n>=$ffa0) and (n<=$ffef) then exit(OptCharScaleFullWidth);
 
   //------------
@@ -252,9 +231,6 @@ begin
   if OptCharSizeProportional then
     if n>=128 then
       exit(GetCharWidth_FromCache(ch));
-
-  if OptCharSizeWideAllowed and IsCharFullWidth(ch) then
-    exit(OptCharScaleFullWidth);
 end;
 
 {
