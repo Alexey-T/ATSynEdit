@@ -67,6 +67,7 @@ var
 const
   _norm = 1;
   _full = 2;
+  _comb = 3;
 
 procedure InitFixedSizes;
 var
@@ -91,8 +92,6 @@ begin
   for i:= $1C80 to $1C8F do
     FixedSizes[i]:= _full;
   for i:= $1D2B to $1D78 do
-    FixedSizes[i]:= _full;
-  for i:= $FE2E to $FE2F do
     FixedSizes[i]:= _full;
 
   //Basic Russian: normal width
@@ -156,6 +155,27 @@ begin
   for i:= $0590 to $05FF do
     FixedSizes[i]:= _full;
 
+  //combining chars
+  // https://en.wikipedia.org/wiki/Combining_character
+  for i:=$0300 to $036F do
+    FixedSizes[i]:= _comb;
+  for i:=$1AB0 to $1AFF do
+    FixedSizes[i]:= _comb;
+  for i:=$1DC0 to $1DFF do
+    FixedSizes[i]:= _comb;
+  for i:=$20D0 to $20FF do
+    FixedSizes[i]:= _comb;
+  for i:=$FE20 to $FE2F do
+    FixedSizes[i]:= _comb;
+
+  FixedSizes[$3099]:= _comb;
+  FixedSizes[$309A]:= _comb;
+  FixedSizes[$032A]:= _comb;
+  for i:= $0346 to $034F do
+    FixedSizes[i]:= _comb;
+  for i:= $0363 to $036F do
+    FixedSizes[i]:= _comb;
+
 end;
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
@@ -187,27 +207,9 @@ begin
   Result:= Pos(ch, OptHexChars)>0;
 end;
 
-{
-http://en.wikipedia.org/wiki/Combining_character
-Combining Diacritical Marks (0300–036F), since version 1.0, with modifications in subsequent versions down to 4.1
-Combining Diacritical Marks Extended (1AB0–1AFF), version 7.0
-Combining Diacritical Marks Supplement (1DC0–1DFF), versions 4.1 to 5.2
-Combining Diacritical Marks for Symbols (20D0–20FF), since version 1.0, with modifications in subsequent versions down to 5.1
-Combining Half Marks (FE20–FE2F), versions 1.0, updates in 5.2
-}
-{
-http://www.unicode.org/charts/PDF/U0E80.pdf
-cannot render them ok anyway as accents:
-0EB1, 0EB4..0EBC, 0EC8..0ECD
-}
 function IsCharAccent(ch: WideChar): boolean;
 begin
-  case GetProps(Ord(ch))^.Category of
-    UGC_NonSpacingMark .. UGC_EnclosingMark:
-      Result:= true;
-    else
-      Result:= false;
-  end;
+  Result:= FixedSizes[Ord(ch)]=_comb;
 end;
 
 {$ifdef windows}
