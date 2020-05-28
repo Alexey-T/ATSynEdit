@@ -279,6 +279,9 @@ begin
   if OptCharSizeProportional then
     if n>=128 then
       exit(GetCharWidth_FromCache(ch));
+
+  //for other codes, use full-width size
+  Result:= OptCharScaleFullWidth;
 end;
 
 {
