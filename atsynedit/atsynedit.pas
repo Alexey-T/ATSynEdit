@@ -1033,7 +1033,8 @@ type
       AOvrMode, ASelectThen: boolean): TATCommandResults;
     function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
     function DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
-    function DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
+    function DoCommand_FoldAll: TATCommandResults;
+    function DoCommand_FoldUnAll: TATCommandResults;
     function DoCommand_FoldRangeAtCurLine(ACommand: TATFoldRangeCmd): TATCommandResults;
     function DoCommand_FoldSelection: TATCommandResults;
     function DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;

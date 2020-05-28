@@ -426,7 +426,7 @@ end;
 
 procedure TATSynEdit.DoFoldForLevel(ALevel: integer);
 begin
-  DoCommand_FoldUnfoldAll(false);
+  DoCommand_FoldUnAll;
   DoFoldForLevelEx(ALevel, -1);
   Update;
 end;

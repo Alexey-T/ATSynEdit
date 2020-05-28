@@ -497,8 +497,8 @@ begin
     cCommand_TextTrimSpacesRight:      Res:= DoCommand_TextTrimSpaces(cTrimRight);
     cCommand_TextTrimSpacesAll:        Res:= DoCommand_TextTrimSpaces(cTrimAll);
 
-    cCommand_FoldAll:                  Res:= DoCommand_FoldUnfoldAll(true);
-    cCommand_UnfoldAll:                Res:= DoCommand_FoldUnfoldAll(false);
+    cCommand_FoldAll:                  Res:= DoCommand_FoldAll;
+    cCommand_UnfoldAll:                Res:= DoCommand_FoldUnAll;
     cCommand_FoldLevel1..
     cCommand_FoldLevel9:               Res:= DoCommand_FoldLevel(ACmd-cCommand_FoldLevel1);
 

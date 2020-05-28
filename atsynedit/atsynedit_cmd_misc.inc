@@ -112,52 +112,54 @@ begin
   Result:= [cResultState];
 end;
 
-function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_FoldAll: TATCommandResults;
 var
   R: PATSynRange;
   NeedFixCaret: boolean;
+  i: integer;
+begin
+  for i:= 0 to Fold.Count-1 do
+  begin
+    R:= Fold.ItemPtr(i);
+    if R^.IsSimple then Continue;
+    DoRangeFold(i);
+  end;
+
+  NeedFixCaret:= false;
+  for i:= 0 to Carets.Count-1 do
+    if IsLineFolded(Carets[i].PosY) then
+    begin
+      NeedFixCaret:= true;
+      Break;
+    end;
+  if NeedFixCaret then
+    DoCaretSingle(0, 0);
+
+  Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
+end;
+
+function TATSynEdit.DoCommand_FoldUnAll: TATCommandResults;
+var
+  R: PATSynRange;
   Str: TATStrings;
   i: integer;
 begin
-  if ADoFold then
+  for i:= 0 to Fold.Count-1 do
   begin
-    for i:= 0 to Fold.Count-1 do
+    R:= Fold.ItemPtr(i);
+    if R^.Folded then
     begin
-      R:= Fold.ItemPtr(i);
-      if R^.IsSimple then Continue;
-      DoRangeFold(i);
+      R^.Folded:= false;
+      //Fold[i]:= R;
+      FWrapUpdateNeeded:= true;
     end;
+  end;
 
-    NeedFixCaret:= false;
-    for i:= 0 to Carets.Count-1 do
-      if IsLineFolded(Carets[i].PosY) then
-      begin
-        NeedFixCaret:= true;
-        Break;
-      end;
-    if NeedFixCaret then
-      DoCaretSingle(0, 0);
-  end
-  else
-  //unfold all
+  Str:= Strings;
+  for i:= 0 to Str.Count-1 do
   begin
-    for i:= 0 to Fold.Count-1 do
-    begin
-      R:= Fold.ItemPtr(i);
-      if R^.Folded then
-      begin
-        R^.Folded:= false;
-        //Fold[i]:= R;
-        FWrapUpdateNeeded:= true;
-      end;
-    end;
-
-    Str:= Strings;
-    for i:= 0 to Str.Count-1 do
-    begin
-      Str.LinesHidden[i, EditorIndex]:= false;
-      Str.LinesFoldFrom[i, EditorIndex]:= 0;
-    end;
+    Str.LinesHidden[i, EditorIndex]:= false;
+    Str.LinesFoldFrom[i, EditorIndex]:= 0;
   end;
 
   Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
@@ -165,7 +167,7 @@ end;
 
 function TATSynEdit.DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
 begin
-  DoCommand_FoldUnfoldAll(false);
+  DoCommand_FoldUnAll;
   DoFoldForLevelEx(ALevel, -1);
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
