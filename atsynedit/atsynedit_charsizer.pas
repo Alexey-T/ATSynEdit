@@ -79,8 +79,17 @@ begin
 
   //Basic Latin
   //Latin-1 Supplement
-  for i:= $20 to $FF do
+  //Latin Extended-A
+  for i:= $20 to $24F do
     FixedSizes[i]:= _norm;
+
+  //some Latin are full-width
+  for i:= $1C4 to $1CC do
+    FixedSizes[i]:= _full;
+  FixedSizes[$1F1]:= _full;
+  FixedSizes[$1F2]:= _full;
+  FixedSizes[$1F3]:= _full;
+  FixedSizes[$24A]:= _full;
 
   //Cyrillic: full-width
   // https://en.wikipedia.org/wiki/Cyrillic_script_in_Unicode
