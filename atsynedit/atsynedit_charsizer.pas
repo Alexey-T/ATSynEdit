@@ -149,6 +149,9 @@ end;
 function _WidestrWidth(C: TCanvas; S: WideChar): integer; inline;
 begin
   Result:= C.TextWidth(UTF8Encode(WideString(S)));
+
+  //debug
+  //Write('#'+IntToHex(Ord(S),2)+'"'+S+'" ');
 end;
 {$endif}
 
@@ -199,7 +202,13 @@ function TATCharSizer.GetCharWidth(ch: WideChar): integer;
 begin
   Result:= 100;
 
+  //Basic Latin letters
   if (Ord(ch)>=32) and (Ord(ch)<128) then exit;
+
+  //Basic Russian letters
+  // https://www.unicode.org/charts/PDF/U0400.pdf
+  if (Ord(ch)>=$410) and (Ord(ch)<=$451) then exit; //a..ya A..YA yo
+  if Ord(ch)=$401 then exit; //YO
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
