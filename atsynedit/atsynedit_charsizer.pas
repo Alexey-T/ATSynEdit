@@ -13,6 +13,8 @@ uses
   Windows,
   {$endif}
   Classes, SysUtils, Graphics,
+  Forms,
+  ExtCtrls,
   Math,
   UnicodeData,
   LCLType, LCLIntf;
@@ -26,8 +28,8 @@ type
   private
     FontName: string;
     FontSize: integer;
-    Bitmap: TBitmap;
     SizeAvg: integer;
+    FPanel: TPanel;
     Sizes: packed array[word] of byte; //width of WideChars, divided by SizeAvg, divided by SaveScale
     function GetCharWidth_FromCache(ch: WideChar): integer;
   public
@@ -35,7 +37,7 @@ type
     destructor Destroy; override;
     procedure Init(const AFontName: string; AFontSize: integer);
     function GetCharWidth(ch: WideChar): integer;
-    function GetStrWidth(const S: WideString): integer;
+    //function GetStrWidth(const S: WideString): integer;
   end;
 
 var
@@ -136,17 +138,17 @@ begin
 end;
 
 {$ifdef windows}
-function _WidestrWidth(C: TCanvas; const S: WideString): integer; inline;
+function _WidestrWidth(C: TCanvas; S: WideChar): integer; inline;
 var
   Size: TSize;
 begin
-  Windows.GetTextExtentPointW(C.Handle, PWChar(S), Length(S), Size);
+  Windows.GetTextExtentPointW(C.Handle, @S, 1{Len}, Size);
   Result:= Size.cx;
 end;
 {$else}
-function _WidestrWidth(C: TCanvas; const S: WideString): integer; inline;
+function _WidestrWidth(C: TCanvas; S: WideChar): integer; inline;
 begin
-  Result:= C.TextWidth(UTF8Encode(S));
+  Result:= C.TextWidth(UTF8Encode(WideString(S)));
 end;
 {$endif}
 
@@ -160,10 +162,13 @@ begin
     FontSize:= AFontSize;
     FillChar(Sizes, SizeOf(Sizes), 0);
   end;
-  Bitmap.Canvas.Font.Name:= AFontName;
-  Bitmap.Canvas.Font.Size:= AFontSize;
-  Bitmap.Canvas.Font.Style:= [];
-  SizeAvg:= Bitmap.Canvas.TextWidth('M');
+
+  FPanel.Parent:= Application.MainForm;
+  FPanel.Canvas.Font.Name:= AFontName;
+  FPanel.Canvas.Font.Size:= AFontSize;
+  FPanel.Canvas.Font.Style:= [];
+
+  SizeAvg:= FPanel.Canvas.TextWidth('N');
 end;
 
 function TATCharSizer.GetCharWidth_FromCache(ch: WideChar): integer;
@@ -171,21 +176,22 @@ begin
   Result:= Sizes[Ord(ch)] * SaveScale;
   if Result=0 then
   begin
-    Result:= _WidestrWidth(Bitmap.Canvas, WideString(ch)) * 100 div SizeAvg;
+    Result:= _WidestrWidth(FPanel.Canvas, ch) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Math.Min(255, Result div SaveScale);
   end;
 end;
 
 constructor TATCharSizer.Create;
 begin
-  Bitmap:= TBitmap.Create;
-  Bitmap.Width:= 50;
-  Bitmap.Height:= 20;
+  FPanel:= TPanel.Create(nil);
+  FPanel.Name:= 'AppSizerPanel';
+  FPanel.Visible:= false;
+  FPanel.SetBounds(0, 0, 50, 20);
 end;
 
 destructor TATCharSizer.Destroy;
 begin
-  FreeAndNil(Bitmap);
+  FreeAndNil(FPanel);
   inherited;
 end;
 
@@ -214,11 +220,12 @@ begin
     exit(OptCharScaleFullWidth);
 end;
 
+{
 function TATCharSizer.GetStrWidth(const S: WideString): integer;
 begin
-  Result:= _WidestrWidth(Bitmap.Canvas, S) * 100 div SizeAvg;
+  Result:= _WidestrWidth(FPanel.Canvas, S) * 100 div SizeAvg;
 end;
-
+}
 
 finalization
 
