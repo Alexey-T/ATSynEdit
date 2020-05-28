@@ -199,40 +199,42 @@ begin
 end;
 
 function TATCharSizer.GetCharWidth(ch: WideChar): integer;
+var
+  n: word absolute ch;
 begin
   Result:= 100;
 
   //Basic Latin letters
-  if (Ord(ch)>=32) and (Ord(ch)<128) then exit;
+  if (n>=32) and (n<128) then exit;
 
   //Basic Russian letters
   // https://www.unicode.org/charts/PDF/U0400.pdf
-  if (Ord(ch)>=$410) and (Ord(ch)<=$451) then exit; //a..ya A..YA yo
-  if Ord(ch)=$401 then exit; //YO
+  if (n>=$410) and (n<=$451) then exit; //a..ya A..YA yo
+  if n=$401 then exit; //YO
 
   //German letters
   // https://resources.german.lsa.umich.edu/schreiben/unicode/
-  if Ord(ch)=$00DF then exit;
-  if Ord(ch)=$00E4 then exit;
-  if Ord(ch)=$00F6 then exit;
-  if Ord(ch)=$00FC then exit;
-  if Ord(ch)=$00C4 then exit;
-  if Ord(ch)=$00D6 then exit;
-  if Ord(ch)=$00DC then exit;
+  if n=$00DF then exit;
+  if n=$00E4 then exit;
+  if n=$00F6 then exit;
+  if n=$00FC then exit;
+  if n=$00C4 then exit;
+  if n=$00D6 then exit;
+  if n=$00DC then exit;
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
 
   if IsCharHexDisplayed(ch) then
   begin
-    if Ord(ch)<$100 then
+    if n<$100 then
       exit(OptCharScaleHex_Small)
     else
       exit(OptCharScaleHex_Big);
   end;
 
   if OptCharSizeProportional then
-    if Ord(ch)>=128 then
+    if n>=128 then
       exit(GetCharWidth_FromCache(ch));
 
   if OptCharSizeWideAllowed and IsCharFullWidth(ch) then
