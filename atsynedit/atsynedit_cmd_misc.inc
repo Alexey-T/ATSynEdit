@@ -165,7 +165,8 @@ end;
 
 function TATSynEdit.DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
 begin
-  DoFoldForLevel(ALevel);
+  DoCommand_FoldUnfoldAll(false);
+  DoFoldForLevelEx(ALevel, -1);
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
 
