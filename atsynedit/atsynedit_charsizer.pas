@@ -62,6 +62,66 @@ function IsCharHexDisplayed(ch: WideChar): boolean;
 
 implementation
 
+var
+  FixedSizes: packed array[word] of byte;
+const
+  _norm = 1;
+  _full = 2;
+
+procedure InitFixedSizes;
+var
+  i: word;
+begin
+  FillChar(FixedSizes, SizeOf(FixedSizes), 0);
+
+  //Basic Latin
+  for i:= 32 to 127 do
+    FixedSizes[i]:= _norm;
+
+  //Basic Russian
+  // https://www.unicode.org/charts/PDF/U0400.pdf
+  for i:= $410 to $451 do //a..ya A..YA yo
+    FixedSizes[i]:= _norm;
+  FixedSizes[$401]:= _norm; //YO
+
+  //German
+  // https://resources.german.lsa.umich.edu/schreiben/unicode/
+  FixedSizes[$00DF]:= _norm;
+  FixedSizes[$00E4]:= _norm;
+  FixedSizes[$00F6]:= _norm;
+  FixedSizes[$00FC]:= _norm;
+  FixedSizes[$00C4]:= _norm;
+  FixedSizes[$00D6]:= _norm;
+  FixedSizes[$00DC]:= _norm;
+
+  //Greek and Coptic
+  // https://unicode.org/charts/PDF/U0370.pdf
+  for i:= $370 to $3ff do
+    FixedSizes[i]:= _norm;
+
+  FixedSizes[$2026]:= _full; //unicode dots
+
+  //Chinese
+  // http://www.unicode.org/versions/Unicode5.0.0/ch12.pdf#G12159
+  for i:= $3400 to $9FFF do
+    FixedSizes[i]:= _full;
+  for i:= $F900 to $FAFF do
+    FixedSizes[i]:= _full;
+
+  // http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml
+  //Japanese punctuation, Hiragana, Katakana
+  for i:= $3000 to $30ff do
+    FixedSizes[i]:= _full;
+  //_full-width Roman
+  for i:= $ff00 to $ff5f do
+    FixedSizes[i]:= _full;
+  //half-width Katakana
+  for i:= $ff60 to $ff9f do
+    FixedSizes[i]:= _norm;
+  for i:= $ffa0 to $ffef do
+    FixedSizes[i]:= _full;
+end;
+
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
 begin
   Result:= (ch<>#9) and (Ord(ch)<$20);
@@ -178,48 +238,13 @@ end;
 function TATCharSizer.GetCharWidth(ch: WideChar): integer;
 var
   n: word absolute ch;
+  size: integer;
 begin
   Result:= 100;
 
-  //Basic Latin
-  if (n>=32) and (n<128) then exit;
-
-  //Basic Russian
-  // https://www.unicode.org/charts/PDF/U0400.pdf
-  if (n>=$410) and (n<=$451) then exit; //a..ya A..YA yo
-  if n=$401 then exit; //YO
-
-  //German
-  // https://resources.german.lsa.umich.edu/schreiben/unicode/
-  if n=$00DF then exit;
-  if n=$00E4 then exit;
-  if n=$00F6 then exit;
-  if n=$00FC then exit;
-  if n=$00C4 then exit;
-  if n=$00D6 then exit;
-  if n=$00DC then exit;
-
-  //Greek and Coptic
-  // https://unicode.org/charts/PDF/U0370.pdf
-  if (n>=$370) and (n<=$3ff) then exit;
-
-  if n=$2026 then exit(OptCharScaleFullWidth); //unicode dots
-
-  //Chinese
-  // http://www.unicode.org/versions/Unicode5.0.0/ch12.pdf#G12159
-  if (n>=$3400) and (n<=$9FFF) then exit(OptCharScaleFullWidth);
-  if (n>=$F900) and (n<=$FAFF) then exit(OptCharScaleFullWidth);
-
-  // http://www.rikai.com/library/kanjitables/kanji_codes.unicode.shtml
-  //Japanese punctuation, Hiragana, Katakana
-  if (n>=$3000) and (n<=$30ff) then exit(OptCharScaleFullWidth);
-  //full-width Roman
-  if (n>=$ff00) and (n<=$ff5f) then exit(OptCharScaleFullWidth);
-  //half-width Katakana
-  if (n>=$ff60) and (n<=$ff9f) then exit(100);
-  if (n>=$ffa0) and (n<=$ffef) then exit(OptCharScaleFullWidth);
-
-  //------------
+  size:= FixedSizes[n];
+  if size=_norm then exit;
+  if size=_full then exit(OptCharScaleFullWidth);
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
@@ -243,6 +268,10 @@ begin
   Result:= _WidestrWidth(FPanel.Canvas, S) * 100 div SizeAvg;
 end;
 }
+
+initialization
+
+  InitFixedSizes;
 
 finalization
 
