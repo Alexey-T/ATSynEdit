@@ -207,12 +207,12 @@ begin
   //Basic Latin letters
   if (n>=32) and (n<128) then exit;
 
-  //Basic Russian letters
+  //Basic Russian
   // https://www.unicode.org/charts/PDF/U0400.pdf
   if (n>=$410) and (n<=$451) then exit; //a..ya A..YA yo
   if n=$401 then exit; //YO
 
-  //German letters
+  //German
   // https://resources.german.lsa.umich.edu/schreiben/unicode/
   if n=$00DF then exit;
   if n=$00E4 then exit;
@@ -221,6 +221,11 @@ begin
   if n=$00C4 then exit;
   if n=$00D6 then exit;
   if n=$00DC then exit;
+
+  //Chinese
+  // http://www.unicode.org/versions/Unicode5.0.0/ch12.pdf#G12159
+  if (n>=$3400) and (n<=$9FFF) then exit(OptCharScaleFullWidth);
+  if (n>=$F900) and (n<=$FAFF) then exit(OptCharScaleFullWidth);
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
