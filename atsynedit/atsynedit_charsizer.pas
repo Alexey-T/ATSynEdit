@@ -120,6 +120,20 @@ begin
     FixedSizes[i]:= _norm;
   for i:= $ffa0 to $ffef do
     FixedSizes[i]:= _full;
+
+  //Arabic
+  // https://en.wikipedia.org/wiki/Arabic_script_in_Unicode
+  for i:= $0600 to $06FF do
+    FixedSizes[i]:= _full;
+  for i:= $0750 to $077F do
+    FixedSizes[i]:= _full;
+  for i:= $08A0 to $08FF do
+    FixedSizes[i]:= _full;
+  for i:= $FB50 to $FDFF do
+    FixedSizes[i]:= _full;
+  for i:= $FE70 to $FEFF do
+    FixedSizes[i]:= _full;
+
 end;
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
