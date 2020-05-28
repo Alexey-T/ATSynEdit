@@ -78,7 +78,24 @@ begin
   for i:= 32 to 127 do
     FixedSizes[i]:= _norm;
 
-  //Basic Russian
+  //Cyrillic: full-width
+  // https://en.wikipedia.org/wiki/Cyrillic_script_in_Unicode
+  for i:= $400 to $4FF do
+    FixedSizes[i]:= _full;
+  for i:= $500 to $52F do
+    FixedSizes[i]:= _full;
+  for i:= $2DE0 to $2DFF do
+    FixedSizes[i]:= _full;
+  for i:= $A640 to $A69F do
+    FixedSizes[i]:= _full;
+  for i:= $1C80 to $1C8F do
+    FixedSizes[i]:= _full;
+  for i:= $1D2B to $1D78 do
+    FixedSizes[i]:= _full;
+  for i:= $FE2E to $FE2F do
+    FixedSizes[i]:= _full;
+
+  //Basic Russian: normal width
   // https://www.unicode.org/charts/PDF/U0400.pdf
   for i:= $410 to $451 do //a..ya A..YA yo
     FixedSizes[i]:= _norm;
