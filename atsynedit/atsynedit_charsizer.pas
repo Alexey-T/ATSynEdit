@@ -199,6 +199,10 @@ begin
   if n=$00D6 then exit;
   if n=$00DC then exit;
 
+  //Greek and Coptic
+  // https://unicode.org/charts/PDF/U0370.pdf
+  if (n>=$370) and (n<=$3ff) then exit;
+
   if n=$2026 then exit(OptCharScaleFullWidth); //unicode dots
 
   //Chinese
