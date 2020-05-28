@@ -134,6 +134,11 @@ begin
   for i:= $FE70 to $FEFF do
     FixedSizes[i]:= _full;
 
+  //Hebrew
+  // https://en.wikipedia.org/wiki/Hebrew_(Unicode_block)
+  for i:= $0590 to $05FF do
+    FixedSizes[i]:= _full;
+
 end;
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
