@@ -99,7 +99,8 @@ end;
 
 procedure TATAdapterHiliteCache.Clear;
 begin
-  FList.Clear;
+  //FList.Clear; //Clear is avail only in FPC 3.2+
+  FList.Resize(0);
 end;
 
 procedure TATAdapterHiliteCache.Add(
