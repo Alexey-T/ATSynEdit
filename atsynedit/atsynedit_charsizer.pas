@@ -306,6 +306,7 @@ begin
   size:= FixedSizes[n];
   if size=_norm then exit;
   if size=_full then exit(OptCharScaleFullWidth);
+  if size=_comb then exit(0);
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
