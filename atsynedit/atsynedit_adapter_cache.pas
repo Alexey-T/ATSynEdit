@@ -39,14 +39,12 @@ type
   TATAdapterHiliteCache = class
   private
     FList: TATAdapterCacheItems;
-    FMaxCount: integer;
     FEnabled: boolean;
     FTempItem: TATAdapterCacheItem;
     procedure SetEnabled(AValue: boolean);
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    property MaxCount: integer read FMaxCount write FMaxCount;
     property Enabled: boolean read FEnabled write SetEnabled;
     procedure Clear;
     procedure Add(
@@ -62,12 +60,11 @@ type
     procedure DeleteForLine(ALineIndex: integer);
   end;
 
+var
+  OptEditorAdapterCacheSize: integer = 100;
+
 
 implementation
-
-const
-  //500 lines in minimap on my monitor+ 100 lines in editor
-  cAdapterCacheMaxSize = 1000;
 
 { TATAdapterCacheItems }
 
@@ -95,7 +92,6 @@ end;
 constructor TATAdapterHiliteCache.Create;
 begin
   FList:= TATAdapterCacheItems.Create;
-  FMaxCount:= cAdapterCacheMaxSize;
 end;
 
 destructor TATAdapterHiliteCache.Destroy;
@@ -118,6 +114,7 @@ var
   NCnt: integer;
 begin
   if not Enabled then exit;
+  if OptEditorAdapterCacheSize<10 then exit;
 
   //ignore if no parts
   if (AParts[0].Len=0) then exit;
@@ -137,8 +134,8 @@ begin
     }
 
   NCnt:= FList.Count;
-  if NCnt>FMaxCount then
-    DeleteRange(FMaxCount, NCnt-1);
+  if NCnt>OptEditorAdapterCacheSize then
+    DeleteRange(OptEditorAdapterCacheSize, NCnt-1);
 
   FillChar(FTempItem, SizeOf(FTempItem), 0);
   FTempItem.LineIndex:= ALineIndex;
