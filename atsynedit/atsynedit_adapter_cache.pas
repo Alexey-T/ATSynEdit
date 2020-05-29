@@ -49,7 +49,7 @@ type
     procedure Clear;
     procedure Add(
       const ALineIndex, ACharIndex, ALineLen: integer;
-      constref AParts: TATLineParts;
+      var AParts: TATLineParts;
       const AColorAfterEol: TColor);
     function Get(
       const ALineIndex, ACharIndex, ALineLen: integer;
@@ -65,6 +65,22 @@ var
 
 
 implementation
+
+procedure CopyLineParts(var A, B: TATLineParts);
+var
+  i: integer;
+begin
+  //safe but slower:
+  //Move(A, B, SizeOf(A));
+
+  for i:= 0 to High(A) do
+  begin
+    B[i]:= A[i];
+    //stop at first empty item
+    if A[i].Len=0 then
+      Break;
+  end;
+end;
 
 { TATAdapterCacheItems }
 
@@ -108,7 +124,7 @@ end;
 
 procedure TATAdapterHiliteCache.Add(
   const ALineIndex, ACharIndex, ALineLen: integer;
-  constref AParts: TATLineParts;
+  var AParts: TATLineParts;
   const AColorAfterEol: TColor);
 var
   NCnt: integer;
@@ -137,12 +153,12 @@ begin
   if NCnt>OptEditorAdapterCacheSize then
     DeleteRange(OptEditorAdapterCacheSize, NCnt-1);
 
-  FillChar(FTempItem, SizeOf(FTempItem), 0);
   FTempItem.LineIndex:= ALineIndex;
   FTempItem.CharIndex:= ACharIndex;
   FTempItem.LineLen:= ALineLen;
   FTempItem.ColorAfterEol:= AColorAfterEol;
-  Move(AParts, FTempItem.Parts, SizeOf(AParts));
+  CopyLineParts(AParts, FTempItem.Parts);
+
   FList.Insert(0, FTempItem);
 end;
 
@@ -165,7 +181,7 @@ begin
       (Item^.CharIndex=ACharIndex) and
       (Item^.LineLen=ALineLen) then
       begin
-        Move(Item^.Parts, AParts, SizeOf(AParts));
+        CopyLineParts(Item^.Parts, AParts);
         AColorAfterEol:= Item^.ColorAfterEol;
         exit(true);
       end;
