@@ -1,4 +1,8 @@
 
+2020.05.29
++ add: optimize AdapterCache: use TDeque instead of list
++ add: use predefined char-widths for many unicode ranges (Russian German CJK Indian etc)
+
 2020.05.26
 + add: optimizations in unfolding code: change algo O(n**2) to O(n)
 + add: optimizations in "fold level / 2..3..4.." code: change O(n**2) to O(n)
