@@ -12,7 +12,7 @@ interface
 uses
   Classes, SysUtils, Graphics,
   ATSynEdit_CanvasProc,
-  ATSynEdit_fgl;
+  gdeque;
 
 type
 
@@ -23,15 +23,11 @@ type
     LineIndex, CharIndex, LineLen: integer;
     ColorAfterEol: TColor;
     Parts: TATLineParts;
-    class operator =(const a, b: TATAdapterCacheItem): boolean;
   end;
 
   { TATAdapterCacheItems }
 
-  TATAdapterCacheItems = class(specialize TFPGList<TATAdapterCacheItem>)
-  public
-    function ItemPtr(AIndex: integer): PATAdapterCacheItem; inline;
-  end;
+  TATAdapterCacheItems = specialize TDeque<TATAdapterCacheItem>;
 
 type
   { TATAdapterHiliteCache }
@@ -55,8 +51,6 @@ type
       const ALineIndex, ACharIndex, ALineLen: integer;
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
-    procedure Delete(AIndex: integer);
-    procedure DeleteRange(AFrom, ATo: integer);
     procedure DeleteForLine(ALineIndex: integer);
   end;
 
@@ -80,20 +74,6 @@ begin
     if A[i].Len=0 then
       Break;
   end;
-end;
-
-{ TATAdapterCacheItems }
-
-function TATAdapterCacheItems.ItemPtr(AIndex: integer): PATAdapterCacheItem;
-begin
-  Result:= PATAdapterCacheItem(InternalGet(AIndex));
-end;
-
-{ TATAdapterCacheItem }
-
-class operator TATAdapterCacheItem.= (const a, b: TATAdapterCacheItem): boolean;
-begin
-  Result:= false;
 end;
 
 { TATAdapterHiliteCache }
@@ -127,7 +107,7 @@ procedure TATAdapterHiliteCache.Add(
   var AParts: TATLineParts;
   const AColorAfterEol: TColor);
 var
-  NCnt: integer;
+  NCnt, i: integer;
 begin
   if not Enabled then exit;
   if OptEditorAdapterCacheSize<10 then exit;
@@ -149,9 +129,9 @@ begin
     then exit;
     }
 
-  NCnt:= FList.Count;
-  if NCnt>OptEditorAdapterCacheSize then
-    DeleteRange(OptEditorAdapterCacheSize, NCnt-1);
+  NCnt:= FList.Size();
+  for i:= 1 to NCnt-OptEditorAdapterCacheSize do
+    FList.PopBack;
 
   FTempItem.LineIndex:= ALineIndex;
   FTempItem.CharIndex:= ACharIndex;
@@ -159,7 +139,7 @@ begin
   FTempItem.ColorAfterEol:= AColorAfterEol;
   CopyLineParts(AParts, FTempItem.Parts);
 
-  FList.Insert(0, FTempItem);
+  FList.PushFront(FTempItem);
 end;
 
 
@@ -174,9 +154,9 @@ begin
   Result:= false;
   if not Enabled then exit;
 
-  for i:= 0 to FList.Count-1 do
+  for i:= 0 to FList.Size()-1 do
   begin
-    Item:= FList.ItemPtr(i);
+    Item:= FList.Mutable[i];
     if (Item^.LineIndex=ALineIndex) and
       (Item^.CharIndex=ACharIndex) and
       (Item^.LineLen=ALineLen) then
@@ -188,26 +168,16 @@ begin
   end;
 end;
 
-procedure TATAdapterHiliteCache.Delete(AIndex: integer);
-begin
-  FList.Delete(AIndex);
-end;
-
-procedure TATAdapterHiliteCache.DeleteRange(AFrom, ATo: integer);
-begin
-  FList.DeleteRange(AFrom, ATo);
-end;
-
 procedure TATAdapterHiliteCache.DeleteForLine(ALineIndex: integer);
 var
   Item: PATAdapterCacheItem;
   i: integer;
 begin
-  for i:= FList.Count-1 downto 0 do
+  for i:= FList.Size()-1 downto 0 do
   begin
-    Item:= FList.ItemPtr(i);
+    Item:= FList.Mutable[i];
     if (Item^.LineIndex=ALineIndex) then
-      Delete(i);
+      FList.Erase(i);
   end;
 end;
 
