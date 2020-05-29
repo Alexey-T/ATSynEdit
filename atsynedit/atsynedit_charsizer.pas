@@ -95,10 +95,23 @@ begin
   FixedSizes[$1F3]:= _full;
   FixedSizes[$24A]:= _full;
 
-  //Cyrillic: full-width
-  // https://en.wikipedia.org/wiki/Cyrillic_script_in_Unicode
-  for i:= $400 to $4FF do
+  //Cyrillic
+  // https://www.compart.com/en/unicode/block/U+0400
+  for i:= $400 to $408 do
+    FixedSizes[i]:= _norm;
+  for i:= $409 to $40B do
     FixedSizes[i]:= _full;
+  for i:= $40C to $458 do //Russian is here
+    FixedSizes[i]:= _norm;
+  for i:= $459 to $45A do
+    FixedSizes[i]:= _full;
+  for i:= $45B to $45F do
+    FixedSizes[i]:= _norm;
+  for i:= $460 to $461 do
+    FixedSizes[i]:= _full;
+  for i:= $462 to $4FF do
+    FixedSizes[i]:= _norm;
+
   for i:= $500 to $52F do
     FixedSizes[i]:= _full;
   for i:= $2DE0 to $2DFF do
@@ -109,12 +122,6 @@ begin
     FixedSizes[i]:= _full;
   for i:= $1D2B to $1D78 do
     FixedSizes[i]:= _full;
-
-  //Basic Russian: normal width
-  // https://www.unicode.org/charts/PDF/U0400.pdf
-  for i:= $410 to $451 do //a..ya A..YA yo
-    FixedSizes[i]:= _norm;
-  FixedSizes[$401]:= _norm; //YO
 
   //German
   // https://resources.german.lsa.umich.edu/schreiben/unicode/
@@ -178,6 +185,8 @@ begin
   //combining chars
   // https://en.wikipedia.org/wiki/Combining_character
   for i:=$0300 to $036F do
+    FixedSizes[i]:= _comb;
+  for i:=$483 to $489 do
     FixedSizes[i]:= _comb;
   for i:=$1AB0 to $1AFF do
     FixedSizes[i]:= _comb;
