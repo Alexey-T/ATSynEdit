@@ -190,11 +190,6 @@ begin
 
   FixedSizes[$3099]:= _comb;
   FixedSizes[$309A]:= _comb;
-  FixedSizes[$032A]:= _comb;
-  for i:= $0346 to $034F do
-    FixedSizes[i]:= _comb;
-  for i:= $0363 to $036F do
-    FixedSizes[i]:= _comb;
 
 end;
 
