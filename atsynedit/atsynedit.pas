@@ -7492,6 +7492,10 @@ begin
 end;
 
 procedure TATSynEdit.DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
+//this is used to prevert caret stopping
+//a) inside surrogate pair (2 codes which make one glyph)
+//b) on accent (combining) char, because accent char must render above lefter non-accent char
+//for case b) we skip ALL accent chars
 var
   Caret: TATCaretItem;
   ch: WideChar;
@@ -7503,8 +7507,23 @@ begin
     if Caret.PosX<=0 then Continue;
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
     ch:= Strings.LineCharAt(Caret.PosY, Caret.PosX+1);
-    if (ch<>#0) and IsCharSurrogateLow(ch) then
+    if ch=#0 then Continue;
+
+    if IsCharSurrogateLow(ch) then
+    begin
       Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
+      Continue;
+    end;
+
+    if IsCharAccent(ch) then
+    begin
+      Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
+      repeat
+        ch:= Strings.LineCharAt(Caret.PosY, Caret.PosX+1);
+        if not IsCharAccent(ch) then Break;
+        Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
+      until false;
+    end;
   end;
 end;
 
