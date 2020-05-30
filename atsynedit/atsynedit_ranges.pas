@@ -331,35 +331,31 @@ end;
 
 function TATSynRanges.FindRangeLevel(AIndex: integer): integer;
 var
-  NLine, NItemOfRng, iItem: integer;
-  Prev: PATSynRange;
+  NLine, iItem: integer;
 begin
-  Result:= -1;
+  Result:= 0;
   NLine:= ItemPtr(AIndex)^.Y;
   if NLine>High(FLineIndexer) then exit;
 
-  NItemOfRng:= 0;
   for iItem:= 0 to High(FLineIndexer[NLine]) do
     if FLineIndexer[NLine][iItem] = AIndex then
     begin
-      NItemOfRng:= iItem;
+      Result:= iItem;
       Break;
     end;
 
   //first in LineIndexer item? then level 0
-  if NItemOfRng=0 then
-    exit(0);
+  if Result=0 then
+    exit;
 
   //skip previous ranges in the same LineIndexer line,
   //if they only touch our range
-  while NItemOfRng>0 do
+  while Result>0 do
   begin
-    iItem:= FLineIndexer[NLine][NItemOfRng-1];
+    iItem:= FLineIndexer[NLine][Result-1];
     if IsRangesTouch(iItem, AIndex) then
-      Dec(NItemOfRng);
+      Dec(Result);
   end;
-
-  Result:= NItemOfRng;
 end;
 
 function TATSynRanges.IsRangesTouch(N1, N2: integer): boolean;
