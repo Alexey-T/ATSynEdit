@@ -3405,7 +3405,7 @@ begin
   SDeleteFrom(Str, #10);
     //e.g. Diff lexer gives collapsed-string with EOL (several lines)
 
-  Str:= FTabHelper.TabsToSpaces(-1, UTF8Decode(Str));
+  Str:= FTabHelper.TabsToSpaces(APosY, UTF8Decode(Str));
     //expand tabs too
 
   if APosX>0 then
