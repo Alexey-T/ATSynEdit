@@ -367,15 +367,20 @@ procedure DoPaintHexChars(C: TCanvas;
   ACharSize: TPoint;
   AColorFont,
   AColorBg: TColor);
+const
+  cHexWidth: array[boolean] of integer = (2, 4);
 var
   Buf: string;
   R: TRect;
-  i, j, NCode: integer;
+  ch: WideChar;
+  i, j: integer;
 begin
   if AString='' then Exit;
 
   for i:= 1 to Length(AString) do
-    if IsCharHexDisplayed(AString[i]) then
+  begin
+    ch:= AString[i];
+    if IsCharHexDisplayed(ch) then
     begin
       R.Left:= APoint.X;
       R.Right:= APoint.X;
@@ -390,8 +395,7 @@ begin
       C.Font.Color:= AColorFont;
       C.Brush.Color:= AColorBg;
 
-      NCode:= Ord(AString[i]);
-      Buf:= 'x'+IntToHex(NCode, IfThen(NCode<$100, 2, 4));
+      Buf:= 'x'+IntToHex(Ord(ch), cHexWidth[Ord(ch)>=$100]);
 
       ExtTextOut(C.Handle,
         R.Left, R.Top,
@@ -401,6 +405,7 @@ begin
         Length(Buf),
         nil);
     end;
+  end;
 end;
 
 procedure DoPaintUnprintedEolText(C: TCanvas;
