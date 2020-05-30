@@ -381,6 +381,7 @@ const
   Buf4: array[0..5] of char = 'x'#0#0#0#0#0;
 var
   Buf: PChar;
+  BufStr: string;
   Value, HexLen: integer;
   ch: WideChar;
   iChar, j: integer;
@@ -423,7 +424,8 @@ begin
           Value:= Value shr 4;
         end;
 
-        CanvasTextOutSimplest(C, AX, AY, StrPas(Buf));
+        SetString(BufStr, Buf, HexLen);
+        CanvasTextOutSimplest(C, AX, AY, BufStr);
       end;
     end;
 
