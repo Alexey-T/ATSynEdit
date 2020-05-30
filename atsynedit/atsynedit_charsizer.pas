@@ -201,6 +201,14 @@ begin
   for i:=$FE20 to $FE2F do
     FixedSizes[i]:= _comb;
 
+  // https://www.compart.com/en/unicode/block/U+0E80
+  FixedSizes[$eb1]:= _comb;
+  FixedSizes[$eb4]:= _comb;
+  for i:= $eb4 to $ebc do
+    FixedSizes[i]:= _comb;
+  for i:= $ec8 to $ecd do
+    FixedSizes[i]:= _comb;
+
   FixedSizes[$3099]:= _comb;
   FixedSizes[$309A]:= _comb;
 
