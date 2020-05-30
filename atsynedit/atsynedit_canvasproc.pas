@@ -443,7 +443,7 @@ begin
       {$ifdef windows}
       _TextOutSimple_Windows(C.Handle, R.Left, R.Top, @R, Buf, HexLen+1);
       {$else}
-      _TextOut_Unix(C.Handle, R.Left, R.Top, nil, StrPas(Buf), nil);
+      CanvasTextOutSimplest(C, R.Left, R.Top, StrPas(Buf));
       {$endif}
     end;
   end;
