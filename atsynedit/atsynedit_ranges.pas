@@ -59,6 +59,7 @@ type
     function Count: integer; inline;
     function CountOfLineIndexer: integer;
     function IsIndexValid(N: integer): boolean; inline;
+    function IsRangesTouch(N1, N2: integer): boolean;
     function Add(AX, AY, AY2: integer; AWithStaple: boolean; const AHint: string;
       const ATag: Int64=0): TATSynRange;
     function Insert(AIndex: integer; AX, AY, AY2: integer; AWithStaple: boolean;
@@ -349,14 +350,21 @@ begin
   if NItemOfRng=0 then
     exit(0);
 
-  //skip previous range in the same LineIndexer line,
-  //if it only touches our range (not includes our range)
-  iItem:= FLineIndexer[NLine][NItemOfRng-1];
-  Prev:= ItemPtr(iItem);
-  if Prev^.Y2=NLine then
-    Dec(NItemOfRng);
+  //skip previous ranges in the same LineIndexer line,
+  //if they only touch our range
+  while NItemOfRng>0 do
+  begin
+    iItem:= FLineIndexer[NLine][NItemOfRng-1];
+    if IsRangesTouch(iItem, AIndex) then
+      Dec(NItemOfRng);
+  end;
 
   Result:= NItemOfRng;
+end;
+
+function TATSynRanges.IsRangesTouch(N1, N2: integer): boolean;
+begin
+  Result:= ItemPtr(N1)^.Y2 = ItemPtr(N2)^.Y;
 end;
 
 type
