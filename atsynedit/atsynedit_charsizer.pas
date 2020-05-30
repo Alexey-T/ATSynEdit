@@ -73,6 +73,7 @@ const
   _full = 2;
   _space = 3;
   _comb = 4;
+  _hexshow = 5;
 
 procedure InitFixedSizes;
 var
@@ -203,6 +204,23 @@ begin
   FixedSizes[$3099]:= _comb;
   FixedSizes[$309A]:= _comb;
 
+  //hex display
+  // http://unicode.org/reports/tr9/#Directional_Formatting_Characters
+  // https://en.wikipedia.org/wiki/Whitespace_character#Unicode
+  for i:= 0 to $20-1 do //ascii control chars
+    if i<>9 then
+      FixedSizes[i]:= _hexshow;
+  for i:= $2000 to $200F do //white spaces + specials
+    FixedSizes[i]:= _hexshow;
+  for i:= $2028 to $202F do  //white spaces + specials
+    FixedSizes[i]:= _hexshow;
+  for i:= $2066 to $2069 do
+    FixedSizes[i]:= _hexshow;
+
+  FixedSizes[$85]:= _hexshow; //white space
+  FixedSizes[$061C]:= _hexshow;
+  FixedSizes[$FEFF]:= _hexshow;
+
   //space chars
   FixedSizes[$9]:= _space;
   FixedSizes[$20]:= _space;
@@ -222,28 +240,12 @@ begin
   Result:= (ch<>#9) and (Ord(ch)<$20);
 end;
 
-{
-http://unicode.org/reports/tr9/#Directional_Formatting_Characters
-https://en.wikipedia.org/wiki/Whitespace_character#Unicode
-}
 function IsCharHexDisplayed(ch: WideChar): boolean;
 begin
-  if ch=#9 then exit(false);
-  if ch<#$20 then exit(true);
-  if ch<#128 then exit(false);
-
-  if ch=#$85 then exit(true); //white space
-
-  //these are Emojis
-  //if IsCharSurrogate(ch) then exit(true);
-
-  if (ch>=#$2000) and (ch<=#$200F) then exit(true); //white spaces + specials
-  if (ch>=#$2028) and (ch<=#$202F) then exit(true); //white spaces + specials
-  if (ch>=#$2066) and (ch<=#$2069) then exit(true);
-  if ch=#$061C then exit(true);
-  if ch=#$FEFF then exit(true);
-
-  Result:= Pos(ch, OptHexChars)>0;
+  Result:= FixedSizes[Ord(ch)]= _hexshow;
+  if Result then exit;
+  if Ord(ch)>=128 then
+    Result:= Pos(ch, OptHexChars)>0;
 end;
 
 function IsCharAccent(ch: WideChar): boolean;
@@ -327,6 +329,13 @@ begin
     _full: exit(OptCharScaleFullWidth);
     _space: exit;
     _comb: exit(0);
+    _hexshow:
+      begin
+        if n<$100 then
+          exit(OptCharScaleHex_Small)
+        else
+          exit(OptCharScaleHex_Big);
+      end;
   end;
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
