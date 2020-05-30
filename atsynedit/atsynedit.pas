@@ -2675,7 +2675,8 @@ begin
             if OptUnprintedEndsDetails then
               DoPaintUnprintedEolText(C,
                 'EOF',
-                Point(ARect.Left, NCoordTop),
+                ARect.Left,
+                NCoordTop,
                 Colors.UnprintedFont,
                 Colors.UnprintedBG)
             else
@@ -3066,7 +3067,8 @@ begin
           if OptUnprintedEndsDetails then
             DoPaintUnprintedEolText(C,
               cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
-              CoordAfterText,
+              CoordAfterText.X,
+              CoordAfterText.Y,
               Colors.UnprintedFont,
               Colors.UnprintedBG)
           else

@@ -156,7 +156,7 @@ procedure CanvasTextOutMinimap(C: TCanvas;
 
 procedure DoPaintUnprintedEolText(C: TCanvas;
   const AText: string;
-  APoint: TPoint;
+  AX, AY: integer;
   AColorFont, AColorBG: TColor);
 
 procedure DoPaintUnprintedEolArrow(C: TCanvas;
@@ -450,7 +450,7 @@ end;
 
 procedure DoPaintUnprintedEolText(C: TCanvas;
   const AText: string;
-  APoint: TPoint;
+  AX, AY: integer;
   AColorFont, AColorBG: TColor);
 var
   NPrevSize: integer;
@@ -462,8 +462,8 @@ begin
   C.Brush.Color:= AColorBG;
 
   CanvasTextOutSimplest(C,
-    APoint.X+OptUnprintedEndFontDx,
-    APoint.Y+OptUnprintedEndFontDy,
+    AX+OptUnprintedEndFontDx,
+    AY+OptUnprintedEndFontDy,
     AText);
 
   C.Font.Size:= NPrevSize;
