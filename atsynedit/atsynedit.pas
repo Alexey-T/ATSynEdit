@@ -6393,7 +6393,7 @@ begin
     if FOptScaleFont<=cMinScale then Exit;
 
   //NTop:= LineTop;
-  FOptScaleFont:= FOptScaleFont+cStep*BoolToPlusMinusOne(AInc);
+  FOptScaleFont:= FOptScaleFont+cStep*BoolToPlusMinusOne[AInc];
   //LineTop:= NTop;
   Update;
 end;
@@ -7510,13 +7510,13 @@ begin
 
     if IsCharSurrogateLow(ch) then
     begin
-      Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
+      Caret.PosX:= Caret.PosX+BoolToPlusMinusOne[AMoveRight];
       Continue;
     end;
 
     while IsCharAccent(ch) do
     begin
-      Caret.PosX:= Caret.PosX+BoolToPlusMinusOne(AMoveRight);
+      Caret.PosX:= Caret.PosX+BoolToPlusMinusOne[AMoveRight];
       ch:= Strings.LineCharAt(Caret.PosY, Caret.PosX+1);
     end;
   end;

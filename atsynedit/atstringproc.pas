@@ -82,6 +82,9 @@ const
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'CRLF', 'LF', 'CR');
   cLineEndLength: array[TATLineEnds] of integer = (0, 2, 1, 1);
 
+const
+  BoolToPlusMinusOne: array[boolean] of integer = (-1, 1);
+
 var
   EditorScalePercents: integer = 100;
   EditorScaleFontPercents: integer = 0; //if 0, it follows previous variable
@@ -187,7 +190,6 @@ procedure SSwapEndianWide(var S: UnicodeString);
 procedure SSwapEndianUCS4(var S: UCS4String); inline;
 procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer);
 
-function BoolToPlusMinusOne(b: boolean): integer; inline;
 procedure TrimStringList(L: TStringList); inline;
 
 const
@@ -783,14 +785,6 @@ begin
 
   if (ACharsSkipped>0) then
     ASpacesSkipped:= Offsets[ACharsSkipped-1] div 100;
-end;
-
-const
-  cSignValue: array[boolean] of integer = (-1, 1);
-
-function BoolToPlusMinusOne(b: boolean): integer;
-begin
-  Result:= cSignValue[b];
 end;
 
 function SGetItem(var S: string; const ch: Char = ','): string;

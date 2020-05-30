@@ -31,7 +31,7 @@ begin
   Result:= ALine;
   N:= Result;
   while IsLineFolded(N) and Strings.IsIndexValid(N) do
-    N:= N+BoolToPlusMinusOne(ADown);
+    N:= N+BoolToPlusMinusOne[ADown];
   if Strings.IsIndexValid(N) then Result:= N;
 end;
 

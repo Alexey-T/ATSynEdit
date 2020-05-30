@@ -738,7 +738,7 @@ begin
       begin
         if not Strings.IsIndexValid(Caret.PosY) then Break;
         X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
-        Y:= Caret.PosY+BoolToPlusMinusOne(ADown)*j;
+        Y:= Caret.PosY+BoolToPlusMinusOne[ADown]*j;
         if not Strings.IsIndexValid(Y) then Break;
         X:= Strings.ColumnPosToCharPos(Y, X, FTabHelper);
         MoreCarets.Add(X, Y);
