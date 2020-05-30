@@ -386,9 +386,11 @@ procedure DoPaintHexChars(C: TCanvas;
   APoint: TPoint;
   ACharSize: TPoint;
   AColorFont,
-  AColorBg: TColor);
+  AColorBg: TColor;
+  ASuperFast: boolean);
 const
   HexDigits: array[0..15] of char = '0123456789ABCDEF';
+  HexDummyMark = '?';
 var
   Buf2, Buf4: array[0..5] of char;
   Buf: PChar;
@@ -412,15 +414,21 @@ begin
       R.Left:= APoint.X;
       R.Right:= APoint.X;
 
+      C.Font.Color:= AColorFont;
+      C.Brush.Color:= AColorBg;
+
+      if ASuperFast then
+      begin
+        CanvasTextOutSimplest(C, R.Left, R.Top, HexDummyMark);
+        Continue;
+      end;
+
       for j:= 0 to iChar-2 do
         Inc(R.Left, ADx^[j]);
       R.Right:= R.Left+ADx^[iChar-1];
 
       R.Top:= APoint.Y;
       R.Bottom:= R.Top+ACharSize.Y;
-
-      C.Font.Color:= AColorFont;
-      C.Brush.Color:= AColorBg;
 
       Value:= Ord(ch);
       if Value>=$100 then
@@ -640,7 +648,8 @@ begin
       Point(APosX, APosY),
       AProps.CharSize,
       AProps.ColorUnprintedHexFont,
-      C.Brush.Color
+      C.Brush.Color,
+      AProps.SuperFast
       );
   end
   else
@@ -767,7 +776,8 @@ begin
           APosY+AProps.TextOffsetFromLine),
         AProps.CharSize,
         AProps.ColorUnprintedHexFont,
-        PartPtr^.ColorBG
+        PartPtr^.ColorBG,
+        AProps.SuperFast
         );
 
       //paint 4 borders of part
