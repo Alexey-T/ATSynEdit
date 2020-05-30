@@ -2740,7 +2740,8 @@ begin
 
           CanvasTextOutMinimap(C,
             ARect,
-            CurrPointText,
+            CurrPointText.X,
+            CurrPointText.Y,
             ACharSize,
             FTabSize,
             FLineParts,
@@ -3007,7 +3008,8 @@ begin
       if StrOutput<>'' then
         CanvasTextOutMinimap(C,
           ARect,
-          CurrPointText,
+          CurrPointText.X,
+          CurrPointText.Y,
           ACharSize,
           FTabSize,
           FLineParts,

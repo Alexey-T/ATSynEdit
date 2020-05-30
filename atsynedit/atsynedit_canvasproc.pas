@@ -145,7 +145,7 @@ procedure CanvasTextOut(C: TCanvas;
 
 procedure CanvasTextOutMinimap(C: TCanvas;
   const ARect: TRect;
-  APos: TPoint;
+  APosX, APosY: integer;
   ACharSize: TPoint;
   ATabSize: integer;
   constref AParts: TATLineParts;
@@ -1149,7 +1149,7 @@ begin
 end;
 
 
-procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APos: TPoint;
+procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APosX, APosY: integer;
   ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
   AColorBG: TColor; const ALine: atString; AUsePixels: boolean);
 {
@@ -1199,9 +1199,9 @@ begin
       else
         Inc(NSpaces);
 
-      X1:= APos.X + ACharSize.X*NSpaces;
+      X1:= APosX + ACharSize.X*NSpaces;
       X2:= X1 + ACharSize.X;
-      Y1:= APos.Y;
+      Y1:= APosY;
       Y2:= Y1 + ACharSize.Y;
 
       if (X1>=ARect.Left) and (X1<ARect.Right) then
