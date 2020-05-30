@@ -133,6 +133,8 @@ procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
   X1, Y1, X2, Y2: integer; AtDown: boolean);
 
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
+
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
   AText: atString;
@@ -255,6 +257,15 @@ begin
 end;
 {$endif}
 
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
+//the same as C.TextOut but works faster on Windows
+begin
+  {$ifdef windows}
+  _TextOutSimple_Windows(C.Handle, X, Y, nil, PChar(S), Length(S));
+  {$else}
+  _TextOut_Unix(C.Handle, X, Y, nil, S, nil);
+  {$endif}
+end;
 
 procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
   AScale: integer; AFontColor: TColor); inline;
@@ -444,7 +455,6 @@ procedure DoPaintUnprintedEolText(C: TCanvas;
   AColorFont, AColorBG: TColor);
 var
   NPrevSize: integer;
-  X, Y: integer;
 begin
   if AText='' then Exit;
   NPrevSize:= C.Font.Size;
@@ -452,14 +462,10 @@ begin
   C.Font.Color:= AColorFont;
   C.Brush.Color:= AColorBG;
 
-  X:= APoint.X+OptUnprintedEndFontDx;
-  Y:= APoint.Y+OptUnprintedEndFontDy;
-
-  {$ifdef windows}
-  _TextOutSimple_Windows(C.Handle, X, Y, nil, PChar(AText), Length(AText));
-  {$else}
-  _TextOut_Unix(C.Handle, X, Y, nil, AText, nil);
-  {$endif}
+  CanvasTextOutSimplest(C,
+    APoint.X+OptUnprintedEndFontDx,
+    APoint.Y+OptUnprintedEndFontDy,
+    AText);
 
   C.Font.Size:= NPrevSize;
 end;
