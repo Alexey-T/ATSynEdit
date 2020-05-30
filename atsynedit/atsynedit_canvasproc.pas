@@ -165,7 +165,7 @@ procedure DoPaintUnprintedEolArrow(C: TCanvas;
   AColorFont: TColor);
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
-  APoint: TPoint;
+  AX, AY: integer;
   ACharSize: TPoint;
   AColorFont: TColor);
 
@@ -489,12 +489,12 @@ begin
 end;
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
-  APoint: TPoint;
+  AX, AY: integer;
   ACharSize: TPoint;
   AColorFont: TColor);
 begin
   CanvasArrowWrapped(C,
-    Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+    Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
     AColorFont,
     OptUnprintedWrapArrowLength,
     OptUnprintedWrapArrowWidth,

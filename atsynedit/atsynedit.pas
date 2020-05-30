@@ -3084,7 +3084,8 @@ begin
         //paint wrapped-line-part mark
         if FUnprintedVisible and FUnprintedEnds then
           DoPaintUnprintedWrapMark(C,
-            CoordAfterText,
+            CoordAfterText.X,
+            CoordAfterText.Y,
             ACharSize,
             Colors.UnprintedFont);
       end;
