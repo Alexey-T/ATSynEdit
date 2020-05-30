@@ -914,7 +914,8 @@ type
     procedure DoPaintMicromapTo(C: TCanvas);
     procedure DoPaintMarginsTo(C: TCanvas);
     procedure DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
-    procedure DoPaintFoldedMark(C: TCanvas; APos: TPoint; ACoord: TPoint;
+    procedure DoPaintFoldedMark(C: TCanvas;
+      APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure DoPaintModeStatic;
@@ -3093,8 +3094,10 @@ begin
       //draw collapsed-mark
       if WrapItem.NFinal=cWrapItemCollapsed then
         DoPaintFoldedMark(C,
-          Point(Strings.LinesFoldFrom[NLinesIndex, FEditorIndex]-1, NLinesIndex),
-          CoordAfterText,
+          Strings.LinesFoldFrom[NLinesIndex, FEditorIndex]-1,
+          NLinesIndex,
+          CoordAfterText.X,
+          CoordAfterText.Y,
           GetFoldedMarkText(NLinesIndex));
     end;
 
@@ -3387,7 +3390,8 @@ end;
 
 
 procedure TATSynEdit.DoPaintFoldedMark(C: TCanvas;
-  APos: TPoint; ACoord: TPoint; const AMarkText: string);
+  APosX, APosY, ACoordX, ACoordY: integer;
+  const AMarkText: string);
 var
   NWidth: integer;
   Str: string;
@@ -3402,12 +3406,12 @@ begin
   Str:= FTabHelper.TabsToSpaces(-1, UTF8Decode(Str));
     //expand tabs too
 
-  if APos.X>0 then
-    Inc(ACoord.X, cFoldedMarkIndentOuter);
+  if APosX>0 then
+    Inc(ACoordX, cFoldedMarkIndentOuter);
 
   //set colors:
   //if 1st chars selected, then use selection-color
-  if IsPosSelected(APos.X, APos.Y) then
+  if IsPosSelected(APosX, APosY) then
   begin
     C.Font.Color:= Colors.TextSelFont;
     C.Brush.Color:= Colors.TextSelBG;
@@ -3420,13 +3424,13 @@ begin
 
   //paint text
   C.TextOut(
-    ACoord.X+cFoldedMarkIndentInner,
-    ACoord.Y+FOptTextOffsetFromLine,
+    ACoordX+cFoldedMarkIndentInner,
+    ACoordY+FOptTextOffsetFromLine,
     Str);
   NWidth:= C.TextWidth(Str) + 2*cFoldedMarkIndentInner;
 
   //paint frame
-  RectMark:= Rect(ACoord.X, ACoord.Y, ACoord.X+NWidth, ACoord.Y+FCharSize.Y);
+  RectMark:= Rect(ACoordX, ACoordY, ACoordX+NWidth, ACoordY+FCharSize.Y);
   C.Pen.Color:= Colors.CollapseMarkBorder;
   C.Brush.Style:= bsClear;
   C.Rectangle(RectMark);
@@ -3436,8 +3440,8 @@ begin
   begin
     FoldMark.Init(
       RectMark,
-      APos.Y,
-      APos.Y + DoGetFoldedMarkLinesCount(APos.Y) -1
+      APosY,
+      APosY + DoGetFoldedMarkLinesCount(APosY) -1
       );
 
     InitFoldedMarkList;
