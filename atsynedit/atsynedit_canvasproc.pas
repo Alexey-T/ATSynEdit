@@ -207,15 +207,6 @@ end;
 
 
 {$ifdef windows}
-procedure _TextOutSimple_Windows(DC: HDC;
-  X, Y: Integer;
-  Rect: PRect;
-  Str: PChar;
-  StrLen: integer); inline;
-begin
-  Windows.ExtTextOutA(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, Str, StrLen, nil);
-end;
-
 //to draw font ligatures
 function _TextOut_Windows(DC: HDC;
   X, Y: Integer;
@@ -258,12 +249,11 @@ end;
 {$endif}
 
 procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
-//the same as C.TextOut but works faster on Windows
 begin
   {$ifdef windows}
-  _TextOutSimple_Windows(C.Handle, X, Y, nil, PChar(S), Length(S));
+  Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
-  _TextOut_Unix(C.Handle, X, Y, nil, S, nil);
+  LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
   {$endif}
 end;
 
@@ -433,11 +423,7 @@ begin
           Value:= Value shr 4;
         end;
 
-        {$ifdef windows}
-        _TextOutSimple_Windows(C.Handle, AX, AY, nil, Buf, HexLen);
-        {$else}
         CanvasTextOutSimplest(C, AX, AY, StrPas(Buf));
-        {$endif}
       end;
     end;
 
