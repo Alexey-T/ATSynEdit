@@ -80,7 +80,7 @@ begin
   //Basic Latin
   //Latin-1 Supplement
   //Latin Extended-A
-  for i:= $20 to $24F do
+  for i:= $0 to $24F do
     FixedSizes[i]:= _norm;
 
   //IPA Extensions
@@ -199,6 +199,15 @@ begin
 
   FixedSizes[$3099]:= _comb;
   FixedSizes[$309A]:= _comb;
+
+  //space chars
+  FixedSizes[$1680]:= _norm; //white space
+  FixedSizes[$2007]:= _norm; //figure space
+  FixedSizes[$200B]:= _norm; //zero width space https://en.wikipedia.org/wiki/Zero-width_space
+  FixedSizes[$202F]:= _norm; //narrow no-break space
+  FixedSizes[$205F]:= _norm; //white space
+  FixedSizes[$2060]:= _norm; //white space
+  FixedSizes[$3000]:= _norm; //CJK white space
 
 end;
 
