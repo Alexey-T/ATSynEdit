@@ -295,23 +295,23 @@ procedure DoPaintUnprintedChar(
 var
   R: TRect;
 begin
-    R.Left:= AX;
-    R.Right:= AX;
-    if AIndex>1 then
-      Inc(R.Left, AOffsets[AIndex-2]);
-    Inc(R.Right, AOffsets[AIndex-1]);
+  R.Left:= AX;
+  R.Right:= AX;
+  if AIndex>1 then
+    Inc(R.Left, AOffsets[AIndex-2]);
+  Inc(R.Right, AOffsets[AIndex-1]);
 
-    R.Top:= AY;
-    R.Bottom:= AY+ACharSize.Y;
+  R.Top:= AY;
+  R.Bottom:= AY+ACharSize.Y;
 
-    if ch<>#9 then
-      CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
-    else
-      CanvasArrowHorz(C, R,
-        AColorFont,
-        OptUnprintedTabCharLength*ACharSize.X,
-        true,
-        OptUnprintedTabPointerScale);
+  if ch<>#9 then
+    CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
+  else
+    CanvasArrowHorz(C, R,
+      AColorFont,
+      OptUnprintedTabCharLength*ACharSize.X,
+      true,
+      OptUnprintedTabPointerScale);
 end;
 
 
