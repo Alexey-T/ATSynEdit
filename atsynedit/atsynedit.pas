@@ -7388,12 +7388,12 @@ begin
   FTabHelper.OnCalcLineLen:= @DoCalcLineLen;
 end;
 
+{$ifdef DEBUG_SHOW_FPS}
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);
 var
   NFps, NFpsMap: integer;
   S: string;
 begin
-  {$ifdef DEBUG_SHOW_FPS}
   if FTickAll<1 then
     FTickAll:= 1;
   if FTickMinimap<1 then
@@ -7408,9 +7408,13 @@ begin
   C.Font.Color:= clRed;
   C.Font.Size:= 8;
   C.Brush.Color:= clCream;
-  C.TextOut(ClientWidth-100, 5, S);
-  {$endif}
+  CanvasTextOutSimplest(C, FClientW-100, 5, S);
 end;
+{$else}
+procedure TATSynEdit.DoPaintFPS(C: TCanvas);
+begin
+end;
+{$endif}
 
 
 function TATSynEdit.GetEncodingName: string;
