@@ -396,60 +396,59 @@ const
 var
   Buf: PChar;
   Value, HexLen: integer;
-  R: TRect;
   ch: WideChar;
+  X, Y: integer;
   iChar, j: integer;
+  bColorSet: boolean;
 begin
   if AString='' then Exit;
+  X:= APoint.X;
+  Y:= APoint.Y;
+  bColorSet:= false;
 
   for iChar:= 1 to Length(AString) do
   begin
     ch:= AString[iChar];
     if IsCharHexDisplayed(ch) then
     begin
-      R.Left:= APoint.X;
-      R.Right:= APoint.X;
-
-      C.Font.Color:= AColorFont;
-      C.Brush.Color:= AColorBg;
-
-      for j:= 0 to iChar-2 do
-        Inc(R.Left, ADx^[j]);
-      R.Right:= R.Left+ADx^[iChar-1];
-
-      R.Top:= APoint.Y;
-      R.Bottom:= R.Top+ACharSize.Y;
+      if not bColorSet then
+      begin
+        bColorSet:= true;
+        C.Font.Color:= AColorFont;
+        C.Brush.Color:= AColorBg;
+      end;
 
       if ASuperFast then
-      begin
-        CanvasTextOutSimplest(C, R.Left, R.Top, HexDummyMark);
-        Continue;
-      end;
-
-      Value:= Ord(ch);
-      if Value>=$100 then
-      begin
-        HexLen:= 4;
-        Buf:= @Buf4;
-      end
+        CanvasTextOutSimplest(C, X, Y, HexDummyMark)
       else
       begin
-        HexLen:= 2;
-        Buf:= @Buf2;
-      end;
+        Value:= Ord(ch);
+        if Value>=$100 then
+        begin
+          HexLen:= 4;
+          Buf:= @Buf4;
+        end
+        else
+        begin
+          HexLen:= 2;
+          Buf:= @Buf2;
+        end;
 
-      for j:= 1 to HexLen do
-      begin
-        Buf[HexLen-j+1]:= HexDigits[Value and 15];
-        Value:= Value shr 4;
-      end;
+        for j:= 1 to HexLen do
+        begin
+          Buf[HexLen-j+1]:= HexDigits[Value and 15];
+          Value:= Value shr 4;
+        end;
 
-      {$ifdef windows}
-      _TextOutSimple_Windows(C.Handle, R.Left, R.Top, @R, Buf, HexLen+1);
-      {$else}
-      CanvasTextOutSimplest(C, R.Left, R.Top, StrPas(Buf));
-      {$endif}
+        {$ifdef windows}
+        _TextOutSimple_Windows(C.Handle, X, Y, nil, Buf, HexLen+1);
+        {$else}
+        CanvasTextOutSimplest(C, X, Y, StrPas(Buf));
+        {$endif}
+      end;
     end;
+
+    Inc(X, ADx^[iChar-1]);
   end;
 end;
 
