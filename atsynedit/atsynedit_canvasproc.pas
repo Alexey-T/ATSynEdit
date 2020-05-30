@@ -288,15 +288,13 @@ procedure DoPaintUnprintedChar(
   C: TCanvas;
   ch: WideChar;
   AIndex: integer;
-  const AOffsets: TATIntArray;
+  var AOffsets: TATIntArray;
   APoint: TPoint;
   ACharSize: TPoint;
-  AColorFont: TColor); inline; //many params, many calls, so inline
+  AColorFont: TColor); inline;
 var
   R: TRect;
 begin
-  if IsCharSpace(ch) then
-  begin
     R.Left:= APoint.X;
     R.Right:= APoint.X;
     if AIndex>1 then
@@ -314,7 +312,6 @@ begin
         OptUnprintedTabCharLength*ACharSize.X,
         true,
         OptUnprintedTabPointerScale);
-  end;
 end;
 
 
@@ -816,6 +813,7 @@ begin
     if AProps.ShowUnprintedSpacesOnlyInSelection then
     begin
       for i:= 1 to Length(AText) do
+       if IsCharUnicodeSpace(AText[i]) then
         if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
           DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
     end
@@ -824,9 +822,11 @@ begin
     begin
       //paint leading
       for i:= 1 to SGetIndentChars(AText) do
+       if IsCharUnicodeSpace(AText[i]) then
         DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
       //paint trailing
       for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+       if IsCharUnicodeSpace(AText[i]) then
         DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
     end
     else
@@ -834,12 +834,14 @@ begin
     begin
       //paint trailing
       for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+       if IsCharUnicodeSpace(AText[i]) then
         DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
     end
     else
     begin
       //paint all
       for i:= 1 to Length(AText) do
+       if IsCharUnicodeSpace(AText[i]) then
         DoPaintUnprintedChar(C, AText[i], i, ListInt, Point(APosX, APosY), AProps.CharSize, AProps.ColorUnprintedFont);
     end;
   end;
