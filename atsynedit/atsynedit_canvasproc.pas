@@ -591,6 +591,7 @@ var
   {$ifdef windows}
   bAllowLigatures: boolean;
   {$endif}
+  ch: WideChar;
 begin
   NLen:= Length(AText);
   if NLen=0 then Exit;
@@ -813,36 +814,51 @@ begin
     if AProps.ShowUnprintedSpacesOnlyInSelection then
     begin
       for i:= 1 to Length(AText) do
-       if IsCharUnicodeSpace(AText[i]) then
-        if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
-          DoPaintUnprintedChar(C, AText[i], i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      begin
+        ch:= AText[i];
+        if IsCharUnicodeSpace(ch) then
+          if AProps.DetectIsPosSelected(i-2+AProps.CharIndexInLine, AProps.LineIndex) then
+            DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      end;
     end
     else
     if AProps.ShowUnprintedSpacesBothEnds then
     begin
       //paint leading
       for i:= 1 to SGetIndentChars(AText) do
-       if IsCharUnicodeSpace(AText[i]) then
-        DoPaintUnprintedChar(C, AText[i], i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      begin
+        ch:= AText[i];
+        if IsCharUnicodeSpace(ch) then
+          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      end;
       //paint trailing
       for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
-       if IsCharUnicodeSpace(AText[i]) then
-        DoPaintUnprintedChar(C, AText[i], i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      begin
+        ch:= AText[i];
+        if IsCharUnicodeSpace(ch) then
+          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      end;
     end
     else
     if AProps.ShowUnprintedSpacesTrailing then
     begin
       //paint trailing
       for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
-       if IsCharUnicodeSpace(AText[i]) then
-        DoPaintUnprintedChar(C, AText[i], i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      begin
+        ch:= AText[i];
+        if IsCharUnicodeSpace(ch) then
+          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      end;
     end
     else
     begin
       //paint all
       for i:= 1 to Length(AText) do
-       if IsCharUnicodeSpace(AText[i]) then
-        DoPaintUnprintedChar(C, AText[i], i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      begin
+        ch:= AText[i];
+        if IsCharUnicodeSpace(ch) then
+          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+      end;
     end;
   end;
 
