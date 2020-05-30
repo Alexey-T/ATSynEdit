@@ -379,7 +379,7 @@ end;
 procedure DoPaintHexChars(C: TCanvas;
   const AString: atString;
   ADx: PIntegerArray;
-  APoint: TPoint;
+  AX, AY: integer;
   ACharSize: TPoint;
   AColorFont,
   AColorBg: TColor;
@@ -393,13 +393,10 @@ var
   Buf: PChar;
   Value, HexLen: integer;
   ch: WideChar;
-  X, Y: integer;
   iChar, j: integer;
   bColorSet: boolean;
 begin
   if AString='' then Exit;
-  X:= APoint.X;
-  Y:= APoint.Y;
   bColorSet:= false;
 
   for iChar:= 1 to Length(AString) do
@@ -415,7 +412,7 @@ begin
       end;
 
       if ASuperFast then
-        CanvasTextOutSimplest(C, X, Y, HexDummyMark)
+        CanvasTextOutSimplest(C, AX, AY, HexDummyMark)
       else
       begin
         Value:= Ord(ch);
@@ -437,14 +434,14 @@ begin
         end;
 
         {$ifdef windows}
-        _TextOutSimple_Windows(C.Handle, X, Y, nil, Buf, HexLen);
+        _TextOutSimple_Windows(C.Handle, AX, AY, nil, Buf, HexLen);
         {$else}
-        CanvasTextOutSimplest(C, X, Y, StrPas(Buf));
+        CanvasTextOutSimplest(C, AX, AY, StrPas(Buf));
         {$endif}
       end;
     end;
 
-    Inc(X, ADx^[iChar-1]);
+    Inc(AX, ADx^[iChar-1]);
   end;
 end;
 
@@ -637,7 +634,8 @@ begin
     DoPaintHexChars(C,
       AText,
       @Dx[0],
-      Point(APosX, APosY),
+      APosX,
+      APosY,
       AProps.CharSize,
       AProps.ColorUnprintedHexFont,
       C.Brush.Color,
@@ -763,9 +761,8 @@ begin
       DoPaintHexChars(C,
         PartStr,
         @Dx[PartOffset],
-        Point(
-          APosX+PixOffset1,
-          APosY+AProps.TextOffsetFromLine),
+        APosX+PixOffset1,
+        APosY+AProps.TextOffsetFromLine,
         AProps.CharSize,
         AProps.ColorUnprintedHexFont,
         PartPtr^.ColorBG,
