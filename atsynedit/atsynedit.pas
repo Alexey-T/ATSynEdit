@@ -3073,7 +3073,8 @@ begin
               Colors.UnprintedBG)
           else
             DoPaintUnprintedEolArrow(C,
-              CoordAfterText,
+              CoordAfterText.X,
+              CoordAfterText.Y,
               ACharSize,
               Colors.UnprintedFont);
         end;

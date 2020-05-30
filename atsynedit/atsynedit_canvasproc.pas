@@ -160,7 +160,7 @@ procedure DoPaintUnprintedEolText(C: TCanvas;
   AColorFont, AColorBG: TColor);
 
 procedure DoPaintUnprintedEolArrow(C: TCanvas;
-  APoint: TPoint;
+  AX, AY: integer;
   ACharSize: TPoint;
   AColorFont: TColor);
 
@@ -470,20 +470,20 @@ begin
 end;
 
 procedure DoPaintUnprintedEolArrow(C: TCanvas;
-  APoint: TPoint;
+  AX, AY: integer;
   ACharSize: TPoint;
   AColorFont: TColor);
 begin
   if OptUnprintedEndArrowOrDot then
     CanvasArrowDown(C,
-      Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+      Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
       AColorFont,
       OptUnprintedEndArrowLength,
       OptUnprintedTabPointerScale
       )
   else
     CanvasUnprintedSpace(C,
-      Rect(APoint.X, APoint.Y, APoint.X+ACharSize.X, APoint.Y+ACharSize.Y),
+      Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
       OptUnprintedEndDotScale,
       AColorFont);
 end;
