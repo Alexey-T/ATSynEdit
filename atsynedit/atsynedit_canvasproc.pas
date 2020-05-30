@@ -413,18 +413,18 @@ begin
       C.Font.Color:= AColorFont;
       C.Brush.Color:= AColorBg;
 
-      if ASuperFast then
-      begin
-        CanvasTextOutSimplest(C, R.Left, R.Top, HexDummyMark);
-        Continue;
-      end;
-
       for j:= 0 to iChar-2 do
         Inc(R.Left, ADx^[j]);
       R.Right:= R.Left+ADx^[iChar-1];
 
       R.Top:= APoint.Y;
       R.Bottom:= R.Top+ACharSize.Y;
+
+      if ASuperFast then
+      begin
+        CanvasTextOutSimplest(C, R.Left, R.Top, HexDummyMark);
+        Continue;
+      end;
 
       Value:= Ord(ch);
       if Value>=$100 then
