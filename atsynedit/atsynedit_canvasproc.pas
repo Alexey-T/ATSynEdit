@@ -391,9 +391,9 @@ procedure DoPaintHexChars(C: TCanvas;
 const
   HexDigits: array[0..15] of char = '0123456789ABCDEF';
   HexDummyMark = '?';
-  HexPrefix = 'x';
+  Buf2: array[0..3] of char = 'x'#0#0#0;
+  Buf4: array[0..5] of char = 'x'#0#0#0#0#0;
 var
-  Buf2, Buf4: array[0..5] of char;
   Buf: PChar;
   Value, HexLen: integer;
   R: TRect;
@@ -401,11 +401,6 @@ var
   iChar, j: integer;
 begin
   if AString='' then Exit;
-
-  FillChar(Buf2, SizeOf(Buf2), 0);
-  FillChar(Buf4, SizeOf(Buf4), 0);
-  Buf2[0]:= HexPrefix;
-  Buf4[0]:= HexPrefix;
 
   for iChar:= 1 to Length(AString) do
   begin
