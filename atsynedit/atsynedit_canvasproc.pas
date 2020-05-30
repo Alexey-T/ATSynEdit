@@ -444,16 +444,23 @@ procedure DoPaintUnprintedEolText(C: TCanvas;
   AColorFont, AColorBG: TColor);
 var
   NPrevSize: integer;
+  X, Y: integer;
 begin
   if AText='' then Exit;
   NPrevSize:= C.Font.Size;
   C.Font.Size:= NPrevSize * OptUnprintedEndFontScale div 100;
   C.Font.Color:= AColorFont;
   C.Brush.Color:= AColorBG;
-  C.TextOut(
-    APoint.X+OptUnprintedEndFontDx,
-    APoint.Y+OptUnprintedEndFontDy,
-    AText);
+
+  X:= APoint.X+OptUnprintedEndFontDx;
+  Y:= APoint.Y+OptUnprintedEndFontDy;
+
+  {$ifdef windows}
+  _TextOutSimple_Windows(C.Handle, X, Y, nil, PChar(AText), Length(AText));
+  {$else}
+  _TextOut_Unix(C.Handle, X, Y, nil, AText, nil);
+  {$endif}
+
   C.Font.Size:= NPrevSize;
 end;
 
