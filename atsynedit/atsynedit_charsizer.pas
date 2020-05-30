@@ -59,6 +59,7 @@ var
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
 function IsCharAccent(ch: WideChar): boolean; inline;
+function IsCharUnicodeSpace(ch: WideChar): boolean; inline;
 function IsCharHexDisplayed(ch: WideChar): boolean;
 
 
@@ -66,10 +67,12 @@ implementation
 
 var
   FixedSizes: packed array[word] of byte;
+
 const
   _norm = 1;
   _full = 2;
-  _comb = 3;
+  _space = 3;
+  _comb = 4;
 
 procedure InitFixedSizes;
 var
@@ -201,13 +204,16 @@ begin
   FixedSizes[$309A]:= _comb;
 
   //space chars
-  FixedSizes[$1680]:= _norm; //white space
-  FixedSizes[$2007]:= _norm; //figure space
-  FixedSizes[$200B]:= _norm; //zero width space https://en.wikipedia.org/wiki/Zero-width_space
-  FixedSizes[$202F]:= _norm; //narrow no-break space
-  FixedSizes[$205F]:= _norm; //white space
-  FixedSizes[$2060]:= _norm; //white space
-  FixedSizes[$3000]:= _norm; //CJK white space
+  FixedSizes[$9]:= _space;
+  FixedSizes[$20]:= _space;
+  FixedSizes[$A0]:= _space; //no-break space, NBSP, often used on macOS
+  FixedSizes[$1680]:= _space; //white space
+  FixedSizes[$2007]:= _space; //figure space
+  FixedSizes[$200B]:= _space; //zero width space https://en.wikipedia.org/wiki/Zero-width_space
+  FixedSizes[$202F]:= _space; //narrow no-break space
+  FixedSizes[$205F]:= _space; //white space
+  FixedSizes[$2060]:= _space; //white space
+  FixedSizes[$3000]:= _space; //CJK white space
 
 end;
 
@@ -243,6 +249,11 @@ end;
 function IsCharAccent(ch: WideChar): boolean;
 begin
   Result:= FixedSizes[Ord(ch)]=_comb;
+end;
+
+function IsCharUnicodeSpace(ch: WideChar): boolean;
+begin
+  Result:= FixedSizes[Ord(ch)]=_space;
 end;
 
 {$ifdef windows}
@@ -308,14 +319,15 @@ end;
 function TATCharSizer.GetCharWidth(ch: WideChar): integer;
 var
   n: word absolute ch;
-  size: integer;
 begin
   Result:= 100;
 
-  size:= FixedSizes[n];
-  if size=_norm then exit;
-  if size=_full then exit(OptCharScaleFullWidth);
-  if size=_comb then exit(0);
+  case FixedSizes[n] of
+    _norm: exit;
+    _full: exit(OptCharScaleFullWidth);
+    _space: exit;
+    _comb: exit(0);
+  end;
 
   if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
