@@ -205,6 +205,15 @@ end;
 
 
 {$ifdef windows}
+procedure _TextOutSimple_Windows(DC: HDC;
+  X, Y: Integer;
+  Rect: PRect;
+  Str: PChar;
+  StrLen: integer); inline;
+begin
+  Windows.ExtTextOutA(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, Str, StrLen, nil);
+end;
+
 //to draw font ligatures
 function _TextOut_Windows(DC: HDC;
   X, Y: Integer;
@@ -368,26 +377,33 @@ procedure DoPaintHexChars(C: TCanvas;
   AColorFont,
   AColorBg: TColor);
 const
-  cHexWidth: array[boolean] of integer = (2, 4);
+  HexDigits: array[0..15] of char = '0123456789ABCDEF';
 var
-  Buf: string;
+  Buf2, Buf4: array[0..5] of char;
+  Buf: PChar;
+  Value, HexLen: integer;
   R: TRect;
   ch: WideChar;
-  i, j: integer;
+  iChar, j: integer;
 begin
   if AString='' then Exit;
 
-  for i:= 1 to Length(AString) do
+  FillChar(Buf2, SizeOf(Buf2), 0);
+  FillChar(Buf4, SizeOf(Buf4), 0);
+  Buf2[0]:= 'x';
+  Buf4[0]:= 'x';
+
+  for iChar:= 1 to Length(AString) do
   begin
-    ch:= AString[i];
+    ch:= AString[iChar];
     if IsCharHexDisplayed(ch) then
     begin
       R.Left:= APoint.X;
       R.Right:= APoint.X;
 
-      for j:= 0 to i-2 do
+      for j:= 0 to iChar-2 do
         Inc(R.Left, ADx^[j]);
-      R.Right:= R.Left+ADx^[i-1];
+      R.Right:= R.Left+ADx^[iChar-1];
 
       R.Top:= APoint.Y;
       R.Bottom:= R.Top+ACharSize.Y;
@@ -395,12 +411,28 @@ begin
       C.Font.Color:= AColorFont;
       C.Brush.Color:= AColorBg;
 
-      Buf:= 'x'+IntToHex(Ord(ch), cHexWidth[Ord(ch)>=$100]);
+      Value:= Ord(ch);
+      if Value>=$100 then
+      begin
+        HexLen:= 4;
+        Buf:= @Buf4;
+      end
+      else
+      begin
+        HexLen:= 2;
+        Buf:= @Buf2;
+      end;
+
+      for j:= 1 to HexLen do
+      begin
+        Buf[HexLen-j+1]:= HexDigits[Value and 15];
+        Value:= Value shr 4;
+      end;
 
       {$ifdef windows}
-      _TextOut_Windows(C.Handle, R.Left, R.Top, @R, Buf, nil, false);
+      _TextOutSimple_Windows(C.Handle, R.Left, R.Top, @R, Buf, HexLen+1);
       {$else}
-      _TextOut_Unix(C.Handle, R.Left, R.Top, nil, Buf, nil);
+      _TextOut_Unix(C.Handle, R.Left, R.Top, nil, StrPas(Buf), nil);
       {$endif}
     end;
   end;
