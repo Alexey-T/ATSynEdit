@@ -1663,6 +1663,7 @@ procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
 var
   NX, NPrevFontSize, NRulerStart, NOutput,
   NTopIndent, NMarkHeight, i: integer;
+  NCharW: integer;
   Str: string;
 begin
   NPrevFontSize:= C.Font.Size;
@@ -1680,6 +1681,8 @@ begin
   C.Line(FRectRuler.Left, FRectRuler.Bottom-1,
          FRectRuler.Right, FRectRuler.Bottom-1);
 
+  NCharW:= FCharSize.X * FOptRulerFontSizePercents div 100;
+
   for i:= NRulerStart to NRulerStart+GetVisibleColumns+1 do
   begin
     case FOptRulerNumeration of
@@ -1689,7 +1692,7 @@ begin
           if (i mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput);
-            C.TextOut(NX - C.TextWidth(Str) div 2, NTopIndent, Str);
+            CanvasTextOutSimplest(C, NX - NCharW*Length(Str) div 2, NTopIndent, Str);
           end;
         end;
       cRulerNumeration_1_11_21:
@@ -1698,7 +1701,7 @@ begin
           if (i mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput+1{!});
-            C.TextOut(NX - C.TextWidth(Str) div 2, NTopIndent, Str);
+            CanvasTextOutSimplest(C, NX - NCharW*Length(Str) div 2, NTopIndent, Str);
           end;
         end;
       cRulerNumeration_1_10_20:
@@ -1707,7 +1710,7 @@ begin
           if (NOutput=1) or (NOutput mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput);
-            C.TextOut(NX - C.TextWidth(Str) div 2, NTopIndent, Str);
+            CanvasTextOutSimplest(C, NX - NCharW*Length(Str) div 2, NTopIndent, Str);
           end;
         end;
     end;
@@ -5871,7 +5874,7 @@ begin
       CoordX:= (ABand.Left + ABand.Right - Size) div 2;
   end;
 
-  C.TextOut(CoordX, ACoordTop, Str);
+  CanvasTextOutSimplest(C, CoordX, ACoordTop, Str);
 end;
 
 
