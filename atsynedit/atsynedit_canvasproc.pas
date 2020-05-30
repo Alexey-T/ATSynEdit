@@ -280,7 +280,6 @@ begin
   R.Top:= (ARect.Top+ARect.Bottom) div 2 - NSize div 2;
   R.Right:= R.Left + NSize;
   R.Bottom:= R.Top + NSize;
-  C.Pen.Color:= AFontColor;
   C.Brush.Color:= AFontColor;
   C.FillRect(R);
 end;
