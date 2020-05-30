@@ -425,23 +425,23 @@ begin
         Value:= Ord(ch);
         if Value>=$100 then
         begin
-          HexLen:= 4;
+          HexLen:= 5;
           Buf:= @Buf4;
         end
         else
         begin
-          HexLen:= 2;
+          HexLen:= 3;
           Buf:= @Buf2;
         end;
 
-        for j:= 1 to HexLen do
+        for j:= 1 to HexLen-1 do
         begin
-          Buf[HexLen-j+1]:= HexDigits[Value and 15];
+          Buf[HexLen-j]:= HexDigits[Value and 15];
           Value:= Value shr 4;
         end;
 
         {$ifdef windows}
-        _TextOutSimple_Windows(C.Handle, X, Y, nil, Buf, HexLen+1);
+        _TextOutSimple_Windows(C.Handle, X, Y, nil, Buf, HexLen);
         {$else}
         CanvasTextOutSimplest(C, X, Y, StrPas(Buf));
         {$endif}
