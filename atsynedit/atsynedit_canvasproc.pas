@@ -397,13 +397,11 @@ begin
 
       Buf:= 'x'+IntToHex(Ord(ch), cHexWidth[Ord(ch)>=$100]);
 
-      ExtTextOut(C.Handle,
-        R.Left, R.Top,
-        ETO_CLIPPED+ETO_OPAQUE,
-        @R,
-        PChar(Buf),
-        Length(Buf),
-        nil);
+      {$ifdef windows}
+      _TextOut_Windows(C.Handle, R.Left, R.Top, @R, Buf, nil, false);
+      {$else}
+      _TextOut_Unix(C.Handle, R.Left, R.Top, nil, Buf, nil);
+      {$endif}
     end;
   end;
 end;
