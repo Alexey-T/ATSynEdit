@@ -1007,6 +1007,7 @@ type
     procedure UpdateMinimapAutosize;
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
+    procedure UpdateClientSizes;
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
@@ -2149,8 +2150,9 @@ end;
 
 function TATSynEdit.UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
 var
-  bVert1, bVert2,
-  bHorz1, bHorz2: boolean;
+  bVert1, bVert2, bHorz1, bHorz2: boolean;
+  bVertOur1, bVertOur2, bHorzOur1, bHorzOur2: boolean;
+  bChangedBarsOs, bChangedBarsOur: boolean;
   NPos, NLineIndex, NGapPos, NGapAll: integer;
 begin
   Result:= false;
@@ -2208,13 +2210,23 @@ begin
 
   bVert1:= ShowOsBarVert;
   bHorz1:= ShowOsBarHorz;
+  bVertOur1:= FScrollbarVert.Visible;
+  bHorzOur1:= FScrollbarHorz.Visible;
 
   UpdateScrollbarVert;
   UpdateScrollbarHorz;
 
   bVert2:= ShowOsBarVert;
   bHorz2:= ShowOsBarHorz;
-  Result:= (bVert1<>bVert2) or (bHorz1<>bHorz2);
+  bVertOur2:= FScrollbarVert.Visible;
+  bHorzOur2:= FScrollbarHorz.Visible;
+
+  bChangedBarsOs:= (bVert1<>bVert2) or (bHorz1<>bHorz2);
+  bChangedBarsOur:= (bVertOur1<>bVertOur2) or (bHorzOur1<>bHorzOur2);
+  Result:= bChangedBarsOs;
+
+  if bChangedBarsOs or bChangedBarsOur then
+    UpdateClientSizes;
 
   if (FPrevHorz<>FScrollHorz) or
     (FPrevVert<>FScrollVert) then
@@ -2427,9 +2439,14 @@ begin
   R.Bottom:= R.Top + FRulerHeight;
 end;
 
-procedure TATSynEdit.UpdateInitialVars(C: TCanvas);
+procedure TATSynEdit.UpdateClientSizes;
 begin
   GetClientSizes(FClientW, FClientH);
+end;
+
+procedure TATSynEdit.UpdateInitialVars(C: TCanvas);
+begin
+  UpdateClientSizes;
 
   C.Font.Name:= Font.Name;
   C.Font.Size:= DoScaleFont(Font.Size);
