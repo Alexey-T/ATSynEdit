@@ -289,18 +289,23 @@ function STestStringMatch(
 //- index check must be in caller
 var
   ch, chFind: WideChar;
-  LenLine, i: integer;
+  MaxCount, i: integer;
 begin
-  LenLine:= Length(SLine);
-  for i:= 1 to Length(SFind) do
-  begin
-    if CharIndex>LenLine then Break;
-    chFind:= SFind[i];
-    ch:= SLine[CharIndex];
-    Inc(CharIndex);
+  MaxCount:= Min(Length(SFind), Length(SLine)-CharIndex+1);
 
-    if not CaseSens then
+  if CaseSens then
+    for i:= 1 to MaxCount do
     begin
+      if SFind[i]<>SLine[CharIndex] then
+        exit(false);
+      Inc(CharIndex);
+    end
+  else
+    for i:= 1 to MaxCount do
+    begin
+      chFind:= SFind[i];
+      ch:= SLine[CharIndex];
+
       //like UpCase(char)
       if (ch>='a') and (ch<='z') then
         Dec(ch, 32)
@@ -308,11 +313,11 @@ begin
       //call slow WideUpperCase only non-ASCII
       if ch>=#$80 then
         ch:= WideUpperCase(ch)[1];
-    end;
 
-    if chFind<>ch then
-      exit(false);
-  end;
+      if chFind<>ch then
+        exit(false);
+      Inc(CharIndex);
+    end;
 
   Result:= true;
 end;
