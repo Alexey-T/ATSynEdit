@@ -288,35 +288,41 @@ function STestStringMatch(
 //- if case-insensitive, StrFind must be already in uppercase
 //- index check must be in caller
 var
-  ch, chFind: WideChar;
+  pf, ps: PWideChar;
+  ch: WideChar;
   MaxCount, i: integer;
 begin
   MaxCount:= Min(Length(SFind), Length(SLine)-CharIndex+1);
+  if MaxCount=0 then exit(false);
+
+  pf:= @SFind[1];
+  ps:= @SLine[CharIndex];
 
   if CaseSens then
     for i:= 1 to MaxCount do
     begin
-      if SFind[i]<>SLine[CharIndex] then
+      if pf^<>ps^ then
         exit(false);
-      Inc(CharIndex);
+      Inc(pf);
+      Inc(ps);
     end
   else
     for i:= 1 to MaxCount do
     begin
-      chFind:= SFind[i];
-      ch:= SLine[CharIndex];
+      ch:= ps^;
 
       //like UpCase(char)
       if (ch>='a') and (ch<='z') then
         Dec(ch, 32)
       else
       //call slow WideUpperCase only non-ASCII
-      if ch>=#$80 then
+      if Ord(ch)>=$80 then
         ch:= WideUpperCase(ch)[1];
 
-      if chFind<>ch then
+      if pf^<>ch then
         exit(false);
-      Inc(CharIndex);
+      Inc(pf);
+      Inc(ps);
     end;
 
   Result:= true;
