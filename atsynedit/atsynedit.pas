@@ -761,6 +761,7 @@ type
     FOptAllowRepaintOnTextChange: boolean;
     FOptAllowReadOnly: boolean;
     FOptZebraActive: boolean;
+    FOptZebraStep: integer;
     FOptZebraAlphaBlend: byte;
 
     //
@@ -1625,6 +1626,7 @@ type
     property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine default true;
     property OptPasteMultilineTextSpreadsToCarets: boolean read FOptPasteMultilineTextSpreadsToCarets write FOptPasteMultilineTextSpreadsToCarets default true;
     property OptZebraActive: boolean read FOptZebraActive write FOptZebraActive default false;
+    property OptZebraStep: integer read FOptZebraStep write FOptZebraStep default 2;
     property OptZebraAlphaBlend: byte read FOptZebraAlphaBlend write FOptZebraAlphaBlend default cInitZebraAlphaBlend;
   end;
 
@@ -2908,7 +2910,7 @@ begin
       bHiliteLinesWithSelection);
 
     if AMainText and FOptZebraActive then
-      if Odd(NLinesIndex) then
+      if NLinesIndex mod FOptZebraStep = FOptZebraStep-1 then
         NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
 
     C.Brush.Color:= NColorEntire;
@@ -3869,6 +3871,7 @@ begin
   FOptPasteAtEndMakesFinalEmptyLine:= true;
   FOptPasteMultilineTextSpreadsToCarets:= true;
   FOptZebraActive:= false;
+  FOptZebraStep:= 2;
   FOptZebraAlphaBlend:= cInitZebraAlphaBlend;
 
   FMouseDownPnt:= Point(-1, -1);

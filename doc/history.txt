@@ -1,4 +1,7 @@
 
+2020.06.02
++ add: OptZebraStep (default=2)
+
 2020.05.29
 + add: optimize AdapterCache: use TDeque instead of list
 + add: use predefined char-widths for many unicode ranges (Russian German CJK Indian etc)
