@@ -91,7 +91,6 @@ type
     chkUnprintEndDet: TCheckBox;
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
-    chkZebra: TCheckBox;
     ComboMsClick2: TComboBox;
     comboRulerStyle: TComboBox;
     edCrHeightNormal: TSpinEdit;
@@ -231,7 +230,6 @@ begin
     chkSaveTrimEmptyLines.Checked:= ed.OptSavingTrimFinalEmptyLines;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
     chkClickLink.Checked:= ed.OptMouseClickOpensURL;
-    chkZebra.Checked:= ed.OptZebraActive;
     chkPasteSpread.Checked:= ed.OptPasteMultilineTextSpreadsToCarets;
 
     //unprint
@@ -363,7 +361,6 @@ begin
       ed.OptSavingTrimFinalEmptyLines:= chkSaveTrimEmptyLines.Checked;
       ed.OptShowScrollHint:= chkScrollHint.Checked;
       ed.OptMouseClickOpensURL:= chkClickLink.Checked;
-      ed.OptZebraActive:= chkZebra.Checked;
       ed.OptPasteMultilineTextSpreadsToCarets:= chkPasteSpread.Checked;
 
       //unprint
