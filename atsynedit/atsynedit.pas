@@ -4893,6 +4893,11 @@ begin
       Exit
     end;
 
+  //don't fire OnChangeCaretPos on right click
+  if Button<>mbLeft then
+    if not FOptMouseRightClickMovesCaret then
+      exit;
+
   DoCaretsSort;
   DoEventCarets;
   Update;
