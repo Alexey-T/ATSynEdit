@@ -2910,7 +2910,7 @@ begin
       bHiliteLinesWithSelection);
 
     if AMainText and FOptZebraActive then
-      if NLinesIndex mod FOptZebraStep = FOptZebraStep-1 then
+      if (NLinesIndex+1) mod FOptZebraStep = 0 then
         NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
 
     C.Brush.Color:= NColorEntire;
