@@ -2,20 +2,20 @@ object fmOpt: TfmOpt
   Left = 422
   Height = 390
   Top = 224
-  Width = 640
+  Width = 713
   BorderStyle = bsDialog
   Caption = 'Options'
   ClientHeight = 390
-  ClientWidth = 640
+  ClientWidth = 713
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poScreenCenter
   LCLVersion = '2.1.0.0'
   object ButtonPanel1: TButtonPanel
     Left = 6
-    Height = 29
-    Top = 355
-    Width = 628
+    Height = 33
+    Top = 351
+    Width = 701
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
@@ -31,22 +31,22 @@ object fmOpt: TfmOpt
   end
   object PageControl1: TPageControl
     Left = 6
-    Height = 343
+    Height = 339
     Top = 6
-    Width = 628
-    ActivePage = TabSheet5
+    Width = 701
+    ActivePage = TabSheet6
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 4
+    TabIndex = 9
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'general'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       OnContextPopup = TabSheet1ContextPopup
       object chkCurLine: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 8
         Width = 169
         Caption = 'highlight currrent line'
@@ -54,7 +54,7 @@ object fmOpt: TfmOpt
       end
       object chkCurCol: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 48
         Width = 188
         Caption = 'highlight current column'
@@ -62,33 +62,33 @@ object fmOpt: TfmOpt
       end
       object chkLastOnTop: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 68
-        Width = 163
+        Width = 162
         Caption = 'show last line on top'
         TabOrder = 3
       end
       object chkCopyNoSel: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 8
-        Width = 225
+        Width = 224
         Caption = 'copy entire line if no selection'
         TabOrder = 9
       end
       object chkShowFullSel: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 88
-        Width = 201
+        Width = 200
         Caption = 'show selection BG full size'
         TabOrder = 4
       end
       object chkOvrPaste: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 68
-        Width = 256
+        Width = 255
         Caption = 'consider overwrite-mode on paste'
         TabOrder = 12
       end
@@ -102,22 +102,22 @@ object fmOpt: TfmOpt
       end
       object edNonWordChars: TEdit
         Left = 296
-        Height = 27
+        Height = 33
         Top = 272
         Width = 106
         TabOrder = 17
       end
       object chkDotLn: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 48
-        Width = 235
+        Width = 234
         Caption = 'show wrapped-indent vert lines'
         TabOrder = 11
       end
       object chkCutNoSel: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 28
         Width = 214
         Caption = 'cut entire line if no selection'
@@ -125,31 +125,31 @@ object fmOpt: TfmOpt
       end
       object chkSaveTrim: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 88
-        Width = 192
+        Width = 191
         Caption = 'on save: trim trail spaces'
         TabOrder = 13
       end
       object chkSaveEol: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 108
-        Width = 184
+        Width = 183
         Caption = 'on save: ensure final eol'
         TabOrder = 14
       end
       object chkScrollHint: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 160
-        Width = 242
+        Width = 241
         Caption = 'show hint on dragging vert-scroll'
         TabOrder = 7
       end
       object chkCurLineMin: TCheckBox
         Left = 32
-        Height = 24
+        Height = 23
         Top = 28
         Width = 112
         Caption = 'minimal part'
@@ -157,7 +157,7 @@ object fmOpt: TfmOpt
       end
       object edTextHint: TEdit
         Left = 296
-        Height = 27
+        Height = 33
         Top = 244
         Width = 106
         TabOrder = 16
@@ -166,37 +166,37 @@ object fmOpt: TfmOpt
         Left = 408
         Height = 17
         Top = 249
-        Width = 127
+        Width = 126
         Caption = 'hint for empty text'
         ParentColor = False
       end
       object chkShowFullHilite: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 108
-        Width = 238
+        Width = 236
         Caption = 'show syntax-regions BG full size'
         TabOrder = 5
       end
       object chkClickLink: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 184
-        Width = 190
+        Width = 189
         Caption = 'open URL by simple click'
         TabOrder = 6
       end
       object chkSaveTrimEmptyLines: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 128
-        Width = 224
+        Width = 223
         Caption = 'on save: trim final empty lines'
         TabOrder = 15
       end
       object chkZebra: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 128
         Width = 106
         Caption = 'zebra mode'
@@ -208,12 +208,12 @@ object fmOpt: TfmOpt
         Top = 200
         Width = 186
         Caption = 'undo'
-        ClientHeight = 86
-        ClientWidth = 182
+        ClientHeight = 87
+        ClientWidth = 184
         TabOrder = 18
         object edUndo: TSpinEdit
           Left = 8
-          Height = 27
+          Height = 33
           Top = 6
           Width = 72
           Increment = 1000
@@ -232,7 +232,7 @@ object fmOpt: TfmOpt
         end
         object chkUndoGr: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 40
           Width = 120
           Caption = 'grouped undo'
@@ -240,26 +240,26 @@ object fmOpt: TfmOpt
         end
         object chkUndoSv: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 61
-          Width = 130
+          Width = 129
           Caption = 'undo after save'
           TabOrder = 2
         end
       end
       object chkPasteSpread: TCheckBox
         Left = 296
-        Height = 24
+        Height = 23
         Top = 207
-        Width = 312
+        Width = 310
         Caption = 'paste multi-line text spreads text to carets'
         TabOrder = 19
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'gutter'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       object Label10: TLabel
         Left = 136
         Height = 17
@@ -388,16 +388,16 @@ object fmOpt: TfmOpt
     end
     object TabSheet9: TTabSheet
       Caption = 'gutter cols'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       object GroupBox2: TGroupBox
         Left = 8
         Height = 248
         Top = 4
         Width = 272
         Caption = 'sizes of columns'
-        ClientHeight = 229
-        ClientWidth = 268
+        ClientHeight = 230
+        ClientWidth = 270
         TabOrder = 0
         object chkGutterBm: TCheckBox
           Left = 8
@@ -540,8 +540,8 @@ object fmOpt: TfmOpt
         Top = 4
         Width = 191
         Caption = 'order of columns'
-        ClientHeight = 229
-        ClientWidth = 187
+        ClientHeight = 230
+        ClientWidth = 189
         TabOrder = 1
         object ListCol: TListBox
           Left = 8
@@ -575,8 +575,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet10: TTabSheet
       Caption = 'ruler'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       object edRulerSize: TSpinEdit
         Left = 16
         Height = 27
@@ -657,19 +657,19 @@ object fmOpt: TfmOpt
     end
     object TabSheet5: TTabSheet
       Caption = 'keys'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       object chkNavUpDown: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 8
-        Width = 262
+        Width = 259
         Caption = 'up/down: navigate in wrapped lines'
         TabOrder = 0
       end
       object chkLeftRtSwap: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 48
         Width = 206
         Caption = 'left/right: swap edge of sel'
@@ -677,7 +677,7 @@ object fmOpt: TfmOpt
       end
       object chkHomeNonspace: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 88
         Width = 177
         Caption = 'home: to nonspace chr'
@@ -685,7 +685,7 @@ object fmOpt: TfmOpt
       end
       object edPageSize: TComboBox
         Left = 8
-        Height = 27
+        Height = 29
         Top = 280
         Width = 106
         ItemHeight = 0
@@ -701,21 +701,21 @@ object fmOpt: TfmOpt
         Left = 120
         Height = 17
         Top = 284
-        Width = 126
+        Width = 124
         Caption = 'page-up/down size'
         ParentColor = False
       end
       object chkOvrSel: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 168
-        Width = 163
+        Width = 160
         Caption = 'overwrite sel by text'
         TabOrder = 8
       end
       object chkEndNonspace: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 108
         Width = 164
         Caption = 'end: to nonspace chr'
@@ -723,7 +723,7 @@ object fmOpt: TfmOpt
       end
       object chkTabSpaces: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 188
         Width = 116
         Caption = 'tab as spaces'
@@ -731,25 +731,25 @@ object fmOpt: TfmOpt
       end
       object chkNavHomeEnd: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 28
-        Width = 271
+        Width = 270
         Caption = 'home/end: navigate in wrapped lines'
         TabOrder = 1
       end
       object chkPageKeepRel: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 128
-        Width = 288
+        Width = 285
         Caption = 'page-up/down: keep relative top offset'
         TabOrder = 6
       end
       object chkKeepCol: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 148
-        Width = 319
+        Width = 316
         Caption = 'up/down: keep column (caret after eol =off)'
         TabOrder = 7
       end
@@ -759,20 +759,20 @@ object fmOpt: TfmOpt
         Top = 4
         Width = 304
         Caption = 'indents'
-        ClientHeight = 158
-        ClientWidth = 300
+        ClientHeight = 159
+        ClientWidth = 302
         TabOrder = 11
         object chkUnindentKeepAlign: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 64
-          Width = 163
+          Width = 162
           Caption = 'unindent keeps align'
           TabOrder = 3
         end
         object edIndentSize: TSpinEdit
           Left = 8
-          Height = 27
+          Height = 33
           Top = 88
           Width = 50
           MaxValue = 30
@@ -790,7 +790,7 @@ object fmOpt: TfmOpt
         end
         object edIndentKind: TComboBox
           Left = 8
-          Height = 27
+          Height = 29
           Top = 120
           Width = 106
           ItemHeight = 0
@@ -813,7 +813,7 @@ object fmOpt: TfmOpt
         end
         object chkEnterIndent: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 4
           Width = 147
           Caption = 'enter: auto-indent'
@@ -821,7 +821,7 @@ object fmOpt: TfmOpt
         end
         object chkTabIndent: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 44
           Width = 152
           Caption = 'tab: also indent sel'
@@ -829,7 +829,7 @@ object fmOpt: TfmOpt
         end
         object chkBackspUnindent: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 24
           Width = 281
           Caption = 'bksp: auto-unindent (on 1st nonspace)'
@@ -838,25 +838,25 @@ object fmOpt: TfmOpt
       end
       object chkLeftRtSwapAndSel: TCheckBox
         Left = 24
-        Height = 24
+        Height = 23
         Top = 68
-        Width = 109
+        Width = 108
         Caption = 'and keep sel'
         TabOrder = 3
       end
       object chkBkspGoPrev: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 208
-        Width = 218
+        Width = 217
         Caption = 'bksp: allow to go to prev line'
         TabOrder = 12
       end
     end
     object TabSheet3: TTabSheet
       Caption = 'mouse'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       object chkMsClick3: TCheckBox
         Left = 8
         Height = 24
@@ -957,8 +957,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet4: TTabSheet
       Caption = 'carets'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       object edCrTime: TSpinEdit
         Left = 8
         Height = 27
@@ -1073,8 +1073,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet7: TTabSheet
       Caption = 'minimap'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       object chkMapSelBorder: TCheckBox
         Left = 8
         Height = 24
@@ -1110,8 +1110,8 @@ object fmOpt: TfmOpt
     end
     object TabSheet8: TTabSheet
       Caption = 'unprinted'
-      ClientHeight = 312
-      ClientWidth = 624
+      ClientHeight = 308
+      ClientWidth = 691
       object chkUnprintAsciiRep: TCheckBox
         Left = 8
         Height = 24
@@ -1207,6 +1207,54 @@ object fmOpt: TfmOpt
         Width = 162
         Caption = '.. only at end of lines'
         TabOrder = 5
+      end
+    end
+    object TabSheet6: TTabSheet
+      Caption = 'zebra'
+      ClientHeight = 308
+      ClientWidth = 691
+      object chkZebraActive: TCheckBox
+        Left = 8
+        Height = 23
+        Top = 24
+        Width = 149
+        Caption = 'zebra mode active'
+        TabOrder = 0
+      end
+      object edZebraAlpha: TSpinEdit
+        Left = 8
+        Height = 33
+        Top = 56
+        Width = 82
+        MaxValue = 255
+        MinValue = 1
+        TabOrder = 1
+        Value = 1
+      end
+      object LabelZebraAlpha: TLabel
+        Left = 97
+        Height = 17
+        Top = 62
+        Width = 79
+        Caption = 'alpha-blend'
+        ParentColor = False
+      end
+      object edZebraStep: TSpinEdit
+        Left = 8
+        Height = 33
+        Top = 96
+        Width = 82
+        MinValue = 2
+        TabOrder = 2
+        Value = 2
+      end
+      object LabelZebraStep: TLabel
+        Left = 99
+        Height = 17
+        Top = 103
+        Width = 71
+        Caption = 'zebra step'
+        ParentColor = False
       end
     end
   end

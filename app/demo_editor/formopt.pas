@@ -19,6 +19,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkZebraActive: TCheckBox;
     chkBkspGoPrev: TCheckBox;
     chkPasteSpread: TCheckBox;
     chkUndoGr: TCheckBox;
@@ -125,6 +126,7 @@ type
     LabChars: TLabel;
     Label1: TLabel;
     Label10: TLabel;
+    LabelZebraAlpha: TLabel;
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
@@ -136,6 +138,7 @@ type
     Label2: TLabel;
     Label20: TLabel;
     Label21: TLabel;
+    LabelZebraStep: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
@@ -149,12 +152,15 @@ type
     ListCol: TListBox;
     PageControl1: TPageControl;
     edCrWidthNormal: TSpinEdit;
+    edZebraAlpha: TSpinEdit;
+    edZebraStep: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet10: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
+    TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TabSheet8: TTabSheet;
     TabSheet9: TTabSheet;
@@ -326,6 +332,11 @@ begin
     chkUndoGr.Checked:= ed.OptUndoGrouped;
     chkUndoSv.Checked:= ed.OptUndoAfterSave;
 
+    //zebra
+    chkZebraActive.Checked:= ed.OptZebraActive;
+    edZebraAlpha.Value:= ed.OptZebraAlphaBlend;
+    edZebraStep.Value:= ed.OptZebraStep;
+
     if ShowModal=mrOk then
     begin
       ed.GutterBandBookmarks:= ListCol.Items.IndexOf(nameBm);
@@ -452,6 +463,11 @@ begin
       ed.OptUndoLimit:= edUndo.Value;
       ed.OptUndoGrouped:= chkUndoGr.Checked;
       ed.OptUndoAfterSave:= chkUndoSv.Checked;
+
+      //zebra
+      ed.OptZebraActive     := chkZebraActive.Checked;
+      ed.OptZebraAlphaBlend := edZebraAlpha.Value;
+      ed.OptZebraStep       := edZebraStep.Value;
 
       //apply
       ed.Gutter.Update;
