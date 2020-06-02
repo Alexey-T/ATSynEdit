@@ -236,9 +236,11 @@ begin
   case ch of
     '0'..'9',
     'a'..'z',
-    'A'..'Z',
-    '_':
+    'A'..'Z':
       exit(true);
+    '_':
+      // to make '_' non-word char, specify it as _first_ in ANonWordChars
+      exit( (ANonWordChars='') or (ANonWordChars[1]<>'_') );
     #0..' ':
       exit(false);
   end;
