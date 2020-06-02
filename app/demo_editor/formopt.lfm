@@ -40,7 +40,7 @@ object fmOpt: TfmOpt
     TabIndex = 0
     TabOrder = 0
     object TabSheet1: TTabSheet
-      Caption = 'general'
+      Caption = 'show'
       ClientHeight = 308
       ClientWidth = 691
       OnContextPopup = TabSheet1ContextPopup
@@ -55,7 +55,7 @@ object fmOpt: TfmOpt
       object chkCurCol: TCheckBox
         Left = 8
         Height = 23
-        Top = 48
+        Top = 56
         Width = 188
         Caption = 'highlight current column'
         TabOrder = 2
@@ -63,109 +63,61 @@ object fmOpt: TfmOpt
       object chkLastOnTop: TCheckBox
         Left = 8
         Height = 23
-        Top = 68
+        Top = 80
         Width = 162
         Caption = 'show last line on top'
         TabOrder = 3
       end
-      object chkCopyNoSel: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 8
-        Width = 224
-        Caption = 'copy entire line if no selection'
-        TabOrder = 8
-      end
       object chkShowFullSel: TCheckBox
         Left = 8
         Height = 23
-        Top = 88
+        Top = 170
         Width = 200
         Caption = 'show selection BG full size'
         TabOrder = 4
       end
-      object chkOvrPaste: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 68
-        Width = 255
-        Caption = 'consider overwrite-mode on paste'
-        TabOrder = 11
-      end
       object LabChars: TLabel
-        Left = 408
+        Left = 448
         Height = 17
-        Top = 276
+        Top = 152
         Width = 103
         Caption = 'non-word chars'
         ParentColor = False
       end
       object edNonWordChars: TEdit
-        Left = 296
+        Left = 336
         Height = 33
-        Top = 272
+        Top = 144
         Width = 106
-        TabOrder = 16
-      end
-      object chkDotLn: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 48
-        Width = 234
-        Caption = 'show wrapped-indent vert lines'
-        TabOrder = 10
-      end
-      object chkCutNoSel: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 28
-        Width = 214
-        Caption = 'cut entire line if no selection'
-        TabOrder = 9
-      end
-      object chkSaveTrim: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 88
-        Width = 191
-        Caption = 'on save: trim trail spaces'
-        TabOrder = 12
-      end
-      object chkSaveEol: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 108
-        Width = 183
-        Caption = 'on save: ensure final eol'
-        TabOrder = 13
+        TabOrder = 8
       end
       object chkScrollHint: TCheckBox
-        Left = 296
+        Left = 8
         Height = 23
-        Top = 160
+        Top = 128
         Width = 241
         Caption = 'show hint on dragging vert-scroll'
-        TabOrder = 7
+        TabOrder = 6
       end
       object chkCurLineMin: TCheckBox
         Left = 32
         Height = 23
-        Top = 28
+        Top = 32
         Width = 112
         Caption = 'minimal part'
         TabOrder = 1
       end
       object edTextHint: TEdit
-        Left = 296
+        Left = 336
         Height = 33
-        Top = 244
+        Top = 104
         Width = 106
-        TabOrder = 15
+        TabOrder = 7
       end
       object LabelHint: TLabel
-        Left = 408
+        Left = 448
         Height = 17
-        Top = 249
+        Top = 112
         Width = 126
         Caption = 'hint for empty text'
         ParentColor = False
@@ -173,79 +125,71 @@ object fmOpt: TfmOpt
       object chkShowFullHilite: TCheckBox
         Left = 8
         Height = 23
-        Top = 108
+        Top = 192
         Width = 236
         Caption = 'show syntax-regions BG full size'
         TabOrder = 5
       end
-      object chkClickLink: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 184
-        Width = 189
-        Caption = 'open URL by simple click'
-        TabOrder = 6
-      end
-      object chkSaveTrimEmptyLines: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 128
-        Width = 223
-        Caption = 'on save: trim final empty lines'
-        TabOrder = 14
-      end
-      object GroupBox3: TGroupBox
+      object chkDotLn: TCheckBox
         Left = 8
-        Height = 105
-        Top = 200
-        Width = 186
-        Caption = 'undo'
-        ClientHeight = 87
-        ClientWidth = 184
-        TabOrder = 17
-        object edUndo: TSpinEdit
+        Height = 23
+        Top = 104
+        Width = 234
+        Caption = 'show wrapped-indent vert lines'
+        TabOrder = 9
+      end
+      object GroupBox4: TGroupBox
+        Left = 336
+        Height = 81
+        Top = 8
+        Width = 353
+        Caption = 'zebra mode'
+        ClientHeight = 63
+        ClientWidth = 351
+        TabOrder = 10
+        object chkZebraActive: TCheckBox
+          Left = 8
+          Height = 23
+          Top = 0
+          Width = 66
+          Caption = 'active'
+          TabOrder = 0
+        end
+        object edZebraAlpha: TSpinEdit
           Left = 8
           Height = 33
-          Top = 6
-          Width = 72
-          Increment = 1000
-          MaxValue = 100000
-          MinValue = 1000
-          TabOrder = 0
-          Value = 1000
+          Top = 24
+          Width = 66
+          MaxValue = 255
+          MinValue = 1
+          TabOrder = 1
+          Value = 1
         end
-        object Label6: TLabel
-          Left = 88
+        object LabelZebraAlpha: TLabel
+          Left = 80
           Height = 17
-          Top = 8
-          Width = 68
-          Caption = 'undo limit'
+          Top = 32
+          Width = 79
+          Caption = 'alpha-blend'
           ParentColor = False
         end
-        object chkUndoGr: TCheckBox
-          Left = 8
-          Height = 23
-          Top = 40
-          Width = 120
-          Caption = 'grouped undo'
-          TabOrder = 1
-        end
-        object chkUndoSv: TCheckBox
-          Left = 8
-          Height = 23
-          Top = 61
-          Width = 129
-          Caption = 'undo after save'
+        object edZebraStep: TSpinEdit
+          Left = 184
+          Height = 33
+          Top = 24
+          Width = 66
+          MinValue = 2
           TabOrder = 2
+          Value = 2
         end
-      end
-      object chkPasteSpread: TCheckBox
-        Left = 296
-        Height = 23
-        Top = 207
-        Width = 310
-        Caption = 'paste multi-line text spreads text to carets'
-        TabOrder = 18
+        object LabelZebraStep: TLabel
+          Left = 256
+          Height = 17
+          Top = 32
+          Width = 30
+          Caption = 'step'
+          ParentColor = False
+        end
       end
     end
     object TabSheet2: TTabSheet
@@ -262,7 +206,7 @@ object fmOpt: TfmOpt
       end
       object edNumStyle: TComboBox
         Left = 8
-        Height = 27
+        Height = 29
         Top = 8
         Width = 122
         ItemHeight = 0
@@ -277,31 +221,31 @@ object fmOpt: TfmOpt
       end
       object chkShowNumBg: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 108
-        Width = 266
+        Width = 264
         Caption = 'show numbers back-color for carets'
         TabOrder = 4
       end
       object chkShowNum1st: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 68
-        Width = 191
+        Width = 190
         Caption = 'show number for 1st line'
         TabOrder = 2
       end
       object chkShowNumCr: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 88
-        Width = 192
+        Width = 191
         Caption = 'show numbers for carets'
         TabOrder = 3
       end
       object edNumChar: TEdit
         Left = 288
-        Height = 27
+        Height = 33
         Top = 44
         Width = 58
         TabOrder = 9
@@ -310,13 +254,13 @@ object fmOpt: TfmOpt
         Left = 352
         Height = 17
         Top = 48
-        Width = 262
+        Width = 261
         Caption = 'char to show when line number skipped'
         ParentColor = False
       end
       object edPlusSize: TSpinEdit
         Left = 288
-        Height = 27
+        Height = 33
         Top = 12
         Width = 58
         MaxValue = 40
@@ -333,23 +277,23 @@ object fmOpt: TfmOpt
       end
       object chkShowFoldAlways: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 128
-        Width = 167
+        Width = 165
         Caption = 'show fold-bar always'
         TabOrder = 5
       end
       object chkShowFoldLines: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 148
-        Width = 127
+        Width = 126
         Caption = 'show fold-lines'
         TabOrder = 6
       end
       object chkShowFoldLinesAll: TCheckBox
         Left = 24
-        Height = 24
+        Height = 23
         Top = 168
         Width = 108
         Caption = 'all line parts'
@@ -357,7 +301,7 @@ object fmOpt: TfmOpt
       end
       object edNumAlign: TComboBox
         Left = 8
-        Height = 27
+        Height = 29
         Top = 36
         Width = 122
         ItemHeight = 0
@@ -393,7 +337,7 @@ object fmOpt: TfmOpt
         TabOrder = 0
         object chkGutterBm: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 0
           Width = 96
           Caption = 'bookmark'
@@ -401,7 +345,7 @@ object fmOpt: TfmOpt
         end
         object chkGutterNum: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 28
           Width = 85
           Caption = 'numbers'
@@ -409,7 +353,7 @@ object fmOpt: TfmOpt
         end
         object chkGutterStat: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 112
           Width = 95
           Caption = 'line states'
@@ -417,7 +361,7 @@ object fmOpt: TfmOpt
         end
         object chkGutterEmpty: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 196
           Width = 69
           Caption = 'empty'
@@ -425,7 +369,7 @@ object fmOpt: TfmOpt
         end
         object edSizeBm: TSpinEdit
           Left = 112
-          Height = 27
+          Height = 33
           Top = 0
           Width = 50
           MinValue = 1
@@ -434,7 +378,7 @@ object fmOpt: TfmOpt
         end
         object edSizeState: TSpinEdit
           Left = 112
-          Height = 27
+          Height = 33
           Top = 112
           Width = 50
           MinValue = 1
@@ -443,7 +387,7 @@ object fmOpt: TfmOpt
         end
         object edSizeEmpty: TSpinEdit
           Left = 112
-          Height = 27
+          Height = 33
           Top = 196
           Width = 50
           MinValue = 1
@@ -452,7 +396,7 @@ object fmOpt: TfmOpt
         end
         object chkGutterFold: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 140
           Width = 74
           Caption = 'folding'
@@ -460,7 +404,7 @@ object fmOpt: TfmOpt
         end
         object edSizeFold: TSpinEdit
           Left = 112
-          Height = 27
+          Height = 33
           Top = 140
           Width = 50
           MinValue = 1
@@ -469,7 +413,7 @@ object fmOpt: TfmOpt
         end
         object edSizeNumIndent: TSpinEdit
           Left = 112
-          Height = 27
+          Height = 33
           Top = 28
           Width = 50
           MaxValue = 500
@@ -477,7 +421,7 @@ object fmOpt: TfmOpt
         end
         object edSizeNum: TSpinEdit
           Left = 112
-          Height = 27
+          Height = 33
           Top = 56
           Width = 50
           MinValue = 1
@@ -502,7 +446,7 @@ object fmOpt: TfmOpt
         end
         object chkGutterNumAuto: TCheckBox
           Left = 112
-          Height = 24
+          Height = 23
           Top = 88
           Width = 83
           Caption = 'autosize'
@@ -510,7 +454,7 @@ object fmOpt: TfmOpt
         end
         object chkGutterSep: TCheckBox
           Left = 8
-          Height = 24
+          Height = 23
           Top = 168
           Width = 93
           Caption = 'separator'
@@ -518,7 +462,7 @@ object fmOpt: TfmOpt
         end
         object edSizeSep: TSpinEdit
           Left = 112
-          Height = 27
+          Height = 33
           Top = 168
           Width = 50
           MinValue = 1
@@ -541,7 +485,7 @@ object fmOpt: TfmOpt
           Top = 0
           Width = 98
           ItemHeight = 0
-          ScrollWidth = 94
+          ScrollWidth = 96
           TabOrder = 0
           TopIndex = -1
         end
@@ -571,7 +515,7 @@ object fmOpt: TfmOpt
       ClientWidth = 691
       object edRulerSize: TSpinEdit
         Left = 16
-        Height = 27
+        Height = 33
         Top = 16
         Width = 58
         MaxValue = 900
@@ -589,7 +533,7 @@ object fmOpt: TfmOpt
       end
       object edRulerFSize: TSpinEdit
         Left = 16
-        Height = 27
+        Height = 33
         Top = 48
         Width = 58
         MaxValue = 900
@@ -608,7 +552,7 @@ object fmOpt: TfmOpt
       end
       object edRulerIndent: TSpinEdit
         Left = 16
-        Height = 27
+        Height = 33
         Top = 80
         Width = 58
         MaxValue = 500
@@ -626,7 +570,7 @@ object fmOpt: TfmOpt
       end
       object comboRulerStyle: TComboBox
         Left = 16
-        Height = 27
+        Height = 29
         Top = 112
         Width = 120
         ItemHeight = 0
@@ -851,7 +795,7 @@ object fmOpt: TfmOpt
       ClientWidth = 691
       object chkMsClick3: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 56
         Width = 173
         Caption = 'triple click selects line'
@@ -859,7 +803,7 @@ object fmOpt: TfmOpt
       end
       object chkMsClick2Drag: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 80
         Width = 221
         Caption = 'dbl click + drag selects words'
@@ -867,23 +811,23 @@ object fmOpt: TfmOpt
       end
       object chkMsDragDrop: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 100
-        Width = 135
+        Width = 134
         Caption = 'drag-drop of txt'
         TabOrder = 3
       end
       object chkMsRtClickMove: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 120
-        Width = 176
+        Width = 175
         Caption = 'right click moves caret'
         TabOrder = 4
       end
       object chkMsClickNumSel: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 140
         Width = 208
         Caption = 'click on number selects line'
@@ -891,23 +835,23 @@ object fmOpt: TfmOpt
       end
       object chkMsNiceScroll: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 160
-        Width = 327
+        Width = 324
         Caption = 'browser-scroll: middle click and mouse-move'
         TabOrder = 6
       end
       object chkMsHideCursor: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 184
-        Width = 197
+        Width = 196
         Caption = 'hide cursor on typing text'
         TabOrder = 7
       end
       object chkMsNormalSel: TCheckBox
         Left = 328
-        Height = 24
+        Height = 23
         Top = 9
         Width = 218
         Caption = 'normal selection with mouse'
@@ -915,7 +859,7 @@ object fmOpt: TfmOpt
       end
       object chkMsColumnSel: TCheckBox
         Left = 328
-        Height = 24
+        Height = 23
         Top = 32
         Width = 260
         Caption = 'column selection (Alt+) with mouse'
@@ -923,7 +867,7 @@ object fmOpt: TfmOpt
       end
       object ComboMsClick2: TComboBox
         Left = 8
-        Height = 27
+        Height = 29
         Top = 16
         Width = 152
         ItemHeight = 0
@@ -941,7 +885,7 @@ object fmOpt: TfmOpt
         AnchorSideTop.Side = asrCenter
         Left = 168
         Height = 17
-        Top = 21
+        Top = 22
         Width = 126
         Caption = 'double-click action'
         ParentColor = False
@@ -1106,15 +1050,15 @@ object fmOpt: TfmOpt
       ClientWidth = 691
       object chkUnprintAsciiRep: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 208
-        Width = 162
+        Width = 161
         Caption = 'show ascii 0-31 as "."'
         TabOrder = 7
       end
       object edTabArrowSize: TSpinEdit
         Left = 304
-        Height = 27
+        Height = 33
         Top = 8
         Width = 50
         MaxValue = 16
@@ -1124,13 +1068,13 @@ object fmOpt: TfmOpt
         Left = 360
         Height = 17
         Top = 12
-        Width = 140
+        Width = 139
         Caption = 'tab-arrow len (0: full)'
         ParentColor = False
       end
       object edTabArrowPnt: TSpinEdit
         Left = 304
-        Height = 27
+        Height = 33
         Top = 36
         Width = 50
         MaxValue = 50
@@ -1140,21 +1084,21 @@ object fmOpt: TfmOpt
         Left = 360
         Height = 17
         Top = 40
-        Width = 175
+        Width = 174
         Caption = 'tab-arrow pointer size (%)'
         ParentColor = False
       end
       object chkUnprintEn: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 8
-        Width = 233
+        Width = 232
         Caption = 'show unprinted (global enable)'
         TabOrder = 0
       end
       object chkUnprintSpace: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 27
         Width = 119
         Caption = '.. spaces/tabs'
@@ -1162,7 +1106,7 @@ object fmOpt: TfmOpt
       end
       object chkUnprintEnd: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 47
         Width = 97
         Caption = '.. line-ends'
@@ -1170,23 +1114,23 @@ object fmOpt: TfmOpt
       end
       object chkUnprintEndDet: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 67
-        Width = 252
+        Width = 251
         Caption = '.. line-ends details (win, unix, mac)'
         TabOrder = 3
       end
       object chkUnprintArrowDown: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 184
-        Width = 319
+        Width = 316
         Caption = 'show arrow-down instead of dot, at line end'
         TabOrder = 6
       end
       object chkUnprintOnlyBothEnds: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 112
         Width = 207
         Caption = '.. only at begin+end of lines'
@@ -1194,59 +1138,125 @@ object fmOpt: TfmOpt
       end
       object chkUnprintOnlyEnd: TCheckBox
         Left = 8
-        Height = 24
+        Height = 23
         Top = 136
         Width = 162
         Caption = '.. only at end of lines'
         TabOrder = 5
       end
     end
-    object TabSheet6: TTabSheet
-      Caption = 'zebra'
+    object TabSheet11: TTabSheet
+      Caption = 'actions'
       ClientHeight = 308
       ClientWidth = 691
-      object chkZebraActive: TCheckBox
+      object chkCopyNoSel: TCheckBox
         Left = 8
         Height = 23
-        Top = 24
-        Width = 149
-        Caption = 'zebra mode active'
+        Top = 8
+        Width = 231
+        Caption = 'copy - entire line if no selection'
         TabOrder = 0
       end
-      object edZebraAlpha: TSpinEdit
+      object chkOvrPaste: TCheckBox
         Left = 8
-        Height = 33
+        Height = 23
         Top = 56
-        Width = 82
-        MaxValue = 255
-        MinValue = 1
+        Width = 242
+        Caption = 'paste - consider overwrite-mode'
         TabOrder = 1
-        Value = 1
       end
-      object LabelZebraAlpha: TLabel
-        Left = 97
-        Height = 17
-        Top = 62
-        Width = 79
-        Caption = 'alpha-blend'
-        ParentColor = False
-      end
-      object edZebraStep: TSpinEdit
+      object chkSaveTrim: TCheckBox
         Left = 8
-        Height = 33
-        Top = 96
-        Width = 82
-        MinValue = 2
+        Height = 23
+        Top = 184
+        Width = 191
+        Caption = 'on save: trim trail spaces'
         TabOrder = 2
-        Value = 2
       end
-      object LabelZebraStep: TLabel
-        Left = 99
-        Height = 17
-        Top = 103
-        Width = 71
-        Caption = 'zebra step'
-        ParentColor = False
+      object chkSaveEol: TCheckBox
+        Left = 8
+        Height = 23
+        Top = 204
+        Width = 183
+        Caption = 'on save: ensure final eol'
+        TabOrder = 3
+      end
+      object chkSaveTrimEmptyLines: TCheckBox
+        Left = 8
+        Height = 23
+        Top = 224
+        Width = 223
+        Caption = 'on save: trim final empty lines'
+        TabOrder = 4
+      end
+      object chkCutNoSel: TCheckBox
+        Left = 8
+        Height = 23
+        Top = 32
+        Width = 221
+        Caption = 'cut - entire line if no selection'
+        TabOrder = 5
+      end
+      object chkClickLink: TCheckBox
+        Left = 8
+        Height = 23
+        Top = 136
+        Width = 189
+        Caption = 'open URL by simple click'
+        TabOrder = 6
+      end
+      object chkPasteSpread: TCheckBox
+        Left = 8
+        Height = 23
+        Top = 80
+        Width = 317
+        Caption = 'paste - multi-line text spreads text to carets'
+        TabOrder = 7
+      end
+      object GroupBox3: TGroupBox
+        Left = 392
+        Height = 105
+        Top = 8
+        Width = 186
+        Caption = 'undo'
+        ClientHeight = 87
+        ClientWidth = 184
+        TabOrder = 8
+        object edUndo: TSpinEdit
+          Left = 8
+          Height = 33
+          Top = 6
+          Width = 72
+          Increment = 1000
+          MaxValue = 100000
+          MinValue = 1000
+          TabOrder = 0
+          Value = 1000
+        end
+        object Label6: TLabel
+          Left = 88
+          Height = 17
+          Top = 8
+          Width = 68
+          Caption = 'undo limit'
+          ParentColor = False
+        end
+        object chkUndoGr: TCheckBox
+          Left = 8
+          Height = 23
+          Top = 40
+          Width = 120
+          Caption = 'grouped undo'
+          TabOrder = 1
+        end
+        object chkUndoSv: TCheckBox
+          Left = 8
+          Height = 23
+          Top = 61
+          Width = 129
+          Caption = 'undo after save'
+          TabOrder = 2
+        end
       end
     end
   end
