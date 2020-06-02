@@ -4894,7 +4894,7 @@ begin
     end;
 
   //don't fire OnChangeCaretPos on right click
-  if Button<>mbLeft then
+  if Button=mbRight then
     if not FOptMouseRightClickMovesCaret then
       exit;
 
