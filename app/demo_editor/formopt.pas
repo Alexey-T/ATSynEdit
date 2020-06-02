@@ -23,7 +23,7 @@ type
     chkCopyNoSel: TCheckBox;
     chkCutNoSel: TCheckBox;
     chkDotLn: TCheckBox;
-    chkOvrPaste: TCheckBox;
+    chkPasteOvr: TCheckBox;
     chkPasteSpread: TCheckBox;
     chkSaveEol: TCheckBox;
     chkSaveTrim: TCheckBox;
@@ -120,10 +120,10 @@ type
     edUndo: TSpinEdit;
     edZebraAlpha: TSpinEdit;
     edZebraStep: TSpinEdit;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
-    GroupBox3: TGroupBox;
-    GroupBox4: TGroupBox;
+    grpOrderCols: TGroupBox;
+    grpSizeCols: TGroupBox;
+    grpUndo: TGroupBox;
+    grpZebra: TGroupBox;
     groupIndent: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
@@ -222,7 +222,7 @@ begin
     chkShowFullHilite.Checked:= ed.OptShowFullWidthForSyntaxHilite;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
-    chkOvrPaste.Checked:= ed.OptOverwriteAllowedOnPaste;
+    chkPasteOvr.Checked:= ed.OptOverwriteAllowedOnPaste;
     chkDotLn.Checked:= ed.OptShowIndentLines;
     edTextHint.Text:= ed.OptTextHint;
     edNonWordChars.Text:= UTF8Encode(ed.OptNonWordChars);
@@ -350,7 +350,7 @@ begin
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptTextHint:= edTextHint.Text;
       ed.OptNonWordChars:= UTF8Decode(edNonWordChars.Text);
-      ed.OptOverwriteAllowedOnPaste:= chkOvrPaste.Checked;
+      ed.OptOverwriteAllowedOnPaste:= chkPasteOvr.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
       ed.OptShowFullWidthForSelection:= chkShowFullSel.Checked;
