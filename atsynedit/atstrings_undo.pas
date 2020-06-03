@@ -18,7 +18,8 @@ type
     aeaChangeEol,
     aeaInsert,
     aeaDelete,
-    aeaClearModified
+    aeaClearModified,
+    aeaCaretJump
     );
 
 const
@@ -27,7 +28,8 @@ const
     'change-eol',
     'insert',
     'delete',
-    'clear-mod'
+    'clear-mod',
+    'jump'
     );
 
 type

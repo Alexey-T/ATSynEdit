@@ -343,6 +343,7 @@ type
     procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: integer);
     procedure ActionReverseLines;
     procedure ActionShuffleLines;
+    procedure ActionAddJumpToUndo;
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const AFilename: string);
@@ -2017,6 +2018,11 @@ begin
 
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
+end;
+
+procedure TATStrings.ActionAddJumpToUndo;
+begin
+  DoAddUndo(aeaCaretJump, 0, '', cEndNone, cLineStateNone);
 end;
 
 

@@ -4797,8 +4797,10 @@ begin
 
     if ActionId=cMouseActionClickSimple then
     begin
-      FSelRect:= cRectEmpty;
       Strings.SetGroupMark;
+      Strings.ActionAddJumpToUndo;
+
+      FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
 
       if Assigned(PosDetails.OnGapItem) then
