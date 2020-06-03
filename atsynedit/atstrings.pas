@@ -1778,8 +1778,7 @@ begin
   //ShowMessage('Undo list:'#10+FUndolist.DebugText);
 
   repeat
-    if (List.Count=0) then Break;
-    if (List.Count=1) and (List[0].ItemAction=cEditActionClearModified) then Break;
+    if List.IsEmpty then Break;
 
     DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);
 
