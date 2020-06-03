@@ -130,6 +130,8 @@ type
     procedure Init(const S: string; AEnd: TATLineEnds);
     procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineStateToChanged;
+    procedure LineStateToSaved;
+    procedure LineStateToNone;
     function IsFake: boolean; inline;
     function IndentSize: integer;
     function CharLenWithoutSpace: integer;
@@ -647,6 +649,17 @@ begin
     cLineStateSaved:
       Ex.State:= TATBits2(cLineStateChanged);
   end;
+end;
+
+procedure TATStringItem.LineStateToSaved;
+begin
+  if TATLineState(Ex.State)<>cLineStateNone then
+    Ex.State:= TATBits2(cLineStateSaved);
+end;
+
+procedure TATStringItem.LineStateToNone;
+begin
+  Ex.State:= TATBits2(cLineStateNone);
 end;
 
 function TATStringItem.LineSub(AFrom, ALen: integer): UnicodeString;
@@ -1467,12 +1480,9 @@ begin
   begin
     Item:= FList.GetItem(i);
     if ASaved then
-    begin
-      if TATLineState(Item^.Ex.State)<>cLineStateNone then
-        Item^.Ex.State:= TATBits2(cLineStateSaved);
-    end
+      Item^.LineStateToSaved
     else
-      Item^.Ex.State:= TATBits2(cLineStateNone);
+      Item^.LineStateToNone;
   end;
 end;
 
