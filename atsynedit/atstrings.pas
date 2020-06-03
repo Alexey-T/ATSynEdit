@@ -1765,9 +1765,15 @@ begin
   if not Assigned(FRedoList) then Exit;
 
   if AUndo then
-    begin List:= FUndoList; ListOther:= FRedoList end
+  begin
+    List:= FUndoList;
+    ListOther:= FRedoList;
+  end
   else
-    begin List:= FRedoList; ListOther:= FUndoList end;
+  begin
+    List:= FRedoList;
+    ListOther:= FUndoList;
+  end;
 
   //ShowMessage('Undo list:'#10+FUndolist.DebugText);
 
