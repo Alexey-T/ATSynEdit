@@ -14,11 +14,11 @@ uses
 
 type
   TATEditAction = (
-    cEditActionChange,
-    cEditActionChangeEol,
-    cEditActionInsert,
-    cEditActionDelete,
-    cEditActionClearModified
+    aeaChange,
+    aeaChangeEol,
+    aeaInsert,
+    aeaDelete,
+    aeaClearModified
     );
 
 const
@@ -263,7 +263,7 @@ begin
   i2:= Items[N2];
   if not Assigned(i1) or not Assigned(i2) then Exit;
   Result:=
-    (i1.ItemAction=cEditActionChange) and
+    (i1.ItemAction=aeaChange) and
     (i1.ItemAction=i2.ItemAction) and
     (i1.ItemIndex=i2.ItemIndex) and
     (i1.ItemText=i2.ItemText);
@@ -300,7 +300,7 @@ begin
   if FLocked then Exit;
 
   //not dup change?
-  if (Count>0) and (AAction in [cEditActionChange, cEditActionChangeEol]) then
+  if (Count>0) and (AAction in [aeaChange, aeaChangeEol]) then
   begin
     Item:= Items[Count-1];
     if (Item.ItemAction=AAction) and
@@ -310,10 +310,10 @@ begin
   end;
 
   //not insert/delete same index?
-  if (Count>0) and (AAction=cEditActionDelete) then
+  if (Count>0) and (AAction=aeaDelete) then
   begin
     Item:= Items[Count-1];
-    if (Item.ItemAction=cEditActionInsert) and
+    if (Item.ItemAction=aeaInsert) and
       (Item.ItemIndex=AIndex) then
       begin
         DeleteLast;
@@ -340,11 +340,11 @@ begin
   //don't do two marks
   Item:= Last;
   if Assigned(Item) then
-    if Item.ItemAction=cEditActionClearModified then exit;
+    if Item.ItemAction=aeaClearModified then exit;
 
   SetLength(Carets, 0);
   Item:= TATUndoItem.Create(
-    cEditActionClearModified, 0, '',
+    aeaClearModified, 0, '',
     cEndNone, cLineStateNone,
     false, false, Carets);
   FList.Add(Item);
@@ -355,7 +355,7 @@ var
   i: integer;
 begin
   for i:= Count-1 downto 0 do
-    if Items[i].ItemAction=cEditActionClearModified then
+    if Items[i].ItemAction=aeaClearModified then
       Delete(i);
 end;
 
@@ -385,7 +385,7 @@ function TATUndoList.IsEmpty: boolean;
 begin
   Result:=
     (Count=0) or
-    ((Count=1) and (Items[0].ItemAction=cEditActionClearModified));
+    ((Count=1) and (Items[0].ItemAction=aeaClearModified));
 end;
 
 

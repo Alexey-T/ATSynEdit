@@ -975,7 +975,7 @@ begin
   if FReadOnly then Exit;
   Item:= FList.GetItem(AIndex);
 
-  DoAddUndo(cEditActionChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
+  DoAddUndo(aeaChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
   DoEventLog(AIndex);
   DoEventChange(cLineChangeEdited, AIndex, 1);
 
@@ -1012,7 +1012,7 @@ begin
 
   Item:= FList.GetItem(AIndex);
 
-  DoAddUndo(cEditActionChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState);
+  DoAddUndo(aeaChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState);
 
   Item^.Ex.Ends:= TATBits2(AValue);
   Item^.LineStateToChanged;
@@ -1240,7 +1240,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
-  DoAddUndo(cEditActionInsert, Count, '', cEndNone, cLineStateNone);
+  DoAddUndo(aeaInsert, Count, '', cEndNone, cLineStateNone);
   DoEventLog(Count);
   DoEventChange(cLineChangeAdded, Count, 1);
 
@@ -1295,7 +1295,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
-  DoAddUndo(cEditActionInsert, ALineIndex, '', cEndNone, cLineStateNone);
+  DoAddUndo(aeaInsert, ALineIndex, '', cEndNone, cLineStateNone);
 
   if AWithEvent then
   begin
@@ -1345,7 +1345,7 @@ begin
   begin
     for i:= 0 to NCount-1 do
     begin
-      DoAddUndo(cEditActionInsert, ALineIndex+i, '', cEndNone, cLineStateNone);
+      DoAddUndo(aeaInsert, ALineIndex+i, '', cEndNone, cLineStateNone);
 
       Item.Init(
         ABlock.GetLine(i),
@@ -1394,7 +1394,7 @@ begin
     Item:= FList.GetItem(ALineIndex);
 
     if AWithUndo then
-      DoAddUndo(cEditActionDelete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
+      DoAddUndo(aeaDelete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
 
     if AWithEvent then
     begin
@@ -1639,7 +1639,7 @@ begin
   AHardMarked:= Item.ItemHardMark;
   NCount:= AUndoList.Count;
   AHardMarkedNext:= (NCount>1) and (AUndoList[NCount-2].ItemHardMark);
-  AUnmodifiedNext:= (NCount>1) and (AUndoList[NCount-2].ItemAction=cEditActionClearModified);
+  AUnmodifiedNext:= (NCount>1) and (AUndoList[NCount-2].ItemAction=aeaClearModified);
 
   //don't undo if one item left: unmodified-mark
   if AUndoList.IsEmpty then exit;
@@ -1650,25 +1650,25 @@ begin
 
   try
     case AAction of
-      cEditActionChange:
+      aeaChange:
         begin
           Lines[AIndex]:= AText;
           LinesState[AIndex]:= ALineState;
         end;
 
-      cEditActionChangeEol:
+      aeaChangeEol:
         begin
           LinesEnds[AIndex]:= AEnd;
           LinesState[AIndex]:= ALineState;
         end;
 
-      cEditActionInsert:
+      aeaInsert:
         begin
           if IsIndexValid(AIndex) then
             LineDelete(AIndex);
         end;
 
-      cEditActionDelete:
+      aeaDelete:
         begin
           if AIndex>=Count then
             LineAddRaw(AText, AEnd)
@@ -1677,7 +1677,7 @@ begin
           LinesState[AIndex]:= ALineState;
         end;
 
-      cEditActionClearModified:
+      aeaClearModified:
         begin
           //add unmodified mark to undo/redo
           if AUndoList=FUndoList then
@@ -2024,7 +2024,7 @@ procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
 begin
   if not Assigned(FListUpdates) then Exit;
 
-  if AAction in [cEditActionDelete, cEditActionInsert] then
+  if AAction in [aeaDelete, aeaInsert] then
   begin
     FListUpdatesHard:= true;
     Exit
