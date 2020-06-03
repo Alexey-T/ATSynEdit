@@ -2604,23 +2604,24 @@ var
   Band: TATGutterItem;
   StringItem: PATStringItem;
   NColorEntire, NColorAfter: TColor;
+  NColorOfStates: array[TATLineState] of TColor;
   NDimValue, NBandDecor: integer;
   StrOutput: atString;
   CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineSeparator: TATLineSeparator;
+  LineState: TATLineState;
   bLineWithCaret, bLineEolSelected, bLineColorForced, bLineHuge: boolean;
   Event: TATSynEditDrawLineEvent;
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap, bUseColorOfCurrentLine: boolean;
   bHiliteLinesWithSelection: boolean;
-  //
-  procedure DoPaintGutterBandState(ATop: integer; AColor: TColor); inline;
-  begin
-    DoPaintGutterBandBG(C, FGutterBandStates, AColor, ATop, ATop+ACharSize.Y, false);
-  end;
-  //
 begin
   bHiliteLinesWithSelection:= not AMainText and FMinimapHiliteLinesWithSelection;
+
+  NColorOfStates[cLineStateNone]:= -1;
+  NColorOfStates[cLineStateChanged]:= Colors.StateChanged;
+  NColorOfStates[cLineStateAdded]:= Colors.StateAdded;
+  NColorOfStates[cLineStateSaved]:= Colors.StateSaved;
 
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -3205,11 +3206,14 @@ begin
       Band:= FGutter[FGutterBandStates];
       if Band.Visible then
       begin
-        case Strings.LinesState[NLinesIndex] of
-          cLineStateChanged: DoPaintGutterBandState(NCoordTop, Colors.StateChanged);
-          cLineStateAdded: DoPaintGutterBandState(NCoordTop, Colors.StateAdded);
-          cLineStateSaved: DoPaintGutterBandState(NCoordTop, Colors.StateSaved);
-        end;
+        LineState:= Strings.LinesState[NLinesIndex];
+        if LineState<>cLineStateNone then
+          DoPaintGutterBandBG(C,
+            FGutterBandStates,
+            NColorOfStates[LineState],
+            NCoordTop,
+            NCoordTop+ACharSize.Y,
+            false);
       end;
 
       //gutter band: separator
