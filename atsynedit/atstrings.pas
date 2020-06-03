@@ -1642,7 +1642,7 @@ begin
   AUnmodifiedNext:= (NCount>1) and (AUndoList[NCount-2].ItemAction=cEditActionClearModified);
 
   //don't undo if one item left: unmodified-mark
-  if (NCount=1) and (AUndoList[0].ItemAction=cEditActionClearModified) then exit;
+  if AUndoList.IsEmpty then exit;
 
   Item:= nil;
   AUndoList.DeleteLast;
