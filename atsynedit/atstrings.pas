@@ -129,6 +129,7 @@ type
     function HasAsciiNoTabs: boolean;
     procedure Init(const S: string; AEnd: TATLineEnds);
     procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
+    procedure LineStateToChanged;
     function IsFake: boolean; inline;
     function IndentSize: integer;
     function CharLenWithoutSpace: integer;
@@ -578,7 +579,7 @@ begin
     Move(S[1], Buf[1], NLen*2);
   end;
 
-  Ex.State:= TATBits2(cLineStateChanged);
+  LineStateToChanged;
   Ex.HasTab:= 0; //cFlagUnknown
   Ex.HasAsciiNoTabs:= 0; //cFlagUnknown
   Ex.Updated:= true;
@@ -610,7 +611,7 @@ begin
       SetLength(Buf, 2*(N-1));
   end;
 
-  Ex.State:= TATBits2(cLineStateChanged);
+  LineStateToChanged;
   Ex.HasTab:= 0; //cFlagUnknown
   Ex.HasAsciiNoTabs:= 0; //cFlagUnknown
   Ex.Updated:= true;
@@ -634,6 +635,18 @@ begin
   Ex.Ends:= TATBits2(AEnd);
   Ex.State:= TATBits2(cLineStateAdded);
   Ex.Updated:= true;
+end;
+
+procedure TATStringItem.LineStateToChanged;
+//switch LineState to "changed" only for "none"+"saved" lines,
+//but skip "added" lines
+// https://github.com/Alexey-T/CudaText/issues/2617
+begin
+  case TATLineState(Ex.State) of
+    cLineStateNone,
+    cLineStateSaved:
+      Ex.State:= TATBits2(cLineStateChanged);
+  end;
 end;
 
 function TATStringItem.LineSub(AFrom, ALen: integer): UnicodeString;
@@ -959,8 +972,7 @@ begin
   Item^.Ex.FoldFrom_0:= 0;
   Item^.Ex.FoldFrom_1:= 0;
 
-  if TATLineState(Item^.Ex.State)<>cLineStateAdded then
-    Item^.Ex.State:= TATBits2(cLineStateChanged);
+  Item^.LineStateToChanged;
 
   Item^.Ex.Updated:= true;
   Item^.Ex.HasTab:= 0; //unknown
@@ -990,8 +1002,7 @@ begin
   DoAddUndo(cEditActionChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState);
 
   Item^.Ex.Ends:= TATBits2(AValue);
-  if TATLineState(Item^.Ex.State)<>cLineStateAdded then
-    Item^.Ex.State:= TATBits2(cLineStateChanged);
+  Item^.LineStateToChanged;
   Item^.Ex.Updated:= true;
 end;
 
