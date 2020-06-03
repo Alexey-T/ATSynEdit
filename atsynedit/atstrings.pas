@@ -130,8 +130,8 @@ type
     procedure Init(const S: string; AEnd: TATLineEnds);
     procedure Init(const S: UnicodeString; AEnd: TATLineEnds);
     procedure LineStateToChanged;
-    procedure LineStateToSaved;
-    procedure LineStateToNone;
+    procedure LineStateToSaved; inline;
+    procedure LineStateToNone; inline;
     function IsFake: boolean; inline;
     function IndentSize: integer;
     function CharLenWithoutSpace: integer;
