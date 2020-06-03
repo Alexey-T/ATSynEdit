@@ -265,7 +265,7 @@ type
     procedure SetRedoAsString(const AValue: string);
     procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
-    procedure DoUndoSingle(AUndoList: TATUndoList; out ASoftMarked, AHardMarked,
+    procedure DoUndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   public
@@ -1608,7 +1608,7 @@ begin
       FUndoList.HardMark:= false;
 end;
 
-procedure TATStrings.DoUndoSingle(AUndoList: TATUndoList;
+procedure TATStrings.DoUndoSingle(ACurList: TATUndoList;
   out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean);
 var
   Item: TATUndoItem;
@@ -1625,9 +1625,9 @@ begin
   AHardMarkedNext:= false;
   AUnmodifiedNext:= false;
   if FReadOnly then Exit;
-  if not Assigned(AUndoList) then Exit;
+  if not Assigned(ACurList) then Exit;
 
-  Item:= AUndoList.Last;
+  Item:= ACurList.Last;
   if Item=nil then Exit;
   AAction:= Item.ItemAction;
   AIndex:= Item.ItemIndex;
@@ -1638,16 +1638,16 @@ begin
   ACarets:= Item.ItemCarets;
   ASoftMarked:= Item.ItemSoftMark;
   AHardMarked:= Item.ItemHardMark;
-  NCount:= AUndoList.Count;
-  AHardMarkedNext:= (NCount>1) and (AUndoList[NCount-2].ItemHardMark);
-  AUnmodifiedNext:= (NCount>1) and (AUndoList[NCount-2].ItemAction=aeaClearModified);
+  NCount:= ACurList.Count;
+  AHardMarkedNext:= (NCount>1) and (ACurList[NCount-2].ItemHardMark);
+  AUnmodifiedNext:= (NCount>1) and (ACurList[NCount-2].ItemAction=aeaClearModified);
 
   //don't undo if one item left: unmodified-mark
-  if AUndoList.IsEmpty then exit;
+  if ACurList.IsEmpty then exit;
 
   Item:= nil;
-  AUndoList.DeleteLast;
-  AUndoList.Locked:= true;
+  ACurList.DeleteLast;
+  ACurList.Locked:= true;
 
   try
     case AAction of
@@ -1681,7 +1681,7 @@ begin
       aeaClearModified:
         begin
           //add unmodified mark to undo/redo
-          if AUndoList=FUndoList then
+          if ACurList=FUndoList then
             FRedoList.AddUnmodifiedMark
           else
             FUndoList.AddUnmodifiedMark;
@@ -1695,7 +1695,7 @@ begin
     SetCaretsArray(ACarets);
     ActionDeleteDupFakeLines;
   finally
-    AUndoList.Locked:= false;
+    ACurList.Locked:= false;
   end;
 end;
 
