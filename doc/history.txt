@@ -1,4 +1,7 @@
 
+2020.06.03
++ add: better logic of LineStates, fixing https://github.com/Alexey-T/CudaText/issues/2617
+
 2020.06.02
 + add: OptZebraStep (default=2)
 
