@@ -1625,7 +1625,7 @@ begin
   AHardMarkedNext:= false;
   AUnmodifiedNext:= false;
   if FReadOnly then Exit;
-  if not Assigned(ACurList) then Exit;
+  if ACurList=nil then Exit;
 
   Item:= ACurList.Last;
   if Item=nil then Exit;
