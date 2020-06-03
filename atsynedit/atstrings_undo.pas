@@ -263,7 +263,8 @@ begin
   Result:= false;
   i1:= Items[N1];
   i2:= Items[N2];
-  if not Assigned(i1) or not Assigned(i2) then Exit;
+  if i1=nil then Exit;
+  if i2=nil then Exit;
   Result:=
     (i1.ItemAction=aeaChange) and
     (i1.ItemAction=i2.ItemAction) and
