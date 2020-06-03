@@ -4797,8 +4797,8 @@ begin
 
     if ActionId=cMouseActionClickSimple then
     begin
-      Strings.SetGroupMark;
       Strings.ActionAddJumpToUndo;
+      Strings.SetGroupMark;
 
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;

@@ -1795,8 +1795,12 @@ begin
         //ListOther.Last.ItemSoftMark:= ?? //for redo needed Softmark too but don't know how
       end;
 
-    if bHardMarked and bHardMarkedNext and not bSoftMarked then Continue;
-    if (not AGrouped) or bSoftMarked then Break;
+    if bHardMarked and bHardMarkedNext and not bSoftMarked then
+      Continue;
+    if not AGrouped then
+      Break;
+    if bSoftMarked then
+      Break;
   until false;
 
   //apply Softmark to ListOther
