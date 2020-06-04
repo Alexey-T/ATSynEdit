@@ -33,6 +33,7 @@ type
     bOpt: TButton;
     btnStop: TButton;
     bClearLog: TButton;
+    chkMouseColSelect: TCheckBox;
     chkSmoothScroll: TCheckBox;
     chkMinimapTooltip: TCheckBox;
     chkMouseEn: TCheckBox;
@@ -137,6 +138,7 @@ type
     procedure btnStopClick(Sender: TObject);
     procedure chkMinimapLeftChange(Sender: TObject);
     procedure chkMinimapTooltipChange(Sender: TObject);
+    procedure chkMouseColSelectChange(Sender: TObject);
     procedure chkMouseEnChange(Sender: TObject);
     procedure chkNewScrollChange(Sender: TObject);
     procedure chkSmoothScrollChange(Sender: TObject);
@@ -708,6 +710,12 @@ procedure TfmMain.chkMinimapTooltipChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptMinimapTooltipVisible:= chkMinimapTooltip.Checked;
+end;
+
+procedure TfmMain.chkMouseColSelectChange(Sender: TObject);
+begin
+  if wait then Exit;
+  ed.OptMouseColumnSelectionWithoutKey:= chkMouseColSelect.Checked;
 end;
 
 procedure TfmMain.chkMouseEnChange(Sender: TObject);
