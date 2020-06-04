@@ -2489,7 +2489,7 @@ begin
   UpdateInitialVars(C);
 
   C.Brush.Color:= FColorBG;
-  C.FillRect(0, 0, FClientW, FClientH);
+  C.FillRect(ClientRect); //avoid FClientW here to fill entire area
 
   UpdateAdapterCacheSize;
   UpdateWrapInfo;
@@ -3999,7 +3999,8 @@ begin
   R:= inherited ClientRect;
 
   W:= R.Width;
-  if FScrollbarVert.Visible then
+  //if FScrollbarVert.Visible then
+  if FOptScrollbarsNew then //better check this instead of FScrollbarVert.Visible
     Dec(W, FScrollbarVert.Width);
   if W<1 then W:= 1;
 
