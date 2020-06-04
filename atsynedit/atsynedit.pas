@@ -2531,6 +2531,8 @@ procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);
 var
   X1, X2, Y1, Y2: integer;
 begin
+  if not FOptMouseEnableNormalSelection then exit;
+
   X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset;
   X2:= FMouseDragCoord.X;
   Y1:= FMouseDownCoord.Y - FScrollVert.TotalOffset;
