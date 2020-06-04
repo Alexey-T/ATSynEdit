@@ -5820,6 +5820,8 @@ begin
 
   if not IsSelRectEmpty then
   begin
+   //avoid weird look when empty area is filled in word-wrap mode
+   if FWrapMode=cWrapOff then
     if (NLineIndex>=FSelRect.Top) and (NLineIndex<=FSelRect.Bottom) then
     begin
       NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
