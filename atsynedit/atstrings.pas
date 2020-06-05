@@ -1640,7 +1640,7 @@ begin
   AHardMarked:= Item.ItemHardMark;
   NCount:= ACurList.Count;
   AHardMarkedNext:= (NCount>1) and (ACurList[NCount-2].ItemHardMark);
-  AUnmodifiedNext:= (NCount>1) and (ACurList[NCount-2].ItemAction=aeaClearModified);
+  AUnmodifiedNext:= (NCount>1) and not cEditActionSetsModified[ACurList[NCount-2].ItemAction];
 
   //don't undo if one item left: unmodified-mark
   if ACurList.IsEmpty then exit;
