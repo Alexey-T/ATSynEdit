@@ -1130,9 +1130,6 @@ begin
   Result:= false;
   AChanged:= false;
 
-  if Editor.Carets.Count=0 then exit;
-  Caret:= Editor.Carets[0];
-
   NLines:= Editor.Strings.Count;
   if NLines=0 then exit;
   NLastY:= NLines-1;
@@ -1170,6 +1167,8 @@ begin
   else
   if OptFromCaret then
   begin
+    if Editor.Carets.Count=0 then exit;
+    Caret:= Editor.Carets[0];
     PosStart.X:= Caret.PosX;
     PosStart.Y:= Caret.PosY;
   end;
