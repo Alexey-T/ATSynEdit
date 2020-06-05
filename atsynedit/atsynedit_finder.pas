@@ -1767,7 +1767,7 @@ begin
       for IndexLine:= APosStart.Y to APosEnd.Y do
       begin
         NLen:= Strs.LinesLen[IndexLine];
-        if NLen<Length(SFind) then Continue;
+        if NLen<SLinePart_Len then Continue;
         if NLen>FMaxLineLen then Continue;
 
         if FStrFindUnicode then
@@ -1845,7 +1845,7 @@ begin
       for IndexLine:= APosStart.Y downto APosEnd.Y do
       begin
         NLen:= Strs.LinesLen[IndexLine];
-        if NLen<Length(SFind) then Continue;
+        if NLen<SLinePart_Len then Continue;
         if NLen>FMaxLineLen then Continue;
 
         if FStrFindUnicode then
