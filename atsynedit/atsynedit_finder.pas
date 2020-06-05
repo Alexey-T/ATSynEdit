@@ -287,13 +287,14 @@ function STestStringMatch(
   CaseSens: boolean): boolean;
 //- if case-insensitive, StrFind must be already in uppercase
 //- index check must be in caller
+//- function must return True for empty SFind (it's used in backward search for multi-line text)
 var
   pf, ps: PWideChar;
   ch: WideChar;
   MaxCount, i: integer;
 begin
   MaxCount:= Min(Length(SFind), Length(SLine)-CharIndex+1);
-  if MaxCount=0 then exit(false);
+  if MaxCount=0 then exit(true); //True for empty text
 
   pf:= @SFind[1];
   ps:= @SLine[CharIndex];
