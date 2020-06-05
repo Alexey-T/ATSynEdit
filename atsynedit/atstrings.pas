@@ -1643,11 +1643,6 @@ begin
   AHardMarkedNext:= (NCount>1) and (ACurList[NCount-2].ItemHardMark);
   AUnmodifiedNext:= (NCount>1) and (ACurList[NCount-2].ItemAction=aeaClearModified);
 
-  if ACurList=FUndoList then
-    OtherList:= FRedoList
-  else
-    OtherList:= FUndoList;
-
   //don't undo if one item left: unmodified-mark
   if ACurList.IsEmpty then exit;
 
@@ -1659,14 +1654,20 @@ begin
     case AAction of
       aeaChange:
         begin
-          Lines[AIndex]:= AText;
-          LinesState[AIndex]:= ALineState;
+          if IsIndexValid(AIndex) then
+          begin
+            Lines[AIndex]:= AText;
+            LinesState[AIndex]:= ALineState;
+          end;
         end;
 
       aeaChangeEol:
         begin
-          LinesEnds[AIndex]:= AEnd;
-          LinesState[AIndex]:= ALineState;
+          if IsIndexValid(AIndex) then
+          begin
+            LinesEnds[AIndex]:= AEnd;
+            LinesState[AIndex]:= ALineState;
+          end;
         end;
 
       aeaInsert:
@@ -1681,11 +1682,17 @@ begin
             LineAddRaw(AText, AEnd)
           else
             LineInsertRaw(AIndex, AText, AEnd);
-          LinesState[AIndex]:= ALineState;
+          if IsIndexValid(AIndex) then
+            LinesState[AIndex]:= ALineState;
         end;
 
       aeaClearModified:
         begin
+          if ACurList=FUndoList then
+            OtherList:= FRedoList
+          else
+            OtherList:= FUndoList;
+
           OtherList.AddUnmodifiedMark;
           exit;
         end
