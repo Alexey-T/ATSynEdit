@@ -1619,6 +1619,7 @@ var
   ALineState: TATLineState;
   ACarets: TATPointArray;
   NCount: integer;
+  OtherList: TATUndoList;
 begin
   ASoftMarked:= true;
   AHardMarked:= false;
@@ -1641,6 +1642,11 @@ begin
   NCount:= ACurList.Count;
   AHardMarkedNext:= (NCount>1) and (ACurList[NCount-2].ItemHardMark);
   AUnmodifiedNext:= (NCount>1) and (ACurList[NCount-2].ItemAction=aeaClearModified);
+
+  if ACurList=FUndoList then
+    OtherList:= FRedoList
+  else
+    OtherList:= FUndoList;
 
   //don't undo if one item left: unmodified-mark
   if ACurList.IsEmpty then exit;
@@ -1680,11 +1686,7 @@ begin
 
       aeaClearModified:
         begin
-          //add unmodified mark to undo/redo
-          if ACurList=FUndoList then
-            FRedoList.AddUnmodifiedMark
-          else
-            FUndoList.AddUnmodifiedMark;
+          OtherList.AddUnmodifiedMark;
           exit;
         end
 
