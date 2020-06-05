@@ -285,8 +285,8 @@ function STestStringMatch(
   const SFind, SLine: UnicodeString;
   CharIndex: integer;
   CaseSens: boolean): boolean;
-//- if case-insensitive, StrFind must be already in uppercase
-//- index check must be in caller
+//- if CaseSens=False, SFind must be already in uppercase
+//- CharIndex check must be in caller
 //- function must return True for empty SFind (it's used in backward search for multi-line text)
 var
   pf, ps: PWideChar;
