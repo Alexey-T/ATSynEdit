@@ -1640,8 +1640,13 @@ begin
   ASoftMarked:= Item.ItemSoftMark;
   AHardMarked:= Item.ItemHardMark;
   NCount:= ACurList.Count;
-  AHardMarkedNext:= (NCount>1) and (ACurList[NCount-2].ItemHardMark);
-  AUnmodifiedNext:= (NCount>1) and (ACurList[NCount-2].ItemAction=aeaClearModified);
+
+  if NCount>1 then
+    with ACurList[NCount-2] do
+    begin
+      AHardMarkedNext:= ItemHardMark;
+      AUnmodifiedNext:= ItemAction=aeaClearModified;
+    end;
 
   //don't undo if one item left: unmodified-mark
   if ACurList.IsEmpty then exit;
