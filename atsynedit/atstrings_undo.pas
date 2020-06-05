@@ -32,6 +32,15 @@ const
     'jump'
     );
 
+  cEditActionSetsModified: array[TATEditAction] of boolean = (
+    true,
+    true,
+    true,
+    true,
+    false,
+    false
+    );
+
 type
   { TATUndoItem }
 

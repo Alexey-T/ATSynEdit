@@ -1731,12 +1731,15 @@ end;
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
 begin
-  FModified:= true;
-  FModifiedRecent:= true;
-  Inc(FModifiedVersion);
+  if cEditActionSetsModified[AAction] then
+  begin
+    FModified:= true;
+    FModifiedRecent:= true;
+    Inc(FModifiedVersion);
+  end;
 
-  if not Assigned(FUndoList) then Exit;
-  if not Assigned(FRedoList) then Exit;
+  if FUndoList=nil then Exit;
+  if FRedoList=nil then Exit;
 
   if not FUndoList.Locked and not FRedoList.Locked then
     FRedoList.Clear;
