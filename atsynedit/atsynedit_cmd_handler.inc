@@ -169,7 +169,11 @@ begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
     DoEventCarets;
-    //UpdateCaretsCoords;
+
+    //update pixel coords, so that plugin command
+    //  for in in range(N): ed.cmd(cCommand_KeyDown)
+    //will move-down N times
+    UpdateCaretsCoords;
   end;
 
   if cResultText in Res then
