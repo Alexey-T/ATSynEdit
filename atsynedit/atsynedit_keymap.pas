@@ -93,7 +93,9 @@ begin
   Result:= 0;
   for i:= Low(Data) to High(Data) do
     if Data[i]<>0 then
-      Inc(Result);
+      Inc(Result)
+    else
+      Break;
 end;
 
 procedure TATKeyArray.Clear;
