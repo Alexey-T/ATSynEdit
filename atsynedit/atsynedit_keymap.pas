@@ -26,7 +26,6 @@ type
     function Length: integer;
     function ToString: string;
     procedure SetFromString(const AHotkey: string; AComboSepar: char= ComboSeparator);
-    procedure Assign(const Ar: TATKeyArray); inline;
     class operator =(const a1, a2: TATKeyArray): boolean;
   end;
 
@@ -82,8 +81,8 @@ procedure TATKeymapItem.Assign(AItem: TATKeymapItem);
 begin
   Command:= AItem.Command;
   Name:= AItem.Name;
-  Keys1.Data:= AItem.Keys1.Data;
-  Keys2.Data:= AItem.Keys2.Data;
+  Keys1:= AItem.Keys1;
+  Keys2:= AItem.Keys2;
 end;
 
 { TATKeyArray }
@@ -359,11 +358,6 @@ begin
     if S='' then Break;
     Data[i]:= TextToShortCut(S);
   end;
-end;
-
-procedure TATKeyArray.Assign(const Ar: TATKeyArray);
-begin
-  Data:= Ar.Data;
 end;
 
 class operator TATKeyArray.=(const a1, a2: TATKeyArray): boolean;
