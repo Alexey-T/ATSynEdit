@@ -26,6 +26,7 @@ type
     function Length: integer;
     function ToString: string;
     procedure SetFromString(const AHotkey: string; AComboSepar: char= ComboSeparator);
+    procedure Assign(const Ar: TATKeyArray); inline;
     class operator =(const a1, a2: TATKeyArray): boolean;
   end;
 
@@ -36,8 +37,8 @@ type
   public
     Command: integer;
     Name: string;
-    Keys1,
-    Keys2: TATKeyArray;
+    Keys1, Keys2: TATKeyArray;
+    procedure Assign(AItem: TATKeymapItem);
   end;
 
 type
@@ -52,7 +53,7 @@ type
     procedure AddToHistory(sh: TShortcut);
     function IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut;
       AAllowOneKey: boolean): boolean;
- public
+  public
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
@@ -61,6 +62,7 @@ type
     property Items[N: integer]: TATKeymapItem read GetItem; default;
     procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string);
     procedure Delete(N: integer);
+    procedure Assign(AKeymap: TATKeyMap);
     function IndexOf(ACmd: integer): integer;
     function GetShortcutFromCommand(ACode: integer): TShortcut;
     function GetCommandFromShortcut(AKey: TShortcut): integer;
@@ -71,8 +73,18 @@ implementation
 
 uses
   Math,
-  LCLProc,
-  Dialogs;
+  LCLProc;
+  //Dialogs;
+
+{ TATKeymapItem }
+
+procedure TATKeymapItem.Assign(AItem: TATKeymapItem);
+begin
+  Command:= AItem.Command;
+  Name:= AItem.Name;
+  Keys1.Data:= AItem.Keys1.Data;
+  Keys2.Data:= AItem.Keys2.Data;
+end;
 
 { TATKeyArray }
 
@@ -156,8 +168,11 @@ begin
   Item.Keys1.Clear;
   Item.Keys2.Clear;
 
-  for i:= 0 to Min(High(AKeys1), High(Item.Keys1.Data)) do Item.Keys1.Data[i]:= _TextToShortcut(AKeys1[i]);
-  for i:= 0 to Min(High(AKeys2), High(Item.Keys2.Data)) do Item.Keys2.Data[i]:= _TextToShortcut(AKeys2[i]);
+  for i:= 0 to Min(High(AKeys1), High(Item.Keys1.Data)) do
+    Item.Keys1.Data[i]:= _TextToShortcut(AKeys1[i]);
+
+  for i:= 0 to Min(High(AKeys2), High(Item.Keys2.Data)) do
+    Item.Keys2.Data[i]:= _TextToShortcut(AKeys2[i]);
 
   FList.Add(Item);
 end;
@@ -166,6 +181,21 @@ procedure TATKeymap.Delete(N: integer);
 begin
   if IsIndexValid(N) then
     FList.Delete(N);
+end;
+
+procedure TATKeymap.Assign(AKeymap: TATKeyMap);
+var
+  OtherItem, NewItem: TATKeymapItem;
+  i: integer;
+begin
+  Clear;
+  for i:= 0 to AKeymap.Count-1 do
+  begin
+    OtherItem:= AKeymap[i];
+    NewItem:= TATKeymapItem.Create;
+    NewItem.Assign(OtherItem);
+    FList.Add(NewItem);
+  end;
 end;
 
 function TATKeymap.IndexOf(ACmd: integer): integer;
@@ -329,6 +359,11 @@ begin
     if S='' then Break;
     Data[i]:= TextToShortCut(S);
   end;
+end;
+
+procedure TATKeyArray.Assign(const Ar: TATKeyArray);
+begin
+  Data:= Ar.Data;
 end;
 
 class operator TATKeyArray.=(const a1, a2: TATKeyArray): boolean;
