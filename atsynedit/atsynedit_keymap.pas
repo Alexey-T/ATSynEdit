@@ -119,10 +119,7 @@ end;
 
 function TATKeymap.GetItem(N: integer): TATKeymapItem;
 begin
-  if IsIndexValid(N) then
-    Result:= TATKeymapItem(FList[N])
-  else
-    Result:= nil;
+  Result:= TATKeymapItem(FList[N])
 end;
 
 procedure TATKeymap.Clear;
