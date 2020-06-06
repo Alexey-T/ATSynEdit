@@ -421,6 +421,7 @@ type
     FPaintLocked: integer;
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
+    FKeymapHistory: TATKeyArray;
     FWantTabs: boolean;
     FWantReturns: boolean;
     FEditorIndex: integer;

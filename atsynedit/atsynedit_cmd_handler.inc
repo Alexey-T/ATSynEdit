@@ -99,7 +99,7 @@ begin
     Exit;
 
   Shortcut:= KeyToShortCut(Key, Shift);
-  Result:= FKeymap.GetCommandFromShortcut(Shortcut);
+  Result:= FKeymap.GetCommandFromShortcut(Shortcut, FKeymapHistory);
   if Result>0 then
     Key:= 0;
 end;

@@ -12,7 +12,8 @@ unit ATSynEdit_Keymap;
 interface
 
 uses
-  Classes, SysUtils, Forms, ATStringProc;
+  Classes, SysUtils,
+  ATStringProc;
 
 type
   { TATKeyArray }
@@ -46,12 +47,10 @@ type
   TATKeymap = class
   private
     FList: TFPList;
-    FHistory: TATKeyArray;
     function GetItem(N: integer): TATKeymapItem;
-    procedure ClearHistory;
-    procedure AddToHistory(sh: TShortcut);
+    procedure AddToHistory(sh: TShortcut; var AHistory: TATKeyArray);
     function IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut;
-      AAllowOneKey: boolean): boolean;
+      AAllowOneKey: boolean; var AHistory: TATKeyArray): boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -64,7 +63,7 @@ type
     procedure Assign(AKeymap: TATKeyMap);
     function IndexOf(ACmd: integer): integer;
     function GetShortcutFromCommand(ACode: integer): TShortcut;
-    function GetCommandFromShortcut(AKey: TShortcut): integer;
+    function GetCommandFromShortcut(AKey: TShortcut; var AHistory: TATKeyArray): integer;
     function GetCommandFromHotkeyString(AHotkey: string; AComboSepar: char): integer;
   end;
 
@@ -107,12 +106,10 @@ end;
 constructor TATKeymap.Create;
 begin
   FList:= TFPList.Create;
-  ClearHistory;
 end;
 
 destructor TATKeymap.Destroy;
 begin
-  ClearHistory;
   Clear;
   FreeAndNil(FList);
   inherited;
@@ -223,7 +220,7 @@ begin
     end;
 end;
 
-function TATKeymap.GetCommandFromShortcut(AKey: TShortcut): integer;
+function TATKeymap.GetCommandFromShortcut(AKey: TShortcut; var AHistory: TATKeyArray): integer;
 var
   bCheckSingle: boolean;
   i: integer;
@@ -233,16 +230,16 @@ begin
   //first check combos, then check single-keys
   for bCheckSingle:= false to true do
     for i:= 0 to Count-1 do
-      if IsMatchedKeys(Items[i].Keys1, AKey, bCheckSingle) or
-         IsMatchedKeys(Items[i].Keys2, AKey, bCheckSingle) then
+      if IsMatchedKeys(Items[i].Keys1, AKey, bCheckSingle, AHistory) or
+         IsMatchedKeys(Items[i].Keys2, AKey, bCheckSingle, AHistory) then
       begin
         Result:= Items[i].Command;
-        ClearHistory;
+        AHistory.Clear;
         Exit
       end;
 
   if AKey>0 then
-    AddToHistory(AKey);
+    AddToHistory(AKey, AHistory);
 end;
 
 function TATKeymap.GetCommandFromHotkeyString(AHotkey: string; AComboSepar: char): integer;
@@ -264,7 +261,7 @@ begin
 end;
 
 function TATKeymap.IsMatchedKeys(const AKeys: TATKeyArray; AKey: TShortcut;
-  AAllowOneKey: boolean): boolean;
+  AAllowOneKey: boolean; var AHistory: TATKeyArray): boolean;
 //function called first for all items with Allow=false (for combos)
 //if not found, called for all items with Allow=true (for single keys)
 var
@@ -285,7 +282,7 @@ begin
   if AKeys.Data[LenThis-1]<>AKey then Exit;
 
   //stack filled?
-  LenStack:= FHistory.Length;
+  LenStack:= AHistory.Length;
   if LenStack<LenThis-1 then
   begin
     //showmessage('no match: if lenstack');
@@ -296,8 +293,8 @@ begin
   for i:= LenThis-2 downto 0 do
   begin
     IndexStack:= LenStack-1-(LenThis-2-i);
-    if (IndexStack>=Low(FHistory.Data)) and (IndexStack<=High(FHistory.Data)) then
-      if AKeys.Data[i]<>FHistory.Data[IndexStack] then
+    if (IndexStack>=Low(AHistory.Data)) and (IndexStack<=High(AHistory.Data)) then
+      if AKeys.Data[i]<>AHistory.Data[IndexStack] then
       begin
         //showmessage('no match: check items');
         Exit;
@@ -307,22 +304,17 @@ begin
   Result:= true;
 end;
 
-procedure TATKeymap.ClearHistory;
-begin
-  FHistory.Clear;
-end;
-
-procedure TATKeymap.AddToHistory(sh: TShortcut);
+procedure TATKeymap.AddToHistory(sh: TShortcut; var AHistory: TATKeyArray);
 var
   len: integer;
 begin
-  len:= FHistory.Length;
-  if len>=Length(FHistory.Data) then
+  len:= AHistory.Length;
+  if len>=Length(AHistory.Data) then
   begin
-    ClearHistory;
+    AHistory.Clear;
     len:= 0;
   end;
-  FHistory.Data[len]:= sh;
+  AHistory.Data[len]:= sh;
 end;
 
 { TATKeyArray }
