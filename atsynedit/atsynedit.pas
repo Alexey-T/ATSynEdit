@@ -7729,16 +7729,19 @@ end;
 function TATSynEdit.UpdateLinksRegexObject: boolean;
 begin
   Result:= false;
+
   if FRegexLinks=nil then
     FRegexLinks:= TRegExpr.Create;
 
-  FRegexLinks.ModifierS:= false;
-  FRegexLinks.ModifierM:= true;
-  FRegexLinks.ModifierI:= true;
-
   try
-    FRegexLinks.Expression:= FOptShowURLsRegex;
-    FRegexLinks.Compile;
+    if FRegexLinks.Expression<>FOptShowURLsRegex then
+    begin
+      FRegexLinks.ModifierS:= false;
+      FRegexLinks.ModifierM:= true;
+      FRegexLinks.ModifierI:= true;
+      FRegexLinks.Expression:= FOptShowURLsRegex;
+      FRegexLinks.Compile;
+    end;
     Result:= true;
   except
     exit;
