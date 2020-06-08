@@ -1744,8 +1744,6 @@ end;
 
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
-var
-  N: integer;
 begin
   if cEditActionSetsModified[AAction] then
   begin
@@ -1758,29 +1756,27 @@ begin
   if FRedoList=nil then Exit;
 
   //handle CaretJump special
+  //if previous item was also Jump, dont add new item  (don't make huge list on many clicks)
+  //also not needed to call DoAddUpdate
   if AAction=aeaCaretJump then
   begin
     if FUndoList.Locked then exit;
+    if (FUndoList.Count>0) and (FUndoList.Last.ItemAction=AAction) then exit;
     FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray);
-    //if previous item was also Jump, delete it (don't make huge list on many clicks)
-    if FUndoList.Count>1 then
-    begin
-      N:= FUndoList.Count-2;
-      if FUndoList.Items[N].ItemAction=AAction then
-        FUndoList.Delete(N);
-    end;
     exit;
   end;
 
   if not FUndoList.Locked and not FRedoList.Locked then
     FRedoList.Clear;
 
+  //normal editing - add to Undo
   if not FUndoList.Locked then
   begin
     DoAddUpdate(AIndex, AAction);
     FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray);
   end
   else
+  //called from Undo - add to Redo
   if not FRedoList.Locked then
   begin
     DoAddUpdate(AIndex, AAction);
