@@ -6988,6 +6988,9 @@ var
   AtrObj: TATLinePartClass;
   MatchPos, MatchLen, NLine, i: integer;
 begin
+  if ModeOneLine then
+    exit;
+
   if not OptShowURLs then
   begin
     if Assigned(FAttribs) then
@@ -7004,6 +7007,7 @@ begin
     if not Strings.IsIndexValid(i) then Break;
     if Strings.LinesLen[i]>FOptMaxLineLenToCalcURL then Continue;
 
+    Assert(Assigned(FRegexLinks), 'FRegexLinks not inited');
     FRegexLinks.InputString:= Strings.Lines[i];
 
     MatchPos:= 0;
