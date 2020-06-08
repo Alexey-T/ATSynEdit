@@ -7000,6 +7000,11 @@ begin
     ReObj.ModifierM:= true;
     ReObj.ModifierI:= true;
     ReObj.Expression:= FOptShowURLsRegex;
+    try
+      ReObj.Compile;
+    except
+      exit;
+    end;
 
     NLine:= LineTop;
     for i:= NLine to NLine+GetVisibleLines do
