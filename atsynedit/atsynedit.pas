@@ -778,7 +778,6 @@ type
     procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
     function DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
-    procedure DoCalcLinks;
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean; out AColor: TColor; out
       AColorForced: boolean; AHiliteLineWithSelection: boolean);
@@ -1004,7 +1003,8 @@ type
     procedure SetWrapIndented(AValue: boolean);
     procedure UpdateAdapterCacheSize;
     procedure UpdateInitialVars(C: TCanvas);
-    function UpdateRegexLinks: boolean;
+    procedure UpdateLinksAttribs;
+    function UpdateLinksRegexObject: boolean;
     procedure UpdateTabHelper;
     procedure UpdateCursor;
     procedure UpdateGutterAutosize;
@@ -2500,7 +2500,7 @@ begin
   if not CanvasTextOutMustUseOffsets then
     DoUpdateFontNeedsOffsets(C);
 
-  DoCalcLinks;
+  UpdateLinksAttribs;
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMarginsTo(C);
   DoPaintNiceScroll(C);
@@ -6982,7 +6982,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCalcLinks;
+procedure TATSynEdit.UpdateLinksAttribs;
 var
   AtrObj: TATLinePartClass;
   MatchPos, MatchLen, NLine, i: integer;
@@ -6997,7 +6997,7 @@ begin
   InitAttribs;
   FAttribs.DeleteWithTag(cUrlMarkerTag);
 
-  if not UpdateRegexLinks then exit;
+  if not UpdateLinksRegexObject then exit;
 
   NLine:= LineTop;
   for i:= NLine to NLine+GetVisibleLines do
@@ -7033,7 +7033,7 @@ begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
-  if not UpdateRegexLinks then exit;
+  if not UpdateLinksRegexObject then exit;
 
   FRegexLinks.InputString:= Strings.Lines[AY];
   MatchPos:= 0;
@@ -7726,7 +7726,7 @@ begin
     Result:= EditorScaleFont(AValue);
 end;
 
-function TATSynEdit.UpdateRegexLinks: boolean;
+function TATSynEdit.UpdateLinksRegexObject: boolean;
 begin
   Result:= false;
   if FRegexLinks=nil then
