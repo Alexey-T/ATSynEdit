@@ -600,6 +600,7 @@ begin
   Result:= [];
   if Strings.Count=0 then exit;
   if Carets.Count=0 then exit;
+  if ModeReadOnly then exit;
 
   if IsSelRectEmpty then
     Result:= DoCommand_TextIndentUnindent_StreamBlock(ARight)
