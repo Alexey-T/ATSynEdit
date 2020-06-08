@@ -4561,7 +4561,7 @@ begin
   begin
     Ch := p^;
     Inc(p);
-    if Ch = '$' then
+    if (Ch = '$') and (p+1 < TemplateEnd) then
       n := GrpIndexes[ParseVarName(p)]
     else
       n := -1;
@@ -4617,7 +4617,7 @@ begin
     p0 := p;
     Inc(p);
     p1 := p;
-    if Ch = '$' then
+    if (Ch = '$') and (p+1 < TemplateEnd) then
       n := GrpIndexes[ParseVarName(p)]
     else
       n := -1;
