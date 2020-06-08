@@ -774,6 +774,7 @@ type
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
+    procedure SetOptShowURLsRegex(const AValue: string);
     procedure SetShowOsBarVert(AValue: boolean);
     procedure SetShowOsBarHorz(AValue: boolean);
     procedure DebugFindWrapIndex;
@@ -1490,7 +1491,7 @@ type
 
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
-    property OptShowURLsRegex: string read FOptShowURLsRegex write FOptShowURLsRegex;
+    property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
@@ -6997,8 +6998,6 @@ begin
   InitAttribs;
   FAttribs.DeleteWithTag(cUrlMarkerTag);
 
-  if not UpdateLinksRegexObject then exit;
-
   NLine:= LineTop;
   for i:= NLine to NLine+GetVisibleLines do
   begin
@@ -7033,8 +7032,7 @@ begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
-  if not UpdateLinksRegexObject then exit;
-
+  Assert(Assigned(FRegexLinks), 'FRegexLinks not inited');
   FRegexLinks.InputString:= Strings.Lines[AY];
   MatchPos:= 0;
   MatchLen:= 0;
@@ -7709,6 +7707,13 @@ begin
   Result:= FGutterDecor;
 end;
 
+procedure TATSynEdit.SetOptShowURLsRegex(const AValue: string);
+begin
+  if FOptShowURLsRegex=AValue then Exit;
+  FOptShowURLsRegex:= AValue;
+  UpdateLinksRegexObject;
+end;
+
 procedure TATSynEdit.InitMarkedRange;
 begin
   if FMarkedRange=nil then
@@ -7734,14 +7739,12 @@ begin
     FRegexLinks:= TRegExpr.Create;
 
   try
-    if FRegexLinks.Expression<>FOptShowURLsRegex then
-    begin
-      FRegexLinks.ModifierS:= false;
-      FRegexLinks.ModifierM:= true;
-      FRegexLinks.ModifierI:= true;
-      FRegexLinks.Expression:= FOptShowURLsRegex;
-      FRegexLinks.Compile;
-    end;
+    FRegexLinks.ModifierS:= false;
+    FRegexLinks.ModifierM:= true;
+    FRegexLinks.ModifierI:= true;
+    FRegexLinks.Expression:= FOptShowURLsRegex;
+    FRegexLinks.Compile;
+
     Result:= true;
   except
     exit;
