@@ -3922,6 +3922,8 @@ begin
 
   //must call UpdateTabHelper also before first Paint
   UpdateTabHelper;
+  //must call before first paint
+  UpdateLinksRegexObject;
 end;
 
 destructor TATSynEdit.Destroy;
