@@ -962,6 +962,8 @@ var
   Caret: TATCaretItem;
   NFrom, NTo: integer;
 begin
+  if ModeReadOnly then exit([]);
+
   NFrom:= -1;
   NTo:= -1;
   if Carets.Count>0 then
@@ -976,6 +978,7 @@ end;
 
 function TATSynEdit.DoCommand_DeleteAllBlanks: TATCommandResults;
 begin
+  if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   Strings.ActionDeleteAllBlanks;
   Result:= [cResultText, cResultCaretTop];
@@ -983,6 +986,7 @@ end;
 
 function TATSynEdit.DoCommand_DeleteAdjacentBlanks: TATCommandResults;
 begin
+  if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   Strings.ActionDeleteAdjacentBlanks;
   Result:= [cResultText, cResultCaretTop];
@@ -990,6 +994,7 @@ end;
 
 function TATSynEdit.DoCommand_DeleteAdjacentDups: TATCommandResults;
 begin
+  if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   Strings.ActionDeleteAdjacentDups;
   Result:= [cResultText, cResultCaretTop];
@@ -997,6 +1002,7 @@ end;
 
 function TATSynEdit.DoCommand_DeleteAllDups(AKeepBlanks: boolean): TATCommandResults;
 begin
+  if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   Strings.ActionDeleteAllDups(AKeepBlanks);
   Result:= [cResultText, cResultCaretTop];
@@ -1004,6 +1010,7 @@ end;
 
 function TATSynEdit.DoCommand_ReverseLines: TATCommandResults;
 begin
+  if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   Strings.ActionReverseLines;
   Result:= [cResultText, cResultCaretTop];
@@ -1011,6 +1018,7 @@ end;
 
 function TATSynEdit.DoCommand_ShuffleLines: TATCommandResults;
 begin
+  if ModeReadOnly then exit([]);
   DoCaretSingle(0, 0);
   Strings.ActionShuffleLines;
   Result:= [cResultText, cResultCaretTop];
