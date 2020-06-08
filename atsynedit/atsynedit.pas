@@ -473,6 +473,7 @@ type
     FMarkedRange: TATMarkers;
     FDimRanges: TATDimRanges;
     FHotspots: TATHotspots;
+    FRegexLinks: TRegExpr;
     FMenuStd: TPopupMenu;
     FMenuText: TPopupMenu;
     FMenuGutterBm: TPopupMenu;
@@ -1003,6 +1004,7 @@ type
     procedure SetWrapIndented(AValue: boolean);
     procedure UpdateAdapterCacheSize;
     procedure UpdateInitialVars(C: TCanvas);
+    function UpdateRegexLinks: boolean;
     procedure UpdateTabHelper;
     procedure UpdateCursor;
     procedure UpdateGutterAutosize;
@@ -3924,6 +3926,8 @@ end;
 destructor TATSynEdit.Destroy;
 begin
   FAdapterHilite:= nil;
+  if Assigned(FRegexLinks) then
+    FreeAndNil(FRegexLinks);
   if Assigned(FAdapterIME) then
     FreeAndNil(FAdapterIME);
   TimersStop;
@@ -6980,7 +6984,6 @@ end;
 
 procedure TATSynEdit.DoCalcLinks;
 var
-  ReObj: TRegExpr;
   AtrObj: TATLinePartClass;
   MatchPos, MatchLen, NLine, i: integer;
 begin
@@ -6994,83 +6997,56 @@ begin
   InitAttribs;
   FAttribs.DeleteWithTag(cUrlMarkerTag);
 
-  ReObj:= TRegExpr.Create;
-  try
-    ReObj.ModifierS:= false;
-    ReObj.ModifierM:= true;
-    ReObj.ModifierI:= true;
-    ReObj.Expression:= FOptShowURLsRegex;
-    try
-      ReObj.Compile;
-    except
-      exit;
-    end;
+  if not UpdateRegexLinks then exit;
 
-    NLine:= LineTop;
-    for i:= NLine to NLine+GetVisibleLines do
+  NLine:= LineTop;
+  for i:= NLine to NLine+GetVisibleLines do
+  begin
+    if not Strings.IsIndexValid(i) then Break;
+    if Strings.LinesLen[i]>FOptMaxLineLenToCalcURL then Continue;
+
+    FRegexLinks.InputString:= Strings.Lines[i];
+
+    MatchPos:= 0;
+    MatchLen:= 0;
+
+    while FRegexLinks.ExecPos(MatchPos+MatchLen+1) do
     begin
-      if not Strings.IsIndexValid(i) then Break;
-      if Strings.LinesLen[i]>FOptMaxLineLenToCalcURL then Continue;
+      MatchPos:= FRegexLinks.MatchPos[0];
+      MatchLen:= FRegexLinks.MatchLen[0];
 
-      ReObj.InputString:= Strings.Lines[i];
-
-      MatchPos:= 0;
-      MatchLen:= 0;
-
-      while ReObj.ExecPos(MatchPos+MatchLen+1) do
-      begin
-        MatchPos:= ReObj.MatchPos[0];
-        MatchLen:= ReObj.MatchLen[0];
-
-        AtrObj:= TATLinePartClass.Create;
-        AtrObj.Data.ColorFont:= Colors.Links;
-        AtrObj.Data.ColorBG:= clNone;
-        AtrObj.Data.ColorBorder:= Colors.Links;
-        AtrObj.Data.BorderDown:= cLineStyleSolid;
-        FAttribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, 0, AtrObj);
-      end;
+      AtrObj:= TATLinePartClass.Create;
+      AtrObj.Data.ColorFont:= Colors.Links;
+      AtrObj.Data.ColorBG:= clNone;
+      AtrObj.Data.ColorBorder:= Colors.Links;
+      AtrObj.Data.BorderDown:= cLineStyleSolid;
+      FAttribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, 0, AtrObj);
     end;
-  finally
-    FreeAndNil(ReObj);
   end;
 end;
 
 
 function TATSynEdit.DoGetLinkAtPos(AX, AY: integer): atString;
 var
-  ReObj: TRegExpr;
   MatchPos, MatchLen: integer;
 begin
   Result:= '';
   if not Strings.IsIndexValid(AY) then exit;
 
-  ReObj:= TRegExpr.Create;
-  try
-    ReObj.ModifierS:= false;
-    ReObj.ModifierM:= true;
-    ReObj.ModifierI:= true;
-    ReObj.Expression:= FOptShowURLsRegex;
-    try
-      ReObj.Compile;
-    except
-      exit;
-    end;
+  if not UpdateRegexLinks then exit;
 
-    ReObj.InputString:= Strings.Lines[AY];
-    MatchPos:= 0;
-    MatchLen:= 0;
+  FRegexLinks.InputString:= Strings.Lines[AY];
+  MatchPos:= 0;
+  MatchLen:= 0;
 
-    while ReObj.ExecPos(MatchPos+MatchLen+1) do
-    begin
-      MatchPos:= ReObj.MatchPos[0]-1;
-      MatchLen:= ReObj.MatchLen[0];
-      if MatchPos>AX then
-        Break;
-      if (MatchPos<=AX) and (MatchPos+MatchLen>AX) then
-        exit(ReObj.Match[0]);
-    end;
-  finally
-    FreeAndNil(ReObj);
+  while FRegexLinks.ExecPos(MatchPos+MatchLen+1) do
+  begin
+    MatchPos:= FRegexLinks.MatchPos[0]-1;
+    MatchLen:= FRegexLinks.MatchLen[0];
+    if MatchPos>AX then
+      Break;
+    if (MatchPos<=AX) and (MatchPos+MatchLen>AX) then
+      exit(FRegexLinks.Match[0]);
   end;
 end;
 
@@ -7750,6 +7726,24 @@ begin
     Result:= EditorScaleFont(AValue);
 end;
 
+function TATSynEdit.UpdateRegexLinks: boolean;
+begin
+  Result:= false;
+  if FRegexLinks=nil then
+    FRegexLinks:= TRegExpr.Create;
+
+  FRegexLinks.ModifierS:= false;
+  FRegexLinks.ModifierM:= true;
+  FRegexLinks.ModifierI:= true;
+
+  try
+    FRegexLinks.Expression:= FOptShowURLsRegex;
+    FRegexLinks.Compile;
+    Result:= true;
+  except
+    exit;
+  end;
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
