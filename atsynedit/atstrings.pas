@@ -1814,7 +1814,8 @@ begin
     DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);
 
     //handle unmodified
-    if bMarkedUnmodified or List.IsEmpty then
+    //don't clear FModified if List.IsEmpty! http://synwrite.sourceforge.net/forums/viewtopic.php?f=5&t=2504
+    if bMarkedUnmodified then
       FModified:= false;
 
     //apply Hardmark to ListOther
