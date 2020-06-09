@@ -196,6 +196,7 @@ type
     //
     constructor Create;
     destructor Destroy; override;
+    procedure Clear;
     //
     function DoAction_FindSimple(const APosStart: TPoint): boolean;
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
@@ -1935,5 +1936,36 @@ begin
     FProgressDelta:= 100;
 end;
 
+procedure TATEditorFinder.Clear;
+begin
+  FStrFind:= '';
+  FStrReplace:= '';
+  StrText:= '';
+
+  OptBack:= false;
+  OptWords:= false;
+  OptCase:= false;
+  OptRegex:= false;
+  OptWrapped:= false;
+  OptTokens:= cTokensAll;
+
+  OptFromCaret:= false;
+  OptConfirmReplace:= false;
+  OptInSelection:= false;
+  OptPutBackwardSelection:= false;
+
+  Editor:= nil;
+  ClearMatchPos;
+
+  FRegex.Expression:= '';
+  FRegex.InputString:= '';
+  FRegexReplacer.Expression:= '';
+  FRegexReplacer.InputString:= '';
+  FBuffer.Clear;
+
+  FSkipLen:= 0;
+  FMaxLineLen:= MaxInt;
+  DoFragmentsClear;
+end;
 
 end.
