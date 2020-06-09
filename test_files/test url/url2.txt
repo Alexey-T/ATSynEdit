@@ -1,5 +1,4 @@
 https://www.my.org/index.php?c=1
-http://ww:ww@www.my.org/index.php?c=1
 
 http://m.org/m/i.php?&start=aa&c=bb
 http://m.org/i.php?c=a&cc
@@ -11,5 +10,6 @@ http://openrouteservice.org/index.php?&start=8.723804,48.532212
 http://userbase.kde.org/index.php?title=Special&www=wwww
 http://www.die-partei.de/?start=0
 
-
-
+---
+tests which must not catch too many chars into URL
+Here is a [](https://example.com){_attr="value"}.
