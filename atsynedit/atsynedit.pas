@@ -7746,8 +7746,8 @@ begin
 
   try
     FRegexLinks.ModifierS:= false;
-    FRegexLinks.ModifierM:= true;
-    FRegexLinks.ModifierI:= true;
+    FRegexLinks.ModifierM:= false; //M not needed
+    FRegexLinks.ModifierI:= false; //I not needed to find links
     FRegexLinks.Expression:= FOptShowURLsRegex;
     FRegexLinks.Compile;
 
