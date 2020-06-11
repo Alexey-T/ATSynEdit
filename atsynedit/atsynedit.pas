@@ -511,6 +511,8 @@ type
     FLastTextCmdText: atString;
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
+    FIsReadOnlyChanged: boolean;
+    FIsReadOnlyAutodetected: boolean;
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
@@ -1305,6 +1307,8 @@ type
     function TextCurrentWord: atString;
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     property IsRunningCommand: boolean read FIsRunningCommand;
+    property IsReadOnlyChanged: boolean read FIsReadOnlyChanged write FIsReadOnlyChanged;
+    property IsReadOnlyAutodetected: boolean read FIsReadOnlyAutodetected write FIsReadOnlyAutodetected;
     procedure DoSelect_All;
     procedure DoSelect_None;
     procedure DoSelect_Inverted;
