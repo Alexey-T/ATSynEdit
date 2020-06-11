@@ -441,7 +441,6 @@ type
     FFoldTooltipVisible: boolean;
     FFoldTooltipWidthPercents: integer;
     FFoldTooltipLineCount: integer;
-    FWiderFlags: TATWiderFlags;
     FCursorText: TCursor;
     FCursorColumnSel: TCursor;
     FCursorGutterBookmark: TCursor;
@@ -1014,7 +1013,6 @@ type
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
     procedure UpdateClientSizes;
-    procedure UpdateWiderFlags(C: TCanvas; var Data: TATWiderFlags);
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
@@ -2503,9 +2501,6 @@ begin
   UpdateAdapterCacheSize;
   UpdateWrapInfo;
 
-  if not CanvasTextOutMustUseOffsets then
-    UpdateWiderFlags(C, FWiderFlags);
-
   UpdateLinksAttribs;
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMarginsTo(C);
@@ -2983,7 +2978,6 @@ begin
       if AMainText then
       begin
         TextOutProps.SuperFast:= bLineHuge;
-        TextOutProps.WiderFlags:= FWiderFlags;
         TextOutProps.TabHelper:= FTabHelper;
         TextOutProps.LineIndex:= NLinesIndex;
         TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
@@ -6954,62 +6948,6 @@ begin
     end;
 end;
 
-procedure TATSynEdit.UpdateWiderFlags(C: TCanvas; var Data: TATWiderFlags);
-//reason for this func: on macOS, italic font paints wider,
-//so without offsets, italic (eg syntax comments) will be too wide, and overlap next token
-const
-  cTest = 'WW';
-var
-  N1, N2: integer;
-  PrevStyle: TFontStyles;
-begin
-  if C.Font.Name=Data.FontName then exit;
-  Data.FontName:= C.Font.Name;
-
-  PrevStyle:= C.Font.Style;
-  try
-    C.Font.Style:= [];
-    N1:= C.TextWidth('n');
-    N2:= C.TextWidth(cTest);
-
-    Data.ForNormal:= N2<>N1*Length(cTest);
-    if Data.ForNormal then
-    begin
-      Data.ForBold:= true;
-      Data.ForItalic:= true;
-      Data.ForBoldItalic:= true;
-      exit;
-    end;
-
-    C.Font.Style:= [fsBold];
-    N2:= C.TextWidth(cTest);
-    Data.ForBold:= N2<>N1*Length(cTest);
-
-    C.Font.Style:= [fsItalic];
-    N2:= C.TextWidth(cTest);
-    Data.ForItalic:= N2<>N1*Length(cTest);
-
-    if Data.ForBold or Data.ForItalic then
-      Data.ForBoldItalic:= true
-    else
-    begin
-      C.Font.Style:= [fsBold, fsItalic];
-      N2:= C.TextWidth(cTest);
-      Data.ForBoldItalic:= N2<>N1*Length(cTest);
-    end;
-  finally
-    C.Font.Style:= PrevStyle;
-  end;
-  {
-  application.MainForm.caption:= (format('norm %d, b %d, i %d, bi %d', [
-    Ord(Data.ForNormal),
-    Ord(Data.ForBold),
-    Ord(Data.ForItalic),
-    Ord(Data.ForBoldItalic)
-    ]));
-    }
-end;
-
 
 procedure TATSynEdit.UpdateLinksAttribs;
 var
@@ -7235,7 +7173,6 @@ begin
   FillChar(TextOutProps{%H-}, SizeOf(TextOutProps), 0);
 
   TextOutProps.SuperFast:= false;
-  TextOutProps.WiderFlags:= FWiderFlags;
   TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;
   TextOutProps.MainTextArea:= true;

@@ -65,7 +65,6 @@ type
     );
 
   TATWiderFlags = record
-    FontName: string;
     ForNormal: boolean;
     ForBold: boolean;
     ForItalic: boolean;
@@ -102,7 +101,6 @@ type
 type
   TATCanvasTextOutProps = record
     SuperFast: boolean;
-    WiderFlags: TATWiderFlags;
     TabHelper: TATStringTabHelper;
     LineIndex: integer;
     CharIndexInLine: integer;
@@ -188,6 +186,91 @@ uses
   Math,
   LCLType,
   LCLIntf;
+
+var
+  _WiderList: TStringList = nil;
+
+type
+  TATWiderObj = class
+    Data: TATWiderFlags;
+  end;
+
+procedure CalcWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
+const
+  cTest = 'WW';
+var
+  N1, N2: integer;
+  PrevStyle: TFontStyles;
+begin
+  PrevStyle:= C.Font.Style;
+  try
+    C.Font.Style:= [];
+    N1:= C.TextWidth('n');
+    N2:= C.TextWidth(cTest);
+
+    Flags.ForNormal:= N2<>N1*Length(cTest);
+    if Flags.ForNormal then
+    begin
+      Flags.ForBold:= true;
+      Flags.ForItalic:= true;
+      Flags.ForBoldItalic:= true;
+      exit;
+    end;
+
+    C.Font.Style:= [fsBold];
+    N2:= C.TextWidth(cTest);
+    Flags.ForBold:= N2<>N1*Length(cTest);
+
+    C.Font.Style:= [fsItalic];
+    N2:= C.TextWidth(cTest);
+    Flags.ForItalic:= N2<>N1*Length(cTest);
+
+    if Flags.ForBold or Flags.ForItalic then
+      Flags.ForBoldItalic:= true
+    else
+    begin
+      C.Font.Style:= [fsBold, fsItalic];
+      N2:= C.TextWidth(cTest);
+      Flags.ForBoldItalic:= N2<>N1*Length(cTest);
+    end;
+  finally
+    C.Font.Style:= PrevStyle;
+  end;
+  {
+  application.MainForm.caption:= (format('norm %d, b %d, i %d, bi %d', [
+    Ord(Flags.ForNormal),
+    Ord(Flags.ForBold),
+    Ord(Flags.ForItalic),
+    Ord(Flags.ForBoldItalic)
+    ]));
+    }
+end;
+
+
+procedure GetWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
+const
+  cMaxItems = 4;
+var
+  Obj: TATWiderObj;
+  N: integer;
+  SName: string;
+begin
+  SName:= C.Font.Name;
+  N:= _WiderList.IndexOf(SName);
+  if N>=0 then
+  begin
+    Flags:= TATWiderObj(_WiderList.Objects[N]).Data;
+    exit;
+  end;
+
+  CalcWiderFlags(C, Flags);
+  Obj:= TATWiderObj.Create;
+  Obj.Data:= Flags;
+  _WiderList.AddObject(SName, Obj);
+
+  while _WiderList.Count>cMaxItems do
+    _WiderList.Delete(0);
+end;
 
 function SRemoveHexDisplayedChars(const S: UnicodeString): UnicodeString;
 var
@@ -497,24 +580,31 @@ begin
 end;
 
 
-function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: UnicodeString;
-  const AFlags: TATWiderFlags): boolean;
+function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: UnicodeString): boolean;
 //detect result by presence of bold/italic tokens, offsets are needed for them,
 //ignore underline, strikeout
+{
 var
+  Flags: TATWiderFlags;
   St: TFontStyles;
+}
 begin
   if CanvasTextOutMustUseOffsets then exit(true);
 
+  {
+  //disabled since CudaText 1.104
+  GetWiderFlags(C, Flags);
+
   St:= C.Font.Style * [fsBold, fsItalic];
 
-  if St=[] then Result:= AFlags.ForNormal else
-   if St=[fsBold] then Result:= AFlags.ForBold else
-    if St=[fsItalic] then Result:= AFlags.ForItalic else
-     if St=[fsBold, fsItalic] then Result:= AFlags.ForBoldItalic else
+  if St=[] then Result:= Flags.ForNormal else
+   if St=[fsBold] then Result:= Flags.ForBold else
+    if St=[fsItalic] then Result:= Flags.ForItalic else
+     if St=[fsBold, fsItalic] then Result:= Flags.ForBoldItalic else
       Result:= false;
 
   if Result then exit;
+  }
 
   //force Offsets not for all unicode.
   //only for those chars, which are full-width or "hex displayed" or unknown width.
@@ -618,7 +708,7 @@ begin
   if AParts=nil then
   begin
     Buf:= UTF8Encode(SRemoveHexDisplayedChars(AText));
-    if CanvasTextOutNeedsOffsets(C, AText, AProps.WiderFlags) then
+    if CanvasTextOutNeedsOffsets(C, AText) then
       DxPointer:= @Dx[0]
     else
       DxPointer:= nil;
@@ -734,7 +824,7 @@ begin
       BufW:= PartStr;
       Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
 
-      if CanvasTextOutNeedsOffsets(C, PartStr, AProps.WiderFlags) then
+      if CanvasTextOutNeedsOffsets(C, PartStr) then
       begin
         _CalcCharSizesUtf8FromWidestring(BufW, @Dx[PartOffset], Length(Dx)-PartOffset, DxUTF8);
         DxPointer:= @DxUTF8[0];
@@ -1235,6 +1325,16 @@ begin
   end;
 end;
 
+initialization
+
+  _WiderList:= TStringList.Create;
+  _WiderList.Sorted:= true;
+  _WiderList.OwnsObjects:= true;
+
+finalization
+
+  _WiderList.Clear;
+  FreeAndNil(_WiderList);
 
 end.
 
