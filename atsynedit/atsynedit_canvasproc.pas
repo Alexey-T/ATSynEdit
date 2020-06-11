@@ -809,9 +809,9 @@ begin
       BufW:= SRemoveHexDisplayedChars(PartStr);
       bAllowLigatures:=
         AProps.ShowFontLigatures
-        and not SStringHasUnicodeChars(BufW); //disable ligatures if unicode chars
+        and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
 
-      if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
+      if CanvasTextOutNeedsOffsets(C, PartStr) then
         DxPointer:= @Dx[PartOffset]
       else
         DxPointer:= nil;
