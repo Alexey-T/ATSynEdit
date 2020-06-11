@@ -441,7 +441,7 @@ type
     FFoldTooltipVisible: boolean;
     FFoldTooltipWidthPercents: integer;
     FFoldTooltipLineCount: integer;
-    FFontNeedsOffsets: TATFontNeedsOffsets;
+    FWiderFlags: TATWiderFlags;
     FCursorText: TCursor;
     FCursorColumnSel: TCursor;
     FCursorGutterBookmark: TCursor;
@@ -1014,7 +1014,7 @@ type
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
     procedure UpdateClientSizes;
-    procedure UpdateFontNeedsOffsets(C: TCanvas; var Data: TATFontNeedsOffsets);
+    procedure UpdateWiderFlags(C: TCanvas; var Data: TATWiderFlags);
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
@@ -2504,7 +2504,7 @@ begin
   UpdateWrapInfo;
 
   if not CanvasTextOutMustUseOffsets then
-    UpdateFontNeedsOffsets(C, FFontNeedsOffsets);
+    UpdateWiderFlags(C, FWiderFlags);
 
   UpdateLinksAttribs;
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
@@ -2983,7 +2983,7 @@ begin
       if AMainText then
       begin
         TextOutProps.SuperFast:= bLineHuge;
-        TextOutProps.NeedOffsets:= FFontNeedsOffsets;
+        TextOutProps.WiderFlags:= FWiderFlags;
         TextOutProps.TabHelper:= FTabHelper;
         TextOutProps.LineIndex:= NLinesIndex;
         TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
@@ -6954,7 +6954,7 @@ begin
     end;
 end;
 
-procedure TATSynEdit.UpdateFontNeedsOffsets(C: TCanvas; var Data: TATFontNeedsOffsets);
+procedure TATSynEdit.UpdateWiderFlags(C: TCanvas; var Data: TATWiderFlags);
 //reason for this func: on macOS, italic font paints wider,
 //so without offsets, italic (eg syntax comments) will be too wide, and overlap next token
 const
@@ -7235,7 +7235,7 @@ begin
   FillChar(TextOutProps{%H-}, SizeOf(TextOutProps), 0);
 
   TextOutProps.SuperFast:= false;
-  TextOutProps.NeedOffsets:= FFontNeedsOffsets;
+  TextOutProps.WiderFlags:= FWiderFlags;
   TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;
   TextOutProps.MainTextArea:= true;

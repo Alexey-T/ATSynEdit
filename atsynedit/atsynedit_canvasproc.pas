@@ -64,7 +64,7 @@ type
     cLineStyleWave
     );
 
-  TATFontNeedsOffsets = record
+  TATWiderFlags = record
     FontName: string;
     ForNormal: boolean;
     ForBold: boolean;
@@ -102,7 +102,7 @@ type
 type
   TATCanvasTextOutProps = record
     SuperFast: boolean;
-    NeedOffsets: TATFontNeedsOffsets;
+    WiderFlags: TATWiderFlags;
     TabHelper: TATStringTabHelper;
     LineIndex: integer;
     CharIndexInLine: integer;
@@ -498,7 +498,7 @@ end;
 
 
 function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: UnicodeString;
-  const AOffsets: TATFontNeedsOffsets): boolean;
+  const AFlags: TATWiderFlags): boolean;
 //detect result by presence of bold/italic tokens, offsets are needed for them,
 //ignore underline, strikeout
 var
@@ -508,10 +508,10 @@ begin
 
   St:= C.Font.Style * [fsBold, fsItalic];
 
-  if St=[] then Result:= AOffsets.ForNormal else
-   if St=[fsBold] then Result:= AOffsets.ForBold else
-    if St=[fsItalic] then Result:= AOffsets.ForItalic else
-     if St=[fsBold, fsItalic] then Result:= AOffsets.ForBoldItalic else
+  if St=[] then Result:= AFlags.ForNormal else
+   if St=[fsBold] then Result:= AFlags.ForBold else
+    if St=[fsItalic] then Result:= AFlags.ForItalic else
+     if St=[fsBold, fsItalic] then Result:= AFlags.ForBoldItalic else
       Result:= false;
 
   if Result then exit;
@@ -618,7 +618,7 @@ begin
   if AParts=nil then
   begin
     Buf:= UTF8Encode(SRemoveHexDisplayedChars(AText));
-    if CanvasTextOutNeedsOffsets(C, AText, AProps.NeedOffsets) then
+    if CanvasTextOutNeedsOffsets(C, AText, AProps.WiderFlags) then
       DxPointer:= @Dx[0]
     else
       DxPointer:= nil;
@@ -734,7 +734,7 @@ begin
       BufW:= PartStr;
       Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
 
-      if CanvasTextOutNeedsOffsets(C, PartStr, AProps.NeedOffsets) then
+      if CanvasTextOutNeedsOffsets(C, PartStr, AProps.WiderFlags) then
       begin
         _CalcCharSizesUtf8FromWidestring(BufW, @Dx[PartOffset], Length(Dx)-PartOffset, DxUTF8);
         DxPointer:= @DxUTF8[0];
