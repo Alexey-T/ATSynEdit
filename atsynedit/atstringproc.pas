@@ -13,7 +13,7 @@ interface
 uses
   Classes, SysUtils, StrUtils,
   LCLType, LCLIntf, Clipbrd,
-  UnicodeData,
+  ATSynEdit_UnicodeData,
   ATSynEdit_RegExpr,
   ATSynEdit_CharSizer;
 
@@ -138,8 +138,8 @@ type
 
 function IsCharEol(ch: widechar): boolean; inline;
 function IsCharEol(ch: char): boolean; inline;
-function IsCharWord(ch: widechar; const ANonWordChars: atString): boolean;
-function IsCharWordA(ch: char): boolean;
+function IsCharWord(ch: widechar; const ANonWordChars: UnicodeString): boolean;
+function IsCharWordA(ch: char): boolean; inline;
 function IsCharWordInIdentifier(ch: widechar): boolean;
 function IsCharDigit(ch: widechar): boolean; inline;
 function IsCharDigit(ch: char): boolean; inline;
@@ -229,48 +229,22 @@ begin
   Result:= (ch=#10) or (ch=#13);
 end;
 
-function IsCharWord(ch: widechar; const ANonWordChars: atString): boolean;
-var
-  NType: byte;
+function IsCharWord(ch: widechar; const ANonWordChars: UnicodeString): boolean;
 begin
-  case ch of
-    '0'..'9',
-    'a'..'z',
-    'A'..'Z':
-      exit(true);
-    '_':
-      // to make '_' non-word char, specify it as _first_ in ANonWordChars
-      exit( (ANonWordChars='') or (ANonWordChars[1]<>'_') );
-    #0..' ':
+  Result := WordDetectArray[Ord(ch)];
+
+  if ch='_' then
+    // to make '_' non-word char, specify it as _first_ in ANonWordChars
+    exit( (ANonWordChars='') or (ANonWordChars[1]<>'_') )
+  else
+  if Ord(ch)>=128 then
+    if Pos(ch, ANonWordChars)>0 then
       exit(false);
-  end;
-
-  if Pos(ch, ANonWordChars)>0 then
-    exit(false);
-
-  if Ord(ch)<128 then
-    Result:= true
-  else
-  if Ord(ch)>=LOW_SURROGATE_BEGIN then
-    exit(false)
-  else
-  begin
-    NType:= GetProps(Ord(ch))^.Category;
-    Result:= (NType<=UGC_OtherNumber);
-  end;
 end;
 
 function IsCharWordA(ch: char): boolean;
 begin
-  case ch of
-    '0'..'9',
-    'a'..'z',
-    'A'..'Z',
-    '_':
-      exit(true);
-    else
-      exit(false);
-  end;
+  Result := WordDetectArray[Ord(ch)];
 end;
 
 
@@ -1059,24 +1033,12 @@ end;
 
 function SCharUpper(ch: WideChar): WideChar;
 begin
-  if (Ord(ch) >= Ord('a')) and (Ord(ch) <= Ord('z')) then
-    Result:= WideChar(Ord(ch)-32)
-  else
-  if Ord(ch) >= 128 then
-    Result:= WideUpperCase(ch)[1]
-  else
-    Result:= ch;
+  Result := CharUpperArray[Ord(Ch)];
 end;
 
 function SCharLower(ch: WideChar): WideChar;
 begin
-  if (Ord(ch) >= Ord('A')) and (Ord(ch) <= Ord('Z')) then
-    Result:= WideChar(Ord(ch)+32)
-  else
-  if Ord(ch) >= 128 then
-    Result:= WideLowerCase(ch)[1]
-  else
-    Result:= ch;
+  Result := CharLowerArray[Ord(Ch)];
 end;
 
 
@@ -1486,7 +1448,6 @@ begin
       Result:= 0;
   end;
 end;
-
 
 end.
 

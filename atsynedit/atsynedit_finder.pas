@@ -16,6 +16,7 @@ uses
   ATSynEdit_FGL,
   ATSynEdit_RegExpr, //must be with {$define Unicode}
   ATSynEdit_Carets,
+  ATSynEdit_UnicodeData,
   ATStrings,
   ATStringProc,
   ATStringProc_TextBuffer;
@@ -311,16 +312,7 @@ begin
   else
     for i:= 1 to MaxCount do
     begin
-      ch:= ps^;
-
-      //like UpCase(char)
-      if (ch>='a') and (ch<='z') then
-        Dec(ch, 32)
-      else
-      //call slow WideUpperCase only non-ASCII
-      if Ord(ch)>=$80 then
-        ch:= WideUpperCase(ch)[1];
-
+      ch:= SCharUpper(ps^);
       if pf^<>ch then
         exit(false);
       Inc(pf);
@@ -1751,7 +1743,8 @@ begin
 
   SFind:= StrFind;
   if not OptCase then
-    SFind:= WideUpperCase(SFind);
+    for i:= 1 to Length(SFind) do
+      SFind[i]:= SCharUpper(SFind[i]);
 
   StringArray_SetFromString(ListParts, SFind, OptBack);
   PartCount:= Length(ListParts);
