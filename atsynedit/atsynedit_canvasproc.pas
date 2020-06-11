@@ -244,7 +244,8 @@ function _TextOut_Unix(DC: HDC;
   Dx: PInteger
   ): boolean; inline;
 begin
-  Result:= ExtTextOut(DC, X, Y, ETO_CLIPPED or ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
+  //ETO_CLIPPED runs more code in TGtk2WidgetSet.ExtTextOut
+  Result:= ExtTextOut(DC, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
 end;
 {$endif}
 
