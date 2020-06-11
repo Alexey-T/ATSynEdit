@@ -62,6 +62,7 @@ function IsCharAccent(ch: WideChar): boolean; inline;
 function IsCharUnicodeSpace(ch: WideChar): boolean; inline;
 function IsCharHexDisplayed(ch: WideChar): boolean;
 function IsCharUnusualWidth(ch: WideChar): boolean; inline;
+function IsStringWithUnusualWidthChars(const S: UnicodeString): boolean;
 
 
 implementation
@@ -275,6 +276,16 @@ begin
     else
       Result:= true;
   end;
+end;
+
+function IsStringWithUnusualWidthChars(const S: UnicodeString): boolean;
+var
+  i: integer;
+begin
+  for i:= 1 to Length(S) do
+    if IsCharUnusualWidth(S[i]) then
+      exit(true);
+  Result:= false;
 end;
 
 {$ifdef windows}

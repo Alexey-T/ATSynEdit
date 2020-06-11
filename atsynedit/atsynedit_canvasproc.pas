@@ -495,13 +495,12 @@ begin
 end;
 
 
-function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: atString;
+function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: UnicodeString;
   const AOffsets: TATFontNeedsOffsets): boolean;
 //detect result by presence of bold/italic tokens, offsets are needed for them,
 //ignore underline, strikeout
 var
   St: TFontStyles;
-  i: integer;
 begin
   if CanvasTextOutMustUseOffsets then exit(true);
 
@@ -517,10 +516,7 @@ begin
 
   //force Offsets not for all unicode.
   //only for those chars, which are full-width or "hex displayed" or unknown width.
-  //e.g. don't force for Ru chars.
-  for i:= 1 to Length(AStr) do
-    if IsCharUnusualWidth(AStr[i]) then
-      exit(true);
+  Result:= IsStringWithUnusualWidthChars(AStr);
 end;
 
 
