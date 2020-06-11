@@ -49,9 +49,9 @@ end;
 -ddebug_show_fps__"/>
       </Other>
     </CompilerOptions>
-    <Description Value="Multi-line editor control, with more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
+    <Description Value="Multi-line editor control, used in CudaText editor. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
-    <Version Major="1" Minor="5"/>
+    <Version Major="1" Minor="6"/>
     <Files Count="34">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
