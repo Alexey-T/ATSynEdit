@@ -816,7 +816,7 @@ type
     procedure DoSelectionDeleteColumnBlock;
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
-    procedure DoUpdateFontNeedsOffsets(C: TCanvas);
+    procedure UpdateFontNeedsOffsets(C: TCanvas; var Data: TATFontNeedsOffsets);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -2504,7 +2504,7 @@ begin
   UpdateWrapInfo;
 
   if not CanvasTextOutMustUseOffsets then
-    DoUpdateFontNeedsOffsets(C);
+    UpdateFontNeedsOffsets(C, FFontNeedsOffsets);
 
   UpdateLinksAttribs;
   DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
@@ -6953,38 +6953,53 @@ begin
     end;
 end;
 
-procedure TATSynEdit.DoUpdateFontNeedsOffsets(C: TCanvas);
+procedure TATSynEdit.UpdateFontNeedsOffsets(C: TCanvas; var Data: TATFontNeedsOffsets);
 const
-  cTest = 'WWWww';
+  cTest = 'WW';
 var
   N1, N2: integer;
   PrevStyle: TFontStyles;
 begin
   PrevStyle:= C.Font.Style;
-  C.Font.Style:= [];
-  N1:= C.TextWidth('n');
-  N2:= C.TextWidth(cTest);
-  FFontNeedsOffsets.ForNormal:= N2<>N1*Length(cTest);
+  try
+    C.Font.Style:= [];
+    N1:= C.TextWidth('n');
+    N2:= C.TextWidth(cTest);
 
-  C.Font.Style:= [fsBold];
-  N2:= C.TextWidth(cTest);
-  FFontNeedsOffsets.ForBold:= N2<>N1*Length(cTest);
+    Data.ForNormal:= N2<>N1*Length(cTest);
+    if Data.ForNormal then
+    begin
+      Data.ForBold:= true;
+      Data.ForItalic:= true;
+      Data.ForBoldItalic:= true;
+      exit;
+    end;
 
-  C.Font.Style:= [fsItalic];
-  N2:= C.TextWidth(cTest);
-  FFontNeedsOffsets.ForItalic:= N2<>N1*Length(cTest);
+    C.Font.Style:= [fsBold];
+    N2:= C.TextWidth(cTest);
+    Data.ForBold:= N2<>N1*Length(cTest);
 
-  C.Font.Style:= [fsBold, fsItalic];
-  N2:= C.TextWidth(cTest);
-  FFontNeedsOffsets.ForBoldItalic:= N2<>N1*Length(cTest);
+    C.Font.Style:= [fsItalic];
+    N2:= C.TextWidth(cTest);
+    Data.ForItalic:= N2<>N1*Length(cTest);
 
-  C.Font.Style:= PrevStyle;
+    if Data.ForBold or Data.ForItalic then
+      Data.ForBoldItalic:= true
+    else
+    begin
+      C.Font.Style:= [fsBold, fsItalic];
+      N2:= C.TextWidth(cTest);
+      Data.ForBoldItalic:= N2<>N1*Length(cTest);
+    end;
+  finally
+    C.Font.Style:= PrevStyle;
+  end;
   {
   application.MainForm.caption:= (format('norm %d, b %d, i %d, bi %d', [
-    Ord(FFontNeedsOffsets.ForNormal),
-    Ord(FFontNeedsOffsets.ForBold),
-    Ord(FFontNeedsOffsets.ForItalic),
-    Ord(FFontNeedsOffsets.ForBoldItalic)
+    Ord(Data.ForNormal),
+    Ord(Data.ForBold),
+    Ord(Data.ForItalic),
+    Ord(Data.ForBoldItalic)
     ]));
     }
 end;
