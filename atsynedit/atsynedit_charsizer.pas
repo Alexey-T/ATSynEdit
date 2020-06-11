@@ -54,13 +54,11 @@ const
 var
   OptUnprintedReplaceSpec: boolean = false;
   OptUnprintedReplaceSpecToCode: integer = 164; //char 164 is small circle
-  OptHexChars: UnicodeString = ''; //show these chars as "<NNNN>"
-  OptHexCharsDefault: UnicodeString = ''; //recommended default for OptHexChars
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
 function IsCharAccent(ch: WideChar): boolean; inline;
 function IsCharUnicodeSpace(ch: WideChar): boolean; inline;
-function IsCharHexDisplayed(ch: WideChar): boolean;
+function IsCharHexDisplayed(ch: WideChar): boolean; inline;
 function IsCharUnusualWidth(ch: WideChar): boolean; inline;
 function IsStringWithUnusualWidthChars(const S: UnicodeString): boolean;
 
@@ -252,10 +250,7 @@ end;
 
 function IsCharHexDisplayed(ch: WideChar): boolean;
 begin
-  Result:= FixedSizes[Ord(ch)]= _hexshow;
-  if Result then exit;
-  if Ord(ch)>=128 then
-    Result:= Pos(ch, OptHexChars)>0;
+  Result:= FixedSizes[Ord(ch)]=_hexshow;
 end;
 
 function IsCharAccent(ch: WideChar): boolean;
