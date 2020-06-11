@@ -501,6 +501,7 @@ function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: atString;
 //ignore underline, strikeout
 var
   St: TFontStyles;
+  i: integer;
 begin
   if CanvasTextOutMustUseOffsets then exit(true);
 
@@ -513,7 +514,13 @@ begin
       Result:= false;
 
   if Result then exit;
-  Result:= SStringHasUnicodeChars(AStr);
+
+  //force Offsets not for all unicode.
+  //only for those chars, which are full-width or "hex displayed" or unknown width.
+  //e.g. don't force for Ru chars.
+  for i:= 1 to Length(AStr) do
+    if IsCharUnusualWidth(AStr[i]) then
+      exit(true);
 end;
 
 

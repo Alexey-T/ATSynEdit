@@ -154,7 +154,6 @@ function IsCharSurrogateAny(ch: widechar): boolean; inline;
 function IsCharSurrogateHigh(ch: widechar): boolean; inline;
 function IsCharSurrogateLow(ch: widechar): boolean; inline;
 
-function SStringHasUnicodeChars(const S: atString): boolean;
 function IsStringSpaces(const S: atString): boolean; inline;
 function IsStringSpaces(const S: atString; AFrom, ALen: integer): boolean;
 
@@ -353,6 +352,7 @@ begin
   Result:= true;
 end;
 
+{
 function SStringHasUnicodeChars(const S: atString): boolean;
 var
   i, N: integer;
@@ -364,7 +364,7 @@ begin
   end;
   Result:= false;
 end;
-
+}
 
 procedure DoDebugOffsets(const AList: TATLineOffsetsInfo);
 var

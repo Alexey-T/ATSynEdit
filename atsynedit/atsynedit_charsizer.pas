@@ -61,6 +61,7 @@ function IsCharAsciiControl(ch: WideChar): boolean; inline;
 function IsCharAccent(ch: WideChar): boolean; inline;
 function IsCharUnicodeSpace(ch: WideChar): boolean; inline;
 function IsCharHexDisplayed(ch: WideChar): boolean;
+function IsCharUnusualWidth(ch: WideChar): boolean; inline;
 
 
 implementation
@@ -264,6 +265,16 @@ end;
 function IsCharUnicodeSpace(ch: WideChar): boolean;
 begin
   Result:= FixedSizes[Ord(ch)]=_space;
+end;
+
+function IsCharUnusualWidth(ch: WideChar): boolean;
+begin
+  case FixedSizes[Ord(ch)] of
+    _norm, _space:
+      Result:= false
+    else
+      Result:= true;
+  end;
 end;
 
 {$ifdef windows}
