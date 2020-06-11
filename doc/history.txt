@@ -1,4 +1,7 @@
 
+2020.06.11
++ add: unit atsynedit_unicodedata, which adds arrays (320K memory), to speedup unicode funcs in finder
+
 2020.06.03
 + add: better logic of LineStates, fixing https://github.com/Alexey-T/CudaText/issues/2617
 
