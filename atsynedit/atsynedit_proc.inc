@@ -219,3 +219,12 @@ begin
     OpenURL(S);
 end;
 
+procedure SRemoveAsciiControlChars(var S: UnicodeString; AReplaceChar: Widechar);
+var
+  i: integer;
+begin
+  for i:= 1 to Length(S) do
+    if IsCharAsciiControl(S[i]) then
+      S[i]:= AReplaceChar;
+end;
+

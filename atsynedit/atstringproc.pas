@@ -182,7 +182,6 @@ function SStringHasTab(const S: string): boolean; inline;
 //function SStringHasAsciiAndNoTabs(const S: string): boolean;
 
 function SRemoveNewlineChars(const S: atString): atString;
-function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar): atString;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
 procedure SSwapEndianWide(var S: UnicodeString);
@@ -915,17 +914,6 @@ begin
   end;
 end;
 
-function SRemoveAsciiControlChars(const S: atString; AReplaceChar: Widechar
-  ): atString;
-var
-  i: integer;
-begin
-  Result:= S;
-  if OptUnprintedReplaceSpec then
-    for i:= 1 to Length(Result) do
-      if IsCharAsciiControl(Result[i]) then
-        Result[i]:= AReplaceChar;
-end;
 
 function SRemoveNewlineChars(const S: atString): atString;
 var

@@ -2977,7 +2977,8 @@ begin
       else
         Event:= nil;
 
-      StrOutput:= SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
+      if OptUnprintedReplaceSpec then
+        SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
 
       if AMainText then
       begin
