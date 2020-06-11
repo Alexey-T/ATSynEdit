@@ -816,7 +816,6 @@ type
     procedure DoSelectionDeleteColumnBlock;
     function DoSelect_MultiCaretsToColumnSel: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
-    procedure UpdateFontNeedsOffsets(C: TCanvas; var Data: TATFontNeedsOffsets);
     function _IsFocused: boolean;
     function GetEncodingName: string;
     procedure SetEncodingName(const AName: string);
@@ -1015,6 +1014,7 @@ type
     procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
     procedure UpdateClientSizes;
+    procedure UpdateFontNeedsOffsets(C: TCanvas; var Data: TATFontNeedsOffsets);
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
@@ -6954,6 +6954,8 @@ begin
 end;
 
 procedure TATSynEdit.UpdateFontNeedsOffsets(C: TCanvas; var Data: TATFontNeedsOffsets);
+//reason for this func: on macOS, italic font paints wider,
+//so without offsets, italic (eg syntax comments) will be too wide, and overlap next token
 const
   cTest = 'WW';
 var
