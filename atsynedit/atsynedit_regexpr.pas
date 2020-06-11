@@ -68,9 +68,6 @@ interface
 {$ENDIF}
 // ======== Define options for TRegExpr engine
 {$DEFINE UniCode} // Use WideChar for characters and UnicodeString/WideString for strings
-{ off $DEFINE UseWordChars} // Use WordChars property, otherwise fixed list 'a'..'z','A'..'Z','0'..'9','_'
-{ off $DEFINE UseSpaceChars} // Use SpaceChars property, otherwise fixed list
-{ off $DEFINE UnicodeWordDetection} // Additionally to ASCII word chars, detect word chars >=128 by Unicode table
 {$DEFINE UseFirstCharSet} // Enable optimization, which finds possible first chars of input string
 {$DEFINE RegExpPCodeDump} // Enable method Dump() to show opcode as string
 {$IFNDEF FPC} // Not supported in FreePascal
@@ -141,18 +138,6 @@ const
   RegExprModifierG: boolean = True; // default value for ModifierG
   RegExprModifierM: boolean = True; // default value for ModifierM
   RegExprModifierX: boolean = False; // default value for ModifierX
-
-  {$IFDEF UseSpaceChars}
-  // default value for SpaceChars
-  RegExprSpaceChars: RegExprString = ' '#$9#$A#$D#$C;
-  {$ENDIF}
-
-  {$IFDEF UseWordChars}
-  // default value for WordChars
-  RegExprWordChars: RegExprString = '0123456789'
-    + 'abcdefghijklmnopqrstuvwxyz'
-    + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_';
-  {$ENDIF}
 
   // default value for LineSeparators
   RegExprLineSeparators: RegExprString = #$a#$b#$c
@@ -304,12 +289,6 @@ type
     fCompModifiers: TRegExprModifiers; // compiler's copy of modifiers
     fProgModifiers: TRegExprModifiers; // modifiers values from last programm compilation
 
-    {$IFDEF UseSpaceChars}
-    fSpaceChars: RegExprString;
-    {$ENDIF}
-    {$IFDEF UseWordChars}
-    fWordChars: RegExprString;
-    {$ENDIF}
     fInvertCase: TRegExprInvertCaseFunction;
 
     fLineSeparators: RegExprString;
@@ -639,24 +618,6 @@ type
     // Useful for error diagnostics
     property CompilerErrorPos: PtrInt read GetCompilerErrorPos;
 
-    {$IFDEF UseSpaceChars}
-    // Contains chars, treated as /s (initially filled with RegExprSpaceChars
-    // global constant)
-    property SpaceChars: RegExprString read fSpaceChars write fSpaceChars;
-    // ###0.927
-    {$ENDIF}
-
-    {$IFDEF UseWordChars}
-    // Contains chars, treated as /w (initially filled with RegExprWordChars
-    // global constant)
-    property WordChars: RegExprString read fWordChars write fWordChars;
-    // ###0.929
-    {$ENDIF}
-
-    {$IFDEF UnicodeWordDetection}
-    // If set to true, in addition to using WordChars, a heuristic to detect unicode word letters is used for \w
-    property UseUnicodeWordDetection: boolean read FUseUnicodeWordDetection write FUseUnicodeWordDetection;
-    {$ENDIF}
     // line separators (like \n in Unix)
     property LineSeparators: RegExprString read fLineSeparators write SetLineSeparators; // ###0.941
 
@@ -1457,12 +1418,6 @@ begin
   ModifierM := RegExprModifierM;
   ModifierX := RegExprModifierX;
 
-  {$IFDEF UseSpaceChars}
-  SpaceChars := RegExprSpaceChars; // ###0.927
-  {$ENDIF}
-  {$IFDEF UseWordChars}
-  WordChars := RegExprWordChars; // ###0.929
-  {$ENDIF}
   fInvertCase := RegExprInvertCaseFunction; // ###0.927
 
   fLineSeparators := RegExprLineSeparators; // ###0.941
@@ -1669,16 +1624,12 @@ end;
 
 function TRegExpr.IsSpaceChar(AChar: REChar): boolean;
 begin
-  {$IFDEF UseSpaceChars}
-  Result := Pos(AChar, fSpaceChars) > 0;
-  {$ELSE}
   case AChar of
     ' ', #$9, #$A, #$D, #$C:
       Result := True
     else
       Result := False;
   end;
-  {$ENDIF}
 end;
 
 function TRegExpr.IsCustomLineSeparator(AChar: REChar): boolean;
@@ -2042,47 +1993,13 @@ end;
 
 
 procedure TRegExpr.GetCharSetFromWordChars(var ARes: TRegExprCharset); {$IFDEF InlineFuncs}inline;{$ENDIF}
-{$IFDEF UseWordChars}
-var
-  i: integer;
-  ch: REChar;
-{$ENDIF}
 begin
-  {$IFDEF UseWordChars}
-  ARes := [];
-  for i := 1 to Length(fWordChars) do
-  begin
-    ch := fWordChars[i];
-    {$IFDEF UniCode}
-    if Ord(ch) <= $FF then
-    {$ENDIF}
-      Include(ARes, byte(ch));
-  end;
-  {$ELSE}
   ARes := RegExprWordSet;
-  {$ENDIF}
 end;
 
 procedure TRegExpr.GetCharSetFromSpaceChars(var ARes: TRegExprCharset); {$IFDEF InlineFuncs}inline;{$ENDIF}
-{$IFDEF UseSpaceChars}
-var
-  i: integer;
-  ch: REChar;
-{$ENDIF}
 begin
-  {$IFDEF UseSpaceChars}
-  ARes := [];
-  for i := 1 to Length(fSpaceChars) do
-  begin
-    ch := fSpaceChars[i];
-    {$IFDEF UniCode}
-    if Ord(ch) <= $FF then
-    {$ENDIF}
-      Include(ARes, byte(ch));
-  end;
-  {$ELSE}
   ARes := RegExprSpaceSet;
-  {$ENDIF}
 end;
 
 procedure TRegExpr.GetCharSetFromCharClass(ABuffer: PRegExprChar; AIgnoreCase: boolean; var ARes: TRegExprCharset);
