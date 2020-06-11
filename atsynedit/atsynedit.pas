@@ -6962,6 +6962,9 @@ var
   N1, N2: integer;
   PrevStyle: TFontStyles;
 begin
+  if C.Font.Name=Data.FontName then exit;
+  Data.FontName:= C.Font.Name;
+
   PrevStyle:= C.Font.Style;
   try
     C.Font.Style:= [];

@@ -65,6 +65,7 @@ type
     );
 
   TATFontNeedsOffsets = record
+    FontName: string;
     ForNormal: boolean;
     ForBold: boolean;
     ForItalic: boolean;
