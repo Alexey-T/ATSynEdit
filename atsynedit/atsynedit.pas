@@ -2155,6 +2155,7 @@ begin
 end;
 
 function TATSynEdit.UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
+//returns True is scrollbars visibility was changed
 var
   bVert1, bVert2, bHorz1, bHorz2: boolean;
   bVertOur1, bVertOur2, bHorzOur1, bHorzOur2: boolean;
@@ -2229,9 +2230,9 @@ begin
 
   bChangedBarsOs:= (bVert1<>bVert2) or (bHorz1<>bHorz2);
   bChangedBarsOur:= (bVertOur1<>bVertOur2) or (bHorzOur1<>bHorzOur2);
-  Result:= bChangedBarsOs;
 
-  if bChangedBarsOs or bChangedBarsOur then
+  Result:= bChangedBarsOs or bChangedBarsOur;
+  if Result then
     UpdateClientSizes;
 
   if (FPrevHorz<>FScrollHorz) or
