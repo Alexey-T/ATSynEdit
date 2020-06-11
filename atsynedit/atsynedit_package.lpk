@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="4">
+  <Package Version="5">
     <PathDelim Value="\"/>
     <Name Value="atsynedit_package"/>
     <Type Value="RunAndDesignTime"/>
@@ -52,7 +52,7 @@ end;
     <Description Value="Multi-line editor control, with more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
     <Version Major="1" Minor="5"/>
-    <Files Count="33">
+    <Files Count="34">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -186,6 +186,10 @@ end;
         <Filename Value="atsynedit_micromap.pas"/>
         <UnitName Value="ATSynEdit_Micromap"/>
       </Item33>
+      <Item34>
+        <Filename Value="atsynedit_unicodedata.pas"/>
+        <UnitName Value="ATSynEdit_UnicodeData"/>
+      </Item34>
     </Files>
     <RequiredPkgs Count="4">
       <Item1>

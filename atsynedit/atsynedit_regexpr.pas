@@ -70,7 +70,7 @@ interface
 {$DEFINE UniCode} // Use WideChar for characters and UnicodeString/WideString for strings
 { off $DEFINE UseWordChars} // Use WordChars property, otherwise fixed list 'a'..'z','A'..'Z','0'..'9','_'
 { off $DEFINE UseSpaceChars} // Use SpaceChars property, otherwise fixed list
-{$DEFINE UnicodeWordDetection} // Additionally to ASCII word chars, detect word chars >=128 by Unicode table
+{ off $DEFINE UnicodeWordDetection} // Additionally to ASCII word chars, detect word chars >=128 by Unicode table
 {$DEFINE UseFirstCharSet} // Enable optimization, which finds possible first chars of input string
 {$DEFINE RegExpPCodeDump} // Enable method Dump() to show opcode as string
 {$IFNDEF FPC} // Not supported in FreePascal
@@ -755,22 +755,13 @@ function RegExprSubExpressions(const ARegExpr: string; ASubExprs: TStrings;
 
 implementation
 
-{$IFDEF FPC}
-{$IFDEF UnicodeWordDetection}
 uses
-  UnicodeData;
-{$ENDIF}
-{$ELSE}
-{$IFDEF D2009}
-uses
-  System.Character; // System.Character exists since Delphi 2009
-{$ENDIF}
-{$ENDIF}
+  ATSynEdit_UnicodeData;
 
 const
   // TRegExpr.VersionMajor/Minor return values of these constants:
   REVersionMajor = 0;
-  REVersionMinor = 991;
+  REVersionMinor = 994;
 
   OpKind_End = REChar(1);
   OpKind_MetaClass = REChar(2);
@@ -870,60 +861,14 @@ begin
   {$ENDIF}
 end;
 
-function _UpperCase(Ch: REChar): REChar;
+function _UpperCase(Ch: REChar): REChar; inline;
 begin
-  Result := Ch;
-  if (Ch >= 'a') and (Ch <= 'z') then
-  begin
-    Dec(Result, 32);
-    Exit;
-  end;
-  if Ord(Ch) < 128 then
-    Exit;
-
-  {$IFDEF FPC}
-    {$IFDEF UniCode}
-    Result := UnicodeUpperCase(Ch)[1];
-    {$ELSE}
-    Result := AnsiUpperCase(Ch)[1];
-    {$ENDIF}
-  {$ELSE}
-    {$IFDEF UniCode}
-    {$IFDEF D2009}
-    Result := TCharacter.ToUpper(Ch);
-    {$ENDIF}
-    {$ELSE}
-    Result := AnsiUpperCase(Ch)[1];
-    {$ENDIF}
-  {$ENDIF}
+  Result := CharUpperArray[Ord(Ch)];
 end;
 
-function _LowerCase(Ch: REChar): REChar;
+function _LowerCase(Ch: REChar): REChar; inline;
 begin
-  Result := Ch;
-  if (Ch >= 'A') and (Ch <= 'Z') then
-  begin
-    Inc(Result, 32);
-    Exit;
-  end;
-  if Ord(Ch) < 128 then
-    Exit;
-
-  {$IFDEF FPC}
-    {$IFDEF UniCode}
-    Result := UnicodeLowerCase(Ch)[1];
-    {$ELSE}
-    Result := AnsiLowerCase(Ch)[1];
-    {$ENDIF}
-  {$ELSE}
-    {$IFDEF UniCode}
-    {$IFDEF D2009}
-    Result := TCharacter.ToLower(Ch);
-    {$ENDIF}
-    {$ELSE}
-    Result := AnsiLowerCase(Ch)[1];
-    {$ENDIF}
-  {$ENDIF}
+  Result := CharLowerArray[Ord(Ch)];
 end;
 
 { ============================================================= }
@@ -1557,40 +1502,10 @@ end; { of destructor TRegExpr.Destroy
 
 class function TRegExpr.InvertCaseFunction(const Ch: REChar): REChar;
 begin
-  Result := Ch;
-  if (Ch >= 'a') and (Ch <= 'z') then
-  begin
-    Dec(Result, 32);
-    Exit;
-  end;
-  if (Ch >= 'A') and (Ch <= 'Z') then
-  begin
-    Inc(Result, 32);
-    Exit;
-  end;
-  if Ord(Ch) < 128 then
-    Exit;
-
-  {$IFDEF FPC}
   Result := _UpperCase(Ch);
   if Result = Ch then
     Result := _LowerCase(Ch);
-  {$ELSE}
-  {$IFDEF UniCode}
-  {$IFDEF D2009}
-  if TCharacter.IsUpper(Ch) then
-    Result := TCharacter.ToLower(Ch)
-  else
-    Result := TCharacter.ToUpper(Ch);
-  {$ENDIF}
-  {$ELSE}
-  Result := _UpperCase(Ch);
-  if Result = Ch then
-    Result := _LowerCase(Ch);
-  {$ENDIF}
-  {$ENDIF}
-end; { of function TRegExpr.InvertCaseFunction
-  -------------------------------------------------------------- }
+end;
 
 procedure TRegExpr.SetExpression(const AStr: RegExprString);
 begin
@@ -1749,22 +1664,7 @@ end; { of procedure TRegExpr.SetModifierStr
 
 function TRegExpr.IsWordChar(AChar: REChar): boolean;
 begin
-  {$IFDEF UseWordChars}
-  Result := Pos(AChar, fWordChars) > 0;
-  {$ELSE}
-  case AChar of
-    'a' .. 'z',
-    'A' .. 'Z',
-    '0' .. '9', '_':
-      Result := True
-    else
-      Result := False;
-  end;
-  {$ENDIF}
-  {$IFDEF UnicodeWordDetection}
-  if not Result and (Ord(AChar) >= 128) and UseUnicodeWordDetection then
-    Result := IsUnicodeWordChar(AChar);
-  {$ENDIF}
+  Result := WordDetectArray[Ord(AChar)];
 end;
 
 function TRegExpr.IsSpaceChar(AChar: REChar): boolean;
