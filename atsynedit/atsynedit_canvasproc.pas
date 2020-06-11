@@ -180,6 +180,8 @@ procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColo
 function ColorBlend(c1, c2: Longint; A: Longint): Longint;
 function ColorBlendHalf(c1, c2: Longint): Longint;
 
+procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
+
 implementation
 
 uses
@@ -187,15 +189,7 @@ uses
   LCLType,
   LCLIntf;
 
-var
-  _WiderList: TStringList = nil;
-
-type
-  TATWiderObj = class
-    Data: TATWiderFlags;
-  end;
-
-procedure CalcWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
+procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 const
   cTest = 'WW';
 var
@@ -244,32 +238,6 @@ begin
     Ord(Flags.ForBoldItalic)
     ]));
     }
-end;
-
-
-procedure GetWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
-const
-  cMaxItems = 4;
-var
-  Obj: TATWiderObj;
-  N: integer;
-  SName: string;
-begin
-  SName:= C.Font.Name;
-  N:= _WiderList.IndexOf(SName);
-  if N>=0 then
-  begin
-    Flags:= TATWiderObj(_WiderList.Objects[N]).Data;
-    exit;
-  end;
-
-  CalcWiderFlags(C, Flags);
-  Obj:= TATWiderObj.Create;
-  Obj.Data:= Flags;
-  _WiderList.AddObject(SName, Obj);
-
-  while _WiderList.Count>cMaxItems do
-    _WiderList.Delete(0);
 end;
 
 function SRemoveHexDisplayedChars(const S: UnicodeString): UnicodeString;
@@ -596,8 +564,6 @@ begin
   //a) its used only on Linux/BSD yet, but is it needed there?
   //it was needed maybe for Win32 (need to check) but on Win32 const CanvasTextOutMustUseOffsets=true
   //b) it must be placed out of this deep func CanvasTextOut, its called too much (for each token)
-
-  GetWiderFlags(C, Flags);
 
   St:= C.Font.Style * [fsBold, fsItalic];
 
@@ -1328,17 +1294,6 @@ begin
     end;
   end;
 end;
-
-initialization
-
-  _WiderList:= TStringList.Create;
-  _WiderList.Sorted:= true;
-  _WiderList.OwnsObjects:= true;
-
-finalization
-
-  _WiderList.Clear;
-  FreeAndNil(_WiderList);
 
 end.
 
