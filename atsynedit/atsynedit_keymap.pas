@@ -38,6 +38,7 @@ type
     Command: integer;
     Name: string;
     Keys1, Keys2: TATKeyArray;
+    LexerSpecific: boolean;
     procedure Assign(AItem: TATKeymapItem);
   end;
 
