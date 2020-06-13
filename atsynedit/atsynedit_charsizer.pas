@@ -142,8 +142,6 @@ begin
   for i:= $370 to $3ff do
     FixedSizes[i]:= _norm;
 
-  FixedSizes[$2026]:= _full; //unicode dots
-
   //Chinese
   // http://www.unicode.org/versions/Unicode5.0.0/ch12.pdf#G12159
   for i:= $3400 to $9FFF do
@@ -185,6 +183,13 @@ begin
   //Syriac...Khmer..general puctuation
   for i:= $700 to $206F do
     FixedSizes[i]:= _full;
+
+  for i:= $2010 to $2027 do
+    FixedSizes[i]:= _norm;
+  for i:= $2030 to $203A do
+    FixedSizes[i]:= _norm;
+  FixedSizes[$20AC]:= _norm;
+  FixedSizes[$2122]:= _norm;
 
   //combining chars
   // https://en.wikipedia.org/wiki/Combining_character
