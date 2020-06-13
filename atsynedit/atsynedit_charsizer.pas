@@ -265,6 +265,10 @@ end;
 
 function IsCharUnusualWidth(ch: WideChar): boolean;
 begin
+  //tab-char must have unusual width (to render it with Dx offset)
+  if Ord(ch)<32 then
+    exit(true);
+
   case FixedSizes[Ord(ch)] of
     _norm, _space:
       Result:= false
