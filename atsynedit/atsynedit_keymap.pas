@@ -65,7 +65,7 @@ type
     function IndexOf(ACmd: integer): integer;
     function GetShortcutFromCommand(ACode: integer): TShortcut;
     function GetCommandFromShortcut(AKey: TShortcut; var AHistory: TATKeyArray): integer;
-    function GetCommandFromHotkeyString(AHotkey: string; AComboSepar: char): integer;
+    function GetCommandFromHotkeyString(const AHotkey: string; AComboSepar: char): integer;
   end;
 
 implementation
@@ -73,7 +73,6 @@ implementation
 uses
   Math,
   LCLProc;
-  //Dialogs;
 
 { TATKeymapItem }
 
@@ -242,7 +241,7 @@ begin
     AddToHistory(AKey, AHistory);
 end;
 
-function TATKeymap.GetCommandFromHotkeyString(AHotkey: string; AComboSepar: char): integer;
+function TATKeymap.GetCommandFromHotkeyString(const AHotkey: string; AComboSepar: char): integer;
 var
   Ar: TATKeyArray;
   Item: TATKeymapItem;
