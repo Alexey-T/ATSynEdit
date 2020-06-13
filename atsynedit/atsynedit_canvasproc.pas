@@ -677,12 +677,18 @@ begin
 
   if AParts=nil then
   begin
-    Buf:= UTF8Encode(SRemoveHexDisplayedChars(AText));
+    BufW:= SRemoveHexDisplayedChars(AText);
     if CanvasTextOutNeedsOffsets(C, AText) then
       DxPointer:= @Dx[0]
     else
       DxPointer:= nil;
-    ExtTextOut(C.Handle, APosX, APosY, 0, nil, PChar(Buf), Length(Buf), DxPointer);
+
+    {$ifdef windows}
+    _TextOut_Windows(C.Handle, APosX, APosY, nil, BufW, DxPointer, false{no ligatures});
+    {$else}
+    Buf:= BufW;
+    _TextOut_Unix(C.Handle, APosX, APosY, nil, Buf, DxPointer);
+    {$endif}
 
     DoPaintHexChars(C,
       AText,
