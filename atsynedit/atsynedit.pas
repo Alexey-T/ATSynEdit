@@ -286,6 +286,7 @@ const
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
   cInitMaxLineLenToTokenize = 4000;
+  cInitMinLineLenToCalcURL = 4;
   cInitMaxLineLenToCalcURL = 300;
   cInitStapleHiliteAlpha = 180;
   cInitZebraAlphaBlend = 235;
@@ -639,6 +640,7 @@ type
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
     FOptMaxLineLenToTokenize: integer;
+    FOptMinLineLenToCalcURL: integer;
     FOptMaxLineLenToCalcURL: integer;
     FOptMaxLinesToCountUnindent: integer;
     FOptScrollStyleVert: TATSynEditScrollStyle;
@@ -1498,6 +1500,7 @@ type
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
+    property OptMinLineLenToCalcURL: integer read FOptMinLineLenToCalcURL write FOptMinLineLenToCalcURL default cInitMinLineLenToCalcURL;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
     property OptMaxLinesToCountUnindent: integer read FOptMaxLinesToCountUnindent write FOptMaxLinesToCountUnindent default 100;
     property OptStapleStyle: TATLineStyle read FOptStapleStyle write FOptStapleStyle default cLineStyleSolid;
@@ -3783,6 +3786,7 @@ begin
   FOptShowDragDropMarker:= true;
 
   FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
+  FOptMinLineLenToCalcURL:= cInitMinLineLenToCalcURL;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
   FOptMaxLinesToCountUnindent:= 100;
 
@@ -6981,8 +6985,6 @@ begin
   InitAttribs;
   FAttribs.DeleteWithTag(cUrlMarkerTag);
 
-  //LinkCache size should depend on editor height
-  //FLinkCache.MaxCount:= GetVisibleLines+3;
   FLinkCache.DeleteDataOutOfRange(NLineStart, NLineEnd);
   NRegexRuns:= 0;
 
@@ -6991,7 +6993,7 @@ begin
     if not Strings.IsIndexValid(iLine) then Break;
     NLineLen:= Strings.LinesLen[iLine];
 
-    if NLineLen<=2 then Continue;
+    if NLineLen<FOptMinLineLenToCalcURL then Continue;
     if NLineLen>FOptMaxLineLenToCalcURL then Continue;
 
     LinkArrayPtr:= FLinkCache.FindData(iLine);
