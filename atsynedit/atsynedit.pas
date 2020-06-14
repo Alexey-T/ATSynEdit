@@ -6958,7 +6958,8 @@ end;
 procedure TATSynEdit.UpdateLinksAttribs;
 var
   AtrObj: TATLinePartClass;
-  MatchPos, MatchLen, NLine, NLineLen, iLine: integer;
+  NLineStart, NLineEnd, NLineLen: integer;
+  MatchPos, MatchLen, iLine: integer;
   LinkArrayPtr: PATLinkArray;
   LinkArray: TATLinkArray;
   LinkIndex: integer;
@@ -6974,15 +6975,18 @@ begin
     exit;
   end;
 
+  NLineStart:= LineTop;
+  NLineEnd:= NLineStart+GetVisibleLines;
+
   InitAttribs;
   FAttribs.DeleteWithTag(cUrlMarkerTag);
 
   //LinkCache size should depend on editor height
-  FLinkCache.MaxCount:= GetVisibleLines+3;
+  //FLinkCache.MaxCount:= GetVisibleLines+3;
+  FLinkCache.DeleteDataOutOfRange(NLineStart, NLineEnd);
   NRegexRuns:= 0;
 
-  NLine:= LineTop;
-  for iLine:= NLine to NLine+GetVisibleLines do
+  for iLine:= NLineStart to NLineEnd do
   begin
     if not Strings.IsIndexValid(iLine) then Break;
     NLineLen:= Strings.LinesLen[iLine];

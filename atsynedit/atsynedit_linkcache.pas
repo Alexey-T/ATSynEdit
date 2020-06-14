@@ -44,6 +44,7 @@ type
     function FindData(ALineIndex: integer): PATLinkArray;
     procedure AddData(ALineIndex: integer; const AData: TATLinkArray);
     procedure DeleteData(ALineIndex: integer);
+    procedure DeleteDataOutOfRange(ALine1, ALine2: integer);
     function DebugText: string;
   end;
 
@@ -114,6 +115,19 @@ begin
       Delete(i);
       exit;
     end;
+  end;
+end;
+
+procedure TATLinkCache.DeleteDataOutOfRange(ALine1, ALine2: integer);
+var
+  Ptr: PATLinkCacheItem;
+  i: integer;
+begin
+  for i:= Count-1 downto 0 do
+  begin
+    Ptr:= InternalGet(i);
+    if (Ptr^.LineIndex<ALine1) or (Ptr^.LineIndex>ALine2) then
+      Delete(i);
   end;
 end;
 
