@@ -51,6 +51,7 @@ uses
   ATSynEdit_Micromap,
   ATSynEdit_Adapters,
   ATSynEdit_Adapter_Cache,
+  ATSynEdit_LinkCache,
   ATSynEdit_FGL,
   ATScrollBar;
 
