@@ -7001,6 +7001,7 @@ begin
       MatchPos:= 0;
       MatchLen:= 0;
 
+      Inc(NRegexRuns);
       while FRegexLinks.ExecPos(MatchPos+MatchLen+1)
         and (LinkIndex<=High(LinkArray)) do
       begin
@@ -7012,8 +7013,7 @@ begin
         Inc(NRegexRuns);
       end;
 
-      if LinkIndex>0 then
-        FLinkCache.AddData(iLine, LinkArray);
+      FLinkCache.AddData(iLine, LinkArray);
     end;
 
     for LinkIndex:= 0 to High(LinkArray) do

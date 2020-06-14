@@ -34,8 +34,11 @@ type
   end;
 
   TATLinkCache = class(specialize TFPGList<TATLinkCacheItem>)
+  private
+    FMaxCount: integer;
+    procedure SetMaxCount(AValue: integer);
   public
-    MaxCount: integer;
+    property MaxCount: integer read FMaxCount write SetMaxCount;
     constructor Create;
     function FindData(ALineIndex: integer): PATLinkCacheItem;
     procedure AddData(ALineIndex: integer; const AData: TATLinkArray);
@@ -53,6 +56,17 @@ begin
 end;
 
 { TATLinkCache }
+
+procedure TATLinkCache.SetMaxCount(AValue: integer);
+begin
+  if FMaxCount=AValue then Exit;
+  FMaxCount:= AValue;
+  if FMaxCount<2 then
+    FMaxCount:= 2;
+
+  while Count>FMaxCount do
+    Delete(0);
+end;
 
 constructor TATLinkCache.Create;
 begin
