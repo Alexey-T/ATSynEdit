@@ -5970,6 +5970,8 @@ end;
 
 procedure TATSynEdit.DoEventChange(AllowOnChange: boolean=true);
 begin
+  FLinkCache.Clear;
+
   if Assigned(FAdapterHilite) then
   begin
     InvalidateHilitingCache;
@@ -6957,8 +6959,10 @@ procedure TATSynEdit.UpdateLinksAttribs;
 var
   AtrObj: TATLinePartClass;
   MatchPos, MatchLen, NLine, iLine: integer;
+  LinkDataPtr: PATLinkCacheItem;
   LinkArray: TATLinkArray;
   LinkIndex: integer;
+  NRegexRuns: integer;
 begin
   if ModeOneLine then
     exit;
@@ -6975,6 +6979,7 @@ begin
 
   //LinkCache size should depend on editor height
   FLinkCache.MaxCount:= GetVisibleLines+3;
+  NRegexRuns:= 0;
 
   NLine:= LineTop;
   for iLine:= NLine to NLine+GetVisibleLines do
@@ -6982,42 +6987,58 @@ begin
     if not Strings.IsIndexValid(iLine) then Break;
     if Strings.LinesLen[iLine]>FOptMaxLineLenToCalcURL then Continue;
 
-    Assert(Assigned(FRegexLinks), 'FRegexLinks not inited');
-    FRegexLinks.InputString:= Strings.Lines[iLine];
+    LinkDataPtr:= FLinkCache.FindData(iLine);
 
-    MatchPos:= 0;
-    MatchLen:= 0;
-
-    FillChar(LinkArray, SizeOf(LinkArray), 0);
-    LinkIndex:= 0;
-
-    while FRegexLinks.ExecPos(MatchPos+MatchLen+1) do
+    if Assigned(LinkDataPtr) then
+      LinkArray:= LinkDataPtr^.Data
+    else
     begin
-      MatchPos:= FRegexLinks.MatchPos[0];
-      MatchLen:= FRegexLinks.MatchLen[0];
+      Assert(Assigned(FRegexLinks), 'FRegexLinks not inited');
+      FRegexLinks.InputString:= Strings.Lines[iLine];
 
-      if LinkIndex<=High(LinkArray) then
+      LinkIndex:= 0;
+      FillChar(LinkArray, SizeOf(LinkArray), 0);
+      MatchPos:= 0;
+      MatchLen:= 0;
+
+      while FRegexLinks.ExecPos(MatchPos+MatchLen+1)
+        and (LinkIndex<=High(LinkArray)) do
       begin
+        MatchPos:= FRegexLinks.MatchPos[0];
+        MatchLen:= FRegexLinks.MatchLen[0];
         LinkArray[LinkIndex].NFrom:= MatchPos;
         LinkArray[LinkIndex].NLen:= MatchLen;
         Inc(LinkIndex);
+        Inc(NRegexRuns);
       end;
+
+      if LinkIndex>0 then
+        FLinkCache.AddData(iLine, LinkArray);
+    end;
+
+    for LinkIndex:= 0 to High(LinkArray) do
+    begin
+      if LinkArray[LinkIndex].NLen=0 then Break;
 
       AtrObj:= TATLinePartClass.Create;
       AtrObj.Data.ColorFont:= Colors.Links;
       AtrObj.Data.ColorBG:= clNone;
       AtrObj.Data.ColorBorder:= Colors.Links;
       AtrObj.Data.BorderDown:= cLineStyleSolid;
-      FAttribs.Add(MatchPos-1, iLine, cUrlMarkerTag, MatchLen, 0, AtrObj);
-    end;
 
-    FLinkCache.DeleteData(iLine);
-    if LinkIndex>0 then
-      FLinkCache.AddData(iLine, LinkArray);
+      FAttribs.Add(
+        LinkArray[LinkIndex].NFrom-1,
+        iLine,
+        cUrlMarkerTag,
+        LinkArray[LinkIndex].NLen,
+        0,
+        AtrObj
+        );
+    end;
   end;
 
   ////debug
-  Application.MainForm.Caption:= FLinkCache.DebugText;
+  //Application.MainForm.Caption:= 'runs:'+IntToStr(NRegexRuns)+' '+FLinkCache.DebugText;
 end;
 
 
