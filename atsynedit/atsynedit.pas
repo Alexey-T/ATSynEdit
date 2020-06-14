@@ -6958,8 +6958,8 @@ end;
 procedure TATSynEdit.UpdateLinksAttribs;
 var
   AtrObj: TATLinePartClass;
-  MatchPos, MatchLen, NLine, iLine: integer;
-  LinkDataPtr: PATLinkCacheItem;
+  MatchPos, MatchLen, NLine, NLineLen, iLine: integer;
+  LinkArrayPtr: PATLinkArray;
   LinkArray: TATLinkArray;
   LinkIndex: integer;
   NRegexRuns: integer;
@@ -6985,13 +6985,13 @@ begin
   for iLine:= NLine to NLine+GetVisibleLines do
   begin
     if not Strings.IsIndexValid(iLine) then Break;
-    if Strings.LinesLen[iLine]>FOptMaxLineLenToCalcURL then Continue;
+    NLineLen:= Strings.LinesLen[iLine];
 
-    LinkDataPtr:= FLinkCache.FindData(iLine);
+    if NLineLen<=2 then Continue;
+    if NLineLen>FOptMaxLineLenToCalcURL then Continue;
 
-    if Assigned(LinkDataPtr) then
-      LinkArray:= LinkDataPtr^.Data
-    else
+    LinkArrayPtr:= FLinkCache.FindData(iLine);
+    if LinkArrayPtr=nil then
     begin
       Assert(Assigned(FRegexLinks), 'FRegexLinks not inited');
       FRegexLinks.InputString:= Strings.Lines[iLine];
@@ -7000,25 +7000,28 @@ begin
       FillChar(LinkArray, SizeOf(LinkArray), 0);
       MatchPos:= 0;
       MatchLen:= 0;
-
       Inc(NRegexRuns);
-      while FRegexLinks.ExecPos(MatchPos+MatchLen+1)
-        and (LinkIndex<=High(LinkArray)) do
+
+      while FRegexLinks.ExecPos(MatchPos+MatchLen+1) do
       begin
         MatchPos:= FRegexLinks.MatchPos[0];
         MatchLen:= FRegexLinks.MatchLen[0];
         LinkArray[LinkIndex].NFrom:= MatchPos;
         LinkArray[LinkIndex].NLen:= MatchLen;
         Inc(LinkIndex);
+        if LinkIndex>High(LinkArray) then Break;
         Inc(NRegexRuns);
       end;
 
       FLinkCache.AddData(iLine, LinkArray);
+      LinkArrayPtr:= @LinkArray;
     end;
 
     for LinkIndex:= 0 to High(LinkArray) do
     begin
-      if LinkArray[LinkIndex].NLen=0 then Break;
+      MatchLen:= LinkArrayPtr^[LinkIndex].NLen;
+      if MatchLen=0 then Break;
+      MatchPos:= LinkArrayPtr^[LinkIndex].NFrom;
 
       AtrObj:= TATLinePartClass.Create;
       AtrObj.Data.ColorFont:= Colors.Links;
@@ -7027,10 +7030,10 @@ begin
       AtrObj.Data.BorderDown:= cLineStyleSolid;
 
       FAttribs.Add(
-        LinkArray[LinkIndex].NFrom-1,
+        MatchPos-1,
         iLine,
         cUrlMarkerTag,
-        LinkArray[LinkIndex].NLen,
+        MatchLen,
         0,
         AtrObj
         );

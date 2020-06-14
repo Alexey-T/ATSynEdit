@@ -21,6 +21,7 @@ type
     NFrom, NLen: integer;
   end;
 
+  PATLinkArray = ^TATLinkArray;
   TATLinkArray = array[0..cMaxLinksPerLine-1] of TATLinkPair;
 
 type
@@ -40,7 +41,7 @@ type
   public
     property MaxCount: integer read FMaxCount write SetMaxCount;
     constructor Create;
-    function FindData(ALineIndex: integer): PATLinkCacheItem;
+    function FindData(ALineIndex: integer): PATLinkArray;
     procedure AddData(ALineIndex: integer; const AData: TATLinkArray);
     procedure DeleteData(ALineIndex: integer);
     function DebugText: string;
@@ -74,7 +75,7 @@ begin
   MaxCount:= 80;
 end;
 
-function TATLinkCache.FindData(ALineIndex: integer): PATLinkCacheItem;
+function TATLinkCache.FindData(ALineIndex: integer): PATLinkArray;
 var
   Ptr: PATLinkCacheItem;
   i: integer;
@@ -83,7 +84,7 @@ begin
   begin
     Ptr:= InternalGet(i);
     if Ptr^.LineIndex=ALineIndex then
-      exit(Ptr);
+      exit(@(Ptr^.Data));
   end;
   Result:= nil;
 end;
