@@ -1,6 +1,12 @@
 
+2020.06.14
++ add: internal cache of calculated URLs, so: 
+   a) scrolling by Up/Down key runs URL search for 1 new line, not for all visible lines
+   b) moving caret w/o scrolling don't run URL search at all
++ add: OptMinLineLenToCalcURL (default 4)
+
 2020.06.11
-+ add: unit atsynedit_unicodedata, which adds arrays (320K memory), to speedup unicode funcs in finder
++ add: unit atsynedit_UnicodeData, which adds arrays (320K memory), to speedup unicode funcs in finder
 
 2020.06.03
 + add: better logic of LineStates, fixing https://github.com/Alexey-T/CudaText/issues/2617
