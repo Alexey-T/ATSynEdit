@@ -94,9 +94,6 @@ procedure TATLinkCache.AddData(ALineIndex: integer; const AData: TATLinkArray);
 var
   Item: TATLinkCacheItem;
 begin
-  while Count>MaxCount do
-    Delete(0);
-
   Item.LineIndex:= ALineIndex;
   Item.Data:= AData;
   Add(Item);
