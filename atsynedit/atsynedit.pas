@@ -474,6 +474,7 @@ type
     FDimRanges: TATDimRanges;
     FHotspots: TATHotspots;
     FRegexLinks: TRegExpr;
+    FLinkCache: TATLinkCache;
     FMenuStd: TPopupMenu;
     FMenuText: TPopupMenu;
     FMenuGutterBm: TPopupMenu;
@@ -3601,6 +3602,7 @@ begin
   FDimRanges:= nil;
   FHotspots:= nil;
   FAdapterCache:= TATAdapterHiliteCache.Create;
+  FLinkCache:= TATLinkCache.Create;
 
   {$ifdef windows}
   FAdapterIME:= TATAdapterIMEStandard.Create;
@@ -3970,6 +3972,7 @@ begin
     FreeAndNil(FGutterDecor);
   FreeAndNil(FBitmap);
   FreeAndNil(FColors);
+  FreeAndNil(FLinkCache);
   FreeAndNil(FAdapterCache);
   FreeAndNil(FFontItalic);
   FreeAndNil(FFontBold);
@@ -6954,6 +6957,8 @@ procedure TATSynEdit.UpdateLinksAttribs;
 var
   AtrObj: TATLinePartClass;
   MatchPos, MatchLen, NLine, i: integer;
+  LinkArray: TATLinkArray;
+  LinkIndex: integer;
 begin
   if ModeOneLine then
     exit;
@@ -6968,6 +6973,9 @@ begin
   InitAttribs;
   FAttribs.DeleteWithTag(cUrlMarkerTag);
 
+  //LinkCache size should depend on editor height
+  FLinkCache.MaxCount:= GetVisibleLines+3;
+
   NLine:= LineTop;
   for i:= NLine to NLine+GetVisibleLines do
   begin
@@ -6980,10 +6988,20 @@ begin
     MatchPos:= 0;
     MatchLen:= 0;
 
+    FillChar(LinkArray, SizeOf(LinkArray), 0);
+    LinkIndex:= 0;
+
     while FRegexLinks.ExecPos(MatchPos+MatchLen+1) do
     begin
       MatchPos:= FRegexLinks.MatchPos[0];
       MatchLen:= FRegexLinks.MatchLen[0];
+
+      if LinkIndex<=High(LinkArray) then
+      begin
+        LinkArray[LinkIndex].NFrom:= MatchPos;
+        LinkArray[LinkIndex].NLen:= MatchLen;
+        Inc(LinkIndex);
+      end;
 
       AtrObj:= TATLinePartClass.Create;
       AtrObj.Data.ColorFont:= Colors.Links;
@@ -6992,7 +7010,14 @@ begin
       AtrObj.Data.BorderDown:= cLineStyleSolid;
       FAttribs.Add(MatchPos-1, i, cUrlMarkerTag, MatchLen, 0, AtrObj);
     end;
+
+    FLinkCache.DeleteData(i);
+    if LinkIndex>0 then
+      FLinkCache.AddData(i, LinkArray);
   end;
+
+  ////debug
+  //Application.MainForm.Caption:= FLinkCache.DebugText;
 end;
 
 
