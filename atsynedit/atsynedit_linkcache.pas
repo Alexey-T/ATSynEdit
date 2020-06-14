@@ -10,6 +10,7 @@ unit ATSynEdit_LinkCache;
 interface
 
 uses
+  SysUtils,
   ATSynEdit_fgl;
 
 const
@@ -39,6 +40,7 @@ type
     function FindData(ALineIndex: integer): PATLinkCacheItem;
     procedure AddData(ALineIndex: integer; const AData: TATLinkArray);
     procedure DeleteData(ALineIndex: integer);
+    function DebugText: string;
   end;
 
 implementation
@@ -77,7 +79,7 @@ var
   Item: TATLinkCacheItem;
 begin
   while Count>MaxCount do
-    Delete(Count-1);
+    Delete(0);
 
   Item.LineIndex:= ALineIndex;
   Item.Data:= AData;
@@ -97,6 +99,25 @@ begin
       Delete(i);
       exit;
     end;
+  end;
+end;
+
+function TATLinkCache.DebugText: string;
+var
+  Ptr: PATLinkCacheItem;
+  iCache, iPair: integer;
+begin
+  Result:= '';
+  for iCache:= 0 to Count-1 do
+  begin
+    Ptr:= InternalGet(iCache);
+    Result+= '['+IntToStr(Ptr^.LineIndex)+'] ';
+    for iPair:= 0 to High(TATLinkArray) do
+      with Ptr^.Data[iPair] do
+      begin
+        if NLen=0 then Break;
+        Result+= IntToStr(NFrom)+','+IntToStr(NLen)+' ';
+      end;
   end;
 end;
 
