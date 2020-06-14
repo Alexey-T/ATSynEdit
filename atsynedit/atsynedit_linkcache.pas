@@ -50,6 +50,11 @@ type
 
 implementation
 
+function CompareItems(const a, b: TATLinkCacheItem): integer;
+begin
+  Result:= a.LineIndex - b.LineIndex;
+end;
+
 { TATLinkCacheItem }
 
 class operator TATLinkCacheItem.=(const a, b: TATLinkCacheItem): boolean;
@@ -79,13 +84,22 @@ end;
 function TATLinkCache.FindData(ALineIndex: integer): PATLinkArray;
 var
   Ptr: PATLinkCacheItem;
-  i: integer;
+  a, b, m: integer;
+  dif: integer;
 begin
-  for i:= 0 to Count-1 do
+  a:= 0;
+  b:= Count-1;
+  while a<=b do
   begin
-    Ptr:= InternalGet(i);
-    if Ptr^.LineIndex=ALineIndex then
-      exit(@(Ptr^.Data));
+    m:= (a+b+1) div 2;
+    Ptr:= PATLinkCacheItem(InternalGet(m));
+    dif:= Ptr^.LineIndex-ALineIndex;
+    if dif=0 then
+      exit(@Ptr^.Data);
+    if dif<0 then
+      a:= m+1
+    else
+      b:= m-1;
   end;
   Result:= nil;
 end;
@@ -97,6 +111,7 @@ begin
   Item.LineIndex:= ALineIndex;
   Item.Data:= AData;
   Add(Item);
+  Sort(@CompareItems);
 end;
 
 procedure TATLinkCache.DeleteData(ALineIndex: integer);
