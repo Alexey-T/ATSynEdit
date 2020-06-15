@@ -330,9 +330,9 @@ const
   cHintBookmarkDy = 16;
   cUrlMarkerTag = -100;
 
-  cUrlRegex_Email = '\b\w[\w\-\.]*@\w[\w\-\.]*\.\w{2,}\b';
-  cUrlRegex_WebBegin = 'https?://|ftp://|mailto:|magnet:\?|www\.|ftp\.';
-  cUrlRegex_Web = '\b(' + cUrlRegex_WebBegin + ')\w[\w\.\-\/]*(\?[^<>''"\s]+)?'; //various chars allowed only after path+'?'
+  cUrlRegex_Email = '\b(mailto:)?\w[\w\-\.]*@\w[\w\-\.]*\.\w{2,}\b';
+  cUrlRegex_WebBegin = 'https?://|ftp://|magnet:\?|www\.|ftp\.';
+  cUrlRegex_Web = '\b(' + cUrlRegex_WebBegin + ')\w[\w\.\-\/]*(\?[^<>''"\s]+)?(\#\w*)?'; //various chars allowed only after path+'?'
   cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
 
   cTextEditorLocked: string = 'Wait...';

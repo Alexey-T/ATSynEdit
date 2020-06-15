@@ -1,9 +1,11 @@
-﻿Unicode sample:
+﻿Sample:
 ΓΔΕΘΛΞ √∞∟∩∫
 Ударе́ние 
-Links: http://yahoo.com www.yahoo.com dd@dd.dd
+Full-width: ああえ and ああえ, end
 
-Jp full-width: ああえ, end
+links http://dd.dd#page / www.dd.dd?(param)[param] 
+emails dd@dd.dd / mailto:dd@dd.dd
+
 wwwwwwwwwwwwwwwwwwwwwwwww. wwwwwwww, wwwwwww; wwwww: ..test... www "www...", www,
 wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 		wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
