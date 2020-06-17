@@ -662,6 +662,7 @@ type
     FOptStapleHiliteActiveAlpha: integer;
     FOptStapleEdge1: TATStapleEdge;
     FOptStapleEdge2: TATStapleEdge;
+    FOptStapleIndentConsidersEnd: boolean;
     FOptMouseEnableAll: boolean;
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
@@ -1510,6 +1511,7 @@ type
     property OptStapleHiliteActiveAlpha: integer read FOptStapleHiliteActiveAlpha write FOptStapleHiliteActiveAlpha default cInitStapleHiliteAlpha;
     property OptStapleEdge1: TATStapleEdge read FOptStapleEdge1 write FOptStapleEdge1 default cStapleEdgeAngle;
     property OptStapleEdge2: TATStapleEdge read FOptStapleEdge2 write FOptStapleEdge2 default cStapleEdgeAngle;
+    property OptStapleIndentConsidersEnd: boolean read FOptStapleIndentConsidersEnd write FOptStapleIndentConsidersEnd default false;
     property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
     property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
@@ -3797,6 +3799,7 @@ begin
   FOptStapleHiliteActiveAlpha:= cInitStapleHiliteAlpha;
   FOptStapleEdge1:= cStapleEdgeAngle;
   FOptStapleEdge2:= cStapleEdgeAngle;
+  FOptStapleIndentConsidersEnd:= false;
 
   FOptTextCenteringCharWidth:= 0;
   FOptTextOffsetLeft:= 0;
@@ -6781,7 +6784,8 @@ end;
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
   ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
 var
-  nLineFrom, nLineTo, nIndent, nRangeDeepest, nMaxHeight: integer;
+  nLineFrom, nLineTo, nRangeDeepest, nMaxHeight: integer;
+  nIndent, nIndentBegin, nIndentEnd: integer;
   Indexes: TATIntArray;
   Range: PATSynRange;
   P1, P2: TPoint;
@@ -6826,12 +6830,18 @@ begin
     if (P1.Y<FRectMain.Top) and (Range^.Y>=nLineFrom) then Continue;
     if (P2.Y<FRectMain.Top) and (Range^.Y2>=nLineFrom) then Continue;
 
-    NIndent:= Min(
-      FTabHelper.GetIndentExpanded(Range^.Y, Strings.Lines[Range^.Y]),
-      FTabHelper.GetIndentExpanded(Range^.Y2, Strings.Lines[Range^.Y2])
-      );
-    Inc(P1.X, NIndent*ACharSize.X);
-    Inc(P2.X, NIndent*ACharSize.X);
+    nIndentBegin:= FTabHelper.GetIndentExpanded(Range^.Y, Strings.Lines[Range^.Y]);
+
+    if FOptStapleIndentConsidersEnd then
+    begin
+      nIndentEnd:= FTabHelper.GetIndentExpanded(Range^.Y2, Strings.Lines[Range^.Y2]);
+      nIndent:= Min(nIndentBegin, nIndentEnd);
+    end
+    else
+      nIndent:= nIndentBegin;
+
+    Inc(P1.X, nIndent*ACharSize.X);
+    Inc(P2.X, nIndent*ACharSize.X);
 
     RSt.Left:= P1.X + FOptStapleIndent;
     RSt.Top:= P1.Y;

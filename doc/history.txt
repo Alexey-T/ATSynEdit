@@ -1,4 +1,7 @@
 
+2020.06.17
++ add: OptStapleIndentConsidersEnd (default: false)
+
 2020.06.14
 + add: internal cache of calculated URLs, so: 
    a) scrolling by Up/Down key runs URL search for 1 new line, not for all visible lines
