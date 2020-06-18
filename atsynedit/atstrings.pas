@@ -1641,7 +1641,11 @@ begin
   AHardMarked:= Item.ItemHardMark;
   NCount:= ACurList.Count;
 
-  if NCount>1 then
+  //detect that after reverting one item, list will have "unmodified mark" last item
+  //we need to skip all "jump" items, https://github.com/Alexey-T/CudaText/issues/2677
+  while (NCount>=2) and (ACurList[NCount-2].ItemAction=aeaCaretJump) do
+    Dec(NCount);
+  if NCount>=2 then
     with ACurList[NCount-2] do
     begin
       AHardMarkedNext:= ItemHardMark;
