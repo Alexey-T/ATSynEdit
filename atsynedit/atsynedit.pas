@@ -4091,6 +4091,7 @@ begin
   end;
 
   Strings.SaveToFile(AFilename);
+  Modified:= false;
   DoEventState; //modified
   Update;
 end;
