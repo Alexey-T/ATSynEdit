@@ -4076,13 +4076,16 @@ begin
 
   if FOptSavingForceFinalEol then
     Change1:= Strings.ActionEnsureFinalEol;
+
   if FOptSavingTrimSpaces then
     Change2:= Strings.ActionTrimSpaces(cTrimRight);
-  if FOptSavingTrimFinalEmptyLines then
-    Change3:= Strings.ActionTrimFinalEmptyLines;
 
-  if Change3 then
-    DoCaretsFixIncorrectPos(false);
+  if FOptSavingTrimFinalEmptyLines then
+  begin
+    Change3:= Strings.ActionTrimFinalEmptyLines;
+    if Change3 then
+      DoCaretsFixIncorrectPos(false);
+  end;
 
   if Change1 or Change2 or Change3 then
   begin
@@ -4092,8 +4095,6 @@ begin
 
   Strings.SaveToFile(AFilename);
   Modified:= false;
-  DoEventState; //modified
-  Update;
 end;
 
 
