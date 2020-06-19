@@ -58,9 +58,9 @@ uses
 
 type
   TATTokenKind = (
-    cTokenKindOther,
-    cTokenKindComment,
-    cTokenKindString
+    atkOther,
+    atkComment,
+    atkString
     );
 
   TATSynEditScrollStyle = (

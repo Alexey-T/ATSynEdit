@@ -1027,17 +1027,17 @@ begin
   FOnGetToken(Editor, AX, AY, Kind);
   case OptTokens of
     cTokensOnlyComments:
-      Result:= Kind=cTokenKindComment;
+      Result:= Kind=atkComment;
     cTokensOnlyStrings:
-      Result:= Kind=cTokenKindString;
+      Result:= Kind=atkString;
     cTokensOnlyCommentsAndStrings:
-      Result:= Kind<>cTokenKindOther; //Kind in [cTokenKindComment, cTokenKindString];
+      Result:= Kind<>atkOther; //Kind in [atkComment, atkString];
     cTokensNoComments:
-      Result:= Kind<>cTokenKindComment;
+      Result:= Kind<>atkComment;
     cTokensNoStrings:
-      Result:= Kind<>cTokenKindString;
+      Result:= Kind<>atkString;
     cTokensNoCommentsAndStrings:
-      Result:= Kind=cTokenKindOther; //not (Kind in [cTokenKindComment, cTokenKindString]);
+      Result:= Kind=atkOther; //not (Kind in [atkComment, atkString]);
   end;
 end;
 
