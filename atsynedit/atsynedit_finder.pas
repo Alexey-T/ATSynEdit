@@ -42,12 +42,6 @@ type
 
   TATFinderResults = specialize TFPGList<TATFinderResult>;
 
-  TATFinderTokenKind = (
-    cTokenKindOther,
-    cTokenKindComment,
-    cTokenKindString
-    );
-
   TATFinderTokensAllowed = (
     cTokensAll,
     cTokensOnlyComments,
@@ -61,7 +55,7 @@ type
 type
   TATFinderGetToken = procedure(Sender: TObject;
     AX, AY: integer;
-    out AKind: TATFinderTokenKind) of object;
+    out AKind: TATTokenKind) of object;
 
 type
   { TATTextFinder }
@@ -1024,7 +1018,7 @@ end;
 
 function TATEditorFinder.CheckTokens(AX, AY: integer): boolean;
 var
-  Kind: TATFinderTokenKind;
+  Kind: TATTokenKind;
 begin
   if OptTokens=cTokensAll then
     exit(true);

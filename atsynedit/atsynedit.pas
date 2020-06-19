@@ -55,7 +55,14 @@ uses
   ATSynEdit_FGL,
   ATScrollBar;
 
+
 type
+  TATTokenKind = (
+    cTokenKindOther,
+    cTokenKindComment,
+    cTokenKindString
+    );
+
   TATSynEditScrollStyle = (
     aessHide,
     aessShow,
