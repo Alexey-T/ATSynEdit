@@ -184,12 +184,13 @@ begin
 end;
 
 procedure TATSynRanges.ClearLineIndexer(ALineCount: integer; ASetLenOnly: boolean=false);
-var
-  i: integer;
 begin
   if not ASetLenOnly then
+    {
     for i:= High(FLineIndexer) downto 0 do
       SetLength(FLineIndexer[i], 0);
+    }
+    SetLength(FLineIndexer, 0); //it frees old memory? seems yes
 
   SetLength(FLineIndexer, ALineCount);
 end;
