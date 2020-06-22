@@ -229,20 +229,21 @@ end;
 
 function IsCharWord(ch: widechar; const ANonWordChars: UnicodeString): boolean;
 begin
-  Result := WordDetectArray[Ord(ch)];
-
+  //to make '_' non-word char, specify it as _first_ in ANonWordChars
   if ch='_' then
-    // to make '_' non-word char, specify it as _first_ in ANonWordChars
-    exit( (ANonWordChars='') or (ANonWordChars[1]<>'_') )
-  else
-  if Ord(ch)>=128 then
-    if Pos(ch, ANonWordChars)>0 then
-      exit(false);
+    exit( (ANonWordChars='') or (ANonWordChars[1]<>'_') );
+
+  //if it's unicode letter, return true, ignore option string
+  //if it's not letter, check for option (maybe char '$' is present there for PHP lexer)
+  Result:= WordDetectArray[Ord(ch)];
+  if not Result then
+    if Pos(ch, ANonWordChars)=0 then
+      exit(true);
 end;
 
 function IsCharWordA(ch: char): boolean;
 begin
-  Result := WordDetectArray[Ord(ch)];
+  Result:= WordDetectArray[Ord(ch)];
 end;
 
 
