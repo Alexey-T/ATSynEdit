@@ -262,17 +262,21 @@ begin
   if b<0 then Exit;
 
   repeat
-    dif:= FList[a]-APos;
-    if dif=0 then begin m:= a; Break end;
-
-    //middle, which is near b if not exact middle
     m:= (a+b+1) div 2;
 
     dif:= FList[m]-APos;
     if dif=0 then Break;
 
-    if Abs(a-b)<=1 then begin m:= a; Break end;
-    if dif>0 then b:= m else a:= m;
+    if Abs(a-b)<=1 then
+    begin
+      m:= a;
+      Break
+    end;
+
+    if dif>0 then
+      b:= m
+    else
+      a:= m;
   until false;
 
   Result.Y:= m;
