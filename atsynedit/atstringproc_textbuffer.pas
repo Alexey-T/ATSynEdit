@@ -255,7 +255,10 @@ begin
   Result.Y:= -1;
   Result.X:= 0;
   if APos<=0 then
-    begin Result.Y:= 0; Exit end;
+  begin
+    Result.Y:= 0;
+    Exit
+  end;
 
   a:= 0;
   b:= FCount-1;
@@ -280,7 +283,7 @@ begin
   until false;
 
   Result.Y:= m;
-  Result.X:= APos-FList[Result.Y];
+  Result.X:= APos-FList[m];
 end;
 
 function TATStringBuffer.SubString(APos, ALen: integer): UnicodeString; inline;
