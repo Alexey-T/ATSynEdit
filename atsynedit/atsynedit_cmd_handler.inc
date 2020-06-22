@@ -95,7 +95,7 @@ begin
     Exit;
   end;
 
-  if IsEditableTextKey(Key) and ((Shift=[]) or (Shift=[ssShift])) then
+  if IsEditorHotkeyForText(Key) and ((Shift=[]) or (Shift=[ssShift])) then
     Exit;
 
   Shortcut:= KeyToShortCut(Key, Shift);

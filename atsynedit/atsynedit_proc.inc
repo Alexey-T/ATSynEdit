@@ -228,3 +228,19 @@ begin
       S[i]:= AReplaceChar;
 end;
 
+//it's like LCLProc.IsEditableTextKey() but changed to ignore Num-keys
+function IsEditorHotkeyForText(Key: Word): Boolean;
+begin
+  case Key of
+    VK_A..VK_Z,
+    //VK_NUMPAD0..VK_DIVIDE,
+    VK_0..VK_9,
+    186..192,
+    219..222:
+      Result:= true;
+    else
+     Result:= false;
+   end;
+end;
+
+
