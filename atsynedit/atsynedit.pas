@@ -782,6 +782,7 @@ type
     FOptZebraAlphaBlend: byte;
 
     //
+    procedure ClearMouseDownVariables;
     function DoCalcLineLen(ALineIndex: integer): integer;
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
@@ -3903,15 +3904,8 @@ begin
   FOptZebraStep:= 2;
   FOptZebraAlphaBlend:= cInitZebraAlphaBlend;
 
-  FMouseDownPnt:= Point(-1, -1);
-  FMouseDownGutterLineNumber:= -1;
-  FMouseDownDouble:= false;
-  FMouseDragDropping:= false;
-  FMouseDragDroppingReal:= false;
+  ClearMouseDownVariables;
   FMouseNiceScrollPos:= Point(0, 0);
-  FMouseDownCoordOriginal:= Point(-1, -1);
-  FMouseDownCoord:= Point(-1, -1);
-  FMouseDragCoord:= Point(-1, -1);
 
   FSelRect:= cRectEmpty;
   FCursorOnMinimap:= false;
@@ -5016,7 +5010,17 @@ begin
             FOnClickLink(Self, Str);
       end;
 
-  //todo: move this block to procedure, reuse in Create
+  ClearMouseDownVariables;
+
+  if Carets.Count=1 then
+    with Carets[0] do
+      if EndY>=0 then
+        if Assigned(FOnClickEndSelect) then
+          FOnClickEndSelect(Self, Point(EndX, EndY), Point(PosX, PosY));
+end;
+
+procedure TATSynEdit.ClearMouseDownVariables;
+begin
   FMouseDownCoordOriginal:= Point(-1, -1);
   FMouseDownCoord:= Point(-1, -1);
   FMouseDownPnt:= Point(-1, -1);
@@ -5028,14 +5032,7 @@ begin
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
   FTimerScroll.Enabled:= false;
-
-  if Carets.Count=1 then
-    with Carets[0] do
-      if EndY>=0 then
-        if Assigned(FOnClickEndSelect) then
-          FOnClickEndSelect(Self, Point(EndX, EndY), Point(PosX, PosY));
 end;
-
 
 procedure TATSynEdit.DoHandleRightClick(X, Y: integer);
 var
