@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Spin, ComCtrls, Menus, LclIntf,
+  ExtCtrls, Spin, ComCtrls, Menus, LclIntf, Buttons,
   EncConv,
   ATStrings,
   ATStringProc,
@@ -208,6 +208,11 @@ type
     ed_gap: TATSynEdit;
     FGapInitSize: integer;
     FDecorImage: integer;
+    FCfmPanel: TPanel;
+    FCfmLink: string;
+    procedure ConfirmButtonOkClick(Sender: TObject);
+    procedure ConfirmPanelMouseLeave(Sender: TObject);
+    procedure InitConfirmPanel;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
     procedure EditCalcBookmarkColor(Sender: TObject; ABookmarkKind: integer; var AColor: TColor);
@@ -455,6 +460,7 @@ procedure TfmMain.mnuUnlockClick(Sender: TObject);
 begin
   ed.EndUpdate;
 end;
+
 
 procedure TfmMain.EditCaretMoved(Sender: TObject);
 begin
@@ -1097,8 +1103,25 @@ begin
 end;
 
 procedure TfmMain.EditClickLink(Sender: TObject; const ALink: string);
+var
+  P: TPoint;
+  bEmail: boolean;
 begin
-  EditorOpenLink(ALink);
+  FCfmLink:= ALink;
+  InitConfirmPanel;
+
+  bEmail:= (Pos('://', ALink)=0) and (Pos('@', ALink)>0);
+  if bEmail then
+    FCfmPanel.Caption:= '[send email]'
+  else
+    FCfmPanel.Caption:= '[open link]';
+
+  P:= Mouse.CursorPos;
+  P:= ScreenToClient(P);
+  FCfmPanel.Parent:= Self;
+  FCfmPanel.Left:= P.X - FCfmPanel.Width div 2;
+  FCfmPanel.Top:= P.Y - FCfmPanel.Height div 2;
+  FCfmPanel.Show;
 end;
 
 procedure TfmMain.EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
@@ -1586,5 +1609,32 @@ begin
   //ShowMessage('delete gap '+IntToStr(ALineIndex));
 end;
 
+procedure TfmMain.InitConfirmPanel;
+const
+  cPanelW = 100;
+  cPanelH = 35;
+begin
+  if FCfmPanel=nil then
+  begin
+    FCfmPanel:= TPanel.Create(Self);
+    FCfmPanel.Caption:= '??';
+    FCfmPanel.OnMouseLeave:= @ConfirmPanelMouseLeave;
+    FCfmPanel.Hide;
+    FCfmPanel.Width:= cPanelW;
+    FCfmPanel.Height:= cPanelH;
+    FCfmPanel.OnClick:= @ConfirmButtonOkClick;
+  end;
+end;
+
+procedure TfmMain.ConfirmButtonOkClick(Sender: TObject);
+begin
+  FCfmPanel.Hide;
+  EditorOpenLink(FCfmLink);
+end;
+
+procedure TfmMain.ConfirmPanelMouseLeave(Sender: TObject);
+begin
+  FCfmPanel.Hide;
+end;
 
 end.
