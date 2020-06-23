@@ -4765,6 +4765,7 @@ var
   PosDetails: TATPosDetails;
   Index: integer;
   ActionId: TATMouseActionId;
+  bClickOnSelection: boolean;
   R: TRect;
 begin
   if not OptMouseEnableAll then exit;
@@ -4807,13 +4808,14 @@ begin
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
     FMouseDownPnt:= PCaret;
+    bClickOnSelection:= GetCaretSelectionIndex(FMouseDownPnt)>=0;
 
     if Shift=[ssMiddle] then
       if DoHandleClickEvent(FOnClickMiddle) then Exit;
 
     //Ctrl+click on selection must not be ignored, but must start drag-drop with copying
     if ActionId=cMouseActionMakeCaret then
-      if IsPosSelected(PCaret.X, PCaret.Y) then
+      if bClickOnSelection then
         ActionId:= cMouseActionClickSimple;
 
     if ActionId=cMouseActionNiceScrolling then
@@ -4840,7 +4842,7 @@ begin
           FOnClickGap(Self, PosDetails.OnGapItem, PosDetails.OnGapPos);
       end;
 
-      if FOptMouseDragDrop and (GetCaretSelectionIndex(FMouseDownPnt)>=0) and not ModeReadOnly then
+      if FOptMouseDragDrop and bClickOnSelection and not ModeReadOnly then
       begin
         //DragMode must be dmManual, drag started by code
         FMouseDragDropping:= true;
@@ -4889,7 +4891,7 @@ begin
     if ActionId=cMouseActionClickRight then
     begin
       if FOptMouseRightClickMovesCaret then
-        if GetCaretSelectionIndex(FMouseDownPnt)<0 then
+        if not bClickOnSelection then
         begin
           DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
           DoSelect_None;
