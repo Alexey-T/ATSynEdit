@@ -85,6 +85,7 @@ end;
 function TATSynEdit.GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
 var
   Shortcut: TShortcut;
+  bComboPressing: boolean;
 begin
   Result:= 0;
 
@@ -95,8 +96,10 @@ begin
     Exit;
   end;
 
-  if IsEditorHotkeyForText(Key) and ((Shift=[]) or (Shift=[ssShift])) then
-    Exit;
+  bComboPressing:= (FKeymapHistory.Length>0);
+  if not bComboPressing then
+    if IsEditorHotkeyForText(Key) and ((Shift=[]) or (Shift=[ssShift])) then
+      Exit;
 
   Shortcut:= KeyToShortCut(Key, Shift);
   Result:= FKeymap.GetCommandFromShortcut(Shortcut, FKeymapHistory);
