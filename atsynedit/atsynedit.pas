@@ -4993,6 +4993,7 @@ begin
     begin
       PntCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
       DoCaretSingle(PntCaret.X, PntCaret.Y);
+      DoEventCarets;
       Update;
     end;
     FMouseDragDropping:= false;
