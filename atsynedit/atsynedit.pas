@@ -501,6 +501,7 @@ type
     MenuitemTextRedo: TMenuItem;
     FOverwrite: boolean;
     FHintWnd: THintWindow;
+    FMouseDownCoordOriginal: TPoint;
     FMouseDownCoord: TPoint;
     FMouseDragCoord: TPoint;
     FMouseDownPnt: TPoint;
@@ -509,6 +510,7 @@ type
     FMouseDownDouble: boolean;
     FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
+    FMouseDragDroppingReal: boolean;
     FMouseDragMinimap: boolean;
     FMouseDragMinimapDelta: integer;
     FMouseDragMinimapSelHeight: integer;
@@ -3905,7 +3907,9 @@ begin
   FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDragDropping:= false;
+  FMouseDragDroppingReal:= false;
   FMouseNiceScrollPos:= Point(0, 0);
+  FMouseDownCoordOriginal:= Point(-1, -1);
   FMouseDownCoord:= Point(-1, -1);
   FMouseDragCoord:= Point(-1, -1);
 
@@ -4773,6 +4777,8 @@ begin
   SetFocus;
   DoCaretForceShow;
 
+  FMouseDownCoordOriginal.X:= X;
+  FMouseDownCoordOriginal.Y:= Y;
   FMouseDownCoord.X:= X + FScrollHorz.TotalOffset;
   FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset;
 
@@ -4781,6 +4787,7 @@ begin
   FMouseDownOnMinimap:= false;
   FMouseDownGutterLineNumber:= -1;
   FMouseDragDropping:= false;
+  FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
   ActionId:= EditorMouseActionId(FMouseActions, Shift);
 
@@ -4846,7 +4853,6 @@ begin
       begin
         //DragMode must be dmManual, drag started by code
         FMouseDragDropping:= true;
-        BeginDrag(true);
       end
       else
       begin
@@ -4947,6 +4953,8 @@ var
   bCopySelection: boolean;
   Str: atString;
   Caret: TATCaretItem;
+  PosDetails: TATPosDetails;
+  PntCaret: TPoint;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -4972,16 +4980,29 @@ begin
   if PtInRect(ClientRect, Point(X, Y)) then
   if FMouseDragDropping then
   begin
-    Strings.BeginUndoGroup;
-    try
-      bCopySelection:=
-        FOptMouseDragDropCopying and
-        (FOptMouseDragDropCopyingWithState in Shift);
-      DoDropText(not bCopySelection);
-    finally
-      Strings.EndUndoGroup;
+    //drag-drop really started
+    if FMouseDragDroppingReal then
+    begin
+      Strings.BeginUndoGroup;
+      try
+        bCopySelection:=
+          FOptMouseDragDropCopying and
+          (FOptMouseDragDropCopyingWithState in Shift);
+        DoDropText(not bCopySelection);
+      finally
+        Strings.EndUndoGroup;
+        Update;
+      end;
+    end
+    else
+    //mouse released w/o drag-drop
+    begin
+      PntCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
+      DoCaretSingle(PntCaret.X, PntCaret.Y);
       Update;
     end;
+    FMouseDragDropping:= false;
+    FMouseDragDroppingReal:= false;
   end;
 
   if FOptMouseClickOpensURL then
@@ -4995,12 +5016,16 @@ begin
             FOnClickLink(Self, Str);
       end;
 
+  //todo: move this block to procedure, reuse in Create
+  FMouseDownCoordOriginal:= Point(-1, -1);
+  FMouseDownCoord:= Point(-1, -1);
   FMouseDownPnt:= Point(-1, -1);
   FMouseDownGutterLineNumber:= -1;
   FMouseDownDouble:= false;
   FMouseDownAndColumnSelection:= false;
   FMouseDownOnMinimap:= false;
   FMouseDragDropping:= false;
+  FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
   FTimerScroll.Enabled:= false;
 
@@ -5253,6 +5278,18 @@ begin
         end;
       end;
     Exit
+  end;
+
+  //mouse drag-drop just begins
+  if bOnMain and FMouseDragDropping then
+  begin
+    if not FMouseDragDroppingReal and
+      IsPointsDiffByDelta(Point(X, Y), FMouseDownCoordOriginal, Mouse.DragThreshold) then
+    begin
+      FMouseDragDroppingReal:= true;
+      BeginDrag(true);
+    end;
+    exit;
   end;
 
   //mouse just moved on text

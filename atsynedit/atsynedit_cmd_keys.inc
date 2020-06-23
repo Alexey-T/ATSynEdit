@@ -451,6 +451,7 @@ begin
   DoSelect_None;
 
   FMouseDragDropping:= false;
+  FMouseDragDroppingReal:= false;
   UpdateCursor;
 
   Result:= [cResultCaretTop];

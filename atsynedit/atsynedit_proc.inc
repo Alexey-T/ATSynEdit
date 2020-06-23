@@ -243,4 +243,11 @@ begin
    end;
 end;
 
+function IsPointsDiffByDelta(const P1, P2: TPoint; Delta: integer): boolean; inline;
+begin
+  Result:=
+    (Abs(P1.X-P2.X)>=Delta) or
+    (Abs(P1.Y-P2.Y)>=Delta);
+
+end;
 
