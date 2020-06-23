@@ -200,15 +200,30 @@ begin
   {$endif}
 end;
 
-procedure EditorOpenLink(const S: string);
+function EditorLinkIsEmail(const S: string): boolean;
 const
   MailPrefix = 'mailto:';
 begin
   if SBeginsWith(S, MailPrefix) then
-    OpenURL(S)
+    Result:= true
   else
   if (Pos('://', S)=0) and (Pos('@', S)>0) and (Pos('.', S)>0) then
-    OpenURL(MailPrefix+S)
+    Result:= true
+  else
+    Result:= false;
+end;
+
+procedure EditorOpenLink(const S: string);
+const
+  MailPrefix = 'mailto:';
+begin
+  if EditorLinkIsEmail(S) then
+  begin
+    if SBeginsWith(S, MailPrefix) then
+      OpenURL(S)
+    else
+      OpenURL(MailPrefix+S);
+  end
   else
   if SBeginsWith(S, 'www.') then
     OpenURL('http://'+S)

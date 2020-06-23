@@ -1669,6 +1669,7 @@ const
   cEncNameUtf32BE_WithBom = 'UTF-32 BE with BOM';
   cEncNameUtf32BE_NoBom = 'UTF-32 BE';
 
+function EditorLinkIsEmail(const S: string): boolean;
 procedure EditorOpenLink(const S: string);
 
 implementation
