@@ -237,8 +237,13 @@ begin
   //if it's not letter, check for option (maybe char '$' is present there for PHP lexer)
   Result:= WordDetectArray[Ord(ch)];
   if not Result then
+  begin
+    if IsCharUnicodeSpace(ch) then
+      exit(false);
+
     if Pos(ch, ANonWordChars)=0 then
       exit(true);
+  end;
 end;
 
 function IsCharWordA(ch: char): boolean;
