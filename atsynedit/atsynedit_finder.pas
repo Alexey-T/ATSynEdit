@@ -212,7 +212,8 @@ implementation
 
 function IsWordChar(ch: WideChar): boolean; inline;
 begin
-  Result:= ATStringProc.IsCharWord(ch, cDefaultNonWordChars);
+  //Result:= ATStringProc.IsCharWord(ch, cDefaultNonWordChars);
+  Result:= WordDetectArray[Ord(ch)];
 end;
 
 {
@@ -1635,10 +1636,12 @@ function _CheckWholeWordPos(const S: UnicodeString; APos1, APos2: integer): bool
 // APos1 - index of 1st word char
 // APos2 - index after last word char
 begin
-  if (APos1>1) and IsWordChar(S[APos1-1]) then
-    exit(false);
-  if (APos2<=Length(S)) and IsWordChar(S[APos2]) then
-    exit(false);
+  if (APos1>1) then
+    if IsWordChar(S[APos1-1]) = IsWordChar(S[APos1]) then
+      exit(false);
+  if (APos2<=Length(S)) then
+    if IsWordChar(S[APos2-1]) = IsWordChar(S[APos2]) then
+      exit(false);
   Result:= true;
 end;
 
