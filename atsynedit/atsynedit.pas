@@ -2205,7 +2205,7 @@ begin
   with FScrollVert do
   begin
     NPage:= Max(1, GetVisibleLines)-1;
-    NMax:= Max(1, FWrapInfo.Count-1);
+    NMax:= Max(0, FWrapInfo.Count-1); //must be 0 for single line text
     if FOptLastLineOnTop then
       Inc(NMax, NPage);
     NPosLast:= Max(0, NMax-NPage);
