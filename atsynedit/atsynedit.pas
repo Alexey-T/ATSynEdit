@@ -6246,7 +6246,6 @@ begin
   if not bSel then Exit;
 
   DoSelect_None;
-  DoEventCarets;
 
   //calc insert-pos
   P:= ScreenToClient(Mouse.CursorPos);
@@ -6285,6 +6284,7 @@ begin
   end;
 
   Update(true);
+  DoEventCarets;
   DoEventChange;
 end;
 
