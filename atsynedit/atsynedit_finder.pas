@@ -1631,6 +1631,17 @@ begin
   end;
 end;
 
+function _CheckWholeWordPos(const S: UnicodeString; APos1, APos2: integer): boolean; inline;
+// APos1 - index of 1st word char
+// APos2 - index after last word char
+begin
+  if (APos1>1) and IsWordChar(S[APos1-1]) then
+    exit(false);
+  if (APos2<=Length(S)) and IsWordChar(S[APos2]) then
+    exit(false);
+  Result:= true;
+end;
+
 function TATEditorFinder.FindMatch_InEditor(APosStart, APosEnd: TPoint;
   AWithEvent: boolean): boolean;
 var
@@ -1811,10 +1822,11 @@ begin
           bOk:= STestStringMatch(SFind, SLineToTest, IndexChar+1, OptCase);
           //consider whole words (only for single line)
           if bOk and OptWords and (PartCount=1) then
-            bOk:= ((IndexChar<=0) or not IsWordChar(SLineLoopedW[IndexChar])) and
-                  ((IndexChar+SLinePart_Len+1>SLineLooped_Len) or not IsWordChar(SLineLoopedW[IndexChar+SLinePart_Len+1]));
-          if bOk and
-            CheckTokens(IndexChar, IndexLine) then
+            bOk:= _CheckWholeWordPos(SLineLoopedW, IndexChar+1, IndexChar+1+SLinePart_Len);
+          //consider syntax-elements
+          if bOk then
+            bOk:= CheckTokens(IndexChar, IndexLine);
+          if bOk then
           begin
             FMatchEdPos.Y:= IndexLine;
             FMatchEdPos.X:= IndexChar;
@@ -1888,10 +1900,11 @@ begin
           bOk:= _CompareParts_Back(IndexChar);
           //consider whole words (only for single line)
           if bOk and OptWords and (PartCount=1) then
-            bOk:= ((IndexChar>SLineLooped_Len) or not IsWordChar(SLineLoopedW[IndexChar])) and
-                  ((IndexChar-1-SLinePart_Len<1) or not IsWordChar(SLineLoopedW[IndexChar-1-SLinePart_Len]));
-          if bOk and
-            CheckTokens(IndexChar-1-SLinePart_Len, IndexLine) then
+            bOk:= _CheckWholeWordPos(SLineLoopedW, IndexChar-SLinePart_Len, IndexChar);
+          //check syntax-elements
+          if bOk then
+            bOk:= CheckTokens(IndexChar-1-SLinePart_Len, IndexLine);
+          if bOk then
           begin
             if PartCount=1 then
             begin
