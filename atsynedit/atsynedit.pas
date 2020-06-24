@@ -339,7 +339,7 @@ const
 
   cUrlRegex_Email = '\b(mailto:)?\w[\w\-\.]*@\w[\w\-\.]*\.\w{2,}\b';
   cUrlRegex_WebBegin = 'https?://|ftp://|magnet:\?|www\.|ftp\.';
-  cUrlRegex_Web = '\b(' + cUrlRegex_WebBegin + ')\w[\w\.\-\/@]*(\?[^<>''"\s]+)?(\#\w*)?'; //various chars allowed only after path+'?'
+  cUrlRegex_Web = '\b(' + cUrlRegex_WebBegin + ')\w[\w\-\.@]*(\:\d+)?(/[\w\.\-\+\/]*)?(\?[^<>''"\s]+)?(\#\w*)?'; //various chars allowed only after path+'?'
   cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
 
   cTextEditorLocked: string = 'Wait...';
