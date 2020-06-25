@@ -6604,26 +6604,26 @@ procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
   AWrapItemIndex: integer;
   ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
 var
-  CoordXM, CoordYM: integer;
+  CoordXCenter, CoordYCenter: integer;
   IsLineUp, IsLineDown: boolean;
   //
   procedure DrawUp; inline;
   begin
     if IsLineUp then
       C.Line(
-        CoordXM,
+        CoordXCenter,
         ACoordY1,
-        CoordXM,
-        CoordYM
+        CoordXCenter,
+        CoordYCenter
         );
   end;
   procedure DrawDown; inline;
   begin
     if IsLineDown then
       C.Line(
-        CoordXM,
-        CoordYM,
-        CoordXM,
+        CoordXCenter,
+        CoordYCenter,
+        CoordXCenter,
         ACoordY2
         );
   end;
@@ -6698,8 +6698,8 @@ begin
     NColorLine:= Colors.GutterFoldBG;
   C.Pen.Color:= NColorLine;
 
-  CoordXM:= (ACoordX1+ACoordX2) div 2;
-  CoordYM:= (ACoordY1+ACoordY2) div 2;
+  CoordXCenter:= (ACoordX1+ACoordX2) div 2;
+  CoordYCenter:= (ACoordY1+ACoordY2) div 2;
 
   case State of
     cFoldbarBegin:
@@ -6711,7 +6711,7 @@ begin
           DrawDown;
 
         DoPaintGutterPlusMinus(C,
-          CoordXM, CoordYM, IsPlus, NColorPlus);
+          CoordXCenter, CoordYCenter, IsPlus, NColorPlus);
       end;
     cFoldbarEnd:
       begin
@@ -6720,24 +6720,24 @@ begin
 
         Dec(ACoordY2, cSizeGutterFoldLineDx);
         C.Line(
-          CoordXM,
+          CoordXCenter,
           ACoordY1,
-          CoordXM,
+          CoordXCenter,
           ACoordY2
           );
         C.Line(
-          CoordXM,
+          CoordXCenter,
           ACoordY2,
-          CoordXM + EditorScale(FOptGutterPlusSize),
+          CoordXCenter + EditorScale(FOptGutterPlusSize),
           ACoordY2
           );
       end;
     cFoldbarMiddle:
       begin
         C.Line(
-          CoordXM,
+          CoordXCenter,
           ACoordY1,
-          CoordXM,
+          CoordXCenter,
           ACoordY2
           );
       end;
