@@ -7001,7 +7001,7 @@ begin
       begin
         CanvasPaintPlusMinus(C,
           ALineColor,
-          Colors.GutterPlusBG,
+          Colors.GutterFoldBG,
           Point(AX, AY),
           EditorScale(FOptGutterPlusSize),
           APlus);
