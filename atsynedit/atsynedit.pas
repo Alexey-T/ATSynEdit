@@ -952,7 +952,8 @@ type
       const AScrollHorz: TATSynScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintMarkerOfDragDrop(C: TCanvas);
-    procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean);
+    procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean;
+      ALineColor: TColor);
     procedure DoPaintGutterFolding(C: TCanvas; AWrapItemIndex: integer; ACoordX1,
       ACoordX2, ACoordY1, ACoordY2: integer);
     procedure DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect: TRect);
@@ -6631,6 +6632,10 @@ var
   //
 var
   Rng: PATSynRange;
+  NIndexOfCaretRng: integer;
+  Caret: TATCaretItem;
+  bHiliteLines: boolean;
+  NLineColor: TColor;
 begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then Exit;
@@ -6638,8 +6643,19 @@ begin
   WrapItem:= FWrapInfo[AWrapItemIndex];
   LineIndex:= WrapItem.NLineIndex;
 
+  //find deepest range which includes caret pos
+  NIndexOfCaretRng:= -1;
+  if Carets.Count>0 then
+  begin
+    Caret:= Carets[0];
+    List:= FFold.FindRangesWithLine(Caret.PosY, false{OnlyFolded});
+    if Length(List)>0 then
+      NIndexOfCaretRng:= List[High(List)];
+  end;
+
   List:= FFold.FindRangesWithLine(LineIndex, false{OnlyFolded});
   if Length(List)=0 then Exit;
+  bHiliteLines:= List[High(List)]=NIndexOfCaretRng;
 
   //calc state
   State:= cFoldbarNone;
@@ -6648,6 +6664,7 @@ begin
   IsLineDown:= false;
 
   for i:= Low(List) to High(List) do
+  //i:= List[High(List)];
     begin
       Rng:= Fold.ItemPtr(List[i]);
       if Rng^.Y<LineIndex then IsLineUp:= true;
@@ -6673,9 +6690,16 @@ begin
     if WrapItem.NFinal=cWrapItemMiddle then
       State:= cFoldbarMiddle;
 
-  C.Pen.Color:= IfThen(FOptGutterShowFoldLines,
-    Colors.GutterFoldLine,
-    Colors.GutterFoldBG);
+  if FOptGutterShowFoldLines then
+  begin
+    if bHiliteLines then
+      NLineColor:= clRed
+    else
+      NLineColor:= Colors.GutterFoldLine;
+  end
+  else
+    NLineColor:= Colors.GutterFoldBG;
+  C.Pen.Color:= NLineColor;
 
   CoordXM:= (ACoordX1+ACoordX2) div 2;
   CoordYM:= (ACoordY1+ACoordY2) div 2;
@@ -6690,7 +6714,7 @@ begin
           DrawDown;
 
         DoPaintGutterPlusMinus(C,
-          CoordXM, CoordYM, IsPlus);
+          CoordXM, CoordYM, IsPlus, NLineColor);
       end;
     cFoldbarEnd:
       begin
@@ -6970,13 +6994,13 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer;
-  APlus: boolean);
+  APlus: boolean; ALineColor: TColor);
 begin
   case OptGutterIcons of
     cGutterIconsPlusMinus:
       begin
         CanvasPaintPlusMinus(C,
-          Colors.GutterPlusBorder,
+          ALineColor,
           Colors.GutterPlusBG,
           Point(AX, AY),
           EditorScale(FOptGutterPlusSize),
@@ -6986,12 +7010,12 @@ begin
       begin
         if APlus then
           CanvasPaintTriangleRight(C,
-            Colors.GutterPlusBorder,
+            ALineColor,
             Point(AX, AY),
             EditorScale(FOptGutterPlusSize div 2))
         else
           CanvasPaintTriangleDown(C,
-            Colors.GutterPlusBorder,
+            ALineColor,
             Point(AX, AY),
             EditorScale(FOptGutterPlusSize div 2))
       end;
