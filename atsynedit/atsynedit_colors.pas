@@ -135,7 +135,7 @@ begin
   C.GutterCaretFont:= clGray;
   C.GutterCaretBG:= $c8c8c8;
   C.GutterFoldLine:= clGray;
-  C.GutterFoldLine2:= $a06060;
+  C.GutterFoldLine2:= $904040;
   C.GutterFoldBG:= $c8c8c8;
   C.GutterSeparatorBG:= clBlack;
   C.CurrentLineBG:= $e0f0f0;
