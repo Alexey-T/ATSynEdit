@@ -6705,7 +6705,10 @@ begin
     cFoldbarBegin:
       begin
         if FOptGutterShowFoldLinesAll then
-          begin DrawUp; DrawDown; end;
+        begin
+          DrawUp;
+          DrawDown;
+        end;
 
         if not IsPlus then
           DrawDown;
@@ -6716,7 +6719,10 @@ begin
     cFoldbarEnd:
       begin
         if FOptGutterShowFoldLinesAll then
-          begin DrawUp; DrawDown; end;
+        begin
+          DrawUp;
+          DrawDown;
+        end;
 
         Dec(ACoordY2, cSizeGutterFoldLineDx);
         C.Line(
