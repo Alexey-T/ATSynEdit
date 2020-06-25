@@ -6604,15 +6604,10 @@ procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
   AWrapItemIndex: integer;
   ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
 var
-  List: TATIntArray;
-  State: (cFoldbarNone, cFoldbarBegin, cFoldbarEnd, cFoldbarMiddle);
   CoordXM, CoordYM: integer;
-  WrapItem: TATWrapItem;
-  LineIndex: integer;
-  IsPlus, IsLineUp, IsLineDown: boolean;
-  i: integer;
+  IsLineUp, IsLineDown: boolean;
   //
-  procedure DrawUp;
+  procedure DrawUp; inline;
   begin
     if IsLineUp then
       C.Line(
@@ -6622,7 +6617,7 @@ var
         CoordYM
         );
   end;
-  procedure DrawDown;
+  procedure DrawDown; inline;
   begin
     if IsLineDown then
       C.Line(
@@ -6634,8 +6629,12 @@ var
   end;
   //
 var
+  State: (cFoldbarNone, cFoldbarBegin, cFoldbarEnd, cFoldbarMiddle);
+  LineIndex: integer;
+  IsPlus: boolean;
+  WrapItem: TATWrapItem;
   Rng: PATSynRange;
-  NIndexOfCaretRng: integer;
+  NIndexOfCurrentRng, NIndexOfCaretRng: integer;
   Caret: TATCaretItem;
   bHiliteLines: boolean;
   NColorLine, NColorPlus: TColor;
@@ -6652,14 +6651,12 @@ begin
     if Carets.Count>0 then
     begin
       Caret:= Carets[0];
-      List:= FFold.FindRangesWithLine(Caret.PosY, false{OnlyFolded});
-      if Length(List)>0 then
-        NIndexOfCaretRng:= List[High(List)];
+      NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false);
     end;
 
-  List:= FFold.FindRangesWithLine(LineIndex, false{OnlyFolded});
-  if Length(List)=0 then Exit;
-  bHiliteLines:= List[High(List)]=NIndexOfCaretRng;
+  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(LineIndex, false);
+  if NIndexOfCurrentRng<0 then exit;
+  bHiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
 
   //calc state
   State:= cFoldbarNone;
@@ -6667,8 +6664,7 @@ begin
   IsLineUp:= false;
   IsLineDown:= false;
 
-  i:= High(List);
-  Rng:= Fold.ItemPtr(List[i]);
+  Rng:= Fold.ItemPtr(NIndexOfCurrentRng);
   if Rng^.Y<LineIndex then IsLineUp:= true;
   if Rng^.Y2>LineIndex then IsLineDown:= true;
   if Rng^.Y=LineIndex then
