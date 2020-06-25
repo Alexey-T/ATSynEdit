@@ -6638,7 +6638,7 @@ var
   NIndexOfCaretRng: integer;
   Caret: TATCaretItem;
   bHiliteLines: boolean;
-  NLineColor: TColor;
+  NColorLine, NColorPlus: TColor;
 begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then Exit;
@@ -6691,16 +6691,16 @@ begin
     if WrapItem.NFinal=cWrapItemMiddle then
       State:= cFoldbarMiddle;
 
-  if FOptGutterShowFoldLines then
-  begin
-    if bHiliteLines then
-      NLineColor:= Colors.GutterFoldLine2
-    else
-      NLineColor:= Colors.GutterFoldLine;
-  end
+  if bHiliteLines then
+    NColorPlus:= Colors.GutterFoldLine2
   else
-    NLineColor:= Colors.GutterFoldBG;
-  C.Pen.Color:= NLineColor;
+    NColorPlus:= Colors.GutterFoldLine;
+
+  if FOptGutterShowFoldLines then
+    NColorLine:= NColorPlus
+  else
+    NColorLine:= Colors.GutterFoldBG;
+  C.Pen.Color:= NColorLine;
 
   CoordXM:= (ACoordX1+ACoordX2) div 2;
   CoordYM:= (ACoordY1+ACoordY2) div 2;
@@ -6715,7 +6715,7 @@ begin
           DrawDown;
 
         DoPaintGutterPlusMinus(C,
-          CoordXM, CoordYM, IsPlus, NLineColor);
+          CoordXM, CoordYM, IsPlus, NColorPlus);
       end;
     cFoldbarEnd:
       begin
