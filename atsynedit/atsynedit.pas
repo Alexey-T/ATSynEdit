@@ -718,6 +718,7 @@ type
     FOptGutterShowFoldAlways: boolean;
     FOptGutterShowFoldLines: boolean;
     FOptGutterShowFoldLinesAll: boolean;
+    FOptGutterShowFoldLinesForCaret: boolean;
     FOptGutterIcons: TATGutterIconsKind;
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
@@ -1555,6 +1556,7 @@ type
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways default true;
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines default true;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
+    property OptGutterShowFoldLinesForCaret: boolean read FOptGutterShowFoldLinesForCaret write FOptGutterShowFoldLinesForCaret default true;
     property OptGutterIcons: TATGutterIconsKind read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 0;
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
@@ -3730,6 +3732,7 @@ begin
   FOptGutterShowFoldAlways:= true;
   FOptGutterShowFoldLines:= true;
   FOptGutterShowFoldLinesAll:= false;
+  FOptGutterShowFoldLinesForCaret:= true;
   FOptGutterIcons:= cGutterIconsPlusMinus;
 
   FGutterBandBookmarks:= 0;
@@ -6645,13 +6648,14 @@ begin
 
   //find deepest range which includes caret pos
   NIndexOfCaretRng:= -1;
-  if Carets.Count>0 then
-  begin
-    Caret:= Carets[0];
-    List:= FFold.FindRangesWithLine(Caret.PosY, false{OnlyFolded});
-    if Length(List)>0 then
-      NIndexOfCaretRng:= List[High(List)];
-  end;
+  if FOptGutterShowFoldLinesForCaret then
+    if Carets.Count>0 then
+    begin
+      Caret:= Carets[0];
+      List:= FFold.FindRangesWithLine(Caret.PosY, false{OnlyFolded});
+      if Length(List)>0 then
+        NIndexOfCaretRng:= List[High(List)];
+    end;
 
   List:= FFold.FindRangesWithLine(LineIndex, false{OnlyFolded});
   if Length(List)=0 then Exit;
