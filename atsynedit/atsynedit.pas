@@ -6667,22 +6667,19 @@ begin
   IsLineUp:= false;
   IsLineDown:= false;
 
-  for i:= Low(List) to High(List) do
-  //i:= List[High(List)];
-    begin
-      Rng:= Fold.ItemPtr(List[i]);
-      if Rng^.Y<LineIndex then IsLineUp:= true;
-      if Rng^.Y2>LineIndex then IsLineDown:= true;
-      if Rng^.Y=LineIndex then
-      begin
-        State:= cFoldbarBegin;
-        //don't override found [+], 2 blocks can start at same pos
-        if not IsPlus then IsPlus:= Rng^.Folded;
-      end;
-      if Rng^.Y2=LineIndex then
-        if State<>cFoldbarBegin then
-          State:= cFoldbarEnd;
-    end;
+  i:= High(List);
+  Rng:= Fold.ItemPtr(List[i]);
+  if Rng^.Y<LineIndex then IsLineUp:= true;
+  if Rng^.Y2>LineIndex then IsLineDown:= true;
+  if Rng^.Y=LineIndex then
+  begin
+    State:= cFoldbarBegin;
+    //don't override found [+], 2 blocks can start at same pos
+    if not IsPlus then IsPlus:= Rng^.Folded;
+  end;
+  if Rng^.Y2=LineIndex then
+    if State<>cFoldbarBegin then
+      State:= cFoldbarEnd;
 
   //correct state for wrapped line
   if State=cFoldbarBegin then
