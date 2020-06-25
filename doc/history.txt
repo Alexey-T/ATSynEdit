@@ -1,5 +1,6 @@
 
 2020.06.25
++ add: draw gutter folding lines, for deepest range of 1st caret, with new color - Colors.GutterFoldLine2
 + add: finder: proper detect word-boundary in normal (non regex) search
 
 2020.06.17
