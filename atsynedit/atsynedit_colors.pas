@@ -27,6 +27,7 @@ type
     FGutterCaretFont,
     FGutterCaretBG,
     FGutterFoldLine,
+    FGutterFoldLine2,
     FGutterFoldBG,
     FGutterSeparatorBG,
     FCurrentLineBG,
@@ -76,6 +77,7 @@ type
     property GutterCaretFont: TColor read FGutterCaretFont write FGutterCaretFont;
     property GutterCaretBG: TColor read FGutterCaretBG write FGutterCaretBG;
     property GutterFoldLine: TColor read FGutterFoldLine write FGutterFoldLine;
+    property GutterFoldLine2: TColor read FGutterFoldLine2 write FGutterFoldLine2;
     property GutterFoldBG: TColor read FGutterFoldBG write FGutterFoldBG;
     property GutterSeparatorBG: TColor read FGutterSeparatorBG write FGutterSeparatorBG;
     property CurrentLineBG: TColor read FCurrentLineBG write FCurrentLineBG;
@@ -133,6 +135,7 @@ begin
   C.GutterCaretFont:= clGray;
   C.GutterCaretBG:= $c8c8c8;
   C.GutterFoldLine:= clGray;
+  C.GutterFoldLine2:= $a06060;
   C.GutterFoldBG:= $c8c8c8;
   C.GutterSeparatorBG:= clBlack;
   C.CurrentLineBG:= $e0f0f0;

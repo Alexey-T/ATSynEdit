@@ -6693,7 +6693,7 @@ begin
   if FOptGutterShowFoldLines then
   begin
     if bHiliteLines then
-      NLineColor:= clRed
+      NLineColor:= Colors.GutterFoldLine2
     else
       NLineColor:= Colors.GutterFoldLine;
   end
