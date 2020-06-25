@@ -6630,12 +6630,12 @@ var
   //
 var
   State: (cFoldbarNone, cFoldbarBegin, cFoldbarEnd, cFoldbarMiddle);
-  LineIndex: integer;
-  IsPlus: boolean;
+  NLineIndex: integer;
   WrapItem: TATWrapItem;
   Rng: PATSynRange;
   NIndexOfCurrentRng, NIndexOfCaretRng: integer;
   Caret: TATCaretItem;
+  IsPlus: boolean;
   bHiliteLines: boolean;
   NColorLine, NColorPlus: TColor;
 begin
@@ -6643,7 +6643,7 @@ begin
     if not FCursorOnGutter then Exit;
 
   WrapItem:= FWrapInfo[AWrapItemIndex];
-  LineIndex:= WrapItem.NLineIndex;
+  NLineIndex:= WrapItem.NLineIndex;
 
   //find deepest range which includes caret pos
   NIndexOfCaretRng:= -1;
@@ -6654,7 +6654,7 @@ begin
       NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false);
     end;
 
-  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(LineIndex, false);
+  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false);
   if NIndexOfCurrentRng<0 then exit;
   bHiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
 
@@ -6665,15 +6665,15 @@ begin
   IsLineDown:= false;
 
   Rng:= Fold.ItemPtr(NIndexOfCurrentRng);
-  if Rng^.Y<LineIndex then IsLineUp:= true;
-  if Rng^.Y2>LineIndex then IsLineDown:= true;
-  if Rng^.Y=LineIndex then
+  if Rng^.Y<NLineIndex then IsLineUp:= true;
+  if Rng^.Y2>NLineIndex then IsLineDown:= true;
+  if Rng^.Y=NLineIndex then
   begin
     State:= cFoldbarBegin;
     //don't override found [+], 2 blocks can start at same pos
     if not IsPlus then IsPlus:= Rng^.Folded;
   end;
-  if Rng^.Y2=LineIndex then
+  if Rng^.Y2=NLineIndex then
     if State<>cFoldbarBegin then
       State:= cFoldbarEnd;
 
