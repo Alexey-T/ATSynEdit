@@ -1327,6 +1327,7 @@ type
     procedure EndUpdate;
     function IsLocked: boolean;
     function TextSelected: atString;
+    function TextSelectedEx(ACaret: TATCaretItem): atString;
     function TextCurrentWord: atString;
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     property IsRunningCommand: boolean read FIsRunningCommand;
@@ -6547,16 +6548,23 @@ begin
   Result:= FPaintLocked>0;
 end;
 
-function TATSynEdit.TextSelected: atString;
+function TATSynEdit.TextSelectedEx(ACaret: TATCaretItem): atString;
 var
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
 begin
   Result:= '';
-  if Carets.Count=0 then Exit;
-  Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
+  ACaret.GetRange(X1, Y1, X2, Y2, bSel);
   if bSel then
     Result:= Strings.TextSubstring(X1, Y1, X2, Y2);
+end;
+
+function TATSynEdit.TextSelected: atString;
+begin
+  if Carets.Count>0 then
+    Result:= TextSelectedEx(Carets[0])
+  else
+    Result:= '';
 end;
 
 function TATSynEdit.TextCurrentWord: atString;
