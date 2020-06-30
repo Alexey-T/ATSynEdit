@@ -689,6 +689,8 @@ begin
     Sep2.GetItemInt(Y2, -1, -1{no sel}, MaxInt);
     Add(X1, Y1, X2, Y2);
   end;
+
+  Sort;
 end;
 
 procedure TATCarets.UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
