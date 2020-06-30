@@ -380,15 +380,15 @@ end;
 
 procedure TATCarets.Assign(Obj: TATCarets);
 var
+  Caret: TATCaretItem;
   i: integer;
 begin
   Clear;
   for i:= 0 to Obj.Count-1 do
-    Add(
-      Obj[i].PosX,
-      Obj[i].PosY,
-      Obj[i].EndX,
-      Obj[i].EndY);
+  begin
+    Caret:= Obj[i];
+    Add(Caret.PosX, Caret.PosY, Caret.EndX, Caret.EndY);
+  end;
   DoChanged;
 end;
 

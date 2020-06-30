@@ -133,8 +133,10 @@ type
     FMatchEdPos: TPoint;
     FMatchEdEnd: TPoint;
     FMaxLineLen: integer;
+    FinderCarets: TATCarets;
     //FReplacedAtEndOfText: boolean;
     //
+    procedure UpdateCarets;
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean): boolean;
     procedure InitProgress;
@@ -657,6 +659,12 @@ end;
 
 { TATEditorFinder }
 
+procedure TATEditorFinder.UpdateCarets;
+begin
+  if Assigned(Editor) then
+    FinderCarets.Assign(Editor.Carets);
+end;
+
 procedure TATEditorFinder.ClearMatchPos;
 begin
   inherited;
@@ -719,6 +727,7 @@ begin
   FSkipLen:= 0;
   FFragments:= TATEditorFragments.Create;
   FFragmentIndex:= 0;
+  FinderCarets:= TATCarets.Create;
   //FReplacedAtEndOfText:= false;
   FMaxLineLen:= MaxInt;
 
@@ -732,6 +741,7 @@ destructor TATEditorFinder.Destroy;
 begin
   Editor:= nil;
   DoFragmentsClear;
+  FreeAndNil(FinderCarets);
   FreeAndNil(FFragments);
   FreeAndNil(FBuffer);
   inherited;
@@ -742,6 +752,7 @@ var
   Cnt: integer;
   PosEnd: TPoint;
 begin
+  UpdateCarets;
   if OptRegex then
     raise Exception.Create('Finder FindSimple called in regex mode');
 
@@ -792,11 +803,14 @@ function TATEditorFinder.GetOffsetOfCaret: integer;
 var
   Pnt: TPoint;
 begin
-  with Editor.Carets[0] do
-  begin
-    Pnt.X:= PosX;
-    Pnt.Y:= PosY;
-  end;
+  if FinderCarets.Count>0 then
+    with FinderCarets[0] do
+    begin
+      Pnt.X:= PosX;
+      Pnt.Y:= PosY;
+    end
+  else
+    Pnt:= Point(0, 0);
 
   Result:= ConvertCaretPosToBufferPos(Pnt);
 
@@ -812,6 +826,7 @@ function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
 var
   i: integer;
 begin
+  UpdateCarets;
   UpdateFragments;
   if OptRegex then
     UpdateBuffer;
@@ -832,6 +847,7 @@ end;
 
 procedure TATEditorFinder.DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
 begin
+  UpdateCarets;
   UpdateFragments;
   CurrentFragmentIndex:= 0;
 
@@ -855,6 +871,7 @@ var
 begin
   if not OptRegex then
     raise Exception.Create('Finder Extract action called for non-regex mode');
+  UpdateCarets;
   UpdateBuffer;
 
   AMatches.Clear;
@@ -888,6 +905,7 @@ begin
   Result:= 0;
   if Editor.ModeReadOnly then exit;
 
+  UpdateCarets;
   UpdateFragments;
   if OptRegex then
     UpdateBuffer;
@@ -1016,8 +1034,8 @@ var
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
 begin
-  if Editor.Carets.Count=0 then exit;
-  Caret:= Editor.Carets[0];
+  if FinderCarets.Count=0 then exit;
+  Caret:= FinderCarets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
 
@@ -1077,13 +1095,14 @@ var
 begin
   Result:= false;
   AChanged:= false;
+  UpdateCarets;
 
   if not Assigned(Editor) then
     raise Exception.Create('Finder.Editor not set');
   if StrFind='' then
     raise Exception.Create('Finder.StrFind is empty');
-  if Editor.Carets.Count=0 then
-    raise Exception.Create('Finder.Editor.Carets is empty');
+  if FinderCarets.Count=0 then
+    raise Exception.Create('Finder.FinderCarets is empty');
   if AReplace and Editor.ModeReadOnly then exit;
 
   UpdateFragments;
@@ -1176,8 +1195,8 @@ begin
   else
   if OptFromCaret then
   begin
-    if Editor.Carets.Count=0 then exit;
-    Caret:= Editor.Carets[0];
+    if FinderCarets.Count=0 then exit;
+    Caret:= FinderCarets[0];
     PosStart.X:= Caret.PosX;
     PosStart.Y:= Caret.PosY;
   end;
@@ -1390,8 +1409,8 @@ var
   bSel: boolean;
 begin
   Result:= false;
-  if Editor.Carets.Count=0 then exit;
-  Caret:= Editor.Carets[0];
+  if FinderCarets.Count=0 then exit;
+  Caret:= FinderCarets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
 
@@ -1414,8 +1433,8 @@ var
   bSel: boolean;
 begin
   Result:= false;
-  if Editor.Carets.Count=0 then exit;
-  Caret:= Editor.Carets[0];
+  if FinderCarets.Count=0 then exit;
+  Caret:= FinderCarets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
 
@@ -1438,6 +1457,8 @@ var
 begin
   Result:= false;
   if Editor.ModeReadOnly then exit;
+
+  UpdateCarets;
   UpdateFragments;
 
   if OptRegex then
@@ -1457,7 +1478,7 @@ begin
     end;
   end;
 
-  Caret:= Editor.Carets[0];
+  Caret:= FinderCarets[0];
   Caret.GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then exit;
   P1:= Point(X1, Y1);
@@ -1567,9 +1588,9 @@ begin
   DoFragmentsClear;
   if Editor=nil then exit;
 
-  for i:= 0 to Editor.Carets.Count-1 do
+  for i:= 0 to FinderCarets.Count-1 do
   begin
-    Caret:= Editor.Carets[i];
+    Caret:= FinderCarets[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
     if not bSel then Continue;
 
