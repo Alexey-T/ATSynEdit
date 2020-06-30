@@ -946,7 +946,7 @@ var
   Res: TATFinderResult;
   Str: UnicodeString;
   P1, P2, PosAfter: TPoint;
-  i: integer;
+  NLast, i: integer;
   Ok: boolean;
 begin
   Result:= 0;
@@ -958,7 +958,8 @@ begin
     else
       DoCollect_Usual(L, false, OptConfirmReplace);
 
-    for i:= L.Count-1 downto 0 do
+    NLast:= L.Count-1;
+    for i:= NLast downto 0 do
     begin
       if Application.Terminated then exit;
       Res:= L[i];
@@ -983,7 +984,7 @@ begin
         if Assigned(FOnProgress) then
         begin
           Ok:= true;
-          FOnProgress(Self, L.Count-1-i, L.Count-1, Ok);
+          FOnProgress(Self, NLast-i, NLast, Ok);
           if not Ok then Break;
         end;
     end;
