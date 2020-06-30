@@ -670,26 +670,10 @@ begin
 end;
 
 procedure TATEditorFinder.SetVirtualCaretsAsString(const AValue: string);
-var
-  Sep1, Sep2: TATStringSeparator;
-  OneItem: string;
-  X1, Y1, X2, Y2: integer;
 begin
   if FVirtualCaretsAsString=AValue then exit;
-  FinderCarets.Clear;
-  Sep1.Init(AValue, ';');
-
-  while Sep1.GetItemStr(OneItem) do
-  begin
-    Sep2.Init(OneItem, ',');
-    Sep2.GetItemInt(X1, -1, 0, MaxInt);
-    if X1<0 then Continue;
-    Sep2.GetItemInt(Y1, -1, 0, MaxInt);
-    if Y1<0 then Continue;
-    Sep2.GetItemInt(X2, -1, -1{no sel}, MaxInt);
-    Sep2.GetItemInt(Y2, -1, -1{no sel}, MaxInt);
-    FinderCarets.Add(X1, Y1, X2, Y2);
-  end;
+  FVirtualCaretsAsString:= AValue;
+  FinderCarets.AsString:= AValue;
 end;
 
 procedure TATEditorFinder.ClearMatchPos;

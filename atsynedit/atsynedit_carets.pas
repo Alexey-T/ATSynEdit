@@ -89,6 +89,8 @@ type
       out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
     function GetAsArray: TATPointArray;
     procedure SetAsArray(const Res: TATPointArray);
+    function GetAsString: string;
+    procedure SetAsString(const AValue: string);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -113,6 +115,7 @@ type
     property ManyAllowed: boolean read FManyAllowed write FManyAllowed;
     property OneLine: boolean read FOneLine write FOneLine;
     property AsArray: TATPointArray read GetAsArray write SetAsArray;
+    property AsString: string read GetAsString write SetAsString;
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
     procedure UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
     procedure UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
@@ -643,6 +646,49 @@ begin
       Res[i*2+1].Y
       );
   DoChanged;
+end;
+
+function TATCarets.GetAsString: string;
+var
+  Item: TATCaretItem;
+  S: string;
+  NLast, i: integer;
+begin
+  Result:= '';
+  NLast:= Count-1;
+  for i:= 0 to NLast do
+  begin
+    Item:= Items[i];
+    if Item.EndY<0 then
+      S:= Format('%d,%d', [Item.PosX, Item.PosY])
+    else
+      S:= Format('%d,%d,%d,%d', [Item.PosX, Item.PosY, Item.EndX, Item.EndY]);
+    if i<NLast then
+      S+= ';';
+    Result+= S;
+  end;
+end;
+
+procedure TATCarets.SetAsString(const AValue: string);
+var
+  Sep1, Sep2: TATStringSeparator;
+  OneItem: string;
+  X1, Y1, X2, Y2: integer;
+begin
+  Clear;
+  Sep1.Init(AValue, ';');
+
+  while Sep1.GetItemStr(OneItem) do
+  begin
+    Sep2.Init(OneItem, ',');
+    Sep2.GetItemInt(X1, -1, 0, MaxInt);
+    if X1<0 then Continue;
+    Sep2.GetItemInt(Y1, -1, 0, MaxInt);
+    if Y1<0 then Continue;
+    Sep2.GetItemInt(X2, -1, -1{no sel}, MaxInt);
+    Sep2.GetItemInt(Y2, -1, -1{no sel}, MaxInt);
+    Add(X1, Y1, X2, Y2);
+  end;
 end;
 
 procedure TATCarets.UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
