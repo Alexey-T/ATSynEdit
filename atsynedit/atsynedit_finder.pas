@@ -36,7 +36,6 @@ type
   TATFinderResult = record
   public
     FPos, FEnd: TPoint;
-    FPosAfterRep: TPoint;
     procedure Init(APos, AEnd: TPoint);
     class operator =(const a, b: TATFinderResult): boolean;
   end;
@@ -356,8 +355,6 @@ procedure TATFinderResult.Init(APos, AEnd: TPoint);
 begin
   FPos:= APos;
   FEnd:= AEnd;
-  FPosAfterRep.X:= 0;
-  FPosAfterRep.Y:= 0;
 end;
 
 class operator TATFinderResult.=(const a, b: TATFinderResult): boolean;
@@ -948,7 +945,7 @@ var
   L: TATFinderResults;
   Res: TATFinderResult;
   Str: UnicodeString;
-  P1, P2: TPoint;
+  P1, P2, PosAfter: TPoint;
   i: integer;
   Ok: boolean;
 begin
@@ -979,7 +976,7 @@ begin
       else
         Str:= StrReplace;
 
-      DoReplaceTextInEditor(P1, P2, Str, false, false, Res.FPosAfterRep);
+      DoReplaceTextInEditor(P1, P2, Str, false, false, PosAfter);
       Inc(Result);
 
       if i mod 100 = 0 then
