@@ -36,6 +36,7 @@ type
   TATFinderResult = record
   public
     FPos, FEnd: TPoint;
+    FPosAfterRep: TPoint;
     procedure Init(APos, AEnd: TPoint);
     class operator =(const a, b: TATFinderResult): boolean;
   end;
@@ -132,7 +133,7 @@ type
     FFragmentIndex: integer;
     FMatchEdPos: TPoint;
     FMatchEdEnd: TPoint;
-    FReplaceEdEnd: TPoint;
+    FMatchEdPosAfterRep: TPoint;
     FMaxLineLen: integer;
     FinderCarets: TATCarets;
     FVirtualCaretsAsString: string;
@@ -169,7 +170,8 @@ type
     function DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
       AStartPos: integer; AUpdateCaret: boolean): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
-      const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean);
+      const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean;
+      out APosAfterReplace: TPoint);
     function IsSelStartsAtMatch_InEditor: boolean;
     function IsSelStartsAtMatch_Buffered: boolean;
     //fragments
@@ -195,7 +197,7 @@ type
     //
     property MatchEdPos: TPoint read FMatchEdPos;
     property MatchEdEnd: TPoint read FMatchEdEnd;
-    property ReplaceEdEnd: TPoint read FReplaceEdEnd;
+    property MatchEdPosAfterRep: TPoint read FMatchEdPosAfterRep;
     property MaxLineLen: integer read FMaxLineLen write FMaxLineLen;
     property VirtualCaretsAsString: string read FVirtualCaretsAsString write SetVirtualCaretsAsString;
     //
@@ -354,6 +356,8 @@ procedure TATFinderResult.Init(APos, AEnd: TPoint);
 begin
   FPos:= APos;
   FEnd:= AEnd;
+  FPosAfterRep.X:= 0;
+  FPosAfterRep.Y:= 0;
 end;
 
 class operator TATFinderResult.=(const a, b: TATFinderResult): boolean;
@@ -975,7 +979,7 @@ begin
       else
         Str:= StrReplace;
 
-      DoReplaceTextInEditor(P1, P2, Str, false, false);
+      DoReplaceTextInEditor(P1, P2, Str, false, false, Res.FPosAfterRep);
       Inc(Result);
 
       if i mod 100 = 0 then
@@ -995,7 +999,8 @@ end;
 
 
 procedure TATEditorFinder.DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
-  const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean);
+  const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean; out
+  APosAfterReplace: TPoint);
 var
   Shift: TPoint;
   Strs: TATStrings;
@@ -1011,7 +1016,7 @@ begin
     APosEnd.X, APosEnd.Y,
     AReplacement,
     Shift,
-    FReplaceEdEnd,
+    APosAfterReplace,
     true //use grouped undo
     );
 
@@ -1027,7 +1032,7 @@ begin
       //correct caret pos
       //e.g. replace "dddddd" to "--": move lefter
       //e.g. replace "ab" to "cd cd": move righter
-      Editor.DoCaretSingle(FReplaceEdEnd.X, FReplaceEdEnd.Y);
+      Editor.DoCaretSingle(APosAfterReplace.X, APosAfterReplace.Y);
     end;
 end;
 
@@ -1298,7 +1303,7 @@ begin
         else
           SNew:= StrReplace;
 
-        DoReplaceTextInEditor(FMatchEdPos, FMatchEdEnd, SNew, true, true);
+        DoReplaceTextInEditor(FMatchEdPos, FMatchEdEnd, SNew, true, true, FMatchEdPosAfterRep);
 
         FSkipLen:= Length(SNew)+GetRegexSkipIncrement;
 
@@ -1394,7 +1399,7 @@ begin
         else
           SNew:= StrReplace;
 
-        DoReplaceTextInEditor(P1, P2, SNew, true, true);
+        DoReplaceTextInEditor(P1, P2, SNew, true, true, FMatchEdPosAfterRep);
 
         FSkipLen:= Length(SNew)+GetRegexSkipIncrement;
 
@@ -1508,7 +1513,7 @@ begin
   else
     SNew:= StrReplace;
 
-  DoReplaceTextInEditor(P1, P2, SNew, true, true);
+  DoReplaceTextInEditor(P1, P2, SNew, true, true, FMatchEdPosAfterRep);
   Result:= true;
 end;
 
