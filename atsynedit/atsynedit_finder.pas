@@ -65,10 +65,12 @@ type
     FMatchPos: integer;
     FMatchLen: integer;
     FStrFind: UnicodeString;
+    FStrFindCompiled: UnicodeString;
     FStrReplace: UnicodeString;
     FStrFindUnicode: boolean;
     FRegex: TRegExpr;
     FRegexReplacer: TRegExpr;
+    FRegexCorrect: boolean;
     FProgressPrev: integer;
     FProgressDelta: integer;
     FOnProgress: TATFinderProgress;
@@ -96,6 +98,7 @@ type
     StrText: UnicodeString;
     property StrFind: UnicodeString read FStrFind write SetStrFind;
     property StrReplace: UnicodeString read FStrReplace write SetStrReplace;
+    function IsRegexBad: boolean;
     constructor Create;
     destructor Destroy; override;
     function FindMatch_Regex(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
@@ -384,6 +387,11 @@ begin
   Result:= true;
 end;
 
+function TATTextFinder.IsRegexBad: boolean;
+begin
+  Result:= OptRegex and not FRegexCorrect;
+end;
+
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
 begin
   Result:= false;
@@ -392,12 +400,18 @@ begin
   InitRegex;
 
   try
-    FRegex.ModifierI:= not OptCase;
-    FRegex.Expression:= StrFind;
-    FRegex.Compile;
+    if FStrFindCompiled<>StrFind then
+    begin
+      FStrFindCompiled:= StrFind;
+      FRegex.ModifierI:= not OptCase;
+      FRegex.Expression:= StrFind;
+      FRegex.Compile;
+      FRegexCorrect:= true;
+    end;
   except
     on e: Exception do
     begin
+      FRegexCorrect:= false;
       if Assigned(FOnBadRegex) then
         FOnBadRegex(Self, e.Message);
       exit;
@@ -541,12 +555,18 @@ begin
   InitRegex;
 
   try
-    FRegex.ModifierI:= not OptCase;
-    FRegex.Expression:= StrFind;
-    FRegex.Compile;
+    if FStrFindCompiled<>StrFind then
+    begin
+      FStrFindCompiled:= StrFind;
+      FRegex.ModifierI:= not OptCase;
+      FRegex.Expression:= StrFind;
+      FRegex.Compile;
+      FRegexCorrect:= true;
+    end;
   except
     on e: Exception do
     begin
+      FRegexCorrect:= false;
       if Assigned(FOnBadRegex) then
         FOnBadRegex(Self, e.Message);
       exit;
