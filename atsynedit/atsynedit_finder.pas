@@ -1442,7 +1442,7 @@ begin
      (FMatchEdEnd.X=X2) and
      (FMatchEdEnd.Y=Y2)
     ) or
-    ((StrFind<>'') and (Editor.TextSelected=StrFind));
+    ((StrFind<>'') and (Editor.TextSelectedEx(Caret)=StrFind));
 end;
 
 function TATEditorFinder.IsSelStartsAtMatch_Buffered: boolean;
@@ -1464,7 +1464,7 @@ begin
   //allow to replace, also if selection=Strfind
   Result:=
     ((PosOfBegin=FMatchPos) and (PosOfEnd=FMatchPos+FMatchLen)) or
-    ((StrFind<>'') and (Editor.TextSelected=StrFind));
+    ((StrFind<>'') and (Editor.TextSelectedEx(Caret)=StrFind));
 end;
 
 function TATEditorFinder.DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
@@ -1504,7 +1504,7 @@ begin
   P1:= Point(X1, Y1);
   P2:= Point(X2, Y2);
 
-  SSelText:= Editor.TextSelected;
+  SSelText:= Editor.TextSelectedEx(Caret);
 
   Caret.EndX:= -1;
   Caret.EndY:= -1;
