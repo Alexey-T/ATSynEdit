@@ -75,6 +75,13 @@ begin
   L[L.Count-1]:= L[L.Count-1]+'</code></pre>';
 end;
 
+procedure EscapeSpecChars(var S: string); inline;
+begin
+  S:= StringReplace(S, '&', '&amp;', [rfReplaceAll]);
+  S:= StringReplace(S, '<', '&lt;', [rfReplaceAll]);
+  S:= StringReplace(S, '>', '&gt;', [rfReplaceAll]);
+end;
+
 procedure DoEditorExportToHTML(Ed: TATSynEdit; const AFilename, APageTitle,
   AFontName: string; AFontSize: integer; AWithNumbers: boolean; AColorBg,
   AColorNumbers: TColor);
@@ -121,8 +128,7 @@ begin
         NeedStyle:= NeedStyleFont or NeedStyleBg;
 
         StrText:= Ed.Strings.LineSub(i, PPart^.Offset+1, PPart^.Len);
-        StrText:= StringReplace(StrText, '<', '&lt;', [rfReplaceAll]);
-        StrText:= StringReplace(StrText, '>', '&gt;', [rfReplaceAll]);
+        EscapeSpecChars(StrText);
 
         if _IsSpaces(StrText) and not NeedStyleBg then
         begin
