@@ -1,4 +1,7 @@
 
+2020.06.30
++ add: Finder property VirtualCaretsAsString, it allows to perform search from any pos, or in any blocks
+
 2020.06.25
 + add: draw gutter folding lines, for deepest range of 1st caret, with new color - Colors.GutterFoldLine2
 + add: prop OptGutterShowFoldLinesForCaret
