@@ -132,6 +132,7 @@ type
     FFragmentIndex: integer;
     FMatchEdPos: TPoint;
     FMatchEdEnd: TPoint;
+    FReplaceEdEnd: TPoint;
     FMaxLineLen: integer;
     FinderCarets: TATCarets;
     FVirtualCaretsAsString: string;
@@ -194,6 +195,7 @@ type
     //
     property MatchEdPos: TPoint read FMatchEdPos;
     property MatchEdEnd: TPoint read FMatchEdEnd;
+    property ReplaceEdEnd: TPoint read FReplaceEdEnd;
     property MaxLineLen: integer read FMaxLineLen write FMaxLineLen;
     property VirtualCaretsAsString: string read FVirtualCaretsAsString write SetVirtualCaretsAsString;
     //
@@ -995,7 +997,7 @@ end;
 procedure TATEditorFinder.DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
   const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean);
 var
-  Shift, PosAfter: TPoint;
+  Shift: TPoint;
   Strs: TATStrings;
 begin
   //replace in editor
@@ -1008,7 +1010,8 @@ begin
     APosBegin.X, APosBegin.Y,
     APosEnd.X, APosEnd.Y,
     AReplacement,
-    Shift, PosAfter,
+    Shift,
+    FReplaceEdEnd,
     true //use grouped undo
     );
 
@@ -1024,7 +1027,7 @@ begin
       //correct caret pos
       //e.g. replace "dddddd" to "--": move lefter
       //e.g. replace "ab" to "cd cd": move righter
-      Editor.DoCaretSingle(PosAfter.X, PosAfter.Y);
+      Editor.DoCaretSingle(FReplaceEdEnd.X, FReplaceEdEnd.Y);
     end;
 end;
 
