@@ -134,9 +134,11 @@ type
     FMatchEdEnd: TPoint;
     FMaxLineLen: integer;
     FinderCarets: TATCarets;
+    FVirtualCaretsAsString: string;
     //FReplacedAtEndOfText: boolean;
     //
     procedure UpdateCarets;
+    procedure SetVirtualCaretsAsString(const AValue: string);
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean): boolean;
     procedure InitProgress;
@@ -193,6 +195,7 @@ type
     property MatchEdPos: TPoint read FMatchEdPos;
     property MatchEdEnd: TPoint read FMatchEdEnd;
     property MaxLineLen: integer read FMaxLineLen write FMaxLineLen;
+    property VirtualCaretsAsString: string read FVirtualCaretsAsString write SetVirtualCaretsAsString;
     //
     constructor Create;
     destructor Destroy; override;
@@ -661,8 +664,32 @@ end;
 
 procedure TATEditorFinder.UpdateCarets;
 begin
-  if Assigned(Editor) then
-    FinderCarets.Assign(Editor.Carets);
+  if FVirtualCaretsAsString='' then
+    if Assigned(Editor) then
+      FinderCarets.Assign(Editor.Carets);
+end;
+
+procedure TATEditorFinder.SetVirtualCaretsAsString(const AValue: string);
+var
+  Sep1, Sep2: TATStringSeparator;
+  OneItem: string;
+  X1, Y1, X2, Y2: integer;
+begin
+  if FVirtualCaretsAsString=AValue then exit;
+  FinderCarets.Clear;
+  Sep1.Init(AValue, ';');
+
+  while Sep1.GetItemStr(OneItem) do
+  begin
+    Sep2.Init(OneItem, ',');
+    Sep2.GetItemInt(X1, -1, 0, MaxInt);
+    if X1<0 then Continue;
+    Sep2.GetItemInt(Y1, -1, 0, MaxInt);
+    if Y1<0 then Continue;
+    Sep2.GetItemInt(X2, -1, -1{no sel}, MaxInt);
+    Sep2.GetItemInt(Y2, -1, -1{no sel}, MaxInt);
+    FinderCarets.Add(X1, Y1, X2, Y2);
+  end;
 end;
 
 procedure TATEditorFinder.ClearMatchPos;
