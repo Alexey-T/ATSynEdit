@@ -221,6 +221,9 @@ type
 
 implementation
 
+const
+  cStepForProgress = 100;
+
 function IsWordChar(ch: WideChar): boolean; inline;
 begin
   //Result:= ATStringProc.IsCharWord(ch, cDefaultNonWordChars);
@@ -980,7 +983,7 @@ begin
       DoReplaceTextInEditor(P1, P2, Str, false, false, PosAfter);
       Inc(Result);
 
-      if i mod 100 = 0 then
+      if i mod cStepForProgress = 0 then
         if Assigned(FOnProgress) then
         begin
           Ok:= true;
