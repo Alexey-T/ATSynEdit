@@ -70,7 +70,7 @@ begin
   Finder.OptBack:= chkBack.Checked and not chkRegex.Checked;
   Finder.OptFromCaret:= ANext and not chkRegex.Checked;
 
-  if Finder.DoAction_FindOrReplace(ANext, false, false, bChanged) then
+  if Finder.DoAction_FindOrReplace(ANext, false, false, bChanged, true) then
   begin
     MemoRes.Text:= Format('(line %d)'#10, [Finder.MatchEdPos.Y+1]) +
       Ed.Strings.TextSubstring(Finder.MatchEdPos.X, Finder.MatchEdPos.Y, Finder.MatchEdEnd.X, Finder.MatchEdEnd.Y);
