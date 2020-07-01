@@ -26,7 +26,6 @@ type
   TATFinderProgress = procedure(Sender: TObject;
     const ACurPos, AMaxPos: Int64;
     var AContinue: boolean) of object;
-  TATFinderBadRegexEvent = procedure(Sender: TObject; const Msg: string) of object;
   TATFinderFound = procedure(Sender: TObject; APos1, APos2: TPoint) of object;
   TATFinderConfirmReplace = procedure(Sender: TObject;
     APos1, APos2: TPoint; AForMany: boolean;
@@ -71,10 +70,10 @@ type
     FRegex: TRegExpr;
     FRegexReplacer: TRegExpr;
     FRegexCorrect: boolean;
+    FRegexErrorMsg: string;
     FProgressPrev: integer;
     FProgressDelta: integer;
     FOnProgress: TATFinderProgress;
-    FOnBadRegex: TATFinderBadRegexEvent;
     FOnGetToken: TATFinderGetToken;
     procedure ClearMatchPos; virtual;
     //function IsMatchUsual(APos: integer): boolean;
@@ -99,13 +98,13 @@ type
     property StrFind: UnicodeString read FStrFind write SetStrFind;
     property StrReplace: UnicodeString read FStrReplace write SetStrReplace;
     function IsRegexBad: boolean;
+    property RegexErrorMsg: string read FRegexErrorMsg;
     constructor Create;
     destructor Destroy; override;
     function FindMatch_Regex(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
     property MatchLen: integer read FMatchLen;
     property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
-    property OnBadRegex: TATFinderBadRegexEvent read FOnBadRegex write FOnBadRegex;
     property OnGetToken: TATFinderGetToken read FOnGetToken write FOnGetToken;
   end;
 
@@ -423,8 +422,7 @@ begin
     on e: Exception do
     begin
       FRegexCorrect:= false;
-      if Assigned(FOnBadRegex) then
-        FOnBadRegex(Self, e.Message);
+      FRegexErrorMsg:= e.Message;
       exit;
     end;
   end;
@@ -578,8 +576,7 @@ begin
     on e: Exception do
     begin
       FRegexCorrect:= false;
-      if Assigned(FOnBadRegex) then
-        FOnBadRegex(Self, e.Message);
+      FRegexErrorMsg:= e.Message;
       exit;
     end;
   end;
