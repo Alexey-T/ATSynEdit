@@ -228,7 +228,6 @@ type
     procedure EditClickGap(Sender: TObject; AGapItem: TATGapItem; APos: TPoint);
     procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
-    procedure FinderBadRegex(Sender: TObject; const AMsg: string);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
       AForMany: boolean; var AConfirm, AContinue: boolean);
     procedure DoFindError;
@@ -252,6 +251,7 @@ type
     procedure FinderUpdateEditor(AUpdateText: boolean);
     procedure MenuEncClick(Sender: TObject);
     procedure MsgStatus(const S: string);
+    procedure ShowBadRegex;
     procedure UpdateCaption;
     procedure UpdateGapPanel;
     procedure UpdateStatus;
@@ -345,7 +345,6 @@ begin
   FFinder.OptRegex:= true;
   FFinder.OnConfirmReplace:= @FinderConfirmReplace;
   FFinder.OnProgress:= @FinderProgress;
-  FFinder.OnBadRegex:= @FinderBadRegex;
   FFinder.OnFound:= @FinderFound;
 
   ed_gap:= TATSynEdit.Create(Self);
@@ -900,13 +899,21 @@ begin
         begin
           ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged, true);
           FinderUpdateEditor(false);
-          if not ok then DoFindError;
+          if not ok then
+            if FFinder.IsRegexBad then
+              ShowBadRegex
+            else
+              DoFindError;
         end;
       mrYes: //replace
         begin
           ok:= FFinder.DoAction_FindOrReplace(false, true, false, bChanged, true);
           FinderUpdateEditor(true);
-          if not ok then DoFindError;
+          if not ok then
+            if FFinder.IsRegexBad then
+              ShowBadRegex
+            else
+              DoFindError;
         end;
       mrYesToAll: //replace all
         begin
@@ -1549,11 +1556,12 @@ begin
 end;
 
 
-procedure TfmMain.FinderBadRegex(Sender: TObject; const AMsg: string);
+procedure TfmMain.ShowBadRegex;
 begin
   MessageDlg(
-    'Incorrect regex',
-    Utf8Encode(FFinder.StrFind)+#10+AMsg,
+    'Incorrect RegEx',
+    Utf8Encode(FFinder.StrFind)+#10+
+    FFinder.RegexErrorMsg,
     mtError,
     [mbOk], ''
     );
