@@ -903,7 +903,8 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  Strings.BeginUndoGroup;
+ Strings.BeginUndoGroup;
+ try
   for i:= Carets.Count-1 downto 0 do
   begin
     Caret:= Carets[i];
@@ -929,7 +930,9 @@ begin
     Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
     Strings.TextInsert(X1, Y1, Str2, false, Shift, PosAfter);
   end;
+ finally
   Strings.EndUndoGroup;
+ end;
 
   Result:= [cResultText, cResultCaretAny];
 end;
