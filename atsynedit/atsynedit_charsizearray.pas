@@ -179,6 +179,10 @@ begin
   FixedSizes[$061C]:= _hexshow;
   FixedSizes[$FEFF]:= _hexshow;
 
+  //line-break chars
+  FixedSizes[$0A]:= _space;
+  FixedSizes[$0D]:= _space;
+
   //space chars
   FixedSizes[$9]:= _space;
   FixedSizes[$20]:= _space;
