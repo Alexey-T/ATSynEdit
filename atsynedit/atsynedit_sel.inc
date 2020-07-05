@@ -343,10 +343,43 @@ begin
     end;
 end;
 
+procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
+var
+  Coord1, Coord2: TPoint;
+  LineCoord1, LineCoord2: TPoint;
+  Details: TATPosDetails;
+  Y: integer;
+begin
+  if P1.Y>P2.Y then
+    SwapInt(P1.Y, P2.Y);
+  Coord1:= CaretPosToClientPos(P1);
+  Coord2:= CaretPosToClientPos(P2);
+  DoSelect_None;
+  Y:= Coord1.Y+1;
+
+  repeat
+    LineCoord1:= ClientPosToCaretPos(Point(Coord1.X, Y), Details);
+    LineCoord2:= ClientPosToCaretPos(Point(Coord2.X, Y), Details);
+    if (LineCoord1.Y>=0) and (LineCoord2.Y>=0) then
+      Carets.Add(LineCoord2.X, LineCoord2.Y, LineCoord1.X, LineCoord1.Y);
+    Inc(Y, FCharSize.Y);
+  until Y>Coord2.Y;
+
+  //don't allow no carets
+  if Carets.Count=0 then
+    DoCaretSingle(P2.X, P2.Y);
+end;
+
 procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
 var
   PTarget: TPoint;
 begin
+  if FOptCaretsPrimitiveColumnSelection then
+  begin
+    DoSelect_ColumnBlock_Primitive(P1, P2);
+    exit;
+  end;
+
   //consider tab-chars
   P1.X:= Strings.CharPosToColumnPos(P1.Y, P1.X, FTabHelper);
   P2.X:= Strings.CharPosToColumnPos(P2.Y, P2.X, FTabHelper);

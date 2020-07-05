@@ -266,6 +266,7 @@ const
   cInitScrollbarHorzAddSpace = 4;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
+  cInitCaretsPrimitiveColumnSelection = true;
   cInitCaretsMultiToColumnSel = true;
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
@@ -684,6 +685,7 @@ type
     FOptMouseEnableNormalSelection: boolean;
     FOptMouseEnableColumnSelection: boolean;
     FOptMouseColumnSelectionWithoutKey: boolean;
+    FOptCaretsPrimitiveColumnSelection: boolean;
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
     FOptCaretPosAfterPasteColumn: TATPasteCaret;
@@ -1344,6 +1346,7 @@ type
     procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_FromSelRect;
+    procedure DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(ADeltaX, ADeltaY: integer);
     procedure DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
@@ -1548,6 +1551,7 @@ type
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused default true;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide default true;
     property OptCaretPosAfterPasteColumn: TATPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn default cPasteCaretColumnRight;
+    property OptCaretsPrimitiveColumnSelection: boolean read FOptCaretsPrimitiveColumnSelection write FOptCaretsPrimitiveColumnSelection default cInitCaretsPrimitiveColumnSelection;
     property OptCaretsAddedToColumnSelection: boolean read FOptCaretsAddedToColumnSelection write FOptCaretsAddedToColumnSelection default true;
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
@@ -3907,6 +3911,7 @@ begin
   FOptCaretPosAfterPasteColumn:= cPasteCaretColumnRight;
   FOptCaretsAddedToColumnSelection:= true;
   FOptCaretFixAfterRangeFolded:= true;
+  FOptCaretsPrimitiveColumnSelection:= cInitCaretsPrimitiveColumnSelection;
   FOptCaretsMultiToColumnSel:= cInitCaretsMultiToColumnSel;
   FOptMarkersSize:= 25;
   FOptMouseEnableAll:= true;
