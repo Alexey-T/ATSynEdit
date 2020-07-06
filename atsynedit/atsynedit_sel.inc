@@ -363,7 +363,7 @@ begin
     if (LineCoord1.Y>=0) and (LineCoord2.Y>=0) then
       Carets.Add(LineCoord2.X, LineCoord2.Y, LineCoord1.X, LineCoord1.Y);
     Inc(Y, FCharSize.Y);
-  until Y>Coord2.Y;
+  until Y-FCharSize.Y>Coord2.Y;
 
   //don't allow no carets
   if Carets.Count=0 then
