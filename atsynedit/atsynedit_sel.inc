@@ -354,9 +354,11 @@ begin
     SwapInt(P1.Y, P2.Y);
   Coord1:= CaretPosToClientPos(P1);
   Coord2:= CaretPosToClientPos(P2);
-  DoSelect_None;
-  Y:= Coord1.Y+1;
 
+  DoSelect_None;
+  Carets.Clear;
+
+  Y:= Coord1.Y+1;
   repeat
     LineCoord1:= ClientPosToCaretPos(Point(Coord1.X, Y), Details);
     LineCoord2:= ClientPosToCaretPos(Point(Coord2.X, Y), Details);
