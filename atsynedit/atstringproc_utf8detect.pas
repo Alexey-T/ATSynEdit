@@ -23,18 +23,20 @@ const bytesFromUTF8:array[AnsiChar] of byte = (
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  //224
   2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, 3,3,3,3,3,3,3,3,4,4,4,4,5,5,5,5); //256
 
+{
 function GetUtf8CharWidth(firstchar:AnsiChar):integer;
 begin
   result:=bytesFromUTF8[firstchar]+1;
 end;
+}
 
-function IsFirstUTF8Char(thechar:AnsiChar):boolean;
+function IsFirstUTF8Char(thechar:AnsiChar):boolean; inline;
 {The remaining bytes in a multi-byte sequence have 10 as their two most significant bits.}
 begin
   result:=(byte(thechar) and (128+64))<>128;
 end;
 
-function IsSecondaryUTF8Char(thechar:AnsiChar):boolean;
+function IsSecondaryUTF8Char(thechar:AnsiChar):boolean; inline;
 {The remaining bytes in a multi-byte sequence have 10 as their two most significant bits.}
 begin
   result:=(byte(thechar) and (128+64))=128;
@@ -51,14 +53,19 @@ begin
   hadutf8bytes:=false;
   result:=false;
   utf8bytes:=0;
-  while p[0]<>#0 do begin
-    if utf8bytes>0 then begin  {Expecting secondary AnsiChar}
+  while p^<>#0 do
+  begin
+    if utf8bytes>0 then
+    begin  {Expecting secondary AnsiChar}
       hadutf8bytes:=true;
-      if not IsSecondaryUTF8Char(p[0]) then exit;  {Fail!}
+      if not IsSecondaryUTF8Char(p^) then exit;  {Fail!}
       dec(utf8bytes);
-    end else if IsFirstUTF8Char(p[0]) then
-      utf8bytes:=GetUtf8CharWidth(p[0])-1
-    else if IsSecondaryUTF8Char(p[0]) then
+    end
+    else
+    if IsFirstUTF8Char(p^) then
+      utf8bytes:=bytesFromUTF8[p^]
+    else
+    //if IsSecondaryUTF8Char(p^) then //Alexey: redundant check
       exit;  {Fail!}
     inc(p);
   end;
