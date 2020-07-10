@@ -147,12 +147,14 @@ function TATSynEdit.DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandRes
 var
   NFrom, NTo, NLastLine: integer;
   Caret: TATCaretItem;
-  Str: atString;
+  St: TATStrings;
+  S: atString;
   Pnt: TPoint;
   bLastNoEol: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   DoCaretSingleAsIs;
   Caret:= Carets[0];
@@ -164,27 +166,27 @@ begin
   end;
 
  try
-  Strings.EnabledBookmarksUpdate:= false;
-  NLastLine:= Strings.Count-1;
+  St.EnabledBookmarksUpdate:= false;
+  NLastLine:= St.Count-1;
 
   if ADown then
   begin
     if NTo>=NLastLine then Exit;
-    bLastNoEol:= (NTo+1=NLastLine) and (Strings.LinesEnds[NLastLine]=cEndNone);
+    bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=cEndNone);
 
-    Str:= Strings.Lines[NTo+1];
-    Strings.LineDelete(NTo+1);
-    Strings.LineInsert(NFrom, Str);
+    S:= St.Lines[NTo+1];
+    St.LineDelete(NTo+1);
+    St.LineInsert(NFrom, S);
 
     if bLastNoEol then
-      Strings.ActionDeleteFakeLineAndFinalEol;
+      St.ActionDeleteFakeLineAndFinalEol;
 
     Inc(Caret.PosY);
     if Caret.EndY>=0 then
       Inc(Caret.EndY);
 
     //correct caret if out of file
-    if Caret.PosY>=Strings.Count then
+    if Caret.PosY>=St.Count then
     begin
       Pnt:= GetEndOfFilePos;
       Caret.PosX:= Pnt.X;
@@ -194,17 +196,17 @@ begin
   else
   begin
     if NFrom<=0 then Exit;
-    bLastNoEol:= (NTo=NLastLine) and (Strings.LinesEnds[NTo]=cEndNone);
+    bLastNoEol:= (NTo=NLastLine) and (St.LinesEnds[NTo]=cEndNone);
 
     if bLastNoEol then
-      Strings.LinesEnds[NTo]:= Strings.Endings;
+      St.LinesEnds[NTo]:= St.Endings;
 
-    Str:= Strings.Lines[NFrom-1];
-    Strings.LineDelete(NFrom-1);
-    Strings.LineInsert(NTo, Str);
+    S:= St.Lines[NFrom-1];
+    St.LineDelete(NFrom-1);
+    St.LineInsert(NTo, S);
 
     if bLastNoEol then
-      Strings.ActionDeleteFakeLineAndFinalEol;
+      St.ActionDeleteFakeLineAndFinalEol;
 
     Dec(Caret.PosY);
     if Caret.EndY>=0 then
@@ -212,7 +214,7 @@ begin
   end;
 
  finally
-   Strings.EnabledBookmarksUpdate:= true;
+   St.EnabledBookmarksUpdate:= true;
  end;
 
   Result:= [cResultText, cResultCaretTop];
