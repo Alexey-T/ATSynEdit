@@ -149,6 +149,7 @@ var
   Caret: TATCaretItem;
   Str: atString;
   Pnt: TPoint;
+  bLastNoEol: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -164,17 +165,19 @@ begin
 
  try
   Strings.EnabledBookmarksUpdate:= false;
+  NLastLine:= Strings.Count-1;
 
   if ADown then
   begin
-    NLastLine:= Strings.Count-1;
-    if Strings.IsLastLineFake then
-      Dec(NLastLine);
     if NTo>=NLastLine then Exit;
+    bLastNoEol:= (NTo+1=NLastLine) and (Strings.LinesEnds[NLastLine]=cEndNone);
 
     Str:= Strings.Lines[NTo+1];
     Strings.LineDelete(NTo+1);
     Strings.LineInsert(NFrom, Str);
+
+    if bLastNoEol then
+      Strings.ActionDeleteFakeLineAndFinalEol;
 
     Inc(Caret.PosY);
     if Caret.EndY>=0 then
@@ -191,9 +194,17 @@ begin
   else
   begin
     if NFrom<=0 then Exit;
+    bLastNoEol:= (NTo=NLastLine) and (Strings.LinesEnds[NTo]=cEndNone);
+
+    if bLastNoEol then
+      Strings.LinesEnds[NTo]:= Strings.Endings;
+
     Str:= Strings.Lines[NFrom-1];
     Strings.LineDelete(NFrom-1);
     Strings.LineInsert(NTo, Str);
+
+    if bLastNoEol then
+      Strings.ActionDeleteFakeLineAndFinalEol;
 
     Dec(Caret.PosY);
     if Caret.EndY>=0 then
