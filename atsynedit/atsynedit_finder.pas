@@ -79,7 +79,7 @@ type
     FStrFindUnicode: boolean;
     FRegex: TRegExpr;
     FRegexReplacer: TRegExpr;
-    FRegexCorrect: boolean;
+    FRegexBad: boolean;
     FRegexErrorMsg: string;
     FProgressPrev: integer;
     FProgressDelta: integer;
@@ -422,7 +422,7 @@ end;
 
 function TATTextFinder.IsRegexBad: boolean;
 begin
-  Result:= OptRegex and not FRegexCorrect;
+  Result:= OptRegex and FRegexBad;
 end;
 
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
@@ -439,15 +439,15 @@ begin
       FRegex.ModifierI:= not OptCase;
       FRegex.Expression:= StrFind;
       FRegex.Compile;
-      FRegexCorrect:= true;
+      FRegexBad:= false;
     end
     else
     //previous call was failed to compile?
-    if not FRegexCorrect then exit;
+    if FRegexBad then exit;
   except
     on e: Exception do
     begin
-      FRegexCorrect:= false;
+      FRegexBad:= true;
       FRegexErrorMsg:= e.Message;
       exit;
     end;
@@ -596,15 +596,15 @@ begin
       FRegex.ModifierI:= not OptCase;
       FRegex.Expression:= StrFind;
       FRegex.Compile;
-      FRegexCorrect:= true;
+      FRegexBad:= false;
     end
     else
     //previous call was failed to compile?
-    if not FRegexCorrect then exit;
+    if FRegexBad then exit;
   except
     on e: Exception do
     begin
-      FRegexCorrect:= false;
+      FRegexBad:= true;
       FRegexErrorMsg:= e.Message;
       exit;
     end;
