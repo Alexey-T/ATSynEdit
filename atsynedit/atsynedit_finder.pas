@@ -135,6 +135,9 @@ type
     FMaxLineLen: integer;
     FinderCarets: TATCarets;
     FVirtualCaretsAsString: string;
+    FIndentHorz: integer;
+    FIndentVert: integer;
+    FDataString: string;
     //FReplacedAtEndOfText: boolean;
     //
     procedure UpdateCarets;
@@ -198,6 +201,9 @@ type
     property MatchEdPosAfterRep: TPoint read FMatchEdPosAfterRep;
     property MaxLineLen: integer read FMaxLineLen write FMaxLineLen;
     property VirtualCaretsAsString: string read FVirtualCaretsAsString write SetVirtualCaretsAsString;
+    property IndentHorz: integer read FIndentHorz write FIndentHorz;
+    property IndentVert: integer read FIndentVert write FIndentVert;
+    property DataString: string read FDataString write FDataString;
     //
     constructor Create;
     destructor Destroy; override;
@@ -749,6 +755,9 @@ begin
   OptConfirmReplace:= false;
   OptInSelection:= false;
   OptPutBackwardSelection:= false;
+
+  FIndentVert:= -5;
+  FIndentHorz:= 10;
 end;
 
 destructor TATEditorFinder.Destroy;
@@ -2018,15 +2027,27 @@ begin
   Editor:= nil;
   ClearMatchPos;
 
-  FRegex.Expression:= '';
-  FRegex.InputString:= '';
-  FRegexReplacer.Expression:= '';
-  FRegexReplacer.InputString:= '';
-  FBuffer.Clear;
+  if Assigned(FRegex) then
+  begin
+    FRegex.Expression:= '';
+    FRegex.InputString:= '';
+  end;
+
+  if Assigned(FRegexReplacer) then
+  begin
+    FRegexReplacer.Expression:= '';
+    FRegexReplacer.InputString:= '';
+  end;
+
+  if Assigned(FBuffer) then
+    FBuffer.Clear;
 
   FSkipLen:= 0;
   FMaxLineLen:= MaxInt;
   DoFragmentsClear;
+
+  FIndentVert:= -5;
+  FIndentHorz:= 10;
 end;
 
 end.
