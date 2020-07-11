@@ -148,6 +148,7 @@ type
     FIndentHorz: integer;
     FIndentVert: integer;
     FDataString: string;
+    FCallbackString: string;
     //FReplacedAtEndOfText: boolean;
     //
     procedure UpdateCarets;
@@ -214,6 +215,7 @@ type
     property IndentHorz: integer read FIndentHorz write FIndentHorz;
     property IndentVert: integer read FIndentVert write FIndentVert;
     property DataString: string read FDataString write FDataString;
+    property CallbackString: string read FCallbackString write FCallbackString;
     //
     constructor Create;
     destructor Destroy; override;
