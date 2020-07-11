@@ -2074,6 +2074,9 @@ begin
 
   FIndentVert:= -5;
   FIndentHorz:= 10;
+
+  FDataString:= '';
+  FCallbackString:= '';
 end;
 
 end.
