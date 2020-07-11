@@ -29,7 +29,8 @@ type
   TATFinderFound = procedure(Sender: TObject; APos1, APos2: TPoint) of object;
   TATFinderConfirmReplace = procedure(Sender: TObject;
     APos1, APos2: TPoint; AForMany: boolean;
-    var AConfirm, AContinue: boolean) of object;
+    var AConfirm, AContinue: boolean;
+    var AReplacement: UnicodeString) of object;
 
 type
   TATFinderResult = record
@@ -197,7 +198,8 @@ type
     property CurrentFragmentIndex: integer read FFragmentIndex write SetFragmentIndex;
   protected
     procedure DoOnFound; override;
-    procedure DoConfirmReplace(APos, AEnd: TPoint; var AConfirmThis, AConfirmContinue: boolean);
+    procedure DoConfirmReplace(APos, AEnd: TPoint; var AConfirmThis,
+      AConfirmContinue: boolean; var AReplacement: UnicodeString);
     function CheckTokens(AX, AY: integer): boolean;
     function CheckTokens(APos: integer): boolean; override;
   public
@@ -520,9 +522,11 @@ var
   bOk, bContinue: boolean;
   Res: TATFinderResult;
   Fr: TATEditorFragment;
+  SNew: UnicodeString;
 begin
   AList.Clear;
   if StrFind='' then exit;
+  SNew:= '';
 
   IndexLineMax:= Editor.Strings.Count-1;
   InitProgress;
@@ -561,7 +565,7 @@ begin
 
     if AWithConfirm then
     begin
-      DoConfirmReplace(FMatchEdPos, FMatchEdEnd, bOk, bContinue);
+      DoConfirmReplace(FMatchEdPos, FMatchEdEnd, bOk, bContinue, SNew);
       if not bContinue then exit;
       if not bOk then Continue;
     end;
@@ -585,11 +589,13 @@ var
   bOk, bContinue: boolean;
   Res: TATFinderResult;
   P1, P2: TPoint;
+  SNew: UnicodeString;
 begin
   AList.Clear;
   if StrFind='' then exit;
   if StrText='' then exit;
   InitRegex;
+  SNew:= '';
 
   try
     if FStrFindCompiled<>StrFind then
@@ -625,7 +631,7 @@ begin
 
   if bOk and AWithConfirm then
   begin
-    DoConfirmReplace(P1, P2, bOk, bContinue);
+    DoConfirmReplace(P1, P2, bOk, bContinue, SNew);
     if not bContinue then exit;
   end;
 
@@ -653,7 +659,7 @@ begin
 
     if AWithConfirm then
     begin
-      DoConfirmReplace(P1, P2, bOk, bContinue);
+      DoConfirmReplace(P1, P2, bOk, bContinue, SNew);
       if not bContinue then exit;
       if not bOk then Continue;
     end;
@@ -1312,33 +1318,31 @@ begin
       ConfirmThis:= true;
       ConfirmContinue:= true;
 
+      if OptRegex then
+      begin
+        P1:= FMatchEdPos;
+        P2:= FMatchEdEnd;
+        if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
+        begin
+          P1:= FMatchEdEnd;
+          P2:= FMatchEdPos;
+        end;
+        SNew:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
+      end
+      else
+        SNew:= StrReplace;
+
       if OptConfirmReplace then
         if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, FMatchEdPos, FMatchEdEnd, AForMany, ConfirmThis, ConfirmContinue);
+          FOnConfirmReplace(Self, FMatchEdPos, FMatchEdEnd, AForMany, ConfirmThis, ConfirmContinue, SNew);
 
       if not ConfirmContinue then
         Exit(false);
 
       if ConfirmThis then
       begin
-        if OptRegex then
-        begin
-          P1:= FMatchEdPos;
-          P2:= FMatchEdEnd;
-          if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, true) then
-          begin
-            P1:= FMatchEdEnd;
-            P2:= FMatchEdPos;
-          end;
-          SNew:= GetRegexReplacement(Editor.Strings.TextSubstring(P1.X, P1.Y, P2.X, P2.Y));
-        end
-        else
-          SNew:= StrReplace;
-
         DoReplaceTextInEditor(FMatchEdPos, FMatchEdEnd, SNew, true, true, FMatchEdPosAfterRep);
-
         FSkipLen:= Length(SNew)+GetRegexSkipIncrement;
-
         AChanged:= true;
       end;
     end;
@@ -1418,24 +1422,22 @@ begin
       ConfirmThis:= true;
       ConfirmContinue:= true;
 
+      if OptRegex then
+        SNew:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
+      else
+        SNew:= StrReplace;
+
       if OptConfirmReplace then
         if Assigned(FOnConfirmReplace) then
-          FOnConfirmReplace(Self, P1, P2, AForMany, ConfirmThis, ConfirmContinue);
+          FOnConfirmReplace(Self, P1, P2, AForMany, ConfirmThis, ConfirmContinue, SNew);
 
       if not ConfirmContinue then
         Exit(false);
 
       if ConfirmThis then
       begin
-        if OptRegex then
-          SNew:= GetRegexReplacement(FBuffer.SubString(FMatchPos, FMatchLen))
-        else
-          SNew:= StrReplace;
-
         DoReplaceTextInEditor(P1, P2, SNew, true, true, FMatchEdPosAfterRep);
-
         FSkipLen:= Length(SNew)+GetRegexSkipIncrement;
-
         AChanged:= true;
       end;
     end;
@@ -1713,7 +1715,8 @@ begin
 end;
 
 procedure TATEditorFinder.DoConfirmReplace(APos, AEnd: TPoint;
-  var AConfirmThis, AConfirmContinue: boolean);
+  var AConfirmThis, AConfirmContinue: boolean;
+  var AReplacement: UnicodeString);
 begin
   AConfirmThis:= true;
   AConfirmContinue:= true;
@@ -1721,7 +1724,7 @@ begin
   if Assigned(FOnConfirmReplace) then
   begin
     Editor.DoCaretSingle(APos.X, APos.Y);
-    FOnConfirmReplace(Self, APos, AEnd, true, AConfirmThis, AConfirmContinue);
+    FOnConfirmReplace(Self, APos, AEnd, true, AConfirmThis, AConfirmContinue, AReplacement);
   end;
 end;
 
