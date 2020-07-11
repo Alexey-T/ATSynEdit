@@ -111,7 +111,7 @@ type
     property RegexErrorMsg: string read FRegexErrorMsg;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch_Regex(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
+    function FindMatch_Regex(ASkipLen: integer; AStartPos: integer): boolean;
     property MatchLen: integer read FMatchLen;
     property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
@@ -170,15 +170,15 @@ type
     function DoCount_InFragment(AWithEvent: boolean): integer;
     function DoReplace_InFragment: integer;
     //
-    function DoFindOrReplace_InFragment(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
+    function DoFindOrReplace_InFragment(AReplace, AForMany: boolean; out AChanged: boolean;
       AUpdateCaret: boolean): boolean;
     function DoFindOrReplace_InEditor(AReplace, AForMany: boolean; out AChanged: boolean;
       AUpdateCaret: boolean): boolean;
     function DoFindOrReplace_InEditor_Internal(AReplace, AForMany: boolean; out AChanged: boolean; APosStart,
       APosEnd: TPoint; AUpdateCaret: boolean): boolean;
-    function DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
+    function DoFindOrReplace_Buffered(AReplace, AForMany: boolean; out AChanged: boolean;
       AUpdateCaret: boolean): boolean;
-    function DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
+    function DoFindOrReplace_Buffered_Internal(AReplace, AForMany: boolean; out AChanged: boolean;
       AStartPos: integer; AUpdateCaret: boolean): boolean;
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
       const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean;
@@ -220,7 +220,7 @@ type
     procedure Clear;
     //
     function DoAction_FindSimple(const APosStart: TPoint): boolean;
-    function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean;
+    function DoAction_FindOrReplace(AReplace, AForMany: boolean; out AChanged: boolean;
       AUpdateCaret: boolean): boolean;
     function DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
     procedure DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
@@ -1137,7 +1137,7 @@ begin
   Result:= CheckTokens(P.X, P.Y);
 end;
 
-function TATEditorFinder.DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoAction_FindOrReplace(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   i: integer;
@@ -1159,7 +1159,7 @@ begin
 
   if not OptInSelection or (FFragments.Count=0) then
   begin
-    Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged, AUpdateCaret);
+    Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
     exit
   end;
 
@@ -1168,7 +1168,7 @@ begin
     for i:= 0 to FFragments.Count-1 do
     begin
       CurrentFragmentIndex:= i;
-      Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged, AUpdateCaret);
+      Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
       if Result then Break;
     end;
   end
@@ -1177,7 +1177,7 @@ begin
     for i:= FFragments.Count-1 downto 0 do
     begin
       CurrentFragmentIndex:= i;
-      Result:= DoFindOrReplace_InFragment(ANext, AReplace, AForMany, AChanged, AUpdateCaret);
+      Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
       if Result then Break;
     end;
   end;
@@ -1186,11 +1186,11 @@ begin
 end;
 
 
-function TATEditorFinder.DoFindOrReplace_InFragment(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoFindOrReplace_InFragment(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
 begin
   if OptRegex then
-    Result:= DoFindOrReplace_Buffered(ANext, AReplace, AForMany, AChanged, AUpdateCaret)
+    Result:= DoFindOrReplace_Buffered(AReplace, AForMany, AChanged, AUpdateCaret)
   else
     Result:= DoFindOrReplace_InEditor(AReplace, AForMany, AChanged, AUpdateCaret);
 end;
@@ -1355,7 +1355,7 @@ begin
   end;
 end;
 
-function TATEditorFinder.DoFindOrReplace_Buffered(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoFindOrReplace_Buffered(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   NStartPos: integer;
@@ -1367,7 +1367,7 @@ begin
   UpdateBuffer;
 
   NStartPos:= GetOffsetStartPos;
-  Result:= DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
+  Result:= DoFindOrReplace_Buffered_Internal(AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
 
   if (not Result) and (OptWrapped and not OptInSelection) then
     if (not OptBack and (NStartPos>1)) or
@@ -1376,7 +1376,7 @@ begin
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
       //
-      if DoFindOrReplace_Buffered_Internal(ANext, false, AForMany, AChanged,
+      if DoFindOrReplace_Buffered_Internal(false, AForMany, AChanged,
         IfThen(not OptBack, 1, Length(StrText)),
         AUpdateCaret) then
       begin
@@ -1389,7 +1389,7 @@ begin
 end;
 
 
-function TATEditorFinder.DoFindOrReplace_Buffered_Internal(ANext, AReplace, AForMany: boolean;
+function TATEditorFinder.DoFindOrReplace_Buffered_Internal(AReplace, AForMany: boolean;
   out AChanged: boolean; AStartPos: integer; AUpdateCaret: boolean): boolean;
   //function usually called 1 time in outer func,
   //or 1-2 times if OptWrap=true
@@ -1399,7 +1399,7 @@ var
   SNew: UnicodeString;
 begin
   AChanged:= false;
-  Result:= FindMatch_Regex(ANext, FSkipLen, AStartPos);
+  Result:= FindMatch_Regex(FSkipLen, AStartPos);
 
   FSkipLen:= FMatchLen+GetRegexSkipIncrement;
 
@@ -1514,7 +1514,7 @@ begin
   begin
     if not IsSelStartsAtMatch_Buffered then
     begin
-      DoFindOrReplace_Buffered(false, false, false, bSel, AUpdateCaret);
+      DoFindOrReplace_Buffered(false, false, bSel, AUpdateCaret);
       exit;
     end;
   end
@@ -1585,7 +1585,7 @@ begin
   end;
 end;
 
-function TATTextFinder.FindMatch_Regex(ANext: boolean; ASkipLen: integer; AStartPos: integer): boolean;
+function TATTextFinder.FindMatch_Regex(ASkipLen: integer; AStartPos: integer): boolean;
 var
   NPos: integer;
 begin
