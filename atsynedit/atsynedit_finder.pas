@@ -41,6 +41,16 @@ type
 
   TATFinderResults = specialize TFPGList<TATFinderResult>;
 
+  { TATFinderResult2 }
+
+  TATFinderResult2 = record
+  public
+    Pos, PosEnd, PosAfter: TPoint;
+    class operator =(const a, b: TATFinderResult2): boolean;
+  end;
+
+  TATFinderResults2 = specialize TFPGList<TATFinderResult2>;
+
   TATFinderTokensAllowed = (
     cTokensAll,
     cTokensOnlyComments,
@@ -334,6 +344,13 @@ begin
     end;
 
   Result:= true;
+end;
+
+{ TATFinderResult2 }
+
+class operator TATFinderResult2.=(const a, b: TATFinderResult2): boolean;
+begin
+  Result:= false;
 end;
 
 { TATEditorFragment }
