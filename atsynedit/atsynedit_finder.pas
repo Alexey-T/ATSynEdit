@@ -440,7 +440,10 @@ begin
       FRegex.Expression:= StrFind;
       FRegex.Compile;
       FRegexCorrect:= true;
-    end;
+    end
+    else
+    //previous call was failed to compile?
+    if not FRegexCorrect then exit;
   except
     on e: Exception do
     begin
@@ -594,7 +597,10 @@ begin
       FRegex.Expression:= StrFind;
       FRegex.Compile;
       FRegexCorrect:= true;
-    end;
+    end
+    else
+    //previous call was failed to compile?
+    if not FRegexCorrect then exit;
   except
     on e: Exception do
     begin
