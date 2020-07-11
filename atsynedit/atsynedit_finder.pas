@@ -1345,7 +1345,8 @@ begin
     begin
       if AReplace then
         //don't select
-        Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y)
+        //Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y) //bad: cudatext.finder_proc(.. FINDER_REP_ALL_EX) won't go to next
+        Editor.DoCaretSingle(FMatchEdEnd.X, FMatchEdEnd.Y)
       else
       if OptBack and OptPutBackwardSelection then
         Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y, FMatchEdEnd.X, FMatchEdEnd.Y)
