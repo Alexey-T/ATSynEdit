@@ -152,6 +152,9 @@ begin
   WantReturns:= true; //allow combo to handle Enter
 
   FItems:= TStringList.Create;
+  FItems.TextLineBreakStyle:= tlbsLF;
+  FItems.TrailingLineBreak:= false;
+
   FItemIndex:= -1;
   FMenu:= TPopupMenu.Create(Self);
 
