@@ -229,7 +229,7 @@ type
     procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
-      AForMany: boolean; var AConfirm, AContinue: boolean);
+      AForMany: boolean; var AConfirm, AContinue: boolean; var AReplacement: UnicodeString);
     procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
@@ -897,7 +897,7 @@ begin
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged, true);
+          ok:= FFinder.DoAction_FindOrReplace(false, false, bChanged, true);
           FinderUpdateEditor(false);
           if not ok then
             if FFinder.IsRegexBad then
@@ -907,7 +907,7 @@ begin
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.DoAction_FindOrReplace(false, true, false, bChanged, true);
+          ok:= FFinder.DoAction_FindOrReplace(true, false, bChanged, true);
           FinderUpdateEditor(true);
           if not ok then
             if FFinder.IsRegexBad then
@@ -955,7 +955,7 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
-  ok:= FFinder.DoAction_FindOrReplace(false, false, false, bChanged, true);
+  ok:= FFinder.DoAction_FindOrReplace(false, false, bChanged, true);
   FinderUpdateEditor(false);
   if not ok then DoFindError;
 end;
@@ -1520,7 +1520,8 @@ begin
 end;
 
 procedure TfmMain.FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
-  AForMany: boolean; var AConfirm, AContinue: boolean);
+  AForMany: boolean; var AConfirm, AContinue: boolean;
+  var AReplacement: UnicodeString);
 var
   Res: TModalResult;
   Buttons: TMsgDlgButtons;
@@ -1535,7 +1536,9 @@ begin
     PosX:= APos1.X;
     PosY:= APos1.Y;
     EndX:= APos2.X;
-    EndY:= APos2.Y;        end;
+    EndY:= APos2.Y;
+  end;
+
   Ed.DoCommand(cCommand_ScrollToCaretTop);
   Ed.Update(true);
 
