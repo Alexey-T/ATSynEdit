@@ -391,10 +391,7 @@ begin
     SwapInt(P1.Y, P2.Y);
 
   //setting SelRect must be first, it's used later
-  FSelRect.Left:= Min(P1.X, P2.X);
-  FSelRect.Right:= Max(P1.X, P2.X);
-  FSelRect.Top:= P1.Y;
-  FSelRect.Bottom:= P2.Y;
+  UpdateSelRectFromPoints(P1, P2);
 
   if FOptCaretsAddedToColumnSelection then
     DoCaretsAddOnColumnBlock(P1, P2, FSelRect)
@@ -485,6 +482,14 @@ begin
 end;
 
 
+procedure TATSynEdit.UpdateSelRectFromPoints(const P1, P2: TPoint);
+begin
+  FSelRect.Left:= Min(P1.X, P2.X);
+  FSelRect.Top:= Min(P1.Y, P2.Y);
+  FSelRect.Right:= Max(P1.X, P2.X);
+  FSelRect.Bottom:= Max(P1.Y, P2.Y);
+end;
+
 function TATSynEdit.DoSelect_MultiCaretsToColumnSel: boolean;
 //Convert multi-carets to column block,
 //but only if carets are placed vertically, if all multi-selections are single line
@@ -518,14 +523,6 @@ begin
   end;
 
   Result:= true;
-
-  //must set FSelRect
-  FSelRect:= Rect(
-    Min(FSelRectBegin.X, FSelRectEnd.X),
-    Min(FSelRectBegin.Y, FSelRectEnd.Y),
-    Max(FSelRectBegin.X, FSelRectEnd.X),
-    Max(FSelRectBegin.Y, FSelRectEnd.Y)
-    );
 
   {//debug
   Application.MainForm.Caption:= Format('selrect %d:%d-%d:%d, begin %d:%d',

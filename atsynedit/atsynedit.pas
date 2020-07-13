@@ -1031,6 +1031,7 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
+    procedure UpdateSelRectFromPoints(const P1, P2: TPoint);
     procedure UpdateAdapterCacheSize;
     procedure UpdateInitialVars(C: TCanvas);
     procedure UpdateLinksAttribs;
