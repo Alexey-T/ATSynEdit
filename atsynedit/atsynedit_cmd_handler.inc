@@ -123,20 +123,22 @@ end;
 procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
 var
   Caret: TATCaretItem;
+  bTextChanged: boolean;
   bNeedRepaint, bAllowRepaint: boolean;
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
+  bTextChanged:= cResultText in Res;
 
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
-    if (cResultText in Res) then
+    if bTextChanged then
     begin
       FScrollHorz.NPos:= 0;
       Include(Res, cResultCaretTop);
     end;
 
-  if (cResultText in Res) or
+  if bTextChanged or
      (cResultFoldChange in Res) then
   begin
     bNeedRepaint:= true;
@@ -144,7 +146,7 @@ begin
     UpdateWrapInfo;
   end;
 
-  if cResultText in Res then
+  if bTextChanged then
   begin
     bAllowRepaint:= FOptAllowRepaintOnTextChange;
     if FOptMouseHideCursor then
@@ -189,7 +191,7 @@ begin
     UpdateCaretsCoords;
   end;
 
-  if cResultText in Res then
+  if bTextChanged then
   begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
