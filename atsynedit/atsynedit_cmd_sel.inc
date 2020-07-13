@@ -38,12 +38,14 @@ begin
 
   if FOptCaretsPrimitiveColumnSelection then
   begin
+    AX:= Strings.ColumnPosToCharPos(AY, AX, FTabHelper);
     Pnt:= CaretPosToClientPos(Point(AX, AY));
     Inc(Pnt.Y, ALineDelta*FCharSize.Y);
     Pnt:= ClientPosToCaretPos(Pnt, Details);
     if Pnt.Y<0 then exit;
     AX:= Pnt.X;
     AY:= Pnt.Y;
+    AX:= Strings.CharPosToColumnPos(AY, AX, FTabHelper);
   end
   else
   begin
