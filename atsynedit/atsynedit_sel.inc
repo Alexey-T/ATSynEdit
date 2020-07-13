@@ -490,9 +490,9 @@ begin
   FSelRect.Bottom:= Max(P1.Y, P2.Y);
 end;
 
-function TATSynEdit.DoSelect_MultiCaretsToColumnSel: boolean;
-//Convert multi-carets to column block,
-//but only if carets are placed vertically, if all multi-selections are single line
+function TATSynEdit.DoSelect_MultiCaretsLookLikeColumnSelection: boolean;
+//carets are placed vertically,
+//and all multi-selections are single line
 var
   Caret0, Caret: TATCaretItem;
   Pnt: TPoint;

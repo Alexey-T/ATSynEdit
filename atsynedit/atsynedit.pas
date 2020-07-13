@@ -840,7 +840,7 @@ type
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
     procedure DoSelectionDeleteColumnBlock;
-    function DoSelect_MultiCaretsToColumnSel: boolean;
+    function DoSelect_MultiCaretsLookLikeColumnSelection: boolean;
     procedure DoSelect_NormalSelToColumnSel(out ABegin, AEnd: TPoint);
     function _IsFocused: boolean;
     function GetEncodingName: string;
