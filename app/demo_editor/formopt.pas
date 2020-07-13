@@ -19,6 +19,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkCrPrimitiveCol: TCheckBox;
     chkClickLink: TCheckBox;
     chkCopyNoSel: TCheckBox;
     chkCutNoSel: TCheckBox;
@@ -252,6 +253,7 @@ begin
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
     chkCrStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
     chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
+    chkCrPrimitiveCol.Checked:= ed.OptCaretsPrimitiveColumnSelection;
 
     edCrWidthNormal.Value:= ed.CaretPropsNormal.Width;
     edCrHeightNormal.Value:= ed.CaretPropsNormal.Height;
@@ -383,6 +385,7 @@ begin
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
       ed.OptCaretStopUnfocused:= chkCrStopUnfocus.Checked;
       ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
+      ed.OptCaretsPrimitiveColumnSelection:= chkCrPrimitiveCol.Checked;
 
       ed.CaretPropsNormal.Width:= edCrWidthNormal.Value;
       ed.CaretPropsNormal.Height:= edCrHeightNormal.Value;

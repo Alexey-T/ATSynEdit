@@ -95,6 +95,7 @@ begin
   if not bDown then
     NPageLines:= -NPageLines;
 
+  //make correct FSelRectEnd, w/o making any carets
   case ADir of
     cDirColumnLeft:
       begin
@@ -128,6 +129,8 @@ begin
       end;
   end;
 
+  //this makes multi-carets from FSelRectBegin/FSelRectEnd
+  //and considers OptCaretsPrimitiveColumnSelection
   DoSelect_ColumnBlock_FromSelRect;
 end;
 

@@ -485,7 +485,7 @@ object fmOpt: TfmOpt
           Top = 0
           Width = 98
           ItemHeight = 0
-          ScrollWidth = 96
+          ScrollWidth = 94
           TabOrder = 0
           TopIndex = -1
         end
@@ -1005,6 +1005,14 @@ object fmOpt: TfmOpt
         Width = 42
         Caption = 'height'
         ParentColor = False
+      end
+      object chkCrPrimitiveCol: TCheckBox
+        Left = 8
+        Height = 23
+        Top = 191
+        Width = 312
+        Caption = 'primitive column sel (affects wapped lines)'
+        TabOrder = 9
       end
     end
     object TabSheet7: TTabSheet
