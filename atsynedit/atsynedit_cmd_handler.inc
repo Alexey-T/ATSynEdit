@@ -275,7 +275,7 @@ begin
     cCommand_KeyLeft_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnLeft)
+          Res:= DoCommand_SelectColumnToDirection(cDirColumnLeft)
         else
           Res:= DoCommand_KeyLeft(true);
        end;
@@ -285,7 +285,7 @@ begin
     cCommand_KeyRight_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnRight)
+          Res:= DoCommand_SelectColumnToDirection(cDirColumnRight)
         else
           Res:= DoCommand_KeyRight(true);
       end;
@@ -295,7 +295,7 @@ begin
     cCommand_KeyUp_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnUp)
+          Res:= DoCommand_SelectColumnToDirection(cDirColumnUp)
         else
           Res:= DoCommand_KeyUpDown(false, 1, false);
         end;
@@ -305,7 +305,7 @@ begin
     cCommand_KeyDown_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnDown)
+          Res:= DoCommand_SelectColumnToDirection(cDirColumnDown)
         else
           Res:= DoCommand_KeyUpDown(true, 1, false);
       end;
@@ -335,7 +335,7 @@ begin
     cCommand_KeyPageUp_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnPageUp)
+          Res:= DoCommand_SelectColumnToDirection(cDirColumnPageUp)
         else
           Res:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
       end;
@@ -345,17 +345,17 @@ begin
     cCommand_KeyPageDown_Sel:
       begin
         if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnPageDown)
+          Res:= DoCommand_SelectColumnToDirection(cDirColumnPageDown)
         else
           Res:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
       end;
 
-    cCommand_ColSelectLeft:        Res:= DoCommand_SelectColumn(cDirColumnLeft);
-    cCommand_ColSelectRight:       Res:= DoCommand_SelectColumn(cDirColumnRight);
-    cCommand_ColSelectUp:          Res:= DoCommand_SelectColumn(cDirColumnUp);
-    cCommand_ColSelectDown:        Res:= DoCommand_SelectColumn(cDirColumnDown);
-    cCommand_ColSelectPageUp:      Res:= DoCommand_SelectColumn(cDirColumnPageUp);
-    cCommand_ColSelectPageDown:    Res:= DoCommand_SelectColumn(cDirColumnPageDown);
+    cCommand_ColSelectLeft:        Res:= DoCommand_SelectColumnToDirection(cDirColumnLeft);
+    cCommand_ColSelectRight:       Res:= DoCommand_SelectColumnToDirection(cDirColumnRight);
+    cCommand_ColSelectUp:          Res:= DoCommand_SelectColumnToDirection(cDirColumnUp);
+    cCommand_ColSelectDown:        Res:= DoCommand_SelectColumnToDirection(cDirColumnDown);
+    cCommand_ColSelectPageUp:      Res:= DoCommand_SelectColumnToDirection(cDirColumnPageUp);
+    cCommand_ColSelectPageDown:    Res:= DoCommand_SelectColumnToDirection(cDirColumnPageDown);
     cCommand_ColSelectToLineBegin: Res:= DoCommand_SelectColumnToLineEdge(false);
     cCommand_ColSelectToLineEnd:   Res:= DoCommand_SelectColumnToLineEdge(true);
 

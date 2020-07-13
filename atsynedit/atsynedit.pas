@@ -1080,7 +1080,7 @@ type
     function DoCommand_ScaleReset: TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
-    function DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATCommandResults;
+    function DoCommand_SelectColumnToDirection(ADir: TATSelectColumnDirection): TATCommandResults;
     function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
     function DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;

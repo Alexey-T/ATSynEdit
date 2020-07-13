@@ -72,7 +72,7 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATCommandResults;
+function TATSynEdit.DoCommand_SelectColumnToDirection(ADir: TATSelectColumnDirection): TATCommandResults;
 var
   PntBegin, PntEnd: TPoint;
   N, NPageLines: integer;
@@ -149,7 +149,7 @@ begin
 
   if IsSelRectEmpty or (FSelRectBegin.X<0) then Exit;
   //maybe todo: make column sel if normal sel active here
-  //like DoCommand_SelectColumn
+  //like DoCommand_SelectColumnToDirection
 
   if not AToEnd then
   begin
