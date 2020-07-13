@@ -531,6 +531,7 @@ type
     FLastTextCmdText: atString;
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
+    FLastCommandMakesColumnSel: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
     FIsRunningCommand: boolean;
@@ -3927,6 +3928,8 @@ begin
   FMouseNiceScrollPos:= Point(0, 0);
 
   FSelRect:= cRectEmpty;
+  FSelRectBegin:= Point(-1, -1);
+  FSelRectEnd:= Point(-1, -1);
   FCursorOnMinimap:= false;
   FCursorOnGutter:= false;
   FLastTextCmd:= 0;

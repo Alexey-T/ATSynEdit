@@ -30,17 +30,22 @@ procedure TATSynEdit.DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALi
 var
   bDown: boolean;
   YMax, i: integer;
+  Pnt: TPoint;
+  Details: TATPosDetails;
 begin
   bDown:= ALineDelta>0;
   YMax:= Strings.Count-1;
 
-  {
   if FOptCaretsPrimitiveColumnSelection then
   begin
-    //todo;
+    Pnt:= CaretPosToClientPos(Point(AX, AY));
+    Inc(Pnt.Y, ALineDelta*FCharSize.Y);
+    Pnt:= ClientPosToCaretPos(Pnt, Details);
+    if Pnt.Y<0 then exit;
+    AX:= Pnt.X;
+    AY:= Pnt.Y;
   end
   else
-  }
   begin
     for i:= 1 to Abs(ALineDelta) do
     begin
@@ -75,8 +80,9 @@ var
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
+  FLastCommandMakesColumnSel:= true;
 
-  if IsSelRectEmpty or (FSelRectBegin.X<0) then
+  if IsSelRectEmpty and (FSelRectBegin.X<0) then
     if not DoSelect_MultiCaretsToColumnSel then
     begin
       DoSelect_NormalSelToColumnSel(PntBegin, PntEnd);
@@ -136,7 +142,7 @@ end;
 
 function TATSynEdit.DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
 var
-  NPos, i: integer;
+  NPos, i, Y1, Y2: integer;
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
@@ -152,7 +158,11 @@ begin
   else
   begin
     NPos:= 0;
-    for i:= FSelRectBegin.Y to FSelRectEnd.Y do
+    Y1:= FSelRectBegin.Y;
+    Y2:= FSelRectEnd.Y;
+    if Y1>Y2 then
+      SwapInt(Y1, Y2);
+    for i:= Y1 to Y2 do
       if Strings.IsIndexValid(i) then
         NPos:= Max(NPos, FTabHelper.TabsToSpaces_Length(i, Strings.Lines[i], -1));
     FSelRectEnd.X:= NPos;

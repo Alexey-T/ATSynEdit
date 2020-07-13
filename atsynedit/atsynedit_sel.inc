@@ -333,7 +333,6 @@ var
   i: integer;
 begin
   FSelRect:= cRectEmpty;
-  FSelRectBegin:= Point(-1, -1);
 
   for i:= 0 to Carets.Count-1 do
     with Carets[i] do
@@ -355,7 +354,7 @@ begin
   Coord1:= CaretPosToClientPos(P1);
   Coord2:= CaretPosToClientPos(P2);
 
-  DoSelect_None;
+  FSelRect:= cRectEmpty;
   Carets.Clear;
 
   Y:= Coord1.Y+1;
@@ -411,6 +410,9 @@ procedure TATSynEdit.DoSelect_ColumnBlock_FromSelRect;
 var
   PntBegin, PntEnd: TPoint;
 begin
+  if FSelRectBegin.Y<0 then exit;
+  if FSelRectEnd.Y<0 then exit;
+
   //convert SelRect to char-pos
   PntBegin:= FSelRectBegin;
   PntBegin.X:= Strings.ColumnPosToCharPos(PntBegin.Y, PntBegin.X, FTabHelper);
@@ -516,19 +518,13 @@ begin
   end;
 
   Result:= true;
-  //must set FSelRect, FSelRectBegin, FSelRectEnd
 
-  Caret:= Carets[Carets.Count-1];
-  FSelRectEnd.X:= Caret0.PosX;
-  FSelRectEnd.Y:= Caret.PosY;
-  FSelRectBegin.X:= IfThen(bSel, Caret.EndX, Caret.PosX);
-  FSelRectBegin.Y:= Caret0.PosY;
-
+  //must set FSelRect
   FSelRect:= Rect(
     Min(FSelRectBegin.X, FSelRectEnd.X),
-    Caret0.PosY,
+    Min(FSelRectBegin.Y, FSelRectEnd.Y),
     Max(FSelRectBegin.X, FSelRectEnd.X),
-    Caret.PosY
+    Max(FSelRectBegin.Y, FSelRectEnd.Y)
     );
 
   {//debug

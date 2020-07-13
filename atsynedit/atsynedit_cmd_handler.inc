@@ -229,6 +229,7 @@ var
 begin
   if ACmd<=0 then Exit;
   LastCommandChangedLines:= 0;
+  FLastCommandMakesColumnSel:= false;
   DoHotspotsExit;
 
   if AText<>'' then
@@ -529,6 +530,13 @@ begin
     cCommand_ZoomReset:                Res:= DoCommand_ScaleReset;
     cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
+
+  if cResultCaretAny in Res then
+    if not FLastCommandMakesColumnSel then
+    begin
+      FSelRectBegin:= Point(-1, -1);
+      FSelRectEnd:= Point(-1, -1);
+    end;
 
   FLastCommandChangedText2:= FLastCommandChangedText;
   FLastCommandChangedText:= cResultText in Res;
