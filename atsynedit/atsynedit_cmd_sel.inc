@@ -26,10 +26,52 @@ begin
   Result:= [cResultCaretBottom];
 end;
 
+procedure TATSynEdit.DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);
+var
+  bDown: boolean;
+  YMax, i: integer;
+begin
+  bDown:= ALineDelta>0;
+  YMax:= Strings.Count-1;
+
+  {
+  if FOptCaretsPrimitiveColumnSelection then
+  begin
+    //todo;
+  end
+  else
+  }
+  begin
+    for i:= 1 to Abs(ALineDelta) do
+    begin
+      if bDown then
+      begin
+        Inc(AY);
+        if AY>YMax then
+        begin
+          AY:= YMax;
+          Break;
+        end;
+      end
+      else
+      begin
+        Dec(AY);
+        if AY<0 then
+        begin
+          AY:= 0;
+          Break;
+        end;
+      end;
+      AY:= Unfolded_NextLineNumber(AY, bDown);
+    end;
+  end;
+end;
+
 function TATSynEdit.DoCommand_SelectColumn(ADir: TATSelectColumnDirection): TATCommandResults;
 var
   PntBegin, PntEnd: TPoint;
-  N, NPageLines, i: integer;
+  N, NPageLines: integer;
+  bDown: boolean;
 begin
   Result:= [];
   if Carets.Count=0 then Exit;
@@ -49,6 +91,10 @@ begin
   else
     NPageLines:= 1;
 
+  bDown:= ADir in [cDirColumnDown, cDirColumnPageDown];
+  if not bDown then
+    NPageLines:= -NPageLines;
+
   case ADir of
     cDirColumnLeft:
       begin
@@ -58,6 +104,7 @@ begin
         FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretLeft];
       end;
+
     cDirColumnRight:
       begin
         N:= Strings.ColumnPosToCharPos(FSelRectEnd.Y, FSelRectEnd.X, FTabHelper);
@@ -66,30 +113,13 @@ begin
         FSelRectEnd.X:= N;
         Result:= [cResultKeepColumnSel, cResultCaretRight];
       end;
-    cDirColumnUp,
-    cDirColumnPageUp:
-      begin
-        for i:= 1 to NPageLines do
-          if FSelRectEnd.Y>0 then
-          begin
-            Dec(FSelRectEnd.Y);
-            FSelRectEnd.Y:= Unfolded_NextLineNumber(FSelRectEnd.Y, false);
-          end;
 
-        if FSelRectEnd.Y>=FSelRectBegin.Y then
-          Result:= [cResultKeepColumnSel, cResultCaretBottom]
-        else
-          Result:= [cResultKeepColumnSel, cResultCaretTop];
-      end;
+    cDirColumnUp,
+    cDirColumnPageUp,
     cDirColumnDown,
     cDirColumnPageDown:
       begin
-        for i:= 1 to NPageLines do
-          if FSelRectEnd.Y<Strings.Count-1 then
-          begin
-            Inc(FSelRectEnd.Y);
-            FSelRectEnd.Y:= Unfolded_NextLineNumber(FSelRectEnd.Y, true);
-          end;
+        DoSelect_ColumnBlock_MoveEndUpDown(FSelRectEnd.X, FSelRectEnd.Y, NPageLines);
 
         if FSelRectEnd.Y>=FSelRectBegin.Y then
           Result:= [cResultKeepColumnSel, cResultCaretBottom]

@@ -795,6 +795,7 @@ type
     //
     procedure ClearMouseDownVariables;
     function DoCalcLineLen(ALineIndex: integer): integer;
+    procedure DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
     function GetMarkers: TATMarkers;
