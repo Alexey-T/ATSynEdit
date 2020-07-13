@@ -795,7 +795,6 @@ type
     //
     procedure ClearMouseDownVariables;
     function DoCalcLineLen(ALineIndex: integer): integer;
-    procedure DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
     function GetMarkers: TATMarkers;
@@ -912,6 +911,7 @@ type
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
     procedure DoSelect_Line_ByClick;
+    procedure DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);
     function TempSel_IsSelection: boolean;
     function TempSel_IsMultiline: boolean;
     function TempSel_IsLineWithSelection(ALine: integer): boolean;
@@ -1341,8 +1341,7 @@ type
     procedure DoSelect_Inverted;
     procedure DoSelect_SplitSelectionToLines;
     procedure DoSelect_Line(APos: TPoint);
-    procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret,
-      AllowOnlyWordChars: boolean);
+    procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock(P1, P2: TPoint);
