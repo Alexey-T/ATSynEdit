@@ -137,6 +137,8 @@ begin
   //this makes multi-carets from FSelRectBegin/FSelRectEnd
   //and considers OptCaretsPrimitiveColumnSelection
   DoSelect_ColumnBlock_FromSelRect;
+
+  //DebugSelRect; ////debug
 end;
 
 function TATSynEdit.DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;

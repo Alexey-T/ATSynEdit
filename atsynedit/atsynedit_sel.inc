@@ -347,24 +347,24 @@ var
   Coord1, Coord2: TPoint;
   LineCoord1, LineCoord2: TPoint;
   Details: TATPosDetails;
-  Y: integer;
+  Y, YMin, YMax: integer;
 begin
-  if P1.Y>P2.Y then
-    SwapInt(P1.Y, P2.Y);
   Coord1:= CaretPosToClientPos(P1);
   Coord2:= CaretPosToClientPos(P2);
+  YMin:= Min(Coord1.Y, Coord2.Y);
+  YMax:= Max(Coord1.Y, Coord2.Y);
 
   FSelRect:= cRectEmpty;
   Carets.Clear;
 
-  Y:= Coord1.Y+1;
+  Y:= YMin+1;
   repeat
     LineCoord1:= ClientPosToCaretPos(Point(Coord1.X, Y), Details);
     LineCoord2:= ClientPosToCaretPos(Point(Coord2.X, Y), Details);
     if (LineCoord1.Y>=0) and (LineCoord2.Y>=0) then
       Carets.Add(LineCoord2.X, LineCoord2.Y, LineCoord1.X, LineCoord1.Y);
     Inc(Y, FCharSize.Y);
-  until Y-FCharSize.Y>Coord2.Y;
+  until Y-FCharSize.Y>YMax;
 
   //don't allow no carets
   if Carets.Count=0 then
