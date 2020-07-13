@@ -109,6 +109,16 @@ begin
     Key:= 0;
 end;
 
+function TATSynEdit.IsCommandResults_CaretMove(const Res: TATCommandResults): boolean; inline;
+begin
+  Result:= Res*[
+    cResultCaretAny,
+    cResultCaretLeft,
+    cResultCaretRight,
+    cResultCaretTop,
+    cResultCaretBottom
+    ] <> [];
+end;
 
 procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
 var
@@ -155,9 +165,7 @@ begin
   DoCaretsFixIfInsideFolded;
   DoCaretsSort;
 
-  if Res*[cResultCaretAny,
-    cResultCaretLeft, cResultCaretRight,
-    cResultCaretTop, cResultCaretBottom]<>[] then
+  if IsCommandResults_CaretMove(Res) then
   begin
     if cResultCaretTop in Res then
       DoGotoCaret(cEdgeTop, false, false)
@@ -531,7 +539,7 @@ begin
     cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
 
-  if cResultCaretAny in Res then
+  if IsCommandResults_CaretMove(Res) then
     if not FLastCommandMakesColumnSel then
     begin
       FSelRectBegin:= Point(-1, -1);

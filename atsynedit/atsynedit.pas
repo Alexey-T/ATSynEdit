@@ -1065,6 +1065,7 @@ type
     procedure DoCaretsDeleteOnSameLines;
 
     //editing
+    function IsCommandResults_CaretMove(const Res: TATCommandResults): boolean;
     procedure DoCommandResults(ACmd: integer; Res: TATCommandResults);
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;
