@@ -523,13 +523,22 @@ begin
   end;
 
   Result:= true;
-
-  {//debug
-  Application.MainForm.Caption:= Format('selrect %d:%d-%d:%d, begin %d:%d',
-    [FSelRect.Left, FSelRect.Top, FSelRect.Right, FSelRect.Bottom, FSelRectBegin.X, FSelRectBegin.Y]);
-    }
 end;
 
+
+procedure TATSynEdit.DebugSelRect;
+begin
+  Application.MainForm.Caption:= Format('selrect %d:%d-%d:%d, begin %d:%d, end %d:%d', [
+    FSelRect.Left,
+    FSelRect.Top,
+    FSelRect.Right,
+    FSelRect.Bottom,
+    FSelRectBegin.X,
+    FSelRectBegin.Y,
+    FSelRectEnd.X,
+    FSelRectEnd.Y
+    ]);
+end;
 
 function TATSynEdit.TempSel_IsSelection: boolean;
 begin

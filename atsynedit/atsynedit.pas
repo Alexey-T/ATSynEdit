@@ -795,6 +795,7 @@ type
 
     //
     procedure ClearMouseDownVariables;
+    procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
