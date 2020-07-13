@@ -1346,7 +1346,7 @@ type
     procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ClearColumnBlock;
-    procedure DoSelect_ColumnBlock(P1, P2: TPoint);
+    procedure DoSelect_ColumnBlock_FromPoints(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_FromSelRect;
     procedure DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
@@ -4893,7 +4893,7 @@ begin
       FSelRect:= cRectEmpty;
       DoCaretSingleAsIs;
       with Carets[0] do
-        DoSelect_ColumnBlock(
+        DoSelect_ColumnBlock_FromPoints(
           Point(PosX, PosY),
           FMouseDownPnt
           );
@@ -5379,7 +5379,7 @@ begin
                 FMouseDownAndColumnSelection:= true;
                 DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 DoSelect_None;
-                DoSelect_ColumnBlock(FMouseDownPnt, P);
+                DoSelect_ColumnBlock_FromPoints(FMouseDownPnt, P);
               end
               else
               if FOptMouseEnableNormalSelection then
@@ -5407,7 +5407,7 @@ begin
                 FMouseDownAndColumnSelection:= true;
                 DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
                 DoSelect_None;
-                DoSelect_ColumnBlock(FMouseDownPnt, P);
+                DoSelect_ColumnBlock_FromPoints(FMouseDownPnt, P);
               end;
 
             DoCaretsSort;
@@ -5717,7 +5717,7 @@ begin
     end
     else
     begin
-      DoSelect_ColumnBlock(FMouseDownPnt, PCaret);
+      DoSelect_ColumnBlock_FromPoints(FMouseDownPnt, PCaret);
     end;
   end;
 

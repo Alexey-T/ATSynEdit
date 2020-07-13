@@ -371,7 +371,7 @@ begin
     DoCaretSingle(P2.X, P2.Y);
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
+procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(P1, P2: TPoint);
 var
   PTarget: TPoint;
 begin
@@ -418,7 +418,7 @@ begin
   PntEnd.X:= Strings.ColumnPosToCharPos(PntEnd.Y, PntEnd.X, FTabHelper);
 
   //func needs char-pos
-  DoSelect_ColumnBlock(PntBegin, PntEnd);
+  DoSelect_ColumnBlock_FromPoints(PntBegin, PntEnd);
 end;
 
 
