@@ -224,7 +224,7 @@ Each keymap item has 2 (yet) hotkeys, second is needed for e.g.: Copy-to-clipboa
 
 When adding keymap item, you can set simple hotkeys (e.g. "Alt+Shift+F") or key combos (several simple hotkeys which must be pressed in order). Example adds commands with simple hotkey and combo:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
   var 
     M: TATKeymap;
   const 
@@ -270,7 +270,7 @@ type TATGutter in unit atsynedit_gutter. Holds list of gutter items. Each gutter
 
 To know which band of gutter does what, use properties of ATSynEdit: GutterBandNum (index of band for line numbers), GutterBandFold (index of band for folding) etc. Example shows/hides gutter column:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
   ed.Gutter[ed.GutterBandNum].Visible:= checkGutterNum.Checked;
   ed.Gutter.Update;
   ed.Update;
@@ -308,7 +308,7 @@ type TATSynRanges in unit atsynedit_ranges. Holds list of ranges which can be fo
 
 Example adds few ranges to text:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
   Edit1.Fold.Clear;
   Edit1.Fold.Add(1, 4, 15, false, ''); //line 4 to 15, range1
   Edit1.Fold.Add(1, 5, 9, false, ''); //line 5 to 9, nested into range1
@@ -334,7 +334,7 @@ Markers are painted as red triangles below their positions (PosX, PosY). They ar
 
 Example code from CudaText:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
 procedure EditorMarkerGotoLast(Ed: TATSynEdit; AndDelete: boolean);
 var
   Caret: TATCaretItem;
@@ -389,7 +389,7 @@ Use cases:
 
 To add/remove gaps:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
   //to add
   ed.Gaps.Add(NLine, NGapHeight, FSomeBitmap, NGapTag);
   ed.Update;
@@ -415,7 +415,7 @@ There is no checking for line indexes, ranges can have any indexes, but overlapp
 
 Example adds 2 ranges and changes them later:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
   R1:= Ed.DimRanges.Add(0, 6, 100{dim value});
   R2:= Ed.DimRanges.Add(20, MaxInt, 100{dim value});
   Ed.Update;
@@ -564,7 +564,7 @@ Strings object holds UnicodeString's, where each WideChar gives offset=1, and ev
 
 Methods allow to convert text position to/from control-relative coordinates (in pixels). Layout of gutter, ruler and other UI elements are already considered by methods.
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint;
       out ADetails: TATPosDetails;
@@ -582,7 +582,7 @@ Property OptCaretVirtual exists. If it's True, caret is allowed after end-of-lin
 
 To convert text coordinate X to/from column index (considering Tab chars), ATSynEdit has TabHelper object and methods of Strings object. Here is example, code which converts X of first caret to its column index:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
     var
       ed: TATSynEdit;
       caret: TATCaretItem;
@@ -604,7 +604,7 @@ Better don't do overlapping selections (when e.g. selection of caret-2 overlaps 
 
 You can delete and add caret items.
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
   var
     Caret: TATCaretItem;
     i: integer;
@@ -729,7 +729,7 @@ If user changes text in ed3, ed3 will update but others will not: you need to fo
 To change action of internal commands (file atsynedit_commands.pas) you need to use event OnCommand which can do any action for any command (and return AHandled=True to disable default code). Better use OnCommand handler for all commands, even new ones. So you can call DoCommand() and have one handler to do anything. 
 
 Example func which adds new commands to Keymap object:
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
 const
   cmd_FileNew = 2500;
   ...
@@ -744,7 +744,8 @@ end;
 </syntaxhighlight>
 
 Example handler for new commands: some close editor tabs (special case: cannot close tabs just inside OnCommand) and some commands copy something to clipboard:
-<syntaxhighlight>
+
+<syntaxhighlight lang="pascal">
 procedure TfmMain.EditorOnCommand(Sender: TObject; Cmd: integer; var Handled: boolean);
 begin
   Handled:= true; //by default command marked as handled
@@ -782,7 +783,7 @@ Special child of ATEdit exists: ATComboEdit. It has micromap area which paints d
 
 Variants must be added to history by user code, using OnCommand handler: react to command "cCommand_KeyEnter". Example of handler:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
 procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;
   var AHandled: boolean);
 var
@@ -964,7 +965,7 @@ You can configure some of mouse clicks with modifier keys: simple click,
 Ctrl+click, Shift+click, Ctrl+Shift+click, middle click, etc. Property MouseMap configures it,
 it's array, type TATMouseActions. Default code configures it in InitMouseActions like this:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
 procedure InitMouseActions(var M: TATMouseActions);
 //...
 begin
@@ -984,7 +985,7 @@ It can use it, all methods which work with clipboard, get AClipboardObject:TClip
 
 Command codes for Paste: exist for Clipboard, and for PrimarySelection. This is part which reacts to command codes:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
     cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy(false, Clipboard);
     cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true, Clipboard);
     cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut(Clipboard);
@@ -1007,7 +1008,8 @@ Command codes for Paste: exist for Clipboard, and for PrimarySelection. This is 
 Default code uses PrimarySelection in one place: on copy, it copies to Clipboard, then (under Linux/Mac) copies the same to PrimarySelection. 
 
 To make middle-button-click paste from PrimarySelection, you need to handle OnClickMiddle, here's example from CudaText:
-<syntaxhighlight>
+
+<syntaxhighlight lang="pascal">
 procedure TEditorFrame.EditorOnClickMiddle(Sender: TObject; var AHandled: boolean);
 begin
   AHandled:= false;
@@ -1102,7 +1104,7 @@ You need to install package from repo https://github.com/Alexey-T/ATSynEdit_Ex .
 
 Unit atsynedit_form_complete has function to show completion-listbox for editor. Listbox is not modal. It keeps editor caret blinking. While listbox shown, editor don't get keyboard input, but listbox passes typed chars/Backspace/Left/Right to editor. Listbox replaces text on Enter/Tab keys, hides on Esc or clicking outside.
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
 type
   TATCompletionPropEvent = procedure (Sender: TObject;
     out AText: string; out ACharsLeft, ACharsRight: integer) of object;
@@ -1115,7 +1117,7 @@ Callback params:
 * AText: Chr(13)-separated strings, each string is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. After items you may add Chr(9)+S_hint: item shows outside of listbox, in a hint window. 
 For ex, this gives listbox with 3 items:
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
 AText:= 'func|Func1|(param1, param2)'#9'Func desc' + #13 + 'var|Var1' + #13 + 'var|Var2';
 </syntaxhighlight>
 
@@ -1181,7 +1183,7 @@ Dialog of demo:
 
 Methods to find/replace text (they will place selection on found match, and scroll editor to caret, except method CountAll):
 
-<syntaxhighlight>
+<syntaxhighlight lang="pascal">
     function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
     function DoAction_ReplaceSelected: boolean;
     function DoAction_CountAll(AWithEvent: boolean): integer;
