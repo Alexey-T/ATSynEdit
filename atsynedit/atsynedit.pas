@@ -4811,6 +4811,8 @@ begin
   FMouseDragMinimap:= false;
   ActionId:= EditorMouseActionId(FMouseActions, Shift);
 
+  ClearSelRectPoints; //SelRect points will be set in MouseMove
+
   if Assigned(FAdapterIME) then
     FAdapterIME.Stop(Self, false);
 
@@ -5042,15 +5044,13 @@ begin
   if Carets.Count=1 then
     with Carets[0] do
     begin
+      //mouse-up after selection made
       if EndY>=0 then
       begin
         if Assigned(FOnClickEndSelect) then
           FOnClickEndSelect(Self, Point(EndX, EndY), Point(PosX, PosY));
       end
-      else
-        //simple mouse click
-        //this must clear FSelRectBegin/End
-        ClearSelRectPoints;
+      //else: simple mouse click
     end;
 end;
 
