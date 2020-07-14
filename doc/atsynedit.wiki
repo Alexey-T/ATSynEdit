@@ -1097,6 +1097,24 @@ First param of Update() method is boolean: force updating the WrapInfo object.
 * Update(false): needed if you only changed look, ie carets, scroll position, bookmarks, markers, etc.
 * no Update() call is needed, if you only called DoCommand(). DoCommand does it automatically.
 
+==Behaviour of column selection==
+
+ATSynEdit gives two modes of column selection, which have differences when you select over wrapped lines, or lines with full-width characters. This is controlled by property OptCaretsPrimitiveColumnSelection.
+
+* Value True: "pritimive mode" which behaves much like Sublime Text. In this mode editor places multi-selections over visual rectangle of characters. In this mode, one line can have 6 chars selected, and another line can have 8 chars selected. This depends on visual positions of chars in those lines.
+
+* Value False: in this mode, all affected lines have the same number of selected chars. But when full-width chars (e.g. CJK) are present in text, selection may look weird. Here is an example picture where starting lines are ASCII and ending lines have full-width chars.
+
+[[File:cudatext-column-sel-cjk.png]]
+
+It is not a bug. In this example, user selected column block from column 7 (at line 1) until column 20 (at line 6), so column block takes columns 7...20 from all lines. On first ASCII lines, columns 7...20 take different visual area, than columns on last lines. When you copy/paste that block to another program, block may look differently. But that block contains equal number of chars on each line.
+
+Even more weird look happens when user selects column block over word-wrapped lines.
+
+[[File:cudatext-column-sel-weird.png]]
+
+Here is the code's logic in all these cases (with full-width characters and with word-wrapped lines). Code calculates (line1, column1) text position of column block left-top edge. Then code calculates (line2, column2) text position of column block right-bottom edge. Then code selects characters in range column1...column2 in all those affected lines line1...line2. And this code logic produces so weird look in word-wrapped mode.
+
 ==more==
 
 = Auto-completion lists =
@@ -1186,10 +1204,15 @@ Dialog of demo:
 Methods to find/replace text (they will place selection on found match, and scroll editor to caret, except method CountAll):
 
 <syntaxhighlight lang="pascal">
-    function DoAction_FindOrReplace(ANext, AReplace, AForMany: boolean; out AChanged: boolean): boolean;
-    function DoAction_ReplaceSelected: boolean;
-    function DoAction_CountAll(AWithEvent: boolean): integer;
-    function DoAction_ReplaceAll: integer;
+function DoAction_FindSimple(const APosStart: TPoint): boolean;
+function DoAction_FindOrReplace(AReplace, AForMany: boolean; out AChanged: boolean;
+  AUpdateCaret: boolean): boolean;
+function DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
+procedure DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
+function DoAction_CountAll(AWithEvent: boolean): integer;
+procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
+  ADuplicates: TDuplicates);
+function DoAction_ReplaceAll: integer;
 </syntaxhighlight>
 
 Found position and len are saved in props: MatchPos, MatchLen.
@@ -1198,7 +1221,6 @@ Internally Finder object uses ATStringBuffer to read editor lines into buffer an
 Finder has events:
 
 * OnProgress: allows to show progressbar during search
-* OnBadRegex: called if incorrect regex passed
 * OnFound: called when result found
 * OnConfirmReplace: called before replacing text (to show confirmation) if OptConfirmReplace set
 
@@ -1207,7 +1229,5 @@ Finder can handle multi-selections, by option OptInSelection. Selections are han
 = Adapter for EControl lexers=
 See [[ATSynEdit EControl adapter]]
 
-= more =
-
-[[Category: ATSynEdit]]
+[[Category:ATSynEdit]]
 [[Category:Components]]
