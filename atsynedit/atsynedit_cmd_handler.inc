@@ -544,8 +544,7 @@ begin
   if IsCommandResults_CaretMove(Res) then
     if not FLastCommandMakesColumnSel then
     begin
-      FSelRectBegin:= Point(-1, -1);
-      FSelRectEnd:= Point(-1, -1);
+      ClearSelRectPoints;
     end;
 
   FLastCommandChangedText2:= FLastCommandChangedText;

@@ -794,6 +794,7 @@ type
     FOptZebraAlphaBlend: byte;
 
     //
+    procedure ClearSelRectPoints;
     procedure ClearMouseDownVariables;
     procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
@@ -3932,8 +3933,7 @@ begin
   FMouseNiceScrollPos:= Point(0, 0);
 
   FSelRect:= cRectEmpty;
-  FSelRectBegin:= Point(-1, -1);
-  FSelRectEnd:= Point(-1, -1);
+  ClearSelRectPoints;
   FCursorOnMinimap:= false;
   FCursorOnGutter:= false;
   FLastTextCmd:= 0;
@@ -5041,9 +5041,24 @@ begin
 
   if Carets.Count=1 then
     with Carets[0] do
+    begin
       if EndY>=0 then
+      begin
         if Assigned(FOnClickEndSelect) then
           FOnClickEndSelect(Self, Point(EndX, EndY), Point(PosX, PosY));
+      end
+      else
+        //simple mouse click
+        //this must clear FSelRectBegin/End
+        ClearSelRectPoints;
+    end;
+end;
+
+procedure TATSynEdit.ClearSelRectPoints;
+begin
+  FLastCommandMakesColumnSel:= false;
+  FSelRectBegin:= Point(-1, -1);
+  FSelRectEnd:= Point(-1, -1);
 end;
 
 procedure TATSynEdit.ClearMouseDownVariables;
