@@ -136,7 +136,7 @@ begin
 
   //this makes multi-carets from FSelRectBegin/FSelRectEnd
   //and considers OptCaretsPrimitiveColumnSelection
-  DoSelect_ColumnBlock_FromSelRect;
+  DoSelect_ColumnBlock_FromPointsColumns(FSelRectBegin, FSelRectEnd);
 
   //DebugSelRect; ////debug
 end;
@@ -169,7 +169,7 @@ begin
     FSelRectEnd.X:= NPos;
   end;
 
-  DoSelect_ColumnBlock_FromSelRect;
+  DoSelect_ColumnBlock_FromPointsColumns(FSelRectBegin, FSelRectEnd);
   Result:= [cResultKeepColumnSel, cResultCaretBottom];
 end;
 

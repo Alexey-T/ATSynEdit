@@ -1349,7 +1349,7 @@ type
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ClearColumnBlock;
     procedure DoSelect_ColumnBlock_FromPoints(P1, P2: TPoint);
-    procedure DoSelect_ColumnBlock_FromSelRect;
+    procedure DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(ADeltaX, ADeltaY: integer);

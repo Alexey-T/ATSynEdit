@@ -403,22 +403,18 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock_FromSelRect;
+procedure TATSynEdit.DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
+//convert column-pos to char-pos
 var
   PntBegin, PntEnd: TPoint;
 begin
-  if FSelRectBegin.Y<0 then exit;
-  if FSelRectEnd.Y<0 then exit;
+  if P1.Y<0 then exit;
+  if P2.Y<0 then exit;
 
-  //convert SelRect to char-pos
-  PntBegin:= FSelRectBegin;
-  PntBegin.X:= Strings.ColumnPosToCharPos(PntBegin.Y, PntBegin.X, FTabHelper);
+  P1.X:= Strings.ColumnPosToCharPos(P1.Y, P1.X, FTabHelper);
+  P2.X:= Strings.ColumnPosToCharPos(P2.Y, P2.X, FTabHelper);
 
-  PntEnd:= FSelRectEnd;
-  PntEnd.X:= Strings.ColumnPosToCharPos(PntEnd.Y, PntEnd.X, FTabHelper);
-
-  //func needs char-pos
-  DoSelect_ColumnBlock_FromPoints(PntBegin, PntEnd);
+  DoSelect_ColumnBlock_FromPoints(P1, P2);
 end;
 
 
