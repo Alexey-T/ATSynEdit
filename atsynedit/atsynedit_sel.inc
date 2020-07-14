@@ -371,19 +371,27 @@ begin
     DoCaretSingle(P2.X, P2.Y);
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(P1, P2: TPoint);
+procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(P1, P2: TPoint;
+  AUpdateSelRectPoints: boolean);
 var
   PTarget: TPoint;
 begin
   if FOptCaretsPrimitiveColumnSelection then
-  begin
     DoSelect_ColumnBlock_Primitive(P1, P2);
-    exit;
-  end;
+    //work is done, but also need to update FSelRectBegin/FSelRectEnd
 
-  //consider tab-chars
   P1.X:= Strings.CharPosToColumnPos(P1.Y, P1.X, FTabHelper);
   P2.X:= Strings.CharPosToColumnPos(P2.Y, P2.X, FTabHelper);
+
+  if AUpdateSelRectPoints then
+  begin
+    FLastCommandMakesColumnSel:= true;
+    FSelRectBegin:= P1;
+    FSelRectEnd:= P2;
+  end;
+
+  if FOptCaretsPrimitiveColumnSelection then
+    exit;
 
   //fix coords
   PTarget:= P2;
@@ -405,8 +413,6 @@ end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
 //convert column-pos to char-pos
-var
-  PntBegin, PntEnd: TPoint;
 begin
   if P1.Y<0 then exit;
   if P2.Y<0 then exit;
@@ -414,7 +420,7 @@ begin
   P1.X:= Strings.ColumnPosToCharPos(P1.Y, P1.X, FTabHelper);
   P2.X:= Strings.ColumnPosToCharPos(P2.Y, P2.X, FTabHelper);
 
-  DoSelect_ColumnBlock_FromPoints(P1, P2);
+  DoSelect_ColumnBlock_FromPoints(P1, P2, false{FSelRect* already set});
 end;
 
 
