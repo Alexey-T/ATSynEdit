@@ -371,38 +371,42 @@ begin
     DoCaretSingle(P2.X, P2.Y);
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(P1, P2: TPoint;
-  AUpdateSelRectPoints: boolean);
+procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;
+  AUpdateSelRectPoints: boolean=true);
 var
+  //P1/P2 hold char-pos
+  //P1Col/P2Col hold column-pos
+  P1Col, P2Col: TPoint;
   PTarget: TPoint;
 begin
-  if FOptCaretsPrimitiveColumnSelection then
-    DoSelect_ColumnBlock_Primitive(P1, P2);
-    //work is done, but also need to update FSelRectBegin/FSelRectEnd
-
-  P1.X:= Strings.CharPosToColumnPos(P1.Y, P1.X, FTabHelper);
-  P2.X:= Strings.CharPosToColumnPos(P2.Y, P2.X, FTabHelper);
+  P1Col:= P1Char;
+  P2Col:= P2Char;
+  P1Col.X:= Strings.CharPosToColumnPos(P1Col.Y, P1Col.X, FTabHelper);
+  P2Col.X:= Strings.CharPosToColumnPos(P2Col.Y, P2Col.X, FTabHelper);
 
   if AUpdateSelRectPoints then
   begin
     FLastCommandMakesColumnSel:= true;
-    FSelRectBegin:= P1;
-    FSelRectEnd:= P2;
+    FSelRectBegin:= P1Col;
+    FSelRectEnd:= P2Col;
   end;
 
   if FOptCaretsPrimitiveColumnSelection then
+  begin
+    DoSelect_ColumnBlock_Primitive(P1Char, P2Char);
     exit;
-
-  //fix coords
-  PTarget:= P2;
-  if P1.Y>P2.Y then
-    SwapInt(P1.Y, P2.Y);
+  end;
 
   //setting SelRect must be first, it's used later
-  UpdateSelRectFromPoints(P1, P2);
+  UpdateSelRectFromPoints(P1Col, P2Col);
+
+  //fix coords
+  PTarget:= P2Col;
+  if P1Col.Y>P2Col.Y then
+    SwapInt(P1Col.Y, P2Col.Y);
 
   if FOptCaretsAddedToColumnSelection then
-    DoCaretsAddOnColumnBlock(P1, P2, FSelRect)
+    DoCaretsAddOnColumnBlock(P1Col, P2Col, FSelRect)
   else
   begin
     //single caret at moving block edge

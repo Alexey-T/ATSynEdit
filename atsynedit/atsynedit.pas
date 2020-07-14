@@ -1348,7 +1348,8 @@ type
     procedure DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
     procedure DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
     procedure DoSelect_ClearColumnBlock;
-    procedure DoSelect_ColumnBlock_FromPoints(P1, P2: TPoint; AUpdateSelRectPoints: boolean=true);
+    procedure DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;
+      AUpdateSelRectPoints: boolean=true);
     procedure DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
     procedure DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
