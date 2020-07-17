@@ -2,6 +2,7 @@
 https://Alexey-T@github.com/Alexey-T/EControl.git
 http://test.my.domain.com:2100/integrator/services/WebService?WSDL
 https://custom.domain.com/docs/display/project/Main+Docs%20and%23%and#some-link
+http://dd.dd/~mmm20/test.c
 
 http://www.designboom.com/weblog/index.php?&start=30&num_record_tot=20
 http://www.imkerverein-dachau.de/index.php?cat=home&site=
