@@ -153,7 +153,9 @@ begin
 
   FItems:= TStringList.Create;
   FItems.TextLineBreakStyle:= tlbsLF;
+  {$IF FPC_FULLVERSION>=30200}
   FItems.TrailingLineBreak:= false;
+  {$ENDIF}
 
   FItemIndex:= -1;
   FMenu:= TPopupMenu.Create(Self);
