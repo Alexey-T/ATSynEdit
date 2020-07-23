@@ -7,6 +7,8 @@
 
 Author: Alexey Torgashin
 
+Requires: Lazarus 1.8 or newer. Supports all widgetsets: Windows, gtk2, Qt, Cocoa.
+
 [[File:atsynedit.png]]
 
 = License =
@@ -14,17 +16,6 @@ Author: Alexey Torgashin
 ATSynEdit files licensed under MPL 2.0. You can optionally use them under LGPL if your project needs it.
 
 EControl files licensed under special license (readme.txt), usage allowed only in open-source projects.
-
-= Requirements =
-
-Lazarus: 1.8+
-
-Tested on:
-
-* Windows (x32/x64) 
-* GTK2 (x32, x64)
-* Qt (Linux, Windows)
-* macOS (10.8 and later), Carbon/Cocoa
 
 = Keyboard shortcuts =
 
