@@ -33,6 +33,7 @@ var
   Pnt: TPoint;
   Details: TATPosDetails;
 begin
+  if AY<0 then exit;
   bDown:= ALineDelta>0;
   YMax:= Strings.Count-1;
 
@@ -90,6 +91,8 @@ begin
       DoCaretSingleAsIs;
       DoSelect_None;
     end;
+
+  if FSelRectEnd.Y<0 then Exit;
 
   if ADir in [cDirColumnPageUp, cDirColumnPageDown] then
     NPageLines:= GetPageLines
