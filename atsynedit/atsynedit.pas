@@ -1047,9 +1047,6 @@ type
     procedure UpdateClientSizes;
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
-    function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
-    procedure UpdateScrollbarVert;
-    procedure UpdateScrollbarHorz;
     procedure UpdateCaretsCoords(AOnlyLast: boolean = false);
     function GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
     function GetScrollbarVisible(bVertical: boolean): boolean;
@@ -1186,6 +1183,9 @@ type
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
     procedure UpdateFoldLineIndexer;
+    function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
+    procedure UpdateScrollbarVert;
+    procedure UpdateScrollbarHorz;
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
     procedure DoEventChange(AllowOnChange: boolean=true); virtual;
