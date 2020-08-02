@@ -1033,6 +1033,8 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure SetWrapMode(AValue: TATSynWrapMode);
     procedure SetWrapIndented(AValue: boolean);
+    procedure UpdateScrollbarVert;
+    procedure UpdateScrollbarHorz;
     procedure UpdateSelRectFromPoints(const P1, P2: TPoint);
     procedure UpdateAdapterCacheSize;
     procedure UpdateInitialVars(C: TCanvas);
@@ -1184,8 +1186,6 @@ type
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
     procedure UpdateFoldLineIndexer;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
-    procedure UpdateScrollbarVert;
-    procedure UpdateScrollbarHorz;
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
     procedure DoEventChange(AllowOnChange: boolean=true); virtual;
