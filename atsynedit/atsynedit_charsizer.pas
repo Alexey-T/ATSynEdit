@@ -12,7 +12,7 @@ uses
   {$ifdef windows}
   Windows,
   {$endif}
-  Classes, SysUtils, Graphics,
+  Classes, SysUtils, Graphics, Controls,
   Forms,
   ExtCtrls,
   Math,
@@ -29,10 +29,11 @@ type
     FontSize: integer;
     SizeAvg: integer;
     FPanel: TPanel;
+    FOwner: TComponent;
     Sizes: packed array[word] of byte; //width of WideChars, divided by SizeAvg, divided by SaveScale
     function GetCharWidth_FromCache(ch: WideChar): integer;
   public
-    constructor Create;
+    constructor Create(AOwner: TComponent);
     destructor Destroy; override;
     procedure Init(const AFontName: string; AFontSize: integer);
     function GetCharWidth(ch: WideChar): integer;
@@ -140,7 +141,10 @@ begin
     FillChar(Sizes, SizeOf(Sizes), 0);
   end;
 
-  FPanel.Parent:= Application.MainForm;
+  if IsLibrary then
+    FPanel.Parent:= FOwner as TWinControl
+  else
+    FPanel.Parent:= Application.MainForm;
   FPanel.Canvas.Font.Name:= AFontName;
   FPanel.Canvas.Font.Size:= AFontSize;
   FPanel.Canvas.Font.Style:= [];
@@ -158,8 +162,9 @@ begin
   end;
 end;
 
-constructor TATCharSizer.Create;
+constructor TATCharSizer.Create(AOwner: TComponent);
 begin
+  FOwner:= AOwner;
   FPanel:= TPanel.Create(nil);
   FPanel.Name:= 'AppSizerPanel';
   FPanel.Visible:= false;

@@ -3563,7 +3563,7 @@ begin
 
   //GlobalCharSizer should be created after MainForm is inited
   if not Assigned(GlobalCharSizer) then
-    GlobalCharSizer:= TATCharSizer.Create;
+    GlobalCharSizer:= TATCharSizer.Create(AOwner);
 
   if not Assigned(cBitmapNiceScroll) then
     InitEditorResources;
