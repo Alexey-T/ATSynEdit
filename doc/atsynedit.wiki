@@ -1220,5 +1220,34 @@ Finder can handle multi-selections, by option OptInSelection. Selections are han
 = Adapter for EControl lexers=
 See [[ATSynEdit EControl adapter]]
 
+=How to adapt TRegExpr upstream for ATSynEdit=
+
+TRegExpr upstream is https://github.com/andgineer/TRegExpr . How to convert it to atsynedit_regexpr unit.
+
+* rename unit
+* change "uses regexpr_unicodedata" to "uses ATSynEdit_UnicodeData"
+* comment line {$I regexpr_compilers.inc}
+* set define on: UniCode
+* set define on: FastUnicodeData
+* set defines off: UseSpaceChars, UseWordChars
+* fix vars:
+<syntaxhighlight lang="pascal">
+  RegExprModifierI: boolean = False; // default value for ModifierI
+  RegExprModifierR: boolean = True; // default value for ModifierR
+  RegExprModifierS: boolean = False; // default value for ModifierS
+  RegExprModifierG: boolean = True; // default value for ModifierG
+  RegExprModifierM: boolean = True; // default value for ModifierM
+  RegExprModifierX: boolean = False; // default value for ModifierX
+
+  RegExprLineSeparators: RegExprString = #$a#$b#$c
+    {$IFDEF UniCode}
+    + #$2028#$2029#$85
+    {$ENDIF}; 
+  RegExprLinePairedSeparator: RegExprString = ''; //#$d#$a;  
+
+  FUseOsLineEndOnReplace := False;
+  FReplaceLineEnd := #10; //not sLineBreak, it is CR LF on Windows
+</syntaxhighlight>
+
 [[Category:ATSynEdit]]
 [[Category:Components]]
