@@ -1,0 +1,32 @@
+How to adapt TRegExpr from https://github.com/andgineer/TRegExpr
+to make atsynedit_regexpr unit.
+
+- rename unit
+- change "uses regexpr_unicodedata" to "uses ATSynEdit_UnicodeData"
+
+- comment line {$I regexpr_compilers.inc}
+- set define on: UniCode
+- set define on: FastUnicodeData
+- set defines off: UseSpaceChars, UseWordChars
+
+- fix vars:
+  RegExprModifierI: boolean = False; // default value for ModifierI
+  RegExprModifierR: boolean = True; // default value for ModifierR
+  RegExprModifierS: boolean = False; // default value for ModifierS
+  RegExprModifierG: boolean = True; // default value for ModifierG
+  RegExprModifierM: boolean = True; // default value for ModifierM
+  RegExprModifierX: boolean = False; // default value for ModifierX
+
+- fix vars:
+  RegExprLineSeparators: RegExprString = #$a#$b#$c
+    {$IFDEF UniCode}
+    + #$2028#$2029#$85
+    {$ENDIF}; 
+  RegExprLinePairedSeparator: RegExprString = ''; //#$d#$a;  
+
+- fix vars:
+  FUseOsLineEndOnReplace := False;
+  FReplaceLineEnd := #10; //not sLineBreak, it is CR LF on Windows
+ 
+Alexey, 2020
+ 
