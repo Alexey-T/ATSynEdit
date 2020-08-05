@@ -1,4 +1,7 @@
 #!/usr/bin/python3
+# run script from folder of regexpr.pas from https://github.com/andgineer/TRegExpr
+# to create atsynedit_regexpr.pas
+
 import sys
 import os
 
