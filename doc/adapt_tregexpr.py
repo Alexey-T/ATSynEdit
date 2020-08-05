@@ -27,8 +27,10 @@ else:
     print('Cannot find unit name "regexpr"')
     sys.exit()
     
-rep(l, '  regexpr_unicodedata;','  atsynedit_unicodedata;')
-rep(l, '{$I regexpr_compilers.inc}', '//{$I regexpr_compilers.inc}')
+rep(l, '  regexpr_unicodedata;',
+       '  atsynedit_unicodedata;')
+rep(l, '{$I regexpr_compilers.inc}', 
+       '//{$I regexpr_compilers.inc}')
 rep(l, '{ off $DEFINE UniCode} // Use WideChar for characters and UnicodeString/WideString for strings',
        '{$DEFINE UniCode}')
 rep(l, '  RegExprModifierS: boolean = True; // default value for ModifierS',
