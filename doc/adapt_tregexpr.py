@@ -23,6 +23,9 @@ if not os.path.isfile(fn):
 l = open(fn).read().split('\n')
 if 'unit regexpr;' in l[0]:
     l[0] = 'unit atsynedit_regexpr;'
+else:
+    print('Cannot find unit name "regexpr"')
+    sys.exit()
     
 rep(l, '  regexpr_unicodedata;','  atsynedit_unicodedata;')
 rep(l, '{$I regexpr_compilers.inc}', '//{$I regexpr_compilers.inc}')
