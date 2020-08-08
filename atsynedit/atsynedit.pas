@@ -2661,6 +2661,8 @@ var
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap, bUseColorOfCurrentLine: boolean;
   bHiliteLinesWithSelection: boolean;
+  NSubPos, NSubLen: integer;
+  bTrimmedNonSpaces: boolean;
 begin
   bHiliteLinesWithSelection:= not AMainText and FMinimapHiliteLinesWithSelection;
 
@@ -2853,6 +2855,7 @@ begin
     CurrPointText.X:= CurrPoint.X + (WrapItem.NIndent-AScrollHorz.NPos)*ACharSize.X;
     CurrPointText.Y:= CurrPoint.Y;
 
+    bTrimmedNonSpaces:= false;
     if AMainText then
     begin
       NLineLen:= Strings.LinesLen[NLinesIndex];
@@ -2860,13 +2863,14 @@ begin
       if not bLineHuge then
       begin
         //little slow for huge lines
-        StrOutput:= Strings.LineSub(
-          NLinesIndex,
-          WrapItem.NCharIndex,
-          Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6)
-            //+1 because of NPixelOffset
-            //+6 because of HTML color underlines
-          );
+        NSubPos:= WrapItem.NCharIndex;
+        NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
+          //+1 because of NPixelOffset
+          //+6 because of HTML color underlines
+        StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
+
+        if FUnprintedSpacesTrailing then
+          bTrimmedNonSpaces:= NSubPos+NSubLen < Strings.LineLenWithoutSpace(NLinesIndex);
 
         if WrapItem.bInitial then
         begin
@@ -2886,13 +2890,14 @@ begin
         NOutputCharsSkipped:= AScrollHorz.NPos;
         NOutputSpacesSkipped:= NOutputCharsSkipped;
 
-        StrOutput:= Strings.LineSub(
-          NLinesIndex,
-          WrapItem.NCharIndex + NOutputCharsSkipped,
-          Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6)
-            //+1 because of NPixelOffset
-            //+6 because of HTML color underlines
-          );
+        NSubPos:= WrapItem.NCharIndex + NOutputCharsSkipped;
+        NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
+          //+1 because of NPixelOffset
+          //+6 because of HTML color underlines
+        StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
+
+        if FUnprintedSpacesTrailing then
+          bTrimmedNonSpaces:= NSubPos+NSubLen < Strings.LineLenWithoutSpace(NLinesIndex);
       end;
 
       Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
@@ -3027,6 +3032,7 @@ begin
           //todo:
           //needed number of chars of all chars counted as 100%,
           //while NOutputSpacesSkipped is with cjk counted as 170%
+        TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
         TextOutProps.DrawEvent:= Event;
         TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
         TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;

@@ -107,6 +107,7 @@ type
     CharSize: TPoint;
     MainTextArea: boolean;
     CharsSkipped: integer;
+    TrimmedTrailingNonSpaces: boolean;
     DrawEvent: TATSynEditDrawLineEvent;
     ControlWidth: integer;
     TextOffsetFromLine: integer;
@@ -899,12 +900,13 @@ begin
     if AProps.ShowUnprintedSpacesTrailing then
     begin
       //paint trailing
-      for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
-      begin
-        ch:= AText[i];
-        if IsCharUnicodeSpace(ch) then
-          DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
-      end;
+      if not AProps.TrimmedTrailingNonSpaces then
+        for i:= SGetNonSpaceLength(AText)+1 to Length(AText) do
+        begin
+          ch:= AText[i];
+          if IsCharUnicodeSpace(ch) then
+            DoPaintUnprintedChar(C, ch, i, ListInt, APosX, APosY, AProps.CharSize, AProps.ColorUnprintedFont);
+        end;
     end
     else
     begin
