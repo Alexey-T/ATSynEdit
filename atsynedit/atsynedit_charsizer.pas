@@ -27,10 +27,12 @@ type
   private
     FontName: string;
     FontSize: integer;
+    FontReset: boolean;
     SizeAvg: integer;
     FPanel: TPanel;
     FOwner: TComponent;
     Sizes: packed array[word] of byte; //width of WideChars, divided by SizeAvg, divided by SaveScale
+    procedure InitPanel;
     function GetCharWidth_FromCache(ch: WideChar): integer;
   public
     constructor Create(AOwner: TComponent);
@@ -136,22 +138,12 @@ procedure TATCharSizer.Init(const AFontName: string; AFontSize: integer);
 begin
   if (FontName<>AFontName) or (FontSize<>AFontSize) then
   begin
+    FontReset:= true;
     FontName:= AFontName;
     FontSize:= AFontSize;
     FillChar(Sizes, SizeOf(Sizes), 0);
   end;
-
-  if IsLibrary then
-    FPanel.Parent:= FOwner as TWinControl
-  else
-    FPanel.Parent:= Application.MainForm;
-  FPanel.Canvas.Font.Name:= AFontName;
-  FPanel.Canvas.Font.Size:= AFontSize;
-  FPanel.Canvas.Font.Style:= [];
-
   SizeAvg:= 0;
-    //dont call FPanel.Canvas.TextWidth() here, it's giving SigFPE exception in LCL
-    //(if CudaText is started with floating side/bottom panels?)
 end;
 
 function TATCharSizer.GetCharWidth_FromCache(ch: WideChar): integer;
@@ -159,6 +151,8 @@ begin
   Result:= Sizes[Ord(ch)] * SaveScale;
   if Result=0 then
   begin
+    InitPanel;
+
     if SizeAvg=0 then
       SizeAvg:= _WidestrWidth(FPanel.Canvas, 'N');
 
@@ -170,15 +164,35 @@ end;
 constructor TATCharSizer.Create(AOwner: TComponent);
 begin
   FOwner:= AOwner;
-  FPanel:= TPanel.Create(nil);
-  FPanel.Name:= 'AppSizerPanel';
-  FPanel.Visible:= false;
-  FPanel.SetBounds(0, 0, 50, 20);
+end;
+
+procedure TATCharSizer.InitPanel;
+begin
+  if FPanel=nil then
+  begin
+    FPanel:= TPanel.Create(nil);
+    FPanel.Name:= 'AppSizerPanel';
+    FPanel.Visible:= false;
+    FPanel.SetBounds(0, 0, 50, 20);
+    if IsLibrary then
+      FPanel.Parent:= FOwner as TWinControl
+    else
+      FPanel.Parent:= Application.MainForm;
+  end;
+
+  if FontReset then
+  begin
+    FontReset:= false;
+    FPanel.Canvas.Font.Name:= FontName;
+    FPanel.Canvas.Font.Size:= FontSize;
+    FPanel.Canvas.Font.Style:= [];
+  end;
 end;
 
 destructor TATCharSizer.Destroy;
 begin
-  FreeAndNil(FPanel);
+  if Assigned(FPanel) then
+    FreeAndNil(FPanel);
   inherited;
 end;
 
