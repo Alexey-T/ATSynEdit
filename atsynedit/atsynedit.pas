@@ -2870,7 +2870,7 @@ begin
         StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
 
         if FUnprintedSpacesTrailing then
-          bTrimmedNonSpaces:= NSubPos+NSubLen < Strings.LineLenWithoutSpace(NLinesIndex);
+          bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
 
         if WrapItem.bInitial then
         begin
@@ -2897,7 +2897,7 @@ begin
         StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
 
         if FUnprintedSpacesTrailing then
-          bTrimmedNonSpaces:= NSubPos+NSubLen < Strings.LineLenWithoutSpace(NLinesIndex);
+          bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
       end;
 
       Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
