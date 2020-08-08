@@ -149,7 +149,9 @@ begin
   FPanel.Canvas.Font.Size:= AFontSize;
   FPanel.Canvas.Font.Style:= [];
 
-  SizeAvg:= FPanel.Canvas.TextWidth('N');
+  SizeAvg:= 0;
+    //dont call FPanel.Canvas.TextWidth() here, it's giving SigFPE exception in LCL
+    //(if CudaText is started with floating side/bottom panels?)
 end;
 
 function TATCharSizer.GetCharWidth_FromCache(ch: WideChar): integer;
@@ -157,6 +159,9 @@ begin
   Result:= Sizes[Ord(ch)] * SaveScale;
   if Result=0 then
   begin
+    if SizeAvg=0 then
+      SizeAvg:= FPanel.Canvas.TextWidth('N');
+
     Result:= _WidestrWidth(FPanel.Canvas, ch) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Math.Min(255, Result div SaveScale);
   end;
