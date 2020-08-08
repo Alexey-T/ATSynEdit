@@ -160,7 +160,7 @@ begin
   if Result=0 then
   begin
     if SizeAvg=0 then
-      SizeAvg:= FPanel.Canvas.TextWidth('N');
+      SizeAvg:= _WidestrWidth(FPanel.Canvas, 'N');
 
     Result:= _WidestrWidth(FPanel.Canvas, ch) * 100 div SizeAvg;
     Sizes[Ord(ch)]:= Math.Min(255, Result div SaveScale);
