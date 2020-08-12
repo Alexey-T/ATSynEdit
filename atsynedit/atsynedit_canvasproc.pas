@@ -129,6 +129,9 @@ type
     DetectIsPosSelected: TATSynEditCallbackIsCharSelected;
   end;
 
+procedure CanvasLineHorz(C: TCanvas; X1, Y, X2: integer; AWithEnd: boolean); inline;
+procedure CanvasLineVert(C: TCanvas; X, Y1, Y2: integer; AWithEnd: boolean); inline;
+
 procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
   X1, Y1, X2, Y2: integer; AtDown: boolean);
@@ -359,15 +362,31 @@ begin
 end;
 
 
-procedure CanvasLine_WithEnd(C: TCanvas; X1, Y1, X2, Y2: integer); inline;
+procedure CanvasLineHorz(C: TCanvas; X1, Y, X2: integer; AWithEnd: boolean);
 begin
-  if Y1=Y2 then
-    C.Line(X1, Y1, X2+1, Y2)
-  else
-    C.Line(X1, Y1, X2, Y2+1);
+  Assert(X2>X1, 'LineHorz x2>x1');
+  if AWithEnd then Inc(X2);
+  C.Line(X1, Y, X2, Y);
 end;
 
+procedure CanvasLineVert(C: TCanvas; X, Y1, Y2: integer; AWithEnd: boolean);
+begin
+  Assert(Y2>Y1, 'LineVert y2>y1');
+  if AWithEnd then Inc(Y2);
+  C.Line(X, Y1, X, Y2);
+end;
+
+
 procedure CanvasLineEx(C: TCanvas; Color: TColor; Style: TATLineStyle; X1, Y1, X2, Y2: integer; AtDown: boolean);
+  //
+  procedure CanvasLine_WithEnd(X1, Y1, X2, Y2: integer); inline;
+  begin
+    if Y1=Y2 then
+      CanvasLineHorz(C, X1, Y1, X2, true)
+    else
+      CanvasLineVert(C, X1, Y1, Y2, true);
+  end;
+  //
 begin
   case Style of
     cLineStyleNone:
@@ -376,13 +395,13 @@ begin
     cLineStyleSolid:
       begin
         C.Pen.Color:= Color;
-        CanvasLine_WithEnd(C, X1, Y1, X2, Y2);
+        CanvasLine_WithEnd(X1, Y1, X2, Y2);
       end;
 
     cLineStyleSolid2px:
       begin
         C.Pen.Color:= Color;
-        CanvasLine_WithEnd(C, X1, Y1, X2, Y2);
+        CanvasLine_WithEnd(X1, Y1, X2, Y2);
         if Y1=Y2 then
         begin
           if AtDown then
@@ -397,14 +416,14 @@ begin
           else
             begin Inc(X1); Inc(X2) end;
         end;
-        CanvasLine_WithEnd(C, X1, Y1, X2, Y2);
+        CanvasLine_WithEnd(X1, Y1, X2, Y2);
       end;
 
     cLineStyleDash:
       begin
         C.Pen.Color:= Color;
         C.Pen.Style:= psDot;
-        CanvasLine_WithEnd(C, X1, Y1, X2, Y2);
+        CanvasLine_WithEnd(X1, Y1, X2, Y2);
         C.Pen.Style:= psSolid;
       end;
 
