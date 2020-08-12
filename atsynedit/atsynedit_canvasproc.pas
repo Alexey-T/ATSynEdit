@@ -129,8 +129,8 @@ type
     DetectIsPosSelected: TATSynEditCallbackIsCharSelected;
   end;
 
-procedure CanvasLineHorz(C: TCanvas; X1, Y, X2: integer; AWithEnd: boolean); inline;
-procedure CanvasLineVert(C: TCanvas; X, Y1, Y2: integer; AWithEnd: boolean); inline;
+procedure CanvasLineHorz(C: TCanvas; X1, Y, X2: integer; AWithEnd: boolean=false); inline;
+procedure CanvasLineVert(C: TCanvas; X, Y1, Y2: integer; AWithEnd: boolean=false); inline;
 
 procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
@@ -364,14 +364,14 @@ end;
 
 procedure CanvasLineHorz(C: TCanvas; X1, Y, X2: integer; AWithEnd: boolean);
 begin
-  Assert(X2>X1, 'LineHorz x2>x1');
+  //Assert(X2>X1, 'LineHorz x2>x1');
   if AWithEnd then Inc(X2);
   C.Line(X1, Y, X2, Y);
 end;
 
 procedure CanvasLineVert(C: TCanvas; X, Y1, Y2: integer; AWithEnd: boolean);
 begin
-  Assert(Y2>Y1, 'LineVert y2>y1');
+  //Assert(Y2>Y1, 'LineVert y2>y1');
   if AWithEnd then Inc(Y2);
   C.Line(X, Y1, X, Y2);
 end;

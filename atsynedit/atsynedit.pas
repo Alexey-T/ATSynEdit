@@ -1728,8 +1728,7 @@ begin
   C.Brush.Color:= Colors.RulerBG;
 
   C.FillRect(FRectRuler);
-  C.Line(FRectRuler.Left, FRectRuler.Bottom-1,
-         FRectRuler.Right, FRectRuler.Bottom-1);
+  CanvasLineHorz(C, FRectRuler.Left, FRectRuler.Bottom-1, FRectRuler.Right);
 
   NCharW:= FCharSize.X * FOptRulerFontSizePercents div 100;
 
@@ -1770,8 +1769,7 @@ begin
     else
       NMarkHeight:= EditorScale(FOptRulerMarkSizeSmall);
 
-    C.Line(NX, FRectRuler.Bottom-1,
-           NX, FRectRuler.Bottom-1-NMarkHeight);
+    CanvasLineVert(C, NX, FRectRuler.Bottom-1-NMarkHeight, FRectRuler.Bottom-1);
 
     Inc(NX, FCharSize.X);
   end;
@@ -2839,11 +2837,11 @@ begin
       begin
         NCoordSep:= NCoordTop-1;
         C.Pen.Color:= Colors.CollapseLine;
-        C.Line(
+        CanvasLineHorz(C,
           ARect.Left+FFoldUnderlineOffset,
           NCoordSep,
-          ARect.Right-FFoldUnderlineOffset,
-          NCoordSep);
+          ARect.Right-FFoldUnderlineOffset
+          );
       end;
     end;
 
@@ -3185,7 +3183,7 @@ begin
       else
         NCoordSep:= NCoordTop+ACharSize.Y-1;
       C.Pen.Color:= Colors.BlockSepLine;
-      C.Line(ARect.Left, NCoordSep, ARect.Right, NCoordSep);
+      CanvasLineHorz(C, ARect.Left, NCoordSep, ARect.Right);
     end;
 
     //draw gutter
@@ -3394,8 +3392,7 @@ begin
   if Colors.MinimapBorder<>clNone then
   begin
     C.Pen.Color:= Colors.MinimapBorder;
-    C.Line(FRectMinimap.Left-1, FRectMinimap.Top,
-           FRectMinimap.Left-1, FRectMinimap.Bottom);
+    CanvasLineVert(C, FRectMinimap.Left-1, FRectMinimap.Top, FRectMinimap.Bottom);
   end;
 
   {$ifdef debug_show_fps}
@@ -3447,8 +3444,7 @@ begin
   if (AX>=FRectMain.Left) and (AX<FRectMain.Right) then
   begin
     C.Pen.Color:= AColor;
-    C.Line(AX, FRectMain.Top,
-           AX, FRectMain.Bottom);
+    CanvasLineVert(C, AX, FRectMain.Top, FRectMain.Bottom);
   end;
 end;
 
@@ -6653,20 +6649,18 @@ var
   procedure DrawUp; inline;
   begin
     if IsLineUp then
-      C.Line(
+      CanvasLineVert(C,
         CoordXCenter,
         ACoordY1,
-        CoordXCenter,
         CoordYCenter
         );
   end;
   procedure DrawDown; inline;
   begin
     if IsLineDown then
-      C.Line(
+      CanvasLineVert(C,
         CoordXCenter,
         CoordYCenter,
-        CoordXCenter,
         ACoordY2
         );
   end;
@@ -6768,25 +6762,22 @@ begin
         end;
 
         Dec(ACoordY2, cSizeGutterFoldLineDx);
-        C.Line(
+        CanvasLineVert(C,
           CoordXCenter,
           ACoordY1,
-          CoordXCenter,
           ACoordY2
           );
-        C.Line(
+        CanvasLineHorz(C,
           CoordXCenter,
           ACoordY2,
-          CoordXCenter + EditorScale(FOptGutterPlusSize),
-          ACoordY2
+          CoordXCenter + EditorScale(FOptGutterPlusSize)
           );
       end;
     cFoldbarMiddle:
       begin
-        C.Line(
+        CanvasLineVert(C,
           CoordXCenter,
           ACoordY1,
-          CoordXCenter,
           ACoordY2
           );
       end;
