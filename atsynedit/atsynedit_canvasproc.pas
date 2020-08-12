@@ -1241,10 +1241,8 @@ end;
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APosX, APosY: integer;
   ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
   AColorBG: TColor; const ALine: atString; AUsePixels: boolean);
-{$ifdef windows}
 var
   CanvasHandle: THandle;
-{$endif}
   //
   procedure _SetPixel(X, Y: integer; AColor: TColor); inline;
   begin
