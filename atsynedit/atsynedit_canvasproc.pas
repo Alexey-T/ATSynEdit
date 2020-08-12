@@ -1209,10 +1209,24 @@ begin
   end;
 end;
 
-
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APosX, APosY: integer;
   ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
   AColorBG: TColor; const ALine: atString; AUsePixels: boolean);
+{$ifdef windows}
+var
+  CanvasHandle: THandle;
+{$endif}
+  //
+  procedure _SetPixel(X, Y: integer; AColor: TColor); inline;
+  begin
+    //TCanvas.SetPixel has overhead
+    {$ifdef windows}
+    Windows.SetPixel(CanvasHandle, X, Y, AColor);
+    {$else}
+    C.Pixels[X, Y]:= AColor;
+    {$endif}
+  end;
+  //
 {
 Line is painted with ACharSize.Y=2px height, with 1px spacing between lines
 }
@@ -1226,6 +1240,7 @@ var
 begin
   //offset<0 means some bug on making parts!
   if AParts[0].Offset<0 then exit;
+  CanvasHandle:= C.Handle;
 
   NSpaces:= 0;
   for NPartIndex:= Low(TATLineParts) to High(TATLineParts) do
@@ -1276,8 +1291,8 @@ begin
           //paint BG as 2 pixel line
           if AUsePixels then
           begin
-            C.Pixels[X1, Y1]:= NColorBack;
-            C.Pixels[X1, Y2-1]:= NColorBack;
+            _SetPixel(X1, Y1, NColorBack);
+            _SetPixel(X1, Y2-1, NColorBack);
           end
           else
           begin
@@ -1290,7 +1305,7 @@ begin
         begin
           if AUsePixels then
           begin
-            C.Pixels[X1, Y2-1]:= NColorFontHalf;
+            _SetPixel(X1, Y2-1, NColorFontHalf);
           end
           else
           begin

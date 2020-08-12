@@ -2661,10 +2661,12 @@ var
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap, bUseColorOfCurrentLine: boolean;
   bHiliteLinesWithSelection: boolean;
+  bUseSetPixel: boolean;
   NSubPos, NSubLen: integer;
   bTrimmedNonSpaces: boolean;
 begin
   bHiliteLinesWithSelection:= not AMainText and FMinimapHiliteLinesWithSelection;
+  bUseSetPixel:= {$ifdef windows} true {$else} DoubleBuffered and (ACharSize.X=1) {$endif};
 
   NColorOfStates[cLineStateNone]:= -1;
   NColorOfStates[cLineStateChanged]:= Colors.StateChanged;
@@ -2818,7 +2820,7 @@ begin
               WrapItem.NLineIndex,
               WrapItem.NCharIndex,
               GetVisibleColumns), //optimize for huge lines
-            DoubleBuffered and (ACharSize.X=1)
+            bUseSetPixel
             );
 
           //end of painting line
@@ -3090,7 +3092,7 @@ begin
             WrapItem.NLineIndex,
             WrapItem.NCharIndex,
             GetVisibleColumns), //optimize for huge lines
-          DoubleBuffered and (ACharSize.X=1)
+          bUseSetPixel
           );
 
       //restore after textout
