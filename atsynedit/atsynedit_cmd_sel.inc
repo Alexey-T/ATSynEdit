@@ -84,7 +84,7 @@ begin
   if Carets.Count=0 then Exit;
   FLastCommandMakesColumnSel:= true;
 
-  if IsSelRectEmpty and (FSelRectBegin.X<0) then
+  if IsSelRectEmpty and (FSelRectEnd.Y<0) then
     if not DoSelect_MultiCaretsLookLikeColumnSelection then
     begin
       DoSelect_NormalSelToColumnSel(FSelRectBegin, FSelRectEnd);

@@ -501,7 +501,7 @@ function TATSynEdit.DoSelect_MultiCaretsLookLikeColumnSelection: boolean;
 //and all multi-selections are single line
 var
   Caret0, Caret: TATCaretItem;
-  Pnt: TPoint;
+  Pnt, PntEnd: TPoint;
   bSel: boolean;
   i: integer;
 begin
@@ -517,6 +517,12 @@ begin
   Pnt.X:= Strings.CharPosToColumnPos(Caret0.PosY, Caret0.PosX, FTabHelper);
   Pnt.Y:= Caret0.PosY;
 
+  Caret:= Carets[Carets.Count-1];
+  PntEnd.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.EndX, FTabHelper);
+  PntEnd.Y:= Caret.PosY;
+  if PntEnd.X<0 then
+    PntEnd.X:= Pnt.X;
+
   for i:= 1{>0} to Carets.Count-1 do
   begin
     Caret:= Carets[i];
@@ -527,6 +533,13 @@ begin
     //check for vertically (x)
     if Pnt.X<>Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper) then exit;
   end;
+
+  //multi-carets look like column sel,
+  //set the FSelRectBegin/FSelRectEnd
+  FSelRectBegin.X:= Pnt.X;
+  FSelRectBegin.Y:= Pnt.Y;
+  FSelRectEnd.X:= PntEnd.X;
+  FSelRectEnd.Y:= PntEnd.Y;
 
   Result:= true;
 end;
