@@ -2664,7 +2664,9 @@ var
   bTrimmedNonSpaces: boolean;
 begin
   bHiliteLinesWithSelection:= not AMainText and FMinimapHiliteLinesWithSelection;
-  bUseSetPixel:= {$ifdef windows} true {$else} DoubleBuffered and (ACharSize.X=1) {$endif};
+  bUseSetPixel:=
+    {$ifndef windows} DoubleBuffered and {$endif}
+    (ACharSize.X=1);
 
   NColorOfStates[cLineStateNone]:= -1;
   NColorOfStates[cLineStateChanged]:= Colors.StateChanged;
