@@ -1838,6 +1838,7 @@ var
   SFind, SLineToTest: UnicodeString;
   NLen, NStartOffset, NEndOffset: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
+  bLineMustBeUnicode: boolean;
   bOk: boolean;
 begin
   Result:= false;
@@ -1858,6 +1859,10 @@ begin
   SLinePartW:= ListParts[0];
   SLinePart_Len:= Length(SLinePartW);
 
+  //don't check unicode for multi-line StrFind
+  //(entire StrFind can be unicode, but individual parts can be ascii)
+  bLineMustBeUnicode:= FStrFindUnicode and (PartCount<=1);
+
   InitProgress;
   IndexLineMax:= Strs.Count-PartCount;
 
@@ -1869,7 +1874,7 @@ begin
         if NLen<SLinePart_Len then Continue;
         if NLen>FMaxLineLen then Continue;
 
-        if FStrFindUnicode then
+        if bLineMustBeUnicode then
           if Strs.LinesAscii[IndexLine] then Continue;
 
         if IsProgressNeeded(IndexLine) then
@@ -1948,7 +1953,7 @@ begin
         if NLen<SLinePart_Len then Continue;
         if NLen>FMaxLineLen then Continue;
 
-        if FStrFindUnicode then
+        if bLineMustBeUnicode then
           if Strs.LinesAscii[IndexLine] then Continue;
 
         if IsProgressNeeded(IndexLine) then
