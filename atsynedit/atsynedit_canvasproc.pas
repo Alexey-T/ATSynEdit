@@ -35,11 +35,11 @@ var
   OptUnprintedWrapArrowWidth: integer = 80;
   OptItalicFontLongerInPercents: integer = 40;
 
-const
+var
   //Win: seems no slowdown from offsets
   //macOS: better use offsets, fonts have floating width value, e.g. 10.2 pixels
   //Linux gtk2: big slowdown from offsets
-  CanvasTextOutMustUseOffsets =
+  OptCanvasTextoutNeedsOffsets: boolean =
     {$ifdef windows}
     true
     {$else}
@@ -578,22 +578,23 @@ begin
 end;
 
 
-function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: UnicodeString): boolean;
-//detect result by presence of bold/italic tokens, offsets are needed for them,
-//ignore underline, strikeout
+function CanvasTextOutNeedsOffsets(C: TCanvas; const AStr: UnicodeString): boolean; inline;
 {
 var
   Flags: TATWiderFlags;
   St: TFontStyles;
 }
 begin
-  if CanvasTextOutMustUseOffsets then exit(true);
+  if OptCanvasTextoutNeedsOffsets then exit(true);
 
   {
   //disabled since CudaText 1.104
   //a) its used only on Linux/BSD yet, but is it needed there?
-  //it was needed maybe for Win32 (need to check) but on Win32 const CanvasTextOutMustUseOffsets=true
+  //it was needed maybe for Win32 (need to check) but on Win32 const OptCanvasTextoutNeedsOffsets=true
   //b) it must be placed out of this deep func CanvasTextOut, its called too much (for each token)
+
+  //detect result by presence of bold/italic tokens, offsets are needed for them,
+  //ignore underline, strikeout
 
   St:= C.Font.Style * [fsBold, fsItalic];
 
