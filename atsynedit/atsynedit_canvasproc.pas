@@ -585,7 +585,8 @@ var
   St: TFontStyles;
 }
 begin
-  if OptCanvasTextoutNeedsOffsets then exit(true);
+  if OptCanvasTextoutNeedsOffsets then
+    exit(true);
 
   {
   //disabled since CudaText 1.104
