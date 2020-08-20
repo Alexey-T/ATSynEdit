@@ -235,7 +235,8 @@ begin
 
   //if it's unicode letter, return true, ignore option string
   //if it's not letter, check for option (maybe char '$' is present there for PHP lexer)
-  Result:= WordDetectArray[Ord(ch)];
+  // bit 7 in value: is word char
+  Result := CharCategoryArray[Ord(ch)] and 128 <> 0;
   if not Result then
   begin
     if IsCharUnicodeSpace(ch) then
@@ -248,7 +249,8 @@ end;
 
 function IsCharWordA(ch: char): boolean;
 begin
-  Result:= WordDetectArray[Ord(ch)];
+  // bit 7 in value: is word char
+  Result := CharCategoryArray[Ord(ch)] and 128 <> 0;
 end;
 
 

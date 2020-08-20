@@ -245,8 +245,8 @@ const
 
 function IsWordChar(ch: WideChar): boolean; inline;
 begin
-  //Result:= ATStringProc.IsCharWord(ch, cDefaultNonWordChars);
-  Result:= WordDetectArray[Ord(ch)];
+  // bit 7 in value: is word char
+  Result := CharCategoryArray[Ord(ch)] and 128 <> 0;
 end;
 
 {
