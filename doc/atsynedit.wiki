@@ -1125,14 +1125,15 @@ procedure DoEditorCompletionListbox(AEd: TATSynEdit; AOnGetProp: TATCompletionPr
 
 Callback params:
 
-* AText: Chr(13)-separated strings, each string is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. After items you may add Chr(9)+S_hint: item shows outside of listbox, in a hint window. 
-For ex, this gives listbox with 3 items:
+* AText: Chr(13)-separated lines, each line is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. For ex, this gives listbox with 3 items:
 
 <syntaxhighlight lang="pascal">
 AText:= 'func|Func1|(param1, param2)'#9'Func desc' + #13 + 'var|Var1' + #13 + 'var|Var2';
 </syntaxhighlight>
 
-If you need to insert not only S_text but also additional substr, use such S_text: S_text+#1+S_before_caret+#1+S_after_caret (also substrings will be added before and after caret). This is used by HTML autocompletion: here S_before_caret is ">" and S_after_caret is "</tag>".
+** If you need to insert not only S_text but also additional substring (showing in the listbox only S_text), use such S_text: S_text+#1+S_before_caret+#1+S_after_caret (also substrings will be added before and after caret). This is used by HTML autocompletion: here S_before_caret is ">" and S_after_caret is "</tag>".
+
+** At the end of lines, you may add Chr(9)+S_tooltip: string S_tooltip will show outside of listbox, in a tooltip, when user selects its line. To show multi-line tooltip, separate it with Chr(2).
 
 * ACharsLeft, ACharsRight: count of chars, to the left and right of the caret, which will be replaced by selected listbox item. These counts must be detected by app. Some app may need to count only word chars, some may need spaces/brackets.
 
