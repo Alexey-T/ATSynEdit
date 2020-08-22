@@ -124,7 +124,7 @@ type
     function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
     function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
-    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
+    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; out AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
     function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): integer;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
@@ -133,7 +133,7 @@ type
       AAllowVirtualPos: boolean;
       out AEndOfLinePos: boolean): integer;
     procedure FindOutputSkipOffset(ALineIndex: integer; const S: atString; AScrollPos: integer;
-      out ACharsSkipped: integer; out ASpacesSkipped: integer);
+      out ACharsSkipped: integer; out ACellPercentsSkipped: integer);
   end;
 
 function IsCharEol(ch: widechar): boolean; inline;
@@ -570,7 +570,7 @@ end;
 
 
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
-  var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer);
+  out AInfo: TATLineOffsetsInfo; ACharsSkipped: integer);
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
@@ -738,12 +738,12 @@ begin
 end;
 
 procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
-  AScrollPos: integer; out ACharsSkipped: integer; out ASpacesSkipped: integer);
+  AScrollPos: integer; out ACharsSkipped: integer; out ACellPercentsSkipped: integer);
 var
   Offsets: TATLineOffsetsInfo;
 begin
   ACharsSkipped:= 0;
-  ASpacesSkipped:= 0;
+  ACellPercentsSkipped:= 0;
   if (S='') or (AScrollPos=0) then Exit;
 
   CalcCharOffsets(ALineIndex, S, Offsets);
@@ -753,7 +753,7 @@ begin
     Inc(ACharsSkipped);
 
   if (ACharsSkipped>0) then
-    ASpacesSkipped:= Offsets[ACharsSkipped-1] div 100;
+    ACellPercentsSkipped:= Offsets[ACharsSkipped-1];
 end;
 
 function SGetItem(var S: string; const ch: Char = ','): string;

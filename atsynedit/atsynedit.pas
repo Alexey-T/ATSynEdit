@@ -2641,7 +2641,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
 var
   NCoordTop, NCoordSep: integer;
   NWrapIndex, NWrapIndexDummy, NLinesIndex, NLineLen, NCount: integer;
-  NOutputCharsSkipped, NOutputSpacesSkipped: integer;
+  NOutputCharsSkipped, NOutputCellPercentsSkipped: integer;
   NOutputStrWidth, NOutputMaximalChars: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
@@ -2849,12 +2849,15 @@ begin
 
     //prepare line
     NOutputCharsSkipped:= 0;
-    NOutputSpacesSkipped:= 0;
+    NOutputCellPercentsSkipped:= 0;
     NOutputStrWidth:= 0;
 
     CurrPoint.X:= ARect.Left;
     CurrPoint.Y:= NCoordTop;
-    CurrPointText.X:= CurrPoint.X + (WrapItem.NIndent-AScrollHorz.NPos)*ACharSize.X;
+    CurrPointText.X:= CurrPoint.X
+                      + WrapItem.NIndent*ACharSize.X
+                      - AScrollHorz.SmoothPos
+                      + AScrollHorz.NPixelOffset;
     CurrPointText.Y:= CurrPoint.Y;
 
     bTrimmedNonSpaces:= false;
@@ -2882,7 +2885,7 @@ begin
             StrOutput,
             AScrollHorz.NPos,
             NOutputCharsSkipped,
-            NOutputSpacesSkipped);
+            NOutputCellPercentsSkipped);
           Delete(StrOutput, 1, NOutputCharsSkipped);
         end;
       end
@@ -2890,7 +2893,7 @@ begin
       begin
         //work faster for huge lines (but not accurate horiz scrollbar)
         NOutputCharsSkipped:= AScrollHorz.NPos;
-        NOutputSpacesSkipped:= NOutputCharsSkipped;
+        NOutputCellPercentsSkipped:= NOutputCharsSkipped*100;
 
         NSubPos:= WrapItem.NCharIndex + NOutputCharsSkipped;
         NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
@@ -2902,7 +2905,7 @@ begin
           bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
       end;
 
-      Inc(CurrPointText.X, NOutputSpacesSkipped * ACharSize.X);
+      Inc(CurrPointText.X, NOutputCellPercentsSkipped * ACharSize.X div 100);
 
       if Length(StrOutput)>cMaxCharsForOutput then
         SetLength(StrOutput, cMaxCharsForOutput);
@@ -3030,10 +3033,7 @@ begin
         TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
         TextOutProps.CharSize:= ACharSize;
         TextOutProps.MainTextArea:= AMainText;
-        TextOutProps.CharsSkipped:= NOutputSpacesSkipped;
-          //todo:
-          //needed number of chars of all chars counted as 100%,
-          //while NOutputSpacesSkipped is with cjk counted as 170%
+        TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
         TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
         TextOutProps.DrawEvent:= Event;
         TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
