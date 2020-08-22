@@ -163,7 +163,8 @@ var
   Item: TATWrapItem;
   StringItem: PATStringItem;
   NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
-  NScrolledHorz, NScrolledVert: integer;
+  NScrolledHorzSmooth: integer;
+  NScrolledVert: integer;
   Str: atString;
   bLineHuge: boolean;
   bAsciiOnly: boolean;
@@ -180,7 +181,7 @@ begin
   bAsciiOnly:= StringItem^.HasAsciiNoTabs;
   bLineHuge:= StringItem^.CharLen>OptMaxLineLenForAccurateCharWidths;
 
-  NScrolledHorz:= AScrollHorz.NPos;
+  NScrolledHorzSmooth:= AScrollHorz.SmoothPos-AScrollHorz.NPixelOffset;
   NScrolledVert:= Max(0, AScrollVert.NPos);
 
   for i:= NIndex1 to NIndex2 do
@@ -210,9 +211,7 @@ begin
     if NFromStart>Item.NLength then
       Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.X);
 
-    //TODO: here scrolled part is taken as small chars (*ACharSize.X),
-    //while text may have full-width chars, and it gives incorrect result
-    Inc(Result.X, (Item.NIndent-NScrolledHorz)*ACharSize.X);
+    Inc(Result.X, Item.NIndent*ACharSize.X - NScrolledHorzSmooth);
     Result.Y:= (i-NScrolledVert)*ACharSize.Y;
 
     //consider gaps

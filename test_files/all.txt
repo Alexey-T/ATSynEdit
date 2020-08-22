@@ -1,7 +1,7 @@
 ﻿Sample:
 ΓΔΕΘΛΞ √∞∟∩∫
 Ударе́ние 
-Full-width: ああえ and ああえ, end
+Full-width: ああえ and ああ, wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww
 
 links http://dd.dd#page / www.dd.dd?(param)[param] 
 emails dd@dd.dd / mailto:dd@dd.dd
