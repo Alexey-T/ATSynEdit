@@ -35,6 +35,8 @@ rep(l, '{$I regexpr_compilers.inc}',
 rep(l, '{ off $DEFINE UniCode} // Use WideChar for characters and UnicodeString/WideString for strings',
        '{$DEFINE UniCode}',
        needed=False)
+rep(l, '{ off $DEFINE UnicodeEx} // Support Unicode >0xFFFF, e.g. emoji, e.g. "." must find 2 WideChars of 1 emoji',
+       '{$DEFINE UnicodeEx}')
 rep(l, '  RegExprModifierS: boolean = True; // default value for ModifierS',
        '  RegExprModifierS: boolean = False; // default value for ModifierS')
 rep(l, '  RegExprModifierM: boolean = False; // default value for ModifierM',
