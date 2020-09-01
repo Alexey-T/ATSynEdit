@@ -43,12 +43,12 @@ rep(l, '  RegExprModifierM: boolean = False; // default value for ModifierM',
        '  RegExprModifierM: boolean = True; // default value for ModifierM')
 rep(l, '  RegExprLineSeparators: RegExprString = #$d#$a#$b#$c',
        '  RegExprLineSeparators: RegExprString = #$a#$b#$c')
-rep(l, '  RegExprLinePairedSeparator: RegExprString = #$d#$a;',
-       "  RegExprLinePairedSeparator: RegExprString = ''; //#$d#$a;")
-rep(l, '  FUseOsLineEndOnReplace := True;',
-       '  FUseOsLineEndOnReplace := False;')
-rep(l, '  FReplaceLineEnd := sLineBreak;',
-       '  FReplaceLineEnd := #10; //not sLineBreak, it is CR LF on Windows')
+rep(l, '  UseLinePairedBreak := True;',
+       '  UseLinePairedBreak := False;')
+rep(l, '  fReplaceLineEndFromOS := True;',
+       '  fReplaceLineEndFromOS := False;')
+rep(l, '  fReplaceLineEnd := sLineBreak;',
+       '  fReplaceLineEnd := #10;')
 
 with open(fn2, 'w') as f:
     f.write('\n'.join(l))
