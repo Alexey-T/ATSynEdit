@@ -43,10 +43,10 @@ rep(l, '  RegExprModifierM: boolean = False; // default value for ModifierM',
        '  RegExprModifierM: boolean = True; // default value for ModifierM')
 rep(l, '  RegExprLineSeparators: RegExprString = #$d#$a#$b#$c',
        '  RegExprLineSeparators: RegExprString = #$a#$b#$c')
-rep(l, '  UseLinePairedBreak := True;',
-       '  UseLinePairedBreak := False;')
-rep(l, '  fReplaceLineEndFromOS := True;',
-       '  fReplaceLineEndFromOS := False;')
+rep(l, '  RegExprUsePairedBreak: boolean = True;',
+       '  RegExprUsePairedBreak: boolean = False;')
+rep(l, '  RegExprReplaceLineBreakFromOS: boolean = True;',
+       '  RegExprReplaceLineBreakFromOS: boolean = False;')
 rep(l, '  fReplaceLineEnd := sLineBreak;',
        '  fReplaceLineEnd := #10;')
 

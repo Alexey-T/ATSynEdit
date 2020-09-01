@@ -130,12 +130,10 @@ type
     {$ENDIF}
   {$ENDIF}
   REChar = WideChar;
-  PRegex2Chars = ^LongInt;
   {$ELSE}
   PRegExprChar = PChar;
   RegExprString = AnsiString;
   REChar = Char;
-  PRegex2Chars = ^Word;
   {$ENDIF}
   TREOp = REChar; // internal opcode type
   PREOp = ^TREOp;
@@ -183,6 +181,9 @@ const
     {$IFDEF UniCode}
     + #$1680#$2000#$2001#$2002#$2003#$2004#$2005#$2006#$2007#$2008#$2009#$200A#$202F#$205F#$3000
     {$ENDIF};
+
+  RegExprUsePairedBreak: boolean = False;
+  RegExprReplaceLineBreakFromOS: boolean = False;
 
 const
   RegexMaxGroups = 90;
@@ -780,7 +781,7 @@ uses
 const
   // TRegExpr.VersionMajor/Minor return values of these constants:
   REVersionMajor = 1;
-  REVersionMinor = 141;
+  REVersionMinor = 142;
 
   OpKind_End = REChar(1);
   OpKind_MetaClass = REChar(2);
@@ -840,10 +841,16 @@ const
   RENumberSz = SizeOf(LongInt) div SizeOf(REChar);
 
 function IsPairedBreak(p: PRegExprChar): boolean; {$IFDEF InlineFuncs}inline;{$ENDIF}
+type
+  {$IFDEF Unicode}
+  PtrPair = ^LongInt;
+  {$ELSE}
+  PtrPair = ^Word;
+  {$ENDIF}
 const
   cBreak = 13 shl (SizeOf(REChar) * 8) + 10;
 begin
-  Result := PRegex2Chars(p)^ = cBreak;
+  Result := PtrPair(p)^ = cBreak;
 end;
 
 function _FindCharInBuffer(SBegin, SEnd: PRegExprChar; Ch: REChar): PRegExprChar; {$IFDEF InlineFuncs}inline;{$ENDIF}
@@ -1695,9 +1702,9 @@ begin
   fLineSeparators := RegExprLineSeparators;
   {$ENDIF}
 
-  UseLinePairedBreak := False;
+  fUsePairedBreak := RegExprUsePairedBreak;
 
-  fReplaceLineEndFromOS := False;
+  fReplaceLineEndFromOS := RegExprReplaceLineBreakFromOS;
   fReplaceLineEnd := #10;
 
   fSlowChecksSizeMax := 2000;
