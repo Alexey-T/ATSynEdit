@@ -7929,6 +7929,11 @@ end;
 initialization
   ATClipboardColumnFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Block');
 
+  RegExprModifierS:= False;
+  RegExprModifierM:= True;
+  RegExprUsePairedBreak:= False;
+  RegExprReplaceLineBreak:= #10;
+
 finalization
   FreeEditorResources;
 
