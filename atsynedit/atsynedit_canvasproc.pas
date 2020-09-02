@@ -175,11 +175,13 @@ procedure DoPaintUnprintedWrapMark(C: TCanvas;
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
   ATabHelper: TATStringTabHelper; ACharWidth: integer): integer; inline;
 
+function DoPartsGetCount(constref AParts: TATLineParts): integer;
 procedure DoPartFind(constref AParts: TATLineParts; APos: integer; out AIndex, AOffsetLeft: integer);
 function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart; AKeepFontStyles: boolean): boolean;
 procedure DoPartSetColorBG(var AParts: TATLineParts; AColor: TColor; AForceColor: boolean);
 procedure DoPartsShow(var P: TATLineParts);
 procedure DoPartsDim(var P: TATLineParts; ADimLevel255: integer; AColorBG: TColor);
+procedure DoPartsCutFromOffset(var P: TATLineParts; AOffset: integer);
 
 function ColorBlend(c1, c2: Longint; A: Longint): Longint;
 function ColorBlendHalf(c1, c2: Longint): Longint;
@@ -1239,6 +1241,44 @@ begin
     end;
   end;
 end;
+
+procedure DoPartsCutFromOffset(var P: TATLineParts; AOffset: integer);
+var
+  NCount, N, i: integer;
+  PartPtr: PATLinePart;
+begin
+  NCount:= DoPartsGetCount(P);
+
+  //how many parts to delete from start
+  N:= 0;
+  repeat
+    PartPtr:= @P[N];
+    if PartPtr^.Len<=0 then Break;
+    if PartPtr^.Offset+PartPtr^.Len>AOffset then Break;
+    Inc(N);
+  until false;
+
+  //shift all parts by N items
+  for i:= 0 to NCount-N-1 do
+    P[i]:= P[i+N];
+
+  //fill tail with zeros
+  for i:= NCount-N to NCount-1 do
+    FillChar(P[i], SizeOf(TATLinePart), 0);
+
+  for i:= 0 to NCount-1-N do
+    with P[i] do
+      if Len>0 then
+      begin
+        Dec(Offset, AOffset);
+        if Offset<0 then
+        begin
+          Inc(Len, Offset);
+          Offset:= 0;
+        end;
+      end;
+end;
+
 
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APosX, APosY: integer;
   ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
