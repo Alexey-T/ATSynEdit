@@ -37,6 +37,7 @@ uses
   ATSynEdit_RegExpr,
   ATSynEdit_Colors,
   ATSynEdit_Keymap,
+  ATSynEdit_LineParts,
   ATSynEdit_CanvasProc,
   ATSynEdit_Carets,
   ATSynEdit_Markers,

@@ -11,6 +11,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Messages,
   ATStringProc,
+  ATSynEdit_LineParts,
   ATSynEdit_CanvasProc;
 
 type
