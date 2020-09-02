@@ -12,7 +12,6 @@ uses
   Classes, SysUtils, Graphics, StrUtils,
   ATSynEdit,
   ATSynEdit_LineParts,
-  ATSynEdit_CanvasProc,
   ATStringProc_HtmlColor;
 
 procedure DoEditorExportToHTML(Ed: TATSynEdit;

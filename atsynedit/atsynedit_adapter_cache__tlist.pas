@@ -10,7 +10,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
-  ATSynEdit_CanvasProc;
+  ATSynEdit_LineParts;
 
 type
   TATAdapterCacheItem = class

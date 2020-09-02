@@ -11,8 +11,7 @@ interface
 uses
   Classes, SysUtils, Graphics, Messages,
   ATStringProc,
-  ATSynEdit_LineParts,
-  ATSynEdit_CanvasProc;
+  ATSynEdit_LineParts;
 
 type
   { TATAdapterHilite }

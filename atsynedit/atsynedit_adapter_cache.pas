@@ -12,7 +12,6 @@ interface
 uses
   Classes, SysUtils, Graphics,
   ATSynEdit_LineParts,
-  ATSynEdit_CanvasProc,
   gdeque;
 
 type

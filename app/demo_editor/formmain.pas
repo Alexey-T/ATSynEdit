@@ -11,7 +11,7 @@ uses
   ATStrings,
   ATStringProc,
   ATSynEdit,
-  ATSynEdit_CanvasProc,
+  ATSynEdit_LineParts,
   ATSynEdit_Carets,
   ATSynEdit_Bookmarks,
   ATSynEdit_Gaps,
