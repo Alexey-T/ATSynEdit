@@ -238,6 +238,9 @@ type
  end;
 
 
+function IsFinderWholeWordRange(const S: UnicodeString; APos1, APos2: integer): boolean; inline;
+
+
 implementation
 
 const
@@ -1728,25 +1731,19 @@ begin
   end;
 end;
 
-function _CheckWholeWordPos(const S: UnicodeString; APos1, APos2: integer): boolean; inline;
+function IsFinderWholeWordRange(const S: UnicodeString; APos1, APos2: integer): boolean; inline;
 // APos1 - index of 1st word char
 // APos2 - index after last word char
-var
-  b1, b2: boolean;
+// dont do "if IsWordChar(i)=IsWordChar(i+1)", which gives False for position inside non-word chars
 begin
   if (APos1>1) then
   begin
-    b1:= IsWordChar(S[APos1-1]);
-    b2:= IsWordChar(S[APos1]);
-    // dont do "if b1=b2", which works bad for position inside non-word chars
-    if b1 and b2 then
+    if IsWordChar(S[APos1-1]) and IsWordChar(S[APos1]) then
       exit(false);
   end;
   if (APos2<=Length(S)) then
   begin
-    b1:= IsWordChar(S[APos2-1]);
-    b2:= IsWordChar(S[APos2]);
-    if b1 and b2 then
+    if IsWordChar(S[APos2-1]) and IsWordChar(S[APos2]) then
       exit(false);
   end;
   Result:= true;
@@ -1937,7 +1934,7 @@ begin
           bOk:= STestStringMatch(SFind, SLineToTest, IndexChar+1, OptCase);
           //consider whole words (only for single line)
           if bOk and OptWords and (PartCount=1) then
-            bOk:= _CheckWholeWordPos(SLineLoopedW, IndexChar+1, IndexChar+1+SLinePart_Len);
+            bOk:= IsFinderWholeWordRange(SLineLoopedW, IndexChar+1, IndexChar+1+SLinePart_Len);
           //consider syntax-elements
           if bOk then
             bOk:= CheckTokens(IndexChar, IndexLine);
@@ -2015,7 +2012,7 @@ begin
           bOk:= _CompareParts_Back(IndexChar);
           //consider whole words (only for single line)
           if bOk and OptWords and (PartCount=1) then
-            bOk:= _CheckWholeWordPos(SLineLoopedW, IndexChar-SLinePart_Len, IndexChar);
+            bOk:= IsFinderWholeWordRange(SLineLoopedW, IndexChar-SLinePart_Len, IndexChar);
           //check syntax-elements
           if bOk then
             bOk:= CheckTokens(IndexChar-1-SLinePart_Len, IndexLine);
