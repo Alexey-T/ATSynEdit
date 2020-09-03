@@ -1731,13 +1731,24 @@ end;
 function _CheckWholeWordPos(const S: UnicodeString; APos1, APos2: integer): boolean; inline;
 // APos1 - index of 1st word char
 // APos2 - index after last word char
+var
+  b1, b2: boolean;
 begin
   if (APos1>1) then
-    if IsWordChar(S[APos1-1]) = IsWordChar(S[APos1]) then
+  begin
+    b1:= IsWordChar(S[APos1-1]);
+    b2:= IsWordChar(S[APos1]);
+    // dont do "if b1=b2", which works bad for position inside non-word chars
+    if b1 and b2 then
       exit(false);
+  end;
   if (APos2<=Length(S)) then
-    if IsWordChar(S[APos2-1]) = IsWordChar(S[APos2]) then
+  begin
+    b1:= IsWordChar(S[APos2-1]);
+    b2:= IsWordChar(S[APos2]);
+    if b1 and b2 then
       exit(false);
+  end;
   Result:= true;
 end;
 
