@@ -27,27 +27,27 @@ type
     TArr=array of T;
   var 
     FData:TArr;
-    FDataSize:SizeUInt;
-    FCapacity:SizeUInt;
-    FStart:SizeUInt;
-    function GetMutable(position:SizeUInt):PT;inline;
+    FDataSize:Integer;
+    FCapacity:Integer;
+    FStart:Integer;
+    function GetMutable(position:Integer):PT;inline;
     procedure IncreaseCapacity();inline;
   public
-    function Size():SizeUInt;inline;
+    function Size():Integer;inline;
     constructor Create();
     Procedure Clear;
     procedure PushBack(constref value:T);inline;
     procedure PushFront(constref value:T);inline;
     procedure PopBack();inline;
     procedure PopFront();inline;
-    function Front():T;inline;
-    function Back():T;inline;
+    //function Front():T;inline;
+    //function Back():T;inline;
     function IsEmpty():boolean;inline;
-    procedure Reserve(cap:SizeUInt);inline;
-    procedure Resize(cap:SizeUInt);inline;
-    procedure Insert(Position:SizeUInt; constref Value:T);inline;
-    procedure Erase(Position:SIzeUInt);inline;
-    property Mutable[i : SizeUInt]:PT read GetMutable;
+    procedure Reserve(cap:Integer);inline;
+    procedure Resize(cap:Integer);inline;
+    procedure Insert(Position:Integer; constref Value:T);inline;
+    procedure Erase(Position:Integer);inline;
+    property Mutable[i: Integer]:PT read GetMutable;
 end;
 
 implementation
@@ -65,7 +65,7 @@ begin
  FStart:=0;
 end;
 
-function TDeque.Size():SizeUInt;inline;
+function TDeque.Size():Integer;inline;
 begin
   Size:=FDataSize;
 end;
@@ -112,6 +112,7 @@ begin
   inc(FDataSize);
 end;
 
+{
 function TDeque.Front():T;inline;
 begin
   Assert(size > 0, 'Accessing empty deque');
@@ -123,8 +124,9 @@ begin
   Assert(size > 0, 'Accessing empty deque');
   Back:=FData[(FStart+FDataSize-1)mod FCapacity];
 end;
+}
 
-function TDeque.GetMutable(position:SizeUInt):PT;inline;
+function TDeque.GetMutable(position:Integer):PT;inline;
 begin
   Assert(position < size, 'Deque access out of range');
   GetMutable:=@FData[(FStart+position) mod FCapacity];
@@ -139,7 +141,7 @@ const
   cSizeBig = 256*1024*1024;
 var
   i,OldEnd,
-  DataSize:SizeUInt;
+  DataSize:Integer;
 begin
   OldEnd:=FCapacity;
   DataSize:=FCapacity*SizeOf(T);
@@ -160,8 +162,8 @@ begin
       FData[OldEnd+i]:=FData[i];
 end;
 
-procedure TDeque.Reserve(cap:SizeUInt);inline;
-var i,OldEnd:SizeUInt;
+procedure TDeque.Reserve(cap:Integer);inline;
+var i,OldEnd:Integer;
 begin
   if(cap<FCapacity) then 
     exit
@@ -178,14 +180,14 @@ begin
   end;
 end;
 
-procedure TDeque.Resize(cap:SizeUInt);inline;
+procedure TDeque.Resize(cap:Integer);inline;
 begin
   Reserve(cap);
   FDataSize:=cap;
 end;
 
-procedure TDeque.Insert(Position: SizeUInt; constref Value: T);
-var i:SizeUInt;
+procedure TDeque.Insert(Position: Integer; constref Value: T);
+var i:Integer;
 begin
   pushBack(Value);
   for i:=Size-1 downto Position+1 do 
@@ -195,8 +197,8 @@ begin
   Move(Value, Mutable[Position]^, SizeOf(T));
 end;
 
-procedure TDeque.Erase(Position: SIzeUInt);
-var i:SizeUInt;
+procedure TDeque.Erase(Position: Integer);
+var i:Integer;
 begin
   if Position <= Size then 
   begin
