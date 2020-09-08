@@ -12,7 +12,7 @@ interface
 uses
   Classes, SysUtils, Graphics,
   ATSynEdit_LineParts,
-  gdeque;
+  ATSynEdit_gdeque;
 
 type
 
