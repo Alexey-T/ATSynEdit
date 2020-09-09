@@ -12,7 +12,7 @@ interface
 uses
   Classes, SysUtils, Graphics,
   ATSynEdit_LineParts,
-  ATSynEdit_gdeque;
+  ATSynEdit_fgl;
 
 type
 
@@ -23,11 +23,12 @@ type
     LineIndex, CharIndex: integer;
     ColorAfterEol: TColor;
     Parts: TATLineParts;
+    class operator=(const A, B: TATAdapterCacheItem): boolean;
   end;
 
   { TATAdapterCacheItems }
 
-  TATAdapterCacheItems = specialize TDeque<TATAdapterCacheItem>;
+  TATAdapterCacheItems = specialize TFPGList<TATAdapterCacheItem>;
 
 type
   { TATAdapterHiliteCache }
@@ -76,6 +77,13 @@ begin
   end;
 end;
 
+{ TATAdapterCacheItem }
+
+class operator TATAdapterCacheItem.=(const A, B: TATAdapterCacheItem): boolean;
+begin
+  Result:= false;
+end;
+
 { TATAdapterHiliteCache }
 
 procedure TATAdapterHiliteCache.SetEnabled(AValue: boolean);
@@ -99,16 +107,13 @@ end;
 
 procedure TATAdapterHiliteCache.Clear;
 begin
-  //FList.Clear; //Clear is avail only in FPC 3.2+
-  FList.Resize(0);
+  FList.Clear;
 end;
 
 procedure TATAdapterHiliteCache.Add(
   const ALineIndex, ACharIndex: integer;
   var AParts: TATLineParts;
   const AColorAfterEol: TColor);
-var
-  NCnt, i: integer;
 begin
   if not Enabled then exit;
   if OptEditorAdapterCacheSize<10 then exit;
@@ -130,16 +135,14 @@ begin
     then exit;
     }
 
-  NCnt:= FList.Size();
-  for i:= 1 to NCnt-OptEditorAdapterCacheSize do
-    FList.PopBack;
+  if FList.Count>OptEditorAdapterCacheSize then
+    FList.Count:= OptEditorAdapterCacheSize;
 
   FTempItem.LineIndex:= ALineIndex;
   FTempItem.CharIndex:= ACharIndex;
   FTempItem.ColorAfterEol:= AColorAfterEol;
   CopyLineParts(AParts, FTempItem.Parts);
-
-  FList.PushFront(FTempItem);
+  FList.Add(FTempItem);
 end;
 
 
@@ -154,9 +157,9 @@ begin
   Result:= false;
   if not Enabled then exit;
 
-  for i:= 0 to FList.Size()-1 do
+  for i:= 0 to FList.Count-1 do
   begin
-    Item:= FList.Mutable[i];
+    Item:= FList._GetItemPtr(i);
     if (Item^.LineIndex=ALineIndex) and
       (Item^.CharIndex=ACharIndex) then
       begin
@@ -172,11 +175,11 @@ var
   Item: PATAdapterCacheItem;
   i: integer;
 begin
-  for i:= FList.Size()-1 downto 0 do
+  for i:= FList.Count-1 downto 0 do
   begin
-    Item:= FList.Mutable[i];
+    Item:= FList._GetItemPtr(i);
     if (Item^.LineIndex=ALineIndex) then
-      FList.Erase(i);
+      FList.Delete(i);
   end;
 end;
 
