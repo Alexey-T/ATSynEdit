@@ -282,7 +282,7 @@ const
   cInitTimerAutoScroll = 100;
   cInitTimerNiceScroll = 100;
   cInitMinimapVisible = false;
-  cInitMinimapSelColorChange = 6;
+  cInitMinimapSelColorChange = 6; //how much minimap sel-rect is darker, in %
   cInitMinimapTooltipVisible = true;
   cInitMinimapTooltipLinesCount = 6;
   cInitMinimapTooltipWidthPercents = 60;
