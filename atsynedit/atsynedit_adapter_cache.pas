@@ -39,6 +39,8 @@ type
     FEnabled: boolean;
     FTempItem: TATAdapterCacheItem;
     procedure SetEnabled(AValue: boolean);
+    function FindPrior(ALineIndex, ACharIndex: integer; out AExact: boolean): integer;
+    function IsSorted: boolean;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -114,6 +116,9 @@ procedure TATAdapterHiliteCache.Add(
   const ALineIndex, ACharIndex: integer;
   var AParts: TATLineParts;
   const AColorAfterEol: TColor);
+var
+  N: integer;
+  bExact: boolean;
 begin
   if not Enabled then exit;
   if OptEditorAdapterCacheSize<10 then exit;
@@ -142,7 +147,19 @@ begin
   FTempItem.CharIndex:= ACharIndex;
   FTempItem.ColorAfterEol:= AColorAfterEol;
   CopyLineParts(AParts, FTempItem.Parts);
-  FList.Add(FTempItem);
+
+  N:= FindPrior(ALineIndex, ACharIndex, bExact);
+  if N>=FList.Count then
+    FList.Add(FTempItem)
+  else
+    FList.Insert(N, FTempItem);
+
+  //for debug only
+  {
+  if not IsSorted then
+    if N>2 then
+      ;
+      }
 end;
 
 
@@ -152,21 +169,19 @@ function TATAdapterHiliteCache.Get(
   var AColorAfterEol: TColor): boolean;
 var
   Item: PATAdapterCacheItem;
-  i: integer;
+  N: integer;
+  bExact: boolean;
 begin
   Result:= false;
   if not Enabled then exit;
 
-  for i:= 0 to FList.Count-1 do
+  N:= FindPrior(ALineIndex, ACharIndex, bExact);
+  if bExact then
   begin
-    Item:= FList._GetItemPtr(i);
-    if (Item^.LineIndex=ALineIndex) and
-      (Item^.CharIndex=ACharIndex) then
-      begin
-        CopyLineParts(Item^.Parts, AParts);
-        AColorAfterEol:= Item^.ColorAfterEol;
-        exit(true);
-      end;
+    Item:= FList._GetItemPtr(N);
+    CopyLineParts(Item^.Parts, AParts);
+    AColorAfterEol:= Item^.ColorAfterEol;
+    Result:= true;
   end;
 end;
 
@@ -182,6 +197,82 @@ begin
       FList.Delete(i);
   end;
 end;
+
+function TATAdapterHiliteCache.FindPrior(ALineIndex, ACharIndex: integer; out AExact: boolean): integer;
+//Find list index, at which data >= parameters.
+//Result=Count, if all items are smaller.
+  //
+  function GetDif(m: integer): integer; inline;
+  var
+    midItem: PATAdapterCacheItem;
+    midLine, midChar: integer;
+  begin
+    midItem:= FList._GetItemPtr(m);
+    midLine:= midItem^.LineIndex;
+    midChar:= midItem^.CharIndex;
+    if ALineIndex>midLine then
+      exit(1)
+    else
+    if ALineIndex<midLine then
+      exit(-1)
+    else
+    if ACharIndex>midChar then
+      exit(1)
+    else
+    if ACharIndex<midChar then
+      exit(-1)
+    else
+      exit(0);
+  end;
+  //
+var
+  a, b, m: integer;
+  dif: integer;
+begin
+  AExact:= false;
+  a:= 0;
+  b:= FList.Count-1;
+  if b<0 then exit(0);
+  m:= 0;
+
+  while a<=b do
+  begin
+    m:= (a+b+1) div 2;
+    dif:= GetDif(m);
+    if dif>0 then
+      a:= m+1
+    else
+    if dif<0 then
+      b:= m-1
+    else
+    begin
+      AExact:= true;
+      exit(m);
+    end;
+  end;
+
+  if GetDif(m)>0 then
+    Inc(m);
+  Result:= m;
+end;
+
+function TATAdapterHiliteCache.IsSorted: boolean;
+var
+  p1, p2: PATAdapterCacheItem;
+  i: integer;
+begin
+  Result:= true;
+  for i:= 0 to FList.Count-2 do
+  begin
+    p1:= FList._GetItemPtr(i);
+    p2:= FList._GetItemPtr(i+1);
+    if p1^.LineIndex>p2^.LineIndex then
+      exit(false);
+    if (p1^.LineIndex=p2^.LineIndex) and (p1^.CharIndex>p2^.CharIndex) then
+      exit(false);
+  end;
+end;
+
 
 end.
 
