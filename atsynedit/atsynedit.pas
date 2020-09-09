@@ -33,6 +33,7 @@ uses
   EncConv,
   {$ifdef UseBgra}
   BGRABitmap,
+  BGRABitmapTypes,
   {$endif}
   ATStringProc,
   ATStrings,
@@ -951,7 +952,11 @@ type
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
+    {$ifdef UseBgra}
+    procedure DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
+    {$else}
     procedure DoPaintMinimapSelTo(C: TCanvas);
+    {$endif}
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
     procedure DoPaintMarginsTo(C: TCanvas);
@@ -2743,14 +2748,6 @@ begin
     Assigned(FAdapterHilite) and
     not TempSel_IsMultiline;
 
-  {$ifdef UseBgra}
-  if not AMainText then
-  begin
-    FFastBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
-    FFastBmp.Fill(FColorBG);
-  end;
-  {$endif}
-
   repeat
     if NCoordTop>ARect.Bottom then Break;
 
@@ -3315,11 +3312,6 @@ begin
   //staples
   if AMainText then
     DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
-
-  {$ifdef UseBgra}
-  if not AMainText then
-    FFastBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
-  {$endif}
 end;
 
 function TATSynEdit.GetMinimapSelTop: integer;
@@ -3378,26 +3370,63 @@ begin
     Result:= FOptTextOffsetTop;
 end;
 
+{$ifdef UseBgra}
+procedure TATSynEdit.DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
+const
+  cAlphaValue = $2000; //max is $FFFF
+var
+  R: TRect;
+  rColor: TBGRAPixel;
+begin
+  if FMinimapShowSelAlways or FCursorOnMinimap then
+  begin
+    GetRectMinimapSel(R);
+    OffsetRect(R, -FRectMinimap.Left, -FRectMinimap.Top);
+
+    rColor.FromColor(Colors.MinimapSelBG);
+    C.FillRect(R, rColor, dmDrawWithTransparency, cAlphaValue);
+
+    if FMinimapShowSelBorder then
+    begin
+      rColor.FromColor(Colors.MinimapBorder);
+      C.Rectangle(R, rColor);
+    end;
+  end;
+
+  if Colors.MinimapBorder<>clNone then
+  begin
+    rColor.FromColor(Colors.MinimapBorder);
+    C.DrawVertLine(0, 0, FRectMinimap.Height, rColor);
+  end;
+end;
+{$else}
 procedure TATSynEdit.DoPaintMinimapSelTo(C: TCanvas);
 var
   R: TRect;
 begin
-  if not FMinimapShowSelAlways then
-    if not FCursorOnMinimap then Exit;
-
-  GetRectMinimapSel(R);
-  if IntersectRect(R, R, FRectMinimap) then
+  if FMinimapShowSelAlways or FCursorOnMinimap then
   begin
-    CanvasInvertRect(C, R, Colors.MinimapSelBG);
-    if FMinimapShowSelBorder then
+    GetRectMinimapSel(R);
+    //if IntersectRect(R, R, FRectMinimap) then
     begin
-      C.Pen.Color:= Colors.MinimapBorder;
-      C.Brush.Style:= bsClear;
-      C.Rectangle(R);
-      C.Brush.Style:= bsSolid;
+      CanvasInvertRect(C, R, Colors.MinimapSelBG);
+      if FMinimapShowSelBorder then
+      begin
+        C.Pen.Color:= Colors.MinimapBorder;
+        C.Brush.Style:= bsClear;
+        C.Rectangle(R);
+        C.Brush.Style:= bsSolid;
+      end;
     end;
   end;
+
+  if Colors.MinimapBorder<>clNone then
+  begin
+    C.Pen.Color:= Colors.MinimapBorder;
+    CanvasLineVert(C, FRectMinimap.Left-1, FRectMinimap.Top, FRectMinimap.Bottom);
+  end;
 end;
+{$endif}
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
 begin
@@ -3410,15 +3439,23 @@ begin
 
   FScrollVertMinimap.NPos:= GetMinimapScrollPos;
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
+
+  {$ifdef UseBgra}
+  FFastBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
+  FFastBmp.Fill(FColorBG);
+  {$endif}
+
   DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
 
+  {$ifdef UseBgra}
+  DoPaintMinimapSelTo_BGRA(FFastBmp);
+  {$else}
   DoPaintMinimapSelTo(C);
+  {$endif}
 
-  if Colors.MinimapBorder<>clNone then
-  begin
-    C.Pen.Color:= Colors.MinimapBorder;
-    CanvasLineVert(C, FRectMinimap.Left-1, FRectMinimap.Top, FRectMinimap.Bottom);
-  end;
+  {$ifdef UseBgra}
+  FFastBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
+  {$endif}
 
   {$ifdef debug_show_fps}
   FTickMinimap:= GetTickCount64-FTickMinimap;
