@@ -120,7 +120,8 @@ procedure CanvasTextOut(C: TCanvas;
   const AProps: TATCanvasTextOutProps
   );
 
-procedure CanvasTextOutMinimap(C: TCanvas;
+procedure CanvasTextOutMinimap(
+  {$ifdef UseBgra} C: TBGRABitmap; {$else} C: TCanvas; {$endif}
   const ARect: TRect;
   APosX, APosY: integer;
   ACharSize: TPoint;
@@ -128,9 +129,6 @@ procedure CanvasTextOutMinimap(C: TCanvas;
   constref AParts: TATLineParts;
   AColorBG: TColor;
   const ALine: atString;
-  {$ifdef UseBgra}
-  ABmp: TBGRABitmap;
-  {$endif}
   AUsePixels: boolean
   );
 
@@ -1035,12 +1033,12 @@ begin
   end;
 end;
 {$else}
-procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APosX, APosY: integer;
+// BGRABitmap version
+procedure CanvasTextOutMinimap(
+  C: TBGRABitmap;
+  const ARect: TRect; APosX, APosY: integer;
   ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
   AColorBG: TColor; const ALine: atString;
-  {$ifdef UseBgra}
-  ABmp: TBGRABitmap;
-  {$endif}
   AUsePixels: boolean
   );
 {
@@ -1057,9 +1055,6 @@ var
 begin
   //offset<0 means some bug on making parts!
   if AParts[0].Offset<0 then exit;
-
-  ABmp.SetSize(ARect.Width, ACharSize.Y);
-  ABmp.Fill(AColorBG);
 
   NSpaces:= 0;
   for NPartIndex:= Low(TATLineParts) to High(TATLineParts) do
@@ -1097,9 +1092,9 @@ begin
       else
         Inc(NSpaces);
 
-      X1:= ACharSize.X*NSpaces;
+      X1:= APosX + ACharSize.X*NSpaces;
       X2:= X1 + ACharSize.X;
-      Y1:= 0;
+      Y1:= APosY;
       Y2:= Y1 + ACharSize.Y;
 
       //must limit line on right edge
@@ -1109,23 +1104,21 @@ begin
       if AUsePixels then
       begin
         if bHasBG then
-          ABmp.SetPixel(X1, Y1, rColorBack);
+          C.SetPixel(X1, Y1, rColorBack);
 
         if not IsCharSpace(ch) then
-          ABmp.SetPixel(X1, Y1+ACharSize.Y div 2, rColorFont);
+          C.SetPixel(X1, Y1+ACharSize.Y div 2, rColorFont);
       end
       else
       begin
         if bHasBG then
-          ABmp.FillRect(X1, Y1, X2, Y2, rColorBack);
+          C.FillRect(X1, Y1, X2, Y2, rColorBack);
 
         if not IsCharSpace(ch) then
-          ABmp.FillRect(X1, Y1+ACharSize.Y div 2, X2, Y2, rColorFont);
+          C.FillRect(X1, Y1+ACharSize.Y div 2, X2, Y2, rColorFont);
       end;
     end;
   end;
-
-  ABmp.Draw(C, APosX, APosY);
 end;
 {$endif}
 

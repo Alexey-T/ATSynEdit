@@ -2742,6 +2742,14 @@ begin
     Assigned(FAdapterHilite) and
     not TempSel_IsMultiline;
 
+  {$ifdef UseBgra}
+  if not AMainText then
+  begin
+    FFastBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
+    FFastBmp.Fill(FColorBG);
+  end;
+  {$endif}
+
   repeat
     if NCoordTop>ARect.Bottom then Break;
 
@@ -2815,10 +2823,11 @@ begin
             Int64(ARect.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
             NCoordTop);
 
-          CanvasTextOutMinimap(C,
+          CanvasTextOutMinimap(
+            {$ifdef UseBgra} FFastBmp, {$else} C, {$endif}
             ARect,
-            CurrPointText.X,
-            CurrPointText.Y,
+            CurrPointText.X {$ifdef UseBgra} - FRectMinimap.Left {$endif},
+            CurrPointText.Y {$ifdef UseBgra} - FRectminimap.Top {$endif},
             ACharSize,
             FTabSize,
             FLineParts,
@@ -2827,9 +2836,6 @@ begin
               WrapItem.NLineIndex,
               WrapItem.NCharIndex,
               GetVisibleColumns), //optimize for huge lines
-            {$ifdef UseBgra}
-            FFastBmp,
-            {$endif}
             bUseSetPixel
             );
 
@@ -3090,10 +3096,11 @@ begin
       end
       else
       if StrOutput<>'' then
-        CanvasTextOutMinimap(C,
+        CanvasTextOutMinimap(
+          {$ifdef UseBgra} FFastBmp, {$else} C, {$endif}
           ARect,
-          CurrPointText.X,
-          CurrPointText.Y,
+          CurrPointText.X {$ifdef UseBgra} - FRectMinimap.Left {$endif},
+          CurrPointText.Y {$ifdef UseBgra} - FRectminimap.Top {$endif},
           ACharSize,
           FTabSize,
           FLineParts,
@@ -3102,9 +3109,6 @@ begin
             WrapItem.NLineIndex,
             WrapItem.NCharIndex,
             GetVisibleColumns), //optimize for huge lines
-          {$ifdef UseBgra}
-          FFastBmp,
-          {$endif}
           bUseSetPixel
           );
 
@@ -3310,6 +3314,11 @@ begin
   //staples
   if AMainText then
     DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
+
+  {$ifdef UseBgra}
+  if not AMainText then
+    FFastBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
+  {$endif}
 end;
 
 function TATSynEdit.GetMinimapSelTop: integer;
