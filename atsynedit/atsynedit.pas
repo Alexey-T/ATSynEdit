@@ -2784,7 +2784,6 @@ begin
       if FAdapterCache.Get(
         WrapItem.NLineIndex,
         WrapItem.NCharIndex,
-        WrapItem.NLength,
         FLineParts,
         NColorAfter) then
         begin

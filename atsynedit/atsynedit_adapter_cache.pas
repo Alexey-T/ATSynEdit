@@ -48,7 +48,7 @@ type
       var AParts: TATLineParts;
       const AColorAfterEol: TColor);
     function Get(
-      const ALineIndex, ACharIndex, ALineLen: integer;
+      const ALineIndex, ACharIndex: integer;
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
     procedure DeleteForLine(ALineIndex: integer);
@@ -144,7 +144,7 @@ end;
 
 
 function TATAdapterHiliteCache.Get(
-  const ALineIndex, ACharIndex, ALineLen: integer;
+  const ALineIndex, ACharIndex: integer;
   var AParts: TATLineParts;
   var AColorAfterEol: TColor): boolean;
 var

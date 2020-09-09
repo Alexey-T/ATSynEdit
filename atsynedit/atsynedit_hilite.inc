@@ -50,7 +50,7 @@ begin
     {$ifdef atsynedit_cache}
     //DynamicHilite must disable cache
     FAdapterCache.Enabled:= not FAdapterHilite.DynamicHiliteActiveNow(Strings.Count);
-    bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
+    bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, AParts, AColorAfter);
     if not bFound then
     begin
       FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
