@@ -193,7 +193,9 @@ begin
   for i:= FList.Count-1 downto 0 do
   begin
     Item:= FList._GetItemPtr(i);
-    if (Item^.LineIndex=ALineIndex) then
+    if Item^.LineIndex<ALineIndex then
+      Break;
+    if Item^.LineIndex=ALineIndex then
       FList.Delete(i);
   end;
 end;
