@@ -35,6 +35,7 @@ type
 
   TATAdapterHiliteCache = class
   private
+    FMaxSize: integer;
     FList: TATAdapterCacheItems;
     FEnabled: boolean;
     FTempItem: TATAdapterCacheItem;
@@ -45,6 +46,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     property Enabled: boolean read FEnabled write SetEnabled;
+    property MaxSize: integer read FMaxSize write FMaxSize;
     procedure Clear;
     procedure Add(
       const ALineIndex, ACharIndex: integer;
@@ -56,10 +58,6 @@ type
       var AColorAfterEol: TColor): boolean;
     procedure DeleteForLine(ALineIndex: integer);
   end;
-
-var
-  OptEditorAdapterCacheSize: integer = 100;
-
 
 implementation
 
@@ -97,6 +95,7 @@ end;
 
 constructor TATAdapterHiliteCache.Create;
 begin
+  FMaxSize:= 100;
   FList:= TATAdapterCacheItems.Create;
 end;
 
@@ -121,7 +120,7 @@ var
   bExact: boolean;
 begin
   if not Enabled then exit;
-  if OptEditorAdapterCacheSize<10 then exit;
+  if FMaxSize<10 then exit;
 
   //ignore if no parts
   if (AParts[0].Len=0) then exit;
@@ -140,8 +139,8 @@ begin
     then exit;
     }
 
-  if FList.Count>OptEditorAdapterCacheSize then
-    FList.Count:= OptEditorAdapterCacheSize;
+  if FList.Count>FMaxSize then
+    FList.Count:= FMaxSize;
 
   FTempItem.LineIndex:= ALineIndex;
   FTempItem.CharIndex:= ACharIndex;
