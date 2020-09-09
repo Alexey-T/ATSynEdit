@@ -3370,10 +3370,17 @@ begin
     Result:= FOptTextOffsetTop;
 end;
 
+function _IsColorDark(N: TColor): boolean;
+const
+  cMax = $60;
+begin
+  Result:= (Red(N)<cMax) and (Green(N)<cMax) and (Blue(N)<cMax);
+end;
+
 {$ifdef UseBgra}
 procedure TATSynEdit.DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
 const
-  cAlphaValue = $2000; //max is $FFFF
+  cChange = 7; //how much color is darker, %
 var
   R: TRect;
   rColor: TBGRAPixel;
@@ -3383,8 +3390,13 @@ begin
     GetRectMinimapSel(R);
     OffsetRect(R, -FRectMinimap.Left, -FRectMinimap.Top);
 
-    rColor.FromColor(Colors.MinimapSelBG);
-    C.FillRect(R, rColor, dmDrawWithTransparency, cAlphaValue);
+    // https://forum.lazarus.freepascal.org/index.php/topic,51383.msg377195.html#msg377195
+    if _IsColorDark(Colors.TextBG) then
+      rColor.FromRGB(255, 255, 255, cChange*255 div 100)
+    else
+      rColor.FromRGB(0, 0, 0, cChange*255 div 100);
+
+    C.FillRect(R, rColor, dmDrawWithTransparency);
 
     if FMinimapShowSelBorder then
     begin
