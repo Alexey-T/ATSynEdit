@@ -4315,18 +4315,14 @@ begin
 end;
 
 procedure TATSynEdit.UpdateAdapterCacheSize;
-{
 var
   N: integer;
-  }
 begin
-  {
   if FMinimapVisible then
-    N:= GetVisibleLinesMinimap+1
+    N:= Max(GetVisibleLines, GetVisibleLinesMinimap)+1
   else
-    N:= GetVisibleLines+2;
-  FAdapterCache.MaxCount:= N;
-  }
+    N:= GetVisibleLines+1;
+  FAdapterCache.MaxSize:= N;
 end;
 
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
