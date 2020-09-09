@@ -7,7 +7,7 @@ unit ATSynEdit_CanvasProc;
 {$mode objfpc}{$H+}
 {$MinEnumSize 1}
 
-//{$define UseBgra}
+{$I atsynedit_defines.inc}
 
 interface
 

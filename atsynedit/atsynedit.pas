@@ -13,7 +13,8 @@ License: MPL 2.0 or LGPL
                          //when horz-scroll hides/shows/hides/...
                          //ok also for win32
 //{$define at_show_scroll_info}
-//{$define UseBgra}
+
+{$I atsynedit_defines.inc}
 
 unit ATSynEdit;
 
