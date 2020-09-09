@@ -52,7 +52,7 @@ end;
     <Description Value="Multi-line editor control, used in CudaText editor. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
     <Version Major="1" Minor="6"/>
-    <Files Count="38">
+    <Files Count="37">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -202,10 +202,6 @@ end;
         <Filename Value="atsynedit_lineparts.pas"/>
         <UnitName Value="ATSynEdit_LineParts"/>
       </Item37>
-      <Item38>
-        <Filename Value="atsynedit_gdeque.pas"/>
-        <UnitName Value="atsynedit_gdeque"/>
-      </Item38>
     </Files>
     <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="4">
