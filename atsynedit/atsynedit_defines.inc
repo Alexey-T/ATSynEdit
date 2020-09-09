@@ -1,1 +1,1 @@
-{.$define UseBgra} // Use BGRABitmap to render minimap
+{$define UseBgra} // Use BGRABitmap to render minimap
