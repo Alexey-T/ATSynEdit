@@ -5589,7 +5589,7 @@ begin
         if (not ModeOneLine) and FOptMouseWheelScrollVert then
         begin
           //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
-          DoScrollByDelta(0, NSpeedY);
+          DoScrollByDeltaInPixels(0, NSpeedY*FCharSize.Y);
           Invalidate;
           Result:= true;
         end;
