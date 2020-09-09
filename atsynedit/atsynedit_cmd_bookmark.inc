@@ -14,8 +14,8 @@ begin
   Data.Tag:= ATag;
   Strings.Bookmarks.Add(Data);
 
-  //InvalidateHilitingCache(ALine); //it hangs! on FPC 3.2.1, on Linux x64, gdeque Erase(0) hangs
-  InvalidateHilitingCache;
+  InvalidateHilitingCache(ALine);
+  //InvalidateHilitingCache; //use it if the above call hangs (due to FPC bug)
 
   Update;
 end;
