@@ -54,7 +54,7 @@ begin
     if not bFound then
     begin
       FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
-      FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
+      FAdapterCache.Add(nLineIndex, nCharIndex, AParts, AColorAfter);
     end;
     {$else}
     FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);

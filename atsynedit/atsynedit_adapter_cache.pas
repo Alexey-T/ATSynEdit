@@ -20,7 +20,7 @@ type
 
   PATAdapterCacheItem = ^TATAdapterCacheItem;
   TATAdapterCacheItem = packed record
-    LineIndex, CharIndex, LineLen: integer;
+    LineIndex, CharIndex: integer;
     ColorAfterEol: TColor;
     Parts: TATLineParts;
   end;
@@ -44,7 +44,7 @@ type
     property Enabled: boolean read FEnabled write SetEnabled;
     procedure Clear;
     procedure Add(
-      const ALineIndex, ACharIndex, ALineLen: integer;
+      const ALineIndex, ACharIndex: integer;
       var AParts: TATLineParts;
       const AColorAfterEol: TColor);
     function Get(
@@ -104,7 +104,7 @@ begin
 end;
 
 procedure TATAdapterHiliteCache.Add(
-  const ALineIndex, ACharIndex, ALineLen: integer;
+  const ALineIndex, ACharIndex: integer;
   var AParts: TATLineParts;
   const AColorAfterEol: TColor);
 var
@@ -136,7 +136,6 @@ begin
 
   FTempItem.LineIndex:= ALineIndex;
   FTempItem.CharIndex:= ACharIndex;
-  FTempItem.LineLen:= ALineLen;
   FTempItem.ColorAfterEol:= AColorAfterEol;
   CopyLineParts(AParts, FTempItem.Parts);
 
@@ -159,8 +158,7 @@ begin
   begin
     Item:= FList.Mutable[i];
     if (Item^.LineIndex=ALineIndex) and
-      (Item^.CharIndex=ACharIndex) and
-      (Item^.LineLen=ALineLen) then
+      (Item^.CharIndex=ACharIndex) then
       begin
         CopyLineParts(Item^.Parts, AParts);
         AColorAfterEol:= Item^.ColorAfterEol;
