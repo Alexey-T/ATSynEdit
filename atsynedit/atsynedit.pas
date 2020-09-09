@@ -282,6 +282,7 @@ const
   cInitTimerAutoScroll = 100;
   cInitTimerNiceScroll = 100;
   cInitMinimapVisible = false;
+  cInitMinimapSelColorChange = 6;
   cInitMinimapTooltipVisible = true;
   cInitMinimapTooltipLinesCount = 6;
   cInitMinimapTooltipWidthPercents = 60;
@@ -639,6 +640,7 @@ type
     FMinimapVisible: boolean;
     FMinimapShowSelBorder: boolean;
     FMinimapShowSelAlways: boolean;
+    FMinimapSelColorChange: integer;
     FMinimapAtLeft: boolean;
     FMinimapTooltipVisible: boolean;
     FMinimapTooltipLinesCount: integer;
@@ -1599,6 +1601,7 @@ type
     property OptMinimapCharWidth: integer read FMinimapCharWidth write FMinimapCharWidth default 0;
     property OptMinimapShowSelBorder: boolean read FMinimapShowSelBorder write FMinimapShowSelBorder default false;
     property OptMinimapShowSelAlways: boolean read FMinimapShowSelAlways write FMinimapShowSelAlways default true;
+    property OptMinimapSelColorChange: integer read FMinimapSelColorChange write FMinimapSelColorChange default cInitMinimapSelColorChange;
     property OptMinimapAtLeft: boolean read FMinimapAtLeft write FMinimapAtLeft default false;
     property OptMinimapTooltipVisible: boolean read FMinimapTooltipVisible write FMinimapTooltipVisible default cInitMinimapTooltipVisible;
     property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
@@ -3379,8 +3382,6 @@ end;
 
 {$ifdef UseBgra}
 procedure TATSynEdit.DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
-const
-  cChange = 7; //how much color is darker, %
 var
   R: TRect;
   rColor: TBGRAPixel;
@@ -3392,9 +3393,9 @@ begin
 
     // https://forum.lazarus.freepascal.org/index.php/topic,51383.msg377195.html#msg377195
     if _IsColorDark(Colors.TextBG) then
-      rColor.FromRGB(255, 255, 255, cChange*255 div 100)
+      rColor.FromRGB(255, 255, 255, FMinimapSelColorChange*255 div 100)
     else
-      rColor.FromRGB(0, 0, 0, cChange*255 div 100);
+      rColor.FromRGB(0, 0, 0, FMinimapSelColorChange*255 div 100);
 
     C.FillRect(R, rColor, dmDrawWithTransparency);
 
@@ -3877,6 +3878,7 @@ begin
   FMinimapVisible:= cInitMinimapVisible;
   FMinimapShowSelBorder:= false;
   FMinimapShowSelAlways:= true;
+  FMinimapSelColorChange:= cInitMinimapSelColorChange;
   FMinimapAtLeft:= false;
   FMinimapTooltipVisible:= cInitMinimapTooltipVisible;
   FMinimapTooltipLinesCount:= cInitMinimapTooltipLinesCount;
