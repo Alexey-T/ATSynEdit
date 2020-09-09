@@ -949,7 +949,8 @@ var
   Part: PATLinePart;
   NPartIndex, NCharIndex, NSpaces: integer;
   X1, X2, Y1, Y2: integer;
-  HasBG: boolean;
+  bHasBG: boolean;
+  bSpace: boolean;
   NColorBack, NColorFont, NColorFontHalf: TColor;
   ch: WideChar;
 begin
@@ -968,11 +969,11 @@ begin
     NColorBack:= Part^.ColorBG;
     if NColorBack=clNone then
       NColorBack:= AColorBG;
-    HasBG:= NColorBack<>AColorBG;
+    bHasBG:= NColorBack<>AColorBG;
 
     //clNone means that it's empty/space part (adapter must set so)
     if NColorFont=clNone then
-      if HasBG then
+      if bHasBG then
         NColorFont:= NColorBack
       else
         Continue;
@@ -986,9 +987,15 @@ begin
       if NCharIndex>Length(ALine) then Break;
       ch:= ALine[NCharIndex];
       if ch=#9 then
-        Inc(NSpaces, ATabSize)
+      begin
+        bSpace:= true;
+        Inc(NSpaces, ATabSize);
+      end
       else
+      begin
+        bSpace:= ch=' ';
         Inc(NSpaces);
+      end;
 
       X1:= APosX + ACharSize.X*NSpaces;
       X2:= X1 + ACharSize.X;
@@ -1001,7 +1008,7 @@ begin
         //if X2>ARect.Right then
         //  X2:= ARect.Right;
 
-        if HasBG then
+        if bHasBG then
         begin
           //paint BG as 2 pixel line
           if AUsePixels then
@@ -1016,7 +1023,7 @@ begin
           end;
         end;
 
-        if not IsCharSpace(ch) then
+        if not bSpace then
         begin
           if AUsePixels then
           begin
@@ -1049,6 +1056,7 @@ var
   NPartIndex, NCharIndex, NSpaces: integer;
   X1, X2, Y1, Y2: integer;
   bHasBG: boolean;
+  bSpace: boolean;
   NColorBack, NColorFont, NColorFontHalf: TColor;
   ch: WideChar;
   rColorBack, rColorFont: TBGRAPixel;
@@ -1088,9 +1096,15 @@ begin
       if NCharIndex>Length(ALine) then Break;
       ch:= ALine[NCharIndex];
       if ch=#9 then
-        Inc(NSpaces, ATabSize)
+      begin
+        bSpace:= true;
+        Inc(NSpaces, ATabSize);
+      end
       else
+      begin
+        bSpace:= ch=' ';
         Inc(NSpaces);
+      end;
 
       X1:= APosX + ACharSize.X*NSpaces;
       X2:= X1 + ACharSize.X;
@@ -1105,16 +1119,14 @@ begin
       begin
         if bHasBG then
           C.SetPixel(X1, Y1, rColorBack);
-
-        if not IsCharSpace(ch) then
+        if not bSpace then
           C.SetPixel(X1, Y1+ACharSize.Y div 2, rColorFont);
       end
       else
       begin
         if bHasBG then
           C.FillRect(X1, Y1, X2, Y2, rColorBack);
-
-        if not IsCharSpace(ch) then
+        if not bSpace then
           C.FillRect(X1, Y1+ACharSize.Y div 2, X2, Y2, rColorFont);
       end;
     end;
