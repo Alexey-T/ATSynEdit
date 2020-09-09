@@ -13,6 +13,7 @@ License: MPL 2.0 or LGPL
                          //when horz-scroll hides/shows/hides/...
                          //ok also for win32
 //{$define at_show_scroll_info}
+//{$define UseBgra}
 
 unit ATSynEdit;
 
@@ -29,6 +30,9 @@ uses
   LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
+  {$ifdef UseBgra}
+  BGRABitmap,
+  {$endif}
   ATStringProc,
   ATStrings,
   ATStringProc_WordJump,
@@ -654,6 +658,9 @@ type
     {$endif}
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
+    {$ifdef UseBgra}
+    FFastBmp: TBGRABitmap;
+    {$endif}
 
     FOptScaleFont: integer;
     FOptIdleInterval: integer;
@@ -2820,6 +2827,9 @@ begin
               WrapItem.NLineIndex,
               WrapItem.NCharIndex,
               GetVisibleColumns), //optimize for huge lines
+            {$ifdef UseBgra}
+            FFastBmp,
+            {$endif}
             bUseSetPixel
             );
 
@@ -3092,6 +3102,9 @@ begin
             WrapItem.NLineIndex,
             WrapItem.NCharIndex,
             GetVisibleColumns), //optimize for huge lines
+          {$ifdef UseBgra}
+          FFastBmp,
+          {$endif}
           bUseSetPixel
           );
 
@@ -3648,6 +3661,10 @@ begin
   FAdapterCache:= TATAdapterHiliteCache.Create;
   FLinkCache:= TATLinkCache.Create;
 
+  {$ifdef UseBgra}
+  FFastBmp:= TBGRABitmap.Create;
+  {$endif}
+
   {$ifdef windows}
   FAdapterIME:= TATAdapterIMEStandard.Create;
   {$endif}
@@ -3991,6 +4008,9 @@ begin
     FFoldedMarkList.Clear;
     FreeAndNil(FFoldedMarkList);
   end;
+  {$ifdef UseBgra}
+  FreeAndNil(FFastBmp);
+  {$endif}
   FreeAndNil(FMicromap);
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);
