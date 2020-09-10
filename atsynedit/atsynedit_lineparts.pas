@@ -22,11 +22,16 @@ type
     cLineStyleWave
     );
 
+const
+  afsFontBold = 1;
+  afsFontItalic = 2;
+  afsFontCrossed = 4;
+
 type
   TATLinePart = packed record
-    Offset, Len: integer;
+    Offset, Len: word;
     ColorFont, ColorBG, ColorBorder: TColor;
-    FontBold, FontItalic, FontStrikeOut: ByteBool;
+    FontStyles: byte;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;
   end;
   PATLinePart = ^TATLinePart;
@@ -209,9 +214,7 @@ begin
   PartSelBegin.Offset:= AParts[nIndex1].Offset+nOffset1;
   PartSelBegin.Len:= AParts[nIndex1].Len-nOffset1;
 
-  PartSelBegin.FontBold:= AParts[nIndex1].FontBold;
-  PartSelBegin.FontItalic:= AParts[nIndex1].FontItalic;
-  PartSelBegin.FontStrikeOut:= AParts[nIndex1].FontStrikeOut;
+  PartSelBegin.FontStyles:= AParts[nIndex1].FontStyles;
   PartSelBegin.BorderDown:= AParts[nIndex1].BorderDown;
   PartSelBegin.BorderLeft:= AParts[nIndex1].BorderLeft;
   PartSelBegin.BorderRight:= AParts[nIndex1].BorderRight;
@@ -222,9 +225,7 @@ begin
   PartSelEnd.ColorBG:= APart.ColorBG;
   PartSelEnd.Offset:= AParts[nIndex2].Offset;
   PartSelEnd.Len:= nOffset2;
-  PartSelEnd.FontBold:= AParts[nIndex2].FontBold;
-  PartSelEnd.FontItalic:= AParts[nIndex2].FontItalic;
-  PartSelEnd.FontStrikeOut:= AParts[nIndex2].FontStrikeOut;
+  PartSelEnd.FontStyles:= AParts[nIndex2].FontStyles;
   PartSelEnd.BorderDown:= AParts[nIndex2].BorderDown;
   PartSelEnd.BorderLeft:= AParts[nIndex2].BorderLeft;
   PartSelEnd.BorderRight:= AParts[nIndex2].BorderRight;

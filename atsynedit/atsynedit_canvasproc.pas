@@ -639,6 +639,8 @@ var
   {$ifdef windows}
   bAllowLigatures: boolean;
   {$endif}
+  NStyles: integer;
+  bBold, bItalic: boolean;
   ch: WideChar;
 begin
   NLen:= Length(AText);
@@ -710,9 +712,13 @@ begin
       if PartStr='' then Break;
 
       PartFontStyle:= [];
-      if PartPtr^.FontBold then Include(PartFontStyle, fsBold);
-      if PartPtr^.FontItalic then Include(PartFontStyle, fsItalic);
-      if PartPtr^.FontStrikeOut then Include(PartFontStyle, fsStrikeOut);
+      NStyles:= PartPtr^.FontStyles;
+      if (NStyles and afsFontBold)<>0 then
+        Include(PartFontStyle, fsBold);
+      if (NStyles and afsFontItalic)<>0 then
+        Include(PartFontStyle, fsItalic);
+      if (NStyles and afsFontCrossed)<>0 then
+        Include(PartFontStyle, fsStrikeOut);
 
       if PartOffset>0 then
         PixOffset1:= ListInt[PartOffset-1]
@@ -729,7 +735,11 @@ begin
       C.Brush.Color:= PartPtr^.ColorBG;
       C.Font.Style:= PartFontStyle;
 
-      if PartPtr^.FontItalic and not PartPtr^.FontBold then
+      NStyles:= PartPtr^.FontStyles;
+      bBold:= (NStyles and afsFontBold)<>0;
+      bItalic:= (NStyles and afsFontItalic)<>0;
+
+      if bItalic and not bBold then
       begin
         if AProps.FontItalic_Name<>'' then
         begin
@@ -738,7 +748,7 @@ begin
         end;
       end
       else
-      if PartPtr^.FontBold and not PartPtr^.FontItalic then
+      if bBold and not bItalic then
       begin
         if AProps.FontBold_Name<>'' then
         begin
@@ -747,7 +757,7 @@ begin
         end;
       end
       else
-      if PartPtr^.FontBold and PartPtr^.FontItalic then
+      if bBold and bItalic then
       begin
         if AProps.FontBoldItalic_Name<>'' then
         begin
@@ -770,7 +780,7 @@ begin
       //increase rect to avoid clipping of italic font at line end,
       //eg comment //WWW, if theme has italic comments style,
       //with font eg "Fira Code Retina"
-      if PartPtr^.FontItalic then
+      if bItalic then
         Inc(PartRect.Right,
           C.Font.Size * OptItalicFontLongerInPercents div 100
           );

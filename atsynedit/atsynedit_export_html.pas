@@ -136,9 +136,9 @@ begin
           Continue;
         end;
 
-        if PPart^.FontBold then S+= '<b>';
-        if PPart^.FontItalic then S+= '<i>';
-        if PPart^.FontStrikeOut then S+= '<s>';
+        if (PPart^.FontStyles and afsFontBold)<>0 then S+= '<b>';
+        if (PPart^.FontStyles and afsFontItalic)<>0  then S+= '<i>';
+        if (PPart^.FontStyles and afsFontCrossed)<>0 then S+= '<s>';
 
         if NeedStyle then
         begin
@@ -156,9 +156,9 @@ begin
         if NeedStyle then
           S+= '</span>';
 
-        if PPart^.FontStrikeOut then S+= '</s>';
-        if PPart^.FontItalic then S+= '</i>';
-        if PPart^.FontBold then S+= '</b>';
+        if (PPart^.FontStyles and afsFontCrossed)<>0  then S+= '</s>';
+        if (PPart^.FontStyles and afsFontItalic)<>0  then S+= '</i>';
+        if (PPart^.FontStyles and afsFontBold)<>0  then S+= '</b>';
       end;
       LCode.Add(S);
     end;
