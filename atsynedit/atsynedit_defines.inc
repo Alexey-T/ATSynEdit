@@ -1,4 +1,4 @@
-{$define UseBgra} // Use BGRABitmap to render minimap
+{$define use_bg} // Use BGRABitmap to render minimap
 
 {.$define debug_show_fps}
 

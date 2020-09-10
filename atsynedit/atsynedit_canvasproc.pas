@@ -17,7 +17,7 @@ uses
   {$endif}
   Classes, SysUtils, Graphics, Types,
   Forms,
-  {$ifdef UseBgra}
+  {$ifdef use_bg}
   BGRABitmap,
   BGRABitmapTypes,
   {$endif}
@@ -121,7 +121,7 @@ procedure CanvasTextOut(C: TCanvas;
   );
 
 procedure CanvasTextOutMinimap(
-  {$ifdef UseBgra} C: TBGRABitmap; {$else} C: TCanvas; {$endif}
+  {$ifdef use_bg} C: TBGRABitmap; {$else} C: TCanvas; {$endif}
   const ARect: TRect;
   APosX, APosY: integer;
   ACharSize: TPoint;
@@ -935,7 +935,7 @@ begin
 end;
 
 
-{$ifndef UseBgra}
+{$ifndef use_bg}
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APosX, APosY: integer;
   ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
   AColorBG: TColor; const ALine: atString; AUsePixels: boolean);

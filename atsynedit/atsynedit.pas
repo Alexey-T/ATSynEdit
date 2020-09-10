@@ -23,7 +23,7 @@ uses
   LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
-  {$ifdef UseBgra}
+  {$ifdef use_bg}
   BGRABitmap,
   BGRABitmapTypes,
   {$endif}
@@ -654,7 +654,7 @@ type
     {$endif}
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
-    {$ifdef UseBgra}
+    {$ifdef use_bg}
     FFastBmp: TBGRABitmap;
     {$endif}
 
@@ -946,7 +946,7 @@ type
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
-    {$ifdef UseBgra}
+    {$ifdef use_bg}
     procedure DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
     {$else}
     procedure DoPaintMinimapSelTo(C: TCanvas);
@@ -2817,10 +2817,10 @@ begin
             NCoordTop);
 
           CanvasTextOutMinimap(
-            {$ifdef UseBgra} FFastBmp, {$else} C, {$endif}
+            {$ifdef use_bg} FFastBmp, {$else} C, {$endif}
             ARect,
-            CurrPointText.X {$ifdef UseBgra} - FRectMinimap.Left {$endif},
-            CurrPointText.Y {$ifdef UseBgra} - FRectminimap.Top {$endif},
+            CurrPointText.X {$ifdef use_bg} - FRectMinimap.Left {$endif},
+            CurrPointText.Y {$ifdef use_bg} - FRectminimap.Top {$endif},
             ACharSize,
             FTabSize,
             FLineParts,
@@ -3090,10 +3090,10 @@ begin
       else
       if StrOutput<>'' then
         CanvasTextOutMinimap(
-          {$ifdef UseBgra} FFastBmp, {$else} C, {$endif}
+          {$ifdef use_bg} FFastBmp, {$else} C, {$endif}
           ARect,
-          CurrPointText.X {$ifdef UseBgra} - FRectMinimap.Left {$endif},
-          CurrPointText.Y {$ifdef UseBgra} - FRectminimap.Top {$endif},
+          CurrPointText.X {$ifdef use_bg} - FRectMinimap.Left {$endif},
+          CurrPointText.Y {$ifdef use_bg} - FRectminimap.Top {$endif},
           ACharSize,
           FTabSize,
           FLineParts,
@@ -3372,7 +3372,7 @@ begin
   Result:= (Red(N)<cMax) and (Green(N)<cMax) and (Blue(N)<cMax);
 end;
 
-{$ifdef UseBgra}
+{$ifdef use_bg}
 procedure TATSynEdit.DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
 var
   R: TRect;
@@ -3445,20 +3445,20 @@ begin
   FScrollVertMinimap.NPos:= GetMinimapScrollPos;
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
 
-  {$ifdef UseBgra}
+  {$ifdef use_bg}
   FFastBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
   FFastBmp.Fill(FColorBG);
   {$endif}
 
   DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
 
-  {$ifdef UseBgra}
+  {$ifdef use_bg}
   DoPaintMinimapSelTo_BGRA(FFastBmp);
   {$else}
   DoPaintMinimapSelTo(C);
   {$endif}
 
-  {$ifdef UseBgra}
+  {$ifdef use_bg}
   FFastBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
   {$endif}
 
@@ -3713,7 +3713,7 @@ begin
   FAdapterCache:= TATAdapterHiliteCache.Create;
   FLinkCache:= TATLinkCache.Create;
 
-  {$ifdef UseBgra}
+  {$ifdef use_bg}
   FFastBmp:= TBGRABitmap.Create;
   {$endif}
 
@@ -4061,7 +4061,7 @@ begin
     FFoldedMarkList.Clear;
     FreeAndNil(FFoldedMarkList);
   end;
-  {$ifdef UseBgra}
+  {$ifdef use_bg}
   FreeAndNil(FFastBmp);
   {$endif}
   FreeAndNil(FMicromap);
