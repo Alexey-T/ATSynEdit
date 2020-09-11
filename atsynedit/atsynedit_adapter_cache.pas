@@ -57,6 +57,7 @@ type
       var AParts: TATLineParts;
       var AColorAfterEol: TColor): boolean;
     procedure DeleteForLine(ALineIndex: integer);
+    procedure DeleteOutOfRange(ALine1, ALine2: integer);
   end;
 
 implementation
@@ -195,6 +196,19 @@ begin
     if Item^.LineIndex<ALineIndex then
       Break;
     if Item^.LineIndex=ALineIndex then
+      FList.Delete(i);
+  end;
+end;
+
+procedure TATAdapterHiliteCache.DeleteOutOfRange(ALine1, ALine2: integer);
+var
+  Item: PATAdapterCacheItem;
+  i: integer;
+begin
+  for i:= FList.Count-1 downto 0 do
+  begin
+    Item:= FList._GetItemPtr(i);
+    if (Item^.LineIndex>ALine2) or (Item^.LineIndex<ALine1) then
       FList.Delete(i);
   end;
 end;

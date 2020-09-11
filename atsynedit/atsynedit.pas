@@ -7647,7 +7647,8 @@ end;
 {$ifdef DEBUG_SHOW_FPS}
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);
 var
-  NFps, NFpsMap: integer;
+  NFps: integer;
+  //NFpsMap: integer;
   S: string;
 begin
   if FTickAll<1 then
@@ -7655,7 +7656,7 @@ begin
   if FTickMinimap<1 then
     FTickMinimap:= 1;
   NFps:= 1000 div FTickAll div 5 * 5;
-  NFpsMap:= 1000 div FTickMinimap;
+  //NFpsMap:= 1000 div FTickMinimap;
 
   C.Font.Name:= 'Arial';
   C.Font.Color:= clRed;
