@@ -1167,7 +1167,7 @@ begin
       if X1>ARect.Right then Break;
       Inc(NSpaces, NSpaceThis);
 
-      if AUsePixels then
+      if AUsePixels and (NSpaceThis=1) then
       begin
         if bHasBG then
           C.SetPixel(X1, Y1, rColorBack);
