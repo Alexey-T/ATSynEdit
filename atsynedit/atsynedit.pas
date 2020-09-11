@@ -5261,12 +5261,15 @@ begin
 end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
+const
+  cMovedDeltaPx = 5;
 var
   P: TPoint;
   RectNums, RectBookmk: TRect;
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
+  bMovedMinimal: boolean;
   Details: TATPosDetails;
   nIndex: integer;
   Caret: TATCaretItem;
@@ -5276,6 +5279,10 @@ begin
 
   P:= Point(X, Y);
   UpdateCursor;
+
+  bMovedMinimal:=
+    (Abs(X-FMouseDownCoordOriginal.X)>cMovedDeltaPx) or
+    (Abs(Y-FMouseDownCoordOriginal.Y)>cMovedDeltaPx);
 
   bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
   bSelectingGutterNumbers:= FMouseDownGutterLineNumber>=0;
@@ -5524,7 +5531,7 @@ begin
 
   //mouse dragged on minimap
   if bOnMinimap then
-    if FMouseDragMinimap then
+    if FMouseDragMinimap and bMovedMinimal then
     begin
       if Shift=[ssLeft] then
         DoMinimapDrag(Y);
