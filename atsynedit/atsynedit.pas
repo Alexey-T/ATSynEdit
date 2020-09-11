@@ -2439,7 +2439,7 @@ begin
   R.Right:= FRectMinimap.Right;
   R.Top:= GetMinimapSelTop;
   R.Bottom:= Min(
-    R.Top + (FScrollVert.NPage+1)*FCharSizeMinimap.Y,
+    R.Top + (GetVisibleLines+1)*FCharSizeMinimap.Y,
     FRectMinimap.Bottom
     );
 end;
