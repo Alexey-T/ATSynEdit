@@ -4887,6 +4887,19 @@ begin
   FMouseDownCoord.X:= X + FScrollHorz.TotalOffset;
   FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset;
 
+  if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
+  begin
+    GetRectMinimapSel(R);
+    FMouseDownOnMinimap:= true;
+    FMouseDragMinimapSelHeight:= R.Height;
+    if PtInRect(R, Point(X, Y)) then
+    begin
+      FMouseDragMinimap:= true;
+      FMouseDragMinimapDelta:= Y-R.Top;
+    end;
+    Exit;
+  end;
+
   PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
   FMouseDownOnMinimap:= false;
@@ -4905,18 +4918,6 @@ begin
   begin
     MouseNiceScroll:= false;
     Exit
-  end;
-
-  if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
-  begin
-    GetRectMinimapSel(R);
-    FMouseDownOnMinimap:= true;
-    FMouseDragMinimapSelHeight:= R.Height;
-    if PtInRect(R, Point(X, Y)) then
-    begin
-      FMouseDragMinimap:= true;
-      FMouseDragMinimapDelta:= Y-R.Top;
-    end;
   end;
 
   if PtInRect(FRectMain, Point(X, Y)) then
