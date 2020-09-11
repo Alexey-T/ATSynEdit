@@ -3061,6 +3061,7 @@ begin
         TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
         TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not bLineWithCaret);
+        TextOutProps.ColorNormalFont:= Colors.TextFont;
         TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
         TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 
@@ -7452,6 +7453,7 @@ begin
   TextOutProps.DetectIsPosSelected:= @IsPosSelected;
 
   TextOutProps.ShowFontLigatures:= FOptShowFontLigatures;
+  TextOutProps.ColorNormalFont:= Colors.TextFont;
   TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
   TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
 

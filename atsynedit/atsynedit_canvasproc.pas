@@ -90,6 +90,7 @@ type
     ShowUnprintedSpacesBothEnds: boolean;
     ShowUnprintedSpacesOnlyInSelection: boolean;
     ShowFontLigatures: boolean;
+    ColorNormalFont: TColor;
     ColorUnprintedFont: TColor;
     ColorUnprintedHexFont: TColor;
     FontNormal_Name: string;
@@ -702,7 +703,8 @@ begin
       );
   end
   else
-  for j:= 0 to High(TATLineParts) do
+  begin
+    for j:= 0 to High(TATLineParts) do
     begin
       PartPtr:= @AParts^[j];
       PartLen:= PartPtr^.Len;
@@ -872,6 +874,37 @@ begin
           true);
       end;
     end;
+
+    //paint chars after all LineParts are painted, when too many tokens in line
+    PartPtr:= @AParts^[High(TATLineParts)-1];
+    PartLen:= PartPtr^.Len;
+    if PartLen>0 then
+    begin
+      PartOffset:= PartPtr^.Offset;
+      PartStr:= Copy(AText, PartOffset+1+PartLen, MaxInt);
+      PixOffset1:= ListInt[PartOffset];
+      C.Font.Color:= AProps.ColorNormalFont;
+      C.Font.Style:= [];
+
+      {$ifdef windows}
+      _TextOut_Windows(C.Handle,
+        APosX+PixOffset1,
+        APosY+AProps.TextOffsetFromLine,
+        nil,
+        PartStr,
+        nil
+        );
+      {$else}
+      _TextOut_Unix(C.Handle,
+        APosX+PixOffset1,
+        APosY+AProps.TextOffsetFromLine,
+        nil,
+        PartStr,
+        nil
+        );
+      {$endif}
+    end;
+  end;
 
   if AProps.ShowUnprinted then
   begin
