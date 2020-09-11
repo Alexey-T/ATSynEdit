@@ -1110,7 +1110,12 @@ begin
   //offset<0 means some bug on making parts!
   if AParts[0].Offset<0 then exit;
 
+  X1:= 0;
+  X2:= 0;
+  Y1:= APosY;
+  Y2:= Y1 + ACharSize.Y;
   NSpaces:= 0;
+
   for NPartIndex:= Low(TATLineParts) to High(TATLineParts) do
   begin
     Part:= @AParts[NPartIndex];
@@ -1154,8 +1159,6 @@ begin
 
       X1:= APosX + ACharSize.X*NSpaces;
       X2:= X1 + ACharSize.X*NSpaceThis;
-      Y1:= APosY;
-      Y2:= Y1 + ACharSize.Y;
 
       if X1>ARect.Right then Break;
       Inc(NSpaces, NSpaceThis);
