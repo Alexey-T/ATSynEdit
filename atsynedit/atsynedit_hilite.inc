@@ -42,6 +42,7 @@ begin
   bEnableHilite:= Strings.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
 
   FillChar(AParts, SizeOf(AParts), 0);
+  if nLineLen=0 then exit;
 
   //1) get hilites from adapter
   if bEnableHilite then
@@ -55,6 +56,9 @@ begin
     begin
       FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
       FAdapterCache.Add(nLineIndex, nCharIndex, AParts, AColorAfter);
+      {$ifdef debug_show_fps}
+      Inc(FMissMain);
+      {$endif}
     end;
     {$else}
     FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);

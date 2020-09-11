@@ -651,6 +651,8 @@ type
     {$ifdef debug_show_fps}
     FTickMinimap: QWord;
     FTickAll: QWord;
+    FMissMain: integer;
+    FMissMinimap: integer;
     {$endif}
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
@@ -2789,11 +2791,8 @@ begin
     //if line parts cached, paint them now
     NColorAfter:= clNone;
     if bCachedMinimap then
-      if FAdapterCache.Get(
-        WrapItem.NLineIndex,
-        WrapItem.NCharIndex,
-        FLineParts,
-        NColorAfter) then
+      if (WrapItem.NLength>0) and
+        FAdapterCache.Get(WrapItem.NLineIndex, WrapItem.NCharIndex, FLineParts, NColorAfter) then
         begin
           DoCalcLineEntireColor(
             WrapItem.NLineIndex,
@@ -2836,6 +2835,13 @@ begin
           Inc(NCoordTop, ACharSize.Y);
           Inc(NWrapIndex);
           Continue;
+        end
+        else
+        begin
+          {$ifdef debug_show_fps}
+          if WrapItem.NLength>0 then
+            Inc(FMissMinimap);
+          {$endif}
         end;
     {$endif}
 
@@ -4519,6 +4525,8 @@ begin
 
   {$ifdef debug_show_fps}
   FTickAll:= GetTickCount64;
+  FMissMain:= 0;
+  FMissMinimap:= 0;
   {$endif}
 
   //if scrollbars shown, paint again
@@ -7649,14 +7657,16 @@ begin
   NFps:= 1000 div FTickAll div 5 * 5;
   NFpsMap:= 1000 div FTickMinimap;
 
-  //S:= Format('#%d, fps %d/%d', [FPaintCounter, NFps, NFpsMap]);
-  S:= Format('#%d, fps %d', [FPaintCounter, NFps]);
-
   C.Font.Name:= 'Arial';
   C.Font.Color:= clRed;
   C.Font.Size:= 8;
   C.Brush.Color:= clCream;
+
+  S:= Format('#%d, fps %d', [FPaintCounter, NFps]);
   CanvasTextOutSimplest(C, FClientW-100, 5, S);
+
+  S:= Format('miss %d+%d', [FMissMain-FMissMinimap, FMissMinimap]);
+  CanvasTextOutSimplest(C, FClientW-100, 20, S);
 end;
 {$else}
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);
