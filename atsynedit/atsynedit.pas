@@ -648,7 +648,7 @@ type
     FFoldedMarkTooltip: TPanel;
     FPaintCounter: integer;
     FPaintStarted: boolean;
-    {$ifdef debug_show_fps}
+    {$ifdef debug_fps}
     FTickMinimap: QWord;
     FTickAll: QWord;
     FMissMain: integer;
@@ -2839,7 +2839,7 @@ begin
         end
         else
         begin
-          {$ifdef debug_show_fps}
+          {$ifdef debug_fps}
           if WrapItem.NLength>0 then
             Inc(FMissMinimap);
           {$endif}
@@ -3443,7 +3443,7 @@ end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
 begin
-  {$ifdef debug_show_fps}
+  {$ifdef debug_fps}
   FTickMinimap:= GetTickCount64;
   {$endif}
 
@@ -3470,7 +3470,7 @@ begin
   FFastBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
   {$endif}
 
-  {$ifdef debug_show_fps}
+  {$ifdef debug_fps}
   FTickMinimap:= GetTickCount64-FTickMinimap;
   {$endif}
 end;
@@ -4525,7 +4525,7 @@ begin
   if DoubleBuffered then
     if not Assigned(FBitmap) then exit;
 
-  {$ifdef debug_show_fps}
+  {$ifdef debug_fps}
   FTickAll:= GetTickCount64;
   FMissMain:= 0;
   FMissMinimap:= 0;
@@ -4560,7 +4560,7 @@ begin
 
   DoPaintMarkerOfDragDrop(Canvas);
 
-  {$ifdef debug_show_fps}
+  {$ifdef debug_fps}
   FTickAll:= GetTickCount64-FTickAll;
   DoPaintFPS(Canvas);
   {$endif}
@@ -7643,7 +7643,7 @@ begin
   FTabHelper.OnCalcLineLen:= @DoCalcLineLen;
 end;
 
-{$ifdef DEBUG_SHOW_FPS}
+{$ifdef debug_fps}
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);
 var
   NFps: integer;
