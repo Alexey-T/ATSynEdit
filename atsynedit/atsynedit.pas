@@ -7437,9 +7437,6 @@ begin
   TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;
   TextOutProps.CharsSkipped:= 0;
-    //todo:
-    //needed number of chars of all chars counted as 100%,
-    //while NOutputSpacesSkipped is with cjk counted as 170%
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
   TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
