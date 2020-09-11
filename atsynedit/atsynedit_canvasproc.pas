@@ -128,6 +128,7 @@ procedure CanvasTextOutMinimap(
   ATabSize: integer;
   constref AParts: TATLineParts;
   AColorBG: TColor;
+  AColorAfter: TColor;
   const ALine: atString;
   AUsePixels: boolean
   );
@@ -971,7 +972,8 @@ end;
 {$ifndef use_bg}
 procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APosX, APosY: integer;
   ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
-  AColorBG: TColor; const ALine: atString; AUsePixels: boolean);
+  AColorBG: TColor; AColorAfter: TColor;
+  const ALine: atString; AUsePixels: boolean);
 var
   CanvasHandle: THandle;
   //
@@ -1088,7 +1090,8 @@ procedure CanvasTextOutMinimap(
   C: TBGRABitmap;
   const ARect: TRect; APosX, APosY: integer;
   ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
-  AColorBG: TColor; const ALine: atString;
+  AColorBG: TColor; AColorAfter: TColor;
+  const ALine: atString;
   AUsePixels: boolean
   );
 {
@@ -1172,6 +1175,12 @@ begin
           C.FillRect(X1, Y1+ACharSize.Y div 2, X2, Y2, rColorFont);
       end;
     end;
+  end;
+
+  if AColorAfter<>clNone then
+  begin
+    rColorBack.FromColor(AColorAfter);
+    C.FillRect(X2, Y1, ARect.Right, Y2, rColorBack);
   end;
 end;
 {$endif}

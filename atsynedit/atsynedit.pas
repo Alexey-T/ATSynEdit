@@ -2824,6 +2824,7 @@ begin
             FTabSize,
             FLineParts,
             FColorBG,
+            NColorAfter,
             Strings.LineSub(
               WrapItem.NLineIndex,
               WrapItem.NCharIndex,
@@ -3104,6 +3105,7 @@ begin
           FTabSize,
           FLineParts,
           FColorBG,
+          NColorAfter,
           Strings.LineSub(
             WrapItem.NLineIndex,
             WrapItem.NCharIndex,
