@@ -119,6 +119,7 @@ procedure TATAdapterHiliteCache.Add(
 var
   N: integer;
   bExact: boolean;
+  bAppend: boolean;
 begin
   if not Enabled then exit;
   if FMaxSize<10 then exit;
@@ -140,19 +141,23 @@ begin
     then exit;
     }
 
-  if FList.Count>FMaxSize then
-    FList.Count:= FMaxSize;
-
   FTempItem.LineIndex:= ALineIndex;
   FTempItem.CharIndex:= ACharIndex;
   FTempItem.ColorAfterEol:= AColorAfterEol;
   CopyLineParts(AParts, FTempItem.Parts);
 
   N:= FindPrior(ALineIndex, ACharIndex, bExact);
-  if N>=FList.Count then
+  bAppend:= N>=FList.Count;
+  if bAppend then
     FList.Add(FTempItem)
   else
     FList.Insert(N, FTempItem);
+
+  if FList.Count>FMaxSize then
+    if bAppend then
+      FList.Delete(0)
+    else
+      FList.Count:= FMaxSize;
 
   //for debug only
   {
