@@ -3047,7 +3047,6 @@ begin
         TextOutProps.LineIndex:= NLinesIndex;
         TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
         TextOutProps.CharSize:= ACharSize;
-        TextOutProps.MainTextArea:= AMainText;
         TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
         TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
         TextOutProps.DrawEvent:= Event;
@@ -7437,7 +7436,6 @@ begin
   TextOutProps.SuperFast:= false;
   TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;
-  TextOutProps.MainTextArea:= true;
   TextOutProps.CharsSkipped:= 0;
     //todo:
     //needed number of chars of all chars counted as 100%,

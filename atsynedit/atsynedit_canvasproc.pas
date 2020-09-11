@@ -79,7 +79,6 @@ type
     LineIndex: integer;
     CharIndexInLine: integer;
     CharSize: TPoint;
-    MainTextArea: boolean;
     CharsSkipped: integer;
     TrimmedTrailingNonSpaces: boolean;
     DrawEvent: TATSynEditDrawLineEvent;
@@ -842,40 +841,37 @@ begin
         );
 
       //paint 4 borders of part
-      if AProps.MainTextArea then
-      begin
-        //note: PartRect is changed here
-        Dec(PartRect.Right);
-        Dec(PartRect.Bottom);
+      //note: PartRect is changed here
+      Dec(PartRect.Right);
+      Dec(PartRect.Bottom);
 
-        CanvasLineEx(C,
-          PartPtr^.ColorBorder,
-          PartPtr^.BorderDown,
-          PartRect.Left, PartRect.Bottom,
-          PartRect.Right, PartRect.Bottom,
-          true);
+      CanvasLineEx(C,
+        PartPtr^.ColorBorder,
+        PartPtr^.BorderDown,
+        PartRect.Left, PartRect.Bottom,
+        PartRect.Right, PartRect.Bottom,
+        true);
 
-        CanvasLineEx(C,
-          PartPtr^.ColorBorder,
-          PartPtr^.BorderUp,
-          PartRect.Left, PartRect.Top,
-          PartRect.Right, PartRect.Top,
-          false);
+      CanvasLineEx(C,
+        PartPtr^.ColorBorder,
+        PartPtr^.BorderUp,
+        PartRect.Left, PartRect.Top,
+        PartRect.Right, PartRect.Top,
+        false);
 
-        CanvasLineEx(C,
-          PartPtr^.ColorBorder,
-          PartPtr^.BorderLeft,
-          PartRect.Left, PartRect.Top,
-          PartRect.Left, PartRect.Bottom,
-          false);
+      CanvasLineEx(C,
+        PartPtr^.ColorBorder,
+        PartPtr^.BorderLeft,
+        PartRect.Left, PartRect.Top,
+        PartRect.Left, PartRect.Bottom,
+        false);
 
-        CanvasLineEx(C,
-          PartPtr^.ColorBorder,
-          PartPtr^.BorderRight,
-          PartRect.Right, PartRect.Top,
-          PartRect.Right, PartRect.Bottom,
-          true);
-      end;
+      CanvasLineEx(C,
+        PartPtr^.ColorBorder,
+        PartPtr^.BorderRight,
+        PartRect.Right, PartRect.Top,
+        PartRect.Right, PartRect.Bottom,
+        true);
     end;
 
     //paint chars after all LineParts are painted, when too many tokens in line
