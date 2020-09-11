@@ -892,7 +892,8 @@ begin
         APosY+AProps.TextOffsetFromLine,
         nil,
         PartStr,
-        nil
+        nil,
+        false
         );
       {$else}
       _TextOut_Unix(C.Handle,
