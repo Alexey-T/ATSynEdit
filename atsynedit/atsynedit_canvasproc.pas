@@ -628,6 +628,7 @@ var
   DxUTF8: TATIntArray;
   {$endif}
   NLen, NCharWidth, i, j: integer;
+  NLastPart: integer;
   PartStr: atString;
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
@@ -704,6 +705,7 @@ begin
   end
   else
   begin
+    NLastPart:= 0;
     for j:= 0 to High(TATLineParts) do
     begin
       PartPtr:= @AParts^[j];
@@ -712,6 +714,7 @@ begin
       PartOffset:= PartPtr^.Offset;
       PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
+      NLastPart:= j;
 
       PartFontStyle:= [];
       NStyles:= PartPtr^.FontStyles;
@@ -876,10 +879,10 @@ begin
     end;
 
     //paint chars after all LineParts are painted, when too many tokens in line
-    PartPtr:= @AParts^[High(TATLineParts)-1];
-    PartLen:= PartPtr^.Len;
-    if PartLen>0 then
+    if NLastPart>=High(TATLineParts)-1 then
     begin
+      PartPtr:= @AParts^[NLastPart];
+      PartLen:= PartPtr^.Len;
       PartOffset:= PartPtr^.Offset;
       PartStr:= Copy(AText, PartOffset+1+PartLen, MaxInt);
       PixOffset1:= ListInt[PartOffset];
