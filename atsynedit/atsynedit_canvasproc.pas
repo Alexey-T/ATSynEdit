@@ -1100,7 +1100,7 @@ Line is painted with ACharSize.Y=2px height, with 1px spacing between lines
 var
   Part: PATLinePart;
   NPartIndex, NCharIndex, NSpaces, NSpaceThis: integer;
-  X1, X2, Y1, Y2: integer;
+  X1, X2, Y1, Y2, Y2b: integer;
   bHasBG: boolean;
   bSpace: boolean;
   NColorBack, NColorFont, NColorFontHalf: TColor;
@@ -1114,6 +1114,7 @@ begin
   X2:= 0;
   Y1:= APosY;
   Y2:= Y1 + ACharSize.Y;
+  Y2b:= Y1 + ACharSize.Y div 2;
   NSpaces:= 0;
 
   for NPartIndex:= Low(TATLineParts) to High(TATLineParts) do
@@ -1168,14 +1169,14 @@ begin
         if bHasBG then
           C.SetPixel(X1, Y1, rColorBack);
         if not bSpace then
-          C.SetPixel(X1, Y1+ACharSize.Y div 2, rColorFont);
+          C.SetPixel(X1, Y2b, rColorFont);
       end
       else
       begin
         if bHasBG then
           C.FillRect(X1, Y1, X2, Y2, rColorBack);
         if not bSpace then
-          C.FillRect(X1, Y1+ACharSize.Y div 2, X2, Y2, rColorFont);
+          C.FillRect(X1, Y2b, X2, Y2, rColorFont);
       end;
     end;
   end;
