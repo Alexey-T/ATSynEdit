@@ -5280,9 +5280,7 @@ begin
   P:= Point(X, Y);
   UpdateCursor;
 
-  bMovedMinimal:=
-    (Abs(X-FMouseDownCoordOriginal.X)>cMovedDeltaPx) or
-    (Abs(Y-FMouseDownCoordOriginal.Y)>cMovedDeltaPx);
+  bMovedMinimal:= IsPointsDiffByDelta(P, FMouseDownCoordOriginal, cMovedDeltaPx);
 
   bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
   bSelectingGutterNumbers:= FMouseDownGutterLineNumber>=0;
