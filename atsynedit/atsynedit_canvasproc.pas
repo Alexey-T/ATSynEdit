@@ -992,8 +992,8 @@ Line is painted with ACharSize.Y=2px height, with 1px spacing between lines
 }
 var
   Part: PATLinePart;
-  NPartIndex, NCharIndex, NSpaces: integer;
-  X1, X2, Y1, Y2: integer;
+  NPartIndex, NCharIndex, NSpaces, NSpaceThis: integer;
+  X1, X2, Y1, Y2, Y2b: integer;
   bHasBG: boolean;
   bSpace: boolean;
   NColorBack, NColorFont, NColorFontHalf: TColor;
@@ -1003,7 +1003,13 @@ begin
   if AParts[0].Offset<0 then exit;
   CanvasHandle:= C.Handle;
 
+  X1:= 0;
+  X2:= 0;
+  Y1:= APosY;
+  Y2:= Y1 + ACharSize.Y;
+  Y2b:= Y1 + ACharSize.Y div 2;
   NSpaces:= 0;
+
   for NPartIndex:= Low(TATLineParts) to High(TATLineParts) do
   begin
     Part:= @AParts[NPartIndex];
@@ -1034,24 +1040,22 @@ begin
       if ch=#9 then
       begin
         bSpace:= true;
-        Inc(NSpaces, ATabSize);
+        NSpaceThis:= ATabSize;
       end
       else
       begin
         bSpace:= ch=' ';
-        Inc(NSpaces);
+        NSpaceThis:= 1;
       end;
 
       X1:= APosX + ACharSize.X*NSpaces;
-      X2:= X1 + ACharSize.X;
-      Y1:= APosY;
-      Y2:= Y1 + ACharSize.Y;
+      X2:= X1 + ACharSize.X*NSpaceThis;
+      Inc(NSpaces, NSpaceThis);
 
-      if (X1>=ARect.Left) and (X1<ARect.Right) then
-      begin
-        //must limit line on right edge
-        //if X2>ARect.Right then
-        //  X2:= ARect.Right;
+      if X1>ARect.Right then
+        Break;
+      if X2>ARect.Right then
+        X2:= ARect.Right;
 
         if bHasBG then
         begin
@@ -1077,10 +1081,9 @@ begin
           else
           begin
             C.Brush.Color:= NColorFontHalf;
-            C.FillRect(X1, Y1+ACharSize.Y div 2, X2, Y2);
+            C.FillRect(X1, Y2b, X2, Y2);
           end;
         end;
-      end;
     end;
   end;
 end;
