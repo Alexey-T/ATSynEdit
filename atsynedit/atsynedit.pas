@@ -2338,7 +2338,7 @@ begin
     SetScrollInfo(Handle, SB_VERT, si, True);
   end;
 
-  {$ifdef at_show_scroll_info}
+  {$ifdef debug_scroll}
   Writeln(Format('ATSynEdit SetScrollInfo: SB_VERT, nMin=%d, nMax=%d, nPage=%d, nPos=%d',
     [FScrollVert.NMin, FScrollVert.NMax, FScrollVert.NPage, FScrollVert.NPos]));
   {$endif}
@@ -2391,7 +2391,7 @@ begin
     SetScrollInfo(Handle, SB_HORZ, si, True);
   end;
 
-  {$ifdef at_show_scroll_info}
+  {$ifdef debug_scroll}
   Writeln(Format('ATSynEdit SetScrollInfo: SB_HORZ, nMin=%d, nMax=%d, nPage=%d, nPos=%d',
     [FScrollHorz.NMin, FScrollHorz.NMax, FScrollHorz.NPage, FScrollHorz.NPos]));
   {$endif}
