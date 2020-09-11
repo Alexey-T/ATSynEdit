@@ -29,7 +29,8 @@ const
 
 type
   TATLinePart = packed record
-    Offset, Len: word;
+    Offset: SmallInt; //2 bytes
+    Len: word; //2 bytes
     ColorFont, ColorBG, ColorBorder: TColor;
     FontStyles: byte;
     BorderUp, BorderDown, BorderLeft, BorderRight: TATLineStyle;

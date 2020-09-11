@@ -1096,7 +1096,7 @@ Line is painted with ACharSize.Y=2px height, with 1px spacing between lines
 }
 var
   Part: PATLinePart;
-  NPartIndex, NCharIndex, NSpaces: integer;
+  NPartIndex, NCharIndex, NSpaces, NSpaceThis: integer;
   X1, X2, Y1, Y2: integer;
   bHasBG: boolean;
   bSpace: boolean;
@@ -1141,22 +1141,21 @@ begin
       if ch=#9 then
       begin
         bSpace:= true;
-        Inc(NSpaces, ATabSize);
+        NSpaceThis:= ATabSize;
       end
       else
       begin
         bSpace:= ch=' ';
-        Inc(NSpaces);
+        NSpaceThis:= 1;
       end;
 
       X1:= APosX + ACharSize.X*NSpaces;
-      X2:= X1 + ACharSize.X;
+      X2:= X1 + ACharSize.X*NSpaceThis;
       Y1:= APosY;
       Y2:= Y1 + ACharSize.Y;
 
-      //must limit line on right edge
-      //if X2>ARect.Right then
-      //  X2:= ARect.Right;
+      if X1>ARect.Right then Break;
+      Inc(NSpaces, NSpaceThis);
 
       if AUsePixels then
       begin
