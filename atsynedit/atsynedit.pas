@@ -2448,7 +2448,7 @@ procedure TATSynEdit.GetRectMicromap(out R: TRect);
 var
   NSize: integer;
 begin
-  NSize:= FMicromap.UpdateSizes(FCharSize.X);
+  NSize:= FMicromap.UpdateSizes(EditorScale(FCharSize.X));
 
   if not FMicromapVisible then
   begin
