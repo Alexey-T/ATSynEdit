@@ -2008,7 +2008,8 @@ begin
   end;
 end;
 
-function MatchOneCharCategory(opnd, scan: PRegExprChar): boolean; {$IFDEF InlineFuncs}inline;{$ENDIF}
+// FPC 3.3 bug: with "inline" it cannot compile this func
+function MatchOneCharCategory(opnd, scan: PRegExprChar): boolean; {$IFDEF InlineFuncs_}inline;{$ENDIF}
 // opnd: points to opcode operands after OP_*CATEGORY
 // scan: points into InputString
 begin
