@@ -532,6 +532,7 @@ type
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
+    FLastTooltipLine: integer;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
     FIsRunningCommand: boolean;
@@ -1348,6 +1349,7 @@ type
     function TextSelectedEx(ACaret: TATCaretItem): atString;
     function TextCurrentWord: atString;
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
+    property LastTooltipLine: integer read FLastTooltipLine write FLastTooltipLine;
     property IsRunningCommand: boolean read FIsRunningCommand;
     property IsReadOnlyChanged: boolean read FIsReadOnlyChanged write FIsReadOnlyChanged;
     property IsReadOnlyAutodetected: boolean read FIsReadOnlyAutodetected write FIsReadOnlyAutodetected;
@@ -4024,6 +4026,7 @@ begin
   FLastTextCmdText:= '';
   FLastCommandChangedText:= false;
   FLastHotspot:= -1;
+  FLastTooltipLine:= -1;
 
   FScrollVert.Clear;
   FScrollHorz.Clear;
