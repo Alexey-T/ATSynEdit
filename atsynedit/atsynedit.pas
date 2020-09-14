@@ -532,7 +532,6 @@ type
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
-    FLastTooltipLine: integer;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
     FIsRunningCommand: boolean;
@@ -4025,7 +4024,6 @@ begin
   FLastTextCmdText:= '';
   FLastCommandChangedText:= false;
   FLastHotspot:= -1;
-  FLastTooltipLine:= -1;
 
   FScrollVert.Clear;
   FScrollHorz.Clear;
