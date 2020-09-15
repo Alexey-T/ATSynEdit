@@ -2711,8 +2711,13 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  C.Brush.Color:= FColorBG;
-  C.FillRect(ARect);
+  {$ifdef use_bg}
+  if AMainText then
+  {$endif}
+  begin
+    C.Brush.Color:= FColorBG;
+    C.FillRect(ARect);
+  end;
 
   if AMainText then
   begin
