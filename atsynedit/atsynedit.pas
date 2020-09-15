@@ -2805,11 +2805,15 @@ begin
           if bLineColorForced then
             NColorAfter:= NColorEntire;
 
+          {$ifdef use_bg}
+          //todo?
+          {$else}
           if NColorAfter<>clNone then
           begin
             C.Brush.Color:= NColorAfter;
             C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
           end;
+          {$endif}
 
           CurrPointText:= Point(
             Int64(ARect.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
@@ -2986,8 +2990,17 @@ begin
       if (NLinesIndex+1) mod FOptZebraStep = 0 then
         NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
 
+    {$ifdef use_bg}
+    FFastBmp.FillRect(
+      0,
+      NCoordTop - FRectMinimap.Top,
+      FRectMinimap.Width,
+      NCoordTop - FRectMinimap.Top + ACharSize.Y,
+      NColorEntire);
+    {$else}
     C.Brush.Color:= NColorEntire;
     C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+    {$endif}
 
     //paint line
     if StrOutput<>'' then
