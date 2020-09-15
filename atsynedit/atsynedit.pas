@@ -2651,6 +2651,29 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   ALineFrom: integer);
 var
   NCoordTop, NCoordSep: integer;
+  //
+  procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
+  begin
+    {$ifdef use_bg}
+    if AMainText then
+    begin
+      C.Brush.Color:= AFillColor;
+      C.FillRect(ARectLeft, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+    end
+    else
+      FFastBmp.FillRect(
+        ARectLeft - FRectMinimap.Left,
+        NCoordTop - FRectMinimap.Top,
+        FRectMinimap.Width,
+        NCoordTop - FRectMinimap.Top + ACharSize.Y,
+        AFillColor);
+    {$else}
+    C.Brush.Color:= AFillColor;
+    C.FillRect(ARectLeft, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+    {$endif}
+  end;
+  //
+var
   NWrapIndex, NWrapIndexDummy, NLinesIndex, NLineLen, NCount: integer;
   NOutputCharsSkipped, NOutputCellPercentsSkipped: integer;
   NOutputStrWidth, NOutputMaximalChars: integer;
@@ -2805,15 +2828,8 @@ begin
           if bLineColorForced then
             NColorAfter:= NColorEntire;
 
-          {$ifdef use_bg}
-          //todo?
-          {$else}
           if NColorAfter<>clNone then
-          begin
-            C.Brush.Color:= NColorAfter;
-            C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-          end;
-          {$endif}
+            FillOneLine(NColorAfter, ARect.Left);
 
           CurrPointText:= Point(
             Int64(ARect.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
@@ -2990,17 +3006,7 @@ begin
       if (NLinesIndex+1) mod FOptZebraStep = 0 then
         NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
 
-    {$ifdef use_bg}
-    FFastBmp.FillRect(
-      0,
-      NCoordTop - FRectMinimap.Top,
-      FRectMinimap.Width,
-      NCoordTop - FRectMinimap.Top + ACharSize.Y,
-      NColorEntire);
-    {$else}
-    C.Brush.Color:= NColorEntire;
-    C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-    {$endif}
+    FillOneLine(NColorEntire, ARect.Left);
 
     //paint line
     if StrOutput<>'' then
@@ -3041,10 +3047,7 @@ begin
       //adapter may return ColorAfterEol, paint it
       if FOptShowFullHilite then
         if NColorAfter<>clNone then
-        begin
-          C.Brush.Color:= NColorAfter;
-          C.FillRect(CurrPointText.X, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-        end;
+          FillOneLine(NColorAfter, CurrPointText.X);
 
       if AWithGutter then
         Event:= FOnDrawLine
@@ -3137,10 +3140,7 @@ begin
         NColorAfter:= clNone;
         DoCalcPosColor(0, NLinesIndex, NColorAfter);
         if NColorAfter<>clNone then
-        begin
-          C.Brush.Color:= NColorAfter;
-          C.FillRect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-        end;
+          FillOneLine(NColorAfter, ARect.Left);
       end;
 
       DoPaintSelectedLineBG(C, ACharSize, ARect,
