@@ -39,7 +39,7 @@ const
   cStringsProgressSaveLines = 100*1000;
 
   //force utf8 for huge files on loading
-  cMaxFileSizeToDetectFileEncoding: integer = 50*1024*1024;
+  cMaxFileSizeMbToDetectEncoding: integer = 50;
 
 type
   TATIntegerList = specialize TFPGList<integer>;

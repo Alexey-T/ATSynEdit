@@ -340,7 +340,7 @@ begin
   NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
-  if NStreamSize>cMaxFileSizeToDetectFileEncoding then
+  if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
   begin
     //don't set codepages like cp437 for huge files, it's much slower
     FEncoding:= cEncUTF8;
