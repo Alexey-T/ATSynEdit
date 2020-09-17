@@ -38,6 +38,9 @@ const
   cStringsProgressLoadChars = 1000*1000;
   cStringsProgressSaveLines = 100*1000;
 
+  //force utf8 for huge files on loading
+  cMaxFileSizeToDetectFileEncoding: integer = 50*1024*1024;
+
 type
   TATIntegerList = specialize TFPGList<integer>;
 

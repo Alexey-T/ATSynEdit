@@ -327,6 +327,7 @@ var
   //------
 var
   NStart, NEnd, NCounted, Len, NSignatureLen: integer;
+  NStreamSize: Int64;
   SA, SUtf8: string;
   SWide: UnicodeString;
   SQuad: UCS4String;
@@ -336,8 +337,15 @@ begin
   Clear;
 
   bWithBom:= false;
+  NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
+  if NStreamSize>cMaxFileSizeToDetectFileEncoding then
+  begin
+    //don't set codepages like cp437 for huge files, it's much slower
+    FEncoding:= cEncUTF8;
+  end
+  else
   if FEncodingDetect then
   begin
     //detect encoding by signature and by buffer content
@@ -365,7 +373,7 @@ begin
 
   CharSize:= cEncodingSize[FEncoding];
 
-  BufSize:= Stream.Size-NSignatureLen;
+  BufSize:= NStreamSize-NSignatureLen;
   if BufSize<=0 then Exit;
 
   GetMem(Buf, BufSize);
@@ -385,7 +393,7 @@ begin
       begin
         NCounted:= NStart;
         FProgressKind:= cStringsProgressLoading;
-        FProgressValue:= Int64(NStart)*100 div Stream.Size;
+        FProgressValue:= Int64(NStart)*100 div NStreamSize;
         if Assigned(FOnProgress) then
           FOnProgress(Self);
       end;
