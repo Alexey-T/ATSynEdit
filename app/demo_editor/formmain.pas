@@ -1446,8 +1446,7 @@ var
              BorderUp:= cLineStyleRounded;
              BorderLeft:= cLineStyleRounded;
              BorderRight:= cLineStyleRounded;
-             FontItalic:= true;
-             FontBold:= true;
+             FontStyles:= afsFontBold+afsFontItalic;
            end;
         3: begin
              ColorFont:= clred;
