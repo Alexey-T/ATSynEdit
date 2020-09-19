@@ -10,7 +10,8 @@ interface
 
 uses
   Classes, SysUtils,
-  ATStringProc;
+  ATStringProc,
+  ATStringProc_Separator;
 
 type
   TATEditAction = (

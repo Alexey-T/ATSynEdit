@@ -28,6 +28,7 @@ uses
   BGRABitmapTypes,
   {$endif}
   ATStringProc,
+  ATStringProc_Separator,
   ATStrings,
   ATStringProc_WordJump,
   ATCanvasPrimitives,

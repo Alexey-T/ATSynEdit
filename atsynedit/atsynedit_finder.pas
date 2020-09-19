@@ -19,6 +19,7 @@ uses
   ATSynEdit_UnicodeData,
   ATStrings,
   ATStringProc,
+  ATStringProc_Separator,
   ATStringProc_TextBuffer;
 
 type

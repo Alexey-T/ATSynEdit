@@ -18,7 +18,7 @@ uses
   ATSynEdit_Adapter_Cache, ATSynEdit_Gaps, ATSynEdit_DimRanges, 
   ATSynEdit_Bookmarks, ATSynEdit_Gutter_Decor, ATSynEdit_fgl, 
   ATSynEdit_Micromap, atsynedit_unicodedata, ATSynEdit_LinkCache, 
-  ATSynEdit_CharSizeArray, ATSynEdit_LineParts, 
+  ATSynEdit_CharSizeArray, ATSynEdit_LineParts, ATStringProc_Separator, 
   LazarusPackageIntf;
 
 implementation

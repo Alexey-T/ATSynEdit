@@ -13,7 +13,7 @@ interface
 
 uses
   Classes, SysUtils,
-  ATStringProc;
+  ATStringProc_Separator;
 
 type
   { TATKeyArray }
