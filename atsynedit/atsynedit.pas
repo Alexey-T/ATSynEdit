@@ -218,7 +218,8 @@ type
     cNumbersAll,
     cNumbersNone,
     cNumbersEach10th,
-    cNumbersEach5th
+    cNumbersEach5th,
+    cNumbersRelative
     );
 
   TATSynPaintFlag = (
@@ -1836,7 +1837,21 @@ begin
 end;
 
 function TATSynEdit.DoFormatLineNumber(N: integer): string;
+var
+  NCurLine: integer;
 begin
+  if FOptNumbersStyle=cNumbersRelative then
+  begin
+    if Carets.Count=0 then
+      exit(IntToStr(N));
+    NCurLine:= Carets[0].PosY+1;
+    if N=NCurLine then
+      Result:= IntToStr(N)
+    else
+      Result:= IntToStr(N-NCurLine);
+    exit
+  end;
+
   if FOptNumbersShowCarets then
     if IsLineWithCaret(N-1) then
       Exit(IntToStr(N));
