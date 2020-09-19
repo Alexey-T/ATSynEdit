@@ -6,7 +6,6 @@ unit ATStringProc;
 
 {$mode objfpc}{$H+}
 {$codepage utf8}
-{$ModeSwitch advancedrecords}
 
 interface
 
