@@ -2214,10 +2214,11 @@ begin
 
   //when very long line has caret at end, and we toggle wordwrap, let's scroll to new caret pos
   if Carets.Count=1 then
-  begin
-    Application.ProcessMessages;
-    DoGotoCaret(cEdgeTop);
-  end;
+    if Carets[0].PosX>0 then
+    begin
+      Application.ProcessMessages;
+      DoGotoCaret(cEdgeTop);
+    end;
 end;
 
 procedure TATSynEdit.SetWrapIndented(AValue: boolean);
