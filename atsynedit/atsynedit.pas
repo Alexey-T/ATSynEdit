@@ -2192,6 +2192,7 @@ end;
 procedure TATSynEdit.SetWrapMode(AValue: TATSynWrapMode);
 var
   NLine: integer;
+  Caret: TATCaretItem;
 begin
   if FWrapMode=AValue then Exit;
 
@@ -2214,12 +2215,16 @@ begin
 
   //when very long line has caret at end, and we toggle wordwrap, let's scroll to new caret pos
   if FWrapMode=cWrapOff then
-   if Carets.Count=1 then
-    if Carets[0].PosX>0 then
+    if Carets.Count=1 then
     begin
-      Application.ProcessMessages;
-      DoGotoCaret(cEdgeTop);
-    end;
+      Caret:= Carets[0];
+      if Caret.PosX>0 then
+        DoShowPos(
+          Point(Caret.PosX, Caret.PosY),
+          FOptScrollIndentCaretHorz,
+          FOptScrollIndentCaretVert,
+          true);
+      end;
 end;
 
 procedure TATSynEdit.SetWrapIndented(AValue: boolean);
