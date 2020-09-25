@@ -72,14 +72,16 @@ var
   Caret: TATCaretItem;
   imc: HIMC;
   CandiForm: CANDIDATEFORM;
+  {
   VisRect: TRect;
   Y: integer;
+  }
 begin
   Ed:= TATSynEdit(Sender);
   if Ed.Carets.Count=0 then exit;
   Caret:= Ed.Carets[0];
 
-  VisRect:= Screen.WorkAreaRect;
+  //VisRect:= Screen.WorkAreaRect;
 
   imc:= ImmGetContext(Ed.Handle);
   if imc<>0 then
