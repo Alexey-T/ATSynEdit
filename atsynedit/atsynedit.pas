@@ -1419,6 +1419,7 @@ type
     property Anchors;
     property BorderSpacing;
     property BorderStyle;
+    property Constraints;
     property DoubleBuffered;
     property DragMode;
     property DragKind;
