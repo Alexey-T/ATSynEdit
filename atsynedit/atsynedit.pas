@@ -5427,9 +5427,12 @@ begin
     FOptMouseEnableColumnSelection and
     (ssLeft in Shift) and
     (not bOnMain) and
+    //auto-scroll must not work when cursor is over minimap/micromap
     (not bOnMinimap) and
     (not bOnMicromap) and
-    (not bOnGutter);
+    //auto-scroll must not work when cursor is over line-numbers
+    //but can work if over other gutter columns
+    (not bOnGutterNumbers);
 
   FMouseAutoScroll:= cDirNone;
   if (P.Y<FRectMain.Top) and (not ModeOneLine) then
