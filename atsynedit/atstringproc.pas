@@ -32,6 +32,7 @@ type
 type
   TATIntArray = array of integer;
   TATPointArray = array of TPoint;
+  TATInt64Array = array of Int64;
   TATLineOffsetsInfo = array of integer; //word is too small
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;

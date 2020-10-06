@@ -715,10 +715,23 @@ begin
     Result:= FCarets.AsArray;
 end;
 
+function TATSynEdit.GetMarkersArray: TATInt64Array;
+begin
+  SetLength(Result, 0);
+  if Assigned(FMarkers) then
+    Result:= FMarkers.AsArray;
+end;
+
 procedure TATSynEdit.SetCaretsArray(const Ar: TATPointArray);
 begin
   if Assigned(FCarets) then
     FCarets.AsArray:= Ar;
+end;
+
+procedure TATSynEdit.SetMarkersArray(const Ar: TATInt64Array);
+begin
+  if Assigned(FMarkers) then
+    FMarkers.AsArray:= Ar;
 end;
 
 procedure TATSynEdit.DoCaretsExtend(ADown: boolean; ALines: integer);

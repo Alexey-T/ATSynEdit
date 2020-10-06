@@ -48,6 +48,7 @@ type
   TATUndoItem = class
   private
     const PartSep = #9;
+    const MarkersSep = #1;
     function GetAsString: string;
     procedure SetAsString(const AValue: string);
   public
@@ -57,6 +58,7 @@ type
     ItemEnd: TATLineEnds;
     ItemLineState: TATLineState;
     ItemCarets: TATPointArray;
+    ItemMarkers: TATInt64Array;
     ItemSoftMark: boolean;
     ItemHardMark: boolean;
     procedure Assign(const D: TATUndoItem);
@@ -64,7 +66,7 @@ type
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ASoftMark, AHardMark: boolean;
-      const ACarets: TATPointArray); virtual;
+      const ACarets: TATPointArray; const AMarkers: TATInt64Array); virtual;
     constructor CreateEmpty;
   end;
 
@@ -98,7 +100,8 @@ type
     procedure DeleteLast;
     procedure DeleteUnmodifiedMarks;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
-      AEnd: TATLineEnds; ALineState: TATLineState; const ACarets: TATPointArray);
+      AEnd: TATLineEnds; ALineState: TATLineState;
+      const ACarets: TATPointArray; const AMarkers: TATInt64Array);
     procedure AddUnmodifiedMark;
     function DebugText: string;
     function IsEmpty: boolean;
@@ -124,6 +127,15 @@ begin
   end;
 end;
 
+function Int64ArrayToString(const A: TATInt64Array): string;
+var
+  i: integer;
+begin
+  Result:= '';
+  for i:= 0 to High(A) do
+    Result+= IntToStr(A[i])+',';
+end;
+
 procedure StringToPointsArray(var A: TATPointArray; const AStr: string);
 var
   Sep: TATStringSeparator;
@@ -142,6 +154,20 @@ begin
   end;
 end;
 
+procedure StringToInt64Array(var A: TATInt64Array; const AStr: string);
+var
+  Sep: TATStringSeparator;
+  i, NLen: integer;
+begin
+  NLen:= SFindCharCount(AStr, ',');
+  SetLength(A, NLen);
+  Sep.Init(AStr, ',');
+  for i:= 0 to NLen-1 do
+  begin
+    Sep.GetItemInt64(A[i], 0);
+  end;
+end;
+
 { TATUndoItem }
 
 function TATUndoItem.GetAsString: string;
@@ -151,7 +177,8 @@ begin
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
-    PointsArrayToString(ItemCarets)+PartSep+
+    PointsArrayToString(ItemCarets)+MarkersSep+
+    Int64ArrayToString(ItemMarkers)+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
     UTF8Encode(ItemText);
@@ -160,7 +187,7 @@ end;
 procedure TATUndoItem.SetAsString(const AValue: string);
 var
   Sep: TATStringSeparator;
-  S: string;
+  S, S1, S2: string;
   N: integer;
 begin
   Sep.Init(AValue, PartSep);
@@ -178,7 +205,9 @@ begin
   ItemLineState:= TATLineState(N);
 
   Sep.GetItemStr(S);
-  StringToPointsArray(ItemCarets, S);
+  SSplitByChar(S, MarkersSep, S1, S2);
+  StringToPointsArray(ItemCarets, S1);
+  StringToInt64Array(ItemMarkers, S2);
 
   Sep.GetItemStr(S);
   ItemSoftMark:= S='1';
@@ -206,7 +235,7 @@ end;
 constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   ASoftMark, AHardMark: boolean;
-  const ACarets: TATPointArray);
+  const ACarets: TATPointArray; const AMarkers: TATInt64Array);
 var
   i: integer;
 begin
@@ -220,9 +249,11 @@ begin
 
   SetLength(ItemCarets, Length(ACarets));
   for i:= 0 to High(ACarets) do
-  begin
     ItemCarets[i]:= ACarets[i];
-  end;
+
+  SetLength(ItemMarkers, Length(AMarkers));
+  for i:= 0 to High(AMarkers) do
+    ItemMarkers[i]:= AMarkers[i];
 end;
 
 constructor TATUndoItem.CreateEmpty;
@@ -306,7 +337,7 @@ end;
 
 procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
-  const ACarets: TATPointArray);
+  const ACarets: TATPointArray; const AMarkers: TATInt64Array);
 var
   Item: TATUndoItem;
 begin
@@ -334,7 +365,7 @@ begin
       end;
   end;
 
-  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState, FSoftMark, FHardMark, ACarets);
+  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState, FSoftMark, FHardMark, ACarets, AMarkers);
   FList.Add(Item);
   FSoftMark:= false;
 
@@ -347,6 +378,7 @@ procedure TATUndoList.AddUnmodifiedMark;
 var
   Item: TATUndoItem;
   Carets: TATPointArray;
+  Markers: TATInt64Array;
 begin
   //if FLocked then exit; //on load file called with Locked=true
 
@@ -356,10 +388,12 @@ begin
     if Item.ItemAction=aeaClearModified then exit;
 
   SetLength(Carets, 0);
+  SetLength(Markers, 0);
+
   Item:= TATUndoItem.Create(
     aeaClearModified, 0, '',
     cEndNone, cLineStateNone,
-    false, false, Carets);
+    false, false, Carets, Markers);
   FList.Add(Item);
 end;
 

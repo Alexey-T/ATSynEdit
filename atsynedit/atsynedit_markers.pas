@@ -11,6 +11,7 @@ interface
 
 uses
   Classes, SysUtils,
+  ATStringProc,
   ATSynEdit_fgl,
   ATSynEdit_Carets;
 
@@ -51,7 +52,9 @@ type
     FList: TATMarkerItems;
     FSorted: boolean;
     FDuplicates: boolean;
+    function GetAsArray: TATInt64Array;
     function GetItem(N: integer): TATMarkerItem;
+    procedure SetAsArray(const AValue: TATInt64Array);
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
     constructor Create; virtual;
@@ -74,6 +77,7 @@ type
     procedure DeleteWithTag(const ATag: Int64);
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
+    property AsArray: TATInt64Array read GetAsArray write SetAsArray;
   end;
 
 implementation
@@ -172,6 +176,43 @@ end;
 function TATMarkers.GetItem(N: integer): TATMarkerItem;
 begin
   Result:= FList[N];
+end;
+
+function TATMarkers.GetAsArray: TATInt64Array;
+var
+  Item: TATMarkerItem;
+  i: integer;
+begin
+  SetLength(Result, Count*7);
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    Result[i*7]:= Item.PosX;
+    Result[i*7+1]:= Item.PosY;
+    Result[i*7+2]:= Item.LenX;
+    Result[i*7+3]:= Item.LenY;
+    Result[i*7+4]:= Item.Tag;
+    Result[i*7+5]:= Item.Value;
+    Result[i*7+6]:= Ord(Item.MicromapOnly);
+  end;
+end;
+
+procedure TATMarkers.SetAsArray(const AValue: TATInt64Array);
+var
+  i: integer;
+begin
+  Clear;
+  for i:= 0 to Length(AValue) div 7 - 1 do
+    Add(
+      AValue[i*7],
+      AValue[i*7+1],
+      AValue[i*7+4],
+      AValue[i*7+2],
+      AValue[i*7+3],
+      nil,
+      AValue[i*7+5],
+      Boolean(AValue[i*7+6])
+      );
 end;
 
 procedure TATMarkers.SetItem(N: integer; const AItem: TATMarkerItem);

@@ -161,7 +161,9 @@ type
 
 type
   TATStringsGetCarets = function: TATPointArray of object;
+  TATStringsGetMarkers = function: TATInt64Array of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
+  TATStringsSetMarkers = procedure(const AMarkers: TATInt64Array) of object;
   TATStringsLogEvent = procedure(Sender: TObject; ALine: integer) of object;
   TATStringsChangeEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
@@ -198,7 +200,9 @@ type
     FProgressValue: integer;
     FProgressKind: TATStringsProgressKind;
     FOnGetCaretsArray: TATStringsGetCarets;
+    FOnGetMarkersArray: TATStringsGetMarkers;
     FOnSetCaretsArray: TATStringsSetCarets;
+    FOnSetMarkersArray: TATStringsSetMarkers;
     FOnProgress: TNotifyEvent;
     FOnLog: TATStringsLogEvent;
     FOnChange: TATStringsChangeEvent;
@@ -225,6 +229,7 @@ type
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
+    function GetMarkersArray: TATInt64Array;
     function GetLine(AIndex: integer): atString;
     function GetLineAscii(AIndex: integer): boolean;
     function GetLineBlank(AIndex: integer): boolean;
@@ -252,6 +257,7 @@ type
     procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
       AWithEvent: boolean=true);
     procedure SetCaretsArray(const L: TATPointArray);
+    procedure SetMarkersArray(const L: TATInt64Array);
     procedure SetEndings(AValue: TATLineEnds);
     procedure SetLine(AIndex: integer; const AValue: atString);
     procedure SetLineEnd(AIndex: integer; AValue: TATLineEnds);
@@ -381,7 +387,9 @@ type
     function TextSubstringLength(AX1, AY1, AX2, AY2: integer; const AEolString: string=#10): integer;
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
+    property OnGetMarkersArray: TATStringsGetMarkers read FOnGetMarkersArray write FOnGetMarkersArray;
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
+    property OnSetMarkersArray: TATStringsSetMarkers read FOnSetMarkersArray write FOnSetMarkersArray;
     procedure SetGroupMark;
     procedure BeginUndoGroup;
     procedure EndUndoGroup;
@@ -1173,6 +1181,8 @@ begin
   FOnChangeBlock:= nil;
   FOnGetCaretsArray:= nil;
   FOnSetCaretsArray:= nil;
+  FOnGetMarkersArray:= nil;
+  FOnSetMarkersArray:= nil;
   FOnProgress:= nil;
   FOnLog:= nil;
 
@@ -1621,6 +1631,7 @@ var
   AEnd: TATLineEnds;
   ALineState: TATLineState;
   ACarets: TATPointArray;
+  AMarkers: TATInt64Array;
   NCount: integer;
   OtherList: TATUndoList;
 begin
@@ -1640,6 +1651,7 @@ begin
   AEnd:= Item.ItemEnd;
   ALineState:= Item.ItemLineState;
   ACarets:= Item.ItemCarets;
+  AMarkers:= Item.ItemMarkers;
   ASoftMarked:= Item.ItemSoftMark;
   AHardMarked:= Item.ItemHardMark;
   NCount:= ACurList.Count;
@@ -1714,6 +1726,7 @@ begin
     end;
 
     SetCaretsArray(ACarets);
+    SetMarkersArray(AMarkers);
     ActionDeleteDupFakeLines;
   finally
     ACurList.Locked:= false;
@@ -1743,10 +1756,22 @@ begin
     Result:= FOnGetCaretsArray();
 end;
 
+function TATStrings.GetMarkersArray: TATInt64Array;
+begin
+  if Assigned(FOnGetMarkersArray) then
+    Result:= FOnGetMarkersArray();
+end;
+
 procedure TATStrings.SetCaretsArray(const L: TATPointArray);
 begin
   if Assigned(FOnSetCaretsArray) then
     FOnSetCaretsArray(L);
+end;
+
+procedure TATStrings.SetMarkersArray(const L: TATInt64Array);
+begin
+  if Assigned(FOnSetMarkersArray) then
+    FOnSetMarkersArray(L);
 end;
 
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer;
@@ -1769,7 +1794,7 @@ begin
   begin
     if FUndoList.Locked then exit;
     if (FUndoList.Count>0) and (FUndoList.Last.ItemAction=AAction) then exit;
-    FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray);
+    FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
     exit;
   end;
 
@@ -1780,14 +1805,14 @@ begin
   if not FUndoList.Locked then
   begin
     DoAddUpdate(AIndex, AAction);
-    FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray);
+    FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
   end
   else
   //called from Undo - add to Redo
   if not FRedoList.Locked then
   begin
     DoAddUpdate(AIndex, AAction);
-    FRedoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray);
+    FRedoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
   end;
 end;
 

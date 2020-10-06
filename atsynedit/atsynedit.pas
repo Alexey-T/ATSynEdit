@@ -1172,7 +1172,9 @@ type
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
     function DoMouseWheelAction(Shift: TShiftState; AUp, AForceHorz: boolean): boolean;
     function GetCaretsArray: TATPointArray;
+    function GetMarkersArray: TATInt64Array;
     procedure SetCaretsArray(const Ar: TATPointArray);
+    procedure SetMarkersArray(const Ar: TATInt64Array);
     property MouseNiceScroll: boolean read GetMouseNiceScroll write SetMouseNiceScroll;
     property ShowOsBarVert: boolean read FShowOsBarVert write SetShowOsBarVert;
     property ShowOsBarHorz: boolean read FShowOsBarHorz write SetShowOsBarHorz;
@@ -3819,7 +3821,9 @@ begin
   FStringsExternal:= nil;
   FStringsInt:= TATStrings.Create;
   FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
+  FStringsInt.OnGetMarkersArray:= @GetMarkersArray;
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
+  FStringsInt.OnSetMarkersArray:= @SetMarkersArray;
   FStringsInt.OnProgress:= @DoStringsOnProgress;
   FStringsInt.OnChange:= @DoStringsOnChange;
 
