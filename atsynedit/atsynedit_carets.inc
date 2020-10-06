@@ -730,6 +730,7 @@ end;
 
 procedure TATSynEdit.SetMarkersArray(const Ar: TATInt64Array);
 begin
+  InitMarkers; //FMarkers can be nil
   if Assigned(FMarkers) then
     FMarkers.AsArray:= Ar;
 end;
