@@ -1755,13 +1755,17 @@ end;
 function TATStrings.GetCaretsArray: TATPointArray;
 begin
   if Assigned(FOnGetCaretsArray) then
-    Result:= FOnGetCaretsArray();
+    Result:= FOnGetCaretsArray()
+  else
+    SetLength(Result, 0);
 end;
 
 function TATStrings.GetMarkersArray: TATInt64Array;
 begin
   if Assigned(FOnGetMarkersArray) then
-    Result:= FOnGetMarkersArray();
+    Result:= FOnGetMarkersArray()
+  else
+    SetLength(Result, 0);
 end;
 
 procedure TATStrings.SetCaretsArray(const L: TATPointArray);
