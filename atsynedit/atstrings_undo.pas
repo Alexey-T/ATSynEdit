@@ -171,14 +171,20 @@ end;
 { TATUndoItem }
 
 function TATUndoItem.GetAsString: string;
+var
+  SMarks: string;
 begin
+  if Length(ItemMarkers)>0 then
+    SMarks:= MarkersSep+Int64ArrayToString(ItemMarkers)
+  else
+    SMarks:= '';
+
   Result:=
     IntToStr(Ord(ItemAction))+PartSep+
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
-    PointsArrayToString(ItemCarets)+MarkersSep+
-    Int64ArrayToString(ItemMarkers)+PartSep+
+    PointsArrayToString(ItemCarets)+SMarks+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
     UTF8Encode(ItemText);
@@ -207,7 +213,10 @@ begin
   Sep.GetItemStr(S);
   SSplitByChar(S, MarkersSep, S1, S2);
   StringToPointsArray(ItemCarets, S1);
-  StringToInt64Array(ItemMarkers, S2);
+  if S2<>'' then
+    StringToInt64Array(ItemMarkers, S2)
+  else
+    SetLength(ItemMarkers, 0);
 
   Sep.GetItemStr(S);
   ItemSoftMark:= S='1';
