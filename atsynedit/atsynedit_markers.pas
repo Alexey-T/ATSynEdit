@@ -179,40 +179,56 @@ begin
 end;
 
 function TATMarkers.GetAsArray: TATInt64Array;
+const
+  NN = 7;
 var
   Item: TATMarkerItem;
   i: integer;
 begin
-  SetLength(Result, Count*7);
+  SetLength(Result, Count*NN);
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
-    Result[i*7]:= Item.PosX;
-    Result[i*7+1]:= Item.PosY;
-    Result[i*7+2]:= Item.LenX;
-    Result[i*7+3]:= Item.LenY;
-    Result[i*7+4]:= Item.Tag;
-    Result[i*7+5]:= Item.Value;
-    Result[i*7+6]:= Ord(Item.MicromapOnly);
+    Result[i*NN]:= Item.PosX;
+    Result[i*NN+1]:= Item.PosY;
+    Result[i*NN+2]:= Item.LenX;
+    Result[i*NN+3]:= Item.LenY;
+    Result[i*NN+4]:= Item.Tag;
+    Result[i*NN+5]:= Item.Value;
+    Result[i*NN+6]:= Ord(Item.MicromapOnly);
   end;
 end;
 
 procedure TATMarkers.SetAsArray(const AValue: TATInt64Array);
+const
+  NN = 7;
 var
+  NPosX, NPosY, NLenX, NLenY: integer;
+  NTag, NValue: Int64;
+  bMinimap: boolean;
   i: integer;
 begin
   Clear;
-  for i:= 0 to Length(AValue) div 7 - 1 do
+  for i:= 0 to Length(AValue) div NN - 1 do
+  begin
+    NPosX:= AValue[i*NN];
+    NPosY:= AValue[i*NN+1];
+    NLenX:= AValue[i*NN+2];
+    NLenY:= AValue[i*NN+3];
+    NTag:= AValue[i*NN+4];
+    NValue:= AValue[i*NN+5];
+    bMinimap:= boolean(AValue[i*NN+6]);
     Add(
-      AValue[i*7],
-      AValue[i*7+1],
-      AValue[i*7+4],
-      AValue[i*7+2],
-      AValue[i*7+3],
+      NPosX,
+      NPosY,
+      NTag,
+      NLenX,
+      NLenY,
       nil,
-      AValue[i*7+5],
-      Boolean(AValue[i*7+6])
+      NValue,
+      bMinimap
       );
+  end;
 end;
 
 procedure TATMarkers.SetItem(N: integer; const AItem: TATMarkerItem);
