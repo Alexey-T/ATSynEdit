@@ -1726,7 +1726,9 @@ begin
     end;
 
     SetCaretsArray(ACarets);
-    SetMarkersArray(AMarkers);
+    if Length(AMarkers)>0 then
+      SetMarkersArray(AMarkers);
+
     ActionDeleteDupFakeLines;
   finally
     ACurList.Locked:= false;
