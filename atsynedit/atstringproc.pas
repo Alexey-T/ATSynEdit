@@ -186,6 +186,7 @@ procedure SDeleteFromEol(var S: string);
 procedure SDeleteFromEol(var S: UnicodeString);
 
 procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
+function SFindCharCount(const S: string; ch: char): integer;
 function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
 function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
 function SCountTextOccurrences(const SubStr, Str: UnicodeString): integer;
@@ -1197,6 +1198,16 @@ begin
   {$ENDIF}
 end;
 
+
+function SFindCharCount(const S: string; ch: char): integer;
+var
+  i: integer;
+begin
+  Result:= 0;
+  for i:= 1 to Length(S) do
+    if S[i]=ch then
+      Inc(Result);
+end;
 
 function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
 var

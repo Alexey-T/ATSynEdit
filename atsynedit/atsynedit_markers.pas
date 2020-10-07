@@ -12,6 +12,7 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
+  ATStringProc_Separator,
   ATSynEdit_fgl,
   ATSynEdit_Carets;
 
@@ -53,8 +54,10 @@ type
     FSorted: boolean;
     FDuplicates: boolean;
     function GetAsArray: TATInt64Array;
+    function GetAsString: string;
     function GetItem(N: integer): TATMarkerItem;
     procedure SetAsArray(const AValue: TATInt64Array);
+    procedure SetAsString(const AValue: string);
     procedure SetItem(N: integer; const AItem: TATMarkerItem);
   public
     constructor Create; virtual;
@@ -78,6 +81,7 @@ type
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
     property AsArray: TATInt64Array read GetAsArray write SetAsArray;
+    property AsString: string read GetAsString write SetAsString;
   end;
 
 implementation
@@ -229,6 +233,45 @@ begin
       bMinimap
       );
   end;
+end;
+
+function TATMarkers.GetAsString: string;
+var
+  Ar: TATInt64Array;
+  i: integer;
+begin
+  Result:= '';
+  Ar:= AsArray;
+  for i:= 0 to High(Ar) do
+    Result+= IntToStr(Ar[i])+',';
+end;
+
+procedure TATMarkers.SetAsString(const AValue: string);
+var
+  Sep: TATStringSeparator;
+  Ar: TATInt64Array;
+  Len: integer;
+  N: Int64;
+  i: integer;
+begin
+  if AValue='' then
+  begin
+    Clear;
+    exit;
+  end;
+
+  Len:= SFindCharCount(AValue, ',');
+  if Len=0 then exit;
+  SetLength(Ar, Len);
+
+  Sep.Init(AValue);
+  for i:= 0 to Len-1 do
+  begin
+    Sep.GetItemInt64(N, 0);
+    Ar[i]:= N;
+  end;
+
+  AsArray:= Ar;
 end;
 
 procedure TATMarkers.SetItem(N: integer; const AItem: TATMarkerItem);
