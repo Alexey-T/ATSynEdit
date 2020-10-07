@@ -1726,8 +1726,7 @@ begin
     end;
 
     SetCaretsArray(ACarets);
-    if Length(AMarkers)>0 then
-      SetMarkersArray(AMarkers);
+    SetMarkersArray(AMarkers);
 
     ActionDeleteDupFakeLines;
   finally
