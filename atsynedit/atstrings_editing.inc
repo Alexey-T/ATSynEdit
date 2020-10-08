@@ -604,7 +604,7 @@ begin
   begin
     BeginUndoGroup;
 
-    if (AX<Length(Str)-1) then
+    if AX<Length(Str) then
     begin
       StrMove:= Copy(Str, AX+1, MaxInt);
       Delete(Str, AX+1, MaxInt);
