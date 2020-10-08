@@ -494,6 +494,7 @@ type
     FHotspots: TATHotspots;
     FRegexLinks: TRegExpr;
     FLinkCache: TATLinkCache;
+    FFileName: string;
     FMenuStd: TPopupMenu;
     FMenuText: TPopupMenu;
     FMenuGutterBm: TPopupMenu;
@@ -1270,6 +1271,7 @@ type
     property GutterBandEmpty: integer read FGutterBandEmpty write FGutterBandEmpty;
     property GutterBandDecor: integer read FGutterBandDecor write FGutterBandDecor;
     //files
+    property FileName: string read FFileName write FFileName;
     procedure LoadFromFile(const AFilename: string; AKeepScroll: boolean=false); virtual;
     procedure SaveToFile(const AFilename: string); virtual;
     //cmd
@@ -4219,7 +4221,9 @@ begin
 
   BeginUpdate;
   try
+    FFileName:= '';
     Strings.LoadFromFile(AFilename);
+    FFileName:= AFileName;
   finally
     EndUpdate;
   end;
@@ -4258,6 +4262,7 @@ begin
   end;
 
   Strings.SaveToFile(AFilename);
+  FFileName:= AFilename;
   Modified:= false;
 end;
 
