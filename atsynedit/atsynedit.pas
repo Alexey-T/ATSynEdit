@@ -244,8 +244,8 @@ type
     SmoothPos: integer;
     SmoothPosLast: integer;
     procedure Clear;
-    procedure SetZero;
-    procedure SetLast;
+    procedure SetZero; inline;
+    procedure SetLast; inline;
     function TopGapVisible: boolean; inline;
     function TotalOffset: integer; inline;
     class operator =(const A, B: TATSynScrollInfo): boolean;
