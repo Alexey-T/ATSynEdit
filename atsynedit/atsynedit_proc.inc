@@ -72,6 +72,20 @@ begin
   SmoothPage:= 1;
 end;
 
+procedure TATSynScrollInfo.SetZero;
+begin
+  NPos:= 0;
+  NPixelOffset:= 0;
+  SmoothPos:= 0;
+end;
+
+procedure TATSynScrollInfo.SetLast;
+begin
+  NPos:= NPosLast;
+  NPixelOffset:= 0;
+  SmoothPos:= SmoothPosLast;
+end;
+
 function TATSynScrollInfo.TopGapVisible: boolean;
 begin
   Result:= NPos=-1;

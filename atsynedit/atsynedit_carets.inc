@@ -458,8 +458,7 @@ begin
     Dec(NIndex);
     if NIndex<0 then
     begin
-      FScrollVert.NPos:= 0;
-      FScrollVert.NPixelOffset:= 0;
+      FScrollVert.SetZero;
       Exit;
     end;
 

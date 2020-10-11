@@ -134,7 +134,7 @@ begin
   if ModeOneLine then
     if bTextChanged then
     begin
-      FScrollHorz.NPos:= 0;
+      FScrollHorz.SetZero;
       Include(Res, cResultCaretTop);
     end;
 

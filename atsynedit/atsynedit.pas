@@ -244,6 +244,8 @@ type
     SmoothPos: integer;
     SmoothPosLast: integer;
     procedure Clear;
+    procedure SetZero;
+    procedure SetLast;
     function TopGapVisible: boolean; inline;
     function TotalOffset: integer; inline;
     class operator =(const A, B: TATSynScrollInfo): boolean;
@@ -2210,10 +2212,7 @@ begin
   FWrapUpdateNeeded:= true;
 
   if FWrapMode<>cWrapOff then
-  begin
-    FScrollHorz.NPos:= 0;
-    FScrollHorz.NPixelOffset:= 0;
-  end;
+    FScrollHorz.SetZero;
 
   Update;
   LineTop:= NLine;
@@ -4364,8 +4363,7 @@ var
 begin
   if AValue<=0 then
   begin
-    FScrollVert.NPos:= 0;
-    FScrollVert.SmoothPos:= 0;
+    FScrollVert.SetZero;
     Update;
     Exit
   end;
@@ -4746,9 +4744,7 @@ begin
 
   if APos<=0 then
   begin
-    AInfo.SmoothPos:= 0;
-    AInfo.NPos:= 0;
-    AInfo.NPixelOffset:= 0;
+    AInfo.SetZero;
     if bConsiderGaps then
       if Gaps.SizeOfGapTop>0 then
         AInfo.NPos:= -1;
@@ -4757,9 +4753,7 @@ begin
 
   if APos>=AInfo.SmoothPosLast then
   begin
-    AInfo.SmoothPos:= AInfo.SmoothPosLast;
-    AInfo.NPos:= AInfo.NPosLast;
-    AInfo.NPixelOffset:= 0;
+    AInfo.SetLast;
     exit
   end;
 
@@ -6282,11 +6276,11 @@ end;
 
 procedure TATSynEdit.DoScrollToBeginOrEnd(AToBegin: boolean);
 begin
-  FScrollHorz.NPos:= 0;
+  FScrollHorz.SetZero;
   if AToBegin then
-    FScrollVert.NPos:= 0
+    FScrollVert.SetZero
   else
-    FScrollVert.NPos:= FScrollVert.NPosLast;
+    FScrollVert.SetLast;
 
   FScrollHorz.NPixelOffset:= 0;
   FScrollVert.NPixelOffset:= 0;
