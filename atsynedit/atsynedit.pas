@@ -2209,7 +2209,10 @@ begin
 
   NLine:= LineTop;
   FWrapMode:= AValue;
+
   FWrapUpdateNeeded:= true;
+  UpdateWrapInfo; //helps to solve https://github.com/Alexey-T/CudaText/issues/2879
+                  //FWrapUpdateNeeded:=true and Update() is not enough
 
   if FWrapMode<>cWrapOff then
     FScrollHorz.SetZero;
