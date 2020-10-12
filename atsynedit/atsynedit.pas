@@ -1926,12 +1926,10 @@ var
   NLine, NIndexFrom, NIndexTo: integer;
   i, j: integer;
 begin
-  {
-  //2020.03: works ok w/o this block
-  //old comment: method can be called before 1st paint,
-  //so TCanvas.TextWidth will give exception (control has no parent window)
+  //method can be called before 1st paint,
+  //so TCanvas.TextWidth will give exception "Control has no parent window"
+  //example: CudaText has user.json with "wrap_mode":1
   if not HandleAllocated then exit;
-  }
 
   //must init FRect* if called before first paint (wrapped items need it)
   if FRectMain.Width=0 then
@@ -2211,10 +2209,8 @@ begin
   FWrapMode:= AValue;
 
   FWrapUpdateNeeded:= true;
-
-  if HandleAllocated then //required for Win32
-    UpdateWrapInfo; //helps to solve https://github.com/Alexey-T/CudaText/issues/2879
-                    //FWrapUpdateNeeded:=true and Update() is not enough
+  UpdateWrapInfo; //helps to solve https://github.com/Alexey-T/CudaText/issues/2879
+                  //FWrapUpdateNeeded:=true and Update() is not enough
 
   if FWrapMode<>cWrapOff then
     FScrollHorz.SetZero;
