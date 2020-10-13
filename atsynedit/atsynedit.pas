@@ -422,8 +422,13 @@ type
     ShowMicromap: boolean;
     ShowRuler: boolean;
     ShowNumbers: boolean;
-    ShowUnprinted: boolean;
     ShowFolding: boolean;
+    ShowUnprinted: boolean;
+    UnprintedSpaces: boolean;
+    UnprintedSpacesTrail: boolean;
+    UnprintedSpacesInSel: boolean;
+    UnprintedEnds: boolean;
+    UnprintedEndsDetails: boolean;
   end;
 
 type
