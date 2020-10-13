@@ -67,8 +67,8 @@ begin
 
   M.Add(cCommand_ForceFinalEndOfLine, 'force final end-of-line', [], []);
 
-  M.Add(cCommand_TextDeleteLine, 'delete line', [cXControl+'+Y'], []);
-  M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXControl+'+D'], []);
+  M.Add(cCommand_TextDeleteLine, 'delete line(s)', [cXControl+'+Y'], []);
+  M.Add(cCommand_TextDuplicateLine, 'duplicate line(s)', [cXControl+'+D'], []);
 
   M.Add(cCommand_GotoTextBegin,      'go to text begin',          [cXControl+'+Home'], []);
   M.Add(cCommand_GotoTextBegin_Sel,  'go to text begin + select', [cXControl+'+Shift+Home'], []);
