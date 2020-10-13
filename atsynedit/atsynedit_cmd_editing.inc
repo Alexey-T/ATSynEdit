@@ -440,31 +440,39 @@ end;
 
 function TATSynEdit.DoCommand_TextDuplicateLine: TATCommandResults;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
-  Y1, Y2, i: integer;
+  Line1, Line2, iCaret, iLine: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  //cmd handles only 1 caret, to handle seltext
-  Caret:= Carets[0];
-  if not Strings.IsIndexValid(Caret.PosY) then Exit;
+  DoCaretsDeleteOnSameLines;
 
-  Strings.BeginUndoGroup;
+  St:= Strings;
+  St.BeginUndoGroup;
   try
-    //universal code, for selection or not
-    Caret.GetSelLines(Y1, Y2, true);
-    Strings.LinesEnds[Y2]:= Strings.Endings;
-    for i:= Y2 downto Y1 do
+    for iCaret:= Carets.Count-1 downto 0 do
     begin
-      Strings.LineInsert(Y2+1, Strings.Lines[i]);
-      Strings.LinesEnds[Y2+1]:= Strings.Endings;
+      Caret:= Carets[iCaret];
+      if not St.IsIndexValid(Caret.PosY) then Continue;
+
+      //universal code, for selection or not
+      Caret.GetSelLines(Line1, Line2, true);
+      if St.LinesEnds[Line2]=cEndNone then
+        St.LinesEnds[Line2]:= St.Endings;
+      for iLine:= Line2 downto Line1 do
+      begin
+        St.LineInsert(Line2+1, St.Lines[iLine]);
+        St.LinesEnds[Line2+1]:= St.Endings;
+      end;
+
+      DoCaretsShift(iCaret, Caret.PosX, Caret.PosY, 0, (Line2-Line1+1), Point(0, 0));
     end;
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
   end;
 
-  DoCaretSingleAsIs;
   Result:= [cResultText, cResultCaretTop];
 end;
 
