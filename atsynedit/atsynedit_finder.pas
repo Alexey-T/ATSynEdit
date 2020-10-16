@@ -1135,10 +1135,17 @@ function TATEditorFinder.CheckTokens(AX, AY: integer): boolean;
 var
   Kind: TATTokenKind;
 begin
+  if OptInSelection then
+    //block positions found after the selection
+    if not FinderCarets.IsPosSelected(AX, AY) then
+      exit(false);
+
   if OptTokens=cTokensAll then
     exit(true);
+
   if not Assigned(FOnGetToken) then
     exit(true);
+
   FOnGetToken(Editor, AX, AY, Kind);
   case OptTokens of
     cTokensOnlyComments:
