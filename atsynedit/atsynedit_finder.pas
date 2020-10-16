@@ -864,15 +864,32 @@ end;
 function TATEditorFinder.GetOffsetOfCaret: integer;
 var
   Pnt: TPoint;
+  MarkX, MarkY: integer;
+  bMark: boolean;
 begin
-  if FinderCarets.Count>0 then
-    with FinderCarets[0] do
+  bMark:= false;
+  if FPlaceMarker then
+  begin
+    GetMarkerPos(MarkX, MarkY);
+    if MarkY>=0 then
     begin
-      Pnt.X:= PosX;
-      Pnt.Y:= PosY;
-    end
-  else
-    Pnt:= Point(0, 0);
+      bMark:= true;
+      Pnt.X:= MarkX;
+      Pnt.Y:= MarkY;
+    end;
+  end;
+
+  if not bMark then
+  begin
+    if FinderCarets.Count>0 then
+      with FinderCarets[0] do
+      begin
+        Pnt.X:= PosX;
+        Pnt.Y:= PosY;
+      end
+    else
+      Pnt:= Point(0, 0);
+  end;
 
   Result:= ConvertCaretPosToBufferPos(Pnt);
 
@@ -1083,19 +1100,7 @@ begin
 end;
 
 function TATEditorFinder.GetOffsetStartPos: integer;
-var
-  MarkX, MarkY: integer;
 begin
-  if OptFromCaret and FPlaceMarker then
-  begin
-    GetMarkerPos(MarkX, MarkY);
-    if MarkY>=0 then
-    begin
-      Result:= ConvertCaretPosToBufferPos(Point(MarkX, MarkY));
-      exit;
-    end;
-  end;
-
   if OptFromCaret then
     Result:= GetOffsetOfCaret
   else
@@ -2150,6 +2155,7 @@ procedure TATEditorFinder.GetMarkerPos(out AX, AY: integer);
 var
   Mark: TATMarkerItem;
   Caret: TATCaretItem;
+  MarkX, MarkY: integer;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
   i: integer;
@@ -2157,12 +2163,17 @@ begin
   AX:= -1;
   AY:= -1;
   if Editor.Markers.Count<>1 then exit;
-  Mark:= Editor.Markers[0];
 
-  if FinderCarets.IsPosSelected(Mark.PosX, Mark.PosY) then
+  Mark:= Editor.Markers[0];
+  MarkX:= Mark.PosX;
+  MarkY:= Mark.PosY;
+  if OptBack then
+    Inc(MarkX, Mark.LineLen);
+
+  if FinderCarets.IsPosSelected(MarkX, MarkY) then
   begin
-    AX:= Mark.PosX;
-    AY:= Mark.PosY;
+    AX:= MarkX;
+    AY:= MarkY;
     exit;
   end;
 
@@ -2173,7 +2184,7 @@ begin
     Caret:= FinderCarets[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
     if bSel then
-      if IsPosSorted(Mark.PosX, Mark.PosY, X1, Y1, false) then
+      if IsPosSorted(MarkX, MarkY, X1, Y1, false) then
       begin
         AX:= X1;
         AY:= Y1;
