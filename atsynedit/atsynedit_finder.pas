@@ -716,7 +716,7 @@ begin
     if Assigned(Editor) then
       FinderCarets.Assign(Editor.Carets);
 
-  FPlaceMarker:= ASimpleAction and OptInSelection and Assigned(Editor) and Editor.Carets.IsSelection;
+  FPlaceMarker:= ASimpleAction and OptInSelection and FinderCarets.IsSelection;
 end;
 
 procedure TATEditorFinder.SetVirtualCaretsAsString(const AValue: string);
@@ -2139,11 +2139,7 @@ begin
   if Editor.Markers.Count<>1 then exit;
   Mark:= Editor.Markers[0];
 
-  if FinderCarets.Count>0 then
-    FCarets:= FinderCarets
-  else
-    FCarets:= Editor.Carets;
-  Result:= FCarets.IsPosSelected(Mark.PosX, Mark.PosY);
+  Result:= FinderCarets.IsPosSelected(Mark.PosX, Mark.PosY);
 end;
 
 
