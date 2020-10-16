@@ -293,7 +293,6 @@ const
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
   cInitMarkerSize = 25;
-  cInitMarkerSizeSmallPercents = 50;
   cInitFoldStyle = cFoldHereWithTruncatedText;
   cInitFoldUnderlineOffset = 3;
   cInitFoldTooltipVisible = true;
@@ -711,7 +710,6 @@ type
     FOptCaretFixAfterRangeFolded: boolean;
     FOptCaretsMultiToColumnSel: boolean;
     FOptMarkersSize: integer;
-    FOptMarkersSizeSmallPercents: integer;
     FOptShowScrollHint: boolean;
     FOptTextCenteringCharWidth: integer;
     FOptTextOffsetLeft: integer;
@@ -1589,7 +1587,6 @@ type
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default cInitMarkerSize;
-    property OptMarkersSizeSmallPercents: integer read FOptMarkersSizeSmallPercents write FOptMarkersSizeSmallPercents default cInitMarkerSizeSmallPercents;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways default true;
@@ -4068,7 +4065,6 @@ begin
   FOptCaretsPrimitiveColumnSelection:= cInitCaretsPrimitiveColumnSelection;
   FOptCaretsMultiToColumnSel:= cInitCaretsMultiToColumnSel;
   FOptMarkersSize:= cInitMarkerSize;
-  FOptMarkersSizeSmallPercents:= cInitMarkerSizeSmallPercents;
   FOptMouseEnableAll:= true;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
@@ -7186,7 +7182,7 @@ begin
       LenPnt.Y:= Mark.PosY;
       LenPnt:= CaretPosToClientPos(LenPnt);
 
-      NLineW:= Max(1, NMarkSize * FOptMarkersSizeSmallPercents div (100 div 2));
+      NLineW:= Max(1, NMarkSize { * FOptMarkersSizeSmallPercents div (100 div 2) });
       R.Left:= Min(Pnt.X, LenPnt.X);
       R.Right:= Max(Pnt.X, LenPnt.X)+1;
       R.Bottom:= Pnt.Y+NMarkSize+1;
