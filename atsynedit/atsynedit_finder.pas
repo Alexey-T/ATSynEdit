@@ -866,15 +866,7 @@ end;
 function TATEditorFinder.GetOffsetOfCaret: integer;
 var
   Pnt: TPoint;
-  Mark: TATMarkerItem;
 begin
-  if FPlaceMarker and IsMarkerInsideSelection then
-  begin
-    Mark:= Editor.Markers[0];
-    Pnt.X:= Mark.PosX;
-    Pnt.Y:= Mark.PosY;
-  end
-  else
   if FinderCarets.Count>0 then
     with FinderCarets[0] do
     begin
@@ -1093,7 +1085,15 @@ begin
 end;
 
 function TATEditorFinder.GetOffsetStartPos: integer;
+var
+  Mark: TATMarkerItem;
 begin
+  if FPlaceMarker and IsMarkerInsideSelection then
+  begin
+    Mark:= Editor.Markers[0];
+    Result:= ConvertCaretPosToBufferPos(Point(Mark.PosX, Mark.PosY));
+  end
+  else
   if OptFromCaret then
     Result:= GetOffsetOfCaret
   else
