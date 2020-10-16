@@ -98,7 +98,7 @@ type
     function GetRegexReplacement(const AFromText: UnicodeString): UnicodeString;
     function IsProgressNeeded(ANewPos: integer): boolean; inline;
   protected
-    procedure DoOnFound; virtual;
+    procedure DoOnFound(AWithEvent: boolean); virtual;
     function CheckTokens(APos: integer): boolean; virtual;
   public
     OptBack: boolean;
@@ -203,7 +203,7 @@ type
     function CurrentFragment: TATEditorFragment;
     property CurrentFragmentIndex: integer read FFragmentIndex write SetFragmentIndex;
   protected
-    procedure DoOnFound; override;
+    procedure DoOnFound(AWithEvent: boolean); override;
     procedure DoConfirmReplace(APos, AEnd: TPoint; var AConfirmThis,
       AConfirmContinue: boolean; var AReplacement: UnicodeString);
     function CheckTokens(AX, AY: integer): boolean;
@@ -423,7 +423,7 @@ begin
   FStrReplace:= AValue;
 end;
 
-procedure TATTextFinder.DoOnFound;
+procedure TATTextFinder.DoOnFound(AWithEvent: boolean);
 begin
   //
 end;
@@ -649,12 +649,9 @@ begin
     Res.Init(P1, P2);
     AList.Add(Res);
 
-    if AWithEvent then
-    begin
-      FMatchPos:= FRegex.MatchPos[0];
-      FMatchLen:= FRegex.MatchLen[0];
-      DoOnFound;
-    end;
+    FMatchPos:= FRegex.MatchPos[0];
+    FMatchLen:= FRegex.MatchLen[0];
+    DoOnFound(AWithEvent);
   end;
 
   while FRegex.ExecNext do
@@ -676,12 +673,9 @@ begin
     Res.Init(P1, P2);
     AList.Add(Res);
 
-    if AWithEvent then
-    begin
-      FMatchPos:= FRegex.MatchPos[0];
-      FMatchLen:= FRegex.MatchLen[0];
-      DoOnFound;
-    end;
+    FMatchPos:= FRegex.MatchPos[0];
+    FMatchLen:= FRegex.MatchLen[0];
+    DoOnFound(AWithEvent);
 
     if IsProgressNeeded(Res.FPos.Y) then
       if Assigned(FOnProgress) then
@@ -1642,13 +1636,14 @@ begin
   begin
     NPos:= Max(1, AStartPos);
     Result:= DoFind_Regex(NPos);
-    if Result then DoOnFound;
+    if Result then
+      DoOnFound(true);
   end
   else
     ShowMessage('Error: Finder.FindMatch called for non-regex');
 end;
 
-procedure TATEditorFinder.DoOnFound;
+procedure TATEditorFinder.DoOnFound(AWithEvent: boolean);
 begin
   if OptRegex then
   begin
@@ -1656,8 +1651,9 @@ begin
     FMatchEdEnd:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
   end;
 
-  if Assigned(FOnFound) then
-    FOnFound(Self, FMatchEdPos, FMatchEdEnd);
+  if AWithEvent then
+    if Assigned(FOnFound) then
+      FOnFound(Self, FMatchEdPos, FMatchEdEnd);
 end;
 
 function TATEditorFinder.GetRegexSkipIncrement: integer;
@@ -1983,8 +1979,7 @@ begin
               FMatchEdEnd.X:= IndexChar+SLinePart_Len
             else
               FMatchEdEnd.X:= _GetLenPart(PartCount-1);
-            if AWithEvent then
-              DoOnFound;
+            DoOnFound(AWithEvent);
             Exit(true);
           end;
         end;
@@ -2068,8 +2063,7 @@ begin
               FMatchEdEnd.Y:= IndexLine-PartCount+1;
               FMatchEdEnd.X:= Strs.LinesLen[FMatchEdEnd.Y] - _GetLenPart(PartCount-1);
             end;
-            if AWithEvent then
-              DoOnFound;
+            DoOnFound(AWithEvent);
             Exit(true);
           end;
         end;
