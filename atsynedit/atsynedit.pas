@@ -293,7 +293,7 @@ const
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
   cInitMarkerSize = 25;
-  cInitMarkerLineWidth = 2;
+  cInitMarkerLineWidth = 50;
   cInitFoldStyle = cFoldHereWithTruncatedText;
   cInitFoldUnderlineOffset = 3;
   cInitFoldTooltipVisible = true;
@@ -7161,9 +7161,10 @@ end;
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
   Mark: TATMarkerItem;
-  Pnt: TPoint;
-  LenPnt: TPoint;
-  iMark, iLine: integer;
+  Pnt, LenPnt: TPoint;
+  iMark: integer;
+  NMarkSize, NLineW: integer;
+  R: TRect;
 begin
   if FMarkers=nil then exit;
   for iMark:= 0 to FMarkers.Count-1 do
@@ -7176,21 +7177,23 @@ begin
     Pnt.Y:= Mark.CoordY+FCharSize.Y;
     if not PtInRect(FRectMain, Pnt) then Continue;
 
-    CanvasPaintTriangleUp(C,
-      Colors.Markers,
-      Pnt,
-      FCharSize.X * FOptMarkersSize div 100
-      );
+    NMarkSize:= FCharSize.X * FOptMarkersSize div 100;
+    CanvasPaintTriangleUp(C, Colors.Markers, Pnt, NMarkSize);
 
     if Mark.LineLen<>0 then
     begin
       LenPnt.X:= Max(0, Mark.PosX+Mark.LineLen);
       LenPnt.Y:= Mark.PosY;
       LenPnt:= CaretPosToClientPos(LenPnt);
-      C.Pen.Color:= Colors.Markers;
 
-      for iLine:= 0 to EditorScale(FOptMarkersLineWidth)-1 do
-        CanvasLineHorz(C, Pnt.X, Pnt.Y+iLine, LenPnt.X, true);
+      NLineW:= Max(1, NMarkSize * FOptMarkersLineWidth div 50);
+      R.Left:= Min(Pnt.X, LenPnt.X);
+      R.Right:= Max(Pnt.X, LenPnt.X)+1;
+      R.Bottom:= Pnt.Y+NMarkSize+1;
+      R.Top:= R.Bottom-NLineW;
+
+      C.Brush.Color:= Colors.Markers;
+      C.FillRect(R);
     end;
   end;
 end;
