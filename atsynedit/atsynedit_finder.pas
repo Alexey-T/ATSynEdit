@@ -1235,6 +1235,7 @@ var
   bStartAtEdge: boolean;
   bMarkerFound: boolean;
   Fr: TATEditorFragment;
+  MarkX, MarkY: integer;
 begin
   Result:= false;
   AChanged:= false;
@@ -1262,8 +1263,13 @@ begin
   bMarkerFound:= false;
   if FPlaceMarker then
   begin
-    GetMarkerPos(PosStart.X, PosStart.Y);
-    bMarkerFound:= PosStart.Y>=0;
+    GetMarkerPos(MarkX, MarkY);
+    if MarkY>=0 then
+    begin
+      bMarkerFound:= true;
+      PosStart.X:= MarkX;
+      PosStart.Y:= MarkY;
+    end;
   end;
 
   if not bMarkerFound then
