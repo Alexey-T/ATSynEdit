@@ -31,6 +31,8 @@ type
       //if LenY=0 - LenX is length of sel (single line)
       //if LenY>0 - LenY is Y-delta of sel-end,
       //            LenX is absolute X of sel-end
+    LineLen: integer;
+      //render underline near the marker, to left/right, if <>0
     Value: Int64;
     Ptr: TObject;
       //used in Attribs object of ATSynedit
@@ -75,7 +77,8 @@ type
       ALenY: integer=0;
       APtr: TObject=nil;
       AValue: Int64=0;
-      AMicromapOnly: boolean=False);
+      AMicromapOnly: boolean=False;
+      ALineLen: integer=0);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
@@ -279,8 +282,9 @@ begin
   FList[N]:= AItem;
 end;
 
-procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64; ALenX: integer; ALenY: integer;
-  APtr: TObject; AValue: Int64; AMicromapOnly: boolean);
+procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
+  ALenX: integer; ALenY: integer; APtr: TObject; AValue: Int64;
+  AMicromapOnly: boolean; ALineLen: integer);
 var
   Item: TATMarkerItem;
   NIndex: integer;
@@ -294,6 +298,7 @@ begin
   Item.Tag:= ATag;
   Item.LenX:= ALenX;
   Item.LenY:= ALenY;
+  Item.LineLen:= ALineLen;
   Item.Ptr:= APtr;
   Item.Value:= AValue;
   Item.MicromapOnly:= AMicromapOnly;

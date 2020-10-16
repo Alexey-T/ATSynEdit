@@ -709,6 +709,7 @@ type
     FOptCaretFixAfterRangeFolded: boolean;
     FOptCaretsMultiToColumnSel: boolean;
     FOptMarkersSize: integer;
+    FOptMarkersLineWidth: integer;
     FOptShowScrollHint: boolean;
     FOptTextCenteringCharWidth: integer;
     FOptTextOffsetLeft: integer;
@@ -1586,6 +1587,7 @@ type
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default 25;
+    property OptMarkersLineWidth: integer read FOptMarkersLineWidth write FOptMarkersLineWidth default 2;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways default true;
@@ -4064,6 +4066,7 @@ begin
   FOptCaretsPrimitiveColumnSelection:= cInitCaretsPrimitiveColumnSelection;
   FOptCaretsMultiToColumnSel:= cInitCaretsMultiToColumnSel;
   FOptMarkersSize:= 25;
+  FOptMarkersLineWidth:= 2;
   FOptMouseEnableAll:= true;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
@@ -7157,12 +7160,13 @@ procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
   Mark: TATMarkerItem;
   Pnt: TPoint;
-  i: integer;
+  LenPnt: TPoint;
+  iMark, iLine: integer;
 begin
   if FMarkers=nil then exit;
-  for i:= 0 to FMarkers.Count-1 do
+  for iMark:= 0 to FMarkers.Count-1 do
   begin
-    Mark:= FMarkers[i];
+    Mark:= FMarkers[iMark];
     if Mark.CoordX<0 then Continue;
     if Mark.CoordY<0 then Continue;
 
@@ -7175,6 +7179,17 @@ begin
       Pnt,
       FCharSize.X * FOptMarkersSize div 100
       );
+
+    if Mark.LineLen<>0 then
+    begin
+      LenPnt.X:= Max(0, Mark.PosX+Mark.LineLen);
+      LenPnt.Y:= Mark.PosY;
+      LenPnt:= CaretPosToClientPos(LenPnt);
+      C.Pen.Color:= Colors.Markers;
+
+      for iLine:= 0 to EditorScale(FOptMarkersLineWidth)-1 do
+        CanvasLineHorz(C, Pnt.X, Pnt.Y+iLine, LenPnt.X, true);
+    end;
   end;
 end;
 

@@ -1540,11 +1540,17 @@ end;
 
 procedure TATEditorFinder.PlaceCaret(APosX, APosY: integer; AEndX: integer;
   AEndY: integer);
+var
+  NLineLen: integer;
 begin
   if FPlaceMarker then
   begin
+    if APosY=AEndY then
+      NLineLen:= AEndX-APosX
+    else
+      NLineLen:= 0;
     Editor.Markers.Clear;
-    Editor.Markers.Add(APosX, APosY);
+    Editor.Markers.Add(APosX, APosY, 0, 0, 0, nil, 0, false, NLineLen);
   end
   else
     Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);
