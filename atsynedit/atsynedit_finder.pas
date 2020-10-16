@@ -771,9 +771,6 @@ end;
 
 procedure TATEditorFinder.UpdateFragments;
 begin
-  if OptInSelection then
-    OptFromCaret:= false;
-
   DoFragmentsClear;
   if OptInSelection then
     DoFragmentsInit;
@@ -1089,7 +1086,7 @@ function TATEditorFinder.GetOffsetStartPos: integer;
 var
   MarkX, MarkY: integer;
 begin
-  if FPlaceMarker then
+  if OptFromCaret and FPlaceMarker then
   begin
     GetMarkerPos(MarkX, MarkY);
     if MarkY>=0 then
@@ -1261,7 +1258,7 @@ begin
   end;
 
   bMarkerFound:= false;
-  if FPlaceMarker then
+  if OptFromCaret and FPlaceMarker then
   begin
     GetMarkerPos(MarkX, MarkY);
     if MarkY>=0 then
