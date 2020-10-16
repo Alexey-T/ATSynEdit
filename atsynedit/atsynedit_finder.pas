@@ -2132,13 +2132,10 @@ end;
 function TATEditorFinder.IsMarkerInsideSelection: boolean;
 var
   Mark: TATMarkerItem;
-  FCarets: TATCarets;
 begin
   Result:= false;
-
   if Editor.Markers.Count<>1 then exit;
   Mark:= Editor.Markers[0];
-
   Result:= FinderCarets.IsPosSelected(Mark.PosX, Mark.PosY);
 end;
 
