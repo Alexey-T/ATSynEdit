@@ -170,7 +170,6 @@ type
     function GetOffsetStartPos: integer;
     function GetRegexSkipIncrement: integer; inline;
     procedure GetMarkerPos(out AX, AY: integer);
-    function IsMarkerInsideSelection: boolean;
     procedure DoFixCaretSelectionDirection;
     //
     procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
@@ -2138,16 +2137,6 @@ begin
   FCallbackString:= '';
 end;
 
-function TATEditorFinder.IsMarkerInsideSelection: boolean;
-var
-  Mark: TATMarkerItem;
-begin
-  Result:= false;
-  if Editor.Markers.Count<>1 then exit;
-  Mark:= Editor.Markers[0];
-  Result:= FinderCarets.IsPosSelected(Mark.PosX, Mark.PosY);
-end;
-
 procedure TATEditorFinder.GetMarkerPos(out AX, AY: integer);
 var
   Mark: TATMarkerItem;
@@ -2161,7 +2150,7 @@ begin
   if Editor.Markers.Count<>1 then exit;
   Mark:= Editor.Markers[0];
 
-  if IsMarkerInsideSelection then
+  if FinderCarets.IsPosSelected(Mark.PosX, Mark.PosY) then
   begin
     AX:= Mark.PosX;
     AY:= Mark.PosY;
