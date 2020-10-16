@@ -146,6 +146,7 @@ type
     FMatchEdEnd: TPoint;
     FMatchEdPosAfterRep: TPoint;
     FMaxLineLen: integer;
+    //note: all code of finder must use FinderCarets, not Editor.Carets! except in: FinderCarets.Assign(Editor.Carets)
     FinderCarets: TATCarets;
     FVirtualCaretsAsString: string;
     FIndentHorz: integer;
