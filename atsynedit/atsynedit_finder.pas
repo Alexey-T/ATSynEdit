@@ -169,6 +169,7 @@ type
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
     function GetRegexSkipIncrement: integer; inline;
+    procedure GetMarkerPos(out AX, AY: integer);
     function IsMarkerInsideSelection: boolean;
     procedure DoFixCaretSelectionDirection;
     //
@@ -1087,14 +1088,18 @@ end;
 
 function TATEditorFinder.GetOffsetStartPos: integer;
 var
-  Mark: TATMarkerItem;
+  MarkX, MarkY: integer;
 begin
-  if FPlaceMarker and IsMarkerInsideSelection then
+  if FPlaceMarker then
   begin
-    Mark:= Editor.Markers[0];
-    Result:= ConvertCaretPosToBufferPos(Point(Mark.PosX, Mark.PosY));
-  end
-  else
+    GetMarkerPos(MarkX, MarkY);
+    if MarkY>=0 then
+    begin
+      Result:= ConvertCaretPosToBufferPos(Point(MarkX, MarkY));
+      exit;
+    end;
+  end;
+
   if OptFromCaret then
     Result:= GetOffsetOfCaret
   else
@@ -1226,10 +1231,10 @@ function TATEditorFinder.DoFindOrReplace_InEditor(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   Caret: TATCaretItem;
-  Mark: TATMarkerItem;
   NLastX, NLastY, NLines: integer;
   PosStart, PosEnd, SecondStart, SecondEnd: TPoint;
   bStartAtEdge: boolean;
+  bMarkerFound: boolean;
   Fr: TATEditorFragment;
 begin
   Result:= false;
@@ -1255,34 +1260,37 @@ begin
     PosEnd.Y:= 0;
   end;
 
-  Fr:= CurrentFragment;
-  if FPlaceMarker and IsMarkerInsideSelection then
+  bMarkerFound:= false;
+  if FPlaceMarker then
   begin
-    Mark:= Editor.Markers[0];
-    PosStart.X:= Mark.PosX;
-    PosStart.Y:= Mark.PosY;
-  end
-  else
-  if Fr.Inited then
+    GetMarkerPos(PosStart.X, PosStart.Y);
+    bMarkerFound:= PosStart.Y>=0;
+  end;
+
+  if not bMarkerFound then
   begin
-    if not OptBack then
+    Fr:= CurrentFragment;
+    if Fr.Inited then
     begin
-      PosStart.X:= Fr.X1;
-      PosStart.Y:= Fr.Y1;
+      if not OptBack then
+      begin
+        PosStart.X:= Fr.X1;
+        PosStart.Y:= Fr.Y1;
+      end
+      else
+      begin
+        PosStart.X:= Fr.X2;
+        PosStart.Y:= Fr.Y2;
+      end;
     end
     else
+    if OptFromCaret then
     begin
-      PosStart.X:= Fr.X2;
-      PosStart.Y:= Fr.Y2;
+      if FinderCarets.Count=0 then exit;
+      Caret:= FinderCarets[0];
+      PosStart.X:= Caret.PosX;
+      PosStart.Y:= Caret.PosY;
     end;
-  end
-  else
-  if OptFromCaret then
-  begin
-    if FinderCarets.Count=0 then exit;
-    Caret:= FinderCarets[0];
-    PosStart.X:= Caret.PosX;
-    PosStart.Y:= Caret.PosY;
   end;
 
   Result:= DoFindOrReplace_InEditor_Internal(AReplace, AForMany, AChanged, PosStart, PosEnd, AUpdateCaret);
@@ -2140,5 +2148,40 @@ begin
   Result:= FinderCarets.IsPosSelected(Mark.PosX, Mark.PosY);
 end;
 
+procedure TATEditorFinder.GetMarkerPos(out AX, AY: integer);
+var
+  Mark: TATMarkerItem;
+  Caret: TATCaretItem;
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+  i: integer;
+begin
+  AX:= -1;
+  AY:= -1;
+  if Editor.Markers.Count<>1 then exit;
+  Mark:= Editor.Markers[0];
+
+  if IsMarkerInsideSelection then
+  begin
+    AX:= Mark.PosX;
+    AY:= Mark.PosY;
+    exit;
+  end;
+
+  //if marker is not in selection, find first selection _after_ the marker,
+  //and return it's left side
+  for i:= 0 to FinderCarets.Count-1 do
+  begin
+    Caret:= FinderCarets[i];
+    Caret.GetRange(X1, Y1, X2, Y2, bSel);
+    if bSel then
+      if IsPosSorted(Mark.PosX, Mark.PosY, X1, Y1, false) then
+      begin
+        AX:= X1;
+        AY:= Y1;
+        exit;
+      end;
+  end;
+end;
 
 end.
