@@ -7173,7 +7173,7 @@ begin
     Pnt.Y:= Mark.CoordY+FCharSize.Y;
     if not PtInRect(FRectMain, Pnt) then Continue;
 
-    NMarkSize:= FCharSize.X * FOptMarkersSize div 100;
+    NMarkSize:= Max(1, FCharSize.X * FOptMarkersSize div 100);
     CanvasPaintTriangleUp(C, Colors.Markers, Pnt, NMarkSize);
 
     if Mark.LineLen<>0 then
@@ -7182,7 +7182,7 @@ begin
       LenPnt.Y:= Mark.PosY;
       LenPnt:= CaretPosToClientPos(LenPnt);
 
-      NLineW:= Max(1, NMarkSize { * FOptMarkersSizeSmallPercents div (100 div 2) });
+      NLineW:= NMarkSize; //Max(1, NMarkSize * FOptMarkersSizeSmallPercents div (100 div 2) );
       R.Left:= Min(Pnt.X, LenPnt.X);
       R.Right:= Max(Pnt.X, LenPnt.X)+1;
       R.Bottom:= Pnt.Y+NMarkSize+1;
