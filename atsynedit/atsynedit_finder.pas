@@ -16,6 +16,7 @@ uses
   ATSynEdit_FGL,
   ATSynEdit_RegExpr, //must be with {$define Unicode}
   ATSynEdit_Carets,
+  ATSynEdit_Markers,
   ATSynEdit_UnicodeData,
   ATStrings,
   ATStringProc,
@@ -151,9 +152,10 @@ type
     FIndentVert: integer;
     FDataString: string;
     FCallbackString: string;
+    FPlaceMarker: boolean;
     //FReplacedAtEndOfText: boolean;
     //
-    procedure UpdateCarets;
+    procedure UpdateCarets(ASimpleAction: boolean);
     procedure SetVirtualCaretsAsString(const AValue: string);
     procedure ClearMatchPos; override;
     function FindMatch_InEditor(APosStart, APosEnd: TPoint; AWithEvent: boolean): boolean;
@@ -166,6 +168,7 @@ type
     function GetOffsetOfCaret: integer;
     function GetOffsetStartPos: integer;
     function GetRegexSkipIncrement: integer; inline;
+    function IsMarkerInsideSelection: boolean;
     procedure DoFixCaretSelectionDirection;
     //
     procedure DoCollect_Usual(AList: TATFinderResults; AWithEvent, AWithConfirm: boolean);
@@ -188,6 +191,7 @@ type
       out APosAfterReplace: TPoint);
     function IsSelStartsAtMatch_InEditor: boolean;
     function IsSelStartsAtMatch_Buffered: boolean;
+    procedure PlaceCaret(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     //fragments
     procedure DoFragmentsClear;
     procedure DoFragmentsInit;
@@ -706,11 +710,13 @@ end;
 
 { TATEditorFinder }
 
-procedure TATEditorFinder.UpdateCarets;
+procedure TATEditorFinder.UpdateCarets(ASimpleAction: boolean);
 begin
   if FVirtualCaretsAsString='' then
     if Assigned(Editor) then
       FinderCarets.Assign(Editor.Carets);
+
+  FPlaceMarker:= ASimpleAction and OptInSelection and Assigned(Editor) and Editor.Carets.IsSelection;
 end;
 
 procedure TATEditorFinder.SetVirtualCaretsAsString(const AValue: string);
@@ -810,7 +816,7 @@ var
   Cnt: integer;
   PosEnd: TPoint;
 begin
-  UpdateCarets;
+  UpdateCarets(true);
   if OptRegex then
     raise Exception.Create('Finder FindSimple called in regex mode');
 
@@ -860,7 +866,15 @@ end;
 function TATEditorFinder.GetOffsetOfCaret: integer;
 var
   Pnt: TPoint;
+  Mark: TATMarkerItem;
 begin
+  if FPlaceMarker and IsMarkerInsideSelection then
+  begin
+    Mark:= Editor.Markers[0];
+    Pnt.X:= Mark.PosX;
+    Pnt.Y:= Mark.PosY;
+  end
+  else
   if FinderCarets.Count>0 then
     with FinderCarets[0] do
     begin
@@ -884,7 +898,7 @@ function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
 var
   i: integer;
 begin
-  UpdateCarets;
+  UpdateCarets(false);
   UpdateFragments;
   if OptRegex then
     UpdateBuffer;
@@ -905,7 +919,7 @@ end;
 
 procedure TATEditorFinder.DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
 begin
-  UpdateCarets;
+  UpdateCarets(false);
   UpdateFragments;
   CurrentFragmentIndex:= 0;
 
@@ -929,7 +943,7 @@ var
 begin
   if not OptRegex then
     raise Exception.Create('Finder Extract action called for non-regex mode');
-  UpdateCarets;
+  UpdateCarets(false);
   UpdateBuffer;
 
   AMatches.Clear;
@@ -963,7 +977,7 @@ begin
   Result:= 0;
   if Editor.ModeReadOnly then exit;
 
-  UpdateCarets;
+  UpdateCarets(false);
   UpdateFragments;
   if OptRegex then
     UpdateBuffer;
@@ -1074,7 +1088,7 @@ begin
       //correct caret pos
       //e.g. replace "dddddd" to "--": move lefter
       //e.g. replace "ab" to "cd cd": move righter
-      Editor.DoCaretSingle(APosAfterReplace.X, APosAfterReplace.Y);
+      PlaceCaret(APosAfterReplace.X, APosAfterReplace.Y);
     end;
 end;
 
@@ -1156,7 +1170,7 @@ var
 begin
   Result:= false;
   AChanged:= false;
-  UpdateCarets;
+  UpdateCarets(true);
 
   if not Assigned(Editor) then
     raise Exception.Create('Finder.Editor not set');
@@ -1211,6 +1225,7 @@ function TATEditorFinder.DoFindOrReplace_InEditor(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   Caret: TATCaretItem;
+  Mark: TATMarkerItem;
   NLastX, NLastY, NLines: integer;
   PosStart, PosEnd, SecondStart, SecondEnd: TPoint;
   bStartAtEdge: boolean;
@@ -1240,6 +1255,13 @@ begin
   end;
 
   Fr:= CurrentFragment;
+  if FPlaceMarker and IsMarkerInsideSelection then
+  begin
+    Mark:= Editor.Markers[0];
+    PosStart.X:= Mark.PosX;
+    PosStart.Y:= Mark.PosY;
+  end
+  else
   if Fr.Inited then
   begin
     if not OptBack then
@@ -1315,7 +1337,7 @@ begin
   if Result then
   begin
     if AUpdateCaret then
-      Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y);
+      PlaceCaret(FMatchEdPos.X, FMatchEdPos.Y);
 
     if AReplace then
     begin
@@ -1355,13 +1377,13 @@ begin
     begin
       if AReplace then
         //don't select
-        //Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y) //bad: cudatext.finder_proc(.. FINDER_REP_ALL_EX) won't go to next
-        Editor.DoCaretSingle(FMatchEdEnd.X, FMatchEdEnd.Y)
+        //PlaceCaret(FMatchEdPos.X, FMatchEdPos.Y) //bad: cudatext.finder_proc(.. FINDER_REP_ALL_EX) won't go to next
+        PlaceCaret(FMatchEdEnd.X, FMatchEdEnd.Y)
       else
       if OptBack and OptPutBackwardSelection then
-        Editor.DoCaretSingle(FMatchEdPos.X, FMatchEdPos.Y, FMatchEdEnd.X, FMatchEdEnd.Y)
+        PlaceCaret(FMatchEdPos.X, FMatchEdPos.Y, FMatchEdEnd.X, FMatchEdEnd.Y)
       else
-        Editor.DoCaretSingle(FMatchEdEnd.X, FMatchEdEnd.Y, FMatchEdPos.X, FMatchEdPos.Y);
+        PlaceCaret(FMatchEdEnd.X, FMatchEdEnd.Y, FMatchEdPos.X, FMatchEdPos.Y);
     end;
   end;
 end;
@@ -1419,7 +1441,7 @@ begin
     P1:= ConvertBufferPosToCaretPos(FMatchPos);
     P2:= ConvertBufferPosToCaretPos(FMatchPos+FMatchLen);
     if AUpdateCaret then
-      Editor.DoCaretSingle(P1.X, P1.Y);
+      PlaceCaret(P1.X, P1.Y);
 
     if AReplace then
     begin
@@ -1450,12 +1472,12 @@ begin
     begin
       if AReplace then
         //don't select
-        Editor.DoCaretSingle(P1.X, P1.Y)
+        PlaceCaret(P1.X, P1.Y)
       else
       if OptBack and OptPutBackwardSelection then
-        Editor.DoCaretSingle(P1.X, P1.Y, P2.X, P2.Y)
+        PlaceCaret(P1.X, P1.Y, P2.X, P2.Y)
       else
-        Editor.DoCaretSingle(P2.X, P2.Y, P1.X, P1.Y);
+        PlaceCaret(P2.X, P2.Y, P1.X, P1.Y);
     end;
   end;
 end;
@@ -1505,6 +1527,18 @@ begin
     ((StrFind<>'') and (Editor.TextSelectedEx(Caret)=StrFind));
 end;
 
+procedure TATEditorFinder.PlaceCaret(APosX, APosY: integer; AEndX: integer;
+  AEndY: integer);
+begin
+  if FPlaceMarker then
+  begin
+    Editor.Markers.Clear;
+    Editor.Markers.Add(APosX, APosY);
+  end
+  else
+    Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);
+end;
+
 function TATEditorFinder.DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
 var
   Caret: TATCaretItem;
@@ -1516,7 +1550,7 @@ begin
   Result:= false;
   if Editor.ModeReadOnly then exit;
 
-  UpdateCarets;
+  UpdateCarets(true);
   UpdateFragments;
 
   if OptRegex then
@@ -1634,7 +1668,6 @@ begin
     Result:= 0;
 end;
 
-
 procedure TATEditorFinder.DoFragmentsInit;
 var
   Caret: TATCaretItem;
@@ -1727,7 +1760,7 @@ begin
 
   if Assigned(FOnConfirmReplace) then
   begin
-    Editor.DoCaretSingle(APos.X, APos.Y);
+    PlaceCaret(APos.X, APos.Y);
     FOnConfirmReplace(Self, APos, AEnd, true, AConfirmThis, AConfirmContinue, AReplacement);
   end;
 end;
@@ -2095,5 +2128,28 @@ begin
   FDataString:= '';
   FCallbackString:= '';
 end;
+
+function TATEditorFinder.IsMarkerInsideSelection: boolean;
+var
+  Caret: TATCaretItem;
+  Mark: TATMarkerItem;
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  Result:= false;
+  if Editor.Markers.Count<>1 then exit;
+  if FinderCarets.Count>0 then
+    Caret:= FinderCarets[0]
+  else
+  begin
+    if Editor.Carets.Count=0 then exit;
+    Caret:= Editor.Carets[0];
+  end;
+  Caret.GetRange(X1, Y1, X2, Y2, bSel);
+  if not bSel then exit;
+  Mark:= Editor.Markers[0];
+  Result:= IsPosInRange(Mark.PosX, Mark.PosY, X1, Y1, X2, Y2)=cRelateInside;
+end;
+
 
 end.
