@@ -1496,28 +1496,18 @@ function TATEditorFinder.IsSelStartsAtMatch: boolean;
 var
   X1, Y1, X2, Y2: integer;
   SSelText: UnicodeString;
-  PosOfBegin, PosOfEnd: integer;
 begin
   Result:= false;
   GetEditorSelRange(X1, Y1, X2, Y2, SSelText);
   if SSelText='' then exit;
 
-  if OptRegex then
-  begin
-    PosOfBegin:= ConvertCaretPosToBufferPos(Point(X1, Y1));
-    PosOfEnd:= ConvertCaretPosToBufferPos(Point(X2, Y2));
-    Result:= (PosOfBegin=FMatchPos) and (PosOfEnd=FMatchPos+FMatchLen);
-  end
-  else
-  begin
-    Result:=
-      (
-      (FMatchEdPos.X=X1) and
-      (FMatchEdPos.Y=Y1) and
-      (FMatchEdEnd.X=X2) and
-      (FMatchEdEnd.Y=Y2)
-      );
-  end;
+  //FMatchEd* are set even in OptRegex mode
+  Result:= (
+    (FMatchEdPos.X=X1) and
+    (FMatchEdPos.Y=Y1) and
+    (FMatchEdEnd.X=X2) and
+    (FMatchEdEnd.Y=Y2)
+    );
   if Result then exit;
 
   if not FPlaceMarker then
