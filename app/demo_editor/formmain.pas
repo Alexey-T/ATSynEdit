@@ -894,6 +894,8 @@ begin
     progress.Show;
     progress.Position:= 0;
 
+    ed.Markers.Clear; //support "find first" in selection
+
     case res of
       mrOk: //find
         begin
