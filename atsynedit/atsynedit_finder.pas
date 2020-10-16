@@ -858,10 +858,8 @@ end;
 function TATEditorFinder.GetOffsetOfCaret: integer;
 var
   Pnt: TPoint;
-  Caret: TATCaretItem;
   MarkX, MarkY: integer;
-  X1, Y1, X2, Y2: integer;
-  bMarkerUsed, bSel: boolean;
+  bMarkerUsed: boolean;
 begin
   bMarkerUsed:= false;
   if FPlaceMarker then
@@ -872,19 +870,6 @@ begin
       bMarkerUsed:= true;
       Pnt.X:= MarkX;
       Pnt.Y:= MarkY;
-    end
-    else
-    //"replace" is called without found fragment, no marker yet
-    begin
-      if FinderCarets.Count=0 then exit;
-      Caret:= FinderCarets[0];
-      Caret.GetRange(X1, Y1, X2, Y2, bSel);
-      if bSel then
-      begin
-        bMarkerUsed:= true;
-        Pnt.X:= X1;
-        Pnt.Y:= Y1;
-      end;
     end;
   end;
 
