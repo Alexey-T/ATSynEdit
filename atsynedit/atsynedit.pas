@@ -292,6 +292,8 @@ const
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
+  cInitMarkerSize = 25;
+  cInitMarkerLineWidth = 2;
   cInitFoldStyle = cFoldHereWithTruncatedText;
   cInitFoldUnderlineOffset = 3;
   cInitFoldTooltipVisible = true;
@@ -1586,8 +1588,8 @@ type
     property OptCaretsAddedToColumnSelection: boolean read FOptCaretsAddedToColumnSelection write FOptCaretsAddedToColumnSelection default true;
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
-    property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default 25;
-    property OptMarkersLineWidth: integer read FOptMarkersLineWidth write FOptMarkersLineWidth default 2;
+    property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default cInitMarkerSize;
+    property OptMarkersLineWidth: integer read FOptMarkersLineWidth write FOptMarkersLineWidth default cInitMarkerLineWidth;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
     property OptGutterShowFoldAlways: boolean read FOptGutterShowFoldAlways write FOptGutterShowFoldAlways default true;
@@ -4065,8 +4067,8 @@ begin
   FOptCaretFixAfterRangeFolded:= true;
   FOptCaretsPrimitiveColumnSelection:= cInitCaretsPrimitiveColumnSelection;
   FOptCaretsMultiToColumnSel:= cInitCaretsMultiToColumnSel;
-  FOptMarkersSize:= 25;
-  FOptMarkersLineWidth:= 2;
+  FOptMarkersSize:= cInitMarkerSize;
+  FOptMarkersLineWidth:= cInitMarkerLineWidth;
   FOptMouseEnableAll:= true;
   FOptMouseEnableNormalSelection:= true;
   FOptMouseEnableColumnSelection:= true;
