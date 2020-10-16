@@ -2131,24 +2131,19 @@ end;
 
 function TATEditorFinder.IsMarkerInsideSelection: boolean;
 var
-  Caret: TATCaretItem;
   Mark: TATMarkerItem;
-  X1, Y1, X2, Y2: integer;
-  bSel: boolean;
+  FCarets: TATCarets;
 begin
   Result:= false;
+
   if Editor.Markers.Count<>1 then exit;
-  if FinderCarets.Count>0 then
-    Caret:= FinderCarets[0]
-  else
-  begin
-    if Editor.Carets.Count=0 then exit;
-    Caret:= Editor.Carets[0];
-  end;
-  Caret.GetRange(X1, Y1, X2, Y2, bSel);
-  if not bSel then exit;
   Mark:= Editor.Markers[0];
-  Result:= IsPosInRange(Mark.PosX, Mark.PosY, X1, Y1, X2, Y2)=cRelateInside;
+
+  if FinderCarets.Count>0 then
+    FCarets:= FinderCarets
+  else
+    FCarets:= Editor.Carets;
+  Result:= FCarets.IsPosSelected(Mark.PosX, Mark.PosY);
 end;
 
 
