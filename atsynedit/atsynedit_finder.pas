@@ -156,6 +156,7 @@ type
     FPlaceMarker: boolean;
     //FReplacedAtEndOfText: boolean;
     //
+    function IsSelStartsAtMatch: boolean;
     procedure UpdateCarets(ASimpleAction: boolean);
     procedure SetVirtualCaretsAsString(const AValue: string);
     procedure ClearMatchPos; override;
@@ -191,8 +192,6 @@ type
     procedure DoReplaceTextInEditor(APosBegin, APosEnd: TPoint;
       const AReplacement: UnicodeString; AUpdateBuffer, AUpdateCaret: boolean;
       out APosAfterReplace: TPoint);
-    function IsSelStartsAtMatch_InEditor: boolean;
-    function IsSelStartsAtMatch_Buffered: boolean;
     procedure PlaceCaret(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     //fragments
     procedure DoFragmentsClear;
@@ -1499,73 +1498,36 @@ begin
   end;
 end;
 
-function TATEditorFinder.IsSelStartsAtMatch_InEditor: boolean;
+function TATEditorFinder.IsSelStartsAtMatch: boolean;
 var
-  Caret: TATCaretItem;
-  Mark: TATMarkerItem;
   X1, Y1, X2, Y2: integer;
-  bSel: boolean;
+  SSelText: UnicodeString;
+  PosOfBegin, PosOfEnd: integer;
 begin
   Result:= false;
-  if FPlaceMarker then
+  GetEditorSelRange(X1, Y1, X2, Y2, SSelText);
+  if SSelText='' then exit;
+
+  if OptRegex then
   begin
-    if Editor.Markers.Count<>1 then exit;
-    Mark:= Editor.Markers[0];
-    if Mark.LineLen=0 then exit;
-    Result:=
-      (
-       (FMatchEdPos.X=Mark.PosX) and
-       (FMatchEdPos.Y=Mark.PosY) and
-       (FMatchEdEnd.X=Mark.PosX+Mark.LineLen) and
-       (FMatchEdEnd.Y=Mark.PosY)
-      )
-      or
-      (
-       (FMatchEdPos.X=Mark.PosX+Mark.LineLen) and
-       (FMatchEdPos.Y=Mark.PosY) and
-       (FMatchEdEnd.X=Mark.PosX) and
-       (FMatchEdEnd.Y=Mark.PosY)
-      );
+    PosOfBegin:= ConvertCaretPosToBufferPos(Point(X1, Y1));
+    PosOfEnd:= ConvertCaretPosToBufferPos(Point(X2, Y2));
+    Result:= (PosOfBegin=FMatchPos) and (PosOfEnd=FMatchPos+FMatchLen);
   end
   else
   begin
-    if FinderCarets.Count=0 then exit;
-    Caret:= FinderCarets[0];
-    Caret.GetRange(X1, Y1, X2, Y2, bSel);
-    if not bSel then exit;
-
-    //allow to replace, also if selection=StrFind
     Result:=
-    (
-     (FMatchEdPos.X=X1) and
-     (FMatchEdPos.Y=Y1) and
-     (FMatchEdEnd.X=X2) and
-     (FMatchEdEnd.Y=Y2)
-    ) or
-    ((StrFind<>'') and (Editor.TextSelectedEx(Caret)=StrFind));
+      (
+      (FMatchEdPos.X=X1) and
+      (FMatchEdPos.Y=Y1) and
+      (FMatchEdEnd.X=X2) and
+      (FMatchEdEnd.Y=Y2)
+      );
   end;
-end;
+  if Result then exit;
 
-function TATEditorFinder.IsSelStartsAtMatch_Buffered: boolean;
-var
-  Caret: TATCaretItem;
-  X1, Y1, X2, Y2: integer;
-  PosOfBegin, PosOfEnd: integer;
-  bSel: boolean;
-begin
-  Result:= false;
-  if FinderCarets.Count=0 then exit;
-  Caret:= FinderCarets[0];
-  Caret.GetRange(X1, Y1, X2, Y2, bSel);
-  if not bSel then exit;
-
-  PosOfBegin:= ConvertCaretPosToBufferPos(Point(X1, Y1));
-  PosOfEnd:= ConvertCaretPosToBufferPos(Point(X2, Y2));
-
-  //allow to replace, also if selection=Strfind
-  Result:=
-    ((PosOfBegin=FMatchPos) and (PosOfEnd=FMatchPos+FMatchLen)) or
-    ((StrFind<>'') and (Editor.TextSelectedEx(Caret)=StrFind));
+  if not FPlaceMarker then
+    Result:= SSelText=StrFind;
 end;
 
 procedure TATEditorFinder.PlaceCaret(APosX, APosY: integer; AEndX: integer;
@@ -1599,21 +1561,13 @@ begin
   UpdateCarets(true);
   UpdateFragments;
 
-  if OptRegex then
+  if not IsSelStartsAtMatch then
   begin
-    if not IsSelStartsAtMatch_Buffered then
-    begin
-      DoFindOrReplace_Buffered(false, false, bSel, AUpdateCaret);
-      exit;
-    end;
-  end
-  else
-  begin
-    if not IsSelStartsAtMatch_InEditor then
-    begin
+    if OptRegex then
+      DoFindOrReplace_Buffered(false, false, bSel, AUpdateCaret)
+    else
       DoFindOrReplace_InEditor(false, false, bSel, AUpdateCaret);
-      exit;
-    end;
+    exit;
   end;
 
   GetEditorSelRange(X1, Y1, X2, Y2, SSelText);
