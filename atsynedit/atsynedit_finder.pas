@@ -1523,6 +1523,8 @@ end;
 
 procedure TATEditorFinder.PlaceCaret(APosX, APosY: integer; AEndX: integer;
   AEndY: integer);
+const
+  cTag = 100;
 var
   NLineLen: integer;
 begin
@@ -1533,7 +1535,7 @@ begin
     else
       NLineLen:= 0;
     Editor.Markers.Clear;
-    Editor.Markers.Add(APosX, APosY, 0, 0, 0, nil, 0, false, NLineLen);
+    Editor.Markers.Add(APosX, APosY, cTag, 0, 0, nil, 0, false, NLineLen);
   end
   else
     Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);
