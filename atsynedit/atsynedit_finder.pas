@@ -1179,6 +1179,7 @@ begin
   Result:= false;
   AChanged:= false;
   UpdateCarets(true);
+  if OptInSelection and not FinderCarets.IsSelection then exit;
 
   if not Assigned(Editor) then
     raise Exception.Create('Finder.Editor not set');
