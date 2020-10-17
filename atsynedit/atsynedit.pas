@@ -292,7 +292,7 @@ const
   cInitBitmapWidth = 1000;
   cInitBitmapHeight = 800;
   cInitGutterPlusSize = 4;
-  cInitMarkerSize = 25;
+  cInitMarkerSize = 30;
   cInitFoldStyle = cFoldHereWithTruncatedText;
   cInitFoldUnderlineOffset = 3;
   cInitFoldTooltipVisible = true;
@@ -7173,7 +7173,7 @@ begin
     Pnt.Y:= Mark.CoordY+FCharSize.Y;
     if not PtInRect(FRectMain, Pnt) then Continue;
 
-    NMarkSize:= Max(1, FCharSize.X * FOptMarkersSize div 100);
+    NMarkSize:= Max(1, FCharSize.Y * FOptMarkersSize div (100*2));
     CanvasPaintTriangleUp(C, Colors.Markers, Pnt, NMarkSize);
 
     if Mark.LineLen<>0 then
