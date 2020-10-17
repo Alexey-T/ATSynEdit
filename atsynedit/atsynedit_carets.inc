@@ -494,15 +494,16 @@ begin
   end;
 end;
 
-function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AllowUpdate: boolean): boolean;
+function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AUnfold, AllowUpdate: boolean): boolean;
 var
   Coord: TPoint;
   NIndex, NChars: integer;
 begin
   Result:= false;
 
-  if IsLineFolded(APos.Y, true) then
-    DoUnfoldLine(APos.Y);
+  if AUnfold then
+    if IsLineFolded(APos.Y, true) then
+      DoUnfoldLine(APos.Y);
 
   Coord:= CaretPosToClientPos(APos);
 
@@ -583,10 +584,10 @@ begin
   end;
 
   if APosEnd.Y>=0 then
-    changed1:= DoShowPos(APosEnd, AIndentHorz, AIndentVert, false)
+    changed1:= DoShowPos(APosEnd, AIndentHorz, AIndentVert, ADoUnfold, false)
   else
     changed1:= false;
-  changed2:= DoShowPos(APos, AIndentHorz, AIndentVert, false);
+  changed2:= DoShowPos(APos, AIndentHorz, AIndentVert, ADoUnfold, false);
 
   ////always update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
   if not changed1 and not changed2 then

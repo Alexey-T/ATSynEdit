@@ -1300,7 +1300,7 @@ type
       AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
-    function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AllowUpdate: boolean): boolean;
+    function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AUnfold, AllowUpdate: boolean): boolean;
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
       APlaceCaret, ADoUnfold: boolean;
@@ -2234,6 +2234,7 @@ begin
           Point(Caret.PosX, Caret.PosY),
           FOptScrollIndentCaretHorz,
           FOptScrollIndentCaretVert,
+          true,
           true);
       end;
 end;
