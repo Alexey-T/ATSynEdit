@@ -7158,11 +7158,15 @@ procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
   Mark: TATMarkerItem;
   Pnt, LenPnt: TPoint;
-  iMark: integer;
   NMarkSize, NLineW: integer;
+  iMark: integer;
   R: TRect;
 begin
   if FMarkers=nil then exit;
+
+  NMarkSize:= Max(1, FCharSize.Y * FOptMarkersSize div (100*2));
+  NLineW:= NMarkSize;
+
   for iMark:= 0 to FMarkers.Count-1 do
   begin
     Mark:= FMarkers[iMark];
@@ -7171,10 +7175,9 @@ begin
 
     Pnt.X:= Mark.CoordX;
     Pnt.Y:= Mark.CoordY+FCharSize.Y;
-    if not PtInRect(FRectMain, Pnt) then Continue;
 
-    NMarkSize:= Max(1, FCharSize.Y * FOptMarkersSize div (100*2));
-    CanvasPaintTriangleUp(C, Colors.Markers, Pnt, NMarkSize);
+    if PtInRect(FRectMain, Pnt) then
+      CanvasPaintTriangleUp(C, Colors.Markers, Pnt, NMarkSize);
 
     if Mark.LineLen<>0 then
     begin
@@ -7182,11 +7185,14 @@ begin
       LenPnt.Y:= Mark.PosY;
       LenPnt:= CaretPosToClientPos(LenPnt);
 
-      NLineW:= NMarkSize; //Max(1, NMarkSize * FOptMarkersSizeSmallPercents div (100 div 2) );
       R.Left:= Min(Pnt.X, LenPnt.X);
       R.Right:= Max(Pnt.X, LenPnt.X)+1;
       R.Bottom:= Pnt.Y+NMarkSize+1;
       R.Top:= R.Bottom-NLineW;
+
+      //avoid painting part of the line over minimap/gutter
+      R.Left:= Max(R.Left, FRectMain.Left);
+      R.Right:= Min(R.Right, FRectMain.Right);
 
       C.Brush.Color:= Colors.Markers;
       C.FillRect(R);
