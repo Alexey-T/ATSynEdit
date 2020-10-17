@@ -500,6 +500,10 @@ var
   NIndex, NChars: integer;
 begin
   Result:= false;
+
+  if IsLineFolded(APos.Y, true) then
+    DoUnfoldLine(APos.Y);
+
   Coord:= CaretPosToClientPos(APos);
 
   //for y
@@ -557,7 +561,7 @@ var
 begin
   if not Strings.IsIndexValid(APos.Y) then exit;
 
-  //if IsPosFolded(ACaretPos.X, ACaretPos.Y) -better?
+  //if IsPosFolded(APos.X, APos.Y) - better?
   if IsLineFolded(APos.Y, true) then
   begin
     if ADoUnfold then
