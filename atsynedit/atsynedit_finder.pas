@@ -1553,6 +1553,7 @@ begin
   if Editor.ModeReadOnly then exit;
 
   UpdateCarets(true);
+  if OptInSelection and not FinderCarets.IsSelection then exit;
   UpdateFragments;
 
   if not IsSelStartsAtMatch then
