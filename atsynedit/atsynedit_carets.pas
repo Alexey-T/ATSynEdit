@@ -75,8 +75,8 @@ type
   { TATCaretSelections }
   {
   why new record here? we could make methods in TATCarets, but during loops,
-  we must always a) skip carets w/o selection, b) call CaretItem.GetRange
-  every time to get _sorted_ range.
+  we must always a) skip carets w/o selection,
+  b) call CaretItem.GetRange to get _sorted_ range.
   code for binary search (Is***Selected) would be ugly.
   }
 
