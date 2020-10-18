@@ -137,12 +137,22 @@ begin
     begin
       Marker.CoordX:= -1;
       Marker.CoordY:= -1;
+      Marker.CoordX2:= -1;
+      Marker.CoordY2:= -1;
     end
     else
     begin
       P:= CaretPosToClientPos(P);
       Marker.CoordX:= P.X;
       Marker.CoordY:= P.Y;
+      Marker.CoordX2:= -1;
+      Marker.CoordY2:= -1;
+      if Marker.LineLen<>0 then
+      begin
+        P:= CaretPosToClientPos(Point(Marker.PosX+Marker.LineLen, Marker.PosY));
+        Marker.CoordX2:= P.X;
+        Marker.CoordY2:= P.Y;
+      end;
     end;
     FMarkers[i]:= Marker;
   end;

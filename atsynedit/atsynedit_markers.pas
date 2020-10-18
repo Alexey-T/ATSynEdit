@@ -23,6 +23,7 @@ type
   TATMarkerItem = record
     PosX, PosY: integer;
     CoordX, CoordY: integer; //screen coords
+    CoordX2, CoordY2: integer; //screen coords for LineLen end
     Tag: Int64;
       //used in CudaText: when "collect marker" runs, for all markers
       //with the same Tag>0 multi-carets placed
@@ -295,6 +296,8 @@ begin
   Item.PosY:= APosY;
   Item.CoordX:= -1;
   Item.CoordY:= -1;
+  Item.CoordX2:= -1;
+  Item.CoordY2:= -1;
   Item.Tag:= ATag;
   Item.LenX:= ALenX;
   Item.LenY:= ALenY;

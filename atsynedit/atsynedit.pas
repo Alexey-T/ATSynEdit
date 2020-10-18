@@ -7158,7 +7158,7 @@ end;
 procedure TATSynEdit.DoPaintMarkersTo(C: TCanvas);
 var
   Mark: TATMarkerItem;
-  Pnt, LenPnt: TPoint;
+  Pnt: TPoint;
   NMarkSize, NLineW: integer;
   iMark: integer;
   R: TRect;
@@ -7180,14 +7180,10 @@ begin
     if PtInRect(FRectMain, Pnt) then
       CanvasPaintTriangleUp(C, Colors.Markers, Pnt, NMarkSize);
 
-    if Mark.LineLen<>0 then
+    if (Mark.LineLen<>0) and (Mark.CoordY=Mark.CoordY2) then
     begin
-      LenPnt.X:= Max(0, Mark.PosX+Mark.LineLen);
-      LenPnt.Y:= Mark.PosY;
-      LenPnt:= CaretPosToClientPos(LenPnt);
-
-      R.Left:= Min(Pnt.X, LenPnt.X);
-      R.Right:= Max(Pnt.X, LenPnt.X)+1;
+      R.Left:= Min(Pnt.X, Mark.CoordX2);
+      R.Right:= Max(Pnt.X, Mark.CoordX2)+1;
       R.Bottom:= Pnt.Y+NMarkSize+1;
       R.Top:= R.Bottom-NLineW;
 
