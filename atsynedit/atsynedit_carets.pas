@@ -47,6 +47,7 @@ type
     function Change(APosX, APosY, AEndX, AEndY: integer): boolean;
     procedure SwapSelection;
     function IsForwardSelection: boolean;
+    function IsMultilineSelection: boolean;
   end;
 
 type
@@ -246,6 +247,11 @@ end;
 function TATCaretItem.IsForwardSelection: boolean;
 begin
   Result:= (PosY>=0) and IsPosSorted(EndX, EndY, PosX, PosY, false);
+end;
+
+function TATCaretItem.IsMultilineSelection: boolean;
+begin
+  Result:= (EndY>=0) and (EndY<>PosY);
 end;
 
 procedure TATCaretItem.SelectNone;
