@@ -27,10 +27,10 @@ type
     Tag: Int64;
       //used in CudaText: when "collect marker" runs, for all markers
       //with the same Tag>0 multi-carets placed
-    LenX, LenY: integer;
-      //used in CudaText: when "collect marker" runs, caret will be with selection
-      //if LenY=0 - LenX is length of sel (single line)
-      //if LenY>0 - LenY is Y-delta of sel-end,
+    SelX, SelY: integer;
+      //used in CudaText: when "collect marker" gets this marker, caret will be with selection
+      //if SelY=0 - LenX is length of sel (single line)
+      //if SelY>0 - LenY is Y-delta of sel-end,
       //            LenX is absolute X of sel-end
     LineLen: integer;
       //render underline near the marker, to left/right, if <>0
@@ -39,8 +39,8 @@ type
       //used in Attribs object of ATSynedit
     MicromapOnly: boolean;
     class operator=(const A, B: TATMarkerItem): boolean;
-    function Contains(AX, AY: integer): boolean;
-    function PosEnd: TPoint;
+    function SelContains(AX, AY: integer): boolean;
+    function SelEnd: TPoint;
   end;
   
 type
@@ -97,33 +97,33 @@ begin
   Result:= (A.PosX=B.PosX) and (A.PosY=B.PosY);
 end;
 
-function TATMarkerItem.Contains(AX, AY: integer): boolean;
+function TATMarkerItem.SelContains(AX, AY: integer): boolean;
 var
   P: TPoint;
 begin
-  if (LenX<=0) and (LenY<=0) then
+  if (SelX<=0) and (SelY<=0) then
     Result:= false
   else
   begin
-    P:= PosEnd;
+    P:= SelEnd;
     Result:= IsPosInRange(AX, AY, PosX, PosY, P.X, P.Y)=cRelateInside;
   end;
 end;
 
-function TATMarkerItem.PosEnd: TPoint;
+function TATMarkerItem.SelEnd: TPoint;
 begin
-  if LenY<=0 then
+  if SelY<=0 then
   begin
-    //LenX is selection len (selection is single line)
-    Result.X:= PosX+LenX;
+    //SelX is selection len (selection is single line)
+    Result.X:= PosX+SelX;
     Result.Y:= PosY;
   end
   else
   begin
-    //LenX is selection end X-pos;
-    //LenY is count of sel lines
-    Result.X:= LenX;
-    Result.Y:= PosY+LenY;
+    //SelX is selection end X-pos;
+    //SelY is count of sel lines
+    Result.X:= SelX;
+    Result.Y:= PosY+SelY;
   end;
 end;
 
@@ -199,8 +199,8 @@ begin
     Item:= Items[i];
     Result[i*NN]:= Item.PosX;
     Result[i*NN+1]:= Item.PosY;
-    Result[i*NN+2]:= Item.LenX;
-    Result[i*NN+3]:= Item.LenY;
+    Result[i*NN+2]:= Item.SelX;
+    Result[i*NN+3]:= Item.SelY;
     Result[i*NN+4]:= Item.Tag;
     Result[i*NN+5]:= Item.Value;
     Result[i*NN+6]:= Ord(Item.MicromapOnly);
@@ -299,8 +299,8 @@ begin
   Item.CoordX2:= -1;
   Item.CoordY2:= -1;
   Item.Tag:= ATag;
-  Item.LenX:= ALenX;
-  Item.LenY:= ALenY;
+  Item.SelX:= ALenX;
+  Item.SelY:= ALenY;
   Item.LineLen:= ALineLen;
   Item.Ptr:= APtr;
   Item.Value:= AValue;
@@ -411,14 +411,14 @@ begin
     NIndex:= Count-1;
 
   Item:= Items[NIndex];
-  if Item.Contains(AX, AY) then
+  if Item.SelContains(AX, AY) then
     exit(NIndex);
 
   if NIndex>0 then
   begin
     Dec(NIndex);
     Item:= Items[NIndex];
-    if Item.Contains(AX, AY) then
+    if Item.SelContains(AX, AY) then
       exit(NIndex);
   end;
 end;

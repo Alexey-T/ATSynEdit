@@ -26,7 +26,7 @@ begin
   X1:= Mark.PosX;
   Y1:= Mark.PosY;
 
-  Pnt:= Mark.PosEnd;
+  Pnt:= Mark.SelEnd;
   X2:= Pnt.X;
   Y2:= Pnt.Y;
 
@@ -52,8 +52,8 @@ begin
         Mark:= FMarkers[i];
         if Mark.Tag=NTag then
         begin
-          Pnt:= Mark.PosEnd;
-          if (Mark.LenX<=0) and (Mark.LenY<=0) then
+          Pnt:= Mark.SelEnd;
+          if (Mark.SelX<=0) and (Mark.SelY<=0) then
             Carets.Add(Mark.PosX, Mark.PosY)
           else
             Carets.Add(Pnt.X, Pnt.Y, Mark.PosX, Mark.PosY);

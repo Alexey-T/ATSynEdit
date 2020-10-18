@@ -338,12 +338,12 @@ begin
         //must check offset, for part of wrapped line
         nOffset:= Attr.PosX-ACharIndex;
         if (nOffset>=AOffsetMax) then Continue;
-        if (nOffset+Attr.LenX<=0) then Continue;
+        if (nOffset+Attr.SelX<=0) then Continue;
 
         //fix part visible partly, because of horz scroll
         if (nOffset<0) then
         begin
-          Inc(Attr.LenX, nOffset);
+          Inc(Attr.SelX, nOffset);
           nOffset:= 0;
         end;
 
@@ -357,7 +357,7 @@ begin
         end;
 
         Part:= PartObj.Data;
-        Part.Len:= Attr.LenX;
+        Part.Len:= Attr.SelX;
         Part.Offset:= nOffset;
         //note: don't change Part.ColorBG here
         DoPartInsert(AParts, Part, false);
