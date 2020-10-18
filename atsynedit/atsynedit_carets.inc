@@ -102,7 +102,7 @@ var
   P: TPoint;
   NStart, i: integer;
   Caret: TATCaretItem;
-  Marker: TATMarkerItem;
+  Marker: PATMarkerItem;
 begin
   if AOnlyLast then
     NStart:= Carets.Count-1
@@ -130,31 +130,32 @@ begin
   if Assigned(FMarkers) then
   for i:= 0 to FMarkers.Count-1 do
   begin
-    Marker:= FMarkers[i];
-    P.X:= Marker.PosX;
-    P.Y:= Marker.PosY;
+    Marker:= FMarkers.ItemPtr(i);
+    P.X:= Marker^.PosX;
+    P.Y:= Marker^.PosY;
     if IsPosFolded(P.X, P.Y) then
     begin
-      Marker.CoordX:= -1;
-      Marker.CoordY:= -1;
-      Marker.CoordX2:= -1;
-      Marker.CoordY2:= -1;
+      Marker^.CoordX:= -1;
+      Marker^.CoordY:= -1;
+      Marker^.CoordX2:= -1;
+      Marker^.CoordY2:= -1;
     end
     else
     begin
       P:= CaretPosToClientPos(P);
-      Marker.CoordX:= P.X;
-      Marker.CoordY:= P.Y;
-      Marker.CoordX2:= -1;
-      Marker.CoordY2:= -1;
-      if Marker.LineLen<>0 then
+      Marker^.CoordX:= P.X;
+      Marker^.CoordY:= P.Y;
+      Marker^.CoordX2:= -1;
+      Marker^.CoordY2:= -1;
+      if Marker^.LineLen<>0 then
       begin
-        P:= CaretPosToClientPos(Point(Marker.PosX+Marker.LineLen, Marker.PosY));
-        Marker.CoordX2:= P.X;
-        Marker.CoordY2:= P.Y;
+        P.X:= Marker^.PosX+Marker^.LineLen;
+        P.Y:= Marker^.PosY;
+        P:= CaretPosToClientPos(P);
+        Marker^.CoordX2:= P.X;
+        Marker^.CoordY2:= P.Y;
       end;
     end;
-    FMarkers[i]:= Marker;
   end;
 end;
 

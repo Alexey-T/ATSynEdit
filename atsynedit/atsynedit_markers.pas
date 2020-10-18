@@ -67,6 +67,7 @@ type
     procedure Delete(AIndex: integer);
     function Count: integer; inline;
     function IsIndexValid(AIndex: integer): boolean; inline;
+    function ItemPtr(AIndex: integer): PATMarkerItem;
     property Items[AIndex: integer]: TATMarkerItem read GetItem write SetItem; default;
     property Sorted: boolean read FSorted write FSorted;
     property Duplicates: boolean read FDuplicates write FDuplicates;
@@ -182,6 +183,11 @@ end;
 function TATMarkers.GetItem(N: integer): TATMarkerItem;
 begin
   Result:= FList[N];
+end;
+
+function TATMarkers.ItemPtr(AIndex: integer): PATMarkerItem;
+begin
+  Result:= FList._GetItemPtr(AIndex);
 end;
 
 function TATMarkers.GetAsArray: TATInt64Array;
