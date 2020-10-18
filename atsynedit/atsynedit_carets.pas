@@ -87,6 +87,7 @@ type
     end;
   public
     Data: array of TATCaretSelection;
+    procedure Clear;
     function IsEmpty: boolean;
     function IsMultiline: boolean;
     function IsLineWithSelection(ALine: integer): boolean;
@@ -196,6 +197,11 @@ begin
 end;
 
 { TATCaretSelections }
+
+procedure TATCaretSelections.Clear;
+begin
+  SetLength(Data, 0);
+end;
 
 function TATCaretSelections.IsEmpty: boolean;
 begin
