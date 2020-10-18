@@ -561,179 +561,36 @@ end;
 
 function TATSynEdit.TempSel_IsSelection: boolean;
 begin
-  Result:= Length(FSel)>0;
+  Result:= not FSel.IsEmpty;
 end;
 
 function TATSynEdit.TempSel_IsMultiline: boolean;
-var
-  i: integer;
 begin
-  for i:= 0 to High(FSel) do
-    if FSel[i].EndY<>FSel[i].PosY then
-      exit(true);
-  Result:= false;
+  Result:= FSel.IsMultiline;
 end;
 
 function TATSynEdit.TempSel_IsLineWithSelection(ALine: integer): boolean;
-var
-  Y1, Y2, X2: integer;
-  a, b, m: integer;
 begin
-  Result:= false;
-  a:= 0;
-  b:= High(FSel);
-
-  repeat
-    if a>b then exit;
-    m:= (a+b+1) div 2;
-
-    Y1:= FSel[m].PosY;
-    X2:= FSel[m].EndX;
-    Y2:= FSel[m].EndY;
-
-    if (X2=0) and (Y2>0) then
-      Dec(Y2);
-
-    if ALine<Y1 then
-      b:= m-1
-    else
-    if ALine<=Y2 then
-      exit(true)
-    else
-      a:= m+1;
-  until false;
+  Result:= FSel.IsLineWithSelection(ALine);
 end;
 
 function TATSynEdit.TempSel_IsLineAllSelected(ALine: integer): boolean;
-var
-  X1, Y1, Y2, X2: integer;
-  NLen: integer;
-  a, b, m: integer;
 begin
-  Result:= false;
-  a:= 0;
-  b:= High(FSel);
-
-  NLen:= Strings.LinesLen[ALine];
-
-  repeat
-    if a>b then exit;
-    m:= (a+b+1) div 2;
-
-    X1:= FSel[m].PosX;
-    Y1:= FSel[m].PosY;
-    X2:= FSel[m].EndX;
-    Y2:= FSel[m].EndY;
-
-    if not IsPosSorted(X1, Y1, 0, ALine, true) then
-      b:= m-1
-    else
-    if IsPosSorted(NLen, ALine, X2, Y2, true) then
-      exit(true)
-    else
-      a:= m+1;
-  until false;
+  Result:= FSel.IsLineAllSelected(ALine, Strings.LinesLen[ALine]);
 end;
 
-
 function TATSynEdit.TempSel_IsPosSelected(AX, AY: integer): boolean;
-var
-  X1, Y1, X2, Y2: integer;
-  a, b, m: integer;
 begin
-  Result:= false;
-  a:= 0;
-  b:= High(FSel);
-
-  repeat
-    if a>b then exit;
-    m:= (a+b+1) div 2;
-
-    X1:= FSel[m].PosX;
-    Y1:= FSel[m].PosY;
-    X2:= FSel[m].EndX;
-    Y2:= FSel[m].EndY;
-
-    case IsPosInRange(AX, AY, X1, Y1, X2, Y2) of
-      cRelateInside:
-        exit(true);
-      cRelateBefore:
-        b:= m-1;
-      cRelateAfter:
-        a:= m+1;
-    end;
-  until false;
+  Result:= FSel.IsPosSelected(AX, AY);
 end;
 
 function TATSynEdit.TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
-var
-  X1, Y1, X2, Y2: integer;
-  a, b, m: integer;
-  bLeft, bRight: TATPosRelation;
 begin
-  Result:= cRangeAllUnselected;
-  a:= 0;
-  b:= High(FSel);
-
-  repeat
-    if a>b then exit;
-    m:= (a+b+1) div 2;
-
-    X1:= FSel[m].PosX;
-    Y1:= FSel[m].PosY;
-    X2:= FSel[m].EndX;
-    Y2:= FSel[m].EndY;
-
-    bLeft:= IsPosInRange(AX1, AY1, X1, Y1, X2, Y2);
-    if (bLeft=cRelateAfter) then
-    begin
-      a:= m+1;
-      Continue;
-    end;
-
-    bRight:= IsPosInRange(AX2, AY2, X1, Y1, X2, Y2, true);
-    if (bRight=cRelateBefore) then
-    begin
-      b:= m-1;
-      Continue;
-    end;
-
-    if (bLeft=cRelateInside) and (bRight=cRelateInside) then
-      exit(cRangeAllSelected)
-    else
-      exit(cRangePartlySelected);
-  until false;
+  Result:= FSel.IsRangeSelected(AX1, AY1, AX2, AY2);
 end;
 
-procedure TATSynEdit.TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out
-  ARanges: TATSimpleRangeArray);
-var
-  X1, Y1, X2, Y2, XFrom, XTo: integer;
-  i: integer;
+procedure TATSynEdit.TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
 begin
-  SetLength(ARanges, 0);
-  for i:= 0 to High(FSel) do
-  begin
-    X1:= FSel[i].PosX;
-    Y1:= FSel[i].PosY;
-    X2:= FSel[i].EndX;
-    Y2:= FSel[i].EndY;
-
-    if (Y1>AY) then Break; //caret is fully after line AY: stop
-    if (Y2<AY) then Continue; //caret is fully before line AY
-
-    if (Y1<AY) then XFrom:= 0 else XFrom:= X1;
-    if (Y2>AY) then XTo:= MaxInt else XTo:= X2;
-
-    if XTo<=AX then Continue;
-    if XFrom<AX then XFrom:= AX;
-
-    SetLength(ARanges, Length(ARanges)+1);
-    with ARanges[High(ARanges)] do
-    begin
-      NFrom:= XFrom;
-      NTo:= XTo;
-    end;
-  end;
+  FSel.GetRangesInLineAfterPoint(AX, AY, ARanges);
 end;
 

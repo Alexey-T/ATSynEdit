@@ -932,13 +932,13 @@ type
     procedure DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
     procedure DoSelect_Line_ByClick;
     procedure DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);
-    function TempSel_IsSelection: boolean;
-    function TempSel_IsMultiline: boolean;
-    function TempSel_IsLineWithSelection(ALine: integer): boolean;
-    function TempSel_IsLineAllSelected(ALine: integer): boolean;
-    function TempSel_IsPosSelected(AX, AY: integer): boolean;
-    function TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
-    procedure TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
+    function TempSel_IsSelection: boolean; inline;
+    function TempSel_IsMultiline: boolean; inline;
+    function TempSel_IsLineWithSelection(ALine: integer): boolean; inline;
+    function TempSel_IsLineAllSelected(ALine: integer): boolean; inline;
+    function TempSel_IsPosSelected(AX, AY: integer): boolean; inline;
+    function TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection; inline;
+    procedure TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray); inline;
     //paint
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
