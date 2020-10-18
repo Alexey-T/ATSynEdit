@@ -1879,6 +1879,7 @@ var
   SFind, SLineToTest: UnicodeString;
   NLen, NStartOffset, NEndOffset: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
+  FoundPos, FoundEnd: TPoint;
   bLineMustBeUnicode: boolean;
   bOk: boolean;
 begin
@@ -1968,18 +1969,22 @@ begin
           //consider whole words (only for single line)
           if bOk and OptWords and (PartCount=1) then
             bOk:= IsFinderWholeWordRange(SLineLoopedW, IndexChar+1, IndexChar+1+SLinePart_Len);
+
+          FoundPos.Y:= IndexLine;
+          FoundPos.X:= IndexChar;
+          FoundEnd.Y:= IndexLine+PartCount-1;
+          if PartCount=1 then
+            FoundEnd.X:= IndexChar+SLinePart_Len
+          else
+            FoundEnd.X:= _GetLenPart(PartCount-1);
+
           //consider syntax-elements
           if bOk then
-            bOk:= CheckTokens(IndexChar, IndexLine);
+            bOk:= CheckTokens(FoundPos.X, FoundPos.Y);
           if bOk then
           begin
-            FMatchEdPos.Y:= IndexLine;
-            FMatchEdPos.X:= IndexChar;
-            FMatchEdEnd.Y:= IndexLine+PartCount-1;
-            if PartCount=1 then
-              FMatchEdEnd.X:= IndexChar+SLinePart_Len
-            else
-              FMatchEdEnd.X:= _GetLenPart(PartCount-1);
+            FMatchEdPos:= FoundPos;
+            FMatchEdEnd:= FoundEnd;
             DoOnFound(AWithEvent);
             Exit(true);
           end;
@@ -2045,25 +2050,29 @@ begin
           //consider whole words (only for single line)
           if bOk and OptWords and (PartCount=1) then
             bOk:= IsFinderWholeWordRange(SLineLoopedW, IndexChar-SLinePart_Len, IndexChar);
+
+          if PartCount=1 then
+          begin
+            FoundEnd.Y:= IndexLine;
+            FoundEnd.X:= IndexChar-1;
+            FoundPos.Y:= IndexLine;
+            FoundPos.X:= IndexChar-1-SLinePart_Len;
+          end
+          else
+          begin
+            FoundPos.Y:= IndexLine;
+            FoundPos.X:= SLinePart_Len;
+            FoundEnd.Y:= IndexLine-PartCount+1;
+            FoundEnd.X:= Strs.LinesLen[FoundEnd.Y] - _GetLenPart(PartCount-1);
+          end;
+
           //check syntax-elements
           if bOk then
-            bOk:= CheckTokens(IndexChar-1-SLinePart_Len, IndexLine);
+            bOk:= CheckTokens(FoundPos.X, FoundPos.Y);
           if bOk then
           begin
-            if PartCount=1 then
-            begin
-              FMatchEdEnd.Y:= IndexLine;
-              FMatchEdEnd.X:= IndexChar-1;
-              FMatchEdPos.Y:= IndexLine;
-              FMatchEdPos.X:= IndexChar-1-SLinePart_Len;
-            end
-            else
-            begin
-              FMatchEdPos.Y:= IndexLine;
-              FMatchEdPos.X:= SLinePart_Len;
-              FMatchEdEnd.Y:= IndexLine-PartCount+1;
-              FMatchEdEnd.X:= Strs.LinesLen[FMatchEdEnd.Y] - _GetLenPart(PartCount-1);
-            end;
+            FMatchEdPos:= FoundPos;
+            FMatchEdEnd:= FoundEnd;
             DoOnFound(AWithEvent);
             Exit(true);
           end;
