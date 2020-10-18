@@ -72,10 +72,6 @@ type
     );
 
 type
-  TATCaretSelection = record
-    PosX, PosY, EndX, EndY: integer;
-  end;
-
   { TATCaretSelections }
   {
   why new record here? we could make methods in TATCarets, but during loops,
@@ -86,6 +82,9 @@ type
 
   TATCaretSelections = record
   private
+    type TATCaretSelection = record
+      PosX, PosY, EndX, EndY: integer;
+    end;
   public
     Data: array of TATCaretSelection;
     function IsEmpty: boolean;
