@@ -22,6 +22,7 @@ type
   PATMarkerItem = ^TATMarkerItem;
   TATMarkerItem = record
     PosX, PosY: integer;
+    LineLen: integer; //render underline near the marker, if <>0
     CoordX, CoordY: integer; //screen coords
     CoordX2, CoordY2: integer; //screen coords for LineLen end
     Tag: Int64;
@@ -32,11 +33,8 @@ type
       //if SelY=0 - LenX is length of sel (single line)
       //if SelY>0 - LenY is Y-delta of sel-end,
       //            LenX is absolute X of sel-end
-    LineLen: integer;
-      //render underline near the marker, to left/right, if <>0
     Value: Int64;
-    Ptr: TObject;
-      //used in Attribs object of ATSynedit
+    Ptr: TObject; //used in Attribs object of ATSynEdit
     MicromapOnly: boolean;
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
