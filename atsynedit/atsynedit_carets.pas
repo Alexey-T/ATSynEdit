@@ -121,7 +121,7 @@ type
     procedure Delete(N: integer);
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
-    function IsPosSelected(AX, AY: integer): boolean;
+    function IsPosSelected(AX, AY: integer; AllowAtEdge: boolean=false): boolean;
     property Items[N: integer]: TATCaretItem read GetItem; default;
     procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     procedure Sort(AJoinAdjacentCarets: boolean=true);
@@ -989,7 +989,7 @@ begin
 end;
 
 
-function TATCarets.IsPosSelected(AX, AY: integer): boolean;
+function TATCarets.IsPosSelected(AX, AY: integer; AllowAtEdge: boolean): boolean;
 var
   Caret: TATCaretItem;
   X1, Y1, X2, Y2: integer;
@@ -1002,7 +1002,7 @@ begin
     Caret:= Items[i];
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
     if bSel then
-      if IsPosInRange(AX, AY, X1, Y1, X2, Y2)=cRelateInside then
+      if IsPosInRange(AX, AY, X1, Y1, X2, Y2, AllowAtEdge)=cRelateInside then
         exit(true);
   end;
 end;

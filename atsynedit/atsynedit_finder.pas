@@ -99,7 +99,7 @@ type
     function IsProgressNeeded(ANewPos: integer): boolean; inline;
   protected
     procedure DoOnFound(AWithEvent: boolean); virtual;
-    function CheckTokens(APos: integer): boolean; virtual;
+    function CheckTokensBuffer(APos1, APos2: integer): boolean; virtual;
   public
     OptBack: boolean;
     OptWords: boolean; //for non-regex
@@ -206,8 +206,8 @@ type
     procedure DoOnFound(AWithEvent: boolean); override;
     procedure DoConfirmReplace(APos, AEnd: TPoint; var AConfirmThis,
       AConfirmContinue: boolean; var AReplacement: UnicodeString);
-    function CheckTokens(AX, AY: integer): boolean;
-    function CheckTokens(APos: integer): boolean; override;
+    function CheckTokensEd(AX, AY, AX2, AY2: integer): boolean;
+    function CheckTokensBuffer(APos1, APos2: integer): boolean; override;
   public
     Editor: TATSynEdit;
     OptFromCaret: boolean;
@@ -428,7 +428,7 @@ begin
   //
 end;
 
-function TATTextFinder.CheckTokens(APos: integer): boolean;
+function TATTextFinder.CheckTokensBuffer(APos1, APos2: integer): boolean;
 begin
   Result:= true;
 end;
@@ -439,6 +439,8 @@ begin
 end;
 
 function TATTextFinder.DoFind_Regex(AFromPos: integer): boolean;
+var
+  FoundPos, FoundLen: integer;
 begin
   Result:= false;
   if StrText='' then exit;
@@ -470,21 +472,25 @@ begin
 
   if FRegex.ExecPos(AFromPos, false, OptBack) then
   begin
-    if CheckTokens(FRegex.MatchPos[0]) then
+    FoundPos:= FRegex.MatchPos[0];
+    FoundLen:= FRegex.MatchLen[0];
+    if CheckTokensBuffer(FoundPos, FoundPos+FoundLen) then
     begin
       Result:= true;
-      FMatchPos:= FRegex.MatchPos[0];
-      FMatchLen:= FRegex.MatchLen[0];
+      FMatchPos:= FoundPos;
+      FMatchLen:= FoundLen;
       exit
     end;
 
     repeat
       if not FRegex.ExecNext(OptBack) then exit;
-      if CheckTokens(FRegex.MatchPos[0]) then
+      FoundPos:= FRegex.MatchPos[0];
+      FoundLen:= FRegex.MatchLen[0];
+      if CheckTokensBuffer(FoundPos, FoundPos+FoundLen) then
       begin
         Result:= true;
-        FMatchPos:= FRegex.MatchPos[0];
-        FMatchLen:= FRegex.MatchLen[0];
+        FMatchPos:= FoundPos;
+        FMatchLen:= FoundLen;
         exit
       end;
     until false;
@@ -635,7 +641,7 @@ begin
   bOk:= true;
 
   if bOk then
-    if not CheckTokens(P1.X, P1.Y) then
+    if not CheckTokensEd(P1.X, P1.Y, P2.X, P2.Y) then
       bOk:= false;
 
   if bOk and AWithConfirm then
@@ -661,7 +667,7 @@ begin
 
     if Application.Terminated then exit;
 
-    if not CheckTokens(P1.X, P1.Y) then Continue;
+    if not CheckTokensEd(P1.X, P1.Y, P2.X, P2.Y) then Continue;
 
     if AWithConfirm then
     begin
@@ -1131,14 +1137,18 @@ begin
   end;
 end;
 
-function TATEditorFinder.CheckTokens(AX, AY: integer): boolean;
+function TATEditorFinder.CheckTokensEd(AX, AY, AX2, AY2: integer): boolean;
 var
   Kind: TATTokenKind;
 begin
   if OptInSelection then
-    //block positions found after the selection
+  begin
+    //ignore positions found after the selection
     if not FinderCarets.IsPosSelected(AX, AY) then
       exit(false);
+    if not FinderCarets.IsPosSelected(AX2, AY2, true{AllowAtEdge}) then
+      exit(false);
+  end;
 
   if OptTokens=cTokensAll then
     exit(true);
@@ -1163,12 +1173,13 @@ begin
   end;
 end;
 
-function TATEditorFinder.CheckTokens(APos: integer): boolean;
+function TATEditorFinder.CheckTokensBuffer(APos1, APos2: integer): boolean;
 var
-  P: TPoint;
+  P1, P2: TPoint;
 begin
-  P:= ConvertBufferPosToCaretPos(APos);
-  Result:= CheckTokens(P.X, P.Y);
+  P1:= ConvertBufferPosToCaretPos(APos1);
+  P2:= ConvertBufferPosToCaretPos(APos2);
+  Result:= CheckTokensEd(P1.X, P1.Y, P2.X, P2.Y);
 end;
 
 function TATEditorFinder.DoAction_FindOrReplace(AReplace, AForMany: boolean;
@@ -1980,7 +1991,7 @@ begin
 
           //consider syntax-elements
           if bOk then
-            bOk:= CheckTokens(FoundPos.X, FoundPos.Y);
+            bOk:= CheckTokensEd(FoundPos.X, FoundPos.Y, FoundEnd.X, FoundEnd.Y);
           if bOk then
           begin
             FMatchEdPos:= FoundPos;
@@ -2068,7 +2079,7 @@ begin
 
           //check syntax-elements
           if bOk then
-            bOk:= CheckTokens(FoundPos.X, FoundPos.Y);
+            bOk:= CheckTokensEd(FoundPos.X, FoundPos.Y, FoundEnd.X, FoundEnd.Y);
           if bOk then
           begin
             FMatchEdPos:= FoundPos;
