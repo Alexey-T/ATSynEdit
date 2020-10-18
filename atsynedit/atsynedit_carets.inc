@@ -131,22 +131,17 @@ begin
   for i:= 0 to FMarkers.Count-1 do
   begin
     Marker:= FMarkers.ItemPtr(i);
+    Marker^.CoordX:= -1;
+    Marker^.CoordY:= -1;
+    Marker^.CoordX2:= -1;
+    Marker^.CoordY2:= -1;
     P.X:= Marker^.PosX;
     P.Y:= Marker^.PosY;
-    if IsPosFolded(P.X, P.Y) then
-    begin
-      Marker^.CoordX:= -1;
-      Marker^.CoordY:= -1;
-      Marker^.CoordX2:= -1;
-      Marker^.CoordY2:= -1;
-    end
-    else
+    if not IsPosFolded(P.X, P.Y) then
     begin
       P:= CaretPosToClientPos(P);
       Marker^.CoordX:= P.X;
       Marker^.CoordY:= P.Y;
-      Marker^.CoordX2:= -1;
-      Marker^.CoordY2:= -1;
       if Marker^.LineLen<>0 then
       begin
         P.X:= Marker^.PosX+Marker^.LineLen;
