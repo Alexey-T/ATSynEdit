@@ -73,8 +73,8 @@ type
     property Duplicates: boolean read FDuplicates write FDuplicates;
     procedure Add(APosX, APosY: integer;
       const ATag: Int64=0;
-      ALenX: integer=0;
-      ALenY: integer=0;
+      ASelX: integer=0;
+      ASelY: integer=0;
       APtr: TObject=nil;
       AValue: Int64=0;
       AMicromapOnly: boolean=False;
@@ -288,7 +288,7 @@ begin
 end;
 
 procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
-  ALenX: integer; ALenY: integer; APtr: TObject; AValue: Int64;
+  ASelX: integer; ASelY: integer; APtr: TObject; AValue: Int64;
   AMicromapOnly: boolean; ALineLen: integer);
 var
   Item: TATMarkerItem;
@@ -303,8 +303,8 @@ begin
   Item.CoordX2:= -1;
   Item.CoordY2:= -1;
   Item.Tag:= ATag;
-  Item.SelX:= ALenX;
-  Item.SelY:= ALenY;
+  Item.SelX:= ASelX;
+  Item.SelY:= ASelY;
   Item.LineLen:= ALineLen;
   Item.Ptr:= APtr;
   Item.Value:= AValue;
