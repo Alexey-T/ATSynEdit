@@ -450,6 +450,7 @@ type
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
     FKeymapHistory: TATKeyArray;
+    FBrotherEditor: TATSynEdit;
     FWantTabs: boolean;
     FWantReturns: boolean;
     FEditorIndex: integer;
@@ -1231,6 +1232,7 @@ type
     property WrapInfo: TATWrapInfo read FWrapInfo;
     property ScrollVert: TATSynScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATSynScrollInfo read FScrollHorz write FScrollHorz;
+    property BrotherEditor: TATSynEdit read FBrotherEditor write FBrotherEditor;
     property CaretPropsNormal: TATCaretProps read FCaretPropsNormal;
     property CaretPropsOverwrite: TATCaretProps read FCaretPropsOverwrite;
     property CaretPropsReadonly: TATCaretProps read FCaretPropsReadonly;
