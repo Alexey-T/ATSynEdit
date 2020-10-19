@@ -178,6 +178,7 @@ var
 begin
   Result.X:= -1;
   Result.Y:= -1;
+  if not AStrings.IsIndexValid(P.Y) then Exit;
 
   AWrapInfo.FindIndexesOfLineNumber(P.Y, NIndex1, NIndex2);
   if NIndex1<0 then Exit;
@@ -349,6 +350,8 @@ begin
         Item:= AWrapInfo[NIndex];
         Result.Y:= Item.NLineIndex;
         Result.X:= Item.NCharIndex+Item.NLength-1;
+        if not AStrings.IsIndexValid(Result.Y) then
+          exit(Point(-1, -1));
       end;
       Exit
     end;
@@ -357,6 +360,8 @@ begin
   //click in text
     Item:= AWrapInfo[NIndex];
     Result.Y:= Item.NLineIndex;
+    if not AStrings.IsIndexValid(Result.Y) then
+      exit(Point(-1, -1));
 
     Str:= AStrings.LineSub(
       Result.Y,
