@@ -44,7 +44,7 @@ begin
   if bOneLine then
   begin
     TextReplace_OneLine(AFromY, AFromX, AToX, AText);
-    AShift.X:= 0;
+    AShift.X:= Length(AText)-(AToX-AFromX);
     AShift.Y:= 0;
     APosAfter.X:= AFromX+Length(AText);
     APosAfter.Y:= AFromY;
