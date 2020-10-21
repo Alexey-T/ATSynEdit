@@ -9,7 +9,7 @@ unit ATStringProc_UTF8Detect;
 interface
 
 type
-  TBufferUTF8State = (usUnknown, usYes, usNo);
+  TBufferUTF8State = (u8sUnknown, u8sYes, u8sNo);
 
 //PartialAllowed must be set to true if the buffer is smaller than the file.
 function IsBufferUtf8(buf:PAnsiChar;PartialAllowed:boolean): TBufferUTF8State;
@@ -54,14 +54,14 @@ var p:PAnsiChar;
 begin
   p:=buf;
   hadutf8bytes:=false;
-  result:=usUnknown;
+  result:=u8sUnknown;
   utf8bytes:=0;
   while p^<>#0 do
   begin
     if utf8bytes>0 then
     begin  {Expecting secondary AnsiChar}
       hadutf8bytes:=true;
-      if not IsSecondaryUTF8Char(p^) then exit(usNo);  {Fail!}
+      if not IsSecondaryUTF8Char(p^) then exit(u8sNo);  {Fail!}
       dec(utf8bytes);
     end
     else
@@ -69,11 +69,11 @@ begin
       utf8bytes:=bytesFromUTF8[p^]
     else
     if IsSecondaryUTF8Char(p^) then
-      exit(usNo);  {Fail!}
+      exit(u8sNo);  {Fail!}
     inc(p);
   end;
   if hadutf8bytes and (PartialAllowed or (utf8bytes=0)) then
-    result:=usYes;
+    result:=u8sYes;
 end;
 
 end.

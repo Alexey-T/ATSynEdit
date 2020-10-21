@@ -80,7 +80,7 @@ var
   Buf: PChar;
   Size: integer;
 begin
-  Result:= usUnknown;
+  Result:= u8sUnknown;
   if Stream.Size<cMinLen then Exit;
 
   if BufSizeKb=0 then BufSizeKb:= 1;
@@ -150,16 +150,18 @@ begin
   end;
 
   if BufSizeKb>0 then
-    if IsStreamWithUt8NoBom(Stream, BufSizeKb)<>usNo then
-    begin
-      Enc:= cEncUTF8;
-      EncWithBom:= false;
-      Exit
-    end
-    else
-    begin
-      // https://github.com/Alexey-T/CudaText/issues/2928
-      Enc:= cEncAnsi;
+    case IsStreamWithUt8NoBom(Stream, BufSizeKb) of
+      u8sYes:
+        begin
+          Enc:= cEncUTF8;
+          EncWithBom:= false;
+          Exit
+        end;
+      u8sNo:
+        begin
+          // https://github.com/Alexey-T/CudaText/issues/2928
+          Enc:= cEncAnsi;
+        end;
     end;
 
   if BufSizeWords>0 then
