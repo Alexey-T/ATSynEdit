@@ -73,14 +73,14 @@ begin
 end;
 
 
-function IsStreamWithUt8NoBom(Stream: TStream; BufSizeKb: word): boolean;
+function IsStreamWithUt8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
 const
   cMinLen = 10;
 var
   Buf: PChar;
   Size: integer;
 begin
-  Result:= false;
+  Result:= usUnknown;
   if Stream.Size<cMinLen then Exit;
 
   if BufSizeKb=0 then BufSizeKb:= 1;
@@ -150,7 +150,7 @@ begin
   end;
 
   if BufSizeKb>0 then
-    if IsStreamWithUt8NoBom(Stream, BufSizeKb) then
+    if IsStreamWithUt8NoBom(Stream, BufSizeKb)<>usNo then
     begin
       Enc:= cEncUTF8;
       EncWithBom:= false;

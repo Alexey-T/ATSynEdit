@@ -8,8 +8,11 @@ unit ATStringProc_UTF8Detect;
 
 interface
 
+type
+  TBufferUTF8State = (usUnknown, usYes, usNo);
+
 //PartialAllowed must be set to true if the buffer is smaller than the file.
-function IsBufferUtf8(buf:PAnsiChar;PartialAllowed:boolean):boolean;
+function IsBufferUtf8(buf:PAnsiChar;PartialAllowed:boolean): TBufferUTF8State;
 
 implementation
 
@@ -42,7 +45,7 @@ begin
   result:=(byte(thechar) and (128+64))=128;
 end;
 
-function IsBufferUtf8(buf:PAnsiChar;PartialAllowed:boolean):boolean;
+function IsBufferUtf8(buf:PAnsiChar;PartialAllowed:boolean):TBufferUTF8State;
 {Buffer contains only valid UTF-8 characters, no secondary alone,
 no primary without the correct nr of secondary}
 var p:PAnsiChar;
@@ -51,25 +54,26 @@ var p:PAnsiChar;
 begin
   p:=buf;
   hadutf8bytes:=false;
-  result:=false;
+  result:=usUnknown;
   utf8bytes:=0;
   while p^<>#0 do
   begin
     if utf8bytes>0 then
     begin  {Expecting secondary AnsiChar}
       hadutf8bytes:=true;
-      if not IsSecondaryUTF8Char(p^) then exit;  {Fail!}
+      if not IsSecondaryUTF8Char(p^) then exit(usNo);  {Fail!}
       dec(utf8bytes);
     end
     else
     if IsFirstUTF8Char(p^) then
       utf8bytes:=bytesFromUTF8[p^]
     else
-    //if IsSecondaryUTF8Char(p^) then //Alexey: redundant check
-      exit;  {Fail!}
+    if IsSecondaryUTF8Char(p^) then
+      exit(usNo);  {Fail!}
     inc(p);
   end;
-    result:=hadutf8bytes and (PartialAllowed or (utf8bytes=0));
+  if hadutf8bytes and (PartialAllowed or (utf8bytes=0)) then
+    result:=usYes;
 end;
 
 end.
