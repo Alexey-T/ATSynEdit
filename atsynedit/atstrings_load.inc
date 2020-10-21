@@ -155,6 +155,11 @@ begin
       Enc:= cEncUTF8;
       EncWithBom:= false;
       Exit
+    end
+    else
+    begin
+      // https://github.com/Alexey-T/CudaText/issues/2928
+      Enc:= cEncAnsi;
     end;
 
   if BufSizeWords>0 then
