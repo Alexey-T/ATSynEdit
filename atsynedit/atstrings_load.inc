@@ -350,9 +350,9 @@ begin
 
   if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
   begin
-    //don't set UTF8 for huge files, they are often not UTF8,
-    //many chars will be ????, and next saving will break the contents
-    FEncoding:= cEncAnsi;
+    //it's safe to set here UTF8 even for binary files, later contents
+    //will be checked by IsBufferUtf8
+    FEncoding:= cEncUTF8;
   end
   else
   if FEncodingDetect then
@@ -390,8 +390,9 @@ begin
     Stream.Position:= NSignatureLen;
     Stream.ReadBuffer(Buf^, BufSize);
 
-    //double-check that we won't break file contents,
-    //it may be cp1252 file, so UTF8 loading will break it, making ???? chars
+    //important for users!
+    //check that we won't break file contents, it may be cp1252 file,
+    //so UTF8 loading will break it, making ???? chars
     if FEncoding=cEncUTF8 then
       if IsBufferUtf8(Buf, BufSize, false)=u8sNo then
       begin
