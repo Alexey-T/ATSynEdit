@@ -350,8 +350,9 @@ begin
 
   if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
   begin
-    //don't set codepages like cp437 for huge files, it's much slower
-    FEncoding:= cEncUTF8;
+    //don't set UTF8 for huge files, they are often not UTF8,
+    //many chars will be ????, and next saving will break the contents
+    FEncoding:= cEncAnsi;
   end
   else
   if FEncodingDetect then
