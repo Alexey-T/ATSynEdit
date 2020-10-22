@@ -430,20 +430,14 @@ begin
         case FEncoding of
           cEncAnsi:
             begin
-              SA:= '';
-              SetLength(SA, Len);
-              Move(Buf[NStart], SA[1], Len);
-
+              SetString(SA, @Buf[NStart], Len);
               SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
-
               LineAddRaw_NoUndo(SUtf8, LineEnd);
             end;
 
           cEncUTF8:
             begin
-              SA:= '';
-              SetLength(SA, Len);
-              Move(Buf[NStart], SA[1], Len);
+              SetString(SA, @Buf[NStart], Len);
               LineAddRaw_NoUndo(SA, LineEnd);
             end;
 
