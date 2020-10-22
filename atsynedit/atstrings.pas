@@ -214,6 +214,7 @@ type
       //because OnChangeBlock is called for all lines at once
     FLastCommandChangedLines: integer;
     FEnabledBookmarksUpdate: boolean;
+    FLoadingForcedANSI: boolean;
 
     function Compare_Asc(Key1, Key2: Pointer): Integer;
     function Compare_AscNoCase(Key1, Key2: Pointer): Integer;
@@ -266,7 +267,7 @@ type
     procedure SetLineSep(AIndex: integer; AValue: TATLineSeparator);
     procedure SetLineState(AIndex: integer; AValue: TATLineState);
     procedure SetLineUpdated(AIndex: integer; AValue: boolean);
-    procedure DoLoadFromStream(Stream: TStream);
+    procedure DoLoadFromStream(Stream: TStream; out AForcedToANSI: boolean);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure DoClearLineStates(ASaved: boolean);
@@ -322,6 +323,7 @@ type
     property EncodingDetect: boolean read FEncodingDetect write FEncodingDetect;
     property EncodingDetectDefaultUtf8: boolean read FEncodingDetectDefaultUtf8 write FEncodingDetectDefaultUtf8;
     property Endings: TATLineEnds read FEndings write SetEndings;
+    property LoadingForcedANSI: boolean read FLoadingForcedANSI;
     property ListUpdates: TATIntegerList read FListUpdates;
     property ListUpdatesHard: boolean read FListUpdatesHard write FListUpdatesHard;
     property Modified: boolean read FModified write SetModified;

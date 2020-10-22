@@ -1,6 +1,7 @@
 {
-Code by Christian Ghisler (ghisler.com)
+Based on code by Christian Ghisler (ghisler.com)
 Christian gave code to open-source at Total Commander public forum
+Changed for ATSynEdit by Alexey Torgashin (UVviewsoft.com)
 }
 unit ATStringProc_UTF8Detect;
 
@@ -12,7 +13,7 @@ type
   TBufferUTF8State = (u8sUnknown, u8sYes, u8sNo);
 
 //PartialAllowed must be set to true if the buffer is smaller than the file.
-function IsBufferUtf8(buf:PAnsiChar;PartialAllowed:boolean): TBufferUTF8State;
+function IsBufferUtf8(buf:PAnsiChar; bufSize:SizeInt; PartialAllowed:boolean): TBufferUTF8State;
 
 implementation
 
@@ -45,18 +46,20 @@ begin
   result:=(byte(thechar) and (128+64))=128;
 end;
 
-function IsBufferUtf8(buf:PAnsiChar;PartialAllowed:boolean):TBufferUTF8State;
+function IsBufferUtf8(buf:PAnsiChar; bufSize:SizeInt; PartialAllowed:boolean):TBufferUTF8State;
 {Buffer contains only valid UTF-8 characters, no secondary alone,
 no primary without the correct nr of secondary}
-var p:PAnsiChar;
-    utf8bytes:integer;
-    hadutf8bytes:boolean;
+var
+  p:PAnsiChar;
+  i:SizeInt;
+  utf8bytes:integer;
+  hadutf8bytes:boolean;
 begin
   p:=buf;
   hadutf8bytes:=false;
   result:=u8sUnknown;
   utf8bytes:=0;
-  while p^<>#0 do
+  for i:= 1 to bufSize do
   begin
     if utf8bytes>0 then
     begin  {Expecting secondary AnsiChar}

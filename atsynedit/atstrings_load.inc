@@ -91,7 +91,7 @@ begin
     Stream.Position:= 0;
     Stream.Read(Buf^, Size-1{trail zero});
     Stream.Position:= 0;
-    Result:= IsBufferUtf8(Buf, true);
+    Result:= IsBufferUtf8(Buf, Size-1, true);
   finally
     FreeMem(Buf);
   end;
@@ -294,7 +294,7 @@ begin
   end;
 end;
 
-procedure TATStrings.DoLoadFromStream(Stream: TStream);
+procedure TATStrings.DoLoadFromStream(Stream: TStream; out AForcedToANSI: boolean);
 var
   Buf: PAnsiChar;
   BufSize: int64;
@@ -341,6 +341,7 @@ var
   LineEnd: TATLineEnds;
   bWithBom: boolean;
 begin
+  AForcedToANSI:= false;
   Clear;
 
   bWithBom:= false;
@@ -387,6 +388,16 @@ begin
   try
     Stream.Position:= NSignatureLen;
     Stream.ReadBuffer(Buf^, BufSize);
+
+    //double-check that we won't break file contents,
+    //it may be cp1252 file, so UTF8 loading will break it, making ???? chars
+    if FEncoding=cEncUTF8 then
+      if IsBufferUtf8(Buf, BufSize, false)=u8sNo then
+      begin
+        AForcedToANSI:= true;
+        FEncoding:= cEncAnsi;
+        CharSize:= cEncodingSize[FEncoding];
+      end;
 
     NStart:= 0;
     NCounted:= 0;
@@ -475,7 +486,7 @@ end;
 procedure TATStrings.LoadFromStream(Stream: TStream);
 begin
   DoClearUndo(true);
-  DoLoadFromStream(Stream);
+  DoLoadFromStream(Stream, FLoadingForcedANSI);
   DoFinalizeLoading;
 end;
 
