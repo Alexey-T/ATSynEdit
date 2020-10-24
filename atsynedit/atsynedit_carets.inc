@@ -512,6 +512,10 @@ var
 begin
   Result:= false;
 
+  //allow big values - make centering vertically
+  if Abs(AIndentVert)>=cMaxIndentVert then
+    AIndentVert:= GetVisibleLines div 2;
+
   if AUnfold then
     if IsLineFolded(APos.Y, true) then
       DoUnfoldLine(APos.Y);

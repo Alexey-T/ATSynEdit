@@ -267,6 +267,7 @@ type
   end;
 
 const
+  cMaxIndentVert = 100;
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
   cInitScrollbarHorzAddSpace = 4;
