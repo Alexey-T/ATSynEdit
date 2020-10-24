@@ -608,14 +608,27 @@ begin
     Update;
 end;
 
-procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge;
+procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
   AAllowProcessMsg: boolean=true; AAllowUpdate: boolean=true);
+var
+  NIndentVert, NIndentHorz: integer;
 begin
+  if AUndoRedo then
+  begin
+    NIndentVert:= FOptUndoIndentVert;
+    NIndentHorz:= FOptUndoIndentHorz;
+  end
+  else
+  begin
+    NIndentVert:= FOptScrollIndentCaretVert;
+    NIndentHorz:= FOptScrollIndentCaretHorz;
+  end;
+
   DoGotoPos(
     Carets.CaretAtEdge(AEdge),
     Point(-1, -1),
-    FOptScrollIndentCaretHorz,
-    FOptScrollIndentCaretVert,
+    NIndentHorz,
+    NIndentVert,
     false,
     false, //dont unfold
     AAllowProcessMsg,

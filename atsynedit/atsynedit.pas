@@ -149,6 +149,7 @@ type
     cResultCaretBottom,
     cResultKeepColumnSel,
     cResultScroll,
+    cResultUndoRedo,
     cResultState
     );
   TATCommandResults = set of TATCommandResult;
@@ -266,6 +267,8 @@ type
   end;
 
 const
+  cInitUndoIndentVert = 15;
+  cInitUndoIndentHorz = 20;
   cInitScrollbarHorzAddSpace = 4;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
@@ -685,6 +688,8 @@ type
     FOptScrollSmooth: boolean;
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
+    FOptUndoIndentVert: integer;
+    FOptUndoIndentHorz: integer;
     FOptScrollbarsNew: boolean;
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
@@ -1308,7 +1313,7 @@ type
       APlaceCaret, ADoUnfold: boolean;
       AAllowProcessMsg: boolean=true;
       AAllowUpdate: boolean=true);
-    procedure DoGotoCaret(AEdge: TATCaretEdge;
+    procedure DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
       AAllowProcessMsg: boolean= true; AAllowUpdate: boolean= true);
     //bookmarks
     procedure BookmarkSetForLine(ALine, ABmKind: integer;
@@ -1549,6 +1554,8 @@ type
     property OptScrollSmooth: boolean read FOptScrollSmooth write FOptScrollSmooth default true;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
+    property OptUndoIndentVert: integer read FOptUndoIndentVert write FOptUndoIndentVert default cInitUndoIndentVert;
+    property OptUndoIndentHorz: integer read FOptUndoIndentHorz write FOptUndoIndentHorz default cInitUndoIndentHorz;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
     property OptScrollbarHorizontalAddSpace: integer read FOptScrollbarHorizontalAddSpace write FOptScrollbarHorizontalAddSpace default cInitScrollbarHorzAddSpace;
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
@@ -3960,6 +3967,8 @@ begin
   FOptScrollSmooth:= true;
   FOptScrollIndentCaretHorz:= 10;
   FOptScrollIndentCaretVert:= 0;
+  FOptUndoIndentVert:= cInitUndoIndentVert;
+  FOptUndoIndentHorz:= cInitUndoIndentHorz;
   FOptScrollbarsNew:= false;
   FOptScrollbarHorizontalAddSpace:= cInitScrollbarHorzAddSpace;
   FOptScrollLineCommandsKeepCaretOnScreen:= true;

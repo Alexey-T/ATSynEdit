@@ -125,10 +125,12 @@ var
   Caret: TATCaretItem;
   bTextChanged: boolean;
   bNeedRepaint, bAllowRepaint: boolean;
+  bUndoRedo: boolean;
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
   bTextChanged:= cResultText in Res;
+  bUndoRedo:= cResultUndoRedo in Res;
 
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
@@ -170,16 +172,16 @@ begin
   if IsCommandResults_CaretMove(Res) then
   begin
     if cResultCaretTop in Res then
-      DoGotoCaret(cEdgeTop, false, false)
+      DoGotoCaret(cEdgeTop, bUndoRedo, false, false)
     else
     if cResultCaretBottom in Res then
-      DoGotoCaret(cEdgeBottom, false, false)
+      DoGotoCaret(cEdgeBottom, bUndoRedo, false, false)
     else
     if cResultCaretLeft in Res then
-      DoGotoCaret(cEdgeLeft, false, false)
+      DoGotoCaret(cEdgeLeft, bUndoRedo, false, false)
     else
     if cResultCaretRight in Res then
-      DoGotoCaret(cEdgeRight, false, false);
+      DoGotoCaret(cEdgeRight, bUndoRedo, false, false);
 
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
