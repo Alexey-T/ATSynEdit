@@ -1,3 +1,7 @@
+{
+Source code is taken from FPC 3.2fixes, and changed by Alexey Torgashin.
+License: same as for FPC.
+}
 unit ATStringProc_UTF8Decode;
 
 interface
