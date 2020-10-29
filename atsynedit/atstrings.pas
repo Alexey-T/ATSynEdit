@@ -426,8 +426,8 @@ type
   TBufferUTF8State = ATStringProc_Utf8Detect.TBufferUTF8State;
 
 function ATStrings_To_StringList(AStr: TATStrings): TStringList;
-function IsStreamWithUt8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
-function IsStreamWithUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
+function DetectStreamUtf8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
+function DetectStreamUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
 
 var
   GlobalDetectUtf8BufferKb: integer = 8;

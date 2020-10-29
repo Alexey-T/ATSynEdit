@@ -29,7 +29,7 @@ begin
 end;
 
 
-function IsStreamWithUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
+function DetectStreamUtf16NoBom(Stream: TStream; BufSizeWords: integer; out IsLE: boolean): boolean;
 var
   Buf: array[0..80] of word;
   BufItem: word;
@@ -73,7 +73,7 @@ begin
 end;
 
 
-function IsStreamWithUt8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
+function DetectStreamUtf8NoBom(Stream: TStream; BufSizeKb: word): TBufferUTF8State;
 const
   cMinLen = 10;
 var
@@ -97,7 +97,7 @@ begin
   end;
 end;
 
-procedure DoDetectStreamEncoding(Stream: TStream;
+procedure DetectStreamEncoding(Stream: TStream;
   var Enc: TATFileEncoding;
   out SignLen: integer;
   out EncWithBom: boolean;
@@ -150,7 +150,7 @@ begin
   end;
 
   if BufSizeKb>0 then
-    case IsStreamWithUt8NoBom(Stream, BufSizeKb) of
+    case DetectStreamUtf8NoBom(Stream, BufSizeKb) of
       u8sYes:
         begin
           Enc:= cEncUTF8;
@@ -165,7 +165,7 @@ begin
     end;
 
   if BufSizeWords>0 then
-    if IsStreamWithUtf16NoBom(Stream, BufSizeWords, IsLE) then
+    if DetectStreamUtf16NoBom(Stream, BufSizeWords, IsLE) then
     begin
       if IsLE then
         Enc:= cEncWideLE
@@ -428,8 +428,7 @@ begin
 
   if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
   begin
-    //it's safe to set here UTF8 even for binary files, later contents
-    //will be checked by IsBufferUtf8
+    //it's safe to set here UTF8 even for binary files, later contents will be checked
     FEncoding:= cEncUTF8;
   end
   else
@@ -440,14 +439,14 @@ begin
       FEncoding:= cEncUTF8
     else
       FEncoding:= cEncAnsi;
-    DoDetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
+    DetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
       GlobalDetectUtf8BufferKb,
       GlobalDetectUf16BufferWords);
   end
   else
   begin
     //detect encoding only by signature
-    DoDetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
+    DetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
       0, //buffer sizes=0
       0);
   end;
