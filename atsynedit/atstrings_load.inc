@@ -135,7 +135,10 @@ begin
           eidUTF8BOM,
           eidUCS2LE,
           eidUCS2BE:
-            AEnc:= cEncUTF8;
+            begin
+              AEnc:= cEncUTF8;
+              AEncCodepage:= eidUTF8;
+            end
           else
             AEnc:= cEncAnsi;
         end;
