@@ -7,16 +7,22 @@ unit ATStringProc_UTF8Decode;
 interface
 
 procedure CustomUTF8Decode(const s: RawByteString; out Res: UnicodeString; out Error: boolean);
+function CustomUTF8ToUnicode(Dest: PUnicodeChar; MaxDestChars: SizeUInt; Source: PChar; SourceBytes: SizeUInt): SizeUInt;
+procedure RaiseUTF8TextError;
 
 implementation
 
 uses SysUtils;
 
+type
+  EBadUTF8Text = class(Exception);
+
+procedure RaiseUTF8TextError;
+begin
+  raise EBadUTF8Text.Create('UTF-8 decode error');
+end;
+
 function CustomUTF8ToUnicode(Dest: PUnicodeChar; MaxDestChars: SizeUInt; Source: PChar; SourceBytes: SizeUInt): SizeUInt;
-  procedure DoError;
-  begin
-    raise Exception.Create('UTF8 decode error');
-  end;  
 var
   InputUTF8: SizeUInt;
   IBYTE: BYTE;
@@ -72,7 +78,7 @@ begin
           case CharLen of
             1:  begin
                   //Not valid UTF-8 sequence
-                  DoError;
+                  RaiseUTF8TextError;
                 end;
             2:  begin
                   //Two bytes UTF, convert it
@@ -81,7 +87,7 @@ begin
                   if UC <= $7F then
                     begin
                       //Invalid UTF sequence.
-                      DoError;
+                      RaiseUTF8TextError;
                     end;
                 end;
             3:  begin
@@ -92,7 +98,7 @@ begin
                   if (UC <= $7FF) or (UC >= $FFFE) or ((UC >= $D800) and (UC <= $DFFF)) then
                     begin
                       //Invalid UTF-8 sequence
-                      DoError;
+                      RaiseUTF8TextError;
                     End;
                 end;
             4:  begin
@@ -103,7 +109,7 @@ begin
                   UC:= UC or ((byte(Source[InputUTF8+3]) and $3F));
                   if (UC < $10000) or (UC > $10FFFF) then
                     begin
-                      DoError;
+                      RaiseUTF8TextError;
                     end
                   else
                     begin
@@ -126,7 +132,7 @@ begin
             5,6,7:  begin
                       //Invalid UTF8 to unicode conversion,
                       //mask it as invalid UNICODE too.
-                      DoError;
+                      RaiseUTF8TextError;
                     end;
           end;
           if CharLen > 0 then

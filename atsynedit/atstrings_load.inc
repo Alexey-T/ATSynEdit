@@ -299,6 +299,8 @@ var
   Buf: PAnsiChar;
   BufSize: int64;
   CharSize: integer;
+  NSignatureLen: integer;
+  NStreamSize: Int64;
   //------
   procedure _FindNextEol(AFromPos: integer;
     out AFoundPos: integer;
@@ -332,13 +334,89 @@ var
     until false;
   end;
   //------
+  procedure _LoadItems;
+  var
+    Len, NStart, NEnd, NCounted: integer;
+    LineEnd: TATLineEnds;
+    SA, SUtf8: string;
+    SWide: UnicodeString;
+    SQuad: UCS4String;
+  begin
+    NStart:= 0;
+    NCounted:= 0;
+    repeat
+      _FindNextEol(NStart, NEnd, LineEnd);
+      Len:= NEnd-NStart;
+
+      //call OnProgress each 1M chars
+      //it's smooth enough progress, on 280Mb log, 10 seconds
+      if NStart-NCounted>cStringsProgressLoadChars then
+      begin
+        NCounted:= NStart;
+        FProgressKind:= cStringsProgressLoading;
+        FProgressValue:= Int64(NStart)*100 div NStreamSize;
+        if Assigned(FOnProgress) then
+          FOnProgress(Self);
+      end;
+
+      if LineEnd=cEndWin then
+        Inc(NEnd, CharSize*2)
+      else
+        Inc(NEnd, CharSize);
+
+      if Len=0 then
+        LineAddRaw_NoUndo('', LineEnd)
+      else
+      begin
+        case FEncoding of
+          cEncAnsi:
+            begin
+              SetString(SA, @Buf[NStart], Len);
+              SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
+              LineAddRaw_NoUndo(SUtf8, LineEnd);
+            end;
+
+          cEncUTF8:
+            begin
+              //this now raises exception if UTF8 content is bad, it's needed
+              SetString(SA, @Buf[NStart], Len);
+              LineAddRaw_NoUndo(SA, LineEnd);
+            end;
+
+          cEncWideLE,
+          cEncWideBE:
+            begin
+              SWide:= '';
+              SetLength(SWide, Len div 2);
+              Move(Buf[NStart], SWide[1], Len);
+              if FEncoding=cEncWideBE then
+                SSwapEndianWide(SWide);
+              LineAddRaw_NoUndo(SWide, LineEnd);
+            end;
+
+          cEnc32LE,
+          cEnc32BE:
+            begin
+              SetLength(SQuad, Len div 4+1);
+              Move(Buf[NStart], SQuad[0], Len);
+              if FEncoding=cEnc32BE then
+                SSwapEndianUCS4(SQuad);
+              SWide:= UCS4StringToUnicodeString(SQuad);
+              LineAddRaw_NoUndo(SWide, LineEnd);
+            end;
+
+          else
+            DoEncError;
+        end;
+      end;
+
+      NStart:= NEnd;
+      if (NStart>=BufSize) then Break;
+    until false;
+
+  end;
+  //------
 var
-  NStart, NEnd, NCounted, Len, NSignatureLen: integer;
-  NStreamSize: Int64;
-  SA, SUtf8: string;
-  SWide: UnicodeString;
-  SQuad: UCS4String;
-  LineEnd: TATLineEnds;
   bWithBom: boolean;
 begin
   AForcedToANSI:= false;
@@ -390,7 +468,7 @@ begin
     Stream.Position:= NSignatureLen;
     Stream.ReadBuffer(Buf^, BufSize);
 
-    //important for users!
+    (*
     //check that we won't break file contents, it may be cp1252 file,
     //so UTF8 loading will break it, making ???? chars
     if FEncoding=cEncUTF8 then
@@ -398,80 +476,20 @@ begin
       begin
         AForcedToANSI:= true;
         FEncoding:= cEncAnsi;
-        CharSize:= cEncodingSize[FEncoding];
+        CharSize:= 1;
       end;
+      *)
 
-    NStart:= 0;
-    NCounted:= 0;
-    repeat
-      _FindNextEol(NStart, NEnd, LineEnd);
-      Len:= NEnd-NStart;
-
-      //call OnProgress each 1M chars
-      //it's smooth enough progress, on 280Mb log, 10 seconds
-      if NStart-NCounted>cStringsProgressLoadChars then
-      begin
-        NCounted:= NStart;
-        FProgressKind:= cStringsProgressLoading;
-        FProgressValue:= Int64(NStart)*100 div NStreamSize;
-        if Assigned(FOnProgress) then
-          FOnProgress(Self);
-      end;
-
-      if LineEnd=cEndWin then
-        Inc(NEnd, CharSize*2)
-      else
-        Inc(NEnd, CharSize);
-
-      if Len=0 then
-        LineAddRaw_NoUndo('', LineEnd)
-      else
-      begin
-        case FEncoding of
-          cEncAnsi:
-            begin
-              SetString(SA, @Buf[NStart], Len);
-              SUtf8:= EncConvertToUTF8(SA, FEncodingCodepage);
-              LineAddRaw_NoUndo(SUtf8, LineEnd);
-            end;
-
-          cEncUTF8:
-            begin
-              SetString(SA, @Buf[NStart], Len);
-              LineAddRaw_NoUndo(SA, LineEnd);
-            end;
-
-          cEncWideLE,
-          cEncWideBE:
-            begin
-              SWide:= '';
-              SetLength(SWide, Len div 2);
-              Move(Buf[NStart], SWide[1], Len);
-              if FEncoding=cEncWideBE then
-                SSwapEndianWide(SWide);
-              LineAddRaw_NoUndo(SWide, LineEnd);
-            end;
-
-          cEnc32LE,
-          cEnc32BE:
-            begin
-              SetLength(SQuad, Len div 4+1);
-              Move(Buf[NStart], SQuad[0], Len);
-              if FEncoding=cEnc32BE then
-                SSwapEndianUCS4(SQuad);
-              SWide:= UCS4StringToUnicodeString(SQuad);
-              LineAddRaw_NoUndo(SWide, LineEnd);
-            end;
-
-          else
-            DoEncError;
-        end;
-      end;
-
-      NStart:= NEnd;
-      if (NStart>=BufSize) then Break;
-    until false;
-
+    try
+      _LoadItems;
+    except
+      //failed to load text as UTF8, so load again as ANSI
+      Clear; //clear loaded items
+      AForcedToANSI:= true;
+      FEncoding:= cEncAnsi;
+      CharSize:= 1;
+      _LoadItems;
+    end;
   finally
     FreeMem(Buf);
     FProgressValue:= 0;

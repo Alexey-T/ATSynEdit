@@ -16,7 +16,8 @@ uses
   FileUtil,
   LCLVersion,
   ATStringProc,
-  ATStringProc_Utf8Detect,
+  ATStringProc_UTF8Detect,
+  ATStringProc_UTF8Decode,
   ATStrings_Undo,
   ATSynEdit_fgl,
   ATSynEdit_Gaps,
@@ -608,6 +609,11 @@ procedure TATStringItem.SetLineA(const S: string);
 var
   NLen, N: integer;
 begin
+  LineStateToChanged;
+  Ex.HasTab:= 0; //cFlagUnknown
+  Ex.HasAsciiNoTabs:= 0; //cFlagUnknown
+  Ex.Updated:= true;
+
   NLen:= Length(S);
   if NLen=0 then
   begin
@@ -625,15 +631,25 @@ begin
   begin
     Ex.Wide:= true;
     SetLength(Buf, NLen*2);
-    N:= Utf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen);
-    if N>0 then
-      SetLength(Buf, 2*(N-1));
+    try
+      //this func is the same as Utf8ToUnicode but raises exception
+      N:= CustomUtf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen);
+      if N>0 then
+        SetLength(Buf, 2*(N-1))
+      else
+        Buf:= '';
+    except
+      //failed to load as UTF8
+      //load it again with FPC which replaces bad characters with '?'
+      //and raise exception, to allow outer procedure to load file again
+      N:= Utf8ToUnicode(PUnicodeChar(PChar(Buf)), NLen, PChar(S), NLen);
+      if N>0 then
+        SetLength(Buf, 2*(N-1))
+      else
+        Buf:= '';
+      RaiseUTF8TextError;
+    end;
   end;
-
-  LineStateToChanged;
-  Ex.HasTab:= 0; //cFlagUnknown
-  Ex.HasAsciiNoTabs:= 0; //cFlagUnknown
-  Ex.Updated:= true;
 end;
 
 procedure TATStringItem.Init(const S: string; AEnd: TATLineEnds);
