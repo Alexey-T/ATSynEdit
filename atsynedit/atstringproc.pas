@@ -189,6 +189,7 @@ procedure SClipboardCopy(AText: string; AClipboardObj: TClipboard=nil);
 function SFindCharCount(const S: string; ch: char): integer;
 function SFindCharCount(const S: UnicodeString; ch: WideChar): integer;
 function SFindRegexMatch(const Subject, Regex: UnicodeString; out MatchPos, MatchLen: integer): boolean;
+function SFindRegexMatch(const Subject, Regex: UnicodeString; GroupIndex: integer; ModS, ModI, ModM: boolean): UnicodeString;
 function SCountTextOccurrences(const SubStr, Str: UnicodeString): integer;
 function SCountTextLines(const Str, StrBreak: UnicodeString): integer;
 procedure SSplitByChar(const S: string; Sep: char; out S1, S2: string);
@@ -1255,6 +1256,24 @@ begin
       MatchPos:= Obj.MatchPos[0];
       MatchLen:= Obj.MatchLen[0];
     end;
+  finally
+    FreeAndNil(Obj);
+  end;
+end;
+
+function SFindRegexMatch(const Subject, Regex: UnicodeString; GroupIndex: integer; ModS, ModI, ModM: boolean): UnicodeString;
+var
+  Obj: TRegExpr;
+begin
+  Result:= '';
+  Obj:= TRegExpr.Create;
+  try
+    Obj.ModifierS:= ModS;
+    Obj.ModifierM:= ModM;
+    Obj.ModifierI:= ModI;
+    Obj.Expression:= Regex;
+    if Obj.Exec(Subject) then
+      Result:= Obj.Match[GroupIndex];
   finally
     FreeAndNil(Obj);
   end;

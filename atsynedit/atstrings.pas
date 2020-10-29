@@ -13,8 +13,6 @@ interface
 uses
   {$ifdef windows} Windows, {$endif}
   SysUtils, Classes, Graphics,
-  FileUtil,
-  LCLVersion,
   ATStringProc,
   ATStringProc_UTF8Detect,
   ATStringProc_UTF8Decode,
@@ -23,7 +21,6 @@ uses
   ATSynEdit_Gaps,
   ATSynEdit_Bookmarks,
   ATSynEdit_Gutter_Decor,
-  Math,
   EncConv;
 
 const
@@ -434,6 +431,12 @@ var
   GlobalDetectUf16BufferWords: integer = 5;
 
 implementation
+
+uses
+  FileUtil,
+  LCLVersion,
+  Math,
+  ATStringProc_Separator;
 
 const
   cSignUTF8: string = #$EF#$BB#$BF;

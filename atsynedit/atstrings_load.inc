@@ -25,7 +25,6 @@ begin
     else
       Result:= false;
   end;
-
 end;
 
 
@@ -97,8 +96,58 @@ begin
   end;
 end;
 
+function DetectStreamEncodingByPythonId(Stream: TStream; var AEnc: TATFileEncoding; var AEncCodepage: TEncConvId): boolean;
+// https://docs.python.org/3/reference/lexical_analysis.html#encoding-declarations
+const
+  BufSize = 100;
+  cRegex = '^.+coding[=:]\s*([-\w.]+)';
+  cRegexGroup = 1;
+var
+  Buf, SLine, SEncId: string;
+  Sep: TATStringSeparator;
+  i: integer;
+begin
+  Result:= false;
+  Buf:= StringOfChar(' ', BufSize);
+  Stream.Position:= 0;
+  Stream.Read(Buf[1], Length(Buf));
+  Sep.Init(Buf, #10); //don't support CR separator yet
+
+  //detect by first 2 lines, 2nd used if 1st is comment
+  for i:= 1 to 2 do
+    if Sep.GetItemStr(SLine) then
+    begin
+      if SLine='' then exit;
+
+      //support several line comments, not all
+      if
+        not SBeginsWith(SLine, '#') and
+        not SBeginsWith(SLine, ';') and
+        not SBeginsWith(SLine, '//') and
+        not SBeginsWith(SLine, '--') then exit;
+
+      SEncId:= SFindRegexMatch(SLine, cRegex, cRegexGroup, false, false, false);
+      if SEncId<>'' then
+      begin
+        AEncCodepage:= EncConvFindEncoding(SEncId);
+        case AEncCodepage of
+          eidUTF8,
+          eidUTF8BOM,
+          eidUCS2LE,
+          eidUCS2BE:
+            AEnc:= cEncUTF8;
+          else
+            AEnc:= cEncAnsi;
+        end;
+        Result:= true;
+        exit;
+      end;
+    end;
+end;
+
 procedure DetectStreamEncoding(Stream: TStream;
   var Enc: TATFileEncoding;
+  var EncCodepage: TEncConvId;
   out SignLen: integer;
   out EncWithBom: boolean;
   BufSizeUTF8: integer;
@@ -163,6 +212,9 @@ begin
           Enc:= cEncAnsi;
         end;
     end;
+
+  if DetectStreamEncodingByPythonId(Stream, Enc, EncCodepage) then
+    Exit;
 
   if BufSizeUTF16>0 then
     if DetectStreamUtf16NoBom(Stream, BufSizeUTF16, IsLE) then
@@ -439,14 +491,14 @@ begin
       FEncoding:= cEncUTF8
     else
       FEncoding:= cEncAnsi;
-    DetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
+    DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
       GlobalDetectUtf8BufferKb,
       GlobalDetectUf16BufferWords);
   end
   else
   begin
     //detect encoding only by signature
-    DetectStreamEncoding(Stream, FEncoding, NSignatureLen, bWithBom,
+    DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
       0, //buffer sizes=0
       0);
   end;
