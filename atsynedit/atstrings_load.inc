@@ -469,8 +469,8 @@ begin
     Stream.ReadBuffer(Buf^, BufSize);
 
     (*
-    //check that we won't break file contents, it may be cp1252 file,
-    //so UTF8 loading will break it, making ???? chars
+    //check that we won't break file contents, it may be cp1252 file, so UTF8 loading will break chars to '?'
+    //this is now not needed, utf8 load error raises exception in ATStringItem.SetLine, ie in _LoadItems
     if FEncoding=cEncUTF8 then
       if IsBufferUtf8(Buf, BufSize, false)=u8sNo then
       begin
