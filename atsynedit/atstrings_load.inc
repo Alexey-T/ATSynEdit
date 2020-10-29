@@ -101,8 +101,8 @@ procedure DetectStreamEncoding(Stream: TStream;
   var Enc: TATFileEncoding;
   out SignLen: integer;
   out EncWithBom: boolean;
-  BufSizeKb: integer;
-  BufSizeWords: integer);
+  BufSizeUTF8: integer;
+  BufSizeUTF16: integer);
 var
   IsLE: boolean;
 begin
@@ -149,8 +149,8 @@ begin
     Exit
   end;
 
-  if BufSizeKb>0 then
-    case DetectStreamUtf8NoBom(Stream, BufSizeKb) of
+  if BufSizeUTF8>0 then
+    case DetectStreamUtf8NoBom(Stream, BufSizeUTF8) of
       u8sYes:
         begin
           Enc:= cEncUTF8;
@@ -164,8 +164,8 @@ begin
         end;
     end;
 
-  if BufSizeWords>0 then
-    if DetectStreamUtf16NoBom(Stream, BufSizeWords, IsLE) then
+  if BufSizeUTF16>0 then
+    if DetectStreamUtf16NoBom(Stream, BufSizeUTF16, IsLE) then
     begin
       if IsLE then
         Enc:= cEncWideLE
