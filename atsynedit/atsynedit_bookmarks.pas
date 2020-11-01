@@ -68,6 +68,9 @@ type
 
 implementation
 
+uses
+  Math;
+
 { TATBookmarkItems }
 
 function TATBookmarkItems.ItemPtr(AIndex: integer): PATBookmarkItem;
@@ -226,8 +229,7 @@ procedure TATBookmarks.Update(AChange: TATLineChangeKind;
   ALine, AItemCount, ALineCount: integer);
 var
   Item: PATBookmarkItem;
-  //bMovedHere: boolean;
-  NIndexPlaced, i: integer;
+  NIndexPlaced, NewLine, i: integer;
 begin
   case AChange of
     cLineChangeEdited:
@@ -256,7 +258,6 @@ begin
         for i:= 0 to AItemCount-1 do
         begin
           NIndexPlaced:= Find(ALine+i);
-          //bMovedHere:= false;
 
           if (NIndexPlaced>=0) and FList.ItemPtr(NIndexPlaced)^.Data.DeleteOnDelLine then
           begin
@@ -272,20 +273,13 @@ begin
           //spec case for bookmark on last line, keep it if deleting last line
           if (Item^.Data.LineNum>ALine) or (Item^.Data.LineNum=ALineCount-1) then
           begin
-            Item^.Data.LineNum-= AItemCount;
-            {
-            if Item.Data.LineNum=ALine then
-              bMovedHere:= true;
-            }
+            NewLine:= Max(Item^.Data.LineNum-AItemCount, ALine);
+            Item^.Data.LineNum:= NewLine;
           end;
         end;
 
-        {
-        //delete new duplicate
-        if bMovedHere then
-          if NIndexPlaced>=0 then
-            Delete(NIndexPlaced);
-        }
+        //several marks now could be on the same lines
+        DeleteDups;
       end;
   end;
 end;
