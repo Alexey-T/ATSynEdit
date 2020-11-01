@@ -278,7 +278,7 @@ begin
           end;
         end;
 
-        //several marks now could be on the same lines
+        //dups may appeared, if many bookmarks were in 1 block
         DeleteDups;
       end;
   end;
