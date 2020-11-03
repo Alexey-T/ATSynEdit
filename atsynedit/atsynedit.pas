@@ -5443,6 +5443,16 @@ begin
   else
     DoHintHide;
 
+  //mouse dragged on minimap
+  //handle this before starting FTimerScroll (CudaText issues 2941, 2944)
+  if FMouseDragMinimap then
+  begin
+    if bMovedMinimal then
+      if Shift=[ssLeft] then
+        DoMinimapDrag(Y);
+    Exit
+  end;
+
   //start scroll timer
   FTimerScroll.Enabled:=
     FOptMouseEnableAll and
@@ -5600,15 +5610,6 @@ begin
           end;
         end;
       Exit;
-    end;
-
-  //mouse dragged on minimap
-  if bOnMinimap then
-    if FMouseDragMinimap and bMovedMinimal then
-    begin
-      if Shift=[ssLeft] then
-        DoMinimapDrag(Y);
-      Exit
     end;
 end;
 
