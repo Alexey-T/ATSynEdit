@@ -1317,14 +1317,19 @@ type
     procedure DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
       AAllowProcessMsg: boolean= true; AAllowUpdate: boolean= true);
     //bookmarks
+    procedure BookmarkSetForLineEx(ALine, ABmKind: integer;
+      const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64;
+      ABookmarksObj: TATBookmarks);
     procedure BookmarkSetForLine(ALine, ABmKind: integer;
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64);
     procedure BookmarkSetForLine_2(ALine, ABmKind: integer;
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64);
     procedure BookmarkToggleForLine(ALine, ABmKind: integer;
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64);
+    procedure BookmarkDeleteForLineEx(ALine: integer; ABookmarksObj: TATBookmarks);
     procedure BookmarkDeleteForLine(ALine: integer);
     procedure BookmarkDeleteForLine_2(ALine: integer);
+    function BookmarkDeleteByTagEx(const ATag: Int64; ABookmarksObj: TATBookmarks): boolean;
     function BookmarkDeleteByTag(const ATag: Int64): boolean;
     function BookmarkDeleteByTag_2(const ATag: Int64): boolean;
     procedure BookmarkDeleteAll;

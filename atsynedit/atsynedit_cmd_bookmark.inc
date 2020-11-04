@@ -1,8 +1,8 @@
 {$ifdef nnnn}begin end;{$endif}
 
-procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
-  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
-  AShowInList: boolean; const ATag: Int64);
+procedure TATSynEdit.BookmarkSetForLineEx(ALine, ABmKind: integer;
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64;
+  ABookmarksObj: TATBookmarks);
 var
   Data: TATBookmarkData;
 begin
@@ -13,31 +13,40 @@ begin
   Data.AutoDelete:= AAutoDelete;
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
-  Strings.Bookmarks.Add(Data);
+  ABookmarksObj.Add(Data);
 
   InvalidateHilitingCache(ALine);
-  //InvalidateHilitingCache; //use it if the above call hangs (due to FPC bug)
-
   Update;
+end;
+
+procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
+  AShowInList: boolean; const ATag: Int64);
+begin
+  BookmarkSetForLineEx(
+    ALine,
+    ABmKind,
+    AHint,
+    AAutoDelete,
+    AShowInList,
+    ATag,
+    Strings.Bookmarks
+    );
 end;
 
 procedure TATSynEdit.BookmarkSetForLine_2(ALine, ABmKind: integer;
   const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
   AShowInList: boolean; const ATag: Int64);
-var
-  Data: TATBookmarkData;
 begin
-  if not Strings.IsIndexValid(ALine) then exit;
-  Data.LineNum:= ALine;
-  Data.Kind:= ABmKind;
-  Data.Hint:= AHint;
-  Data.AutoDelete:= AAutoDelete;
-  Data.ShowInBookmarkList:= AShowInList;
-  Data.Tag:= ATag;
-  Strings.Bookmarks2.Add(Data);
-
-  InvalidateHilitingCache(ALine);
-  Update;
+  BookmarkSetForLineEx(
+    ALine,
+    ABmKind,
+    AHint,
+    AAutoDelete,
+    AShowInList,
+    ATag,
+    Strings.Bookmarks2
+    );
 end;
 
 
@@ -69,42 +78,44 @@ begin
 end;
 
 
-procedure TATSynEdit.BookmarkDeleteForLine(ALine: integer);
+procedure TATSynEdit.BookmarkDeleteForLineEx(ALine: integer; ABookmarksObj: TATBookmarks);
 begin
   if not Strings.IsIndexValid(ALine) then exit;
-  Strings.Bookmarks.DeleteForLine(ALine);
+  ABookmarksObj.DeleteForLine(ALine);
 
   InvalidateHilitingCache(ALine);
   Update;
+end;
+
+procedure TATSynEdit.BookmarkDeleteForLine(ALine: integer);
+begin
+  BookmarkDeleteForLineEx(ALine, Strings.Bookmarks);
 end;
 
 procedure TATSynEdit.BookmarkDeleteForLine_2(ALine: integer);
 begin
-  if not Strings.IsIndexValid(ALine) then exit;
-  Strings.Bookmarks2.DeleteForLine(ALine);
+  BookmarkDeleteForLineEx(ALine, Strings.Bookmarks2);
+end;
 
-  InvalidateHilitingCache(ALine);
-  Update;
+function TATSynEdit.BookmarkDeleteByTagEx(const ATag: Int64;
+  ABookmarksObj: TATBookmarks): boolean;
+begin
+  Result:= ABookmarksObj.DeleteByTag(ATag);
+  if Result then
+  begin
+    InvalidateHilitingCache;
+    Update;
+  end;
 end;
 
 function TATSynEdit.BookmarkDeleteByTag(const ATag: Int64): boolean;
 begin
-  Result:= Strings.Bookmarks.DeleteByTag(ATag);
-  if Result then
-  begin
-    InvalidateHilitingCache;
-    Update;
-  end;
+  Result:= BookmarkDeleteByTagEx(ATag, Strings.Bookmarks);
 end;
 
 function TATSynEdit.BookmarkDeleteByTag_2(const ATag: Int64): boolean;
 begin
-  Result:= Strings.Bookmarks2.DeleteByTag(ATag);
-  if Result then
-  begin
-    InvalidateHilitingCache;
-    Update;
-  end;
+  Result:= BookmarkDeleteByTagEx(ATag, Strings.Bookmarks2);
 end;
 
 
