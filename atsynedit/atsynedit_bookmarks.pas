@@ -15,6 +15,12 @@ uses
   ATSynEdit_FGL;
 
 type
+  TATBookmarkAutoDelete = (bmadDontDelete, bmadDelete, bmadOption);
+
+var
+  OptBookmarksAutoDelete: boolean = false;
+
+type
   { TATBookmarkData }
 
   TATBookmarkData = packed record
@@ -22,7 +28,7 @@ type
     Hint: string[55];
     LineNum: integer;
     Kind: word;
-    DeleteOnDelLine: boolean;
+    AutoDelete: TATBookmarkAutoDelete;
     ShowInBookmarkList: boolean;
   end;
 
@@ -230,6 +236,7 @@ procedure TATBookmarks.Update(AChange: TATLineChangeKind;
 var
   Item: PATBookmarkItem;
   NIndexPlaced, NewLine, i: integer;
+  fAutoDel: TATBookmarkAutoDelete;
 begin
   case AChange of
     cLineChangeEdited:
@@ -259,10 +266,14 @@ begin
         begin
           NIndexPlaced:= Find(ALine+i);
 
-          if (NIndexPlaced>=0) and FList.ItemPtr(NIndexPlaced)^.Data.DeleteOnDelLine then
+          if (NIndexPlaced>=0) then
           begin
-            Delete(NIndexPlaced);
-            NIndexPlaced:= -1;
+            fAutoDel:= FList.ItemPtr(NIndexPlaced)^.Data.AutoDelete;
+            if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and OptBookmarksAutoDelete) then
+            begin
+              Delete(NIndexPlaced);
+              NIndexPlaced:= -1;
+            end;
           end;
         end;
 

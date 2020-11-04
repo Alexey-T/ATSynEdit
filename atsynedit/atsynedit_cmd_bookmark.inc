@@ -1,7 +1,8 @@
 {$ifdef nnnn}begin end;{$endif}
 
 procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
-  const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
+  AShowInList: boolean; const ATag: Int64);
 var
   Data: TATBookmarkData;
 begin
@@ -9,7 +10,7 @@ begin
   Data.LineNum:= ALine;
   Data.Kind:= ABmKind;
   Data.Hint:= AHint;
-  Data.DeleteOnDelLine:= ADeleteOnDelLine;
+  Data.AutoDelete:= AAutoDelete;
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
   Strings.Bookmarks.Add(Data);
@@ -21,7 +22,8 @@ begin
 end;
 
 procedure TATSynEdit.BookmarkSetForLine_2(ALine, ABmKind: integer;
-  const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
+  AShowInList: boolean; const ATag: Int64);
 var
   Data: TATBookmarkData;
 begin
@@ -29,7 +31,7 @@ begin
   Data.LineNum:= ALine;
   Data.Kind:= ABmKind;
   Data.Hint:= AHint;
-  Data.DeleteOnDelLine:= ADeleteOnDelLine;
+  Data.AutoDelete:= AAutoDelete;
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
   Strings.Bookmarks2.Add(Data);
@@ -40,9 +42,8 @@ end;
 
 
 procedure TATSynEdit.BookmarkToggleForLine(ALine, ABmKind: integer;
-  const AHint: string;
-  ADeleteOnDelLine, AShowInList: boolean;
-  const ATag: Int64);
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
+  AShowInList: boolean; const ATag: Int64);
 var
   NIndex: integer;
   Data: TATBookmarkData;
@@ -57,7 +58,7 @@ begin
     Data.LineNum:= ALine;
     Data.Kind:= ABmKind;
     Data.Hint:= AHint;
-    Data.DeleteOnDelLine:= ADeleteOnDelLine;
+    Data.AutoDelete:= AAutoDelete;
     Data.ShowInBookmarkList:= AShowInList;
     Data.Tag:= ATag;
     Strings.Bookmarks.Add(Data);

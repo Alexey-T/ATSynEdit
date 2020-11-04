@@ -1318,11 +1318,11 @@ type
       AAllowProcessMsg: boolean= true; AAllowUpdate: boolean= true);
     //bookmarks
     procedure BookmarkSetForLine(ALine, ABmKind: integer;
-      const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
+      const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64);
     procedure BookmarkSetForLine_2(ALine, ABmKind: integer;
-      const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
+      const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64);
     procedure BookmarkToggleForLine(ALine, ABmKind: integer;
-      const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
+      const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64);
     procedure BookmarkDeleteForLine(ALine: integer);
     procedure BookmarkDeleteForLine_2(ALine: integer);
     function BookmarkDeleteByTag(const ATag: Int64): boolean;
