@@ -127,6 +127,7 @@ begin
   FillChar(Data{%H-}, SizeOf(Data), 0);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
+  Data.AutoDelete:= bmadOption;
 
   for i:= 0 to Strings.Count-1 do
   begin
@@ -269,6 +270,7 @@ begin
   FillChar(Data{%H-}, SizeOf(Data), 0);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
+  Data.AutoDelete:= bmadOption;
 
   BookmarkDeleteAll;
   for i:= 0 to Carets.Count-1 do
