@@ -88,9 +88,9 @@ type
     cMouseActionClickRight,
     cMouseActionClickAndSelNormalBlock,
     cMouseActionClickAndSelVerticalBlock,
+    cMouseActionClickMiddle,
     cMouseActionMakeCaret,
-    cMouseActionMakeCaretsColumn,
-    cMouseActionNiceScrolling
+    cMouseActionMakeCaretsColumn
     );
 
   TATMouseActionRecord = record
@@ -5010,7 +5010,7 @@ begin
       if bClickOnSelection then
         ActionId:= cMouseActionClickSimple;
 
-    if ActionId=cMouseActionNiceScrolling then
+    if ActionId=cMouseActionClickMiddle then
     begin
       if FOptMouseNiceScroll then
       begin

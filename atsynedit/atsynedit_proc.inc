@@ -181,7 +181,7 @@ begin
   Add(cMouseActionClickAndSelVerticalBlock, [ssLeft, ssAlt, ssShift]);
   Add(cMouseActionMakeCaret, [ssLeft, ssXControl]);
   Add(cMouseActionMakeCaretsColumn, [ssLeft, ssXControl, ssShift]);
-  Add(cMouseActionNiceScrolling, [ssMiddle]);
+  Add(cMouseActionClickMiddle, [ssMiddle]);
 
   Add(cMouseActionClickSimple, [ssLeft, ssAlt]);
   Add(cMouseActionClickSimple, [ssLeft, ssAltGr]);
