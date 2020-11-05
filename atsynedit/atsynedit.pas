@@ -794,6 +794,7 @@ type
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
     FOptMouseMiddleClickScrolling: boolean;
+    FOptMouseMiddleClickPaste: boolean;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
     FOptMouseWheelScrollVertSpeed: integer;
@@ -1670,6 +1671,7 @@ type
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
     property OptMouseMiddleClickScrolling: boolean read FOptMouseMiddleClickScrolling write FOptMouseMiddleClickScrolling default true;
+    property OptMouseMiddleClickPaste: boolean read FOptMouseMiddleClickPaste write FOptMouseMiddleClickPaste default false;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;
@@ -4028,6 +4030,7 @@ begin
   FOptMouseDragDropCopying:= true;
   FOptMouseDragDropCopyingWithState:= ssModifier;
   FOptMouseMiddleClickScrolling:= true;
+  FOptMouseMiddleClickPaste:= false;
   FOptMouseHideCursor:= false;
 
   FOptMouseClickOpensURL:= false;
@@ -5016,6 +5019,12 @@ begin
       begin
         FMouseNiceScrollPos:= Point(X, Y);
         MouseNiceScroll:= true;
+      end
+      else
+      if FOptMouseMiddleClickPaste then
+      begin
+        //don't set caret pos here, user needs to press middle-btn on any place to paste
+        DoCommand(cCommand_ClipboardAltPaste); //uses PrimarySelection:TClipboard
       end;
       Exit
     end;
