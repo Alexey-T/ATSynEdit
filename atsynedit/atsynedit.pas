@@ -793,7 +793,7 @@ type
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
-    FOptMouseNiceScroll: boolean;
+    FOptMouseMiddleClickScrolling: boolean;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
     FOptMouseWheelScrollVertSpeed: integer;
@@ -1669,7 +1669,7 @@ type
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
-    property OptMouseNiceScroll: boolean read FOptMouseNiceScroll write FOptMouseNiceScroll default true;
+    property OptMouseMiddleClickScrolling: boolean read FOptMouseMiddleClickScrolling write FOptMouseMiddleClickScrolling default true;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;
@@ -4027,7 +4027,7 @@ begin
   FOptMouseDragDrop:= true;
   FOptMouseDragDropCopying:= true;
   FOptMouseDragDropCopyingWithState:= ssModifier;
-  FOptMouseNiceScroll:= true;
+  FOptMouseMiddleClickScrolling:= true;
   FOptMouseHideCursor:= false;
 
   FOptMouseClickOpensURL:= false;
@@ -4364,7 +4364,7 @@ begin
     OptScrollStyleHorz:= aessHide;
     OptScrollStyleVert:= aessHide;
     OptAllowReadOnly:= false;
-    OptMouseNiceScroll:= false;
+    OptMouseMiddleClickScrolling:= false;
     OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
@@ -5012,7 +5012,7 @@ begin
 
     if ActionId=cMouseActionClickMiddle then
     begin
-      if FOptMouseNiceScroll then
+      if FOptMouseMiddleClickScrolling then
       begin
         FMouseNiceScrollPos:= Point(X, Y);
         MouseNiceScroll:= true;
