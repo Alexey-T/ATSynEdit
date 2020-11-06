@@ -325,7 +325,7 @@ begin
     chkMsClickNumSel.Checked:= ed.OptMouseClickNumberSelectsLine;
     chkMsDragDrop.Checked:= ed.OptMouseDragDrop;
     chkMsRtClickMove.Checked:= ed.OptMouseRightClickMovesCaret;
-    chkMsNiceScroll.Checked:= ed.OptMouseNiceScroll;
+    chkMsNiceScroll.Checked:= ed.OptMouseMiddleClickScrolling;
     chkMsHideCursor.Checked:= ed.OptMouseHideCursorOnType;
 
     //undo
@@ -457,7 +457,7 @@ begin
       ed.OptMouseClickNumberSelectsLine:= chkMsClickNumSel.Checked;
       ed.OptMouseDragDrop:= chkMsDragDrop.Checked;
       ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
-      ed.OptMouseNiceScroll:= chkMsNiceScroll.Checked;
+      ed.OptMouseMiddleClickScrolling:= chkMsNiceScroll.Checked;
       ed.OptMouseHideCursorOnType:= chkMsHideCursor.Checked;
 
       //undo

@@ -641,9 +641,9 @@ begin
   end;
 
   //test Bookmarks2
-  ed.BookmarkSetForLine_2(4, cBookmarkBgKind, '', false, false, 0);
-  ed.BookmarkSetForLine_2(5, cBookmarkBgKind, '', false, false, 0);
-  ed.BookmarkSetForLine_2(6, cBookmarkBgKind, '', false, false, 0);
+  ed.BookmarkSetForLine_2(4, cBookmarkBgKind, '', bmadDontDelete, false, 0);
+  ed.BookmarkSetForLine_2(5, cBookmarkBgKind, '', bmadDontDelete, false, 0);
+  ed.BookmarkSetForLine_2(6, cBookmarkBgKind, '', bmadDontDelete, false, 0);
 
   Progress.Hide;
   UpdateCaption;
