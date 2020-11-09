@@ -7,8 +7,6 @@
 
 Author: Alexey Torgashin
 
-Requires: Lazarus 1.8 or newer. Supports all widgetsets: Windows, gtk2, Qt, Cocoa.
-
 [[File:atsynedit.png]]
 
 = License =
@@ -354,9 +352,9 @@ end;
 
 type TATMarkers (same as for Markers). Holds list of additional color/font attribute items, these items are added to syntax hiliting and selection hiliting. Each item has properties:
 
-* PosX, PosY: position of attr, like caret pos.
-* SelLen: length if attr (attr is single line).
-* Ptr: object of type TATLinePartClass, which has Data field. This Data is record, it contains all color/font/borders properties of this attr.
+* PosX, PosY: see Markers object.
+* SelX, SelY: see Markers object.
+* Ptr (TObject): object of type TATLinePartClass, which has Data field. This Data is record, it contains all color/font/borders properties of this attr.
 
 Attribs object is used in CudaText: app adds attr items to hilite brackets, to hilite misspelled words, etc. 
 
