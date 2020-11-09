@@ -1,7 +1,6 @@
 
-2020.11.05
-* change: renamed OptMouseNiceScroll to OptMouseMiddleClickScrolling
-+ add: OptMouseMiddleClickPaste
+2020.11.09
+* change: replace 2 props OptMouseMiddleClick* to single OptMouseMiddleClickAction enum
 
 2020.10.16
 + add: finder: when search with selection is called with OptInSelection, finder places marker instead of the caret. This allows to "find first"/"find next"/"find prev"/"replace" inside big selection w/o breaking it.
