@@ -5,12 +5,14 @@ unit formopt;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  Classes, SysUtils, Types,
+  Forms, Controls, Graphics, StdCtrls, Dialogs,
   ButtonPanel, Spin, ComCtrls, ExtCtrls,
+  FileUtil,
   ATStringProc,
   ATSynEdit,
   ATSynEdit_CanvasProc,
-  ATSynEdit_CharSizer, Types;
+  ATSynEdit_CharSizer;
 
 type
   { TfmOpt }
