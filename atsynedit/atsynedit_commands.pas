@@ -236,6 +236,10 @@ const
   // with built-in commands in the DoCommand overridden method
   cCommand_FirstUserCode = 4000;
 
+var
+  //must be set in application
+  cCommand_GotoDefinition: integer = 0;
+
 implementation
 
 end.

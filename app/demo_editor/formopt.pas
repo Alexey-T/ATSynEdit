@@ -63,7 +63,6 @@ type
     chkScrollHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
     chkNavHomeEnd: TCheckBox;
-    chkMsNiceScroll: TCheckBox;
     chkShowNum1st: TCheckBox;
     chkShowNumCr: TCheckBox;
     chkMapSelBorder: TCheckBox;
@@ -92,6 +91,7 @@ type
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
     chkZebraActive: TCheckBox;
+    comboMsMidClick: TComboBox;
     ComboMsClick2: TComboBox;
     comboRulerStyle: TComboBox;
     edCrHeightNormal: TSpinEdit;
@@ -129,6 +129,7 @@ type
     LabChars: TLabel;
     Label1: TLabel;
     Label10: TLabel;
+    Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
@@ -325,7 +326,7 @@ begin
     chkMsClickNumSel.Checked:= ed.OptMouseClickNumberSelectsLine;
     chkMsDragDrop.Checked:= ed.OptMouseDragDrop;
     chkMsRtClickMove.Checked:= ed.OptMouseRightClickMovesCaret;
-    chkMsNiceScroll.Checked:= ed.OptMouseMiddleClickScrolling;
+    comboMsMidClick.ItemIndex:= Ord(ed.OptMouseMiddleClickAction);
     chkMsHideCursor.Checked:= ed.OptMouseHideCursorOnType;
 
     //undo
@@ -457,7 +458,7 @@ begin
       ed.OptMouseClickNumberSelectsLine:= chkMsClickNumSel.Checked;
       ed.OptMouseDragDrop:= chkMsDragDrop.Checked;
       ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
-      ed.OptMouseMiddleClickScrolling:= chkMsNiceScroll.Checked;
+      ed.OptMouseMiddleClickAction:= TATMiddleClickAction(comboMsMidClick.ItemIndex);
       ed.OptMouseHideCursorOnType:= chkMsHideCursor.Checked;
 
       //undo

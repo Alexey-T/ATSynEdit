@@ -69,6 +69,13 @@ type
     aessAuto
     );
 
+  TATMiddleClickAction = (
+    mcaNone,
+    mcaScrolling,
+    mcaPaste,
+    mcaGotoDefinition
+    );
+
   TATPosDetails = record
     EndOfWrappedLine: boolean;
     OnGapItem: TATGapItem;
@@ -793,8 +800,7 @@ type
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
-    FOptMouseMiddleClickScrolling: boolean;
-    FOptMouseMiddleClickPaste: boolean;
+    FOptMouseMiddleClickAction: TATMiddleClickAction;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
     FOptMouseWheelScrollVertSpeed: integer;
@@ -1670,8 +1676,7 @@ type
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
-    property OptMouseMiddleClickScrolling: boolean read FOptMouseMiddleClickScrolling write FOptMouseMiddleClickScrolling default true;
-    property OptMouseMiddleClickPaste: boolean read FOptMouseMiddleClickPaste write FOptMouseMiddleClickPaste default false;
+    property OptMouseMiddleClickAction: TATMiddleClickAction read FOptMouseMiddleClickAction write FOptMouseMiddleClickAction default mcaScrolling;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;
@@ -4029,8 +4034,7 @@ begin
   FOptMouseDragDrop:= true;
   FOptMouseDragDropCopying:= true;
   FOptMouseDragDropCopyingWithState:= ssModifier;
-  FOptMouseMiddleClickScrolling:= true;
-  FOptMouseMiddleClickPaste:= false;
+  FOptMouseMiddleClickAction:= mcaScrolling;
   FOptMouseHideCursor:= false;
 
   FOptMouseClickOpensURL:= false;
@@ -4367,7 +4371,7 @@ begin
     OptScrollStyleHorz:= aessHide;
     OptScrollStyleVert:= aessHide;
     OptAllowReadOnly:= false;
-    OptMouseMiddleClickScrolling:= false;
+    OptMouseMiddleClickAction:= mcaNone;
     OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
     OptUndoLimit:= 200;
@@ -5015,16 +5019,25 @@ begin
 
     if ActionId=cMouseActionClickMiddle then
     begin
-      if FOptMouseMiddleClickScrolling then
-      begin
-        FMouseNiceScrollPos:= Point(X, Y);
-        MouseNiceScroll:= true;
-      end
-      else
-      if FOptMouseMiddleClickPaste then
-      begin
-        //don't set caret pos here, user needs to press middle-btn on any place to paste
-        DoCommand(cCommand_ClipboardAltPaste); //uses PrimarySelection:TClipboard
+      case FOptMouseMiddleClickAction of
+        mcaScrolling:
+          begin
+            FMouseNiceScrollPos:= Point(X, Y);
+            MouseNiceScroll:= true;
+          end;
+        mcaPaste:
+          begin
+            //don't set caret pos here, user needs to press middle-btn on any place to paste
+            DoCommand(cCommand_ClipboardAltPaste); //uses PrimarySelection:TClipboard
+          end;
+        mcaGotoDefinition:
+          begin
+            if cCommand_GotoDefinition>0 then
+            begin
+              DoCaretSingle(PCaret.X, PCaret.Y);
+              DoCommand(cCommand_GotoDefinition);
+            end;
+          end;
       end;
       Exit
     end;
