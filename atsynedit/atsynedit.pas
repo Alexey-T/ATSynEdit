@@ -277,7 +277,7 @@ const
   cMaxIndentVert = 100;
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
-  cInitScrollbarHorzAddSpace = 4;
+  cInitScrollbarHorzAddSpace = 2;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
   cInitCaretsPrimitiveColumnSelection = true;
