@@ -555,6 +555,7 @@ type
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
+    FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
     FIsRunningCommand: boolean;
@@ -1385,6 +1386,7 @@ type
     property IsRunningCommand: boolean read FIsRunningCommand;
     property IsReadOnlyChanged: boolean read FIsReadOnlyChanged write FIsReadOnlyChanged;
     property IsReadOnlyAutodetected: boolean read FIsReadOnlyAutodetected write FIsReadOnlyAutodetected;
+    property IsCaretShapeChangedFromAPI: boolean read FIsCaretShapeChangedFromAPI write FIsCaretShapeChangedFromAPI;
     procedure DoSelect_All;
     procedure DoSelect_None;
     procedure DoSelect_Inverted;
