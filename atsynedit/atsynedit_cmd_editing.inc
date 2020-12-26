@@ -831,7 +831,7 @@ begin
   Result:= [cResultText, cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_TextDeleteToFileBegin: TATCommandResults;
+function TATSynEdit.DoCommand_TextDeleteToDocumentBegin: TATCommandResults;
 var
   Caret: TATCaretItem;
   Str: atString;
@@ -870,7 +870,7 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_TextDeleteToFileEnd: TATCommandResults;
+function TATSynEdit.DoCommand_TextDeleteToDocumentEnd: TATCommandResults;
 var
   Caret: TATCaretItem;
   Str: atString;

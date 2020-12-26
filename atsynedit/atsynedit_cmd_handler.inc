@@ -401,8 +401,8 @@ begin
     cCommand_TextDuplicateLine:        Res:= DoCommand_TextDuplicateLine;
     cCommand_TextDeleteToLineBegin:    Res:= DoCommand_TextDeleteToLineBegin;
     cCommand_TextDeleteToLineEnd:      Res:= DoCommand_TextDeleteToLineEnd;
-    cCommand_TextDeleteToTextBegin:    Res:= DoCommand_TextDeleteToFileBegin;
-    cCommand_TextDeleteToTextEnd:      Res:= DoCommand_TextDeleteToFileEnd;
+    cCommand_TextDeleteToTextBegin:    Res:= DoCommand_TextDeleteToDocumentBegin;
+    cCommand_TextDeleteToTextEnd:      Res:= DoCommand_TextDeleteToDocumentEnd;
     cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);
     cCommand_TextDeleteWordNext:       Res:= DoCommand_TextDeleteWord(true);
 

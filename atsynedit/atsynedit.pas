@@ -1174,8 +1174,8 @@ type
     function DoCommand_TextDeleteToLineBegin: TATCommandResults;
     function DoCommand_TextDeleteToLineEnd: TATCommandResults;
     function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
-    function DoCommand_TextDeleteToFileBegin: TATCommandResults;
-    function DoCommand_TextDeleteToFileEnd: TATCommandResults;
+    function DoCommand_TextDeleteToDocumentBegin: TATCommandResults;
+    function DoCommand_TextDeleteToDocumentEnd: TATCommandResults;
     function DoCommand_GotoTextBegin: TATCommandResults;
     function DoCommand_GotoTextEnd: TATCommandResults;
     function DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
