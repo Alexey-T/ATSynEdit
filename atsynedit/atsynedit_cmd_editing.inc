@@ -858,6 +858,7 @@ begin
     Strings.Lines[Caret.PosY]:= Str;
   end;
 
+  //do it with fast method, not "for loop"
   if Caret.PosY>0 then
     Strings.TextDeleteRange(0, 0, 0, Caret.PosY, Shift, PosAfter);
 
@@ -873,8 +874,7 @@ end;
 function TATSynEdit.DoCommand_TextDeleteToDocumentEnd: TATCommandResults;
 var
   Caret: TATCaretItem;
-  Str: atString;
-  i: integer;
+  Shift, PosAfter: TPoint;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -890,15 +890,7 @@ begin
     nil
     );
 
-  Str:= Strings.Lines[Caret.PosY];
-  if Caret.PosX<Length(Str) then
-  begin
-    Delete(Str, Caret.PosX+1, MaxInt);
-    Strings.Lines[Caret.PosY]:= Str;
-  end;
-
-  for i:= Strings.Count-1 downto Caret.PosY+1 do
-    Strings.LineDelete(i);
+  Strings.TextDeleteRange(Caret.PosX, Caret.PosY, 0, Strings.Count, Shift, PosAfter);
 
   if Caret.PosY>=Strings.Count-1 then
     Strings.LinesEnds[Caret.PosY]:= cEndNone;

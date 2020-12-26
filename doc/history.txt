@@ -1,7 +1,8 @@
 
 2020.12.26
-+ add: command "delete to document begin"
 * change: renamed command to "delete to document end"
++ add: command "delete to document begin"
++ add: optimized command "delete to document end"
 
 2020.11.09
 * change: replace 2 props OptMouseMiddleClick* to single OptMouseMiddleClickAction enum
