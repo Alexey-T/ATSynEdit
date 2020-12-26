@@ -132,7 +132,8 @@ begin
   M.Add(cCommand_TextDeleteWordNext, 'delete word next', [cXControl+'+Del'], []);
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line begin', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXControl+'+K'], []);
-  M.Add(cCommand_TextDeleteToTextEnd, 'delete to text end', [], []);
+  M.Add(cCommand_TextDeleteToTextBegin, 'delete to document begin', [], []);
+  M.Add(cCommand_TextDeleteToTextEnd, 'delete to document end', [], []);
 
   M.Add(cCommand_TextIndent, 'indent selection', [cXControl+'+I'], []);
   M.Add(cCommand_TextUnindent, 'unindent selection', [cXControl+'+Shift+I'], ['Shift+Tab']);

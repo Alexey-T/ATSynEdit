@@ -1174,6 +1174,7 @@ type
     function DoCommand_TextDeleteToLineBegin: TATCommandResults;
     function DoCommand_TextDeleteToLineEnd: TATCommandResults;
     function DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
+    function DoCommand_TextDeleteToFileBegin: TATCommandResults;
     function DoCommand_TextDeleteToFileEnd: TATCommandResults;
     function DoCommand_GotoTextBegin: TATCommandResults;
     function DoCommand_GotoTextEnd: TATCommandResults;

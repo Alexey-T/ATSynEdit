@@ -831,6 +831,44 @@ begin
   Result:= [cResultText, cResultCaretBottom];
 end;
 
+function TATSynEdit.DoCommand_TextDeleteToFileBegin: TATCommandResults;
+var
+  Caret: TATCaretItem;
+  Str: atString;
+  i: integer;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  DoCaretSingleAsIs;
+  Caret:= FCarets[0];
+
+  Strings.ChangeBlockActive:= true;
+  Strings.DoOnChangeBlock(
+    0, 0,
+    Caret.PosX, Caret.PosY,
+    cBlockDeleteLines,
+    nil
+    );
+
+  if Caret.PosX>0 then
+  begin
+    Str:= Strings.Lines[Caret.PosY];
+    Delete(Str, 1, Caret.PosX);
+    Strings.Lines[Caret.PosY]:= Str;
+  end;
+
+  for i:= Caret.PosY-1 downto 0 do
+    Strings.LineDelete(i);
+
+  Strings.ChangeBlockActive:= false;
+
+  //move caret to beginning
+  DoCaretSingle(0, 0);
+
+  Result:= [cResultText, cResultCaretBottom];
+end;
+
 
 function TATSynEdit.DoCommand_TextDeleteToFileEnd: TATCommandResults;
 var
