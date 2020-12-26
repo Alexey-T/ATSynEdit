@@ -835,7 +835,7 @@ function TATSynEdit.DoCommand_TextDeleteToFileBegin: TATCommandResults;
 var
   Caret: TATCaretItem;
   Str: atString;
-  i: integer;
+  Shift, PosAfter: TPoint;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -858,8 +858,8 @@ begin
     Strings.Lines[Caret.PosY]:= Str;
   end;
 
-  for i:= Caret.PosY-1 downto 0 do
-    Strings.LineDelete(i);
+  if Caret.PosY>0 then
+    Strings.TextDeleteRange(0, 0, 0, Caret.PosY, Shift, PosAfter);
 
   Strings.ChangeBlockActive:= false;
 
