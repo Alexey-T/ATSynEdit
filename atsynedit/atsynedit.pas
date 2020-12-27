@@ -684,7 +684,16 @@ type
     FFastBmp: TBGRABitmap;
     {$endif}
 
+    //these options are implemented in CudaText, they are dummy here
     FOptAutoCloseBrackets: string;
+    FOptAutocompleteAutoshowCharCount: integer;
+    FOptAutocompleteTriggerChars: string;
+    FOptAutocompleteCommitChars: string;
+    FOptAutocompleteCloseChars: string;
+    FOptAutocompleteAddOpeningBracket: boolean;
+    FOptAutocompleteUpDownAtEdge: integer;
+
+    //options
     FOptScaleFont: integer;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
@@ -1536,7 +1545,14 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
-    property OptAutoCloseBrackets: string read FOptAutoCloseBrackets write FOptAutoCloseBrackets nodefault;
+    property OptAutoCloseBrackets: string read FOptAutoCloseBrackets write FOptAutoCloseBrackets;
+    property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
+    property OptAutocompleteTriggerChars: string read FOptAutocompleteTriggerChars write FOptAutocompleteTriggerChars;
+    property OptAutocompleteCommitChars: string read FOptAutocompleteCommitChars write FOptAutocompleteCommitChars;
+    property OptAutocompleteCloseChars: string read FOptAutocompleteCloseChars write FOptAutocompleteCloseChars;
+    property OptAutocompleteAddOpeningBracket: boolean read FOptAutocompleteAddOpeningBracket write FOptAutocompleteAddOpeningBracket default true;
+    property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
+
     property OptScaleFont: integer read FOptScaleFont write FOptScaleFont default 0;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
@@ -3890,7 +3906,14 @@ begin
   SetLength(FMarginList, 0);
   FFoldedMarkList:= nil;
   FOptIdleInterval:= cInitIdleInterval;
+
   FOptAutoCloseBrackets:= '([{';
+  FOptAutocompleteAutoshowCharCount:= 0;
+  FOptAutocompleteTriggerChars:= '';
+  FOptAutocompleteCommitChars:= ' ,;/\''"';
+  FOptAutocompleteCloseChars:= '<>()[]{}=';
+  FOptAutocompleteAddOpeningBracket:= true;
+  FOptAutocompleteUpDownAtEdge:= 1; //cudWrap
 
   FShowOsBarVert:= false;
   FShowOsBarHorz:= false;
