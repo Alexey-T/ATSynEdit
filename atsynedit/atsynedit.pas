@@ -684,6 +684,7 @@ type
     FFastBmp: TBGRABitmap;
     {$endif}
 
+    FOptAutoCloseBrackets: string;
     FOptScaleFont: integer;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
@@ -1535,6 +1536,7 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
+    property OptAutoCloseBrackets: string read FOptAutoCloseBrackets write FOptAutoCloseBrackets nodefault;
     property OptScaleFont: integer read FOptScaleFont write FOptScaleFont default 0;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
@@ -3888,6 +3890,7 @@ begin
   SetLength(FMarginList, 0);
   FFoldedMarkList:= nil;
   FOptIdleInterval:= cInitIdleInterval;
+  FOptAutoCloseBrackets:= '([{';
 
   FShowOsBarVert:= false;
   FShowOsBarHorz:= false;
