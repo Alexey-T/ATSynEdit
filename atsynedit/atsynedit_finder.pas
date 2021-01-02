@@ -1231,6 +1231,7 @@ begin
   if not OptBack then
   begin
     //handle OptWrapped #1, Result isn't ready
+    //this is to reset special marker, when last match in last selection is: abc[def], ie until selection end
     if OptWrapped then
       if FPlaceMarker then
         if FFragments[NMaxFragment].IsMarkerOnFragmentEnd(Editor) then
@@ -1245,6 +1246,7 @@ begin
     end;
 
     //handle OptWrapped #2, "if not Result"
+    //this is to reset special marker, when last match in last selection is: abc[def]gh, ie not until selection end
     if OptWrapped then
       if not Result then
         if FPlaceMarker then
