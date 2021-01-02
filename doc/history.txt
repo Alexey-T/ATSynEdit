@@ -1,5 +1,6 @@
 
 2021.01.02
++ add: finder: support search "in selection"+"wrapped search" in multi-selections (with the forward search)
 * change: renamed and changed type of Attribs.MicromapMode field, now it's enum
 
 2020.12.26
