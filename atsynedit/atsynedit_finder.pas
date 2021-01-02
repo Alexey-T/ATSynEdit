@@ -122,10 +122,14 @@ type
   end;
 
 type
+
+  { TATEditorFragment }
+
   TATEditorFragment = record
     X1, Y1, X2, Y2: integer;
     procedure Init(AX1, AY1, AX2, AY2: integer);
     function Inited: boolean;
+    function IsMarkerOnFragmentEnd(Ed: TATSynEdit): boolean;
     class operator =(const a, b: TATEditorFragment): boolean;
   end;
 
@@ -379,6 +383,17 @@ end;
 function TATEditorFragment.Inited: boolean;
 begin
   Result:= Y1>=0;
+end;
+
+function TATEditorFragment.IsMarkerOnFragmentEnd(Ed: TATSynEdit): boolean;
+var
+  Mark: TATMarkerItem;
+begin
+  if Ed.Markers.Count=0 then exit(false);
+  Mark:= Ed.Markers[0];
+  Result:=
+    (Mark.LineLen<>0) and (Mark.PosY=Y2) and
+    ((Mark.PosX=X2) or (Mark.PosX+Mark.LineLen=X2));
 end;
 
 class operator TATEditorFragment.=(const a, b: TATEditorFragment): boolean;
@@ -1184,7 +1199,10 @@ end;
 
 function TATEditorFinder.DoAction_FindOrReplace(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
+label
+  LoopFw;
 var
+  NMaxFragment: integer;
   i: integer;
 begin
   Result:= false;
@@ -1209,18 +1227,36 @@ begin
     exit
   end;
 
+  NMaxFragment:= FFragments.Count-1;
   if not OptBack then
   begin
-    for i:= 0 to FFragments.Count-1 do
+    //handle OptWrapped #1, Result isn't ready
+    if OptWrapped then
+      if FPlaceMarker then
+        if FFragments[NMaxFragment].IsMarkerOnFragmentEnd(Editor) then
+          Editor.Markers.Clear;
+
+    LoopFw:
+    for i:= 0 to NMaxFragment do
     begin
       CurrentFragmentIndex:= i;
       Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
       if Result then Break;
     end;
+
+    //handle OptWrapped #2, "if not Result"
+    if OptWrapped then
+      if not Result then
+        if FPlaceMarker then
+          if CurrentFragmentIndex=NMaxFragment then
+          begin
+            Editor.Markers.Clear;
+            goto LoopFw;
+          end;
   end
   else
   begin
-    for i:= FFragments.Count-1 downto 0 do
+    for i:= NMaxFragment downto 0 do
     begin
       CurrentFragmentIndex:= i;
       Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
