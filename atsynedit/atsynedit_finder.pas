@@ -1547,7 +1547,7 @@ begin
     else
       NLineLen:= 0;
     Editor.Markers.Clear;
-    Editor.Markers.Add(APosX, APosY, cTag, 0, 0, nil, 0, false, NLineLen);
+    Editor.Markers.Add(APosX, APosY, cTag, 0, 0, nil, 0, mmmShowInTextOnly, NLineLen);
   end
   else
     Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);

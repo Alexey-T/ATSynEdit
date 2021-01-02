@@ -17,6 +17,13 @@ uses
   ATSynEdit_Carets;
 
 type
+  TATMarkerMicromapMode = (
+    mmmShowInTextOnly,
+    mmmShowInMicromapOnly,
+    mmmShowInTextAndMicromap
+    );
+
+type
   { TATMarkerItem }
 
   PATMarkerItem = ^TATMarkerItem;
@@ -35,7 +42,7 @@ type
       //            LenX is absolute X of sel-end
     Value: Int64;
     Ptr: TObject; //used in Attribs object of ATSynEdit
-    MicromapOnly: boolean;
+    MicromapMode: TATMarkerMicromapMode;
     class operator=(const A, B: TATMarkerItem): boolean;
     function SelContains(AX, AY: integer): boolean;
     function SelEnd: TPoint;
@@ -77,7 +84,7 @@ type
       ASelY: integer=0;
       APtr: TObject=nil;
       AValue: Int64=0;
-      AMicromapOnly: boolean=False;
+      AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
       ALineLen: integer=0);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
     procedure DeleteWithTag(const ATag: Int64);
@@ -207,7 +214,7 @@ begin
     Result[i*NN+3]:= Item.SelY;
     Result[i*NN+4]:= Item.Tag;
     Result[i*NN+5]:= Item.Value;
-    Result[i*NN+6]:= Ord(Item.MicromapOnly);
+    Result[i*NN+6]:= Ord(Item.MicromapMode);
   end;
 end;
 
@@ -217,7 +224,7 @@ const
 var
   NPosX, NPosY, NLenX, NLenY: integer;
   NTag, NValue: Int64;
-  bMinimap: boolean;
+  MicromapMode: TATMarkerMicromapMode;
   i: integer;
 begin
   Clear;
@@ -229,7 +236,7 @@ begin
     NLenY:= AValue[i*NN+3];
     NTag:= AValue[i*NN+4];
     NValue:= AValue[i*NN+5];
-    bMinimap:= boolean(AValue[i*NN+6]);
+    MicromapMode:= TATMarkerMicromapMode(AValue[i*NN+6]);
     Add(
       NPosX,
       NPosY,
@@ -238,7 +245,7 @@ begin
       NLenY,
       nil,
       NValue,
-      bMinimap
+      MicromapMode
       );
   end;
 end;
@@ -289,7 +296,7 @@ end;
 
 procedure TATMarkers.Add(APosX, APosY: integer; const ATag: Int64;
   ASelX: integer; ASelY: integer; APtr: TObject; AValue: Int64;
-  AMicromapOnly: boolean; ALineLen: integer);
+  AMicromapMode: TATMarkerMicromapMode; ALineLen: integer);
 var
   Item: TATMarkerItem;
   NIndex: integer;
@@ -308,7 +315,7 @@ begin
   Item.LineLen:= ALineLen;
   Item.Ptr:= APtr;
   Item.Value:= AValue;
-  Item.MicromapOnly:= AMicromapOnly;
+  Item.MicromapMode:= AMicromapMode;
 
   if FSorted then
   begin
