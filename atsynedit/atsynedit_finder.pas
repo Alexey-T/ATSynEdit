@@ -1258,6 +1258,7 @@ begin
   end
   else
   begin
+    //OptWrap isn't supported for multi-select for backward search yet
     for i:= NMaxFragment downto 0 do
     begin
       CurrentFragmentIndex:= i;
