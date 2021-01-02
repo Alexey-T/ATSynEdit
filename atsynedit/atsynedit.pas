@@ -1539,17 +1539,17 @@ type
     property CursorGutterNumbers: TCursor read FCursorGutterNumbers write FCursorGutterNumbers default crDefault;
     property CursorMinimap: TCursor read FCursorMinimap write FCursorMinimap default crDefault;
     property CursorMicromap: TCursor read FCursorMicromap write FCursorMicromap default crDefault;
-    property Colors: TATSynEditColors read FColors write FColors;
+    property Colors: TATSynEditColors read FColors write FColors stored false;
     property ImagesGutterDecor: TImageList read FGutterDecorImages write FGutterDecorImages;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
-    property OptAutoCloseBrackets: string read FOptAutoCloseBrackets write FOptAutoCloseBrackets;
+    property OptAutoCloseBrackets: string read FOptAutoCloseBrackets write FOptAutoCloseBrackets stored false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
-    property OptAutocompleteTriggerChars: string read FOptAutocompleteTriggerChars write FOptAutocompleteTriggerChars;
-    property OptAutocompleteCommitChars: string read FOptAutocompleteCommitChars write FOptAutocompleteCommitChars;
-    property OptAutocompleteCloseChars: string read FOptAutocompleteCloseChars write FOptAutocompleteCloseChars;
+    property OptAutocompleteTriggerChars: string read FOptAutocompleteTriggerChars write FOptAutocompleteTriggerChars stored false;
+    property OptAutocompleteCommitChars: string read FOptAutocompleteCommitChars write FOptAutocompleteCommitChars stored false;
+    property OptAutocompleteCloseChars: string read FOptAutocompleteCloseChars write FOptAutocompleteCloseChars stored false;
     property OptAutocompleteAddOpeningBracket: boolean read FOptAutocompleteAddOpeningBracket write FOptAutocompleteAddOpeningBracket default true;
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
 
@@ -1557,7 +1557,7 @@ type
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
-    property OptNonWordChars: atString read FOptNonWordChars write FOptNonWordChars;
+    property OptNonWordChars: atString read FOptNonWordChars write FOptNonWordChars stored false;
     property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
     property OptFoldUnderlineOffset: integer read FFoldUnderlineOffset write FFoldUnderlineOffset default cInitFoldUnderlineOffset;
@@ -1596,7 +1596,7 @@ type
 
     property OptShowFontLigatures: boolean read FOptShowFontLigatures write FOptShowFontLigatures default true;
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
-    property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex;
+    property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMinLineLenToCalcURL: integer read FOptMinLineLenToCalcURL write FOptMinLineLenToCalcURL default cInitMinLineLenToCalcURL;
