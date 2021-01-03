@@ -10,14 +10,15 @@ unit ATSynEdit_Finder;
 interface
 
 uses
-  SysUtils, Classes, Dialogs, Forms,
-  Math,
+  SysUtils, Classes, Graphics,
+  Dialogs, Forms, Math,
   ATSynEdit,
   ATSynEdit_FGL,
   ATSynEdit_RegExpr, //must be with {$define Unicode}
   ATSynEdit_Carets,
   ATSynEdit_Markers,
   ATSynEdit_UnicodeData,
+  ATSynEdit_LineParts,
   ATStrings,
   ATStringProc,
   ATStringProc_Separator,
@@ -242,6 +243,8 @@ type
     procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
       ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
+    procedure DoAction_HighlightAllEditorMatches(AColorBorder: TColor; ATagValue,
+      AMaxLines: integer; AMoveCaret: boolean);
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
@@ -2272,6 +2275,114 @@ begin
   end;
 
  ASelText:= Editor.Strings.TextSubstring(AX1, AY1, AX2, AY2);
+end;
+
+
+procedure TATEditorFinder.DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
+  ATagValue, AMaxLines: integer; AMoveCaret: boolean);
+var
+  Results: TATFinderResults;
+  Res: TATFinderResult;
+  PosX, PosY, SelX, SelY: integer;
+  AttrRec: TATLinePart;
+  AttrObj: TATLinePartClass;
+  iRes, iLine: integer;
+const
+  MicromapMode: TATMarkerMicromapMode = mmmShowInTextAndMicromap;
+  MicromapColumn = 1;
+begin
+  if Editor=nil then exit;
+
+  if Editor.Strings.Count>=AMaxLines then
+    exit;
+
+  Results:= TATFinderResults.Create;
+  try
+    try
+      DoAction_FindAll(Results, false);
+    except
+      exit;
+    end;
+    if Results.Count=0 then exit;
+
+    FillChar(AttrRec, SizeOf(AttrRec), 0);
+    AttrRec.ColorBG:= clNone;
+    AttrRec.ColorFont:= clNone;
+    AttrRec.ColorBorder:= AColorBorder;
+    AttrRec.BorderDown:= cLineStyleRounded;
+    AttrRec.BorderLeft:= cLineStyleRounded;
+    AttrRec.BorderRight:= cLineStyleRounded;
+    AttrRec.BorderUp:= cLineStyleRounded;
+
+    for iRes:= 0 to Results.Count-1 do
+    begin
+      Res:= Results[iRes];
+      //single line attr
+      if Res.FPos.Y=Res.FEnd.Y then
+      begin
+        AttrObj:= TATLinePartClass.Create;
+        AttrObj.Data:= AttrRec;
+        AttrObj.ColumnTag:= MicromapColumn;
+        PosX:= Res.FPos.X;
+        PosY:= Res.FPos.Y;
+        SelY:= 0;
+        SelX:= Abs(Res.FEnd.X-Res.FPos.X);
+        Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, AttrObj, 0, MicromapMode);
+      end
+      else
+      //add N attrs per each line of a match
+      for iLine:= Res.FPos.Y to Res.FEnd.Y do
+        if Editor.Strings.IsIndexValid(iLine) then
+        begin
+          AttrObj:= TATLinePartClass.Create;
+          AttrObj.Data:= AttrRec;
+          AttrObj.ColumnTag:= MicromapColumn;
+
+          PosY:= iLine;
+          SelY:= 0;
+          //attr on first line
+          if iLine=Res.FPos.Y then
+          begin
+            PosX:= Res.FPos.X;
+            SelX:= Editor.Strings.LinesLen[iLine];
+          end
+          else
+          //attr in final line
+          if iLine=Res.FEnd.Y then
+          begin
+            PosX:= 0;
+            SelX:= Res.FEnd.X;
+          end
+          else
+          //attr on middle line
+          begin
+            PosX:= 0;
+            SelX:= Editor.Strings.LinesLen[iLine];
+          end;
+
+          Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, AttrObj, 0, MicromapMode);
+        end;
+    end;
+
+    Res:= Results.First;
+
+    if AMoveCaret then
+    begin
+      Editor.DoCaretSingle(Res.FPos.X, Res.FPos.Y);
+      Editor.DoEventCarets;
+    end;
+
+    Editor.DoShowPos(
+      Res.FPos,
+      FIndentHorz,
+      100{big value to center vertically},
+      true{AUnfold},
+      false{AllowUpdate}
+      );
+    Editor.Update;
+  finally
+    FreeAndNil(Results);
+  end;
 end;
 
 end.
