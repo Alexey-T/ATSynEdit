@@ -2285,11 +2285,17 @@ var
   Res: TATFinderResult;
   PosX, PosY, SelX, SelY: integer;
   AttrRec: TATLinePart;
-  AttrObj: TATLinePartClass;
   iRes, iLine: integer;
 const
   MicromapMode: TATMarkerMicromapMode = mmmShowInTextAndMicromap;
-  MicromapColumn = 1;
+  //
+  function GetAttrObj: TATLinePartClass;
+  begin
+    Result:= TATLinePartClass.Create;
+    Result.Data:= AttrRec;
+    Result.ColumnTag:= 1; //tag of micromap column
+  end;
+  //
 begin
   if Editor=nil then exit;
 
@@ -2320,24 +2326,17 @@ begin
       //single line attr
       if Res.FPos.Y=Res.FEnd.Y then
       begin
-        AttrObj:= TATLinePartClass.Create;
-        AttrObj.Data:= AttrRec;
-        AttrObj.ColumnTag:= MicromapColumn;
         PosX:= Res.FPos.X;
         PosY:= Res.FPos.Y;
         SelY:= 0;
         SelX:= Abs(Res.FEnd.X-Res.FPos.X);
-        Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, AttrObj, 0, MicromapMode);
+        Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, GetAttrObj, 0, MicromapMode);
       end
       else
       //add N attrs per each line of a match
       for iLine:= Res.FPos.Y to Res.FEnd.Y do
         if Editor.Strings.IsIndexValid(iLine) then
         begin
-          AttrObj:= TATLinePartClass.Create;
-          AttrObj.Data:= AttrRec;
-          AttrObj.ColumnTag:= MicromapColumn;
-
           PosY:= iLine;
           SelY:= 0;
           //attr on first line
@@ -2360,7 +2359,7 @@ begin
             SelX:= Editor.Strings.LinesLen[iLine];
           end;
 
-          Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, AttrObj, 0, MicromapMode);
+          Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, GetAttrObj, 0, MicromapMode);
         end;
     end;
 
