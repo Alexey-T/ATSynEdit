@@ -2369,13 +2369,14 @@ begin
 
     Res:= Results.First;
 
-    if AMoveCaret then
-    begin
-      Editor.DoCaretSingle(Res.FPos.X, Res.FPos.Y);
-      Editor.DoEventCarets;
-    end;
-
     if AScrollTo1st then
+    begin
+      if AMoveCaret then
+      begin
+        Editor.DoCaretSingle(Res.FPos.X, Res.FPos.Y);
+        Editor.DoEventCarets;
+      end;
+
       Editor.DoShowPos(
         Res.FPos,
         FIndentHorz,
@@ -2383,6 +2384,7 @@ begin
         true{AUnfold},
         false{AllowUpdate}
         );
+    end;
 
     Editor.Update;
   finally
