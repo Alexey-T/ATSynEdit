@@ -2373,15 +2373,16 @@ begin
     begin
       Editor.DoCaretSingle(Res.FPos.X, Res.FPos.Y);
       Editor.DoEventCarets;
+
+      Editor.DoShowPos(
+        Res.FPos,
+        FIndentHorz,
+        100{big value to center vertically},
+        true{AUnfold},
+        false{AllowUpdate}
+        );
     end;
 
-    Editor.DoShowPos(
-      Res.FPos,
-      FIndentHorz,
-      100{big value to center vertically},
-      true{AUnfold},
-      false{AllowUpdate}
-      );
     Editor.Update;
   finally
     FreeAndNil(Results);
