@@ -244,7 +244,8 @@ type
       ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
     function DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
-      AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer; AMoveCaret: boolean): integer;
+      AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer;
+      AScrollTo1st, AMoveCaret: boolean): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
@@ -2279,9 +2280,8 @@ end;
 
 
 function TATEditorFinder.DoAction_HighlightAllEditorMatches(
-  AColorBorder: TColor;
-  AStyleBorder: TATLineStyle;
-  ATagValue, AMaxLines: integer; AMoveCaret: boolean): integer;
+  AColorBorder: TColor; AStyleBorder: TATLineStyle; ATagValue,
+  AMaxLines: integer; AScrollTo1st, AMoveCaret: boolean): integer;
 var
   Results: TATFinderResults;
   Res: TATFinderResult;
@@ -2373,7 +2373,9 @@ begin
     begin
       Editor.DoCaretSingle(Res.FPos.X, Res.FPos.Y);
       Editor.DoEventCarets;
+    end;
 
+    if AScrollTo1st then
       Editor.DoShowPos(
         Res.FPos,
         FIndentHorz,
@@ -2381,7 +2383,6 @@ begin
         true{AUnfold},
         false{AllowUpdate}
         );
-    end;
 
     Editor.Update;
   finally
