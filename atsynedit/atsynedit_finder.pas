@@ -243,8 +243,8 @@ type
     procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
       ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
-    function DoAction_HighlightAllEditorMatches(AColorBorder: TColor; ATagValue,
-      AMaxLines: integer; AMoveCaret: boolean; ALineStyle: TATLineStyle): integer;
+    function DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
+      AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer; AMoveCaret: boolean): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
@@ -2279,8 +2279,9 @@ end;
 
 
 function TATEditorFinder.DoAction_HighlightAllEditorMatches(
-  AColorBorder: TColor; ATagValue, AMaxLines: integer; AMoveCaret: boolean;
-  ALineStyle: TATLineStyle): integer;
+  AColorBorder: TColor;
+  AStyleBorder: TATLineStyle;
+  ATagValue, AMaxLines: integer; AMoveCaret: boolean): integer;
 var
   Results: TATFinderResults;
   Res: TATFinderResult;
@@ -2318,10 +2319,10 @@ begin
     AttrRec.ColorBG:= clNone;
     AttrRec.ColorFont:= clNone;
     AttrRec.ColorBorder:= AColorBorder;
-    AttrRec.BorderDown:= ALineStyle;
-    AttrRec.BorderLeft:= ALineStyle;
-    AttrRec.BorderRight:= ALineStyle;
-    AttrRec.BorderUp:= ALineStyle;
+    AttrRec.BorderDown:= AStyleBorder;
+    AttrRec.BorderLeft:= AStyleBorder;
+    AttrRec.BorderRight:= AStyleBorder;
+    AttrRec.BorderUp:= AStyleBorder;
 
     for iRes:= 0 to Results.Count-1 do
     begin
