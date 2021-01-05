@@ -243,8 +243,8 @@ type
     procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
       ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
-    procedure DoAction_HighlightAllEditorMatches(AColorBorder: TColor; ATagValue,
-      AMaxLines: integer; AMoveCaret: boolean);
+    function DoAction_HighlightAllEditorMatches(AColorBorder: TColor; ATagValue,
+      AMaxLines: integer; AMoveCaret: boolean): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
@@ -2278,8 +2278,8 @@ begin
 end;
 
 
-procedure TATEditorFinder.DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
-  ATagValue, AMaxLines: integer; AMoveCaret: boolean);
+function TATEditorFinder.DoAction_HighlightAllEditorMatches(
+  AColorBorder: TColor; ATagValue, AMaxLines: integer; AMoveCaret: boolean): integer;
 var
   Results: TATFinderResults;
   Res: TATFinderResult;
@@ -2297,6 +2297,7 @@ const
   end;
   //
 begin
+  Result:= 0;
   if Editor=nil then exit;
 
   if Editor.Strings.Count>=AMaxLines then
@@ -2306,6 +2307,7 @@ begin
   try
     try
       DoAction_FindAll(Results, false);
+      Result:= Results.Count;
     except
       exit;
     end;
