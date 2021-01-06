@@ -1593,7 +1593,10 @@ begin
     Editor.Markers.Add(APosX, APosY, cTag, 0, 0, nil, 0, mmmShowInTextOnly, NLineLen);
   end
   else
+  begin
     Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);
+    Editor.DoEventCarets;
+  end;
 end;
 
 function TATEditorFinder.DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
