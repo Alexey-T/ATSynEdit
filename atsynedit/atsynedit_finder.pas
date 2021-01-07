@@ -1208,6 +1208,7 @@ label
 var
   NMaxFragment: integer;
   i: integer;
+  bWasGoodFragment: boolean;
 begin
   Result:= false;
   AChanged:= false;
@@ -1232,26 +1233,37 @@ begin
   end;
 
   NMaxFragment:= FFragments.Count-1;
+
   if not OptBack then
   begin
+    bWasGoodFragment:= false;
+
     //handle OptWrapped #1, Result isn't ready
     //this is to reset special marker, when last match in last selection is: abc[def], ie until selection end
     if OptWrapped then
       if FPlaceMarker then
         if FFragments[NMaxFragment].IsMarkerOnFragmentEnd(Editor) then
+        begin
           Editor.Markers.Clear;
+          bWasGoodFragment:= true;
+        end;
 
-    LoopFw:
+    //LoopFw:
     for i:= 0 to NMaxFragment do
     begin
       CurrentFragmentIndex:= i;
       Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
-      if Result then Break;
+      if Result then
+      begin
+        bWasGoodFragment:= true;
+        Break;
+      end;
     end;
 
+    {
     //handle OptWrapped #2, "if not Result"
     //this is to reset special marker, when last match in last selection is: abc[def]gh, ie not until selection end
-    if OptWrapped then
+    if OptWrapped and bWasGoodFragment then
       if not Result then
         if FPlaceMarker then
           if CurrentFragmentIndex=NMaxFragment then
@@ -1259,6 +1271,7 @@ begin
             Editor.Markers.Clear;
             goto LoopFw;
           end;
+          }
   end
   else
   begin
