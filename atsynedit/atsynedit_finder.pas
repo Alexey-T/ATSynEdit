@@ -1203,8 +1203,8 @@ end;
 
 function TATEditorFinder.DoAction_FindOrReplace(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
-label
-  LoopFw;
+//label
+//  LoopFw;
 var
   NMaxFragment: integer;
   i: integer;
@@ -1261,6 +1261,10 @@ begin
     end;
 
     {
+    removed due to looping forever:
+    https://github.com/Alexey-T/CudaText/issues/3006
+    http://synwrite.sourceforge.net/forums/viewtopic.php?p=14438#p14438
+
     //handle OptWrapped #2, "if not Result"
     //this is to reset special marker, when last match in last selection is: abc[def]gh, ie not until selection end
     if OptWrapped and bWasGoodFragment then
