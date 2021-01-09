@@ -405,6 +405,7 @@ begin
     cCommand_TextDeleteToTextEnd:      Res:= DoCommand_TextDeleteToDocumentEnd;
     cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);
     cCommand_TextDeleteWordNext:       Res:= DoCommand_TextDeleteWord(true);
+    cCommand_TextDeleteWordEntire:     Res:= DoCommand_TextDeleteWordEntire;
 
     cCommand_SelectAll:                Res:= DoCommand_SelectAll;
     cCommand_SelectNone:               Res:= [cResultCaretAny];

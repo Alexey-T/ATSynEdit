@@ -603,6 +603,60 @@ begin
     Result:= [cResultText, cResultCaretTop];
 end;
 
+function TATSynEdit.DoCommand_TextDeleteWordEntire: TATCommandResults;
+var
+  Caret: TATCaretItem;
+  Str: atString;
+  Shift, PosAfter: TPoint;
+  bNeedGroup: boolean;
+  N1, N2, i: integer;
+begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
+  bNeedGroup:= Carets.Count>1;
+  if bNeedGroup then Strings.BeginUndoGroup;
+
+  for i:= FCarets.Count-1 downto 0 do
+  begin
+    Caret:= FCarets[i];
+    if not Strings.IsIndexValid(Caret.PosY) then Continue;
+    Str:= Strings.Lines[Caret.PosY];
+
+    N1:= Caret.PosX;
+    N2:= N1;
+
+    //don't work if caret is not on a word-char
+    if N1<0 then Continue;
+    if N1>=Length(Str) then Continue;
+    if not IsCharWord(Str[N1+1]) then Continue;
+
+    //find left edge only if a word-char is lefter
+    if (N1>0) and IsCharWord(Str[N1]) then
+      N1:= SFindWordOffset(Str, N1, cWordjumpToPrev, false, FOptNonWordChars);
+
+    //find right edge always
+    N2:= SFindWordOffset(Str, N2, cWordjumpToNext, false, FOptNonWordChars);
+
+    if N1=N2 then Continue;
+    System.Delete(Str, N1+1, N2-N1);
+    Strings.Lines[Caret.PosY]:= Str;
+
+    Shift.X:= N1-N2;
+    Shift.Y:= 0;
+    PosAfter.X:= N1;
+    PosAfter.Y:= Caret.PosY;
+    Caret.PosX:= N1;
+
+    DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+  end;
+
+  if bNeedGroup then Strings.EndUndoGroup;
+
+  Result:= [cResultText, cResultCaretBottom];
+end;
+
+
 function TATSynEdit.DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
 begin
   Result:= [];

@@ -74,6 +74,7 @@ const
   cCommand_TextDeleteWordNext = 176 or cCmdFlag_ResetSel;
   cCommand_TextDeleteWordPrev = 177 or cCmdFlag_ResetSel;
   cCommand_TextDeleteToTextBegin = 178 or cCmdFlag_ResetSel;
+  cCommand_TextDeleteWordEntire = 179 or cCmdFlag_ResetSel;
 
   _base_GotoTextBegin = 200 or cCmdFlag_Caret;
   _base_GotoTextEnd   = 201 or cCmdFlag_Caret;

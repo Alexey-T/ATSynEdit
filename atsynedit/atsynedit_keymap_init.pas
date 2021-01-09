@@ -130,6 +130,7 @@ begin
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word previous', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word next', [cXControl+'+Del'], []);
+  M.Add(cCommand_TextDeleteWordEntire, 'delete word', [], []);
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line begin', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXControl+'+K'], []);
   M.Add(cCommand_TextDeleteToTextBegin, 'delete to document begin', [], []);
@@ -253,6 +254,7 @@ begin
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);
+  M.Add(cCommand_TextDeleteWordEntire, 'delete word', [], []);
 
   M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
   M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Shift+Z'], []);
