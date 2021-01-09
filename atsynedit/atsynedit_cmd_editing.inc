@@ -609,7 +609,7 @@ var
   Str: atString;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
-  N1, N2, i: integer;
+  NLen, N1, N2, i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -622,21 +622,20 @@ begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
     Str:= Strings.Lines[Caret.PosY];
+    NLen:= Length(Str);
 
     N1:= Caret.PosX;
     N2:= N1;
 
-    //don't work if caret is not on a word-char
+    //command is supposed to delete word-chars, so avoid using SFindWordOffset()
     if N1<0 then Continue;
-    if N1>=Length(Str) then Continue;
+    if N1>=NLen then Continue;
     if not IsCharWord(Str[N1+1]) then Continue;
 
-    //find left edge only if a word-char is lefter
-    if (N1>0) and IsCharWord(Str[N1]) then
-      N1:= SFindWordOffset(Str, N1, cWordjumpToPrev, false, FOptNonWordChars);
-
-    //find right edge always
-    N2:= SFindWordOffset(Str, N2, cWordjumpToNext, false, FOptNonWordChars);
+    while (N1>0) and IsCharWord(Str[N1]) do
+      Dec(N1);
+    while (N2<NLen) and IsCharWord(Str[N2+1]) do
+      Inc(N2);
 
     if N1=N2 then Continue;
     System.Delete(Str, N1+1, N2-N1);
