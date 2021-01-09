@@ -16103,159 +16103,237 @@ object TecSyntaxManager
     )
     Charset = DEFAULT_CHARSET
   end
-  object SyntAnal2: TLibSyntAnalyzer
-    Formats = <    
+  object SyntAnal16: TLibSyntAnalyzer
+    Formats = <
       item
         DisplayName = 'Number'
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clNavy
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = [fsBold]
-      end    
+      end
       item
         DisplayName = 'String'
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clTeal
         Font.Height = -13
         Font.Name = 'Courier New'
-      end    
+        Font.Style = []
+      end
       item
         DisplayName = 'Symbol'
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clMaroon
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = [fsBold]
-      end    
+      end
       item
         DisplayName = 'Comment'
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clGray
         Font.Height = -13
         Font.Name = 'Courier New'
         Font.Style = [fsItalic]
-      end    
+      end
       item
         DisplayName = 'Id'
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clBlack
         Font.Height = -13
         Font.Name = 'Courier New'
-      end    
+        Font.Style = []
+      end
       item
         DisplayName = 'Id keyword'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clNavy
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Id keyword def'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBlack
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = [fsBold]
+      end
+      item
+        DisplayName = 'Id function'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clGreen
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Id func name'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clMaroon
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+      end
+      item
+        DisplayName = 'Id types'
+        Font.Charset = DEFAULT_CHARSET
         Font.Color = clPurple
         Font.Height = -13
         Font.Name = 'Courier New'
-        Font.Style = [fsBold]
-      end    
+        Font.Style = []
+      end
       item
-        DisplayName = 'Id keyword def'
-        Font.Color = clBlack
+        DisplayName = 'Id exception'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clOlive
         Font.Height = -13
         Font.Name = 'Courier New'
-        Font.Style = [fsBold]
-      end    
+        Font.Style = []
+      end
       item
-        DisplayName = 'Id function'
-        Font.Color = clBlue
+        DisplayName = 'Decorator'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = 51200
         Font.Height = -13
         Font.Name = 'Courier New'
+        Font.Style = []
       end>
-    TokenRules = <    
+    TokenRules = <
       item
-        DisplayName = '1st Tree item'
+        DisplayName = '^Tree item'
         StyleName = 'Id keyword def'
         TokenType = 11
-        Expression = '^[\x20\x09]*(def|class|async [\x20\x09]+ def)\b'
+        Expression = '(def|class|async[\x20\x09]+def)\b'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
       item
-        DisplayName = '1st Keyword'
+        DisplayName = '^Keyword'
         StyleName = 'Id keyword'
         TokenType = 10
-        Expression = '^[\x20\x09]*(if|else|elif|for|while|try|except|finally|switch|case|with)\b'
+        Expression = 
+          '(?<=^[\x20\x09]*) (if|else|elif|for|async\x20+for|while|try|exce' +
+          'pt|finally|switch|case|with)\b'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
       item
-        DisplayName = '1st Number'
-        StyleName = 'Number'
-        TokenType = 9
-        Expression = '^[\x20\x09]* \d+(\.\d+)?'
-        ColumnFrom = 0
-        ColumnTo = 0
-      end    
-      item
-        DisplayName = '1st String'
+        DisplayName = 'String '#39#39#39
         StyleName = 'String'
         TokenType = 4
-        Expression = '(?s) ^[\x20\x09]* [rbu] ("""|'''''') .*? (\1|\Z)'
+        Expression = '(?s)[rbuf]* ("""|'#39#39#39') .*? (\1|\Z)'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
       item
-        DisplayName = '1st Id'
-        StyleName = 'Id'
-        TokenType = 9
-        Expression = '^[\x20\x09]*\w+'
-        ColumnFrom = 0
-        ColumnTo = 0
-      end    
-      item
-        DisplayName = '1st Attrib'
-        StyleName = 'Symbol'
-        TokenType = 9
-        Expression = '^[\x20\x09]*@'
-        ColumnFrom = 0
-        ColumnTo = 0
-      end    
-      item
-        DisplayName = '1st Comment'
-        Enabled = False
-        StyleName = 'Comment'
-        TokenType = 13
-        Expression = '^[\x20\x09]* \#.*'
-        ColumnFrom = 0
-        ColumnTo = 0
-      end    
-      item
-        DisplayName = 'String2'
+        DisplayName = 'String raw \ at eol'
         StyleName = 'String'
         TokenType = 4
-        Expression = '(?s) [rbu]? ("""|'''''') .*? (\1|\Z)'
+        Expression = '(r|rf|rb|br|ur) ("|'#39') (\\\z|\\.|.)*? \2'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
+      item
+        DisplayName = 'String \ at eol'
+        StyleName = 'String'
+        TokenType = 4
+        Expression = '(b|u|f)? ("|'#39') (\\\z|\\.|.)*? \2'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'String raw'
+        StyleName = 'String'
+        TokenType = 4
+        Expression = '(r|rf|fr|rb|br|ur) ("|'#39') (\\.|.)*? (\2|$)'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
       item
         DisplayName = 'String'
         StyleName = 'String'
         TokenType = 4
-        Expression = '[rbu]? ("|'') (\\.|.)*? (\1|$)'
+        Expression = '(b|u|f)? ("|'#39') (\\.|.)*? (\2|$)'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
       item
-        DisplayName = 'Id'
+        DisplayName = '^Id='
+        StyleName = 'Id'
+        TokenType = 15
+        Expression = '(?r)[a-z_]\w*(?=\x20*=)'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'Id func name'
+        StyleName = 'Id func name'
+        TokenType = 13
+        Expression = '(?r)(?<=\bclass\x20+)\w+ |'#13#10'(?r)(?<=\bdef\x20+)\w+'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'Id after .'
+        StyleName = 'Id'
+        TokenType = 14
+        Expression = '(?r)(?<=\.)[a-z_]\w*'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = '^Id'
         StyleName = 'Id'
         TokenType = 2
-        Expression = '[a-z_]\w*'
+        Expression = '(?r)[a-z_]\w*'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
       item
-        DisplayName = 'Integer hex'
+        DisplayName = '^Symbol'
+        StyleName = 'Symbol'
+        TokenType = 8
+        Expression = '[\(\)\[\]\{\}]'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'Int hex'
         StyleName = 'Number'
         TokenType = 5
-        Expression = '0[xbo][0-9a-f]+'
+        Expression = '\b0x(_?[0-9a-f])+\b'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
       item
-        DisplayName = 'Integer'
+        DisplayName = 'Int octal'
         StyleName = 'Number'
         TokenType = 5
-        Expression = '\d+(\.\d*)?'
+        Expression = '\b0o(_?[0-7])+\b'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
+      item
+        DisplayName = 'Int bin'
+        StyleName = 'Number'
+        TokenType = 5
+        Expression = '\b0b(_?[01])+\b'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'Int/float'
+        StyleName = 'Number'
+        TokenType = 5
+        Expression = 
+          '\b \d[_\d]* \.(\d[_\d]*)? (e[\-\+]?\d[_\d]*)?j? \b |'#13#10'\B\.\d[_\d' +
+          ']* (e[\-\+]?\d[_\d]*)?j? \b |'#13#10'\b\d[_\d]*\.? ([Lj]\b)?'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
       item
         DisplayName = 'Comment'
         StyleName = 'Comment'
@@ -16263,47 +16341,62 @@ object TecSyntaxManager
         Expression = '\#.*'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
       item
-        DisplayName = 'Symbol :'
+        DisplayName = 'Ending :'
         StyleName = 'Symbol'
         TokenType = 12
-        Expression = ':'
+        Expression = ':\x20*$ | :(?=\x20*\#.*$)'
         ColumnFrom = 0
         ColumnTo = 0
-      end    
+      end
       item
         DisplayName = 'Symbol'
         StyleName = 'Symbol'
         TokenType = 3
-        Expression = '[/\*,\.;\(\)=<>\+\-\[\]\{\}\^@!%\\\|~&]'
+        Expression = '[/\*,\.;=<>\+\-\^!%\\\|~&]+'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'Symbol :'
+        StyleName = 'Symbol'
+        TokenType = 9
+        Expression = ':'
+        ColumnFrom = 0
+        ColumnTo = 0
+      end
+      item
+        DisplayName = 'Decorator'
+        StyleName = 'Decorator'
+        TokenType = 16
+        Expression = '(?r)@\w[\w\.]*'
         ColumnFrom = 0
         ColumnTo = 0
       end>
-    BlockRules = <    
+    BlockRules = <
       item
         DisplayName = 'Keywords def'
         StyleName = 'Id keyword def'
         BlockType = btTagDetect
-        ConditionList = <        
+        ConditionList = <
           item
             TagList.Strings = (
               'class'
               'def'
               'global'
               'lambda'
-              'nonlocal'
-            )
+              'nonlocal')
             TokenTypes = 1540
           end>
         HighlightPos = cpAny
         IgnoreAsParent = False
-      end    
+      end
       item
         DisplayName = 'Keywords'
         StyleName = 'Id keyword'
         BlockType = btTagDetect
-        ConditionList = <        
+        ConditionList = <
           item
             TagList.Strings = (
               'and'
@@ -16317,7 +16410,6 @@ object TecSyntaxManager
               'elif'
               'else'
               'except'
-              'exec'
               'finally'
               'for'
               'from'
@@ -16328,48 +16420,48 @@ object TecSyntaxManager
               'not'
               'or'
               'pass'
-              'print'
               'raise'
               'return'
               'try'
               'while'
               'with'
-              'yield'
-            )
+              'yield')
             TokenTypes = 516
           end>
         HighlightPos = cpAny
         IgnoreAsParent = False
-      end    
+      end
       item
         DisplayName = 'Functions'
         StyleName = 'Id function'
         BlockType = btTagDetect
-        ConditionList = <        
+        ConditionList = <
           item
             TagList.Strings = (
+              '__future__'
+              '__import__'
               'abs'
+              'all'
+              'any'
               'apply'
-              'bool'
+              'ascii'
+              'bin'
               'buffer'
               'callable'
               'chr'
-              'classmethod'
               'cmp'
               'coerce'
-              'complex'
+              'compile'
               'delattr'
-              'dict'
               'dir'
               'divmod'
               'enumerate'
               'eval'
+              'exec'
               'execfile'
-              'False'
               'file'
               'filter'
-              'float'
-              '__future__'
+              'format'
               'getattr'
               'globals'
               'hasattr'
@@ -16377,61 +16469,163 @@ object TecSyntaxManager
               'help'
               'hex'
               'id'
-              '__import__'
               'input'
-              'int'
               'intern'
               'isinstance'
               'issubclass'
               'iter'
               'len'
-              'list'
               'locals'
               'long'
-              'map'
               'max'
               'min'
-              'None'
-              'NotImplemented'
-              'object'
+              'next'
               'oct'
               'open'
               'ord'
               'pow'
-              'property'
+              'print'
               'range'
               'raw_input'
               'reduce'
               'reload'
               'repr'
+              'reversed'
               'round'
               'self'
               'setattr'
               'slice'
-              'staticmethod'
-              'str'
+              'sorted'
               'sum'
-              'super'
-              'True'
-              'tuple'
-              'type'
               'unichr'
               'unicode'
               'vars'
               'xrange'
-              'zip'
-            )
+              'zip')
             TokenTypes = 516
           end>
         HighlightPos = cpAny
         IgnoreAsParent = False
-      end    
+      end
+      item
+        DisplayName = 'Type-related'
+        StyleName = 'Id types'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'bool'
+              'bytearray'
+              'bytes'
+              'classmethod'
+              'complex'
+              'dict'
+              'Ellipsis'
+              'False'
+              'float'
+              'frozenset'
+              'int'
+              'list'
+              'map'
+              'memoryview'
+              'None'
+              'NotImplemented'
+              'object'
+              'property'
+              'set'
+              'staticmethod'
+              'str'
+              'super'
+              'True'
+              'tuple'
+              'type')
+            TokenTypes = 516
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
+      item
+        DisplayName = 'Exceptions'
+        StyleName = 'Id exception'
+        BlockType = btTagDetect
+        ConditionList = <
+          item
+            TagList.Strings = (
+              'ArithmeticError'
+              'AssertionError'
+              'AttributeError'
+              'BaseException'
+              'BlockingIOError'
+              'BrokenPipeError'
+              'BufferError'
+              'BytesWarning'
+              'ChildProcessError'
+              'ConnectionAbortedError'
+              'ConnectionError'
+              'ConnectionRefusedError'
+              'ConnectionResetError'
+              'DeprecationWarning'
+              'EOFError'
+              'Exception'
+              'FileExistsError'
+              'FileNotFoundError'
+              'FloatingPointError'
+              'FutureWarning'
+              'GeneratorExit'
+              'ImportError'
+              'ImportWarning'
+              'IndentationError'
+              'IndexError'
+              'InterruptedError'
+              'IsADirectoryError'
+              'KeyboardInterrupt'
+              'KeyError'
+              'LookupError'
+              'MemoryError'
+              'ModuleNotFoundError'
+              'NameError'
+              'NotADirectoryError'
+              'NotImplementedError'
+              'OSError'
+              'OverflowError'
+              'PendingDeprecationWarning'
+              'PermissionError'
+              'ProcessLookupError'
+              'RecursionError'
+              'ReferenceError'
+              'ResourceWarning'
+              'RuntimeError'
+              'RuntimeWarning'
+              'StopAsyncIteration'
+              'StopIteration'
+              'SyntaxError'
+              'SyntaxWarning'
+              'SystemError'
+              'SystemExit'
+              'TabError'
+              'TimeoutError'
+              'TypeError'
+              'UnboundLocalError'
+              'UnicodeDecodeError'
+              'UnicodeEncodeError'
+              'UnicodeError'
+              'UnicodeTranslateError'
+              'UnicodeWarning'
+              'UserWarning'
+              'ValueError'
+              'Warning'
+              'ZeroDivisionError')
+            TokenTypes = 516
+          end>
+        HighlightPos = cpAny
+        IgnoreAsParent = False
+      end
       item
         DisplayName = 'Block comment'
         BlockName = 'Block comment'
         NotParent = True
         AlwaysEnabled = True
-        ConditionList = <        
+        ConditionList = <
           item
             TokenTypes = 8192
           end>
@@ -16441,14 +16635,14 @@ object TecSyntaxManager
         HighlightPos = cpBound
         CollapseFmt = '{ ... }'
         IgnoreAsParent = False
-      end    
+      end
       item
         DisplayName = 'Block comment end'
         BlockName = 'Block comment'
         StrictParent = True
         AlwaysEnabled = True
         BlockType = btRangeEnd
-        ConditionList = <        
+        ConditionList = <
           item
             CondType = tcNotEqual
             TokenTypes = 8192
@@ -16456,45 +16650,40 @@ object TecSyntaxManager
         BlockOffset = 1
         HighlightPos = cpBound
         IgnoreAsParent = False
-      end    
+      end
       item
         DisplayName = 'block for tree'
-        ConditionList = <        
+        ConditionList = <
           item
-            TagList.Strings = (
-              ':'
-            )
             TokenTypes = 4096
-          end        
+          end
           item
             CondType = tcSkip
-            TokenTypes = 510
-          end        
+            TokenTypes = 59390
+          end
           item
             TokenTypes = 2048
           end>
         EndOfTextClose = True
-        NameFmt = '%sz0'
+        NameFmt = '%s0 %s-1'
         RefToCondEnd = True
         HighlightPos = cpAny
         CancelNextRules = True
+        DrawStaple = True
         GroupIndex = 20
         CollapseFmt = '%s0 %s-1...'
         IgnoreAsParent = False
-      end    
+      end
       item
         DisplayName = 'block for tree (ex)'
-        ConditionList = <        
+        ConditionList = <
           item
-            TagList.Strings = (
-              ':'
-            )
             TokenTypes = 4096
-          end        
+          end
           item
             CondType = tcSkip
-            TokenTypes = 1022
-          end        
+            TokenTypes = 59390
+          end
           item
             TokenTypes = 2048
           end>
@@ -16507,41 +16696,37 @@ object TecSyntaxManager
         GroupIndex = 20
         CollapseFmt = '%s0 %s-1...'
         IgnoreAsParent = False
-      end    
+      end
       item
-        DisplayName = 'block begin'
-        ConditionList = <        
+        DisplayName = 'block not for tree'
+        ConditionList = <
           item
-            TagList.Strings = (
-              ':'
-            )
             TokenTypes = 4096
-          end        
+          end
           item
             CondType = tcSkip
-            TokenTypes = 510
-          end        
+            TokenTypes = 59390
+          end
           item
             TokenTypes = 1024
           end>
         EndOfTextClose = True
         DisplayInTree = False
-        NameFmt = '"%s0"'
         RefToCondEnd = True
         HighlightPos = cpAny
+        CancelNextRules = True
         DrawStaple = True
         GroupIndex = 20
         CollapseFmt = '%sz0 ...'
         IgnoreAsParent = False
-      end    
+      end
       item
         DisplayName = 'import'
-        ConditionList = <        
+        ConditionList = <
           item
             TagList.Strings = (
               'from'
-              'import'
-            )
+              'import')
             TokenTypes = 512
           end>
         NameFmt = '%sz0'
@@ -16554,64 +16739,64 @@ object TecSyntaxManager
     CodeTemplates = <>
     SubAnalyzers = <>
     SampleText.Strings = (
-      '#Comment'
-      'test = u"""Doc'
-      'string""" +'
-      'r"""test'
-      '"""'
+      '#comment'
+      'test = u"""doc'
+      'string""" + r"""doc'
+      'string""" + "long \'
+      'string"; #end'
+      '11_22_3.44_5 + 0x_FF_aa_b_0 + 0b10_1_0'
+      '+ 3. + .3 + 3.0 + 1.2e-3'
+      ''
       'import sys, sys2, sys3'
       'from csv import aa, bb'
-      'str = r''\test\test'' + u''test'' + r"\test"'
+      'str = r'#39'\test\test'#39' + u'#39'test'#39' + r"\test"'
       'func = lambda x: x'
       ''
-      'def func(num):'
+      'def func(num):      #cmt  '
       '    for n in range(len(sys.argv)):'
-      '      print "Arg %s" % sys.argv[n]'
+      '      print("Arg %s" % s)'
       '      if n>2:'
       '        return True'
       '    return False'
       '    '
       'async def get_json(client, url):  '
       '    async with client.get(url) as response:'
-      '        assert response.status == 100'
+      '        assert test = {'#39'aa'#39': 2, '#39'bb'#39': None}'
       '        return await response.read()'
       ''
       'class MyName(object):      '
-      '  @staticmethod'
+      '  @Decor.name('#39'test'#39')'
       '  def func1(num):'
       '    pass'
       '   '
-      'MyName().func1(num)'
-    )
+      'MyName().func1(num)')
     TokenTypeNames.Strings = (
       'Unknown'
       'Comment'
-      'Identifier'
+      '^Id'
       'Symbol'
-      'String'
-      'Integer const'
-      'Float const'
-      'Hex const'
-      'Char const'
-      '1st word'
-      '1st keyword'
-      '1st word tree'
-      'Symbol :'
-      '1st comment'
-    )
-    Extentions = 'py pyw rpy cpy sconstruct'
+      '^String'
+      'Number'
+      'Number2'
+      '^Comment'
+      '^Symbol'
+      'Usual :'
+      '^Id keyword'
+      '^Id tree'
+      'Ending :'
+      'Id func name'
+      'Id after .'
+      '^Id='
+      '^@Id')
+    Extentions = 'py pyw rpy cpy sconstruct pyi'
     LexerName = 'Python'
-    SkipSpaces = False
-    FullRefreshSize = 80000
     Notes.Strings = (
-      'New Python lexer, by Alex (SynWrite)'
-      'For indent-based folding lexer must be tweaked:'
-      'see SynWrite lexer documentation about these tweaks.'
-    )
+      'Python lexer by Alexey (CudaText)')
+    RestartFromLineStart = True
     LineComment = '#'
     Charset = DEFAULT_CHARSET
-    left = 144
-    top = 184
+    Left = 144
+    Top = 184
   end
   object SyntAnal4: TLibSyntAnalyzer
     Formats = <    
