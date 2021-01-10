@@ -628,9 +628,15 @@ begin
     N2:= N1;
 
     //command is supposed to delete word-chars, so avoid using SFindWordOffset()
-    if N1<0 then Continue;
-    if N1>=NLen then Continue;
-    if not IsCharWord(Str[N1+1]) then Continue;
+    if N1<0 then
+      Continue;
+    if N1>=NLen then
+    begin
+      Caret.PosX:= NLen;
+      Continue;
+    end;
+    if not IsCharWord(Str[N1+1]) then
+      Continue;
 
     while (N1>0) and IsCharWord(Str[N1]) do
       Dec(N1);
