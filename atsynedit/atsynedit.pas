@@ -6019,6 +6019,7 @@ var
   i: integer;
   Item: TATCaretItem;
   CaretProps: TATCaretProps;
+  NCaretColor: TColor;
 begin
   if ModeReadOnly then
     CaretProps:= FCaretPropsReadonly
@@ -6027,6 +6028,12 @@ begin
     CaretProps:= FCaretPropsOverwrite
   else
     CaretProps:= FCaretPropsNormal;
+
+  //if we cannot avoid painting the caret, let's make its color invisible (BG)
+  if _IsFocused then
+    NCaretColor:= Colors.Caret
+  else
+    NCaretColor:= Colors.TextBG;
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -6047,16 +6054,16 @@ begin
     if FCaretBlinkEnabled then
     begin
       FCaretShown:= not FCaretShown;
-      CanvasInvertRect(C, R, Colors.Caret);
+      CanvasInvertRect(C, R, NCaretColor);
       //if shape FrameFull, invert inner area
       if CaretProps.EmptyInside then
-        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), Colors.Caret);
+        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor);
     end
     else
     begin
       FCaretShown:= true;
       //paint non-blinking caret simpler
-      C.Brush.Color:= Colors.Caret;
+      C.Brush.Color:= NCaretColor;
       C.FillRect(R);
     end;
 
