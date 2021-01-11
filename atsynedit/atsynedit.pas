@@ -6033,7 +6033,7 @@ begin
   if _IsFocused then
     NCaretColor:= Colors.Caret
   else
-    NCaretColor:= Colors.TextBG;
+    NCaretColor:= Colors.TextBG xor Colors.TextFont;
 
   for i:= 0 to FCarets.Count-1 do
   begin
