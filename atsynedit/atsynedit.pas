@@ -6029,10 +6029,14 @@ begin
   else
     CaretProps:= FCaretPropsNormal;
 
-  //if we cannot avoid painting the caret, let's make its color invisible (BG)
   if _IsFocused then
     NCaretColor:= Colors.Caret
   else
+    //I cannot find proper color of NCaretColor, to make unfocused carets invisible,
+    //tried several combinations of Colors.TextBG / Colors.TextFont,
+    //tried 'xor', 'xor $ffffff' with some values, but it didn't help.
+    //at least value 'Colors.TextBG xor Colors.TextFont' gives PALE caret color
+    //on many CudaText themes (default and dark themes).
     NCaretColor:= Colors.TextBG xor Colors.TextFont;
 
   for i:= 0 to FCarets.Count-1 do
