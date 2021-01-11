@@ -6033,8 +6033,7 @@ begin
     NCaretColor:= Colors.Caret
   else
     //I cannot find proper color of NCaretColor, to make unfocused carets invisible,
-    //tried several combinations of Colors.TextBG / Colors.TextFont,
-    //tried 'xor', 'xor $ffffff' with some values, but it didn't help.
+    //tried several combinations: Colors.TextBG with Colors.TextFont with 'xor'.
     //at least value 'Colors.TextBG xor Colors.TextFont' gives PALE caret color
     //on many CudaText themes (default and dark themes).
     NCaretColor:= Colors.TextBG xor Colors.TextFont;
