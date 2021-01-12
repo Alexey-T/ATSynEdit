@@ -6029,7 +6029,7 @@ begin
   else
     CaretProps:= FCaretPropsNormal;
 
-  if _IsFocused then
+  if (not FCaretStopUnfocused) or _IsFocused then
     NCaretColor:= Colors.Caret
   else
     //I cannot find proper color of NCaretColor, to make unfocused carets invisible,
