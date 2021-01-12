@@ -1,4 +1,7 @@
 
+2021.01.12
++ add: OptCaretHideUnfocused (note: True by default)
+
 2021.01.09
 + add: command "delete word"
 

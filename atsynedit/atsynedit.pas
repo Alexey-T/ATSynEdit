@@ -496,15 +496,17 @@ type
     FSelRectBegin: TPoint;
     FSelRectEnd: TPoint;
     FCarets: TATCarets;
+    FCaretShowEnabled: boolean;
+    FCaretShown: boolean;
     FCaretBlinkEnabled: boolean;
     FCaretBlinkTime: integer;
-    FCaretShown: boolean;
     FCaretPropsNormal: TATCaretProps;
     FCaretPropsOverwrite: TATCaretProps;
     FCaretPropsReadonly: TATCaretProps;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
+    FCaretHideUnfocused: boolean;
     FCaretAllowNextBlink: boolean;
     FIsEntered: boolean;
     FMarkers: TATMarkers;
@@ -1624,6 +1626,7 @@ type
     property OptCaretBlinkTime: integer read FCaretBlinkTime write SetCaretBlinkTime default cInitCaretBlinkTime;
     property OptCaretBlinkEnabled: boolean read FCaretBlinkEnabled write SetCaretBlinkEnabled default true;
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused default true;
+    property OptCaretHideUnfocused: boolean read FCaretHideUnfocused write FCaretHideUnfocused default true;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide default true;
     property OptCaretPosAfterPasteColumn: TATPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn default cPasteCaretColumnRight;
     property OptCaretsPrimitiveColumnSelection: boolean read FOptCaretsPrimitiveColumnSelection write FOptCaretsPrimitiveColumnSelection default cInitCaretsPrimitiveColumnSelection;
@@ -3810,11 +3813,13 @@ begin
   FCarets.Add(0, 0);
   FCarets.OnCaretChanged:= @DoCaretsOnChanged;
 
-  FCaretBlinkEnabled:= true;
+  FCaretShowEnabled:= false; //code sets it On in DoEnter
   FCaretShown:= false;
+  FCaretBlinkEnabled:= true;
   FCaretVirtual:= true;
   FCaretSpecPos:= false;
   FCaretStopUnfocused:= true;
+  FCaretHideUnfocused:= true;
 
   FTabHelper:= TATStringTabHelper.Create;
   FMarkers:= nil;
@@ -5912,6 +5917,8 @@ end;
 
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
+  if not FCaretShowEnabled then exit;
+
   if FCaretStopUnfocused and not _IsFocused then
     if FCaretShown then
       exit;
@@ -6021,6 +6028,8 @@ var
   CaretProps: TATCaretProps;
   NCaretColor: TColor;
 begin
+  if not FCaretShowEnabled then exit;
+
   if ModeReadOnly then
     CaretProps:= FCaretPropsReadonly
   else
@@ -6029,6 +6038,8 @@ begin
   else
     CaretProps:= FCaretPropsNormal;
 
+  NCaretColor:= Colors.Caret;
+  { //block was needed when we didn't have OptCaretHideUnfocused
   if (not FCaretStopUnfocused) or _IsFocused then
     NCaretColor:= Colors.Caret
   else
@@ -6037,6 +6048,7 @@ begin
     //at least value 'Colors.TextBG xor Colors.TextFont' gives PALE caret color
     //on many CudaText themes (default and dark themes).
     NCaretColor:= Colors.TextBG xor Colors.TextFont;
+    }
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -6673,6 +6685,8 @@ procedure TATSynEdit.DoEnter;
 begin
   inherited;
   FIsEntered:= true;
+  if FCaretHideUnfocused then
+    FCaretShowEnabled:= true;
   if IsRepaintNeededOnEnterOrExit then
     Invalidate;
   TimersStart;
@@ -6682,6 +6696,8 @@ procedure TATSynEdit.DoExit;
 begin
   inherited;
   FIsEntered:= false;
+  if FCaretHideUnfocused then
+    FCaretShowEnabled:= false;
   if IsRepaintNeededOnEnterOrExit then
     Invalidate;
   TimersStop;
