@@ -542,6 +542,9 @@ type
     FMouseDownGutterLineNumber: integer;
     FMouseDownOnMinimap: boolean;
     FMouseDownDouble: boolean;
+    FMouseDownWithCtrl: boolean;
+    FMouseDownWithAlt: boolean;
+    FMouseDownWithShift: boolean;
     FMouseNiceScrollPos: TPoint;
     FMouseDragDropping: boolean;
     FMouseDragDroppingReal: boolean;
@@ -5007,6 +5010,9 @@ begin
   FMouseDownCoordOriginal.Y:= Y;
   FMouseDownCoord.X:= X + FScrollHorz.TotalOffset;
   FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset;
+  FMouseDownWithCtrl:= ssXControl in Shift;
+  FMouseDownWithAlt:= ssAlt in Shift;
+  FMouseDownWithShift:= ssShift in Shift;
 
   if FMinimapVisible and PtInRect(FRectMinimap, Point(X, Y)) then
   begin
@@ -5292,6 +5298,9 @@ begin
   FMouseDownDouble:= false;
   FMouseDownAndColumnSelection:= false;
   FMouseDownOnMinimap:= false;
+  FMouseDownWithCtrl:= false;
+  FMouseDownWithAlt:= false;
+  FMouseDownWithShift:= false;
   FMouseDragDropping:= false;
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
@@ -5629,7 +5638,7 @@ begin
           begin
             //drag w/out button pressed: single selection
             //ssShift is allowed to select by Shift+MouseWheel
-            if [ssXControl, ssAlt]*Shift=[] then
+            if not FMouseDownWithCtrl and not FMouseDownWithAlt then
             begin
               if FOptMouseEnableColumnSelection and FOptMouseColumnSelectionWithoutKey then
               begin
@@ -5652,7 +5661,10 @@ begin
             end;
 
             //drag with Ctrl pressed: add selection
-            if Shift=[ssXControl, ssLeft] then
+            if (ssLeft in Shift) and
+              FMouseDownWithCtrl and
+              not FMouseDownWithAlt and
+              not FMouseDownWithShift then
             begin
               nIndex:= Carets.IndexOfPosXY(FMouseDownPnt.X, FMouseDownPnt.Y, true);
               DoSelect_CharRange(nIndex, P);
@@ -5660,7 +5672,10 @@ begin
 
             //drag with Alt pressed: column selection
             if FOptMouseEnableColumnSelection then
-              if Shift=[ssAlt, ssLeft] then
+              if (ssLeft in Shift) and
+                not FMouseDownWithCtrl and
+                FMouseDownWithAlt and
+                not FMouseDownWithShift then
               begin
                 FMouseDownAndColumnSelection:= true;
                 DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
