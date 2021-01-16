@@ -694,6 +694,7 @@ type
     FOptAutocompleteCloseChars: string;
     FOptAutocompleteAddOpeningBracket: boolean;
     FOptAutocompleteUpDownAtEdge: integer;
+    FOptAutocompleteCommitIfSingleItem: boolean;
 
     //options
     FOptScaleFont: integer;
@@ -1555,6 +1556,7 @@ type
     property OptAutocompleteCloseChars: string read FOptAutocompleteCloseChars write FOptAutocompleteCloseChars stored false;
     property OptAutocompleteAddOpeningBracket: boolean read FOptAutocompleteAddOpeningBracket write FOptAutocompleteAddOpeningBracket default true;
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
+    property OptAutocompleteCommitIfSingleItem: boolean read FOptAutocompleteCommitIfSingleItem write FOptAutocompleteCommitIfSingleItem default false;
 
     property OptScaleFont: integer read FOptScaleFont write FOptScaleFont default 0;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
