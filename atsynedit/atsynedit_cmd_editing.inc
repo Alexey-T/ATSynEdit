@@ -36,7 +36,7 @@ function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  bNeedGroup: boolean;
+  bAllowUndo, bNeedGroup: boolean;
   TextItems: TStringList;
   TextItem: atString;
   i: integer;
@@ -46,7 +46,10 @@ begin
   TextItems:= nil;
 
   try
-    bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
+    bAllowUndo:= Carets.Count<=FOptMaxCaretsToAllowEditingUndo;
+    bNeedGroup:= bAllowUndo and (Carets.Count>1) or (Carets.IsSelection);
+    if not bAllowUndo then
+      Strings.DoClearUndo(true);
     if bNeedGroup then
       Strings.BeginUndoGroup;
 
@@ -87,6 +90,8 @@ begin
   finally
     if Assigned(TextItems) then
       FreeAndNil(TextItems);
+    if not bAllowUndo then
+      Strings.DoClearUndo(false);
     if bNeedGroup then
       Strings.EndUndoGroup;
   end;
@@ -206,9 +211,14 @@ end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
 var
-  bColBlock: boolean;
+  bAllowUndo, bColBlock: boolean;
 begin
+  bAllowUndo:= Carets.Count<=FOptMaxCaretsToAllowEditingUndo;
   bColBlock:= not IsSelRectEmpty;
+
+  if not bAllowUndo then
+    Strings.DoClearUndo(true);
+
   if bColBlock then
     if FSelRect.Left=FSelRect.Right then
     begin
@@ -220,6 +230,9 @@ begin
     Result:= DoCommand_TextDeleteSelection
   else
     Result:= DoCommand_TextDeleteRight(1);
+
+  if not bAllowUndo then
+    Strings.DoClearUndo(false);
 end;
 
 (*
