@@ -1,4 +1,7 @@
 
+2021.01.19
++ add: OptMaxCaretsToAllowEditingUndo (default=500)
+
 2021.01.12
 + add: OptCaretHideUnfocused (note: True by default)
 
