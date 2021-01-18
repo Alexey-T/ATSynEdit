@@ -212,6 +212,7 @@ type
       //because OnChangeBlock is called for all lines at once
     FLastCommandChangedLines: integer;
     FEnabledBookmarksUpdate: boolean;
+    FEnabledChangeEvents: boolean;
     FLoadingForcedANSI: boolean;
 
     function Compare_Asc(Key1, Key2: Pointer): Integer;
@@ -332,6 +333,7 @@ type
     property ProgressKind: TATStringsProgressKind read FProgressKind write FProgressKind;
     property ChangeBlockActive: boolean read FChangeBlockActive write FChangeBlockActive;
     property EnabledBookmarksUpdate: boolean read FEnabledBookmarksUpdate write FEnabledBookmarksUpdate;
+    property EnabledChangeEvents: boolean read FEnabledChangeEvents write FEnabledChangeEvents;
     property Gaps: TATGaps read FGaps;
     property Bookmarks: TATBookmarks read FBookmarks;
     property Bookmarks2: TATBookmarks read FBookmarks2;
@@ -1174,6 +1176,7 @@ begin
   FBookmarks:= TATBookmarks.Create;
   FBookmarks2:= TATBookmarks.Create;
   FEnabledBookmarksUpdate:= true;
+  FEnabledChangeEvents:= true;
 
   FEncoding:= cEncUTF8;
   FEncodingDetect:= true;
@@ -2260,12 +2263,15 @@ end;
 
 procedure TATStrings.DoEventLog(ALine: integer); inline;
 begin
+  if not FEnabledChangeEvents then exit;
   if Assigned(FOnLog) then
     FOnLog(Self, ALine);
 end;
 
 procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
 begin
+  if not FEnabledChangeEvents then exit;
+
   FGaps.Update(AChange, ALineIndex, AItemCount);
 
   if FEnabledBookmarksUpdate then
