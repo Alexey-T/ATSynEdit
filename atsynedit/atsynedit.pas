@@ -561,6 +561,7 @@ type
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
+    FLastLineOfSlowEvents: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
@@ -1049,6 +1050,7 @@ type
     function GetTextForClipboard: string;
     function GetStrings: TATStrings;
     function GetMouseNiceScroll: boolean;
+    procedure SetEnabledSlowEvents(AValue: boolean);
     procedure SetCaretBlinkEnabled(AValue: boolean);
     procedure SetFoldEnabled(AValue: boolean);
     procedure SetFontBold(AValue: TFont);
@@ -6883,6 +6885,23 @@ end;
 function TATSynEdit.GetMouseNiceScroll: boolean;
 begin
   Result:= FTimerNiceScroll.Enabled;
+end;
+
+procedure TATSynEdit.SetEnabledSlowEvents(AValue: boolean);
+begin
+  if not AValue then
+  begin
+    Strings.DoClearUndo(true);
+    Strings.EnabledChangeEvents:= false;
+    FLastLineOfSlowEvents:= Carets[0].FirstTouchedLine;
+  end
+  else
+  begin
+    Strings.DoClearUndo(false);
+    Strings.EnabledChangeEvents:= true;
+    Strings.DoEventLog(FLastLineOfSlowEvents);
+    Strings.DoEventChange(cLineChangeEdited, FLastLineOfSlowEvents, 1);
+  end;
 end;
 
 procedure TATSynEdit.SetMouseNiceScroll(AValue: boolean);

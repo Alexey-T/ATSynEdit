@@ -37,7 +37,6 @@ var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   bAllowUndo, bNeedGroup: boolean;
-  NFirstLine: integer;
   TextItems: TStringList;
   TextItem: atString;
   i: integer;
@@ -51,11 +50,7 @@ begin
     bNeedGroup:= bAllowUndo and (Carets.Count>1) or (Carets.IsSelection);
 
     if not bAllowUndo then
-    begin
-      Strings.DoClearUndo(true);
-      Strings.EnabledChangeEvents:= false;
-      NFirstLine:= Carets[0].FirstTouchedLine;
-    end;
+      SetEnabledSlowEvents(false);
 
     if bNeedGroup then
       Strings.BeginUndoGroup;
@@ -98,12 +93,7 @@ begin
     if Assigned(TextItems) then
       FreeAndNil(TextItems);
     if not bAllowUndo then
-    begin
-      Strings.DoClearUndo(false);
-      Strings.EnabledChangeEvents:= true;
-      Strings.DoEventLog(NFirstLine);
-      Strings.DoEventChange(cLineChangeEdited, NFirstLine, 1);
-    end;
+      SetEnabledSlowEvents(true);
     if bNeedGroup then
       Strings.EndUndoGroup;
   end;
@@ -224,17 +214,12 @@ end;
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
 var
   bAllowUndo, bColBlock: boolean;
-  NFirstLine: integer;
 begin
   bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
   bColBlock:= not IsSelRectEmpty;
 
   if not bAllowUndo then
-  begin
-    Strings.DoClearUndo(true);
-    Strings.EnabledChangeEvents:= false;
-    NFirstLine:= Carets[0].FirstTouchedLine;
-  end;
+    SetEnabledSlowEvents(false);
 
   if bColBlock then
     if FSelRect.Left=FSelRect.Right then
@@ -249,12 +234,7 @@ begin
     Result:= DoCommand_TextDeleteRight(1);
 
   if not bAllowUndo then
-  begin
-    Strings.DoClearUndo(false);
-    Strings.EnabledChangeEvents:= true;
-    Strings.DoEventLog(NFirstLine);
-    Strings.DoEventChange(cLineChangeEdited, NFirstLine, 1);
-  end;
+    SetEnabledSlowEvents(true);
 end;
 
 (*
@@ -382,7 +362,6 @@ var
   Shift, PosAfter: TPoint;
   Str: atString;
   bAllowUndo, bNeedGroup, bBetterBrackets: boolean;
-  NFirstLine: integer;
   NShiftX, NShiftY, i: integer;
 begin
   Result:= [];
@@ -393,11 +372,7 @@ begin
   bNeedGroup:= bAllowUndo and (Carets.Count>1);
 
   if not bAllowUndo then
-  begin
-    Strings.DoClearUndo(true);
-    Strings.EnabledChangeEvents:= false;
-    NFirstLine:= Carets[0].FirstTouchedLine;
-  end;
+    SetEnabledSlowEvents(false);
 
   if bNeedGroup then
     Strings.BeginUndoGroup;
@@ -445,12 +420,7 @@ begin
     Strings.EndUndoGroup;
 
   if not bAllowUndo then
-  begin
-    Strings.DoClearUndo(false);
-    Strings.EnabledChangeEvents:= true;
-    Strings.DoEventLog(NFirstLine);
-    Strings.DoEventChange(cLineChangeEdited, NFirstLine, 1);
-  end;
+    SetEnabledSlowEvents(true);
 
   Result:= [cResultText, cResultCaretBottom];
 end;
