@@ -47,7 +47,7 @@ begin
   TextItems:= nil;
 
   try
-    bAllowUndo:= Carets.Count<=FOptMaxCaretsToAllowEditingUndo;
+    bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
     bNeedGroup:= bAllowUndo and (Carets.Count>1) or (Carets.IsSelection);
 
     if not bAllowUndo then
@@ -226,7 +226,7 @@ var
   bAllowUndo, bColBlock: boolean;
   NFirstLine: integer;
 begin
-  bAllowUndo:= Carets.Count<=FOptMaxCaretsToAllowEditingUndo;
+  bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
   bColBlock:= not IsSelRectEmpty;
 
   if not bAllowUndo then
@@ -389,7 +389,7 @@ begin
   if ModeReadOnly then Exit;
   if ModeOneLine then Exit;
 
-  bAllowUndo:= Carets.Count<=FOptMaxCaretsToAllowEditingUndo;
+  bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
   bNeedGroup:= bAllowUndo and (Carets.Count>1);
 
   if not bAllowUndo then

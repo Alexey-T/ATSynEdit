@@ -263,7 +263,7 @@ var
   bAllowUndo, bColBlock: boolean;
   NFirstLine: integer;
 begin
-  bAllowUndo:= Carets.Count<=FOptMaxCaretsToAllowEditingUndo;
+  bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
   bColBlock:= not IsSelRectEmpty;
 
   if not bAllowUndo then

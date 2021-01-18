@@ -309,7 +309,7 @@ const
   cInitFoldTooltipVisible = true;
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
-  cInitMaxCaretsToAllowEditingUndo = 500;
+  cInitMaxCaretsToEnableSlowEvents = 200;
   cInitMaxLineLenToTokenize = 4000;
   cInitMinLineLenToCalcURL = 4;
   cInitMaxLineLenToCalcURL = 300;
@@ -705,7 +705,7 @@ type
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
-    FOptMaxCaretsToAllowEditingUndo: integer;
+    FOptMaxCaretsToEnableSlowEvents: integer;
     FOptMaxLineLenToTokenize: integer;
     FOptMinLineLenToCalcURL: integer;
     FOptMaxLineLenToCalcURL: integer;
@@ -1608,7 +1608,7 @@ type
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
-    property OptMaxCaretsToAllowEditingUndo: integer read FOptMaxCaretsToAllowEditingUndo write FOptMaxCaretsToAllowEditingUndo default cInitMaxCaretsToAllowEditingUndo;
+    property OptMaxCaretsToEnableSlowEvents: integer read FOptMaxCaretsToEnableSlowEvents write FOptMaxCaretsToEnableSlowEvents default cInitMaxCaretsToEnableSlowEvents;
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMinLineLenToCalcURL: integer read FOptMinLineLenToCalcURL write FOptMinLineLenToCalcURL default cInitMinLineLenToCalcURL;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
@@ -4034,7 +4034,7 @@ begin
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
 
-  FOptMaxCaretsToAllowEditingUndo:= cInitMaxCaretsToAllowEditingUndo;
+  FOptMaxCaretsToEnableSlowEvents:= cInitMaxCaretsToEnableSlowEvents;
   FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMinLineLenToCalcURL:= cInitMinLineLenToCalcURL;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
