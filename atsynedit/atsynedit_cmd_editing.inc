@@ -381,15 +381,26 @@ var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   Str: atString;
-  bNeedGroup, bBetterBrackets: boolean;
+  bAllowUndo, bNeedGroup, bBetterBrackets: boolean;
+  NFirstLine: integer;
   NShiftX, NShiftY, i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   if ModeOneLine then Exit;
 
-  bNeedGroup:= Carets.Count>1;
-  if bNeedGroup then Strings.BeginUndoGroup;
+  bAllowUndo:= Carets.Count<=FOptMaxCaretsToAllowEditingUndo;
+  bNeedGroup:= bAllowUndo and (Carets.Count>1);
+
+  if not bAllowUndo then
+  begin
+    Strings.DoClearUndo(true);
+    Strings.EnabledChangeEvents:= false;
+    NFirstLine:= Carets[0].FirstTouchedLine;
+  end;
+
+  if bNeedGroup then
+    Strings.BeginUndoGroup;
 
   DoSelectionDeleteOrReset;
 
@@ -430,7 +441,16 @@ begin
     Caret.SavedX:= 0;
   end;
 
-  if bNeedGroup then Strings.EndUndoGroup;
+  if bNeedGroup then
+    Strings.EndUndoGroup;
+
+  if not bAllowUndo then
+  begin
+    Strings.DoClearUndo(false);
+    Strings.EnabledChangeEvents:= true;
+    Strings.DoEventLog(NFirstLine);
+    Strings.DoEventChange(cLineChangeEdited, NFirstLine, 1);
+  end;
 
   Result:= [cResultText, cResultCaretBottom];
 end;
