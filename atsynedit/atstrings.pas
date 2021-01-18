@@ -223,9 +223,6 @@ type
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
     function DebugText: string;
     function DoCheckFilled: boolean;
-    procedure DoEventLog(ALine: integer);
-    procedure DoEventChange(AChange: TATLineChangeKind; ALineIndex,
-      AItemCount: integer);
     procedure DoFinalizeSaving;
     procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
@@ -407,6 +404,8 @@ type
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     procedure DoClearUndo(ALocked: boolean = false);
     procedure DoClearLineStatesUpdated;
+    procedure DoEventLog(ALine: integer);
+    procedure DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     //misc
     procedure DoSaveLastEditPos(AX: integer=-1; AY: integer=-1);
     procedure DoGotoLastEditPos;

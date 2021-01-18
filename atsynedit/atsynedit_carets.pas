@@ -49,6 +49,7 @@ type
     procedure SwapSelection;
     function IsForwardSelection: boolean;
     function IsMultilineSelection: boolean;
+    function FirstTouchedLine: integer;
   end;
 
 type
@@ -456,6 +457,14 @@ end;
 function TATCaretItem.IsMultilineSelection: boolean;
 begin
   Result:= (EndY>=0) and (EndY<>PosY);
+end;
+
+function TATCaretItem.FirstTouchedLine: integer;
+begin
+  if (EndY>=0) and (EndY<PosY) then
+    Result:= EndY
+  else
+    Result:= PosY;
 end;
 
 procedure TATCaretItem.SelectNone;
