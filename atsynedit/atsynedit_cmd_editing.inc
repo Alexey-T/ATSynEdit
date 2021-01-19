@@ -649,14 +649,18 @@ var
   Caret: TATCaretItem;
   Str: atString;
   Shift, PosAfter: TPoint;
-  bNeedGroup: boolean;
+  bAllowUndo, bNeedGroup: boolean;
   NLen, N1, N2, i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  bNeedGroup:= Carets.Count>1;
-  if bNeedGroup then Strings.BeginUndoGroup;
+  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
+  bNeedGroup:= bAllowUndo and (Carets.Count>1);
+  if not bAllowUndo then
+    SetEnabledSlowEvents(false);
+  if bNeedGroup then
+    Strings.BeginUndoGroup;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
@@ -697,7 +701,10 @@ begin
     DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
   end;
 
-  if bNeedGroup then Strings.EndUndoGroup;
+  if bNeedGroup then
+    Strings.EndUndoGroup;
+  if not bAllowUndo then
+    SetEnabledSlowEvents(true);
 
   Result:= [cResultText, cResultCaretBottom];
 end;
