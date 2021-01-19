@@ -309,7 +309,7 @@ const
   cInitFoldTooltipVisible = true;
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
-  cInitMaxCaretsToEnableSlowEvents = 200;
+  cInitUndoMaxCarets = 200;
   cInitMaxLineLenToTokenize = 4000;
   cInitMinLineLenToCalcURL = 4;
   cInitMaxLineLenToCalcURL = 300;
@@ -706,7 +706,6 @@ type
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
-    FOptMaxCaretsToEnableSlowEvents: integer;
     FOptMaxLineLenToTokenize: integer;
     FOptMinLineLenToCalcURL: integer;
     FOptMaxLineLenToCalcURL: integer;
@@ -753,6 +752,7 @@ type
     FOptSavingTrimSpaces: boolean;
     FOptSavingTrimFinalEmptyLines: boolean;
     FOptUndoGrouped: boolean;
+    FOptUndoMaxCarets: integer;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
     FOptIndentMakesWholeLinesSelection: boolean;
@@ -1610,7 +1610,6 @@ type
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
-    property OptMaxCaretsToEnableSlowEvents: integer read FOptMaxCaretsToEnableSlowEvents write FOptMaxCaretsToEnableSlowEvents default cInitMaxCaretsToEnableSlowEvents;
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMinLineLenToCalcURL: integer read FOptMinLineLenToCalcURL write FOptMinLineLenToCalcURL default cInitMinLineLenToCalcURL;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
@@ -1748,6 +1747,7 @@ type
     property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit default 5000;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped default true;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave default true;
+    property OptUndoMaxCarets: integer read FOptUndoMaxCarets write FOptUndoMaxCarets default cInitUndoMaxCarets;
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
@@ -4036,7 +4036,7 @@ begin
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
 
-  FOptMaxCaretsToEnableSlowEvents:= cInitMaxCaretsToEnableSlowEvents;
+  FOptUndoMaxCarets:= cInitUndoMaxCarets;
   FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMinLineLenToCalcURL:= cInitMinLineLenToCalcURL;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;

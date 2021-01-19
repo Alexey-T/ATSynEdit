@@ -262,7 +262,7 @@ function TATSynEdit.DoCommand_TextBackspace: TATCommandResults;
 var
   bAllowUndo, bColBlock: boolean;
 begin
-  bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
+  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
   bColBlock:= not IsSelRectEmpty;
 
   if not bAllowUndo then

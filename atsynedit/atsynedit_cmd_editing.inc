@@ -46,7 +46,7 @@ begin
   TextItems:= nil;
 
   try
-    bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
+    bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
     bNeedGroup:= bAllowUndo and (Carets.Count>1) or (Carets.IsSelection);
 
     if not bAllowUndo then
@@ -215,7 +215,7 @@ function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
 var
   bAllowUndo, bColBlock: boolean;
 begin
-  bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
+  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
   bColBlock:= not IsSelRectEmpty;
 
   if not bAllowUndo then
@@ -368,7 +368,7 @@ begin
   if ModeReadOnly then Exit;
   if ModeOneLine then Exit;
 
-  bAllowUndo:= Carets.Count<=FOptMaxCaretsToEnableSlowEvents;
+  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
   bNeedGroup:= bAllowUndo and (Carets.Count>1);
 
   if not bAllowUndo then

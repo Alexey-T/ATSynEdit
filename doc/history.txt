@@ -1,6 +1,6 @@
 
 2021.01.19
-+ add: OptMaxCaretsToEnableSlowEvents (=200)
++ add: OptUndoMaxCarets (default 200)
 
 2021.01.12
 + add: OptCaretHideUnfocused (note: True by default)
