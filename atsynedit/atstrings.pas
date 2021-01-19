@@ -181,6 +181,7 @@ type
     FGutterDecor2: TATGutterDecor;
     FUndoList,
     FRedoList: TATUndoList;
+    FUndoLimit: integer;
     FEndings: TATLineEnds;
     FEncoding: TATFileEncoding;
     FEncodingDetect: boolean;
@@ -275,7 +276,7 @@ type
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   public
-    constructor Create; virtual;
+    constructor Create(AUndoLimit: integer); virtual;
     destructor Destroy; override;
     procedure Clear;
     procedure ClearSeparators;
@@ -1164,13 +1165,14 @@ begin
 end;
 
 
-constructor TATStrings.Create;
+constructor TATStrings.Create(AUndoLimit: integer);
 begin
   FList:= TATStringItemList.Create;
   FListUpdates:= TATIntegerList.Create;
   FListUpdatesHard:= false;
-  FUndoList:= TATUndoList.Create;
-  FRedoList:= TATUndoList.Create;
+  FUndoLimit:= AUndoLimit;
+  FUndoList:= TATUndoList.Create(FUndoLimit);
+  FRedoList:= TATUndoList.Create(FUndoLimit);
   FGaps:= TATGaps.Create;
   FBookmarks:= TATBookmarks.Create;
   FBookmarks2:= TATBookmarks.Create;

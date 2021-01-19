@@ -84,7 +84,7 @@ type
     function GetItem(N: integer): TATUndoItem;
     procedure SetAsString(const AValue: string);
   public
-    constructor Create; virtual;
+    constructor Create(AMaxCount: integer); virtual;
     destructor Destroy; override;
     function IsIndexValid(N: integer): boolean; inline;
     function IsItemsEqual(N1, N2: integer): boolean;
@@ -280,10 +280,10 @@ begin
     Result:= nil;
 end;
 
-constructor TATUndoList.Create;
+constructor TATUndoList.Create(AMaxCount: integer);
 begin
   FList:= TFPList.Create;
-  FMaxCount:= 5000;
+  FMaxCount:= AMaxCount;
   FSoftMark:= false;
   FHardMark:= false;
   FLocked:= false;

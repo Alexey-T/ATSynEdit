@@ -872,7 +872,7 @@ begin
   DoSelect_None;
   Caret:= FCarets[0];
 
-  Block:= TATStrings.Create;
+  Block:= TATStrings.Create(FOptUndoLimit);
   try
     Block.LoadFromString(AText);
     Block.ActionDeleteFakeLine;

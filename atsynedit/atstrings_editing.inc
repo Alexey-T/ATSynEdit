@@ -144,7 +144,7 @@ begin
   //----------------------
   //Insert multi-line text
 
-  Block:= TATStrings.Create;
+  Block:= TATStrings.Create(FUndoLimit);
   try
     FChangeBlockActive:= true;
     BeginUndoGroup;

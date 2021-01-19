@@ -275,6 +275,7 @@ type
 
 const
   cMaxIndentVert = 100;
+  cInitUndoLimit = 5000;
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
   cInitScrollbarHorzAddSpace = 2;
@@ -715,6 +716,7 @@ type
     FOptScrollSmooth: boolean;
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
+    FOptUndoLimit: integer;
     FOptUndoIndentVert: integer;
     FOptUndoIndentHorz: integer;
     FOptScrollbarsNew: boolean;
@@ -936,7 +938,6 @@ type
     function GetText: atString;
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
-    function GetUndoLimit: integer;
     procedure InitAttribs;
     procedure InitMarkers;
     procedure InitHotspots;
@@ -1744,7 +1745,7 @@ type
     property OptShowGutterCaretBG: boolean read FOptShowGutterCaretBG write FOptShowGutterCaretBG default true;
     property OptAllowRepaintOnTextChange: boolean read FOptAllowRepaintOnTextChange write FOptAllowRepaintOnTextChange default true;
     property OptAllowReadOnly: boolean read FOptAllowReadOnly write FOptAllowReadOnly default true;
-    property OptUndoLimit: integer read GetUndoLimit write SetUndoLimit default 5000;
+    property OptUndoLimit: integer read FOptUndoLimit write SetUndoLimit default cInitUndoLimit;
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped default true;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave default true;
     property OptUndoMaxCarets: integer read FOptUndoMaxCarets write FOptUndoMaxCarets default cInitUndoMaxCarets;
@@ -3886,8 +3887,9 @@ begin
   FBitmap.Width:= cInitBitmapWidth;
   FBitmap.Height:= cInitBitmapHeight;
 
+  FOptUndoLimit:= cInitUndoLimit;
   FStringsExternal:= nil;
-  FStringsInt:= TATStrings.Create;
+  FStringsInt:= TATStrings.Create(FOptUndoLimit);
   FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
   FStringsInt.OnGetMarkersArray:= @GetMarkersArray;
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
@@ -6775,14 +6777,10 @@ begin
   Result:= Strings.RedoAsString;
 end;
 
-function TATSynEdit.GetUndoLimit: integer;
-begin
-  Result:= Strings.UndoLimit;
-end;
-
 procedure TATSynEdit.SetUndoLimit(AValue: integer);
 begin
-  Strings.UndoLimit:= AValue;
+  FOptUndoLimit:= Max(0, AValue);
+  Strings.UndoLimit:= FOptUndoLimit;
 end;
 
 function TATSynEdit.GetUndoAfterSave: boolean;
