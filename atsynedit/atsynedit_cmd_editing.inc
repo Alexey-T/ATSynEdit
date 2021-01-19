@@ -36,7 +36,7 @@ function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  bAllowUndo, bNeedGroup: boolean;
+  bNeedGroup: boolean;
   TextItems: TStringList;
   TextItem: atString;
   i: integer;
@@ -46,11 +46,7 @@ begin
   TextItems:= nil;
 
   try
-    bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
-    bNeedGroup:= bAllowUndo and (Carets.Count>1) or (Carets.IsSelection);
-
-    if not bAllowUndo then
-      SetEnabledSlowEvents(false);
+    bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
 
     if bNeedGroup then
       Strings.BeginUndoGroup;
@@ -92,8 +88,6 @@ begin
   finally
     if Assigned(TextItems) then
       FreeAndNil(TextItems);
-    if not bAllowUndo then
-      SetEnabledSlowEvents(true);
     if bNeedGroup then
       Strings.EndUndoGroup;
   end;
@@ -106,17 +100,12 @@ var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   StrSpaces: atString;
-  bAllowUndo: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
-  if bAllowUndo then
-    Strings.BeginUndoGroup
-  else
-    SetEnabledSlowEvents(false);
+  Strings.BeginUndoGroup;
 
   try
     DoSelectionDeleteOrReset;
@@ -134,10 +123,7 @@ begin
       Caret.EndY:= -1;
     end;
   finally
-    if bAllowUndo then
-      Strings.EndUndoGroup
-    else
-      SetEnabledSlowEvents(true);
+    Strings.EndUndoGroup;
   end;
 
   Result:= [cResultText, cResultCaretBottom];
@@ -222,13 +208,9 @@ end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
 var
-  bAllowUndo, bColBlock: boolean;
+  bColBlock: boolean;
 begin
-  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
   bColBlock:= not IsSelRectEmpty;
-
-  if not bAllowUndo then
-    SetEnabledSlowEvents(false);
 
   if bColBlock then
     if FSelRect.Left=FSelRect.Right then
@@ -241,9 +223,6 @@ begin
     Result:= DoCommand_TextDeleteSelection
   else
     Result:= DoCommand_TextDeleteRight(1);
-
-  if not bAllowUndo then
-    SetEnabledSlowEvents(true);
 end;
 
 (*
@@ -370,18 +349,14 @@ var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   Str: atString;
-  bAllowUndo, bNeedGroup, bBetterBrackets: boolean;
+  bNeedGroup, bBetterBrackets: boolean;
   NShiftX, NShiftY, i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   if ModeOneLine then Exit;
 
-  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
-  bNeedGroup:= bAllowUndo and (Carets.Count>1);
-
-  if not bAllowUndo then
-    SetEnabledSlowEvents(false);
+  bNeedGroup:= Carets.Count>1;
 
   if bNeedGroup then
     Strings.BeginUndoGroup;
@@ -427,9 +402,6 @@ begin
 
   if bNeedGroup then
     Strings.EndUndoGroup;
-
-  if not bAllowUndo then
-    SetEnabledSlowEvents(true);
 
   Result:= [cResultText, cResultCaretBottom];
 end;
@@ -564,16 +536,13 @@ var
   Caret: TATCaretItem;
   Str: atString;
   Shift, PosAfter: TPoint;
-  bAllowUndo, bNeedGroup: boolean;
+  bNeedGroup: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
-  bNeedGroup:= bAllowUndo and (Carets.Count>1);
-  if not bAllowUndo then
-    SetEnabledSlowEvents(false);
+  bNeedGroup:= Carets.Count>1;
   if bNeedGroup then
     Strings.BeginUndoGroup;
 
@@ -635,8 +604,6 @@ begin
 
   if bNeedGroup then
     Strings.EndUndoGroup;
-  if not bAllowUndo then
-    SetEnabledSlowEvents(true);
 
   if ANext then
     Result:= [cResultText, cResultCaretBottom]
@@ -649,16 +616,13 @@ var
   Caret: TATCaretItem;
   Str: atString;
   Shift, PosAfter: TPoint;
-  bAllowUndo, bNeedGroup: boolean;
+  bNeedGroup: boolean;
   NLen, N1, N2, i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
-  bNeedGroup:= bAllowUndo and (Carets.Count>1);
-  if not bAllowUndo then
-    SetEnabledSlowEvents(false);
+  bNeedGroup:= Carets.Count>1;
   if bNeedGroup then
     Strings.BeginUndoGroup;
 
@@ -703,8 +667,6 @@ begin
 
   if bNeedGroup then
     Strings.EndUndoGroup;
-  if not bAllowUndo then
-    SetEnabledSlowEvents(true);
 
   Result:= [cResultText, cResultCaretBottom];
 end;

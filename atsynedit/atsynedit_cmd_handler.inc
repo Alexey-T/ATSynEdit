@@ -237,6 +237,7 @@ var
   Caret: TATCaretItem;
   Res: TATCommandResults;
   Str: string;
+  bAllowUndo: boolean;
   i: integer;
 begin
   if ACmd<=0 then Exit;
@@ -276,6 +277,10 @@ begin
 
   Carets.UpdateSavedX(cUpdateX_Prepare, false);
   FIsRunningCommand:= true;
+
+  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
+  if not bAllowUndo then
+    SetEnabledSlowEvents(false);
 
   //--------
   case ACmd of
@@ -544,6 +549,9 @@ begin
     cCommand_ZoomReset:                Res:= DoCommand_ScaleReset;
     cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
+
+  if not bAllowUndo then
+    SetEnabledSlowEvents(true);
 
   if IsCommandResults_CaretMove(Res) then
     if not FLastCommandMakesColumnSel then

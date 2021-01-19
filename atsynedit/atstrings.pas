@@ -1630,6 +1630,7 @@ begin
   Inc(FUndoGroupCounter);
   if Assigned(FUndoList) then
   begin
+    if FUndoList.Locked then exit;
     //softmark if not-nested call
     if FUndoGroupCounter=1 then
       FUndoList.SoftMark:= true;
@@ -1640,13 +1641,17 @@ end;
 
 procedure TATStrings.EndUndoGroup;
 begin
-  Dec(FUndoGroupCounter);
-  if FUndoGroupCounter<0 then
+  if FUndoGroupCounter>0 then
+    Dec(FUndoGroupCounter)
+  else
     FUndoGroupCounter:= 0;
 
   if FUndoGroupCounter=0 then
     if Assigned(FUndoList) then
+    begin
+      if FUndoList.Locked then exit;
       FUndoList.HardMark:= false;
+    end;
 end;
 
 procedure TATStrings.DoUndoSingle(ACurList: TATUndoList;

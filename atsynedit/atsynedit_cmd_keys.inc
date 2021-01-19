@@ -260,13 +260,9 @@ end;
 
 function TATSynEdit.DoCommand_TextBackspace: TATCommandResults;
 var
-  bAllowUndo, bColBlock: boolean;
+  bColBlock: boolean;
 begin
-  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
   bColBlock:= not IsSelRectEmpty;
-
-  if not bAllowUndo then
-    SetEnabledSlowEvents(false);
 
   if bColBlock then
     if FSelRect.Left=FSelRect.Right then
@@ -279,9 +275,6 @@ begin
     Result:= DoCommand_TextDeleteSelection
   else
     Result:= DoCommand_TextDeleteLeft(1, FOptKeyBackspaceUnindent);
-
-  if not bAllowUndo then
-    SetEnabledSlowEvents(true);
 end;
 
 function TATSynEdit.DoCommand_GotoTextBegin: TATCommandResults;
