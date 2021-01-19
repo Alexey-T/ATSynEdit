@@ -106,12 +106,18 @@ var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
   StrSpaces: atString;
+  bAllowUndo: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  Strings.BeginUndoGroup;
+  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
+  if bAllowUndo then
+    Strings.BeginUndoGroup
+  else
+    SetEnabledSlowEvents(false);
+
   try
     DoSelectionDeleteOrReset;
 
@@ -128,7 +134,10 @@ begin
       Caret.EndY:= -1;
     end;
   finally
-    Strings.EndUndoGroup;
+    if bAllowUndo then
+      Strings.EndUndoGroup
+    else
+      SetEnabledSlowEvents(true);
   end;
 
   Result:= [cResultText, cResultCaretBottom];
