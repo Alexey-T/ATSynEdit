@@ -1,6 +1,6 @@
 
 2021.01.19
-+ add: OptUndoMaxCarets (default 200)
++ add: OptUndoMaxCarets (default 200); editing commands are much faster for >200 carets
 
 2021.01.12
 + add: OptCaretHideUnfocused (note: True by default)
