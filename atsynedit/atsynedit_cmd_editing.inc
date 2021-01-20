@@ -473,7 +473,7 @@ begin
         St.LinesEnds[Line2+1]:= St.Endings;
       end;
 
-      DoCaretsShift(iCaret, Caret.PosX, Caret.PosY, 0, (Line2-Line1+1), Point(0, 0));
+      DoCaretsShift(iCaret+1, Caret.PosX, Caret.PosY, 0, (Line2-Line1+1), Point(0, 0));
     end;
   finally
     St.EndUndoGroup;
