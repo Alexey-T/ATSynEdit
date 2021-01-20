@@ -323,7 +323,7 @@ type TATMarkers in unit atsynedit_markers. Holds list of marker items. Each mark
 * Tag (Int64): some integer value, useful for apps: e.g. CudaText holds here tabstop-index (several markers with the same index >0 give multi-carets, when user jumps to one of markers).
 * Value (Int64): some integer value, attached to marker.
 * Ptr (TObject): some application-specific object. Object is freed automatically when marker item is freed.
-* MicromapOnly (boolean): render this marker only on micromap, but not on the main text area.
+* MicromapOnly (enum): where to render the marker: on text area, on micromap, on both text/micromap. 
 
 Markers are painted as red triangles below their positions (PosX, PosY). They are needed e.g. for making snippets, where user needs to jump over snippet's insert points and wants to see these points. Also it's good for IDE to have commands like "drop marker here", "remove last marker", "swap caret and last marker" etc (like CodeRush).
 
