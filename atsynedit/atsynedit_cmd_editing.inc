@@ -92,7 +92,10 @@ begin
       Strings.EndUndoGroup;
   end;
 
-  Result:= [cResultText, cResultCaretBottom];
+  Result:= [cResultText,
+    //cResultCaretBottom //changed for issue #3065
+    cResultCaretAny
+    ];
 end;
 
 function TATSynEdit.DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
@@ -203,7 +206,10 @@ begin
 
   if bNeedGroup then Strings.EndUndoGroup;
 
-  Result:= [cResultText, cResultCaretTop];
+  Result:= [cResultText,
+    //cResultCaretTop //changed for issue #3065
+    cResultCaretAny
+    ];
 end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
