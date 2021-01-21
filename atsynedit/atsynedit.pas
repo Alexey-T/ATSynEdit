@@ -6886,19 +6886,27 @@ begin
 end;
 
 procedure TATSynEdit.SetEnabledSlowEvents(AValue: boolean);
+var
+  St: TATStrings;
 begin
+  St:= Strings;
   if not AValue then
   begin
-    Strings.DoClearUndo(true);
-    Strings.EnabledChangeEvents:= false;
-    FLastLineOfSlowEvents:= Carets[0].FirstTouchedLine;
+    St.DoClearUndo(true);
+    St.EnabledChangeEvents:= false;
+    if Carets.Count>0 then
+      FLastLineOfSlowEvents:= Carets[0].FirstTouchedLine;
   end
   else
   begin
-    Strings.DoClearUndo(false);
-    Strings.EnabledChangeEvents:= true;
-    Strings.DoEventLog(FLastLineOfSlowEvents);
-    Strings.DoEventChange(cLineChangeEdited, FLastLineOfSlowEvents, 1);
+    St.DoClearUndo(false);
+    St.EnabledChangeEvents:= true;
+    if St.IsIndexValid(FLastLineOfSlowEvents) then
+    begin
+      St.DoEventLog(FLastLineOfSlowEvents);
+      St.DoEventChange(cLineChangeEdited, FLastLineOfSlowEvents, 1);
+      FLastLineOfSlowEvents:= -1;
+    end;
   end;
 end;
 
