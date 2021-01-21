@@ -6895,7 +6895,11 @@ begin
     St.DoClearUndo(true);
     St.EnabledChangeEvents:= false;
     if Carets.Count>0 then
+    begin
       FLastLineOfSlowEvents:= Carets[0].FirstTouchedLine;
+      if not St.IsIndexValid(FLastLineOfSlowEvents) then
+        FLastLineOfSlowEvents:= -1;
+    end;
   end
   else
   begin
