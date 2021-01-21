@@ -96,7 +96,10 @@ var
   bMultiCarets: boolean;
   i: integer;
 begin
-  Result:= [cResultCaretLeft];
+  // changed because of issue #3065
+  //Result:= [cResultCaretLeft];
+  Result:= [cResultCaretAny];
+
   bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
@@ -131,7 +134,10 @@ var
   bMultiCarets: boolean;
   i: integer;
 begin
-  Result:= [cResultCaretRight];
+  // changed because of issue #3065
+  //Result:= [cResultCaretRight];
+  Result:= [cResultCaretAny];
+
   bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
@@ -383,10 +389,14 @@ begin
     end;
   end;
 
+  {
   if AJump=cWordjumpToPrev then
     Result:= [cResultCaretTop]
   else
     Result:= [cResultCaretBottom];
+    }
+  //changed because of issue #3065
+  Result:= [cResultCaretAny];
 end;
 
 function TATSynEdit.DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
