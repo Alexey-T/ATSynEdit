@@ -276,6 +276,7 @@ type
 const
   cMaxIndentVert = 100;
   cInitUndoLimit = 5000;
+  cInitUndoMaxCarets = cInitUndoLimit;
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
   cInitScrollbarHorzAddSpace = 2;
@@ -310,7 +311,6 @@ const
   cInitFoldTooltipVisible = true;
   cInitFoldTooltipLineCount = 15;
   cInitFoldTooltipWidthPercents = 80;
-  cInitUndoMaxCarets = 200;
   cInitMaxLineLenToTokenize = 4000;
   cInitMinLineLenToCalcURL = 4;
   cInitMaxLineLenToCalcURL = 300;
