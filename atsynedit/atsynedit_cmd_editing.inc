@@ -695,6 +695,8 @@ function TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): T
 var
   i: integer;
 begin
+  DoCaretsDeleteOnSameLines;
+
   for i:= Carets.Count-1 downto 0 do
     DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight, Carets[i]);
 
