@@ -4325,7 +4325,12 @@ begin
     Change1:= Strings.ActionEnsureFinalEol;
 
   if FOptSavingTrimSpaces then
+  begin
     Change2:= Strings.ActionTrimSpaces(cTrimRight);
+    //caret may be after end-of-line, so fix it
+    if not OptCaretVirtual then
+      DoCaretsFixIncorrectPos(true);
+  end;
 
   if FOptSavingTrimFinalEmptyLines then
   begin
