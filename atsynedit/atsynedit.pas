@@ -147,17 +147,17 @@ type
     );
 
   TATCommandResult = (
-    cResultText,            //Text was changed.
-    cResultFoldChange,      //Folding ranges were changed or folded/unfolded.
-    cResultCaretAny,        //Some caret pos/selection was changed. Don't scroll to caret.
-    cResultCaretLeft,       //Some caret pos/selection was changed. Scroll to the most left caret.
-    cResultCaretTop,        //Some caret pos/selection was changed. Scroll to the most top caret (first caret).
-    cResultCaretRight,      //Some caret pos/selection was changed. Scroll to the most right caret.
-    cResultCaretBottom,     //Some caret pos/selection was changed. Scroll to the most bottom caret (last caret).
-    cResultKeepColumnSel,   //Restore previous column selection, if command changed it.
-    cResultScroll,          //Some scrolling was made.
-    cResultUndoRedo,        //Undo or Redo action was made.
-    cResultState            //Some internal properties of editor were changed (e.g. word-wrap state).
+    cResultText,             //Text was changed.
+    cResultFoldChange,       //Folding range(s) were changed or folded/unfolded.
+    cResultCaretAny,         //Caret(s) pos/selection was changed. Don't scroll to caret.
+    cResultCaretLeft,        //Caret(s) pos/selection was changed. Scroll to the most left caret.
+    cResultCaretTop,         //Caret(s) pos/selection was changed. Scroll to the first caret.
+    cResultCaretRight,       //Caret(s) pos/selection was changed. Scroll to the most right caret.
+    cResultCaretBottom,      //Caret(s) pos/selection was changed. Scroll to the last caret.
+    cResultKeepColumnSel,    //Restore previous column selection, if command changed it.
+    cResultScroll,           //Some scrolling was made.
+    cResultUndoRedo,         //Undo or Redo action was made.
+    cResultState             //Some properties of editor were changed (e.g. word-wrap state).
     );
   TATCommandResults = set of TATCommandResult;
 
