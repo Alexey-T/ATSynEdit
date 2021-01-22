@@ -835,7 +835,7 @@ begin
   if ModeReadOnly then Exit;
 
   Strings.Undo(FOptUndoGrouped);
-  Result:= [cResultText, cResultCaretBottom, cResultUndoRedo];
+  Result:= [cResultText, cResultCaretAny, cResultUndoRedo];
 end;
 
 function TATSynEdit.DoCommand_Redo: TATCommandResults;
@@ -845,7 +845,7 @@ begin
 
   Strings.SetGroupMark;
   Strings.Redo(FOptUndoGrouped);
-  Result:= [cResultText, cResultCaretBottom, cResultUndoRedo];
+  Result:= [cResultText, cResultCaretAny, cResultUndoRedo];
 end;
 
 
