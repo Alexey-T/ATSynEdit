@@ -693,13 +693,21 @@ end;
 
 function TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): TATCommandResults;
 var
+  i: integer;
+begin
+  for i:= Carets.Count-1 downto 0 do
+    DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight, Carets[i]);
+
+  Result:= [cResultText, cResultCaretAny];
+end;
+
+procedure TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: boolean; Caret: TATCaretItem);
+var
   NDecSpaces, NMinSpaces, i: integer;
   Str: atString;
-  Caret: TATCaretItem;
   NShiftInit, NShift1, NShift2, NShiftChars, NIndent1, NIndent2: integer;
   NBlockBeginX, NBlockBeginY, NBlockEndX, NBlockEndY: integer;
 begin
-  Caret:= Carets[0];
   Caret.GetSelLines(NBlockBeginY, NBlockEndY, true{Allow no sel});
   if NBlockBeginY<0 then exit;
   if Caret.EndY<0 then
@@ -789,8 +797,6 @@ begin
     if NBlockEndX>0 then
       Caret.EndX:= Max(0, NBlockEndX+NShift2);
   end;
-
-  Result:= [cResultText, cResultCaretAny];
 end;
 
 
