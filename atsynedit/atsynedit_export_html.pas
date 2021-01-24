@@ -29,7 +29,7 @@ var
 begin
   if AColorFont<>AColorFontDef then
   begin
-    NameF:= SColorToHtmlColor(AColorFont);
+    NameF:= TATHtmlColorParser.ColorToHtmlString(AColorFont);
     TextF:= 'color: '+NameF+'; ';
     Delete(NameF, 1, 1);
   end
@@ -41,7 +41,7 @@ begin
 
   if AColorBg<>AColorBgDef then
   begin
-    NameBg:= SColorToHtmlColor(AColorBg);
+    NameBg:= TATHtmlColorParser.ColorToHtmlString(AColorBg);
     TextBg:= 'background: '+NameBg+'; ';
     Delete(NameBg, 1, 1);
   end
@@ -172,8 +172,8 @@ begin
     L.Add('  <title>'+APageTitle+'</title>');
     L.Add('  <style>');
     L.Add('    body, table {');
-    L.Add('      color: '+SColorToHtmlColor(NColorFont)+';');
-    L.Add('      background-color: '+SColorToHtmlColor(AColorBg)+';');
+    L.Add('      color: '+TATHtmlColorParser.ColorToHtmlString(NColorFont)+';');
+    L.Add('      background-color: '+TATHtmlColorParser.ColorToHtmlString(AColorBg)+';');
     L.Add('    }');
     L.Add('    pre, code {');
     L.Add('      font-family: "'+AFontName+'", sans-serif;');
@@ -186,7 +186,7 @@ begin
     L.Add('      vertical-align: top;');
     L.Add('    }');
     L.Add('    td.num {');
-    L.Add('      color: '+SColorToHtmlColor(AColorNumbers)+';');
+    L.Add('      color: '+TATHtmlColorParser.ColorToHtmlString(AColorNumbers)+';');
     L.Add('      text-align: right;');
     L.Add('    }');
     L.AddStrings(LStyles);

@@ -13,12 +13,6 @@ uses
   GraphUtil, //for HLS color conversion
   ATStringProc;
 
-//convert TColor -> HTML color string #rrggbb
-function SColorToHtmlColor(Color: TColor): string;
-
-//convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
-function SHtmlColorToColor(s: PChar; out Len: integer; Default: TColor): TColor;
-
 type
 
   { TATHtmlColorParser }
@@ -26,13 +20,17 @@ type
   TATHtmlColorParser = class
   private
   public
+    //convert TColor -> HTML color string #rrggbb
+    class function ColorToHtmlString(Color: TColor): string;
+    //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
+    class function ParseTokenRGB(s: PChar; out Len: integer; Default: TColor): TColor;
     class function ParseFunctionRGB(const S: UnicodeString; FromPos: integer; out LenOfColor: integer): TColor;
     class function ParseFunctionHSL(const S: UnicodeString; FromPos: integer; out LenOfColor: integer): TColor;
   end;
 
 implementation
 
-function SColorToHtmlColor(Color: TColor): string;
+class function TATHtmlColorParser.ColorToHtmlString(Color: TColor): string;
 var
   N: Longint;
 begin
@@ -45,7 +43,7 @@ begin
     IntToHex(Blue(N), 2);
 end;
 
-function SHtmlColorToColor(s: PChar; out Len: integer; Default: TColor): TColor;
+class function TATHtmlColorParser.ParseTokenRGB(s: PChar; out Len: integer; Default: TColor): TColor;
 var
   N1, N2, N3: integer;
   ch: char;
