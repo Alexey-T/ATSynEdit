@@ -18,7 +18,11 @@ function SColorToHtmlColor(Color: TColor): string;
 //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
 function SHtmlColorToColor(s: PChar; out Len: integer; Default: TColor): TColor;
 
-function SHtmlColor_ParseString_RGB(const S: UnicodeString; FromPos: integer; out LenOfColor: integer): TColor;
+type
+  TATHtmlColorParser = class
+  public
+    class function ParseFunctionRGB(const S: UnicodeString; FromPos: integer; out LenOfColor: integer): TColor;
+  end;
 
 implementation
 
@@ -80,7 +84,7 @@ begin
 end;
 
 
-function SHtmlColor_ParseString_RGB(const S: UnicodeString; FromPos: integer; out LenOfColor: integer): TColor;
+class function TATHtmlColorParser.ParseFunctionRGB(const S: UnicodeString; FromPos: integer; out LenOfColor: integer): TColor;
 var
   NLen: integer;
   //
