@@ -69,11 +69,13 @@ type
 
 type
   TATSynEditDrawLineEvent = procedure(Sender: TObject; C: TCanvas;
+    ALineIndex: integer;
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     const AExtent: TATIntArray) of object;
 
 type
   TATCanvasTextOutProps = record
+    Editor: TObject;
     SuperFast: boolean;
     TabHelper: TATStringTabHelper;
     LineIndex: integer;
@@ -975,7 +977,16 @@ begin
 
   if AText<>'' then
     if Assigned(AProps.DrawEvent) then
-      AProps.DrawEvent(nil, C, APosX, APosY, AText, AProps.CharSize, ListInt);
+      AProps.DrawEvent(
+        AProps.Editor,
+        C,
+        AProps.LineIndex,
+        APosX,
+        APosY,
+        AText,
+        AProps.CharSize,
+        ListInt
+        );
 end;
 
 

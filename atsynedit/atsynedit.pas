@@ -3165,6 +3165,7 @@ begin
 
       if AMainText then
       begin
+        TextOutProps.Editor:= Self;
         TextOutProps.SuperFast:= bLineHuge;
         TextOutProps.TabHelper:= FTabHelper;
         TextOutProps.LineIndex:= NLinesIndex;
@@ -7673,6 +7674,7 @@ begin
 
   FillChar(TextOutProps{%H-}, SizeOf(TextOutProps), 0);
 
+  TextOutProps.Editor:= Self;
   TextOutProps.SuperFast:= false;
   TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;
