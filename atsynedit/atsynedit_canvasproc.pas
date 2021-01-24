@@ -111,6 +111,7 @@ procedure CanvasLineEx(C: TCanvas;
   X1, Y1, X2, Y2: integer; AtDown: boolean);
 
 procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
+procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
@@ -278,6 +279,15 @@ begin
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
   LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
+  {$endif}
+end;
+
+procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
+begin
+  {$ifdef windows}
+  Windows.TextOutA(C.Handle, X, Y, Buf, Len);
+  {$else}
+  LCLIntf.TextOut(C.Handle, X, Y, Buf, Len);
   {$endif}
 end;
 
