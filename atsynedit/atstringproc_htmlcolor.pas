@@ -18,6 +18,8 @@ function SColorToHtmlColor(Color: TColor): string;
 //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
 function SHtmlColorToColor(s: PChar; out Len: integer; Default: TColor): TColor;
 
+function SHtmlColor_ParseString_RGB(const S: UnicodeString; FromPos: integer; out LenOfColor: integer): TColor;
+
 implementation
 
 function SColorToHtmlColor(Color: TColor): string;
@@ -78,5 +80,101 @@ begin
 end;
 
 
+function SHtmlColor_ParseString_RGB(const S: UnicodeString; FromPos: integer; out LenOfColor: integer): TColor;
+var
+  NLen: integer;
+  //
+  procedure SkipSpaces(var N: integer); inline;
+  begin
+    while (N<=NLen) and IsCharSpace(S[N]) do
+      Inc(N);
+  end;
+  //
+  procedure SkipComma(var N: integer); inline;
+  begin
+    if S[N]=',' then
+      Inc(N);
+  end;
+  //
+  function SkipInt(var N: integer): integer;
+  begin
+    Result:= -1;
+    SkipSpaces(N);
+    while (N<=NLen) and IsCharDigit(S[N]) do
+    begin
+      if Result=-1 then
+        Result:= 0;
+      Result:= Result*10+StrToIntDef(S[N], 0);
+      Inc(N);
+    end;
+    SkipSpaces(N);
+  end;
+  //
+  function SkipFloat(var N: integer): integer;
+  begin
+    Result:= -1;
+    SkipSpaces(N);
+    while (N<=NLen) and (IsCharDigit(S[N]) or (S[N]='.')) do
+    begin
+      Inc(N);
+      Result:= 1; //ignore the value
+    end;
+    SkipSpaces(N);
+  end;
+var
+  Val1, Val2, Val3, ValAlpha: integer;
+  bAlpha: boolean;
+  N: integer;
+begin
+  Result:= clNone;
+  LenOfColor:= 0;
+
+  NLen:= Length(S);
+  N:= FromPos;
+  bAlpha:= false;
+
+  if N+9>NLen then exit;
+  if S[N]<>'r' then exit;
+  Inc(N);
+  if S[N]<>'g' then exit;
+  Inc(N);
+  if S[N]<>'b' then exit;
+  Inc(N);
+  if S[N]='a' then
+  begin
+    bAlpha:= true;
+    Inc(N);
+  end;
+  if S[N]<>'(' then exit;
+  Inc(N);
+
+  Val1:= SkipInt(N);
+  if Val1<0 then exit;
+  if Val1>255 then exit;
+  if N>NLen then exit;
+  SkipComma(N);
+
+  Val2:= SkipInt(N);
+  if Val2<0 then exit;
+  if Val2>255 then exit;
+  if N>NLen then exit;
+  SkipComma(N);
+
+  Val3:= SkipInt(N);
+  if Val3<0 then exit;
+  if Val3>255 then exit;
+  if N>NLen then exit;
+  if bAlpha then
+  begin
+    SkipComma(N);
+    ValAlpha:= SkipFloat(N);
+    if ValAlpha<0 then exit;
+  end;
+  if S[N]<>')' then exit;
+
+  Result:= RGBToColor(byte(Val1), byte(Val2), byte(Val3));
+  LenOfColor:= N-FromPos+1;
+end;
+  
 end.
 
