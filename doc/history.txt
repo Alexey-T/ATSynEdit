@@ -1,4 +1,7 @@
 
+2021.01.24
+* change: refactored all code in atstringproc_htmlcolor unit, all funcs are moved into class
+
 2021.01.19
 + add: OptUndoMaxCarets (default 200); editing commands are much faster for >200 carets
 
