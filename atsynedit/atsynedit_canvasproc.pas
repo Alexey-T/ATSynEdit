@@ -107,6 +107,7 @@ type
 
 procedure CanvasLineHorz(C: TCanvas; X1, Y, X2: integer; AWithEnd: boolean=false); inline;
 procedure CanvasLineVert(C: TCanvas; X, Y1, Y2: integer; AWithEnd: boolean=false); inline;
+procedure CanvasLineVert2(C: TCanvas; AX, AY1, AY2: integer; AWithEnd: boolean; ALineWidth: integer);
 
 procedure CanvasLineEx(C: TCanvas;
   Color: TColor; Style: TATLineStyle;
@@ -363,6 +364,21 @@ begin
   {$else}
   C.Line(X, Y1, X, Y2);
   {$endif}
+end;
+
+procedure CanvasLineVert2(C: TCanvas; AX, AY1, AY2: integer; AWithEnd: boolean; ALineWidth: integer);
+var
+  XFrom, XTo, X: integer;
+begin
+  if ALineWidth<=1 then
+    CanvasLineVert(C, AX, AY1, AY2, AWithEnd)
+  else
+  begin
+    XFrom:= AX-ALineWidth div 2;
+    XTo:= XFrom+ALineWidth-1;
+    for X:= XFrom to XTo do
+      CanvasLineVert(C, X, AY1, AY2, AWithEnd);
+  end;
 end;
 
 

@@ -3641,15 +3641,7 @@ begin
   if (AX>=FRectMain.Left) and (AX<FRectMain.Right) then
   begin
     C.Pen.Color:= AColor;
-    if AWidth<=1 then
-      CanvasLineVert(C, AX, FRectMain.Top, FRectMain.Bottom)
-    else
-    begin
-      XFrom:= AX-AWidth div 2;
-      XTo:= XFrom+AWidth-1;
-      for X:= XFrom to XTo do
-        CanvasLineVert(C, X, FRectMain.Top, FRectMain.Bottom)
-    end;
+    CanvasLineVert2(C, AX, FRectMain.Top, FRectMain.Bottom, false, AWidth);
   end;
 end;
 
