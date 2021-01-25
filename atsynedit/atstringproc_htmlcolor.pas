@@ -16,10 +16,10 @@ type
 
   generic TATHtmlColorParser<TStr, TChar, TPChar> = class
   private
-    class function IsCodeDigit(ch: word): boolean;
+    class function IsCodeDigit(ch: word): boolean; inline;
     class function IsCodeHexDigit(ch: word): boolean;
     class function IsCodeWord(ch: word): boolean;
-    class function IsCodeSpace(ch: word): boolean;
+    class function IsCodeSpace(ch: word): boolean; inline;
     class function HexCodeToInt(ch: word): integer;
     class procedure SkipSpaces(const S: TStr; var N: integer);
     class procedure SkipComma(const S: TStr; var N: integer);
@@ -78,12 +78,7 @@ end;
 
 class function TATHtmlColorParser.IsCodeSpace(ch: word): boolean;
 begin
-  case ch of
-    ord(' '), 9:
-      Result:= true
-    else
-      Result:= false;
-  end;
+  Result:= (ch=ord(' ')) or (ch=9);
 end;
 
 class function TATHtmlColorParser.HexCodeToInt(ch: word): integer;
