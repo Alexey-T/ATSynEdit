@@ -30,7 +30,7 @@ type
     //convert TColor -> HTML color string #rrggbb
     class function ColorToHtmlString(Color: TColor): string;
     //convert string which starts with HTML color token #rgb, #rrggbb -> TColor, get len of color-string
-    class function ParseTokenRGB(s: TPChar; out Len: integer; Default: TColor): TColor;
+    class function ParseTokenRGB(S: TPChar; out Len: integer; Default: TColor): TColor;
     //parses 'rgb(10,20,30)' and rgba(10,20,30,0.5)
     class function ParseFunctionRGB(const S: TStr; FromPos: integer; out LenOfColor: integer): TColor;
     //parses 'hsl(0,50%,100%)' and 'hsla(0,50%,100%,0.5)
@@ -109,21 +109,21 @@ begin
     IntToHex(Blue(N), 2);
 end;
 
-class function TATHtmlColorParser.ParseTokenRGB(s: TPChar; out Len: integer; Default: TColor): TColor;
+class function TATHtmlColorParser.ParseTokenRGB(S: TPChar; out Len: integer; Default: TColor): TColor;
 var
   N1, N2, N3: integer;
   ch: word;
 begin
   Result:= Default;
-  if s=nil then Exit;
+  if S=nil then Exit;
 
-  if s^='#' then
-    Inc(s);
+  if S^='#' then
+    Inc(S);
 
   //must handle string longer than needed, with additional chars
   Len:= 0;
   repeat
-    ch:= ord(s[Len]);
+    ch:= ord(S[Len]);
     if ch=0 then Break;
     if not IsCodeHexDigit(ch) then
       if IsCodeWord(ch) then
@@ -138,16 +138,16 @@ begin
   case Len of
     6, 8:
       begin
-        N1:= HexCodeToInt(ord(s[0]))*16 + HexCodeToInt(ord(s[1]));
-        N2:= HexCodeToInt(ord(s[2]))*16 + HexCodeToInt(ord(s[3]));
-        N3:= HexCodeToInt(ord(s[4]))*16 + HexCodeToInt(ord(s[5]));
+        N1:= HexCodeToInt(ord(S[0]))*16 + HexCodeToInt(ord(S[1]));
+        N2:= HexCodeToInt(ord(S[2]))*16 + HexCodeToInt(ord(S[3]));
+        N3:= HexCodeToInt(ord(S[4]))*16 + HexCodeToInt(ord(S[5]));
         Result:= RGBToColor(N1, N2, N3);
       end;
     3, 4:
       begin
-        N1:= HexCodeToInt(ord(s[0]))*17;
-        N2:= HexCodeToInt(ord(s[1]))*17;
-        N3:= HexCodeToInt(ord(s[2]))*17;
+        N1:= HexCodeToInt(ord(S[0]))*17;
+        N2:= HexCodeToInt(ord(S[1]))*17;
+        N3:= HexCodeToInt(ord(S[2]))*17;
         Result:= RGBToColor(N1, N2, N3);
       end;
   end;
