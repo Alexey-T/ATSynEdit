@@ -174,7 +174,7 @@ begin
   begin
     if Result=-1 then
       Result:= 0;
-    Result:= Result*10+StrToIntDef(S[N], 0);
+    Result:= Result*10 + ord(S[N]) - ord('0');
     Inc(N);
   end;
   SkipSpaces(S, N);
@@ -182,15 +182,7 @@ end;
 
 class function TATHtmlColorParser.SkipIntWithPercent(const S: TStr; var N: integer): integer;
 begin
-  Result:= -1;
-  SkipSpaces(S, N);
-  while (N<=Length(S)) and IsCodeDigit(ord(S[N])) do
-  begin
-    if Result=-1 then
-      Result:= 0;
-    Result:= Result*10+StrToIntDef(S[N], 0);
-    Inc(N);
-  end;
+  Result:= SkipInt(S, N);
   if N>Length(S) then exit(-1);
   if S[N]='%' then
     Inc(N)
