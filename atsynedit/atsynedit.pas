@@ -982,7 +982,7 @@ type
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
-    procedure DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
+    procedure DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
     procedure DoPaintRulerTo(C: TCanvas);
     procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
     procedure DoPaintFPS(C: TCanvas);
@@ -3634,12 +3634,22 @@ begin
     FOnDrawGap(Self, C, ARect, AGap);
 end;
 
-procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX: integer; AColor: TColor);
+procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
+var
+  XFrom, XTo, X: integer;
 begin
   if (AX>=FRectMain.Left) and (AX<FRectMain.Right) then
   begin
     C.Pen.Color:= AColor;
-    CanvasLineVert(C, AX, FRectMain.Top, FRectMain.Bottom);
+    if AWidth<=1 then
+      CanvasLineVert(C, AX, FRectMain.Top, FRectMain.Bottom)
+    else
+    begin
+      XFrom:= AX-AWidth div 2;
+      XTo:= XFrom+AWidth-1;
+      for X:= XFrom to XTo do
+        CanvasLineVert(C, X, FRectMain.Top, FRectMain.Bottom)
+    end;
   end;
 end;
 
@@ -3650,12 +3660,13 @@ procedure TATSynEdit.DoPaintMarginsTo(C: TCanvas);
     Result:= FRectMain.Left + FCharSize.X*(NMargin-FScrollHorz.NPos);
   end;
 var
-  i: integer;
+  NWidth, i: integer;
 begin
+  NWidth:= EditorScale(1);
   if FMarginRight>1 then
-    DoPaintMarginLineTo(C, PosX(FMarginRight), Colors.MarginRight);
+    DoPaintMarginLineTo(C, PosX(FMarginRight), NWidth, Colors.MarginRight);
   for i:= 0 to Length(FMarginList)-1 do
-    DoPaintMarginLineTo(C, PosX(FMarginList[i]), Colors.MarginUser);
+    DoPaintMarginLineTo(C, PosX(FMarginList[i]), NWidth, Colors.MarginUser);
 end;
 
 
@@ -4551,7 +4562,7 @@ end;
 
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
 var
-  NCaretX: integer;
+  NCaretX, NWidth: integer;
 begin
   if Enabled then
   begin
@@ -4576,8 +4587,9 @@ begin
   if Carets.Count>0 then
   begin
     NCaretX:= Carets[0].CoordX;
+    NWidth:= EditorScale(1);
     if FOptShowCurColumn then
-      DoPaintMarginLineTo(C, NCaretX, Colors.MarginCaret);
+      DoPaintMarginLineTo(C, NCaretX, NWidth, Colors.MarginCaret);
     if FOptRulerVisible and (FOptRulerMarkSizeCaret>0) then
       DoPaintRulerCaretMark(C, NCaretX);
   end;
