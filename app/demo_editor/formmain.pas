@@ -235,7 +235,7 @@ type
     procedure DoSetEnc(const Str: string);
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
-    procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
+    procedure EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX, AY: integer;
       const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
@@ -1398,8 +1398,9 @@ begin
   ed.Update;
 end;
 
-procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas;
-  AX, AY: integer; const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
+procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX,
+  AY: integer; const AStr: atString; ACharSize: TPoint;
+  const AExtent: TATIntArray);
 var
   X1, X2, Y, i: integer;
 begin
