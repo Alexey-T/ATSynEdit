@@ -14,7 +14,7 @@ uses
 type
   { TATHtmlColorParser }
 
-  generic TATHtmlColorParser<TStr, TChar, TPChar> = class
+  generic TATHtmlColorParser<TStr, TPChar> = class
   private
     class function IsCodeDigit(ch: word): boolean; inline;
     class function IsCodeHexDigit(ch: word): boolean;
@@ -38,8 +38,8 @@ type
   end;
 
 type
-  TATHtmlColorParserA = specialize TATHtmlColorParser<string, char, PChar>;
-  TATHtmlColorParserW = specialize TATHtmlColorParser<UnicodeString, WideChar, PWideChar>;
+  TATHtmlColorParserA = specialize TATHtmlColorParser<string, PChar>;
+  TATHtmlColorParserW = specialize TATHtmlColorParser<UnicodeString, PWideChar>;
 
 implementation
 
