@@ -116,29 +116,17 @@ begin
     cResultCaretLeft,
     cResultCaretRight,
     cResultCaretTop,
-    cResultCaretBottom,
-    cResultCaretLeftLazy,
-    cResultCaretRightLazy,
-    cResultCaretTopLazy,
-    cResultCaretBottomLazy
+    cResultCaretBottom
     ] <> [];
 end;
 
 procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
-  //
-  function IsAnyCaretVisible: boolean;
-  begin
-    //must refresh carets' CoordX/CoordY first, otherwise 1st carets' move out of
-    //visible rect will not be detected
-    UpdateCaretsCoords;
-    Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
-  end;
-  //
 var
   Caret: TATCaretItem;
   bTextChanged: boolean;
   bNeedRepaint, bAllowRepaint: boolean;
   bUndoRedo: boolean;
+  bAllowCaretScroll: boolean;
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
@@ -184,37 +172,26 @@ begin
 
   if IsCommandResults_CaretMove(Res) then
   begin
-    if cResultCaretTop in Res then
-      DoGotoCaret(cEdgeTop, bUndoRedo, false, false)
+    if Carets.Count=1 then
+      bAllowCaretScroll:= true
     else
-    if cResultCaretBottom in Res then
-      DoGotoCaret(cEdgeBottom, bUndoRedo, false, false)
+    if cResultCaretLazy in Res then
+      bAllowCaretScroll:= not IsCaretOnVisibleRect
     else
-    if cResultCaretLeft in Res then
-      DoGotoCaret(cEdgeLeft, bUndoRedo, false, false)
-    else
-    if cResultCaretRight in Res then
-      DoGotoCaret(cEdgeRight, bUndoRedo, false, false)
-    else
-    if cResultCaretTopLazy in Res then
+      bAllowCaretScroll:= true;
+
+    if bAllowCaretScroll then
     begin
-      if not IsAnyCaretVisible then
-        DoGotoCaret(cEdgeTop, bUndoRedo, false, false);
-    end
-    else
-    if cResultCaretBottomLazy in Res then
-    begin
-      if not IsAnyCaretVisible then
-        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false);
-    end;
-    if cResultCaretLeftLazy in Res then
-    begin
-      if not IsAnyCaretVisible then
-        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false);
-    end;
-    if cResultCaretRightLazy in Res then
-    begin
-      if not IsAnyCaretVisible then
+      if cResultCaretTop in Res then
+        DoGotoCaret(cEdgeTop, bUndoRedo, false, false)
+      else
+      if cResultCaretBottom in Res then
+        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false)
+      else
+      if cResultCaretLeft in Res then
+        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false)
+      else
+      if cResultCaretRight in Res then
         DoGotoCaret(cEdgeRight, bUndoRedo, false, false);
     end;
 

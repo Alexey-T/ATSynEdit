@@ -96,13 +96,10 @@ var
   bMultiCarets: boolean;
   i: integer;
 begin
-  bMultiCarets:= FCarets.Count>1;
+  //changed because of issue CudaText#3065
+  Result:= [cResultCaretLeft, cResultCaretLazy];
 
-  //changed because of issue #3065
-  if not bMultiCarets then
-    Result:= [cResultCaretLeft]
-  else
-    Result:= [cResultCaretLeftLazy];
+  bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -136,13 +133,10 @@ var
   bMultiCarets: boolean;
   i: integer;
 begin
-  bMultiCarets:= FCarets.Count>1;
+  //changed because of issue CudaText#3065
+  Result:= [cResultCaretRight, cResultCaretLazy];
 
-  //changed because of issue #3065
-  if not bMultiCarets then
-    Result:= [cResultCaretRight]
-  else
-    Result:= [cResultCaretRightLazy];
+  bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -393,11 +387,11 @@ begin
     end;
   end;
 
-  //changed because of issue #3065
+  //changed because of issue CudaText#3065
   if AJump=cWordjumpToPrev then
-    Result:= [cResultCaretTopLazy]
+    Result:= [cResultCaretTop, cResultCaretLazy]
   else
-    Result:= [cResultCaretBottomLazy];
+    Result:= [cResultCaretBottom, cResultCaretLazy];
 end;
 
 function TATSynEdit.DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;

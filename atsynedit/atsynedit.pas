@@ -154,10 +154,7 @@ type
     cResultCaretTop,         //Caret(s) pos/selection was changed. Scroll to the first caret.
     cResultCaretRight,       //Caret(s) pos/selection was changed. Scroll to the most right caret.
     cResultCaretBottom,      //Caret(s) pos/selection was changed. Scroll to the last caret.
-    cResultCaretLeftLazy,    //xxxLazy is the same as xxx, but scrolls only if no carets are left in visible area.
-    cResultCaretTopLazy,     //
-    cResultCaretRightLazy,   //
-    cResultCaretBottomLazy,  //
+    cResultCaretLazy,  //Additional to CaretLeft/CaretRight/CaretTop/CaretBottom, scrolls only if no carets are left in visible area.
     cResultKeepColumnSel,    //Restore previous column selection, if command changed it.
     cResultScroll,           //Some scrolling was made.
     cResultUndoRedo,         //Undo or Redo action was made.
@@ -861,6 +858,7 @@ type
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
+    function IsCaretOnVisibleRect: boolean;
     procedure SetOptShowURLsRegex(const AValue: string);
     procedure SetShowOsBarVert(AValue: boolean);
     procedure SetShowOsBarHorz(AValue: boolean);

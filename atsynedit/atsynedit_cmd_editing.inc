@@ -92,9 +92,8 @@ begin
       Strings.EndUndoGroup;
   end;
 
-  Result:= [cResultText,
-    cResultCaretBottomLazy //changed for issue #3065
-    ];
+  //changed for issue CudaText#3065
+  Result:= [cResultText, cResultCaretBottom, cResultCaretLazy];
 end;
 
 function TATSynEdit.DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
@@ -205,9 +204,8 @@ begin
 
   if bNeedGroup then Strings.EndUndoGroup;
 
-  Result:= [cResultText,
-    cResultCaretTopLazy //changed for issue #3065
-    ];
+  //changed for issue CudaText#3065
+  Result:= [cResultText, cResultCaretTop, cResultCaretLazy];
 end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;

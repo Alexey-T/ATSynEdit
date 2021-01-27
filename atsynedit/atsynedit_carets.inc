@@ -1100,6 +1100,15 @@ begin
 end;
 
 
+function TATSynEdit.IsCaretOnVisibleRect: boolean;
+begin
+  //must refresh carets' CoordX/CoordY first, otherwise 1st carets' move out of
+  //visible rect will not be detected
+  UpdateCaretsCoords;
+
+  Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
+end;
+
 { TATCaretProps }
 
 procedure TATCaretProps.Assign(Obj: TATCaretProps);
