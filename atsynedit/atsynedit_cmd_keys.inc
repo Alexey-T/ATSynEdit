@@ -96,11 +96,13 @@ var
   bMultiCarets: boolean;
   i: integer;
 begin
-  // changed because of issue #3065
-  //Result:= [cResultCaretLeft];
-  Result:= [cResultCaretAny];
-
   bMultiCarets:= FCarets.Count>1;
+
+  //changed because of issue #3065
+  if not bMultiCarets then
+    Result:= [cResultCaretLeft]
+  else
+    Result:= [cResultCaretAny];
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -134,11 +136,13 @@ var
   bMultiCarets: boolean;
   i: integer;
 begin
-  // changed because of issue #3065
-  //Result:= [cResultCaretRight];
-  Result:= [cResultCaretAny];
-
   bMultiCarets:= FCarets.Count>1;
+
+  //changed because of issue #3065
+  if not bMultiCarets then
+    Result:= [cResultCaretRight]
+  else
+    Result:= [cResultCaretAny];
 
   for i:= 0 to FCarets.Count-1 do
   begin
