@@ -154,7 +154,7 @@ type
     cResultCaretTop,         //Caret(s) pos/selection was changed. Scroll to the first caret.
     cResultCaretRight,       //Caret(s) pos/selection was changed. Scroll to the most right caret.
     cResultCaretBottom,      //Caret(s) pos/selection was changed. Scroll to the last caret.
-    cResultCaretLeftLazy,    //XxxxLazy is the same as Xxxx, but scrolls only if no carets are in visible rect
+    cResultCaretLeftLazy,    //xxxLazy is the same as xxx, but scrolls only if no carets are left in visible area.
     cResultCaretTopLazy,     //
     cResultCaretRightLazy,   //
     cResultCaretBottomLazy,  //
