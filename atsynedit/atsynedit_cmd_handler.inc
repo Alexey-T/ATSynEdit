@@ -128,6 +128,9 @@ procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
   //
   function IsAnyCaretVisible: boolean;
   begin
+    //must refresh carets' CoordX/CoordY first, otherwise 1st carets' move out of
+    //visible rect will not be detected
+    UpdateCaretsCoords;
     Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
   end;
   //
