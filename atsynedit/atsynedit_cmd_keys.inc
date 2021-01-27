@@ -393,14 +393,11 @@ begin
     end;
   end;
 
-  {
-  if AJump=cWordjumpToPrev then
-    Result:= [cResultCaretTop]
-  else
-    Result:= [cResultCaretBottom];
-    }
   //changed because of issue #3065
-  Result:= [cResultCaretAny];
+  if AJump=cWordjumpToPrev then
+    Result:= [cResultCaretTopLazy]
+  else
+    Result:= [cResultCaretBottomLazy];
 end;
 
 function TATSynEdit.DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;

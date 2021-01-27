@@ -93,8 +93,7 @@ begin
   end;
 
   Result:= [cResultText,
-    //cResultCaretBottom //changed for issue #3065
-    cResultCaretAny
+    cResultCaretBottomLazy //changed for issue #3065
     ];
 end;
 
@@ -207,8 +206,7 @@ begin
   if bNeedGroup then Strings.EndUndoGroup;
 
   Result:= [cResultText,
-    //cResultCaretTop //changed for issue #3065
-    cResultCaretAny
+    cResultCaretTopLazy //changed for issue #3065
     ];
 end;
 
