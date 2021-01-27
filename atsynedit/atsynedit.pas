@@ -154,6 +154,10 @@ type
     cResultCaretTop,         //Caret(s) pos/selection was changed. Scroll to the first caret.
     cResultCaretRight,       //Caret(s) pos/selection was changed. Scroll to the most right caret.
     cResultCaretBottom,      //Caret(s) pos/selection was changed. Scroll to the last caret.
+    cResultCaretLeftLazy,    //XxxxLazy is the same as Xxxx, but scrolls only if no carets are in visible rect
+    cResultCaretTopLazy,     //
+    cResultCaretRightLazy,   //
+    cResultCaretBottomLazy,  //
     cResultKeepColumnSel,    //Restore previous column selection, if command changed it.
     cResultScroll,           //Some scrolling was made.
     cResultUndoRedo,         //Undo or Redo action was made.

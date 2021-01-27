@@ -102,7 +102,7 @@ begin
   if not bMultiCarets then
     Result:= [cResultCaretLeft]
   else
-    Result:= [cResultCaretAny];
+    Result:= [cResultCaretLeftLazy];
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -142,7 +142,7 @@ begin
   if not bMultiCarets then
     Result:= [cResultCaretRight]
   else
-    Result:= [cResultCaretAny];
+    Result:= [cResultCaretRightLazy];
 
   for i:= 0 to FCarets.Count-1 do
   begin

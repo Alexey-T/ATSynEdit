@@ -11,6 +11,7 @@ interface
 
 uses
   Classes, SysUtils,
+  LCLIntf,
   ATStringProc,
   ATStringProc_Separator;
 
@@ -134,6 +135,7 @@ type
     function IsLineListed(APosY: integer): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
+    function IsAnyCaretInVisibleRect(const R: TRect): boolean;
     procedure GetSelections(var D: TATCaretSelections);
     function CaretAtEdge(AEdge: TATCaretEdge): TPoint;
     function DebugText: string;
@@ -750,6 +752,23 @@ begin
     if Items[i].EndY>=0 then
       exit(true);
   Result:= false;
+end;
+
+function TATCarets.IsAnyCaretInVisibleRect(const R: TRect): boolean;
+var
+  Caret: TATCaretItem;
+  Pnt: TPoint;
+  i: integer;
+begin
+  Result:= false;
+  for i:= 0 to Count-1 do
+  begin
+    Caret:= Items[i];
+    Pnt.X:= Caret.CoordX;
+    Pnt.Y:= Caret.CoordY;
+    if PtInRect(R, Pnt) then
+      exit(true);
+  end;
 end;
 
 

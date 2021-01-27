@@ -116,11 +116,21 @@ begin
     cResultCaretLeft,
     cResultCaretRight,
     cResultCaretTop,
-    cResultCaretBottom
+    cResultCaretBottom,
+    cResultCaretLeftLazy,
+    cResultCaretRightLazy,
+    cResultCaretTopLazy,
+    cResultCaretBottomLazy
     ] <> [];
 end;
 
 procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
+  //
+  function IsAnyCaretVisible: boolean;
+  begin
+    Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
+  end;
+  //
 var
   Caret: TATCaretItem;
   bTextChanged: boolean;
@@ -181,7 +191,29 @@ begin
       DoGotoCaret(cEdgeLeft, bUndoRedo, false, false)
     else
     if cResultCaretRight in Res then
-      DoGotoCaret(cEdgeRight, bUndoRedo, false, false);
+      DoGotoCaret(cEdgeRight, bUndoRedo, false, false)
+    else
+    if cResultCaretTopLazy in Res then
+    begin
+      if not IsAnyCaretVisible then
+        DoGotoCaret(cEdgeTop, bUndoRedo, false, false);
+    end
+    else
+    if cResultCaretBottomLazy in Res then
+    begin
+      if not IsAnyCaretVisible then
+        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false);
+    end;
+    if cResultCaretLeftLazy in Res then
+    begin
+      if not IsAnyCaretVisible then
+        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false);
+    end;
+    if cResultCaretRightLazy in Res then
+    begin
+      if not IsAnyCaretVisible then
+        DoGotoCaret(cEdgeRight, bUndoRedo, false, false);
+    end;
 
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
