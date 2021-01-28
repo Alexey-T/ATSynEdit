@@ -4702,7 +4702,6 @@ var
 begin
   if not HandleAllocated then exit;
 
-  NLine:= -1;
   if not FPaintStarted then
   begin
     FPaintStarted:= true;
@@ -4715,7 +4714,7 @@ begin
     end;
   end;
 
-  PaintEx(NLine);
+  PaintEx(-1);
 end;
 
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
