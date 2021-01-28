@@ -2004,9 +2004,9 @@ begin
   //to fix this issue, let's not Exit "if not HandleAllocated",
   //but handle this in GetCharSize(), via GetDC(0)
 
-  {
-  if not HandleAllocated then exit;
-  }
+  if not HandleAllocated then
+    if FWrapMode<>cWrapOff then
+      exit;
 
   //must init FRect* if called before first paint (wrapped items need it)
   if FRectMain.Width=0 then
