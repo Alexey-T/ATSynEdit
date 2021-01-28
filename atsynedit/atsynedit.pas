@@ -564,6 +564,7 @@ type
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
     FLastLineOfSlowEvents: integer;
+    FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
@@ -4481,6 +4482,12 @@ procedure TATSynEdit.SetLineTop(AValue: integer);
 var
   NFrom, NTo, i: integer;
 begin
+  if not HandleAllocated then
+  begin
+    FLineTopTodo:= AValue;
+    exit;
+  end;
+
   if AValue<=0 then
   begin
     FScrollVert.SetZero;
@@ -4690,10 +4697,25 @@ end;
 
 
 procedure TATSynEdit.Paint;
+var
+  NLine: integer;
 begin
   if not HandleAllocated then exit;
-  FPaintStarted:= true;
-  PaintEx(-1);
+
+  NLine:= -1;
+  if not FPaintStarted then
+  begin
+    FPaintStarted:= true;
+    if FLineTopTodo>0 then
+    begin
+      NLine:= FLineTopTodo;
+      FLineTopTodo:= 0;
+      SetLineTop(NLine);
+      exit;
+    end;
+  end;
+
+  PaintEx(NLine);
 end;
 
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
