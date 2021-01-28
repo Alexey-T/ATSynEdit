@@ -1996,6 +1996,12 @@ begin
   //method can be called before 1st paint,
   //so TCanvas.TextWidth will give exception "Control has no parent window"
   //example: CudaText has user.json with "wrap_mode":1
+
+  //2021.01.29:
+  //check "if not HandleAllocated" stops the work, when passive file-tabs are
+  //trying to restore Ed.LineTop.
+  // https://github.com/Alexey-T/CudaText/issues/3112
+  //TOFIX!!
   if not HandleAllocated then exit;
 
   //must init FRect* if called before first paint (wrapped items need it)
