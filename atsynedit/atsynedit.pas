@@ -1994,15 +1994,19 @@ var
   i, j: integer;
 begin
   //method can be called before 1st paint,
-  //so TCanvas.TextWidth will give exception "Control has no parent window"
+  //so TCanvas.TextWidth (TATSynEdit.GetCharSize) will give exception "Control has no parent window"
   //example: CudaText has user.json with "wrap_mode":1
 
   //2021.01.29:
   //check "if not HandleAllocated" stops the work, when passive file-tabs are
   //trying to restore Ed.LineTop.
   // https://github.com/Alexey-T/CudaText/issues/3112
-  //TOFIX!!
+  //to fix this issue, let's not Exit "if not HandleAllocated",
+  //but handle this in GetCharSize(), via GetDC(0)
+
+  {
   if not HandleAllocated then exit;
+  }
 
   //must init FRect* if called before first paint (wrapped items need it)
   if FRectMain.Width=0 then
@@ -2721,10 +2725,28 @@ begin
 end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
+const
+  Sample: string = 'N'; //char 'M' is not ok, it's too wide for var-width fonts
 var
   Size: TSize;
+  TempC: TCanvas;
 begin
-  Size:= C.TextExtent('N'); // 'M' is not ok, it's too wide for var-width fonts
+  if C.HandleAllocated then
+  begin
+    Size:= C.TextExtent(Sample);
+  end
+  else
+  begin
+    TempC:= TCanvas.Create;
+    try
+      TempC.Handle:= GetDC(0);
+      TempC.Font.Assign(Self.Font);
+      Size:= TempC.TextExtent(Sample);
+    finally
+      FreeAndNil(TempC);
+    end;
+  end;
+
   Result.X:= Max(1, Size.cx + ACharSpacing.X);
   Result.Y:= Max(1, Size.cy + ACharSpacing.Y);
 end;
