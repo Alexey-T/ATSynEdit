@@ -4493,6 +4493,13 @@ begin
   //this is required for restoring LineTop for n tabs, on opening CudaText.
   UpdateWrapInfo;
 
+  if FWrapInfo.Count=0 then
+  begin
+    FScrollVert.SetZero;
+    Update;
+    Exit
+  end;
+
   //find exact match
   FWrapInfo.FindIndexesOfLineNumber(AValue, NFrom, NTo);
   if NFrom>=0 then
