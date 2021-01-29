@@ -3777,10 +3777,15 @@ function TATSynEdit.GetLineTop: integer;
 var
   N: integer;
 begin
+  if FLineTopTodo>0 then
+    exit(FLineTopTodo);
   Result:= 0;
-  N:= Max(0, FScrollVert.NPos);
-  if FWrapInfo.IsIndexValid(N) then
-    Result:= FWrapInfo[N].NLineIndex;
+  if FWrapInfo.Count>0 then
+  begin
+    N:= Max(0, FScrollVert.NPos);
+    if FWrapInfo.IsIndexValid(N) then
+      Result:= FWrapInfo[N].NLineIndex;
+  end;
 end;
 
 function TATSynEdit.GetColumnLeft: integer;
