@@ -2032,7 +2032,7 @@ begin
     FWrapUpdateNeeded:= true
   else
   if (not FWrapUpdateNeeded) and
-    (FWrapMode=cWrapOn) and
+    (FWrapMode<>cWrapOff) and
     (FPrevVisibleColumns<>NNewVisibleColumns) then
     FWrapUpdateNeeded:= true;
 
