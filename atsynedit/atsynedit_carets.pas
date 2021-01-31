@@ -103,6 +103,8 @@ type
   { TATCarets }
 
   TATCarets = class
+  private const
+    AllowSelectionsTouch = true;
   private
     FList: TFPList;
     FManyAllowed: boolean;
@@ -834,8 +836,12 @@ begin
     SwapInt(OutPosY, OutEndY);
   end;
 
-  if IsPosSorted(XMax1, YMax1, XMin2, YMin2, false) then Exit; //ranges not overlap [x1, y1]...[x2, y2]
-  if IsPosSorted(XMax2, YMax2, XMin1, YMin1, false) then Exit; //ranges not overlap [x2, y2]...[x1, y1]
+  if IsPosSorted(XMax1, YMax1, XMin2, YMin2, AllowSelectionsTouch) then
+    Exit; //ranges not overlap [x1, y1]...[x2, y2]
+
+  if IsPosSorted(XMax2, YMax2, XMin1, YMin1, AllowSelectionsTouch) then
+    Exit; //ranges not overlap [x2, y2]...[x1, y1]
+
   Result:= true; //ranges overlap
 end;
 
