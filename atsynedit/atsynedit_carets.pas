@@ -110,7 +110,7 @@ type
     FOnCaretChanged: TNotifyEvent;
     function GetItem(N: integer): TATCaretItem;
     procedure DeleteDups(AJoinAdjacentCarets: boolean);
-    function IsJoinNeeded(N1, N2: integer;
+    function IsJoinNeeded(AIndex1, AIndex2: integer;
       out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
     function GetAsArray: TATPointArray;
     procedure SetAsArray(const Res: TATPointArray);
@@ -788,7 +788,7 @@ begin
       Result:= Point(PosX, PosY);
 end;
 
-function TATCarets.IsJoinNeeded(N1, N2: integer;
+function TATCarets.IsJoinNeeded(AIndex1, AIndex2: integer;
   out OutPosX, OutPosY, OutEndX, OutEndY: integer): boolean;
 var
   Item1, Item2: TATCaretItem;
@@ -796,11 +796,11 @@ var
   Sel1, Sel2: boolean;
 begin
   Result:= false;
-  if not IsIndexValid(N1) then Exit;
-  if not IsIndexValid(N2) then Exit;
+  if not IsIndexValid(AIndex1) then Exit;
+  if not IsIndexValid(AIndex2) then Exit;
 
-  Item1:= Items[N1];
-  Item2:= Items[N2];
+  Item1:= Items[AIndex1];
+  Item2:= Items[AIndex2];
   Item1.GetRange(XMin1, YMin1, XMax1, YMax1, Sel1);
   Item2.GetRange(XMin2, YMin2, XMax2, YMax2, Sel2);
 
