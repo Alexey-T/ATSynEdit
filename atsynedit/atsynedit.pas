@@ -847,6 +847,7 @@ type
     FOptZebraActive: boolean;
     FOptZebraStep: integer;
     FOptZebraAlphaBlend: byte;
+    FOptAtomicFileSave: boolean;
 
     //
     procedure ClearSelRectPoints;
@@ -1325,6 +1326,7 @@ type
     property FileName: string read FFileName write FFileName;
     procedure LoadFromFile(const AFilename: string; AKeepScroll: boolean=false); virtual;
     procedure SaveToFile(const AFilename: string); virtual;
+    property OptAtomicFileSave: boolean read FOptAtomicFileSave write FOptAtomicFileSave;
     //cmd
     procedure TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean);
