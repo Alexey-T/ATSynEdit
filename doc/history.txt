@@ -1,4 +1,7 @@
 
+2021.02.06
++ add: OptDimUnfocusedBack (0..255, 0: don't change)
+
 2021.01.24
 * change: refactored all code in atstringproc_htmlcolor unit, all funcs are moved into class
 
