@@ -3968,6 +3968,8 @@ begin
   FWrapEnabledForMaxLines:= cInitWrapEnabledForMaxLines;
 
   FMicromap:= TATMicromap.Create;
+  FMicromapVisible:= cInitMicromapVisible;
+  FMicromapScaleDiv:= 1;
   FMicromapShowForMinCount:= cInitMicromapShowForMinCount;
 
   FOverwrite:= false;
@@ -4068,8 +4070,6 @@ begin
   FMinimapTooltipWidthPercents:= cInitMinimapTooltipWidthPercents;
   FMinimapCachedPainting:= true;
   FMinimapHiliteLinesWithSelection:= true;
-
-  FMicromapVisible:= cInitMicromapVisible;
 
   FCharSpacingText:= Point(0, cInitSpacingText);
   FCharSizeMinimap:= Point(1, 2);
