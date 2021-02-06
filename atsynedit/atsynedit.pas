@@ -3546,7 +3546,7 @@ begin
     OffsetRect(R, -FRectMinimap.Left, -FRectMinimap.Top);
 
     // https://forum.lazarus.freepascal.org/index.php/topic,51383.msg377195.html#msg377195
-    if _IsColorDark(Colors.TextBG) then
+    if _IsColorDark(FColorBG) then
       rColor.FromRGB(255, 255, 255, FMinimapSelColorChange*255 div 100)
     else
       rColor.FromRGB(0, 0, 0, FMinimapSelColorChange*255 div 100);
@@ -4675,7 +4675,7 @@ var
   NValue: integer;
   Bmp: TGraphic;
 begin
-  C.Brush.Color:= Colors.TextBG;
+  C.Brush.Color:= FColorBG;
   C.FillRect(ClientRect);
 
   if Strings.ProgressKind<>cStringsProgressSaving then
