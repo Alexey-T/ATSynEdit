@@ -317,7 +317,7 @@ const
   cInitMaxLineLenToCalcURL = 300;
   cInitStapleHiliteAlpha = 180;
   cInitZebraAlphaBlend = 235;
-  cInitDimUnfocusedBack = 12;
+  cInitDimUnfocusedBack = 0;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
