@@ -4615,7 +4615,7 @@ begin
     FColorBG:= Colors.TextBG;
     if FOptDimUnfocusedBack>0 then
       if not _IsFocused then
-        FColorBG:= ColorBlend(FColorFont, FColorBG, FOptDimUnfocusedBack);
+        FColorBG:= ColorBlend(clBlack{FColorFont}, FColorBG, FOptDimUnfocusedBack);
   end
   else
   begin
