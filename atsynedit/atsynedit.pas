@@ -317,7 +317,7 @@ const
   cInitMaxLineLenToCalcURL = 300;
   cInitStapleHiliteAlpha = 180;
   cInitZebraAlphaBlend = 235;
-  cInitDimUnfocusedBack = 50;
+  cInitDimUnfocusedBack = 12;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
@@ -4613,6 +4613,9 @@ begin
   begin
     FColorFont:= Colors.TextFont;
     FColorBG:= Colors.TextBG;
+    if FOptDimUnfocusedBack>0 then
+      if not _IsFocused then
+        FColorBG:= ColorBlend(FColorFont, FColorBG, FOptDimUnfocusedBack);
   end
   else
   begin
