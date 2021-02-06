@@ -317,6 +317,7 @@ const
   cInitMaxLineLenToCalcURL = 300;
   cInitStapleHiliteAlpha = 180;
   cInitZebraAlphaBlend = 235;
+  cInitDimUnfocusedBack = 50;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
@@ -847,6 +848,7 @@ type
     FOptZebraActive: boolean;
     FOptZebraStep: integer;
     FOptZebraAlphaBlend: byte;
+    FOptDimUnfocusedBack: integer;
 
     //
     procedure ClearSelRectPoints;
@@ -1761,6 +1763,7 @@ type
     property OptZebraActive: boolean read FOptZebraActive write FOptZebraActive default false;
     property OptZebraStep: integer read FOptZebraStep write FOptZebraStep default 2;
     property OptZebraAlphaBlend: byte read FOptZebraAlphaBlend write FOptZebraAlphaBlend default cInitZebraAlphaBlend;
+    property OptDimUnfocusedBack: integer read FOptDimUnfocusedBack write FOptDimUnfocusedBack default cInitDimUnfocusedBack;
   end;
 
 var
@@ -4187,6 +4190,7 @@ begin
   FOptZebraActive:= false;
   FOptZebraStep:= 2;
   FOptZebraAlphaBlend:= cInitZebraAlphaBlend;
+  FOptDimUnfocusedBack:= cInitDimUnfocusedBack;
 
   ClearMouseDownVariables;
   FMouseNiceScrollPos:= Point(0, 0);
