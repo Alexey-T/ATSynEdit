@@ -280,6 +280,7 @@ const
   cInitUndoMaxCarets = cInitUndoLimit;
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
+  cInitMicromapShowForMinCount = 2;
   cInitScrollbarHorzAddSpace = 2;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
@@ -678,6 +679,7 @@ type
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
     FMicromapScaleDiv: integer;
+    FMicromapShowForMinCount: integer;
     FFoldedMarkList: TATFoldedMarks;
     FFoldedMarkCurrent: TATFoldedMark;
     FFoldedMarkTooltip: TPanel;
@@ -1681,6 +1683,7 @@ type
     property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
+    property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
     property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
@@ -3631,6 +3634,10 @@ end;
 
 procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
 begin
+  if not ModeOneLine then
+    if (FMicromapShowForMinCount>0) and (Strings.Count<FMicromapShowForMinCount) then
+      exit;
+
   if Assigned(FOnDrawMicromap) then
     FOnDrawMicromap(Self, C, FRectMicromap)
   else
@@ -3961,6 +3968,7 @@ begin
   FWrapEnabledForMaxLines:= cInitWrapEnabledForMaxLines;
 
   FMicromap:= TATMicromap.Create;
+  FMicromapShowForMinCount:= cInitMicromapShowForMinCount;
 
   FOverwrite:= false;
   FTabSize:= cInitTabSize;
