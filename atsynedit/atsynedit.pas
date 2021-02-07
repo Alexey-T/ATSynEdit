@@ -3634,10 +3634,6 @@ end;
 
 procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
 begin
-  if not ModeOneLine then
-    if (FMicromapShowForMinCount>0) and (Strings.Count<FMicromapShowForMinCount) then
-      exit;
-
   if Assigned(FOnDrawMicromap) then
     FOnDrawMicromap(Self, C, FRectMicromap)
   else
