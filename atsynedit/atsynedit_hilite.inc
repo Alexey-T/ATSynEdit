@@ -56,7 +56,7 @@ begin
     begin
       FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
       FAdapterCache.Add(nLineIndex, nCharIndex, AParts, AColorAfter);
-      {$ifdef debug_show_fps}
+      {$ifdef debug_fps}
       Inc(FMissMain);
       {$endif}
     end;

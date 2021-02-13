@@ -1,6 +1,6 @@
 {$define use_bg} // Use BGRABitmap to render minimap
 
-{.$define debug_show_fps}
+{.$define debug_fps} // Show frames-per-second red indicator in editor top-right corner
 
 {$define atsynedit_cache}
 
