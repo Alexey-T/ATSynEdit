@@ -217,7 +217,7 @@ type
     cPageSizeHalf
     );
 
-  TATSynWrapMode = (
+  TATEditorWrapMode = (
     cWrapOff,
     cWrapOn,
     cWrapAtMargin,
@@ -435,7 +435,7 @@ type
 
   TATEditorTempOptions = record
     FontSize: integer;
-    WrapMode: TATSynWrapMode;
+    WrapMode: TATEditorWrapMode;
     ShowMinimap: boolean;
     ShowMicromap: boolean;
     ShowRuler: boolean;
@@ -609,7 +609,7 @@ type
     FWrapInfo: TATWrapInfo;
     FWrapTemps: TATWrapItems;
     FWrapColumn: integer;
-    FWrapMode: TATSynWrapMode;
+    FWrapMode: TATEditorWrapMode;
     FWrapUpdateNeeded: boolean;
     FWrapIndented: boolean;
     FWrapAddSpace: integer;
@@ -1097,7 +1097,7 @@ type
     procedure SetUndoAfterSave(AValue: boolean);
     procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
-    procedure SetWrapMode(AValue: TATSynWrapMode);
+    procedure SetWrapMode(AValue: TATEditorWrapMode);
     procedure SetWrapIndented(AValue: boolean);
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
@@ -1687,7 +1687,7 @@ type
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
-    property OptWrapMode: TATSynWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
+    property OptWrapMode: TATEditorWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
     property OptWrapAddSpace: integer read FWrapAddSpace write FWrapAddSpace default 1;
     property OptWrapEnabledForMaxLines: integer read FWrapEnabledForMaxLines write FWrapEnabledForMaxLines default cInitWrapEnabledForMaxLines;
@@ -2280,7 +2280,7 @@ begin
   Update(true);
 end;
 
-procedure TATSynEdit.SetWrapMode(AValue: TATSynWrapMode);
+procedure TATSynEdit.SetWrapMode(AValue: TATEditorWrapMode);
 var
   NLine: integer;
   Caret: TATCaretItem;
