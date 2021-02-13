@@ -232,12 +232,12 @@ type
     cNumbersRelative
     );
 
-  TATSynPaintFlag = (
-    cPaintUpdateBitmap,
-    cPaintUpdateResize,
-    cPaintUpdateCaretsCoords
+  TATEditorPaintFlag = (
+    cPntFlagBitmap,
+    cPntFlagResize,
+    cPntFlagCaretsCoords
     );
-  TATSynPaintFlags = set of TATSynPaintFlag;
+  TATEditorPaintFlags = set of TATEditorPaintFlag;
 
   { TATSynScrollInfo }
 
@@ -462,7 +462,7 @@ type
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
     FTimerNiceScroll: TTimer;
-    FPaintFlags: TATSynPaintFlags;
+    FPaintFlags: TATEditorPaintFlags;
     FPaintLocked: integer;
     FBitmap: TBitmap;
     FKeymap: TATKeymap;
@@ -985,9 +985,9 @@ type
     procedure TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray); inline;
     //paint
     procedure PaintEx(ALineNumber: integer);
-    function DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
+    function DoPaint(AFlags: TATEditorPaintFlags; ALineFrom: integer): boolean;
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
-    procedure DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
+    procedure DoPaintAllTo(C: TCanvas; AFlags: TATEditorPaintFlags; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
@@ -3904,7 +3904,7 @@ begin
   {$endif}
 
   FPaintLocked:= 0;
-  FPaintFlags:= [cPaintUpdateBitmap];
+  FPaintFlags:= [cPntFlagBitmap];
 
   FColors:= TATSynEditColors.Create;
   InitDefaultColors(FColors);
@@ -4310,7 +4310,7 @@ begin
     ////UpdateWrapInfo; //performed later
   end;
   if AUpdateCaretsCoords then
-    Include(FPaintFlags, cPaintUpdateCaretsCoords);
+    Include(FPaintFlags, cPntFlagCaretsCoords);
   Invalidate;
 end;
 
@@ -4616,7 +4616,7 @@ begin
   FAdapterCache.MaxSize:= N;
 end;
 
-procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATSynPaintFlags; ALineFrom: integer);
+procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATEditorPaintFlags; ALineFrom: integer);
 var
   NCaretX, NWidth: integer;
 begin
@@ -4640,7 +4640,7 @@ begin
 
   DoPaintMainTo(C, ALineFrom);
 
-  if cPaintUpdateCaretsCoords in AFlags then
+  if cPntFlagCaretsCoords in AFlags then
     UpdateCaretsCoords;
 
   if Carets.Count>0 then
@@ -4656,7 +4656,7 @@ begin
   DoPaintMarkersTo(C);
 end;
 
-function TATSynEdit.DoPaint(AFlags: TATSynPaintFlags; ALineFrom: integer): boolean;
+function TATSynEdit.DoPaint(AFlags: TATEditorPaintFlags; ALineFrom: integer): boolean;
 //gets True if one of scrollbars changed Visible state
 begin
   UpdateTabHelper;
@@ -4664,7 +4664,7 @@ begin
   if DoubleBuffered then
   begin
     if Assigned(FBitmap) then
-      if cPaintUpdateBitmap in AFlags then
+      if cPntFlagBitmap in AFlags then
       begin
         FBitmap.BeginUpdate(true);
         DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
@@ -4729,9 +4729,9 @@ begin
 
   FPaintWorking:= true;
   try
-    if cPaintUpdateResize in FPaintFlags then
+    if cPntFlagResize in FPaintFlags then
     begin
-      Exclude(FPaintFlags, cPaintUpdateResize);
+      Exclude(FPaintFlags, cPntFlagResize);
       if DoubleBuffered then
         if Assigned(FBitmap) then
           BitmapResizeBySteps(FBitmap, Width, Height, cStep, cStep);
@@ -4777,11 +4777,11 @@ begin
   //if scrollbars shown, paint again
   if DoPaint(FPaintFlags, ALineNumber) then
     DoPaint(FPaintFlags, ALineNumber);
-  Exclude(FPaintFlags, cPaintUpdateBitmap);
+  Exclude(FPaintFlags, cPntFlagBitmap);
 
     if DoubleBuffered then
     //buf mode: timer tick don't give painting of whole bitmap
-    //(cPaintUpdateBitmap off)
+    //(cPntFlagBitmap off)
     begin
       DoPaintCarets(FBitmap.Canvas, true);
     end
@@ -4813,11 +4813,11 @@ procedure TATSynEdit.Resize;
 begin
   inherited;
 
-  Include(FPaintFlags, cPaintUpdateResize);
+  Include(FPaintFlags, cPntFlagResize);
   if FWrapMode in [cWrapOn, cWrapAtWindowOrMargin] then
   begin
     FWrapUpdateNeeded:= true;
-    Include(FPaintFlags, cPaintUpdateCaretsCoords);
+    Include(FPaintFlags, cPntFlagCaretsCoords);
   end;
 
   if not FPaintStarted then exit;
@@ -5043,7 +5043,7 @@ end;
 
 procedure TATSynEdit.WMVScroll(var Msg: TLMVScroll);
 begin
-  Include(FPaintFlags, cPaintUpdateCaretsCoords);
+  Include(FPaintFlags, cPntFlagCaretsCoords);
   UpdateScrollInfoFromMessage(FScrollVert, Msg);
   Invalidate;
 end;
@@ -5082,7 +5082,7 @@ end;
 
 procedure TATSynEdit.WMHScroll(var Msg: TLMHScroll);
 begin
-  Include(FPaintFlags, cPaintUpdateCaretsCoords);
+  Include(FPaintFlags, cPntFlagCaretsCoords);
   UpdateScrollInfoFromMessage(FScrollHorz, Msg);
   Invalidate;
 end;
@@ -5994,7 +5994,7 @@ end;
 
 procedure TATSynEdit.Invalidate;
 begin
-  Include(FPaintFlags, cPaintUpdateBitmap);
+  Include(FPaintFlags, cPntFlagBitmap);
   inherited;
 end;
 
