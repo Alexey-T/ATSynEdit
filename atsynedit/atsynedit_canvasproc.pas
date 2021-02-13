@@ -266,12 +266,15 @@ end;
 {$else}
 function _TextOut_Unix(DC: HDC;
   X, Y: Integer;
-  Rect: PRect;
+  constref Rect: PRect;
   const Str: string;
   Dx: PInteger
   ): boolean; inline;
 begin
   //ETO_CLIPPED runs more code in TGtk2WidgetSet.ExtTextOut
+  //ETO_OPAQUE paints rect first, but it's needed
+  //  a) to fill tab-chars in selection (full width >1)
+  //  b) to fill inter-line 1px area
   Result:= ExtTextOut(DC, X, Y, {ETO_CLIPPED or} ETO_OPAQUE, Rect, PChar(Str), Length(Str), Dx);
 end;
 {$endif}
