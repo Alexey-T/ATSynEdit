@@ -63,7 +63,7 @@ type
     atkString
     );
 
-  TATSynEditScrollStyle = (
+  TATEditorScrollbarStyle = (
     aessHide,
     aessShow,
     aessAuto
@@ -718,8 +718,8 @@ type
     FOptMinLineLenToCalcURL: integer;
     FOptMaxLineLenToCalcURL: integer;
     FOptMaxLinesToCountUnindent: integer;
-    FOptScrollStyleVert: TATSynEditScrollStyle;
-    FOptScrollStyleHorz: TATSynEditScrollStyle;
+    FOptScrollStyleVert: TATEditorScrollbarStyle;
+    FOptScrollStyleHorz: TATEditorScrollbarStyle;
     FOptScrollSmooth: boolean;
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
@@ -1606,8 +1606,8 @@ type
     property OptLastLineOnTop: boolean read FOptLastLineOnTop write FOptLastLineOnTop default false;
     property OptOverwriteSel: boolean read FOptOverwriteSel write FOptOverwriteSel default true;
     property OptOverwriteAllowedOnPaste: boolean read FOptOverwriteAllowedOnPaste write FOptOverwriteAllowedOnPaste default false;
-    property OptScrollStyleHorz: TATSynEditScrollStyle read FOptScrollStyleHorz write FOptScrollStyleHorz default aessAuto;
-    property OptScrollStyleVert: TATSynEditScrollStyle read FOptScrollStyleVert write FOptScrollStyleVert default aessShow;
+    property OptScrollStyleHorz: TATEditorScrollbarStyle read FOptScrollStyleHorz write FOptScrollStyleHorz default aessAuto;
+    property OptScrollStyleVert: TATEditorScrollbarStyle read FOptScrollStyleVert write FOptScrollStyleVert default aessShow;
     property OptScrollSmooth: boolean read FOptScrollSmooth write FOptScrollSmooth default true;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
