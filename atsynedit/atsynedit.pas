@@ -234,6 +234,7 @@ type
 
   TATSynPaintFlag = (
     cPaintUpdateBitmap,
+    cPaintUpdateResize,
     cPaintUpdateCaretsCoords
     );
   TATSynPaintFlags = set of TATSynPaintFlag;
@@ -685,6 +686,7 @@ type
     FFoldedMarkTooltip: TPanel;
     FPaintCounter: integer;
     FPaintStarted: boolean;
+    FPaintWorking: boolean;
     {$ifdef debug_fps}
     FTickMinimap: QWord;
     FTickAll: QWord;
@@ -4718,24 +4720,39 @@ end;
 
 
 procedure TATSynEdit.Paint;
+const
+  cStep = 100;
 var
   NLine: integer;
 begin
   if not HandleAllocated then exit;
 
-  if not FPaintStarted then
-  begin
-    FPaintStarted:= true;
-    if FLineTopTodo>0 then
+  FPaintWorking:= true;
+  try
+    if cPaintUpdateResize in FPaintFlags then
     begin
-      NLine:= FLineTopTodo;
-      FLineTopTodo:= 0;
-      SetLineTop(NLine);
-      exit;
+      Exclude(FPaintFlags, cPaintUpdateResize);
+      if DoubleBuffered then
+        if Assigned(FBitmap) then
+          BitmapResizeBySteps(FBitmap, Width, Height, cStep, cStep);
     end;
-  end;
 
-  PaintEx(-1);
+    if not FPaintStarted then
+    begin
+      FPaintStarted:= true;
+      if FLineTopTodo>0 then
+      begin
+        NLine:= FLineTopTodo;
+        FLineTopTodo:= 0;
+        SetLineTop(NLine);
+        exit;
+      end;
+    end;
+
+    PaintEx(-1);
+  finally
+    FPaintWorking:= false;
+  end;
 end;
 
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
@@ -4793,25 +4810,10 @@ begin
 end;
 
 procedure TATSynEdit.Resize;
-const
-  cStep = 200; //resize bitmap by N pixels step
-var
-  SizeX, SizeY: integer;
 begin
   inherited;
 
-  if DoubleBuffered then
-    if Assigned(FBitmap) then
-    begin
-      SizeX:= (Width div cStep + 1)*cStep;
-      SizeY:= (Height div cStep + 1)*cStep;
-      if (SizeX>FBitmap.Width) or (SizeY>FBitmap.Height) then
-      begin
-        FBitmap.SetSize(SizeX, SizeY);
-        FBitmap.FreeImage; //recommended, else seen black bitmap on bigsize
-      end;
-    end;
-
+  Include(FPaintFlags, cPaintUpdateResize);
   if FWrapMode in [cWrapOn, cWrapAtWindowOrMargin] then
   begin
     FWrapUpdateNeeded:= true;
@@ -4819,11 +4821,6 @@ begin
   end;
 
   if not FPaintStarted then exit;
-
-  {
-  Include(FPaintFlags, cPaintUpdateBitmap);
-  PaintEx(LineTop);
-  }
   Invalidate;
 end;
 
