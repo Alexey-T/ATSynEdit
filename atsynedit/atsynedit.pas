@@ -4721,8 +4721,6 @@ end;
 
 
 procedure TATSynEdit.Paint;
-const
-  cStep = 100;
 var
   NLine: integer;
 begin
@@ -4735,7 +4733,7 @@ begin
       Exclude(FPaintFlags, cIntFlagResize);
       if DoubleBuffered then
         if Assigned(FBitmap) then
-          BitmapResizeBySteps(FBitmap, Width, Height, cStep, cStep);
+          BitmapResizeBySteps(FBitmap, Width, Height);
     end;
 
     if not FPaintStarted then
