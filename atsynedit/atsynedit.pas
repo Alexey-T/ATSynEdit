@@ -211,7 +211,7 @@ type
     cIndentToOpeningBracket
     );
 
-  TATPageUpDownSize = (
+  TATEditorPageDownSize = (
     cPageSizeFull,
     cPageSizeFullMinus1,
     cPageSizeHalf
@@ -837,7 +837,7 @@ type
     FOptMouseWheelScrollHorzWithState: TShiftStateEnum;
     FOptMouseWheelZooms: boolean;
     FOptMouseWheelZoomsWithState: TShiftStateEnum;
-    FOptKeyPageUpDownSize: TATPageUpDownSize;
+    FOptKeyPageUpDownSize: TATEditorPageDownSize;
     FOptKeyLeftRightGoToNextLineWithCarets: boolean;
     FOptKeyLeftRightSwapSel: boolean;
     FOptKeyLeftRightSwapSelAndSelect: boolean;
@@ -1738,7 +1738,7 @@ type
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
     property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn default true;
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped default true;
-    property OptKeyPageUpDownSize: TATPageUpDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize default cPageSizeFullMinus1;
+    property OptKeyPageUpDownSize: TATEditorPageDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize default cPageSizeFullMinus1;
     property OptKeyLeftRightGoToNextLineWithCarets: boolean read FOptKeyLeftRightGoToNextLineWithCarets write FOptKeyLeftRightGoToNextLineWithCarets default true;
     property OptKeyLeftRightSwapSel: boolean read FOptKeyLeftRightSwapSel write FOptKeyLeftRightSwapSel default true;
     property OptKeyLeftRightSwapSelAndSelect: boolean read FOptKeyLeftRightSwapSelAndSelect write FOptKeyLeftRightSwapSelAndSelect default false;
