@@ -49,9 +49,9 @@ begin
   NCmd:= GetCommandFromKey(Key, Shift);
   if NCmd>0 then
   begin
-    DoPaintModeStatic;
+    TimerBlinkDisable;
     DoCommand(NCmd);
-    DoPaintModeBlinking;
+    TimerBlickEnable;
   end;
 end;
 
@@ -75,9 +75,9 @@ begin
     if not Allow then Exit;
   end;
 
-  DoPaintModeStatic;
+  TimerBlinkDisable;
   DoCommand(cCommand_TextInsert, Str);
-  DoPaintModeBlinking;
+  TimerBlickEnable;
 
   Utf8Key:= '';
 end;

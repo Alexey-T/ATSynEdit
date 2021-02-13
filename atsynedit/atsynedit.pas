@@ -276,6 +276,7 @@ type
   end;
 
 const
+  cUsePaintStatic = true;
   cMaxIndentVert = 100;
   cInitUndoLimit = 5000;
   cInitUndoMaxCarets = cInitUndoLimit;
@@ -1016,8 +1017,8 @@ type
       APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
-    procedure DoPaintModeStatic;
-    procedure DoPaintModeBlinking;
+    procedure TimerBlinkDisable;
+    procedure TimerBlickEnable;
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
       const AVisRect: TRect; APointLeft, APointText: TPoint;
       const AWrapItem: TATWrapItem; ALineWidth: integer;
@@ -4253,7 +4254,7 @@ begin
     FreeAndNil(FHintWnd);
   if Assigned(FMenuStd) then
     FreeAndNil(FMenuStd);
-  DoPaintModeStatic;
+  TimerBlinkDisable;
   if Assigned(FFoldedMarkList) then
   begin
     FFoldedMarkList.Clear;
@@ -4339,7 +4340,7 @@ end;
 
 procedure TATSynEdit.LoadFromFile(const AFilename: string; AKeepScroll: boolean=false);
 begin
-  DoPaintModeStatic;
+  TimerBlinkDisable;
 
   FCarets.Clear;
   FCarets.Add(0, 0);
@@ -4364,7 +4365,7 @@ begin
   end;
 
   Update;
-  DoPaintModeBlinking;
+  TimerBlickEnable;
   DoEventChange(false); //calling OnChange makes almost no sense on opening file
   //DoEventCarets; //calling OnChangeCaretPos makes little sense on opening file
 end;
@@ -6226,15 +6227,19 @@ begin
   //InvalidateRect(Handle, @R, false);
 end;
 
-procedure TATSynEdit.DoPaintModeStatic;
+procedure TATSynEdit.TimerBlinkDisable;
 begin
-  FTimerBlink.Enabled:= false;
+  if cUsePaintStatic then
+    FTimerBlink.Enabled:= false;
 end;
 
-procedure TATSynEdit.DoPaintModeBlinking;
+procedure TATSynEdit.TimerBlickEnable;
 begin
-  FTimerBlink.Enabled:= false;
-  FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;
+  if cUsePaintStatic then
+  begin
+    FTimerBlink.Enabled:= false;
+    FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;
+  end;
 end;
 
 
