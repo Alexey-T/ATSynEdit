@@ -2,7 +2,7 @@
 
 {.$define debug_fps} // Show frames-per-second red indicator in editor top-right corner
 
-{$define atsynedit_cache}
+{$define atsynedit_cache} // Use FAdapterCache, ie caching of colored lines
 
 {.$define debug_findwrapindex}
 
