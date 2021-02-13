@@ -4,7 +4,7 @@ function TATSynEdit.DoCommand_KeyHome: TATCommandResults;
 var
   Caret: TATCaretItem;
   Pnt: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
   NLine, NIndent, NWrapped, i: integer;
 begin
   for i:= 0 to FCarets.Count-1 do
@@ -49,7 +49,7 @@ var
   Caret: TATCaretItem;
   Pnt: TPoint;
   NLine, NLenTotal, NLen, NWrapped, i: integer;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -216,7 +216,7 @@ function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer)
 var
   Caret: TATCaretItem;
   Pnt: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
   NWrapIndex, i: integer;
 const
   cGapActions: array[boolean] of TATGapCoordAction =
@@ -420,7 +420,7 @@ const
 var
   R: TRect;
   P: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   Result:= [];
 

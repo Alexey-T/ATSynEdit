@@ -62,7 +62,7 @@ end;
 procedure TATSynEdit.DoCaretsColumnToPoint(AX, AY: integer);
 var
   P, PM1, PM2: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   DoCaretSingleAsIs;
   with Carets[0] do
@@ -252,7 +252,7 @@ function _DoClientPosToCaretPos(
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   AVirtualPos: boolean;
-  out ADetails: TATPosDetails;
+  out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATGapCoordAction;
   AAfterEofUsesLastLen: boolean;
   AEditorIndex: integer): TPoint;
@@ -412,7 +412,7 @@ begin
 end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TPoint;
-  out ADetails: TATPosDetails;
+  out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATGapCoordAction = cGapCoordToLineEnd): TPoint; inline;
 begin
   Result:= _DoClientPosToCaretPos(P,
@@ -1046,7 +1046,7 @@ function TATSynEdit.DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
 var
   Caret: TATCaretItem;
   Pnt: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
   i: integer;
 begin
   Result:= false;

@@ -346,7 +346,7 @@ procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
 var
   Coord1, Coord2: TPoint;
   LineCoord1, LineCoord2: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
   Y, YMin, YMax: integer;
 begin
   Coord1:= CaretPosToClientPos(P1);

@@ -76,7 +76,7 @@ type
     mcaGotoDefinition
     );
 
-  TATPosDetails = record
+  TATEditorPosDetails = record
     EndOfWrappedLine: boolean;
     OnGapItem: TATGapItem;
     OnGapPos: TPoint;
@@ -1345,7 +1345,7 @@ type
     procedure DoCaretForceShow;
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint;
-      out ADetails: TATPosDetails;
+      out ADetails: TATEditorPosDetails;
       AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
@@ -5090,7 +5090,7 @@ end;
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
   PCaret: TPoint;
-  PosDetails: TATPosDetails;
+  PosDetails: TATEditorPosDetails;
   Index: integer;
   ActionId: TATMouseActionId;
   bClickOnSelection: boolean;
@@ -5298,7 +5298,7 @@ var
   bCopySelection: boolean;
   Str: atString;
   Caret: TATCaretItem;
-  PosDetails: TATPosDetails;
+  PosDetails: TATEditorPosDetails;
   PntCaret: TPoint;
 begin
   if not OptMouseEnableAll then exit;
@@ -5510,7 +5510,7 @@ var
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
   bMovedMinimal: boolean;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
   nIndex: integer;
   Caret: TATCaretItem;
 begin
@@ -5980,7 +5980,7 @@ end;
 procedure TATSynEdit.DoSelect_Line_ByClick;
 var
   P: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   P:= ScreenToClient(Mouse.CursorPos);
   if PtInRect(FRectMain, P) then
@@ -6045,7 +6045,7 @@ procedure TATSynEdit.TimerScrollTick(Sender: TObject);
 var
   nIndex: integer;
   PClient, PCaret: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   PClient:= ScreenToClient(Mouse.CursorPos);
   PClient.X:= Max(FRectMain.Left, PClient.X);
@@ -6202,7 +6202,7 @@ end;
 
 procedure TATSynEdit.DoPaintMarkerOfDragDrop(C: TCanvas);
 var
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
   P: TPoint;
   R: TRect;
 begin
@@ -6637,7 +6637,7 @@ var
   bSel: boolean;
   Str: atString;
   Relation: TATPosRelation;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   if Carets.Count<>1 then Exit; //allow only 1 caret
   Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
@@ -7616,7 +7616,7 @@ procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
 var
   SText: atString;
   Pnt: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   if not (Source is TATSynEdit) then exit;
   if (Source=Self) then exit;

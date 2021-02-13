@@ -317,7 +317,7 @@ var
   Pnt: TPoint;
   NLine: integer;
   IntList: TATIntArray;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
   Rng: PATSynRange;
   mi: TMenuItem;
   i: integer;

@@ -31,7 +31,7 @@ var
   bDown: boolean;
   YMax, i: integer;
   Pnt: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   if AY<0 then exit;
   bDown:= ALineDelta>0;
