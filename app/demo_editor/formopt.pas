@@ -396,7 +396,7 @@ begin
 
       //gutter
       //ed.OptNumbersFontSizePercents:= edNumSize.Value;
-      ed.OptNumbersStyle:= TATSynNumbersStyle(edNumStyle.ItemIndex);
+      ed.OptNumbersStyle:= TATEditorNumbersStyle(edNumStyle.ItemIndex);
       ed.OptNumbersAlignment:= TAlignment(edNumAlign.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
@@ -437,7 +437,7 @@ begin
       ed.OptKeyUpDownKeepColumn:= chkKeepCol.Checked;
       ed.OptKeyUpDownNavigateWrapped:= chkNavUpDown.Checked;
       ed.OptKeyHomeEndNavigateWrapped:= chkNavHomeEnd.Checked;
-      ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPageSize.ItemIndex);
+      ed.OptKeyPageUpDownSize:= TATEditorPageDownSize(edPageSize.ItemIndex);
       ed.OptKeyLeftRightSwapSel:= chkLeftRtSwap.Checked;
       ed.OptKeyLeftRightSwapSelAndSelect:= chkLeftRtSwapAndSel.Checked;
       ed.OptKeyHomeToNonSpace:= chkHomeNonspace.Checked;
