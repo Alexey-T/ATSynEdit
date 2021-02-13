@@ -3939,8 +3939,7 @@ begin
 
   FBitmap:= Graphics.TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
-  FBitmap.Width:= cInitBitmapWidth;
-  FBitmap.Height:= cInitBitmapHeight;
+  FBitmap.SetSize(cInitBitmapWidth, cInitBitmapHeight);
 
   FOptUndoLimit:= cInitUndoLimit;
   FStringsExternal:= nil;
