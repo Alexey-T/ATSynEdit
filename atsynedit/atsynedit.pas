@@ -107,7 +107,7 @@ type
 
   TATMouseActions = array of TATMouseActionRecord;
 
-  TATDirection = (
+  TATEditorDirection = (
     cDirNone,
     cDirLeft,
     cDirRight,
@@ -558,7 +558,7 @@ type
     FMouseDragMinimapDelta: integer;
     FMouseDragMinimapSelHeight: integer;
     FMouseDownAndColumnSelection: boolean;
-    FMouseAutoScroll: TATDirection;
+    FMouseAutoScroll: TATEditorDirection;
     FMouseActions: TATMouseActions;
     FLastHotspot: integer;
     FLastTextCmd: integer;
@@ -6092,7 +6092,7 @@ procedure TATSynEdit.TimerNiceScrollTick(Sender: TObject);
 var
   Pnt: TPoint;
   Dx, Dy: integer;
-  Dir: TATDirection;
+  Dir: TATEditorDirection;
 begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
   if not PtInRect(FRectMain, Pnt) then Exit;
