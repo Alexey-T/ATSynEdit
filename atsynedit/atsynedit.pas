@@ -224,7 +224,7 @@ type
     cWrapAtWindowOrMargin
     );
 
-  TATSynNumbersStyle = (
+  TATEditorNumbersStyle = (
     cNumbersAll,
     cNumbersNone,
     cNumbersEach10th,
@@ -785,7 +785,7 @@ type
     FOptGutterIcons: TATGutterIconsKind;
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
-    FOptNumbersStyle: TATSynNumbersStyle;
+    FOptNumbersStyle: TATEditorNumbersStyle;
     FOptNumbersShowFirst: boolean;
     FOptNumbersShowCarets: boolean;
     FOptNumbersSkippedChar: string;
@@ -1695,7 +1695,7 @@ type
     property OptMarginString: string read GetMarginString write SetMarginString;
     property OptNumbersAutosize: boolean read FOptNumbersAutosize write FOptNumbersAutosize default true;
     property OptNumbersAlignment: TAlignment read FOptNumbersAlignment write FOptNumbersAlignment default taRightJustify;
-    property OptNumbersStyle: TATSynNumbersStyle read FOptNumbersStyle write FOptNumbersStyle default cInitNumbersStyle;
+    property OptNumbersStyle: TATEditorNumbersStyle read FOptNumbersStyle write FOptNumbersStyle default cInitNumbersStyle;
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst default true;
     property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets default false;
     property OptNumbersSkippedChar: string read FOptNumbersSkippedChar write FOptNumbersSkippedChar;
