@@ -118,7 +118,7 @@ procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len
 
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
-  AText: atString;
+  const AText: atString;
   AParts: PATLineParts;
   out ATextWidth: integer;
   const AProps: TATCanvasTextOutProps
@@ -648,8 +648,11 @@ begin
 end;
 
 
-procedure CanvasTextOut(C: TCanvas; APosX, APosY: integer; AText: atString;
-  AParts: PATLineParts; out ATextWidth: integer;
+procedure CanvasTextOut(C: TCanvas;
+  APosX, APosY: integer;
+  const AText: atString;
+  AParts: PATLineParts;
+  out ATextWidth: integer;
   const AProps: TATCanvasTextOutProps);
 var
   ListOffsets: TATLineOffsetsInfo;
@@ -697,11 +700,6 @@ begin
 
     for i:= 0 to High(ListOffsets) do
       ListInt[i]:= ListOffsets[i] * NCharWidth div 100;
-
-    //truncate AText, to not paint over screen
-    i:= AProps.ControlWidth div AProps.CharSize.X + 2;
-    if Length(AText)>i then
-      SetLength(AText, i);
 
     Dx[0]:= ListInt[0];
     for i:= 1 to High(ListInt) do

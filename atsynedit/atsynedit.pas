@@ -3200,6 +3200,11 @@ begin
       if OptUnprintedReplaceSpec then
         SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
 
+      //truncate text to not paint over screen
+      NCount:= ARect.Width div ACharSize.X + 2;
+      if Length(StrOutput)>NCount then
+        SetLength(StrOutput, NCount);
+
       if AMainText then
       begin
         TextOutProps.Editor:= Self;
