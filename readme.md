@@ -1,8 +1,8 @@
 Multi-line editor control for Lazarus, which was made by Alexey Torgashin
 as an alternative to SynEdit. It is not based on SynEdit, it has totally different structure
-(Alexey: I even don't know base structure of SynEdit, it is very complex and very blurry,
+I even don't know base structure of SynEdit, it is very complex and very blurry,
 structure of ATSynEdit is much simpler, it has less base classes, storages, helper classes,
-but of course internal/hidden complexity of classes is big).
+but of course internal/hidden complexity of classes is big.
 
 It implements lot of features that modern text editors need.
 CudaText editor is rather modern in 2020 year, it is based on this component.
