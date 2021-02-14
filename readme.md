@@ -9,9 +9,9 @@ CudaText editor is rather modern in 2020 year, it is based on this component.
 Implements word-wrap from birth.
 Implements multi-carets + multi-selections from birth.
 
-Includes copy of TRegExpr engine, which was improved by Alexey Torgashin
-(TRegExpr development was continued in 2019 by Alexey, because CudaText users needed it,
-all patches were later merged to Free Pascal repo).
+Includes renamed copy of TRegExpr engine, which was improved by Alexey Torgashin.
+TRegExpr development was continued in 2019 by Alexey, because CudaText users needed it.
+Some patches were later merged to Free Pascal repo, but not all patches yet.
 
 - Full documentation: http://wiki.freepascal.org/ATSynEdit
 - Adapter for EControl lexers: http://wiki.freepascal.org/ATSynEdit_EControl_adapter
