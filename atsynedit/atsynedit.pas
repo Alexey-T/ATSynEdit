@@ -900,8 +900,7 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure DoStringsOnProgress(Sender: TObject);
-    procedure DoScroll_SetPos(var AScrollInfo: TATSynScrollInfo;
-      APos: integer; AUpdateScrollbars: boolean);
+    procedure DoScroll_SetPos(var AScrollInfo: TATSynScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
@@ -2900,7 +2899,7 @@ begin
   if ALineFrom>=0 then
   begin
     FWrapInfo.FindIndexesOfLineNumber(ALineFrom, NWrapIndex, NWrapIndexDummy);
-    DoScroll_SetPos(AScrollVert, NWrapIndex, true);
+    DoScroll_SetPos(AScrollVert, NWrapIndex);
       //last param True, to continue scrolling after resize
   end
   else
@@ -4523,13 +4522,11 @@ begin
   DoScroll_LineTop(AValue, true);
 end;
 
-procedure TATSynEdit.DoScroll_SetPos(var AScrollInfo: TATSynScrollInfo;
-  APos: integer; AUpdateScrollbars: boolean);
+procedure TATSynEdit.DoScroll_SetPos(var AScrollInfo: TATSynScrollInfo; APos: integer);
 begin
   AScrollInfo.NPos:= APos;
   //control width is maybe changed, must update other infos
-  if AUpdateScrollbars then
-    UpdateScrollbars(true);
+  UpdateScrollbars(true);
 end;
 
 procedure TATSynEdit.DoScroll_LineTop(ALine: integer; AUpdate: boolean);
@@ -4550,7 +4547,7 @@ begin
   FWrapInfo.FindIndexesOfLineNumber(ALine, NFrom, NTo);
   if NFrom>=0 then
   begin
-    DoScroll_SetPos(FScrollVert, NFrom, true);
+    DoScroll_SetPos(FScrollVert, NFrom);
     if AUpdate then
       Invalidate;
     Exit
@@ -4561,7 +4558,7 @@ begin
     with FWrapInfo[i] do
       if NLineIndex>=ALine then
       begin
-        DoScroll_SetPos(FScrollVert, i, true);
+        DoScroll_SetPos(FScrollVert, i);
         if AUpdate then
           Invalidate;
         Exit
