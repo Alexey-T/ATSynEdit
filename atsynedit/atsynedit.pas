@@ -4567,9 +4567,8 @@ end;
 
 procedure TATSynEdit.SetColumnLeft(AValue: integer);
 begin
-  FScrollHorz.NPos:= AValue;
-  UpdateScrollbars(true);
-  Update;
+  DoScroll_SetPos(FScrollHorz, AValue);
+  Invalidate;
 end;
 
 procedure TATSynEdit.SetLinesFromTop(AValue: integer);
