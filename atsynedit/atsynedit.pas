@@ -4550,8 +4550,7 @@ begin
   FWrapInfo.FindIndexesOfLineNumber(ALine, NFrom, NTo);
   if NFrom>=0 then
   begin
-    FScrollVert.NPos:= NFrom;
-    UpdateScrollbars(true);
+    DoScroll_SetPos(FScrollVert, NFrom, true);
     if AUpdate then
       Invalidate;
     Exit
@@ -4562,8 +4561,7 @@ begin
     with FWrapInfo[i] do
       if NLineIndex>=ALine then
       begin
-        FScrollVert.NPos:= i;
-        UpdateScrollbars(true);
+        DoScroll_SetPos(FScrollVert, i, true);
         if AUpdate then
           Invalidate;
         Exit
