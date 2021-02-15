@@ -609,7 +609,6 @@ type
     FOnHotspotExit: TATSynEditHotspotEvent;
     FWrapInfo: TATWrapInfo;
     FWrapTemps: TATWrapItems;
-    FWrapColumn: integer;
     FWrapMode: TATEditorWrapMode;
     FWrapUpdateNeeded: boolean;
     FWrapIndented: boolean;
@@ -623,7 +622,6 @@ type
     FUnprintedEof,
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
-    FPrevVisibleColumns: integer;
     FPrevModified: boolean;
     FCharSize: TPoint;
     FCharSizeMinimap: TPoint;
@@ -2042,24 +2040,24 @@ begin
   else
   if (not FWrapUpdateNeeded) and
     (FWrapMode<>cWrapOff) and
-    (FPrevVisibleColumns<>NNewVisibleColumns) then
+    (FWrapInfo.VisibleColumns<>NNewVisibleColumns) then
     FWrapUpdateNeeded:= true;
 
   if not FWrapUpdateNeeded then Exit;
   FWrapUpdateNeeded:= false;
-  FPrevVisibleColumns:= NNewVisibleColumns;
+  FWrapInfo.VisibleColumns:= NNewVisibleColumns;
 
   InvalidateHilitingCache;
 
   case FWrapMode of
     cWrapOff:
-      FWrapColumn:= 0;
+      FWrapInfo.WrapColumn:= 0;
     cWrapOn:
-      FWrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
+      FWrapInfo.WrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
     cWrapAtMargin:
-      FWrapColumn:= Max(cMinWrapColumn, FMarginRight);
+      FWrapInfo.WrapColumn:= Max(cMinWrapColumn, FMarginRight);
     cWrapAtWindowOrMargin:
-      FWrapColumn:= Max(cMinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
+      FWrapInfo.WrapColumn:= Max(cMinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
   end;
 
   UseCachedUpdate:=
@@ -2225,7 +2223,7 @@ begin
     Strings,
     FTabHelper,
     FEditorIndex,
-    FWrapColumn,
+    FWrapInfo.WrapColumn,
     FWrapIndented,
     GetVisibleColumns,
     FOptNonWordChars,
@@ -3961,11 +3959,11 @@ begin
 
   FWrapInfo:= TATWrapInfo.Create;
   FWrapInfo.StringsObj:= FStringsInt;
+  FWrapInfo.WrapColumn:= cInitMarginRight;
 
   FWrapTemps:= TATWrapItems.Create;
   FWrapUpdateNeeded:= true;
   FWrapMode:= cInitWrapMode;
-  FWrapColumn:= cInitMarginRight;
   FWrapIndented:= true;
   FWrapAddSpace:= 1;
   FWrapEnabledForMaxLines:= cInitWrapEnabledForMaxLines;

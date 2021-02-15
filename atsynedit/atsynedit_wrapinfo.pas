@@ -51,6 +51,8 @@ type
     procedure SetVirtualMode(AValue: boolean);
     function IsLineFolded(ALine: integer): boolean;
   public
+    VisibleColumns: integer;
+    WrapColumn: integer;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
