@@ -900,6 +900,7 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure DoStringsOnProgress(Sender: TObject);
+    procedure DoScroll_LineTop(ALine: integer);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
     procedure DoSelectionDeleteColumnBlock;
@@ -2666,7 +2667,7 @@ begin
   UpdateInitialVars(C);
 
   C.Brush.Color:= FColorBG;
-  C.FillRect(ClientRect); //avoid FClientW here to fill entire area
+  C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
 
   UpdateAdapterCacheSize;
   UpdateWrapInfo;
@@ -3792,7 +3793,7 @@ begin
   if FLineTopTodo>0 then
     exit(FLineTopTodo);
   Result:= 0;
-  if FWrapInfo.Count>0 then
+  if Assigned(FWrapInfo) and (FWrapInfo.Count>0) then
   begin
     N:= Max(0, FScrollVert.NPos);
     if FWrapInfo.IsIndexValid(N) then
@@ -4497,8 +4498,6 @@ begin
 end;
 
 procedure TATSynEdit.SetLineTop(AValue: integer);
-var
-  NFrom, NTo, i: integer;
 begin
   if not HandleAllocated then
   begin
@@ -4509,7 +4508,7 @@ begin
   if AValue<=0 then
   begin
     FScrollVert.SetZero;
-    Update;
+    Invalidate;
     Exit
   end;
 
@@ -4518,31 +4517,40 @@ begin
   //this is required for restoring LineTop for n tabs, on opening CudaText.
   UpdateWrapInfo;
 
-  if FWrapInfo.Count=0 then
+  DoScroll_LineTop(AValue);
+end;
+
+procedure TATSynEdit.DoScroll_LineTop(ALine: integer);
+var
+  NFrom, NTo, i: integer;
+begin
+  if FWrapInfo=nil then exit;
+
+  if (ALine<=0) or (FWrapInfo.Count=0) then
   begin
     FScrollVert.SetZero;
-    Update;
+    Invalidate;
     Exit
   end;
 
   //find exact match
-  FWrapInfo.FindIndexesOfLineNumber(AValue, NFrom, NTo);
+  FWrapInfo.FindIndexesOfLineNumber(ALine, NFrom, NTo);
   if NFrom>=0 then
   begin
     FScrollVert.NPos:= NFrom;
     UpdateScrollbars(true);
-    Update;
+    Invalidate;
     Exit
   end;
 
   //find approx match
   for i:= 0 to FWrapInfo.Count-1 do
     with FWrapInfo[i] do
-      if NLineIndex>=AValue then
+      if NLineIndex>=ALine then
       begin
         FScrollVert.NPos:= i;
         UpdateScrollbars(true);
-        Update;
+        Invalidate;
         Exit
       end;
 end;
@@ -4745,7 +4753,15 @@ begin
       end;
     end;
 
-    PaintEx(-1);
+    NLine:= -1;
+    if FLineTopTodo>0 then
+    begin
+      NLine:= FLineTopTodo;
+      FLineTopTodo:= 0;
+      SetLineTop(NLine);
+    end;
+
+    PaintEx(NLine);
   finally
     FPaintWorking:= false;
   end;
@@ -4808,6 +4824,8 @@ end;
 procedure TATSynEdit.Resize;
 begin
   inherited;
+
+  FLineTopTodo:= GetLineTop;
 
   Include(FPaintFlags, cIntFlagResize);
   if FWrapMode in [cWrapOn, cWrapAtWindowOrMargin] then
