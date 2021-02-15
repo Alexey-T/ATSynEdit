@@ -4775,20 +4775,20 @@ begin
     DoPaint(FPaintFlags, ALineNumber);
   Exclude(FPaintFlags, cIntFlagBitmap);
 
-    if DoubleBuffered then
-    //buf mode: timer tick don't give painting of whole bitmap
-    //(cIntFlagBitmap off)
-    begin
-      DoPaintCarets(FBitmap.Canvas, true);
-    end
-    else
-    //non-buf mode: timer tick clears whole canvas first.
-    //we already painted bitmap above,
-    //and now we invert carets or dont invert (use FCaretAllowNextBlink)
-    begin
-      if not FCaretBlinkEnabled or FCaretAllowNextBlink then
-        DoPaintCarets(Canvas, true);
-    end;
+  if DoubleBuffered then
+  //buf mode: timer tick don't give painting of whole bitmap
+  //(cIntFlagBitmap off)
+  begin
+    DoPaintCarets(FBitmap.Canvas, true);
+  end
+  else
+  //non-buf mode: timer tick clears whole canvas first.
+  //we already painted bitmap above,
+  //and now we invert carets or dont invert (use FCaretAllowNextBlink)
+  begin
+    if not FCaretBlinkEnabled or FCaretAllowNextBlink then
+      DoPaintCarets(Canvas, true);
+  end;
 
   if DoubleBuffered then
   begin
