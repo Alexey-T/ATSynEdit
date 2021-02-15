@@ -900,7 +900,7 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure DoStringsOnProgress(Sender: TObject);
-    procedure DoScroll_LineTop(ALine: integer);
+    procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
     procedure DoSelectionDeleteColumnBlock;
@@ -4517,10 +4517,10 @@ begin
   //this is required for restoring LineTop for n tabs, on opening CudaText.
   UpdateWrapInfo;
 
-  DoScroll_LineTop(AValue);
+  DoScroll_LineTop(AValue, true);
 end;
 
-procedure TATSynEdit.DoScroll_LineTop(ALine: integer);
+procedure TATSynEdit.DoScroll_LineTop(ALine: integer; AUpdate: boolean);
 var
   NFrom, NTo, i: integer;
 begin
@@ -4529,7 +4529,8 @@ begin
   if (ALine<=0) or (FWrapInfo.Count=0) then
   begin
     FScrollVert.SetZero;
-    Invalidate;
+    if AUpdate then
+      Invalidate;
     Exit
   end;
 
@@ -4539,7 +4540,8 @@ begin
   begin
     FScrollVert.NPos:= NFrom;
     UpdateScrollbars(true);
-    Invalidate;
+    if AUpdate then
+      Invalidate;
     Exit
   end;
 
@@ -4550,7 +4552,8 @@ begin
       begin
         FScrollVert.NPos:= i;
         UpdateScrollbars(true);
-        Invalidate;
+        if AUpdate then
+          Invalidate;
         Exit
       end;
 end;
@@ -4741,26 +4744,14 @@ begin
           BitmapResizeBySteps(FBitmap, Width, Height);
     end;
 
-    if not FPaintStarted then
-    begin
-      FPaintStarted:= true;
-      if FLineTopTodo>0 then
-      begin
-        NLine:= FLineTopTodo;
-        FLineTopTodo:= 0;
-        SetLineTop(NLine);
-        exit;
-      end;
-    end;
-
     NLine:= -1;
     if FLineTopTodo>0 then
     begin
       NLine:= FLineTopTodo;
       FLineTopTodo:= 0;
-      SetLineTop(NLine);
     end;
 
+    FPaintStarted:= true;
     PaintEx(NLine);
   finally
     FPaintWorking:= false;
