@@ -174,7 +174,7 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_FoldRangeAtCurLine(ACommand: TATFoldRangeCmd): TATCommandResults;
+function TATSynEdit.DoCommand_FoldRangeAtCurLine(ACommand: TATEditorFoldRangeCommand): TATCommandResults;
 begin
   DoFoldUnfoldRangeAtCurLine(ACommand);
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];

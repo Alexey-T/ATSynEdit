@@ -173,7 +173,7 @@ type
     cGutterIconsTriangles
     );
 
-  TATPasteCaret = (
+  TATEditorPasteCaret = (
     cPasteCaretNoChange,
     cPasteCaretLeftBottom,
     cPasteCaretRightBottom,
@@ -182,7 +182,7 @@ type
     cPasteCaretColumnRight
     );
 
-  TATFoldStyle = ( //affects folding of blocks without "text hint" passed from adapter
+  TATEditorFoldStyle = ( //affects folding of blocks without "text hint" passed from adapter
     cFoldHereWithDots, //show "..." from fold-pos
     cFoldHereWithTruncatedText, //show truncated line instead of "..."
     cFoldFromEndOfLine, //looks like Lazarus: show "..." after line, bad with 2 blocks starting at the same line
@@ -190,7 +190,7 @@ type
     cFoldFromNextLine //looks like SynWrite: don't show "...", show separator line
     );
 
-  TATFoldRangeCmd = (
+  TATEditorFoldRangeCommand = (
     cFoldingFold,
     cFoldingUnfold,
     cFoldingToggle
@@ -482,7 +482,7 @@ type
     FAdapterIME: TATAdapterIME;
     FFold: TATSynRanges;
     FFoldImageList: TImageList;
-    FFoldStyle: TATFoldStyle;
+    FFoldStyle: TATEditorFoldStyle;
     FFoldUnderlineOffset: integer;
     FFoldEnabled: boolean;
     FFoldTooltipVisible: boolean;
@@ -747,7 +747,7 @@ type
     FOptCaretsPrimitiveColumnSelection: boolean;
     FOptCaretsAddedToColumnSelection: boolean;
     FOptCaretPreferLeftSide: boolean;
-    FOptCaretPosAfterPasteColumn: TATPasteCaret;
+    FOptCaretPosAfterPasteColumn: TATEditorPasteCaret;
     FOptCaretFixAfterRangeFolded: boolean;
     FOptCaretsMultiToColumnSel: boolean;
     FOptMarkersSize: integer;
@@ -1141,7 +1141,7 @@ type
     function DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
     function DoCommand_FoldAll: TATCommandResults;
     function DoCommand_FoldUnAll: TATCommandResults;
-    function DoCommand_FoldRangeAtCurLine(ACommand: TATFoldRangeCmd): TATCommandResults;
+    function DoCommand_FoldRangeAtCurLine(ACommand: TATEditorFoldRangeCommand): TATCommandResults;
     function DoCommand_FoldSelection: TATCommandResults;
     function DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
     function DoCommand_TextChangeCase(AMode: TATEditorCaseConvert): TATCommandResults;
@@ -1388,7 +1388,7 @@ type
     procedure DoRangeHideLines(ALineFrom, ALineTo: integer); inline;
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
-    procedure DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
+    procedure DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand);
     //markers
     procedure MarkerClearAll;
     procedure MarkerDrop;
@@ -1582,7 +1582,7 @@ type
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
     property OptNonWordChars: atString read FOptNonWordChars write FOptNonWordChars stored false;
-    property OptFoldStyle: TATFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
+    property OptFoldStyle: TATEditorFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
     property OptFoldUnderlineOffset: integer read FFoldUnderlineOffset write FFoldUnderlineOffset default cInitFoldUnderlineOffset;
     property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;
@@ -1649,7 +1649,7 @@ type
     property OptCaretStopUnfocused: boolean read FCaretStopUnfocused write FCaretStopUnfocused default true;
     property OptCaretHideUnfocused: boolean read FCaretHideUnfocused write FCaretHideUnfocused default true;
     property OptCaretPreferLeftSide: boolean read FOptCaretPreferLeftSide write FOptCaretPreferLeftSide default true;
-    property OptCaretPosAfterPasteColumn: TATPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn default cPasteCaretColumnRight;
+    property OptCaretPosAfterPasteColumn: TATEditorPasteCaret read FOptCaretPosAfterPasteColumn write FOptCaretPosAfterPasteColumn default cPasteCaretColumnRight;
     property OptCaretsPrimitiveColumnSelection: boolean read FOptCaretsPrimitiveColumnSelection write FOptCaretsPrimitiveColumnSelection default cInitCaretsPrimitiveColumnSelection;
     property OptCaretsAddedToColumnSelection: boolean read FOptCaretsAddedToColumnSelection write FOptCaretsAddedToColumnSelection default true;
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;

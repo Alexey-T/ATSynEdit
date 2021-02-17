@@ -444,7 +444,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATFoldRangeCmd);
+procedure TATSynEdit.DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand);
 var
   NLine, NRange: integer;
   bFolded: boolean;
