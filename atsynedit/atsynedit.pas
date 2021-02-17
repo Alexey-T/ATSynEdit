@@ -196,14 +196,14 @@ type
     cFoldingToggle
     );
 
-  TATStapleEdge = (
+  TATEditorStapleEdge = (
     cStapleEdgeNone,
     cStapleEdgeAngle,
     cStapleEdgeLine
     );
 
 type
-  TATAutoIndentKind = (
+  TATEditorAutoIndentKind = (
     cIndentAsPrevLine,
     cIndentSpacesOnly,
     cIndentTabsAndSpaces,
@@ -737,8 +737,8 @@ type
     FOptStapleWidthPercent: integer;
     FOptStapleHiliteActive: boolean;
     FOptStapleHiliteActiveAlpha: integer;
-    FOptStapleEdge1: TATStapleEdge;
-    FOptStapleEdge2: TATStapleEdge;
+    FOptStapleEdge1: TATEditorStapleEdge;
+    FOptStapleEdge2: TATEditorStapleEdge;
     FOptStapleIndentConsidersEnd: boolean;
     FOptMouseEnableAll: boolean;
     FOptMouseEnableNormalSelection: boolean;
@@ -791,7 +791,7 @@ type
     FOptNumbersIndentPercents: integer;
     FOptNonWordChars: atString;
     FOptAutoIndent: boolean;
-    FOptAutoIndentKind: TATAutoIndentKind;
+    FOptAutoIndentKind: TATEditorAutoIndentKind;
     FOptAutoIndentBetterBracketsCurly: boolean;
     FOptAutoIndentBetterBracketsRound: boolean;
     FOptAutoIndentBetterBracketsSquare: boolean;
@@ -1596,7 +1596,7 @@ type
     property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop default 0;
     property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine default cInitTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
-    property OptAutoIndentKind: TATAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
+    property OptAutoIndentKind: TATEditorAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
     property OptAutoIndentBetterBracketsCurly: boolean read FOptAutoIndentBetterBracketsCurly write FOptAutoIndentBetterBracketsCurly default true;
     property OptAutoIndentBetterBracketsRound: boolean read FOptAutoIndentBetterBracketsRound write FOptAutoIndentBetterBracketsRound default false;
     property OptAutoIndentBetterBracketsSquare: boolean read FOptAutoIndentBetterBracketsSquare write FOptAutoIndentBetterBracketsSquare default false;
@@ -1631,8 +1631,8 @@ type
     property OptStapleWidthPercent: integer read FOptStapleWidthPercent write FOptStapleWidthPercent default 100;
     property OptStapleHiliteActive: boolean read FOptStapleHiliteActive write FOptStapleHiliteActive default true;
     property OptStapleHiliteActiveAlpha: integer read FOptStapleHiliteActiveAlpha write FOptStapleHiliteActiveAlpha default cInitStapleHiliteAlpha;
-    property OptStapleEdge1: TATStapleEdge read FOptStapleEdge1 write FOptStapleEdge1 default cStapleEdgeAngle;
-    property OptStapleEdge2: TATStapleEdge read FOptStapleEdge2 write FOptStapleEdge2 default cStapleEdgeAngle;
+    property OptStapleEdge1: TATEditorStapleEdge read FOptStapleEdge1 write FOptStapleEdge1 default cStapleEdgeAngle;
+    property OptStapleEdge2: TATEditorStapleEdge read FOptStapleEdge2 write FOptStapleEdge2 default cStapleEdgeAngle;
     property OptStapleIndentConsidersEnd: boolean read FOptStapleIndentConsidersEnd write FOptStapleIndentConsidersEnd default false;
     property OptShowFullWidthForSelection: boolean read FOptShowFullSel write FOptShowFullSel default false;
     property OptShowFullWidthForSyntaxHilite: boolean read FOptShowFullHilite write FOptShowFullHilite default true;
