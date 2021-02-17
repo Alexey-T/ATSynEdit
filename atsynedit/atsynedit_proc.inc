@@ -56,9 +56,9 @@ begin
   Result:= false;
 end;
 
-{ TATSynScrollInfo }
+{ TATEditorScrollInfo }
 
-procedure TATSynScrollInfo.Clear;
+procedure TATEditorScrollInfo.Clear;
 begin
   NPos:= 0;
   NPosLast:= 1;
@@ -72,31 +72,31 @@ begin
   SmoothPage:= 1;
 end;
 
-procedure TATSynScrollInfo.SetZero;
+procedure TATEditorScrollInfo.SetZero;
 begin
   NPos:= 0;
   NPixelOffset:= 0;
   SmoothPos:= 0;
 end;
 
-procedure TATSynScrollInfo.SetLast;
+procedure TATEditorScrollInfo.SetLast;
 begin
   NPos:= NPosLast;
   NPixelOffset:= 0;
   SmoothPos:= SmoothPosLast;
 end;
 
-function TATSynScrollInfo.TopGapVisible: boolean;
+function TATEditorScrollInfo.TopGapVisible: boolean;
 begin
   Result:= NPos=-1;
 end;
 
-function TATSynScrollInfo.TotalOffset: integer;
+function TATEditorScrollInfo.TotalOffset: integer;
 begin
   Result:= NPos*SmoothCharSize + NPixelOffset;
 end;
 
-class operator TATSynScrollInfo.= (const A, B: TATSynScrollInfo): boolean;
+class operator TATEditorScrollInfo.= (const A, B: TATEditorScrollInfo): boolean;
 begin
   Result:=
     (A.Vertical=B.Vertical) and

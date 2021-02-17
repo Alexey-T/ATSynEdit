@@ -239,9 +239,9 @@ type
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
 
-  { TATSynScrollInfo }
+  { TATEditorScrollInfo }
 
-  TATSynScrollInfo = record
+  TATEditorScrollInfo = record
     Vertical: boolean;
     NMax: integer;
     NPage: integer;
@@ -258,7 +258,7 @@ type
     procedure SetLast; inline;
     function TopGapVisible: boolean; inline;
     function TotalOffset: integer; inline;
-    class operator =(const A, B: TATSynScrollInfo): boolean;
+    class operator =(const A, B: TATEditorScrollInfo): boolean;
   end;
 
 type
@@ -656,12 +656,12 @@ type
     FScrollVert,
     FScrollHorz,
     FScrollVertMinimap,
-    FScrollHorzMinimap: TATSynScrollInfo;
+    FScrollHorzMinimap: TATEditorScrollInfo;
     FScrollbarVert,
     FScrollbarHorz: TATScrollbar;
     FScrollbarLock: boolean;
     FPrevHorz,
-    FPrevVert: TATSynScrollInfo;
+    FPrevVert: TATEditorScrollInfo;
     FMinimapWidth: integer;
     FMinimapCharWidth: integer;
     FMinimapCustomScale: integer;
@@ -900,7 +900,7 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure DoStringsOnProgress(Sender: TObject);
-    procedure DoScroll_SetPos(var AScrollInfo: TATSynScrollInfo; APos: integer);
+    procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
@@ -998,7 +998,7 @@ type
     procedure DoPaintFPS(C: TCanvas);
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
-      var AScrollHorz, AScrollVert: TATSynScrollInfo; ALineFrom: integer);
+      var AScrollHorz, AScrollVert: TATEditorScrollInfo; ALineFrom: integer);
     procedure DoPaintTextFragmentTo(C: TCanvas; const ARect: TRect; ALineFrom,
       ALineTo: integer; AConsiderWrapInfo: boolean; AColorBG, AColorBorder: TColor);
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
@@ -1022,7 +1022,7 @@ type
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
       const AVisRect: TRect; APointLeft, APointText: TPoint;
       const AWrapItem: TATWrapItem; ALineWidth: integer;
-      const AScrollHorz: TATSynScrollInfo);
+      const AScrollHorz: TATEditorScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintMarkerOfDragDrop(C: TCanvas);
     procedure DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer; APlus: boolean;
@@ -1035,7 +1035,7 @@ type
     procedure DoPaintLockedWarning(C: TCanvas);
     procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
     procedure DoPaintStaples(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
-      const AScrollHorz: TATSynScrollInfo);
+      const AScrollHorz: TATEditorScrollInfo);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPaintMouseSelFrame(C: TCanvas);
     //carets
@@ -1115,7 +1115,7 @@ type
     procedure UpdateFoldedMarkTooltip;
     procedure UpdateClientSizes;
     function DoFormatLineNumber(N: integer): string;
-    function UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
+    function UpdateScrollInfoFromMessage(var Info: TATEditorScrollInfo; const Msg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean = false);
     function GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
     function GetScrollbarVisible(bVertical: boolean): boolean;
@@ -1255,7 +1255,7 @@ type
     procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
     procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
-    procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
+    procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; APos: integer);
     procedure UpdateFoldLineIndexer;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure DoEventCarets; virtual;
@@ -1278,8 +1278,8 @@ type
     property MouseMap: TATEditorMouseActionArray read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
     property WrapInfo: TATWrapInfo read FWrapInfo;
-    property ScrollVert: TATSynScrollInfo read FScrollVert write FScrollVert;
-    property ScrollHorz: TATSynScrollInfo read FScrollHorz write FScrollHorz;
+    property ScrollVert: TATEditorScrollInfo read FScrollVert write FScrollVert;
+    property ScrollHorz: TATEditorScrollInfo read FScrollHorz write FScrollHorz;
     //property BrotherEditor: TATSynEdit read FBrotherEditor write FBrotherEditor;
     property CaretPropsNormal: TATCaretProps read FCaretPropsNormal;
     property CaretPropsOverwrite: TATCaretProps read FCaretPropsOverwrite;
@@ -2788,7 +2788,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   const ARect: TRect;
   const ACharSize: TPoint;
   AWithGutter, AMainText: boolean;
-  var AScrollHorz, AScrollVert: TATSynScrollInfo;
+  var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   ALineFrom: integer);
 var
   NCoordTop, NCoordSep: integer;
@@ -4523,7 +4523,7 @@ begin
   DoScroll_LineTop(AValue, true);
 end;
 
-procedure TATSynEdit.DoScroll_SetPos(var AScrollInfo: TATSynScrollInfo; APos: integer);
+procedure TATSynEdit.DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
 begin
   AScrollInfo.NPos:= APos;
   //control width is maybe changed, must update other infos
@@ -4911,7 +4911,7 @@ begin
     FHintWnd.Hide;
 end;
 
-procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATSynScrollInfo; APos: integer);
+procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; APos: integer);
 //Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
   NPos, NPixels, NLineIndex, NCharSize: integer;
@@ -4985,7 +4985,7 @@ begin
   end;
 end;
 
-function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATSynScrollInfo; const Msg: TLMScroll): boolean;
+function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATEditorScrollInfo; const Msg: TLMScroll): boolean;
 begin
   if Info.NMax<Info.NPage then
   begin
@@ -6290,7 +6290,7 @@ procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
   APointLeft, APointText: TPoint;
   const AWrapItem: TATWrapItem;
   ALineWidth: integer;
-  const AScrollHorz: TATSynScrollInfo);
+  const AScrollHorz: TATEditorScrollInfo);
 var
   NLineIndex, NPartXAfter: integer;
   NLeft, NRight, i: integer;
@@ -6518,7 +6518,7 @@ end;
 
 procedure TATSynEdit.DoScrollByDelta(ADeltaX, ADeltaY: integer);
 //
-  procedure _Delta(var AInfo: TATSynScrollInfo; ADelta: integer); inline;
+  procedure _Delta(var AInfo: TATEditorScrollInfo; ADelta: integer); inline;
   begin
     if ADelta=0 then exit;
     with AInfo do
@@ -6537,7 +6537,7 @@ end;
 
 procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
 //
-  procedure _Delta(var AInfo: TATSynScrollInfo; ADelta: integer); inline;
+  procedure _Delta(var AInfo: TATEditorScrollInfo; ADelta: integer); inline;
   begin
     if ADelta=0 then exit;
     UpdateScrollInfoFromSmoothPos(AInfo,
@@ -7297,7 +7297,7 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
-  ACharSize: TPoint; const AScrollHorz: TATSynScrollInfo);
+  ACharSize: TPoint; const AScrollHorz: TATEditorScrollInfo);
 var
   nLineFrom, nLineTo, nRangeDeepest, nMaxHeight: integer;
   nIndent, nIndentBegin, nIndentEnd: integer;
