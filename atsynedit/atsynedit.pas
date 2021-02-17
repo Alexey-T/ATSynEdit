@@ -638,7 +638,7 @@ type
     FGutterBandSeparator: integer;
     FGutterBandEmpty: integer;
     FGutterBandDecor: integer;
-    FColors: TATSynEditColors;
+    FColors: TATEditorColors;
     FColorFont: TColor;
     FColorBG: TColor;
     FRulerHeight: integer;
@@ -1563,7 +1563,7 @@ type
     property CursorGutterNumbers: TCursor read FCursorGutterNumbers write FCursorGutterNumbers default crDefault;
     property CursorMinimap: TCursor read FCursorMinimap write FCursorMinimap default crDefault;
     property CursorMicromap: TCursor read FCursorMicromap write FCursorMicromap default crDefault;
-    property Colors: TATSynEditColors read FColors write FColors stored false;
+    property Colors: TATEditorColors read FColors write FColors stored false;
     property ImagesGutterDecor: TImageList read FGutterDecorImages write FGutterDecorImages;
     property WantTabs: boolean read FWantTabs write FWantTabs default true;
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
@@ -3909,7 +3909,7 @@ begin
   FPaintLocked:= 0;
   FPaintFlags:= [cIntFlagBitmap];
 
-  FColors:= TATSynEditColors.Create;
+  FColors:= TATEditorColors.Create;
   InitDefaultColors(FColors);
   InitEditorMouseActions(FMouseActions);
 

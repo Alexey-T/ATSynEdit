@@ -12,7 +12,7 @@ uses
   Classes, SysUtils, Graphics;
 
 type
-  TATSynEditColors = class(TPersistent)
+  TATEditorColors = class(TPersistent)
   private
     FTextFont,
     FTextBG,
@@ -115,12 +115,12 @@ type
     property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
   end;
 
-procedure InitDefaultColors(C: TATSynEditColors);
+procedure InitDefaultColors(C: TATEditorColors);
 
 
 implementation
 
-procedure InitDefaultColors(C: TATSynEditColors);
+procedure InitDefaultColors(C: TATEditorColors);
 begin
   C.TextFont:= clBlack;
   C.TextBG:= clWhite;
