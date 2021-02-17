@@ -4325,10 +4325,6 @@ begin
 
   if AUpdateWrapInfo then
     FWrapUpdateNeeded:= true;
-    //UpdateWrapInfo runs later
-
-  //if AUpdateCaretsCoords then
-  //  Include(FPaintFlags, cIntFlagCaretsCoords);
 
   Invalidate;
 end;
