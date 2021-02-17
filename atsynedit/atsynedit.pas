@@ -69,7 +69,7 @@ type
     aessAuto
     );
 
-  TATEditorMidClickAction = (
+  TATEditorMiddleClickAction = (
     mcaNone,
     mcaScrolling,
     mcaPaste,
@@ -82,7 +82,7 @@ type
     OnGapPos: TPoint;
   end;
 
-  TATMouseDoubleClickAction = (
+  TATEditorDoubleClickAction = (
     cMouseDblClickNone,
     cMouseDblClickSelectWordChars,
     cMouseDblClickSelectAnyChars,
@@ -820,7 +820,7 @@ type
     FOptMouseClickOpensURL: boolean;
     FOptMouseClickNumberSelectsLine: boolean;
     FOptMouseClickNumberSelectsLineWithEOL: boolean;
-    FOptMouse2ClickAction: TATMouseDoubleClickAction;
+    FOptMouse2ClickAction: TATEditorDoubleClickAction;
     FOptMouse2ClickOpensURL: boolean;
     FOptMouse2ClickDragSelectsWords: boolean;
     FOptMouse3ClickSelectsLine: boolean;
@@ -828,7 +828,7 @@ type
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
-    FOptMouseMiddleClickAction: TATEditorMidClickAction;
+    FOptMouseMiddleClickAction: TATEditorMiddleClickAction;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
     FOptMouseWheelScrollVertSpeed: integer;
@@ -1716,14 +1716,14 @@ type
     property OptMouseClickOpensURL: boolean read FOptMouseClickOpensURL write FOptMouseClickOpensURL default false;
     property OptMouseClickNumberSelectsLine: boolean read FOptMouseClickNumberSelectsLine write FOptMouseClickNumberSelectsLine default true;
     property OptMouseClickNumberSelectsLineWithEOL: boolean read FOptMouseClickNumberSelectsLineWithEOL write FOptMouseClickNumberSelectsLineWithEOL default true;
-    property OptMouse2ClickAction: TATMouseDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectAnyChars;
+    property OptMouse2ClickAction: TATEditorDoubleClickAction read FOptMouse2ClickAction write FOptMouse2ClickAction default cMouseDblClickSelectAnyChars;
     property OptMouse2ClickOpensURL: boolean read FOptMouse2ClickOpensURL write FOptMouse2ClickOpensURL default true;
     property OptMouse2ClickDragSelectsWords: boolean read FOptMouse2ClickDragSelectsWords write FOptMouse2ClickDragSelectsWords default true;
     property OptMouse3ClickSelectsLine: boolean read FOptMouse3ClickSelectsLine write FOptMouse3ClickSelectsLine default true;
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
-    property OptMouseMiddleClickAction: TATEditorMidClickAction read FOptMouseMiddleClickAction write FOptMouseMiddleClickAction default mcaScrolling;
+    property OptMouseMiddleClickAction: TATEditorMiddleClickAction read FOptMouseMiddleClickAction write FOptMouseMiddleClickAction default mcaScrolling;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;

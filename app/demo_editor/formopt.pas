@@ -454,13 +454,13 @@ begin
       //mouse
       ed.OptMouseEnableNormalSelection:= chkMsNormalSel.Checked;
       ed.OptMouseEnableColumnSelection:= chkMsColumnSel.Checked;
-      ed.OptMouse2ClickAction:= TATMouseDoubleClickAction(ComboMsClick2.ItemIndex);
+      ed.OptMouse2ClickAction:= TATEditorDoubleClickAction(ComboMsClick2.ItemIndex);
       ed.OptMouse3ClickSelectsLine:= chkMsClick3.Checked;
       ed.OptMouse2ClickDragSelectsWords:= chkMsClick2Drag.Checked;
       ed.OptMouseClickNumberSelectsLine:= chkMsClickNumSel.Checked;
       ed.OptMouseDragDrop:= chkMsDragDrop.Checked;
       ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
-      ed.OptMouseMiddleClickAction:= TATEditorMidClickAction(comboMsMidClick.ItemIndex);
+      ed.OptMouseMiddleClickAction:= TATEditorMiddleClickAction(comboMsMidClick.ItemIndex);
       ed.OptMouseHideCursorOnType:= chkMsHideCursor.Checked;
 
       //undo
