@@ -234,8 +234,7 @@ type
 
   TATEditorInternalFlag = (
     cIntFlagBitmap,
-    cIntFlagResize,
-    cIntFlagCaretsCoords
+    cIntFlagResize
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
 
@@ -1255,7 +1254,7 @@ type
     procedure Invalidate; override;
     procedure InvalidateHilitingCache;
     procedure InvalidateHilitingCache(ALineIndex: integer);
-    procedure Update(AUpdateWrapInfo: boolean = false; AUpdateCaretsCoords: boolean = true); reintroduce;
+    procedure Update(AUpdateWrapInfo: boolean=false); reintroduce;
     procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
     procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; APos: integer);
@@ -4320,9 +4319,7 @@ begin
   inherited;
 end;
 
-procedure TATSynEdit.Update(
-  AUpdateWrapInfo: boolean = false;
-  AUpdateCaretsCoords: boolean = true);
+procedure TATSynEdit.Update(AUpdateWrapInfo: boolean=false);
 begin
   UpdateCursor;
 
@@ -4330,8 +4327,8 @@ begin
     FWrapUpdateNeeded:= true;
     //UpdateWrapInfo runs later
 
-  if AUpdateCaretsCoords then
-    Include(FPaintFlags, cIntFlagCaretsCoords);
+  //if AUpdateCaretsCoords then
+  //  Include(FPaintFlags, cIntFlagCaretsCoords);
 
   Invalidate;
 end;
@@ -4675,8 +4672,7 @@ begin
 
   DoPaintMainTo(C, ALineFrom);
 
-  if cIntFlagCaretsCoords in FPaintFlags then
-    UpdateCaretsCoords;
+  UpdateCaretsCoords;
 
   if Carets.Count>0 then
   begin
@@ -4844,10 +4840,7 @@ begin
 
   Include(FPaintFlags, cIntFlagResize);
   if FWrapMode in [cWrapOn, cWrapAtWindowOrMargin] then
-  begin
     FWrapUpdateNeeded:= true;
-    Include(FPaintFlags, cIntFlagCaretsCoords);
-  end;
 
   if not FPaintStarted then exit;
   Invalidate;
@@ -5072,7 +5065,6 @@ end;
 
 procedure TATSynEdit.WMVScroll(var Msg: TLMVScroll);
 begin
-  Include(FPaintFlags, cIntFlagCaretsCoords);
   UpdateScrollInfoFromMessage(FScrollVert, Msg);
   Invalidate;
 end;
@@ -5111,7 +5103,6 @@ end;
 
 procedure TATSynEdit.WMHScroll(var Msg: TLMHScroll);
 begin
-  Include(FPaintFlags, cIntFlagCaretsCoords);
   UpdateScrollInfoFromMessage(FScrollHorz, Msg);
   Invalidate;
 end;
