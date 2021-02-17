@@ -100,12 +100,12 @@ type
     cMouseActionMakeCaretsColumn
     );
 
-  TATMouseActionRecord = record
+  TATEditorMouseActionRecord = record
     MouseState: TShiftState;
     MouseActionId: TATEditorMouseAction;
   end;
 
-  TATMouseActions = array of TATMouseActionRecord;
+  TATEditorMouseActionArray = array of TATEditorMouseActionRecord;
 
   TATEditorDirection = (
     cDirNone,
@@ -560,7 +560,7 @@ type
     FMouseDragMinimapSelHeight: integer;
     FMouseDownAndColumnSelection: boolean;
     FMouseAutoScroll: TATEditorDirection;
-    FMouseActions: TATMouseActions;
+    FMouseActions: TATEditorMouseActionArray;
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
@@ -1275,7 +1275,7 @@ type
     property Hotspots: TATHotspots read GetHotspots;
     property Gaps: TATGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
-    property MouseMap: TATMouseActions read FMouseActions write FMouseActions;
+    property MouseMap: TATEditorMouseActionArray read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
     property WrapInfo: TATWrapInfo read FWrapInfo;
     property ScrollVert: TATSynScrollInfo read FScrollVert write FScrollVert;
