@@ -168,7 +168,7 @@ type
     cGapCoordMoveDown
     );
 
-  TATGutterIconsKind = (
+  TATEditorGutterIcons = (
     cGutterIconsPlusMinus,
     cGutterIconsTriangles
     );
@@ -781,7 +781,7 @@ type
     FOptGutterShowFoldLines: boolean;
     FOptGutterShowFoldLinesAll: boolean;
     FOptGutterShowFoldLinesForCaret: boolean;
-    FOptGutterIcons: TATGutterIconsKind;
+    FOptGutterIcons: TATEditorGutterIcons;
     FOptNumbersAutosize: boolean;
     FOptNumbersAlignment: TAlignment;
     FOptNumbersStyle: TATEditorNumbersStyle;
@@ -1661,7 +1661,7 @@ type
     property OptGutterShowFoldLines: boolean read FOptGutterShowFoldLines write FOptGutterShowFoldLines default true;
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterShowFoldLinesForCaret: boolean read FOptGutterShowFoldLinesForCaret write FOptGutterShowFoldLinesForCaret default true;
-    property OptGutterIcons: TATGutterIconsKind read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
+    property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 0;
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
