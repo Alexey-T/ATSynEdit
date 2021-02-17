@@ -1881,7 +1881,7 @@ begin
   if (ACaretX>=FRectRuler.Left) and (ACaretX<FRectRuler.Right) then
     CanvasPaintTriangleDown(C,
       Colors.RulerFont,
-      Point(ACaretX, FRectRuler.Top+FOptRulerMarkSizeCaret),
+      Point(ACaretX, FRectRuler.Top+EditorScale(FOptRulerMarkSizeCaret)),
       EditorScale(FOptRulerMarkSizeCaret)
       );
 end;
