@@ -130,7 +130,7 @@ type
     cDirColumnPageDown
     );
 
-  TATScrollbarsArrowsKind = (
+  TATEditorScrollbarsArrowsKind = (
     cScrollArrowsNormal,
     cScrollArrowsHidden,
     cScrollArrowsAbove,
@@ -138,7 +138,7 @@ type
     cScrollArrowsCorner
     );
 
-  TATCaseConvert = (
+  TATEditorCaseConvert = (
     cCaseLower,
     cCaseUpper,
     cCaseTitle,
@@ -1144,7 +1144,7 @@ type
     function DoCommand_FoldRangeAtCurLine(ACommand: TATFoldRangeCmd): TATCommandResults;
     function DoCommand_FoldSelection: TATCommandResults;
     function DoCommand_TextTrimSpaces(AMode: TATTrimSpaces): TATCommandResults;
-    function DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
+    function DoCommand_TextChangeCase(AMode: TATEditorCaseConvert): TATCommandResults;
     function DoCommand_ScaleDelta(AIncrease: boolean): TATCommandResults;
     function DoCommand_ScaleReset: TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;

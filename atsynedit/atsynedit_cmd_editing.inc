@@ -1008,7 +1008,7 @@ begin
   Result:= [cResultText, cResultCaretAny];
 end;
 
-function TATSynEdit.DoCommand_TextChangeCase(AMode: TATCaseConvert): TATCommandResults;
+function TATSynEdit.DoCommand_TextChangeCase(AMode: TATEditorCaseConvert): TATCommandResults;
 var
   Caret: TATCaretItem;
   Str1, Str2: atString;
