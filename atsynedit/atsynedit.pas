@@ -4306,18 +4306,19 @@ begin
   UpdateCursor;
 
   if AUpdateWrapInfo then
-  begin
     FWrapUpdateNeeded:= true;
-    ////UpdateWrapInfo; //performed later
-  end;
+    //UpdateWrapInfo runs later
+
   if AUpdateCaretsCoords then
     Include(FPaintFlags, cIntFlagCaretsCoords);
+
   Invalidate;
 end;
 
 procedure TATSynEdit.SetFocus;
 begin
-  LCLIntf.SetFocus(Handle);
+  if HandleAllocated then
+    LCLIntf.SetFocus(Handle);
 end;
 
 procedure TATSynEdit.GetClientSizes(out W, H: integer);
