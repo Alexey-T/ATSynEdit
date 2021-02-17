@@ -447,7 +447,7 @@ begin
       ed.OptAutoIndent:= chkEnterIndent.Checked;
       ed.OptKeyBackspaceUnindent := chkBackspUnindent.Checked;
       ed.OptKeyBackspaceGoesToPrevLine:= chkBkspGoPrev.Checked;
-      ed.OptAutoIndentKind:= TATAutoIndentKind(edIndentKind.ItemIndex);
+      ed.OptAutoIndentKind:= TATEditorAutoIndentKind(edIndentKind.ItemIndex);
       ed.OptIndentSize:= edIndentSize.Value;
       ed.OptIndentKeepsAlign:= chkUnindentKeepAlign.Checked;
 
