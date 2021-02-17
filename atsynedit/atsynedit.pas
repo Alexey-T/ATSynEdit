@@ -5466,13 +5466,13 @@ begin
 
   RectBm.Left:= FGutter[FGutterBandBookmarks].Left;
   RectBm.Right:= FGutter[FGutterBandBookmarks].Right;
-  RectBm.Top:= FRectMain.Top;
-  RectBm.Bottom:= FRectMain.Bottom;
+  RectBm.Top:= FRectGutter.Top;
+  RectBm.Bottom:= FRectGutter.Bottom;
 
   RectNums.Left:= FGutter[FGutterBandNumbers].Left;
   RectNums.Right:= FGutter[FGutterBandNumbers].Right;
-  RectNums.Top:= FRectMain.Top;
-  RectNums.Bottom:= FRectMain.Bottom;
+  RectNums.Top:= FRectGutter.Top;
+  RectNums.Bottom:= FRectGutter.Bottom;
 
   //if FMouseDragDropping then
   //  Cursor:= crDrag
