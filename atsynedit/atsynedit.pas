@@ -997,6 +997,7 @@ type
     procedure DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
     procedure DoPaintRulerTo(C: TCanvas);
     procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
+    procedure DoPaintRulerCaretMarks(C: TCanvas);
     procedure DoPaintFPS(C: TCanvas);
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
@@ -1886,6 +1887,22 @@ begin
       Point(ACaretX, FRectRuler.Top+EditorScale(FOptRulerMarkSizeCaret)),
       EditorScale(FOptRulerMarkSizeCaret)
       );
+end;
+
+procedure TATSynEdit.DoPaintRulerCaretMarks(C: TCanvas);
+var
+  NCount, i: integer;
+begin
+  if FOptRulerVisible and (FOptRulerMarkSizeCaret>0) then
+  begin
+    if FOptRulerMarkForAllCarets then
+      NCount:= Carets.Count
+    else
+      NCount:= 1;
+
+    for i:= 0 to NCount-1 do
+      DoPaintRulerCaretMark(C, Carets[i].CoordX);
+  end;
 end;
 
 procedure TATSynEdit.UpdateGutterAutosize;
@@ -4637,8 +4654,6 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATEditorInternalFlags; ALineFrom: integer);
-var
-  NCaretX, NWidth, NCaretCount, iCaret: integer;
 begin
   if Enabled then
   begin
@@ -4666,24 +4681,9 @@ begin
   if Carets.Count>0 then
   begin
     if FOptShowCurColumn then
-    begin
-      NCaretX:= Carets[0].CoordX;
-      NWidth:= EditorScale(1);
-      DoPaintMarginLineTo(C, NCaretX, NWidth, Colors.MarginCaret);
-    end;
+      DoPaintMarginLineTo(C, Carets[0].CoordX, EditorScale(1), Colors.MarginCaret);
 
-    if FOptRulerVisible and (FOptRulerMarkSizeCaret>0) then
-    begin
-      if FOptRulerMarkForAllCarets then
-        NCaretCount:= Carets.Count
-      else
-        NCaretCount:= 1;
-      for iCaret:= 0 to NCaretCount-1 do
-      begin
-        NCaretX:= Carets[iCaret].CoordX;
-        DoPaintRulerCaretMark(C, NCaretX);
-      end
-    end;
+    DoPaintRulerCaretMarks(C);
   end;
 
   DoPaintMarkersTo(C);
