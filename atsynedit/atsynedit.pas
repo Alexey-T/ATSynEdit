@@ -988,9 +988,9 @@ type
     procedure TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray); inline;
     //paint
     procedure PaintEx(ALineNumber: integer);
-    function DoPaint(AFlags: TATEditorInternalFlags; ALineFrom: integer): boolean;
+    function DoPaint(ALineFrom: integer): boolean;
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
-    procedure DoPaintAllTo(C: TCanvas; AFlags: TATEditorInternalFlags; ALineFrom: integer);
+    procedure DoPaintAllTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
@@ -4653,7 +4653,7 @@ begin
   FAdapterCache.MaxSize:= N;
 end;
 
-procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATEditorInternalFlags; ALineFrom: integer);
+procedure TATSynEdit.DoPaintAllTo(C: TCanvas; ALineFrom: integer);
 begin
   if Enabled then
   begin
@@ -4675,7 +4675,7 @@ begin
 
   DoPaintMainTo(C, ALineFrom);
 
-  if cIntFlagCaretsCoords in AFlags then
+  if cIntFlagCaretsCoords in FPaintFlags then
     UpdateCaretsCoords;
 
   if Carets.Count>0 then
@@ -4689,7 +4689,7 @@ begin
   DoPaintMarkersTo(C);
 end;
 
-function TATSynEdit.DoPaint(AFlags: TATEditorInternalFlags; ALineFrom: integer): boolean;
+function TATSynEdit.DoPaint(ALineFrom: integer): boolean;
 //gets True if one of scrollbars changed Visible state
 begin
   UpdateTabHelper;
@@ -4697,15 +4697,15 @@ begin
   if DoubleBuffered then
   begin
     if Assigned(FBitmap) then
-      if cIntFlagBitmap in AFlags then
+      if cIntFlagBitmap in FPaintFlags then
       begin
         FBitmap.BeginUpdate(true);
-        DoPaintAllTo(FBitmap.Canvas, AFlags, ALineFrom);
+        DoPaintAllTo(FBitmap.Canvas, ALineFrom);
         FBitmap.EndUpdate();
       end;
   end
   else
-    DoPaintAllTo(Canvas, AFlags, ALineFrom);
+    DoPaintAllTo(Canvas, ALineFrom);
 
   Result:= UpdateScrollbars(false);
 end;
@@ -4802,8 +4802,8 @@ begin
   {$endif}
 
   //if scrollbars shown, paint again
-  if DoPaint(FPaintFlags, ALineNumber) then
-    DoPaint(FPaintFlags, ALineNumber);
+  if DoPaint(ALineNumber) then
+    DoPaint(ALineNumber);
   Exclude(FPaintFlags, cIntFlagBitmap);
 
   if DoubleBuffered then
