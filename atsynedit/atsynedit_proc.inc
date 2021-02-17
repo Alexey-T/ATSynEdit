@@ -165,7 +165,7 @@ end;
 
 procedure InitEditorMouseActions(var M: TATMouseActions);
   //
-  procedure Add(AId: TATMouseActionId; AState: TShiftState);
+  procedure Add(AId: TATEditorMouseAction; AState: TShiftState);
   begin
     SetLength(M, Length(M)+1);
     M[High(M)].MouseActionId:= AId;
@@ -190,7 +190,7 @@ begin
 end;
 
 
-function EditorMouseActionId(const M: TATMouseActions; State: TShiftState): TATMouseActionId;
+function EditorMouseActionId(const M: TATMouseActions; State: TShiftState): TATEditorMouseAction;
 var
   i: integer;
 begin

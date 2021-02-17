@@ -89,7 +89,7 @@ type
     cMouseDblClickSelectEntireLine
     );
 
-  TATMouseActionId = (
+  TATEditorMouseAction = (
     cMouseActionNone,
     cMouseActionClickSimple,
     cMouseActionClickRight,
@@ -102,7 +102,7 @@ type
 
   TATMouseActionRecord = record
     MouseState: TShiftState;
-    MouseActionId: TATMouseActionId;
+    MouseActionId: TATEditorMouseAction;
   end;
 
   TATMouseActions = array of TATMouseActionRecord;
@@ -5104,7 +5104,7 @@ var
   PCaret: TPoint;
   PosDetails: TATEditorPosDetails;
   Index: integer;
-  ActionId: TATMouseActionId;
+  ActionId: TATEditorMouseAction;
   bClickOnSelection: boolean;
   R: TRect;
 begin
