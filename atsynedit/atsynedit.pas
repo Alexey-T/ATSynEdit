@@ -69,7 +69,7 @@ type
     aessAuto
     );
 
-  TATMiddleClickAction = (
+  TATEditorMidClickAction = (
     mcaNone,
     mcaScrolling,
     mcaPaste,
@@ -828,7 +828,7 @@ type
     FOptMouseDragDropCopying: boolean;
     FOptMouseDragDropCopyingWithState: TShiftStateEnum;
     FOptMouseRightClickMovesCaret: boolean;
-    FOptMouseMiddleClickAction: TATMiddleClickAction;
+    FOptMouseMiddleClickAction: TATEditorMidClickAction;
     FOptMouseWheelScrollVert: boolean;
     FOptMouseWheelScrollHorz: boolean;
     FOptMouseWheelScrollVertSpeed: integer;
@@ -1723,7 +1723,7 @@ type
     property OptMouseDragDrop: boolean read FOptMouseDragDrop write FOptMouseDragDrop default true;
     property OptMouseDragDropCopying: boolean read FOptMouseDragDropCopying write FOptMouseDragDropCopying default true;
     property OptMouseDragDropCopyingWithState: TShiftStateEnum read FOptMouseDragDropCopyingWithState write FOptMouseDragDropCopyingWithState default ssModifier;
-    property OptMouseMiddleClickAction: TATMiddleClickAction read FOptMouseMiddleClickAction write FOptMouseMiddleClickAction default mcaScrolling;
+    property OptMouseMiddleClickAction: TATEditorMidClickAction read FOptMouseMiddleClickAction write FOptMouseMiddleClickAction default mcaScrolling;
     property OptMouseRightClickMovesCaret: boolean read FOptMouseRightClickMovesCaret write FOptMouseRightClickMovesCaret default false;
     property OptMouseWheelScrollVert: boolean read FOptMouseWheelScrollVert write FOptMouseWheelScrollVert default true;
     property OptMouseWheelScrollVertSpeed: integer read FOptMouseWheelScrollVertSpeed write FOptMouseWheelScrollVertSpeed default 3;

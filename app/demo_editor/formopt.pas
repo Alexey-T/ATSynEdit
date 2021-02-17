@@ -460,7 +460,7 @@ begin
       ed.OptMouseClickNumberSelectsLine:= chkMsClickNumSel.Checked;
       ed.OptMouseDragDrop:= chkMsDragDrop.Checked;
       ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
-      ed.OptMouseMiddleClickAction:= TATMiddleClickAction(comboMsMidClick.ItemIndex);
+      ed.OptMouseMiddleClickAction:= TATEditorMidClickAction(comboMsMidClick.ItemIndex);
       ed.OptMouseHideCursorOnType:= chkMsHideCursor.Checked;
 
       //undo
