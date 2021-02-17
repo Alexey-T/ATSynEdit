@@ -262,9 +262,9 @@ type
   end;
 
 type
-  { TATCaretProps }
+  { TATEditorCaretProps }
 
-  TATCaretProps = class
+  TATEditorCaretProps = class
   public
     //Value>=0: in pixels
     //Value<0: in percents
@@ -272,7 +272,7 @@ type
     Width: integer;
     Height: integer;
     EmptyInside: boolean;
-    procedure Assign(Obj: TATCaretProps);
+    procedure Assign(Obj: TATEditorCaretProps);
   end;
 
 const
@@ -507,9 +507,9 @@ type
     FCaretShown: boolean;
     FCaretBlinkEnabled: boolean;
     FCaretBlinkTime: integer;
-    FCaretPropsNormal: TATCaretProps;
-    FCaretPropsOverwrite: TATCaretProps;
-    FCaretPropsReadonly: TATCaretProps;
+    FCaretPropsNormal: TATEditorCaretProps;
+    FCaretPropsOverwrite: TATEditorCaretProps;
+    FCaretPropsReadonly: TATEditorCaretProps;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
@@ -873,7 +873,7 @@ type
     procedure DoCalcPosColor(AX, AY: integer; var AColor: TColor);
     procedure DoCalcLineEntireColor(ALine: integer; AUseColorOfCurrentLine: boolean; out AColor: TColor; out
       AColorForced: boolean; AHiliteLineWithSelection: boolean);
-    procedure DoCaretsApplyShape(var R: TRect; Props: TATCaretProps; W, H: integer);
+    procedure DoCaretsApplyShape(var R: TRect; Props: TATEditorCaretProps; W, H: integer);
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
     function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
@@ -1281,9 +1281,9 @@ type
     property ScrollVert: TATEditorScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATEditorScrollInfo read FScrollHorz write FScrollHorz;
     //property BrotherEditor: TATSynEdit read FBrotherEditor write FBrotherEditor;
-    property CaretPropsNormal: TATCaretProps read FCaretPropsNormal;
-    property CaretPropsOverwrite: TATCaretProps read FCaretPropsOverwrite;
-    property CaretPropsReadonly: TATCaretProps read FCaretPropsReadonly;
+    property CaretPropsNormal: TATEditorCaretProps read FCaretPropsNormal;
+    property CaretPropsOverwrite: TATEditorCaretProps read FCaretPropsOverwrite;
+    property CaretPropsReadonly: TATEditorCaretProps read FCaretPropsReadonly;
     //common
     property EncodingName: string read GetEncodingName write SetEncodingName;
     property Modified: boolean read GetModified write SetModified;
@@ -3860,9 +3860,9 @@ begin
   FScrollbarHorz.Update;
   FScrollbarHorz.OnChange:= @OnNewScrollbarHorzChanged;
 
-  FCaretPropsNormal:= TATCaretProps.Create;
-  FCaretPropsOverwrite:= TATCaretProps.Create;
-  FCaretPropsReadonly:= TATCaretProps.Create;
+  FCaretPropsNormal:= TATEditorCaretProps.Create;
+  FCaretPropsOverwrite:= TATEditorCaretProps.Create;
+  FCaretPropsReadonly:= TATEditorCaretProps.Create;
 
   FCaretPropsNormal.Width:= 2;
   FCaretPropsNormal.Height:= -100;
@@ -6149,7 +6149,7 @@ var
   R: TRect;
   i: integer;
   Item: TATCaretItem;
-  CaretProps: TATCaretProps;
+  CaretProps: TATEditorCaretProps;
   NCaretColor: TColor;
 begin
   if not FCaretShowEnabled then exit;
