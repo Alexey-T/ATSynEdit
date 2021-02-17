@@ -219,7 +219,7 @@ var
   Details: TATEditorPosDetails;
   NWrapIndex, i: integer;
 const
-  cGapActions: array[boolean] of TATGapCoordAction =
+  cGapActions: array[boolean] of TATEditorGapCoordAction =
     (cGapCoordIgnore, cGapCoordMoveDown);
 begin
   for i:= 0 to FCarets.Count-1 do

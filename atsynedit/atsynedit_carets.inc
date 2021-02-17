@@ -253,7 +253,7 @@ function _DoClientPosToCaretPos(
   const AScrollHorz, AScrollVert: TATSynScrollInfo;
   AVirtualPos: boolean;
   out ADetails: TATEditorPosDetails;
-  AGapCoordAction: TATGapCoordAction;
+  AGapCoordAction: TATEditorGapCoordAction;
   AAfterEofUsesLastLen: boolean;
   AEditorIndex: integer): TPoint;
 var
@@ -413,7 +413,7 @@ end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TPoint;
   out ADetails: TATEditorPosDetails;
-  AGapCoordAction: TATGapCoordAction = cGapCoordToLineEnd): TPoint; inline;
+  AGapCoordAction: TATEditorGapCoordAction = cGapCoordToLineEnd): TPoint; inline;
 begin
   Result:= _DoClientPosToCaretPos(P,
     FWrapInfo,

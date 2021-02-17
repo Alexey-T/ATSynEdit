@@ -162,7 +162,7 @@ type
     );
   TATCommandResults = set of TATCommandResult;
 
-  TATGapCoordAction = (
+  TATEditorGapCoordAction = (
     cGapCoordIgnore,
     cGapCoordToLineEnd,
     cGapCoordMoveDown
@@ -1347,7 +1347,7 @@ type
     function CaretPosToClientPos(P: TPoint): TPoint;
     function ClientPosToCaretPos(P: TPoint;
       out ADetails: TATEditorPosDetails;
-      AGapCoordAction: TATGapCoordAction=cGapCoordToLineEnd): TPoint;
+      AGapCoordAction: TATEditorGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
     //goto
     function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AUnfold, AllowUpdate: boolean): boolean;
