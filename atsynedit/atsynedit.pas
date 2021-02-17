@@ -775,6 +775,7 @@ type
     FOptRulerMarkSizeCaret: integer;
     FOptRulerMarkSizeSmall: integer;
     FOptRulerMarkSizeBig: integer;
+    FOptRulerMarkForAllCarets: boolean;
     FOptRulerTopIndentPercents: integer;
     FOptGutterVisible: boolean;
     FOptGutterPlusSize: integer;
@@ -1673,6 +1674,7 @@ type
     property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cSizeRulerMarkCaret;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cSizeRulerMarkBig;
+    property OptRulerMarkForAllCarets: boolean read FOptRulerMarkForAllCarets write FOptRulerMarkForAllCarets default false;
     property OptRulerTopIndentPercents: integer read FOptRulerTopIndentPercents write FOptRulerTopIndentPercents default 0;
     property OptMinimapCustomScale: integer read FMinimapCustomScale write FMinimapCustomScale default 0;
     property OptMinimapVisible: boolean read FMinimapVisible write SetMinimapVisible default cInitMinimapVisible;
@@ -4059,6 +4061,7 @@ begin
   FOptRulerMarkSizeCaret:= cSizeRulerMarkCaret;
   FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
   FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
+  FOptRulerMarkForAllCarets:= false;
   FOptRulerFontSizePercents:= 80;
   FOptRulerTopIndentPercents:= 0;
 
@@ -4635,7 +4638,7 @@ end;
 
 procedure TATSynEdit.DoPaintAllTo(C: TCanvas; AFlags: TATEditorInternalFlags; ALineFrom: integer);
 var
-  NCaretX, NWidth: integer;
+  NCaretX, NWidth, NCaretCount, iCaret: integer;
 begin
   if Enabled then
   begin
@@ -4662,12 +4665,25 @@ begin
 
   if Carets.Count>0 then
   begin
-    NCaretX:= Carets[0].CoordX;
-    NWidth:= EditorScale(1);
     if FOptShowCurColumn then
+    begin
+      NCaretX:= Carets[0].CoordX;
+      NWidth:= EditorScale(1);
       DoPaintMarginLineTo(C, NCaretX, NWidth, Colors.MarginCaret);
+    end;
+
     if FOptRulerVisible and (FOptRulerMarkSizeCaret>0) then
-      DoPaintRulerCaretMark(C, NCaretX);
+    begin
+      if FOptRulerMarkForAllCarets then
+        NCaretCount:= Carets.Count
+      else
+        NCaretCount:= 1;
+      for iCaret:= 0 to NCaretCount-1 do
+      begin
+        NCaretX:= Carets[iCaret].CoordX;
+        DoPaintRulerCaretMark(C, NCaretX);
+      end
+    end;
   end;
 
   DoPaintMarkersTo(C);
