@@ -115,13 +115,13 @@ type
     cDirDown
     );
 
-  TATRulerNumeration = (
+  TATEditorRulerNumeration = (
     cRulerNumeration_0_10_20,
     cRulerNumeration_1_11_21,
     cRulerNumeration_1_10_20
     );
 
-  TATSelectColumnDirection = (
+  TATEditorSelectColumnDirection = (
     cDirColumnLeft,
     cDirColumnRight,
     cDirColumnUp,
@@ -768,7 +768,7 @@ type
     FOptBorderWidthFocused: integer;
     FOptBorderFocusedActive: boolean;
     FOptRulerVisible: boolean;
-    FOptRulerNumeration: TATRulerNumeration;
+    FOptRulerNumeration: TATEditorRulerNumeration;
     FOptRulerHeightPercents: integer;
     FOptRulerFontSizePercents: integer;
     FOptRulerMarkSizeCaret: integer;
@@ -1149,7 +1149,7 @@ type
     function DoCommand_ScaleReset: TATCommandResults;
     function DoCommand_MoveSelectionUpDown(ADown: boolean): TATCommandResults;
     function DoCommand_TextInsertEmptyAboveBelow(ADown: boolean): TATCommandResults;
-    function DoCommand_SelectColumnToDirection(ADir: TATSelectColumnDirection): TATCommandResults;
+    function DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
     function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
     function DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
@@ -1666,7 +1666,7 @@ type
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
-    property OptRulerNumeration: TATRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cRulerNumeration_0_10_20;
+    property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cRulerNumeration_0_10_20;
     property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cSizeRulerHeightPercents;
     property OptRulerFontSizePercents: integer read FOptRulerFontSizePercents write FOptRulerFontSizePercents default 80;
     property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cSizeRulerMarkCaret;

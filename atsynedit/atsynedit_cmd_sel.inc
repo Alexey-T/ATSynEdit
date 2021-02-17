@@ -75,7 +75,7 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCommand_SelectColumnToDirection(ADir: TATSelectColumnDirection): TATCommandResults;
+function TATSynEdit.DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
 var
   N, NPageLines: integer;
   bDown: boolean;

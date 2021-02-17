@@ -409,7 +409,7 @@ begin
       ed.OptRulerHeightPercents:= edRulerSize.Value;
       ed.OptRulerFontSizePercents:= edRulerFSize.Value;
       ed.OptRulerTopIndentPercents:= edRulerIndent.Value;
-      ed.OptRulerNumeration:= TATRulerNumeration(comboRulerStyle.ItemIndex);
+      ed.OptRulerNumeration:= TATEditorRulerNumeration(comboRulerStyle.ItemIndex);
 
       ed.Gutter[ed.GutterBandBookmarks].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNumbers].Visible:= chkGutterNum.Checked;
