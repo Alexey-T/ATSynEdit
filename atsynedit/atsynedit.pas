@@ -671,9 +671,10 @@ type
     FMinimapSelColorChange: integer;
     FMinimapAtLeft: boolean;
     FMinimapTooltipVisible: boolean;
+    FMinimapTooltipEnabled: boolean;
+    FMinimapTooltipBitmap: TBitmap;
     FMinimapTooltipLinesCount: integer;
     FMinimapTooltipWidthPercents: integer;
-    FMinimapTooltip: TPanel;
     FMinimapCachedPainting: boolean;
     FMinimapHiliteLinesWithSelection: boolean;
     FMicromap: TATMicromap;
@@ -926,7 +927,6 @@ type
     procedure MenuFoldLevelClick(Sender: TObject);
     procedure MenuFoldUnfoldAllClick(Sender: TObject);
     procedure MenuFoldPlusMinusClick(Sender: TObject);
-    procedure MinimapTooltipPaint(Sender: TObject);
     procedure FoldedMarkTooltipPaint(Sender: TObject);
     procedure FoldedMarkMouseEnter(Sender: TObject);
     procedure OnNewScrollbarHorzChanged(Sender: TObject);
@@ -955,7 +955,6 @@ type
     procedure InitDimRanges;
     procedure InitGutterDecor;
     procedure InitMarkedRange;
-    procedure InitMinimapTooltip;
     procedure InitFoldedMarkList;
     procedure InitFoldedMarkTooltip;
     procedure InitFoldImageList;
@@ -1012,6 +1011,7 @@ type
     procedure DoPaintMinimapSelTo(C: TCanvas);
     {$endif}
     procedure DoPaintMinimapTo(C: TCanvas);
+    procedure DoPaintMinimapTooltip(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
     procedure DoPaintMarginsTo(C: TCanvas);
     procedure DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
@@ -1113,7 +1113,6 @@ type
     procedure UpdateCursor;
     procedure UpdateGutterAutosize;
     procedure UpdateMinimapAutosize;
-    procedure UpdateMinimapTooltip;
     procedure UpdateFoldedMarkTooltip;
     procedure UpdateClientSizes;
     function DoFormatLineNumber(N: integer): string;
@@ -2708,7 +2707,12 @@ begin
     FOnDrawEditor(Self, C, FRectMain);
 
   if FMinimapVisible then
+  begin
     DoPaintMinimapTo(C);
+    if FMinimapTooltipVisible and FMinimapTooltipEnabled then
+      DoPaintMinimapTooltip(C);
+  end;
+
   if FMicromapVisible then
     DoPaintMicromapTo(C);
 
@@ -4265,6 +4269,8 @@ end;
 destructor TATSynEdit.Destroy;
 begin
   FAdapterHilite:= nil;
+  if Assigned(FMinimapTooltipBitmap) then
+    FreeAndNil(FMinimapTooltipBitmap);
   if Assigned(FRegexLinks) then
     FreeAndNil(FRegexLinks);
   if Assigned(FAdapterIME) then
@@ -5523,6 +5529,7 @@ var
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
   bMovedMinimal: boolean;
+  bUpdateForMinimap: boolean;
   Details: TATEditorPosDetails;
   nIndex: integer;
   Caret: TATCaretItem;
@@ -5556,22 +5563,19 @@ begin
   //detect cursor on minimap
   if FMinimapVisible then
   begin
-    if not FMinimapShowSelAlways then
-      if bOnMinimap<>FCursorOnMinimap then
-        Invalidate;
+    bUpdateForMinimap:= false;
+    if bOnMinimap<>FCursorOnMinimap then
+      bUpdateForMinimap:= true;
     FCursorOnMinimap:= bOnMinimap;
-  end;
-
-  if bOnMinimap and FMinimapTooltipVisible then
-  begin
-    InitMinimapTooltip;
-    FMinimapTooltip.Show;
-    UpdateMinimapTooltip;
-  end
-  else
-  begin
-    if Assigned(FMinimapTooltip) then
-      FMinimapTooltip.Hide;
+    if FMinimapTooltipVisible and bOnMinimap then
+    begin
+      FMinimapTooltipEnabled:= true;
+      bUpdateForMinimap:= true;
+    end
+    else
+      FMinimapTooltipEnabled:= false;
+    if bUpdateForMinimap then
+      Update;
   end;
 
   //detect cursor on gutter
@@ -5806,8 +5810,7 @@ begin
   inherited;
   DoHintHide;
   DoHotspotsExit;
-  if Assigned(FMinimapTooltip) then
-    FMinimapTooltip.Hide;
+  FMinimapTooltipEnabled:= false;
 end;
 
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
@@ -5844,8 +5847,7 @@ begin
   DoHotspotsExit;
   if Assigned(FFoldedMarkTooltip) then
     FFoldedMarkTooltip.Hide;
-  if Assigned(FMinimapTooltip) then
-    FMinimapTooltip.Hide;
+  FMinimapTooltipEnabled:= false;
 
   if AForceHorz then
     Mode:= aWheelModeHoriz
@@ -6859,7 +6861,6 @@ begin
     NItem:= Max(0, NItem - GetVisibleLines div 2);
     DoScroll_SetPos(FScrollVert, Min(NItem, FScrollVert.NMax));
     Update;
-    UpdateMinimapTooltip;
   end;
 end;
 
@@ -7721,37 +7722,6 @@ begin
 end;
 
 
-procedure TATSynEdit.MinimapTooltipPaint(Sender: TObject);
-var
-  C: TCanvas;
-  RectAll: TRect;
-  Pnt: TPoint;
-  NWrapIndex, NLineCenter, NLineTop, NLineBottom: integer;
-begin
-  C:= FMinimapTooltip.Canvas;
-  RectAll:= Rect(0, 0, FMinimapTooltip.Width, FMinimapTooltip.Height);
-  Pnt:= ScreenToClient(Mouse.CursorPos);
-
-  C.Pen.Color:= Colors.MinimapTooltipBorder;
-  C.Brush.Color:= Colors.MinimapTooltipBG;
-  C.Rectangle(RectAll);
-
-  NWrapIndex:= GetMinimap_ClickedPosToWrapIndex(Pnt.Y);
-  FMinimapTooltip.Visible:= FMinimapTooltipVisible and (NWrapIndex>=0);
-  if NWrapIndex<0 then exit;
-  NLineCenter:= FWrapInfo[NWrapIndex].NLineIndex;
-  NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
-  NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
-
-  DoPaintTextFragmentTo(C, RectAll,
-    NLineTop,
-    NLineBottom,
-    true,
-    Colors.MinimapTooltipBG,
-    Colors.MinimapTooltipBorder
-    );
-end;
-
 procedure TATSynEdit.DoPaintTextFragmentTo(C: TCanvas;
   const ARect: TRect;
   ALineFrom, ALineTo: integer;
@@ -7849,13 +7819,14 @@ begin
 end;
 
 
-procedure TATSynEdit.UpdateMinimapTooltip;
+procedure TATSynEdit.DoPaintMinimapTooltip(C: TCanvas);
 var
+  C_Bmp: TCanvas;
+  RectAll: TRect;
   Pnt: TPoint;
+  NWrapIndex, NLineCenter, NLineTop, NLineBottom: integer;
   NLeft, NTop, NWidth, NHeight: integer;
 begin
-  if FMinimapTooltip=nil then exit;
-  if not FMinimapTooltip.Visible then exit;
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
   NWidth:= FRectMain.Width * FMinimapTooltipWidthPercents div 100;
@@ -7868,8 +7839,31 @@ begin
     Pnt.Y - FCharSize.Y*FMinimapTooltipLinesCount div 2
     ));
 
-  FMinimapTooltip.SetBounds(NLeft, NTop, NWidth, NHeight);
-  FMinimapTooltip.Invalidate;
+  if FMinimapTooltipBitmap=nil then
+    FMinimapTooltipBitmap:= TBitmap.Create;
+  FMinimapTooltipBitmap.SetSize(NWidth, NHeight);
+
+  RectAll:= Rect(0, 0, NWidth, NHeight);
+  C_Bmp:= FMinimapTooltipBitmap.Canvas;
+  C_Bmp.Pen.Color:= Colors.MinimapTooltipBorder;
+  C_Bmp.Brush.Color:= Colors.MinimapTooltipBG;
+  C_Bmp.Rectangle(RectAll);
+
+  NWrapIndex:= GetMinimap_ClickedPosToWrapIndex(Pnt.Y);
+  if NWrapIndex<0 then exit;
+  NLineCenter:= FWrapInfo[NWrapIndex].NLineIndex;
+  NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
+  NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
+
+  DoPaintTextFragmentTo(C_Bmp, RectAll,
+    NLineTop,
+    NLineBottom,
+    true,
+    Colors.MinimapTooltipBG,
+    Colors.MinimapTooltipBorder
+    );
+
+  C.Draw(NLeft, NTop, FMinimapTooltipBitmap);
 end;
 
 
@@ -8167,20 +8161,6 @@ begin
   if FShowOsBarHorz=AValue then Exit;
   FShowOsBarHorz:= AValue;
   ShowScrollBar(Handle, SB_Horz, AValue);
-end;
-
-procedure TATSynEdit.InitMinimapTooltip;
-begin
-  if FMinimapTooltip=nil then
-  begin
-    FMinimapTooltip:= TPanel.Create(Self);
-    FMinimapTooltip.Hide;
-    FMinimapTooltip.Width:= 15;
-    FMinimapTooltip.Height:= 15;
-    FMinimapTooltip.Parent:= Self;
-    FMinimapTooltip.BorderStyle:= bsNone;
-    FMinimapTooltip.OnPaint:= @MinimapTooltipPaint;
-  end;
 end;
 
 procedure TATSynEdit.InitFoldedMarkList;
