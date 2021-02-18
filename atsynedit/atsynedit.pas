@@ -7852,21 +7852,23 @@ end;
 procedure TATSynEdit.UpdateMinimapTooltip;
 var
   Pnt: TPoint;
+  NLeft, NTop, NWidth, NHeight: integer;
 begin
   if FMinimapTooltip=nil then exit;
   if not FMinimapTooltip.Visible then exit;
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
-  FMinimapTooltip.Width:= FRectMain.Width * FMinimapTooltipWidthPercents div 100;
+  NWidth:= FRectMain.Width * FMinimapTooltipWidthPercents div 100;
   if FMinimapAtLeft then
-    FMinimapTooltip.Left:= FRectMinimap.Right + 1
+    NLeft:= FRectMinimap.Right + 1
   else
-    FMinimapTooltip.Left:= FRectMinimap.Left - FMinimapTooltip.Width - 1;
-  FMinimapTooltip.Height:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
-  FMinimapTooltip.Top:= Max(0, Min(ClientHeight-FMinimapTooltip.Height,
-    Pnt.Y - Trunc(FCharSize.Y*FMinimapTooltipLinesCount/2)
+    NLeft:= FRectMinimap.Left - NWidth - 1;
+  NHeight:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
+  NTop:= Max(0, Min(ClientHeight-NHeight,
+    Pnt.Y - FCharSize.Y*FMinimapTooltipLinesCount div 2
     ));
 
+  FMinimapTooltip.SetBounds(NLeft, NTop, NWidth, NHeight);
   FMinimapTooltip.Invalidate;
 end;
 
