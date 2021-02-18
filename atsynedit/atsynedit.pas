@@ -4525,7 +4525,7 @@ begin
   if AValue<=0 then
   begin
     FScrollVert.SetZero;
-    Invalidate;
+    Update;
     Exit
   end;
 
@@ -4553,8 +4553,7 @@ begin
   if (ALine<=0) or (FWrapInfo.Count=0) then
   begin
     FScrollVert.SetZero;
-    if AUpdate then
-      Invalidate;
+    if AUpdate then Update;
     Exit
   end;
 
@@ -4563,8 +4562,7 @@ begin
   if NFrom>=0 then
   begin
     DoScroll_SetPos(FScrollVert, NFrom);
-    if AUpdate then
-      Invalidate;
+    if AUpdate then Update;
     Exit
   end;
 
@@ -4574,8 +4572,7 @@ begin
       if NLineIndex>=ALine then
       begin
         DoScroll_SetPos(FScrollVert, i);
-        if AUpdate then
-          Invalidate;
+        if AUpdate then Update;
         Exit
       end;
 end;
@@ -4583,7 +4580,7 @@ end;
 procedure TATSynEdit.SetColumnLeft(AValue: integer);
 begin
   DoScroll_SetPos(FScrollHorz, AValue);
-  Invalidate;
+  Update;
 end;
 
 procedure TATSynEdit.SetLinesFromTop(AValue: integer);
