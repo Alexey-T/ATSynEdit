@@ -4540,7 +4540,7 @@ end;
 procedure TATSynEdit.DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
 begin
   AScrollInfo.NPos:= APos;
-  //control width is maybe changed, must update other infos
+  //must update other info in AScrollInfo
   UpdateScrollbars(true);
 end;
 
@@ -6857,8 +6857,7 @@ begin
   if NItem>=0 then
   begin
     NItem:= Max(0, NItem - GetVisibleLines div 2);
-    FScrollVert.NPos:= Min(NItem, FScrollVert.NMax);
-    UpdateScrollbars(true);
+    DoScroll_SetPos(FScrollVert, Min(NItem, FScrollVert.NMax));
     Update;
     UpdateMinimapTooltip;
   end;
@@ -6866,8 +6865,7 @@ end;
 
 procedure TATSynEdit.DoMinimapDrag(APosY: integer);
 begin
-  FScrollVert.NPos:= GetMinimap_DraggedPosToWrapIndex(APosY);
-  UpdateScrollbars(true);
+  DoScroll_SetPos(FScrollVert, GetMinimap_DraggedPosToWrapIndex(APosY));
   Update;
 end;
 
