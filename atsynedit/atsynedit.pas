@@ -7825,25 +7825,24 @@ var
   RectAll: TRect;
   Pnt: TPoint;
   NWrapIndex, NLineCenter, NLineTop, NLineBottom: integer;
-  NLeft, NTop, NWidth, NHeight: integer;
+  NPanelLeft, NPanelTop, NPanelWidth, NPanelHeight: integer;
 begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
 
-  NWidth:= FRectMain.Width * FMinimapTooltipWidthPercents div 100;
+  NPanelWidth:= FRectMain.Width * FMinimapTooltipWidthPercents div 100;
   if FMinimapAtLeft then
-    NLeft:= FRectMinimap.Right + 1
+    NPanelLeft:= FRectMinimap.Right + 1
   else
-    NLeft:= FRectMinimap.Left - NWidth - 1;
-  NHeight:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
-  NTop:= Max(0, Min(ClientHeight-NHeight,
-    Pnt.Y - FCharSize.Y*FMinimapTooltipLinesCount div 2
-    ));
+    NPanelLeft:= FRectMinimap.Left - NPanelWidth - 1;
+  NPanelHeight:= FMinimapTooltipLinesCount*FCharSize.Y + 2;
+  NPanelTop:= Max(0, Min(ClientHeight-NPanelHeight,
+    Pnt.Y - FCharSize.Y*FMinimapTooltipLinesCount div 2 ));
 
   if FMinimapTooltipBitmap=nil then
     FMinimapTooltipBitmap:= TBitmap.Create;
-  FMinimapTooltipBitmap.SetSize(NWidth, NHeight);
+  FMinimapTooltipBitmap.SetSize(NPanelWidth, NPanelHeight);
 
-  RectAll:= Rect(0, 0, NWidth, NHeight);
+  RectAll:= Rect(0, 0, NPanelWidth, NPanelHeight);
   C_Bmp:= FMinimapTooltipBitmap.Canvas;
   C_Bmp.Pen.Color:= Colors.MinimapTooltipBorder;
   C_Bmp.Brush.Color:= Colors.MinimapTooltipBG;
@@ -7863,7 +7862,7 @@ begin
     Colors.MinimapTooltipBorder
     );
 
-  C.Draw(NLeft, NTop, FMinimapTooltipBitmap);
+  C.Draw(NPanelLeft, NPanelTop, FMinimapTooltipBitmap);
 end;
 
 
