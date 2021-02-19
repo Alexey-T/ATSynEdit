@@ -374,7 +374,6 @@ const
     + cUrlRegex_WebAnchor;
   cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
 
-  cTextEditorLocked: string = 'Wait...';
   cTextHintScrollPrefix: string = 'Line';
 
   cStrMenuitemFoldAll: string = 'Fold all';
