@@ -662,7 +662,11 @@ var
   Dx: TATIntArray;
   {$ifndef windows}
   DxUTF8: TATIntArray;
+  Buf: string;
+  {$else}
+  bAllowLigatures: boolean;
   {$endif}
+  BufW: UnicodeString;
   NLen, NCharWidth, i, j: integer;
   NLastPart: integer;
   PartStr: atString;
@@ -671,12 +675,7 @@ var
   PartPtr: ^TATLinePart;
   PartFontStyle: TFontStyles;
   PartRect: TRect;
-  Buf: string;
-  BufW: UnicodeString;
   DxPointer: PInteger;
-  {$ifdef windows}
-  bAllowLigatures: boolean;
-  {$endif}
   NStyles: integer;
   bBold, bItalic: boolean;
   ch: WideChar;
@@ -688,7 +687,7 @@ begin
   SetLength(ListInt, NLen);
   SetLength(Dx, NLen);
 
-  if AProps.SuperFast then
+  if AProps.SuperFast or AProps.HasAsciiNoTabs then
   begin
     for i:= 0 to NLen-1 do
     begin
@@ -822,15 +821,24 @@ begin
           );
 
       {$ifdef windows}
-      BufW:= SRemoveHexDisplayedChars(PartStr);
-      bAllowLigatures:=
-        AProps.ShowFontLigatures
-        and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
-
-      if CanvasTextOutNeedsOffsets(C, PartStr) then
-        DxPointer:= @Dx[PartOffset]
-      else
+      if AProps.HasAsciiNoTabs then
+      begin
+        BufW:= PartStr;
+        bAllowLigatures:= AProps.ShowFontLigatures;
         DxPointer:= nil;
+      end
+      else
+      begin
+        BufW:= SRemoveHexDisplayedChars(PartStr);
+        bAllowLigatures:=
+          AProps.ShowFontLigatures
+          and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
+
+        if CanvasTextOutNeedsOffsets(C, PartStr) then
+          DxPointer:= @Dx[PartOffset]
+        else
+          DxPointer:= nil;
+      end;
 
       _TextOut_Windows(C.Handle,
         APosX+PixOffset1,
@@ -841,16 +849,24 @@ begin
         bAllowLigatures
         );
       {$else}
-      BufW:= PartStr;
-      Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
-
-      if CanvasTextOutNeedsOffsets(C, PartStr) then
+      if AProps.HasAsciiNoTabs then
       begin
-        _CalcCharSizesUtf8FromWidestring(BufW, @Dx[PartOffset], Length(Dx)-PartOffset, DxUTF8);
-        DxPointer:= @DxUTF8[0];
+        Buf:= PartStr;
+        DxPointer:= nil;
       end
       else
-        DxPointer:= nil;
+      begin
+        BufW:= PartStr;
+        Buf:= UTF8Encode(SRemoveHexDisplayedChars(BufW));
+
+        if CanvasTextOutNeedsOffsets(C, PartStr) then
+        begin
+          _CalcCharSizesUtf8FromWidestring(BufW, @Dx[PartOffset], Length(Dx)-PartOffset, DxUTF8);
+          DxPointer:= @DxUTF8[0];
+        end
+        else
+          DxPointer:= nil;
+      end;
 
       _TextOut_Unix(C.Handle,
         APosX+PixOffset1,

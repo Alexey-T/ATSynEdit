@@ -7742,7 +7742,6 @@ begin
   FillChar(TextOutProps{%H-}, SizeOf(TextOutProps), 0);
 
   TextOutProps.Editor:= Self;
-  TextOutProps.SuperFast:= false;
   TextOutProps.TabHelper:= FTabHelper;
   TextOutProps.CharSize:= FCharSize;
   TextOutProps.CharsSkipped:= 0;
@@ -7803,6 +7802,7 @@ begin
 
     TextOutProps.HasTab:= Strings.LinesHasTab[WrapItem.NLineIndex];
     TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
+    TextOutProps.SuperFast:= false;
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
     CanvasTextOut(C,
