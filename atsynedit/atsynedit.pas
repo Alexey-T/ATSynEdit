@@ -3235,7 +3235,6 @@ begin
       if AMainText then
       begin
         TextOutProps.Editor:= Self;
-        TextOutProps.HasTab:= Strings.LinesHasTab[NLinesIndex];
         TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[NLinesIndex];
         TextOutProps.SuperFast:= bLineHuge;
         TextOutProps.TabHelper:= FTabHelper;
@@ -7800,7 +7799,6 @@ begin
       NColorAfter,
       true);
 
-    TextOutProps.HasTab:= Strings.LinesHasTab[WrapItem.NLineIndex];
     TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
     TextOutProps.SuperFast:= false;
     TextOutProps.LineIndex:= WrapItem.NLineIndex;

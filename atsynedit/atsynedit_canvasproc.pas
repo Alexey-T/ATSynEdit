@@ -76,7 +76,6 @@ type
 type
   TATCanvasTextOutProps = record
     Editor: TObject;
-    HasTab: boolean;
     HasAsciiNoTabs: boolean;
     SuperFast: boolean;
     TabHelper: TATStringTabHelper;
