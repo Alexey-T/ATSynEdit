@@ -4717,8 +4717,8 @@ var
   NValue: integer;
   Bmp: TGraphic;
 begin
-  C.Brush.Color:= FColorBG;
-  C.FillRect(ClientRect);
+  C.Brush.Color:= Colors.TextBG;
+  C.FillRect(Rect(0, 0, Width, Height));
 
   if Strings.ProgressKind<>cStringsProgressSaving then
     Bmp:= cBitmapWait
