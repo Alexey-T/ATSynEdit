@@ -731,16 +731,16 @@ begin
     {$endif}
 
     if not AProps.HasAsciiNoTabs then
-     DoPaintHexChars(C,
-      AText,
-      @Dx[0],
-      APosX,
-      APosY,
-      AProps.CharSize,
-      AProps.ColorUnprintedHexFont,
-      C.Brush.Color,
-      AProps.SuperFast
-      );
+      DoPaintHexChars(C,
+        AText,
+        @Dx[0],
+        APosX,
+        APosY,
+        AProps.CharSize,
+        AProps.ColorUnprintedHexFont,
+        C.Brush.Color,
+        AProps.SuperFast
+        );
   end
   else
   begin
@@ -887,16 +887,16 @@ begin
       {$endif}
 
       if not AProps.HasAsciiNoTabs then
-       DoPaintHexChars(C,
-        PartStr,
-        @Dx[PartOffset],
-        APosX+PixOffset1,
-        APosY+AProps.TextOffsetFromLine,
-        AProps.CharSize,
-        AProps.ColorUnprintedHexFont,
-        PartPtr^.ColorBG,
-        AProps.SuperFast
-        );
+        DoPaintHexChars(C,
+          PartStr,
+          @Dx[PartOffset],
+          APosX+PixOffset1,
+          APosY+AProps.TextOffsetFromLine,
+          AProps.CharSize,
+          AProps.ColorUnprintedHexFont,
+          PartPtr^.ColorBG,
+          AProps.SuperFast
+          );
 
       //paint 4 borders of part
       //note: PartRect is changed here
