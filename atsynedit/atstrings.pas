@@ -574,6 +574,7 @@ procedure TATStringItem.LineToBuffer(OtherBuf: PWideChar);
 //OtherBuf must point to WideChar array of enough size
 var
   NLen, i: integer;
+  SrcBuf: PChar;
 begin
   NLen:= Length(Buf);
   if NLen=0 then exit;
@@ -583,9 +584,11 @@ begin
   end
   else
   begin
+    SrcBuf:= PChar(Buf);
     for i:= 1 to NLen do
     begin
-      OtherBuf^:= WideChar(Ord(Buf[i]));
+      OtherBuf^:= WideChar(Ord(SrcBuf^));
+      Inc(SrcBuf);
       Inc(OtherBuf);
     end;
   end;
