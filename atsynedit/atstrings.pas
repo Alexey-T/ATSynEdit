@@ -125,6 +125,7 @@ type
     property LineState: TATLineState read GetLineState;
     property LineEnds: TATLineEnds read GetLineEnds;
     function LineSub(AFrom, ALen: integer): UnicodeString;
+    procedure LineToBuffer(OtherBuf: PWideChar);
     function CharAt(AIndex: integer): WideChar;
     function HasTab: boolean;
     function HasAsciiNoTabs: boolean;
@@ -566,6 +567,27 @@ begin
     SetLength(Result, NLen);
     for i:= 1 to NLen do
       Result[i]:= WideChar(Ord(Buf[i]));
+  end;
+end;
+
+procedure TATStringItem.LineToBuffer(OtherBuf: PWideChar);
+//OtherBuf must point to WideChar array of enough size
+var
+  NLen, i: integer;
+begin
+  NLen:= Length(Buf);
+  if NLen=0 then exit;
+  if Ex.Wide then
+  begin
+    Move(Buf[1], OtherBuf^, NLen);
+  end
+  else
+  begin
+    for i:= 1 to NLen do
+    begin
+      OtherBuf^:= WideChar(Ord(Buf[i]));
+      Inc(OtherBuf);
+    end;
   end;
 end;
 
@@ -1114,7 +1136,6 @@ var
   Item: PATStringItem;
   Ptr: pointer;
   bFinalEol: boolean;
-  SW: WideString;
 begin
   Result:= '';
   if Count=0 then Exit;
@@ -1149,10 +1170,7 @@ begin
       if (AMaxLen>0) and (Len>AMaxLen) then
         FillChar(Ptr^, Len*2, $20) //fill item with spaces
       else
-      begin
-        SW:= Item^.Line;
-        Move(SW[1], Ptr^, Len*2);
-      end;
+        Item^.LineToBuffer(Ptr);
       Inc(Ptr, Len*2);
     end;
     //copy eol
