@@ -6432,6 +6432,9 @@ end;
 
 procedure TATSynEdit.DoEventScroll;
 begin
+  //horizontal scroll must clear CaretItem.SavedX values
+  Carets.UpdateSavedX(cUpdateX_Clear, false);
+
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorScroll(Self);
 
