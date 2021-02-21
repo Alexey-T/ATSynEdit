@@ -369,7 +369,7 @@ const
   cUrlRegex_Web =
     '\b(' + cUrlRegex_WebBegin + ')'
     + cUrlRegex_WebSite
-    + '(/[~\w\.\-\+\/%]*)?' //folders
+    + '(/[~\w\.\-\+\/%@]*)?' //folders
     + cUrlRegex_WebParams
     + cUrlRegex_WebAnchor;
   cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
