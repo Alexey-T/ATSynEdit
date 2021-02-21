@@ -361,7 +361,7 @@ const
   cHintBookmarkDy = 16;
   cUrlMarkerTag = -100;
 
-  cUrlRegex_Email = '\b(mailto:)?\w[\w\-\.]*@\w[\w\-\.]*\.\w{2,}\b';
+  cUrlRegex_Email = '\b(mailto:)?\w[\w\-\+\.]*@\w[\w\-\.]*\.\w{2,}\b';
   cUrlRegex_WebBegin = 'https?://|ftp://|magnet:\?|www\.|ftp\.';
   cUrlRegex_WebSite = '\w[\w\-\.@]*(:\d+)?'; // @ for password; :\d+ is port
   cUrlRegex_WebAnchor = '(\#[\w\-]*)?';
