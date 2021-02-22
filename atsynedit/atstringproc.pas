@@ -47,6 +47,8 @@ function SCaseTitle(const S, SNonWordChars: atString): atString;
 function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SNonWordChars: atString): atString;
 
+function StringOfCharW(ch: WideChar; Len: integer): UnicodeString;
+
 {$Z1}
 type
   TATLineEnds = (cEndNone, cEndWin, cEndUnix, cEndMac);
@@ -531,7 +533,7 @@ begin
     else
     begin
       Result[N]:= ' ';
-      Insert(StringOfChar(' ', NSize-1), Result, N);
+      Insert(StringOfCharW(' ', NSize-1), Result, N);
     end;
   until false;
 end;
@@ -780,7 +782,7 @@ end;
 
 function TATStringTabHelper.SpacesToTabs(ALineIndex: integer; const S: atString): atString;
 begin
-  Result:= StringReplace(S, StringOfChar(' ', TabSize), #9, [rfReplaceAll]);
+  Result:= StringReplace(S, StringOfCharW(' ', TabSize), WideChar(9), [rfReplaceAll]);
 end;
 
 function TATStringTabHelper.CharPosToColumnPos(ALineIndex: integer; const S: atString;
@@ -866,7 +868,7 @@ begin
   if IndentSize=0 then
   begin
     if TabSpaces then
-      StrIndent:= StringOfChar(' ', TabSize)
+      StrIndent:= StringOfCharW(' ', TabSize)
     else
       StrIndent:= #9;
     DecSpaces:= TabSize;
@@ -875,13 +877,13 @@ begin
   if IndentSize>0 then
   begin
     //use spaces
-    StrIndent:= StringOfChar(' ', IndentSize);
+    StrIndent:= StringOfCharW(' ', IndentSize);
     DecSpaces:= IndentSize;
   end
   else
   begin
     //indent<0 - use tabs
-    StrIndent:= StringOfChar(#9, Abs(IndentSize));
+    StrIndent:= StringOfCharW(#9, Abs(IndentSize));
     DecSpaces:= Abs(IndentSize)*TabSize;
   end;
 
@@ -1073,6 +1075,15 @@ begin
       if (ch = '.') or (ch = '!') or (ch = '?') then
         dot:= True;
   end;
+end;
+
+function StringOfCharW(ch: WideChar; Len: integer): UnicodeString;
+var
+  i: integer;
+begin
+  SetLength(Result, Len);
+  for i:= 1 to Len do
+    Result[i]:= ch;
 end;
 
 

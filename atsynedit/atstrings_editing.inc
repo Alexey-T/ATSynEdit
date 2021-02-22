@@ -122,7 +122,7 @@ begin
   end
   else
   begin
-    StrLead:= Str+StringOfChar(' ', AX-Length(Str));
+    StrLead:= Str+StringOfCharW(' ', AX-Length(Str));
     StrTail:= '';
   end;
 
@@ -351,7 +351,7 @@ begin
       begin
         //add spaces if we are after eol
         if AX>=Length(Str) then
-          Str:= Str+StringOfChar(' ', AX-Length(Str));
+          Str+= StringOfCharW(' ', AX-Length(Str));
 
         //not last: del next line
         if AY+1<Count then

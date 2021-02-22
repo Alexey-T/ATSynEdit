@@ -175,7 +175,7 @@ begin
       begin
         NLen:= X2-X1-Length(Str);
         if NLen>0 then
-          Str:= Str+StringOfChar(' ', NLen);
+          Str+= StringOfCharW(' ', NLen);
       end;
       Result:= Result+UTF8Encode(Str)+EolString;
     end;

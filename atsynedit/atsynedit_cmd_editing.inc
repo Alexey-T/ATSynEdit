@@ -114,7 +114,7 @@ begin
     for i:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[i];
-      StrSpaces:= StringOfChar(' ', FTabSize - Caret.PosX mod FTabSize);
+      StrSpaces:= StringOfCharW(' ', FTabSize - Caret.PosX mod FTabSize);
       Strings.TextInsert(Caret.PosX, Caret.PosY, StrSpaces, AOvrMode, Shift, PosAfter);
       DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
 

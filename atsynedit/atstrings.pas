@@ -384,8 +384,8 @@ type
     procedure TextReplaceRange(AFromX, AFromY, AToX, AToY: integer; const AText: atString; out AShift,
       APosAfter: TPoint; AWithUndoGroup: boolean);
     function TextReplaceLines_UTF8(ALineFrom, ALineTo: integer; ANewLines: TStringList): boolean;
-    function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: string = #10): atString;
-    function TextSubstringLength(AX1, AY1, AX2, AY2: integer; const AEolString: string=#10): integer;
+    function TextSubstring(AX1, AY1, AX2, AY2: integer; const AEolString: UnicodeString = #10): atString;
+    function TextSubstringLength(AX1, AY1, AX2, AY2: integer; const AEolString: UnicodeString=#10): integer;
     //undo
     property OnGetCaretsArray: TATStringsGetCarets read FOnGetCaretsArray write FOnGetCaretsArray;
     property OnGetMarkersArray: TATStringsGetMarkers read FOnGetMarkersArray write FOnGetMarkersArray;
@@ -1583,7 +1583,7 @@ begin
 end;
 
 function TATStrings.TextSubstring(AX1, AY1, AX2, AY2: integer;
-  const AEolString: string = #10): atString;
+  const AEolString: UnicodeString = #10): atString;
 var
   i: integer;
 begin
@@ -1607,7 +1607,7 @@ begin
 end;
 
 function TATStrings.TextSubstringLength(AX1, AY1, AX2, AY2: integer;
-  const AEolString: string = #10): integer;
+  const AEolString: UnicodeString = #10): integer;
 var
   NLen, NLenEol, i: integer;
 begin

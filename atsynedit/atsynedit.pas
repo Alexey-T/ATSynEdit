@@ -1321,7 +1321,7 @@ type
     property RectMinimap: TRect read FRectMinimap;
     property RectMicromap: TRect read FRectMicromap;
     property RectRuler: TRect read FRectRuler;
-    function IndentString: string;
+    function IndentString: UnicodeString;
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
     //gutter
     property Gutter: TATGutter read FGutter;
@@ -6870,10 +6870,10 @@ begin
   DoEventChange;
 end;
 
-function TATSynEdit.IndentString: string;
+function TATSynEdit.IndentString: UnicodeString;
 begin
   if FOptTabSpaces then
-    Result:= StringOfChar(' ', FTabSize)
+    Result:= StringOfCharW(' ', FTabSize)
   else
     Result:= #9;
 end;
@@ -6905,16 +6905,16 @@ begin
     cIndentAsPrevLine:
       Result:= StrIndent;
     cIndentSpacesOnly:
-      Result:= StringOfChar(' ', NSpaces);
+      Result:= StringOfCharW(' ', NSpaces);
     cIndentTabsOnly:
-      Result:= StringOfChar(#9, NSpaces div FTabSize);
+      Result:= StringOfCharW(#9, NSpaces div FTabSize);
     cIndentTabsAndSpaces:
-      Result:= StringOfChar(#9, NSpaces div FTabSize) + StringOfChar(' ', NSpaces mod FTabSize);
+      Result:= StringOfCharW(#9, NSpaces div FTabSize) + StringOfCharW(' ', NSpaces mod FTabSize);
     cIndentToOpeningBracket:
       begin
         //indent like in prev line + spaces up to opening bracket
         NSpaces:= SGetIndentCharsToOpeningBracket(StrPrev);
-        Result:= StrIndent + StringOfChar(' ', NSpaces-Length(StrIndent));
+        Result:= StrIndent + StringOfCharW(' ', NSpaces-Length(StrIndent));
       end;
   end;
 
