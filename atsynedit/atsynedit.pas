@@ -989,9 +989,9 @@ type
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
     procedure DoPaintAllTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
-    procedure DoPaintLine(C: TCanvas; var ARectLine: TRect;
-      const ACharSize: TPoint; AMainText, AWithGutter: boolean;
-  var AScrollHorz, AScrollVert: TATEditorScrollInfo; AWrapIndex: integer);
+    procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TPoint;
+      AMainText, AWithGutter: boolean; var AScrollHorz,
+      AScrollVert: TATEditorScrollInfo; const AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
     procedure DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
@@ -2809,6 +2809,12 @@ begin
   end;
 end;
 
+type
+  TATEditorPaintingItemProp = record
+    WrapIndex: integer;
+    LineRect: TRect;
+  end;
+
 procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   const ARect: TRect;
   const ACharSize: TPoint;
@@ -2816,8 +2822,11 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   ALineFrom: integer);
 var
-  NWrapIndex, NWrapIndexDummy, NCount: integer;
+  Props: array of TATEditorPaintingItemProp;
   RectLine: TRect;
+  GapItem: TATGapItem;
+  NWrapIndex, NWrapIndexDummy, NCount, iProp: integer;
+  NPaintedLines: integer;
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -2878,12 +2887,13 @@ begin
 
   DoEventBeforeCalcHilite;
 
+  //loop to fill Props array
+  NPaintedLines:= 0;
+  SetLength(Props, 150); //preallocate memory
   RectLine.Top:= ARect.Top;
+
   repeat
     if RectLine.Top>ARect.Bottom then Break;
-    RectLine.Left:= ARect.Left;
-    RectLine.Right:= ARect.Right;
-    RectLine.Bottom:= RectLine.Top+ACharSize.Y;
 
     if not FWrapInfo.IsIndexValid(NWrapIndex) then
     begin
@@ -2907,13 +2917,46 @@ begin
       Break;
     end;
 
-    DoPaintLine(C, RectLine, ACharSize,
-      AMainText, AWithGutter,
-      AScrollHorz, AScrollVert,
-      NWrapIndex);
+    RectLine.Left:= ARect.Left;
+    RectLine.Right:= ARect.Right;
+    RectLine.Bottom:= RectLine.Top+ACharSize.Y;
+
+    Inc(NPaintedLines);
+    if Length(Props)<NPaintedLines then
+      SetLength(Props, Length(Props)+30);
+
+    Props[NPaintedLines-1].WrapIndex:= NWrapIndex;
+    Props[NPaintedLines-1].LineRect:= RectLine;
+
+    Inc(RectLine.Top, ACharSize.Y);
+
+    if AMainText then
+    begin
+      //consider gap before 1st line
+      if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
+      begin
+        GapItem:= Gaps.Find(-1);
+        if Assigned(GapItem) then
+          Inc(RectLine.Top, GapItem.Size);
+      end;
+
+      //conside gap for this line
+      GapItem:= Gaps.Find(WrapInfo[NWrapIndex].NLineIndex);
+      if Assigned(GapItem) then
+        Inc(RectLine.Top, GapItem.Size);
+    end;
 
     Inc(NWrapIndex);
   until false;
+
+  //render lines using Props array
+  for iProp:= 0 to NPaintedLines-1 do
+    DoPaintLine(C,
+      Props[iProp].LineRect,
+      ACharSize,
+      AMainText, AWithGutter,
+      AScrollHorz, AScrollVert,
+      Props[iProp].WrapIndex);
 
   //staples
   if AMainText then
@@ -2921,11 +2964,11 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintLine(C: TCanvas;
-  var ARectLine: TRect;
-  const ACharSize: TPoint;
+  ARectLine: TRect;
+  ACharSize: TPoint;
   AMainText, AWithGutter: boolean;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  AWrapIndex: integer);
+  const AWrapIndex: integer);
   //
   procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
   begin
@@ -3003,7 +3046,7 @@ begin
         if Assigned(GapItem) then
         begin
           DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
-          ARectLine.Top+= GapItem.Size;
+          Inc(ARectLine.Top, GapItem.Size);
         end;
       end;
 
@@ -3522,7 +3565,7 @@ begin
       if Assigned(GapItem) then
       begin
         DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
-        ARectLine.Top+= GapItem.Size;
+        Inc(ARectLine.Top, GapItem.Size);
       end;
     end;
 end;
