@@ -719,14 +719,14 @@ end;
 
 function TATCarets.IsLineWithSelection(APosY: integer): boolean;
 var
-  i: integer;
   Item: TATCaretItem;
   Y1, Y2, X1, X2: integer;
+  i: integer;
 begin
   Result:= false;
-  for i:= 0 to FList.Count-1 do
+  for i:= 0 to Count-1 do
   begin
-    Item:= TATCaretItem(FList[i]);
+    Item:= Items[i];
     if Item.EndY>=0 then
     begin
       X1:= Item.PosX;
