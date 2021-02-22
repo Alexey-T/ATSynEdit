@@ -989,6 +989,9 @@ type
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
     procedure DoPaintAllTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
+    procedure DoPaintLine(C: TCanvas; var ARectLine: TRect;
+      const ACharSize: TPoint; AMainText, AWithGutter: boolean;
+  var AScrollHorz, AScrollVert: TATEditorScrollInfo; AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
     procedure DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
@@ -2813,63 +2816,9 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   ALineFrom: integer);
 var
-  NCoordTop, NCoordSep: integer;
-  //
-  procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
-  begin
-    {$ifdef use_bg}
-    if AMainText then
-    begin
-      C.Brush.Color:= AFillColor;
-      C.FillRect(ARectLeft, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-    end
-    else
-      FFastBmp.FillRect(
-        ARectLeft - FRectMinimap.Left,
-        NCoordTop - FRectMinimap.Top,
-        FRectMinimap.Width,
-        NCoordTop - FRectMinimap.Top + ACharSize.Y,
-        AFillColor);
-    {$else}
-    C.Brush.Color:= AFillColor;
-    C.FillRect(ARectLeft, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
-    {$endif}
-  end;
-  //
-var
-  NWrapIndex, NWrapIndexDummy, NLinesIndex, NLineLen, NCount: integer;
-  NOutputCharsSkipped, NOutputCellPercentsSkipped: integer;
-  NOutputStrWidth, NOutputMaximalChars: integer;
-  WrapItem: TATWrapItem;
-  GapItem: TATGapItem;
-  Band: TATGutterItem;
-  StringItem: PATStringItem;
-  NColorEntire, NColorAfter: TColor;
-  NColorOfStates: array[TATLineState] of TColor;
-  NDimValue, NBandDecor: integer;
-  StrOutput: atString;
-  CurrPoint, CurrPointText, CoordAfterText: TPoint;
-  LineSeparator: TATLineSeparator;
-  LineState: TATLineState;
-  bLineWithCaret, bLineEolSelected, bLineColorForced, bLineHuge: boolean;
-  Event: TATSynEditDrawLineEvent;
-  TextOutProps: TATCanvasTextOutProps;
-  bCachedMinimap, bUseColorOfCurrentLine: boolean;
-  bHiliteLinesWithSelection: boolean;
-  bUseSetPixel: boolean;
-  NSubPos, NSubLen: integer;
-  bTrimmedNonSpaces: boolean;
+  NWrapIndex, NWrapIndexDummy, NCount: integer;
+  RectLine: TRect;
 begin
-  bHiliteLinesWithSelection:= not AMainText and FMinimapHiliteLinesWithSelection;
-  bUseSetPixel:=
-    {$ifndef windows} DoubleBuffered and {$endif}
-    (ACharSize.X=1);
-
-  NColorOfStates[cLineStateNone]:= -1;
-  NColorOfStates[cLineStateChanged]:= Colors.StateChanged;
-  NColorOfStates[cLineStateAdded]:= Colors.StateAdded;
-  NColorOfStates[cLineStateSaved]:= Colors.StateSaved;
-
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
@@ -2916,8 +2865,6 @@ begin
   AScrollHorz.NMax:= 1;
   {$endif}
 
-  NCoordTop:= ARect.Top;
-
   if ALineFrom>=0 then
   begin
     FWrapInfo.FindIndexesOfLineNumber(ALineFrom, NWrapIndex, NWrapIndexDummy);
@@ -2931,14 +2878,12 @@ begin
 
   DoEventBeforeCalcHilite;
 
-  bCachedMinimap:=
-    not AMainText and
-    FMinimapCachedPainting and
-    Assigned(FAdapterHilite) and
-    not TempSel_IsMultiline;
-
+  RectLine.Top:= ARect.Top;
   repeat
-    if NCoordTop>ARect.Bottom then Break;
+    if RectLine.Top>ARect.Bottom then Break;
+    RectLine.Left:= ARect.Left;
+    RectLine.Right:= ARect.Right;
+    RectLine.Bottom:= RectLine.Top+ACharSize.Y;
 
     if not FWrapInfo.IsIndexValid(NWrapIndex) then
     begin
@@ -2950,31 +2895,115 @@ begin
               DoPaintUnprintedEolText(C,
                 'EOF',
                 ARect.Left,
-                NCoordTop,
+                RectLine.Top,
                 Colors.UnprintedFont,
                 Colors.UnprintedBG)
             else
               CanvasArrowHorz(C,
-                Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y),
+                RectLine,
                 Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
                 false,
                 OptUnprintedTabPointerScale);
       Break;
     end;
 
-    WrapItem:= FWrapInfo[NWrapIndex];
+    DoPaintLine(C, RectLine, ACharSize,
+      AMainText, AWithGutter,
+      AScrollHorz, AScrollVert,
+      NWrapIndex);
+
+    Inc(NWrapIndex);
+  until false;
+
+  //staples
+  if AMainText then
+    DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
+end;
+
+procedure TATSynEdit.DoPaintLine(C: TCanvas;
+  var ARectLine: TRect;
+  const ACharSize: TPoint;
+  AMainText, AWithGutter: boolean;
+  var AScrollHorz, AScrollVert: TATEditorScrollInfo;
+  AWrapIndex: integer);
+  //
+  procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
+  begin
+    {$ifdef use_bg}
+    if AMainText then
+    begin
+      C.Brush.Color:= AFillColor;
+      C.FillRect(ARectLine);
+    end
+    else
+      FFastBmp.FillRect(
+        ARectLeft - FRectMinimap.Left,
+        ARectLine.Top - FRectMinimap.Top,
+        FRectMinimap.Width,
+        ARectLine.Top - FRectMinimap.Top + ACharSize.Y,
+        AFillColor);
+    {$else}
+    C.Brush.Color:= AFillColor;
+    C.FillRect(ARectLeft, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+    {$endif}
+  end;
+  //
+var
+  NLinesIndex, NLineLen, NCount: integer;
+  NOutputCharsSkipped, NOutputCellPercentsSkipped: integer;
+  NOutputStrWidth, NOutputMaximalChars: integer;
+  NCoordSep: integer;
+  WrapItem: TATWrapItem;
+  GapItem: TATGapItem;
+  Band: TATGutterItem;
+  StringItem: PATStringItem;
+  NColorEntire, NColorAfter: TColor;
+  NDimValue, NBandDecor: integer;
+  StrOutput: atString;
+  CurrPoint, CurrPointText, CoordAfterText: TPoint;
+  LineSeparator: TATLineSeparator;
+  LineState: TATLineState;
+  bLineWithCaret, bLineEolSelected, bLineColorForced, bLineHuge: boolean;
+  NColorOfStates: array[TATLineState] of TColor;
+  Event: TATSynEditDrawLineEvent;
+  TextOutProps: TATCanvasTextOutProps;
+  bCachedMinimap: boolean;
+  bUseSetPixel: boolean;
+  NSubPos, NSubLen: integer;
+  bHiliteLinesWithSelection: boolean;
+  bTrimmedNonSpaces: boolean;
+  bUseColorOfCurrentLine: boolean;
+begin
+  NColorOfStates[cLineStateNone]:= -1;
+  NColorOfStates[cLineStateChanged]:= Colors.StateChanged;
+  NColorOfStates[cLineStateAdded]:= Colors.StateAdded;
+  NColorOfStates[cLineStateSaved]:= Colors.StateSaved;
+
+  bUseSetPixel:=
+    {$ifndef windows} DoubleBuffered and {$endif}
+    (ACharSize.X=1);
+
+  bCachedMinimap:=
+    not AMainText and
+    FMinimapCachedPainting and
+    Assigned(FAdapterHilite) and
+    not TempSel_IsMultiline;
+
+  bHiliteLinesWithSelection:= not AMainText and FMinimapHiliteLinesWithSelection;
+
+    WrapItem:= FWrapInfo[AWrapIndex];
     NLinesIndex:= WrapItem.NLineIndex;
-    if not Strings.IsIndexValid(NLinesIndex) then Break;
+    if not Strings.IsIndexValid(NLinesIndex) then Exit;
 
     //support Gap before the 1st line
     if AMainText then
-      if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
+      if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
       begin
         GapItem:= Gaps.Find(-1);
         if Assigned(GapItem) then
         begin
-          DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+GapItem.Size), GapItem);
-          NCoordTop+= GapItem.Size;
+          DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
+          ARectLine.Top+= GapItem.Size;
         end;
       end;
 
@@ -2998,15 +3027,15 @@ begin
             NColorAfter:= NColorEntire;
 
           if NColorAfter<>clNone then
-            FillOneLine(NColorAfter, ARect.Left);
+            FillOneLine(NColorAfter, ARectLine.Left);
 
           CurrPointText:= Point(
-            Int64(ARect.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
-            NCoordTop);
+            Int64(ARectLine.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
+            ARectLine.Top);
 
           CanvasTextOutMinimap(
             {$ifdef use_bg} FFastBmp, {$else} C, {$endif}
-            ARect,
+            ARectLine,
             CurrPointText.X {$ifdef use_bg} - FRectMinimap.Left {$endif},
             CurrPointText.Y {$ifdef use_bg} - FRectminimap.Top {$endif},
             ACharSize,
@@ -3022,9 +3051,7 @@ begin
             );
 
           //end of painting line
-          Inc(NCoordTop, ACharSize.Y);
-          Inc(NWrapIndex);
-          Continue;
+          Inc(ARectLine.Top, ACharSize.Y);
         end
         else
         begin
@@ -3040,14 +3067,14 @@ begin
     begin
       FLineBottom:= NLinesIndex;
 
-      if IsFoldLineNeededBeforeWrapitem(NWrapIndex) then
+      if IsFoldLineNeededBeforeWrapitem(AWrapIndex) then
       begin
-        NCoordSep:= NCoordTop-1;
+        NCoordSep:= ARectLine.Top-1;
         C.Pen.Color:= Colors.CollapseLine;
         CanvasLineHorz(C,
-          ARect.Left+FFoldUnderlineOffset,
+          ARectLine.Left+FFoldUnderlineOffset,
           NCoordSep,
-          ARect.Right-FFoldUnderlineOffset
+          ARectLine.Right-FFoldUnderlineOffset
           );
       end;
     end;
@@ -3057,8 +3084,8 @@ begin
     NOutputCellPercentsSkipped:= 0;
     NOutputStrWidth:= 0;
 
-    CurrPoint.X:= ARect.Left;
-    CurrPoint.Y:= NCoordTop;
+    CurrPoint.X:= ARectLine.Left;
+    CurrPoint.Y:= ARectLine.Top;
     CurrPointText.X:= CurrPoint.X
                       + WrapItem.NIndent*ACharSize.X
                       - AScrollHorz.SmoothPos
@@ -3159,7 +3186,7 @@ begin
       if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsEntered) then
       begin
         if FOptShowCurLineMinimal then
-          bUseColorOfCurrentLine:= IsLinePartWithCaret(NLinesIndex, NCoordTop)
+          bUseColorOfCurrentLine:= IsLinePartWithCaret(NLinesIndex, ARectLine.Top)
         else
           bUseColorOfCurrentLine:= true;
       end;
@@ -3175,7 +3202,7 @@ begin
       if (NLinesIndex+1) mod FOptZebraStep = 0 then
         NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
 
-    FillOneLine(NColorEntire, ARect.Left);
+    FillOneLine(NColorEntire, ARectLine.Left);
 
     //paint line
     if StrOutput<>'' then
@@ -3184,8 +3211,8 @@ begin
       begin
         NColorAfter:= FColorBG;
         DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter);
-        DoPaintLineIndent(C, ARect, ACharSize,
-          NCoordTop, WrapItem.NIndent,
+        DoPaintLineIndent(C, ARectLine, ACharSize,
+          ARectLine.Top, WrapItem.NIndent,
           NColorAfter,
           AScrollHorz.NPos, AMainText and FOptShowIndentLines);
       end;
@@ -3202,7 +3229,7 @@ begin
         //raise Exception.Create('Program bug in text renderer, report to author!');
         C.Font.Color:= clRed;
         C.TextOut(CurrPointText.X, CurrPointText.Y, 'Program bug in text renderer, report to author!');
-        Break;
+        Exit;
       end;
 
       //apply DimRanges
@@ -3227,7 +3254,7 @@ begin
         SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
 
       //truncate text to not paint over screen
-      NCount:= ARect.Width div ACharSize.X + 2;
+      NCount:= ARectLine.Width div ACharSize.X + 2;
       if Length(StrOutput)>NCount then
         SetLength(StrOutput, NCount);
 
@@ -3279,7 +3306,7 @@ begin
           );
 
         //paint selection bg, after applying ColorAfterEol
-        DoPaintSelectedLineBG(C, ACharSize, ARect,
+        DoPaintSelectedLineBG(C, ACharSize, ARectLine,
           CurrPoint,
           CurrPointText,
           WrapItem,
@@ -3290,7 +3317,7 @@ begin
       if StrOutput<>'' then
         CanvasTextOutMinimap(
           {$ifdef use_bg} FFastBmp, {$else} C, {$endif}
-          ARect,
+          ARectLine,
           CurrPointText.X {$ifdef use_bg} - FRectMinimap.Left {$endif},
           CurrPointText.Y {$ifdef use_bg} - FRectminimap.Top {$endif},
           ACharSize,
@@ -3316,10 +3343,10 @@ begin
         NColorAfter:= clNone;
         DoCalcPosColor(0, NLinesIndex, NColorAfter);
         if NColorAfter<>clNone then
-          FillOneLine(NColorAfter, ARect.Left);
+          FillOneLine(NColorAfter, ARectLine.Left);
       end;
 
-      DoPaintSelectedLineBG(C, ACharSize, ARect,
+      DoPaintSelectedLineBG(C, ACharSize, ARectLine,
         CurrPoint,
         CurrPointText,
         WrapItem,
@@ -3388,11 +3415,11 @@ begin
     if LineSeparator<>cLineSepNone then
     begin
       if LineSeparator=cLineSepTop then
-        NCoordSep:= NCoordTop
+        NCoordSep:= ARectLine.Top
       else
-        NCoordSep:= NCoordTop+ACharSize.Y-1;
+        NCoordSep:= ARectLine.Top+ACharSize.Y-1;
       C.Pen.Color:= Colors.BlockSepLine;
-      CanvasLineHorz(C, ARect.Left, NCoordSep, ARect.Right);
+      CanvasLineHorz(C, ARectLine.Left, NCoordSep, ARectLine.Right);
     end;
 
     //draw gutter
@@ -3400,7 +3427,7 @@ begin
     begin
       //paint area over scrolled text
       C.Brush.Color:= Colors.GutterBG;
-      C.FillRect(FRectGutter.Left, NCoordTop, FRectGutter.Right, NCoordTop+ACharSize.Y);
+      C.FillRect(FRectGutter.Left, ARectLine.Top, FRectGutter.Right, ARectLine.Top+ACharSize.Y);
 
       //gutter band: number
       Band:= FGutter[FGutterBandNumbers];
@@ -3408,14 +3435,14 @@ begin
       begin
         if bLineWithCaret and FOptShowGutterCaretBG then
         begin
-          DoPaintGutterBandBG(C, FGutterBandNumbers, Colors.GutterCaretBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+          DoPaintGutterBandBG(C, FGutterBandNumbers, Colors.GutterCaretBG, ARectLine.Top, ARectLine.Top+ACharSize.Y, false);
           C.Font.Color:= Colors.GutterCaretFont;
         end
         else
           C.Font.Color:= Colors.GutterFont;
 
         if WrapItem.bInitial then
-          DoPaintLineNumber(C, NLinesIndex, NCoordTop, Band);
+          DoPaintLineNumber(C, NLinesIndex, ARectLine.Top, Band);
       end;
 
       //gutter decor
@@ -3429,9 +3456,9 @@ begin
           DoPaintGutterDecor(C, NLinesIndex,
             Rect(
               Band.Left,
-              NCoordTop,
+              ARectLine.Top,
               Band.Right,
-              NCoordTop+ACharSize.Y
+              ARectLine.Top+ACharSize.Y
               ));
 
       //gutter band: bookmark
@@ -3443,9 +3470,9 @@ begin
             DoEventDrawBookmarkIcon(C, NLinesIndex,
               Rect(
                 Band.Left,
-                NCoordTop,
+                ARectLine.Top,
                 Band.Right,
-                NCoordTop+ACharSize.Y
+                ARectLine.Top+ACharSize.Y
                 ));
         end;
 
@@ -3453,13 +3480,13 @@ begin
       Band:= FGutter[FGutterBandFolding];
       if Band.Visible then
       begin
-        DoPaintGutterBandBG(C, FGutterBandFolding, Colors.GutterFoldBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+        DoPaintGutterBandBG(C, FGutterBandFolding, Colors.GutterFoldBG, ARectLine.Top, ARectLine.Top+ACharSize.Y, false);
         DoPaintGutterFolding(C,
-          NWrapIndex,
+          AWrapIndex,
           Band.Left,
           Band.Right,
-          NCoordTop,
-          NCoordTop+ACharSize.Y
+          ARectLine.Top,
+          ARectLine.Top+ACharSize.Y
           );
       end;
 
@@ -3472,22 +3499,21 @@ begin
           DoPaintGutterBandBG(C,
             FGutterBandStates,
             NColorOfStates[LineState],
-            NCoordTop,
-            NCoordTop+ACharSize.Y,
+            ARectLine.Top,
+            ARectLine.Top+ACharSize.Y,
             false);
       end;
 
       //gutter band: separator
       if FGutter[FGutterBandSeparator].Visible then
-        DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+        DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, ARectLine.Top, ARectLine.Top+ACharSize.Y, false);
       //gutter band: empty indent
       if FGutter[FGutterBandEmpty].Visible then
-        DoPaintGutterBandBG(C, FGutterBandEmpty, FColorBG, NCoordTop, NCoordTop+ACharSize.Y, false);
+        DoPaintGutterBandBG(C, FGutterBandEmpty, FColorBG, ARectLine.Top, ARectLine.Top+ACharSize.Y, false);
     end;
 
     //end of painting line
-    Inc(NCoordTop, ACharSize.Y);
-    Inc(NWrapIndex);
+    Inc(ARectLine.Top, ACharSize.Y);
 
     //consider gap (not for minimap)
     if AMainText and (WrapItem.NFinal=cWrapItemFinal) then
@@ -3495,15 +3521,10 @@ begin
       GapItem:= Gaps.Find(NLinesIndex);
       if Assigned(GapItem) then
       begin
-        DoPaintGapTo(C, Rect(ARect.Left, NCoordTop, ARect.Right, NCoordTop+GapItem.Size), GapItem);
-        NCoordTop+= GapItem.Size;
+        DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
+        ARectLine.Top+= GapItem.Size;
       end;
     end;
-  until false;
-
-  //staples
-  if AMainText then
-    DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
 end;
 
 function TATSynEdit.GetMinimapSelTop: integer;
