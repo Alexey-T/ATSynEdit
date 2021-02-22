@@ -1208,7 +1208,7 @@ function TATEditorFinder.DoAction_FindOrReplace(AReplace, AForMany: boolean;
 var
   NMaxFragment: integer;
   i: integer;
-  bWasGoodFragment: boolean;
+  //bWasGoodFragment: boolean;
 begin
   Result:= false;
   AChanged:= false;
@@ -1236,7 +1236,7 @@ begin
 
   if not OptBack then
   begin
-    bWasGoodFragment:= false;
+    //bWasGoodFragment:= false;
 
     //handle OptWrapped #1, Result isn't ready
     //this is to reset special marker, when last match in last selection is: abc[def], ie until selection end
@@ -1245,7 +1245,7 @@ begin
         if FFragments[NMaxFragment].IsMarkerOnFragmentEnd(Editor) then
         begin
           Editor.Markers.Clear;
-          bWasGoodFragment:= true;
+          //bWasGoodFragment:= true;
         end;
 
     //LoopFw:
@@ -1255,7 +1255,7 @@ begin
       Result:= DoFindOrReplace_InFragment(AReplace, AForMany, AChanged, AUpdateCaret);
       if Result then
       begin
-        bWasGoodFragment:= true;
+        //bWasGoodFragment:= true;
         Break;
       end;
     end;

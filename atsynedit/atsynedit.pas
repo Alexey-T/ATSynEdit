@@ -3825,8 +3825,6 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
-var
-  XFrom, XTo, X: integer;
 begin
   if (AX>=FRectMain.Left) and (AX<FRectMain.Right) then
   begin

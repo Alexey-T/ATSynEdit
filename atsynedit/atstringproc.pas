@@ -61,7 +61,7 @@ type
     );
 
 const
-  cLineEndStrings: array[TATLineEnds] of string = ('', #13#10, #10, #13);
+  cLineEndStrings: array[TATLineEnds] of UnicodeString = ('', #13#10, #10, #13);
   cLineEndNiceNames: array[TATLineEnds] of string = ('', 'CRLF', 'LF', 'CR');
   cLineEndLength: array[TATLineEnds] of integer = (0, 2, 1, 1);
 
