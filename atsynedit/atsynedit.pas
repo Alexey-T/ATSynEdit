@@ -2813,6 +2813,8 @@ type
   PATEditorPaintingItemProp = ^TATEditorPaintingItemProp;
   TATEditorPaintingItemProp = record
     LineRect: TRect;
+    BitmapRect: TRect;
+    Bitmap: TBitmap;
     WrapIndex: integer;
   end;
 
@@ -2893,6 +2895,7 @@ begin
   //loop to fill Props array
   NPropCount:= 0;
   SetLength(Props, 100); //preallocate memory
+  FillChar(Props, SizeOf(Props), 0);
 
   RectLine.Left:= ARect.Left;
   RectLine.Right:= ARect.Right;
@@ -2949,6 +2952,9 @@ begin
     PropPtr:= @Props[NPropCount-1];
     PropPtr^.WrapIndex:= NWrapIndex;
     PropPtr^.LineRect:= RectLine;
+    PropPtr^.BitmapRect:= Rect(0, 0, RectLine.Width, RectLine.Height);
+    PropPtr^.Bitmap:= TBitmap.Create;
+    PropPtr^.Bitmap.PixelFormat:= pf24bit;
 
     Inc(NWrapIndex);
   until false;
@@ -2983,6 +2989,11 @@ begin
     C.FrameRect(RectLine);
     }
   end;
+
+  for iProp:= NPropCount-1 downto 0 do
+    with Props[iProp] do
+      if Assigned(Bitmap) then
+        FreeAndNil(Bitmap);
 
   //staples
   if AMainText then
