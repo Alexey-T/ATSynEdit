@@ -991,8 +991,8 @@ type
     procedure DoPaintAllTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TPoint;
-      AMainText, AWithGutter: boolean; var AScrollHorz,
-      AScrollVert: TATEditorScrollInfo; const AWrapIndex: integer);
+      AMainText: boolean; var AScrollHorz, AScrollVert: TATEditorScrollInfo;
+  const AWrapIndex: integer);
     procedure DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TPoint;
       AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
@@ -2981,11 +2981,11 @@ begin
   begin
     PropPtr:= @Props[iProp];
 
-    DoPaintLine(C,
+    DoPaintLine(
+      C,
       PropPtr^.LineRect,
       ACharSize,
       AMainText,
-      AWithGutter,
       AScrollHorz,
       AScrollVert,
       PropPtr^.WrapIndex
@@ -2994,7 +2994,7 @@ begin
     if AWithGutter then
       DoPaintGutterOfLine(
         C,
-        PropPtr^.LineRect,
+        PropPtr^.LineRect, //only Top/Bottom coords of rect are read here
         ACharSize,
         PropPtr^.WrapIndex
         );
@@ -3021,7 +3021,7 @@ end;
 procedure TATSynEdit.DoPaintLine(C: TCanvas;
   ARectLine: TRect;
   ACharSize: TPoint;
-  AMainText, AWithGutter: boolean;
+  AMainText: boolean;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   const AWrapIndex: integer);
   //
@@ -3335,7 +3335,7 @@ begin
         if NColorAfter<>clNone then
           FillOneLine(NColorAfter, CurrPointText.X);
 
-      if AWithGutter then
+      if AMainText then
         Event:= FOnDrawLine
       else
         Event:= nil;
