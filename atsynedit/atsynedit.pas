@@ -6504,7 +6504,7 @@ end;
 procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
 //painting of text is slower, paint a special mark if possible
   //
-  procedure PaintDash(NW, NH: integer);
+  procedure PaintDash(W, H: integer);
   var
     P: TPoint;
   begin
@@ -6514,17 +6514,17 @@ procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: intege
       taLeftJustify:
         P.X:= ABand.Left + FNumbersIndent;
       taRightJustify:
-        P.X:= ABand.Right - FNumbersIndent - NW;
+        P.X:= ABand.Right - FNumbersIndent - FCharSize.X div 2;
       taCenter:
-        P.X:= (ABand.Left+ABand.Right) div 2 - 1;
+        P.X:= (ABand.Left+ABand.Right) div 2;
     end;
 
     C.Brush.Color:= C.Font.Color;
     C.FillRect(
-      P.X,
+      P.X - W div 2,
       P.Y,
-      P.X+NW,
-      P.Y+NH
+      P.X - W div 2 + W,
+      P.Y + H
       );
   end;
   //
