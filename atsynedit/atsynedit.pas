@@ -2811,8 +2811,8 @@ end;
 
 type
   TATEditorPaintingItemProp = record
-    WrapIndex: integer;
     LineRect: TRect;
+    WrapIndex: integer;
   end;
 
 procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
@@ -2890,7 +2890,7 @@ begin
 
   //loop to fill Props array
   NPropCount:= 0;
-  SetLength(Props, 150); //preallocate memory
+  SetLength(Props, 100); //preallocate memory
   RectLine.Top:= ARect.Top;
 
   repeat
