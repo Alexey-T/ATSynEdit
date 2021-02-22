@@ -2950,6 +2950,10 @@ begin
     Inc(NWrapIndex);
   until false;
 
+  //update LineBottom
+  NWrapIndex:= Props[NPropCount-1].WrapIndex;
+  FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
+
   //render lines using Props array
   for iProp:= 0 to NPropCount-1 do
   begin
@@ -3118,8 +3122,6 @@ begin
     //don't update FLineBottom if minimap paints
     if AMainText then
     begin
-      FLineBottom:= NLinesIndex;
-
       if IsFoldLineNeededBeforeWrapitem(AWrapIndex) then
       begin
         NCoordSep:= ARectLine.Top-1;
