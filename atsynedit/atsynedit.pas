@@ -6894,7 +6894,7 @@ begin
   bAddIndent:=
     AUseIndentRegexRule and
     (FOptAutoIndentRegexRule<>'') and
-    SFindRegexMatch(StrPrev, FOptAutoIndentRegexRule, MatchPos, MatchLen);
+    SFindRegexMatch(StrPrev, FOptAutoIndentRegexRule{%H-}, MatchPos, MatchLen);
 
   StrIndent:= Copy(StrPrev, 1, NChars);
   NSpaces:= Length(FTabHelper.TabsToSpaces(APosY, StrIndent));
@@ -8455,7 +8455,7 @@ begin
     FRegexLinks.ModifierS:= false;
     FRegexLinks.ModifierM:= false; //M not needed
     FRegexLinks.ModifierI:= false; //I not needed to find links
-    FRegexLinks.Expression:= FOptShowURLsRegex;
+    FRegexLinks.Expression:= FOptShowURLsRegex{%H-};
     FRegexLinks.Compile;
 
     Result:= true;

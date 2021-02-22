@@ -869,7 +869,7 @@ var
   Item: TATCaretItem;
   i: integer;
 begin
-  SetLength(Result, Count*2);
+  SetLength(Result{%H-}, Count*2);
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];

@@ -295,7 +295,7 @@ begin
     Parts:= 1;
   if N<0 then
   begin
-    SetLength(Result, 0);
+    SetLength(Result{%H-}, 0);
     exit;
   end;
   if N+1<=Parts then

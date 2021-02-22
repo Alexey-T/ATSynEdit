@@ -388,7 +388,7 @@ begin
     nEndLine:= RngOuter^.Y2;
   end;
 
-  SetLength(Result, 0);
+  SetLength(Result{%H-}, 0);
   L:= TATIntegerList.Create;
   L.Capacity:= 128;
 
@@ -428,7 +428,7 @@ var
   R: PATSynRange;
   NLen, NRange, i: integer;
 begin
-  SetLength(Result, 0);
+  SetLength(Result{%H-}, 0);
   if ALine>High(FLineIndexer) then exit;
 
   if not AOnlyFolded then
@@ -464,7 +464,7 @@ function TATSynRanges.FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TAT
 var
   NMax, NRange, iLine, iItem: integer;
 begin
-  SetLength(Result, 0);
+  SetLength(Result{%H-}, 0);
   NMax:= High(FLineIndexer);
   if ALineFrom>NMax then exit;
   if ALineTo>NMax then ALineTo:= NMax;
@@ -486,7 +486,7 @@ var
   NMax, NRange, iLine, iItem: integer;
   Rng: PATSynRange;
 begin
-  SetLength(Result, 0);
+  SetLength(Result{%H-}, 0);
   NMax:= High(FLineIndexer);
   if ALineFrom>NMax then exit;
   if ALineTo>NMax then ALineTo:= NMax;

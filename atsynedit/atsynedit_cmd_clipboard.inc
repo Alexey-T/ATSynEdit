@@ -219,7 +219,7 @@ begin
         Caret.GetRange(X1, Y1, X2, Y2, bSel);
         if not bSel then Continue;
 
-        Str:= Strings.TextSubstring(X1, Y1, X2, Y2, EolString);
+        Str:= Strings.TextSubstring(X1, Y1, X2, Y2, EolString{%H-});
         if Str<>'' then
           ListStr.Add(UTF8Encode(Str));
       end;

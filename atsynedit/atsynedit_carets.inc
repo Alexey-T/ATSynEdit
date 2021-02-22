@@ -742,14 +742,14 @@ end;
 
 function TATSynEdit.GetCaretsArray: TATPointArray;
 begin
-  SetLength(Result, 0);
+  SetLength(Result{%H-}, 0);
   if Assigned(FCarets) then
     Result:= FCarets.AsArray;
 end;
 
 function TATSynEdit.GetMarkersArray: TATInt64Array;
 begin
-  SetLength(Result, 0);
+  SetLength(Result{%H-}, 0);
   if Assigned(FMarkers) then
     Result:= FMarkers.AsArray;
 end;

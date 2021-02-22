@@ -204,7 +204,7 @@ var
   Item: TATMarkerItem;
   i: integer;
 begin
-  SetLength(Result, Count*NN);
+  SetLength(Result{%H-}, Count*NN);
   for i:= 0 to Count-1 do
   begin
     Item:= Items[i];
