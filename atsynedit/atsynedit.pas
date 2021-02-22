@@ -2810,6 +2810,7 @@ begin
 end;
 
 type
+  PATEditorPaintingItemProp = ^TATEditorPaintingItemProp;
   TATEditorPaintingItemProp = record
     LineRect: TRect;
     WrapIndex: integer;
@@ -2823,6 +2824,7 @@ procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
   ALineFrom: integer);
 var
   Props: array of TATEditorPaintingItemProp;
+  PropPtr: PATEditorPaintingItemProp;
   RectLine: TRect;
   GapItem: TATGapItem;
   NWrapIndex, NWrapIndexDummy,
@@ -2944,8 +2946,9 @@ begin
         Inc(RectLine.Bottom, GapItem.Size);
     end;
 
-    Props[NPropCount-1].WrapIndex:= NWrapIndex;
-    Props[NPropCount-1].LineRect:= RectLine;
+    PropPtr:= @Props[NPropCount-1];
+    PropPtr^.WrapIndex:= NWrapIndex;
+    PropPtr^.LineRect:= RectLine;
 
     Inc(NWrapIndex);
   until false;
@@ -2957,16 +2960,20 @@ begin
   //render lines using Props array
   for iProp:= 0 to NPropCount-1 do
   begin
+    PropPtr:= @Props[iProp];
     DoPaintLine(C,
-      Props[iProp].LineRect,
+      PropPtr^.LineRect,
       ACharSize,
-      AMainText, AWithGutter,
-      AScrollHorz, AScrollVert,
-      Props[iProp].WrapIndex);
+      AMainText,
+      AWithGutter,
+      AScrollHorz,
+      AScrollVert,
+      PropPtr^.WrapIndex);
+
     {
     //debug
     C.Brush.Color:= clRed;
-    RectLine:= Props[iProp].LineRect;
+    RectLine:= PropPtr^.LineRect;
     InflateRect(RectLine, -1, -1);
     C.FrameRect(RectLine);
     }
