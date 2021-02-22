@@ -185,7 +185,6 @@ object fmLexerProp: TfmLexerProp
         OptRulerVisible = False
         OptWrapMode = cWrapOff
         OptNumbersStyle = cNumbersNone
-        OptNumbersSkippedChar = '.'
         OptUnprintedVisible = False
       end
     end

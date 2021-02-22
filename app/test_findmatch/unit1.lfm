@@ -156,7 +156,6 @@ object fmMain: TfmMain
     Colors.ComboboxArrowBG = 15790320
     OptNonWordChars = '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`'#8230
     OptShowURLsRegex = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+'
-    OptNumbersSkippedChar = '.'
     OptUnprintedVisible = False
     OptUnprintedSpaces = False
     OptUnprintedEnds = False
