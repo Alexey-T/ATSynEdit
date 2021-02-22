@@ -6504,14 +6504,13 @@ end;
 procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
 //painting of text is slower, paint a special mark if possible
 var
-  Str: string;
-  CoordX: integer;
-  NDotSize, NW, NH: integer;
+  SText: string;
   P: TPoint;
+  NW, NH: integer;
 begin
-  Str:= DoFormatLineNumber(ALineIndex+1);
+  SText:= DoFormatLineNumber(ALineIndex+1);
 
-  case Str of
+  case SText of
     '':
       exit;
 
@@ -6527,14 +6526,14 @@ begin
             P.X:= (ABand.Left+ABand.Right) div 2 - 1;
         end;
 
-        NDotSize:= EditorScale(2);
+        NW:= EditorScale(2);
 
         C.Brush.Color:= C.Font.Color;
         C.FillRect(
           P.X,
           P.Y,
-          P.X+NDotSize,
-          P.Y+NDotSize
+          P.X+NW,
+          P.Y+NW
           );
         exit;
       end;
@@ -6566,18 +6565,19 @@ begin
 
     else
       begin
-        NW:= FCharSize.X*Length(Str);
+        NW:= FCharSize.X*Length(SText);
 
+        P.Y:= ACoordTop;
         case FOptNumbersAlignment of
           taLeftJustify:
-            CoordX:= ABand.Left + FNumbersIndent;
+            P.X:= ABand.Left + FNumbersIndent;
           taRightJustify:
-            CoordX:= ABand.Right - NW - FNumbersIndent;
+            P.X:= ABand.Right - NW - FNumbersIndent;
           taCenter:
-            CoordX:= (ABand.Left + ABand.Right - NW) div 2;
+            P.X:= (ABand.Left + ABand.Right - NW) div 2;
         end;
 
-        CanvasTextOutSimplest(C, CoordX, ACoordTop, Str);
+        CanvasTextOutSimplest(C, P.X, P.Y, SText);
       end;
   end;
 end;
