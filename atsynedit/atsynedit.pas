@@ -2825,8 +2825,9 @@ var
   Props: array of TATEditorPaintingItemProp;
   RectLine: TRect;
   GapItem: TATGapItem;
-  NWrapIndex, NWrapIndexDummy, NCount, iProp: integer;
-  NPaintedLines: integer;
+  NWrapIndex, NWrapIndexDummy,
+  NLineCount, NPropCount,
+  iProp: integer;
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -2862,8 +2863,8 @@ begin
 
   if AMainText and (FTextHint<>'') then
   begin
-    NCount:= Strings.Count;
-    if (NCount=0) or ((NCount=1) and (Strings.LinesLen[0]=0)) then
+    NLineCount:= Strings.Count;
+    if (NLineCount=0) or ((NLineCount=1) and (Strings.LinesLen[0]=0)) then
     begin
       DoPaintTextHintTo(C);
       Exit
@@ -2888,7 +2889,7 @@ begin
   DoEventBeforeCalcHilite;
 
   //loop to fill Props array
-  NPaintedLines:= 0;
+  NPropCount:= 0;
   SetLength(Props, 150); //preallocate memory
   RectLine.Top:= ARect.Top;
 
@@ -2921,12 +2922,12 @@ begin
     RectLine.Right:= ARect.Right;
     RectLine.Bottom:= RectLine.Top+ACharSize.Y;
 
-    Inc(NPaintedLines);
-    if Length(Props)<NPaintedLines then
+    Inc(NPropCount);
+    if Length(Props)<NPropCount then
       SetLength(Props, Length(Props)+30);
 
-    Props[NPaintedLines-1].WrapIndex:= NWrapIndex;
-    Props[NPaintedLines-1].LineRect:= RectLine;
+    Props[NPropCount-1].WrapIndex:= NWrapIndex;
+    Props[NPropCount-1].LineRect:= RectLine;
 
     Inc(RectLine.Top, ACharSize.Y);
 
@@ -2950,7 +2951,7 @@ begin
   until false;
 
   //render lines using Props array
-  for iProp:= 0 to NPaintedLines-1 do
+  for iProp:= 0 to NPropCount-1 do
     DoPaintLine(C,
       Props[iProp].LineRect,
       ACharSize,
