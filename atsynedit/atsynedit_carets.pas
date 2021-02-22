@@ -704,16 +704,22 @@ end;
 
 function TATCarets.IsLineListed(APosY: integer): boolean;
 var
-  i: integer;
-  Item: TATCaretItem;
+  a, b, m, dif: integer;
 begin
   Result:= false;
-  for i:= 0 to FList.Count-1 do
-  begin
-    Item:= TATCaretItem(FList[i]);
-    if Item.PosY=APosY then
+  a:= 0;
+  b:= Count-1;
+  repeat
+    if a>b then exit;
+    m:= (a+b+1) div 2;
+    dif:= Items[m].PosY-APosY;
+    if dif=0 then
       exit(true);
-  end;
+    if dif>0 then
+      b:= m-1
+    else
+      a:= m+1;
+  until false;
 end;
 
 function TATCarets.IsLineWithSelection(APosY: integer): boolean;
