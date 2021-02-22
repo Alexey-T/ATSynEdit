@@ -6503,10 +6503,35 @@ end;
 
 procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
 //painting of text is slower, paint a special mark if possible
+  //
+  procedure PaintDash(NW, NH: integer);
+  var
+    P: TPoint;
+  begin
+    P.Y:= ACoordTop + FCharSize.Y div 2 - EditorScale(1);
+
+    case FOptNumbersAlignment of
+      taLeftJustify:
+        P.X:= ABand.Left + FNumbersIndent;
+      taRightJustify:
+        P.X:= ABand.Right - FNumbersIndent - NW;
+      taCenter:
+        P.X:= (ABand.Left+ABand.Right) div 2 - 1;
+    end;
+
+    C.Brush.Color:= C.Font.Color;
+    C.FillRect(
+      P.X,
+      P.Y,
+      P.X+NW,
+      P.Y+NH
+      );
+  end;
+  //
 var
   SText: string;
   P: TPoint;
-  NW, NH: integer;
+  NW: integer;
 begin
   SText:= DoFormatLineNumber(ALineIndex+1);
 
@@ -6516,51 +6541,12 @@ begin
 
     '.':
       begin
-        P.Y:= ACoordTop + FCharSize.Y div 2 - 1;
-        case FOptNumbersAlignment of
-          taLeftJustify:
-            P.X:= ABand.Left + FNumbersIndent;
-          taRightJustify:
-            P.X:= ABand.Right - FNumbersIndent - FCharSize.X;
-          taCenter:
-            P.X:= (ABand.Left+ABand.Right) div 2 - 1;
-        end;
-
-        NW:= EditorScale(2);
-
-        C.Brush.Color:= C.Font.Color;
-        C.FillRect(
-          P.X,
-          P.Y,
-          P.X+NW,
-          P.Y+NW
-          );
-        exit;
+        PaintDash(EditorScale(2), EditorScale(2));
       end;
 
     '-':
       begin
-        P.Y:= ACoordTop + FCharSize.Y div 2 - 1;
-        case FOptNumbersAlignment of
-          taLeftJustify:
-            P.X:= ABand.Left + FNumbersIndent;
-          taRightJustify:
-            P.X:= ABand.Right - FNumbersIndent - FCharSize.X;
-          taCenter:
-            P.X:= (ABand.Left+ABand.Right) div 2 - 1;
-        end;
-
-        NH:= EditorScale(1);
-        NW:= EditorScale(FCharSize.X);
-
-        C.Brush.Color:= C.Font.Color;
-        C.FillRect(
-          P.X-NW div 2,
-          P.Y,
-          P.X+NW div 2,
-          P.Y+NH
-          );
-        exit;
+        PaintDash(FCharSize.X, EditorScale(2));
       end;
 
     else
