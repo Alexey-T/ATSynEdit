@@ -697,6 +697,7 @@ type
     {$ifdef use_bg}
     FFastBmp: TBGRABitmap;
     {$endif}
+    FColorOfStates: array[TATLineState] of TColor;
 
     //these options are implemented in CudaText, they are dummy here
     FOptAutoCloseBrackets: string;
@@ -992,6 +993,8 @@ type
     procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TPoint;
       AMainText, AWithGutter: boolean; var AScrollHorz,
       AScrollVert: TATEditorScrollInfo; const AWrapIndex: integer);
+    procedure DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TPoint;
+      AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
     procedure DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
@@ -2853,6 +2856,11 @@ begin
 
   if AWithGutter then
   begin
+    FColorOfStates[cLineStateNone]:= -1;
+    FColorOfStates[cLineStateChanged]:= Colors.StateChanged;
+    FColorOfStates[cLineStateAdded]:= Colors.StateAdded;
+    FColorOfStates[cLineStateSaved]:= Colors.StateSaved;
+
     C.Brush.Color:= Colors.GutterBG;
     C.FillRect(FRectGutter);
 
@@ -2972,6 +2980,7 @@ begin
   for iProp:= 0 to NPropCount-1 do
   begin
     PropPtr:= @Props[iProp];
+
     DoPaintLine(C,
       PropPtr^.LineRect,
       ACharSize,
@@ -2979,7 +2988,16 @@ begin
       AWithGutter,
       AScrollHorz,
       AScrollVert,
-      PropPtr^.WrapIndex);
+      PropPtr^.WrapIndex
+      );
+
+    if AWithGutter then
+      DoPaintGutterOfLine(
+        C,
+        PropPtr^.LineRect,
+        ACharSize,
+        PropPtr^.WrapIndex
+        );
 
     {
     //debug
@@ -3035,16 +3053,13 @@ var
   NCoordSep: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
-  Band: TATGutterItem;
   StringItem: PATStringItem;
   NColorEntire, NColorAfter: TColor;
-  NDimValue, NBandDecor: integer;
+  NDimValue: integer;
   StrOutput: atString;
   CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineSeparator: TATLineSeparator;
-  LineState: TATLineState;
   bLineWithCaret, bLineEolSelected, bLineColorForced, bLineHuge: boolean;
-  NColorOfStates: array[TATLineState] of TColor;
   Event: TATSynEditDrawLineEvent;
   TextOutProps: TATCanvasTextOutProps;
   bCachedMinimap: boolean;
@@ -3054,11 +3069,6 @@ var
   bTrimmedNonSpaces: boolean;
   bUseColorOfCurrentLine: boolean;
 begin
-  NColorOfStates[cLineStateNone]:= -1;
-  NColorOfStates[cLineStateChanged]:= Colors.StateChanged;
-  NColorOfStates[cLineStateAdded]:= Colors.StateAdded;
-  NColorOfStates[cLineStateSaved]:= Colors.StateSaved;
-
   bUseSetPixel:=
     {$ifndef windows} DoubleBuffered and {$endif}
     (ACharSize.X=1);
@@ -3502,96 +3512,6 @@ begin
       CanvasLineHorz(C, ARectLine.Left, NCoordSep, ARectLine.Right);
     end;
 
-    //draw gutter
-    if AWithGutter then
-    begin
-      //paint area over scrolled text
-      C.Brush.Color:= Colors.GutterBG;
-      C.FillRect(FRectGutter.Left, ARectLine.Top, FRectGutter.Right, ARectLine.Top+ACharSize.Y);
-
-      //gutter band: number
-      Band:= FGutter[FGutterBandNumbers];
-      if Band.Visible then
-      begin
-        if bLineWithCaret and FOptShowGutterCaretBG then
-        begin
-          DoPaintGutterBandBG(C, FGutterBandNumbers, Colors.GutterCaretBG, ARectLine.Top, ARectLine.Top+ACharSize.Y, false);
-          C.Font.Color:= Colors.GutterCaretFont;
-        end
-        else
-          C.Font.Color:= Colors.GutterFont;
-
-        if WrapItem.bInitial then
-          DoPaintLineNumber(C, NLinesIndex, ARectLine.Top, Band);
-      end;
-
-      //gutter decor
-      NBandDecor:= FGutterBandDecor;
-      if NBandDecor<0 then
-        NBandDecor:= FGutterBandBookmarks;
-
-      Band:= FGutter[NBandDecor];
-      if Band.Visible then
-        if WrapItem.bInitial then
-          DoPaintGutterDecor(C, NLinesIndex,
-            Rect(
-              Band.Left,
-              ARectLine.Top,
-              Band.Right,
-              ARectLine.Top+ACharSize.Y
-              ));
-
-      //gutter band: bookmark
-      Band:= FGutter[FGutterBandBookmarks];
-      if Band.Visible then
-        if WrapItem.bInitial then
-        begin
-          if Strings.Bookmarks.Find(NLinesIndex)>=0 then
-            DoEventDrawBookmarkIcon(C, NLinesIndex,
-              Rect(
-                Band.Left,
-                ARectLine.Top,
-                Band.Right,
-                ARectLine.Top+ACharSize.Y
-                ));
-        end;
-
-      //gutter band: fold
-      Band:= FGutter[FGutterBandFolding];
-      if Band.Visible then
-      begin
-        DoPaintGutterBandBG(C, FGutterBandFolding, Colors.GutterFoldBG, ARectLine.Top, ARectLine.Top+ACharSize.Y, false);
-        DoPaintGutterFolding(C,
-          AWrapIndex,
-          Band.Left,
-          Band.Right,
-          ARectLine.Top,
-          ARectLine.Top+ACharSize.Y
-          );
-      end;
-
-      //gutter band: state
-      Band:= FGutter[FGutterBandStates];
-      if Band.Visible then
-      begin
-        LineState:= Strings.LinesState[NLinesIndex];
-        if LineState<>cLineStateNone then
-          DoPaintGutterBandBG(C,
-            FGutterBandStates,
-            NColorOfStates[LineState],
-            ARectLine.Top,
-            ARectLine.Top+ACharSize.Y,
-            false);
-      end;
-
-      //gutter band: separator
-      if FGutter[FGutterBandSeparator].Visible then
-        DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, ARectLine.Top, ARectLine.Top+ACharSize.Y, false);
-      //gutter band: empty indent
-      if FGutter[FGutterBandEmpty].Visible then
-        DoPaintGutterBandBG(C, FGutterBandEmpty, FColorBG, ARectLine.Top, ARectLine.Top+ACharSize.Y, false);
-    end;
-
     //end of painting line
     Inc(ARectLine.Top, ACharSize.Y);
 
@@ -3606,6 +3526,108 @@ begin
       end;
     end;
 end;
+
+procedure TATSynEdit.DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TPoint;
+  AWrapIndex: integer);
+var
+  WrapItem: TATWrapItem;
+  LineState: TATLineState;
+  Band: TATGutterItem;
+  bLineWithCaret: boolean;
+  NLinesIndex, NBandDecor: integer;
+begin
+  WrapItem:= FWrapInfo[AWrapIndex];
+  NLinesIndex:= WrapItem.NLineIndex;
+  bLineWithCaret:= IsLineWithCaret(NLinesIndex);
+
+  //paint area over scrolled text
+  C.Brush.Color:= Colors.GutterBG;
+  C.FillRect(FRectGutter.Left, ARect.Top, FRectGutter.Right, ARect.Bottom);
+
+  //gutter band: number
+  Band:= FGutter[FGutterBandNumbers];
+  if Band.Visible then
+  begin
+    if bLineWithCaret and FOptShowGutterCaretBG then
+    begin
+      DoPaintGutterBandBG(C, FGutterBandNumbers, Colors.GutterCaretBG, ARect.Top, ARect.Bottom, false);
+      C.Font.Color:= Colors.GutterCaretFont;
+    end
+    else
+      C.Font.Color:= Colors.GutterFont;
+
+    if WrapItem.bInitial then
+      DoPaintLineNumber(C, NLinesIndex, ARect.Top, Band);
+  end;
+
+  //gutter decor
+  NBandDecor:= FGutterBandDecor;
+  if NBandDecor<0 then
+    NBandDecor:= FGutterBandBookmarks;
+
+  Band:= FGutter[NBandDecor];
+  if Band.Visible then
+    if WrapItem.bInitial then
+      DoPaintGutterDecor(C, NLinesIndex,
+        Rect(
+          Band.Left,
+          ARect.Top,
+          Band.Right,
+          ARect.Bottom
+          ));
+
+  //gutter band: bookmark
+  Band:= FGutter[FGutterBandBookmarks];
+  if Band.Visible then
+    if WrapItem.bInitial then
+    begin
+      if Strings.Bookmarks.Find(NLinesIndex)>=0 then
+        DoEventDrawBookmarkIcon(C, NLinesIndex,
+          Rect(
+            Band.Left,
+            ARect.Top,
+            Band.Right,
+            ARect.Bottom
+            ));
+    end;
+
+  //gutter band: fold
+  Band:= FGutter[FGutterBandFolding];
+  if Band.Visible then
+  begin
+    DoPaintGutterBandBG(C, FGutterBandFolding, Colors.GutterFoldBG, ARect.Top, ARect.Bottom, false);
+    DoPaintGutterFolding(C,
+      AWrapIndex,
+      Band.Left,
+      Band.Right,
+      ARect.Top,
+      ARect.Bottom
+      );
+  end;
+
+  //gutter band: state
+  Band:= FGutter[FGutterBandStates];
+  if Band.Visible then
+  begin
+    LineState:= Strings.LinesState[NLinesIndex];
+    if LineState<>cLineStateNone then
+      DoPaintGutterBandBG(C,
+        FGutterBandStates,
+        FColorOfStates[LineState],
+        ARect.Top,
+        ARect.Bottom,
+        false);
+  end;
+
+  //gutter band: separator
+  if FGutter[FGutterBandSeparator].Visible then
+    DoPaintGutterBandBG(C, FGutterBandSeparator, Colors.GutterSeparatorBG, ARect.Top, ARect.Bottom, false);
+
+  //gutter band: empty indent
+  if FGutter[FGutterBandEmpty].Visible then
+    DoPaintGutterBandBG(C, FGutterBandEmpty, FColorBG, ARect.Top, ARect.Bottom, false);
+end;
+
 
 function TATSynEdit.GetMinimapSelTop: integer;
 begin
