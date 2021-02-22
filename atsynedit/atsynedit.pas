@@ -2891,9 +2891,15 @@ begin
   //loop to fill Props array
   NPropCount:= 0;
   SetLength(Props, 100); //preallocate memory
-  RectLine.Top:= ARect.Top;
+
+  RectLine.Left:= ARect.Left;
+  RectLine.Right:= ARect.Right;
+  RectLine.Top:= 0;
+  RectLine.Bottom:= ARect.Top;
 
   repeat
+    RectLine.Top:= RectLine.Bottom;
+    RectLine.Bottom:= RectLine.Top+ACharSize.Y;
     if RectLine.Top>ARect.Bottom then Break;
 
     if not FWrapInfo.IsIndexValid(NWrapIndex) then
@@ -2918,18 +2924,9 @@ begin
       Break;
     end;
 
-    RectLine.Left:= ARect.Left;
-    RectLine.Right:= ARect.Right;
-    RectLine.Bottom:= RectLine.Top+ACharSize.Y;
-
     Inc(NPropCount);
     if Length(Props)<NPropCount then
       SetLength(Props, Length(Props)+30);
-
-    Props[NPropCount-1].WrapIndex:= NWrapIndex;
-    Props[NPropCount-1].LineRect:= RectLine;
-
-    Inc(RectLine.Top, ACharSize.Y);
 
     if AMainText then
     begin
@@ -2938,26 +2935,38 @@ begin
       begin
         GapItem:= Gaps.Find(-1);
         if Assigned(GapItem) then
-          Inc(RectLine.Top, GapItem.Size);
+          Inc(RectLine.Bottom, GapItem.Size);
       end;
 
       //conside gap for this line
       GapItem:= Gaps.Find(WrapInfo[NWrapIndex].NLineIndex);
       if Assigned(GapItem) then
-        Inc(RectLine.Top, GapItem.Size);
+        Inc(RectLine.Bottom, GapItem.Size);
     end;
+
+    Props[NPropCount-1].WrapIndex:= NWrapIndex;
+    Props[NPropCount-1].LineRect:= RectLine;
 
     Inc(NWrapIndex);
   until false;
 
   //render lines using Props array
   for iProp:= 0 to NPropCount-1 do
+  begin
     DoPaintLine(C,
       Props[iProp].LineRect,
       ACharSize,
       AMainText, AWithGutter,
       AScrollHorz, AScrollVert,
       Props[iProp].WrapIndex);
+    {
+    //debug
+    C.Brush.Color:= clRed;
+    RectLine:= Props[iProp].LineRect;
+    InflateRect(RectLine, -1, -1);
+    C.FrameRect(RectLine);
+    }
+  end;
 
   //staples
   if AMainText then
