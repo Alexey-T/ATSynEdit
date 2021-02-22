@@ -133,7 +133,7 @@ type
     function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): TATCaretItem;
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
-    function IsLineListed(APosY: integer): boolean;
+    function IsLineWithCaret(APosY: integer): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
     function IsAnyCaretInVisibleRect(const R: TRect): boolean;
@@ -697,7 +697,7 @@ begin
   end;
 end;
 
-function TATCarets.IsLineListed(APosY: integer): boolean;
+function TATCarets.IsLineWithCaret(APosY: integer): boolean;
 var
   a, b, m, dif: integer;
 begin

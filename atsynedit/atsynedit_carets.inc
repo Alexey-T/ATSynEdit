@@ -2,7 +2,7 @@
 
 function TATSynEdit.IsLineWithCaret(ALine: integer): boolean; inline;
 begin
-  Result:= FCarets.IsLineListed(ALine);
+  Result:= FCarets.IsLineWithCaret(ALine);
 end;
 
 function TATSynEdit.IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
@@ -12,7 +12,7 @@ var
   Coord: TPoint;
 begin
   Result:= false;
-  //like Carets.IsLineListed with more code
+  //like Carets.IsLineWithCaret with more code
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
@@ -84,7 +84,7 @@ begin
     Inc(PM1.Y, FCharSize.Y);
     P:= ClientPosToCaretPos(PM1, Details);
     if P.Y>=0 then
-      if not Carets.IsLineListed(P.Y) then
+      if not Carets.IsLineWithCaret(P.Y) then
         Carets.Add(P.X, P.Y);
   until PM1.Y>=PM2.Y;
 
