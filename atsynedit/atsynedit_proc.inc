@@ -280,3 +280,56 @@ begin
 
 end;
 
+{-----------------------------}
+type
+  TATIntPair = record
+    NFrom, NTo: integer;
+  end;
+  TATIntPairArray = array of TATIntPair;
+
+function DivideRangeByPartsFrom0(N, Parts: integer): TATIntPairArray;
+var
+  i, d: integer;
+begin
+  if Parts<1 then
+    Parts:= 1;
+  if N<0 then
+  begin
+    SetLength(Result, 0);
+    exit;
+  end;
+  if N+1<=Parts then
+  begin
+    SetLength(Result, N+1);
+    for i:= 0 to N do
+    begin
+      Result[i].NFrom:= i;
+      Result[i].NTo:= i;
+    end;
+  end
+  else
+  begin
+    SetLength(Result, Parts);
+    Result[0].NFrom:= 0;
+    Result[High(Result)].NTo:= N;
+    for i:= 1 to Parts-1 do
+    begin
+      d:= N * i div Parts;
+      Result[i-1].NTo:= d;
+      Result[i].NFrom:= d+1;
+    end;
+  end;
+end;
+
+function DivideRangeByParts(NFrom, NTo, Parts: integer): TATIntPairArray;
+var
+  i: integer;
+begin
+  Result:= DivideRangeByPartsFrom0(NTo-NFrom, Parts);
+  for i:= 0 to High(Result) do
+  begin
+    Inc(Result[i].NFrom, NFrom);
+    Inc(Result[i].NTo, NFrom);
+  end;
+end;
+
