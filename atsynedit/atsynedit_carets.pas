@@ -132,7 +132,6 @@ type
     procedure Assign(Obj: TATCarets);
     function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): TATCaretItem;
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
-    //function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
@@ -642,43 +641,37 @@ end;
 
 function TATCarets.IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean = false): integer;
 var
-  iStart, i: integer;
   Item: TATCaretItem;
-  XUse, YUse: integer;
+  useX, useY: integer;
+  a, b, m, difX, difY: integer;
 begin
   Result:= -1;
-
-  iStart:= 0;
-  //todo--fix for case called from TimerScrollTick, dont work for cScrollUp
-  //iStart:= IndexOfPosYAvg(APosY);
-  //if iStart<0 then Exit;
-
-  for i:= iStart to Count-1 do
-  begin
-    Item:= Items[i];
-
+  a:= 0;
+  b:= Count-1;
+  repeat
+    if a>b then exit;
+    m:= (a+b+1) div 2;
+    Item:= Items[m];
     if AUseEndXY and (Item.EndY>=0) then
-      begin XUse:= Item.EndX; YUse:= Item.EndY; end
+    begin
+      useX:= Item.EndX;
+      useY:= Item.EndY;
+    end
     else
-      begin XUse:= Item.PosX; YUse:= Item.PosY; end;
-
-    if (YUse>APosY) then Break;
-    if (XUse=APosX) and (YUse=APosY) then exit(i);
-  end;
+    begin
+      useX:= Item.PosX;
+      useY:= Item.PosY;
+    end;
+    difX:= useX-APosX;
+    difY:= useY-APosY;
+    if (difX=0) and (difY=0) then
+      exit(m);
+    if (difY>0) or ((difY=0) and (difX>0)) then
+      b:= m-1
+    else
+      a:= m+1;
+  until false;
 end;
-
-{
-//todo-- binary search
-function TATCarets.IndexOfPosYAvg(APosY: integer): integer;
-var
-  i: integer;
-begin
-  Result:= -1;
-  for i:= 0 to FList.Count-1 do
-    if TATCaretItem(FList[i]).PosY>=APosY then
-      exit(i);
-end;
-}
 
 function TATCarets.IndexOfLeftRight(ALeft: boolean): integer;
 var
