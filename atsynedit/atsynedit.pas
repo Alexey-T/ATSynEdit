@@ -3246,6 +3246,8 @@ begin
     end;
 
     C.Brush.Color:= FColorBG;
+    C.Font.Name:= Font.Name;
+    C.Font.Size:= DoScaleFont(Font.Size);
     C.Font.Color:= FColorFont;
 
     bUseColorOfCurrentLine:= false;
