@@ -132,7 +132,7 @@ type
     procedure Assign(Obj: TATCarets);
     function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): TATCaretItem;
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
-    function IndexOfPosYAvg(APosY: integer): integer;
+    //function IndexOfPosYAvg(APosY: integer): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineListed(APosY: integer): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
@@ -667,6 +667,7 @@ begin
   end;
 end;
 
+{
 //todo-- binary search
 function TATCarets.IndexOfPosYAvg(APosY: integer): integer;
 var
@@ -677,6 +678,7 @@ begin
     if TATCaretItem(FList[i]).PosY>=APosY then
       exit(i);
 end;
+}
 
 function TATCarets.IndexOfLeftRight(ALeft: boolean): integer;
 var
