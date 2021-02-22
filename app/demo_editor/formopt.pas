@@ -266,7 +266,6 @@ begin
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
     edNumAlign.ItemIndex:= Ord(ed.OptNumbersAlignment);
     //edNumSize.Value:= ed.OptNumbersFontSizePercents;
-    edNumChar.Text:= ed.OptNumbersSkippedChar;
     edPlusSize.Value:= ed.OptGutterPlusSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
@@ -400,7 +399,6 @@ begin
       ed.OptNumbersAlignment:= TAlignment(edNumAlign.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
-      ed.OptNumbersSkippedChar:= edNumChar.Text;
       ed.OptGutterShowFoldAlways:= chkShowFoldAlways.Checked;
       ed.OptGutterShowFoldLines:= chkShowFoldLines.Checked;
       ed.OptGutterShowFoldLinesAll:= chkShowFoldLinesAll.Checked;

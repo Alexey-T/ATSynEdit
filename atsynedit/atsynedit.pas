@@ -789,7 +789,6 @@ type
     FOptNumbersStyle: TATEditorNumbersStyle;
     FOptNumbersShowFirst: boolean;
     FOptNumbersShowCarets: boolean;
-    FOptNumbersSkippedChar: string;
     FOptNumbersIndentPercents: integer;
     FOptNonWordChars: atString;
     FOptAutoIndent: boolean;
@@ -1706,7 +1705,6 @@ type
     property OptNumbersStyle: TATEditorNumbersStyle read FOptNumbersStyle write FOptNumbersStyle default cInitNumbersStyle;
     property OptNumbersShowFirst: boolean read FOptNumbersShowFirst write FOptNumbersShowFirst default true;
     property OptNumbersShowCarets: boolean read FOptNumbersShowCarets write FOptNumbersShowCarets default false;
-    property OptNumbersSkippedChar: string read FOptNumbersSkippedChar write FOptNumbersSkippedChar;
     property OptNumbersIndentPercents: integer read FOptNumbersIndentPercents write FOptNumbersIndentPercents default cInitNumbersIndentPercents;
     property OptUnprintedVisible: boolean read FUnprintedVisible write FUnprintedVisible default true;
     property OptUnprintedSpaces: boolean read FUnprintedSpaces write FUnprintedSpaces default true;
@@ -1972,7 +1970,7 @@ begin
     cNumbersAll:
       Result:= IntToStr(N);
     cNumbersNone:
-      Result:= FOptNumbersSkippedChar;
+      Result:= '.';
     cNumbersEach10th:
       begin
         if (N mod 10 = 0) then
@@ -1981,14 +1979,14 @@ begin
         if (N mod 5) = 0 then
           Result:= '-'
         else
-          Result:= FOptNumbersSkippedChar;
+          Result:= '.';
       end;
     cNumbersEach5th:
       begin
         if (N mod 5 = 0) then
           Result:= IntToStr(N)
         else
-          Result:= FOptNumbersSkippedChar;
+          Result:= '.';
       end;
   end;
 end;
@@ -4191,7 +4189,6 @@ begin
   FOptNumbersStyle:= cInitNumbersStyle;
   FOptNumbersShowFirst:= true;
   FOptNumbersShowCarets:= false;
-  FOptNumbersSkippedChar:= '.';
   FOptNumbersIndentPercents:= cInitNumbersIndentPercents;
 
   FOptBorderWidth:= 0;
@@ -6505,28 +6502,84 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
+//painting of text is slower, paint a special mark if possible
 var
   Str: string;
-  Size: integer;
   CoordX: integer;
+  NDotSize, NW, NH: integer;
+  P: TPoint;
 begin
   Str:= DoFormatLineNumber(ALineIndex+1);
 
-  //C.Font.Name:= Font.Name;
-  //C.Font.Size:= DoScaleFont(Font.Size);
-  //Size:= C.TextWidth(Str);
-  Size:= FCharSize.X*Length(Str);
+  case Str of
+    '':
+      exit;
 
-  case FOptNumbersAlignment of
-    taLeftJustify:
-      CoordX:= ABand.Left + FNumbersIndent;
-    taRightJustify:
-      CoordX:= ABand.Right - Size - FNumbersIndent;
-    taCenter:
-      CoordX:= (ABand.Left + ABand.Right - Size) div 2;
+    '.':
+      begin
+        P.Y:= ACoordTop + FCharSize.Y div 2 - 1;
+        case FOptNumbersAlignment of
+          taLeftJustify:
+            P.X:= ABand.Left + FNumbersIndent;
+          taRightJustify:
+            P.X:= ABand.Right - FNumbersIndent - FCharSize.X;
+          taCenter:
+            P.X:= (ABand.Left+ABand.Right) div 2 - 1;
+        end;
+
+        NDotSize:= EditorScale(2);
+
+        C.Brush.Color:= C.Font.Color;
+        C.FillRect(
+          P.X,
+          P.Y,
+          P.X+NDotSize,
+          P.Y+NDotSize
+          );
+        exit;
+      end;
+
+    '-':
+      begin
+        P.Y:= ACoordTop + FCharSize.Y div 2 - 1;
+        case FOptNumbersAlignment of
+          taLeftJustify:
+            P.X:= ABand.Left + FNumbersIndent;
+          taRightJustify:
+            P.X:= ABand.Right - FNumbersIndent - FCharSize.X;
+          taCenter:
+            P.X:= (ABand.Left+ABand.Right) div 2 - 1;
+        end;
+
+        NH:= EditorScale(1);
+        NW:= EditorScale(FCharSize.X);
+
+        C.Brush.Color:= C.Font.Color;
+        C.FillRect(
+          P.X-NW div 2,
+          P.Y,
+          P.X+NW div 2,
+          P.Y+NH
+          );
+        exit;
+      end;
+
+    else
+      begin
+        NW:= FCharSize.X*Length(Str);
+
+        case FOptNumbersAlignment of
+          taLeftJustify:
+            CoordX:= ABand.Left + FNumbersIndent;
+          taRightJustify:
+            CoordX:= ABand.Right - NW - FNumbersIndent;
+          taCenter:
+            CoordX:= (ABand.Left + ABand.Right - NW) div 2;
+        end;
+
+        CanvasTextOutSimplest(C, CoordX, ACoordTop, Str);
+      end;
   end;
-
-  CanvasTextOutSimplest(C, CoordX, ACoordTop, Str);
 end;
 
 

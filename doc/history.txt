@@ -1,4 +1,8 @@
 
+2021.02.22
++ refactored for future rendeding with threads
+* removed prop OptNumbersSkippedChar, always draw a 'dot'
+
 2021.02.06
 + add: OptDimUnfocusedBack (0..255, 0: don't change)
 + add: OptMicromapShowForMinCount (=2, only for multiline editors)
