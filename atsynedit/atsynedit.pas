@@ -7968,7 +7968,7 @@ begin
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
     CanvasTextOut(C,
-      cSizeIndentTooltipX,
+      cSizeIndentTooltipX + WrapItem.NIndent*FCharSize.X,
       cSizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
       Strings.LineSub(
         WrapItem.NLineIndex,
