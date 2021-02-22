@@ -2954,8 +2954,13 @@ begin
   until false;
 
   //update LineBottom
-  NWrapIndex:= Props[NPropCount-1].WrapIndex;
-  FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
+  if NPropCount>0 then
+  begin
+    NWrapIndex:= Props[NPropCount-1].WrapIndex;
+    FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
+  end
+  else
+    FLineBottom:= 1;
 
   //render lines using Props array
   for iProp:= 0 to NPropCount-1 do
