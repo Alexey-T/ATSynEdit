@@ -2814,8 +2814,8 @@ type
   PATEditorPaintingItemProp = ^TATEditorPaintingItemProp;
   TATEditorPaintingItemProp = record
     LineRect: TRect;
-    BitmapRect: TRect;
-    Bitmap: TBitmap;
+    //BitmapRect: TRect;
+    //Bitmap: TBitmap;
     WrapIndex: integer;
   end;
 
@@ -2833,6 +2833,9 @@ var
   NWrapIndex, NWrapIndexDummy,
   NLineCount, NPropCount,
   iProp: integer;
+  {$ifdef debug_paint_time}
+  t: DWord;
+  {$endif}
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -2958,7 +2961,7 @@ begin
     PropPtr:= @Props[NPropCount-1];
     PropPtr^.WrapIndex:= NWrapIndex;
     PropPtr^.LineRect:= RectLine;
-    PropPtr^.BitmapRect:= Rect(0, 0, RectLine.Width, RectLine.Height);
+    //PropPtr^.BitmapRect:= Rect(0, 0, RectLine.Width, RectLine.Height);
     //PropPtr^.Bitmap:= TBitmap.Create;
     //PropPtr^.Bitmap.PixelFormat:= pf24bit;
 
@@ -2966,13 +2969,20 @@ begin
   until false;
 
   //update LineBottom
-  if NPropCount>0 then
+  if AMainText then
   begin
-    NWrapIndex:= Props[NPropCount-1].WrapIndex;
-    FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
-  end
-  else
-    FLineBottom:= 1;
+    if NPropCount>0 then
+    begin
+      NWrapIndex:= Props[NPropCount-1].WrapIndex;
+      FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
+    end
+    else
+      FLineBottom:= 1;
+  end;
+
+  {$ifdef debug_paint_time}
+  t:= GetTickCount;
+  {$endif}
 
   //render lines using Props array
   for iProp:= 0 to NPropCount-1 do
@@ -3006,10 +3016,18 @@ begin
     }
   end;
 
+  {$ifdef debug_paint_time}
+  t:= GetTickCount-t;
+  if AMainText then
+    application.mainform.Caption:= 'paint '+IntToStr(t);
+  {$endif}
+
+  {
   for iProp:= NPropCount-1 downto 0 do
     with Props[iProp] do
       if Assigned(Bitmap) then
         FreeAndNil(Bitmap);
+        }
 
   //staples
   if AMainText then
@@ -3150,7 +3168,6 @@ begin
         end;
     {$endif}
 
-    //don't update FLineBottom if minimap paints
     if AMainText then
     begin
       if IsFoldLineNeededBeforeWrapitem(AWrapIndex) then

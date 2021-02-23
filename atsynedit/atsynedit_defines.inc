@@ -1,5 +1,7 @@
 {$define use_bg} // Use BGRABitmap to render minimap
 
+{.$define debug_paint_time} // Show time of DoPaintLine loop
+
 {.$define debug_fps} // Show frames-per-second red indicator in editor top-right corner
 
 {$define atsynedit_cache} // Use FAdapterCache, ie caching of colored lines
