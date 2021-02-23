@@ -35,11 +35,13 @@ type
   TATInt64Array = array of Int64;
 
 const
-  cMaxCharOffsets = 1024;
+  //must be >= OptMaxLineLenForAccurateCharWidths
+  cMaxFixedArray = 1024;
+
 type
-  TATIntArrayFixed = record
-    Offsets: packed array[0..cMaxCharOffsets-1] of integer; //'word' is too small
-    Count: integer;
+  TATIntFixedArray = record
+    Data: packed array[0..cMaxFixedArray-1] of integer; //'word' is too small for CalcCharOffsets
+    Len: integer;
   end;
 
 type
@@ -116,7 +118,7 @@ type
     function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
     function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
-    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATIntArrayFixed; ACharsSkipped: integer = 0);
+    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATIntFixedArray; ACharsSkipped: integer = 0);
     function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): integer;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
@@ -367,14 +369,14 @@ begin
 end;
 }
 
-procedure DoDebugOffsets(const Info: TATIntArrayFixed);
+procedure DoDebugOffsets(const Info: TATIntFixedArray);
 var
   i: integer;
   s: string;
 begin
   s:= '';
-  for i:= 0 to Info.Count-1 do
-    s:= s+IntToStr(Info.Offsets[i])+'% ';
+  for i:= 0 to Info.Len-1 do
+    s:= s+IntToStr(Info.Data[i])+'% ';
   ShowMessage('Offsets'#10+s);
 end;
 
@@ -393,7 +395,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
   //
 var
   N, NMin, NAvg: integer;
-  Offsets: TATIntArrayFixed;
+  Offsets: TATIntFixedArray;
 begin
   if S='' then
     Exit(0);
@@ -402,12 +404,12 @@ begin
 
   CalcCharOffsets(ALineIndex, S, Offsets);
 
-  if Offsets.Offsets[Offsets.Count-1]<=AColumns*100 then
+  if Offsets.Data[Offsets.Len-1]<=AColumns*100 then
     Exit(Length(S));
 
   //NAvg is average wrap offset, we use it if no correct offset found
-  N:= Min(Length(S), cMaxCharOffsets)-1;
-  while (N>0) and (Offsets.Offsets[N]>(AColumns+1)*100) do Dec(N);
+  N:= Min(Length(S), cMaxFixedArray)-1;
+  while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
   if NAvg<OptMinWordWrapOffset then
     Exit(OptMinWordWrapOffset);
@@ -564,7 +566,7 @@ end;
 
 
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
-  var AInfo: TATIntArrayFixed; ACharsSkipped: integer);
+  var AInfo: TATIntFixedArray; ACharsSkipped: integer);
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
@@ -574,8 +576,8 @@ var
   i: integer;
 begin
   FillChar(AInfo, SizeOf(AInfo), 0);
-  NLen:= Min(Length(S), cMaxCharOffsets);
-  AInfo.Count:= NLen;
+  NLen:= Min(Length(S), cMaxFixedArray);
+  AInfo.Len:= NLen;
   if NLen=0 then Exit;
 
   NCharsSkipped:= ACharsSkipped;
@@ -585,7 +587,7 @@ begin
   if NLen>OptMaxLineLenForAccurateCharWidths then
   begin
     for i:= 0 to NLen-1 do
-      AInfo.Offsets[i]:= 100*(i+1);
+      AInfo.Data[i]:= 100*(i+1);
     exit;
   end;
 
@@ -630,9 +632,9 @@ begin
     end;
 
     if i=1 then
-      AInfo.Offsets[i-1]:= NSize*NScalePercents
+      AInfo.Data[i-1]:= NSize*NScalePercents
     else
-      AInfo.Offsets[i-1]:= AInfo.Offsets[i-2]+NSize*NScalePercents;
+      AInfo.Data[i-1]:= AInfo.Data[i-2]+NSize*NScalePercents;
   end;
 end;
 
@@ -645,7 +647,7 @@ var
   i: integer;
 begin
   Result:= 0;
-  NLen:= Min(Length(S), cMaxCharOffsets);
+  NLen:= Min(Length(S), cMaxFixedArray);
   if NLen=0 then Exit;
 
   if NLen>OptMaxLineLenForAccurateCharWidths then
@@ -684,8 +686,8 @@ end;
 function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString; APixelsFromLeft,
   ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
 var
-  ListOffsets: TATIntArrayFixed;
-  ListEnds, ListMid: TATIntArrayFixed;
+  ListOffsets: TATIntFixedArray;
+  ListEnds, ListMid: TATIntFixedArray;
   i: integer;
 begin
   AEndOfLinePos:= false;
@@ -700,22 +702,22 @@ begin
 
   CalcCharOffsets(ALineIndex, Str, ListOffsets);
 
-  ListEnds.Count:= ListOffsets.Count;
-  ListMid.Count:= ListOffsets.Count;
+  ListEnds.Len:= ListOffsets.Len;
+  ListMid.Len:= ListOffsets.Len;
 
   //positions of each char end
-  for i:= 0 to ListOffsets.Count-1 do
-    ListEnds.Offsets[i]:= ListOffsets.Offsets[i]*ACharSize div 100;
+  for i:= 0 to ListOffsets.Len-1 do
+    ListEnds.Data[i]:= ListOffsets.Data[i]*ACharSize div 100;
 
   //positions of each char middle
-  for i:= 0 to ListOffsets.Count-1 do
+  for i:= 0 to ListOffsets.Len-1 do
     if i=0 then
-      ListMid.Offsets[i]:= ListEnds.Offsets[i] div 2
+      ListMid.Data[i]:= ListEnds.Data[i] div 2
     else
-      ListMid.Offsets[i]:= (ListEnds.Offsets[i-1]+ListEnds.Offsets[i]) div 2;
+      ListMid.Data[i]:= (ListEnds.Data[i-1]+ListEnds.Data[i]) div 2;
 
-  for i:= 0 to ListOffsets.Count-1 do
-    if APixelsFromLeft<ListMid.Offsets[i] then
+  for i:= 0 to ListOffsets.Len-1 do
+    if APixelsFromLeft<ListMid.Data[i] then
     begin
       Result:= i+1;
 
@@ -728,7 +730,7 @@ begin
 
   AEndOfLinePos:= true;
   if AAllowVirtualPos then
-    Result:= Length(Str)+1 + (APixelsFromLeft - ListEnds.Offsets[ListEnds.Count-1]) div ACharSize
+    Result:= Length(Str)+1 + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) div ACharSize
   else
     Result:= Length(Str)+1;
 end;
@@ -736,7 +738,7 @@ end;
 procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
   AScrollPos: integer; out ACharsSkipped: integer; out ACellPercentsSkipped: integer);
 var
-  Offsets: TATIntArrayFixed;
+  Offsets: TATIntFixedArray;
 begin
   ACharsSkipped:= 0;
   ACellPercentsSkipped:= 0;
@@ -744,12 +746,12 @@ begin
 
   CalcCharOffsets(ALineIndex, S, Offsets);
 
-  while (ACharsSkipped<Offsets.Count) and
-    (Offsets.Offsets[ACharsSkipped] < AScrollPos*100) do
+  while (ACharsSkipped<Offsets.Len) and
+    (Offsets.Data[ACharsSkipped] < AScrollPos*100) do
     Inc(ACharsSkipped);
 
   if (ACharsSkipped>0) then
-    ACellPercentsSkipped:= Offsets.Offsets[ACharsSkipped-1];
+    ACellPercentsSkipped:= Offsets.Data[ACharsSkipped-1];
 end;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
