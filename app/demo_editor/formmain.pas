@@ -236,7 +236,7 @@ type
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX, AY: integer;
-      const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
+      const AStr: atString; ACharSize: TPoint; constref AExtent: TATIntFixedArray);
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
@@ -1399,8 +1399,7 @@ begin
 end;
 
 procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX,
-  AY: integer; const AStr: atString; ACharSize: TPoint;
-  const AExtent: TATIntArray);
+  AY: integer; const AStr: atString; ACharSize: TPoint; constref AExtent: TATIntFixedArray);
 var
   X1, X2, Y, i: integer;
 begin
@@ -1411,13 +1410,13 @@ begin
   C.Pen.Width:= 2;
   C.Pen.EndCap:= pecSquare;
 
-  for i:= 1 to Length(AStr) do
+  for i:= 1 to Min(Length(AStr), AExtent.Len) do
     if AStr[i]='w' then
     begin
       X1:= AX;
       if i>1 then
-        Inc(X1, AExtent[i-2]);
-      X2:= AX+AExtent[i-1];
+        Inc(X1, AExtent.Data[i-2]);
+      X2:= AX+AExtent.Data[i-1];
       Y:= AY+ACharSize.Y-1;
 
       C.Line(X1, Y, X2, Y);
