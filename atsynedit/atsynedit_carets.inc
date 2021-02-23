@@ -257,6 +257,8 @@ function _DoClientPosToCaretPos(
   AAfterEofUsesLastLen: boolean;
   AEditorIndex: integer): TPoint;
 var
+  CharOffsets: TATIntFixedArray;
+  NLineLenOriginal, NLineLenTrimmed: integer;
   NIndex, NIndexDecrement, NPixels: integer;
   Item: TATWrapItem;
   ItemGap: TATGapItem;
@@ -363,13 +365,20 @@ begin
     if not AStrings.IsIndexValid(Result.Y) then
       exit(Point(-1, -1));
 
-    Str:= AStrings.LineSub(
-      Result.Y,
-      Item.NCharIndex,
-      //optimized for huge line
-      Min(Item.NLength,
-          AScrollHorz.NPos + ARect.Width div ACharSize.X)
-      );
+    NLineLenOriginal:= Item.NLength;
+    NLineLenTrimmed:= Min(Item.NLength, AScrollHorz.NPos + ARect.Width div ACharSize.X);
+
+    if NLineLenOriginal>OptMaxLineLenForAccurateCharWidths then
+    begin
+      Str:= StringOfCharW('N', NLineLenOriginal); //fake to calc CharOffsets only
+      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
+      Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
+    end
+    else
+    begin
+      Str:= AStrings.LineSub(Item.NLineIndex, Item.NCharIndex, NLineLenTrimmed);
+      ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
+    end;
 
     if bGapGoesToEnd then
       Result.X:= Length(Str) + Item.NCharIndex-1
@@ -380,6 +389,7 @@ begin
       Result.X:= ATabHelper.FindClickedPosition(
         Result.Y,
         Str,
+        CharOffsets,
         NPixels,
         ACharSize.X,
         AllowVirtual,

@@ -123,6 +123,7 @@ type
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer; const Str: atString;
+      constref ListOffsets: TATIntFixedArray;
       APixelsFromLeft, ACharSize: integer;
       AAllowVirtualPos: boolean;
       out AEndOfLinePos: boolean): integer;
@@ -683,10 +684,10 @@ begin
 end;
 
 
-function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString; APixelsFromLeft,
-  ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
+function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString;
+  constref ListOffsets: TATIntFixedArray;
+  APixelsFromLeft, ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
 var
-  ListOffsets: TATIntFixedArray;
   ListEnds, ListMid: TATIntFixedArray;
   i: integer;
 begin
@@ -699,8 +700,6 @@ begin
       Result:= 1;
     Exit;
   end;
-
-  CalcCharOffsets(ALineIndex, Str, ListOffsets);
 
   ListEnds.Len:= ListOffsets.Len;
   ListMid.Len:= ListOffsets.Len;
