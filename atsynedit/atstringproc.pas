@@ -643,11 +643,11 @@ function TATStringTabHelper.CalcCharOffsetLast(ALineIndex: integer; const S: atS
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
-  ch: widechar;
+  ch: WideChar;
   i: integer;
 begin
   Result:= 0;
-  NLen:= Min(Length(S), cMaxFixedArray);
+  NLen:= Length(S);
   if NLen=0 then Exit;
 
   if NLen>OptMaxLineLenForAccurateCharWidths then
