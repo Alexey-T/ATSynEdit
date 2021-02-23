@@ -3058,7 +3058,7 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
         AFillColor);
     {$else}
     C.Brush.Color:= AFillColor;
-    C.FillRect(ARectLeft, NCoordTop, ARect.Right, NCoordTop+ACharSize.Y);
+    C.FillRect(ARectLeft, ARectLine.Top, ARectLine.Right, ARectLine.Bottom);
     {$endif}
   end;
   //
@@ -3323,6 +3323,7 @@ begin
       end;
 
       NColorAfter:= clNone;
+
       DoCalcLineHilite(WrapItem, FLineParts{%H-},
         NOutputCharsSkipped, cMaxCharsForOutput,
         NColorEntire, bLineColorForced,
