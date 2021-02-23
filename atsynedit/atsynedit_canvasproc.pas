@@ -488,7 +488,7 @@ begin
       else
       begin
         Value:= Ord(ch);
-        if Value>=$100 then
+        if Value>$FF then
         begin
           HexLen:= 5;
           Buf:= @Buf4;
