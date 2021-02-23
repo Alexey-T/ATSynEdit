@@ -103,6 +103,9 @@ type
 
   TATStringTabHelper = class
   private
+    //these arrays are local vars, placed here to alloc 2*4Kb not in stack
+    ListEnds: TATIntFixedArray;
+    ListMid: TATIntFixedArray;
   public
     TabSpaces: boolean;
     TabSize: integer;
@@ -688,7 +691,6 @@ function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: 
   constref ListOffsets: TATIntFixedArray;
   APixelsFromLeft, ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
 var
-  ListEnds, ListMid: TATIntFixedArray;
   i: integer;
 begin
   AEndOfLinePos:= false;
