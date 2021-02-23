@@ -29,19 +29,21 @@ type
     cLineChangeDeletedAll
     );
 
-const
-  cMaxCharOffsets = 1024;
 type
   TATIntArray = array of integer;
   TATPointArray = array of TPoint;
   TATInt64Array = array of Int64;
 
+const
+  cMaxCharOffsets = 1024;
+type
   TATLineOffsetsInfo = record
-    Count: integer;
     Offsets: packed array[0..cMaxCharOffsets-1] of integer; //'word' is too small
+    Count: integer;
   end;
   TATIntArrayFixed = TATLineOffsetsInfo;
 
+type
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;
 
