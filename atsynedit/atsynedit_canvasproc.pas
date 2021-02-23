@@ -851,7 +851,7 @@ begin
           and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
 
         if CanvasTextOutNeedsOffsets(C, PartStr) then
-          DxPointer:= @Dx.Offsets[PartOffset]
+          DxPointer:= @Dx.Data[PartOffset]
         else
           DxPointer:= nil;
       end;
