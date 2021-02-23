@@ -3162,7 +3162,7 @@ begin
         end;
       end;
 
-    {$ifdef atsynedit_cache}
+    {$ifdef use_cache}
     //speedup painting minimap:
     //if line parts cached, paint them now
     NColorAfter:= clNone;

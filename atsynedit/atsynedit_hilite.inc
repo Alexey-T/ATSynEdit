@@ -48,7 +48,7 @@ begin
   if bEnableHilite then
   if Assigned(FAdapterHilite) then
   begin
-    {$ifdef atsynedit_cache}
+    {$ifdef use_cache}
     //DynamicHilite must disable cache
     FAdapterCache.Enabled:= not FAdapterHilite.DynamicHiliteActiveNow(Strings.Count);
     bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, AParts, AColorAfter);
