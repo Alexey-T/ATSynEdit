@@ -646,10 +646,11 @@ begin
   until false;
 end;
 
-//global vars to avoid mem allocs
+//global vars to avoid mem allocs, speeds up rendering by 10-30%
 var
-  ListOffsets: TATLineOffsetsInfo;
-  ListInt, Dx: TATIntArrayFixed;
+  ListOffsets,
+  ListInt,
+  Dx: TATIntArrayFixed;
   {$ifndef windows}
   DxUTF8: TATIntArrayFixed;
   {$endif}

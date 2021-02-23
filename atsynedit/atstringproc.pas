@@ -37,11 +37,10 @@ type
 const
   cMaxCharOffsets = 1024;
 type
-  TATLineOffsetsInfo = record
+  TATIntArrayFixed = record
     Offsets: packed array[0..cMaxCharOffsets-1] of integer; //'word' is too small
     Count: integer;
   end;
-  TATIntArrayFixed = TATLineOffsetsInfo;
 
 type
   TATSimpleRange = record NFrom, NTo: integer; end;
@@ -117,7 +116,7 @@ type
     function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
     function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
-    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
+    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATIntArrayFixed; ACharsSkipped: integer = 0);
     function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): integer;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
@@ -368,7 +367,7 @@ begin
 end;
 }
 
-procedure DoDebugOffsets(const Info: TATLineOffsetsInfo);
+procedure DoDebugOffsets(const Info: TATIntArrayFixed);
 var
   i: integer;
   s: string;
@@ -394,7 +393,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
   //
 var
   N, NMin, NAvg: integer;
-  Offsets: TATLineOffsetsInfo;
+  Offsets: TATIntArrayFixed;
 begin
   if S='' then
     Exit(0);
@@ -565,7 +564,7 @@ end;
 
 
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
-  var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer);
+  var AInfo: TATIntArrayFixed; ACharsSkipped: integer);
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
@@ -685,7 +684,7 @@ end;
 function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString; APixelsFromLeft,
   ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
 var
-  ListOffsets: TATLineOffsetsInfo;
+  ListOffsets: TATIntArrayFixed;
   ListEnds, ListMid: TATIntArray;
   i: integer;
 begin
@@ -736,7 +735,7 @@ end;
 procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
   AScrollPos: integer; out ACharsSkipped: integer; out ACellPercentsSkipped: integer);
 var
-  Offsets: TATLineOffsetsInfo;
+  Offsets: TATIntArrayFixed;
 begin
   ACharsSkipped:= 0;
   ACellPercentsSkipped:= 0;
