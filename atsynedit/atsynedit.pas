@@ -3075,8 +3075,6 @@ var
   StrOutput: atString;
   CurrPoint, CurrPointText, CoordAfterText: TPoint;
   LineSeparator: TATLineSeparator;
-  LineIndentKind: TATLineIndentKind;
-  NIndentCharsRaw, NIndentCharsAsSpaces: integer;
   bLineWithCaret, bLineEolSelected, bLineColorForced, bLineHuge: boolean;
   Event: TATSynEditDrawLineEvent;
   TextOutProps: TATCanvasTextOutProps;
@@ -3123,21 +3121,6 @@ begin
       if (WrapItem.NLength>0) and
         FAdapterCache.Get(WrapItem.NLineIndex, WrapItem.NCharIndex, FLineParts, NColorAfter) then
         begin
-          //optimize: avoid rendering indentation spaces/tabs
-          if WrapItem.bInitial then
-          begin
-            Strings.GetIndentProp(WrapItem.NLineIndex, NIndentCharsRaw, LineIndentKind);
-            NIndentCharsAsSpaces:= NIndentCharsRaw;
-            if LineIndentKind=cLineIndentTabs then
-              NIndentCharsAsSpaces*= FTabSize;
-          end
-          else
-          begin
-            LineIndentKind:= cLineIndentOther;
-            NIndentCharsRaw:= 0;
-            NIndentCharsAsSpaces:= 0;
-          end;
-
           DoCalcLineEntireColor(
             WrapItem.NLineIndex,
             false,
@@ -3153,7 +3136,7 @@ begin
             FillOneLine(NColorAfter, ARectLine.Left);
 
           CurrPointText:= Point(
-            Int64(ARectLine.Left) + (Int64(WrapItem.NIndent)+NIndentCharsAsSpaces-AScrollHorz.NPos)*ACharSize.X,
+            Int64(ARectLine.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
             ARectLine.Top);
 
           CanvasTextOutMinimap(
@@ -3168,7 +3151,7 @@ begin
             NColorAfter,
             Strings.LineSub(
               WrapItem.NLineIndex,
-              WrapItem.NCharIndex+NIndentCharsRaw,
+              WrapItem.NCharIndex,
               GetVisibleColumns), //optimize for huge lines
             bUseSetPixel
             );
