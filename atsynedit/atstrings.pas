@@ -43,6 +43,12 @@ type
   TATIntegerList = specialize TFPGList<integer>;
 
 type
+  TATLineIndentKind = (
+    cLineIndentOther,
+    cLineIndentSpaces,
+    cLineIndentTabs
+    );
+
   TATLineSeparator = (
     cLineSepNone,
     cLineSepTop,
@@ -135,7 +141,7 @@ type
     procedure LineStateToSaved; inline;
     procedure LineStateToNone; inline;
     function IsFake: boolean; inline;
-    function IndentSize: integer;
+    procedure GetIndentProp(out ACharCount: integer; out AKind: TATLineIndentKind);
     function CharLenWithoutSpace: integer;
     function IsBlank: boolean;
   end;
@@ -308,7 +314,7 @@ type
     property LinesSeparator[Index: integer]: TATLineSeparator read GetLineSep write SetLineSep;
     function LineSub(ALineIndex, APosFrom, ALen: integer): atString;
     function LineCharAt(ALineIndex, ACharIndex: integer): WideChar;
-    function LineIndent(ALineIndex: integer): integer;
+    procedure GetIndentProp(ALineIndex: integer; out ACharCount: integer; out AKind: TATLineIndentKind);
     function LineLenWithoutSpace(ALineIndex: integer): integer;
     procedure LineBlockDelete(ALine1, ALine2: integer);
     procedure LineBlockInsert(ALineFrom: integer; ANewLines: TStringList);
@@ -491,19 +497,41 @@ begin
     (LineEnds=cEndNone);
 end;
 
-function TATStringItem.IndentSize: integer;
+procedure TATStringItem.GetIndentProp(out ACharCount: integer; out
+  AKind: TATLineIndentKind);
 var
-  NLen: integer;
-  ch: WideChar;
+  NSpaces, NTabs: integer;
+  i: integer;
 begin
-  Result:= 0;
-  NLen:= CharLen;
-  repeat
-    if Result>=NLen then Break;
-    ch:= CharAt(Result+1);
-    if not IsCharSpace(ch) then Break;
-    Inc(Result);
-  until false;
+  ACharCount:= 0;
+  AKind:= cLineIndentOther;
+  NSpaces:= 0;
+  NTabs:= 0;
+
+  for i:= 1 to CharLen do
+  begin
+    case CharAt(i) of
+      ' ':
+        begin
+          Inc(ACharCount);
+          Inc(NSpaces);
+        end;
+      #9:
+        begin
+          Inc(ACharCount);
+          Inc(NTabs);
+        end
+      else
+        Break;
+    end;
+  end;
+
+  if ACharCount=0 then exit;
+  if (NSpaces>0) and (NTabs>0) then exit;
+  if NSpaces>0 then
+    AKind:= cLineIndentSpaces
+  else
+    AKind:= cLineIndentTabs;
 end;
 
 function TATStringItem.CharLenWithoutSpace: integer;
@@ -1488,9 +1516,10 @@ begin
   Result:= GetItemPtr(ALineIndex)^.CharAt(ACharIndex);
 end;
 
-function TATStrings.LineIndent(ALineIndex: integer): integer;
+procedure TATStrings.GetIndentProp(ALineIndex: integer; out
+  ACharCount: integer; out AKind: TATLineIndentKind);
 begin
-  Result:= GetItemPtr(ALineIndex)^.IndentSize;
+  GetItemPtr(ALineIndex)^.GetIndentProp(ACharCount, AKind);
 end;
 
 function TATStrings.LineLenWithoutSpace(ALineIndex: integer): integer;

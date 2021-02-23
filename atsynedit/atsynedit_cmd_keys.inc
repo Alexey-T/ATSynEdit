@@ -6,6 +6,7 @@ var
   Pnt: TPoint;
   Details: TATEditorPosDetails;
   NLine, NIndent, NWrapped, i: integer;
+  IndentKind: TATLineIndentKind;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -24,7 +25,7 @@ begin
     end;
 
     if FOptKeyHomeToNonSpace then
-      NIndent:= Strings.LineIndent(NLine);
+      Strings.GetIndentProp(NLine, NIndent, IndentKind);
 
     if (NWrapped>0) and (Caret.PosX>NWrapped) then
       Caret.PosX:= NWrapped
