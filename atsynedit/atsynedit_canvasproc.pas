@@ -299,7 +299,7 @@ begin
 end;
 
 procedure CanvasUnprintedSpace(C: TCanvas; const ARect: TRect;
-  AScale: integer; AFontColor: TColor); inline;
+  AScale: integer; AFontColor: TColor);
 const
   cMinDotSize = 2;
 var
@@ -322,7 +322,7 @@ procedure DoPaintUnprintedChar(
   var AOffsets: TATIntArrayFixed;
   AX, AY: integer;
   ACharSize: TPoint;
-  AColorFont: TColor); inline;
+  AColorFont: TColor);
 var
   R: TRect;
 begin
@@ -459,11 +459,10 @@ procedure DoPaintHexChars(C: TCanvas;
 const
   HexDigits: array[0..15] of char = '0123456789ABCDEF';
   HexDummyMark = '?';
-  Buf2: array[0..3] of char = 'x'#0#0#0;
-  Buf4: array[0..5] of char = 'x'#0#0#0#0#0;
+  Buf2: array[0..3] of char = 'x??'#0; //2 hex digits, trailing 0
+  Buf4: array[0..5] of char = 'x????'#0; //4 hex digits, trailing 0
 var
   Buf: PChar;
-  BufStr: string;
   Value, HexLen: integer;
   ch: WideChar;
   iChar, j: integer;
@@ -506,8 +505,7 @@ begin
           Value:= Value shr 4;
         end;
 
-        SetString(BufStr, Buf, HexLen);
-        CanvasTextOutSimplest(C, AX, AY, BufStr);
+        CanvasTextOutSimplest_PChar(C, AX, AY, Buf, HexLen);
       end;
     end;
 
