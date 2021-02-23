@@ -71,7 +71,7 @@ type
   TATSynEditDrawLineEvent = procedure(Sender: TObject; C: TCanvas;
     ALineIndex: integer;
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
-    const AExtent: TATIntArray) of object;
+    constref AExtent: TATIntArrayFixed) of object;
 
 type
   TATCanvasTextOutProps = record
@@ -319,7 +319,7 @@ procedure DoPaintUnprintedChar(
   C: TCanvas;
   ch: WideChar;
   AIndex: integer;
-  var AOffsets: TATIntArray;
+  var AOffsets: TATIntArrayFixed;
   AX, AY: integer;
   ACharSize: TPoint;
   AColorFont: TColor); inline;
@@ -329,8 +329,8 @@ begin
   R.Left:= AX;
   R.Right:= AX;
   if AIndex>1 then
-    Inc(R.Left, AOffsets[AIndex-2]);
-  Inc(R.Right, AOffsets[AIndex-1]);
+    Inc(R.Left, AOffsets.Offsets[AIndex-2]);
+  Inc(R.Right, AOffsets.Offsets[AIndex-1]);
 
   R.Top:= AY;
   R.Bottom:= AY+ACharSize.Y;
@@ -616,12 +616,12 @@ end;
 procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
   DxIn: PInteger;
   DxInLen: integer;
-  out DxOut: TATIntArray);
+  var DxOut: TATIntArrayFixed);
 var
   NLen, NSize, ResLen, i: integer;
 begin
-  NLen:= Length(S);
-  SetLength(DxOut, NLen);
+  NLen:= Min(Length(S), cMaxCharOffsets);
+  FillChar(DxOut, SizeOf(DxOut), 0);
 
   ResLen:= 0;
   i:= 0;
@@ -641,13 +641,18 @@ begin
       NSize:= DxIn[i-1];
 
     Inc(ResLen);
-    DxOut[ResLen-1]:= NSize;
+    DxOut.Count:= ResLen;
+    DxOut.Offsets[ResLen-1]:= NSize;
   until false;
-
-  //realloc after the loop
-  SetLength(DxOut, ResLen);
 end;
 
+//global vars to avoid mem allocs
+var
+  ListOffsets: TATLineOffsetsInfo;
+  ListInt, Dx: TATIntArrayFixed;
+  {$ifndef windows}
+  DxUTF8: TATIntArrayFixed;
+  {$endif}
 
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
@@ -656,11 +661,7 @@ procedure CanvasTextOut(C: TCanvas;
   out ATextWidth: integer;
   const AProps: TATCanvasTextOutProps);
 var
-  ListOffsets: TATLineOffsetsInfo;
-  ListInt: TATIntArray;
-  Dx: TATIntArray;
   {$ifndef windows}
-  DxUTF8: TATIntArray;
   Buf: string;
   {$else}
   bAllowLigatures: boolean;
@@ -679,31 +680,39 @@ var
   bBold, bItalic: boolean;
   ch: WideChar;
 begin
-  NLen:= Length(AText);
+  NLen:= Min(Length(AText), cMaxCharOffsets);
   if NLen=0 then Exit;
   NCharWidth:= AProps.CharSize.X;
 
-  SetLength(ListInt, NLen);
-  SetLength(Dx, NLen);
+  FillChar(ListInt, SizeOf(ListInt), 0);
+  FillChar(Dx, SizeOf(Dx), 0);
+  {$ifndef windows}
+  FillChar(DxUTF8, SizeOf(DxUTF8), 0);
+  {$endif}
 
   if AProps.SuperFast or AProps.HasAsciiNoTabs then
   begin
+    ListInt.Count:= NLen;
+    Dx.Count:= NLen;
     for i:= 0 to NLen-1 do
     begin
-      ListInt[i]:= NCharWidth*(i+1);
-      Dx[i]:= NCharWidth;
+      ListInt.Offsets[i]:= NCharWidth*(i+1);
+      Dx.Offsets[i]:= NCharWidth;
     end;
   end
   else
   begin
     AProps.TabHelper.CalcCharOffsets(AProps.LineIndex, AText, ListOffsets, AProps.CharsSkipped);
 
-    for i:= 0 to High(ListOffsets) do
-      ListInt[i]:= ListOffsets[i] * NCharWidth div 100;
+    ListInt.Count:= ListOffsets.Count;
+    Dx.Count:= ListOffsets.Count;
 
-    Dx[0]:= ListInt[0];
-    for i:= 1 to High(ListInt) do
-      Dx[i]:= ListInt[i]-ListInt[i-1];
+    for i:= 0 to ListOffsets.Count-1 do
+      ListInt.Offsets[i]:= ListOffsets.Offsets[i] * NCharWidth div 100;
+
+    Dx.Offsets[0]:= ListInt.Offsets[0];
+    for i:= 1 to ListInt.Count-1 do
+      Dx.Offsets[i]:= ListInt.Offsets[i]-ListInt.Offsets[i-1];
   end;
 
   if AParts=nil then
@@ -717,7 +726,7 @@ begin
     begin
       BufW:= SRemoveHexDisplayedChars(AText);
       if CanvasTextOutNeedsOffsets(C, AText) then
-        DxPointer:= @Dx[0]
+        DxPointer:= @Dx.Offsets[0]
       else
         DxPointer:= nil;
     end;
@@ -732,7 +741,7 @@ begin
     if not AProps.HasAsciiNoTabs then
       DoPaintHexChars(C,
         AText,
-        @Dx[0],
+        @Dx.Offsets[0],
         APosX,
         APosY,
         AProps.CharSize,
@@ -764,13 +773,13 @@ begin
         Include(PartFontStyle, fsStrikeOut);
 
       if PartOffset>0 then
-        PixOffset1:= ListInt[PartOffset-1]
+        PixOffset1:= ListInt.Offsets[PartOffset-1]
       else
         PixOffset1:= 0;
 
       i:= Min(PartOffset+PartLen, Length(AText));
       if i>0 then
-        PixOffset2:= ListInt[i-1]
+        PixOffset2:= ListInt.Offsets[i-1]
       else
         PixOffset2:= 0;
 
@@ -843,7 +852,7 @@ begin
           and not IsStringWithUnusualWidthChars(BufW); //disable ligatures if unicode chars
 
         if CanvasTextOutNeedsOffsets(C, PartStr) then
-          DxPointer:= @Dx[PartOffset]
+          DxPointer:= @Dx.Offsets[PartOffset]
         else
           DxPointer:= nil;
       end;
@@ -869,8 +878,8 @@ begin
 
         if CanvasTextOutNeedsOffsets(C, PartStr) then
         begin
-          _CalcCharSizesUtf8FromWidestring(BufW, @Dx[PartOffset], Length(Dx)-PartOffset, DxUTF8);
-          DxPointer:= @DxUTF8[0];
+          _CalcCharSizesUtf8FromWidestring(BufW, @Dx.Offsets[PartOffset], Dx.Count-PartOffset, DxUTF8);
+          DxPointer:= @DxUTF8.Offsets[0];
         end
         else
           DxPointer:= nil;
@@ -888,7 +897,7 @@ begin
       if not AProps.HasAsciiNoTabs then
         DoPaintHexChars(C,
           PartStr,
-          @Dx[PartOffset],
+          @Dx.Offsets[PartOffset],
           APosX+PixOffset1,
           APosY+AProps.TextOffsetFromLine,
           AProps.CharSize,
@@ -938,7 +947,7 @@ begin
       PartLen:= PartPtr^.Len;
       PartOffset:= PartPtr^.Offset;
       PartStr:= Copy(AText, PartOffset+1+PartLen, MaxInt);
-      PixOffset1:= ListInt[PartOffset];
+      PixOffset1:= ListInt.Offsets[PartOffset];
       C.Font.Color:= AProps.ColorNormalFont;
       C.Font.Style:= [];
 
@@ -1017,7 +1026,7 @@ begin
     end;
   end;
 
-  ATextWidth:= ListInt[High(ListInt)];
+  ATextWidth:= ListInt.Offsets[ListInt.Count-1];
 
   if AText<>'' then
     if Assigned(AProps.DrawEvent) then

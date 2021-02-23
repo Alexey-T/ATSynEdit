@@ -29,11 +29,19 @@ type
     cLineChangeDeletedAll
     );
 
+const
+  cMaxCharOffsets = 1024;
 type
   TATIntArray = array of integer;
   TATPointArray = array of TPoint;
   TATInt64Array = array of Int64;
-  TATLineOffsetsInfo = array of integer; //word is too small
+
+  TATLineOffsetsInfo = record
+    Count: integer;
+    Offsets: packed array[0..cMaxCharOffsets-1] of integer; //'word' is too small
+  end;
+  TATIntArrayFixed = TATLineOffsetsInfo;
+
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;
 
@@ -107,7 +115,7 @@ type
     function CharPosToColumnPos(ALineIndex: integer; const S: atString; APos: integer): integer;
     function ColumnPosToCharPos(ALineIndex: integer; const S: atString; AColumn: integer): integer;
     function IndentUnindent(ALineIndex: integer; const Str: atString; ARight: boolean): atString;
-    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; out AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
+    procedure CalcCharOffsets(ALineIndex: integer; const S: atString; var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer = 0);
     function CalcCharOffsetLast(ALineIndex: integer; const S: atString; ACharsSkipped: integer = 0): integer;
     function FindWordWrapOffset(ALineIndex: integer; const S: atString; AColumns: integer;
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
@@ -358,14 +366,14 @@ begin
 end;
 }
 
-procedure DoDebugOffsets(const AList: TATLineOffsetsInfo);
+procedure DoDebugOffsets(const Info: TATLineOffsetsInfo);
 var
   i: integer;
   s: string;
 begin
   s:= '';
-  for i:= Low(AList) to High(AList) do
-    s:= s+IntToStr(AList[i])+'% ';
+  for i:= 0 to Info.Count-1 do
+    s:= s+IntToStr(Info.Offsets[i])+'% ';
   ShowMessage('Offsets'#10+s);
 end;
 
@@ -393,12 +401,12 @@ begin
 
   CalcCharOffsets(ALineIndex, S, Offsets);
 
-  if Offsets[High(Offsets)]<=AColumns*100 then
+  if Offsets.Offsets[Offsets.Count-1]<=AColumns*100 then
     Exit(Length(S));
 
   //NAvg is average wrap offset, we use it if no correct offset found
-  N:= Length(S)-1;
-  while (N>0) and (Offsets[N]>(AColumns+1)*100) do Dec(N);
+  N:= Min(Length(S), cMaxCharOffsets)-1;
+  while (N>0) and (Offsets.Offsets[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
   if NAvg<OptMinWordWrapOffset then
     Exit(OptMinWordWrapOffset);
@@ -555,7 +563,7 @@ end;
 
 
 procedure TATStringTabHelper.CalcCharOffsets(ALineIndex: integer; const S: atString;
-  out AInfo: TATLineOffsetsInfo; ACharsSkipped: integer);
+  var AInfo: TATLineOffsetsInfo; ACharsSkipped: integer);
 var
   NLen, NSize, NTabSize, NCharsSkipped: integer;
   NScalePercents: integer;
@@ -564,8 +572,9 @@ var
   ch: widechar;
   i: integer;
 begin
-  NLen:= Length(S);
-  SetLength(AInfo, NLen);
+  FillChar(AInfo, SizeOf(AInfo), 0);
+  NLen:= Min(Length(S), cMaxCharOffsets);
+  AInfo.Count:= NLen;
   if NLen=0 then Exit;
 
   NCharsSkipped:= ACharsSkipped;
@@ -575,7 +584,7 @@ begin
   if NLen>OptMaxLineLenForAccurateCharWidths then
   begin
     for i:= 0 to NLen-1 do
-      AInfo[i]:= 100*(i+1);
+      AInfo.Offsets[i]:= 100*(i+1);
     exit;
   end;
 
@@ -620,9 +629,9 @@ begin
     end;
 
     if i=1 then
-      AInfo[i-1]:= NSize*NScalePercents
+      AInfo.Offsets[i-1]:= NSize*NScalePercents
     else
-      AInfo[i-1]:= AInfo[i-2]+NSize*NScalePercents;
+      AInfo.Offsets[i-1]:= AInfo.Offsets[i-2]+NSize*NScalePercents;
   end;
 end;
 
@@ -635,7 +644,7 @@ var
   i: integer;
 begin
   Result:= 0;
-  NLen:= Length(S);
+  NLen:= Min(Length(S), cMaxCharOffsets);
   if NLen=0 then Exit;
 
   if NLen>OptMaxLineLenForAccurateCharWidths then
@@ -688,13 +697,13 @@ begin
     Exit;
   end;
 
-  SetLength(ListEnds, Length(Str));
-  SetLength(ListMid, Length(Str));
   CalcCharOffsets(ALineIndex, Str, ListOffsets);
+  SetLength(ListEnds, ListOffsets.Count);
+  SetLength(ListMid, ListOffsets.Count);
 
   //positions of each char end
   for i:= 0 to High(ListEnds) do
-    ListEnds[i]:= ListOffsets[i]*ACharSize div 100;
+    ListEnds[i]:= ListOffsets.Offsets[i]*ACharSize div 100;
 
   //positions of each char middle
   for i:= 0 to High(ListEnds) do
@@ -733,12 +742,12 @@ begin
 
   CalcCharOffsets(ALineIndex, S, Offsets);
 
-  while (ACharsSkipped<Length(S)) and
-    (Offsets[ACharsSkipped] < AScrollPos*100) do
+  while (ACharsSkipped<Offsets.Count) and
+    (Offsets.Offsets[ACharsSkipped] < AScrollPos*100) do
     Inc(ACharsSkipped);
 
   if (ACharsSkipped>0) then
-    ACellPercentsSkipped:= Offsets[ACharsSkipped-1];
+    ACellPercentsSkipped:= Offsets.Offsets[ACharsSkipped-1];
 end;
 
 function SGetItem(var S: string; const ch: Char = ','): string;
