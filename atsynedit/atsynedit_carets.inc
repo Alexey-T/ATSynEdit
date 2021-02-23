@@ -186,7 +186,6 @@ begin
   //prepare optimization
   StringItem:= AStrings.GetItemPtr(P.Y);
   bAsciiOnly:= StringItem^.HasAsciiNoTabs;
-  bLineHuge:= StringItem^.CharLen>OptMaxLineLenForAccurateCharWidths;
 
   NScrolledHorzSmooth:= AScrollHorz.SmoothPos-AScrollHorz.NPixelOffset;
   NScrolledVert:= Max(0, AScrollVert.NPos);
@@ -194,6 +193,7 @@ begin
   for i:= NIndex1 to NIndex2 do
   begin
     Item:= AWrapInfo[i];
+    bLineHuge:= Item.NLength>OptMaxLineLenForAccurateCharWidths;
 
     if (P.X<Item.NCharIndex-1) then Continue;
     if (Item.NFinal=cWrapItemMiddle) then

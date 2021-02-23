@@ -3199,7 +3199,9 @@ begin
     if AMainText then
     begin
       NLineLen:= Strings.LinesLen[NLinesIndex];
-      bLineHuge:= NLineLen>OptMaxLineLenForAccurateCharWidths;
+      bLineHuge:= WrapItem.NLength>OptMaxLineLenForAccurateCharWidths;
+              //not this: NLineLen>OptMaxLineLenForAccurateCharWidths;
+
       if not bLineHuge then
       begin
         //little slow for huge lines
