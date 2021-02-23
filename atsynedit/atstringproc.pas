@@ -685,7 +685,7 @@ function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: 
   ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
 var
   ListOffsets: TATIntArrayFixed;
-  ListEnds, ListMid: TATIntArray;
+  ListEnds, ListMid: TATIntArrayFixed;
   i: integer;
 begin
   AEndOfLinePos:= false;
@@ -699,22 +699,23 @@ begin
   end;
 
   CalcCharOffsets(ALineIndex, Str, ListOffsets);
-  SetLength(ListEnds, ListOffsets.Count);
-  SetLength(ListMid, ListOffsets.Count);
+
+  ListEnds.Count:= ListOffsets.Count;
+  ListMid.Count:= ListOffsets.Count;
 
   //positions of each char end
-  for i:= 0 to High(ListEnds) do
-    ListEnds[i]:= ListOffsets.Offsets[i]*ACharSize div 100;
+  for i:= 0 to ListOffsets.Count-1 do
+    ListEnds.Offsets[i]:= ListOffsets.Offsets[i]*ACharSize div 100;
 
   //positions of each char middle
-  for i:= 0 to High(ListEnds) do
+  for i:= 0 to ListOffsets.Count-1 do
     if i=0 then
-      ListMid[i]:= ListEnds[i] div 2
+      ListMid.Offsets[i]:= ListEnds.Offsets[i] div 2
     else
-      ListMid[i]:= (ListEnds[i-1]+ListEnds[i]) div 2;
+      ListMid.Offsets[i]:= (ListEnds.Offsets[i-1]+ListEnds.Offsets[i]) div 2;
 
-  for i:= 0 to High(ListEnds) do
-    if APixelsFromLeft<ListMid[i] then
+  for i:= 0 to ListOffsets.Count-1 do
+    if APixelsFromLeft<ListMid.Offsets[i] then
     begin
       Result:= i+1;
 
@@ -727,7 +728,7 @@ begin
 
   AEndOfLinePos:= true;
   if AAllowVirtualPos then
-    Result:= Length(Str)+1 + (APixelsFromLeft - ListEnds[High(ListEnds)]) div ACharSize
+    Result:= Length(Str)+1 + (APixelsFromLeft - ListEnds.Offsets[ListEnds.Count-1]) div ACharSize
   else
     Result:= Length(Str)+1;
 end;
