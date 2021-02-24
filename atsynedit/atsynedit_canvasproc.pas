@@ -666,7 +666,7 @@ var
   bAllowLigatures: boolean;
   {$endif}
   BufW: UnicodeString;
-  NLen, NCharWidth, i, j: integer;
+  NLen, NCharWidth, i, iPart: integer;
   NLastPart: integer;
   PartStr: atString;
   PartOffset, PartLen,
@@ -752,15 +752,15 @@ begin
   else
   begin
     NLastPart:= 0;
-    for j:= 0 to High(TATLineParts) do
+    for iPart:= 0 to High(TATLineParts) do
     begin
-      PartPtr:= @AParts^[j];
+      PartPtr:= @AParts^[iPart];
       PartLen:= PartPtr^.Len;
       if PartLen=0 then Break;
       PartOffset:= PartPtr^.Offset;
       PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
-      NLastPart:= j;
+      NLastPart:= iPart;
 
       PartFontStyle:= [];
       NStyles:= PartPtr^.FontStyles;
