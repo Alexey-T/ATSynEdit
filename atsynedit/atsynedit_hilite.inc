@@ -115,13 +115,13 @@ begin
       if nLen=0 then Break;
       ch:= Strings.LineCharAt(ALineIndex, ACharIndex+nOffset+1);
       if ch<>#9 then Break;
-      AParts[nPart].Offset:= nOffset;
-      AParts[nPart].Len:= 1;
-      AParts[nPart].ColorFont:= FColorFont;
-      AParts[nPart].ColorBG:= AColorBG;
-      Inc(nPart);
+      AParts[0].Offset:= 0;
+      Inc(AParts[0].Len);
+      AParts[0].ColorFont:= FColorFont;
+      AParts[0].ColorBG:= AColorBG;
       Inc(nOffset);
       Dec(nLen);
+      nPart:= 1;
     until false;
 
     AParts[nPart].Offset:= nOffset;
