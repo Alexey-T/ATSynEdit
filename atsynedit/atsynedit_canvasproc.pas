@@ -690,7 +690,7 @@ var
   PartRect: TRect;
   DxPointer: PInteger;
   NStyles: integer;
-  bBold, bItalic, bSpaceChars: boolean;
+  bBold, bItalic, bCrossed, bSpaceChars: boolean;
   ch: WideChar;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
@@ -792,21 +792,18 @@ begin
 
       if not bSpaceChars then
       begin
-        PartFontStyle:= [];
-        NStyles:= PartPtr^.FontStyles;
-        if (NStyles and afsFontBold)<>0 then
-          Include(PartFontStyle, fsBold);
-        if (NStyles and afsFontItalic)<>0 then
-          Include(PartFontStyle, fsItalic);
-        if (NStyles and afsFontCrossed)<>0 then
-          Include(PartFontStyle, fsStrikeOut);
-
-        C.Font.Color:= PartPtr^.ColorFont;
-        C.Font.Style:= PartFontStyle;
-
         NStyles:= PartPtr^.FontStyles;
         bBold:= (NStyles and afsFontBold)<>0;
         bItalic:= (NStyles and afsFontItalic)<>0;
+        bCrossed:= (NStyles and afsFontCrossed)<>0;
+
+        PartFontStyle:= [];
+        if bBold then Include(PartFontStyle, fsBold);
+        if bItalic then Include(PartFontStyle, fsItalic);
+        if bCrossed then Include(PartFontStyle, fsStrikeOut);
+
+        C.Font.Style:= PartFontStyle;
+        C.Font.Color:= PartPtr^.ColorFont;
 
         if bItalic and not bBold then
         begin
