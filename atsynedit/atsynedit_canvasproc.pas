@@ -856,6 +856,7 @@ begin
           );
 
       //part with only blanks, render simpler
+      //important for gtk2: tab-chars give Dx offsets, render is much slower with Dx
       if bSpaceChars then
       begin
         C.FillRect(PartRect);
