@@ -100,14 +100,34 @@ procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
   AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
 var
   bSel, bSelPrev, bAdd: boolean;
-  nIndex, i: integer;
+  nPart, nOffset, nLen, nIndex, i: integer;
+  ch: WideChar;
 begin
   if not TempSel_IsLineWithSelection(ALineIndex) then
   begin
-    AParts[0].Offset:= 0;
-    AParts[0].Len:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
-    AParts[0].ColorFont:= FColorFont;
-    AParts[0].ColorBG:= AColorBG;
+    nOffset:= 0;
+    nLen:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
+    nPart:= 0;
+
+    //split leading tab-chars to separate leading parts
+    //this is much needed for gtk2, which paints ExtTextOut with Dx (for tabs) much slower
+    repeat
+      if nLen=0 then Break;
+      ch:= Strings.LineCharAt(ALineIndex, ACharIndex+nOffset+1);
+      if ch<>#9 then Break;
+      AParts[nPart].Offset:= nOffset;
+      AParts[nPart].Len:= 1;
+      AParts[nPart].ColorFont:= FColorFont;
+      AParts[nPart].ColorBG:= AColorBG;
+      Inc(nPart);
+      Inc(nOffset);
+      Dec(nLen);
+    until false;
+
+    AParts[nPart].Offset:= nOffset;
+    AParts[nPart].Len:= nLen;
+    AParts[nPart].ColorFont:= FColorFont;
+    AParts[nPart].ColorBG:= AColorBG;
     exit;
   end;
 
