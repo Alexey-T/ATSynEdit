@@ -644,6 +644,16 @@ begin
   until false;
 end;
 
+function IsStringOfTabs(const S: UnicodeString): boolean; inline;
+var
+  i: integer;
+begin
+  for i:= 1 to Length(S) do
+    if S[i]<>#9 then
+      exit(false);
+  Result:= true;
+end;
+
 //global vars to avoid mem allocs, speeds up rendering by 10-30%
 var
   ListOffsets,
@@ -676,7 +686,7 @@ var
   PartRect: TRect;
   DxPointer: PInteger;
   NStyles: integer;
-  bBold, bItalic: boolean;
+  bBold, bItalic, bTabChars: boolean;
   ch: WideChar;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
@@ -760,6 +770,7 @@ begin
       PartOffset:= PartPtr^.Offset;
       PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
+      bTabChars:= IsStringOfTabs(PartStr);
       NLastPart:= iPart;
 
       PartFontStyle:= [];
@@ -786,6 +797,8 @@ begin
       C.Brush.Color:= PartPtr^.ColorBG;
       C.Font.Style:= PartFontStyle;
 
+     if not bTabChars then
+     begin
       NStyles:= PartPtr^.FontStyles;
       bBold:= (NStyles and afsFontBold)<>0;
       bItalic:= (NStyles and afsFontItalic)<>0;
@@ -821,6 +834,7 @@ begin
         C.Font.Name:= AProps.FontNormal_Name;
         C.Font.Size:= AProps.FontNormal_Size;
       end;
+     end; //if not bTabChars
 
       PartRect:= Rect(
         APosX+PixOffset1,
@@ -835,6 +849,13 @@ begin
         Inc(PartRect.Right,
           C.Font.Size * OptItalicFontLongerInPercents div 100
           );
+
+      //part with only tab-chars: render simpler
+      if bTabChars then
+      begin
+        C.FillRect(PartRect);
+        Continue;
+      end;
 
       {$ifdef windows}
       if AProps.HasAsciiNoTabs then
