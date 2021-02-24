@@ -109,8 +109,8 @@ begin
     nLen:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
     nPart:= 0;
 
-    //split leading tab-chars to separate leading parts
-    //this is much needed for gtk2, which paints ExtTextOut with Dx (for tabs) much slower
+    //split leading tab-chars to separate part
+    //this is much needed for gtk2, which paints ExtTextOut with Dx much slower
     repeat
       if nLen=0 then Break;
       ch:= Strings.LineCharAt(ALineIndex, ACharIndex+nOffset+1);
