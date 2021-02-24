@@ -777,15 +777,6 @@ begin
       bSpaceChars:= IsStringOfSpacesTabs(PartStr);
       NLastPart:= iPart;
 
-      PartFontStyle:= [];
-      NStyles:= PartPtr^.FontStyles;
-      if (NStyles and afsFontBold)<>0 then
-        Include(PartFontStyle, fsBold);
-      if (NStyles and afsFontItalic)<>0 then
-        Include(PartFontStyle, fsItalic);
-      if (NStyles and afsFontCrossed)<>0 then
-        Include(PartFontStyle, fsStrikeOut);
-
       if PartOffset>0 then
         PixOffset1:= ListInt.Data[PartOffset-1]
       else
@@ -797,12 +788,22 @@ begin
       else
         PixOffset2:= 0;
 
-      C.Font.Color:= PartPtr^.ColorFont;
       C.Brush.Color:= PartPtr^.ColorBG;
-      C.Font.Style:= PartFontStyle;
 
       if not bSpaceChars then
       begin
+        PartFontStyle:= [];
+        NStyles:= PartPtr^.FontStyles;
+        if (NStyles and afsFontBold)<>0 then
+          Include(PartFontStyle, fsBold);
+        if (NStyles and afsFontItalic)<>0 then
+          Include(PartFontStyle, fsItalic);
+        if (NStyles and afsFontCrossed)<>0 then
+          Include(PartFontStyle, fsStrikeOut);
+
+        C.Font.Color:= PartPtr^.ColorFont;
+        C.Font.Style:= PartFontStyle;
+
         NStyles:= PartPtr^.FontStyles;
         bBold:= (NStyles and afsFontBold)<>0;
         bItalic:= (NStyles and afsFontItalic)<>0;
