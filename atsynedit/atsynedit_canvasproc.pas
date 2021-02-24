@@ -699,9 +699,7 @@ begin
 
   FillChar(ListInt, SizeOf(ListInt), 0);
   FillChar(Dx, SizeOf(Dx), 0);
-  {$ifndef windows}
-  FillChar(DxUTF8, SizeOf(DxUTF8), 0);
-  {$endif}
+  //no need to do FillChar(DxUTF8...)
 
   if AProps.SuperFast or AProps.HasAsciiNoTabs then
   begin
