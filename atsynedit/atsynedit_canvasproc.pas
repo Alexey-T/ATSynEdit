@@ -644,20 +644,6 @@ begin
   until false;
 end;
 
-function IsStringOfSpacesTabs(const S: UnicodeString): boolean;
-var
-  i: integer;
-begin
-  for i:= 1 to Length(S) do
-    case S[i] of
-      ' ', #9:
-        Continue;
-      else
-        exit(false);
-    end;
-  Result:= true;
-end;
-
 //global vars to avoid mem allocs, speeds up rendering by 10-30%
 var
   ListOffsets,
@@ -772,7 +758,7 @@ begin
       PartOffset:= PartPtr^.Offset;
       PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
-      bSpaceChars:= IsStringOfSpacesTabs(PartStr);
+      bSpaceChars:= IsStringSpaces(PartStr);
       NLastPart:= iPart;
 
       if PartOffset>0 then
