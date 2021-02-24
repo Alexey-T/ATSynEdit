@@ -644,13 +644,17 @@ begin
   until false;
 end;
 
-function IsStringOfTabs(const S: UnicodeString): boolean; inline;
+function IsStringOfSpacesTabs(const S: UnicodeString): boolean;
 var
   i: integer;
 begin
   for i:= 1 to Length(S) do
-    if S[i]<>#9 then
-      exit(false);
+    case S[i] of
+      ' ', #9:
+        Continue;
+      else
+        exit(false);
+    end;
   Result:= true;
 end;
 
@@ -686,7 +690,7 @@ var
   PartRect: TRect;
   DxPointer: PInteger;
   NStyles: integer;
-  bBold, bItalic, bTabChars: boolean;
+  bBold, bItalic, bSpaceChars: boolean;
   ch: WideChar;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
@@ -770,7 +774,7 @@ begin
       PartOffset:= PartPtr^.Offset;
       PartStr:= Copy(AText, PartOffset+1, PartLen);
       if PartStr='' then Break;
-      bTabChars:= IsStringOfTabs(PartStr);
+      bSpaceChars:= IsStringOfSpacesTabs(PartStr);
       NLastPart:= iPart;
 
       PartFontStyle:= [];
@@ -797,44 +801,44 @@ begin
       C.Brush.Color:= PartPtr^.ColorBG;
       C.Font.Style:= PartFontStyle;
 
-     if not bTabChars then
-     begin
-      NStyles:= PartPtr^.FontStyles;
-      bBold:= (NStyles and afsFontBold)<>0;
-      bItalic:= (NStyles and afsFontItalic)<>0;
+      if not bSpaceChars then
+      begin
+        NStyles:= PartPtr^.FontStyles;
+        bBold:= (NStyles and afsFontBold)<>0;
+        bItalic:= (NStyles and afsFontItalic)<>0;
 
-      if bItalic and not bBold then
-      begin
-        if AProps.FontItalic_Name<>'' then
+        if bItalic and not bBold then
         begin
-          C.Font.Name:= AProps.FontItalic_Name;
-          C.Font.Size:= AProps.FontItalic_Size;
-        end;
-      end
-      else
-      if bBold and not bItalic then
-      begin
-        if AProps.FontBold_Name<>'' then
+          if AProps.FontItalic_Name<>'' then
+          begin
+            C.Font.Name:= AProps.FontItalic_Name;
+            C.Font.Size:= AProps.FontItalic_Size;
+          end;
+        end
+        else
+        if bBold and not bItalic then
         begin
-          C.Font.Name:= AProps.FontBold_Name;
-          C.Font.Size:= AProps.FontBold_Size;
-        end;
-      end
-      else
-      if bBold and bItalic then
-      begin
-        if AProps.FontBoldItalic_Name<>'' then
+          if AProps.FontBold_Name<>'' then
+          begin
+            C.Font.Name:= AProps.FontBold_Name;
+            C.Font.Size:= AProps.FontBold_Size;
+          end;
+        end
+        else
+        if bBold and bItalic then
         begin
-          C.Font.Name:= AProps.FontBoldItalic_Name;
-          C.Font.Size:= AProps.FontBoldItalic_Size;
+          if AProps.FontBoldItalic_Name<>'' then
+          begin
+            C.Font.Name:= AProps.FontBoldItalic_Name;
+            C.Font.Size:= AProps.FontBoldItalic_Size;
+          end;
+        end
+        else
+        begin
+          C.Font.Name:= AProps.FontNormal_Name;
+          C.Font.Size:= AProps.FontNormal_Size;
         end;
-      end
-      else
-      begin
-        C.Font.Name:= AProps.FontNormal_Name;
-        C.Font.Size:= AProps.FontNormal_Size;
-      end;
-     end; //if not bTabChars
+      end; //if not bSpaceChars
 
       PartRect:= Rect(
         APosX+PixOffset1,
@@ -850,8 +854,8 @@ begin
           C.Font.Size * OptItalicFontLongerInPercents div 100
           );
 
-      //part with only tab-chars: render simpler
-      if bTabChars then
+      //part with only blanks, render simpler
+      if bSpaceChars then
       begin
         C.FillRect(PartRect);
         Continue;
