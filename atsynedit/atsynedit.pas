@@ -2833,9 +2833,6 @@ var
   NWrapIndex, NWrapIndexDummy,
   NLineCount, NPropCount,
   iProp: integer;
-  {$ifdef debug_paint_time}
-  t: DWord;
-  {$endif}
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -2980,10 +2977,6 @@ begin
       FLineBottom:= 1;
   end;
 
-  {$ifdef debug_paint_time}
-  t:= GetTickCount;
-  {$endif}
-
   //render lines using Props array
   for iProp:= 0 to NPropCount-1 do
   begin
@@ -3006,28 +2999,7 @@ begin
         ACharSize,
         PropPtr^.WrapIndex
         );
-
-    {
-    //debug
-    C.Brush.Color:= clRed;
-    RectLine:= PropPtr^.LineRect;
-    InflateRect(RectLine, -1, -1);
-    C.FrameRect(RectLine);
-    }
   end;
-
-  {$ifdef debug_paint_time}
-  t:= GetTickCount-t;
-  if AMainText then
-    application.mainform.Caption:= 'paint '+IntToStr(t);
-  {$endif}
-
-  {
-  for iProp:= NPropCount-1 downto 0 do
-    with Props[iProp] do
-      if Assigned(Bitmap) then
-        FreeAndNil(Bitmap);
-        }
 
   //staples
   if AMainText then
