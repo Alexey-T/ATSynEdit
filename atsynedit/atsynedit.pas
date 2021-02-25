@@ -3773,10 +3773,6 @@ end;
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
 begin
-  {$ifdef debug_fps}
-  FTickMinimap:= GetTickCount64;
-  {$endif}
-
   FScrollHorzMinimap.Clear;
   FScrollVertMinimap.Clear;
 
@@ -3798,10 +3794,6 @@ begin
 
   {$ifdef use_bg}
   FFastBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
-  {$endif}
-
-  {$ifdef debug_fps}
-  FTickMinimap:= GetTickCount64-FTickMinimap;
   {$endif}
 end;
 
