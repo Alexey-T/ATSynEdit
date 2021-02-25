@@ -714,7 +714,7 @@ begin
 
   if AParts=nil then
   begin
-    if AProps.HasAsciiNoTabs then
+    if AProps.HasAsciiNoTabs and not OptCanvasTextoutNeedsOffsets then
     begin
       BufW:= AText;
       DxPointer:= nil;
@@ -873,7 +873,7 @@ begin
         bAllowLigatures
         );
       {$else}
-      if AProps.HasAsciiNoTabs then
+      if AProps.HasAsciiNoTabs and not OptCanvasTextoutNeedsOffsets then
       begin
         Buf:= PartStr;
         DxPointer:= nil;
