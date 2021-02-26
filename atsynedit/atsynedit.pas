@@ -4740,9 +4740,10 @@ end;
 function TATSynEdit.DoPaint(ALineFrom: integer): boolean;
 //gets True if one of scrollbars changed Visible state
 begin
-  UpdateTabHelper;
   if csLoading in ComponentState then
     exit(false);
+
+  UpdateTabHelper;
 
   if DoubleBuffered then
   begin
@@ -4750,8 +4751,11 @@ begin
       if cIntFlagBitmap in FPaintFlags then
       begin
         FBitmap.BeginUpdate(true);
-        DoPaintAll(FBitmap.Canvas, ALineFrom);
-        FBitmap.EndUpdate();
+        try
+          DoPaintAll(FBitmap.Canvas, ALineFrom);
+        finally
+          FBitmap.EndUpdate();
+        end;
       end;
   end
   else
