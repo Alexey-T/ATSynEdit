@@ -694,7 +694,7 @@ type
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
     {$ifdef use_bg}
-    FFastBmp: TBGRABitmap;
+    FMinimapBmp: TBGRABitmap;
     {$endif}
     FColorOfStates: array[TATLineState] of TColor;
 
@@ -3024,7 +3024,7 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
       C.FillRect(ARectLine);
     end
     else
-      FFastBmp.FillRect(
+      FMinimapBmp.FillRect(
         ARectLeft - FRectMinimap.Left,
         ARectLine.Top - FRectMinimap.Top,
         FRectMinimap.Width,
@@ -3336,7 +3336,7 @@ begin
       else
       if StrOutput<>'' then
         CanvasTextOutMinimap(
-          {$ifdef use_bg} FFastBmp, {$else} C, {$endif}
+          {$ifdef use_bg} FMinimapBmp, {$else} C, {$endif}
           ARectLine,
           CurrPointText.X {$ifdef use_bg} - FRectMinimap.Left {$endif},
           CurrPointText.Y {$ifdef use_bg} - FRectminimap.Top {$endif},
@@ -3692,20 +3692,20 @@ begin
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
 
   {$ifdef use_bg}
-  FFastBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
-  FFastBmp.Fill(FColorBG);
+  FMinimapBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
+  FMinimapBmp.Fill(FColorBG);
   {$endif}
 
   DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
 
   {$ifdef use_bg}
-  DoPaintMinimapSelTo_BGRA(FFastBmp);
+  DoPaintMinimapSelTo_BGRA(FMinimapBmp);
   {$else}
   DoPaintMinimapSelTo(C);
   {$endif}
 
   {$ifdef use_bg}
-  FFastBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
+  FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
   {$endif}
 end;
 
@@ -3964,7 +3964,7 @@ begin
   FLinkCache:= TATLinkCache.Create;
 
   {$ifdef use_bg}
-  FFastBmp:= TBGRABitmap.Create;
+  FMinimapBmp:= TBGRABitmap.Create;
   {$endif}
 
   {$ifdef windows}
@@ -4328,7 +4328,7 @@ begin
     FreeAndNil(FFoldedMarkList);
   end;
   {$ifdef use_bg}
-  FreeAndNil(FFastBmp);
+  FreeAndNil(FMinimapBmp);
   {$endif}
   FreeAndNil(FMicromap);
   FreeAndNil(FFold);
