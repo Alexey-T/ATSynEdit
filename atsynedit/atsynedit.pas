@@ -3438,13 +3438,7 @@ begin
     Min(WrapItem.NLength, GetVisibleColumns)
     );
 
-  with FMinimapBmp.Canvas do
-  begin
-    Brush.Color:= FColorBG;
-    Font.Name:= Font.Name;
-    Font.Size:= DoScaleFont(Font.Size);
-    Font.Color:= FColorFont;
-  end;
+  //FMinimapBmp.Canvas.Brush.Color:= FColorBG;
 
   bUseColorOfCurrentLine:= false;
 
