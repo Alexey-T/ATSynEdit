@@ -1827,11 +1827,13 @@ var
 begin
   Ed:= TATSynEdit(Editor);
   repeat
-    Ed.FEventMapStart.WaitFor(INFINITE);
-    ed.FEventMapStart.ResetEvent;
-    if Terminated then exit;
-    Ed.DoPaintMinimapAllToBGRABitmap;
-    Ed.FEventMapDone.SetEvent;
+    if Ed.FEventMapStart.WaitFor(1000)=wrSignaled then
+    begin
+      ed.FEventMapStart.ResetEvent;
+      if Terminated then exit;
+      Ed.DoPaintMinimapAllToBGRABitmap;
+      Ed.FEventMapDone.SetEvent;
+    end;
   until false;
 end;
 
