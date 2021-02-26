@@ -23,10 +23,8 @@ uses
   LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
-  {$ifdef use_bg}
   BGRABitmap,
   BGRABitmapTypes,
-  {$endif}
   ATStringProc,
   ATStringProc_Separator,
   ATStrings,
@@ -693,9 +691,7 @@ type
     {$endif}
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
-    {$ifdef use_bg}
     FMinimapBmp: TBGRABitmap;
-    {$endif}
     FColorOfStates: array[TATLineState] of TColor;
 
     //these options are implemented in CudaText, they are dummy here
@@ -1008,11 +1004,7 @@ type
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
-    {$ifdef use_bg}
     procedure DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
-    {$else}
-    procedure DoPaintMinimapSelTo(C: TCanvas);
-    {$endif}
     procedure DoPaintMinimapTo(C: TCanvas);
     procedure DoPaintMinimapTooltip(C: TCanvas);
     procedure DoPaintMicromapTo(C: TCanvas);
@@ -2836,9 +2828,7 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  {$ifdef use_bg}
   if AMainText then
-  {$endif}
   begin
     C.Brush.Color:= FColorBG;
     C.FillRect(ARect);
@@ -3017,7 +3007,6 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   //
   procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
   begin
-    {$ifdef use_bg}
     if AMainText then
     begin
       C.Brush.Color:= AFillColor;
@@ -3030,10 +3019,6 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
         FRectMinimap.Width,
         ARectLine.Top - FRectMinimap.Top + ACharSize.Y,
         AFillColor);
-    {$else}
-    C.Brush.Color:= AFillColor;
-    C.FillRect(ARectLeft, ARectLine.Top, ARectLine.Right, ARectLine.Bottom);
-    {$endif}
   end;
   //
 var
@@ -3336,10 +3321,10 @@ begin
       else
       if StrOutput<>'' then
         CanvasTextOutMinimap(
-          {$ifdef use_bg} FMinimapBmp, {$else} C, {$endif}
+          FMinimapBmp,
           ARectLine,
-          CurrPointText.X {$ifdef use_bg} - FRectMinimap.Left {$endif},
-          CurrPointText.Y {$ifdef use_bg} - FRectminimap.Top {$endif},
+          CurrPointText.X - FRectMinimap.Left,
+          CurrPointText.Y - FRectminimap.Top,
           ACharSize,
           FTabSize,
           FLineParts,
@@ -3622,7 +3607,6 @@ begin
   Result:= (Red(N)<cMax) and (Green(N)<cMax) and (Blue(N)<cMax);
 end;
 
-{$ifdef use_bg}
 procedure TATSynEdit.DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
 var
   R: TRect;
@@ -3654,34 +3638,6 @@ begin
     C.DrawVertLine(0, 0, FRectMinimap.Height, rColor);
   end;
 end;
-{$else}
-procedure TATSynEdit.DoPaintMinimapSelTo(C: TCanvas);
-var
-  R: TRect;
-begin
-  if FMinimapShowSelAlways or FCursorOnMinimap then
-  begin
-    GetRectMinimapSel(R);
-    //if IntersectRect(R, R, FRectMinimap) then
-    begin
-      CanvasInvertRect(C, R, Colors.MinimapSelBG);
-      if FMinimapShowSelBorder then
-      begin
-        C.Pen.Color:= Colors.MinimapBorder;
-        C.Brush.Style:= bsClear;
-        C.Rectangle(R);
-        C.Brush.Style:= bsSolid;
-      end;
-    end;
-  end;
-
-  if Colors.MinimapBorder<>clNone then
-  begin
-    C.Pen.Color:= Colors.MinimapBorder;
-    CanvasLineVert(C, FRectMinimap.Left-1, FRectMinimap.Top, FRectMinimap.Bottom);
-  end;
-end;
-{$endif}
 
 procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
 begin
@@ -3691,22 +3647,13 @@ begin
   FScrollVertMinimap.NPos:= GetMinimapScrollPos;
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
 
-  {$ifdef use_bg}
   FMinimapBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
   FMinimapBmp.Fill(FColorBG);
-  {$endif}
 
   DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
-
-  {$ifdef use_bg}
   DoPaintMinimapSelTo_BGRA(FMinimapBmp);
-  {$else}
-  DoPaintMinimapSelTo(C);
-  {$endif}
 
-  {$ifdef use_bg}
   FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
-  {$endif}
 end;
 
 procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
@@ -3963,9 +3910,7 @@ begin
   FAdapterCache:= TATAdapterHiliteCache.Create;
   FLinkCache:= TATLinkCache.Create;
 
-  {$ifdef use_bg}
   FMinimapBmp:= TBGRABitmap.Create;
-  {$endif}
 
   {$ifdef windows}
   FAdapterIME:= TATAdapterIMEStandard.Create;
@@ -4327,9 +4272,7 @@ begin
     FFoldedMarkList.Clear;
     FreeAndNil(FFoldedMarkList);
   end;
-  {$ifdef use_bg}
   FreeAndNil(FMinimapBmp);
-  {$endif}
   FreeAndNil(FMicromap);
   FreeAndNil(FFold);
   FreeAndNil(FTimerNiceScroll);

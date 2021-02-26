@@ -17,10 +17,8 @@ uses
   {$endif}
   Classes, SysUtils, Graphics, Types,
   Forms,
-  {$ifdef use_bg}
   BGRABitmap,
   BGRABitmapTypes,
-  {$endif}
   ATCanvasPrimitives,
   ATStringProc,
   ATStrings,
@@ -126,7 +124,7 @@ procedure CanvasTextOut(C: TCanvas;
   );
 
 procedure CanvasTextOutMinimap(
-  {$ifdef use_bg} C: TBGRABitmap; {$else} C: TCanvas; {$endif}
+  C: TBGRABitmap;
   const ARect: TRect;
   APosX, APosY: integer;
   ACharSize: TPoint;
@@ -1050,126 +1048,6 @@ begin
 end;
 
 
-{$ifndef use_bg}
-procedure CanvasTextOutMinimap(C: TCanvas; const ARect: TRect; APosX, APosY: integer;
-  ACharSize: TPoint; ATabSize: integer; constref AParts: TATLineParts;
-  AColorBG: TColor; AColorAfter: TColor;
-  const ALine: atString; AUsePixels: boolean);
-var
-  CanvasHandle: THandle;
-  //
-  procedure _SetPixel(X, Y: integer; AColor: TColor); inline;
-  begin
-    //TCanvas.SetPixel has overhead
-    {$ifdef windows}
-    Windows.SetPixel(CanvasHandle, X, Y, AColor);
-    {$else}
-    C.Pixels[X, Y]:= AColor;
-    {$endif}
-  end;
-  //
-{
-Line is painted with ACharSize.Y=2px height, with 1px spacing between lines
-}
-var
-  Part: PATLinePart;
-  NPartIndex, NCharIndex, NSpaces, NSpaceThis: integer;
-  X1, X2, Y1, Y2, Y2b: integer;
-  bHasBG: boolean;
-  bSpace: boolean;
-  NColorBack, NColorFont, NColorFontHalf: TColor;
-  ch: WideChar;
-begin
-  //offset<0 means some bug on making parts!
-  if AParts[0].Offset<0 then exit;
-  CanvasHandle:= C.Handle;
-
-  X1:= 0;
-  X2:= 0;
-  Y1:= APosY;
-  Y2:= Y1 + ACharSize.Y;
-  Y2b:= Y1 + ACharSize.Y div 2;
-  NSpaces:= 0;
-
-  for NPartIndex:= Low(TATLineParts) to High(TATLineParts) do
-  begin
-    Part:= @AParts[NPartIndex];
-    if Part^.Len=0 then Break; //last part
-    if Part^.Offset>Length(ALine) then Break; //part out of ALine
-
-    NColorFont:= Part^.ColorFont;
-    NColorBack:= Part^.ColorBG;
-    if NColorBack=clNone then
-      NColorBack:= AColorBG;
-    bHasBG:= NColorBack<>AColorBG;
-
-    //clNone means that it's empty/space part (adapter must set so)
-    if NColorFont=clNone then
-      if bHasBG then
-        NColorFont:= NColorBack
-      else
-        Continue;
-
-    NColorFontHalf:= ColorBlendHalf(NColorBack, NColorFont);
-
-    //iterate over all chars, to check for spaces (ignore them) and Tabs (add indent for them).
-    //because need to paint multiline comments/strings nicely.
-    for NCharIndex:= Part^.Offset+1 to Part^.Offset+Part^.Len do
-    begin
-      if NCharIndex>Length(ALine) then Break;
-      ch:= ALine[NCharIndex];
-      if ch=#9 then
-      begin
-        bSpace:= true;
-        NSpaceThis:= ATabSize;
-      end
-      else
-      begin
-        bSpace:= ch=' ';
-        NSpaceThis:= 1;
-      end;
-
-      X1:= APosX + ACharSize.X*NSpaces;
-      X2:= X1 + ACharSize.X*NSpaceThis;
-      Inc(NSpaces, NSpaceThis);
-
-      if X1>ARect.Right then
-        Break;
-      if X2>ARect.Right then
-        X2:= ARect.Right;
-
-        if bHasBG then
-        begin
-          //paint BG as 2 pixel line
-          if AUsePixels then
-          begin
-            _SetPixel(X1, Y1, NColorBack);
-            _SetPixel(X1, Y2-1, NColorBack);
-          end
-          else
-          begin
-            C.Brush.Color:= NColorBack;
-            C.FillRect(X1, Y1, X2, Y2);
-          end;
-        end;
-
-        if not bSpace then
-        begin
-          if AUsePixels then
-          begin
-            _SetPixel(X1, Y2-1, NColorFontHalf);
-          end
-          else
-          begin
-            C.Brush.Color:= NColorFontHalf;
-            C.FillRect(X1, Y2b, X2, Y2);
-          end;
-        end;
-    end;
-  end;
-end;
-{$else}
-// BGRABitmap version
 procedure CanvasTextOutMinimap(
   C: TBGRABitmap;
   const ARect: TRect; APosX, APosY: integer;
@@ -1271,7 +1149,6 @@ begin
     C.FillRect(X2, Y1, ARect.Right, Y2, rColorBack);
   end;
 end;
-{$endif}
 
 end.
 
