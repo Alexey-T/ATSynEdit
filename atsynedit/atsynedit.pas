@@ -664,7 +664,7 @@ type
     FClientH: integer;
     FLineBottom: integer;
     FParts: TATLineParts; //this is used in DoPaintLine
-    FParts2: TATLineParts; //this is used by DoPaintMinimapLine, in thread
+    FPartsMinimap: TATLineParts; //this is used by DoPaintMinimapLine, in thread
     FPartsSel: TATLineParts; //this is used in DoPartCalc_ApplySelectionOver
     FScrollVert,
     FScrollHorz,
@@ -1001,10 +1001,10 @@ type
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TPoint;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-      const AWrapIndex: integer);
+  const AWrapIndex: integer; var ATempParts: TATLineParts);
     procedure DoPaintMinimapLine(ARectLine: TRect; ACharSize: TPoint;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-      const AWrapIndex: integer);
+  const AWrapIndex: integer; var ATempParts: TATLineParts);
     procedure DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TPoint;
       AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
@@ -2972,7 +2972,7 @@ begin
     if Assigned(GapItem) then
       Inc(RectLine.Bottom, GapItem.Size);
 
-    DoPaintLine(C, RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex);
+    DoPaintLine(C, RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex, FParts);
     if AWithGutter then
       DoPaintGutterOfLine(C, RectLine, ACharSize, NWrapIndex);
 
@@ -3015,7 +3015,7 @@ begin
     if not FWrapInfo.IsIndexValid(NWrapIndex) then
       Break;
 
-    DoPaintMinimapLine(RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex);
+    DoPaintMinimapLine(RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex, FPartsMinimap);
 
     Inc(NWrapIndex);
   until false;
@@ -3026,7 +3026,8 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   ARectLine: TRect;
   ACharSize: TPoint;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  const AWrapIndex: integer);
+  const AWrapIndex: integer;
+  var ATempParts: TATLineParts);
   //
   procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
   begin
@@ -3213,12 +3214,12 @@ begin
 
     NColorAfter:= clNone;
 
-    DoCalcLineHilite(WrapItem, FParts{%H-},
+    DoCalcLineHilite(WrapItem, ATempParts{%H-},
       NOutputCharsSkipped, cMaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, true);
 
-    if FParts[0].Offset<0 then
+    if ATempParts[0].Offset<0 then
     begin
       //some bug in making parts! to fix!
       //raise Exception.Create('Program bug in text renderer, report to author!');
@@ -3232,7 +3233,7 @@ begin
     begin
       NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
       if NDimValue>0 then //-1: no ranges found, 0: no effect
-        DoPartsDim(FParts, NDimValue, FColorBG);
+        DoPartsDim(ATempParts, NDimValue, FColorBG);
     end;
 
     //adapter may return ColorAfterEol, paint it
@@ -3290,7 +3291,7 @@ begin
         CurrPointText.X,
         CurrPointText.Y,
         StrOutput,
-        @FParts,
+        @ATempParts,
         NOutputStrWidth,
         TextOutProps
         );
@@ -3409,7 +3410,8 @@ procedure TATSynEdit.DoPaintMinimapLine(
   ARectLine: TRect;
   ACharSize: TPoint;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  const AWrapIndex: integer);
+  const AWrapIndex: integer;
+  var ATempParts: TATLineParts);
   //
   procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
   begin
@@ -3477,7 +3479,7 @@ begin
   begin
     NColorAfter:= clNone;
 
-    DoCalcLineHilite(WrapItem, FParts2{%H-},
+    DoCalcLineHilite(WrapItem, ATempParts{%H-},
       NOutputCharsSkipped, cMaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, false);
@@ -3500,7 +3502,7 @@ begin
         CurrPointText.Y - FRectminimap.Top,
         ACharSize,
         FTabSize,
-        FParts2,
+        ATempParts,
         FColorBG,
         NColorAfter,
         Strings.LineSub(
