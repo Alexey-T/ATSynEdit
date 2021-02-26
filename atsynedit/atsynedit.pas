@@ -3193,7 +3193,8 @@ begin
     C.Font.Color:= FColorFont;
 
     bUseColorOfCurrentLine:= false;
-    if bLineWithCaret then
+    if AMainText then
+     if bLineWithCaret then
       if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsEntered) then
       begin
         if FOptShowCurLineMinimal then
