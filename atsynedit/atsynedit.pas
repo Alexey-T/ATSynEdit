@@ -686,8 +686,6 @@ type
     {$ifdef debug_fps}
     FTickMinimap: QWord;
     FTickAll: QWord;
-    FMissMain: integer;
-    FMissMinimap: integer;
     {$endif}
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
@@ -2701,7 +2699,13 @@ begin
 
   if FMinimapVisible then
   begin
+    {$ifdef debug_fps}
+    FTickMinimap:= GetTickCount64;
+    {$endif}
     DoPaintMinimapTo(C);
+    {$ifdef debug_fps}
+    FTickMinimap:= GetTickCount64-FTickMinimap;
+    {$endif}
     if FMinimapTooltipVisible and FMinimapTooltipEnabled then
       DoPaintMinimapTooltip(C);
   end;
@@ -4779,8 +4783,6 @@ begin
 
   {$ifdef debug_fps}
   FTickAll:= GetTickCount64;
-  FMissMain:= 0;
-  FMissMinimap:= 0;
   {$endif}
 
   //if scrollbars shown, paint again
@@ -8009,27 +8011,17 @@ end;
 {$ifdef debug_fps}
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);
 var
-  NFps: integer;
-  //NFpsMap: integer;
   S: string;
 begin
-  if FTickAll<1 then
-    FTickAll:= 1;
-  if FTickMinimap<1 then
-    FTickMinimap:= 1;
-  NFps:= 1000 div FTickAll div 5 * 5;
-  //NFpsMap:= 1000 div FTickMinimap;
+  if ModeOneLine then exit;
+  if GetVisibleLines<30 then exit;
 
-  C.Font.Name:= 'Arial';
+  C.Font.Name:= Font.Name;
   C.Font.Color:= clRed;
   C.Font.Size:= 8;
-  C.Brush.Color:= clCream;
 
-  S:= Format('#%d, fps %d', [FPaintCounter, NFps]);
-  CanvasTextOutSimplest(C, FClientW-100, 5, S);
-
-  S:= Format('miss %d+%d', [FMissMain-FMissMinimap, FMissMinimap]);
-  CanvasTextOutSimplest(C, FClientW-100, 20, S);
+  S:= Format('#%03d, %d+%d ms', [FPaintCounter, FTickAll, FTickMinimap]);
+  CanvasTextOutSimplest(C, 5, 5, S);
 end;
 {$else}
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);

@@ -1,4 +1,4 @@
-{.$define debug_fps} // Show frames-per-second red indicator in editor top-right corner
+{.$define debug_fps} // Show rendering times in ms, in a red label in the corner
 
 {$define use_cache} // Use FAdapterCache, ie caching of colored lines
 
