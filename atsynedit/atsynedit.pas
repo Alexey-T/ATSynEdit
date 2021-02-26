@@ -3447,6 +3447,7 @@ begin
     {$ifndef windows} DoubleBuffered and {$endif}
     (ACharSize.X=1);
 
+  if not FWrapInfo.IsIndexValid(AWrapIndex) then Exit; //e.g. main thread updated WrapInfo
   WrapItem:= FWrapInfo[AWrapIndex];
   NLinesIndex:= WrapItem.NLineIndex;
   if not Strings.IsIndexValid(NLinesIndex) then Exit;
