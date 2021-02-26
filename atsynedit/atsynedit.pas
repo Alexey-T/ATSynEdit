@@ -1009,7 +1009,7 @@ type
       AScrollPos: integer; AIndentLines: boolean);
     procedure DoPaintMinimapAllToBGRABitmap;
     procedure DoPaintMinimapTextToBGRABitmap(const ARect: TRect;
-      const ACharSize: TPoint; var AScrollHorz, AScrollVert: TATEditorScrollInfo);
+      ACharSize: TPoint; var AScrollHorz, AScrollVert: TATEditorScrollInfo);
     procedure DoPaintMinimapSelToBGRABitmap;
     procedure DoPaintMinimapTooltip(C: TCanvas);
     procedure DoPaintMicromap(C: TCanvas);
@@ -2970,14 +2970,13 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMinimapTextToBGRABitmap(
-  const ARect: TRect;
-  const ACharSize: TPoint;
+  const ARect: TRect; ACharSize: TPoint;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo);
 var
   RectLine: TRect;
   NWrapIndex: integer;
 begin
-  FMinimapBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
+  FMinimapBmp.SetSize(ARect.Width, ARect.Height);
   FMinimapBmp.Fill(FColorBG);
 
   //wrap turned off can cause bad scrollpos, fix it
