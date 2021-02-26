@@ -1000,15 +1000,17 @@ type
     procedure DoPaintRulerCaretMarks(C: TCanvas);
     procedure DoPaintTiming(C: TCanvas);
     procedure DoPaintText(C: TCanvas; const ARect: TRect;
-      const ACharSize: TPoint; AWithGutter, AMainText: boolean;
+      const ACharSize: TPoint; AWithGutter: boolean;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo; ALineFrom: integer);
     procedure DoPaintTextFragmentTo(C: TCanvas; const ARect: TRect; ALineFrom,
       ALineTo: integer; AConsiderWrapInfo: boolean; AColorBG, AColorBorder: TColor);
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
-    procedure DoPaintMinimap(C: TCanvas);
-    procedure DoPaintMinimapSel_BGRA(C: TBGRABitmap);
+    procedure DoPaintMinimapAllToBGRABitmap;
+    procedure DoPaintMinimapTextToBGRABitmap(const ARect: TRect;
+      const ACharSize: TPoint; var AScrollHorz, AScrollVert: TATEditorScrollInfo);
+    procedure DoPaintMinimapSelToBGRABitmap;
     procedure DoPaintMinimapTooltip(C: TCanvas);
     procedure DoPaintMicromap(C: TCanvas);
     procedure DoPaintMargins(C: TCanvas);
@@ -2684,7 +2686,7 @@ begin
   UpdateWrapInfo;
 
   UpdateLinksAttribs;
-  DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
+  DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, FScrollHorz, FScrollVert, ALineFrom);
   DoPaintMargins(C);
   DoPaintNiceScroll(C);
 
@@ -2702,7 +2704,10 @@ begin
   begin
     if OptEditorDebugTiming then
       FTickMinimap:= GetTickCount64;
-    DoPaintMinimap(C);
+
+    DoPaintMinimapAllToBGRABitmap;
+    FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
+
     if OptEditorDebugTiming then
       FTickMinimap:= GetTickCount64-FTickMinimap;
     if FMinimapTooltipVisible and FMinimapTooltipEnabled then
@@ -2815,7 +2820,7 @@ type
 procedure TATSynEdit.DoPaintText(C: TCanvas;
   const ARect: TRect;
   const ACharSize: TPoint;
-  AWithGutter, AMainText: boolean;
+  AWithGutter: boolean;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   ALineFrom: integer);
 var
@@ -2831,13 +2836,13 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  if AMainText then
+  //if AMainText then
   begin
     C.Brush.Color:= FColorBG;
     C.FillRect(ARect);
   end;
 
-  if AMainText then
+  //if AMainText then
   begin
     if Assigned(FFoldedMarkList) then
       FFoldedMarkList.Clear;
@@ -2862,7 +2867,7 @@ begin
       DoPaintGutterBandBG(C, FGutterBandEmpty, FColorBG, -1, -1, true);
   end;
 
-  if AMainText and (FTextHint<>'') then
+  if (FTextHint<>'') then
   begin
     NLineCount:= Strings.Count;
     if (NLineCount=0) or ((NLineCount=1) and (Strings.LinesLen[0]=0)) then
@@ -2891,10 +2896,7 @@ begin
 
   //loop to fill Props array
   NPropCount:= 0;
-  if AMainText then
-    NLineCount:= GetVisibleLines+1
-  else
-    NLineCount:= GetVisibleLinesMinimap+1;
+  NLineCount:= GetVisibleLines+1;
   SetLength(Props, NLineCount); //preallocate memory
   FillChar(Props, SizeOf(Props), 0);
 
@@ -2911,22 +2913,21 @@ begin
     if not FWrapInfo.IsIndexValid(NWrapIndex) then
     begin
       //paint end-of-file arrow
-      if AMainText then
-        if NWrapIndex>=0 then
-          if OptUnprintedVisible and OptUnprintedEof then
-            if OptUnprintedEndsDetails then
-              DoPaintUnprintedEolText(C,
-                'EOF',
-                ARect.Left,
-                RectLine.Top,
-                Colors.UnprintedFont,
-                Colors.UnprintedBG)
-            else
-              CanvasArrowHorz(C,
-                RectLine,
-                Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
-                false,
-                OptUnprintedTabPointerScale);
+      if NWrapIndex>=0 then
+        if OptUnprintedVisible and OptUnprintedEof then
+          if OptUnprintedEndsDetails then
+            DoPaintUnprintedEolText(C,
+              'EOF',
+              ARect.Left,
+              RectLine.Top,
+              Colors.UnprintedFont,
+              Colors.UnprintedBG)
+          else
+            CanvasArrowHorz(C,
+              RectLine,
+              Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
+              false,
+              OptUnprintedTabPointerScale);
       Break;
     end;
 
@@ -2934,21 +2935,18 @@ begin
     if Length(Props)<NPropCount then
       SetLength(Props, Length(Props)+30);
 
-    if AMainText then
+    //consider gap before 1st line
+    if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
-      //consider gap before 1st line
-      if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
-      begin
-        GapItem:= Gaps.Find(-1);
-        if Assigned(GapItem) then
-          Inc(RectLine.Bottom, GapItem.Size);
-      end;
-
-      //conside gap for this line
-      GapItem:= Gaps.Find(WrapInfo[NWrapIndex].NLineIndex);
+      GapItem:= Gaps.Find(-1);
       if Assigned(GapItem) then
         Inc(RectLine.Bottom, GapItem.Size);
     end;
+
+    //conside gap for this line
+    GapItem:= Gaps.Find(WrapInfo[NWrapIndex].NLineIndex);
+    if Assigned(GapItem) then
+      Inc(RectLine.Bottom, GapItem.Size);
 
     PropPtr:= @Props[NPropCount-1];
     PropPtr^.WrapIndex:= NWrapIndex;
@@ -2961,36 +2959,89 @@ begin
   until false;
 
   //update LineBottom
-  if AMainText then
+  if NPropCount>0 then
   begin
-    if NPropCount>0 then
-    begin
-      NWrapIndex:= Props[NPropCount-1].WrapIndex;
-      FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
-    end
-    else
-      FLineBottom:= 1;
-  end;
+    NWrapIndex:= Props[NPropCount-1].WrapIndex;
+    FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
+  end
+  else
+    FLineBottom:= 1;
 
   //render lines using Props array
   for iProp:= 0 to NPropCount-1 do
   begin
     PropPtr:= @Props[iProp];
-
-    if AMainText then
-    begin
-      DoPaintLine(C, PropPtr^.LineRect, ACharSize, AScrollHorz, AScrollVert, PropPtr^.WrapIndex);
-      if AWithGutter then
-        DoPaintGutterOfLine(C, PropPtr^.LineRect, ACharSize, PropPtr^.WrapIndex);
-    end
-    else
-      DoPaintMinimapLine(PropPtr^.LineRect, ACharSize, AScrollHorz, AScrollVert, PropPtr^.WrapIndex);
+    DoPaintLine(C, PropPtr^.LineRect, ACharSize, AScrollHorz, AScrollVert, PropPtr^.WrapIndex);
+    if AWithGutter then
+      DoPaintGutterOfLine(C, PropPtr^.LineRect, ACharSize, PropPtr^.WrapIndex);
   end;
 
   //staples
-  if AMainText then
-    DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
+  DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
 end;
+
+procedure TATSynEdit.DoPaintMinimapTextToBGRABitmap(
+  const ARect: TRect;
+  const ACharSize: TPoint;
+  var AScrollHorz, AScrollVert: TATEditorScrollInfo);
+var
+  Props: array of TATEditorPaintingItemProp;
+  PropPtr: PATEditorPaintingItemProp;
+  RectLine: TRect;
+  NWrapIndex,
+  NLineCount, NPropCount,
+  iProp: integer;
+begin
+  FMinimapBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
+  FMinimapBmp.Fill(FColorBG);
+
+  //wrap turned off can cause bad scrollpos, fix it
+  with AScrollVert do
+    NPos:= Min(NPos, NPosLast);
+
+  NWrapIndex:= Max(0, AScrollVert.NPos);
+
+  //loop to fill Props array
+  NPropCount:= 0;
+  NLineCount:= GetVisibleLinesMinimap+1;
+  SetLength(Props, NLineCount); //preallocate memory
+  FillChar(Props, SizeOf(Props), 0);
+
+  RectLine.Left:= ARect.Left;
+  RectLine.Right:= ARect.Right;
+  RectLine.Top:= 0;
+  RectLine.Bottom:= ARect.Top;
+
+  repeat
+    RectLine.Top:= RectLine.Bottom;
+    RectLine.Bottom:= RectLine.Top+ACharSize.Y;
+    if RectLine.Top>ARect.Bottom then Break;
+
+    if not FWrapInfo.IsIndexValid(NWrapIndex) then
+      Break;
+
+    Inc(NPropCount);
+    if Length(Props)<NPropCount then
+      SetLength(Props, Length(Props)+30);
+
+    PropPtr:= @Props[NPropCount-1];
+    PropPtr^.WrapIndex:= NWrapIndex;
+    PropPtr^.LineRect:= RectLine;
+    //PropPtr^.BitmapRect:= Rect(0, 0, RectLine.Width, RectLine.Height);
+    //PropPtr^.Bitmap:= TBitmap.Create;
+    //PropPtr^.Bitmap.PixelFormat:= pf24bit;
+
+    Inc(NWrapIndex);
+  until false;
+
+  //render lines using Props array
+  for iProp:= 0 to NPropCount-1 do
+  begin
+    PropPtr:= @Props[iProp];
+    DoPaintMinimapLine(PropPtr^.LineRect, ACharSize, AScrollHorz, AScrollVert, PropPtr^.WrapIndex);
+  end;
+end;
+
 
 procedure TATSynEdit.DoPaintLine(C: TCanvas;
   ARectLine: TRect;
@@ -3670,11 +3721,13 @@ begin
   Result:= (Red(N)<cMax) and (Green(N)<cMax) and (Blue(N)<cMax);
 end;
 
-procedure TATSynEdit.DoPaintMinimapSel_BGRA(C: TBGRABitmap);
+procedure TATSynEdit.DoPaintMinimapSelToBGRABitmap;
 var
+  C: TBGRABitmap;
   R: TRect;
   rColor: TBGRAPixel;
 begin
+  C:= FMinimapBmp;
   if FMinimapShowSelAlways or FCursorOnMinimap then
   begin
     GetRectMinimapSel(R);
@@ -3702,7 +3755,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPaintMinimap(C: TCanvas);
+procedure TATSynEdit.DoPaintMinimapAllToBGRABitmap;
 begin
   FScrollHorzMinimap.Clear;
   FScrollVertMinimap.Clear;
@@ -3710,13 +3763,8 @@ begin
   FScrollVertMinimap.NPos:= GetMinimapScrollPos;
   FScrollVertMinimap.NPosLast:= MaxInt div 2;
 
-  FMinimapBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
-  FMinimapBmp.Fill(FColorBG);
-
-  DoPaintText(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
-  DoPaintMinimapSel_BGRA(FMinimapBmp);
-
-  FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
+  DoPaintMinimapTextToBGRABitmap(FRectMinimap, FCharSizeMinimap, FScrollHorzMinimap, FScrollVertMinimap);
+  DoPaintMinimapSelToBGRABitmap;
 end;
 
 procedure TATSynEdit.DoPaintMicromap(C: TCanvas);
