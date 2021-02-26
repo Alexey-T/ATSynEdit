@@ -705,8 +705,8 @@ type
     FShowOsBarHorz: boolean;
     FMinimapBmp: TBGRABitmap;
     FMinimapThread: TATMinimapThread;
-    FEventStart: TSimpleEvent;
-    FEventDone: TSimpleEvent;
+    FEventMapStart: TSimpleEvent; //fired when need to start MinimapThread work
+    FEventMapDone: TSimpleEvent; //fired by MinimapThread, when it's work done
     FColorOfStates: array[TATLineState] of TColor;
 
     //these options are implemented in CudaText, they are dummy here
@@ -1824,11 +1824,11 @@ uses
 procedure TATMinimapThread.Execute;
 begin
   repeat
-    TATSynEdit(Editor).FEventStart.WaitFor(INFINITE);
+    TATSynEdit(Editor).FEventMapStart.WaitFor(INFINITE);
     if Terminated then exit;
-    TATSynEdit(Editor).FEventStart.ResetEvent;
+    TATSynEdit(Editor).FEventMapStart.ResetEvent;
     TATSynEdit(Editor).DoPaintMinimapAllToBGRABitmap;
-    TATSynEdit(Editor).FEventDone.SetEvent;
+    TATSynEdit(Editor).FEventMapDone.SetEvent;
   until false;
 end;
 
@@ -2715,14 +2715,14 @@ begin
     {$ifdef map_th}
     if not Assigned(FMinimapThread) then
     begin
-      FEventStart:= TSimpleEvent.Create;
-      FEventDone:= TSimpleEvent.Create;
+      FEventMapStart:= TSimpleEvent.Create;
+      FEventMapDone:= TSimpleEvent.Create;
       FMinimapThread:= TATMinimapThread.Create(true);
       FMinimapThread.FreeOnTerminate:= false;
       FMinimapThread.Editor:= Self;
       FMinimapThread.Start;
     end;
-    FEventStart.SetEvent;
+    FEventMapStart.SetEvent;
     {$else}
     DoPaintMinimapAllToBGRABitmap;
     {$endif}
@@ -2764,8 +2764,8 @@ begin
       DoPaintMinimapTooltip(C);
 
     {$ifdef map_th}
-    FEventDone.WaitFor(INFINITE);
-    FEventDone.ResetEvent;
+    FEventMapDone.WaitFor(INFINITE);
+    FEventMapDone.ResetEvent;
     {$endif}
     FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
   end;
@@ -4353,15 +4353,15 @@ begin
   if Assigned(FMinimapThread) then
   begin
     FMinimapThread.Terminate;
-    FEventStart.SetEvent;
+    FEventMapStart.SetEvent;
     if not FMinimapThread.Finished then
       FMinimapThread.WaitFor;
     FreeAndNil(FMinimapThread);
   end;
-  if Assigned(FEventStart) then
-    FreeAndNil(FEventStart);
-  if Assigned(FEventDone) then
-    FreeAndNil(FEventDone);
+  if Assigned(FEventMapStart) then
+    FreeAndNil(FEventMapStart);
+  if Assigned(FEventMapDone) then
+    FreeAndNil(FEventMapDone);
   FAdapterHilite:= nil;
   if Assigned(FMinimapTooltipBitmap) then
     FreeAndNil(FMinimapTooltipBitmap);
