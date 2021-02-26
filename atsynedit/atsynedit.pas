@@ -2900,7 +2900,11 @@ begin
 
   //loop to fill Props array
   NPropCount:= 0;
-  SetLength(Props, 100); //preallocate memory
+  if AMainText then
+    NLineCount:= GetVisibleLines+1
+  else
+    NLineCount:= GetVisibleLinesMinimap+1;
+  SetLength(Props, NLineCount); //preallocate memory
   FillChar(Props, SizeOf(Props), 0);
 
   RectLine.Left:= ARect.Left;
