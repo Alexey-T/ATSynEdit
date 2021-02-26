@@ -982,8 +982,8 @@ type
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(ALineFrom: integer): boolean;
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
-    procedure DoPaintAllTo(C: TCanvas; ALineFrom: integer);
-    procedure DoPaintMainTo(C: TCanvas; ALineFrom: integer);
+    procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
+    procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TPoint;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
       const AWrapIndex: integer);
@@ -2675,7 +2675,7 @@ begin
   GetRectRuler(FRectRuler); //after main
 end;
 
-procedure TATSynEdit.DoPaintMainTo(C: TCanvas; ALineFrom: integer);
+procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
 begin
   if csLoading in ComponentState then Exit;
 
@@ -2711,10 +2711,6 @@ begin
       FTickMinimap:= GetTickCount64-FTickMinimap;
     if FMinimapTooltipVisible and FMinimapTooltipEnabled then
       DoPaintMinimapTooltip(C);
-  end
-  else
-  begin
-    FTickMinimap:= 0;
   end;
 
   if FMicromapVisible then
@@ -4707,7 +4703,7 @@ begin
   FAdapterCache.MaxSize:= N;
 end;
 
-procedure TATSynEdit.DoPaintAllTo(C: TCanvas; ALineFrom: integer);
+procedure TATSynEdit.DoPaintAll(C: TCanvas; ALineFrom: integer);
 begin
   if Enabled then
   begin
@@ -4728,7 +4724,7 @@ begin
   FCaretShown:= false;
   Carets.GetSelections(FSel);
 
-  DoPaintMainTo(C, ALineFrom);
+  DoPaintMain(C, ALineFrom);
 
   UpdateCaretsCoords;
 
@@ -4754,12 +4750,12 @@ begin
       if cIntFlagBitmap in FPaintFlags then
       begin
         FBitmap.BeginUpdate(true);
-        DoPaintAllTo(FBitmap.Canvas, ALineFrom);
+        DoPaintAll(FBitmap.Canvas, ALineFrom);
         FBitmap.EndUpdate();
       end;
   end
   else
-    DoPaintAllTo(Canvas, ALineFrom);
+    DoPaintAll(Canvas, ALineFrom);
 
   Result:= UpdateScrollbars(false);
 end;
@@ -4850,7 +4846,10 @@ begin
     if not Assigned(FBitmap) then exit;
 
   if OptEditorDebugTiming then
+  begin
     FTickAll:= GetTickCount64;
+    FTickMinimap:= 0;
+  end;
 
   //if scrollbars shown, paint again
   if DoPaint(ALineNumber) then
