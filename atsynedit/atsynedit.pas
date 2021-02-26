@@ -502,6 +502,7 @@ type
     FSelRect: TRect;
     FSelRectBegin: TPoint;
     FSelRectEnd: TPoint;
+    FVisibleColumns: integer;
     FCarets: TATCarets;
     FCaretShowEnabled: boolean;
     FCaretShown: boolean;
@@ -1826,7 +1827,7 @@ begin
 
   NCharW:= FCharSize.X * FOptRulerFontSizePercents div 100;
 
-  for i:= NRulerStart to NRulerStart+GetVisibleColumns+1 do
+  for i:= NRulerStart to NRulerStart+FVisibleColumns+1 do
   begin
     case FOptRulerNumeration of
       cRulerNumeration_0_10_20:
@@ -2249,17 +2250,17 @@ begin
 end;
 
 
-function TATSynEdit.GetVisibleLines: integer; inline;
+function TATSynEdit.GetVisibleLines: integer;
 begin
   Result:= FRectMainVisible.Height div FCharSize.Y;
 end;
 
-function TATSynEdit.GetVisibleColumns: integer; inline;
+function TATSynEdit.GetVisibleColumns: integer;
 begin
   Result:= FRectMainVisible.Width div FCharSize.X;
 end;
 
-function TATSynEdit.GetVisibleLinesMinimap: integer; inline;
+function TATSynEdit.GetVisibleLinesMinimap: integer;
 begin
   Result:= FRectMinimap.Height div FCharSizeMinimap.Y - 1;
 end;
@@ -3083,7 +3084,7 @@ begin
   begin
     //little slow for huge lines
     NSubPos:= WrapItem.NCharIndex;
-    NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
+    NSubLen:= Min(WrapItem.NLength, FVisibleColumns+AScrollHorz.NPos+1+6);
       //+1 because of NPixelOffset
       //+6 because of HTML color underlines
     StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
@@ -3110,7 +3111,7 @@ begin
     NOutputCellPercentsSkipped:= NOutputCharsSkipped*100;
 
     NSubPos:= WrapItem.NCharIndex + NOutputCharsSkipped;
-    NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
+    NSubLen:= Min(WrapItem.NLength, FVisibleColumns+AScrollHorz.NPos+1+6);
       //+1 because of NPixelOffset
       //+6 because of HTML color underlines
     StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
@@ -3435,7 +3436,7 @@ begin
   StrOutput:= Strings.LineSub(
     NLinesIndex,
     1,
-    Min(WrapItem.NLength, GetVisibleColumns)
+    Min(WrapItem.NLength, FVisibleColumns)
     );
 
   //FMinimapBmp.Canvas.Brush.Color:= FColorBG;
@@ -3485,7 +3486,7 @@ begin
         Strings.LineSub(
           WrapItem.NLineIndex,
           WrapItem.NCharIndex,
-          GetVisibleColumns), //optimize for huge lines
+          FVisibleColumns), //optimize for huge lines
         bUseSetPixel
         );
   end
@@ -4723,6 +4724,7 @@ begin
   end;
 
   Inc(FPaintCounter);
+  FVisibleColumns:= GetVisibleColumns;
   FCaretShown:= false;
   Carets.GetSelections(FSel);
 
