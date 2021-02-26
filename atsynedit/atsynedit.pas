@@ -272,6 +272,16 @@ type
     procedure Assign(Obj: TATEditorCaretProps);
   end;
 
+type
+  { TMinimapThread }
+
+  TATMinimapThread = class(TThread)
+  public
+    Editor: TObject;
+  protected
+    procedure Execute; override;
+  end;
+
 const
   cUsePaintStatic = true;
   cMaxIndentVert = 100;
@@ -562,7 +572,6 @@ type
     FMouseDownAndColumnSelection: boolean;
     FMouseAutoScroll: TATEditorDirection;
     FMouseActions: TATEditorMouseActionArray;
-    FMinimapThread: TThread;
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
@@ -693,6 +702,7 @@ type
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
     FMinimapBmp: TBGRABitmap;
+    FMinimapThread: TATMinimapThread;
     FColorOfStates: array[TATLineState] of TColor;
 
     //these options are implemented in CudaText, they are dummy here
@@ -1805,21 +1815,12 @@ uses
 
 {$I atsynedit_proc.inc}
 
-type
-  { TMinimapThread }
-
-  TMinimapThread = class(TThread)
-  public
-    Editor: TATSynEdit;
-    procedure Execute; override;
-  end;
-
 { TATMinimapThread }
 
-procedure TMinimapThread.Execute;
+procedure TATMinimapThread.Execute;
 begin
-  if Assigned(Editor) and Assigned(Editor.FMinimapBmp) then
-    Editor.DoPaintMinimapAllToBGRABitmap;
+  if Assigned(Editor) then
+    TATSynEdit(Editor).DoPaintMinimapAllToBGRABitmap;
 end;
 
 { TATSynEdit }
@@ -2704,8 +2705,11 @@ begin
   begin
     {$ifdef map_th}
     if not Assigned(FMinimapThread) then
-      FMinimapThread:= TMinimapThread.Create(true);
-    TMinimapThread(FMinimapThread).Editor:= Self;
+    begin
+      FMinimapThread:= TATMinimapThread.Create(true);
+      FMinimapThread.FreeOnTerminate:= false;
+    end;
+    FMinimapThread.Editor:= Self;
     FMinimapThread.Start;
     {$else}
     DoPaintMinimapAllToBGRABitmap;
