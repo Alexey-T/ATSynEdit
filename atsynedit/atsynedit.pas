@@ -2715,6 +2715,9 @@ begin
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
 
+  UpdateAdapterCacheSize;
+  UpdateWrapInfo; //update WrapInfo before MinimapThread start
+
   if FMinimapVisible then
   begin
     {$ifdef map_th}
@@ -2732,9 +2735,6 @@ begin
     DoPaintMinimapAllToBGRABitmap;
     {$endif}
   end;
-
-  UpdateAdapterCacheSize;
-  UpdateWrapInfo;
 
   UpdateLinksAttribs;
   DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, FScrollHorz, FScrollVert, ALineFrom);
