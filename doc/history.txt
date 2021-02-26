@@ -1,4 +1,8 @@
 
+2021.02.26
++ BGRABitmap is now required (used to paint minimap)
++ minimap painting now runs in a thread! much faster!
+
 2021.02.22
 + refactored for future rendeding with threads
 * removed prop OptNumbersSkippedChar, always draw a 'dot'
