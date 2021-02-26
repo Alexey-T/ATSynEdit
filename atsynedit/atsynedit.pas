@@ -2812,8 +2812,6 @@ type
   PATEditorPaintingItemProp = ^TATEditorPaintingItemProp;
   TATEditorPaintingItemProp = record
     LineRect: TRect;
-    //BitmapRect: TRect;
-    //Bitmap: TBitmap;
     WrapIndex: integer;
   end;
 
