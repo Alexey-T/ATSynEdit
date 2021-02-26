@@ -2974,12 +2974,8 @@ procedure TATSynEdit.DoPaintMinimapTextToBGRABitmap(
   const ACharSize: TPoint;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo);
 var
-  Props: array of TATEditorPaintingItemProp;
-  PropPtr: PATEditorPaintingItemProp;
   RectLine: TRect;
-  NWrapIndex,
-  NLineCount, NPropCount,
-  iProp: integer;
+  NWrapIndex: integer;
 begin
   FMinimapBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
   FMinimapBmp.Fill(FColorBG);
@@ -2989,12 +2985,6 @@ begin
     NPos:= Min(NPos, NPosLast);
 
   NWrapIndex:= Max(0, AScrollVert.NPos);
-
-  //loop to fill Props array
-  NPropCount:= 0;
-  NLineCount:= GetVisibleLinesMinimap+1;
-  SetLength(Props, NLineCount); //preallocate memory
-  FillChar(Props, SizeOf(Props), 0);
 
   RectLine.Left:= ARect.Left;
   RectLine.Right:= ARect.Right;
@@ -3009,23 +2999,10 @@ begin
     if not FWrapInfo.IsIndexValid(NWrapIndex) then
       Break;
 
-    Inc(NPropCount);
-    if Length(Props)<NPropCount then
-      SetLength(Props, Length(Props)+30);
-
-    PropPtr:= @Props[NPropCount-1];
-    PropPtr^.WrapIndex:= NWrapIndex;
-    PropPtr^.LineRect:= RectLine;
+    DoPaintMinimapLine(RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex);
 
     Inc(NWrapIndex);
   until false;
-
-  //render lines using Props array
-  for iProp:= 0 to NPropCount-1 do
-  begin
-    PropPtr:= @Props[iProp];
-    DoPaintMinimapLine(PropPtr^.LineRect, ACharSize, AScrollHorz, AScrollVert, PropPtr^.WrapIndex);
-  end;
 end;
 
 
