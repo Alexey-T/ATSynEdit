@@ -3016,9 +3016,6 @@ begin
     PropPtr:= @Props[NPropCount-1];
     PropPtr^.WrapIndex:= NWrapIndex;
     PropPtr^.LineRect:= RectLine;
-    //PropPtr^.BitmapRect:= Rect(0, 0, RectLine.Width, RectLine.Height);
-    //PropPtr^.Bitmap:= TBitmap.Create;
-    //PropPtr^.Bitmap.PixelFormat:= pf24bit;
 
     Inc(NWrapIndex);
   until false;
