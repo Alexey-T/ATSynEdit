@@ -2767,10 +2767,14 @@ begin
       DoPaintMinimapTooltip(C);
 
     {$ifdef map_th}
-    FEventMapDone.WaitFor(INFINITE);
-    FEventMapDone.ResetEvent;
-    {$endif}
+    if FEventMapDone.WaitFor(1000)=wrSignaled then
+    begin
+      FEventMapDone.ResetEvent;
+      FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
+    end;
+    {$else}
     FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
+    {$endif}
   end;
 end;
 
