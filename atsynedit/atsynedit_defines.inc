@@ -7,3 +7,6 @@
                          //ok also for win32
 
 {.$define debug_scroll}
+
+{.$define map_th} //render minimap in thread
+

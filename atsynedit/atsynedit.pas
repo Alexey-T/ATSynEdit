@@ -562,6 +562,7 @@ type
     FMouseDownAndColumnSelection: boolean;
     FMouseAutoScroll: TATEditorDirection;
     FMouseActions: TATEditorMouseActionArray;
+    FMinimapThread: TThread;
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
@@ -1804,6 +1805,23 @@ uses
 
 {$I atsynedit_proc.inc}
 
+type
+  { TMinimapThread }
+
+  TMinimapThread = class(TThread)
+  public
+    Editor: TATSynEdit;
+    procedure Execute; override;
+  end;
+
+{ TATMinimapThread }
+
+procedure TMinimapThread.Execute;
+begin
+  if Assigned(Editor) and Assigned(Editor.FMinimapBmp) then
+    Editor.DoPaintMinimapAllToBGRABitmap;
+end;
+
 { TATSynEdit }
 
 procedure TATSynEdit.DoPaintRuler(C: TCanvas);
@@ -2682,6 +2700,18 @@ begin
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
 
+  if FMinimapVisible then
+  begin
+    {$ifdef map_th}
+    if not Assigned(FMinimapThread) then
+      FMinimapThread:= TMinimapThread.Create(true);
+    TMinimapThread(FMinimapThread).Editor:= Self;
+    FMinimapThread.Start;
+    {$else}
+    DoPaintMinimapAllToBGRABitmap;
+    {$endif}
+  end;
+
   UpdateAdapterCacheSize;
   UpdateWrapInfo;
 
@@ -2700,20 +2730,6 @@ begin
   if Assigned(FOnDrawEditor) then
     FOnDrawEditor(Self, C, FRectMain);
 
-  if FMinimapVisible then
-  begin
-    if OptEditorDebugTiming then
-      FTickMinimap:= GetTickCount64;
-
-    DoPaintMinimapAllToBGRABitmap;
-    FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
-
-    if OptEditorDebugTiming then
-      FTickMinimap:= GetTickCount64-FTickMinimap;
-    if FMinimapTooltipVisible and FMinimapTooltipEnabled then
-      DoPaintMinimapTooltip(C);
-  end;
-
   if FMicromapVisible then
     DoPaintMicromap(C);
 
@@ -2725,6 +2741,18 @@ begin
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
       DoPaintMouseSelFrame(C);
+
+  if FMinimapVisible then
+  begin
+    if FMinimapTooltipVisible and FMinimapTooltipEnabled then
+      DoPaintMinimapTooltip(C);
+
+    {$ifdef map_th}
+    if not FMinimapThread.Finished then
+      FMinimapThread.WaitFor;
+    {$endif}
+    FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
+  end;
 end;
 
 procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);
@@ -3692,6 +3720,9 @@ end;
 
 procedure TATSynEdit.DoPaintMinimapAllToBGRABitmap;
 begin
+  if OptEditorDebugTiming then
+    FTickMinimap:= GetTickCount64;
+
   FScrollHorzMinimap.Clear;
   FScrollVertMinimap.Clear;
 
@@ -3700,6 +3731,9 @@ begin
 
   DoPaintMinimapTextToBGRABitmap(FRectMinimap, FCharSizeMinimap, FScrollHorzMinimap, FScrollVertMinimap);
   DoPaintMinimapSelToBGRABitmap;
+
+  if OptEditorDebugTiming then
+    FTickMinimap:= GetTickCount64-FTickMinimap;
 end;
 
 procedure TATSynEdit.DoPaintMicromap(C: TCanvas);
@@ -4300,6 +4334,12 @@ end;
 
 destructor TATSynEdit.Destroy;
 begin
+  if Assigned(FMinimapThread) then
+  begin
+    if not FMinimapThread.Finished then
+      FMinimapThread.WaitFor;
+    FreeAndNil(FMinimapThread);
+  end;
   FAdapterHilite:= nil;
   if Assigned(FMinimapTooltipBitmap) then
     FreeAndNil(FMinimapTooltipBitmap);
