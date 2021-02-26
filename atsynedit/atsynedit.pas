@@ -674,7 +674,6 @@ type
     FMinimapTooltipBitmap: TBitmap;
     FMinimapTooltipLinesCount: integer;
     FMinimapTooltipWidthPercents: integer;
-    FMinimapCachedPainting: boolean;
     FMinimapHiliteLinesWithSelection: boolean;
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
@@ -1689,7 +1688,6 @@ type
     property OptMinimapTooltipVisible: boolean read FMinimapTooltipVisible write FMinimapTooltipVisible default cInitMinimapTooltipVisible;
     property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
     property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
-    property OptMinimapCachedPainting: boolean read FMinimapCachedPainting write FMinimapCachedPainting default true;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
@@ -3054,7 +3052,6 @@ var
   bLineWithCaret, bLineEolSelected, bLineColorForced, bLineHuge: boolean;
   Event: TATSynEditDrawLineEvent;
   TextOutProps: TATCanvasTextOutProps;
-  bCachedMinimap: boolean;
   bUseSetPixel: boolean;
   NSubPos, NSubLen: integer;
   bHiliteLinesWithSelection: boolean;
@@ -3064,12 +3061,6 @@ begin
   bUseSetPixel:=
     {$ifndef windows} DoubleBuffered and {$endif}
     (ACharSize.X=1);
-
-  bCachedMinimap:=
-    not AMainText and
-    FMinimapCachedPainting and
-    Assigned(FAdapterHilite) and
-    not TempSel_IsMultiline;
 
   bHiliteLinesWithSelection:= not AMainText and FMinimapHiliteLinesWithSelection;
 
@@ -3088,61 +3079,6 @@ begin
           Inc(ARectLine.Top, GapItem.Size);
         end;
       end;
-
-    {$ifdef use_cache}
-    //speedup painting minimap:
-    //if line parts cached, paint them now
-    NColorAfter:= clNone;
-    if bCachedMinimap then
-      if (WrapItem.NLength>0) and
-        FAdapterCache.Get(WrapItem.NLineIndex, WrapItem.NCharIndex, FLineParts, NColorAfter) then
-        begin
-          DoCalcLineEntireColor(
-            WrapItem.NLineIndex,
-            false,
-            NColorEntire,
-            bLineColorForced,
-            bHiliteLinesWithSelection);
-
-          DoPartSetColorBG(FLineParts, NColorEntire, bLineColorForced);
-          if bLineColorForced then
-            NColorAfter:= NColorEntire;
-
-          if NColorAfter<>clNone then
-            FillOneLine(NColorAfter, ARectLine.Left);
-
-          CurrPointText:= Point(
-            Int64(ARectLine.Left) + (Int64(WrapItem.NIndent)-AScrollHorz.NPos)*ACharSize.X,
-            ARectLine.Top);
-
-          CanvasTextOutMinimap(
-            {$ifdef use_bg} FFastBmp, {$else} C, {$endif}
-            ARectLine,
-            CurrPointText.X {$ifdef use_bg} - FRectMinimap.Left {$endif},
-            CurrPointText.Y {$ifdef use_bg} - FRectminimap.Top {$endif},
-            ACharSize,
-            FTabSize,
-            FLineParts,
-            FColorBG,
-            NColorAfter,
-            Strings.LineSub(
-              WrapItem.NLineIndex,
-              WrapItem.NCharIndex,
-              GetVisibleColumns), //optimize for huge lines
-            bUseSetPixel
-            );
-
-          //end of painting line
-          Inc(ARectLine.Top, ACharSize.Y);
-        end
-        else
-        begin
-          {$ifdef debug_fps}
-          if WrapItem.NLength>0 then
-            Inc(FMissMinimap);
-          {$endif}
-        end;
-    {$endif}
 
     if AMainText then
     begin
@@ -4202,7 +4138,6 @@ begin
   FMinimapTooltipVisible:= cInitMinimapTooltipVisible;
   FMinimapTooltipLinesCount:= cInitMinimapTooltipLinesCount;
   FMinimapTooltipWidthPercents:= cInitMinimapTooltipWidthPercents;
-  FMinimapCachedPainting:= true;
   FMinimapHiliteLinesWithSelection:= true;
 
   FCharSpacingText:= Point(0, cInitSpacingText);
@@ -4748,9 +4683,12 @@ procedure TATSynEdit.UpdateAdapterCacheSize;
 var
   N: integer;
 begin
+  {
+  //let's not use cache for minimap
   if FMinimapVisible then
     N:= Max(GetVisibleLines, GetVisibleLinesMinimap)+1
   else
+  }
     N:= GetVisibleLines+1;
   FAdapterCache.MaxSize:= N;
 end;
