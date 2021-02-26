@@ -20,6 +20,7 @@ uses
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
+  syncobjs,
   LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
@@ -703,6 +704,8 @@ type
     FShowOsBarHorz: boolean;
     FMinimapBmp: TBGRABitmap;
     FMinimapThread: TATMinimapThread;
+    FEventStart: TSimpleEvent;
+    FEventDone: TSimpleEvent;
     FColorOfStates: array[TATLineState] of TColor;
 
     //these options are implemented in CudaText, they are dummy here
@@ -1819,8 +1822,13 @@ uses
 
 procedure TATMinimapThread.Execute;
 begin
-  if Assigned(Editor) then
+  while not Terminated do
+  begin
+    TATSynEdit(Editor).FEventStart.WaitFor(INFINITE);
+    TATSynEdit(Editor).FEventStart.ResetEvent;
     TATSynEdit(Editor).DoPaintMinimapAllToBGRABitmap;
+    TATSynEdit(Editor).FEventDone.SetEvent;
+  end;
 end;
 
 { TATSynEdit }
@@ -2706,11 +2714,14 @@ begin
     {$ifdef map_th}
     if not Assigned(FMinimapThread) then
     begin
+      FEventStart:= TSimpleEvent.Create;
+      FEventDone:= TSimpleEvent.Create;
       FMinimapThread:= TATMinimapThread.Create(true);
       FMinimapThread.FreeOnTerminate:= false;
+      FMinimapThread.Editor:= Self;
+      FMinimapThread.Start;
     end;
-    FMinimapThread.Editor:= Self;
-    FMinimapThread.Start;
+    FEventStart.SetEvent;
     {$else}
     DoPaintMinimapAllToBGRABitmap;
     {$endif}
@@ -2752,8 +2763,8 @@ begin
       DoPaintMinimapTooltip(C);
 
     {$ifdef map_th}
-    if not FMinimapThread.Finished then
-      FMinimapThread.WaitFor;
+    FEventDone.WaitFor(INFINITE);
+    FEventDone.ResetEvent;
     {$endif}
     FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
   end;
@@ -4340,10 +4351,14 @@ destructor TATSynEdit.Destroy;
 begin
   if Assigned(FMinimapThread) then
   begin
-    if not FMinimapThread.Finished then
-      FMinimapThread.WaitFor;
+    FMinimapThread.Terminate;
+    FMinimapThread.WaitFor;
     FreeAndNil(FMinimapThread);
   end;
+  if Assigned(FEventStart) then
+    FreeAndNil(FEventStart);
+  if Assigned(FEventDone) then
+    FreeAndNil(FEventDone);
   FAdapterHilite:= nil;
   if Assigned(FMinimapTooltipBitmap) then
     FreeAndNil(FMinimapTooltipBitmap);
