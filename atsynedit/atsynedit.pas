@@ -1822,13 +1822,16 @@ uses
 { TATMinimapThread }
 
 procedure TATMinimapThread.Execute;
+var
+  Ed: TATSynEdit;
 begin
+  Ed:= TATSynEdit(Editor);
   repeat
-    TATSynEdit(Editor).FEventMapStart.WaitFor(INFINITE);
-    TATSynEdit(Editor).FEventMapStart.ResetEvent;
+    Ed.FEventMapStart.WaitFor(INFINITE);
+    ed.FEventMapStart.ResetEvent;
     if Terminated then exit;
-    TATSynEdit(Editor).DoPaintMinimapAllToBGRABitmap;
-    TATSynEdit(Editor).FEventMapDone.SetEvent;
+    Ed.DoPaintMinimapAllToBGRABitmap;
+    Ed.FEventMapDone.SetEvent;
   until false;
 end;
 
