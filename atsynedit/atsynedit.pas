@@ -3219,7 +3219,7 @@ begin
     //paint line
     if StrOutput<>'' then
     begin
-      if WrapItem.NIndent>0 then
+      if AMainText and (WrapItem.NIndent>0) then
       begin
         NColorAfter:= FColorBG;
         DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter);
@@ -3246,7 +3246,7 @@ begin
       end;
 
       //apply DimRanges
-      if Assigned(FDimRanges) then
+      if AMainText and Assigned(FDimRanges) then
       begin
         NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
         if NDimValue>0 then //-1: no ranges found, 0: no effect
@@ -3263,8 +3263,9 @@ begin
       else
         Event:= nil;
 
-      if OptUnprintedReplaceSpec then
-        SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
+      if AMainText then
+        if OptUnprintedReplaceSpec then
+          SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
 
       //truncate text to not paint over screen
       NCount:= ARectLine.Width div ACharSize.X + 2;
