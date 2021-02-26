@@ -1829,8 +1829,8 @@ begin
   repeat
     if Ed.FEventMapStart.WaitFor(1000)=wrSignaled then
     begin
-      ed.FEventMapStart.ResetEvent;
       if Terminated then exit;
+      Ed.FEventMapStart.ResetEvent;
       Ed.DoPaintMinimapAllToBGRABitmap;
       Ed.FEventMapDone.SetEvent;
     end;
