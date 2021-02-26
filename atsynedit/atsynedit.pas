@@ -402,7 +402,7 @@ var
   ATClipboardColumnSignature: integer = $1000;
 
 var
-  OptEditorDebugTiming: boolean = true;
+  OptEditorDebugTiming: boolean = false;
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
