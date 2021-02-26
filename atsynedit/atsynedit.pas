@@ -994,7 +994,7 @@ type
     procedure DoPaintRulerTo(C: TCanvas);
     procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
     procedure DoPaintRulerCaretMarks(C: TCanvas);
-    procedure DoPaintFPS(C: TCanvas);
+    procedure DoPaintTiming(C: TCanvas);
     procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo; ALineFrom: integer);
@@ -4819,7 +4819,7 @@ begin
   if OptEditorDebugTiming then
   begin
     FTickAll:= GetTickCount64-FTickAll;
-    DoPaintFPS(Canvas);
+    DoPaintTiming(Canvas);
   end;
 end;
 
@@ -8011,7 +8011,7 @@ begin
   FTabHelper.OnCalcLineLen:= @DoCalcLineLen;
 end;
 
-procedure TATSynEdit.DoPaintFPS(C: TCanvas);
+procedure TATSynEdit.DoPaintTiming(C: TCanvas);
 var
   S: string;
 begin
