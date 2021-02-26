@@ -3426,7 +3426,7 @@ begin
     end;
 
     //draw separators
-    if LineSeparator<>cLineSepNone then
+    if AMainText and (LineSeparator<>cLineSepNone) then
     begin
       if LineSeparator=cLineSepTop then
         NCoordSep:= ARectLine.Top
@@ -3436,12 +3436,12 @@ begin
       CanvasLineHorz(C, ARectLine.Left, NCoordSep, ARectLine.Right);
     end;
 
-    //end of painting line
-    Inc(ARectLine.Top, ACharSize.Y);
-
     //consider gap (not for minimap)
     if AMainText and (WrapItem.NFinal=cWrapItemFinal) then
     begin
+      //end of painting line
+      Inc(ARectLine.Top, ACharSize.Y);
+
       GapItem:= Gaps.Find(NLinesIndex);
       if Assigned(GapItem) then
       begin
