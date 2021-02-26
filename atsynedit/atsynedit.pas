@@ -2677,8 +2677,6 @@ end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
 begin
-  UpdateInitialVars(C);
-
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
 
@@ -4703,6 +4701,8 @@ end;
 
 procedure TATSynEdit.DoPaintAll(C: TCanvas; ALineFrom: integer);
 begin
+  UpdateInitialVars(C);
+
   if Enabled then
   begin
     FColorFont:= Colors.TextFont;
