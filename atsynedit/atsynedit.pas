@@ -995,11 +995,11 @@ type
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
     procedure DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
-    procedure DoPaintRulerTo(C: TCanvas);
+    procedure DoPaintRuler(C: TCanvas);
     procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
     procedure DoPaintRulerCaretMarks(C: TCanvas);
     procedure DoPaintTiming(C: TCanvas);
-    procedure DoPaintTextTo(C: TCanvas; const ARect: TRect;
+    procedure DoPaintText(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter, AMainText: boolean;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo; ALineFrom: integer);
     procedure DoPaintTextFragmentTo(C: TCanvas; const ARect: TRect; ALineFrom,
@@ -1007,12 +1007,12 @@ type
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
       AScrollPos: integer; AIndentLines: boolean);
-    procedure DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
-    procedure DoPaintMinimapTo(C: TCanvas);
+    procedure DoPaintMinimap(C: TCanvas);
+    procedure DoPaintMinimapSel_BGRA(C: TBGRABitmap);
     procedure DoPaintMinimapTooltip(C: TCanvas);
-    procedure DoPaintMicromapTo(C: TCanvas);
-    procedure DoPaintMarginsTo(C: TCanvas);
-    procedure DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
+    procedure DoPaintMicromap(C: TCanvas);
+    procedure DoPaintMargins(C: TCanvas);
+    procedure DoPaintGap(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
     procedure DoPaintFoldedMark(C: TCanvas;
       APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
@@ -1804,7 +1804,7 @@ uses
 
 { TATSynEdit }
 
-procedure TATSynEdit.DoPaintRulerTo(C: TCanvas);
+procedure TATSynEdit.DoPaintRuler(C: TCanvas);
 var
   NX, NPrevFontSize, NRulerStart, NOutput,
   NTopIndent, NMarkHeight, i: integer;
@@ -2389,7 +2389,7 @@ begin
   with FScrollHorz do
   begin
     NPage:= Max(1, GetVisibleColumns);
-    //NMax is calculated in DoPaintTextTo
+    //NMax is calculated in DoPaintText
     //hide horz bar for word-wrap:
     if FWrapMode=cWrapOn then
       NMax:= NPage;
@@ -2684,13 +2684,13 @@ begin
   UpdateWrapInfo;
 
   UpdateLinksAttribs;
-  DoPaintTextTo(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
-  DoPaintMarginsTo(C);
+  DoPaintText(C, FRectMain, FCharSize, FOptGutterVisible, true, FScrollHorz, FScrollVert, ALineFrom);
+  DoPaintMargins(C);
   DoPaintNiceScroll(C);
 
   if FOptRulerVisible then
   begin
-    DoPaintRulerTo(C);
+    DoPaintRuler(C);
     if Assigned(FOnDrawRuler) then
       FOnDrawRuler(Self, C, FRectRuler);
   end;
@@ -2702,7 +2702,7 @@ begin
   begin
     if OptEditorDebugTiming then
       FTickMinimap:= GetTickCount64;
-    DoPaintMinimapTo(C);
+    DoPaintMinimap(C);
     if OptEditorDebugTiming then
       FTickMinimap:= GetTickCount64-FTickMinimap;
     if FMinimapTooltipVisible and FMinimapTooltipEnabled then
@@ -2710,7 +2710,7 @@ begin
   end;
 
   if FMicromapVisible then
-    DoPaintMicromapTo(C);
+    DoPaintMicromap(C);
 
   if FOptBorderFocusedActive and FIsEntered then
     DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
@@ -2812,7 +2812,7 @@ type
     WrapIndex: integer;
   end;
 
-procedure TATSynEdit.DoPaintTextTo(C: TCanvas;
+procedure TATSynEdit.DoPaintText(C: TCanvas;
   const ARect: TRect;
   const ACharSize: TPoint;
   AWithGutter, AMainText: boolean;
@@ -3037,7 +3037,7 @@ begin
     GapItem:= Gaps.Find(-1);
     if Assigned(GapItem) then
     begin
-      DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
+      DoPaintGap(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
       Inc(ARectLine.Top, GapItem.Size);
     end;
   end;
@@ -3369,7 +3369,7 @@ begin
     GapItem:= Gaps.Find(NLinesIndex);
     if Assigned(GapItem) then
     begin
-      DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
+      DoPaintGap(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
       Inc(ARectLine.Top, GapItem.Size);
     end;
   end;
@@ -3670,7 +3670,7 @@ begin
   Result:= (Red(N)<cMax) and (Green(N)<cMax) and (Blue(N)<cMax);
 end;
 
-procedure TATSynEdit.DoPaintMinimapSelTo_BGRA(C: TBGRABitmap);
+procedure TATSynEdit.DoPaintMinimapSel_BGRA(C: TBGRABitmap);
 var
   R: TRect;
   rColor: TBGRAPixel;
@@ -3702,7 +3702,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPaintMinimapTo(C: TCanvas);
+procedure TATSynEdit.DoPaintMinimap(C: TCanvas);
 begin
   FScrollHorzMinimap.Clear;
   FScrollVertMinimap.Clear;
@@ -3713,13 +3713,13 @@ begin
   FMinimapBmp.SetSize(FRectMinimap.Width, FRectMinimap.Height);
   FMinimapBmp.Fill(FColorBG);
 
-  DoPaintTextTo(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
-  DoPaintMinimapSelTo_BGRA(FMinimapBmp);
+  DoPaintText(C, FRectMinimap, FCharSizeMinimap, false, false, FScrollHorzMinimap, FScrollVertMinimap, -1);
+  DoPaintMinimapSel_BGRA(FMinimapBmp);
 
   FMinimapBmp.Draw(C, FRectMinimap.Left, FRectMinimap.Top);
 end;
 
-procedure TATSynEdit.DoPaintMicromapTo(C: TCanvas);
+procedure TATSynEdit.DoPaintMicromap(C: TCanvas);
 begin
   if Assigned(FOnDrawMicromap) then
     FOnDrawMicromap(Self, C, FRectMicromap)
@@ -3731,7 +3731,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintGapTo(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
+procedure TATSynEdit.DoPaintGap(C: TCanvas; const ARect: TRect; AGap: TATGapItem);
 var
   RHere, RBmp: TRect;
   NColor: TColor;
@@ -3767,7 +3767,7 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPaintMarginsTo(C: TCanvas);
+procedure TATSynEdit.DoPaintMargins(C: TCanvas);
   //
   function PosX(NMargin: integer): integer; inline;
   begin
