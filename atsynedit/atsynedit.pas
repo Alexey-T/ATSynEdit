@@ -2677,8 +2677,6 @@ end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
 begin
-  if csLoading in ComponentState then Exit;
-
   UpdateInitialVars(C);
 
   C.Brush.Color:= FColorBG;
@@ -4743,6 +4741,8 @@ function TATSynEdit.DoPaint(ALineFrom: integer): boolean;
 //gets True if one of scrollbars changed Visible state
 begin
   UpdateTabHelper;
+  if csLoading in ComponentState then
+    exit(false);
 
   if DoubleBuffered then
   begin
