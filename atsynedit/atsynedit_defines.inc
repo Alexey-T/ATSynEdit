@@ -1,4 +1,4 @@
-{$define use_cache} // Use FAdapterCache, ie caching of colored lines
+{.$define use_cache} // Use FAdapterCache, ie caching of colored lines
 
 {.$define debug_findwrapindex}
 

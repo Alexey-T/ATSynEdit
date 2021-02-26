@@ -1822,13 +1822,13 @@ uses
 
 procedure TATMinimapThread.Execute;
 begin
-  while not Terminated do
-  begin
+  repeat
     TATSynEdit(Editor).FEventStart.WaitFor(INFINITE);
+    if Terminated then exit;
     TATSynEdit(Editor).FEventStart.ResetEvent;
     TATSynEdit(Editor).DoPaintMinimapAllToBGRABitmap;
     TATSynEdit(Editor).FEventDone.SetEvent;
-  end;
+  until false;
 end;
 
 { TATSynEdit }
@@ -3429,14 +3429,11 @@ var
   CurrPoint, CurrPointText: TPoint;
   bLineColorForced: boolean;
   bUseSetPixel: boolean;
-  bHiliteLinesWithSelection: boolean;
   bUseColorOfCurrentLine: boolean;
 begin
   bUseSetPixel:=
     {$ifndef windows} DoubleBuffered and {$endif}
     (ACharSize.X=1);
-
-  bHiliteLinesWithSelection:= FMinimapHiliteLinesWithSelection;
 
   WrapItem:= FWrapInfo[AWrapIndex];
   NLinesIndex:= WrapItem.NLineIndex;
@@ -3469,7 +3466,8 @@ begin
     bUseColorOfCurrentLine,
     NColorEntire,
     bLineColorForced,
-    bHiliteLinesWithSelection);
+    false{FMinimapHiliteLinesWithSelection}
+    );
 
   FillOneLine(NColorEntire, ARectLine.Left);
 
@@ -4352,7 +4350,9 @@ begin
   if Assigned(FMinimapThread) then
   begin
     FMinimapThread.Terminate;
-    FMinimapThread.WaitFor;
+    FEventStart.SetEvent;
+    if not FMinimapThread.Finished then
+      FMinimapThread.WaitFor;
     FreeAndNil(FMinimapThread);
   end;
   if Assigned(FEventStart) then
