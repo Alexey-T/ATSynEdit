@@ -4571,8 +4571,6 @@ begin
   if FMinimapVisible=AValue then Exit;
   FMinimapVisible:= AValue;
   FWrapUpdateNeeded:= true;
-  //fix empty minimap with MinimapThread
-  if FMinimapVisible then Paint;
 end;
 
 procedure TATSynEdit.SetOneLine(AValue: boolean);
