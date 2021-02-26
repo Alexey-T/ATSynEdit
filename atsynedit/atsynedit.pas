@@ -1825,8 +1825,8 @@ procedure TATMinimapThread.Execute;
 begin
   repeat
     TATSynEdit(Editor).FEventMapStart.WaitFor(INFINITE);
-    if Terminated then exit;
     TATSynEdit(Editor).FEventMapStart.ResetEvent;
+    if Terminated then exit;
     TATSynEdit(Editor).DoPaintMinimapAllToBGRABitmap;
     TATSynEdit(Editor).FEventMapDone.SetEvent;
   until false;
