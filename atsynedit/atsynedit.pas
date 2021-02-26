@@ -3034,352 +3034,352 @@ var
 begin
   bHiliteLinesWithSelection:= false;
 
-    WrapItem:= FWrapInfo[AWrapIndex];
-    NLinesIndex:= WrapItem.NLineIndex;
-    if not Strings.IsIndexValid(NLinesIndex) then Exit;
+  WrapItem:= FWrapInfo[AWrapIndex];
+  NLinesIndex:= WrapItem.NLineIndex;
+  if not Strings.IsIndexValid(NLinesIndex) then Exit;
 
-    //support Gap before the 1st line
-      if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
-      begin
-        GapItem:= Gaps.Find(-1);
-        if Assigned(GapItem) then
-        begin
-          DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
-          Inc(ARectLine.Top, GapItem.Size);
-        end;
-      end;
-
-      if IsFoldLineNeededBeforeWrapitem(AWrapIndex) then
-      begin
-        NCoordSep:= ARectLine.Top-1;
-        C.Pen.Color:= Colors.CollapseLine;
-        CanvasLineHorz(C,
-          ARectLine.Left+FFoldUnderlineOffset,
-          NCoordSep,
-          ARectLine.Right-FFoldUnderlineOffset
-          );
-      end;
-
-    //prepare line
-    NOutputCharsSkipped:= 0;
-    NOutputCellPercentsSkipped:= 0;
-    NOutputStrWidth:= 0;
-
-    CurrPoint.X:= ARectLine.Left;
-    CurrPoint.Y:= ARectLine.Top;
-    CurrPointText.X:= CurrPoint.X
-                      + WrapItem.NIndent*ACharSize.X
-                      - AScrollHorz.SmoothPos
-                      + AScrollHorz.NPixelOffset;
-    CurrPointText.Y:= CurrPoint.Y;
-
-    bTrimmedNonSpaces:= false;
-
-      NLineLen:= Strings.LinesLen[NLinesIndex];
-      bLineHuge:= WrapItem.NLength>OptMaxLineLenForAccurateCharWidths;
-              //not this: NLineLen>OptMaxLineLenForAccurateCharWidths;
-
-      if not bLineHuge then
-      begin
-        //little slow for huge lines
-        NSubPos:= WrapItem.NCharIndex;
-        NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
-          //+1 because of NPixelOffset
-          //+6 because of HTML color underlines
-        StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
-
-        if FUnprintedSpacesTrailing then
-          bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
-
-        if WrapItem.bInitial then
-        begin
-          //very slow for huge lines
-          FTabHelper.FindOutputSkipOffset(
-            NLinesIndex,
-            StrOutput,
-            AScrollHorz.NPos,
-            NOutputCharsSkipped,
-            NOutputCellPercentsSkipped);
-          Delete(StrOutput, 1, NOutputCharsSkipped);
-        end;
-      end
-      else
-      begin
-        //work faster for huge lines (but not accurate horiz scrollbar)
-        NOutputCharsSkipped:= AScrollHorz.NPos;
-        NOutputCellPercentsSkipped:= NOutputCharsSkipped*100;
-
-        NSubPos:= WrapItem.NCharIndex + NOutputCharsSkipped;
-        NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
-          //+1 because of NPixelOffset
-          //+6 because of HTML color underlines
-        StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
-
-        if FUnprintedSpacesTrailing then
-          bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
-      end;
-
-      Inc(CurrPointText.X, NOutputCellPercentsSkipped * ACharSize.X div 100);
-
-      if Length(StrOutput)>cMaxCharsForOutput then
-        SetLength(StrOutput, cMaxCharsForOutput);
-
-    LineSeparator:= Strings.LinesSeparator[NLinesIndex];
-    bLineWithCaret:= IsLineWithCaret(NLinesIndex);
-    bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
-
-      //horz scrollbar max: is calculated here, to make variable horz bar
-      //vert scrollbar max: is calculated in UpdateScrollbars
-      if bLineHuge then
-        NOutputMaximalChars:= NLineLen //approximate, it don't consider CJK chars, but OK for huge lines
-      else
-      begin
-        StringItem:= Strings.GetItemPtr(NLinesIndex);
-        if StringItem^.HasAsciiNoTabs then
-          NOutputMaximalChars:= StringItem^.CharLen
-        else
-          NOutputMaximalChars:= CanvasTextWidth(
-            StringItem^.Line,
-            NLinesIndex,
-            FTabHelper,
-            1 //pass CharWidth=1px
-            );
-      end;
-      AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputMaximalChars + FOptScrollbarHorizontalAddSpace);
-
-    C.Brush.Color:= FColorBG;
-    C.Font.Name:= Font.Name;
-    C.Font.Size:= DoScaleFont(Font.Size);
-    C.Font.Color:= FColorFont;
-
-    bUseColorOfCurrentLine:= false;
-   if bLineWithCaret then
-      if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsEntered) then
-      begin
-        if FOptShowCurLineMinimal then
-          bUseColorOfCurrentLine:= IsLinePartWithCaret(NLinesIndex, ARectLine.Top)
-        else
-          bUseColorOfCurrentLine:= true;
-      end;
-
-    DoCalcLineEntireColor(
-      NLinesIndex,
-      bUseColorOfCurrentLine,
-      NColorEntire,
-      bLineColorForced,
-      bHiliteLinesWithSelection);
-
-    if FOptZebraActive then
-      if (NLinesIndex+1) mod FOptZebraStep = 0 then
-        NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
-
-    FillOneLine(NColorEntire, ARectLine.Left);
-
-    //paint line
-    if StrOutput<>'' then
+  //support Gap before the 1st line
+  if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
+  begin
+    GapItem:= Gaps.Find(-1);
+    if Assigned(GapItem) then
     begin
-      if (WrapItem.NIndent>0) then
-      begin
-        NColorAfter:= FColorBG;
-        DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter);
-        DoPaintLineIndent(C, ARectLine, ACharSize,
-          ARectLine.Top, WrapItem.NIndent,
-          NColorAfter,
-          AScrollHorz.NPos, FOptShowIndentLines);
-      end;
+      DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
+      Inc(ARectLine.Top, GapItem.Size);
+    end;
+  end;
 
-      NColorAfter:= clNone;
+  if IsFoldLineNeededBeforeWrapitem(AWrapIndex) then
+  begin
+    NCoordSep:= ARectLine.Top-1;
+    C.Pen.Color:= Colors.CollapseLine;
+    CanvasLineHorz(C,
+      ARectLine.Left+FFoldUnderlineOffset,
+      NCoordSep,
+      ARectLine.Right-FFoldUnderlineOffset
+      );
+  end;
 
-      DoCalcLineHilite(WrapItem, FLineParts{%H-},
-        NOutputCharsSkipped, cMaxCharsForOutput,
-        NColorEntire, bLineColorForced,
-        NColorAfter, true);
+  //prepare line
+  NOutputCharsSkipped:= 0;
+  NOutputCellPercentsSkipped:= 0;
+  NOutputStrWidth:= 0;
 
-      if FLineParts[0].Offset<0 then
-      begin
-        //some bug in making parts! to fix!
-        //raise Exception.Create('Program bug in text renderer, report to author!');
-        C.Font.Color:= clRed;
-        C.TextOut(CurrPointText.X, CurrPointText.Y, 'Program bug in text renderer, report to author!');
-        Exit;
-      end;
+  CurrPoint.X:= ARectLine.Left;
+  CurrPoint.Y:= ARectLine.Top;
+  CurrPointText.X:= CurrPoint.X
+                    + WrapItem.NIndent*ACharSize.X
+                    - AScrollHorz.SmoothPos
+                    + AScrollHorz.NPixelOffset;
+  CurrPointText.Y:= CurrPoint.Y;
 
-      //apply DimRanges
-      if Assigned(FDimRanges) then
-      begin
-        NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
-        if NDimValue>0 then //-1: no ranges found, 0: no effect
-          DoPartsDim(FLineParts, NDimValue, FColorBG);
-      end;
+  bTrimmedNonSpaces:= false;
 
-      //adapter may return ColorAfterEol, paint it
-      if FOptShowFullHilite then
-        if NColorAfter<>clNone then
-          FillOneLine(NColorAfter, CurrPointText.X);
+  NLineLen:= Strings.LinesLen[NLinesIndex];
+  bLineHuge:= WrapItem.NLength>OptMaxLineLenForAccurateCharWidths;
+          //not this: NLineLen>OptMaxLineLenForAccurateCharWidths;
 
-      Event:= FOnDrawLine;
+  if not bLineHuge then
+  begin
+    //little slow for huge lines
+    NSubPos:= WrapItem.NCharIndex;
+    NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
+      //+1 because of NPixelOffset
+      //+6 because of HTML color underlines
+    StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
 
-      if OptUnprintedReplaceSpec then
-        SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
+    if FUnprintedSpacesTrailing then
+      bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
 
-      //truncate text to not paint over screen
-      NCount:= ARectLine.Width div ACharSize.X + 2;
-      if Length(StrOutput)>NCount then
-        SetLength(StrOutput, NCount);
+    if WrapItem.bInitial then
+    begin
+      //very slow for huge lines
+      FTabHelper.FindOutputSkipOffset(
+        NLinesIndex,
+        StrOutput,
+        AScrollHorz.NPos,
+        NOutputCharsSkipped,
+        NOutputCellPercentsSkipped);
+      Delete(StrOutput, 1, NOutputCharsSkipped);
+    end;
+  end
+  else
+  begin
+    //work faster for huge lines (but not accurate horiz scrollbar)
+    NOutputCharsSkipped:= AScrollHorz.NPos;
+    NOutputCellPercentsSkipped:= NOutputCharsSkipped*100;
 
-        TextOutProps.Editor:= Self;
-        TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[NLinesIndex];
-        TextOutProps.SuperFast:= bLineHuge;
-        TextOutProps.TabHelper:= FTabHelper;
-        TextOutProps.LineIndex:= NLinesIndex;
-        TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
-        TextOutProps.CharSize:= ACharSize;
-        TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
-        TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
-        TextOutProps.DrawEvent:= Event;
-        TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
-        TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
+    NSubPos:= WrapItem.NCharIndex + NOutputCharsSkipped;
+    NSubLen:= Min(WrapItem.NLength, GetVisibleColumns+AScrollHorz.NPos+1+6);
+      //+1 because of NPixelOffset
+      //+6 because of HTML color underlines
+    StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
 
-        TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
-        TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
-        TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
-        TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection;
-        TextOutProps.DetectIsPosSelected:= @IsPosSelected;
+    if FUnprintedSpacesTrailing then
+      bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
+  end;
 
-        TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not bLineWithCaret);
-        TextOutProps.ColorNormalFont:= Colors.TextFont;
-        TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
-        TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+  Inc(CurrPointText.X, NOutputCellPercentsSkipped * ACharSize.X div 100);
 
-        TextOutProps.FontNormal_Name:= Font.Name;
-        TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
+  if Length(StrOutput)>cMaxCharsForOutput then
+    SetLength(StrOutput, cMaxCharsForOutput);
 
-        TextOutProps.FontItalic_Name:= FontItalic.Name;
-        TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
+  LineSeparator:= Strings.LinesSeparator[NLinesIndex];
+  bLineWithCaret:= IsLineWithCaret(NLinesIndex);
+  bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
-        TextOutProps.FontBold_Name:= FontBold.Name;
-        TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
-
-        TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
-        TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
-
-        CanvasTextOut(C,
-          CurrPointText.X,
-          CurrPointText.Y,
-          StrOutput,
-          @FLineParts,
-          NOutputStrWidth,
-          TextOutProps
-          );
-
-        //paint selection bg, after applying ColorAfterEol
-        DoPaintSelectedLineBG(C, ACharSize, ARectLine,
-          CurrPoint,
-          CurrPointText,
-          WrapItem,
-          NOutputStrWidth,
-          AScrollHorz);
-
-      //restore after textout
-      C.Font.Style:= Font.Style;
-    end
+  //horz scrollbar max: is calculated here, to make variable horz bar
+  //vert scrollbar max: is calculated in UpdateScrollbars
+  if bLineHuge then
+    NOutputMaximalChars:= NLineLen //approximate, it don't consider CJK chars, but OK for huge lines
+  else
+  begin
+    StringItem:= Strings.GetItemPtr(NLinesIndex);
+    if StringItem^.HasAsciiNoTabs then
+      NOutputMaximalChars:= StringItem^.CharLen
     else
-    //paint empty line bg
-    begin
-      if FOptShowFullHilite then
-      begin
-        NColorAfter:= clNone;
-        DoCalcPosColor(0, NLinesIndex, NColorAfter);
-        if NColorAfter<>clNone then
-          FillOneLine(NColorAfter, ARectLine.Left);
-      end;
+      NOutputMaximalChars:= CanvasTextWidth(
+        StringItem^.Line,
+        NLinesIndex,
+        FTabHelper,
+        1 //pass CharWidth=1px
+        );
+  end;
+  AScrollHorz.NMax:= Max(AScrollHorz.NMax, NOutputMaximalChars + FOptScrollbarHorizontalAddSpace);
 
+  C.Brush.Color:= FColorBG;
+  C.Font.Name:= Font.Name;
+  C.Font.Size:= DoScaleFont(Font.Size);
+  C.Font.Color:= FColorFont;
+
+  bUseColorOfCurrentLine:= false;
+  if bLineWithCaret then
+    if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsEntered) then
+    begin
+      if FOptShowCurLineMinimal then
+        bUseColorOfCurrentLine:= IsLinePartWithCaret(NLinesIndex, ARectLine.Top)
+      else
+        bUseColorOfCurrentLine:= true;
+    end;
+
+  DoCalcLineEntireColor(
+    NLinesIndex,
+    bUseColorOfCurrentLine,
+    NColorEntire,
+    bLineColorForced,
+    bHiliteLinesWithSelection);
+
+  if FOptZebraActive then
+    if (NLinesIndex+1) mod FOptZebraStep = 0 then
+      NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
+
+  FillOneLine(NColorEntire, ARectLine.Left);
+
+  //paint line
+  if StrOutput<>'' then
+  begin
+    if (WrapItem.NIndent>0) then
+    begin
+      NColorAfter:= FColorBG;
+      DoCalcPosColor(WrapItem.NCharIndex, NLinesIndex, NColorAfter);
+      DoPaintLineIndent(C, ARectLine, ACharSize,
+        ARectLine.Top, WrapItem.NIndent,
+        NColorAfter,
+        AScrollHorz.NPos, FOptShowIndentLines);
+    end;
+
+    NColorAfter:= clNone;
+
+    DoCalcLineHilite(WrapItem, FLineParts{%H-},
+      NOutputCharsSkipped, cMaxCharsForOutput,
+      NColorEntire, bLineColorForced,
+      NColorAfter, true);
+
+    if FLineParts[0].Offset<0 then
+    begin
+      //some bug in making parts! to fix!
+      //raise Exception.Create('Program bug in text renderer, report to author!');
+      C.Font.Color:= clRed;
+      C.TextOut(CurrPointText.X, CurrPointText.Y, 'Program bug in text renderer, report to author!');
+      Exit;
+    end;
+
+    //apply DimRanges
+    if Assigned(FDimRanges) then
+    begin
+      NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
+      if NDimValue>0 then //-1: no ranges found, 0: no effect
+        DoPartsDim(FLineParts, NDimValue, FColorBG);
+    end;
+
+    //adapter may return ColorAfterEol, paint it
+    if FOptShowFullHilite then
+      if NColorAfter<>clNone then
+        FillOneLine(NColorAfter, CurrPointText.X);
+
+    Event:= FOnDrawLine;
+
+    if OptUnprintedReplaceSpec then
+      SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
+
+    //truncate text to not paint over screen
+    NCount:= ARectLine.Width div ACharSize.X + 2;
+    if Length(StrOutput)>NCount then
+      SetLength(StrOutput, NCount);
+
+      TextOutProps.Editor:= Self;
+      TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[NLinesIndex];
+      TextOutProps.SuperFast:= bLineHuge;
+      TextOutProps.TabHelper:= FTabHelper;
+      TextOutProps.LineIndex:= NLinesIndex;
+      TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
+      TextOutProps.CharSize:= ACharSize;
+      TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
+      TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
+      TextOutProps.DrawEvent:= Event;
+      TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
+      TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
+
+      TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
+      TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
+      TextOutProps.ShowUnprintedSpacesBothEnds:= FUnprintedSpacesBothEnds;
+      TextOutProps.ShowUnprintedSpacesOnlyInSelection:= FUnprintedSpacesOnlyInSelection;
+      TextOutProps.DetectIsPosSelected:= @IsPosSelected;
+
+      TextOutProps.ShowFontLigatures:= FOptShowFontLigatures and (not bLineWithCaret);
+      TextOutProps.ColorNormalFont:= Colors.TextFont;
+      TextOutProps.ColorUnprintedFont:= Colors.UnprintedFont;
+      TextOutProps.ColorUnprintedHexFont:= Colors.UnprintedHexFont;
+
+      TextOutProps.FontNormal_Name:= Font.Name;
+      TextOutProps.FontNormal_Size:= DoScaleFont(Font.Size);
+
+      TextOutProps.FontItalic_Name:= FontItalic.Name;
+      TextOutProps.FontItalic_Size:= DoScaleFont(FontItalic.Size);
+
+      TextOutProps.FontBold_Name:= FontBold.Name;
+      TextOutProps.FontBold_Size:= DoScaleFont(FontBold.Size);
+
+      TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
+      TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
+
+      CanvasTextOut(C,
+        CurrPointText.X,
+        CurrPointText.Y,
+        StrOutput,
+        @FLineParts,
+        NOutputStrWidth,
+        TextOutProps
+        );
+
+      //paint selection bg, after applying ColorAfterEol
       DoPaintSelectedLineBG(C, ACharSize, ARectLine,
         CurrPoint,
         CurrPointText,
         WrapItem,
-        0,
+        NOutputStrWidth,
         AScrollHorz);
+
+    //restore after textout
+    C.Font.Style:= Font.Style;
+  end
+  else
+  //paint empty line bg
+  begin
+    if FOptShowFullHilite then
+    begin
+      NColorAfter:= clNone;
+      DoCalcPosColor(0, NLinesIndex, NColorAfter);
+      if NColorAfter<>clNone then
+        FillOneLine(NColorAfter, ARectLine.Left);
     end;
 
-      CoordAfterText.X:= CurrPointText.X+NOutputStrWidth;
-      CoordAfterText.Y:= CurrPointText.Y;
+    DoPaintSelectedLineBG(C, ACharSize, ARectLine,
+      CurrPoint,
+      CurrPointText,
+      WrapItem,
+      0,
+      AScrollHorz);
+  end;
 
-      if WrapItem.NFinal=cWrapItemFinal then
-      begin
-        //for OptShowFullWidthForSelection=false paint eol bg
-        if bLineEolSelected then
-        begin
-          C.Brush.Color:= Colors.TextSelBG;
-          C.FillRect(
-            CoordAfterText.X,
-            CoordAfterText.Y,
-            CoordAfterText.X+ACharSize.X,
-            CoordAfterText.Y+ACharSize.Y);
-        end;
+  CoordAfterText.X:= CurrPointText.X+NOutputStrWidth;
+  CoordAfterText.Y:= CurrPointText.Y;
 
-        //paint eol mark
-        if FUnprintedVisible and FUnprintedEnds then
-        begin
-          if OptUnprintedEndsDetails then
-            DoPaintUnprintedEolText(C,
-              cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
-              CoordAfterText.X,
-              CoordAfterText.Y,
-              Colors.UnprintedFont,
-              Colors.UnprintedBG)
-          else
-            DoPaintUnprintedEolArrow(C,
-              CoordAfterText.X,
-              CoordAfterText.Y,
-              ACharSize,
-              Colors.UnprintedFont);
-        end;
-      end
-      else
-      begin
-        //paint wrapped-line-part mark
-        if FUnprintedVisible and FUnprintedEnds then
-          DoPaintUnprintedWrapMark(C,
-            CoordAfterText.X,
-            CoordAfterText.Y,
-            ACharSize,
-            Colors.UnprintedFont);
-      end;
+  if WrapItem.NFinal=cWrapItemFinal then
+  begin
+    //for OptShowFullWidthForSelection=false paint eol bg
+    if bLineEolSelected then
+    begin
+      C.Brush.Color:= Colors.TextSelBG;
+      C.FillRect(
+        CoordAfterText.X,
+        CoordAfterText.Y,
+        CoordAfterText.X+ACharSize.X,
+        CoordAfterText.Y+ACharSize.Y);
+    end;
 
-      //draw collapsed-mark
-      if WrapItem.NFinal=cWrapItemCollapsed then
-        DoPaintFoldedMark(C,
-          Strings.LinesFoldFrom[NLinesIndex, FEditorIndex]-1,
-          NLinesIndex,
+    //paint eol mark
+    if FUnprintedVisible and FUnprintedEnds then
+    begin
+      if OptUnprintedEndsDetails then
+        DoPaintUnprintedEolText(C,
+          cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
           CoordAfterText.X,
           CoordAfterText.Y,
-          GetFoldedMarkText(NLinesIndex));
-
-    //draw separators
-    if (LineSeparator<>cLineSepNone) then
-    begin
-      if LineSeparator=cLineSepTop then
-        NCoordSep:= ARectLine.Top
+          Colors.UnprintedFont,
+          Colors.UnprintedBG)
       else
-        NCoordSep:= ARectLine.Top+ACharSize.Y-1;
-      C.Pen.Color:= Colors.BlockSepLine;
-      CanvasLineHorz(C, ARectLine.Left, NCoordSep, ARectLine.Right);
+        DoPaintUnprintedEolArrow(C,
+          CoordAfterText.X,
+          CoordAfterText.Y,
+          ACharSize,
+          Colors.UnprintedFont);
     end;
+  end
+  else
+  begin
+    //paint wrapped-line-part mark
+    if FUnprintedVisible and FUnprintedEnds then
+      DoPaintUnprintedWrapMark(C,
+        CoordAfterText.X,
+        CoordAfterText.Y,
+        ACharSize,
+        Colors.UnprintedFont);
+  end;
 
-    //consider gap (not for minimap)
-    if (WrapItem.NFinal=cWrapItemFinal) then
+  //draw collapsed-mark
+  if WrapItem.NFinal=cWrapItemCollapsed then
+    DoPaintFoldedMark(C,
+      Strings.LinesFoldFrom[NLinesIndex, FEditorIndex]-1,
+      NLinesIndex,
+      CoordAfterText.X,
+      CoordAfterText.Y,
+      GetFoldedMarkText(NLinesIndex));
+
+  //draw separators
+  if (LineSeparator<>cLineSepNone) then
+  begin
+    if LineSeparator=cLineSepTop then
+      NCoordSep:= ARectLine.Top
+    else
+      NCoordSep:= ARectLine.Top+ACharSize.Y-1;
+    C.Pen.Color:= Colors.BlockSepLine;
+    CanvasLineHorz(C, ARectLine.Left, NCoordSep, ARectLine.Right);
+  end;
+
+  //consider gap (not for minimap)
+  if (WrapItem.NFinal=cWrapItemFinal) then
+  begin
+    //end of painting line
+    Inc(ARectLine.Top, ACharSize.Y);
+
+    GapItem:= Gaps.Find(NLinesIndex);
+    if Assigned(GapItem) then
     begin
-      //end of painting line
-      Inc(ARectLine.Top, ACharSize.Y);
-
-      GapItem:= Gaps.Find(NLinesIndex);
-      if Assigned(GapItem) then
-      begin
-        DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
-        Inc(ARectLine.Top, GapItem.Size);
-      end;
+      DoPaintGapTo(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
+      Inc(ARectLine.Top, GapItem.Size);
     end;
+  end;
 end;
 
 procedure TATSynEdit.DoPaintMinimapLine(
@@ -3416,106 +3416,106 @@ begin
 
   bHiliteLinesWithSelection:= FMinimapHiliteLinesWithSelection;
 
-    WrapItem:= FWrapInfo[AWrapIndex];
-    NLinesIndex:= WrapItem.NLineIndex;
-    if not Strings.IsIndexValid(NLinesIndex) then Exit;
+  WrapItem:= FWrapInfo[AWrapIndex];
+  NLinesIndex:= WrapItem.NLineIndex;
+  if not Strings.IsIndexValid(NLinesIndex) then Exit;
 
-    //prepare line
-    NOutputCharsSkipped:= 0;
+  //prepare line
+  NOutputCharsSkipped:= 0;
 
-    CurrPoint.X:= ARectLine.Left;
-    CurrPoint.Y:= ARectLine.Top;
-    CurrPointText.X:= CurrPoint.X
-                      + WrapItem.NIndent*ACharSize.X
-                      - AScrollHorz.SmoothPos
-                      + AScrollHorz.NPixelOffset;
-    CurrPointText.Y:= CurrPoint.Y;
+  CurrPoint.X:= ARectLine.Left;
+  CurrPoint.Y:= ARectLine.Top;
+  CurrPointText.X:= CurrPoint.X
+                    + WrapItem.NIndent*ACharSize.X
+                    - AScrollHorz.SmoothPos
+                    + AScrollHorz.NPixelOffset;
+  CurrPointText.Y:= CurrPoint.Y;
 
-      //work very fast for minimap, take LineSub from start
-      StrOutput:= Strings.LineSub(
-        NLinesIndex,
-        1,
-        Min(WrapItem.NLength, GetVisibleColumns)
-        );
+  //work very fast for minimap, take LineSub from start
+  StrOutput:= Strings.LineSub(
+    NLinesIndex,
+    1,
+    Min(WrapItem.NLength, GetVisibleColumns)
+    );
 
-    with FMinimapBmp.Canvas do
-    begin
-      Brush.Color:= FColorBG;
-      Font.Name:= Font.Name;
-      Font.Size:= DoScaleFont(Font.Size);
-      Font.Color:= FColorFont;
-    end;
+  with FMinimapBmp.Canvas do
+  begin
+    Brush.Color:= FColorBG;
+    Font.Name:= Font.Name;
+    Font.Size:= DoScaleFont(Font.Size);
+    Font.Color:= FColorFont;
+  end;
 
-    bUseColorOfCurrentLine:= false;
+  bUseColorOfCurrentLine:= false;
 
-    DoCalcLineEntireColor(
-      NLinesIndex,
-      bUseColorOfCurrentLine,
-      NColorEntire,
-      bLineColorForced,
-      bHiliteLinesWithSelection);
+  DoCalcLineEntireColor(
+    NLinesIndex,
+    bUseColorOfCurrentLine,
+    NColorEntire,
+    bLineColorForced,
+    bHiliteLinesWithSelection);
 
-    FillOneLine(NColorEntire, ARectLine.Left);
+  FillOneLine(NColorEntire, ARectLine.Left);
 
-    //paint line
+  //paint line
+  if StrOutput<>'' then
+  begin
+    NColorAfter:= clNone;
+
+    DoCalcLineHilite(WrapItem, FLineParts{%H-},
+      NOutputCharsSkipped, cMaxCharsForOutput,
+      NColorEntire, bLineColorForced,
+      NColorAfter, false);
+
+    //adapter may return ColorAfterEol, paint it
+    if FOptShowFullHilite then
+      if NColorAfter<>clNone then
+        FillOneLine(NColorAfter, CurrPointText.X);
+
+    //truncate text to not paint over screen
+    NCount:= ARectLine.Width div ACharSize.X + 2;
+    if Length(StrOutput)>NCount then
+      SetLength(StrOutput, NCount);
+
     if StrOutput<>'' then
+      CanvasTextOutMinimap(
+        FMinimapBmp,
+        ARectLine,
+        CurrPointText.X - FRectMinimap.Left,
+        CurrPointText.Y - FRectminimap.Top,
+        ACharSize,
+        FTabSize,
+        FLineParts,
+        FColorBG,
+        NColorAfter,
+        Strings.LineSub(
+          WrapItem.NLineIndex,
+          WrapItem.NCharIndex,
+          GetVisibleColumns), //optimize for huge lines
+        bUseSetPixel
+        );
+  end
+  else
+  //paint empty line bg
+  begin
+    if FOptShowFullHilite then
     begin
       NColorAfter:= clNone;
-
-      DoCalcLineHilite(WrapItem, FLineParts{%H-},
-        NOutputCharsSkipped, cMaxCharsForOutput,
-        NColorEntire, bLineColorForced,
-        NColorAfter, false);
-
-      //adapter may return ColorAfterEol, paint it
-      if FOptShowFullHilite then
-        if NColorAfter<>clNone then
-          FillOneLine(NColorAfter, CurrPointText.X);
-
-      //truncate text to not paint over screen
-      NCount:= ARectLine.Width div ACharSize.X + 2;
-      if Length(StrOutput)>NCount then
-        SetLength(StrOutput, NCount);
-
-      if StrOutput<>'' then
-        CanvasTextOutMinimap(
-          FMinimapBmp,
-          ARectLine,
-          CurrPointText.X - FRectMinimap.Left,
-          CurrPointText.Y - FRectminimap.Top,
-          ACharSize,
-          FTabSize,
-          FLineParts,
-          FColorBG,
-          NColorAfter,
-          Strings.LineSub(
-            WrapItem.NLineIndex,
-            WrapItem.NCharIndex,
-            GetVisibleColumns), //optimize for huge lines
-          bUseSetPixel
-          );
-    end
-    else
-    //paint empty line bg
-    begin
-      if FOptShowFullHilite then
-      begin
-        NColorAfter:= clNone;
-        DoCalcPosColor(0, NLinesIndex, NColorAfter);
-        if NColorAfter<>clNone then
-          FillOneLine(NColorAfter, ARectLine.Left);
-      end;
-
-      {
-      //TODO???
-      DoPaintSelectedLineBG(C, ACharSize, ARectLine,
-        CurrPoint,
-        CurrPointText,
-        WrapItem,
-        0,
-        AScrollHorz);
-      }
+      DoCalcPosColor(0, NLinesIndex, NColorAfter);
+      if NColorAfter<>clNone then
+        FillOneLine(NColorAfter, ARectLine.Left);
     end;
+
+    {
+    //TODO???
+    DoPaintSelectedLineBG(C, ACharSize, ARectLine,
+      CurrPoint,
+      CurrPointText,
+      WrapItem,
+      0,
+      AScrollHorz);
+    }
+  end;
 end;
 
 procedure TATSynEdit.DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TPoint;
