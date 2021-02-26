@@ -390,6 +390,9 @@ var
   ATClipboardColumnFormat: TClipboardFormat = 0; //must be inited
   ATClipboardColumnSignature: integer = $1000;
 
+var
+  OptEditorDebugTiming: boolean = true;
+
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
@@ -683,10 +686,8 @@ type
     FPaintCounter: integer;
     FPaintStarted: boolean;
     FPaintWorking: boolean;
-    {$ifdef debug_fps}
     FTickMinimap: QWord;
     FTickAll: QWord;
-    {$endif}
     FShowOsBarVert: boolean;
     FShowOsBarHorz: boolean;
     FMinimapBmp: TBGRABitmap;
@@ -2699,21 +2700,17 @@ begin
 
   if FMinimapVisible then
   begin
-    {$ifdef debug_fps}
-    FTickMinimap:= GetTickCount64;
-    {$endif}
+    if OptEditorDebugTiming then
+      FTickMinimap:= GetTickCount64;
     DoPaintMinimapTo(C);
-    {$ifdef debug_fps}
-    FTickMinimap:= GetTickCount64-FTickMinimap;
-    {$endif}
+    if OptEditorDebugTiming then
+      FTickMinimap:= GetTickCount64-FTickMinimap;
     if FMinimapTooltipVisible and FMinimapTooltipEnabled then
       DoPaintMinimapTooltip(C);
   end
   else
   begin
-    {$ifdef debug_fps}
     FTickMinimap:= 0;
-    {$endif}
   end;
 
   if FMicromapVisible then
@@ -4787,9 +4784,8 @@ begin
   if DoubleBuffered then
     if not Assigned(FBitmap) then exit;
 
-  {$ifdef debug_fps}
-  FTickAll:= GetTickCount64;
-  {$endif}
+  if OptEditorDebugTiming then
+    FTickAll:= GetTickCount64;
 
   //if scrollbars shown, paint again
   if DoPaint(ALineNumber) then
@@ -4820,10 +4816,11 @@ begin
 
   DoPaintMarkerOfDragDrop(Canvas);
 
-  {$ifdef debug_fps}
-  FTickAll:= GetTickCount64-FTickAll;
-  DoPaintFPS(Canvas);
-  {$endif}
+  if OptEditorDebugTiming then
+  begin
+    FTickAll:= GetTickCount64-FTickAll;
+    DoPaintFPS(Canvas);
+  end;
 end;
 
 procedure TATSynEdit.Resize;
@@ -8014,7 +8011,6 @@ begin
   FTabHelper.OnCalcLineLen:= @DoCalcLineLen;
 end;
 
-{$ifdef debug_fps}
 procedure TATSynEdit.DoPaintFPS(C: TCanvas);
 var
   S: string;
@@ -8029,11 +8025,6 @@ begin
   S:= Format('#%03d, %d+%d ms', [FPaintCounter, FTickAll, FTickMinimap]);
   CanvasTextOutSimplest(C, 5, 5, S);
 end;
-{$else}
-procedure TATSynEdit.DoPaintFPS(C: TCanvas);
-begin
-end;
-{$endif}
 
 
 function TATSynEdit.GetEncodingName: string;

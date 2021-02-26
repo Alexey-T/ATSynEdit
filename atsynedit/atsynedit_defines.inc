@@ -1,5 +1,3 @@
-{.$define debug_fps} // Show rendering times in ms, in a red label in the corner
-
 {$define use_cache} // Use FAdapterCache, ie caching of colored lines
 
 {.$define debug_findwrapindex}
