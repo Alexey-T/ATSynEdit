@@ -51,7 +51,7 @@ end;
     </CompilerOptions>
     <Description Value="Multi-line editor control, used in CudaText editor. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
-    <Version Major="1" Minor="9"/>
+    <Version Major="2"/>
     <Files Count="39">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
