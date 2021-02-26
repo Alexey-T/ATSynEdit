@@ -2808,12 +2808,14 @@ begin
   end;
 end;
 
+{
 type
   PATEditorPaintingItemProp = ^TATEditorPaintingItemProp;
   TATEditorPaintingItemProp = record
     LineRect: TRect;
     WrapIndex: integer;
   end;
+}
 
 procedure TATSynEdit.DoPaintText(C: TCanvas;
   const ARect: TRect;
@@ -2822,13 +2824,9 @@ procedure TATSynEdit.DoPaintText(C: TCanvas;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   ALineFrom: integer);
 var
-  Props: array of TATEditorPaintingItemProp;
-  PropPtr: PATEditorPaintingItemProp;
   RectLine: TRect;
   GapItem: TATGapItem;
-  NWrapIndex, NWrapIndexDummy,
-  NLineCount, NPropCount,
-  iProp: integer;
+  NWrapIndex, NWrapIndexDummy, NLineCount: integer;
 begin
   //wrap turned off can cause bad scrollpos, fix it
   with AScrollVert do
@@ -2886,12 +2884,6 @@ begin
 
   DoEventBeforeCalcHilite;
 
-  //loop to fill Props array
-  NPropCount:= 0;
-  NLineCount:= GetVisibleLines+1;
-  SetLength(Props, NLineCount); //preallocate memory
-  FillChar(Props, SizeOf(Props), 0);
-
   RectLine.Left:= ARect.Left;
   RectLine.Right:= ARect.Right;
   RectLine.Top:= 0;
@@ -2923,10 +2915,6 @@ begin
       Break;
     end;
 
-    Inc(NPropCount);
-    if Length(Props)<NPropCount then
-      SetLength(Props, Length(Props)+30);
-
     //consider gap before 1st line
     if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
@@ -2940,32 +2928,17 @@ begin
     if Assigned(GapItem) then
       Inc(RectLine.Bottom, GapItem.Size);
 
-    PropPtr:= @Props[NPropCount-1];
-    PropPtr^.WrapIndex:= NWrapIndex;
-    PropPtr^.LineRect:= RectLine;
+    DoPaintLine(C, RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex);
+    if AWithGutter then
+      DoPaintGutterOfLine(C, RectLine, ACharSize, NWrapIndex);
+
+    //update LineBottom as index of last painted line
+    FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
 
     Inc(NWrapIndex);
   until false;
 
-  //update LineBottom
-  if NPropCount>0 then
-  begin
-    NWrapIndex:= Props[NPropCount-1].WrapIndex;
-    FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
-  end
-  else
-    FLineBottom:= 1;
-
-  //render lines using Props array
-  for iProp:= 0 to NPropCount-1 do
-  begin
-    PropPtr:= @Props[iProp];
-    DoPaintLine(C, PropPtr^.LineRect, ACharSize, AScrollHorz, AScrollVert, PropPtr^.WrapIndex);
-    if AWithGutter then
-      DoPaintGutterOfLine(C, PropPtr^.LineRect, ACharSize, PropPtr^.WrapIndex);
-  end;
-
-  //staples
+  //block staples
   DoPaintStaples(C, ARect, ACharSize, AScrollHorz);
 end;
 
