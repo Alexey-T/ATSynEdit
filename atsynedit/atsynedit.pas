@@ -2836,17 +2836,11 @@ begin
   with AScrollVert do
     NPos:= Min(NPos, NPosLast);
 
-  //if AMainText then
-  begin
-    C.Brush.Color:= FColorBG;
-    C.FillRect(ARect);
-  end;
+  C.Brush.Color:= FColorBG;
+  C.FillRect(ARect);
 
-  //if AMainText then
-  begin
-    if Assigned(FFoldedMarkList) then
-      FFoldedMarkList.Clear;
-  end;
+  if Assigned(FFoldedMarkList) then
+    FFoldedMarkList.Clear;
 
   if AWithGutter then
   begin
@@ -2951,9 +2945,6 @@ begin
     PropPtr:= @Props[NPropCount-1];
     PropPtr^.WrapIndex:= NWrapIndex;
     PropPtr^.LineRect:= RectLine;
-    //PropPtr^.BitmapRect:= Rect(0, 0, RectLine.Width, RectLine.Height);
-    //PropPtr^.Bitmap:= TBitmap.Create;
-    //PropPtr^.Bitmap.PixelFormat:= pf24bit;
 
     Inc(NWrapIndex);
   until false;
