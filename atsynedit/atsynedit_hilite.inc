@@ -204,10 +204,10 @@ begin
   //we loop over parts
   //- fully selected parts, colorize them.
   //- fully unselected parts, skip.
-  //- partly selected parts, save them to FLineOtherParts,
+  //- partly selected parts, save them to FPartsSel,
   //  and do slow loop (by offsets) over them.
 
-  FillChar(FLineOtherParts, SizeOf(TATLineParts), 0);
+  FillChar(FPartsSel, SizeOf(TATLineParts), 0);
   iPart:= 0;
 
   for i:= Low(AParts) to High(AParts) do
@@ -223,8 +223,8 @@ begin
         end;
       cRangePartlySelected:
         begin
-          FLineOtherParts[iPart].Offset:= AParts[i].Offset;
-          FLineOtherParts[iPart].Len:= AParts[i].Len;
+          FPartsSel[iPart].Offset:= AParts[i].Offset;
+          FPartsSel[iPart].Len:= AParts[i].Len;
           Inc(iPart);
         end;
     end;
@@ -232,7 +232,7 @@ begin
 
   for iPart:= Low(AParts) to High(AParts) do
   begin
-    PartOther:= @FLineOtherParts[iPart];
+    PartOther:= @FPartsSel[iPart];
     if PartOther^.Len=0 then Break;
 
     bSel:= false;

@@ -663,9 +663,9 @@ type
     FClientW: integer; //saved on Paint, to avoid calling Controls.ClientWidth/ClientHeight
     FClientH: integer;
     FLineBottom: integer;
-    FLineParts: TATLineParts; //size is huge, so not local var
-    FLineParts2: TATLineParts; //this is used by PaintMinimapLine
-    FLineOtherParts: TATLineParts; //size is huge, so not local var
+    FParts: TATLineParts; //this is used in DoPaintLine
+    FParts2: TATLineParts; //this is used by DoPaintMinimapLine, in thread
+    FPartsSel: TATLineParts; //this is used in DoPartCalc_ApplySelectionOver
     FScrollVert,
     FScrollHorz,
     FScrollVertMinimap,
@@ -3213,12 +3213,12 @@ begin
 
     NColorAfter:= clNone;
 
-    DoCalcLineHilite(WrapItem, FLineParts{%H-},
+    DoCalcLineHilite(WrapItem, FParts{%H-},
       NOutputCharsSkipped, cMaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, true);
 
-    if FLineParts[0].Offset<0 then
+    if FParts[0].Offset<0 then
     begin
       //some bug in making parts! to fix!
       //raise Exception.Create('Program bug in text renderer, report to author!');
@@ -3232,7 +3232,7 @@ begin
     begin
       NDimValue:= FDimRanges.GetDimValue(WrapItem.NLineIndex, -1);
       if NDimValue>0 then //-1: no ranges found, 0: no effect
-        DoPartsDim(FLineParts, NDimValue, FColorBG);
+        DoPartsDim(FParts, NDimValue, FColorBG);
     end;
 
     //adapter may return ColorAfterEol, paint it
@@ -3290,7 +3290,7 @@ begin
         CurrPointText.X,
         CurrPointText.Y,
         StrOutput,
-        @FLineParts,
+        @FParts,
         NOutputStrWidth,
         TextOutProps
         );
@@ -3477,7 +3477,7 @@ begin
   begin
     NColorAfter:= clNone;
 
-    DoCalcLineHilite(WrapItem, FLineParts2{%H-},
+    DoCalcLineHilite(WrapItem, FParts2{%H-},
       NOutputCharsSkipped, cMaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, false);
@@ -3500,7 +3500,7 @@ begin
         CurrPointText.Y - FRectminimap.Top,
         ACharSize,
         FTabSize,
-        FLineParts2,
+        FParts2,
         FColorBG,
         NColorAfter,
         Strings.LineSub(
@@ -7939,7 +7939,7 @@ begin
       WrapItem.NLength:= Strings.LinesLen[NLine];
     end;
 
-    DoCalcLineHilite(WrapItem, FLineParts{%H-},
+    DoCalcLineHilite(WrapItem, FParts{%H-},
       0, cMaxCharsForOutput,
       AColorBG,
       false,
@@ -7957,7 +7957,7 @@ begin
         WrapItem.NLineIndex,
         WrapItem.NCharIndex,
         GetVisibleColumns),
-      @FLineParts,
+      @FParts,
       NOutputStrWidth,
       TextOutProps
       )
