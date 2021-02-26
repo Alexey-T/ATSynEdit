@@ -2708,6 +2708,12 @@ begin
     {$endif}
     if FMinimapTooltipVisible and FMinimapTooltipEnabled then
       DoPaintMinimapTooltip(C);
+  end
+  else
+  begin
+    {$ifdef debug_fps}
+    FTickMinimap:= 0;
+    {$endif}
   end;
 
   if FMicromapVisible then
@@ -6042,7 +6048,7 @@ begin
   if not DoubleBuffered then
     FCaretAllowNextBlink:= not FCaretAllowNextBlink;
 
-  inherited Invalidate;
+  DoPaintCarets(Canvas, true);
 end;
 
 procedure TATSynEdit.TimerScrollTick(Sender: TObject);
