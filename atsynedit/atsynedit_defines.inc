@@ -1,4 +1,4 @@
-{.$define use_cache} // Use FAdapterCache, ie caching of colored lines
+{.$define use_cache} //use FAdapterCache, ie caching of colored lines
 
 {.$define debug_findwrapindex}
 
@@ -8,5 +8,5 @@
 
 {.$define debug_scroll}
 
-{.$define map_th} //render minimap in thread
+{$define map_th} //render minimap in thread
 

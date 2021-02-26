@@ -664,6 +664,7 @@ type
     FClientH: integer;
     FLineBottom: integer;
     FLineParts: TATLineParts; //size is huge, so not local var
+    FLineParts2: TATLineParts; //this is used by PaintMinimapLine
     FLineOtherParts: TATLineParts; //size is huge, so not local var
     FScrollVert,
     FScrollHorz,
@@ -3476,7 +3477,7 @@ begin
   begin
     NColorAfter:= clNone;
 
-    DoCalcLineHilite(WrapItem, FLineParts{%H-},
+    DoCalcLineHilite(WrapItem, FLineParts2{%H-},
       NOutputCharsSkipped, cMaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, false);
@@ -3499,7 +3500,7 @@ begin
         CurrPointText.Y - FRectminimap.Top,
         ACharSize,
         FTabSize,
-        FLineParts,
+        FLineParts2,
         FColorBG,
         NColorAfter,
         Strings.LineSub(
