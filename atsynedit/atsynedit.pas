@@ -5453,6 +5453,7 @@ begin
       FMouseDownOnMinimap:= false;
       if not FMouseDragMinimap then
         DoMinimapClick(Y);
+      FMouseDragMinimap:= false;
     end;
     Exit
   end;
