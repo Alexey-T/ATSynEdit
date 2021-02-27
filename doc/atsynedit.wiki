@@ -204,7 +204,9 @@ Carets object is sorted by text position, method Sort does this. Duplicate caret
 
 === CaretsSel object ===
 
-type TATCaretSelections in unit atsynedit_carets. It is helping object, internally it holds array of carets coordinates, sorted by text position, but only for carets with selection (carets w/o selection are not included). It is read-only, ie it's needed only to find some info about selections, not to store it. Finding some info about selection(s) is much faster with CaretsSel object, though you can use Carets object too (slower). Gives methods to find something via binary search.
+type TATCaretSelections in unit atsynedit_carets. It is helping object, internally it holds array of carets coordinates, sorted by text position, but only for carets with selection (carets w/o selection are not included). It is read-only, ie it's needed only to find some info about selections, not to store it. Finding some info about selections is much faster with CaretsSel object, though you can use Carets object too (slower). It uses binary search.
+
+Note: object is updated (from contents of Carets) in Paint method, not immediately after you add/change something in Carets.
 
 === Keymap object ===
 
