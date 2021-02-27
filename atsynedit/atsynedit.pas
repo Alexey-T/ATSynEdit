@@ -3479,7 +3479,7 @@ begin
     bUseColorOfCurrentLine,
     NColorEntire,
     bLineColorForced,
-    false{FMinimapHiliteLinesWithSelection}
+    FMinimapHiliteLinesWithSelection
     );
 
   FillOneLine(NColorEntire, ARectLine.Left);
