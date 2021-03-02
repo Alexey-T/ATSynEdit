@@ -6715,7 +6715,7 @@ procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
 //
   procedure _Delta(var AInfo: TATEditorScrollInfo; ADelta: integer);
   var
-    OldInfo: TATEditorScrollInfo;
+    OldSmoothPos: integer;
     i: integer;
   begin
     if ADelta=0 then exit;
@@ -6723,11 +6723,11 @@ procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
     //scrolling animation
     if FOptScrollAnimationSteps>1 then
     begin
-      OldInfo:= AInfo;
+      OldSmoothPos:= AInfo.SmoothPos;
       for i:= 1 to FOptScrollAnimationSteps do
       begin
         UpdateScrollInfoFromSmoothPos(AInfo,
-          Min(AInfo.SmoothPosLast, OldInfo.SmoothPos + ADelta * i div FOptScrollAnimationSteps));
+          Min(AInfo.SmoothPosLast, OldSmoothPos + ADelta * i div FOptScrollAnimationSteps));
         Update;
         Paint;
         //don't do Application.ProcessMessages here! it will break scrolling for N mouse events
