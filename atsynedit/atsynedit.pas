@@ -287,7 +287,7 @@ const
   cUsePaintStatic = true;
   cMaxIndentVert = 100;
   cInitScrollAnimationSteps = 4;
-  cInitScrollAnimationSleep = 10;
+  cInitScrollAnimationSleep = 0;
   cInitUndoLimit = 5000;
   cInitUndoMaxCarets = cInitUndoLimit;
   cInitUndoIndentVert = 15;
