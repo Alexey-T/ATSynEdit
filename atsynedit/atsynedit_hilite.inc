@@ -33,7 +33,10 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   AMainText: boolean);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
-  bEnableHilite, bFound: boolean;
+  bEnableHilite: boolean;
+  {$ifdef use_cache}
+  bFound: boolean;
+  {$endif}
 begin
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;

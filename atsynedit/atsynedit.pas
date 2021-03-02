@@ -5966,7 +5966,6 @@ var
   Mode: TATMouseWheelMode;
   NSpeedX, NSpeedY: integer;
   Pnt: TPoint;
-  i: integer;
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
