@@ -4742,11 +4742,12 @@ end;
 function TATSynEdit.GetPageLines: integer;
 begin
   case FOptKeyPageUpDownSize of
-    cPageSizeFull: Result:= GetVisibleLines;
-    cPageSizeFullMinus1: Result:= GetVisibleLines-1;
-    cPageSizeHalf: Result:= GetVisibleLines div 2;
-    else
-      raise Exception.Create('Unknown pagesize');
+    cPageSizeFull:
+      Result:= GetVisibleLines;
+    cPageSizeFullMinus1:
+      Result:= GetVisibleLines-1;
+    cPageSizeHalf:
+      Result:= GetVisibleLines div 2;
   end;
 end;
 
