@@ -286,6 +286,8 @@ type
 const
   cUsePaintStatic = true;
   cMaxIndentVert = 100;
+  cInitScrollAnimationSteps = 4;
+  cInitScrollAnimationSleep = 10;
   cInitUndoLimit = 5000;
   cInitUndoMaxCarets = cInitUndoLimit;
   cInitUndoIndentVert = 15;
@@ -720,6 +722,8 @@ type
     FOptAutocompleteCommitIfSingleItem: boolean;
 
     //options
+    FOptScrollAnimationSteps: integer;
+    FOptScrollAnimationSleep: integer;
     FOptScaleFont: integer;
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
@@ -1594,6 +1598,8 @@ type
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
     property OptAutocompleteCommitIfSingleItem: boolean read FOptAutocompleteCommitIfSingleItem write FOptAutocompleteCommitIfSingleItem default false;
 
+    property OptScrollAnimationSteps: integer read FOptScrollAnimationSteps write FOptScrollAnimationSteps default cInitScrollAnimationSteps;
+    property OptScrollAnimationSleep: integer read FOptScrollAnimationSleep write FOptScrollAnimationSleep default cInitScrollAnimationSleep;
     property OptScaleFont: integer read FOptScaleFont write FOptScaleFont default 0;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
@@ -4099,6 +4105,9 @@ begin
   FMarginRight:= cInitMarginRight;
   SetLength(FMarginList, 0);
   FFoldedMarkList:= nil;
+
+  FOptScrollAnimationSteps:= cInitScrollAnimationSteps;
+  FOptScrollAnimationSleep:= cInitScrollAnimationSleep;
   FOptIdleInterval:= cInitIdleInterval;
 
   FOptAutoCloseBrackets:= '([{';
@@ -5956,6 +5965,7 @@ var
   Mode: TATMouseWheelMode;
   NSpeedX, NSpeedY: integer;
   Pnt: TPoint;
+  i: integer;
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
@@ -5994,7 +6004,7 @@ begin
         begin
           //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
           DoScrollByDeltaInPixels(0, NSpeedY*FCharSize.Y);
-          Invalidate;
+          Update;
           Result:= true;
         end;
       end;
@@ -6683,7 +6693,7 @@ end;
 
 procedure TATSynEdit.DoScrollByDelta(ADeltaX, ADeltaY: integer);
 //
-  procedure _Delta(var AInfo: TATEditorScrollInfo; ADelta: integer); inline;
+  procedure _Delta(var AInfo: TATEditorScrollInfo; ADelta: integer);
   begin
     if ADelta=0 then exit;
     with AInfo do
@@ -6702,9 +6712,30 @@ end;
 
 procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
 //
-  procedure _Delta(var AInfo: TATEditorScrollInfo; ADelta: integer); inline;
+  procedure _Delta(var AInfo: TATEditorScrollInfo; ADelta: integer);
+  var
+    OldInfo: TATEditorScrollInfo;
+    i: integer;
   begin
     if ADelta=0 then exit;
+
+    //scrolling animation
+    if FOptScrollAnimationSteps>1 then
+    begin
+      OldInfo:= AInfo;
+      for i:= 1 to FOptScrollAnimationSteps-1 do
+      begin
+        UpdateScrollInfoFromSmoothPos(AInfo,
+          Min(AInfo.SmoothPosLast, AInfo.SmoothPos + ADelta div FOptScrollAnimationSteps));
+        Update;
+        Paint;
+        //don't do Application.ProcessMessages here! it will break scrolling for N mouse events
+        Sleep(FOptScrollAnimationSleep);
+      end;
+      AInfo:= OldInfo;
+    end;
+
+    //out for for-loop, to make the exact pixels increment for last step
     UpdateScrollInfoFromSmoothPos(AInfo,
       Min(AInfo.SmoothPosLast, AInfo.SmoothPos + ADelta));
   end;
