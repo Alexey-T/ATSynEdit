@@ -6724,21 +6724,16 @@ procedure TATSynEdit.DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
     if FOptScrollAnimationSteps>1 then
     begin
       OldInfo:= AInfo;
-      for i:= 1 to FOptScrollAnimationSteps-1 do
+      for i:= 1 to FOptScrollAnimationSteps do
       begin
         UpdateScrollInfoFromSmoothPos(AInfo,
-          Min(AInfo.SmoothPosLast, AInfo.SmoothPos + ADelta div FOptScrollAnimationSteps));
+          Min(AInfo.SmoothPosLast, OldInfo.SmoothPos + ADelta * i div FOptScrollAnimationSteps));
         Update;
         Paint;
         //don't do Application.ProcessMessages here! it will break scrolling for N mouse events
         Sleep(FOptScrollAnimationSleep);
       end;
-      AInfo:= OldInfo;
     end;
-
-    //out for for-loop, to make the exact pixels increment for last step
-    UpdateScrollInfoFromSmoothPos(AInfo,
-      Min(AInfo.SmoothPosLast, AInfo.SmoothPos + ADelta));
   end;
 //
 begin
