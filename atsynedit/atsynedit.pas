@@ -1021,7 +1021,7 @@ type
     procedure DoPaintText(C: TCanvas; const ARect: TRect;
       const ACharSize: TPoint; AWithGutter: boolean;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo; ALineFrom: integer);
-    procedure DoPaintTextFragmentTo(C: TCanvas; const ARect: TRect; ALineFrom,
+    procedure DoPaintTextFragment(C: TCanvas; const ARect: TRect; ALineFrom,
       ALineTo: integer; AConsiderWrapInfo: boolean; AColorBG, AColorBorder: TColor);
     procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TPoint;
       ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
@@ -7911,7 +7911,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoPaintTextFragmentTo(C: TCanvas;
+procedure TATSynEdit.DoPaintTextFragment(C: TCanvas;
   const ARect: TRect;
   ALineFrom, ALineTo: integer;
   AConsiderWrapInfo: boolean;
@@ -8044,7 +8044,7 @@ begin
   NLineTop:= Max(0, NLineCenter - FMinimapTooltipLinesCount div 2);
   NLineBottom:= Min(NLineTop + FMinimapTooltipLinesCount-1, Strings.Count-1);
 
-  DoPaintTextFragmentTo(C_Bmp, RectAll,
+  DoPaintTextFragment(C_Bmp, RectAll,
     NLineTop,
     NLineBottom,
     true,
@@ -8087,7 +8087,7 @@ end;
 procedure TATSynEdit.FoldedMarkTooltipPaint(Sender: TObject);
 begin
   if FFoldedMarkCurrent.IsInited then
-    DoPaintTextFragmentTo(
+    DoPaintTextFragment(
       FFoldedMarkTooltip.Canvas,
       Rect(0, 0, FFoldedMarkTooltip.Width, FFoldedMarkTooltip.Height),
       FFoldedMarkCurrent.LineFrom,
