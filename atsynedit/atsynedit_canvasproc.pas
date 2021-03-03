@@ -843,7 +843,7 @@ begin
       end;
 
       {$ifdef windows}
-      if AProps.HasAsciiNoTabs then
+      if AProps.HasAsciiNoTabs and not OptCanvasTextoutNeedsOffsets then
       begin
         BufW:= PartStr;
         bAllowLigatures:= AProps.ShowFontLigatures;
