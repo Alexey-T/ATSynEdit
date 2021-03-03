@@ -41,6 +41,7 @@ type
     PosX, PosY, //caret blinking pos
     EndX, EndY: integer; //end of selection or -1
     CoordX, CoordY: integer; //screen coords
+    OldRect: TRect; //screen coords but before running the last editor command
     SavedX, SavedX_Pre: integer; //to use with arrows Up/Down
     procedure SelectNone;
     procedure SelectToPoint(AX, AY: integer);

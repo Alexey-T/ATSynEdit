@@ -6322,6 +6322,17 @@ begin
 
     if FCaretBlinkEnabled then
     begin
+      //this block is to solve 'ghost caret on typing'
+      // https://github.com/Alexey-T/CudaText/issues/3167
+      if FCaretShown then
+        if Item.OldRect.Width>0 then
+        begin
+          CanvasInvertRect(C, Item.OldRect, NCaretColor);
+          if AWithInvalidate then
+            if not (csCustomPaint in ControlState) then //disable during Paint
+              InvalidateRect(Handle, @Item.OldRect, false);
+        end;
+
       FCaretShown:= not FCaretShown;
       CanvasInvertRect(C, R, NCaretColor);
       //if shape FrameFull, invert inner area
@@ -6339,6 +6350,8 @@ begin
     if AWithInvalidate then
       if not (csCustomPaint in ControlState) then //disable during Paint
         InvalidateRect(Handle, @R, false);
+
+    Item.OldRect:= R;
   end;
 end;
 
