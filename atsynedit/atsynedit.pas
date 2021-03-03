@@ -6305,7 +6305,9 @@ begin
     }
 
   if FCaretBlinkEnabled then
-    FCaretShown:= not FCaretShown;
+    FCaretShown:= not FCaretShown
+  else
+    FCaretShown:= true;
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -6346,7 +6348,6 @@ begin
     end
     else
     begin
-      FCaretShown:= true;
       //paint non-blinking caret simpler
       C.Brush.Color:= NCaretColor;
       C.FillRect(R);
