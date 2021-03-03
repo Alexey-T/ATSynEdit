@@ -6276,11 +6276,11 @@ end;
 
 procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
-  R: TRect;
-  i: integer;
-  Item: TATCaretItem;
+  Caret: TATCaretItem;
   CaretProps: TATEditorCaretProps;
   NCaretColor: TColor;
+  R: TRect;
+  i: integer;
 begin
   if not FCaretShowEnabled then exit;
 
@@ -6306,9 +6306,9 @@ begin
 
   for i:= 0 to FCarets.Count-1 do
   begin
-    Item:= FCarets[i];
-    R.Left:= Item.CoordX;
-    R.Top:= Item.CoordY;
+    Caret:= FCarets[i];
+    R.Left:= Caret.CoordX;
+    R.Top:= Caret.CoordY;
     R.Right:= R.Left+FCharSize.X;
     R.Bottom:= R.Top+FCharSize.Y;
 
@@ -6325,12 +6325,12 @@ begin
       //this block is to solve 'ghost caret on typing'
       // https://github.com/Alexey-T/CudaText/issues/3167
       if FCaretShown then
-        if Item.OldRect.Width>0 then
+        if Caret.OldRect.Width>0 then
         begin
-          CanvasInvertRect(C, Item.OldRect, NCaretColor);
+          CanvasInvertRect(C, Caret.OldRect, NCaretColor);
           if AWithInvalidate then
             if not (csCustomPaint in ControlState) then //disable during Paint
-              InvalidateRect(Handle, @Item.OldRect, false);
+              InvalidateRect(Handle, @Caret.OldRect, false);
         end;
 
       FCaretShown:= not FCaretShown;
@@ -6351,7 +6351,7 @@ begin
       if not (csCustomPaint in ControlState) then //disable during Paint
         InvalidateRect(Handle, @R, false);
 
-    Item.OldRect:= R;
+    Caret.OldRect:= R;
   end;
 end;
 
