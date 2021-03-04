@@ -1,9 +1,4 @@
 
-2021.03.02
-+ show animation for mouse-wheel up/down
-+ OptScrollAnimationSteps
-+ OptScrollAnimationSleep
-
 2021.02.26
 + BGRABitmap is now required (used to paint minimap)
 + minimap painting now runs in a thread! much faster!
