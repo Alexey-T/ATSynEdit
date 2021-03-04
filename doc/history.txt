@@ -1,4 +1,7 @@
 
+2021.03.04
++ prop FoldingAsString
+
 2021.02.26
 + BGRABitmap is now required (used to paint minimap)
 + minimap painting now runs in a thread! much faster!

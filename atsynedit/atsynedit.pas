@@ -876,11 +876,13 @@ type
     function DoCalcLineLen(ALineIndex: integer): integer;
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
+    function GetFoldingAsString: string;
     function GetMarkers: TATMarkers;
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
     function IsCaretOnVisibleRect: boolean;
+    procedure SetFoldingAsString(const AValue: string);
     procedure SetOptShowURLsRegex(const AValue: string);
     procedure SetShowOsBarVert(AValue: boolean);
     procedure SetShowOsBarHorz(AValue: boolean);
@@ -1411,7 +1413,7 @@ type
     procedure DoFoldForLevel(ALevel: integer);
     procedure DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
     procedure DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand);
-    property FoldingAsString: string read FFoldingAsString write FFoldingAsString; //dummy, for CudaText
+    property FoldingAsString: string read GetFoldingAsString write SetFoldingAsString;
     //markers
     procedure MarkerClearAll;
     procedure MarkerDrop;
@@ -8475,6 +8477,58 @@ begin
     exit;
   end;
 end;
+
+
+function TATSynEdit.GetFoldingAsString: string;
+var
+  L: TStringList;
+  i: integer;
+  R: PATSynRange;
+begin
+  Result:= '';
+  L:= TStringList.Create;
+  try
+    L.LineBreak:= ',';
+    for i:= 0 to Fold.Count-1 do
+    begin
+      R:= Fold.ItemPtr(i);
+      if R^.Folded then
+        L.Add(IntToStr(R^.Y));
+    end;
+    Result:= L.Text;
+  finally
+    L.Free;
+  end;
+end;
+
+procedure TATSynEdit.SetFoldingAsString(const AValue: string);
+var
+  Sep: TATStringSeparator;
+  NLineTop, N: integer;
+begin
+  DoCommand(cCommand_UnfoldAll);
+  NLineTop:= LineTop;
+
+  Sep.Init(AValue);
+  repeat
+    if not Sep.GetItemInt(N, -1) then Break;
+
+    if not Strings.IsIndexValid(N) then Continue;
+
+    N:= Fold.FindRangeWithPlusAtLine(N);
+    if N<0 then Continue;
+
+    DoRangeFold(N);
+  until false;
+
+  //fix changed horz scroll, CudaText issue #1439
+  FScrollHorz.NPos:= 0;
+  //keep LineTop! CudaText issue #3055
+  LineTop:= NLineTop;
+
+  Update;
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
