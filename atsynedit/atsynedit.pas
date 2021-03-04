@@ -710,7 +710,7 @@ type
     FEventMapStart: TSimpleEvent; //fired when need to start MinimapThread work
     FEventMapDone: TSimpleEvent; //fired by MinimapThread, when it's work done
     FColorOfStates: array[TATLineState] of TColor;
-    FFoldingAsString: string;
+    FFoldingAsStringTodo: string;
 
     //these options are implemented in CudaText, they are dummy here
     FOptAutoCloseBrackets: string;
@@ -1414,6 +1414,7 @@ type
     procedure DoFoldForLevelEx(ALevel: integer; AOuterRange: integer);
     procedure DoFoldUnfoldRangeAtCurLine(AOp: TATEditorFoldRangeCommand);
     property FoldingAsString: string read GetFoldingAsString write SetFoldingAsString;
+    property FoldingAsStringTodo: string read FFoldingAsStringTodo write FFoldingAsStringTodo;
     //markers
     procedure MarkerClearAll;
     procedure MarkerDrop;
