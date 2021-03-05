@@ -287,7 +287,7 @@ begin
     Strings.SetGroupMark;
   end;
 
-  Carets.UpdateSavedX(cUpdateX_Prepare, false);
+  Carets.UpdateMemory(cCaretMem_PrepareX, false);
   FIsRunningCommand:= true;
 
   bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
@@ -587,7 +587,7 @@ begin
     cCommand_KeyTab:
       begin
         if not FLastCommandChangedText2 then
-          Carets.UpdateSavedX(cUpdateX_Save, false);
+          Carets.UpdateMemory(cCaretMem_SaveX, false);
       end;
     {
     // https://github.com/Alexey-T/CudaText/issues/1326
@@ -597,16 +597,16 @@ begin
     cCommand_ClipboardAltAltPaste,
     cCommand_ClipboardAltPaste_Select:
       begin
-        Carets.UpdateSavedX(cUpdateX_Save, false);
+        Carets.UpdateMemory(cCaretMem_SaveX, false);
       end;
     }
     cCommand_KeyUp,
     cCommand_KeyUp_Sel,
     cCommand_KeyDown,
     cCommand_KeyDown_Sel:
-      Carets.UpdateSavedX(cUpdateX_Save, true);
+      Carets.UpdateMemory(cCaretMem_SaveX, true);
     else
-      Carets.UpdateSavedX(cUpdateX_Clear, false);
+      Carets.UpdateMemory(cCaretMem_ClearX, false);
   end;
 
   DoCommandResults(ACmd, Res);

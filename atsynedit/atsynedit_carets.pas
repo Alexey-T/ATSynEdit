@@ -68,10 +68,10 @@ type
     cScreenSideBottom
     );
 
-  TATCaretUpdateXMode = (
-    cUpdateX_Prepare,
-    cUpdateX_Save,
-    cUpdateX_Clear
+  TATCaretMemoryAction = (
+    cCaretMem_PrepareX,
+    cCaretMem_SaveX,
+    cCaretMem_ClearX
     );
 
 type
@@ -146,7 +146,7 @@ type
     property AsArray: TATPointArray read GetAsArray write SetAsArray;
     property AsString: string read GetAsString write SetAsString;
     property OnCaretChanged: TNotifyEvent read FOnCaretChanged write FOnCaretChanged;
-    procedure UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
+    procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
     procedure UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);
     procedure DoChanged;
   end;
@@ -941,7 +941,7 @@ begin
   Sort;
 end;
 
-procedure TATCarets.UpdateSavedX(AMode: TATCaretUpdateXMode; AArrowUpDown: boolean);
+procedure TATCarets.UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
 var
   i: integer;
   Caret: TATCaretItem;
@@ -950,16 +950,16 @@ begin
   begin
     Caret:= Items[i];
     case AMode of
-      cUpdateX_Prepare:
+      cCaretMem_PrepareX:
         begin
           Caret.SavedX_Pre:= Caret.CoordX;
         end;
-      cUpdateX_Save:
+      cCaretMem_SaveX:
         begin
           if (not AArrowUpDown) or (Caret.SavedX<Caret.SavedX_Pre) then
             Caret.SavedX:= Caret.SavedX_Pre;
         end;
-      cUpdateX_Clear:
+      cCaretMem_ClearX:
         begin
           Caret.SavedX:= 0;
         end;
