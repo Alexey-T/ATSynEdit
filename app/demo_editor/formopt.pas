@@ -21,6 +21,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkUpDownToEdge: TCheckBox;
     chkCrPrimitiveCol: TCheckBox;
     chkClickLink: TCheckBox;
     chkCopyNoSel: TCheckBox;
@@ -302,6 +303,7 @@ begin
     chkTabSpaces.Checked:= ed.OptTabSpaces;
     chkOvrSel.Checked:= ed.OptOverwriteSel;
     chkNavUpDown.Checked:= ed.OptKeyUpDownNavigateWrapped;
+    chkUpDownToEdge.Checked:= ed.OptKeyUpDownAllowToEdge;
     chkNavHomeEnd.Checked:= ed.OptKeyHomeEndNavigateWrapped;
     chkKeepCol.Checked:= ed.OptKeyUpDownKeepColumn;
     chkLeftRtSwap.Checked:= ed.OptKeyLeftRightSwapSel;
@@ -433,6 +435,7 @@ begin
       ed.OptTabSpaces:= chkTabSpaces.Checked;
       ed.OptOverwriteSel:= chkOvrSel.Checked;
       ed.OptKeyUpDownKeepColumn:= chkKeepCol.Checked;
+      ed.OptKeyUpDownAllowToEdge:= chkUpDownToEdge.Checked;
       ed.OptKeyUpDownNavigateWrapped:= chkNavUpDown.Checked;
       ed.OptKeyHomeEndNavigateWrapped:= chkNavHomeEnd.Checked;
       ed.OptKeyPageUpDownSize:= TATEditorPageDownSize(edPageSize.ItemIndex);

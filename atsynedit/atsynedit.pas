@@ -820,6 +820,7 @@ type
     FOptKeyBackspaceGoesToPrevLine: boolean;
     FOptKeyPageKeepsRelativePos: boolean;
     FOptKeyUpDownNavigateWrapped: boolean;
+    FOptKeyUpDownAllowToEdge: boolean;
     FOptKeyHomeEndNavigateWrapped: boolean;
     FOptKeyUpDownKeepColumn: boolean;
     FOptCopyLinesIfNoSel: boolean;
@@ -1764,6 +1765,7 @@ type
     property OptKeyBackspaceGoesToPrevLine: boolean read FOptKeyBackspaceGoesToPrevLine write FOptKeyBackspaceGoesToPrevLine default true;
     property OptKeyPageKeepsRelativePos: boolean read FOptKeyPageKeepsRelativePos write FOptKeyPageKeepsRelativePos default true;
     property OptKeyUpDownNavigateWrapped: boolean read FOptKeyUpDownNavigateWrapped write FOptKeyUpDownNavigateWrapped default true;
+    property OptKeyUpDownAllowToEdge: boolean read FOptKeyUpDownAllowToEdge write FOptKeyUpDownAllowToEdge default false;
     property OptKeyUpDownKeepColumn: boolean read FOptKeyUpDownKeepColumn write FOptKeyUpDownKeepColumn default true;
     property OptKeyHomeEndNavigateWrapped: boolean read FOptKeyHomeEndNavigateWrapped write FOptKeyHomeEndNavigateWrapped default true;
     property OptKeyPageUpDownSize: TATEditorPageDownSize read FOptKeyPageUpDownSize write FOptKeyPageUpDownSize default cPageSizeFullMinus1;
@@ -4251,6 +4253,7 @@ begin
   FOptKeyBackspaceGoesToPrevLine:= true;
   FOptKeyPageKeepsRelativePos:= true;
   FOptKeyUpDownNavigateWrapped:= true;
+  FOptKeyUpDownAllowToEdge:= false;
   FOptKeyHomeEndNavigateWrapped:= true;
   FOptKeyUpDownKeepColumn:= true;
 

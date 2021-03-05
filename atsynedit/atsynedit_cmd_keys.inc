@@ -242,8 +242,21 @@ begin
     //this allows to avoid jump to end of last line (arrow down)
     NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
 
-    if not ADown and (NWrapIndex=0) then exit;
-    if ADown and (NWrapIndex=WrapInfo.Count-1) then exit;
+    //caret is on 1st line. jump to very begin?
+    if (not ADown) and (NWrapIndex=0) then
+    begin
+      if FOptKeyUpDownAllowToEdge then
+        Caret.PosX:= 0;
+      Continue;
+    end;
+
+    //caret is on last line. jump to very end?
+    if ADown and (NWrapIndex=WrapInfo.Count-1) then
+    begin
+      if FOptKeyUpDownAllowToEdge then
+        Caret.PosX:= Strings.LinesLen[Strings.Count-1];
+      Continue;
+    end;
 
     //increase/decrease Caret.CoordY and calculate pos from it
     Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
