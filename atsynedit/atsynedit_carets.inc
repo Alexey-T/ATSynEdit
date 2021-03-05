@@ -1085,7 +1085,7 @@ begin
 end;
 
 
-procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Props: TATEditorCaretProps; W, H: integer);
+procedure TATSynEdit.DoCaretsApplyShape(var R: TRect; Props: TATCaretShape; W, H: integer);
 var
   Y0, DY: integer;
 begin
@@ -1119,9 +1119,9 @@ begin
   Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
 end;
 
-{ TATEditorCaretProps }
+{ TATCaretShape }
 
-procedure TATEditorCaretProps.Assign(Obj: TATEditorCaretProps);
+procedure TATCaretShape.Assign(Obj: TATCaretShape);
 begin
   Width:= Obj.Width;
   Height:= Obj.Height;
