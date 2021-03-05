@@ -254,6 +254,7 @@ begin
     if FOptKeyUpDownKeepColumn and (Caret.SavedX>0) then
     begin
       Pnt.X:= Caret.SavedX;
+      //needed for arrow-down on last line; w/o this, arrow-up (2 times) jumps weird
       Caret.SavedX_Pre:= 0;
     end;
 
