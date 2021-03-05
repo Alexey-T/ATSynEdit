@@ -28,6 +28,12 @@ type
     cRangePartlySelected
     );
 
+  TATCaretMemoryAction = (
+    cCaretMem_PrepareX,
+    cCaretMem_SaveX,
+    cCaretMem_ClearX
+    );
+
 procedure SwapInt(var n1, n2: integer); inline;
 function IsPosSorted(X1, Y1, X2, Y2: integer; AllowEq: boolean): boolean; inline;
 function IsPosInRange(X, Y, X1, Y1, X2, Y2: integer; AllowOnRightEdge: boolean=false): TATPosRelation;
@@ -52,6 +58,7 @@ type
     function IsForwardSelection: boolean;
     function IsMultilineSelection: boolean;
     function FirstTouchedLine: integer;
+    procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
   end;
 
 type
@@ -66,12 +73,6 @@ type
     cScreenSideTop,
     cScreenSideMiddle,
     cScreenSideBottom
-    );
-
-  TATCaretMemoryAction = (
-    cCaretMem_PrepareX,
-    cCaretMem_SaveX,
-    cCaretMem_ClearX
     );
 
 type
@@ -469,6 +470,25 @@ begin
     Result:= EndY
   else
     Result:= PosY;
+end;
+
+procedure TATCaretItem.UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
+begin
+  case AMode of
+    cCaretMem_PrepareX:
+      begin
+        SavedX_Pre:= CoordX;
+      end;
+    cCaretMem_SaveX:
+      begin
+        if (not AArrowUpDown) or (SavedX<SavedX_Pre) then
+          SavedX:= SavedX_Pre;
+      end;
+    cCaretMem_ClearX:
+      begin
+        SavedX:= 0;
+      end;
+  end;
 end;
 
 procedure TATCaretItem.SelectNone;
@@ -944,27 +964,9 @@ end;
 procedure TATCarets.UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
 var
   i: integer;
-  Caret: TATCaretItem;
 begin
   for i:= 0 to Count-1 do
-  begin
-    Caret:= Items[i];
-    case AMode of
-      cCaretMem_PrepareX:
-        begin
-          Caret.SavedX_Pre:= Caret.CoordX;
-        end;
-      cCaretMem_SaveX:
-        begin
-          if (not AArrowUpDown) or (Caret.SavedX<Caret.SavedX_Pre) then
-            Caret.SavedX:= Caret.SavedX_Pre;
-        end;
-      cCaretMem_ClearX:
-        begin
-          Caret.SavedX:= 0;
-        end;
-    end;
-  end;
+    Items[i].UpdateMemory(AMode, AArrowUpDown);
 end;
 
 procedure TATCarets.UpdateAfterRangeFolded(ARangeX, ARangeY, ARangeY2: integer);

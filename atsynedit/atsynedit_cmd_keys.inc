@@ -252,7 +252,9 @@ begin
 
     Pnt.X:= Caret.CoordX;
     if FOptKeyUpDownKeepColumn and (Caret.SavedX>0) then
+    begin
       Pnt.X:= Caret.SavedX;
+    end;
 
     //prevent any action if caret on first line (arrow up) / last line (arrow down)
     //this allows to avoid jump to end of last line (arrow down)
