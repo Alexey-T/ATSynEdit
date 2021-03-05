@@ -188,8 +188,10 @@ end;
 function TATSynEdit.DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
 var
   Caret: TATCaretItem;
+  NCount: integer;
   i, Y: integer;
 begin
+  NCount:= Strings.Count;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
@@ -201,8 +203,22 @@ begin
 
     if not IsLineFolded(Y) then
     begin
-      if Y<0 then Y:= Unfolded_FirstLineNumber;
-      if Y>=Strings.Count then Y:= Unfolded_LastLineNumber;
+      //moved above 1st line
+      if Y<0 then
+      begin
+        Y:= Unfolded_FirstLineNumber;
+        if Y=0 then
+          if FOptKeyUpDownAllowToEdge then
+            Caret.PosX:= 0;
+      end;
+      //moved below last line
+      if Y>=NCount then
+      begin
+        Y:= Unfolded_LastLineNumber;
+        if Y=NCount-1 then
+          if FOptKeyUpDownAllowToEdge then
+            Caret.PosX:= Strings.LinesLen[Y];
+      end;
       Caret.PosY:= Y;
     end;
   end;
