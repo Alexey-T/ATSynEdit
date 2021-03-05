@@ -521,9 +521,9 @@ type
     FCaretShown: boolean;
     FCaretBlinkEnabled: boolean;
     FCaretBlinkTime: integer;
-    FCaretPropsNormal: TATCaretShape;
-    FCaretPropsOverwrite: TATCaretShape;
-    FCaretPropsReadonly: TATCaretShape;
+    FCaretShapeNormal: TATCaretShape;
+    FCaretShapeOverwrite: TATCaretShape;
+    FCaretShapeReadonly: TATCaretShape;
     FCaretVirtual: boolean;
     FCaretSpecPos: boolean;
     FCaretStopUnfocused: boolean;
@@ -1306,9 +1306,9 @@ type
     property ScrollVert: TATEditorScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATEditorScrollInfo read FScrollHorz write FScrollHorz;
     //property BrotherEditor: TATSynEdit read FBrotherEditor write FBrotherEditor;
-    property CaretPropsNormal: TATCaretShape read FCaretPropsNormal;
-    property CaretPropsOverwrite: TATCaretShape read FCaretPropsOverwrite;
-    property CaretPropsReadonly: TATCaretShape read FCaretPropsReadonly;
+    property CaretShapeNormal: TATCaretShape read FCaretShapeNormal;
+    property CaretShapeOverwrite: TATCaretShape read FCaretShapeOverwrite;
+    property CaretShapeReadonly: TATCaretShape read FCaretShapeReadonly;
     //common
     property EncodingName: string read GetEncodingName write SetEncodingName;
     property Modified: boolean read GetModified write SetModified;
@@ -3993,16 +3993,16 @@ begin
   FScrollbarHorz.Update;
   FScrollbarHorz.OnChange:= @OnNewScrollbarHorzChanged;
 
-  FCaretPropsNormal:= TATCaretShape.Create;
-  FCaretPropsOverwrite:= TATCaretShape.Create;
-  FCaretPropsReadonly:= TATCaretShape.Create;
+  FCaretShapeNormal:= TATCaretShape.Create;
+  FCaretShapeOverwrite:= TATCaretShape.Create;
+  FCaretShapeReadonly:= TATCaretShape.Create;
 
-  FCaretPropsNormal.Width:= 2;
-  FCaretPropsNormal.Height:= -100;
-  FCaretPropsOverwrite.Width:= -100;
-  FCaretPropsOverwrite.Height:= -100;
-  FCaretPropsReadonly.Width:= -100;
-  FCaretPropsReadonly.Height:= 2;
+  FCaretShapeNormal.Width:= 2;
+  FCaretShapeNormal.Height:= -100;
+  FCaretShapeOverwrite.Width:= -100;
+  FCaretShapeOverwrite.Height:= -100;
+  FCaretShapeReadonly.Width:= -100;
+  FCaretShapeReadonly.Height:= 2;
 
   FWantTabs:= true;
   FWantReturns:= true;
@@ -4439,9 +4439,9 @@ begin
   FreeAndNil(FFontItalic);
   FreeAndNil(FFontBold);
   FreeAndNil(FFontBoldItalic);
-  FreeAndNil(FCaretPropsNormal);
-  FreeAndNil(FCaretPropsOverwrite);
-  FreeAndNil(FCaretPropsReadonly);
+  FreeAndNil(FCaretShapeNormal);
+  FreeAndNil(FCaretShapeOverwrite);
+  FreeAndNil(FCaretShapeReadonly);
   inherited;
 end;
 
@@ -6285,7 +6285,7 @@ end;
 procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
   Caret: TATCaretItem;
-  CaretProps: TATCaretShape;
+  CaretShape: TATCaretShape;
   NCaretColor: TColor;
   R: TRect;
   i: integer;
@@ -6293,12 +6293,12 @@ begin
   if not FCaretShowEnabled then exit;
 
   if ModeReadOnly then
-    CaretProps:= FCaretPropsReadonly
+    CaretShape:= FCaretShapeReadonly
   else
   if ModeOverwrite then
-    CaretProps:= FCaretPropsOverwrite
+    CaretShape:= FCaretShapeOverwrite
   else
-    CaretProps:= FCaretPropsNormal;
+    CaretShape:= FCaretShapeNormal;
 
   NCaretColor:= Colors.Caret;
   { //block was needed when we didn't have OptCaretHideUnfocused
@@ -6331,7 +6331,7 @@ begin
     if R.Left>=FRectMain.Right then Continue;
     if R.Top>=FRectMain.Bottom then Continue;
 
-    DoCaretsApplyShape(R, CaretProps, FCharSize.X, FCharSize.Y);
+    DoCaretsApplyShape(R, CaretShape, FCharSize.X, FCharSize.Y);
 
     if FCaretBlinkEnabled then
     begin
@@ -6350,7 +6350,7 @@ begin
 
       CanvasInvertRect(C, R, NCaretColor);
       //if shape FrameFull, invert inner area
-      if CaretProps.EmptyInside then
+      if CaretShape.EmptyInside then
         CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor);
     end
     else

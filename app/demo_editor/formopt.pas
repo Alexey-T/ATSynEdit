@@ -259,9 +259,9 @@ begin
     chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
     chkCrPrimitiveCol.Checked:= ed.OptCaretsPrimitiveColumnSelection;
 
-    edCrWidthNormal.Value:= ed.CaretPropsNormal.Width;
-    edCrHeightNormal.Value:= ed.CaretPropsNormal.Height;
-    chkCrEmptyNormal.Checked:= ed.CaretPropsNormal.EmptyInside;
+    edCrWidthNormal.Value:= ed.CaretShapeNormal.Width;
+    edCrHeightNormal.Value:= ed.CaretShapeNormal.Height;
+    chkCrEmptyNormal.Checked:= ed.CaretShapeNormal.EmptyInside;
 
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
@@ -391,9 +391,9 @@ begin
       ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
       ed.OptCaretsPrimitiveColumnSelection:= chkCrPrimitiveCol.Checked;
 
-      ed.CaretPropsNormal.Width:= edCrWidthNormal.Value;
-      ed.CaretPropsNormal.Height:= edCrHeightNormal.Value;
-      ed.CaretPropsNormal.EmptyInside:= chkCrEmptyNormal.Checked;
+      ed.CaretShapeNormal.Width:= edCrWidthNormal.Value;
+      ed.CaretShapeNormal.Height:= edCrHeightNormal.Value;
+      ed.CaretShapeNormal.EmptyInside:= chkCrEmptyNormal.Checked;
 
       //gutter
       //ed.OptNumbersFontSizePercents:= edNumSize.Value;
