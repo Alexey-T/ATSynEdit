@@ -1,4 +1,7 @@
 
+2021.03.05
++ prop OptKeyUpDownAllowToEdge
+
 2021.03.04
 + prop FoldingAsString
 
