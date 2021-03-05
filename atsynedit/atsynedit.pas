@@ -6346,7 +6346,6 @@ begin
             if not (csCustomPaint in ControlState) then //disable during Paint
               InvalidateRect(Handle, @Caret.OldRect, false);
         end;
-        Caret.OldRect:= R;
       end;
 
       CanvasInvertRect(C, R, NCaretColor);
@@ -6360,6 +6359,8 @@ begin
       C.Brush.Color:= NCaretColor;
       C.FillRect(R);
     end;
+
+    Caret.OldRect:= R;
 
     if AWithInvalidate then
       if not (csCustomPaint in ControlState) then //disable during Paint
