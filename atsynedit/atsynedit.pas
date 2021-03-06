@@ -8509,29 +8509,45 @@ end;
 procedure TATSynEdit.SetFoldingAsString(const AValue: string);
 var
   Sep: TATStringSeparator;
-  NLineTop, N: integer;
+  NLineTop, NLine, NRange: integer;
+  bChange: boolean;
 begin
   DoCommand(cCommand_UnfoldAll);
   NLineTop:= LineTop;
+  bChange:= false;
 
   Sep.Init(AValue);
   repeat
-    if not Sep.GetItemInt(N, -1) then Break;
+    if not Sep.GetItemInt(NLine, -1) then Break;
 
-    if not Strings.IsIndexValid(N) then Continue;
+    if not Strings.IsIndexValid(NLine) then Continue;
 
-    N:= Fold.FindRangeWithPlusAtLine(N);
-    if N<0 then Continue;
+    NRange:= Fold.FindRangeWithPlusAtLine(NLine);
+    if NRange<0 then Continue;
 
-    DoRangeFold(N);
+    if not Fold.ItemPtr(NRange)^.Folded then
+    begin
+      bChange:= true;
+      DoRangeFold(NRange);
+    end;
   until false;
 
-  //fix changed horz scroll, CudaText issue #1439
-  FScrollHorz.NPos:= 0;
-  //keep LineTop! CudaText issue #3055
-  LineTop:= NLineTop;
+  if bChange then
+  begin
+    if FScrollHorz.NPos>0 then
+    begin
+      //fix changed horz scroll, CudaText issue #1439
+      FScrollHorz.SetZero;
 
-  Update;
+      //SetZero may scroll view out of caret
+      DoGotoCaret(cEdgeTop);
+    end;
+
+    //keep LineTop! CudaText issue #3055
+    LineTop:= NLineTop;
+
+    Update;
+  end;
 end;
 
 
