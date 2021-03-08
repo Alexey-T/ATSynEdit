@@ -55,10 +55,38 @@ begin
   end;
 end;
 
+function CheckInputForNumberOnly(const S: UnicodeString; X: integer; ch: WideChar; AllowNegative: boolean): boolean;
+var
+  bMinusPresent: boolean;
+begin
+  Result:= false;
+  bMinusPresent:= Pos('-', S)>0;
+  case ch of
+    '-':
+      begin
+        if not AllowNegative then exit(false);
+        if S='' then
+          exit(true);
+        if (X=0) and not bMinusPresent then
+          exit(true);
+        exit(false);
+      end;
+  '0'..'9':
+    begin
+      if S='' then
+        exit(true);
+      if (X=0) and bMinusPresent then
+        exit(false);
+      exit(true);
+    end;
+  end;
+end;
+
 procedure TATSynEdit.UTF8KeyPress(var UTF8Key: TUTF8Char);
 var
-  Str: atString;
+  Str, StrLine: atString;
   Allow: boolean;
+  Caret: TATCaretItem;
 begin
   inherited;
 
@@ -73,6 +101,21 @@ begin
     Allow:= true;
     FOnCheckInput(Self, Str[1], Allow);
     if not Allow then Exit;
+  end;
+
+  if FOptInputNumberOnly then
+  begin
+    if Length(Str)<>1 then exit;
+    if Carets.Count<>1 then exit;
+    Caret:= Carets[0];
+    if not Strings.IsIndexValid(Caret.PosY) then exit;
+    StrLine:= Strings.Lines[Caret.PosY];
+    if Caret.PosX>Length(StrLine) then exit;
+    if not CheckInputForNumberOnly(
+      StrLine,
+      Caret.PosX,
+      Str[1],
+      FOptInputNumberAllowNegative) then exit;
   end;
 
   TimerBlinkDisable;

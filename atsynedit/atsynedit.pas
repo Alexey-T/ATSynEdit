@@ -286,6 +286,7 @@ type
 const
   cUsePaintStatic = true;
   cMaxIndentVert = 100;
+  cInitInputNumberAllowNegative = true;
   cInitMaskChar = '*';
   cInitScrollAnimationSteps = 4;
   cInitScrollAnimationSleep = 0;
@@ -724,6 +725,8 @@ type
     FOptAutocompleteCommitIfSingleItem: boolean;
 
     //options
+    FOptInputNumberOnly: boolean;
+    FOptInputNumberAllowNegative: boolean;
     FOptMaskChar: WideChar;
     FOptMaskCharUsed: boolean;
     FOptScrollAnimationSteps: integer;
@@ -1607,6 +1610,8 @@ type
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
     property OptAutocompleteCommitIfSingleItem: boolean read FOptAutocompleteCommitIfSingleItem write FOptAutocompleteCommitIfSingleItem default false;
 
+    property OptInputNumberOnly: boolean read FOptInputNumberOnly write FOptInputNumberOnly default false;
+    property OptInputNumberAllowNegative: boolean read FOptInputNumberAllowNegative write FOptInputNumberAllowNegative default cInitInputNumberAllowNegative;
     property OptMaskChar: WideChar read FOptMaskChar write FOptMaskChar default cInitMaskChar;
     property OptMaskCharUsed: boolean read FOptMaskCharUsed write FOptMaskCharUsed default false;
     property OptScrollAnimationSteps: integer read FOptScrollAnimationSteps write FOptScrollAnimationSteps default cInitScrollAnimationSteps;
@@ -4121,6 +4126,8 @@ begin
   SetLength(FMarginList, 0);
   FFoldedMarkList:= nil;
 
+  FOptInputNumberOnly:= false;
+  FOptInputNumberAllowNegative:= cInitInputNumberAllowNegative;
   FOptMaskChar:= cInitMaskChar;
   FOptMaskCharUsed:= false;
   FOptScrollAnimationSteps:= cInitScrollAnimationSteps;

@@ -81,7 +81,7 @@ object fmCombo: TfmCombo
   end
   object edMaxLen: TSpinEdit
     Left = 8
-    Height = 27
+    Height = 26
     Top = 216
     Width = 80
     MaxValue = 1000
@@ -96,7 +96,7 @@ object fmCombo: TfmCombo
     Left = 94
     Height = 17
     Top = 221
-    Width = 116
+    Width = 115
     BorderSpacing.Left = 6
     Caption = 'Max length (if >0)'
     ParentColor = False
@@ -111,5 +111,25 @@ object fmCombo: TfmCombo
     OnChange = chkEnMouseChange
     State = cbChecked
     TabOrder = 3
+  end
+  object chkNumOnly: TCheckBox
+    Left = 192
+    Height = 24
+    Top = 136
+    Width = 112
+    Caption = 'Number only'
+    OnChange = chkNumOnlyChange
+    TabOrder = 6
+  end
+  object chkNumAllowNeg: TCheckBox
+    Left = 216
+    Height = 24
+    Top = 160
+    Width = 134
+    Caption = 'Allow number<0'
+    Checked = True
+    OnChange = chkNumAllowNegChange
+    State = cbChecked
+    TabOrder = 7
   end
 end
