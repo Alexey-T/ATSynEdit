@@ -877,6 +877,8 @@ type
     FOptDimUnfocusedBack: integer;
 
     //
+    class function CheckInputForNumberOnly(const S: UnicodeString; X: integer;
+      ch: WideChar; AllowNegative: boolean): boolean;
     procedure ClearSelRectPoints;
     procedure ClearMouseDownVariables;
     procedure DebugSelRect;

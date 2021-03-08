@@ -55,7 +55,7 @@ begin
   end;
 end;
 
-function CheckInputForNumberOnly(const S: UnicodeString; X: integer; ch: WideChar; AllowNegative: boolean): boolean;
+class function TATSynEdit.CheckInputForNumberOnly(const S: UnicodeString; X: integer; ch: WideChar; AllowNegative: boolean): boolean;
 var
   bMinusPresent: boolean;
 begin
