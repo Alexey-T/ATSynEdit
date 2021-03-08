@@ -5,6 +5,7 @@ function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
 var
   Str: atString;
   bHandled, bNeedFixLastEol: boolean;
+  Num64: Int64;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
@@ -28,6 +29,9 @@ begin
   Str:= UTF8Decode(AClipboardObject.AsText);
   if ModeOneLine then
     Str:= SRemoveNewlineChars(Str);
+
+  if FOptInputNumberOnly then
+    if not TryStrToInt64(Str, Num64) then exit;
 
   //we delete unneeded eol after paste, if:
   //- one caret, on last line
@@ -78,11 +82,15 @@ function TATSynEdit.DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
   Str: atString;
+  Num64: Int64;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
   Str:= UTF8Decode(AClipboardObject.AsText);
+
+  if FOptInputNumberOnly then
+    if not TryStrToInt64(Str, Num64) then exit;
 
   Strings.BeginUndoGroup;
   try
