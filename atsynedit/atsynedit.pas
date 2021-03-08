@@ -3177,7 +3177,7 @@ begin
     SetLength(StrOutput, cMaxCharsForOutput);
 
   if FOptMaskCharUsed then
-    StringMaskChars(StrOutput, FOptMaskChar);
+    StrOutput:= StringOfCharW(FOptMaskChar, Length(StrOutput));
 
   LineSeparator:= Strings.LinesSeparator[NLinesIndex];
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
@@ -8011,8 +8011,9 @@ begin
         WrapItem.NLineIndex,
         WrapItem.NCharIndex,
         GetVisibleColumns);
+
     if FOptMaskCharUsed then
-      StringMaskChars(SText, FOptMaskChar);
+      SText:= StringOfCharW(FOptMaskChar, Length(SText));
 
     TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
     TextOutProps.SuperFast:= false;

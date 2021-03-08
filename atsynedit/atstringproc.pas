@@ -59,7 +59,6 @@ function SCaseInvert(const S: atString): atString;
 function SCaseSentence(const S, SNonWordChars: atString): atString;
 
 function StringOfCharW(ch: WideChar; Len: integer): UnicodeString;
-procedure StringMaskChars(var S: UnicodeString; MaskChar: WideChar);
 
 {$Z1}
 type
@@ -1099,14 +1098,6 @@ begin
   SetLength(Result, Len);
   for i:= 1 to Len do
     Result[i]:= ch;
-end;
-
-procedure StringMaskChars(var S: UnicodeString; MaskChar: WideChar);
-var
-  i: integer;
-begin
-  for i:= 1 to Length(S) do
-    S[i]:= MaskChar;
 end;
 
 
