@@ -1,4 +1,7 @@
 
+2021.03.08
++ prop OptMaskChar, OptMaskCharUsed, to make password-input fields
+
 2021.03.05
 + prop OptKeyUpDownAllowToEdge
 

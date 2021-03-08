@@ -286,6 +286,7 @@ type
 const
   cUsePaintStatic = true;
   cMaxIndentVert = 100;
+  cInitMaskChar = '*';
   cInitScrollAnimationSteps = 4;
   cInitScrollAnimationSleep = 0;
   cInitUndoLimit = 5000;
@@ -723,6 +724,8 @@ type
     FOptAutocompleteCommitIfSingleItem: boolean;
 
     //options
+    FOptMaskChar: WideChar;
+    FOptMaskCharUsed: boolean;
     FOptScrollAnimationSteps: integer;
     FOptScrollAnimationSleep: integer;
     FOptScaleFont: integer;
@@ -1604,6 +1607,8 @@ type
     property OptAutocompleteUpDownAtEdge: integer read FOptAutocompleteUpDownAtEdge write FOptAutocompleteUpDownAtEdge default 1;
     property OptAutocompleteCommitIfSingleItem: boolean read FOptAutocompleteCommitIfSingleItem write FOptAutocompleteCommitIfSingleItem default false;
 
+    property OptMaskChar: WideChar read FOptMaskChar write FOptMaskChar default cInitMaskChar;
+    property OptMaskCharUsed: boolean read FOptMaskCharUsed write FOptMaskCharUsed default false;
     property OptScrollAnimationSteps: integer read FOptScrollAnimationSteps write FOptScrollAnimationSteps default cInitScrollAnimationSteps;
     property OptScrollAnimationSleep: integer read FOptScrollAnimationSleep write FOptScrollAnimationSleep default cInitScrollAnimationSleep;
     property OptScaleFont: integer read FOptScaleFont write FOptScaleFont default 0;
@@ -3171,6 +3176,9 @@ begin
   if Length(StrOutput)>cMaxCharsForOutput then
     SetLength(StrOutput, cMaxCharsForOutput);
 
+  if FOptMaskCharUsed then
+    StringMaskChars(StrOutput, FOptMaskChar);
+
   LineSeparator:= Strings.LinesSeparator[NLinesIndex];
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
   bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
@@ -4113,6 +4121,8 @@ begin
   SetLength(FMarginList, 0);
   FFoldedMarkList:= nil;
 
+  FOptMaskChar:= cInitMaskChar;
+  FOptMaskCharUsed:= false;
   FOptScrollAnimationSteps:= cInitScrollAnimationSteps;
   FOptScrollAnimationSleep:= cInitScrollAnimationSleep;
   FOptIdleInterval:= cInitIdleInterval;
@@ -7931,6 +7941,7 @@ var
   NColorAfter: TColor;
   WrapItem: TATWrapItem;
   TextOutProps: TATCanvasTextOutProps;
+  SText: UnicodeString;
 begin
   C.Brush.Color:= AColorBG;
   C.FillRect(ARect);
@@ -7996,6 +8007,13 @@ begin
       NColorAfter,
       true);
 
+    SText:= Strings.LineSub(
+        WrapItem.NLineIndex,
+        WrapItem.NCharIndex,
+        GetVisibleColumns);
+    if FOptMaskCharUsed then
+      StringMaskChars(SText, FOptMaskChar);
+
     TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
     TextOutProps.SuperFast:= false;
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
@@ -8003,10 +8021,7 @@ begin
     CanvasTextOut(C,
       cSizeIndentTooltipX + WrapItem.NIndent*FCharSize.X,
       cSizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
-      Strings.LineSub(
-        WrapItem.NLineIndex,
-        WrapItem.NCharIndex,
-        GetVisibleColumns),
+      SText,
       @FParts,
       NOutputStrWidth,
       TextOutProps
