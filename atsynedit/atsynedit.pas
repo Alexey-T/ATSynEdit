@@ -2982,9 +2982,10 @@ begin
         if OptUnprintedVisible and OptUnprintedEof then
           if OptUnprintedEndsDetails then
             DoPaintUnprintedEolText(C,
-              'EOF',
+              cEndingTextEOF,
               ARect.Left,
               RectLine.Top,
+              ACharSize,
               Colors.UnprintedFont,
               Colors.UnprintedBG)
           else
@@ -3387,9 +3388,10 @@ begin
     begin
       if OptUnprintedEndsDetails then
         DoPaintUnprintedEolText(C,
-          cLineEndNiceNames[Strings.LinesEnds[WrapItem.NLineIndex]],
+          cLineEndsToText[Strings.LinesEnds[WrapItem.NLineIndex]],
           CoordAfterText.X,
           CoordAfterText.Y,
+          ACharSize,
           Colors.UnprintedFont,
           Colors.UnprintedBG)
       else

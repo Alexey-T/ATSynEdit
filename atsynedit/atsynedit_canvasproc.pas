@@ -32,8 +32,6 @@ var
   OptUnprintedSpaceDotScale: integer = 15;
   OptUnprintedEndDotScale: integer = 30;
   OptUnprintedEndFontScale: integer = 80;
-  OptUnprintedEndFontDx: integer = 3;
-  OptUnprintedEndFontDy: integer = 2;
   OptUnprintedEndArrowOrDot: boolean = true;
   OptUnprintedEndArrowLength: integer = 70;
   OptUnprintedWrapArrowLength: integer = 40;
@@ -70,6 +68,23 @@ type
     ALineIndex: integer;
     AX, AY: integer; const AStr: atString; ACharSize: TPoint;
     constref AExtent: TATIntFixedArray) of object;
+
+type
+  TATLineEndsText = (
+    cEndingTextNone,
+    cEndingTextLF,
+    cEndingTextCRLF,
+    cEndingTextCR,
+    cEndingTextEOF
+    );
+
+const
+  cLineEndsToText: array[TATLineEnds] of TATLineEndsText = (
+    cEndingTextNone,
+    cEndingTextCRLF,
+    cEndingTextLF,
+    cEndingTextCR
+    );
 
 type
   TATCanvasTextOutProps = record
@@ -137,8 +152,9 @@ procedure CanvasTextOutMinimap(
   );
 
 procedure DoPaintUnprintedEolText(C: TCanvas;
-  const AText: string;
+  AText: TATLineEndsText;
   AX, AY: integer;
+  ACharSize: TPoint;
   AColorFont, AColorBG: TColor);
 
 procedure DoPaintUnprintedEolArrow(C: TCanvas;
@@ -511,25 +527,105 @@ begin
   end;
 end;
 
+procedure CanvasChar(C: TCanvas; AColorFont, AColorBg: TColor; ch: char; X, Y, W, H: integer);
+begin
+  C.Pen.Color:= AColorFont;
+  C.Brush.Color:= AColorBg;
+  C.FillRect(X, Y, X+W, Y+H);
+
+  case ch of
+    'L':
+      begin
+        CanvasLineVert(C, X, Y, Y+H, true);
+        CanvasLineHorz(C, X, Y+H, X+W, true);
+      end;
+    'F':
+      begin
+        CanvasLineVert(C, X, Y, Y+H, true);
+        CanvasLineHorz(C, X, Y, X+W, true);
+        CanvasLineHorz(C, X, Y+H div 2, X+W-1, true);
+      end;
+    'C':
+      begin
+        CanvasLineVert(C, X, Y, Y+H, true);
+        CanvasLineHorz(C, X, Y, X+W, true);
+        CanvasLineHorz(C, X, Y+H, X+W, true);
+      end;
+    'R':
+      begin
+        CanvasLineVert(C, X, Y, Y+H, true);
+        CanvasLineVert(C, X+W, Y, Y+H div 2, true);
+        CanvasLineHorz(C, X, Y, X+W, true);
+        CanvasLineHorz(C, X, Y+H div 2, X+W-1, true);
+        CanvasLine(C, Point(X+W div 2, Y+H div 2), Point(X+W+1, Y+H+1), AColorFont);
+      end;
+    'E':
+      begin
+        CanvasLineVert(C, X, Y, Y+H, true);
+        CanvasLineHorz(C, X, Y, X+W, true);
+        CanvasLineHorz(C, X, Y+H div 2, X+W-1, true);
+        CanvasLineHorz(C, X, Y+H, X+W, true);
+      end;
+    'O':
+      begin
+        CanvasLineVert(C, X, Y, Y+H, true);
+        CanvasLineVert(C, X+W, Y, Y+H, true);
+        CanvasLineHorz(C, X, Y, X+W, true);
+        CanvasLineHorz(C, X, Y+H, X+W, true);
+      end;
+  end;
+end;
+
 procedure DoPaintUnprintedEolText(C: TCanvas;
-  const AText: string;
+  AText: TATLineEndsText;
   AX, AY: integer;
+  ACharSize: TPoint;
   AColorFont, AColorBG: TColor);
 var
-  NPrevSize: integer;
+  X, Y, W, H: integer;
 begin
-  if AText='' then Exit;
-  NPrevSize:= C.Font.Size;
-  C.Font.Size:= NPrevSize * OptUnprintedEndFontScale div 100;
-  C.Font.Color:= AColorFont;
-  C.Brush.Color:= AColorBG;
+  H:= ACharSize.Y * OptUnprintedEndFontScale div 100 * 6 div 10;
+  W:= H div 2;
 
-  CanvasTextOutSimplest(C,
-    AX+OptUnprintedEndFontDx,
-    AY+OptUnprintedEndFontDy,
-    AText);
+  X:= AX + 2;
+  Y:= AY + ACharSize.Y div 2 - H div 2;
 
-  C.Font.Size:= NPrevSize;
+  case AText of
+    cEndingTextLF:
+      begin
+        CanvasChar(C, AColorFont, AColorBG, 'L', X, Y, W, H);
+        Inc(X, W+2);
+        CanvasChar(C, AColorFont, AColorBG, 'F', X, Y, W, H);
+        Inc(X, W+2);
+      end;
+    cEndingTextCRLF:
+      begin
+        CanvasChar(C, AColorFont, AColorBG, 'C', X, Y, W, H);
+        Inc(X, W+2);
+        CanvasChar(C, AColorFont, AColorBG, 'R', X, Y, W, H);
+        Inc(X, W+2);
+        CanvasChar(C, AColorFont, AColorBG, 'L', X, Y, W, H);
+        Inc(X, W+2);
+        CanvasChar(C, AColorFont, AColorBG, 'F', X, Y, W, H);
+        Inc(X, W+2);
+      end;
+    cEndingTextCR:
+      begin
+        CanvasChar(C, AColorFont, AColorBG, 'C', X, Y, W, H);
+        Inc(X, W+2);
+        CanvasChar(C, AColorFont, AColorBG, 'R', X, Y, W, H);
+        Inc(X, W+2);
+      end;
+    cEndingTextEOF:
+      begin
+        CanvasChar(C, AColorFont, AColorBG, 'E', X, Y, W, H);
+        Inc(X, W+2);
+        CanvasChar(C, AColorFont, AColorBG, 'O', X, Y, W, H);
+        Inc(X, W+2);
+        CanvasChar(C, AColorFont, AColorBG, 'F', X, Y, W, H);
+        Inc(X, W+2);
+      end;
+  end;
 end;
 
 procedure DoPaintUnprintedEolArrow(C: TCanvas;
