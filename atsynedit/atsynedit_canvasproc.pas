@@ -581,8 +581,12 @@ procedure DoPaintUnprintedEolText(C: TCanvas;
   AX, AY: integer;
   ACharSize: TPoint;
   AColorFont, AColorBG: TColor);
+const
+  cText: array[TATLineEndsText] of string[4] = ('', 'LF', 'CRLF', 'CR', 'EOF');
 var
+  SText: string[4];
   X, Y, W, H: integer;
+  i: integer;
 begin
   H:= ACharSize.Y * OptUnprintedEndFontScale div 100 * 6 div 10;
   W:= H div 2;
@@ -590,41 +594,11 @@ begin
   X:= AX + 2;
   Y:= AY + ACharSize.Y div 2 - H div 2;
 
-  case AText of
-    cEndingTextLF:
-      begin
-        CanvasChar(C, AColorFont, AColorBG, 'L', X, Y, W, H);
-        Inc(X, W+2);
-        CanvasChar(C, AColorFont, AColorBG, 'F', X, Y, W, H);
-        Inc(X, W+2);
-      end;
-    cEndingTextCRLF:
-      begin
-        CanvasChar(C, AColorFont, AColorBG, 'C', X, Y, W, H);
-        Inc(X, W+2);
-        CanvasChar(C, AColorFont, AColorBG, 'R', X, Y, W, H);
-        Inc(X, W+2);
-        CanvasChar(C, AColorFont, AColorBG, 'L', X, Y, W, H);
-        Inc(X, W+2);
-        CanvasChar(C, AColorFont, AColorBG, 'F', X, Y, W, H);
-        Inc(X, W+2);
-      end;
-    cEndingTextCR:
-      begin
-        CanvasChar(C, AColorFont, AColorBG, 'C', X, Y, W, H);
-        Inc(X, W+2);
-        CanvasChar(C, AColorFont, AColorBG, 'R', X, Y, W, H);
-        Inc(X, W+2);
-      end;
-    cEndingTextEOF:
-      begin
-        CanvasChar(C, AColorFont, AColorBG, 'E', X, Y, W, H);
-        Inc(X, W+2);
-        CanvasChar(C, AColorFont, AColorBG, 'O', X, Y, W, H);
-        Inc(X, W+2);
-        CanvasChar(C, AColorFont, AColorBG, 'F', X, Y, W, H);
-        Inc(X, W+2);
-      end;
+  SText:= cText[AText];
+  for i:= 1 to Length(SText) do
+  begin
+    CanvasChar(C, AColorFont, AColorBG, SText[i], X, Y, W, H);
+    Inc(X, W+2);
   end;
 end;
 
