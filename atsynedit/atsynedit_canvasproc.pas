@@ -550,9 +550,9 @@ begin
       end;
     'C':
       begin
-        CanvasLineVert(C, X, Y, Y+H, true);
-        CanvasLineHorz(C, X, Y, X+W, true);
-        CanvasLineHorz(C, X, Y+H, X+W, true);
+        CanvasLineVert(C, X, Y+1, Y+H-1, true);
+        CanvasLineHorz(C, X+1, Y, X+W, true);
+        CanvasLineHorz(C, X+1, Y+H, X+W, true);
       end;
     'R':
       begin
@@ -560,7 +560,7 @@ begin
         CanvasLineVert(C, X+W, Y+1, Y+H div 2-1, true);
         CanvasLineHorz(C, X, Y, X+W-1, true);
         CanvasLineHorz(C, X, Y+H div 2, X+W-1, true);
-        CanvasLine(C, Point(X+W div 2, Y+H div 2), Point(X+W+1, Y+H+1), AColorFont);
+        CanvasLine(C, Point(X+W, Y+H), Point(X+W div 2, Y+H div 2), AColorFont);
       end;
     'E':
       begin
@@ -571,10 +571,10 @@ begin
       end;
     'O':
       begin
-        CanvasLineVert(C, X, Y, Y+H, true);
-        CanvasLineVert(C, X+W, Y, Y+H, true);
-        CanvasLineHorz(C, X, Y, X+W, true);
-        CanvasLineHorz(C, X, Y+H, X+W, true);
+        CanvasLineVert(C, X, Y+1, Y+H-1, true);
+        CanvasLineVert(C, X+W, Y+1, Y+H-1, true);
+        CanvasLineHorz(C, X+1, Y, X+W-1, true);
+        CanvasLineHorz(C, X+1, Y+H, X+W-1, true);
       end;
   end;
 end;
