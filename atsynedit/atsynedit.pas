@@ -715,7 +715,8 @@ type
     FFoldingAsStringTodo: string;
 
     //these options are implemented in CudaText, they are dummy here
-    FOptAutoCloseBrackets: string;
+    FOptAutoPairForMultiCarets: boolean;
+    FOptAutoPairChars: string;
     FOptAutocompleteAutoshowCharCount: integer;
     FOptAutocompleteTriggerChars: string;
     FOptAutocompleteCommitChars: string;
@@ -1603,7 +1604,8 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
-    property OptAutoCloseBrackets: string read FOptAutoCloseBrackets write FOptAutoCloseBrackets stored false;
+    property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default false;
+    property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
     property OptAutocompleteTriggerChars: string read FOptAutocompleteTriggerChars write FOptAutocompleteTriggerChars stored false;
     property OptAutocompleteCommitChars: string read FOptAutocompleteCommitChars write FOptAutocompleteCommitChars stored false;
@@ -4136,7 +4138,8 @@ begin
   FOptScrollAnimationSleep:= cInitScrollAnimationSleep;
   FOptIdleInterval:= cInitIdleInterval;
 
-  FOptAutoCloseBrackets:= '([{';
+  FOptAutoPairForMultiCarets:= false;
+  FOptAutoPairChars:= '([{';
   FOptAutocompleteAutoshowCharCount:= 0;
   FOptAutocompleteTriggerChars:= '';
   FOptAutocompleteCommitChars:= ' ,;/\''"';
