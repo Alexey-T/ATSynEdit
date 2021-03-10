@@ -531,7 +531,7 @@ procedure CanvasChar(C: TCanvas; AColorFont, AColorBg: TColor; ch: char; X, Y, W
 begin
   C.Pen.Color:= AColorFont;
   C.Brush.Color:= AColorBg;
-  C.FillRect(X, Y, X+W, Y+H);
+  C.FillRect(X-1, Y-1, X+W+2, Y+H+2);
 
   case ch of
     'L':
