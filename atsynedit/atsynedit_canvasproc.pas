@@ -70,7 +70,7 @@ type
     constref AExtent: TATIntFixedArray) of object;
 
 type
-  TATLineEndsText = (
+  TATLineEndsSymbols = (
     cEndingTextNone,
     cEndingTextLF,
     cEndingTextCRLF,
@@ -79,7 +79,7 @@ type
     );
 
 const
-  cLineEndsToText: array[TATLineEnds] of TATLineEndsText = (
+  cLineEndsToSymbols: array[TATLineEnds] of TATLineEndsSymbols = (
     cEndingTextNone,
     cEndingTextCRLF,
     cEndingTextLF,
@@ -151,8 +151,8 @@ procedure CanvasTextOutMinimap(
   AUsePixels: boolean
   );
 
-procedure DoPaintUnprintedEolText(C: TCanvas;
-  AText: TATLineEndsText;
+procedure DoPaintUnprintedSymbols(C: TCanvas;
+  ASymbols: TATLineEndsSymbols;
   AX, AY: integer;
   ACharSize: TPoint;
   AColorFont, AColorBG: TColor);
@@ -579,13 +579,13 @@ begin
   end;
 end;
 
-procedure DoPaintUnprintedEolText(C: TCanvas;
-  AText: TATLineEndsText;
+procedure DoPaintUnprintedSymbols(C: TCanvas;
+  ASymbols: TATLineEndsSymbols;
   AX, AY: integer;
   ACharSize: TPoint;
   AColorFont, AColorBG: TColor);
 const
-  cText: array[TATLineEndsText] of string[4] = ('', 'LF', 'CRLF', 'CR', 'EOF');
+  cText: array[TATLineEndsSymbols] of string[4] = ('', 'LF', 'CRLF', 'CR', 'EOF');
 var
   SText: string[4];
   X, Y, W, H: integer;
@@ -597,7 +597,7 @@ begin
   X:= AX + 2;
   Y:= AY + ACharSize.Y div 2 - H div 2;
 
-  SText:= cText[AText];
+  SText:= cText[ASymbols];
   for i:= 1 to Length(SText) do
   begin
     CanvasChar(C, AColorFont, AColorBG, SText[i], X, Y, W, H);

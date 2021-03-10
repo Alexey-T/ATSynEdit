@@ -2981,7 +2981,7 @@ begin
       if NWrapIndex>=0 then
         if OptUnprintedVisible and OptUnprintedEof then
           if OptUnprintedEndsDetails then
-            DoPaintUnprintedEolText(C,
+            DoPaintUnprintedSymbols(C,
               cEndingTextEOF,
               ARect.Left,
               RectLine.Top,
@@ -3387,8 +3387,8 @@ begin
     if FUnprintedVisible and FUnprintedEnds then
     begin
       if OptUnprintedEndsDetails then
-        DoPaintUnprintedEolText(C,
-          cLineEndsToText[Strings.LinesEnds[WrapItem.NLineIndex]],
+        DoPaintUnprintedSymbols(C,
+          cLineEndsToSymbols[Strings.LinesEnds[WrapItem.NLineIndex]],
           CoordAfterText.X,
           CoordAfterText.Y,
           ACharSize,
