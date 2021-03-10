@@ -31,7 +31,7 @@ var
   OptUnprintedEofCharLength: integer = 1;
   OptUnprintedSpaceDotScale: integer = 15;
   OptUnprintedEndDotScale: integer = 30;
-  OptUnprintedEndFontScale: integer = 80;
+  OptUnprintedEndFontScale: integer = 40;
   OptUnprintedEndArrowOrDot: boolean = true;
   OptUnprintedEndArrowLength: integer = 70;
   OptUnprintedWrapArrowLength: integer = 40;
@@ -591,7 +591,7 @@ var
   X, Y, W, H: integer;
   i: integer;
 begin
-  H:= ACharSize.Y * OptUnprintedEndFontScale div 100 * 6 div 10;
+  H:= ACharSize.Y * OptUnprintedEndFontScale div 100;
   W:= H div 2;
 
   X:= AX + 2;
