@@ -557,8 +557,8 @@ begin
     'R':
       begin
         CanvasLineVert(C, X, Y, Y+H, true);
-        CanvasLineVert(C, X+W, Y, Y+H div 2, true);
-        CanvasLineHorz(C, X, Y, X+W, true);
+        CanvasLineVert(C, X+W, Y+1, Y+H div 2-1, true);
+        CanvasLineHorz(C, X, Y, X+W-1, true);
         CanvasLineHorz(C, X, Y+H div 2, X+W-1, true);
         CanvasLine(C, Point(X+W div 2, Y+H div 2), Point(X+W+1, Y+H+1), AColorFont);
       end;
