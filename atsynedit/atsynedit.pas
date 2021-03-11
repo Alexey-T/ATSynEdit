@@ -286,6 +286,7 @@ type
 const
   cUsePaintStatic = true;
   cMaxIndentVert = 100;
+  cInitAutoPairForMultiCarets = true;
   cInitInputNumberAllowNegative = true;
   cInitMaskChar = '*';
   cInitScrollAnimationSteps = 4;
@@ -1604,7 +1605,7 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
-    property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default false;
+    property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
     property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
     property OptAutocompleteTriggerChars: string read FOptAutocompleteTriggerChars write FOptAutocompleteTriggerChars stored false;
@@ -4140,7 +4141,7 @@ begin
   FOptScrollAnimationSleep:= cInitScrollAnimationSleep;
   FOptIdleInterval:= cInitIdleInterval;
 
-  FOptAutoPairForMultiCarets:= false;
+  FOptAutoPairForMultiCarets:= cInitAutoPairForMultiCarets;
   FOptAutoPairChars:= '([{';
   FOptAutocompleteAutoshowCharCount:= 0;
   FOptAutocompleteTriggerChars:= '';
