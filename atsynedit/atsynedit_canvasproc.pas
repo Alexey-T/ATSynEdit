@@ -546,7 +546,7 @@ begin
       begin
         CanvasLineVert(C, X, Y, Y+H, true);
         CanvasLineHorz(C, X, Y, X+W, true);
-        CanvasLineHorz(C, X, Y+H div 2, X+W-1, true);
+        CanvasLineHorz(C, X, Y+H div 2, X+W*3 div 4, true);
       end;
     'C':
       begin
@@ -566,7 +566,7 @@ begin
       begin
         CanvasLineVert(C, X, Y, Y+H, true);
         CanvasLineHorz(C, X, Y, X+W, true);
-        CanvasLineHorz(C, X, Y+H div 2, X+W-1, true);
+        CanvasLineHorz(C, X, Y+H div 2, X+W*3 div 4, true);
         CanvasLineHorz(C, X, Y+H, X+W, true);
       end;
     'O':
