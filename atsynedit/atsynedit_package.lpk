@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="5">
+  <Package Version="4">
     <PathDelim Value="\"/>
     <Name Value="atsynedit_package"/>
     <Type Value="RunAndDesignTime"/>
@@ -9,29 +9,8 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value=".;..\proc_lexer;..\..\..\..\cmp\mORMot"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
-      <Conditionals Value="if defined(FULLSPEED) then begin
-undefine(DEBUG);
-CustomOptions:=CustomOptions+&apos; -dTRICK -O3 -g -gl &apos;;
-end
-else begin
-CustomOptions:=CustomOptions+&apos; -O1 -g -gl &apos;;
-end;
-if defined(UseLogger) then begin
-CustomOptions:=CustomOptions+&apos; -dDEBUGLOG &apos;;
-end;
-
-// example for adding linker options on Mac OS X
-//if TargetOS=&apos;darwin&apos; then
-//  LinkerOptions := &apos; -framework OpenGL&apos;;
-
-// example for adding a unit and include path on Windows
-//if SrcOS=&apos;win&apos; then begin
-//  UnitPath += &apos;;win&apos;;
-//  IncPath += &apos;;win&apos;;
-//end;"/>
       <Parsing>
         <SyntaxOptions>
           <IncludeAssertionCode Value="True"/>
@@ -39,15 +18,17 @@ end;
       </Parsing>
       <CodeGeneration>
         <SmartLinkUnit Value="True"/>
-        <Optimizations>
-          <OptimizationLevel Value="0"/>
-        </Optimizations>
+        <Checks>
+          <RangeChecks Value="True"/>
+          <OverflowChecks Value="True"/>
+        </Checks>
       </CodeGeneration>
-      <Other>
-        <CustomOptions Value="-Sa
--dFGLINLINE
--ddebug_show_fps__"/>
-      </Other>
+      <Linking>
+        <Debugging>
+          <DebugInfoType Value="dsDwarf2Set"/>
+          <UseExternalDbgSyms Value="True"/>
+        </Debugging>
+      </Linking>
     </CompilerOptions>
     <Description Value="Multi-line editor control, used in CudaText editor. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
@@ -211,7 +192,6 @@ end;
         <UnitName Value="ATStringProc_UTF8Decode"/>
       </Item39>
     </Files>
-    <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="5">
       <Item1>
         <PackageName Value="BGRABitmapPack"/>
