@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="4">
+  <Package Version="5">
     <PathDelim Value="\"/>
     <Name Value="atsynedit_package"/>
     <Type Value="RunAndDesignTime"/>
@@ -18,10 +18,6 @@
       </Parsing>
       <CodeGeneration>
         <SmartLinkUnit Value="True"/>
-        <Checks>
-          <RangeChecks Value="True"/>
-          <OverflowChecks Value="True"/>
-        </Checks>
       </CodeGeneration>
       <Linking>
         <Debugging>
@@ -192,6 +188,7 @@
         <UnitName Value="ATStringProc_UTF8Decode"/>
       </Item39>
     </Files>
+    <CompatibilityMode Value="True"/>
     <RequiredPkgs Count="5">
       <Item1>
         <PackageName Value="BGRABitmapPack"/>
