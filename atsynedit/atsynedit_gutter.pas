@@ -15,6 +15,7 @@ uses
 type
   TATGutterItem = class
     Visible: boolean;
+    VisibleModified: boolean;
     Size: integer;
     Left, Right: integer;
     Scaled: boolean;
