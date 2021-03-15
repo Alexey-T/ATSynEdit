@@ -1281,6 +1281,8 @@ type
     ModifiedGutterNumbersVisible: boolean;
     ModifiedGutterFoldingVisible: boolean;
     ModifiedGutterBookmarksVisible: boolean;
+    ModifiedUnprintedVisible: boolean;
+    ModifiedWrapMode: boolean;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
