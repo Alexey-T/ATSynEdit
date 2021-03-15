@@ -1275,6 +1275,7 @@ type
     TagString: string; //to store plugin specific data in CudaText
     InitialOptions: TATEditorTempOptions;
 
+    ModifiedWrapMode: boolean;
     ModifiedMinimapVisible: boolean;
     ModifiedMicromapVisible: boolean;
     ModifiedRulerVisible: boolean;
@@ -1282,7 +1283,10 @@ type
     ModifiedGutterFoldingVisible: boolean;
     ModifiedGutterBookmarksVisible: boolean;
     ModifiedUnprintedVisible: boolean;
-    ModifiedWrapMode: boolean;
+    ModifiedUnprintedSpaces: boolean;
+    ModifiedUnprintedTrailingOnly: boolean;
+    ModifiedUnprintedEnds: boolean;
+    ModifiedUnprintedEndDetails: boolean;
 
     //overrides
     constructor Create(AOwner: TComponent); override;
