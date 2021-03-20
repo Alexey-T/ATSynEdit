@@ -1,5 +1,3 @@
-{.$define use_cache} //use FAdapterCache, ie caching of colored lines
-
 {.$define debug_findwrapindex}
 
 {$define fix_horzscroll} //workaround for gtk2 widgetset unstable: it freezes app

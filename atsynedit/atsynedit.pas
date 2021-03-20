@@ -494,7 +494,6 @@ type
     FStringsExternal: TATStrings;
     FTabHelper: TATStringTabHelper;
     FAdapterHilite: TATAdapterHilite;
-    FAdapterCache: TATAdapterHiliteCache;
     FAdapterIME: TATAdapterIME;
     FFold: TATSynRanges;
     FFoldImageList: TImageList;
@@ -1138,7 +1137,6 @@ type
     procedure UpdateScrollbarVert;
     procedure UpdateScrollbarHorz;
     procedure UpdateSelRectFromPoints(const P1, P2: TPoint);
-    procedure UpdateAdapterCacheSize;
     procedure UpdateInitialVars(C: TCanvas);
     procedure UpdateLinksAttribs;
     function UpdateLinksRegexObject: boolean;
@@ -1297,8 +1295,6 @@ type
     property ClientHeight: integer read FClientH;
     //updates
     procedure Invalidate; override;
-    procedure InvalidateHilitingCache;
-    procedure InvalidateHilitingCache(ALineIndex: integer);
     procedure Update(AUpdateWrapInfo: boolean=false); reintroduce;
     procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
@@ -2140,8 +2136,6 @@ begin
   FWrapUpdateNeeded:= false;
   FWrapInfo.VisibleColumns:= NNewVisibleColumns;
 
-  InvalidateHilitingCache;
-
   case FWrapMode of
     cWrapOff:
       FWrapInfo.WrapColumn:= 0;
@@ -2757,7 +2751,6 @@ begin
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
 
-  UpdateAdapterCacheSize;
   UpdateWrapInfo; //update WrapInfo before MinimapThread start
 
   if FMinimapVisible then
@@ -4060,7 +4053,6 @@ begin
   FMarkedRange:= nil;
   FDimRanges:= nil;
   FHotspots:= nil;
-  FAdapterCache:= TATAdapterHiliteCache.Create;
   FLinkCache:= TATLinkCache.Create;
 
   FMinimapBmp:= TBGRABitmap.Create;
@@ -4473,7 +4465,6 @@ begin
   FreeAndNil(FBitmap);
   FreeAndNil(FColors);
   FreeAndNil(FLinkCache);
-  FreeAndNil(FAdapterCache);
   FreeAndNil(FFontItalic);
   FreeAndNil(FFontBold);
   FreeAndNil(FFontBoldItalic);
@@ -4795,20 +4786,6 @@ begin
     cPageSizeHalf:
       Result:= GetVisibleLines div 2;
   end;
-end;
-
-procedure TATSynEdit.UpdateAdapterCacheSize;
-var
-  N: integer;
-begin
-  {
-  //let's not use cache for minimap
-  if FMinimapVisible then
-    N:= Max(GetVisibleLines, GetVisibleLinesMinimap)+1
-  else
-  }
-    N:= GetVisibleLines+1;
-  FAdapterCache.MaxSize:= N;
 end;
 
 procedure TATSynEdit.DoPaintAll(C: TCanvas; ALineFrom: integer);
@@ -6186,17 +6163,6 @@ begin
   inherited;
 end;
 
-procedure TATSynEdit.InvalidateHilitingCache;
-begin
-  FAdapterCache.Clear;
-end;
-
-procedure TATSynEdit.InvalidateHilitingCache(ALineIndex: integer);
-begin
-  if Assigned(FAdapterCache) then
-    FAdapterCache.DeleteForLine(ALineIndex);
-end;
-
 function TATSynEdit._IsFocused: boolean;
 //this method is to speedup focused check (TControl.Focused prop is slower)
 var
@@ -6681,7 +6647,6 @@ begin
 
   if Assigned(FAdapterHilite) then
   begin
-    InvalidateHilitingCache;
     FAdapterHilite.OnEditorChange(Self);
   end;
 
@@ -7721,7 +7686,6 @@ begin
     FMarkedRange.Add(0, ALine1);
     FMarkedRange.Add(0, ALine2);
   end;
-  InvalidateHilitingCache;
 end;
 
 procedure TATSynEdit.DoGetMarkedLines(out ALine1, ALine2: integer);

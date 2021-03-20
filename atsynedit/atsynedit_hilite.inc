@@ -34,9 +34,6 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
-  {$ifdef use_cache}
-  bFound: boolean;
-  {$endif}
 begin
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
@@ -51,21 +48,7 @@ begin
   if bEnableHilite then
   if Assigned(FAdapterHilite) then
   begin
-    {$ifdef use_cache}
-    //DynamicHilite must disable cache
-    FAdapterCache.Enabled:= not FAdapterHilite.DynamicHiliteActiveNow(Strings.Count);
-    bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, AParts, AColorAfter);
-    if not bFound then
-    begin
-      FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
-      FAdapterCache.Add(nLineIndex, nCharIndex, AParts, AColorAfter);
-      {
-      Inc(FCacheMiss);
-      }
-    end;
-    {$else}
     FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
-    {$endif}
   end;
 
   //2) get hilites from OnCalcHilite

@@ -15,7 +15,6 @@ begin
   Data.Tag:= ATag;
   ABookmarksObj.Add(Data);
 
-  InvalidateHilitingCache(ALine);
   Update;
 end;
 
@@ -73,7 +72,6 @@ begin
     Strings.Bookmarks.Add(Data);
   end;
 
-  InvalidateHilitingCache(ALine);
   Update;
 end;
 
@@ -83,7 +81,6 @@ begin
   if not Strings.IsIndexValid(ALine) then exit;
   ABookmarksObj.DeleteForLine(ALine);
 
-  InvalidateHilitingCache(ALine);
   Update;
 end;
 
@@ -103,7 +100,6 @@ begin
   Result:= ABookmarksObj.DeleteByTag(ATag);
   if Result then
   begin
-    InvalidateHilitingCache;
     Update;
   end;
 end;
@@ -141,7 +137,6 @@ begin
     end;
   end;
 
-  InvalidateHilitingCache;
   Update;
 end;
 
@@ -149,7 +144,6 @@ procedure TATSynEdit.BookmarkDeleteAll;
 begin
   Strings.Bookmarks.Clear;
 
-  InvalidateHilitingCache;
   Update;
 end;
 
@@ -157,7 +151,6 @@ procedure TATSynEdit.BookmarkDeleteAll_2;
 begin
   Strings.Bookmarks2.Clear;
 
-  InvalidateHilitingCache;
   Update;
 end;
 
