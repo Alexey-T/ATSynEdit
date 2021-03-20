@@ -38,7 +38,8 @@ type
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
-      var AColorAfterEol: TColor); virtual;
+      var AColorAfterEol: TColor;
+      AMainText: boolean); virtual;
     //called to calculate hilite of entire line.
     //ACharIndex is starting offset in this line, >0 if editor scrolled horizontally.
     //ALineLen is len of line part, starting from ACharIndex.
@@ -166,7 +167,8 @@ end;
 
 procedure TATAdapterHilite.OnEditorCalcHilite(Sender: TObject;
   var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer;
-  var AColorAfterEol: TColor);
+  var AColorAfterEol: TColor;
+  AMainText: boolean);
 begin
   //
 end;

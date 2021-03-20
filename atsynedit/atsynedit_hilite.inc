@@ -48,7 +48,12 @@ begin
   if bEnableHilite then
   if Assigned(FAdapterHilite) then
   begin
-    FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
+    FAdapterHilite.OnEditorCalcHilite(Self, AParts,
+      nLineIndex,
+      nCharIndex,
+      nLineLen,
+      AColorAfter,
+      AMainText);
   end;
 
   //2) get hilites from OnCalcHilite
