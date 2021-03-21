@@ -1729,7 +1729,10 @@ begin
   if Item=nil then Exit;
   AAction:= Item.ItemAction;
   AIndex:= Item.ItemIndex;
-  if not IsIndexValid(AIndex) then exit;
+
+  //AIndex=Count is allowed, CudaText issue #3258
+  if (AIndex<0) or (AIndex>Count) then exit;
+
   AText:= Item.ItemText;
   AEnd:= Item.ItemEnd;
   ALineState:= Item.ItemLineState;
