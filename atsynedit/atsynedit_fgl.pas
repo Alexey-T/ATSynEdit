@@ -968,11 +968,11 @@ end;
 
 class function TFPGList.ItemIsManaged: Boolean;
 begin
-  {$ifndef ver3_0}
-  Result := IsManagedType(T);
-  {$else}
-  Result := true;
-  {$endif}
+{$IFNDEF VER3_0}
+  Result:=IsManagedType(T);
+{$ELSE}
+  Result:=True; // Fallback to old behaviour  
+{$ENDIF}
 end;
 
 function TFPGList.GetEnumerator: TFPGListEnumeratorSpec;
