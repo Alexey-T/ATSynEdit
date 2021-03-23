@@ -8579,11 +8579,13 @@ begin
   if not AGroupMark then exit;
   if FOptUndoPause<=0 then exit;
 
+  { //gives no effect
   if FOptUndoPauseHighlightLine then
   begin
     OldOption:= OptShowCurLine;
     OptShowCurLine:= true;
   end;
+  }
 
   DoShowPos(
     Point(0, ALine),
@@ -8594,8 +8596,10 @@ begin
   Paint;
   Sleep(FOptUndoPause);
 
+  {
   if FOptUndoPauseHighlightLine then
     OptShowCurLine:= OldOption;
+    }
 end;
 
 procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; ALine: integer; AGroupMark: boolean);
