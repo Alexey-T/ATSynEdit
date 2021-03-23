@@ -15,6 +15,7 @@ uses
   ATSynEdit_Carets,
   ATSynEdit_Bookmarks,
   ATSynEdit_Gaps,
+  ATSynEdit_CanvasProc,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
   //ATSynEdit_Hotspots,
@@ -300,6 +301,10 @@ begin
   ed:= TATSynEdit.Create(Self);
   ed.Parent:= PanelMain;
   ed.Align:= alClient;
+
+  {$ifdef LCLQt5}
+  OptCanvasTextoutNeedsOffsets:= true;
+  {$endif}
 
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
