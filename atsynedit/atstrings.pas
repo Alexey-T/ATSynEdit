@@ -212,6 +212,8 @@ type
     FOnProgress: TNotifyEvent;
     FOnLog: TATStringsLogEvent;
     FOnChange: TATStringsChangeEvent;
+    FOnUndoBefore: TATStringsLogEvent;
+    FOnUndoAfter: TATStringsLogEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
     FSavedCaretsArray: TATPointArray;
     FChangeBlockActive: boolean;
@@ -426,6 +428,8 @@ type
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
     property OnChange: TATStringsChangeEvent read FOnChange write FOnChange;
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
+    property OnUndoBefore: TATStringsLogEvent read FOnUndoBefore write FOnUndoBefore;
+    property OnUndoAfter: TATStringsLogEvent read FOnUndoAfter write FOnUndoAfter;
   end;
 
 type
@@ -1760,6 +1764,9 @@ begin
   ACurList.DeleteLast;
   ACurList.Locked:= true;
 
+  if Assigned(FOnUndoBefore) then
+    FOnUndoBefore(Self, AIndex);
+
   try
     case AAction of
       aeaChange:
@@ -1813,6 +1820,9 @@ begin
 
     SetCaretsArray(ACarets);
     SetMarkersArray(AMarkers);
+
+    if Assigned(FOnUndoAfter) then
+      FOnUndoAfter(Self, AIndex);
 
     ActionDeleteDupFakeLines;
   finally
