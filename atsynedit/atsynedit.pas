@@ -296,6 +296,7 @@ const
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
   cInitUndoPause = 400;
+  cInitUndoPauseHighlightLine = true;
   cInitMicromapShowForMinCount = 2;
   cInitScrollbarHorzAddSpace = 2;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
@@ -752,6 +753,7 @@ type
     FOptUndoIndentVert: integer;
     FOptUndoIndentHorz: integer;
     FOptUndoPause: integer;
+    FOptUndoPauseHighlightLine: boolean;
     FOptScrollbarsNew: boolean;
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
@@ -1819,6 +1821,7 @@ type
     property OptUndoIndentVert: integer read FOptUndoIndentVert write FOptUndoIndentVert default cInitUndoIndentVert;
     property OptUndoIndentHorz: integer read FOptUndoIndentHorz write FOptUndoIndentHorz default cInitUndoIndentHorz;
     property OptUndoPause: integer read FOptUndoPause write FOptUndoPause default cInitUndoPause;
+    property OptUndoPauseHighlightLine: boolean read FOptUndoPauseHighlightLine write FOptUndoPauseHighlightLine default cInitUndoPauseHighlightLine;
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
@@ -4109,6 +4112,7 @@ begin
   FOptUndoMaxCarets:= cInitUndoMaxCarets;
   FOptUndoGrouped:= true;
   FOptUndoPause:= cInitUndoPause;
+  FOptUndoPauseHighlightLine:= cInitUndoPauseHighlightLine;
 
   FStringsExternal:= nil;
   FStringsInt:= TATStrings.Create(FOptUndoLimit);
@@ -8575,8 +8579,12 @@ begin
   if not AGroupMark then exit;
   if FOptUndoPause<=0 then exit;
 
-  OldOption:= OptShowCurLine;
-  OptShowCurLine:= true;
+  if FOptUndoPauseHighlightLine then
+  begin
+    OldOption:= OptShowCurLine;
+    OptShowCurLine:= true;
+  end;
+
   DoShowPos(
     Point(0, ALine),
     FOptUndoIndentHorz,
@@ -8585,7 +8593,9 @@ begin
     true{Update});
   Paint;
   Sleep(FOptUndoPause);
-  OptShowCurLine:= OldOption;
+
+  if FOptUndoPauseHighlightLine then
+    OptShowCurLine:= OldOption;
 end;
 
 procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; ALine: integer; AGroupMark: boolean);
@@ -8595,12 +8605,18 @@ begin
   if not AGroupMark then exit;
   if FOptUndoPause<=0 then exit;
 
-  OldOption:= OptShowCurLine;
-  OptShowCurLine:= true;
+  if FOptUndoPauseHighlightLine then
+  begin
+    OldOption:= OptShowCurLine;
+    OptShowCurLine:= true;
+  end;
+
   Update(true);
   Paint;
   Sleep(FOptUndoPause);
-  OptShowCurLine:= OldOption;
+
+  if FOptUndoPauseHighlightLine then
+    OptShowCurLine:= OldOption;
 end;
 
 
