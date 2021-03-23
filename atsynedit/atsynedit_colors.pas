@@ -138,7 +138,7 @@ begin
   C.GutterFoldLine2:= $904040;
   C.GutterFoldBG:= $c8c8c8;
   C.GutterSeparatorBG:= clBlack;
-  C.CurrentLineBG:= $e0f0f0;
+  C.CurrentLineBG:= $d0f0d0;
   C.BookmarkBG:= clMoneyGreen;
   C.RulerBG:= C.GutterBG;
   C.RulerFont:= clGray;

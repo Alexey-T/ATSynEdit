@@ -896,6 +896,7 @@ type
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
     function IsCaretOnVisibleRect: boolean;
+    procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
     procedure SetFoldingAsString(const AValue: string);
     procedure SetOptShowURLsRegex(const AValue: string);
     procedure SetShowOsBarVert(AValue: boolean);
@@ -8572,21 +8573,25 @@ begin
   end;
 end;
 
+procedure TATSynEdit.UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
+begin
+  Update(AUpdateWrapInfo);
+  Paint;
+  Application.ProcessMessages;
+  Sleep(APause);
+end;
+
 procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; ALine: integer);
-{
 var
   OldOption: boolean;
-  }
 begin
   if FOptUndoPause<=0 then exit;
 
-  { //gives no effect
   if FOptUndoPauseHighlightLine then
   begin
     OldOption:= OptShowCurLine;
     OptShowCurLine:= true;
   end;
-  }
 
   DoShowPos(
     Point(0, ALine),
@@ -8594,13 +8599,11 @@ begin
     FOptUndoIndentVert,
     true{Unfold},
     true{Update});
-  Paint;
-  Sleep(FOptUndoPause);
 
-  {
+  UpdateAndWait(true, FOptUndoPause);
+
   if FOptUndoPauseHighlightLine then
     OptShowCurLine:= OldOption;
-    }
 end;
 
 procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; ALine: integer);
@@ -8615,9 +8618,7 @@ begin
     OptShowCurLine:= true;
   end;
 
-  Update(true);
-  Paint;
-  Sleep(FOptUndoPause);
+  UpdateAndWait(true, FOptUndoPause);
 
   if FOptUndoPauseHighlightLine then
     OptShowCurLine:= OldOption;
