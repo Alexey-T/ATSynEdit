@@ -173,7 +173,7 @@ type
   TATStringsChangeEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
-  TATStringsUndoEvent = procedure(Sender: TObject; ALine: integer; AGroupMark: boolean) of object;
+  TATStringsUndoEvent = procedure(Sender: TObject; ALine: integer) of object;
 
 type
   { TATStrings }
@@ -1723,6 +1723,7 @@ var
   AMarkers: TATInt64Array;
   NCount: integer;
   OtherList: TATUndoList;
+  bEnableUndoEvent: boolean;
 begin
   ASoftMarked:= true;
   AHardMarked:= false;
@@ -1766,8 +1767,19 @@ begin
   ACurList.DeleteLast;
   ACurList.Locked:= true;
 
-  if Assigned(FOnUndoBefore) then
-    FOnUndoBefore(Self, AIndex, ASoftMarked);
+  case AAction of
+    aeaChange,
+    aeaDelete,
+    aeaInsert,
+    aeaCaretJump:
+      bEnableUndoEvent:= ASoftMarked or AHardMarked;
+    else
+      bEnableUndoEvent:= false;
+  end;
+
+  if bEnableUndoEvent then
+    if Assigned(FOnUndoBefore) then
+      FOnUndoBefore(Self, AIndex);
 
   try
     case AAction of
@@ -1823,8 +1835,9 @@ begin
     SetCaretsArray(ACarets);
     SetMarkersArray(AMarkers);
 
-    if Assigned(FOnUndoAfter) then
-      FOnUndoAfter(Self, AIndex, ASoftMarked);
+    if bEnableUndoEvent then
+      if Assigned(FOnUndoAfter) then
+        FOnUndoAfter(Self, AIndex);
 
     ActionDeleteDupFakeLines;
   finally

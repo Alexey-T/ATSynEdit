@@ -932,8 +932,8 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure DoStringsOnProgress(Sender: TObject);
-    procedure DoStringsOnUndoAfter(Sender: TObject; ALine: integer; AGroupMark: boolean);
-    procedure DoStringsOnUndoBefore(Sender: TObject; ALine: integer; AGroupMark: boolean);
+    procedure DoStringsOnUndoAfter(Sender: TObject; ALine: integer);
+    procedure DoStringsOnUndoBefore(Sender: TObject; ALine: integer);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
@@ -8572,11 +8572,12 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; ALine: integer; AGroupMark: boolean);
+procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; ALine: integer);
+{
 var
   OldOption: boolean;
+  }
 begin
-  if not AGroupMark then exit;
   if FOptUndoPause<=0 then exit;
 
   { //gives no effect
@@ -8602,11 +8603,10 @@ begin
     }
 end;
 
-procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; ALine: integer; AGroupMark: boolean);
+procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; ALine: integer);
 var
   OldOption: boolean;
 begin
-  if not AGroupMark then exit;
   if FOptUndoPause<=0 then exit;
 
   if FOptUndoPauseHighlightLine then
