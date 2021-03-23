@@ -173,6 +173,8 @@ type
   TATStringsChangeEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
+  TATStringsUndoEvent = procedure(Sender: TObject; ALine: integer; AGroupMark: boolean) of object;
+
 type
   { TATStrings }
 
@@ -212,8 +214,8 @@ type
     FOnProgress: TNotifyEvent;
     FOnLog: TATStringsLogEvent;
     FOnChange: TATStringsChangeEvent;
-    FOnUndoBefore: TATStringsLogEvent;
-    FOnUndoAfter: TATStringsLogEvent;
+    FOnUndoBefore: TATStringsUndoEvent;
+    FOnUndoAfter: TATStringsUndoEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
     FSavedCaretsArray: TATPointArray;
     FChangeBlockActive: boolean;
@@ -428,8 +430,8 @@ type
     property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
     property OnChange: TATStringsChangeEvent read FOnChange write FOnChange;
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
-    property OnUndoBefore: TATStringsLogEvent read FOnUndoBefore write FOnUndoBefore;
-    property OnUndoAfter: TATStringsLogEvent read FOnUndoAfter write FOnUndoAfter;
+    property OnUndoBefore: TATStringsUndoEvent read FOnUndoBefore write FOnUndoBefore;
+    property OnUndoAfter: TATStringsUndoEvent read FOnUndoAfter write FOnUndoAfter;
   end;
 
 type
@@ -1765,7 +1767,7 @@ begin
   ACurList.Locked:= true;
 
   if Assigned(FOnUndoBefore) then
-    FOnUndoBefore(Self, AIndex);
+    FOnUndoBefore(Self, AIndex, ASoftMarked);
 
   try
     case AAction of
@@ -1822,7 +1824,7 @@ begin
     SetMarkersArray(AMarkers);
 
     if Assigned(FOnUndoAfter) then
-      FOnUndoAfter(Self, AIndex);
+      FOnUndoAfter(Self, AIndex, ASoftMarked);
 
     ActionDeleteDupFakeLines;
   finally

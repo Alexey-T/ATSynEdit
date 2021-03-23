@@ -295,6 +295,7 @@ const
   cInitUndoMaxCarets = cInitUndoLimit;
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
+  cInitUndoPause = 400;
   cInitMicromapShowForMinCount = 2;
   cInitScrollbarHorzAddSpace = 2;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
@@ -746,8 +747,11 @@ type
     FOptScrollIndentCaretHorz: integer; //offsets for caret-moving: if caret goes out of control
     FOptScrollIndentCaretVert: integer; //must be 0, >0 gives jumps on move-down
     FOptUndoLimit: integer;
+    FOptUndoGrouped: boolean;
+    FOptUndoMaxCarets: integer;
     FOptUndoIndentVert: integer;
     FOptUndoIndentHorz: integer;
+    FOptUndoPause: integer;
     FOptScrollbarsNew: boolean;
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
@@ -782,8 +786,6 @@ type
     FOptSavingForceFinalEol: boolean;
     FOptSavingTrimSpaces: boolean;
     FOptSavingTrimFinalEmptyLines: boolean;
-    FOptUndoGrouped: boolean;
-    FOptUndoMaxCarets: integer;
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
     FOptIndentMakesWholeLinesSelection: boolean;
@@ -928,6 +930,8 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure DoStringsOnProgress(Sender: TObject);
+    procedure DoStringsOnUndoAfter(Sender: TObject; ALine: integer; AGroupMark: boolean);
+    procedure DoStringsOnUndoBefore(Sender: TObject; ALine: integer; AGroupMark: boolean);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
@@ -1665,8 +1669,6 @@ type
     property OptScrollSmooth: boolean read FOptScrollSmooth write FOptScrollSmooth default true;
     property OptScrollIndentCaretHorz: integer read FOptScrollIndentCaretHorz write FOptScrollIndentCaretHorz default 10;
     property OptScrollIndentCaretVert: integer read FOptScrollIndentCaretVert write FOptScrollIndentCaretVert default 0;
-    property OptUndoIndentVert: integer read FOptUndoIndentVert write FOptUndoIndentVert default cInitUndoIndentVert;
-    property OptUndoIndentHorz: integer read FOptUndoIndentHorz write FOptUndoIndentHorz default cInitUndoIndentHorz;
     property OptScrollbarsNew: boolean read FOptScrollbarsNew write FOptScrollbarsNew default false;
     property OptScrollbarHorizontalAddSpace: integer read FOptScrollbarHorizontalAddSpace write FOptScrollbarHorizontalAddSpace default cInitScrollbarHorzAddSpace;
     property OptScrollLineCommandsKeepCaretOnScreen: boolean read FOptScrollLineCommandsKeepCaretOnScreen write FOptScrollLineCommandsKeepCaretOnScreen default true;
@@ -1814,6 +1816,9 @@ type
     property OptUndoGrouped: boolean read FOptUndoGrouped write FOptUndoGrouped default true;
     property OptUndoAfterSave: boolean read GetUndoAfterSave write SetUndoAfterSave default true;
     property OptUndoMaxCarets: integer read FOptUndoMaxCarets write FOptUndoMaxCarets default cInitUndoMaxCarets;
+    property OptUndoIndentVert: integer read FOptUndoIndentVert write FOptUndoIndentVert default cInitUndoIndentVert;
+    property OptUndoIndentHorz: integer read FOptUndoIndentHorz write FOptUndoIndentHorz default cInitUndoIndentHorz;
+    property OptUndoPause: integer read FOptUndoPause write FOptUndoPause default cInitUndoPause;
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
@@ -4099,6 +4104,12 @@ begin
   FBitmap.SetSize(cInitBitmapWidth, cInitBitmapHeight);
 
   FOptUndoLimit:= cInitUndoLimit;
+  FOptUndoIndentVert:= cInitUndoIndentVert;
+  FOptUndoIndentHorz:= cInitUndoIndentHorz;
+  FOptUndoMaxCarets:= cInitUndoMaxCarets;
+  FOptUndoGrouped:= true;
+  FOptUndoPause:= cInitUndoPause;
+
   FStringsExternal:= nil;
   FStringsInt:= TATStrings.Create(FOptUndoLimit);
   FStringsInt.OnGetCaretsArray:= @GetCaretsArray;
@@ -4107,6 +4118,8 @@ begin
   FStringsInt.OnSetMarkersArray:= @SetMarkersArray;
   FStringsInt.OnProgress:= @DoStringsOnProgress;
   FStringsInt.OnChange:= @DoStringsOnChange;
+  FStringsInt.OnUndoBefore:= @DoStringsOnUndoBefore;
+  FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
 
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
@@ -4246,8 +4259,7 @@ begin
   FOptScrollSmooth:= true;
   FOptScrollIndentCaretHorz:= 10;
   FOptScrollIndentCaretVert:= 0;
-  FOptUndoIndentVert:= cInitUndoIndentVert;
-  FOptUndoIndentHorz:= cInitUndoIndentHorz;
+
   FOptScrollbarsNew:= false;
   FOptScrollbarHorizontalAddSpace:= cInitScrollbarHorzAddSpace;
   FOptScrollLineCommandsKeepCaretOnScreen:= true;
@@ -4257,7 +4269,6 @@ begin
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
 
-  FOptUndoMaxCarets:= cInitUndoMaxCarets;
   FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMinLineLenToCalcURL:= cInitMinLineLenToCalcURL;
   FOptMaxLineLenToCalcURL:= cInitMaxLineLenToCalcURL;
@@ -4347,7 +4358,6 @@ begin
   FOptIndentSize:= 2;
   FOptIndentKeepsAlign:= true;
   FOptIndentMakesWholeLinesSelection:= false;
-  FOptUndoGrouped:= true;
   FOptSavingForceFinalEol:= false;
   FOptSavingTrimSpaces:= false;
   FOptShowScrollHint:= false;
@@ -8556,6 +8566,41 @@ begin
 
     Update;
   end;
+end;
+
+procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; ALine: integer; AGroupMark: boolean);
+var
+  OldOption: boolean;
+begin
+  if not AGroupMark then exit;
+  if FOptUndoPause<=0 then exit;
+
+  OldOption:= OptShowCurLine;
+  OptShowCurLine:= true;
+  DoShowPos(
+    Point(0, ALine),
+    FOptUndoIndentHorz,
+    FOptUndoIndentVert,
+    true{Unfold},
+    true{Update});
+  Paint;
+  Sleep(FOptUndoPause);
+  OptShowCurLine:= OldOption;
+end;
+
+procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; ALine: integer; AGroupMark: boolean);
+var
+  OldOption: boolean;
+begin
+  if not AGroupMark then exit;
+  if FOptUndoPause<=0 then exit;
+
+  OldOption:= OptShowCurLine;
+  OptShowCurLine:= true;
+  Update(true);
+  Paint;
+  Sleep(FOptUndoPause);
+  OptShowCurLine:= OldOption;
 end;
 
 

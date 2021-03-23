@@ -1,4 +1,8 @@
 
+2021.03.24
++ show small animation for Undo/Redo
++ prop OptPauseOnUndo
+
 2021.03.08
 + prop OptMaskChar and OptMaskCharUsed, to make password-input fields
 + prop OptInputNumberOnly
@@ -65,7 +69,7 @@
 + add: OptStapleIndentConsidersEnd (default: false)
 
 2020.06.14
-+ add: internal cache of calculated URLs, so: 
++ add: internal cache of calculated URLs, so:
    a) scrolling by Up/Down key runs URL search for 1 new line, not for all visible lines
    b) moving caret w/o scrolling don't run URL search at all
 + add: OptMinLineLenToCalcURL (default 4)
