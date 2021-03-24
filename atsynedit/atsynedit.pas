@@ -1025,10 +1025,10 @@ type
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TPoint;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  const AWrapIndex: integer; var ATempParts: TATLineParts);
+      const AWrapIndex: integer; var ATempParts: TATLineParts);
     procedure DoPaintMinimapLine(ARectLine: TRect; ACharSize: TPoint;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-  const AWrapIndex: integer; var ATempParts: TATLineParts);
+      const AWrapIndex: integer; var ATempParts: TATLineParts);
     procedure DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TPoint;
       AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
@@ -8585,8 +8585,9 @@ procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; ALine: integer);
 var
   OldOption: boolean;
 begin
-  if FOptUndoPause<=0 then exit;
   if ModeOneLine then exit;
+  if FOptUndoPause<=0 then exit;
+  if IsCaretOnVisibleRect then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
@@ -8611,8 +8612,9 @@ procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; ALine: integer);
 var
   OldOption: boolean;
 begin
-  if FOptUndoPause<=0 then exit;
   if ModeOneLine then exit;
+  if FOptUndoPause<=0 then exit;
+  if IsCaretOnVisibleRect then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
