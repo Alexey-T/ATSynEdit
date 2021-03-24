@@ -1713,14 +1713,14 @@ end;
 procedure TATStrings.DoUndoSingle(ACurList: TATUndoList;
   out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean);
 var
-  Item: TATUndoItem;
-  AAction: TATEditAction;
-  AText: atString;
-  AIndex: integer;
-  AEnd: TATLineEnds;
-  ALineState: TATLineState;
-  ACarets: TATPointArray;
-  AMarkers: TATInt64Array;
+  CurItem: TATUndoItem;
+  CurAction: TATEditAction;
+  CurText: atString;
+  CurIndex: integer;
+  CurLineEnd: TATLineEnds;
+  CurLineState: TATLineState;
+  CaretsArray: TATPointArray;
+  MarkersArray: TATInt64Array;
   NCount: integer;
   OtherList: TATUndoList;
   bEnableUndoEvent: boolean;
@@ -1732,21 +1732,21 @@ begin
   if FReadOnly then Exit;
   if ACurList=nil then Exit;
 
-  Item:= ACurList.Last;
-  if Item=nil then Exit;
-  AAction:= Item.ItemAction;
-  AIndex:= Item.ItemIndex;
+  CurItem:= ACurList.Last;
+  if CurItem=nil then Exit;
+  CurAction:= CurItem.ItemAction;
+  CurIndex:= CurItem.ItemIndex;
 
-  //AIndex=Count is allowed, CudaText issue #3258
-  if (AIndex<0) or (AIndex>Count) then exit;
+  //CurIndex=Count is allowed, CudaText issue #3258
+  if (CurIndex<0) or (CurIndex>Count) then exit;
 
-  AText:= Item.ItemText;
-  AEnd:= Item.ItemEnd;
-  ALineState:= Item.ItemLineState;
-  ACarets:= Item.ItemCarets;
-  AMarkers:= Item.ItemMarkers;
-  ASoftMarked:= Item.ItemSoftMark;
-  AHardMarked:= Item.ItemHardMark;
+  CurText:= CurItem.ItemText;
+  CurLineEnd:= CurItem.ItemEnd;
+  CurLineState:= CurItem.ItemLineState;
+  CaretsArray:= CurItem.ItemCarets;
+  MarkersArray:= CurItem.ItemMarkers;
+  ASoftMarked:= CurItem.ItemSoftMark;
+  AHardMarked:= CurItem.ItemHardMark;
   NCount:= ACurList.Count;
 
   //detect that after reverting one item, list will have "unmodified mark" last item
@@ -1763,11 +1763,11 @@ begin
   //don't undo if one item left: unmodified-mark
   if ACurList.IsEmpty then exit;
 
-  Item:= nil;
+  CurItem:= nil;
   ACurList.DeleteLast;
   ACurList.Locked:= true;
 
-  case AAction of
+  case CurAction of
     aeaChange,
     aeaDelete,
     aeaInsert,
@@ -1779,42 +1779,42 @@ begin
 
   if bEnableUndoEvent then
     if Assigned(FOnUndoBefore) then
-      FOnUndoBefore(Self, AIndex);
+      FOnUndoBefore(Self, CurIndex);
 
   try
-    case AAction of
+    case CurAction of
       aeaChange:
         begin
-          if IsIndexValid(AIndex) then
+          if IsIndexValid(CurIndex) then
           begin
-            Lines[AIndex]:= AText;
-            LinesState[AIndex]:= ALineState;
+            Lines[CurIndex]:= CurText;
+            LinesState[CurIndex]:= CurLineState;
           end;
         end;
 
       aeaChangeEol:
         begin
-          if IsIndexValid(AIndex) then
+          if IsIndexValid(CurIndex) then
           begin
-            LinesEnds[AIndex]:= AEnd;
-            LinesState[AIndex]:= ALineState;
+            LinesEnds[CurIndex]:= CurLineEnd;
+            LinesState[CurIndex]:= CurLineState;
           end;
         end;
 
       aeaInsert:
         begin
-          if IsIndexValid(AIndex) then
-            LineDelete(AIndex);
+          if IsIndexValid(CurIndex) then
+            LineDelete(CurIndex);
         end;
 
       aeaDelete:
         begin
-          if AIndex>=Count then
-            LineAddRaw(AText, AEnd)
+          if CurIndex>=Count then
+            LineAddRaw(CurText, CurLineEnd)
           else
-            LineInsertRaw(AIndex, AText, AEnd);
-          if IsIndexValid(AIndex) then
-            LinesState[AIndex]:= ALineState;
+            LineInsertRaw(CurIndex, CurText, CurLineEnd);
+          if IsIndexValid(CurIndex) then
+            LinesState[CurIndex]:= CurLineState;
         end;
 
       aeaClearModified:
@@ -1832,12 +1832,12 @@ begin
       //  raise Exception.Create('Unknown undo action');
     end;
 
-    SetCaretsArray(ACarets);
-    SetMarkersArray(AMarkers);
+    SetCaretsArray(CaretsArray);
+    SetMarkersArray(MarkersArray);
 
     if bEnableUndoEvent then
       if Assigned(FOnUndoAfter) then
-        FOnUndoAfter(Self, AIndex);
+        FOnUndoAfter(Self, CurIndex);
 
     ActionDeleteDupFakeLines;
   finally
