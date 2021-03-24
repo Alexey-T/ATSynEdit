@@ -1771,9 +1771,13 @@ begin
   case CurAction of
     aeaChange,
     aeaDelete,
-    aeaInsert,
-    aeaCaretJump:
+    aeaInsert:
       bEnableUndoEvent:= ASoftMarked or AHardMarked;
+    aeaCaretJump:
+      begin
+        bEnableUndoEvent:= true;
+        CurIndex:= CaretsArray[0].Y; //because CurIndex=0 for CaretJumps
+      end
     else
       bEnableUndoEvent:= false;
   end;

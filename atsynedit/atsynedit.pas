@@ -295,7 +295,7 @@ const
   cInitUndoMaxCarets = cInitUndoLimit;
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
-  cInitUndoPause = 400;
+  cInitUndoPause = 300;
   cInitUndoPauseHighlightLine = true;
   cInitMicromapShowForMinCount = 2;
   cInitScrollbarHorzAddSpace = 2;
