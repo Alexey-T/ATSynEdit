@@ -8586,6 +8586,7 @@ var
   OldOption: boolean;
 begin
   if FOptUndoPause<=0 then exit;
+  if ModeOneLine then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
@@ -8611,6 +8612,7 @@ var
   OldOption: boolean;
 begin
   if FOptUndoPause<=0 then exit;
+  if ModeOneLine then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
