@@ -1713,7 +1713,7 @@ end;
 procedure TATStrings.DoUndoSingle(ACurList: TATUndoList;
   out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean);
 var
-  CurItem: TATUndoItem;
+  CurItem, PrevItem: TATUndoItem;
   CurAction: TATEditAction;
   CurText: atString;
   CurIndex: integer;
@@ -1753,12 +1753,13 @@ begin
   //we need to skip all "jump" items, https://github.com/Alexey-T/CudaText/issues/2677
   while (NCount>=2) and (ACurList[NCount-2].ItemAction=aeaCaretJump) do
     Dec(NCount);
+
   if NCount>=2 then
-    with ACurList[NCount-2] do
-    begin
-      AHardMarkedNext:= ItemHardMark;
-      AUnmodifiedNext:= ItemAction=aeaClearModified;
-    end;
+  begin
+    PrevItem:= ACurList[NCount-2];
+    AHardMarkedNext:= PrevItem.ItemHardMark;
+    AUnmodifiedNext:= PrevItem.ItemAction=aeaClearModified;
+  end;
 
   //don't undo if one item left: unmodified-mark
   if ACurList.IsEmpty then exit;
