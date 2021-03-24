@@ -1719,9 +1719,10 @@ var
   CurIndex: integer;
   CurLineEnd: TATLineEnds;
   CurLineState: TATLineState;
-  CaretsArray: TATPointArray;
-  MarkersArray: TATInt64Array;
+  CurCaretsArray: TATPointArray;
+  CurMarkersArray: TATInt64Array;
   NCount: integer;
+  NEventLineIndex: integer;
   OtherList: TATUndoList;
   bEnableUndoEvent: boolean;
 begin
@@ -1743,8 +1744,8 @@ begin
   CurText:= CurItem.ItemText;
   CurLineEnd:= CurItem.ItemEnd;
   CurLineState:= CurItem.ItemLineState;
-  CaretsArray:= CurItem.ItemCarets;
-  MarkersArray:= CurItem.ItemMarkers;
+  CurCaretsArray:= CurItem.ItemCarets;
+  CurMarkersArray:= CurItem.ItemMarkers;
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
   NCount:= ACurList.Count;
@@ -1772,19 +1773,25 @@ begin
     aeaChange,
     aeaDelete,
     aeaInsert:
-      bEnableUndoEvent:= ASoftMarked or AHardMarked;
+      begin
+        bEnableUndoEvent:= ASoftMarked or AHardMarked;
+        NEventLineIndex:= CurIndex;
+      end;
     aeaCaretJump:
       begin
         bEnableUndoEvent:= true;
-        CurIndex:= CaretsArray[0].Y; //because CurIndex=0 for CaretJumps
-      end
+        NEventLineIndex:= CurCaretsArray[0].Y //CurIndex is 0 for CaretJump
+      end;
     else
-      bEnableUndoEvent:= false;
+      begin
+        bEnableUndoEvent:= false;
+        NEventLineIndex:= CurIndex;
+      end;
   end;
 
   if bEnableUndoEvent then
     if Assigned(FOnUndoBefore) then
-      FOnUndoBefore(Self, CurIndex);
+      FOnUndoBefore(Self, NEventLineIndex);
 
   try
     case CurAction of
@@ -1837,12 +1844,12 @@ begin
       //  raise Exception.Create('Unknown undo action');
     end;
 
-    SetCaretsArray(CaretsArray);
-    SetMarkersArray(MarkersArray);
+    SetCaretsArray(CurCaretsArray);
+    SetMarkersArray(CurMarkersArray);
 
     if bEnableUndoEvent then
       if Assigned(FOnUndoAfter) then
-        FOnUndoAfter(Self, CurIndex);
+        FOnUndoAfter(Self, NEventLineIndex);
 
     ActionDeleteDupFakeLines;
   finally
