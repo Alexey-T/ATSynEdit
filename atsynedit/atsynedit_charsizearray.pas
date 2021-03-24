@@ -33,7 +33,7 @@ begin
     FixedSizes[i]:= _norm;
 
   //IPA Extensions
-  for i:= $250 to $2AF do
+  for i:= $250 to $2D7 do
     FixedSizes[i]:= _norm;
 
   //some Latin are full-width
