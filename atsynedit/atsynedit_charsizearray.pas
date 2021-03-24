@@ -133,8 +133,16 @@ begin
     FixedSizes[i]:= _norm;
   for i:= $2030 to $203A do
     FixedSizes[i]:= _norm;
+  //"Superscripts and Subscripts" block which goes from 0x2070 to 0x209F
+  for i:= $2070 to $209F do
+    FixedSizes[i]:= _norm;
+
   FixedSizes[$20AC]:= _norm;
   FixedSizes[$2122]:= _norm;
+
+  //"Miscellaneous Symbols" block which goes from 0x2600 to 0x26FF
+  for i:= $2600 to $26FF do
+    FixedSizes[i]:= _full;
 
   //combining chars
   // https://en.wikipedia.org/wiki/Combining_character
