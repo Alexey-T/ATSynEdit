@@ -1750,11 +1750,7 @@ begin
   AHardMarked:= CurItem.ItemHardMark;
   NCount:= ACurList.Count;
 
-  //detect that after reverting one item, list will have "unmodified mark" last item
-  //we need to skip all "jump" items, https://github.com/Alexey-T/CudaText/issues/2677
-  while (NCount>=2) and (ACurList[NCount-2].ItemAction=aeaCaretJump) do
-    Dec(NCount);
-
+  //note: do not break this issue https://github.com/Alexey-T/CudaText/issues/2677
   if NCount>=2 then
   begin
     PrevItem:= ACurList[NCount-2];
@@ -1972,6 +1968,7 @@ begin
   //ShowMessage('Undo list:'#10+FUndolist.DebugText);
 
   repeat
+    if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
     DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);

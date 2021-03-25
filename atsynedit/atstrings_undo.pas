@@ -441,10 +441,18 @@ function TATUndoList.IsEmpty: boolean;
 var
   N: integer;
 begin
-  N:= Count-1;
-  while (N>=0) and not cEditActionSetsModified[Items[N].ItemAction] do
+  N:= Count;
+  repeat
     Dec(N);
-  Result:= N<0;
+    if N<0 then
+      exit(true);
+    case Items[N].ItemAction of
+      aeaClearModified:
+        Continue;
+      else
+        exit(false);
+    end;
+  until false;
 end;
 
 
