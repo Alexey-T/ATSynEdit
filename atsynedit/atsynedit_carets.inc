@@ -605,6 +605,7 @@ begin
   if APlaceCaret then
   begin
     DoCaretSingle(APos.X, APos.Y, APosEnd.X, APosEnd.Y);
+    ActionAddJumpToUndo;
     DoEventCarets;
   end;
 

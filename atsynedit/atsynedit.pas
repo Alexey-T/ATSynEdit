@@ -1353,6 +1353,7 @@ type
     property RedoCount: integer read GetRedoCount;
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
+    procedure ActionAddJumpToUndo;
     property Text: atString read GetText write SetText;
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
@@ -5366,7 +5367,7 @@ begin
 
     if ActionId=cMouseActionClickSimple then
     begin
-      Strings.ActionAddJumpToUndo(FLastEditionCaretsArray);
+      ActionAddJumpToUndo;
       Strings.SetGroupMark;
 
       FSelRect:= cRectEmpty;
@@ -8627,6 +8628,11 @@ begin
 
   if FOptUndoPauseHighlightLine then
     OptShowCurLine:= OldOption;
+end;
+
+procedure TATSynEdit.ActionAddJumpToUndo;
+begin
+  Strings.ActionAddJumpToUndo(FLastEditionCaretsArray);
 end;
 
 

@@ -1613,6 +1613,9 @@ begin
   begin
     Editor.DoCaretSingle(APosX, APosY, AEndX, AEndY);
     Editor.DoEventCarets;
+
+    //solve CudaText issue #3261:
+    Editor.ActionAddJumpToUndo;
   end;
 end;
 
