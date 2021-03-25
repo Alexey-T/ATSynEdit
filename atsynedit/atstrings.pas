@@ -1904,6 +1904,9 @@ end;
 
 procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
+var
+  CurList: TATUndoList;
+  bCaretJump: boolean;
 begin
   if cEditActionSetsModified[AAction] then
   begin
@@ -1912,36 +1915,34 @@ begin
     Inc(FModifiedVersion);
   end;
 
-  if FUndoList=nil then Exit;
-  if FRedoList=nil then Exit;
+  if FUndoList=nil then exit;
+  if FRedoList=nil then exit;
 
-  //handle CaretJump special
-  //if previous item was also Jump, dont add new item  (don't make huge list on many clicks)
-  //also not needed to call DoAddUpdate
-  if AAction=aeaCaretJump then
-  begin
-    if FUndoList.Locked then exit;
-    if (FUndoList.Count>0) and (FUndoList.Last.ItemAction=AAction) then exit;
-    FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
+  if not FUndoList.Locked then
+    CurList:= FUndoList
+  else
+  if not FRedoList.Locked then
+    CurList:= FRedoList
+  else
     exit;
+
+  //handle CaretJump:
+  //if last item was also CaretJump, delete the last item  (don't make huge list on many clicks)
+  bCaretJump:= AAction=aeaCaretJump;
+  if bCaretJump then
+  begin
+    if (CurList.Count>0) and (CurList.Last.ItemAction=AAction) then
+      CurList.Delete(CurList.Count-1);
   end;
 
   if not FUndoList.Locked and not FRedoList.Locked then
     FRedoList.Clear;
 
-  //normal editing - add to Undo
-  if not FUndoList.Locked then
-  begin
+  //not needed to call DoAddUpdate for CaretJump
+  if not bCaretJump then
     DoAddUpdate(AIndex, AAction);
-    FUndoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
-  end
-  else
-  //called from Undo - add to Redo
-  if not FRedoList.Locked then
-  begin
-    DoAddUpdate(AIndex, AAction);
-    FRedoList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
-  end;
+
+  CurList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
 end;
 
 procedure TATStrings.DoUndoRedo(AUndo: boolean; AGrouped: boolean);
