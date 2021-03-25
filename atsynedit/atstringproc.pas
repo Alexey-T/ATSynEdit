@@ -256,6 +256,8 @@ end;
 
 function IsCharWordInIdentifier(ch: widechar): boolean;
 begin
+  if Ord(ch)>Ord('z') then
+    exit(false);
   case ch of
     '0'..'9',
     'a'..'z',
