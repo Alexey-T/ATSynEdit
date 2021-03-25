@@ -363,7 +363,7 @@ type
     procedure ActionSort(AAction: TATStringsSortAction; AFrom, ATo: integer);
     procedure ActionReverseLines;
     procedure ActionShuffleLines;
-    procedure ActionAddJumpToUndo;
+    procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointArray);
     //file
     procedure LoadFromStream(Stream: TStream);
     procedure LoadFromFile(const AFilename: string);
@@ -1781,7 +1781,10 @@ begin
     aeaCaretJump:
       begin
         bEnableUndoEvent:= true;
-        NEventLineIndex:= CurCaretsArray[0].Y //CurIndex is 0 for CaretJump
+        if Length(CurCaretsArray)>0 then
+          NEventLineIndex:= CurCaretsArray[0].Y //CurIndex is 0 for CaretJump
+        else
+          NEventLineIndex:= 0;
       end;
     else
       begin
@@ -2215,9 +2218,16 @@ begin
   DoEventLog(0);
 end;
 
-procedure TATStrings.ActionAddJumpToUndo;
+procedure TATStrings.ActionAddJumpToUndo(constref ACaretsArray: TATPointArray);
+var
+  Item: TATUndoItem;
 begin
+  if FUndoList.Locked then exit;
   DoAddUndo(aeaCaretJump, 0, '', cEndNone, cLineStateNone);
+  Item:= FUndoList.Last;
+  if Assigned(Item) then
+    if Length(ACaretsArray)>0 then
+      Item.ItemCarets:= ACaretsArray;
 end;
 
 

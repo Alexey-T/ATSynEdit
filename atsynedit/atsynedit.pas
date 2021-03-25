@@ -586,6 +586,7 @@ type
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
     FLastLineOfSlowEvents: integer;
+    FLastEditionCaretsArray: TATPointArray;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
@@ -5365,7 +5366,7 @@ begin
 
     if ActionId=cMouseActionClickSimple then
     begin
-      Strings.ActionAddJumpToUndo;
+      Strings.ActionAddJumpToUndo(FLastEditionCaretsArray);
       Strings.SetGroupMark;
 
       FSelRect:= cRectEmpty;

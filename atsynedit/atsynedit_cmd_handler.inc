@@ -194,6 +194,7 @@ begin
 
   if bTextChanged then
   begin
+    FLastEditionCaretsArray:= FCarets.AsArray;
     bAllowRepaint:= FOptAllowRepaintOnTextChange;
     if FOptMouseHideCursor then
       if PtInRect(FRectMain, ScreenToClient(Mouse.CursorPos)) then
