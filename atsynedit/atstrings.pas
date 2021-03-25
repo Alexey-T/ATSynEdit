@@ -1769,6 +1769,11 @@ begin
   ACurList.DeleteLast;
   ACurList.Locked:= true;
 
+  if ACurList=FUndoList then
+    OtherList:= FRedoList
+  else
+    OtherList:= FUndoList;
+
   case CurAction of
     aeaChange,
     aeaDelete,
@@ -1831,17 +1836,14 @@ begin
 
       aeaClearModified:
         begin
-          if ACurList=FUndoList then
-            OtherList:= FRedoList
-          else
-            OtherList:= FUndoList;
-
           OtherList.AddUnmodifiedMark;
           exit;
-        end
+        end;
 
-      //else
-      //  raise Exception.Create('Unknown undo action');
+      aeaCaretJump:
+        begin
+          OtherList.Add(CurAction, 0, '', cEndNone, cLineStateNone, CurCaretsArray, CurMarkersArray);
+        end;
     end;
 
     SetCaretsArray(CurCaretsArray);
