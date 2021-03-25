@@ -1932,7 +1932,7 @@ begin
   if bCaretJump then
   begin
     if (CurList.Count>0) and (CurList.Last.ItemAction=AAction) then
-      CurList.Delete(CurList.Count-1);
+      CurList.DeleteLast;
   end;
 
   if not FUndoList.Locked and not FRedoList.Locked then
