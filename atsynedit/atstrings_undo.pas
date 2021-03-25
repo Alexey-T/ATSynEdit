@@ -99,6 +99,7 @@ type
     procedure Delete(N: integer);
     procedure DeleteLast;
     procedure DeleteUnmodifiedMarks;
+    procedure DeleteTrailingCaretJumps;
     procedure Add(AAction: TATEditAction; AIndex: integer; const AText: atString;
       AEnd: TATLineEnds; ALineState: TATLineState;
       const ACarets: TATPointArray; const AMarkers: TATInt64Array);
@@ -413,6 +414,12 @@ begin
   for i:= Count-1 downto 0 do
     if Items[i].ItemAction=aeaClearModified then
       Delete(i);
+end;
+
+procedure TATUndoList.DeleteTrailingCaretJumps;
+begin
+  while (Count>0) and (Last.ItemAction=aeaCaretJump) do
+    DeleteLast;
 end;
 
 function TATUndoList.DebugText: string;
