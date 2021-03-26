@@ -8591,21 +8591,21 @@ end;
 function TATSynEdit.IsPosInVisibleArea(AX, AY: integer): boolean;
 var
   Pnt: TPoint;
-  NTop, NCount, NVisibleCount: integer;
+  NTop, NCount: integer;
 begin
   NTop:= LineTop;
   if AY<NTop then exit(false);
 
-  //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
   NCount:= Strings.Count;
-  NVisibleCount:= GetVisibleLines;
-  if NCount<NVisibleCount then exit(true);
+  if NCount<=1 then exit(true);
+
+  //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
   if AY>=NCount then
     AY:= NCount-1;
 
   if OptWrapMode=cWrapOff then
   begin
-    Result:= AY<=NTop+NVisibleCount;
+    Result:= AY<=NTop+GetVisibleLines;
   end
   else
   begin
