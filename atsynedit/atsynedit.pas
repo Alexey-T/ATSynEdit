@@ -935,8 +935,8 @@ type
     procedure DoMinimapDrag(APosY: integer);
     procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure DoStringsOnProgress(Sender: TObject);
-    procedure DoStringsOnUndoAfter(Sender: TObject; ALine: integer);
-    procedure DoStringsOnUndoBefore(Sender: TObject; ALine: integer);
+    procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: integer);
+    procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
     procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
@@ -8589,14 +8589,14 @@ begin
   Result:= (ALine>=LineTop) and (ALine<LineBottom);
 end;
 
-procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; ALine: integer);
+procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
 var
   OldOption: boolean;
 begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
-  if ALine<0 then exit;
-  if IsLineOnVisibleRect(ALine) then exit;
+  if AY<0 then exit;
+  if IsLineOnVisibleRect(AY) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
@@ -8605,7 +8605,7 @@ begin
   end;
 
   DoGotoPos(
-    Point(0, ALine),
+    Point(AX, AY),
     Point(-1, -1),
     FOptUndoIndentHorz,
     FOptUndoIndentVert,
@@ -8628,14 +8628,14 @@ begin
     OptShowCurLine:= OldOption;
 end;
 
-procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; ALine: integer);
+procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; AX, AY: integer);
 var
   OldOption: boolean;
 begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
-  if ALine<0 then exit;
-  if IsLineOnVisibleRect(ALine) then exit;
+  if AY<0 then exit;
+  if IsLineOnVisibleRect(AY) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin

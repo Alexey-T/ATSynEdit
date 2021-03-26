@@ -173,7 +173,7 @@ type
   TATStringsChangeEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
-  TATStringsUndoEvent = procedure(Sender: TObject; ALine: integer) of object;
+  TATStringsUndoEvent = procedure(Sender: TObject; AX, AY: integer) of object;
 
 type
   { TATStrings }
@@ -1721,13 +1721,14 @@ var
   CurLineState: TATLineState;
   CurCaretsArray: TATPointArray;
   CurMarkersArray: TATInt64Array;
-  NCount: integer;
-  NEventLineIndex: integer;
   OtherList: TATUndoList;
-  bEnableEventBefore: boolean;
+  NCount: integer;
+  NEventX, NEventY: integer;
+  bEnableEventBefore,
   bEnableEventAfter: boolean;
 const
-  NPrevLineIndex: integer = -1;
+  //need memory for several calls
+  NPrevY: integer = -1;
 begin
   ASoftMarked:= true;
   AHardMarked:= false;
@@ -1791,16 +1792,22 @@ begin
   end;
 
   if Length(CurCaretsArray)>0 then
-    NEventLineIndex:= CurCaretsArray[0].Y //CurIndex is 0 for CaretJump
+  begin
+    NEventX:= CurCaretsArray[0].X;
+    NEventY:= CurCaretsArray[0].Y; //CurIndex is 0 for CaretJump
+  end
   else
-    NEventLineIndex:= -1;
+  begin
+    NEventX:= -1;
+    NEventY:= -1;
+  end;
 
-  bEnableEventBefore:= (NEventLineIndex>=0) and (NEventLineIndex<>NPrevLineIndex);
-  NPrevLineIndex:= NEventLineIndex;
+  bEnableEventBefore:= (NEventY>=0) and (NEventY<>NPrevY);
+  NPrevY:= NEventY;
 
   if bEnableEventBefore then
     if Assigned(FOnUndoBefore) then
-      FOnUndoBefore(Self, NEventLineIndex);
+      FOnUndoBefore(Self, NEventX, NEventY);
 
   try
     case CurAction of
@@ -1855,7 +1862,7 @@ begin
 
     if bEnableEventAfter then
       if Assigned(FOnUndoAfter) then
-        FOnUndoAfter(Self, NEventLineIndex);
+        FOnUndoAfter(Self, NEventX, NEventY);
 
     ActionDeleteDupFakeLines;
   finally
