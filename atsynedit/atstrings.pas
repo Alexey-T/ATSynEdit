@@ -1907,7 +1907,6 @@ procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
 var
   CurList: TATUndoList;
-  bCaretJump: boolean;
 begin
   if cEditActionSetsModified[AAction] then
   begin
@@ -1929,19 +1928,17 @@ begin
 
   //handle CaretJump:
   //if last item was also CaretJump, delete the last item  (don't make huge list on many clicks)
-  bCaretJump:= AAction=aeaCaretJump;
-  if bCaretJump then
+  if AAction=aeaCaretJump then
   begin
     if (CurList.Count>0) and (CurList.Last.ItemAction=AAction) then
       CurList.DeleteLast;
-  end;
-
-  if not FUndoList.Locked and not FRedoList.Locked then
-    FRedoList.Clear;
-
-  //not needed to call DoAddUpdate for CaretJump
-  if not bCaretJump then
+  end
+  else
+  begin
+    if not FUndoList.Locked and not FRedoList.Locked then
+      FRedoList.Clear;
     DoAddUpdate(AIndex, AAction);
+  end;
 
   CurList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
 end;
