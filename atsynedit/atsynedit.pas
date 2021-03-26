@@ -8589,8 +8589,13 @@ begin
 end;
 
 function TATSynEdit.IsLineOnVisibleRect(ALine: integer): boolean;
+var
+  NBottom: integer;
 begin
-  Result:= (ALine>=LineTop) and (ALine<LineBottom);
+  NBottom:= LineBottom;
+  if NBottom>=Strings.Count-1 then
+    NBottom:= MaxInt;
+  Result:= (ALine>=LineTop) and (ALine<=NBottom);
 end;
 
 procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
