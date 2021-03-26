@@ -8598,8 +8598,7 @@ begin
 
   if OptWrapMode=cWrapOff then
   begin
-    if AY>=NTop+GetVisibleLines then exit(false);
-    Result:= true;
+    Result:= AY<NTop+GetVisibleLines;
   end
   else
   begin
