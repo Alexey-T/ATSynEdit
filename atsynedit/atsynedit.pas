@@ -897,6 +897,7 @@ type
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
     function IsCaretOnVisibleRect: boolean;
+    function IsLineOnVisibleRect(ALine: integer): boolean;
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
     procedure SetFoldingAsString(const AValue: string);
     procedure SetOptShowURLsRegex(const AValue: string);
@@ -8583,13 +8584,19 @@ begin
   Sleep(APause);
 end;
 
+function TATSynEdit.IsLineOnVisibleRect(ALine: integer): boolean;
+begin
+  Result:= (ALine>=LineTop) and (ALine<LineBottom);
+end;
+
 procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; ALine: integer);
 var
   OldOption: boolean;
 begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
-  if IsCaretOnVisibleRect then exit;
+  if ALine<0 then exit;
+  if IsLineOnVisibleRect(ALine) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
@@ -8597,12 +8604,23 @@ begin
     OptShowCurLine:= true;
   end;
 
+  DoGotoPos(
+    Point(0, ALine),
+    Point(-1, -1),
+    FOptUndoIndentHorz,
+    FOptUndoIndentVert,
+    true,
+    true,
+    false,
+    false);
+  { //not good
   DoShowPos(
     Point(0, ALine),
     FOptUndoIndentHorz,
     FOptUndoIndentVert,
-    true{Unfold},
-    true{Update});
+    true,
+    true);
+    }
 
   UpdateAndWait(true, FOptUndoPause);
 
@@ -8616,7 +8634,8 @@ var
 begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
-  if IsCaretOnVisibleRect then exit;
+  if ALine<0 then exit;
+  if IsLineOnVisibleRect(ALine) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin

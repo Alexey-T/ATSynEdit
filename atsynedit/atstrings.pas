@@ -1724,7 +1724,10 @@ var
   NCount: integer;
   NEventLineIndex: integer;
   OtherList: TATUndoList;
-  bEnableUndoEvent: boolean;
+  bEnableEventBefore: boolean;
+  bEnableEventAfter: boolean;
+const
+  NPrevLineIndex: integer = -1;
 begin
   ASoftMarked:= true;
   AHardMarked:= false;
@@ -1775,25 +1778,27 @@ begin
     aeaDelete,
     aeaInsert:
       begin
-        bEnableUndoEvent:= ASoftMarked or AHardMarked;
-        NEventLineIndex:= CurIndex;
+        bEnableEventAfter:= ASoftMarked or AHardMarked;
       end;
     aeaCaretJump:
       begin
-        bEnableUndoEvent:= true;
-        if Length(CurCaretsArray)>0 then
-          NEventLineIndex:= CurCaretsArray[0].Y //CurIndex is 0 for CaretJump
-        else
-          NEventLineIndex:= 0;
+        bEnableEventAfter:= true;
       end;
     else
       begin
-        bEnableUndoEvent:= false;
-        NEventLineIndex:= CurIndex;
+        bEnableEventAfter:= false;
       end;
   end;
 
-  if bEnableUndoEvent then
+  if Length(CurCaretsArray)>0 then
+    NEventLineIndex:= CurCaretsArray[0].Y //CurIndex is 0 for CaretJump
+  else
+    NEventLineIndex:= -1;
+
+  bEnableEventBefore:= (NEventLineIndex>=0) and (NEventLineIndex<>NPrevLineIndex);
+  NPrevLineIndex:= NEventLineIndex;
+
+  if bEnableEventBefore then
     if Assigned(FOnUndoBefore) then
       FOnUndoBefore(Self, NEventLineIndex);
 
@@ -1848,7 +1853,7 @@ begin
     SetCaretsArray(CurCaretsArray);
     SetMarkersArray(CurMarkersArray);
 
-    if bEnableUndoEvent then
+    if bEnableEventAfter then
       if Assigned(FOnUndoAfter) then
         FOnUndoAfter(Self, NEventLineIndex);
 
