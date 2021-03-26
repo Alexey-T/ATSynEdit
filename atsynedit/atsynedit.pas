@@ -1362,7 +1362,7 @@ type
     function IsPosSelected(AX, AY: integer): boolean;
     function IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     function IsPosFolded(AX, AY: integer): boolean;
-    function IsPosInVisibleArea(AX, AY: integer; AllowAfterEnd: boolean): boolean;
+    function IsPosInVisibleArea(AX, AY: integer): boolean;
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsCharWord(ch: Widechar): boolean;
     property TextCharSize: TPoint read FCharSize;
@@ -8588,21 +8588,23 @@ begin
   Sleep(APause);
 end;
 
-function TATSynEdit.IsPosInVisibleArea(AX, AY: integer; AllowAfterEnd: boolean): boolean;
+function TATSynEdit.IsPosInVisibleArea(AX, AY: integer): boolean;
 var
   Pnt: TPoint;
-  NTop: integer;
+  NTop, NCount: integer;
 begin
   NTop:= LineTop;
   if AY<NTop then exit(false);
 
   //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
-  if AllowAfterEnd then
-    if AY>=Strings.Count then exit(true);
+  NCount:= Strings.Count;
+  if NCount<=1 then exit(true);
+  if AY>=NCount then
+    AY:= NCount-1;
 
   if OptWrapMode=cWrapOff then
   begin
-    Result:= AY<NTop+GetVisibleLines;
+    Result:= AY<=NTop+GetVisibleLines;
   end
   else
   begin
@@ -8620,7 +8622,7 @@ begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
-  if IsPosInVisibleArea(AX, AY, true) then exit;
+  if IsPosInVisibleArea(AX, AY) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
@@ -8659,7 +8661,7 @@ begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
-  if IsPosInVisibleArea(AX, AY, true) then exit;
+  if IsPosInVisibleArea(AX, AY) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
