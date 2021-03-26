@@ -1196,8 +1196,7 @@ type
     function DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
     function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
-    function DoCommand_Undo: TATCommandResults;
-    function DoCommand_Redo: TATCommandResults;
+    function DoCommand_UndoRedo(AUndo: boolean): TATCommandResults;
     function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
     function DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): TATCommandResults;
     procedure DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: boolean; Caret: TATCaretItem);

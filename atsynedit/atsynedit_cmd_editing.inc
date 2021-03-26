@@ -833,36 +833,40 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_Undo: TATCommandResults;
+function TATSynEdit.DoCommand_UndoRedo(AUndo: boolean): TATCommandResults;
+//undo/redo runs App.ProcessMessages, need to lock
+var
+  bBlock, bFocus: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  FLockInput:= true;
-  OptMouseEnableAll:= false;
-  try
-    Strings.Undo(FOptUndoGrouped);
-  finally
-    OptMouseEnableAll:= true;
-    FLockInput:= false;
+  if AUndo then
+    bBlock:= (GetUndoCount>0) and (OptUndoPause>0)
+  else
+    bBlock:= (GetRedoCount>0) and (OptUndoPause>0);
+
+  if bBlock then
+  begin
+    bFocus:= _IsFocused;
+    Enabled:= false;
   end;
 
-  Result:= [cResultText, cResultCaretBottom, cResultCaretLazy, cResultUndoRedo];
-end;
-
-function TATSynEdit.DoCommand_Redo: TATCommandResults;
-begin
-  Result:= [];
-  if ModeReadOnly then Exit;
-
-  FLockInput:= true;
-  OptMouseEnableAll:= false;
   try
-    Strings.SetGroupMark;
-    Strings.Redo(FOptUndoGrouped);
+    if AUndo then
+      Strings.Undo(FOptUndoGrouped)
+    else
+    begin
+      Strings.SetGroupMark;
+      Strings.Redo(FOptUndoGrouped);
+    end;
   finally
-    OptMouseEnableAll:= true;
-    FLockInput:= false;
+    if bBlock then
+    begin
+      Enabled:= true;
+      if bFocus and CanSetFocus then
+        SetFocus;
+    end;
   end;
 
   Result:= [cResultText, cResultCaretBottom, cResultCaretLazy, cResultUndoRedo];

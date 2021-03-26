@@ -455,8 +455,8 @@ begin
     cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
     cCommand_ForceFinalEndOfLine: Res:= DoCommand_ForceFinalEndOfLine;
 
-    cCommand_Undo:                Res:= DoCommand_Undo;
-    cCommand_Redo:                Res:= DoCommand_Redo;
+    cCommand_Undo:                Res:= DoCommand_UndoRedo(true);
+    cCommand_Redo:                Res:= DoCommand_UndoRedo(false);
     //end of most used
 
     cCommand_TextDeleteSelection:      Res:= DoCommand_TextDeleteSelection;
