@@ -836,17 +836,17 @@ end;
 function TATSynEdit.DoCommand_UndoRedo(AUndo: boolean): TATCommandResults;
 //undo/redo runs App.ProcessMessages, need to lock
 var
-  bBlock, bFocus: boolean;
+  bLock, bFocus: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
   if AUndo then
-    bBlock:= (GetUndoCount>0) and (OptUndoPause>0)
+    bLock:= (GetUndoCount>0) and (OptUndoPause>0)
   else
-    bBlock:= (GetRedoCount>0) and (OptUndoPause>0);
+    bLock:= (GetRedoCount>0) and (OptUndoPause>0);
 
-  if bBlock then
+  if bLock then
   begin
     bFocus:= _IsFocused;
     Enabled:= false;
@@ -861,7 +861,7 @@ begin
       Strings.Redo(FOptUndoGrouped);
     end;
   finally
-    if bBlock then
+    if bLock then
     begin
       Enabled:= true;
       if bFocus and CanSetFocus then
