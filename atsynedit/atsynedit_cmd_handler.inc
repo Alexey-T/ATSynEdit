@@ -18,6 +18,7 @@ procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
 var
   NCmd: integer;
 begin
+  if FLockInput then exit;
   inherited;
   if Key=0 then Exit;
 
@@ -88,6 +89,7 @@ var
   Allow: boolean;
   Caret: TATCaretItem;
 begin
+  if FLockInput then exit;
   inherited;
 
   //skip control Ascii chars

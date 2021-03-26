@@ -838,7 +838,15 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  Strings.Undo(FOptUndoGrouped);
+  FLockInput:= true;
+  OptMouseEnableAll:= false;
+  try
+    Strings.Undo(FOptUndoGrouped);
+  finally
+    OptMouseEnableAll:= true;
+    FLockInput:= false;
+  end;
+
   Result:= [cResultText, cResultCaretBottom, cResultCaretLazy, cResultUndoRedo];
 end;
 
@@ -847,8 +855,16 @@ begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  Strings.SetGroupMark;
-  Strings.Redo(FOptUndoGrouped);
+  FLockInput:= true;
+  OptMouseEnableAll:= false;
+  try
+    Strings.SetGroupMark;
+    Strings.Redo(FOptUndoGrouped);
+  finally
+    OptMouseEnableAll:= true;
+    FLockInput:= false;
+  end;
+
   Result:= [cResultText, cResultCaretBottom, cResultCaretLazy, cResultUndoRedo];
 end;
 

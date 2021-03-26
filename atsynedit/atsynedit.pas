@@ -579,6 +579,7 @@ type
     FMouseDownAndColumnSelection: boolean;
     FMouseAutoScroll: TATEditorDirection;
     FMouseActions: TATEditorMouseActionArray;
+    FLockInput: boolean;
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
