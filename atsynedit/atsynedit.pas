@@ -297,6 +297,7 @@ const
   cInitUndoIndentHorz = 20;
   cInitUndoPause = 300;
   cInitUndoPauseHighlightLine = true;
+  cInitUndoForCaretJump = true;
   cInitMicromapShowForMinCount = 2;
   cInitScrollbarHorzAddSpace = 2;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
@@ -756,6 +757,7 @@ type
     FOptUndoIndentHorz: integer;
     FOptUndoPause: integer;
     FOptUndoPauseHighlightLine: boolean;
+    FOptUndoForCaretJump: boolean;
     FOptScrollbarsNew: boolean;
     FOptScrollbarHorizontalAddSpace: integer;
     FOptScrollLineCommandsKeepCaretOnScreen: boolean;
@@ -1826,6 +1828,7 @@ type
     property OptUndoIndentHorz: integer read FOptUndoIndentHorz write FOptUndoIndentHorz default cInitUndoIndentHorz;
     property OptUndoPause: integer read FOptUndoPause write FOptUndoPause default cInitUndoPause;
     property OptUndoPauseHighlightLine: boolean read FOptUndoPauseHighlightLine write FOptUndoPauseHighlightLine default cInitUndoPauseHighlightLine;
+    property OptUndoForCaretJump: boolean read FOptUndoForCaretJump write FOptUndoForCaretJump default cInitUndoForCaretJump;
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
     property OptSavingTrimSpaces: boolean read FOptSavingTrimSpaces write FOptSavingTrimSpaces default false;
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
@@ -4117,6 +4120,7 @@ begin
   FOptUndoGrouped:= true;
   FOptUndoPause:= cInitUndoPause;
   FOptUndoPauseHighlightLine:= cInitUndoPauseHighlightLine;
+  FOptUndoForCaretJump:= cInitUndoForCaretJump;
 
   FStringsExternal:= nil;
   FStringsInt:= TATStrings.Create(FOptUndoLimit);
@@ -8651,7 +8655,8 @@ end;
 
 procedure TATSynEdit.ActionAddJumpToUndo;
 begin
-  Strings.ActionAddJumpToUndo(FLastEditionCaretsArray);
+  if FOptUndoForCaretJump then
+    Strings.ActionAddJumpToUndo(FLastEditionCaretsArray);
 end;
 
 
