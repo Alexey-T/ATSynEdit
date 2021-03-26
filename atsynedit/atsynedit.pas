@@ -900,7 +900,6 @@ type
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
     function IsCaretOnVisibleRect: boolean;
-    function IsLineOnVisibleRect(ALine: integer): boolean;
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
     procedure SetFoldingAsString(const AValue: string);
     procedure SetOptShowURLsRegex(const AValue: string);
@@ -8589,30 +8588,30 @@ begin
   Sleep(APause);
 end;
 
-function TATSynEdit.IsLineOnVisibleRect(ALine: integer): boolean;
-var
-  NBottom: integer;
-begin
-  NBottom:= LineBottom;
-  if NBottom>=Strings.Count-1 then
-    NBottom:= MaxInt;
-  Result:= (ALine>=LineTop) and (ALine<=NBottom);
-end;
-
 function TATSynEdit.IsPosInVisibleArea(AX, AY: integer; AllowAfterEnd: boolean): boolean;
 var
   Pnt: TPoint;
+  NTop: integer;
 begin
-  if AY<LineTop then exit(false);
+  NTop:= LineTop;
+  if AY<NTop then exit(false);
 
-  //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
-  if AllowAfterEnd then
-    if AY>=Strings.Count then exit(true);
+  if OptWrapMode=cWrapOff then
+  begin
+    if AY>=NTop+GetVisibleLines then exit(false);
+    Result:= true;
+  end
+  else
+  begin
+    //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
+    if AllowAfterEnd then
+      if AY>=Strings.Count then exit(true);
 
-  if AY>LineBottom then exit(false);
+    if AY>LineBottom then exit(false);
 
-  Pnt:= CaretPosToClientPos(Point(AX, AY));
-  Result:= PtInRect(FRectMainVisible, Pnt);
+    Pnt:= CaretPosToClientPos(Point(AX, AY));
+    Result:= PtInRect(FRectMainVisible, Pnt);
+  end;
 end;
 
 procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
