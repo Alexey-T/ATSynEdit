@@ -8596,16 +8596,16 @@ begin
   NTop:= LineTop;
   if AY<NTop then exit(false);
 
+  //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
+  if AllowAfterEnd then
+    if AY>=Strings.Count then exit(true);
+
   if OptWrapMode=cWrapOff then
   begin
     Result:= AY<NTop+GetVisibleLines;
   end
   else
   begin
-    //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
-    if AllowAfterEnd then
-      if AY>=Strings.Count then exit(true);
-
     if AY>LineBottom then exit(false);
 
     Pnt:= CaretPosToClientPos(Point(AX, AY));
