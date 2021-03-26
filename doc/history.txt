@@ -1,7 +1,8 @@
 
-2021.03.24
-+ show small animation for Undo/Redo
-+ prop OptPauseOnUndo
+2021.03.26
++ prop OptUndoForCaretJump
++ prop OptUndoPause
++ show small animation + pause for Undo/Redo
 
 2021.03.08
 + prop OptMaskChar and OptMaskCharUsed, to make password-input fields
