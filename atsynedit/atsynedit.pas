@@ -1363,7 +1363,7 @@ type
     function IsPosSelected(AX, AY: integer): boolean;
     function IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     function IsPosFolded(AX, AY: integer): boolean;
-    function IsPosInVisibleArea(AX, AY: integer): boolean;
+    function IsPosInVisibleArea(AX, AY: integer; AllowAfterEnd: boolean): boolean;
     function IsLineFolded(ALine: integer; ADetectPartialFold: boolean = false): boolean;
     function IsCharWord(ch: Widechar): boolean;
     property TextCharSize: TPoint read FCharSize;
@@ -8599,13 +8599,18 @@ begin
   Result:= (ALine>=LineTop) and (ALine<=NBottom);
 end;
 
-function TATSynEdit.IsPosInVisibleArea(AX, AY: integer): boolean;
+function TATSynEdit.IsPosInVisibleArea(AX, AY: integer; AllowAfterEnd: boolean): boolean;
 var
   Pnt: TPoint;
 begin
   if AY<LineTop then exit(false);
-  if AY>=Strings.Count then exit(true); //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
+
+  //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
+  if AllowAfterEnd then
+    if AY>=Strings.Count then exit(true);
+
   if AY>LineBottom then exit(false);
+
   Pnt:= CaretPosToClientPos(Point(AX, AY));
   Result:= PtInRect(FRectMainVisible, Pnt);
 end;
@@ -8617,7 +8622,7 @@ begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
-  if IsPosInVisibleArea(AX, AY) then exit;
+  if IsPosInVisibleArea(AX, AY, true) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
@@ -8656,7 +8661,7 @@ begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
-  if IsPosInVisibleArea(AX, AY) then exit;
+  if IsPosInVisibleArea(AX, AY, true) then exit;
 
   if FOptUndoPauseHighlightLine then
   begin
