@@ -21,6 +21,9 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkUndoForCrt: TCheckBox;
+    chkUndoGrp: TCheckBox;
+    chkUndoAfterSave: TCheckBox;
     chkUpDownToEdge: TCheckBox;
     chkCrPrimitiveCol: TCheckBox;
     chkClickLink: TCheckBox;
@@ -33,8 +36,6 @@ type
     chkSaveTrim: TCheckBox;
     chkSaveTrimEmptyLines: TCheckBox;
     chkBkspGoPrev: TCheckBox;
-    chkUndoGr: TCheckBox;
-    chkUndoSv: TCheckBox;
     chkUnprintOnlyBothEnds: TCheckBox;
     chkUnprintOnlyEnd: TCheckBox;
     chkCrEmptyNormal: TCheckBox;
@@ -121,7 +122,8 @@ type
     edTabArrowSize: TSpinEdit;
     edTabArrowPnt: TSpinEdit;
     edTextHint: TEdit;
-    edUndo: TSpinEdit;
+    edUndoLimit: TSpinEdit;
+    edUndoPause: TSpinEdit;
     edZebraAlpha: TSpinEdit;
     edZebraStep: TSpinEdit;
     grpOrderCols: TGroupBox;
@@ -144,6 +146,7 @@ type
     Label2: TLabel;
     Label20: TLabel;
     Label21: TLabel;
+    Label22: TLabel;
     Label6: TLabel;
     LabelZebraAlpha: TLabel;
     Label3: TLabel;
@@ -166,6 +169,7 @@ type
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
+    TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TabSheet8: TTabSheet;
     TabSheet9: TTabSheet;
@@ -333,9 +337,11 @@ begin
     chkMsHideCursor.Checked:= ed.OptMouseHideCursorOnType;
 
     //undo
-    edUndo.Value:= ed.OptUndoLimit;
-    chkUndoGr.Checked:= ed.OptUndoGrouped;
-    chkUndoSv.Checked:= ed.OptUndoAfterSave;
+    edUndoLimit.Value:= ed.OptUndoLimit;
+    edUndoPause.Value:= ed.OptUndoPause;
+    chkUndoGrp.Checked:= ed.OptUndoGrouped;
+    chkUndoAfterSave.Checked:= ed.OptUndoAfterSave;
+    chkUndoForCrt.Checked:= ed.OptUndoForCaretJump;
 
     //zebra
     chkZebraActive.Checked:= ed.OptZebraActive;
@@ -465,9 +471,11 @@ begin
       ed.OptMouseHideCursorOnType:= chkMsHideCursor.Checked;
 
       //undo
-      ed.OptUndoLimit:= edUndo.Value;
-      ed.OptUndoGrouped:= chkUndoGr.Checked;
-      ed.OptUndoAfterSave:= chkUndoSv.Checked;
+      ed.OptUndoLimit:= edUndoLimit.Value;
+      ed.OptUndoPause:= edUndoPause.Value;
+      ed.OptUndoGrouped:= chkUndoGrp.Checked;
+      ed.OptUndoAfterSave:= chkUndoAfterSave.Checked;
+      ed.OptUndoForCaretJump:= chkUndoForCrt.Checked;
 
       //zebra
       ed.OptZebraActive     := chkZebraActive.Checked;
