@@ -8669,7 +8669,7 @@ procedure TATSynEdit.ActionAddJumpToUndo;
 begin
   if FOptUndoForCaretJump then
     with Strings do
-      ActionAddJumpToUndo(CaretsAfterLastEdition);
+      ActionAddJumpToUndo(GetCaretsArray);
 end;
 
 
