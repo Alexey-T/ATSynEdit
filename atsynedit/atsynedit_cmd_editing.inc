@@ -853,13 +853,9 @@ begin
   end;
 
   try
-    if AUndo then
-      Strings.UndoOrRedo(AUndo, FOptUndoGrouped)
-    else
-    begin
+    if not AUndo then
       Strings.SetGroupMark;
-      Strings.UndoOrRedo(AUndo, FOptUndoGrouped);
-    end;
+    Strings.UndoOrRedo(AUndo, FOptUndoGrouped)
   finally
     if bLock then
     begin
