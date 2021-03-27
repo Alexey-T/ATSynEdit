@@ -225,6 +225,7 @@ type
     FEnabledBookmarksUpdate: boolean;
     FEnabledChangeEvents: boolean;
     FLoadingForcedANSI: boolean;
+    FLastUndoY: integer;
 
     function Compare_Asc(Key1, Key2: Pointer): Integer;
     function Compare_AscNoCase(Key1, Key2: Pointer): Integer;
@@ -1724,9 +1725,6 @@ var
   NEventX, NEventY: integer;
   bEnableEventBefore,
   bEnableEventAfter: boolean;
-const
-  //need memory for several calls
-  NPrevY: integer = -1;
 begin
   ASoftMarked:= true;
   AHardMarked:= false;
@@ -1800,8 +1798,8 @@ begin
     NEventY:= -1;
   end;
 
-  bEnableEventBefore:= (NEventY>=0) and (NEventY<>NPrevY);
-  NPrevY:= NEventY;
+  bEnableEventBefore:= (NEventY>=0) and (NEventY<>FLastUndoY);
+  FLastUndoY:= NEventY;
 
   if bEnableEventBefore then
     if Assigned(FOnUndoBefore) then
@@ -1986,6 +1984,15 @@ begin
   Usually first time it doesn't jump (as expected) but after repeating steps 2 and 3 it's starting to jump again.
   }
   SetCaretsArray(CaretsAfterLastEdition);
+
+  {
+  solve CudaText #3268
+  - Type something in line 100
+  - Scroll screen to line 1 (to hide line 100 from the screen)
+  - Perform undo
+  In my case I see blink but don't see the change itself on the line 100.
+  }
+  FLastUndoY:= -1;
 
   repeat
     if List.Count=0 then Break;
