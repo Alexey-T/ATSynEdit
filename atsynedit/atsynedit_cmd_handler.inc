@@ -197,7 +197,7 @@ begin
 
   St:= Strings;
   if bTextChanged or St.ModifiedRecent then
-    St.DoSaveLastEditPos; //clears St.ModifiedRecent
+    St.ActionSaveLastEditionPos; //clears St.ModifiedRecent
 
   if bTextChanged then
   begin

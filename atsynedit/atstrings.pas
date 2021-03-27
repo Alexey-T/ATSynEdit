@@ -417,8 +417,8 @@ type
     procedure DoEventLog(ALine: integer);
     procedure DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     //misc
-    procedure DoSaveLastEditPos(AX: integer=-1; AY: integer=-1);
-    procedure DoGotoLastEditPos;
+    procedure ActionSaveLastEditionPos(AX: integer=-1; AY: integer=-1);
+    procedure ActionGotoLastEditionPos;
     procedure DoOnChangeBlock(AX1, AY1, AX2, AY2: integer;
       AChange: TATBlockChangeKind; ABlock: TStringList);
     function OffsetToPosition(AOffset: integer): TPoint;
@@ -2048,7 +2048,7 @@ begin
     FList.GetItem(i)^.Ex.Updated:= false;
 end;
 
-procedure TATStrings.DoSaveLastEditPos(AX: integer; AY: integer);
+procedure TATStrings.ActionSaveLastEditionPos(AX: integer; AY: integer);
 var
   Ar: TATPointArray;
 begin
@@ -2070,7 +2070,7 @@ begin
     CaretsAfterLastEdition:= Ar;
 end;
 
-procedure TATStrings.DoGotoLastEditPos;
+procedure TATStrings.ActionGotoLastEditionPos;
 begin
   if Length(CaretsAfterLastEdition)>0 then
     SetCaretsArray(CaretsAfterLastEdition);
