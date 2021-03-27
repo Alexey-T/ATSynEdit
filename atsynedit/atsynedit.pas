@@ -8669,7 +8669,8 @@ procedure TATSynEdit.ActionAddJumpToUndo;
 begin
   if FOptUndoForCaretJump then
     with Strings do
-      ActionAddJumpToUndo(GetCaretsArray);
+      ActionAddJumpToUndo(CaretsAfterLastEdition);
+      //ActionAddJumpToUndo(GetCaretsArray); //bad, parameter is needed only for another array
 end;
 
 
