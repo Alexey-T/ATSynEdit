@@ -168,6 +168,7 @@ end;
 procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   bTextChanged: boolean;
   bNeedRepaint, bAllowRepaint: boolean;
   bUndoRedo: boolean;
@@ -194,9 +195,12 @@ begin
     UpdateWrapInfo;
   end;
 
+  St:= Strings;
+  if bTextChanged or St.ModifiedRecent then
+    St.DoSaveLastEditPos; //clears St.ModifiedRecent
+
   if bTextChanged then
   begin
-    FLastEditionCaretsArray:= FCarets.AsArray;
     bAllowRepaint:= FOptAllowRepaintOnTextChange;
     if FOptMouseHideCursor then
       if PtInRect(FRectMain, ScreenToClient(Mouse.CursorPos)) then

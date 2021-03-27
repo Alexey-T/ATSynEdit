@@ -588,7 +588,6 @@ type
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
     FLastLineOfSlowEvents: integer;
-    FLastEditionCaretsArray: TATPointArray;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
@@ -914,7 +913,6 @@ type
     procedure DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
     procedure DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
     function DoCaretsKeepOnScreen(AMoveDown: boolean): boolean;
-    procedure DoCaretsOnChanged(Sender: TObject);
     procedure DoCaretsAssign(NewCarets: TATCarets);
     procedure DoCaretsShift_CaretItem(Caret: TATCaretItem; APosX, APosY, AShiftX,
       AShiftY, AShiftBelowX: integer);
@@ -4052,7 +4050,6 @@ begin
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
-  FCarets.OnCaretChanged:= @DoCaretsOnChanged;
 
   FCaretShowEnabled:= false; //code sets it On in DoEnter
   FCaretShown:= false;
@@ -7900,14 +7897,6 @@ begin
   WMHScroll(Msg);
 end;
 
-procedure TATSynEdit.DoCaretsOnChanged(Sender: TObject);
-begin
-  if Strings.ModifiedRecent then
-    if Assigned(FCarets) and (FCarets.Count>0) then
-      Strings.DoSaveLastEditPos;
-      //it clears ModifiedRecent
-end;
-
 procedure TATSynEdit.TimerIdleTick(Sender: TObject);
 begin
   FTimerIdle.Enabled:= false;
@@ -8679,7 +8668,8 @@ end;
 procedure TATSynEdit.ActionAddJumpToUndo;
 begin
   if FOptUndoForCaretJump then
-    Strings.ActionAddJumpToUndo(FLastEditionCaretsArray);
+    with Strings do
+      ActionAddJumpToUndo(CaretsAfterLastEdition);
 end;
 
 
