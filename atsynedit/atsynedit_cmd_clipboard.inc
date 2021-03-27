@@ -3,12 +3,14 @@
 function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
+  St: TATStrings;
   Str: atString;
   bHandled, bNeedFixLastEol: boolean;
   Num64: Int64;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   if Assigned(FOnPaste) then
   begin
@@ -41,39 +43,39 @@ begin
     bNeedFixLastEol:= false
   else
     bNeedFixLastEol:=
-      (Strings.Count>0) and
+      (St.Count>0) and
       (Carets.Count=1) and
-      (Carets[0].PosY=Strings.Count-1) and
-      (Strings.LinesEnds[Strings.Count-1]=cEndNone) and
+      (Carets[0].PosY=St.Count-1) and
+      (St.LinesEnds[St.Count-1]=cEndNone) and
       not SEndsWithEol(Str);
 
   //paste
-  Strings.BeginUndoGroup;
+  St.BeginUndoGroup;
   DoCommand_TextDeleteSelection;
   Result:= DoCommand_TextInsertAtCarets(Str,
              AKeepCaret,
              FOverwrite and FOptOverwriteAllowedOnPaste,
              ASelectThen);
-  Strings.EndUndoGroup;
+  St.EndUndoGroup;
 
   //test special case: paste on text end
   if Carets.Count>0 then
     if bNeedFixLastEol then
     begin
-      Strings.ActionDeleteFakeLineAndFinalEol;
+      St.ActionDeleteFakeLineAndFinalEol;
       //correct caret after line deleted
       if not AKeepCaret
-        and (Carets[0].PosY>=Strings.Count)
-        and (Strings.Count>0) then
+        and (Carets[0].PosY>=St.Count)
+        and (St.Count>0) then
         DoCaretSingle(
-          Strings.LinesLen[Strings.Count-1],
-          Strings.Count-1
+          St.LinesLen[St.Count-1],
+          St.Count-1
           );
     end
     else
     begin
-      if Carets[Carets.Count-1].PosY>=Strings.Count then
-        Strings.ActionAddFakeLineIfNeeded;
+      if Carets[Carets.Count-1].PosY>=St.Count then
+        St.ActionAddFakeLineIfNeeded;
     end;
 end;
 
