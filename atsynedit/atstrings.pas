@@ -1977,6 +1977,16 @@ begin
 
   //ShowMessage('Undo list:'#10+FUndolist.DebugText);
 
+  {
+  solve CudaText #3261:
+   - Type something on line e.g. 100
+   - Press Ctrl+F and find any text on line e.g. 25
+   - Go to main window and try Undo/Redo
+  it undoes/redoes editing on the line 100, but moves the caret to line 25.
+  Usually first time it doesn't jump (as expected) but after repeating steps 2 and 3 it's starting to jump again.
+  }
+  SetCaretsArray(CaretsAfterLastEdition);
+
   repeat
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
