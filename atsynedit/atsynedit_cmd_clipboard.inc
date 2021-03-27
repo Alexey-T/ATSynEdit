@@ -58,6 +58,9 @@ begin
              ASelectThen);
   St.EndUndoGroup;
 
+  //solve CudaText #3270
+  St.SetGroupMark;
+
   //test special case: paste on text end
   if Carets.Count>0 then
     if bNeedFixLastEol then
