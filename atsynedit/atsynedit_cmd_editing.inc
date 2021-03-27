@@ -836,10 +836,12 @@ end;
 function TATSynEdit.DoCommand_UndoRedo(AUndo: boolean): TATCommandResults;
 //undo/redo runs App.ProcessMessages, need to lock
 var
+  St: TATStrings;
   bLock, bFocus: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   if AUndo then
     bLock:= (GetUndoCount>0) and (OptUndoPause>0)
@@ -854,8 +856,9 @@ begin
 
   try
     if not AUndo then
-      Strings.SetGroupMark;
-    Strings.UndoOrRedo(AUndo, FOptUndoGrouped)
+      St.SetGroupMark;
+
+    St.UndoOrRedo(AUndo, FOptUndoGrouped)
   finally
     if bLock then
     begin
