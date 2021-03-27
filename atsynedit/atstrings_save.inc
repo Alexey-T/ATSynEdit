@@ -114,10 +114,10 @@ end;
 
 procedure TATStrings.DoFinalizeSaving;
 begin
-  DoClearLineStates(true);
+  ClearLineStates(true);
 
   if not FUndoAfterSave then
-    DoClearUndo
+    ClearUndo
   else
   begin
     FUndoList.DeleteUnmodifiedMarks;

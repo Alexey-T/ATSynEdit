@@ -406,7 +406,7 @@ begin
   begin
     //delete fast
     FList.DeleteRange(ALine1, ALine2);
-    DoClearUndo;
+    ClearUndo;
   end;
 
   DoEventChange(cLineChangeDeleted, ALine1, ALine2-ALine1+1);

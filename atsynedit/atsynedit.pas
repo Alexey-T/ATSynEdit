@@ -7215,7 +7215,7 @@ begin
   St:= Strings;
   if not AValue then
   begin
-    St.DoClearUndo(true);
+    St.ClearUndo(true);
     St.EnabledChangeEvents:= false;
     if Carets.Count>0 then
     begin
@@ -7226,7 +7226,7 @@ begin
   end
   else
   begin
-    St.DoClearUndo(false);
+    St.ClearUndo(false);
     St.EnabledChangeEvents:= true;
     if St.IsIndexValid(FLastLineOfSlowEvents) then
     begin

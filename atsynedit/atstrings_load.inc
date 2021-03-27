@@ -553,7 +553,7 @@ end;
 
 procedure TATStrings.LoadFromStream(Stream: TStream);
 begin
-  DoClearUndo(true);
+  ClearUndo(true);
   DoLoadFromStream(Stream, FLoadingForcedANSI);
   DoFinalizeLoading;
 end;
@@ -587,8 +587,8 @@ procedure TATStrings.DoFinalizeLoading;
 begin
   DoDetectEndings;
   ActionAddFakeLineIfNeeded;
-  DoClearLineStates(false);
-  DoClearUndo;
+  ClearLineStates(false);
+  ClearUndo;
   Modified:= false;
   FProgressValue:= 0;
 end;

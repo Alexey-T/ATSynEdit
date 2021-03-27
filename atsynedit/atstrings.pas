@@ -276,7 +276,7 @@ type
     procedure DoLoadFromStream(Stream: TStream; out AForcedToANSI: boolean);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
-    procedure DoClearLineStates(ASaved: boolean);
+    procedure ClearLineStates(ASaved: boolean);
     procedure SetModified(AValue: boolean);
     procedure SetRedoAsString(const AValue: string);
     procedure SetUndoAsString(const AValue: string);
@@ -412,8 +412,8 @@ type
     property RedoEmpty: boolean read GetRedoEmpty;
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
-    procedure DoClearUndo(ALocked: boolean = false);
-    procedure DoClearLineStatesUpdated;
+    procedure ClearUndo(ALocked: boolean = false);
+    procedure ClearLineStatesUpdated;
     procedure DoEventLog(ALine: integer);
     procedure DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     //misc
@@ -1252,7 +1252,7 @@ begin
   SetLength(CaretsAfterLastEdition, 0);
 
   ActionAddFakeLineIfNeeded;
-  DoClearUndo;
+  ClearUndo;
 end;
 
 destructor TATStrings.Destroy;
@@ -1270,7 +1270,7 @@ begin
   GutterDecor1:= nil;
   GutterDecor2:= nil;
 
-  DoClearUndo(true);
+  ClearUndo(true);
   FList.Clear; //Clear calls event, no need
 
   FreeAndNil(FList);
@@ -1560,14 +1560,14 @@ end;
 
 procedure TATStrings.Clear;
 begin
-  DoClearUndo(FUndoList.Locked);
+  ClearUndo(FUndoList.Locked);
   DoEventLog(-1);
   DoEventChange(cLineChangeDeletedAll, -1, 1);
 
   FList.Clear;
 end;
 
-procedure TATStrings.DoClearLineStates(ASaved: boolean);
+procedure TATStrings.ClearLineStates(ASaved: boolean);
 var
   Item: PATStringItem;
   i: integer;
@@ -2019,7 +2019,7 @@ begin
     ListOther.SoftMark:= true;
 end;
 
-procedure TATStrings.DoClearUndo(ALocked: boolean = false);
+procedure TATStrings.ClearUndo(ALocked: boolean = false);
 begin
   if Assigned(FUndoList) then
   begin
@@ -2040,7 +2040,7 @@ begin
   end;
 end;
 
-procedure TATStrings.DoClearLineStatesUpdated;
+procedure TATStrings.ClearLineStatesUpdated;
 var
   i: integer;
 begin
@@ -2086,15 +2086,15 @@ procedure TATStrings.ActionDeleteAllBlanks;
 var
   i: integer;
 begin
-  DoClearUndo;
-  DoClearLineStates(false);
+  ClearUndo;
+  ClearLineStates(false);
 
   for i:= Count-1 downto 0 do
     if LinesBlank[i] then
       FList.Delete(i);
 
   ActionAddFakeLineIfNeeded;
-  DoClearLineStates(false);
+  ClearLineStates(false);
 
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
@@ -2104,15 +2104,15 @@ procedure TATStrings.ActionDeleteAdjacentBlanks;
 var
   i: integer;
 begin
-  DoClearUndo;
-  DoClearLineStates(false);
+  ClearUndo;
+  ClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
     if LinesBlank[i] and LinesBlank[i-1] then
       FList.Delete(i);
 
   ActionAddFakeLineIfNeeded;
-  DoClearLineStates(false);
+  ClearLineStates(false);
 
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
@@ -2122,15 +2122,15 @@ procedure TATStrings.ActionDeleteAdjacentDups;
 var
   i: integer;
 begin
-  DoClearUndo;
-  DoClearLineStates(false);
+  ClearUndo;
+  ClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
     if (LinesLen[i]=LinesLen[i-1]) and (Lines[i]=Lines[i-1]) then
       FList.Delete(i);
 
   ActionAddFakeLineIfNeeded;
-  DoClearLineStates(false);
+  ClearLineStates(false);
 
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
@@ -2141,8 +2141,8 @@ var
   i, j, NLen: integer;
   S: UnicodeString;
 begin
-  DoClearUndo;
-  DoClearLineStates(false);
+  ClearUndo;
+  ClearLineStates(false);
 
   for i:= Count-1 downto 1{!} do
   begin
@@ -2159,7 +2159,7 @@ begin
   end;
 
   ActionAddFakeLineIfNeeded;
-  DoClearLineStates(false);
+  ClearLineStates(false);
 
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
@@ -2180,8 +2180,8 @@ begin
     exit;
   end;
 
-  DoClearUndo;
-  DoClearLineStates(false);
+  ClearUndo;
+  ClearLineStates(false);
 
   mid:= Cnt div 2;
   if Odd(Cnt) then
@@ -2191,7 +2191,7 @@ begin
     FList.Exchange(i, Cnt-1-i);
 
   ActionAddFakeLineIfNeeded;
-  DoClearLineStates(false);
+  ClearLineStates(false);
 
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
@@ -2211,15 +2211,15 @@ begin
     exit;
   end;
 
-  DoClearUndo;
-  DoClearLineStates(false);
+  ClearUndo;
+  ClearLineStates(false);
 
   // https://stackoverflow.com/a/14006825/6792690
   for i:= Cnt-1 downto 1 do
     FList.Exchange(i, Random(i+1));
 
   ActionAddFakeLineIfNeeded;
-  DoClearLineStates(false);
+  ClearLineStates(false);
 
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
@@ -2474,8 +2474,8 @@ begin
       Func:= @Compare_DescNoCase;
   end;
 
-  DoClearUndo;
-  DoClearLineStates(false);
+  ClearUndo;
+  ClearLineStates(false);
 
   for i:= Count-1 downto 0 do
     if LinesLen[i]=0 then
@@ -2487,7 +2487,7 @@ begin
     FList.SortRange(AFrom, ATo, Func);
 
   ActionAddFakeLineIfNeeded;
-  DoClearLineStates(false);
+  ClearLineStates(false);
 
   //this clears all bookmarks, ranges, decors - it's ok
   DoEventChange(cLineChangeDeletedAll, -1, 1);
