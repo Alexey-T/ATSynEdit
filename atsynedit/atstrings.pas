@@ -217,7 +217,6 @@ type
     FOnUndoBefore: TATStringsUndoEvent;
     FOnUndoAfter: TATStringsUndoEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
-    FSavedCaretsArray: TATPointArray;
     FChangeBlockActive: boolean;
       //to use with OnChangeBlock:
       //indicates that program can ignore separate line changes in OnChange,
@@ -287,6 +286,7 @@ type
       AHardMarkedNext, AUnmodifiedNext: boolean);
     procedure DoAddUpdate(N: integer; AAction: TATEditAction);
   public
+    CaretsAfterLastEdition: TATPointArray;
     constructor Create(AUndoLimit: integer); virtual;
     destructor Destroy; override;
     procedure Clear;
@@ -1251,7 +1251,7 @@ begin
   FOneLine:= false;
   FProgressValue:= 0;
   FProgressKind:= cStringsProgressNone;
-  SetLength(FSavedCaretsArray, 0);
+  SetLength(CaretsAfterLastEdition, 0);
 
   ActionAddFakeLineIfNeeded;
   DoClearUndo;
@@ -2069,13 +2069,13 @@ begin
     Ar:= GetCaretsArray;
 
   if Length(Ar)>0 then
-    FSavedCaretsArray:= Ar;
+    CaretsAfterLastEdition:= Ar;
 end;
 
 procedure TATStrings.DoGotoLastEditPos;
 begin
-  if Length(FSavedCaretsArray)>0 then
-    SetCaretsArray(FSavedCaretsArray);
+  if Length(CaretsAfterLastEdition)>0 then
+    SetCaretsArray(CaretsAfterLastEdition);
 end;
 
 procedure TATStrings.ActionDeleteDupFakeLines;
