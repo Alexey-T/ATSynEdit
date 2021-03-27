@@ -231,7 +231,7 @@ type
     function Compare_AscNoCase(Key1, Key2: Pointer): Integer;
     function Compare_Desc(Key1, Key2: Pointer): Integer;
     function Compare_DescNoCase(Key1, Key2: Pointer): Integer;
-    procedure DoAddUndo(AAction: TATEditAction; AIndex: integer;
+    procedure AddUndoItem(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
     function DebugText: string;
     function DoCheckFilled: boolean;
@@ -282,9 +282,9 @@ type
     procedure SetRedoAsString(const AValue: string);
     procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
-    procedure DoUndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
+    procedure UndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean);
-    procedure DoAddUpdate(N: integer; AAction: TATEditAction);
+    procedure AddUpdatesAction(N: integer; AAction: TATEditAction);
   public
     CaretsAfterLastEdition: TATPointArray;
     constructor Create(AUndoLimit: integer); virtual;
@@ -1071,7 +1071,7 @@ begin
   if FReadOnly then Exit;
   Item:= FList.GetItem(AIndex);
 
-  DoAddUndo(aeaChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
+  AddUndoItem(aeaChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
   DoEventLog(AIndex);
   DoEventChange(cLineChangeEdited, AIndex, 1);
 
@@ -1108,7 +1108,7 @@ begin
 
   Item:= FList.GetItem(AIndex);
 
-  DoAddUndo(aeaChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState);
+  AddUndoItem(aeaChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState);
 
   Item^.Ex.Ends:= TATBits2(AValue);
   Item^.LineStateToChanged;
@@ -1336,7 +1336,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
-  DoAddUndo(aeaInsert, Count, '', cEndNone, cLineStateNone);
+  AddUndoItem(aeaInsert, Count, '', cEndNone, cLineStateNone);
   DoEventLog(Count);
   DoEventChange(cLineChangeAdded, Count, 1);
 
@@ -1391,7 +1391,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
-  DoAddUndo(aeaInsert, ALineIndex, '', cEndNone, cLineStateNone);
+  AddUndoItem(aeaInsert, ALineIndex, '', cEndNone, cLineStateNone);
 
   if AWithEvent then
   begin
@@ -1441,7 +1441,7 @@ begin
   begin
     for i:= 0 to NCount-1 do
     begin
-      DoAddUndo(aeaInsert, ALineIndex+i, '', cEndNone, cLineStateNone);
+      AddUndoItem(aeaInsert, ALineIndex+i, '', cEndNone, cLineStateNone);
 
       Item.Init(
         ABlock.GetLine(i),
@@ -1490,7 +1490,7 @@ begin
     Item:= FList.GetItem(ALineIndex);
 
     if AWithUndo then
-      DoAddUndo(aeaDelete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
+      AddUndoItem(aeaDelete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState);
 
     if AWithEvent then
     begin
@@ -1709,7 +1709,7 @@ begin
     end;
 end;
 
-procedure TATStrings.DoUndoSingle(ACurList: TATUndoList;
+procedure TATStrings.UndoSingle(ACurList: TATUndoList;
   out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean);
 var
   CurItem, PrevItem: TATUndoItem;
@@ -1911,7 +1911,7 @@ begin
     FOnSetMarkersArray(L);
 end;
 
-procedure TATStrings.DoAddUndo(AAction: TATEditAction; AIndex: integer;
+procedure TATStrings.AddUndoItem(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState);
 var
   CurList: TATUndoList;
@@ -1945,7 +1945,7 @@ begin
   begin
     if not FUndoList.Locked and not FRedoList.Locked then
       FRedoList.Clear;
-    DoAddUpdate(AIndex, AAction);
+    AddUpdatesAction(AIndex, AAction);
   end;
 
   CurList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
@@ -1998,7 +1998,7 @@ begin
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
-    DoUndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);
+    UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);
 
     //handle unmodified
     //don't clear FModified if List.IsEmpty! http://synwrite.sourceforge.net/forums/viewtopic.php?f=5&t=2504
@@ -2237,7 +2237,7 @@ var
   Item: TATUndoItem;
 begin
   if FUndoList.Locked then exit;
-  DoAddUndo(aeaCaretJump, 0, '', cEndNone, cLineStateNone);
+  AddUndoItem(aeaCaretJump, 0, '', cEndNone, cLineStateNone);
   Item:= FUndoList.Last;
   if Assigned(Item) then
     if Length(ACaretsArray)>0 then
@@ -2245,7 +2245,7 @@ begin
 end;
 
 
-procedure TATStrings.DoAddUpdate(N: integer; AAction: TATEditAction);
+procedure TATStrings.AddUpdatesAction(N: integer; AAction: TATEditAction);
 begin
   if not Assigned(FListUpdates) then Exit;
 
