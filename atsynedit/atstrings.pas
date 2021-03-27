@@ -235,7 +235,6 @@ type
     function DebugText: string;
     function DoCheckFilled: boolean;
     procedure DoFinalizeSaving;
-    procedure DoUndoRedo(AUndo: boolean; AGrouped: boolean);
     function GetCaretsArray: TATPointArray;
     function GetMarkersArray: TATInt64Array;
     function GetLine(AIndex: integer): atString;
@@ -404,8 +403,7 @@ type
     procedure SetGroupMark;
     procedure BeginUndoGroup;
     procedure EndUndoGroup;
-    procedure Undo(AGrouped: boolean);
-    procedure Redo(AGrouped: boolean);
+    procedure UndoOrRedo(AUndo: boolean; AGrouped: boolean);
     property UndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
     property UndoCount: integer read GetUndoCount;
@@ -1955,7 +1953,7 @@ begin
   CurList.Add(AAction, AIndex, AText, AEnd, ALineState, GetCaretsArray, GetMarkersArray);
 end;
 
-procedure TATStrings.DoUndoRedo(AUndo: boolean; AGrouped: boolean);
+procedure TATStrings.UndoOrRedo(AUndo: boolean; AGrouped: boolean);
 var
   List, ListOther: TATUndoList;
   bSoftMarked,
@@ -2009,16 +2007,6 @@ begin
   //apply Softmark to ListOther
   if bSoftMarked and AGrouped then
     ListOther.SoftMark:= true;
-end;
-
-procedure TATStrings.Undo(AGrouped: boolean);
-begin
-  DoUndoRedo(true, AGrouped);
-end;
-
-procedure TATStrings.Redo(AGrouped: boolean);
-begin
-  DoUndoRedo(false, AGrouped);
 end;
 
 procedure TATStrings.DoClearUndo(ALocked: boolean = false);

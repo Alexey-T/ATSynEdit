@@ -854,11 +854,11 @@ begin
 
   try
     if AUndo then
-      Strings.Undo(FOptUndoGrouped)
+      Strings.UndoOrRedo(AUndo, FOptUndoGrouped)
     else
     begin
       Strings.SetGroupMark;
-      Strings.Redo(FOptUndoGrouped);
+      Strings.UndoOrRedo(AUndo, FOptUndoGrouped);
     end;
   finally
     if bLock then
