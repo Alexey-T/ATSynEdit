@@ -80,6 +80,8 @@ type
     FLocked: boolean;
     FSoftMark: boolean;
     FHardMark: boolean;
+    FLastTick: DWord;
+    FPauseForMakingGroup: integer;
     function GetAsString: string;
     function GetItem(N: integer): TATUndoItem;
     procedure SetAsString(const AValue: string);
@@ -95,6 +97,7 @@ type
     property SoftMark: boolean read FSoftMark write FSoftMark;
     property HardMark: boolean read FHardMark write FHardMark;
     property Locked: boolean read FLocked write FLocked;
+    property PauseForMakingGroup: integer read FPauseForMakingGroup write FPauseForMakingGroup;
     procedure Clear;
     procedure Delete(N: integer);
     procedure DeleteLast;
@@ -288,6 +291,7 @@ begin
   FSoftMark:= false;
   FHardMark:= false;
   FLocked:= false;
+  FPauseForMakingGroup:= 1500;
 end;
 
 destructor TATUndoList.Destroy;
@@ -350,6 +354,7 @@ procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
   const ACarets: TATPointArray; const AMarkers: TATInt64Array);
 var
   Item: TATUndoItem;
+  NewTick: QWord;
 begin
   if FLocked then Exit;
 
@@ -374,6 +379,11 @@ begin
         Exit
       end;
   end;
+
+  NewTick:= GetTickCount64;
+  if (FLastTick>0) and (NewTick-FLastTick>=FPauseForMakingGroup) then
+    FSoftMark:= true;
+  FLastTick:= NewTick;
 
   Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState, FSoftMark, FHardMark, ACarets, AMarkers);
   FList.Add(Item);
