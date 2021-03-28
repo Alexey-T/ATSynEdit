@@ -80,7 +80,7 @@ type
     FLocked: boolean;
     FSoftMark: boolean;
     FHardMark: boolean;
-    FLastTick: DWord;
+    FLastTick: QWord;
     FPauseForMakingGroup: integer;
     function GetAsString: string;
     function GetItem(N: integer): TATUndoItem;
