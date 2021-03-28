@@ -8583,24 +8583,33 @@ var
   NTop, NCount: integer;
 begin
   NTop:= LineTop;
-  if AY<NTop then exit(false);
+  if AY<NTop then
+    exit(false);
 
   NCount:= Strings.Count;
-  if NCount<=1 then exit(true);
-
-  //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
-  if AY>=NCount then
-    AY:= NCount-1;
+  if NCount<=1 then
+    exit(true);
 
   if OptWrapMode=cWrapOff then
   begin
+    if AY>=NCount then
+      AY:= NCount-1;
+
     Result:= AY<=NTop+GetVisibleLines;
   end
   else
   begin
-    if AY>LineBottom then exit(false);
+    //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
+    if AY>=NCount then
+      AY:= NCount-1
+    else
+    if AY>LineBottom then
+      exit(false);
 
     Pnt:= CaretPosToClientPos(Point(AX, AY));
+    //Pnt=(-1, -1) on Undo at end-of-file
+    if Pnt.Y=-1 then exit(true);
+
     Result:= PtInRect(FRectMainVisible, Pnt);
   end;
 end;
