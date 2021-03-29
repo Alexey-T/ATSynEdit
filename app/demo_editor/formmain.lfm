@@ -4,7 +4,7 @@ object fmMain: TfmMain
   Top = 168
   Width = 953
   Caption = 'Demo'
-  ClientHeight = 517
+  ClientHeight = 519
   ClientWidth = 953
   Menu = MainMenu1
   OnCreate = FormCreate
@@ -13,25 +13,25 @@ object fmMain: TfmMain
   LCLVersion = '2.1.0.0'
   object PanelMain: TPanel
     Left = 0
-    Height = 517
+    Height = 519
     Top = 0
     Width = 672
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 517
+    ClientHeight = 519
     ClientWidth = 672
     TabOrder = 0
     object Status: TStatusBar
       Left = 0
-      Height = 18
+      Height = 20
       Top = 499
       Width = 672
       Panels = <>
     end
     object StatusMsg: TStatusBar
       Left = 0
-      Height = 18
-      Top = 481
+      Height = 20
+      Top = 479
       Width = 672
       Font.Color = clBlue
       Panels = <>
@@ -46,7 +46,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Side = asrCenter
       Left = 507
       Height = 14
-      Top = 483
+      Top = 482
       Width = 160
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
@@ -61,7 +61,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Side = asrCenter
       Left = 412
       Height = 22
-      Top = 479
+      Top = 478
       Width = 90
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
@@ -73,17 +73,17 @@ object fmMain: TfmMain
   end
   object PanelRt: TPanel
     Left = 672
-    Height = 517
+    Height = 519
     Top = 0
     Width = 281
     Align = alRight
     BevelOuter = bvNone
-    ClientHeight = 517
+    ClientHeight = 519
     ClientWidth = 281
     TabOrder = 1
     object chkGutter: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 8
       Width = 68
       Caption = 'gutter'
@@ -92,7 +92,7 @@ object fmMain: TfmMain
     end
     object chkRuler: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 30
       Width = 58
       Caption = 'ruler'
@@ -101,7 +101,7 @@ object fmMain: TfmMain
     end
     object chkMinimap: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 52
       Width = 85
       Caption = 'minimap'
@@ -113,14 +113,14 @@ object fmMain: TfmMain
       AnchorSideTop.Side = asrCenter
       Left = 64
       Height = 17
-      Top = 376
+      Top = 373
       Width = 83
       Caption = 'fixed margin'
       ParentColor = False
     end
     object edMarginFixed: TSpinEdit
       Left = 8
-      Height = 33
+      Height = 26
       Top = 368
       Width = 52
       MaxValue = 200
@@ -135,12 +135,12 @@ object fmMain: TfmMain
       Top = 4
       Width = 128
       Caption = 'wrap'
-      ClientHeight = 120
-      ClientWidth = 126
+      ClientHeight = 119
+      ClientWidth = 124
       TabOrder = 15
       object chkWrapOff: TRadioButton
         Left = 8
-        Height = 23
+        Height = 24
         Top = 0
         Width = 46
         Caption = 'off'
@@ -151,7 +151,7 @@ object fmMain: TfmMain
       end
       object chkWrapOn: TRadioButton
         Left = 8
-        Height = 23
+        Height = 24
         Top = 20
         Width = 77
         Caption = 'window'
@@ -160,7 +160,7 @@ object fmMain: TfmMain
       end
       object chkWrapMargin: TRadioButton
         Left = 8
-        Height = 23
+        Height = 24
         Top = 40
         Width = 73
         Caption = 'margin'
@@ -169,7 +169,7 @@ object fmMain: TfmMain
       end
       object chkWrapIndent: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 88
         Width = 101
         Caption = 'with indent'
@@ -178,7 +178,7 @@ object fmMain: TfmMain
       end
       object chkWrapWndMargin: TRadioButton
         Left = 8
-        Height = 23
+        Height = 24
         Top = 62
         Width = 115
         Caption = 'min wnd/mrg'
@@ -188,7 +188,7 @@ object fmMain: TfmMain
     end
     object edFontsize: TSpinEdit
       Left = 8
-      Height = 33
+      Height = 26
       Top = 272
       Width = 52
       MaxValue = 40
@@ -202,7 +202,7 @@ object fmMain: TfmMain
       AnchorSideTop.Side = asrCenter
       Left = 64
       Height = 17
-      Top = 280
+      Top = 277
       Width = 58
       Caption = 'font size'
       ParentColor = False
@@ -213,12 +213,12 @@ object fmMain: TfmMain
       Top = 144
       Width = 128
       Caption = 'unprintable'
-      ClientHeight = 86
-      ClientWidth = 126
+      ClientHeight = 85
+      ClientWidth = 124
       TabOrder = 16
       object chkUnprintVis: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 1
         Width = 60
         Caption = 'show'
@@ -227,7 +227,7 @@ object fmMain: TfmMain
       end
       object chkUnprintSp: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 20
         Width = 72
         Caption = 'spaces'
@@ -236,7 +236,7 @@ object fmMain: TfmMain
       end
       object chkUnprintEnd: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 40
         Width = 58
         Caption = 'ends'
@@ -245,7 +245,7 @@ object fmMain: TfmMain
       end
       object chkUnprintEndDet: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 60
         Width = 101
         Caption = 'end-details'
@@ -255,7 +255,7 @@ object fmMain: TfmMain
     end
     object edTabsize: TSpinEdit
       Left = 8
-      Height = 33
+      Height = 26
       Top = 304
       Width = 52
       MaxValue = 12
@@ -269,7 +269,7 @@ object fmMain: TfmMain
       AnchorSideTop.Side = asrCenter
       Left = 64
       Height = 17
-      Top = 312
+      Top = 309
       Width = 52
       Caption = 'tab size'
       ParentColor = False
@@ -285,7 +285,7 @@ object fmMain: TfmMain
     end
     object chkMicromap: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 118
       Width = 95
       Caption = 'micromap'
@@ -294,7 +294,7 @@ object fmMain: TfmMain
     end
     object edSpaceY: TSpinEdit
       Left = 8
-      Height = 33
+      Height = 26
       Top = 336
       Width = 52
       MaxValue = 10
@@ -307,7 +307,7 @@ object fmMain: TfmMain
       AnchorSideTop.Side = asrCenter
       Left = 64
       Height = 17
-      Top = 344
+      Top = 341
       Width = 62
       Caption = 'spacing-y'
       ParentColor = False
@@ -323,7 +323,7 @@ object fmMain: TfmMain
     end
     object chkMinimapLeft: TCheckBox
       Left = 30
-      Height = 23
+      Height = 24
       Top = 74
       Width = 67
       Caption = 'at left'
@@ -332,7 +332,7 @@ object fmMain: TfmMain
     end
     object chkNewScroll: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 140
       Width = 123
       Caption = 'new scrollbars'
@@ -341,7 +341,7 @@ object fmMain: TfmMain
     end
     object chkTabSpaces: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 162
       Width = 116
       Caption = 'tab as spaces'
@@ -354,7 +354,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Control = PanelRt
       AnchorSideBottom.Side = asrBottom
       Left = 8
-      Height = 107
+      Height = 109
       Top = 408
       Width = 271
       Anchors = [akTop, akLeft, akRight, akBottom]
@@ -375,7 +375,7 @@ object fmMain: TfmMain
     end
     object chkMouseEn: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 184
       Width = 150
       Caption = 'mouse sel enabled'
@@ -386,7 +386,7 @@ object fmMain: TfmMain
     end
     object chkMinimapTooltip: TCheckBox
       Left = 30
-      Height = 23
+      Height = 24
       Top = 96
       Width = 73
       Caption = 'tooltip'
@@ -397,7 +397,7 @@ object fmMain: TfmMain
     end
     object chkSmoothScroll: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 232
       Width = 118
       Caption = 'smooth scroll'
@@ -434,7 +434,7 @@ object fmMain: TfmMain
     end
     object chkMouseColSelect: TCheckBox
       Left = 8
-      Height = 23
+      Height = 24
       Top = 208
       Width = 123
       Caption = 'mouse vert sel'
@@ -549,6 +549,10 @@ object fmMain: TfmMain
       object mnuTestMarker: TMenuItem
         Caption = 'place marker at caret'
         OnClick = btnMarkerClick
+      end
+      object mnuTestConvPos: TMenuItem
+        Caption = 'test CaretPosToClientPos'
+        OnClick = mnuTestConvPosClick
       end
       object MenuItem5: TMenuItem
         Caption = '-'

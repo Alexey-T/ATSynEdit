@@ -93,7 +93,7 @@ type
     mnuEnc: TMenuItem;
     MenuItem2: TMenuItem;
     mnuHelpMous: TMenuItem;
-    MenuItem3: TMenuItem;
+    mnuTestConvPos: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
@@ -158,6 +158,7 @@ type
     procedure mnuFileSaveClick(Sender: TObject);
     procedure mnuFindClick(Sender: TObject);
     procedure mnuFindNextClick(Sender: TObject);
+    procedure mnuTestConvPosClick(Sender: TObject);
     procedure mnuTestGapAddClick(Sender: TObject);
     procedure mnuTestGapClearClick(Sender: TObject);
     procedure mnuTestGapPanelsClick(Sender: TObject);
@@ -965,6 +966,14 @@ begin
   ok:= FFinder.DoAction_FindOrReplace(false, false, bChanged, true);
   FinderUpdateEditor(false);
   if not ok then DoFindError;
+end;
+
+procedure TfmMain.mnuTestConvPosClick(Sender: TObject);
+var
+  P: TPoint;
+begin
+  P:= ed.CaretPosToClientPos(Point(0, ed.Strings.Count{after end-of-file!}));
+  ShowMessage(Format('Client pos (%d, %d)', [P.X, P.Y]));
 end;
 
 procedure TfmMain.mnuTestGapAddClick(Sender: TObject);

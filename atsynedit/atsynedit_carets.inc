@@ -171,14 +171,34 @@ var
   NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
   NScrolledHorzSmooth: integer;
   NScrolledVert: integer;
+  NLineCount: integer;
   Str: atString;
   bLineHuge: boolean;
   bAsciiOnly: boolean;
+  bAfterEnd: boolean;
   i: integer;
 begin
   Result.X:= -1;
   Result.Y:= -1;
-  if not AStrings.IsIndexValid(P.Y) then Exit;
+
+  if P.Y<0 then Exit;
+
+  NLineCount:= AStrings.Count;
+  if NLineCount=0 then
+  begin
+    Result.X:= ARect.Left;
+    Result.Y:= ARect.Top;
+    Exit;
+  end;
+
+  //if needed pos after file-end, we
+  //1) calculate pos of last char, 2) increase Y by char height
+  bAfterEnd:= P.Y>=NLineCount;
+  if bAfterEnd then
+  begin
+    P.Y:= NLineCount-1;
+    P.X:= AStrings.LinesLen[P.Y];
+  end;
 
   AWrapInfo.FindIndexesOfLineNumber(P.Y, NIndex1, NIndex2);
   if NIndex1<0 then Exit;
@@ -237,6 +257,13 @@ begin
     //coords of corner
     Inc(Result.X, ARect.Left);
     Inc(Result.Y, ARect.Top);
+
+    if bAfterEnd then
+    begin
+      Result.X:= ARect.Left;
+      Inc(Result.Y, ACharSize.Y);
+    end;
+
     Exit
   end;
 end;
