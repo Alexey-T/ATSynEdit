@@ -8600,8 +8600,6 @@ begin
       exit(false);
 
     Pnt:= CaretPosToClientPos(Point(AX, AY));
-
-    //happens after end-of-file
     if Pnt.Y=-1 then
       exit(true);
 
