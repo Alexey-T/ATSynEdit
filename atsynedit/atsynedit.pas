@@ -8590,12 +8590,6 @@ begin
   if NCount<=1 then
     exit(true);
 
-  //happens after end-of-file,
-  //return True to not slow down the undo/redo
-  //for example: big file; Ctrl+A, Del; Undo
-  if AY>=NCount then
-    exit(true);
-
   if OptWrapMode=cWrapOff then
   begin
     Result:= AY<=NTop+GetVisibleLines;
@@ -8622,6 +8616,7 @@ begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
+  if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
   if IsPosInVisibleArea(AX, AY) then exit;
 
   if FOptUndoPauseHighlightLine then
@@ -8661,6 +8656,7 @@ begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
+  if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
   if IsPosInVisibleArea(AX, AY) then exit;
 
   if FOptUndoPauseHighlightLine then
