@@ -3614,6 +3614,7 @@ var
 begin
   WrapItem:= FWrapInfo[AWrapIndex];
   NLinesIndex:= WrapItem.NLineIndex;
+  if not Strings.IsIndexValid(NLinesIndex) then exit;
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
 
   //paint area over scrolled text
@@ -3683,7 +3684,7 @@ begin
 
   //gutter band: state
   Band:= FGutter[FGutterBandStates];
-  if Band.Visible and Strings.IsIndexValid(NLinesIndex) then
+  if Band.Visible then
   begin
     LineState:= Strings.LinesState[NLinesIndex];
     if LineState<>cLineStateNone then
