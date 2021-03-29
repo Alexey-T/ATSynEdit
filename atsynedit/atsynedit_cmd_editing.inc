@@ -46,7 +46,8 @@ begin
   TextItems:= nil;
 
   try
-    bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
+    //bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
+    bNeedGroup:= false; //CudaText #3274
 
     if bNeedGroup then
       Strings.BeginUndoGroup;
