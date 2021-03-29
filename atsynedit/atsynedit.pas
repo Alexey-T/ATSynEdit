@@ -296,6 +296,7 @@ const
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
   cInitUndoPause = 300;
+  cInitUndoPause2 = 100;
   cInitUndoPauseHighlightLine = true;
   cInitUndoForCaretJump = true;
   cInitMicromapShowForMinCount = 2;
@@ -588,6 +589,7 @@ type
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
     FLastLineOfSlowEvents: integer;
+    //FLastTickOfUndo: QWord;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
@@ -755,6 +757,7 @@ type
     FOptUndoIndentVert: integer;
     FOptUndoIndentHorz: integer;
     FOptUndoPause: integer;
+    FOptUndoPause2: integer;
     FOptUndoPauseHighlightLine: boolean;
     FOptUndoForCaretJump: boolean;
     FOptScrollbarsNew: boolean;
@@ -1825,6 +1828,7 @@ type
     property OptUndoIndentVert: integer read FOptUndoIndentVert write FOptUndoIndentVert default cInitUndoIndentVert;
     property OptUndoIndentHorz: integer read FOptUndoIndentHorz write FOptUndoIndentHorz default cInitUndoIndentHorz;
     property OptUndoPause: integer read FOptUndoPause write FOptUndoPause default cInitUndoPause;
+    property OptUndoPause2: integer read FOptUndoPause2 write FOptUndoPause2 default cInitUndoPause2;
     property OptUndoPauseHighlightLine: boolean read FOptUndoPauseHighlightLine write FOptUndoPauseHighlightLine default cInitUndoPauseHighlightLine;
     property OptUndoForCaretJump: boolean read FOptUndoForCaretJump write FOptUndoForCaretJump default cInitUndoForCaretJump;
     property OptSavingForceFinalEol: boolean read FOptSavingForceFinalEol write FOptSavingForceFinalEol default false;
@@ -3678,7 +3682,7 @@ begin
 
   //gutter band: state
   Band:= FGutter[FGutterBandStates];
-  if Band.Visible then
+  if Band.Visible and Strings.IsIndexValid(NLinesIndex) then
   begin
     LineState:= Strings.LinesState[NLinesIndex];
     if LineState<>cLineStateNone then
@@ -4116,6 +4120,7 @@ begin
   FOptUndoMaxCarets:= cInitUndoMaxCarets;
   FOptUndoGrouped:= true;
   FOptUndoPause:= cInitUndoPause;
+  FOptUndoPause2:= cInitUndoPause2;
   FOptUndoPauseHighlightLine:= cInitUndoPauseHighlightLine;
   FOptUndoForCaretJump:= cInitUndoForCaretJump;
 
@@ -8610,12 +8615,21 @@ end;
 procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
 var
   OldOption: boolean;
+  //Tick: QWord;
 begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
   if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
   if IsPosInVisibleArea(AX, AY) then exit;
+
+  {
+  Tick:= GetTickCount64;
+  if FLastTickOfUndo>0 then
+    if Tick-FLastTickOfUndo<FOptUndoPause2 then
+      exit;
+  FLastTickOfUndo:= Tick;
+  }
 
   if FOptUndoPauseHighlightLine then
   begin
@@ -8650,12 +8664,21 @@ end;
 procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; AX, AY: integer);
 var
   OldOption: boolean;
+  //Tick: QWord;
 begin
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
   if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
   if IsPosInVisibleArea(AX, AY) then exit;
+
+  {
+  Tick:= GetTickCount64;
+  if FLastTickOfUndo>0 then
+    if Tick-FLastTickOfUndo<FOptUndoPause2 then
+      exit;
+  FLastTickOfUndo:= Tick;
+  }
 
   if FOptUndoPauseHighlightLine then
   begin

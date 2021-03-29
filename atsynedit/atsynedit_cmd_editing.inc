@@ -854,6 +854,8 @@ begin
     Enabled:= false;
   end;
 
+  //FLastTickOfUndo:= 0;
+
   try
     if not AUndo then
       St.SetGroupMark;
