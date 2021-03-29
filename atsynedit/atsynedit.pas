@@ -8592,6 +8592,7 @@ begin
 
   //happens after end-of-file,
   //return True to not slow down the undo/redo
+  //for example: big file; Ctrl+A, Del; Undo
   if AY>=NCount then
     exit(true);
 
