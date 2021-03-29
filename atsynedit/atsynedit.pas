@@ -8590,24 +8590,23 @@ begin
   if NCount<=1 then
     exit(true);
 
+  //happens after end-of-file,
+  //return True to not slow down the undo/redo
+  if AY>=NCount then
+    exit(true);
+
   if OptWrapMode=cWrapOff then
   begin
-    if AY>=NCount then
-      AY:= NCount-1;
-
     Result:= AY<=NTop+GetVisibleLines;
   end
   else
   begin
-    //fixes CudaText issue #3268, blinking_and_delay_in_visible_area.zip
-    if AY>=NCount then
-      AY:= NCount-1
-    else
     if AY>LineBottom then
       exit(false);
 
     Pnt:= CaretPosToClientPos(Point(AX, AY));
-    //Pnt=(-1, -1) on Undo at end-of-file
+
+    //happens after end-of-file
     if Pnt.Y=-1 then
       exit(true);
 
