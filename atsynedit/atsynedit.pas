@@ -296,7 +296,7 @@ const
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
   cInitUndoPause = 300;
-  cInitUndoPause2 = 100;
+  cInitUndoPause2 = 1000;
   cInitUndoPauseHighlightLine = true;
   cInitUndoForCaretJump = true;
   cInitMicromapShowForMinCount = 2;
@@ -589,7 +589,8 @@ type
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
     FLastLineOfSlowEvents: integer;
-    //FLastTickOfUndo: QWord;
+    FLastUndoTick: QWord;
+    FLastUndoPaused: boolean;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
@@ -8615,21 +8616,23 @@ end;
 procedure TATSynEdit.DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
 var
   OldOption: boolean;
-  //Tick: QWord;
+  Tick: QWord;
 begin
+  FLastUndoPaused:= false;
+
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
   if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
   if IsPosInVisibleArea(AX, AY) then exit;
 
-  {
   Tick:= GetTickCount64;
-  if FLastTickOfUndo>0 then
-    if Tick-FLastTickOfUndo<FOptUndoPause2 then
+  if FLastUndoTick>0 then
+    if Tick-FLastUndoTick<FOptUndoPause2 then
       exit;
-  FLastTickOfUndo:= Tick;
-  }
+
+  FLastUndoPaused:= true;
+  FLastUndoTick:= Tick;
 
   if FOptUndoPauseHighlightLine then
   begin
@@ -8664,20 +8667,14 @@ end;
 procedure TATSynEdit.DoStringsOnUndoAfter(Sender: TObject; AX, AY: integer);
 var
   OldOption: boolean;
-  //Tick: QWord;
 begin
+  if not FLastUndoPaused then exit;
+  {
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
   if AY<0 then exit;
   if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
   if IsPosInVisibleArea(AX, AY) then exit;
-
-  {
-  Tick:= GetTickCount64;
-  if FLastTickOfUndo>0 then
-    if Tick-FLastTickOfUndo<FOptUndoPause2 then
-      exit;
-  FLastTickOfUndo:= Tick;
   }
 
   if FOptUndoPauseHighlightLine then
