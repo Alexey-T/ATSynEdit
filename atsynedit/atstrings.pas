@@ -12,7 +12,7 @@ interface
 
 uses
   {$ifdef windows} Windows, {$endif}
-  SysUtils, Classes, Graphics,
+  SysUtils, Classes, Graphics, Forms,
   ATStringProc,
   ATStringProc_UTF8Detect,
   ATStringProc_UTF8Decode,
@@ -1995,6 +1995,9 @@ begin
   FLastUndoY:= -1;
 
   repeat
+    //this is a must have for Undo after Ctrl+A, Del
+    if Application.Terminated then Break;
+
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
