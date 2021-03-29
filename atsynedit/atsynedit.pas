@@ -8608,7 +8608,8 @@ begin
 
     Pnt:= CaretPosToClientPos(Point(AX, AY));
     //Pnt=(-1, -1) on Undo at end-of-file
-    if Pnt.Y=-1 then exit(true);
+    if Pnt.Y=-1 then
+      exit(true);
 
     Result:= PtInRect(FRectMainVisible, Pnt);
   end;
