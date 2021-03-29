@@ -7563,6 +7563,9 @@ begin
     if Range^.Folded then Continue;
     }
 
+    if not Strings.IsIndexValid(Range^.Y) then Continue;
+    if not Strings.IsIndexValid(Range^.Y2) then Continue;
+
     if IsLineFolded(Range^.Y, true) then Continue;
     if IsLineFolded(Range^.Y2, true) then Continue;
 
