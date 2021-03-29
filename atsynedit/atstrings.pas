@@ -1995,7 +1995,8 @@ begin
   FLastUndoY:= -1;
 
   repeat
-    //this is a must have for Undo after Ctrl+A, Del
+    //better to have this, e.g. for Undo after Ctrl+A, Del
+    //we can have not fixed 'chain reaction of pauses'
     if Application.Terminated then Break;
 
     if List.Count=0 then Break;
