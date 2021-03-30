@@ -28,16 +28,18 @@ end;
 
 procedure TATSynEdit.DoCaretsAddOnColumnBlock(APos1, APos2: TPoint; const ARect: TRect);
 var
+  St: TATStrings;
   i: integer;
 begin
+  St:= Strings;
   for i:= APos1.Y to APos2.Y do
   begin
     if i=APos1.Y then
       Carets.Clear;
     Carets.Add(
-      Strings.ColumnPosToCharPos(i, ARect.Right, FTabHelper),
+      St.ColumnPosToCharPos(i, ARect.Right, FTabHelper),
       i,
-      Strings.ColumnPosToCharPos(i, ARect.Left, FTabHelper),
+      St.ColumnPosToCharPos(i, ARect.Left, FTabHelper),
       i
       );
   end
