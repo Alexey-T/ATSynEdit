@@ -814,9 +814,15 @@ procedure TATSynEdit.DoCaretsExtend(ADown: boolean; ALines: integer);
 var
   Caret: TATCaretItem;
   MoreCarets: TATCarets;
+  St: TATStrings;
   X, Y: integer;
   i, j: integer;
 begin
+  St:= Strings;
+
+  //it's needed to Undo to multi-carets, not to single caret
+  St.SetGroupMark;
+
   MoreCarets:= TATCarets.Create;
   try
     for i:= 0 to Carets.Count-1 do
@@ -824,11 +830,11 @@ begin
       Caret:= Carets[i];
       for j:= 1 to ALines do
       begin
-        if not Strings.IsIndexValid(Caret.PosY) then Break;
-        X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
+        if not St.IsIndexValid(Caret.PosY) then Break;
+        X:= St.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper);
         Y:= Caret.PosY+BoolToPlusMinusOne[ADown]*j;
-        if not Strings.IsIndexValid(Y) then Break;
-        X:= Strings.ColumnPosToCharPos(Y, X, FTabHelper);
+        if not St.IsIndexValid(Y) then Break;
+        X:= St.ColumnPosToCharPos(Y, X, FTabHelper);
         MoreCarets.Add(X, Y);
       end;
     end;
