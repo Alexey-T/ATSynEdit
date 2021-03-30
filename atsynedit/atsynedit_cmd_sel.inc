@@ -84,6 +84,9 @@ begin
   if Carets.Count=0 then Exit;
   FLastCommandMakesColumnSel:= true;
 
+  //it's needed to Undo to multi-carets, not one caret
+  Strings.SetGroupMark;
+
   if IsSelRectEmpty and (FSelRectEnd.Y<0) then
     if not DoSelect_MultiCaretsLookLikeColumnSelection then
     begin
