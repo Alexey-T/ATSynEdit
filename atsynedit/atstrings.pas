@@ -2025,9 +2025,19 @@ begin
       Break;
   until false;
 
-  //apply Softmark to ListOther
+  //apply SoftMark to ListOther
   if bSoftMarked and AGrouped then
     ListOther.SoftMark:= true;
+
+  //to fix this:
+  // - new tab, make 5 lines "dd'
+  // - caret at end of 1st line
+  // - Shift+Alt+Down to make 5 carets column
+  // - do fast: 'd', Undo, 'dd', Undo, 'd', Undo...
+  // -> it gave return to single caret, but must return to multi-carets
+  // https://github.com/Alexey-T/CudaText/issues/3274#issuecomment-810522418
+  if bSoftMarked then
+    List.SoftMark:= true;
 end;
 
 procedure TATStrings.ClearUndo(ALocked: boolean = false);
