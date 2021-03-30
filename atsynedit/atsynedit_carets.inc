@@ -66,6 +66,9 @@ var
   P, PM1, PM2: TPoint;
   Details: TATEditorPosDetails;
 begin
+  //needed to Undo multi-carets to last multi-caret state, before single caret appears
+  Strings.SetGroupMark;
+
   DoCaretSingleAsIs;
   with Carets[0] do
     begin P.X:= PosX; P.Y:= PosY; end;
