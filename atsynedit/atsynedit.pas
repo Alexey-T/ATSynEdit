@@ -8626,6 +8626,7 @@ begin
 
   if ModeOneLine then exit;
   if FOptUndoPause<=0 then exit;
+  if Carets.Count>1 then exit;
   if AY<0 then exit;
   if AY>=Strings.Count then exit; //must have for the case: big file; Ctrl+A, Del; Undo
   if IsPosInVisibleArea(AX, AY) then exit;
