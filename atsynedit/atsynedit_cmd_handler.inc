@@ -344,6 +344,8 @@ begin
   if not bAllowUndo then
     SetEnabledSlowEvents(false);
 
+  BeginEditing;
+
   //--------
   case ACmd of
     //most used commands
@@ -611,6 +613,8 @@ begin
     cCommand_ZoomReset:                Res:= DoCommand_ScaleReset;
     cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
+
+  EndEditing;
 
   if not bAllowUndo then
     SetEnabledSlowEvents(true);
