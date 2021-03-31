@@ -614,7 +614,7 @@ begin
     cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
   end;
 
-  EndEditing;
+  EndEditing(cResultText in Res);
 
   if not bAllowUndo then
     SetEnabledSlowEvents(true);

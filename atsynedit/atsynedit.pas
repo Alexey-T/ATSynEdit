@@ -1476,7 +1476,7 @@ type
     procedure BeginUpdate;
     procedure EndUpdate;
     procedure BeginEditing;
-    procedure EndEditing;
+    procedure EndEditing(ATextChanged: boolean);
     function IsLocked: boolean;
     function TextSelected: atString;
     function TextSelectedEx(ACaret: TATCaretItem): atString;
@@ -8726,11 +8726,12 @@ begin
   FEditingTopLine:= -1;
 end;
 
-procedure TATSynEdit.EndEditing;
+procedure TATSynEdit.EndEditing(ATextChanged: boolean);
 begin
   FEditingActive:= false;
-  if FEditingTopLine>=0 then
-    FlushEditingChanges(cLineChangeEdited, FEditingTopLine, 1);
+  if ATextChanged then
+    if FEditingTopLine>=0 then
+      FlushEditingChanges(cLineChangeEdited, FEditingTopLine, 1);
 end;
 
 {$I atsynedit_carets.inc}
