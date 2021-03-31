@@ -611,7 +611,7 @@ type
     FOnClickLink: TATSynEditClickLinkEvent;
     FOnIdle: TNotifyEvent;
     FOnChange: TNotifyEvent;
-    FOnChangeLog: TATStringsLogEvent;
+    FOnChangeLog: TATStringsChangeLogEvent;
     FOnChangeState: TNotifyEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChangeModified: TNotifyEvent;
@@ -1602,7 +1602,7 @@ type
     property OnCheckInput: TATSynEditCheckInputEvent read FOnCheckInput write FOnCheckInput;
     property OnIdle: TNotifyEvent read FOnIdle write FOnIdle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
-    property OnChangeLog: TATStringsLogEvent read FOnChangeLog write FOnChangeLog;
+    property OnChangeLog: TATStringsChangeLogEvent read FOnChangeLog write FOnChangeLog;
     property OnChangeModified: TNotifyEvent read FOnChangeModified write FOnChangeModified;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
@@ -4142,8 +4142,8 @@ begin
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
   FStringsInt.OnSetMarkersArray:= @SetMarkersArray;
   FStringsInt.OnProgress:= @DoStringsOnProgress;
-  FStringsInt.OnChange:= @DoStringsOnChangeEx;
-  FStringsInt.OnLog:= @DoStringsOnChangeLog;
+  FStringsInt.OnChangeEx:= @DoStringsOnChangeEx;
+  FStringsInt.OnChangeLog:= @DoStringsOnChangeLog;
   FStringsInt.OnUndoBefore:= @DoStringsOnUndoBefore;
   FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
 

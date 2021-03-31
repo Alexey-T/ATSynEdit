@@ -169,8 +169,8 @@ type
   TATStringsGetMarkers = function: TATInt64Array of object;
   TATStringsSetCarets = procedure(const ACarets: TATPointArray) of object;
   TATStringsSetMarkers = procedure(const AMarkers: TATInt64Array) of object;
-  TATStringsLogEvent = procedure(Sender: TObject; ALine: integer) of object;
-  TATStringsChangeEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
+  TATStringsChangeLogEvent = procedure(Sender: TObject; ALine: integer) of object;
+  TATStringsChangeExEvent = procedure(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer) of object;
   TATStringsChangeBlockEvent = procedure(Sender: TObject; const AStartPos, AEndPos: TPoint; 
                                  AChange: TATBlockChangeKind; ABlock: TStringList) of object;
   TATStringsUndoEvent = procedure(Sender: TObject; AX, AY: integer) of object;
@@ -212,8 +212,8 @@ type
     FOnSetCaretsArray: TATStringsSetCarets;
     FOnSetMarkersArray: TATStringsSetMarkers;
     FOnProgress: TNotifyEvent;
-    FOnLog: TATStringsLogEvent;
-    FOnChange: TATStringsChangeEvent;
+    FOnChangeLog: TATStringsChangeLogEvent;
+    FOnChangeEx: TATStringsChangeExEvent;
     FOnUndoBefore: TATStringsUndoEvent;
     FOnUndoAfter: TATStringsUndoEvent;
     FOnChangeBlock: TATStringsChangeBlockEvent;
@@ -426,8 +426,8 @@ type
     property LastCommandChangedLines: integer read FLastCommandChangedLines write FLastCommandChangedLines;
     //events
     property OnProgress: TNotifyEvent read FOnProgress write FOnProgress;
-    property OnLog: TATStringsLogEvent read FOnLog write FOnLog;
-    property OnChange: TATStringsChangeEvent read FOnChange write FOnChange;
+    property OnChangeLog: TATStringsChangeLogEvent read FOnChangeLog write FOnChangeLog;
+    property OnChangeEx: TATStringsChangeExEvent read FOnChangeEx write FOnChangeEx;
     property OnChangeBlock: TATStringsChangeBlockEvent read FOnChangeBlock write FOnChangeBlock;
     property OnUndoBefore: TATStringsUndoEvent read FOnUndoBefore write FOnUndoBefore;
     property OnUndoAfter: TATStringsUndoEvent read FOnUndoAfter write FOnUndoAfter;
@@ -1259,14 +1259,14 @@ end;
 destructor TATStrings.Destroy;
 begin
   //disable events: so Clear won't call them
-  FOnChange:= nil;
+  FOnChangeEx:= nil;
   FOnChangeBlock:= nil;
   FOnGetCaretsArray:= nil;
   FOnSetCaretsArray:= nil;
   FOnGetMarkersArray:= nil;
   FOnSetMarkersArray:= nil;
   FOnProgress:= nil;
-  FOnLog:= nil;
+  FOnChangeLog:= nil;
 
   GutterDecor1:= nil;
   GutterDecor2:= nil;
@@ -2398,8 +2398,8 @@ end;
 procedure TATStrings.DoEventLog(ALine: integer); inline;
 begin
   if not FEnabledChangeEvents then exit;
-  if Assigned(FOnLog) then
-    FOnLog(Self, ALine);
+  if Assigned(FOnChangeLog) then
+    FOnChangeLog(Self, ALine);
 end;
 
 procedure TATStrings.DoEventChange(AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
@@ -2419,8 +2419,8 @@ begin
   if Assigned(FGutterDecor2) then
     FGutterDecor2.Update(AChange, ALineIndex, AItemCount, Count);
 
-  if Assigned(FOnChange) then
-    FOnChange(Self, AChange, ALineIndex, AItemCount);
+  if Assigned(FOnChangeEx) then
+    FOnChangeEx(Self, AChange, ALineIndex, AItemCount);
 end;
 
 procedure TATStrings.ClearSeparators;
