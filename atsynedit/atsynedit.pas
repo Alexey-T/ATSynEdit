@@ -611,6 +611,7 @@ type
     FOnClickLink: TATSynEditClickLinkEvent;
     FOnIdle: TNotifyEvent;
     FOnChange: TNotifyEvent;
+    FOnChangeLog: TATStringsLogEvent;
     FOnChangeState: TNotifyEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChangeModified: TNotifyEvent;
@@ -897,7 +898,8 @@ type
     procedure ClearMouseDownVariables;
     procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
-    procedure FlushEditingChanges(AChange: TATLineChangeKind; ALine, AItemCount: integer);
+    procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
+    procedure FlushEditingChangeLog(ALine: integer);
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
     function GetFoldingAsString: string;
@@ -940,7 +942,8 @@ type
     procedure DoMenuText;
     procedure DoMinimapClick(APosY: integer);
     procedure DoMinimapDrag(APosY: integer);
-    procedure DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
+    procedure DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
+    procedure DoStringsOnChangeLog(Sender: TObject; ALine: integer);
     procedure DoStringsOnProgress(Sender: TObject);
     procedure DoStringsOnUndoAfter(Sender: TObject; AX, AY: integer);
     procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
@@ -1599,6 +1602,7 @@ type
     property OnCheckInput: TATSynEditCheckInputEvent read FOnCheckInput write FOnCheckInput;
     property OnIdle: TNotifyEvent read FOnIdle write FOnIdle;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property OnChangeLog: TATStringsLogEvent read FOnChangeLog write FOnChangeLog;
     property OnChangeModified: TNotifyEvent read FOnChangeModified write FOnChangeModified;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
@@ -4138,7 +4142,8 @@ begin
   FStringsInt.OnSetCaretsArray:= @SetCaretsArray;
   FStringsInt.OnSetMarkersArray:= @SetMarkersArray;
   FStringsInt.OnProgress:= @DoStringsOnProgress;
-  FStringsInt.OnChange:= @DoStringsOnChange;
+  FStringsInt.OnChange:= @DoStringsOnChangeEx;
+  FStringsInt.OnLog:= @DoStringsOnChangeLog;
   FStringsInt.OnUndoBefore:= @DoStringsOnUndoBefore;
   FStringsInt.OnUndoAfter:= @DoStringsOnUndoAfter;
 
@@ -7921,7 +7926,7 @@ begin
     FAdapterHilite.OnEditorIdle(Self);
 end;
 
-procedure TATSynEdit.DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
+procedure TATSynEdit.DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
 //we are called inside BeginEditing/EndEditing - just remember top edited line
 begin
   if FEditingActive then
@@ -7931,15 +7936,33 @@ begin
         FEditingTopLine:= ALine;
   end
   else
-    FlushEditingChanges(AChange, ALine, AItemCount);
+    FlushEditingChangeEx(AChange, ALine, AItemCount);
 end;
 
-procedure TATSynEdit.FlushEditingChanges(AChange: TATLineChangeKind; ALine, AItemCount: integer);
+procedure TATSynEdit.DoStringsOnChangeLog(Sender: TObject; ALine: integer);
+begin
+  if FEditingActive then
+  begin
+    if ALine>=0 then
+      if (FEditingTopLine<0) or (ALine<FEditingTopLine) then
+        FEditingTopLine:= ALine;
+  end
+  else
+    FlushEditingChangeLog(ALine);
+end;
+
+procedure TATSynEdit.FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
 begin
   Fold.Update(AChange, ALine, AItemCount);
 
   if Assigned(FAdapterHilite) then
     FAdapterHilite.OnEditorChangeEx(Self, AChange, ALine, AItemCount);
+end;
+
+procedure TATSynEdit.FlushEditingChangeLog(ALine: integer);
+begin
+  if Assigned(FOnChangeLog) then
+    FOnChangeLog(Self, ALine);
 end;
 
 procedure TATSynEdit.DoStringsOnProgress(Sender: TObject);
@@ -8731,7 +8754,10 @@ begin
   FEditingActive:= false;
   if ATextChanged then
     if FEditingTopLine>=0 then
-      FlushEditingChanges(cLineChangeEdited, FEditingTopLine, 1);
+    begin
+      //FlushEditingChangeEx(cLineChangeEdited, FEditingTopLine, 1); //not needed
+      FlushEditingChangeLog(FEditingTopLine);
+    end;
 end;
 
 {$I atsynedit_carets.inc}
