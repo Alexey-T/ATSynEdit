@@ -582,6 +582,8 @@ type
     FMouseAutoScroll: TATEditorDirection;
     FMouseActions: TATEditorMouseActionArray;
     FLockInput: boolean;
+    FEditingActive: boolean;
+    FEditingTopLine: integer;
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
@@ -895,6 +897,7 @@ type
     procedure ClearMouseDownVariables;
     procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
+    procedure FlushEditingChanges(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
     function GetFoldingAsString: string;
@@ -1472,6 +1475,8 @@ type
     procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
+    procedure BeginEditing;
+    procedure EndEditing;
     function IsLocked: boolean;
     function TextSelected: atString;
     function TextSelectedEx(ACaret: TATCaretItem): atString;
@@ -7916,8 +7921,20 @@ begin
     FAdapterHilite.OnEditorIdle(Self);
 end;
 
-procedure TATSynEdit.DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine,
-  AItemCount: integer);
+procedure TATSynEdit.DoStringsOnChange(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
+//we are called inside BeginEditing/EndEditing - just remember top edited line
+begin
+  if FEditingActive then
+  begin
+    if ALine>=0 then
+      if (FEditingTopLine<0) or (ALine<FEditingTopLine) then
+        FEditingTopLine:= ALine;
+  end
+  else
+    FlushEditingChanges(AChange, ALine, AItemCount);
+end;
+
+procedure TATSynEdit.FlushEditingChanges(AChange: TATLineChangeKind; ALine, AItemCount: integer);
 begin
   Fold.Update(AChange, ALine, AItemCount);
 
@@ -8702,6 +8719,19 @@ begin
       //ActionAddJumpToUndo(GetCaretsArray); //bad, parameter is needed only for another array
 end;
 
+
+procedure TATSynEdit.BeginEditing;
+begin
+  FEditingActive:= true;
+  FEditingTopLine:= -1;
+end;
+
+procedure TATSynEdit.EndEditing;
+begin
+  FEditingActive:= false;
+  if FEditingTopLine>=0 then
+    FlushEditingChanges(cLineChangeEdited, FEditingTopLine, 1);
+end;
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
