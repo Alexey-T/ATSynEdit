@@ -1983,7 +1983,8 @@ begin
   it undoes/redoes editing on the line 100, but moves the caret to line 25.
   Usually first time it doesn't jump (as expected) but after repeating steps 2 and 3 it's starting to jump again.
   }
-  SetCaretsArray(CaretsAfterLastEdition);
+  if Length(CaretsAfterLastEdition)>0 then
+    SetCaretsArray(CaretsAfterLastEdition);
 
   {
   solve CudaText #3268
