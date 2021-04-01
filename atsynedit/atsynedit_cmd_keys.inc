@@ -421,7 +421,7 @@ begin
     end;
   end;
 
-  //changed because of issue CudaText#3065
+  //cResultCaretLazy is to fix CudaText #3065
   if AJump=cWordjumpToPrev then
     Result:= [cResultCaretTop, cResultCaretLazy]
   else

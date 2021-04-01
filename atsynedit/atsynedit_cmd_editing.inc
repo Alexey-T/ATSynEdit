@@ -608,10 +608,11 @@ begin
   if bNeedGroup then
     Strings.EndUndoGroup;
 
+  //cResultCaretLazy is to fix CudaText #3065
   if ANext then
-    Result:= [cResultText, cResultCaretBottom]
+    Result:= [cResultText, cResultCaretBottom, cResultCaretLazy]
   else
-    Result:= [cResultText, cResultCaretTop];
+    Result:= [cResultText, cResultCaretTop, cResultCaretLazy];
 end;
 
 function TATSynEdit.DoCommand_TextDeleteWordEntire: TATCommandResults;
