@@ -898,6 +898,7 @@ type
     procedure ClearMouseDownVariables;
     procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
+    function DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults; inline;
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
     function GetAttribs: TATMarkers;
