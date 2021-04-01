@@ -1853,7 +1853,8 @@ begin
         end;
     end;
 
-    SetCaretsArray(CurCaretsArray);
+    if Length(CurCaretsArray)>0 then
+      SetCaretsArray(CurCaretsArray);
     SetMarkersArray(CurMarkersArray);
 
     if bEnableEventAfter then
