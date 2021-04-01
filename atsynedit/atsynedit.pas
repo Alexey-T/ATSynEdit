@@ -898,7 +898,6 @@ type
     procedure ClearMouseDownVariables;
     procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
-    function DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults; inline;
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
     function GetAttribs: TATMarkers;
@@ -1186,6 +1185,7 @@ type
 
     //editing
     function IsCommandResults_CaretMove(const Res: TATCommandResults): boolean;
+    function DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults;
     procedure DoCommandResults(ACmd: integer; Res: TATCommandResults);
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen: boolean): TATCommandResults;

@@ -294,7 +294,7 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults; inline;
+function TATSynEdit.DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults;
 begin
   Result:= [];
   case ACmd of
