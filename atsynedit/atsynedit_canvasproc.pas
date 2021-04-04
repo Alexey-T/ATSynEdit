@@ -41,16 +41,13 @@ var
 var
   //Win: seems no slowdown from offsets
   //macOS: better use offsets, fonts have floating width value, e.g. 10.2 pixels
-  //Linux gtk2: big slowdown from offsets
+  //Linux Qt5: same as for macOS
+  //Linux GTK2: big slowdown from offsets
   OptCanvasTextoutNeedsOffsets: boolean =
-    {$ifdef windows}
+    {$if defined(windows) or defined(darwin) or defined(LCLQt5)}
     true
     {$else}
-      {$ifdef darwin}
-      true
-      {$else}
-      false
-      {$endif}
+    false
     {$endif} ;
 
 type
