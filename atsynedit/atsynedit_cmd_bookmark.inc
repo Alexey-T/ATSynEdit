@@ -173,7 +173,7 @@ begin
 
     nItem:= Strings.Bookmarks.Find(nLine);
     if (nItem>=0) and
-      (not AOnlyShownInList or Strings.Bookmarks[nItem].Data.ShowInBookmarkList) then
+      (not AOnlyShownInList or Strings.Bookmarks[nItem]^.Data.ShowInBookmarkList) then
     begin
       DoGotoPos(
         Point(0, nLine),
@@ -198,7 +198,7 @@ begin
   try
     for i:= 0 to Strings.Bookmarks.Count-1 do
     begin
-      NLine:= Strings.Bookmarks[i].Data.LineNum;
+      NLine:= Strings.Bookmarks[i]^.Data.LineNum;
       if Strings.IsIndexValid(NLine) then
         List.Add(UTF8Encode(Strings.Lines[NLine]));
     end;
@@ -218,7 +218,7 @@ begin
 
   for i:= NCount-1 downto 0 do
   begin
-    NLine:= Strings.Bookmarks[i].Data.LineNum;
+    NLine:= Strings.Bookmarks[i]^.Data.LineNum;
     Strings.LineDelete(NLine);
   end;
 
@@ -245,7 +245,7 @@ begin
   Carets.Clear;
   for i:= 0 to Strings.Bookmarks.Count-1 do
   begin
-    NLine:= Strings.Bookmarks[i].Data.LineNum;
+    NLine:= Strings.Bookmarks[i]^.Data.LineNum;
     Carets.Add(0, NLine);
   end;
 

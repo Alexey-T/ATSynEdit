@@ -289,7 +289,7 @@ begin
     NIndex:= Strings.Bookmarks.Find(ALine);
     if NIndex>=0 then
     begin
-      BmKind:= Strings.Bookmarks[NIndex].Data.Kind;
+      BmKind:= Strings.Bookmarks[NIndex]^.Data.Kind;
       AColor:= Colors.BookmarkBG;
       if Assigned(FOnCalcBookmarkColor) then
         FOnCalcBookmarkColor(Self, BmKind, AColor);
@@ -299,7 +299,7 @@ begin
       NIndex:= Strings.Bookmarks2.Find(ALine);
       if NIndex>=0 then
       begin
-        BmKind:= Strings.Bookmarks2[NIndex].Data.Kind;
+        BmKind:= Strings.Bookmarks2[NIndex]^.Data.Kind;
         AColor:= Colors.BookmarkBG;
         if Assigned(FOnCalcBookmarkColor) then
           FOnCalcBookmarkColor(Self, BmKind, AColor);
