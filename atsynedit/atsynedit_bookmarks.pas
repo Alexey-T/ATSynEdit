@@ -29,7 +29,7 @@ type
     Kind: word;
     AutoDelete: TATBookmarkAutoDelete;
     ShowInBookmarkList: boolean;
-    Hint: string[255];
+    Hint: PChar;
   end;
 
   { TATBookmarkItem }
@@ -82,7 +82,12 @@ uses
 
 procedure TATBookmarkItems.Deref(Item: Pointer);
 begin
-  PATBookmarkItem(Item)^.Data.Hint:= '';
+  with PATBookmarkItem(Item)^ do
+    if Data.Hint<>nil then
+    begin
+      StrDispose(Data.Hint);
+      Data.Hint:= nil;
+    end;
 end;
 
 function TATBookmarkItems.ItemPtr(AIndex: integer): PATBookmarkItem;
@@ -104,7 +109,7 @@ begin
   Data.Kind:= AData.Kind;
   Data.AutoDelete:= AData.AutoDelete;
   Data.ShowInBookmarkList:= AData.ShowInBookmarkList;
-  Data.Hint:= AData.Hint;
+  Data.Hint:= StrNew(AData.Hint);
 end;
 
 { TATBookmarks }

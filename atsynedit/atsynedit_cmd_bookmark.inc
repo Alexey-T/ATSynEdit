@@ -7,9 +7,11 @@ var
   Data: TATBookmarkData;
 begin
   if not Strings.IsIndexValid(ALine) then exit;
+
+  FillChar(Data, SizeOf(Data), 0);
   Data.LineNum:= ALine;
   Data.Kind:= ABmKind;
-  Data.Hint:= AHint;
+  Data.Hint:= StrNew(PChar(AHint));
   Data.AutoDelete:= AAutoDelete;
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
@@ -63,9 +65,10 @@ begin
     Strings.Bookmarks.Delete(NIndex)
   else
   begin
+    FillChar(Data, SizeOf(Data), 0);
     Data.LineNum:= ALine;
     Data.Kind:= ABmKind;
-    Data.Hint:= AHint;
+    Data.Hint:= StrNew(PChar(AHint));
     Data.AutoDelete:= AAutoDelete;
     Data.ShowInBookmarkList:= AShowInList;
     Data.Tag:= ATag;
