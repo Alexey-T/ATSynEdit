@@ -44,6 +44,8 @@ type
   { TATBookmarkItems }
 
   TATBookmarkItems = class(specialize TFPGList<TATBookmarkItem>)
+  protected
+    procedure Deref(Item: Pointer); override;
   public
     function ItemPtr(AIndex: integer): PATBookmarkItem;
   end;
@@ -77,6 +79,11 @@ uses
   Math;
 
 { TATBookmarkItems }
+
+procedure TATBookmarkItems.Deref(Item: Pointer);
+begin
+  PATBookmarkItem(Item)^.Data.Hint:= '';
+end;
 
 function TATBookmarkItems.ItemPtr(AIndex: integer): PATBookmarkItem;
 begin
