@@ -109,6 +109,8 @@ begin
   Data.Kind:= AData.Kind;
   Data.AutoDelete:= AData.AutoDelete;
   Data.ShowInBookmarkList:= AData.ShowInBookmarkList;
+  if Data.Hint<>nil then
+    StrDispose(Data.Hint);
   Data.Hint:= StrNew(AData.Hint);
 end;
 
