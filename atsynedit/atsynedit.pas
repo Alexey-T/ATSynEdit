@@ -8739,8 +8739,11 @@ procedure TATSynEdit.ActionAddJumpToUndo;
 begin
   if FOptUndoForCaretJump then
     with Strings do
+    begin
+      SetGroupMark; //solve CudaText #3269
       ActionAddJumpToUndo(CaretsAfterLastEdition);
       //ActionAddJumpToUndo(GetCaretsArray); //bad, parameter is needed only for another array
+    end;
 end;
 
 
