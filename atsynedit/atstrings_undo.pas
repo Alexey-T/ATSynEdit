@@ -194,6 +194,9 @@ begin
     SMarks:= '';
 
   Result:=
+    // testing
+    //'g='+IntToStr(ItemGlobalCounter)+PartSep+
+    //
     IntToStr(Ord(ItemAction))+PartSep+
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
@@ -201,8 +204,6 @@ begin
     PointsArrayToString(ItemCarets)+SMarks+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
-    //testing!!
-    //'gc='+IntToStr(ItemGlobalCounter)+PartSep+
     UTF8Encode(ItemText);
 end;
 
