@@ -4826,6 +4826,8 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintAll(C: TCanvas; ALineFrom: integer);
+var
+  NColorOther: TColor;
 begin
   UpdateInitialVars(C);
 
@@ -4833,9 +4835,15 @@ begin
   begin
     FColorFont:= Colors.TextFont;
     FColorBG:= Colors.TextBG;
-    if FOptDimUnfocusedBack>0 then
+    if FOptDimUnfocusedBack<>0 then
       if not _IsFocused then
-        FColorBG:= ColorBlend(clBlack{FColorFont}, FColorBG, FOptDimUnfocusedBack);
+      begin
+        if FOptDimUnfocusedBack>0 then
+          NColorOther:= clBlack
+        else
+          NColorOther:= clWhite;
+        FColorBG:= ColorBlend(NColorOther, FColorBG, Abs(FOptDimUnfocusedBack));
+      end;
   end
   else
   begin

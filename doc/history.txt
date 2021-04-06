@@ -1,4 +1,7 @@
 
+2021.04.06
++ OptDimUnfocused<0 is allowed, to blend with white
+
 2021.03.26
 + prop OptUndoForCaretJump
 + prop OptUndoPause
