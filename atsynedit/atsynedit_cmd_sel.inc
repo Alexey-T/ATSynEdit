@@ -216,6 +216,7 @@ begin
   end;
 
   try
+    St.BeginUndoGroup;
     St.EnabledBookmarksUpdate:= false;
     NLastLine:= St.Count-1;
 
@@ -266,6 +267,7 @@ begin
     end;
 
   finally
+    St.EndUndoGroup;
     St.EnabledBookmarksUpdate:= true;
   end;
 
