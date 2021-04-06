@@ -570,7 +570,7 @@ var
   Caret: TATCaretItem;
   Res: TATCommandResults;
   Str: string;
-  bAllowUndo: boolean;
+  bTooManyCarets: boolean;
   i: integer;
 begin
   if ACmd<=0 then Exit;
@@ -610,8 +610,8 @@ begin
   Carets.UpdateMemory(cCaretMem_PrepareX, false);
   FIsRunningCommand:= true;
 
-  bAllowUndo:= Carets.Count<=FOptUndoMaxCarets;
-  if not bAllowUndo then
+  bTooManyCarets:= Carets.Count>FOptUndoMaxCarets;
+  if bTooManyCarets then
     SetEnabledSlowEvents(false);
 
   BeginEditing;
@@ -621,7 +621,7 @@ begin
   finally
     EndEditing(cResultText in Res);
 
-    if not bAllowUndo then
+    if bTooManyCarets then
       SetEnabledSlowEvents(true);
   end;
 
