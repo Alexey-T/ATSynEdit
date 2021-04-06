@@ -1002,6 +1002,7 @@ var
 begin
   Result:= 0;
   if Editor.ModeReadOnly then exit;
+  Editor.Strings.SetNewCommandMark;
 
   UpdateCarets(false);
   UpdateFragments;
@@ -1222,6 +1223,8 @@ begin
   if FinderCarets.Count=0 then
     raise Exception.Create('Finder.FinderCarets is empty');
   if AReplace and Editor.ModeReadOnly then exit;
+  if AReplace then
+    Editor.Strings.SetNewCommandMark;
 
   UpdateFragments;
   DoFixCaretSelectionDirection;
@@ -1628,6 +1631,7 @@ var
 begin
   Result:= false;
   if Editor.ModeReadOnly then exit;
+  Editor.Strings.SetNewCommandMark;
 
   UpdateCarets(true);
   if OptInSelection and not FinderCarets.IsSelection then exit;
