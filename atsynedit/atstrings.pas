@@ -285,7 +285,8 @@ type
     procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
     procedure UndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
-      AHardMarkedNext, AUnmodifiedNext: boolean);
+      AHardMarkedNext, AUnmodifiedNext: boolean;
+      out ACommandCode: integer);
     procedure AddUpdatesAction(N: integer; AAction: TATEditAction);
   public
     CaretsAfterLastEdition: TATPointArray;
@@ -1713,7 +1714,8 @@ begin
 end;
 
 procedure TATStrings.UndoSingle(ACurList: TATUndoList;
-  out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean);
+  out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
+  out ACommandCode: integer);
 var
   CurItem, PrevItem: TATUndoItem;
   CurAction: TATEditAction;
@@ -1723,7 +1725,6 @@ var
   CurLineState: TATLineState;
   CurCaretsArray: TATPointArray;
   CurMarkersArray: TATInt64Array;
-  CurCommandCode: integer;
   OtherList: TATUndoList;
   NCount: integer;
   NEventX, NEventY: integer;
@@ -1750,7 +1751,7 @@ begin
   CurLineState:= CurItem.ItemLineState;
   CurCaretsArray:= CurItem.ItemCarets;
   CurMarkersArray:= CurItem.ItemMarkers;
-  CurCommandCode:= CurItem.ItemCommandCode;
+  ACommandCode:= CurItem.ItemCommandCode;
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
   NCount:= ACurList.Count;
@@ -1854,7 +1855,7 @@ begin
 
       aeaCaretJump:
         begin
-          OtherList.Add(CurAction, 0, '', cEndNone, cLineStateNone, CurCaretsArray, CurMarkersArray, CurCommandCode);
+          OtherList.Add(CurAction, 0, '', cEndNone, cLineStateNone, CurCaretsArray, CurMarkersArray, ACommandCode);
         end;
     end;
 
@@ -1965,6 +1966,7 @@ var
   bHardMarked,
   bHardMarkedNext,
   bMarkedUnmodified: boolean;
+  NCommandCode: integer;
 begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
@@ -2010,7 +2012,7 @@ begin
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
-    UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified);
+    UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified, NCommandCode);
 
     //handle unmodified
     //don't clear FModified if List.IsEmpty! http://synwrite.sourceforge.net/forums/viewtopic.php?f=5&t=2504
@@ -2029,6 +2031,12 @@ begin
       Continue;
     if not AGrouped then
       Break;
+
+    //make commands with non-zero ItemCommandCode grouped (ie 'move lines up/down')
+    if NCommandCode<>0 then
+      if List.Last.ItemCommandCode=NCommandCode then
+        Continue;
+
     if bSoftMarked then
       Break;
   until false;
