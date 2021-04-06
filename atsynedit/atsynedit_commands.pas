@@ -139,8 +139,8 @@ const
   cCommand_SelectSplitToLines = 265 or cCmdFlag_Caret;
   cCommand_SelectExtendByLine = 266 or cCmdFlag_Caret;
 
-  cCommand_MoveSelectionUp = 268 or cCmdFlag_Caret;
-  cCommand_MoveSelectionDown = 269 or cCmdFlag_Caret;
+  cCommand_MoveSelectionUp = 268; // or cCmdFlag_Caret;
+  cCommand_MoveSelectionDown = 269; // or cCmdFlag_Caret;
   cCommand_TextInsertEmptyAbove = 270 or cCmdFlag_ResetSel or cCmdFlag_Caret;
   cCommand_TextInsertEmptyBelow = 271 or cCmdFlag_ResetSel or cCmdFlag_Caret;
 
