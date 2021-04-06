@@ -53,6 +53,10 @@ type
     procedure SetAsString(const AValue: string);
   public
     ItemTickCount: QWord; //from GetTickCount64
+    ItemGlobalCounter: DWord; //several adjacent items, made by the same editor command, have the same GlobalCounter
+    ItemCommandCode: integer; //if not 0, all adjacent items with the same CommandCode will undo as a group
+                              //it's used mainly for commands "move lines up/down", CudaText issue #3289
+
     ItemAction: TATEditAction; //action of undo-item
     ItemIndex: integer; //index of editor line
     ItemText: UnicodeString; //text of that editor line
@@ -62,16 +66,15 @@ type
     ItemMarkers: TATInt64Array; //simple markers packed into array
     ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
     ItemHardMark: boolean; //undo hard-mark
-    ItemCommandCode: integer; //if not 0, all nearest undo-items with the same value will undo as a group
-                              //it's used mainly for "move lines up/down"
-    procedure Assign(const D: TATUndoItem);
-    property AsString: string read GetAsString write SetAsString;
+
     constructor Create(AAction: TATEditAction; AIndex: integer;
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray; const AMarkers: TATInt64Array;
       ACommandCode: integer; const ATickCount: QWord); virtual;
     constructor CreateEmpty;
+    procedure Assign(const D: TATUndoItem);
+    property AsString: string read GetAsString write SetAsString;
   end;
 
 type
