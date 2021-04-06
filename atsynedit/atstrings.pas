@@ -2042,7 +2042,7 @@ begin
       begin
         LastItem:= List.Last;
         if LastItem.ItemCommandCode=NCommandCode then
-          if Abs(Int64(LastItem.ItemTickCount-NTickCount))<List.PauseForMakingGroup then
+          if Abs(Int64(LastItem.ItemTickCount)-Int64(NTickCount))<List.PauseForMakingGroup then
             Continue;
       end;
 
