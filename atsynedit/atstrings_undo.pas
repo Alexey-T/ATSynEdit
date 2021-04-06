@@ -54,6 +54,7 @@ type
   public
     ItemTickCount: QWord; //from GetTickCount64
     ItemGlobalCounter: DWord; //several adjacent items, made by the same editor command, have the same GlobalCounter
+                              //it's used for deleting old undo-items when MaxCount is reached
     ItemCommandCode: integer; //if not 0, all adjacent items with the same CommandCode will undo as a group
                               //it's used mainly for commands "move lines up/down", CudaText issue #3289
 
