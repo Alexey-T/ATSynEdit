@@ -256,6 +256,7 @@ begin
   ItemHardMark:= D.ItemHardMark;
   ItemCommandCode:= D.ItemCommandCode;
   ItemTickCount:= D.ItemTickCount;
+  ItemGlobalCounter:= D.ItemGlobalCounter;
 end;
 
 
