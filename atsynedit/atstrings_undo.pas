@@ -47,21 +47,22 @@ type
 
   TATUndoItem = class
   private
-    const PartSep = #9;
+    const PartSep = #9; //separators for AsString property
     const MarkersSep = #1;
     function GetAsString: string;
     procedure SetAsString(const AValue: string);
   public
-    ItemAction: TATEditAction;
-    ItemIndex: integer;
-    ItemText: atString;
-    ItemEnd: TATLineEnds;
-    ItemLineState: TATLineState;
-    ItemCarets: TATPointArray;
-    ItemMarkers: TATInt64Array;
-    ItemSoftMark: boolean;
-    ItemHardMark: boolean;
-    ItemCommandCode: integer;
+    ItemAction: TATEditAction; //action of undo-item
+    ItemIndex: integer; //index of editor line
+    ItemText: atString; //text of that editor line
+    ItemEnd: TATLineEnds; //line-ending of that editor line
+    ItemLineState: TATLineState; //line-state of that editor line
+    ItemCarets: TATPointArray; //carets packed into array
+    ItemMarkers: TATInt64Array; //simple markers packed into array
+    ItemSoftMark: boolean; //undo soft-mark. logic is described in ATSynEdit Wiki page
+    ItemHardMark: boolean; //undo hard-mark
+    ItemCommandCode: integer; //if not 0, all nearest undo-items with the same value will undo as a group
+                              //it's used mainly for "move lines up/down"
     procedure Assign(const D: TATUndoItem);
     property AsString: string read GetAsString write SetAsString;
     constructor Create(AAction: TATEditAction; AIndex: integer;
