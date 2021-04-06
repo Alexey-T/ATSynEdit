@@ -617,6 +617,9 @@ begin
     Strings.SetGroupMark;
   end;
 
+  //support CudaText #3084
+  Strings.SetNewCommandMark;
+
   Carets.UpdateMemory(cCaretMem_PrepareX, false);
   FIsRunningCommand:= true;
 

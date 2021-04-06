@@ -407,6 +407,7 @@ type
     property OnSetCaretsArray: TATStringsSetCarets read FOnSetCaretsArray write FOnSetCaretsArray;
     property OnSetMarkersArray: TATStringsSetMarkers read FOnSetMarkersArray write FOnSetMarkersArray;
     procedure SetGroupMark;
+    procedure SetNewCommandMark;
     procedure BeginUndoGroup;
     procedure EndUndoGroup;
     procedure UndoOrRedo(AUndo: boolean; AGrouped: boolean);
@@ -1050,6 +1051,12 @@ begin
     Result:= FUndoList.MaxCount
   else
     Result:= 2000;
+end;
+
+procedure TATStrings.SetNewCommandMark;
+begin
+  if Assigned(FUndoList) then
+    FUndoList.NewCommandMark:= true;
 end;
 
 procedure TATStrings.SetEndings(AValue: TATLineEnds);

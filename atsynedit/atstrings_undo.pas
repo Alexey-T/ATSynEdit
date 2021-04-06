@@ -89,6 +89,7 @@ type
     FHardMark: boolean;
     FLastTick: QWord;
     FPauseForMakingGroup: integer;
+    FNewCommandMark: boolean;
     function GetAsString: string;
     function GetItem(N: integer): TATUndoItem;
     procedure SetAsString(const AValue: string);
@@ -118,6 +119,7 @@ type
     function DebugText: string;
     function IsEmpty: boolean;
     property AsString: string read GetAsString write SetAsString;
+    property NewCommandMark: boolean read FNewCommandMark write FNewCommandMark;
   end;
 
 
@@ -199,6 +201,8 @@ begin
     PointsArrayToString(ItemCarets)+SMarks+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
+    //testing!!
+    //'gc='+IntToStr(ItemGlobalCounter)+PartSep+
     UTF8Encode(ItemText);
 end;
 
@@ -273,6 +277,7 @@ begin
   ItemHardMark:= AHardMark;
   ItemCommandCode:= ACommandCode;
   ItemTickCount:= ATickCount;
+  ItemGlobalCounter:= 0;
 
   SetLength(ItemCarets, Length(ACarets));
   for i:= 0 to High(ACarets) do
@@ -370,13 +375,28 @@ procedure TATUndoList.Add(AAction: TATEditAction; AIndex: integer;
 var
   Item: TATUndoItem;
   NewTick: QWord;
+  NGlobalCounter: DWord;
+  bNotEmpty: boolean;
 begin
   if FLocked then Exit;
+  bNotEmpty:= Count>0;
+
+  if bNotEmpty then
+  begin
+    NGlobalCounter:= Last.ItemGlobalCounter;
+    if FNewCommandMark then
+    begin
+      FNewCommandMark:= false;
+      Inc(NGlobalCounter);
+    end;
+  end
+  else
+    NGlobalCounter:= 0;
 
   //not dup change?
-  if (Count>0) and (AAction in [aeaChange, aeaChangeEol]) then
+  if bNotEmpty and (AAction in [aeaChange, aeaChangeEol]) then
   begin
-    Item:= Items[Count-1];
+    Item:= Last;
     if (Item.ItemAction=AAction) and
       (Item.ItemIndex=AIndex) and
       (Item.ItemText=AText) then
@@ -384,9 +404,9 @@ begin
   end;
 
   //not insert/delete same index?
-  if (Count>0) and (AAction=aeaDelete) then
+  if bNotEmpty and (AAction=aeaDelete) then
   begin
-    Item:= Items[Count-1];
+    Item:= Last;
     if (Item.ItemAction=aeaInsert) and
       (Item.ItemIndex=AIndex) then
       begin
@@ -405,10 +425,14 @@ begin
                             ACarets, AMarkers,
                             ACommandCode,
                             NewTick);
+  Item.ItemGlobalCounter:= NGlobalCounter;
+
   FList.Add(Item);
   FSoftMark:= false;
 
-  while Count>MaxCount do
+  //support MaxCount _actions_ in the list, intead of MaxCount simple items
+  //CudaText issue #3084
+  while (NGlobalCounter-Items[0].ItemGlobalCounter)>MaxCount do
     Delete(0);
 end;
 
