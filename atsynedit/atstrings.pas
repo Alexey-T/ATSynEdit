@@ -350,6 +350,7 @@ type
     property Bookmarks2: TATBookmarks read FBookmarks2;
     property GutterDecor1: TATGutterDecor read FGutterDecor1 write FGutterDecor1;
     property GutterDecor2: TATGutterDecor read FGutterDecor2 write FGutterDecor2;
+    property CommandCode: integer read FCommandCode write FCommandCode;
     //actions
     procedure ActionDeleteFakeLine;
     procedure ActionDeleteFakeLineAndFinalEol;
@@ -406,8 +407,6 @@ type
     procedure SetGroupMark;
     procedure BeginUndoGroup;
     procedure EndUndoGroup;
-    procedure BeginCommand(ACommand: integer);
-    procedure EndCommand;
     procedure UndoOrRedo(AUndo: boolean; AGrouped: boolean);
     property UndoLimit: integer read GetUndoLimit write SetUndoLimit;
     property UndoAfterSave: boolean read FUndoAfterSave write FUndoAfterSave;
@@ -1711,16 +1710,6 @@ begin
       if FUndoList.Locked then exit;
       FUndoList.HardMark:= false;
     end;
-end;
-
-procedure TATStrings.BeginCommand(ACommand: integer);
-begin
-  FCommandCode:= ACommand;
-end;
-
-procedure TATStrings.EndCommand;
-begin
-  FCommandCode:= 0;
 end;
 
 procedure TATStrings.UndoSingle(ACurList: TATUndoList;

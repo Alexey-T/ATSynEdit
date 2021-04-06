@@ -571,6 +571,7 @@ var
   Res: TATCommandResults;
   Str: string;
   bTooManyCarets: boolean;
+  NCommandCode: integer;
   i: integer;
 begin
   if ACmd<=0 then Exit;
@@ -584,6 +585,15 @@ begin
     Str:= '';
 
   if DoEventCommand(ACmd, Str) then Exit;
+
+  case ACmd of
+    cCommand_MoveSelectionUp,
+    cCommand_MoveSelectionDown:
+      NCommandCode:= ACmd;
+    else
+      NCommandCode:= 0;
+  end;
+  Strings.CommandCode:= NCommandCode;
 
   FCaretSpecPos:= false;
 
@@ -669,6 +679,8 @@ begin
       Carets.UpdateMemory(cCaretMem_ClearX, false);
   end;
 
+  if NCommandCode<>0 then
+    Strings.CommandCode:= 0;
   DoCommandResults(ACmd, Res);
   DoEventCommandAfter(ACmd, AText);
   FIsRunningCommand:= false;
