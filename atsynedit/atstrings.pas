@@ -1964,6 +1964,7 @@ end;
 procedure TATStrings.UndoOrRedo(AUndo: boolean; AGrouped: boolean);
 var
   List, ListOther: TATUndoList;
+  LastItem: TATUndoItem;
   bSoftMarked,
   bHardMarked,
   bHardMarkedNext,
@@ -2037,9 +2038,13 @@ begin
 
     //make commands with non-zero ItemCommandCode grouped (ie 'move lines up/down')
     if NCommandCode<>0 then
-      if List.Last.ItemCommandCode=NCommandCode then
-        if Abs(Int64(List.Last.ItemTickCount-NTickCount))<List.PauseForMakingGroup then
-          Continue;
+      if List.Count>0 then
+      begin
+        LastItem:= List.Last;
+        if LastItem.ItemCommandCode=NCommandCode then
+          if Abs(Int64(LastItem.ItemTickCount-NTickCount))<List.PauseForMakingGroup then
+            Continue;
+      end;
 
     if bSoftMarked then
       Break;
