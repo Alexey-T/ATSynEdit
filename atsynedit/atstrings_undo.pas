@@ -52,9 +52,10 @@ type
     function GetAsString: string;
     procedure SetAsString(const AValue: string);
   public
+    ItemTickCount: QWord; //from GetTickCount64
     ItemAction: TATEditAction; //action of undo-item
     ItemIndex: integer; //index of editor line
-    ItemText: atString; //text of that editor line
+    ItemText: UnicodeString; //text of that editor line
     ItemEnd: TATLineEnds; //line-ending of that editor line
     ItemLineState: TATLineState; //line-state of that editor line
     ItemCarets: TATPointArray; //carets packed into array
@@ -69,7 +70,7 @@ type
       const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
       ASoftMark, AHardMark: boolean;
       const ACarets: TATPointArray; const AMarkers: TATInt64Array;
-      ACommandCode: integer); virtual;
+      ACommandCode: integer; const ATickCount: QWord); virtual;
     constructor CreateEmpty;
   end;
 
@@ -247,6 +248,7 @@ begin
   ItemSoftMark:= D.ItemSoftMark;
   ItemHardMark:= D.ItemHardMark;
   ItemCommandCode:= D.ItemCommandCode;
+  ItemTickCount:= D.ItemTickCount;
 end;
 
 
@@ -254,7 +256,8 @@ constructor TATUndoItem.Create(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   ASoftMark, AHardMark: boolean;
   const ACarets: TATPointArray; const AMarkers: TATInt64Array;
-  ACommandCode: integer);
+  ACommandCode: integer;
+  const ATickCount: QWord);
 var
   i: integer;
 begin
@@ -266,6 +269,7 @@ begin
   ItemSoftMark:= ASoftMark;
   ItemHardMark:= AHardMark;
   ItemCommandCode:= ACommandCode;
+  ItemTickCount:= ATickCount;
 
   SetLength(ItemCarets, Length(ACarets));
   for i:= 0 to High(ACarets) do
@@ -393,7 +397,11 @@ begin
     FSoftMark:= true;
   FLastTick:= NewTick;
 
-  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState, FSoftMark, FHardMark, ACarets, AMarkers, ACommandCode);
+  Item:= TATUndoItem.Create(AAction, AIndex, AText, AEnd, ALineState,
+                            FSoftMark, FHardMark,
+                            ACarets, AMarkers,
+                            ACommandCode,
+                            NewTick);
   FList.Add(Item);
   FSoftMark:= false;
 
@@ -421,7 +429,7 @@ begin
   Item:= TATUndoItem.Create(
     aeaClearModified, 0, '',
     cEndNone, cLineStateNone,
-    false, false, Carets, Markers, 0);
+    false, false, Carets, Markers, 0, 0);
   FList.Add(Item);
 end;
 

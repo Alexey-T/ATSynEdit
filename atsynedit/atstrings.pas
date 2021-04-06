@@ -286,7 +286,8 @@ type
     procedure SetUndoLimit(AValue: integer);
     procedure UndoSingle(ACurList: TATUndoList; out ASoftMarked, AHardMarked,
       AHardMarkedNext, AUnmodifiedNext: boolean;
-      out ACommandCode: integer);
+      out ACommandCode: integer;
+      out ATickCount: QWord);
     procedure AddUpdatesAction(N: integer; AAction: TATEditAction);
   public
     CaretsAfterLastEdition: TATPointArray;
@@ -1715,7 +1716,7 @@ end;
 
 procedure TATStrings.UndoSingle(ACurList: TATUndoList;
   out ASoftMarked, AHardMarked, AHardMarkedNext, AUnmodifiedNext: boolean;
-  out ACommandCode: integer);
+  out ACommandCode: integer; out ATickCount: QWord);
 var
   CurItem, PrevItem: TATUndoItem;
   CurAction: TATEditAction;
@@ -1754,6 +1755,7 @@ begin
   ACommandCode:= CurItem.ItemCommandCode;
   ASoftMarked:= CurItem.ItemSoftMark;
   AHardMarked:= CurItem.ItemHardMark;
+  ATickCount:= CurItem.ItemTickCount;
   NCount:= ACurList.Count;
 
   //note: do not break this issue https://github.com/Alexey-T/CudaText/issues/2677
@@ -1967,6 +1969,7 @@ var
   bHardMarkedNext,
   bMarkedUnmodified: boolean;
   NCommandCode: integer;
+  NTickCount: QWord;
 begin
   if not Assigned(FUndoList) then Exit;
   if not Assigned(FRedoList) then Exit;
@@ -2012,7 +2015,7 @@ begin
     if List.Count=0 then Break;
     if List.IsEmpty then Break;
 
-    UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified, NCommandCode);
+    UndoSingle(List, bSoftMarked, bHardMarked, bHardMarkedNext, bMarkedUnmodified, NCommandCode, NTickCount);
 
     //handle unmodified
     //don't clear FModified if List.IsEmpty! http://synwrite.sourceforge.net/forums/viewtopic.php?f=5&t=2504
@@ -2035,7 +2038,8 @@ begin
     //make commands with non-zero ItemCommandCode grouped (ie 'move lines up/down')
     if NCommandCode<>0 then
       if List.Last.ItemCommandCode=NCommandCode then
-        Continue;
+        if Abs(Int64(List.Last.ItemTickCount-NTickCount))<List.PauseForMakingGroup then
+          Continue;
 
     if bSoftMarked then
       Break;
