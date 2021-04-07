@@ -4532,14 +4532,15 @@ var
   R: TRect;
 begin
   R:= inherited ClientRect;
-
   W:= R.Width;
+  H:= R.Height;
+  if ModeOneLine then exit;
+
   //if FScrollbarVert.Visible then
   if FOptScrollbarsNew then //better check this instead of FScrollbarVert.Visible
     Dec(W, FScrollbarVert.Width);
   if W<1 then W:= 1;
 
-  H:= R.Height;
   if FScrollbarHorz.Visible then
     Dec(H, FScrollbarHorz.Height);
   if H<1 then H:= 1;
