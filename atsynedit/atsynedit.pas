@@ -4528,12 +4528,9 @@ begin
 end;
 
 procedure TATSynEdit.GetClientSizes(out W, H: integer);
-var
-  R: TRect;
 begin
-  R:= inherited ClientRect;
-  W:= R.Width;
-  H:= R.Height;
+  W:= Width;
+  H:= Height;
   if ModeOneLine then exit;
 
   //if FScrollbarVert.Visible then
