@@ -535,6 +535,7 @@ begin
   for iItem:= NItemLen-1 downto 0 do
   begin
     NRange:= FLineIndexer[ALine][iItem];
+    if not IsIndexValid(NRange) then Continue;
     Ptr:= ItemPtr(NRange);
     if Ptr^.IsSimple then
       Continue;
