@@ -292,7 +292,7 @@ const
   cInitScrollAnimationSteps = 4;
   cInitScrollAnimationSleep = 0;
   cInitUndoLimit = 5000;
-  cInitUndoMaxCarets = cInitUndoLimit;
+  cInitUndoMaxCarets = 20000;
   cInitUndoIndentVert = 15;
   cInitUndoIndentHorz = 20;
   cInitUndoPause = 300;
