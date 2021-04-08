@@ -195,14 +195,14 @@ begin
     SMarks:= '';
 
   Result:=
-    // testing
-    //'g='+IntToStr(ItemGlobalCounter)+PartSep+
-    //
     IntToStr(Ord(ItemAction))+PartSep+
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
-    PointsArrayToString(ItemCarets)+SMarks+PartSep+
+    PointsArrayToString(ItemCarets)+MarkersSep+
+      SMarks+MarkersSep+
+      IntToStr(ItemGlobalCounter)+MarkersSep+
+      IntToStr(ItemTickCount)+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
     IntToStr(Ord(ItemHardMark))+PartSep+
     UTF8Encode(ItemText);
@@ -210,8 +210,8 @@ end;
 
 procedure TATUndoItem.SetAsString(const AValue: string);
 var
-  Sep: TATStringSeparator;
-  S, S1, S2: string;
+  Sep, Sep2: TATStringSeparator;
+  S, SubItem: string;
   N: integer;
 begin
   Sep.Init(AValue, PartSep);
@@ -228,13 +228,24 @@ begin
   Sep.GetItemInt(N, 0);
   ItemLineState:= TATLineState(N);
 
+  //this item contains: carets+#1+markers+#1+global_cnt+#1+tick_cnt
   Sep.GetItemStr(S);
-  SSplitByChar(S, MarkersSep, S1, S2);
-  StringToPointsArray(ItemCarets, S1);
-  if S2<>'' then
-    StringToInt64Array(ItemMarkers, S2)
+  Sep2.Init(S, MarkersSep);
+  //a) carets
+  Sep2.GetItemStr(SubItem);
+  StringToPointsArray(ItemCarets, SubItem);
+  //b) markers
+  Sep2.GetItemStr(SubItem);
+  if SubItem<>'' then
+    StringToInt64Array(ItemMarkers, SubItem)
   else
     SetLength(ItemMarkers, 0);
+  //c) global_cnt
+  Sep2.GetItemStr(SubItem);
+  ItemGlobalCounter:= StrToDWordDef(SubItem, 0);
+  //d) tick_cnt
+  Sep2.GetItemStr(SubItem);
+  ItemTickCount:= StrToQWordDef(SubItem, 0);
 
   Sep.GetItemStr(S);
   ItemSoftMark:= S='1';
@@ -243,7 +254,7 @@ begin
   ItemHardMark:= S='1';
 
   Sep.GetItemStr(S);
-  ItemText:= S;
+  ItemText:= UTF8Decode(S);
 end;
 
 procedure TATUndoItem.Assign(const D: TATUndoItem);
