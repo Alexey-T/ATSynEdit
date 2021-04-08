@@ -186,21 +186,15 @@ end;
 { TATUndoItem }
 
 function TATUndoItem.GetAsString: string;
-var
-  SMarks: string;
+//if more data will be needed here, add it to 'carets' item after MarkersSep=#1 separator
 begin
-  if Length(ItemMarkers)>0 then
-    SMarks:= MarkersSep+Int64ArrayToString(ItemMarkers)
-  else
-    SMarks:= '';
-
   Result:=
     IntToStr(Ord(ItemAction))+PartSep+
     IntToStr(ItemIndex)+PartSep+
     IntToStr(Ord(ItemEnd))+PartSep+
     IntToStr(Ord(ItemLineState))+PartSep+
     PointsArrayToString(ItemCarets)+MarkersSep+
-      SMarks+MarkersSep+
+      Int64ArrayToString(ItemMarkers)+MarkersSep+
       IntToStr(ItemGlobalCounter)+MarkersSep+
       IntToStr(ItemTickCount)+PartSep+
     IntToStr(Ord(ItemSoftMark))+PartSep+
