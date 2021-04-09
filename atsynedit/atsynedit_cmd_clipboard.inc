@@ -205,6 +205,8 @@ begin
     for i:= 0 to Carets.Count-1 do
     begin
       Caret:= Carets[i];
+      if not Strings.IsIndexValid(Caret.PosY) then
+        Continue;
       if ListNum.IndexOf(Caret.PosY)<0 then
         ListNum.Add(Caret.PosY);
     end;
