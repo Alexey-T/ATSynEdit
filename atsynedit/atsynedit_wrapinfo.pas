@@ -40,9 +40,6 @@ type
   TATWrapItems = specialize TFPGList<TATWrapItem>;
 
 type
-  TATCheckLineCollapsedEvent = function(ALineNum: integer): boolean of object;
-
-type
   { TATWrapInfo }
 
   TATWrapInfo = class
@@ -50,10 +47,12 @@ type
     FList: TATWrapItems;
     FStrings: TATStrings;
     FVirtualMode: boolean;
-    FOnCheckCollapsed: TATCheckLineCollapsedEvent;
     function GetData(AIndex: integer): TATWrapItem;
     procedure SetVirtualMode(AValue: boolean);
+    function IsLineFolded(ALine: integer): boolean;
   public
+    VisibleColumns: integer;
+    WrapColumn: integer;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
@@ -69,7 +68,6 @@ type
     function FindIndexOfCaretPos(APos: TPoint): integer;
     procedure SetCapacity(N: integer);
     procedure ReplaceItems(AFrom, ATo: integer; AItems: TATWrapItems);
-    property OnCheckLineCollapsed: TATCheckLineCollapsedEvent read FOnCheckCollapsed write FOnCheckCollapsed;
   end;
 
 
@@ -122,6 +120,15 @@ begin
   }
   //if FVirtualMode then
   //  Clear;
+end;
+
+function TATWrapInfo.IsLineFolded(ALine: integer): boolean;
+const
+  FEditorIndex = 0;
+begin
+  Result:= false;
+  if not StringsObj.IsIndexValid(ALine) then exit;
+  Result:= StringsObj.LinesHidden[ALine, FEditorIndex];
 end;
 
 constructor TATWrapInfo.Create;
@@ -183,25 +190,22 @@ begin
   AFrom:= -1;
   ATo:= -1;
 
-  if Assigned(FOnCheckCollapsed) then
-    if FOnCheckCollapsed(ALineNum) then Exit;
+  if IsLineFolded(ALineNum) then Exit;
 
   a:= 0;
   b:= Count-1;
-  if b<0 then Exit;
 
   repeat
-    dif:= Data[a].NLineIndex-ALineNum;
-    if dif=0 then begin m:= a; Break end;
-
-    //middle, which is near b if not exact middle
+    if a>b then exit;
     m:= (a+b+1) div 2;
 
     dif:= Data[m].NLineIndex-ALineNum;
-    if dif=0 then Break;
-
-    if Abs(a-b)<=1 then Exit;
-    if dif>0 then b:= m else a:= m;
+    if dif=0 then
+      Break;
+    if dif>0 then
+      b:= m-1
+    else
+      a:= m+1;
   until false;
 
   AFrom:= m;
@@ -220,8 +224,8 @@ begin
   for i:= NFrom to NTo do
   begin
     Result:= i;
-    with Data[i] do
-      if NCharIndex+NLength > APos.X then Break;
+    if Data[i].NCharIndex + Data[i].NLength > APos.X+1 then // APos.X+1: see CudaText issue 2466
+      Break;
   end;
 end;
 

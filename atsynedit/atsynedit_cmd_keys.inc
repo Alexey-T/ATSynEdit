@@ -2,16 +2,19 @@
 
 function TATSynEdit.DoCommand_KeyHome: TATCommandResults;
 var
-  i, NIndent, NWrapped: integer;
   Caret: TATCaretItem;
   Pnt: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
+  NLine, NIndent, NWrapped, i: integer;
+  IndentKind: TATLineIndentKind;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     NWrapped:= 0;
     NIndent:= 0;
+    NLine:= Caret.PosY;
+    if not Strings.IsIndexValid(NLine) then Continue;
 
     if FOptKeyHomeEndNavigateWrapped and (FWrapMode<>cWrapOff) then
     begin
@@ -22,12 +25,15 @@ begin
     end;
 
     if FOptKeyHomeToNonSpace then
-      NIndent:= SGetIndentChars(Strings.Lines[Caret.PosY]);
+      Strings.GetIndentProp(NLine, NIndent, IndentKind);
 
     if (NWrapped>0) and (Caret.PosX>NWrapped) then
       Caret.PosX:= NWrapped
     else
     if (NIndent>0) and (Caret.PosX>NIndent) then
+      Caret.PosX:= NIndent
+    else
+    if FOptKeyHomeToNonSpace and (Caret.PosX=0) and (NIndent>0) then
       Caret.PosX:= NIndent
     else
       Caret.PosX:= 0;
@@ -42,15 +48,17 @@ end;
 function TATSynEdit.DoCommand_KeyEnd: TATCommandResults;
 var
   Caret: TATCaretItem;
-  Str: atString;
   Pnt: TPoint;
-  i, NLen, NWrapped: integer;
-  Details: TATPosDetails;
+  NLine, NLenTotal, NLen, NWrapped, i: integer;
+  Details: TATEditorPosDetails;
 begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
-    Str:= Strings.Lines[Caret.PosY];
+    NLine:= Caret.PosY;
+    if not Strings.IsIndexValid(NLine) then Continue;
+
+    NLenTotal:= Strings.LinesLen[NLine];
     NLen:= 0;
     NWrapped:= 0;
 
@@ -59,14 +67,14 @@ begin
       Pnt.X:= ClientWidth;
       Pnt.Y:= Caret.CoordY;
       Pnt:= ClientPosToCaretPos(Pnt, Details);
-      if Pnt.X<Length(Str) then
+      if Pnt.X<NLenTotal then
         NWrapped:= Pnt.X-1;
         //-1 here: need to jump not to last chr but to last-1 chr
         //(like Synwrite; to not blink caret at next part of wrapped line)
     end;
 
     if FOptKeyEndToNonSpace then
-      NLen:= SGetNonSpaceLength(Str);
+      NLen:= Strings.LineLenWithoutSpace(NLine);
 
     if (NWrapped>0) and (Caret.PosX<NWrapped) then
       Caret.PosX:= NWrapped
@@ -74,7 +82,10 @@ begin
     if (NLen>0) and (Caret.PosX<NLen) then
       Caret.PosX:= NLen
     else
-      Caret.PosX:= Length(Str);
+    if FOptKeyEndToNonSpace and (Caret.PosX=NLenTotal) and (NLen<>NLenTotal) then
+      Caret.PosX:= NLen
+    else
+      Caret.PosX:= NLenTotal;
   end;
 
   Result:= [cResultCaretRight];
@@ -83,23 +94,31 @@ end;
 function TATSynEdit.DoCommand_KeyLeft(ASelCommand: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  bMultiCarets: boolean;
   i: integer;
 begin
-  Result:= [cResultCaretLeft];
+  //changed because of issue CudaText#3065
+  Result:= [cResultCaretLeft, cResultCaretLazy];
 
-  if not ASelCommand then
-  begin
-    if FOptKeyLeftRightSwapSel then
-      if DoCaretSwapEdge(true) then Exit;
-    DoSelect_None;
-  end;
+  bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
+
+    if not ASelCommand and FOptKeyLeftRightSwapSel and DoCaretSwapEdge(Caret, true) then
+    begin
+      //none
+    end
+    else
     if (Caret.PosX>0) then
       Dec(Caret.PosX)
+    else
+    if bMultiCarets and not FOptKeyLeftRightGoToNextLineWithCarets then
+    begin
+      //none
+    end
     else
     if (Caret.PosY>0) and not FCaretVirtual then
     begin
@@ -112,23 +131,31 @@ end;
 function TATSynEdit.DoCommand_KeyRight(ASelCommand: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  bMultiCarets: boolean;
   i: integer;
 begin
-  Result:= [cResultCaretRight];
+  //changed because of issue CudaText#3065
+  Result:= [cResultCaretRight, cResultCaretLazy];
 
-  if not ASelCommand then
-  begin
-    if FOptKeyLeftRightSwapSel then
-      if DoCaretSwapEdge(false) then Exit;
-    DoSelect_None;
-  end;
+  bMultiCarets:= FCarets.Count>1;
 
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     if not Strings.IsIndexValid(Caret.PosY) then Continue;
+
+    if not ASelCommand and FOptKeyLeftRightSwapSel and DoCaretSwapEdge(Caret, false) then
+    begin
+      //none
+    end
+    else
     if (Caret.PosX<Strings.LinesLen[Caret.PosY]) or FCaretVirtual then
       Inc(Caret.PosX)
+    else
+    if bMultiCarets and not FOptKeyLeftRightGoToNextLineWithCarets then
+    begin
+      //none
+    end
     else
     if (Caret.PosY<Strings.Count-1) then
     begin
@@ -161,21 +188,37 @@ end;
 function TATSynEdit.DoCommand_KeyUpDown_NextLine(ADown: boolean; ALines: integer): TATCommandResults;
 var
   Caret: TATCaretItem;
+  NCount: integer;
   i, Y: integer;
 begin
+  NCount:= Strings.Count;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
     Y:= Caret.PosY;
 
     repeat
-      Y:= Y+ALines*BoolToPlusMinusOne(ADown);
+      Y:= Y+ALines*BoolToPlusMinusOne[ADown];
     until not Strings.IsIndexValid(Y) or not IsLineFolded(Y);
 
     if not IsLineFolded(Y) then
     begin
-      if Y<0 then Y:= GetFirstUnfoldedLineNumber;
-      if Y>=Strings.Count then Y:= GetLastUnfoldedLineNumber;
+      //moved above 1st line
+      if Y<0 then
+      begin
+        Y:= Unfolded_FirstLineNumber;
+        if Y=0 then
+          if FOptKeyUpDownAllowToEdge then
+            Caret.PosX:= 0;
+      end;
+      //moved below last line
+      if Y>=NCount then
+      begin
+        Y:= Unfolded_LastLineNumber;
+        if Y=NCount-1 then
+          if FOptKeyUpDownAllowToEdge then
+            Caret.PosX:= Strings.LinesLen[Y];
+      end;
       Caret.PosY:= Y;
     end;
   end;
@@ -190,10 +233,10 @@ function TATSynEdit.DoCommand_KeyUpDown_Wrapped(ADown: boolean; ALines: integer)
 var
   Caret: TATCaretItem;
   Pnt: TPoint;
-  Details: TATPosDetails;
-  i: integer;
+  Details: TATEditorPosDetails;
+  NWrapIndex, i: integer;
 const
-  cGapActions: array[boolean] of TATGapCoordAction =
+  cGapActions: array[boolean] of TATEditorGapCoordAction =
     (cGapCoordIgnore, cGapCoordMoveDown);
 begin
   for i:= 0 to FCarets.Count-1 do
@@ -203,15 +246,40 @@ begin
     if IsPosFolded(Caret.PosX, Caret.PosY) then
     begin
       Caret.PosX:= 0;
-      Caret.PosY:= GetNextUnfoldedLineNumber(Caret.PosY, ADown);
+      Caret.PosY:= Unfolded_NextLineNumber(Caret.PosY, ADown);
       Continue;
     end;
 
     Pnt.X:= Caret.CoordX;
     if FOptKeyUpDownKeepColumn and (Caret.SavedX>0) then
+    begin
       Pnt.X:= Caret.SavedX;
+      //needed for arrow-down on last line; w/o this, arrow-up (2 times) jumps weird
+      Caret.SavedX_Pre:= 0;
+    end;
 
-    Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne(ADown);
+    //prevent any action if caret on first line (arrow up) / last line (arrow down)
+    //this allows to avoid jump to end of last line (arrow down)
+    NWrapIndex:= WrapInfo.FindIndexOfCaretPos(Point(Caret.PosX, Caret.PosY));
+
+    //caret is on 1st line. jump to very begin?
+    if (not ADown) and (NWrapIndex=0) then
+    begin
+      if FOptKeyUpDownAllowToEdge then
+        Caret.PosX:= 0;
+      Continue;
+    end;
+
+    //caret is on last line. jump to very end?
+    if ADown and (NWrapIndex=WrapInfo.Count-1) then
+    begin
+      if FOptKeyUpDownAllowToEdge then
+        Caret.PosX:= Strings.LinesLen[Strings.Count-1];
+      Continue;
+    end;
+
+    //increase/decrease Caret.CoordY and calculate pos from it
+    Pnt.Y:= Caret.CoordY + ALines*FCharSize.Y*BoolToPlusMinusOne[ADown];
     Pnt:= ClientPosToCaretPos(Pnt, Details, cGapActions[ADown]);
     if Pnt.Y<0 then Continue;
 
@@ -233,6 +301,7 @@ var
   bColBlock: boolean;
 begin
   bColBlock:= not IsSelRectEmpty;
+
   if bColBlock then
     if FSelRect.Left=FSelRect.Right then
     begin
@@ -258,11 +327,17 @@ function TATSynEdit.DoCommand_GotoTextEnd: TATCommandResults;
 var
   NLine: integer;
 begin
+  {
+  //worked not reliable, e.g. in CudaText fmConsole.memo
   if FWrapInfo.Count>0 then
   begin
     NLine:= FWrapInfo[FWrapInfo.Count-1].NLineIndex;
     DoCaretSingle(Strings.LinesLen[NLine], NLine, false);
   end;
+  }
+
+  NLine:= Strings.Count-1;
+  DoCaretSingle(Strings.LinesLen[NLine], NLine, false);
 
   Result:= [cResultCaretTop];
 end;
@@ -290,38 +365,45 @@ function TATSynEdit.DoCommand_GotoWord(AJump: TATWordJump; AJumpSimple: boolean
   ): TATCommandResults;
 var
   Caret: TATCaretItem;
+  Strs: TATStrings;
   Str: atString;
+  bMultiCaret: boolean;
   i: integer;
 begin
+  Strs:= Strings;
+  bMultiCaret:= FCarets.Count>1;
+
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
-    if not Strings.IsIndexValid(Caret.PosY) then Continue;
-    Str:= Strings.Lines[Caret.PosY];
+    if not Strs.IsIndexValid(Caret.PosY) then Continue;
+    Str:= Strs.Lines[Caret.PosY];
 
     //jump to prev line?
     if (Caret.PosX=0) and (AJump=cWordjumpToPrev) then
     begin
+      if not bMultiCaret or FOptKeyLeftRightGoToNextLineWithCarets then
       if Caret.PosY>0 then
       begin
         Dec(Caret.PosY);
-        Caret.PosX:= Strings.LinesLen[Caret.PosY];
+        Caret.PosX:= Strs.LinesLen[Caret.PosY];
       end;
     end
     else
     //jump to next line?
     if (Caret.PosX>=Length(Str)) and (AJump in [cWordjumpToNext, cWordjumpToEndOrNext]) then
     begin
-      if Caret.PosY<Strings.Count-1 then
+      if not bMultiCaret or FOptKeyLeftRightGoToNextLineWithCarets then
+      if Caret.PosY<Strs.Count-1 then
       begin
         Inc(Caret.PosY);
-        Caret.PosX:= SGetIndentChars(Strings.Lines[Caret.PosY]);
+        Str:= Strs.Lines[Caret.PosY];
+        Caret.PosX:= SGetIndentChars(Str);
 
         //additional jump to word end
         if AJump=cWordjumpToEndOrNext then
         begin
-          Str:= Strings.Lines[Caret.PosY];
-          Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars, AJumpSimple);
+          Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptNonWordChars, AJumpSimple);
         end;
       end;
     end
@@ -335,14 +417,15 @@ begin
     //jump inside line?
     if (Caret.PosX<=Length(Str)) then
     begin
-      Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptWordChars, AJumpSimple);
+      Caret.PosX:= SFindWordOffset(Str, Caret.PosX, AJump, true, FOptNonWordChars, AJumpSimple);
     end;
   end;
 
+  //cResultCaretLazy is to fix CudaText #3065
   if AJump=cWordjumpToPrev then
-    Result:= [cResultCaretTop]
+    Result:= [cResultCaretTop, cResultCaretLazy]
   else
-    Result:= [cResultCaretBottom];
+    Result:= [cResultCaretBottom, cResultCaretLazy];
 end;
 
 function TATSynEdit.DoCommand_GotoLineEdge(ABegin: boolean): TATCommandResults;
@@ -371,7 +454,7 @@ const
 var
   R: TRect;
   P: TPoint;
-  Details: TATPosDetails;
+  Details: TATEditorPosDetails;
 begin
   Result:= [];
 
@@ -387,7 +470,6 @@ begin
       P:= Point(R.Left, (R.Top+R.Bottom) div 2);
   end;
 
-  if P.Y<0 then exit;
   P:= ClientPosToCaretPos(P, Details);
   if P.Y<0 then exit;
 
@@ -409,6 +491,7 @@ begin
   DoSelect_None;
 
   FMouseDragDropping:= false;
+  FMouseDragDroppingReal:= false;
   UpdateCursor;
 
   Result:= [cResultCaretTop];

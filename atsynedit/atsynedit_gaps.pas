@@ -9,15 +9,8 @@ unit ATSynEdit_Gaps;
 interface
 
 uses
-  SysUtils, Classes, Graphics, Controls, Math;
-
-type
-  TATLineChangeKind = (
-    cLineChangeEdited,
-    cLineChangeAdded,
-    cLineChangeDeleted,
-    cLineChangeDeletedAll
-    );
+  SysUtils, Classes, Graphics, Controls, Math,
+  ATStringProc;
 
 type
   { TATGapItem }
@@ -42,7 +35,7 @@ type
 
   TATGaps = class
   private
-    FList: TList;
+    FList: TFPList;
     FOnDelete: TATGapDeleteEvent;
     FSizeOfGapTop: integer;
     FSizeOfGap0: integer;
@@ -99,7 +92,7 @@ end;
 constructor TATGaps.Create;
 begin
   inherited;
-  FList:= TList.Create;
+  FList:= TFPList.Create;
   FSizeOfGapTop:= 0;
   FSizeOfGap0:= 0;
 end;

@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, Graphics,
-  ATSynEdit_Gaps,
+  ATStringProc,
   ATSynEdit_FGL;
 
 type
@@ -28,13 +28,19 @@ type
 
   { TATGutterDecorItem }
 
+  PATGutterDecorItem = ^TATGutterDecorItem;
   TATGutterDecorItem = record
     Data: TATGutterDecorData;
     procedure Init(const AData: TATGutterDecorData);
     class operator =(const a, b: TATGutterDecorItem): boolean;
   end;
 
-  TATGutterDecorItems = specialize TFPGList<TATGutterDecorItem>;
+  { TATGutterDecorItems }
+
+  TATGutterDecorItems = class(specialize TFPGList<TATGutterDecorItem>)
+  public
+    function ItemPtr(AIndex: integer): PATGutterDecorItem; inline;
+  end;
 
 type
   { TATGutterDecor }
@@ -61,6 +67,13 @@ type
   end;
 
 implementation
+
+{ TATGutterDecorItems }
+
+function TATGutterDecorItems.ItemPtr(AIndex: integer): PATGutterDecorItem;
+begin
+  Result:= PATGutterDecorItem(InternalGet(AIndex));
+end;
 
 { TATGutterDecorItem }
 
@@ -123,20 +136,20 @@ var
   i: integer;
 begin
   Result:= false;
-  for i:= Count-1 downto 0 do
-    if Items[i].Data.Tag=ATag then
+  for i:= FList.Count-1 downto 0 do
+    if FList.ItemPtr(i)^.Data.Tag=ATag then
     begin
       Result:= true;
       Delete(i);
     end;
 end;
 
-function TATGutterDecor.Count: integer; inline;
+function TATGutterDecor.Count: integer;
 begin
   Result:= FList.Count;
 end;
 
-function TATGutterDecor.IsIndexValid(N: integer): boolean; inline;
+function TATGutterDecor.IsIndexValid(N: integer): boolean;
 begin
   Result:= (N>=0) and (N<FList.Count);
 end;
@@ -150,7 +163,7 @@ begin
 
   for i:= 0 to Count-1 do
   begin
-    nLine:= Items[i].Data.LineNum;
+    nLine:= FList.ItemPtr(i)^.Data.LineNum;
 
     //item already exists: overwrite
     if nLine=AData.LineNum then
@@ -192,20 +205,18 @@ begin
   Result:= -1;
   a:= 0;
   b:= Count-1;
-  if b<0 then Exit;
 
   repeat
-    dif:= Items[a].Data.LineNum-ALineNum;
-    if dif=0 then exit(a);
-
-    //middle, which is near b if not exact middle
+    if a>b then exit;
     m:= (a+b+1) div 2;
 
-    dif:= Items[m].Data.LineNum-ALineNum;
-    if dif=0 then exit(m);
-
-    if Abs(a-b)<=1 then exit;
-    if dif>0 then b:= m else a:= m;
+    dif:= FList.ItemPtr(m)^.Data.LineNum-ALineNum;
+    if dif=0 then
+      exit(m);
+    if dif>0 then
+      b:= m-1
+    else
+      a:= m+1;
   until false;
 end;
 
@@ -213,7 +224,7 @@ end;
 procedure TATGutterDecor.Update(AChange: TATLineChangeKind; ALine, AItemCount,
   ALineCount: integer);
 var
-  Item: TATGutterDecorItem;
+  Item: PATGutterDecorItem;
   //bMovedHere: boolean;
   NIndexPlaced, i: integer;
 begin
@@ -226,11 +237,10 @@ begin
       begin
         for i:= 0 to Count-1 do
         begin
-          Item:= Items[i];
-          if Item.Data.LineNum>=ALine then
+          Item:= FList.ItemPtr(i);
+          if Item^.Data.LineNum>=ALine then
           begin
-            Item.Data.LineNum:= Item.Data.LineNum+AItemCount;
-            Items[i]:= Item;
+            Item^.Data.LineNum+= AItemCount;
           end;
         end;
       end;
@@ -247,7 +257,7 @@ begin
           NIndexPlaced:= Find(ALine+i);
           //bMovedHere:= false;
 
-          if (NIndexPlaced>=0) and Items[NIndexPlaced].Data.DeleteOnDelLine then
+          if (NIndexPlaced>=0) and FList.ItemPtr(NIndexPlaced)^.Data.DeleteOnDelLine then
           begin
             Delete(NIndexPlaced);
             NIndexPlaced:= -1;
@@ -256,15 +266,14 @@ begin
 
         for i:= Count-1 downto 0 do
         begin
-          Item:= Items[i];
+          Item:= FList.ItemPtr(i);
 
           //spec case for item on last line, keep it if deleting last line
-          if (Item.Data.LineNum>ALine) or (Item.Data.LineNum=ALineCount-1) then
+          if (Item^.Data.LineNum>ALine) or (Item^.Data.LineNum=ALineCount-1) then
           begin
-            Item.Data.LineNum:= Item.Data.LineNum-AItemCount;
-            Items[i]:= Item;
+            Item^.Data.LineNum-= AItemCount;
             {
-            if Item.Data.LineNum=ALine then
+            if Item^.Data.LineNum=ALine then
               bMovedHere:= true;
             }
           end;

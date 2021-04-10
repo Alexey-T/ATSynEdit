@@ -1,72 +1,32 @@
 object fmMain: TfmMain
   Left = 396
-  Height = 321
+  Height = 505
   Top = 258
-  Width = 667
+  Width = 793
   BorderStyle = bsDialog
   Caption = 'Test Finder.FindMatch'
-  ClientHeight = 321
-  ClientWidth = 667
+  ClientHeight = 505
+  ClientWidth = 793
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '1.7'
-  Visible = False
-  object Memo1: TMemo
-    Left = 8
-    Height = 48
-    Top = 24
-    Width = 407
-    Lines.Strings = (
-      'register'
-    )
-    TabOrder = 0
-  end
-  object Memo2: TMemo
-    Left = 8
-    Height = 216
-    Top = 96
-    Width = 407
-    Lines.Strings = (
-      'unit shapeline_reg;'
-      ''
-      'interface'
-      ''
-      'uses'
-      '  SysUtils, Classes, Controls, LResources, shapeline;'
-      ''
-      'procedure Register;'
-      ''
-      'implementation'
-      ''
-      'procedure Register;'
-      'begin'
-      '  RegisterComponents(''Misc'', [TShapeLine]);'
-      'end;'
-      ''
-      'initialization'
-      '  {$I res/icons.lrs}'
-      ''
-      'end.'
-    )
-    TabOrder = 1
-  end
+  LCLVersion = '2.1.0.0'
   object bFindNext: TButton
-    Left = 431
+    Left = 536
     Height = 25
-    Top = 62
+    Top = 56
     Width = 120
     Caption = 'find next'
     OnClick = bFindNextClick
-    TabOrder = 3
+    TabOrder = 1
   end
   object bFind: TButton
-    Left = 431
+    Left = 536
     Height = 25
-    Top = 30
+    Top = 24
     Width = 120
     Caption = 'find first'
     OnClick = bFindClick
-    TabOrder = 2
+    TabOrder = 0
   end
   object Label1: TLabel
     Left = 8
@@ -84,55 +44,131 @@ object fmMain: TfmMain
     Caption = 'find where'
     ParentColor = False
   end
-  object Memo3: TMemo
-    Left = 424
-    Height = 58
-    Top = 254
-    Width = 230
+  object MemoRes: TMemo
+    Left = 536
+    Height = 72
+    Top = 248
+    Width = 249
     Lines.Strings = (
       ''
     )
     ReadOnly = True
-    TabOrder = 8
-  end
-  object chkBack: TCheckBox
-    Left = 431
-    Height = 24
-    Top = 174
-    Width = 92
-    Caption = 'backward'
-    TabOrder = 7
-  end
-  object chkCase: TCheckBox
-    Left = 431
-    Height = 24
-    Top = 126
-    Width = 89
-    Caption = 'case sens'
-    TabOrder = 5
-  end
-  object chkWords: TCheckBox
-    Left = 431
-    Height = 24
-    Top = 150
-    Width = 111
-    Caption = 'whole words'
     TabOrder = 6
   end
+  object chkBack: TCheckBox
+    Left = 536
+    Height = 24
+    Top = 168
+    Width = 92
+    Caption = 'backward'
+    TabOrder = 5
+  end
+  object chkCase: TCheckBox
+    Left = 536
+    Height = 24
+    Top = 120
+    Width = 89
+    Caption = 'case sens'
+    TabOrder = 3
+  end
+  object chkWords: TCheckBox
+    Left = 536
+    Height = 24
+    Top = 144
+    Width = 111
+    Caption = 'whole words'
+    TabOrder = 4
+  end
   object Label3: TLabel
-    Left = 424
+    Left = 536
     Height = 17
-    Top = 230
+    Top = 224
     Width = 39
     Caption = 'result'
     ParentColor = False
   end
   object chkRegex: TCheckBox
-    Left = 431
+    Left = 536
     Height = 24
-    Top = 102
+    Top = 96
     Width = 64
     Caption = 'regex'
-    TabOrder = 4
+    TabOrder = 2
+  end
+  object Ed: TATSynEdit
+    Left = 8
+    Height = 400
+    Top = 96
+    Width = 520
+    DoubleBuffered = True
+    Font.Height = -12
+    Font.Name = 'Courier New'
+    ParentFont = False
+    TabOrder = 7
+    TabStop = True
+    Colors.TextFont = clBlack
+    Colors.TextBG = clWhite
+    Colors.TextDisabledFont = clGray
+    Colors.TextDisabledBG = 15790320
+    Colors.TextSelFont = clHighlightText
+    Colors.TextSelBG = clHighlight
+    Colors.Caret = clBlack
+    Colors.Markers = 192
+    Colors.GutterFont = clGray
+    Colors.GutterBG = 14737632
+    Colors.GutterCaretFont = clGray
+    Colors.GutterCaretBG = 13158600
+    Colors.GutterFoldLine = clGray
+    Colors.GutterFoldBG = 13158600
+    Colors.GutterSeparatorBG = clBlack
+    Colors.CurrentLineBG = 14741744
+    Colors.MarginRight = clSilver
+    Colors.MarginCaret = clLime
+    Colors.MarginUser = clYellow
+    Colors.IndentVertLines = clMedGray
+    Colors.BookmarkBG = clMoneyGreen
+    Colors.RulerFont = clGray
+    Colors.RulerBG = 14737632
+    Colors.CollapseLine = 10510432
+    Colors.CollapseMarkFont = 14712960
+    Colors.CollapseMarkBG = clCream
+    Colors.CollapseMarkBorder = 14712960
+    Colors.UnprintedFont = 5263600
+    Colors.UnprintedBG = 14737632
+    Colors.UnprintedHexFont = clMedGray
+    Colors.MinimapBorder = clSilver
+    Colors.MinimapSelBG = 15658734
+    Colors.MinimapTooltipBG = clMoneyGreen
+    Colors.MinimapTooltipBorder = clGray
+    Colors.StateChanged = 61680
+    Colors.StateAdded = 2146336
+    Colors.StateSaved = clMedGray
+    Colors.BlockStaple = clMedGray
+    Colors.BlockStapleForCaret = clNone
+    Colors.BlockSepLine = clMedGray
+    Colors.Links = clBlue
+    Colors.LockedBG = 14737632
+    Colors.TextHintFont = clGray
+    Colors.MarkedLinesBG = 15786160
+    Colors.BorderLine = clMedGray
+    Colors.BorderLineFocused = clNavy
+    Colors.ComboboxArrow = clGray
+    Colors.ComboboxArrowBG = 15790320
+    OptNonWordChars = '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`'#8230
+    OptShowURLsRegex = '\b(https?://|ftp://|magnet:\?|www\.)\w[^<>''"\s]+'
+    OptUnprintedVisible = False
+    OptUnprintedSpaces = False
+    OptUnprintedEnds = False
+    OptUnprintedEndsDetails = False
+    OptUnprintedEof = False
+  end
+  object MemoWhat: TEdit
+    Left = 8
+    Height = 27
+    Top = 24
+    Width = 520
+    OnChange = MemoWhatChange
+    TabOrder = 8
+    Text = 'ATSyn'
   end
 end

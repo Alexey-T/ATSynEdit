@@ -5,12 +5,14 @@ unit formopt;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  Classes, SysUtils, Types,
+  Forms, Controls, Graphics, StdCtrls, Dialogs,
   ButtonPanel, Spin, ComCtrls, ExtCtrls,
+  FileUtil,
   ATStringProc,
   ATSynEdit,
   ATSynEdit_CanvasProc,
-  ATSynEdit_CharSizer, Types;
+  ATSynEdit_CharSizer;
 
 type
   { TfmOpt }
@@ -19,13 +21,24 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
-    chkUndoGr: TCheckBox;
-    chkUndoSv: TCheckBox;
+    chkUndoForCrt: TCheckBox;
+    chkUndoGrp: TCheckBox;
+    chkUndoAfterSave: TCheckBox;
+    chkUpDownToEdge: TCheckBox;
+    chkCrPrimitiveCol: TCheckBox;
+    chkClickLink: TCheckBox;
+    chkCopyNoSel: TCheckBox;
+    chkCutNoSel: TCheckBox;
+    chkDotLn: TCheckBox;
+    chkPasteOvr: TCheckBox;
+    chkPasteSpread: TCheckBox;
+    chkSaveEol: TCheckBox;
+    chkSaveTrim: TCheckBox;
+    chkSaveTrimEmptyLines: TCheckBox;
+    chkBkspGoPrev: TCheckBox;
     chkUnprintOnlyBothEnds: TCheckBox;
     chkUnprintOnlyEnd: TCheckBox;
-    chkSaveTrimEmptyLines: TCheckBox;
     chkCrEmptyNormal: TCheckBox;
-    chkClickLink: TCheckBox;
     chkCrBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
     chkMsColumnSel: TCheckBox;
@@ -54,17 +67,12 @@ type
     chkScrollHint: TCheckBox;
     chkPageKeepRel: TCheckBox;
     chkNavHomeEnd: TCheckBox;
-    chkMsNiceScroll: TCheckBox;
-    chkSaveEol: TCheckBox;
-    chkSaveTrim: TCheckBox;
     chkShowNum1st: TCheckBox;
     chkShowNumCr: TCheckBox;
     chkMapSelBorder: TCheckBox;
     chkMapSelAlways: TCheckBox;
     chkShowNumBg: TCheckBox;
     chkTabSpaces: TCheckBox;
-    chkCutNoSel: TCheckBox;
-    chkDotLn: TCheckBox;
     chkMsClickNumSel: TCheckBox;
     chkCrStopUnfocus: TCheckBox;
     chkEndNonspace: TCheckBox;
@@ -79,16 +87,15 @@ type
     chkMsClick2Drag: TCheckBox;
     chkMsClick3: TCheckBox;
     chkShowFullSel: TCheckBox;
-    chkCopyNoSel: TCheckBox;
     chkCurCol: TCheckBox;
     chkCurLine: TCheckBox;
     chkLastOnTop: TCheckBox;
-    chkOvrPaste: TCheckBox;
     chkUnprintEnd: TCheckBox;
     chkUnprintEndDet: TCheckBox;
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
-    chkZebra: TCheckBox;
+    chkZebraActive: TCheckBox;
+    comboMsMidClick: TComboBox;
     ComboMsClick2: TComboBox;
     comboRulerStyle: TComboBox;
     edCrHeightNormal: TSpinEdit;
@@ -100,8 +107,7 @@ type
     edIndentKind: TComboBox;
     edCrTime: TSpinEdit;
     edSizeSep: TSpinEdit;
-    edUndo: TSpinEdit;
-    edWordChars: TEdit;
+    edNonWordChars: TEdit;
     edIndentSize: TSpinEdit;
     edPlusSize: TSpinEdit;
     edNumChar: TEdit;
@@ -116,13 +122,19 @@ type
     edTabArrowSize: TSpinEdit;
     edTabArrowPnt: TSpinEdit;
     edTextHint: TEdit;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
-    GroupBox3: TGroupBox;
+    edUndoLimit: TSpinEdit;
+    edUndoPause: TSpinEdit;
+    edZebraAlpha: TSpinEdit;
+    edZebraStep: TSpinEdit;
+    grpOrderCols: TGroupBox;
+    grpSizeCols: TGroupBox;
+    grpUndo: TGroupBox;
+    grpZebra: TGroupBox;
     groupIndent: TGroupBox;
     LabChars: TLabel;
     Label1: TLabel;
     Label10: TLabel;
+    Label11: TLabel;
     Label12: TLabel;
     Label13: TLabel;
     Label14: TLabel;
@@ -134,25 +146,30 @@ type
     Label2: TLabel;
     Label20: TLabel;
     Label21: TLabel;
+    Label22: TLabel;
+    Label6: TLabel;
+    LabelZebraAlpha: TLabel;
     Label3: TLabel;
     Label4: TLabel;
     Label5: TLabel;
-    Label6: TLabel;
     Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
     LabelArr: TLabel;
     LabelArr1: TLabel;
     LabelHint: TLabel;
+    LabelZebraStep: TLabel;
     ListCol: TListBox;
     PageControl1: TPageControl;
     edCrWidthNormal: TSpinEdit;
     TabSheet1: TTabSheet;
     TabSheet10: TTabSheet;
+    TabSheet11: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
     TabSheet4: TTabSheet;
     TabSheet5: TTabSheet;
+    TabSheet6: TTabSheet;
     TabSheet7: TTabSheet;
     TabSheet8: TTabSheet;
     TabSheet9: TTabSheet;
@@ -214,16 +231,16 @@ begin
     chkShowFullHilite.Checked:= ed.OptShowFullWidthForSyntaxHilite;
     chkCopyNoSel.Checked:= ed.OptCopyLinesIfNoSel;
     chkCutNoSel.Checked:= ed.OptCutLinesIfNoSel;
-    chkOvrPaste.Checked:= ed.OptOverwriteAllowedOnPaste;
+    chkPasteOvr.Checked:= ed.OptOverwriteAllowedOnPaste;
     chkDotLn.Checked:= ed.OptShowIndentLines;
     edTextHint.Text:= ed.OptTextHint;
-    edWordChars.Text:= ed.OptWordChars;
+    edNonWordChars.Text:= UTF8Encode(ed.OptNonWordChars);
     chkSaveEol.Checked:= ed.OptSavingForceFinalEol;
     chkSaveTrim.Checked:= ed.OptSavingTrimSpaces;
     chkSaveTrimEmptyLines.Checked:= ed.OptSavingTrimFinalEmptyLines;
     chkScrollHint.Checked:= ed.OptShowScrollHint;
     chkClickLink.Checked:= ed.OptMouseClickOpensURL;
-    chkZebra.Checked:= ed.OptZebraActive;
+    chkPasteSpread.Checked:= ed.OptPasteMultilineTextSpreadsToCarets;
 
     //unprint
     chkUnprintEn.Checked:= ed.OptUnprintedVisible;
@@ -244,16 +261,16 @@ begin
     chkCrMul.Checked:= ed.OptCaretManyAllowed;
     chkCrStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
     chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
+    chkCrPrimitiveCol.Checked:= ed.OptCaretsPrimitiveColumnSelection;
 
-    edCrWidthNormal.Value:= ed.CaretPropsNormal.Width;
-    edCrHeightNormal.Value:= ed.CaretPropsNormal.Height;
-    chkCrEmptyNormal.Checked:= ed.CaretPropsNormal.EmptyInside;
+    edCrWidthNormal.Value:= ed.CaretShapeNormal.Width;
+    edCrHeightNormal.Value:= ed.CaretShapeNormal.Height;
+    chkCrEmptyNormal.Checked:= ed.CaretShapeNormal.EmptyInside;
 
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
     edNumAlign.ItemIndex:= Ord(ed.OptNumbersAlignment);
     //edNumSize.Value:= ed.OptNumbersFontSizePercents;
-    edNumChar.Text:= ed.OptNumbersSkippedChar;
     edPlusSize.Value:= ed.OptGutterPlusSize;
     chkShowNum1st.Checked:= ed.OptNumbersShowFirst;
     chkShowNumCr.Checked:= ed.OptNumbersShowCarets;
@@ -290,6 +307,7 @@ begin
     chkTabSpaces.Checked:= ed.OptTabSpaces;
     chkOvrSel.Checked:= ed.OptOverwriteSel;
     chkNavUpDown.Checked:= ed.OptKeyUpDownNavigateWrapped;
+    chkUpDownToEdge.Checked:= ed.OptKeyUpDownAllowToEdge;
     chkNavHomeEnd.Checked:= ed.OptKeyHomeEndNavigateWrapped;
     chkKeepCol.Checked:= ed.OptKeyUpDownKeepColumn;
     chkLeftRtSwap.Checked:= ed.OptKeyLeftRightSwapSel;
@@ -299,6 +317,7 @@ begin
     chkTabIndent.Checked:= ed.OptKeyTabIndents;
     chkEnterIndent.Checked:= ed.OptAutoIndent;
     chkBackspUnindent.Checked:= ed.OptKeyBackspaceUnindent;
+    chkBkspGoPrev.Checked:= ed.OptKeyBackspaceGoesToPrevLine;
     edIndentKind.ItemIndex:= Ord(ed.OptAutoIndentKind);
     edIndentSize.Value:= ed.OptIndentSize;
     chkUnindentKeepAlign.Checked:= ed.OptIndentKeepsAlign;
@@ -314,13 +333,20 @@ begin
     chkMsClickNumSel.Checked:= ed.OptMouseClickNumberSelectsLine;
     chkMsDragDrop.Checked:= ed.OptMouseDragDrop;
     chkMsRtClickMove.Checked:= ed.OptMouseRightClickMovesCaret;
-    chkMsNiceScroll.Checked:= ed.OptMouseNiceScroll;
+    comboMsMidClick.ItemIndex:= Ord(ed.OptMouseMiddleClickAction);
     chkMsHideCursor.Checked:= ed.OptMouseHideCursorOnType;
 
     //undo
-    edUndo.Value:= ed.OptUndoLimit;
-    chkUndoGr.Checked:= ed.OptUndoGrouped;
-    chkUndoSv.Checked:= ed.OptUndoAfterSave;
+    edUndoLimit.Value:= ed.OptUndoLimit;
+    edUndoPause.Value:= ed.OptUndoPause;
+    chkUndoGrp.Checked:= ed.OptUndoGrouped;
+    chkUndoAfterSave.Checked:= ed.OptUndoAfterSave;
+    chkUndoForCrt.Checked:= ed.OptUndoForCaretJump;
+
+    //zebra
+    chkZebraActive.Checked:= ed.OptZebraActive;
+    edZebraAlpha.Value:= ed.OptZebraAlphaBlend;
+    edZebraStep.Value:= ed.OptZebraStep;
 
     if ShowModal=mrOk then
     begin
@@ -335,8 +361,8 @@ begin
       ed.OptShowCurLineMinimal:= chkCurLineMin.Checked;
       ed.OptShowCurColumn:= chkCurCol.Checked;
       ed.OptTextHint:= edTextHint.Text;
-      ed.OptWordChars:= edWordChars.Text;
-      ed.OptOverwriteAllowedOnPaste:= chkOvrPaste.Checked;
+      ed.OptNonWordChars:= UTF8Decode(edNonWordChars.Text);
+      ed.OptOverwriteAllowedOnPaste:= chkPasteOvr.Checked;
       ed.OptCopyLinesIfNoSel:= chkCopyNoSel.Checked;
       ed.OptCutLinesIfNoSel:= chkCutNoSel.Checked;
       ed.OptShowFullWidthForSelection:= chkShowFullSel.Checked;
@@ -348,7 +374,7 @@ begin
       ed.OptSavingTrimFinalEmptyLines:= chkSaveTrimEmptyLines.Checked;
       ed.OptShowScrollHint:= chkScrollHint.Checked;
       ed.OptMouseClickOpensURL:= chkClickLink.Checked;
-      ed.OptZebraActive:= chkZebra.Checked;
+      ed.OptPasteMultilineTextSpreadsToCarets:= chkPasteSpread.Checked;
 
       //unprint
       ed.OptUnprintedVisible:= chkUnprintEn.Checked;
@@ -369,18 +395,18 @@ begin
       ed.OptCaretManyAllowed:= chkCrMul.Checked;
       ed.OptCaretStopUnfocused:= chkCrStopUnfocus.Checked;
       ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
+      ed.OptCaretsPrimitiveColumnSelection:= chkCrPrimitiveCol.Checked;
 
-      ed.CaretPropsNormal.Width:= edCrWidthNormal.Value;
-      ed.CaretPropsNormal.Height:= edCrHeightNormal.Value;
-      ed.CaretPropsNormal.EmptyInside:= chkCrEmptyNormal.Checked;
+      ed.CaretShapeNormal.Width:= edCrWidthNormal.Value;
+      ed.CaretShapeNormal.Height:= edCrHeightNormal.Value;
+      ed.CaretShapeNormal.EmptyInside:= chkCrEmptyNormal.Checked;
 
       //gutter
       //ed.OptNumbersFontSizePercents:= edNumSize.Value;
-      ed.OptNumbersStyle:= TATSynNumbersStyle(edNumStyle.ItemIndex);
+      ed.OptNumbersStyle:= TATEditorNumbersStyle(edNumStyle.ItemIndex);
       ed.OptNumbersAlignment:= TAlignment(edNumAlign.ItemIndex);
       ed.OptNumbersShowFirst:= chkShowNum1st.Checked;
       ed.OptNumbersShowCarets:= chkShowNumCr.Checked;
-      ed.OptNumbersSkippedChar:= edNumChar.Text;
       ed.OptGutterShowFoldAlways:= chkShowFoldAlways.Checked;
       ed.OptGutterShowFoldLines:= chkShowFoldLines.Checked;
       ed.OptGutterShowFoldLinesAll:= chkShowFoldLinesAll.Checked;
@@ -389,7 +415,7 @@ begin
       ed.OptRulerHeightPercents:= edRulerSize.Value;
       ed.OptRulerFontSizePercents:= edRulerFSize.Value;
       ed.OptRulerTopIndentPercents:= edRulerIndent.Value;
-      ed.OptRulerNumeration:= TATRulerNumeration(comboRulerStyle.ItemIndex);
+      ed.OptRulerNumeration:= TATEditorRulerNumeration(comboRulerStyle.ItemIndex);
 
       ed.Gutter[ed.GutterBandBookmarks].Visible:= chkGutterBm.Checked;
       ed.Gutter[ed.GutterBandNumbers].Visible:= chkGutterNum.Checked;
@@ -415,9 +441,10 @@ begin
       ed.OptTabSpaces:= chkTabSpaces.Checked;
       ed.OptOverwriteSel:= chkOvrSel.Checked;
       ed.OptKeyUpDownKeepColumn:= chkKeepCol.Checked;
+      ed.OptKeyUpDownAllowToEdge:= chkUpDownToEdge.Checked;
       ed.OptKeyUpDownNavigateWrapped:= chkNavUpDown.Checked;
       ed.OptKeyHomeEndNavigateWrapped:= chkNavHomeEnd.Checked;
-      ed.OptKeyPageUpDownSize:= TATPageUpDownSize(edPageSize.ItemIndex);
+      ed.OptKeyPageUpDownSize:= TATEditorPageDownSize(edPageSize.ItemIndex);
       ed.OptKeyLeftRightSwapSel:= chkLeftRtSwap.Checked;
       ed.OptKeyLeftRightSwapSelAndSelect:= chkLeftRtSwapAndSel.Checked;
       ed.OptKeyHomeToNonSpace:= chkHomeNonspace.Checked;
@@ -426,26 +453,34 @@ begin
       ed.OptKeyTabIndents:= chkTabIndent.Checked;
       ed.OptAutoIndent:= chkEnterIndent.Checked;
       ed.OptKeyBackspaceUnindent := chkBackspUnindent.Checked;
-      ed.OptAutoIndentKind:= TATAutoIndentKind(edIndentKind.ItemIndex);
+      ed.OptKeyBackspaceGoesToPrevLine:= chkBkspGoPrev.Checked;
+      ed.OptAutoIndentKind:= TATEditorAutoIndentKind(edIndentKind.ItemIndex);
       ed.OptIndentSize:= edIndentSize.Value;
       ed.OptIndentKeepsAlign:= chkUnindentKeepAlign.Checked;
 
       //mouse
       ed.OptMouseEnableNormalSelection:= chkMsNormalSel.Checked;
       ed.OptMouseEnableColumnSelection:= chkMsColumnSel.Checked;
-      ed.OptMouse2ClickAction:= TATMouseDoubleClickAction(ComboMsClick2.ItemIndex);
+      ed.OptMouse2ClickAction:= TATEditorDoubleClickAction(ComboMsClick2.ItemIndex);
       ed.OptMouse3ClickSelectsLine:= chkMsClick3.Checked;
       ed.OptMouse2ClickDragSelectsWords:= chkMsClick2Drag.Checked;
       ed.OptMouseClickNumberSelectsLine:= chkMsClickNumSel.Checked;
       ed.OptMouseDragDrop:= chkMsDragDrop.Checked;
       ed.OptMouseRightClickMovesCaret:= chkMsRtClickMove.Checked;
-      ed.OptMouseNiceScroll:= chkMsNiceScroll.Checked;
+      ed.OptMouseMiddleClickAction:= TATEditorMiddleClickAction(comboMsMidClick.ItemIndex);
       ed.OptMouseHideCursorOnType:= chkMsHideCursor.Checked;
 
       //undo
-      ed.OptUndoLimit:= edUndo.Value;
-      ed.OptUndoGrouped:= chkUndoGr.Checked;
-      ed.OptUndoAfterSave:= chkUndoSv.Checked;
+      ed.OptUndoLimit:= edUndoLimit.Value;
+      ed.OptUndoPause:= edUndoPause.Value;
+      ed.OptUndoGrouped:= chkUndoGrp.Checked;
+      ed.OptUndoAfterSave:= chkUndoAfterSave.Checked;
+      ed.OptUndoForCaretJump:= chkUndoForCrt.Checked;
+
+      //zebra
+      ed.OptZebraActive     := chkZebraActive.Checked;
+      ed.OptZebraAlphaBlend := edZebraAlpha.Value;
+      ed.OptZebraStep       := edZebraStep.Value;
 
       //apply
       ed.Gutter.Update;

@@ -214,10 +214,9 @@ end;
 
 procedure TfmMain.EditorChangeCaretPos(Sender: TObject);
 begin
-  CodetreeSelectItemForPosition(Tree, Point(
-    ed.Carets[0].PosX,
-    ed.Carets[0].PosY
-    ));
+  if ed.Carets.Count>0 then
+    with ed.Carets[0] do
+      CodetreeSelectItemForPosition(Tree, PosX, PosY);
 end;
 
 procedure TfmMain.chkFullSelChange(Sender: TObject);

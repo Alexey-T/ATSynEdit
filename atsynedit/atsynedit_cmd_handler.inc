@@ -8,14 +8,19 @@ begin
   if Assigned(FMenuText) then
     FMenuText.PopUp(P.X, P.Y)
   else
+  begin
+    InitMenuStd;
     FMenuStd.PopUp(P.X, P.Y);
+  end;
 end;
 
 procedure TATSynEdit.KeyDown(var Key: Word; Shift: TShiftState);
 var
   NCmd: integer;
 begin
+  if FLockInput then exit;
   inherited;
+  if Key=0 then Exit;
 
   //special handle for spec keys
   case Key of
@@ -45,17 +50,46 @@ begin
   NCmd:= GetCommandFromKey(Key, Shift);
   if NCmd>0 then
   begin
-    DoPaintModeStatic;
+    TimerBlinkDisable;
     DoCommand(NCmd);
-    DoPaintModeBlinking;
+    TimerBlickEnable;
+  end;
+end;
+
+class function TATSynEdit.CheckInputForNumberOnly(const S: UnicodeString; X: integer; ch: WideChar; AllowNegative: boolean): boolean;
+var
+  bMinusPresent: boolean;
+begin
+  Result:= false;
+  bMinusPresent:= Pos('-', S)>0;
+  case ch of
+    '-':
+      begin
+        if not AllowNegative then exit(false);
+        if S='' then
+          exit(true);
+        if (X=0) and not bMinusPresent then
+          exit(true);
+        exit(false);
+      end;
+  '0'..'9':
+    begin
+      if S='' then
+        exit(true);
+      if (X=0) and bMinusPresent then
+        exit(false);
+      exit(true);
+    end;
   end;
 end;
 
 procedure TATSynEdit.UTF8KeyPress(var UTF8Key: TUTF8Char);
 var
-  Str: atString;
+  Str, StrLine: atString;
   Allow: boolean;
+  Caret: TATCaretItem;
 begin
+  if FLockInput then exit;
   inherited;
 
   //skip control Ascii chars
@@ -71,9 +105,24 @@ begin
     if not Allow then Exit;
   end;
 
-  DoPaintModeStatic;
+  if FOptInputNumberOnly then
+  begin
+    if Length(Str)<>1 then exit;
+    if Carets.Count<>1 then exit;
+    Caret:= Carets[0];
+    if not Strings.IsIndexValid(Caret.PosY) then exit;
+    StrLine:= Strings.Lines[Caret.PosY];
+    if Caret.PosX>Length(StrLine) then exit;
+    if not CheckInputForNumberOnly(
+      StrLine,
+      Caret.PosX,
+      Str[1],
+      FOptInputNumberAllowNegative) then exit;
+  end;
+
+  TimerBlinkDisable;
   DoCommand(cCommand_TextInsert, Str);
-  DoPaintModeBlinking;
+  TimerBlickEnable;
 
   Utf8Key:= '';
 end;
@@ -81,6 +130,7 @@ end;
 function TATSynEdit.GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
 var
   Shortcut: TShortcut;
+  bComboPressing: boolean;
 begin
   Result:= 0;
 
@@ -91,32 +141,53 @@ begin
     Exit;
   end;
 
-  if IsEditableTextKey(Key) and ((Shift=[]) or (Shift=[ssShift])) then
-    Exit;
+  //support combo-hotkeys with simple letter
+  // https://github.com/Alexey-T/CudaText/issues/2690
+  bComboPressing:= (FKeymapHistory.Length>0);
+  if not bComboPressing then
+    if IsEditorHotkeyForText(Key) and ((Shift=[]) or (Shift=[ssShift])) then
+      Exit;
 
   Shortcut:= KeyToShortCut(Key, Shift);
-  Result:= FKeymap.GetCommandFromShortcut(Shortcut);
+  Result:= FKeymap.GetCommandFromShortcut(Shortcut, FKeymapHistory);
   if Result>0 then
     Key:= 0;
 end;
 
-procedure TATSynEdit.DoCommandResults(Res: TATCommandResults);
+function TATSynEdit.IsCommandResults_CaretMove(const Res: TATCommandResults): boolean; inline;
+begin
+  Result:= Res*[
+    cResultCaretAny,
+    cResultCaretLeft,
+    cResultCaretRight,
+    cResultCaretTop,
+    cResultCaretBottom
+    ] <> [];
+end;
+
+procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
 var
   Caret: TATCaretItem;
+  St: TATStrings;
+  bTextChanged: boolean;
   bNeedRepaint, bAllowRepaint: boolean;
+  bUndoRedo: boolean;
+  bAllowCaretScroll: boolean;
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
+  bTextChanged:= cResultText in Res;
+  bUndoRedo:= cResultUndoRedo in Res;
 
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
-    if (cResultText in Res) then
+    if bTextChanged then
     begin
-      FScrollHorz.NPos:= 0;
+      FScrollHorz.SetZero;
       Include(Res, cResultCaretTop);
     end;
 
-  if (cResultText in Res) or
+  if bTextChanged or
      (cResultFoldChange in Res) then
   begin
     bNeedRepaint:= true;
@@ -124,7 +195,11 @@ begin
     UpdateWrapInfo;
   end;
 
-  if cResultText in Res then
+  St:= Strings;
+  if bTextChanged or St.ModifiedRecent then
+    St.ActionSaveLastEditionPos; //clears St.ModifiedRecent
+
+  if bTextChanged then
   begin
     bAllowRepaint:= FOptAllowRepaintOnTextChange;
     if FOptMouseHideCursor then
@@ -132,32 +207,55 @@ begin
         SetCursor(crNone);
   end;
 
+  case ACmd of
+    cCommand_KeyLeft,
+    cCommand_KeyLeft_Sel,
+    cCommand_CaretsExtendDownLine..cCommand_CaretsExtendUpToTop:
+      DoCaretsFixForSurrogatePairs(false);
+    cCommand_KeyRight,
+    cCommand_KeyRight_Sel:
+      DoCaretsFixForSurrogatePairs(true);
+  end;
+
   DoCaretsFixIfInsideFolded;
   DoCaretsSort;
 
-  if Res*[cResultCaretAny,
-    cResultCaretLeft, cResultCaretRight,
-    cResultCaretTop, cResultCaretBottom]<>[] then
+  if IsCommandResults_CaretMove(Res) then
   begin
-    if cResultCaretTop in Res then
-      DoGotoCaret(cEdgeTop, false, false)
+    if Carets.Count=1 then
+      bAllowCaretScroll:= true
     else
-    if cResultCaretBottom in Res then
-      DoGotoCaret(cEdgeBottom, false, false)
+    if cResultCaretLazy in Res then
+      bAllowCaretScroll:= not IsCaretOnVisibleRect
     else
-    if cResultCaretLeft in Res then
-      DoGotoCaret(cEdgeLeft, false, false)
-    else
-    if cResultCaretRight in Res then
-      DoGotoCaret(cEdgeRight, false, false);
+      bAllowCaretScroll:= true;
+
+    if bAllowCaretScroll then
+    begin
+      if cResultCaretTop in Res then
+        DoGotoCaret(cEdgeTop, bUndoRedo, false, false)
+      else
+      if cResultCaretBottom in Res then
+        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false)
+      else
+      if cResultCaretLeft in Res then
+        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false)
+      else
+      if cResultCaretRight in Res then
+        DoGotoCaret(cEdgeRight, bUndoRedo, false, false);
+    end;
 
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
     DoEventCarets;
-    //UpdateCaretsCoords;
+
+    //update pixel coords, so that plugin command
+    //  for in in range(N): ed.cmd(cCommand_KeyDown)
+    //will move-down N times
+    UpdateCaretsCoords;
   end;
 
-  if cResultText in Res then
+  if bTextChanged then
   begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
@@ -196,15 +294,289 @@ begin
   end;
 end;
 
+function TATSynEdit.DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults;
+begin
+  Result:= [];
+  case ACmd of
+    //most used commands
+
+    //Shift+arrows must make column selection, if column select option on
+    cCommand_KeyLeft:
+      Result:= DoCommand_KeyLeft(false);
+    cCommand_KeyLeft_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToDirection(cDirColumnLeft)
+        else
+          Result:= DoCommand_KeyLeft(true);
+       end;
+
+    cCommand_KeyRight:
+      Result:= DoCommand_KeyRight(false);
+    cCommand_KeyRight_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToDirection(cDirColumnRight)
+        else
+          Result:= DoCommand_KeyRight(true);
+      end;
+
+    cCommand_KeyUp:
+      Result:= DoCommand_KeyUpDown(false, 1, false);
+    cCommand_KeyUp_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToDirection(cDirColumnUp)
+        else
+          Result:= DoCommand_KeyUpDown(false, 1, false);
+        end;
+
+    cCommand_KeyDown:
+      Result:= DoCommand_KeyUpDown(true, 1, false);
+    cCommand_KeyDown_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToDirection(cDirColumnDown)
+        else
+          Result:= DoCommand_KeyUpDown(true, 1, false);
+      end;
+
+    cCommand_KeyHome:
+      Result:= DoCommand_KeyHome;
+    cCommand_KeyHome_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToLineEdge(false)
+        else
+          Result:= DoCommand_KeyHome;
+      end;
+
+    cCommand_KeyEnd:
+      Result:= DoCommand_KeyEnd;
+    cCommand_KeyEnd_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToLineEdge(true)
+        else
+          Result:= DoCommand_KeyEnd;
+      end;
+
+    cCommand_KeyPageUp:
+      Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
+    cCommand_KeyPageUp_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToDirection(cDirColumnPageUp)
+        else
+          Result:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
+      end;
+
+    cCommand_KeyPageDown:
+      Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
+    cCommand_KeyPageDown_Sel:
+      begin
+        if OptMouseColumnSelectionWithoutKey then
+          Result:= DoCommand_SelectColumnToDirection(cDirColumnPageDown)
+        else
+          Result:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
+      end;
+
+    cCommand_ColSelectLeft:        Result:= DoCommand_SelectColumnToDirection(cDirColumnLeft);
+    cCommand_ColSelectRight:       Result:= DoCommand_SelectColumnToDirection(cDirColumnRight);
+    cCommand_ColSelectUp:          Result:= DoCommand_SelectColumnToDirection(cDirColumnUp);
+    cCommand_ColSelectDown:        Result:= DoCommand_SelectColumnToDirection(cDirColumnDown);
+    cCommand_ColSelectPageUp:      Result:= DoCommand_SelectColumnToDirection(cDirColumnPageUp);
+    cCommand_ColSelectPageDown:    Result:= DoCommand_SelectColumnToDirection(cDirColumnPageDown);
+    cCommand_ColSelectToLineBegin: Result:= DoCommand_SelectColumnToLineEdge(false);
+    cCommand_ColSelectToLineEnd:   Result:= DoCommand_SelectColumnToLineEdge(true);
+
+    cCommand_ColSelectWithoutKey_On:
+      Result:= DoCommand_ColumnSelectWithoutKey(true);
+    cCommand_ColSelectWithoutKey_Off:
+      Result:= DoCommand_ColumnSelectWithoutKey(false);
+    cCommand_ColSelectWithoutKey_Toggle:
+      begin
+        OptMouseColumnSelectionWithoutKey:= not OptMouseColumnSelectionWithoutKey;
+        Result:= [cResultState];
+      end;
+
+    cCommand_RemoveFirstCaret:    Result:= DoCommand_RemoveOneCaret(true);
+    cCommand_RemoveLastCaret:     Result:= DoCommand_RemoveOneCaret(false);
+
+    cCommand_TextInsert:          Result:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
+    cCommand_TextInsertTabChar:   Result:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
+    cCommand_KeyBackspace:        Result:= DoCommand_TextBackspace;
+    cCommand_KeyDelete:           Result:= DoCommand_TextDelete;
+    cCommand_KeyTab:              Result:= DoCommand_TextTabulation;
+    cCommand_KeyEnter:            Result:= DoCommand_TextInsertEol(false);
+    cCommand_ForceFinalEndOfLine: Result:= DoCommand_ForceFinalEndOfLine;
+
+    cCommand_Undo:                Result:= DoCommand_UndoRedo(true);
+    cCommand_Redo:                Result:= DoCommand_UndoRedo(false);
+    //end of most used
+
+    cCommand_TextDeleteSelection:      Result:= DoCommand_TextDeleteSelection;
+    cCommand_TextDeleteLine:           Result:= DoCommand_TextDeleteLines;
+    cCommand_TextDuplicateLine:        Result:= DoCommand_TextDuplicateLine;
+    cCommand_TextDeleteToLineBegin:    Result:= DoCommand_TextDeleteToLineBegin;
+    cCommand_TextDeleteToLineEnd:      Result:= DoCommand_TextDeleteToLineEnd;
+    cCommand_TextDeleteToTextBegin:    Result:= DoCommand_TextDeleteToDocumentBegin;
+    cCommand_TextDeleteToTextEnd:      Result:= DoCommand_TextDeleteToDocumentEnd;
+    cCommand_TextDeleteWordPrev:       Result:= DoCommand_TextDeleteWord(false);
+    cCommand_TextDeleteWordNext:       Result:= DoCommand_TextDeleteWord(true);
+    cCommand_TextDeleteWordEntire:     Result:= DoCommand_TextDeleteWordEntire;
+
+    cCommand_SelectAll:                Result:= DoCommand_SelectAll;
+    cCommand_SelectNone:               Result:= [cResultCaretAny];
+    cCommand_SelectInverted:           Result:= DoCommand_SelectInverted;
+    cCommand_SelectSplitToLines:       Result:= DoCommand_SelectSplitToLines;
+    cCommand_SelectExtendByLine:       Result:= DoCommand_SelectExtendByLine;
+    cCommand_SelectWords:              Result:= DoCommand_SelectWords;
+    cCommand_SelectLines:              Result:= DoCommand_SelectLines;
+
+    cCommand_GotoTextBegin,
+    cCommand_GotoTextBegin_Sel:        Result:= DoCommand_GotoTextBegin;
+    cCommand_GotoTextEnd,
+    cCommand_GotoTextEnd_Sel:          Result:= DoCommand_GotoTextEnd;
+
+    cCommand_GotoScreenTop:            Result:= DoCommand_GotoScreenSide(cScreenSideTop);
+    cCommand_GotoScreenBottom:         Result:= DoCommand_GotoScreenSide(cScreenSideBottom);
+    cCommand_GotoScreenCenter:         Result:= DoCommand_GotoScreenSide(cScreenSideMiddle);
+
+    cCommand_GotoWordNext,
+    cCommand_GotoWordNext_Sel:         Result:= DoCommand_GotoWord(cWordjumpToNext);
+    cCommand_GotoWordPrev,
+    cCommand_GotoWordPrev_Sel:         Result:= DoCommand_GotoWord(cWordjumpToPrev);
+
+    cCommand_GotoWordNext_Simple,
+    cCommand_GotoWordNext_Simple_Sel:  Result:= DoCommand_GotoWord(cWordjumpToNext, true);
+    cCommand_GotoWordPrev_Simple,
+    cCommand_GotoWordPrev_Simple_Sel:  Result:= DoCommand_GotoWord(cWordjumpToPrev, true);
+
+    cCommand_GotoWordEnd,
+    cCommand_GotoWordEnd_Sel:          Result:= DoCommand_GotoWord(cWordjumpToEndOrNext);
+
+    cCommand_GotoLineAbsBegin,
+    cCommand_GotoLineAbsBegin_Sel:     Result:= DoCommand_GotoLineEdge(true);
+    cCommand_GotoLineAbsEnd,
+    cCommand_GotoLineAbsEnd_Sel:       Result:= DoCommand_GotoLineEdge(false);
+
+    cCommand_ToggleOverwrite:          Result:= DoCommand_ToggleOverwrite;
+    cCommand_ToggleReadOnly:           Result:= DoCommand_ToggleReadOnly;
+    cCommand_ToggleWordWrap:           Result:= DoCommand_ToggleWordWrap(false);
+    cCommand_ToggleWordWrapAlt:        Result:= DoCommand_ToggleWordWrap(true);
+    cCommand_ToggleUnprinted:          Result:= DoCommand_ToggleUnprinted;
+    cCommand_ToggleUnprintedSpaces:    Result:= DoCommand_ToggleUnprintedSpaces;
+    cCommand_ToggleUnprintedSpacesTrailing: Result:= DoCommand_ToggleUnprintedSpacesTrailing;
+    cCommand_ToggleUnprintedEnds:      Result:= DoCommand_ToggleUnprintedEnds;
+    cCommand_ToggleUnprintedEndDetails: Result:= DoCommand_ToggleUnprintedEndDetails;
+    cCommand_ToggleLineNums:           Result:= DoCommand_ToggleLineNums;
+    cCommand_ToggleFolding:            Result:= DoCommand_ToggleFolding;
+    cCommand_ToggleRuler:              Result:= DoCommand_ToggleRuler;
+    cCommand_ToggleMinimap:            Result:= DoCommand_ToggleMiniMap;
+    cCommand_ToggleMicromap:           Result:= DoCommand_ToggleMicroMap;
+
+    cCommand_TextIndent:               Result:= DoCommand_TextIndentUnindent(true);
+    cCommand_TextUnindent:             Result:= DoCommand_TextIndentUnindent(false);
+
+    cCommand_ScrollToBegin:            Result:= DoCommand_ScrollToBeginOrEnd(true);
+    cCommand_ScrollToEnd:              Result:= DoCommand_ScrollToBeginOrEnd(false);
+    cCommand_ScrollLineUp:             Result:= DoCommand_ScrollByDelta(-1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollLineDown:           Result:= DoCommand_ScrollByDelta(1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollPageUp:             Result:= DoCommand_ScrollByDelta(-GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollPageDown:           Result:= DoCommand_ScrollByDelta(GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollColumnLeft:         Result:= DoCommand_ScrollByDelta(0, -1, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollColumnRight:        Result:= DoCommand_ScrollByDelta(0, 1, FOptScrollLineCommandsKeepCaretOnScreen);
+    cCommand_ScrollToCaretTop:         Result:= [cResultCaretTop];
+    cCommand_ScrollToCaretBottom:      Result:= [cResultCaretBottom];
+    cCommand_ScrollToCaretLeft:        Result:= [cResultCaretLeft];
+    cCommand_ScrollToCaretRight:       Result:= [cResultCaretRight];
+
+    cCommand_Sort_Asc:                 Result:= DoCommand_Sort(cSortActionAsc);
+    cCommand_Sort_AscNoCase:           Result:= DoCommand_Sort(cSortActionAscNoCase);
+    cCommand_Sort_Desc:                Result:= DoCommand_Sort(cSortActionDesc);
+    cCommand_Sort_DescNoCase:          Result:= DoCommand_Sort(cSortActionDescNoCase);
+
+    cCommand_DeleteAllBlanks:          Result:= DoCommand_DeleteAllBlanks;
+    cCommand_DeleteAdjacentBlanks:     Result:= DoCommand_DeleteAdjacentBlanks;
+    cCommand_DeleteAdjacentDups:       Result:= DoCommand_DeleteAdjacentDups;
+    cCommand_DeleteAllDups:            Result:= DoCommand_DeleteAllDups(false);
+    cCommand_DeleteAllDupsKeepBlanks:  Result:= DoCommand_DeleteAllDups(true);
+    cCommand_ReverseLines:             Result:= DoCommand_ReverseLines;
+    cCommand_ShuffleLines:             Result:= DoCommand_ShuffleLines;
+
+    cCommand_ClipboardCopy:            Result:= DoCommand_ClipboardCopy(false, Clipboard);
+    cCommand_ClipboardCopyAdd:         Result:= DoCommand_ClipboardCopy(true, Clipboard);
+    cCommand_ClipboardCut:             Result:= DoCommand_ClipboardCut(Clipboard);
+
+    //use Clipboard:TClipboard
+    cCommand_ClipboardPaste:                 Result:= DoCommand_ClipboardPaste(false, false, Clipboard);
+    cCommand_ClipboardPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true, Clipboard);
+    cCommand_ClipboardPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false, Clipboard);
+    cCommand_ClipboardPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false, Clipboard);
+    cCommand_ClipboardPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true, Clipboard);
+
+    //use PrimarySelection:TClipboard
+    cCommand_ClipboardAltPaste:                 Result:= DoCommand_ClipboardPaste(false, false, PrimarySelection);
+    cCommand_ClipboardAltPaste_Select:          Result:= DoCommand_ClipboardPaste(false, true, PrimarySelection);
+    cCommand_ClipboardAltPaste_KeepCaret:       Result:= DoCommand_ClipboardPaste(true, false, PrimarySelection);
+    cCommand_ClipboardAltPaste_Column:          Result:= DoCommand_ClipboardPasteColumnBlock(false, PrimarySelection);
+    cCommand_ClipboardAltPaste_ColumnKeepCaret: Result:= DoCommand_ClipboardPasteColumnBlock(true, PrimarySelection);
+    //use SecondarySelection:TClipboard
+    cCommand_ClipboardAltAltPaste:              Result:= DoCommand_ClipboardPaste(false, false, SecondarySelection);
+
+    cCommand_MoveSelectionUp:          Result:= DoCommand_MoveSelectionUpDown(false);
+    cCommand_MoveSelectiondown:        Result:= DoCommand_MoveSelectionUpDown(true);
+    cCommand_TextInsertEmptyAbove:     Result:= DoCommand_TextInsertEmptyAboveBelow(false);
+    cCommand_TextInsertEmptyBelow:     Result:= DoCommand_TextInsertEmptyAboveBelow(true);
+
+    cCommand_TextCaseLower:            Result:= DoCommand_TextChangeCase(cCaseLower);
+    cCommand_TextCaseUpper:            Result:= DoCommand_TextChangeCase(cCaseUpper);
+    cCommand_TextCaseTitle:            Result:= DoCommand_TextChangeCase(cCaseTitle);
+    cCommand_TextCaseInvert:           Result:= DoCommand_TextChangeCase(cCaseInvert);
+    cCommand_TextCaseSentence:         Result:= DoCommand_TextChangeCase(cCaseSentence);
+
+    cCommand_TextTrimSpacesLeft:       Result:= DoCommand_TextTrimSpaces(cTrimLeft);
+    cCommand_TextTrimSpacesRight:      Result:= DoCommand_TextTrimSpaces(cTrimRight);
+    cCommand_TextTrimSpacesAll:        Result:= DoCommand_TextTrimSpaces(cTrimAll);
+
+    cCommand_FoldAll:                  Result:= DoCommand_FoldAll;
+    cCommand_UnfoldAll:                Result:= DoCommand_FoldUnAll;
+    cCommand_FoldLevel1..
+    cCommand_FoldLevel9:               Result:= DoCommand_FoldLevel(ACmd-cCommand_FoldLevel1);
+
+    cCommand_FoldingFoldAtCurLine:     Result:= DoCommand_FoldRangeAtCurLine(cFoldingFold);
+    cCommand_FoldingUnfoldAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(cFoldingUnfold);
+    cCommand_FoldingToggleAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(cFoldingToggle);
+    cCommand_FoldingFoldSelection:     Result:= DoCommand_FoldSelection;
+
+    cCommand_Cancel:                   Result:= DoCommand_Cancel;
+    cCommand_CaretsExtendUpLine:       Result:= DoCommand_CaretsExtend(false, 1);
+    cCommand_CaretsExtendUpPage:       Result:= DoCommand_CaretsExtend(false, GetPageLines);
+    cCommand_CaretsExtendUpToTop:      Result:= DoCommand_CaretsExtend(false, Strings.Count);
+    cCommand_CaretsExtendDownLine:     Result:= DoCommand_CaretsExtend(true, 1);
+    cCommand_CaretsExtendDownPage:     Result:= DoCommand_CaretsExtend(true, GetPageLines);
+    cCommand_CaretsExtendDownToEnd:    Result:= DoCommand_CaretsExtend(true, Strings.Count);
+
+    cCommand_ZoomIn:                   Result:= DoCommand_ScaleDelta(true);
+    cCommand_ZoomOut:                  Result:= DoCommand_ScaleDelta(false);
+    cCommand_ZoomReset:                Result:= DoCommand_ScaleReset;
+    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
+  end;
+end;
+
 procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');
 var
   Caret: TATCaretItem;
   Res: TATCommandResults;
   Str: string;
+  bTooManyCarets: boolean;
+  NCommandCode: integer;
   i: integer;
 begin
   if ACmd<=0 then Exit;
   LastCommandChangedLines:= 0;
+  FLastCommandMakesColumnSel:= false;
   DoHotspotsExit;
 
   if AText<>'' then
@@ -214,7 +586,15 @@ begin
 
   if DoEventCommand(ACmd, Str) then Exit;
 
-  Res:= [];
+  case ACmd of
+    cCommand_MoveSelectionUp,
+    cCommand_MoveSelectionDown:
+      NCommandCode:= ACmd;
+    else
+      NCommandCode:= 0;
+  end;
+  Strings.CommandCode:= NCommandCode;
+
   FCaretSpecPos:= false;
 
   //moving must be with visible caret
@@ -237,259 +617,32 @@ begin
     Strings.SetGroupMark;
   end;
 
-  Carets.UpdateSavedX(cUpdateX_Prepare, false);
+  //support CudaText #3084
+  Strings.SetNewCommandMark;
+
+  Carets.UpdateMemory(cCaretMem_PrepareX, false);
   FIsRunningCommand:= true;
 
-  //--------
-  case ACmd of
-    //most used commands
+  bTooManyCarets:= Carets.Count>FOptUndoMaxCarets;
+  if bTooManyCarets then
+    SetEnabledSlowEvents(false);
 
-    //Shift+arrows must make column selection, if column select option on
-    cCommand_KeyLeft:
-      Res:= DoCommand_KeyLeft(false);
-    cCommand_KeyLeft_Sel:
-      begin
-        if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnLeft)
-        else
-          Res:= DoCommand_KeyLeft(true);
-       end;
+  BeginEditing;
 
-    cCommand_KeyRight:
-      Res:= DoCommand_KeyRight(false);
-    cCommand_KeyRight_Sel:
-      begin
-        if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnRight)
-        else
-          Res:= DoCommand_KeyRight(true);
-      end;
+  try
+    Res:= DoCommandCore(ACmd, AText);
+  finally
+    EndEditing(cResultText in Res);
 
-    cCommand_KeyUp:
-      Res:= DoCommand_KeyUpDown(false, 1, false);
-    cCommand_KeyUp_Sel:
-      begin
-        if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnUp)
-        else
-          Res:= DoCommand_KeyUpDown(false, 1, false);
-        end;
-
-    cCommand_KeyDown:
-      Res:= DoCommand_KeyUpDown(true, 1, false);
-    cCommand_KeyDown_Sel:
-      begin
-        if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnDown)
-        else
-          Res:= DoCommand_KeyUpDown(true, 1, false);
-      end;
-
-    cCommand_KeyHome:
-      Res:= DoCommand_KeyHome;
-    cCommand_KeyHome_Sel:
-      begin
-        if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumnToLineEdge(false)
-        else
-          Res:= DoCommand_KeyHome;
-      end;
-
-    cCommand_KeyEnd:
-      Res:= DoCommand_KeyEnd;
-    cCommand_KeyEnd_Sel:
-      begin
-        if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumnToLineEdge(true)
-        else
-          Res:= DoCommand_KeyEnd;
-      end;
-
-    cCommand_KeyPageUp:
-      Res:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
-    cCommand_KeyPageUp_Sel:
-      begin
-        if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnPageUp)
-        else
-          Res:= DoCommand_KeyUpDown(false, GetPageLines, FOptKeyPageKeepsRelativePos);
-      end;
-
-    cCommand_KeyPageDown:
-      Res:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
-    cCommand_KeyPageDown_Sel:
-      begin
-        if OptMouseColumnSelectionWithoutKey then
-          Res:= DoCommand_SelectColumn(cDirColumnPageDown)
-        else
-          Res:= DoCommand_KeyUpDown(true, GetPageLines, FOptKeyPageKeepsRelativePos);
-      end;
-
-    cCommand_ColSelectLeft:        Res:= DoCommand_SelectColumn(cDirColumnLeft);
-    cCommand_ColSelectRight:       Res:= DoCommand_SelectColumn(cDirColumnRight);
-    cCommand_ColSelectUp:          Res:= DoCommand_SelectColumn(cDirColumnUp);
-    cCommand_ColSelectDown:        Res:= DoCommand_SelectColumn(cDirColumnDown);
-    cCommand_ColSelectPageUp:      Res:= DoCommand_SelectColumn(cDirColumnPageUp);
-    cCommand_ColSelectPageDown:    Res:= DoCommand_SelectColumn(cDirColumnPageDown);
-    cCommand_ColSelectToLineBegin: Res:= DoCommand_SelectColumnToLineEdge(false);
-    cCommand_ColSelectToLineEnd:   Res:= DoCommand_SelectColumnToLineEdge(true);
-
-    cCommand_ColSelectWithoutKey_On:
-      Res:= DoCommand_ColumnSelectWithoutKey(true);
-    cCommand_ColSelectWithoutKey_Off:
-      Res:= DoCommand_ColumnSelectWithoutKey(false);
-    cCommand_ColSelectWithoutKey_Toggle:
-      begin
-        OptMouseColumnSelectionWithoutKey:= not OptMouseColumnSelectionWithoutKey;
-        Res:= [cResultState];
-      end;
-
-    cCommand_RemoveFirstCaret:    Res:= DoCommand_RemoveOneCaret(true);
-    cCommand_RemoveLastCaret:     Res:= DoCommand_RemoveOneCaret(false);
-
-    cCommand_TextInsert:          Res:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
-    cCommand_TextInsertTabChar:   Res:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
-    cCommand_KeyBackspace:        Res:= DoCommand_TextBackspace;
-    cCommand_KeyDelete:           Res:= DoCommand_TextDelete;
-    cCommand_KeyTab:              Res:= DoCommand_TextTabulation;
-    cCommand_KeyEnter:            Res:= DoCommand_TextInsertEol(false);
-    cCommand_ForceFinalEndOfLine: Res:= DoCommand_ForceFinalEndOfLine;
-
-    cCommand_Undo:                Res:= DoCommand_Undo;
-    cCommand_Redo:                Res:= DoCommand_Redo;
-    //end of most used
-
-    cCommand_TextDeleteSelection:      Res:= DoCommand_TextDeleteSelection;
-    cCommand_TextDeleteLine:           Res:= DoCommand_TextDeleteLines;
-    cCommand_TextDuplicateLine:        Res:= DoCommand_TextDuplicateLine;
-    cCommand_TextDeleteToLineBegin:    Res:= DoCommand_TextDeleteToLineBegin;
-    cCommand_TextDeleteToLineEnd:      Res:= DoCommand_TextDeleteToLineEnd;
-    cCommand_TextDeleteToTextEnd:      Res:= DoCommand_TextDeleteToFileEnd;
-    cCommand_TextDeleteWordPrev:       Res:= DoCommand_TextDeleteWord(false);
-    cCommand_TextDeleteWordNext:       Res:= DoCommand_TextDeleteWord(true);
-
-    cCommand_SelectAll:                Res:= DoCommand_SelectAll;
-    cCommand_SelectNone:               Res:= [cResultCaretAny];
-    cCommand_SelectInverted:           Res:= DoCommand_SelectInverted;
-    cCommand_SelectSplitToLines:       Res:= DoCommand_SelectSplitToLines;
-    cCommand_SelectExtendByLine:       Res:= DoCommand_SelectExtendByLine;
-    cCommand_SelectWords:              Res:= DoCommand_SelectWords;
-    cCommand_SelectLines:              Res:= DoCommand_SelectLines;
-
-    cCommand_GotoTextBegin,
-    cCommand_GotoTextBegin_Sel:        Res:= DoCommand_GotoTextBegin;
-    cCommand_GotoTextEnd,
-    cCommand_GotoTextEnd_Sel:          Res:= DoCommand_GotoTextEnd;
-
-    cCommand_GotoScreenTop:            Res:= DoCommand_GotoScreenSide(cScreenSideTop);
-    cCommand_GotoScreenBottom:         Res:= DoCommand_GotoScreenSide(cScreenSideBottom);
-    cCommand_GotoScreenCenter:         Res:= DoCommand_GotoScreenSide(cScreenSideMiddle);
-
-    cCommand_GotoWordNext,
-    cCommand_GotoWordNext_Sel:         Res:= DoCommand_GotoWord(cWordjumpToNext);
-    cCommand_GotoWordPrev,
-    cCommand_GotoWordPrev_Sel:         Res:= DoCommand_GotoWord(cWordjumpToPrev);
-
-    cCommand_GotoWordNext_Simple,
-    cCommand_GotoWordNext_Simple_Sel:  Res:= DoCommand_GotoWord(cWordjumpToNext, true);
-    cCommand_GotoWordPrev_Simple,
-    cCommand_GotoWordPrev_Simple_Sel:  Res:= DoCommand_GotoWord(cWordjumpToPrev, true);
-
-    cCommand_GotoWordEnd,
-    cCommand_GotoWordEnd_Sel:          Res:= DoCommand_GotoWord(cWordjumpToEndOrNext);
-
-    cCommand_GotoLineAbsBegin,
-    cCommand_GotoLineAbsBegin_Sel:     Res:= DoCommand_GotoLineEdge(true);
-    cCommand_GotoLineAbsEnd,
-    cCommand_GotoLineAbsEnd_Sel:       Res:= DoCommand_GotoLineEdge(false);
-
-    cCommand_ToggleOverwrite:          Res:= DoCommand_ToggleOverwrite;
-    cCommand_ToggleReadOnly:           Res:= DoCommand_ToggleReadOnly;
-    cCommand_ToggleWordWrap:           Res:= DoCommand_ToggleWordWrap(false);
-    cCommand_ToggleWordWrapAlt:        Res:= DoCommand_ToggleWordWrap(true);
-    cCommand_ToggleUnprinted:          Res:= DoCommand_ToggleUnprinted;
-    cCommand_ToggleUnprintedSpaces:    Res:= DoCommand_ToggleUnprintedSpaces;
-    cCommand_ToggleUnprintedSpacesTrailing: Res:= DoCommand_ToggleUnprintedSpacesTrailing;
-    cCommand_ToggleUnprintedEnds:      Res:= DoCommand_ToggleUnprintedEnds;
-    cCommand_ToggleUnprintedEndDetails: Res:= DoCommand_ToggleUnprintedEndDetails;
-    cCommand_ToggleLineNums:           Res:= DoCommand_ToggleLineNums;
-    cCommand_ToggleFolding:            Res:= DoCommand_ToggleFolding;
-    cCommand_ToggleRuler:              Res:= DoCommand_ToggleRuler;
-    cCommand_ToggleMinimap:            Res:= DoCommand_ToggleMiniMap;
-    cCommand_ToggleMicromap:           Res:= DoCommand_ToggleMicroMap;
-
-    cCommand_TextIndent:               Res:= DoCommand_TextIndentUnindent(true);
-    cCommand_TextUnindent:             Res:= DoCommand_TextIndentUnindent(false);
-
-    cCommand_ScrollToBegin:            Res:= DoCommand_ScrollToBeginOrEnd(true);
-    cCommand_ScrollToEnd:              Res:= DoCommand_ScrollToBeginOrEnd(false);
-    cCommand_ScrollLineUp:             Res:= DoCommand_ScrollByDelta(-1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
-    cCommand_ScrollLineDown:           Res:= DoCommand_ScrollByDelta(1, 0, FOptScrollLineCommandsKeepCaretOnScreen);
-    cCommand_ScrollPageUp:             Res:= DoCommand_ScrollByDelta(-GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
-    cCommand_ScrollPageDown:           Res:= DoCommand_ScrollByDelta(GetPageLines, 0, FOptScrollLineCommandsKeepCaretOnScreen);
-    cCommand_ScrollColumnLeft:         Res:= DoCommand_ScrollByDelta(0, -1, FOptScrollLineCommandsKeepCaretOnScreen);
-    cCommand_ScrollColumnRight:        Res:= DoCommand_ScrollByDelta(0, 1, FOptScrollLineCommandsKeepCaretOnScreen);
-    cCommand_ScrollToCaretTop:         Res:= [cResultCaretTop];
-    cCommand_ScrollToCaretBottom:      Res:= [cResultCaretBottom];
-    cCommand_ScrollToCaretLeft:        Res:= [cResultCaretLeft];
-    cCommand_ScrollToCaretRight:       Res:= [cResultCaretRight];
-
-    cCommand_ClipboardCopy:            Res:= DoCommand_ClipboardCopy(false, Clipboard);
-    cCommand_ClipboardCopyAdd:         Res:= DoCommand_ClipboardCopy(true, Clipboard);
-    cCommand_ClipboardCut:             Res:= DoCommand_ClipboardCut(Clipboard);
-
-    //use Clipboard:TClipboard
-    cCommand_ClipboardPaste:                 Res:= DoCommand_ClipboardPaste(false, false, Clipboard);
-    cCommand_ClipboardPaste_Select:          Res:= DoCommand_ClipboardPaste(false, true, Clipboard);
-    cCommand_ClipboardPaste_KeepCaret:       Res:= DoCommand_ClipboardPaste(true, false, Clipboard);
-    cCommand_ClipboardPaste_Column:          Res:= DoCommand_ClipboardPasteColumnBlock(false, Clipboard);
-    cCommand_ClipboardPaste_ColumnKeepCaret: Res:= DoCommand_ClipboardPasteColumnBlock(true, Clipboard);
-
-    //use PrimarySelection:TClipboard
-    cCommand_ClipboardAltPaste:                 Res:= DoCommand_ClipboardPaste(false, false, PrimarySelection);
-    cCommand_ClipboardAltPaste_Select:          Res:= DoCommand_ClipboardPaste(false, true, PrimarySelection);
-    cCommand_ClipboardAltPaste_KeepCaret:       Res:= DoCommand_ClipboardPaste(true, false, PrimarySelection);
-    cCommand_ClipboardAltPaste_Column:          Res:= DoCommand_ClipboardPasteColumnBlock(false, PrimarySelection);
-    cCommand_ClipboardAltPaste_ColumnKeepCaret: Res:= DoCommand_ClipboardPasteColumnBlock(true, PrimarySelection);
-    //use SecondarySelection:TClipboard
-    cCommand_ClipboardAltAltPaste:              Res:= DoCommand_ClipboardPaste(false, false, SecondarySelection);
-
-    cCommand_MoveSelectionUp:          Res:= DoCommand_MoveSelectionUpDown(false);
-    cCommand_MoveSelectiondown:        Res:= DoCommand_MoveSelectionUpDown(true);
-    cCommand_TextInsertEmptyAbove:     Res:= DoCommand_TextInsertEmptyAboveBelow(false);
-    cCommand_TextInsertEmptyBelow:     Res:= DoCommand_TextInsertEmptyAboveBelow(true);
-
-    cCommand_TextCaseLower:            Res:= DoCommand_TextChangeCase(cCaseLower);
-    cCommand_TextCaseUpper:            Res:= DoCommand_TextChangeCase(cCaseUpper);
-    cCommand_TextCaseTitle:            Res:= DoCommand_TextChangeCase(cCaseTitle);
-    cCommand_TextCaseInvert:           Res:= DoCommand_TextChangeCase(cCaseInvert);
-    cCommand_TextCaseSentence:         Res:= DoCommand_TextChangeCase(cCaseSentence);
-
-    cCommand_TextTrimSpacesLeft:       Res:= DoCommand_TextTrimSpaces(cTrimLeft);
-    cCommand_TextTrimSpacesRight:      Res:= DoCommand_TextTrimSpaces(cTrimRight);
-    cCommand_TextTrimSpacesAll:        Res:= DoCommand_TextTrimSpaces(cTrimAll);
-
-    cCommand_FoldAll:                  Res:= DoCommand_FoldUnfoldAll(true);
-    cCommand_UnfoldAll:                Res:= DoCommand_FoldUnfoldAll(false);
-    cCommand_FoldLevel1..
-    cCommand_FoldLevel9:               Res:= DoCommand_FoldLevel(ACmd-cCommand_FoldLevel1);
-
-    cCommand_FoldingFoldAtCurLine:     Res:= DoCommand_FoldRangeAtCurLine(cFoldingFold);
-    cCommand_FoldingUnfoldAtCurLine:   Res:= DoCommand_FoldRangeAtCurLine(cFoldingUnfold);
-    cCommand_FoldingToggleAtCurLine:   Res:= DoCommand_FoldRangeAtCurLine(cFoldingToggle);
-
-    cCommand_Cancel:                   Res:= DoCommand_Cancel;
-    cCommand_CaretsExtendUpLine:       Res:= DoCommand_CaretsExtend(false, 1);
-    cCommand_CaretsExtendUpPage:       Res:= DoCommand_CaretsExtend(false, GetPageLines);
-    cCommand_CaretsExtendUpToTop:      Res:= DoCommand_CaretsExtend(false, Strings.Count);
-    cCommand_CaretsExtendDownLine:     Res:= DoCommand_CaretsExtend(true, 1);
-    cCommand_CaretsExtendDownPage:     Res:= DoCommand_CaretsExtend(true, GetPageLines);
-    cCommand_CaretsExtendDownToEnd:    Res:= DoCommand_CaretsExtend(true, Strings.Count);
-
-    cCommand_ZoomIn:                   Res:= DoCommand_SizeChange(true);
-    cCommand_ZoomOut:                  Res:= DoCommand_SizeChange(false);
-    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
+    if bTooManyCarets then
+      SetEnabledSlowEvents(true);
   end;
+
+  if IsCommandResults_CaretMove(Res) then
+    if not FLastCommandMakesColumnSel then
+    begin
+      ClearSelRectPoints;
+    end;
 
   FLastCommandChangedText2:= FLastCommandChangedText;
   FLastCommandChangedText:= cResultText in Res;
@@ -507,7 +660,7 @@ begin
     cCommand_KeyTab:
       begin
         if not FLastCommandChangedText2 then
-          Carets.UpdateSavedX(cUpdateX_Save, false);
+          Carets.UpdateMemory(cCaretMem_SaveX, false);
       end;
     {
     // https://github.com/Alexey-T/CudaText/issues/1326
@@ -517,19 +670,21 @@ begin
     cCommand_ClipboardAltAltPaste,
     cCommand_ClipboardAltPaste_Select:
       begin
-        Carets.UpdateSavedX(cUpdateX_Save, false);
+        Carets.UpdateMemory(cCaretMem_SaveX, false);
       end;
     }
     cCommand_KeyUp,
     cCommand_KeyUp_Sel,
     cCommand_KeyDown,
     cCommand_KeyDown_Sel:
-      Carets.UpdateSavedX(cUpdateX_Save, true);
+      Carets.UpdateMemory(cCaretMem_SaveX, true);
     else
-      Carets.UpdateSavedX(cUpdateX_Clear, false);
+      Carets.UpdateMemory(cCaretMem_ClearX, false);
   end;
 
-  DoCommandResults(Res);
+  if NCommandCode<>0 then
+    Strings.CommandCode:= 0;
+  DoCommandResults(ACmd, Res);
   DoEventCommandAfter(ACmd, AText);
   FIsRunningCommand:= false;
 end;

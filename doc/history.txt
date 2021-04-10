@@ -1,4 +1,203 @@
 
+2021.04.06
++ OptDimUnfocused<0 is allowed, to blend with white
+
+2021.03.26
++ prop OptUndoForCaretJump
++ prop OptUndoPause
++ show small animation + pause for Undo/Redo
+
+2021.03.08
++ prop OptMaskChar and OptMaskCharUsed, to make password-input fields
++ prop OptInputNumberOnly
++ prop OptInputNumberAllowNegative
+
+2021.03.05
++ prop OptKeyUpDownAllowToEdge
+
+2021.03.04
++ prop FoldingAsString
+
+2021.02.26
++ BGRABitmap is now required (used to paint minimap)
++ minimap painting now runs in a thread! much faster!
+
+2021.02.22
++ refactored for future rendeding with threads
+* removed prop OptNumbersSkippedChar, always draw a 'dot'
+
+2021.02.06
++ add: OptDimUnfocusedBack (0..255, 0: don't change)
++ add: OptMicromapShowForMinCount (=2, only for multiline editors)
+
+2021.01.24
+* change: refactored all code in atstringproc_htmlcolor unit, all funcs are moved into class
+
+2021.01.19
++ add: OptUndoMaxCarets (default 200); editing commands are much faster for >200 carets
+
+2021.01.12
++ add: OptCaretHideUnfocused (note: True by default)
+
+2021.01.09
++ add: command "delete word"
+
+2021.01.02
++ add: finder: support search "in selection"+"wrapped search" in multi-selections (with the forward search)
+* change: renamed and changed type of Attribs.MicromapMode field, now it's enum
+
+2020.12.26
+* change: renamed command to "delete to document end"
++ add: command "delete to document begin"
++ add: optimized command "delete to document end"
+
+2020.11.09
+* change: replace 2 props OptMouseMiddleClick* to single OptMouseMiddleClickAction enum
+
+2020.10.16
++ add: finder: when search with selection is called with OptInSelection, finder places marker instead of the caret. This allows to "find first"/"find next"/"find prev"/"replace" inside big selection w/o breaking it.
++ add: Markers prop LineLen - to paint underline near the triangle, it's used by finder with OptInSelection
+
+2020.07.06
++ add: OptCaretsPrimitiveColumnSelection (True by default, to mimic column selection of VSCode/Sublime)
+
+2020.06.30
++ add: Finder property VirtualCaretsAsString, it allows to perform search from any pos, or in any blocks
+
+2020.06.25
++ add: draw gutter folding lines, for deepest range of 1st caret, with new color - Colors.GutterFoldLine2
++ add: prop OptGutterShowFoldLinesForCaret
++ add: finder: proper detect word-boundary in normal (non regex) search
+
+2020.06.17
++ add: OptStapleIndentConsidersEnd (default: false)
+
+2020.06.14
++ add: internal cache of calculated URLs, so:
+   a) scrolling by Up/Down key runs URL search for 1 new line, not for all visible lines
+   b) moving caret w/o scrolling don't run URL search at all
++ add: OptMinLineLenToCalcURL (default 4)
+
+2020.06.11
++ add: unit atsynedit_UnicodeData, which adds arrays (320K memory), to speedup unicode funcs in finder
+
+2020.06.03
++ add: better logic of LineStates, fixing https://github.com/Alexey-T/CudaText/issues/2617
+
+2020.06.02
++ add: OptZebraStep (default=2)
+
+2020.05.29
++ add: optimize AdapterCache: use TDeque instead of list
++ add: use predefined char-widths for many unicode ranges (Russian German CJK Indian etc)
+
+2020.05.26
++ add: optimizations in unfolding code: change algo O(n**2) to O(n)
++ add: optimizations in "fold level / 2..3..4.." code: change O(n**2) to O(n)
+
+2020.05.21
++ add: when unprinted symbols visible, paint additional curved-arrow for wrapped line parts
++ add: "line states" are saved to Undo-list and Undo/Redo commands handles them
+* changed format of UndoAsString/RedoAsString data
+
+2020.05.17
++ add: method Strings.TextSubstringLength
+
+2020.05.13
++ add: prop OptMouse2ClickOpensURL (default True)
+
+2020.05.12
+- fix: OptMarkersSize was not used
+* change: OptMarkersSize default changed from 4 (pixels) to 25 (percents of text cell)
+
+2020.03.21
++ add: OptKeyLeftRightGoToNextLineWithCaret (to be like EmEditor)
+
+2020.03.20
++ add: OptScaleFont (if >0, it is scale of editor's font in percents)
+* change: make Ctrl+MouseWheel change editor font scale by 10%, instead of changing font.size by 1
+* deleted OptAllowZooming (we have OptMouseWheelZooms)
+
+2020.03.18
++ add: commands "(without undo) sort asc / desc / asc ignore case / desc ignore case"
++ add: command "(without undo) delete all blank lines"
++ add: command "(without undo) delete adjacent blank lines"
++ add: command "(without undo) delete all duplicate lines"
++ add: command "(without undo) delete adjacent duplicate lines"
++ add: command "(without undo) reverse lines"
++ add: command "(without undo) shuffle lines"
+
+2020.03.02
++ add: Strings.Delete has param AWithUndo
++ add: public method UpdateWrapInfo(AForce)
+
+2020.02.24
+* change: hidden all Popup* properties (TPopupMenu) to "public" section to avoid Lazarus crash
+
+2020.02.23
++ add: much faster SHtmlColorToColor
+
+2020.02.21
++ add: reworked strings storage system TATStrings:
+  a) it takes less memory for ASCII text lines
+  b) for lines with non-ASCII chars, it takes more memory, but it works much faster, so scrolling in smoother
++ add: much faster rendering at the end of huge lines (>1M)
++ add: much faster toggling Wrap mode on huge lines
++ add: on long lines (>500), editor ignores CJK char sizes
+
+2020.02.15
++ add: used Alexey Torgashin's patches to Sorokin's TRegExpr
+
+2020.02.13
++ add: OptMaxLineLenToTokenize=4000
+
+2019.12.17
++ add: finder: added method Action_FindAll (collect all matches in a list)
+
+2019.12.11
++ add: supported encodings UTF-32LE, UTF-32BE
+
+2019.11.26
++ add: OptKeyBackspaceGoesToPrevLine
+
+2019.11.09
++ add: OptMinimapCustomScale (if >100, sets scale only for minimap)
+
+2019.11.03
++ add: OptScrollStyleHorz
++ add: OptScrollStyleVert
+* deleted OptScrollbarHorizontalHidden
+* deleted OptAllowScrollbarVert
+* deleted OptAllowScrollbarHorz
+
+2019.10.24
+* add: Micromap object to allow more columns
+* deleted OptMicromapWidthPercents
+
+2019.10.18
++ add: OptPasteMultilineTextSpreadsToCarets
+
+2019.10.13
++ add: methods MarkerSelectToCaret, MarkerDeleteToCaret
+
+2019.10.10
++ add: handling of surrogate pairs: when caret moves, don't allow to place it inside surrogate pair
+
+2019.09.27
++ add: OptShowDragDropMarker (works during drag-drop of text block)
+
+2019.09.23
+* change: replaced option OptWordChars to OptNonWordChars; replaced also AWordChars to ANonWordChars in all code
+
+2019.09.19
+* change: require package EncConv (from github.com/alexey-t) instead if LConvEncoding
+
+2019.09.13
++ add: OptUnprintedSpacesOnlyInSelection
+
+2019.09.10
++ add: OptMinimapHiliteLinesWithSelection (it uses Colors.CurrentLineBG)
+
 2019.06.12
 + add: Finder has property OptTokens (enum: all, comments, strings, comments+strings, except comments, ...)
 + add: Finder has event OnGetToken (to implement checks for OptTokens)
@@ -328,7 +527,7 @@
 + rewritten bookmarks support. now bookmarks are not embedded into Strings items, they are in separate Strings.Bookmarks object. now bookmarks aren't deleted if their lines are deleted - good.
 + smaller size of Strings item
 + added unit atsynedit_bookmarks
-* deleted unit atstrings_hints 
+* deleted unit atstrings_hints
 * deprecated Strings.LinesBm[]
 * deleted Strings.LinesHint[]
 

@@ -1,0 +1,5 @@
+#
+# coding: cp866
+
+Some dummy text
+just to detect encoding

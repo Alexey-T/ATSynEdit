@@ -72,14 +72,16 @@ var
   Caret: TATCaretItem;
   imc: HIMC;
   CandiForm: CANDIDATEFORM;
+  {
   VisRect: TRect;
   Y: integer;
+  }
 begin
   Ed:= TATSynEdit(Sender);
   if Ed.Carets.Count=0 then exit;
   Caret:= Ed.Carets[0];
 
-  VisRect:= Screen.WorkAreaRect;
+  //VisRect:= Screen.WorkAreaRect;
 
   imc:= ImmGetContext(Ed.Handle);
   if imc<>0 then
@@ -115,6 +117,7 @@ var
   Caret: TATCaretItem;
   cp: PIMECHARPOSITION;
   Pnt: TPoint;
+  R: TRect;
 begin
   Ed:= TATSynEdit(Sender);
   if Ed.Carets.Count=0 then exit;
@@ -134,8 +137,9 @@ begin
         cp^.pt.x := Pnt.X;
         cp^.pt.y := Pnt.Y;
 
-        cp^.rcDocument.TopLeft := Ed.ClientToScreen(Ed.ClientRect.TopLeft);
-        cp^.rcDocument.BottomRight := Ed.ClientToScreen(Ed.ClientRect.BottomRight);
+        R := Ed.ClientRect;
+        cp^.rcDocument.TopLeft := Ed.ClientToScreen(R.TopLeft);
+        cp^.rcDocument.BottomRight := Ed.ClientToScreen(R.BottomRight);
 
         Msg.Result:= 1;
       end;

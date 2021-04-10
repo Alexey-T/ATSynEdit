@@ -12,7 +12,7 @@ uses
   Classes, SysUtils, Graphics;
 
 type
-  TATSynEditColors = class(TPersistent)
+  TATEditorColors = class(TPersistent)
   private
     FTextFont,
     FTextBG,
@@ -26,9 +26,8 @@ type
     FGutterBG,
     FGutterCaretFont,
     FGutterCaretBG,
-    FGutterPlusBorder,
-    FGutterPlusBG,
     FGutterFoldLine,
+    FGutterFoldLine2,
     FGutterFoldBG,
     FGutterSeparatorBG,
     FCurrentLineBG,
@@ -77,9 +76,8 @@ type
     property GutterBG: TColor read FGutterBG write FGutterBG;
     property GutterCaretFont: TColor read FGutterCaretFont write FGutterCaretFont;
     property GutterCaretBG: TColor read FGutterCaretBG write FGutterCaretBG;
-    property GutterPlusBorder: TColor read FGutterPlusBorder write FGutterPlusBorder;
-    property GutterPlusBG: TColor read FGutterPlusBG write FGutterPlusBG;
     property GutterFoldLine: TColor read FGutterFoldLine write FGutterFoldLine;
+    property GutterFoldLine2: TColor read FGutterFoldLine2 write FGutterFoldLine2;
     property GutterFoldBG: TColor read FGutterFoldBG write FGutterFoldBG;
     property GutterSeparatorBG: TColor read FGutterSeparatorBG write FGutterSeparatorBG;
     property CurrentLineBG: TColor read FCurrentLineBG write FCurrentLineBG;
@@ -117,12 +115,12 @@ type
     property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
   end;
 
-procedure InitDefaultColors(C: TATSynEditColors);
+procedure InitDefaultColors(C: TATEditorColors);
 
 
 implementation
 
-procedure InitDefaultColors(C: TATSynEditColors);
+procedure InitDefaultColors(C: TATEditorColors);
 begin
   C.TextFont:= clBlack;
   C.TextBG:= clWhite;
@@ -136,12 +134,11 @@ begin
   C.GutterBG:= $e0e0e0;
   C.GutterCaretFont:= clGray;
   C.GutterCaretBG:= $c8c8c8;
-  C.GutterPlusBorder:= clGray;
-  C.GutterPlusBG:= $f4f4f4;
   C.GutterFoldLine:= clGray;
+  C.GutterFoldLine2:= $904040;
   C.GutterFoldBG:= $c8c8c8;
   C.GutterSeparatorBG:= clBlack;
-  C.CurrentLineBG:= $e0f0f0;
+  C.CurrentLineBG:= $d0f0d0;
   C.BookmarkBG:= clMoneyGreen;
   C.RulerBG:= C.GutterBG;
   C.RulerFont:= clGray;

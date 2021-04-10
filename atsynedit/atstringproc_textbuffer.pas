@@ -255,28 +255,35 @@ begin
   Result.Y:= -1;
   Result.X:= 0;
   if APos<=0 then
-    begin Result.Y:= 0; Exit end;
+  begin
+    Result.Y:= 0;
+    Exit
+  end;
 
   a:= 0;
   b:= FCount-1;
   if b<0 then Exit;
 
   repeat
-    dif:= FList[a]-APos;
-    if dif=0 then begin m:= a; Break end;
-
-    //middle, which is near b if not exact middle
     m:= (a+b+1) div 2;
 
     dif:= FList[m]-APos;
     if dif=0 then Break;
 
-    if Abs(a-b)<=1 then begin m:= a; Break end;
-    if dif>0 then b:= m else a:= m;
+    if Abs(a-b)<=1 then
+    begin
+      m:= a;
+      Break
+    end;
+
+    if dif>0 then
+      b:= m
+    else
+      a:= m;
   until false;
 
   Result.Y:= m;
-  Result.X:= APos-FList[Result.Y];
+  Result.X:= APos-FList[m];
 end;
 
 function TATStringBuffer.SubString(APos, ALen: integer): UnicodeString; inline;

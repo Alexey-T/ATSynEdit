@@ -14,10 +14,12 @@ uses
   ATSynEdit_Commands, ATSynEdit_Edits, ATSynEdit_Gutter, ATSynEdit_Keymap, 
   ATSynEdit_Keymap_Init, ATSynEdit_Ranges, ATSynEdit_WrapInfo, 
   ATSynEdit_Finder, ATStringProc_HtmlColor, ATSynEdit_Colors, 
-  ATSynEdit_Export_HTML, ATSynEdit_Markers, ATSynEdit_RegExpr, 
+  ATSynEdit_Export_HTML, ATSynEdit_Markers, atsynedit_regexpr, 
   ATSynEdit_Adapter_Cache, ATSynEdit_Gaps, ATSynEdit_DimRanges, 
   ATSynEdit_Bookmarks, ATSynEdit_Gutter_Decor, ATSynEdit_fgl, 
-  LazarusPackageIntf;
+  ATSynEdit_Micromap, atsynedit_unicodedata, ATSynEdit_LinkCache, 
+  ATSynEdit_CharSizeArray, ATSynEdit_LineParts, ATStringProc_Separator, 
+  ATStringProc_UTF8Decode, LazarusPackageIntf;
 
 implementation
 

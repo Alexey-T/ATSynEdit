@@ -88,3 +88,5 @@ end;
 Many lexers support icons in tree (e.g. Pascal, C#). To show icons, use for tree ImageList with these 8 icons: folder, parts-1, parts-2, parts-3, box, func, arrow-1, arrow-2. Example of icons from CudaText:
 
 [[File:atsynedit_tree_img.png]]
+
+[[Category:ATSynEdit]]

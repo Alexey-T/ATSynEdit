@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
-  <Package Version="4">
+  <Package Version="5">
     <PathDelim Value="\"/>
     <Name Value="atsynedit_package"/>
     <Type Value="RunAndDesignTime"/>
@@ -9,29 +9,8 @@
       <Version Value="11"/>
       <PathDelim Value="\"/>
       <SearchPaths>
-        <OtherUnitFiles Value=".;..\proc_lexer;..\..\..\..\cmp\mORMot"/>
         <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
-      <Conditionals Value="if defined(FULLSPEED) then begin
-undefine(DEBUG);
-CustomOptions:=CustomOptions+&apos; -dTRICK -O3 -g -gl &apos;;
-end
-else begin
-CustomOptions:=CustomOptions+&apos; -O1 -g -gl &apos;;
-end;
-if defined(UseLogger) then begin
-CustomOptions:=CustomOptions+&apos; -dDEBUGLOG &apos;;
-end;
-
-// example for adding linker options on Mac OS X
-//if TargetOS=&apos;darwin&apos; then
-//  LinkerOptions := &apos; -framework OpenGL&apos;;
-
-// example for adding a unit and include path on Windows
-//if SrcOS=&apos;win&apos; then begin
-//  UnitPath += &apos;;win&apos;;
-//  IncPath += &apos;;win&apos;;
-//end;"/>
       <Parsing>
         <SyntaxOptions>
           <IncludeAssertionCode Value="True"/>
@@ -39,20 +18,18 @@ end;
       </Parsing>
       <CodeGeneration>
         <SmartLinkUnit Value="True"/>
-        <Optimizations>
-          <OptimizationLevel Value="0"/>
-        </Optimizations>
       </CodeGeneration>
-      <Other>
-        <CustomOptions Value="-Sa
--dFGLINLINE
--ddebug_show_fps__"/>
-      </Other>
+      <Linking>
+        <Debugging>
+          <DebugInfoType Value="dsDwarf2Set"/>
+          <UseExternalDbgSyms Value="True"/>
+        </Debugging>
+      </Linking>
     </CompilerOptions>
-    <Description Value="Multi-line editor control, with much more features than SynEdit. Supports syntax highlighting using EControl engine or other engines."/>
+    <Description Value="Multi-line editor control, used in CudaText editor. Supports syntax highlighting using EControl engine or other engines."/>
     <License Value="MPL 2.0, LGPL"/>
-    <Version Major="1" Minor="4"/>
-    <Files Count="32">
+    <Version Major="2" Minor="3"/>
+    <Files Count="39">
       <Item1>
         <Filename Value="atsynedit_register.pas"/>
         <HasRegisterProc Value="True"/>
@@ -152,7 +129,7 @@ end;
       </Item24>
       <Item25>
         <Filename Value="atsynedit_regexpr.pas"/>
-        <UnitName Value="ATSynEdit_RegExpr"/>
+        <UnitName Value="atsynedit_regexpr"/>
       </Item25>
       <Item26>
         <Filename Value="atsynedit_adapter_cache.pas"/>
@@ -182,17 +159,52 @@ end;
         <Filename Value="atsynedit_fgl.pas"/>
         <UnitName Value="ATSynEdit_fgl"/>
       </Item32>
+      <Item33>
+        <Filename Value="atsynedit_micromap.pas"/>
+        <UnitName Value="ATSynEdit_Micromap"/>
+      </Item33>
+      <Item34>
+        <Filename Value="atsynedit_unicodedata.pas"/>
+        <UnitName Value="atsynedit_unicodedata"/>
+      </Item34>
+      <Item35>
+        <Filename Value="atsynedit_linkcache.pas"/>
+        <UnitName Value="ATSynEdit_LinkCache"/>
+      </Item35>
+      <Item36>
+        <Filename Value="atsynedit_charsizearray.pas"/>
+        <UnitName Value="ATSynEdit_CharSizeArray"/>
+      </Item36>
+      <Item37>
+        <Filename Value="atsynedit_lineparts.pas"/>
+        <UnitName Value="ATSynEdit_LineParts"/>
+      </Item37>
+      <Item38>
+        <Filename Value="atstringproc_separator.pas"/>
+        <UnitName Value="ATStringProc_Separator"/>
+      </Item38>
+      <Item39>
+        <Filename Value="atstringproc_utf8decode.pas"/>
+        <UnitName Value="ATStringProc_UTF8Decode"/>
+      </Item39>
     </Files>
-    <RequiredPkgs Count="3">
+    <CompatibilityMode Value="True"/>
+    <RequiredPkgs Count="5">
       <Item1>
-        <PackageName Value="atflatcontrols_package"/>
+        <PackageName Value="BGRABitmapPack"/>
       </Item1>
       <Item2>
-        <PackageName Value="LCL"/>
+        <PackageName Value="encconv_package"/>
       </Item2>
       <Item3>
-        <PackageName Value="FCL"/>
+        <PackageName Value="atflatcontrols_package"/>
       </Item3>
+      <Item4>
+        <PackageName Value="LCL"/>
+      </Item4>
+      <Item5>
+        <PackageName Value="FCL"/>
+      </Item5>
     </RequiredPkgs>
     <UsageOptions>
       <UnitPath Value="$(PkgOutDir)"/>

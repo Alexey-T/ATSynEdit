@@ -3,51 +3,77 @@
 procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
 var
   Item: PATStringItem;
-  SA, Sign: string;
+  ItemEnd: TATLineEnds;
+  SAnsi, Sign: string;
   SWide: UnicodeString;
-  bEncoded: boolean;
-  i: integer;
+  SQuad: UCS4String;
+  NLast, i: integer;
 begin
-  {$if (lcl_major>=2)}
-  LConvEncoding.ConvertEncodingFromUtf8RaisesException:= true;
-  {$endif}
+  EncConvErrorMode:= eemException;
 
   if AWithSignature then
   begin
-    Sign:= '';
     case FEncoding of
-      cEncUTF8: Sign:= cSignUTF8;
-      cEncWideLE: Sign:= cSignWideLE;
-      cEncWideBE: Sign:= cSignWideBE;
+      cEncUTF8:
+        Sign:= cSignUTF8;
+      cEncWideLE:
+        Sign:= cSignWideLE;
+      cEncWideBE:
+        Sign:= cSignWideBE;
+      cEnc32LE:
+        Sign:= cSign32LE;
+      cEnc32BE:
+        Sign:= cSign32BE;
+      else
+        Sign:= '';
     end;
     if Sign<>'' then
       Stream.WriteBuffer(Sign[1], Length(Sign));
   end;
 
-  for i:= 0 to Count-1 do
+  NLast:= Count-1;
+  for i:= 0 to NLast do
   begin
     Item:= FList.GetItem(i);
-    SA:= Item^.Str + cLineEndStrings[TATLineEnds(Item^.Ex.Ends)];
-    if SA<>'' then
+
+    ItemEnd:= Item^.LineEnds;
+    //don't break file if ending of some non-last line is unset
+    if i<NLast then
+      if ItemEnd=cEndNone then
+        ItemEnd:= FEndings;
+
+    SWide:= Item^.Line + cLineEndStrings[ItemEnd];
+
+    if SWide<>'' then
     case AEncoding of
       cEncAnsi:
         begin
-          SA:= ConvertEncodingFromUTF8(SA, FEncodingCodepage, bEncoded);
-          Stream.WriteBuffer(SA[1], Length(SA));
+          SAnsi:= UTF8Encode(SWide);
+          SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
+          Stream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
       cEncUTF8:
         begin
-          Stream.WriteBuffer(SA[1], Length(SA));
+          SAnsi:= UTF8Encode(SWide);
+          Stream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
       cEncWideLE,
       cEncWideBE:
         begin
-          SWide:= UTF8Decode(SA);
           if AEncoding=cEncWideBE then
-            SWide:= SSwapEndian(SWide);
+            SSwapEndianWide(SWide);
           Stream.WriteBuffer(SWide[1], Length(SWide)*2);
+        end;
+
+      cEnc32LE,
+      cEnc32BE:
+        begin
+          SQuad:= UnicodeStringToUCS4String(SWide);
+          if AEncoding=cEnc32BE then
+            SSwapEndianUCS4(SQuad);
+          Stream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
         end;
 
       else
@@ -69,14 +95,14 @@ end;
 
 procedure TATStrings.SaveToFile(const AFilename: string);
 var
-  fs: TFileStreamUtf8;
+  fs: TFileStream;
   WithSign: boolean;
 begin
   WithSign:=
     ((FEncoding in [cEncUTF8]) and FSaveSignUtf8) or
-    ((FEncoding in [cEncWideLE, cEncWideBE]) and FSaveSignWide);
+    ((FEncoding in [cEncWideLE, cEncWideBE, cEnc32LE, cEnc32BE]) and FSaveSignWide);
 
-  fs:= TFileStreamUtf8.Create(AFilename, fmCreate or fmOpenWrite or fmShareDenyWrite);
+  fs:= TFileStream.Create(AFilename, fmCreate or fmOpenWrite or fmShareDenyWrite);
   try
     SaveToStream(fs, FEncoding, WithSign);
   finally
@@ -88,10 +114,10 @@ end;
 
 procedure TATStrings.DoFinalizeSaving;
 begin
-  DoClearLineStates(true);
+  ClearLineStates(true);
 
   if not FUndoAfterSave then
-    DoClearUndo
+    ClearUndo
   else
   begin
     FUndoList.DeleteUnmodifiedMarks;

@@ -1,46 +1,59 @@
 {$ifdef nnnn}begin end;{$endif}
 
-procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
-  const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
+procedure TATSynEdit.BookmarkSetForLineEx(ALine, ABmKind: integer;
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64;
+  ABookmarksObj: TATBookmarks);
 var
   Data: TATBookmarkData;
 begin
   if not Strings.IsIndexValid(ALine) then exit;
+
+  FillChar(Data, SizeOf(Data), 0);
   Data.LineNum:= ALine;
   Data.Kind:= ABmKind;
-  Data.Hint:= AHint;
-  Data.DeleteOnDelLine:= ADeleteOnDelLine;
+  Data.Hint:= StrNew(PChar(AHint));
+  Data.AutoDelete:= AAutoDelete;
   Data.ShowInBookmarkList:= AShowInList;
   Data.Tag:= ATag;
-  Strings.Bookmarks.Add(Data);
+  ABookmarksObj.Add(Data);
 
-  InvalidateHilitingCache(ALine);
   Update;
 end;
 
-procedure TATSynEdit.BookmarkSetForLine_2(ALine, ABmKind: integer;
-  const AHint: string; ADeleteOnDelLine, AShowInList: boolean; const ATag: Int64);
-var
-  Data: TATBookmarkData;
+procedure TATSynEdit.BookmarkSetForLine(ALine, ABmKind: integer;
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
+  AShowInList: boolean; const ATag: Int64);
 begin
-  if not Strings.IsIndexValid(ALine) then exit;
-  Data.LineNum:= ALine;
-  Data.Kind:= ABmKind;
-  Data.Hint:= AHint;
-  Data.DeleteOnDelLine:= ADeleteOnDelLine;
-  Data.ShowInBookmarkList:= AShowInList;
-  Data.Tag:= ATag;
-  Strings.Bookmarks2.Add(Data);
+  BookmarkSetForLineEx(
+    ALine,
+    ABmKind,
+    AHint,
+    AAutoDelete,
+    AShowInList,
+    ATag,
+    Strings.Bookmarks
+    );
+end;
 
-  InvalidateHilitingCache(ALine);
-  Update;
+procedure TATSynEdit.BookmarkSetForLine_2(ALine, ABmKind: integer;
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
+  AShowInList: boolean; const ATag: Int64);
+begin
+  BookmarkSetForLineEx(
+    ALine,
+    ABmKind,
+    AHint,
+    AAutoDelete,
+    AShowInList,
+    ATag,
+    Strings.Bookmarks2
+    );
 end;
 
 
 procedure TATSynEdit.BookmarkToggleForLine(ALine, ABmKind: integer;
-  const AHint: string;
-  ADeleteOnDelLine, AShowInList: boolean;
-  const ATag: Int64);
+  const AHint: string; AAutoDelete: TATBookmarkAutoDelete;
+  AShowInList: boolean; const ATag: Int64);
 var
   NIndex: integer;
   Data: TATBookmarkData;
@@ -52,56 +65,56 @@ begin
     Strings.Bookmarks.Delete(NIndex)
   else
   begin
+    FillChar(Data, SizeOf(Data), 0);
     Data.LineNum:= ALine;
     Data.Kind:= ABmKind;
-    Data.Hint:= AHint;
-    Data.DeleteOnDelLine:= ADeleteOnDelLine;
+    Data.Hint:= StrNew(PChar(AHint));
+    Data.AutoDelete:= AAutoDelete;
     Data.ShowInBookmarkList:= AShowInList;
     Data.Tag:= ATag;
     Strings.Bookmarks.Add(Data);
   end;
 
-  InvalidateHilitingCache(ALine);
   Update;
 end;
 
 
-procedure TATSynEdit.BookmarkDeleteForLine(ALine: integer);
+procedure TATSynEdit.BookmarkDeleteForLineEx(ALine: integer; ABookmarksObj: TATBookmarks);
 begin
   if not Strings.IsIndexValid(ALine) then exit;
-  Strings.Bookmarks.DeleteForLine(ALine);
+  ABookmarksObj.DeleteForLine(ALine);
 
-  InvalidateHilitingCache(ALine);
   Update;
+end;
+
+procedure TATSynEdit.BookmarkDeleteForLine(ALine: integer);
+begin
+  BookmarkDeleteForLineEx(ALine, Strings.Bookmarks);
 end;
 
 procedure TATSynEdit.BookmarkDeleteForLine_2(ALine: integer);
 begin
-  if not Strings.IsIndexValid(ALine) then exit;
-  Strings.Bookmarks2.DeleteForLine(ALine);
+  BookmarkDeleteForLineEx(ALine, Strings.Bookmarks2);
+end;
 
-  InvalidateHilitingCache(ALine);
-  Update;
+function TATSynEdit.BookmarkDeleteByTagEx(const ATag: Int64;
+  ABookmarksObj: TATBookmarks): boolean;
+begin
+  Result:= ABookmarksObj.DeleteByTag(ATag);
+  if Result then
+  begin
+    Update;
+  end;
 end;
 
 function TATSynEdit.BookmarkDeleteByTag(const ATag: Int64): boolean;
 begin
-  Result:= Strings.Bookmarks.DeleteByTag(ATag);
-  if Result then
-  begin
-    InvalidateHilitingCache;
-    Update;
-  end;
+  Result:= BookmarkDeleteByTagEx(ATag, Strings.Bookmarks);
 end;
 
 function TATSynEdit.BookmarkDeleteByTag_2(const ATag: Int64): boolean;
 begin
-  Result:= Strings.Bookmarks2.DeleteByTag(ATag);
-  if Result then
-  begin
-    InvalidateHilitingCache;
-    Update;
-  end;
+  Result:= BookmarkDeleteByTagEx(ATag, Strings.Bookmarks2);
 end;
 
 
@@ -113,6 +126,7 @@ begin
   FillChar(Data{%H-}, SizeOf(Data), 0);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
+  Data.AutoDelete:= bmadOption;
 
   for i:= 0 to Strings.Count-1 do
   begin
@@ -126,7 +140,6 @@ begin
     end;
   end;
 
-  InvalidateHilitingCache;
   Update;
 end;
 
@@ -134,7 +147,6 @@ procedure TATSynEdit.BookmarkDeleteAll;
 begin
   Strings.Bookmarks.Clear;
 
-  InvalidateHilitingCache;
   Update;
 end;
 
@@ -142,7 +154,6 @@ procedure TATSynEdit.BookmarkDeleteAll_2;
 begin
   Strings.Bookmarks2.Clear;
 
-  InvalidateHilitingCache;
   Update;
 end;
 
@@ -165,7 +176,7 @@ begin
 
     nItem:= Strings.Bookmarks.Find(nLine);
     if (nItem>=0) and
-      (not AOnlyShownInList or Strings.Bookmarks[nItem].Data.ShowInBookmarkList) then
+      (not AOnlyShownInList or Strings.Bookmarks[nItem]^.Data.ShowInBookmarkList) then
     begin
       DoGotoPos(
         Point(0, nLine),
@@ -190,9 +201,9 @@ begin
   try
     for i:= 0 to Strings.Bookmarks.Count-1 do
     begin
-      NLine:= Strings.Bookmarks[i].Data.LineNum;
+      NLine:= Strings.Bookmarks[i]^.Data.LineNum;
       if Strings.IsIndexValid(NLine) then
-        List.Add(Strings.LinesUTF8[NLine]);
+        List.Add(UTF8Encode(Strings.Lines[NLine]));
     end;
     SClipboardCopy(List.Text);
   finally
@@ -210,7 +221,7 @@ begin
 
   for i:= NCount-1 downto 0 do
   begin
-    NLine:= Strings.Bookmarks[i].Data.LineNum;
+    NLine:= Strings.Bookmarks[i]^.Data.LineNum;
     Strings.LineDelete(NLine);
   end;
 
@@ -237,7 +248,7 @@ begin
   Carets.Clear;
   for i:= 0 to Strings.Bookmarks.Count-1 do
   begin
-    NLine:= Strings.Bookmarks[i].Data.LineNum;
+    NLine:= Strings.Bookmarks[i]^.Data.LineNum;
     Carets.Add(0, NLine);
   end;
 
@@ -255,6 +266,7 @@ begin
   FillChar(Data{%H-}, SizeOf(Data), 0);
   Data.Kind:= 1;
   Data.ShowInBookmarkList:= true;
+  Data.AutoDelete:= bmadOption;
 
   BookmarkDeleteAll;
   for i:= 0 to Carets.Count-1 do

@@ -23,7 +23,7 @@ begin
 end;
 
 
-function DoPartAsString(i: integer; const P: TATLineParts): string;
+function DoPartAsString(i: integer; constref P: TATLineParts): string;
 begin
   Result:= Format('[%d]: offset %d..%d', [i, P[i].Offset, P[i].Offset+P[i].Len, P[i].Len]);
 end;

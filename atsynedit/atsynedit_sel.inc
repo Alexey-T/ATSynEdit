@@ -14,7 +14,7 @@ begin
     Result:= (AX>=NPosLeft) and (AX<NPosRight);
   end
   else
-    Result:= Carets.IsPosSelected(AX, AY);
+    Result:= TempSel_IsPosSelected(AX, AY);
 end;
 
 
@@ -44,7 +44,7 @@ begin
       Result:= cRangePartlySelected;
   end
   else
-    Result:= Carets.IsRangeSelected(AX1, AY1, AX2, AY2);
+    Result:= TempSel_IsRangeSelected(AX1, AY1, AX2, AY2);
 end;
 
 
@@ -62,11 +62,17 @@ begin
   if not Strings.IsIndexValid(P.Y) then Exit;
 
   Str:= Strings.Lines[P.Y];
-  if not ((P.X>=0) and (P.X<Length(Str))) then Exit;
+  if Str='' then exit;
+
+  if P.X<0 then Exit;
+  //allow clicking after line end
+  if P.X>=Length(Str) then
+    P.X:= Length(Str)-1;
+
   ch:= Str[P.X+1];
 
   if IsCharWord(ch) then
-    SFindWordBounds(Str, P.X, XFrom, XTo, FOptWordChars)
+    SFindWordBounds(Str, P.X, XFrom, XTo, FOptNonWordChars)
   else
   begin
     if AllowOnlyWordChars then
@@ -109,8 +115,8 @@ begin
     SwapInt(P1.Y, P2.Y);
   end;
 
-  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptWordChars);
-  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptWordChars);
+  P1.X:= SFindWordOffset(Strings.Lines[P1.Y], P1.X, cWordjumpToPrev, false, FOptNonWordChars);
+  P2.X:= SFindWordOffset(Strings.Lines[P2.Y], P2.X, cWordjumpToNext, false, FOptNonWordChars);
 
   with Carets[ACaretIndex] do
   begin
@@ -327,7 +333,6 @@ var
   i: integer;
 begin
   FSelRect:= cRectEmpty;
-  FSelRectBegin:= Point(-1, -1);
 
   for i:= 0 to Carets.Count-1 do
     with Carets[i] do
@@ -337,27 +342,71 @@ begin
     end;
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock(P1, P2: TPoint);
+procedure TATSynEdit.DoSelect_ColumnBlock_Primitive(P1, P2: TPoint);
 var
+  Coord1, Coord2: TPoint;
+  LineCoord1, LineCoord2: TPoint;
+  Details: TATEditorPosDetails;
+  Y, YMin, YMax: integer;
+begin
+  Coord1:= CaretPosToClientPos(P1);
+  Coord2:= CaretPosToClientPos(P2);
+  YMin:= Min(Coord1.Y, Coord2.Y);
+  YMax:= Max(Coord1.Y, Coord2.Y);
+
+  FSelRect:= cRectEmpty;
+  Carets.Clear;
+
+  Y:= YMin+1;
+  repeat
+    LineCoord1:= ClientPosToCaretPos(Point(Coord1.X, Y), Details);
+    LineCoord2:= ClientPosToCaretPos(Point(Coord2.X, Y), Details);
+    if (LineCoord1.Y>=0) and (LineCoord2.Y>=0) then
+      Carets.Add(LineCoord2.X, LineCoord2.Y, LineCoord1.X, LineCoord1.Y);
+    Inc(Y, FCharSize.Y);
+  until Y-FCharSize.Y>YMax;
+
+  //don't allow no carets
+  if Carets.Count=0 then
+    DoCaretSingle(P2.X, P2.Y);
+end;
+
+procedure TATSynEdit.DoSelect_ColumnBlock_FromPoints(P1Char, P2Char: TPoint;
+  AUpdateSelRectPoints: boolean=true);
+var
+  //P1/P2 hold char-pos
+  //P1Col/P2Col hold column-pos
+  P1Col, P2Col: TPoint;
   PTarget: TPoint;
 begin
-  //consider tab-chars
-  P1.X:= Strings.CharPosToColumnPos(P1.Y, P1.X, FTabHelper);
-  P2.X:= Strings.CharPosToColumnPos(P2.Y, P2.X, FTabHelper);
+  P1Col:= P1Char;
+  P2Col:= P2Char;
+  P1Col.X:= Strings.CharPosToColumnPos(P1Col.Y, P1Col.X, FTabHelper);
+  P2Col.X:= Strings.CharPosToColumnPos(P2Col.Y, P2Col.X, FTabHelper);
 
-  //fix coords
-  PTarget:= P2;
-  if P1.Y>P2.Y then
-    SwapInt(P1.Y, P2.Y);
+  if AUpdateSelRectPoints then
+  begin
+    FLastCommandMakesColumnSel:= true;
+    FSelRectBegin:= P1Col;
+    FSelRectEnd:= P2Col;
+  end;
+
+  if FOptCaretsPrimitiveColumnSelection then
+  begin
+    DoSelect_ColumnBlock_Primitive(P1Char, P2Char);
+    exit;
+  end;
 
   //setting SelRect must be first, it's used later
-  FSelRect.Left:= Min(P1.X, P2.X);
-  FSelRect.Right:= Max(P1.X, P2.X);
-  FSelRect.Top:= P1.Y;
-  FSelRect.Bottom:= P2.Y;
+  UpdateSelRectFromPoints(P1Col, P2Col);
+
+  //fix coords
+  PTarget:= P2Col;
+  if P1Col.Y>P2Col.Y then
+    SwapInt(P1Col.Y, P2Col.Y);
 
   if FOptCaretsAddedToColumnSelection then
-    DoCaretsAddOnColumnBlock(P1, P2, FSelRect)
+    DoCaretsAddOnColumnBlock(P1Col, P2Col, FSelRect)
   else
   begin
     //single caret at moving block edge
@@ -366,19 +415,16 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoSelect_ColumnBlock_FromSelRect;
-var
-  PntBegin, PntEnd: TPoint;
+procedure TATSynEdit.DoSelect_ColumnBlock_FromPointsColumns(P1, P2: TPoint);
+//convert column-pos to char-pos
 begin
-  //convert SelRect to char-pos
-  PntBegin:= FSelRectBegin;
-  PntBegin.X:= Strings.ColumnPosToCharPos(PntBegin.Y, PntBegin.X, FTabHelper);
+  if P1.Y<0 then exit;
+  if P2.Y<0 then exit;
 
-  PntEnd:= FSelRectEnd;
-  PntEnd.X:= Strings.ColumnPosToCharPos(PntEnd.Y, PntEnd.X, FTabHelper);
+  P1.X:= Strings.ColumnPosToCharPos(P1.Y, P1.X, FTabHelper);
+  P2.X:= Strings.ColumnPosToCharPos(P2.Y, P2.X, FTabHelper);
 
-  //func needs char-pos
-  DoSelect_ColumnBlock(PntBegin, PntEnd);
+  DoSelect_ColumnBlock_FromPoints(P1, P2, false{FSelRect* already set});
 end;
 
 
@@ -442,12 +488,20 @@ begin
 end;
 
 
-function TATSynEdit.DoSelect_MultiCaretsToColumnSel: boolean;
-//Convert multi-carets to column block,
-//but only if carets are placed vertically, if all multi-selections are single line
+procedure TATSynEdit.UpdateSelRectFromPoints(const P1, P2: TPoint);
+begin
+  FSelRect.Left:= Min(P1.X, P2.X);
+  FSelRect.Top:= Min(P1.Y, P2.Y);
+  FSelRect.Right:= Max(P1.X, P2.X);
+  FSelRect.Bottom:= Max(P1.Y, P2.Y);
+end;
+
+function TATSynEdit.DoSelect_MultiCaretsLookLikeColumnSelection: boolean;
+//carets are placed vertically,
+//and all multi-selections are single line
 var
   Caret0, Caret: TATCaretItem;
-  Pnt: TPoint;
+  Pnt, PntEnd: TPoint;
   bSel: boolean;
   i: integer;
 begin
@@ -463,6 +517,12 @@ begin
   Pnt.X:= Strings.CharPosToColumnPos(Caret0.PosY, Caret0.PosX, FTabHelper);
   Pnt.Y:= Caret0.PosY;
 
+  Caret:= Carets[Carets.Count-1];
+  PntEnd.X:= Strings.CharPosToColumnPos(Caret.PosY, Caret.EndX, FTabHelper);
+  PntEnd.Y:= Caret.PosY;
+  if PntEnd.X<0 then
+    PntEnd.X:= Pnt.X;
+
   for i:= 1{>0} to Carets.Count-1 do
   begin
     Caret:= Carets[i];
@@ -474,25 +534,63 @@ begin
     if Pnt.X<>Strings.CharPosToColumnPos(Caret.PosY, Caret.PosX, FTabHelper) then exit;
   end;
 
+  //multi-carets look like column sel,
+  //set the FSelRectBegin/FSelRectEnd
+  FSelRectBegin.X:= Pnt.X;
+  FSelRectBegin.Y:= Pnt.Y;
+  FSelRectEnd.X:= PntEnd.X;
+  FSelRectEnd.Y:= PntEnd.Y;
+
   Result:= true;
-  //must set FSelRect, FSelRectBegin, FSelRectEnd
+end;
 
-  Caret:= Carets[Carets.Count-1];
-  FSelRectEnd.X:= Caret0.PosX;
-  FSelRectEnd.Y:= Caret.PosY;
-  FSelRectBegin.X:= IfThen(bSel, Caret.EndX, Caret.PosX);
-  FSelRectBegin.Y:= Caret0.PosY;
 
-  FSelRect:= Rect(
-    Min(FSelRectBegin.X, FSelRectEnd.X),
-    Caret0.PosY,
-    Max(FSelRectBegin.X, FSelRectEnd.X),
-    Caret.PosY
-    );
+procedure TATSynEdit.DebugSelRect;
+begin
+  Application.MainForm.Caption:= Format('selrect %d:%d-%d:%d, begin %d:%d, end %d:%d', [
+    FSelRect.Left,
+    FSelRect.Top,
+    FSelRect.Right,
+    FSelRect.Bottom,
+    FSelRectBegin.X,
+    FSelRectBegin.Y,
+    FSelRectEnd.X,
+    FSelRectEnd.Y
+    ]);
+end;
 
-  {//debug
-  Application.MainForm.Caption:= Format('selrect %d:%d-%d:%d, begin %d:%d',
-    [FSelRect.Left, FSelRect.Top, FSelRect.Right, FSelRect.Bottom, FSelRectBegin.X, FSelRectBegin.Y]);
-    }
+function TATSynEdit.TempSel_IsSelection: boolean;
+begin
+  Result:= not FSel.IsEmpty;
+end;
+
+function TATSynEdit.TempSel_IsMultiline: boolean;
+begin
+  Result:= FSel.IsMultiline;
+end;
+
+function TATSynEdit.TempSel_IsLineWithSelection(ALine: integer): boolean;
+begin
+  Result:= FSel.IsLineWithSelection(ALine);
+end;
+
+function TATSynEdit.TempSel_IsLineAllSelected(ALine: integer): boolean;
+begin
+  Result:= FSel.IsLineAllSelected(ALine, Strings.LinesLen[ALine]);
+end;
+
+function TATSynEdit.TempSel_IsPosSelected(AX, AY: integer): boolean;
+begin
+  Result:= FSel.IsPosSelected(AX, AY);
+end;
+
+function TATSynEdit.TempSel_IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
+begin
+  Result:= FSel.IsRangeSelected(AX1, AY1, AX2, AY2);
+end;
+
+procedure TATSynEdit.TempSel_GetRangesInLineAfterPoint(AX, AY: integer; out ARanges: TATSimpleRangeArray);
+begin
+  FSel.GetRangesInLineAfterPoint(AX, AY, ARanges);
 end;
 

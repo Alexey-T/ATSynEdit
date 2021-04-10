@@ -73,6 +73,8 @@ const
   cCommand_TextDeleteToTextEnd = 175 or cCmdFlag_ResetSel;
   cCommand_TextDeleteWordNext = 176 or cCmdFlag_ResetSel;
   cCommand_TextDeleteWordPrev = 177 or cCmdFlag_ResetSel;
+  cCommand_TextDeleteToTextBegin = 178 or cCmdFlag_ResetSel;
+  cCommand_TextDeleteWordEntire = 179 or cCmdFlag_ResetSel;
 
   _base_GotoTextBegin = 200 or cCmdFlag_Caret;
   _base_GotoTextEnd   = 201 or cCmdFlag_Caret;
@@ -137,8 +139,8 @@ const
   cCommand_SelectSplitToLines = 265 or cCmdFlag_Caret;
   cCommand_SelectExtendByLine = 266 or cCmdFlag_Caret;
 
-  cCommand_MoveSelectionUp = 268 or cCmdFlag_Caret;
-  cCommand_MoveSelectionDown = 269 or cCmdFlag_Caret;
+  cCommand_MoveSelectionUp = 268; // or cCmdFlag_Caret;
+  cCommand_MoveSelectionDown = 269; // or cCmdFlag_Caret;
   cCommand_TextInsertEmptyAbove = 270 or cCmdFlag_ResetSel or cCmdFlag_Caret;
   cCommand_TextInsertEmptyBelow = 271 or cCmdFlag_ResetSel or cCmdFlag_Caret;
 
@@ -159,6 +161,19 @@ const
   cCommand_ToggleMicromap = 311;
   cCommand_ToggleWordWrapAlt = 312;
   //value 320 busy
+
+  cCommand_Sort_Asc        = 330;
+  cCommand_Sort_AscNoCase  = 331;
+  cCommand_Sort_Desc       = 332;
+  cCommand_Sort_DescNoCase = 333;
+
+  cCommand_DeleteAllBlanks      = 340;
+  cCommand_DeleteAdjacentBlanks = 341;
+  cCommand_DeleteAdjacentDups   = 342;
+  cCommand_DeleteAllDups        = 343;
+  cCommand_DeleteAllDupsKeepBlanks = 344;
+  cCommand_ReverseLines = 350;
+  cCommand_ShuffleLines = 351;
 
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;
@@ -203,12 +218,14 @@ const
   cCommand_FoldingFoldAtCurLine = 1040;
   cCommand_FoldingUnfoldAtCurLine = 1041;
   cCommand_FoldingToggleAtCurLine = 1042;
+  cCommand_FoldingFoldSelection = 1043;
 
   cCommand_Cancel = 2001;
   cCommand_RepeatTextCommand = 2002;
   cCommand_ZoomIn = 2003;
   cCommand_ZoomOut = 2004;
   cCommand_ComboboxRecentsMenu = 2005;
+  cCommand_ZoomReset = 2007;
 
   cCommand_CaretsExtendDownLine = 2010;
   cCommand_CaretsExtendDownPage = 2011;
@@ -220,6 +237,10 @@ const
   // custom commands must start later to not conflict
   // with built-in commands in the DoCommand overridden method
   cCommand_FirstUserCode = 4000;
+
+var
+  //must be set in application
+  cCommand_GotoDefinition: integer = 0;
 
 implementation
 

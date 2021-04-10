@@ -26,39 +26,34 @@ end;
 
 
 procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
-  var AParts: TATLineParts;
+  out AParts: TATLineParts;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
   var AColorAfter: TColor;
   AMainText: boolean);
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
-  bEnableHilite, bFound: boolean;
+  bEnableHilite: boolean;
 begin
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
-  bEnableHilite:= Strings.LinesLenRaw[nLineIndex]<=cMaxLenToTokenize;
+  bEnableHilite:= Strings.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
 
   FillChar(AParts, SizeOf(AParts), 0);
+  if nLineLen=0 then exit;
 
   //1) get hilites from adapter
   if bEnableHilite then
   if Assigned(FAdapterHilite) then
   begin
-    {$ifdef atsynedit_cache}
-    //DynamicHilite must disable cache
-    FAdapterCache.Enabled:= not FAdapterHilite.DynamicHiliteActiveNow(Strings.Count);
-    bFound:= FAdapterCache.Get(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
-    if not bFound then
-    begin
-      FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
-      FAdapterCache.Add(nLineIndex, nCharIndex, nLineLen, AParts, AColorAfter);
-    end;
-    {$else}
-    FAdapterHilite.OnEditorCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
-    {$endif}
+    FAdapterHilite.OnEditorCalcHilite(Self, AParts,
+      nLineIndex,
+      nCharIndex,
+      nLineLen,
+      AColorAfter,
+      AMainText);
   end;
 
   //2) get hilites from OnCalcHilite
@@ -75,28 +70,58 @@ begin
   if AMainText then
     DoPartCalc_ApplyAttribsOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
 
-  //Createnew makes parts for selection and fills empty AParts with these parts.
-  //Applyover makes parts for selection and inserts these one-by-one over ready AParts
+  //CreateNew makes parts for selection and fills empty AParts with these parts.
+  //ApplyOver makes parts for selection and inserts these one-by-one over ready AParts
   //calculated before (in adapter or OnCalc event).
-  //Maybe possible to always use Applyover but it's slower so i made Createnew for
+  //Maybe possible to always use ApplyOver but it's slower so i made CreateNew for
   //faster render w/out adapter
-  if AParts[0].Len>0 then
+  if (AParts[0].Len>0) then
   begin
-    DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
+    if TempSel_IsLineWithSelection(nLineIndex) then
+      DoPartCalc_ApplySelectionOver(AParts, nMaxOffset, nLineIndex, nCharIndex-1);
   end
   else
   begin
+    //this must work w/o adapter, it makes simple long part in AParts
     DoPartCalc_CreateNew(AParts, nMaxOffset, nLineIndex, nCharIndex-1, AColorBG);
   end;
 end;
-
 
 procedure TATSynEdit.DoPartCalc_CreateNew(var AParts: TATLineParts;
   AOffsetMax, ALineIndex, ACharIndex: integer; AColorBG: TColor);
 var
   bSel, bSelPrev, bAdd: boolean;
-  nIndex, i: integer;
+  nPart, nOffset, nLen, nIndex, i: integer;
+  ch: WideChar;
 begin
+  if not TempSel_IsLineWithSelection(ALineIndex) then
+  begin
+    nOffset:= 0;
+    nLen:= Min(Strings.LinesLen[ALineIndex], AOffsetMax);
+    nPart:= 0;
+
+    //split leading tab-chars to separate part
+    //this is much needed for gtk2, which paints ExtTextOut with Dx much slower
+    repeat
+      if nLen=0 then Break;
+      ch:= Strings.LineCharAt(ALineIndex, ACharIndex+nOffset+1);
+      if ch<>#9 then Break;
+      AParts[0].Offset:= 0;
+      Inc(AParts[0].Len);
+      AParts[0].ColorFont:= FColorFont;
+      AParts[0].ColorBG:= AColorBG;
+      Inc(nOffset);
+      Dec(nLen);
+      nPart:= 1;
+    until false;
+
+    AParts[nPart].Offset:= nOffset;
+    AParts[nPart].Len:= nLen;
+    AParts[nPart].ColorFont:= FColorFont;
+    AParts[nPart].ColorBG:= AColorBG;
+    exit;
+  end;
+
   bSel:= false;
   bSelPrev:= false;
   nIndex:= -1;
@@ -130,7 +155,7 @@ begin
         end
         else
         begin
-          ColorFont:= GetColorTextFont;//random($ffff);
+          ColorFont:= FColorFont;//random($ffff);
           ColorBG:= AColorBG;
         end;
       end;
@@ -145,48 +170,35 @@ var
   bSel, bSelPrev: boolean;
   Part: TATLinePart;
   PartOther: ^TATLinePart;
-  nRangeX1, nRangeX2, iPart, i: integer;
+  nRangeX1, nRangeX2: integer;
+  iPart, i: integer;
 begin
+  //optimiziation for select-all case.
+  //if entire line is selected, colorize all parts.
+  if TempSel_IsLineAllSelected(ALineIndex) then
+  begin
+    for i:= Low(AParts) to High(AParts) do
+      if AParts[i].Len=0 then
+        Break
+      else
+      begin
+        AParts[i].ColorFont:= Colors.TextSelFont;
+        AParts[i].ColorBG:= Colors.TextSelBG;
+      end;
+    exit;
+  end;
+
   FillChar(Part{%H-}, SizeOf(Part), 0);
   Part.ColorFont:= Colors.TextSelFont;
   Part.ColorBG:= Colors.TextSelBG;
 
-  //optimiziation for select-all case.
-  //if entire line is selected, colorize all parts.
-
-  nRangeX1:= ACharIndex;
-  for i:= Low(AParts) to High(AParts) do
-    if AParts[i].Len=0 then
-    begin
-      if i=0 then exit;
-      nRangeX2:= ACharIndex + AParts[i-1].Offset + AParts[i-1].Len;
-      Break;
-    end;
-
-  case IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) of
-    cRangeAllUnselected:
-      exit;
-    cRangeAllSelected:
-      begin
-        for i:= Low(AParts) to High(AParts) do
-          if AParts[i].Len=0 then
-            Break
-          else
-          begin
-            AParts[i].ColorFont:= Part.ColorFont;
-            AParts[i].ColorBG:= Part.ColorBG; //clGreen
-          end;
-        exit;
-      end;
-  end;
-
   //we loop over parts
   //- fully selected parts, colorize them.
   //- fully unselected parts, skip.
-  //- partly selected parts, save them to FLineOtherParts,
+  //- partly selected parts, save them to FPartsSel,
   //  and do slow loop (by offsets) over them.
 
-  FillChar(FLineOtherParts, SizeOf(TATLineParts), 0);
+  FillChar(FPartsSel, SizeOf(TATLineParts), 0);
   iPart:= 0;
 
   for i:= Low(AParts) to High(AParts) do
@@ -202,8 +214,8 @@ begin
         end;
       cRangePartlySelected:
         begin
-          FLineOtherParts[iPart].Offset:= AParts[i].Offset;
-          FLineOtherParts[iPart].Len:= AParts[i].Len;
+          FPartsSel[iPart].Offset:= AParts[i].Offset;
+          FPartsSel[iPart].Len:= AParts[i].Len;
           Inc(iPart);
         end;
     end;
@@ -211,7 +223,7 @@ begin
 
   for iPart:= Low(AParts) to High(AParts) do
   begin
-    PartOther:= @FLineOtherParts[iPart];
+    PartOther:= @FPartsSel[iPart];
     if PartOther^.Len=0 then Break;
 
     bSel:= false;
@@ -260,7 +272,8 @@ end;
 
 procedure TATSynEdit.DoCalcLineEntireColor(ALine: integer;
   AUseColorOfCurrentLine: boolean;
-  out AColor: TColor; out AColorForced: boolean);
+  out AColor: TColor; out AColorForced: boolean;
+  AHiliteLineWithSelection: boolean);
 var
   NIndex, BmKind: integer;
 begin
@@ -269,11 +282,14 @@ begin
   if AUseColorOfCurrentLine then
     AColor:= Colors.CurrentLineBG
   else
+  if AHiliteLineWithSelection and TempSel_IsLineWithSelection(ALine) then
+    AColor:= Colors.CurrentLineBG
+  else
   begin
     NIndex:= Strings.Bookmarks.Find(ALine);
     if NIndex>=0 then
     begin
-      BmKind:= Strings.Bookmarks[NIndex].Data.Kind;
+      BmKind:= Strings.Bookmarks[NIndex]^.Data.Kind;
       AColor:= Colors.BookmarkBG;
       if Assigned(FOnCalcBookmarkColor) then
         FOnCalcBookmarkColor(Self, BmKind, AColor);
@@ -283,7 +299,7 @@ begin
       NIndex:= Strings.Bookmarks2.Find(ALine);
       if NIndex>=0 then
       begin
-        BmKind:= Strings.Bookmarks2[NIndex].Data.Kind;
+        BmKind:= Strings.Bookmarks2[NIndex]^.Data.Kind;
         AColor:= Colors.BookmarkBG;
         if Assigned(FOnCalcBookmarkColor) then
           FOnCalcBookmarkColor(Self, BmKind, AColor);
@@ -291,14 +307,15 @@ begin
     end;
   end;
 
-  if FMarkedRange.Count=2 then
+  if Assigned(FMarkedRange) then
+   if FMarkedRange.Count=2 then
     if (ALine>=FMarkedRange.Items[0].PosY) and
        (ALine<=FMarkedRange.Items[1].PosY) then
       AColor:= Colors.MarkedLinesBG;
 
   AColorForced:= AColor<>clNone;
   if not AColorForced then
-    AColor:= GetColorTextBG;
+    AColor:= FColorBG;
 end;
 
 
@@ -311,14 +328,18 @@ var
   nAttrIndex, nOffset, i: integer;
   bExact: boolean;
 begin
-  Attribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact);
-  if nAttrIndex<0 then exit; //not IsIndexValid, because index=Attribs.Count is ok
+  if FAttribs=nil then exit;
+  if FAttribs.Count=0 then exit;
+
+  FAttribs.Find(ACharIndex-1, ALineIndex, nAttrIndex, bExact);
+  if nAttrIndex<0 then exit; //not IsIndexValid, because index=FAttribs.Count is ok
   if nAttrIndex>0 then //fixes disappeared attrib on horz scrolling
     Dec(nAttrIndex);
 
-  for i:= nAttrIndex to Attribs.Count-1 do
+  for i:= nAttrIndex to FAttribs.Count-1 do
   begin
-    Attr:= Attribs[i];
+    Attr:= FAttribs[i];
+    if Attr.MicromapMode=mmmShowInMicromapOnly then Continue;
     if Attr.PosY<ALineIndex then Continue;
     if Attr.PosY>ALineIndex then Break;
 
@@ -328,12 +349,12 @@ begin
         //must check offset, for part of wrapped line
         nOffset:= Attr.PosX-ACharIndex;
         if (nOffset>=AOffsetMax) then Continue;
-        if (nOffset+Attr.LenX<=0) then Continue;
+        if (nOffset+Attr.SelX<=0) then Continue;
 
         //fix part visible partly, because of horz scroll
         if (nOffset<0) then
         begin
-          Inc(Attr.LenX, nOffset);
+          Inc(Attr.SelX, nOffset);
           nOffset:= 0;
         end;
 
@@ -343,11 +364,11 @@ begin
           AParts[0].Offset:= 0;
           AParts[0].Len:= AOffsetMax;
           AParts[0].ColorBG:= AColorBG;
-          AParts[0].ColorFont:= GetColorTextFont;
+          AParts[0].ColorFont:= FColorFont;
         end;
 
         Part:= PartObj.Data;
-        Part.Len:= Attr.LenX;
+        Part.Len:= Attr.SelX;
         Part.Offset:= nOffset;
         //note: don't change Part.ColorBG here
         DoPartInsert(AParts, Part, false);

@@ -91,6 +91,7 @@ end;
 function TATSynEdit.DoCommand_ToggleReadOnly: TATCommandResults;
 begin
   ModeReadOnly:= not ModeReadOnly;
+  FIsReadOnlyChanged:= true;
   Result:= [cResultState];
 end;
 
@@ -100,59 +101,66 @@ begin
   Result:= [cResultCaretAny];
 end;
 
-function TATSynEdit.DoCommand_SizeChange(AIncrease: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_ScaleDelta(AIncrease: boolean): TATCommandResults;
 begin
-  DoSizeChange(AIncrease);
+  DoScaleFontDelta(AIncrease);
   Result:= [cResultState];
 end;
 
+function TATSynEdit.DoCommand_ScaleReset: TATCommandResults;
+begin
+  FOptScaleFont:= 0;
+  Result:= [cResultState];
+end;
 
-function TATSynEdit.DoCommand_FoldUnfoldAll(ADoFold: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_FoldAll: TATCommandResults;
 var
-  R: TATSynRange;
+  R: PATSynRange;
   NeedFixCaret: boolean;
+  i: integer;
+begin
+  for i:= 0 to Fold.Count-1 do
+  begin
+    R:= Fold.ItemPtr(i);
+    if R^.IsSimple then Continue;
+    DoRangeFold(i);
+  end;
+
+  NeedFixCaret:= false;
+  for i:= 0 to Carets.Count-1 do
+    if IsLineFolded(Carets[i].PosY) then
+    begin
+      NeedFixCaret:= true;
+      Break;
+    end;
+  if NeedFixCaret then
+    DoCaretSingle(0, 0);
+
+  Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
+end;
+
+function TATSynEdit.DoCommand_FoldUnAll: TATCommandResults;
+var
+  R: PATSynRange;
   Str: TATStrings;
   i: integer;
 begin
-  if ADoFold then
+  for i:= 0 to Fold.Count-1 do
   begin
-    for i:= 0 to Fold.Count-1 do
+    R:= Fold.ItemPtr(i);
+    if R^.Folded then
     begin
-      R:= Fold[i];
-      if R.IsSimple then Continue;
-      DoRangeFold(i);
+      R^.Folded:= false;
+      //Fold[i]:= R;
+      FWrapUpdateNeeded:= true;
     end;
+  end;
 
-    NeedFixCaret:= false;
-    for i:= 0 to Carets.Count-1 do
-      if IsLineFolded(Carets[i].PosY) then
-      begin
-        NeedFixCaret:= true;
-        Break;
-      end;
-    if NeedFixCaret then
-      DoCaretSingle(0, 0);
-  end
-  else
-  //unfold all
+  Str:= Strings;
+  for i:= 0 to Str.Count-1 do
   begin
-    for i:= 0 to Fold.Count-1 do
-    begin
-      R:= Fold[i];
-      if R.Folded then
-      begin
-        R.Folded:= false;
-        Fold[i]:= R;
-        FWrapUpdateNeeded:= true;
-      end;
-    end;
-
-    Str:= Strings;
-    for i:= 0 to Str.Count-1 do
-    begin
-      Str.LinesHidden[i, EditorIndex]:= false;
-      Str.LinesFoldFrom[i, EditorIndex]:= 0;
-    end;
+    Str.LinesHidden[i, EditorIndex]:= false;
+    Str.LinesFoldFrom[i, EditorIndex]:= 0;
   end;
 
   Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
@@ -160,15 +168,53 @@ end;
 
 function TATSynEdit.DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
 begin
-  DoFoldForLevel(ALevel);
+  DoCommand_FoldUnAll;
+  DoFoldForLevelEx(ALevel, -1);
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
 end;
 
 
-function TATSynEdit.DoCommand_FoldRangeAtCurLine(ACommand: TATFoldRangeCmd): TATCommandResults;
+function TATSynEdit.DoCommand_FoldRangeAtCurLine(ACommand: TATEditorFoldRangeCommand): TATCommandResults;
 begin
   DoFoldUnfoldRangeAtCurLine(ACommand);
   Result:= [cResultCaretAny, cResultScroll, cResultFoldChange];
+end;
+
+procedure TATSynEdit.UpdateFoldLineIndexer;
+//if called w/o lexer active (EControl adapter inits LineIndexer),
+//init LineIndexer
+var
+  NCount: integer;
+begin
+  NCount:= Strings.Count;
+  if Fold.CountOfLineIndexer<NCount then
+  begin
+    Fold.ClearLineIndexer(NCount, true);
+    //Fold.UpdateLineIndexer; //Fold methods auto update all
+  end;
+end;
+
+function TATSynEdit.DoCommand_FoldSelection: TATCommandResults;
+var
+  Caret: TATCaretItem;
+  Y1, Y2: integer;
+begin
+  Result:= [];
+  if Carets.Count<>1 then exit;
+  Caret:= Carets[0];
+  if Caret.EndY<0 then exit;
+  Caret.GetSelLines(Y1, Y2);
+
+  //better clear the selection
+  Caret.SelectNone;
+
+  UpdateFoldLineIndexer;
+  if Fold.FindRangeWithPlusAtLine(Y1)>=0 then exit;
+
+  Fold.Add(1, Y1, Y2, false, '', cTagPersistentFoldRange);
+  DoRangeFold(Fold.Count-1);
+
+  Result:= [cResultCaretAny, cResultFoldChange];
 end;
 
 

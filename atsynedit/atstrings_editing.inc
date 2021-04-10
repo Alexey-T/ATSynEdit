@@ -23,6 +23,9 @@ var
 begin
   Str:= Lines[AY];
   Lines[AY]:= Copy(Str, 1, AX1) + ATextPart1;
+  //line becomes not last so set ending for it
+  if LinesEnds[AY]=cEndNone then
+    LinesEnds[AY]:= FEndings;
   LineInsert(AY+1, ATextPart2 + Copy(Str, AX2+1, MaxInt));
 end;
 
@@ -41,7 +44,7 @@ begin
   if bOneLine then
   begin
     TextReplace_OneLine(AFromY, AFromX, AToX, AText);
-    AShift.X:= 0;
+    AShift.X:= Length(AText)-(AToX-AFromX);
     AShift.Y:= 0;
     APosAfter.X:= AFromX+Length(AText);
     APosAfter.Y:= AFromY;
@@ -119,7 +122,7 @@ begin
   end
   else
   begin
-    StrLead:= Str+StringOfChar(' ', AX-Length(Str));
+    StrLead:= Str+StringOfCharW(' ', AX-Length(Str));
     StrTail:= '';
   end;
 
@@ -129,7 +132,7 @@ begin
   //------------------
   //Insert single line
 
-  if not SWithBreaks(AText) then
+  if not SStringHasEol(AText) then
   begin
     Lines[AY]:= StrLead+AText+StrTail;
     if not AOverwrite then
@@ -141,7 +144,7 @@ begin
   //----------------------
   //Insert multi-line text
 
-  Block:= TATStrings.Create;
+  Block:= TATStrings.Create(FUndoLimit);
   try
     FChangeBlockActive:= true;
     BeginUndoGroup;
@@ -231,7 +234,7 @@ begin
   end;
 end;
 
-procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint);
+procedure TATStrings.TextDeleteLeft(AX, AY: integer; ALen: integer; out AShift, APosAfter: TPoint; AllowGoToPrevLine: boolean);
 var
   Str, StrPrev: atString;
 begin
@@ -248,7 +251,7 @@ begin
     //handle spec case: caret on last fake line, BkSp pressed:
     //delete fake line,
     //delete EOL at prev line
-    if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake then
+    if (AX=0) and (AY=Count-1) and (AY>0) and IsLastLineFake and AllowGoToPrevLine then
     begin
       //DoOnChangeBlock(
       //  0, AY,
@@ -275,7 +278,7 @@ begin
       APosAfter.X:= Max(0, AX-ALen);
     end
     else
-    if AY>0 then
+    if (AY>0) and AllowGoToPrevLine then
     begin
       //DoOnChangeBlock(
       //  0, AY,
@@ -348,7 +351,7 @@ begin
       begin
         //add spaces if we are after eol
         if AX>=Length(Str) then
-          Str:= Str+StringOfChar(' ', AX-Length(Str));
+          Str+= StringOfCharW(' ', AX-Length(Str));
 
         //not last: del next line
         if AY+1<Count then
@@ -403,7 +406,7 @@ begin
   begin
     //delete fast
     FList.DeleteRange(ALine1, ALine2);
-    DoClearUndo;
+    ClearUndo;
   end;
 
   DoEventChange(cLineChangeDeleted, ALine1, ALine2-ALine1+1);
@@ -543,6 +546,7 @@ var
   BlockUTF8: TStringList;
   i: integer;
 begin
+  if not IsIndexValid(AY) then exit;
   FChangeBlockActive:= true;
 
   if Assigned(FOnChangeBlock) then
@@ -600,7 +604,7 @@ begin
   begin
     BeginUndoGroup;
 
-    if (AX<Length(Str)) then
+    if AX<Length(Str) then
     begin
       StrMove:= Copy(Str, AX+1, MaxInt);
       Delete(Str, AX+1, MaxInt);
@@ -610,7 +614,8 @@ begin
     //handle situation when we at non-eol line, this must give
     //inserted line also w/o eol
     NewEnd:= LinesEnds[AY];
-    LinesEnds[AY]:= Endings; //force eol to cur line
+    if NewEnd=cEndNone then
+      LinesEnds[AY]:= Endings; //force eol to cur line
     LineInsertRaw(AY+1, AStrIndent+StrMove, NewEnd);
 
     EndUndoGroup;

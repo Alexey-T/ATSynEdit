@@ -3,11 +3,14 @@
 function TATSynEdit.DoCommand_ClipboardPaste(AKeepCaret, ASelectThen: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
+  St: TATStrings;
   Str: atString;
   bHandled, bNeedFixLastEol: boolean;
+  Num64: Int64;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   if Assigned(FOnPaste) then
   begin
@@ -17,7 +20,7 @@ begin
   end;
 
   //column block
-  if AClipboardObject.HasFormat(cATClipboardFormatId) then
+  if AClipboardObject.HasFormat(ATClipboardColumnFormat) then
   begin
     if ModeOneLine then Exit;
     Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret, AClipboardObject);
@@ -29,6 +32,9 @@ begin
   if ModeOneLine then
     Str:= SRemoveNewlineChars(Str);
 
+  if FOptInputNumberOnly then
+    if not TryStrToInt64(Str, Num64) then exit;
+
   //we delete unneeded eol after paste, if:
   //- one caret, on last line
   //- last line w/o eol
@@ -37,39 +43,42 @@ begin
     bNeedFixLastEol:= false
   else
     bNeedFixLastEol:=
-      (Strings.Count>0) and
+      (St.Count>0) and
       (Carets.Count=1) and
-      (Carets[0].PosY=Strings.Count-1) and
-      (Strings.LinesEnds[Strings.Count-1]=cEndNone) and
+      (Carets[0].PosY=St.Count-1) and
+      (St.LinesEnds[St.Count-1]=cEndNone) and
       not SEndsWithEol(Str);
 
   //paste
-  Strings.BeginUndoGroup;
+  St.BeginUndoGroup;
   DoCommand_TextDeleteSelection;
   Result:= DoCommand_TextInsertAtCarets(Str,
              AKeepCaret,
              FOverwrite and FOptOverwriteAllowedOnPaste,
              ASelectThen);
-  Strings.EndUndoGroup;
+  St.EndUndoGroup;
+
+  //solve CudaText #3270
+  St.SetGroupMark;
 
   //test special case: paste on text end
   if Carets.Count>0 then
     if bNeedFixLastEol then
     begin
-      Strings.ActionDeleteFakeLineAndFinalEol;
+      St.ActionDeleteFakeLineAndFinalEol;
       //correct caret after line deleted
       if not AKeepCaret
-        and (Carets[0].PosY>=Strings.Count)
-        and (Strings.Count>0) then
+        and (Carets[0].PosY>=St.Count)
+        and (St.Count>0) then
         DoCaretSingle(
-          Strings.LinesLen[Strings.Count-1],
-          Strings.Count-1
+          St.LinesLen[St.Count-1],
+          St.Count-1
           );
     end
     else
     begin
-      if Carets[Carets.Count-1].PosY>=Strings.Count then
-        Strings.ActionAddFakeLineIfNeeded;
+      if Carets[Carets.Count-1].PosY>=St.Count then
+        St.ActionAddFakeLineIfNeeded;
     end;
 end;
 
@@ -78,11 +87,15 @@ function TATSynEdit.DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
   Str: atString;
+  Num64: Int64;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
   Str:= UTF8Decode(AClipboardObject.AsText);
+
+  if FOptInputNumberOnly then
+    if not TryStrToInt64(Str, Num64) then exit;
 
   Strings.BeginUndoGroup;
   try
@@ -125,9 +138,9 @@ begin
     //copy vertical block
     SClipboardCopy(SNewText, AClipboardObject);
     AClipboardObject.AddFormat(
-      cATClipboardFormatId,
-      cATClipboardSignatureColBlock,
-      SizeOf(cATClipboardSignatureColBlock));
+      ATClipboardColumnFormat,
+      ATClipboardColumnSignature,
+      SizeOf(ATClipboardColumnSignature));
   end
   else
   begin
@@ -155,8 +168,8 @@ var
   Caret: TATCaretItem;
   i, NLen, X1, Y1, X2, Y2: integer;
   bSel: boolean;
-  Str: atString;
-  EolString, STemp: string;
+  Str, STemp: atString;
+  EolString: string;
 begin
   Result:= '';
 
@@ -175,7 +188,7 @@ begin
       begin
         NLen:= X2-X1-Length(Str);
         if NLen>0 then
-          Str:= Str+StringOfChar(' ', NLen);
+          Str+= StringOfCharW(' ', NLen);
       end;
       Result:= Result+UTF8Encode(Str)+EolString;
     end;
@@ -192,6 +205,8 @@ begin
     for i:= 0 to Carets.Count-1 do
     begin
       Caret:= Carets[i];
+      if not Strings.IsIndexValid(Caret.PosY) then
+        Continue;
       if ListNum.IndexOf(Caret.PosY)<0 then
         ListNum.Add(Caret.PosY);
     end;
@@ -203,9 +218,9 @@ begin
       begin
         for i:= 0 to ListNum.Count-1 do
         begin
-          STemp:= Strings.LinesUTF8[ListNum[i]];
+          STemp:= Strings.Lines[ListNum[i]];
           if STemp<>'' then
-            ListStr.Add(STemp);
+            ListStr.Add(UTF8Encode(STemp));
         end;
         Result:= ListStr.Text; //always use Text, need eol
       end;
@@ -219,7 +234,7 @@ begin
         Caret.GetRange(X1, Y1, X2, Y2, bSel);
         if not bSel then Continue;
 
-        Str:= Strings.TextSubstring(X1, Y1, X2, Y2, EolString);
+        Str:= Strings.TextSubstring(X1, Y1, X2, Y2, EolString{%H-});
         if Str<>'' then
           ListStr.Add(UTF8Encode(Str));
       end;

@@ -67,8 +67,8 @@ begin
 
   M.Add(cCommand_ForceFinalEndOfLine, 'force final end-of-line', [], []);
 
-  M.Add(cCommand_TextDeleteLine, 'delete line', [cXControl+'+Y'], []);
-  M.Add(cCommand_TextDuplicateLine, 'duplicate line', [cXControl+'+D'], []);
+  M.Add(cCommand_TextDeleteLine, 'delete line(s)', [cXControl+'+Y'], []);
+  M.Add(cCommand_TextDuplicateLine, 'duplicate line(s)', [cXControl+'+D'], []);
 
   M.Add(cCommand_GotoTextBegin,      'go to text begin',          [cXControl+'+Home'], []);
   M.Add(cCommand_GotoTextBegin_Sel,  'go to text begin + select', [cXControl+'+Shift+Home'], []);
@@ -130,15 +130,30 @@ begin
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word previous', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word next', [cXControl+'+Del'], []);
+  M.Add(cCommand_TextDeleteWordEntire, 'delete word', [], []);
   M.Add(cCommand_TextDeleteToLineBegin, 'delete to line begin', [], []);
   M.Add(cCommand_TextDeleteToLineEnd, 'delete to line end', [cXControl+'+K'], []);
-  M.Add(cCommand_TextDeleteToTextEnd, 'delete to text end', [], []);
+  M.Add(cCommand_TextDeleteToTextBegin, 'delete to document begin', [], []);
+  M.Add(cCommand_TextDeleteToTextEnd, 'delete to document end', [], []);
 
   M.Add(cCommand_TextIndent, 'indent selection', [cXControl+'+I'], []);
   M.Add(cCommand_TextUnindent, 'unindent selection', [cXControl+'+Shift+I'], ['Shift+Tab']);
 
   M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
   M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Shift+Z'], []);
+
+  M.Add(cCommand_Sort_Asc,        '(without undo) sort asc.', [], []);
+  M.Add(cCommand_Sort_AscNoCase,  '(without undo) sort asc., ignore case', [], []);
+  M.Add(cCommand_Sort_Desc,       '(without undo) sort desc.', [], []);
+  M.Add(cCommand_Sort_DescNoCase, '(without undo) sort desc., ignore case', [], []);
+
+  M.Add(cCommand_DeleteAllBlanks,      '(without undo) delete all blank lines', [], []);
+  M.Add(cCommand_DeleteAdjacentBlanks, '(without undo) delete adjacent blank lines', [], []);
+  M.Add(cCommand_DeleteAllDups,        '(without undo) delete all duplicate lines', [], []);
+  M.Add(cCommand_DeleteAllDupsKeepBlanks, '(without undo) delete all duplicate lines, keep blanks', [], []);
+  M.Add(cCommand_DeleteAdjacentDups,   '(without undo) delete adjacent duplicate lines', [], []);
+  M.Add(cCommand_ReverseLines,         '(without undo) reverse lines', [], []);
+  M.Add(cCommand_ShuffleLines,         '(without undo) shuffle lines', [], []);
 
   M.Add(cCommand_ClipboardCopy, 'clipboard: copy', [cXControl+'+C'], [cXControl+'+Ins']);
   M.Add(cCommand_ClipboardCopyAdd, 'clipboard: copy/append', [], []);
@@ -176,8 +191,9 @@ begin
   M.Add(cCommand_CaretsExtendDownPage, 'carets extend: down a page', [], []);
   M.Add(cCommand_CaretsExtendDownToEnd, 'carets extend: down to end', [], []);
 
-  M.Add(cCommand_ZoomIn, 'zoom in', [], []);
-  M.Add(cCommand_ZoomOut, 'zoom out', [], []);
+  M.Add(cCommand_ZoomIn, 'current document font size: bigger', [], []);
+  M.Add(cCommand_ZoomOut, 'current document font size: smaller', [], []);
+  M.Add(cCommand_ZoomReset, 'current document font size: reset', [], []);
 
   M.Add(cCommand_TextCaseLower, 'convert case: lower case', [], []);
   M.Add(cCommand_TextCaseUpper, 'convert case: upper case', [], []);
@@ -205,6 +221,7 @@ begin
   M.Add(cCommand_FoldingFoldAtCurLine, 'folding: fold block at current line', [], []);
   M.Add(cCommand_FoldingUnfoldAtCurLine, 'folding: unfold block at current line', [], []);
   M.Add(cCommand_FoldingToggleAtCurLine, 'folding: toggle block at current line', [], []);
+  M.Add(cCommand_FoldingFoldSelection, 'folding: fold selected lines', [], []);
 end;
 
 procedure InitKeymapCombo(var M: TATKeymap);
@@ -237,6 +254,7 @@ begin
 
   M.Add(cCommand_TextDeleteWordPrev, 'delete word left', [cXControl+'+Bksp'], []);
   M.Add(cCommand_TextDeleteWordNext, 'delete word right', [cXControl+'+Del'], []);
+  M.Add(cCommand_TextDeleteWordEntire, 'delete word', [], []);
 
   M.Add(cCommand_Undo, 'perform undo', [cXControl+'+Z'], []);
   M.Add(cCommand_Redo, 'perform redo', [cXControl+'+Shift+Z'], []);

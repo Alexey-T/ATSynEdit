@@ -6,14 +6,16 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Spin, ComCtrls, Menus, LclIntf,
+  ExtCtrls, Spin, ComCtrls, Menus, LclIntf, Buttons,
+  EncConv,
   ATStrings,
   ATStringProc,
   ATSynEdit,
-  ATSynEdit_CanvasProc,
+  ATSynEdit_LineParts,
   ATSynEdit_Carets,
   ATSynEdit_Bookmarks,
   ATSynEdit_Gaps,
+  ATSynEdit_CanvasProc,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
   //ATSynEdit_Hotspots,
@@ -32,6 +34,7 @@ type
     bOpt: TButton;
     btnStop: TButton;
     bClearLog: TButton;
+    chkMouseColSelect: TCheckBox;
     chkSmoothScroll: TCheckBox;
     chkMinimapTooltip: TCheckBox;
     chkMouseEn: TCheckBox;
@@ -90,7 +93,7 @@ type
     mnuEnc: TMenuItem;
     MenuItem2: TMenuItem;
     mnuHelpMous: TMenuItem;
-    MenuItem3: TMenuItem;
+    mnuTestConvPos: TMenuItem;
     MenuItem4: TMenuItem;
     MenuItem6: TMenuItem;
     MenuItem7: TMenuItem;
@@ -136,6 +139,7 @@ type
     procedure btnStopClick(Sender: TObject);
     procedure chkMinimapLeftChange(Sender: TObject);
     procedure chkMinimapTooltipChange(Sender: TObject);
+    procedure chkMouseColSelectChange(Sender: TObject);
     procedure chkMouseEnChange(Sender: TObject);
     procedure chkNewScrollChange(Sender: TObject);
     procedure chkSmoothScrollChange(Sender: TObject);
@@ -154,6 +158,7 @@ type
     procedure mnuFileSaveClick(Sender: TObject);
     procedure mnuFindClick(Sender: TObject);
     procedure mnuFindNextClick(Sender: TObject);
+    procedure mnuTestConvPosClick(Sender: TObject);
     procedure mnuTestGapAddClick(Sender: TObject);
     procedure mnuTestGapClearClick(Sender: TObject);
     procedure mnuTestGapPanelsClick(Sender: TObject);
@@ -205,6 +210,11 @@ type
     ed_gap: TATSynEdit;
     FGapInitSize: integer;
     FDecorImage: integer;
+    FCfmPanel: TPanel;
+    FCfmLink: string;
+    procedure ConfirmButtonOkClick(Sender: TObject);
+    procedure ConfirmPanelMouseLeave(Sender: TObject);
+    procedure InitConfirmPanel;
     procedure DoAddEnc(Sub, SName: string);
     procedure DoLog(const S: string);
     procedure EditCalcBookmarkColor(Sender: TObject; ABookmarkKind: integer; var AColor: TColor);
@@ -220,16 +230,15 @@ type
     procedure EditClickGap(Sender: TObject; AGapItem: TATGapItem; APos: TPoint);
     procedure EditStringsChange(Sender: TObject; AChange: TATLineChangeKind; ALineIndex, AItemCount: integer);
     function EditCalcTabSize(Sender: TObject; ALineIndex, APos: integer): integer;
-    procedure FinderBadRegex(Sender: TObject);
     procedure FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
-      AForMany: boolean; var AConfirm, AContinue: boolean);
+      AForMany: boolean; var AConfirm, AContinue: boolean; var AReplacement: UnicodeString);
     procedure DoFindError;
     procedure DoOpen(const fn: string; ADetectEnc: boolean);
     procedure DoSetEnc(const Str: string);
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
-    procedure EditDrawLine(Sender: TObject; C: TCanvas; AX, AY: integer;
-      const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
+    procedure EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX, AY: integer;
+      const AStr: atString; ACharSize: TPoint; constref AExtent: TATIntFixedArray);
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
@@ -244,6 +253,7 @@ type
     procedure FinderUpdateEditor(AUpdateText: boolean);
     procedure MenuEncClick(Sender: TObject);
     procedure MsgStatus(const S: string);
+    procedure ShowBadRegex;
     procedure UpdateCaption;
     procedure UpdateGapPanel;
     procedure UpdateStatus;
@@ -263,13 +273,6 @@ uses
   atsynedit_commands;
 
 {$R *.lfm}
-
-const
-  sEncAnsi = 'ANSI';
-  sEncUtf8 = 'UTF-8';
-  sEncUtf8NoBom = 'UTF-8 no bom';
-  sEncUtf16LE = 'UTF-16 LE';
-  sEncUtf16BE = 'UTF-16 BE';
 
 const
   cColorBmIco = clMedGray;
@@ -299,6 +302,10 @@ begin
   ed:= TATSynEdit.Create(Self);
   ed.Parent:= PanelMain;
   ed.Align:= alClient;
+
+  {$ifdef LCLQt5}
+  OptCanvasTextoutNeedsOffsets:= true;
+  {$endif}
 
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
@@ -344,7 +351,6 @@ begin
   FFinder.OptRegex:= true;
   FFinder.OnConfirmReplace:= @FinderConfirmReplace;
   FFinder.OnProgress:= @FinderProgress;
-  FFinder.OnBadRegex:= @FinderBadRegex;
   FFinder.OnFound:= @FinderFound;
 
   ed_gap:= TATSynEdit.Create(Self);
@@ -372,7 +378,7 @@ begin
   wait:= false;
   ActiveControl:= ed;
 
-  fn:= FFilesDir+'/fn.txt';
+  fn:= FFilesDir+'/all.txt';
   if FileExists(fn) then
     DoOpen(fn, true);
 end;
@@ -460,6 +466,7 @@ begin
   ed.EndUpdate;
 end;
 
+
 procedure TfmMain.EditCaretMoved(Sender: TObject);
 begin
   UpdateStatus;
@@ -485,8 +492,9 @@ begin
   if ed.LastCommandChangedLines>0 then
     sCount:= Format('%d lines chg', [ed.LastCommandChangedLines]);
 
-  Status.SimpleText:= Format('Line:Col%s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d | %s', [
+  Status.SimpleText:= Format('Line:Col%s | %s | Carets: %d | Top: %d | %s | %s %s %s %s | Undo: %d, Redo: %d | %s', [
     sPos,
+    ed.EncodingName,
     ed.Carets.Count,
     ed.LineTop+1,
     cEnd[ed.Strings.Endings],
@@ -630,7 +638,7 @@ begin
   ed.BeginUpdate;
   try
     if ADetectEnc then
-      ed.Strings.EncodingCodepage:= '';
+      ed.Strings.EncodingCodepage:= eidUTF8;
     ed.Strings.EncodingDetect:= ADetectEnc;
     ed.LoadFromFile(fn);
     ed.Strings.EncodingDetect:= true;
@@ -639,9 +647,9 @@ begin
   end;
 
   //test Bookmarks2
-  ed.BookmarkSetForLine_2(4, cBookmarkBgKind, '', false, false, 0);
-  ed.BookmarkSetForLine_2(5, cBookmarkBgKind, '', false, false, 0);
-  ed.BookmarkSetForLine_2(6, cBookmarkBgKind, '', false, false, 0);
+  ed.BookmarkSetForLine_2(4, cBookmarkBgKind, '', bmadDontDelete, false, 0);
+  ed.BookmarkSetForLine_2(5, cBookmarkBgKind, '', bmadDontDelete, false, 0);
+  ed.BookmarkSetForLine_2(6, cBookmarkBgKind, '', bmadDontDelete, false, 0);
 
   Progress.Hide;
   UpdateCaption;
@@ -713,6 +721,12 @@ procedure TfmMain.chkMinimapTooltipChange(Sender: TObject);
 begin
   if wait then Exit;
   ed.OptMinimapTooltipVisible:= chkMinimapTooltip.Checked;
+end;
+
+procedure TfmMain.chkMouseColSelectChange(Sender: TObject);
+begin
+  if wait then Exit;
+  ed.OptMouseColumnSelectionWithoutKey:= chkMouseColSelect.Checked;
 end;
 
 procedure TfmMain.chkMouseEnChange(Sender: TObject);
@@ -851,7 +865,7 @@ procedure TfmMain.mnuFindClick(Sender: TObject);
 var
   res: TModalResult;
   cnt: integer;
-  ok, fchanged: boolean;
+  ok, bChanged: boolean;
 begin
   with TfmFind.Create(nil) do
   try
@@ -886,18 +900,28 @@ begin
     progress.Show;
     progress.Position:= 0;
 
+    ed.Markers.Clear; //support "find first" in selection
+
     case res of
       mrOk: //find
         begin
-          ok:= FFinder.DoAction_FindOrReplace(false, false, false, fchanged);
+          ok:= FFinder.DoAction_FindOrReplace(false, false, bChanged, true);
           FinderUpdateEditor(false);
-          if not ok then DoFindError;
+          if not ok then
+            if FFinder.IsRegexBad then
+              ShowBadRegex
+            else
+              DoFindError;
         end;
       mrYes: //replace
         begin
-          ok:= FFinder.DoAction_FindOrReplace(false, true, false, fchanged);
+          ok:= FFinder.DoAction_FindOrReplace(true, false, bChanged, true);
           FinderUpdateEditor(true);
-          if not ok then DoFindError;
+          if not ok then
+            if FFinder.IsRegexBad then
+              ShowBadRegex
+            else
+              DoFindError;
         end;
       mrYesToAll: //replace all
         begin
@@ -930,7 +954,7 @@ end;
 
 procedure TfmMain.mnuFindNextClick(Sender: TObject);
 var
-  ok, fchanged: boolean;
+  ok, bChanged: boolean;
 begin
   if FFinder.StrFind='' then
   begin
@@ -939,9 +963,17 @@ begin
   end;
 
   FFinder.OptFromCaret:= true;
-  ok:= FFinder.DoAction_FindOrReplace(false, false, false, fchanged);
+  ok:= FFinder.DoAction_FindOrReplace(false, false, bChanged, true);
   FinderUpdateEditor(false);
   if not ok then DoFindError;
+end;
+
+procedure TfmMain.mnuTestConvPosClick(Sender: TObject);
+var
+  P: TPoint;
+begin
+  P:= ed.CaretPosToClientPos(Point(0, ed.Strings.Count{after end-of-file!}));
+  ShowMessage(Format('Client pos (%d, %d)', [P.X, P.Y]));
 end;
 
 procedure TfmMain.mnuTestGapAddClick(Sender: TObject);
@@ -1046,45 +1078,9 @@ end;
 
 procedure TfmMain.DoSetEnc(const Str: string);
 begin
-  if Str=sEncAnsi then
-  begin
-    Ed.Strings.Encoding:= cEncAnsi;
-    Ed.Strings.EncodingCodepage:= '';
-  end
-  else
-  if Str=sEncUtf8 then
-  begin
-    Ed.Strings.Encoding:= cEncUTF8;
-    Ed.Strings.SaveSignUtf8:= true;
-    Ed.Strings.EncodingCodepage:= '';
-  end
-  else
-  if Str=sEncUtf8NoBom then
-  begin
-    Ed.Strings.Encoding:= cEncUTF8;
-    Ed.Strings.SaveSignUtf8:= false;
-    Ed.Strings.EncodingCodepage:= '';
-  end
-  else
-  if Str=sEncUtf16LE then
-  begin
-    Ed.Strings.Encoding:= cEncWideLE;
-    Ed.Strings.EncodingCodepage:= '';
-  end
-  else
-  if Str=sEncUtf16BE then
-  begin
-    Ed.Strings.Encoding:= cEncWideBE;
-    Ed.Strings.EncodingCodepage:= '';
-  end
-  else
-  begin
-    Ed.Strings.Encoding:= cEncAnsi;
-    Ed.Strings.EncodingCodepage:= Str;
-  end;
-
+  ed.EncodingName:= Str;
   if FFileName<>'' then
-    if Application.Messagebox('Encoding changed in mem. Also reload file in this encoding?',
+    if Application.Messagebox('Encoding changed in mem. Reload file in this encoding?',
       'Editor', MB_OKCANCEL or MB_ICONQUESTION) = id_ok then
       DoOpen(FFileName, false);
 end;
@@ -1130,8 +1126,25 @@ begin
 end;
 
 procedure TfmMain.EditClickLink(Sender: TObject; const ALink: string);
+var
+  P: TPoint;
+  bEmail: boolean;
 begin
-  OpenURL(ALink);
+  FCfmLink:= ALink;
+  InitConfirmPanel;
+
+  bEmail:= (Pos('://', ALink)=0) and (Pos('@', ALink)>0);
+  if bEmail then
+    FCfmPanel.Caption:= '[send email]'
+  else
+    FCfmPanel.Caption:= '[open link]';
+
+  P:= Mouse.CursorPos;
+  P:= ScreenToClient(P);
+  FCfmPanel.Parent:= Self;
+  FCfmPanel.Left:= P.X - FCfmPanel.Width div 2;
+  FCfmPanel.Top:= P.Y - FCfmPanel.Height div 2;
+  FCfmPanel.Show;
 end;
 
 procedure TfmMain.EditHotspotEnter(Sender: TObject; AHotspotIndex: integer);
@@ -1209,6 +1222,7 @@ end;
 procedure TfmMain.MenuEncClick(Sender: TObject);
 begin
   DoSetEnc((Sender as TMenuItem).Caption);
+  UpdateStatus;
 end;
 
 
@@ -1216,11 +1230,16 @@ procedure TfmMain.UpdateEnc;
 begin
   mnuEnc.Clear;
 
-  DoAddEnc('', sEncAnsi);
-  DoAddEnc('', sEncUtf8);
-  DoAddEnc('', sEncUtf8NoBom);
-  DoAddEnc('', sEncUtf16LE);
-  DoAddEnc('', sEncUtf16BE);
+  DoAddEnc('', cEncNameUtf8_NoBom);
+  DoAddEnc('', cEncNameUtf8_WithBom);
+  DoAddEnc('', cEncNameUtf16LE_NoBom);
+  DoAddEnc('', cEncNameUtf16LE_WithBom);
+  DoAddEnc('', cEncNameUtf16BE_NoBom);
+  DoAddEnc('', cEncNameUtf16BE_WithBom);
+  DoAddEnc('', cEncNameUtf32LE_NoBom);
+  DoAddEnc('', cEncNameUtf32LE_WithBom);
+  DoAddEnc('', cEncNameUtf32BE_NoBom);
+  DoAddEnc('', cEncNameUtf32BE_WithBom);
   DoAddEnc('', '-');
 
   DoAddEnc('Europe', 'CP1250');
@@ -1234,9 +1253,9 @@ begin
   DoAddEnc('Europe', 'CP852');
   DoAddEnc('Europe', 'CP866');
   DoAddEnc('Europe', '-');
-  DoAddEnc('Europe', 'ISO-8859-1');
-  DoAddEnc('Europe', 'ISO-8859-2');
-  DoAddEnc('Europe', 'Macintosh');
+  DoAddEnc('Europe', 'ISO88591');
+  DoAddEnc('Europe', 'ISO88592');
+  DoAddEnc('Europe', 'Mac');
 
   DoAddEnc('Other', 'CP1254');
   DoAddEnc('Other', 'CP1255');
@@ -1393,8 +1412,8 @@ begin
   ed.Update;
 end;
 
-procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas;
-  AX, AY: integer; const AStr: atString; ACharSize: TPoint; const AExtent: TATIntArray);
+procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX,
+  AY: integer; const AStr: atString; ACharSize: TPoint; constref AExtent: TATIntFixedArray);
 var
   X1, X2, Y, i: integer;
 begin
@@ -1405,13 +1424,13 @@ begin
   C.Pen.Width:= 2;
   C.Pen.EndCap:= pecSquare;
 
-  for i:= 1 to Length(AStr) do
+  for i:= 1 to Min(Length(AStr), AExtent.Len) do
     if AStr[i]='w' then
     begin
       X1:= AX;
       if i>1 then
-        Inc(X1, AExtent[i-2]);
-      X2:= AX+AExtent[i-1];
+        Inc(X1, AExtent.Data[i-2]);
+      X2:= AX+AExtent.Data[i-1];
       Y:= AY+ACharSize.Y-1;
 
       C.Line(X1, Y, X2, Y);
@@ -1443,8 +1462,7 @@ var
              BorderUp:= cLineStyleRounded;
              BorderLeft:= cLineStyleRounded;
              BorderRight:= cLineStyleRounded;
-             FontItalic:= true;
-             FontBold:= true;
+             FontStyles:= afsFontBold+afsFontItalic;
            end;
         3: begin
              ColorFont:= clred;
@@ -1517,7 +1535,8 @@ begin
 end;
 
 procedure TfmMain.FinderConfirmReplace(Sender: TObject; APos1, APos2: TPoint;
-  AForMany: boolean; var AConfirm, AContinue: boolean);
+  AForMany: boolean; var AConfirm, AContinue: boolean;
+  var AReplacement: UnicodeString);
 var
   Res: TModalResult;
   Buttons: TMsgDlgButtons;
@@ -1532,7 +1551,9 @@ begin
     PosX:= APos1.X;
     PosY:= APos1.Y;
     EndX:= APos2.X;
-    EndY:= APos2.Y;        end;
+    EndY:= APos2.Y;
+  end;
+
   Ed.DoCommand(cCommand_ScrollToCaretTop);
   Ed.Update(true);
 
@@ -1553,12 +1574,15 @@ begin
 end;
 
 
-procedure TfmMain.FinderBadRegex(Sender: TObject);
+procedure TfmMain.ShowBadRegex;
 begin
-  Application.MessageBox(
-    PChar('Incorrect regex passed:'#13+Utf8Encode(FFinder.StrFind)),
-    PChar(Application.Title),
-    mb_ok or mb_iconerror);
+  MessageDlg(
+    'Incorrect RegEx',
+    Utf8Encode(FFinder.StrFind)+#10+
+    FFinder.RegexErrorMsg,
+    mtError,
+    [mbOk], ''
+    );
 end;
 
 procedure TfmMain.FinderUpdateEditor(AUpdateText: boolean);
@@ -1611,5 +1635,32 @@ begin
   //ShowMessage('delete gap '+IntToStr(ALineIndex));
 end;
 
+procedure TfmMain.InitConfirmPanel;
+const
+  cPanelW = 100;
+  cPanelH = 35;
+begin
+  if FCfmPanel=nil then
+  begin
+    FCfmPanel:= TPanel.Create(Self);
+    FCfmPanel.Caption:= '??';
+    FCfmPanel.OnMouseLeave:= @ConfirmPanelMouseLeave;
+    FCfmPanel.Hide;
+    FCfmPanel.Width:= cPanelW;
+    FCfmPanel.Height:= cPanelH;
+    FCfmPanel.OnClick:= @ConfirmButtonOkClick;
+  end;
+end;
+
+procedure TfmMain.ConfirmButtonOkClick(Sender: TObject);
+begin
+  FCfmPanel.Hide;
+  EditorOpenLink(FCfmLink);
+end;
+
+procedure TfmMain.ConfirmPanelMouseLeave(Sender: TObject);
+begin
+  FCfmPanel.Hide;
+end;
 
 end.

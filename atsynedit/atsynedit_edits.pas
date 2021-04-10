@@ -12,8 +12,9 @@ uses
   Classes, SysUtils, Graphics, Controls,
   Menus, Math, Forms,
   LCLType,
+  ATCanvasPrimitives,
+  ATScrollbar,
   ATSynEdit,
-  ATSynEdit_CanvasProc,
   ATStringProc;
 
 type
@@ -40,7 +41,6 @@ type
     FItems: TStringList;
     FItemIndex: integer;
     FMenu: TPopupMenu;
-    FOptComboboxArrowSize: integer;
     procedure DoComboUpDown(ADown: boolean);
     procedure MicromapClick(Sender: TObject; AX, AY: integer);
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
@@ -53,7 +53,6 @@ type
     procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
-    property OptComboboxArrowSize: integer read FOptComboboxArrowSize write FOptComboboxArrowSize default 2;
   end;
 
 
@@ -138,6 +137,7 @@ begin
   OptBorderWidthFocused:= 1;
   OptScrollIndentCaretHorz:= 0;
   OptShowMouseSelFrame:= false;
+  OptMouseWheelZooms:= false;
 
   Height:= 26;
 end;
@@ -151,12 +151,16 @@ begin
   WantReturns:= true; //allow combo to handle Enter
 
   FItems:= TStringList.Create;
+  FItems.TextLineBreakStyle:= tlbsLF;
+  {$IF FPC_FULLVERSION>=30200}
+  FItems.TrailingLineBreak:= false;
+  {$ENDIF}
+
   FItemIndex:= -1;
   FMenu:= TPopupMenu.Create(Self);
 
   OptMicromapVisible:= true;
-  OptMicromapWidthPercents:= 300;
-  OptComboboxArrowSize:= 2;
+  Micromap.Columns[0].NWidthPercents:= 300;
 
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
@@ -177,7 +181,7 @@ begin
     Point(
       (ARect.Left+ARect.Right) div 2,
       (ARect.Top+ARect.Bottom) div 2),
-    EditorScale(FOptComboboxArrowSize));
+    EditorScale(ATScrollbarTheme.ArrowSize));
 end;
 
 procedure TATComboEdit.DoMenu;

@@ -10,7 +10,8 @@ interface
 
 uses
   Classes, SysUtils, Graphics, Messages,
-  ATSynEdit_CanvasProc;
+  ATStringProc,
+  ATSynEdit_LineParts;
 
 type
   { TATAdapterHilite }
@@ -27,6 +28,9 @@ type
     procedure OnEditorChange(Sender: TObject); virtual;
     //called when editor's text changes.
 
+    procedure OnEditorChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer); virtual;
+    //detailed version of OnEditorChange
+
     procedure OnEditorIdle(Sender: TObject); virtual;
     //called after text is changed, and pause passed (OptIdleInterval)
     //fast changes (faster than OptIdleInterval): called only after last change
@@ -34,7 +38,8 @@ type
     procedure OnEditorCalcHilite(Sender: TObject;
       var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer;
-      var AColorAfterEol: TColor); virtual;
+      var AColorAfterEol: TColor;
+      AMainText: boolean); virtual;
     //called to calculate hilite of entire line.
     //ACharIndex is starting offset in this line, >0 if editor scrolled horizontally.
     //ALineLen is len of line part, starting from ACharIndex.
@@ -149,6 +154,12 @@ begin
   //
 end;
 
+procedure TATAdapterHilite.OnEditorChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine,
+  AItemCount: integer);
+begin
+  //
+end;
+
 procedure TATAdapterHilite.OnEditorIdle(Sender: TObject);
 begin
   //
@@ -156,7 +167,8 @@ end;
 
 procedure TATAdapterHilite.OnEditorCalcHilite(Sender: TObject;
   var AParts: TATLineParts; ALineIndex, ACharIndex, ALineLen: integer;
-  var AColorAfterEol: TColor);
+  var AColorAfterEol: TColor;
+  AMainText: boolean);
 begin
   //
 end;
