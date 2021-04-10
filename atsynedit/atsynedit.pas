@@ -7547,8 +7547,7 @@ begin
       if Carets.Count>0 then
       begin
         Caret:= Carets[0];
-        Carets.AsString;  // this dummy need to work. bug?
-        IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+Top+TextCharSize.Y*3);
+        IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+TextCharSize.Y);
       end;
     end;
     // valid string at composition & commit
