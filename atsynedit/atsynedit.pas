@@ -3389,7 +3389,8 @@ begin
     if FOptShowFullHilite then
     begin
       NColorAfter:= clNone;
-      DoCalcPosColor(0, NLinesIndex, NColorAfter);
+      //visible StrOutput is empty, but the line itself may be not empty (because of horz scroll)
+      DoCalcPosColor(Strings.LinesLen[NLinesIndex], NLinesIndex, NColorAfter);
       if NColorAfter<>clNone then
         FillOneLine(NColorAfter, ARectLine.Left);
     end;
