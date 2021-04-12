@@ -3390,7 +3390,7 @@ begin
     begin
       NColorAfter:= clNone;
       //visible StrOutput is empty, but the line itself may be not empty (because of horz scroll)
-      DoCalcPosColor(Strings.LinesLen[NLinesIndex], NLinesIndex, NColorAfter);
+      DoCalcPosColor(NLineLen, NLinesIndex, NColorAfter);
       if NColorAfter<>clNone then
         FillOneLine(NColorAfter, ARectLine.Left);
     end;
