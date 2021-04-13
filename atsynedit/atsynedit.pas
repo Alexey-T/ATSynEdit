@@ -32,7 +32,11 @@ uses
   ATStringProc_WordJump,
   ATCanvasPrimitives,
   ATSynEdit_CharSizer,
+  {$ifndef USE_ATSYN_REGEXPR}
+  RegExpr,
+  {$else}
   ATSynEdit_RegExpr,
+  {$endif}
   ATSynEdit_Colors,
   ATSynEdit_Keymap,
   ATSynEdit_LineParts,
@@ -8853,8 +8857,10 @@ initialization
 
   RegExprModifierS:= False;
   RegExprModifierM:= True;
+  {$ifdef USE_ATSYN_REGEXPR}
   RegExprUsePairedBreak:= False;
   RegExprReplaceLineBreak:= #10;
+  {$endif}
 
 finalization
   FreeEditorResources;
