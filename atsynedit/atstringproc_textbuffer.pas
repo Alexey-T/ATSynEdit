@@ -26,10 +26,10 @@ type
 
   TATStringBuffer = class
   strict private
-    FLocked: boolean;
     FList: array of integer;
     FCount: integer;
     FLenEol: integer;
+    FLocked: boolean;
     FBufferVersion: integer;
     FOnChange: TTextChangedEvent;
     procedure SetCount(AValue: integer);
@@ -58,7 +58,7 @@ type
     property Count: integer read FCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
     property Version: integer read FBufferVersion;
-    property IsLocked :boolean read FLocked;
+    property IsLocked: boolean read FLocked;
   end;
 
 implementation
@@ -67,7 +67,7 @@ implementation
 
 procedure TATStringBuffer.SetCount(AValue: integer);
 begin
-  Assert(not FLocked);
+  Assert(not FLocked, 'SetCount called for locked StringBuffer');
   if AValue<0 then
     raise Exception.Create('StringBuffer Count<0');
 
@@ -78,12 +78,12 @@ end;
 
 constructor TATStringBuffer.Create;
 begin
-  FBufferVersion:= 0;
-  FLocked:=false;
   FText:= '';
   FLenEol:= 1; //no apps should use other
   FCount:= 0;
   SetCount(0);
+  FBufferVersion:= 0;
+  FLocked:= false;
 end;
 
 destructor TATStringBuffer.Destroy;
@@ -98,7 +98,7 @@ procedure TATStringBuffer.Setup(const AText: UnicodeString;
 var
   Pos, NLen, i: integer;
 begin
-  Assert(not FLocked, 'Attempt to reSet locked/used buffer!');
+  Assert(not FLocked, 'Attempt to change locked StringBuffer');
   Inc(FBufferVersion);
   FText:= AText;
   //FLenEol:= ALenEol;
@@ -118,7 +118,7 @@ procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
 var
   Pos, NLen, i: integer;
 begin
-  Assert(not FLocked);
+  Assert(not FLocked, 'Attempt to change locked StringBuffer');
   Inc(FBufferVersion);
   SetCount(L.Count+1);
   Pos:= 0;
@@ -137,8 +137,7 @@ var
   Lens: TATGenericIntList;
   i, N: integer;
 begin
-
-  Assert(not FLocked);
+  Assert(not FLocked, 'Attempt to change locked StringBuffer');
   Inc(FBufferVersion);
 
   FText:= AText;
@@ -188,12 +187,12 @@ end;
 
 procedure TATStringBuffer.Lock;
 begin
-  FLocked:=true;
+  FLocked:= true;
 end;
 
 procedure TATStringBuffer.Unlock;
 begin
-  FLocked:=false;
+  FLocked:= false;
 end;
 
 procedure TATStringBuffer.Assign(Other: TATStringBuffer);
@@ -209,7 +208,7 @@ end;
 
 procedure TATStringBuffer.Clear;
 begin
-  Assert(not FLocked);
+  Assert(not FLocked, 'Attempt to clear locked StringBuffer');
   FText:= '';
   SetCount(0);
 end;
