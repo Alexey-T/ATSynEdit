@@ -586,13 +586,10 @@ begin
 
   if DoEventCommand(ACmd, Str) then Exit;
 
-  case ACmd of
-    cCommand_MoveSelectionUp,
-    cCommand_MoveSelectionDown:
-      NCommandCode:= ACmd;
-    else
-      NCommandCode:= 0;
-  end;
+  if IsCommandToUndoInOneStep(ACmd) then
+    NCommandCode:= ACmd
+  else
+    NCommandCode:= 0;
   Strings.CommandCode:= NCommandCode;
 
   FCaretSpecPos:= false;

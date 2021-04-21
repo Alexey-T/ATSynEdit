@@ -175,6 +175,8 @@ const
   cCommand_ReverseLines = 350;
   cCommand_ShuffleLines = 351;
 
+  //first Paste command
+  cCommand_ClipboardPaste_Begin = 1000;
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;
   cCommand_ClipboardPaste_KeepCaret = 1002;
@@ -192,6 +194,8 @@ const
   cCommand_ClipboardAltPaste_ColumnKeepCaret = 1014 or cCmdFlag_ResetSel;
   //use SecondarySelection (has meaning in Linux)
   cCommand_ClipboardAltAltPaste = 1015;
+  //last Paste command
+  cCommand_ClipboardPaste_End = 1015;
 
   cCommand_TextCaseLower = 1020;
   cCommand_TextCaseUpper = 1021;
@@ -242,7 +246,26 @@ var
   //must be set in application
   cCommand_GotoDefinition: integer = 0;
 
+//all sequental Undo-items which have CommandCode with this value,
+//will be undone in single step
+function IsCommandToUndoInOneStep(AValue: integer): boolean;
+
 implementation
+
+function IsCommandToUndoInOneStep(AValue: integer): boolean;
+begin
+  case AValue and not cCmdFlag_ResetSel of
+    cCommand_MoveSelectionUp,
+    cCommand_MoveSelectionDown:
+    {
+    cCommand_ClipboardPaste_Begin..
+    cCommand_ClipboardPaste_End:
+    }
+      Result:= true;
+    else
+      Result:= false;
+  end;
+end;
 
 end.
 
