@@ -1322,7 +1322,7 @@ type
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure DoEventCarets; virtual;
     procedure DoEventScroll; virtual;
-    procedure DoEventChange(AllowOnChange: boolean=true); virtual;
+    procedure DoEventChange(ALineIndex: integer=-1; AllowOnChange: boolean=true); virtual;
     procedure DoEventState; virtual;
     procedure TimersStart;
     procedure TimersStop;
@@ -4572,7 +4572,7 @@ begin
 
   Update;
   TimerBlickEnable;
-  DoEventChange(false); //calling OnChange makes almost no sense on opening file
+  DoEventChange(-1, false); //calling OnChange makes almost no sense on opening file
   //DoEventCarets; //calling OnChangeCaretPos makes little sense on opening file
 end;
 
@@ -6338,6 +6338,8 @@ var
   R: TRect;
   i: integer;
 begin
+  if csLoading in ComponentState then exit;
+  if csDestroying in ComponentState then exit;
   if not FCaretShowEnabled then exit;
 
   if ModeReadOnly then
@@ -6685,13 +6687,22 @@ begin
     FOnScroll(Self);
 end;
 
-procedure TATSynEdit.DoEventChange(AllowOnChange: boolean=true);
+procedure TATSynEdit.DoEventChange(ALineIndex: integer; AllowOnChange: boolean);
+var
+  HandlerChangeLog: TATStringsChangeLogEvent;
 begin
   FLinkCache.Clear;
 
   if Assigned(FAdapterHilite) then
   begin
     FAdapterHilite.OnEditorChange(Self);
+
+    if ALineIndex>=0 then
+    begin
+      HandlerChangeLog:= Strings.OnChangeLog;
+      if Assigned(HandlerChangeLog) then
+        HandlerChangeLog(nil, ALineIndex);
+    end;
   end;
 
   if AllowOnChange then
