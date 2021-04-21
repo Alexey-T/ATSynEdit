@@ -72,7 +72,7 @@ begin
 
   if Strings.Count>0 then
     if Strings.LinesLen[0]>FOptMaxLen then
-      DoEventChange;
+      DoEventChange(0);
 end;
 
 function TATEdit.DoGetTextString: atString;
@@ -220,7 +220,7 @@ begin
   if n>=0 then
   begin
     Text:= UTF8Decode(FItems[n]);
-    DoEventChange;
+    DoEventChange(0);
 
     //scroll to left, select all
     DoScrollByDelta(-10000, 0);
@@ -259,7 +259,7 @@ begin
   FItemIndex:= Max(0, Min(FItems.Count-1, FItemIndex));
 
   Text:= Utf8Decode(FItems[FItemIndex]);
-  DoEventChange;
+  DoEventChange(0);
   DoCommand(cCommand_SelectAll);
 end;
 
