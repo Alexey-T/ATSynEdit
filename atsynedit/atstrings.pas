@@ -1766,7 +1766,7 @@ begin
   AHardMarked:= CurItem.ItemHardMark;
   ATickCount:= CurItem.ItemTickCount;
   NCount:= ACurList.Count;
-  bWithoutPause:= IsCommandToUndoWithoutPause(ACommandCode);
+  bWithoutPause:= IsCommandToUndoInOneStep(ACommandCode);
 
   //note: do not break this issue https://github.com/Alexey-T/CudaText/issues/2677
   if NCount>=2 then
