@@ -249,6 +249,7 @@ var
 //all sequental Undo-items which have CommandCode with this value,
 //will be undone in single step
 function IsCommandToUndoInOneStep(AValue: integer): boolean;
+function IsCommandToUndoWithoutPause(AValue: integer): boolean;
 
 implementation
 
@@ -256,11 +257,20 @@ function IsCommandToUndoInOneStep(AValue: integer): boolean;
 begin
   case AValue and not cCmdFlag_ResetSel of
     cCommand_MoveSelectionUp,
-    cCommand_MoveSelectionDown:
-    {
+    cCommand_MoveSelectionDown,
     cCommand_ClipboardPaste_Begin..
     cCommand_ClipboardPaste_End:
-    }
+      Result:= true;
+    else
+      Result:= false;
+  end;
+end;
+
+function IsCommandToUndoWithoutPause(AValue: integer): boolean;
+begin
+  case AValue and not cCmdFlag_ResetSel of
+    cCommand_ClipboardPaste_Begin..
+    cCommand_ClipboardPaste_End:
       Result:= true;
     else
       Result:= false;

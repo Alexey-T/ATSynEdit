@@ -21,6 +21,7 @@ uses
   ATSynEdit_Gaps,
   ATSynEdit_Bookmarks,
   ATSynEdit_Gutter_Decor,
+  ATSynEdit_Commands,
   EncConv;
 
 const
@@ -1736,6 +1737,7 @@ var
   OtherList: TATUndoList;
   NCount: integer;
   NEventX, NEventY: integer;
+  bWithoutPause: boolean;
   bEnableEventBefore,
   bEnableEventAfter: boolean;
 begin
@@ -1764,6 +1766,7 @@ begin
   AHardMarked:= CurItem.ItemHardMark;
   ATickCount:= CurItem.ItemTickCount;
   NCount:= ACurList.Count;
+  bWithoutPause:= IsCommandToUndoWithoutPause(ACommandCode);
 
   //note: do not break this issue https://github.com/Alexey-T/CudaText/issues/2677
   if NCount>=2 then
@@ -1815,6 +1818,12 @@ begin
 
   bEnableEventBefore:= (NEventY>=0) and (NEventY<>FLastUndoY);
   FLastUndoY:= NEventY;
+
+  if bWithoutPause then
+  begin
+    bEnableEventBefore:= false;
+    bEnableEventAfter:= false;
+  end;
 
   if bEnableEventBefore then
     if Assigned(FOnUndoBefore) then
