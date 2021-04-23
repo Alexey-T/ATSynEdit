@@ -294,7 +294,7 @@ type
     CaretsAfterLastEdition: TATPointArray;
     constructor Create(AUndoLimit: integer); virtual;
     destructor Destroy; override;
-    procedure Clear;
+    procedure Clear(AWithEvent: boolean=true);
     procedure ClearSeparators;
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
@@ -1575,11 +1575,15 @@ begin
   Result:= FList.GetItem(AIndex);
 end;
 
-procedure TATStrings.Clear;
+procedure TATStrings.Clear(AWithEvent: boolean);
 begin
   ClearUndo(FUndoList.Locked);
-  DoEventLog(0);
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
+
+  if AWithEvent then
+  begin
+    DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+  end;
 
   FList.Clear;
 end;

@@ -4551,7 +4551,7 @@ begin
   FCarets.Clear;
   FCarets.Add(0, 0);
 
-  Strings.Clear;
+  Strings.Clear(false{AWithEvent});
   FWrapInfo.Clear;
   FWrapUpdateNeeded:= true;
 
@@ -4573,8 +4573,7 @@ begin
   Update;
   TimerBlickEnable;
 
-  //it's needed??
-  //DoEventChange(0, false); //calling OnChange makes almost no sense on opening file
+  DoEventChange(0, false{AllowOnChange}); //calling OnChange makes almost no sense on opening file
 
   //DoEventCarets; //calling OnChangeCaretPos makes little sense on opening file
 end;
