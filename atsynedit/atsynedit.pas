@@ -1071,7 +1071,7 @@ type
       const AMarkText: string);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure TimerBlinkDisable;
-    procedure TimerBlickEnable;
+    procedure TimerBlinkEnable;
     procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TPoint;
       const AVisRect: TRect; APointLeft, APointText: TPoint;
       const AWrapItem: TATWrapItem; ALineWidth: integer;
@@ -4571,7 +4571,7 @@ begin
   end;
 
   Update;
-  TimerBlickEnable;
+  TimerBlinkEnable;
 
   DoEventChange(0, false{AllowOnChange}); //calling OnChange makes almost no sense on opening file
 
@@ -6452,7 +6452,7 @@ begin
     FTimerBlink.Enabled:= false;
 end;
 
-procedure TATSynEdit.TimerBlickEnable;
+procedure TATSynEdit.TimerBlinkEnable;
 begin
   if cUsePaintStatic then
   begin

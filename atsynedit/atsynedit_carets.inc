@@ -477,7 +477,7 @@ procedure TATSynEdit.SetCaretBlinkEnabled(AValue: boolean);
 begin
   if FCaretBlinkEnabled=AValue then Exit;
   FCaretBlinkEnabled:= AValue;
-  TimerBlickEnable;
+  TimerBlinkEnable;
 end;
 
 procedure TATSynEdit.DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;

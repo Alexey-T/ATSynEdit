@@ -52,7 +52,7 @@ begin
   begin
     TimerBlinkDisable;
     DoCommand(NCmd);
-    TimerBlickEnable;
+    TimerBlinkEnable;
   end;
 end;
 
@@ -122,7 +122,7 @@ begin
 
   TimerBlinkDisable;
   DoCommand(cCommand_TextInsert, Str);
-  TimerBlickEnable;
+  TimerBlinkEnable;
 
   Utf8Key:= '';
 end;
