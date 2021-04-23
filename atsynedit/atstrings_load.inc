@@ -476,9 +476,9 @@ var
 begin
   AForcedToANSI:= false;
 
-  //DoLoadFromFile already called Clear
+  //LoadFromFile already calls Clear
   if Count>0 then
-    Clear;
+    Clear(false{AWithEvent});
 
   bWithBom:= false;
   NStreamSize:= Stream.Size;
