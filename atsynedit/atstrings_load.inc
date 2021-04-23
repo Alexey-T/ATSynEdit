@@ -475,7 +475,10 @@ var
   bWithBom: boolean;
 begin
   AForcedToANSI:= false;
-  Clear;
+
+  //DoLoadFromFile already called Clear
+  if Count>0 then
+    Clear;
 
   bWithBom:= false;
   NStreamSize:= Stream.Size;

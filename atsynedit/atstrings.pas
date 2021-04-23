@@ -302,7 +302,7 @@ type
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
     procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
-    procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
+    procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: integer; const AString: atString; AWithEvent: boolean=true);
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
@@ -1329,7 +1329,7 @@ procedure TATStrings.ActionAddFakeLineIfNeeded;
 begin
   if Count=0 then
   begin
-    LineAddRaw('', cEndNone);
+    LineAddRaw('', cEndNone, false{AWithEvent});
     Exit
   end;
 
@@ -1337,12 +1337,12 @@ begin
 
   if LinesEnds[Count-1]<>cEndNone then
   begin
-    LineAddRaw('', cEndNone);
+    LineAddRaw('', cEndNone, false{AWithEvent});
     Exit
   end;
 end;
 
-procedure TATStrings.LineAddRaw(const AString: atString; AEnd: TATLineEnds);
+procedure TATStrings.LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean);
 var
   Item: TATStringItem;
 begin
@@ -1350,8 +1350,11 @@ begin
   if DoCheckFilled then Exit;
 
   AddUndoItem(aeaInsert, Count, '', cEndNone, cLineStateNone, FCommandCode);
-  DoEventLog(Count);
-  DoEventChange(cLineChangeAdded, Count, 1);
+  if AWithEvent then
+  begin
+    DoEventLog(Count);
+    DoEventChange(cLineChangeAdded, Count, 1);
+  end;
 
   Item.Init(AString, AEnd);
   FList.Add(@Item);
@@ -1575,7 +1578,7 @@ end;
 procedure TATStrings.Clear;
 begin
   ClearUndo(FUndoList.Locked);
-  DoEventLog(-1);
+  DoEventLog(0);
   DoEventChange(cLineChangeDeletedAll, -1, 1);
 
   FList.Clear;
