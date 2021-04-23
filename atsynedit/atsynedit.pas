@@ -4572,7 +4572,10 @@ begin
 
   Update;
   TimerBlickEnable;
-  DoEventChange(-1, false); //calling OnChange makes almost no sense on opening file
+
+  //it's needed??
+  //DoEventChange(0, false); //calling OnChange makes almost no sense on opening file
+
   //DoEventCarets; //calling OnChangeCaretPos makes little sense on opening file
 end;
 
