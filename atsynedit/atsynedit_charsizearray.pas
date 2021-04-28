@@ -140,6 +140,10 @@ begin
   FixedSizes[$20AC]:= _norm;
   FixedSizes[$2122]:= _norm;
 
+  //math operators
+  for i:= $2200 to $22FF do
+    FixedSizes[i]:= _full;
+
   //"Miscellaneous Symbols" block which goes from 0x2600 to 0x26FF
   for i:= $2600 to $26FF do
     FixedSizes[i]:= _full;
