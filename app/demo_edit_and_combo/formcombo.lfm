@@ -132,4 +132,13 @@ object fmCombo: TfmCombo
     State = cbChecked
     TabOrder = 7
   end
+  object chkRO: TCheckBox
+    Left = 8
+    Height = 24
+    Top = 184
+    Width = 92
+    Caption = 'Read-only'
+    OnChange = chkROChange
+    TabOrder = 8
+  end
 end

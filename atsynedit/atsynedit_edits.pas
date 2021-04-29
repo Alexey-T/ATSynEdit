@@ -214,13 +214,17 @@ end;
 
 procedure TATComboEdit.MenuItemClick(Sender: TObject);
 var
+  PrevRO: boolean;
   n: integer;
 begin
   n:= (Sender as TMenuItem).Tag;
   if n>=0 then
   begin
+    PrevRO:= ModeReadOnly;
+    ModeReadOnly:= false;
     Text:= UTF8Decode(FItems[n]);
     DoEventChange(0);
+    ModeReadOnly:= PrevRO;
 
     //scroll to left, select all
     DoScrollByDelta(-10000, 0);
