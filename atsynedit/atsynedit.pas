@@ -4688,7 +4688,6 @@ begin
     OptWrapMode:= cWrapOff;
     OptScrollStyleHorz:= aessHide;
     OptScrollStyleVert:= aessHide;
-    OptAllowReadOnly:= false;
     OptMouseMiddleClickAction:= mcaNone;
     OptMouseDragDrop:= false;
     OptMarginRight:= 1000;
