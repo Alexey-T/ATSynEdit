@@ -3431,11 +3431,12 @@ begin
           Colors.UnprintedFont,
           Colors.UnprintedBG)
       else
-        DoPaintUnprintedEolArrow(C,
+        DoPaintUnprintedEndSymbol(C,
           CoordAfterText.X,
           CoordAfterText.Y,
           ACharSize,
-          Colors.UnprintedFont);
+          Colors.UnprintedFont,
+          Colors.TextBG);
     end;
   end
   else

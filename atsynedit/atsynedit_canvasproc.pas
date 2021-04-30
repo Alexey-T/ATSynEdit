@@ -32,7 +32,7 @@ var
   OptUnprintedSpaceDotScale: integer = 15;
   OptUnprintedEndDotScale: integer = 30;
   OptUnprintedEndFontScale: integer = 40;
-  OptUnprintedEndArrowOrDot: boolean = true;
+  OptUnprintedEndSymbol: integer = 1; //0: 'dot', 1: 'arrow', 2: 'pilcrow'
   OptUnprintedEndArrowLength: integer = 70;
   OptUnprintedWrapArrowLength: integer = 40;
   OptUnprintedWrapArrowWidth: integer = 80;
@@ -154,10 +154,10 @@ procedure DoPaintUnprintedSymbols(C: TCanvas;
   ACharSize: TPoint;
   AColorFont, AColorBG: TColor);
 
-procedure DoPaintUnprintedEolArrow(C: TCanvas;
+procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
   ACharSize: TPoint;
-  AColorFont: TColor);
+  AColorFont, AColorBg: TColor);
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AX, AY: integer;
@@ -602,23 +602,34 @@ begin
   end;
 end;
 
-procedure DoPaintUnprintedEolArrow(C: TCanvas;
+const
+  cPilcrowString: string = '?';
+
+procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
   ACharSize: TPoint;
-  AColorFont: TColor);
+  AColorFont, AColorBg: TColor);
 begin
-  if OptUnprintedEndArrowOrDot then
-    CanvasArrowDown(C,
-      Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
-      AColorFont,
-      OptUnprintedEndArrowLength,
-      OptUnprintedTabPointerScale
-      )
-  else
-    CanvasUnprintedSpace(C,
-      Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
-      OptUnprintedEndDotScale,
-      AColorFont);
+  case OptUnprintedEndSymbol of
+    0:
+      CanvasUnprintedSpace(C,
+        Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+        OptUnprintedEndDotScale,
+        AColorFont);
+    1:
+      CanvasArrowDown(C,
+        Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+        AColorFont,
+        OptUnprintedEndArrowLength,
+        OptUnprintedTabPointerScale
+        );
+    2:
+      begin
+        C.Font.Color:= AColorFont;
+        C.Brush.Color:= AColorBg;
+        CanvasTextOutSimplest(C, AX, AY, cPilcrowString);
+      end;
+  end;
 end;
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
@@ -1219,6 +1230,9 @@ begin
     C.FillRect(X2, Y1, ARect.Right, Y2, rColorBack);
   end;
 end;
+
+initialization
+  cPilcrowString:= UTF8Encode(#$B6);
 
 end.
 

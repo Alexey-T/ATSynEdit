@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 701
-    ActivePage = TabSheet6
+    ActivePage = TabSheet8
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 10
+    TabIndex = 8
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'show'
@@ -486,7 +486,7 @@ object fmOpt: TfmOpt
           Top = 0
           Width = 98
           ItemHeight = 0
-          ScrollWidth = 96
+          ScrollWidth = 94
           TabOrder = 0
           TopIndex = -1
         end
@@ -1082,19 +1082,19 @@ object fmOpt: TfmOpt
       ClientWidth = 697
       object chkUnprintAsciiRep: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 208
         Width = 161
         Caption = 'show ascii 0-31 as "."'
-        TabOrder = 7
+        TabOrder = 6
       end
       object edTabArrowSize: TSpinEdit
         Left = 304
-        Height = 33
+        Height = 26
         Top = 8
         Width = 50
         MaxValue = 16
-        TabOrder = 8
+        TabOrder = 7
       end
       object LabelArr: TLabel
         Left = 360
@@ -1106,11 +1106,11 @@ object fmOpt: TfmOpt
       end
       object edTabArrowPnt: TSpinEdit
         Left = 304
-        Height = 33
+        Height = 26
         Top = 36
         Width = 50
         MaxValue = 50
-        TabOrder = 9
+        TabOrder = 8
       end
       object LabelArr1: TLabel
         Left = 360
@@ -1122,7 +1122,7 @@ object fmOpt: TfmOpt
       end
       object chkUnprintEn: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 8
         Width = 232
         Caption = 'show unprinted (global enable)'
@@ -1130,7 +1130,7 @@ object fmOpt: TfmOpt
       end
       object chkUnprintSpace: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 27
         Width = 119
         Caption = '.. spaces/tabs'
@@ -1138,7 +1138,7 @@ object fmOpt: TfmOpt
       end
       object chkUnprintEnd: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 47
         Width = 97
         Caption = '.. line-ends'
@@ -1146,23 +1146,15 @@ object fmOpt: TfmOpt
       end
       object chkUnprintEndDet: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 67
         Width = 251
         Caption = '.. line-ends details (win, unix, mac)'
         TabOrder = 3
       end
-      object chkUnprintArrowDown: TCheckBox
-        Left = 8
-        Height = 23
-        Top = 184
-        Width = 316
-        Caption = 'show arrow-down instead of dot, at line end'
-        TabOrder = 6
-      end
       object chkUnprintOnlyBothEnds: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 112
         Width = 207
         Caption = '.. only at begin+end of lines'
@@ -1170,11 +1162,34 @@ object fmOpt: TfmOpt
       end
       object chkUnprintOnlyEnd: TCheckBox
         Left = 8
-        Height = 23
+        Height = 24
         Top = 136
         Width = 162
         Caption = '.. only at end of lines'
         TabOrder = 5
+      end
+      object edUnpriEol: TComboBox
+        Left = 304
+        Height = 28
+        Top = 67
+        Width = 100
+        ItemHeight = 0
+        Items.Strings = (
+          'dot'
+          'arrow'
+          'pilcrow'
+        )
+        ReadOnly = True
+        Style = csDropDownList
+        TabOrder = 9
+      end
+      object Label23: TLabel
+        Left = 414
+        Height = 17
+        Top = 72
+        Width = 103
+        Caption = 'symbol for EOL'
+        ParentColor = False
       end
     end
     object TabSheet11: TTabSheet
