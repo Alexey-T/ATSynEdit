@@ -323,7 +323,7 @@ begin
 
   ed.OnChange:= @EditChanged;
   ed.OnChangeModified:=@EditChangeModified;
-  ed.Strings.OnChange:=@EditStringsChange;
+  ed.Strings.OnChangeEx:=@EditStringsChange;
   ed.Strings.OnChangeBlock:=@EditStringsChangeBlock;
   ed.Strings.GutterDecor1:= ed.GutterDecor;
   ed.OnChangeCaretPos:= @EditCaretMoved;
@@ -568,7 +568,7 @@ begin
       Data.Kind:= 1;
       Data.LineNum:= ALine;
       Data.ShowInBookmarkList:= true;
-      Data.Hint:= Format('Bookmark for line %d', [ALine+1]);
+      Data.Hint:= StrNew(PChar(Format('Bookmark for line %d', [ALine+1])));
       ed.Strings.Bookmarks.Add(Data);
     end;
     ed.Update;
