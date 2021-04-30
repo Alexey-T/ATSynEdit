@@ -118,7 +118,10 @@ begin
   adapter.Lexer:= an;
 
   if Assigned(an) then
+  begin
     edLexer.ItemIndex:= edLexer.Items.IndexOf(an.LexerName);
+    ed.DoEventChange(0);
+  end;
 end;
 
 procedure TfmMain.FormCreate(Sender: TObject);
@@ -304,9 +307,16 @@ begin
 end;
 
 procedure TfmMain.DoLexer(const aname: string);
+var
+  an: TecSyntAnalyzer;
 begin
-  adapter.Lexer:= manager.FindAnalyzer(aname);
-  ed.Update;
+  an:= manager.FindAnalyzer(aname);
+  if Assigned(an) then
+  begin
+    adapter.Lexer:= an;
+    ed.DoEventChange(0);
+    ed.Update;
+  end;
 end;
 
 procedure TfmMain.edLexerChange(Sender: TObject);
