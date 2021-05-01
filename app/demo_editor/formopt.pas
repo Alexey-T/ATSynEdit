@@ -250,7 +250,7 @@ begin
     chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
     chkUnprintOnlyBothEnds.Checked:= ed.OptUnprintedSpacesBothEnds;
     chkUnprintOnlyEnd.Checked:= ed.OptUnprintedSpacesTrailing;
-    edUnpriEol.ItemIndex:= OptUnprintedEndSymbol;
+    edUnpriEol.ItemIndex:= Ord(OptUnprintedEndSymbol);
     chkUnprintAsciiRep.Checked:= OptUnprintedReplaceSpec;
     edTabArrowSize.Value:= OptUnprintedTabCharLength;
     edTabArrowPnt.Value:= OptUnprintedTabPointerScale;
@@ -387,7 +387,7 @@ begin
       OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
       OptUnprintedTabCharLength:= edTabArrowSize.Value;
       OptUnprintedTabPointerScale:= edTabArrowPnt.Value;
-      OptUnprintedEndSymbol:= edUnpriEol.ItemIndex;
+      OptUnprintedEndSymbol:= TATSynEditUnptintedEolSymbol(edUnpriEol.ItemIndex);
 
       //caret
       ed.OptCaretBlinkEnabled:= chkCrBlinkEn.Checked;

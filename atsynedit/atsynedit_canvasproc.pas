@@ -25,6 +25,13 @@ uses
   ATSynEdit_LineParts,
   ATSynEdit_CharSizer;
 
+type
+  TATSynEditUnptintedEolSymbol = (
+    aeueDot,
+    aeueArrowDown,
+    aeuePilcrow
+    );
+
 var
   OptUnprintedTabCharLength: integer = 1;
   OptUnprintedTabPointerScale: integer = 22;
@@ -32,7 +39,7 @@ var
   OptUnprintedSpaceDotScale: integer = 15;
   OptUnprintedEndDotScale: integer = 30;
   OptUnprintedEndFontScale: integer = 40;
-  OptUnprintedEndSymbol: integer = 1; //0: 'dot', 1: 'arrow', 2: 'pilcrow'
+  OptUnprintedEndSymbol: TATSynEditUnptintedEolSymbol = aeueArrowDown;
   OptUnprintedEndArrowLength: integer = 70;
   OptUnprintedWrapArrowLength: integer = 40;
   OptUnprintedWrapArrowWidth: integer = 80;
@@ -611,19 +618,19 @@ procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AColorFont, AColorBg: TColor);
 begin
   case OptUnprintedEndSymbol of
-    0:
+    aeueDot:
       CanvasUnprintedSpace(C,
         Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
         OptUnprintedEndDotScale,
         AColorFont);
-    1:
+    aeueArrowDown:
       CanvasArrowDown(C,
         Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
         AColorFont,
         OptUnprintedEndArrowLength,
         OptUnprintedTabPointerScale
         );
-    2:
+    aeuePilcrow:
       begin
         C.Font.Color:= AColorFont;
         C.Brush.Color:= AColorBg;

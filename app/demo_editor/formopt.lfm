@@ -1170,7 +1170,7 @@ object fmOpt: TfmOpt
       end
       object edUnpriEol: TComboBox
         Left = 304
-        Height = 28
+        Height = 27
         Top = 67
         Width = 100
         ItemHeight = 0
