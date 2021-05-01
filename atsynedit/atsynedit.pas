@@ -582,8 +582,6 @@ type
     FMouseAutoScroll: TATEditorDirection;
     FMouseActions: TATEditorMouseActionArray;
     FLockInput: boolean;
-    FEditingActive: boolean;
-    FEditingTopLine: integer;
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
@@ -7949,24 +7947,30 @@ end;
 
 procedure TATSynEdit.DoStringsOnChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer);
 //we are called inside BeginEditing/EndEditing - just remember top edited line
+var
+  St: TATStrings;
 begin
-  if FEditingActive then
+  St:= Strings;
+  if St.EditingActive then
   begin
     if ALine>=0 then
-      if (FEditingTopLine<0) or (ALine<FEditingTopLine) then
-        FEditingTopLine:= ALine;
+      if (St.EditingTopLine<0) or (ALine<St.EditingTopLine) then
+        St.EditingTopLine:= ALine;
   end
   else
     FlushEditingChangeEx(AChange, ALine, AItemCount);
 end;
 
 procedure TATSynEdit.DoStringsOnChangeLog(Sender: TObject; ALine: integer);
+var
+  St: TATStrings;
 begin
-  if FEditingActive then
+  St:= Strings;
+  if St.EditingActive then
   begin
     if ALine>=0 then
-      if (FEditingTopLine<0) or (ALine<FEditingTopLine) then
-        FEditingTopLine:= ALine;
+      if (St.EditingTopLine<0) or (ALine<St.EditingTopLine) then
+        St.EditingTopLine:= ALine;
   end
   else
     FlushEditingChangeLog(ALine);
@@ -8756,31 +8760,39 @@ begin
 end;
 
 procedure TATSynEdit.ActionAddJumpToUndo;
+var
+  St: TATStrings;
 begin
+  St:= Strings;
   if FOptUndoForCaretJump then
-    with Strings do
-    begin
-      SetGroupMark; //solve CudaText #3269
-      ActionAddJumpToUndo(CaretsAfterLastEdition);
-      //ActionAddJumpToUndo(GetCaretsArray); //bad, parameter is needed only for another array
-    end;
+  begin
+    St.SetGroupMark; //solve CudaText #3269
+    St.ActionAddJumpToUndo(St.CaretsAfterLastEdition);
+    //ActionAddJumpToUndo(GetCaretsArray); //bad, parameter is needed only for another array
+  end;
 end;
 
 
 procedure TATSynEdit.BeginEditing;
+var
+  St: TATStrings;
 begin
-  FEditingActive:= true;
-  FEditingTopLine:= -1;
+  St:= Strings;
+  St.EditingActive:= true;
+  St.EditingTopLine:= -1;
 end;
 
 procedure TATSynEdit.EndEditing(ATextChanged: boolean);
+var
+  St: TATStrings;
 begin
-  FEditingActive:= false;
+  St:= Strings;
+  St.EditingActive:= false;
   if ATextChanged then
-    if FEditingTopLine>=0 then
+    if St.EditingTopLine>=0 then
     begin
       //FlushEditingChangeEx(cLineChangeEdited, FEditingTopLine, 1); //not needed
-      FlushEditingChangeLog(FEditingTopLine);
+      FlushEditingChangeLog(St.EditingTopLine);
     end;
 end;
 

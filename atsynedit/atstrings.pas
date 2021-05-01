@@ -292,6 +292,8 @@ type
     procedure AddUpdatesAction(N: integer; AAction: TATEditAction);
   public
     CaretsAfterLastEdition: TATPointArray;
+    EditingActive: boolean;
+    EditingTopLine: integer;
     constructor Create(AUndoLimit: integer); virtual;
     destructor Destroy; override;
     procedure Clear(AWithEvent: boolean=true);
