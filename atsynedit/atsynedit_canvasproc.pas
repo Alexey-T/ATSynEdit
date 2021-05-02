@@ -633,8 +633,9 @@ begin
     aeuePilcrow:
       begin
         C.Font.Color:= AColorFont;
-        C.Brush.Color:= AColorBg;
+        C.Brush.Style:= bsClear;
         CanvasTextOutSimplest(C, AX, AY, cPilcrowString);
+        C.Brush.Style:= bsSolid;
       end;
   end;
 end;
