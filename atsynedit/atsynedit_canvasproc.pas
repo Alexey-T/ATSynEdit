@@ -609,13 +609,13 @@ begin
   end;
 end;
 
-const
-  cPilcrowString: string = '?';
-
 procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
   ACharSize: TPoint;
   AColorFont, AColorBg: TColor);
+const
+  // https://www.fileformat.info/info/unicode/char/B6/index.htm
+  cPilcrowString: PChar = #$C2#$B6;
 begin
   case OptUnprintedEndSymbol of
     aeueDot:
@@ -1238,9 +1238,6 @@ begin
     C.FillRect(X2, Y1, ARect.Right, Y2, rColorBack);
   end;
 end;
-
-initialization
-  cPilcrowString:= UTF8Encode(#$B6);
 
 end.
 
