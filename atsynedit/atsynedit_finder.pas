@@ -159,6 +159,7 @@ type
     FDataString: string;
     FCallbackString: string;
     FPlaceMarker: boolean;
+    FReplacedAtLine: integer;
     //FReplacedAtEndOfText: boolean;
     //
     function IsSelStartsAtMatch: boolean;
@@ -1001,6 +1002,7 @@ var
   i: integer;
 begin
   Result:= 0;
+  FReplacedAtLine:= MaxInt;
   if Editor.ModeReadOnly then exit;
   Editor.Strings.SetNewCommandMark;
 
@@ -1022,6 +1024,9 @@ begin
     end;
     CurrentFragmentIndex:= 0;
   end;
+
+  if FReplacedAtLine<>MaxInt then
+    Editor.DoEventChange(FReplacedAtLine);
 end;
 
 
@@ -1073,8 +1078,6 @@ begin
           if not Ok then Break;
         end;
     end;
-
-    Editor.DoEventChange;
   finally
     FreeAndNil(L);
   end;
@@ -1094,6 +1097,8 @@ begin
   //  (APosEnd.Y>Strs.Count-1) or
   //  ((APosEnd.Y=Strs.Count-1) and (APosEnd.X=Strs.LinesLen[APosEnd.Y]));
 
+  FReplacedAtLine:= Min(FReplacedAtLine, APosBegin.Y);
+
   Strs.TextReplaceRange(
     APosBegin.X, APosBegin.Y,
     APosEnd.X, APosEnd.Y,
@@ -1105,7 +1110,6 @@ begin
 
   if AUpdateBuffer and OptRegex then
   begin
-    Editor.DoEventChange;
     UpdateBuffer_FromStrings(Strs);
   end;
 
@@ -1213,6 +1217,7 @@ var
 begin
   Result:= false;
   AChanged:= false;
+  FReplacedAtLine:= MaxInt;
   UpdateCarets(true);
   if OptInSelection and not FinderCarets.IsSelection then exit;
 
@@ -1292,6 +1297,9 @@ begin
   end;
 
   CurrentFragmentIndex:= -1;
+
+  if FReplacedAtLine<>MaxInt then
+    Editor.DoEventChange(FReplacedAtLine);
 end;
 
 
@@ -1630,6 +1638,7 @@ var
   bSel: boolean;
 begin
   Result:= false;
+  FReplacedAtLine:= MaxInt;
   if Editor.ModeReadOnly then exit;
   Editor.Strings.SetNewCommandMark;
 
@@ -1666,6 +1675,9 @@ begin
     Point(X2, Y2),
     SNew, true, true, FMatchEdPosAfterRep);
   Result:= true;
+
+  if FReplacedAtLine<>MaxInt then
+    Editor.DoEventChange(FReplacedAtLine);
 end;
 
 
