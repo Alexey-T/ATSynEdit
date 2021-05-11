@@ -654,6 +654,7 @@ type
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
     FGutterDecorImages: TImageList;
+    FGutterDecorAlignment: TAlignment;
     FGutterBandBookmarks: integer;
     FGutterBandNumbers: integer;
     FGutterBandStates: integer;
@@ -1384,6 +1385,7 @@ type
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read GetGutterDecor;
+    property GutterDecorAlignment: TAlignment read FGutterDecorAlignment write FGutterDecorAlignment;
     property GutterBandBookmarks: integer read FGutterBandBookmarks write FGutterBandBookmarks;
     property GutterBandNumbers: integer read FGutterBandNumbers write FGutterBandNumbers;
     property GutterBandStates: integer read FGutterBandStates write FGutterBandStates;
@@ -4222,6 +4224,7 @@ begin
   FOptGutterShowFoldLinesForCaret:= true;
   FOptGutterIcons:= cGutterIconsPlusMinus;
 
+  FGutterDecorAlignment:= taCenter;
   FGutterBandBookmarks:= 0;
   FGutterBandNumbers:= 1;
   FGutterBandStates:= 2;
@@ -7448,14 +7451,15 @@ procedure TATSynEdit.DoPaintGutterDecor(C: TCanvas; ALine: integer; const ARect:
 var
   Decor: TATGutterDecorItem;
   Style, StylePrev: TFontStyles;
-  N: integer;
   Ext: TSize;
+  N, NText: integer;
 begin
   if FGutterDecor=nil then exit;
   N:= FGutterDecor.Find(ALine);
   if N<0 then exit;
   Decor:= FGutterDecor[N];
 
+  //paint decor text
   if Decor.Data.Text<>'' then
   begin
     C.Font.Color:= Decor.Data.TextColor;
@@ -7469,14 +7473,25 @@ begin
 
     Ext:= C.TextExtent(Decor.Data.Text);
     C.Brush.Color:= Colors.GutterBG;
+
+    case FGutterDecorAlignment of
+      taCenter:
+        NText:= (ARect.Left+ARect.Right-Ext.cx) div 2;
+      taLeftJustify:
+        NText:= ARect.Left;
+      taRightJustify:
+        NText:= ARect.Right-Ext.cx;
+    end;
+
     C.TextOut(
-      (ARect.Left+ARect.Right-Ext.cx) div 2,
+      NText,
       (ARect.Top+ARect.Bottom-Ext.cy) div 2,
       Decor.Data.Text
       );
     C.Font.Style:= StylePrev;
   end
   else
+  //paint decor icon
   if Assigned(FGutterDecorImages) then
   begin
     N:= Decor.Data.ImageIndex;

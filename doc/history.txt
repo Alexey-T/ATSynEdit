@@ -1,4 +1,7 @@
 
+2021.05.11
++ add: prop GutterDecorAlignment
+
 2021.04.30
 * changed OptUnprintedEndArrowOrDot (bool) to OptUnprintedEndSymbol (0, 1, 2)
 
