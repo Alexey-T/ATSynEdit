@@ -46,6 +46,8 @@ type
     procedure MicromapDraw(Sender: TObject; C: TCanvas; const ARect: TRect);
     procedure DoMenu;
     procedure MenuItemClick(Sender: TObject);
+  protected
+    function DoMouseWheel(Shift: TShiftState; WheelDelta: integer; MousePos: TPoint): boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -215,14 +217,15 @@ end;
 procedure TATComboEdit.MenuItemClick(Sender: TObject);
 var
   PrevRO: boolean;
-  n: integer;
+  N: integer;
 begin
-  n:= (Sender as TMenuItem).Tag;
-  if n>=0 then
+  N:= (Sender as TMenuItem).Tag;
+  if N>=0 then
   begin
+    FItemIndex:= N;
     PrevRO:= ModeReadOnly;
     ModeReadOnly:= false;
-    Text:= UTF8Decode(FItems[n]);
+    Text:= UTF8Decode(FItems[N]);
     DoEventChange(0);
     ModeReadOnly:= PrevRO;
 
@@ -230,6 +233,15 @@ begin
     DoScrollByDelta(-10000, 0);
     DoCommand(cCommand_SelectAll);
   end;
+end;
+
+function TATComboEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
+  MousePos: TPoint): boolean;
+begin
+  if ModeReadOnly then
+    DoComboUpDown(WheelDelta<0)
+  else
+    Result:= inherited;
 end;
 
 procedure TATComboEdit.DoCommand(ACmd: integer; const AText: atString);
@@ -257,12 +269,21 @@ begin
 end;
 
 procedure TATComboEdit.DoComboUpDown(ADown: boolean);
+var
+  bPrevRO: boolean;
 begin
   if FItems.Count=0 then exit;
-  if ADown then Inc(FItemIndex) else Dec(FItemIndex);
+  if ADown then
+    Inc(FItemIndex)
+  else
+    Dec(FItemIndex);
   FItemIndex:= Max(0, Min(FItems.Count-1, FItemIndex));
 
+  bPrevRO:= ModeReadOnly;
+  ModeReadOnly:= false;
   Text:= Utf8Decode(FItems[FItemIndex]);
+  ModeReadOnly:= bPrevRO;
+
   DoEventChange(0);
   DoCommand(cCommand_SelectAll);
 end;
