@@ -239,7 +239,10 @@ function TATComboEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
 begin
   if ModeReadOnly then
-    DoComboUpDown(WheelDelta<0)
+  begin
+    DoComboUpDown(WheelDelta<0);
+    Result:= true;
+  end
   else
     Result:= inherited;
 end;
