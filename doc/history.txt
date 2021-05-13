@@ -1,6 +1,6 @@
 
 2021.05.13
-+ add: prop OptBorderVisible
++ add: prop OptBorderVisible (border inside the control, note that BorderStyle is border around the control)
 
 2021.05.11
 + add: prop GutterDecorAlignment
