@@ -1,4 +1,7 @@
 
+2021.05.13
++ add: prop OptBorderVisible
+
 2021.05.11
 + add: prop GutterDecorAlignment
 
