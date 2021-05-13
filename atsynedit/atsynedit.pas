@@ -800,6 +800,7 @@ type
     FOptIndentSize: integer;
     FOptIndentKeepsAlign: boolean;
     FOptIndentMakesWholeLinesSelection: boolean;
+    FOptBorderVisible: boolean;
     FOptBorderWidth: integer;
     FOptBorderWidthFocused: integer;
     FOptBorderFocusedActive: boolean;
@@ -1737,6 +1738,7 @@ type
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterShowFoldLinesForCaret: boolean read FOptGutterShowFoldLinesForCaret write FOptGutterShowFoldLinesForCaret default true;
     property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
+    property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default true;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 0;
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
@@ -2817,9 +2819,10 @@ begin
   if FMicromapVisible then
     DoPaintMicromap(C);
 
-  if FOptBorderFocusedActive and FIsEntered then
+  if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
     DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
   else
+  if FOptBorderVisible and (FOptBorderWidth>0) then
     DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
 
   if FOptShowMouseSelFrame then
@@ -4254,8 +4257,9 @@ begin
   FOptNumbersShowCarets:= false;
   FOptNumbersIndentPercents:= cInitNumbersIndentPercents;
 
-  FOptBorderWidth:= 0;
-  FOptBorderWidthFocused:= 0;
+  FOptBorderVisible:= true;
+  FOptBorderWidth:= 1;
+  FOptBorderWidthFocused:= 1;
   FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;
