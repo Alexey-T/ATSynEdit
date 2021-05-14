@@ -13,10 +13,10 @@ end;
 
 procedure TATSynEdit.MarkerGotoLast(AndDelete: boolean;
   AIndentHorz, AIndentVert: integer);
+  //
 var
   Mark: TATMarkerItem;
-  X1, Y1, X2, Y2: integer;
-  Pnt: TPoint;
+  P1, P2: TPoint;
   NTag, i: integer;
 begin
   if FMarkers=nil then exit;
@@ -24,16 +24,16 @@ begin
   Mark:= FMarkers[FMarkers.Count-1];
   NTag:= Mark.Tag;
 
-  X1:= Mark.PosX;
-  Y1:= Mark.PosY;
+  P1.X:= Mark.PosX;
+  P1.Y:= Mark.PosY;
+  P2:= Mark.SelEnd;
 
-  Pnt:= Mark.SelEnd;
-  X2:= Pnt.X;
-  Y2:= Pnt.Y;
+  if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, false) then
+    SwapPoints(P1, P2);
 
   DoGotoPos(
-    Point(X1, Y1),
-    Point(X2, Y2),
+    P2,
+    P1,
     AIndentHorz,
     AIndentVert,
     true,
@@ -52,11 +52,17 @@ begin
         Mark:= FMarkers[i];
         if Mark.Tag=NTag then
         begin
-          Pnt:= Mark.SelEnd;
+          P1.X:= Mark.PosX;
+          P1.Y:= Mark.PosY;
+          P2:= Mark.SelEnd;
+
+          if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, false) then
+            SwapPoints(P1, P2);
+
           if (Mark.SelX<=0) and (Mark.SelY<=0) then
             Carets.Add(Mark.PosX, Mark.PosY)
           else
-            Carets.Add(Pnt.X, Pnt.Y, Mark.PosX, Mark.PosY);
+            Carets.Add(P2.X, P2.Y, P1.X, P1.Y);
           FMarkers.Delete(i);
         end;
       end;
