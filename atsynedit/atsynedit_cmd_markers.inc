@@ -17,7 +17,7 @@ procedure TATSynEdit.MarkerGotoLast(AndDelete: boolean;
 var
   Mark: TATMarkerItem;
   P1, P2: TPoint;
-  NTag, i: integer;
+  NTag, iMarker: integer;
 begin
   if FMarkers=nil then exit;
   if FMarkers.Count=0 then exit;
@@ -47,23 +47,25 @@ begin
     //Tag>0: delete also same tag marks
     //and place mul-carets
     if NTag>0 then
-      for i:= FMarkers.Count-1 downto 0 do
+      for iMarker:= FMarkers.Count-1 downto 0 do
       begin
-        Mark:= FMarkers[i];
+        Mark:= FMarkers[iMarker];
         if Mark.Tag=NTag then
         begin
-          P1.X:= Mark.PosX;
-          P1.Y:= Mark.PosY;
-          P2:= Mark.SelEnd;
-
-          if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, false) then
-            SwapPoints(P1, P2);
-
           if (Mark.SelX<=0) and (Mark.SelY<=0) then
             Carets.Add(Mark.PosX, Mark.PosY)
           else
+          begin
+            P1.X:= Mark.PosX;
+            P1.Y:= Mark.PosY;
+            P2:= Mark.SelEnd;
+
+            if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, false) then
+              SwapPoints(P1, P2);
+
             Carets.Add(P2.X, P2.Y, P1.X, P1.Y);
-          FMarkers.Delete(i);
+          end;
+          FMarkers.Delete(iMarker);
         end;
       end;
   end;
