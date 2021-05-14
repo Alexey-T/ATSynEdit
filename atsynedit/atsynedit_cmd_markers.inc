@@ -22,6 +22,7 @@ begin
   if FMarkers=nil then exit;
   if FMarkers.Count=0 then exit;
   Mark:= FMarkers[FMarkers.Count-1];
+  NTag:= Mark.Tag;
 
   X1:= Mark.PosX;
   Y1:= Mark.PosY;
@@ -41,7 +42,6 @@ begin
 
   if AndDelete then
   begin
-    NTag:= FMarkers[FMarkers.Count-1].Tag;
     FMarkers.Delete(FMarkers.Count-1);
 
     //Tag>0: delete also same tag marks
@@ -62,6 +62,7 @@ begin
       end;
   end;
 
+  DoCaretsSort; //must have here
   Update;
 end;
 
