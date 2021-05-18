@@ -160,6 +160,8 @@ type
     FCallbackString: string;
     FPlaceMarker: boolean;
     FReplacedAtLine: integer;
+    FLastTick: QWord;
+    FLastActionTime: QWord;
     //FReplacedAtEndOfText: boolean;
     //
     function IsSelStartsAtMatch: boolean;
@@ -208,6 +210,9 @@ type
     procedure UpdateFragments;
     function CurrentFragment: TATEditorFragment;
     property CurrentFragmentIndex: integer read FFragmentIndex write SetFragmentIndex;
+    //timing
+    procedure BeginTiming;
+    procedure EndTiming;
   protected
     procedure DoOnFound(AWithEvent: boolean); override;
     procedure DoConfirmReplace(APos, AEnd: TPoint; var AConfirmThis,
@@ -230,6 +235,7 @@ type
     property IndentVert: integer read FIndentVert write FIndentVert;
     property DataString: string read FDataString write FDataString;
     property CallbackString: string read FCallbackString write FCallbackString;
+    property LastActionTime: QWord read FLastActionTime;
     //
     constructor Create;
     destructor Destroy; override;
@@ -842,7 +848,9 @@ begin
   PosEnd.X:= Editor.Strings.LinesLen[Cnt-1];
   PosEnd.Y:= Cnt-1;
 
+  BeginTiming;
   Result:= FindMatch_InEditor(APosStart, PosEnd, false);
+  EndTiming;
 end;
 
 function TATEditorFinder.ConvertBufferPosToCaretPos(APos: integer): TPoint;
@@ -929,6 +937,7 @@ begin
   UpdateFragments;
   if OptRegex then
     UpdateBuffer;
+  BeginTiming;
 
   if FFragments.Count=0 then
     Result:= DoCount_InFragment(AWithEvent)
@@ -942,6 +951,8 @@ begin
     end;
     CurrentFragmentIndex:= 0;
   end;
+
+  EndTiming;
 end;
 
 procedure TATEditorFinder.DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
@@ -949,6 +960,7 @@ begin
   UpdateCarets(false);
   UpdateFragments;
   CurrentFragmentIndex:= 0;
+  BeginTiming;
 
   if OptRegex then
   begin
@@ -957,6 +969,8 @@ begin
   end
   else
     DoCollect_Usual(AResults, AWithEvent, false);
+
+  EndTiming;
 end;
 
 
@@ -972,6 +986,7 @@ begin
     raise Exception.Create('Finder Extract action called for non-regex mode');
   UpdateCarets(false);
   UpdateBuffer;
+  BeginTiming;
 
   AMatches.Clear;
   ListRes:= TATFinderResults.Create;
@@ -995,6 +1010,8 @@ begin
   finally
     FreeAndNil(ListRes);
   end;
+
+  EndTiming;
 end;
 
 function TATEditorFinder.DoAction_ReplaceAll: integer;
@@ -1003,6 +1020,7 @@ var
 begin
   Result:= 0;
   FReplacedAtLine:= MaxInt;
+  BeginTiming;
   if Editor.ModeReadOnly then exit;
   Editor.Strings.SetNewCommandMark;
 
@@ -1027,6 +1045,8 @@ begin
 
   if FReplacedAtLine<>MaxInt then
     Editor.DoEventChange(FReplacedAtLine);
+
+  EndTiming;
 end;
 
 
@@ -1219,6 +1239,7 @@ begin
   AChanged:= false;
   FReplacedAtLine:= MaxInt;
   UpdateCarets(true);
+  BeginTiming;
   if OptInSelection and not FinderCarets.IsSelection then exit;
 
   if not Assigned(Editor) then
@@ -1300,6 +1321,8 @@ begin
 
   if FReplacedAtLine<>MaxInt then
     Editor.DoEventChange(FReplacedAtLine);
+
+  EndTiming;
 end;
 
 
@@ -1639,6 +1662,7 @@ var
 begin
   Result:= false;
   FReplacedAtLine:= MaxInt;
+  BeginTiming;
   if Editor.ModeReadOnly then exit;
   Editor.Strings.SetNewCommandMark;
 
@@ -1678,6 +1702,8 @@ begin
 
   if FReplacedAtLine<>MaxInt then
     Editor.DoEventChange(FReplacedAtLine);
+
+  EndTiming;
 end;
 
 
@@ -2339,6 +2365,7 @@ const
   //
 begin
   Result:= 0;
+  BeginTiming;
   if Editor=nil then exit;
 
   if Editor.Strings.Count>=AMaxLines then
@@ -2429,6 +2456,20 @@ begin
   finally
     FreeAndNil(Results);
   end;
+
+  EndTiming;
 end;
+
+procedure TATEditorFinder.BeginTiming;
+begin
+  FLastTick:= GetTickCount64;
+  FLastActionTime:= 0;
+end;
+
+procedure TATEditorFinder.EndTiming;
+begin
+  FLastActionTime:= GetTickCount64-FLastTick;
+end;
+
 
 end.
