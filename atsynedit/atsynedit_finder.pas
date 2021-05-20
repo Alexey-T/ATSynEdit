@@ -2435,9 +2435,10 @@ begin
 
     Res:= Results.First;
 
-    //CudaText issue #3385. Sublime has this logic:
+    //CudaText issue #3385.
+    //Sublime has this logic, with option "Highlight all matches":
     //if first match is below the current view-area: scroll to it,
-    //if it is above: don't scroll.
+    //if it is visible or above: don't scroll.
     if AScrollTo1st then
       AScrollTo1st:= Res.FPos.Y>=Editor.LineBottom;
 
