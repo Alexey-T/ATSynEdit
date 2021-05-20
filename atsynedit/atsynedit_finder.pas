@@ -2435,6 +2435,13 @@ begin
 
     Res:= Results.First;
 
+    //issue #3385.
+    //Sublime has this logic:
+    //if first match is below the current view-area: scroll to it,
+    //if it is above: don't scroll.
+    if AScrollTo1st then
+      AScrollTo1st:= Res.FPos.Y>=Editor.LineBottom;
+
     if AScrollTo1st then
     begin
       if AMoveCaret then
