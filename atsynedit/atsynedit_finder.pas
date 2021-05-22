@@ -2352,6 +2352,7 @@ var
   Res: TATFinderResult;
   PosX, PosY, SelX, SelY: integer;
   AttrRec: TATLinePart;
+  bMatchVisible: boolean;
   iRes, iLine: integer;
 const
   MicromapMode: TATMarkerMicromapMode = mmmShowInTextAndMicromap;
@@ -2367,6 +2368,7 @@ begin
   Result:= 0;
   BeginTiming;
   if Editor=nil then exit;
+  bMatchVisible:= false;
 
   if Editor.Strings.Count>=AMaxLines then
     exit;
@@ -2393,6 +2395,10 @@ begin
     for iRes:= 0 to Results.Count-1 do
     begin
       Res:= Results[iRes];
+
+      if Editor.IsPosInVisibleArea(Res.FPos.X, Res.FPos.Y) then
+        bMatchVisible:= true;
+
       //single line attr
       if Res.FPos.Y=Res.FEnd.Y then
       begin
@@ -2439,8 +2445,15 @@ begin
     //Sublime has this logic, with option "Highlight all matches":
     //if first match is below the current view-area: scroll to it,
     //if it is visible or above: don't scroll.
+    //with the "wrapped search", scroll always.
     if AScrollTo1st then
-      AScrollTo1st:= Res.FPos.Y>=Editor.LineBottom;
+    begin
+      if bMatchVisible then
+        AScrollTo1st:= false
+      else
+      if not OptWrapped then
+        AScrollTo1st:= Res.FPos.Y>=Editor.LineBottom;
+    end;
 
     if AScrollTo1st then
     begin
