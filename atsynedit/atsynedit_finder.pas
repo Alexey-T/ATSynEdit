@@ -2396,8 +2396,9 @@ begin
     begin
       Res:= Results[iRes];
 
-      if Editor.IsPosInVisibleArea(Res.FPos.X, Res.FPos.Y) then
-        bMatchVisible:= true;
+      if not bMatchVisible then
+        if Editor.IsPosInVisibleArea(Res.FPos.X, Res.FPos.Y) then
+          bMatchVisible:= true;
 
       //single line attr
       if Res.FPos.Y=Res.FEnd.Y then
