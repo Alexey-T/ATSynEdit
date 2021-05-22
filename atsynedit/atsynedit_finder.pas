@@ -2443,10 +2443,10 @@ begin
     Res:= Results.First;
 
     //CudaText issue #3385.
-    //Sublime has this logic, with option "Highlight all matches":
-    //if first match is below the current view-area: scroll to it,
-    //if it is visible or above: don't scroll.
-    //with the "wrapped search", scroll always.
+    //trying to do the same as Sublime, with option "Highlight all matches":
+    //if any of matches is visible: don't scroll to 1st match. else:
+    //if 1st match is below the current view-area: scroll to it,
+    //if 1st match is above: scroll depends on "wrapped search".
     if AScrollTo1st then
     begin
       if bMatchVisible then
