@@ -202,7 +202,7 @@ begin
   FList:= Other.FList;
   FCount:= Other.FCount;
   FLenEol:= Other.FLenEol;
-  FVersion:= 0;
+  FVersion:= Other.FVersion;
 end;
 
 
