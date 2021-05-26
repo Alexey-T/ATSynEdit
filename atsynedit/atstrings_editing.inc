@@ -93,6 +93,7 @@ end;
 procedure TATStrings.TextInsert(AX, AY: integer; const AText: atString; AOverwrite: boolean; out AShift, APosAfter: TPoint);
 var
   Str, StrLead, StrTail: atString;
+  LastItem: PATStringItem;
   Block: TATStrings;
   BlockUTF8: TStringList;
   bNoFinalEolBefore,
@@ -110,12 +111,20 @@ begin
   if AText='' then Exit;
 
   Str:= Lines[AY];
-  bNoFinalEolBefore:= (Count=0) or (LinesEnds[Count-1]=cEndNone);
+
   bBlockWithEol:= SEndsWithEol(AText);
   bAtLineEnd:= AX>=Length(Str);
   bAtFileEnd:= bAtLineEnd and (AY>=Count-1);
   bAtEmptyLine:= Str='';
   //note: bools used for pasting block of n lines, yes/no final eol, at end of line
+
+  if Count=0 then
+    bNoFinalEolBefore:= true
+  else
+  begin
+    LastItem:= FList.GetItem(Count-1);
+    bNoFinalEolBefore:= bBlockWithEol and bAtFileEnd and ((LastItem^.CharLen>0) and (LastItem^.LineEnds=cEndNone));
+  end;
 
   if not bAtLineEnd then
   begin
@@ -203,9 +212,8 @@ begin
     LineInsertStrings(AY, Block, bUseBlockFinalEol);
 
     //fix CudaText issue #3408
-    if bBlockWithEol then
-      if bNoFinalEolBefore then
-        ActionDeleteFakeLineAndFinalEol;
+    if bNoFinalEolBefore then
+      ActionDeleteFakeLineAndFinalEol;
 
     if bBlockWithEol then
     begin
