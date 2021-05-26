@@ -118,13 +118,18 @@ begin
   bAtEmptyLine:= Str='';
   //note: bools used for pasting block of n lines, yes/no final eol, at end of line
 
-  if Count=0 then
-    bNoFinalEolBefore:= true
-  else
+  if bBlockWithEol and bAtFileEnd then
   begin
-    LastItem:= FList.GetItem(Count-1);
-    bNoFinalEolBefore:= bBlockWithEol and bAtFileEnd and ((LastItem^.CharLen>0) and (LastItem^.LineEnds=cEndNone));
-  end;
+    if Count=0 then
+      bNoFinalEolBefore:= true
+    else
+    begin
+      LastItem:= FList.GetItem(Count-1);
+      bNoFinalEolBefore:= (LastItem^.CharLen>0) and (LastItem^.LineEnds=cEndNone);
+    end
+  end
+  else
+    bNoFinalEolBefore:= false;
 
   if not bAtLineEnd then
   begin
