@@ -310,7 +310,7 @@ type
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true;
       AWithEvent: boolean=true; AWithUndo: boolean=true);
-    procedure LineMove(AIndexFrom, AIndexTo: integer);
+    procedure LineMove(AIndexFrom, AIndexTo: integer; AWithUndo: boolean=true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesAscii[Index: integer]: boolean read GetLineAscii;
     property LinesLen[Index: integer]: integer read GetLineLen;
@@ -1526,10 +1526,20 @@ begin
     ActionAddFakeLineIfNeeded;
 end;
 
-procedure TATStrings.LineMove(AIndexFrom, AIndexTo: integer);
+procedure TATStrings.LineMove(AIndexFrom, AIndexTo: integer; AWithUndo: boolean=true);
 var
-  NLine: integer;
+  ItemFrom, ItemTo: PATStringItem;
+  NLineMin: integer;
 begin
+  if AWithUndo then
+  begin
+    ItemFrom:= GetItemPtr(AIndexFrom);
+    ItemTo:= GetItemPtr(AIndexTo);
+
+    AddUndoItem(aeaDelete, AIndexFrom, ItemFrom^.Line, ItemFrom^.LineEnds, ItemFrom^.LineState, FCommandCode);
+    AddUndoItem(aeaInsert, AIndexTo, ItemTo^.Line, ItemTo^.LineEnds, ItemTo^.LineState, FCommandCode);
+  end;
+
   FList.Move(AIndexFrom, AIndexTo);
 
   LinesState[AIndexFrom]:= cLineStateChanged;
@@ -1539,9 +1549,10 @@ begin
     LinesEnds[AIndexTo]:= Endings;
 
   ActionAddFakeLineIfNeeded;
+  Modified:= true;
 
-  NLine:= Min(AIndexFrom, AIndexTo);
-  DoEventLog(NLine);
+  NLineMin:= Min(AIndexFrom, AIndexTo);
+  DoEventLog(NLineMin);
 end;
 
 function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
