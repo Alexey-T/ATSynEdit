@@ -95,6 +95,7 @@ var
   Str, StrLead, StrTail: atString;
   Block: TATStrings;
   BlockUTF8: TStringList;
+  bNoFinalEolBefore,
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
   BlockOriginalLineCount: integer;
@@ -109,6 +110,7 @@ begin
   if AText='' then Exit;
 
   Str:= Lines[AY];
+  bNoFinalEolBefore:= (Count=0) or (LinesEnds[Count-1]=cEndNone);
   bBlockWithEol:= SEndsWithEol(AText);
   bAtLineEnd:= AX>=Length(Str);
   bAtFileEnd:= bAtLineEnd and (AY>=Count-1);
@@ -199,6 +201,11 @@ begin
       bUseBlockFinalEol:= bBlockWithEol;
 
     LineInsertStrings(AY, Block, bUseBlockFinalEol);
+
+    //fix CudaText issue #3408
+    if bBlockWithEol then
+      if bNoFinalEolBefore then
+        ActionDeleteFakeLineAndFinalEol;
 
     if bBlockWithEol then
     begin
