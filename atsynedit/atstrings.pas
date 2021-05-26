@@ -1527,10 +1527,23 @@ begin
 end;
 
 procedure TATStrings.LineMove(AIndexFrom, AIndexTo: integer);
+var
+  NLine: integer;
 begin
   FList.Move(AIndexFrom, AIndexTo);
+
   LinesState[AIndexFrom]:= cLineStateChanged;
-  DoEventLog(Min(AIndexFrom, AIndexTo));
+  if LinesEnds[AIndexFrom]=cEndNone then
+    LinesEnds[AIndexFrom]:= Endings;
+  if LinesEnds[AIndexTo]=cEndNone then
+    LinesEnds[AIndexTo]:= Endings;
+
+  ActionAddFakeLineIfNeeded;
+
+  NLine:= Min(AIndexFrom, AIndexTo);
+  if NLine>0 then
+    Dec(NLine);
+  DoEventLog(NLine);
 end;
 
 function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
