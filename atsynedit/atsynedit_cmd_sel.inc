@@ -226,9 +226,12 @@ begin
       if NTo>=NLastLine then Exit;
       bLastNoEol:= (NTo+1=NLastLine) and (St.LinesEnds[NLastLine]=cEndNone);
 
+      {
       S:= St.Lines[NTo+1];
       St.LineDelete(NTo+1);
       St.LineInsert(NFrom, S);
+      }
+      St.LineMove(NTo+1, NFrom);
 
       if bLastNoEol then
         St.ActionDeleteFakeLineAndFinalEol;
@@ -254,9 +257,12 @@ begin
       if bLastNoEol then
         St.LinesEnds[NTo]:= St.Endings;
 
+      {
       S:= St.Lines[NFrom-1];
       St.LineDelete(NFrom-1);
       St.LineInsert(NTo, S);
+      }
+      St.LineMove(NFrom-1, NTo);
 
       if bLastNoEol then
         St.ActionDeleteFakeLineAndFinalEol;

@@ -310,6 +310,7 @@ type
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true;
       AWithEvent: boolean=true; AWithUndo: boolean=true);
+    procedure LineMove(AIndexFrom, AIndexTo: integer);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesAscii[Index: integer]: boolean read GetLineAscii;
     property LinesLen[Index: integer]: integer read GetLineLen;
@@ -1523,6 +1524,13 @@ begin
 
   if AForceLast then
     ActionAddFakeLineIfNeeded;
+end;
+
+procedure TATStrings.LineMove(AIndexFrom, AIndexTo: integer);
+begin
+  FList.Move(AIndexFrom, AIndexTo);
+  LinesState[AIndexFrom]:= cLineStateChanged;
+  DoEventLog(Min(AIndexFrom, AIndexTo));
 end;
 
 function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
