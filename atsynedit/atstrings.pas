@@ -1541,8 +1541,6 @@ begin
   ActionAddFakeLineIfNeeded;
 
   NLine:= Min(AIndexFrom, AIndexTo);
-  if NLine>0 then
-    Dec(NLine);
   DoEventLog(NLine);
 end;
 
