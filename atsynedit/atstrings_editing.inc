@@ -96,7 +96,7 @@ var
   LastItem: PATStringItem;
   Block: TATStrings;
   BlockUTF8: TStringList;
-  bNoFinalEolBefore,
+  bTrimRedundantEol,
   bAtLineEnd, bAtFileEnd, bAtEmptyLine,
   bBlockWithEol, bUseBlockFinalEol: boolean;
   BlockOriginalLineCount: integer;
@@ -121,15 +121,15 @@ begin
   if bBlockWithEol and bAtFileEnd then
   begin
     if Count=0 then
-      bNoFinalEolBefore:= true
+      bTrimRedundantEol:= true
     else
     begin
       LastItem:= FList.GetItem(Count-1);
-      bNoFinalEolBefore:= (LastItem^.CharLen>0) and (LastItem^.LineEnds=cEndNone);
+      bTrimRedundantEol:= (LastItem^.CharLen>0) and (LastItem^.LineEnds=cEndNone);
     end
   end
   else
-    bNoFinalEolBefore:= false;
+    bTrimRedundantEol:= false;
 
   if not bAtLineEnd then
   begin
@@ -217,7 +217,7 @@ begin
     LineInsertStrings(AY, Block, bUseBlockFinalEol);
 
     //fix CudaText issue #3408
-    if bNoFinalEolBefore then
+    if bTrimRedundantEol then
       ActionDeleteFakeLineAndFinalEol;
 
     if bBlockWithEol then
