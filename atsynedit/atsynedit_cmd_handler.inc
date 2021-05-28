@@ -644,11 +644,24 @@ begin
   FLastCommandChangedText2:= FLastCommandChangedText;
   FLastCommandChangedText:= cResultText in Res;
   if FLastCommandChangedText then
+  begin
     if ACmd<>cCommand_RepeatTextCommand then
     begin
       FLastTextCmd:= ACmd;
       FLastTextCmdText:= AText;
     end;
+
+    if IsCommandForDelayedParsing(ACmd) then
+    begin
+      InitTimerDelayedParsing;
+      FTimerDelayedParsing.Enabled:= false;
+      FTimerDelayedParsing.Enabled:= true;
+      FLastCommandDelayedParsingOnLine:= Min(
+        FLastCommandDelayedParsingOnLine,
+        Max(0, Carets[0].FirstTouchedLine-1)
+        );
+    end;
+  end;
 
   //this logic: to make like in SynWrite, option "Fixed column move".
   //arrows up/down must keep their column, even if sometimes they jump to shorter lines (caret_after_end: off).

@@ -483,6 +483,7 @@ type
     FTimerBlink: TTimer;
     FTimerScroll: TTimer;
     FTimerNiceScroll: TTimer;
+    FTimerDelayedParsing: TTimer;
     FPaintFlags: TATEditorInternalFlags;
     FPaintLocked: integer;
     FBitmap: TBitmap;
@@ -588,6 +589,7 @@ type
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;
+    FLastCommandDelayedParsingOnLine: integer;
     FLastLineOfSlowEvents: integer;
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
@@ -1004,6 +1006,7 @@ type
     procedure InitFoldedMarkTooltip;
     procedure InitFoldImageList;
     procedure InitMenuStd;
+    procedure InitTimerDelayedParsing;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuStdPopup(Sender: TObject);
@@ -1177,6 +1180,7 @@ type
     procedure TimerBlinkTick(Sender: TObject);
     procedure TimerScrollTick(Sender: TObject);
     procedure TimerNiceScrollTick(Sender: TObject);
+    procedure TimerDelayedParsingTick(Sender: TObject);
 
     //carets
     procedure DoCaretAddToPoint(AX, AY: integer);
@@ -4422,6 +4426,7 @@ begin
   FLastTextCmd:= 0;
   FLastTextCmdText:= '';
   FLastCommandChangedText:= false;
+  FLastCommandDelayedParsingOnLine:= MaxInt;
   FLastHotspot:= -1;
 
   FScrollVert.Clear;
@@ -4485,6 +4490,8 @@ begin
   FreeAndNil(FMinimapBmp);
   FreeAndNil(FMicromap);
   FreeAndNil(FFold);
+  if Assigned(FTimerDelayedParsing) then
+    FreeAndNil(FTimerDelayedParsing);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
@@ -8007,6 +8014,31 @@ procedure TATSynEdit.FlushEditingChangeLog(ALine: integer);
 begin
   if Assigned(FOnChangeLog) then
     FOnChangeLog(Self, ALine);
+end;
+
+procedure TATSynEdit.InitTimerDelayedParsing;
+begin
+  if FTimerDelayedParsing=nil then
+  begin
+    FTimerDelayedParsing:= TTimer.Create(Self);
+    FTimerDelayedParsing.Interval:= 250;
+    FTimerDelayedParsing.OnTimer:= @TimerDelayedParsingTick;
+  end;
+end;
+
+procedure TATSynEdit.TimerDelayedParsingTick(Sender: TObject);
+//const
+//  c: integer=0;
+begin
+  FTimerDelayedParsing.Enabled:= false;
+  if Assigned(FOnChangeLog) then
+    FOnChangeLog(Self, FLastCommandDelayedParsingOnLine);
+  {
+  //debug
+  inc(c);
+  Application.MainForm.Caption:= 'delayed parse: '+inttostr(c)+': '+inttostr(FLastCommandDelayedParsingOnLine);
+  }
+  FLastCommandDelayedParsingOnLine:= MaxInt;
 end;
 
 procedure TATSynEdit.DoStringsOnProgress(Sender: TObject);

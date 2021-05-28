@@ -250,6 +250,8 @@ var
 //will be undone in single step
 function IsCommandToUndoInOneStep(AValue: integer): boolean;
 
+function IsCommandForDelayedParsing(AValue: integer): boolean;
+
 implementation
 
 function IsCommandToUndoInOneStep(AValue: integer): boolean;
@@ -259,6 +261,18 @@ begin
     cCommand_MoveSelectionDown,
     cCommand_ClipboardPaste_Begin..
     cCommand_ClipboardPaste_End:
+      Result:= true;
+    else
+      Result:= false;
+  end;
+end;
+
+function IsCommandForDelayedParsing(AValue: integer): boolean;
+//to solve CudaText issue #3403 with "Move lines up/down" commands
+begin
+  case AValue of
+    cCommand_MoveSelectionUp,
+    cCommand_MoveSelectionDown:
       Result:= true;
     else
       Result:= false;
