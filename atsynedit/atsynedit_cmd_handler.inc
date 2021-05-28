@@ -651,6 +651,7 @@ begin
       FLastTextCmdText:= AText;
     end;
 
+    //to solve CudaText issue #3403
     if IsCommandForDelayedParsing(ACmd) then
     begin
       InitTimerDelayedParsing;
