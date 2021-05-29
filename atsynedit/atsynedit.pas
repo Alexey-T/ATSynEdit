@@ -2459,6 +2459,13 @@ var
 begin
   Result:= false;
 
+  if ModeOneLine then
+  begin
+    FScrollbarVert.Hide;
+    FScrollbarHorz.Hide;
+    exit;
+  end;
+
   NGapAll:= 0;
   NGapPos:= 0;
 
