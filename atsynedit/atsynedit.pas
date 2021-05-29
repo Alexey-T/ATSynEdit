@@ -583,6 +583,8 @@ type
     FMouseAutoScroll: TATEditorDirection;
     FMouseActions: TATEditorMouseActionArray;
     FLockInput: boolean;
+    FLastControlWidth: integer;
+    FLastControlHeight: integer;
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
@@ -5045,6 +5047,13 @@ end;
 procedure TATSynEdit.Resize;
 begin
   inherited;
+
+  //avoid setting FLineTopTodo, which breaks the v-scroll-pos, if huge line is wrapped
+  //and v-scroll-pos is in the middle of this line
+  if (Width=FLastControlWidth) and
+    (Height=FLastControlHeight) then exit;
+  FLastControlWidth:= Width;
+  FLastControlHeight:= Height;
 
   FLineTopTodo:= GetLineTop;
 
