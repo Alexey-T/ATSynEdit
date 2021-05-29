@@ -1007,6 +1007,7 @@ type
     procedure InitFoldImageList;
     procedure InitMenuStd;
     procedure InitTimerDelayedParsing;
+    procedure StartTimerDelayedParsing;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuStdPopup(Sender: TObject);
@@ -4111,6 +4112,8 @@ begin
   FCursorGutterNumbers:= crDefault;
   FCursorMinimap:= crDefault;
   FCursorMicromap:= crDefault;
+
+  InitTimerDelayedParsing;
 
   FTimerIdle:= TTimer.Create(Self);
   FTimerIdle.Enabled:= false;
@@ -8024,6 +8027,17 @@ begin
     FTimerDelayedParsing.Interval:= 250;
     FTimerDelayedParsing.OnTimer:= @TimerDelayedParsingTick;
   end;
+end;
+
+procedure TATSynEdit.StartTimerDelayedParsing;
+begin
+  FTimerDelayedParsing.Enabled:= false;
+  FTimerDelayedParsing.Enabled:= true;
+  if Carets.Count>0 then
+    FLastCommandDelayedParsingOnLine:= Min(
+      FLastCommandDelayedParsingOnLine,
+      Max(0, Carets[0].FirstTouchedLine-1)
+      );
 end;
 
 procedure TATSynEdit.TimerDelayedParsingTick(Sender: TObject);

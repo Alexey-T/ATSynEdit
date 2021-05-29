@@ -653,15 +653,7 @@ begin
 
     //to solve CudaText issue #3403
     if IsCommandForDelayedParsing(ACmd) then
-    begin
-      InitTimerDelayedParsing;
-      FTimerDelayedParsing.Enabled:= false;
-      FTimerDelayedParsing.Enabled:= true;
-      FLastCommandDelayedParsingOnLine:= Min(
-        FLastCommandDelayedParsingOnLine,
-        Max(0, Carets[0].FirstTouchedLine-1)
-        );
-    end;
+      StartTimerDelayedParsing;
   end;
 
   //this logic: to make like in SynWrite, option "Fixed column move".
@@ -674,7 +666,7 @@ begin
           Carets.UpdateMemory(cCaretMem_SaveX, false);
       end;
     {
-    // https://github.com/Alexey-T/CudaText/issues/1326
+    // CudaText issue #1326
     cCommand_ClipboardPaste,
     cCommand_ClipboardPaste_Select,
     cCommand_ClipboardAltPaste,
