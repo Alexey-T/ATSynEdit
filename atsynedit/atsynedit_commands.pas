@@ -275,6 +275,7 @@ begin
     cCommand_TextInsert,
     cCommand_KeyBackspace,
     cCommand_KeyDelete,
+    cCommand_KeyEnter,
     cCommand_TextDeleteLine,
     cCommand_TextDuplicateLine,
     cCommand_MoveSelectionUp,

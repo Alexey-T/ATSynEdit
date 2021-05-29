@@ -8041,6 +8041,7 @@ begin
 end;
 
 procedure TATSynEdit.TimerDelayedParsingTick(Sender: TObject);
+//to solve CudaText issue #3403
 //const
 //  c: integer=0;
 begin
