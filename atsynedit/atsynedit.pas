@@ -1006,7 +1006,6 @@ type
     procedure InitFoldedMarkTooltip;
     procedure InitFoldImageList;
     procedure InitMenuStd;
-    procedure InitTimerDelayedParsing;
     procedure StartTimerDelayedParsing;
     function IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
     procedure MenuClick(Sender: TObject);
@@ -4113,26 +4112,29 @@ begin
   FCursorMinimap:= crDefault;
   FCursorMicromap:= crDefault;
 
-  InitTimerDelayedParsing;
+  FTimerDelayedParsing:= TTimer.Create(Self);
+  FTimerDelayedParsing.Enabled:= false;
+  FTimerDelayedParsing.Interval:= 300;
+  FTimerDelayedParsing.OnTimer:= @TimerDelayedParsingTick;
 
   FTimerIdle:= TTimer.Create(Self);
   FTimerIdle.Enabled:= false;
   FTimerIdle.OnTimer:=@TimerIdleTick;
 
   FTimerBlink:= TTimer.Create(Self);
+  FTimerBlink.Enabled:= false;
   SetCaretBlinkTime(cInitCaretBlinkTime);
   FTimerBlink.OnTimer:= @TimerBlinkTick;
-  FTimerBlink.Enabled:= false; //true;
 
   FTimerScroll:= TTimer.Create(Self);
+  FTimerScroll.Enabled:= false;
   FTimerScroll.Interval:= cInitTimerAutoScroll;
   FTimerScroll.OnTimer:= @TimerScrollTick;
-  FTimerScroll.Enabled:= false;
 
   FTimerNiceScroll:= TTimer.Create(Self);
+  FTimerNiceScroll.Enabled:= false;
   FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
   FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
-  FTimerNiceScroll.Enabled:= false;
 
   FBitmap:= Graphics.TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
@@ -4493,8 +4495,7 @@ begin
   FreeAndNil(FMinimapBmp);
   FreeAndNil(FMicromap);
   FreeAndNil(FFold);
-  if Assigned(FTimerDelayedParsing) then
-    FreeAndNil(FTimerDelayedParsing);
+  FreeAndNil(FTimerDelayedParsing);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
@@ -8017,16 +8018,6 @@ procedure TATSynEdit.FlushEditingChangeLog(ALine: integer);
 begin
   if Assigned(FOnChangeLog) then
     FOnChangeLog(Self, ALine);
-end;
-
-procedure TATSynEdit.InitTimerDelayedParsing;
-begin
-  if FTimerDelayedParsing=nil then
-  begin
-    FTimerDelayedParsing:= TTimer.Create(Self);
-    FTimerDelayedParsing.Interval:= 250;
-    FTimerDelayedParsing.OnTimer:= @TimerDelayedParsingTick;
-  end;
 end;
 
 procedure TATSynEdit.StartTimerDelayedParsing;
