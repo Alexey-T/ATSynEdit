@@ -268,11 +268,13 @@ begin
 end;
 
 function IsCommandForDelayedParsing(AValue: integer): boolean;
-//to solve CudaText issue #3403 with "Move lines up/down" commands
+//to solve CudaText issue #3403 with "Move lines up/down" and similar commands
 begin
   case AValue of
     cCommand_MoveSelectionUp,
-    cCommand_MoveSelectionDown:
+    cCommand_MoveSelectionDown,
+    cCommand_TextDeleteLine,
+    cCommand_TextDuplicateLine:
       Result:= true;
     else
       Result:= false;
