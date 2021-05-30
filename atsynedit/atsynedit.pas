@@ -305,6 +305,9 @@ const
   cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
   cInitCaretsPrimitiveColumnSelection = true;
   cInitCaretsMultiToColumnSel = true;
+  cInitBorderVisible = true;
+  cInitBorderWidth = 1;
+  cInitBorderWidthFocused = 1;
   cInitRulerNumeration = cRulerNumeration_0_10_20;
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
@@ -1744,9 +1747,9 @@ type
     property OptGutterShowFoldLinesAll: boolean read FOptGutterShowFoldLinesAll write FOptGutterShowFoldLinesAll default false;
     property OptGutterShowFoldLinesForCaret: boolean read FOptGutterShowFoldLinesForCaret write FOptGutterShowFoldLinesForCaret default true;
     property OptGutterIcons: TATEditorGutterIcons read FOptGutterIcons write FOptGutterIcons default cGutterIconsPlusMinus;
-    property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default true;
-    property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default 0;
-    property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default 0;
+    property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default cInitBorderVisible;
+    property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default cInitBorderWidth;
+    property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default cInitBorderWidthFocused;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
@@ -4275,9 +4278,9 @@ begin
   FOptNumbersShowCarets:= false;
   FOptNumbersIndentPercents:= cInitNumbersIndentPercents;
 
-  FOptBorderVisible:= true;
-  FOptBorderWidth:= 1;
-  FOptBorderWidthFocused:= 1;
+  FOptBorderVisible:= cInitBorderVisible;
+  FOptBorderWidth:= cInitBorderWidth;
+  FOptBorderWidthFocused:= cInitBorderWidthFocused;
   FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;
