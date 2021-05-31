@@ -6689,14 +6689,14 @@ begin
 end;
 
 
-function TATSynEdit.DoEventCommand(ACommand: integer; const AText: string): boolean; inline;
+function TATSynEdit.DoEventCommand(ACommand: integer; const AText: string): boolean;
 begin
   Result:= false;
   if Assigned(FOnCommand) then
     FOnCommand(Self, ACommand, AText, Result);
 end;
 
-procedure TATSynEdit.DoEventCommandAfter(ACommand: integer; const AText: string); inline;
+procedure TATSynEdit.DoEventCommandAfter(ACommand: integer; const AText: string);
 begin
   if Assigned(FOnCommandAfter) then
     FOnCommandAfter(Self, ACommand, AText);

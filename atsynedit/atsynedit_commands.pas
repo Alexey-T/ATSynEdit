@@ -269,19 +269,9 @@ end;
 
 function IsCommandForDelayedParsing(AValue: integer): boolean;
 //to solve CudaText issue #3403:
-//holding hotkey for editing-command breaks syntax highlight
+//holding hotkey for 'move lines up/down' breaks syntax highlight
 begin
   case AValue of
-    {
-    cCommand_TextInsert,
-    cCommand_KeyBackspace,
-    cCommand_KeyDelete,
-    cCommand_KeyEnter,
-    }
-    {
-    cCommand_TextDeleteLine,
-    cCommand_TextDuplicateLine,
-    }
     cCommand_MoveSelectionUp,
     cCommand_MoveSelectionDown:
       Result:= true;
