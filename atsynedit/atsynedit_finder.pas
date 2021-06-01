@@ -2370,6 +2370,7 @@ begin
   if Editor=nil then exit;
   bMatchVisible:= false;
 
+  if StrFind='' then exit;
   if Editor.Strings.Count>=AMaxLines then
     exit;
 
@@ -2451,9 +2452,11 @@ begin
     begin
       if bMatchVisible then
         AScrollTo1st:= false
+      { //fixing issue #3422
       else
       if not OptWrapped then
         AScrollTo1st:= Res.FPos.Y>=Editor.LineBottom;
+        }
     end;
 
     if AScrollTo1st then
