@@ -2452,7 +2452,7 @@ begin
     begin
       if bMatchVisible then
         AScrollTo1st:= false
-      { //fixing issue #3422
+      { //commented to fix issue #3422
       else
       if not OptWrapped then
         AScrollTo1st:= Res.FPos.Y>=Editor.LineBottom;
