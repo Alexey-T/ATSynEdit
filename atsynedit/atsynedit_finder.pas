@@ -2459,14 +2459,16 @@ begin
         }
     end;
 
+    if AMoveCaret then
+    begin
+      Editor.DoCaretSingle(Res.FPos.X, Res.FPos.Y);
+      Editor.DoEventCarets;
+    end;
+
+    //handle AScrollTo1st independent from AMoveCaret, because we need caret jump anyway
+    //to indicate the match with a 'gutter highlight'
     if AScrollTo1st then
     begin
-      if AMoveCaret then
-      begin
-        Editor.DoCaretSingle(Res.FPos.X, Res.FPos.Y);
-        Editor.DoEventCarets;
-      end;
-
       Editor.DoShowPos(
         Res.FPos,
         FIndentHorz,
