@@ -252,7 +252,7 @@ type
     function DoAction_ReplaceAll: integer;
     function DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
       AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer;
-      AScrollTo1st, AMoveCaret: boolean): integer;
+      AScrollTo1stNeeded, AScrollTo1stForced, AMoveCaret: boolean): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
@@ -2346,7 +2346,8 @@ end;
 
 function TATEditorFinder.DoAction_HighlightAllEditorMatches(
   AColorBorder: TColor; AStyleBorder: TATLineStyle; ATagValue,
-  AMaxLines: integer; AScrollTo1st, AMoveCaret: boolean): integer;
+  AMaxLines: integer;
+  AScrollTo1stNeeded, AScrollTo1stForced, AMoveCaret: boolean): integer;
 var
   Results: TATFinderResults;
   Res: TATFinderResult;
@@ -2448,10 +2449,10 @@ begin
     //if any of matches is visible: don't scroll to 1st match. else:
     //if 1st match is below the current view-area: scroll to it,
     //if 1st match is above: scroll depends on "wrapped search".
-    if AScrollTo1st then
+    if AScrollTo1stNeeded then
     begin
       if bMatchVisible then
-        AScrollTo1st:= false
+        AScrollTo1stNeeded:= false
       { //commented to fix issue #3422
       else
       if not OptWrapped then
@@ -2467,7 +2468,7 @@ begin
 
     //handle AScrollTo1st independent from AMoveCaret, because we need caret jump anyway
     //to indicate the match with a 'gutter highlight'
-    if AScrollTo1st then
+    if AScrollTo1stNeeded or AScrollTo1stForced then
     begin
       Editor.DoShowPos(
         Res.FPos,
