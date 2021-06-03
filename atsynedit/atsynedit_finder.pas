@@ -252,7 +252,7 @@ type
     function DoAction_ReplaceAll: integer;
     function DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
       AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer;
-      AScrollTo1stNeeded, AScrollTo1stForced, AMoveCaret: boolean): integer;
+      AMoveCaret: boolean): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
@@ -2347,13 +2347,14 @@ end;
 function TATEditorFinder.DoAction_HighlightAllEditorMatches(
   AColorBorder: TColor; AStyleBorder: TATLineStyle; ATagValue,
   AMaxLines: integer;
-  AScrollTo1stNeeded, AScrollTo1stForced, AMoveCaret: boolean): integer;
+  AMoveCaret: boolean): integer;
 var
   Results: TATFinderResults;
   Res: TATFinderResult;
+  Caret: TATCaretItem;
   PosX, PosY, SelX, SelY: integer;
   AttrRec: TATLinePart;
-  bMatchVisible: boolean;
+  bMatchVisible, bChanged, bSel: boolean;
   iRes, iLine: integer;
 const
   MicromapMode: TATMarkerMicromapMode = mmmShowInTextAndMicromap;
@@ -2370,10 +2371,10 @@ begin
   BeginTiming;
   if Editor=nil then exit;
   bMatchVisible:= false;
-
   if StrFind='' then exit;
-  if Editor.Strings.Count>=AMaxLines then
-    exit;
+  if Editor.Strings.Count>=AMaxLines then exit;
+  if Editor.Carets.Count=0 then exit;
+  Caret:= Editor.Carets[0];
 
   Results:= TATFinderResults.Create;
   try
@@ -2442,44 +2443,28 @@ begin
         end;
     end;
 
-    Res:= Results.First;
+    //we found and highlighted all matches,
+    //now we need to do 'find next from caret' like Sublime does
+    OptFromCaret:= true;
+    Caret.GetRange(PosX, PosY, SelX, SelY, bSel);
+    Editor.DoCaretSingle(PosX, PosY);
 
-    //CudaText issue #3385.
-    //trying to do the same as Sublime, with option "Highlight all matches":
-    //if any of matches is visible: don't scroll to 1st match. else:
-    //if 1st match is below the current view-area: scroll to it,
-    //if 1st match is above: scroll depends on "wrapped search".
-    if AScrollTo1stNeeded then
+    if DoAction_FindOrReplace(
+      false{AReplace},
+      false,
+      bChanged,
+      false{AUpdateCaret}
+      ) then
     begin
-      if bMatchVisible then
-        AScrollTo1stNeeded:= false
-      { //commented to fix issue #3422
-      else
-      if not OptWrapped then
-        AScrollTo1st:= Res.FPos.Y>=Editor.LineBottom;
-        }
-    end;
-
-    if AMoveCaret then
-    begin
-      Editor.DoCaretSingle(Res.FPos.X, Res.FPos.Y);
-      Editor.DoEventCarets;
-    end;
-
-    //handle AScrollTo1st independent from AMoveCaret, because we need caret jump anyway
-    //to indicate the match with a 'gutter highlight'
-    if AScrollTo1stNeeded or AScrollTo1stForced then
-    begin
-      Editor.DoShowPos(
-        Res.FPos,
+      Editor.DoGotoPos(
+        FMatchEdPos,
+        FMatchEdEnd,
         FIndentHorz,
         100{big value to center vertically},
-        true{AUnfold},
-        false{AllowUpdate}
+        true{APlaceCaret},
+        true{ADoUnfold}
         );
     end;
-
-    Editor.Update;
   finally
     FreeAndNil(Results);
   end;
