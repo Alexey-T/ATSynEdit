@@ -350,19 +350,20 @@ end;
 
 procedure TATMarkers.DeleteWithTag(const ATag: Int64);
 var
-  NTagged, i: integer;
+  bAllTagged: boolean;
+  i: integer;
 begin
-  //optimized for the case 'all items have tag'
-  NTagged:= 0;
+  bAllTagged:= true;
   for i:= 0 to Count-1 do
-    if ItemPtr(i)^.Tag=ATag then
-      Inc(NTagged);
-  if NTagged=Count then
-  begin
-    Clear;
-    exit;
-  end;
+    if ItemPtr(i)^.Tag<>ATag then
+    begin
+      bAllTagged:= false;
+      Break;
+    end;
 
+  if bAllTagged then
+    Clear
+  else
   for i:= Count-1 downto 0 do
     if ItemPtr(i)^.Tag=ATag then
       Delete(i);
