@@ -176,6 +176,7 @@ const
   cCommand_ShuffleLines = 351;
 
   //first Paste command
+  cCommand_Clipboard_Begin = 1000;
   cCommand_ClipboardPaste_Begin = 1000;
   cCommand_ClipboardPaste = 1000;
   cCommand_ClipboardPaste_Select = 1001;
@@ -196,6 +197,7 @@ const
   cCommand_ClipboardAltAltPaste = 1015;
   //last Paste command
   cCommand_ClipboardPaste_End = 1015;
+  cCommand_Clipboard_End = 1015;
 
   cCommand_TextCaseLower = 1020;
   cCommand_TextCaseUpper = 1021;
@@ -252,6 +254,8 @@ function IsCommandToUndoInOneStep(AValue: integer): boolean;
 
 function IsCommandForDelayedParsing(AValue: integer): boolean;
 
+function IsCommandForClipboardAction(AValue: integer): boolean;
+
 implementation
 
 function IsCommandToUndoInOneStep(AValue: integer): boolean;
@@ -279,6 +283,18 @@ begin
       Result:= false;
   end;
 end;
+
+function IsCommandForClipboardAction(AValue: integer): boolean;
+begin
+  case AValue and not cCmdFlag_ResetSel of
+    cCommand_Clipboard_Begin..
+    cCommand_Clipboard_End:
+      Result:= true
+    else
+      Result:= false;
+  end;
+end;
+
 
 end.
 
