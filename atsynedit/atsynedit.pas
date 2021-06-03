@@ -620,6 +620,7 @@ type
     FOnChangeState: TNotifyEvent;
     FOnChangeCaretPos: TNotifyEvent;
     FOnChangeModified: TNotifyEvent;
+    FOnChangeBookmarks: TNotifyEvent;
     FOnScroll: TNotifyEvent;
     FOnClickGutter: TATSynEditClickGutterEvent;
     FOnClickMicromap: TATSynEditClickMicromapEvent;
@@ -905,6 +906,7 @@ type
     procedure ClearMouseDownVariables;
     procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
+    procedure DoChangeBookmarks;
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
     function GetAttribs: TATMarkers;
@@ -1449,7 +1451,7 @@ type
     function BookmarkDeleteByTagEx(const ATag: Int64; ABookmarksObj: TATBookmarks): boolean;
     function BookmarkDeleteByTag(const ATag: Int64): boolean;
     function BookmarkDeleteByTag_2(const ATag: Int64): boolean;
-    procedure BookmarkDeleteAll;
+    procedure BookmarkDeleteAll(AWithEvent: boolean=true);
     procedure BookmarkDeleteAll_2;
     procedure BookmarkInvertAll;
     procedure BookmarkGotoNext(ANext: boolean; AIndentHorz, AIndentVert: integer; AOnlyShownInList: boolean);
@@ -1617,6 +1619,7 @@ type
     property OnChangeModified: TNotifyEvent read FOnChangeModified write FOnChangeModified;
     property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
+    property OnChangeBookmarks: TNotifyEvent read FOnChangeBookmarks write FOnChangeBookmarks;
     property OnScroll: TNotifyEvent read FOnScroll write FOnScroll;
     property OnCommand: TATSynEditCommandEvent read FOnCommand write FOnCommand;
     property OnCommandAfter: TATSynEditCommandAfterEvent read FOnCommandAfter write FOnCommandAfter;
