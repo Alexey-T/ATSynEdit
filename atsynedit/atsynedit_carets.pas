@@ -53,6 +53,7 @@ type
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);
     procedure GetSelLines(out AFrom, ATo: integer; AllowNoSel: boolean=false);
+    function GetLeftEdge: TPoint;
     function Change(APosX, APosY, AEndX, AEndY: integer): boolean;
     procedure SwapSelection;
     function IsForwardSelection: boolean;
@@ -427,6 +428,15 @@ begin
   ATo:= Y2;
   //sel ended at line-start?
   if (X2=0) and (Y2>0) then Dec(ATo);
+end;
+
+function TATCaretItem.GetLeftEdge: TPoint;
+var
+  X1, Y1, X2, Y2: integer;
+  bSel: boolean;
+begin
+  GetRange(X1, Y1, X2, Y2, bSel);
+  Result:= Point(X1, Y1);
 end;
 
 function TATCaretItem.Change(APosX, APosY, AEndX, AEndY: integer): boolean;
