@@ -161,22 +161,27 @@ end;
 procedure TATSynEdit.BookmarkGotoNext(ANext: boolean; AIndentHorz,
   AIndentVert: integer; AOnlyShownInList: boolean);
 var
+  St: TATStrings;
   nLine, nLineOrig, nItem: integer;
 begin
+  St:= Strings;
+  if St.Count<=1 then exit;
+  if St.Bookmarks.Count=0 then exit;
+  if Carets.Count=0 then exit;
   nLine:= Carets[0].PosY;
   nLineOrig:= nLine;
   repeat
     if ANext then Inc(nLine) else Dec(nLine);
     if nLine=nLineOrig then exit;
 
-    if nLine>=Strings.Count then
+    if nLine>=St.Count then
       nLine:= 0;
     if nLine<0 then
-      nLine:= Strings.Count-1;
+      nLine:= St.Count-1;
 
-    nItem:= Strings.Bookmarks.Find(nLine);
+    nItem:= St.Bookmarks.Find(nLine);
     if (nItem>=0) and
-      (not AOnlyShownInList or Strings.Bookmarks[nItem]^.Data.ShowInBookmarkList) then
+      (not AOnlyShownInList or St.Bookmarks[nItem]^.Data.ShowInBookmarkList) then
     begin
       DoGotoPos(
         Point(0, nLine),
