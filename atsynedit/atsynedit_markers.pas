@@ -337,27 +337,27 @@ end;
 
 procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
 var
-  Item: TATMarkerItem;
+  Item: PATMarkerItem;
   i: integer;
 begin
   for i:= Count-1 downto 0 do
   begin
-    Item:= Items[i];
-    if IsPosInRange(Item.PosX, Item.PosY, AX1, AY1, AX2, AY2)=cRelateInside then
+    Item:= ItemPtr(i);
+    if IsPosInRange(Item^.PosX, Item^.PosY, AX1, AY1, AX2, AY2)=cRelateInside then
       Delete(i);
   end;
 end;
 
 procedure TATMarkers.DeleteWithTag(const ATag: Int64);
 var
-  NCount, i: integer;
+  NTagged, i: integer;
 begin
-  //optimized
-  NCount:= 0;
+  //optimized for the case 'all items have tag'
+  NTagged:= 0;
   for i:= 0 to Count-1 do
     if ItemPtr(i)^.Tag=ATag then
-      Inc(NCount);
-  if NCount=Count then
+      Inc(NTagged);
+  if NTagged=Count then
   begin
     Clear;
     exit;
