@@ -251,8 +251,7 @@ type
       ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
     function DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
-      AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer;
-      AMoveCaret: boolean): integer;
+      AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer): integer;
     //
     property OnFound: TATFinderFound read FOnFound write FOnFound;
     property OnConfirmReplace: TATFinderConfirmReplace read FOnConfirmReplace write FOnConfirmReplace;
@@ -2346,15 +2345,13 @@ end;
 
 function TATEditorFinder.DoAction_HighlightAllEditorMatches(
   AColorBorder: TColor; AStyleBorder: TATLineStyle; ATagValue,
-  AMaxLines: integer;
-  AMoveCaret: boolean): integer;
+  AMaxLines: integer): integer;
 var
   Results: TATFinderResults;
   Res: TATFinderResult;
-  Caret: TATCaretItem;
   PosX, PosY, SelX, SelY: integer;
   AttrRec: TATLinePart;
-  bMatchVisible, bChanged, bSel: boolean;
+  bMatchVisible: boolean;
   iRes, iLine: integer;
 const
   MicromapMode: TATMarkerMicromapMode = mmmShowInTextAndMicromap;
@@ -2373,8 +2370,6 @@ begin
   bMatchVisible:= false;
   if StrFind='' then exit;
   if Editor.Strings.Count>=AMaxLines then exit;
-  if Editor.Carets.Count=0 then exit;
-  Caret:= Editor.Carets[0];
 
   Results:= TATFinderResults.Create;
   try
@@ -2441,29 +2436,6 @@ begin
 
           Editor.Attribs.Add(PosX, PosY, ATagValue, SelX, SelY, GetAttrObj, 0, MicromapMode);
         end;
-    end;
-
-    //we found and highlighted all matches,
-    //now we need to do 'find next from caret' like Sublime does
-    OptFromCaret:= true;
-    Caret.GetRange(PosX, PosY, SelX, SelY, bSel);
-    Editor.DoCaretSingle(PosX, PosY);
-
-    if DoAction_FindOrReplace(
-      false{AReplace},
-      false,
-      bChanged,
-      false{AUpdateCaret}
-      ) then
-    begin
-      Editor.DoGotoPos(
-        FMatchEdPos,
-        FMatchEdEnd,
-        FIndentHorz,
-        100{big value to center vertically},
-        true{APlaceCaret},
-        true{ADoUnfold}
-        );
     end;
   finally
     FreeAndNil(Results);
