@@ -1858,6 +1858,10 @@ begin
   bEnableEventBefore:= (NEventY>=0) and (NEventY<>FLastUndoY);
   FLastUndoY:= NEventY;
 
+  //fixing issue #3427, flag nnnAfter must be false if nnnBefore=false
+  if not bEnableEventBefore then
+    bEnableEventAfter:= false;
+
   if bWithoutPause then
   begin
     bEnableEventBefore:= false;
