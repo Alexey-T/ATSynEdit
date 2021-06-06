@@ -14,10 +14,9 @@ uses
   ATStringProc;
 
 type
-  TATGapFormVisible = (
-    gfvUnknown,
-    gfvShown,
-    gfvHidden
+  TATGapFormState = (
+    gfsUnknown,
+    gfsShown
     );
 
 type
@@ -30,7 +29,7 @@ type
     Color: TColor;
     Bitmap: TBitmap;
     Form: TCustomForm;
-    FormVisible: TATGapFormVisible;
+    FormState: TATGapFormState;
     Tag: Int64;
     DeleteOnDelLine: boolean;
     constructor Create; virtual;

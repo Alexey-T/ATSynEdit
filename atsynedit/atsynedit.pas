@@ -3904,7 +3904,7 @@ begin
     RHere.Right:= RHere.Left + AGap.Form.Width;
     RHere.Bottom:= RHere.Top + AGap.Size;
     AGap.Form.BoundsRect:= RHere;
-    AGap.FormVisible:= gfvShown;
+    AGap.FormState:= gfsShown;
   end
   else
   if Assigned(FOnDrawGap) then
@@ -8905,24 +8905,15 @@ begin
     for i:= 0 to Gaps.Count-1 do
       with Gaps[i] do
         if Assigned(Form) then
-          FormVisible:= gfvUnknown;
-    exit;
+          FormState:= gfsUnknown;
+  end
+  else
+  begin
+    for i:= 0 to Gaps.Count-1 do
+      with Gaps[i] do
+        if Assigned(Form) then
+          Form.Visible:= FormState=gfsShown;
   end;
-
-  for i:= 0 to Gaps.Count-1 do
-    with Gaps[i] do
-      if Assigned(Form) then
-        case FormVisible of
-          gfvUnknown:
-            begin
-              FormVisible:= gfvHidden;
-              Form.Hide;
-            end;
-          gfvShown:
-            begin
-              Form.Show;
-            end;
-        end;
 end;
 
 {$I atsynedit_carets.inc}
