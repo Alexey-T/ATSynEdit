@@ -8317,7 +8317,7 @@ begin
   ARect.Bottom:= Pnt.Y;
 
   //gap can be scrolled away: return False
-  if ARect.Bottom<0 then exit;
+  if ARect.Bottom<=FRectMain.Top then exit;
   if ARect.Top>=FRectMain.Bottom then exit;
 
   Result:= true;
