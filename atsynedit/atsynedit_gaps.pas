@@ -9,7 +9,8 @@ unit ATSynEdit_Gaps;
 interface
 
 uses
-  SysUtils, Classes, Graphics, Controls, Math,
+  SysUtils, Classes, Graphics, Controls, Forms,
+  Math,
   ATStringProc;
 
 type
@@ -21,10 +22,12 @@ type
     Size: integer;
     Color: TColor;
     Bitmap: TBitmap;
+    Form: TCustomForm;
     Tag: Int64;
     DeleteOnDelLine: boolean;
     constructor Create; virtual;
     destructor Destroy; override;
+    function GetObjectWidth: integer;
   end;
 
 type
@@ -48,7 +51,8 @@ type
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATGapItem read GetItem; default;
     procedure Delete(N: integer);
-    function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; const ATag: Int64;
+    function Add(ALineIndex, ASize: integer; ABitmap: TBitmap; AForm: TCustomForm;
+      const ATag: Int64;
       AColor: TColor=clNone; ADeleteOnDelLine: boolean=true): boolean;
     function Find(ALineIndex: integer; ATag: Int64=-1): TATGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
@@ -61,14 +65,14 @@ type
     property OnDelete: TATGapDeleteEvent read FOnDelete write FOnDelete;
   end;
 
-function GetGapBitmapPosLeft(const ARect: TRect; ABitmap: TBitmap): integer;
+function GetGapBitmapPosLeft(const ARect: TRect; AObjectWidth: integer): integer;
 
 
 implementation
 
-function GetGapBitmapPosLeft(const ARect: TRect; ABitmap: TBitmap): integer;
+function GetGapBitmapPosLeft(const ARect: TRect; AObjectWidth: integer): integer;
 begin
-  Result:= Max(ARect.Left, (ARect.Left+ARect.Right-ABitmap.Width) div 2);
+  Result:= Max(ARect.Left, (ARect.Left+ARect.Right-AObjectWidth) div 2);
 end;
 
 
@@ -86,6 +90,17 @@ begin
   if Bitmap<>nil then
     FreeAndNil(Bitmap);
   inherited;
+end;
+
+function TATGapItem.GetObjectWidth: integer;
+begin
+  if Assigned(Bitmap) then
+    Result:= Bitmap.Width
+  else
+  if Assigned(Form) then
+    Result:= Form.Width
+  else
+    Result:= 0;
 end;
 
 { TATGaps }
@@ -188,7 +203,8 @@ begin
 end;
 
 function TATGaps.Add(ALineIndex, ASize: integer; ABitmap: TBitmap;
-  const ATag: Int64; AColor: TColor; ADeleteOnDelLine: boolean): boolean;
+  AForm: TCustomForm; const ATag: Int64; AColor: TColor;
+  ADeleteOnDelLine: boolean): boolean;
 var
   Item: TATGapItem;
 begin
@@ -200,6 +216,7 @@ begin
   Item.LineIndex:= ALineIndex;
   Item.Size:= ASize;
   Item.Bitmap:= ABitmap;
+  Item.Form:= AForm;
   Item.Tag:= ATag;
   Item.Color:= AColor;
   Item.DeleteOnDelLine:= ADeleteOnDelLine;

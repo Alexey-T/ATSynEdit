@@ -292,6 +292,7 @@ var
   CharOffsets: TATIntFixedArray;
   NLineLenOriginal, NLineLenTrimmed: integer;
   NIndex, NIndexDecrement, NPixels: integer;
+  NGapObjectWidth: integer;
   Item: TATWrapItem;
   ItemGap: TATGapItem;
   Str: atString;
@@ -343,8 +344,9 @@ begin
         begin
           ADetails.OnGapItem:= ItemGap;
           ADetails.OnGapPos.Y:= P.Y - (NPixels-ItemGap.Size);
-          if Assigned(ItemGap.Bitmap) then
-            ADetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, ItemGap.Bitmap)
+          NGapObjectWidth:= ItemGap.GetObjectWidth;
+          if NGapObjectWidth>0 then
+            ADetails.OnGapPos.X:= P.X - GetGapBitmapPosLeft(ARect, NGapObjectWidth)
           else
             ADetails.OnGapPos.X:= P.X - ARect.Left;
 
