@@ -917,6 +917,7 @@ type
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
     function IsCaretOnVisibleRect: boolean;
+    procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
     procedure SetFoldingAsString(const AValue: string);
     procedure SetOptShowURLsRegex(const AValue: string);
@@ -3895,14 +3896,15 @@ begin
   else
   if Assigned(AGap.Form) then
   begin
-    AGap.Form.Parent:= Self;
     AGap.Form.BorderStyle:= bsNone;
+    AGap.Form.Parent:= Self;
     //RHere is rect of form, located at center of ARect
     RHere.Left:= GetGapBitmapPosLeft(ARect, AGap.Form.Width);
     RHere.Top:= ARect.Top;
     RHere.Right:= RHere.Left + AGap.Form.Width;
     RHere.Bottom:= RHere.Top + AGap.Size;
     AGap.Form.BoundsRect:= RHere;
+    AGap.FormVisible:= gfvShown;
   end
   else
   if Assigned(FOnDrawGap) then
@@ -4903,8 +4905,9 @@ begin
   FCaretShown:= false;
   Carets.GetSelections(FSel);
 
+  UpdateGapForms(true);
   DoPaintMain(C, ALineFrom);
-
+  UpdateGapForms(false);
   UpdateCaretsCoords;
 
   if Carets.Count>0 then
@@ -8891,6 +8894,33 @@ begin
       //FlushEditingChangeEx(cLineChangeEdited, FEditingTopLine, 1); //not needed
       FlushEditingChangeLog(St.EditingTopLine);
     end;
+end;
+
+procedure TATSynEdit.UpdateGapForms(ABeforePaint: boolean);
+var
+  i: integer;
+begin
+  if ABeforePaint then
+  begin
+    for i:= 0 to Gaps.Count-1 do
+      with Gaps[i] do
+        FormVisible:= gfvUnknown;
+    exit;
+  end;
+
+  for i:= 0 to Gaps.Count-1 do
+    with Gaps[i] do
+      case FormVisible of
+        gfvUnknown:
+          begin
+            FormVisible:= gfvHidden;
+            Form.Hide;
+          end;
+        gfvShown:
+          begin
+            Form.Show;
+          end;
+      end;
 end;
 
 {$I atsynedit_carets.inc}
