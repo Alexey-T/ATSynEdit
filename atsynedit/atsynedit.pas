@@ -3063,9 +3063,12 @@ begin
     end;
 
     //conside gap for this line
-    GapItem:= Gaps.Find(WrapInfo[NWrapIndex].NLineIndex);
-    if Assigned(GapItem) then
-      Inc(RectLine.Bottom, GapItem.Size);
+    if WrapInfo[NWrapIndex].NFinal=cWrapItemFinal then
+    begin
+      GapItem:= Gaps.Find(WrapInfo[NWrapIndex].NLineIndex);
+      if Assigned(GapItem) then
+        Inc(RectLine.Bottom, GapItem.Size);
+    end;
 
     DoPaintLine(C, RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex, FParts);
     if AWithGutter then
