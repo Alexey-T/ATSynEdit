@@ -8904,23 +8904,25 @@ begin
   begin
     for i:= 0 to Gaps.Count-1 do
       with Gaps[i] do
-        FormVisible:= gfvUnknown;
+        if Assigned(Form) then
+          FormVisible:= gfvUnknown;
     exit;
   end;
 
   for i:= 0 to Gaps.Count-1 do
     with Gaps[i] do
-      case FormVisible of
-        gfvUnknown:
-          begin
-            FormVisible:= gfvHidden;
-            Form.Hide;
-          end;
-        gfvShown:
-          begin
-            Form.Show;
-          end;
-      end;
+      if Assigned(Form) then
+        case FormVisible of
+          gfvUnknown:
+            begin
+              FormVisible:= gfvHidden;
+              Form.Hide;
+            end;
+          gfvShown:
+            begin
+              Form.Show;
+            end;
+        end;
 end;
 
 {$I atsynedit_carets.inc}
