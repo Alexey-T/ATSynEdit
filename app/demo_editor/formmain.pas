@@ -1616,7 +1616,7 @@ begin
     exit
   end;
 
-  ed_gap.SetBounds(R.Left, R.Top, R.Width, R.Height);
+  ed_gap.SetBounds(R.Left, R.Top, R.Width-1, R.Height);
   ed_gap.Show;
 end;
 

@@ -8310,12 +8310,16 @@ begin
   if not Gaps.IsIndexValid(AIndex) then exit;
   GapItem:= Gaps.Items[AIndex];
   Pnt:= CaretPosToClientPos(Point(0, GapItem.LineIndex+1));
-  if Pnt.Y<0 then exit;
 
   ARect.Left:= FRectMain.Left;
   ARect.Right:= FRectMain.Right;
   ARect.Top:= Pnt.Y - GapItem.Size;
   ARect.Bottom:= Pnt.Y;
+
+  //gap can be scrolled away: return False
+  if ARect.Bottom<0 then exit;
+  if ARect.Top>=FRectMain.Bottom then exit;
+
   Result:= true;
 end;
 
