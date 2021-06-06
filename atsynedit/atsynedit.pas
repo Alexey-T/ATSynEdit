@@ -8307,11 +8307,10 @@ begin
   Result:= false;
   ARect:= Rect(0, 0, 0, 0);
 
-  if not ((AIndex>=0) and (AIndex<Gaps.Count)) then exit;
-
+  if not Gaps.IsIndexValid(AIndex) then exit;
   GapItem:= Gaps.Items[AIndex];
   Pnt:= CaretPosToClientPos(Point(0, GapItem.LineIndex+1));
-  if Pnt.Y<GapItem.Size then exit;
+  if Pnt.Y<0 then exit;
 
   ARect.Left:= FRectMain.Left;
   ARect.Right:= FRectMain.Right;
