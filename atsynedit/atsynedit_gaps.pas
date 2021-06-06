@@ -52,6 +52,7 @@ type
       AColor: TColor=clNone; ADeleteOnDelLine: boolean=true): boolean;
     function Find(ALineIndex: integer; ATag: Int64=-1): TATGapItem;
     function DeleteForLineRange(ALineFrom, ALineTo: integer): boolean;
+    function DeleteWithTag(const ATag: Int64): boolean;
     function SizeForLineRange(ALineFrom, ALineTo: integer): integer;
     function SizeForAll: integer;
     property SizeOfGapTop: integer read FSizeOfGapTop;
@@ -162,6 +163,23 @@ begin
   begin
     Item:= Items[i];
     if (Item.LineIndex>=ALineFrom) and (Item.LineIndex<=ALineTo) then
+    begin
+      Delete(i);
+      Result:= true;
+    end;
+  end;
+end;
+
+function TATGaps.DeleteWithTag(const ATag: Int64): boolean;
+var
+  Item: TATGapItem;
+  i: integer;
+begin
+  Result:= false;
+  for i:= FList.Count-1 downto 0 do
+  begin
+    Item:= Items[i];
+    if Item.Tag=ATag then
     begin
       Delete(i);
       Result:= true;
