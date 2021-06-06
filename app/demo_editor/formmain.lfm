@@ -4,7 +4,7 @@ object fmMain: TfmMain
   Top = 168
   Width = 953
   Caption = 'Demo'
-  ClientHeight = 519
+  ClientHeight = 521
   ClientWidth = 953
   Menu = MainMenu1
   OnCreate = FormCreate
@@ -13,25 +13,25 @@ object fmMain: TfmMain
   LCLVersion = '2.1.0.0'
   object PanelMain: TPanel
     Left = 0
-    Height = 519
+    Height = 521
     Top = 0
     Width = 672
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 519
+    ClientHeight = 521
     ClientWidth = 672
     TabOrder = 0
     object Status: TStatusBar
       Left = 0
       Height = 20
-      Top = 499
+      Top = 501
       Width = 672
       Panels = <>
     end
     object StatusMsg: TStatusBar
       Left = 0
       Height = 20
-      Top = 479
+      Top = 481
       Width = 672
       Font.Color = clBlue
       Panels = <>
@@ -46,7 +46,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Side = asrCenter
       Left = 507
       Height = 14
-      Top = 482
+      Top = 484
       Width = 160
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
@@ -61,7 +61,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Side = asrCenter
       Left = 412
       Height = 22
-      Top = 478
+      Top = 480
       Width = 90
       Anchors = [akRight, akBottom]
       BorderSpacing.Right = 5
@@ -73,37 +73,37 @@ object fmMain: TfmMain
   end
   object PanelRt: TPanel
     Left = 672
-    Height = 519
+    Height = 521
     Top = 0
     Width = 281
     Align = alRight
     BevelOuter = bvNone
-    ClientHeight = 519
+    ClientHeight = 521
     ClientWidth = 281
     TabOrder = 1
     object chkGutter: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 8
-      Width = 68
+      Width = 57
       Caption = 'gutter'
       OnChange = chkGutterChange
       TabOrder = 0
     end
     object chkRuler: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 30
-      Width = 58
+      Width = 50
       Caption = 'ruler'
       OnChange = chkRulerChange
       TabOrder = 1
     end
     object chkMinimap: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 52
-      Width = 85
+      Width = 72
       Caption = 'minimap'
       OnChange = chkMinimapChange
       TabOrder = 2
@@ -114,7 +114,7 @@ object fmMain: TfmMain
       Left = 64
       Height = 17
       Top = 373
-      Width = 83
+      Width = 70
       Caption = 'fixed margin'
       ParentColor = False
     end
@@ -140,9 +140,9 @@ object fmMain: TfmMain
       TabOrder = 15
       object chkWrapOff: TRadioButton
         Left = 8
-        Height = 24
+        Height = 21
         Top = 0
-        Width = 46
+        Width = 38
         Caption = 'off'
         Checked = True
         OnChange = chkWrapOffChange
@@ -151,36 +151,36 @@ object fmMain: TfmMain
       end
       object chkWrapOn: TRadioButton
         Left = 8
-        Height = 24
+        Height = 21
         Top = 20
-        Width = 77
+        Width = 65
         Caption = 'window'
         OnChange = chkWrapOnChange
         TabOrder = 1
       end
       object chkWrapMargin: TRadioButton
         Left = 8
-        Height = 24
+        Height = 21
         Top = 40
-        Width = 73
+        Width = 63
         Caption = 'margin'
         OnChange = chkWrapMarginChange
         TabOrder = 2
       end
       object chkWrapIndent: TCheckBox
         Left = 8
-        Height = 24
+        Height = 21
         Top = 88
-        Width = 101
+        Width = 84
         Caption = 'with indent'
         OnChange = chkWrapIndentChange
         TabOrder = 4
       end
       object chkWrapWndMargin: TRadioButton
         Left = 8
-        Height = 24
+        Height = 21
         Top = 62
-        Width = 115
+        Width = 97
         Caption = 'min wnd/mrg'
         OnChange = chkWrapWndMarginChange
         TabOrder = 3
@@ -203,7 +203,7 @@ object fmMain: TfmMain
       Left = 64
       Height = 17
       Top = 277
-      Width = 58
+      Width = 47
       Caption = 'font size'
       ParentColor = False
     end
@@ -218,36 +218,36 @@ object fmMain: TfmMain
       TabOrder = 16
       object chkUnprintVis: TCheckBox
         Left = 8
-        Height = 24
+        Height = 21
         Top = 1
-        Width = 60
+        Width = 52
         Caption = 'show'
         OnChange = chkUnprintVisChange
         TabOrder = 0
       end
       object chkUnprintSp: TCheckBox
         Left = 8
-        Height = 24
+        Height = 21
         Top = 20
-        Width = 72
+        Width = 62
         Caption = 'spaces'
         OnChange = chkUnprintSpChange
         TabOrder = 1
       end
       object chkUnprintEnd: TCheckBox
         Left = 8
-        Height = 24
+        Height = 21
         Top = 40
-        Width = 58
+        Width = 50
         Caption = 'ends'
         OnChange = chkUnprintEndChange
         TabOrder = 2
       end
       object chkUnprintEndDet: TCheckBox
         Left = 8
-        Height = 24
+        Height = 21
         Top = 60
-        Width = 101
+        Width = 85
         Caption = 'end-details'
         OnChange = chkUnprintEndDetChange
         TabOrder = 3
@@ -270,7 +270,7 @@ object fmMain: TfmMain
       Left = 64
       Height = 17
       Top = 309
-      Width = 52
+      Width = 43
       Caption = 'tab size'
       ParentColor = False
     end
@@ -285,9 +285,9 @@ object fmMain: TfmMain
     end
     object chkMicromap: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 118
-      Width = 95
+      Width = 80
       Caption = 'micromap'
       OnChange = chkMicromapChange
       TabOrder = 5
@@ -308,7 +308,7 @@ object fmMain: TfmMain
       Left = 64
       Height = 17
       Top = 341
-      Width = 62
+      Width = 53
       Caption = 'spacing-y'
       ParentColor = False
     end
@@ -323,27 +323,27 @@ object fmMain: TfmMain
     end
     object chkMinimapLeft: TCheckBox
       Left = 30
-      Height = 24
+      Height = 21
       Top = 74
-      Width = 67
+      Width = 55
       Caption = 'at left'
       OnChange = chkMinimapLeftChange
       TabOrder = 3
     end
     object chkNewScroll: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 140
-      Width = 123
+      Width = 104
       Caption = 'new scrollbars'
       OnChange = chkNewScrollChange
       TabOrder = 6
     end
     object chkTabSpaces: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 162
-      Width = 116
+      Width = 99
       Caption = 'tab as spaces'
       OnChange = chkTabSpacesChange
       TabOrder = 7
@@ -354,7 +354,7 @@ object fmMain: TfmMain
       AnchorSideBottom.Control = PanelRt
       AnchorSideBottom.Side = asrBottom
       Left = 8
-      Height = 109
+      Height = 111
       Top = 408
       Width = 271
       Anchors = [akTop, akLeft, akRight, akBottom]
@@ -375,9 +375,9 @@ object fmMain: TfmMain
     end
     object chkMouseEn: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 184
-      Width = 150
+      Width = 128
       Caption = 'mouse sel enabled'
       Checked = True
       OnChange = chkMouseEnChange
@@ -386,9 +386,9 @@ object fmMain: TfmMain
     end
     object chkMinimapTooltip: TCheckBox
       Left = 30
-      Height = 24
+      Height = 21
       Top = 96
-      Width = 73
+      Width = 58
       Caption = 'tooltip'
       Checked = True
       OnChange = chkMinimapTooltipChange
@@ -397,9 +397,9 @@ object fmMain: TfmMain
     end
     object chkSmoothScroll: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 232
-      Width = 118
+      Width = 98
       Caption = 'smooth scroll'
       Checked = True
       OnChange = chkSmoothScrollChange
@@ -411,7 +411,7 @@ object fmMain: TfmMain
       AnchorSideLeft.Side = asrBottom
       AnchorSideTop.Control = LabelScale
       AnchorSideTop.Side = asrCenter
-      Left = 184
+      Left = 179
       Height = 46
       Top = 312
       Width = 88
@@ -428,15 +428,15 @@ object fmMain: TfmMain
       Left = 144
       Height = 17
       Top = 327
-      Width = 35
+      Width = 30
       Caption = 'Scale'
       ParentColor = False
     end
     object chkMouseColSelect: TCheckBox
       Left = 8
-      Height = 24
+      Height = 21
       Top = 208
-      Width = 123
+      Width = 105
       Caption = 'mouse vert sel'
       OnChange = chkMouseColSelectChange
       TabOrder = 9

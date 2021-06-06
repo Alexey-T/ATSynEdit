@@ -3895,6 +3895,8 @@ begin
   else
   if Assigned(AGap.Form) then
   begin
+    AGap.Form.Parent:= Self;
+    AGap.Form.BorderStyle:= bsNone;
     //RHere is rect of form, located at center of ARect
     RHere.Left:= GetGapBitmapPosLeft(ARect, AGap.Form.Width);
     RHere.Top:= ARect.Top;
