@@ -32,7 +32,11 @@ uses
   ATStringProc_WordJump,
   ATCanvasPrimitives,
   ATSynEdit_CharSizer,
+  {$ifndef USE_ATSYN_REGEXPR}
+  RegExpr,
+  {$else}
   ATSynEdit_RegExpr,
+  {$endif}
   ATSynEdit_Colors,
   ATSynEdit_Keymap,
   ATSynEdit_LineParts,
@@ -898,6 +902,9 @@ type
     FOptZebraStep: integer;
     FOptZebraAlphaBlend: byte;
     FOptDimUnfocusedBack: integer;
+    {$ifdef LCLGTK2}
+    FIMSelText: string;
+    {$endif}
 
     //
     class function CheckInputForNumberOnly(const S: UnicodeString; X: integer;
@@ -1564,6 +1571,11 @@ type
     procedure WMIME_EndComposition(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
     {$endif}
 
+    {$ifdef LCLGTK2}
+    procedure WM_GTK_IM_COMPOSITION(var Message: TLMessage); message
+      LM_IM_COMPOSITION;
+    {$endif}
+
   published
     property Align;
     property Anchors;
@@ -1895,6 +1907,10 @@ uses
   Dialogs,
   Types,
   Math,
+  {$ifdef LCLGTK2}
+  gtk2,
+  Gtk2Globals,
+  {$endif}
   ATSynEdit_Commands,
   ATSynEdit_Keymap_Init;
 
@@ -7597,6 +7613,51 @@ begin
   end;
 end;
 
+{$ifdef LCLGTK2}
+// fcitx IM
+procedure TATSynEdit.WM_GTK_IM_COMPOSITION(var Message: TLMessage);
+var
+  buffer: atString;
+  len: Integer;
+  bOverwrite, bSelect: Boolean;
+  Caret: TATCaretItem;
+begin
+  if (not ModeReadOnly) then
+  begin
+    if (Message.WParam and GTK_IM_FLAG_START<>0) then
+      FIMSelText:=TextSelected;
+    // to do : candidate position
+    // set candidate position
+    if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
+    begin
+      if Carets.Count>0 then
+      begin
+        Caret:= Carets[0];
+        IM_Context_Set_Cursor_Pos(Caret.CoordX,Caret.CoordY+TextCharSize.Y);
+      end;
+    end;
+    // valid string at composition & commit
+    if Message.WParam and (GTK_IM_FLAG_COMMIT or GTK_IM_FLAG_PREEDIT)<>0 then
+    begin
+      // insert preedit or commit string
+      buffer:=UTF8Decode(pchar(Message.LParam));
+      len:=Length(buffer);
+      bOverwrite:=ModeOverwrite and (Length(FIMSelText)=0);
+      bSelect:=len>0;
+      // commit
+      if Message.WParam and GTK_IM_FLAG_COMMIT<>0 then
+      begin
+        TextInsertAtCarets(buffer, False, bOverwrite, False);
+        FIMSelText:='';
+      end else
+        TextInsertAtCarets(buffer, False, False, bSelect);
+    end;
+    // end composition
+    if (Message.WParam and GTK_IM_FLAG_END<>0) and (FIMSelText<>'') then
+      TextInsertAtCarets(FIMSelText, False, False, False);
+  end;
+end;
+{$endif}
 
 procedure TATSynEdit.DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
 var
@@ -8942,8 +9003,10 @@ initialization
 
   RegExprModifierS:= False;
   RegExprModifierM:= True;
+  {$ifdef USE_ATSYN_REGEXPR}
   RegExprUsePairedBreak:= False;
   RegExprReplaceLineBreak:= #10;
+  {$endif}
 
 finalization
   FreeEditorResources;
