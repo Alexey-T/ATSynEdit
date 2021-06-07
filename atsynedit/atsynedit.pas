@@ -32,7 +32,7 @@ uses
   ATStringProc_WordJump,
   ATCanvasPrimitives,
   ATSynEdit_CharSizer,
-  {$ifndef USE_ATSYN_REGEXPR}
+  {$ifdef USE_FPC_REGEXPR}
   RegExpr,
   {$else}
   ATSynEdit_RegExpr,
@@ -1572,8 +1572,7 @@ type
     {$endif}
 
     {$ifdef LCLGTK2}
-    procedure WM_GTK_IM_COMPOSITION(var Message: TLMessage); message
-      LM_IM_COMPOSITION;
+    procedure WM_GTK_IM_COMPOSITION(var Message: TLMessage); message LM_IM_COMPOSITION;
     {$endif}
 
   published
@@ -9003,7 +9002,7 @@ initialization
 
   RegExprModifierS:= False;
   RegExprModifierM:= True;
-  {$ifdef USE_ATSYN_REGEXPR}
+  {$ifndef USE_FPC_REGEXPR}
   RegExprUsePairedBreak:= False;
   RegExprReplaceLineBreak:= #10;
   {$endif}
