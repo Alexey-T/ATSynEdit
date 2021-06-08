@@ -7,15 +7,13 @@ unit ATStringProc_TextBuffer;
 {$mode objfpc}{$H+}
 
 interface
-{$UNDEF debuglog}
+
 uses
   Classes, SysUtils,
   Dialogs,
   LazUTF8,
   ATStringProc,
-  ATSynEdit_FGL
-   {$IFDEF DEBUGLOG}, SynCommons,SynLog {$ENDIF}
-  ;
+  ATSynEdit_FGL;
 
 type
   TTextChangedEvent = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
@@ -28,15 +26,12 @@ type
 
   TATStringBuffer = class
   strict private
-    FLocked: boolean;
     FList: array of integer;
     FCount: integer;
     FLenEol: integer;
+    FLocked: boolean;
+    FVersion: integer;
     FOnChange: TTextChangedEvent;
-    {$IFDEF DEBUGLOG}
-    FBufferId:integer;
-    {$ENDIF}
-    FBufferVersion:integer;
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
@@ -48,6 +43,7 @@ type
     procedure SetupSlow(const AText: UnicodeString);
     procedure Lock;
     procedure Unlock;
+    procedure Assign(Other: TATStringBuffer);
     function CaretToStr(constref APnt: TPoint): integer;
     function StrToCaret(APos: integer): TPoint;
     function SubString(APos, ALen: integer): UnicodeString; inline;
@@ -61,19 +57,17 @@ type
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
     property Count: integer read FCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
-    property Version :integer read FBufferVersion;
-    property IsLocked :boolean read FLocked;
+    property Version: integer read FVersion;
+    property IsLocked: boolean read FLocked;
   end;
 
 implementation
 
 { TATStringBuffer }
-{$IFDEF DEBUGLOG}
-var __BufferCounter:integer=0;
-{$ENDIF}
+
 procedure TATStringBuffer.SetCount(AValue: integer);
 begin
-  Assert(not FLocked);
+  Assert(not FLocked, 'SetCount called for locked StringBuffer');
   if AValue<0 then
     raise Exception.Create('StringBuffer Count<0');
 
@@ -84,20 +78,12 @@ end;
 
 constructor TATStringBuffer.Create;
 begin
-  {$IFDEF DEBUGLOG}
-  Inc(__BufferCounter);
-  FBufferId:=__BufferCounter;
-
-
-  TSynLog.Add.Log(sllCustom1, 'Create Buffer %', [FBufferId]);
-
-  {$ENDIF}
-  FBufferVersion:= 0;
-  FLocked:=false;
   FText:= '';
   FLenEol:= 1; //no apps should use other
   FCount:= 0;
   SetCount(0);
+  FVersion:= 0;
+  FLocked:= false;
 end;
 
 destructor TATStringBuffer.Destroy;
@@ -112,12 +98,8 @@ procedure TATStringBuffer.Setup(const AText: UnicodeString;
 var
   Pos, NLen, i: integer;
 begin
-  {$IFDEF DEBUGLOG}
-  if FLocked then
-     Assert(false, Format('Buffer %d v=%d', [FBufferId, FBufferVersion]));
-  {$ENDIF}
-  Assert(not FLocked, 'Attempt to reSet locked/used buffer!');
-  Inc(FBufferVersion);
+  Assert(not FLocked, 'Attempt to change locked StringBuffer');
+  Inc(FVersion);
   FText:= AText;
   //FLenEol:= ALenEol;
 
@@ -136,8 +118,8 @@ procedure TATStringBuffer.SetupFromGenericList(L: TATGenericIntList);
 var
   Pos, NLen, i: integer;
 begin
-  Assert(not FLocked);
-  Inc(FBufferVersion);
+  Assert(not FLocked, 'Attempt to change locked StringBuffer');
+  Inc(FVersion);
   SetCount(L.Count+1);
   Pos:= 0;
   FList[0]:= 0;
@@ -155,9 +137,8 @@ var
   Lens: TATGenericIntList;
   i, N: integer;
 begin
-
-  Assert(not FLocked);
-  Inc(FBufferVersion);
+  Assert(not FLocked, 'Attempt to change locked StringBuffer');
+  Inc(FVersion);
 
   FText:= AText;
   if FText='' then
@@ -206,24 +187,28 @@ end;
 
 procedure TATStringBuffer.Lock;
 begin
-  {$IFDEF DEBUGLOG}
-  TSynLog.Add.Log(sllCustom1, 'LOCK Buffer % v=%', [FBufferId, FBufferVersion]);
-  {$ENDIF}
-  FLocked:=true;
+  FLocked:= true;
 end;
 
 procedure TATStringBuffer.Unlock;
 begin
-    {$IFDEF DEBUGLOG}
-  TSynLog.Add.Log(sllCustom1, 'UnLOCK Buffer % v=%', [FBufferId, FBufferVersion]);
-  {$ENDIF}
-  FLocked:=false;
+  FLocked:= false;
+end;
+
+procedure TATStringBuffer.Assign(Other: TATStringBuffer);
+begin
+  FText:= Other.FText;
+  UniqueString(FText);
+  FList:= Other.FList;
+  FCount:= Other.FCount;
+  FLenEol:= Other.FLenEol;
+  FVersion:= Other.FVersion;
 end;
 
 
 procedure TATStringBuffer.Clear;
 begin
-  Assert(not FLocked);
+  Assert(not FLocked, 'Attempt to clear locked StringBuffer');
   FText:= '';
   SetCount(0);
 end;

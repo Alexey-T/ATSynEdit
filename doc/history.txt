@@ -1,4 +1,19 @@
 
+2021.06.06
++ add: Gaps now can contain not only Bitmaps but also Forms
+
+2021.06.03
++ add: OnChangeBookmarks
+
+2021.05.13
++ add: prop OptBorderVisible (border inside the control, note that BorderStyle is border around the control)
+
+2021.05.11
++ add: prop GutterDecorAlignment
+
+2021.04.30
+* changed OptUnprintedEndArrowOrDot (bool) to OptUnprintedEndSymbol (0, 1, 2)
+
 2021.04.06
 + OptDimUnfocused<0 is allowed, to blend with white
 

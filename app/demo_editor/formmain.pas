@@ -323,7 +323,7 @@ begin
 
   ed.OnChange:= @EditChanged;
   ed.OnChangeModified:=@EditChangeModified;
-  ed.Strings.OnChange:=@EditStringsChange;
+  ed.Strings.OnChangeEx:=@EditStringsChange;
   ed.Strings.OnChangeBlock:=@EditStringsChangeBlock;
   ed.Strings.GutterDecor1:= ed.GutterDecor;
   ed.OnChangeCaretPos:= @EditCaretMoved;
@@ -568,7 +568,7 @@ begin
       Data.Kind:= 1;
       Data.LineNum:= ALine;
       Data.ShowInBookmarkList:= true;
-      Data.Hint:= Format('Bookmark for line %d', [ALine+1]);
+      Data.Hint:= StrNew(PChar(Format('Bookmark for line %d', [ALine+1])));
       ed.Strings.Bookmarks.Add(Data);
     end;
     ed.Update;
@@ -978,25 +978,51 @@ end;
 
 procedure TfmMain.mnuTestGapAddClick(Sender: TObject);
 var
-  Vals: array[0..1] of string;
+  Vals: array[0..2] of string;
+  SCaption: string;
   NLine, NSize: integer;
   b: TBitmap;
+  f: TCustomForm;
 begin
   Vals[0]:= '2';
   Vals[1]:= '60';
+  Vals[2]:= 'Caption';
   if not InputQuery('Add gap (sets last_line_on_top)',
-    ['Line number', 'Gap size (pixels)'],
+    ['Line number', 'Gap size (pixels)', 'If not empty: place the form with caption'],
     Vals) then exit;
 
   NLine:= StrToInt(Vals[0]);
   NSize:= StrToInt(Vals[1]);
+  SCaption:= Vals[2];
 
-  b:= TBitmap.Create;
-  b.PixelFormat:= pf24bit;
-  b.SetSize(500, NSize);
-  DoPaintGap(b.Canvas, Rect(0, 0, b.Width, b.Height), NLine);
+  b:= nil;
+  f:= nil;
 
-  if not ed.Gaps.Add(NLine-1, NSize, b, 0) then
+  if SCaption<>'' then
+  begin
+    f:= TForm.CreateNew(Self, 0);
+    f.Color:= clGreen;
+    f.Caption:= SCaption;
+    with TListbox.Create(f) do
+    begin
+      Parent:= f;
+      Align:= alClient;
+      BorderSpacing.Around:= 6;
+      Items.Add('item1');
+      Items.Add('item2');
+    end;
+    f.BorderStyle:= bsNone;
+    f.Show;
+  end
+  else
+  begin
+    b:= TBitmap.Create;
+    b.PixelFormat:= pf24bit;
+    b.SetSize(500, NSize);
+    DoPaintGap(b.Canvas, Rect(0, 0, b.Width, b.Height), NLine);
+  end;
+
+  if not ed.Gaps.Add(NLine-1, NSize, b, f, 0) then
   begin
     ShowMessage(Format('Not correct line index (%d)', [NLine]));
     exit;
@@ -1616,7 +1642,7 @@ begin
     exit
   end;
 
-  ed_gap.SetBounds(R.Left, R.Top, R.Width, R.Height);
+  ed_gap.SetBounds(R.Left, R.Top, R.Width-1, R.Height);
   ed_gap.Show;
 end;
 

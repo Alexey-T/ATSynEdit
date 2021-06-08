@@ -52,7 +52,7 @@ begin
   begin
     TimerBlinkDisable;
     DoCommand(NCmd);
-    TimerBlickEnable;
+    TimerBlinkEnable;
   end;
 end;
 
@@ -122,7 +122,7 @@ begin
 
   TimerBlinkDisable;
   DoCommand(cCommand_TextInsert, Str);
-  TimerBlickEnable;
+  TimerBlinkEnable;
 
   Utf8Key:= '';
 end;
@@ -586,13 +586,10 @@ begin
 
   if DoEventCommand(ACmd, Str) then Exit;
 
-  case ACmd of
-    cCommand_MoveSelectionUp,
-    cCommand_MoveSelectionDown:
-      NCommandCode:= ACmd;
-    else
-      NCommandCode:= 0;
-  end;
+  if IsCommandToUndoInOneStep(ACmd) then
+    NCommandCode:= ACmd
+  else
+    NCommandCode:= 0;
   Strings.CommandCode:= NCommandCode;
 
   FCaretSpecPos:= false;
@@ -647,11 +644,17 @@ begin
   FLastCommandChangedText2:= FLastCommandChangedText;
   FLastCommandChangedText:= cResultText in Res;
   if FLastCommandChangedText then
+  begin
     if ACmd<>cCommand_RepeatTextCommand then
     begin
       FLastTextCmd:= ACmd;
       FLastTextCmdText:= AText;
     end;
+
+    //to solve CudaText issue #3403
+    if IsCommandForDelayedParsing(ACmd) then
+      StartTimerDelayedParsing;
+  end;
 
   //this logic: to make like in SynWrite, option "Fixed column move".
   //arrows up/down must keep their column, even if sometimes they jump to shorter lines (caret_after_end: off).
@@ -663,7 +666,7 @@ begin
           Carets.UpdateMemory(cCaretMem_SaveX, false);
       end;
     {
-    // https://github.com/Alexey-T/CudaText/issues/1326
+    // CudaText issue #1326
     cCommand_ClipboardPaste,
     cCommand_ClipboardPaste_Select,
     cCommand_ClipboardAltPaste,

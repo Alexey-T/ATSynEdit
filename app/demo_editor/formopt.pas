@@ -42,7 +42,6 @@ type
     chkCrBlinkEn: TCheckBox;
     chkMsNormalSel: TCheckBox;
     chkMsColumnSel: TCheckBox;
-    chkUnprintArrowDown: TCheckBox;
     chkShowFullHilite: TCheckBox;
     chkMsHideCursor: TCheckBox;
     chkLeftRtSwapAndSel: TCheckBox;
@@ -95,6 +94,7 @@ type
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
     chkZebraActive: TCheckBox;
+    edUnpriEol: TComboBox;
     comboMsMidClick: TComboBox;
     ComboMsClick2: TComboBox;
     comboRulerStyle: TComboBox;
@@ -147,6 +147,7 @@ type
     Label20: TLabel;
     Label21: TLabel;
     Label22: TLabel;
+    Label23: TLabel;
     Label6: TLabel;
     LabelZebraAlpha: TLabel;
     Label3: TLabel;
@@ -249,7 +250,7 @@ begin
     chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
     chkUnprintOnlyBothEnds.Checked:= ed.OptUnprintedSpacesBothEnds;
     chkUnprintOnlyEnd.Checked:= ed.OptUnprintedSpacesTrailing;
-    chkUnprintArrowDown.Checked:= OptUnprintedEndArrowOrDot;
+    edUnpriEol.ItemIndex:= Ord(OptUnprintedEndSymbol);
     chkUnprintAsciiRep.Checked:= OptUnprintedReplaceSpec;
     edTabArrowSize.Value:= OptUnprintedTabCharLength;
     edTabArrowPnt.Value:= OptUnprintedTabPointerScale;
@@ -386,7 +387,7 @@ begin
       OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
       OptUnprintedTabCharLength:= edTabArrowSize.Value;
       OptUnprintedTabPointerScale:= edTabArrowPnt.Value;
-      OptUnprintedEndArrowOrDot:= chkUnprintArrowDown.Checked;
+      OptUnprintedEndSymbol:= TATSynEditUnptintedEolSymbol(edUnpriEol.ItemIndex);
 
       //caret
       ed.OptCaretBlinkEnabled:= chkCrBlinkEn.Checked;

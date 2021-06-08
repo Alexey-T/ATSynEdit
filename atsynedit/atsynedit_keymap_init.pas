@@ -77,14 +77,14 @@ begin
 
   M.Add(cCommand_GotoWordPrev,       'go to word previous',           [cXControl+'+Left'], []);
   M.Add(cCommand_GotoWordPrev_Sel,   'go to word previous + select',  [cXControl+'+Shift+Left'], []);
-  M.Add(cCommand_GotoWordNext,       'go to word next',          [cXControl+'+Right'], []);
-  M.Add(cCommand_GotoWordNext_Sel,   'go to word next + select', [cXControl+'+Shift+Right'], []);
+  M.Add(cCommand_GotoWordNext,       'go to word next',          [], []);
+  M.Add(cCommand_GotoWordNext_Sel,   'go to word next + select', [], []);
   M.Add(cCommand_GotoWordPrev_Simple,     'go to word previous, simple',          [], []);
   M.Add(cCommand_GotoWordPrev_Simple_Sel, 'go to word previous, simple + select', [], []);
   M.Add(cCommand_GotoWordNext_Simple,     'go to word next, simple',          [], []);
   M.Add(cCommand_GotoWordNext_Simple_Sel, 'go to word next, simple + select', [], []);
-  M.Add(cCommand_GotoWordEnd,        'go to word end',            [], []);
-  M.Add(cCommand_GotoWordEnd_Sel,    'go to word end + select',   [], []);
+  M.Add(cCommand_GotoWordEnd,        'go to word end',            [cXControl+'+Right'], []);
+  M.Add(cCommand_GotoWordEnd_Sel,    'go to word end + select',   [cXControl+'+Shift+Right'], []);
 
   M.Add(cCommand_GotoLineAbsBegin,     'go to line abs. begin',          [], []);
   M.Add(cCommand_GotoLineAbsBegin_Sel, 'go to line abs. begin + select', [], []);

@@ -152,27 +152,27 @@ end;
 
 procedure TATMarkers.Clear;
 var
-  Item: TATMarkerItem;
+  Item: PATMarkerItem;
   i: integer;
 begin
   for i:= FList.Count-1 downto 0 do
   begin
-    Item:= Items[i];
-    if Assigned(Item.Ptr) then
-      Item.Ptr.Free;
+    Item:= ItemPtr(i);
+    if Assigned(Item^.Ptr) then
+      Item^.Ptr.Free;
   end;
   FList.Clear;
 end;
 
 procedure TATMarkers.Delete(AIndex: integer);
 var
-  Item: TATMarkerItem;
+  Item: PATMarkerItem;
 begin
   if IsIndexValid(AIndex) then
   begin
-    Item:= Items[AIndex];
-    if Assigned(Item.Ptr) then
-      Item.Ptr.Free;
+    Item:= ItemPtr(AIndex);
+    if Assigned(Item^.Ptr) then
+      Item^.Ptr.Free;
     FList.Delete(AIndex);
   end;
 end;
@@ -201,20 +201,20 @@ function TATMarkers.GetAsArray: TATInt64Array;
 const
   NN = 7;
 var
-  Item: TATMarkerItem;
+  Item: PATMarkerItem;
   i: integer;
 begin
   SetLength(Result{%H-}, Count*NN);
   for i:= 0 to Count-1 do
   begin
-    Item:= Items[i];
-    Result[i*NN]:= Item.PosX;
-    Result[i*NN+1]:= Item.PosY;
-    Result[i*NN+2]:= Item.SelX;
-    Result[i*NN+3]:= Item.SelY;
-    Result[i*NN+4]:= Item.Tag;
-    Result[i*NN+5]:= Item.Value;
-    Result[i*NN+6]:= Ord(Item.MicromapMode);
+    Item:= ItemPtr(i);
+    Result[i*NN]:= Item^.PosX;
+    Result[i*NN+1]:= Item^.PosY;
+    Result[i*NN+2]:= Item^.SelX;
+    Result[i*NN+3]:= Item^.SelY;
+    Result[i*NN+4]:= Item^.Tag;
+    Result[i*NN+5]:= Item^.Value;
+    Result[i*NN+6]:= Ord(Item^.MicromapMode);
   end;
 end;
 
@@ -337,23 +337,35 @@ end;
 
 procedure TATMarkers.DeleteInRange(AX1, AY1, AX2, AY2: integer);
 var
-  Item: TATMarkerItem;
+  Item: PATMarkerItem;
   i: integer;
 begin
   for i:= Count-1 downto 0 do
   begin
-    Item:= Items[i];
-    if IsPosInRange(Item.PosX, Item.PosY, AX1, AY1, AX2, AY2)=cRelateInside then
+    Item:= ItemPtr(i);
+    if IsPosInRange(Item^.PosX, Item^.PosY, AX1, AY1, AX2, AY2)=cRelateInside then
       Delete(i);
   end;
 end;
 
 procedure TATMarkers.DeleteWithTag(const ATag: Int64);
 var
+  bAllTagged: boolean;
   i: integer;
 begin
+  bAllTagged:= true;
+  for i:= 0 to Count-1 do
+    if ItemPtr(i)^.Tag<>ATag then
+    begin
+      bAllTagged:= false;
+      Break;
+    end;
+
+  if bAllTagged then
+    Clear
+  else
   for i:= Count-1 downto 0 do
-    if Items[i].Tag=ATag then
+    if ItemPtr(i)^.Tag=ATag then
       Delete(i);
 end;
 
@@ -369,7 +381,7 @@ procedure TATMarkers.Find(AX, AY: integer; out AIndex: integer; out AExactMatch:
 //gives AIndex in range [0..Count] (without -1)
 var
   L, H, I, C: Integer;
-  Item: TATMarkerItem;
+  Item: PATMarkerItem;
 begin
   if not FSorted then
     raise Exception.Create('Method Find can be used only with Sorted=true');
@@ -385,8 +397,8 @@ begin
   while L <= H do
   begin
     I := (L + H) shr 1;
-    Item := Items[I];
-    C := _ComparePoints(Item.PosX, Item.PosY, AX, AY);
+    Item := ItemPtr(I);
+    C := _ComparePoints(Item^.PosX, Item^.PosY, AX, AY);
     if C < 0 then
       L := I + 1
     else
@@ -395,7 +407,7 @@ begin
       begin
         AIndex := I;
         if FDuplicates then
-          while (AIndex>0) and (Item=Items[AIndex-1]) do
+          while (AIndex>0) and (Item^=ItemPtr(AIndex-1)^) do
             Dec(AIndex);
         AExactMatch := True;
         Exit;
@@ -408,7 +420,7 @@ end;
 
 function TATMarkers.FindContaining(AX, AY: integer): integer;
 var
-  Item: TATMarkerItem;
+  Item: PATMarkerItem;
   NIndex: integer;
   bExact: boolean;
 begin
@@ -421,15 +433,15 @@ begin
   if NIndex>=Count then
     NIndex:= Count-1;
 
-  Item:= Items[NIndex];
-  if Item.SelContains(AX, AY) then
+  Item:= ItemPtr(NIndex);
+  if Item^.SelContains(AX, AY) then
     exit(NIndex);
 
   if NIndex>0 then
   begin
     Dec(NIndex);
-    Item:= Items[NIndex];
-    if Item.SelContains(AX, AY) then
+    Item:= ItemPtr(NIndex);
+    if Item^.SelContains(AX, AY) then
       exit(NIndex);
   end;
 end;

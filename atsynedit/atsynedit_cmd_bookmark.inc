@@ -1,5 +1,11 @@
 {$ifdef nnnn}begin end;{$endif}
 
+procedure TATSynEdit.DoChangeBookmarks;
+begin
+  if Assigned(FOnChangeBookmarks) then
+    FOnChangeBookmarks(Self);
+end;
+
 procedure TATSynEdit.BookmarkSetForLineEx(ALine, ABmKind: integer;
   const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64;
   ABookmarksObj: TATBookmarks);
@@ -17,6 +23,7 @@ begin
   Data.Tag:= ATag;
   ABookmarksObj.Add(Data);
 
+  DoChangeBookmarks;
   Update;
 end;
 
@@ -75,6 +82,7 @@ begin
     Strings.Bookmarks.Add(Data);
   end;
 
+  DoChangeBookmarks;
   Update;
 end;
 
@@ -84,6 +92,7 @@ begin
   if not Strings.IsIndexValid(ALine) then exit;
   ABookmarksObj.DeleteForLine(ALine);
 
+  DoChangeBookmarks;
   Update;
 end;
 
@@ -103,6 +112,7 @@ begin
   Result:= ABookmarksObj.DeleteByTag(ATag);
   if Result then
   begin
+    DoChangeBookmarks;
     Update;
   end;
 end;
@@ -140,43 +150,58 @@ begin
     end;
   end;
 
+  DoChangeBookmarks;
   Update;
 end;
 
-procedure TATSynEdit.BookmarkDeleteAll;
+procedure TATSynEdit.BookmarkDeleteAll(AWithEvent: boolean=true);
 begin
-  Strings.Bookmarks.Clear;
+  if Strings.Bookmarks.Count>0 then
+  begin
+    Strings.Bookmarks.Clear;
 
-  Update;
+    if AWithEvent then
+      DoChangeBookmarks;
+    Update;
+  end;
 end;
 
 procedure TATSynEdit.BookmarkDeleteAll_2;
 begin
-  Strings.Bookmarks2.Clear;
+  if Strings.Bookmarks2.Count>0 then
+  begin
+    Strings.Bookmarks2.Clear;
 
-  Update;
+    DoChangeBookmarks;
+    Update;
+  end;
 end;
 
 
 procedure TATSynEdit.BookmarkGotoNext(ANext: boolean; AIndentHorz,
   AIndentVert: integer; AOnlyShownInList: boolean);
 var
+  St: TATStrings;
   nLine, nLineOrig, nItem: integer;
 begin
+  St:= Strings;
+  if St.Count<=1 then exit;
+  if St.Bookmarks.Count=0 then exit;
+  if Carets.Count=0 then exit;
   nLine:= Carets[0].PosY;
   nLineOrig:= nLine;
   repeat
     if ANext then Inc(nLine) else Dec(nLine);
     if nLine=nLineOrig then exit;
 
-    if nLine>=Strings.Count then
+    if nLine>=St.Count then
       nLine:= 0;
     if nLine<0 then
-      nLine:= Strings.Count-1;
+      nLine:= St.Count-1;
 
-    nItem:= Strings.Bookmarks.Find(nLine);
+    nItem:= St.Bookmarks.Find(nLine);
     if (nItem>=0) and
-      (not AOnlyShownInList or Strings.Bookmarks[nItem]^.Data.ShowInBookmarkList) then
+      (not AOnlyShownInList or St.Bookmarks[nItem]^.Data.ShowInBookmarkList) then
     begin
       DoGotoPos(
         Point(0, nLine),
@@ -228,6 +253,9 @@ begin
   DoCaretsFixIncorrectPos(false);
   Update(true);
   DoEventChange;
+
+  if NCount<>Strings.Bookmarks.Count then
+    DoChangeBookmarks;
 end;
 
 
@@ -268,7 +296,7 @@ begin
   Data.ShowInBookmarkList:= true;
   Data.AutoDelete:= bmadOption;
 
-  BookmarkDeleteAll;
+  BookmarkDeleteAll(false);
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
@@ -278,5 +306,7 @@ begin
       Strings.Bookmarks.Add(Data);
     end;
   end;
+
+  DoChangeBookmarks;
 end;
 

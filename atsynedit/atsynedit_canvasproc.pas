@@ -25,6 +25,13 @@ uses
   ATSynEdit_LineParts,
   ATSynEdit_CharSizer;
 
+type
+  TATSynEditUnptintedEolSymbol = (
+    aeueDot,
+    aeueArrowDown,
+    aeuePilcrow
+    );
+
 var
   OptUnprintedTabCharLength: integer = 1;
   OptUnprintedTabPointerScale: integer = 22;
@@ -32,7 +39,7 @@ var
   OptUnprintedSpaceDotScale: integer = 15;
   OptUnprintedEndDotScale: integer = 30;
   OptUnprintedEndFontScale: integer = 40;
-  OptUnprintedEndArrowOrDot: boolean = true;
+  OptUnprintedEndSymbol: TATSynEditUnptintedEolSymbol = aeueArrowDown;
   OptUnprintedEndArrowLength: integer = 70;
   OptUnprintedWrapArrowLength: integer = 40;
   OptUnprintedWrapArrowWidth: integer = 80;
@@ -154,10 +161,10 @@ procedure DoPaintUnprintedSymbols(C: TCanvas;
   ACharSize: TPoint;
   AColorFont, AColorBG: TColor);
 
-procedure DoPaintUnprintedEolArrow(C: TCanvas;
+procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
   ACharSize: TPoint;
-  AColorFont: TColor);
+  AColorFont, AColorBg: TColor);
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AX, AY: integer;
@@ -602,23 +609,35 @@ begin
   end;
 end;
 
-procedure DoPaintUnprintedEolArrow(C: TCanvas;
+procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
   ACharSize: TPoint;
-  AColorFont: TColor);
+  AColorFont, AColorBg: TColor);
+const
+  // https://www.fileformat.info/info/unicode/char/B6/index.htm
+  cPilcrowString: PChar = #$C2#$B6;
 begin
-  if OptUnprintedEndArrowOrDot then
-    CanvasArrowDown(C,
-      Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
-      AColorFont,
-      OptUnprintedEndArrowLength,
-      OptUnprintedTabPointerScale
-      )
-  else
-    CanvasUnprintedSpace(C,
-      Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
-      OptUnprintedEndDotScale,
-      AColorFont);
+  case OptUnprintedEndSymbol of
+    aeueDot:
+      CanvasUnprintedSpace(C,
+        Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+        OptUnprintedEndDotScale,
+        AColorFont);
+    aeueArrowDown:
+      CanvasArrowDown(C,
+        Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+        AColorFont,
+        OptUnprintedEndArrowLength,
+        OptUnprintedTabPointerScale
+        );
+    aeuePilcrow:
+      begin
+        C.Font.Color:= AColorFont;
+        C.Brush.Style:= bsClear;
+        CanvasTextOutSimplest(C, AX, AY, cPilcrowString);
+        C.Brush.Style:= bsSolid;
+      end;
+  end;
 end;
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;

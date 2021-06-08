@@ -21,6 +21,7 @@ uses
   ATSynEdit_Gaps,
   ATSynEdit_Bookmarks,
   ATSynEdit_Gutter_Decor,
+  ATSynEdit_Commands,
   EncConv;
 
 const
@@ -291,9 +292,11 @@ type
     procedure AddUpdatesAction(N: integer; AAction: TATEditAction);
   public
     CaretsAfterLastEdition: TATPointArray;
+    EditingActive: boolean;
+    EditingTopLine: integer;
     constructor Create(AUndoLimit: integer); virtual;
     destructor Destroy; override;
-    procedure Clear;
+    procedure Clear(AWithEvent: boolean=true);
     procedure ClearSeparators;
     function Count: integer;
     function IsIndexValid(N: integer): boolean; inline;
@@ -301,12 +304,13 @@ type
     function IsPosFolded(AX, AY, AIndexClient: integer): boolean;
     procedure LineAddRaw_NoUndo(const S: string; AEnd: TATLineEnds);
     procedure LineAddRaw_NoUndo(const S: UnicodeString; AEnd: TATLineEnds);
-    procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds);
+    procedure LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean=true);
     procedure LineAdd(const AString: atString);
     procedure LineInsert(ALineIndex: integer; const AString: atString; AWithEvent: boolean=true);
     procedure LineInsertStrings(ALineIndex: integer; ABlock: TATStrings; AWithFinalEol: boolean);
     procedure LineDelete(ALineIndex: integer; AForceLast: boolean= true;
       AWithEvent: boolean=true; AWithUndo: boolean=true);
+    procedure LineMove(AIndexFrom, AIndexTo: integer; AWithUndo: boolean=true);
     property Lines[Index: integer]: atString read GetLine write SetLine;
     property LinesAscii[Index: integer]: boolean read GetLineAscii;
     property LinesLen[Index: integer]: integer read GetLineLen;
@@ -1328,7 +1332,7 @@ procedure TATStrings.ActionAddFakeLineIfNeeded;
 begin
   if Count=0 then
   begin
-    LineAddRaw('', cEndNone);
+    LineAddRaw('', cEndNone, false{AWithEvent});
     Exit
   end;
 
@@ -1336,12 +1340,12 @@ begin
 
   if LinesEnds[Count-1]<>cEndNone then
   begin
-    LineAddRaw('', cEndNone);
+    LineAddRaw('', cEndNone, false{AWithEvent});
     Exit
   end;
 end;
 
-procedure TATStrings.LineAddRaw(const AString: atString; AEnd: TATLineEnds);
+procedure TATStrings.LineAddRaw(const AString: atString; AEnd: TATLineEnds; AWithEvent: boolean);
 var
   Item: TATStringItem;
 begin
@@ -1349,8 +1353,11 @@ begin
   if DoCheckFilled then Exit;
 
   AddUndoItem(aeaInsert, Count, '', cEndNone, cLineStateNone, FCommandCode);
-  DoEventLog(Count);
-  DoEventChange(cLineChangeAdded, Count, 1);
+  if AWithEvent then
+  begin
+    DoEventLog(Count);
+    DoEventChange(cLineChangeAdded, Count, 1);
+  end;
 
   Item.Init(AString, AEnd);
   FList.Add(@Item);
@@ -1519,6 +1526,35 @@ begin
     ActionAddFakeLineIfNeeded;
 end;
 
+procedure TATStrings.LineMove(AIndexFrom, AIndexTo: integer; AWithUndo: boolean=true);
+var
+  ItemFrom, ItemTo: PATStringItem;
+  NLineMin: integer;
+begin
+  if AWithUndo then
+  begin
+    ItemFrom:= GetItemPtr(AIndexFrom);
+    ItemTo:= GetItemPtr(AIndexTo);
+
+    AddUndoItem(aeaDelete, AIndexFrom, ItemFrom^.Line, ItemFrom^.LineEnds, ItemFrom^.LineState, FCommandCode);
+    AddUndoItem(aeaInsert, AIndexTo, ItemTo^.Line, ItemTo^.LineEnds, ItemTo^.LineState, FCommandCode);
+  end;
+
+  FList.Move(AIndexFrom, AIndexTo);
+
+  LinesState[AIndexFrom]:= cLineStateChanged;
+  if LinesEnds[AIndexFrom]=cEndNone then
+    LinesEnds[AIndexFrom]:= Endings;
+  if LinesEnds[AIndexTo]=cEndNone then
+    LinesEnds[AIndexTo]:= Endings;
+
+  ActionAddFakeLineIfNeeded;
+  Modified:= true;
+
+  NLineMin:= Min(AIndexFrom, AIndexTo);
+  DoEventLog(NLineMin);
+end;
+
 function TATStrings.LineSub(ALineIndex, APosFrom, ALen: integer): atString;
 var
   Item: PATStringItem;
@@ -1571,11 +1607,15 @@ begin
   Result:= FList.GetItem(AIndex);
 end;
 
-procedure TATStrings.Clear;
+procedure TATStrings.Clear(AWithEvent: boolean);
 begin
   ClearUndo(FUndoList.Locked);
-  DoEventLog(-1);
-  DoEventChange(cLineChangeDeletedAll, -1, 1);
+
+  if AWithEvent then
+  begin
+    DoEventLog(0);
+    DoEventChange(cLineChangeDeletedAll, -1, 1);
+  end;
 
   FList.Clear;
 end;
@@ -1736,6 +1776,7 @@ var
   OtherList: TATUndoList;
   NCount: integer;
   NEventX, NEventY: integer;
+  bWithoutPause: boolean;
   bEnableEventBefore,
   bEnableEventAfter: boolean;
 begin
@@ -1764,6 +1805,7 @@ begin
   AHardMarked:= CurItem.ItemHardMark;
   ATickCount:= CurItem.ItemTickCount;
   NCount:= ACurList.Count;
+  bWithoutPause:= IsCommandToUndoInOneStep(ACommandCode);
 
   //note: do not break this issue https://github.com/Alexey-T/CudaText/issues/2677
   if NCount>=2 then
@@ -1815,6 +1857,16 @@ begin
 
   bEnableEventBefore:= (NEventY>=0) and (NEventY<>FLastUndoY);
   FLastUndoY:= NEventY;
+
+  //fixing issue #3427, flag nnnAfter must be false if nnnBefore=false
+  if not bEnableEventBefore then
+    bEnableEventAfter:= false;
+
+  if bWithoutPause then
+  begin
+    bEnableEventBefore:= false;
+    bEnableEventAfter:= false;
+  end;
 
   if bEnableEventBefore then
     if Assigned(FOnUndoBefore) then

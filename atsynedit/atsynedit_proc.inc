@@ -333,3 +333,12 @@ begin
   end;
 end;
 
+procedure SwapPoints(var Pnt1, Pnt2: TPoint);
+var
+  Pnt3: TPoint;
+begin
+  Pnt3:= Pnt1;
+  Pnt1:= Pnt2;
+  Pnt2:= Pnt3;
+end;
+
