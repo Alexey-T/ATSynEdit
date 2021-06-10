@@ -2448,6 +2448,7 @@ begin
     FreeAndNil(Results);
   end;
 
+  Editor.Update; //CudaText issue #3441
   EndTiming;
 end;
 
