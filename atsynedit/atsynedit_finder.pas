@@ -1995,6 +1995,7 @@ var
 var
   Strs: TATStrings;
   SFind, SLineToTest: UnicodeString;
+  NLineCount: integer;
   NLen, NStartOffset, NEndOffset: integer;
   IndexLine, IndexChar, IndexLineMax, i: integer;
   FoundPos, FoundEnd: TPoint;
@@ -2005,6 +2006,12 @@ begin
   if StrFind='' then Exit;
 
   Strs:= Editor.Strings;
+
+  NLineCount:= Strs.Count;
+  if NLineCount=0 then exit;
+  if APosStart.Y>=NLineCount then exit;
+  if APosEnd.Y>=NLineCount then
+    APosEnd.Y:= NLineCount-1;
 
   SFind:= StrFind;
   if not OptCase then
