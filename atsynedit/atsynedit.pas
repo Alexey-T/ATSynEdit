@@ -3914,7 +3914,7 @@ begin
     AGap.Form.BorderStyle:= bsNone;
     AGap.Form.Parent:= Self;
 
-    //RHere is rect of form, located at center of ARect
+    //RHere is rect of form, it is stretched by width to RectMain
     RHere.Left:= GetGapBitmapPosLeft(ARect, RectMain.Width);
     RHere.Top:= ARect.Top;
     RHere.Right:= RHere.Left + RectMain.Width;
