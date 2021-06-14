@@ -3921,7 +3921,7 @@ begin
     RHere.Bottom:= RHere.Top + AGap.Size;
 
     AGap.Form.BoundsRect:= RHere;
-    AGap.FormState:= gfsShown;
+    AGap.FormVisible:= true;
   end
   else
   if Assigned(FOnDrawGap) then
@@ -8960,21 +8960,26 @@ end;
 
 procedure TATSynEdit.UpdateGapForms(ABeforePaint: boolean);
 var
+  Gap: TATGapItem;
   i: integer;
 begin
   if ABeforePaint then
   begin
     for i:= 0 to Gaps.Count-1 do
-      with Gaps[i] do
-        if Assigned(Form) then
-          FormState:= gfsUnknown;
+    begin
+      Gap:= Gaps[i];
+      if Assigned(Gap.Form) then
+        Gap.FormVisible:= false;
+    end;
   end
   else
   begin
     for i:= 0 to Gaps.Count-1 do
-      with Gaps[i] do
-        if Assigned(Form) then
-          Form.Visible:= FormState=gfsShown;
+    begin
+      Gap:= Gaps[i];
+      if Assigned(Gap.Form) then
+        Gap.Form.Visible:= Gap.FormVisible;
+    end;
   end;
 end;
 
