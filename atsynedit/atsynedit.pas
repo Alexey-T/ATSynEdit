@@ -3913,11 +3913,13 @@ begin
   begin
     AGap.Form.BorderStyle:= bsNone;
     AGap.Form.Parent:= Self;
+
     //RHere is rect of form, located at center of ARect
-    RHere.Left:= GetGapBitmapPosLeft(ARect, AGap.Form.Width);
+    RHere.Left:= GetGapBitmapPosLeft(ARect, RectMain.Width);
     RHere.Top:= ARect.Top;
-    RHere.Right:= RHere.Left + AGap.Form.Width;
+    RHere.Right:= RHere.Left + RectMain.Width;
     RHere.Bottom:= RHere.Top + AGap.Size;
+
     AGap.Form.BoundsRect:= RHere;
     AGap.FormState:= gfsShown;
   end
