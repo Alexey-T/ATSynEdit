@@ -3915,9 +3915,9 @@ begin
     AGap.Form.Parent:= Self;
 
     //RHere is rect of form, it is stretched by width to RectMain
-    RHere.Left:= GetGapBitmapPosLeft(ARect, RectMain.Width);
+    RHere.Left:= RectMain.Left;
+    RHere.Right:= RectMain.Right;
     RHere.Top:= ARect.Top;
-    RHere.Right:= RHere.Left + RectMain.Width;
     RHere.Bottom:= RHere.Top + AGap.Size;
 
     AGap.Form.BoundsRect:= RHere;
