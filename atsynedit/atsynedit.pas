@@ -7625,9 +7625,6 @@ var
 begin
   if (not ModeReadOnly) then
   begin
-    if (Message.WParam and GTK_IM_FLAG_START<>0) then
-      FIMSelText:=TextSelected;
-    // to do : candidate position
     // set candidate position
     if (Message.WParam and (GTK_IM_FLAG_START or GTK_IM_FLAG_PREEDIT))<>0 then
     begin
@@ -7640,11 +7637,16 @@ begin
     // valid string at composition & commit
     if Message.WParam and (GTK_IM_FLAG_COMMIT or GTK_IM_FLAG_PREEDIT)<>0 then
     begin
+	  if Message.WParam and GTK_IM_FLAG_REPLACE=0 then
+        FIMSelText:=TextSelected;
       // insert preedit or commit string
       buffer:=UTF8Decode(pchar(Message.LParam));
       len:=Length(buffer);
       bOverwrite:=ModeOverwrite and (Length(FIMSelText)=0);
       bSelect:=len>0;
+	  // fix for IBUS IM
+	  if (len=0) and (Message.WParam and GTK_IM_FLAG_REPLACE<>0) then
+	    TextInsertAtCarets('',False, bOverwrite, False);
       // commit
       if Message.WParam and GTK_IM_FLAG_COMMIT<>0 then
       begin
@@ -7654,6 +7656,7 @@ begin
         TextInsertAtCarets(buffer, False, False, bSelect);
     end;
     // end composition
+    // To Do : skip insert saved selection after commit with ibus.
     if (Message.WParam and GTK_IM_FLAG_END<>0) and (FIMSelText<>'') then
       TextInsertAtCarets(FIMSelText, False, False, False);
   end;
