@@ -269,6 +269,7 @@ end;
 function TATSynEdit.DoCommand_TextDeleteSelection: TATCommandResults;
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   Shift, PosAfter: TPoint;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
@@ -276,6 +277,7 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   if not IsSelRectEmpty and not OptCaretManyAllowed then
   begin
@@ -286,7 +288,7 @@ begin
 
   if not Carets.IsSelection then Exit;
 
-  Strings.BeginUndoGroup;
+  St.BeginUndoGroup;
   try
     for i:= Carets.Count-1 downto 0 do
     begin
@@ -299,7 +301,7 @@ begin
       if Assigned(FAttribs) then
         FAttribs.DeleteInRange(X1, Y1, X2, Y2);
 
-      Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+      St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
 
       Caret.PosX:= X1;
       Caret.PosY:= Y1;
@@ -312,7 +314,7 @@ begin
       DoCaretsShift(i, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
   end;
 
   //to fix https://github.com/Alexey-T/CudaText/issues/1615
