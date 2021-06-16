@@ -56,6 +56,7 @@ type
     function GetLeftEdge: TPoint;
     function Change(APosX, APosY, AEndX, AEndY: integer): boolean;
     procedure SwapSelection;
+    function IsSelection: boolean;
     function IsForwardSelection: boolean;
     function IsMultilineSelection: boolean;
     function FirstTouchedLine: integer;
@@ -464,6 +465,12 @@ begin
   end;
 end;
 
+function TATCaretItem.IsSelection: boolean;
+begin
+  Result:= (EndY>=0) and
+    ((PosX<>EndX) or (PosY<>EndY));
+end;
+
 function TATCaretItem.IsForwardSelection: boolean;
 begin
   Result:= (PosY>=0) and IsPosSorted(EndX, EndY, PosX, PosY, false);
@@ -783,7 +790,7 @@ var
   i: integer;
 begin
   for i:= 0 to Count-1 do
-    if Items[i].EndY>=0 then
+    if Items[i].IsSelection then
       exit(true);
   Result:= false;
 end;
