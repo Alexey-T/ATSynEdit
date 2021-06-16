@@ -174,6 +174,7 @@ end;
 function TATSynEdit.DoCommand_TextDeleteLeft(ALen: integer; AAllowUnindent: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   Shift, PosAfter: TPoint;
   NIndent, NDeleteLen: integer;
   bNeedGroup: boolean;
@@ -181,6 +182,7 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   //selection? delete it, exit.
   if Carets.IsSelection then
@@ -190,7 +192,8 @@ begin
   end;
 
   bNeedGroup:= Carets.Count>1;
-  if bNeedGroup then Strings.BeginUndoGroup;
+  if bNeedGroup then
+    St.BeginUndoGroup;
 
   for i:= 0 to Carets.Count-1 do
   begin
@@ -207,7 +210,7 @@ begin
           NDeleteLen:= Caret.PosX;
     end;
 
-    Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
+    St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
     DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
@@ -215,7 +218,8 @@ begin
     Caret.EndY:= -1;
   end;
 
-  if bNeedGroup then Strings.EndUndoGroup;
+  if bNeedGroup then
+    St.EndUndoGroup;
 
   //changed for issue CudaText#3065
   Result:= [cResultText, cResultCaretTop, cResultCaretLazy];
