@@ -644,6 +644,7 @@ end;
 function TATSynEdit.DoCommand_TextDeleteWordEntire: TATCommandResults;
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   Str: atString;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
@@ -651,16 +652,17 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   bNeedGroup:= Carets.Count>1;
   if bNeedGroup then
-    Strings.BeginUndoGroup;
+    St.BeginUndoGroup;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
     Caret:= FCarets[i];
-    if not Strings.IsIndexValid(Caret.PosY) then Continue;
-    Str:= Strings.Lines[Caret.PosY];
+    if not St.IsIndexValid(Caret.PosY) then Continue;
+    Str:= St.Lines[Caret.PosY];
     NLen:= Length(Str);
 
     N1:= Caret.PosX;
@@ -684,7 +686,7 @@ begin
 
     if N1=N2 then Continue;
     System.Delete(Str, N1+1, N2-N1);
-    Strings.Lines[Caret.PosY]:= Str;
+    St.Lines[Caret.PosY]:= Str;
 
     Shift.X:= N1-N2;
     Shift.Y:= 0;
@@ -696,7 +698,7 @@ begin
   end;
 
   if bNeedGroup then
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
 
   Result:= [cResultText, cResultCaretBottom];
 end;
