@@ -36,7 +36,8 @@ function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
 var
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  bNeedGroup: boolean;
+  X1, Y1, X2, Y2: integer;
+  bSel, bNeedGroup: boolean;
   TextItems: TStringList;
   TextItem: atString;
   i: integer;
@@ -47,14 +48,13 @@ begin
 
   try
     //bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
-    bNeedGroup:= false; //CudaText #3274
+    bNeedGroup:= false; //CudaText issue #3274
 
     if bNeedGroup then
       Strings.BeginUndoGroup;
 
-    DoSelectionDeleteOrReset;
-
-    //TextItems allows to insert each clipboard text line into one caret
+    //TextItems allows to insert each clipboard line into its own caret
+    //when count of carets = count of clipboard lines
     if FOptPasteMultilineTextSpreadsToCarets then
       if (AText<>sLineBreak) and (Length(AText)>1) and (Carets.Count>1) then
         if SCountTextLines(AText, sLineBreak) = Carets.Count then
@@ -69,19 +69,23 @@ begin
     for i:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[i];
+      Caret.GetRange(X1, Y1, X2, Y2, bSel);
 
       if Assigned(TextItems) and (Carets.Count=TextItems.Count) and (i<TextItems.Count) then
         TextItem:= UTF8Decode(TextItems[i])
       else
         TextItem:= AText;
 
-      Strings.TextInsert(Caret.PosX, Caret.PosY, TextItem, AOvrMode, Shift, PosAfter);
-      DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
+      if bSel then
+        Strings.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
+      else
+        Strings.TextInsert(X1, Y1, TextItem, AOvrMode, Shift, PosAfter);
+      DoCaretsShift(i+1, X1, Y1, Shift.X, Shift.Y, PosAfter);
 
       if not AKeepCaret then
       begin
-        Caret.EndX:= IfThen(ASelectThen, Caret.PosX, -1);
-        Caret.EndY:= IfThen(ASelectThen, Caret.PosY, -1);
+        Caret.EndX:= IfThen(ASelectThen, X1, -1);
+        Caret.EndY:= IfThen(ASelectThen, Y1, -1);
         Caret.PosX:= PosAfter.X;
         Caret.PosY:= PosAfter.Y;
       end;
