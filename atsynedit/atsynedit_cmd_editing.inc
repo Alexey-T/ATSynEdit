@@ -327,12 +327,14 @@ end;
 function TATSynEdit.DoCommand_TextDeleteRight(ALen: integer): TATCommandResults;
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   i, Len, ShiftBelowX: integer;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   //selection? delete it, exit.
   if Carets.IsSelection then
@@ -342,7 +344,8 @@ begin
   end;
 
   bNeedGroup:= Carets.Count>1;
-  if bNeedGroup then Strings.BeginUndoGroup;
+  if bNeedGroup then
+    St.BeginUndoGroup;
 
   for i:= 0 to FCarets.Count-1 do
   begin
@@ -350,17 +353,18 @@ begin
 
     //offsetX for carets in line[PosY+1]
     ShiftBelowX:= 0;
-    Len:= Strings.LinesLen[Caret.PosY];
+    Len:= St.LinesLen[Caret.PosY];
     if Caret.PosX=Len then
       ShiftBelowX:= Len;
 
-    Strings.TextDeleteRight(Caret.PosX, Caret.PosY, ALen, Shift, PosAfter);
+    St.TextDeleteRight(Caret.PosX, Caret.PosY, ALen, Shift, PosAfter);
     DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter, ShiftBelowX);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
   end;
 
-  if bNeedGroup then Strings.EndUndoGroup;
+  if bNeedGroup then
+    St.EndUndoGroup;
 
   Result:= [cResultText, cResultCaretAny];
 end;
