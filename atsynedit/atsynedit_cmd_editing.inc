@@ -1069,6 +1069,7 @@ end;
 
 function TATSynEdit.DoCommand_TextChangeCase(AMode: TATEditorCaseConvert): TATCommandResults;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   Str1, Str2: atString;
   X1, Y1, X2, Y2: integer;
@@ -1078,8 +1079,9 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
- Strings.BeginUndoGroup;
+ St.BeginUndoGroup;
  try
   for i:= Carets.Count-1 downto 0 do
   begin
@@ -1087,27 +1089,31 @@ begin
     Caret.GetRange(X1, Y1, X2, Y2, bSel);
     if not bSel then
     begin
-      SFindWordBounds(Strings.Lines[Caret.PosY], Caret.PosX, X1, X2, FOptNonWordChars);
+      SFindWordBounds(St.Lines[Caret.PosY], Caret.PosX, X1, X2, FOptNonWordChars);
       if X1<0 then Continue;
       Y1:= Caret.PosY;
       Y2:= Caret.PosY;
     end;
 
-    Str1:= Strings.TextSubstring(X1, Y1, X2, Y2);
+    Str1:= St.TextSubstring(X1, Y1, X2, Y2);
     case AMode of
-      cCaseLower: Str2:= UnicodeLowerCase(Str1);
-      cCaseUpper: Str2:= UnicodeUpperCase(Str1);
-      cCaseTitle: Str2:= SCaseTitle(Str1, FOptNonWordChars);
-      cCaseInvert: Str2:= SCaseInvert(Str1);
-      cCaseSentence: Str2:= SCaseSentence(Str1, FOptNonWordChars);
+      cCaseLower:
+        Str2:= UnicodeLowerCase(Str1);
+      cCaseUpper:
+        Str2:= UnicodeUpperCase(Str1);
+      cCaseTitle:
+        Str2:= SCaseTitle(Str1, FOptNonWordChars);
+      cCaseInvert:
+        Str2:= SCaseInvert(Str1);
+      cCaseSentence:
+        Str2:= SCaseSentence(Str1, FOptNonWordChars);
     end;
     if Str1=Str2 then Continue;
 
-    Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
-    Strings.TextInsert(X1, Y1, Str2, false, Shift, PosAfter);
+    St.TextReplaceRange(X1, Y1, X2, Y2, Str2, Shift, PosAfter, false);
   end;
  finally
-  Strings.EndUndoGroup;
+  St.EndUndoGroup;
  end;
 
   Result:= [cResultText, cResultCaretAny];
