@@ -143,15 +143,17 @@ end;
 
 function TATSynEdit.DoCalcIndentCharsFromPrevLines(AX, AY: integer): integer;
 var
+  St: TATStrings;
   Str: atString;
   NIndent, i: integer;
 begin
   Result:= -1;
-  if not Strings.IsIndexValid(AY) then Exit;
+  St:= Strings;
+  if not St.IsIndexValid(AY) then Exit;
 
   //allow smart unindent only if caret on 1st nonspace char
   //(else Bksp must delete 1 char)
-  Str:= Strings.Lines[AY];
+  Str:= St.Lines[AY];
   NIndent:= SGetIndentChars(Str);
   if not ((AX=NIndent) and (NIndent>0)) then Exit;
 
@@ -160,9 +162,9 @@ begin
   for i:= 1 to FOptMaxLinesToCountUnindent do
   begin
     Dec(AY);
-    if not Strings.IsIndexValid(AY) then Exit;
+    if not St.IsIndexValid(AY) then Exit;
 
-    Str:= Strings.Lines[AY];
+    Str:= St.Lines[AY];
     NIndent:= SGetIndentChars(Str);
     if NIndent<AX then
       Exit(NIndent);
