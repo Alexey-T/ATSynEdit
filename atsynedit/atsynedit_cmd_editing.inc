@@ -561,6 +561,7 @@ const
     (cWordjumpToPrev, cWordjumpToNext);
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   Str: atString;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
@@ -568,16 +569,17 @@ var
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   bNeedGroup:= Carets.Count>1;
   if bNeedGroup then
-    Strings.BeginUndoGroup;
+    St.BeginUndoGroup;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
     Caret:= FCarets[i];
-    if not Strings.IsIndexValid(Caret.PosY) then Continue;
-    Str:= Strings.Lines[Caret.PosY];
+    if not St.IsIndexValid(Caret.PosY) then Continue;
+    Str:= St.Lines[Caret.PosY];
     Shift.X:= 0;
     Shift.Y:= 0;
     PosAfter.X:= Caret.PosX;
@@ -586,13 +588,13 @@ begin
     //delete to prev line?
     if (Caret.PosX=0) and (not ANext) then
     begin
-      Strings.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
+      St.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
     end
     else
     //delete to next line?
     if (Caret.PosX>=Length(Str)) and ANext then
     begin
-      Strings.TextDeleteRight(Caret.PosX, Caret.PosY, 1, Shift, PosAfter);
+      St.TextDeleteRight(Caret.PosX, Caret.PosY, 1, Shift, PosAfter);
     end
     else
     //jump from beyond eol to eol?
@@ -608,7 +610,7 @@ begin
       if PosAfter.X<>Caret.PosX then
       begin
         System.Delete(Str, Min(Caret.PosX, PosAfter.X)+1, Abs(Caret.PosX-PosAfter.X));
-        Strings.Lines[Caret.PosY]:= Str;
+        St.Lines[Caret.PosY]:= Str;
         Shift.X:= -Abs(Caret.PosX-PosAfter.X);
         PosAfter.X:= Min(Caret.PosX, PosAfter.X);
       end;
@@ -630,7 +632,7 @@ begin
   end;
 
   if bNeedGroup then
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
 
   //cResultCaretLazy is to fix CudaText #3065
   if ANext then
