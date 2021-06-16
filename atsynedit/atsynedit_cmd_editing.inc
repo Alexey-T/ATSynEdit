@@ -832,20 +832,22 @@ end;
 
 function TATSynEdit.DoCommand_TextIndentUnindent_ColumnBlock(ARight: boolean): TATCommandResults;
 var
-  NBlockBeginY, NBlockEndY, NIndentAtCol: integer;
+  St: TATStrings;
   Str: atString;
+  NBlockBeginY, NBlockEndY, NIndentAtCol: integer;
   i: integer;
 begin
-  NBlockBeginY:= Min(SelRect.Top, Strings.Count-1);
-  NBlockEndY:= Min(SelRect.Bottom, Strings.Count-1);
+  St:= Strings;
+  NBlockBeginY:= Min(SelRect.Top, St.Count-1);
+  NBlockEndY:= Min(SelRect.Bottom, St.Count-1);
   NIndentAtCol:= SelRect.Left;
 
   //do indent
-  Strings.BeginUndoGroup;
+  St.BeginUndoGroup;
   try
     for i:= NBlockBeginY to NBlockEndY do
     begin
-      Str:= Strings.Lines[i];
+      Str:= St.Lines[i];
       if Trim(Str)='' then Continue;
 
       Str:= Copy(Str, 1, NIndentAtCol) +
@@ -854,11 +856,11 @@ begin
               Copy(Str, NIndentAtCol+1, MaxInt),
               ARight);
 
-      if Strings.Lines[i]<>Str then
-        Strings.Lines[i]:= Str;
+      if St.Lines[i]<>Str then
+        St.Lines[i]:= Str;
     end;
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
   end;
 
   Result:= [cResultText, cResultCaretAny, cResultKeepColumnSel];
