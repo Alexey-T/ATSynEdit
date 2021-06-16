@@ -372,6 +372,7 @@ end;
 function TATSynEdit.DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   Shift, PosAfter: TPoint;
   Str: atString;
   bNeedGroup, bBetterBrackets: boolean;
@@ -381,23 +382,24 @@ begin
   if ModeReadOnly then Exit;
   if ModeOneLine then Exit;
 
+  St:= Strings;
   bNeedGroup:= Carets.Count>1;
 
   if bNeedGroup then
-    Strings.BeginUndoGroup;
+    St.BeginUndoGroup;
 
   DoSelectionDeleteOrReset;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
     Caret:= FCarets[i];
-    if not Strings.IsIndexValid(Caret.PosY) then Continue;
+    if not St.IsIndexValid(Caret.PosY) then Continue;
 
     NShiftX:= 0;
     NShiftY:= 0;
     bBetterBrackets:= false;
 
-    Str:= Strings.Lines[Caret.PosY];
+    Str:= St.Lines[Caret.PosY];
     if (Caret.PosX>0) and (Caret.PosX<Length(Str)) then
     begin
       Str:= Copy(Str, Caret.PosX, 2);
@@ -408,12 +410,12 @@ begin
     end;
 
     Str:= GetAutoIndentString(Caret.PosX, Caret.PosY, not bBetterBrackets);
-    Strings.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
+    St.TextInsertEol(Caret.PosX, Caret.PosY, AKeepCaret, Str, Shift, PosAfter);
 
     //work to move } to next line, leave caret at current line
     if bBetterBrackets then
     begin
-      Strings.LineInsert(Caret.PosY+1, Str+IndentString);
+      St.LineInsert(Caret.PosY+1, Str+IndentString);
       NShiftX:= Length(IndentString);
       NShiftY:= 1;
     end;
@@ -426,7 +428,7 @@ begin
   end;
 
   if bNeedGroup then
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
 
   Result:= [cResultText, cResultCaretBottom];
 end;
