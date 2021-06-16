@@ -35,23 +35,25 @@ function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
   AKeepCaret, AOvrMode, ASelectThen: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   Shift, PosAfter: TPoint;
-  X1, Y1, X2, Y2: integer;
-  bSel, bNeedGroup: boolean;
   TextItems: TStringList;
   TextItem: atString;
+  X1, Y1, X2, Y2: integer;
+  bSel, bNeedGroup: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   TextItems:= nil;
+  St:= Strings;
 
   try
     //bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
     bNeedGroup:= false; //CudaText issue #3274
 
     if bNeedGroup then
-      Strings.BeginUndoGroup;
+      St.BeginUndoGroup;
 
     //TextItems allows to insert each clipboard line into its own caret
     //when count of carets = count of clipboard lines
@@ -77,9 +79,9 @@ begin
         TextItem:= AText;
 
       if bSel then
-        Strings.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
+        St.TextReplaceRange(X1, Y1, X2, Y2, TextItem, Shift, PosAfter, false)
       else
-        Strings.TextInsert(X1, Y1, TextItem, AOvrMode, Shift, PosAfter);
+        St.TextInsert(X1, Y1, TextItem, AOvrMode, Shift, PosAfter);
       DoCaretsShift(i+1, X1, Y1, Shift.X, Shift.Y, PosAfter);
 
       if not AKeepCaret then
@@ -94,7 +96,7 @@ begin
     if Assigned(TextItems) then
       FreeAndNil(TextItems);
     if bNeedGroup then
-      Strings.EndUndoGroup;
+      St.EndUndoGroup;
   end;
 
   //changed for issue CudaText#3065
