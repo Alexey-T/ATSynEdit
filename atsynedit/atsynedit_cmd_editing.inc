@@ -40,7 +40,7 @@ var
   TextItems: TStringList;
   TextItem: atString;
   X1, Y1, X2, Y2: integer;
-  bSel, bNeedGroup: boolean;
+  bSel, bNeedGroup, bInsertLinePerCaret: boolean;
   i: integer;
 begin
   Result:= [];
@@ -51,6 +51,7 @@ begin
   try
     //bNeedGroup:= (Carets.Count>1) or (Carets.IsSelection);
     bNeedGroup:= false; //CudaText issue #3274
+    bInsertLinePerCaret:= false;
 
     if bNeedGroup then
       St.BeginUndoGroup;
@@ -63,6 +64,7 @@ begin
         begin
           TextItems:= TStringList.Create;
           TextItems.Text:= UTF8Encode(AText);
+          bInsertLinePerCaret:= Carets.Count=TextItems.Count;
           //if Carets.Count<>TextItems.Count then
           //  raise Exception.CreateFmt('Unexpected lines count in clipboard text (found %d, expected %d)',
           //    [TextItems.Count, Carets.Count]);
@@ -73,7 +75,7 @@ begin
       Caret:= Carets[i];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
 
-      if Assigned(TextItems) and (Carets.Count=TextItems.Count) and (i<TextItems.Count) then
+      if bInsertLinePerCaret then
         TextItem:= UTF8Decode(TextItems[i])
       else
         TextItem:= AText;
