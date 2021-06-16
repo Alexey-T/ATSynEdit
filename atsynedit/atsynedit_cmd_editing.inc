@@ -1009,29 +1009,31 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteToDocumentEnd: TATCommandResults;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   DoCaretSingleAsIs;
   Caret:= FCarets[0];
 
-  Strings.ChangeBlockActive:= true;
-  Strings.DoOnChangeBlock(
+  St.ChangeBlockActive:= true;
+  St.DoOnChangeBlock(
     Caret.PosX, Caret.PosY,
-    0, Strings.Count,
+    0, St.Count,
     cBlockDeleteLines,
     nil
     );
 
-  Strings.TextDeleteRange(Caret.PosX, Caret.PosY, 0, Strings.Count, Shift, PosAfter);
+  St.TextDeleteRange(Caret.PosX, Caret.PosY, 0, St.Count, Shift, PosAfter);
 
-  if Caret.PosY>=Strings.Count-1 then
-    Strings.LinesEnds[Caret.PosY]:= cEndNone;
+  if Caret.PosY>=St.Count-1 then
+    St.LinesEnds[Caret.PosY]:= cEndNone;
 
-  Strings.ChangeBlockActive:= false;
+  St.ChangeBlockActive:= false;
 
   Result:= [cResultText, cResultCaretBottom];
 end;
