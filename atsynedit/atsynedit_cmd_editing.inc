@@ -968,17 +968,19 @@ end;
 function TATSynEdit.DoCommand_TextDeleteToDocumentBegin: TATCommandResults;
 var
   Caret: TATCaretItem;
+  St: TATStrings;
   Str: atString;
   Shift, PosAfter: TPoint;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
   DoCaretSingleAsIs;
   Caret:= FCarets[0];
 
-  Strings.ChangeBlockActive:= true;
-  Strings.DoOnChangeBlock(
+  St.ChangeBlockActive:= true;
+  St.DoOnChangeBlock(
     0, 0,
     Caret.PosX, Caret.PosY,
     cBlockDeleteLines,
@@ -987,16 +989,16 @@ begin
 
   if Caret.PosX>0 then
   begin
-    Str:= Strings.Lines[Caret.PosY];
+    Str:= St.Lines[Caret.PosY];
     Delete(Str, 1, Caret.PosX);
-    Strings.Lines[Caret.PosY]:= Str;
+    St.Lines[Caret.PosY]:= Str;
   end;
 
   //do it with fast method, not "for loop"
   if Caret.PosY>0 then
-    Strings.TextDeleteRange(0, 0, 0, Caret.PosY, Shift, PosAfter);
+    St.TextDeleteRange(0, 0, 0, Caret.PosY, Shift, PosAfter);
 
-  Strings.ChangeBlockActive:= false;
+  St.ChangeBlockActive:= false;
 
   //move caret to beginning
   DoCaretSingle(0, 0);
