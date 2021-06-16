@@ -731,11 +731,13 @@ end;
 
 procedure TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: boolean; Caret: TATCaretItem);
 var
-  NDecSpaces, NMinSpaces, i: integer;
+  St: TATStrings;
   Str: atString;
+  NDecSpaces, NMinSpaces, i: integer;
   NShiftInit, NShift1, NShift2, NShiftChars, NIndent1, NIndent2: integer;
   NBlockBeginX, NBlockBeginY, NBlockEndX, NBlockEndY: integer;
 begin
+  St:= Strings;
   Caret.GetSelLines(NBlockBeginY, NBlockEndY, true{Allow no sel});
   if NBlockBeginY<0 then exit;
   if Caret.EndY<0 then
@@ -770,7 +772,7 @@ begin
   NMinSpaces:= MaxInt;
   for i:= NBlockBeginY to NBlockEndY do
   begin
-    Str:= Strings.Lines[i];
+    Str:= St.Lines[i];
     if Trim(Str)='' then Continue;
     NMinSpaces:= Min(NMinSpaces, FTabHelper.GetIndentExpanded(i, Str));
   end;
@@ -781,25 +783,25 @@ begin
     if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
   //calc shifts (emulate Lazarus IDE indent)
-  NIndent1:= SGetIndentChars(Strings.Lines[NBlockBeginY]);
-  NIndent2:= SGetIndentChars(Strings.Lines[NBlockEndY]);
+  NIndent1:= SGetIndentChars(St.Lines[NBlockBeginY]);
+  NIndent2:= SGetIndentChars(St.Lines[NBlockEndY]);
   NShiftInit:= NShiftChars * IfThen(ARight, 1, -1);
   NShift1:= IfThen((NBlockBeginX>=NIndent1) and (NBlockBeginX>0), NShiftInit, 0);
   NShift2:= IfThen((NBlockEndX>=NIndent2), NShiftInit, 0);
 
   //do indent
-  Strings.BeginUndoGroup;
+  St.BeginUndoGroup;
   try
     for i:= NBlockBeginY to NBlockEndY do
     begin
-      Str:= Strings.Lines[i];
+      Str:= St.Lines[i];
       if Trim(Str)='' then Continue;
       Str:= FTabHelper.IndentUnindent(i, Str, ARight);
-      if Strings.Lines[i]<>Str then
-        Strings.Lines[i]:= Str;
+      if St.Lines[i]<>Str then
+        St.Lines[i]:= Str;
     end;
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
   end;
 
   //correct selection
@@ -807,7 +809,7 @@ begin
   begin
     Caret.EndX:= 0;
     Caret.EndY:= NBlockBeginY;
-    if Strings.IsIndexValid(NBlockEndY+1) then
+    if St.IsIndexValid(NBlockEndY+1) then
     begin
       Caret.PosX:= 0;
       Caret.PosY:= NBlockEndY+1;
@@ -815,7 +817,7 @@ begin
     else
     begin
       Caret.PosY:= NBlockEndY;
-      Caret.PosX:= Strings.LinesLen[NBlockEndY];
+      Caret.PosX:= St.LinesLen[NBlockEndY];
     end;
   end
   else
