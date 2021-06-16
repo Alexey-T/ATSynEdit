@@ -59,6 +59,7 @@ type
     function IsSelection: boolean;
     function IsForwardSelection: boolean;
     function IsMultilineSelection: boolean;
+    function IsInVisibleRect(const R: TRect): boolean;
     function FirstTouchedLine: integer;
     procedure UpdateMemory(AMode: TATCaretMemoryAction; AArrowUpDown: boolean);
   end;
@@ -481,6 +482,15 @@ begin
   Result:= (EndY>=0) and (EndY<>PosY);
 end;
 
+function TATCaretItem.IsInVisibleRect(const R: TRect): boolean;
+var
+  Pnt: TPoint;
+begin
+  Pnt.X:= CoordX;
+  Pnt.Y:= CoordY;
+  Result:= PtInRect(R, Pnt);
+end;
+
 function TATCaretItem.FirstTouchedLine: integer;
 begin
   if (EndY>=0) and (EndY<PosY) then
@@ -797,19 +807,12 @@ end;
 
 function TATCarets.IsAnyCaretInVisibleRect(const R: TRect): boolean;
 var
-  Caret: TATCaretItem;
-  Pnt: TPoint;
   i: integer;
 begin
-  Result:= false;
   for i:= 0 to Count-1 do
-  begin
-    Caret:= Items[i];
-    Pnt.X:= Caret.CoordX;
-    Pnt.Y:= Caret.CoordY;
-    if PtInRect(R, Pnt) then
+    if Items[i].IsInVisibleRect(R) then
       exit(true);
-  end;
+  Result:= false;
 end;
 
 
