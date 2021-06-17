@@ -7623,7 +7623,7 @@ var
   bOverwrite, bSelect: Boolean;
   Caret: TATCaretItem;
 begin
-  //exit;
+  exit;
   //exiting, currently it breaks CudaText issue #3442
 
   if (not ModeReadOnly) then
