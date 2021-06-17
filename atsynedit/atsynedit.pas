@@ -7623,7 +7623,7 @@ var
   bOverwrite, bSelect: Boolean;
   Caret: TATCaretItem;
 begin
-  exit;
+  //exit;
   //exiting, currently it breaks CudaText issue #3442
 
   if (not ModeReadOnly) then
@@ -7647,9 +7647,9 @@ begin
       len:=Length(buffer);
       bOverwrite:=ModeOverwrite and (Length(FIMSelText)=0);
       bSelect:=len>0;
-	  // fix for IBUS IM
-	  if (len=0) and (Message.WParam and GTK_IM_FLAG_REPLACE<>0) then
-	    TextInsertAtCarets('',False, bOverwrite, False);
+	  // fix for IBUS IM.
+	  //if (len=0) and (Message.WParam and GTK_IM_FLAG_REPLACE<>0) then
+	  //  TextInsertAtCarets('',False, bOverwrite, False);
       // commit
       if Message.WParam and GTK_IM_FLAG_COMMIT<>0 then
       begin
