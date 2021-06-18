@@ -5403,12 +5403,13 @@ begin
     GetRectMinimapSel(R);
     FMouseDownOnMinimap:= true;
     FMouseDragMinimapSelHeight:= R.Height;
-    //feature of Sublime Text 2, removed in ST3
     if FMinimapDragImmediately then
     begin
+      FCursorOnMinimap:= true;
       FMouseDragMinimap:= true;
-      FMouseDragMinimapDelta:= Min(Y, FMouseDragMinimapSelHeight div 2);
+      FMouseDragMinimapDelta:= FMouseDragMinimapSelHeight div 2;
       FMouseDownOnMinimap:= false;
+      DoMinimapDrag(Y);
       Update;
     end
     else
