@@ -304,7 +304,7 @@ begin
     edMapCharWidth.Value:= ed.OptMinimapCharWidth;
     chkMapSelBorder.Checked:= ed.OptMinimapShowSelBorder;
     chkMapSelAlways.Checked:= ed.OptMinimapShowSelAlways;
-    chkMapClickDoDrag.Checked:= ed.OptMinimapClickStartsSelRectDragging;
+    chkMapClickDoDrag.Checked:= ed.OptMinimapDragImmediately;
 
     //key
     chkTabSpaces.Checked:= ed.OptTabSpaces;
@@ -439,7 +439,7 @@ begin
       ed.OptMinimapCharWidth:= edMapCharWidth.Value;
       ed.OptMinimapShowSelBorder:= chkMapSelBorder.Checked;
       ed.OptMinimapShowSelAlways:= chkMapSelAlways.Checked;
-      ed.OptMinimapClickStartsSelRectDragging:= chkMapClickDoDrag.Checked;
+      ed.OptMinimapDragImmediately:= chkMapClickDoDrag.Checked;
 
       //key
       ed.OptTabSpaces:= chkTabSpaces.Checked;
