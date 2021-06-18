@@ -714,7 +714,7 @@ type
     FMinimapTooltipLinesCount: integer;
     FMinimapTooltipWidthPercents: integer;
     FMinimapHiliteLinesWithSelection: boolean;
-    FMinimapClickStartsSelRectDragging: boolean;
+    FMinimapDragImmediately: boolean;
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
     FMicromapScaleDiv: integer;
@@ -1787,7 +1787,7 @@ type
     property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
     property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
-    property OptMinimapClickStartsSelRectDragging: boolean read FMinimapClickStartsSelRectDragging write FMinimapClickStartsSelRectDragging default false;
+    property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
@@ -5404,10 +5404,10 @@ begin
     FMouseDownOnMinimap:= true;
     FMouseDragMinimapSelHeight:= R.Height;
     //feature of Sublime Text 2, removed in ST3
-    if FMinimapClickStartsSelRectDragging then
+    if FMinimapDragImmediately then
     begin
       FMouseDragMinimap:= true;
-      FMouseDragMinimapDelta:= FMouseDragMinimapSelHeight div 2;
+      FMouseDragMinimapDelta:= Min(Y, FMouseDragMinimapSelHeight div 2);
       FMouseDownOnMinimap:= false;
       Update;
     end
