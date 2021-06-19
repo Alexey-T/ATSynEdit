@@ -252,7 +252,7 @@ begin
     SetLineState(i, cLineStateAdded);
 end;
 
-procedure TATStrings.LoadFromString(const AText: atString);
+procedure TATStrings.LoadFromStringW(const AText: atString);
 var
   MS: TMemoryStream;
   Str: atString;
@@ -283,7 +283,7 @@ begin
       try
         Encoding:= cEncWideLE;
         EncodingDetect:= false;
-        LoadFromStream(MS);
+        LoadFromStream(MS, true{AFromUnicodeString});
       finally
         Encoding:= EncOld;
         ActionAddFakeLineIfNeeded;
@@ -349,7 +349,8 @@ begin
   end;
 end;
 
-procedure TATStrings.DoLoadFromStream(Stream: TStream; out AForcedToANSI: boolean);
+procedure TATStrings.DoLoadFromStream(Stream: TStream;
+  AFromUnicodeStream: boolean; out AForcedToANSI: boolean);
 var
   Buf: PAnsiChar;
   BufSize: int64;
@@ -484,6 +485,11 @@ begin
   NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
+  if AFromUnicodeStream then
+  begin
+    FEncoding:= cEncWideLE;
+  end
+  else
   if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
   begin
     //it's safe to set here UTF8 even for binary files, later contents will be checked
@@ -554,10 +560,10 @@ begin
   end;
 end;
 
-procedure TATStrings.LoadFromStream(Stream: TStream);
+procedure TATStrings.LoadFromStream(Stream: TStream; AFromUnicodeString: boolean);
 begin
   ClearUndo(true);
-  DoLoadFromStream(Stream, FLoadingForcedANSI);
+  DoLoadFromStream(Stream, AFromUnicodeString, FLoadingForcedANSI);
   DoFinalizeLoading;
 end;
 

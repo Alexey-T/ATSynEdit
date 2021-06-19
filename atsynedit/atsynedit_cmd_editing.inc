@@ -924,7 +924,7 @@ begin
 
   Block:= TATStrings.Create(FOptUndoLimit);
   try
-    Block.LoadFromString(AText);
+    Block.LoadFromStringW(AText);
     Block.ActionDeleteFakeLine;
     if Block.Count=0 then Exit;
 
