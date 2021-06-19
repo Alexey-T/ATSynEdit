@@ -714,6 +714,7 @@ type
     FMinimapTooltipLinesCount: integer;
     FMinimapTooltipWidthPercents: integer;
     FMinimapHiliteLinesWithSelection: boolean;
+    FMinimapDragImmediately: boolean;
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
     FMicromapScaleDiv: integer;
@@ -1786,6 +1787,7 @@ type
     property OptMinimapTooltipLinesCount: integer read FMinimapTooltipLinesCount write FMinimapTooltipLinesCount default cInitMinimapTooltipLinesCount;
     property OptMinimapTooltipWidthPercents: integer read FMinimapTooltipWidthPercents write FMinimapTooltipWidthPercents default cInitMinimapTooltipWidthPercents;
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
+    property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
     property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
@@ -5401,6 +5403,15 @@ begin
     GetRectMinimapSel(R);
     FMouseDownOnMinimap:= true;
     FMouseDragMinimapSelHeight:= R.Height;
+    if FMinimapDragImmediately then
+    begin
+      FCursorOnMinimap:= true;
+      FMouseDragMinimap:= true;
+      FMouseDragMinimapDelta:= FMouseDragMinimapSelHeight div 2;
+      FMouseDownOnMinimap:= false;
+      DoMinimapDrag(Y);
+    end
+    else
     if PtInRect(R, Point(X, Y)) then
     begin
       FMouseDragMinimap:= true;
@@ -5845,6 +5856,16 @@ begin
       FMinimapTooltipEnabled:= false;
     if bUpdateForMinimap then
       Update;
+
+    //mouse dragged on minimap
+    //handle this before starting FTimerScroll (CudaText issues 2941, 2944)
+    if FMouseDragMinimap then
+    begin
+      if bMovedMinimal then
+        if Shift=[ssLeft] then
+          DoMinimapDrag(Y);
+      Exit
+      end;
   end;
 
   //detect cursor on gutter
@@ -5896,16 +5917,6 @@ begin
   end
   else
     DoHintHide;
-
-  //mouse dragged on minimap
-  //handle this before starting FTimerScroll (CudaText issues 2941, 2944)
-  if FMouseDragMinimap then
-  begin
-    if bMovedMinimal then
-      if Shift=[ssLeft] then
-        DoMinimapDrag(Y);
-    Exit
-  end;
 
   //start scroll timer
   FTimerScroll.Enabled:=
