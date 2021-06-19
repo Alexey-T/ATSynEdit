@@ -2421,7 +2421,7 @@ end;
 
 procedure TATSynEdit.SetText(const AValue: atString);
 begin
-  Strings.LoadFromStringW(AValue);
+  Strings.LoadFromString(AValue);
   DoCaretSingle(0, 0);
   Update(true);
 end;

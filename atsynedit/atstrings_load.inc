@@ -252,7 +252,7 @@ begin
     SetLineState(i, cLineStateAdded);
 end;
 
-procedure TATStrings.LoadFromStringW(const AText: atString);
+procedure TATStrings.LoadFromString(const AText: atString);
 var
   MS: TMemoryStream;
   Str: atString;

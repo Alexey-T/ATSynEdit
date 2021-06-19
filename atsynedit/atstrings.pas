@@ -376,7 +376,7 @@ type
     //file
     procedure LoadFromStream(Stream: TStream; AFromUnicodeString: boolean=false);
     procedure LoadFromFile(const AFilename: string);
-    procedure LoadFromStringW(const AText: atString);
+    procedure LoadFromString(const AText: atString);
     procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
     procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);

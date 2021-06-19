@@ -164,7 +164,7 @@ begin
   try
     FChangeBlockActive:= true;
     BeginUndoGroup;
-    Block.LoadFromStringW(StrLead+AText);
+    Block.LoadFromString(StrLead+AText);
     BlockOriginalLineCount:= Block.Count;
 
     //note: tricky condition to remove last empty line from Block
