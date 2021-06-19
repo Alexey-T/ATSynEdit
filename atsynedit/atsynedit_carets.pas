@@ -621,7 +621,7 @@ end;
 procedure TATCarets.Sort(AJoinAdjacentCarets: boolean=true);
 begin
   FList.Sort(@_ListCaretsCompare);
-  // DeleteDups(AJoinAdjacentCarets); // fix blocked text multicarets insertion.
+  DeleteDups(AJoinAdjacentCarets);
 end;
 
 procedure TATCarets.DeleteDups(AJoinAdjacentCarets: boolean);
