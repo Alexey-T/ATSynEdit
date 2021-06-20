@@ -127,11 +127,11 @@ type
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer; const Str: atString;
       constref ListOffsets: TATIntFixedArray;
-      APixelsFromLeft, ACharSize: integer;
+      APixelsFromLeft, ACharSize: Int64;
       AAllowVirtualPos: boolean;
       out AEndOfLinePos: boolean): integer;
     procedure FindOutputSkipOffset(ALineIndex: integer; const S: atString;
-      AScrollPos: Int64; out ACharsSkipped: integer; out ACellPercentsSkipped: Int64);
+      AScrollPos: Int64; out ACharsSkipped: Int64; out ACellPercentsSkipped: Int64);
   end;
 
 function IsCharEol(ch: widechar): boolean; inline;
@@ -691,7 +691,7 @@ end;
 
 function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString;
   constref ListOffsets: TATIntFixedArray;
-  APixelsFromLeft, ACharSize: integer; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
+  APixelsFromLeft, ACharSize: Int64; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): integer;
 var
   i: integer;
 begin
@@ -739,7 +739,7 @@ begin
 end;
 
 procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
-  AScrollPos: Int64; out ACharsSkipped: integer; out ACellPercentsSkipped: Int64);
+  AScrollPos: Int64; out ACharsSkipped: Int64; out ACellPercentsSkipped: Int64);
 var
   Offsets: TATIntFixedArray;
 begin

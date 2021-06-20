@@ -60,6 +60,15 @@ uses
 
 
 type
+  TATPoint64 = record
+    X, Y: Int64
+  end;
+
+  TATRect64 = record
+    Left, Top, Right, Bottom: Int64;
+  end;
+
+type
   TATTokenKind = (
     atkOther,
     atkComment,
@@ -3153,10 +3162,10 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   //
 var
   NLinesIndex, NLineLen, NCount: integer;
-  NOutputCharsSkipped: integer;
-  NOutputStrWidth, NOutputMaximalChars: integer;
+  NOutputCharsSkipped: Int64;
+  NOutputStrWidth, NOutputMaximalChars: Int64;
   NOutputCellPercentsSkipped: Int64;
-  NCoordSep: integer;
+  NCoordSep: Int64;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
   StringItem: PATStringItem;
@@ -8194,7 +8203,7 @@ procedure TATSynEdit.DoPaintTextFragment(C: TCanvas;
   AConsiderWrapInfo: boolean;
   AColorBG, AColorBorder: TColor);
 var
-  NOutputStrWidth: integer;
+  NOutputStrWidth: Int64;
   NLine, NWrapIndex: integer;
   NColorAfter: TColor;
   WrapItem: TATWrapItem;

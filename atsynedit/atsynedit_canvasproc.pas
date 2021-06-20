@@ -138,7 +138,7 @@ procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
   const AText: atString;
   AParts: PATLineParts;
-  out ATextWidth: integer;
+  out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps
   );
 
@@ -744,7 +744,7 @@ procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
   const AText: atString;
   AParts: PATLineParts;
-  out ATextWidth: integer;
+  out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps);
 var
   {$ifndef windows}
