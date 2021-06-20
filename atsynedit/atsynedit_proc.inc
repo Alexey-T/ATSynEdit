@@ -91,7 +91,7 @@ begin
   Result:= NPos=-1;
 end;
 
-function TATEditorScrollInfo.TotalOffset: integer;
+function TATEditorScrollInfo.TotalOffset: Int64;
 begin
   Result:= NPos*SmoothCharSize + NPixelOffset;
 end;

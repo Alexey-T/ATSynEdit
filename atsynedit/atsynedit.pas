@@ -245,21 +245,21 @@ type
 
   TATEditorScrollInfo = record
     Vertical: boolean;
-    NMax: integer;
-    NPage: integer;
-    NPos: integer;
-    NPosLast: integer;
-    NPixelOffset: integer;
-    SmoothCharSize: integer;
-    SmoothMax: integer;
-    SmoothPage: integer;
-    SmoothPos: integer;
-    SmoothPosLast: integer;
+    NMax: Int64;
+    NPage: Int64;
+    NPos: Int64;
+    NPosLast: Int64;
+    NPixelOffset: Int64;
+    SmoothCharSize: Int64;
+    SmoothMax: Int64;
+    SmoothPage: Int64;
+    SmoothPos: Int64;
+    SmoothPosLast: Int64;
     procedure Clear;
     procedure SetZero; inline;
     procedure SetLast; inline;
     function TopGapVisible: boolean; inline;
-    function TotalOffset: integer; inline;
+    function TotalOffset: Int64; inline;
     class operator =(const A, B: TATEditorScrollInfo): boolean;
   end;
 
@@ -3153,8 +3153,9 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   //
 var
   NLinesIndex, NLineLen, NCount: integer;
-  NOutputCharsSkipped, NOutputCellPercentsSkipped: integer;
+  NOutputCharsSkipped: integer;
   NOutputStrWidth, NOutputMaximalChars: integer;
+  NOutputCellPercentsSkipped: Int64;
   NCoordSep: integer;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
