@@ -252,7 +252,7 @@ begin
     SetLineState(i, cLineStateAdded);
 end;
 
-procedure TATStrings.LoadFromString(const AText: atString);
+procedure TATStrings.LoadFromString(const AText: UnicodeString);
 var
   MS: TMemoryStream;
   Str: atString;
@@ -283,7 +283,7 @@ begin
       try
         Encoding:= cEncWideLE;
         EncodingDetect:= false;
-        LoadFromStream(MS, true{AFromUnicodeString});
+        LoadFromStream(MS, true{AFromUTF16});
       finally
         Encoding:= EncOld;
         ActionAddFakeLineIfNeeded;
@@ -350,7 +350,7 @@ begin
 end;
 
 procedure TATStrings.DoLoadFromStream(Stream: TStream;
-  AFromUnicodeStream: boolean; out AForcedToANSI: boolean);
+  AFromUTF16: boolean; out AForcedToANSI: boolean);
 var
   Buf: PAnsiChar;
   BufSize: int64;
@@ -485,7 +485,7 @@ begin
   NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
-  if AFromUnicodeStream then
+  if AFromUTF16 then
   begin
     FEncoding:= cEncWideLE;
   end
@@ -560,10 +560,10 @@ begin
   end;
 end;
 
-procedure TATStrings.LoadFromStream(Stream: TStream; AFromUnicodeString: boolean);
+procedure TATStrings.LoadFromStream(Stream: TStream; AFromUTF16: boolean);
 begin
   ClearUndo(true);
-  DoLoadFromStream(Stream, AFromUnicodeString, FLoadingForcedANSI);
+  DoLoadFromStream(Stream, AFromUTF16, FLoadingForcedANSI);
   DoFinalizeLoading;
 end;
 
