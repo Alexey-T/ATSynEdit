@@ -1009,7 +1009,7 @@ type
     function GetOneLine: boolean;
     function GetRedoCount: integer;
     function GetLinesFromTop: integer;
-    function GetText: atString;
+    function GetText: UnicodeString;
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     procedure InitAttribs;
@@ -1166,7 +1166,7 @@ type
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
     procedure SetTabSpaces(AValue: boolean);
-    procedure SetText(const AValue: atString);
+    procedure SetText(const AValue: UnicodeString);
     procedure SetUndoAfterSave(AValue: boolean);
     procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
@@ -1385,7 +1385,7 @@ type
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     procedure ActionAddJumpToUndo;
-    property Text: atString read GetText write SetText;
+    property Text: UnicodeString read GetText write SetText;
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
@@ -2419,9 +2419,9 @@ begin
   FTabHelper.TabSpaces:= AValue;
 end;
 
-procedure TATSynEdit.SetText(const AValue: atString);
+procedure TATSynEdit.SetText(const AValue: UnicodeString);
 begin
-  Strings.LoadFromString(AValue);
+  Strings.LoadFromString(UTF8Encode(AValue));
   DoCaretSingle(0, 0);
   Update(true);
 end;
@@ -7135,7 +7135,7 @@ begin
   Result:= (P.Y-FRectMain.Top) div FCharSize.Y;
 end;
 
-function TATSynEdit.GetText: atString;
+function TATSynEdit.GetText: UnicodeString;
 begin
   Result:= DoGetTextString;
 end;
