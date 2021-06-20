@@ -252,10 +252,10 @@ begin
     SetLineState(i, cLineStateAdded);
 end;
 
-procedure TATStrings.LoadFromString(const AText: UnicodeString);
+procedure TATStrings.LoadFromString(const AText: string);
 var
   MS: TMemoryStream;
-  Str: atString;
+  Str: UnicodeString;
   EncOld: TATFileEncoding;
   i: integer;
 begin
@@ -269,7 +269,7 @@ begin
 
   if OneLine then
   begin
-    Str:= AText;
+    Str:= UTF8Decode(AText);
     SDeleteFromEol(Str);
     LineAddEx(Str, cEndNone);
   end
@@ -278,12 +278,12 @@ begin
     MS:= TMemoryStream.Create;
     EncOld:= Encoding;
     try
-      MS.Write(AText[1], Length(AText)*SizeOf(atChar));
+      MS.Write(AText[1], Length(AText)*1);
       MS.Position:= 0;
       try
-        Encoding:= cEncWideLE;
+        Encoding:= cEncUTF8;
         EncodingDetect:= false;
-        LoadFromStream(MS, true{AFromUTF16});
+        LoadFromStream(MS, true{AFromUTF8});
       finally
         Encoding:= EncOld;
         ActionAddFakeLineIfNeeded;
@@ -350,7 +350,7 @@ begin
 end;
 
 procedure TATStrings.DoLoadFromStream(Stream: TStream;
-  AFromUTF16: boolean; out AForcedToANSI: boolean);
+  AFromUTF8: boolean; out AForcedToANSI: boolean);
 var
   Buf: PAnsiChar;
   BufSize: int64;
@@ -485,9 +485,9 @@ begin
   NStreamSize:= Stream.Size;
   NSignatureLen:= 0;
 
-  if AFromUTF16 then
+  if AFromUTF8 then
   begin
-    FEncoding:= cEncWideLE;
+    FEncoding:= cEncUTF8;
   end
   else
   if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
@@ -560,10 +560,10 @@ begin
   end;
 end;
 
-procedure TATStrings.LoadFromStream(Stream: TStream; AFromUTF16: boolean);
+procedure TATStrings.LoadFromStream(Stream: TStream; AFromUTF8: boolean);
 begin
   ClearUndo(true);
-  DoLoadFromStream(Stream, AFromUTF16, FLoadingForcedANSI);
+  DoLoadFromStream(Stream, AFromUTF8, FLoadingForcedANSI);
   DoFinalizeLoading;
 end;
 
