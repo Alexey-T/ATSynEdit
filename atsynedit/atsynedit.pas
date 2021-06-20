@@ -1224,7 +1224,7 @@ type
     function DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
     function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
     function DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
-    function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
+    function DoCommand_TextInsertColumnBlockOnce(const AText: string; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_UndoRedo(AUndo: boolean): TATCommandResults;
     function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
