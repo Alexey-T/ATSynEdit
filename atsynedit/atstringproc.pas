@@ -39,13 +39,15 @@ const
   cMaxFixedArray = 1024;
 
 type
+  //must be with Int64 items, 32-bit is not enough for single line with len>40M
   TATIntFixedArray = record
-    Data: packed array[0..cMaxFixedArray-1] of Int64; //'integer' is not enough for single line len>40M
+    Data: packed array[0..cMaxFixedArray-1] of Int64;
     Len: integer;
   end;
 
+  //must be with 'longint' items, it's for Dx offsets for rendering
   TATInt32FixedArray = record
-    Data: packed array[0..cMaxFixedArray-1] of Longint; //must be 'integer', it's for Dx offsets for rendering
+    Data: packed array[0..cMaxFixedArray-1] of Longint;
     Len: integer;
   end;
 
