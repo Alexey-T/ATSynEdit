@@ -487,13 +487,20 @@ begin
 
   if AFromUTF8 then
   begin
+    //func param forces UTF8
     FEncoding:= cEncUTF8;
   end
   else
   if NStreamSize>(cMaxFileSizeMbToDetectEncoding*1024*1024) then
   begin
+    //detect encoding by signature, even for huge files
+    DetectStreamEncoding(Stream, FEncoding, FEncodingCodepage, NSignatureLen, bWithBom,
+      0, //buffer sizes=0
+      0);
+    //no signature?
     //it's safe to set here UTF8 even for binary files, later contents will be checked
-    FEncoding:= cEncUTF8;
+    if not bWithBom then
+      FEncoding:= cEncUTF8;
   end
   else
   if FEncodingDetect then
