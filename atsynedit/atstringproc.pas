@@ -684,7 +684,7 @@ begin
       Inc(NCharsSkipped, NTabSize-1);
     end;
 
-    Inc(Result, NSize*NScalePercents);
+    Inc(Result, Int64(NSize)*NScalePercents);
   end;
 end;
 
