@@ -1346,7 +1346,7 @@ type
     procedure Update(AUpdateWrapInfo: boolean=false); reintroduce;
     procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
-    procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; APos: integer);
+    procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
     procedure UpdateFoldLineIndexer;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure DoEventCarets; virtual;
@@ -3217,8 +3217,8 @@ begin
 
   CurrPoint.X:= ARectLine.Left;
   CurrPoint.Y:= ARectLine.Top;
-  CurrPointText.X:= CurrPoint.X
-                    + WrapItem.NIndent*ACharSize.X
+  CurrPointText.X:= Int64(CurrPoint.X)
+                    + Int64(WrapItem.NIndent)*ACharSize.X
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
@@ -3580,8 +3580,8 @@ begin
 
   CurrPoint.X:= ARectLine.Left;
   CurrPoint.Y:= ARectLine.Top;
-  CurrPointText.X:= CurrPoint.X
-                    + WrapItem.NIndent*ACharSize.X
+  CurrPointText.X:= Int64(CurrPoint.X)
+                    + Int64(WrapItem.NIndent)*ACharSize.X
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
@@ -5200,11 +5200,11 @@ begin
     FHintWnd.Hide;
 end;
 
-procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; APos: integer);
+procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
 //Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
-  NPos, NPixels, NLineIndex, NCharSize: integer;
-  NSizeGapTop, NSizeGap0: integer;
+  NPos, NPixels, NLineIndex, NCharSize: Int64;
+  NSizeGapTop, NSizeGap0: Int64;
   bConsiderGaps: boolean;
 begin
   AInfo.SmoothPos:= APos;

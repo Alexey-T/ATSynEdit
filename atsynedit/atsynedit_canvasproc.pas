@@ -172,7 +172,7 @@ procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AColorFont: TColor);
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharWidth: integer): integer; inline;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer): Int64; inline;
 
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 
@@ -656,7 +656,7 @@ end;
 
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharWidth: integer): integer;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer): Int64;
 begin
   Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S) * ACharWidth div 100;
 end;
