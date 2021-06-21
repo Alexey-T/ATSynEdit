@@ -44,6 +44,11 @@ type
     Len: integer;
   end;
 
+  TATInt32FixedArray = record
+    Data: packed array[0..cMaxFixedArray-1] of Longint; //must be 'integer', it's for Dx offsets for rendering
+    Len: integer;
+  end;
+
 type
   TATSimpleRange = record NFrom, NTo: integer; end;
   TATSimpleRangeArray = array of TATSimpleRange;

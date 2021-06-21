@@ -733,11 +733,11 @@ end;
 
 //global vars to avoid mem allocs, speeds up rendering by 10-30%
 var
-  ListOffsets,
-  ListInt,
-  Dx: TATIntFixedArray;
+  ListOffsets: TATIntFixedArray;
+  ListInt: TATIntFixedArray;
+  Dx: TATInt32FixedArray; //must be with 'longint' items
   {$ifndef windows}
-  DxUTF8: TATIntFixedArray;
+  DxUTF8: TATInt32FixedArray; //must be with 'longint' items
   {$endif}
 
 procedure CanvasTextOut(C: TCanvas;
