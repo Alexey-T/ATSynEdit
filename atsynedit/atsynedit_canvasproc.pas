@@ -701,7 +701,7 @@ end;
 procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
   DxIn: PInteger;
   DxInLen: integer;
-  var DxOut: TATIntFixedArray);
+  var DxOut: TATInt32FixedArray);
 var
   NLen, NSize, ResLen, i: integer;
 begin
