@@ -731,9 +731,10 @@ begin
     end;
 
   AEndOfLinePos:= true;
-  Result:= Length(Str)+1;
   if AAllowVirtualPos then
-    Inc(Result, (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) div ACharSize);
+    Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) div ACharSize + 2
+  else
+    Result:= Length(Str)+1;
 end;
 
 procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
