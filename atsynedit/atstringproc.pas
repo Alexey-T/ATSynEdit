@@ -738,10 +738,10 @@ begin
     end;
 
   AEndOfLinePos:= true;
-  if AAllowVirtualPos then
-    Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1] - ACharSize div 2) div ACharSize + 2
-  else
-    Result:= Length(Str)+1;
+  Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1] - ACharSize div 2) div ACharSize + 2;
+
+  if not AAllowVirtualPos then
+    Result:= Min(Result, Length(Str)+1);
 end;
 
 procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
