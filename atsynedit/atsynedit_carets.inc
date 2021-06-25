@@ -173,9 +173,10 @@ function _DoCaretPosToClientPos(
 var
   Item: TATWrapItem;
   StringItem: PATStringItem;
-  NIndex1, NIndex2, NLineIndexTop, NFromStart, NWidth: integer;
-  NScrolledHorzSmooth: integer;
-  NScrolledVert: integer;
+  NIndex1, NIndex2, NLineIndexTop: integer;
+  NFromStart, NWidth: Int64;
+  NScrolledHorzSmooth: Int64;
+  NScrolledVert: Int64;
   NLineCount: integer;
   Str: atString;
   bLineHuge: boolean;
@@ -291,7 +292,7 @@ function _DoClientPosToCaretPos(
 var
   CharOffsets: TATIntFixedArray;
   NLineLenOriginal, NLineLenTrimmed: integer;
-  NIndex, NIndexDecrement, NPixels: integer;
+  NIndex, NIndexDecrement, NPixels: Int64;
   NGapObjectWidth: integer;
   Item: TATWrapItem;
   ItemGap: TATGapItem;
@@ -419,7 +420,7 @@ begin
     else
     begin
       AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
-      NPixels:= P.X-ARect.Left + ACharSize.X*(AScrollHorz.NPos-Item.NIndent);
+      NPixels:= Int64(P.X)-ARect.Left + Int64(ACharSize.X)*(AScrollHorz.NPos-Item.NIndent);
       Result.X:= ATabHelper.FindClickedPosition(
         Result.Y,
         Str,

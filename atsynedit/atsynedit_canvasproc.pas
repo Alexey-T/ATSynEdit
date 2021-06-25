@@ -138,7 +138,7 @@ procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
   const AText: atString;
   AParts: PATLineParts;
-  out ATextWidth: integer;
+  out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps
   );
 
@@ -172,7 +172,7 @@ procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AColorFont: TColor);
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharWidth: integer): integer; inline;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer): Int64; inline;
 
 procedure UpdateWiderFlags(C: TCanvas; out Flags: TATWiderFlags);
 
@@ -656,7 +656,7 @@ end;
 
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
-  ATabHelper: TATStringTabHelper; ACharWidth: integer): integer;
+  ATabHelper: TATStringTabHelper; ACharWidth: integer): Int64;
 begin
   Result:= ATabHelper.CalcCharOffsetLast(ALineIndex, S) * ACharWidth div 100;
 end;
@@ -701,7 +701,7 @@ end;
 procedure _CalcCharSizesUtf8FromWidestring(const S: UnicodeString;
   DxIn: PInteger;
   DxInLen: integer;
-  var DxOut: TATIntFixedArray);
+  var DxOut: TATInt32FixedArray);
 var
   NLen, NSize, ResLen, i: integer;
 begin
@@ -733,18 +733,18 @@ end;
 
 //global vars to avoid mem allocs, speeds up rendering by 10-30%
 var
-  ListOffsets,
-  ListInt,
-  Dx: TATIntFixedArray;
+  ListOffsets: TATIntFixedArray;
+  ListInt: TATIntFixedArray;
+  Dx: TATInt32FixedArray; //must be with 'longint' items
   {$ifndef windows}
-  DxUTF8: TATIntFixedArray;
+  DxUTF8: TATInt32FixedArray; //must be with 'longint' items
   {$endif}
 
 procedure CanvasTextOut(C: TCanvas;
   APosX, APosY: integer;
   const AText: atString;
   AParts: PATLineParts;
-  out ATextWidth: integer;
+  out ATextWidth: Int64;
   const AProps: TATCanvasTextOutProps);
 var
   {$ifndef windows}

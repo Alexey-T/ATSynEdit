@@ -28,6 +28,9 @@ begin
   P1.Y:= Mark.PosY;
   P2:= Mark.SelEnd;
 
+  if P1=P2 then
+    P1:= Point(-1, -1)
+  else
   if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, false) then
     SwapPoints(P1, P2);
 
@@ -60,6 +63,9 @@ begin
             P1.Y:= Mark.PosY;
             P2:= Mark.SelEnd;
 
+            if P1=P2 then
+              P1:= Point(-1, -1)
+            else
             if not IsPosSorted(P1.X, P1.Y, P2.X, P2.Y, false) then
               SwapPoints(P1, P2);
 

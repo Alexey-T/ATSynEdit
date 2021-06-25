@@ -277,7 +277,7 @@ type
     procedure SetLineSep(AIndex: integer; AValue: TATLineSeparator);
     procedure SetLineState(AIndex: integer; AValue: TATLineState);
     procedure SetLineUpdated(AIndex: integer; AValue: boolean);
-    procedure DoLoadFromStream(Stream: TStream; out AForcedToANSI: boolean);
+    procedure DoLoadFromStream(Stream: TStream; AFromUTF8: boolean; out AForcedToANSI: boolean);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure ClearLineStates(ASaved: boolean);
@@ -374,9 +374,9 @@ type
     procedure ActionShuffleLines;
     procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointArray);
     //file
-    procedure LoadFromStream(Stream: TStream);
+    procedure LoadFromStream(Stream: TStream; AFromUTF8: boolean=false);
     procedure LoadFromFile(const AFilename: string);
-    procedure LoadFromString(const AText: atString);
+    procedure LoadFromString(const AText: string);
     procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
     procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);

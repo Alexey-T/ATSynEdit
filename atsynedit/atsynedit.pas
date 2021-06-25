@@ -60,6 +60,15 @@ uses
 
 
 type
+  TATPoint64 = record
+    X, Y: Int64
+  end;
+
+  TATRect64 = record
+    Left, Top, Right, Bottom: Int64;
+  end;
+
+type
   TATTokenKind = (
     atkOther,
     atkComment,
@@ -245,21 +254,21 @@ type
 
   TATEditorScrollInfo = record
     Vertical: boolean;
-    NMax: integer;
-    NPage: integer;
-    NPos: integer;
-    NPosLast: integer;
-    NPixelOffset: integer;
-    SmoothCharSize: integer;
-    SmoothMax: integer;
-    SmoothPage: integer;
-    SmoothPos: integer;
-    SmoothPosLast: integer;
+    NMax: Int64;
+    NPage: Int64;
+    NPos: Int64;
+    NPosLast: Int64;
+    NPixelOffset: Int64;
+    SmoothCharSize: Int64;
+    SmoothMax: Int64;
+    SmoothPage: Int64;
+    SmoothPos: Int64;
+    SmoothPosLast: Int64;
     procedure Clear;
     procedure SetZero; inline;
     procedure SetLast; inline;
     function TopGapVisible: boolean; inline;
-    function TotalOffset: integer; inline;
+    function TotalOffset: Int64; inline;
     class operator =(const A, B: TATEditorScrollInfo): boolean;
   end;
 
@@ -1009,7 +1018,7 @@ type
     function GetOneLine: boolean;
     function GetRedoCount: integer;
     function GetLinesFromTop: integer;
-    function GetText: atString;
+    function GetText: UnicodeString;
     function GetUndoAfterSave: boolean;
     function GetUndoCount: integer;
     procedure InitAttribs;
@@ -1166,7 +1175,7 @@ type
     function GetMinimapScrollPos: integer;
     procedure SetTabSize(AValue: integer);
     procedure SetTabSpaces(AValue: boolean);
-    procedure SetText(const AValue: atString);
+    procedure SetText(const AValue: UnicodeString);
     procedure SetUndoAfterSave(AValue: boolean);
     procedure SetUndoAsString(const AValue: string);
     procedure SetUndoLimit(AValue: integer);
@@ -1224,7 +1233,7 @@ type
     function DoCommand_SelectColumnToDirection(ADir: TATEditorSelectColumnDirection): TATCommandResults;
     function DoCommand_SelectColumnToLineEdge(AToEnd: boolean): TATCommandResults;
     function DoCommand_RemoveOneCaret(AFirstCaret: boolean): TATCommandResults;
-    function DoCommand_TextInsertColumnBlockOnce(const AText: atString; AKeepCaret: boolean): TATCommandResults;
+    function DoCommand_TextInsertColumnBlockOnce(const AText: string; AKeepCaret: boolean): TATCommandResults;
     function DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
     function DoCommand_UndoRedo(AUndo: boolean): TATCommandResults;
     function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
@@ -1337,7 +1346,7 @@ type
     procedure Update(AUpdateWrapInfo: boolean=false); reintroduce;
     procedure UpdateWrapInfo(AForceUpdate: boolean=false);
     procedure UpdateFoldedFromLinesHidden;
-    procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; APos: integer);
+    procedure UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
     procedure UpdateFoldLineIndexer;
     function UpdateScrollbars(AdjustSmoothPos: boolean): boolean;
     procedure DoEventCarets; virtual;
@@ -1385,7 +1394,7 @@ type
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
     property RedoAsString: string read GetRedoAsString write SetRedoAsString;
     procedure ActionAddJumpToUndo;
-    property Text: atString read GetText write SetText;
+    property Text: UnicodeString read GetText write SetText;
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
@@ -2419,9 +2428,9 @@ begin
   FTabHelper.TabSpaces:= AValue;
 end;
 
-procedure TATSynEdit.SetText(const AValue: atString);
+procedure TATSynEdit.SetText(const AValue: UnicodeString);
 begin
-  Strings.LoadFromString(AValue);
+  Strings.LoadFromString(UTF8Encode(AValue));
   DoCaretSingle(0, 0);
   Update(true);
 end;
@@ -3153,9 +3162,10 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   //
 var
   NLinesIndex, NLineLen, NCount: integer;
-  NOutputCharsSkipped, NOutputCellPercentsSkipped: integer;
-  NOutputStrWidth, NOutputMaximalChars: integer;
-  NCoordSep: integer;
+  NOutputCharsSkipped: Int64;
+  NOutputStrWidth, NOutputMaximalChars: Int64;
+  NOutputCellPercentsSkipped: Int64;
+  NCoordSep: Int64;
   WrapItem: TATWrapItem;
   GapItem: TATGapItem;
   StringItem: PATStringItem;
@@ -3207,8 +3217,8 @@ begin
 
   CurrPoint.X:= ARectLine.Left;
   CurrPoint.Y:= ARectLine.Top;
-  CurrPointText.X:= CurrPoint.X
-                    + WrapItem.NIndent*ACharSize.X
+  CurrPointText.X:= Int64(CurrPoint.X)
+                    + Int64(WrapItem.NIndent)*ACharSize.X
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
@@ -3570,8 +3580,8 @@ begin
 
   CurrPoint.X:= ARectLine.Left;
   CurrPoint.Y:= ARectLine.Top;
-  CurrPointText.X:= CurrPoint.X
-                    + WrapItem.NIndent*ACharSize.X
+  CurrPointText.X:= Int64(CurrPoint.X)
+                    + Int64(WrapItem.NIndent)*ACharSize.X
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
@@ -5190,11 +5200,11 @@ begin
     FHintWnd.Hide;
 end;
 
-procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; APos: integer);
+procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
 //Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
-  NPos, NPixels, NLineIndex, NCharSize: integer;
-  NSizeGapTop, NSizeGap0: integer;
+  NPos, NPixels, NLineIndex, NCharSize: Int64;
+  NSizeGapTop, NSizeGap0: Int64;
   bConsiderGaps: boolean;
 begin
   AInfo.SmoothPos:= APos;
@@ -7135,7 +7145,7 @@ begin
   Result:= (P.Y-FRectMain.Top) div FCharSize.Y;
 end;
 
-function TATSynEdit.GetText: atString;
+function TATSynEdit.GetText: UnicodeString;
 begin
   Result:= DoGetTextString;
 end;
@@ -8193,7 +8203,7 @@ procedure TATSynEdit.DoPaintTextFragment(C: TCanvas;
   AConsiderWrapInfo: boolean;
   AColorBG, AColorBorder: TColor);
 var
-  NOutputStrWidth: integer;
+  NOutputStrWidth: Int64;
   NLine, NWrapIndex: integer;
   NColorAfter: TColor;
   WrapItem: TATWrapItem;

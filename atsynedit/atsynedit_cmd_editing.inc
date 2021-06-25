@@ -908,7 +908,7 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_TextInsertColumnBlockOnce(const AText: atString;
+function TATSynEdit.DoCommand_TextInsertColumnBlockOnce(const AText: string;
   AKeepCaret: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
