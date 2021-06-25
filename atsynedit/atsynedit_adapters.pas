@@ -58,7 +58,7 @@ type
     //called before calculation of hilites for n lines, before 1st of these lines.
     //adapter should prepare buffers here for next lines.
 
-    function IsParsingDoneAtLeastPartially: boolean; virtual;
+    function IsParsedAtLeastPartially: boolean; virtual;
     //returns False to supress unneeded painting, when parsing is not done
 
     //
@@ -197,7 +197,7 @@ begin
   //
 end;
 
-function TATAdapterHilite.IsParsingDoneAtLeastPartially: boolean;
+function TATAdapterHilite.IsParsedAtLeastPartially: boolean;
 begin
   Result:= true;
 end;
