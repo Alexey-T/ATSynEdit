@@ -173,7 +173,7 @@ function SEndsWith(const S: string; ch: char): boolean; inline;
 function SEndsWithEol(const S: string): boolean; inline;
 function SEndsWithEol(const S: atString): boolean; inline;
 
-function STrim(const S: UnicodeString): UnicodeString;
+function STrimAll(const S: UnicodeString): UnicodeString;
 function STrimLeft(const S: UnicodeString): UnicodeString;
 function STrimRight(const S: UnicodeString): UnicodeString;
 
@@ -943,40 +943,39 @@ begin
       Result[i]:= ' ';
 end;
 
-function STrim(const S: unicodestring): unicodestring;
-  var
-    Ofs, Len: sizeint;
-  begin
-    len := Length(S);
-    while (Len>0) and (IsCharSpace(S[Len])) do
-     dec(Len);
-    Ofs := 1;
-    while (Ofs<=Len) and (IsCharSpace(S[Ofs])) do
-      Inc(Ofs);
-    result := Copy(S, Ofs, 1 + Len - Ofs);
-  end;
-
+function STrimAll(const S: unicodestring): unicodestring;
+var
+  Ofs, Len: sizeint;
+begin
+  len := Length(S);
+  while (Len>0) and (IsCharSpace(S[Len])) do
+   dec(Len);
+  Ofs := 1;
+  while (Ofs<=Len) and (IsCharSpace(S[Ofs])) do
+    Inc(Ofs);
+  result := Copy(S, Ofs, 1 + Len - Ofs);
+end;
 
 function STrimLeft(const S: unicodestring): unicodestring;
-  var
-    i,l:sizeint;
-  begin
-    l := length(s);
-    i := 1;
-    while (i<=l) and (IsCharSpace(s[i])) do
-      inc(i);
-    Result := copy(s, i, l);
-  end;
+var
+  i,l:sizeint;
+begin
+  l := length(s);
+  i := 1;
+  while (i<=l) and (IsCharSpace(s[i])) do
+    inc(i);
+  Result := copy(s, i, l);
+end;
 
 function STrimRight(const S: unicodestring): unicodestring;
-  var
-	l:sizeint;
-  begin
-    l := length(s);
-    while (l>0) and (IsCharSpace(s[l])) do
-      dec(l);
-    result := copy(s,1,l);
-  end;
+var
+  l:sizeint;
+begin
+  l := length(s);
+  while (l>0) and (IsCharSpace(s[l])) do
+    dec(l);
+  result := copy(s,1,l);
+end;
 
 function SBeginsWith(const S, SubStr: UnicodeString): boolean;
 var

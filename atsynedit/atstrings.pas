@@ -2435,7 +2435,7 @@ begin
       cTrimRight:
         S2:= STrimRight(S1);
       cTrimAll:
-        S2:= STrim(S1);
+        S2:= STrimAll(S1);
     end;
 
     if S2<>S1 then
