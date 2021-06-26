@@ -934,6 +934,7 @@ type
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
+    procedure InitLengthArray(var Lens: TATIntArray);
     function IsCaretOnVisibleRect: boolean;
     procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
@@ -1445,6 +1446,8 @@ type
       out ADetails: TATEditorPosDetails;
       AGapCoordAction: TATEditorGapCoordAction=cGapCoordToLineEnd): TPoint;
     function IsLineWithCaret(ALine: integer): boolean;
+    function OffsetToCaretPos(const APos: integer): TPoint;
+    function CaretPosToOffset(const ACaret: TPoint): integer;
     //goto
     function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AUnfold, AllowUpdate: boolean): boolean;
     procedure DoGotoPos(const APos, APosEnd: TPoint;
@@ -1922,6 +1925,7 @@ uses
   gtk2,
   Gtk2Globals,
   {$endif}
+  ATStringProc_TextBuffer,
   ATSynEdit_Commands,
   ATSynEdit_Keymap_Init;
 

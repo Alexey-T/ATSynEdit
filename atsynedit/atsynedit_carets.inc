@@ -476,6 +476,47 @@ begin
     FEditorIndex);
 end;
 
+procedure TATSynEdit.InitLengthArray(var Lens: TATIntArray);
+var
+  St: TATStrings;
+  i: integer;
+begin
+  St:= Strings;
+  SetLength(Lens{%H-}, St.Count);
+  for i:= 0 to Length(Lens)-1 do
+    Lens[i]:= St.LinesLen[i];
+end;
+
+function TATSynEdit.OffsetToCaretPos(const APos: integer): TPoint;
+var
+  Buffer: TATStringBuffer;
+  Lens: TATIntArray;
+begin
+  Buffer:= TATStringBuffer.Create;
+  try
+    InitLengthArray(Lens);
+    Buffer.Setup('?', Lens);
+    Result:= Buffer.StrToCaret(APos);
+  finally
+    FreeAndNil(Buffer);
+  end;
+end;
+
+function TATSynEdit.CaretPosToOffset(const ACaret: TPoint): integer;
+var
+  Buffer: TATStringBuffer;
+  Lens: TATIntArray;
+begin
+  Buffer:= TATStringBuffer.Create;
+  try
+    InitLengthArray(Lens);
+    Buffer.Setup('?', Lens);
+    Result:= Buffer.CaretToStr(ACaret);
+  finally
+    FreeAndNil(Buffer);
+  end;
+end;
+
 procedure TATSynEdit.SetCaretBlinkEnabled(AValue: boolean);
 begin
   if FCaretBlinkEnabled=AValue then Exit;
