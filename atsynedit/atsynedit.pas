@@ -611,6 +611,7 @@ type
     FLastLineOfSlowEvents: integer;
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
+    FLastPaintDidScrolling: boolean;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
@@ -2575,7 +2576,7 @@ begin
   begin
     FPrevHorz:= FScrollHorz;
     FPrevVert:= FScrollVert;
-    DoEventScroll;
+    FLastPaintDidScrolling:= true;
   end;
 end;
 
@@ -5053,6 +5054,8 @@ procedure TATSynEdit.PaintEx(ALineNumber: integer);
 var
   R: TRect;
 begin
+  FLastPaintDidScrolling:= false;
+
   if IsLocked then
   begin
     DoPaintLockedWarning(Canvas);
@@ -5096,6 +5099,9 @@ begin
   end;
 
   DoPaintMarkerOfDragDrop(Canvas);
+
+  if FLastPaintDidScrolling then
+    DoEventScroll;
 
   if OptEditorDebugTiming then
   begin
