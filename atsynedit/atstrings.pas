@@ -2430,9 +2430,12 @@ begin
   begin
     S1:= Lines[i];
     case AMode of
-      cTrimLeft: S2:= TrimLeft(S1);
-      cTrimRight: S2:= TrimRight(S1);
-      cTrimAll: S2:= Trim(S1);
+      cTrimLeft:
+        S2:= STrimLeft(S1);
+      cTrimRight:
+        S2:= STrimRight(S1);
+      cTrimAll:
+        S2:= STrim(S1);
     end;
 
     if S2<>S1 then
