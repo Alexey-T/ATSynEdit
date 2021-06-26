@@ -298,6 +298,10 @@ begin
   Ed:= TATSynEdit(Sender);
   Len:= Length(FSelText);
   Ed.TextInsertAtCarets(FSelText, False, False, Len>0);
+  // tweak for emoji window, but don't work currently
+  // it shows emoji window on previous position.
+  SetFocus(0);
+  SetFocus(Ed.Handle);
   {$ifdef IME_ATTR_FUNC}
   position:=0;
   {$endif}
