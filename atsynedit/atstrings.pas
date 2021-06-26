@@ -2429,13 +2429,27 @@ begin
   for i:= 0 to Count-1 do
   begin
     S1:= Lines[i];
+    if S1='' then Continue;
+
     case AMode of
       cTrimLeft:
-        S2:= STrimLeft(S1);
+        begin
+          if not IsCharSpace(S1[1]) then
+            Continue;
+          S2:= STrimLeft(S1);
+        end;
       cTrimRight:
-        S2:= STrimRight(S1);
+        begin
+          if not IsCharSpace(S1[Length(S1)]) then
+            Continue;
+          S2:= STrimRight(S1);
+        end;
       cTrimAll:
-        S2:= STrimAll(S1);
+        begin
+          if not IsCharSpace(S1[1]) and not IsCharSpace(S1[Length(S1)]) then
+            Continue;
+          S2:= STrimAll(S1);
+        end;
     end;
 
     if S2<>S1 then
