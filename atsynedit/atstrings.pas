@@ -277,7 +277,7 @@ type
     procedure SetLineSep(AIndex: integer; AValue: TATLineSeparator);
     procedure SetLineState(AIndex: integer; AValue: TATLineState);
     procedure SetLineUpdated(AIndex: integer; AValue: boolean);
-    procedure DoLoadFromStream(Stream: TStream; out AForcedToANSI: boolean);
+    procedure DoLoadFromStream(Stream: TStream; AFromUTF8: boolean; out AForcedToANSI: boolean);
     procedure DoDetectEndings;
     procedure DoFinalizeLoading;
     procedure ClearLineStates(ASaved: boolean);
@@ -374,9 +374,9 @@ type
     procedure ActionShuffleLines;
     procedure ActionAddJumpToUndo(constref ACaretsArray: TATPointArray);
     //file
-    procedure LoadFromStream(Stream: TStream);
+    procedure LoadFromStream(Stream: TStream; AFromUTF8: boolean=false);
     procedure LoadFromFile(const AFilename: string);
-    procedure LoadFromString(const AText: atString);
+    procedure LoadFromString(const AText: string);
     procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
     procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);
@@ -2429,10 +2429,27 @@ begin
   for i:= 0 to Count-1 do
   begin
     S1:= Lines[i];
+    if S1='' then Continue;
+
     case AMode of
-      cTrimLeft: S2:= TrimLeft(S1);
-      cTrimRight: S2:= TrimRight(S1);
-      cTrimAll: S2:= Trim(S1);
+      cTrimLeft:
+        begin
+          if not IsCharSpace(S1[1]) then
+            Continue;
+          S2:= STrimLeft(S1);
+        end;
+      cTrimRight:
+        begin
+          if not IsCharSpace(S1[Length(S1)]) then
+            Continue;
+          S2:= STrimRight(S1);
+        end;
+      cTrimAll:
+        begin
+          if not IsCharSpace(S1[1]) and not IsCharSpace(S1[Length(S1)]) then
+            Continue;
+          S2:= STrimAll(S1);
+        end;
     end;
 
     if S2<>S1 then

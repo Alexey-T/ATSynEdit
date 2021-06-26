@@ -58,6 +58,9 @@ type
     //called before calculation of hilites for n lines, before 1st of these lines.
     //adapter should prepare buffers here for next lines.
 
+    function IsParsedAtLeastPartially: boolean; virtual;
+    //returns False to supress unneeded painting, when parsing is not done
+
     //
     property DynamicHiliteEnabled: boolean
       read FDynamicHiliteEnabled
@@ -192,6 +195,11 @@ end;
 procedure TATAdapterHilite.OnEditorBeforeCalcHilite(Sender: TObject);
 begin
   //
+end;
+
+function TATAdapterHilite.IsParsedAtLeastPartially: boolean;
+begin
+  Result:= true;
 end;
 
 function TATAdapterHilite.DynamicHiliteActiveNow(ALinesCount: integer): boolean;

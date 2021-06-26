@@ -86,13 +86,13 @@ end;
 function TATSynEdit.DoCommand_ClipboardPasteColumnBlock(AKeepCaret: boolean;
   AClipboardObject: TClipboard): TATCommandResults;
 var
-  Str: atString;
+  Str: string;
   Num64: Int64;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
 
-  Str:= UTF8Decode(AClipboardObject.AsText);
+  Str:= AClipboardObject.AsText;
 
   if FOptInputNumberOnly then
     if not TryStrToInt64(Str, Num64) then exit;
