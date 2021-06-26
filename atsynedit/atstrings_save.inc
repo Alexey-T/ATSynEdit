@@ -93,18 +93,30 @@ begin
   FProgressKind:= cStringsProgressNone;
 end;
 
+function TATStrings.IsSavingWithSignature: boolean;
+begin
+  case FEncoding of
+    cEncAnsi:
+      Result:= false;
+    cEncUTF8:
+      Result:= FSaveSignUtf8;
+    cEncWideLE,
+    cEncWideBE,
+    cEnc32LE,
+    cEnc32BE:
+      Result:= FSaveSignWide;
+    else
+      raise Exception.Create('Unknown encoding on saving');
+  end;
+end;
+
 procedure TATStrings.SaveToFile(const AFilename: string);
 var
   fs: TFileStream;
-  WithSign: boolean;
 begin
-  WithSign:=
-    ((FEncoding in [cEncUTF8]) and FSaveSignUtf8) or
-    ((FEncoding in [cEncWideLE, cEncWideBE, cEnc32LE, cEnc32BE]) and FSaveSignWide);
-
   fs:= TFileStream.Create(AFilename, fmCreate or fmOpenWrite or fmShareDenyWrite);
   try
-    SaveToStream(fs, FEncoding, WithSign);
+    SaveToStream(fs, FEncoding, IsSavingWithSignature);
   finally
     FreeAndNil(fs);
   end;
