@@ -4658,18 +4658,18 @@ end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
 var
-  Change1, Change2, Change3: boolean;
+  bChange1, bChange2, bChange3: boolean;
 begin
-  Change1:= false;
-  Change2:= false;
-  Change3:= false;
+  bChange1:= false;
+  bChange2:= false;
+  bChange3:= false;
 
   if FOptSavingForceFinalEol then
-    Change1:= Strings.ActionEnsureFinalEol;
+    bChange1:= Strings.ActionEnsureFinalEol;
 
   if FOptSavingTrimSpaces then
   begin
-    Change2:= Strings.ActionTrimSpaces(cTrimRight);
+    bChange2:= Strings.ActionTrimSpaces(cTrimRight);
     //caret may be after end-of-line, so fix it
     if not OptCaretVirtual then
       DoCaretsFixIncorrectPos(true);
@@ -4677,12 +4677,12 @@ begin
 
   if FOptSavingTrimFinalEmptyLines then
   begin
-    Change3:= Strings.ActionTrimFinalEmptyLines;
-    if Change3 then
+    bChange3:= Strings.ActionTrimFinalEmptyLines;
+    if bChange3 then
       DoCaretsFixIncorrectPos(false);
   end;
 
-  if Change1 or Change2 or Change3 then
+  if bChange1 or bChange2 or bChange3 then
   begin
     Update(true);
     DoEventChange;
