@@ -267,6 +267,7 @@ type
       AWithEvent: boolean=true);
     procedure LineInsertEx(ALineIndex: integer; const AString: atString; AEnd: TATLineEnds;
       AWithEvent: boolean=true);
+    function IsSavingWithSignature: boolean;
     procedure SetCaretsArray(const L: TATPointArray);
     procedure SetMarkersArray(const L: TATInt64Array);
     procedure SetEndings(AValue: TATLineEnds);
