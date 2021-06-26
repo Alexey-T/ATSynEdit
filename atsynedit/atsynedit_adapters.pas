@@ -61,6 +61,8 @@ type
     function IsParsedAtLeastPartially: boolean; virtual;
     //returns False to supress unneeded painting, when parsing is not done
 
+    function GetLexerName: string; virtual;
+
     //
     property DynamicHiliteEnabled: boolean
       read FDynamicHiliteEnabled
@@ -200,6 +202,11 @@ end;
 function TATAdapterHilite.IsParsedAtLeastPartially: boolean;
 begin
   Result:= true;
+end;
+
+function TATAdapterHilite.GetLexerName: string;
+begin
+  Result:= '?';
 end;
 
 function TATAdapterHilite.DynamicHiliteActiveNow(ALinesCount: integer): boolean;

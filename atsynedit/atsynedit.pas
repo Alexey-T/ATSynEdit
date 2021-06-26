@@ -6311,7 +6311,14 @@ procedure TATSynEdit.Invalidate;
 begin
   //to solve CudaText issue #3461
   if Assigned(AdapterForHilite) then
-    if not AdapterForHilite.IsParsedAtLeastPartially then exit;
+    if not AdapterForHilite.IsParsedAtLeastPartially then
+    begin
+      { //debug
+      if Assigned(Application) and Assigned(Application.MainForm) then
+        Application.MainForm.Caption:= 'skip invalidate: '+TimeToStr(Now)+', lexer: '+AdapterForHilite.GetLexerName;
+        }
+      exit;
+    end;
 
   Include(FPaintFlags, cIntFlagBitmap);
   inherited;
