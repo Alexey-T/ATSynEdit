@@ -6311,6 +6311,11 @@ end;
 function TATSynEdit.IsInvalidateAllowed: boolean;
 //solve CudaText issue #3461
 begin
+  {$ifdef darwin}
+  //mac version shows strange issues
+  exit(true);
+  {$endif}
+
   if Assigned(AdapterForHilite) then
     Result:= AdapterForHilite.IsParsedAtLeastPartially
   else
