@@ -6467,6 +6467,12 @@ begin
   if csDestroying in ComponentState then exit;
   if not FCaretShowEnabled then exit;
 
+  //disable InvalidateRect during Paint
+  if (csCustomPaint in ControlState) then
+    AWithInvalidate:= false;
+  if not IsInvalidateAllowed then
+    AWithInvalidate:= false;
+
   if ModeReadOnly then
     CaretShape:= FCaretShapeReadonly
   else
@@ -6518,8 +6524,7 @@ begin
         begin
           CanvasInvertRect(C, Caret.OldRect, NCaretColor);
           if AWithInvalidate then
-            if not (csCustomPaint in ControlState) then //disable during Paint
-              InvalidateRect(Handle, @Caret.OldRect, false);
+            InvalidateRect(Handle, @Caret.OldRect, false);
         end;
       end;
 
@@ -6538,8 +6543,7 @@ begin
     Caret.OldRect:= R;
 
     if AWithInvalidate then
-      if not (csCustomPaint in ControlState) then //disable during Paint
-        InvalidateRect(Handle, @R, false);
+      InvalidateRect(Handle, @R, false);
   end;
 end;
 
