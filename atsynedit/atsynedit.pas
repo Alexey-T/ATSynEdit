@@ -936,6 +936,7 @@ type
     function GetGutterDecor: TATGutterDecor;
     procedure InitLengthArray(var Lens: TATIntArray);
     function IsCaretOnVisibleRect: boolean;
+    function IsInvalidateAllowed: boolean; inline;
     procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
     procedure SetFoldingAsString(const AValue: string);
@@ -6307,18 +6308,25 @@ begin
   end;
 end;
 
+function TATSynEdit.IsInvalidateAllowed: boolean;
+//solve CudaText issue #3461
+begin
+  if Assigned(AdapterForHilite) then
+    Result:= AdapterForHilite.IsParsedAtLeastPartially
+  else
+    Result:= true;
+
+  { //debug
+  if not Result then
+    if Assigned(Application) and Assigned(Application.MainForm) then
+      Application.MainForm.Caption:= 'skip invalidate: '+TimeToStr(Now)+', lexer: '+AdapterForHilite.GetLexerName;
+    }
+end;
+
 procedure TATSynEdit.Invalidate;
 begin
-  //to solve CudaText issue #3461
-  if Assigned(AdapterForHilite) then
-    if not AdapterForHilite.IsParsedAtLeastPartially then
-    begin
-      { //debug
-      if Assigned(Application) and Assigned(Application.MainForm) then
-        Application.MainForm.Caption:= 'skip invalidate: '+TimeToStr(Now)+', lexer: '+AdapterForHilite.GetLexerName;
-        }
-      exit;
-    end;
+  //solve CudaText issue #3461
+  if not IsInvalidateAllowed then exit;
 
   Include(FPaintFlags, cIntFlagBitmap);
   inherited;
