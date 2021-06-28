@@ -6312,13 +6312,9 @@ function TATSynEdit.IsInvalidateAllowed: boolean;
 begin
   exit(true);
 
-  {$ifdef darwin}
-  //mac version shows strange issues
-  exit(true);
-  {$endif}
-
   {
   //solve CudaText issue #3461
+  //but this gives random hangings on editing, e.g. CudaText #3475, also AT sees hangings on macOS
   if Assigned(AdapterForHilite) then
     Result:= AdapterForHilite.IsParsedAtLeastPartially
   else
@@ -6334,8 +6330,7 @@ end;
 
 procedure TATSynEdit.Invalidate;
 begin
-  //solve CudaText issue #3461
-  if not IsInvalidateAllowed then exit;
+  //if not IsInvalidateAllowed then exit;
 
   Include(FPaintFlags, cIntFlagBitmap);
   inherited;
