@@ -14,7 +14,7 @@ uses
   ATSynEdit_fgl;
 
 const
-  cMaxLinksPerLine = 6;
+  cMaxLinksPerLine = 15;
 
 type
   TATLinkPair = record
