@@ -206,7 +206,7 @@ end;
 
 function TATAdapterHilite.GetLexerName: string;
 begin
-  Result:= '?';
+  Result:= '-';
 end;
 
 function TATAdapterHilite.DynamicHiliteActiveNow(ALinesCount: integer): boolean;

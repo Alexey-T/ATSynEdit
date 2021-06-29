@@ -5061,6 +5061,10 @@ var
 begin
   FLastPaintDidScrolling:= false;
 
+  //experimental,
+  //reduce flickering on typing in Markdown
+  FOptAllowRepaintOnTextChange:= (FAdapterHilite=nil) or (FAdapterHilite.GetLexerName='-');
+
   if IsLocked then
   begin
     DoPaintLockedWarning(Canvas);
