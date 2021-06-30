@@ -23,7 +23,6 @@ type
     FDynamicHiliteSupportedInCurrentSyntax: boolean;
   public
     constructor Create(AOwner: TComponent); override;
-    procedure AddEditor(AEditor: TComponent); virtual;
     //
     procedure OnEditorChange(Sender: TObject); virtual;
     //called when editor's text changes.
@@ -145,13 +144,6 @@ begin
   FDynamicHiliteEnabled:= true;
   FDynamicHiliteSupportedInCurrentSyntax:= true;
   FDynamicHiliteMaxLines:= 1000;
-end;
-
-procedure TATAdapterHilite.AddEditor(AEditor: TComponent);
-begin
-  // not nil: adapter adds this editor object to his editors list,
-  //   and should setup editor's OnLog
-  // nil: adapter forgets about all editors
 end;
 
 procedure TATAdapterHilite.OnEditorChange(Sender: TObject);
