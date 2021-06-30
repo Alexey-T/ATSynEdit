@@ -1250,7 +1250,6 @@ type
   ...
   public
     constructor Create(AOwner: TComponent); override;
-    procedure AddEditor(AEditor: TComponent); virtual;
     //
     procedure OnEditorChange(Sender: TObject); virtual;
     //called when editor's text changes.
@@ -1273,7 +1272,7 @@ type
     ...
 </syntaxhighlight>
 
-You need your custom adapter class, child of TATAdapterHilite, which must implement some of methods. You don't have to implement all of them, if your adapter doesn't need that. Then you must create an object of your adapter class, and 1) assign this object to editor's AdapterForHilite property, or 2) call adapter's AddEditor method which should setup the AdapterForHilite property (method is empty in the base class).
+You need your custom adapter class, child of TATAdapterHilite, which must implement some of methods. You don't have to implement all of them, if your adapter doesn't need that. Then you must create an object of your adapter class, and assign this object to editor's AdapterForHilite property.
 
 The package ATSynEdit_Ex contains 2 ready adapter classes: for complex EControl .lcf lexers, and for CudaText simplified "lite" lexers. The lexer files are distributed in the CudaText repos on SourceForge.
 
