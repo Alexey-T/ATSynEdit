@@ -1238,7 +1238,46 @@ Finder has events:
 
 Finder can handle multi-selections, by option OptInSelection. Selections are handled by CountAll, ReplaceAll. For other actions, selections don't make sense, because find-next makes new smaller selection (for found fragment) so prev big selection is lost. Tech note for replace-all: selections are looked from top to bottom, if they don't have common lines, and looked from bottom to top, if they have. This is done to not break lines, which are touched by 2+ selections. Count-all handles selections from top to bottom.
 
-= Adapter for EControl lexers=
+=Adapters=
+==Adapters description==
+To support syntax-highlighting in some way, you need
+* Add event OnCalcHilite handler, which must fill the TATLineParts array with needed highlighting, or
+* Create the unit with adapter class, child of TATAdapterHilite (unit atsynedit_adapters), which must fill the TATLineParts array, again. Partial code of the adapter class:
+
+<syntaxhighlight lang="pascal">
+type
+  TATAdapterHilite = class(TComponent)
+  ...
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure AddEditor(AEditor: TComponent); virtual;
+    //
+    procedure OnEditorChange(Sender: TObject); virtual;
+    //called when editor's text changes.
+
+    procedure OnEditorChangeEx(Sender: TObject; AChange: TATLineChangeKind; ALine, AItemCount: integer); virtual;
+    //detailed version of OnEditorChange
+
+    procedure OnEditorIdle(Sender: TObject); virtual;
+    //called after text is changed, and pause passed (OptIdleInterval)
+    //fast changes (faster than OptIdleInterval): called only after last change
+
+    procedure OnEditorCalcHilite(Sender: TObject;
+      var AParts: TATLineParts;
+      ALineIndex, ACharIndex, ALineLen: integer;
+      var AColorAfterEol: TColor;
+      AMainText: boolean); virtual;
+    //called to calculate hilite of entire line.
+    //ACharIndex is starting offset in this line, >0 if editor scrolled horizontally.
+    //ALineLen is len of line part, starting from ACharIndex.
+    ...
+</syntaxhighlight>
+
+You need your custom adapter class, child of TATAdapterHilite, which must implement some of methods. You don't have to implement all of them, if your adapter doesn't need that. Then you must create an object of your adapter class, and 1) assign this object to editor's AdapterForHilite property, or 2) call adapter's AddEditor method which should setup the AdapterForHilite property (method is empty in the base class).
+
+The package ATSynEdit_Ex contains 2 ready adapter classes: for complex EControl .lcf lexers, and for CudaText simplified "lite" lexers. The lexer files are distributed in the CudaText repos on SourceForge.
+
+==Adapter for EControl lexers==
 See [[ATSynEdit EControl adapter]]
 
 =How to adapt TRegExpr upstream for ATSynEdit=
