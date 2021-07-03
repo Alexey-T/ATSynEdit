@@ -5060,12 +5060,20 @@ end;
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
 var
   R: TRect;
+  SLexer: string;
 begin
   FLastPaintDidScrolling:= false;
 
-  //experimental,
-  //reduce flickering on typing in Markdown
-  FOptAllowRepaintOnTextChange:= (FAdapterHilite=nil) or (FAdapterHilite.GetLexerName='-');
+  //experimental, reduce flickering on typing in Markdown
+  if FAdapterHilite=nil then
+    FOptAllowRepaintOnTextChange:= true
+  else
+  begin
+    SLexer:= FAdapterHilite.GetLexerName;
+    FOptAllowRepaintOnTextChange:=
+      (SLexer='-') or //none lexer
+      SEndsWith(SLexer, ' ^'); //lite lexer
+  end;
 
   if IsLocked then
   begin
