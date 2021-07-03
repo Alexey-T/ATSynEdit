@@ -938,6 +938,7 @@ type
     procedure InitLengthArray(var Lens: TATIntArray);
     function IsCaretOnVisibleRect: boolean;
     function IsInvalidateAllowed: boolean; inline;
+    function IsNormalLexerActive: boolean;
     procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
     procedure SetFoldingAsString(const AValue: string);
@@ -5057,23 +5058,28 @@ begin
   end;
 end;
 
+function TATSynEdit.IsNormalLexerActive: boolean;
+var
+  S: string;
+begin
+  if FAdapterHilite=nil then
+    exit(false);
+  S:= FAdapterHilite.GetLexerName;
+  if S='-' then //none lexer
+    exit(false);
+  if SEndsWith(S, ' ^') then //lite lexer
+    exit(false);
+  Result:= true;
+end;
+
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
 var
   R: TRect;
-  SLexer: string;
 begin
   FLastPaintDidScrolling:= false;
 
   //experimental, reduce flickering on typing in Markdown
-  if FAdapterHilite=nil then
-    FOptAllowRepaintOnTextChange:= true
-  else
-  begin
-    SLexer:= FAdapterHilite.GetLexerName;
-    FOptAllowRepaintOnTextChange:=
-      (SLexer='-') or //none lexer
-      SEndsWith(SLexer, ' ^'); //lite lexer
-  end;
+  FOptAllowRepaintOnTextChange:= not IsNormalLexerActive;
 
   if IsLocked then
   begin
