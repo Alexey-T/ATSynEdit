@@ -18,7 +18,7 @@ type
   TATBookmarkAutoDelete = (bmadDontDelete, bmadDelete, bmadOption);
 
 var
-  OptBookmarksAutoDelete: boolean = false;
+  OptEditorBookmarksAutoDelete: boolean = false;
 
 type
   { TATBookmarkData }
@@ -283,7 +283,7 @@ begin
           if (NIndexPlaced>=0) then
           begin
             fAutoDel:= FList.ItemPtr(NIndexPlaced)^.Data.AutoDelete;
-            if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and OptBookmarksAutoDelete) then
+            if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and OptEditorBookmarksAutoDelete) then
             begin
               Delete(NIndexPlaced);
               NIndexPlaced:= -1;
