@@ -428,6 +428,7 @@ var
 
 var
   OptEditorDebugTiming: boolean = false;
+  OptEditorFlickerReducingPause: integer = 0;
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
@@ -500,6 +501,7 @@ type
     FTimerScroll: TTimer;
     FTimerNiceScroll: TTimer;
     FTimerDelayedParsing: TTimer;
+    FTimerFlicker: TTimer;
     FPaintFlags: TATEditorInternalFlags;
     FPaintLocked: integer;
     FBitmap: TBitmap;
@@ -1211,6 +1213,7 @@ type
     procedure TimerScrollTick(Sender: TObject);
     procedure TimerNiceScrollTick(Sender: TObject);
     procedure TimerDelayedParsingTick(Sender: TObject);
+    procedure TimerFlickerTick(Sender: TObject);
 
     //carets
     procedure DoCaretAddToPoint(AX, AY: integer);
@@ -4206,6 +4209,10 @@ begin
   FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
   FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
 
+  FTimerFlicker:= TTimer.Create(Self);
+  FTimerFlicker.Enabled:= false;
+  FTimerFlicker.OnTimer:= @TimerFlickerTick;
+
   FBitmap:= Graphics.TBitmap.Create;
   FBitmap.PixelFormat:= pf24bit;
   FBitmap.SetSize(cInitBitmapWidth, cInitBitmapHeight);
@@ -4565,6 +4572,7 @@ begin
   FreeAndNil(FMinimapBmp);
   FreeAndNil(FMicromap);
   FreeAndNil(FFold);
+  FreeAndNil(FTimerFlicker);
   FreeAndNil(FTimerDelayedParsing);
   FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
@@ -6350,7 +6358,15 @@ end;
 
 procedure TATSynEdit.Invalidate;
 begin
+  if FTimerFlicker=nil then exit; //ignore Invalidate coming from Create()
   //if not IsInvalidateAllowed then exit;
+
+  if OptEditorFlickerReducingPause>0 then
+  begin
+    FTimerFlicker.Interval:= OptEditorFlickerReducingPause;
+    FTimerFlicker.Enabled:= true;
+    exit;
+  end;
 
   Include(FPaintFlags, cIntFlagBitmap);
   inherited;
@@ -8234,6 +8250,13 @@ begin
   Application.MainForm.Caption:= 'delayed parse: '+inttostr(c)+': '+inttostr(FLastCommandDelayedParsingOnLine);
   }
   FLastCommandDelayedParsingOnLine:= MaxInt;
+end;
+
+procedure TATSynEdit.TimerFlickerTick(Sender: TObject);
+begin
+  FTimerFlicker.Enabled:= false;
+  Include(FPaintFlags, cIntFlagBitmap);
+  inherited Invalidate;
 end;
 
 procedure TATSynEdit.DoStringsOnProgress(Sender: TObject);
