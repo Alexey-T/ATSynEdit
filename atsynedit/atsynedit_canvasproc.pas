@@ -43,14 +43,14 @@ var
   OptUnprintedEndArrowLength: integer = 70;
   OptUnprintedWrapArrowLength: integer = 40;
   OptUnprintedWrapArrowWidth: integer = 80;
-  OptItalicFontLongerInPercents: integer = 40;
+  OptEditorItalicFontLongerInPercents: integer = 40;
 
 var
   //Win: seems no slowdown from offsets
   //macOS: better use offsets, fonts have floating width value, e.g. 10.2 pixels
   //Linux Qt5: same as for macOS
   //Linux GTK2: big slowdown from offsets
-  OptCanvasTextoutNeedsOffsets: boolean =
+  OptEditorTextoutNeedsOffsets: boolean =
     {$if defined(windows) or defined(darwin) or defined(LCLQt5)}
     true
     {$else}
@@ -669,13 +669,13 @@ var
   St: TFontStyles;
 }
 begin
-  if OptCanvasTextoutNeedsOffsets then
+  if OptEditorTextoutNeedsOffsets then
     exit(true);
 
   {
   //disabled since CudaText 1.104
   //a) its used only on Linux/BSD yet, but is it needed there?
-  //it was needed maybe for Win32 (need to check) but on Win32 const OptCanvasTextoutNeedsOffsets=true
+  //it was needed maybe for Win32 (need to check) but on Win32 const OptEditorTextoutNeedsOffsets=true
   //b) it must be placed out of this deep func CanvasTextOut, its called too much (for each token)
 
   //detect result by presence of bold/italic tokens, offsets are needed for them,
@@ -801,7 +801,7 @@ begin
 
   if AParts=nil then
   begin
-    if AProps.HasAsciiNoTabs and not OptCanvasTextoutNeedsOffsets then
+    if AProps.HasAsciiNoTabs and not OptEditorTextoutNeedsOffsets then
     begin
       BufW:= AText;
       DxPointer:= nil;
@@ -920,7 +920,7 @@ begin
       //with font eg "Fira Code Retina"
       if bItalic then
         Inc(PartRect.Right,
-          C.Font.Size * OptItalicFontLongerInPercents div 100
+          C.Font.Size * OptEditorItalicFontLongerInPercents div 100
           );
 
       //part with only blanks, render simpler
@@ -960,7 +960,7 @@ begin
         bAllowLigatures
         );
       {$else}
-      if AProps.HasAsciiNoTabs and not OptCanvasTextoutNeedsOffsets then
+      if AProps.HasAsciiNoTabs and not OptEditorTextoutNeedsOffsets then
       begin
         Buf:= PartStr;
         DxPointer:= nil;
