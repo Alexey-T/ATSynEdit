@@ -6363,6 +6363,7 @@ begin
 
   if OptEditorFlickerReducingPause>0 then
   begin
+    FTimerFlicker.Enabled:= false;
     FTimerFlicker.Interval:= OptEditorFlickerReducingPause;
     FTimerFlicker.Enabled:= true;
     exit;
