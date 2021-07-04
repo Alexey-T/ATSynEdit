@@ -43,16 +43,16 @@ type
   end;
 
 var
-  GlobalCharSizer: TATCharSizer = nil;
   //must be created after MainForm is inited, e.g. in TATSynEdit.Create
+  GlobalCharSizer: TATCharSizer = nil;
 
 var
-  OptCharSizeProportional: boolean = true;
-  OptCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
+  OptEditorCharSizeProportional: boolean = true;
+  OptEditorCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
 
 const
-  OptCharScaleHex_Small = 300; //width of hex show: "xNN"
-  OptCharScaleHex_Big = 500; //width of hex show: "xNNNN"
+  OptEditorCharScaleHex_Small = 300; //width of hex show: "xNN"
+  OptEditorCharScaleHex_Big = 500; //width of hex show: "xNNNN"
 
 var
   OptUnprintedReplaceSpec: boolean = false;
@@ -204,15 +204,15 @@ begin
 
   case FixedSizes[n] of
     _norm: exit;
-    _full: exit(OptCharScaleFullWidth);
+    _full: exit(OptEditorCharScaleFullWidth);
     _space: exit;
     _comb: exit(0);
     _hexshow:
       begin
         if n<$100 then
-          exit(OptCharScaleHex_Small)
+          exit(OptEditorCharScaleHex_Small)
         else
-          exit(OptCharScaleHex_Big);
+          exit(OptEditorCharScaleHex_Big);
       end;
   end;
 
@@ -222,17 +222,17 @@ begin
   if IsCharHexDisplayed(ch) then
   begin
     if n<$100 then
-      exit(OptCharScaleHex_Small)
+      exit(OptEditorCharScaleHex_Small)
     else
-      exit(OptCharScaleHex_Big);
+      exit(OptEditorCharScaleHex_Big);
   end;
 
-  if OptCharSizeProportional then
+  if OptEditorCharSizeProportional then
     if n>=128 then
       exit(GetCharWidth_FromCache(ch));
 
   //for other codes, use full-width size
-  Result:= OptCharScaleFullWidth;
+  Result:= OptEditorCharScaleFullWidth;
 end;
 
 {
