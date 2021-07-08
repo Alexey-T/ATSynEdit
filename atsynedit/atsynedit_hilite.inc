@@ -42,7 +42,6 @@ var
   St: TATStrings;
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
-  bHiliteProcessed: boolean;
 begin
   St:= Strings;
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
@@ -50,7 +49,6 @@ begin
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
   bEnableHilite:= St.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
-  bHiliteProcessed:= false;
 
   FillChar(AParts, SizeOf(AParts), 0);
   if nLineLen=0 then exit;
@@ -60,7 +58,7 @@ begin
       if St.IsIndexValid(nLineIndex) and
         (St.LinesGitMarker[nLineIndex]<>cGitMarkNone) then
       begin
-        bHiliteProcessed:= true;
+        bEnableHilite:= false; //avoid normal highlighting for this line
         AParts[0].Len:= nLineLen;
         AParts[0].Offset:= 0;
         AParts[0].ColorBG:= Colors.Markers;
@@ -68,7 +66,7 @@ begin
       end;
 
   //1) get hilites from adapter
-  if bEnableHilite and not bHiliteProcessed then
+  if bEnableHilite then
   if Assigned(FAdapterHilite) then
   begin
     FAdapterHilite.OnEditorCalcHilite(Self, AParts,
@@ -80,7 +78,7 @@ begin
   end;
 
   //2) get hilites from OnCalcHilite
-  if bEnableHilite and not bHiliteProcessed then
+  if bEnableHilite then
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
 
