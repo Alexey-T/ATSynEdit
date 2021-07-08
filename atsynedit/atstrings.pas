@@ -588,9 +588,9 @@ end;
 
 function TATStringItem.IsGitMarker: boolean;
 const
-  Mark1: PChar = '<<<<<<< ';
-  Mark2: PChar = '=======';
-  Mark3: PChar = '>>>>>>> ';
+  MarkBegin: PChar  = '<<<<<<< ';
+  MarkMiddle: PChar = '=======';
+  MarkEnd: PChar    = '>>>>>>> ';
 var
   NLen: integer;
 begin
@@ -600,13 +600,14 @@ begin
   if NLen>=7 then
   begin
     if NLen>=8 then
-      if strlcomp(PChar(Buf), Mark1, 8)=0 then
+    begin
+      if strlcomp(PChar(Buf), MarkBegin, 8)=0 then
         exit(true);
+      if strlcomp(PChar(Buf), MarkEnd, 8)=0 then
+        exit(true);
+    end;
     if NLen=7 then
-      if strlcomp(PChar(Buf), Mark2, 7)=0 then
-        exit(true);
-    if NLen>=8 then
-      if strlcomp(PChar(Buf), Mark3, 8)=0 then
+      if strlcomp(PChar(Buf), MarkMiddle, 7)=0 then
         exit(true);
   end;
 end;
