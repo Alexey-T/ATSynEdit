@@ -22,7 +22,6 @@ begin
   AColorAfter:= AColorBG;
   DoCalcLineHilite(
     Data,
-    -1,
     AParts,
     0,
     cMaxCharsInLine,
@@ -34,7 +33,6 @@ end;
 
 
 procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
-  AWrapIndex: integer;
   out AParts: TATLineParts;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
