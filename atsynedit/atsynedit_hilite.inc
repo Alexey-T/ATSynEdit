@@ -39,26 +39,26 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
   var AColorAfter: TColor;
   AMainText: boolean);
 var
+  St: TATStrings;
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
   bHiliteProcessed: boolean;
-  ItemPtr: PATStringItem;
 begin
+  St:= Strings;
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
-  bEnableHilite:= Strings.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
+  bEnableHilite:= St.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
   bHiliteProcessed:= false;
 
   FillChar(AParts, SizeOf(AParts), 0);
   if nLineLen=0 then exit;
 
   if FHighlightGitConflicts then
-    if (nLineLen>=7 {Git marker len}) then
-    begin
-      ItemPtr:= Strings.GetItemPtr(nLineIndex);
-      if ItemPtr^.IsGitMarker<>cGitMarkNone then
+    if (nLineLen>=7{Git marker len}) then
+      if St.IsIndexValid(nLineIndex) and
+        (St.LinesGitMarker[nLineIndex]<>cGitMarkNone) then
       begin
         bHiliteProcessed:= true;
         AParts[0].Len:= nLineLen;
@@ -66,7 +66,6 @@ begin
         AParts[0].ColorBG:= Colors.Markers;
         AParts[0].ColorFont:= Colors.TextBG;
       end;
-    end;
 
   //1) get hilites from adapter
   if bEnableHilite and not bHiliteProcessed then
