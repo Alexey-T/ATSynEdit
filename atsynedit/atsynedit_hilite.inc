@@ -65,22 +65,21 @@ begin
         AParts[0].ColorFont:= Colors.TextBG;
       end;
 
-  //1) get highlight from adapter
   if bEnableHilite then
-  if Assigned(FAdapterHilite) then
   begin
-    FAdapterHilite.OnEditorCalcHilite(Self, AParts,
-      nLineIndex,
-      nCharIndex,
-      nLineLen,
-      AColorAfter,
-      AMainText);
-  end;
+    //1) get highlight from adapter
+    if Assigned(FAdapterHilite) then
+      FAdapterHilite.OnEditorCalcHilite(Self, AParts,
+        nLineIndex,
+        nCharIndex,
+        nLineLen,
+        AColorAfter,
+        AMainText);
 
-  //2) get highlight from OnCalcHilite
-  if bEnableHilite then
-  if Assigned(FOnCalcHilite) then
-    FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
+    //2) get highlight from OnCalcHilite
+    if Assigned(FOnCalcHilite) then
+      FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
+  end;
 
   DoPartSetColorBG(AParts, AColorBG, AColorForced);
   if AColorForced then
