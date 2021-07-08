@@ -145,6 +145,7 @@ type
     procedure GetIndentProp(out ACharCount: integer; out AKind: TATLineIndentKind);
     function CharLenWithoutSpace: integer;
     function IsBlank: boolean;
+    function IsGitMarker: boolean;
   end;
   PATStringItem = ^TATStringItem;
 
@@ -583,6 +584,30 @@ begin
     exit(false);
   end;
   Result:= true;
+end;
+
+function TATStringItem.IsGitMarker: boolean;
+const
+  Mark1: PChar = '<<<<<<< ';
+  Mark2: PChar = '=======';
+  Mark3: PChar = '>>>>>>> ';
+var
+  NLen: integer;
+begin
+  Result:= false;
+  NLen:= Length(Buf);
+  if NLen>=7 then
+  begin
+    if NLen>=8 then
+      if strlcomp(PChar(Buf), Mark1, 8)=0 then
+        exit(true);
+    if NLen=7 then
+      if strlcomp(PChar(Buf), Mark2, 7)=0 then
+        exit(true);
+    if NLen>=8 then
+      if strlcomp(PChar(Buf), Mark3, 8)=0 then
+        exit(true);
+  end;
 end;
 
 

@@ -20,12 +20,21 @@ begin
   if Data.NLength=0 then exit;
 
   AColorAfter:= AColorBG;
-  DoCalcLineHilite(Data, AParts, 0, cMaxCharsInLine,
-    AColorBG, false, AColorAfter, true);
+  DoCalcLineHilite(
+    Data,
+    -1,
+    AParts,
+    0,
+    cMaxCharsInLine,
+    AColorBG,
+    false,
+    AColorAfter,
+    true);
 end;
 
 
 procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
+  AWrapIndex: integer;
   out AParts: TATLineParts;
   ACharsSkipped, ACharsMax: integer;
   AColorBG: TColor; AColorForced: boolean;
@@ -35,7 +44,7 @@ var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
   bHiliteProcessed: boolean;
-  SBegin: UnicodeString;
+  ItemPtr: PATStringItem;
 begin
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
@@ -48,19 +57,17 @@ begin
   if nLineLen=0 then exit;
 
   if FHighlightGitConflicts then
-    if nLineLen>=7 then
+    if (AWrapIndex>=0) and (nLineLen>=7 {Git marker len}) then
     begin
-      SBegin:= Strings.LineSub(AData.NLineIndex, 1, 8);
-      if (SBegin='<<<<<<< ') or
-         (SBegin='=======') or
-         (SBegin='>>>>>>> ') then
-         begin
-           bHiliteProcessed:= true;
-           AParts[0].Len:= nLineLen;
-           AParts[0].Offset:= 0;
-           AParts[0].ColorBG:= Colors.Markers; //clRed;
-           AParts[0].ColorFont:= Colors.TextBG; //clWhite;
-         end;
+      ItemPtr:= Strings.GetItemPtr(AWrapIndex);
+      if ItemPtr^.IsGitMarker then
+      begin
+        bHiliteProcessed:= true;
+        AParts[0].Len:= nLineLen;
+        AParts[0].Offset:= 0;
+        AParts[0].ColorBG:= Colors.Markers;
+        AParts[0].ColorFont:= Colors.TextBG;
+      end;
     end;
 
   //1) get hilites from adapter

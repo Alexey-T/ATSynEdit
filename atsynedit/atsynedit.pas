@@ -1047,6 +1047,7 @@ type
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
       AItems: TATWrapItems; AConsiderFolding: boolean);
     procedure DoCalcLineHilite(const AData: TATWrapItem;
+      AWrapIndex: integer;
       out AParts: TATLineParts; ACharsSkipped, ACharsMax: integer;
       AColorBG: TColor; AColorForced: boolean; var AColorAfter: TColor;
       AMainText: boolean);
@@ -3364,7 +3365,10 @@ begin
 
     NColorAfter:= clNone;
 
-    DoCalcLineHilite(WrapItem, ATempParts{%H-},
+    DoCalcLineHilite(
+      WrapItem,
+      AWrapIndex,
+      ATempParts{%H-},
       NOutputCharsSkipped, cMaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, true);
@@ -3633,7 +3637,10 @@ begin
   begin
     NColorAfter:= clNone;
 
-    DoCalcLineHilite(WrapItem, ATempParts{%H-},
+    DoCalcLineHilite(
+      WrapItem,
+      AWrapIndex,
+      ATempParts{%H-},
       NOutputCharsSkipped, cMaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, false);
@@ -8358,7 +8365,10 @@ begin
       WrapItem.NLength:= Strings.LinesLen[NLine];
     end;
 
-    DoCalcLineHilite(WrapItem, FParts{%H-},
+    DoCalcLineHilite(
+      WrapItem,
+      NWrapIndex,
+      FParts{%H-},
       0, cMaxCharsForOutput,
       AColorBG,
       false,
