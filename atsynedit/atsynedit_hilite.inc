@@ -34,18 +34,37 @@ procedure TATSynEdit.DoCalcLineHilite(const AData: TATWrapItem;
 var
   nMaxOffset, nCharIndex, nLineIndex, nLineLen: integer;
   bEnableHilite: boolean;
+  bHiliteProcessed: boolean;
+  SBegin: UnicodeString;
 begin
   nMaxOffset:= Min(ACharsMax, AData.NLength-ACharsSkipped);
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
   bEnableHilite:= Strings.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
+  bHiliteProcessed:= false;
 
   FillChar(AParts, SizeOf(AParts), 0);
   if nLineLen=0 then exit;
 
+  if FHighlightGitConflicts then
+    if nLineLen>=7 then
+    begin
+      SBegin:= Strings.LineSub(AData.NLineIndex, 1, 8);
+      if (SBegin='<<<<<<< ') or
+         (SBegin='=======') or
+         (SBegin='>>>>>>> ') then
+         begin
+           bHiliteProcessed:= true;
+           AParts[0].Len:= nLineLen;
+           AParts[0].Offset:= 0;
+           AParts[0].ColorBG:= Colors.Markers; //clRed;
+           AParts[0].ColorFont:= Colors.TextBG; //clWhite;
+         end;
+    end;
+
   //1) get hilites from adapter
-  if bEnableHilite then
+  if bEnableHilite and not bHiliteProcessed then
   if Assigned(FAdapterHilite) then
   begin
     FAdapterHilite.OnEditorCalcHilite(Self, AParts,
@@ -57,7 +76,7 @@ begin
   end;
 
   //2) get hilites from OnCalcHilite
-  if bEnableHilite then
+  if bEnableHilite and not bHiliteProcessed then
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
 

@@ -1,4 +1,7 @@
 
+2021.07.08
++ add: prop OptHighlightGitConflicts
+
 2021.06.06
 + add: Gaps now can contain not only Bitmaps but also Forms
 

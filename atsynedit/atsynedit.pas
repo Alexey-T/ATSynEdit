@@ -299,6 +299,7 @@ type
 const
   cUsePaintStatic = true;
   cMaxIndentVert = 100;
+  cInitHighlightGitConflicts = true;
   cInitAutoPairForMultiCarets = true;
   cInitInputNumberAllowNegative = true;
   cInitMaskChar = '*';
@@ -748,6 +749,7 @@ type
     FEventMapDone: TSimpleEvent; //fired by MinimapThread, when it's work done
     FColorOfStates: array[TATLineState] of TColor;
     FFoldingAsStringTodo: string;
+    FHighlightGitConflicts: boolean;
 
     //these options are implemented in CudaText, they are dummy here
     FOptAutoPairForMultiCarets: boolean;
@@ -1684,6 +1686,7 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
+    property OptHighlightGitConflicts: boolean read FHighlightGitConflicts write FHighlightGitConflicts default cInitHighlightGitConflicts;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
     property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
     property OptAutocompleteAutoshowCharCount: integer read FOptAutocompleteAutoshowCharCount write FOptAutocompleteAutoshowCharCount default 0;
@@ -4283,6 +4286,7 @@ begin
   FOptScrollAnimationSleep:= cInitScrollAnimationSleep;
   FOptIdleInterval:= cInitIdleInterval;
 
+  FHighlightGitConflicts:= cInitHighlightGitConflicts;
   FOptAutoPairForMultiCarets:= cInitAutoPairForMultiCarets;
   FOptAutoPairChars:= '([{';
   FOptAutocompleteAutoshowCharCount:= 0;
