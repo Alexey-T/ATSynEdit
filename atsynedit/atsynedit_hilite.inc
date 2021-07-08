@@ -65,7 +65,7 @@ begin
         AParts[0].ColorFont:= Colors.TextBG;
       end;
 
-  //1) get hilites from adapter
+  //1) get highlight from adapter
   if bEnableHilite then
   if Assigned(FAdapterHilite) then
   begin
@@ -77,7 +77,7 @@ begin
       AMainText);
   end;
 
-  //2) get hilites from OnCalcHilite
+  //2) get highlight from OnCalcHilite
   if bEnableHilite then
   if Assigned(FOnCalcHilite) then
     FOnCalcHilite(Self, AParts, nLineIndex, nCharIndex, nLineLen, AColorAfter);
