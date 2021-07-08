@@ -595,6 +595,7 @@ var
   NLen: integer;
 begin
   Result:= false;
+  if Ex.Wide then exit;
   NLen:= Length(Buf);
   if NLen>=7 then
   begin
