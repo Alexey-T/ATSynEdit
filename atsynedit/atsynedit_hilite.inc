@@ -58,7 +58,7 @@ begin
     if (nLineLen>=7 {Git marker len}) then
     begin
       ItemPtr:= Strings.GetItemPtr(nLineIndex);
-      if ItemPtr^.IsGitMarker then
+      if ItemPtr^.IsGitMarker<>cGitMarkNone then
       begin
         bHiliteProcessed:= true;
         AParts[0].Len:= nLineLen;

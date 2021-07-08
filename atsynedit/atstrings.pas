@@ -72,6 +72,13 @@ type
     cBlockInsertColumn
   );
 
+  TATStringGitMarker = (
+    cGitMarkNone,
+    cGitMarkBegin,
+    cGitMarkMiddle,
+    cGitMarkEnd
+    );
+
 const
   cEncodingSize: array[TATFileEncoding] of integer = (1, 1, 2, 2, 4, 4);
 
@@ -145,7 +152,7 @@ type
     procedure GetIndentProp(out ACharCount: integer; out AKind: TATLineIndentKind);
     function CharLenWithoutSpace: integer;
     function IsBlank: boolean;
-    function IsGitMarker: boolean;
+    function IsGitMarker: TATStringGitMarker;
   end;
   PATStringItem = ^TATStringItem;
 
@@ -586,7 +593,7 @@ begin
   Result:= true;
 end;
 
-function TATStringItem.IsGitMarker: boolean;
+function TATStringItem.IsGitMarker: TATStringGitMarker;
 const
   MarkBegin: PChar  = '<<<<<<< ';
   MarkMiddle: PChar = '=======';
@@ -594,7 +601,7 @@ const
 var
   NLen: integer;
 begin
-  Result:= false;
+  Result:= cGitMarkNone;
   if Ex.Wide then exit;
   NLen:= Length(Buf);
   if NLen>=7 then
@@ -602,13 +609,13 @@ begin
     if NLen>=8 then
     begin
       if strlcomp(PChar(Buf), MarkBegin, 8)=0 then
-        exit(true);
+        exit(cGitMarkBegin);
       if strlcomp(PChar(Buf), MarkEnd, 8)=0 then
-        exit(true);
+        exit(cGitMarkEnd);
     end;
     if NLen=7 then
       if strlcomp(PChar(Buf), MarkMiddle, 7)=0 then
-        exit(true);
+        exit(cGitMarkMiddle);
   end;
 end;
 
