@@ -57,9 +57,9 @@ begin
   if nLineLen=0 then exit;
 
   if FHighlightGitConflicts then
-    if (AWrapIndex>=0) and (nLineLen>=7 {Git marker len}) then
+    if (nLineLen>=7 {Git marker len}) then
     begin
-      ItemPtr:= Strings.GetItemPtr(AWrapIndex);
+      ItemPtr:= Strings.GetItemPtr(nLineIndex);
       if ItemPtr^.IsGitMarker then
       begin
         bHiliteProcessed:= true;
