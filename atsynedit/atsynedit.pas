@@ -58,6 +58,11 @@ uses
   ATSynEdit_FGL,
   ATScrollBar;
 
+{$ifdef LCLGTK2}
+  {$if (LCL_FULLVERSION >= 2030000)}
+    {$define GTK2_IME_CODE}
+  {$endif}
+{$endif}
 
 type
   TATPoint64 = record
@@ -487,9 +492,6 @@ type
     UnprintedEnds: boolean;
     UnprintedEndsDetails: boolean;
   end;
-
-const
-  LM_IM_COMPOSITION = LM_USER + $FFF0; //included to Lazarus 2.1 trunk
 
 type
   { TATSynEdit }
@@ -1597,7 +1599,7 @@ type
     procedure WMIME_EndComposition(var Msg:TMessage); message WM_IME_ENDCOMPOSITION;
     {$endif}
 
-    {$ifdef LCLGTK2}
+    {$ifdef GTK2_IME_CODE}
     procedure WM_GTK_IM_COMPOSITION(var Message: TLMessage); message LM_IM_COMPOSITION;
     {$endif}
 
@@ -7726,7 +7728,7 @@ begin
   end;
 end;
 
-{$ifdef LCLGTK2}
+{$ifdef GTK2_IME_CODE}
 // fcitx IM
 procedure TATSynEdit.WM_GTK_IM_COMPOSITION(var Message: TLMessage);
 var
