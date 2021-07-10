@@ -488,6 +488,9 @@ type
     UnprintedEndsDetails: boolean;
   end;
 
+const
+  LM_IM_COMPOSITION = LM_USER + $FFF0; //included to Lazarus 2.1 trunk
+
 type
   { TATSynEdit }
 
