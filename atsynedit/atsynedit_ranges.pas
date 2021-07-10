@@ -134,7 +134,7 @@ end;
 
 function TATSynRange.IsSimple: boolean; inline;
 begin
-  Result:= Y=Y2;
+  Result:= Y2-Y<=1;
 end;
 
 function TATSynRange.IsLineInside(ALine: integer): boolean; inline;
