@@ -133,10 +133,9 @@ begin
 end;
 
 function TATSynRange.IsSimple: boolean; inline;
-//ranges containing only 2 lines are useless,
-//they won't show the gutter [-] mark
+//ranges of only 2 lines are needed sometimes, e.g. in FindInFiles lexer
 begin
-  Result:= Y2-Y <= 1;
+  Result:= Y2-Y < 1;
 end;
 
 function TATSynRange.IsLineInside(ALine: integer): boolean; inline;
