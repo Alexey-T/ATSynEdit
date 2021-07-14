@@ -741,7 +741,12 @@ begin
     end;
 
   AEndOfLinePos:= true;
-  Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1] - ACharSize div 2) div ACharSize + 2;
+
+  Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) div ACharSize + 1;
+  ////this works
+  ////a) better if clicked after line end, far
+  ////b) bad if clicked exactly on line end (shifted to right by 1)
+  //Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1] - ACharSize div 2) div ACharSize + 2;
 
   if not AAllowVirtualPos then
     Result:= Min(Result, Length(Str)+1);
