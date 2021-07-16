@@ -2930,7 +2930,7 @@ begin
   YY2:= Min(Height+1, Max(Y1, Y2));
 
   //avoid TCanvas.DrawFocusRect(), sometimes it's painted bad on Qt5
-  C.Pen.Color:= Colors.TextFont;
+  C.Pen.Color:= ColorBlendHalf(Colors.TextFont, Colors.TextBG);
   CanvasLineHorz(C, XX1, YY1, XX2, true);
   CanvasLineHorz(C, XX1, YY2, XX2, true);
   CanvasLineVert(C, XX1, YY1, YY2, true);
