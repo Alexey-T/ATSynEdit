@@ -3900,6 +3900,10 @@ end;
 
 procedure TATSynEdit.DoPaintMinimapAllToBGRABitmap;
 begin
+  //avoid too often minimap repainting
+  if Assigned(AdapterForHilite) then
+    if not AdapterForHilite.IsDataReady then exit;
+
   if OptEditorDebugTiming then
     FTickMinimap:= GetTickCount64;
 

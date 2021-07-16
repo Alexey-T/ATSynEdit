@@ -62,6 +62,8 @@ type
 
     function GetLexerName: string; virtual;
 
+    function IsDataReady: boolean; virtual;
+
     //
     property DynamicHiliteEnabled: boolean
       read FDynamicHiliteEnabled
@@ -199,6 +201,11 @@ end;
 function TATAdapterHilite.GetLexerName: string;
 begin
   Result:= '-';
+end;
+
+function TATAdapterHilite.IsDataReady: boolean;
+begin
+  Result:= true;
 end;
 
 function TATAdapterHilite.DynamicHiliteActiveNow(ALinesCount: integer): boolean;
