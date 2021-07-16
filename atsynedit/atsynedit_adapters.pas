@@ -61,28 +61,31 @@ type
     //returns False to supress unneeded painting, when parsing is not done
 
     function GetLexerName: string; virtual;
+    //return lexer name
 
     function IsDataReady: boolean; virtual;
+    //return False to prevent Minimap repainting (avoid Minimap flicker during typing)
 
+    //
+    //dynamic-highlighting = some elements colors depend on caret position.
+    //e.g. in EControl HTML lexer: highlight of < > is changed, when caret is near < >.
     //
     property DynamicHiliteEnabled: boolean
       read FDynamicHiliteEnabled
       write FDynamicHiliteEnabled;
-    //dyn-hiliting global enabled flag.
+    //dynamic-highlighting global enabled flag.
     //app must set it.
-    //dyn-hiliting is on, if some chars colors depend on caret position,
-    //e.g. in EControl HTML lexer: hilites of < > change, if caret is near < >
 
     property DynamicHiliteMaxLines: integer
       read FDynamicHiliteMaxLines
       write FDynamicHiliteMaxLines;
-    //max count of lines, to use dyn-hiliting (for EControl its slow for 10K lines)
+    //max count of lines, to use dynamic-highlighting (for EControl its slow for 10K lines)
     //app must set it, e.g. 5K is ok
 
     property DynamicHiliteSupportedInCurrentSyntax: boolean
       read FDynamicHiliteSupportedInCurrentSyntax
       write FDynamicHiliteSupportedInCurrentSyntax;
-    //real adapter (subclass of this class) must set it.
+    //adapter must set it.
     //EControl adapter calculates it from lexer-file.
 
     function DynamicHiliteActiveNow(ALinesCount: integer): boolean;
