@@ -5514,8 +5514,11 @@ begin
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
-    FMouseDownPnt:= PCaret;
-    bClickOnSelection:= GetCaretSelectionIndex(FMouseDownPnt)>=0;
+    if Button=mbLeft then
+    begin
+      FMouseDownPnt:= PCaret;
+      bClickOnSelection:= GetCaretSelectionIndex(FMouseDownPnt)>=0;
+    end;
 
     if Shift=[ssMiddle] then
       if DoHandleClickEvent(FOnClickMiddle) then Exit;
