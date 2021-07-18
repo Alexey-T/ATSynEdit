@@ -1336,6 +1336,7 @@ type
     TagString: string; //to store plugin specific data in CudaText
     InitialOptions: TATEditorTempOptions;
 
+    IsRepaintEnabled: boolean;
     IsModifiedWrapMode: boolean;
     IsModifiedMinimapVisible: boolean;
     IsModifiedMicromapVisible: boolean;
@@ -1564,7 +1565,6 @@ type
     procedure DoConvertTabsToSpaces;
 
   protected
-    FCreateDone: boolean;
     procedure Paint; override;
     procedure Resize; override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
@@ -4560,7 +4560,7 @@ begin
   UpdateLinksRegexObject;
 
   //allow Invalidate to work now
-  FCreateDone:= true;
+  IsRepaintEnabled:= true;
 end;
 
 destructor TATSynEdit.Destroy;
@@ -4635,7 +4635,7 @@ end;
 
 procedure TATSynEdit.Update(AUpdateWrapInfo: boolean=false);
 begin
-  if not FCreateDone then exit;
+  if not IsRepaintEnabled then exit;
 
   UpdateCursor;
 
@@ -5174,7 +5174,7 @@ end;
 procedure TATSynEdit.Resize;
 begin
   inherited;
-  if not FCreateDone then exit;
+  if not IsRepaintEnabled then exit;
 
   //avoid setting FLineTopTodo, which breaks the v-scroll-pos, if huge line is wrapped
   //and v-scroll-pos is in the middle of this line
@@ -6390,7 +6390,7 @@ end;
 
 procedure TATSynEdit.Invalidate;
 begin
-  if not FCreateDone then exit;
+  if not IsRepaintEnabled then exit;
   //if not IsInvalidateAllowed then exit;
 
   if OptEditorFlickerReducingPause>0 then

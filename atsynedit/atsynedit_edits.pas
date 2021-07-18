@@ -123,7 +123,7 @@ end;
 constructor TATEdit.Create(AOwner: TComponent);
 begin
   inherited;
-  FCreateDone:= false;
+  IsRepaintEnabled:= false;
 
   WantTabs:= false;
   WantReturns:= false;
@@ -143,7 +143,7 @@ begin
   OptMouseWheelZooms:= false;
   Height:= 26;
 
-  FCreateDone:= true;
+  IsRepaintEnabled:= true;
 end;
 
 { TATComboEdit }
@@ -151,7 +151,7 @@ end;
 constructor TATComboEdit.Create(AOwner: TComponent);
 begin
   inherited;
-  FCreateDone:= false;
+  IsRepaintEnabled:= false;
 
   WantReturns:= true; //allow combo to handle Enter
 
@@ -170,7 +170,7 @@ begin
   OnClickMicromap:= @MicromapClick;
   OnDrawMicromap:= @MicromapDraw;
 
-  FCreateDone:= true;
+  IsRepaintEnabled:= true;
 end;
 
 procedure TATComboEdit.MicromapClick(Sender: TObject; AX, AY: integer);
