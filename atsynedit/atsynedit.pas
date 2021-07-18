@@ -2166,7 +2166,6 @@ begin
   FMarginRight:= Max(AValue, cMinMarginRt);
   if FWrapMode in [cWrapAtMargin, cWrapAtWindowOrMargin] then
     FWrapUpdateNeeded:= true;
-  Update;
 end;
 
 procedure TATSynEdit.UpdateWrapInfo(AForceUpdate: boolean);
