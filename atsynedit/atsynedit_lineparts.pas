@@ -177,6 +177,7 @@ var
   //
 var
   PartSelBegin, PartSelEnd: TATLinePart;
+  ColorFontLeft, ColorFontRight: TColor;
   nIndex1, nIndex2,
   nOffset1, nOffset2, nOffsetLimit,
   newLen2, newOffset2: integer;
@@ -202,14 +203,22 @@ begin
   if APart.ColorBG=clNone then
     APart.ColorBG:= AParts[nIndex1].ColorBG; //clYellow;
 
-  if APart.ColorFont=clNone then
-    APart.ColorFont:= AParts[nIndex1].ColorFont; //clYellow;
+  if APart.ColorFont<>clNone then
+  begin
+    ColorFontLeft:= APart.ColorFont;
+    ColorFontRight:= APart.ColorFont;
+  end
+  else
+  begin
+    ColorFontLeft:= AParts[nIndex1].ColorFont;
+    ColorFontRight:= AParts[nIndex2].ColorFont;
+  end;
 
   //these 2 parts are for edges of selection
   FillChar(PartSelBegin{%H-}, SizeOf(TATLinePart), 0);
   FillChar(PartSelEnd{%H-}, SizeOf(TATLinePart), 0);
 
-  PartSelBegin.ColorFont:= APart.ColorFont;
+  PartSelBegin.ColorFont:= ColorFontLeft;
   PartSelBegin.ColorBG:= APart.ColorBG;
 
   PartSelBegin.Offset:= AParts[nIndex1].Offset+nOffset1;
@@ -222,7 +231,7 @@ begin
   PartSelBegin.BorderUp:= AParts[nIndex1].BorderUp;
   PartSelBegin.ColorBorder:= AParts[nIndex1].ColorBorder;
 
-  PartSelEnd.ColorFont:= APart.ColorFont;
+  PartSelEnd.ColorFont:= ColorFontRight;
   PartSelEnd.ColorBG:= APart.ColorBG;
   PartSelEnd.Offset:= AParts[nIndex2].Offset;
   PartSelEnd.Len:= nOffset2;
@@ -262,7 +271,7 @@ begin
 
     for i:= nIndex1+1 to nIndex2-1 do
     begin
-      AParts[i].ColorFont:= APart.ColorFont;
+      AParts[i].ColorFont:= ColorFontLeft;
       AParts[i].ColorBG:= APart.ColorBG;
       FixPartLen(AParts[i], nOffsetLimit);
       AddPart(AParts[i]);
