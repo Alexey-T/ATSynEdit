@@ -4024,7 +4024,10 @@ begin
   //if 1st chars selected, then use selection-color
   if IsPosSelected(APosX, APosY) then
   begin
-    C.Font.Color:= Colors.TextSelFont;
+    if Colors.TextSelFont<>clNone then
+      C.Font.Color:= Colors.TextSelFont
+    else
+      C.Font.Color:= Colors.TextFont;
     C.Brush.Color:= Colors.TextSelBG;
   end
   else

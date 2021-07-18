@@ -170,7 +170,10 @@ begin
         Len:= 1;
         if bSel then
         begin
-          ColorFont:= FColors.TextSelFont;//random($ffff);
+          if FColors.TextSelFont<>clNone then
+            ColorFont:= FColors.TextSelFont
+          else
+            ColorFont:= FColors.TextFont;
           ColorBG:= FColors.TextSelBG;
         end
         else
@@ -202,7 +205,8 @@ begin
         Break
       else
       begin
-        AParts[i].ColorFont:= Colors.TextSelFont;
+        if Colors.TextSelFont<>clNone then
+          AParts[i].ColorFont:= Colors.TextSelFont;
         AParts[i].ColorBG:= Colors.TextSelBG;
       end;
     exit;
@@ -229,7 +233,8 @@ begin
     case IsRangeSelected(nRangeX1, ALineIndex, nRangeX2, ALineIndex) of
       cRangeAllSelected:
         begin
-          AParts[i].ColorFont:= Part.ColorFont;
+          if Part.ColorFont<>clNone then
+            AParts[i].ColorFont:= Part.ColorFont;
           AParts[i].ColorBG:= Part.ColorBG; //clGreen
         end;
       cRangePartlySelected:
