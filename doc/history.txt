@@ -1,4 +1,7 @@
 
+2021.07.18
++ add: Colors.TextSelFont can now be clNone to keep font-colors
+
 2021.07.08
 + add: prop OptHighlightGitConflicts
 
