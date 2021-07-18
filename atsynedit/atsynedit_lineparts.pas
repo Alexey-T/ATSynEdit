@@ -159,7 +159,7 @@ function DoPartInsert(var AParts: TATLineParts; var APart: TATLinePart;
 var
   ResultPartIndex: integer;
   //
-  procedure AddPart(const P: TATLinePart); inline;
+  procedure AddPart(constref P: TATLinePart); inline;
   begin
     if P.Len>0 then
       if ResultPartIndex<High(ResultParts) then
@@ -171,7 +171,7 @@ var
   //
   procedure FixPartLen(var P: TATLinePart; NOffsetEnd: integer); inline;
   begin
-    if P.Offset+P.Len>NOffsetEnd then
+    if P.Len>NOffsetEnd-P.Offset then
       P.Len:= NOffsetEnd-P.Offset;
   end;
   //
