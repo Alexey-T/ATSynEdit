@@ -1336,7 +1336,6 @@ type
     TagString: string; //to store plugin specific data in CudaText
     InitialOptions: TATEditorTempOptions;
 
-    IsRepaintEnabled: boolean;
     IsModifiedWrapMode: boolean;
     IsModifiedMinimapVisible: boolean;
     IsModifiedMicromapVisible: boolean;
@@ -1565,6 +1564,7 @@ type
     procedure DoConvertTabsToSpaces;
 
   protected
+    IsRepaintEnabled: boolean;
     procedure Paint; override;
     procedure Resize; override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
