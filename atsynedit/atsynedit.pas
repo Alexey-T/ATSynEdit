@@ -744,6 +744,7 @@ type
     FPaintCounter: integer;
     FPaintStarted: boolean;
     FPaintWorking: boolean;
+    FCreateDone: boolean;
     FTickMinimap: QWord;
     FTickAll: QWord;
     FShowOsBarVert: boolean;
@@ -4558,6 +4559,9 @@ begin
   UpdateTabHelper;
   //must call before first paint
   UpdateLinksRegexObject;
+
+  //allow Invalidate to work now
+  FCreateDone:= true;
 end;
 
 destructor TATSynEdit.Destroy;
@@ -4632,6 +4636,8 @@ end;
 
 procedure TATSynEdit.Update(AUpdateWrapInfo: boolean=false);
 begin
+  if not FCreateDone then exit;
+
   UpdateCursor;
 
   if AUpdateWrapInfo then
@@ -6384,7 +6390,7 @@ end;
 
 procedure TATSynEdit.Invalidate;
 begin
-  if FTimerFlicker=nil then exit; //ignore Invalidate coming from Create()
+  if not FCreateDone then exit;
   //if not IsInvalidateAllowed then exit;
 
   if OptEditorFlickerReducingPause>0 then
