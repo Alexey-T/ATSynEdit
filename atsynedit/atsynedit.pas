@@ -744,7 +744,6 @@ type
     FPaintCounter: integer;
     FPaintStarted: boolean;
     FPaintWorking: boolean;
-    FCreateDone: boolean;
     FTickMinimap: QWord;
     FTickAll: QWord;
     FShowOsBarVert: boolean;
@@ -1565,6 +1564,7 @@ type
     procedure DoConvertTabsToSpaces;
 
   protected
+    FCreateDone: boolean;
     procedure Paint; override;
     procedure Resize; override;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
@@ -5175,6 +5175,7 @@ end;
 procedure TATSynEdit.Resize;
 begin
   inherited;
+  if not FCreateDone then exit;
 
   //avoid setting FLineTopTodo, which breaks the v-scroll-pos, if huge line is wrapped
   //and v-scroll-pos is in the middle of this line
