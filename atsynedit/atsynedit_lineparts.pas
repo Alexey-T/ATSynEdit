@@ -212,7 +212,7 @@ begin
   begin
     ColorFontLeft:= AParts[nIndex1].ColorFont;
     ColorFontRight:= AParts[nIndex2].ColorFont;
-    APart.ColorFont:= ColorFontLeft;
+    //APart.ColorFont:= ColorFontLeft; //caused CudaText issue #3574
   end;
 
   //these 2 parts are for edges of selection
