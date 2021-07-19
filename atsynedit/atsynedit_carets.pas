@@ -138,7 +138,7 @@ type
     function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): TATCaretItem;
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
-    function IsLineWithCaret(APosY: integer): boolean;
+    function IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
     function IsLineWithSelection(APosY: integer): boolean;
     function IsSelection: boolean;
     function IsAnyCaretInVisibleRect(const R: TRect): boolean;
@@ -745,7 +745,7 @@ begin
   end;
 end;
 
-function TATCarets.IsLineWithCaret(APosY: integer): boolean;
+function TATCarets.IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
 var
   a, b, m, dif: integer;
 begin
@@ -757,7 +757,12 @@ begin
     m:= (a+b+1) div 2;
     dif:= Items[m].PosY-APosY;
     if dif=0 then
-      exit(true);
+    begin
+      if not ADisableSelected then
+        exit(true)
+      else
+        exit(not Items[m].IsSelection);
+    end;
     if dif>0 then
       b:= m-1
     else

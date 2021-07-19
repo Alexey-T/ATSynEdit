@@ -1,8 +1,8 @@
 {$ifdef nnnn}begin end;{$endif}
 
-function TATSynEdit.IsLineWithCaret(ALine: integer): boolean; inline;
+function TATSynEdit.IsLineWithCaret(ALine: integer; ADisableSelected: boolean=false): boolean; inline;
 begin
-  Result:= FCarets.IsLineWithCaret(ALine);
+  Result:= FCarets.IsLineWithCaret(ALine, ADisableSelected);
 end;
 
 function TATSynEdit.IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;

@@ -1459,7 +1459,7 @@ type
     function ClientPosToCaretPos(P: TPoint;
       out ADetails: TATEditorPosDetails;
       AGapCoordAction: TATEditorGapCoordAction=cGapCoordToLineEnd): TPoint;
-    function IsLineWithCaret(ALine: integer): boolean;
+    function IsLineWithCaret(ALine: integer; ADisableSelected: boolean=false): boolean;
     function OffsetToCaretPos(const APos: integer): TPoint;
     function CaretPosToOffset(const ACaret: TPoint): integer;
     //goto
@@ -3304,7 +3304,7 @@ begin
     StrOutput:= StringOfCharW(FOptMaskChar, Length(StrOutput));
 
   LineSeparator:= Strings.LinesSeparator[NLinesIndex];
-  bLineWithCaret:= IsLineWithCaret(NLinesIndex);
+  bLineWithCaret:= IsLineWithCaret(NLinesIndex, true); //ADisableSelected=true, to mimic Sublime
   bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
   //horz scrollbar max: is calculated here, to make variable horz bar
