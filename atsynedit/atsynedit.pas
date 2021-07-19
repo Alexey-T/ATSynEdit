@@ -885,6 +885,7 @@ type
     FOptShowCurLine: boolean;
     FOptShowCurLineMinimal: boolean;
     FOptShowCurLineOnlyFocused: boolean;
+    FOptShowCurLineIfWithoutSel: boolean;
     FOptShowCurColumn: boolean;
     FOptShowMouseSelFrame: boolean;
     FOptMouseHideCursor: boolean;
@@ -1769,6 +1770,7 @@ type
     property OptShowCurLine: boolean read FOptShowCurLine write FOptShowCurLine default false;
     property OptShowCurLineMinimal: boolean read FOptShowCurLineMinimal write FOptShowCurLineMinimal default true;
     property OptShowCurLineOnlyFocused: boolean read FOptShowCurLineOnlyFocused write FOptShowCurLineOnlyFocused default false;
+    property OptShowCurLineIfWithoutSel: boolean read FOptShowCurLineIfWithoutSel write FOptShowCurLineIfWithoutSel default true;
     property OptShowCurColumn: boolean read FOptShowCurColumn write FOptShowCurColumn default false;
     property OptShowScrollHint: boolean read FOptShowScrollHint write FOptShowScrollHint default false;
     property OptShowMouseSelFrame: boolean read FOptShowMouseSelFrame write FOptShowMouseSelFrame default cInitShowMouseSelFrame;
@@ -3304,7 +3306,7 @@ begin
     StrOutput:= StringOfCharW(FOptMaskChar, Length(StrOutput));
 
   LineSeparator:= Strings.LinesSeparator[NLinesIndex];
-  bLineWithCaret:= IsLineWithCaret(NLinesIndex, true); //ADisableSelected=true, to mimic Sublime
+  bLineWithCaret:= IsLineWithCaret(NLinesIndex, FOptShowCurLineIfWithoutSel);
   bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
   //horz scrollbar max: is calculated here, to make variable horz bar
@@ -4487,6 +4489,7 @@ begin
   FOptShowCurLine:= false;
   FOptShowCurLineMinimal:= true;
   FOptShowCurLineOnlyFocused:= false;
+  FOptShowCurLineIfWithoutSel:= true;
   FOptShowCurColumn:= false;
   FOptShowMouseSelFrame:= cInitShowMouseSelFrame;
 
