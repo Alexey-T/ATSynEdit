@@ -1,6 +1,6 @@
 
 2021.07.19
-+ add: prop ShowCurLineIfWithoutSel
++ add: prop OptShowCurLineIfWithoutSel
 + add: Colors.TextSelFont can now be clNone to keep font-colors
 
 2021.07.08
