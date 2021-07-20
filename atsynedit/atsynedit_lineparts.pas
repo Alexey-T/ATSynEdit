@@ -212,7 +212,6 @@ begin
   begin
     ColorFontLeft:= AParts[nIndex1].ColorFont;
     ColorFontRight:= AParts[nIndex2].ColorFont;
-    //APart.ColorFont:= ColorFontLeft; //caused CudaText issue #3574
   end;
 
   //these 2 parts are for edges of selection
@@ -263,7 +262,11 @@ begin
 
   //add middle (one APart of many parts)
   if not AKeepFontStyles then
-    AddPart(APart)
+  begin
+    if APart.ColorFont=clNone then //fix CudaText issue #3571, #3574
+      APart.ColorFont:= ColorFontLeft;
+    AddPart(APart);
+  end
   else
   begin
     nOffsetLimit:= APart.Offset+APart.Len;
