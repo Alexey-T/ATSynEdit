@@ -950,6 +950,7 @@ type
     function IsCaretOnVisibleRect: boolean;
     function IsInvalidateAllowed: boolean; inline;
     function IsNormalLexerActive: boolean;
+    procedure SetOptScaleFont(AValue: integer);
     procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
     procedure SetFoldingAsString(const AValue: string);
@@ -1713,7 +1714,7 @@ type
     property OptMaskCharUsed: boolean read FOptMaskCharUsed write FOptMaskCharUsed default false;
     property OptScrollAnimationSteps: integer read FOptScrollAnimationSteps write FOptScrollAnimationSteps default cInitScrollAnimationSteps;
     property OptScrollAnimationSleep: integer read FOptScrollAnimationSleep write FOptScrollAnimationSleep default cInitScrollAnimationSleep;
-    property OptScaleFont: integer read FOptScaleFont write FOptScaleFont default 0;
+    property OptScaleFont: integer read FOptScaleFont write SetOptScaleFont default 0;
     property OptIdleInterval: integer read FOptIdleInterval write FOptIdleInterval default cInitIdleInterval;
     property OptTabSpaces: boolean read FOptTabSpaces write SetTabSpaces default false;
     property OptTabSize: integer read FTabSize write SetTabSize default cInitTabSize;
@@ -2970,7 +2971,8 @@ begin
     TempC:= TCanvas.Create;
     try
       TempC.Handle:= GetDC(0);
-      TempC.Font.Assign(Self.Font);
+      TempC.Font.Name:= Self.Font.Name;
+      TempC.Font.Size:= DoScaleFont(Self.Font.Size);
       Size:= TempC.TextExtent(Sample);
     finally
       FreeAndNil(TempC);
@@ -9143,6 +9145,14 @@ begin
     end;
   end;
 end;
+
+procedure TATSynEdit.SetOptScaleFont(AValue: integer);
+begin
+  if FOptScaleFont=AValue then Exit;
+  FOptScaleFont:=AValue;
+  UpdateInitialVars(Canvas);
+end;
+
 
 {$I atsynedit_carets.inc}
 {$I atsynedit_hilite.inc}
