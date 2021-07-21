@@ -6264,6 +6264,7 @@ begin
         if FOptMouseWheelZooms then
         begin
           DoScaleFontDelta(AUp);
+          DoEventState;
           Result:= true;
         end;
       end;
