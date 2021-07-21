@@ -640,8 +640,9 @@ type
     FOnIdle: TNotifyEvent;
     FOnChange: TNotifyEvent;
     FOnChangeLog: TATStringsChangeLogEvent;
-    FOnChangeState: TNotifyEvent;
     FOnChangeCaretPos: TNotifyEvent;
+    FOnChangeState: TNotifyEvent;
+    FOnChangeZoom: TNotifyEvent;
     FOnChangeModified: TNotifyEvent;
     FOnChangeBookmarks: TNotifyEvent;
     FOnScroll: TNotifyEvent;
@@ -1369,6 +1370,7 @@ type
     procedure DoEventScroll; virtual;
     procedure DoEventChange(ALineIndex: integer=-1; AllowOnChange: boolean=true); virtual;
     procedure DoEventState; virtual;
+    procedure DoEventZoom;
     procedure TimersStart;
     procedure TimersStop;
     //complex props
@@ -1659,8 +1661,9 @@ type
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnChangeLog: TATStringsChangeLogEvent read FOnChangeLog write FOnChangeLog;
     property OnChangeModified: TNotifyEvent read FOnChangeModified write FOnChangeModified;
-    property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
     property OnChangeCaretPos: TNotifyEvent read FOnChangeCaretPos write FOnChangeCaretPos;
+    property OnChangeState: TNotifyEvent read FOnChangeState write FOnChangeState;
+    property OnChangeZoom: TNotifyEvent read FOnChangeZoom write FOnChangeZoom;
     property OnChangeBookmarks: TNotifyEvent read FOnChangeBookmarks write FOnChangeBookmarks;
     property OnScroll: TNotifyEvent read FOnScroll write FOnScroll;
     property OnCommand: TATSynEditCommandEvent read FOnCommand write FOnCommand;
@@ -6264,7 +6267,7 @@ begin
         if FOptMouseWheelZooms then
         begin
           DoScaleFontDelta(AUp);
-          DoEventState;
+          DoEventZoom;
           Result:= true;
         end;
       end;
@@ -6940,6 +6943,12 @@ procedure TATSynEdit.DoEventState;
 begin
   if Assigned(FOnChangeState) then
     FOnChangeState(Self);
+end;
+
+procedure TATSynEdit.DoEventZoom;
+begin
+  if Assigned(FOnChangeZoom) then
+    FOnChangeZoom(Self);
 end;
 
 procedure TATSynEdit.DoEventClickGutter(ABandIndex, ALineNumber: integer); inline;
