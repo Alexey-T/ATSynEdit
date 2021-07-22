@@ -1,5 +1,6 @@
 
 2021.07.21
++ add: special value OptEditorFlickerReducingPause>=1000 makes special anti-flickering
 + add: OnChangeZoom
 
 2021.07.19
