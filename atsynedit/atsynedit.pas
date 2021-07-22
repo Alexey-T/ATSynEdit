@@ -434,7 +434,7 @@ var
 
 var
   OptEditorDebugTiming: boolean = false;
-  OptEditorFlickerReducingPause: integer = 0;
+  OptEditorFlickerReducingPause: integer = 0; //when >=1000, timer is not used, but special check is used
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
