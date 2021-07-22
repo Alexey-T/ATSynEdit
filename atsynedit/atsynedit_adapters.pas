@@ -64,6 +64,7 @@ type
     //return lexer name
 
     function IsDataReady: boolean; virtual;
+    function IsDataReadyPartially: boolean; virtual;
     //return False to prevent Minimap repainting (avoid Minimap flicker during typing)
 
     //
@@ -207,6 +208,11 @@ begin
 end;
 
 function TATAdapterHilite.IsDataReady: boolean;
+begin
+  Result:= true;
+end;
+
+function TATAdapterHilite.IsDataReadyPartially: boolean;
 begin
   Result:= true;
 end;

@@ -6405,6 +6405,12 @@ begin
   if not IsRepaintEnabled then exit;
   //if not IsInvalidateAllowed then exit;
 
+  if OptEditorFlickerReducingPause>=1000 then
+  begin
+    if Assigned(AdapterForHilite) then
+      if not AdapterForHilite.IsDataReadyPartially then exit;
+  end
+  else
   if OptEditorFlickerReducingPause>0 then
   begin
     FTimerFlicker.Enabled:= false;
