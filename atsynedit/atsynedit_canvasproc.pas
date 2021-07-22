@@ -1219,7 +1219,9 @@ begin
       begin
         if bHasBG then
           C.SetPixel(X1, Y1, rColorBack);
-        if not bSpace then
+        if bSpace then
+          C.SetPixel(X1, Y2b, rColorBack)
+        else
           C.SetPixel(X1, Y2b, rColorFont);
       end
       else
