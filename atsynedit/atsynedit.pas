@@ -2522,7 +2522,7 @@ begin
   begin
     FScrollbarVert.Hide;
     FScrollbarHorz.Hide;
-    exit;
+    //don't exit, we still need calculation of FScrollHorz fields
   end;
 
   NGapAll:= 0;
@@ -2543,6 +2543,7 @@ begin
     NGapAll:= Gaps.SizeForAll;
   end;
 
+  if not ModeOneLine then
   with FScrollVert do
   begin
     NPage:= Max(1, GetVisibleLines)-1;
@@ -2575,6 +2576,9 @@ begin
     if AdjustSmoothPos then
       SmoothPos:= TotalOffset;
   end;
+
+  //don't need further code for OneLine
+  if ModeOneLine then exit;
 
   bVert1:= ShowOsBarVert;
   bHorz1:= ShowOsBarHorz;
