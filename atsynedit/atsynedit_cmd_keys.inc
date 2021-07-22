@@ -8,6 +8,14 @@ var
   NLine, NIndent, NWrapped, i: integer;
   IndentKind: TATLineIndentKind;
 begin
+  if FCarets.Count=0 then exit([]);
+
+  if ModeOneLine then
+  begin
+    Caret:= FCarets[0];
+    Caret.PosX:= 0;
+  end
+  else
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
@@ -40,7 +48,10 @@ begin
   end;
 
   if Caret.PosX=0 then
+  begin
+    FScrollHorz.NPos:= 0;
     FScrollHorz.NPixelOffset:= 0;
+  end;
 
   Result:= [cResultCaretLeft];
 end;
@@ -52,6 +63,14 @@ var
   NLine, NLenTotal, NLen, NWrapped, i: integer;
   Details: TATEditorPosDetails;
 begin
+  if FCarets.Count=0 then exit([]);
+
+  if ModeOneLine then
+  begin
+    Caret:= FCarets[0];
+    Caret.PosX:= Strings.LinesLen[0];
+  end
+  else
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
