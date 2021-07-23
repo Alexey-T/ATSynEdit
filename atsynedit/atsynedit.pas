@@ -5637,11 +5637,12 @@ begin
     begin
       if FOptMouseRightClickMovesCaret then
         if not bClickOnSelection then
-        begin
-          DoCaretSingle(PCaret.X, PCaret.Y);
-          DoSelect_None;
-          Invalidate;
-        end;
+          if Strings.IsIndexValid(PCaret.Y) then
+          begin
+            DoCaretSingle(PCaret.X, PCaret.Y);
+            DoSelect_None;
+            Invalidate;
+           end;
     end;
   end;
 
