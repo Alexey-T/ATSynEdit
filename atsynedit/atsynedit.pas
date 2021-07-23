@@ -5471,7 +5471,7 @@ end;
 
 procedure TATSynEdit.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  PCaret: TPoint;
+  PosTextClicked: TPoint;
   PosDetails: TATEditorPosDetails;
   Index: integer;
   ActionId: TATEditorMouseAction;
@@ -5513,7 +5513,7 @@ begin
     Exit;
   end;
 
-  PCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
+  PosTextClicked:= ClientPosToCaretPos(Point(X, Y), PosDetails);
   FCaretSpecPos:= false;
   FMouseDownOnMinimap:= false;
   FMouseDownGutterLineNumber:= -1;
@@ -5537,7 +5537,7 @@ begin
   begin
     if Button=mbLeft then
     begin
-      FMouseDownPnt:= PCaret;
+      FMouseDownPnt:= PosTextClicked;
       bClickOnSelection:= GetCaretSelectionIndex(FMouseDownPnt)>=0;
     end;
 
@@ -5566,7 +5566,7 @@ begin
           begin
             if cCommand_GotoDefinition>0 then
             begin
-              DoCaretSingle(PCaret.X, PCaret.Y);
+              DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
               DoCommand(cCommand_GotoDefinition);
             end;
           end;
@@ -5637,9 +5637,9 @@ begin
     begin
       if FOptMouseRightClickMovesCaret then
         if not bClickOnSelection then
-          if Strings.IsIndexValid(PCaret.Y) then
+          if Strings.IsIndexValid(PosTextClicked.Y) then
           begin
-            DoCaretSingle(PCaret.X, PCaret.Y);
+            DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
             DoSelect_None;
             Invalidate;
            end;
@@ -5656,18 +5656,18 @@ begin
         if FOptMouseClickNumberSelectsLine then
         begin
           FSelRect:= cRectEmpty;
-          FMouseDownGutterLineNumber:= PCaret.Y;
-          DoSelect_Line(PCaret);
+          FMouseDownGutterLineNumber:= PosTextClicked.Y;
+          DoSelect_Line(PosTextClicked);
         end;
       end
       else
       if Index=FGutterBandFolding then
       begin
-        DoFoldbarClick(PCaret.Y);
+        DoFoldbarClick(PosTextClicked.Y);
       end
       else
         //click on other bands- event
-        DoEventClickGutter(FGutter.IndexAt(X), PCaret.Y);
+        DoEventClickGutter(FGutter.IndexAt(X), PosTextClicked.Y);
     end;
   end;
 
