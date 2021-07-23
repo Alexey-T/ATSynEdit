@@ -5694,7 +5694,7 @@ var
   Str: atString;
   Caret: TATCaretItem;
   PosDetails: TATEditorPosDetails;
-  PntCaret: TPoint;
+  PosTextClicked: TPoint;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -5738,8 +5738,8 @@ begin
     else
     //mouse released w/o drag-drop
     begin
-      PntCaret:= ClientPosToCaretPos(Point(X, Y), PosDetails);
-      DoCaretSingle(PntCaret.X, PntCaret.Y);
+      PosTextClicked:= ClientPosToCaretPos(Point(X, Y), PosDetails);
+      DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
       DoEventCarets;
       Update;
     end;
