@@ -1155,7 +1155,6 @@ var
   bHasBG: boolean;
   bSpace: boolean;
   NColorBack, NColorFont, NColorFontHalf: TColor;
-  ch: WideChar;
   rColorBack, rColorFont: TBGRAPixel;
 begin
   //offset<0 means some bug on making parts!
@@ -1197,16 +1196,22 @@ begin
     for NCharIndex:= Part^.Offset+1 to Part^.Offset+Part^.Len do
     begin
       if NCharIndex>Length(ALine) then Break;
-      ch:= ALine[NCharIndex];
-      if ch=#9 then
-      begin
-        bSpace:= true;
-        NSpaceThis:= ATabSize;
-      end
-      else
-      begin
-        bSpace:= ch=' ';
-        NSpaceThis:= 1;
+      case ALine[NCharIndex] of
+        ' ':
+          begin
+            bSpace:= true;
+            NSpaceThis:= 1;
+          end;
+        #9:
+          begin
+            bSpace:= true;
+            NSpaceThis:= ATabSize;
+          end
+        else
+          begin
+            bSpace:= false;
+            NSpaceThis:= 1;
+          end;
       end;
 
       X1:= APosX + ACharSize.X*NSpaces;
