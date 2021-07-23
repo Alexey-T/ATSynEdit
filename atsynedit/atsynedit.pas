@@ -7573,7 +7573,8 @@ begin
     if Carets.Count>0 then
     begin
       Caret:= Carets[0];
-      NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false);
+      if Strings.IsIndexValid(Caret.PosY) then
+        NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false);
     end;
 
   NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false);

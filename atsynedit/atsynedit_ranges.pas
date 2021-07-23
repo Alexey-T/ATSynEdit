@@ -530,6 +530,7 @@ var
   Ptr: PATSynRange;
 begin
   Result:= -1;
+  if ALine<0 then exit;
   if ALine>High(FLineIndexer) then exit;
 
   NItemLen:= Length(FLineIndexer[ALine]);
