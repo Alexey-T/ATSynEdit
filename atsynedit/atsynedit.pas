@@ -5638,7 +5638,7 @@ begin
       if FOptMouseRightClickMovesCaret then
         if not bClickOnSelection then
         begin
-          DoCaretSingle(FMouseDownPnt.X, FMouseDownPnt.Y);
+          DoCaretSingle(PCaret.X, PCaret.Y);
           DoSelect_None;
           Invalidate;
         end;
