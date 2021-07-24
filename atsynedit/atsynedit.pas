@@ -758,6 +758,7 @@ type
     FHighlightGitConflicts: boolean;
 
     //these options are implemented in CudaText, they are dummy here
+    FOptThemed: boolean;
     FOptAutoPairForMultiCarets: boolean;
     FOptAutoPairChars: string;
     FOptAutocompleteAutoshowCharCount: integer;
@@ -1697,6 +1698,7 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
+    property OptThemed: boolean read FOptThemed write FOptThemed default false;
     property OptHighlightGitConflicts: boolean read FHighlightGitConflicts write FHighlightGitConflicts default cInitHighlightGitConflicts;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
     property OptAutoPairChars: string read FOptAutoPairChars write FOptAutoPairChars stored false;
