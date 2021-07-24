@@ -1193,9 +1193,9 @@ begin
 
     //iterate over all chars, to check for spaces (ignore them) and Tabs (add indent for them).
     //because need to paint multiline comments/strings nicely.
-    for NCharIndex:= Part^.Offset+1 to Part^.Offset+Part^.Len do
+    for NCharIndex:= Part^.Offset+1 to
+                     Min(Part^.Offset+Part^.Len, Length(ALine)) do
     begin
-      if NCharIndex>Length(ALine) then Break;
       case ALine[NCharIndex] of
         ' ':
           begin
