@@ -7616,8 +7616,13 @@ begin
   AProps.HiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
 
   Rng:= Fold.ItemPtr(NIndexOfCurrentRng);
-  if Rng^.Y<NLineIndex then AProps.IsLineUp:= true;
-  if Rng^.Y2>NLineIndex then AProps.IsLineDown:= true;
+
+  if Rng^.Y<NLineIndex then
+    AProps.IsLineUp:= true;
+
+  if Rng^.Y2>NLineIndex then
+    AProps.IsLineDown:= true;
+
   if Rng^.Y=NLineIndex then
   begin
     AProps.State:= cFoldbarBegin;
@@ -7625,6 +7630,7 @@ begin
     if not AProps.IsPlus then
       AProps.IsPlus:= Rng^.Folded;
   end;
+
   if Rng^.Y2=NLineIndex then
     if AProps.State<>cFoldbarBegin then
       AProps.State:= cFoldbarEnd;
