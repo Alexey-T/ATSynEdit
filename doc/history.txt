@@ -1,4 +1,7 @@
 
+2021.07.27
++ add: OptFoldCacheEnabled (default True): reduces flickering of folding-bar on fast editing
+
 2021.07.21
 + add: special value OptEditorFlickerReducingPause>=1000 makes special anti-flickering
 + add: OnChangeZoom
