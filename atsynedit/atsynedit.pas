@@ -3981,8 +3981,7 @@ end;
 procedure TATSynEdit.DoPaintMinimapAllToBGRABitmap;
 begin
   //avoid too often minimap repainting
-  if Assigned(AdapterForHilite) then
-    if not AdapterForHilite.IsDataReady then exit;
+  if not FAdapterIsDataReady then exit;
 
   if OptEditorDebugTiming then
     FTickMinimap:= GetTickCount64;
@@ -7698,6 +7697,8 @@ begin
   NCacheIndex:= AWrapItemIndex-FFoldbarCacheStart;
   if not ((NCacheIndex>=0) and (NCacheIndex<=High(FFoldbarCache))) then exit;
 
+  //FFoldbarCache removes flickering of the folding-bar on text editing
+  //(folding ranges appear/disappear on editing)
   if not FAdapterIsDataReady then
     Props:= FFoldbarCache[NCacheIndex]
   else
