@@ -122,6 +122,8 @@ type
     MouseActionId: TATEditorMouseAction;
   end;
 
+  TATEditorMouseActionArray = array of TATEditorMouseActionRecord;
+
   TATFoldBarState = (
     cFoldbarNone,
     cFoldbarBegin,
@@ -137,7 +139,7 @@ type
     HiliteLines: boolean;
   end;
 
-  TATEditorMouseActionArray = array of TATEditorMouseActionRecord;
+  TATFoldBarPropsArray = array of TATFoldBarProps;
 
   TATEditorDirection = (
     cDirNone,
@@ -636,6 +638,7 @@ type
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
     FLastPaintDidScrolling: boolean;
+    FLastFoldBarProps: TATFoldBarPropsArray;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
