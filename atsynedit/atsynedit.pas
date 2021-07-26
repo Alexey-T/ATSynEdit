@@ -968,7 +968,7 @@ type
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
-    procedure InitFoldbarCache(AFirstIndex: integer);
+    procedure InitFoldbarCache(ACacheStartIndex: integer);
     procedure InitLengthArray(var Lens: TATIntArray);
     function IsCaretOnVisibleRect: boolean;
     function IsInvalidateAllowed: boolean; inline;
@@ -9262,7 +9262,7 @@ begin
   UpdateInitialVars(Canvas);
 end;
 
-procedure TATSynEdit.InitFoldbarCache(AFirstIndex: integer);
+procedure TATSynEdit.InitFoldbarCache(ACacheStartIndex: integer);
 var
   NCount: integer;
   bLenValid, bClear: boolean;
@@ -9270,13 +9270,13 @@ begin
   NCount:= GetVisibleLines+1;
 
   bClear:= false;
-  if FFoldbarCacheStart<>AFirstIndex then
+  if FFoldbarCacheStart<>ACacheStartIndex then
     bClear:= true;
   bLenValid:= Length(FFoldbarCache)=NCount;
   if not bLenValid then
     bClear:= true;
 
-  FFoldbarCacheStart:= AFirstIndex;
+  FFoldbarCacheStart:= ACacheStartIndex;
 
   if not bLenValid then
     SetLength(FFoldbarCache, NCount);
