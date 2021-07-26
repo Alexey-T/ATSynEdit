@@ -547,6 +547,7 @@ type
     FFoldStyle: TATEditorFoldStyle;
     FFoldUnderlineOffset: integer;
     FFoldEnabled: boolean;
+    FFoldCacheEnabled: boolean;
     FFoldTooltipVisible: boolean;
     FFoldTooltipWidthPercents: integer;
     FFoldTooltipLineCount: integer;
@@ -1745,6 +1746,7 @@ type
     property OptNonWordChars: atString read FOptNonWordChars write FOptNonWordChars stored false;
     property OptFoldStyle: TATEditorFoldStyle read FFoldStyle write FFoldStyle default cInitFoldStyle;
     property OptFoldEnabled: boolean read FFoldEnabled write SetFoldEnabled default true;
+    property OptFoldCacheEnabled: boolean read FFoldCacheEnabled write FFoldCacheEnabled default true;
     property OptFoldUnderlineOffset: integer read FFoldUnderlineOffset write FFoldUnderlineOffset default cInitFoldUnderlineOffset;
     property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;
     property OldFoldTooltipWidthPercents: integer read FFoldTooltipWidthPercents write FFoldTooltipWidthPercents default cInitFoldTooltipWidthPercents;
@@ -3124,7 +3126,8 @@ begin
     NWrapIndex:= Max(0, AScrollVert.NPos);
   end;
 
-  InitFoldbarCache(NWrapIndex);
+  if FFoldCacheEnabled then
+    InitFoldbarCache(NWrapIndex);
 
   DoEventBeforeCalcHilite;
 
@@ -4346,6 +4349,7 @@ begin
   FFold:= TATSynRanges.Create;
   FFoldStyle:= cInitFoldStyle;
   FFoldEnabled:= true;
+  FFoldCacheEnabled:= true;
   FFoldUnderlineOffset:= cInitFoldUnderlineOffset;
   FFoldTooltipVisible:= cInitFoldTooltipVisible;
   FFoldTooltipWidthPercents:= cInitFoldTooltipWidthPercents;
@@ -7694,17 +7698,24 @@ begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then exit;
 
-  NCacheIndex:= AWrapItemIndex-FFoldbarCacheStart;
-  if not ((NCacheIndex>=0) and (NCacheIndex<=High(FFoldbarCache))) then exit;
+  //FFoldbarCache removes flickering of the folding-bar on fast editing
+  if FFoldCacheEnabled then
+  begin
+    NCacheIndex:= AWrapItemIndex-FFoldbarCacheStart;
+    if not ((NCacheIndex>=0) and (NCacheIndex<=High(FFoldbarCache))) then exit;
 
-  //FFoldbarCache removes flickering of the folding-bar on text editing
-  //(folding ranges appear/disappear on editing)
-  if not FAdapterIsDataReady then
-    Props:= FFoldbarCache[NCacheIndex]
+    if not FAdapterIsDataReady then
+      Props:= FFoldbarCache[NCacheIndex]
+    else
+    begin
+      bOk:= DoCalcFoldProps(AWrapItemIndex, Props);
+      FFoldbarCache[NCacheIndex]:= Props;
+      if not bOk then exit;
+    end;
+  end
   else
   begin
     bOk:= DoCalcFoldProps(AWrapItemIndex, Props);
-    FFoldbarCache[NCacheIndex]:= Props;
     if not bOk then exit;
   end;
 
