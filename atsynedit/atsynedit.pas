@@ -122,6 +122,13 @@ type
     MouseActionId: TATEditorMouseAction;
   end;
 
+  TATFoldBarState = (
+    cFoldbarNone,
+    cFoldbarBegin,
+    cFoldbarEnd,
+    cFoldbarMiddle
+    );
+
   TATEditorMouseActionArray = array of TATEditorMouseActionRecord;
 
   TATEditorDirection = (
@@ -931,6 +938,8 @@ type
     {$endif}
 
     //
+    function DoCalcFoldStates(AWrapItemIndex: integer; out AState: TATFoldBarState;
+      out AIsPlus, AIsLineUp, AIsLineDown, AHiliteLines: boolean): boolean;
     class function CheckInputForNumberOnly(const S: UnicodeString; X: integer;
       ch: WideChar; AllowNegative: boolean): boolean;
     procedure ClearSelRectPoints;
@@ -7570,12 +7579,72 @@ begin
   end;
 end;
 
+
+function TATSynEdit.DoCalcFoldStates(AWrapItemIndex: integer;
+  out AState: TATFoldBarState; out AIsPlus, AIsLineUp, AIsLineDown, AHiliteLines: boolean): boolean;
+var
+  NLineIndex: integer;
+  WrapItem: TATWrapItem;
+  Rng: PATSynRange;
+  NIndexOfCurrentRng, NIndexOfCaretRng: integer;
+  Caret: TATCaretItem;
+begin
+  Result:= false;
+  AState:= cFoldbarNone;
+  AIsPlus:= false;
+  AIsLineUp:= false;
+  AIsLineDown:= false;
+  AHiliteLines:= false;
+
+  WrapItem:= FWrapInfo[AWrapItemIndex];
+  NLineIndex:= WrapItem.NLineIndex;
+
+  //find deepest range which includes caret pos
+  NIndexOfCaretRng:= -1;
+  if FOptGutterShowFoldLinesForCaret then
+    if Carets.Count>0 then
+    begin
+      Caret:= Carets[0];
+      if Strings.IsIndexValid(Caret.PosY) then
+        NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false);
+    end;
+
+  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false);
+  if NIndexOfCurrentRng<0 then exit;
+  AHiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
+
+  Rng:= Fold.ItemPtr(NIndexOfCurrentRng);
+  if Rng^.Y<NLineIndex then AIsLineUp:= true;
+  if Rng^.Y2>NLineIndex then AIsLineDown:= true;
+  if Rng^.Y=NLineIndex then
+  begin
+    AState:= cFoldbarBegin;
+    //don't override found [+], 2 blocks can start at same pos
+    if not AIsPlus then AIsPlus:= Rng^.Folded;
+  end;
+  if Rng^.Y2=NLineIndex then
+    if AState<>cFoldbarBegin then
+      AState:= cFoldbarEnd;
+
+  //correct AState for wrapped line
+  if AState=cFoldbarBegin then
+    if not WrapItem.bInitial then
+      AState:= cFoldbarMiddle;
+
+  //correct AState for wrapped line
+  if AState=cFoldbarEnd then
+    if WrapItem.NFinal=cWrapItemMiddle then
+      AState:= cFoldbarMiddle;
+
+  Result:= true;
+end;
+
 procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
   AWrapItemIndex: integer;
   ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
 var
   CoordXCenter, CoordYCenter: integer;
-  IsLineUp, IsLineDown: boolean;
+  IsPlus, IsLineUp, IsLineDown: boolean;
   //
   procedure DrawUp; inline;
   begin
@@ -7597,64 +7666,20 @@ var
   end;
   //
 var
-  State: (cFoldbarNone, cFoldbarBegin, cFoldbarEnd, cFoldbarMiddle);
-  NLineIndex: integer;
-  WrapItem: TATWrapItem;
-  Rng: PATSynRange;
-  NIndexOfCurrentRng, NIndexOfCaretRng: integer;
-  Caret: TATCaretItem;
-  IsPlus: boolean;
+  State: TATFoldBarState;
   bHiliteLines: boolean;
   NColorLine, NColorPlus: TColor;
 begin
   if not FOptGutterShowFoldAlways then
-    if not FCursorOnGutter then Exit;
+    if not FCursorOnGutter then exit;
 
-  WrapItem:= FWrapInfo[AWrapItemIndex];
-  NLineIndex:= WrapItem.NLineIndex;
-
-  //find deepest range which includes caret pos
-  NIndexOfCaretRng:= -1;
-  if FOptGutterShowFoldLinesForCaret then
-    if Carets.Count>0 then
-    begin
-      Caret:= Carets[0];
-      if Strings.IsIndexValid(Caret.PosY) then
-        NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false);
-    end;
-
-  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false);
-  if NIndexOfCurrentRng<0 then exit;
-  bHiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
-
-  //calc state
-  State:= cFoldbarNone;
-  IsPlus:= false;
-  IsLineUp:= false;
-  IsLineDown:= false;
-
-  Rng:= Fold.ItemPtr(NIndexOfCurrentRng);
-  if Rng^.Y<NLineIndex then IsLineUp:= true;
-  if Rng^.Y2>NLineIndex then IsLineDown:= true;
-  if Rng^.Y=NLineIndex then
-  begin
-    State:= cFoldbarBegin;
-    //don't override found [+], 2 blocks can start at same pos
-    if not IsPlus then IsPlus:= Rng^.Folded;
-  end;
-  if Rng^.Y2=NLineIndex then
-    if State<>cFoldbarBegin then
-      State:= cFoldbarEnd;
-
-  //correct state for wrapped line
-  if State=cFoldbarBegin then
-    if not WrapItem.bInitial then
-      State:= cFoldbarMiddle;
-
-  //correct state for wrapped line
-  if State=cFoldbarEnd then
-    if WrapItem.NFinal=cWrapItemMiddle then
-      State:= cFoldbarMiddle;
+  if not DoCalcFoldStates(
+    AWrapItemIndex,
+    State,
+    IsPlus,
+    IsLineUp,
+    IsLineDown,
+    bHiliteLines) then exit;
 
   if bHiliteLines then
     NColorPlus:= Colors.GutterFoldLine2
