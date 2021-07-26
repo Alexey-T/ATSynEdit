@@ -638,7 +638,6 @@ type
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
     FLastPaintDidScrolling: boolean;
-    FLastFoldBarProps: TATFoldBarPropsArray;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
@@ -646,6 +645,9 @@ type
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
+    FFoldbarCache: TATFoldBarPropsArray;
+    FFoldbarCacheStart: integer;
+    FAdapterIsDataReady: boolean;
     FOnCheckInput: TATSynEditCheckInputEvent;
     FOnBeforeCalcHilite: TNotifyEvent;
     FOnClickDbl,
@@ -966,6 +968,7 @@ type
     function GetDimRanges: TATDimRanges;
     function GetHotspots: TATHotspots;
     function GetGutterDecor: TATGutterDecor;
+    procedure InitFoldbarCache(AFirstIndex: integer);
     procedure InitLengthArray(var Lens: TATIntArray);
     function IsCaretOnVisibleRect: boolean;
     function IsInvalidateAllowed: boolean; inline;
@@ -3121,6 +3124,8 @@ begin
     NWrapIndex:= Max(0, AScrollVert.NPos);
   end;
 
+  InitFoldbarCache(NWrapIndex);
+
   DoEventBeforeCalcHilite;
 
   RectLine.Left:= ARect.Left;
@@ -5057,6 +5062,11 @@ begin
   FVisibleColumns:= GetVisibleColumns;
   FCaretShown:= false;
   Carets.GetSelections(FSel);
+
+  if Assigned(FAdapterHilite) then
+    FAdapterIsDataReady:= FAdapterHilite.IsDataReady
+  else
+    FAdapterIsDataReady:= true;
 
   UpdateGapForms(true);
   DoPaintMain(C, ALineFrom);
@@ -7679,11 +7689,23 @@ var
   //
 var
   NColorLine, NColorPlus: TColor;
+  NCacheIndex: integer;
+  bOk: boolean;
 begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then exit;
 
-  if not DoCalcFoldProps(AWrapItemIndex, Props) then exit;
+  NCacheIndex:= AWrapItemIndex-FFoldbarCacheStart;
+  if not ((NCacheIndex>=0) and (NCacheIndex<=High(FFoldbarCache))) then exit;
+
+  if not FAdapterIsDataReady then
+    Props:= FFoldbarCache[NCacheIndex]
+  else
+  begin
+    bOk:= DoCalcFoldProps(AWrapItemIndex, Props);
+    FFoldbarCache[NCacheIndex]:= Props;
+    if not bOk then exit;
+  end;
 
   if Props.HiliteLines then
     NColorPlus:= Colors.GutterFoldLine2
@@ -9237,6 +9259,29 @@ begin
   if FOptScaleFont=AValue then Exit;
   FOptScaleFont:=AValue;
   UpdateInitialVars(Canvas);
+end;
+
+procedure TATSynEdit.InitFoldbarCache(AFirstIndex: integer);
+var
+  NCount: integer;
+  bLenValid, bClear: boolean;
+begin
+  NCount:= GetVisibleLines;
+
+  bClear:= false;
+  if FFoldbarCacheStart<>AFirstIndex then
+    bClear:= true;
+  bLenValid:= Length(FFoldbarCache)=NCount;
+  if not bLenValid then
+    bClear:= true;
+
+  FFoldbarCacheStart:= AFirstIndex;
+
+  if not bLenValid then
+    SetLength(FFoldbarCache, NCount);
+
+  if bClear then
+    FillChar(FFoldbarCache[0], SizeOf(TATFoldBarProps)*NCount, 0);
 end;
 
 
