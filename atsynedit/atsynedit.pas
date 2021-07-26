@@ -129,6 +129,14 @@ type
     cFoldbarMiddle
     );
 
+  TATFoldBarProps = record
+    State: TATFoldBarState;
+    IsPlus: boolean;
+    IsLineUp: boolean;
+    IsLineDown: boolean;
+    HiliteLines: boolean;
+  end;
+
   TATEditorMouseActionArray = array of TATEditorMouseActionRecord;
 
   TATEditorDirection = (
@@ -938,8 +946,7 @@ type
     {$endif}
 
     //
-    function DoCalcFoldStates(AWrapItemIndex: integer; out AState: TATFoldBarState;
-      out AIsPlus, AIsLineUp, AIsLineDown, AHiliteLines: boolean): boolean;
+    function DoCalcFoldProps(AWrapItemIndex: integer; out AProps: TATFoldBarProps): boolean;
     class function CheckInputForNumberOnly(const S: UnicodeString; X: integer;
       ch: WideChar; AllowNegative: boolean): boolean;
     procedure ClearSelRectPoints;
@@ -7580,21 +7587,16 @@ begin
 end;
 
 
-function TATSynEdit.DoCalcFoldStates(AWrapItemIndex: integer;
-  out AState: TATFoldBarState; out AIsPlus, AIsLineUp, AIsLineDown, AHiliteLines: boolean): boolean;
+function TATSynEdit.DoCalcFoldProps(AWrapItemIndex: integer; out AProps: TATFoldBarProps): boolean;
 var
-  NLineIndex: integer;
   WrapItem: TATWrapItem;
   Rng: PATSynRange;
-  NIndexOfCurrentRng, NIndexOfCaretRng: integer;
   Caret: TATCaretItem;
+  NLineIndex: integer;
+  NIndexOfCurrentRng, NIndexOfCaretRng: integer;
 begin
   Result:= false;
-  AState:= cFoldbarNone;
-  AIsPlus:= false;
-  AIsLineUp:= false;
-  AIsLineDown:= false;
-  AHiliteLines:= false;
+  FillChar(AProps, SizeOf(AProps), 0);
 
   WrapItem:= FWrapInfo[AWrapItemIndex];
   NLineIndex:= WrapItem.NLineIndex;
@@ -7611,30 +7613,31 @@ begin
 
   NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false);
   if NIndexOfCurrentRng<0 then exit;
-  AHiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
+  AProps.HiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
 
   Rng:= Fold.ItemPtr(NIndexOfCurrentRng);
-  if Rng^.Y<NLineIndex then AIsLineUp:= true;
-  if Rng^.Y2>NLineIndex then AIsLineDown:= true;
+  if Rng^.Y<NLineIndex then AProps.IsLineUp:= true;
+  if Rng^.Y2>NLineIndex then AProps.IsLineDown:= true;
   if Rng^.Y=NLineIndex then
   begin
-    AState:= cFoldbarBegin;
+    AProps.State:= cFoldbarBegin;
     //don't override found [+], 2 blocks can start at same pos
-    if not AIsPlus then AIsPlus:= Rng^.Folded;
+    if not AProps.IsPlus then
+      AProps.IsPlus:= Rng^.Folded;
   end;
   if Rng^.Y2=NLineIndex then
-    if AState<>cFoldbarBegin then
-      AState:= cFoldbarEnd;
+    if AProps.State<>cFoldbarBegin then
+      AProps.State:= cFoldbarEnd;
 
-  //correct AState for wrapped line
-  if AState=cFoldbarBegin then
+  //correct state for wrapped line
+  if AProps.State=cFoldbarBegin then
     if not WrapItem.bInitial then
-      AState:= cFoldbarMiddle;
+      AProps.State:= cFoldbarMiddle;
 
-  //correct AState for wrapped line
-  if AState=cFoldbarEnd then
+  //correct state for wrapped line
+  if AProps.State=cFoldbarEnd then
     if WrapItem.NFinal=cWrapItemMiddle then
-      AState:= cFoldbarMiddle;
+      AProps.State:= cFoldbarMiddle;
 
   Result:= true;
 end;
@@ -7644,11 +7647,11 @@ procedure TATSynEdit.DoPaintGutterFolding(C: TCanvas;
   ACoordX1, ACoordX2, ACoordY1, ACoordY2: integer);
 var
   CoordXCenter, CoordYCenter: integer;
-  IsPlus, IsLineUp, IsLineDown: boolean;
+  Props: TATFoldBarProps;
   //
   procedure DrawUp; inline;
   begin
-    if IsLineUp then
+    if Props.IsLineUp then
       CanvasLineVert(C,
         CoordXCenter,
         ACoordY1,
@@ -7657,7 +7660,7 @@ var
   end;
   procedure DrawDown; inline;
   begin
-    if IsLineDown then
+    if Props.IsLineDown then
       CanvasLineVert(C,
         CoordXCenter,
         CoordYCenter,
@@ -7666,22 +7669,14 @@ var
   end;
   //
 var
-  State: TATFoldBarState;
-  bHiliteLines: boolean;
   NColorLine, NColorPlus: TColor;
 begin
   if not FOptGutterShowFoldAlways then
     if not FCursorOnGutter then exit;
 
-  if not DoCalcFoldStates(
-    AWrapItemIndex,
-    State,
-    IsPlus,
-    IsLineUp,
-    IsLineDown,
-    bHiliteLines) then exit;
+  if not DoCalcFoldProps(AWrapItemIndex, Props) then exit;
 
-  if bHiliteLines then
+  if Props.HiliteLines then
     NColorPlus:= Colors.GutterFoldLine2
   else
     NColorPlus:= Colors.GutterFoldLine;
@@ -7695,7 +7690,7 @@ begin
   CoordXCenter:= (ACoordX1+ACoordX2) div 2;
   CoordYCenter:= (ACoordY1+ACoordY2) div 2;
 
-  case State of
+  case Props.State of
     cFoldbarBegin:
       begin
         if FOptGutterShowFoldLinesAll then
@@ -7704,11 +7699,11 @@ begin
           DrawDown;
         end;
 
-        if not IsPlus then
+        if not Props.IsPlus then
           DrawDown;
 
         DoPaintGutterPlusMinus(C,
-          CoordXCenter, CoordYCenter, IsPlus, NColorPlus);
+          CoordXCenter, CoordYCenter, Props.IsPlus, NColorPlus);
       end;
     cFoldbarEnd:
       begin
