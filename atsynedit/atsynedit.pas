@@ -9267,7 +9267,7 @@ var
   NCount: integer;
   bLenValid, bClear: boolean;
 begin
-  NCount:= GetVisibleLines;
+  NCount:= GetVisibleLines+1;
 
   bClear:= false;
   if FFoldbarCacheStart<>AFirstIndex then
