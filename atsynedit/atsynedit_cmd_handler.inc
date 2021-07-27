@@ -142,7 +142,7 @@ begin
   end;
 
   //support combo-hotkeys with simple letter
-  // https://github.com/Alexey-T/CudaText/issues/2690
+  //CudaText issue #2690
   bComboPressing:= (FKeymapHistory.Length>0);
   if not bComboPressing then
     if IsEditorHotkeyForText(Key) and ((Shift=[]) or (Shift=[ssShift])) then
