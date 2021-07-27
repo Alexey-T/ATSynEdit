@@ -40,6 +40,8 @@ type
     Keys1, Keys2: TATKeyArray;
     LexerSpecific: boolean;
     procedure Assign(AItem: TATKeymapItem);
+    function ShortenedKeys1: TATKeyArray;
+    function ShortenedKeys2: TATKeyArray;
   end;
 
 type
@@ -82,6 +84,20 @@ begin
   Name:= AItem.Name;
   Keys1:= AItem.Keys1;
   Keys2:= AItem.Keys2;
+end;
+
+function TATKeymapItem.ShortenedKeys1: TATKeyArray;
+begin
+  Result:= Keys1;
+  Result.Data[1]:= 0;
+  Result.Data[2]:= 0;
+end;
+
+function TATKeymapItem.ShortenedKeys2: TATKeyArray;
+begin
+  Result:= Keys2;
+  Result.Data[1]:= 0;
+  Result.Data[2]:= 0;
 end;
 
 { TATKeyArray }
