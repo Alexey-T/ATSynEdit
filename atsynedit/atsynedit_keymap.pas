@@ -26,7 +26,7 @@ type
     procedure Clear;
     function Length: integer;
     function ToString: string;
-    function IsConflictWith(constref AKeys: TATKeyArray): boolean;
+    function IsConflictWith(constref AOther: TATKeyArray): boolean;
     procedure SetFromString(const AHotkey: string; AComboSepar: char= ComboSeparator);
     class operator =(const a1, a2: TATKeyArray): boolean;
   end;
@@ -351,13 +351,13 @@ begin
     end;
 end;
 
-function TATKeyArray.IsConflictWith(constref AKeys: TATKeyArray): boolean;
+function TATKeyArray.IsConflictWith(constref AOther: TATKeyArray): boolean;
 var
   SelfLen, OtherLen: integer;
 begin
   Result:= false;
   SelfLen:= Self.Length;
-  OtherLen:= AKeys.Length;
+  OtherLen:= AOther.Length;
   if OtherLen=0 then exit;
 
   case SelfLen of
@@ -366,20 +366,20 @@ begin
     1:
       begin
         //'Ctrl+K' conflicts with 'Ctrl+K' and with 'Ctrl+K * B'
-        Result:= Data[0]=AKeys.Data[0];
+        Result:= Data[0]=AOther.Data[0];
       end;
     2, 3:
       begin
         if SelfLen=OtherLen then
-          Result:= Self=AKeys
+          Result:= Self=AOther
         else
         case OtherLen of
           1:
             //'Ctrl+K * B' conflicts with 'Ctrl+K'
-            Result:= Data[0]=AKeys.Data[0];
+            Result:= Data[0]=AOther.Data[0];
           else
-            Result:= (Data[0]=AKeys.Data[0]) and
-                     (Data[1]=AKeys.Data[1]);
+            Result:= (Data[0]=AOther.Data[0]) and
+                     (Data[1]=AOther.Data[1]);
         end;
       end;
   end;
