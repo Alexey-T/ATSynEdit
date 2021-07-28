@@ -300,6 +300,7 @@ end;
 
 procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
 begin
+  C.Brush.Style:= bsClear; //faster on Linux/macOS
   {$ifdef windows}
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
@@ -309,6 +310,7 @@ end;
 
 procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 begin
+  C.Brush.Style:= bsClear; //faster on Linux/macOS
   {$ifdef windows}
   Windows.TextOutA(C.Handle, X, Y, Buf, Len);
   {$else}
@@ -815,6 +817,7 @@ begin
         DxPointer:= nil;
     end;
 
+    C.Brush.Style:= bsClear; //faster on Linux/macOS
     {$ifdef windows}
     _TextOut_Windows(C.Handle, APosX, APosY, nil, BufW, DxPointer, false{no ligatures});
     {$else}
@@ -931,6 +934,8 @@ begin
         Continue;
       end;
 
+      C.Brush.Style:= bsClear; //faster on Linux/macOS
+
       {$ifdef windows}
       if AProps.HasAsciiNoTabs and not OptEditorTextoutNeedsOffsets then
       begin
@@ -1044,6 +1049,7 @@ begin
       PixOffset1:= ListInt.Data[PartOffset];
       C.Font.Color:= AProps.ColorNormalFont;
       C.Font.Style:= [];
+      C.Brush.Style:= bsClear; //faster on Linux/macOS
 
       {$ifdef windows}
       _TextOut_Windows(C.Handle,

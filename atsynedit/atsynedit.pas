@@ -4119,6 +4119,7 @@ begin
   end;
 
   //paint text
+  C.Brush.Style:= bsClear;
   C.TextOut(
     ACoordX+cFoldedMarkIndentInner,
     ACoordY+FOptTextOffsetFromLine,
@@ -7820,6 +7821,7 @@ begin
         NText:= ARect.Right-Ext.cx;
     end;
 
+    C.Brush.Style:= bsClear;
     C.TextOut(
       NText,
       (ARect.Top+ARect.Bottom-Ext.cy) div 2,
@@ -7862,6 +7864,7 @@ begin
     Pos:= FTextOffset;
   end;
 
+  C.Brush.Style:= bsClear;
   C.TextOut(Pos.X, Pos.Y, FTextHint);
 end;
 
