@@ -6103,9 +6103,7 @@ begin
     //auto-scroll must not work when cursor is over minimap/micromap
     (not bOnMinimap) and
     (not bOnMicromap) and
-    //auto-scroll must not work when cursor is over line-numbers
-    //but can work if over other gutter columns
-    (not bOnGutterNumbers);
+    (not bOnGutter);
 
   FMouseAutoScroll:= cDirNone;
   if (P.Y<FRectMain.Top) and (not ModeOneLine) then
