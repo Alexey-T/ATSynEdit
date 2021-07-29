@@ -303,10 +303,6 @@ begin
   ed.Parent:= PanelMain;
   ed.Align:= alClient;
 
-  {$ifdef LCLQt5}
-  OptCanvasTextoutNeedsOffsets:= true;
-  {$endif}
-
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
   {$else}
