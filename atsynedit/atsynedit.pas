@@ -8717,7 +8717,7 @@ var
   S: string;
 begin
   if ModeOneLine then exit;
-  if GetVisibleLines<30 then exit;
+  if GetVisibleLines<10 then exit;
 
   C.Font.Name:= Font.Name;
   C.Font.Color:= clRed;

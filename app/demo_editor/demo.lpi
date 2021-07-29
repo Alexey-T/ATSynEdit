@@ -19,9 +19,9 @@
     </i18n>
     <BuildModes Count="4">
       <Item1 Name="Default" Default="True"/>
-      <Item2 Name="Qt">
+      <Item2 Name="qt5">
         <MacroValues Count="1">
-          <Macro3 Name="LCLWidgetType" Value="qt5"/>
+          <Macro2 Name="LCLWidgetType" Value="qt5"/>
         </MacroValues>
         <CompilerOptions>
           <Version Value="11"/>
@@ -30,8 +30,7 @@
             <Filename Value="demo"/>
           </Target>
           <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir);..\..\comp\atsynedit"/>
-            <OtherUnitFiles Value="..\..\proc_lexer"/>
+            <IncludeFiles Value="$(ProjOutDir)"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -48,6 +47,7 @@
           </CodeGeneration>
           <Linking>
             <Debugging>
+              <DebugInfoType Value="dsDwarf2Set"/>
               <UseExternalDbgSyms Value="True"/>
             </Debugging>
             <Options>
@@ -58,7 +58,7 @@
           </Linking>
         </CompilerOptions>
       </Item2>
-      <Item3 Name="Win32">
+      <Item3 Name="win32">
         <CompilerOptions>
           <Version Value="11"/>
           <PathDelim Value="\"/>
@@ -67,7 +67,6 @@
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
-            <OtherUnitFiles Value="..\..\proc_lexer"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -93,7 +92,7 @@
       </Item3>
       <Item4 Name="gtk3">
         <MacroValues Count="1">
-          <Macro2 Name="LCLWidgetType" Value="gtk3"/>
+          <Macro1 Name="LCLWidgetType" Value="gtk3"/>
         </MacroValues>
         <CompilerOptions>
           <Version Value="11"/>
@@ -102,8 +101,7 @@
             <Filename Value="demo"/>
           </Target>
           <SearchPaths>
-            <IncludeFiles Value="$(ProjOutDir);..\..\comp\atsynedit"/>
-            <OtherUnitFiles Value="..\..\proc_lexer"/>
+            <IncludeFiles Value="$(ProjOutDir)"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
           <Parsing>
@@ -130,10 +128,9 @@
           </Linking>
         </CompilerOptions>
       </Item4>
-      <SharedMatrixOptions Count="3">
-        <Item1 ID="346746772345" Type="IDEMacro" MacroName="LCLWidgetType" Value="qt"/>
-        <Item2 ID="976242281230" Modes="gtk3" Type="IDEMacro" MacroName="LCLWidgetType" Value="gtk3"/>
-        <Item3 ID="872452436861" Modes="Qt" Type="IDEMacro" MacroName="LCLWidgetType" Value="qt5"/>
+      <SharedMatrixOptions Count="2">
+        <Item1 ID="976242281230" Modes="gtk3" Type="IDEMacro" MacroName="LCLWidgetType" Value="gtk3"/>
+        <Item2 ID="872452436861" Modes="qt5" Type="IDEMacro" MacroName="LCLWidgetType" Value="qt5"/>
       </SharedMatrixOptions>
     </BuildModes>
     <PublishOptions>
@@ -202,7 +199,6 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="..\..\proc_lexer"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>
