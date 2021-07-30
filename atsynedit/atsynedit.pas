@@ -1350,7 +1350,8 @@ type
     function DoCommand_ShuffleLines: TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
-    function DoMouseWheelAction(Shift: TShiftState; AUp, AForceHorz: boolean): boolean;
+    function DoMouseWheelAction(Shift: TShiftState; ACount: integer; AUp,
+      AForceHorz: boolean): boolean;
     function GetCaretsArray: TATPointArray;
     function GetMarkersArray: TATInt64Array;
     procedure SetCaretsArray(const Ar: TATPointArray);
@@ -6269,21 +6270,23 @@ end;
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
 var
-  i: integer;
+  NCount: integer;
 begin
   if not OptMouseEnableAll then exit(false);
 
-  //if abs(delta)<=120 we make 1 scroll, while bigger delta makes several scrolls
-  for i:= 1 to Max(1, Abs(WheelDelta) div 120) do
-    Result:= DoMouseWheelAction(Shift, WheelDelta>0, false)
+  NCount:= Max(1, Abs(WheelDelta) div 120);
+  Result:= DoMouseWheelAction(Shift, NCount, WheelDelta>0, false)
 end;
 
 function TATSynEdit.DoMouseWheelHorz(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
+var
+  NCount: integer;
 begin
   if not OptMouseEnableAll then exit(false);
 
-  Result:= DoMouseWheelAction([], WheelDelta<0, true);
+  NCount:= Max(1, Abs(WheelDelta) div 120);
+  Result:= DoMouseWheelAction([], NCount, WheelDelta<0, true);
 end;
 
 type
@@ -6293,7 +6296,7 @@ type
     aWheelModeZoom
     );
 
-function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; AUp, AForceHorz: boolean): boolean;
+function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; ACount: integer; AUp, AForceHorz: boolean): boolean;
 var
   Mode: TATMouseWheelMode;
   NSpeedX, NSpeedY: integer;
@@ -6324,8 +6327,8 @@ begin
   else
     exit;
 
-  NSpeedX:= FOptMouseWheelScrollHorzSpeed;
-  NSpeedY:= FOptMouseWheelScrollVertSpeed;
+  NSpeedX:= FOptMouseWheelScrollHorzSpeed * ACount;
+  NSpeedY:= FOptMouseWheelScrollVertSpeed * ACount;
   if AUp then NSpeedX:= -NSpeedX;
   if AUp then NSpeedY:= -NSpeedY;
 
