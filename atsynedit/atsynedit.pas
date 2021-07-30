@@ -6268,15 +6268,21 @@ end;
 
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
+var
+  i: integer;
 begin
   if not OptMouseEnableAll then exit(false);
-  Result:= DoMouseWheelAction(Shift, WheelDelta>0, false);
+
+  //if abs(delta)<=120 we make 1 scroll, while bigger delta makes several scrolls
+  for i:= 1 to Max(1, Abs(WheelDelta) div 120) do
+    Result:= DoMouseWheelAction(Shift, WheelDelta>0, false)
 end;
 
 function TATSynEdit.DoMouseWheelHorz(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
 begin
   if not OptMouseEnableAll then exit(false);
+
   Result:= DoMouseWheelAction([], WheelDelta<0, true);
 end;
 
