@@ -2950,11 +2950,15 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMouseSelFrame(C: TCanvas);
+const
+  cMinSize = 4; //minimal width/height of the frame in pixels
 var
   X1, X2, Y1, Y2: integer;
   XX1, XX2, YY1, YY2: integer;
 begin
   if not FOptMouseEnableNormalSelection then exit;
+
+  if FMouseDownCoord.Y<0 then exit;
 
   X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset;
   X2:= FMouseDragCoord.X;
@@ -2965,6 +2969,10 @@ begin
   YY1:= Max(-1, Min(Y1, Y2));
   XX2:= Min(Width+1, Max(X1, X2));
   YY2:= Min(Height+1, Max(Y1, Y2));
+
+  if XX1<0 then exit;
+  if XX2-XX1<cMinSize then exit;
+  if YY2-YY1<cMinSize then exit;
 
   //avoid TCanvas.DrawFocusRect(), sometimes it's painted bad on Qt5
   C.Pen.Color:= ColorBlendHalf(Colors.TextFont, Colors.TextBG);
