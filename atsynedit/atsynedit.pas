@@ -1558,6 +1558,7 @@ type
     procedure EndUpdate;
     procedure BeginEditing;
     procedure EndEditing(ATextChanged: boolean);
+    procedure DoHideAllTooltips;
     function IsLocked: boolean;
     function TextSelected: atString;
     function TextSelectedEx(ACaret: TATCaretItem): atString;
@@ -6270,9 +6271,7 @@ procedure TATSynEdit.MouseLeave;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
-  DoHintHide;
-  DoHotspotsExit;
-  FMinimapTooltipEnabled:= false;
+  DoHideAllTooltips;
 end;
 
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
@@ -6304,6 +6303,22 @@ type
     aWheelModeZoom
     );
 
+procedure TATSynEdit.DoHideAllTooltips;
+var
+  bUpdate: boolean;
+begin
+  bUpdate:= FMinimapTooltipEnabled;
+
+  DoHintHide;
+  DoHotspotsExit;
+  if Assigned(FFoldedMarkTooltip) then
+    FFoldedMarkTooltip.Hide;
+  FMinimapTooltipEnabled:= false;
+
+  if bUpdate then
+    Update;
+end;
+
 function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; ACount: integer; AUp, AForceHorz: boolean): boolean;
 var
   Mode: TATMouseWheelMode;
@@ -6312,12 +6327,7 @@ var
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
-
-  //hide all temporary windows
-  DoHotspotsExit;
-  if Assigned(FFoldedMarkTooltip) then
-    FFoldedMarkTooltip.Hide;
-  FMinimapTooltipEnabled:= false;
+  DoHideAllTooltips;
 
   if AForceHorz then
     Mode:= aWheelModeHoriz
