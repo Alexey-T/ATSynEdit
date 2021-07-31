@@ -30,12 +30,12 @@ type
     FCount: integer;
     FLenEol: integer;
     FLocked: boolean;
-    FVersion: integer;
     FOnChange: TTextChangedEvent;
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
     FText: UnicodeString;
+    Version: integer;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
@@ -57,7 +57,6 @@ type
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
     property Count: integer read FCount;
     property OnChange: TTextChangedEvent read FOnChange write FOnChange;
-    property Version: integer read FVersion;
     property IsLocked: boolean read FLocked;
   end;
 
@@ -82,7 +81,7 @@ begin
   FLenEol:= 1; //no apps should use other
   FCount:= 0;
   SetCount(0);
-  FVersion:= 0;
+  Version:= 0;
   FLocked:= false;
 end;
 
@@ -99,7 +98,7 @@ var
   Pos, NLen, i: integer;
 begin
   Assert(not FLocked, 'Attempt to change locked StringBuffer');
-  Inc(FVersion);
+  Inc(Version);
   FText:= AText;
   //FLenEol:= ALenEol;
 
@@ -119,7 +118,7 @@ var
   Pos, NLen, i: integer;
 begin
   Assert(not FLocked, 'Attempt to change locked StringBuffer');
-  Inc(FVersion);
+  Inc(Version);
   SetCount(L.Count+1);
   Pos:= 0;
   FList[0]:= 0;
@@ -138,7 +137,7 @@ var
   i, N: integer;
 begin
   Assert(not FLocked, 'Attempt to change locked StringBuffer');
-  Inc(FVersion);
+  Inc(Version);
 
   FText:= AText;
   if FText='' then
@@ -202,7 +201,7 @@ begin
   FList:= Other.FList;
   FCount:= Other.FCount;
   FLenEol:= Other.FLenEol;
-  FVersion:= Other.FVersion;
+  Version:= Other.Version;
 end;
 
 
