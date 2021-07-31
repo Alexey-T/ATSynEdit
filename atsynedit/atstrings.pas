@@ -2519,9 +2519,15 @@ begin
   FillChar(Item, SizeOf(Item), 0);
 end;
 
-procedure TATStrings.DoEventLog(ALine: integer); inline;
+procedure TATStrings.DoEventLog(ALine: integer);
 begin
   if not FEnabledChangeEvents then exit;
+
+  FModified:= true;
+  Inc(FModifiedVersion);
+  if (EditingTopLine<0) or (ALine<EditingTopLine) then
+    EditingTopLine:= ALine;
+
   if Assigned(FOnChangeLog) then
     FOnChangeLog(Self, ALine);
 end;
@@ -2638,6 +2644,7 @@ begin
   DoEventChange(cLineChangeDeletedAll, -1, 1);
   DoEventLog(0);
 end;
+
 
 {$I atstrings_editing.inc}
 {$I atstrings_load.inc}

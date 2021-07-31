@@ -8387,9 +8387,6 @@ begin
   St:= Strings;
   if St.EditingActive then
   begin
-    if ALine>=0 then
-      if (St.EditingTopLine<0) or (ALine<St.EditingTopLine) then
-        St.EditingTopLine:= ALine;
   end
   else
     FlushEditingChangeEx(AChange, ALine, AItemCount);
@@ -8402,9 +8399,6 @@ begin
   St:= Strings;
   if St.EditingActive then
   begin
-    if ALine>=0 then
-      if (St.EditingTopLine<0) or (ALine<St.EditingTopLine) then
-        St.EditingTopLine:= ALine;
   end
   else
     FlushEditingChangeLog(ALine);
