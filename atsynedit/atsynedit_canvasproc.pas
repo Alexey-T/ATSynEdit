@@ -304,8 +304,7 @@ end;
 
 procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
 begin
-  ////don't set Brush.Style, CudaText issue #3625
-  //C.Brush.Style:= cTextoutBrushStyle;
+  //don't set Brush.Style here, causes CudaText issue #3625
   {$ifdef windows}
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
   {$else}
@@ -315,7 +314,6 @@ end;
 
 procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 begin
-  //C.Brush.Style:= cTextoutBrushStyle;
   {$ifdef windows}
   Windows.TextOutA(C.Handle, X, Y, Buf, Len);
   {$else}
