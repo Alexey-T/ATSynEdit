@@ -251,7 +251,7 @@ begin
       Result[i]:= ' '
     else
     if IsCharHexDisplayed(ch) then
-      Result[i]:= '?';
+      Result[i]:= ' '; //not '?', because it will render '?' above gray 'x00'
   end;
 end;
 
