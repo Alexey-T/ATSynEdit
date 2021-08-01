@@ -1113,7 +1113,7 @@ type
     procedure DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TPoint;
       AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
-    procedure DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
+    procedure DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
     procedure DoPaintMarginLineTo(C: TCanvas; AX, AWidth: integer; AColor: TColor);
     procedure DoPaintRuler(C: TCanvas);
     procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
@@ -3801,7 +3801,7 @@ begin
       C.Font.Color:= Colors.GutterFont;
 
     if WrapItem.bInitial then
-      DoPaintLineNumber(C, NLinesIndex, ARect.Top, GutterItem);
+      DoPaintGutterNumber(C, NLinesIndex, ARect.Top, GutterItem);
   end;
 
   //gutter decor
@@ -6912,7 +6912,7 @@ begin
       cBitmapNiceScroll);
 end;
 
-procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
+procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
 //painting of text is slower, paint a special mark if possible
   //
   procedure PaintDash(W, H: integer);
@@ -6931,6 +6931,7 @@ procedure TATSynEdit.DoPaintLineNumber(C: TCanvas; ALineIndex, ACoordTop: intege
     end;
 
     C.Brush.Color:= C.Font.Color;
+    C.Brush.Style:= bsSolid;
     C.FillRect(
       P.X - W div 2,
       P.Y,
@@ -6974,6 +6975,7 @@ begin
             P.X:= (ABand.Left + ABand.Right - NW) div 2;
         end;
 
+        C.Brush.Style:= bsClear;
         CanvasTextOutSimplest(C, P.X, P.Y, SText);
       end;
   end;
