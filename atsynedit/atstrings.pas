@@ -300,6 +300,7 @@ type
       out ACommandCode: integer;
       out ATickCount: QWord);
     procedure AddUpdatesAction(N: integer; AAction: TATEditAction);
+    procedure UpdateModified;
   public
     CaretsAfterLastEdition: TATPointArray;
     EditingActive: boolean;
@@ -1128,6 +1129,7 @@ begin
   if FReadOnly then Exit;
   Item:= FList.GetItem(AIndex);
 
+  UpdateModified;
   AddUndoItem(aeaChange, AIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
   DoEventLog(AIndex);
   DoEventChange(cLineChangeEdited, AIndex, 1);
@@ -1165,6 +1167,7 @@ begin
 
   Item:= FList.GetItem(AIndex);
 
+  UpdateModified;
   AddUndoItem(aeaChangeEol, AIndex, '', Item^.LineEnds, Item^.LineState, FCommandCode);
 
   Item^.Ex.Ends:= TATBits2(AValue);
@@ -1393,6 +1396,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
+  UpdateModified;
   AddUndoItem(aeaInsert, Count, '', cEndNone, cLineStateNone, FCommandCode);
   if AWithEvent then
   begin
@@ -1451,6 +1455,7 @@ begin
   if FReadOnly then Exit;
   if DoCheckFilled then Exit;
 
+  UpdateModified;
   AddUndoItem(aeaInsert, ALineIndex, '', cEndNone, cLineStateNone, FCommandCode);
 
   if AWithEvent then
@@ -1496,6 +1501,8 @@ begin
   NCount:= ABlock.Count;
   if NCount=0 then exit;
   if not AWithFinalEol then Dec(NCount);
+
+  UpdateModified;
 
   if NCount>0 then
   begin
@@ -1549,6 +1556,7 @@ begin
   begin
     Item:= FList.GetItem(ALineIndex);
 
+    UpdateModified;
     if AWithUndo then
       AddUndoItem(aeaDelete, ALineIndex, Item^.Line, Item^.LineEnds, Item^.LineState, FCommandCode);
 
@@ -1572,6 +1580,8 @@ var
   ItemFrom, ItemTo: PATStringItem;
   NLineMin: integer;
 begin
+  UpdateModified;
+
   if AWithUndo then
   begin
     ItemFrom:= GetItemPtr(AIndexFrom);
@@ -1680,7 +1690,8 @@ procedure TATStrings.SetModified(AValue: boolean);
 begin
   FModified:= AValue;
   if FModified then
-    Inc(FModifiedVersion)
+  begin
+  end
   else
     FUndoList.AddUnmodifiedMark;
 end;
@@ -2020,19 +2031,19 @@ begin
     FOnSetMarkersArray(L);
 end;
 
+procedure TATStrings.UpdateModified;
+begin
+  FModified:= true;
+  FModifiedRecent:= true;
+  Inc(FModifiedVersion);
+end;
+
 procedure TATStrings.AddUndoItem(AAction: TATEditAction; AIndex: integer;
   const AText: atString; AEnd: TATLineEnds; ALineState: TATLineState;
   ACommandCode: integer);
 var
   CurList: TATUndoList;
 begin
-  if cEditActionSetsModified[AAction] then
-  begin
-    FModified:= true;
-    FModifiedRecent:= true;
-    Inc(FModifiedVersion);
-  end;
-
   if FUndoList=nil then exit;
   if FRedoList=nil then exit;
 
@@ -2347,6 +2358,7 @@ procedure TATStrings.ActionShuffleLines;
 var
   Cnt, i: integer;
 begin
+  UpdateModified;
   ActionEnsureFinalEol;
   ActionDeleteFakeLine;
 
@@ -2523,8 +2535,6 @@ procedure TATStrings.DoEventLog(ALine: integer);
 begin
   if not FEnabledChangeEvents then exit;
 
-  FModified:= true;
-  Inc(FModifiedVersion);
   if (EditingTopLine<0) or (ALine<EditingTopLine) then
     EditingTopLine:= ALine;
 
