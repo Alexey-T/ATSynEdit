@@ -304,6 +304,7 @@ end;
 
 procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
 begin
+  ////don't set Brush.Style, CudaText issue #3625
   //C.Brush.Style:= cTextoutBrushStyle;
   {$ifdef windows}
   Windows.TextOutA(C.Handle, X, Y, PChar(S), Length(S));
@@ -505,6 +506,7 @@ begin
         bColorSet:= true;
         C.Font.Color:= AColorFont;
         C.Brush.Color:= AColorBg;
+        C.Brush.Style:= bsClear;
       end;
 
       if ASuperFast then
