@@ -30,7 +30,7 @@ var
   Item: TATEditorCommandLogItem;
 begin
   if MaxCount<=0 then exit;
-  while Size()>MaxCount do
+  while Size()>=MaxCount do
     PopFront();
 
   Item.ItemCode:= ACode;
