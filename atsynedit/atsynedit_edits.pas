@@ -236,7 +236,7 @@ begin
 
     //scroll to left, select all
     DoScrollByDelta(-10000, 0);
-    DoCommand(cCommand_SelectAll, cInvokeMenu);
+    DoCommand(cCommand_SelectAll, cInvokeMenuContext);
   end;
 end;
 

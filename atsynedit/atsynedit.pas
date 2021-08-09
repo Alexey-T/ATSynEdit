@@ -77,9 +77,11 @@ type
   TATEditorCommandInvoke = (
     cInvokeInternal,
     cInvokeHotkey,
-    cInvokeMenu,
+    cInvokeMenuContext,
+    cInvokeMenuMain,
     cInvokeAppInternal,
     cInvokeAppPalette,
+    cInvokeAppToolbar,
     cInvokeAppCharMap,
     cInvokeAppAPI
     );
@@ -7161,7 +7163,7 @@ begin
   Cmd:= (Sender as TMenuItem).Tag;
   if Cmd>0 then
   begin
-    DoCommand(Cmd, cInvokeMenu);
+    DoCommand(Cmd, cInvokeMenuContext);
     Invalidate;
   end;
 end;

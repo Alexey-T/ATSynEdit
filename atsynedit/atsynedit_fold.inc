@@ -386,7 +386,7 @@ end;
 
 procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);
 begin
-  DoCommand(cCommand_FoldAll, cInvokeMenu);
+  DoCommand(cCommand_FoldAll, cInvokeMenuContext);
 end;
 
 procedure TATSynEdit.MenuFoldLevelClick(Sender: TObject);
@@ -396,7 +396,7 @@ end;
 
 procedure TATSynEdit.MenuFoldUnfoldAllClick(Sender: TObject);
 begin
-  DoCommand(cCommand_UnfoldAll, cInvokeMenu);
+  DoCommand(cCommand_UnfoldAll, cInvokeMenuContext);
 end;
 
 
