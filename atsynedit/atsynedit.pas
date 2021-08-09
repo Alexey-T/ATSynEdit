@@ -77,6 +77,7 @@ type
   TATEditorCommandInvoke = (
     cInvokeInternal,
     cInvokeHotkey,
+    cInvokeHotkeyChar,
     cInvokeMenuContext,
     cInvokeMenuMain,
     cInvokeAppInternal,
@@ -90,6 +91,7 @@ const
   cEditorCommandInvoke: array[TATEditorCommandInvoke] of string = (
     'int',
     'key',
+    'key_char',
     'menu_ctx',
     'menu_main',
     'app_int',

@@ -294,7 +294,7 @@ begin
   ModeReadOnly:= bPrevRO;
 
   DoEventChange(0);
-  DoCommand(cCommand_SelectAll, cInvokeHotkey);
+  DoCommand(cCommand_SelectAll, cInvokeInternal);
 end;
 
 destructor TATComboEdit.Destroy;

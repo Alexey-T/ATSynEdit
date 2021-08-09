@@ -121,7 +121,7 @@ begin
   end;
 
   TimerBlinkDisable;
-  DoCommand(cCommand_TextInsert, cInvokeHotkey, Str);
+  DoCommand(cCommand_TextInsert, cInvokeHotkeyChar, Str);
   TimerBlinkEnable;
 
   Utf8Key:= '';
@@ -584,7 +584,8 @@ begin
   else
     Str:= '';
 
-  FCommandLog.Add(ACmd, AInvoke, Str);
+  if AInvoke<>cInvokeHotkeyChar then
+    FCommandLog.Add(ACmd, AInvoke, Str);
 
   if DoEventCommand(ACmd, Str) then Exit;
 
