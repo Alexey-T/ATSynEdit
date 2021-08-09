@@ -111,7 +111,6 @@ type
 
   TATEditorCommandLog = class(specialize TDeque<TATEditorCommandLogItem>)
   public
-    Enabled: boolean;
     MaxCount: integer;
     constructor Create;
     procedure Add(ACode: integer; AInvoke: TATEditorCommandInvoke; const AText: string);
@@ -4311,7 +4310,6 @@ begin
   FEditorIndex:= 0;
 
   FCommandLog:= TATEditorCommandLog.Create;
-  FCommandLog.Enabled:= false;
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);

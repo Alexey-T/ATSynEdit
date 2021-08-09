@@ -29,11 +29,9 @@ procedure TATEditorCommandLog.Add(ACode: integer;
 var
   Item: TATEditorCommandLogItem;
 begin
-  if not Enabled then exit;
-
-  if MaxCount>0 then
-    while Size()>MaxCount do
-      PopFront();
+  if MaxCount<=0 then exit;
+  while Size()>MaxCount do
+    PopFront();
 
   Item.ItemCode:= ACode;
   Item.ItemInvoke:= AInvoke;
