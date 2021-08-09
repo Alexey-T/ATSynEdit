@@ -1,4 +1,7 @@
 
+2021.08.09
++ add: CommandLog object (made for new CudaText API)
+
 2021.07.27
 + add: OptFoldCacheEnabled (default True): reduces flickering of folding-bar on fast editing
 
