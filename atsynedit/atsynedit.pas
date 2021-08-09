@@ -86,6 +86,22 @@ type
     cInvokeAppAPI
     );
 
+  TATEditorCommandLogItem = class
+  public
+    ItemInvoke: TATEditorCommandInvoke;
+    ItemCode: integer;
+    ItemText: string;
+  end;
+
+  { TATEditorCommandLog }
+
+  TATEditorCommandLog = class(TFPList)
+  public
+    destructor Destroy; override;
+    procedure Clear;
+    procedure Add(ACode: integer; AInvoke: TATEditorCommandInvoke; const AText: string);
+  end;
+
   TATTokenKind = (
     atkOther,
     atkComment,
@@ -578,6 +594,8 @@ type
     FSelRectBegin: TPoint;
     FSelRectEnd: TPoint;
     FVisibleColumns: integer;
+    FCommandLog: TATEditorCommandLog;
+    FCommandLogEnabled: boolean;
     FCarets: TATCarets;
     FCaretShowEnabled: boolean;
     FCaretShown: boolean;
@@ -1423,6 +1441,7 @@ type
     property Hotspots: TATHotspots read GetHotspots;
     property Gaps: TATGaps read GetGaps;
     property Keymap: TATKeymap read FKeymap write FKeymap;
+    property CommandLog: TATEditorCommandLog read FCommandLog;
     property MouseMap: TATEditorMouseActionArray read FMouseActions write FMouseActions;
     property TabHelper: TATStringTabHelper read FTabHelper;
     property WrapInfo: TATWrapInfo read FWrapInfo;
@@ -1735,6 +1754,7 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
+    property OptCommandLogEnabled: boolean read FCommandLogEnabled write FCommandLogEnabled default true;
     property OptThemed: boolean read FOptThemed write FOptThemed default false;
     property OptHighlightGitConflicts: boolean read FHighlightGitConflicts write FHighlightGitConflicts default cInitHighlightGitConflicts;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
@@ -4276,6 +4296,9 @@ begin
   FCharSize:= Point(4, 4); //not nul
   FEditorIndex:= 0;
 
+  FCommandLog:= TATEditorCommandLog.Create;
+  FCommandLogEnabled:= true;
+
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
 
@@ -4714,6 +4737,7 @@ begin
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
+  FreeAndNil(FCommandLog);
   if Assigned(FHotspots) then
     FreeAndNil(FHotspots);
   if Assigned(FDimRanges) then

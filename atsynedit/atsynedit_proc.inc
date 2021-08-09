@@ -16,6 +16,35 @@ const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
 
+{ TATEditorCommandLog }
+
+destructor TATEditorCommandLog.Destroy;
+begin
+  Clear;
+  inherited Destroy;
+end;
+
+procedure TATEditorCommandLog.Clear;
+var
+  i: integer;
+begin
+  for i:= Count-1 downto 0 do
+    TATEditorCommandLogItem(Items[i]).ItemText:= '';
+  inherited Clear;
+end;
+
+procedure TATEditorCommandLog.Add(ACode: integer; AInvoke: TATEditorCommandInvoke;
+  const AText: string);
+var
+  Item: TATEditorCommandLogItem;
+begin
+  Item:= TATEditorCommandLogItem.Create;
+  Item.ItemCode:= ACode;
+  Item.ItemInvoke:= AInvoke;
+  Item.ItemText:= AText;
+  inherited Add(Pointer(Item));
+end;
+
 { TATFoldedMarks }
 
 function TATFoldedMarks.FindByCoord(ACoord: TPoint): TATFoldedMark;
