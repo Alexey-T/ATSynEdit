@@ -584,6 +584,9 @@ begin
   else
     Str:= '';
 
+  if FCommandLogEnabled then
+    FCommandLog.Add(ACmd, AInvoke, Str);
+
   if DoEventCommand(ACmd, Str) then Exit;
 
   if IsCommandToUndoInOneStep(ACmd) then

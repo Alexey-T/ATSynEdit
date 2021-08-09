@@ -20,7 +20,7 @@ uses
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
-  syncobjs,
+  syncobjs, gqueue,
   LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
@@ -86,7 +86,7 @@ type
     cInvokeAppAPI
     );
 
-  TATEditorCommandLogItem = class
+  TATEditorCommandLogItem = record
   public
     ItemInvoke: TATEditorCommandInvoke;
     ItemCode: integer;
@@ -95,16 +95,14 @@ type
 
   { TATEditorCommandLog }
 
-  TATEditorCommandLog = class(TFPList)
+  TATEditorCommandLog = class(specialize TQueue<TATEditorCommandLogItem>)
   public
     MaxCount: integer;
     constructor Create;
-    destructor Destroy; override;
-    procedure Clear;
-    procedure Delete(AIndex: integer);
     procedure Add(ACode: integer; AInvoke: TATEditorCommandInvoke; const AText: string);
   end;
 
+type
   TATTokenKind = (
     atkOther,
     atkComment,

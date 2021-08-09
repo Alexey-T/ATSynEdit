@@ -24,42 +24,19 @@ begin
   MaxCount:= 200;
 end;
 
-destructor TATEditorCommandLog.Destroy;
-begin
-  Clear;
-  inherited Destroy;
-end;
-
-procedure TATEditorCommandLog.Clear;
-var
-  i: integer;
-begin
-  for i:= Count-1 downto 0 do
-    TATEditorCommandLogItem(Items[i]).ItemText:= '';
-  inherited Clear;
-end;
-
-procedure TATEditorCommandLog.Delete(AIndex: integer);
-begin
-  TATEditorCommandLogItem(Items[AIndex]).ItemText:= '';
-  inherited Delete(AIndex);
-end;
-
-procedure TATEditorCommandLog.Add(ACode: integer; AInvoke: TATEditorCommandInvoke;
-  const AText: string);
+procedure TATEditorCommandLog.Add(ACode: integer;
+  AInvoke: TATEditorCommandInvoke; const AText: string);
 var
   Item: TATEditorCommandLogItem;
-  i: integer;
 begin
   if MaxCount>0 then
-    for i:= 1 to Count-MaxCount do
-      Delete(0);
+    while Size()>MaxCount do
+      Pop();
 
-  Item:= TATEditorCommandLogItem.Create;
   Item.ItemCode:= ACode;
   Item.ItemInvoke:= AInvoke;
   Item.ItemText:= AText;
-  inherited Add(Pointer(Item));
+  Push(Item);
 end;
 
 { TATFoldedMarks }
