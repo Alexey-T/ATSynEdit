@@ -86,6 +86,20 @@ type
     cInvokeAppAPI
     );
 
+const
+  cEditorCommandInvoke: array[TATEditorCommandInvoke] of string = (
+    'int',
+    'key',
+    'menu_ctx',
+    'menu_main',
+    'app_int',
+    'app_pal',
+    'app_toolbar',
+    'app_charmap',
+    'app_api'
+    );
+
+type
   TATEditorCommandLogItem = record
   public
     ItemInvoke: TATEditorCommandInvoke;
