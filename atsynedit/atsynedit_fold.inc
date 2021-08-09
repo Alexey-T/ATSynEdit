@@ -386,7 +386,7 @@ end;
 
 procedure TATSynEdit.MenuFoldFoldAllClick(Sender: TObject);
 begin
-  DoCommand(cCommand_FoldAll);
+  DoCommand(cCommand_FoldAll, cInvokeMenu);
 end;
 
 procedure TATSynEdit.MenuFoldLevelClick(Sender: TObject);
@@ -396,7 +396,7 @@ end;
 
 procedure TATSynEdit.MenuFoldUnfoldAllClick(Sender: TObject);
 begin
-  DoCommand(cCommand_UnfoldAll);
+  DoCommand(cCommand_UnfoldAll, cInvokeMenu);
 end;
 
 
@@ -437,7 +437,7 @@ begin
   FFoldEnabled:= AValue;
   if not FFoldEnabled then
   begin
-    DoCommand(cCommand_UnfoldAll);
+    DoCommand(cCommand_UnfoldAll, cInvokeInternal);
     FFold.Clear;
   end;
   Update;

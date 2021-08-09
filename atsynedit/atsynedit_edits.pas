@@ -52,7 +52,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     property Items: TStringList read FItems;
-    procedure DoCommand(ACmd: integer; const AText: atString = ''); override;
+    procedure DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = ''); override;
     procedure DoAddLineToHistory(const AStr: atString; AMaxItems: integer);
   published
   end;
@@ -236,7 +236,7 @@ begin
 
     //scroll to left, select all
     DoScrollByDelta(-10000, 0);
-    DoCommand(cCommand_SelectAll);
+    DoCommand(cCommand_SelectAll, cInvokeMenu);
   end;
 end;
 
@@ -252,7 +252,8 @@ begin
     Result:= inherited;
 end;
 
-procedure TATComboEdit.DoCommand(ACmd: integer; const AText: atString);
+procedure TATComboEdit.DoCommand(ACmd: integer;
+  AInvoke: TATEditorCommandInvoke; const AText: atString);
 begin
   inherited;
   case ACmd of
@@ -293,7 +294,7 @@ begin
   ModeReadOnly:= bPrevRO;
 
   DoEventChange(0);
-  DoCommand(cCommand_SelectAll);
+  DoCommand(cCommand_SelectAll, cInvokeHotkey);
 end;
 
 destructor TATComboEdit.Destroy;

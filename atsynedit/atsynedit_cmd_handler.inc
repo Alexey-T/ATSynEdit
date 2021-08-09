@@ -51,7 +51,7 @@ begin
   if NCmd>0 then
   begin
     TimerBlinkDisable;
-    DoCommand(NCmd);
+    DoCommand(NCmd, cInvokeHotkey);
     TimerBlinkEnable;
   end;
 end;
@@ -121,7 +121,7 @@ begin
   end;
 
   TimerBlinkDisable;
-  DoCommand(cCommand_TextInsert, Str);
+  DoCommand(cCommand_TextInsert, cInvokeHotkey, Str);
   TimerBlinkEnable;
 
   Utf8Key:= '';
@@ -561,11 +561,11 @@ begin
     cCommand_ZoomIn:                   Result:= DoCommand_ScaleDelta(true);
     cCommand_ZoomOut:                  Result:= DoCommand_ScaleDelta(false);
     cCommand_ZoomReset:                Result:= DoCommand_ScaleReset;
-    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, FLastTextCmdText);
+    cCommand_RepeatTextCommand:        DoCommand(FLastTextCmd, cInvokeInternal, FLastTextCmdText);
   end;
 end;
 
-procedure TATSynEdit.DoCommand(ACmd: integer; const AText: atString = '');
+procedure TATSynEdit.DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = '');
 var
   Caret: TATCaretItem;
   Res: TATCommandResults;

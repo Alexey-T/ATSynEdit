@@ -74,6 +74,15 @@ type
   end;
 
 type
+  TATEditorCommandInvoke = (
+    cInvokeInternal,
+    cInvokeAppInternal,
+    cInvokeHotkey,
+    cInvokeMenu,
+    cInvokePalette,
+    cInvokeAPI
+    );
+
   TATTokenKind = (
     atkOther,
     atkComment,
@@ -1553,7 +1562,7 @@ type
     function GetVisibleLines: integer;
     function GetVisibleColumns: integer;
     function GetVisibleLinesMinimap: integer;
-    procedure DoCommand(ACmd: integer; const AText: atString = ''); virtual;
+    procedure DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = ''); virtual;
     procedure BeginUpdate;
     procedure EndUpdate;
     procedure BeginEditing;
@@ -5648,14 +5657,14 @@ begin
         mcaPaste:
           begin
             //don't set caret pos here, user needs to press middle-btn on any place to paste
-            DoCommand(cCommand_ClipboardAltPaste); //uses PrimarySelection:TClipboard
+            DoCommand(cCommand_ClipboardAltPaste, cInvokeInternal); //uses PrimarySelection:TClipboard
           end;
         mcaGotoDefinition:
           begin
             if cCommand_GotoDefinition>0 then
             begin
               DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
-              DoCommand(cCommand_GotoDefinition);
+              DoCommand(cCommand_GotoDefinition, cInvokeInternal);
             end;
           end;
       end;
@@ -7151,7 +7160,7 @@ begin
   Cmd:= (Sender as TMenuItem).Tag;
   if Cmd>0 then
   begin
-    DoCommand(Cmd);
+    DoCommand(Cmd, cInvokeMenu);
     Invalidate;
   end;
 end;
@@ -8337,13 +8346,13 @@ begin
   if Strings.IsIndexValid(Pnt.Y) then
   begin
     DoCaretSingle(Pnt.X, Pnt.Y);
-    DoCommand(cCommand_TextInsert, SText);
+    DoCommand(cCommand_TextInsert, cInvokeInternal, SText);
     if OptMouseDragDropFocusesTargetEditor then
       SetFocus;
 
     //Ctrl not pressed: delete block from src
     if FOptMouseDragDropCopyingWithState in GetKeyShiftState then
-      (Source as TATSynedit).DoCommand(cCommand_TextDeleteSelection);
+      (Source as TATSynedit).DoCommand(cCommand_TextDeleteSelection, cInvokeInternal);
   end;
 end;
 
@@ -9075,7 +9084,7 @@ var
   NLineTop, NLine, NRange: integer;
   bChange: boolean;
 begin
-  DoCommand(cCommand_UnfoldAll);
+  DoCommand(cCommand_UnfoldAll, cInvokeInternal);
   NLineTop:= LineTop;
   bChange:= false;
 
