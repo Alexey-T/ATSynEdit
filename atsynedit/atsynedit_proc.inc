@@ -18,6 +18,12 @@ const
 
 { TATEditorCommandLog }
 
+constructor TATEditorCommandLog.Create;
+begin
+  inherited;
+  MaxCount:= 200;
+end;
+
 destructor TATEditorCommandLog.Destroy;
 begin
   Clear;
@@ -33,11 +39,22 @@ begin
   inherited Clear;
 end;
 
+procedure TATEditorCommandLog.Delete(AIndex: integer);
+begin
+  TATEditorCommandLogItem(Items[AIndex]).ItemText:= '';
+  inherited Delete(AIndex);
+end;
+
 procedure TATEditorCommandLog.Add(ACode: integer; AInvoke: TATEditorCommandInvoke;
   const AText: string);
 var
   Item: TATEditorCommandLogItem;
+  i: integer;
 begin
+  if MaxCount>0 then
+    for i:= 1 to Count-MaxCount do
+      Delete(0);
+
   Item:= TATEditorCommandLogItem.Create;
   Item.ItemCode:= ACode;
   Item.ItemInvoke:= AInvoke;

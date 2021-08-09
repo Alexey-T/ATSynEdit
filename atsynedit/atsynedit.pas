@@ -97,8 +97,11 @@ type
 
   TATEditorCommandLog = class(TFPList)
   public
+    MaxCount: integer;
+    constructor Create;
     destructor Destroy; override;
     procedure Clear;
+    procedure Delete(AIndex: integer);
     procedure Add(ACode: integer; AInvoke: TATEditorCommandInvoke; const AText: string);
   end;
 
@@ -1754,7 +1757,7 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
-    property OptCommandLogEnabled: boolean read FCommandLogEnabled write FCommandLogEnabled default true;
+    property OptCommandLogEnabled: boolean read FCommandLogEnabled write FCommandLogEnabled default false;
     property OptThemed: boolean read FOptThemed write FOptThemed default false;
     property OptHighlightGitConflicts: boolean read FHighlightGitConflicts write FHighlightGitConflicts default cInitHighlightGitConflicts;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
@@ -4297,7 +4300,7 @@ begin
   FEditorIndex:= 0;
 
   FCommandLog:= TATEditorCommandLog.Create;
-  FCommandLogEnabled:= true;
+  FCommandLogEnabled:= false;
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
