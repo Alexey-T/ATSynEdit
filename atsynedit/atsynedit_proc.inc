@@ -29,6 +29,8 @@ procedure TATEditorCommandLog.Add(ACode: integer;
 var
   Item: TATEditorCommandLogItem;
 begin
+  if not Enabled then exit;
+
   if MaxCount>0 then
     while Size()>MaxCount do
       PopFront();

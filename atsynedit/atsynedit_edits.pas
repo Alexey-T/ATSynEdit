@@ -141,7 +141,6 @@ begin
   OptScrollIndentCaretHorz:= 0;
   OptShowMouseSelFrame:= false;
   OptMouseWheelZooms:= false;
-  OptCommandLogEnabled:= false;
   Height:= 26;
 
   IsRepaintEnabled:= true;

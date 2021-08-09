@@ -584,8 +584,7 @@ begin
   else
     Str:= '';
 
-  if FCommandLogEnabled then
-    FCommandLog.Add(ACmd, AInvoke, Str);
+  FCommandLog.Add(ACmd, AInvoke, Str);
 
   if DoEventCommand(ACmd, Str) then Exit;
 

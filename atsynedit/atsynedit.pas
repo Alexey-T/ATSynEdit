@@ -111,6 +111,7 @@ type
 
   TATEditorCommandLog = class(specialize TDeque<TATEditorCommandLogItem>)
   public
+    Enabled: boolean;
     MaxCount: integer;
     constructor Create;
     procedure Add(ACode: integer; AInvoke: TATEditorCommandInvoke; const AText: string);
@@ -610,7 +611,6 @@ type
     FSelRectEnd: TPoint;
     FVisibleColumns: integer;
     FCommandLog: TATEditorCommandLog;
-    FCommandLogEnabled: boolean;
     FCarets: TATCarets;
     FCaretShowEnabled: boolean;
     FCaretShown: boolean;
@@ -1769,7 +1769,6 @@ type
     property WantReturns: boolean read FWantReturns write FWantReturns default true;
 
     //options
-    property OptCommandLogEnabled: boolean read FCommandLogEnabled write FCommandLogEnabled default false;
     property OptThemed: boolean read FOptThemed write FOptThemed default false;
     property OptHighlightGitConflicts: boolean read FHighlightGitConflicts write FHighlightGitConflicts default cInitHighlightGitConflicts;
     property OptAutoPairForMultiCarets: boolean read FOptAutoPairForMultiCarets write FOptAutoPairForMultiCarets default cInitAutoPairForMultiCarets;
@@ -4312,7 +4311,7 @@ begin
   FEditorIndex:= 0;
 
   FCommandLog:= TATEditorCommandLog.Create;
-  FCommandLogEnabled:= false;
+  FCommandLog.Enabled:= false;
 
   FCarets:= TATCarets.Create;
   FCarets.Add(0, 0);
