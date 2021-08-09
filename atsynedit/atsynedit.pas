@@ -20,7 +20,7 @@ uses
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
-  syncobjs, gqueue,
+  syncobjs, gdeque,
   LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
@@ -95,7 +95,7 @@ type
 
   { TATEditorCommandLog }
 
-  TATEditorCommandLog = class(specialize TQueue<TATEditorCommandLogItem>)
+  TATEditorCommandLog = class(specialize TDeque<TATEditorCommandLogItem>)
   public
     MaxCount: integer;
     constructor Create;

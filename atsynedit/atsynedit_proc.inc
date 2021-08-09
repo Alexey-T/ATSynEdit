@@ -31,12 +31,12 @@ var
 begin
   if MaxCount>0 then
     while Size()>MaxCount do
-      Pop();
+      PopFront();
 
   Item.ItemCode:= ACode;
   Item.ItemInvoke:= AInvoke;
   Item.ItemText:= AText;
-  Push(Item);
+  PushBack(Item);
 end;
 
 { TATFoldedMarks }
