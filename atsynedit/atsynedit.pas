@@ -76,11 +76,11 @@ type
 type
   TATEditorCommandInvoke = (
     cInvokeInternal,
-    cInvokeAppInternal,
     cInvokeHotkey,
     cInvokeMenu,
-    cInvokePalette,
-    cInvokeAPI
+    cInvokeAppInternal,
+    cInvokeAppPalette,
+    cInvokeAppAPI
     );
 
   TATTokenKind = (
