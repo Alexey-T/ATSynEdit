@@ -80,6 +80,7 @@ type
     cInvokeMenu,
     cInvokeAppInternal,
     cInvokeAppPalette,
+    cInvokeAppCharMap,
     cInvokeAppAPI
     );
 
