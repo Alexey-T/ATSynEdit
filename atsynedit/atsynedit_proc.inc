@@ -35,6 +35,7 @@ begin
 
   Item.ItemCode:= ACode;
   Item.ItemInvoke:= AInvoke;
+  Item.ItemTime:= Now;
   Item.ItemText:= AText;
   PushBack(Item);
 end;

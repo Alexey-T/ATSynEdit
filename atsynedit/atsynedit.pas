@@ -110,6 +110,7 @@ type
   public
     ItemInvoke: TATEditorCommandInvoke;
     ItemCode: integer;
+    ItemTime: TDateTime;
     ItemText: string;
   end;
 
