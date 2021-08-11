@@ -85,6 +85,7 @@ type
     cInvokeAppToolbar,
     cInvokeAppSidebar,
     cInvokeAppCharMap,
+    cInvokeAppDragDrop,
     cInvokeAppAPI
     );
 
@@ -100,6 +101,7 @@ const
     'app_toolbar',
     'app_sidebar',
     'app_charmap',
+    'app_dragdrop',
     'app_api'
     );
 
