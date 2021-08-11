@@ -110,7 +110,7 @@ type
   public
     ItemInvoke: TATEditorCommandInvoke;
     ItemCode: integer;
-    ItemTime: TDateTime;
+    ItemTicks: QWord;
     ItemText: string;
   end;
 

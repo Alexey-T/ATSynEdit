@@ -35,7 +35,7 @@ begin
 
   Item.ItemCode:= ACode;
   Item.ItemInvoke:= AInvoke;
-  Item.ItemTime:= Now;
+  Item.ItemTicks:= GetTickCount64;
   Item.ItemText:= AText;
   PushBack(Item);
 end;
