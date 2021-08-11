@@ -502,7 +502,7 @@ type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
   TATSynEditClickGapEvent = procedure(Sender: TObject; AGapItem: TATGapItem; APos: TPoint) of object;
-  TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; const AText: string; var AHandled: boolean) of object;
+  TATSynEditCommandEvent = procedure(Sender: TObject; ACommand: integer; AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean) of object;
   TATSynEditCommandAfterEvent = procedure(Sender: TObject; ACommand: integer; const AText: string) of object;
   TATSynEditClickGutterEvent = procedure(Sender: TObject; ABand: integer; ALineNum: integer) of object;
   TATSynEditClickMicromapEvent = procedure(Sender: TObject; AX, AY: integer) of object;
@@ -1216,7 +1216,7 @@ type
     procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
     procedure DoEventClickGutter(ABandIndex, ALineNumber: integer);
-    function DoEventCommand(ACommand: integer; const AText: string): boolean;
+    function DoEventCommand(ACommand: integer; AInvoke: TATEditorCommandInvoke; const AText: string): boolean;
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     //
@@ -7032,11 +7032,12 @@ begin
 end;
 
 
-function TATSynEdit.DoEventCommand(ACommand: integer; const AText: string): boolean;
+function TATSynEdit.DoEventCommand(ACommand: integer;
+  AInvoke: TATEditorCommandInvoke; const AText: string): boolean;
 begin
   Result:= false;
   if Assigned(FOnCommand) then
-    FOnCommand(Self, ACommand, AText, Result);
+    FOnCommand(Self, ACommand, AInvoke, AText, Result);
 end;
 
 procedure TATSynEdit.DoEventCommandAfter(ACommand: integer; const AText: string);

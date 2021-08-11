@@ -587,7 +587,7 @@ begin
   if AInvoke<>cInvokeHotkeyChar then
     FCommandLog.Add(ACmd, AInvoke, Str);
 
-  if DoEventCommand(ACmd, Str) then Exit;
+  if DoEventCommand(ACmd, AInvoke, Str) then Exit;
 
   if IsCommandToUndoInOneStep(ACmd) then
     NCommandCode:= ACmd
