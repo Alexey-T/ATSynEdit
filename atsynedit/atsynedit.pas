@@ -83,6 +83,7 @@ type
     cInvokeAppInternal,
     cInvokeAppPalette,
     cInvokeAppToolbar,
+    cInvokeAppSidebar,
     cInvokeAppCharMap,
     cInvokeAppAPI
     );
@@ -97,6 +98,7 @@ const
     'app_int',
     'app_pal',
     'app_toolbar',
+    'app_sidebar',
     'app_charmap',
     'app_api'
     );
