@@ -242,7 +242,7 @@ type
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
-    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; const AText: string; var AHandled: boolean);
+    procedure EditCommand(Sender: TObject; ACmd{%H-}: integer; AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
     procedure EditClickGutter(Sender: TObject; ABand, ALine: integer);
     procedure EditClickMicromap(Sender: TObject; AX, AY: integer);
     procedure EditDrawBm(Sender: TObject; C: TCanvas; ALineNum{%H-}: integer; const ARect: TRect);
@@ -542,7 +542,7 @@ begin
 end;
 
 procedure TfmMain.EditCommand(Sender: TObject; ACmd: integer;
-  const AText: string; var AHandled: boolean);
+  AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
 begin
   AHandled:= false;
   {
@@ -837,7 +837,7 @@ begin
   Cmd:= DoCommandDialog(ed);
   if Cmd>0 then
   begin
-    ed.DoCommand(Cmd);
+    ed.DoCommand(Cmd, cInvokeAppPalette);
     ed.Update;
   end;
 end;
@@ -1582,7 +1582,7 @@ begin
     EndY:= APos2.Y;
   end;
 
-  Ed.DoCommand(cCommand_ScrollToCaretTop);
+  Ed.DoCommand(cCommand_ScrollToCaretTop, cInvokeAppInternal);
   Ed.Update(true);
 
   Buttons:= [mbYes, mbNo];
