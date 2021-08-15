@@ -1,4 +1,8 @@
 
+2021.08.15
+* rename OptCharSpacingY to OptSpacingY
+* delete OptTextOffsetFromLine
+
 2021.08.09
 + add: CommandLog object (made for new CudaText API)
 
