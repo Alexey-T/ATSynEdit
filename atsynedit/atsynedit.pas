@@ -7779,7 +7779,7 @@ var
       CanvasLineVert(C,
         CoordXCenter,
         CoordYCenter,
-        ACoordY2
+        ACoordY2+1
         );
   end;
   //
@@ -8209,6 +8209,9 @@ end;
 procedure TATSynEdit.DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer;
   APlus: boolean; ALineColor: TColor);
 begin
+  if FCharSpacingText.Y<0 then
+    Inc(AY, FCharSpacingText.Y);
+
   case OptGutterIcons of
     cGutterIconsPlusMinus:
       begin
