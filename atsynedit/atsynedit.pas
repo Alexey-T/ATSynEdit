@@ -3539,7 +3539,7 @@ begin
       TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
       TextOutProps.DrawEvent:= Event;
       TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
-      TextOutProps.TextOffsetFromLine:= FCharSpacingText.Y; //FOptTextOffsetFromLine;
+      TextOutProps.TextOffsetFromLine:= IfThen(FCharSpacingText.Y<0, FCharSpacingText.Y, 0);
 
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
       TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
@@ -3836,7 +3836,8 @@ begin
   if not Strings.IsIndexValid(NLinesIndex) then exit;
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
 
-  Inc(ARect.Top, FCharSpacingText.Y-1);
+  if FCharSpacingText.Y<0 then
+    Inc(ARect.Top, FCharSpacingText.Y);
 
   //paint area over scrolled text
   C.Brush.Color:= Colors.GutterBG;
@@ -6768,6 +6769,12 @@ begin
     R.Right:= R.Left+FCharSize.X;
     R.Bottom:= R.Top+FCharSize.Y;
 
+    if FCharSpacingText.Y<0 then
+    begin
+      Inc(R.Top, FCharSpacingText.Y);
+      Inc(R.Bottom, FCharSpacingText.Y);
+    end;
+
     //check caret is visible (IntersectRect is slower)
     if R.Right<=FRectMain.Left then Continue;
     if R.Bottom<=FRectMain.Top then Continue;
@@ -8564,7 +8571,7 @@ begin
   TextOutProps.CharsSkipped:= 0;
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
-  TextOutProps.TextOffsetFromLine:= FCharSpacingText.Y; //FOptTextOffsetFromLine;
+  TextOutProps.TextOffsetFromLine:= IfThen(FCharSpacingText.Y<0, FCharSpacingText.Y, 0);
 
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
   TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
