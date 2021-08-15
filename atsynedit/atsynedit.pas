@@ -610,6 +610,7 @@ type
     FCursorMinimap: TCursor;
     FCursorMicromap: TCursor;
     FTextOffset: TPoint;
+    FTextOffsetFromTop: integer;
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
     FTextHintCenter: boolean;
@@ -2907,6 +2908,11 @@ begin
 
   FCharSize:= GetCharSize(C, FCharSpacingText);
 
+  if FCharSpacingText.Y<0 then
+    FTextOffsetFromTop:= FCharSpacingText.Y
+  else
+    FTextOffsetFromTop:= 0;
+
   if FMinimapCustomScale<100 then
   begin
     FCharSizeMinimap.X:= EditorScale(1);
@@ -3539,7 +3545,7 @@ begin
       TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
       TextOutProps.DrawEvent:= Event;
       TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
-      TextOutProps.TextOffsetFromLine:= IfThen(FCharSpacingText.Y<0, FCharSpacingText.Y, 0);
+      TextOutProps.TextOffsetFromLine:= FTextOffsetFromTop;
 
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
       TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
@@ -3564,9 +3570,7 @@ begin
       TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
       TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
 
-      Dec(CurrPointText.Y);
-      if FCharSpacingText.Y<0 then
-        Inc(CurrPointText.Y, FCharSpacingText.Y);
+      Inc(CurrPointText.Y, FTextOffsetFromTop-1);
 
       CanvasTextOut(C,
         CurrPointText.X,
@@ -3836,8 +3840,7 @@ begin
   if not Strings.IsIndexValid(NLinesIndex) then exit;
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
 
-  if FCharSpacingText.Y<0 then
-    Inc(ARect.Top, FCharSpacingText.Y);
+  Inc(ARect.Top, FTextOffsetFromTop);
 
   //paint area over scrolled text
   C.Brush.Color:= Colors.GutterBG;
@@ -6769,11 +6772,8 @@ begin
     R.Right:= R.Left+FCharSize.X;
     R.Bottom:= R.Top+FCharSize.Y;
 
-    if FCharSpacingText.Y<0 then
-    begin
-      Inc(R.Top, FCharSpacingText.Y);
-      Inc(R.Bottom, FCharSpacingText.Y);
-    end;
+    Inc(R.Top, FTextOffsetFromTop);
+    Inc(R.Bottom, FTextOffsetFromTop);
 
     //check caret is visible (IntersectRect is slower)
     if R.Right<=FRectMain.Left then Continue;
@@ -7046,8 +7046,7 @@ begin
             P.X:= (ABand.Left + ABand.Right - NW) div 2;
         end;
 
-        if FCharSpacingText.Y<0 then
-          Inc(P.Y, FCharSpacingText.Y);
+        Inc(P.Y, FTextOffsetFromTop);
 
         C.Brush.Style:= bsClear;
         CanvasTextOutSimplest(C, P.X, P.Y, SText);
@@ -8219,8 +8218,7 @@ end;
 procedure TATSynEdit.DoPaintGutterPlusMinus(C: TCanvas; AX, AY: integer;
   APlus: boolean; ALineColor: TColor);
 begin
-  if FCharSpacingText.Y<0 then
-    Inc(AY, FCharSpacingText.Y);
+  Inc(AY, FTextOffsetFromTop);
 
   case OptGutterIcons of
     cGutterIconsPlusMinus:
@@ -8574,7 +8572,7 @@ begin
   TextOutProps.CharsSkipped:= 0;
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
-  TextOutProps.TextOffsetFromLine:= IfThen(FCharSpacingText.Y<0, FCharSpacingText.Y, 0);
+  TextOutProps.TextOffsetFromLine:= FTextOffsetFromTop;
 
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
   TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
