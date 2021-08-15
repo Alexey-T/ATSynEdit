@@ -398,7 +398,7 @@ const
   cInitRulerNumeration = cRulerNumeration_0_10_20;
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
-  cInitSpacingText = 1;
+  cInitSpacingY = 1;
   cInitCaretBlinkTime = 600;
   cInitTimerAutoScroll = 100;
   cInitTimerNiceScroll = 100;
@@ -755,7 +755,7 @@ type
     FPrevModified: boolean;
     FCharSize: TPoint;
     FCharSizeMinimap: TPoint;
-    FCharSpacingText: TPoint;
+    FSpacingY: integer;
     FTabSize: integer;
     FGutter: TATGutter;
     FGutterDecor: TATGutterDecor;
@@ -1226,7 +1226,6 @@ type
     procedure DoEventDrawBookmarkIcon(C: TCanvas; ALineNumber: integer; const ARect: TRect);
     procedure DoEventCommandAfter(ACommand: integer; const AText: string);
     //
-    function GetCharSpacingY: integer;
     function GetEndOfFilePos: TPoint;
     function GetMarginString: string;
     function GetReadOnly: boolean;
@@ -1246,7 +1245,7 @@ type
     procedure SetMouseNiceScroll(AValue: boolean);
     procedure SetCaretManyAllowed(AValue: boolean);
     procedure SetCaretBlinkTime(AValue: integer);
-    procedure SetCharSpacingY(AValue: integer);
+    procedure SetSpacingY(AValue: integer);
     procedure SetMarginString(const AValue: string);
     procedure SetMicromapVisible(AValue: boolean);
     procedure SetMinimapVisible(AValue: boolean);
@@ -1289,7 +1288,7 @@ type
     function DoFormatLineNumber(N: integer): string;
     function UpdateScrollInfoFromMessage(var Info: TATEditorScrollInfo; const Msg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean = false);
-    function GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
+    function GetCharSize(C: TCanvas; ACharSpacingY: integer): TPoint;
     function GetScrollbarVisible(bVertical: boolean): boolean;
     procedure SetMarginRight(AValue: integer);
 
@@ -1905,7 +1904,7 @@ type
     property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
-    property OptCharSpacingY: integer read GetCharSpacingY write SetCharSpacingY default cInitSpacingText;
+    property OptSpacingY: integer read FSpacingY write SetSpacingY default cInitSpacingY;
     property OptWrapMode: TATEditorWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
     property OptWrapIndented: boolean read FWrapIndented write SetWrapIndented default true;
     property OptWrapAddSpace: integer read FWrapAddSpace write FWrapAddSpace default 1;
@@ -2903,10 +2902,10 @@ begin
   C.Font.Name:= Font.Name;
   C.Font.Size:= DoScaleFont(Font.Size);
 
-  FCharSize:= GetCharSize(C, FCharSpacingText);
+  FCharSize:= GetCharSize(C, FSpacingY);
 
-  if FCharSpacingText.Y<0 then
-    FTextOffsetFromTop:= FCharSpacingText.Y
+  if FSpacingY<0 then
+    FTextOffsetFromTop:= FSpacingY
   else
     FTextOffsetFromTop:= 0;
 
@@ -3052,7 +3051,7 @@ begin
     C.Frame(i, i, W-i, H-i);
 end;
 
-function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacing: TPoint): TPoint;
+function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TPoint;
 const
   Sample: string = 'N'; //char 'M' is not ok, it's too wide for var-width fonts
 var
@@ -3076,8 +3075,8 @@ begin
     end;
   end;
 
-  Result.X:= Max(1, Size.cx + ACharSpacing.X);
-  Result.Y:= Max(1, Size.cy + ACharSpacing.Y);
+  Result.X:= Max(1, Size.cx);
+  Result.Y:= Max(1, Size.cy + ACharSpacingY);
 end;
 
 procedure TATSynEdit.DoPaintGutterBandBG(C: TCanvas; AColor: TColor;
@@ -4217,11 +4216,6 @@ begin
   end;
 end;
 
-function TATSynEdit.GetCharSpacingY: integer;
-begin
-  Result:= FCharSpacingText.Y;
-end;
-
 function TATSynEdit.GetMarginString: string;
 var
   i: integer;
@@ -4554,7 +4548,7 @@ begin
   FMinimapTooltipWidthPercents:= cInitMinimapTooltipWidthPercents;
   FMinimapHiliteLinesWithSelection:= true;
 
-  FCharSpacingText:= Point(0, cInitSpacingText);
+  FSpacingY:= cInitSpacingY;
   FCharSizeMinimap:= Point(1, 2);
 
   FOptScrollStyleHorz:= aessAuto;
@@ -4916,10 +4910,10 @@ begin
   FTimerBlink.Interval:= AValue;
 end;
 
-procedure TATSynEdit.SetCharSpacingY(AValue: integer);
+procedure TATSynEdit.SetSpacingY(AValue: integer);
 begin
-  if FCharSpacingText.Y=AValue then Exit;
-  FCharSpacingText.Y:= AValue;
+  if FSpacingY=AValue then Exit;
+  FSpacingY:= AValue;
   FWrapUpdateNeeded:= true;
 end;
 
