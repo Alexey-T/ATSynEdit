@@ -371,6 +371,8 @@ type
 const
   cUsePaintStatic = true;
   cMaxIndentVert = 100;
+  cInitTextOffsetLeft = 0;
+  cInitTextOffsetTop = 2;
   cInitHighlightGitConflicts = true;
   cInitAutoPairForMultiCarets = true;
   cInitInputNumberAllowNegative = true;
@@ -1809,8 +1811,8 @@ type
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle default [fsItalic];
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
     property OptTextCenteringCharWidth: integer read FOptTextCenteringCharWidth write FOptTextCenteringCharWidth default 0;
-    property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft default 0;
-    property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop default 0;
+    property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft default cInitTextOffsetLeft;
+    property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop default cInitTextOffsetTop;
     property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine default cInitTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
     property OptAutoIndentKind: TATEditorAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
@@ -3537,7 +3539,7 @@ begin
       TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
       TextOutProps.DrawEvent:= Event;
       TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
-      TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
+      TextOutProps.TextOffsetFromLine:= FCharSpacingText.Y; //FOptTextOffsetFromLine;
 
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
       TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
@@ -3561,6 +3563,10 @@ begin
 
       TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
       TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
+
+      Dec(CurrPointText.Y);
+      if FCharSpacingText.Y<0 then
+        Inc(CurrPointText.Y, FCharSpacingText.Y);
 
       CanvasTextOut(C,
         CurrPointText.X,
@@ -4578,8 +4584,8 @@ begin
   FOptStapleIndentConsidersEnd:= false;
 
   FOptTextCenteringCharWidth:= 0;
-  FOptTextOffsetLeft:= 0;
-  FOptTextOffsetTop:= 0;
+  FOptTextOffsetLeft:= cInitTextOffsetLeft;
+  FOptTextOffsetTop:= cInitTextOffsetTop;
   FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
   FOptAllowRepaintOnTextChange:= true;
   FOptAllowReadOnly:= true;
@@ -8552,7 +8558,7 @@ begin
   TextOutProps.CharsSkipped:= 0;
   TextOutProps.DrawEvent:= nil;
   TextOutProps.ControlWidth:= ARect.Width;
-  TextOutProps.TextOffsetFromLine:= FOptTextOffsetFromLine;
+  TextOutProps.TextOffsetFromLine:= FCharSpacingText.Y; //FOptTextOffsetFromLine;
 
   TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
   TextOutProps.ShowUnprintedSpacesTrailing:= FUnprintedSpacesTrailing;
