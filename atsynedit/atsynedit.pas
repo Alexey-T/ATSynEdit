@@ -7046,6 +7046,9 @@ begin
             P.X:= (ABand.Left + ABand.Right - NW) div 2;
         end;
 
+        if FCharSpacingText.Y<0 then
+          Inc(P.Y, FCharSpacingText.Y);
+
         C.Brush.Style:= bsClear;
         CanvasTextOutSimplest(C, P.X, P.Y, SText);
       end;
