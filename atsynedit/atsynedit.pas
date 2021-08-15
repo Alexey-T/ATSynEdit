@@ -4196,7 +4196,7 @@ begin
   C.Brush.Style:= bsClear;
   C.TextOut(
     ACoordX+cFoldedMarkIndentInner,
-    ACoordY+FOptTextOffsetFromLine,
+    ACoordY+FTextOffsetFromTop,
     Str);
   NWidth:= C.TextWidth(Str) + 2*cFoldedMarkIndentInner;
 
