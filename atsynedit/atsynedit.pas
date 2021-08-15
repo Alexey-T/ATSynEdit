@@ -3836,6 +3836,8 @@ begin
   if not Strings.IsIndexValid(NLinesIndex) then exit;
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
 
+  Inc(ARect.Top, FCharSpacingText.Y-1);
+
   //paint area over scrolled text
   C.Brush.Color:= Colors.GutterBG;
   C.FillRect(FRectGutter.Left, ARect.Top, FRectGutter.Right, ARect.Bottom);
@@ -7027,6 +7029,7 @@ begin
         NW:= FCharSize.X*Length(SText);
 
         P.Y:= ACoordTop;
+
         case FOptNumbersAlignment of
           taLeftJustify:
             P.X:= ABand.Left + FNumbersIndent;
