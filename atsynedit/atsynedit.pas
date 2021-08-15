@@ -390,7 +390,6 @@ const
   cInitMicromapShowForMinCount = 2;
   cInitScrollbarHorzAddSpace = 2;
   cInitIdleInterval = 0; //1000; //0 dont fire OnIdle, faster
-  cInitTextOffsetFromLine = {$ifdef windows} 0 {$else} 1 {$endif};
   cInitCaretsPrimitiveColumnSelection = true;
   cInitCaretsMultiToColumnSel = true;
   cInitBorderVisible = true;
@@ -903,7 +902,6 @@ type
     FOptTextCenteringCharWidth: integer;
     FOptTextOffsetLeft: integer;
     FOptTextOffsetTop: integer;
-    FOptTextOffsetFromLine: integer;
     FOptSavingForceFinalEol: boolean;
     FOptSavingTrimSpaces: boolean;
     FOptSavingTrimFinalEmptyLines: boolean;
@@ -1814,7 +1812,6 @@ type
     property OptTextCenteringCharWidth: integer read FOptTextCenteringCharWidth write FOptTextCenteringCharWidth default 0;
     property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft default cInitTextOffsetLeft;
     property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop default cInitTextOffsetTop;
-    property OptTextOffsetFromLine: integer read FOptTextOffsetFromLine write FOptTextOffsetFromLine default cInitTextOffsetFromLine;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
     property OptAutoIndentKind: TATEditorAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
     property OptAutoIndentBetterBracketsCurly: boolean read FOptAutoIndentBetterBracketsCurly write FOptAutoIndentBetterBracketsCurly default true;
@@ -4592,7 +4589,6 @@ begin
   FOptTextCenteringCharWidth:= 0;
   FOptTextOffsetLeft:= cInitTextOffsetLeft;
   FOptTextOffsetTop:= cInitTextOffsetTop;
-  FOptTextOffsetFromLine:= cInitTextOffsetFromLine;
   FOptAllowRepaintOnTextChange:= true;
   FOptAllowReadOnly:= true;
 
