@@ -454,12 +454,17 @@ begin
     FScrollVert,
     FCaretSpecPos or FOptCaretPreferLeftSide
     );
+
+  if Result.Y>=0 then
+    Inc(Result.Y, FTextOffsetFromTop-1);
 end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TPoint;
   out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction = cGapCoordToLineEnd): TPoint; inline;
 begin
+  Dec(P.Y, FTextOffsetFromTop-1);
+
   Result:= _DoClientPosToCaretPos(P,
     FWrapInfo,
     Strings,

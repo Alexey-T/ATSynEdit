@@ -6762,9 +6762,6 @@ begin
     R.Right:= R.Left+FCharSize.X;
     R.Bottom:= R.Top+FCharSize.Y;
 
-    Inc(R.Top, FTextOffsetFromTop);
-    Inc(R.Bottom, FTextOffsetFromTop);
-
     //check caret is visible (IntersectRect is slower)
     if R.Right<=FRectMain.Left then Continue;
     if R.Bottom<=FRectMain.Top then Continue;
