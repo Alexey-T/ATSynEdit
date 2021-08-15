@@ -521,7 +521,7 @@ begin
   chkNewScroll.Checked:= ed.OptScrollbarsNew;
   edFontsize.Value:= ed.Font.Size;
   edTabsize.Value:= ed.OptTabSize;
-  edSpaceY.Value:= ed.OptCharSpacingY;
+  edSpaceY.Value:= ed.OptSpacingY;
   edMarginFixed.Value:= ed.OptMarginRight;
   case ed.OptWrapMode of
     cWrapOff: chkWrapOff.Checked:= true;
@@ -1429,7 +1429,7 @@ end;
 procedure TfmMain.edSpaceYChange(Sender: TObject);
 begin
   if wait then Exit;
-  ed.OptCharSpacingY:= edSpaceY.Value;
+  ed.OptSpacingY:= edSpaceY.Value;
   ed.Update;
 end;
 
