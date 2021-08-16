@@ -4809,17 +4809,23 @@ end;
 
 procedure TATSynEdit.GetClientSizes(out W, H: integer);
 begin
-  W:= inherited ClientWidth;
+  W:= Width;
   H:= Height;
   if ModeOneLine then exit;
 
-  //if FScrollbarVert.Visible then
   if FOptScrollbarsNew then //better check this instead of FScrollbarVert.Visible
+  begin
     Dec(W, FScrollbarVert.Width);
-  if W<1 then W:= 1;
+  end
+  else
+  begin
+    W:= inherited ClientWidth;
+  end;
 
   if FScrollbarHorz.Visible then
     Dec(H, FScrollbarHorz.Height);
+
+  if W<1 then W:= 1;
   if H<1 then H:= 1;
 end;
 
