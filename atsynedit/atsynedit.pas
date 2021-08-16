@@ -3370,6 +3370,7 @@ begin
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
+  Inc(CurrPointText.Y, FTextOffsetFromTop-1);
 
   bTrimmedNonSpaces:= false;
 
@@ -3565,8 +3566,6 @@ begin
 
       TextOutProps.FontBoldItalic_Name:= FontBoldItalic.Name;
       TextOutProps.FontBoldItalic_Size:= DoScaleFont(FontBoldItalic.Size);
-
-      Inc(CurrPointText.Y, FTextOffsetFromTop-1);
 
       CanvasTextOut(C,
         CurrPointText.X,
