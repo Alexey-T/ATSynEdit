@@ -5088,7 +5088,7 @@ begin
   Result.Y:= OptTextOffsetTop;
 
   if FSpacingY<0 then
-    Result.Y:= Max(Result.Y, -FSpacingY*2);
+    Result.Y:= Max(Result.Y, -FSpacingY*2); //*2 is needed to not clip the first line
 
   if FOptRulerVisible then
     Inc(Result.Y, FRulerHeight);
