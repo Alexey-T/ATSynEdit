@@ -307,7 +307,7 @@ begin
   OptEditorTextoutNeedsOffsets:= true;
   {$endif}
 
-  OptEditorDebugTiming:= true;
+  //OptEditorDebugTiming:= true;
 
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
