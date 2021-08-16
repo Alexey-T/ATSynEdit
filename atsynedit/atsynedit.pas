@@ -1125,7 +1125,7 @@ type
     procedure InitFoldImageList;
     procedure InitMenuStd;
     procedure StartTimerDelayedParsing;
-    function IsLinePartWithCaret_(APosX, APosY, AWrapIndex: integer): boolean;
+    function IsWrapItemWithCaret(constref AWrapItem: TATWrapItem): boolean;
     procedure MenuClick(Sender: TObject);
     procedure MenuStdPopup(Sender: TObject);
     procedure DoCalcWrapInfos(ALine: integer; AIndentMaximal: integer;
@@ -3470,7 +3470,7 @@ begin
     if FOptShowCurLine and (not FOptShowCurLineOnlyFocused or FIsEntered) then
     begin
       if FOptShowCurLineMinimal then
-        bUseColorOfCurrentLine:= IsLinePartWithCaret_(WrapItem.NCharIndex-1, NLinesIndex, AWrapIndex)
+        bUseColorOfCurrentLine:= IsWrapItemWithCaret(WrapItem)
       else
         bUseColorOfCurrentLine:= true;
     end;

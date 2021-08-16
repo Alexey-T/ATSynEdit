@@ -5,24 +5,24 @@ begin
   Result:= FCarets.IsLineWithCaret(ALine, ADisableSelected);
 end;
 
-function TATSynEdit.IsLinePartWithCaret_(APosX, APosY, AWrapIndex: integer): boolean;
+function TATSynEdit.IsWrapItemWithCaret(constref AWrapItem: TATWrapItem): boolean;
 var
-  WrapItem: TATWrapItem;
   Caret: TATCaretItem;
-  i: integer;
+  AX, AY, i: integer;
 begin
   Result:= false;
+  AX:= AWrapItem.NCharIndex-1;
+  AY:= AWrapItem.NLineIndex;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    if Caret.PosY>APosY then
+    if Caret.PosY>AY then
       Break;
-    if Caret.PosY=APosY then
+    if Caret.PosY=AY then
     begin
-      WrapItem:= FWrapInfo[AWrapIndex];
-      if Caret.PosX<WrapItem.NCharIndex-1 then Continue;
-      if WrapItem.NFinal<>cWrapItemFinal then
-        if Caret.PosX>=WrapItem.NCharIndex-1+WrapItem.NLength then Continue;
+      if Caret.PosX<AX then Continue;
+      if AWrapItem.NFinal<>cWrapItemFinal then
+        if Caret.PosX>=AX+AWrapItem.NLength then Continue;
       exit(true);
     end;
   end;
