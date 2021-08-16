@@ -293,6 +293,8 @@ end;
 { TfmMain }
 
 procedure TfmMain.FormCreate(Sender: TObject);
+const
+  cGoodFont = 'DejaVu Sans Mono';
 begin
   UpdateEnc;
 
@@ -313,6 +315,8 @@ begin
   ed.Font.Name:= 'Consolas';
   {$else}
   ed.Font.Name:= 'Courier New';
+  if Screen.Fonts.IndexOf(cGoodFont)>=0 then
+    ed.Font.Name:= cGoodFont;
   {$endif}
 
   ed.PopupGutterBm:= PopupBookmk;
@@ -602,6 +606,7 @@ procedure TfmMain.EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRe
 begin
   C.Pen.Color:= $c0c0c0;
   C.Brush.Color:= $eeeeee;
+  C.Brush.Style:= bsSolid;
   C.Rectangle(ARect);
   C.TextOut(ARect.Left+2, ARect.Top+2, 'tst');
 end;

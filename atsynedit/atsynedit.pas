@@ -4079,6 +4079,7 @@ begin
   else
   begin
     C.Brush.Color:= clCream;
+    C.Brush.Style:= bsSolid;
     C.FillRect(FRectMicromap);
   end;
 end;
