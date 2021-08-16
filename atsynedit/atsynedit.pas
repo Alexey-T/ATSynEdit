@@ -2931,9 +2931,9 @@ begin
     UpdateMinimapAutosize; //after FTextOffset
 
   GetRectMicromap(FRectMicromap);
-  GetRectMinimap(FRectMinimap); //after FMicromap
+  GetRectMinimap(FRectMinimap); //after micromap
   GetRectGutter(FRectGutter);
-  GetRectMain(FRectMain); //after gutter/minimap/FMicromap
+  GetRectMain(FRectMain); //after gutter/minimap/micromap
   GetRectRuler(FRectRuler); //after main
 end;
 
