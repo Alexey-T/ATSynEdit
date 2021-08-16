@@ -2071,7 +2071,6 @@ begin
   C.Brush.Color:= Colors.RulerBG;
 
   C.FillRect(FRectRuler);
-  CanvasLineHorz(C, FRectRuler.Left, FRectRuler.Bottom-1, FRectRuler.Right);
 
   NCharW:= FCharSize.X * FOptRulerFontSizePercents div 100;
 
@@ -2116,6 +2115,8 @@ begin
 
     Inc(NX, FCharSize.X);
   end;
+
+  CanvasLineHorz(C, FRectRuler.Left, FRectRuler.Bottom-1, FRectRuler.Right);
 
   C.Font.Size:= NPrevFontSize;
 end;
