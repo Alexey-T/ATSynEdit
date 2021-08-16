@@ -411,7 +411,6 @@ const
   cInitShowMouseSelFrame = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
-  cInitMinimapWidth = 160;
   cInitNumbersStyle = cNumbersEach5th;
   cInitNumbersIndentPercents = 60;
   cInitBitmapWidth = 1000;
@@ -4536,7 +4535,7 @@ begin
   FOptRulerFontSizePercents:= 80;
   FOptRulerTopIndentPercents:= 0;
 
-  FMinimapWidth:= cInitMinimapWidth;
+  FMinimapWidth:= 150;
   FMinimapCharWidth:= 0;
   FMinimapCustomScale:= 0;
   FMinimapVisible:= cInitMinimapVisible;
