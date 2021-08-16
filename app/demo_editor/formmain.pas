@@ -319,6 +319,11 @@ begin
     ed.Font.Name:= cGoodFont;
   {$endif}
 
+  SetLength(ed.Micromap.Columns, 0);
+  ed.Micromap.ColumnAdd(1, 100, clRed);
+  ed.Micromap.ColumnAdd(2, 100, clBlue);
+  ed.Micromap.ColumnAdd(3, 100, clGreen);
+
   ed.PopupGutterBm:= PopupBookmk;
   ed.PopupGutterNum:= PopupNums;
   ed.PopupGutterFold:= PopupFold;
@@ -603,12 +608,19 @@ begin
 end;
 
 procedure TfmMain.EditDrawMicromap(Sender: TObject; C: TCanvas; const ARect: TRect);
+var
+  R: TRect;
+  i: integer;
 begin
-  C.Pen.Color:= $c0c0c0;
-  C.Brush.Color:= $eeeeee;
-  C.Brush.Style:= bsSolid;
-  C.Rectangle(ARect);
-  C.TextOut(ARect.Left+2, ARect.Top+2, 'tst');
+  for i:= 0 to High(ed.Micromap.Columns) do
+  begin
+    C.Brush.Style:= bsSolid;
+    C.Brush.Color:= ed.Micromap.Columns[i].NColor;
+    R:= ARect;
+    R.Left:= ed.Micromap.Columns[i].NLeft;
+    R.Right:= ed.Micromap.Columns[i].NRight;
+    C.FillRect(R);
+  end;
 end;
 
 procedure TfmMain.EditDrawTest(Sender: TObject; C: TCanvas; const ARect: TRect);

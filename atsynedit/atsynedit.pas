@@ -4809,7 +4809,7 @@ end;
 
 procedure TATSynEdit.GetClientSizes(out W, H: integer);
 begin
-  W:= Width;
+  W:= inherited ClientWidth;
   H:= Height;
   if ModeOneLine then exit;
 
