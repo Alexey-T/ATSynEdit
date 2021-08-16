@@ -5087,6 +5087,10 @@ begin
   Inc(Result.X, NGutterWidth);
 
   Result.Y:= OptTextOffsetTop;
+
+  if FSpacingY<0 then
+    Result.Y:= Max(Result.Y, -FSpacingY*2);
+
   if FOptRulerVisible then
     Inc(Result.Y, FRulerHeight);
 end;
