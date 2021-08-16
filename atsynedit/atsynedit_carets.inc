@@ -5,22 +5,25 @@ begin
   Result:= FCarets.IsLineWithCaret(ALine, ADisableSelected);
 end;
 
-function TATSynEdit.IsLinePartWithCaret(ALine: integer; ACoordY: integer): boolean;
+function TATSynEdit.IsLinePartWithCaret_(APosX, APosY, AWrapIndex: integer): boolean;
 var
-  i: integer;
+  WrapItem: TATWrapItem;
   Caret: TATCaretItem;
-  Coord: TPoint;
+  i: integer;
 begin
   Result:= false;
-  //like Carets.IsLineWithCaret with more code
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    if Caret.PosY=ALine then
+    if Caret.PosY>APosY then
+      Break;
+    if Caret.PosY=APosY then
     begin
-      Coord:= CaretPosToClientPos(Point(Caret.PosX, Caret.PosY));
-      if Coord.Y=ACoordY then
-        exit(true);
+      WrapItem:= FWrapInfo[AWrapIndex];
+      if Caret.PosX<WrapItem.NCharIndex-1 then Continue;
+      if WrapItem.NFinal<>cWrapItemFinal then
+        if Caret.PosX>=WrapItem.NCharIndex-1+WrapItem.NLength then Continue;
+      exit(true);
     end;
   end;
 end;
