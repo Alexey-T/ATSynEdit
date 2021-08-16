@@ -33,6 +33,7 @@ type
     NFinal: TATWrapItemFinal;
     bInitial: boolean;
     procedure Init(ALineIndex, ACharIndex, ALength, AIndent: integer; AFinal: TATWrapItemFinal; AInitial: boolean); inline;
+    function ContainsPos(AX, AY: integer): boolean;
     class operator=(const A, B: TATWrapItem): boolean;
   end;
 
@@ -87,6 +88,16 @@ begin
   NIndent:= AIndent;
   NFinal:= AFinal;
   bInitial:= AInitial;
+end;
+
+function TATWrapItem.ContainsPos(AX, AY: integer): boolean;
+begin
+  Result:= false;
+  if AY<>NLineIndex then exit;
+  if AX<NCharIndex-1 then exit;
+  if NFinal<>cWrapItemFinal then
+    if AX>=NCharIndex-1+NLength then exit;
+  Result:= true;
 end;
 
 class operator TATWrapItem.=(const A, B: TATWrapItem): boolean;

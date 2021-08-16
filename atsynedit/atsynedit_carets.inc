@@ -8,23 +8,16 @@ end;
 function TATSynEdit.IsWrapItemWithCaret(constref AWrapItem: TATWrapItem): boolean;
 var
   Caret: TATCaretItem;
-  AX, AY, i: integer;
+  i: integer;
 begin
   Result:= false;
-  AX:= AWrapItem.NCharIndex-1;
-  AY:= AWrapItem.NLineIndex;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    if Caret.PosY>AY then
-      Break;
-    if Caret.PosY=AY then
-    begin
-      if Caret.PosX<AX then Continue;
-      if AWrapItem.NFinal<>cWrapItemFinal then
-        if Caret.PosX>=AX+AWrapItem.NLength then Continue;
+    if Caret.PosY>AWrapItem.NLineIndex then
+      exit;
+    if AWrapItem.ContainsPos(Caret.PosX, Caret.PosY) then
       exit(true);
-    end;
   end;
 end;
 
