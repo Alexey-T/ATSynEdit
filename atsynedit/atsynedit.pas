@@ -609,6 +609,7 @@ type
     FCursorMicromap: TCursor;
     FTextOffset: TPoint;
     FTextOffsetFromTop: integer;
+    FTextOffsetFromTop1: integer;
     FTextHint: string;
     FTextHintFontStyle: TFontStyles;
     FTextHintCenter: boolean;
@@ -2907,6 +2908,7 @@ begin
     FTextOffsetFromTop:= FSpacingY
   else
     FTextOffsetFromTop:= 0;
+  FTextOffsetFromTop1:= FTextOffsetFromTop-1;
 
   if FMinimapCustomScale<100 then
   begin
@@ -3302,8 +3304,6 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   const AWrapIndex: integer;
   var ATempParts: TATLineParts);
-var
-  NTextOffsetY: integer;
   //
   procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
   var
@@ -3313,8 +3313,8 @@ var
     C.Brush.Color:= AFillColor;
     R:= ARectLine;
     R.Left:= ARectLeft;
-    Inc(R.Top, NTextOffsetY);
-    Inc(R.Bottom, NTextOffsetY);
+    Inc(R.Top, FTextOffsetFromTop1);
+    Inc(R.Bottom, FTextOffsetFromTop1);
     C.FillRect(R);
   end;
   //
@@ -3380,9 +3380,7 @@ begin
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
-
-  NTextOffsetY:= FTextOffsetFromTop-1;
-  Inc(CurrPointText.Y, NTextOffsetY);
+  Inc(CurrPointText.Y, FTextOffsetFromTop1);
 
   bTrimmedNonSpaces:= false;
 
