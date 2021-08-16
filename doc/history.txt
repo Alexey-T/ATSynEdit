@@ -1,5 +1,6 @@
 
-2021.08.15
+2021.08.16
+* move to 'public': OptTextOffsetLeft, OptTextOffsetTop
 * rename OptCharSpacingY to OptSpacingY
 * delete OptTextOffsetFromLine
 

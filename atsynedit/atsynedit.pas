@@ -1509,6 +1509,8 @@ type
     property RectRuler: TRect read FRectRuler;
     function IndentString: UnicodeString;
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
+    property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft;
+    property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop;
     //gutter
     property Gutter: TATGutter read FGutter;
     property GutterDecor: TATGutterDecor read GetGutterDecor;
@@ -1809,8 +1811,6 @@ type
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle default [fsItalic];
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
     property OptTextCenteringCharWidth: integer read FOptTextCenteringCharWidth write FOptTextCenteringCharWidth default 0;
-    property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft default cInitTextOffsetLeft;
-    property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop default cInitTextOffsetTop;
     property OptAutoIndent: boolean read FOptAutoIndent write FOptAutoIndent default true;
     property OptAutoIndentKind: TATEditorAutoIndentKind read FOptAutoIndentKind write FOptAutoIndentKind default cIndentAsPrevLine;
     property OptAutoIndentBetterBracketsCurly: boolean read FOptAutoIndentBetterBracketsCurly write FOptAutoIndentBetterBracketsCurly default true;
