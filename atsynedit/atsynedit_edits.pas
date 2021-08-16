@@ -134,7 +134,6 @@ begin
   BorderStyle:= bsNone;
   OptShowURLs:= false;
   OptTextOffsetLeft:= 2;
-  OptTextOffsetTop:= 3;
   OptMaxLen:= 0;
   OptBorderWidth:= 1;
   OptBorderWidthFocused:= 1;

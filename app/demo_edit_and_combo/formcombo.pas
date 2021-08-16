@@ -6,7 +6,9 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls, ButtonPanel, Spin, ATSynEdit_Edits;
+  StdCtrls, ButtonPanel, Spin,
+  ATSynEdit,
+  ATSynEdit_Edits;
 
 type
   { TfmCombo }
@@ -32,7 +34,8 @@ type
     procedure edMaxLenChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    procedure ComboCommand(Sender: TObject; ACmd: integer; const AText: string; var AHandled: boolean);
+    procedure ComboCommand(Sender: TObject; ACmd: integer; AInvoke: TATEditorCommandInvoke;
+      const AText: string; var AHandled: boolean);
     { private declarations }
   public
     { public declarations }
@@ -110,7 +113,7 @@ begin
 end;
 
 procedure TfmCombo.ComboCommand(Sender: TObject; ACmd: integer;
-  const AText: string; var AHandled: boolean);
+  AInvoke: TATEditorCommandInvoke; const AText: string; var AHandled: boolean);
 var
   s: string;
   n: integer;
