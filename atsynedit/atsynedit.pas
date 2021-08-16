@@ -2908,7 +2908,7 @@ begin
     FTextOffsetFromTop:= FSpacingY
   else
     FTextOffsetFromTop:= 0;
-  FTextOffsetFromTop1:= FTextOffsetFromTop-1;
+  FTextOffsetFromTop1:= FTextOffsetFromTop; //"-1" gives artifacts on gutter bands
 
   if FMinimapCustomScale<100 then
   begin
@@ -3312,7 +3312,7 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
     C.Brush.Style:= bsSolid;
     C.Brush.Color:= AFillColor;
     R:= ARectLine;
-    R.Left:= ARectLeft;
+    //R.Left:= ARectLeft;
     Inc(R.Top, FTextOffsetFromTop1);
     Inc(R.Bottom, FTextOffsetFromTop1);
     C.FillRect(R);

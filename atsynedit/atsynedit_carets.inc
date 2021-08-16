@@ -459,14 +459,14 @@ begin
     );
 
   if Result.Y>=0 then
-    Inc(Result.Y, FTextOffsetFromTop-1);
+    Inc(Result.Y, FTextOffsetFromTop1);
 end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TPoint;
   out ADetails: TATEditorPosDetails;
   AGapCoordAction: TATEditorGapCoordAction = cGapCoordToLineEnd): TPoint; inline;
 begin
-  Dec(P.Y, FTextOffsetFromTop-1);
+  Dec(P.Y, FTextOffsetFromTop1);
 
   Result:= _DoClientPosToCaretPos(P,
     FWrapInfo,
