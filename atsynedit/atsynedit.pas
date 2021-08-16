@@ -5072,6 +5072,13 @@ function TATSynEdit.GetTextOffset: TPoint;
 var
   NGutterWidth: integer;
 begin
+  if ModeOneLine then
+  begin
+    Result.X:= OptTextOffsetLeft;
+    Result.Y:= OptTextOffsetTop;
+    exit;
+  end;
+
   if FOptGutterVisible then
     NGutterWidth:= Gutter.Width
   else
