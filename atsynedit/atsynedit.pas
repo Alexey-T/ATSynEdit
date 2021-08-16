@@ -2925,10 +2925,12 @@ begin
 
   if FOptGutterVisible and FOptNumbersAutosize then
     UpdateGutterAutosize;
-  if FMinimapVisible then
-    UpdateMinimapAutosize;
 
   FTextOffset:= GetTextOffset; //after gutter autosize
+
+  if FMinimapVisible then
+    UpdateMinimapAutosize; //after FTextOffset
+
   GetRectMicromap(FRectMicromap);
   GetRectMinimap(FRectMinimap); //after FMicromap
   GetRectGutter(FRectGutter);
