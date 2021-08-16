@@ -66,6 +66,7 @@ type
     procedure edStyleTypeChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure ListStylesClick(Sender: TObject);
   private
     { private declarations }
@@ -117,6 +118,11 @@ procedure TfmLexerProp.FormDestroy(Sender: TObject);
 begin
   Adapter.AddEditor(nil);
   FreeAndNil(Adapter);
+end;
+
+procedure TfmLexerProp.FormShow(Sender: TObject);
+begin
+  edSample.DoEventChange(0);
 end;
 
 procedure TfmLexerProp.ListStylesClick(Sender: TObject);
