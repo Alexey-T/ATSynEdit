@@ -3302,11 +3302,20 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   const AWrapIndex: integer;
   var ATempParts: TATLineParts);
+var
+  NTextOffsetY: integer;
   //
   procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
+  var
+    R: TRect;
   begin
+    C.Brush.Style:= bsSolid;
     C.Brush.Color:= AFillColor;
-    C.FillRect(ARectLine);
+    R:= ARectLine;
+    R.Left:= ARectLeft;
+    Inc(R.Top, NTextOffsetY);
+    Inc(R.Bottom, NTextOffsetY);
+    C.FillRect(R);
   end;
   //
 var
@@ -3371,7 +3380,9 @@ begin
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
-  Inc(CurrPointText.Y, FTextOffsetFromTop-1);
+
+  NTextOffsetY:= FTextOffsetFromTop-1;
+  Inc(CurrPointText.Y, NTextOffsetY);
 
   bTrimmedNonSpaces:= false;
 
