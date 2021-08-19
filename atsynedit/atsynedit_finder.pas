@@ -933,8 +933,9 @@ begin
     Dec(Result, NDelta);
   end;
 
-  if Result<1 then
-    Result:= 1;
+  if not (OptBack and OptRegex) then
+    if Result<1 then
+      Result:= 1;
 end;
 
 function TATEditorFinder.DoAction_CountAll(AWithEvent: boolean): integer;
@@ -1531,7 +1532,10 @@ begin
   UpdateBuffer;
 
   NStartPos:= GetOffsetStartPos;
-  Result:= DoFindOrReplace_Buffered_Internal(AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
+  if (NStartPos<1) and OptBack then
+    Result:= false
+  else
+    Result:= DoFindOrReplace_Buffered_Internal(AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
 
   if (not Result) and (OptWrapped and not OptInSelection) then
     if (not OptBack and (NStartPos>1)) or
@@ -1759,7 +1763,6 @@ begin
   Result:= false;
   if StrText='' then Exit;
   if StrFind='' then Exit;
-  if OptBack and (AStartPos<=1) then Exit; //fix backward regex search stuck at begin
 
   if OptRegex then
   begin
