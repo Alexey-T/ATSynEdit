@@ -1762,6 +1762,7 @@ begin
   Result:= false;
   if StrText='' then Exit;
   if StrFind='' then Exit;
+  if OptBack and (AStartPos<=1) then Exit; //fix backward regex search stuck at begin
 
   if OptRegex then
   begin
