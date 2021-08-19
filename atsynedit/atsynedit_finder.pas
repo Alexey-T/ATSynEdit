@@ -930,7 +930,7 @@ begin
   if OptBack then
   begin
     if OptRegex then
-      NDelta:= 1
+      NDelta:= 2
     else
       NDelta:= Length(StrFind);
     Dec(Result, NDelta);
