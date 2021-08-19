@@ -115,7 +115,7 @@ type
     property RegexErrorMsg: string read FRegexErrorMsg;
     constructor Create;
     destructor Destroy; override;
-    function FindMatch_Regex(ASkipLen: integer; AStartPos: integer): boolean;
+    function FindMatch_Regex(AStartPos: integer): boolean;
     property MatchLen: integer read FMatchLen;
     property MatchPos: integer read FMatchPos;
     property OnProgress: TATFinderProgress read FOnProgress write FOnProgress;
@@ -893,6 +893,7 @@ var
   Pnt: TPoint;
   MarkX, MarkY: integer;
   bMarkerUsed: boolean;
+  NDelta: integer;
 begin
   bMarkerUsed:= false;
   if FPlaceMarker then
@@ -909,11 +910,16 @@ begin
   if not bMarkerUsed then
   begin
     if FinderCarets.Count>0 then
+    begin
+      if OptBack then
+        Pnt:= FinderCarets[0].GetLeftEdge
+      else
       with FinderCarets[0] do
       begin
         Pnt.X:= PosX;
         Pnt.Y:= PosY;
       end
+    end
     else
       Pnt:= Point(0, 0);
   end;
@@ -922,7 +928,13 @@ begin
 
   //find-back must goto previous match
   if OptBack then
-    Dec(Result, Length(StrFind));
+  begin
+    if OptRegex then
+      NDelta:= 1
+    else
+      NDelta:= Length(StrFind);
+    Dec(Result, NDelta);
+  end;
 
   if Result<1 then
     Result:= 1;
@@ -1554,7 +1566,7 @@ var
   SNew: UnicodeString;
 begin
   AChanged:= false;
-  Result:= FindMatch_Regex(FSkipLen, AStartPos);
+  Result:= FindMatch_Regex(AStartPos);
 
   FSkipLen:= FMatchLen+GetRegexSkipIncrement;
 
@@ -1743,7 +1755,7 @@ begin
   end;
 end;
 
-function TATTextFinder.FindMatch_Regex(ASkipLen: integer; AStartPos: integer): boolean;
+function TATTextFinder.FindMatch_Regex(AStartPos: integer): boolean;
 var
   NPos: integer;
 begin
