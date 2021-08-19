@@ -911,9 +911,6 @@ begin
   begin
     if FinderCarets.Count>0 then
     begin
-      if OptBack then
-        Pnt:= FinderCarets[0].GetLeftEdge
-      else
       with FinderCarets[0] do
       begin
         Pnt.X:= PosX;
