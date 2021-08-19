@@ -3061,6 +3061,7 @@ const
 var
   Size: TSize;
   TempC: TCanvas;
+  dc: HDC;
 begin
   if C.HandleAllocated then
   begin
@@ -3070,10 +3071,12 @@ begin
   begin
     TempC:= TCanvas.Create;
     try
-      TempC.Handle:= GetDC(0);
+      dc:= GetDC(0);
+      TempC.Handle:= dc;
       TempC.Font.Name:= Self.Font.Name;
       TempC.Font.Size:= DoScaleFont(Self.Font.Size);
       Size:= TempC.TextExtent(Sample);
+      ReleaseDC(dc, 0);
     finally
       FreeAndNil(TempC);
     end;
