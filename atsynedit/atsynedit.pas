@@ -112,6 +112,7 @@ type
   public
     ItemInvoke: TATEditorCommandInvoke;
     ItemCode: integer;
+    //don't use 'string' here! it gives crashes on freeing of editor objects
     ItemText: string[200];
   end;
 
