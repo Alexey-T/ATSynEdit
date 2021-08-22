@@ -66,6 +66,7 @@ begin
   M.Add(cCommand_TextInsertTabChar, 'insert tab char', [], []);
 
   M.Add(cCommand_ForceFinalEndOfLine, 'force final end-of-line', [], []);
+  M.Add(cCommand_DeleteFinalEndOfLine, 'delete final end-of-line', [], []);
 
   M.Add(cCommand_TextDeleteLine, 'delete line(s)', [cXControl+'+Y'], []);
   M.Add(cCommand_TextDuplicateLine, 'duplicate line(s)', [cXControl+'+D'], []);

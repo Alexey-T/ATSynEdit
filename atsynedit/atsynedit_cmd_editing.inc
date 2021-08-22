@@ -1142,6 +1142,20 @@ begin
     Result:= [];
 end;
 
+function TATSynEdit.DoCommand_DeleteFinalEndOfLine: TATCommandResults;
+var
+  N: integer;
+begin
+  N:= Strings.Count;
+  if (N>0) and (Strings.LinesLen[N-1]=0) then
+  begin
+    Strings.ActionDeleteFakeLineAndFinalEol;
+    Result:= [cResultText];
+  end
+  else
+    Result:= [];
+end;
+
 function TATSynEdit.DoCommand_Sort(AAction: TATStringsSortAction): TATCommandResults;
 var
   Caret: TATCaretItem;

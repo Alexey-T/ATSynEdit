@@ -410,6 +410,7 @@ begin
     cCommand_KeyTab:              Result:= DoCommand_TextTabulation;
     cCommand_KeyEnter:            Result:= DoCommand_TextInsertEol(false);
     cCommand_ForceFinalEndOfLine: Result:= DoCommand_ForceFinalEndOfLine;
+    cCommand_DeleteFinalEndOfLine: Result:= DoCommand_DeleteFinalEndOfLine;
 
     cCommand_Undo:                Result:= DoCommand_UndoRedo(true);
     cCommand_Redo:                Result:= DoCommand_UndoRedo(false);
