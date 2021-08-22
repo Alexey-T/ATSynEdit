@@ -112,7 +112,7 @@ type
   public
     ItemInvoke: TATEditorCommandInvoke;
     ItemCode: integer;
-    ItemText: string[120];
+    ItemText: string[200];
   end;
 
   { TATEditorCommandLog }
