@@ -112,8 +112,7 @@ type
   public
     ItemInvoke: TATEditorCommandInvoke;
     ItemCode: integer;
-    //ItemTicks: QWord;
-    ItemText: string;
+    ItemText: string[200];
   end;
 
   { TATEditorCommandLog }
