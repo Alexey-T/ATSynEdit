@@ -23,6 +23,8 @@ begin
 end;
 
 function CustomUTF8ToUnicode(Dest: PUnicodeChar; MaxDestChars: SizeUInt; Source: PChar; SourceBytes: SizeUInt): SizeUInt;
+//this is taken from System.Utf8ToUnicode,
+//instead of replacing result chars to '?' it raises exception now
 var
   InputUTF8: SizeUInt;
   IBYTE: BYTE;
