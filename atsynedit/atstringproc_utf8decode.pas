@@ -78,7 +78,8 @@ begin
           case CharLen of
             1:  begin
                   //Not valid UTF-8 sequence
-                  RaiseUTF8TextError;
+                  //RaiseUTF8TextError; ////Exception is bad here, see CudaText issue #3678
+                  UC:= Ord('?');
                 end;
             2:  begin
                   //Two bytes UTF, convert it
