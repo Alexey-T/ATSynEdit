@@ -48,7 +48,10 @@ begin
   nLineIndex:= AData.NLineIndex;
   nLineLen:= AData.NLength;
   nCharIndex:= AData.NCharIndex+ACharsSkipped;
-  bEnableHilite:= St.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
+
+  ///the following line gives problems with huge lines (len>10K) in HTML, CudaText issue #3694
+  //bEnableHilite:= St.LinesLen[nLineIndex]<=FOptMaxLineLenToTokenize;
+  bEnableHilite:= true;
 
   FillChar(AParts, SizeOf(AParts), 0);
   if nLineLen=0 then exit;
