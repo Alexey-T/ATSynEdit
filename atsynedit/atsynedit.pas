@@ -410,6 +410,7 @@ const
   cInitMinimapTooltipLinesCount = 6;
   cInitMinimapTooltipWidthPercents = 60;
   cInitMicromapVisible = false;
+  cInitMicromapOnScrollbar = false;
   cInitShowMouseSelFrame = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
@@ -813,6 +814,7 @@ type
     FMinimapDragImmediately: boolean;
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
+    FMicromapOnScrollbar: boolean;
     FMicromapScaleDiv: integer;
     FMicromapShowForMinCount: integer;
     FFoldedMarkList: TATFoldedMarks;
@@ -1909,6 +1911,7 @@ type
     property OptMinimapHiliteLinesWithSelection: boolean read FMinimapHiliteLinesWithSelection write FMinimapHiliteLinesWithSelection default true;
     property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
+    property OptMicromapOnScrollbar: boolean read FMicromapOnScrollbar write FMicromapOnScrollbar default cInitMicromapOnScrollbar;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
     property OptSpacingY: integer read FSpacingY write SetSpacingY default cInitSpacingY;
     property OptWrapMode: TATEditorWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
@@ -2180,7 +2183,7 @@ begin
   if FMinimapCharWidth=0 then
   begin
     FMinimapWidth:= ClientWidth-FTextOffset.X;
-    if FMicromapVisible then
+    if FMicromapVisible and not FMicromapOnScrollbar then
       Dec(FMinimapWidth, FRectMicromap.Width);
     FMinimapWidth:= FMinimapWidth * CharSmall div (CharSmall+CharBig);
   end
@@ -2803,7 +2806,7 @@ begin
   R.Top:= FTextOffset.Y;
   R.Right:= ClientWidth
     - IfThen(FMinimapVisible and not FMinimapAtLeft, FMinimapWidth)
-    - IfThen(FMicromapVisible, FRectMicromap.Width);
+    - IfThen(FMicromapVisible and not FMicromapOnScrollbar, FRectMicromap.Width);
   R.Bottom:= ClientHeight;
 
   FRectMainVisible:= R;
@@ -2826,7 +2829,7 @@ begin
   if FMinimapAtLeft then
     R.Left:= 0
   else
-    R.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible, FRectMicromap.Width);
+    R.Left:= ClientWidth-FMinimapWidth-IfThen(FMicromapVisible and not FMicromapOnScrollbar, FRectMicromap.Width);
 
   R.Right:= R.Left+FMinimapWidth;
   R.Top:= 0;
@@ -2850,16 +2853,17 @@ var
 begin
   NSize:= FMicromap.UpdateSizes(EditorScale(FCharSize.X));
 
-  if not FMicromapVisible then
+  if not FMicromapVisible or FMicromapOnScrollbar then
   begin
     R:= cRectEmpty;
-    exit
+  end
+  else
+  begin
+    R.Top:= 0;
+    R.Bottom:= ClientHeight;
+    R.Right:= ClientWidth;
+    R.Left:= R.Right-NSize;
   end;
-
-  R.Top:= 0;
-  R.Bottom:= ClientHeight;
-  R.Right:= ClientWidth;
-  R.Left:= R.Right-NSize;
 
   FMicromap.UpdateCoords(R.Left);
   FMicromapScaleDiv:= Max(1, Strings.Count);
@@ -2988,7 +2992,7 @@ begin
   if Assigned(FOnDrawEditor) then
     FOnDrawEditor(Self, C, FRectMain);
 
-  if FMicromapVisible then
+  if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
 
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
@@ -4458,6 +4462,7 @@ begin
 
   FMicromap:= TATMicromap.Create;
   FMicromapVisible:= cInitMicromapVisible;
+  FMicromapOnScrollbar:= cInitMicromapOnScrollbar;
   FMicromapScaleDiv:= 1;
   FMicromapShowForMinCount:= cInitMicromapShowForMinCount;
 
@@ -4964,7 +4969,8 @@ procedure TATSynEdit.SetMicromapVisible(AValue: boolean);
 begin
   if FMicromapVisible=AValue then Exit;
   FMicromapVisible:= AValue;
-  FWrapUpdateNeeded:= true;
+  if not FMicromapOnScrollbar then
+    FWrapUpdateNeeded:= true;
 end;
 
 procedure TATSynEdit.SetMinimapVisible(AValue: boolean);
@@ -5855,7 +5861,7 @@ begin
     end;
   end;
 
-  if FMicromapVisible and PtInRect(FRectMicromap, Point(X, Y)) then
+  if FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, Point(X, Y)) then
     if ActionId=cMouseActionClickSimple then
     begin
       DoEventClickMicromap(X-FRectMicromap.Left, Y-FRectMicromap.Top);
@@ -6013,7 +6019,7 @@ begin
     if Assigned(FMenuMinimap) then FMenuMinimap.PopUp;
   end
   else
-  if FMicromapVisible and PtInRect(FRectMicromap, Point(X, Y)) then
+  if FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, Point(X, Y)) then
   begin
     if Assigned(FMenuMicromap) then FMenuMicromap.PopUp;
   end
@@ -6116,7 +6122,7 @@ begin
 
   bOnMain:= PtInRect(FRectMain, P);
   bOnMinimap:= FMinimapVisible and PtInRect(FRectMinimap, P);
-  bOnMicromap:= FMicromapVisible and PtInRect(FRectMicromap, P);
+  bOnMicromap:= FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, P);
   bOnGutter:= FOptGutterVisible and PtInRect(FRectGutter, P);
   bOnGutterNumbers:= false;
   bOnGutterBookmk:= false;
