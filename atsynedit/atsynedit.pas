@@ -2860,6 +2860,8 @@ begin
 
   FMicromap.UpdateCoords(R.Left);
   FMicromapScaleDiv:= Max(1, Strings.Count);
+  if OptLastLineOnTop then
+    FMicromapScaleDiv:= Max(1, FMicromapScaleDiv+GetVisibleLines-1);
 end;
 
 procedure TATSynEdit.GetRectGutter(out R: TRect);
