@@ -1471,6 +1471,8 @@ type
     property WrapInfo: TATWrapInfo read FWrapInfo;
     property ScrollVert: TATEditorScrollInfo read FScrollVert write FScrollVert;
     property ScrollHorz: TATEditorScrollInfo read FScrollHorz write FScrollHorz;
+    property ScrollbarVert: TATScrollbar read FScrollbarVert;
+    property ScrollbarHorz: TATScrollbar read FScrollbarHorz;
     property CudatextFrame: TCustomFrame read FCudatextFrame write FCudatextFrame;
     //property BrotherEditor: TATSynEdit read FBrotherEditor write FBrotherEditor;
     property CaretShapeNormal: TATCaretShape read FCaretShapeNormal;
@@ -1511,7 +1513,8 @@ type
     property RectMicromap: TRect read FRectMicromap;
     property RectRuler: TRect read FRectRuler;
     function IndentString: UnicodeString;
-    function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
+    function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer;
+      const ARectMicromap: TRect): TRect;
     property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft;
     property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop;
     //gutter
@@ -8962,7 +8965,7 @@ begin
   end;
 end;
 
-function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer): TRect;
+function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer; const ARectMicromap: TRect): TRect;
 const
   cMinHeight = 2;
 var
@@ -8970,23 +8973,23 @@ var
 begin
   if FMicromap.IsIndexValid(AColumn) then
   begin
-    H:= FRectMicromap.Height;
+    H:= ARectMicromap.Height;
 
     if ALineFrom>=0 then
-      Result.Top:= FRectMicromap.Top + Int64(ALineFrom) * H div FMicromapScaleDiv
+      Result.Top:= ARectMicromap.Top + Int64(ALineFrom) * H div FMicromapScaleDiv
     else
-      Result.Top:= FRectMicromap.Top;
+      Result.Top:= ARectMicromap.Top;
 
     if ALineTo>=0 then
       Result.Bottom:= Max(Result.Top+cMinHeight,
-                 FRectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv)
+                 ARectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv)
     else
-      Result.Bottom:= FRectMicromap.Bottom;
+      Result.Bottom:= ARectMicromap.Bottom;
 
     with FMicromap.Columns[AColumn] do
     begin
-      Result.Left:= NLeft;
-      Result.Right:= NRight;
+      Result.Left:= NLeft - FRectMicromap.Left;
+      Result.Right:= NRight - FRectMicromap.Left;
     end;
   end
   else
