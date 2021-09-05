@@ -43,11 +43,24 @@ implementation
 constructor TATMicromap.Create;
 begin
   inherited Create;
-  SetLength(Columns, 1);
+  SetLength(Columns, 3);
   with Columns[0] do
   begin
-    NWidthPercents:= 100;
+    NWidthPercents:= 50;
     NTag:= 0;
+    NColor:= clNone;
+  end;
+  with Columns[1] do
+  begin
+    NWidthPercents:= 50;
+    NTag:= 1;
+    NColor:= clNone;
+  end;
+  with Columns[2] do
+  begin
+    NWidthPercents:= 50;
+    NTag:= 2;
+    NColor:= clNone;
   end;
 end;
 
