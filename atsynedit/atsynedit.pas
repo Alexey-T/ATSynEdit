@@ -2865,7 +2865,7 @@ begin
     R.Left:= R.Right-NSize;
   end;
 
-  FMicromap.UpdateCoords(R.Left);
+  FMicromap.UpdateCoords;
   FMicromapScaleDiv:= Max(1, Strings.Count);
   if OptLastLineOnTop then
     FMicromapScaleDiv:= Max(1, FMicromapScaleDiv+GetVisibleLines-1);
@@ -8994,8 +8994,8 @@ begin
 
     with FMicromap.Columns[AColumn] do
     begin
-      Result.Left:= NLeft - FRectMicromap.Left;
-      Result.Right:= NRight - FRectMicromap.Left;
+      Result.Left:= NLeft;
+      Result.Right:= NRight;
     end;
   end
   else
