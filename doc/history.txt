@@ -1,4 +1,7 @@
 
+2021.09.05
++ add: OptMicromapOnScrollbar (app must paint the micromap by itself, in OnDraw* event of its vertical scrollbar)
+
 2021.08.16
 * move to 'public': OptTextOffsetLeft, OptTextOffsetTop
 * rename OptCharSpacingY to OptSpacingY
