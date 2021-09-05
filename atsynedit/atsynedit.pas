@@ -327,10 +327,13 @@ type
   { TATEditorScrollInfo }
 
   TATEditorScrollInfo = record
+  private
+    procedure SetNPos(const AValue: Int64);
+  public
     Vertical: boolean;
     NMax: Int64;
     NPage: Int64;
-    NPos: Int64;
+    NPos_: Int64;
     NPosLast: Int64;
     NPixelOffset: Int64;
     SmoothCharSize: Int64;
@@ -338,6 +341,7 @@ type
     SmoothPage: Int64;
     SmoothPos: Int64;
     SmoothPosLast: Int64;
+    property NPos: Int64 read NPos_ write SetNPos; //only for debugging
     procedure Clear;
     procedure SetZero; inline;
     procedure SetLast; inline;
@@ -5090,7 +5094,7 @@ end;
 procedure TATSynEdit.SetLinesFromTop(AValue: integer);
 begin
   with FScrollVert do
-    NPos:= Max(0, NPos + (GetLinesFromTop - AValue));
+    NPos:= Max(0, Min(NPosLast, NPos + (GetLinesFromTop - AValue)));
 end;
 
 procedure TATSynEdit.SetRedoAsString(const AValue: string);

@@ -110,6 +110,12 @@ begin
   SmoothPos:= SmoothPosLast;
 end;
 
+procedure TATEditorScrollInfo.SetNPos(const AValue: Int64);
+begin
+  if NPos_=AValue then Exit;
+  NPos_:= AValue;
+end;
+
 function TATEditorScrollInfo.TopGapVisible: boolean;
 begin
   Result:= NPos=-1;

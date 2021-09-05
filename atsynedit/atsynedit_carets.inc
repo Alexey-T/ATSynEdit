@@ -642,7 +642,7 @@ begin
   if Coord.X>FRectMain.Right-FCharSize.X then
   begin
     NChars:= (Coord.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
-    Inc(FScrollHorz.NPos, NChars);
+    FScrollHorz.NPos:= FScrollHorz.NPos+NChars;
     Result:= true;
   end;
 
