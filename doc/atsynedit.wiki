@@ -1131,24 +1131,32 @@ Here is the code's logic in all these cases (with full-width characters and with
 = Auto-completion lists =
 == General API ==
 
-You need to install package from repo https://github.com/Alexey-T/ATSynEdit_Cmp .
+You need to install package ATSynEdit_Cmp, from repo https://github.com/Alexey-T/ATSynEdit_Cmp .
 
-Unit atsynedit_form_complete (from ATSynEdit_Cmp package) has the function to show completion listbox in the editor. This listbox is not modal, it only emulates modality of some degree. It keeps editor caret blinking. While completion listbox is shown, editor doesn't get keyboard input, but listbox passes typing letters/Backspace/Left/Right to the editor, so it looks like editor gets some part of keyboard input. Listbox performs insertion of chosen item on Enter/Tab keys, and it hides on Esc-key or clicking outside of the listbox.
+Unit atsynedit_cmp_form (from ATSynEdit_Cmp package) has the function to show completion listbox in the editor. This listbox is not modal, it only emulates modality of some degree. It keeps editor caret blinking. While completion listbox is shown, editor doesn't get keyboard input, but listbox passes typing letters/Backspace/Left/Right to the editor, so it looks like editor gets some part of keyboard input. Listbox performs insertion of chosen item on Enter/Tab keys, and it hides on Esc-key or clicking outside of the listbox.
 
 <syntaxhighlight lang="pascal">
 type
   TATCompletionPropEvent = procedure (Sender: TObject;
-    out AText: string; out ACharsLeft, ACharsRight: integer) of object;
+    AContent: TStringList; out ACharsLeft, ACharsRight: integer) of object;
+  TATCompletionResultEvent = procedure (Sender: TObject;
+    const ASnippetId: string; ASnippetIndex: integer) of object;
 
-procedure DoEditorCompletionListbox(AEd: TATSynEdit; AOnGetProp: TATCompletionPropEvent);
+procedure EditorShowCompletionListbox(AEd: TATSynEdit;
+  AOnGetProp: TATCompletionPropEvent;
+  AOnResult: TATCompletionResultEvent = nil;
+  AOnChoose: TATCompletionResultEvent = nil;
+  const ASnippetId: string = '';
+  ASelectedIndex: integer = 0;
+  AAllowCarets: boolean = false);
 </syntaxhighlight>
 
-Callback params:
+Callback AOnGetProp params:
 
-* AText: Chr(13)-separated lines, each line is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. For ex, this gives listbox with 3 items:
+* AContent: list of lines, each line is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. For example, this list makes the listbox line of 3 columns:
 
 <syntaxhighlight lang="pascal">
-AText:= 'func|Func1|(param1, param2)'#9'Func desc' + #13 + 'var|Var1' + #13 + 'var|Var2';
+  'func|FuncName|(param1, param2)'#9'Func description';
 </syntaxhighlight>
 
 ** If you need to insert not only S_text but also additional substring (showing in the listbox only S_text), use such S_text: S_text+#1+S_before_caret+#1+S_after_caret (also substrings will be added before and after caret). This is used by HTML autocompletion: here S_before_caret is ">" and S_after_caret is "</tag>".
@@ -1159,8 +1167,8 @@ AText:= 'func|Func1|(param1, param2)'#9'Func desc' + #13 + 'var|Var1' + #13 + 'v
 
 Notes:
 
-* Func don't work for a) read-only editor, b) multi-carets.
-* You can change colors/sizes/font of listbox: see unit source.
+* Function EditorShowCompletionListbox doesn't work for a) read-only editor, b) multi-carets.
+* You can change colors/sizes/font of listbox: see unit source, it gives the global variable (record with many fields).
 
 == SynWrite acp files ==
 Unit atsynedit_form_complete_synwrite has function to show auto-completion listbox, from SynWrite .acp files.
