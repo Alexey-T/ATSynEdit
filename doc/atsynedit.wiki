@@ -1153,7 +1153,7 @@ procedure EditorShowCompletionListbox(AEd: TATSynEdit;
 
 Callback AOnGetProp params:
 
-* AContent: list of lines, each line is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. For example, this list makes the listbox line of 3 columns:
+* AContent: list of lines, each line is S_id+'|'+S_text+'|'+S_desc. S_id is a prefix before actual text (good to pass here short texts: "var", "func"). S_text (it is usually second item) is text which is inserted into editor on closing listbox. After id/text several items may exist, all '|'-separated, they will show in additional listbox columns. For example, this TStringList line makes the listbox line of 3 columns:
 
 <syntaxhighlight lang="pascal">
   'func|FuncName|(param1, param2)'#9'Func description';
