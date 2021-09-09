@@ -1129,7 +1129,7 @@ Here is the code's logic in all these cases (with full-width characters and with
 ==more==
 
 = Auto-completion lists =
-== General API ==
+== General auto-completion API ==
 
 You need to install package ATSynEdit_Cmp, from repo https://github.com/Alexey-T/ATSynEdit_Cmp .
 
@@ -1167,34 +1167,32 @@ Notes:
 * Function EditorShowCompletionListbox doesn't work for a) read-only editor, b) multi-carets.
 * You can change colors/sizes/font of listbox: see unit source, it gives the global variable (record with many fields).
 
-== SynWrite acp files ==
-Unit atsynedit_form_complete_synwrite has function to show auto-completion listbox, from SynWrite .acp files.
-Acp file must be in the format described in SynWrite help file. You may copy acp files from SynWrite distro, or from additional lexers (zip files at sf.net). "Control line" in acp file is suppoted.
-
-Function reads text under caret and leaves only items which match the text. Like SynWrite.
+== Auto-completion using acp-files ==
+Unit atsynedit_cmp_acpfiles has the function to show auto-completion listbox, from CudaText/SynWrite .acp files.
+Acp file must be in the format described in the SynWrite help file. You may copy acp files from CudaText distro, or from additional lexers, ie from CudaText lexers on CudaText.SF.net.
 
 [[File:cudatext-php-complete.png]]
 
-== CSS files ==
-Unit atsynedit_form_complete_css has function to show auto-completion listbox, for CSS syntax.
-You must pass path of file "css_list.ini" from SynWrite distro (it is list of css tags/values).
-Completion works in 2 modes: 
+== Auto-completion for CSS ==
+Unit atsynedit_cmp_css has the function to show auto-completion listbox, for CSS syntax.
+You must pass path of the file "data/autocompletespec/css_list.ini" from CudaText distro.
+CSS completion supports several modes: 
 
 * caret is on css attrib before ":" char - then list of css attribs is shown (which match the substring under caret), 
 * caret is after css attrib and ":" char (before closing ";") - then list of values for this attrib is shown.
+* and more
 
 [[File:cudatext-css-complete.png]]
 
-==HTML files==
-Unit atsynedit_form_complete_html has function to show auto-completion listbox, for HTML syntax. You must pass path of file "html_list.ini" from SynWrite distro. Completion works in modes: 
+== Auto-completion for HTML ==
+Unit atsynedit_cmp_html has the function to show auto-completion listbox, for HTML syntax. You must pass path of the file "data/autocompletespec/html_list.ini" from CudaText distro. HTML completion supports several modes: 
 
 * caret on opening/closing tag name: list of tags shown
 * caret after tag, on attribute place before "=": list of attribs for found tag shown
 * caret after tag, after attribute, after "=": list of values of found tag+attrib shown
+* and more
 
 [[File:cudatext-html-complete.png]]
-
-== more ==
 
 = Finder =
 
