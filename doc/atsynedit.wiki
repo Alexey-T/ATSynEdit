@@ -1131,7 +1131,7 @@ Here is the code's logic in all these cases (with full-width characters and with
 = Auto-completion lists =
 == General API ==
 
-You need to install package from repo https://github.com/Alexey-T/ATSynEdit_Ex .
+You need to install package from repo https://github.com/Alexey-T/ATSynEdit_Cmp .
 
 Unit atsynedit_form_complete has function to show completion-listbox for editor. Listbox is not modal. It keeps editor caret blinking. While listbox shown, editor don't get keyboard input, but listbox passes typed chars/Backspace/Left/Right to editor. Listbox replaces text on Enter/Tab keys, hides on Esc or clicking outside.
 
