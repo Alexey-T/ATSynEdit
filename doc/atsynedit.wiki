@@ -1133,7 +1133,7 @@ Here is the code's logic in all these cases (with full-width characters and with
 
 You need to install package from repo https://github.com/Alexey-T/ATSynEdit_Cmp .
 
-Unit atsynedit_form_complete has function to show completion-listbox for editor. Listbox is not modal. It keeps editor caret blinking. While listbox shown, editor don't get keyboard input, but listbox passes typed chars/Backspace/Left/Right to editor. Listbox replaces text on Enter/Tab keys, hides on Esc or clicking outside.
+Unit atsynedit_form_complete (from ATSynEdit_Cmp package) has the function to show completion listbox in the editor. This listbox is not modal, it only emulates modality of some degree. It keeps editor caret blinking. While completion listbox is shown, editor doesn't get keyboard input, but listbox passes typing letters/Backspace/Left/Right to the editor, so it looks like editor gets some part of keyboard input. Listbox performs insertion of chosen item on Enter/Tab keys, and it hides on Esc-key or clicking outside of the listbox.
 
 <syntaxhighlight lang="pascal">
 type
