@@ -567,6 +567,7 @@ begin
 end;
 
 procedure TATSynEdit.DoCommand(ACmd: integer; AInvoke: TATEditorCommandInvoke; const AText: atString = '');
+// AInvoke is used only by CudaText, you may pass any value here
 var
   Caret: TATCaretItem;
   Res: TATCommandResults;
