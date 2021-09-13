@@ -260,7 +260,8 @@ begin
   begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
-    //fixing CudaText issue #3708, syntax highlight is broken after Undo
+    //fixing CudaText issue #3708, syntax highlight is broken after Undo,
+    //with "Commands History" plugin (cannot find how plugin breaks it)
     if bUndoRedo and (Carets.Count>0) then
       NLineChanged:= Carets[0].FirstTouchedLine
     else
