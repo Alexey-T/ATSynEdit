@@ -173,6 +173,7 @@ var
   bNeedRepaint, bAllowRepaint: boolean;
   bUndoRedo: boolean;
   bAllowCaretScroll: boolean;
+  NLineChanged: integer;
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
@@ -259,7 +260,12 @@ begin
   begin
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
-    DoEventChange;
+    //fixing CudaText issue #3708, syntax highlight is broken after Undo
+    if bUndoRedo and (Carets.Count>0) then
+      NLineChanged:= Carets[0].FirstTouchedLine
+    else
+      NLineChanged:= -1;
+    DoEventChange(NLineChanged);
   end;
 
   if cResultState in Res then
