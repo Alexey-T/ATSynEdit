@@ -247,8 +247,8 @@ type
     function DoAction_ReplaceSelected(AUpdateCaret: boolean): boolean;
     procedure DoAction_FindAll(AResults: TATFinderResults; AWithEvent: boolean);
     function DoAction_CountAll(AWithEvent: boolean): integer;
-    procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList; ASorted: boolean;
-      ADuplicates: TDuplicates);
+    procedure DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList;
+      ASorted, ACaseSens: boolean; ADuplicates: TDuplicates);
     function DoAction_ReplaceAll: integer;
     function DoAction_HighlightAllEditorMatches(AColorBorder: TColor;
       AStyleBorder: TATLineStyle; ATagValue, AMaxLines: integer): integer;
@@ -984,7 +984,7 @@ end;
 
 
 procedure TATEditorFinder.DoAction_ExtractAll(AWithEvent: boolean; AMatches: TStringList;
-  ASorted: boolean; ADuplicates: TDuplicates);
+  ASorted, ACaseSens: boolean; ADuplicates: TDuplicates);
 var
   ListRes: TATFinderResults;
   Res: TATFinderResult;
@@ -1003,6 +1003,7 @@ begin
     AMatches.TextLineBreakStyle:= tlbsLF;
     AMatches.Sorted:= ASorted;
     AMatches.Duplicates:= ADuplicates;
+    AMatches.CaseSensitive:= ACaseSens;
 
     DoCollect_Regex(ListRes, 1, AWithEvent, false);
     for i:= 0 to ListRes.Count-1 do
