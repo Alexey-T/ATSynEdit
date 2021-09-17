@@ -5321,8 +5321,6 @@ procedure TATSynEdit.PaintEx(ALineNumber: integer);
 var
   R: TRect;
 begin
-  FLastPaintDidScrolling:= false;
-
   //experimental, reduce flickering on typing in Markdown
   FOptAllowRepaintOnTextChange:= not IsNormalLexerActive;
 
@@ -5369,9 +5367,6 @@ begin
   end;
 
   DoPaintMarkerOfDragDrop(Canvas);
-
-  if FLastPaintDidScrolling then
-    DoEventScroll;
 
   if OptEditorDebugTiming then
   begin
@@ -6635,6 +6630,12 @@ begin
 
   Include(FPaintFlags, cIntFlagBitmap);
   inherited;
+
+  if FLastPaintDidScrolling then
+  begin
+    FLastPaintDidScrolling:= false;
+    DoEventScroll;
+  end;
 end;
 
 function TATSynEdit._IsFocused: boolean;
