@@ -320,6 +320,7 @@ type
 
   TATEditorInternalFlag = (
     cIntFlagBitmap,
+    cIntFlagScrolled,
     cIntFlagResize
     );
   TATEditorInternalFlags = set of TATEditorInternalFlag;
@@ -698,7 +699,6 @@ type
     FLastLineOfSlowEvents: integer;
     FLastUndoTick: QWord;
     FLastUndoPaused: boolean;
-    FLastPaintDidScrolling: boolean;
     FLineTopTodo: integer;
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
@@ -2698,7 +2698,7 @@ begin
   begin
     FPrevHorz:= FScrollHorz;
     FPrevVert:= FScrollVert;
-    FLastPaintDidScrolling:= true;
+    Include(FPaintFlags, cIntFlagScrolled);
   end;
 end;
 
@@ -6631,9 +6631,9 @@ begin
   Include(FPaintFlags, cIntFlagBitmap);
   inherited;
 
-  if FLastPaintDidScrolling then
+  if cIntFlagScrolled in FPaintFlags then
   begin
-    FLastPaintDidScrolling:= false;
+    Exclude(FPaintFlags, cIntFlagScrolled);
     DoEventScroll;
   end;
 end;
