@@ -167,8 +167,8 @@ begin
 
   M.Add(cCommand_ClipboardAltPaste, 'primary selection (Linux): paste', [], []);
 
-  M.Add(cCommand_ScrollToBegin, 'scroll to begin', [], []);
-  M.Add(cCommand_ScrollToEnd, 'scroll to end', [], []);
+  M.Add(cCommand_ScrollToBegin, 'scroll to document begin', [], []);
+  M.Add(cCommand_ScrollToEnd, 'scroll to document end', [], []);
   M.Add(cCommand_ScrollLineUp, 'scroll line up', [cXControl+'+Up'], []);
   M.Add(cCommand_ScrollLineDown, 'scroll line down', [cXControl+'+Down'], []);
   M.Add(cCommand_ScrollPageUp, 'scroll page up', [], []);
