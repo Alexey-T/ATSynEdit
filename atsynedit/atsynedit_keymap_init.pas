@@ -179,6 +179,7 @@ begin
   M.Add(cCommand_ScrollToCaretBottom, 'scroll to bottom caret (of multi-carets)', [], []);
   M.Add(cCommand_ScrollToCaretLeft, 'scroll to left caret (of multi-carets)', [], []);
   M.Add(cCommand_ScrollToCaretRight, 'scroll to right caret (of multi-carets)', [], []);
+  M.Add(cCommand_ScrollToLeft, 'scroll to left edge', [], []);
 
   M.Add(cCommand_MoveSelectionUp, 'move selected lines up', ['Alt+Up'], []);
   M.Add(cCommand_MoveSelectionDown, 'move selected lines down', ['Alt+Down'], []);

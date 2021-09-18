@@ -372,6 +372,12 @@ begin
       Include(Result, cResultCaretAny);
 end;
 
+function TATSynEdit.DoCommand_ScrollToLeft: TATCommandResults;
+begin
+  FScrollHorz.SetZero;
+  Result:= [cResultScroll];
+end;
+
 
 function TATSynEdit.DoCommand_ScrollToBeginOrEnd(AToBegin: boolean): TATCommandResults;
 begin

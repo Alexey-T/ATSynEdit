@@ -499,6 +499,7 @@ begin
     cCommand_ScrollToCaretBottom:      Result:= [cResultCaretBottom];
     cCommand_ScrollToCaretLeft:        Result:= [cResultCaretLeft];
     cCommand_ScrollToCaretRight:       Result:= [cResultCaretRight];
+    cCommand_ScrollToLeft:             Result:= DoCommand_ScrollToLeft;
 
     cCommand_Sort_Asc:                 Result:= DoCommand_Sort(cSortActionAsc);
     cCommand_Sort_AscNoCase:           Result:= DoCommand_Sort(cSortActionAscNoCase);

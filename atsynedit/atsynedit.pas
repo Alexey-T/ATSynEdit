@@ -1366,6 +1366,7 @@ type
     function DoCommand_GotoScreenSide(ASide: TATCaretScreenSide): TATCommandResults;
     function DoCommand_ScrollToBeginOrEnd(AToBegin: boolean): TATCommandResults;
     function DoCommand_ScrollByDelta(ALines, AColumns: integer; AKeepCaretOnScreen: boolean): TATCommandResults;
+    function DoCommand_ScrollToLeft: TATCommandResults;
     function DoCommand_TextInsertTabSpacesAtCarets(AOvrMode: boolean): TATCommandResults;
     function DoCommand_TextTabulation: TATCommandResults;
     function DoCommand_KeyHome: TATCommandResults;
