@@ -6684,11 +6684,16 @@ begin
   PClient.Y:= Min(FRectMain.Bottom, PClient.Y);
 
   case FMouseAutoScroll of
-    cDirUp:    DoScrollByDelta(0, -cSpeedScrollAutoVert);
-    cDirDown:  DoScrollByDelta(0, cSpeedScrollAutoVert);
-    cDirLeft:  DoScrollByDelta(-cSpeedScrollAutoHorz, 0);
-    cDirRight: DoScrollByDelta(cSpeedScrollAutoHorz, 0);
-    else Exit;
+    cDirUp:
+      DoScrollByDelta(0, -cSpeedScrollAutoVert);
+    cDirDown:
+      DoScrollByDelta(0, cSpeedScrollAutoVert);
+    cDirLeft:
+      DoScrollByDelta(-cSpeedScrollAutoHorz, 0);
+    cDirRight:
+      DoScrollByDelta(cSpeedScrollAutoHorz, 0);
+    else
+      Exit;
   end;
 
   PCaret:= ClientPosToCaretPos(PClient, Details);
@@ -6714,7 +6719,6 @@ begin
 
   DoCaretsSort;
   DoEventCarets;
-  //DoEventScroll;
   Invalidate;
 end;
 
