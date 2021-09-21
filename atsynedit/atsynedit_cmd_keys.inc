@@ -502,9 +502,22 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_Cancel: TATCommandResults;
+function TATSynEdit.DoCommand_Cancel(AKeepLast: boolean): TATCommandResults;
+var
+  NX, NY: integer;
 begin
-  DoCaretSingleAsIs;
+  if AKeepLast and (Carets.Count>0) then
+  begin
+    with Carets[Carets.Count-1] do
+    begin
+      NX:= PosX;
+      NY:= PosY;
+    end;
+    DoCaretSingle(NX, NY);
+  end
+  else
+    DoCaretSingleAsIs;
+
   DoSelect_None;
 
   FMouseDragDropping:= false;

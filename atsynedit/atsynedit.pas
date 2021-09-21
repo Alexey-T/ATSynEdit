@@ -1349,7 +1349,7 @@ type
     function DoCommand_SelectInverted: TATCommandResults;
     function DoCommand_SelectSplitToLines: TATCommandResults;
     function DoCommand_SelectExtendByLine: TATCommandResults;
-    function DoCommand_Cancel: TATCommandResults;
+    function DoCommand_Cancel(AKeepLast: boolean): TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;
     function DoCommand_ToggleWordWrap(AltOrder: boolean): TATCommandResults;

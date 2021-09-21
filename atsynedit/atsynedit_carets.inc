@@ -741,14 +741,16 @@ begin
 end;
 
 procedure TATSynEdit.DoCaretSingleAsIs;
+var
+  i: integer;
 begin
   FSelRect:= cRectEmpty;
 
   if Carets.Count=0 then
-    Carets.Add(0, 0);
-
-  while Carets.Count>1 do
-    Carets.Delete(Carets.Count-1);
+    Carets.Add(0, 0)
+  else
+  for i:= Carets.Count-1 downto 1{not 0} do
+    Carets.Delete(i);
 end;
 
 

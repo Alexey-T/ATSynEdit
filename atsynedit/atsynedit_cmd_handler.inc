@@ -559,7 +559,9 @@ begin
     cCommand_FoldingToggleAtCurLine:   Result:= DoCommand_FoldRangeAtCurLine(cFoldingToggle);
     cCommand_FoldingFoldSelection:     Result:= DoCommand_FoldSelection;
 
-    cCommand_Cancel:                   Result:= DoCommand_Cancel;
+    cCommand_Cancel:                   Result:= DoCommand_Cancel(false);
+    cCommand_CancelKeepLast:           Result:= DoCommand_Cancel(true);
+
     cCommand_CaretsExtendUpLine:       Result:= DoCommand_CaretsExtend(false, 1);
     cCommand_CaretsExtendUpPage:       Result:= DoCommand_CaretsExtend(false, GetPageLines);
     cCommand_CaretsExtendUpToTop:      Result:= DoCommand_CaretsExtend(false, Strings.Count);
