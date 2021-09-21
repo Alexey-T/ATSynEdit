@@ -1,4 +1,7 @@
 
+2021.09.21
++ add: 3 commands "cancel carets, but keep ...."
+
 2021.09.05
 + add: OptMicromapOnScrollbar (app must paint the micromap by itself, in OnDraw* event of its vertical scrollbar)
 
