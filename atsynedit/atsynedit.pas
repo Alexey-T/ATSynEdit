@@ -416,6 +416,7 @@ const
   cInitMinimapTooltipWidthPercents = 60;
   cInitMicromapVisible = false;
   cInitMicromapOnScrollbar = false;
+  cInitMicromapBookmarks = false;
   cInitShowMouseSelFrame = true;
   cInitMarginRight = 80;
   cInitTabSize = 8;
@@ -819,6 +820,7 @@ type
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
     FMicromapOnScrollbar: boolean;
+    FMicromapBookmarks: boolean;
     FMicromapScaleDiv: integer;
     FMicromapShowForMinCount: integer;
     FFoldedMarkList: TATFoldedMarks;
@@ -1917,6 +1919,7 @@ type
     property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapOnScrollbar: boolean read FMicromapOnScrollbar write FMicromapOnScrollbar default cInitMicromapOnScrollbar;
+    property OptMicromapBookmarks: boolean read FMicromapBookmarks write FMicromapBookmarks default cInitMicromapBookmarks;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
     property OptSpacingY: integer read FSpacingY write SetSpacingY default cInitSpacingY;
     property OptWrapMode: TATEditorWrapMode read FWrapMode write SetWrapMode default cInitWrapMode;
@@ -4468,6 +4471,7 @@ begin
   FMicromap:= TATMicromap.Create;
   FMicromapVisible:= cInitMicromapVisible;
   FMicromapOnScrollbar:= cInitMicromapOnScrollbar;
+  FMicromapBookmarks:= cInitMicromapBookmarks;
   FMicromapScaleDiv:= 1;
   FMicromapShowForMinCount:= cInitMicromapShowForMinCount;
 
