@@ -47,11 +47,13 @@ var
 
 var
   //Win: seems no slowdown from offsets
-  //macOS: better use offsets, fonts have floating width value, e.g. 10.2 pixels
+  //macOS: better to use True, fonts have floating width value, e.g. 10.2 pixels
+  //       but we use False, because with the Zoe's patch to LCL it's 2x faster TextOut
+  //       https://forum.lazarus.freepascal.org/index.php/topic,55431.0.html
   //Linux Qt5: same as for macOS
   //Linux GTK2: big slowdown from offsets
   OptEditorTextoutNeedsOffsets: boolean =
-    {$if defined(windows) or defined(darwin) or defined(LCLQt5)}
+    {$if defined(windows) or defined(LCLQt5)}
     true
     {$else}
     false
