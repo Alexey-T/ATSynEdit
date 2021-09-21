@@ -104,8 +104,11 @@ begin
   M.Add(cCommand_SelectWords, 'selection: select words at carets', [], []);
   M.Add(cCommand_SelectLines, 'selection: select lines at carets', [], []);
   M.Add(cCommand_SelectNone, 'selection: cancel selection', [], []);
-  M.Add(cCommand_Cancel, 'selection: cancel carets, selection, drag-drop', ['Esc'], []);
-  M.Add(cCommand_CancelKeepLast, 'selection: cancel carets, keep last caret', [], []);
+
+  M.Add(cCommand_Cancel, 'selection: cancel carets + selection + drag-drop', ['Esc'], []);
+  M.Add(cCommand_CancelKeepSel, 'selection: cancel carets, but keep selection', [], []);
+  M.Add(cCommand_CancelKeepLast, 'selection: cancel carets, but keep last caret', [], []);
+  M.Add(cCommand_CancelKeepLastAndSel, 'selection: cancel carets, but keep last caret + selection', [], []);
   M.Add(cCommand_RemoveFirstCaret, 'selection: remove first caret', [], []);
   M.Add(cCommand_RemoveLastCaret, 'selection: remove last caret', [], []);
 

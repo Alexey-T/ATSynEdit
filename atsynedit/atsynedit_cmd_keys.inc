@@ -502,23 +502,20 @@ begin
 end;
 
 
-function TATSynEdit.DoCommand_Cancel(AKeepLast: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_Cancel(AKeepLast, AKeepSel: boolean): TATCommandResults;
 var
-  NX, NY: integer;
+  i: integer;
 begin
   if AKeepLast and (Carets.Count>0) then
   begin
-    with Carets[Carets.Count-1] do
-    begin
-      NX:= PosX;
-      NY:= PosY;
-    end;
-    DoCaretSingle(NX, NY);
+    for i:= Carets.Count-2 downto 0 do
+      Carets.Delete(i);
   end
   else
     DoCaretSingleAsIs;
 
-  DoSelect_None;
+  if not AKeepSel then
+    DoSelect_None;
 
   FMouseDragDropping:= false;
   FMouseDragDroppingReal:= false;
