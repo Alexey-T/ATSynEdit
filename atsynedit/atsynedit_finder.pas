@@ -849,6 +849,8 @@ begin
 
   BeginTiming;
   Result:= FindMatch_InEditor(APosStart, PosEnd, false);
+  if not Result and OptWrapped then
+    Result:= FindMatch_InEditor(Point(0, 0), APosStart, false);
   EndTiming;
 end;
 
