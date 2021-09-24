@@ -54,6 +54,7 @@ type
   public
     VisibleColumns: integer;
     WrapColumn: integer;
+    EditorIndex: integer;
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Clear;
@@ -134,12 +135,10 @@ begin
 end;
 
 function TATWrapInfo.IsLineFolded(ALine: integer): boolean;
-const
-  FEditorIndex = 0;
 begin
   Result:= false;
   if not StringsObj.IsIndexValid(ALine) then exit;
-  Result:= StringsObj.LinesHidden[ALine, FEditorIndex];
+  Result:= StringsObj.LinesHidden[ALine, EditorIndex];
 end;
 
 constructor TATWrapInfo.Create;

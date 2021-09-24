@@ -1036,6 +1036,7 @@ type
     function IsCaretOnVisibleRect: boolean;
     function IsInvalidateAllowed: boolean; inline;
     function IsNormalLexerActive: boolean;
+    procedure SetEditorIndex(AValue: integer);
     procedure SetOptScaleFont(AValue: integer);
     procedure UpdateGapForms(ABeforePaint: boolean);
     procedure UpdateAndWait(AUpdateWrapInfo: boolean; APause: integer);
@@ -1492,7 +1493,7 @@ type
     property Modified: boolean read GetModified write SetModified;
     property AdapterForHilite: TATAdapterHilite read FAdapterHilite write FAdapterHilite;
     property AdapterIME: TATAdapterIME read FAdapterIME write FAdapterIME;
-    property EditorIndex: integer read FEditorIndex write FEditorIndex;
+    property EditorIndex: integer read FEditorIndex write SetEditorIndex;
     property LineTop: integer read GetLineTop write SetLineTop;
     property LineBottom: integer read FLineBottom;
     property LinesFromTop: integer read GetLinesFromTop write SetLinesFromTop;
@@ -5322,6 +5323,13 @@ begin
   Result:= true;
 end;
 
+procedure TATSynEdit.SetEditorIndex(AValue: integer);
+begin
+  if FEditorIndex=AValue then Exit;
+  FEditorIndex:= AValue;
+  FWrapInfo.EditorIndex:= AValue;
+end;
+
 procedure TATSynEdit.PaintEx(ALineNumber: integer);
 var
   R: TRect;
@@ -6816,6 +6824,7 @@ begin
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
+    if Caret.CoordX=-1 then Continue;
     R.Left:= Caret.CoordX;
     R.Top:= Caret.CoordY;
     R.Right:= R.Left+FCharSize.X;
