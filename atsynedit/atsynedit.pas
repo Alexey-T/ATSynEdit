@@ -6832,7 +6832,7 @@ begin
     if FCaretBlinkEnabled then
     begin
       //this block is to solve 'ghost caret on typing'
-      // https://github.com/Alexey-T/CudaText/issues/3167
+      //CudaText issue #3167
       if not FCaretShown then
       begin
         if Caret.OldRect.Width>0 then
