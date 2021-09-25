@@ -838,6 +838,7 @@ function TATEditorFinder.DoAction_FindSimple(const APosStart: TPoint): boolean;
 var
   Cnt: integer;
   PosEnd: TPoint;
+  bStartAtEdge: boolean;
 begin
   UpdateCarets(true);
   if OptRegex then
@@ -846,10 +847,11 @@ begin
   Cnt:= Editor.Strings.Count;
   PosEnd.X:= Editor.Strings.LinesLen[Cnt-1];
   PosEnd.Y:= Cnt-1;
+  bStartAtEdge:= (APosStart.X=0) and (APosStart.Y=0);
 
   BeginTiming;
   Result:= FindMatch_InEditor(APosStart, PosEnd, false);
-  if not Result and OptWrapped then
+  if not Result and OptWrapped and not bStartAtEdge then
     Result:= FindMatch_InEditor(Point(0, 0), APosStart, false);
   EndTiming;
 end;
@@ -1421,11 +1423,15 @@ begin
 
   Result:= DoFindOrReplace_InEditor_Internal(AReplace, AForMany, AChanged, PosStart, PosEnd, AUpdateCaret);
 
-  if not Result and OptWrapped and not OptInSelection then
+  if not OptBack then
+    bStartAtEdge:= (PosStart.X=0) and (PosStart.Y=0)
+  else
+    bStartAtEdge:= (PosStart.X=NLastX) and (PosStart.Y=NLastY);
+
+  if not Result and OptWrapped and not OptInSelection and not bStartAtEdge then
   begin
     if not OptBack then
     begin
-      bStartAtEdge:= (PosStart.X=0) and (PosStart.Y=0);
       SecondEnd.X:= PosStart.X;
       SecondEnd.Y:= PosStart.Y;
       SecondStart.X:= 0;
@@ -1433,25 +1439,21 @@ begin
     end
     else
     begin
-      bStartAtEdge:= (PosStart.X=NLastX) and (PosStart.Y=NLastY);
       SecondEnd.X:= PosStart.X;
       SecondEnd.Y:= PosStart.Y;
       SecondStart.X:= NLastX;
       SecondStart.Y:= NLastY;
     end;
 
-    if not bStartAtEdge then
+    //same as _buffered version:
+    //we must have AReplace=false
+    //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
+    if DoFindOrReplace_InEditor_Internal(false, AForMany, AChanged, SecondStart, SecondEnd, AUpdateCaret) then
     begin
-      //same as _buffered version:
-      //we must have AReplace=false
-      //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
-      if DoFindOrReplace_InEditor_Internal(false, AForMany, AChanged, SecondStart, SecondEnd, AUpdateCaret) then
-      begin
-        Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, PosStart.X, PosStart.Y, false)) or
-                 (OptBack and IsPosSorted(PosStart.X, PosStart.Y, FMatchEdPos.X, FMatchEdPos.Y, false));
-        if not Result then
-          ClearMatchPos;
-      end;
+      Result:= (not OptBack and IsPosSorted(FMatchEdPos.X, FMatchEdPos.Y, PosStart.X, PosStart.Y, false)) or
+               (OptBack and IsPosSorted(PosStart.X, PosStart.Y, FMatchEdPos.X, FMatchEdPos.Y, false));
+      if not Result then
+        ClearMatchPos;
     end;
   end;
 end;
@@ -1527,6 +1529,7 @@ function TATEditorFinder.DoFindOrReplace_Buffered(AReplace, AForMany: boolean;
   out AChanged: boolean; AUpdateCaret: boolean): boolean;
 var
   NStartPos: integer;
+  bStartAtEdge: boolean;
 begin
   Result:= false;
   AChanged:= false;
@@ -1540,9 +1543,13 @@ begin
   else
     Result:= DoFindOrReplace_Buffered_Internal(AReplace, AForMany, AChanged, NStartPos, AUpdateCaret);
 
-  if (not Result) and (OptWrapped and not OptInSelection) then
-    if (not OptBack and (NStartPos>1)) or
-       (OptBack and (NStartPos<Length(StrText))) then
+  if not OptBack then
+    bStartAtEdge:= NStartPos<=1
+  else
+    bStartAtEdge:= NStartPos>=Length(StrText);
+
+  if not Result and OptWrapped and not OptInSelection
+    and not bStartAtEdge then
     begin
       //we must have AReplace=false
       //(if not, need more actions: don't allow to replace in wrapped part if too big pos)
