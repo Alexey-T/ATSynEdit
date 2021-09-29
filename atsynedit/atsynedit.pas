@@ -1524,7 +1524,7 @@ type
     property RectRuler: TRect read FRectRuler;
     function IndentString: UnicodeString;
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer;
-      const ARectMicromap: TRect): TRect;
+      const ARectMicromap: TRect; AMinMarkHeight: integer): TRect;
     property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft;
     property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop;
     //gutter
@@ -8994,9 +8994,8 @@ begin
   end;
 end;
 
-function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer; const ARectMicromap: TRect): TRect;
-const
-  cMinHeight = 2;
+function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer;
+  const ARectMicromap: TRect; AMinMarkHeight: integer): TRect;
 var
   H: integer;
 begin
@@ -9010,7 +9009,7 @@ begin
       Result.Top:= ARectMicromap.Top;
 
     if ALineTo>=0 then
-      Result.Bottom:= Max(Result.Top+cMinHeight,
+      Result.Bottom:= Max(Result.Top + AMinMarkHeight,
                  ARectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv)
     else
       Result.Bottom:= ARectMicromap.Bottom;
