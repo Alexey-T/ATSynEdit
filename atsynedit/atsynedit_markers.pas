@@ -87,7 +87,7 @@ type
       AMicromapMode: TATMarkerMicromapMode=mmmShowInTextOnly;
       ALineLen: integer=0);
     procedure DeleteInRange(AX1, AY1, AX2, AY2: integer);
-    procedure DeleteWithTag(const ATag: Int64);
+    function DeleteWithTag(const ATag: Int64): boolean;
     procedure Find(AX, AY: integer; out AIndex: integer; out AExactMatch: boolean);
     function FindContaining(AX, AY: integer): integer;
     property AsArray: TATInt64Array read GetAsArray write SetAsArray;
@@ -348,11 +348,13 @@ begin
   end;
 end;
 
-procedure TATMarkers.DeleteWithTag(const ATag: Int64);
+function TATMarkers.DeleteWithTag(const ATag: Int64): boolean;
 var
   bAllTagged: boolean;
   i: integer;
 begin
+  Result:= false;
+
   bAllTagged:= true;
   for i:= 0 to Count-1 do
     if ItemPtr(i)^.Tag<>ATag then
@@ -362,11 +364,17 @@ begin
     end;
 
   if bAllTagged then
-    Clear
+  begin
+    Clear;
+    Result:= true;
+  end
   else
   for i:= Count-1 downto 0 do
     if ItemPtr(i)^.Tag=ATag then
+    begin
       Delete(i);
+      Result:= true;
+    end;
 end;
 
 function _ComparePoints(X1, Y1, X2, Y2: integer): integer; inline;
