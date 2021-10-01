@@ -137,6 +137,7 @@ begin
   for i:= $2070 to $209F do
     FixedSizes[i]:= _norm;
 
+  FixedSizes[$2026]:= _full; //ellipsis char should be full-width
   FixedSizes[$20AC]:= _norm;
   FixedSizes[$2122]:= _norm;
 
