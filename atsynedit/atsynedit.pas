@@ -925,6 +925,7 @@ type
     FOptBorderWidthFocused: integer;
     FOptBorderWidthMacro: integer;
     FOptBorderFocusedActive: boolean;
+    FOptBorderMacroRecording: boolean;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
     FOptRulerHeightPercents: integer;
@@ -1902,6 +1903,7 @@ type
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default cInitBorderWidthFocused;
     property OptBorderWidthMacro: integer read FOptBorderWidthMacro write FOptBorderWidthMacro default cInitBorderWidthMacro;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
+    property OptBorderMacroRecording: boolean read FOptBorderMacroRecording write FOptBorderMacroRecording default true;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
     property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cSizeRulerHeightPercents;
@@ -3009,7 +3011,7 @@ begin
   if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
 
-  if FIsMacroRecording then
+  if FOptBorderMacroRecording and FIsMacroRecording then
     DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro)
   else
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
@@ -4570,6 +4572,7 @@ begin
   FOptBorderWidthFocused:= cInitBorderWidthFocused;
   FOptBorderWidthMacro:= cInitBorderWidthMacro;
   FOptBorderFocusedActive:= false;
+  FOptBorderMacroRecording:= true;
 
   FOptRulerVisible:= true;
   FOptRulerNumeration:= cInitRulerNumeration;
