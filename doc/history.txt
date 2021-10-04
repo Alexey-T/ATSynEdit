@@ -1,4 +1,8 @@
 
+2021.10.04
++ add: prop ModeMacroRecording (uses Colors.Markers)
++ add: prop OptBorderWidthMacro
+
 2021.09.21
 + add: 3 commands "cancel carets, but keep ...."
 

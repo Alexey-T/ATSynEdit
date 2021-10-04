@@ -402,6 +402,7 @@ const
   cInitBorderVisible = true;
   cInitBorderWidth = 1;
   cInitBorderWidthFocused = 1;
+  cInitBorderWidthMacro = 3;
   cInitRulerNumeration = cRulerNumeration_0_10_20;
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
@@ -704,6 +705,7 @@ type
     FIsCaretShapeChangedFromAPI: boolean;
     FIsReadOnlyChanged: boolean;
     FIsReadOnlyAutodetected: boolean;
+    FIsMacroRecording: boolean;
     FIsRunningCommand: boolean;
     FCursorOnMinimap: boolean;
     FCursorOnGutter: boolean;
@@ -921,6 +923,7 @@ type
     FOptBorderVisible: boolean;
     FOptBorderWidth: integer;
     FOptBorderWidthFocused: integer;
+    FOptBorderWidthMacro: integer;
     FOptBorderFocusedActive: boolean;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
@@ -1501,6 +1504,7 @@ type
     property ModeOverwrite: boolean read FOverwrite write FOverwrite;
     property ModeReadOnly: boolean read GetReadOnly write SetReadOnly;
     property ModeOneLine: boolean read GetOneLine write SetOneLine;
+    property ModeMacroRecording: boolean read FIsMacroRecording write FIsMacroRecording;
     property UndoCount: integer read GetUndoCount;
     property RedoCount: integer read GetRedoCount;
     property UndoAsString: string read GetUndoAsString write SetUndoAsString;
@@ -1896,6 +1900,7 @@ type
     property OptBorderVisible: boolean read FOptBorderVisible write FOptBorderVisible default cInitBorderVisible;
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default cInitBorderWidth;
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default cInitBorderWidthFocused;
+    property OptBorderWidthMacro: integer read FOptBorderWidthMacro write FOptBorderWidthMacro default cInitBorderWidthMacro;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
@@ -3004,6 +3009,9 @@ begin
   if FMicromapVisible and not FMicromapOnScrollbar then
     DoPaintMicromap(C);
 
+  if FIsMacroRecording then
+    DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro)
+  else
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
     DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
   else
@@ -4560,6 +4568,7 @@ begin
   FOptBorderVisible:= cInitBorderVisible;
   FOptBorderWidth:= cInitBorderWidth;
   FOptBorderWidthFocused:= cInitBorderWidthFocused;
+  FOptBorderWidthMacro:= cInitBorderWidthMacro;
   FOptBorderFocusedActive:= false;
 
   FOptRulerVisible:= true;
