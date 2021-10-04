@@ -909,6 +909,7 @@ type
     FOptCaretPosAfterPasteColumn: TATEditorPasteCaret;
     FOptCaretFixAfterRangeFolded: boolean;
     FOptCaretsMultiToColumnSel: boolean;
+    FOptCaretPaintNonBlinkingSimpler: boolean;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
     FOptTextCenteringCharWidth: integer;
@@ -1890,6 +1891,7 @@ type
     property OptCaretsAddedToColumnSelection: boolean read FOptCaretsAddedToColumnSelection write FOptCaretsAddedToColumnSelection default true;
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
+    property OptCaretPaintNonBlinkingSimpler: boolean read FOptCaretPaintNonBlinkingSimpler write FOptCaretPaintNonBlinkingSimpler default false;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default cInitMarkerSize;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
@@ -6866,9 +6868,19 @@ begin
     end
     else
     begin
-      //paint non-blinking caret simpler
-      C.Brush.Color:= NCaretColor;
-      C.FillRect(R);
+      if FOptCaretPaintNonBlinkingSimpler then
+      begin
+        //paint non-blinking caret simpler
+        C.Brush.Color:= NCaretColor;
+        C.FillRect(R);
+      end
+      else
+      begin
+        CanvasInvertRect(C, R, NCaretColor);
+        //if shape FrameFull, invert inner area
+        if CaretShape.EmptyInside then
+          CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor);
+      end;
     end;
 
     Caret.OldRect:= R;
