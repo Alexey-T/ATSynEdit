@@ -3020,7 +3020,7 @@ begin
     DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro, true);
     C.Brush.Color:= Colors.Markers;
     C.Font.Color:= Colors.TextSelFont;
-    C.TextOut(
+    CanvasTextOutSimplest(C,
       FRectMain.Right-Length(cTextMacro)*FCharSize.X-FOptBorderWidthMacro,
       FRectMain.Bottom-FCharSize.Y,
       cTextMacro);
