@@ -2972,7 +2972,7 @@ end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
 const
-  cTextMacro = 'REC';
+  cTextMacro = 'R';
 begin
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
