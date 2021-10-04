@@ -2973,8 +2973,6 @@ end;
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
 const
   cTextMacro = 'REC';
-var
-  N: integer;
 begin
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
@@ -3022,8 +3020,10 @@ begin
     DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro);
     C.Brush.Color:= Colors.Markers;
     C.Font.Color:= Colors.TextSelFont;
-    N:= C.TextWidth(cTextMacro);
-    C.TextOut(FRectMain.Right-N, FRectMain.Bottom-FCharSize.Y, cTextMacro);
+    C.TextOut(
+      FRectMain.Right-Length(cTextMacro)*FCharSize.X-FOptBorderWidthMacro,
+      FRectMain.Bottom-FCharSize.Y,
+      cTextMacro);
   end
   else
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
