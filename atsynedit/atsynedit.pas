@@ -1169,7 +1169,7 @@ type
     //paint
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(ALineFrom: integer): boolean;
-    procedure DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
+    procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer);
     procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TPoint;
@@ -2971,6 +2971,10 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
+const
+  cTextMacro = 'REC';
+var
+  N: integer;
 begin
   C.Brush.Color:= FColorBG;
   C.FillRect(0, 0, Width, Height); //avoid FClientW here to fill entire area
@@ -3014,7 +3018,13 @@ begin
     DoPaintMicromap(C);
 
   if FOptBorderMacroRecording and FIsMacroRecording then
-    DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro)
+  begin
+    DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro);
+    C.Brush.Color:= Colors.Markers;
+    C.Font.Color:= Colors.TextSelFont;
+    N:= C.TextWidth(cTextMacro);
+    C.TextOut(FRectMain.Right-N, FRectMain.Bottom-FCharSize.Y, cTextMacro);
+  end
   else
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
     DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
@@ -3076,15 +3086,19 @@ begin
   CanvasLineVert(C, XX2, YY1, YY2, true);
 end;
 
-procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; AWidth: integer);
+procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer);
 var
   W, H, i: integer;
 begin
-  if AWidth<1 then exit;
+  if ABorderWidth<1 then exit;
   C.Pen.Color:= AColor;
-  W:= ClientWidth;
-  H:= ClientHeight;
-  for i:= 0 to AWidth-1 do
+
+  //W:= ClientWidth;
+  //H:= ClientHeight;
+  W:= FRectMain.Right;
+  H:= FRectMain.Bottom;
+
+  for i:= 0 to ABorderWidth-1 do
     C.Frame(i, i, W-i, H-i);
 end;
 
