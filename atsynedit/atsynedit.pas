@@ -1418,7 +1418,7 @@ type
     function DoCommand_ShuffleLines: TATCommandResults;
     //
     function GetCommandFromKey(var Key: Word; Shift: TShiftState): integer;
-    function DoMouseWheelAction(Shift: TShiftState; ACount: integer; AUp,
+    function DoMouseWheelAction(Shift: TShiftState; AWheelDelta: integer;
       AForceHorz: boolean): boolean;
     function GetCaretsArray: TATPointArray;
     function GetMarkersArray: TATInt64Array;
@@ -6402,24 +6402,18 @@ end;
 
 function TATSynEdit.DoMouseWheel(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
-var
-  NCount: integer;
 begin
   if not OptMouseEnableAll then exit(false);
 
-  NCount:= Max(1, Abs(WheelDelta) div 120);
-  Result:= DoMouseWheelAction(Shift, NCount, WheelDelta>0, false)
+  Result:= DoMouseWheelAction(Shift, WheelDelta, false)
 end;
 
 function TATSynEdit.DoMouseWheelHorz(Shift: TShiftState; WheelDelta: integer;
   MousePos: TPoint): boolean;
-var
-  NCount: integer;
 begin
   if not OptMouseEnableAll then exit(false);
 
-  NCount:= Max(1, Abs(WheelDelta) div 120);
-  Result:= DoMouseWheelAction([], NCount, WheelDelta<0, true);
+  Result:= DoMouseWheelAction([], -WheelDelta, true);
 end;
 
 type
@@ -6445,10 +6439,10 @@ begin
     Update;
 end;
 
-function TATSynEdit.DoMouseWheelAction(Shift: TShiftState; ACount: integer; AUp, AForceHorz: boolean): boolean;
+function TATSynEdit.DoMouseWheelAction(Shift: TShiftState;
+  AWheelDelta: integer; AForceHorz: boolean): boolean;
 var
   Mode: TATMouseWheelMode;
-  NSpeedX, NSpeedY: integer;
   Pnt: TPoint;
 begin
   Result:= false;
@@ -6471,18 +6465,16 @@ begin
   else
     exit;
 
-  NSpeedX:= FOptMouseWheelScrollHorzSpeed * ACount;
-  NSpeedY:= FOptMouseWheelScrollVertSpeed * ACount;
-  if AUp then NSpeedX:= -NSpeedX;
-  if AUp then NSpeedY:= -NSpeedY;
-
   case Mode of
     aWheelModeNormal:
       begin
         if (not ModeOneLine) and FOptMouseWheelScrollVert then
         begin
           //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
-          DoScrollByDeltaInPixels(0, NSpeedY*FCharSize.Y);
+          DoScrollByDeltaInPixels(
+            0,
+            FCharSize.Y * -FOptMouseWheelScrollVertSpeed * AWheelDelta div 120
+            );
           Update;
           Result:= true;
         end;
@@ -6492,7 +6484,10 @@ begin
       begin
         if (not ModeOneLine) and FOptMouseWheelScrollHorz then
         begin
-          DoScrollByDelta(NSpeedX, 0);
+          DoScrollByDelta(
+            -FOptMouseWheelScrollHorzSpeed * AWheelDelta div 120,
+            0
+            );
           Invalidate;
           Result:= true;
         end;
@@ -6502,7 +6497,7 @@ begin
       begin
         if FOptMouseWheelZooms then
         begin
-          DoScaleFontDelta(AUp);
+          DoScaleFontDelta(AWheelDelta>0);
           DoEventZoom;
           Result:= true;
         end;
