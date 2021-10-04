@@ -1169,7 +1169,7 @@ type
     //paint
     procedure PaintEx(ALineNumber: integer);
     function DoPaint(ALineFrom: integer): boolean;
-    procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer);
+    procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer; AUseRectMain: boolean);
     procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TPoint;
@@ -3017,7 +3017,7 @@ begin
 
   if FOptBorderMacroRecording and FIsMacroRecording then
   begin
-    DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro);
+    DoPaintBorder(C, Colors.Markers, FOptBorderWidthMacro, true);
     C.Brush.Color:= Colors.Markers;
     C.Font.Color:= Colors.TextSelFont;
     C.TextOut(
@@ -3027,10 +3027,10 @@ begin
   end
   else
   if FOptBorderFocusedActive and FIsEntered and (FOptBorderWidthFocused>0) then
-    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused)
+    DoPaintBorder(C, Colors.BorderLineFocused, FOptBorderWidthFocused, false)
   else
   if FOptBorderVisible and (FOptBorderWidth>0) then
-    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth);
+    DoPaintBorder(C, Colors.BorderLine, FOptBorderWidth, false);
 
   if FOptShowMouseSelFrame then
     if FMouseDragCoord.X>=0 then
@@ -3086,17 +3086,24 @@ begin
   CanvasLineVert(C, XX2, YY1, YY2, true);
 end;
 
-procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer);
+procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor;
+  ABorderWidth: integer; AUseRectMain: boolean);
 var
   W, H, i: integer;
 begin
   if ABorderWidth<1 then exit;
   C.Pen.Color:= AColor;
 
-  //W:= ClientWidth;
-  //H:= ClientHeight;
-  W:= FRectMain.Right;
-  H:= FRectMain.Bottom;
+  if AUseRectMain then
+  begin
+    W:= FRectMain.Right;
+    H:= FRectMain.Bottom;
+  end
+  else
+  begin
+    W:= ClientWidth;
+    H:= ClientHeight;
+  end;
 
   for i:= 0 to ABorderWidth-1 do
     C.Frame(i, i, W-i, H-i);
