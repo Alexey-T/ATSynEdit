@@ -40,7 +40,7 @@ var
   Shift, PosAfter: TPoint;
   TextItems: TStringList;
   TextItem: atString;
-  X1, Y1, X2, Y2: integer;
+  X1, Y1, X2, Y2, X1_saved: integer;
   bSel, bNeedGroup, bInsertLinePerCaret: boolean;
   i: integer;
 begin
@@ -76,8 +76,12 @@ begin
       Caret:= Carets[i];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
 
+      X1_saved:= -1;
       if AInsertAtLineStarts and not bSel then
+      begin
+        X1_saved:= X1;
         X1:= 0;
+      end;
 
       if bInsertLinePerCaret then
         TextItem:= UTF8Decode(TextItems[i])
@@ -96,6 +100,8 @@ begin
         Caret.EndY:= IfThen(ASelectThen, Y1, -1);
         Caret.PosX:= PosAfter.X;
         Caret.PosY:= PosAfter.Y;
+        if X1_saved>=0 then
+          Caret.PosX:= X1_saved;
       end;
     end;
   finally
