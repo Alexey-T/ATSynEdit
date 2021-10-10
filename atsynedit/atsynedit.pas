@@ -866,6 +866,7 @@ type
     FOptIdleInterval: integer;
     FOptPasteAtEndMakesFinalEmptyLine: boolean;
     FOptPasteMultilineTextSpreadsToCarets: boolean;
+    FOptPasteWithEolAtLineStart: boolean;
     FOptMaxLineLenToTokenize: integer;
     FOptMinLineLenToCalcURL: integer;
     FOptMaxLineLenToCalcURL: integer;
@@ -1326,7 +1327,7 @@ type
     function DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults;
     procedure DoCommandResults(ACmd: integer; Res: TATCommandResults);
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
-      AOvrMode, ASelectThen: boolean): TATCommandResults;
+      AOvrMode, ASelectThen, AInsertAtLineStarts: boolean): TATCommandResults;
     function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
     function DoCommand_FoldLevel(ALevel: integer): TATCommandResults;
     function DoCommand_FoldAll: TATCommandResults;
@@ -2016,6 +2017,7 @@ type
     property OptSavingTrimFinalEmptyLines: boolean read FOptSavingTrimFinalEmptyLines write FOptSavingTrimFinalEmptyLines default false;
     property OptPasteAtEndMakesFinalEmptyLine: boolean read FOptPasteAtEndMakesFinalEmptyLine write FOptPasteAtEndMakesFinalEmptyLine default true;
     property OptPasteMultilineTextSpreadsToCarets: boolean read FOptPasteMultilineTextSpreadsToCarets write FOptPasteMultilineTextSpreadsToCarets default true;
+    property OptPasteWithEolAtLineStart: boolean read FOptPasteWithEolAtLineStart write FOptPasteWithEolAtLineStart default true;
     property OptZebraActive: boolean read FOptZebraActive write FOptZebraActive default false;
     property OptZebraStep: integer read FOptZebraStep write FOptZebraStep default 2;
     property OptZebraAlphaBlend: byte read FOptZebraAlphaBlend write FOptZebraAlphaBlend default cInitZebraAlphaBlend;
@@ -4742,6 +4744,7 @@ begin
   FOptMouseEnableColumnSelection:= true;
   FOptPasteAtEndMakesFinalEmptyLine:= true;
   FOptPasteMultilineTextSpreadsToCarets:= true;
+  FOptPasteWithEolAtLineStart:= true;
   FOptZebraActive:= false;
   FOptZebraStep:= 2;
   FOptZebraAlphaBlend:= cInitZebraAlphaBlend;
@@ -8999,7 +9002,7 @@ procedure TATSynEdit.TextInsertAtCarets(const AText: atString; AKeepCaret,
 var
   Res: TATCommandResults;
 begin
-  Res:= DoCommand_TextInsertAtCarets(AText, AKeepCaret, AOvrMode, ASelectThen);
+  Res:= DoCommand_TextInsertAtCarets(AText, AKeepCaret, AOvrMode, ASelectThen, false);
   DoCommandResults(0, Res);
 end;
 

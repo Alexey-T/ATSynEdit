@@ -6,6 +6,7 @@ var
   St: TATStrings;
   Str: atString;
   bHandled, bNeedFixLastEol: boolean;
+  bAtLineStart: boolean;
   Num64: Int64;
 begin
   Result:= [];
@@ -29,8 +30,15 @@ begin
 
   //usual text
   Str:= UTF8Decode(AClipboardObject.AsText);
+  bAtLineStart:= FOptPasteWithEolAtLineStart and not Carets.IsSelection and SStringHasEol(Str);
   if ModeOneLine then
+  begin
     Str:= SRemoveNewlineChars(Str);
+    bAtLineStart:= false;
+  end;
+
+  if bAtLineStart then
+    DoCaretsDeleteOnSameLines;
 
   if FOptInputNumberOnly then
     if not TryStrToInt64(Str, Num64) then exit;
@@ -55,7 +63,9 @@ begin
   Result:= DoCommand_TextInsertAtCarets(Str,
              AKeepCaret,
              FOverwrite and FOptOverwriteAllowedOnPaste,
-             ASelectThen);
+             ASelectThen,
+             bAtLineStart
+             );
   St.EndUndoGroup;
 
   //solve CudaText #3270

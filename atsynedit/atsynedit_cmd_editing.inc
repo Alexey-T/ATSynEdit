@@ -27,12 +27,13 @@ begin
   if FOptTabSpaces then
     Result:= DoCommand_TextInsertTabSpacesAtCarets(FOverwrite)
   else
-    Result:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
+    Result:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false, false);
 end;
 
 
 function TATSynEdit.DoCommand_TextInsertAtCarets(const AText: atString;
-  AKeepCaret, AOvrMode, ASelectThen: boolean): TATCommandResults;
+  AKeepCaret, AOvrMode, ASelectThen, AInsertAtLineStarts: boolean
+  ): TATCommandResults;
 var
   Caret: TATCaretItem;
   St: TATStrings;
@@ -74,6 +75,9 @@ begin
     begin
       Caret:= Carets[i];
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
+
+      if AInsertAtLineStarts and not bSel then
+        X1:= 0;
 
       if bInsertLinePerCaret then
         TextItem:= UTF8Decode(TextItems[i])

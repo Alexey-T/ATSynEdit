@@ -410,8 +410,8 @@ begin
     cCommand_RemoveFirstCaret:    Result:= DoCommand_RemoveOneCaret(true);
     cCommand_RemoveLastCaret:     Result:= DoCommand_RemoveOneCaret(false);
 
-    cCommand_TextInsert:          Result:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false);
-    cCommand_TextInsertTabChar:   Result:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false);
+    cCommand_TextInsert:          Result:= DoCommand_TextInsertAtCarets(AText, false, FOverwrite, false, false);
+    cCommand_TextInsertTabChar:   Result:= DoCommand_TextInsertAtCarets(#9, false, FOverwrite, false, false);
     cCommand_KeyBackspace:        Result:= DoCommand_TextBackspace;
     cCommand_KeyDelete:           Result:= DoCommand_TextDelete;
     cCommand_KeyTab:              Result:= DoCommand_TextTabulation;
