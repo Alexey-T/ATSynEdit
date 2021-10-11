@@ -71,6 +71,10 @@ begin
           //    [TextItems.Count, Carets.Count]);
         end;
 
+    //avoid 2 non-compatable modes of paste
+    if bInsertLinePerCaret then
+      AInsertAtLineStarts:= false;
+
     for i:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[i];
