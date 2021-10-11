@@ -256,6 +256,8 @@ begin
 end;
 
 procedure TATSynEdit.DoSelect_ExtendSelectionByLine(AUp: boolean);
+const
+  bForwardSelectionWhenUp = false;
 var
   St: TATStrings;
   NewCarets: TATCarets;
@@ -287,6 +289,11 @@ begin
         NewY2:= Y1;
         if (NewY2>0) and (X1=0) then
           Dec(NewY2);
+        if bForwardSelectionWhenUp then
+        begin
+          SwapInt(NewX1, NewX2);
+          SwapInt(NewY1, NewY2);
+        end;
       end
       else
       begin
