@@ -1154,7 +1154,7 @@ type
     function DoScaleFont(AValue: integer): integer;
     //select
     procedure DoSelectionDeleteOrReset;
-    procedure DoSelect_ExtendSelectionByLine;
+    procedure DoSelect_ExtendSelectionByLine(AUp: boolean);
     procedure DoSelect_CharRange(ACaretIndex: integer; Pnt: TPoint);
     procedure DoSelect_WordRange(ACaretIndex: integer; P1, P2: TPoint);
     procedure DoSelect_ByDoubleClick(AllowOnlyWordChars: boolean);
@@ -1355,7 +1355,7 @@ type
     function DoCommand_SelectAll: TATCommandResults;
     function DoCommand_SelectInverted: TATCommandResults;
     function DoCommand_SelectSplitToLines: TATCommandResults;
-    function DoCommand_SelectExtendByLine: TATCommandResults;
+    function DoCommand_SelectExtendByLine(AUp: boolean): TATCommandResults;
     function DoCommand_Cancel(AKeepLast, AKeepSel: boolean): TATCommandResults;
     function DoCommand_ToggleReadOnly: TATCommandResults;
     function DoCommand_ToggleOverwrite: TATCommandResults;

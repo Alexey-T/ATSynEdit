@@ -140,6 +140,7 @@ const
   cCommand_SelectInverted = 264 or cCmdFlag_Caret;
   cCommand_SelectSplitToLines = 265 or cCmdFlag_Caret;
   cCommand_SelectExtendByLine = 266 or cCmdFlag_Caret;
+  cCommand_SelectExtendByLineUp = 267 or cCmdFlag_Caret;
 
   cCommand_MoveSelectionUp = 268; // or cCmdFlag_Caret;
   cCommand_MoveSelectionDown = 269; // or cCmdFlag_Caret;

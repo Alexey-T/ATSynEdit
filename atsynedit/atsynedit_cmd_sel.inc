@@ -20,10 +20,13 @@ begin
   Result:= [cResultCaretBottom];
 end;
 
-function TATSynEdit.DoCommand_SelectExtendByLine: TATCommandResults;
+function TATSynEdit.DoCommand_SelectExtendByLine(AUp: boolean): TATCommandResults;
 begin
-  DoSelect_ExtendSelectionByLine;
-  Result:= [cResultCaretBottom];
+  DoSelect_ExtendSelectionByLine(AUp);
+  if AUp then
+    Result:= [cResultCaretTop]
+  else
+    Result:= [cResultCaretBottom];
 end;
 
 procedure TATSynEdit.DoSelect_ColumnBlock_MoveEndUpDown(var AX, AY: integer; ALineDelta: integer);

@@ -438,7 +438,8 @@ begin
     cCommand_SelectNone:               Result:= [cResultCaretAny];
     cCommand_SelectInverted:           Result:= DoCommand_SelectInverted;
     cCommand_SelectSplitToLines:       Result:= DoCommand_SelectSplitToLines;
-    cCommand_SelectExtendByLine:       Result:= DoCommand_SelectExtendByLine;
+    cCommand_SelectExtendByLine:       Result:= DoCommand_SelectExtendByLine(false);
+    cCommand_SelectExtendByLineUp:     Result:= DoCommand_SelectExtendByLine(true);
     cCommand_SelectWords:              Result:= DoCommand_SelectWords;
     cCommand_SelectLines:              Result:= DoCommand_SelectLines;
 

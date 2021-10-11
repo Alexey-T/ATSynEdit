@@ -255,38 +255,59 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoSelect_ExtendSelectionByLine;
+procedure TATSynEdit.DoSelect_ExtendSelectionByLine(AUp: boolean);
 var
+  St: TATStrings;
   NewCarets: TATCarets;
   X1, Y1, X2, Y2: integer;
-  i: integer;
-  Sel: boolean;
+  NewX1, NewY1, NewX2, NewY2: integer;
+  bSel: boolean;
   PosLast: TPoint;
+  NLastLine, i: integer;
 begin
+  St:= Strings;
+  NLastLine:= St.Count-1;
+
   NewCarets:= TATCarets.Create;
   try
     for i:= 0 to Carets.Count-1 do
     begin
-      Carets[i].GetRange(X1, Y1, X2, Y2, Sel);
-      if not Sel then
-        begin X2:= X1; Y2:= Y1; end;
-
-      X1:= 0; //select entire 1st line
-      if Y2<Strings.Count-1 then
+      Carets[i].GetRange(X1, Y1, X2, Y2, bSel);
+      if not bSel then
       begin
-        //select till start of next ln
-        X2:= 0;
-        Y2:= Y2+1;
+        X2:= X1;
+        Y2:= Y1;
+      end;
+
+      if AUp then
+      begin
+        NewX1:= St.LinesLen[Y2];
+        NewY1:= Y2;
+        NewX2:= 0;
+        NewY2:= Y1;
+        if (NewY2>0) and (X1=0) then
+          Dec(NewY2);
       end
       else
       begin
-        //select till eof
-        PosLast:= GetEndOfFilePos;
-        X2:= PosLast.X;
-        Y2:= PosLast.Y;
+        NewX1:= 0; //select entire 1st line
+        NewY1:= Y1;
+        if Y2<NLastLine then
+        begin
+          //select till start of next ln
+          NewX2:= 0;
+          NewY2:= Y2+1;
+        end
+        else
+        begin
+          //select till eof
+          PosLast:= GetEndOfFilePos;
+          NewX2:= PosLast.X;
+          NewY2:= PosLast.Y;
+        end;
       end;
 
-      NewCarets.Add(X2, Y2, X1, Y1);
+      NewCarets.Add(NewX2, NewY2, NewX1, NewY1);
     end;
 
     DoCaretsAssign(NewCarets);
