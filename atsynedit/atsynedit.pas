@@ -9010,16 +9010,18 @@ procedure TATSynEdit.DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
 //a) inside surrogate pair (2 codes which make one glyph)
 //b) on accent (combining) char; we skip _all_ chars (Unicode allows several accent chars)
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   ch: WideChar;
   i: integer;
 begin
+  St:= Strings;
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
     if Caret.PosX<=0 then Continue;
-    if not Strings.IsIndexValid(Caret.PosY) then Continue;
-    ch:= Strings.LineCharAt(Caret.PosY, Caret.PosX+1);
+    if not St.IsIndexValid(Caret.PosY) then Continue;
+    ch:= St.LineCharAt(Caret.PosY, Caret.PosX+1);
     if ch=#0 then Continue;
 
     if IsCharSurrogateLow(ch) then
@@ -9031,7 +9033,7 @@ begin
     while IsCharAccent(ch) do
     begin
       Caret.PosX:= Caret.PosX+BoolToPlusMinusOne[AMoveRight];
-      ch:= Strings.LineCharAt(Caret.PosY, Caret.PosX+1);
+      ch:= St.LineCharAt(Caret.PosY, Caret.PosX+1);
     end;
   end;
 end;
