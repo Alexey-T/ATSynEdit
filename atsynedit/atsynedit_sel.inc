@@ -340,6 +340,8 @@ begin
   finally
     FreeAndNil(NewCarets);
   end;
+
+  DoCaretsSort;
 end;
 
 procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
