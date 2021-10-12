@@ -1234,7 +1234,6 @@ type
     function GetCaretManyAllowed: boolean;
     function GetCaretSelectionIndex(P: TPoint): integer;
     function DoCaretSwapEdge(Item: TATCaretItem; AMoveLeft: boolean): boolean;
-    procedure DoCaretsSort;
     //events
     procedure DoEventBeforeCalcHilite;
     procedure DoEventClickMicromap(AX, AY: integer);
@@ -5923,7 +5922,7 @@ begin
     if not FOptMouseRightClickMovesCaret then
       exit;
 
-  DoCaretsSort;
+  Carets.Sort;
   DoEventCarets;
   Update;
 end;
@@ -6287,7 +6286,7 @@ begin
         if (P.Y>=0) and (P.X>=0) then
         begin
           DoSelect_LineRange(FMouseDownGutterLineNumber, P);
-          DoCaretsSort;
+          Carets.Sort;
           DoEventCarets;
           Invalidate;
         end;
@@ -6410,7 +6409,7 @@ begin
                 DoSelect_ColumnBlock_FromPoints(FMouseDownPnt, P);
               end;
 
-            DoCaretsSort;
+            Carets.Sort;
             DoEventCarets;
             Invalidate;
           end;
@@ -6762,7 +6761,7 @@ begin
     end;
   end;
 
-  DoCaretsSort;
+  Carets.Sort;
   DoEventCarets;
   Invalidate;
 end;

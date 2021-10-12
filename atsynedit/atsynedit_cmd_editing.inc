@@ -324,16 +324,16 @@ begin
       Caret.EndY:= -1;
 
       //tested on these cases:
-      // https://github.com/Alexey-T/CudaText/issues/1615
-      // https://github.com/Alexey-T/CudaText/issues/2261
+      //CudaText issue #1615
+      //CudaText issue #2261
       DoCaretsShift(i, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   finally
     St.EndUndoGroup;
   end;
 
-  //to fix https://github.com/Alexey-T/CudaText/issues/1615
-  DoCaretsSort;
+  //CudaText issue #1615
+  Carets.Sort;
 
   Result:= [cResultText, cResultCaretTop];
 end;

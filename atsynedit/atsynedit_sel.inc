@@ -91,7 +91,7 @@ begin
   if AddCaret then
   begin
     Carets.Add(XTo, P.Y, XFrom, P.Y);
-    DoCaretsSort;
+    Carets.Sort;
   end
   else
     DoCaretSingle(XTo, P.Y, XFrom, P.Y);
@@ -341,7 +341,7 @@ begin
     FreeAndNil(NewCarets);
   end;
 
-  DoCaretsSort;
+  Carets.Sort;
 end;
 
 procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);

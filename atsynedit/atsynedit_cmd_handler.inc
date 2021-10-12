@@ -219,7 +219,7 @@ begin
   end;
 
   DoCaretsFixIfInsideFolded;
-  DoCaretsSort;
+  Carets.Sort;
 
   if IsCommandResults_CaretMove(Res) then
   begin

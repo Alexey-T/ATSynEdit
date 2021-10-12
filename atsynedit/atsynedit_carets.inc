@@ -93,11 +93,6 @@ begin
     Carets.Add(AX, AY);
 end;
 
-procedure TATSynEdit.DoCaretsSort; inline;
-begin
-  Carets.Sort;
-end;
-
 procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean = false);
 var
   P: TPoint;

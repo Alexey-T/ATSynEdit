@@ -76,7 +76,7 @@ begin
       end;
   end;
 
-  DoCaretsSort; //must have here
+  Carets.Sort; //must have here
   Update;
 end;
 
