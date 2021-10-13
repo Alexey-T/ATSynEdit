@@ -296,8 +296,18 @@ begin
           begin
             NewX1:= X1;
             NewY1:= Y1;
-            NewX2:= X2;
-            NewY2:= Y2;
+            if Y2<NLastLine then
+            begin
+              NewX2:= 0;
+              NewY2:= Y2+1;
+            end
+            else
+            begin
+              //select till EOF
+              PosLast:= GetEndOfFilePos;
+              NewX2:= PosLast.X;
+              NewY2:= PosLast.Y;
+            end;
           end
           else
           begin
@@ -377,7 +387,7 @@ begin
           end
           else
           begin
-            //select till eof
+            //select till EOF
             PosLast:= GetEndOfFilePos;
             NewX2:= PosLast.X;
             NewY2:= PosLast.Y;

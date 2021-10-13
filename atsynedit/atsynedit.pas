@@ -7789,15 +7789,21 @@ begin
 end;
 
 function TATSynEdit.GetEndOfFilePos: TPoint;
+var
+  St: TATStrings;
 begin
-  Result.X:= 0;
-  Result.Y:= 0;
-  if Strings.Count>0 then
+  St:= Strings;
+  if St.Count>0 then
   begin
-    Result.Y:= Strings.Count-1;
-    Result.X:= Strings.LinesLen[Result.Y];
-    if Strings.LinesEnds[Result.Y]<>cEndNone then
+    Result.Y:= St.Count-1;
+    Result.X:= St.LinesLen[Result.Y];
+    if St.LinesEnds[Result.Y]<>cEndNone then
       Inc(Result.X);
+  end
+  else
+  begin
+    Result.X:= 0;
+    Result.Y:= 0;
   end;
 end;
 
