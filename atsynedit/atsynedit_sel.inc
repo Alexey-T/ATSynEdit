@@ -336,10 +336,12 @@ begin
         else
         //shrink selection down
         begin
-          NewX1:= X2;
+          if Y1=Y2 then
+            NewX1:= 0
+          else
+            NewX1:= X2;
           NewY1:= Y2;
-          NewX2:= X1;
-          NewY2:= Min(Y1+1, NLastLine);
+          GetPosDown(Y1, NLastLine, NewX2, NewY2);
         end;
       end
       else
