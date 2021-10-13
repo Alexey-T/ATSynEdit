@@ -282,7 +282,7 @@ begin
       end;
 
       bSelShrink:= bSel and (Caret.IsForwardSelection=AUp);
-      bWholeLinesSel:= (X1=0) and (X2>=St.LinesLen[Y2]);
+      bWholeLinesSel:= (X1=0) and ((X2=0) or (X2>=St.LinesLen[Y2]));
 
       if bSelShrink then
       begin
