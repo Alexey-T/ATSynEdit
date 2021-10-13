@@ -256,6 +256,24 @@ begin
 end;
 
 procedure TATSynEdit.DoSelect_ExtendSelectionByLine(AUp: boolean);
+  //
+  procedure GetPosDown(Y, NLastLine: integer; out ResX, ResY: integer);
+  var
+    PosLast: TPoint;
+  begin
+    if Y<NLastLine then
+    begin
+      ResX:= 0;
+      ResY:= Y+1;
+    end
+    else
+    begin
+      PosLast:= GetEndOfFilePos;
+      ResX:= PosLast.X;
+      ResY:= PosLast.Y;
+    end;
+  end;
+  //
 var
   St: TATStrings;
   Caret: TATCaretItem;
@@ -263,8 +281,8 @@ var
   X1, Y1, X2, Y2: integer;
   NewX1, NewY1, NewX2, NewY2: integer;
   bSel, bSelShrink, bWholeLinesSel: boolean;
-  PosLast: TPoint;
-  NLastLine, iCaret: integer;
+  NLastLine: integer;
+  iCaret: integer;
 begin
   St:= Strings;
   NLastLine:= St.Count-1;
@@ -296,18 +314,7 @@ begin
           begin
             NewX1:= X1;
             NewY1:= Y1;
-            if Y2<NLastLine then
-            begin
-              NewX2:= 0;
-              NewY2:= Y2+1;
-            end
-            else
-            begin
-              //select till EOF
-              PosLast:= GetEndOfFilePos;
-              NewX2:= PosLast.X;
-              NewY2:= PosLast.Y;
-            end;
+            GetPosDown(Y2, NLastLine, NewX2, NewY2);
           end
           else
           begin
@@ -377,21 +384,9 @@ begin
         else
         //extend selection down
         begin
-          NewX1:= 0; //select entire 1st line
+          NewX1:= 0;
           NewY1:= Y1;
-          if Y2<NLastLine then
-          begin
-            //select till start of next ln
-            NewX2:= 0;
-            NewY2:= Y2+1;
-          end
-          else
-          begin
-            //select till EOF
-            PosLast:= GetEndOfFilePos;
-            NewX2:= PosLast.X;
-            NewY2:= PosLast.Y;
-          end;
+          GetPosDown(Y2, NLastLine, NewX2, NewY2);
         end;
       end;
 
