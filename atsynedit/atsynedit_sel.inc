@@ -353,16 +353,7 @@ begin
           begin
             NewX1:= 0;
             NewY1:= Y1;
-            if Y2<NLastLine then
-            begin
-              NewX2:= 0;
-              NewY2:= Y2+1;
-            end
-            else
-            begin
-              NewX2:= St.LinesLen[Y2];
-              NewY2:= Y2;
-            end;
+            GetPosDown(Y2, NLastLine, NewX2, NewY2);
           end
           else
           begin
