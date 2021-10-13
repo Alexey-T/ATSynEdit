@@ -262,7 +262,7 @@ var
   NewCarets: TATCarets;
   X1, Y1, X2, Y2: integer;
   NewX1, NewY1, NewX2, NewY2: integer;
-  bSel, bSelShrink: boolean;
+  bSel, bSelShrink, bWholeLinesSel: boolean;
   PosLast: TPoint;
   NLastLine, iCaret: integer;
 begin
@@ -282,9 +282,32 @@ begin
       end;
 
       bSelShrink:= bSel and (Caret.IsForwardSelection=AUp);
+      bWholeLinesSel:= (X1=0) and (X2>=St.LinesLen[Y2]);
 
       if bSelShrink then
       begin
+        //not _whole_ line(s) selected? select whole line(s), and don't shrink/extend mode
+        //fixes CudaText issue #3778 (comment)
+        if not bWholeLinesSel then
+        begin
+          X1:= 0;
+          X2:= St.LinesLen[Y2];
+          if not AUp then
+          begin
+            NewX1:= X1;
+            NewY1:= Y1;
+            NewX2:= X2;
+            NewY2:= Y2;
+          end
+          else
+          begin
+            NewX1:= X2;
+            NewY1:= Y2;
+            NewX2:= X1;
+            NewY2:= Y1;
+          end;
+        end
+        else
         //shrink selection up
         if AUp then
         begin
