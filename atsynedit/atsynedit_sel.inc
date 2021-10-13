@@ -326,33 +326,62 @@ begin
         end;
       end
       else
-      //extend selection up
-      if AUp then
       begin
-        NewX1:= St.LinesLen[Y2];
-        NewY1:= Y2;
-        NewX2:= 0;
-        NewY2:= Y1;
-        if (NewY2>0) and (X1=0) then
-          Dec(NewY2);
-      end
-      else
-      //extend selection down
-      begin
-        NewX1:= 0; //select entire 1st line
-        NewY1:= Y1;
-        if Y2<NLastLine then
+        //no selection - select the whole line
+        if not bSel then
         begin
-          //select till start of next ln
-          NewX2:= 0;
-          NewY2:= Y2+1;
+          if not AUp then
+          begin
+            NewX1:= 0;
+            NewY1:= Y1;
+            if Y2<NLastLine then
+            begin
+              NewX2:= 0;
+              NewY2:= Y2+1;
+            end
+            else
+            begin
+              NewX2:= St.LinesLen[Y2];
+              NewY2:= Y2;
+            end;
+          end
+          else
+          begin
+            NewX1:= St.LinesLen[Y2];
+            NewY1:= Y2;
+            NewX2:= 0;
+            NewY2:= Y1;
+          end;
         end
         else
+        //extend selection up
+        if AUp then
         begin
-          //select till eof
-          PosLast:= GetEndOfFilePos;
-          NewX2:= PosLast.X;
-          NewY2:= PosLast.Y;
+          NewX1:= St.LinesLen[Y2];
+          NewY1:= Y2;
+          NewX2:= 0;
+          NewY2:= Y1;
+          if (NewY2>0) and (X1=0) then
+            Dec(NewY2);
+        end
+        else
+        //extend selection down
+        begin
+          NewX1:= 0; //select entire 1st line
+          NewY1:= Y1;
+          if Y2<NLastLine then
+          begin
+            //select till start of next ln
+            NewX2:= 0;
+            NewY2:= Y2+1;
+          end
+          else
+          begin
+            //select till eof
+            PosLast:= GetEndOfFilePos;
+            NewX2:= PosLast.X;
+            NewY2:= PosLast.Y;
+          end;
         end;
       end;
 
