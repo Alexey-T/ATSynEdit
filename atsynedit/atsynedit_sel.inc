@@ -286,7 +286,7 @@ begin
 
       if bSelShrink then
       begin
-        //not _whole_ line(s) selected? select whole line(s), and don't shrink/extend mode
+        //not _whole_ line(s) selected? select whole line(s), and don't shrink/extend more
         //fixes CudaText issue #3778 (comment)
         if not bWholeLinesSel then
         begin
