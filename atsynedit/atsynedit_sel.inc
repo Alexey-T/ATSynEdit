@@ -257,10 +257,12 @@ end;
 
 procedure TATSynEdit.DoSelect_ExtendSelectionByLine(AUp: boolean);
   //
-  procedure GetPosDown(Y, NLastLine: integer; out ResX, ResY: integer);
+  procedure GetPosDown(Y: integer; out ResX, ResY: integer);
   var
+    NLastLine: integer;
     PosLast: TPoint;
   begin
+    NLastLine:= Strings.Count-1;
     if Y<NLastLine then
     begin
       ResX:= 0;
@@ -281,11 +283,9 @@ var
   X1, Y1, X2, Y2: integer;
   NewX1, NewY1, NewX2, NewY2: integer;
   bSel, bSelShrink, bWholeLinesSel: boolean;
-  NLastLine: integer;
   iCaret: integer;
 begin
   St:= Strings;
-  NLastLine:= St.Count-1;
 
   NewCarets:= TATCarets.Create;
   try
@@ -314,7 +314,7 @@ begin
           begin
             NewX1:= X1;
             NewY1:= Y1;
-            GetPosDown(Y2, NLastLine, NewX2, NewY2);
+            GetPosDown(Y2, NewX2, NewY2);
           end
           else
           begin
@@ -341,7 +341,7 @@ begin
           else
             NewX1:= X2;
           NewY1:= Y2;
-          GetPosDown(Y1, NLastLine, NewX2, NewY2);
+          GetPosDown(Y1, NewX2, NewY2);
         end;
       end
       else
@@ -353,7 +353,7 @@ begin
           begin
             NewX1:= 0;
             NewY1:= Y1;
-            GetPosDown(Y2, NLastLine, NewX2, NewY2);
+            GetPosDown(Y2, NewX2, NewY2);
           end
           else
           begin
@@ -379,7 +379,7 @@ begin
         begin
           NewX1:= 0;
           NewY1:= Y1;
-          GetPosDown(Y2, NLastLine, NewX2, NewY2);
+          GetPosDown(Y2, NewX2, NewY2);
         end;
       end;
 
