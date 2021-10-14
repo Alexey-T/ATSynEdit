@@ -4944,18 +4944,20 @@ end;
 
 procedure TATSynEdit.SaveToFile(const AFilename: string);
 var
+  St: TATStrings;
   bChange1, bChange2, bChange3: boolean;
 begin
+  St:= Strings;
   bChange1:= false;
   bChange2:= false;
   bChange3:= false;
 
   if FOptSavingForceFinalEol then
-    bChange1:= Strings.ActionEnsureFinalEol;
+    bChange1:= St.ActionEnsureFinalEol;
 
   if FOptSavingTrimSpaces then
   begin
-    bChange2:= Strings.ActionTrimSpaces(cTrimRight);
+    bChange2:= St.ActionTrimSpaces(cTrimRight);
     //caret may be after end-of-line, so fix it
     if not OptCaretVirtual then
       DoCaretsFixIncorrectPos(true);
@@ -4963,7 +4965,7 @@ begin
 
   if FOptSavingTrimFinalEmptyLines then
   begin
-    bChange3:= Strings.ActionTrimFinalEmptyLines;
+    bChange3:= St.ActionTrimFinalEmptyLines;
     if bChange3 then
       DoCaretsFixIncorrectPos(false);
   end;
@@ -4974,7 +4976,7 @@ begin
     DoEventChange;
   end;
 
-  Strings.SaveToFile(AFilename);
+  St.SaveToFile(AFilename);
   FFileName:= AFilename;
   Modified:= false;
 end;
@@ -5035,11 +5037,11 @@ end;
 
 procedure TATSynEdit.SetOneLine(AValue: boolean);
 var
-  Str: TATStrings;
+  St: TATStrings;
 begin
   Carets.OneLine:= AValue;
-  Str:= Strings;
-  Str.OneLine:= AValue;
+  St:= Strings;
+  St.OneLine:= AValue;
 
   if AValue then
   begin
@@ -5060,8 +5062,8 @@ begin
 
     DoCaretSingle(0, 0);
 
-    while Str.Count>1 do
-      Str.LineDelete(Str.Count-1, false, false, false);
+    while St.Count>1 do
+      St.LineDelete(St.Count-1, false, false, false);
   end;
 end;
 
@@ -7420,13 +7422,15 @@ end;
 //drop selection of 1st caret into mouse-pos
 procedure TATSynEdit.DoDropText(AndDeleteSelection: boolean);
 var
+  St: TATStrings;
+  Str: atString;
   P, PosAfter, Shift: TPoint;
   X1, Y1, X2, Y2: integer;
   bSel: boolean;
-  Str: atString;
   Relation: TATPosRelation;
   Details: TATEditorPosDetails;
 begin
+  St:= Strings;
   if Carets.Count<>1 then Exit; //allow only 1 caret
   Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
   if not bSel then Exit;
@@ -7442,29 +7446,29 @@ begin
   Relation:= IsPosInRange(P.X, P.Y, X1, Y1, X2, Y2);
   if Relation=cRelateInside then exit;
 
-  Str:= Strings.TextSubstring(X1, Y1, X2, Y2);
+  Str:= St.TextSubstring(X1, Y1, X2, Y2);
   if Str='' then exit;
 
   //insert before selection?
   if Relation=cRelateBefore then
   begin
     if AndDeleteSelection then
-      Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
-    Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
+      St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+    St.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
 
     //select moved text
     DoCaretSingle(PosAfter.X, PosAfter.Y, P.X, P.Y);
   end
   else
   begin
-    Strings.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
+    St.TextInsert(P.X, P.Y, Str, false, Shift, PosAfter);
 
     //select moved text
     DoCaretSingle(PosAfter.X, PosAfter.Y, P.X, P.Y);
 
     if AndDeleteSelection then
     begin
-      Strings.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
+      St.TextDeleteRange(X1, Y1, X2, Y2, Shift, PosAfter);
       DoCaretsShift(0, X1, Y1, Shift.X, Shift.Y, PosAfter);
     end;
   end;
