@@ -281,7 +281,7 @@ var
   Caret: TATCaretItem;
   NewCarets: TATCarets;
   X1, Y1, X2, Y2: integer;
-  NewX1, NewY1, NewX2, NewY2: integer;
+  NewX1, NewY1, NewX, NewY: integer;
   bSel, bSelShrink, bWholeLinesSel: boolean;
   iCaret: integer;
 begin
@@ -314,14 +314,14 @@ begin
           begin
             NewX1:= X1;
             NewY1:= Y1;
-            GetPosDown(Y2, NewX2, NewY2);
+            GetPosDown(Y2, NewX, NewY);
           end
           else
           begin
             NewX1:= X2;
             NewY1:= Y2;
-            NewX2:= X1;
-            NewY2:= Y1;
+            NewX:= X1;
+            NewY:= Y1;
           end;
         end
         else
@@ -330,8 +330,8 @@ begin
         begin
           NewX1:= X1;
           NewY1:= Y1;
-          NewX2:= X2;
-          NewY2:= Max(0, Y2-1);
+          NewX:= X2;
+          NewY:= Max(0, Y2-1);
         end
         else
         //shrink selection down
@@ -341,7 +341,7 @@ begin
           else
             NewX1:= X2;
           NewY1:= Y2;
-          GetPosDown(Y1, NewX2, NewY2);
+          GetPosDown(Y1, NewX, NewY);
         end;
       end
       else
@@ -353,14 +353,14 @@ begin
           begin
             NewX1:= 0;
             NewY1:= Y1;
-            GetPosDown(Y2, NewX2, NewY2);
+            GetPosDown(Y2, NewX, NewY);
           end
           else
           begin
             NewX1:= 0;
             NewY1:= Y2;
-            NewX2:= 0;
-            NewY2:= Max(0, Y1-1);
+            NewX:= 0;
+            NewY:= Max(0, Y1-1);
           end;
         end
         else
@@ -369,34 +369,33 @@ begin
         begin
           NewX1:= 0;
           NewY1:= Y2;
-          NewX2:= 0;
-          NewY2:= Y1;
-          if (NewY2>0) and (X1=0) then
-            Dec(NewY2);
+          NewX:= 0;
+          NewY:= Y1;
+          if (NewY>0) and (X1=0) then
+            Dec(NewY);
         end
         else
         //extend selection down
         begin
           NewX1:= 0;
           NewY1:= Y1;
-          GetPosDown(Y2, NewX2, NewY2);
+          GetPosDown(Y2, NewX, NewY);
         end;
       end;
 
-      if (NewX1=NewX2) and (NewY1=NewY2) then
+      if (NewX1=NewX) and (NewY1=NewY) then
       begin
         NewX1:= -1;
         NewY1:= -1;
       end;
-      NewCarets.Add(NewX2, NewY2, NewX1, NewY1);
+      NewCarets.Add(NewX, NewY, NewX1, NewY1);
     end;
 
     DoCaretsAssign(NewCarets);
+    Carets.Sort;
   finally
     FreeAndNil(NewCarets);
   end;
-
-  Carets.Sort;
 end;
 
 procedure TATSynEdit.DoSelect_LineRange(ALineFrom: integer; APosTo: TPoint);
