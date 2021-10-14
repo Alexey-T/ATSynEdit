@@ -8178,6 +8178,7 @@ end;
 procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
   ACharSize: TPoint; const AScrollHorz: TATEditorScrollInfo);
 var
+  St: TATStrings;
   nLineFrom, nLineTo, nRangeDeepest, nMaxHeight: integer;
   nIndent, nIndentBegin, nIndentEnd: integer;
   Indexes: TATIntArray;
@@ -8190,6 +8191,7 @@ begin
   if FOptStapleStyle=cLineStyleNone then Exit;
   if not FFold.HasStaples then Exit;
 
+  St:= Strings;
   nLineFrom:= LineTop;
   nLineTo:= LineBottom;
   nMaxHeight:= FRectMain.Height+2;
@@ -8216,8 +8218,8 @@ begin
     if Range^.Folded then Continue;
     }
 
-    if not Strings.IsIndexValid(Range^.Y) then Continue;
-    if not Strings.IsIndexValid(Range^.Y2) then Continue;
+    if not St.IsIndexValid(Range^.Y) then Continue;
+    if not St.IsIndexValid(Range^.Y2) then Continue;
 
     if IsLineFolded(Range^.Y, true) then Continue;
     if IsLineFolded(Range^.Y2, true) then Continue;
@@ -8227,11 +8229,11 @@ begin
     if (P1.Y<FRectMain.Top) and (Range^.Y>=nLineFrom) then Continue;
     if (P2.Y<FRectMain.Top) and (Range^.Y2>=nLineFrom) then Continue;
 
-    nIndentBegin:= FTabHelper.GetIndentExpanded(Range^.Y, Strings.Lines[Range^.Y]);
+    nIndentBegin:= FTabHelper.GetIndentExpanded(Range^.Y, St.Lines[Range^.Y]);
 
     if FOptStapleIndentConsidersEnd then
     begin
-      nIndentEnd:= FTabHelper.GetIndentExpanded(Range^.Y2, Strings.Lines[Range^.Y2]);
+      nIndentEnd:= FTabHelper.GetIndentExpanded(Range^.Y2, St.Lines[Range^.Y2]);
       nIndent:= Min(nIndentBegin, nIndentEnd);
     end
     else
@@ -8386,6 +8388,7 @@ end;
 
 procedure TATSynEdit.UpdateLinksAttribs;
 var
+  St: TATStrings;
   AtrObj: TATLinePartClass;
   NLineStart, NLineEnd, NLineLen: integer;
   MatchPos, MatchLen, iLine: integer;
@@ -8404,6 +8407,7 @@ begin
     exit;
   end;
 
+  St:= Strings;
   NLineStart:= LineTop;
   NLineEnd:= NLineStart+GetVisibleLines;
 
@@ -8415,8 +8419,8 @@ begin
 
   for iLine:= NLineStart to NLineEnd do
   begin
-    if not Strings.IsIndexValid(iLine) then Break;
-    NLineLen:= Strings.LinesLen[iLine];
+    if not St.IsIndexValid(iLine) then Break;
+    NLineLen:= St.LinesLen[iLine];
 
     if NLineLen<FOptMinLineLenToCalcURL then Continue;
     if NLineLen>FOptMaxLineLenToCalcURL then Continue;
@@ -8425,7 +8429,7 @@ begin
     if LinkArrayPtr=nil then
     begin
       Assert(Assigned(FRegexLinks), 'FRegexLinks not inited');
-      FRegexLinks.InputString:= Strings.Lines[iLine];
+      FRegexLinks.InputString:= St.Lines[iLine];
 
       LinkIndex:= 0;
       FillChar(LinkArray, SizeOf(LinkArray), 0);
@@ -8667,6 +8671,7 @@ procedure TATSynEdit.DoPaintTextFragment(C: TCanvas;
   AConsiderWrapInfo: boolean;
   AColorBG, AColorBorder: TColor);
 var
+  St: TATStrings;
   NOutputStrWidth: Int64;
   NLine, NWrapIndex: integer;
   NColorAfter: TColor;
@@ -8674,6 +8679,7 @@ var
   TextOutProps: TATCanvasTextOutProps;
   SText: UnicodeString;
 begin
+  St:= Strings;
   C.Brush.Color:= AColorBG;
   C.FillRect(ARect);
 
@@ -8724,11 +8730,11 @@ begin
     end
     else
     begin
-      if not Strings.IsIndexValid(NLine) then Break;
+      if not St.IsIndexValid(NLine) then Break;
       FillChar(WrapItem, SizeOf(WrapItem), 0);
       WrapItem.NLineIndex:= NLine;
       WrapItem.NCharIndex:= 1;
-      WrapItem.NLength:= Strings.LinesLen[NLine];
+      WrapItem.NLength:= St.LinesLen[NLine];
     end;
 
     DoCalcLineHilite(
@@ -8740,7 +8746,7 @@ begin
       NColorAfter,
       true);
 
-    SText:= Strings.LineSub(
+    SText:= St.LineSub(
         WrapItem.NLineIndex,
         WrapItem.NCharIndex,
         GetVisibleColumns);
@@ -8748,7 +8754,7 @@ begin
     if FOptMaskCharUsed then
       SText:= StringOfCharW(FOptMaskChar, Length(SText));
 
-    TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
+    TextOutProps.HasAsciiNoTabs:= St.LinesHasAsciiNoTabs[WrapItem.NLineIndex];
     TextOutProps.SuperFast:= false;
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
@@ -8864,11 +8870,13 @@ end;
 
 function TATSynEdit.DoGetFoldedMarkLinesCount(ALine: integer): integer;
 var
+  St: TATStrings;
   i: integer;
 begin
   Result:= 1;
-  for i:= ALine+1 to Min(ALine+FFoldTooltipLineCount-1, Strings.Count-1) do
-    if Strings.LinesHidden[i, FEditorIndex] then
+  St:= Strings;
+  for i:= ALine+1 to Min(ALine+FFoldTooltipLineCount-1, St.Count-1) do
+    if St.LinesHidden[i, FEditorIndex] then
       Inc(Result)
     else
       Break;
@@ -8942,45 +8950,45 @@ end;
 
 function TATSynEdit.GetEncodingName: string;
 var
-  Str: TATStrings;
+  St: TATStrings;
 begin
-  Str:= Strings;
-  case Str.Encoding of
+  St:= Strings;
+  case St.Encoding of
     cEncAnsi:
       begin
-        Result:= cEncConvNames[Str.EncodingCodepage];
+        Result:= cEncConvNames[St.EncodingCodepage];
       end;
     cEncUTF8:
       begin
-        if Str.SaveSignUtf8 then
+        if St.SaveSignUtf8 then
           Result:= cEncNameUtf8_WithBom
         else
           Result:= cEncNameUtf8_NoBom;
       end;
     cEncWideLE:
       begin
-        if Str.SaveSignWide then
+        if St.SaveSignWide then
           Result:= cEncNameUtf16LE_WithBom
         else
           Result:= cEncNameUtf16LE_NoBom;
       end;
     cEncWideBE:
       begin
-        if Str.SaveSignWide then
+        if St.SaveSignWide then
           Result:= cEncNameUtf16BE_WithBom
         else
           Result:= cEncNameUtf16BE_NoBom;
       end;
     cEnc32LE:
       begin
-        if Str.SaveSignWide then
+        if St.SaveSignWide then
           Result:= cEncNameUtf32LE_WithBom
         else
           Result:= cEncNameUtf32LE_NoBom;
       end;
     cEnc32BE:
       begin
-        if Str.SaveSignWide then
+        if St.SaveSignWide then
           Result:= cEncNameUtf32BE_WithBom
         else
           Result:= cEncNameUtf32BE_NoBom;
