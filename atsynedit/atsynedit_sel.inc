@@ -357,17 +357,17 @@ begin
           end
           else
           begin
-            NewX1:= St.LinesLen[Y2];
+            NewX1:= 0;
             NewY1:= Y2;
             NewX2:= 0;
-            NewY2:= Y1;
+            NewY2:= Max(0, Y1-1);
           end;
         end
         else
         //extend selection up
         if AUp then
         begin
-          NewX1:= St.LinesLen[Y2];
+          NewX1:= 0;
           NewY1:= Y2;
           NewX2:= 0;
           NewY2:= Y1;
@@ -383,6 +383,11 @@ begin
         end;
       end;
 
+      if (NewX1=NewX2) and (NewY1=NewY2) then
+      begin
+        NewX1:= -1;
+        NewY1:= -1;
+      end;
       NewCarets.Add(NewX2, NewY2, NewX1, NewY1);
     end;
 
