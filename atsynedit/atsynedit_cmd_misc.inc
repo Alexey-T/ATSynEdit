@@ -141,8 +141,8 @@ end;
 
 function TATSynEdit.DoCommand_FoldUnAll: TATCommandResults;
 var
+  St: TATStrings;
   R: PATSynRange;
-  Str: TATStrings;
   i: integer;
 begin
   for i:= 0 to Fold.Count-1 do
@@ -156,11 +156,11 @@ begin
     end;
   end;
 
-  Str:= Strings;
-  for i:= 0 to Str.Count-1 do
+  St:= Strings;
+  for i:= 0 to St.Count-1 do
   begin
-    Str.LinesHidden[i, EditorIndex]:= false;
-    Str.LinesFoldFrom[i, EditorIndex]:= 0;
+    St.LinesHidden[i, EditorIndex]:= false;
+    St.LinesFoldFrom[i, EditorIndex]:= 0;
   end;
 
   Result:= [cResultCaretTop, cResultScroll, cResultFoldChange];
