@@ -9269,6 +9269,7 @@ end;
 
 procedure TATSynEdit.SetFoldingAsString(const AValue: string);
 var
+  St: TATStrings;
   Sep: TATStringSeparator;
   NLineTop, NLine, NRange: integer;
   bChange: boolean;
@@ -9277,11 +9278,12 @@ begin
   NLineTop:= LineTop;
   bChange:= false;
 
+  St:= Strings;
   Sep.Init(AValue);
   repeat
     if not Sep.GetItemInt(NLine, -1) then Break;
 
-    if not Strings.IsIndexValid(NLine) then Continue;
+    if not St.IsIndexValid(NLine) then Continue;
 
     NRange:= Fold.FindRangeWithPlusAtLine(NLine);
     if NRange<0 then Continue;
