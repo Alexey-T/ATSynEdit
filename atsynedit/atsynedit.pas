@@ -3778,6 +3778,7 @@ procedure TATSynEdit.DoPaintMinimapLine(
   end;
   //
 var
+  St: TATStrings;
   NLinesIndex, NCount: integer;
   NOutputCharsSkipped: integer;
   WrapItem: TATWrapItem;
@@ -3788,6 +3789,7 @@ var
   bUseSetPixel: boolean;
   bUseColorOfCurrentLine: boolean;
 begin
+  St:= Strings;
   bUseSetPixel:=
     {$ifndef windows} DoubleBuffered and {$endif}
     (ACharSize.X=1);
@@ -3795,7 +3797,7 @@ begin
   if not FWrapInfo.IsIndexValid(AWrapIndex) then Exit; //e.g. main thread updated WrapInfo
   WrapItem:= FWrapInfo[AWrapIndex];
   NLinesIndex:= WrapItem.NLineIndex;
-  if not Strings.IsIndexValid(NLinesIndex) then Exit;
+  if not St.IsIndexValid(NLinesIndex) then Exit;
 
   //prepare line
   NOutputCharsSkipped:= 0;
@@ -3809,7 +3811,7 @@ begin
   CurrPointText.Y:= CurrPoint.Y;
 
   //work very fast for minimap, take LineSub from start
-  StrOutput:= Strings.LineSub(
+  StrOutput:= St.LineSub(
     NLinesIndex,
     1,
     Min(WrapItem.NLength, FVisibleColumns)
@@ -3862,7 +3864,7 @@ begin
         ATempParts,
         FColorBG,
         NColorAfter,
-        Strings.LineSub(
+        St.LineSub(
           WrapItem.NLineIndex,
           WrapItem.NCharIndex,
           FVisibleColumns), //optimize for huge lines
@@ -3895,15 +3897,17 @@ end;
 procedure TATSynEdit.DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TPoint;
   AWrapIndex: integer);
 var
+  St: TATStrings;
   WrapItem: TATWrapItem;
   LineState: TATLineState;
   GutterItem: TATGutterItem;
   bLineWithCaret: boolean;
   NLinesIndex, NBandDecor: integer;
 begin
+  St:= Strings;
   WrapItem:= FWrapInfo[AWrapIndex];
   NLinesIndex:= WrapItem.NLineIndex;
-  if not Strings.IsIndexValid(NLinesIndex) then exit;
+  if not St.IsIndexValid(NLinesIndex) then exit;
   bLineWithCaret:= IsLineWithCaret(NLinesIndex);
 
   Inc(ARect.Top, FTextOffsetFromTop);
@@ -3955,7 +3959,7 @@ begin
   if GutterItem.Visible then
     if WrapItem.bInitial then
     begin
-      if Strings.Bookmarks.Find(NLinesIndex)>=0 then
+      if St.Bookmarks.Find(NLinesIndex)>=0 then
         DoEventDrawBookmarkIcon(C, NLinesIndex,
           Rect(
             GutterItem.Left,
@@ -3989,7 +3993,7 @@ begin
   GutterItem:= FGutter[FGutterBandStates];
   if GutterItem.Visible then
   begin
-    LineState:= Strings.LinesState[NLinesIndex];
+    LineState:= St.LinesState[NLinesIndex];
     if LineState<>cLineStateNone then
       DoPaintGutterBandBG(C,
         FColorOfStates[LineState],
