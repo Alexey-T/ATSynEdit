@@ -3378,6 +3378,7 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   end;
   //
 var
+  St: TATStrings;
   NLinesIndex, NLineLen, NCount: integer;
   NOutputCharsSkipped: Int64;
   NOutputStrWidth, NOutputMaximalChars: Int64;
@@ -3399,11 +3400,12 @@ var
   bTrimmedNonSpaces: boolean;
   bUseColorOfCurrentLine: boolean;
 begin
+  St:= Strings;
   bHiliteLinesWithSelection:= false;
 
   WrapItem:= FWrapInfo[AWrapIndex];
   NLinesIndex:= WrapItem.NLineIndex;
-  if not Strings.IsIndexValid(NLinesIndex) then Exit;
+  if not St.IsIndexValid(NLinesIndex) then Exit;
 
   //support Gap before the 1st line
   if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
@@ -3443,7 +3445,7 @@ begin
 
   bTrimmedNonSpaces:= false;
 
-  NLineLen:= Strings.LinesLen[NLinesIndex];
+  NLineLen:= St.LinesLen[NLinesIndex];
   bLineHuge:= WrapItem.NLength>OptMaxLineLenForAccurateCharWidths;
           //not this: NLineLen>OptMaxLineLenForAccurateCharWidths;
 
@@ -3454,10 +3456,10 @@ begin
     NSubLen:= Min(WrapItem.NLength, FVisibleColumns+AScrollHorz.NPos+1+6);
       //+1 because of NPixelOffset
       //+6 because of HTML color underlines
-    StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
+    StrOutput:= St.LineSub(NLinesIndex, NSubPos, NSubLen);
 
     if FUnprintedSpacesTrailing then
-      bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
+      bTrimmedNonSpaces:= NSubPos+NSubLen <= St.LineLenWithoutSpace(NLinesIndex);
 
     if WrapItem.bInitial then
     begin
@@ -3481,10 +3483,10 @@ begin
     NSubLen:= Min(WrapItem.NLength, FVisibleColumns+AScrollHorz.NPos+1+6);
       //+1 because of NPixelOffset
       //+6 because of HTML color underlines
-    StrOutput:= Strings.LineSub(NLinesIndex, NSubPos, NSubLen);
+    StrOutput:= St.LineSub(NLinesIndex, NSubPos, NSubLen);
 
     if FUnprintedSpacesTrailing then
-      bTrimmedNonSpaces:= NSubPos+NSubLen <= Strings.LineLenWithoutSpace(NLinesIndex);
+      bTrimmedNonSpaces:= NSubPos+NSubLen <= St.LineLenWithoutSpace(NLinesIndex);
   end;
 
   Inc(CurrPointText.X, NOutputCellPercentsSkipped * ACharSize.X div 100);
@@ -3495,7 +3497,7 @@ begin
   if FOptMaskCharUsed then
     StrOutput:= StringOfCharW(FOptMaskChar, Length(StrOutput));
 
-  LineSeparator:= Strings.LinesSeparator[NLinesIndex];
+  LineSeparator:= St.LinesSeparator[NLinesIndex];
   bLineWithCaret:= IsLineWithCaret(NLinesIndex, FOptShowCurLineIfWithoutSel);
   bLineEolSelected:= IsPosSelected(WrapItem.NCharIndex-1+WrapItem.NLength, WrapItem.NLineIndex);
 
@@ -3505,7 +3507,7 @@ begin
     NOutputMaximalChars:= NLineLen //approximate, it don't consider CJK chars, but OK for huge lines
   else
   begin
-    StringItem:= Strings.GetItemPtr(NLinesIndex);
+    StringItem:= St.GetItemPtr(NLinesIndex);
     if StringItem^.HasAsciiNoTabs then
       NOutputMaximalChars:= StringItem^.CharLen
     else
@@ -3601,7 +3603,7 @@ begin
       SetLength(StrOutput, NCount);
 
       TextOutProps.Editor:= Self;
-      TextOutProps.HasAsciiNoTabs:= Strings.LinesHasAsciiNoTabs[NLinesIndex];
+      TextOutProps.HasAsciiNoTabs:= St.LinesHasAsciiNoTabs[NLinesIndex];
       TextOutProps.SuperFast:= bLineHuge;
       TextOutProps.TabHelper:= FTabHelper;
       TextOutProps.LineIndex:= NLinesIndex;
@@ -3697,7 +3699,7 @@ begin
     begin
       if OptUnprintedEndsDetails then
         DoPaintUnprintedSymbols(C,
-          cLineEndsToSymbols[Strings.LinesEnds[WrapItem.NLineIndex]],
+          cLineEndsToSymbols[St.LinesEnds[WrapItem.NLineIndex]],
           CoordAfterText.X,
           CoordAfterText.Y,
           ACharSize,
@@ -3726,7 +3728,7 @@ begin
   //draw collapsed-mark
   if WrapItem.NFinal=cWrapItemCollapsed then
     DoPaintFoldedMark(C,
-      Strings.LinesFoldFrom[NLinesIndex, FEditorIndex]-1,
+      St.LinesFoldFrom[NLinesIndex, FEditorIndex]-1,
       NLinesIndex,
       CoordAfterText.X,
       CoordAfterText.Y,
