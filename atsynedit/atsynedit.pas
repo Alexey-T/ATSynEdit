@@ -6317,7 +6317,9 @@ begin
     begin
       FMouseDragDroppingReal:= true;
       BeginDrag(true);
-    end;
+    end
+    else
+      Invalidate; //Invalidate is needed even if nothing changed, just to paint drop-marker
     exit;
   end;
 
