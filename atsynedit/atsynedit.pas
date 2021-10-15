@@ -6934,24 +6934,24 @@ procedure TATSynEdit.DoPaintMarkerOfDragDrop(C: TCanvas);
 var
   Details: TATEditorPosDetails;
   NMarkWidth: integer;
-  P: TPoint;
+  PntText, PntCoord: TPoint;
   R: TRect;
 begin
   if not FOptShowDragDropMarker then exit;
   if not FMouseDragDropping then exit;
   if not FMouseDragDroppingReal then exit;
 
-  P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos), Details);
-  if P.Y<0 then exit;
-  P:= CaretPosToClientPos(P);
-  if P.Y<0 then exit;
-  if not PtInRect(FRectMain, P) then exit;
+  PntText:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos), Details);
+  if PntText.Y<0 then exit;
+  PntCoord:= CaretPosToClientPos(PntText);
+  if PntCoord.Y<0 then exit;
+  if not PtInRect(FRectMain, PntCoord) then exit;
 
   NMarkWidth:= EditorScale(FOptShowDragDropMarkerWidth);
-  R.Left:= P.X - NMarkWidth div 2;
+  R.Left:= PntCoord.X - NMarkWidth div 2;
   R.Right:= R.Left + NMarkWidth;
-  R.Top:= P.Y;
-  R.Bottom:= P.Y + FCharSize.Y; //100% height
+  R.Top:= PntCoord.Y;
+  R.Bottom:= R.Top + FCharSize.Y; //100% height
 
   C.Brush.Color:= Colors.Markers;
   C.FillRect(R);
