@@ -7484,9 +7484,9 @@ begin
     end;
   end;
 
-  Update(true);
   DoEventCarets;
   DoEventChange;
+  Update(true);
 end;
 
 function TATSynEdit.IndentString: UnicodeString;
