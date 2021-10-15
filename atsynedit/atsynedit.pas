@@ -6113,6 +6113,9 @@ begin
   //else
   if PtInRect(FRectMain, P) then
   begin
+    if FMouseDragDropping and FMouseDragDroppingReal then
+      Cursor:= crDrag
+    else
     if FMouseDownAndColumnSelection then
       Cursor:= FCursorColumnSel
     else
