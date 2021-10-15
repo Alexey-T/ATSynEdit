@@ -6922,6 +6922,8 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMarkerOfDragDrop(C: TCanvas);
+const
+  cMarkerWidth = 2;
 var
   Details: TATEditorPosDetails;
   P: TPoint;
@@ -6937,7 +6939,7 @@ begin
   if not PtInRect(FRectMain, P) then exit;
 
   R.Left:= P.X-1;
-  R.Right:= P.X+1; //2 pixels width
+  R.Right:= R.Left+cMarkerWidth;
   R.Top:= P.Y;
   R.Bottom:= P.Y+FCharSize.Y; //100% height
 
