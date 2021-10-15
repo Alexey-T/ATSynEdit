@@ -497,12 +497,16 @@ begin
   begin
     //selected entire lines
     LineBlockDelete(AFromY, AToY-1);
+
+    AShift.Y:= -(AToY-AFromY);
   end
   else
   if (AFromX=0) and (AToY=Count-1) and (AToX=LinesLen[AToY]) then
   begin
     //selected entire lines, to the end of last line
     LineBlockDelete(AFromY, AToY);
+
+    AShift.Y:= -(AToY-AFromY);
   end
   else
   begin
