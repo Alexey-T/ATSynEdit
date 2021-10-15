@@ -6950,7 +6950,8 @@ begin
   C.Brush.Color:= Colors.Markers;
   C.FillRect(R);
 
-  //InvalidateRect(Handle, @R, false);
+  //InvalidateRect(Handle, @R, false); //doens't work for CudaText issue #3784
+  Invalidate; //fix CudaText issue #3784
 end;
 
 procedure TATSynEdit.TimerBlinkDisable;
