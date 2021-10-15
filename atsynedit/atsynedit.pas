@@ -6935,12 +6935,9 @@ var
   P: TPoint;
   R: TRect;
 begin
-  if not FOptShowDragDropMarker then
-    exit;
-  if not FMouseDragDropping then
-    exit;
-  if not FMouseDragDroppingReal then
-    exit;
+  if not FOptShowDragDropMarker then exit;
+  if not FMouseDragDropping then exit;
+  if not FMouseDragDroppingReal then exit;
 
   P:= ClientPosToCaretPos(ScreenToClient(Mouse.CursorPos), Details);
   if P.Y<0 then exit;
