@@ -435,6 +435,7 @@ const
   cInitMaxLineLenToTokenize = 4000;
   cInitMinLineLenToCalcURL = 4;
   cInitMaxLineLenToCalcURL = 300;
+  cInitDragDropMarkerWidth = 4;
   cInitStapleHiliteAlpha = 180;
   cInitZebraAlphaBlend = 235;
   cInitDimUnfocusedBack = 0;
@@ -892,6 +893,7 @@ type
     FOptShowURLs: boolean;
     FOptShowURLsRegex: string;
     FOptShowDragDropMarker: boolean;
+    FOptShowDragDropMarkerWidth: integer;
     FOptStapleStyle: TATLineStyle;
     FOptStapleIndent: integer;
     FOptStapleWidthPercent: integer;
@@ -1858,6 +1860,7 @@ type
     property OptShowURLs: boolean read FOptShowURLs write FOptShowURLs default true;
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
+    property OptShowDragDropMarkerWidth: integer read FOptShowDragDropMarkerWidth write FOptShowDragDropMarkerWidth default cInitDragDropMarkerWidth;
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMinLineLenToCalcURL: integer read FOptMinLineLenToCalcURL write FOptMinLineLenToCalcURL default cInitMinLineLenToCalcURL;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
@@ -4644,6 +4647,7 @@ begin
   FOptShowURLs:= true;
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
+  FOptShowDragDropMarkerWidth:= cInitDragDropMarkerWidth;
 
   FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMinLineLenToCalcURL:= cInitMinLineLenToCalcURL;
@@ -6925,10 +6929,9 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMarkerOfDragDrop(C: TCanvas);
-const
-  cMarkerWidth = 2;
 var
   Details: TATEditorPosDetails;
+  NMarkWidth: integer;
   P: TPoint;
   R: TRect;
 begin
@@ -6945,10 +6948,11 @@ begin
   if P.Y<0 then exit;
   if not PtInRect(FRectMain, P) then exit;
 
-  R.Left:= P.X-1;
-  R.Right:= R.Left+cMarkerWidth;
+  NMarkWidth:= EditorScale(FOptShowDragDropMarkerWidth);
+  R.Left:= P.X - NMarkWidth div 2;
+  R.Right:= R.Left + NMarkWidth;
   R.Top:= P.Y;
-  R.Bottom:= P.Y+FCharSize.Y; //100% height
+  R.Bottom:= P.Y + FCharSize.Y; //100% height
 
   C.Brush.Color:= Colors.Markers;
   C.FillRect(R);

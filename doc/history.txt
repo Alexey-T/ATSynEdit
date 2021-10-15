@@ -1,4 +1,7 @@
 
+2021.10.15
++ add: prop OptShowDragDropMarkerWidth
+
 2021.10.11
 * change: new prop OptPasteWithEolAtLineStart, which is set to True
 
