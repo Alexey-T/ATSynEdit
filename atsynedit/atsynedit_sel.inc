@@ -305,23 +305,27 @@ begin
       if bSelShrink then
       begin
         //not _whole_ line(s) selected? select whole line(s), and don't shrink/extend more
-        //fixes CudaText issue #3778 (comment)
         if not bWholeLinesSel then
         begin
-          X1:= 0;
-          X2:= St.LinesLen[Y2];
           if not AUp then
           begin
-            NewX1:= X1;
+            NewX1:= 0;
             NewY1:= Y1;
             GetPosDown(Y2, NewX, NewY);
           end
           else
           begin
-            NewX1:= X2;
-            NewY1:= Y2;
-            NewX:= X1;
+            NewX:= 0;
             NewY:= Y1;
+            if X2=0 then
+            begin
+              NewX1:= 0;
+              NewY1:= Y2;
+            end
+            else
+            begin
+              GetPosDown(Y2, NewX1, NewY1);
+            end;
           end;
         end
         else
