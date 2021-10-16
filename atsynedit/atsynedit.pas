@@ -823,6 +823,8 @@ type
     FMicromap: TATMicromap;
     FMicromapVisible: boolean;
     FMicromapOnScrollbar: boolean;
+    FMicromapLineStates: boolean;
+    FMicromapSelections: boolean;
     FMicromapBookmarks: boolean;
     FMicromapScaleDiv: integer;
     FMicromapShowForMinCount: integer;
@@ -1932,6 +1934,8 @@ type
     property OptMinimapDragImmediately: boolean read FMinimapDragImmediately write FMinimapDragImmediately default false;
     property OptMicromapVisible: boolean read FMicromapVisible write SetMicromapVisible default cInitMicromapVisible;
     property OptMicromapOnScrollbar: boolean read FMicromapOnScrollbar write FMicromapOnScrollbar default cInitMicromapOnScrollbar;
+    property OptMicromapLineStates: boolean read FMicromapLineStates write FMicromapLineStates default true;
+    property OptMicromapSelections: boolean read FMicromapSelections write FMicromapSelections default true;
     property OptMicromapBookmarks: boolean read FMicromapBookmarks write FMicromapBookmarks default cInitMicromapBookmarks;
     property OptMicromapShowForMinCount: integer read FMicromapShowForMinCount write FMicromapShowForMinCount default cInitMicromapShowForMinCount;
     property OptSpacingY: integer read FSpacingY write SetSpacingY default cInitSpacingY;
@@ -4515,6 +4519,8 @@ begin
   FMicromap:= TATMicromap.Create;
   FMicromapVisible:= cInitMicromapVisible;
   FMicromapOnScrollbar:= cInitMicromapOnScrollbar;
+  FMicromapLineStates:= true;
+  FMicromapSelections:= true;
   FMicromapBookmarks:= cInitMicromapBookmarks;
   FMicromapScaleDiv:= 1;
   FMicromapShowForMinCount:= cInitMicromapShowForMinCount;
