@@ -281,7 +281,7 @@ var
   Caret: TATCaretItem;
   NewCarets: TATCarets;
   X1, Y1, X2, Y2: integer;
-  NewX1, NewY1, NewX, NewY: integer;
+  NewX, NewY, EndX, EndY: integer;
   bSel, bSelShrink, bWholeLinesSel: boolean;
   iCaret: integer;
 begin
@@ -309,8 +309,8 @@ begin
         begin
           if not AUp then
           begin
-            NewX1:= 0;
-            NewY1:= Y1;
+            EndX:= 0;
+            EndY:= Y1;
             GetPosDown(Y2, NewX, NewY);
           end
           else
@@ -319,12 +319,12 @@ begin
             NewY:= Y1;
             if X2=0 then
             begin
-              NewX1:= 0;
-              NewY1:= Y2;
+              EndX:= 0;
+              EndY:= Y2;
             end
             else
             begin
-              GetPosDown(Y2, NewX1, NewY1);
+              GetPosDown(Y2, EndX, EndY);
             end;
           end;
         end
@@ -332,8 +332,8 @@ begin
         //shrink selection up
         if AUp then
         begin
-          NewX1:= X1;
-          NewY1:= Y1;
+          EndX:= X1;
+          EndY:= Y1;
           NewX:= X2;
           NewY:= Max(0, Y2-1);
         end
@@ -341,10 +341,10 @@ begin
         //shrink selection down
         begin
           if Y1=Y2 then
-            NewX1:= 0
+            EndX:= 0
           else
-            NewX1:= X2;
-          NewY1:= Y2;
+            EndX:= X2;
+          EndY:= Y2;
           GetPosDown(Y1, NewX, NewY);
         end;
       end
@@ -355,14 +355,14 @@ begin
         begin
           if not AUp then
           begin
-            NewX1:= 0;
-            NewY1:= Y1;
+            EndX:= 0;
+            EndY:= Y1;
             GetPosDown(Y2, NewX, NewY);
           end
           else
           begin
-            NewX1:= 0;
-            NewY1:= Y2;
+            EndX:= 0;
+            EndY:= Y2;
             NewX:= 0;
             NewY:= Max(0, Y1-1);
           end;
@@ -371,10 +371,10 @@ begin
         //extend selection up
         if AUp then
         begin
-          NewX1:= X2;
-          NewY1:= Y2;
+          EndX:= X2;
+          EndY:= Y2;
           if Y2<St.Count-1 then
-            NewX1:= 0;
+            EndX:= 0;
           NewX:= 0;
           NewY:= Y1;
           if (NewY>0) and (X1=0) then
@@ -383,18 +383,18 @@ begin
         else
         //extend selection down
         begin
-          NewX1:= 0;
-          NewY1:= Y1;
+          EndX:= 0;
+          EndY:= Y1;
           GetPosDown(Y2, NewX, NewY);
         end;
       end;
 
-      if (NewX1=NewX) and (NewY1=NewY) then
+      if (EndX=NewX) and (EndY=NewY) then
       begin
-        NewX1:= -1;
-        NewY1:= -1;
+        EndX:= -1;
+        EndY:= -1;
       end;
-      NewCarets.Add(NewX, NewY, NewX1, NewY1);
+      NewCarets.Add(NewX, NewY, EndX, EndY);
     end;
 
     DoCaretsAssign(NewCarets);
