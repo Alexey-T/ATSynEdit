@@ -371,8 +371,10 @@ begin
         //extend selection up
         if AUp then
         begin
-          NewX1:= 0;
+          NewX1:= X2;
           NewY1:= Y2;
+          if Y2<St.Count-1 then
+            NewX1:= 0;
           NewX:= 0;
           NewY:= Y1;
           if (NewY>0) and (X1=0) then
