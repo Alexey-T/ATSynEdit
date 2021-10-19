@@ -8599,7 +8599,7 @@ begin
     if FOptScrollSmooth then
       NPos:= NPos div FCharSize.Y;
     DoUnfoldLine(NPos);
-    LineTop:= Max(0, NPos-3);
+    LineTop:= NPos; //Max(0, NPos-3);
   end
   else
   begin
