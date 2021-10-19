@@ -2731,6 +2731,7 @@ procedure TATSynEdit.UpdateScrollbarVert;
 var
   NeedBar: boolean;
   si: TScrollInfo;
+  NDelta: Int64;
 begin
   case FOptScrollStyleVert of
     aessHide:
@@ -2747,11 +2748,31 @@ begin
   if FScrollbarVert.Visible then
   begin
     FScrollbarLock:= true;
-    FScrollbarVert.Min:= 0;
-    FScrollbarVert.Max:= FScrollVert.SmoothMax;
-    FScrollbarVert.SmallChange:= FScrollVert.SmoothCharSize;
-    FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
-    FScrollbarVert.Position:= FScrollVert.SmoothPos;
+
+    //if option "minimap on scrollbar" on, scrollbar shows all lines (from 0 to St.Count-1)
+    //including folded lines.
+    //if option is off, it shows smaller range, if lines are folded.
+    if FMicromapOnScrollbar then
+    begin
+      if FOptScrollSmooth then
+        NDelta:= FCharSize.Y
+      else
+        NDelta:= 1;
+      FScrollbarVert.Min:= 0;
+      FScrollbarVert.Max:= NDelta * Max(0, Strings.Count-1);
+      FScrollbarVert.SmallChange:= NDelta;
+      FScrollbarVert.PageSize:= NDelta * Max(1, GetVisibleLines);
+      FScrollbarVert.Position:= NDelta * LineTop;
+    end
+    else
+    begin
+      FScrollbarVert.Min:= 0;
+      FScrollbarVert.Max:= FScrollVert.SmoothMax;
+      FScrollbarVert.SmallChange:= FScrollVert.SmoothCharSize;
+      FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
+      FScrollbarVert.Position:= FScrollVert.SmoothPos;
+    end;
+
     FScrollbarVert.Update;
     FScrollbarLock:= false;
   end;
@@ -8568,12 +8589,24 @@ end;
 procedure TATSynEdit.OnNewScrollbarVertChanged(Sender: TObject);
 var
   Msg: TLMVScroll;
+  NPos: Int64;
 begin
   if FScrollbarLock then exit;
-  FillChar(Msg{%H-}, SizeOf(Msg), 0);
-  Msg.ScrollCode:= SB_THUMBPOSITION;
-  Msg.Pos:= FScrollbarVert.Position;
-  WMVScroll(Msg);
+
+  if FMicromapOnScrollbar then
+  begin
+    NPos:= FScrollbarVert.Position;
+    if FOptScrollSmooth then
+      NPos:= NPos div FCharSize.Y;
+    LineTop:= NPos;
+  end
+  else
+  begin
+    FillChar(Msg{%H-}, SizeOf(Msg), 0);
+    Msg.ScrollCode:= SB_THUMBPOSITION;
+    Msg.Pos:= FScrollbarVert.Position;
+    WMVScroll(Msg);
+  end;
 
   //show scroll hint
   DoHintShow;
