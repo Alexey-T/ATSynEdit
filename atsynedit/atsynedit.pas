@@ -8598,7 +8598,8 @@ begin
     NPos:= FScrollbarVert.Position;
     if FOptScrollSmooth then
       NPos:= NPos div FCharSize.Y;
-    LineTop:= NPos;
+    DoUnfoldLine(NPos);
+    LineTop:= Max(0, NPos-3);
   end
   else
   begin
