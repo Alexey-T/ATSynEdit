@@ -1,4 +1,7 @@
 
+2021.10.19
++ add: prop OptShowFoldedMarkWithSelectionBG
+
 2021.10.15
 + add: prop OptShowDragDropMarkerWidth
 

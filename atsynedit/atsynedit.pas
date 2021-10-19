@@ -439,6 +439,7 @@ const
   cInitStapleHiliteAlpha = 180;
   cInitZebraAlphaBlend = 235;
   cInitDimUnfocusedBack = 0;
+  cInitShowFoldedMarkWithSelectionBG = true;
 
   cGutterBands = 6;
   cGutterSizeBm = 16;
@@ -896,6 +897,7 @@ type
     FOptShowURLsRegex: string;
     FOptShowDragDropMarker: boolean;
     FOptShowDragDropMarkerWidth: integer;
+    FOptShowFoldedMarkWithSelectionBG: boolean;
     FOptStapleStyle: TATLineStyle;
     FOptStapleIndent: integer;
     FOptStapleWidthPercent: integer;
@@ -1863,6 +1865,7 @@ type
     property OptShowURLsRegex: string read FOptShowURLsRegex write SetOptShowURLsRegex stored false;
     property OptShowDragDropMarker: boolean read FOptShowDragDropMarker write FOptShowDragDropMarker default true;
     property OptShowDragDropMarkerWidth: integer read FOptShowDragDropMarkerWidth write FOptShowDragDropMarkerWidth default cInitDragDropMarkerWidth;
+    property OptShowFoldedMarkWithSelectionBG: boolean read FOptShowFoldedMarkWithSelectionBG write FOptShowFoldedMarkWithSelectionBG default cInitShowFoldedMarkWithSelectionBG;
     property OptMaxLineLenToTokenize: integer read FOptMaxLineLenToTokenize write FOptMaxLineLenToTokenize default cInitMaxLineLenToTokenize;
     property OptMinLineLenToCalcURL: integer read FOptMinLineLenToCalcURL write FOptMinLineLenToCalcURL default cInitMinLineLenToCalcURL;
     property OptMaxLineLenToCalcURL: integer read FOptMaxLineLenToCalcURL write FOptMaxLineLenToCalcURL default cInitMaxLineLenToCalcURL;
@@ -4256,7 +4259,7 @@ begin
 
   //set colors:
   //if 1st chars selected, then use selection-color
-  if IsPosSelected(APosX, APosY) then
+  if IsPosSelected(APosX, APosY) and FOptShowFoldedMarkWithSelectionBG then
   begin
     if Colors.TextSelFont<>clNone then
       C.Font.Color:= Colors.TextSelFont
@@ -4271,7 +4274,9 @@ begin
   end;
 
   //paint text
-  C.Brush.Style:= bsClear;
+  if not FOptShowFoldedMarkWithSelectionBG then
+    C.Brush.Style:= bsClear;
+
   C.TextOut(
     ACoordX+cFoldedMarkIndentInner,
     ACoordY+FTextOffsetFromTop,
@@ -4654,6 +4659,7 @@ begin
   FOptShowURLsRegex:= cUrlRegexInitial;
   FOptShowDragDropMarker:= true;
   FOptShowDragDropMarkerWidth:= cInitDragDropMarkerWidth;
+  FOptShowFoldedMarkWithSelectionBG:= cInitShowFoldedMarkWithSelectionBG;
 
   FOptMaxLineLenToTokenize:= cInitMaxLineLenToTokenize;
   FOptMinLineLenToCalcURL:= cInitMinLineLenToCalcURL;
