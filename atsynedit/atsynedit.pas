@@ -8595,11 +8595,10 @@ begin
 
   if FMicromapOnScrollbar then
   begin
-    NPos:= FScrollbarVert.Position;
-    if FOptScrollSmooth then
-      NPos:= NPos div FCharSize.Y;
+    NPos:= FScrollbarVert.Position
+           div FScrollbarVert.SmallChange; //this supports OptScrollSmooth
     DoUnfoldLine(NPos);
-    LineTop:= NPos; //Max(0, NPos-3);
+    LineTop:= NPos;
   end
   else
   begin
