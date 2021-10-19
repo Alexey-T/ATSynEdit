@@ -1536,7 +1536,7 @@ type
     property RectRuler: TRect read FRectRuler;
     function IndentString: UnicodeString;
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer;
-      const ARectMicromap: TRect; AMinMarkHeight: integer): TRect;
+      AMicromapHeight, AMinMarkHeight: integer): TRect;
     property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft;
     property OptTextOffsetTop: integer read GetOptTextOffsetTop write FOptTextOffsetTop;
     //gutter
@@ -9088,24 +9088,25 @@ begin
 end;
 
 function TATSynEdit.RectMicromapMark(AColumn, ALineFrom, ALineTo: integer;
-  const ARectMicromap: TRect; AMinMarkHeight: integer): TRect;
+  AMicromapHeight, AMinMarkHeight: integer): TRect;
+//to make safe, don't pass the ARect, but only its height
 var
   H: integer;
 begin
   if FMicromap.IsIndexValid(AColumn) then
   begin
-    H:= ARectMicromap.Height;
+    H:= AMicromapHeight;
 
     if ALineFrom>=0 then
-      Result.Top:= ARectMicromap.Top + Int64(ALineFrom) * H div FMicromapScaleDiv
+      Result.Top:= Int64(ALineFrom) * H div FMicromapScaleDiv
     else
-      Result.Top:= ARectMicromap.Top;
+      Result.Top:= 0;
 
     if ALineTo>=0 then
       Result.Bottom:= Max(Result.Top + AMinMarkHeight,
-                 ARectMicromap.Top + Int64(ALineTo+1) * H div FMicromapScaleDiv)
+                 0 + Int64(ALineTo+1) * H div FMicromapScaleDiv)
     else
-      Result.Bottom:= ARectMicromap.Bottom;
+      Result.Bottom:= H;
 
     with FMicromap.Columns[AColumn] do
     begin
