@@ -95,31 +95,32 @@ end;
 
 procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean = false);
 var
-  P: TPoint;
-  NStart, i: integer;
+  NCaretCount, NStart, i: integer;
   Caret: TATCaretItem;
   Marker: PATMarkerItem;
+  PntCaret, PntCoord: TPoint;
 begin
+  NCaretCount:= Carets.Count;
   if AOnlyLast then
-    NStart:= Carets.Count-1
+    NStart:= NCaretCount-1
   else
     NStart:= 0;
 
-  for i:= NStart to Carets.Count-1 do
+  for i:= NStart to NCaretCount-1 do
   begin
     Caret:= Carets[i];
-    P.X:= Caret.PosX;
-    P.Y:= Caret.PosY;
-    if IsPosFolded(P.X, P.Y) then
+    PntCaret.X:= Caret.PosX;
+    PntCaret.Y:= Caret.PosY;
+    if IsPosFolded(PntCaret.X, PntCaret.Y) then
     begin
       Caret.CoordX:= -1;
       Caret.CoordY:= -1;
     end
     else
     begin
-      P:= CaretPosToClientPos(P);
-      Caret.CoordX:= P.X;
-      Caret.CoordY:= P.Y;
+      PntCoord:= CaretPosToClientPos(PntCaret);
+      Caret.CoordX:= PntCoord.X;
+      Caret.CoordY:= PntCoord.Y;
     end;
   end;
 
@@ -131,20 +132,20 @@ begin
     Marker^.CoordY:= -1;
     Marker^.CoordX2:= -1;
     Marker^.CoordY2:= -1;
-    P.X:= Marker^.PosX;
-    P.Y:= Marker^.PosY;
-    if not IsPosFolded(P.X, P.Y) then
+    PntCaret.X:= Marker^.PosX;
+    PntCaret.Y:= Marker^.PosY;
+    if not IsPosFolded(PntCaret.X, PntCaret.Y) then
     begin
-      P:= CaretPosToClientPos(P);
-      Marker^.CoordX:= P.X;
-      Marker^.CoordY:= P.Y;
+      PntCoord:= CaretPosToClientPos(PntCaret);
+      Marker^.CoordX:= PntCoord.X;
+      Marker^.CoordY:= PntCoord.Y;
       if Marker^.LineLen<>0 then
       begin
-        P.X:= Marker^.PosX+Marker^.LineLen;
-        P.Y:= Marker^.PosY;
-        P:= CaretPosToClientPos(P);
-        Marker^.CoordX2:= P.X;
-        Marker^.CoordY2:= P.Y;
+        PntCaret.X:= Marker^.PosX+Marker^.LineLen;
+        PntCaret.Y:= Marker^.PosY;
+        PntCoord:= CaretPosToClientPos(PntCaret);
+        Marker^.CoordX2:= PntCoord.X;
+        Marker^.CoordY2:= PntCoord.Y;
       end;
     end;
   end;
