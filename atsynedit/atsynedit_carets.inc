@@ -587,10 +587,58 @@ begin
   end;
 end;
 
+function TATSynEdit.DoCaretApplyProximityToVertEdge(ACaretPos: TPoint; ACaretCoordY: integer;
+  AProximity, AIndentVert: integer): boolean;
+//  vert indent <0: always indent from top;
+//             >=0: indent from top (goto up) or bottom (goto down)
+var
+  NIndex: integer;
+begin
+  Result:= false;
+  if ACaretCoordY < FRectMain.Top + AProximity*FCharSize.Y then
+  begin
+    NIndex:= FWrapInfo.FindIndexOfCaretPos(ACaretPos);
+    if NIndex<0 then Exit;
+    DoScroll_IndentFromTop(NIndex, Abs(AIndentVert));
+    Result:= true;
+  end
+  else
+  if ACaretCoordY+FCharSize.Y >= FRectMain.Bottom - AProximity*FCharSize.Y then
+  begin
+    NIndex:= FWrapInfo.FindIndexOfCaretPos(ACaretPos);
+    if NIndex<0 then Exit;
+    if AIndentVert<0 then
+      DoScroll_IndentFromTop(NIndex, Abs(AIndentVert))
+    else
+      DoScroll_IndentFromBottom(NIndex, Abs(AIndentVert));
+    Result:= true;
+  end;
+end;
+
+function TATSynEdit.DoCaretApplyProximityToHorzEdge(ACaretCoordX, AProximity,
+  AIndentHorz: integer): boolean;
+var
+  NChars: integer;
+begin
+  Result:= false;
+  if ACaretCoordX < FRectMain.Left+AProximity*FCharSize.X then
+  begin
+    NChars:= (FRectMain.Left-ACaretCoordX) div FCharSize.X + 1 + AIndentHorz;
+    FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
+    Result:= true;
+  end
+  else
+  if ACaretCoordX > FRectMain.Right-AProximity*FCharSize.X-FCharSize.X then
+  begin
+    NChars:= (ACaretCoordX-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
+    FScrollHorz.NPos:= FScrollHorz.NPos+NChars;
+    Result:= true;
+  end;
+end;
+
 function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AUnfold, AllowUpdate: boolean): boolean;
 var
   Coord: TPoint;
-  NIndex, NChars: integer;
 begin
   Result:= false;
 
@@ -605,48 +653,16 @@ begin
   Coord:= CaretPosToClientPos(APos);
 
   //for y
-  //  vert indent <0: always indent from top;
-  //             >=0: indent from top (goto up) or bottom (goto down)
-  if Coord.Y<FRectMain.Top then
-  begin
-    NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
-    if NIndex<0 then Exit;
-    DoScroll_IndentFromTop(NIndex, Abs(AIndentVert));
-    Result:= true;
-  end
-  else
-  if Coord.Y+FCharSize.Y >= FRectMain.Bottom then
-  begin
-    NIndex:= FWrapInfo.FindIndexOfCaretPos(APos);
-    if NIndex<0 then Exit;
-    if AIndentVert<0 then
-      DoScroll_IndentFromTop(NIndex, Abs(AIndentVert))
-    else
-      DoScroll_IndentFromBottom(NIndex, Abs(AIndentVert));
-    Result:= true;
-  end;
+  Result:= DoCaretApplyProximityToVertEdge(APos, Coord.Y, 0, AIndentVert);
+  if not Result then exit;
 
   //for x
-  if Coord.X<FRectMain.Left then
-  begin
-    NChars:= (FRectMain.Left-Coord.X) div FCharSize.X + 1 + AIndentHorz;
-    FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
-    Result:= true;
-  end
-  else
-  if Coord.X>FRectMain.Right-FCharSize.X then
-  begin
-    NChars:= (Coord.X-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
-    FScrollHorz.NPos:= FScrollHorz.NPos+NChars;
-    Result:= true;
-  end;
+  Result:= DoCaretApplyProximityToHorzEdge(Coord.X, 0, AIndentHorz);
+  if not Result then exit;
 
-  if Result then
-  begin
-    UpdateScrollbars(true);
-    if AllowUpdate then
-      Update;
-  end;
+  UpdateScrollbars(true);
+  if AllowUpdate then
+    Update;
 end;
 
 procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
