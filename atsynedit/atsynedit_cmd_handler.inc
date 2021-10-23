@@ -256,7 +256,9 @@ begin
     //will move-down exactly N times
     UpdateCaretsCoords;
 
-    if (FOptCaretProximityVert>0) and (FOptCaretProximityVert<=10) and (Carets.Count=1) then
+    if (FOptCaretProximityVert>0) and
+      (FOptCaretProximityVert<=10) and
+      (FOptCaretProximityVert<=GetVisibleLines div 2 - 1) then
     begin
       Caret:= Carets[0];
       if DoCaretApplyProximityToVertEdge(
@@ -264,7 +266,18 @@ begin
            Caret.CoordY,
            FOptCaretProximityVert,
            FOptCaretProximityVert) then
-        UpdateCaretsCoords;
+        UpdateCaretsCoords
+      else
+      if Carets.Count>1 then
+      begin
+        Caret:= Carets[Carets.Count-1];
+        if DoCaretApplyProximityToVertEdge(
+             Point(Caret.PosX, Caret.PosY),
+             Caret.CoordY,
+             FOptCaretProximityVert,
+             FOptCaretProximityVert) then
+          UpdateCaretsCoords;
+      end;
     end;
   end;
 
