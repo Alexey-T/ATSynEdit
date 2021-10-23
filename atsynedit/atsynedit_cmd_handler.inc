@@ -260,15 +260,18 @@ begin
     NProximityVert:= GetActualProximityVert;
     if NProximityVert>0 then
     begin
-      Caret:= Carets[0];
-      if DoCaretApplyProximityToVertEdge(
-           Point(Caret.PosX, Caret.PosY),
-           Caret.CoordY,
-           NProximityVert,
-           NProximityVert) then
-        UpdateCaretsCoords
+      if (Carets.Count=1) or (Res*[cResultCaretTop, cResultCaretAny]<>[]) then
+      begin
+        Caret:= Carets[0];
+        if DoCaretApplyProximityToVertEdge(
+             Point(Caret.PosX, Caret.PosY),
+             Caret.CoordY,
+             NProximityVert,
+             NProximityVert) then
+          UpdateCaretsCoords
+      end
       else
-      if Carets.Count>1 then
+      if (Carets.Count>1) and (Res*[cResultCaretBottom]<>[]) then
       begin
         Caret:= Carets[Carets.Count-1];
         if DoCaretApplyProximityToVertEdge(
