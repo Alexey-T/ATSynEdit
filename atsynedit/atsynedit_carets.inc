@@ -655,13 +655,13 @@ begin
   Coord:= CaretPosToClientPos(APos);
 
   //for y
-  Result:= DoCaretApplyProximityToVertEdge(APos, Coord.Y, GetActualProximityVert, AIndentVert);
-  if not Result then exit;
+  if not DoCaretApplyProximityToVertEdge(APos, Coord.Y, GetActualProximityVert, AIndentVert) then
+    exit;
 
   //for x
-  Result:= DoCaretApplyProximityToHorzEdge(Coord.X, 0, AIndentHorz);
-  if not Result then exit;
+  DoCaretApplyProximityToHorzEdge(Coord.X, 0, AIndentHorz);
 
+  Result:= true;
   UpdateScrollbars(true);
   if AllowUpdate then
     Update;
