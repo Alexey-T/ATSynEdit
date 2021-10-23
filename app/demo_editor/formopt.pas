@@ -95,6 +95,7 @@ type
     chkUnprintSpace: TCheckBox;
     chkUnprintEn: TCheckBox;
     chkZebraActive: TCheckBox;
+    edCrProxi: TSpinEdit;
     edUnpriEol: TComboBox;
     comboMsMidClick: TComboBox;
     ComboMsClick2: TComboBox;
@@ -149,6 +150,7 @@ type
     Label21: TLabel;
     Label22: TLabel;
     Label23: TLabel;
+    Label24: TLabel;
     Label6: TLabel;
     LabelZebraAlpha: TLabel;
     Label3: TLabel;
@@ -264,6 +266,7 @@ begin
     chkCrStopUnfocus.Checked:= ed.OptCaretStopUnfocused;
     chkCrPreferLeft.Checked:= ed.OptCaretPreferLeftSide;
     chkCrPrimitiveCol.Checked:= ed.OptCaretsPrimitiveColumnSelection;
+    edCrProxi.Value:= ed.OptCaretProximityVert;
 
     edCrWidthNormal.Value:= ed.CaretShapeNormal.Width;
     edCrHeightNormal.Value:= ed.CaretShapeNormal.Height;
@@ -399,6 +402,7 @@ begin
       ed.OptCaretStopUnfocused:= chkCrStopUnfocus.Checked;
       ed.OptCaretPreferLeftSide:= chkCrPreferLeft.Checked;
       ed.OptCaretsPrimitiveColumnSelection:= chkCrPrimitiveCol.Checked;
+      ed.OptCaretProximityVert:= edCrProxi.Value;
 
       ed.CaretShapeNormal.Width:= edCrWidthNormal.Value;
       ed.CaretShapeNormal.Height:= edCrHeightNormal.Value;

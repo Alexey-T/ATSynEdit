@@ -250,10 +250,22 @@ begin
       FSelRect:= cRectEmpty;
     DoEventCarets;
 
-    //update pixel coords, so that plugin command
-    //  for in in range(N): ed.cmd(cCommand_KeyDown)
-    //will move-down N times
+    //update pixel coords, so that CudaText python code
+    //    for in in range(N):
+    //        ed.cmd(cCommand_KeyDown)
+    //will move-down exactly N times
     UpdateCaretsCoords;
+
+    if (FOptCaretProximityVert>0) and (FOptCaretProximityVert<=10) and (Carets.Count=1) then
+    begin
+      Caret:= Carets[0];
+      if DoCaretApplyProximityToVertEdge(
+           Point(Caret.PosX, Caret.PosY),
+           Caret.CoordY,
+           FOptCaretProximityVert,
+           FOptCaretProximityVert) then
+        UpdateCaretsCoords;
+    end;
   end;
 
   if bTextChanged then

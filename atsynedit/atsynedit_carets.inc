@@ -528,7 +528,7 @@ begin
   FScrollVert.NPixelOffset:= 0;
 end;
 
-procedure TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
+function TATSynEdit.DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer): boolean;
 //index: original vert scroll pos
 //do dec(index), until offset (pixels) from caret to bottom is small enough
 var
@@ -536,6 +536,7 @@ var
   ItemGap: TATGapItem;
   i: integer;
 begin
+  Result:= false;
   NIndex:= AWrapInfoIndex;
   if NIndex<=0 then exit;
 
@@ -553,7 +554,7 @@ begin
     if NIndex<0 then
     begin
       FScrollVert.SetZero;
-      Exit;
+      Exit(true);
     end;
 
     Dec(NPixels, NCell);
@@ -577,13 +578,13 @@ begin
     if NPixels<0 then
     begin
       FScrollVert.NPos:= NIndex+1;
-      Exit;
+      Exit(true);
     end;
 
     if NPixels<=NPixelsNeeded then
     begin
       FScrollVert.NPos:= NIndex;
-      Exit;
+      Exit(true);
     end;
   end;
 end;

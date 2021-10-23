@@ -1,4 +1,7 @@
 
+2021.10.23
++ add: prop OptCaretProximityVert
+
 2021.10.19
 + add: prop OptShowFoldedMarkWithSelectionBG
 

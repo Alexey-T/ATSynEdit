@@ -917,6 +917,7 @@ type
     FOptCaretFixAfterRangeFolded: boolean;
     FOptCaretsMultiToColumnSel: boolean;
     FOptCaretPaintNonBlinkingSimpler: boolean;
+    FOptCaretProximityVert: integer;
     FOptMarkersSize: integer;
     FOptShowScrollHint: boolean;
     FOptTextCenteringCharWidth: integer;
@@ -1096,7 +1097,7 @@ type
     procedure DoStringsOnUndoBefore(Sender: TObject; AX, AY: integer);
     procedure DoScroll_SetPos(var AScrollInfo: TATEditorScrollInfo; APos: integer);
     procedure DoScroll_LineTop(ALine: integer; AUpdate: boolean);
-    procedure DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer);
+    function DoScroll_IndentFromBottom(AWrapInfoIndex, AIndentVert: integer): boolean;
     procedure DoScroll_IndentFromTop(AWrapInfoIndex, AIndentVert: integer); inline;
     procedure DoSelectionDeleteColumnBlock;
     function DoSelect_MultiCaretsLookLikeColumnSelection: boolean;
@@ -1904,6 +1905,7 @@ type
     property OptCaretFixAfterRangeFolded: boolean read FOptCaretFixAfterRangeFolded write FOptCaretFixAfterRangeFolded default true;
     property OptCaretsMultiToColumnSel: boolean read FOptCaretsMultiToColumnSel write FOptCaretsMultiToColumnSel default cInitCaretsMultiToColumnSel;
     property OptCaretPaintNonBlinkingSimpler: boolean read FOptCaretPaintNonBlinkingSimpler write FOptCaretPaintNonBlinkingSimpler default false;
+    property OptCaretProximityVert: integer read FOptCaretProximityVert write FOptCaretProximityVert default 0;
     property OptMarkersSize: integer read FOptMarkersSize write FOptMarkersSize default cInitMarkerSize;
     property OptGutterVisible: boolean read FOptGutterVisible write FOptGutterVisible default true;
     property OptGutterPlusSize: integer read FOptGutterPlusSize write FOptGutterPlusSize default cInitGutterPlusSize;
@@ -4784,6 +4786,7 @@ begin
   FOptCaretFixAfterRangeFolded:= true;
   FOptCaretsPrimitiveColumnSelection:= cInitCaretsPrimitiveColumnSelection;
   FOptCaretsMultiToColumnSel:= cInitCaretsMultiToColumnSel;
+  FOptCaretProximityVert:= 0;
   FOptMarkersSize:= cInitMarkerSize;
   FOptMouseEnableAll:= true;
   FOptMouseEnableNormalSelection:= true;

@@ -34,10 +34,10 @@ object fmOpt: TfmOpt
     Height = 343
     Top = 6
     Width = 701
-    ActivePage = TabSheet1
+    ActivePage = TabSheet4
     Align = alClient
     BorderSpacing.Around = 6
-    TabIndex = 0
+    TabIndex = 6
     TabOrder = 0
     object TabSheet1: TTabSheet
       Caption = 'show'
@@ -971,7 +971,7 @@ object fmOpt: TfmOpt
         Top = 32
         Width = 66
         MinValue = -100
-        TabOrder = 6
+        TabOrder = 8
       end
       object chkCrEmptyNormal: TCheckBox
         Left = 344
@@ -979,7 +979,7 @@ object fmOpt: TfmOpt
         Top = 96
         Width = 112
         Caption = 'empty inside'
-        TabOrder = 8
+        TabOrder = 10
       end
       object edCrHeightNormal: TSpinEdit
         Left = 344
@@ -987,7 +987,7 @@ object fmOpt: TfmOpt
         Top = 64
         Width = 66
         MinValue = -300
-        TabOrder = 7
+        TabOrder = 9
       end
       object Label9: TLabel
         AnchorSideTop.Control = edCrWidthNormal
@@ -1013,7 +1013,22 @@ object fmOpt: TfmOpt
         Top = 191
         Width = 312
         Caption = 'primitive column sel (affects wapped lines)'
-        TabOrder = 9
+        TabOrder = 6
+      end
+      object edCrProxi: TSpinEdit
+        Left = 8
+        Height = 26
+        Top = 224
+        Width = 64
+        MaxValue = 10
+        TabOrder = 7
+      end
+      object Label24: TLabel
+        Left = 80
+        Height = 17
+        Top = 228
+        Width = 204
+        Caption = 'proximity of caret to vert edge'
       end
     end
     object TabSheet7: TTabSheet
