@@ -98,7 +98,10 @@ end;
 function TATSynEdit.DoCommand_CaretsExtend(ADown: boolean; ALines: integer): TATCommandResults;
 begin
   DoCaretsExtend(ADown, ALines);
-  Result:= [cResultCaretAny];
+  if ADown then
+    Result:= [cResultCaretBottom]
+  else
+    Result:= [cResultCaretTop];
 end;
 
 function TATSynEdit.DoCommand_ScaleDelta(AIncrease: boolean): TATCommandResults;
