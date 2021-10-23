@@ -655,7 +655,7 @@ begin
   Coord:= CaretPosToClientPos(APos);
 
   //for y
-  Result:= DoCaretApplyProximityToVertEdge(APos, Coord.Y, 0, AIndentVert);
+  Result:= DoCaretApplyProximityToVertEdge(APos, Coord.Y, GetActualProximityVert, AIndentVert);
   if not Result then exit;
 
   //for x

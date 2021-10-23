@@ -1037,6 +1037,7 @@ type
     procedure DoChangeBookmarks;
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
+    function GetActualProximityVert: integer;
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
     function GetFoldingAsString: string;
@@ -2553,6 +2554,13 @@ end;
 function TATSynEdit.GetVisibleLinesMinimap: integer;
 begin
   Result:= FRectMinimap.Height div FCharSizeMinimap.Y - 1;
+end;
+
+function TATSynEdit.GetActualProximityVert: integer;
+begin
+  Result:= FOptCaretProximityVert;
+  if Result>0 then
+    Result:= Min(Min(Result, 10), GetVisibleLines div 2 - 1)
 end;
 
 function TATSynEdit.GetMinimapScrollPos: integer;
