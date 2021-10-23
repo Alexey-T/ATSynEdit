@@ -655,16 +655,19 @@ begin
   Coord:= CaretPosToClientPos(APos);
 
   //for y
-  if not DoCaretApplyProximityToVertEdge(APos, Coord.Y, GetActualProximityVert, AIndentVert) then
-    exit;
+  if DoCaretApplyProximityToVertEdge(APos, Coord.Y, GetActualProximityVert, AIndentVert) then
+    Result:= true;
 
   //for x
-  DoCaretApplyProximityToHorzEdge(Coord.X, 0, AIndentHorz);
+  if DoCaretApplyProximityToHorzEdge(Coord.X, 0, AIndentHorz) then
+    Result:= true;
 
-  Result:= true;
-  UpdateScrollbars(true);
-  if AllowUpdate then
-    Update;
+  if Result then
+  begin
+    UpdateScrollbars(true);
+    if AllowUpdate then
+      Update;
+  end;
 end;
 
 procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
