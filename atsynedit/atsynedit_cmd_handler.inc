@@ -174,6 +174,7 @@ var
   bUndoRedo: boolean;
   bAllowCaretScroll: boolean;
   NLineChanged: integer;
+  NProximityVert: integer;
 begin
   bNeedRepaint:= false;
   bAllowRepaint:= true;
@@ -256,27 +257,29 @@ begin
     //will move-down exactly N times
     UpdateCaretsCoords;
 
-    if (FOptCaretProximityVert>0) and
-      (FOptCaretProximityVert<=10) and
-      (FOptCaretProximityVert<=GetVisibleLines div 2 - 1) then
+    if (FOptCaretProximityVert>0) then
     begin
-      Caret:= Carets[0];
-      if DoCaretApplyProximityToVertEdge(
-           Point(Caret.PosX, Caret.PosY),
-           Caret.CoordY,
-           FOptCaretProximityVert,
-           FOptCaretProximityVert) then
-        UpdateCaretsCoords
-      else
-      if Carets.Count>1 then
+      NProximityVert:= Min(Min(FOptCaretProximityVert, 10), GetVisibleLines div 2 - 1);
+      if NProximityVert>0 then
       begin
-        Caret:= Carets[Carets.Count-1];
+        Caret:= Carets[0];
         if DoCaretApplyProximityToVertEdge(
              Point(Caret.PosX, Caret.PosY),
              Caret.CoordY,
-             FOptCaretProximityVert,
-             FOptCaretProximityVert) then
-          UpdateCaretsCoords;
+             NProximityVert,
+             NProximityVert) then
+          UpdateCaretsCoords
+        else
+        if Carets.Count>1 then
+        begin
+          Caret:= Carets[Carets.Count-1];
+          if DoCaretApplyProximityToVertEdge(
+               Point(Caret.PosX, Caret.PosY),
+               Caret.CoordY,
+               NProximityVert,
+               NProximityVert) then
+            UpdateCaretsCoords;
+        end;
       end;
     end;
   end;
