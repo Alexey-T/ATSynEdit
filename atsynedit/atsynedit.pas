@@ -5820,6 +5820,7 @@ begin
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
   ActionId:= EditorMouseActionId(FMouseActions, Shift);
+  bClickOnSelection:= false;
 
   ClearSelRectPoints; //SelRect points will be set in MouseMove
 
@@ -5834,11 +5835,8 @@ begin
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
-    if Button in [mbLeft, mbRight] then
-    begin
-      FMouseDownPnt:= PosTextClicked;
-      bClickOnSelection:= GetCaretSelectionIndex(FMouseDownPnt)>=0;
-    end;
+    FMouseDownPnt:= PosTextClicked;
+    bClickOnSelection:= GetCaretSelectionIndex(FMouseDownPnt)>=0;
 
     if Shift=[ssMiddle] then
       if DoHandleClickEvent(FOnClickMiddle) then Exit;
