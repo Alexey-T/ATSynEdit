@@ -749,8 +749,8 @@ var
   St: TATStrings;
   Str: atString;
   NDecSpaces, NMinSpaces, i: integer;
-  NShift1, NShift2, NShiftChars, NIndent1, NIndent2: integer;
-  NBlockBeginX, NBlockBeginY, NBlockEndX, NBlockEndY: integer;
+  NShift1, NShift2, NShiftChars, NIndentChars1, NIndentChars2: integer;
+  NBlockBeginY, NBlockEndY: integer;
 begin
   St:= Strings;
   Caret.PosY:= Min(Caret.PosY, St.Count-1);
@@ -763,8 +763,6 @@ begin
     Caret.EndX:= Caret.PosX;
     Caret.EndY:= Caret.PosY;
   end;
-  NBlockBeginX:= Caret.PosX;
-  NBlockEndX:= Caret.EndX;
 
   if FOptIndentSize=0 then
   begin
@@ -800,19 +798,17 @@ begin
   if FOptIndentKeepsAlign then
     if (not ARight) and (NMinSpaces<NDecSpaces) then Exit;
 
-  //calc shifts (emulate Lazarus IDE indent)
-  NIndent1:= SGetIndentChars(St.Lines[Caret.PosY]);
-  NIndent2:= SGetIndentChars(St.Lines[Caret.EndY]);
-
   if ARight then
   begin
-    NShift1:= IfThen((NBlockBeginX>=NIndent1) and (NBlockBeginX>0), NShiftChars, 0);
-    NShift2:= IfThen((NBlockEndX>=NIndent2) and (NBlockEndX>0), NShiftChars, 0);
+    NShift1:= IfThen(Caret.PosX>0, NShiftChars, 0);
+    NShift2:= IfThen(Caret.EndX>0, NShiftChars, 0);
   end
   else
   begin
-    NShift1:= -Min(NIndent1, NShiftChars);
-    NShift2:= -Min(NIndent2, NShiftChars);
+    NIndentChars1:= SGetIndentChars(St.Lines[Caret.PosY]);
+    NIndentChars2:= SGetIndentChars(St.Lines[Caret.EndY]);
+    NShift1:= -Min(NIndentChars1, NShiftChars);
+    NShift2:= -Min(NIndentChars2, NShiftChars);
   end;
 
   //do indent
@@ -847,10 +843,10 @@ begin
   end
   else
   begin
-    if NBlockBeginX>0 then
-      Caret.PosX:= Max(0, NBlockBeginX+NShift1);
-    if NBlockEndX>0 then
-      Caret.EndX:= Max(0, NBlockEndX+NShift2);
+    if Caret.PosX>0 then
+      Caret.PosX:= Max(0, Caret.PosX+NShift1);
+    if Caret.EndX>0 then
+      Caret.EndX:= Max(0, Caret.EndX+NShift2);
   end;
 end;
 
