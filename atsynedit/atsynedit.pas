@@ -5834,7 +5834,7 @@ begin
 
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
-    if Button=mbLeft then
+    if Button in [mbLeft, mbRight] then
     begin
       FMouseDownPnt:= PosTextClicked;
       bClickOnSelection:= GetCaretSelectionIndex(FMouseDownPnt)>=0;
