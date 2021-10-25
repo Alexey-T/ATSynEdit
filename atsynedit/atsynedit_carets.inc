@@ -795,23 +795,6 @@ begin
   DoCaretSingle(AX, AY, NEndX, NEndY);
 end;
 
-function TATSynEdit.FindCaretOverPosition(P: TPoint): integer;
-var
-  Caret: TATCaretItem;
-  X1, Y1, X2, Y2, i: integer;
-  bSel: boolean;
-begin
-  Result:= -1;
-  for i:= 0 to Carets.Count-1 do
-  begin
-    Caret:= Carets[i];
-    Caret.GetRange(X1, Y1, X2, Y2, bSel);
-    if bSel then
-      if IsPosInRange(P.X, P.Y, X1, Y1, X2, Y2)=cRelateInside then
-        Exit(i);
-  end;
-end;
-
 function TATSynEdit.DoCaretSwapEdge(Item: TATCaretItem; AMoveLeft: boolean): boolean;
 var
   X1, Y1, X2, Y2: integer;

@@ -1245,7 +1245,6 @@ type
     //carets
     procedure DoCaretsExtend(ADown: boolean; ALines: integer);
     function GetCaretManyAllowed: boolean;
-    function FindCaretOverPosition(P: TPoint): integer;
     function DoCaretSwapEdge(Item: TATCaretItem; AMoveLeft: boolean): boolean;
     //events
     procedure DoEventBeforeCalcHilite;
@@ -5836,7 +5835,7 @@ begin
   if PtInRect(FRectMain, Point(X, Y)) then
   begin
     FMouseDownPnt:= PosTextClicked;
-    bClickOnSelection:= FindCaretOverPosition(FMouseDownPnt)>=0;
+    bClickOnSelection:= Carets.FindCaretContainingPos(FMouseDownPnt.X, FMouseDownPnt.Y)>=0;
 
     if Shift=[ssMiddle] then
       if DoHandleClickEvent(FOnClickMiddle) then Exit;

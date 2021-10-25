@@ -137,6 +137,7 @@ type
     procedure Sort(AJoinAdjacentCarets: boolean=true);
     procedure Assign(Obj: TATCarets);
     function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): TATCaretItem;
+    function FindCaretContainingPos(APosX, APosY: integer): integer;
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
     function IsLineWithCaret(APosY: integer; ADisableSelected: boolean=false): boolean;
@@ -710,6 +711,23 @@ begin
       Continue;
     if (Y1<APosY) or ((Y1=APosY) and (X1<APosX)) then
       exit(Item);
+  end;
+end;
+
+function TATCarets.FindCaretContainingPos(APosX, APosY: integer): integer;
+var
+  Item: TATCaretItem;
+  X1, Y1, X2, Y2, i: integer;
+  bSel: boolean;
+begin
+  Result:= -1;
+  for i:= 0 to Count-1 do
+  begin
+    Item:= Items[i];
+    Item.GetRange(X1, Y1, X2, Y2, bSel);
+    if bSel then
+      if IsPosInRange(APosX, APosY, X1, Y1, X2, Y2)=cRelateInside then
+        Exit(i);
   end;
 end;
 
