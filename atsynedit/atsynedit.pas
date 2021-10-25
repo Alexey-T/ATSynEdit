@@ -5933,7 +5933,7 @@ begin
     if ActionId=cMouseActionClickRight then
     begin
       if FOptMouseRightClickMovesCaret then
-        if not bClickOnSelection then
+        if not bClickOnSelection then //click over selection must never reset that selection, like in Notepad++
           if Strings.IsIndexValid(PosTextClicked.Y) then
           begin
             DoCaretSingle(PosTextClicked.X, PosTextClicked.Y);
