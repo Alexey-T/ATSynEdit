@@ -136,7 +136,7 @@ type
     procedure Add(APosX, APosY: integer; AEndX: integer=-1; AEndY: integer=-1);
     procedure Sort(AJoinAdjacentCarets: boolean=true);
     procedure Assign(Obj: TATCarets);
-    function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): TATCaretItem;
+    function FindCaretBeforePos(APosX, APosY: integer; ARequireSel: boolean): integer;
     function FindCaretContainingPos(APosX, APosY: integer): integer;
     function IndexOfPosXY(APosX, APosY: integer; AUseEndXY: boolean= false): integer;
     function IndexOfLeftRight(ALeft: boolean): integer;
@@ -695,14 +695,14 @@ begin
 end;
 
 function TATCarets.FindCaretBeforePos(APosX, APosY: integer;
-  ARequireSel: boolean): TATCaretItem;
+  ARequireSel: boolean): integer;
 var
   Item: TATCaretItem;
   bSel: boolean;
   X1, Y1, X2, Y2: integer;
   i: integer;
 begin
-  Result:= nil;
+  Result:= -1;
   for i:= Count-1 downto 0 do
   begin
     Item:= Items[i];
@@ -710,7 +710,7 @@ begin
     if ARequireSel and not bSel then
       Continue;
     if (Y1<APosY) or ((Y1=APosY) and (X1<APosX)) then
-      exit(Item);
+      Exit(i);
   end;
 end;
 
