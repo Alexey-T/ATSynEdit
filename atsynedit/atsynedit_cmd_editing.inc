@@ -430,8 +430,8 @@ begin
     //work to move } to next line, leave caret at current line
     if bBetterBrackets then
     begin
-      St.LineInsert(Caret.PosY+1, Str+IndentString);
-      NShiftX:= Length(IndentString);
+      St.LineInsert(Caret.PosY+1, Str+GetIndentString);
+      NShiftX:= Length(GetIndentString);
       NShiftY:= 1;
     end;
 

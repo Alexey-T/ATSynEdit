@@ -1037,6 +1037,7 @@ type
     procedure DoChangeBookmarks;
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
+    function GetIndentString: UnicodeString;
     function GetActualProximityVert: integer;
     function GetAttribs: TATMarkers;
     procedure GetClientSizes(out W, H: integer);
@@ -1540,7 +1541,6 @@ type
     property RectMinimap: TRect read FRectMinimap;
     property RectMicromap: TRect read FRectMicromap;
     property RectRuler: TRect read FRectRuler;
-    function IndentString: UnicodeString;
     function RectMicromapMark(AColumn, ALineFrom, ALineTo: integer;
       AMapHeight, AMinMarkHeight: integer): TRect;
     property OptTextOffsetLeft: integer read FOptTextOffsetLeft write FOptTextOffsetLeft;
@@ -7539,7 +7539,7 @@ begin
   Update(true);
 end;
 
-function TATSynEdit.IndentString: UnicodeString;
+function TATSynEdit.GetIndentString: UnicodeString;
 begin
   if FOptTabSpaces then
     Result:= StringOfCharW(' ', FTabSize)
@@ -7588,7 +7588,7 @@ begin
   end;
 
   if bAddIndent then
-    Result:= Result+IndentString;
+    Result:= Result+GetIndentString;
 end;
 
 function TATSynEdit.GetModified: boolean;
