@@ -113,8 +113,14 @@ end;
 procedure TATStrings.SaveToFile(const AFilename: string);
 var
   fs: TFileStream;
+  NMode: word;
 begin
-  fs:= TFileStream.Create(AFilename, fmCreate or fmOpenWrite or fmShareDenyWrite);
+  NMode:= fmOpenWrite or fmShareDenyWrite;
+  //don't set fmCreate for existing file, to keep NTFS file streams
+  if not FileExists(AFilename) then
+    NMode:= NMode or fmCreate;
+
+  fs:= TFileStream.Create(AFilename, NMode);
   try
     SaveToStream(fs, FEncoding, IsSavingWithSignature);
   finally
