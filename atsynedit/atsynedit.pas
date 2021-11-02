@@ -3136,7 +3136,7 @@ end;
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor;
   ABorderWidth: integer; AUseRectMain: boolean);
 var
-  NColorBG: TColor;
+  NColorBG, NColorFore: TColor;
   W, H, i: integer;
 begin
   if ABorderWidth<1 then exit;
@@ -3158,13 +3158,21 @@ begin
 
   if FOptBorderVisible and FOptBorderRounded and (ABorderWidth=1) then
   begin
-    NColorBG:= Colors.BorderParentBG;
-    NColorBG:= ColorToRGB(NColorBG);
+    NColorBG:= ColorToRGB(Colors.BorderParentBG);
+    NColorFore:= ColorToRGB(Colors.TextBG);
 
     CanvasPaintRoundedCorners(C,
       Rect(0, 0, W, H),
-      [acckLeftTop, acckLeftBottom, acckRightTop, acckRightBottom],
-      NColorBG, AColor, Colors.TextBG);
+      [acckLeftTop, acckLeftBottom],
+      NColorBG, AColor, NColorFore);
+
+    if ModeOneLine and FMicromapVisible then
+      NColorFore:= Colors.ComboboxArrowBG;
+
+    CanvasPaintRoundedCorners(C,
+      Rect(0, 0, W, H),
+      [acckRightTop, acckRightBottom],
+      NColorBG, AColor, NColorFore);
   end;
 end;
 
