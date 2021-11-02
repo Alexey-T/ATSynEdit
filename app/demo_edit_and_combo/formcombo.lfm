@@ -1,26 +1,26 @@
 object fmCombo: TfmCombo
   Left = 418
-  Height = 289
+  Height = 348
   Top = 398
-  Width = 397
+  Width = 404
   ActiveControl = PanelEdit
   Caption = 'Demo - ATEdit, ATComboEdit'
-  ClientHeight = 289
-  ClientWidth = 397
+  ClientHeight = 348
+  ClientWidth = 404
   Constraints.MinHeight = 200
   OnCreate = FormCreate
   Position = poScreenCenter
-  LCLVersion = '2.1.0.0'
+  LCLVersion = '2.3.0.0'
   object PanelCombo: TPanel
     Left = 6
     Height = 58
     Top = 70
-    Width = 385
+    Width = 392
     Align = alTop
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     ClientHeight = 58
-    ClientWidth = 385
+    ClientWidth = 392
     TabOrder = 1
     object Label1: TLabel
       Left = 0
@@ -28,14 +28,13 @@ object fmCombo: TfmCombo
       Top = 8
       Width = 93
       Caption = 'ATComboEdit'
-      ParentColor = False
     end
   end
   object ButtonPanel1: TButtonPanel
     Left = 6
     Height = 29
-    Top = 254
-    Width = 385
+    Top = 313
+    Width = 392
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
@@ -63,12 +62,12 @@ object fmCombo: TfmCombo
     Left = 6
     Height = 58
     Top = 6
-    Width = 385
+    Width = 392
     Align = alTop
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     ClientHeight = 58
-    ClientWidth = 385
+    ClientWidth = 392
     TabOrder = 0
     object Label2: TLabel
       Left = 0
@@ -76,7 +75,6 @@ object fmCombo: TfmCombo
       Top = 8
       Width = 44
       Caption = 'ATEdit'
-      ParentColor = False
     end
   end
   object edMaxLen: TSpinEdit
@@ -99,7 +97,6 @@ object fmCombo: TfmCombo
     Width = 115
     BorderSpacing.Left = 6
     Caption = 'Max length (if >0)'
-    ParentColor = False
   end
   object chkEnMouse: TCheckBox
     Left = 8
@@ -140,5 +137,14 @@ object fmCombo: TfmCombo
     Caption = 'Read-only'
     OnChange = chkROChange
     TabOrder = 8
+  end
+  object chkRounded: TCheckBox
+    Left = 8
+    Height = 24
+    Top = 249
+    Width = 136
+    Caption = 'Rounded border'
+    OnChange = chkRoundedChange
+    TabOrder = 9
   end
 end

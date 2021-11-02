@@ -15,6 +15,7 @@ type
 
   TfmCombo = class(TForm)
     ButtonPanel1: TButtonPanel;
+    chkRounded: TCheckBox;
     chkRO: TCheckBox;
     chkNumAllowNeg: TCheckBox;
     chkNumOnly: TCheckBox;
@@ -31,6 +32,7 @@ type
     procedure chkNumAllowNegChange(Sender: TObject);
     procedure chkNumOnlyChange(Sender: TObject);
     procedure chkROChange(Sender: TObject);
+    procedure chkRoundedChange(Sender: TObject);
     procedure edMaxLenChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -65,6 +67,7 @@ begin
   ed.OnCommand:= @ComboCommand;
   //ed.Text:= 'combo';
   ed.OptTextHint:= '(empty)';
+  ed.Colors.ComboboxArrowBG:= clMoneyGreen;
 
   ed0:= TATEdit.Create(Self);
   ed0.Parent:= PanelEdit;
@@ -104,6 +107,14 @@ procedure TfmCombo.chkROChange(Sender: TObject);
 begin
   ed.ModeReadOnly:= chkRO.Checked;
   ed0.ModeReadOnly:= chkRO.Checked;
+end;
+
+procedure TfmCombo.chkRoundedChange(Sender: TObject);
+begin
+  ed.OptBorderRounded:= chkRounded.Checked;
+  ed0.OptBorderRounded:= chkRounded.Checked;
+  ed.Invalidate;
+  ed0.Invalidate;
 end;
 
 procedure TfmCombo.edMaxLenChange(Sender: TObject);

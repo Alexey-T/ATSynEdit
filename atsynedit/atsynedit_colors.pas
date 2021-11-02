@@ -61,6 +61,7 @@ type
     FMarkedLinesBG,
     FBorderLine,
     FBorderLineFocused,
+    FBorderParentBG,
     FComboboxArrow,
     FComboboxArrowBG: TColor;
   published
@@ -111,6 +112,7 @@ type
     property MarkedLinesBG: TColor read FMarkedLinesBG write FMarkedLinesBG;
     property BorderLine: TColor read FBorderLine write FBorderLine;
     property BorderLineFocused: TColor read FBorderLineFocused write FBorderLineFocused;
+    property BorderParentBG: TColor read FBorderParentBG write FBorderParentBG;
     property ComboboxArrow: TColor read FComboboxArrow write FComboboxArrow;
     property ComboboxArrowBG: TColor read FComboboxArrowBG write FComboboxArrowBG;
   end;
@@ -169,6 +171,7 @@ begin
   C.MarkedLinesBG:= $f0e0b0;
   C.BorderLine:= clMedGray;
   C.BorderLineFocused:= clNavy;
+  C.BorderParentBG:= clWindow;
   C.ComboboxArrow:= clGray;
   C.ComboboxArrowBG:= $f0f0f0;
 end;

@@ -935,6 +935,7 @@ type
     FOptBorderWidthMacro: integer;
     FOptBorderFocusedActive: boolean;
     FOptBorderMacroRecording: boolean;
+    FOptBorderRounded: boolean;
     FOptRulerVisible: boolean;
     FOptRulerNumeration: TATEditorRulerNumeration;
     FOptRulerHeightPercents: integer;
@@ -1918,6 +1919,7 @@ type
     property OptBorderWidth: integer read FOptBorderWidth write FOptBorderWidth default cInitBorderWidth;
     property OptBorderWidthFocused: integer read FOptBorderWidthFocused write FOptBorderWidthFocused default cInitBorderWidthFocused;
     property OptBorderWidthMacro: integer read FOptBorderWidthMacro write FOptBorderWidthMacro default cInitBorderWidthMacro;
+    property OptBorderRounded: boolean read FOptBorderRounded write FOptBorderRounded default false;
     property OptBorderFocusedActive: boolean read FOptBorderFocusedActive write FOptBorderFocusedActive default false;
     property OptBorderMacroRecording: boolean read FOptBorderMacroRecording write FOptBorderMacroRecording default true;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
@@ -3134,6 +3136,7 @@ end;
 procedure TATSynEdit.DoPaintBorder(C: TCanvas; AColor: TColor;
   ABorderWidth: integer; AUseRectMain: boolean);
 var
+  NColorBG: TColor;
   W, H, i: integer;
 begin
   if ABorderWidth<1 then exit;
@@ -3152,6 +3155,17 @@ begin
 
   for i:= 0 to ABorderWidth-1 do
     C.Frame(i, i, W-i, H-i);
+
+  if FOptBorderVisible and FOptBorderRounded and (ABorderWidth=1) then
+  begin
+    NColorBG:= Colors.BorderParentBG;
+    NColorBG:= ColorToRGB(NColorBG);
+
+    CanvasPaintRoundedCorners(C,
+      Rect(0, 0, W, H),
+      [acckLeftTop, acckLeftBottom, acckRightTop, acckRightBottom],
+      NColorBG, AColor, Colors.TextBG);
+  end;
 end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TPoint;

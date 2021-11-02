@@ -1,4 +1,7 @@
 
+2021.11.02
++ add: prop OptBorderRounded; and Colors.BorderParentBG
+
 2021.10.23
 + add: prop OptCaretProximityVert
 
