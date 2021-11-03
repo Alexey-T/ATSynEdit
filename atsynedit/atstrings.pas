@@ -390,7 +390,7 @@ type
     procedure LoadFromFile(const AFilename: string);
     procedure LoadFromString(const AText: string);
     procedure LoadFromStrings(AList: TStrings; AEnds: TATLineEnds);
-    procedure SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
+    procedure SaveToStream(AStream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
     procedure SaveToFile(const AFilename: string);
     property SaveSignUtf8: boolean read FSaveSignUtf8 write FSaveSignUtf8;
     property SaveSignWide: boolean read FSaveSignWide write FSaveSignWide;

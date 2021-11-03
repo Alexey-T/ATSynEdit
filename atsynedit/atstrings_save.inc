@@ -1,6 +1,6 @@
 {$ifdef nn}begin end;{$endif}
 
-procedure TATStrings.SaveToStream(Stream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
+procedure TATStrings.SaveToStream(AStream: TStream; AEncoding: TATFileEncoding; AWithSignature: boolean);
 var
   Item: PATStringItem;
   ItemEnd: TATLineEnds;
@@ -28,7 +28,7 @@ begin
         Sign:= '';
     end;
     if Sign<>'' then
-      Stream.WriteBuffer(Sign[1], Length(Sign));
+      AStream.WriteBuffer(Sign[1], Length(Sign));
   end;
 
   NLast:= Count-1;
@@ -50,13 +50,13 @@ begin
         begin
           SAnsi:= UTF8Encode(SWide);
           SAnsi:= EncConvertFromUTF8(SAnsi, FEncodingCodepage);
-          Stream.WriteBuffer(SAnsi[1], Length(SAnsi));
+          AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
       cEncUTF8:
         begin
           SAnsi:= UTF8Encode(SWide);
-          Stream.WriteBuffer(SAnsi[1], Length(SAnsi));
+          AStream.WriteBuffer(SAnsi[1], Length(SAnsi));
         end;
 
       cEncWideLE,
@@ -64,7 +64,7 @@ begin
         begin
           if AEncoding=cEncWideBE then
             SSwapEndianWide(SWide);
-          Stream.WriteBuffer(SWide[1], Length(SWide)*2);
+          AStream.WriteBuffer(SWide[1], Length(SWide)*2);
         end;
 
       cEnc32LE,
@@ -73,7 +73,7 @@ begin
           SQuad:= UnicodeStringToUCS4String(SWide);
           if AEncoding=cEnc32BE then
             SSwapEndianUCS4(SQuad);
-          Stream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
+          AStream.WriteBuffer(SQuad[0], (Length(SQuad)-1)*4);
         end;
 
       else
