@@ -9,6 +9,9 @@ var
   SQuad: UCS4String;
   NLast, i: integer;
 begin
+  AStream.Size:= 0;
+  AStream.Seek(0, soFromBeginning);
+
   EncConvErrorMode:= eemException;
 
   if AWithSignature then
