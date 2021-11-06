@@ -1139,25 +1139,32 @@ var
   Caret: TATCaretItem;
   Pnt: TPoint;
   Details: TATEditorPosDetails;
+  NProximity, NRectTop, NRectBottom: integer;
   i: integer;
 begin
   Result:= false;
+  //"keep caret on screen" works bad for multi-carets
+  if Carets.Count>1 then exit;
+
+  NProximity:= GetActualProximityVert;
+  NRectTop:= FRectMain.Top+NProximity*FCharSize.Y;
+  NRectBottom:= Max(FRectMain.Top, FRectMain.Bottom-NProximity*FCharSize.Y);
 
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    if AMoveDown and (Caret.CoordY<=FRectMain.Top+2) then
+    if AMoveDown and (Caret.CoordY<=NRectTop+2) then
     begin
-      Pnt:= Point(Caret.CoordX, FRectMain.Top);
+      Pnt:= Point(Caret.CoordX, NRectTop);
       Pnt:= ClientPosToCaretPos(Pnt, Details);
       Caret.PosX:= Pnt.X;
       Caret.PosY:= Pnt.Y;
       Result:= true;
     end
     else
-    if not AMoveDown and (Caret.CoordY>=FRectMain.Bottom-2*FCharSize.Y-2) then
+    if not AMoveDown and (Caret.CoordY>=NRectBottom-2*FCharSize.Y-2) then
     begin
-      Pnt:= Point(Caret.CoordX, FRectMain.Bottom-FCharSize.Y);
+      Pnt:= Point(Caret.CoordX, NRectBottom-FCharSize.Y);
       Pnt:= ClientPosToCaretPos(Pnt, Details);
       Caret.PosX:= Pnt.X;
       Caret.PosY:= Pnt.Y;
