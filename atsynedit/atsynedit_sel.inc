@@ -656,7 +656,7 @@ end;
 
 procedure TATSynEdit.DebugSelRect;
 begin
-  Application.MainForm.Caption:= Format('selrect %d:%d-%d:%d, begin %d:%d, end %d:%d', [
+  Application.MainForm.Caption:= Format('SelRect %d:%d-%d:%d, SelRectBegin %d:%d, SelRectEnd %d:%d', [
     FSelRect.Left,
     FSelRect.Top,
     FSelRect.Right,
