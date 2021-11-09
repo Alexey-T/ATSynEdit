@@ -696,6 +696,7 @@ type
     FLastHotspot: integer;
     FLastTextCmd: integer;
     FLastTextCmdText: atString;
+    FLastCommand: integer;
     FLastCommandChangedText: boolean;
     FLastCommandChangedText2: boolean;
     FLastCommandMakesColumnSel: boolean;

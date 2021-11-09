@@ -49,6 +49,7 @@ type
     CoordX, CoordY: integer; //screen coords
     OldRect: TRect; //screen rect, but before running the last command
     SavedX, SavedX_Pre: integer; //memory of last column, to use with arrows Up/Down
+    BeforeExtendX: integer; //memory for commands "carets extend: up/down/..."
     procedure SelectNone;
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);

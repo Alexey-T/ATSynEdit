@@ -687,6 +687,7 @@ begin
       ClearSelRectPoints;
     end;
 
+  FLastCommand:= ACmd;
   FLastCommandChangedText2:= FLastCommandChangedText;
   FLastCommandChangedText:= cResultText in Res;
   if FLastCommandChangedText then

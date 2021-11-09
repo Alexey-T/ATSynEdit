@@ -858,13 +858,35 @@ var
   Caret: TATCaretItem;
   MoreCarets: TATCarets;
   St: TATStrings;
+  NLen: integer;
   X, Y: integer;
   i, j: integer;
 begin
+  if Carets.Count=0 then exit;
   St:= Strings;
 
   //it's needed to Undo to multi-carets, not to single caret
   St.SetGroupMark;
+
+  if not FCaretVirtual then
+    case FLastCommand of
+      cCommand_CaretsExtendUpLine,
+      cCommand_CaretsExtendUpPage,
+      cCommand_CaretsExtendUpToTop,
+      cCommand_CaretsExtendDownLine,
+      cCommand_CaretsExtendDownPage,
+      cCommand_CaretsExtendDownToEnd:
+        begin
+        end
+      else
+        begin
+          for i:= 0 to Carets.Count-1 do
+          begin
+            Caret:= Carets[i];
+            Caret.BeforeExtendX:= Caret.PosX;
+          end;
+        end;
+    end;
 
   MoreCarets:= TATCarets.Create;
   try
@@ -878,7 +900,20 @@ begin
         Y:= Caret.PosY+BoolToPlusMinusOne[ADown]*j;
         if not St.IsIndexValid(Y) then Break;
         X:= St.ColumnPosToCharPos(Y, X, FTabHelper);
+
+        //restore X from memory, if we made X smaller (like in Notepad++)
+        if not FCaretVirtual then
+        begin
+          NLen:= St.LinesLen[Y];
+          if X<NLen then
+            if X<Caret.BeforeExtendX then
+              X:= Caret.BeforeExtendX;
+          X:= Min(X, NLen);
+        end;
+
         MoreCarets.Add(X, Y);
+        if not FCaretVirtual then
+          MoreCarets[MoreCarets.Count-1].BeforeExtendX:= Caret.BeforeExtendX;
       end;
     end;
 
@@ -886,6 +921,8 @@ begin
     begin
       Caret:= MoreCarets[i];
       Carets.Add(Caret.PosX, Caret.PosY);
+      if not FCaretVirtual then
+        Carets[Carets.Count-1].BeforeExtendX:= Caret.BeforeExtendX;
     end;
 
     //must remove many dups
