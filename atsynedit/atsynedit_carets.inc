@@ -67,7 +67,10 @@ begin
 
   DoCaretSingleAsIs;
   with Carets[0] do
-    begin P.X:= PosX; P.Y:= PosY; end;
+  begin
+    P.X:= PosX;
+    P.Y:= PosY;
+  end;
 
   PM1:= CaretPosToClientPos(P);
   PM2:= CaretPosToClientPos(Point(AX, AY));
