@@ -951,6 +951,10 @@ begin
 
     Strings.TextInsertColumnBlock(Caret.PosX, Caret.PosY, Block, FOverwrite);
 
+    //fix limiting of resulting carets-column (OptCaretPosAfterPasteColumn=cPasteCaretColumnRight)
+    //by short lines, CudaText issue #3826
+    UpdateWrapInfo(true{AForceUpdate});
+
     if not AKeepCaret then
       case FOptCaretPosAfterPasteColumn of
         cPasteCaretNoChange:
