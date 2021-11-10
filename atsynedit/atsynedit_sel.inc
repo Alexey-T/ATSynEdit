@@ -54,9 +54,11 @@ begin
 end;
 
 function TATSynEdit.IsSelColumn: boolean;
+//it also gives True if 'new kind' of column block is set,
+//which is activated by OptCaretsPrimitiveColumnSelection
 begin
   Result:= not EqualRect(FSelRect, cRectEmpty) or
-    ((FSelRectBegin.Y>=0) and (FSelRectBegin<>FSelRectEnd));
+    (FSelRectBegin.Y>=0);
 end;
 
 procedure TATSynEdit.DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
