@@ -59,7 +59,7 @@ end;
 
 procedure TATSynEdit.DoCaretsColumnToPoint(AX, AY: integer);
 var
-  P, PM1, PM2: TPoint;
+  PCaret, PCoord1, PCoord2: TPoint;
   Details: TATEditorPosDetails;
 begin
   //needed to Undo multi-carets to last multi-caret state, before single caret appears
@@ -68,29 +68,29 @@ begin
   DoCaretSingleAsIs;
   with Carets[0] do
   begin
-    P.X:= PosX;
-    P.Y:= PosY;
+    PCaret.X:= PosX;
+    PCaret.Y:= PosY;
   end;
 
-  PM1:= CaretPosToClientPos(P);
-  PM2:= CaretPosToClientPos(Point(AX, AY));
+  PCoord1:= CaretPosToClientPos(PCaret);
+  PCoord2:= CaretPosToClientPos(Point(AX, AY));
 
   //clicked above caret?
-  if PM2.Y<PM1.Y then
-    SwapInt(PM1.Y, PM2.Y);
+  if PCoord2.Y<PCoord1.Y then
+    SwapInt(PCoord1.Y, PCoord2.Y);
 
   Carets.Clear;
-  P:= ClientPosToCaretPos(PM1, Details);
-  if P.Y>=0 then
-    Carets.Add(P.X, P.Y);
+  PCaret:= ClientPosToCaretPos(PCoord1, Details);
+  if PCaret.Y>=0 then
+    Carets.Add(PCaret.X, PCaret.Y);
 
   repeat
-    Inc(PM1.Y, FCharSize.Y);
-    P:= ClientPosToCaretPos(PM1, Details);
-    if P.Y>=0 then
-      if not Carets.IsLineWithCaret(P.Y) then
-        Carets.Add(P.X, P.Y);
-  until PM1.Y>=PM2.Y;
+    Inc(PCoord1.Y, FCharSize.Y);
+    PCaret:= ClientPosToCaretPos(PCoord1, Details);
+    if PCaret.Y>=0 then
+      if not Carets.IsLineWithCaret(PCaret.Y) then
+        Carets.Add(PCaret.X, PCaret.Y);
+  until PCoord1.Y>=PCoord2.Y;
 
   if Carets.Count=0 then
     Carets.Add(AX, AY);
