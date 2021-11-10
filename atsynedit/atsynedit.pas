@@ -1529,6 +1529,7 @@ type
     property Text: UnicodeString read GetText write SetText;
     property SelRect: TRect read FSelRect;
     function IsSelRectEmpty: boolean;
+    function IsSelColumn: boolean;
     function IsPosSelected(AX, AY: integer): boolean;
     function IsRangeSelected(AX1, AY1, AX2, AY2: integer): TATRangeSelection;
     function IsPosFolded(AX, AY: integer): boolean;

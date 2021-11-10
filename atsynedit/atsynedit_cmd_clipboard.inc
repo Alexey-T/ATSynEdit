@@ -144,11 +144,9 @@ var
 begin
   SNewText:= GetTextForClipboard;
 
-  //check both IsSelRectEmpty (for old-style vertical blocks)
-  //and FSelRectBegin/End (for primitive blocks activated by OptCaretsPrimitiveColumnSelection)
-  if (not IsSelRectEmpty) or (FSelRectBegin<>FSelRectEnd) then
+  if IsSelColumn then
   begin
-    //copy vertical block
+    //copy column block
     SClipboardCopy(SNewText, AClipboardObject);
     AClipboardObject.AddFormat(
       ATClipboardColumnFormat,

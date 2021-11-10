@@ -53,6 +53,12 @@ begin
   Result:= EqualRect(FSelRect, cRectEmpty);
 end;
 
+function TATSynEdit.IsSelColumn: boolean;
+begin
+  Result:= not EqualRect(FSelRect, cRectEmpty) or
+    ((FSelRectBegin.Y>=0) and (FSelRectBegin<>FSelRectEnd));
+end;
+
 procedure TATSynEdit.DoSelect_CharGroupAtPos(P: TPoint; AddCaret, AllowOnlyWordChars: boolean);
 var
   XFrom, XTo: integer;

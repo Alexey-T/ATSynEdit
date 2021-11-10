@@ -90,7 +90,7 @@ begin
   //it's needed to Undo to multi-carets, not one caret
   Strings.SetGroupMark;
 
-  if IsSelRectEmpty and (FSelRectEnd.Y<0) then
+  if not IsSelColumn then
     if not DoSelect_MultiCaretsLookLikeColumnSelection then
     begin
       DoSelect_NormalSelToColumnSel(FSelRectBegin, FSelRectEnd);
@@ -157,7 +157,7 @@ begin
   Result:= [];
   if Carets.Count=0 then Exit;
 
-  if IsSelRectEmpty or (FSelRectBegin.X<0) then Exit;
+  if not IsSelColumn then Exit;
   //maybe todo: make column sel if normal sel active here
   //like DoCommand_SelectColumnToDirection
 
