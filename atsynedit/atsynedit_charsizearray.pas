@@ -190,6 +190,8 @@ begin
 
   FixedSizes[$85]:= _hexshow; //white space
   FixedSizes[$061C]:= _hexshow;
+  FixedSizes[$3164]:= _hexshow; //https://www.opennet.ru/opennews/art.shtml?num=56131
+  FixedSizes[$01C3]:= _hexshow; //https://www.opennet.ru/opennews/art.shtml?num=56131
   FixedSizes[$FEFF]:= _hexshow;
 
   //line-break chars
