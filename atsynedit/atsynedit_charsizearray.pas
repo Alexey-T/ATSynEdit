@@ -181,17 +181,19 @@ begin
   for i:= 0 to $20-1 do //ascii control chars
     if i<>9 then
       FixedSizes[i]:= _hexshow;
+
+  //for Unicode BiDi chars attack:
   for i:= $2000 to $200F do //white spaces + specials
     FixedSizes[i]:= _hexshow;
   for i:= $2028 to $202F do  //white spaces + specials
     FixedSizes[i]:= _hexshow;
   for i:= $2066 to $2069 do
     FixedSizes[i]:= _hexshow;
+  FixedSizes[$061C]:= _hexshow;
 
   FixedSizes[$85]:= _hexshow; //white space
-  FixedSizes[$061C]:= _hexshow;
-  FixedSizes[$3164]:= _hexshow; //https://www.opennet.ru/opennews/art.shtml?num=56131
-  FixedSizes[$01C3]:= _hexshow; //https://www.opennet.ru/opennews/art.shtml?num=56131
+  FixedSizes[$3164]:= _hexshow; //for Unicode attack: https://www.opennet.ru/opennews/art.shtml?num=56131
+  FixedSizes[$01C3]:= _hexshow; //for Unicode attack: https://www.opennet.ru/opennews/art.shtml?num=56131
   FixedSizes[$FEFF]:= _hexshow;
 
   //line-break chars
