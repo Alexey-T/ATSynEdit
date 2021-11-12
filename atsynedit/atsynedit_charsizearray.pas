@@ -182,7 +182,7 @@ begin
     if i<>9 then
       FixedSizes[i]:= _hexshow;
 
-  //for Unicode BiDi chars attack:
+  //for Unicode BiDi chars attack: https://www.opennet.ru/opennews/art.shtml?num=56083
   for i:= $2000 to $200F do //white spaces + specials
     FixedSizes[i]:= _hexshow;
   for i:= $2028 to $202F do  //white spaces + specials
