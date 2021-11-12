@@ -78,17 +78,17 @@ end;
 
 function IsCharHexDisplayed(ch: WideChar): boolean;
 begin
-  Result:= FixedSizes[Ord(ch)]=_hexshow;
+  Result:= FixedSizes[Ord(ch)]=uw_hexshow;
 end;
 
 function IsCharAccent(ch: WideChar): boolean;
 begin
-  Result:= FixedSizes[Ord(ch)]=_comb;
+  Result:= FixedSizes[Ord(ch)]=uw_combined;
 end;
 
 function IsCharUnicodeSpace(ch: WideChar): boolean;
 begin
-  Result:= FixedSizes[Ord(ch)]=_space;
+  Result:= FixedSizes[Ord(ch)]=uw_space;
 end;
 
 function IsCharUnusualWidth(ch: WideChar): boolean;
@@ -98,7 +98,7 @@ begin
     exit(true);
 
   case FixedSizes[Ord(ch)] of
-    _norm, _space:
+    uw_normal, uw_space:
       Result:= false
     else
       Result:= true;
@@ -203,11 +203,11 @@ begin
   Result:= 100;
 
   case FixedSizes[n] of
-    _norm: exit;
-    _full: exit(OptEditorCharScaleFullWidth);
-    _space: exit;
-    _comb: exit(0);
-    _hexshow:
+    uw_normal: exit;
+    uw_fullwidth: exit(OptEditorCharScaleFullWidth);
+    uw_space: exit;
+    uw_combined: exit(0);
+    uw_hexshow:
       begin
         if n<$100 then
           exit(OptEditorCharScaleHex_Small)
