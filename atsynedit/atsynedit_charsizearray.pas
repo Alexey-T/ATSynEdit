@@ -129,6 +129,10 @@ begin
   for i:= $700 to $206F do
     FixedSizes[i]:= uw_fullwidth;
 
+  //Georgian - normal width
+  for i:= $10A0 to $10FF do
+    FixedSizes[i]:= uw_normal;
+
   for i:= $2010 to $2027 do
     FixedSizes[i]:= uw_normal;
   for i:= $2030 to $203A do
