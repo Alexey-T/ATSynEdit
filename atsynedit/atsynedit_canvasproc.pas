@@ -761,7 +761,7 @@ var
   bAllowLigatures: boolean;
   {$endif}
   BufW: UnicodeString;
-  NLen, NCharWidth, i, iPart: integer;
+  NLen, NCharWidthScaled, i, iPart: integer;
   NLastPart: integer;
   PartStr: atString;
   PartOffset, PartLen,
@@ -776,7 +776,7 @@ var
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
   if NLen=0 then Exit;
-  NCharWidth:= AProps.CharSize.XScaled div ATEditorCharXScale;
+  NCharWidthScaled:= AProps.CharSize.XScaled;
 
   FillChar(ListInt, SizeOf(ListInt), 0);
   FillChar(Dx, SizeOf(Dx), 0);
@@ -788,8 +788,8 @@ begin
     Dx.Len:= NLen;
     for i:= 0 to NLen-1 do
     begin
-      ListInt.Data[i]:= NCharWidth*(i+1);
-      Dx.Data[i]:= NCharWidth;
+      ListInt.Data[i]:= NCharWidthScaled*(i+1) div ATEditorCharXScale;
+      Dx.Data[i]:= NCharWidthScaled div ATEditorCharXScale;
     end;
   end
   else
@@ -800,7 +800,7 @@ begin
     Dx.Len:= ListOffsets.Len;
 
     for i:= 0 to ListOffsets.Len-1 do
-      ListInt.Data[i]:= ListOffsets.Data[i] * NCharWidth div 100;
+      ListInt.Data[i]:= ListOffsets.Data[i] * NCharWidthScaled div 100 div ATEditorCharXScale;
 
     Dx.Data[0]:= ListInt.Data[0];
     for i:= 1 to ListInt.Len-1 do

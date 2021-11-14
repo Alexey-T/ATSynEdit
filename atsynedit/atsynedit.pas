@@ -2102,14 +2102,13 @@ end;
 
 procedure TATSynEdit.DoPaintRuler(C: TCanvas);
 var
-  NX, NPrevFontSize, NRulerStart, NOutput,
+  NCoordX, NPrevFontSize, NRulerStart, NOutput,
   NTopIndent, NMarkHeight, i: integer;
-  NCharW: integer;
+  NCharWidthScaled: integer;
   Str: string;
 begin
   NPrevFontSize:= C.Font.Size;
   NRulerStart:= FScrollHorz.NPos;
-  NX:= FRectMain.Left;
   NTopIndent:= FOptRulerTopIndentPercents*FCharSize.Y div 100;
 
   C.Font.Name:= Font.Name;
@@ -2120,10 +2119,12 @@ begin
 
   C.FillRect(FRectRuler);
 
-  NCharW:= FCharSize.XScaled * FOptRulerFontSizePercents div 100 div ATEditorCharXScale;
+  NCharWidthScaled:= FCharSize.XScaled * FOptRulerFontSizePercents div 100;
 
   for i:= NRulerStart to NRulerStart+FVisibleColumns+1 do
   begin
+    NCoordX:= FRectMain.Left + (i-NRulerStart) * FCharSize.XScaled div ATEditorCharXScale;
+
     case FOptRulerNumeration of
       cRulerNumeration_0_10_20:
         begin
@@ -2131,7 +2132,7 @@ begin
           if (i mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput);
-            CanvasTextOutSimplest(C, NX - NCharW*Length(Str) div 2, NTopIndent, Str);
+            CanvasTextOutSimplest(C, NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale, NTopIndent, Str);
           end;
         end;
       cRulerNumeration_1_11_21:
@@ -2140,7 +2141,7 @@ begin
           if (i mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput+1{!});
-            CanvasTextOutSimplest(C, NX - NCharW*Length(Str) div 2, NTopIndent, Str);
+            CanvasTextOutSimplest(C, NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale, NTopIndent, Str);
           end;
         end;
       cRulerNumeration_1_10_20:
@@ -2149,7 +2150,7 @@ begin
           if (NOutput=1) or (NOutput mod 10 = 0) then
           begin
             Str:= IntToStr(NOutput);
-            CanvasTextOutSimplest(C, NX - NCharW*Length(Str) div 2, NTopIndent, Str);
+            CanvasTextOutSimplest(C, NCoordX - NCharWidthScaled*Length(Str) div 2 div ATEditorCharXScale, NTopIndent, Str);
           end;
         end;
     end;
@@ -2159,9 +2160,7 @@ begin
     else
       NMarkHeight:= EditorScale(FOptRulerMarkSizeSmall);
 
-    CanvasLineVert(C, NX, FRectRuler.Bottom-1-NMarkHeight, FRectRuler.Bottom-1);
-
-    Inc(NX, FCharSize.XScaled div ATEditorCharXScale);
+    CanvasLineVert(C, NCoordX, FRectRuler.Bottom-1-NMarkHeight, FRectRuler.Bottom-1);
   end;
 
   CanvasLineHorz(C, FRectRuler.Left, FRectRuler.Bottom-1, FRectRuler.Right);
