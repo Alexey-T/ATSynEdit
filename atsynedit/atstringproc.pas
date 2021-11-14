@@ -22,7 +22,7 @@ type
   PatChar = PWideChar;
 
 const
-  ATEditorCharXScale = 1000;
+  ATEditorCharXScale = 1024;
 
 type
   TATEditorCharSize = record

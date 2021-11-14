@@ -2917,7 +2917,7 @@ procedure TATSynEdit.GetRectMicromap(out R: TRect);
 var
   NSize: integer;
 begin
-  NSize:= FMicromap.UpdateSizes(EditorScale(FCharSize.XScaled div ATEditorCharXScale));
+  NSize:= FMicromap.UpdateSizes(EditorScale(FCharSize.XScaled) div ATEditorCharXScale);
 
   if not FMicromapVisible or FMicromapOnScrollbar then
   begin
@@ -3356,7 +3356,8 @@ begin
           else
             CanvasArrowHorz(C,
               RectLine,
-              Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.XScaled div ATEditorCharXScale,
+              Colors.UnprintedFont,
+              OptUnprintedEofCharLength*ACharSize.XScaled div ATEditorCharXScale,
               false,
               OptUnprintedTabPointerScale);
       Break;
