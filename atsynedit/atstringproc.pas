@@ -26,8 +26,8 @@ const
 
 type
   TATEditorCharSize = record
-    XScaled: integer;
-    Y: integer;
+    XScaled: Int64;
+    Y: Int64;
   end;
 
 type
