@@ -2120,7 +2120,7 @@ begin
 
   C.FillRect(FRectRuler);
 
-  NCharW:= FCharSize.X * FOptRulerFontSizePercents div 100;
+  NCharW:= FCharSize.XScaled * FOptRulerFontSizePercents div 100 div ATEditorCharXScale;
 
   for i:= NRulerStart to NRulerStart+FVisibleColumns+1 do
   begin
@@ -2161,7 +2161,7 @@ begin
 
     CanvasLineVert(C, NX, FRectRuler.Bottom-1-NMarkHeight, FRectRuler.Bottom-1);
 
-    Inc(NX, FCharSize.X);
+    Inc(NX, FCharSize.XScaled div ATEditorCharXScale);
   end;
 
   CanvasLineHorz(C, FRectRuler.Left, FRectRuler.Bottom-1, FRectRuler.Right);
@@ -2202,7 +2202,7 @@ var
 begin
   Str:= IntToStr(Max(10, Strings.Count));
   FGutter[FGutterBandNumbers].Size:=
-    Length(Str)*FCharSize.X + 2*FNumbersIndent;
+    Length(Str)*FCharSize.XScaled div ATEditorCharXScale + 2*FNumbersIndent;
   FGutter.Update;
 end;
 
@@ -2216,8 +2216,8 @@ procedure TATSynEdit.UpdateMinimapAutosize;
 var
   CharSmall, CharBig: integer;
 begin
-  CharBig:= FCharSize.X;
-  CharSmall:= FCharSizeMinimap.X;
+  CharBig:= FCharSize.XScaled div ATEditorCharXScale;
+  CharSmall:= FCharSizeMinimap.XScaled div ATEditorCharXScale;
 
   if FMinimapCharWidth=0 then
   begin
@@ -2551,7 +2551,7 @@ end;
 
 function TATSynEdit.GetVisibleColumns: integer;
 begin
-  Result:= FRectMainVisible.Width div FCharSize.X;
+  Result:= FRectMainVisible.Width * ATEditorCharXScale div FCharSize.XScaled;
 end;
 
 function TATSynEdit.GetVisibleLinesMinimap: integer;
@@ -2704,7 +2704,7 @@ begin
       NMax:= NPage;
     NPosLast:= Max(0, NMax-NPage);
 
-    SmoothCharSize:= FCharSize.X;
+    SmoothCharSize:= FCharSize.XScaled div ATEditorCharXScale;
     SmoothMax:= NMax*SmoothCharSize;
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
@@ -2918,7 +2918,7 @@ procedure TATSynEdit.GetRectMicromap(out R: TRect);
 var
   NSize: integer;
 begin
-  NSize:= FMicromap.UpdateSizes(EditorScale(FCharSize.X));
+  NSize:= FMicromap.UpdateSizes(EditorScale(FCharSize.XScaled div ATEditorCharXScale));
 
   if not FMicromapVisible or FMicromapOnScrollbar then
   begin
@@ -2992,16 +2992,16 @@ begin
 
   if FMinimapCustomScale<100 then
   begin
-    FCharSizeMinimap.X:= EditorScale(1);
+    FCharSizeMinimap.XScaled:= EditorScale(1) * ATEditorCharXScale;
     FCharSizeMinimap.Y:= EditorScale(2);
   end
   else
   begin
-    FCharSizeMinimap.X:= 1 * FMinimapCustomScale div 100;
+    FCharSizeMinimap.XScaled:= 1 * FMinimapCustomScale div 100 * ATEditorCharXScale;
     FCharSizeMinimap.Y:= 2 * FMinimapCustomScale div 100;
   end;
 
-  FNumbersIndent:= FCharSize.X * FOptNumbersIndentPercents div 100;
+  FNumbersIndent:= FCharSize.XScaled * FOptNumbersIndentPercents div 100 div ATEditorCharXScale;
   FRulerHeight:= FCharSize.Y * FOptRulerHeightPercents div 100;
 
   if FOptGutterVisible and FOptNumbersAutosize then
@@ -3070,7 +3070,7 @@ begin
     C.Brush.Color:= Colors.Markers;
     C.Font.Color:= Colors.TextSelFont;
     CanvasTextOutSimplest(C,
-      FRectMain.Right-Length(cTextMacro)*FCharSize.X-FOptBorderWidthMacro,
+      FRectMain.Right-Length(cTextMacro)*FCharSize.XScaled div ATEditorCharXScale - FOptBorderWidthMacro,
       FRectMain.Bottom-FCharSize.Y,
       cTextMacro);
   end
@@ -3205,7 +3205,7 @@ begin
     end;
   end;
 
-  Result.X:= Max(1, Size.cx);
+  Result.XScaled:= Max(1, Size.cx) * ATEditorCharXScale;
   Result.Y:= Max(1, Size.cy + ACharSpacingY);
 end;
 
@@ -3353,7 +3353,7 @@ begin
           else
             CanvasArrowHorz(C,
               RectLine,
-              Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.X,
+              Colors.UnprintedFont, OptUnprintedEofCharLength*ACharSize.XScaled div ATEditorCharXScale,
               false,
               OptUnprintedTabPointerScale);
       Break;
@@ -3505,7 +3505,7 @@ begin
   CurrPoint.X:= ARectLine.Left;
   CurrPoint.Y:= ARectLine.Top;
   CurrPointText.X:= Int64(CurrPoint.X)
-                    + Int64(WrapItem.NIndent)*ACharSize.X
+                    + Int64(WrapItem.NIndent)*ACharSize.XScaled div ATEditorCharXScale
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
@@ -3557,7 +3557,7 @@ begin
       bTrimmedNonSpaces:= NSubPos+NSubLen <= St.LineLenWithoutSpace(NLinesIndex);
   end;
 
-  Inc(CurrPointText.X, NOutputCellPercentsSkipped * ACharSize.X div 100);
+  Inc(CurrPointText.X, NOutputCellPercentsSkipped * ACharSize.XScaled div ATEditorCharXScale div 100);
 
   if Length(StrOutput)>cMaxCharsForOutput then
     SetLength(StrOutput, cMaxCharsForOutput);
@@ -3666,7 +3666,7 @@ begin
       SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
 
     //truncate text to not paint over screen
-    NCount:= ARectLine.Width div ACharSize.X + 2;
+    NCount:= ARectLine.Width * ATEditorCharXScale div ACharSize.XScaled + 2;
     if Length(StrOutput)>NCount then
       SetLength(StrOutput, NCount);
 
@@ -3680,7 +3680,7 @@ begin
       TextOutProps.CharsSkipped:= NOutputCellPercentsSkipped div 100;
       TextOutProps.TrimmedTrailingNonSpaces:= bTrimmedNonSpaces;
       TextOutProps.DrawEvent:= Event;
-      TextOutProps.ControlWidth:= ClientWidth+ACharSize.X*2;
+      TextOutProps.ControlWidth:= ClientWidth+ACharSize.XScaled div ATEditorCharXScale * 2;
       TextOutProps.TextOffsetFromLine:= FTextOffsetFromTop;
 
       TextOutProps.ShowUnprinted:= FUnprintedVisible and FUnprintedSpaces;
@@ -3758,7 +3758,7 @@ begin
       C.FillRect(
         CoordAfterText.X,
         CoordAfterText.Y,
-        CoordAfterText.X+ACharSize.X,
+        CoordAfterText.X+ACharSize.XScaled div ATEditorCharXScale,
         CoordAfterText.Y+ACharSize.Y);
     end;
 
@@ -3860,7 +3860,7 @@ begin
   St:= Strings;
   bUseSetPixel:=
     {$ifndef windows} DoubleBuffered and {$endif}
-    (ACharSize.X=1);
+    (ACharSize.XScaled div ATEditorCharXScale = 1);
 
   if not FWrapInfo.IsIndexValid(AWrapIndex) then Exit; //e.g. main thread updated WrapInfo
   WrapItem:= FWrapInfo[AWrapIndex];
@@ -3873,7 +3873,7 @@ begin
   CurrPoint.X:= ARectLine.Left;
   CurrPoint.Y:= ARectLine.Top;
   CurrPointText.X:= Int64(CurrPoint.X)
-                    + Int64(WrapItem.NIndent)*ACharSize.X
+                    + Int64(WrapItem.NIndent)*ACharSize.XScaled div ATEditorCharXScale
                     - AScrollHorz.SmoothPos
                     + AScrollHorz.NPixelOffset;
   CurrPointText.Y:= CurrPoint.Y;
@@ -3917,7 +3917,7 @@ begin
         FillOneLine(NColorAfter, CurrPointText.X);
 
     //truncate text to not paint over screen
-    NCount:= ARectLine.Width div ACharSize.X + 2;
+    NCount:= ARectLine.Width div ACharSize.XScaled div ATEditorCharXScale + 2;
     if Length(StrOutput)>NCount then
       SetLength(StrOutput, NCount);
 
@@ -4282,7 +4282,7 @@ procedure TATSynEdit.DoPaintMargins(C: TCanvas);
   //
   function PosX(NMargin: integer): integer; inline;
   begin
-    Result:= FRectMain.Left + FCharSize.X*(NMargin-FScrollHorz.NPos);
+    Result:= FRectMain.Left + FCharSize.XScaled *(NMargin-FScrollHorz.NPos) div ATEditorCharXScale;
   end;
 var
   NWidth, i: integer;
@@ -4461,7 +4461,7 @@ begin
 
   FWantTabs:= true;
   FWantReturns:= true;
-  FCharSize.X:= 4;
+  FCharSize.XScaled:= 4 * ATEditorCharXScale;
   FCharSize.Y:= 4;
   FEditorIndex:= 0;
 
@@ -4701,7 +4701,7 @@ begin
   FMinimapHiliteLinesWithSelection:= true;
 
   FSpacingY:= cInitSpacingY;
-  FCharSizeMinimap.X:= 1;
+  FCharSizeMinimap.XScaled:= 1 * ATEditorCharXScale;
   FCharSizeMinimap.Y:= 2;
 
   FOptScrollStyleHorz:= aessAuto;
@@ -5253,7 +5253,7 @@ begin
 
   if FOptTextCenteringCharWidth>0 then
     Result.X:= Max(0, (ClientWidth - NGutterWidth -
-                       FOptTextCenteringCharWidth * FCharSize.X) div 2)
+                       FOptTextCenteringCharWidth * FCharSize.XScaled div ATEditorCharXScale) div 2)
   else
     Result.X:= OptTextOffsetLeft;
 
@@ -6947,7 +6947,7 @@ begin
     if Caret.CoordX=-1 then Continue;
     R.Left:= Caret.CoordX;
     R.Top:= Caret.CoordY;
-    R.Right:= R.Left+FCharSize.X;
+    R.Right:= R.Left+FCharSize.XScaled div ATEditorCharXScale;
     R.Bottom:= R.Top+FCharSize.Y;
 
     //check caret is visible (IntersectRect is slower)
@@ -6956,7 +6956,7 @@ begin
     if R.Left>=FRectMain.Right then Continue;
     if R.Top>=FRectMain.Bottom then Continue;
 
-    DoCaretsApplyShape(R, CaretShape, FCharSize.X, FCharSize.Y);
+    DoCaretsApplyShape(R, CaretShape, FCharSize.XScaled div ATEditorCharXScale, FCharSize.Y);
 
     if FCaretBlinkEnabled then
     begin
@@ -7061,8 +7061,8 @@ var
 begin
   if AIndentSize=0 then Exit;
 
-  RBack:= Rect(0, 0, AIndentSize*ACharSize.X, ACharSize.Y);
-  OffsetRect(RBack, ARect.Left-AScrollPos*ACharSize.X, ACoordY);
+  RBack:= Rect(0, 0, AIndentSize*ACharSize.XScaled div ATEditorCharXScale, ACharSize.Y);
+  OffsetRect(RBack, ARect.Left-AScrollPos*ACharSize.XScaled div ATEditorCharXScale, ACoordY);
 
   C.Brush.Color:= AColorBG;
   C.FillRect(RBack);
@@ -7072,7 +7072,7 @@ begin
       if i mod FTabSize = 0 then
         CanvasLine_DottedVertAlt(C,
           Colors.IndentVertLines,
-          ARect.Left + (i-AScrollPos)*ACharSize.X,
+          ARect.Left + (i-AScrollPos)*ACharSize.XScaled div ATEditorCharXScale,
           ACoordY,
           ACoordY+ACharSize.Y);
 end;
@@ -7098,8 +7098,8 @@ begin
    if FWrapMode=cWrapOff then
     if (NLineIndex>=FSelRect.Top) and (NLineIndex<=FSelRect.Bottom) then
     begin
-      NLeft:= APointLeft.X+ACharSize.X*(FSelRect.Left-AScrollHorz.NPos);
-      NRight:= NLeft+ACharSize.X*FSelRect.Width;
+      NLeft:= APointLeft.X+ACharSize.XScaled*(FSelRect.Left-AScrollHorz.NPos) div ATEditorCharXScale;
+      NRight:= NLeft+ACharSize.XScaled*FSelRect.Width div ATEditorCharXScale;
       NLeft:= Max(NLeft, APointText.X+ALineWidth);
       if (NLeft<NRight) then
       begin
@@ -7133,11 +7133,11 @@ begin
         if (AWrapItem.NFinal=cWrapItemMiddle) then
           Continue;
 
-      NLeft:= APointText.X + ALineWidth + (RangeFrom-NPartXAfter)*ACharSize.X;
+      NLeft:= APointText.X + ALineWidth + (RangeFrom-NPartXAfter)*ACharSize.XScaled div ATEditorCharXScale;
       if RangeTo=MaxInt then
         NRight:= AVisRect.Right
       else
-        NRight:= NLeft+(RangeTo-RangeFrom)*ACharSize.X;
+        NRight:= NLeft+(RangeTo-RangeFrom)*ACharSize.XScaled div ATEditorCharXScale;
 
       C.Brush.Color:= Colors.TextSelBG;
       C.FillRect(
@@ -7184,7 +7184,7 @@ procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: inte
       taLeftJustify:
         P.X:= ABand.Left + FNumbersIndent;
       taRightJustify:
-        P.X:= ABand.Right - FNumbersIndent - FCharSize.X div 2;
+        P.X:= ABand.Right - FNumbersIndent - FCharSize.XScaled div ATEditorCharXScale div 2;
       taCenter:
         P.X:= (ABand.Left+ABand.Right) div 2;
     end;
@@ -7217,12 +7217,12 @@ begin
 
     '-':
       begin
-        PaintDash(FCharSize.X, EditorScale(2));
+        PaintDash(FCharSize.XScaled div ATEditorCharXScale, EditorScale(2));
       end;
 
     else
       begin
-        NW:= FCharSize.X*Length(SText);
+        NW:= FCharSize.XScaled * Length(SText) div ATEditorCharXScale;
 
         P.Y:= ACoordTop;
 
@@ -8323,12 +8323,12 @@ begin
     else
       nIndent:= nIndentBegin;
 
-    Inc(P1.X, nIndent*ACharSize.X);
-    Inc(P2.X, nIndent*ACharSize.X);
+    Inc(P1.X, nIndent*ACharSize.XScaled div ATEditorCharXScale);
+    Inc(P2.X, nIndent*ACharSize.XScaled div ATEditorCharXScale);
 
     RSt.Left:= P1.X + FOptStapleIndent;
     RSt.Top:= P1.Y;
-    RSt.Right:= RSt.Left+ (ACharSize.X * FOptStapleWidthPercent div 100);
+    RSt.Right:= RSt.Left+ (ACharSize.XScaled * FOptStapleWidthPercent div ATEditorCharXScale div 100);
     RSt.Bottom:= P2.Y + ACharSize.Y-1;
 
     if (RSt.Left>=ARect.Left) and
@@ -8855,7 +8855,7 @@ begin
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
     CanvasTextOut(C,
-      cSizeIndentTooltipX + WrapItem.NIndent*FCharSize.X,
+      cSizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled div ATEditorCharXScale,
       cSizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
       SText,
       @FParts,

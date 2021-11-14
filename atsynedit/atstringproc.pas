@@ -21,6 +21,15 @@ type
   atChar = WideChar;
   PatChar = PWideChar;
 
+const
+  ATEditorCharXScale = 1000;
+
+type
+  TATEditorCharSize = record
+    XScaled: integer;
+    Y: integer;
+  end;
+
 type
   TATLineChangeKind = (
     cLineChangeEdited,
@@ -134,7 +143,8 @@ type
       const ANonWordChars: atString; AWrapIndented: boolean): integer;
     function FindClickedPosition(ALineIndex: integer; const Str: atString;
       constref ListOffsets: TATIntFixedArray;
-      APixelsFromLeft, ACharSize: Int64;
+      APixelsFromLeft: Int64;
+      ACharSize: TATEditorCharSize;
       AAllowVirtualPos: boolean;
       out AEndOfLinePos: boolean): Int64;
     procedure FindOutputSkipOffset(ALineIndex: integer; const S: atString;
@@ -701,7 +711,9 @@ end;
 
 function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString;
   constref ListOffsets: TATIntFixedArray;
-  APixelsFromLeft, ACharSize: Int64; AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): Int64;
+  APixelsFromLeft: Int64;
+  ACharSize: TATEditorCharSize;
+  AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): Int64;
 var
   i: integer;
 begin
@@ -710,7 +722,7 @@ begin
   begin
     Result:= 1;
     if AAllowVirtualPos then
-      Inc(Result, APixelsFromLeft div ACharSize);
+      Inc(Result, APixelsFromLeft * ATEditorCharXScale div ACharSize.XScaled);
     Exit;
   end;
 
@@ -719,7 +731,7 @@ begin
 
   //positions of each char end
   for i:= 0 to ListOffsets.Len-1 do
-    ListEnds.Data[i]:= ListOffsets.Data[i]*ACharSize div 100;
+    ListEnds.Data[i]:= ListOffsets.Data[i]*ACharSize.XScaled div ATEditorCharXScale div 100;
 
   //positions of each char middle
   for i:= 0 to ListOffsets.Len-1 do
@@ -742,7 +754,7 @@ begin
 
   AEndOfLinePos:= true;
 
-  Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) div ACharSize + 1;
+  Result:= ListEnds.Len + (APixelsFromLeft - ListEnds.Data[ListEnds.Len-1]) * ATEditorCharXScale div ACharSize.XScaled + 1;
   ////this works
   ////a) better if clicked after line end, far
   ////b) bad if clicked exactly on line end (shifted to right by 1)

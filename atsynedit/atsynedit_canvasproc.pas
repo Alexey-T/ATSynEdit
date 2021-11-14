@@ -60,12 +60,6 @@ var
     {$endif} ;
 
 type
-  TATEditorCharSize = record
-    X: integer;
-    Y: integer;
-  end;
-
-type
   TATSynEditCallbackIsCharSelected = function(AX, AY: integer): boolean of object;
 
   TATWiderFlags = record
@@ -371,7 +365,7 @@ begin
   else
     CanvasArrowHorz(C, R,
       AColorFont,
-      OptUnprintedTabCharLength*ACharSize.X,
+      OptUnprintedTabCharLength*ACharSize.XScaled div ATEditorCharXScale,
       true,
       OptUnprintedTabPointerScale);
 end;
@@ -634,12 +628,12 @@ begin
   case OptUnprintedEndSymbol of
     aeueDot:
       CanvasUnprintedSpace(C,
-        Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+        Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
         OptUnprintedEndDotScale,
         AColorFont);
     aeueArrowDown:
       CanvasArrowDown(C,
-        Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+        Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
         AColorFont,
         OptUnprintedEndArrowLength,
         OptUnprintedTabPointerScale
@@ -660,7 +654,7 @@ procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AColorFont: TColor);
 begin
   CanvasArrowWrapped(C,
-    Rect(AX, AY, AX+ACharSize.X, AY+ACharSize.Y),
+    Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
     AColorFont,
     OptUnprintedWrapArrowLength,
     OptUnprintedWrapArrowWidth,
@@ -782,7 +776,7 @@ var
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
   if NLen=0 then Exit;
-  NCharWidth:= AProps.CharSize.X;
+  NCharWidth:= AProps.CharSize.XScaled div ATEditorCharXScale;
 
   FillChar(ListInt, SizeOf(ListInt), 0);
   FillChar(Dx, SizeOf(Dx), 0);
@@ -1232,8 +1226,8 @@ begin
           end;
       end;
 
-      X1:= APosX + ACharSize.X*NSpaces;
-      X2:= X1 + ACharSize.X*NSpaceThis;
+      X1:= APosX + ACharSize.XScaled*NSpaces div ATEditorCharXScale;
+      X2:= X1 + ACharSize.XScaled*NSpaceThis div ATEditorCharXScale;
 
       if X1>ARect.Right then Break;
       Inc(NSpaces, NSpaceThis);

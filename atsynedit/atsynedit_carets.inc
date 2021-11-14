@@ -226,20 +226,20 @@ begin
 
     if bAsciiOnly or bLineHuge then
     begin
-      NWidth:= Min(NFromStart, Item.NLength) * ACharSize.X;
+      NWidth:= Min(NFromStart, Item.NLength) * ACharSize.XScaled div ATEditorCharXScale;
     end
     else
     begin
       Str:= AStrings.LineSub(P.Y, Item.NCharIndex, Min(NFromStart, Item.NLength));
-      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize.X);
+      NWidth:= CanvasTextWidth(Str, P.Y, ATabHelper, ACharSize.XScaled) div ATEditorCharXScale;
     end;
 
     Result.X:= NWidth;
 
     if NFromStart>Item.NLength then
-      Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.X);
+      Inc(Result.X, (NFromStart-Item.NLength)*ACharSize.XScaled div ATEditorCharXScale);
 
-    Inc(Result.X, Item.NIndent*ACharSize.X - NScrolledHorzSmooth);
+    Inc(Result.X, Item.NIndent*ACharSize.XScaled div ATEditorCharXScale - NScrolledHorzSmooth);
     Result.Y:= (i-NScrolledVert)*ACharSize.Y;
 
     //consider gaps
@@ -298,7 +298,7 @@ begin
   Result.Y:= -1;
   FillChar(ADetails, SizeOf(ADetails), 0);
 
-  if (ACharSize.X<=0) or (ACharSize.Y<=0) then Exit;
+  if (ACharSize.XScaled div ATEditorCharXScale <=0) or (ACharSize.Y<=0) then Exit;
   P.X:= Max(P.X, ARect.Left);
 
   //find index in WrapInfo for P.Y
@@ -396,7 +396,7 @@ begin
       exit(Point(-1, -1));
 
     NLineLenOriginal:= Item.NLength;
-    NLineLenTrimmed:= Min(Item.NLength, AScrollHorz.NPos + ARect.Width div ACharSize.X);
+    NLineLenTrimmed:= Min(Item.NLength, AScrollHorz.NPos + ARect.Width * ATEditorCharXScale div ACharSize.XScaled);
 
     if NLineLenOriginal>OptMaxLineLenForAccurateCharWidths then
     begin
@@ -415,13 +415,13 @@ begin
     else
     begin
       AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
-      NPixels:= Int64(P.X)-ARect.Left + Int64(ACharSize.X)*(AScrollHorz.NPos-Item.NIndent);
+      NPixels:= Int64(P.X)-ARect.Left + Int64(ACharSize.XScaled)*(AScrollHorz.NPos-Item.NIndent) div ATEditorCharXScale;
       Result.X:= ATabHelper.FindClickedPosition(
         Result.Y,
         Str,
         CharOffsets,
         NPixels,
-        ACharSize.X,
+        ACharSize,
         AllowVirtual,
         ADetails.EndOfWrappedLine)
         + Item.NCharIndex - 2;
@@ -626,16 +626,16 @@ var
   NChars: integer;
 begin
   Result:= false;
-  if ACaretCoordX < FRectMain.Left+AProximity*FCharSize.X then
+  if ACaretCoordX < FRectMain.Left+AProximity*FCharSize.XScaled div ATEditorCharXScale then
   begin
-    NChars:= (FRectMain.Left-ACaretCoordX) div FCharSize.X + 1 + AIndentHorz;
+    NChars:= (FRectMain.Left-ACaretCoordX) * ATEditorCharXScale div FCharSize.XScaled + 1 + AIndentHorz;
     FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
     Result:= true;
   end
   else
-  if ACaretCoordX > FRectMain.Right-AProximity*FCharSize.X-FCharSize.X then
+  if ACaretCoordX > FRectMain.Right-AProximity*FCharSize.XScaled div ATEditorCharXScale - FCharSize.XScaled div ATEditorCharXScale then
   begin
-    NChars:= (ACaretCoordX-FRectMain.Right) div FCharSize.X + 2 + AIndentHorz;
+    NChars:= (ACaretCoordX-FRectMain.Right) * ATEditorCharXScale div FCharSize.XScaled + 2 + AIndentHorz;
     FScrollHorz.NPos:= FScrollHorz.NPos+NChars;
     Result:= true;
   end;
