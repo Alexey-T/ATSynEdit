@@ -6908,6 +6908,7 @@ var
   CaretShape: TATCaretShape;
   NCaretColor: TColor;
   R: TRect;
+  NCharWidth: integer;
   i: integer;
 begin
   if csLoading in ComponentState then exit;
@@ -6945,13 +6946,15 @@ begin
   else
     FCaretShown:= true;
 
+  NCharWidth:= FCharSize.XScaled div ATEditorCharXScale;
+
   for i:= 0 to FCarets.Count-1 do
   begin
     Caret:= FCarets[i];
     if Caret.CoordX=-1 then Continue;
     R.Left:= Caret.CoordX;
     R.Top:= Caret.CoordY;
-    R.Right:= R.Left+FCharSize.XScaled div ATEditorCharXScale;
+    R.Right:= R.Left+NCharWidth;
     R.Bottom:= R.Top+FCharSize.Y;
 
     //check caret is visible (IntersectRect is slower)
@@ -6960,7 +6963,7 @@ begin
     if R.Left>=FRectMain.Right then Continue;
     if R.Top>=FRectMain.Bottom then Continue;
 
-    DoCaretsApplyShape(R, CaretShape, FCharSize.XScaled div ATEditorCharXScale, FCharSize.Y);
+    DoCaretsApplyShape(R, CaretShape, NCharWidth, FCharSize.Y);
 
     if FCaretBlinkEnabled then
     begin
