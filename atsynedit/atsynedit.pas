@@ -3180,15 +3180,19 @@ end;
 
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCharSize;
 const
-  Sample: string = 'N'; //char 'M' is not ok, it's too wide for var-width fonts
+  SampleChar = 'N';
+  SampleStrLen = 128;
 var
+  SampleStr: string;
   Size: TSize;
   TempC: TCanvas;
   dc: HDC;
 begin
+  SampleStr:= StringOfChar(SampleChar, SampleStrLen);
+
   if C.HandleAllocated then
   begin
-    Size:= C.TextExtent(Sample);
+    Size:= C.TextExtent(SampleStr);
   end
   else
   begin
@@ -3198,14 +3202,14 @@ begin
       TempC.Handle:= dc;
       TempC.Font.Name:= Self.Font.Name;
       TempC.Font.Size:= DoScaleFont(Self.Font.Size);
-      Size:= TempC.TextExtent(Sample);
+      Size:= TempC.TextExtent(SampleStr);
       ReleaseDC(dc, 0);
     finally
       FreeAndNil(TempC);
     end;
   end;
 
-  Result.XScaled:= Max(1, Size.cx) * ATEditorCharXScale;
+  Result.XScaled:= Max(1, Size.cx) * ATEditorCharXScale div SampleStrLen;
   Result.Y:= Max(1, Size.cy + ACharSpacingY);
 end;
 
