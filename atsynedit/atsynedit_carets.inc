@@ -160,7 +160,7 @@ function _DoCaretPosToClientPos(
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
   AGaps: TATGaps;
-  ACharSize: TPoint;
+  ACharSize: TATEditorCharSize;
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
@@ -275,7 +275,7 @@ function _DoClientPosToCaretPos(
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
   AGaps: TATGaps;
-  ACharSize: TPoint;
+  ACharSize: TATEditorCharSize;
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
