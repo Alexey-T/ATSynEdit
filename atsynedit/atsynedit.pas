@@ -1696,6 +1696,7 @@ type
     IsRepaintEnabled: boolean;
     procedure Paint; override;
     procedure Resize; override;
+    procedure DoHandleDummyEvent(var Message: TLMPaint); message LM_MEASUREITEM;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
     procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
@@ -6648,7 +6649,8 @@ begin
     MouseMove(Shift, Pnt.X, Pnt.Y);
   end;
 
-  Invalidate;
+  //trying to post a _delayed_ paint event
+  PostMessage(Handle, LM_MEASUREITEM, 0, 0);
 end;
 
 function TATSynEdit.DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
@@ -6787,8 +6789,6 @@ begin
     FTimerFlicker.Enabled:= true;
     exit;
   end;
-
-  DoHandleWheelQueue;
 
   Include(FPaintFlags, cIntFlagBitmap);
   inherited;
@@ -9681,6 +9681,16 @@ begin
         end;
     end;
   end;
+end;
+
+procedure TATSynEdit.DoHandleDummyEvent(var Message: TLMPaint);
+begin
+  if Assigned(AdapterForHilite) then
+    if not AdapterForHilite.IsDataReadyPartially then exit;
+
+  DoHandleWheelQueue;
+  Update;
+  Message.Result:= 1;
 end;
 
 
