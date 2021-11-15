@@ -5611,7 +5611,11 @@ begin
     FHintWnd.Hide;
 end;
 
-procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
+procedure _UpdateScrollInfoFromSmoothPos(
+  var AInfo: TATEditorScrollInfo;
+  const APos: Int64;
+  AWrapInfo: TATWrapInfo;
+  AGaps: TATGaps);
 //Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
   NPos, NPixels, NLineIndex, NCharSize: Int64;
@@ -5619,13 +5623,13 @@ var
   bConsiderGaps: boolean;
 begin
   AInfo.SmoothPos:= APos;
-  bConsiderGaps:= AInfo.Vertical and (Gaps.Count>0);
+  bConsiderGaps:= AInfo.Vertical and (AGaps.Count>0);
 
   if APos<=0 then
   begin
     AInfo.SetZero;
     if bConsiderGaps then
-      if Gaps.SizeOfGapTop>0 then
+      if AGaps.SizeOfGapTop>0 then
         AInfo.NPos:= -1;
     exit
   end;
@@ -5639,8 +5643,8 @@ begin
   if bConsiderGaps then
   begin
     //for position before line=0
-    NSizeGapTop:= Gaps.SizeOfGapTop;
-    NSizeGap0:= Gaps.SizeOfGap0;
+    NSizeGapTop:= AGaps.SizeOfGapTop;
+    NSizeGap0:= AGaps.SizeOfGap0;
 
     if NSizeGapTop>0 then
       if APos<NSizeGapTop then
@@ -5668,12 +5672,12 @@ begin
   //consider Gaps for vert scrolling
   if bConsiderGaps then
   begin
-    NPos:= Min(AInfo.NPos, WrapInfo.Count-1);
+    NPos:= Min(AInfo.NPos, AWrapInfo.Count-1);
     NPixels:= AInfo.NPixelOffset;
 
     repeat
-      NLineIndex:= FWrapInfo.Data[NPos].NLineIndex - 1;
-      NPixels:= APos - NPos*NCharSize - Gaps.SizeForLineRange(-1, NLineIndex);
+      NLineIndex:= AWrapInfo.Data[NPos].NLineIndex - 1;
+      NPixels:= APos - NPos*NCharSize - AGaps.SizeForLineRange(-1, NLineIndex);
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;
@@ -5683,6 +5687,11 @@ begin
     AInfo.NPos:= NPos;
     AInfo.NPixelOffset:= NPixels
   end;
+end;
+
+procedure TATSynEdit.UpdateScrollInfoFromSmoothPos(var AInfo: TATEditorScrollInfo; const APos: Int64);
+begin
+  _UpdateScrollInfoFromSmoothPos(AInfo, APos, WrapInfo, Gaps);
 end;
 
 function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATEditorScrollInfo; const Msg: TLMScroll): boolean;
