@@ -20,7 +20,7 @@ uses
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
-  syncobjs, gdeque,
+  syncobjs, gdeque, gqueue,
   LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
@@ -124,6 +124,13 @@ type
     constructor Create;
     procedure Add(ACode: integer; AInvoke: TATEditorCommandInvoke; const AText: string);
   end;
+
+  TATEditorWheelRecord = record
+    Kind: (wqkVert, wqkHorz, wqkZoom);
+    Delta: integer;
+  end;
+
+  TATEditorWheelQueue = specialize TQueue<TATEditorWheelRecord>;
 
 type
   TATTokenKind = (
@@ -757,6 +764,7 @@ type
     FWrapIndented: boolean;
     FWrapAddSpace: integer;
     FWrapEnabledForMaxLines: integer;
+    FWheelQueue: TATEditorWheelQueue;
     FUnprintedVisible,
     FUnprintedSpaces,
     FUnprintedSpacesTrailing,
@@ -1037,6 +1045,8 @@ type
     procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
     procedure DoChangeBookmarks;
+    procedure DoHandleWheelQueue;
+    procedure DoHandleWheelRecord(const ARecord: TATEditorWheelRecord);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
     function GetIndentString: UnicodeString;
@@ -4469,6 +4479,8 @@ begin
   FCharSize.Y:= 4;
   FEditorIndex:= 0;
 
+  FWheelQueue:= TATEditorWheelQueue.Create;
+
   FCommandLog:= TATEditorCommandLog.Create;
 
   FCarets:= TATCarets.Create;
@@ -4946,6 +4958,7 @@ begin
   FreeAndNil(FCaretShapeNormal);
   FreeAndNil(FCaretShapeOverwrite);
   FreeAndNil(FCaretShapeReadonly);
+  FreeAndNil(FWheelQueue);
   inherited;
 end;
 
@@ -6570,6 +6583,7 @@ function TATSynEdit.DoMouseWheelAction(Shift: TShiftState;
 var
   Mode: TATMouseWheelMode;
   Pnt: TPoint;
+  QueueRecord: TATEditorWheelRecord;
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
@@ -6592,17 +6606,16 @@ begin
   else
     exit;
 
+  QueueRecord:= Default(TATEditorWheelRecord);
+
   case Mode of
     aWheelModeNormal:
       begin
         if FOptMouseWheelScrollVert then
         begin
-          //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
-          DoScrollByDeltaInPixels(
-            0,
-            FCharSize.Y * -FOptMouseWheelScrollVertSpeed * AWheelDelta div 120
-            );
-          Update;
+          QueueRecord.Kind:= wqkVert;
+          QueueRecord.Delta:= AWheelDelta;
+          FWheelQueue.Push(QueueRecord);
           Result:= true;
         end;
       end;
@@ -6611,11 +6624,9 @@ begin
       begin
         if FOptMouseWheelScrollHorz then
         begin
-          DoScrollByDelta(
-            -FOptMouseWheelScrollHorzSpeed * AWheelDelta div 120,
-            0
-            );
-          Invalidate;
+          QueueRecord.Kind:= wqkHorz;
+          QueueRecord.Delta:= AWheelDelta;
+          FWheelQueue.Push(QueueRecord);
           Result:= true;
         end;
       end;
@@ -6624,12 +6635,15 @@ begin
       begin
         if FOptMouseWheelZooms then
         begin
-          DoScaleFontDelta(AWheelDelta>0);
-          DoEventZoom;
+          QueueRecord.Kind:= wqkZoom;
+          QueueRecord.Delta:= AWheelDelta;
+          FWheelQueue.Push(QueueRecord);
           Result:= true;
         end;
       end;
   end;
+
+  DoHandleWheelQueue;
 
   if ssLeft in Shift then
   begin
@@ -9628,6 +9642,48 @@ begin
 
   if bClear then
     FillChar(FFoldbarCache[0], SizeOf(TATFoldBarProps)*NCount, 0);
+end;
+
+procedure TATSynEdit.DoHandleWheelRecord(const ARecord: TATEditorWheelRecord);
+begin
+  case ARecord.Kind of
+    wqkVert:
+      begin
+        //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
+        DoScrollByDeltaInPixels(
+          0,
+          FCharSize.Y * -FOptMouseWheelScrollVertSpeed * ARecord.Delta div 120
+          );
+        Update;
+      end;
+
+    wqkHorz:
+      begin
+        DoScrollByDelta(
+          -FOptMouseWheelScrollHorzSpeed * ARecord.Delta div 120,
+          0
+          );
+        Invalidate;
+      end;
+
+    wqkZoom:
+      begin
+        DoScaleFontDelta(ARecord.Delta>0);
+        DoEventZoom;
+      end;
+  end;
+end;
+
+procedure TATSynEdit.DoHandleWheelQueue;
+var
+  Rec: TATEditorWheelRecord;
+begin
+  while not FWheelQueue.IsEmpty() do
+  begin
+    Rec:= FWheelQueue.Front;
+    FWheelQueue.Pop();
+    DoHandleWheelRecord(Rec);
+  end;
 end;
 
 
