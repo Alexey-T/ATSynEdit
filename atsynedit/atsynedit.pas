@@ -6564,6 +6564,7 @@ var
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
+  if ModeOneLine then exit;
   DoHideAllTooltips;
 
   if AForceHorz then
@@ -6585,7 +6586,7 @@ begin
   case Mode of
     aWheelModeNormal:
       begin
-        if (not ModeOneLine) and FOptMouseWheelScrollVert then
+        if FOptMouseWheelScrollVert then
         begin
           //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
           DoScrollByDeltaInPixels(
@@ -6599,7 +6600,7 @@ begin
 
     aWheelModeHoriz:
       begin
-        if (not ModeOneLine) and FOptMouseWheelScrollHorz then
+        if FOptMouseWheelScrollHorz then
         begin
           DoScrollByDelta(
             -FOptMouseWheelScrollHorzSpeed * AWheelDelta div 120,
