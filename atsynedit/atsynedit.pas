@@ -1046,7 +1046,6 @@ type
     function DoCalcLineLen(ALineIndex: integer): integer;
     procedure DoChangeBookmarks;
     procedure DoHandleWheelQueue;
-    procedure DoHandleWheelRecord(const ARecord: TATEditorWheelRecord);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
     function GetIndentString: UnicodeString;
@@ -9644,45 +9643,41 @@ begin
     FillChar(FFoldbarCache[0], SizeOf(TATFoldBarProps)*NCount, 0);
 end;
 
-procedure TATSynEdit.DoHandleWheelRecord(const ARecord: TATEditorWheelRecord);
-begin
-  case ARecord.Kind of
-    wqkVert:
-      begin
-        //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
-        DoScrollByDeltaInPixels(
-          0,
-          FCharSize.Y * -FOptMouseWheelScrollVertSpeed * ARecord.Delta div 120
-          );
-        Update;
-      end;
-
-    wqkHorz:
-      begin
-        DoScrollByDelta(
-          -FOptMouseWheelScrollHorzSpeed * ARecord.Delta div 120,
-          0
-          );
-        Invalidate;
-      end;
-
-    wqkZoom:
-      begin
-        DoScaleFontDelta(ARecord.Delta>0);
-        DoEventZoom;
-      end;
-  end;
-end;
-
 procedure TATSynEdit.DoHandleWheelQueue;
 var
   Rec: TATEditorWheelRecord;
 begin
-  while not FWheelQueue.IsEmpty() do
+  while FWheelQueue.Size()>0 do
   begin
     Rec:= FWheelQueue.Front;
     FWheelQueue.Pop();
-    DoHandleWheelRecord(Rec);
+
+    case Rec.Kind of
+      wqkVert:
+        begin
+          //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
+          DoScrollByDeltaInPixels(
+            0,
+            FCharSize.Y * -FOptMouseWheelScrollVertSpeed * Rec.Delta div 120
+            );
+          Update;
+        end;
+
+      wqkHorz:
+        begin
+          DoScrollByDelta(
+            -FOptMouseWheelScrollHorzSpeed * Rec.Delta div 120,
+            0
+            );
+          Invalidate;
+        end;
+
+      wqkZoom:
+        begin
+          DoScaleFontDelta(Rec.Delta>0);
+          DoEventZoom;
+        end;
+    end;
   end;
 end;
 
