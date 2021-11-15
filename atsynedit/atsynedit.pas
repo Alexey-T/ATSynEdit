@@ -6581,9 +6581,9 @@ end;
 function TATSynEdit.DoMouseWheelAction(Shift: TShiftState;
   AWheelDelta: integer; AForceHorz: boolean): boolean;
 var
+  WheelRecord: TATEditorWheelRecord;
   Mode: TATMouseWheelMode;
   Pnt: TPoint;
-  QueueRecord: TATEditorWheelRecord;
 begin
   Result:= false;
   if not OptMouseEnableAll then exit;
@@ -6606,18 +6606,17 @@ begin
   else
     exit;
 
-  QueueRecord:= Default(TATEditorWheelRecord);
+  WheelRecord:= Default(TATEditorWheelRecord);
 
   case Mode of
     aWheelModeNormal:
       begin
         if FOptMouseWheelScrollVert then
         begin
-          QueueRecord.Kind:= wqkVert;
-          QueueRecord.Delta:= AWheelDelta;
-
-          //FWheelQueue.Push(QueueRecord);
-          DoHandleWheelRecord(QueueRecord);
+          WheelRecord.Kind:= wqkVert;
+          WheelRecord.Delta:= AWheelDelta;
+          //FWheelQueue.Push(WheelRecord);
+          DoHandleWheelRecord(WheelRecord);
           Update;
 
           Result:= true;
@@ -6628,11 +6627,10 @@ begin
       begin
         if FOptMouseWheelScrollHorz then
         begin
-          QueueRecord.Kind:= wqkHorz;
-          QueueRecord.Delta:= AWheelDelta;
-
-          //FWheelQueue.Push(QueueRecord);
-          DoHandleWheelRecord(QueueRecord);
+          WheelRecord.Kind:= wqkHorz;
+          WheelRecord.Delta:= AWheelDelta;
+          //FWheelQueue.Push(WheelRecord);
+          DoHandleWheelRecord(WheelRecord);
           Update;
 
           Result:= true;
@@ -6643,11 +6641,10 @@ begin
       begin
         if FOptMouseWheelZooms then
         begin
-          QueueRecord.Kind:= wqkZoom;
-          QueueRecord.Delta:= AWheelDelta;
-
-          //FWheelQueue.Push(QueueRecord);
-          DoHandleWheelRecord(QueueRecord);
+          WheelRecord.Kind:= wqkZoom;
+          WheelRecord.Delta:= AWheelDelta;
+          //FWheelQueue.Push(WheelRecord);
+          DoHandleWheelRecord(WheelRecord);
           Update;
 
           Result:= true;
