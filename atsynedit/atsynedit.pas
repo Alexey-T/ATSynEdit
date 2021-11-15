@@ -453,8 +453,8 @@ const
   cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2; //indent inside [...] folded-mark
   cFoldedMarkIndentOuter = 2; //indent before [...] folded-mark
-  cSpeedScrollAutoHorz: integer = 10; //auto-scroll (drag out of control): speed x
-  cSpeedScrollAutoVert: integer = 1; //... speed y
+  OptEditorSpeedScrollAutoHorz: integer = 10; //auto-scroll (drag out of control): speed x
+  OptEditorSpeedScrollAutoVert: integer = 1; //... speed y
   cSpeedScrollNice: integer = 3;
   cSizeGutterFoldLineDx = 3;
   cSizeRulerHeightPercents = 120;
@@ -6821,13 +6821,13 @@ begin
 
   case FMouseAutoScroll of
     cDirUp:
-      DoScrollByDelta(0, -cSpeedScrollAutoVert);
+      DoScrollByDelta(0, -OptEditorSpeedScrollAutoVert);
     cDirDown:
-      DoScrollByDelta(0, cSpeedScrollAutoVert);
+      DoScrollByDelta(0, OptEditorSpeedScrollAutoVert);
     cDirLeft:
-      DoScrollByDelta(-cSpeedScrollAutoHorz, 0);
+      DoScrollByDelta(-OptEditorSpeedScrollAutoHorz, 0);
     cDirRight:
-      DoScrollByDelta(cSpeedScrollAutoHorz, 0);
+      DoScrollByDelta(OptEditorSpeedScrollAutoHorz, 0);
     else
       Exit;
   end;
