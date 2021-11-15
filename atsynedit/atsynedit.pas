@@ -764,7 +764,7 @@ type
     FWrapIndented: boolean;
     FWrapAddSpace: integer;
     FWrapEnabledForMaxLines: integer;
-    FWheelQueue: TATEditorWheelQueue;
+    //FWheelQueue: TATEditorWheelQueue;
     FUnprintedVisible,
     FUnprintedSpaces,
     FUnprintedSpacesTrailing,
@@ -1046,6 +1046,7 @@ type
     function DoCalcLineLen(ALineIndex: integer): integer;
     procedure DoChangeBookmarks;
     procedure DoHandleWheelQueue;
+    procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
     function GetIndentString: UnicodeString;
@@ -1696,7 +1697,6 @@ type
     IsRepaintEnabled: boolean;
     procedure Paint; override;
     procedure Resize; override;
-    procedure DoHandleDummyEvent(var Message: TLMPaint); message LM_MEASUREITEM;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
     procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
@@ -4479,7 +4479,7 @@ begin
   FCharSize.Y:= 4;
   FEditorIndex:= 0;
 
-  FWheelQueue:= TATEditorWheelQueue.Create;
+  //FWheelQueue:= TATEditorWheelQueue.Create;
 
   FCommandLog:= TATEditorCommandLog.Create;
 
@@ -4958,7 +4958,7 @@ begin
   FreeAndNil(FCaretShapeNormal);
   FreeAndNil(FCaretShapeOverwrite);
   FreeAndNil(FCaretShapeReadonly);
-  FreeAndNil(FWheelQueue);
+  //FreeAndNil(FWheelQueue);
   inherited;
 end;
 
@@ -6615,7 +6615,11 @@ begin
         begin
           QueueRecord.Kind:= wqkVert;
           QueueRecord.Delta:= AWheelDelta;
-          FWheelQueue.Push(QueueRecord);
+
+          //FWheelQueue.Push(QueueRecord);
+          DoHandleWheelRecord(QueueRecord);
+          Update;
+
           Result:= true;
         end;
       end;
@@ -6626,7 +6630,11 @@ begin
         begin
           QueueRecord.Kind:= wqkHorz;
           QueueRecord.Delta:= AWheelDelta;
-          FWheelQueue.Push(QueueRecord);
+
+          //FWheelQueue.Push(QueueRecord);
+          DoHandleWheelRecord(QueueRecord);
+          Update;
+
           Result:= true;
         end;
       end;
@@ -6637,7 +6645,11 @@ begin
         begin
           QueueRecord.Kind:= wqkZoom;
           QueueRecord.Delta:= AWheelDelta;
-          FWheelQueue.Push(QueueRecord);
+
+          //FWheelQueue.Push(QueueRecord);
+          DoHandleWheelRecord(QueueRecord);
+          Update;
+
           Result:= true;
         end;
       end;
@@ -6648,9 +6660,6 @@ begin
     Pnt:= ScreenToClient(Mouse.CursorPos);
     MouseMove(Shift, Pnt.X, Pnt.Y);
   end;
-
-  //trying to post a _delayed_ paint event
-  PostMessage(Handle, LM_MEASUREITEM, 0, 0);
 end;
 
 function TATSynEdit.DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
@@ -9647,7 +9656,38 @@ begin
     FillChar(FFoldbarCache[0], SizeOf(TATFoldBarProps)*NCount, 0);
 end;
 
+procedure TATSynEdit.DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
+begin
+  case ARec.Kind of
+    wqkVert:
+      begin
+        //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
+        DoScrollByDeltaInPixels(
+          0,
+          FCharSize.Y * -FOptMouseWheelScrollVertSpeed * ARec.Delta div 120
+          );
+      end;
+
+    wqkHorz:
+      begin
+        DoScrollByDelta(
+          -FOptMouseWheelScrollHorzSpeed * ARec.Delta div 120,
+          0
+          );
+      end;
+
+    wqkZoom:
+      begin
+        DoScaleFontDelta(ARec.Delta>0, false);
+        DoEventZoom;
+      end;
+  end;
+end;
+
 procedure TATSynEdit.DoHandleWheelQueue;
+begin
+end;
+{
 var
   Rec: TATEditorWheelRecord;
 begin
@@ -9655,43 +9695,10 @@ begin
   begin
     Rec:= FWheelQueue.Front;
     FWheelQueue.Pop();
-
-    case Rec.Kind of
-      wqkVert:
-        begin
-          //w/o this handler wheel works only with OS scrollbars, need with new scrollbars too
-          DoScrollByDeltaInPixels(
-            0,
-            FCharSize.Y * -FOptMouseWheelScrollVertSpeed * Rec.Delta div 120
-            );
-        end;
-
-      wqkHorz:
-        begin
-          DoScrollByDelta(
-            -FOptMouseWheelScrollHorzSpeed * Rec.Delta div 120,
-            0
-            );
-        end;
-
-      wqkZoom:
-        begin
-          DoScaleFontDelta(Rec.Delta>0, false);
-          DoEventZoom;
-        end;
-    end;
+    DoHandleWheelRecord(Rec);
   end;
 end;
-
-procedure TATSynEdit.DoHandleDummyEvent(var Message: TLMPaint);
-begin
-  if Assigned(AdapterForHilite) then
-    if not AdapterForHilite.IsDataReadyPartially then exit;
-
-  DoHandleWheelQueue;
-  Update;
-  Message.Result:= 1;
-end;
+}
 
 
 {$I atsynedit_carets.inc}
