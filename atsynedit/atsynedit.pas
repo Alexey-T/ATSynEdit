@@ -20,7 +20,7 @@ uses
   InterfaceBase,
   Classes, SysUtils, Graphics,
   Controls, ExtCtrls, Menus, Forms, Clipbrd,
-  syncobjs, gdeque, gqueue,
+  syncobjs, gdeque,
   LMessages, LCLType, LCLVersion,
   LazUTF8,
   EncConv,
@@ -130,7 +130,7 @@ type
     Delta: integer;
   end;
 
-  TATEditorWheelQueue = specialize TQueue<TATEditorWheelRecord>;
+  //TATEditorWheelQueue = specialize TQueue<TATEditorWheelRecord>;
 
 type
   TATTokenKind = (
