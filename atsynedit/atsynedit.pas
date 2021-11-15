@@ -1045,7 +1045,6 @@ type
     procedure DebugSelRect;
     function DoCalcLineLen(ALineIndex: integer): integer;
     procedure DoChangeBookmarks;
-    procedure DoHandleWheelQueue;
     procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
@@ -9681,10 +9680,8 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoHandleWheelQueue;
-begin
-end;
 {
+procedure TATSynEdit.DoHandleWheelQueue;
 var
   Rec: TATEditorWheelRecord;
 begin
