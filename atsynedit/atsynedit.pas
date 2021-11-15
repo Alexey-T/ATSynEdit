@@ -1682,7 +1682,7 @@ type
     procedure DoScrollToBeginOrEnd(AToBegin: boolean);
     procedure DoScrollByDelta(ADeltaX, ADeltaY: integer);
     procedure DoScrollByDeltaInPixels(ADeltaX, ADeltaY: integer);
-    procedure DoScaleFontDelta(AInc: boolean);
+    procedure DoScaleFontDelta(AInc: boolean; AllowUpdate: boolean);
     function DoCalcLineHiliteEx(ALineIndex: integer; var AParts: TATLineParts;
       AColorBG: TColor; out AColorAfter: TColor): boolean;
     procedure DoSetMarkedLines(ALine1, ALine2: integer);
@@ -6642,13 +6642,13 @@ begin
       end;
   end;
 
-  DoHandleWheelQueue;
-
   if ssLeft in Shift then
   begin
     Pnt:= ScreenToClient(Mouse.CursorPos);
     MouseMove(Shift, Pnt.X, Pnt.Y);
   end;
+
+  Invalidate;
 end;
 
 function TATSynEdit.DoHandleClickEvent(AEvent: TATSynEditClickEvent): boolean;
@@ -6787,6 +6787,8 @@ begin
     FTimerFlicker.Enabled:= true;
     exit;
   end;
+
+  DoHandleWheelQueue;
 
   Include(FPaintFlags, cIntFlagBitmap);
   inherited;
@@ -7793,7 +7795,7 @@ begin
   Strings.UndoAsString:= AValue;
 end;
 
-procedure TATSynEdit.DoScaleFontDelta(AInc: boolean);
+procedure TATSynEdit.DoScaleFontDelta(AInc: boolean; AllowUpdate: boolean);
 const
   cMinScale = 60;
   cStep = 10;
@@ -7813,7 +7815,9 @@ begin
   //NTop:= LineTop;
   FOptScaleFont:= FOptScaleFont+cStep*BoolToPlusMinusOne[AInc];
   //LineTop:= NTop;
-  Update;
+
+  if AllowUpdate then
+    Update;
 end;
 
 procedure TATSynEdit.BeginUpdate; inline;
@@ -9660,7 +9664,6 @@ begin
             0,
             FCharSize.Y * -FOptMouseWheelScrollVertSpeed * Rec.Delta div 120
             );
-          Update;
         end;
 
       wqkHorz:
@@ -9669,12 +9672,11 @@ begin
             -FOptMouseWheelScrollHorzSpeed * Rec.Delta div 120,
             0
             );
-          Invalidate;
         end;
 
       wqkZoom:
         begin
-          DoScaleFontDelta(Rec.Delta>0);
+          DoScaleFontDelta(Rec.Delta>0, false);
           DoEventZoom;
         end;
     end;

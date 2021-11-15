@@ -106,7 +106,7 @@ end;
 
 function TATSynEdit.DoCommand_ScaleDelta(AIncrease: boolean): TATCommandResults;
 begin
-  DoScaleFontDelta(AIncrease);
+  DoScaleFontDelta(AIncrease, true);
   Result:= [cResultState];
 end;
 
