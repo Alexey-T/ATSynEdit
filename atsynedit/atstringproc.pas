@@ -26,7 +26,12 @@ const
 
 type
   TATEditorCharSize = record
+    //what is XScaled? it is the char-width, multiplied by ATEditorCharXScale and truncated.
+    //on win32/gtk/qt, XScaled is multiple of ATEditorCharXScale; but not on macOS.
+    //macOS has actually floating-number font width, e.g. 7.801 pixels of a single char in monospaced fonts
+    //(all ASCII chars have the same width, tested).
     XScaled: Int64;
+    //macOS char-height is decimal-number.
     Y: Int64;
   end;
 
