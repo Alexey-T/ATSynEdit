@@ -521,6 +521,7 @@ var
 var
   OptEditorDebugTiming: boolean = false;
   OptEditorFlickerReducingPause: integer = 0; //when >=1000, timer is not used, but special check is used
+  OptEditorPreciseCalculationOfCharWidth: boolean = true;
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
@@ -3189,13 +3190,18 @@ end;
 function TATSynEdit.GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCharSize;
 const
   SampleChar = 'N';
-  SampleStrLen = 128;
 var
+  SampleStrLen: integer;
   SampleStr: string;
   Size: TSize;
   TempC: TCanvas;
   dc: HDC;
 begin
+  if OptEditorPreciseCalculationOfCharWidth then
+    SampleStrLen:= 128
+  else
+    SampleStrLen:= 1;
+
   SampleStr:= StringOfChar(SampleChar, SampleStrLen);
 
   if C.HandleAllocated then
