@@ -142,7 +142,7 @@ object fmOpt: TfmOpt
         Top = 8
         Width = 353
         Caption = 'zebra mode'
-        ClientHeight = 62
+        ClientHeight = 77
         ClientWidth = 349
         TabOrder = 8
         object chkZebraActive: TCheckBox
@@ -1029,6 +1029,14 @@ object fmOpt: TfmOpt
         Top = 228
         Width = 204
         Caption = 'proximity of caret to vert edge'
+      end
+      object chkCrRenderText: TCheckBox
+        Left = 344
+        Height = 24
+        Top = 120
+        Width = 144
+        Caption = 'render text above'
+        TabOrder = 11
       end
     end
     object TabSheet7: TTabSheet

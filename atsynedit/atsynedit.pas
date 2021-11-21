@@ -370,6 +370,7 @@ type
     Width: integer;
     Height: integer;
     EmptyInside: boolean;
+    RenderCharAbove: boolean;
     procedure Assign(Obj: TATCaretShape);
   end;
 
@@ -6926,12 +6927,40 @@ begin
   Invalidate;
 end;
 
+
 procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
   Caret: TATCaretItem;
   CaretShape: TATCaretShape;
   NCaretColor: TColor;
+  StrCaret: atString;
   R: TRect;
+  //
+  procedure DoPaintCaretShape;
+  var
+    NCoordY: integer;
+  begin
+    CanvasInvertRect(C, R, NCaretColor);
+    if CaretShape.EmptyInside then
+      CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor);
+
+    if CaretShape.RenderCharAbove then
+      if Caret.PosX<Strings.LinesLen[Caret.PosY] then
+      begin
+        StrCaret:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
+        if (StrCaret<>'') and not IsCharUnicodeSpace(StrCaret[1]) then
+        begin
+          C.Font.Color:= Colors.TextFont;
+          C.Brush.Style:= bsClear;
+          NCoordY:= Caret.CoordY;
+          if OptSpacingY<0 then
+            Inc(NCoordY, OptSpacingY);
+          CanvasTextOutSimplest(C, Caret.CoordX, NCoordY, StrCaret);
+        end;
+      end;
+  end;
+  //
+var
   NCharWidth: integer;
   i: integer;
 begin
@@ -7003,15 +7032,11 @@ begin
         end;
       end;
 
-      CanvasInvertRect(C, R, NCaretColor);
-      if CaretShape.EmptyInside then
-        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor);
+      DoPaintCaretShape;
     end
     else
     begin
-      CanvasInvertRect(C, R, NCaretColor);
-      if CaretShape.EmptyInside then
-        CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor);
+      DoPaintCaretShape;
     end;
 
     Caret.OldRect:= R;

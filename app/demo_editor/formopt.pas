@@ -22,6 +22,7 @@ type
     bColDown: TButton;
     bColUp: TButton;
     ButtonPanel1: TButtonPanel;
+    chkCrRenderText: TCheckBox;
     chkMapClickDoDrag: TCheckBox;
     chkUndoForCrt: TCheckBox;
     chkUndoGrp: TCheckBox;
@@ -272,6 +273,7 @@ begin
     edCrWidthNormal.Value:= ed.CaretShapeNormal.Width;
     edCrHeightNormal.Value:= ed.CaretShapeNormal.Height;
     chkCrEmptyNormal.Checked:= ed.CaretShapeNormal.EmptyInside;
+    chkCrRenderText.Checked:= ed.CaretShapeNormal.RenderCharAbove;
 
     //gutter
     edNumStyle.ItemIndex:= Ord(ed.OptNumbersStyle);
@@ -408,6 +410,7 @@ begin
       ed.CaretShapeNormal.Width:= edCrWidthNormal.Value;
       ed.CaretShapeNormal.Height:= edCrHeightNormal.Value;
       ed.CaretShapeNormal.EmptyInside:= chkCrEmptyNormal.Checked;
+      ed.CaretShapeNormal.RenderCharAbove:= chkCrRenderText.Checked;
 
       //gutter
       //ed.OptNumbersFontSizePercents:= edNumSize.Value;
