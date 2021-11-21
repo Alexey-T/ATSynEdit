@@ -370,7 +370,7 @@ type
     Width: integer;
     Height: integer;
     EmptyInside: boolean;
-    RenderCharAbove: boolean;
+    PaintChar: boolean;
     procedure Assign(Obj: TATCaretShape);
   end;
 
@@ -6945,7 +6945,7 @@ var
     if CaretShape.EmptyInside then
       CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor)
     else
-    if CaretShape.RenderCharAbove then
+    if CaretShape.PaintChar then
       if Caret.PosX<Strings.LinesLen[Caret.PosY] then
       begin
         StrCaret:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);

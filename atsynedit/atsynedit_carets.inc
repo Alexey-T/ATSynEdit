@@ -1255,6 +1255,6 @@ begin
   Width:= Obj.Width;
   Height:= Obj.Height;
   EmptyInside:= Obj.EmptyInside;
-  RenderCharAbove:= Obj.RenderCharAbove;
+  PaintChar:= Obj.PaintChar;
 end;
 
