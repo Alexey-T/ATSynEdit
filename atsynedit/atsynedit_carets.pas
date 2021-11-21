@@ -10,7 +10,7 @@ unit ATSynEdit_Carets;
 interface
 
 uses
-  Classes, SysUtils,
+  Classes, SysUtils, Graphics,
   LCLIntf,
   ATStringProc,
   ATStringProc_Separator;
@@ -50,6 +50,8 @@ type
     OldRect: TRect; //screen rect, but before running the last command
     SavedX, SavedX_Pre: integer; //memory of last column, to use with arrows Up/Down
     BeforeExtendX: integer; //memory for commands "carets extend: up/down/..."
+    PaintChar: UnicodeString;
+    PaintCharColor: TColor;
     procedure SelectNone;
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);

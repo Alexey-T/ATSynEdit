@@ -125,6 +125,15 @@ begin
       Caret.CoordX:= PntCoord.X;
       Caret.CoordY:= PntCoord.Y;
     end;
+
+    if CaretShapeNormal.PaintChar then
+    begin
+      if Caret.PosX<Strings.LinesLen[Caret.PosY] then
+        Caret.PaintChar:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1)
+      else
+        Caret.PaintChar:= '';
+      Caret.PaintCharColor:= clRed; //TODO
+    end;
   end;
 
   if Assigned(FMarkers) then

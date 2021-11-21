@@ -6933,7 +6933,6 @@ var
   Caret: TATCaretItem;
   CaretShape: TATCaretShape;
   NCaretColor: TColor;
-  StrCaret: atString;
   R: TRect;
   //
   procedure DoPaintCaretShape;
@@ -6946,19 +6945,17 @@ var
       CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor)
     else
     if CaretShape.PaintChar then
-      if Caret.PosX<Strings.LinesLen[Caret.PosY] then
+    begin
+      if (Caret.PaintChar<>'') and not IsCharUnicodeSpace(Caret.PaintChar[1]) then
       begin
-        StrCaret:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
-        if (StrCaret<>'') and not IsCharUnicodeSpace(StrCaret[1]) then
-        begin
-          C.Font.Color:= Colors.TextFont;
-          C.Brush.Style:= bsClear;
-          NCoordY:= Caret.CoordY;
-          if OptSpacingY<0 then
-            Inc(NCoordY, OptSpacingY);
-          CanvasTextOutSimplest(C, Caret.CoordX, NCoordY, StrCaret);
-        end;
+        C.Font.Color:= Caret.PaintCharColor;
+        C.Brush.Style:= bsClear;
+        NCoordY:= Caret.CoordY;
+        if OptSpacingY<0 then
+          Inc(NCoordY, OptSpacingY);
+        CanvasTextOutSimplest(C, Caret.CoordX, NCoordY, Caret.PaintChar);
       end;
+    end;
   end;
   //
 var
