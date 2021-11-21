@@ -32,8 +32,6 @@ var
     UnprintedReplaceSpecToCode: integer;
     CharSizeProportional: boolean;
     CharScaleFullWidth: word;
-    CharScaleHex_Small: integer; //width of hex show: "xNN"
-    CharScaleHex_Big: integer; //width of hex show: "xNNNN"
     SpeedScrollAutoHorz: integer; //auto-scroll (drag out of control): speed x
     SpeedScrollAutoVert: integer; //... speed y
     DebugTiming: boolean;
@@ -72,8 +70,6 @@ initialization
     UnprintedReplaceSpecToCode:= 164;
     CharSizeProportional:= true;
     CharScaleFullWidth:= 190;
-    CharScaleHex_Small:= 300;
-    CharScaleHex_Big:= 500;
     SpeedScrollAutoHorz:= 10;
     SpeedScrollAutoVert:= 1;
     DebugTiming:= false;

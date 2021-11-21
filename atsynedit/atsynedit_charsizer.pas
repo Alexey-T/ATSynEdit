@@ -186,6 +186,9 @@ begin
 end;
 
 function TATCharSizer.GetCharWidth(ch: WideChar): integer;
+const
+  CharScaleHex_Small = 300; //width of 'xNN'
+  CharScaleHex_Big = 500; //width of 'xNNNN'
 var
   n: word absolute ch;
 begin
@@ -199,9 +202,9 @@ begin
     uw_hexshow:
       begin
         if n<$100 then
-          exit(ATEditorOptions.CharScaleHex_Small)
+          exit(CharScaleHex_Small)
         else
-          exit(ATEditorOptions.CharScaleHex_Big);
+          exit(CharScaleHex_Big);
       end;
   end;
 
@@ -211,9 +214,9 @@ begin
   if IsCharHexDisplayed(ch) then
   begin
     if n<$100 then
-      exit(ATEditorOptions.CharScaleHex_Small)
+      exit(CharScaleHex_Small)
     else
-      exit(ATEditorOptions.CharScaleHex_Big);
+      exit(CharScaleHex_Big);
   end;
 
   if ATEditorOptions.CharSizeProportional then
