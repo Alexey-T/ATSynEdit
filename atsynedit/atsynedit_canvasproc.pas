@@ -22,28 +22,9 @@ uses
   ATCanvasPrimitives,
   ATStringProc,
   ATStrings,
+  ATSynEdit_Options,
   ATSynEdit_LineParts,
   ATSynEdit_CharSizer;
-
-type
-  TATSynEditUnptintedEolSymbol = (
-    aeueDot,
-    aeueArrowDown,
-    aeuePilcrow
-    );
-
-var
-  OptUnprintedTabCharLength: integer = 1;
-  OptUnprintedTabPointerScale: integer = 22;
-  OptUnprintedEofCharLength: integer = 1;
-  OptUnprintedSpaceDotScale: integer = 15;
-  OptUnprintedEndDotScale: integer = 30;
-  OptUnprintedEndFontScale: integer = 40;
-  OptUnprintedEndSymbol: TATSynEditUnptintedEolSymbol = aeueArrowDown;
-  OptUnprintedEndArrowLength: integer = 70;
-  OptUnprintedWrapArrowLength: integer = 40;
-  OptUnprintedWrapArrowWidth: integer = 80;
-  OptEditorItalicFontLongerInPercents: integer = 40;
 
 var
   //Win: seems no slowdown from offsets
@@ -361,13 +342,13 @@ begin
   R.Bottom:= AY+ACharSize.Y;
 
   if ch<>#9 then
-    CanvasUnprintedSpace(C, R, OptUnprintedSpaceDotScale, AColorFont)
+    CanvasUnprintedSpace(C, R, ATEditorOptions.UnprintedSpaceDotScale, AColorFont)
   else
     CanvasArrowHorz(C, R,
       AColorFont,
-      OptUnprintedTabCharLength*ACharSize.XScaled div ATEditorCharXScale,
+      ATEditorOptions.UnprintedTabCharLength*ACharSize.XScaled div ATEditorCharXScale,
       true,
-      OptUnprintedTabPointerScale);
+      ATEditorOptions.UnprintedTabPointerScale);
 end;
 
 
@@ -603,7 +584,7 @@ var
   X, Y, W, H: integer;
   i: integer;
 begin
-  H:= ACharSize.Y * OptUnprintedEndFontScale div 100;
+  H:= ACharSize.Y * ATEditorOptions.UnprintedEndFontScale div 100;
   W:= H div 2;
 
   X:= AX + 2;
@@ -625,18 +606,18 @@ const
   // https://www.fileformat.info/info/unicode/char/B6/index.htm
   cPilcrowString: PChar = #$C2#$B6;
 begin
-  case OptUnprintedEndSymbol of
+  case ATEditorOptions.UnprintedEndSymbol of
     aeueDot:
       CanvasUnprintedSpace(C,
         Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
-        OptUnprintedEndDotScale,
+        ATEditorOptions.UnprintedEndDotScale,
         AColorFont);
     aeueArrowDown:
       CanvasArrowDown(C,
         Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
         AColorFont,
-        OptUnprintedEndArrowLength,
-        OptUnprintedTabPointerScale
+        ATEditorOptions.UnprintedEndArrowLength,
+        ATEditorOptions.UnprintedTabPointerScale
         );
     aeuePilcrow:
       begin
@@ -656,9 +637,9 @@ begin
   CanvasArrowWrapped(C,
     Rect(AX, AY, AX+ACharSize.XScaled div ATEditorCharXScale, AY+ACharSize.Y),
     AColorFont,
-    OptUnprintedWrapArrowLength,
-    OptUnprintedWrapArrowWidth,
-    OptUnprintedTabPointerScale
+    ATEditorOptions.UnprintedWrapArrowLength,
+    ATEditorOptions.UnprintedWrapArrowWidth,
+    ATEditorOptions.UnprintedTabPointerScale
     )
 end;
 
@@ -929,7 +910,7 @@ begin
       //with font eg "Fira Code Retina"
       if bItalic then
         Inc(PartRect.Right,
-          C.Font.Size * OptEditorItalicFontLongerInPercents div 100
+          C.Font.Size * ATEditorOptions.ItalicFontLongerInPercents div 100
           );
 
       //part with only blanks, render simpler

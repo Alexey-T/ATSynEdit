@@ -46,18 +46,6 @@ var
   //must be created after MainForm is inited, e.g. in TATSynEdit.Create
   GlobalCharSizer: TATCharSizer = nil;
 
-var
-  OptEditorCharSizeProportional: boolean = true;
-  OptEditorCharScaleFullWidth: word = 190; //width of fullsize chars (CJK and others) in percents
-
-const
-  OptEditorCharScaleHex_Small = 300; //width of hex show: "xNN"
-  OptEditorCharScaleHex_Big = 500; //width of hex show: "xNNNN"
-
-var
-  OptUnprintedReplaceSpec: boolean = false;
-  OptUnprintedReplaceSpecToCode: integer = 164; //char 164 is small circle
-
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
 function IsCharAccent(ch: WideChar): boolean; inline;
 function IsCharUnicodeSpace(ch: WideChar): boolean; inline;
@@ -69,6 +57,7 @@ function IsStringWithUnusualWidthChars(const S: UnicodeString): boolean;
 implementation
 
 uses
+  ATSynEdit_Options,
   ATSynEdit_CharSizeArray;
 
 function IsCharAsciiControl(ch: WideChar): boolean; inline;
@@ -204,35 +193,35 @@ begin
 
   case FixedSizes[n] of
     uw_normal: exit;
-    uw_fullwidth: exit(OptEditorCharScaleFullWidth);
+    uw_fullwidth: exit(ATEditorOptions.CharScaleFullWidth);
     uw_space: exit;
     uw_combined: exit(0);
     uw_hexshow:
       begin
         if n<$100 then
-          exit(OptEditorCharScaleHex_Small)
+          exit(ATEditorOptions.CharScaleHex_Small)
         else
-          exit(OptEditorCharScaleHex_Big);
+          exit(ATEditorOptions.CharScaleHex_Big);
       end;
   end;
 
-  if OptUnprintedReplaceSpec and IsCharAsciiControl(ch) then
+  if ATEditorOptions.UnprintedReplaceSpec and IsCharAsciiControl(ch) then
     exit;
 
   if IsCharHexDisplayed(ch) then
   begin
     if n<$100 then
-      exit(OptEditorCharScaleHex_Small)
+      exit(ATEditorOptions.CharScaleHex_Small)
     else
-      exit(OptEditorCharScaleHex_Big);
+      exit(ATEditorOptions.CharScaleHex_Big);
   end;
 
-  if OptEditorCharSizeProportional then
+  if ATEditorOptions.CharSizeProportional then
     if n>=128 then
       exit(GetCharWidth_FromCache(ch));
 
   //for other codes, use full-width size
-  Result:= OptEditorCharScaleFullWidth;
+  Result:= ATEditorOptions.CharScaleFullWidth;
 end;
 
 {

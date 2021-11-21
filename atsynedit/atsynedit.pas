@@ -31,6 +31,7 @@ uses
   ATStrings,
   ATStringProc_WordJump,
   ATCanvasPrimitives,
+  ATSynEdit_Options,
   ATSynEdit_CharSizer,
   {$ifdef USE_FPC_REGEXPR}
   RegExpr,
@@ -460,8 +461,6 @@ const
   cFoldedLenOfEmptyHint = 50;
   cFoldedMarkIndentInner = 2; //indent inside [...] folded-mark
   cFoldedMarkIndentOuter = 2; //indent before [...] folded-mark
-  OptEditorSpeedScrollAutoHorz: integer = 10; //auto-scroll (drag out of control): speed x
-  OptEditorSpeedScrollAutoVert: integer = 1; //... speed y
   cSpeedScrollNice: integer = 3;
   cSizeGutterFoldLineDx = 3;
   cSizeRulerHeightPercents = 120;
@@ -3372,9 +3371,9 @@ begin
             CanvasArrowHorz(C,
               RectLine,
               Colors.UnprintedFont,
-              OptUnprintedEofCharLength*ACharSize.XScaled div ATEditorCharXScale,
+              ATEditorOptions.UnprintedEofCharLength*ACharSize.XScaled div ATEditorCharXScale,
               false,
-              OptUnprintedTabPointerScale);
+              ATEditorOptions.UnprintedTabPointerScale);
       Break;
     end;
 
@@ -3681,8 +3680,8 @@ begin
 
     Event:= FOnDrawLine;
 
-    if OptUnprintedReplaceSpec then
-      SRemoveAsciiControlChars(StrOutput, WideChar(OptUnprintedReplaceSpecToCode));
+    if ATEditorOptions.UnprintedReplaceSpec then
+      SRemoveAsciiControlChars(StrOutput, WideChar(ATEditorOptions.UnprintedReplaceSpecToCode));
 
     //truncate text to not paint over screen
     NCount:= ARectLine.Width * ATEditorCharXScale div ACharSize.XScaled + 2;
@@ -6857,13 +6856,13 @@ begin
 
   case FMouseAutoScroll of
     cDirUp:
-      DoScrollByDelta(0, -OptEditorSpeedScrollAutoVert);
+      DoScrollByDelta(0, -ATEditorOptions.SpeedScrollAutoVert);
     cDirDown:
-      DoScrollByDelta(0, OptEditorSpeedScrollAutoVert);
+      DoScrollByDelta(0, ATEditorOptions.SpeedScrollAutoVert);
     cDirLeft:
-      DoScrollByDelta(-OptEditorSpeedScrollAutoHorz, 0);
+      DoScrollByDelta(-ATEditorOptions.SpeedScrollAutoHorz, 0);
     cDirRight:
-      DoScrollByDelta(OptEditorSpeedScrollAutoHorz, 0);
+      DoScrollByDelta(ATEditorOptions.SpeedScrollAutoHorz, 0);
     else
       Exit;
   end;
