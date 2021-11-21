@@ -1,4 +1,7 @@
 
+2021.11.21
+* change: moved all global options to record ATEditorOptions in atsynedit_options unit
+
 2021.11.02
 + add: prop OptBorderRounded; and Colors.BorderParentBG
 
