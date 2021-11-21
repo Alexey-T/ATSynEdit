@@ -11,6 +11,7 @@ uses
   FileUtil,
   ATStringProc,
   ATSynEdit,
+  ATSynEdit_Options,
   ATSynEdit_CanvasProc,
   ATSynEdit_CharSizer;
 
@@ -253,10 +254,10 @@ begin
     chkUnprintEndDet.Checked:= ed.OptUnprintedEndsDetails;
     chkUnprintOnlyBothEnds.Checked:= ed.OptUnprintedSpacesBothEnds;
     chkUnprintOnlyEnd.Checked:= ed.OptUnprintedSpacesTrailing;
-    edUnpriEol.ItemIndex:= Ord(OptUnprintedEndSymbol);
-    chkUnprintAsciiRep.Checked:= OptUnprintedReplaceSpec;
-    edTabArrowSize.Value:= OptUnprintedTabCharLength;
-    edTabArrowPnt.Value:= OptUnprintedTabPointerScale;
+    edUnpriEol.ItemIndex:= Ord(ATEditorOptions.UnprintedEndSymbol);
+    chkUnprintAsciiRep.Checked:= ATEditorOptions.UnprintedReplaceSpec;
+    edTabArrowSize.Value:= ATEditorOptions.UnprintedTabCharLength;
+    edTabArrowPnt.Value:= ATEditorOptions.UnprintedTabPointerScale;
 
     //caret
     chkCrBlinkEn.Checked:= ed.OptCaretBlinkEnabled;
@@ -389,10 +390,10 @@ begin
       ed.OptUnprintedEndsDetails:= chkUnprintEndDet.Checked;
       ed.OptUnprintedSpacesBothEnds:= chkUnprintOnlyBothEnds.Checked;
       ed.OptUnprintedSpacesTrailing:= chkUnprintOnlyEnd.Checked;
-      OptUnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
-      OptUnprintedTabCharLength:= edTabArrowSize.Value;
-      OptUnprintedTabPointerScale:= edTabArrowPnt.Value;
-      OptUnprintedEndSymbol:= TATSynEditUnptintedEolSymbol(edUnpriEol.ItemIndex);
+      ATEditorOptions.UnprintedReplaceSpec:= chkUnprintAsciiRep.Checked;
+      ATEditorOptions.UnprintedTabCharLength:= edTabArrowSize.Value;
+      ATEditorOptions.UnprintedTabPointerScale:= edTabArrowPnt.Value;
+      ATEditorOptions.UnprintedEndSymbol:= TATEditorUnptintedEolSymbol(edUnpriEol.ItemIndex);
 
       //caret
       ed.OptCaretBlinkEnabled:= chkCrBlinkEn.Checked;
