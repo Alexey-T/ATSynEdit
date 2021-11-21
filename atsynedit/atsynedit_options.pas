@@ -4,6 +4,8 @@ License: MPL 2.0 or LGPL
 }
 unit ATSynEdit_Options;
 
+{$mode objfpc}{$H+}
+
 interface
 
 type
