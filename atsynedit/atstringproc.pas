@@ -12,6 +12,7 @@ interface
 uses
   Classes, SysUtils, StrUtils,
   LCLType, LCLIntf, Clipbrd,
+  ATSynEdit_Options,
   ATSynEdit_UnicodeData,
   ATSynEdit_RegExpr,
   ATSynEdit_CharSizer;
@@ -106,13 +107,6 @@ var
 
 function EditorScale(AValue: integer): integer; inline;
 function EditorScaleFont(AValue: integer): integer;
-
-var
-  OptEmojiWidthPercents: integer = 210;
-  OptMaxTabPositionToExpand: integer = 500; //no sense to expand too far tabs
-  OptMinWordWrapOffset: integer = 3;
-  OptCommaCharsWrapWithWords: UnicodeString = '.,;:''"`~?!&%$';
-  OptMaxLineLenForAccurateCharWidths: integer = 500; //must be <= cMaxFixedArray
 
 type
   TATStringTabCalcEvent = function(Sender: TObject; ALineIndex, ACharIndex: integer): integer of object;
@@ -418,7 +412,7 @@ function TATStringTabHelper.FindWordWrapOffset(ALineIndex: integer; const S: atS
   //to wrap them with wordchars
   function _IsWord(ch: widechar): boolean; inline;
   begin
-    if Pos(ch, OptCommaCharsWrapWithWords)>0 then
+    if Pos(ch, ATEditorOptions.CommaCharsWrapWithWords)>0 then
       Result:= true
     else
       Result:= IsCharWord(ch, ANonWordChars);
@@ -430,7 +424,7 @@ var
 begin
   if S='' then
     Exit(0);
-  if AColumns<OptMinWordWrapOffset then
+  if AColumns<ATEditorOptions.MinWordWrapOffset then
     Exit(AColumns);
 
   CalcCharOffsets(ALineIndex, S, Offsets);
@@ -442,8 +436,8 @@ begin
   N:= Min(Length(S), cMaxFixedArray)-1;
   while (N>0) and (Offsets.Data[N]>(AColumns+1)*100) do Dec(N);
   NAvg:= N;
-  if NAvg<OptMinWordWrapOffset then
-    Exit(OptMinWordWrapOffset);
+  if NAvg<ATEditorOptions.MinWordWrapOffset then
+    Exit(ATEditorOptions.MinWordWrapOffset);
 
   //find correct offset: not allowed at edge
   //a) 2 wordchars,
@@ -532,10 +526,10 @@ begin
   if Assigned(OnCalcTabSize) then
     Result:= OnCalcTabSize(SenderObj, ALineIndex, APos)
   else
-  if Assigned(OnCalcLineLen) and (OnCalcLineLen(ALineIndex)>OptMaxLineLenForAccurateCharWidths) then
+  if Assigned(OnCalcLineLen) and (OnCalcLineLen(ALineIndex)>ATEditorOptions.MaxLineLenForAccurateCharWidths) then
     Result:= 1
   else
-  if APos>OptMaxTabPositionToExpand then
+  if APos>ATEditorOptions.MaxTabPositionToExpand then
     Result:= 1
   else
     Result:= TabSize - (APos-1) mod TabSize;
@@ -615,7 +609,7 @@ begin
   //NPairSize:= 0;
   //StrPair:= 'ab';
 
-  if NLen>OptMaxLineLenForAccurateCharWidths then
+  if NLen>ATEditorOptions.MaxLineLenForAccurateCharWidths then
   begin
     for i:= 0 to NLen-1 do
       AInfo.Data[i]:= (Int64(i)+1)*100;
@@ -645,7 +639,7 @@ begin
     }
     if IsCharSurrogateAny(ch) then
     begin
-      NScalePercents:= OptEmojiWidthPercents div 2;
+      NScalePercents:= ATEditorOptions.EmojiWidthPercents div 2;
     end
     else
     begin
@@ -681,7 +675,7 @@ begin
   NLen:= Length(S);
   if NLen=0 then Exit;
 
-  if NLen>OptMaxLineLenForAccurateCharWidths then
+  if NLen>ATEditorOptions.MaxLineLenForAccurateCharWidths then
     exit(NLen*100);
 
   NCharsSkipped:= ACharsSkipped;
@@ -693,7 +687,7 @@ begin
 
     if IsCharSurrogateAny(ch) then
     begin
-      NScalePercents:= OptEmojiWidthPercents div 2;
+      NScalePercents:= ATEditorOptions.EmojiWidthPercents div 2;
     end
     else
     begin

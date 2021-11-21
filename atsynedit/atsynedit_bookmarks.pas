@@ -12,13 +12,11 @@ interface
 uses
   Classes, SysUtils,
   ATStringProc,
+  ATSynEdit_Options,
   ATSynEdit_FGL;
 
 type
   TATBookmarkAutoDelete = (bmadDontDelete, bmadDelete, bmadOption);
-
-var
-  OptEditorBookmarksAutoDelete: boolean = false;
 
 type
   { TATBookmarkData }
@@ -283,7 +281,7 @@ begin
           if (NIndexPlaced>=0) then
           begin
             fAutoDel:= FList.ItemPtr(NIndexPlaced)^.Data.AutoDelete;
-            if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and OptEditorBookmarksAutoDelete) then
+            if (fAutoDel=bmadDelete) or ((fAutoDel=bmadOption) and ATEditorOptions.BookmarksAutoDelete) then
             begin
               Delete(NIndexPlaced);
               NIndexPlaced:= -1;

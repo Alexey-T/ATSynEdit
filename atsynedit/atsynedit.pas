@@ -517,11 +517,6 @@ var
   ATClipboardColumnFormat: TClipboardFormat = 0; //must be inited
   ATClipboardColumnSignature: integer = $1000;
 
-var
-  OptEditorDebugTiming: boolean = false;
-  OptEditorFlickerReducingPause: integer = 0; //when >=1000, timer is not used, but special check is used
-  OptEditorPreciseCalculationOfCharWidth: boolean = {$ifdef darwin} true {$else} false {$endif};
-
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
   TATSynEditClickMoveCaretEvent = procedure(Sender: TObject; APrevPnt, ANewPnt: TPoint) of object;
@@ -2052,10 +2047,6 @@ type
     property OptDimUnfocusedBack: integer read FOptDimUnfocusedBack write FOptDimUnfocusedBack default cInitDimUnfocusedBack;
   end;
 
-var
-  //better to have as global bar (for many editors)
-  OptMouseDragDropFocusesTargetEditor: boolean = true;
-
 const
   cEncNameUtf8_WithBom = 'UTF-8 with BOM';
   cEncNameUtf8_NoBom = 'UTF-8';
@@ -3196,7 +3187,7 @@ var
   TempC: TCanvas;
   dc: HDC;
 begin
-  if OptEditorPreciseCalculationOfCharWidth then
+  if ATEditorOptions.PreciseCalculationOfCharWidth then
     SampleStrLen:= 128
   else
     SampleStrLen:= 1;
@@ -3532,7 +3523,7 @@ begin
   bTrimmedNonSpaces:= false;
 
   NLineLen:= St.LinesLen[NLinesIndex];
-  bLineHuge:= WrapItem.NLength>OptMaxLineLenForAccurateCharWidths;
+  bLineHuge:= WrapItem.NLength>ATEditorOptions.MaxLineLenForAccurateCharWidths;
           //not this: NLineLen>OptMaxLineLenForAccurateCharWidths;
 
   if not bLineHuge then
@@ -4216,7 +4207,7 @@ begin
   //avoid too often minimap repainting
   if not FAdapterIsDataReady then exit;
 
-  if OptEditorDebugTiming then
+  if ATEditorOptions.DebugTiming then
     FTickMinimap:= GetTickCount64;
 
   FScrollHorzMinimap.Clear;
@@ -4228,7 +4219,7 @@ begin
   DoPaintMinimapTextToBGRABitmap(FRectMinimap, FCharSizeMinimap, FScrollHorzMinimap, FScrollVertMinimap);
   DoPaintMinimapSelToBGRABitmap;
 
-  if OptEditorDebugTiming then
+  if ATEditorOptions.DebugTiming then
     FTickMinimap:= GetTickCount64-FTickMinimap;
 end;
 
@@ -5489,7 +5480,7 @@ begin
   if DoubleBuffered then
     if not Assigned(FBitmap) then exit;
 
-  if OptEditorDebugTiming then
+  if ATEditorOptions.DebugTiming then
   begin
     FTickAll:= GetTickCount64;
     FTickMinimap:= 0;
@@ -5524,7 +5515,7 @@ begin
 
   DoPaintMarkerOfDragDrop(Canvas);
 
-  if OptEditorDebugTiming then
+  if ATEditorOptions.DebugTiming then
   begin
     FTickAll:= GetTickCount64-FTickAll;
     DoPaintTiming(Canvas);
@@ -6786,16 +6777,16 @@ begin
   if not IsRepaintEnabled then exit;
   //if not IsInvalidateAllowed then exit;
 
-  if OptEditorFlickerReducingPause>=1000 then
+  if ATEditorOptions.FlickerReducingPause>=1000 then
   begin
     if Assigned(AdapterForHilite) then
       if not AdapterForHilite.IsDataReadyPartially then exit;
   end
   else
-  if OptEditorFlickerReducingPause>0 then
+  if ATEditorOptions.FlickerReducingPause>0 then
   begin
     FTimerFlicker.Enabled:= false;
-    FTimerFlicker.Interval:= OptEditorFlickerReducingPause;
+    FTimerFlicker.Interval:= ATEditorOptions.FlickerReducingPause;
     FTimerFlicker.Enabled:= true;
     exit;
   end;
@@ -8659,7 +8650,7 @@ begin
   begin
     DoCaretSingle(Pnt.X, Pnt.Y);
     DoCommand(cCommand_TextInsert, cInvokeInternal, SText);
-    if OptMouseDragDropFocusesTargetEditor then
+    if ATEditorOptions.MouseDragDropFocusesTargetEditor then
       SetFocus;
 
     //Ctrl not pressed: delete block from src

@@ -26,20 +26,6 @@ uses
   ATSynEdit_LineParts,
   ATSynEdit_CharSizer;
 
-var
-  //Win: seems no slowdown from offsets
-  //macOS: better to use True, fonts have floating width value, e.g. 10.2 pixels
-  //       but we use False, because with the Zoe's patch to LCL it's 2x faster TextOut
-  //       https://forum.lazarus.freepascal.org/index.php/topic,55431.0.html
-  //Linux Qt5: same as for macOS
-  //Linux GTK2: big slowdown from offsets
-  OptEditorTextoutNeedsOffsets: boolean =
-    {$if defined(windows) or defined(LCLQt5)}
-    true
-    {$else}
-    false
-    {$endif} ;
-
 type
   TATSynEditCallbackIsCharSelected = function(AX, AY: integer): boolean of object;
 
@@ -658,7 +644,7 @@ var
   St: TFontStyles;
 }
 begin
-  if OptEditorTextoutNeedsOffsets then
+  if ATEditorOptions.TextoutNeedsOffsets then
     exit(true);
 
   {
@@ -790,7 +776,7 @@ begin
 
   if AParts=nil then
   begin
-    if AProps.HasAsciiNoTabs and not OptEditorTextoutNeedsOffsets then
+    if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
     begin
       BufW:= AText;
       DxPointer:= nil;
@@ -952,7 +938,7 @@ begin
         bAllowLigatures
         );
       {$else}
-      if AProps.HasAsciiNoTabs and not OptEditorTextoutNeedsOffsets then
+      if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
       begin
         Buf:= PartStr;
         DxPointer:= nil;

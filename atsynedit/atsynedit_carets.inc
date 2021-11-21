@@ -214,7 +214,7 @@ begin
   for i:= NIndex1 to NIndex2 do
   begin
     Item:= AWrapInfo[i];
-    bLineHuge:= Item.NLength>OptMaxLineLenForAccurateCharWidths;
+    bLineHuge:= Item.NLength>ATEditorOptions.MaxLineLenForAccurateCharWidths;
 
     if (P.X<Item.NCharIndex-1) then Continue;
     if (Item.NFinal=cWrapItemMiddle) then
@@ -398,7 +398,7 @@ begin
     NLineLenOriginal:= Item.NLength;
     NLineLenTrimmed:= Min(Item.NLength, AScrollHorz.NPos + ARect.Width * ATEditorCharXScale div ACharSize.XScaled);
 
-    if NLineLenOriginal>OptMaxLineLenForAccurateCharWidths then
+    if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
     begin
       Str:= StringOfCharW('N', NLineLenOriginal); //fake to calc CharOffsets only
       ATabHelper.CalcCharOffsets(Item.NLineIndex, Str, CharOffsets, 0);
