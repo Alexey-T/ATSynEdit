@@ -6941,9 +6941,10 @@ var
     NCoordY: integer;
   begin
     CanvasInvertRect(C, R, NCaretColor);
-    if CaretShape.EmptyInside then
-      CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor);
 
+    if CaretShape.EmptyInside then
+      CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor)
+    else
     if CaretShape.RenderCharAbove then
       if Caret.PosX<Strings.LinesLen[Caret.PosY] then
       begin
