@@ -1,6 +1,6 @@
 {
-Source code is taken from FPC 3.2fixes, and changed by Alexey Torgashin.
-License: same as for FPC.
+Copyright (C) Alexey Torgashin, uvviewsoft.com
+License: MPL 2.0 or LGPL
 }
 unit ATSynEdit_Options;
 
