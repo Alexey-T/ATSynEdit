@@ -135,7 +135,7 @@ begin
       begin
         Caret.PaintCharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
         if Assigned(AdapterForHilite) then
-          AdapterForHilite.OnEditorCalcPosForeColor(nil,
+          AdapterForHilite.OnEditorCalcPosForeground(nil,
             Caret.PosX,
             Caret.PosY,
             Caret.PaintCharColor,
