@@ -47,6 +47,10 @@ type
       AX, AY: integer; var AColor: TColor); virtual;
     //called to calculate BG/background color at position (usually pos after line end).
 
+    procedure OnEditorCalcPosForeColor(Sender: TObject;
+      AX, AY: integer; var AColor: TColor; var AFontStyles: TFontStyles); virtual;
+    //called to calculate foreground/font color at position
+
     procedure OnEditorCaretMove(Sender: TObject); virtual;
     //called after caret is moved.
 
@@ -176,8 +180,14 @@ begin
   //
 end;
 
-procedure TATAdapterHilite.OnEditorCalcPosColor(Sender: TObject; AX,
-  AY: integer; var AColor: TColor);
+procedure TATAdapterHilite.OnEditorCalcPosColor(Sender: TObject;
+  AX, AY: integer; var AColor: TColor);
+begin
+  //
+end;
+
+procedure TATAdapterHilite.OnEditorCalcPosForeColor(Sender: TObject;
+  AX, AY: integer; var AColor: TColor; var AFontStyles: TFontStyles);
 begin
   //
 end;

@@ -126,12 +126,22 @@ begin
       Caret.CoordY:= PntCoord.Y;
     end;
 
-    Caret.PaintChar:= '';
     if CaretShapeNormal.PaintChar then
     begin
+      Caret.PaintCharStr:= '';
+      Caret.PaintCharColor:= Colors.TextFont;
+      Caret.PaintCharStyles:= [];
       if Caret.PosX<Strings.LinesLen[Caret.PosY] then
-        Caret.PaintChar:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
-      Caret.PaintCharColor:= clRed; //TODO
+      begin
+        Caret.PaintCharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
+        if Assigned(AdapterForHilite) then
+          AdapterForHilite.OnEditorCalcPosForeColor(nil,
+            Caret.PosX,
+            Caret.PosY,
+            Caret.PaintCharColor,
+            Caret.PaintCharStyles
+            );
+      end;
     end;
   end;
 
