@@ -305,12 +305,6 @@ begin
   ed.Parent:= PanelMain;
   ed.Align:= alClient;
 
-  {$ifdef LCLQt5}
-  OptEditorTextoutNeedsOffsets:= true;
-  {$endif}
-
-  //OptEditorDebugTiming:= true;
-
   {$ifdef windows}
   ed.Font.Name:= 'Consolas';
   {$else}
