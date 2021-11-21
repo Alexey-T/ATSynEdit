@@ -6946,16 +6946,16 @@ var
     else
     if CaretShape.PaintChar then
     begin
-      if (Caret.PaintCharStr<>'') and not IsCharUnicodeSpace(Caret.PaintCharStr[1]) then
+      if (Caret.CharStr<>'') and not IsCharUnicodeSpace(Caret.CharStr[1]) then
       begin
-        C.Font.Color:= Caret.PaintCharColor;
-        C.Font.Style:= Caret.PaintCharStyles;
+        C.Font.Color:= Caret.CharColor;
+        C.Font.Style:= Caret.CharStyles;
         C.Brush.Style:= bsClear;
         NCoordX:= Caret.CoordX;
         NCoordY:= Caret.CoordY;
         if OptSpacingY<0 then
           Inc(NCoordY, OptSpacingY);
-        CanvasTextOutSimplest(C, NCoordX, NCoordY, Caret.PaintCharStr);
+        CanvasTextOutSimplest(C, NCoordX, NCoordY, Caret.CharStr);
       end;
     end;
   end;

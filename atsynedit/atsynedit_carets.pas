@@ -50,9 +50,9 @@ type
     OldRect: TRect; //screen rect, but before running the last command
     SavedX, SavedX_Pre: integer; //memory of last column, to use with arrows Up/Down
     BeforeExtendX: integer; //memory for commands "carets extend: up/down/..."
-    PaintCharStr: UnicodeString;
-    PaintCharColor: TColor;
-    PaintCharStyles: TFontStyles;
+    CharStr: UnicodeString; //str is rendered above the inverted-rect, if TATSynEdit.CaretShape's option is on
+    CharColor: TColor;
+    CharStyles: TFontStyles;
     procedure SelectNone;
     procedure SelectToPoint(AX, AY: integer);
     procedure GetRange(out AX1, AY1, AX2, AY2: integer; out ASel: boolean);

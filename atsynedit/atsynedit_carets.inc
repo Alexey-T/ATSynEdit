@@ -128,18 +128,18 @@ begin
 
     if CaretShapeNormal.PaintChar then
     begin
-      Caret.PaintCharStr:= '';
-      Caret.PaintCharColor:= Colors.TextFont;
-      Caret.PaintCharStyles:= [];
+      Caret.CharStr:= '';
+      Caret.CharColor:= Colors.TextFont;
+      Caret.CharStyles:= [];
       if Caret.PosX<Strings.LinesLen[Caret.PosY] then
       begin
-        Caret.PaintCharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
+        Caret.CharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
         if Assigned(AdapterForHilite) then
           AdapterForHilite.OnEditorCalcPosForeground(nil,
             Caret.PosX,
             Caret.PosY,
-            Caret.PaintCharColor,
-            Caret.PaintCharStyles
+            Caret.CharColor,
+            Caret.CharStyles
             );
       end;
     end;
