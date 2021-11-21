@@ -648,11 +648,6 @@ begin
     exit(true);
 
   {
-  //disabled since CudaText 1.104
-  //a) its used only on Linux/BSD yet, but is it needed there?
-  //it was needed maybe for Win32 (need to check) but on Win32 const OptEditorTextoutNeedsOffsets=true
-  //b) it must be placed out of this deep func CanvasTextOut, its called too much (for each token)
-
   //detect result by presence of bold/italic tokens, offsets are needed for them,
   //ignore underline, strikeout
 
@@ -910,7 +905,7 @@ begin
       C.Brush.Style:= cTextoutBrushStyle;
 
       {$ifdef windows}
-      if AProps.HasAsciiNoTabs and not OptEditorTextoutNeedsOffsets then
+      if AProps.HasAsciiNoTabs and not ATEditorOptions.TextoutNeedsOffsets then
       begin
         BufW:= PartStr;
         bAllowLigatures:= AProps.ShowFontLigatures;
