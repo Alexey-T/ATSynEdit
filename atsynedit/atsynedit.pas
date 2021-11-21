@@ -6937,7 +6937,7 @@ var
   //
   procedure DoPaintCaretShape;
   var
-    NCoordY: integer;
+    NCoordX, NCoordY: integer;
   begin
     CanvasInvertRect(C, R, NCaretColor);
 
@@ -6951,10 +6951,11 @@ var
         C.Font.Color:= Caret.PaintCharColor;
         C.Font.Style:= Caret.PaintCharStyles;
         C.Brush.Style:= bsClear;
+        NCoordX:= Caret.CoordX;
         NCoordY:= Caret.CoordY;
         if OptSpacingY<0 then
           Inc(NCoordY, OptSpacingY);
-        CanvasTextOutSimplest(C, Caret.CoordX, NCoordY, Caret.PaintCharStr);
+        CanvasTextOutSimplest(C, NCoordX, NCoordY, Caret.PaintCharStr);
       end;
     end;
   end;
