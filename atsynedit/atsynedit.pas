@@ -6946,7 +6946,7 @@ var
     else
     if CaretShape.PaintChar then
     begin
-      if (Caret.CharStr<>'') and not IsCharUnicodeSpace(Caret.CharStr[1]) then
+      if (Caret.CharStr<>'') and (Caret.CharColor<>clNone) and not IsCharUnicodeSpace(Caret.CharStr[1]) then
       begin
         C.Font.Color:= Caret.CharColor;
         C.Font.Style:= Caret.CharStyles;

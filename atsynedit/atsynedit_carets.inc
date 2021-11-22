@@ -129,7 +129,7 @@ begin
     if CaretShapeNormal.PaintChar then
     begin
       Caret.CharStr:= '';
-      Caret.CharColor:= Colors.TextFont;
+      Caret.CharColor:= clNone;
       Caret.CharStyles:= [];
       if Caret.PosX<Strings.LinesLen[Caret.PosY] then
       begin
