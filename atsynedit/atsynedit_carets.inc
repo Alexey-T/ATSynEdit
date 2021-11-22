@@ -102,6 +102,9 @@ var
   Caret: TATCaretItem;
   Marker: PATMarkerItem;
   PntCaret, PntCoord: TPoint;
+  ObjLinePart: TATLinePartClass;
+  bExact: boolean;
+  NMarkerIndex, NStyles: integer;
 begin
   NCaretCount:= Carets.Count;
   if AOnlyLast then
@@ -134,6 +137,7 @@ begin
       if Caret.PosX<Strings.LinesLen[Caret.PosY] then
       begin
         Caret.CharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
+
         if Assigned(AdapterForHilite) then
           AdapterForHilite.OnEditorCalcPosForeground(nil,
             Caret.PosX,
@@ -141,6 +145,29 @@ begin
             Caret.CharColor,
             Caret.CharStyles
             );
+
+        {
+        //not working, gets wrong color, TOFIX
+        if Assigned(Attribs) and (Attribs.Count>0) then
+        begin
+          Attribs.Find(Caret.PosX, Caret.PosY, NMarkerIndex, bExact);
+          if NMarkerIndex>=0 then
+          begin
+            Marker:= Attribs.ItemPtr(NMarkerIndex);
+            if Marker^.Ptr is TATLinePartClass then
+            begin
+              ObjLinePart:= Marker^.Ptr as TATLinePartClass;
+              Caret.CharColor:= ObjLinePart.Data.ColorFont;
+              Caret.CharStyles:= [];
+              NStyles:= ObjLinePart.Data.FontStyles;
+              if (NStyles and afsFontBold)<>0 then
+                Include(Caret.CharStyles, fsBold);
+              if (NStyles and afsFontItalic)<>0 then
+                Include(Caret.CharStyles, fsItalic);
+            end;
+          end;
+        end;
+        }
       end;
     end;
   end;
