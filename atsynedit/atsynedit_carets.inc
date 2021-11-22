@@ -164,7 +164,11 @@ begin
       begin
         Caret.CharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
 
-        if not DoCalcForegroundFromAttribs(Caret.PosX, Caret.PosY, Caret.CharColor, Caret.CharStyles) then
+        if not DoCalcForegroundFromAttribs(
+                 Caret.PosX,
+                 Caret.PosY,
+                 Caret.CharColor,
+                 Caret.CharStyles) then
           if Assigned(AdapterForHilite) then
             AdapterForHilite.OnEditorCalcPosForeground(nil,
               Caret.PosX,
