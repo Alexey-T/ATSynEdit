@@ -100,7 +100,7 @@ function TATSynEdit.DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TCo
 var
   Marker: PATMarkerItem;
   Obj: TATLinePartClass;
-  NMarkerIndex, NStyles: integer;
+  NMarkerIndex: integer;
 begin
   Result:= false;
   if Assigned(Attribs) and (Attribs.Count>0) then
@@ -114,12 +114,7 @@ begin
         Result:= true;
         Obj:= TATLinePartClass(Marker^.Ptr);
         AColor:= Obj.Data.ColorFont;
-        AFontStyles:= [];
-        NStyles:= Obj.Data.FontStyles;
-        if (NStyles and afsFontBold)<>0 then
-          Include(AFontStyles, fsBold);
-        if (NStyles and afsFontItalic)<>0 then
-          Include(AFontStyles, fsItalic);
+        AFontStyles:= ConvertIntegerToFontStyles(Obj.Data.FontStyles);
       end;
     end;
   end;

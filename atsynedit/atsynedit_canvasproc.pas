@@ -746,7 +746,6 @@ var
   PartOffset, PartLen,
   PixOffset1, PixOffset2: integer;
   PartPtr: ^TATLinePart;
-  PartFontStyle: TFontStyles;
   PartRect: TRect;
   DxPointer: PInteger;
   NStyles: integer;
@@ -856,12 +855,7 @@ begin
         bItalic:= (NStyles and afsFontItalic)<>0;
         bCrossed:= (NStyles and afsFontCrossed)<>0;
 
-        PartFontStyle:= [];
-        if bBold then Include(PartFontStyle, fsBold);
-        if bItalic then Include(PartFontStyle, fsItalic);
-        if bCrossed then Include(PartFontStyle, fsStrikeOut);
-
-        C.Font.Style:= PartFontStyle;
+        C.Font.Style:= ConvertIntegerToFontStyles(NStyles);
         C.Font.Color:= PartPtr^.ColorFont;
 
         if bItalic and not bBold then
