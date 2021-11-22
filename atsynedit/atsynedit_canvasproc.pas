@@ -101,6 +101,7 @@ procedure CanvasLineEx(C: TCanvas;
   X1, Y1, X2, Y2: integer; AtDown: boolean);
 
 procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: UnicodeString); inline;
 procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 
 procedure CanvasTextOut(C: TCanvas;
@@ -271,7 +272,7 @@ begin
 end;
 {$endif}
 
-procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string); inline;
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: string);
 begin
   //don't set Brush.Style here, causes CudaText issue #3625
   {$ifdef windows}
@@ -280,6 +281,22 @@ begin
   LCLIntf.TextOut(C.Handle, X, Y, PChar(S), Length(S));
   {$endif}
 end;
+
+procedure CanvasTextOutSimplest(C: TCanvas; X, Y: integer; const S: UnicodeString);
+{$ifndef windows}
+var
+  Buf: string;
+{$endif}
+begin
+  //don't set Brush.Style here, causes CudaText issue #3625
+  {$ifdef windows}
+  Windows.TextOutW(C.Handle, X, Y, PWChar(S), Length(S));
+  {$else}
+  Buf:= UTF8Encode(S);
+  LCLIntf.TextOut(C.Handle, X, Y, PChar(Buf), Length(Buf));
+  {$endif}
+end;
+
 
 procedure CanvasTextOutSimplest_PChar(C: TCanvas; X, Y: integer; Buf: PChar; Len: integer); inline;
 begin
