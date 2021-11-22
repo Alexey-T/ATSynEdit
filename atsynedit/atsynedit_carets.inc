@@ -96,14 +96,41 @@ begin
     Carets.Add(AX, AY);
 end;
 
+function TATSynEdit.GetFontColorFromAttribs(AX, AY: integer; var AColor: TColor; var AFontStyles: TFontStyles): boolean;
+var
+  Marker: PATMarkerItem;
+  Obj: TATLinePartClass;
+  NMarkerIndex, NStyles: integer;
+begin
+  Result:= false;
+  if Assigned(Attribs) and (Attribs.Count>0) then
+  begin
+    NMarkerIndex:= Attribs.FindContaining(AX, AY);
+    if NMarkerIndex>=0 then
+    begin
+      Marker:= Attribs.ItemPtr(NMarkerIndex);
+      if Marker^.Ptr is TATLinePartClass then
+      begin
+        Result:= true;
+        Obj:= TATLinePartClass(Marker^.Ptr);
+        AColor:= Obj.Data.ColorFont;
+        AFontStyles:= [];
+        NStyles:= Obj.Data.FontStyles;
+        if (NStyles and afsFontBold)<>0 then
+          Include(AFontStyles, fsBold);
+        if (NStyles and afsFontItalic)<>0 then
+          Include(AFontStyles, fsItalic);
+      end;
+    end;
+  end;
+end;
+
 procedure TATSynEdit.UpdateCaretsCoords(AOnlyLast: boolean = false);
 var
   NCaretCount, NStart, i: integer;
   Caret: TATCaretItem;
   Marker: PATMarkerItem;
   PntCaret, PntCoord: TPoint;
-  ObjLinePart: TATLinePartClass;
-  NMarkerIndex, NStyles: integer;
 begin
   NCaretCount:= Carets.Count;
   if AOnlyLast then
@@ -137,33 +164,14 @@ begin
       begin
         Caret.CharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
 
-        if Assigned(AdapterForHilite) then
-          AdapterForHilite.OnEditorCalcPosForeground(nil,
-            Caret.PosX,
-            Caret.PosY,
-            Caret.CharColor,
-            Caret.CharStyles
-            );
-
-        if Assigned(Attribs) and (Attribs.Count>0) then
-        begin
-          NMarkerIndex:= Attribs.FindContaining(Caret.PosX, Caret.PosY);
-          if NMarkerIndex>=0 then
-          begin
-            Marker:= Attribs.ItemPtr(NMarkerIndex);
-            if Marker^.Ptr is TATLinePartClass then
-            begin
-              ObjLinePart:= Marker^.Ptr as TATLinePartClass;
-              Caret.CharColor:= ObjLinePart.Data.ColorFont;
-              Caret.CharStyles:= [];
-              NStyles:= ObjLinePart.Data.FontStyles;
-              if (NStyles and afsFontBold)<>0 then
-                Include(Caret.CharStyles, fsBold);
-              if (NStyles and afsFontItalic)<>0 then
-                Include(Caret.CharStyles, fsItalic);
-            end;
-          end;
-        end;
+        if not GetFontColorFromAttribs(Caret.PosX, Caret.PosY, Caret.CharColor, Caret.CharStyles) then
+          if Assigned(AdapterForHilite) then
+            AdapterForHilite.OnEditorCalcPosForeground(nil,
+              Caret.PosX,
+              Caret.PosY,
+              Caret.CharColor,
+              Caret.CharStyles
+              );
       end;
     end;
   end;
