@@ -103,7 +103,6 @@ var
   Marker: PATMarkerItem;
   PntCaret, PntCoord: TPoint;
   ObjLinePart: TATLinePartClass;
-  bExact: boolean;
   NMarkerIndex, NStyles: integer;
 begin
   NCaretCount:= Carets.Count;
@@ -146,11 +145,9 @@ begin
             Caret.CharStyles
             );
 
-        {
-        //not working, gets wrong color, TOFIX
         if Assigned(Attribs) and (Attribs.Count>0) then
         begin
-          Attribs.Find(Caret.PosX, Caret.PosY, NMarkerIndex, bExact);
+          NMarkerIndex:= Attribs.FindContaining(Caret.PosX, Caret.PosY);
           if NMarkerIndex>=0 then
           begin
             Marker:= Attribs.ItemPtr(NMarkerIndex);
@@ -167,7 +164,6 @@ begin
             end;
           end;
         end;
-        }
       end;
     end;
   end;
