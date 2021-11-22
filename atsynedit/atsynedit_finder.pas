@@ -106,6 +106,7 @@ type
     OptWords: boolean; //for non-regex
     OptCase: boolean; //for regex and usual
     OptRegex: boolean;
+    OptRegexSubst: boolean;
     OptWrapped: boolean;
     OptTokens: TATFinderTokensAllowed;
     StrText: UnicodeString;
@@ -544,7 +545,10 @@ begin
     exit(StrReplace);
   end;
 
-  Result:= FRegexReplacer.Substitute(StrReplace);
+  if OptRegexSubst then
+    Result:= FRegexReplacer.Substitute(StrReplace)
+  else
+    Result:= StrReplace;
 end;
 
 function TATTextFinder.IsProgressNeeded(ANewPos: integer): boolean;
@@ -1738,6 +1742,7 @@ begin
   OptCase:= false;
   OptWords:= false;
   OptRegex:= false;
+  OptRegexSubst:= true;
   OptTokens:= cTokensAll;
   ClearMatchPos;
 
