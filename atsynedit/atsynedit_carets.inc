@@ -96,7 +96,7 @@ begin
     Carets.Add(AX, AY);
 end;
 
-function TATSynEdit.GetFontColorFromAttribs(AX, AY: integer; var AColor: TColor; var AFontStyles: TFontStyles): boolean;
+function TATSynEdit.DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TColor; var AFontStyles: TFontStyles): boolean;
 var
   Marker: PATMarkerItem;
   Obj: TATLinePartClass;
@@ -164,7 +164,7 @@ begin
       begin
         Caret.CharStr:= Strings.LineSub(Caret.PosY, Caret.PosX+1, 1);
 
-        if not GetFontColorFromAttribs(Caret.PosX, Caret.PosY, Caret.CharColor, Caret.CharStyles) then
+        if not DoCalcForegroundFromAttribs(Caret.PosX, Caret.PosY, Caret.CharColor, Caret.CharStyles) then
           if Assigned(AdapterForHilite) then
             AdapterForHilite.OnEditorCalcPosForeground(nil,
               Caret.PosX,

@@ -1031,7 +1031,7 @@ type
     {$endif}
 
     //
-    function GetFontColorFromAttribs(AX, AY: integer; var AColor: TColor;
+    function DoCalcForegroundFromAttribs(AX, AY: integer; var AColor: TColor;
       var AFontStyles: TFontStyles): boolean;
     function DoCalcFoldProps(AWrapItemIndex: integer; out AProps: TATFoldBarProps): boolean;
     class function CheckInputForNumberOnly(const S: UnicodeString; X: integer;
