@@ -126,7 +126,7 @@ begin
       Caret.CoordY:= PntCoord.Y;
     end;
 
-    if CaretShapeNormal.PaintChar then
+    if ATEditorOptions.CaretTextOverInvertedRect then
     begin
       Caret.CharStr:= '';
       Caret.CharColor:= clNone;
@@ -1273,6 +1273,5 @@ begin
   Width:= Obj.Width;
   Height:= Obj.Height;
   EmptyInside:= Obj.EmptyInside;
-  PaintChar:= Obj.PaintChar;
 end;
 

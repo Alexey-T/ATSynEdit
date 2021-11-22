@@ -45,6 +45,7 @@ var
     CommaCharsWrapWithWords: UnicodeString;
     MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
+    CaretTextOverInvertedRect: boolean;
   end;
 
 implementation
