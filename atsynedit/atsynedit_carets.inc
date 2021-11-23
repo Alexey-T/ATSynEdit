@@ -138,6 +138,14 @@ begin
     Caret:= Carets[i];
     PntCaret.X:= Caret.PosX;
     PntCaret.Y:= Caret.PosY;
+
+    if not Strings.IsIndexValid(PntCaret.Y) then
+    begin
+      Caret.CoordX:= -1;
+      Caret.CoordY:= -1;
+      Continue;
+    end;
+
     if IsPosFolded(PntCaret.X, PntCaret.Y) then
     begin
       Caret.CoordX:= -1;
