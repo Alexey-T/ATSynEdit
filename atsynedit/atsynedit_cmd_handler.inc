@@ -161,7 +161,8 @@ begin
     cResultCaretLeft,
     cResultCaretRight,
     cResultCaretTop,
-    cResultCaretBottom
+    cResultCaretBottom,
+    cResultScroll //scroll should also do UpdateCaretsCoords, to fix CudaText issue #3777
     ] <> [];
 end;
 
