@@ -1341,7 +1341,7 @@ type
     procedure DoCaretsDeleteOnSameLines;
 
     //editing
-    function IsCommandResults_CaretMove(const Res: TATCommandResults): boolean;
+    function IsCommandResults_CaretMove(Res: TATCommandResults): boolean;
     function DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults;
     procedure DoCommandResults(ACmd: integer; Res: TATCommandResults);
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,

@@ -154,15 +154,14 @@ begin
     Key:= 0;
 end;
 
-function TATSynEdit.IsCommandResults_CaretMove(const Res: TATCommandResults): boolean; inline;
+function TATSynEdit.IsCommandResults_CaretMove(Res: TATCommandResults): boolean;
 begin
   Result:= Res*[
     cResultCaretAny,
     cResultCaretLeft,
     cResultCaretRight,
     cResultCaretTop,
-    cResultCaretBottom,
-    cResultScroll //scroll should also do UpdateCaretsCoords, to fix CudaText issue #3777
+    cResultCaretBottom
     ] <> [];
 end;
 
@@ -223,7 +222,10 @@ begin
   DoCaretsFixIfInsideFolded;
   Carets.Sort;
 
-  if IsCommandResults_CaretMove(Res) then
+
+  if IsCommandResults_CaretMove(Res)
+    or (cResultScroll in Res) then
+    //scroll should also do UpdateCaretsCoords, to fix CudaText issue #3777
   begin
     if Carets.Count=1 then
       bAllowCaretScroll:= true
