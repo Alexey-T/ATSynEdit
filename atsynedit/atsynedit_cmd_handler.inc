@@ -223,9 +223,7 @@ begin
   Carets.Sort;
 
 
-  if IsCommandResults_CaretMove(Res)
-    or (cResultScroll in Res) then
-    //scroll should also do UpdateCaretsCoords, to fix CudaText issue #3777
+  if IsCommandResults_CaretMove(Res) then
   begin
     if Carets.Count=1 then
       bAllowCaretScroll:= true
@@ -285,7 +283,12 @@ begin
           UpdateCaretsCoords;
       end;
     end;
-  end;
+  end
+  else
+  //scroll should do UpdateCaretsCoords, CudaText issue #3777
+  if cResultScroll in Res then
+    UpdateCaretsCoords;
+
 
   if bTextChanged then
   begin
