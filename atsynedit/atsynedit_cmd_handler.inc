@@ -258,8 +258,11 @@ begin
     //will move-down exactly N times
     UpdateCaretsCoords;
 
+
     NProximityVert:= GetActualProximityVert;
-    if NProximityVert>0 then
+    if (NProximityVert>0)
+      and (ACmd<>cCommand_SelectAll) //don't apply Proximity if 'select all' is called
+      then
     begin
       if (Carets.Count=1) or (Res*[cResultCaretTop, cResultCaretAny]<>[]) then
       begin
