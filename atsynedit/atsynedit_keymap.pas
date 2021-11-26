@@ -40,6 +40,7 @@ type
     Name: string;
     Keys1, Keys2: TATKeyArray;
     LexerSpecific: boolean;
+    AppCommandText: string;
     procedure Assign(AItem: TATKeymapItem);
     function ShortenedKeys1: TATKeyArray;
     function ShortenedKeys2: TATKeyArray;
@@ -62,7 +63,7 @@ type
     function Count: integer; inline;
     function IsIndexValid(N: integer): boolean; inline;
     property Items[N: integer]: TATKeymapItem read GetItem; default;
-    procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string);
+    procedure Add(ACmd: integer; const AName: string; const AKeys1, AKeys2: array of string; const AAppCommandText: string='');
     procedure Delete(N: integer);
     procedure Assign(AKeymap: TATKeyMap);
     function IndexOf(ACmd: integer): integer;
@@ -168,7 +169,7 @@ begin
 end;
 
 procedure TATKeymap.Add(ACmd: integer; const AName: string; const AKeys1,
-  AKeys2: array of string);
+  AKeys2: array of string; const AAppCommandText: string);
 var
   Item: TATKeymapItem;
   i: integer;
@@ -176,6 +177,7 @@ begin
   Item:= TATKeymapItem.Create;
   Item.Command:= ACmd;
   Item.Name:= AName;
+  Item.AppCommandText:= AAppCommandText;
 
   Item.Keys1.Clear;
   Item.Keys2.Clear;
