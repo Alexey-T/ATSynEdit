@@ -86,6 +86,7 @@ begin
   Name:= AItem.Name;
   Keys1:= AItem.Keys1;
   Keys2:= AItem.Keys2;
+  AppCommandText:= AItem.AppCommandText;
 end;
 
 function TATKeymapItem.ShortenedKeys1: TATKeyArray;
