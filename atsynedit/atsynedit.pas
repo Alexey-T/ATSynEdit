@@ -2591,7 +2591,15 @@ end;
 procedure TATSynEdit.SetText(const AValue: UnicodeString);
 begin
   Strings.LoadFromString(UTF8Encode(AValue));
+
   DoCaretSingle(0, 0);
+  if Assigned(FMarkers) then
+    FMarkers.Clear;
+  if Assigned(FAttribs) then
+    FAttribs.Clear;
+  if Assigned(FLinkCache) then
+    FLinkCache.Clear;
+
   Update(true);
 end;
 
