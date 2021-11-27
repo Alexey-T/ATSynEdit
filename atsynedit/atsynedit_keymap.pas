@@ -39,7 +39,7 @@ type
     Command: integer;
     Name: string;
     Keys1, Keys2: TATKeyArray;
-    LexerSpecific: boolean;
+    LexerSpecific: boolean; //CudaText stores here True for lexer-specific keymaps
     Description: string; //CudaText stores here 'pythonmodule,method,param'
     procedure Assign(AItem: TATKeymapItem);
     function ShortenedKeys1: TATKeyArray;
