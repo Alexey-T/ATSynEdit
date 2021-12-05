@@ -697,9 +697,11 @@ begin
   end;
 end;
 
-function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AUnfold, AllowUpdate: boolean): boolean;
+function TATSynEdit.DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer;
+  AUnfold, AllowUpdate, AllowProximity: boolean): boolean;
 var
   Coord: TPoint;
+  NProximityVert, NProximityHorz: integer;
 begin
   Result:= false;
 
@@ -713,12 +715,23 @@ begin
 
   Coord:= CaretPosToClientPos(APos);
 
+  if AllowProximity then
+  begin
+    NProximityVert:= GetActualProximityVert;
+    NProximityHorz:= 0;
+  end
+  else
+  begin
+    NProximityVert:= 0;
+    NProximityHorz:= 0;
+  end;
+
   //for y
-  if DoCaretApplyProximityToVertEdge(APos, Coord.Y, GetActualProximityVert, AIndentVert) then
+  if DoCaretApplyProximityToVertEdge(APos, Coord.Y, NProximityVert, AIndentVert) then
     Result:= true;
 
   //for x
-  if DoCaretApplyProximityToHorzEdge(Coord.X, 0, AIndentHorz) then
+  if DoCaretApplyProximityToHorzEdge(Coord.X, NProximityHorz, AIndentHorz) then
     Result:= true;
 
   if Result then
@@ -733,7 +746,8 @@ procedure TATSynEdit.DoGotoPos(const APos, APosEnd: TPoint;
   AIndentHorz, AIndentVert: integer;
   APlaceCaret, ADoUnfold: boolean;
   AAllowProcessMsg: boolean=true;
-  AAllowUpdate: boolean=true);
+  AAllowUpdate: boolean=true;
+  AAllowProximity: boolean=true);
 var
   changed1, changed2: boolean;
 begin
@@ -762,10 +776,10 @@ begin
   end;
 
   if APosEnd.Y>=0 then
-    changed1:= DoShowPos(APosEnd, AIndentHorz, AIndentVert, ADoUnfold, false)
+    changed1:= DoShowPos(APosEnd, AIndentHorz, AIndentVert, ADoUnfold, false, AAllowProximity)
   else
     changed1:= false;
-  changed2:= DoShowPos(APos, AIndentHorz, AIndentVert, ADoUnfold, false);
+  changed2:= DoShowPos(APos, AIndentHorz, AIndentVert, ADoUnfold, false, AAllowProximity);
 
   ////always update scrollbar after all keyboard cmds (PageUp, PageDown, Ctrl+Home)
   if not changed1 and not changed2 then

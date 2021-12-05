@@ -1587,12 +1587,14 @@ type
     function OffsetToCaretPos(const APos: integer): TPoint;
     function CaretPosToOffset(const ACaret: TPoint): integer;
     //goto
-    function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer; AUnfold, AllowUpdate: boolean): boolean;
+    function DoShowPos(const APos: TPoint; AIndentHorz, AIndentVert: integer;
+      AUnfold, AllowUpdate, AllowProximity: boolean): boolean;
     procedure DoGotoPos(const APos, APosEnd: TPoint;
       AIndentHorz, AIndentVert: integer;
       APlaceCaret, ADoUnfold: boolean;
       AAllowProcessMsg: boolean=true;
-      AAllowUpdate: boolean=true);
+      AAllowUpdate: boolean=true;
+      AAllowProximity: boolean=true);
     procedure DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
       AAllowProcessMsg: boolean= true; AAllowUpdate: boolean= true);
     //bookmarks
@@ -2638,7 +2640,8 @@ begin
           FOptScrollIndentCaretHorz,
           FOptScrollIndentCaretVert,
           true,
-          true);
+          true,
+          false);
       end;
 end;
 
