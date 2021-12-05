@@ -236,16 +236,16 @@ begin
     if bAllowCaretScroll then
     begin
       if cResultCaretTop in Res then
-        DoGotoCaret(cEdgeTop, bUndoRedo, false, false)
+        DoGotoCaret(cEdgeTop, bUndoRedo, false, false, false)
       else
       if cResultCaretBottom in Res then
-        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false)
+        DoGotoCaret(cEdgeBottom, bUndoRedo, false, false, false)
       else
       if cResultCaretLeft in Res then
-        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false)
+        DoGotoCaret(cEdgeLeft, bUndoRedo, false, false, false)
       else
       if cResultCaretRight in Res then
-        DoGotoCaret(cEdgeRight, bUndoRedo, false, false);
+        DoGotoCaret(cEdgeRight, bUndoRedo, false, false, false);
     end;
 
     if not (cResultKeepColumnSel in Res) then
