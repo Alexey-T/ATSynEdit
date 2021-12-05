@@ -769,6 +769,7 @@ type
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
     FPrevModified: boolean;
+    FPrevCaretFarFromVertEdge: boolean;
     FCharSize: TATEditorCharSize;
     FCharSizeMinimap: TATEditorCharSize;
     FSpacingY: integer;

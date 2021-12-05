@@ -262,6 +262,7 @@ begin
     NProximityVert:= GetActualProximityVert;
     if (NProximityVert>0)
       and (ACmd<>cCommand_SelectAll) //don't apply Proximity if 'select all' is called
+      and FPrevCaretFarFromVertEdge //don't apply Proximity if caret was near the edge, before the command
       then
     begin
       if (Carets.Count=1) or (Res*[cResultCaretTop, cResultCaretAny]<>[]) then
@@ -648,6 +649,8 @@ begin
   Strings.CommandCode:= NCommandCode;
 
   FCaretSpecPos:= false;
+
+  FPrevCaretFarFromVertEdge:= IsCaretFarFromVertEdge;
 
   //moving must be with visible caret
   DoCaretForceShow;
