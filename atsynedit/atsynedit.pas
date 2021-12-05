@@ -1055,6 +1055,7 @@ type
     function GetGutterDecor: TATGutterDecor;
     procedure InitFoldbarCache(ACacheStartIndex: integer);
     procedure InitLengthArray(var Lens: TATIntArray);
+    function IsCaretFarFromVertEdge: boolean;
     function IsCaretOnVisibleRect: boolean;
     function IsInvalidateAllowed: boolean; inline;
     function IsNormalLexerActive: boolean;

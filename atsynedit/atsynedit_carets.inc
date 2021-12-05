@@ -1320,6 +1320,25 @@ begin
   Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
 end;
 
+function TATSynEdit.IsCaretFarFromVertEdge: boolean;
+var
+  NProximity, NPixels: integer;
+  Caret: TATCaretItem;
+begin
+  Result:= false;
+  NProximity:= GetActualProximityVert;
+  if NProximity=0 then exit;
+
+  if Carets.Count<>1 then exit;
+  Caret:= Carets[0];
+  if Caret.CoordY=-1 then exit;
+
+  NPixels:= NProximity*FCharSize.Y;
+  Result:=
+    (Abs(Caret.CoordY-FRectMain.Top)>=NPixels) and
+    (Abs(Caret.CoordY-FRectMain.Bottom)>=NPixels);
+end;
+
 { TATCaretShape }
 
 procedure TATCaretShape.Assign(Obj: TATCaretShape);
