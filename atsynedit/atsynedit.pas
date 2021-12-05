@@ -1596,7 +1596,8 @@ type
       AAllowUpdate: boolean=true;
       AAllowProximity: boolean=true);
     procedure DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
-      AAllowProcessMsg: boolean= true; AAllowUpdate: boolean= true);
+      AAllowProcessMsg: boolean=true; AAllowUpdate: boolean=true;
+      AAllowProximity: boolean=true);
     //bookmarks
     procedure BookmarkSetForLineEx(ALine, ABmKind: integer;
       const AHint: string; AAutoDelete: TATBookmarkAutoDelete; AShowInList: boolean; const ATag: Int64;

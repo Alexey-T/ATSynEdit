@@ -790,7 +790,8 @@ begin
 end;
 
 procedure TATSynEdit.DoGotoCaret(AEdge: TATCaretEdge; AUndoRedo: boolean=false;
-  AAllowProcessMsg: boolean=true; AAllowUpdate: boolean=true);
+  AAllowProcessMsg: boolean=true; AAllowUpdate: boolean=true;
+  AAllowProximity: boolean=true);
 var
   NIndentVert, NIndentHorz: integer;
 begin
@@ -813,7 +814,8 @@ begin
     false,
     false, //dont unfold
     AAllowProcessMsg,
-    AAllowUpdate
+    AAllowUpdate,
+    AAllowProximity
     );
 end;
 
