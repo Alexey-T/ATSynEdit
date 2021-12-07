@@ -165,8 +165,7 @@ begin
     ] <> [];
 end;
 
-procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults;
-  ACaretFarFromVertEdge: boolean);
+procedure TATSynEdit.DoCommandResults(ACmd: integer; Res: TATCommandResults);
 var
   Caret: TATCaretItem;
   St: TATStrings;
@@ -263,7 +262,7 @@ begin
     NProximityVert:= GetActualProximityVert;
     if (NProximityVert>0)
       and (ACmd<>cCommand_SelectAll) //don't apply Proximity if 'select all' is called
-      and ACaretFarFromVertEdge //don't apply Proximity if caret was near the edge, before the command
+      and (cResultCaretFarFromEdge in Res) //don't apply Proximity if caret was near the edge, before the command
       then
     begin
       if (Carets.Count=1) or (Res*[cResultCaretTop, cResultCaretAny]<>[]) then
@@ -748,7 +747,10 @@ begin
 
   if NCommandCode<>0 then
     Strings.CommandCode:= 0;
-  DoCommandResults(ACmd, Res, bCaretFarFromVertEdge);
+  if bCaretFarFromVertEdge then
+    Include(Res, cResultCaretFarFromEdge);
+
+  DoCommandResults(ACmd, Res);
   DoEventCommandAfter(ACmd, AText);
   FIsRunningCommand:= false;
 end;

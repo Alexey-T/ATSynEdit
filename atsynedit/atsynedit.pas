@@ -249,6 +249,7 @@ type
     cResultCaretRight,       //Caret(s) pos/selection was changed. Scroll to the most right caret.
     cResultCaretBottom,      //Caret(s) pos/selection was changed. Scroll to the last caret.
     cResultCaretLazy,  //Additional to CaretLeft/CaretRight/CaretTop/CaretBottom, scrolls only if no carets are left in visible area.
+    cResultCaretFarFromEdge, //Before running the command, caret was far from both vertical edges
     cResultKeepColumnSel,    //Restore previous column selection, if command changed it.
     cResultScroll,           //Some scrolling was made.
     cResultUndoRedo,         //Undo or Redo action was made.
@@ -1344,7 +1345,7 @@ type
     //editing
     function IsCommandResults_CaretMove(Res: TATCommandResults): boolean;
     function DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults;
-    procedure DoCommandResults(ACmd: integer; Res: TATCommandResults; ACaretFarFromVertEdge: boolean);
+    procedure DoCommandResults(ACmd: integer; Res: TATCommandResults);
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen, AInsertAtLineStarts: boolean): TATCommandResults;
     function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
@@ -9183,7 +9184,7 @@ var
   Res: TATCommandResults;
 begin
   Res:= DoCommand_TextInsertAtCarets(AText, AKeepCaret, AOvrMode, ASelectThen, false);
-  DoCommandResults(0, Res, false);
+  DoCommandResults(0, Res);
 end;
 
 procedure TATSynEdit.DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
