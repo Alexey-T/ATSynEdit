@@ -769,7 +769,6 @@ type
     FUnprintedEnds,
     FUnprintedEndsDetails: boolean;
     FPrevModified: boolean;
-    FPrevCaretFarFromVertEdge: boolean;
     FCharSize: TATEditorCharSize;
     FCharSizeMinimap: TATEditorCharSize;
     FSpacingY: integer;
@@ -1345,7 +1344,7 @@ type
     //editing
     function IsCommandResults_CaretMove(Res: TATCommandResults): boolean;
     function DoCommandCore(ACmd: integer; const AText: atString): TATCommandResults;
-    procedure DoCommandResults(ACmd: integer; Res: TATCommandResults);
+    procedure DoCommandResults(ACmd: integer; Res: TATCommandResults; ACaretFarFromVertEdge: boolean);
     function DoCommand_TextInsertAtCarets(const AText: atString; AKeepCaret,
       AOvrMode, ASelectThen, AInsertAtLineStarts: boolean): TATCommandResults;
     function DoCommand_ColumnSelectWithoutKey(AValue: boolean): TATCommandResults;
@@ -9184,7 +9183,7 @@ var
   Res: TATCommandResults;
 begin
   Res:= DoCommand_TextInsertAtCarets(AText, AKeepCaret, AOvrMode, ASelectThen, false);
-  DoCommandResults(0, Res);
+  DoCommandResults(0, Res, false);
 end;
 
 procedure TATSynEdit.DoCaretsFixForSurrogatePairs(AMoveRight: boolean);
