@@ -1663,6 +1663,7 @@ type
     function TextSelected: atString;
     function TextSelectedEx(ACaret: TATCaretItem): atString;
     function TextCurrentWord: atString;
+    //LastCommandChangedLines: count of lines changed by last call of Strings.ActionTrimSpaces
     property LastCommandChangedLines: integer read GetLastCommandChangedLines write SetLastCommandChangedLines;
     property IsRunningCommand: boolean read FIsRunningCommand;
     property IsReadOnlyChanged: boolean read FIsReadOnlyChanged write FIsReadOnlyChanged;
