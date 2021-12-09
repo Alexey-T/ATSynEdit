@@ -228,9 +228,12 @@ begin
     end;
 
     //handle deletion of emoji (2 surrogate chars: high+low)
-    ch:= St.LineCharAt(Caret.PosY, Caret.PosX);
-    if IsCharSurrogateLow(ch) then
-      Inc(NDeleteLen);
+    if Caret.PosX>1 then
+    begin
+      ch:= St.LineCharAt(Caret.PosY, Caret.PosX);
+      if IsCharSurrogateLow(ch) then
+        Inc(NDeleteLen);
+    end;
 
     St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
     DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
