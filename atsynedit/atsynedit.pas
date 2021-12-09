@@ -6245,9 +6245,9 @@ begin
   RectNums.Top:= FRectGutter.Top;
   RectNums.Bottom:= FRectGutter.Bottom;
 
-  if PtInRect(FRectMain, P) then
+  if FMouseDragDropping and FMouseDragDroppingReal then
   begin
-    if FMouseDragDropping and FMouseDragDroppingReal then
+    if PtInRect(FRectMain, P) then
     begin
       if ModeReadOnly then
         Cursor:= crNoDrop
@@ -6258,6 +6258,11 @@ begin
         Cursor:= crDrag;
     end
     else
+      Cursor:= crNoDrop;
+  end
+  else
+  if PtInRect(FRectMain, P) then
+  begin
     if FMouseDownAndColumnSelection then
       Cursor:= FCursorColumnSel
     else
@@ -6265,10 +6270,16 @@ begin
   end
   else
   if PtInRect(RectBm, P) then
-    Cursor:= FCursorGutterBookmark
+  begin
+    if FMouseDownPnt.Y<0 then
+      Cursor:= FCursorGutterBookmark;
+  end
   else
   if PtInRect(RectNums, P) then
-    Cursor:= FCursorGutterNumbers
+  begin
+    if FMouseDownPnt.Y<0 then
+      Cursor:= FCursorGutterNumbers;
+  end
   else
   if PtInRect(FRectMinimap, P) then
     Cursor:= FCursorMinimap
