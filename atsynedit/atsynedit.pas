@@ -6056,7 +6056,6 @@ end;
 
 procedure TATSynEdit.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
 var
-  bCopySelection: boolean;
   Str: atString;
   Caret: TATCaretItem;
   PosDetails: TATEditorPosDetails;
@@ -6092,8 +6091,7 @@ begin
     begin
       Strings.BeginUndoGroup;
       try
-        bCopySelection:= GetActualDragDropIsCopying;
-        DoDropText(not bCopySelection);
+        DoDropText(not GetActualDragDropIsCopying);
       finally
         Strings.EndUndoGroup;
         Update;
