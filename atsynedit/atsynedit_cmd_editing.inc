@@ -186,13 +186,14 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCommand_TextDeleteLeft(ALen: integer; AAllowUnindent: boolean): TATCommandResults;
+function TATSynEdit.DoCommand_TextDeleteLeft(ADeleteLen: integer; AAllowUnindent: boolean): TATCommandResults;
 var
   Caret: TATCaretItem;
   St: TATStrings;
   Shift, PosAfter: TPoint;
   NIndent, NDeleteLen: integer;
   bNeedGroup: boolean;
+  ch: WideChar;
   i: integer;
 begin
   Result:= [];
@@ -213,7 +214,8 @@ begin
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
-    NDeleteLen:= ALen;
+    if not St.IsIndexValid(Caret.PosY) then Continue;
+    NDeleteLen:= ADeleteLen;
 
     if AAllowUnindent then
     begin
@@ -224,6 +226,11 @@ begin
         else
           NDeleteLen:= Caret.PosX;
     end;
+
+    //handle deletion of emoji (2 surrogate chars: high+low)
+    ch:= St.LineCharAt(Caret.PosY, Caret.PosX);
+    if IsCharSurrogateLow(ch) then
+      Inc(NDeleteLen);
 
     St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
     DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);

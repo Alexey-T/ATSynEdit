@@ -1408,7 +1408,7 @@ type
     function DoCommand_TextBackspace: TATCommandResults;
     function DoCommand_TextDelete: TATCommandResults;
     function DoCommand_TextDeleteSelection: TATCommandResults;
-    function DoCommand_TextDeleteLeft(ALen: integer; AAllowUnindent: boolean): TATCommandResults;
+    function DoCommand_TextDeleteLeft(ADeleteLen: integer; AAllowUnindent: boolean): TATCommandResults;
     function DoCommand_TextDeleteRight(ADeleteLen: integer): TATCommandResults;
     function DoCommand_TextInsertEol(AKeepCaret: boolean): TATCommandResults;
     function DoCommand_ForceFinalEndOfLine: TATCommandResults;
