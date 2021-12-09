@@ -6216,12 +6216,6 @@ begin
   RectNums.Top:= FRectGutter.Top;
   RectNums.Bottom:= FRectGutter.Bottom;
 
-  //if FMouseDragDropping then
-  //  Cursor:= crDrag
-  //else
-  //if FMouseDragMinimap then
-  //  Cursor:= crSizeNS
-  //else
   if PtInRect(FRectMain, P) then
   begin
     if FMouseDragDropping and FMouseDragDroppingReal then
