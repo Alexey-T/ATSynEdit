@@ -6206,34 +6206,10 @@ procedure TATSynEdit.UpdateCursor;
 var
   PntMouse, P: TPoint;
   RectBm, RectNums: TRect;
-  {
-  Ctl: TControl;
-  SomeCursor: TCursor;
-  }
 begin
   if MouseNiceScroll then Exit;
   PntMouse:= Mouse.CursorPos;
   P:= ScreenToClient(PntMouse);
-
-  (*
-  //2021.12: cannot make it to work, cursor over another editor is not affected
-  if not PtInRect(ClientRect, P) then
-  begin
-    Ctl:= FindControlAtPosition(PntMouse, false);
-    if Ctl is TATSynEdit then
-    begin
-      {
-      if TATSynEdit(Ctl).ModeReadOnly then
-        SomeCursor:= crNoDrop
-      else
-        SomeCursor:= crDrag;
-        }
-      SomeCursor:= crHourGlass;
-      Screen.BeginTempCursor(SomeCursor);
-    end;
-    exit;
-  end;
-  *)
 
   RectBm.Left:= FGutter[FGutterBandBookmarks].Left;
   RectBm.Right:= FGutter[FGutterBandBookmarks].Right;
