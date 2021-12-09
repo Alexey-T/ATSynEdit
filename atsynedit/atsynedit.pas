@@ -8693,7 +8693,8 @@ begin
     (not ModeReadOnly) and
     (not ModeOneLine) and
     (Source is TATSynEdit) and
-    ((Source as TATSynEdit).TextSelected<>'');
+    ((Source as TATSynEdit).Carets.Count>0) and
+    ((Source as TATSynEdit).Carets[0].IsSelection);
 end;
 
 procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
