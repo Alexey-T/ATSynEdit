@@ -1300,6 +1300,8 @@ type
     procedure GetRectMicromap(out R: TRect);
     procedure GetRectGutter(out R: TRect);
     procedure GetRectRuler(out R: TRect);
+    function GetRectGutterNumbers: TRect;
+    function GetRectGutterBookmarks: TRect;
     function GetTextOffset: TPoint;
     function GetPageLines: integer;
     function GetMinimapScrollPos: integer;
@@ -2991,6 +2993,33 @@ begin
   R.Top:= 0;
   R.Bottom:= R.Top + FRulerHeight;
 end;
+
+function TATSynEdit.GetRectGutterNumbers: TRect;
+begin
+  if FOptGutterVisible and FGutter[FGutterBandNumbers].Visible then
+  begin
+    Result.Left:= FGutter[FGutterBandNumbers].Left;
+    Result.Right:= FGutter[FGutterBandNumbers].Right;
+    Result.Top:= FRectGutter.Top;
+    Result.Bottom:= FRectGutter.Bottom;
+  end
+  else
+    Result:= cRectEmpty;
+end;
+
+function TATSynEdit.GetRectGutterBookmarks: TRect;
+begin
+  if FOptGutterVisible and FGutter[FGutterBandBookmarks].Visible then
+  begin
+    Result.Left:= FGutter[FGutterBandBookmarks].Left;
+    Result.Right:= FGutter[FGutterBandBookmarks].Right;
+    Result.Top:= FRectGutter.Top;
+    Result.Bottom:= FRectGutter.Bottom;
+  end
+  else
+    Result:= cRectEmpty;
+end;
+
 
 procedure TATSynEdit.UpdateClientSizes;
 begin
@@ -6203,23 +6232,6 @@ begin
 end;
 
 procedure TATSynEdit.UpdateCursor;
-  //
-  function RectBm: TRect;
-  begin
-    Result.Left:= FGutter[FGutterBandBookmarks].Left;
-    Result.Right:= FGutter[FGutterBandBookmarks].Right;
-    Result.Top:= FRectGutter.Top;
-    Result.Bottom:= FRectGutter.Bottom;
-  end;
-  //
-  function RectNums: TRect;
-  begin
-    Result.Left:= FGutter[FGutterBandNumbers].Left;
-    Result.Right:= FGutter[FGutterBandNumbers].Right;
-    Result.Top:= FRectGutter.Top;
-    Result.Bottom:= FRectGutter.Bottom;
-  end;
-  //
 var
   PntMouse, P: TPoint;
 begin
@@ -6251,13 +6263,13 @@ begin
       Cursor:= FCursorText;
   end
   else
-  if PtInRect(RectBm, P) then
+  if PtInRect(GetRectGutterBookmarks, P) then
   begin
     if FMouseDownPnt.Y<0 then
       Cursor:= FCursorGutterBookmark;
   end
   else
-  if PtInRect(RectNums, P) then
+  if PtInRect(GetRectGutterNumbers, P) then
   begin
     if FMouseDownPnt.Y<0 then
       Cursor:= FCursorGutterNumbers;
@@ -6286,7 +6298,6 @@ const
   cMovedDeltaPx = 5;
 var
   P: TPoint;
-  RectNums, RectBookmk: TRect;
   bOnMain, bOnMinimap, bOnMicromap,
   bOnGutter, bOnGutterNumbers, bOnGutterBookmk,
   bSelecting, bSelectingGutterNumbers: boolean;
@@ -6321,8 +6332,8 @@ begin
   bOnMinimap:= FMinimapVisible and PtInRect(FRectMinimap, P);
   bOnMicromap:= FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, P);
   bOnGutter:= FOptGutterVisible and PtInRect(FRectGutter, P);
-  bOnGutterNumbers:= false;
-  bOnGutterBookmk:= false;
+  bOnGutterNumbers:= bOnGutter and PtInRect(GetRectGutterNumbers, P);
+  bOnGutterBookmk:= bOnGutter and PtInRect(GetRectGutterBookmarks, P);
 
   //detect cursor on minimap
   if FMinimapVisible then
@@ -6359,31 +6370,6 @@ begin
       if bOnGutter<>FCursorOnGutter then
         Invalidate;
     FCursorOnGutter:= bOnGutter;
-  end;
-
-  RectNums:= Rect(0, 0, 0, 0);
-  RectBookmk:= Rect(0, 0, 0, 0);
-  if FOptGutterVisible then
-  begin
-    if FGutter[FGutterBandNumbers].Visible then
-    begin
-      RectNums.Left:= FGutter[FGutterBandNumbers].Left;
-      RectNums.Right:= FGutter[FGutterBandNumbers].Right;
-      RectNums.Top:= FRectMain.Top;
-      RectNums.Bottom:= FRectMain.Bottom;
-
-      bOnGutterNumbers:= bOnGutter and PtInRect(RectNums, P);
-    end;
-
-    if FGutter[FGutterBandBookmarks].Visible then
-    begin
-      RectBookmk.Left:= FGutter[FGutterBandBookmarks].Left;
-      RectBookmk.Right:= FGutter[FGutterBandBookmarks].Right;
-      RectBookmk.Top:= FRectMain.Top;
-      RectBookmk.Bottom:= FRectMain.Bottom;
-
-      bOnGutterBookmk:= bOnGutter and PtInRect(RectBookmk, P);
-    end;
   end;
 
   //detect cursor on folded marks
