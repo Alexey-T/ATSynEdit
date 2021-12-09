@@ -5946,7 +5946,7 @@ begin
           FOnClickGap(Self, PosDetails.OnGapItem, PosDetails.OnGapPos);
       end;
 
-      if FOptMouseDragDrop and bClickOnSelection and not ModeReadOnly then
+      if FOptMouseDragDrop and bClickOnSelection then
       begin
         //DragMode must be dmManual, drag started by code
         FMouseDragDropping:= true;
@@ -6225,7 +6225,12 @@ begin
   if PtInRect(FRectMain, P) then
   begin
     if FMouseDragDropping and FMouseDragDroppingReal then
-      Cursor:= crDrag
+    begin
+      if ModeReadOnly then
+        Cursor:= crNoDrop
+      else
+        Cursor:= crDrag;
+    end
     else
     if FMouseDownAndColumnSelection then
       Cursor:= FCursorColumnSel
@@ -7575,6 +7580,7 @@ var
   Relation: TATPosRelation;
   Details: TATEditorPosDetails;
 begin
+  if ModeReadOnly then exit;
   St:= Strings;
   if Carets.Count<>1 then Exit; //allow only 1 caret
   Carets[0].GetRange(X1, Y1, X2, Y2, bSel);
