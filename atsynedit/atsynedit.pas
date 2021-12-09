@@ -1701,6 +1701,7 @@ type
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
     procedure UTF8KeyPress(var UTF8Key: TUTF8Char); override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    procedure KeyUp(var Key: Word; Shift: TShiftState); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Integer); override;
     procedure MouseMove(Shift: TShiftState; X,Y: Integer); override;
@@ -6247,6 +6248,9 @@ begin
     begin
       if ModeReadOnly then
         Cursor:= crNoDrop
+      else
+      if EditorIsPressedCtrl then
+        Cursor:= crMultiDrag
       else
         Cursor:= crDrag;
     end

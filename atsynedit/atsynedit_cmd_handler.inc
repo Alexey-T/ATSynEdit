@@ -24,12 +24,19 @@ begin
 
   //special handle for spec keys
   case Key of
-    VK_SHIFT,
     VK_CONTROL,
+    VK_LWIN,
+    VK_RWIN:
+      begin
+        if FMouseDragDropping then
+          UpdateCursor;
+        exit;
+      end;
+    VK_SHIFT,
     VK_MENU, //3 usual state keys
     VK_LSHIFT..VK_RMENU: //also 6 state keys
       begin
-        //ignore Ctrl/Alt/Shift to not hide caret
+        //ignore Alt/Shift to not hide caret
         exit;
       end;
     VK_TAB:
@@ -53,6 +60,24 @@ begin
     TimerBlinkDisable;
     DoCommand(NCmd, cInvokeHotkey);
     TimerBlinkEnable;
+  end;
+end;
+
+procedure TATSynEdit.KeyUp(var Key: Word; Shift: TShiftState);
+begin
+  inherited;
+  if Key=0 then Exit;
+
+  //special handle for spec keys
+  case Key of
+    VK_CONTROL,
+    VK_LWIN,
+    VK_RWIN:
+      begin
+        if FMouseDragDropping then
+          UpdateCursor;
+        exit;
+      end;
   end;
 end;
 
