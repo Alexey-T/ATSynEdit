@@ -1045,6 +1045,7 @@ type
     procedure DoHandleWheelRecord(const ARec: TATEditorWheelRecord);
     procedure FlushEditingChangeEx(AChange: TATLineChangeKind; ALine, AItemCount: integer);
     procedure FlushEditingChangeLog(ALine: integer);
+    function GetActualDragDropIsCopying: boolean;
     function GetIndentString: UnicodeString;
     function GetActualProximityVert: integer;
     function GetAttribs: TATMarkers;
@@ -2563,6 +2564,12 @@ end;
 function TATSynEdit.GetVisibleLinesMinimap: integer;
 begin
   Result:= FRectMinimap.Height div FCharSizeMinimap.Y - 1;
+end;
+
+function TATSynEdit.GetActualDragDropIsCopying: boolean;
+begin
+  Result:= FOptMouseDragDropCopying and
+    (FOptMouseDragDropCopyingWithState in GetKeyShiftState);
 end;
 
 function TATSynEdit.GetActualProximityVert: integer;
@@ -6085,9 +6092,7 @@ begin
     begin
       Strings.BeginUndoGroup;
       try
-        bCopySelection:=
-          FOptMouseDragDropCopying and
-          (FOptMouseDragDropCopyingWithState in Shift);
+        bCopySelection:= GetActualDragDropIsCopying;
         DoDropText(not bCopySelection);
       finally
         Strings.EndUndoGroup;
@@ -6249,7 +6254,7 @@ begin
       if ModeReadOnly then
         Cursor:= crNoDrop
       else
-      if EditorIsPressedCtrl then
+      if GetActualDragDropIsCopying then
         Cursor:= crMultiDrag
       else
         Cursor:= crDrag;
@@ -8713,7 +8718,7 @@ begin
       SetFocus;
 
     //Ctrl not pressed: delete block from src
-    if FOptMouseDragDropCopyingWithState in GetKeyShiftState then
+    if not GetActualDragDropIsCopying then
       (Source as TATSynedit).DoCommand(cCommand_TextDeleteSelection, cInvokeInternal);
   end;
 end;
