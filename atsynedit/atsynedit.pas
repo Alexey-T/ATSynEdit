@@ -6203,23 +6203,29 @@ begin
 end;
 
 procedure TATSynEdit.UpdateCursor;
+  //
+  function RectBm: TRect;
+  begin
+    Result.Left:= FGutter[FGutterBandBookmarks].Left;
+    Result.Right:= FGutter[FGutterBandBookmarks].Right;
+    Result.Top:= FRectGutter.Top;
+    Result.Bottom:= FRectGutter.Bottom;
+  end;
+  //
+  function RectNums: TRect;
+  begin
+    Result.Left:= FGutter[FGutterBandNumbers].Left;
+    Result.Right:= FGutter[FGutterBandNumbers].Right;
+    Result.Top:= FRectGutter.Top;
+    Result.Bottom:= FRectGutter.Bottom;
+  end;
+  //
 var
   PntMouse, P: TPoint;
-  RectBm, RectNums: TRect;
 begin
   if MouseNiceScroll then Exit;
   PntMouse:= Mouse.CursorPos;
   P:= ScreenToClient(PntMouse);
-
-  RectBm.Left:= FGutter[FGutterBandBookmarks].Left;
-  RectBm.Right:= FGutter[FGutterBandBookmarks].Right;
-  RectBm.Top:= FRectGutter.Top;
-  RectBm.Bottom:= FRectGutter.Bottom;
-
-  RectNums.Left:= FGutter[FGutterBandNumbers].Left;
-  RectNums.Right:= FGutter[FGutterBandNumbers].Right;
-  RectNums.Top:= FRectGutter.Top;
-  RectNums.Bottom:= FRectGutter.Bottom;
 
   if FMouseDragDropping and FMouseDragDroppingReal then
   begin
