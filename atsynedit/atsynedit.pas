@@ -8676,8 +8676,8 @@ begin
     (not ModeReadOnly) and
     (not ModeOneLine) and
     (Source is TATSynEdit) and
-    ((Source as TATSynEdit).Carets.Count>0) and
-    ((Source as TATSynEdit).Carets[0].IsSelection);
+    (TATSynEdit(Source).Carets.Count>0) and
+    (TATSynEdit(Source).Carets[0].IsSelection);
 end;
 
 procedure TATSynEdit.DragDrop(Source: TObject; X, Y: Integer);
@@ -8688,7 +8688,7 @@ var
 begin
   if not (Source is TATSynEdit) then exit;
   if (Source=Self) then exit;
-  SText:= (Source as TATSynedit).TextSelected;
+  SText:= TATSynEdit(Source).TextSelected;
   if SText='' then exit;
 
   Pnt:= ClientPosToCaretPos(Point(X, Y), Details);
@@ -8701,7 +8701,7 @@ begin
 
     //Ctrl not pressed: delete block from src
     if not GetActualDragDropIsCopying then
-      (Source as TATSynedit).DoCommand(cCommand_TextDeleteSelection, cInvokeInternal);
+      TATSynEdit(Source).DoCommand(cCommand_TextDeleteSelection, cInvokeInternal);
   end;
 end;
 
