@@ -8699,8 +8699,9 @@ begin
     if ATEditorOptions.MouseDragDropFocusesTargetEditor then
       SetFocus;
 
-    //Ctrl not pressed: delete block from src
-    if not GetActualDragDropIsCopying then
+    //Ctrl is pressed: delete block from src
+    //note: it's opposite to the drag-drop in the single document
+    if GetActualDragDropIsCopying then
       TATSynEdit(Source).DoCommand(cCommand_TextDeleteSelection, cInvokeInternal);
   end;
 end;
