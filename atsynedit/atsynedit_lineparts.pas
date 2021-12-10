@@ -29,7 +29,7 @@ const
 
 type
   TATLinePart = packed record
-    Offset: SmallInt; //2 bytes
+    Offset: integer; //4 bytes, 2 bytes are not enough (app will crash on line length 120K, with wrap=off)
     Len: word; //2 bytes
     ColorFont, ColorBG, ColorBorder: TColor;
     FontStyles: byte;
