@@ -749,7 +749,7 @@ var
   PartRect: TRect;
   DxPointer: PInteger;
   NStyles: integer;
-  bBold, bItalic, bCrossed, bSpaceChars: boolean;
+  bBold, bItalic, {bCrossed,} bSpaceChars: boolean;
   ch: WideChar;
 begin
   NLen:= Min(Length(AText), cMaxFixedArray);
@@ -853,7 +853,7 @@ begin
         NStyles:= PartPtr^.FontStyles;
         bBold:= (NStyles and afsFontBold)<>0;
         bItalic:= (NStyles and afsFontItalic)<>0;
-        bCrossed:= (NStyles and afsFontCrossed)<>0;
+        //bCrossed:= (NStyles and afsFontCrossed)<>0;
 
         C.Font.Style:= ConvertIntegerToFontStyles(NStyles);
         C.Font.Color:= PartPtr^.ColorFont;
