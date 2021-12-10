@@ -795,6 +795,8 @@ type
     FRectMinimap,
     FRectMicromap,
     FRectGutter,
+    FRectGutterBm,
+    FRectGutterNums,
     FRectRuler: TRect;
     FClientW: integer; //saved on Paint, to avoid calling Controls.ClientWidth/ClientHeight
     FClientH: integer;
@@ -1300,8 +1302,8 @@ type
     procedure GetRectMicromap(out R: TRect);
     procedure GetRectGutter(out R: TRect);
     procedure GetRectRuler(out R: TRect);
-    function GetRectGutterNumbers: TRect;
-    function GetRectGutterBookmarks: TRect;
+    procedure GetRectGutterNumbers(out R: TRect);
+    procedure GetRectGutterBookmarks(out R: TRect);
     function GetTextOffset: TPoint;
     function GetPageLines: integer;
     function GetMinimapScrollPos: integer;
@@ -2994,30 +2996,30 @@ begin
   R.Bottom:= R.Top + FRulerHeight;
 end;
 
-function TATSynEdit.GetRectGutterNumbers: TRect;
+procedure TATSynEdit.GetRectGutterNumbers(out R: TRect);
 begin
   if FOptGutterVisible and FGutter[FGutterBandNumbers].Visible then
   begin
-    Result.Left:= FGutter[FGutterBandNumbers].Left;
-    Result.Right:= FGutter[FGutterBandNumbers].Right;
-    Result.Top:= FRectGutter.Top;
-    Result.Bottom:= FRectGutter.Bottom;
+    R.Left:= FGutter[FGutterBandNumbers].Left;
+    R.Right:= FGutter[FGutterBandNumbers].Right;
+    R.Top:= FRectGutter.Top;
+    R.Bottom:= FRectGutter.Bottom;
   end
   else
-    Result:= cRectEmpty;
+    R:= cRectEmpty;
 end;
 
-function TATSynEdit.GetRectGutterBookmarks: TRect;
+procedure TATSynEdit.GetRectGutterBookmarks(out R: TRect);
 begin
   if FOptGutterVisible and FGutter[FGutterBandBookmarks].Visible then
   begin
-    Result.Left:= FGutter[FGutterBandBookmarks].Left;
-    Result.Right:= FGutter[FGutterBandBookmarks].Right;
-    Result.Top:= FRectGutter.Top;
-    Result.Bottom:= FRectGutter.Bottom;
+    R.Left:= FGutter[FGutterBandBookmarks].Left;
+    R.Right:= FGutter[FGutterBandBookmarks].Right;
+    R.Top:= FRectGutter.Top;
+    R.Bottom:= FRectGutter.Bottom;
   end
   else
-    Result:= cRectEmpty;
+    R:= cRectEmpty;
 end;
 
 
@@ -3068,6 +3070,8 @@ begin
   GetRectGutter(FRectGutter);
   GetRectMain(FRectMain); //after gutter/minimap/micromap
   GetRectRuler(FRectRuler); //after main
+  GetRectGutterBookmarks(FRectGutterBm); //after gutter
+  GetRectGutterNumbers(FRectGutterNums); //after gutter
 end;
 
 procedure TATSynEdit.DoPaintMain(C: TCanvas; ALineFrom: integer);
@@ -6263,13 +6267,13 @@ begin
       Cursor:= FCursorText;
   end
   else
-  if PtInRect(GetRectGutterBookmarks, P) then
+  if PtInRect(FRectGutterBm, P) then
   begin
     if FMouseDownPnt.Y<0 then
       Cursor:= FCursorGutterBookmark;
   end
   else
-  if PtInRect(GetRectGutterNumbers, P) then
+  if PtInRect(FRectGutterNums, P) then
   begin
     if FMouseDownPnt.Y<0 then
       Cursor:= FCursorGutterNumbers;
@@ -6332,8 +6336,8 @@ begin
   bOnMinimap:= FMinimapVisible and PtInRect(FRectMinimap, P);
   bOnMicromap:= FMicromapVisible and not FMicromapOnScrollbar and PtInRect(FRectMicromap, P);
   bOnGutter:= FOptGutterVisible and PtInRect(FRectGutter, P);
-  bOnGutterNumbers:= bOnGutter and PtInRect(GetRectGutterNumbers, P);
-  bOnGutterBookmk:= bOnGutter and PtInRect(GetRectGutterBookmarks, P);
+  bOnGutterNumbers:= bOnGutter and PtInRect(FRectGutterNums, P);
+  bOnGutterBookmk:= bOnGutter and PtInRect(FRectGutterBm, P);
 
   //detect cursor on minimap
   if FMinimapVisible then
