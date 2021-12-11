@@ -452,7 +452,7 @@ begin
       exit(Point(-1, -1));
 
     NLineLenOriginal:= Item.NLength;
-    NLineLenTrimmed:= Min(Item.NLength, AScrollHorz.NPos + ARect.Width * ATEditorCharXScale div ACharSize.XScaled);
+    NLineLenTrimmed:= Min(Item.NLength, (AScrollHorz.SmoothPos + ARect.Width) * ATEditorCharXScale div ACharSize.XScaled);
 
     if NLineLenOriginal>ATEditorOptions.MaxLineLenForAccurateCharWidths then
     begin
@@ -471,7 +471,7 @@ begin
     else
     begin
       AllowVirtual:= AVirtualPos and (Item.NFinal=cWrapItemFinal);
-      NPixels:= Int64(P.X)-ARect.Left + Int64(ACharSize.XScaled)*(AScrollHorz.NPos-Item.NIndent) div ATEditorCharXScale;
+      NPixels:= Int64(P.X)-ARect.Left + AScrollHorz.SmoothPos - ACharSize.XScaled*Item.NIndent div ATEditorCharXScale;
       Result.X:= ATabHelper.FindClickedPosition(
         Result.Y,
         Str,
