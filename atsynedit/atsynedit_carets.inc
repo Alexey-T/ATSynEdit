@@ -216,7 +216,7 @@ function _DoCaretPosToClientPos(
   AWrapInfo: TATWrapInfo;
   AStrings: TATStrings;
   AGaps: TATGaps;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   ATabHelper: TATStringTabHelper;
   const ARect: TRect;
   const AScrollHorz, AScrollVert: TATEditorScrollInfo;
