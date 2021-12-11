@@ -146,8 +146,12 @@ type
       ACharSize: TATEditorCharSize;
       AAllowVirtualPos: boolean;
       out AEndOfLinePos: boolean): Int64;
-    procedure FindOutputSkipOffset(ALineIndex: integer; const S: atString;
-      AScrollPos: Int64; out ACharsSkipped: Int64; out ACellPercentsSkipped: Int64);
+    procedure FindOutputSkipOffset(ALineIndex: integer;
+      const S: atString;
+      const AScrollPosSmooth: Int64;
+      const ACharSizeXScaled: Int64;
+      out ACharsSkipped: Int64;
+      out ACellPercentsSkipped: Int64);
   end;
 
 function IsCharEol(ch: widechar): boolean; inline;
@@ -763,19 +767,26 @@ begin
     Result:= Min(Result, Length(Str)+1);
 end;
 
-procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer; const S: atString;
-  AScrollPos: Int64; out ACharsSkipped: Int64; out ACellPercentsSkipped: Int64);
+procedure TATStringTabHelper.FindOutputSkipOffset(ALineIndex: integer;
+  const S: atString;
+  const AScrollPosSmooth: Int64;
+  const ACharSizeXScaled: Int64;
+  out ACharsSkipped: Int64;
+  out ACellPercentsSkipped: Int64);
 var
   Offsets: TATIntFixedArray;
+  NCheckedOffset: Int64;
 begin
   ACharsSkipped:= 0;
   ACellPercentsSkipped:= 0;
-  if (S='') or (AScrollPos=0) then Exit;
+  if (S='') or (AScrollPosSmooth=0) then Exit;
 
   CalcCharOffsets(ALineIndex, S, Offsets);
 
+  NCheckedOffset:= AScrollPosSmooth * 100 * ATEditorCharXScale div ACharSizeXScaled;
+
   while (ACharsSkipped<Offsets.Len) and
-    (Offsets.Data[ACharsSkipped] < AScrollPos*100) do
+    (Offsets.Data[ACharsSkipped] < NCheckedOffset) do
     Inc(ACharsSkipped);
 
   if (ACharsSkipped>0) then

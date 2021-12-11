@@ -3600,7 +3600,8 @@ begin
       FTabHelper.FindOutputSkipOffset(
         NLinesIndex,
         StrOutput,
-        AScrollHorz.NPos,
+        AScrollHorz.SmoothPos,
+        ACharSize.XScaled,
         NOutputCharsSkipped,
         NOutputCellPercentsSkipped);
       Delete(StrOutput, 1, NOutputCharsSkipped);
