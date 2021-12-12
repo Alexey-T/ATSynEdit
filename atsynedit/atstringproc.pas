@@ -143,7 +143,7 @@ type
     function FindClickedPosition(ALineIndex: integer; const Str: atString;
       constref ListOffsets: TATIntFixedArray;
       APixelsFromLeft: Int64;
-      ACharSize: TATEditorCharSize;
+      const ACharSize: TATEditorCharSize;
       AAllowVirtualPos: boolean;
       out AEndOfLinePos: boolean): Int64;
     procedure FindOutputSkipOffset(ALineIndex: integer;
@@ -715,8 +715,9 @@ end;
 function TATStringTabHelper.FindClickedPosition(ALineIndex: integer; const Str: atString;
   constref ListOffsets: TATIntFixedArray;
   APixelsFromLeft: Int64;
-  ACharSize: TATEditorCharSize;
-  AAllowVirtualPos: boolean; out AEndOfLinePos: boolean): Int64;
+  const ACharSize: TATEditorCharSize;
+  AAllowVirtualPos: boolean;
+  out AEndOfLinePos: boolean): Int64;
 var
   i: integer;
 begin

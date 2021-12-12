@@ -39,7 +39,7 @@ type
 type
   TATSynEditDrawLineEvent = procedure(Sender: TObject; C: TCanvas;
     ALineIndex: integer;
-    AX, AY: integer; const AStr: atString; ACharSize: TATEditorCharSize;
+    AX, AY: integer; const AStr: atString; const ACharSize: TATEditorCharSize;
     constref AExtent: TATIntFixedArray) of object;
 
 type
@@ -116,7 +116,7 @@ procedure CanvasTextOutMinimap(
   C: TBGRABitmap;
   const ARect: TRect;
   APosX, APosY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   ATabSize: integer;
   constref AParts: TATLineParts;
   AColorBG: TColor;
@@ -128,17 +128,17 @@ procedure CanvasTextOutMinimap(
 procedure DoPaintUnprintedSymbols(C: TCanvas;
   ASymbols: TATLineEndsSymbols;
   AX, AY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   AColorFont, AColorBG: TColor);
 
 procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   AColorFont, AColorBg: TColor);
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AX, AY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   AColorFont: TColor);
 
 function CanvasTextWidth(const S: atString; ALineIndex: integer;
@@ -330,7 +330,7 @@ procedure DoPaintUnprintedChar(
   AIndex: integer;
   var AOffsets: TATIntFixedArray;
   AX, AY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   AColorFont: TColor);
 var
   R: TRect;
@@ -461,7 +461,7 @@ procedure DoPaintHexChars(C: TCanvas;
   const AString: atString;
   ADx: PIntegerArray;
   AX, AY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   AColorFont,
   AColorBg: TColor;
   ASuperFast: boolean);
@@ -578,7 +578,7 @@ end;
 procedure DoPaintUnprintedSymbols(C: TCanvas;
   ASymbols: TATLineEndsSymbols;
   AX, AY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   AColorFont, AColorBG: TColor);
 const
   cText: array[TATLineEndsSymbols] of string[4] = ('', 'LF', 'CRLF', 'CR', 'EOF');
@@ -603,7 +603,7 @@ end;
 
 procedure DoPaintUnprintedEndSymbol(C: TCanvas;
   AX, AY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   AColorFont, AColorBg: TColor);
 const
   // https://www.fileformat.info/info/unicode/char/B6/index.htm
@@ -634,7 +634,7 @@ end;
 
 procedure DoPaintUnprintedWrapMark(C: TCanvas;
   AX, AY: integer;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   AColorFont: TColor);
 begin
   CanvasArrowWrapped(C,
@@ -1124,9 +1124,13 @@ end;
 
 procedure CanvasTextOutMinimap(
   C: TBGRABitmap;
-  const ARect: TRect; APosX, APosY: integer;
-  ACharSize: TATEditorCharSize; ATabSize: integer; constref AParts: TATLineParts;
-  AColorBG: TColor; AColorAfter: TColor;
+  const ARect: TRect;
+  APosX, APosY: integer;
+  const ACharSize: TATEditorCharSize;
+  ATabSize: integer;
+  constref AParts: TATLineParts;
+  AColorBG: TColor;
+  AColorAfter: TColor;
   const ALine: atString;
   AUsePixels: boolean
   );

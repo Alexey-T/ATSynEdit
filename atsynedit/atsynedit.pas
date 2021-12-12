@@ -1198,13 +1198,19 @@ type
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer; AUseRectMain: boolean);
     procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
-    procedure DoPaintLine(C: TCanvas; ARectLine: TRect; ACharSize: TATEditorCharSize;
+    procedure DoPaintLine(C: TCanvas; ARectLine: TRect;
+      const ACharSize: TATEditorCharSize;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-      const AWrapIndex: integer; var ATempParts: TATLineParts);
-    procedure DoPaintMinimapLine(ARectLine: TRect; ACharSize: TATEditorCharSize;
+      const AWrapIndex: integer;
+      var ATempParts: TATLineParts);
+    procedure DoPaintMinimapLine(ARectLine: TRect;
+      const ACharSize: TATEditorCharSize;
       var AScrollHorz, AScrollVert: TATEditorScrollInfo;
-      const AWrapIndex: integer; var ATempParts: TATLineParts);
-    procedure DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TATEditorCharSize;
+      const AWrapIndex: integer;
+      var ATempParts: TATLineParts);
+    procedure DoPaintGutterOfLine(C: TCanvas;
+      ARect: TRect;
+      const ACharSize: TATEditorCharSize;
       AWrapIndex: integer);
     procedure DoPaintNiceScroll(C: TCanvas);
     procedure DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
@@ -1213,17 +1219,30 @@ type
     procedure DoPaintRulerCaretMark(C: TCanvas; ACaretX: integer);
     procedure DoPaintRulerCaretMarks(C: TCanvas);
     procedure DoPaintTiming(C: TCanvas);
-    procedure DoPaintText(C: TCanvas; const ARect: TRect;
-      const ACharSize: TATEditorCharSize; AWithGutter: boolean;
-      var AScrollHorz, AScrollVert: TATEditorScrollInfo; ALineFrom: integer);
-    procedure DoPaintTextFragment(C: TCanvas; const ARect: TRect; ALineFrom,
-      ALineTo: integer; AConsiderWrapInfo: boolean; AColorBG, AColorBorder: TColor);
-    procedure DoPaintLineIndent(C: TCanvas; const ARect: TRect; ACharSize: TATEditorCharSize;
-      ACoordY: integer; AIndentSize: integer; AColorBG: TColor;
-      AScrollPos: integer; AIndentLines: boolean);
+    procedure DoPaintText(C: TCanvas;
+      const ARect: TRect;
+      const ACharSize: TATEditorCharSize;
+      AWithGutter: boolean;
+      var AScrollHorz, AScrollVert: TATEditorScrollInfo;
+      ALineFrom: integer);
+    procedure DoPaintTextFragment(C: TCanvas;
+      const ARect: TRect;
+      ALineFrom, ALineTo: integer;
+      AConsiderWrapInfo: boolean;
+      AColorBG, AColorBorder: TColor);
+    procedure DoPaintLineIndent(C: TCanvas;
+      const ARect: TRect;
+      const ACharSize: TATEditorCharSize;
+      ACoordY: integer;
+      AIndentSize: integer;
+      AColorBG: TColor;
+      AScrollPos: integer;
+      AIndentLines: boolean);
     procedure DoPaintMinimapAllToBGRABitmap;
-    procedure DoPaintMinimapTextToBGRABitmap(const ARect: TRect;
-      ACharSize: TATEditorCharSize; var AScrollHorz, AScrollVert: TATEditorScrollInfo);
+    procedure DoPaintMinimapTextToBGRABitmap(
+      const ARect: TRect;
+      const ACharSize: TATEditorCharSize;
+      var AScrollHorz, AScrollVert: TATEditorScrollInfo);
     procedure DoPaintMinimapSelToBGRABitmap;
     procedure DoPaintMinimapTooltip(C: TCanvas);
     procedure DoPaintMicromap(C: TCanvas);
@@ -1235,9 +1254,12 @@ type
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure TimerBlinkDisable;
     procedure TimerBlinkEnable;
-    procedure DoPaintSelectedLineBG(C: TCanvas; ACharSize: TATEditorCharSize;
-      const AVisRect: TRect; APointLeft, APointText: TPoint;
-      const AWrapItem: TATWrapItem; ALineWidth: integer;
+    procedure DoPaintSelectedLineBG(C: TCanvas;
+      const ACharSize: TATEditorCharSize;
+      const AVisRect: TRect;
+      APointLeft, APointText: TPoint;
+      const AWrapItem: TATWrapItem;
+      ALineWidth: integer;
       const AScrollHorz: TATEditorScrollInfo);
     procedure DoPaintMarkersTo(C: TCanvas);
     procedure DoPaintMarkerOfDragDrop(C: TCanvas);
@@ -1250,7 +1272,9 @@ type
       AY2: integer; AEntireHeight: boolean);
     procedure DoPaintLockedWarning(C: TCanvas);
     procedure DoPaintStaple(C: TCanvas; const R: TRect; AColor: TColor);
-    procedure DoPaintStaples(C: TCanvas; const ARect: TRect; ACharSize: TATEditorCharSize;
+    procedure DoPaintStaples(C: TCanvas;
+      const ARect: TRect;
+      const ACharSize: TATEditorCharSize;
       const AScrollHorz: TATEditorScrollInfo);
     procedure DoPaintTextHintTo(C: TCanvas);
     procedure DoPaintMouseSelFrame(C: TCanvas);
@@ -3455,7 +3479,8 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintMinimapTextToBGRABitmap(
-  const ARect: TRect; ACharSize: TATEditorCharSize;
+  const ARect: TRect;
+  const ACharSize: TATEditorCharSize;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo);
 var
   RectLine: TRect;
@@ -3492,7 +3517,7 @@ end;
 
 procedure TATSynEdit.DoPaintLine(C: TCanvas;
   ARectLine: TRect;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   const AWrapIndex: integer;
   var ATempParts: TATLineParts);
@@ -3896,7 +3921,7 @@ end;
 
 procedure TATSynEdit.DoPaintMinimapLine(
   ARectLine: TRect;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   var AScrollHorz, AScrollVert: TATEditorScrollInfo;
   const AWrapIndex: integer;
   var ATempParts: TATLineParts);
@@ -4028,7 +4053,9 @@ begin
   end;
 end;
 
-procedure TATSynEdit.DoPaintGutterOfLine(C: TCanvas; ARect: TRect; ACharSize: TATEditorCharSize;
+procedure TATSynEdit.DoPaintGutterOfLine(C: TCanvas;
+  ARect: TRect;
+  const ACharSize: TATEditorCharSize;
   AWrapIndex: integer);
 var
   St: TATStrings;
@@ -7127,7 +7154,7 @@ end;
 
 procedure TATSynEdit.DoPaintLineIndent(C: TCanvas;
   const ARect: TRect;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   ACoordY: integer;
   AIndentSize: integer;
   AColorBG: TColor;
@@ -7156,7 +7183,7 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintSelectedLineBG(C: TCanvas;
-  ACharSize: TATEditorCharSize;
+  const ACharSize: TATEditorCharSize;
   const AVisRect: TRect;
   APointLeft, APointText: TPoint;
   const AWrapItem: TATWrapItem;
@@ -8340,8 +8367,10 @@ begin
     CanvasLineEx(C, AColor, FOptStapleStyle, R.Left, R.Bottom, R.Right, R.Bottom, true);
 end;
 
-procedure TATSynEdit.DoPaintStaples(C: TCanvas; const ARect: TRect;
-  ACharSize: TATEditorCharSize; const AScrollHorz: TATEditorScrollInfo);
+procedure TATSynEdit.DoPaintStaples(C: TCanvas;
+  const ARect: TRect;
+  const ACharSize: TATEditorCharSize;
+  const AScrollHorz: TATEditorScrollInfo);
 var
   St: TATStrings;
   nLineFrom, nLineTo, nRangeDeepest, nMaxHeight: integer;
