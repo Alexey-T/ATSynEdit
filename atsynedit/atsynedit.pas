@@ -2755,8 +2755,8 @@ begin
     NPosLast:= Max(0, NMax-NPage);
 
     SmoothCharSize:= FCharSize.XScaled div ATEditorCharXScale;
-    SmoothMax:= NMax*SmoothCharSize;
-    SmoothPage:= NPage*SmoothCharSize;
+    SmoothMax:= NMax * FCharSize.XScaled div ATEditorCharXScale;
+    SmoothPage:= NPage * FCharSize.XScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
       SmoothPos:= TotalOffset;
