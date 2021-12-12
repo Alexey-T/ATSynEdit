@@ -676,22 +676,21 @@ begin
   end;
 end;
 
-function TATSynEdit.DoCaretApplyProximityToHorzEdge(ACaretCoordX, AProximity,
-  AIndentHorz: integer): boolean;
+function TATSynEdit.DoCaretApplyProximityToHorzEdge(ACaretCoordX, AProximity, AIndentHorz: integer): boolean;
 var
-  NChars: integer;
+  NChars: Int64;
 begin
   Result:= false;
   if ACaretCoordX < FRectMain.Left+AProximity*FCharSize.XScaled div ATEditorCharXScale then
   begin
-    NChars:= (FRectMain.Left-ACaretCoordX) * ATEditorCharXScale div FCharSize.XScaled + 1 + AIndentHorz;
+    NChars:= Int64(FRectMain.Left-ACaretCoordX) * ATEditorCharXScale div FCharSize.XScaled + 1 + AIndentHorz;
     FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
     Result:= true;
   end
   else
   if ACaretCoordX > FRectMain.Right-AProximity*FCharSize.XScaled div ATEditorCharXScale - FCharSize.XScaled div ATEditorCharXScale then
   begin
-    NChars:= (ACaretCoordX-FRectMain.Right) * ATEditorCharXScale div FCharSize.XScaled + 2 + AIndentHorz;
+    NChars:= Int64(ACaretCoordX-FRectMain.Right) * ATEditorCharXScale div FCharSize.XScaled + 2 + AIndentHorz;
     FScrollHorz.NPos:= FScrollHorz.NPos+NChars;
     Result:= true;
   end;
