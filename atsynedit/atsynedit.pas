@@ -356,7 +356,7 @@ type
     procedure SetZero; inline;
     procedure SetLast; inline;
     function TopGapVisible: boolean; inline;
-    function TotalOffset: Int64; inline;
+    function TotalOffset(const ACharSize: TATEditorCharSize): Int64;
     class operator =(const A, B: TATEditorScrollInfo): boolean;
   end;
 
@@ -2742,7 +2742,7 @@ begin
     SmoothPage:= NPage*SmoothCharSize;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
-      SmoothPos:= TotalOffset + NGapPos;
+      SmoothPos:= TotalOffset(FCharSize) + NGapPos;
   end;
 
   with FScrollHorz do
@@ -2759,7 +2759,7 @@ begin
     SmoothPage:= NPage * FCharSize.XScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
-      SmoothPos:= TotalOffset;
+      SmoothPos:= TotalOffset(FCharSize);
   end;
 
   //don't need further code for OneLine
@@ -3192,9 +3192,9 @@ begin
 
   if FMouseDownCoord.Y<0 then exit;
 
-  X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset;
+  X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset(FCharSize);
   X2:= FMouseDragCoord.X;
-  Y1:= FMouseDownCoord.Y - FScrollVert.TotalOffset;
+  Y1:= FMouseDownCoord.Y - FScrollVert.TotalOffset(FCharSize);
   Y2:= FMouseDragCoord.Y;
 
   XX1:= Max(-1, Min(X1, X2));
@@ -5914,8 +5914,8 @@ begin
 
   FMouseDownCoordOriginal.X:= X;
   FMouseDownCoordOriginal.Y:= Y;
-  FMouseDownCoord.X:= X + FScrollHorz.TotalOffset;
-  FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset;
+  FMouseDownCoord.X:= X + FScrollHorz.TotalOffset(FCharSize);
+  FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset(FCharSize);
   FMouseDownWithCtrl:= ssXControl in Shift;
   FMouseDownWithAlt:= ssAlt in Shift;
   FMouseDownWithShift:= ssShift in Shift;
