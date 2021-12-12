@@ -338,12 +338,12 @@ type
 
   TATEditorScrollInfo = record
   private
+    NPosInternal: Int64;
     procedure SetNPos(const AValue: Int64);
   public
     Vertical: boolean;
     NMax: Int64;
     NPage: Int64;
-    NPos_: Int64;
     NPosLast: Int64;
     NPixelOffset: Int64;
     SmoothCharSize: Int64;
@@ -351,7 +351,7 @@ type
     SmoothPage: Int64;
     SmoothPos: Int64;
     SmoothPosLast: Int64;
-    property NPos: Int64 read NPos_ write SetNPos; //only for debugging
+    property NPos: Int64 read NPosInternal write SetNPos; //property is only for debugging
     procedure Clear;
     procedure SetZero; inline;
     procedure SetLast; inline;

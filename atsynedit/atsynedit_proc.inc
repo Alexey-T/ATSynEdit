@@ -112,8 +112,8 @@ end;
 
 procedure TATEditorScrollInfo.SetNPos(const AValue: Int64);
 begin
-  if NPos_=AValue then Exit;
-  NPos_:= AValue;
+  if NPosInternal=AValue then Exit;
+  NPosInternal:= AValue;
 end;
 
 function TATEditorScrollInfo.TopGapVisible: boolean;
