@@ -346,7 +346,7 @@ type
     NPage: Int64;
     NPosLast: Int64;
     NPixelOffset: Int64;
-    SmoothCharSize: Int64;
+    CharSizeScaled: Int64; //char width/height, multiplied by ATEditorCharXScale
     SmoothMax: Int64;
     SmoothPage: Int64;
     SmoothPos: Int64;
@@ -356,7 +356,7 @@ type
     procedure SetZero; inline;
     procedure SetLast; inline;
     function TopGapVisible: boolean; inline;
-    function TotalOffset(const ACharSize: TATEditorCharSize): Int64;
+    function TotalOffset: Int64;
     class operator =(const A, B: TATEditorScrollInfo): boolean;
   end;
 
@@ -2737,12 +2737,12 @@ begin
       Inc(NMax, NPage);
     NPosLast:= Max(0, NMax-NPage);
 
-    SmoothCharSize:= FCharSize.Y;
-    SmoothMax:= NMax*SmoothCharSize + NGapAll;
-    SmoothPage:= NPage*SmoothCharSize;
+    CharSizeScaled:= FCharSize.Y * ATEditorCharXScale;
+    SmoothMax:= NMax * CharSizeScaled div ATEditorCharXScale + NGapAll;
+    SmoothPage:= NPage * CharSizeScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
-      SmoothPos:= TotalOffset(FCharSize) + NGapPos;
+      SmoothPos:= TotalOffset + NGapPos;
   end;
 
   with FScrollHorz do
@@ -2754,12 +2754,12 @@ begin
       NMax:= NPage;
     NPosLast:= Max(0, NMax-NPage);
 
-    SmoothCharSize:= FCharSize.XScaled div ATEditorCharXScale;
-    SmoothMax:= NMax * FCharSize.XScaled div ATEditorCharXScale;
-    SmoothPage:= NPage * FCharSize.XScaled div ATEditorCharXScale;
+    CharSizeScaled:= FCharSize.XScaled;
+    SmoothMax:= NMax * CharSizeScaled div ATEditorCharXScale;
+    SmoothPage:= NPage * CharSizeScaled div ATEditorCharXScale;
     SmoothPosLast:= Max(0, SmoothMax - SmoothPage);
     if AdjustSmoothPos then
-      SmoothPos:= TotalOffset(FCharSize);
+      SmoothPos:= TotalOffset;
   end;
 
   //don't need further code for OneLine
@@ -2835,7 +2835,7 @@ begin
     begin
       FScrollbarVert.Min:= 0;
       FScrollbarVert.Max:= FScrollVert.SmoothMax;
-      FScrollbarVert.SmallChange:= FScrollVert.SmoothCharSize;
+      FScrollbarVert.SmallChange:= FScrollVert.CharSizeScaled div ATEditorCharXScale;
       FScrollbarVert.PageSize:= FScrollVert.SmoothPage;
       FScrollbarVert.Position:= FScrollVert.SmoothPos;
     end;
@@ -2886,7 +2886,7 @@ begin
     FScrollbarLock:= true;
     FScrollbarHorz.Min:= 0;
     FScrollbarHorz.Max:= FScrollHorz.SmoothMax;
-    FScrollbarHorz.SmallChange:= FScrollHorz.SmoothCharSize;
+    FScrollbarHorz.SmallChange:= FScrollHorz.CharSizeScaled div ATEditorCharXScale;
     FScrollbarHorz.PageSize:= FScrollHorz.SmoothPage;
     FScrollbarHorz.Position:= FScrollHorz.SmoothPos;
     FScrollbarHorz.Update;
@@ -3192,9 +3192,9 @@ begin
 
   if FMouseDownCoord.Y<0 then exit;
 
-  X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset(FCharSize);
+  X1:= FMouseDownCoord.X - FScrollHorz.TotalOffset;
   X2:= FMouseDragCoord.X;
-  Y1:= FMouseDownCoord.Y - FScrollVert.TotalOffset(FCharSize);
+  Y1:= FMouseDownCoord.Y - FScrollVert.TotalOffset;
   Y2:= FMouseDragCoord.Y;
 
   XX1:= Max(-1, Min(X1, X2));
@@ -5710,7 +5710,7 @@ procedure _UpdateScrollInfoFromSmoothPos(
   AGaps: TATGaps);
 //Note: for vertical bar, NPos=-1 means than we are before the first line, over top gap
 var
-  NPos, NPixels, NLineIndex, NCharSize: Int64;
+  NPos, NPixels, NLineIndex: Int64;
   NSizeGapTop, NSizeGap0: Int64;
   bConsiderGaps: boolean;
 begin
@@ -5749,7 +5749,7 @@ begin
     //for position before line=1
     //(other positions are calculated ok later)
     if NSizeGap0>0 then
-      if APos<NSizeGapTop+AInfo.SmoothCharSize+NSizeGap0 then
+      if APos<NSizeGapTop+AInfo.CharSizeScaled div ATEditorCharXScale + NSizeGap0 then
       begin
         AInfo.NPos:= 0;
         AInfo.NPixelOffset:= APos-NSizeGapTop;
@@ -5757,9 +5757,8 @@ begin
       end;
   end;
 
-  NCharSize:= AInfo.SmoothCharSize;
-  AInfo.NPos:= Min(APos div NCharSize, AInfo.NMax);
-  AInfo.NPixelOffset:= APos mod NCharSize;
+  AInfo.NPos:= Min(APos * ATEditorCharXScale div AInfo.CharSizeScaled, AInfo.NMax);
+  AInfo.NPixelOffset:= APos mod (AInfo.CharSizeScaled div ATEditorCharXScale);
 
   //consider Gaps for vert scrolling
   if bConsiderGaps then
@@ -5769,7 +5768,7 @@ begin
 
     repeat
       NLineIndex:= AWrapInfo.Data[NPos].NLineIndex - 1;
-      NPixels:= APos - NPos*NCharSize - AGaps.SizeForLineRange(-1, NLineIndex);
+      NPixels:= APos - NPos* AInfo.CharSizeScaled div ATEditorCharXScale - AGaps.SizeForLineRange(-1, NLineIndex);
       if NPos=0 then Break;
       if NLineIndex=0 then Break;
       if NPixels>=0 then Break;
@@ -5807,12 +5806,12 @@ begin
 
     SB_LINEUP:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos-Info.SmoothCharSize);
+        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos-Info.CharSizeScaled div ATEditorCharXScale);
       end;
 
     SB_LINEDOWN:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos+Info.SmoothCharSize);
+        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos+Info.CharSizeScaled div ATEditorCharXScale);
       end;
 
     SB_PAGEUP:
@@ -5914,8 +5913,8 @@ begin
 
   FMouseDownCoordOriginal.X:= X;
   FMouseDownCoordOriginal.Y:= Y;
-  FMouseDownCoord.X:= X + FScrollHorz.TotalOffset(FCharSize);
-  FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset(FCharSize);
+  FMouseDownCoord.X:= X + FScrollHorz.TotalOffset;
+  FMouseDownCoord.Y:= Y + FScrollVert.TotalOffset;
   FMouseDownWithCtrl:= ssXControl in Shift;
   FMouseDownWithAlt:= ssAlt in Shift;
   FMouseDownWithShift:= ssShift in Shift;

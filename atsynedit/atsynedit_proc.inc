@@ -89,7 +89,7 @@ begin
   NMax:= 1;
   NPage:= 1;
   NPixelOffset:= 0;
-  SmoothCharSize:= 1;
+  CharSizeScaled:= 1*ATEditorCharXScale;
   SmoothPos:= 0;
   SmoothPosLast:= 1;
   SmoothMax:= 1;
@@ -121,9 +121,9 @@ begin
   Result:= NPos=-1;
 end;
 
-function TATEditorScrollInfo.TotalOffset(const ACharSize: TATEditorCharSize): Int64;
+function TATEditorScrollInfo.TotalOffset: Int64;
 begin
-  Result:= NPos * ACharSize.XScaled div ATEditorCharXScale + NPixelOffset;
+  Result:= NPos * CharSizeScaled div ATEditorCharXScale + NPixelOffset;
 end;
 
 class operator TATEditorScrollInfo.= (const A, B: TATEditorScrollInfo): boolean;
