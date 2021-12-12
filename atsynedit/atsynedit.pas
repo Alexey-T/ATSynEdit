@@ -3635,11 +3635,11 @@ begin
   else
   begin
     //work faster for huge lines (but not accurate horiz scrollbar)
-    NOutputCharsSkipped:= AScrollHorz.NPos;
+    NOutputCharsSkipped:= AScrollHorz.SmoothPos * ATEditorCharXScale div ACharSize.XScaled;
     NOutputCellPercentsSkipped:= NOutputCharsSkipped*100;
 
     NSubPos:= WrapItem.NCharIndex + NOutputCharsSkipped;
-    NSubLen:= Min(WrapItem.NLength, FVisibleColumns+AScrollHorz.NPos+1+6);
+    NSubLen:= Min(WrapItem.NLength, FVisibleColumns+1+6);
       //+1 because of NPixelOffset
       //+6 because of HTML color underlines
     StrOutput:= St.LineSub(NLinesIndex, NSubPos, NSubLen);
