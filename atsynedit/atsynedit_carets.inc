@@ -681,14 +681,14 @@ var
   NChars: Int64;
 begin
   Result:= false;
-  if ACaretCoordX < FRectMain.Left+AProximity*FCharSize.XScaled div ATEditorCharXScale then
+  if ACaretCoordX < FRectMain.Left + AProximity*FCharSize.XScaled div ATEditorCharXScale then
   begin
     NChars:= Int64(FRectMain.Left-ACaretCoordX) * ATEditorCharXScale div FCharSize.XScaled + 1 + AIndentHorz;
     FScrollHorz.NPos:= Max(0, FScrollHorz.NPos-NChars);
     Result:= true;
   end
   else
-  if ACaretCoordX > FRectMain.Right-AProximity*FCharSize.XScaled div ATEditorCharXScale - FCharSize.XScaled div ATEditorCharXScale then
+  if ACaretCoordX > FRectMain.Right - (AProximity+1)*FCharSize.XScaled div ATEditorCharXScale then
   begin
     NChars:= Int64(ACaretCoordX-FRectMain.Right) * ATEditorCharXScale div FCharSize.XScaled + 2 + AIndentHorz;
     FScrollHorz.NPos:= FScrollHorz.NPos+NChars;
