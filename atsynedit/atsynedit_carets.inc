@@ -492,7 +492,7 @@ begin
       ADetails.EndOfWrappedLine:= false;
 end;
 
-function TATSynEdit.CaretPosToClientPos(P: TPoint): TPoint; inline;
+function TATSynEdit.CaretPosToClientPos(P: TPoint): TPoint;
 begin
   Result:= _DoCaretPosToClientPos(P,
     FWrapInfo,
@@ -512,7 +512,7 @@ end;
 
 function TATSynEdit.ClientPosToCaretPos(P: TPoint;
   out ADetails: TATEditorPosDetails;
-  AGapCoordAction: TATEditorGapCoordAction = cGapCoordToLineEnd): TPoint; inline;
+  AGapCoordAction: TATEditorGapCoordAction = cGapCoordToLineEnd): TPoint;
 begin
   Dec(P.Y, FTextOffsetFromTop1);
 

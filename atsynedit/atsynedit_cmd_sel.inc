@@ -201,7 +201,6 @@ var
   NFrom, NTo, NLastLine: integer;
   Caret: TATCaretItem;
   St: TATStrings;
-  S: atString;
   Pnt: TPoint;
   bLastNoEol: boolean;
 begin
