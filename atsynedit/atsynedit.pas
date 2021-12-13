@@ -1352,7 +1352,7 @@ type
     procedure UpdateFoldedMarkTooltip;
     procedure UpdateClientSizes;
     function DoFormatLineNumber(N: integer): string;
-    function UpdateScrollInfoFromMessage(var Info: TATEditorScrollInfo; const Msg: TLMScroll): boolean;
+    function UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
     procedure UpdateCaretsCoords(AOnlyLast: boolean = false);
     function GetCharSize(C: TCanvas; ACharSpacingY: integer): TATEditorCharSize;
     function GetScrollbarVisible(bVertical: boolean): boolean;
@@ -5785,57 +5785,57 @@ begin
   _UpdateScrollInfoFromSmoothPos(AInfo, APos, WrapInfo, Gaps);
 end;
 
-function TATSynEdit.UpdateScrollInfoFromMessage(var Info: TATEditorScrollInfo; const Msg: TLMScroll): boolean;
+function TATSynEdit.UpdateScrollInfoFromMessage(var AInfo: TATEditorScrollInfo; const AMsg: TLMScroll): boolean;
 begin
-  if Info.NMax<Info.NPage then
+  if AInfo.NMax<AInfo.NPage then
   begin
-    Info.Clear;
+    AInfo.Clear;
     Exit(true);
   end;
 
-  case Msg.ScrollCode of
+  case AMsg.ScrollCode of
     SB_TOP:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, 0);
+        UpdateScrollInfoFromSmoothPos(AInfo, 0);
       end;
 
     SB_BOTTOM:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPosLast);
+        UpdateScrollInfoFromSmoothPos(AInfo, AInfo.SmoothPosLast);
       end;
 
     SB_LINEUP:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos-Info.CharSizeScaled div ATEditorCharXScale);
+        UpdateScrollInfoFromSmoothPos(AInfo, AInfo.SmoothPos-AInfo.CharSizeScaled div ATEditorCharXScale);
       end;
 
     SB_LINEDOWN:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos+Info.CharSizeScaled div ATEditorCharXScale);
+        UpdateScrollInfoFromSmoothPos(AInfo, AInfo.SmoothPos+AInfo.CharSizeScaled div ATEditorCharXScale);
       end;
 
     SB_PAGEUP:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos-Info.SmoothPage);
+        UpdateScrollInfoFromSmoothPos(AInfo, AInfo.SmoothPos-AInfo.SmoothPage);
       end;
 
     SB_PAGEDOWN:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPos+Info.SmoothPage);
+        UpdateScrollInfoFromSmoothPos(AInfo, AInfo.SmoothPos+AInfo.SmoothPage);
       end;
 
     SB_THUMBPOSITION:
       begin
-        //must ignore message with Msg.Msg set: LM_VSCROLL, LM_HSCROLL;
+        //must ignore message with AMsg.Msg set: LM_VSCROLL, LM_HSCROLL;
         //we get it on macOS during window resize, not expected! moves v-scroll pos to 0.
-        if Msg.Msg=0 then
-          UpdateScrollInfoFromSmoothPos(Info, Msg.Pos);
+        if AMsg.Msg=0 then
+          UpdateScrollInfoFromSmoothPos(AInfo, AMsg.Pos);
       end;
 
     SB_THUMBTRACK:
       begin
-        UpdateScrollInfoFromSmoothPos(Info, Msg.Pos);
-        if Info.Vertical then
+        UpdateScrollInfoFromSmoothPos(AInfo, AMsg.Pos);
+        if AInfo.Vertical then
           DoHintShow;
       end;
 
@@ -5844,13 +5844,13 @@ begin
   end;
 
   //correct value (if -1)
-  if Info.SmoothPos>Info.SmoothPosLast then
-    UpdateScrollInfoFromSmoothPos(Info, Info.SmoothPosLast)
+  if AInfo.SmoothPos>AInfo.SmoothPosLast then
+    UpdateScrollInfoFromSmoothPos(AInfo, AInfo.SmoothPosLast)
   else
-  if Info.SmoothPos<0 then
-    UpdateScrollInfoFromSmoothPos(Info, 0);
+  if AInfo.SmoothPos<0 then
+    UpdateScrollInfoFromSmoothPos(AInfo, 0);
 
-  Result:= Msg.ScrollCode<>SB_THUMBTRACK;
+  Result:= AMsg.ScrollCode<>SB_THUMBTRACK;
 end;
 
 procedure TATSynEdit.WMVScroll(var Msg: TLMVScroll);
