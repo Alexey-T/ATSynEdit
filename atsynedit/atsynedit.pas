@@ -351,7 +351,10 @@ type
     SmoothPage: Int64;
     SmoothPos: Int64;
     SmoothPosLast: Int64;
-    property NPos: Int64 read NPosInternal write SetNPos; //property is only for debugging
+    property NPos: Int64 //property is only for debugging
+      read NPosInternal
+      write NPosInternal;
+      //write SetNPos;
     procedure Clear;
     procedure SetZero; inline;
     procedure SetLast; inline;
