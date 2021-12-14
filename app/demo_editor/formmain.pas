@@ -238,7 +238,7 @@ type
     procedure EditChanged(Sender: TObject);
     procedure EditCaretMoved(Sender: TObject);
     procedure EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX, AY: integer;
-      const AStr: atString; ACharSize: TATEditorCharSize; constref AExtent: TATIntFixedArray);
+      const AStr: atString; const ACharSize: TATEditorCharSize; constref AExtent: TATIntFixedArray);
     procedure EditCalcLine(Sender: TObject; var AParts: TATLineParts;
       ALineIndex, ACharIndex, ALineLen: integer; var AColorAfterEol: TColor);
     procedure EditScroll(Sender: TObject);
@@ -1452,7 +1452,7 @@ begin
 end;
 
 procedure TfmMain.EditDrawLine(Sender: TObject; C: TCanvas; ALineIndex, AX,
-  AY: integer; const AStr: atString; ACharSize: TATEditorCharSize; constref AExtent: TATIntFixedArray);
+  AY: integer; const AStr: atString; const ACharSize: TATEditorCharSize; constref AExtent: TATIntFixedArray);
 var
   X1, X2, Y, i: integer;
 begin
