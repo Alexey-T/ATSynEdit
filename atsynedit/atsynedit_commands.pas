@@ -263,6 +263,8 @@ function IsCommandForDelayedParsing(AValue: integer): boolean;
 
 function IsCommandForClipboardAction(AValue: integer): boolean;
 
+procedure IsCommandForMultiCarets(AValue: integer; out AAllowMultiCarets, AMoveDown: boolean);
+
 implementation
 
 function IsCommandToUndoInOneStep(AValue: integer): boolean;
@@ -299,6 +301,33 @@ begin
       Result:= true
     else
       Result:= false;
+  end;
+end;
+
+procedure IsCommandForMultiCarets(AValue: integer; out AAllowMultiCarets, AMoveDown: boolean);
+begin
+  case AValue of
+    cCommand_SelectExtendByLine,
+    cCommand_CaretsExtendDownLine,
+    cCommand_CaretsExtendDownPage,
+    cCommand_CaretsExtendDownToEnd:
+      begin
+        AAllowMultiCarets:= true;
+        AMoveDown:= true;
+      end;
+    cCommand_SelectExtendByLineUp,
+    cCommand_CaretsExtendUpLine,
+    cCommand_CaretsExtendUpPage,
+    cCommand_CaretsExtendUpToTop:
+      begin
+        AAllowMultiCarets:= true;
+        AMoveDown:= false;
+      end;
+    else
+      begin
+        AAllowMultiCarets:= false;
+        AMoveDown:= false;
+      end;
   end;
 end;
 

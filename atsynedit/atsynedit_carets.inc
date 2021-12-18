@@ -1319,17 +1319,31 @@ begin
   Result:= Carets.IsAnyCaretInVisibleRect(FRectMain);
 end;
 
-function TATSynEdit.IsCaretFarFromVertEdge: boolean;
+function TATSynEdit.IsCaretFarFromVertEdge(ACommand: integer): boolean;
 var
   NProximity, NPixels: integer;
   Caret: TATCaretItem;
+  bAllowMultiCarets, bMoveDown: boolean;
 begin
   Result:= false;
   NProximity:= GetActualProximityVert;
   if NProximity=0 then exit;
 
-  if Carets.Count<>1 then exit;
-  Caret:= Carets[0];
+  case Carets.Count of
+    0:
+      exit;
+    1:
+      Caret:= Carets[0];
+    else
+      begin
+        IsCommandForMultiCarets(ACommand, bAllowMultiCarets, bMoveDown);
+        if bAllowMultiCarets and bMoveDown then
+          Caret:= Carets[Carets.Count-1]
+        else
+          Caret:= Carets[0];
+      end;
+  end;
+
   if Caret.CoordY=-1 then exit;
 
   NPixels:= NProximity*FCharSize.Y;

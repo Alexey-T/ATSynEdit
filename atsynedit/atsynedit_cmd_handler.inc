@@ -676,7 +676,7 @@ begin
 
   FCaretSpecPos:= false;
 
-  bCaretFarFromVertEdge:= IsCaretFarFromVertEdge;
+  bCaretFarFromVertEdge:= IsCaretFarFromVertEdge(ACmd);
 
   //moving must be with visible caret
   DoCaretForceShow;
