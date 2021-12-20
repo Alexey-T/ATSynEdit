@@ -6461,7 +6461,7 @@ begin
   end;
 
   //mouse drag-drop just begins
-  if (bOnMain or bOnGutter or bOnMinimap) and FMouseDragDropping then
+  if FMouseDragDropping then
   begin
     if not FMouseDragDroppingReal and
       IsPointsDiffByDelta(Point(X, Y), FMouseDownCoordOriginal, Mouse.DragThreshold) then
