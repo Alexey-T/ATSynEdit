@@ -6277,15 +6277,16 @@ begin
     if PtInRect(FRectMain, P) then
     begin
       if ModeReadOnly then
-        Cursor:= crNoDrop
+        DragCursor:= crNoDrop
       else
       if GetActualDragDropIsCopying then
-        Cursor:= crMultiDrag
+        DragCursor:= crMultiDrag
       else
-        Cursor:= crDrag;
+        DragCursor:= crDrag;
     end
     else
-      Cursor:= crNoDrop;
+      DragCursor:= crNoDrop;
+    Cursor:= DragCursor;
   end
   else
   if PtInRect(FRectMain, P) then
