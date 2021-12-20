@@ -8702,7 +8702,23 @@ end;
 
 procedure TATSynEdit.DragOver(Source: TObject; X, Y: Integer;
   State: TDragState; var Accept: Boolean);
+var
+  Cur: TCursor;
 begin
+  if (Source is TATSynEdit) and (Source<>Self) then
+  begin
+    if TATSynEdit(Source).OptMouseDragDrop then
+    begin
+      //for drag to another control, we reverse Ctrl-pressed state
+      if GetActualDragDropIsCopying then
+        Cur:= crDrag
+      else
+        Cur:= crMultiDrag;
+      TATSynEdit(Source).DragCursor:= Cur;
+      TATSynEdit(Source).Cursor:= Cur;
+    end;
+  end;
+
   Accept:=
     FOptMouseDragDrop and
     (not ModeReadOnly) and
