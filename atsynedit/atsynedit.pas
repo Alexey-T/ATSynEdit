@@ -6274,18 +6274,15 @@ begin
 
   if FMouseDragDropping and FMouseDragDroppingReal then
   begin
-    if PtInRect(FRectMain, P) then
-    begin
-      if ModeReadOnly then
-        DragCursor:= crNoDrop
-      else
-      if GetActualDragDropIsCopying then
-        DragCursor:= crMultiDrag
-      else
-        DragCursor:= crDrag;
-    end
+    //don't check here PtInRect(FRectMain, P), to have ok cursor
+    //when dragging to another editor
+    if ModeReadOnly then
+      DragCursor:= crNoDrop
     else
-      DragCursor:= crNoDrop;
+    if GetActualDragDropIsCopying then
+      DragCursor:= crMultiDrag
+    else
+      DragCursor:= crDrag;
     Cursor:= DragCursor;
   end
   else
