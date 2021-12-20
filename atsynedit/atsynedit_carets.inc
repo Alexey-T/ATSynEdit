@@ -1321,7 +1321,7 @@ end;
 
 function TATSynEdit.IsCaretFarFromVertEdge(ACommand: integer): boolean;
 var
-  NProximity, NPixels: integer;
+  NProximity, NPixels1, NPixels2: integer;
   Caret: TATCaretItem;
   bAllowMultiCarets, bMoveDown: boolean;
 begin
@@ -1346,10 +1346,11 @@ begin
 
   if Caret.CoordY=-1 then exit;
 
-  NPixels:= NProximity*FCharSize.Y;
+  NPixels1:= NProximity*FCharSize.Y;
+  NPixels2:= (NProximity+1)*FCharSize.Y;
   Result:=
-    (Abs(Caret.CoordY-FRectMain.Top)>=NPixels) and
-    (Abs(Caret.CoordY-FRectMain.Bottom)>=NPixels);
+    (Abs(Caret.CoordY-FRectMain.Top)>=NPixels1) and
+    (Abs(Caret.CoordY-FRectMain.Bottom)>=NPixels2);
 end;
 
 { TATCaretShape }
