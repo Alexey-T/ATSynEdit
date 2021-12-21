@@ -598,7 +598,7 @@ type
     FKeymap: TATKeymap;
     FKeymapHistory: TATKeyArray;
     //FBrotherEditor: TATSynEdit;
-    FCudatextFrame: TCustomFrame;
+    FParentFrameObject: TCustomFrame;
     FWantTabs: boolean;
     FWantReturns: boolean;
     FEditorIndex: integer;
@@ -1540,7 +1540,7 @@ type
     property ScrollHorz: TATEditorScrollInfo read FScrollHorz write FScrollHorz;
     property ScrollbarVert: TATScrollbar read FScrollbarVert;
     property ScrollbarHorz: TATScrollbar read FScrollbarHorz;
-    property CudatextFrame: TCustomFrame read FCudatextFrame write FCudatextFrame;
+    property ParentFrameObject: TCustomFrame read FParentFrameObject write FParentFrameObject;
     //property BrotherEditor: TATSynEdit read FBrotherEditor write FBrotherEditor;
     property CaretShapeNormal: TATCaretShape read FCaretShapeNormal;
     property CaretShapeOverwrite: TATCaretShape read FCaretShapeOverwrite;
