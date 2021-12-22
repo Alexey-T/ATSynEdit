@@ -8702,6 +8702,8 @@ var
   Cur: TCursor;
   EdOther: TATSynEdit;
 begin
+  Sleep(30);
+
   if (Source is TATSynEdit) and (Source<>Self) then
   begin
     EdOther:= TATSynEdit(Source);
