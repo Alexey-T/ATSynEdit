@@ -8735,7 +8735,10 @@ var
   Details: TATEditorPosDetails;
 begin
   if not (Source is TATSynEdit) then exit;
+
+  //this check means: method runs only on drop from another editor
   if (Source=Self) then exit;
+
   SText:= TATSynEdit(Source).TextSelected;
   if SText='' then exit;
 
