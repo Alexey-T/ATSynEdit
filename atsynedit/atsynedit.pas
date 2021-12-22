@@ -7636,6 +7636,7 @@ begin
 
   Str:= St.TextSubstring(X1, Y1, X2, Y2);
   if Str='' then exit;
+  BeginEditing;
 
   //insert before selection?
   if Relation=cRelateBefore then
@@ -7662,10 +7663,15 @@ begin
   end;
 
   DoEventCarets;
-  DoEventChange(Min(Y1, P.Y));
+
+  EndEditing(true);
+  {
+  NChangedLine:= St.EditingTopLine; //Min(Y1, P.Y)
+  DoEventChange(NChangedLine);
     //with DoEventChange(ALineIndex=-1), we have broken syntax highlight,
     //after drag-drop from huge line, to the lower position of the same huge line,
     //e.g. in 100K HTML file with huge line
+  }
 
   Update(true);
 end;
