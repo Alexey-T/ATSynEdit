@@ -7662,7 +7662,11 @@ begin
   end;
 
   DoEventCarets;
-  DoEventChange;
+  DoEventChange(Min(Y1, P.Y));
+    //with DoEventChange(ALineIndex=-1), we have broken syntax highlight,
+    //after drag-drop from huge line, to the lower position of the same huge line,
+    //e.g. in 100K HTML file with huge line
+
   Update(true);
 end;
 
