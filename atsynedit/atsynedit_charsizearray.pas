@@ -148,6 +148,11 @@ begin
   //math operators
   for i:= $2200 to $22FF do
     FixedSizes[i]:= uw_fullwidth;
+  FixedSizes[$221a]:= uw_normal;
+  FixedSizes[$2248]:= uw_normal;
+  FixedSizes[$2260]:= uw_normal;
+  FixedSizes[$2264]:= uw_normal;
+  FixedSizes[$2265]:= uw_normal;
 
   //"Miscellaneous Symbols" block which goes from 0x2600 to 0x26FF
   for i:= $2600 to $26FF do
