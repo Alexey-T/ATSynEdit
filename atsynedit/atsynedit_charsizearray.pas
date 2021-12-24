@@ -146,6 +146,7 @@ begin
   FixedSizes[$2122]:= uw_normal;
 
   //math operators
+  { //let's not force widths of math chars - see CudaText issue #3873, where user asked to force them
   for i:= $2200 to $22FF do
     FixedSizes[i]:= uw_fullwidth;
   FixedSizes[$2200]:= uw_normal;
@@ -166,6 +167,7 @@ begin
   FixedSizes[$2286]:= uw_normal;
   FixedSizes[$2287]:= uw_normal;
   FixedSizes[$22C2]:= uw_normal;
+  }
 
   //"Miscellaneous Symbols" block which goes from 0x2600 to 0x26FF
   for i:= $2600 to $26FF do
