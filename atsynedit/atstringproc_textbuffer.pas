@@ -10,8 +10,6 @@ interface
 
 uses
   Classes, SysUtils,
-  //Dialogs,
-  LazUTF8,
   ATStringProc,
   ATSynEdit_FGL;
 
