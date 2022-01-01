@@ -1,4 +1,7 @@
 
+2022.01.01
++ add: OptFoldIconForMinimalRangeHeight
+
 2021.11.21
 + add: TATCaretShape has new prop RenderCharAbove
 * change: moved all global options to record ATEditorOptions in atsynedit_options unit
