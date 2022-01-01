@@ -10,13 +10,13 @@ interface
 
 uses
   Classes, SysUtils,
-  Dialogs,
+  //Dialogs,
   LazUTF8,
   ATStringProc,
   ATSynEdit_FGL;
 
 type
-  TTextChangedEvent = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
+  TATStringBufferChange = procedure(Sender: TObject; Pos, Count, LineChange: integer) of object;
 
 type
   TATGenericIntList = specialize TFPGList<integer>;
@@ -31,7 +31,7 @@ type
     FLenEol: integer;
     FLocked: boolean;
     FVersion: integer;
-    FOnChange: TTextChangedEvent;
+    FOnChange: TATStringBufferChange;
     procedure SetCount(AValue: integer);
     procedure SetupFromGenericList(L: TATGenericIntList);
   public
@@ -56,7 +56,7 @@ type
     function OffsetToOffsetOfLineStart(APos: integer): integer; inline;
     function OffsetToOffsetOfLineEnd(APos: integer): integer; inline;
     property Count: integer read FCount;
-    property OnChange: TTextChangedEvent read FOnChange write FOnChange;
+    property OnChange: TATStringBufferChange read FOnChange write FOnChange;
     property Version: integer read FVersion;
     procedure IncreaseVersion;
     property IsLocked: boolean read FLocked;
