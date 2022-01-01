@@ -78,7 +78,7 @@ type
     function FindRangesWithAnyOfLines(ALineFrom, ALineTo: integer): TATIntArray;
     function FindRangesWithStaples(ALineFrom, ALineTo: integer): TATIntArray;
     function FindDeepestRangeContainingLine_Old(ALine: integer; const AIndexes: TATIntArray): integer;
-    function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
+    function FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean; AMinimalRangeHeight: integer): integer;
     function FindRangeWithPlusAtLine(ALine: integer): integer;
     function FindRangeWithPlusAtLine_ViaIndexer(ALine: integer): integer;
     function FindRangeLevel(AIndex: integer): integer;
@@ -524,7 +524,7 @@ begin
   end;
 end;
 
-function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean): integer;
+function TATSynRanges.FindDeepestRangeContainingLine(ALine: integer; AWithStaple: boolean; AMinimalRangeHeight: integer): integer;
 var
   NItemLen, NRange, iItem: integer;
   Ptr: PATSynRange;
@@ -542,6 +542,8 @@ begin
     if Ptr^.IsSimple then
       Continue;
     if AWithStaple and not Ptr^.Staple then
+      Continue;
+    if Ptr^.Y2-Ptr^.Y<AMinimalRangeHeight then
       Continue;
     exit(NRange);
   end;

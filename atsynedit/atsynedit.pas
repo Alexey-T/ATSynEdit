@@ -617,6 +617,7 @@ type
     FFoldTooltipVisible: boolean;
     FFoldTooltipWidthPercents: integer;
     FFoldTooltipLineCount: integer;
+    FFoldIconForMinimalRange: integer;
     FCursorText: TCursor;
     FCursorColumnSel: TCursor;
     FCursorGutterBookmark: TCursor;
@@ -1884,6 +1885,7 @@ type
     property OptFoldTooltipVisible: boolean read FFoldTooltipVisible write FFoldTooltipVisible default cInitFoldTooltipVisible;
     property OldFoldTooltipWidthPercents: integer read FFoldTooltipWidthPercents write FFoldTooltipWidthPercents default cInitFoldTooltipWidthPercents;
     property OptFoldTooltipLineCount: integer read FFoldTooltipLineCount write FFoldTooltipLineCount default cInitFoldTooltipLineCount;
+    property OptFoldIconForMinimalRangeHeight: integer read FFoldIconForMinimalRange write FFoldIconForMinimalRange default 0;
     property OptTextHint: string read FTextHint write FTextHint;
     property OptTextHintFontStyle: TFontStyles read FTextHintFontStyle write FTextHintFontStyle default [fsItalic];
     property OptTextHintCenter: boolean read FTextHintCenter write FTextHintCenter default false;
@@ -8039,10 +8041,10 @@ begin
     begin
       Caret:= Carets[0];
       if Strings.IsIndexValid(Caret.PosY) then
-        NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false);
+        NIndexOfCaretRng:= FFold.FindDeepestRangeContainingLine(Caret.PosY, false, FFoldIconForMinimalRange);
     end;
 
-  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false);
+  NIndexOfCurrentRng:= FFold.FindDeepestRangeContainingLine(NLineIndex, false, FFoldIconForMinimalRange);
   if NIndexOfCurrentRng<0 then exit;
   AProps.HiliteLines:= NIndexOfCurrentRng=NIndexOfCaretRng;
 
@@ -8404,7 +8406,7 @@ begin
   //currently find active range for first caret only
   if FOptStapleHiliteActive then
     if Carets.Count>0 then
-      nRangeDeepest:= FFold.FindDeepestRangeContainingLine(Carets[0].PosY, true);
+      nRangeDeepest:= FFold.FindDeepestRangeContainingLine(Carets[0].PosY, true, FFoldIconForMinimalRange);
 
   NColorNormal:= Colors.BlockStaple;
   NColorActive:= Colors.BlockStapleForCaret;
