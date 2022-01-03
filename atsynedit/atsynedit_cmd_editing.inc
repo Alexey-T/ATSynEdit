@@ -255,8 +255,9 @@ begin
   if bNeedGroup then
     St.EndUndoGroup;
 
-  //changed for issue CudaText#3065
+  //changed for CudaText issue #3065
   Result:= [cResultCaretTop, cResultCaretLazy];
+  //changed for CudaText issue #3883
   if bTextChangeAny then
     Include(Result, cResultText);
 end;
