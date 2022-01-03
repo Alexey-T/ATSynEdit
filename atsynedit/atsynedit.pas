@@ -6846,7 +6846,7 @@ begin
   begin
     FTimerFlicker.Enabled:= false;
     FTimerFlicker.Interval:= ATEditorOptions.FlickerReducingPause;
-    FTimerFlicker.Enabled:= true;
+    FTimerFlicker.Enabled:= FTimersEnabled;
     exit;
   end;
 
@@ -7818,10 +7818,24 @@ end;
 procedure TATSynEdit.TimersStop;
 begin
   FTimersEnabled:= false;
-  if Assigned(FTimerBlink) then FTimerBlink.Enabled:= false;
-  if Assigned(FTimerIdle) then FTimerIdle.Enabled:= false;
-  if Assigned(FTimerScroll) then FTimerScroll.Enabled:= false;
-  if Assigned(FTimerNiceScroll) then FTimerNiceScroll.Enabled:= false;
+
+  if Assigned(FTimerBlink) then
+    FTimerBlink.Enabled:= false;
+
+  if Assigned(FTimerIdle) then
+    FTimerIdle.Enabled:= false;
+
+  if Assigned(FTimerScroll) then
+    FTimerScroll.Enabled:= false;
+
+  if Assigned(FTimerNiceScroll) then
+    FTimerNiceScroll.Enabled:= false;
+
+  if Assigned(FTimerDelayedParsing) then
+    FTimerDelayedParsing.Enabled:= false;
+
+  if Assigned(FTimerFlicker) then
+    FTimerFlicker.Enabled:= false;
 end;
 
 procedure TATSynEdit.DoMinimapClick(APosY: integer);
@@ -8857,7 +8871,8 @@ end;
 procedure TATSynEdit.StartTimerDelayedParsing;
 begin
   FTimerDelayedParsing.Enabled:= false;
-  FTimerDelayedParsing.Enabled:= true;
+  FTimerDelayedParsing.Enabled:= FTimersEnabled;
+
   if Carets.Count>0 then
     FLastCommandDelayedParsingOnLine:= Min(
       FLastCommandDelayedParsingOnLine,
