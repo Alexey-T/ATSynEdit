@@ -193,6 +193,7 @@ var
   Shift, PosAfter: TPoint;
   NIndent, NDeleteLen: integer;
   bNeedGroup: boolean;
+  bTextChange: boolean;
   ch: WideChar;
   i: integer;
 begin
@@ -210,12 +211,17 @@ begin
   bNeedGroup:= Carets.Count>1;
   if bNeedGroup then
     St.BeginUndoGroup;
+  bTextChange:= false;
 
   for i:= 0 to Carets.Count-1 do
   begin
     Caret:= Carets[i];
     if not St.IsIndexValid(Caret.PosY) then Continue;
     NDeleteLen:= ADeleteLen;
+
+    //BackSpace doesn't change text if caret is after line-length
+    if (not FCaretVirtual) or (Caret.PosX-NDeleteLen < St.LinesLen[Caret.PosY]) then
+      bTextChange:= true;
 
     if AAllowUnindent then
     begin
@@ -228,6 +234,7 @@ begin
     end;
 
     //handle deletion of emoji (2 surrogate chars: high+low)
+    if bTextChange then
     if Caret.PosX>1 then
     begin
       ch:= St.LineCharAt(Caret.PosY, Caret.PosX);
@@ -247,7 +254,9 @@ begin
     St.EndUndoGroup;
 
   //changed for issue CudaText#3065
-  Result:= [cResultText, cResultCaretTop, cResultCaretLazy];
+  Result:= [cResultCaretTop, cResultCaretLazy];
+  if bTextChange then
+    Include(Result, cResultText);
 end;
 
 function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
