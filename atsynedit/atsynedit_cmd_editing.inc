@@ -230,26 +230,23 @@ begin
           NDeleteLen:= Caret.PosX;
     end;
 
-    //BackSpace doesn't change text if caret is after line end
-    bTextChangeCurrent:= (not FCaretVirtual) or (Caret.PosX-NDeleteLen < St.LinesLen[Caret.PosY]);
-    if bTextChangeCurrent then
-      bTextChangeAny:= true;
-
     //handle deletion of emoji (2 surrogate chars: high+low)
-    if bTextChangeCurrent then
-      if Caret.PosX>1 then
-      begin
-        ch:= St.LineCharAt(Caret.PosY, Caret.PosX);
-        if IsCharSurrogateLow(ch) then
-          Inc(NDeleteLen);
-      end;
+    if Caret.PosX>1 then
+    begin
+      ch:= St.LineCharAt(Caret.PosY, Caret.PosX);
+      if IsCharSurrogateLow(ch) then
+        Inc(NDeleteLen);
+    end;
 
-    St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
+    St.TextDeleteLeft(Caret.PosX, Caret.PosY, NDeleteLen, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bTextChangeCurrent);
     DoCaretsShift(i, Caret.PosX, Caret.PosY, Shift.X, Shift.Y, PosAfter);
     Caret.PosX:= PosAfter.X;
     Caret.PosY:= PosAfter.Y;
     Caret.EndX:= -1;
     Caret.EndY:= -1;
+
+    if bTextChangeCurrent then
+      bTextChangeAny:= true;
   end;
 
   if bNeedGroup then
@@ -612,6 +609,7 @@ var
   Str: atString;
   Shift, PosAfter: TPoint;
   bNeedGroup: boolean;
+  bTextChanged: boolean;
   i: integer;
 begin
   Result:= [];
@@ -635,7 +633,7 @@ begin
     //delete to prev line?
     if (Caret.PosX=0) and (not ANext) then
     begin
-      St.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine);
+      St.TextDeleteLeft(Caret.PosX, Caret.PosY, 1, Shift, PosAfter, FOptKeyBackspaceGoesToPrevLine, bTextChanged);
     end
     else
     //delete to next line?
