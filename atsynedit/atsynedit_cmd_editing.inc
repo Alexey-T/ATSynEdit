@@ -193,7 +193,7 @@ var
   Shift, PosAfter: TPoint;
   NIndent, NDeleteLen: integer;
   bNeedGroup: boolean;
-  bTextChange: boolean;
+  bTextChangeCurrent, bTextChangeAny: boolean;
   ch: WideChar;
   i: integer;
 begin
@@ -211,7 +211,8 @@ begin
   bNeedGroup:= Carets.Count>1;
   if bNeedGroup then
     St.BeginUndoGroup;
-  bTextChange:= false;
+
+  bTextChangeAny:= false;
 
   for i:= 0 to Carets.Count-1 do
   begin
@@ -220,8 +221,9 @@ begin
     NDeleteLen:= ADeleteLen;
 
     //BackSpace doesn't change text if caret is after line-length
-    if (not FCaretVirtual) or (Caret.PosX-NDeleteLen < St.LinesLen[Caret.PosY]) then
-      bTextChange:= true;
+    bTextChangeCurrent:= (not FCaretVirtual) or (Caret.PosX-NDeleteLen < St.LinesLen[Caret.PosY]);
+    if bTextChangeCurrent then
+      bTextChangeAny:= true;
 
     if AAllowUnindent then
     begin
@@ -234,7 +236,7 @@ begin
     end;
 
     //handle deletion of emoji (2 surrogate chars: high+low)
-    if bTextChange then
+    if bTextChangeCurrent then
       if Caret.PosX>1 then
       begin
         ch:= St.LineCharAt(Caret.PosY, Caret.PosX);
@@ -255,7 +257,7 @@ begin
 
   //changed for issue CudaText#3065
   Result:= [cResultCaretTop, cResultCaretLazy];
-  if bTextChange then
+  if bTextChangeAny then
     Include(Result, cResultText);
 end;
 
