@@ -110,6 +110,8 @@ begin
   LNums:= TStringList.Create;
 
   try
+    LStyles.UseLocale:= false; //speedup IndexOf
+
     for i:= 0 to Ed.Strings.Count-1 do
       LNums.Add(IntToStr(i+1)+'&nbsp;');
     _AddPreToStrings(LNums);
