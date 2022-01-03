@@ -220,11 +220,6 @@ begin
     if not St.IsIndexValid(Caret.PosY) then Continue;
     NDeleteLen:= ADeleteLen;
 
-    //BackSpace doesn't change text if caret is after line-length
-    bTextChangeCurrent:= (not FCaretVirtual) or (Caret.PosX-NDeleteLen < St.LinesLen[Caret.PosY]);
-    if bTextChangeCurrent then
-      bTextChangeAny:= true;
-
     if AAllowUnindent then
     begin
       NIndent:= DoCalcIndentCharsFromPrevLines(Caret.PosX, Caret.PosY);
@@ -234,6 +229,11 @@ begin
         else
           NDeleteLen:= Caret.PosX;
     end;
+
+    //BackSpace doesn't change text if caret is after line end
+    bTextChangeCurrent:= (not FCaretVirtual) or (Caret.PosX-NDeleteLen < St.LinesLen[Caret.PosY]);
+    if bTextChangeCurrent then
+      bTextChangeAny:= true;
 
     //handle deletion of emoji (2 surrogate chars: high+low)
     if bTextChangeCurrent then
