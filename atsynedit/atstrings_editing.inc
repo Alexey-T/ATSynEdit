@@ -307,7 +307,8 @@ begin
       //  nil);
 
       StrPrev:= Lines[AY-1];
-      Lines[AY-1]:= StrPrev+Str;
+      if Str<>'' then
+        Lines[AY-1]:= StrPrev+Str;
       LineDelete(AY);
       AShift.Y:= -1;
       APosAfter.X:= Length(StrPrev);
