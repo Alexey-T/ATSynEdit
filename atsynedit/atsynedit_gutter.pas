@@ -10,7 +10,7 @@ interface
 
 uses
   Classes, SysUtils,
-  ATStringProc;
+  ATSynEdit_Options;
 
 type
   TATGutterItem = class
@@ -131,7 +131,7 @@ begin
       if Visible then
       begin
         if Scaled then
-          Inc(Right, EditorScale(Size))
+          Inc(Right, ATEditorOptions.Scale(Size))
         else
           Inc(Right, Size);
       end;

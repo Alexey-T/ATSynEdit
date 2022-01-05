@@ -2146,9 +2146,9 @@ begin
     end;
 
     if NOutput mod 5 = 0 then
-      NMarkHeight:= EditorScale(FOptRulerMarkSizeBig)
+      NMarkHeight:= ATEditorOptions.Scale(FOptRulerMarkSizeBig)
     else
-      NMarkHeight:= EditorScale(FOptRulerMarkSizeSmall);
+      NMarkHeight:= ATEditorOptions.Scale(FOptRulerMarkSizeSmall);
 
     CanvasLineVert(C, NCoordX, FRectRuler.Bottom-1-NMarkHeight, FRectRuler.Bottom-1);
   end;
@@ -2164,8 +2164,8 @@ begin
   if (ACaretX>=FRectRuler.Left) and (ACaretX<FRectRuler.Right) then
     CanvasPaintTriangleDown(C,
       Colors.RulerFont,
-      Point(ACaretX, FRectRuler.Top+EditorScale(FOptRulerMarkSizeCaret)),
-      EditorScale(FOptRulerMarkSizeCaret)
+      Point(ACaretX, FRectRuler.Top+ATEditorOptions.Scale(FOptRulerMarkSizeCaret)),
+      ATEditorOptions.Scale(FOptRulerMarkSizeCaret)
       );
 end;
 
@@ -2922,7 +2922,7 @@ procedure TATSynEdit.GetRectMicromap(out R: TRect);
 var
   NSize: integer;
 begin
-  NSize:= FMicromap.UpdateSizes(EditorScale(FCharSize.XScaled) div ATEditorCharXScale);
+  NSize:= FMicromap.UpdateSizes(ATEditorOptions.Scale(FCharSize.XScaled) div ATEditorCharXScale);
 
   if not FMicromapVisible or FMicromapOnScrollbar then
   begin
@@ -3023,8 +3023,8 @@ begin
 
   if FMinimapCustomScale<100 then
   begin
-    FCharSizeMinimap.XScaled:= EditorScale(1) * ATEditorCharXScale;
-    FCharSizeMinimap.Y:= EditorScale(2);
+    FCharSizeMinimap.XScaled:= ATEditorOptions.Scale(1) * ATEditorCharXScale;
+    FCharSizeMinimap.Y:= ATEditorOptions.Scale(2);
   end
   else
   begin
@@ -4334,7 +4334,7 @@ procedure TATSynEdit.DoPaintMargins(C: TCanvas);
 var
   NWidth, i: integer;
 begin
-  NWidth:= EditorScale(1);
+  NWidth:= ATEditorOptions.Scale(1);
   if FMarginRight>1 then
     DoPaintMarginLineTo(C, PosX(FMarginRight), NWidth, Colors.MarginRight);
   for i:= 0 to Length(FMarginList)-1 do
@@ -5363,7 +5363,7 @@ begin
   if Carets.Count>0 then
   begin
     if FOptShowCurColumn then
-      DoPaintMarginLineTo(C, Carets[0].CoordX, EditorScale(1), Colors.MarginCaret);
+      DoPaintMarginLineTo(C, Carets[0].CoordX, ATEditorOptions.Scale(1), Colors.MarginCaret);
 
     DoPaintRulerCaretMarks(C);
   end;
@@ -7073,7 +7073,7 @@ begin
   if PntCoord.Y<0 then exit;
   if not PtInRect(FRectMain, PntCoord) then exit;
 
-  NMarkWidth:= EditorScale(FOptShowDragDropMarkerWidth);
+  NMarkWidth:= ATEditorOptions.Scale(FOptShowDragDropMarkerWidth);
   R.Left:= PntCoord.X - NMarkWidth div 2;
   R.Right:= R.Left + NMarkWidth;
   R.Top:= PntCoord.Y;
@@ -7236,7 +7236,7 @@ procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: inte
   var
     P: TPoint;
   begin
-    P.Y:= ACoordTop + FCharSize.Y div 2 - EditorScale(1);
+    P.Y:= ACoordTop + FCharSize.Y div 2 - ATEditorOptions.Scale(1);
 
     case FOptNumbersAlignment of
       taLeftJustify:
@@ -7270,12 +7270,12 @@ begin
 
     '.':
       begin
-        PaintDash(EditorScale(2), EditorScale(2));
+        PaintDash(ATEditorOptions.Scale(2), ATEditorOptions.Scale(2));
       end;
 
     '-':
       begin
-        PaintDash(FCharSize.XScaled div ATEditorCharXScale, EditorScale(2));
+        PaintDash(FCharSize.XScaled div ATEditorCharXScale, ATEditorOptions.Scale(2));
       end;
 
     else
@@ -7877,9 +7877,9 @@ const
 begin
   if FOptScaleFont=0 then
   begin
-    FOptScaleFont:= EditorScaleFontPercents;
+    FOptScaleFont:= ATEditorOptions.ScaleFontPercents;
     if FOptScaleFont=0 then
-      FOptScaleFont:= EditorScalePercents;
+      FOptScaleFont:= ATEditorOptions.ScalePercents;
   end;
 
   if not AInc then
@@ -8174,7 +8174,7 @@ begin
         CanvasLineHorz(C,
           CoordXCenter,
           ACoordY2,
-          CoordXCenter + EditorScale(FOptGutterPlusSize)
+          CoordXCenter + ATEditorOptions.Scale(FOptGutterPlusSize)
           );
       end;
     cFoldbarMiddle:
@@ -8538,7 +8538,7 @@ begin
           ALineColor,
           Colors.GutterFoldBG,
           Point(AX, AY),
-          EditorScale(FOptGutterPlusSize),
+          ATEditorOptions.Scale(FOptGutterPlusSize),
           APlus);
       end;
     cGutterIconsTriangles:
@@ -8547,12 +8547,12 @@ begin
           CanvasPaintTriangleRight(C,
             ALineColor,
             Point(AX, AY),
-            EditorScale(FOptGutterPlusSize div 2))
+            ATEditorOptions.Scale(FOptGutterPlusSize div 2))
         else
           CanvasPaintTriangleDown(C,
             ALineColor,
             Point(AX, AY),
-            EditorScale(FOptGutterPlusSize div 2))
+            ATEditorOptions.Scale(FOptGutterPlusSize div 2))
       end;
   end;
 end;
@@ -9451,7 +9451,7 @@ begin
   if FOptScaleFont>0 then
     Result:= AValue * FOptScaleFont div 100
   else
-    Result:= EditorScaleFont(AValue);
+    Result:= ATEditorOptions.ScaleFont(AValue);
 end;
 
 function TATSynEdit.UpdateLinksRegexObject: boolean;

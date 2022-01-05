@@ -15,6 +15,7 @@ uses
   ATCanvasPrimitives,
   ATScrollbar,
   ATSynEdit,
+  ATSynEdit_Options,
   ATStringProc;
 
 type
@@ -187,7 +188,7 @@ begin
     Point(
       (ARect.Left+ARect.Right) div 2,
       (ARect.Top+ARect.Bottom) div 2),
-    EditorScale(ATScrollbarTheme.ArrowSize));
+    ATEditorOptions.Scale(ATScrollbarTheme.ArrowSize));
 end;
 
 procedure TATComboEdit.DoMenu;

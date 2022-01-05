@@ -38,6 +38,8 @@ type
   public
     ScaleSuffix: string;
     InitedCursorsForNiceScroll: boolean;
+    ScalePercents: integer;
+    ScaleFontPercents: integer; //if 0, it follows previous variable
 
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
@@ -122,6 +124,9 @@ type
 
     ClipboardColumnSignature: integer;
     function ClipboardColumnFormat: TClipboardFormat;
+
+    function Scale(AValue: integer): integer;
+    function ScaleFont(AValue: integer): integer;
 
     function BitmapWait: TPortableNetworkGraphic;
     function BitmapSaving: TPortableNetworkGraphic;
@@ -208,6 +213,20 @@ begin
     Result:= '';
 end;
 
+function TATEditorOptions.Scale(AValue: integer): integer;
+begin
+  Result:= AValue * ScalePercents div 100;
+end;
+
+function TATEditorOptions.ScaleFont(AValue: integer): integer;
+begin
+  if ScaleFontPercents=0 then
+    Result:= Scale(AValue)
+  else
+    Result:= AValue * ScaleFontPercents div 100;
+end;
+
+
 initialization
 
   FillChar(ATEditorOptions, SizeOf(ATEditorOptions), 0);
@@ -215,6 +234,8 @@ initialization
   begin
     ScaleSuffix:= GetScaleSuffix;
     InitedCursorsForNiceScroll:= false;
+    ScalePercents:= 100;
+    ScaleFontPercents:= 0; //if 0, it follows previous variable
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
