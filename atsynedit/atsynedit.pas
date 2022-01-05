@@ -471,8 +471,6 @@ const
 
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
-  ATClipboardColumnFormat: TClipboardFormat = 0; //must be inited
-  ATClipboardColumnSignature: integer = $1000;
 
 type
   TATSynEditClickEvent = procedure(Sender: TObject; var AHandled: boolean) of object;
@@ -9793,7 +9791,6 @@ end;
 
 
 initialization
-  ATClipboardColumnFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Block');
 
   RegExprModifierS:= False;
   RegExprModifierM:= True;

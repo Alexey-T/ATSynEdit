@@ -21,7 +21,7 @@ begin
   end;
 
   //column block
-  if AClipboardObject.HasFormat(ATClipboardColumnFormat) then
+  if AClipboardObject.HasFormat(ATEditorOptions.ClipboardColumnFormat) then
   begin
     if ModeOneLine then Exit;
     Result:= DoCommand_ClipboardPasteColumnBlock(AKeepCaret, AClipboardObject);
@@ -149,9 +149,9 @@ begin
     //copy column block
     SClipboardCopy(SNewText, AClipboardObject);
     AClipboardObject.AddFormat(
-      ATClipboardColumnFormat,
-      ATClipboardColumnSignature,
-      SizeOf(ATClipboardColumnSignature));
+      ATEditorOptions.ClipboardColumnFormat,
+      ATEditorOptions.ClipboardColumnSignature,
+      SizeOf(ATEditorOptions.ClipboardColumnSignature));
   end
   else
   begin

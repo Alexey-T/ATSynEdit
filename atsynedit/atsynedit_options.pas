@@ -8,6 +8,10 @@ unit ATSynEdit_Options;
 
 interface
 
+uses
+  LCLType,
+  Clipbrd;
+
 type
   TATEditorUnptintedEolSymbol = (
     aeueDot,
@@ -80,6 +84,9 @@ var
     HintBookmarkDx: integer;
     HintBookmarkDy: integer;
     UrlMarkerTag: integer;
+
+    ClipboardColumnFormat: TClipboardFormat;
+    ClipboardColumnSignature: integer;
 
     //UI strings
     TextHintScrollPrefix: string;
@@ -178,6 +185,9 @@ initialization
     HintBookmarkDy:= 16;
     UrlMarkerTag:= -100;
 
+    ClipboardColumnFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Block');
+    ClipboardColumnSignature:= $1000;
+
     //UI strings
     TextHintScrollPrefix:= 'Line';
     TextMenuitemFoldAll:= 'Fold all';
@@ -193,3 +203,4 @@ initialization
   end;
 
 end.
+
