@@ -388,7 +388,6 @@ type
 
 const
   cUsePaintStatic = true;
-  cMaxIndentVert = 100;
   cInitTextOffsetLeft = 0;
   cInitTextOffsetTop = 2;
   cInitHighlightGitConflicts = true;

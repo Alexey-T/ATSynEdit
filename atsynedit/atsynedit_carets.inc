@@ -705,7 +705,7 @@ begin
   Result:= false;
 
   //allow big values - make centering vertically
-  if Abs(AIndentVert)>=cMaxIndentVert then
+  if Abs(AIndentVert)>=100 then
     AIndentVert:= GetVisibleLines div 2;
 
   if AUnfold then
