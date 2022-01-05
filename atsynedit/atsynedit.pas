@@ -455,14 +455,6 @@ const
   cInitDimUnfocusedBack = 0;
   cInitShowFoldedMarkWithSelectionBG = true;
 
-  cGutterBands = 6;
-  cGutterSizeBm = 16;
-  cGutterSizeNum = 10;
-  cGutterSizeFold = 14;
-  cGutterSizeState = 3;
-  cGutterSizeSep = 1;
-  cGutterSizeEmpty = 2;
-
 const
   cUrlRegex_Email = '\b(mailto:)?\w[\w\-\+\.]*@\w[\w\-\.]*\.\w{2,}\b';
   cUrlRegex_WebBegin = 'https?://|ftp://|magnet:\?|www\.|ftp\.';
@@ -4708,17 +4700,17 @@ begin
   FGutterBandEmpty:= 5;
   FGutterBandDecor:= -1;
 
-  for i:= 1 to cGutterBands do
+  for i:= 1 to ATEditorOptions.GutterBandsCount do
     FGutter.Add(10);
-  FGutter[FGutterBandBookmarks].Size:= cGutterSizeBm;
+  FGutter[FGutterBandBookmarks].Size:= ATEditorOptions.GutterSizeBookmarks;
   FGutter[FGutterBandBookmarks].Scaled:= true;
-  FGutter[FGutterBandNumbers].Size:= cGutterSizeNum;
-  FGutter[FGutterBandStates].Size:= cGutterSizeState;
+  FGutter[FGutterBandNumbers].Size:= ATEditorOptions.GutterSizeNumbers;
+  FGutter[FGutterBandStates].Size:= ATEditorOptions.GutterSizeLineStates;
   FGutter[FGutterBandStates].Scaled:= true;
-  FGutter[FGutterBandFolding].Size:= cGutterSizeFold;
+  FGutter[FGutterBandFolding].Size:= ATEditorOptions.GutterSizeFolding;
   FGutter[FGutterBandFolding].Scaled:= true;
-  FGutter[FGutterBandSeparator].Size:= cGutterSizeSep;
-  FGutter[FGutterBandEmpty].Size:= cGutterSizeEmpty;
+  FGutter[FGutterBandSeparator].Size:= ATEditorOptions.GutterSizeSepar;
+  FGutter[FGutterBandEmpty].Size:= ATEditorOptions.GutterSizeEmpty;
   FGutter[FGutterBandSeparator].Visible:= false;
   FGutter.Update;
 

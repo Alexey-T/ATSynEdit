@@ -48,6 +48,14 @@ var
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
 
+    GutterBandsCount: integer;
+    GutterSizeBookmarks: integer;
+    GutterSizeNumbers: integer;
+    GutterSizeFolding: integer;
+    GutterSizeLineStates: integer;
+    GutterSizeSepar: integer;
+    GutterSizeEmpty: integer;
+
     UsePaintStatic: boolean;
     FoldedLenOfEmptyHint: integer;
     FoldedMarkIndentInner: integer;
@@ -136,6 +144,14 @@ initialization
       {$else}
       false
       {$endif} ;
+
+    GutterBandsCount:= 6;
+    GutterSizeBookmarks:= 16;
+    GutterSizeNumbers:= 10;
+    GutterSizeFolding:= 14;
+    GutterSizeLineStates:= 3;
+    GutterSizeSepar:= 1;
+    GutterSizeEmpty:= 2;
 
     UsePaintStatic:= true;
     FoldedLenOfEmptyHint:= 50;
