@@ -387,7 +387,6 @@ type
   end;
 
 const
-  cUsePaintStatic = true;
   cInitTextOffsetLeft = 0;
   cInitTextOffsetTop = 2;
   cInitHighlightGitConflicts = true;
@@ -7102,13 +7101,13 @@ end;
 
 procedure TATSynEdit.TimerBlinkDisable;
 begin
-  if cUsePaintStatic then
+  if ATEditorOptions.UsePaintStatic then
     FTimerBlink.Enabled:= false;
 end;
 
 procedure TATSynEdit.TimerBlinkEnable;
 begin
-  if cUsePaintStatic then
+  if ATEditorOptions.UsePaintStatic then
   begin
     FTimerBlink.Enabled:= false;
     FTimerBlink.Enabled:= FTimersEnabled and FCaretBlinkEnabled;

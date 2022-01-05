@@ -48,6 +48,7 @@ var
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
 
+    UsePaintStatic: boolean;
     FoldedLenOfEmptyHint: integer;
     FoldedMarkIndentInner: integer;
     FoldedMarkIndentOuter: integer;
@@ -136,6 +137,7 @@ initialization
       false
       {$endif} ;
 
+    UsePaintStatic:= true;
     FoldedLenOfEmptyHint:= 50;
     FoldedMarkIndentInner:= 2; //indent inside [...] folded-mark
     FoldedMarkIndentOuter:= 2; //indent before [...] folded-mark
