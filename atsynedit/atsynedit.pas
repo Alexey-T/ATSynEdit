@@ -6290,8 +6290,6 @@ begin
 
   P:= Point(X, Y);
   UpdateCursor;
-  if not PtInRect(ClientRect, P) then
-    exit;
 
   bMovedMinimal:= IsPointsDiffByDelta(P, FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
 
