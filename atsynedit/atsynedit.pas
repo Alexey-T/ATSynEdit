@@ -5431,10 +5431,10 @@ begin
 end;
 
 function TATSynEdit.DoPaint(ALineFrom: integer): boolean;
-//gets True if one of scrollbars changed Visible state
+//gets True if one of the scrollbars changed its Visible state
 begin
-  if csLoading in ComponentState then
-    exit(false);
+  if csLoading in ComponentState then exit(false);
+  if csDestroying in ComponentState then exit(false);
 
   UpdateTabHelper;
 
