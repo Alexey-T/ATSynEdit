@@ -5,6 +5,7 @@ License: MPL 2.0 or LGPL
 unit ATSynEdit_Options;
 
 {$mode objfpc}{$H+}
+{$ModeSwitch advancedrecords}
 
 interface
 
@@ -19,8 +20,14 @@ type
     aeuePilcrow
     );
 
-var
-  ATEditorOptions: record
+type
+
+  { TATEditorOptions }
+
+  TATEditorOptions = record
+  private
+    FClipboardColumnFormat: TClipboardFormat;
+  public
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
     UnprintedTabPointerScale: integer;
@@ -85,9 +92,6 @@ var
     HintBookmarkDy: integer;
     UrlMarkerTag: integer;
 
-    ClipboardColumnFormat: TClipboardFormat;
-    ClipboardColumnSignature: integer;
-
     //UI strings
     TextHintScrollPrefix: string;
     TextMenuitemFoldAll: string;
@@ -100,10 +104,24 @@ var
     TextMenuitemSelectAll: string;
     TextMenuitemUndo: string;
     TextMenuitemRedo: string;
+
+    ClipboardColumnSignature: integer;
+    function ClipboardColumnFormat: TClipboardFormat;
   end;
+
+var
+  ATEditorOptions: TATEditorOptions;
 
 implementation
 
+{ TATEditorOptions }
+
+function TATEditorOptions.ClipboardColumnFormat: TClipboardFormat;
+begin
+  if FClipboardColumnFormat=0 then
+    FClipboardColumnFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Block');
+  Result:= FClipboardColumnFormat;
+end;
 
 initialization
 
@@ -185,9 +203,6 @@ initialization
     HintBookmarkDy:= 16;
     UrlMarkerTag:= -100;
 
-    ClipboardColumnFormat:= RegisterClipboardFormat('Application/X-ATSynEdit-Block');
-    ClipboardColumnSignature:= $1000;
-
     //UI strings
     TextHintScrollPrefix:= 'Line';
     TextMenuitemFoldAll:= 'Fold all';
@@ -200,6 +215,8 @@ initialization
     TextMenuitemSelectAll:= 'Select all';
     TextMenuitemUndo:= 'Undo';
     TextMenuitemRedo:= 'Redo';
+
+    ClipboardColumnSignature:= $1000;
   end;
 
 end.
