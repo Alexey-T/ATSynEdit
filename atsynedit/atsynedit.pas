@@ -7567,7 +7567,7 @@ begin
   begin
     FTimerScroll:= TTimer.Create(Self);
     FTimerScroll.Enabled:= false;
-    FTimerScroll.Interval:= ATEditorOptions.TimerInternalAutoScroll;
+    FTimerScroll.Interval:= ATEditorOptions.TimerIntervalAutoScroll;
     FTimerScroll.OnTimer:= @TimerScrollTick;
   end;
 end;

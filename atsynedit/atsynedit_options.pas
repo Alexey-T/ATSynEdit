@@ -69,7 +69,7 @@ type
     MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
-    TimerInternalAutoScroll: integer;
+    TimerIntervalAutoScroll: integer;
     TimerIntervalNiceScroll: integer;
 
     GutterBandsCount: integer;
@@ -256,7 +256,7 @@ initialization
       false
       {$endif} ;
 
-    TimerInternalAutoScroll:= 100;
+    TimerIntervalAutoScroll:= 100;
     TimerIntervalNiceScroll:= 100;
 
     GutterBandsCount:= 6;
