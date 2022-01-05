@@ -38,6 +38,7 @@ var
     FlickerReducingPause: integer;
     PreciseCalculationOfCharWidth: boolean;
     BookmarksAutoDelete: boolean;
+    MouseMoveSmallDelta: integer;
     MouseDragDropFocusesTargetEditor: boolean;
     EmojiWidthPercents: integer;
     MaxTabPositionToExpand: integer; //no sense to expand too far tabs
@@ -77,6 +78,7 @@ initialization
     FlickerReducingPause:= 0;
     PreciseCalculationOfCharWidth:= {$ifdef darwin} true {$else} false {$endif};
     BookmarksAutoDelete:= false;
+    MouseMoveSmallDelta:= 5;
     MouseDragDropFocusesTargetEditor:= true;
     EmojiWidthPercents:= 210;
     MaxTabPositionToExpand:= 500;

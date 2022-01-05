@@ -6326,8 +6326,6 @@ begin
 end;
 
 procedure TATSynEdit.MouseMove(Shift: TShiftState; X, Y: Integer);
-const
-  cMovedDeltaPx = 5;
 var
   P: TPoint;
   bOnMain, bOnMinimap, bOnMicromap,
@@ -6347,7 +6345,7 @@ begin
   if not PtInRect(ClientRect, P) then
     exit;
 
-  bMovedMinimal:= IsPointsDiffByDelta(P, FMouseDownCoordOriginal, cMovedDeltaPx);
+  bMovedMinimal:= IsPointsDiffByDelta(P, FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
 
   bSelecting:= (not FMouseDragDropping) and (FMouseDownPnt.X>=0);
   bSelectingGutterNumbers:= FMouseDownGutterLineNumber>=0;
