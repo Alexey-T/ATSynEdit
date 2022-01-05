@@ -4453,8 +4453,11 @@ begin
   if not Assigned(GlobalCharSizer) then
     GlobalCharSizer:= TATCharSizer.Create(AOwner);
 
-  if not Assigned(cBitmapNiceScroll) then
-    InitEditorResources;
+  if not ATEditorOptions.CursorsLoaded then
+  begin
+    ATEditorOptions.CursorsLoaded:= true;
+    InitEditorCursors;
+  end;
 
   Caption:= '';
   ControlStyle:= ControlStyle+[csOpaque, csDoubleClicks, csTripleClicks];
@@ -5425,9 +5428,9 @@ begin
   C.FillRect(Rect(0, 0, Width, Height));
 
   if Strings.ProgressKind<>cStringsProgressSaving then
-    Bmp:= cBitmapWait
+    Bmp:= ATEditorOptions.BitmapWait
   else
-    Bmp:= cBitmapSaving;
+    Bmp:= ATEditorOptions.BitmapSaving;
   C.Draw(cBitmapX, cBitmapY, Bmp);
 
   NValue:= Strings.ProgressValue;
@@ -6901,6 +6904,7 @@ var
   Pnt: TPoint;
   Dx, Dy: integer;
   Dir: TATEditorDirection;
+  NBitmapSize: integer;
 begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
   if not PtInRect(FRectMain, Pnt) then Exit;
@@ -6909,8 +6913,9 @@ begin
   Dx:= Pnt.X-FMouseNiceScrollPos.X;
   Dy:= Pnt.Y-FMouseNiceScrollPos.Y;
 
-  if (Abs(Dx)<=cBitmapNiceScroll.Height div 2) and
-    (Abs(Dy)<=cBitmapNiceScroll.Height div 2) then
+  NBitmapSize:= ATEditorOptions.BitmapNiceScroll.Width;
+  if (Abs(Dx)<=NBitmapSize div 2) and
+    (Abs(Dy)<=NBitmapSize div 2) then
     begin
       Cursor:= crNiceScrollNone;
       Exit;
@@ -6929,8 +6934,8 @@ begin
   end;
 
   //delta in pixels
-  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) + 1) div ATEditorOptions.SpeedScrollNice;
-  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) + 1) div ATEditorOptions.SpeedScrollNice;
+  Dx:= Sign(Dx)*((Abs(Dx)-NBitmapSize div 2) + 1) div ATEditorOptions.SpeedScrollNice;
+  Dy:= Sign(Dy)*((Abs(Dy)-NBitmapSize div 2) + 1) div ATEditorOptions.SpeedScrollNice;
 
   if Dir in [cDirLeft, cDirRight] then
     DoScrollByDeltaInPixels(Dx, 0)
@@ -7221,12 +7226,15 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintNiceScroll(C: TCanvas);
+var
+  NBitmapSize: integer;
 begin
+  NBitmapSize:= ATEditorOptions.BitmapNiceScroll.Width;
   if MouseNiceScroll then
     C.Draw(
-      FMouseNiceScrollPos.X - cBitmapNiceScroll.Height div 2,
-      FMouseNiceScrollPos.Y - cBitmapNiceScroll.Height div 2,
-      cBitmapNiceScroll);
+      FMouseNiceScrollPos.X - NBitmapSize div 2,
+      FMouseNiceScrollPos.Y - NBitmapSize div 2,
+      ATEditorOptions.BitmapNiceScroll);
 end;
 
 procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
@@ -9798,9 +9806,6 @@ initialization
   RegExprUsePairedBreak:= False;
   RegExprReplaceLineBreak:= #10;
   {$endif}
-
-finalization
-  FreeEditorResources;
 
 end.
 

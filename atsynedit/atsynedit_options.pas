@@ -10,7 +10,10 @@ unit ATSynEdit_Options;
 interface
 
 uses
+  SysUtils,
   LCLType,
+  Graphics,
+  Forms,
   Clipbrd;
 
 type
@@ -27,7 +30,14 @@ type
   TATEditorOptions = record
   private
     FClipboardColumnFormat: TClipboardFormat;
+    FBitmapWait: TPortableNetworkGraphic;
+    FBitmapSaving: TPortableNetworkGraphic;
+    FBitmapNiceScroll: TPortableNetworkGraphic;
+    FBitmapFoldPlus: TPortableNetworkGraphic;
+    FBitmapFoldMinus: TPortableNetworkGraphic;
   public
+    ScaleSuffix: string;
+    CursorsLoaded: boolean;
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
     UnprintedTabPointerScale: integer;
@@ -107,6 +117,12 @@ type
 
     ClipboardColumnSignature: integer;
     function ClipboardColumnFormat: TClipboardFormat;
+
+    function BitmapWait: TPortableNetworkGraphic;
+    function BitmapSaving: TPortableNetworkGraphic;
+    function BitmapNiceScroll: TPortableNetworkGraphic;
+    function BitmapFoldPlus: TPortableNetworkGraphic;
+    function BitmapFoldMinus: TPortableNetworkGraphic;
   end;
 
 var
@@ -123,11 +139,76 @@ begin
   Result:= FClipboardColumnFormat;
 end;
 
+function TATEditorOptions.BitmapWait: TPortableNetworkGraphic;
+begin
+  if FBitmapWait=nil then
+  begin
+    FBitmapWait:= TPortableNetworkGraphic.Create;
+    FBitmapWait.LoadFromResourceName(HInstance, 'ATSYN_WAIT');
+  end;
+  Result:= FBitmapWait;
+end;
+
+function TATEditorOptions.BitmapSaving: TPortableNetworkGraphic;
+begin
+  if FBitmapSaving=nil then
+  begin
+    FBitmapSaving:= TPortableNetworkGraphic.Create;
+    FBitmapSaving.LoadFromResourceName(HInstance, 'ATSYN_SAVE');
+  end;
+  Result:= FBitmapSaving;
+end;
+
+function TATEditorOptions.BitmapNiceScroll: TPortableNetworkGraphic;
+begin
+  if FBitmapNiceScroll=nil then
+  begin
+    FBitmapNiceScroll:= TPortableNetworkGraphic.Create;
+    FBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK'+ScaleSuffix);
+  end;
+  Result:= FBitmapNiceScroll;
+end;
+
+function TATEditorOptions.BitmapFoldPlus: TPortableNetworkGraphic;
+begin
+  if FBitmapFoldPlus=nil then
+  begin
+    FBitmapFoldPlus:= TPortableNetworkGraphic.Create;
+    FBitmapFoldPlus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_P'+ScaleSuffix);
+  end;
+  Result:= FBitmapFoldPlus;
+end;
+
+function TATEditorOptions.BitmapFoldMinus: TPortableNetworkGraphic;
+begin
+  if FBitmapFoldMinus=nil then
+  begin
+    FBitmapFoldMinus:= TPortableNetworkGraphic.Create;
+    FBitmapFoldMinus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_M'+ScaleSuffix);
+  end;
+  Result:= FBitmapFoldMinus;
+end;
+
+function GetScaleSuffix: string;
+var
+  N: integer;
+begin
+  N:= Screen.PixelsPerInch;
+  if N>=96*2 then
+    Result:= '_200'
+  else
+  if N>=(96 * 3 div 2) then
+    Result:= '_150'
+  else
+    Result:= '';
+end;
+
 initialization
 
   FillChar(ATEditorOptions, SizeOf(ATEditorOptions), 0);
   with ATEditorOptions do
   begin
+    ScaleSuffix:= GetScaleSuffix;
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
     UnprintedTabPointerScale:= 22;
@@ -217,6 +298,22 @@ initialization
     TextMenuitemRedo:= 'Redo';
 
     ClipboardColumnSignature:= $1000;
+  end;
+
+finalization
+
+  with ATEditorOptions do
+  begin
+    if Assigned(FBitmapWait) then
+      FreeAndNil(FBitmapWait);
+    if Assigned(FBitmapSaving) then
+      FreeAndNil(FBitmapSaving);
+    if Assigned(FBitmapNiceScroll) then
+      FreeAndNil(FBitmapNiceScroll);
+    if Assigned(FBitmapFoldPlus) then
+      FreeAndNil(FBitmapFoldPlus);
+    if Assigned(FBitmapFoldMinus) then
+      FreeAndNil(FBitmapFoldMinus);
   end;
 
 end.

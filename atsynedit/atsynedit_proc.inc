@@ -1,10 +1,3 @@
-var
-  cBitmapWait: TPortableNetworkGraphic = nil;
-  cBitmapSaving: TPortableNetworkGraphic = nil;
-  cBitmapNiceScroll: TPortableNetworkGraphic = nil;
-  cBitmapFoldPlus: TPortableNetworkGraphic = nil;
-  cBitmapFoldMinus: TPortableNetworkGraphic = nil;
-
 const
   crNiceScrollNone  = TCursor(-40);
   crNiceScrollUp    = TCursor(-41);
@@ -136,55 +129,14 @@ begin
     (A.NPixelOffset=B.NPixelOffset);
 end;
 
-function EditorResourceScaleSuffix: string;
-var
-  N: integer;
-begin
-  N:= Screen.PixelsPerInch;
-  if N>=96*2 then
-    Result:= '_200'
-  else
-  if N>=(96 * 3 div 2) then
-    Result:= '_150'
-  else
-    Result:= '';
-end;
 
-procedure InitEditorResources;
-var
-  Suffix: string;
+procedure InitEditorCursors;
 begin
-  Suffix:= EditorResourceScaleSuffix;
-
   Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
   Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
   Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
   Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'ATSYN_MOVE_L');
   Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
-
-  cBitmapNiceScroll:= TPortableNetworkGraphic.Create;
-  cBitmapNiceScroll.LoadFromResourceName(HInstance, 'ATSYN_SCROLLMARK'+Suffix);
-
-  cBitmapWait:= TPortableNetworkGraphic.Create;
-  cBitmapWait.LoadFromResourceName(HInstance, 'ATSYN_WAIT');
-
-  cBitmapSaving:= TPortableNetworkGraphic.Create;
-  cBitmapSaving.LoadFromResourceName(HInstance, 'ATSYN_SAVE');
-
-  cBitmapFoldPlus:= TPortableNetworkGraphic.Create;
-  cBitmapFoldPlus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_P'+Suffix);
-
-  cBitmapFoldMinus:= TPortableNetworkGraphic.Create;
-  cBitmapFoldMinus.LoadFromResourceName(HInstance, 'ATSYN_FOLD_M'+Suffix);
-end;
-
-procedure FreeEditorResources;
-begin
-  FreeAndNil(cBitmapWait);
-  FreeAndNil(cBitmapSaving);
-  FreeAndNil(cBitmapNiceScroll);
-  FreeAndNil(cBitmapFoldPlus);
-  FreeAndNil(cBitmapFoldMinus);
 end;
 
 function EditorDoubleBufferedNeeded: boolean;
