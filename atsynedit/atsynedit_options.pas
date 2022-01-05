@@ -37,7 +37,7 @@ type
     FBitmapFoldMinus: TPortableNetworkGraphic;
   public
     ScaleSuffix: string;
-    CursorsLoaded: boolean;
+    InitedCursorsForNiceScroll: boolean;
 
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
@@ -210,7 +210,7 @@ initialization
   with ATEditorOptions do
   begin
     ScaleSuffix:= GetScaleSuffix;
-    CursorsLoaded:= false;
+    InitedCursorsForNiceScroll:= false;
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;

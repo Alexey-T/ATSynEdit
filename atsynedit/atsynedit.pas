@@ -4453,12 +4453,6 @@ begin
   if not Assigned(GlobalCharSizer) then
     GlobalCharSizer:= TATCharSizer.Create(AOwner);
 
-  if not ATEditorOptions.CursorsLoaded then
-  begin
-    ATEditorOptions.CursorsLoaded:= true;
-    InitEditorCursors;
-  end;
-
   Caption:= '';
   ControlStyle:= ControlStyle+[csOpaque, csDoubleClicks, csTripleClicks];
   DoubleBuffered:= EditorDoubleBufferedNeeded;
@@ -6908,6 +6902,8 @@ var
 begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
   if not PtInRect(FRectMain, Pnt) then Exit;
+
+  InitCursorsForNiceScroll;
 
   //delta in pixels
   Dx:= Pnt.X-FMouseNiceScrollPos.X;

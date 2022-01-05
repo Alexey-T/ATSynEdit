@@ -130,8 +130,10 @@ begin
 end;
 
 
-procedure InitEditorCursors;
+procedure InitCursorsForNiceScroll;
 begin
+  if ATEditorOptions.InitedCursorsForNiceScroll then exit;
+  ATEditorOptions.InitedCursorsForNiceScroll:= true;
   Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
   Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
   Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
