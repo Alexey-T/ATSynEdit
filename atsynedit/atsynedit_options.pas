@@ -215,7 +215,10 @@ end;
 
 function TATEditorOptions.Scale(AValue: integer): integer;
 begin
-  Result:= AValue * ScalePercents div 100;
+  if ScalePercents=100 then
+    Result:= AValue
+  else
+    Result:= AValue * ScalePercents div 100;
 end;
 
 function TATEditorOptions.ScaleFont(AValue: integer): integer;
@@ -235,7 +238,7 @@ initialization
     ScaleSuffix:= GetScaleSuffix;
     InitedCursorsForNiceScroll:= false;
     ScalePercents:= 100;
-    ScaleFontPercents:= 0; //if 0, it follows previous variable
+    ScaleFontPercents:= 100; //if 0, it follows previous variable
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
