@@ -119,6 +119,8 @@ type
 
   end;
 
+  { TATEditorBitmaps }
+
   TATEditorBitmaps = record
   private
     FBitmapWait: TPortableNetworkGraphic;
@@ -126,6 +128,7 @@ type
     FBitmapNiceScroll: TPortableNetworkGraphic;
     FBitmapFoldPlus: TPortableNetworkGraphic;
     FBitmapFoldMinus: TPortableNetworkGraphic;
+    function GetScaleSuffix: string;
   public
     ScaleSuffix: string;
     function BitmapWait: TPortableNetworkGraphic;
@@ -209,7 +212,7 @@ begin
   Result:= FBitmapFoldMinus;
 end;
 
-function GetScaleSuffix: string;
+function TATEditorBitmaps.GetScaleSuffix: string;
 var
   N: integer;
 begin
@@ -222,6 +225,8 @@ begin
   else
     Result:= '';
 end;
+
+{ globals }
 
 function ATEditorScale(AValue: integer): integer;
 begin
