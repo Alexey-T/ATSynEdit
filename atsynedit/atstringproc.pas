@@ -211,9 +211,6 @@ procedure SAddStringToHistory(const S: string; List: TStrings; MaxItems: integer
 
 procedure TrimStringList(L: TStringList); inline;
 
-const
-  cDefaultNonWordChars: UnicodeString = '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…';
-
 type
   TATDecodeRec = record SFrom, STo: UnicodeString; end;
 function SDecodeRecords(const S: UnicodeString; const Decode: array of TATDecodeRec): UnicodeString;

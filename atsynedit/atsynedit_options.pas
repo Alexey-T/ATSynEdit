@@ -69,6 +69,8 @@ type
     MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
+    DefaultNonWordChars: UnicodeString;
+
     TimerIntervalAutoScroll: integer;
     TimerIntervalNiceScroll: integer;
 
@@ -255,6 +257,8 @@ initialization
       {$else}
       false
       {$endif} ;
+
+    DefaultNonWordChars:= '-+*=/\()[]{}<>"''.,:;~?!@#$%^&|`…';
 
     TimerIntervalAutoScroll:= 100;
     TimerIntervalNiceScroll:= 100;

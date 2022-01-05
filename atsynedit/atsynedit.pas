@@ -4786,7 +4786,7 @@ begin
   FOptKeyUpDownKeepColumn:= true;
 
   FOptOverwriteAllowedOnPaste:= false;
-  FOptNonWordChars:= cDefaultNonWordChars;
+  FOptNonWordChars:= ATEditorOptions.DefaultNonWordChars;
   FOptAutoIndent:= true;
   FOptAutoIndentKind:= cIndentAsPrevLine;
   FOptAutoIndentBetterBracketsCurly:= true;
