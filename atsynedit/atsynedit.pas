@@ -422,8 +422,6 @@ const
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingY = 1;
   cInitCaretBlinkTime = 600;
-  cInitTimerAutoScroll = 100;
-  cInitTimerNiceScroll = 100;
   cInitMinimapVisible = false;
   cInitMinimapSelColorChange = 6; //how much minimap sel-rect is darker, in %
   cInitMinimapTooltipVisible = true;
@@ -7569,7 +7567,7 @@ begin
   begin
     FTimerScroll:= TTimer.Create(Self);
     FTimerScroll.Enabled:= false;
-    FTimerScroll.Interval:= cInitTimerAutoScroll;
+    FTimerScroll.Interval:= ATEditorOptions.TimerInternalAutoScroll;
     FTimerScroll.OnTimer:= @TimerScrollTick;
   end;
 end;
@@ -7580,7 +7578,7 @@ begin
   begin
     FTimerNiceScroll:= TTimer.Create(Self);
     FTimerNiceScroll.Enabled:= false;
-    FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
+    FTimerNiceScroll.Interval:= ATEditorOptions.TimerIntervalNiceScroll;
     FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
   end;
 end;
