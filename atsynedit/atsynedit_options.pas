@@ -38,6 +38,7 @@ type
   public
     ScaleSuffix: string;
     CursorsLoaded: boolean;
+
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
     UnprintedTabPointerScale: integer;
@@ -209,6 +210,8 @@ initialization
   with ATEditorOptions do
   begin
     ScaleSuffix:= GetScaleSuffix;
+    CursorsLoaded:= false;
+
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
     UnprintedTabPointerScale:= 22;
