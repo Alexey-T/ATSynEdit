@@ -38,8 +38,6 @@ type
   public
     ScaleSuffix: string;
     InitedCursorsForNiceScroll: boolean;
-    ScalePercents: integer;
-    ScaleFontPercents: integer; //if 0, it follows previous variable
 
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
@@ -125,9 +123,6 @@ type
     ClipboardColumnSignature: integer;
     function ClipboardColumnFormat: TClipboardFormat;
 
-    function Scale(AValue: integer): integer;
-    function ScaleFont(AValue: integer): integer;
-
     function BitmapWait: TPortableNetworkGraphic;
     function BitmapSaving: TPortableNetworkGraphic;
     function BitmapNiceScroll: TPortableNetworkGraphic;
@@ -137,6 +132,13 @@ type
 
 var
   ATEditorOptions: TATEditorOptions;
+
+var
+  ATEditorScalePercents: integer = 100;
+  ATEditorScaleFontPercents: integer = 100; //if 0, it follows previous variable
+
+function ATEditorScale(AValue: integer): integer;
+function ATEditorScaleFont(AValue: integer): integer;
 
 implementation
 
@@ -213,20 +215,20 @@ begin
     Result:= '';
 end;
 
-function TATEditorOptions.Scale(AValue: integer): integer;
+function ATEditorScale(AValue: integer): integer;
 begin
-  if ScalePercents=100 then
+  if ATEditorScalePercents=100 then
     Result:= AValue
   else
-    Result:= AValue * ScalePercents div 100;
+    Result:= AValue * ATEditorScalePercents div 100;
 end;
 
-function TATEditorOptions.ScaleFont(AValue: integer): integer;
+function ATEditorScaleFont(AValue: integer): integer;
 begin
-  if ScaleFontPercents=0 then
-    Result:= Scale(AValue)
+  if ATEditorScaleFontPercents=0 then
+    Result:= ATEditorScale(AValue)
   else
-    Result:= AValue * ScaleFontPercents div 100;
+    Result:= AValue * ATEditorScaleFontPercents div 100;
 end;
 
 
@@ -237,8 +239,6 @@ initialization
   begin
     ScaleSuffix:= GetScaleSuffix;
     InitedCursorsForNiceScroll:= false;
-    ScalePercents:= 100;
-    ScaleFontPercents:= 100; //if 0, it follows previous variable
 
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;

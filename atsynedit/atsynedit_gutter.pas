@@ -131,7 +131,7 @@ begin
       if Visible then
       begin
         if Scaled then
-          Inc(Right, ATEditorOptions.Scale(Size))
+          Inc(Right, ATEditorScale(Size))
         else
           Inc(Right, Size);
       end;

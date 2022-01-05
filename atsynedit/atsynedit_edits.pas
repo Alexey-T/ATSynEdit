@@ -188,7 +188,7 @@ begin
     Point(
       (ARect.Left+ARect.Right) div 2,
       (ARect.Top+ARect.Bottom) div 2),
-    ATEditorOptions.Scale(ATScrollbarTheme.ArrowSize));
+    ATEditorScale(ATScrollbarTheme.ArrowSize));
 end;
 
 procedure TATComboEdit.DoMenu;
