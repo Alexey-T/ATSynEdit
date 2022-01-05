@@ -1120,6 +1120,7 @@ type
     procedure InitFoldedMarkTooltip;
     procedure InitFoldImageList;
     procedure InitMenuStd;
+    procedure InitTimerNiceScroll;
     procedure StartTimerDelayedParsing;
     function IsWrapItemWithCaret(constref AWrapItem: TATWrapItem): boolean;
     procedure MenuClick(Sender: TObject);
@@ -4571,11 +4572,6 @@ begin
   FTimerScroll.Interval:= cInitTimerAutoScroll;
   FTimerScroll.OnTimer:= @TimerScrollTick;
 
-  FTimerNiceScroll:= TTimer.Create(Self);
-  FTimerNiceScroll.Enabled:= false;
-  FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
-  FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
-
   FTimerFlicker:= TTimer.Create(Self);
   FTimerFlicker.Enabled:= false;
   FTimerFlicker.OnTimer:= @TimerFlickerTick;
@@ -4957,7 +4953,8 @@ begin
   FreeAndNil(FFold);
   FreeAndNil(FTimerFlicker);
   FreeAndNil(FTimerDelayedParsing);
-  FreeAndNil(FTimerNiceScroll);
+  if Assigned(FTimerNiceScroll) then
+    FreeAndNil(FTimerNiceScroll);
   FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
@@ -7565,6 +7562,17 @@ begin
   end;
 end;
 
+procedure TATSynEdit.InitTimerNiceScroll;
+begin
+  if FTimerNiceScroll=nil then
+  begin
+    FTimerNiceScroll:= TTimer.Create(Self);
+    FTimerNiceScroll.Enabled:= false;
+    FTimerNiceScroll.Interval:= cInitTimerNiceScroll;
+    FTimerNiceScroll.OnTimer:= @TimerNiceScrollTick;
+  end;
+end;
+
 //drop selection of 1st caret into mouse-pos
 procedure TATSynEdit.DoDropText(AndDeleteSelection: boolean);
 var
@@ -7931,7 +7939,7 @@ end;
 
 function TATSynEdit.GetMouseNiceScroll: boolean;
 begin
-  Result:= FTimerNiceScroll.Enabled;
+  Result:= Assigned(FTimerNiceScroll) and FTimerNiceScroll.Enabled;
 end;
 
 procedure TATSynEdit.SetEnabledSlowEvents(AValue: boolean);
@@ -7965,7 +7973,10 @@ end;
 
 procedure TATSynEdit.SetMouseNiceScroll(AValue: boolean);
 begin
-  FTimerNiceScroll.Enabled:= AValue;
+  if AValue then
+    InitTimerNiceScroll;
+  if Assigned(FTimerNiceScroll) then
+    FTimerNiceScroll.Enabled:= AValue;
   if not AValue then
     UpdateCursor;
   Invalidate;
