@@ -7871,13 +7871,13 @@ begin
     Update;
 end;
 
-procedure TATSynEdit.BeginUpdate; inline;
+procedure TATSynEdit.BeginUpdate;
 begin
   Inc(FPaintLocked);
   Invalidate;
 end;
 
-procedure TATSynEdit.EndUpdate; inline;
+procedure TATSynEdit.EndUpdate;
 begin
   Dec(FPaintLocked);
   if FPaintLocked<0 then
@@ -7886,7 +7886,7 @@ begin
     Invalidate;
 end;
 
-function TATSynEdit.IsLocked: boolean; inline;
+function TATSynEdit.IsLocked: boolean;
 begin
   Result:= FPaintLocked>0;
 end;
