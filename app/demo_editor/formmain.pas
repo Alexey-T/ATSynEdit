@@ -11,15 +11,13 @@ uses
   ATStrings,
   ATStringProc,
   ATSynEdit,
+  ATSynEdit_Options,
   ATSynEdit_LineParts,
   ATSynEdit_Carets,
   ATSynEdit_Bookmarks,
   ATSynEdit_Gaps,
-  ATSynEdit_CanvasProc,
   ATSynEdit_Finder,
   ATSynEdit_Export_HTML,
-  //ATSynEdit_Hotspots,
-  //ATSynEdit_DimRanges,
   ATSynEdit_Gutter_Decor,
   ATScrollBar,
   formkey,
@@ -1110,8 +1108,9 @@ end;
 
 procedure TfmMain.TrackbarScaleChange(Sender: TObject);
 begin
-  EditorScalePercents:= TrackbarScale.Position;
-  ATScrollbarTheme.ScalePercents:= EditorScalePercents;
+  ATEditorScalePercents:= TrackbarScale.Position;
+  ATEditorScaleFontPercents:= TrackbarScale.Position;
+  ATScrollbarTheme.ScalePercents:= ATEditorScalePercents;
   Ed.Update(true);
 end;
 
