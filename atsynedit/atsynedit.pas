@@ -415,6 +415,7 @@ const
   cInitBorderWidthMacro = 3;
   cInitRulerNumeration = cRulerNumeration_0_10_20;
   cInitRulerHeightPercents = 120;
+  cInitRulerFontSizePercents = 80;
   cInitRulerMarkCaret = 1;
   cInitRulerMarkSmall = 3;
   cInitRulerMarkBig = 7;
@@ -1931,7 +1932,7 @@ type
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
     property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cInitRulerHeightPercents;
-    property OptRulerFontSizePercents: integer read FOptRulerFontSizePercents write FOptRulerFontSizePercents default 80;
+    property OptRulerFontSizePercents: integer read FOptRulerFontSizePercents write FOptRulerFontSizePercents default cInitRulerFontSizePercents;
     property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cInitRulerMarkCaret;
     property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cInitRulerMarkSmall;
     property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cInitRulerMarkBig;
@@ -4743,7 +4744,7 @@ begin
   FOptRulerMarkSizeSmall:= cInitRulerMarkSmall;
   FOptRulerMarkSizeBig:= cInitRulerMarkBig;
   FOptRulerMarkForAllCarets:= false;
-  FOptRulerFontSizePercents:= 80;
+  FOptRulerFontSizePercents:= cInitRulerFontSizePercents;
   FOptRulerTopIndentPercents:= 0;
 
   FMinimapWidth:= 150;
