@@ -1120,6 +1120,7 @@ type
     procedure InitFoldedMarkTooltip;
     procedure InitFoldImageList;
     procedure InitMenuStd;
+    procedure InitTimerScroll;
     procedure InitTimerNiceScroll;
     procedure StartTimerDelayedParsing;
     function IsWrapItemWithCaret(constref AWrapItem: TATWrapItem): boolean;
@@ -4567,11 +4568,6 @@ begin
   SetCaretBlinkTime(cInitCaretBlinkTime);
   FTimerBlink.OnTimer:= @TimerBlinkTick;
 
-  FTimerScroll:= TTimer.Create(Self);
-  FTimerScroll.Enabled:= false;
-  FTimerScroll.Interval:= cInitTimerAutoScroll;
-  FTimerScroll.OnTimer:= @TimerScrollTick;
-
   FTimerFlicker:= TTimer.Create(Self);
   FTimerFlicker.Enabled:= false;
   FTimerFlicker.OnTimer:= @TimerFlickerTick;
@@ -4955,7 +4951,8 @@ begin
   FreeAndNil(FTimerDelayedParsing);
   if Assigned(FTimerNiceScroll) then
     FreeAndNil(FTimerNiceScroll);
-  FreeAndNil(FTimerScroll);
+  if Assigned(FTimerScroll) then
+    FreeAndNil(FTimerScroll);
   FreeAndNil(FTimerBlink);
   FreeAndNil(FCarets);
   FreeAndNil(FCommandLog);
@@ -6168,7 +6165,8 @@ begin
   FMouseDragDropping:= false;
   FMouseDragDroppingReal:= false;
   FMouseDragMinimap:= false;
-  FTimerScroll.Enabled:= false;
+  if Assigned(FTimerScroll) then
+    FTimerScroll.Enabled:= false;
 end;
 
 procedure TATSynEdit.DoHandleRightClick(X, Y: integer);
@@ -6282,6 +6280,7 @@ var
   bSelecting, bSelectingGutterNumbers: boolean;
   bMovedMinimal: boolean;
   bUpdateForMinimap: boolean;
+  bStartTimerScroll: boolean;
   Details: TATEditorPosDetails;
   nIndex: integer;
   Caret: TATCaretItem;
@@ -6367,8 +6366,7 @@ begin
   else
     DoHintHide;
 
-  //start scroll timer
-  FTimerScroll.Enabled:=
+  bStartTimerScroll:=
     FOptMouseEnableAll and
     FOptMouseEnableNormalSelection and
     FOptMouseEnableColumnSelection and
@@ -6378,6 +6376,11 @@ begin
     (not bOnMinimap) and
     (not bOnMicromap) and
     (not bOnGutter);
+
+  if bStartTimerScroll then
+    InitTimerScroll;
+  if Assigned(FTimerScroll) then
+    FTimerScroll.Enabled:= bStartTimerScroll;
 
   FMouseAutoScroll:= cDirNone;
   if (P.Y<FRectMain.Top) and (not ModeOneLine) then
@@ -7559,6 +7562,17 @@ begin
     MenuitemTextDelete:= Add('Delete', cCommand_TextDeleteSelection);
     Add('-', 0);
     MenuitemTextSelAll:= Add('Select all', cCommand_SelectAll);
+  end;
+end;
+
+procedure TATSynEdit.InitTimerScroll;
+begin
+  if FTimerScroll=nil then
+  begin
+    FTimerScroll:= TTimer.Create(Self);
+    FTimerScroll.Enabled:= false;
+    FTimerScroll.Interval:= cInitTimerAutoScroll;
+    FTimerScroll.OnTimer:= @TimerScrollTick;
   end;
 end;
 
