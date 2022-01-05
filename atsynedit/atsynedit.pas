@@ -414,6 +414,10 @@ const
   cInitBorderWidthFocused = 1;
   cInitBorderWidthMacro = 3;
   cInitRulerNumeration = cRulerNumeration_0_10_20;
+  cInitRulerHeightPercents = 120;
+  cInitRulerMarkCaret = 1;
+  cInitRulerMarkSmall = 3;
+  cInitRulerMarkBig = 7;
   cInitWrapMode = cWrapOff;
   cInitWrapEnabledForMaxLines = 60*1000;
   cInitSpacingY = 1;
@@ -460,34 +464,6 @@ const
   cGutterSizeEmpty = 2;
 
 const
-  cFoldedLenOfEmptyHint = 50;
-  cFoldedMarkIndentInner = 2; //indent inside [...] folded-mark
-  cFoldedMarkIndentOuter = 2; //indent before [...] folded-mark
-  cSpeedScrollNice: integer = 3;
-  cSizeGutterFoldLineDx = 3;
-  cSizeRulerHeightPercents = 120;
-  cSizeRulerMarkSmall = 3;
-  cSizeRulerMarkBig = 7;
-  cSizeRulerMarkCaret = 1;
-  cSizeIndentTooltipX = 5;
-  cSizeIndentTooltipY = 1;
-  cMinFontSize = 6;
-  cMinTabSize = 1;
-  cMaxTabSize = 64;
-  cMinMinimapWidth = 30;
-  cMaxCharsForOutput = 1000; //don't paint more chars in line
-  cMinWrapColumn = 20; //too small width won't give smaller wrap-column
-  cMinWrapColumnAbs = 4; //absolute min of wrap-column (leave n chars on line anyway)
-  cMinMarginRt = 20;
-  cMinCaretTime = 300;
-  cMaxCaretTime = 2000;
-  cMinCharsAfterAnyIndent = 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
-  cMaxLinesForOldWrapUpdate = 100; //if less lines, force old wrapinfo update (fast)
-  cHintScrollDx = 5;
-  cHintBookmarkDx = 6;
-  cHintBookmarkDy = 16;
-  cUrlMarkerTag = -100;
-
   cUrlRegex_Email = '\b(mailto:)?\w[\w\-\+\.]*@\w[\w\-\.]*\.\w{2,}\b';
   cUrlRegex_WebBegin = 'https?://|ftp://|magnet:\?|www\.|ftp\.';
   cUrlRegex_WebSite = '\w[\w\-\.@]*(:\d+)?'; // @ for password; :\d+ is port
@@ -1954,11 +1930,11 @@ type
     property OptBorderMacroRecording: boolean read FOptBorderMacroRecording write FOptBorderMacroRecording default true;
     property OptRulerVisible: boolean read FOptRulerVisible write FOptRulerVisible default true;
     property OptRulerNumeration: TATEditorRulerNumeration read FOptRulerNumeration write FOptRulerNumeration default cInitRulerNumeration;
-    property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cSizeRulerHeightPercents;
+    property OptRulerHeightPercents: integer read FOptRulerHeightPercents write FOptRulerHeightPercents default cInitRulerHeightPercents;
     property OptRulerFontSizePercents: integer read FOptRulerFontSizePercents write FOptRulerFontSizePercents default 80;
-    property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cSizeRulerMarkCaret;
-    property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cSizeRulerMarkSmall;
-    property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cSizeRulerMarkBig;
+    property OptRulerMarkSizeCaret: integer read FOptRulerMarkSizeCaret write FOptRulerMarkSizeCaret default cInitRulerMarkCaret;
+    property OptRulerMarkSizeSmall: integer read FOptRulerMarkSizeSmall write FOptRulerMarkSizeSmall default cInitRulerMarkSmall;
+    property OptRulerMarkSizeBig: integer read FOptRulerMarkSizeBig write FOptRulerMarkSizeBig default cInitRulerMarkBig;
     property OptRulerMarkForAllCarets: boolean read FOptRulerMarkForAllCarets write FOptRulerMarkForAllCarets default false;
     property OptRulerTopIndentPercents: integer read FOptRulerTopIndentPercents write FOptRulerTopIndentPercents default 0;
     property OptMinimapCustomScale: integer read FMinimapCustomScale write FMinimapCustomScale default 0;
@@ -2252,7 +2228,7 @@ begin
   else
     FMinimapWidth:= CharSmall*FMinimapCharWidth;
 
-  FMinimapWidth:= Max(cMinMinimapWidth, FMinimapWidth);
+  FMinimapWidth:= Max(ATEditorOptions.MinMinimapWidth, FMinimapWidth);
 end;
 
 function TATSynEdit.DoFormatLineNumber(N: integer): string;
@@ -2320,7 +2296,7 @@ end;
 procedure TATSynEdit.SetMarginRight(AValue: integer);
 begin
   if AValue=FMarginRight then Exit;
-  FMarginRight:= Max(AValue, cMinMarginRt);
+  FMarginRight:= Max(AValue, ATEditorOptions.MinMarginRt);
   if FWrapMode in [cWrapAtMargin, cWrapAtWindowOrMargin] then
     FWrapUpdateNeeded:= true;
 end;
@@ -2368,7 +2344,7 @@ begin
 
   bConsiderFolding:= Fold.Count>0;
   NNewVisibleColumns:= GetVisibleColumns;
-  NIndentMaximal:= Max(2, NNewVisibleColumns-cMinCharsAfterAnyIndent); //don't do too big NIndent
+  NIndentMaximal:= Max(2, NNewVisibleColumns-ATEditorOptions.MinCharsAfterAnyIndent); //don't do too big NIndent
 
   if AForceUpdate then
     FWrapUpdateNeeded:= true
@@ -2386,16 +2362,16 @@ begin
     cWrapOff:
       FWrapInfo.WrapColumn:= 0;
     cWrapOn:
-      FWrapInfo.WrapColumn:= Max(cMinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
+      FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, NNewVisibleColumns-FWrapAddSpace);
     cWrapAtMargin:
-      FWrapInfo.WrapColumn:= Max(cMinWrapColumn, FMarginRight);
+      FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, FMarginRight);
     cWrapAtWindowOrMargin:
-      FWrapInfo.WrapColumn:= Max(cMinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
+      FWrapInfo.WrapColumn:= Max(ATEditorOptions.MinWrapColumn, Min(NNewVisibleColumns-FWrapAddSpace, FMarginRight));
   end;
 
   UseCachedUpdate:=
     (FWrapInfo.Count>0) and
-    (CurStrings.Count>cMaxLinesForOldWrapUpdate) and
+    (CurStrings.Count>ATEditorOptions.MaxLinesForOldWrapUpdate) and
     (not CurStrings.ListUpdatesHard) and
     (CurStrings.ListUpdates.Count>0);
   //UseCachedUpdate:= false;////to disable
@@ -2503,14 +2479,14 @@ begin
   end;
 
   //line not wrapped?
-  if (AWrapColumn<cMinWrapColumnAbs) then
+  if (AWrapColumn<ATEditorOptions.MinWrapColumnAbs) then
   begin
     WrapItem.Init(ALineIndex, 1, NLen, 0, cWrapItemFinal, true);
     AItems.Add(WrapItem);
     Exit;
   end;
 
-  NVisColumns:= Max(AVisibleColumns, cMinWrapColumnAbs);
+  NVisColumns:= Max(AVisibleColumns, ATEditorOptions.MinWrapColumnAbs);
   NPartOffset:= 1;
   NIndent:= 0;
   bInitialItem:= true;
@@ -2524,7 +2500,7 @@ begin
       //very slow to calc for entire line (eg len=70K),
       //calc for first NVisColumns chars
       StrPart,
-      Max(AWrapColumn-NIndent, cMinWrapColumnAbs),
+      Max(AWrapColumn-NIndent, ATEditorOptions.MinWrapColumnAbs),
       ANonWordChars,
       AWrapIndented);
 
@@ -2606,7 +2582,7 @@ end;
 procedure TATSynEdit.SetTabSize(AValue: integer);
 begin
   if FTabSize=AValue then Exit;
-  FTabSize:= Min(cMaxTabSize, Max(cMinTabSize, AValue));
+  FTabSize:= Min(ATEditorOptions.MaxTabSize, Max(ATEditorOptions.MinTabSize, AValue));
   FWrapUpdateNeeded:= true;
   FTabHelper.TabSize:= FTabSize;
 end;
@@ -3638,8 +3614,8 @@ begin
 
   Inc(CurrPointText.X, NOutputCellPercentsSkipped * ACharSize.XScaled div ATEditorCharXScale div 100);
 
-  if Length(StrOutput)>cMaxCharsForOutput then
-    SetLength(StrOutput, cMaxCharsForOutput);
+  if Length(StrOutput)>ATEditorOptions.MaxCharsForOutput then
+    SetLength(StrOutput, ATEditorOptions.MaxCharsForOutput);
 
   if FOptMaskCharUsed then
     StrOutput:= StringOfCharW(FOptMaskChar, Length(StrOutput));
@@ -3713,7 +3689,7 @@ begin
     DoCalcLineHilite(
       WrapItem,
       ATempParts{%H-},
-      NOutputCharsSkipped, cMaxCharsForOutput,
+      NOutputCharsSkipped, ATEditorOptions.MaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, true);
 
@@ -3986,7 +3962,7 @@ begin
     DoCalcLineHilite(
       WrapItem,
       ATempParts{%H-},
-      NOutputCharsSkipped, cMaxCharsForOutput,
+      NOutputCharsSkipped, ATEditorOptions.MaxCharsForOutput,
       NColorEntire, bLineColorForced,
       NColorAfter, false);
 
@@ -4394,7 +4370,7 @@ begin
     //expand tabs too
 
   if APosX>0 then
-    Inc(ACoordX, cFoldedMarkIndentOuter);
+    Inc(ACoordX, ATEditorOptions.FoldedMarkIndentOuter);
 
   //set colors:
   //if 1st chars selected, then use selection-color
@@ -4417,10 +4393,10 @@ begin
     C.Brush.Style:= bsClear;
 
   C.TextOut(
-    ACoordX+cFoldedMarkIndentInner,
+    ACoordX+ATEditorOptions.FoldedMarkIndentInner,
     ACoordY+FTextOffsetFromTop,
     Str);
-  NWidth:= C.TextWidth(Str) + 2*cFoldedMarkIndentInner;
+  NWidth:= C.TextWidth(Str) + 2*ATEditorOptions.FoldedMarkIndentInner;
 
   //paint frame
   RectMark:= Rect(ACoordX, ACoordY, ACoordX+NWidth, ACoordY+FCharSize.Y);
@@ -4762,10 +4738,10 @@ begin
 
   FOptRulerVisible:= true;
   FOptRulerNumeration:= cInitRulerNumeration;
-  FOptRulerHeightPercents:= cSizeRulerHeightPercents;
-  FOptRulerMarkSizeCaret:= cSizeRulerMarkCaret;
-  FOptRulerMarkSizeSmall:= cSizeRulerMarkSmall;
-  FOptRulerMarkSizeBig:= cSizeRulerMarkBig;
+  FOptRulerHeightPercents:= cInitRulerHeightPercents;
+  FOptRulerMarkSizeCaret:= cInitRulerMarkCaret;
+  FOptRulerMarkSizeSmall:= cInitRulerMarkSmall;
+  FOptRulerMarkSizeBig:= cInitRulerMarkBig;
   FOptRulerMarkForAllCarets:= false;
   FOptRulerFontSizePercents:= 80;
   FOptRulerTopIndentPercents:= 0;
@@ -5153,8 +5129,8 @@ end;
 
 procedure TATSynEdit.SetCaretBlinkTime(AValue: integer);
 begin
-  AValue:= Max(AValue, cMinCaretTime);
-  AValue:= Min(AValue, cMaxCaretTime);
+  AValue:= Max(AValue, ATEditorOptions.MinCaretTime);
+  AValue:= Min(AValue, ATEditorOptions.MaxCaretTime);
   FCaretBlinkTime:= AValue;
   FTimerBlink.Interval:= AValue;
 end;
@@ -5650,7 +5626,7 @@ begin
 
   P:= ClientToScreen(Point(ClientWidth-R.Width, 0));
   OffsetRect(R, P.X, P.Y);
-  OffsetRect(R, -cHintScrollDx, cHintScrollDx);
+  OffsetRect(R, -ATEditorOptions.HintScrollDx, ATEditorOptions.HintScrollDx);
 
   FHintWnd.ActivateHint(R, S);
   FHintWnd.Invalidate; //for Win
@@ -5678,7 +5654,7 @@ begin
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
   P:= Mouse.CursorPos;
-  OffsetRect(R, P.X+cHintBookmarkDx, P.Y+cHintBookmarkDy);
+  OffsetRect(R, P.X+ATEditorOptions.HintBookmarkDx, P.Y+ATEditorOptions.HintBookmarkDy);
 
   FHintWnd.ActivateHint(R, S);
   FHintWnd.Invalidate; //for Win
@@ -6963,8 +6939,8 @@ begin
   end;
 
   //delta in pixels
-  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) + 1) div cSpeedScrollNice;
-  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) + 1) div cSpeedScrollNice;
+  Dx:= Sign(Dx)*((Abs(Dx)-cBitmapNiceScroll.Height div 2) + 1) div ATEditorOptions.SpeedScrollNice;
+  Dy:= Sign(Dy)*((Abs(Dy)-cBitmapNiceScroll.Height div 2) + 1) div ATEditorOptions.SpeedScrollNice;
 
   if Dir in [cDirLeft, cDirRight] then
     DoScrollByDeltaInPixels(Dx, 0)
@@ -8174,7 +8150,7 @@ begin
           DrawDown;
         end;
 
-        Dec(ACoordY2, cSizeGutterFoldLineDx);
+        Dec(ACoordY2, ATEditorOptions.SizeGutterFoldLineDx);
         CanvasLineVert(C,
           CoordXCenter,
           ACoordY1,
@@ -8608,7 +8584,7 @@ begin
   if not OptShowURLs then
   begin
     if Assigned(FAttribs) then
-      FAttribs.DeleteWithTag(cUrlMarkerTag);
+      FAttribs.DeleteWithTag(ATEditorOptions.UrlMarkerTag);
     exit;
   end;
 
@@ -8617,7 +8593,7 @@ begin
   NLineEnd:= NLineStart+GetVisibleLines;
 
   InitAttribs;
-  FAttribs.DeleteWithTag(cUrlMarkerTag);
+  FAttribs.DeleteWithTag(ATEditorOptions.UrlMarkerTag);
 
   FLinkCache.DeleteDataOutOfRange(NLineStart, NLineEnd);
   NRegexRuns:= 0;
@@ -8672,7 +8648,7 @@ begin
       FAttribs.Add(
         MatchPos-1,
         iLine,
-        cUrlMarkerTag,
+        ATEditorOptions.UrlMarkerTag,
         MatchLen,
         0,
         AtrObj
@@ -8983,7 +8959,7 @@ begin
     DoCalcLineHilite(
       WrapItem,
       FParts{%H-},
-      0, cMaxCharsForOutput,
+      0, ATEditorOptions.MaxCharsForOutput,
       AColorBG,
       false,
       NColorAfter,
@@ -9002,8 +8978,8 @@ begin
     TextOutProps.LineIndex:= WrapItem.NLineIndex;
     TextOutProps.CharIndexInLine:= WrapItem.NCharIndex;
     CanvasTextOut(C,
-      cSizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled div ATEditorCharXScale,
-      cSizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
+      ATEditorOptions.SizeIndentTooltipX + WrapItem.NIndent*FCharSize.XScaled div ATEditorCharXScale,
+      ATEditorOptions.SizeIndentTooltipY + FCharSize.Y*(NLine-ALineFrom),
       SText,
       @FParts,
       NOutputStrWidth,

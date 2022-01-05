@@ -47,6 +47,31 @@ var
     MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
+
+    FoldedLenOfEmptyHint: integer;
+    FoldedMarkIndentInner: integer;
+    FoldedMarkIndentOuter: integer;
+    SpeedScrollNice: integer;
+    SizeGutterFoldLineDx: integer;
+    SizeIndentTooltipX: integer;
+    SizeIndentTooltipY: integer;
+    MinFontSize: integer;
+    MinTabSize: integer;
+    MaxTabSize: integer;
+    MinMinimapWidth: integer;
+    MaxCharsForOutput: integer;
+    MinWrapColumn: integer;
+    MinWrapColumnAbs: integer;
+    MinMarginRt: integer;
+    MinCaretTime: integer;
+    MaxCaretTime: integer;
+    MinCharsAfterAnyIndent: integer;
+    MaxLinesForOldWrapUpdate: integer;
+    HintScrollDx: integer;
+    HintBookmarkDx: integer;
+    HintBookmarkDy: integer;
+    UrlMarkerTag: integer;
+
     //UI strings
     TextHintScrollPrefix: string;
     TextMenuitemFoldAll: string;
@@ -111,6 +136,31 @@ initialization
       false
       {$endif} ;
 
+    FoldedLenOfEmptyHint:= 50;
+    FoldedMarkIndentInner:= 2; //indent inside [...] folded-mark
+    FoldedMarkIndentOuter:= 2; //indent before [...] folded-mark
+    SpeedScrollNice:= 3;
+    SizeGutterFoldLineDx:= 3;
+    SizeIndentTooltipX:= 5;
+    SizeIndentTooltipY:= 1;
+    MinFontSize:= 6;
+    MinTabSize:= 1;
+    MaxTabSize:= 64;
+    MinMinimapWidth:= 30;
+    MaxCharsForOutput:= 1000; //don't paint more chars in line
+    MinWrapColumn:= 20; //too small width won't give smaller wrap-column
+    MinWrapColumnAbs:= 4; //absolute min of wrap-column (leave n chars on line anyway)
+    MinMarginRt:= 20;
+    MinCaretTime:= 300;
+    MaxCaretTime:= 2000;
+    MinCharsAfterAnyIndent:= 20; //if indent is too big, leave 20 chrs in wrapped-parts anyway
+    MaxLinesForOldWrapUpdate:= 100; //if less lines, force old wrapinfo update (fast)
+    HintScrollDx:= 5;
+    HintBookmarkDx:= 6;
+    HintBookmarkDy:= 16;
+    UrlMarkerTag:= -100;
+
+    //UI strings
     TextHintScrollPrefix:= 'Line';
     TextMenuitemFoldAll:= 'Fold all';
     TextMenuitemUnfoldAll:= 'Unfold all';

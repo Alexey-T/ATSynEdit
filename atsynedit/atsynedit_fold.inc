@@ -134,7 +134,7 @@ begin
     begin
       Strings.LinesFoldFrom[Range^.Y, FEditorIndex]:= Range^.X;
       if Range^.Hint='' then
-        Range^.Hint:= Strings.LineSub(Range^.Y, Range^.X, cFoldedLenOfEmptyHint)+'...';
+        Range^.Hint:= Strings.LineSub(Range^.Y, Range^.X, ATEditorOptions.FoldedLenOfEmptyHint)+'...';
     end;
     cFoldFromEndOfLine:
     begin
@@ -346,7 +346,7 @@ begin
 
     mi.Caption:=
       ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(Rng^.Y+1)+': '+
-      UTF8Encode(Strings.LineSub(Rng^.Y, 1, cFoldedLenOfEmptyHint));
+      UTF8Encode(Strings.LineSub(Rng^.Y, 1, ATEditorOptions.FoldedLenOfEmptyHint));
 
     if Rng^.Folded then
       mi.ImageIndex:= 0
