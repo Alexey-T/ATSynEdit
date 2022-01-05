@@ -645,7 +645,7 @@ type
     FMouseDragMinimapDelta: integer;
     FMouseDragMinimapSelHeight: integer;
     FMouseDownAndColumnSelection: boolean;
-    FMouseAutoScroll: TATEditorDirection;
+    FMouseAutoScrollDirection: TATEditorDirection;
     FMouseActions: TATEditorMouseActionArray;
     FLockInput: boolean;
     FLastControlWidth: integer;
@@ -6380,15 +6380,15 @@ begin
   if Assigned(FTimerScroll) then
     FTimerScroll.Enabled:= bStartTimerScroll;
 
-  FMouseAutoScroll:= cDirNone;
+  FMouseAutoScrollDirection:= cDirNone;
   if (P.Y<FRectMain.Top) and (not ModeOneLine) then
-    FMouseAutoScroll:= cDirUp else
+    FMouseAutoScrollDirection:= cDirUp else
   if (P.Y>=FRectMain.Bottom) and (not ModeOneLine) then
-    FMouseAutoScroll:= cDirDown else
+    FMouseAutoScrollDirection:= cDirDown else
   if (P.X<FRectMain.Left) then
-    FMouseAutoScroll:= cDirLeft else
+    FMouseAutoScrollDirection:= cDirLeft else
   if (P.X>=FRectMain.Right) then
-    FMouseAutoScroll:= cDirRight;
+    FMouseAutoScrollDirection:= cDirRight;
 
   //mouse dragged on gutter numbers (only if drag started on gutter numbers)
   if bSelectingGutterNumbers then
@@ -6852,7 +6852,7 @@ begin
   PClient.X:= Min(FRectMain.Right, PClient.X);
   PClient.Y:= Min(FRectMain.Bottom, PClient.Y);
 
-  case FMouseAutoScroll of
+  case FMouseAutoScrollDirection of
     cDirUp:
       DoScrollByDelta(0, -ATEditorOptions.SpeedScrollAutoVert);
     cDirDown:
