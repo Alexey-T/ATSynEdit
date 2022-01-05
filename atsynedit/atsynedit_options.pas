@@ -30,13 +30,7 @@ type
   TATEditorOptions = record
   private
     FClipboardColumnFormat: TClipboardFormat;
-    FBitmapWait: TPortableNetworkGraphic;
-    FBitmapSaving: TPortableNetworkGraphic;
-    FBitmapNiceScroll: TPortableNetworkGraphic;
-    FBitmapFoldPlus: TPortableNetworkGraphic;
-    FBitmapFoldMinus: TPortableNetworkGraphic;
   public
-    ScaleSuffix: string;
     InitedCursorsForNiceScroll: boolean;
 
     ItalicFontLongerInPercents: integer;
@@ -123,6 +117,17 @@ type
     ClipboardColumnSignature: integer;
     function ClipboardColumnFormat: TClipboardFormat;
 
+  end;
+
+  TATEditorBitmaps = record
+  private
+    FBitmapWait: TPortableNetworkGraphic;
+    FBitmapSaving: TPortableNetworkGraphic;
+    FBitmapNiceScroll: TPortableNetworkGraphic;
+    FBitmapFoldPlus: TPortableNetworkGraphic;
+    FBitmapFoldMinus: TPortableNetworkGraphic;
+  public
+    ScaleSuffix: string;
     function BitmapWait: TPortableNetworkGraphic;
     function BitmapSaving: TPortableNetworkGraphic;
     function BitmapNiceScroll: TPortableNetworkGraphic;
@@ -132,6 +137,7 @@ type
 
 var
   ATEditorOptions: TATEditorOptions;
+  ATEditorBitmaps: TATEditorBitmaps;
 
 var
   ATEditorScalePercents: integer = 100;
@@ -151,7 +157,9 @@ begin
   Result:= FClipboardColumnFormat;
 end;
 
-function TATEditorOptions.BitmapWait: TPortableNetworkGraphic;
+{ TATEditorBitmaps }
+
+function TATEditorBitmaps.BitmapWait: TPortableNetworkGraphic;
 begin
   if FBitmapWait=nil then
   begin
@@ -161,7 +169,7 @@ begin
   Result:= FBitmapWait;
 end;
 
-function TATEditorOptions.BitmapSaving: TPortableNetworkGraphic;
+function TATEditorBitmaps.BitmapSaving: TPortableNetworkGraphic;
 begin
   if FBitmapSaving=nil then
   begin
@@ -171,7 +179,7 @@ begin
   Result:= FBitmapSaving;
 end;
 
-function TATEditorOptions.BitmapNiceScroll: TPortableNetworkGraphic;
+function TATEditorBitmaps.BitmapNiceScroll: TPortableNetworkGraphic;
 begin
   if FBitmapNiceScroll=nil then
   begin
@@ -181,7 +189,7 @@ begin
   Result:= FBitmapNiceScroll;
 end;
 
-function TATEditorOptions.BitmapFoldPlus: TPortableNetworkGraphic;
+function TATEditorBitmaps.BitmapFoldPlus: TPortableNetworkGraphic;
 begin
   if FBitmapFoldPlus=nil then
   begin
@@ -191,7 +199,7 @@ begin
   Result:= FBitmapFoldPlus;
 end;
 
-function TATEditorOptions.BitmapFoldMinus: TPortableNetworkGraphic;
+function TATEditorBitmaps.BitmapFoldMinus: TPortableNetworkGraphic;
 begin
   if FBitmapFoldMinus=nil then
   begin
@@ -237,7 +245,6 @@ initialization
   FillChar(ATEditorOptions, SizeOf(ATEditorOptions), 0);
   with ATEditorOptions do
   begin
-    ScaleSuffix:= GetScaleSuffix;
     InitedCursorsForNiceScroll:= false;
 
     ItalicFontLongerInPercents:= 40;
@@ -336,9 +343,15 @@ initialization
     ClipboardColumnSignature:= $1000;
   end;
 
+  FillChar(ATEditorBitmaps, SizeOf(ATEditorBitmaps), 0);
+  with ATEditorBitmaps do
+  begin
+    ScaleSuffix:= GetScaleSuffix;
+  end;
+
 finalization
 
-  with ATEditorOptions do
+  with ATEditorBitmaps do
   begin
     if Assigned(FBitmapWait) then
       FreeAndNil(FBitmapWait);

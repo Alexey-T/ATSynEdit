@@ -362,10 +362,10 @@ begin
   if FFoldImageList=nil then
   begin
     FFoldImageList:= TImageList.Create(Self);
-    FFoldImageList.Width:= ATEditorOptions.BitmapFoldPlus.Width;
-    FFoldImageList.Height:= ATEditorOptions.BitmapFoldPlus.Height;
-    FFoldImageList.Add(ATEditorOptions.BitmapFoldPlus, nil);
-    FFoldImageList.Add(ATEditorOptions.BitmapFoldMinus, nil);
+    FFoldImageList.Width:= ATEditorBitmaps.BitmapFoldPlus.Width;
+    FFoldImageList.Height:= ATEditorBitmaps.BitmapFoldPlus.Height;
+    FFoldImageList.Add(ATEditorBitmaps.BitmapFoldPlus, nil);
+    FFoldImageList.Add(ATEditorBitmaps.BitmapFoldMinus, nil);
   end;
 end;
 

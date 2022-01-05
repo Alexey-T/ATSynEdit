@@ -5414,9 +5414,9 @@ begin
   C.FillRect(Rect(0, 0, Width, Height));
 
   if Strings.ProgressKind<>cStringsProgressSaving then
-    Bmp:= ATEditorOptions.BitmapWait
+    Bmp:= ATEditorBitmaps.BitmapWait
   else
-    Bmp:= ATEditorOptions.BitmapSaving;
+    Bmp:= ATEditorBitmaps.BitmapSaving;
   C.Draw(cBitmapX, cBitmapY, Bmp);
 
   NValue:= Strings.ProgressValue;
@@ -6905,7 +6905,7 @@ begin
   Dx:= Pnt.X-FMouseNiceScrollPos.X;
   Dy:= Pnt.Y-FMouseNiceScrollPos.Y;
 
-  NBitmapSize:= ATEditorOptions.BitmapNiceScroll.Width;
+  NBitmapSize:= ATEditorBitmaps.BitmapNiceScroll.Width;
   if (Abs(Dx)<=NBitmapSize div 2) and
     (Abs(Dy)<=NBitmapSize div 2) then
     begin
@@ -7221,12 +7221,12 @@ procedure TATSynEdit.DoPaintNiceScroll(C: TCanvas);
 var
   NBitmapSize: integer;
 begin
-  NBitmapSize:= ATEditorOptions.BitmapNiceScroll.Width;
+  NBitmapSize:= ATEditorBitmaps.BitmapNiceScroll.Width;
   if MouseNiceScroll then
     C.Draw(
       FMouseNiceScrollPos.X - NBitmapSize div 2,
       FMouseNiceScrollPos.Y - NBitmapSize div 2,
-      ATEditorOptions.BitmapNiceScroll);
+      ATEditorBitmaps.BitmapNiceScroll);
 end;
 
 procedure TATSynEdit.DoPaintGutterNumber(C: TCanvas; ALineIndex, ACoordTop: integer; ABand: TATGutterItem);
