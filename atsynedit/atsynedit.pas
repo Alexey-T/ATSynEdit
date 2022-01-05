@@ -6122,6 +6122,7 @@ var
   Caret: TATCaretItem;
   PosDetails: TATEditorPosDetails;
   PosTextClicked: TPoint;
+  bMovedMinimal: boolean;
 begin
   if not OptMouseEnableAll then exit;
   inherited;
@@ -6130,7 +6131,9 @@ begin
     if FMouseDragCoord.X>=0 then
     begin
       FMouseDragCoord:= Point(-1, -1);
-      Invalidate;
+      bMovedMinimal:= IsPointsDiffByDelta(Point(X, Y), FMouseDownCoordOriginal, ATEditorOptions.MouseMoveSmallDelta);
+      if bMovedMinimal then
+        Invalidate;
     end;
 
   if PtInRect(FRectMinimap, Point(X, Y)) then
