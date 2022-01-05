@@ -47,6 +47,18 @@ var
     MaxLineLenForAccurateCharWidths: integer; //must be <= cMaxFixedArray
     TextoutNeedsOffsets: boolean;
     CaretTextOverInvertedRect: boolean;
+    //UI strings
+    TextHintScrollPrefix: string;
+    TextMenuitemFoldAll: string;
+    TextMenuitemUnfoldAll: string;
+    TextMenuitemFoldLevel: string;
+    TextMenuitemCut: string;
+    TextMenuitemCopy: string;
+    TextMenuitemPaste: string;
+    TextMenuitemDelete: string;
+    TextMenuitemSelectAll: string;
+    TextMenuitemUndo: string;
+    TextMenuitemRedo: string;
   end;
 
 implementation
@@ -99,6 +111,17 @@ initialization
       false
       {$endif} ;
 
+    TextHintScrollPrefix:= 'Line';
+    TextMenuitemFoldAll:= 'Fold all';
+    TextMenuitemUnfoldAll:= 'Unfold all';
+    TextMenuitemFoldLevel:= 'Fold level';
+    TextMenuitemCut:= 'Cut';
+    TextMenuitemCopy:= 'Copy';
+    TextMenuitemPaste:= 'Paste';
+    TextMenuitemDelete:= 'Delete';
+    TextMenuitemSelectAll:= 'Select all';
+    TextMenuitemUndo:= 'Undo';
+    TextMenuitemRedo:= 'Redo';
   end;
 
 end.

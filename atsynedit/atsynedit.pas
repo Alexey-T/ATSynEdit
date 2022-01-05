@@ -501,19 +501,6 @@ const
     + cUrlRegex_WebAnchor;
   cUrlRegexInitial = cUrlRegex_Email + '|' + cUrlRegex_Web;
 
-  cTextHintScrollPrefix: string = 'Line';
-
-  cStrMenuitemFoldAll: string = 'Fold all';
-  cStrMenuitemUnfoldAll: string = 'Unfold all';
-  cStrMenuitemFoldLevel: string = 'Fold level';
-  cStrMenuitemCut: string = 'Cut';
-  cStrMenuitemCopy: string = 'Copy';
-  cStrMenuitemPaste: string = 'Paste';
-  cStrMenuitemDelete: string = 'Delete';
-  cStrMenuitemSelectAll: string = 'Select all';
-  cStrMenuitemUndo: string = 'Undo';
-  cStrMenuitemRedo: string = 'Redo';
-
 var
   cRectEmpty: TRect = (Left: 0; Top: 0; Right: 0; Bottom: 0);
   ATClipboardColumnFormat: TClipboardFormat = 0; //must be inited
@@ -5658,7 +5645,7 @@ begin
   if FHintWnd=nil then
     FHintWnd:= THintWindow.Create(Self);
 
-  S:= cTextHintScrollPrefix+' '+IntToStr(LineTop+1);
+  S:= ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(LineTop+1);
   R:= FHintWnd.CalcHintRect(500, S, nil);
 
   P:= ClientToScreen(Point(ClientWidth-R.Width, 0));
@@ -7528,13 +7515,13 @@ procedure TATSynEdit.MenuStdPopup(Sender: TObject);
 var
   i: integer;
 begin
-  MenuitemTextCut.Caption:= cStrMenuitemCut;
-  MenuitemTextCopy.Caption:= cStrMenuitemCopy;
-  MenuitemTextPaste.Caption:= cStrMenuitemPaste;
-  MenuitemTextDelete.Caption:= cStrMenuitemDelete;
-  MenuitemTextSelAll.Caption:= cStrMenuitemSelectAll;
-  MenuitemTextUndo.Caption:= cStrMenuitemUndo;
-  MenuitemTextRedo.Caption:= cStrMenuitemRedo;
+  MenuitemTextCut.Caption:= ATEditorOptions.TextMenuitemCut;
+  MenuitemTextCopy.Caption:= ATEditorOptions.TextMenuitemCopy;
+  MenuitemTextPaste.Caption:= ATEditorOptions.TextMenuitemPaste;
+  MenuitemTextDelete.Caption:= ATEditorOptions.TextMenuitemDelete;
+  MenuitemTextSelAll.Caption:= ATEditorOptions.TextMenuitemSelectAll;
+  MenuitemTextUndo.Caption:= ATEditorOptions.TextMenuitemUndo;
+  MenuitemTextRedo.Caption:= ATEditorOptions.TextMenuitemRedo;
 
   for i:= 0 to FMenuStd.Items.Count-1 do
     with FMenuStd.Items[i] do

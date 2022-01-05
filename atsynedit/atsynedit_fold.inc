@@ -279,20 +279,20 @@ begin
 
   //items "fold all", "unfold all"
   mi:= TMenuItem.Create(Self);
-  mi.Caption:= cStrMenuitemFoldAll;
+  mi.Caption:= ATEditorOptions.TextMenuitemFoldAll;
   mi.OnClick:= @MenuFoldFoldAllClick;
   mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
 
   mi:= TMenuItem.Create(Self);
-  mi.Caption:= cStrMenuitemUnfoldAll;
+  mi.Caption:= ATEditorOptions.TextMenuitemUnfoldAll;
   mi.OnClick:= @MenuFoldUnfoldAllClick;
   mi.Enabled:= Fold.Count>0;
   Menu.Items.Add(mi);
 
   //submenu "fold level"
   miSub:= TMenuItem.Create(Self);
-  miSub.Caption:= cStrMenuitemFoldLevel;
+  miSub.Caption:= ATEditorOptions.TextMenuitemFoldLevel;
   miSub.Enabled:= Fold.Count>0;
   Menu.Items.Add(miSub);
 
@@ -345,7 +345,7 @@ begin
     mi.OnClick:= @MenuFoldPlusMinusClick;
 
     mi.Caption:=
-      cTextHintScrollPrefix+' '+Inttostr(Rng^.Y+1)+': '+
+      ATEditorOptions.TextHintScrollPrefix+' '+IntToStr(Rng^.Y+1)+': '+
       UTF8Encode(Strings.LineSub(Rng^.Y, 1, cFoldedLenOfEmptyHint));
 
     if Rng^.Folded then
