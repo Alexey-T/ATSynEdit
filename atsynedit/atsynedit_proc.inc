@@ -1,11 +1,4 @@
 const
-  crNiceScrollNone  = TCursor(-40);
-  crNiceScrollUp    = TCursor(-41);
-  crNiceScrollDown  = TCursor(-42);
-  crNiceScrollLeft  = TCursor(-43);
-  crNiceScrollRight = TCursor(-44);
-
-const
   //under Mac don't use Ctrl key, use Meta key as default (e.g. Meta+C, Meta+A)
   ssXControl = {$ifndef darwin} ssCtrl {$else} ssMeta {$endif};
 
@@ -129,17 +122,6 @@ begin
     (A.NPixelOffset=B.NPixelOffset);
 end;
 
-
-procedure InitCursorsForNiceScroll;
-begin
-  if ATEditorOptions.InitedCursorsForNiceScroll then exit;
-  ATEditorOptions.InitedCursorsForNiceScroll:= true;
-  Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
-  Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
-  Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
-  Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'ATSYN_MOVE_L');
-  Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
-end;
 
 function EditorDoubleBufferedNeeded: boolean;
 begin

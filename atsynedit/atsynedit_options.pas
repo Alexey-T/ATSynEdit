@@ -11,10 +11,8 @@ interface
 
 uses
   SysUtils,
-  LCLType,
-  Graphics,
-  Forms,
-  Clipbrd;
+  LCLType, LCLIntf,
+  Graphics, Controls, Forms, Clipbrd;
 
 type
   TATEditorUnptintedEolSymbol = (
@@ -119,6 +117,8 @@ type
 
   end;
 
+type
+
   { TATEditorBitmaps }
 
   TATEditorBitmaps = record
@@ -128,6 +128,7 @@ type
     FBitmapNiceScroll: TPortableNetworkGraphic;
     FBitmapFoldPlus: TPortableNetworkGraphic;
     FBitmapFoldMinus: TPortableNetworkGraphic;
+    FInitedCursorsForNiceScroll: boolean;
     function GetScaleSuffix: string;
   public
     ScaleSuffix: string;
@@ -136,6 +137,7 @@ type
     function BitmapNiceScroll: TPortableNetworkGraphic;
     function BitmapFoldPlus: TPortableNetworkGraphic;
     function BitmapFoldMinus: TPortableNetworkGraphic;
+    procedure InitCursorsForNiceScroll;
   end;
 
 var
@@ -148,6 +150,13 @@ var
 
 function ATEditorScale(AValue: integer): integer;
 function ATEditorScaleFont(AValue: integer): integer;
+
+const
+  crNiceScrollNone  = TCursor(-40);
+  crNiceScrollUp    = TCursor(-41);
+  crNiceScrollDown  = TCursor(-42);
+  crNiceScrollLeft  = TCursor(-43);
+  crNiceScrollRight = TCursor(-44);
 
 implementation
 
@@ -226,6 +235,19 @@ begin
     Result:= '';
 end;
 
+procedure TATEditorBitmaps.InitCursorsForNiceScroll;
+begin
+  if FInitedCursorsForNiceScroll then exit;
+  FInitedCursorsForNiceScroll:= true;
+
+  Screen.Cursors[crNiceScrollNone]:= LoadCursor(HInstance, 'ATSYN_MOVE');
+  Screen.Cursors[crNiceScrollUp]:= LoadCursor(HInstance, 'ATSYN_MOVE_U');
+  Screen.Cursors[crNiceScrollDown]:= LoadCursor(HInstance, 'ATSYN_MOVE_D');
+  Screen.Cursors[crNiceScrollLeft]:= LoadCursor(HInstance, 'ATSYN_MOVE_L');
+  Screen.Cursors[crNiceScrollRight]:= LoadCursor(HInstance, 'ATSYN_MOVE_R');
+end;
+
+
 { globals }
 
 function ATEditorScale(AValue: integer): integer;
@@ -250,8 +272,6 @@ initialization
   FillChar(ATEditorOptions, SizeOf(ATEditorOptions), 0);
   with ATEditorOptions do
   begin
-    InitedCursorsForNiceScroll:= false;
-
     ItalicFontLongerInPercents:= 40;
     UnprintedTabCharLength:= 1;
     UnprintedTabPointerScale:= 22;

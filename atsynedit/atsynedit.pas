@@ -6899,7 +6899,7 @@ begin
   Pnt:= ScreenToClient(Mouse.CursorPos);
   if not PtInRect(FRectMain, Pnt) then Exit;
 
-  InitCursorsForNiceScroll;
+  ATEditorBitmaps.InitCursorsForNiceScroll;
 
   //delta in pixels
   Dx:= Pnt.X-FMouseNiceScrollPos.X;
