@@ -6919,10 +6919,14 @@ begin
         Dir:= cDirRight;
 
   case Dir of
-    cDirLeft:  Cursor:= crNiceScrollLeft;
-    cDirRight: Cursor:= crNiceScrollRight;
-    cDirUp:    Cursor:= crNiceScrollUp;
-    cDirDown:  Cursor:= crNiceScrollDown;
+    cDirLeft:
+      Cursor:= crNiceScrollLeft;
+    cDirRight:
+      Cursor:= crNiceScrollRight;
+    cDirUp:
+      Cursor:= crNiceScrollUp;
+    cDirDown:
+      Cursor:= crNiceScrollDown;
   end;
 
   //delta in pixels
