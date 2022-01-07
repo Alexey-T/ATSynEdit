@@ -3902,7 +3902,7 @@ procedure TATSynEdit.DoPaintMinimapLine(
   //
 var
   St: TATStrings;
-  NLinesIndex, NCount: integer;
+  NLinesIndex, NMaxStringLen: integer;
   NOutputCharsSkipped: integer;
   WrapItem: TATWrapItem;
   NColorEntire, NColorAfter: TColor;
@@ -3972,9 +3972,9 @@ begin
         FillOneLine(NColorAfter, CurrPointText.X);
 
     //truncate text to not paint over screen
-    NCount:= ARectLine.Width div ACharSize.XScaled div ATEditorCharXScale + 2;
-    if Length(StrOutput)>NCount then
-      SetLength(StrOutput, NCount);
+    NMaxStringLen:= ARectLine.Width div ACharSize.XScaled div ATEditorCharXScale + 2;
+    if Length(StrOutput)>NMaxStringLen then
+      SetLength(StrOutput, NMaxStringLen);
 
     if StrOutput<>'' then
       CanvasTextOutMinimap(
