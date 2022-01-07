@@ -1154,12 +1154,13 @@ type
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
     procedure DoPaintLine(C: TCanvas; ARectLine: TRect;
       const ACharSize: TATEditorCharSize;
-      var AScrollHorz, AScrollVert: TATEditorScrollInfo;
+      var AScrollHorz: TATEditorScrollInfo;
       const AWrapIndex: integer;
-      var ATempParts: TATLineParts);
+      var ATempParts: TATLineParts;
+      ATopGapVisible: boolean);
     procedure DoPaintMinimapLine(ARectLine: TRect;
       const ACharSize: TATEditorCharSize;
-      var AScrollHorz, AScrollVert: TATEditorScrollInfo;
+      var AScrollHorz: TATEditorScrollInfo;
       const AWrapIndex: integer;
       var ATempParts: TATLineParts);
     procedure DoPaintGutterOfLine(C: TCanvas;
@@ -3420,7 +3421,7 @@ begin
         Inc(RectLine.Bottom, GapItem.Size);
     end;
 
-    DoPaintLine(C, RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex, FParts);
+    DoPaintLine(C, RectLine, ACharSize, AScrollHorz, NWrapIndex, FParts, (NWrapIndex=0) and AScrollVert.TopGapVisible);
     if AWithGutter then
       DoPaintGutterOfLine(C, RectLine, ACharSize, NWrapIndex);
 
@@ -3464,7 +3465,7 @@ begin
     if not FWrapInfo.IsIndexValid(NWrapIndex) then
       Break;
 
-    DoPaintMinimapLine(RectLine, ACharSize, AScrollHorz, AScrollVert, NWrapIndex, FPartsMinimap);
+    DoPaintMinimapLine(RectLine, ACharSize, AScrollHorz, NWrapIndex, FPartsMinimap);
 
     Inc(NWrapIndex);
   until false;
@@ -3474,9 +3475,10 @@ end;
 procedure TATSynEdit.DoPaintLine(C: TCanvas;
   ARectLine: TRect;
   const ACharSize: TATEditorCharSize;
-  var AScrollHorz, AScrollVert: TATEditorScrollInfo;
+  var AScrollHorz: TATEditorScrollInfo;
   const AWrapIndex: integer;
-  var ATempParts: TATLineParts);
+  var ATempParts: TATLineParts;
+  ATopGapVisible: boolean);
   //
   procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
   var
@@ -3522,7 +3524,7 @@ begin
   if not St.IsIndexValid(NLinesIndex) then Exit;
 
   //support Gap before the 1st line
-  if (AWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
+  if (AWrapIndex=0) and ATopGapVisible and (Gaps.SizeOfGapTop>0) then
   begin
     GapItem:= Gaps.Find(-1);
     if Assigned(GapItem) then
@@ -3878,7 +3880,7 @@ end;
 procedure TATSynEdit.DoPaintMinimapLine(
   ARectLine: TRect;
   const ACharSize: TATEditorCharSize;
-  var AScrollHorz, AScrollVert: TATEditorScrollInfo;
+  var AScrollHorz: TATEditorScrollInfo;
   const AWrapIndex: integer;
   var ATempParts: TATLineParts);
   //
