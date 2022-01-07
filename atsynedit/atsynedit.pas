@@ -6829,7 +6829,7 @@ end;
 procedure TATSynEdit.TimerBlinkTick(Sender: TObject);
 begin
   if not FCaretShowEnabled then exit;
-  if ATEditorOptions.IsApplicationDeactivated then exit;
+  if not Application.Active then exit;
 
   if FCaretStopUnfocused and not _IsFocused then
     if FCaretShown then

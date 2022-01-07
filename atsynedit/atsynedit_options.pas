@@ -30,7 +30,6 @@ type
     FClipboardColumnFormat: TClipboardFormat;
   public
     InitedCursorsForNiceScroll: boolean;
-    IsApplicationDeactivated: boolean; //app must set this flag to supress caret blinking in inactive app
 
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
