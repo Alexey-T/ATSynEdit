@@ -6976,7 +6976,6 @@ var
   CaretShape: TATCaretShape;
   NCaretColor: TColor;
   R: TRect;
-var
   NCharWidth: integer;
   i: integer;
 begin
