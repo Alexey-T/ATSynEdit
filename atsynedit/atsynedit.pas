@@ -9173,6 +9173,9 @@ begin
 end;
 
 procedure TATSynEdit.DoPaintTiming(C: TCanvas);
+const
+  cFontSize = 8;
+  cFontColor = clRed;
 var
   S: string;
 begin
@@ -9180,13 +9183,13 @@ begin
   if GetVisibleLines<10 then exit;
 
   C.Font.Name:= Font.Name;
-  C.Font.Color:= clRed;
-  C.Font.Size:= 8;
+  C.Font.Color:= cFontColor;
+  C.Font.Size:= cFontSize;
 
   S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
   if FMinimapVisible then
     S+= Format(', mmap %d ms', [FTickMinimap]);
-  CanvasTextOutSimplest(C, 1, Height-15, S);
+  CanvasTextOutSimplest(C, 1, Height - cFontSize * 18 div 10, S);
 end;
 
 
