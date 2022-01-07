@@ -29,8 +29,6 @@ type
   private
     FClipboardColumnFormat: TClipboardFormat;
   public
-    InitedCursorsForNiceScroll: boolean;
-
     ItalicFontLongerInPercents: integer;
     UnprintedTabCharLength: integer;
     UnprintedTabPointerScale: integer;
