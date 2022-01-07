@@ -1205,6 +1205,8 @@ type
     procedure DoPaintFoldedMark(C: TCanvas;
       APosX, APosY, ACoordX, ACoordY: integer;
       const AMarkText: string);
+    procedure DoPaintCaretShape(C: TCanvas; const ARect: TRect; ACaret: TATCaretItem;
+      ACaretShape: TATCaretShape; ACaretColor: TColor);
     procedure DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
     procedure TimerBlinkDisable;
     procedure TimerBlinkEnable;
@@ -6942,38 +6944,38 @@ begin
 end;
 
 
+procedure TATSynEdit.DoPaintCaretShape(C: TCanvas; const ARect: TRect;
+  ACaret: TATCaretItem; ACaretShape: TATCaretShape; ACaretColor: TColor);
+var
+  NCoordX, NCoordY: integer;
+begin
+  CanvasInvertRect(C, ARect, ACaretColor);
+
+  if ACaretShape.EmptyInside then
+    CanvasInvertRect(C, Rect(ARect.Left+1, ARect.Top+1, ARect.Right-1, ARect.Bottom-1), ACaretColor)
+  else
+  if ATEditorOptions.CaretTextOverInvertedRect then
+  begin
+    if (ACaret.CharStr<>'') and (ACaret.CharColor<>clNone) and not IsCharUnicodeSpace(ACaret.CharStr[1]) then
+    begin
+      C.Font.Color:= ACaret.CharColor;
+      C.Font.Style:= ACaret.CharStyles;
+      C.Brush.Style:= bsClear;
+      NCoordX:= ACaret.CoordX;
+      NCoordY:= ACaret.CoordY;
+      if OptSpacingY<0 then
+        Inc(NCoordY, OptSpacingY);
+      CanvasTextOutSimplest(C, NCoordX, NCoordY, ACaret.CharStr);
+    end;
+  end;
+end;
+
 procedure TATSynEdit.DoPaintCarets(C: TCanvas; AWithInvalidate: boolean);
 var
   Caret: TATCaretItem;
   CaretShape: TATCaretShape;
   NCaretColor: TColor;
   R: TRect;
-  //
-  procedure DoPaintCaretShape;
-  var
-    NCoordX, NCoordY: integer;
-  begin
-    CanvasInvertRect(C, R, NCaretColor);
-
-    if CaretShape.EmptyInside then
-      CanvasInvertRect(C, Rect(R.Left+1, R.Top+1, R.Right-1, R.Bottom-1), NCaretColor)
-    else
-    if ATEditorOptions.CaretTextOverInvertedRect then
-    begin
-      if (Caret.CharStr<>'') and (Caret.CharColor<>clNone) and not IsCharUnicodeSpace(Caret.CharStr[1]) then
-      begin
-        C.Font.Color:= Caret.CharColor;
-        C.Font.Style:= Caret.CharStyles;
-        C.Brush.Style:= bsClear;
-        NCoordX:= Caret.CoordX;
-        NCoordY:= Caret.CoordY;
-        if OptSpacingY<0 then
-          Inc(NCoordY, OptSpacingY);
-        CanvasTextOutSimplest(C, NCoordX, NCoordY, Caret.CharStr);
-      end;
-    end;
-  end;
-  //
 var
   NCharWidth: integer;
   i: integer;
@@ -7046,11 +7048,11 @@ begin
         end;
       end;
 
-      DoPaintCaretShape;
+      DoPaintCaretShape(C, R, Caret, CaretShape, NCaretColor);
     end
     else
     begin
-      DoPaintCaretShape;
+      DoPaintCaretShape(C, R, Caret, CaretShape, NCaretColor);
     end;
 
     Caret.OldRect:= R;
