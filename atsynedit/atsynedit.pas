@@ -1152,12 +1152,12 @@ type
     procedure DoPaintBorder(C: TCanvas; AColor: TColor; ABorderWidth: integer; AUseRectMain: boolean);
     procedure DoPaintAll(C: TCanvas; ALineFrom: integer);
     procedure DoPaintMain(C: TCanvas; ALineFrom: integer);
-    procedure DoPaintLine(C: TCanvas; ARectLine: TRect;
+    procedure DoPaintLine(C: TCanvas;
+      const ARectLine: TRect;
       const ACharSize: TATEditorCharSize;
       var AScrollHorz: TATEditorScrollInfo;
       const AWrapIndex: integer;
-      var ATempParts: TATLineParts;
-      ATopGapVisible: boolean);
+      var ATempParts: TATLineParts);
     procedure DoPaintMinimapLine(ARectLine: TRect;
       const ACharSize: TATEditorCharSize;
       var AScrollHorz: TATEditorScrollInfo;
@@ -3288,6 +3288,7 @@ var
   RectLine: TRect;
   GapItem: TATGapItem;
   GutterItem: TATGutterItem;
+  WrapItem: TATWrapItem;
   NWrapIndex, NWrapIndexDummy, NLineCount: integer;
 begin
   //wrap turned off can cause bad scrollpos, fix it
@@ -3405,6 +3406,8 @@ begin
       Break;
     end;
 
+    WrapItem:= FWrapInfo[NWrapIndex];
+
     //consider gap before 1st line
     if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
@@ -3414,19 +3417,45 @@ begin
     end;
 
     //conside gap for this line
-    if WrapInfo[NWrapIndex].NFinal=cWrapItemFinal then
+    if WrapItem.NFinal=cWrapItemFinal then
     begin
-      GapItem:= Gaps.Find(WrapInfo[NWrapIndex].NLineIndex);
+      GapItem:= Gaps.Find(WrapItem.NLineIndex);
       if Assigned(GapItem) then
         Inc(RectLine.Bottom, GapItem.Size);
     end;
 
-    DoPaintLine(C, RectLine, ACharSize, AScrollHorz, NWrapIndex, FParts, (NWrapIndex=0) and AScrollVert.TopGapVisible);
+    //support gap before the 1st line
+    if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
+    begin
+      GapItem:= Gaps.Find(-1);
+      if Assigned(GapItem) then
+      begin
+        DoPaintGap(C, Rect(RectLine.Left, RectLine.Top, RectLine.Right, RectLine.Top+GapItem.Size), GapItem);
+        Inc(RectLine.Top, GapItem.Size);
+      end;
+    end;
+
+    DoPaintLine(C, RectLine, ACharSize, AScrollHorz, NWrapIndex, FParts);
+
+    //paint gap after line
+    if (WrapItem.NFinal=cWrapItemFinal) then
+    begin
+      GapItem:= Gaps.Find(WrapItem.NLineIndex);
+      if Assigned(GapItem) then
+        DoPaintGap(C,
+          Rect(
+            RectLine.Left,
+            RectLine.Top+ACharSize.Y,
+            RectLine.Right,
+            RectLine.Top+ACharSize.Y+GapItem.Size),
+          GapItem);
+    end;
+
     if AWithGutter then
       DoPaintGutterOfLine(C, RectLine, ACharSize, NWrapIndex);
 
     //update LineBottom as index of last painted line
-    FLineBottom:= FWrapInfo[NWrapIndex].NLineIndex;
+    FLineBottom:= WrapItem.NLineIndex;
 
     Inc(NWrapIndex);
   until false;
@@ -3473,12 +3502,11 @@ end;
 
 
 procedure TATSynEdit.DoPaintLine(C: TCanvas;
-  ARectLine: TRect;
+  const ARectLine: TRect;
   const ACharSize: TATEditorCharSize;
   var AScrollHorz: TATEditorScrollInfo;
   const AWrapIndex: integer;
-  var ATempParts: TATLineParts;
-  ATopGapVisible: boolean);
+  var ATempParts: TATLineParts);
   //
   procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
   var
@@ -3501,7 +3529,6 @@ var
   NOutputCellPercentsSkipped: Int64;
   NCoordSep: Int64;
   WrapItem: TATWrapItem;
-  GapItem: TATGapItem;
   StringItem: PATStringItem;
   NColorEntire, NColorAfter: TColor;
   NDimValue: integer;
@@ -3522,17 +3549,6 @@ begin
   WrapItem:= FWrapInfo[AWrapIndex];
   NLinesIndex:= WrapItem.NLineIndex;
   if not St.IsIndexValid(NLinesIndex) then Exit;
-
-  //support Gap before the 1st line
-  if (AWrapIndex=0) and ATopGapVisible and (Gaps.SizeOfGapTop>0) then
-  begin
-    GapItem:= Gaps.Find(-1);
-    if Assigned(GapItem) then
-    begin
-      DoPaintGap(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
-      Inc(ARectLine.Top, GapItem.Size);
-    end;
-  end;
 
   if IsFoldLineNeededBeforeWrapitem(AWrapIndex) then
   begin
@@ -3860,20 +3876,6 @@ begin
       NCoordSep:= ARectLine.Top+ACharSize.Y-1;
     C.Pen.Color:= Colors.BlockSepLine;
     CanvasLineHorz(C, ARectLine.Left, NCoordSep, ARectLine.Right);
-  end;
-
-  //consider gap (not for minimap)
-  if (WrapItem.NFinal=cWrapItemFinal) then
-  begin
-    //end of painting line
-    Inc(ARectLine.Top, ACharSize.Y);
-
-    GapItem:= Gaps.Find(NLinesIndex);
-    if Assigned(GapItem) then
-    begin
-      DoPaintGap(C, Rect(ARectLine.Left, ARectLine.Top, ARectLine.Right, ARectLine.Top+GapItem.Size), GapItem);
-      Inc(ARectLine.Top, GapItem.Size);
-    end;
   end;
 end;
 
