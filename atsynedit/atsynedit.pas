@@ -3429,11 +3429,22 @@ begin
     //paint gap before 1st line
     if Assigned(GapItemFirst) then
     begin
-      DoPaintGap(C, Rect(RectLine.Left, RectLine.Top, RectLine.Right, RectLine.Top+GapItemFirst.Size), GapItemFirst);
+      DoPaintGap(C,
+        Rect(
+          RectLine.Left,
+          RectLine.Top,
+          RectLine.Right,
+          RectLine.Top+GapItemFirst.Size),
+        GapItemFirst);
       Inc(RectLine.Top, GapItemFirst.Size);
     end;
 
-    DoPaintLine(C, RectLine, ACharSize, AScrollHorz, NWrapIndex, FParts);
+    DoPaintLine(C,
+      RectLine,
+      ACharSize,
+      AScrollHorz,
+      NWrapIndex,
+      FParts);
 
     //paint gap after line
     if Assigned(GapItemNext) then
