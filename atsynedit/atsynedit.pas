@@ -9184,7 +9184,7 @@ begin
   C.Font.Size:= 8;
 
   S:= Format('#%03d, %d+%d ms', [FPaintCounter, FTickAll, FTickMinimap]);
-  CanvasTextOutSimplest(C, 5, 5, S);
+  CanvasTextOutSimplest(C, 1, Height-15, S);
 end;
 
 
