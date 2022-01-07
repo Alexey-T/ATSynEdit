@@ -9183,7 +9183,9 @@ begin
   C.Font.Color:= clRed;
   C.Font.Size:= 8;
 
-  S:= Format('#%03d, %d+%d ms', [FPaintCounter, FTickAll, FTickMinimap]);
+  S:= Format('#%03d, %d ms', [FPaintCounter, FTickAll]);
+  if FMinimapVisible then
+    S+= Format(', mmap %d ms', [FTickMinimap]);
   CanvasTextOutSimplest(C, 1, Height-15, S);
 end;
 
