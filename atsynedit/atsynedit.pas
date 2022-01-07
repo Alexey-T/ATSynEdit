@@ -3513,17 +3513,16 @@ procedure TATSynEdit.DoPaintLine(C: TCanvas;
   const AWrapIndex: integer;
   var ATempParts: TATLineParts);
   //
-  procedure FillOneLine(AFillColor: TColor; ARectLeft: integer);
-  var
-    R: TRect;
+  procedure FillOneLine(AFillColor: TColor);
   begin
     C.Brush.Style:= bsSolid;
     C.Brush.Color:= AFillColor;
-    R:= ARectLine;
-    //R.Left:= ARectLeft;
-    Inc(R.Top, FTextOffsetFromTop1);
-    Inc(R.Bottom, FTextOffsetFromTop1);
-    C.FillRect(R);
+    C.FillRect(
+      ARectLine.Left,
+      ARectLine.Top+FTextOffsetFromTop1,
+      ARectLine.Right,
+      ARectLine.Bottom+FTextOffsetFromTop1
+      );
   end;
   //
 var
@@ -3684,7 +3683,7 @@ begin
     if (NLinesIndex+1) mod FOptZebraStep = 0 then
       NColorEntire:= ColorBlend(NColorEntire, FColorFont, FOptZebraAlphaBlend);
 
-  FillOneLine(NColorEntire, ARectLine.Left);
+  FillOneLine(NColorEntire{, ARectLine.Left});
 
   //paint line
   if StrOutput<>'' then
@@ -3728,7 +3727,7 @@ begin
     //adapter may return ColorAfterEol, paint it
     if FOptShowFullHilite then
       if NColorAfter<>clNone then
-        FillOneLine(NColorAfter, CurrPointText.X);
+        FillOneLine(NColorAfter{, CurrPointText.X});
 
     Event:= FOnDrawLine;
 
@@ -3805,7 +3804,7 @@ begin
       //visible StrOutput is empty, but the line itself may be not empty (because of horz scroll)
       DoCalcPosColor(NLineLen, NLinesIndex, NColorAfter);
       if NColorAfter<>clNone then
-        FillOneLine(NColorAfter, ARectLine.Left);
+        FillOneLine(NColorAfter{, ARectLine.Left});
     end;
 
     DoPaintSelectedLineBG(C, ACharSize, ARectLine,
