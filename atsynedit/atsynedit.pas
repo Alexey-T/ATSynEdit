@@ -9176,11 +9176,12 @@ procedure TATSynEdit.DoPaintTiming(C: TCanvas);
 const
   cFontSize = 8;
   cFontColor = clRed;
+  cMinEditorLines = 15;
 var
   S: string;
 begin
   if ModeOneLine then exit;
-  if GetVisibleLines<10 then exit;
+  if GetVisibleLines<cMinEditorLines then exit;
 
   C.Font.Name:= Font.Name;
   C.Font.Color:= cFontColor;
