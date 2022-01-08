@@ -555,24 +555,34 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineBegin: TATCommandResults;
 var
-  Caret: TATCaretItem;
+  St: TATStrings;
   Str: atString;
+  Caret: TATCaretItem;
+  bChange: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   DoCaretsDeleteOnSameLines;
+  bChange:= false;
+  St:= Strings;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
     Caret:= FCarets[i];
-    Str:= Strings.Lines[Caret.PosY];
+    if not St.IsIndexValid(Caret.PosY) then Continue;
+    if Caret.PosX=0 then Continue;
+    Str:= St.Lines[Caret.PosY];
+    if Str='' then Continue;
     Delete(Str, 1, Caret.PosX);
-    Strings.Lines[Caret.PosY]:= Str;
+    St.Lines[Caret.PosY]:= Str;
     Caret.PosX:= 0;
+    bChange:= true;
   end;
 
-  Result:= [cResultText, cResultCaretLeft];
+  Result:= [cResultCaretLeft];
+  if bChange then
+    Include(Result, cResultText);
 end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineEnd: TATCommandResults;
