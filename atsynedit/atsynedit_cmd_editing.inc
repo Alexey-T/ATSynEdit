@@ -5,6 +5,9 @@ var
   N1, N2: integer;
   bBlockSel: boolean;
 begin
+  Result:= [];
+  if ModeReadOnly then Exit;
+
   //multiline selection?
   //instead of tabulation, do indent
   if FOptKeyTabIndents then
@@ -263,6 +266,8 @@ function TATSynEdit.DoCommand_TextDelete: TATCommandResults;
 var
   bColBlock: boolean;
 begin
+  Result:= [];
+  if ModeReadOnly then Exit;
   bColBlock:= not IsSelRectEmpty;
 
   if bColBlock then
@@ -753,9 +758,9 @@ end;
 function TATSynEdit.DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
 begin
   Result:= [];
+  if ModeReadOnly then exit;
   if Strings.Count=0 then exit;
   if Carets.Count=0 then exit;
-  if ModeReadOnly then exit;
 
   if IsSelRectEmpty then
     Result:= DoCommand_TextIndentUnindent_StreamBlock(ARight)
@@ -1190,6 +1195,9 @@ end;
 
 function TATSynEdit.DoCommand_ForceFinalEndOfLine: TATCommandResults;
 begin
+  Result:= [];
+  if ModeReadOnly then exit;
+
   if Strings.ActionEnsureFinalEol then
   begin
     Strings.ActionAddFakeLineIfNeeded;
@@ -1203,6 +1211,9 @@ function TATSynEdit.DoCommand_DeleteFinalEndOfLine: TATCommandResults;
 var
   N: integer;
 begin
+  Result:= [];
+  if ModeReadOnly then exit;
+
   N:= Strings.Count;
   if (N>0) and (Strings.LinesLen[N-1]=0) then
   begin
