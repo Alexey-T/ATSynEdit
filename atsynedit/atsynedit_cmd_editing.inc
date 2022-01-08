@@ -479,37 +479,41 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteLines: TATCommandResults;
 var
+  St: TATStrings;
   Caret: TATCaretItem;
   Shift, PosAfter: TPoint;
-  YFrom, YTo, i, j: integer;
+  NLineFrom, NLineTo: integer;
+  iCaret, iLine: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
+  St:= Strings;
 
-  Strings.BeginUndoGroup;
+  St.BeginUndoGroup;
   try
     DoCaretsDeleteOnSameLines;
 
-    for i:= Carets.Count-1 downto 0 do
+    for iCaret:= Carets.Count-1 downto 0 do
     begin
-      Caret:= Carets[i];
-      Caret.GetSelLines(YFrom, YTo, true);
+      Caret:= Carets[iCaret];
+      if not St.IsIndexValid(Caret.PosY) then Continue;
+      Caret.GetSelLines(NLineFrom, NLineTo, true);
 
       //Caret.PosX:= 0;
-      Caret.PosY:= YFrom;
+      Caret.PosY:= NLineFrom;
       Caret.EndX:= -1;
       Caret.EndY:= -1;
 
-      for j:= YTo downto YFrom do
+      for iLine:= NLineTo downto NLineFrom do
       begin
-        Strings.TextDeleteLine(0, j, Shift, PosAfter);
-        DoCaretsShift(i, 0, j, Shift.X, Shift.Y, PosAfter);
+        St.TextDeleteLine(0, iLine, Shift, PosAfter);
+        DoCaretsShift(iCaret, 0, iLine, Shift.X, Shift.Y, PosAfter);
       end;
     end;
 
     DoCaretsFixIncorrectPos(false);
   finally
-    Strings.EndUndoGroup;
+    St.EndUndoGroup;
   end;
 
   Result:= [cResultText, cResultCaretTop];
