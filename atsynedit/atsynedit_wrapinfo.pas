@@ -136,9 +136,10 @@ end;
 
 function TATWrapInfo.IsLineFolded(ALine: integer): boolean;
 begin
-  Result:= false;
-  if not StringsObj.IsIndexValid(ALine) then exit;
-  Result:= StringsObj.LinesHidden[ALine, EditorIndex];
+  if StringsObj.IsIndexValid(ALine) then
+    Result:= StringsObj.LinesHidden[ALine, EditorIndex]
+  else
+    Result:= false;
 end;
 
 constructor TATWrapInfo.Create;
