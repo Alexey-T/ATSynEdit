@@ -278,27 +278,6 @@ begin
     Result:= DoCommand_TextDeleteRight(1);
 end;
 
-(*
-type
-  { TATPosShift }
-
-  TATPosShift = record
-    CaretIndex: integer;
-    X, Y: integer;
-    Shift: TPoint;
-    PosAfter: TPoint;
-    class operator =(const a, b: TATPosShift): boolean;
-  end;
-
-  TATPosShifts = specialize TFPGList<TATPosShift>;
-
-{ TATPointsShift }
-
-class operator TATPosShift.= (const a, b: TATPosShift): boolean;
-begin
-  Result:= false;
-end;
-*)
 
 function TATSynEdit.DoCommand_TextDeleteSelection: TATCommandResults;
 var
