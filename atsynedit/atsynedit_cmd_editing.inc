@@ -577,26 +577,34 @@ end;
 
 function TATSynEdit.DoCommand_TextDeleteToLineEnd: TATCommandResults;
 var
-  Caret: TATCaretItem;
+  St: TATStrings;
   Str: atString;
+  Caret: TATCaretItem;
+  bChange: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   DoCaretsDeleteOnSameLines;
+  bChange:= false;
+  St:= Strings;
 
   for i:= FCarets.Count-1 downto 0 do
   begin
     Caret:= FCarets[i];
-    Str:= Strings.Lines[Caret.PosY];
-    if Caret.PosX<Length(Str) then
+    if not St.IsIndexValid(Caret.PosY) then Continue;
+    if Caret.PosX<St.LinesLen[Caret.PosY] then
     begin
-      Delete(Str, Caret.PosX+1, MaxInt);
-      Strings.Lines[Caret.PosY]:= Str;
+      Str:= St.Lines[Caret.PosY];
+      SetLength(Str, Caret.PosX);
+      St.Lines[Caret.PosY]:= Str;
+      bChange:= true;
     end;
   end;
 
-  Result:= [cResultText, cResultCaretAny];
+  Result:= [cResultCaretAny];
+  if bChange then
+    Include(Result, cResultText);
 end;
 
 function TATSynEdit.DoCommand_TextDeleteWord(ANext: boolean): TATCommandResults;
