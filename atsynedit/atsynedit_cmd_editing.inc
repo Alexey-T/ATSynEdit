@@ -1157,40 +1157,40 @@ begin
   if ModeReadOnly then Exit;
   St:= Strings;
 
- St.BeginUndoGroup;
- try
-  for i:= Carets.Count-1 downto 0 do
-  begin
-    Caret:= Carets[i];
-    Caret.GetRange(X1, Y1, X2, Y2, bSel);
-    if not bSel then
+  St.BeginUndoGroup;
+  try
+    for i:= Carets.Count-1 downto 0 do
     begin
-      SFindWordBounds(St.Lines[Caret.PosY], Caret.PosX, X1, X2, FOptNonWordChars);
-      if X1<0 then Continue;
-      Y1:= Caret.PosY;
-      Y2:= Caret.PosY;
-    end;
+      Caret:= Carets[i];
+      Caret.GetRange(X1, Y1, X2, Y2, bSel);
+      if not bSel then
+      begin
+        SFindWordBounds(St.Lines[Caret.PosY], Caret.PosX, X1, X2, FOptNonWordChars);
+        if X1<0 then Continue;
+        Y1:= Caret.PosY;
+        Y2:= Caret.PosY;
+      end;
 
-    Str1:= St.TextSubstring(X1, Y1, X2, Y2);
-    case AMode of
-      cCaseLower:
-        Str2:= UnicodeLowerCase(Str1);
-      cCaseUpper:
-        Str2:= UnicodeUpperCase(Str1);
-      cCaseTitle:
-        Str2:= SCaseTitle(Str1, FOptNonWordChars);
-      cCaseInvert:
-        Str2:= SCaseInvert(Str1);
-      cCaseSentence:
-        Str2:= SCaseSentence(Str1, FOptNonWordChars);
-    end;
-    if Str1=Str2 then Continue;
+      Str1:= St.TextSubstring(X1, Y1, X2, Y2);
+      case AMode of
+        cCaseLower:
+          Str2:= UnicodeLowerCase(Str1);
+        cCaseUpper:
+          Str2:= UnicodeUpperCase(Str1);
+        cCaseTitle:
+          Str2:= SCaseTitle(Str1, FOptNonWordChars);
+        cCaseInvert:
+          Str2:= SCaseInvert(Str1);
+        cCaseSentence:
+          Str2:= SCaseSentence(Str1, FOptNonWordChars);
+      end;
+      if Str1=Str2 then Continue;
 
-    St.TextReplaceRange(X1, Y1, X2, Y2, Str2, Shift, PosAfter, false);
+      St.TextReplaceRange(X1, Y1, X2, Y2, Str2, Shift, PosAfter, false);
+    end;
+  finally
+    St.EndUndoGroup;
   end;
- finally
-  St.EndUndoGroup;
- end;
 
   Result:= [cResultText, cResultCaretAny];
 end;
