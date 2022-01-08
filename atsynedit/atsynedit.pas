@@ -1354,7 +1354,8 @@ type
     function DoCommand_UndoRedo(AUndo: boolean): TATCommandResults;
     function DoCommand_TextIndentUnindent(ARight: boolean): TATCommandResults;
     function DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): TATCommandResults;
-    procedure DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: boolean; Caret: TATCaretItem);
+    procedure DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: boolean;
+      Caret: TATCaretItem; out ATextChanged: boolean);
     function DoCommand_TextIndentUnindent_ColumnBlock(ARight: boolean): TATCommandResults;
     function DoCommand_SelectWords: TATCommandResults;
     function DoCommand_SelectLines: TATCommandResults;

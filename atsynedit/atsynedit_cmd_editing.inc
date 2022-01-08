@@ -770,17 +770,28 @@ end;
 
 function TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock(ARight: boolean): TATCommandResults;
 var
+  bChangeAny, bChangeOne: boolean;
   i: integer;
 begin
   DoCaretsDeleteOnSameLines;
 
-  for i:= Carets.Count-1 downto 0 do
-    DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight, Carets[i]);
+  bChangeAny:= false;
+  bChangeOne:= false;
 
-  Result:= [cResultText, cResultCaretAny];
+  for i:= Carets.Count-1 downto 0 do
+  begin
+    DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight, Carets[i], bChangeOne);
+    if bChangeOne then
+      bChangeAny:= true;
+  end;
+
+  Result:= [cResultCaretAny];
+  if bChangeAny then
+    Include(Result, cResultText);
 end;
 
-procedure TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: boolean; Caret: TATCaretItem);
+procedure TATSynEdit.DoCommand_TextIndentUnindent_StreamBlock_OneCaret(ARight: boolean;
+  Caret: TATCaretItem; out ATextChanged: boolean);
 var
   St: TATStrings;
   Str: atString;
@@ -788,6 +799,7 @@ var
   NShift1, NShift2, NShiftChars, NIndentChars1, NIndentChars2: integer;
   NBlockBeginY, NBlockEndY: integer;
 begin
+  ATextChanged:= false;
   St:= Strings;
   Caret.PosY:= Min(Caret.PosY, St.Count-1);
   Caret.EndY:= Min(Caret.EndY, St.Count-1);
@@ -855,7 +867,10 @@ begin
       Str:= St.Lines[i];
       Str:= FTabHelper.IndentUnindent(i, Str, ARight);
       if St.Lines[i]<>Str then
+      begin
         St.Lines[i]:= Str;
+        ATextChanged:= true;
+      end;
     end;
   finally
     St.EndUndoGroup;
