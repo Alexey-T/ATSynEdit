@@ -198,6 +198,7 @@ var
   bNeedRepaint, bAllowRepaint: boolean;
   bUndoRedo: boolean;
   bAllowCaretScroll: boolean;
+  bCaretMoved: boolean;
   NLineChanged: integer;
   NProximityVert: integer;
 begin
@@ -205,6 +206,7 @@ begin
   bAllowRepaint:= true;
   bTextChanged:= cResultText in Res;
   bUndoRedo:= cResultUndoRedo in Res;
+  bCaretMoved:= false;
 
   //if one-line, try to make right edge of text near the edge of control, like Win inputs
   if ModeOneLine then
@@ -248,7 +250,8 @@ begin
   Carets.Sort;
 
 
-  if IsCommandResults_CaretMove(Res) then
+  bCaretMoved:= IsCommandResults_CaretMove(Res);
+  if bCaretMoved then
   begin
     if Carets.Count=1 then
       bAllowCaretScroll:= true
@@ -275,7 +278,6 @@ begin
 
     if not (cResultKeepColumnSel in Res) then
       FSelRect:= cRectEmpty;
-    DoEventCarets;
 
     //update pixel coords, so that CudaText python code
     //    for in in range(N):
@@ -331,6 +333,10 @@ begin
       NLineChanged:= -1;
     DoEventChange(NLineChanged);
   end;
+
+  //fire DoEventCarets after DoEventChange, so that 'highlight pair brackets' properly works
+  if bCaretMoved then
+    DoEventCarets;
 
   if cResultState in Res then
     DoEventState;
