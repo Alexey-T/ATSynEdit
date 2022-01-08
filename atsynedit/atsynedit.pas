@@ -3269,14 +3269,6 @@ begin
   end;
 end;
 
-{
-type
-  PATEditorPaintingItemProp = ^TATEditorPaintingItemProp;
-  TATEditorPaintingItemProp = record
-    LineRect: TRect;
-    WrapIndex: integer;
-  end;
-}
 
 procedure TATSynEdit.DoPaintText(C: TCanvas;
   const ARect: TRect;
@@ -3286,7 +3278,7 @@ procedure TATSynEdit.DoPaintText(C: TCanvas;
   ALineFrom: integer);
 var
   RectLine: TRect;
-  GapItemFirst, GapItemNext: TATGapItem;
+  GapItemTop, GapItemCur: TATGapItem;
   GutterItem: TATGutterItem;
   WrapItem: TATWrapItem;
   NWrapIndex, NWrapIndexDummy, NLineCount: integer;
@@ -3407,36 +3399,36 @@ begin
     end;
 
     WrapItem:= FWrapInfo[NWrapIndex];
-    GapItemFirst:= nil;
-    GapItemNext:= nil;
+    GapItemTop:= nil;
+    GapItemCur:= nil;
 
     //consider gap before 1st line
     if (NWrapIndex=0) and AScrollVert.TopGapVisible and (Gaps.SizeOfGapTop>0) then
     begin
-      GapItemFirst:= Gaps.Find(-1);
-      if Assigned(GapItemFirst) then
-        Inc(RectLine.Bottom, GapItemFirst.Size);
+      GapItemTop:= Gaps.Find(-1);
+      if Assigned(GapItemTop) then
+        Inc(RectLine.Bottom, GapItemTop.Size);
     end;
 
     //consider gap for this line
     if WrapItem.NFinal=cWrapItemFinal then
     begin
-      GapItemNext:= Gaps.Find(WrapItem.NLineIndex);
-      if Assigned(GapItemNext) then
-        Inc(RectLine.Bottom, GapItemNext.Size);
+      GapItemCur:= Gaps.Find(WrapItem.NLineIndex);
+      if Assigned(GapItemCur) then
+        Inc(RectLine.Bottom, GapItemCur.Size);
     end;
 
     //paint gap before 1st line
-    if Assigned(GapItemFirst) then
+    if Assigned(GapItemTop) then
     begin
       DoPaintGap(C,
         Rect(
           RectLine.Left,
           RectLine.Top,
           RectLine.Right,
-          RectLine.Top+GapItemFirst.Size),
-        GapItemFirst);
-      Inc(RectLine.Top, GapItemFirst.Size);
+          RectLine.Top+GapItemTop.Size),
+        GapItemTop);
+      Inc(RectLine.Top, GapItemTop.Size);
     end;
 
     DoPaintLine(C,
@@ -3447,14 +3439,14 @@ begin
       FParts);
 
     //paint gap after line
-    if Assigned(GapItemNext) then
+    if Assigned(GapItemCur) then
       DoPaintGap(C,
         Rect(
           RectLine.Left,
           RectLine.Top+ACharSize.Y,
           RectLine.Right,
-          RectLine.Top+ACharSize.Y+GapItemNext.Size),
-        GapItemNext);
+          RectLine.Top+ACharSize.Y+GapItemCur.Size),
+        GapItemCur);
 
     if AWithGutter then
       DoPaintGutterOfLine(C, RectLine, ACharSize, NWrapIndex);
