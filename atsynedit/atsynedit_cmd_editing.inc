@@ -1194,13 +1194,15 @@ begin
 end;
 
 function TATSynEdit.DoCommand_ForceFinalEndOfLine: TATCommandResults;
+var
+  St: TATStrings;
 begin
-  Result:= [];
-  if ModeReadOnly then exit;
+  if ModeReadOnly then exit([]);
 
-  if Strings.ActionEnsureFinalEol then
+  St:= Strings;
+  if St.ActionEnsureFinalEol then
   begin
-    Strings.ActionAddFakeLineIfNeeded;
+    St.ActionAddFakeLineIfNeeded;
     Result:= [cResultText];
   end
   else
@@ -1209,15 +1211,16 @@ end;
 
 function TATSynEdit.DoCommand_DeleteFinalEndOfLine: TATCommandResults;
 var
+  St: TATStrings;
   N: integer;
 begin
-  Result:= [];
-  if ModeReadOnly then exit;
+  if ModeReadOnly then exit([]);
 
-  N:= Strings.Count;
-  if (N>0) and (Strings.LinesLen[N-1]=0) then
+  St:= Strings;
+  N:= St.Count;
+  if (N>0) and (St.LinesLen[N-1]=0) then
   begin
-    Strings.ActionDeleteFakeLineAndFinalEol;
+    St.ActionDeleteFakeLineAndFinalEol;
     Result:= [cResultText];
   end
   else
