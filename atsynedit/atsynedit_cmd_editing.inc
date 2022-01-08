@@ -1163,6 +1163,7 @@ begin
     for i:= Carets.Count-1 downto 0 do
     begin
       Caret:= Carets[i];
+      if not St.IsIndexValid(Caret.PosY) then Continue;
       Caret.GetRange(X1, Y1, X2, Y2, bSel);
       if not bSel then
       begin
