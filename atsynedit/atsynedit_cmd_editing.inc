@@ -1150,12 +1150,13 @@ var
   Str1, Str2: atString;
   X1, Y1, X2, Y2: integer;
   Shift, PosAfter: TPoint;
-  bSel: boolean;
+  bSel, bChange: boolean;
   i: integer;
 begin
   Result:= [];
   if ModeReadOnly then Exit;
   St:= Strings;
+  bChange:= false;
 
   St.BeginUndoGroup;
   try
@@ -1184,15 +1185,20 @@ begin
         cCaseSentence:
           Str2:= SCaseSentence(Str1, FOptNonWordChars);
       end;
-      if Str1=Str2 then Continue;
 
-      St.TextReplaceRange(X1, Y1, X2, Y2, Str2, Shift, PosAfter, false);
+      if Str1<>Str2 then
+      begin
+        St.TextReplaceRange(X1, Y1, X2, Y2, Str2, Shift, PosAfter, false);
+        bChange:= true;
+      end;
     end;
   finally
     St.EndUndoGroup;
   end;
 
-  Result:= [cResultText, cResultCaretAny];
+  Result:= [cResultCaretAny];
+  if bChange then
+    Include(Result, cResultText);
 end;
 
 
